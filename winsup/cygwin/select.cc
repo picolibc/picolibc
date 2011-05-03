@@ -133,11 +133,21 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   /* Degenerate case.  No fds to wait for.  Just wait. */
   if (sel.start.next == NULL)
     {
-      if (WaitForSingleObject (signal_arrived, ms) == WAIT_OBJECT_0)
+      HANDLE w4[2] = { signal_arrived, pthread::get_cancel_event () };
+      DWORD cnt = w4[1] ? 2 : 1;
+
+      switch (WaitForMultipleObjects (cnt, w4, FALSE, ms))
 	{
+	case WAIT_OBJECT_0:
 	  select_printf ("signal received");
 	  set_sig_errno (EINTR);
 	  return -1;
+	case WAIT_OBJECT_0 + 1:
+	  sel.destroy ();
+	  pthread::static_cancel_self ();
+	  /*NOTREACHED*/
+	default:
+	  break;
 	}
       timeout = 1;
     }
@@ -193,9 +203,9 @@ select_stuff::cleanup ()
 }
 
 /* Destroy all storage associated with select stuff. */
-select_stuff::~select_stuff ()
+inline void
+select_stuff::destroy ()
 {
-  cleanup ();
   select_record *s = &start;
   select_record *snext = start.next;
 
@@ -205,6 +215,12 @@ select_stuff::~select_stuff ()
       snext = s->next;
       delete s;
     }
+}
+
+select_stuff::~select_stuff ()
+{
+  cleanup ();
+  destroy ();
 }
 
 /* Add a record to the select chain */
@@ -254,8 +270,15 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   select_record *s = &start;
   int m = 0;
   int res = 0;
+  bool is_cancelable = false;
 
   w4[m++] = signal_arrived;  /* Always wait for the arrival of a signal. */
+  if ((w4[m] = pthread::get_cancel_event ()) != NULL)
+    {
+      ++m;
+      is_cancelable = true;
+    }
+
   /* Loop through the select chain, starting up anything appropriate and
      counting the number of active fds. */
   while ((s = s->next))
@@ -292,10 +315,9 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	   the problem that the call to PeekMessage disarms the queue state
 	   so that a subsequent MWFMO hangs, even if there are still messages
 	   in the queue. */
-	wait_ret =
-	  MsgWaitForMultipleObjectsEx (m, w4, ms,
-				       QS_ALLINPUT | QS_ALLPOSTMESSAGE,
-				       MWMO_INPUTAVAILABLE);
+	wait_ret = MsgWaitForMultipleObjectsEx (m, w4, ms,
+						QS_ALLINPUT | QS_ALLPOSTMESSAGE,
+						MWMO_INPUTAVAILABLE);
 
       switch (wait_ret)
       {
@@ -304,6 +326,14 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  select_printf ("signal received");
 	  set_sig_errno (EINTR);
 	  return -1;
+	case WAIT_OBJECT_0 + 1:
+	  if (is_cancelable)
+	    {
+	      cleanup ();
+	      destroy ();
+	      pthread::static_cancel_self ();
+	    }
+	  break;
 	case WAIT_FAILED:
 	  cleanup ();
 	  system_printf ("WaitForMultipleObjects failed");

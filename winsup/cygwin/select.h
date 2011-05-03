@@ -83,6 +83,7 @@ public:
   int poll (fd_set *readfds, fd_set *writefds, fd_set *exceptfds);
   int wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds, DWORD ms);
   void cleanup ();
+  void destroy ();
   select_stuff (): always_ready (0), windows_used (0), start (0),
 		   device_specific_pipe (0),
 		   device_specific_socket (0),
