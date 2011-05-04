@@ -1,3 +1,8 @@
+2011-05-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* new-features.sgml (ov-new1.7.10): Document psiginfo, psignal,
+	and sys_siglist.
+
 2011-05-02  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* new-features.sgml (ov-new1.7.10): Document new pthread APIs.
