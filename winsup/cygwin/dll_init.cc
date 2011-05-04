@@ -37,6 +37,11 @@ static bool dll_global_dtors_recorded;
 void
 dll_global_dtors ()
 {
+  /* Don't attempt to call destructors if we're still in fork processing
+     since that likely means fork is failing and everything will not have been
+     set up.  */
+  if (in_forkee)
+    return;
   int recorded = dll_global_dtors_recorded;
   dll_global_dtors_recorded = false;
   if (recorded && dlls.start.next)
