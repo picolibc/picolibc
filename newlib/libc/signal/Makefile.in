@@ -55,12 +55,13 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am__objects_1 = lib_a-raise.$(OBJEXT) lib_a-signal.$(OBJEXT)
+am__objects_1 = lib_a-psignal.$(OBJEXT) lib_a-raise.$(OBJEXT) \
+	lib_a-signal.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libsignal_la_LIBADD =
-am__objects_2 = raise.lo signal.lo
+am__objects_2 = psignal.lo raise.lo signal.lo
 @USE_LIBTOOL_TRUE@am_libsignal_la_OBJECTS = $(am__objects_2)
 libsignal_la_OBJECTS = $(am_libsignal_la_OBJECTS)
 libsignal_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -228,7 +229,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-LIB_SOURCES = raise.c signal.c
+LIB_SOURCES = psignal.c raise.c signal.c
 libsignal_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libsignal.la
 @USE_LIBTOOL_TRUE@libsignal_la_SOURCES = $(LIB_SOURCES)
@@ -237,7 +238,7 @@ libsignal_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-CHEWOUT_FILES = raise.def signal.def
+CHEWOUT_FILES = psignal.def raise.def signal.def
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
 TARGETDOC = ../tmp.texi
@@ -309,6 +310,12 @@ distclean-compile:
 
 .c.lo:
 	$(LTCOMPILE) -c -o $@ $<
+
+lib_a-psignal.o: psignal.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-psignal.o `test -f 'psignal.c' || echo '$(srcdir)/'`psignal.c
+
+lib_a-psignal.obj: psignal.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-psignal.obj `if test -f 'psignal.c'; then $(CYGPATH_W) 'psignal.c'; else $(CYGPATH_W) '$(srcdir)/psignal.c'; fi`
 
 lib_a-raise.o: raise.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-raise.o `test -f 'raise.c' || echo '$(srcdir)/'`raise.c

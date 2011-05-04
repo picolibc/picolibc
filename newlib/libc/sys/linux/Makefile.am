@@ -72,7 +72,6 @@ GENERAL_SOURCES = \
 	process.c \
 	prof-freq.c \
 	profile.c \
-	psignal.c \
 	pwrite.c \
 	raise.c \
 	realloc.c \

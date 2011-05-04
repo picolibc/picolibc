@@ -1,3 +1,15 @@
+2011-05-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/signal.h (psignal): Declare.
+	* libc/sys/linux/psignal.c: Move from here...
+	* libc/signal/psignal.c: ... to here. Document.
+	* libc/sys/linux/Makefile.am (GENERAL_SOURCES): Move psignal.c from here...
+	* libc/signal/Makefile.am (LIB_SOURCES): ... to here.
+	(CHEWOUT_FILES): Add psignal.def.
+	* libc/sys/linux/Makefile.in: Regenerate.
+	* libc/signal/Makefile.in: Ditto.
+	* libc/signal/signal.tex: Add references to psignal.
+
 2011-05-04  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/locale/lmessages.h (__messages_load_locale): Declare.  Remove

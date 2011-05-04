@@ -37,7 +37,6 @@ typedef _sig_func_ptr __sighandler_t;
 #include <_ansi.h>
 
 int 	_EXFUN(kill, (int, int));
-_VOID 	_EXFUN(psignal, (int, const char *));
 int 	_EXFUN(sigaction, (int, const struct sigaction *, struct sigaction *));
 int 	_EXFUN(sigaddset, (sigset_t *, const int));
 int 	_EXFUN(sigdelset, (sigset_t *, const int));
