@@ -1,5 +1,14 @@
 2011-05-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_dev_tape::_lock): Add bool parameter.
+	* fhandler_tape.cc (lock): Call _lock with false argument.
+	(_lock): Take bool cancelable parameter.  Handle O_NONBLOCK. 
+	Make cancelable if cancelabe parameter is true.
+	(fhandler_dev_tape::raw_read): Call _lock with true argument.
+	(fhandler_dev_tape::raw_write): Ditto.
+
+2011-05-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_dsp.cc (fhandler_dev_dsp::Audio): Add fh member.
 	(fhandler_dev_dsp::Audio_out::Audio_out): Take pointer to encapsulating
 	fhandler_dev_dsp as parameter.

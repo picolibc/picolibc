@@ -751,7 +751,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
   unsigned int driveno () { return (unsigned int) get_minor () & 0x7f; }
   void drive_init ();
 
-  inline bool _lock ();
+  inline bool _lock (bool);
   inline int unlock (int ret = 0);
 
  public:
