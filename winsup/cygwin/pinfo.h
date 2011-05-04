@@ -142,7 +142,7 @@ public:
   bool waiter_ready;
   class cygthread *wait_thread;
   void init (pid_t, DWORD, HANDLE) __attribute__ ((regparm(3)));
-  pinfo () {}
+  pinfo (): procinfo (NULL) {}
   pinfo (_pinfo *x): procinfo (x), hProcess (NULL) {}
   pinfo (pid_t n) : rd_proc_pipe (NULL), hProcess (NULL) {init (n, 0, NULL);}
   pinfo (pid_t n, DWORD flag) : rd_proc_pipe (NULL), hProcess (NULL), waiter_ready (0), wait_thread (NULL) {init (n, flag, NULL);}
