@@ -1,5 +1,12 @@
 2011-05-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* thread.h (pthread::static_cancel_self): Mark as noreturn.
+	(pthread::cancel_self): Ditto.
+	* thread.cc (pthread::cancel_self): Explicitly use pthread::exit to
+	avoid a "function returns" error.
+
+2011-05-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* pinfo.cc (pinfo::pinfo): Set procinfo to NULL to avoid potential
 	cleanup of uninitialized garbage.  (Suggested by Ryan Johnson)
 

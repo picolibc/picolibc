@@ -401,7 +401,7 @@ public:
 
   virtual void testcancel ();
   static HANDLE get_cancel_event ();
-  static void static_cancel_self ();
+  static void static_cancel_self () __attribute__ ((noreturn));
 
   virtual int setcancelstate (int state, int *oldstate);
   virtual int setcanceltype (int type, int *oldtype);
@@ -454,7 +454,7 @@ private:
   void postcreate ();
   bool create_cancel_event ();
   static void set_tls_self_pointer (pthread *);
-  void cancel_self ();
+  void cancel_self () __attribute__ ((noreturn));
   DWORD get_thread_id ();
 };
 

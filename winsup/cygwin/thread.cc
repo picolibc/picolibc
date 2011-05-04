@@ -1044,7 +1044,9 @@ pthread::pop_all_cleanup_handlers ()
 void
 pthread::cancel_self ()
 {
-  exit (PTHREAD_CANCELED);
+  /* Can someone explain why the pthread:: is needed here?  g++ complains
+     without it. */
+  pthread::exit (PTHREAD_CANCELED);
 }
 
 DWORD
