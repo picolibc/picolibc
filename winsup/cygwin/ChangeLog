@@ -1,3 +1,27 @@
+2011-05-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_dsp.cc (fhandler_dev_dsp::Audio): Add fh member.
+	(fhandler_dev_dsp::Audio_out::Audio_out): Take pointer to encapsulating
+	fhandler_dev_dsp as parameter.
+	(fhandler_dev_dsp::Audio_in::Audio_in): Ditto.
+	(fhandler_dev_dsp::Audio::Audio): Take pointer to encapsulating
+	fhandler_dev_dsp as parameter and store in fh.
+	(fhandler_dev_dsp::Audio_out::write): Change return type to int and
+	return number of bytes written.  Return -1 if waitforspace returns false
+	and no bytes have been written so far.
+	(fhandler_dev_dsp::Audio_out::waitforspace): Change return type to bool.
+	Handle O_NONBLOCK.  Make waiting loop interruptible and cancelable.
+	Return false in any of these cases, otherwise true.
+	(fhandler_dev_dsp::Audio_in::read): Set returned nBytes to -1 if
+	waitfordata returns false and nothing has been read so far.
+	(fhandler_dev_dsp::Audio_in::waitfordata): Change return type to bool.
+	Handle O_NONBLOCK.  Make waiting loop interruptible and cancelable.
+	Return false in any of these cases, otherwise true.
+	(fhandler_dev_dsp::write): Call Audio_out constructor with this as
+	parameter.
+	(fhandler_dev_dsp::read): Call Audio_in constructor with this as
+	parameter.
+
 2011-05-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* thread.h (pthread::static_cancel_self): Mark as noreturn.

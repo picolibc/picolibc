@@ -1,6 +1,6 @@
 /* Fhandler_dev_dsp: code to emulate OSS sound model /dev/dsp
 
-   Copyright 2001, 2002, 2003, 2004, 2008 Red Hat, Inc
+   Copyright 2001, 2002, 2003, 2004, 2008, 2011 Red Hat, Inc
 
    Written by Andy Younger (andy@snoogie.demon.co.uk)
    Extended by Gerd Spalink (Gerd.Spalink@t-online.de)
@@ -20,6 +20,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "sigproc.h"
 
 /*------------------------------------------------------------------------
   Simple encapsulation of the win32 audio device.
@@ -49,7 +50,7 @@ details. */
 class fhandler_dev_dsp::Audio
 { // This class contains functionality common to Audio_in and Audio_out
  public:
-   Audio ();
+   Audio (fhandler_dev_dsp *my_fh);
    ~Audio ();
 
   class queue;
@@ -74,6 +75,8 @@ class fhandler_dev_dsp::Audio
   char *bigwavebuffer_; // audio samples only
   // Member variables below must be locked
   queue *Qisr2app_; // blocks passed from wave callback
+
+  fhandler_dev_dsp *fh;
 };
 
 class fhandler_dev_dsp::Audio::queue
@@ -104,11 +107,13 @@ static void CALLBACK waveOut_callback (HWAVEOUT hWave, UINT msg, DWORD instance,
 class fhandler_dev_dsp::Audio_out: public Audio
 {
  public:
+  Audio_out (fhandler_dev_dsp *my_fh) : Audio (my_fh) {}
+
   void fork_fixup (HANDLE parent);
   bool query (int rate, int bits, int channels);
   bool start ();
   void stop (bool immediately = false);
-  bool write (const char *pSampleData, int nBytes);
+  int write (const char *pSampleData, int nBytes);
   void buf_info (audio_buf_info *p, int rate, int bits, int channels);
   void callback_sampledone (WAVEHDR *pHdr);
   bool parsewav (const char *&pData, int &nBytes,
@@ -117,7 +122,7 @@ class fhandler_dev_dsp::Audio_out: public Audio
  private:
   void init (unsigned blockSize);
   void waitforallsent ();
-  void waitforspace ();
+  bool waitforspace ();
   bool sendcurrent ();
 
   enum { MAX_BLOCKS = 12 };
@@ -135,6 +140,8 @@ static void CALLBACK waveIn_callback (HWAVEIN hWave, UINT msg, DWORD instance,
 class fhandler_dev_dsp::Audio_in: public Audio
 {
 public:
+  Audio_in (fhandler_dev_dsp *my_fh) : Audio (my_fh) {}
+
   void fork_fixup (HANDLE parent);
   bool query (int rate, int bits, int channels);
   bool start (int rate, int bits, int channels);
@@ -146,7 +153,7 @@ public:
 private:
   bool init (unsigned blockSize);
   bool queueblock (WAVEHDR *pHdr);
-  void waitfordata (); // blocks until we have a good pHdr_
+  bool waitfordata (); // blocks until we have a good pHdr_ unless O_NONBLOCK
 
   HWAVEIN dev_;
 };
@@ -222,11 +229,12 @@ fhandler_dev_dsp::Audio::queue::query ()
 }
 
 // Audio class implements functionality need for both read and write
-fhandler_dev_dsp::Audio::Audio ()
+fhandler_dev_dsp::Audio::Audio (fhandler_dev_dsp *my_fh)
 {
   bigwavebuffer_ = NULL;
   Qisr2app_ = new queue (MAX_BLOCKS);
   convert_ = &fhandler_dev_dsp::Audio::convert_none;
+  fh = my_fh;
 }
 
 fhandler_dev_dsp::Audio::~Audio ()
@@ -452,18 +460,24 @@ fhandler_dev_dsp::Audio_out::init (unsigned blockSize)
   pHdr_ = NULL;
 }
 
-bool
+int
 fhandler_dev_dsp::Audio_out::write (const char *pSampleData, int nBytes)
 {
-  while (nBytes != 0)
+  int bytes_to_write = nBytes;
+  while (bytes_to_write != 0)
     { // Block if all blocks used until at least one is free
-      waitforspace ();
+      if (!waitforspace ())
+	{
+	  if (bytes_to_write != nBytes)
+	    break;
+	  return -1;
+	}
 
       int sizeleft = (int)pHdr_->dwUser - bufferIndex_;
-      if (nBytes < sizeleft)
+      if (bytes_to_write < sizeleft)
 	{ // all data fits into the current block, with some space left
-	  memcpy (&pHdr_->lpData[bufferIndex_], pSampleData, nBytes);
-	  bufferIndex_ += nBytes;
+	  memcpy (&pHdr_->lpData[bufferIndex_], pSampleData, bytes_to_write);
+	  bufferIndex_ += bytes_to_write;
 	  break;
 	}
       else
@@ -472,10 +486,10 @@ fhandler_dev_dsp::Audio_out::write (const char *pSampleData, int nBytes)
 	  bufferIndex_ += sizeleft;
 	  sendcurrent ();
 	  pSampleData += sizeleft;
-	  nBytes -= sizeleft;
+	  bytes_to_write -= sizeleft;
 	}
     }
-  return true;
+  return nBytes - bytes_to_write;
 }
 
 void
@@ -511,18 +525,39 @@ fhandler_dev_dsp::Audio_out::callback_sampledone (WAVEHDR *pHdr)
   Qisr2app_->send (pHdr);
 }
 
-void
+bool
 fhandler_dev_dsp::Audio_out::waitforspace ()
 {
   WAVEHDR *pHdr;
   MMRESULT rc = WAVERR_STILLPLAYING;
 
   if (pHdr_ != NULL)
-    return;
+    return true;
   while (!Qisr2app_->recv (&pHdr))
     {
+      if (fh->is_nonblocking ())
+	{
+	  set_errno (EAGAIN);
+	  return false;
+	}
+      HANDLE w4[2] = { signal_arrived, pthread::get_cancel_event () };
+      DWORD cnt = w4[1] ? 2 : 1;
       debug_printf ("100ms");
-      Sleep (100);
+      switch (WaitForMultipleObjects (cnt, w4, FALSE, 100))
+	{
+	case WAIT_OBJECT_0:
+	  if (!_my_tls.call_signal_handler ())
+	    {
+	      set_errno (EINTR);
+	      return false;
+	    }
+	  break;
+	case WAIT_OBJECT_0 + 1:
+	  pthread::static_cancel_self ();
+	  /*NOTREACHED*/
+	default:
+	  break;
+	}
     }
   if (pHdr->dwFlags)
     {
@@ -533,6 +568,7 @@ fhandler_dev_dsp::Audio_out::waitforspace ()
     }
   pHdr_ = pHdr;
   bufferIndex_ = 0;
+  return true;
 }
 
 void
@@ -830,7 +866,13 @@ fhandler_dev_dsp::Audio_in::read (char *pSampleData, int &nBytes)
   debug_printf ("pSampleData=%08x nBytes=%d", pSampleData, bytes_to_read);
   while (bytes_to_read != 0)
     { // Block till next sound has been read
-      waitfordata ();
+      if (!waitfordata ())
+      	{
+	  if (nBytes)
+	    return true;
+	  nBytes = -1;
+	  return false;
+	}
 
       // Handle gathering our blocks into smaller or larger buffer
       int sizeleft = pHdr_->dwBytesRecorded - bufferIndex_;
@@ -863,18 +905,39 @@ fhandler_dev_dsp::Audio_in::read (char *pSampleData, int &nBytes)
   return true;
 }
 
-void
+bool
 fhandler_dev_dsp::Audio_in::waitfordata ()
 {
   WAVEHDR *pHdr;
   MMRESULT rc;
 
   if (pHdr_ != NULL)
-    return;
+    return true;
   while (!Qisr2app_->recv (&pHdr))
     {
+      if (fh->is_nonblocking ())
+	{
+	  set_errno (EAGAIN);
+	  return false;
+	}
+      HANDLE w4[2] = { signal_arrived, pthread::get_cancel_event () };
+      DWORD cnt = w4[1] ? 2 : 1;
       debug_printf ("100ms");
-      Sleep (100);
+      switch (WaitForMultipleObjects (cnt, w4, FALSE, 100))
+	{
+	case WAIT_OBJECT_0:
+	  if (!_my_tls.call_signal_handler ())
+	    {
+	      set_errno (EINTR);
+	      return false;
+	    }
+	  break;
+	case WAIT_OBJECT_0 + 1:
+	  pthread::static_cancel_self ();
+	  /*NOTREACHED*/
+	default:
+	  break;
+	}
     }
   if (pHdr->dwFlags) /* Zero if queued following error in queueblock */
     {
@@ -885,6 +948,7 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
     }
   pHdr_ = pHdr;
   bufferIndex_ = 0;
+  return true;
 }
 
 void
@@ -1012,7 +1076,7 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
   else if (IS_WRITE ())
     {
       debug_printf ("Allocating");
-      if (!(audio_out_ = new Audio_out))
+      if (!(audio_out_ = new Audio_out (this)))
 	return -1;
 
       /* check for wave file & get parameters & skip header if possible. */
@@ -1036,8 +1100,14 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
       return -1;
     }
 
-  audio_out_->write (ptr_s, len_s);
-  return len;
+  int written = audio_out_->write (ptr_s, len_s);
+  if (written < 0)
+    {
+      if (len - len_s > 0)
+	return len - len_s;
+      return -1;
+    }
+  return len - len_s + written;
 }
 
 void __stdcall
@@ -1052,7 +1122,7 @@ fhandler_dev_dsp::read (void *ptr, size_t& len)
   else if (IS_READ ())
     {
       debug_printf ("Allocating");
-      if (!(audio_in_ = new Audio_in))
+      if (!(audio_in_ = new Audio_in (this)))
 	{
 	  len = (size_t)-1;
 	  return;
