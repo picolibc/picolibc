@@ -181,7 +181,10 @@ void
 dll_list::detach (void *retaddr)
 {
   dll *d;
-  if (!myself)
+  /* Don't attempt to call destructors if we're still in fork processing
+     since that likely means fork is failing and everything will not have been
+     set up.  */
+  if (!myself || in_forkee)
     return;
   guard (true);
   if ((d = find (retaddr)))

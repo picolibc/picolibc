@@ -1,5 +1,10 @@
 2011-05-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* dll_list::detach (dll_list::detach): Avoid doing anything with detach
+	during a failing fork.
+
+2011-05-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* dll_init.cc (dll_global_dtors): Avoid calling destructors during
 	failing fork().
 
