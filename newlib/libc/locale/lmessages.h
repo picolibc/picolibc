@@ -50,7 +50,7 @@ struct	lc_messages_T {
 };
 
 struct lc_messages_T *__get_current_messages_locale(void);
-int __numeric_load_locale(const char *, void *, const char *);
+int __messages_load_locale(const char *, void *, const char *);
 
 __END_DECLS
 

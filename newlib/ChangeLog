@@ -1,3 +1,13 @@
+2011-05-04  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/locale/lmessages.h (__messages_load_locale): Declare.  Remove
+	accidental declaration of __numeric_load_locale.
+	* libc/locale/locale.c: Include timelocal.h to get declaration of
+	__time_load_locale.
+	(__set_locale_from_locale_alias): Fix return type.
+	(__locale_msgcharset): Avoid compiler warnings.
+	(_localeconv_r): Ditto.
+
 2011-05-04  Andy Koppe  <andy.koppe@gmail.com>
 
 	* libc/locale/locale.c (current_categories): On Cygwin, set LC_CTYPE 
