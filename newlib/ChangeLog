@@ -1,3 +1,10 @@
+2011-05-04  Andy Koppe  <andy.koppe@gmail.com>
+
+	* libc/locale/locale.c (current_categories): On Cygwin, set LC_CTYPE 
+	to C.UTF-8 to match initial __wctomb and __mbtowc settings.
+	(lc_ctype_charset): On Cygwin, initialize to "UTF-8".
+	(loadlocale): Remove unused Cygwin-specifc code.
+
 2011-05-02  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/sys/features.h [__CYGWIN__] (_POSIX_SPIN_LOCKS): Define.

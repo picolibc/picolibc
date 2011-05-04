@@ -235,7 +235,11 @@ char __default_locale[ENCODING_LEN + 1] = DEFAULT_LOCALE;
 static char current_categories[_LC_LAST][ENCODING_LEN + 1] = {
     "C",
     "C",
+#ifdef __CYGWIN__ /* Cygwin starts with LC_CTYPE set to "C.UTF-8". */
+    "C.UTF-8",
+#else
     "C",
+#endif
     "C",
     "C",
     "C",
@@ -255,13 +259,12 @@ static const char *__get_locale_env(struct _reent *, int);
 
 #endif /* _MB_CAPABLE */
 
-#if 0 /*def __CYGWIN__  TODO: temporarily(?) disable C == UTF-8 */
+#ifdef __CYGWIN__
 static char lc_ctype_charset[ENCODING_LEN + 1] = "UTF-8";
-static char lc_message_charset[ENCODING_LEN + 1] = "UTF-8";
 #else
 static char lc_ctype_charset[ENCODING_LEN + 1] = "ASCII";
-static char lc_message_charset[ENCODING_LEN + 1] = "ASCII";
 #endif
+static char lc_message_charset[ENCODING_LEN + 1] = "ASCII";
 static int lc_ctype_cjk_lang = 0;
 
 char *
@@ -495,11 +498,7 @@ restart:
   if (!strcmp (locale, "POSIX"))
     strcpy (locale, "C");
   if (!strcmp (locale, "C"))				/* Default "C" locale */
-#if 0 /*def __CYGWIN__  TODO: temporarily(?) disable C == UTF-8 */
-    strcpy (charset, "UTF-8");
-#else
     strcpy (charset, "ASCII");
-#endif
   else if (locale[0] == 'C'
 	   && (locale[1] == '-'		/* Old newlib style */
 	       || locale[1] == '.'))	/* Extension for the C locale to allow
