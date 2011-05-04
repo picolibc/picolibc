@@ -259,3 +259,15 @@ struct external_ldrel
 };
 
 #define LDRELSZ (16)
+
+struct external_exceptab
+{
+  union {
+    bfd_byte e_symndx[4];
+    bfd_byte e_paddr[8];
+  } e_addr;
+  bfd_byte e_lang[1];
+  bfd_byte e_reason[1];
+};
+
+#define EXCEPTSZ (10)
