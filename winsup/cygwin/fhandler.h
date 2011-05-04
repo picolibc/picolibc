@@ -405,18 +405,6 @@ public:
   virtual bool __stdcall has_ongoing_io () __attribute__ ((regparm (1))) {return false;}
 };
 
-class fhandler_mailslot : public fhandler_base
-{
-  POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &, PUNICODE_STRING, int);
- public:
-  fhandler_mailslot ();
-  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
-  int open (int flags, mode_t mode = 0);
-  ssize_t __stdcall write (const void *ptr, size_t len);
-  int ioctl (unsigned int cmd, void *);
-  select_record *select_read (select_stuff *);
-};
-
 struct wsa_event
 {
   LONG serial_number;
@@ -665,6 +653,19 @@ public:
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
+};
+
+class fhandler_mailslot : public fhandler_base_overlapped
+{
+  POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &, PUNICODE_STRING, int);
+ public:
+  fhandler_mailslot ();
+  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int open (int flags, mode_t mode = 0);
+  void __stdcall raw_read (void *ptr, size_t& len);
+  ssize_t __stdcall raw_write (const void *, size_t);
+  int ioctl (unsigned int cmd, void *);
+  select_record *select_read (select_stuff *);
 };
 
 class fhandler_dev_raw: public fhandler_base

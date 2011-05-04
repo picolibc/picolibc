@@ -1,6 +1,6 @@
 /* fhandler_mailslot.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2005, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 2005, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -21,7 +21,7 @@
 /* fhandler_mailslot */
 
 fhandler_mailslot::fhandler_mailslot ()
-  : fhandler_base ()
+  : fhandler_base_overlapped ()
 {
 }
 
@@ -30,7 +30,7 @@ fhandler_mailslot::fstat (struct __stat64 *buf)
 {
   debug_printf ("here");
 
-  fhandler_base::fstat (buf);
+  fhandler_base_overlapped::fstat (buf);
   if (is_auto_device ())
     {
       buf->st_mode = S_IFCHR | S_IRUSR | S_IWUSR;
@@ -125,8 +125,7 @@ fhandler_mailslot::open (int flags, mode_t mode)
 	}
       status = NtOpenFile (&x, GENERIC_WRITE | SYNCHRONIZE,
 			   get_object_attr (attr, &path, flags), &io,
-			   FILE_SHARE_VALID_FLAGS,
-			   FILE_SYNCHRONOUS_IO_NONALERT);
+			   FILE_SHARE_VALID_FLAGS, 0);
       if (!NT_SUCCESS (status))
 	{
 	  __seterrno_from_nt_status (status);
@@ -144,8 +143,14 @@ fhandler_mailslot::open (int flags, mode_t mode)
   return res;
 }
 
+void __stdcall
+fhandler_mailslot::raw_read (void *in_ptr, size_t& len)
+{
+  read_overlapped (in_ptr, len);
+}
+
 ssize_t __stdcall
-fhandler_mailslot::write (const void *ptr, size_t len)
+fhandler_mailslot::raw_write (const void *ptr, size_t len)
 {
   /* Check for 425/426 byte weirdness */
   if (len == 425 || len == 426)
@@ -155,7 +160,7 @@ fhandler_mailslot::write (const void *ptr, size_t len)
       memcpy (buf, ptr, len);
       return raw_write (buf, 427);
     }
-  return raw_write (ptr, len);
+  return write_overlapped (ptr, len);
 }
 
 int
@@ -183,7 +188,7 @@ fhandler_mailslot::ioctl (unsigned int cmd, void *buf)
       }
       /*FALLTHRU*/
     default:
-      res =  fhandler_base::ioctl (cmd, buf);
+      res =  fhandler_base_overlapped::ioctl (cmd, buf);
       break;
     }
   return res;

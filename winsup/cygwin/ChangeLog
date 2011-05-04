@@ -1,5 +1,21 @@
 2011-05-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_mailslot): Move down in file and change
+	parent class to fhandler_base_overlapped.  Remove declaration of
+	method write.  Add declaraiotns for raw_read and raw_write.
+	* fhandler_mailslot.cc (fhandler_mailslot::fhandler_mailslot): Call
+	fhandler_base_overlapped constructor.
+	(fhandler_mailslot::fstat): Call fhandler_base_overlapped::fstat.
+	(fhandler_mailslot::open): Drop FILE_SYNCHRONOUS_IO_NONALERT flag from
+	call to NtOpenFile.
+	(fhandler_mailslot::raw_read): New method.
+	(fhandler_mailslot::raw_write): Ditto.  Take over length algorithm from
+	former write method.
+	(fhandler_mailslot::write): Remove.
+	(fhandler_mailslot::ioctl): Call fhandler_base_overlapped::ioctl.
+
+2011-05-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_dev_tape::_lock): Add bool parameter.
 	* fhandler_tape.cc (lock): Call _lock with false argument.
 	(_lock): Take bool cancelable parameter.  Handle O_NONBLOCK. 
