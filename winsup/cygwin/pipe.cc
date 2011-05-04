@@ -28,7 +28,6 @@ fhandler_pipe::fhandler_pipe ()
 {
   max_atomic_write = DEFAULT_PIPEBUFSIZE;
   need_fork_fixup (true);
-  uninterruptible_io (true);
 }
 
 int
@@ -130,7 +129,6 @@ fhandler_pipe::open (int flags, mode_t mode)
       goto out;
     }
   init (nio_hdl, fh->get_access (), mode & O_TEXT ?: O_BINARY);
-  uninterruptible_io (fh->uninterruptible_io ());
   cfree (fh);
   CloseHandle (proc);
   return 1;
@@ -407,7 +405,6 @@ _pipe (int filedes[2], unsigned int psize, int mode)
     {
       cygheap_fdnew fdin;
       cygheap_fdnew fdout (fdin, false);
-      fhs[0]->uninterruptible_io (true);
       fdin = fhs[0];
       fdout = fhs[1];
       filedes[0] = fdin;

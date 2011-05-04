@@ -694,17 +694,6 @@ pipe_cleanup (select_record *, select_stuff *stuff)
   stuff->device_specific_pipe = NULL;
 }
 
-int
-fhandler_pipe::ready_for_read (int fd, DWORD howlong)
-{
-  int res;
-  if (!howlong)
-    res = fhandler_base::ready_for_read (fd, howlong);
-  else
-    res = 1;
-  return res;
-}
-
 select_record *
 fhandler_pipe::select_read (select_stuff *ss)
 {
@@ -1234,55 +1223,6 @@ fhandler_serial::select_except (select_stuff *ss)
   s->except_selected = false;	// Can't do this
   s->except_ready = false;
   return s;
-}
-
-int
-fhandler_base::ready_for_read (int fd, DWORD howlong)
-{
-  bool avail = false;
-
-  select_stuff sel;
-  fd_set *thisfd = allocfd_set (fd + 1);
-  fd_set *dummy_writefds = allocfd_set (fd + 1);
-  fd_set *dummy_exceptfds = allocfd_set (fd + 1);
-  UNIX_FD_SET(fd, thisfd);
-
-  if (!sel.test_and_set (fd, thisfd, dummy_writefds, dummy_exceptfds))
-    select_printf ("aborting due to test_and_set error");
-  else
-    {
-      select_record *me = sel.start.next;
-      while (!avail)
-	{
-	  avail = me->read_ready ?: me->peek (me, false);
-
-	  if (fd >= 0 && cygheap->fdtab.not_open (fd))
-	    {
-	      set_sig_errno (EBADF);
-	      avail = false;
-	      break;
-	    }
-
-	  if (howlong != INFINITE)
-	    {
-	      if (!avail)
-		set_sig_errno (EAGAIN);
-	      break;
-	    }
-
-	  if (WaitForSingleObject (signal_arrived, avail ? 0 : 10) == WAIT_OBJECT_0)
-	    {
-	      debug_printf ("interrupted");
-	      set_sig_errno (EINTR);
-	      avail = false;
-	      break;
-	    }
-	}
-    }
-
-  select_printf ("read_ready %d, avail %d", sel.start.next->read_ready, avail);
-  sel.cleanup ();
-  return avail;
 }
 
 select_record *

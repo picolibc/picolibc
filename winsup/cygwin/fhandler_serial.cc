@@ -246,8 +246,6 @@ fhandler_serial::open (int flags, mode_t mode)
 
   SetCommMask (get_handle (), EV_RXCHAR);
 
-  uninterruptible_io (true);	// Handled explicitly in read code
-
   overlapped_setup ();
 
   memset (&to, 0, sizeof (to));

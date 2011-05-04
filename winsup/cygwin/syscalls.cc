@@ -987,19 +987,10 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 	  break;
 	}
 
-      DWORD wait = cfd->is_nonblocking () ? 0 : INFINITE;
-
       /* Could block, so let user know we at least got here.  */
       syscall_printf ("readv (%d, %p, %d) %sblocking, sigcatchers %d",
-		      fd, iov, iovcnt, wait ? "" : "non", sigcatchers);
-
-      if (wait && (!cfd->is_slow () || cfd->uninterruptible_io ()))
-	/* no need to call ready_for_read */;
-      else if (!cfd->ready_for_read (fd, wait))
-	{
-	  res = -1;
-	  goto out;
-	}
+		      fd, iov, iovcnt, cfd->is_nonblocking () ? "non" : "",
+		      sigcatchers);
 
       /* FIXME: This is not thread safe.  We need some method to
 	 ensure that an fd, closed in another thread, aborts I/O
@@ -1029,7 +1020,6 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 	  myself->process_state &= ~PID_TTYIN;
 	}
 
-    out:
       if (res >= 0 || get_errno () != EINTR || !_my_tls.call_signal_handler ())
 	break;
       set_errno (e);

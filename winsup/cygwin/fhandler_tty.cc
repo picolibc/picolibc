@@ -456,9 +456,7 @@ process_ioctl (void *)
 
 fhandler_tty_slave::fhandler_tty_slave ()
   : fhandler_tty_common (), inuse (NULL)
-{
-  uninterruptible_io (true);
-}
+{}
 
 /* FIXME: This function needs to close handles when it has
    a failing condition. */
@@ -1652,7 +1650,6 @@ fhandler_tty_master::init_console ()
 
   console->init (NULL, GENERIC_READ | GENERIC_WRITE, O_BINARY);
   cygheap->manage_console_count ("fhandler_tty_master::init_console", -1, true);
-  console->uninterruptible_io (true);
   return 0;
 }
 

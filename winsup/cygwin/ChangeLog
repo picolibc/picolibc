@@ -1,5 +1,27 @@
 2011-05-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_base): Remove uninterruptible_io status
+	flag.
+	(fhandler_base::ready_for_read): Remove declaration.
+	(fhandler_socket::ready_for_read): Ditto.
+	(fhandler_pipe::ready_for_read): Ditto.
+	(fhandler_tty_master::is_slow): Remove.
+	* fhandler_console.cc (fhandler_console::open): Drop setting
+	uninterruptible_io.
+	* fhandler_serial.cc (fhandler_serial::open): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::fhandler_tty_slave): Ditto.
+	(fhandler_tty_master::init_console): Ditto.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Ditto.
+	(fhandler_pipe::open): Ditto.
+	(_pipe): Ditto.
+	* select.cc (fhandler_pipe::ready_for_read): Remove.
+	(fhandler_base::ready_for_read): Remove.
+	* syscalls.cc (readv): Drop unneeded wait variable.  Remove entire test
+	which might lead to calling ready_for_read.  Remove now unused label
+	out.
+
+2011-05-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_mailslot): Move down in file and change
 	parent class to fhandler_base_overlapped.  Remove declaration of
 	method write.  Add declaraiotns for raw_read and raw_write.

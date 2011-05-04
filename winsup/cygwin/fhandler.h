@@ -133,7 +133,6 @@ class fhandler_base
     unsigned wbinary            : 1; /* binary write mode */
     unsigned wbinset            : 1; /* binary write mode explicitly set */
     unsigned nohandle           : 1; /* No handle associated with fhandler. */
-    unsigned uninterruptible_io : 1; /* Set if I/O should be uninterruptible. */
     unsigned did_lseek          : 1; /* set when lseek is called as a flag that
 					_write should check if we've moved
 					beyond EOF, zero filling or making
@@ -146,8 +145,8 @@ class fhandler_base
    public:
     status_flags () :
       rbinary (0), rbinset (0), wbinary (0), wbinset (0), nohandle (0),
-      uninterruptible_io (0), did_lseek (0),
-      query_open (no_query), close_on_exec (0), need_fork_fixup (0)
+      did_lseek (0), query_open (no_query), close_on_exec (0),
+      need_fork_fixup (0)
       {}
   } status, open_status;
 
@@ -227,7 +226,6 @@ class fhandler_base
   IMPLEMENT_STATUS_FLAG (bool, wbinset)
   IMPLEMENT_STATUS_FLAG (bool, rbinset)
   IMPLEMENT_STATUS_FLAG (bool, nohandle)
-  IMPLEMENT_STATUS_FLAG (bool, uninterruptible_io)
   IMPLEMENT_STATUS_FLAG (bool, did_lseek)
   IMPLEMENT_STATUS_FLAG (query_state, query_open)
   IMPLEMENT_STATUS_FLAG (bool, close_on_exec)
@@ -375,7 +373,6 @@ public:
   virtual select_record *select_read (select_stuff *);
   virtual select_record *select_write (select_stuff *);
   virtual select_record *select_except (select_stuff *);
-  virtual int ready_for_read (int fd, DWORD howlong);
   virtual const char *get_native_name ()
   {
     return dev ().native;
@@ -536,7 +533,6 @@ class fhandler_socket: public fhandler_base
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
-  int ready_for_read (int, DWORD) { return true; }
   void set_addr_family (int af) {addr_family = af;}
   int get_addr_family () {return addr_family;}
   void set_socket_type (int st) { type = st;}
@@ -615,7 +611,6 @@ public:
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   int __stdcall fadvise (_off64_t, _off64_t, int) __attribute__ ((regparm (3)));
   int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
-  int ready_for_read (int fd, DWORD howlong);
   int init (HANDLE, DWORD, mode_t);
   static int create (fhandler_pipe *[2], unsigned, int);
   static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD, const char * = NULL);
@@ -1205,7 +1200,6 @@ class fhandler_tty_master: public fhandler_pty_master
   int init ();
   int init_console ();
   void set_winsize (bool);
-  bool is_slow () {return true;}
 };
 
 class fhandler_dev_null: public fhandler_base

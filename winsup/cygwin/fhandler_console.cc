@@ -710,7 +710,6 @@ fhandler_console::open (int flags, mode_t)
       return 0;
     }
   set_io_handle (h);
-  uninterruptible_io (true);	// Handled explicitly in read code
 
   h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
 		  FILE_SHARE_READ | FILE_SHARE_WRITE, sec_none_cloexec (flags),
