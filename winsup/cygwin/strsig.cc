@@ -1,6 +1,6 @@
 /* strsig.cc
 
-   Copyright 2004, 2007, 2008, 2010 Red Hat, Inc.
+   Copyright 2004, 2007, 2008, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -10,6 +10,8 @@ details. */
 
 #include "winsup.h"
 #include <cygtls.h>
+#include <stdio.h>
+#include <string.h>
 
 struct sigdesc
 {
@@ -66,6 +68,16 @@ const char *sys_sigabbrev[] NO_COPY_INIT =
 
 #undef _s
 #undef _s2
+#define _s(n, s) s
+#define _s2(n, s, n1, s1) s
+const char *sys_siglist[] NO_COPY_INIT =
+{
+  NULL,
+  __signals
+};
+
+#undef _s
+#undef _s2
 #define _s(n, s) {n, #n, s}
 #define _s2(n, s, n1, s1) {n, #n, s}, {n, #n1, #s1}
 static const sigdesc siglist[] =
@@ -95,4 +107,39 @@ strtosigno (const char *name)
     if (strcmp (siglist[i].name, name) == 0)
       return siglist[i].n;
   return 0;
+}
+
+extern "C" void
+psiginfo (const siginfo_t *info, const char *s)
+{
+  if (s != NULL && *s != '\0')
+    fprintf (stderr, "%s: ", s);
+
+  fprintf (stderr, "%s", strsignal (info->si_signo));
+
+  if (info->si_signo > 0 && info->si_signo < NSIG)
+    {
+      switch (info->si_signo)
+	{
+	  case SIGILL:
+	  case SIGBUS:
+	  case SIGFPE:
+	  case SIGSEGV:
+	    fprintf (stderr, " (%d [%p])", info->si_code, info->si_addr);
+	    break;
+	  case SIGCHLD:
+	    fprintf (stderr, " (%d %d %d %ld)", info->si_code, info->si_pid,
+		     info->si_status, info->si_uid);
+	    break;
+/* FIXME: implement si_band
+	  case SIGPOLL:
+	    fprintf (stderr, " (%d %ld)", info->si_code, info->si_band);
+	    break;
+*/
+	  default:
+	    fprintf (stderr, " (%d %d %ld)", info->si_code, info->si_pid, info->si_uid);
+	}
+    }
+
+  fprintf (stderr, "\n");
 }

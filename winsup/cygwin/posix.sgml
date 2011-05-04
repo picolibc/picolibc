@@ -527,6 +527,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pread
     printf
     pselect
+    psiginfo
+    psignal
     pthread_atfork
     pthread_attr_destroy
     pthread_attr_getdetachstate
@@ -1244,6 +1246,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     setutent			(XPG2)
     sys_errlist			(BSD)
     sys_nerr			(BSD)
+    sys_siglist			(BSD)
     ttyslot			(SUSv2)
     ualarm			(SUSv3)
     usleep			(SUSv3)
@@ -1375,8 +1378,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     posix_trace[...]
     posix_typed_[...]
     powl
-    psiginfo
-    psignal
     pthread_attr_getguardsize
     pthread_attr_setguardsize
     pthread_attr_setstack

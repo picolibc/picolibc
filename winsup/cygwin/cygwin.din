@@ -28,6 +28,7 @@ _sys_errlist DATA
 sys_nerr = _sys_nerr DATA
 _sys_nerr DATA
 sys_sigabbrev DATA
+sys_siglist DATA
 _timezone DATA
 _tzname DATA
 _Exit SIGFE
@@ -1167,6 +1168,8 @@ program_invocation_name DATA
 program_invocation_short_name DATA
 _printf = printf SIGFE
 pselect SIGFE
+psiginfo SIGFE
+psignal SIGFE
 pthread_atfork SIGFE
 pthread_attr_destroy SIGFE
 pthread_attr_getdetachstate SIGFE

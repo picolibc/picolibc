@@ -1,3 +1,17 @@
+2011-05-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (psiginfo): Export.
+	(psignal): Export.
+	(sys_siglist): Export.
+	* posix.sgml (std-notimpl): Move psiginfo and psignal from here...
+	(std-susv4): ... to here.
+	(std-deprec): Add sys_siglist.
+	* strsig.cc (sys_siglist): New array.
+	(psiginfo): New function.
+	* include/cygwin/signal.h (sys_siglist): Declare.
+	(psiginfo): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2011-05-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dll_list::detach (dll_list::detach): Avoid doing anything with detach
