@@ -168,13 +168,16 @@ union external_auxent {
 		char x_tvndx[2];		/* tv index */
 	} x_sym;
 
-	union {
-		char x_fname[E_FILNMLEN];
-		struct {
-			char x_zeroes[4];
-			char x_offset[4];
-		} x_n;
-	} x_file;
+        struct {
+                union {
+                        char x_fname[E_FILNMLEN];
+                        struct {
+                                char x_zeroes[4];
+                                char x_offset[4];
+                        } x_n;
+                } x_n;
+                char x_ftype[1];
+        } x_file;
 
 	struct {
 		char x_scnlen[4];			/* section length */

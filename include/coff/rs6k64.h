@@ -152,15 +152,17 @@ union external_auxent
  	} x_fcnary;
     } x_sym;
          
-    union {
-	char x_fname[E_FILNMLEN];
-	struct {
-	    char x_zeroes[4];
-	    char x_offset[4];
-	    char          x_pad[6];
-	    unsigned char x_ftype[1];
-	    unsigned char x_resv[2];
-	} x_n;
+    struct {
+        union {
+            char x_fname[E_FILNMLEN];
+            struct {
+	        char x_zeroes[4];
+                char x_offset[4];
+	        char x_pad[6];
+            } x_n;
+        } x_n;
+        unsigned char x_ftype[1];
+        unsigned char x_resv[2];
     } x_file;
 
     struct {
