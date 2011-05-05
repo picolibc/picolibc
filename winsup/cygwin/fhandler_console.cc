@@ -94,8 +94,6 @@ fhandler_console::get_tty_stuff (int flags = 0)
   if (!shared_console_info->tty_min_state.ntty)
     {
       shared_console_info->tty_min_state.setntty (TTY_CONSOLE);
-      shared_console_info->tty_min_state.setsid (myself->sid);
-      myself->set_ctty (&shared_console_info->tty_min_state, flags, this);
 
       dev_state->scroll_region.Bottom = -1;
       dev_state->dwLastCursorPosition.X = -1;
@@ -700,8 +698,6 @@ fhandler_console::open (int flags, mode_t)
   set_io_handle (NULL);
   set_output_handle (NULL);
 
-  set_flags ((flags & ~O_TEXT) | O_BINARY);
-
   /* Open the input handle as handle_ */
   h = CreateFile ("CONIN$", GENERIC_READ | GENERIC_WRITE,
 		  FILE_SHARE_READ | FILE_SHARE_WRITE, sec_none_cloexec (flags),
@@ -735,7 +731,6 @@ fhandler_console::open (int flags, mode_t)
 
   tc->rstcons (false);
   set_open_status ();
-  cygheap->manage_console_count ("fhandler_console::open", 1);
 
   DWORD cflags;
   if (GetConsoleMode (get_io_handle (), &cflags))
@@ -748,6 +743,14 @@ fhandler_console::open (int flags, mode_t)
   return 1;
 }
 
+void
+fhandler_console::open_setup (int flags)
+{
+  cygheap->manage_console_count ("fhandler_console::open", 1);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
+  myself->set_ctty (&shared_console_info->tty_min_state, flags, this);
+}
+
 int
 fhandler_console::close ()
 {
@@ -755,19 +758,6 @@ fhandler_console::close ()
   CloseHandle (get_output_handle ());
   if (!hExeced)
     cygheap->manage_console_count ("fhandler_console::close", -1);
-  return 0;
-}
-
-/*  Special console dup to duplicate input and output  handles.  */
-
-int
-fhandler_console::dup (fhandler_base *child)
-{
-  fhandler_console *fhc = (fhandler_console *) child;
-
-  if (!fhc->open (get_flags () & ~O_NOCTTY, 0))
-    system_printf ("error opening console, %E");
-
   return 0;
 }
 
@@ -855,6 +845,8 @@ fhandler_console::output_tcsetattr (int, struct termios const *t)
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
 
   int res = SetConsoleMode (get_output_handle (), flags) ? 0 : -1;
+  if (!res)
+    __seterrno_from_win_error (GetLastError ());
   syscall_printf ("%d = tcsetattr (,%x) (ENABLE FLAGS %x) (lflag %x oflag %x)",
 		  res, t, flags, t->c_lflag, t->c_oflag);
   return res;
@@ -980,6 +972,7 @@ fhandler_console::tcgetattr (struct termios *t)
 fhandler_console::fhandler_console () :
   fhandler_termios ()
 {
+  dev ().parse (FH_CONSOLE);
   trunc_buf.len = 0;
 }
 
@@ -2094,7 +2087,7 @@ fhandler_console::init (HANDLE h, DWORD a, mode_t bin)
     flags = O_WRONLY;
   if (a == (GENERIC_READ | GENERIC_WRITE))
     flags = O_RDWR;
-  open (flags | O_BINARY | (h ? 0 : O_NOCTTY));
+  open_with_arch (flags | O_BINARY | (h ? 0 : O_NOCTTY));
   if (h && h != INVALID_HANDLE_VALUE)
     CloseHandle (h);	/* Reopened by open */
 
@@ -2127,24 +2120,7 @@ set_console_title (char *title)
 void
 fhandler_console::fixup_after_fork_exec (bool execing)
 {
-  HANDLE h = get_handle ();
-  HANDLE oh = get_output_handle ();
-
-  if ((execing && close_on_exec ()) || open (O_NOCTTY | get_flags (), 0))
-    cygheap->manage_console_count ("fhandler_console::fixup_after_fork_exec", -1);
-  else
-    {
-      if (!get_io_handle ())
-	system_printf ("error opening input console handle for %s after fork/exec, errno %d, %E", get_name (), get_errno ());
-      if (!get_output_handle ())
-	system_printf ("error opening output console handle for %s after fork/exec, errno %d, %E", get_name (), get_errno ());
-    }
-
-  if (!close_on_exec ())
-    {
-      CloseHandle (h);
-      CloseHandle (oh);
-    }
+  get_tty_stuff ();
 }
 
 bool NO_COPY fhandler_console::invisible_console;

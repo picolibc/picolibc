@@ -101,7 +101,7 @@ close_all_files (bool norelease)
 	  DuplicateHandle (GetCurrentProcess (), fh->get_output_handle (),
 			   GetCurrentProcess (), &h,
 			   0, false, DUPLICATE_SAME_ACCESS);
-	fh->close ();
+	fh->close_with_arch ();
 	if (!norelease)
 	  cygheap->fdtab.release (i);
       }
@@ -601,7 +601,7 @@ unlink_nt (path_conv &pc)
          NFS implements its own mechanism to remove in-use files which
 	 looks quite similar to what we do in try_to_bin for remote files.
 	 That's why we don't call try_to_bin on NFS.
-	 
+
 	 Netapp filesystems don't understand the "move and delete" method
 	 at all and have all kinds of weird effects.  Just setting the delete
 	 dispositon usually works fine, though. */
@@ -721,7 +721,7 @@ unlink_nt (path_conv &pc)
 	     http://msdn.microsoft.com/en-us/library/ff545765%28VS.85%29.aspx
 	     "Subsequently, the only legal operation by such a caller is
 	     to close the open file handle."
-	     
+
 	     FIXME? On Vista and later, we could use FILE_HARD_LINK_INFORMATION
 	     to find all hardlinks and use one of them to restore the R/O bit,
 	     after the NtClose, but before we stop the transaction.  This
@@ -1107,25 +1107,18 @@ open (const char *unix_path, int flags, ...)
 	      res = -1;
 	      set_errno (EEXIST);
 	    }
-	  else if (fh->is_fs_special () && fh->device_access_denied (flags))
+	  else if ((fh->is_fs_special () && fh->device_access_denied (flags))
+		   || !fh->open_with_arch (flags, (mode & 07777) & ~cygheap->umask))
 	    {
 	      delete fh;
 	      res = -1;
 	    }
 	  else
 	    {
-	      fh->close_on_exec (flags & O_CLOEXEC);
-	      if (!fh->open (flags, (mode & 07777) & ~cygheap->umask))
-		{
-		  delete fh;
-		  res = -1;
-		}
-	      else
-		{
-		  cygheap->fdtab[fd] = fh;
-		  if ((res = fd) <= 2)
-		    set_std_handle (res);
-		}
+	      fd = fh;
+	      if (fd <= 2)
+		set_std_handle (fd);
+	      res = fd;
 	    }
 	}
     }
@@ -1185,7 +1178,7 @@ close (int fd)
     res = -1;
   else
     {
-      res = cfd->close ();
+      res = cfd->close_with_arch ();
       cfd.release ();
     }
 
@@ -1974,7 +1967,7 @@ rename (const char *oldpath, const char *newpath)
 	     filename has one of the blessed executable suffixes. */
 	  if (!old_explicit_suffix && oldpc.known_suffix
 	      && !newpc.is_binary ()
-	      && !nt_path_has_executable_suffix (newpc.get_nt_native_path ()))	
+	      && !nt_path_has_executable_suffix (newpc.get_nt_native_path ()))
 	    {
 	      rename_append_suffix (new2pc, newpath, nlen, ".exe");
 	      removepc = &newpc;
@@ -2040,7 +2033,7 @@ retry:
 	     a temporary filename and then rename the temp filename to the
 	     target filename.  This renaming fails due to the jealous virus
 	     scanner and the application fails to create the target file.
-	     
+
 	     This kludge tries to work around that by yielding until the
 	     sharing violation goes away, or a signal arrived, or after
 	     about a second, give or take. */

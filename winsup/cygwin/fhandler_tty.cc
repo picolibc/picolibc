@@ -113,7 +113,7 @@ fhandler_tty_common::__acquire_output_mutex (const char *fn, int ln,
 					   DWORD ms)
 {
   if (strace.active ())
-    strace.prntf (_STRACE_TERMIOS, fn, "(%d): tty output_mutex: waiting %d ms", ln, ms);
+    strace.prntf (_STRACE_TERMIOS, fn, "(%d): tty output_mutex (%p): waiting %d ms", ln, output_mutex, ms);
   DWORD res = WaitForSingleObject (output_mutex, ms);
   if (res == WAIT_OBJECT_0)
     {
@@ -138,11 +138,11 @@ fhandler_tty_common::__release_output_mutex (const char *fn, int ln)
     {
 #ifndef DEBUGGING
       if (strace.active ())
-	strace.prntf (_STRACE_TERMIOS, fn, "(%d): tty output_mutex released", ln);
+	strace.prntf (_STRACE_TERMIOS, fn, "(%d): tty output_mutex(%p) released", ln, output_mutex);
 #else
       if (osi > 0)
 	osi--;
-      termios_printf ("released at %s:%d, osi %d", fn, ln, osi);
+      termios_printf ("released(%p) at %s:%d, osi %d", output_mutex, fn, ln, osi);
       termios_printf ("  for %s:%d (%s)", ostack[osi].fn, ostack[osi].ln, ostack[osi].tname);
       ostack[osi].ln = -ln;
 #endif
@@ -299,7 +299,10 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	  while (1)
 	    {
 	      if (!PeekNamedPipe (handle, NULL, 0, NULL, &n, NULL))
-		goto err;
+		{
+		  termios_printf ("PeekNamedPipe failed, %E");
+		  goto err;
+		}
 	      if (n > 0)
 		break;
 	      if (hit_eof ())
@@ -307,6 +310,10 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	      /* DISCARD (FLUSHO) and tcflush can finish here. */
 	      if ((get_ttyp ()->ti.c_lflag & FLUSHO || !buf))
 		goto out;
+
+	      if (is_tty_master ())
+		continue;
+
 	      if (is_nonblocking ())
 		{
 		  set_errno (EAGAIN);
@@ -321,17 +328,19 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 		  rc = -1;
 		  goto out;
 		}
-		
 	    }
 
-	  if (ReadFile (handle, outbuf, rlen, &n, NULL) == FALSE)
-	    goto err;
+	  if (!ReadFile (handle, outbuf, rlen, &n, NULL))
+	    {
+	      termios_printf ("ReadFile failed, %E");
+	      goto err;
+	    }
 	}
 
       termios_printf ("bytes read %u", n);
       get_ttyp ()->write_error = 0;
       if (output_done_event != NULL)
-	SetEvent (output_done_event);
+	  SetEvent (output_done_event);
 
       if (get_ttyp ()->ti.c_lflag & FLUSHO || !buf)
 	continue;
@@ -420,14 +429,17 @@ process_output (void *)
   for (;;)
     {
       int n = tty_master->process_slave_output (buf, OUT_BUFFER_SIZE, 0);
-      if (n <= 0)
+      if (n > 0)
+	{
+	  n = tty_master->console->write ((void *) buf, (size_t) n);
+	  tty_master->get_ttyp ()->write_error = n == -1 ? get_errno () : 0;
+	}
+      else
 	{
 	  if (n < 0)
 	    termios_printf ("ReadFile %E");
 	  ExitThread (0);
 	}
-      n = tty_master->console->write ((void *) buf, (size_t) n);
-      tty_master->get_ttyp ()->write_error = n == -1 ? get_errno () : 0;
     }
 }
 
@@ -454,9 +466,12 @@ process_ioctl (void *)
 /**********************************************************************/
 /* Tty slave stuff */
 
-fhandler_tty_slave::fhandler_tty_slave ()
+fhandler_tty_slave::fhandler_tty_slave (int ntty)
   : fhandler_tty_common (), inuse (NULL)
-{}
+{
+  if (ntty >= 0)
+    dev ().parse (DEV_TTYS_MAJOR, ntty);
+}
 
 /* FIXME: This function needs to close handles when it has
    a failing condition. */
@@ -472,28 +487,13 @@ fhandler_tty_slave::open (int flags, mode_t)
     NULL
   };
 
-  const char *errmsg = NULL;
-
   for (HANDLE **h = handles; *h; h++)
     **h = NULL;
-
-  if (get_device () == FH_TTY)
-    dev().tty_to_real_device ();
-  fhandler_tty_slave *arch = (fhandler_tty_slave *) cygheap->fdtab.find_archetype (pc.dev);
-  if (arch)
-    {
-      *this = *(fhandler_tty_slave *) arch;
-      termios_printf ("copied fhandler_tty_slave archetype");
-      set_flags ((flags & ~O_TEXT) | O_BINARY);
-      cygheap->manage_console_count ("fhandler_tty_slave::open<arch>", 1);
-      goto out;
-    }
 
   tcinit (cygwin_shared->tty[get_unit ()], false);
 
   cygwin_shared->tty.attach (get_unit ());
 
-  set_flags ((flags & ~O_TEXT) | O_BINARY);
   /* Create synchronisation events */
   char buf[MAX_PATH];
 
@@ -504,6 +504,8 @@ fhandler_tty_slave::open (int flags, mode_t)
      output is handled by a separate thread which controls output.  */
   shared_name (buf, OUTPUT_DONE_EVENT, get_unit ());
   output_done_event = OpenEvent (MAXIMUM_ALLOWED, TRUE, buf);
+
+  const char *errmsg = NULL;
 
   if (!(output_mutex = get_ttyp ()->open_output_mutex (MAXIMUM_ALLOWED)))
     {
@@ -646,19 +648,6 @@ fhandler_tty_slave::open (int flags, mode_t)
   if (cygheap->manage_console_count ("fhandler_tty_slave::open", 1) == 1
       && !output_done_event)
     fhandler_console::need_invisible ();
-
-  // FIXME: Do this better someday
-  arch = (fhandler_tty_slave *) cmalloc_abort (HEAP_ARCHETYPES, sizeof (*this));
-  *((fhandler_tty_slave **) cygheap->fdtab.add_archetype ()) = arch;
-  archetype = arch;
-  *arch = *this;
-
-out:
-  usecount = 0;
-  arch->usecount++;
-  report_tty_counts (this, "opened", "");
-  myself->set_ctty (get_ttyp (), flags, arch);
-
   return 1;
 
 err:
@@ -672,8 +661,17 @@ err_no_msg:
   return 0;
 }
 
-int
-fhandler_tty_slave::close ()
+void
+fhandler_tty_slave::open_setup (int flags)
+{
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
+  myself->set_ctty (get_ttyp (), flags, this);
+  cygheap->manage_console_count ("fhandler_tty_slave::setup", 1);
+  report_tty_counts (this, "opened", "");
+}
+
+void
+fhandler_tty_slave::cleanup ()
 {
   /* This used to always call fhandler_tty_common::close when hExeced but that
      caused multiple closes of the handles associated with this tty.  Since
@@ -681,20 +679,12 @@ fhandler_tty_slave::close ()
      or before a non-cygwin process has exited, it should be safe to just
      close this normally.  cgf 2006-05-20 */
   cygheap->manage_console_count ("fhandler_tty_slave::close", -1);
-
-  archetype->usecount--;
   report_tty_counts (this, "closed", "");
+}
 
-  if (archetype->usecount)
-    {
-#ifdef DEBUGGING
-      if (archetype->usecount < 0)
-	system_printf ("error: usecount %d", archetype->usecount);
-#endif
-      termios_printf ("just returning because archetype usecount is != 0");
-      return 0;
-    }
-
+int
+fhandler_tty_slave::close ()
+{
   termios_printf ("closing last open %s handle", ttyname ());
   if (inuse && !CloseHandle (inuse))
     termios_printf ("CloseHandle (inuse), %E");
@@ -702,7 +692,7 @@ fhandler_tty_slave::close ()
 }
 
 int
-fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
+fhandler_tty_slave::init (HANDLE h, DWORD a, mode_t)
 {
   int flags = 0;
 
@@ -714,7 +704,7 @@ fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
   if (a == (GENERIC_READ | GENERIC_WRITE))
     flags = O_RDWR;
 
-  int ret = open (flags);
+  int ret = open_with_arch (flags);
 
   if (ret && !cygwin_finished_initializing && !being_debugged ())
     {
@@ -735,8 +725,8 @@ fhandler_tty_slave::init (HANDLE f, DWORD a, mode_t)
 	}
     }
 
-  if (f != INVALID_HANDLE_VALUE)
-    CloseHandle (f);	/* Reopened by open */
+  if (h != INVALID_HANDLE_VALUE)
+    CloseHandle (h);	/* Reopened by open */
 
   return ret;
 }
@@ -1037,38 +1027,14 @@ out:
 int
 fhandler_tty_slave::dup (fhandler_base *child)
 {
-  fhandler_tty_slave *arch = (fhandler_tty_slave *) archetype;
-  /* In dtable::dup_worker, the path_conv member has already been assigned
-     from "this" to "child".  Part of this assigment (path_conv::operator=)
-     is to allocate memory for the strings "path" and "normalized_path from
-     cygheap.  The below `child = *arch' statement will overwrite child's
-     path_conv again, this time from "*arch".  By doing that, it will allocate
-     new strings from cygheap, overwriting the old pointer values.  Thus, the
-     old allocated strings are lost, and we're leaking memory for each tty dup,
-     unless we free the strings here.
-     FIXME: We can't redefine path_conv::operator= so that it frees the old
-     strings.  Probably it would be most helpful to copy only the required
-     members from *arch, rather than copying everything. */
-  child->pc.free_strings ();
-  *(fhandler_tty_slave *) child = *arch;
-  child->set_flags (get_flags ());
-  child->usecount = 0;
-  arch->usecount++;
   cygheap->manage_console_count ("fhandler_tty_slave::dup", 1);
-  report_tty_counts (child, "duped", "");
+  report_tty_counts (child, "duped slave", "");
   return 0;
 }
 
 int
 fhandler_pty_master::dup (fhandler_base *child)
 {
-  fhandler_tty_master *arch = (fhandler_tty_master *) archetype;
-  /* See comment in fhandler_tty_slave::dup. */
-  child->pc.free_strings ();
-  *(fhandler_tty_master *) child = *arch;
-  child->set_flags (get_flags ());
-  child->usecount = 0;
-  arch->usecount++;
   report_tty_counts (child, "duped master", "");
   return 0;
 }
@@ -1435,15 +1401,8 @@ fhandler_pty_master::open (int flags, mode_t)
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 
-  /* FIXME: Do this better someday */
-  fhandler_pty_master *arch = (fhandler_tty_master *) cmalloc_abort (HEAP_ARCHETYPES, sizeof (*this));
-  *((fhandler_pty_master **) cygheap->fdtab.add_archetype ()) = arch;
-  archetype = arch;
-  *arch = *this;
-  arch->dwProcessId = GetCurrentProcessId ();
+  dwProcessId = GetCurrentProcessId ();
 
-  usecount = 0;
-  arch->usecount++;
   char buf[sizeof ("opened pty master for ttyNNNNNNNNNNN")];
   __small_sprintf (buf, "opened pty master for tty%d", get_unit ());
   report_tty_counts (this, buf, "");
@@ -1482,6 +1441,12 @@ fhandler_tty_common::close ()
   return 0;
 }
 
+void
+fhandler_pty_master::cleanup ()
+{
+  report_tty_counts (this, "closing master", "");
+}
+
 int
 fhandler_pty_master::close ()
 {
@@ -1489,25 +1454,12 @@ fhandler_pty_master::close ()
   while (accept_input () > 0)
     continue;
 #endif
-  archetype->usecount--;
-  report_tty_counts (this, "closing master", "");
 
-  if (archetype->usecount)
-    {
-#ifdef DEBUGGING
-      if (archetype->usecount < 0)
-	system_printf ("error: usecount %d", archetype->usecount);
-#endif
-      termios_printf ("just returning because archetype usecount is != 0");
-      return 0;
-    }
-
-  fhandler_tty_master *arch = (fhandler_tty_master *) archetype;
   termios_printf ("closing from_master(%p)/to_master(%p) since we own them(%d)",
-		  arch->from_master, arch->to_master, arch->dwProcessId);
+		  from_master, to_master, dwProcessId);
   if (cygwin_finished_initializing)
     {
-      if (arch->master_ctl && get_ttyp ()->master_pid == myself->pid)
+      if (master_ctl && get_ttyp ()->master_pid == myself->pid)
 	{
 	  char buf[MAX_PATH];
 	  pipe_request req = { (DWORD) -1 };
@@ -1517,13 +1469,13 @@ fhandler_pty_master::close ()
 	  __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-tty%d-master-ctl",
 			   &installation_key, get_unit ());
 	  CallNamedPipe (buf, &req, sizeof req, &repl, sizeof repl, &len, 500);
-	  CloseHandle (arch->master_ctl);
-	  arch->master_thread->detach ();
+	  CloseHandle (master_ctl);
+	  master_thread->detach ();
 	}
-      if (!ForceCloseHandle (arch->from_master))
-	termios_printf ("error closing from_master %p, %E", arch->from_master);
-      if (!ForceCloseHandle (arch->to_master))
-	termios_printf ("error closing from_master %p, %E", arch->to_master);
+      if (!ForceCloseHandle (from_master))
+	termios_printf ("error closing from_master %p, %E", from_master);
+      if (!ForceCloseHandle (to_master))
+	termios_printf ("error closing from_master %p, %E", to_master);
     }
   fhandler_tty_common::close ();
 
@@ -1674,7 +1626,7 @@ fhandler_tty_slave::fixup_after_exec ()
 int
 fhandler_tty_master::init_console ()
 {
-  console = (fhandler_console *) build_fh_dev (*console_dev, "/dev/ttym");
+  console = (fhandler_console *) build_fh_dev (*console_dev, "/dev/ttym_console");
   if (console == NULL)
     return -1;
 
@@ -1824,10 +1776,10 @@ reply:
 }
 
 static DWORD WINAPI
-pty_master_thread (VOID *arg)           
-{ 
+pty_master_thread (VOID *arg)
+{
   return ((fhandler_pty_master *) arg)->pty_master_thread ();
-} 
+}
 
 bool
 fhandler_pty_master::setup (bool ispty)

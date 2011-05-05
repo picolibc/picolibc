@@ -107,11 +107,7 @@ void
 init_cygheap::close_ctty ()
 {
   debug_printf ("closing cygheap->ctty %p", cygheap->ctty);
-  /* FIXME: Support for console-as-ctty is limited due to the fact that
-     the console doesn't use archetypes - even though they could and should */
-  if (cygheap->ctty->get_ttyp ()
-      && cygheap->ctty->get_ttyp ()->ntty != TTY_CONSOLE)
-    cygheap->ctty->close ();
+  cygheap->ctty->close_with_arch ();
   cygheap->ctty = NULL;
 }
 

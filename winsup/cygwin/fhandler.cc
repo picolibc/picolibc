@@ -39,7 +39,7 @@ struct __cygwin_perfile *perfile_table;
 inline fhandler_base&
 fhandler_base::operator =(fhandler_base& x)
 {
-  memcpy (this, &x, sizeof *this);
+  memcpy (this, &x, size ());
   pc = x.pc;
   rabuf = NULL;
   ralen = 0;
@@ -446,6 +446,40 @@ done:
       res = -1;
     }
   debug_printf ("returning %d", res);
+  return res;
+}
+
+int
+fhandler_base::open_with_arch (int flags, mode_t mode)
+{
+  int res;
+  close_on_exec (flags & O_CLOEXEC);
+  if (!(res = (archetype && archetype->io_handle)
+	|| open (flags, (mode & 07777) & ~cygheap->umask)))
+    {
+      if (archetype)
+	delete archetype;
+    }
+  else if (archetype)
+    {
+      if (!archetype->io_handle)
+	{
+	  usecount = 0;
+	  *archetype = *this;
+	  archetype_usecount (1);
+	  archetype->archetype = NULL;
+	}
+      else
+	{
+	  fhandler_base *arch = archetype;
+	  *this = *archetype;
+	  archetype = arch;
+	  archetype_usecount (1);
+	  usecount = 0;
+	}
+      open_setup (flags);
+    }
+
   return res;
 }
 
@@ -1027,6 +1061,48 @@ fhandler_base::pwrite (void *, size_t, _off64_t)
 {
   set_errno (ESPIPE);
   return -1;
+}
+
+int
+fhandler_base::close_with_arch ()
+{
+  int res;
+  fhandler_base *fh;
+  if (usecount)
+    {
+      if (!--usecount)
+	debug_printf ("closing passed in archetype, usecount %d", usecount);
+      else
+	{
+	  debug_printf ("not closing passed in archetype, usecount %d", usecount);
+	  return 0;
+	}
+      fh = this;
+    }
+  else if (!archetype)
+    fh = this;
+  else
+    {
+      cleanup ();
+      if (archetype_usecount (-1) == 0)
+	{
+	  debug_printf ("closing archetype");
+	  fh = archetype;
+	}
+      else
+	{
+	  debug_printf ("not closing archetype");
+	  return 0;
+	}
+    }
+
+  res = fh->close ();
+  if (archetype)
+    {
+      cygheap->fdtab.delete_archetype (archetype);
+      archetype = NULL;
+    }
+  return res;
 }
 
 int

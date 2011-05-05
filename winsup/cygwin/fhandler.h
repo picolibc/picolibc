@@ -178,8 +178,13 @@ class fhandler_base
 
   path_conv pc;
 
+  virtual bool use_archetype () const {return false;}
   virtual void set_name (path_conv &pc);
-  virtual void set_name (const char *s) {pc.set_normalized_path (s);}
+  virtual void set_name (const char *s)
+  {
+    pc.set_normalized_path (s);
+    pc.set_path (s);
+  }
   int error () const {return pc.error;}
   void set_error (int error) {pc.error = error;}
   bool exists () const {return pc.exists ();}
@@ -290,9 +295,24 @@ class fhandler_base
   bool fork_fixup (HANDLE, HANDLE &, const char *);
   virtual bool need_fixup_before () const {return false;}
 
-  virtual int open (int, mode_t = 0);
+  int open_with_arch (int, mode_t = 0);
+  virtual int open (int, mode_t);
+  virtual void open_setup (int flags) { return; }
+
   int open_fs (int, mode_t = 0);
+  virtual int close_with_arch ();
   virtual int close ();
+  virtual void cleanup () { return; }
+  int _archetype_usecount (const char *fn, int ln, int n)
+  {
+    if (!archetype)
+      return 0;
+    archetype->usecount += n;
+    if (strace.active ())
+      strace.prntf (_STRACE_ALL, fn, "line %d:  %s<%p> usecount + %d = %d", ln, get_name (), archetype, n, archetype->usecount);
+    return archetype->usecount;
+  }
+# define archetype_usecount(n) _archetype_usecount (__PRETTY_FUNCTION__, __LINE__, (n))
   int close_fs () { return fhandler_base::close (); }
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_fs (struct __stat64 *buf) __attribute__ ((regparm (2)));
@@ -548,6 +568,7 @@ class fhandler_socket: public fhandler_base
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   int __stdcall link (const char *) __attribute__ ((regparm (2)));
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_base_overlapped: public fhandler_base
@@ -612,6 +633,7 @@ public:
   static int create (fhandler_pipe *[2], unsigned, int);
   static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE&, HANDLE&, DWORD, const char * = NULL);
   friend class fhandler_fifo;
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_fifo: public fhandler_base_overlapped
@@ -645,6 +667,7 @@ public:
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_mailslot : public fhandler_base_overlapped
@@ -657,6 +680,7 @@ class fhandler_mailslot : public fhandler_base_overlapped
   ssize_t __stdcall raw_write (const void *, size_t) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   select_record *select_read (select_stuff *);
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_dev_raw: public fhandler_base
@@ -689,6 +713,7 @@ class fhandler_dev_raw: public fhandler_base
 
   void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
+  size_t size () const { return sizeof (*this);}
 };
 
 #define MAX_PARTITIONS 15
@@ -732,6 +757,7 @@ class fhandler_dev_floppy: public fhandler_dev_raw
   ssize_t __stdcall raw_write (const void *ptr, size_t ulen) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
   int ioctl (unsigned int cmd, void *buf);
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_dev_tape: public fhandler_dev_raw
@@ -749,7 +775,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
  public:
   fhandler_dev_tape ();
 
-  virtual int open (int flags, mode_t mode = 0);
+  int open (int flags, mode_t mode = 0);
   virtual int close ();
 
   void __stdcall raw_read (void *ptr, size_t& ulen) __attribute__ ((regparm (3)));
@@ -763,6 +789,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
   virtual void fixup_after_fork (HANDLE parent);
   virtual void set_close_on_exec (bool val);
   virtual int ioctl (unsigned int cmd, void *buf);
+  size_t size () const { return sizeof (*this);}
 };
 
 /* Standard disk file */
@@ -806,6 +833,7 @@ class fhandler_disk_file: public fhandler_base
 
   ssize_t __stdcall pread (void *, size_t, _off64_t) __attribute__ ((regparm (3)));
   ssize_t __stdcall pwrite (void *, size_t, _off64_t) __attribute__ ((regparm (3)));
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_cygdrive: public fhandler_disk_file
@@ -827,6 +855,7 @@ class fhandler_cygdrive: public fhandler_disk_file
   void rewinddir (DIR *);
   int closedir (DIR *);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_serial: public fhandler_base
@@ -875,6 +904,7 @@ class fhandler_serial: public fhandler_base
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
   bool is_slow () {return true;}
+  size_t size () const { return sizeof (*this);}
 };
 
 #define acquire_output_mutex(ms) \
@@ -1048,7 +1078,10 @@ class fhandler_console: public fhandler_termios
 
   fhandler_console* is_console () { return this; }
 
-  int open (int flags, mode_t mode = 0);
+  bool use_archetype () const {return true;}
+
+  int open (int flags, mode_t mode);
+  void open_setup (int flags);
 
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   ssize_t __stdcall write (const void *ptr, size_t len);
@@ -1058,9 +1091,6 @@ class fhandler_console: public fhandler_termios
   int tcflush (int);
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
-
-  /* Special dup as we must dup two handles */
-  int dup (fhandler_base *child);
 
   int ioctl (unsigned int cmd, void *);
   int init (HANDLE, DWORD, mode_t);
@@ -1080,6 +1110,7 @@ class fhandler_console: public fhandler_termios
   bool is_slow () {return true;}
   static bool need_invisible ();
   static bool has_a () {return !invisible_console;}
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_tty_common: public fhandler_termios
@@ -1124,9 +1155,11 @@ class fhandler_tty_slave: public fhandler_tty_common
 
  public:
   /* Constructor */
-  fhandler_tty_slave ();
+  fhandler_tty_slave (int);
 
+  bool use_archetype () const {return true;}
   int open (int flags, mode_t mode = 0);
+  void open_setup (int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int init (HANDLE, DWORD, mode_t);
@@ -1136,6 +1169,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   int tcflush (int);
   int ioctl (unsigned int cmd, void *);
   int close ();
+  void cleanup ();
   int dup (fhandler_base *child);
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
@@ -1146,6 +1180,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_pty_master: public fhandler_tty_common
@@ -1161,6 +1196,7 @@ public:
   /* Constructor */
   fhandler_pty_master ();
 
+  virtual bool use_archetype () const {return true;}
   DWORD pty_master_thread ();
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
@@ -1169,6 +1205,7 @@ public:
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int close ();
+  void cleanup ();
 
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
@@ -1184,6 +1221,8 @@ public:
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
   int tcgetpgrp ();
+  virtual bool is_tty_master () const {return false;}
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_tty_master: public fhandler_pty_master
@@ -1191,11 +1230,14 @@ class fhandler_tty_master: public fhandler_pty_master
  public:
   /* Constructor */
   fhandler_console *console;	// device handler to perform real i/o.
+  bool use_archetype () const {return false;}
 
   fhandler_tty_master ();
   int init ();
   int init_console ();
   void set_winsize (bool);
+  bool is_tty_master () const {return true;}
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_dev_null: public fhandler_base
@@ -1206,6 +1248,7 @@ class fhandler_dev_null: public fhandler_base
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_dev_zero: public fhandler_base
@@ -1224,6 +1267,7 @@ class fhandler_dev_zero: public fhandler_base
   virtual bool fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 				      _off64_t offset, DWORD size,
 				      void *address);
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_dev_random: public fhandler_base
@@ -1245,6 +1289,7 @@ class fhandler_dev_random: public fhandler_base
   _off64_t lseek (_off64_t offset, int whence);
   int close ();
   int dup (fhandler_base *child);
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_dev_mem: public fhandler_base
@@ -1269,7 +1314,8 @@ class fhandler_dev_mem: public fhandler_base
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   bool fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 			      _off64_t offset, DWORD size, void *address);
-} ;
+  size_t size () const { return sizeof (*this);}
+};
 
 class fhandler_dev_clipboard: public fhandler_base
 {
@@ -1288,6 +1334,7 @@ class fhandler_dev_clipboard: public fhandler_base
 
   int dup (fhandler_base *child);
   void fixup_after_exec ();
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_windows: public fhandler_base
@@ -1310,6 +1357,7 @@ class fhandler_windows: public fhandler_base
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_dev_dsp: public fhandler_base
@@ -1334,12 +1382,13 @@ class fhandler_dev_dsp: public fhandler_base
   int ioctl (unsigned int cmd, void *);
   _off64_t lseek (_off64_t, int);
   int close ();
-  int dup (fhandler_base *child);
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
  private:
   void close_audio_in ();
   void close_audio_out (bool immediately = false);
+  size_t size () const { return sizeof (*this);}
+  bool use_archetype () const {return true;}
 };
 
 class fhandler_virtual : public fhandler_base
@@ -1374,6 +1423,7 @@ class fhandler_virtual : public fhandler_base
   virtual bool fill_filebuf ();
   char *get_filebuf () { return filebuf; }
   void fixup_after_exec ();
+  virtual size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_proc: public fhandler_virtual
@@ -1387,6 +1437,7 @@ class fhandler_proc: public fhandler_virtual
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   bool fill_filebuf ();
+  virtual size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_procsys: public fhandler_virtual
@@ -1406,6 +1457,7 @@ class fhandler_procsys: public fhandler_virtual
   ssize_t __stdcall write (const void *ptr, size_t len);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   bool fill_filebuf ();
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_procsysvipc: public fhandler_proc
@@ -1418,6 +1470,7 @@ class fhandler_procsysvipc: public fhandler_proc
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   bool fill_filebuf ();
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_netdrive: public fhandler_virtual
@@ -1431,6 +1484,7 @@ class fhandler_netdrive: public fhandler_virtual
   int closedir (DIR *);
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_registry: public fhandler_proc
@@ -1454,6 +1508,7 @@ class fhandler_registry: public fhandler_proc
   bool fill_filebuf ();
   int close ();
   int dup (fhandler_base *child);
+  size_t size () const { return sizeof (*this);}
 };
 
 class pinfo;
@@ -1468,6 +1523,7 @@ class fhandler_process: public fhandler_proc
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   bool fill_filebuf ();
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_procnet: public fhandler_proc
@@ -1480,6 +1536,7 @@ class fhandler_procnet: public fhandler_proc
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   bool fill_filebuf ();
+  size_t size () const { return sizeof (*this);}
 };
 
 struct fhandler_nodevice: public fhandler_base
@@ -1492,7 +1549,7 @@ struct fhandler_nodevice: public fhandler_base
 #define report_tty_counts(fh, call, use_op) \
   termios_printf ("%s %s, %susecount %d",\
 		  fh->ttyname (), call,\
-		  use_op, ((fhandler_tty_slave *) fh)->archetype->usecount);
+		  use_op, ((fhandler_tty_slave *) (fh->archetype ?: fh))->usecount);
 
 typedef union
 {

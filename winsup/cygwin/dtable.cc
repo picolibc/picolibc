@@ -245,10 +245,7 @@ dtable::release (int fd)
     {
       if (fds[fd]->need_fixup_before ())
 	dec_need_fixup_before ();
-      fhandler_base *arch = fds[fd]->archetype;
       delete fds[fd];
-      if (arch && !arch->usecount)
-	cygheap->fdtab.delete_archetype (arch);
       fds[fd] = NULL;
     }
 }
@@ -309,25 +306,20 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       else
 	dev = *pipew_dev;
     }
-  else if (GetConsoleScreenBufferInfo (handle, &buf))
+  else if (GetConsoleScreenBufferInfo (handle, &buf)
+  	   || GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
     {
-      /* Console output */
-      if (ISSTATE (myself, PID_USETTY))
-	dev.parse (FH_TTY);
-      else
+      /* Console I/O */
+      if (!ISSTATE (myself, PID_USETTY))
 	dev = *console_dev;
-    }
-  else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
-    {
-      /* Console input */
-      if (ISSTATE (myself, PID_USETTY))
-	dev.parse (FH_TTY);
+      else if (myself->ctty >= 0)
+	dev.parse (DEV_TTYS_MAJOR, myself->ctty);
       else
-	dev = *console_dev;
+	dev.parse (FH_TTY);
     }
   else if (GetCommState (handle, &dcb))
-    /* serial */
-    dev.parse (DEV_TTYS_MAJOR, 0);
+    /* FIXME: Not right - assumes ttyS0 */
+    dev.parse (DEV_SERIAL_MAJOR, 0);
   else
     /* Try to figure it out from context - probably a disk file */
     handle_to_fn (handle, name);
@@ -434,15 +426,15 @@ build_fh_dev (const device& dev, const char *unix_name)
 }
 
 #define fh_unset ((fhandler_base *) 1)
-fhandler_base *
-build_fh_pc (path_conv& pc, bool set_name)
+static fhandler_base *
+fh_alloc (device dev)
 {
   fhandler_base *fh = fh_unset;
 
-  switch (pc.dev.major)
+  switch (dev.major)
     {
     case DEV_TTYS_MAJOR:
-      fh = cnew (fhandler_tty_slave) ();
+      fh = cnew (fhandler_tty_slave) (dev.minor);
       break;
     case DEV_TTYM_MAJOR:
       fh = cnew (fhandler_tty_master) ();
@@ -469,7 +461,7 @@ build_fh_pc (path_conv& pc, bool set_name)
       fh = cnew (fhandler_serial) ();
       break;
     default:
-      switch (pc.dev)
+      switch (dev)
 	{
 	case FH_CONSOLE:
 	case FH_CONIN:
@@ -548,8 +540,8 @@ build_fh_pc (path_conv& pc, bool set_name)
 	  {
 	    if (myself->ctty == TTY_CONSOLE)
 	      fh = cnew (fhandler_console) ();
-	    else if (myself->ctty >= 0)
-	      fh = cnew (fhandler_tty_slave) ();
+	    else
+	      fh = cnew (fhandler_tty_slave) (myself->ctty);
 	    break;
 	  }
 	case FH_KMSG:
@@ -560,11 +552,33 @@ build_fh_pc (path_conv& pc, bool set_name)
 
   if (fh == fh_unset)
     fh = cnew (fhandler_nodevice) ();
+  return fh;
+}
+
+fhandler_base *
+build_fh_pc (path_conv& pc, bool set_name)
+{
+  fhandler_base *fh = fh_alloc (pc.dev);
 
   if (!fh)
     set_errno (EMFILE);
+  else if (fh->dev () != FH_BAD)
+    fh->set_name (fh->dev ().name);
   else if (set_name)
     fh->set_name (pc);
+
+  if (!fh->use_archetype ())
+    /* doesn't use archetypes */;
+  else if ((fh->archetype = cygheap->fdtab.find_archetype (fh->dev ())))
+    debug_printf ("found an archetype for %s(%d/%d)", fh->get_name (), fh->dev ().major, fh->dev ().minor);
+  else
+    {
+      debug_printf ("creating an archetype for %s(%d/%d)", fh->get_name (), fh->dev ().major, fh->dev ().minor);
+      fh->archetype = fh_alloc (fh->pc.dev);
+      *fh->archetype = *fh;
+      fh->archetype->archetype = NULL;
+      *cygheap->fdtab.add_archetype () = fh->archetype;
+    }
 
   debug_printf ("fh %p", fh);
   return fh;
@@ -582,7 +596,8 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
   else
     {
       *newfh = *oldfh;
-      newfh->set_io_handle (NULL);
+      if (!oldfh->archetype)
+	newfh->set_io_handle (NULL);
       newfh->pc.reset_conv_handle ();
       if (oldfh->dup (newfh))
 	{
@@ -592,11 +607,10 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
 	}
       else
 	{
+	  newfh->usecount = 0;
+	  newfh->archetype_usecount (1);
 	  /* The O_CLOEXEC flag enforces close-on-exec behaviour. */
-	  if (flags & O_CLOEXEC)
-	    newfh->set_close_on_exec (true);
-	  else
-	    newfh->close_on_exec (false);
+	  newfh->set_close_on_exec (!!(flags & O_CLOEXEC));
 	  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
 	}
     }
@@ -754,7 +768,7 @@ dtable::fixup_after_exec ()
 	    if (fh->archetype)
 	      {
 		debug_printf ("closing fd %d since it is an archetype", i);
-		fh->close ();
+		fh->close_with_arch ();
 	      }
 	    release (i);
 	  }
@@ -785,102 +799,6 @@ dtable::fixup_after_fork (HANDLE parent)
 	  SetStdHandle (std_consts[i], fh->get_output_handle ());
       }
 }
-
-#ifdef NEWVFORK
-int
-dtable::vfork_child_dup ()
-{
-  fhandler_base **newtable;
-  lock ();
-  newtable = (fhandler_base **) ccalloc (HEAP_ARGV, size, sizeof (fds[0]));
-  int res = 1;
-
-  /* Remove impersonation */
-  cygheap->user.deimpersonate ();
-  if (cygheap->ctty)
-    {
-      cygheap->ctty->usecount++;
-      cygheap->console_count++;
-      report_tty_counts (cygheap->ctty, "vfork dup", "incremented ", "");
-    }
-
-  for (size_t i = 0; i < size; i++)
-    if (not_open (i))
-      continue;
-    else if ((newtable[i] = dup_worker (fds[i])) != NULL)
-      newtable[i]->set_close_on_exec (fds[i]->close_on_exec ());
-    else
-      {
-	res = 0;
-	goto out;
-      }
-
-  fds_on_hold = fds;
-  fds = newtable;
-
-out:
-  /* Restore impersonation */
-  cygheap->user.reimpersonate ();
-
-  unlock ();
-  return 1;
-}
-
-void
-dtable::vfork_parent_restore ()
-{
-  lock ();
-
-  fhandler_tty_slave *ctty_on_hold = cygheap->ctty_on_hold;
-  close_all_files ();
-  fhandler_base **deleteme = fds;
-  fds = fds_on_hold;
-  fds_on_hold = NULL;
-  cfree (deleteme);
-  unlock ();
-
-  if (cygheap->ctty != ctty_on_hold)
-    {
-      cygheap->ctty = ctty_on_hold;		// revert
-      cygheap->ctty->close ();			// Undo previous bump of this archetype
-    }
-  cygheap->ctty_on_hold = NULL;
-}
-
-void
-dtable::vfork_child_fixup ()
-{
-  if (!fds_on_hold)
-    return;
-  debug_printf ("here");
-  fhandler_base **saveme = fds;
-  fds = fds_on_hold;
-
-  fhandler_base *fh;
-  for (int i = 0; i < (int) size; i++)
-    if ((fh = fds[i]) != NULL)
-      {
-	fh->clear_readahead ();
-	if (!fh->archetype && fh->close_on_exec ())
-	  release (i);
-	else
-	  {
-	    fh->close ();
-	    release (i);
-	  }
-      }
-
-  fds = saveme;
-  cfree (fds_on_hold);
-  fds_on_hold = NULL;
-
-  if (cygheap->ctty_on_hold)
-    {
-      cygheap->ctty_on_hold->close ();
-      cygheap->ctty_on_hold = NULL;
-    }
-}
-#endif /*NEWVFORK*/
 
 static void
 decode_tty (char *buf, WCHAR *w32)

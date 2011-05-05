@@ -43440,15 +43440,6 @@ device::parse (_dev_t dev)
 }
 
 void
-device::tty_to_real_device ()
-{
-  if (!real_tty_attached (myself))
-    *this = myself->ctty < 0 ? dev_bad_storage : *console_dev;
-  else
-    parse (DEV_TTYS_MAJOR, myself->ctty);
-}
-
-void
 device::parsedisk (int drive, int part)
 {
   int base;

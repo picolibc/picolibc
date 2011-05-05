@@ -268,7 +268,6 @@ struct device
     return true;
   }
   static void init ();
-  void tty_to_real_device ();
   inline operator int () const {return devn;}
   inline void setfs (bool x) {dev_on_fs = x;}
   inline bool isfs () const {return dev_on_fs || devn == FH_FS;}

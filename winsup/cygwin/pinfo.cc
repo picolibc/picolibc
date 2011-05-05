@@ -371,12 +371,33 @@ _pinfo::_ctty (char *buf)
 }
 
 void
-_pinfo::set_ctty (tty_min *tc, int flags, fhandler_termios *arch)
+_pinfo::set_ctty (tty_min *tc, int flags, fhandler_termios *fh)
 {
-  debug_printf ("old %s", __ctty ());
+  debug_printf ("old %s, ctty %d, tc->ntty %d flags & O_NOCTTY %p", __ctty (), ctty, tc->ntty, flags & O_NOCTTY);
   if ((ctty < 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc->ntty;
+      if (cygheap->ctty != fh->archetype)
+	{
+	  debug_printf ("/dev/tty%d cygheap->ctty %p, archetype %p", ctty, cygheap->ctty, fh->archetype);
+	  if (!cygheap->ctty)
+	    syscall_printf ("ctty was NULL");
+	  else
+	    {
+	      syscall_printf ("ctty %p, usecount %d", cygheap->ctty,
+			      cygheap->ctty->archetype_usecount (0));
+	      cygheap->ctty->close ();
+	    }
+	  cygheap->ctty = (fhandler_termios *) fh->archetype;
+	  if (cygheap->ctty)
+	    {
+	      fh->archetype_usecount (1);
+	      /* guard ctty fh */
+	      cygheap->manage_console_count ("_pinfo::set_ctty", 1);
+	      report_tty_counts (cygheap->ctty, "ctty", "");
+	    }
+	}
+
       lock_ttys here;
       syscall_printf ("attaching %s sid %d, pid %d, pgid %d, tty->pgid %d, tty->sid %d",
 		      __ctty (), sid, pid, pgid, tc->getpgid (), tc->getsid ());
@@ -399,28 +420,8 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_termios *arch)
 	sid = tc->getsid ();
       if (tc->getpgid () == 0)
 	  tc->setpgid (pgid);
-      if (cygheap->ctty != arch)
-	{
-	  debug_printf ("cygheap->ctty %p, arch %p", cygheap->ctty, arch);
-	  if (!cygheap->ctty)
-	    syscall_printf ("ctty NULL");
-	  else
-	    {
-	      syscall_printf ("ctty %p, usecount %d", cygheap->ctty,
-			      cygheap->ctty->usecount);
-	      cygheap->ctty->close ();
-	    }
-	  cygheap->ctty = arch;
-	  if (arch)
-	    {
-	      arch->usecount++;
-	      /* guard ctty arch */
-	      cygheap->manage_console_count ("_pinfo::set_ctty", 1);
-	      report_tty_counts (cygheap->ctty, "ctty", "");
-	    }
-	}
     }
-    debug_printf ("cygheap->ctty now %p, arch %p", cygheap->ctty, arch);
+    debug_printf ("cygheap->ctty now %p, archetype %p", cygheap->ctty, fh->archetype);
 }
 
 /* Test to determine if a process really exists and is processing signals.

@@ -1006,11 +1006,6 @@ fhandler_dev_dsp::fhandler_dev_dsp ():
 int
 fhandler_dev_dsp::open (int flags, mode_t mode)
 {
-  if (cygheap->fdtab.find_archetype (dev ()))
-    {
-      set_errno (EBUSY);
-      return 0;
-    }
   int err = 0;
   UINT num_in = 0, num_out = 0;
   set_flags ((flags & ~O_TEXT) | O_BINARY);
@@ -1042,13 +1037,6 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
       set_open_status ();
       need_fork_fixup (true);
       nohandle (true);
-
-      // FIXME: Do this better someday
-      fhandler_dev_dsp *arch = (fhandler_dev_dsp *) cmalloc_abort (HEAP_ARCHETYPES, sizeof (*this));
-      archetype = arch;
-      *((fhandler_dev_dsp **) cygheap->fdtab.add_archetype ()) = arch;
-      *arch = *this;
-      archetype->usecount = 1;
     }
   else
     set_errno (err);
@@ -1065,9 +1053,6 @@ ssize_t __stdcall
 fhandler_dev_dsp::write (const void *ptr, size_t len)
 {
   debug_printf ("ptr=%08x len=%d", ptr, len);
-  if ((fhandler_dev_dsp *) archetype != this)
-    return ((fhandler_dev_dsp *)archetype)->write(ptr, len);
-
   int len_s = len;
   const char *ptr_s = static_cast <const char *> (ptr);
 
@@ -1114,8 +1099,6 @@ void __stdcall
 fhandler_dev_dsp::read (void *ptr, size_t& len)
 {
   debug_printf ("ptr=%08x len=%d", ptr, len);
-  if ((fhandler_dev_dsp *) archetype != this)
-    return ((fhandler_dev_dsp *)archetype)->read(ptr, len);
 
   if (audio_in_)
     /* nothing to do */;
@@ -1181,27 +1164,8 @@ fhandler_dev_dsp::close ()
 {
   debug_printf ("audio_in=%08x audio_out=%08x",
 		(int)audio_in_, (int)audio_out_);
-  if (!hExeced)
-    {
-      if ((fhandler_dev_dsp *) archetype != this)
-	return ((fhandler_dev_dsp *) archetype)->close ();
-
-      if (--usecount == 0)
-	{
-	  close_audio_in ();
-	  close_audio_out (exit_state != ES_NOT_EXITING);
-	}
-    }
-  return 0;
-}
-
-int
-fhandler_dev_dsp::dup (fhandler_base * child)
-{
-  debug_printf ("");
-  child->archetype = archetype;
-  child->set_flags (get_flags ());
-  archetype->usecount++;
+  close_audio_in ();
+  close_audio_out (exit_state != ES_NOT_EXITING);
   return 0;
 }
 
@@ -1210,9 +1174,6 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 {
   debug_printf ("audio_in=%08x audio_out=%08x",
 		(int)audio_in_, (int)audio_out_);
-  if ((fhandler_dev_dsp *) archetype != this)
-    return ((fhandler_dev_dsp *)archetype)->ioctl(cmd, ptr);
-
   int *intptr = (int *) ptr;
   switch (cmd)
     {
@@ -1419,11 +1380,9 @@ fhandler_dev_dsp::fixup_after_fork (HANDLE parent)
 { // called from new child process
   debug_printf ("audio_in=%08x audio_out=%08x",
 		(int)audio_in_, (int)audio_out_);
-  if (archetype != this)
-    return ((fhandler_dev_dsp *)archetype)->fixup_after_fork (parent);
 
   if (audio_in_)
-    audio_in_ ->fork_fixup (parent);
+    audio_in_->fork_fixup (parent);
   if (audio_out_)
     audio_out_->fork_fixup (parent);
 }
@@ -1435,9 +1394,6 @@ fhandler_dev_dsp::fixup_after_exec ()
 		(int) audio_in_, (int) audio_out_, close_on_exec ());
   if (!close_on_exec ())
     {
-      if (archetype != this)
-	return ((fhandler_dev_dsp *) archetype)->fixup_after_exec ();
-
       audio_in_ = NULL;
       audio_out_ = NULL;
     }

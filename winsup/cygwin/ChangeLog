@@ -1,3 +1,96 @@
+2011-05-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* cygheap.cc (cygheap::close_ctty): Close ctty via close_with_arch().
+	* debug.cc (close_handle): Call debugger on failure.
+	* devices.in (device::tty_to_real_device): Delete.
+	* devices.h (device::tty_to_real_device): Ditto.
+	* devices.cc: Regenerate.
+	* dtable.cc: Delete old ifdef'ed vfork code.
+	(dtable::release): Don't handle archetype here.
+	(dtable::init_std_file_from_handle): Consolidate console tests.
+	Generate major/minor for tty ASAP.  Fix incorrect setting of DEV_TTYS*
+	for serial.
+	(fh_alloc): New function derived from build_fh_pc.  Pass current tty
+	when building tty.
+	(build_pc_pc): Use fh_alloc to create.  Set name from fh->dev if
+	appropriate.  Generate an archetype or point to one here.
+	(dtable::dup_worker): Deal with archetypes.  Rely on = operator copying
+	whole class rather than just fhandler_base.
+	(dtable::fixup_after_exec): Call close_with_arch to handle closing of
+	fhandlers with archetypes.
+	* fhandler.cc (fhandler_base::operator =): Call memcpy with fhandler's
+	size() rather than sizeof fhandler_base.
+	(fhandler_base::open_with_arch): New function.  Handles opening of
+	fhandler's with archetypes, dealing with usecounts, etc.
+	(fhandler_base::close_with_arch): Ditto for close.
+	* fhandler.h: Many changes for archetypes.
+	(fhandler_base::set_name): Set both normalized path and regular path.
+	(fhandler_base::open_with_arch): New function.
+	(fhandler_base::open_setup): Ditto.
+	(fhandler_base::use_archetype): Ditto.
+	(fhandler_base::_archetype_usecount): Ditto.
+	(fhandler_*::size): Ditto.
+	(fhandler_dev_tape::open): Remove virtual decoration.
+	(fhandler_console::use_archetype): New function.  Return true.
+	(fhandler_console::open_setup): New function.
+	(fhandler_console::dup): Delete.
+	(fhandler_tty_slave::fhandler_tty_slave): Redeclare to take an
+	argument.
+	(fhandler_tty_slave::use_archetype): New function.  Return true.
+	(fhandler_tty_slave::cleanup): New function.
+	(fhandler_pty_master::use_archetype): New function.  Return true.
+	(fhandler_pty_master::cleanup): New function.
+	(fhandler_pty_master::is_tty_master): New function.  Return false.
+	(fhandler_tty_master::is_tty_master): New function.  Return true.
+	(fhandler_dev_dsp::fhandler_dev_dsp): New function.  Return true.
+	(report_tty_counts): Only report on archetype's usecount if there is
+	one.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Remove
+	handling of setsid, set_ctty, set_flags, and manage_console_count.
+	(fhandler_console::open_setup): New function.  Implement functionality
+	removed from get_tty_stuff.
+	(fhandler_console::dup): Delete.
+	(fhandler_console::output_tcsetattr): Set errno on error.
+	(fhandler_console::fhandler_console): Set device early.
+	(fhandler_console::init): Use open_with_arch to open console handles.
+	(fhandler_console::fixup_after_fork_exec): Nuke most of the stuff for
+	dealing with console handles.
+	* fhandler_dsp.cc (fhandler_dev_dsp::open): Remove archetype handling.
+	(fhandler_dev_dsp::write): Ditto.
+	(fhandler_dev_dsp::read): Ditto.
+	(fhandler_dev_dsp::close): Ditto.
+	(fhandler_dev_dsp::dup): Ditto.
+	(fhandler_dev_dsp::ioctl): Ditto.
+	(fhandler_dev_dsp::fixup_after_fork): Ditto.
+	(fhandler_dev_dsp::fixup_after_exec): Ditto.
+	* fhandler_tty.cc (fhandler_tty_common::__acquire_output_mutex): Add a
+	little more debugging.
+	(fhandler_tty_common::__release_output_mutex): Ditto.
+	(fhandler_pty_master::process_slave_output): Ditto.  Don't do signal
+	handling or pthread_cancel handling in the tty master thread.
+	(process_output): Minor reorg.
+	(fhandler_tty_slave::fhandler_tty_slave): Set device based on new ntty
+	argument.
+	(fhandler_tty_slave::open): Remove archetype handling.  Move some
+	processing into open_setup().
+	(fhandler_tty_slave::open_setup): New function.
+	(fhandler_tty_slave::cleanup): New function.
+	(fhandler_tty_slave::close): Remove archetype handling.  Move some
+	processing into cleanup().
+	(fhandler_tty_slave::init): Rename argument from f to h.  Open device
+	using open_with_arch().  Remove archetype handling.
+	(fhandler_pty_master::dup): Ditto.
+	(fhandler_pty_master::open): Ditto.
+	(fhandler_pty_master::close): Ditto.  Move some handling to cleanup().
+	(fhandler_pty_master::cleanup): New function.
+	(fhandler_tty_master::init_console): Give unique name to captive
+	console fhandler.
+	* pinfo.cc (_pinfo::set_ctty): Rename argument from arch to fh.
+	Eliminate archetype assumption.
+	* syscalls.cc (close_all_files): Use close_with_arch for closing.
+	(open): Use open_with_arch() rather than open().
+	(close): Use close_with_arch() rather than close().
+
 2011-05-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pinfo.h (class push_process_state): New class to push a process state
