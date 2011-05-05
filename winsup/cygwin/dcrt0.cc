@@ -905,7 +905,10 @@ dll_crt0_1 (void *)
   set_errno (0);
 
   if (dynamically_loaded)
-    return;
+    {
+      _setlocale_r (_REENT, LC_CTYPE, "C");
+      return;
+    }
 
   /* Disable case-insensitive globbing */
   ignore_case_with_glob = false;
