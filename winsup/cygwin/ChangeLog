@@ -1,3 +1,12 @@
+2011-05-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* signal.cc (_pinfo::kill): Return success on kill(0) only if pid
+	exists or is in PID_EXITED state.  Report pid 0 when pid does not exist
+	rather than pid -1.  Make debug output reflect actual function call.
+	* sigproc.cc (stopped_or_terminated): Set process state to reaped when
+	we've finished waiting for it.
+	* include/sys/cygwin.h (PID_REAPED): New enum.
+
 2011-05-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin.din (psiginfo): Export.

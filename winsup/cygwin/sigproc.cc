@@ -1041,6 +1041,7 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
     }
   else
     {
+      child->process_state = PID_REAPED;
       w->status = (__uint16_t) child->exitcode;
 
       add_rusage (&myself->rusage_children, &child->rusage_children);

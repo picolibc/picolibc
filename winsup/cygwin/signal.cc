@@ -250,7 +250,7 @@ _pinfo::kill (siginfo_t& si)
 	}
       this_pid = pid;
     }
-  else if (si.si_signo == 0 && this)
+  else if (si.si_signo == 0 && this && process_state == PID_EXITED)
     {
       this_process_state = process_state;
       this_pid = pid;
@@ -260,12 +260,12 @@ _pinfo::kill (siginfo_t& si)
     {
       set_errno (ESRCH);
       this_process_state = 0;
-      this_pid = -1;
+      this_pid = 0;
       res = -1;
     }
 
-  syscall_printf ("%d = _pinfo::kill (%d, %d), process_state %p", res, this_pid,
-		  si.si_signo, this_process_state);
+  syscall_printf ("%d = _pinfo::kill (%d), pid %d, process_state %p", res,
+		  si.si_signo, this_pid, this_process_state);
   return res;
 }
 
