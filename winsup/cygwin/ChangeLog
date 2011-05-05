@@ -1,4 +1,9 @@
-2011-05-04  Christian Franke  <franke@computer.org>
+2011-05-05  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* posix.sgml (std-notimpl): Remove bsd_signal, setcontext, and
+	swapcontext, marked obsolete in SUSv3 and not present in SUSv4.
+
+2011-05-05  Christian Franke  <franke@computer.org>
 
 	* fhandler_registry.cc (fhandler_registry::exists): Fix regression
 	in EACCES handling.

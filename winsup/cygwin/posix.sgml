@@ -1273,7 +1273,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     atan2l
     atanhl
     atanl
-    bsd_signal
     cabsl
     cacoshl
     cacosl
@@ -1397,7 +1396,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     roundl
     scalblnl
     scalbnl
-    setcontext
     setnetent
     sigaltstack
     sigtimedwait
@@ -1411,7 +1409,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strncasecmp_l
     strtold
     strxfrm_l
-    swabcontext
     tanhl
     tanl
     tcgetsid
