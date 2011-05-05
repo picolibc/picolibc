@@ -428,7 +428,7 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_termios *arch)
 bool __stdcall
 _pinfo::exists ()
 {
-  return this && !(process_state & PID_EXITED);
+  return this && !(process_state & (PID_EXITED | PID_REAPED));
 }
 
 bool
