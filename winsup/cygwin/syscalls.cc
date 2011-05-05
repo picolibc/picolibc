@@ -962,12 +962,17 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 {
   pthread_testcancel ();
 
-  extern int sigcatchers;
-  const int e = get_errno ();
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
 
   ssize_t res = -1;
-
+  const int e = get_errno ();
   const ssize_t tot = check_iovec_for_read (iov, iovcnt);
+
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    goto done;
 
   if (tot <= 0)
     {
@@ -975,47 +980,27 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
       goto done;
     }
 
+  if ((cfd->get_flags () & O_ACCMODE) == O_WRONLY)
+    {
+      set_errno (EBADF);
+      goto done;
+    }
+
+  /* Could block, so let user know we at least got here.  */
+  extern int sigcatchers;
+  syscall_printf ("readv (%d, %p, %d) %sblocking, sigcatchers %d",
+		  fd, iov, iovcnt, cfd->is_nonblocking () ? "non" : "",
+		  sigcatchers);
+
   while (1)
     {
-      cygheap_fdget cfd (fd);
-      if (cfd < 0)
-	break;
-
-      if ((cfd->get_flags () & O_ACCMODE) == O_WRONLY)
-	{
-	  set_errno (EBADF);
-	  break;
-	}
-
-      /* Could block, so let user know we at least got here.  */
-      syscall_printf ("readv (%d, %p, %d) %sblocking, sigcatchers %d",
-		      fd, iov, iovcnt, cfd->is_nonblocking () ? "non" : "",
-		      sigcatchers);
-
-      /* FIXME: This is not thread safe.  We need some method to
-	 ensure that an fd, closed in another thread, aborts I/O
-	 operations. */
-      if (!cfd.isopen ())
-	break;
-
       /* Check to see if this is a background read from a "tty",
 	 sending a SIGTTIN, if appropriate */
       res = cfd->bg_check (SIGTTIN);
 
-      if (!cfd.isopen ())
-	{
-	  res = -1;
-	  break;
-	}
-
       if (res > bg_eof)
 	{
 	  myself->process_state |= PID_TTYIN;
-	  if (!cfd.isopen ())
-	    {
-	      res = -1;
-	      break;
-	    }
 	  res = cfd->readv (iov, iovcnt, tot);
 	  myself->process_state &= ~PID_TTYIN;
 	}
@@ -1036,6 +1021,10 @@ extern "C" ssize_t
 writev (const int fd, const struct iovec *const iov, const int iovcnt)
 {
   pthread_testcancel ();
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
 
   int res = -1;
   const ssize_t tot = check_iovec_for_write (iov, iovcnt);
