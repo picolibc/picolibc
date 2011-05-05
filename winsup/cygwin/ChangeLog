@@ -1,5 +1,11 @@
 2011-05-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::pread): Correctly return
+	with errno set to EBADF if file open mode is incorrect.
+	(fhandler_disk_file::pwrite): Ditto.
+
+2011-05-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (is_at_eof): Drop static storage class.  Drop err
 	parameter since we don't change the Win32 error here anymore.
 	(fhandler_base::raw_read): Accommodate change to is_at_eof.

@@ -1415,6 +1415,12 @@ out:
 ssize_t __stdcall
 fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 {
+  if ((get_flags () & O_ACCMODE) == O_WRONLY)
+    {
+      set_errno (EBADF);
+      return -1;
+    }
+
   /* In binary mode, we can use an atomic NtReadFile call. */
   if (rbinary ())
     {
@@ -1476,6 +1482,12 @@ fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 ssize_t __stdcall
 fhandler_disk_file::pwrite (void *buf, size_t count, _off64_t offset)
 {
+  if ((get_flags () & O_ACCMODE) == O_RDONLY)
+    {
+      set_errno (EBADF);
+      return -1;
+    }
+
   /* In binary mode, we can use an atomic NtWriteFile call. */
   if (wbinary ())
     {
