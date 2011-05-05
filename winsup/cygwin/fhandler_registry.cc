@@ -317,10 +317,12 @@ fhandler_registry::exists ()
 
       if (!val_only)
 	hKey = open_key (path, KEY_READ, wow64, false);
-      if (hKey != (HKEY) INVALID_HANDLE_VALUE || get_errno () == EACCES)
+      if (hKey != (HKEY) INVALID_HANDLE_VALUE)
 	file_type = virt_directory;
       else
 	{
+	  /* Key does not exist or open failed with EACCES,
+	     enumerate subkey and value names of parent key.  */
 	  hKey = open_key (path, KEY_READ, wow64, true);
 	  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
 	    return virt_none;
@@ -797,7 +799,7 @@ fhandler_registry::open (int flags, mode_t mode)
 	handle = open_key (path, KEY_READ, wow64, false);
       if (handle == (HKEY) INVALID_HANDLE_VALUE)
 	{
-	  if (get_errno () != EACCES)
+	  if (val_only || get_errno () != EACCES)
 	    handle = open_key (path, KEY_READ, wow64, true);
 	  if (handle == (HKEY) INVALID_HANDLE_VALUE)
 	    {
