@@ -143,12 +143,6 @@ fhandler_mailslot::open (int flags, mode_t mode)
   return res;
 }
 
-void __stdcall
-fhandler_mailslot::raw_read (void *in_ptr, size_t& len)
-{
-  read_overlapped (in_ptr, len);
-}
-
 ssize_t __stdcall
 fhandler_mailslot::raw_write (const void *ptr, size_t len)
 {
@@ -160,7 +154,7 @@ fhandler_mailslot::raw_write (const void *ptr, size_t len)
       memcpy (buf, ptr, len);
       return raw_write (buf, 427);
     }
-  return write_overlapped (ptr, len);
+  return fhandler_base_overlapped::raw_write (ptr, len);
 }
 
 int

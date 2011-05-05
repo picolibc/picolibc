@@ -360,8 +360,8 @@ public:
   virtual class fhandler_console *is_console () { return 0; }
   virtual int is_windows () {return 0; }
 
-  virtual void __stdcall raw_read (void *ptr, size_t& ulen);
-  virtual ssize_t __stdcall raw_write (const void *ptr, size_t ulen);
+  virtual void __stdcall raw_read (void *ptr, size_t& ulen) __attribute__ ((regparm (3)));
+  virtual ssize_t __stdcall raw_write (const void *ptr, size_t ulen) __attribute__ ((regparm (3)));
 
   /* Virtual accessor functions to hide the fact
      that some fd's have two handles. */
@@ -567,9 +567,8 @@ public:
   wait_return __stdcall wait_overlapped (bool, bool, DWORD *, bool, DWORD = 0) __attribute__ ((regparm (3)));
   int __stdcall setup_overlapped () __attribute__ ((regparm (1)));
   void __stdcall destroy_overlapped () __attribute__ ((regparm (1)));
-  void __stdcall read_overlapped (void *ptr, size_t& len) __attribute__ ((regparm (3)));
-  ssize_t __stdcall write_overlapped (const void *ptr, size_t len) __attribute__ ((regparm (3)));
-    __attribute__ ((regparm (3)));
+  virtual void __stdcall raw_read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
+  virtual ssize_t __stdcall raw_write (const void *ptr, size_t len) __attribute__ ((regparm (3)));
   OVERLAPPED *&get_overlapped () {return overlapped;}
   OVERLAPPED *get_overlapped_buffer () {return &io_status;}
   void set_overlapped (OVERLAPPED *ov) {overlapped = ov;}
@@ -603,8 +602,6 @@ public:
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
   char *get_proc_fd_name (char *buf);
-  void __stdcall raw_read (void *ptr, size_t& len);
-  ssize_t __stdcall raw_write (const void *, size_t);
   int open (int flags, mode_t mode = 0);
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
@@ -637,8 +634,8 @@ class fhandler_fifo: public fhandler_base_overlapped
   char *fifo_name (char *) __attribute__ ((regparm (2)));
 public:
   fhandler_fifo ();
-  void __stdcall raw_read (void *, size_t&);
-  ssize_t __stdcall raw_write (const void *, size_t);
+  void __stdcall raw_read (void *, size_t&) __attribute__ ((regparm (3)));
+  ssize_t __stdcall raw_write (const void *, size_t) __attribute__ ((regparm (3)));
   int open (int, mode_t);
   int close ();
   int dup (fhandler_base *child);
@@ -657,8 +654,7 @@ class fhandler_mailslot : public fhandler_base_overlapped
   fhandler_mailslot ();
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int open (int flags, mode_t mode = 0);
-  void __stdcall raw_read (void *ptr, size_t& len);
-  ssize_t __stdcall raw_write (const void *, size_t);
+  ssize_t __stdcall raw_write (const void *, size_t) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   select_record *select_read (select_stuff *);
 };
@@ -732,8 +728,8 @@ class fhandler_dev_floppy: public fhandler_dev_raw
   int open (int flags, mode_t mode = 0);
   int close ();
   int dup (fhandler_base *child);
-  void __stdcall raw_read (void *ptr, size_t& ulen);
-  ssize_t __stdcall raw_write (const void *ptr, size_t ulen);
+  void __stdcall raw_read (void *ptr, size_t& ulen) __attribute__ ((regparm (3)));
+  ssize_t __stdcall raw_write (const void *ptr, size_t ulen) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
   int ioctl (unsigned int cmd, void *buf);
 };
@@ -756,8 +752,8 @@ class fhandler_dev_tape: public fhandler_dev_raw
   virtual int open (int flags, mode_t mode = 0);
   virtual int close ();
 
-  void __stdcall raw_read (void *ptr, size_t& ulen);
-  ssize_t __stdcall raw_write (const void *ptr, size_t ulen);
+  void __stdcall raw_read (void *ptr, size_t& ulen) __attribute__ ((regparm (3)));
+  ssize_t __stdcall raw_write (const void *ptr, size_t ulen) __attribute__ ((regparm (3)));
 
   virtual _off64_t lseek (_off64_t offset, int whence);
 
@@ -855,8 +851,8 @@ class fhandler_serial: public fhandler_base
   int init (HANDLE h, DWORD a, mode_t flags);
   void overlapped_setup ();
   int dup (fhandler_base *child);
-  void __stdcall raw_read (void *ptr, size_t& ulen);
-  ssize_t __stdcall raw_write (const void *ptr, size_t ulen);
+  void __stdcall raw_read (void *ptr, size_t& ulen) __attribute__ ((regparm (3)));
+  ssize_t __stdcall raw_write (const void *ptr, size_t ulen) __attribute__ ((regparm (3)));
   int tcsendbreak (int);
   int tcdrain ();
   int tcflow (int);

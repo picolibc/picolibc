@@ -265,7 +265,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
     else
       {
 	size_t prev_len = len;
-	read_overlapped (in_ptr, len);
+	fhandler_base_overlapped::raw_read (in_ptr, len);
 	if (len)
 	  break;
 	wait_state = fifo_wait_for_next_client;
@@ -279,7 +279,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 ssize_t __stdcall
 fhandler_fifo::raw_write (const void *ptr, size_t len)
 {
-  return wait (true) ? write_overlapped (ptr, len) : -1;
+  return wait (true) ? fhandler_base_overlapped::raw_write (ptr, len) : -1;
 }
 
 int __stdcall

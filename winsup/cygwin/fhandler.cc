@@ -1817,7 +1817,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 }
 
 void __stdcall __attribute__ ((regparm (3)))
-fhandler_base_overlapped::read_overlapped (void *ptr, size_t& len)
+fhandler_base_overlapped::raw_read (void *ptr, size_t& len)
 {
   DWORD nbytes;
   if (has_ongoing_io ())
@@ -1847,7 +1847,7 @@ fhandler_base_overlapped::read_overlapped (void *ptr, size_t& len)
 }
 
 ssize_t __stdcall __attribute__ ((regparm (3)))
-fhandler_base_overlapped::write_overlapped (const void *ptr, size_t len)
+fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
 {
   size_t nbytes;
   if (has_ongoing_io ())

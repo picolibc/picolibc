@@ -1,5 +1,26 @@
 2011-05-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* fhandler.cc (fhandler_base_overlapped::raw_read): Rename from
+	read_overlapped.
+	(fhandler_base_overlapped::raw_e): Rename from write_overlapped.
+	* fhandler.h (fhandler_*::raw_read): Add reparm decoration.
+	(fhandler_*::raw_write): Ditto.
+	(fhandler_base_overlapped::raw_read): Rename from read_overlapped.
+	(fhandler_base_overlapped::raw_write): Rename from write_overlapped.
+	(fhandler_pipe::raw_read): Delete.
+	(fhandler_pipe::raw_write): Ditto.
+	(fhandler_mailslot::raw_read): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo::raw_read): Reflect read_overlapped
+	-> raw_read rename.
+	(fhandler_fifo::raw_write): Ditto.
+	* fhandler_mailslot.cc (fhandler_mailslot::raw_read): Delete.
+	(fhandler_mailslot::raw_write): Reflect read_overlapped -> raw_read
+	rename.
+	* pipe.cc (fhandler_pipe::raw_read): Delete.
+	(fhandler_pipe::raw_write): Ditto.
+
+2011-05-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* fork.cc (fork): Clear PID_REAPED.
 	* pinfo.cc (pinfo_init): Ditto.
 	(pinfo::init): Check for PID_REAPED.
