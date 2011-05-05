@@ -621,7 +621,7 @@ fork ()
   if (ischild)
     {
       myself->process_state |= PID_ACTIVE;
-      myself->process_state &= ~(PID_INITIALIZING | PID_EXITED);
+      myself->process_state &= ~(PID_INITIALIZING | PID_EXITED | PID_REAPED);
     }
   else if (res < 0)
     {

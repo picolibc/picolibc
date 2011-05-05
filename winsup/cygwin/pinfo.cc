@@ -111,7 +111,7 @@ pinfo_init (char **envp, int envc)
     }
 
   myself->process_state |= PID_ACTIVE;
-  myself->process_state &= ~(PID_INITIALIZING | PID_EXITED);
+  myself->process_state &= ~(PID_INITIALIZING | PID_EXITED | PID_REAPED);
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
 }
 
@@ -302,10 +302,10 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	 region to exist for a while after a process has exited.  This should
 	 only be a brief occurrence, so rather than introduce some kind of
 	 locking mechanism, just loop.  */
-      if (!created && createit && (procinfo->process_state & PID_EXITED))
+      if (!created && createit && (procinfo->process_state & (PID_EXITED | PID_REAPED)))
 	{
 	  debug_printf ("looping because pid %d, procinfo->pid %d, "
-			"procinfo->dwProcessid %u has PID_EXITED set",
+			"procinfo->dwProcessid %u has PID_EXITED|PID_REAPED set",
 			n, procinfo->pid, procinfo->dwProcessId);
 	  goto loop;
 	}

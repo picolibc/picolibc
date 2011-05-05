@@ -1022,7 +1022,7 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 
   int terminated;
 
-  if (!((terminated = (child->process_state == PID_EXITED))
+  if (!((terminated = (child->process_state & (PID_REAPED | PID_EXITED)))
 	|| ((w->options & WCONTINUED) && child->stopsig == SIGCONT)
 	|| ((w->options & WUNTRACED) && child->stopsig && child->stopsig != SIGCONT)))
     return false;
