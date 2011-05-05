@@ -247,6 +247,8 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
 void __stdcall
 fhandler_console::read (void *pv, size_t& buflen)
 {
+  push_process_state process_state (PID_TTYIN);
+
   HANDLE h = get_io_handle ();
 
 #define buf ((char *) pv)
@@ -288,6 +290,7 @@ restart:
 	    goto restart;
 	  goto sig_exit;
 	case WAIT_OBJECT_0 + 2:
+	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
 	case WAIT_TIMEOUT:
@@ -1814,6 +1817,12 @@ do_print:
 ssize_t __stdcall
 fhandler_console::write (const void *vsrc, size_t len)
 {
+  bg_check_types bg = bg_check (SIGTTOU);
+  if (bg <= bg_eof)
+    return (ssize_t) bg;
+
+  push_process_state process_state (PID_TTYOU);
+
   /* Run and check for ansi sequences */
   unsigned const char *src = (unsigned char *) vsrc;
   unsigned const char *end = src + len;

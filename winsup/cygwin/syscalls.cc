@@ -994,17 +994,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 
   while (1)
     {
-      /* Check to see if this is a background read from a "tty",
-	 sending a SIGTTIN, if appropriate */
-      res = cfd->bg_check (SIGTTIN);
-
-      if (res > bg_eof)
-	{
-	  myself->process_state |= PID_TTYIN;
-	  res = cfd->readv (iov, iovcnt, tot);
-	  myself->process_state &= ~PID_TTYIN;
-	}
-
+      res = cfd->readv (iov, iovcnt, tot);
       if (res >= 0 || get_errno () != EINTR || !_my_tls.call_signal_handler ())
 	break;
       set_errno (e);
@@ -1051,14 +1041,7 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
   else
     syscall_printf  ("writev (%d, %p, %d)", fd, iov, iovcnt);
 
-  res = cfd->bg_check (SIGTTOU);
-
-  if (res > (int) bg_eof)
-    {
-      myself->process_state |= PID_TTYOU;
-      res = cfd->writev (iov, iovcnt, tot);
-      myself->process_state &= ~PID_TTYOU;
-    }
+  res = cfd->writev (iov, iovcnt, tot);
 
 done:
   if (fd == 1 || fd == 2)

@@ -1,5 +1,20 @@
 2011-05-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pinfo.h (class push_process_state): New class to push a process state
+	flag temporarily into myself->process_state.
+	* fhandler_console.cc (fhandler_console::read): Add push_process_state
+	handler.
+	(fhandler_console::write): Call bg_check from here.  Add
+	push_process_state handler.
+	* fhandler_tty.cc (fhandler_tty_slave::write): Ditto.
+	(fhandler_tty_slave::read): Ditto.
+	(fhandler_pty_master::write): Ditto.
+	(fhandler_pty_master::read): Ditto.
+	* syscalls.cc (readv): Remove bg_check call and setting process state.
+	(writev): Ditto.
+
+2011-05-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (readv): Add myfault handler.  Don't check repeatedly
 	open state of file handler.  Streamline loop.
 	(writev): Add myfault handler.

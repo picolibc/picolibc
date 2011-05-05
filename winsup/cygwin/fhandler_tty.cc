@@ -746,7 +746,13 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
 {
   DWORD n, towrite = len;
 
+  bg_check_types bg = bg_check (SIGTTOU);
+  if (bg <= bg_eof)
+    return (ssize_t) bg;
+
   termios_printf ("tty%d, write(%x, %d)", get_unit (), ptr, len);
+
+  push_process_state process_state (PID_TTYOU);
 
   acquire_output_mutex (INFINITE);
 
@@ -807,7 +813,16 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
   char peek_buf[INP_BUFFER_SIZE];
   DWORD time_to_wait;
 
+  bg_check_types bg = bg_check (SIGTTIN);
+  if (bg <= bg_eof)
+    {
+      len = (size_t) bg;
+      return;
+    }
+
   termios_printf ("read(%x, %d) handle %p", ptr, len, get_handle ());
+
+  push_process_state process_state (PID_TTYIN);
 
   if (is_nonblocking () || !ptr) /* Indicating tcflush(). */
     time_to_wait = 0;
@@ -848,6 +863,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 	  totalread = -1;
 	  goto out;
 	case WAIT_OBJECT_0 + 2:
+	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
 	case WAIT_TIMEOUT:
@@ -885,6 +901,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 	  totalread = -1;
 	  goto out;
 	case WAIT_OBJECT_0 + 2:
+	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
 	case WAIT_TIMEOUT:
@@ -1525,6 +1542,12 @@ fhandler_pty_master::write (const void *ptr, size_t len)
   char *p = (char *) ptr;
   termios ti = tc->ti;
 
+  bg_check_types bg = bg_check (SIGTTOU);
+  if (bg <= bg_eof)
+    return (ssize_t) bg;
+
+  push_process_state process_state (PID_TTYOU);
+
   for (i = 0; i < (int) len; i++)
     {
       line_edit_status status = line_edit (p++, 1, ti);
@@ -1541,6 +1564,13 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 void __stdcall
 fhandler_pty_master::read (void *ptr, size_t& len)
 {
+  bg_check_types bg = bg_check (SIGTTIN);
+  if (bg <= bg_eof)
+    {
+      len = (size_t) bg;
+      return;
+    }
+  push_process_state process_state (PID_TTYIN);
   len = (size_t) process_slave_output ((char *) ptr, len, pktmode);
 }
 

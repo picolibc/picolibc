@@ -224,6 +224,23 @@ cygwin_pid (pid_t pid)
 void __stdcall pinfo_init (char **, int);
 extern pinfo myself;
 
+/* Helper class to allow convenient setting and unsetting a process_state
+   flag in myself.  This is used in certain fhandler read/write methods
+   to set the PID_TTYIN/PID_TTYOU flags in myself->process_state. */
+class push_process_state
+{
+private:
+  int flag;
+public:
+  push_process_state (int add_flag)
+  {
+    flag = add_flag;
+    myself->process_state |= flag;
+  }
+  void pop () { myself->process_state &= ~(flag); }
+  ~push_process_state () { pop (); }
+};
+
 #define _P_VFORK 0
 #define _P_SYSTEM 512
 /* Add this flag in calls to spawn_guts if the calling function is one of
