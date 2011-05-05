@@ -1415,6 +1415,47 @@ out:
 ssize_t __stdcall
 fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 {
+  /* In binary mode, we can use an atomic NtReadFile call. */
+  if (rbinary ())
+    {
+      extern int __stdcall is_at_eof (HANDLE h);
+      NTSTATUS status;
+      IO_STATUS_BLOCK io;
+      LARGE_INTEGER off = { QuadPart:offset };
+
+      status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, buf, count,
+			   &off, NULL);
+      if (!NT_SUCCESS (status))
+	{
+	  if (pc.isdir ())
+	    {
+	      set_errno (EISDIR);
+	      return -1;
+	    }
+	  if (status == (NTSTATUS) STATUS_ACCESS_VIOLATION)
+	    {
+	      if (is_at_eof (get_handle ()))
+		return 0;
+	      switch (mmap_is_attached_or_noreserve (buf, count))
+		{
+		case MMAP_NORESERVE_COMMITED:
+		  status = NtReadFile (get_handle (), NULL, NULL, NULL, &io,
+				       buf, count, &off, NULL);
+		  if (NT_SUCCESS (status))
+		    return io.Information;
+		  break;
+		case MMAP_RAISE_SIGBUS:
+		  raise (SIGBUS);
+		default:
+		  break;
+		}
+	    }
+	  __seterrno_from_nt_status (status);
+	  return -1;
+	}
+      return io.Information;
+    }
+  /* Text mode stays slow and non-atomic. */
   ssize_t res;
   _off64_t curpos = lseek (0, SEEK_CUR);
   if (curpos < 0 || lseek (offset, SEEK_SET) < 0)
@@ -1435,6 +1476,23 @@ fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 ssize_t __stdcall
 fhandler_disk_file::pwrite (void *buf, size_t count, _off64_t offset)
 {
+  /* In binary mode, we can use an atomic NtWriteFile call. */
+  if (wbinary ())
+    {
+      NTSTATUS status;
+      IO_STATUS_BLOCK io;
+      LARGE_INTEGER off = { QuadPart:offset };
+
+      status = NtWriteFile (get_handle (), NULL, NULL, NULL, &io, buf, count,
+			    &off, NULL);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  return -1;
+	}
+      return io.Information;
+    }
+  /* Text mode stays slow and non-atomic. */
   int res;
   _off64_t curpos = lseek (0, SEEK_CUR);
   if (curpos < 0 || lseek (offset, SEEK_SET) < 0)

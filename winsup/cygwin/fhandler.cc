@@ -163,8 +163,8 @@ char *fhandler_base::get_proc_fd_name (char *buf)
 
 /* Detect if we are sitting at EOF for conditions where Windows
    returns an error but UNIX doesn't.  */
-static int __stdcall
-is_at_eof (HANDLE h, DWORD err)
+int __stdcall
+is_at_eof (HANDLE h)
 {
   IO_STATUS_BLOCK io;
   FILE_POSITION_INFORMATION fpi;
@@ -176,7 +176,6 @@ is_at_eof (HANDLE h, DWORD err)
 					     FilePositionInformation))
       && fsi.EndOfFile.QuadPart == fpi.CurrentByteOffset.QuadPart)
     return 1;
-  SetLastError (err);
   return 0;
 }
 
@@ -237,7 +236,7 @@ retry:
 	  /* `bytes_read' is supposedly valid.  */
 	  break;
 	case ERROR_NOACCESS:
-	  if (is_at_eof (get_handle (), errcode))
+	  if (is_at_eof (get_handle ()))
 	    {
 	      bytes_read = 0;
 	      break;

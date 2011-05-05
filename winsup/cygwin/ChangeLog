@@ -1,5 +1,16 @@
 2011-05-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (is_at_eof): Drop static storage class.  Drop err
+	parameter since we don't change the Win32 error here anymore.
+	(fhandler_base::raw_read): Accommodate change to is_at_eof.
+
+	* fhandler_disk_file.cc (fhandler_disk_file::pread): In binary mode use
+	direct call to NtReadFile, rather than lseek/read.
+	(fhandler_disk_file::pwrite): In binary mode use direct call to
+	NtWriteFile, rather than lseek/write.
+
+2011-05-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (dll_crt0_1): Reset locale to "C" even when dynamically
 	loaded.
 
