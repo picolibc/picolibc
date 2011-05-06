@@ -1682,6 +1682,7 @@ symlinkat SIGFE
 sync SIGFE
 sysconf SIGFE
 _sysconf = sysconf SIGFE
+sysinfo SIGFE
 syslog SIGFE
 _syslog = syslog SIGFE
 system SIGFE

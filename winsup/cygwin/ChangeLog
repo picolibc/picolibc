@@ -1,3 +1,12 @@
+2011-05-06  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* sysconf.cc (sysinfo): New function.
+	* cygwin.din (sysinfo): Export.
+	* posix.sgml (std-gnu): Add sysinfo.
+	* include/sys/sysinfo.h (struct sysinfo): Define.
+	(sysinfo): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2011-05-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/minires-os-if.c (get_dns_info): Drop printing uninitialized
