@@ -1316,6 +1316,14 @@ fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
   return res;
 }
 
+void __stdcall
+fhandler_socket::read (void *in_ptr, size_t& len)
+{
+  WSABUF wsabuf = { len, (char *) in_ptr };
+  WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0,  NULL }, 0 };
+  len = recv_internal (&wsamsg);
+}
+
 int
 fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
 			ssize_t tot)
@@ -1528,6 +1536,14 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 	msg->msg_flags = wsamsg.dwFlags;
     }
   return ret;
+}
+
+int
+fhandler_socket::write (const void *ptr, size_t len)
+{
+  WSABUF wsabuf = { len, (char *) ptr };
+  WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0, NULL }, 0 };
+  return send_internal (&wsamsg, 0);
 }
 
 int

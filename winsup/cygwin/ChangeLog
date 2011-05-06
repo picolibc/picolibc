@@ -1,3 +1,18 @@
+2011-05-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_socket::read): Declare.
+	(fhandler_socket::write): Declare.
+	* fhandler_procsys.cc (fhandler_procsys::read): Add FIXME comment.
+	(fhandler_procsys::write): Ditto.
+	* fhandler_socket.cc (fhandler_socket::read): New method.
+	(fhandler_socket::write): New method.
+	* syscalls.cc: Rearrange order of read/write functions.
+	(read): Call fhandler read method directly instead of just readv.
+	(readv): Remove EINTR loop.  This is done in all affected fhandler's
+	now.
+	(write): Call fhandler write method directly instead of just writev.
+	Fix debug output.
+
 2011-05-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* cygheap.cc (cygheap::close_ctty): Close ctty via close_with_arch().

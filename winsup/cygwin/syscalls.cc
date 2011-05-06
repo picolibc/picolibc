@@ -898,64 +898,40 @@ getsid (pid_t pid)
 extern "C" ssize_t
 read (int fd, void *ptr, size_t len)
 {
-  const iovec iov =
-    {
-      iov_base: ptr,
-      iov_len: len
-    };
+  pthread_testcancel ();
 
-  return readv (fd, &iov, 1);
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
+  size_t res = (size_t) -1;
+
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    goto done;
+
+  if ((cfd->get_flags () & O_ACCMODE) == O_WRONLY)
+    {
+      set_errno (EBADF);
+      goto done;
+    }
+
+  /* Could block, so let user know we at least got here.  */
+  extern int sigcatchers;
+  syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d",
+		  fd, ptr, len, cfd->is_nonblocking () ? "non" : "",
+		  sigcatchers);
+
+  cfd->read (ptr, res = len);
+
+done:
+  syscall_printf ("%d = read (%d, %p, %d), errno %d", res, fd, ptr, len,
+		  get_errno ());
+  MALLOC_CHECK;
+  return (ssize_t) res;
 }
 
 EXPORT_ALIAS (read, _read)
-
-extern "C" ssize_t
-pread (int fd, void *ptr, size_t len, _off64_t off)
-{
-  pthread_testcancel ();
-
-  ssize_t res;
-  cygheap_fdget cfd (fd);
-  if (cfd < 0)
-    res = -1;
-  else
-    res = cfd->pread (ptr, len, off);
-
-  syscall_printf ("%d = pread (%d, %p, %d, %d), errno %d",
-		  res, fd, ptr, len, off, get_errno ());
-  return res;
-}
-
-extern "C" ssize_t
-pwrite (int fd, void *ptr, size_t len, _off64_t off)
-{
-  pthread_testcancel ();
-
-  ssize_t res;
-  cygheap_fdget cfd (fd);
-  if (cfd < 0)
-    res = -1;
-  else
-    res = cfd->pwrite (ptr, len, off);
-
-  syscall_printf ("%d = pwrite (%d, %p, %d, %d), errno %d",
-		  res, fd, ptr, len, off, get_errno ());
-  return res;
-}
-
-extern "C" ssize_t
-write (int fd, const void *ptr, size_t len)
-{
-  const struct iovec iov =
-    {
-      iov_base: (void *) ptr,	// const_cast
-      iov_len: len
-    };
-
-  return writev (fd, &iov, 1);
-}
-
-EXPORT_ALIAS (write, _write)
 
 extern "C" ssize_t
 readv (int fd, const struct iovec *const iov, const int iovcnt)
@@ -967,7 +943,6 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
     return -1;
 
   ssize_t res = -1;
-  const int e = get_errno ();
   const ssize_t tot = check_iovec_for_read (iov, iovcnt);
 
   cygheap_fdget cfd (fd);
@@ -992,13 +967,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 		  fd, iov, iovcnt, cfd->is_nonblocking () ? "non" : "",
 		  sigcatchers);
 
-  while (1)
-    {
-      res = cfd->readv (iov, iovcnt, tot);
-      if (res >= 0 || get_errno () != EINTR || !_my_tls.call_signal_handler ())
-	break;
-      set_errno (e);
-    }
+  res = cfd->readv (iov, iovcnt, tot);
 
 done:
   syscall_printf ("%d = readv (%d, %p, %d), errno %d", res, fd, iov, iovcnt,
@@ -1006,6 +975,66 @@ done:
   MALLOC_CHECK;
   return res;
 }
+
+extern "C" ssize_t
+pread (int fd, void *ptr, size_t len, _off64_t off)
+{
+  pthread_testcancel ();
+
+  ssize_t res;
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = -1;
+  else
+    res = cfd->pread (ptr, len, off);
+
+  syscall_printf ("%d = pread (%d, %p, %d, %d), errno %d",
+		  res, fd, ptr, len, off, get_errno ());
+  return res;
+}
+
+extern "C" ssize_t
+write (int fd, const void *ptr, size_t len)
+{
+  pthread_testcancel ();
+
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
+  int res = -1;
+
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    goto done;
+
+  if ((cfd->get_flags () & O_ACCMODE) == O_RDONLY)
+    {
+      set_errno (EBADF);
+      goto done;
+    }
+
+  /* Could block, so let user know we at least got here.  */
+  if (fd == 1 || fd == 2)
+    paranoid_printf ("write (%d, %p, %d)", fd, ptr, len);
+  else
+    syscall_printf  ("write (%d, %p, %d)", fd, ptr, len);
+
+  res = cfd->write (ptr, len);
+
+done:
+  if (fd == 1 || fd == 2)
+    paranoid_printf ("%d = write (%d, %p, %d), errno %d",
+		     res, fd, ptr, len, get_errno ());
+  else
+    syscall_printf ("%d = write (%d, %p, %d), errno %d",
+		    res, fd, ptr, len, get_errno ());
+
+  MALLOC_CHECK;
+  return res;
+}
+
+EXPORT_ALIAS (write, _write)
 
 extern "C" ssize_t
 writev (const int fd, const struct iovec *const iov, const int iovcnt)
@@ -1045,13 +1074,30 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
 
 done:
   if (fd == 1 || fd == 2)
-    paranoid_printf ("%d = write (%d, %p, %d), errno %d",
+    paranoid_printf ("%d = writev (%d, %p, %d), errno %d",
 		     res, fd, iov, iovcnt, get_errno ());
   else
-    syscall_printf ("%d = write (%d, %p, %d), errno %d",
+    syscall_printf ("%d = writev (%d, %p, %d), errno %d",
 		    res, fd, iov, iovcnt, get_errno ());
 
   MALLOC_CHECK;
+  return res;
+}
+
+extern "C" ssize_t
+pwrite (int fd, void *ptr, size_t len, _off64_t off)
+{
+  pthread_testcancel ();
+
+  ssize_t res;
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = -1;
+  else
+    res = cfd->pwrite (ptr, len, off);
+
+  syscall_printf ("%d = pwrite (%d, %p, %d, %d), errno %d",
+		  res, fd, ptr, len, off, get_errno ());
   return res;
 }
 

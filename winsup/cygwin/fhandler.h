@@ -524,12 +524,14 @@ class fhandler_socket: public fhandler_base
   int getpeereid (pid_t *pid, __uid32_t *euid, __gid32_t *egid);
 
   int open (int flags, mode_t mode = 0);
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   ssize_t __stdcall readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   inline ssize_t recv_internal (struct _WSAMSG *wsamsg);
   ssize_t recvfrom (void *ptr, size_t len, int flags,
 		    struct sockaddr *from, int *fromlen);
   ssize_t recvmsg (struct msghdr *msg, int flags);
 
+  ssize_t __stdcall write (const void *ptr, size_t len);
   ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   inline ssize_t send_internal (struct _WSAMSG *wsamsg, int flags);
   ssize_t sendto (const void *ptr, size_t len, int flags,

@@ -398,6 +398,7 @@ fhandler_procsys::read (void *ptr, size_t& len)
   IO_STATUS_BLOCK io;
   LARGE_INTEGER off = { QuadPart:0LL };
 
+  /* FIXME: Implement nonblocking I/O, interruptibility and cancelability. */
   status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, ptr, len,
 		       &off, NULL);
   if (!NT_SUCCESS (status))
@@ -412,6 +413,7 @@ fhandler_procsys::read (void *ptr, size_t& len)
 ssize_t __stdcall
 fhandler_procsys::write (const void *ptr, size_t len)
 {
+  /* FIXME: Implement nonblocking I/O, interruptibility and cancelability. */
   return fhandler_base::raw_write (ptr, len);
 }
 
