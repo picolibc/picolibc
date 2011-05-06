@@ -421,7 +421,7 @@ void get_dns_info(res_state statp)
 
   if (statp->use_os)
   {
-    DPRINTF(debug, "using dnsapi.dll %d\n", dwRetVal);
+    DPRINTF(debug, "using dnsapi.dll\n");
     statp->os_query = (typeof(statp->os_query)) cygwin_query;
     /* We just need the search list. Avoid loading iphlpapi. */
     statp->nscount = -1;

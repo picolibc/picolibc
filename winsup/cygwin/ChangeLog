@@ -1,5 +1,10 @@
 2011-05-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/minires-os-if.c (get_dns_info): Drop printing uninitialized
+	value of dwRetVal in debug output.
+
+2011-05-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_socket::read): Declare.
 	(fhandler_socket::write): Declare.
 	* fhandler_procsys.cc (fhandler_procsys::read): Add FIXME comment.
