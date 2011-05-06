@@ -1,5 +1,15 @@
 2011-05-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* fhandler.cc (fhandler_base::dup): Avoid duping a handle when an
+	fhandler has an archetype.
+	* fhandler_console.cc (fhandler_console::invisible_console): Move to
+	the top.
+	(fhandler_console::set_close_on_exec): Don't set close-on-exec on
+	handle since it's an archetype and you don't know how many things could
+	be using it.
+
+2011-05-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* fhandler.h (fhandler_dev_dsp): Cosmetic change.
 
 	* fhandler_tty.cc (fhandler_pty_master::process_slave_output): Put back

@@ -1246,7 +1246,7 @@ fhandler_base::dup (fhandler_base *child)
   debug_printf ("in fhandler_base dup");
 
   HANDLE nh;
-  if (!nohandle ())
+  if (!nohandle () && !archetype)
     {
       if (!DuplicateHandle (GetCurrentProcess (), get_handle (),
 			    GetCurrentProcess (), &nh,

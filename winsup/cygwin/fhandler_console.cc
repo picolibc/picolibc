@@ -56,6 +56,8 @@ const unsigned fhandler_console::MAX_WRITE_CHARS = 16384;
 
 static console_state NO_COPY *shared_console_info;
 
+bool NO_COPY fhandler_console::invisible_console;
+
 dev_console NO_COPY *fhandler_console::dev_state;
 
 static void
@@ -2103,8 +2105,7 @@ fhandler_console::igncr_enabled ()
 void
 fhandler_console::set_close_on_exec (bool val)
 {
-  fhandler_base::set_close_on_exec (val);
-  set_no_inheritance (output_handle, val);
+  close_on_exec (val);
 }
 
 void __stdcall
@@ -2122,8 +2123,6 @@ fhandler_console::fixup_after_fork_exec (bool execing)
 {
   get_tty_stuff ();
 }
-
-bool NO_COPY fhandler_console::invisible_console;
 
 // #define WINSTA_ACCESS (WINSTA_READATTRIBUTES | STANDARD_RIGHTS_READ | STANDARD_RIGHTS_WRITE | WINSTA_CREATEDESKTOP | WINSTA_EXITWINDOWS)
 #define WINSTA_ACCESS WINSTA_ALL_ACCESS
