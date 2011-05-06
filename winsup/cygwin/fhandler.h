@@ -299,8 +299,7 @@ class fhandler_base
   virtual int open (int, mode_t);
   virtual void open_setup (int flags) { return; }
 
-  int open_fs (int, mode_t = 0);
-  virtual int close_with_arch ();
+  int close_with_arch ();
   virtual int close ();
   virtual void cleanup () { return; }
   int _archetype_usecount (const char *fn, int ln, int n)
@@ -312,6 +311,8 @@ class fhandler_base
       strace.prntf (_STRACE_ALL, fn, "line %d:  %s<%p> usecount + %d = %d", ln, get_name (), archetype, n, archetype->usecount);
     return archetype->usecount;
   }
+
+  int open_fs (int, mode_t = 0);
 # define archetype_usecount(n) _archetype_usecount (__PRETTY_FUNCTION__, __LINE__, (n))
   int close_fs () { return fhandler_base::close (); }
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));

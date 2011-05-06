@@ -1,5 +1,10 @@
 2011-05-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* fhandler.h (fhandler_base::close_with_arch): Make non-virtual.
+	(fhandler_base::open_fs): Move closer to it's close counterpart.
+
+2011-05-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* fhandler.cc (fhandler_base::dup): Avoid duping a handle when an
 	fhandler has an archetype.
 	* fhandler_console.cc (fhandler_console::invisible_console): Move to
