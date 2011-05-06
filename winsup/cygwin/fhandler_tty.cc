@@ -312,7 +312,10 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 		goto out;
 
 	      if (is_tty_master ())
-		continue;
+		{
+		  Sleep (10);
+		  continue;
+		}
 
 	      if (is_nonblocking ())
 		{

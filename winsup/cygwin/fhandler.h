@@ -1389,8 +1389,8 @@ class fhandler_dev_dsp: public fhandler_base
  private:
   void close_audio_in ();
   void close_audio_out (bool immediately = false);
-  size_t size () const { return sizeof (*this);}
   bool use_archetype () const {return true;}
+  size_t size () const { return sizeof (*this);}
 };
 
 class fhandler_virtual : public fhandler_base

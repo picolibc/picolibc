@@ -1,3 +1,13 @@
+2011-05-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.h (fhandler_dev_dsp): Cosmetic change.
+
+	* fhandler_tty.cc (fhandler_pty_master::process_slave_output): Put back
+	Sleep(10) for tty_master case.
+
+	* sigproc.cc (stopped_or_terminated): Don't consider a pid which has
+	been reaped to be terminated.
+
 2011-05-06  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* sysconf.cc (sysinfo): New function.
