@@ -238,13 +238,13 @@ get_registry_hive_path (PCWSTR name, PWCHAR path)
 				   NULL, NULL);
   if (!NT_SUCCESS (status) || buf.Length == 0)
     {
-      system_printf ("ProfileImagePath for %W not found, status %p", name,
+      debug_printf ("ProfileImagePath for %W not found, status %p", name,
 		    status);
       return NULL;
     }
   wcpcpy (path, L"\\??\\");
   ExpandEnvironmentStringsW (buf.Buffer, path + 4, NT_MAX_PATH - 4);
-  system_printf ("ProfileImagePath for %W: %W", name, path);
+  debug_printf ("ProfileImagePath for %W: %W", name, path);
   return path;
 }
 
@@ -277,9 +277,9 @@ load_registry_hive (PCWSTR name)
   /* Load file into key. */
   status = NtLoadKey (&key_attr, &path_attr);
   if (!NT_SUCCESS (status))
-    system_printf ("Loading user registry hive %S into %S failed: %p",
+    debug_printf ("Loading user registry hive %S into %S failed: %p",
 		  &upath, &ukey, status);
   else
-    system_printf ("Loading user registry hive %S into %S SUCCEEDED: %p",
+    debug_printf ("Loading user registry hive %S into %S SUCCEEDED: %p",
 		  &upath, &ukey, status);
 }

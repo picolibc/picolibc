@@ -1,3 +1,9 @@
+2011-05-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* registry.cc (get_registry_hive_path): Change system_printf to
+	debug_printf.
+	(load_registry_hive): Ditto.
+
 2011-05-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.h (fhandler_base::close_with_arch): Make non-virtual.
