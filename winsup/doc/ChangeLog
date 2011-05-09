@@ -1,3 +1,7 @@
+2011-05-08  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* new-features.sgml (ov-new1.7.10): Document clock_settime.
+
 2011-05-06  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* new-features.sgml (ov-new1.7.10): Document sysinfo.
