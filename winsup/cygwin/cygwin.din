@@ -220,6 +220,7 @@ _clock = clock SIGFE
 clock_getres SIGFE
 clock_gettime SIGFE
 clock_setres SIGFE
+clock_settime SIGFE
 clog NOSIGFE
 clogf NOSIGFE
 close SIGFE

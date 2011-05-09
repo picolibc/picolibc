@@ -109,7 +109,15 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
   struct tm *ptm;
   int res;
 
-  tz = tz;			/* silence warning about unused variable */
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+
+  if (tv->tv_usec < 0 || tv->tv_usec >= 1000000)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
   ptm = gmtime (&tv->tv_sec);
   st.wYear	   = ptm->tm_year + 1900;
@@ -121,10 +129,13 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
   st.wSecond       = ptm->tm_sec;
   st.wMilliseconds = tv->tv_usec / 1000;
 
-  res = !SetSystemTime (&st);
+  res = -!SetSystemTime (&st);
   gtod.reset ();
 
   syscall_printf ("%d = settimeofday (%x, %x)", res, tv, tz);
+
+  if (res != 0)
+    set_errno (EPERM);
 
   return res;
 }
@@ -612,6 +623,23 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
     }
 
   return 0;
+}
+
+extern "C" int
+clock_settime (clockid_t clk_id, const struct timespec *tp)
+{
+  struct timeval tv;
+
+  if (clk_id != CLOCK_REALTIME)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  tv.tv_sec = tp->tv_sec;
+  tv.tv_usec = tp->tv_nsec / 1000;
+
+  return settimeofday (&tv, NULL);
 }
 
 static DWORD minperiod;	// FIXME: Maintain period after a fork.

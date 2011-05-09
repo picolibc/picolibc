@@ -1,3 +1,18 @@
+2011-05-08  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* times.cc (settimeofday): Add EFAULT handler.
+	Set errno to EINVAL if tv.tv_nsec is invalid, and to EPERM if
+	SetSystemTime fails.  Return -1 in case of failure, all for
+	compatibility with BSD and Linux.
+	(clock_settime): New function.
+	* cygwin.din (clock_settime): Export.
+	* posix.sgml (std-susv4): Add clock_settime.
+	Move clock_setres from here...
+	(std-deprec): ... to here.
+	(std-notes): Correct limitation of clock_setres to only CLOCK_REALTIME.
+	Add limitation of clock_settime to only CLOCK_REALTIME.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2011-05-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* registry.cc (get_registry_hive_path): Change system_printf to
