@@ -323,7 +323,7 @@ HOST_LIBELFINC = @libelfinc@
 # Programs producing files for the BUILD machine
 # ----------------------------------------------
 
-SHELL = @config_shell@
+SHELL = @SHELL@
 
 # pwd command to use.  Allow user to override default by setting PWDCMD in
 # the environment to account for automounters.  The make variable must not
@@ -494,7 +494,7 @@ CXXFLAGS_FOR_TARGET = @CXXFLAGS_FOR_TARGET@
 
 LIBCFLAGS_FOR_TARGET = $(CFLAGS_FOR_TARGET)
 LIBCXXFLAGS_FOR_TARGET = $(CXXFLAGS_FOR_TARGET) -fno-implicit-templates
-LDFLAGS_FOR_TARGET = 
+LDFLAGS_FOR_TARGET = @LDFLAGS_FOR_TARGET@
 GOCFLAGS_FOR_TARGET = -O2 -g
 
 FLAGS_FOR_TARGET = @FLAGS_FOR_TARGET@
