@@ -181,7 +181,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   heapslop:0x4,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
-  is_server:true,
+  is_server:false,
   has_physical_mem_access:false,
   has_create_global_privilege:true,
   has_ioctl_storage_get_media_types_ex:true,
@@ -279,6 +279,7 @@ wincapc::init ()
   if (caps)
     return;		// already initialized
 
+  GetSystemInfo (&system_info);
   memset (&version, 0, sizeof version);
   version.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
   if (!GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version)))
@@ -347,8 +348,7 @@ wincapc::init ()
 	break;
     }
 
-  if (version.wProductType != VER_NT_WORKSTATION)
-    ((wincaps *)caps)->is_server = true;
+  ((wincaps *)caps)->is_server = (version.wProductType != VER_NT_WORKSTATION);
   if (NT_SUCCESS (NtQueryInformationProcess (NtCurrentProcess (),
 					     ProcessWow64Information,
 					     &wow64, sizeof wow64, NULL))

@@ -1,5 +1,21 @@
 2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (format_proc_uptime): Don't call GetSystemInfo.
+	Fetch CPU count from wincap.
+	(format_proc_stat): Ditto.
+	* globals.cc (system_info): Move to wincap.
+	* heap.cc (heap_init): Fetch page size from wincap.
+	* syscalls.cc (getpagesize): Fetch allocation granularity from wincap.
+	(getsystempagesize): Fetch page size from wincap.
+	* wincap.cc (wincap_2003): Default is_server to false.
+	(wincapc::init): Call GetSystemInfo here.  Always set is_server value.
+	* wincap.h (class wincapc): Add system_info as private member.
+	(wincapc::cpu_count): New public method.
+	(wincapc::page_size): Ditto.
+	(wincapc::allocation_granularity): Ditto.
+
+2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (set_chunksize): Remove.
 	(parse_thing): Remove forkchunk entry.
 	* fork.cc (child_copy): Drop handling external chunksize setting.

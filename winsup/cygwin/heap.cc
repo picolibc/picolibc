@@ -1,6 +1,7 @@
 /* heap.cc: Cygwin heap manager.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -31,7 +32,7 @@ heap_init ()
   /* If we're the forkee, we must allocate the heap at exactly the same place
      as our parent.  If not, we don't care where it ends up.  */
 
-  page_const = system_info.dwPageSize;
+  page_const = wincap.page_size ();
   if (!cygheap->user_heap.base)
     {
       cygheap->user_heap.chunk = cygwin_shared->heap_chunk_size ();

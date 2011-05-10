@@ -2287,17 +2287,13 @@ getdtablesize ()
 extern "C" int
 getpagesize ()
 {
-  if (!system_info.dwAllocationGranularity)
-    GetSystemInfo (&system_info);
-  return (size_t) system_info.dwAllocationGranularity;
+  return (size_t) wincap.allocation_granularity ();
 }
 
 size_t
 getsystempagesize ()
 {
-  if (!system_info.dwPageSize)
-    GetSystemInfo (&system_info);
-  return (size_t) system_info.dwPageSize;
+  return (size_t) wincap.page_size ();
 }
 
 /* FIXME: not all values are correct... */

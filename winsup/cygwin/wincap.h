@@ -46,6 +46,7 @@ struct wincaps
 
 class wincapc
 {
+  SYSTEM_INFO      system_info;
   OSVERSIONINFOEX  version;
   char             osnam[40];
   ULONG            wow64;
@@ -54,6 +55,10 @@ class wincapc
 public:
   void init ();
 
+  const DWORD cpu_count () const { return system_info.dwNumberOfProcessors; }
+  const DWORD page_size () const { return system_info.dwPageSize; }
+  const DWORD allocation_granularity () const
+			      { return system_info.dwAllocationGranularity; }
   const char *osname () const { return osnam; }
   const bool is_wow64 () const { return wow64; }
 

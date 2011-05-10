@@ -48,8 +48,6 @@ enum exit_states
 
 exit_states NO_COPY exit_state;
 
-SYSTEM_INFO system_info;
-
 /* Set in init.cc.  Used to check if Cygwin DLL is dynamically loaded. */
 int NO_COPY dynamically_loaded;
 

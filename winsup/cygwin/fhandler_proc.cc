@@ -480,9 +480,6 @@ format_proc_uptime (void *, char *&destbuf)
   PSYSTEM_PERFORMANCE_INFORMATION spi = (PSYSTEM_PERFORMANCE_INFORMATION)
 					alloca (sizeof_spi);
 
-  if (!system_info.dwNumberOfProcessors)
-    GetSystemInfo (&system_info);
-
   ret = NtQuerySystemInformation (SystemTimeOfDayInformation, &stodi,
 				  sizeof stodi, NULL);
   if (NT_SUCCESS (ret))
@@ -493,7 +490,7 @@ format_proc_uptime (void *, char *&destbuf)
 
   if (NT_SUCCESS (NtQuerySystemInformation (SystemPerformanceInformation,
 						 spi, sizeof_spi, NULL)))
-    idle_time = (spi->IdleTime.QuadPart / system_info.dwNumberOfProcessors)
+    idle_time = (spi->IdleTime.QuadPart / wincap.cpu_count ())
 		/ 100000ULL;
 
   destbuf = (char *) crealloc_abort (destbuf, 80);
@@ -522,19 +519,16 @@ format_proc_stat (void *, char *&destbuf)
   char *buf = tp.c_get ();
   char *eobuf = buf;
 
-  if (!system_info.dwNumberOfProcessors)
-    GetSystemInfo (&system_info);
-
-  SYSTEM_PROCESSOR_TIMES spt[system_info.dwNumberOfProcessors];
+  SYSTEM_PROCESSOR_TIMES spt[wincap.cpu_count ()];
   ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
-				  sizeof spt[0] * system_info.dwNumberOfProcessors, NULL);
+				  sizeof spt[0] * wincap.cpu_count (), NULL);
   if (!NT_SUCCESS (ret))
     debug_printf ("NtQuerySystemInformation(SystemProcessorTimes), "
 		  "status %p", ret);
   else
     {
       unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
-      for (unsigned long i = 0; i < system_info.dwNumberOfProcessors; i++)
+      for (unsigned long i = 0; i < wincap.cpu_count (); i++)
 	{
 	  kernel_time += (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart)
 			 * HZ / 10000000ULL;
@@ -545,7 +539,7 @@ format_proc_stat (void *, char *&destbuf)
       eobuf += __small_sprintf (eobuf, "cpu %U %U %U %U\n",
 				user_time, 0ULL, kernel_time, idle_time);
       user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
-      for (unsigned long i = 0; i < system_info.dwNumberOfProcessors; i++)
+      for (unsigned long i = 0; i < wincap.cpu_count (); i++)
 	{
 	  interrupt_count += spt[i].InterruptCount;
 	  kernel_time = (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart) * HZ / 10000000ULL;
