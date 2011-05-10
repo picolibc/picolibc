@@ -41,7 +41,7 @@ static const struct lc_messages_T _C_messages_locale = {
 	"^[yY]" ,	/* yesexpr */
 	"^[nN]" ,	/* noexpr */
 	"yes" , 	/* yesstr */
-	"no"		/* nostr */
+	"no" ,		/* nostr */
 	"ASCII"		/* codeset */
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
 	, L"^[yY]" ,	/* wyesexpr */
