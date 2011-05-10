@@ -1085,8 +1085,13 @@ check_registry_access (HANDLE hdl, int flags, bool effective)
     desired |= KEY_SET_VALUE;
   if (flags & X_OK)
     desired |= KEY_QUERY_VALUE;
-  if (!get_reg_sd (hdl, sd))
+
+  if ((HKEY) hdl == HKEY_PERFORMANCE_DATA)
+    /* RegGetKeySecurity() always fails with ERROR_INVALID_HANDLE.  */
+    ret = 0;
+  else if (!get_reg_sd (hdl, sd))
     ret = check_access (sd, reg_mapping, desired, flags, effective);
+
   /* As long as we can't write the registry... */
   if (flags & W_OK)
     {

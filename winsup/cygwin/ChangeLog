@@ -1,3 +1,8 @@
+2011-05-10  Christian Franke  <franke@computer.org>
+
+	* security.cc (check_registry_access): Handle missing
+	security descriptor of HKEY_PERFORMANCE_DATA.
+
 2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lc_msg.h: Regenerate.
