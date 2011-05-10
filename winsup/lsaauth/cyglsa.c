@@ -11,7 +11,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for details. */
 
 #define WINVER 0x0600
 #include <ntstatus.h>
-#include <wchar.h>
 #include <windows.h>
 #include <wininet.h>
 #include <lmcons.h>
@@ -49,6 +48,11 @@ ULONG NTAPI RtlLengthSid (PSID);
 PULONG NTAPI RtlSubAuthoritySid (PSID, ULONG);
 PUCHAR NTAPI RtlSubAuthorityCountSid (PSID);
 BOOLEAN NTAPI RtlValidSid (PSID);
+/* These standard POSIX functions are implemented in NTDLL and exported.
+   There's just no header to define them and using wchar.h from mingw
+   or Cygwin seems wrong somehow. */
+wchar_t *__cdecl wcscpy (wchar_t *, const wchar_t *);
+size_t __cdecl wcslen (const wchar_t *);
 
 #ifndef RtlInitEmptyUnicodeString
 __inline VOID NTAPI

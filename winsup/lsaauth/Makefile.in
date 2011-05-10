@@ -29,8 +29,6 @@ INSTALL_DATA    := @INSTALL_DATA@
 CC              := @CC@
 CC_FOR_TARGET   := $(CC)
 
-override CC	:= @NO_CYGWIN@ $(firstword ${CC})
-
 CFLAGS          := @CFLAGS@
 
 include $(srcdir)/../Makefile.common

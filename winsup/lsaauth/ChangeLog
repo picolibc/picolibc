@@ -1,3 +1,9 @@
+2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Don't override CC.
+	* cyglsa.c: Don't include wchar.h.  Declare wcscpy and wcslen instead.
+	* cyglsa64.dll: Rebuild.
+
 2011-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (LIBS): Remove advapi32.dll.
