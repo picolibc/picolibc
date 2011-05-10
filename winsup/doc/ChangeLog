@@ -1,5 +1,10 @@
 2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwinenv.sgml: Move "forkchunk:xxx" to the removed options section.
+	Change text accordingly.
+
+2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* setup2.sgml (setup-env-ov): Make sure everybody knows that the
 	CYGWIN settings are just an example.
 

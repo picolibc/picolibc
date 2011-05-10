@@ -44,15 +44,6 @@ There is no default set.
 </listitem>
 
 <listitem>
-<para><envar>forkchunk:32768</envar> - causes <function>fork()</function>
-to copy memory some number of bytes at a time, in the above example 
-32768 bytes (32Kb) at a time. The default is to copy as many bytes as 
-possible, which is preferable in most cases but may slow some older systems
-down.
-</para>
-</listitem>
-
-<listitem>
 <para><envar>proc_retry:n</envar> - causes <function>fork()</function> and
 <function>exec*()</function> to retry n times when a child process fails
 due to certain windows-specific errors.  These errors usually occur when
@@ -179,13 +170,21 @@ information, read the documentation in <xref linkend="mount-table"></xref> and
 </listitem>
 
 <listitem>
-<para><envar>codepage:[ansi|oem]</envar> - This option controled
+<para><envar>codepage:[ansi|oem]</envar> - This option controlled
 which character set is used for file and console operations.  Since Cygwin
 is now doing all character conversion by itself, depending on the
 application call to the <function>setlocale()</function> function, and in
 turn by the setting of the environment variables <envar>$LANG</envar>,
 <envar>$LC_ALL</envar>, or <envar>$LC_CTYPE</envar>, this setting
 became superfluous.</para>
+</listitem>
+
+<listitem>
+<para><envar>forkchunk:[intval]</envar> - This option allowed to influence
+the <function>fork()</function> function in the way the memory of the
+parent process gets copied to the child process.  This functionality was
+only useful for Windows 95/98/Me.
+</para>
 </listitem>
 
 <listitem>
