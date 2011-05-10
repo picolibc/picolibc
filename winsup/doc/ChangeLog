@@ -1,3 +1,8 @@
+2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setup2.sgml (setup-env-ov): Make sure everybody knows that the
+	CYGWIN settings are just an example.
+
 2011-05-08  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* new-features.sgml (ov-new1.7.10): Document clock_settime.

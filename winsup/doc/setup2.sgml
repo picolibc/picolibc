@@ -18,17 +18,18 @@ Cygwin processes.</para>
 <para>
 The <envar>CYGWIN</envar> variable is used to configure many global
 settings for the Cygwin runtime system.  Initially you can leave
-<envar>CYGWIN</envar> unset or set it to <literal>tty</literal> (e.g.
-to support job control with ^Z etc...) using a syntax like this in the
-DOS shell, before launching bash.</para>
+<envar>CYGWIN</envar> unset or set it to a value indicating several
+global Cygwin settings, using a syntax like this in the DOS shell,
+before launching bash:</para>
 
 <screen>
-<prompt>C:\&gt;</prompt> <userinput>set CYGWIN=tty notitle glob</userinput>
+<prompt>C:\&gt;</prompt> <userinput>set CYGWIN=notitle glob</userinput>
 </screen>
 
 <para>
-For all possible settings of the <envar>CYGWIN</envar> environment variable,
-see <xref linkend="using-cygwinenv"></xref>.
+This is, of course, just an example.  For all possible settings of the
+<envar>CYGWIN</envar> environment variable, see
+<xref linkend="using-cygwinenv"></xref>.
 </para>
 
 <para>
