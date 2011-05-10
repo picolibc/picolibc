@@ -558,12 +558,6 @@ glob_init (const char *buf)
 }
 
 static void
-set_chunksize (const char *buf)
-{
-  wincap.set_chunksize (strtoul (buf, NULL, 0));
-}
-
-static void
 set_proc_retry (const char *buf)
 {
   child_info::retry_count = strtoul (buf, NULL, 0);
@@ -596,7 +590,6 @@ static struct parse_thing
   {"envcache", {&envcache}, justset, NULL, {{true}, {false}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
-  {"forkchunk", {func: set_chunksize}, isfunc, NULL, {{0}, {0}}},
   {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},

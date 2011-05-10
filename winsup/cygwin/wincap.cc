@@ -24,7 +24,6 @@ details. */
 #define wincap_minimal wincap_2000
 
 wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
@@ -56,7 +55,6 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
@@ -88,7 +86,6 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
@@ -120,7 +117,6 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
@@ -152,7 +148,6 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
   heapslop:0x0,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
@@ -184,7 +179,6 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
   heapslop:0x4,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:true,
@@ -216,7 +210,6 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
   heapslop:0x4,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
@@ -248,7 +241,6 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  chunksize:0,
   heapslop:0x4,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
@@ -370,10 +362,4 @@ wincapc::init ()
     ((wincaps *) caps)->has_buggy_thread_startup = false;
   __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,
 		   version.dwMinorVersion);
-}
-
-void
-wincapc::set_chunksize (DWORD nchunksize)
-{
-  ((wincaps *)caps)->chunksize = nchunksize;
 }

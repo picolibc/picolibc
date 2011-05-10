@@ -1,3 +1,13 @@
+2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (set_chunksize): Remove.
+	(parse_thing): Remove forkchunk entry.
+	* fork.cc (child_copy): Drop handling external chunksize setting.
+	* wincap.cc: Througout, drop chunksize.
+	(wincapc::set_chunksize): Remove.
+	* wincap.h (struct wincaps): Drop chunksize and declaration of
+	set_chunksize.
+
 2011-05-08  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* times.cc (settimeofday): Add EFAULT handler.

@@ -14,7 +14,6 @@ details. */
 
 struct wincaps
 {
-  DWORD    chunksize;
   DWORD    heapslop;
   DWORD    max_sys_priv;
   unsigned is_server                                    : 1;
@@ -55,14 +54,11 @@ class wincapc
 public:
   void init ();
 
-  void set_chunksize (DWORD nchunksize);
-
   const char *osname () const { return osnam; }
   const bool is_wow64 () const { return wow64; }
 
 #define IMPLEMENT(cap) cap() const { return ((wincaps *) this->caps)->cap; }
 
-  DWORD IMPLEMENT (chunksize)
   DWORD IMPLEMENT (heapslop)
   DWORD IMPLEMENT (max_sys_priv)
   bool  IMPLEMENT (is_server)
