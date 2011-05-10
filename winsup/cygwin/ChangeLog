@@ -1,5 +1,9 @@
 2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* lc_msg.h: Regenerate.
+
+2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_proc.cc (format_proc_uptime): Don't call GetSystemInfo.
 	Fetch CPU count from wincap.
 	(format_proc_stat): Ditto.
