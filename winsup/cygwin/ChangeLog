@@ -1,5 +1,11 @@
 2011-05-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (GetProcessMemoryInfo): Remove.
+	* resource.cc (fill_rusage): Call NtQueryInformationProcess rather than
+	GetProcessMemoryInfo to drop a psapi dependency.
+
+2011-05-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (get_inet_addr): Rearrange for better readability.
 	Make waiting loop interruptible and cancelable.  Check for SYSTEM DOS
 	flag before reading the file.  Change return value to return 0 on
