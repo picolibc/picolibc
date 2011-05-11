@@ -1,3 +1,13 @@
+2011-05-11  Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
+
+	* fhandler_process.cc (format_process_maps): Rework to report
+	all mapped address space in a process (committed or reserved),
+	identifying the nature of the mapping (mapped file/image, heap,
+	shared memory) when possible.
+	(dos_drive_mappings): New helper classes.
+	(heap_info): Ditto.
+	* ntdll.h (struct _MEMORY_SECTION_NAME): Define.
+
 2011-05-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (GetProcessMemoryInfo): Remove.

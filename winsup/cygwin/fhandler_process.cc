@@ -29,6 +29,7 @@ details. */
 #include <sys/param.h>
 #include <ctype.h>
 #include <psapi.h>
+#include <tlhelp32.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -527,6 +528,136 @@ format_process_winexename (void *data, char *&destbuf)
   return len + 1;
 }
 
+struct dos_drive_mappings
+{
+  struct mapping
+  {
+    mapping *next;
+    int len;
+    wchar_t drive_letter;
+    wchar_t mapping[1];
+  };
+  mapping *mappings;
+  
+  dos_drive_mappings ()
+    : mappings(0)
+  {
+    /* The logical drive strings buffer holds a list of (at most 26)
+       drive names separated by nulls and terminated by a double-null:
+
+       "a:\\\0b:\\\0...z:\\\0"
+
+       The annoying part is, QueryDosDeviceW wants only "x:" rather
+       than the "x:\" we get back from GetLogicalDriveStringsW, so
+       we'll have to strip out the trailing slash for each mapping.
+       
+       The returned mapping a native NT pathname (\Device\...) which
+       we can use to fix up the output of GetMappedFileNameW
+    */
+    static unsigned const DBUFLEN = 26 * 4;
+    wchar_t dbuf[DBUFLEN + 1];
+    wchar_t pbuf[NT_MAX_PATH];
+    wchar_t drive[] = {L'x', L':', 0};
+    unsigned result = GetLogicalDriveStringsW (DBUFLEN * sizeof (wchar_t),
+					       dbuf);
+    if (!result)
+      debug_printf ("Failed to get logical DOS drive names: %lu",
+		    GetLastError ());
+    else if (result > DBUFLEN)
+      debug_printf ("Too many mapped drive letters: %u", result);
+    else
+      for (wchar_t *cur = dbuf; (*drive = *cur); cur = wcschr (cur, L'\0')+1)
+	if (QueryDosDeviceW (drive, pbuf, NT_MAX_PATH))
+	  {
+	    size_t plen = wcslen (pbuf);
+	    size_t psize = plen * sizeof (wchar_t);
+	    debug_printf ("DOS drive %ls maps to %ls", drive, pbuf);
+	    mapping *m = (mapping*) cmalloc (HEAP_FHANDLER,
+					     sizeof (mapping) + psize);
+	    m->next = mappings;
+	    m->len = plen;
+	    m->drive_letter = *drive;
+	    memcpy (m->mapping, pbuf, psize + sizeof (wchar_t));
+	    mappings = m;
+	  }
+	else
+	  debug_printf ("Unable to determine the native mapping for %ls "
+			"(error %lu)", drive, GetLastError ());
+  }
+  
+  wchar_t *fixup_if_match (wchar_t *path)
+  {
+    for (mapping *m = mappings; m; m = m->next)
+      if (!wcsncmp (m->mapping, path, m->len))
+	{
+	  path += m->len - 2;
+	  path[0] = m->drive_letter;
+	  path[1] = L':';
+	  break;
+	}
+    return path;
+  }
+  
+  ~dos_drive_mappings ()
+  {
+    mapping *n = 0;
+    for (mapping *m = mappings; m; m = n)
+      {
+	n = m->next;
+	cfree (m);
+      }
+  }
+};
+
+struct heap_info
+{
+  struct heap
+  {
+    heap *next;
+    void *base;
+  };
+  heap *heaps;
+
+  heap_info (DWORD pid)
+    : heaps (0)
+  {
+    HANDLE hHeapSnap = CreateToolhelp32Snapshot (TH32CS_SNAPHEAPLIST, pid);
+    HEAPLIST32 hl;
+    hl.dwSize = sizeof(hl);
+
+    if (hHeapSnap != INVALID_HANDLE_VALUE && Heap32ListFirst (hHeapSnap, &hl))
+      do
+	{
+	  heap *h = (heap *) cmalloc (HEAP_FHANDLER, sizeof (heap));
+	  *h = (heap) {heaps, (void*) hl.th32HeapID};
+	  heaps = h;
+	} while (Heap32ListNext (hHeapSnap, &hl));
+    CloseHandle (hHeapSnap);
+  }
+  
+  char *fill_if_match (void *base, char *dest )
+  {
+    long count = 0;
+    for (heap *h = heaps; h && ++count; h = h->next)
+      if (base == h->base)
+	{
+	  __small_sprintf (dest, "[heap %ld]", count);
+	  return dest;
+	}
+    return 0;
+  }
+  
+  ~heap_info () 
+  {
+    heap *n = 0;
+    for (heap *m = heaps; m; m = n)
+      {
+	n = m->next;
+	cfree (m);
+      }
+  }
+};
+
 static _off64_t
 format_process_maps (void *data, char *&destbuf)
 {
@@ -538,14 +669,28 @@ format_process_maps (void *data, char *&destbuf)
     return 0;
 
   _off64_t len = 0;
-  HMODULE *modules;
-  DWORD needed, i;
-  DWORD_PTR wset_size;
-  DWORD_PTR *workingset = NULL;
-  MODULEINFO info;
+  
+  union access
+  {
+    char flags[8];
+    _off64_t word;
+  } a;
+
+  struct region {
+    access a;
+    char *abase;
+    char *rbase;
+    char *rend;
+  } cur = {{{'\0'}}, (char *)1, 0, 0};
+  
+  MEMORY_BASIC_INFORMATION mb;
+  dos_drive_mappings drive_maps;
+  heap_info heaps (p->dwProcessId);
+  struct __stat64 st;
+  long last_pass = 0;
 
   tmp_pathbuf tp;
-  PWCHAR modname = tp.w_get ();
+  PMEMORY_SECTION_NAME msi = (PMEMORY_SECTION_NAME) tp.w_get ();
   char *posix_modname = tp.c_get ();
   size_t maxsize = 0;
 
@@ -554,75 +699,92 @@ format_process_maps (void *data, char *&destbuf)
       cfree (destbuf);
       destbuf = NULL;
     }
-  if (!EnumProcessModules (proc, NULL, 0, &needed))
+  
+  /* Iterate over each VM region in the address space, coalescing
+     memory regions with the same permissions. Once we run out, do one
+     last_pass to trigger output of the last accumulated region. */
+  for (char *i = 0;
+       VirtualQueryEx (proc, i, &mb, sizeof(mb)) || (1 == ++last_pass);
+       i = cur.rend)
     {
-      __seterrno ();
-      len = -1;
-      goto out;
-    }
-  modules = (HMODULE*) alloca (needed);
-  if (!EnumProcessModules (proc, modules, needed, &needed))
-    {
-      __seterrno ();
-      len = -1;
-      goto out;
-    }
+      if (mb.State == MEM_FREE)
+	a.word = 0;
+      else
+	{
+	  static DWORD const RW = (PAGE_EXECUTE_READWRITE | PAGE_READWRITE
+				   | PAGE_EXECUTE_WRITECOPY | PAGE_WRITECOPY);
+	  DWORD p = mb.Protect;
+	  a = (access) {{
+	      (p & (RW | PAGE_EXECUTE_READ | PAGE_READONLY))?	'r' : '-',
+	      (p & (RW))?					'w' : '-',
+	      (p & (PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_READ
+		    | PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE))?	'x' : '-',
+	      (p & (PAGE_GUARD))? 				's' : 'p',
+	      '\0', // zero-fill the remaining bytes
+	    }};
+	}
 
-  QueryWorkingSet (proc, (void *) &wset_size, sizeof wset_size);
-  if (GetLastError () == ERROR_BAD_LENGTH)
-    {
-      workingset = (DWORD_PTR *) alloca (sizeof (DWORD_PTR) * ++wset_size);
-      if (!QueryWorkingSet (proc, (void *) workingset,
-			    sizeof (DWORD_PTR) * wset_size))
-	workingset = NULL;
-    }
-  for (i = 0; i < needed / sizeof (HMODULE); i++)
-    if (GetModuleInformation (proc, modules[i], &info, sizeof info)
-	&& GetModuleFileNameExW (proc, modules[i], modname, NT_MAX_PATH))
-      {
-	char access[5];
-	strcpy (access, "r--p");
-	struct __stat64 st;
-	if (mount_table->conv_to_posix_path (modname, posix_modname, 0))
-	  sys_wcstombs (posix_modname, NT_MAX_PATH, modname);
-	if (stat64 (posix_modname, &st))
-	  {
-	    st.st_dev = 0;
-	    st.st_ino = 0;
-	  }
-	size_t newlen = strlen (posix_modname) + 62;
-	if (len + newlen >= maxsize)
-	  destbuf = (char *) crealloc_abort (destbuf,
-					   maxsize += roundup2 (newlen, 2048));
-	if (workingset)
-	  for (unsigned i = 1; i <= wset_size; ++i)
+      region next = { a,
+		      (char *) mb.AllocationBase,
+		      (char *) mb.BaseAddress,
+		      (char *) mb.BaseAddress+mb.RegionSize
+      };
+      
+      /* Windows permissions are more fine-grained than the unix rwxp,
+	 so we reduce clutter by manually coalescing regions sharing
+	 the same allocation base and effective permissions. */
+      bool newbase = (next.abase != cur.abase);
+      if (!last_pass && !newbase && next.a.word == cur.a.word)
+	  cur.rend = next.rend; // merge with previous
+      else
+	{
+	  // output the current region if it's "interesting"
+	  if (cur.a.word)
 	    {
-	      DWORD_PTR addr = workingset[i] & 0xfffff000UL;
-	      if ((char *)addr >= info.lpBaseOfDll
-		  && (char *)addr < (char *)info.lpBaseOfDll + info.SizeOfImage)
-		{
-		  access[0] = (workingset[i] & 0x5) ? 'r' : '-';
-		  access[1] = (workingset[i] & 0x4) ? 'w' : '-';
-		  access[2] = (workingset[i] & 0x2) ? 'x' : '-';
-		  access[3] = (workingset[i] & 0x100) ? 's' : 'p';
-		}
+	      size_t newlen = strlen (posix_modname) + 62;
+	      if (len + newlen >= maxsize)
+		destbuf = (char *) crealloc_abort (destbuf,
+						   maxsize += roundup2 (newlen,
+									2048));
+	      int written = __small_sprintf (destbuf + len,
+					     "%08lx-%08lx %s %08lx %04x:%04x %U   ",
+					     cur.rbase, cur.rend, cur.a.flags,
+					     cur.rbase - cur.abase,
+					     st.st_dev >> 16,
+					     st.st_dev & 0xffff,
+					     st.st_ino);
+	      while (written < 62)
+		destbuf[len + written++] = ' ';
+	      len += written;
+	      len += __small_sprintf (destbuf + len, "%s\n", posix_modname);
 	    }
-	int written = __small_sprintf (destbuf + len,
-				"%08lx-%08lx %s %08lx %04x:%04x %U   ",
-				info.lpBaseOfDll,
-				(unsigned long)info.lpBaseOfDll
-				+ info.SizeOfImage,
-				access,
-				info.EntryPoint,
-				st.st_dev >> 16,
-				st.st_dev & 0xffff,
-				st.st_ino);
-	while (written < 62)
-	  destbuf[len + written++] = ' ';
-	len += written;
-	len += __small_sprintf (destbuf + len, "%s\n", posix_modname);
-      }
-out:
+	  // start of a new region (but possibly still the same allocation)
+	  cur = next;
+	  // if a new allocation, figure out what kind it is 
+	  if (newbase && !last_pass)
+	    {
+	      st.st_dev = 0;
+	      st.st_ino = 0;
+	      if ((mb.Type & (MEM_MAPPED | MEM_IMAGE))
+		  && NT_SUCCESS (NtQueryVirtualMemory (proc, cur.abase,
+						       MemorySectionName,
+						       msi, 65536, NULL)))
+		{
+		  PWCHAR dosname =
+		      drive_maps.fixup_if_match (msi->SectionFileName.Buffer);
+		  if (mount_table->conv_to_posix_path (dosname,
+						       posix_modname, 0))
+		    sys_wcstombs (posix_modname, NT_MAX_PATH, dosname);
+		  stat64 (posix_modname, &st);
+		}
+	      else if (mb.Type & MEM_MAPPED)
+		strcpy (posix_modname, "[shareable]");
+	      else if (!(mb.Type & MEM_PRIVATE
+			 && heaps.fill_if_match (cur.abase, posix_modname)))
+		posix_modname[0] = 0;
+	    }
+	}
+    }
   CloseHandle (proc);
   return len;
 }
