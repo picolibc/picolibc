@@ -1,3 +1,7 @@
+2011-05-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (QueryWorkingSet): Remove.
+
 2011-05-11  Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
 
 	* fhandler_process.cc (format_process_maps): Rework to report

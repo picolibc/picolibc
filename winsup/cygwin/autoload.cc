@@ -417,7 +417,6 @@ LoadDLLfunc (CoTaskMemFree, 4, ole32)
 LoadDLLfunc (EnumProcessModules, 16, psapi)
 LoadDLLfunc (GetModuleFileNameExW, 16, psapi)
 LoadDLLfunc (GetModuleInformation, 16, psapi)
-LoadDLLfunc (QueryWorkingSet, 12, psapi)
 
 LoadDLLfunc (LsaDeregisterLogonProcess, 4, secur32)
 LoadDLLfunc (LsaFreeReturnBuffer, 4, secur32)
