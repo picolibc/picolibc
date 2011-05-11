@@ -206,7 +206,7 @@ connect_syslogd ()
   syslogd_sock = -1;
   sun.sun_family = AF_LOCAL;
   strncpy (sun.sun_path, _PATH_LOG, sizeof sun.sun_path);
-  if (!get_inet_addr ((struct sockaddr *) &sun, sizeof sun, &sst, &len, &type))
+  if (get_inet_addr ((struct sockaddr *) &sun, sizeof sun, &sst, &len, &type))
     return;
   if ((fd = cygwin_socket (AF_LOCAL, type, 0)) < 0)
     return;

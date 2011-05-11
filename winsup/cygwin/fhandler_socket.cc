@@ -71,95 +71,123 @@ get_inet_addr (const struct sockaddr *in, int inlen,
   int secret_buf [4];
   int* secret_ptr = (secret ? : secret_buf);
 
-  if (in->sa_family == AF_INET || in->sa_family == AF_INET6)
+  switch (in->sa_family)
     {
+    case AF_LOCAL:
+      break;
+    case AF_INET:
+    case AF_INET6:
       memcpy (out, in, inlen);
       *outlen = inlen;
-      return 1;
-    }
-  else if (in->sa_family == AF_LOCAL)
-    {
-      NTSTATUS status;
-      HANDLE fh;
-      OBJECT_ATTRIBUTES attr;
-      IO_STATUS_BLOCK io;
-
-      path_conv pc (in->sa_data, PC_SYM_FOLLOW);
-      if (pc.error)
-	{
-	  set_errno (pc.error);
-	  return 0;
-	}
-      if (!pc.exists ())
-	{
-	  set_errno (ENOENT);
-	  return 0;
-	}
-      /* Do NOT test for the file being a socket file here.  The socket file
-	 creation is not an atomic operation, so there is a chance that socket
-	 files which are just in the process of being created are recognized
-	 as non-socket files.  To work around this problem we now create the
-	 file with all sharing disabled.  If the below NtOpenFile fails
-	 with STATUS_SHARING_VIOLATION we know that the file already exists,
-	 but the creating process isn't finished yet.  So we yield and try
-	 again, until we can either open the file successfully, or some error
-	 other than STATUS_SHARING_VIOLATION occurs.
-	 Since we now don't know if the file is actually a socket file, we
-	 perform this check here explicitely. */
-      pc.get_object_attr (attr, sec_none_nih);
-      do
-	{
-	  status = NtOpenFile (&fh, GENERIC_READ | SYNCHRONIZE, &attr, &io,
-			       FILE_SHARE_VALID_FLAGS,
-			       FILE_SYNCHRONOUS_IO_NONALERT
-			       | FILE_OPEN_FOR_BACKUP_INTENT);
-	  if (status == STATUS_SHARING_VIOLATION)
-	    yield ();
-	  else if (!NT_SUCCESS (status))
-	    {
-	      __seterrno_from_nt_status (status);
-	      return 0;
-	    }
-	}
-      while (status == STATUS_SHARING_VIOLATION);
-      int ret = 0;
-      char buf[128];
-      memset (buf, 0, sizeof buf);
-      status = NtReadFile (fh, NULL, NULL, NULL, &io, buf, 128, NULL, NULL);
-      NtClose (fh);
-      if (NT_SUCCESS (status))
-	{
-	  struct sockaddr_in sin;
-	  char ctype;
-	  sin.sin_family = AF_INET;
-	  if (strncmp (buf, SOCKET_COOKIE, strlen (SOCKET_COOKIE)))
-	    {
-	      set_errno (EBADF);
-	      return 0;
-	    }
-	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %c %08x-%08x-%08x-%08x",
-		  &sin.sin_port,
-		  &ctype,
-		  secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
-	  sin.sin_port = htons (sin.sin_port);
-	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-	  memcpy (out, &sin, sizeof sin);
-	  *outlen = sizeof sin;
-	  if (type)
-	    *type = (ctype == 's' ? SOCK_STREAM :
-		     ctype == 'd' ? SOCK_DGRAM
-				  : 0);
-	  ret = 1;
-	}
-      else
-	__seterrno_from_nt_status (status);
-      return ret;
-    }
-  else
-    {
+      return 0;
+    default:
       set_errno (EAFNOSUPPORT);
+      return SOCKET_ERROR;
+    }
+  /* AF_LOCAL/AF_UNIX only */
+  path_conv pc (in->sa_data, PC_SYM_FOLLOW);
+  if (pc.error)
+    {
+      set_errno (pc.error);
+      return SOCKET_ERROR;
+    }
+  if (!pc.exists ())
+    {
+      set_errno (ENOENT);
+      return SOCKET_ERROR;
+    }
+  /* Do NOT test for the file being a socket file here.  The socket file
+     creation is not an atomic operation, so there is a chance that socket
+     files which are just in the process of being created are recognized
+     as non-socket files.  To work around this problem we now create the
+     file with all sharing disabled.  If the below NtOpenFile fails
+     with STATUS_SHARING_VIOLATION we know that the file already exists,
+     but the creating process isn't finished yet.  So we yield and try
+     again, until we can either open the file successfully, or some error
+     other than STATUS_SHARING_VIOLATION occurs.
+     Since we now don't know if the file is actually a socket file, we
+     perform this check here explicitely. */
+  NTSTATUS status;
+  HANDLE fh;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+
+  pc.get_object_attr (attr, sec_none_nih);
+  do
+    {
+      status = NtOpenFile (&fh, GENERIC_READ | SYNCHRONIZE, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS,
+			   FILE_SYNCHRONOUS_IO_NONALERT
+			   | FILE_OPEN_FOR_BACKUP_INTENT
+			   | FILE_NON_DIRECTORY_FILE);
+      if (status == STATUS_SHARING_VIOLATION)
+	{
+	  /* While we hope that the sharing violation is only temporary, we
+	     also could easily get stuck here, waiting for a file in use by
+	     some greedy Win32 application.  Therefore we should never wait
+	     endlessly without checking for signals and thread cancel event. */
+	  pthread_testcancel ();
+	  if (IsEventSignalled (signal_arrived)
+	      && !_my_tls.call_signal_handler ())
+	    {
+	      set_errno (EINTR);
+	      return SOCKET_ERROR;
+	    }
+	  yield ();
+	}
+      else if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  return SOCKET_ERROR;
+	}
+    }
+  while (status == STATUS_SHARING_VIOLATION);
+  /* Now test for the SYSTEM bit. */
+  FILE_BASIC_INFORMATION fbi;
+  status = NtQueryInformationFile (fh, &io, &fbi, sizeof fbi,
+				   FileBasicInformation);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return SOCKET_ERROR;
+    }
+  if (!(fbi.FileAttributes & FILE_ATTRIBUTE_SYSTEM))
+    {
+      NtClose (fh);
+      set_errno (EBADF);
+      return SOCKET_ERROR;
+    }
+  /* Eventually check the content and fetch the required information. */
+  char buf[128];
+  memset (buf, 0, sizeof buf);
+  status = NtReadFile (fh, NULL, NULL, NULL, &io, buf, 128, NULL, NULL);
+  NtClose (fh);
+  if (NT_SUCCESS (status))
+    {
+      struct sockaddr_in sin;
+      char ctype;
+      sin.sin_family = AF_INET;
+      if (strncmp (buf, SOCKET_COOKIE, strlen (SOCKET_COOKIE)))
+	{
+	  set_errno (EBADF);
+	  return SOCKET_ERROR;
+	}
+      sscanf (buf + strlen (SOCKET_COOKIE), "%hu %c %08x-%08x-%08x-%08x",
+	      &sin.sin_port,
+	      &ctype,
+	      secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
+      sin.sin_port = htons (sin.sin_port);
+      sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+      memcpy (out, &sin, sizeof sin);
+      *outlen = sizeof sin;
+      if (type)
+	*type = (ctype == 's' ? SOCK_STREAM :
+		 ctype == 'd' ? SOCK_DGRAM
+			      : 0);
       return 0;
     }
+  __seterrno_from_nt_status (status);
+  return SOCKET_ERROR;
 }
 
 /**********************************************************************/
@@ -930,7 +958,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       mode_t mode = adjust_socket_file_mode ((S_IRWXU | S_IRWXG | S_IRWXO)
 					     & ~cygheap->umask);
       DWORD fattr = FILE_ATTRIBUTE_SYSTEM;
-      if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
+      if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)) && !pc.has_acls ())
 	fattr |= FILE_ATTRIBUTE_READONLY;
       SECURITY_ATTRIBUTES sa = sec_none_nih;
       NTSTATUS status;
@@ -1020,7 +1048,6 @@ out:
 int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
-  int res = -1;
   bool in_progress = false;
   struct sockaddr_storage sst;
   DWORD err;
@@ -1028,17 +1055,18 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
   pthread_testcancel ();
 
-  if (!get_inet_addr (name, namelen, &sst, &namelen, &type, connect_secret))
-    return -1;
+  if (get_inet_addr (name, namelen, &sst, &namelen, &type, connect_secret)
+      == SOCKET_ERROR)
+    return SOCKET_ERROR;
 
   if (get_addr_family () == AF_LOCAL && get_socket_type () != type)
     {
       WSASetLastError (WSAEPROTOTYPE);
       set_winsock_errno ();
-      return -1;
+      return SOCKET_ERROR;
     }
 
-  res = ::connect (get_socket (), (struct sockaddr *) &sst, namelen);
+  int res = ::connect (get_socket (), (struct sockaddr *) &sst, namelen);
   if (!is_nonblocking ()
       && res == SOCKET_ERROR
       && WSAGetLastError () == WSAEWOULDBLOCK)
@@ -1075,7 +1103,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
       if (!res && af_local_connect ())
 	{
 	  set_winsock_errno ();
-	  return -1;
+	  return SOCKET_ERROR;
 	}
     }
 
@@ -1652,7 +1680,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 
   pthread_testcancel ();
 
-  if (to && !get_inet_addr (to, tolen, &sst, &tolen))
+  if (to && get_inet_addr (to, tolen, &sst, &tolen) == SOCKET_ERROR)
     return SOCKET_ERROR;
 
   WSABUF wsabuf = { len, (char *) ptr };

@@ -1,3 +1,17 @@
+2011-05-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (get_inet_addr): Rearrange for better readability.
+	Make waiting loop interruptible and cancelable.  Check for SYSTEM DOS
+	flag before reading the file.  Change return value to return 0 on
+	success, SOCKET_ERROR on failure.
+	(fhandler_socket::bind): Only set R/O DOS flag on filesystems not
+	supporting ACLs.
+	(fhandler_socket::connect): Accommodate changed return values from
+	get_inet_addr.  Use SOCKET_ERROR instead of -1.
+	(fhandler_socket::sendto): Accommodate changed return values from
+	get_inet_addr.
+	* syslog.cc (connect_syslogd): Ditto.
+
 2011-05-10  Christian Franke  <franke@computer.org>
 
 	* security.cc (check_registry_access): Handle missing
