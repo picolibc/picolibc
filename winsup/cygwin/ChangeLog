@@ -1,5 +1,16 @@
 2011-05-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (EnumProcessModules): Remove.
+	* dlfcn.cc (dlopen): Make sure errno is set if an error occurs.
+	(dlsym): Rewrite using RtlQueryProcessDebugInformation instead of
+	EnumProcessModules.
+	* ntdll.h (struct _DEBUG_MODULE_ARRAY): Define.
+	(RtlCreateQueryDebugBuffer): Declare.
+	(RtlDestroyQueryDebugBuffer): Declare.
+	(RtlQueryProcessDebugInformation): Declare.
+
+2011-05-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (GetModuleFileNameExW): Remove.
 	* autoload.cc (GetModuleInformation): Remove.
 

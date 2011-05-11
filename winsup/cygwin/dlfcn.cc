@@ -1,6 +1,7 @@
 /* dlfcn.cc
 
-   Copyright 1998, 2000, 2001, 2002, 2003, 2004, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 1998, 2000, 2001, 2002, 2003, 2004, 2008, 2009, 2010,
+   2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -17,6 +18,7 @@ details. */
 #include "dlfcn.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"
+#include "ntdll.h"
 
 static void __stdcall
 set_dl_error (const char *str)
@@ -71,7 +73,11 @@ dlopen (const char *name, int)
   void *ret;
 
   if (name == NULL)
-    ret = (void *) GetModuleHandle (NULL); /* handle for the current module */
+    {
+      ret = (void *) GetModuleHandle (NULL); /* handle for the current module */
+      if (!ret)
+      	__seterrno ();
+    }
   else
     {
       /* handle for the named library */
@@ -112,7 +118,7 @@ dlopen (const char *name, int)
 	  /* Restore original cxx_malloc pointer. */
 	  __cygwin_user_data.cxx_malloc = tmp_malloc;
 
-	  if (ret == NULL)
+	  if (!ret)
 	    __seterrno ();
 	}
     }
@@ -128,26 +134,42 @@ void *
 dlsym (void *handle, const char *name)
 {
   void *ret = NULL;
+
   if (handle == RTLD_DEFAULT)
     { /* search all modules */
-      HANDLE cur_proc = GetCurrentProcess ();
-      HMODULE *modules;
-      DWORD needed, i;
-      if (!EnumProcessModules (cur_proc, NULL, 0, &needed))
+      PDEBUG_BUFFER buf;
+      NTSTATUS status;
+
+      buf = RtlCreateQueryDebugBuffer (0, FALSE);
+      if (!buf)
 	{
-	dlsym_fail:
+	  set_errno (ENOMEM);
 	  set_dl_error ("dlsym");
 	  return NULL;
 	}
-      modules = (HMODULE*) alloca (needed);
-      if (!EnumProcessModules (cur_proc, modules, needed, &needed))
-	goto dlsym_fail;
-      for (i = 0; i < needed / sizeof (HMODULE); i++)
-	if ((ret = (void *) GetProcAddress (modules[i], name)))
-	  break;
+      status = RtlQueryProcessDebugInformation (GetCurrentProcessId (),
+						PDI_MODULES, buf);
+      if (!NT_SUCCESS (status))
+	__seterrno_from_nt_status (status);
+      else
+	{
+	  PDEBUG_MODULE_ARRAY mods = (PDEBUG_MODULE_ARRAY)
+				     buf->ModuleInformation;
+	  for (ULONG i = 0; i < mods->Count; ++i)
+	    if ((ret = (void *)
+		       GetProcAddress ((HMODULE) mods->Modules[i].Base, name)))
+	      break;
+	  if (!ret)
+	    set_errno (ENOENT);
+	}
+      RtlDestroyQueryDebugBuffer (buf);
     }
   else
-    ret = (void *) GetProcAddress ((HMODULE)handle, name);
+    {
+      ret = (void *) GetProcAddress ((HMODULE) handle, name);
+      if (!ret)
+	__seterrno ();
+    }
   if (!ret)
     set_dl_error ("dlsym");
   debug_printf ("ret %p", ret);

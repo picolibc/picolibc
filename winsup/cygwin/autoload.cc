@@ -414,8 +414,6 @@ LoadDLLfunc (RtlSetCurrentTransaction, 4, ntdll)
 
 LoadDLLfunc (CoTaskMemFree, 4, ole32)
 
-LoadDLLfunc (EnumProcessModules, 16, psapi)
-
 LoadDLLfunc (LsaDeregisterLogonProcess, 4, secur32)
 LoadDLLfunc (LsaFreeReturnBuffer, 4, secur32)
 LoadDLLfunc (LsaLogonUser, 56, secur32)
