@@ -1,5 +1,9 @@
 2011-05-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc: Remove useless comment.
+
+2011-05-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (EnumProcessModules): Remove.
 	* dlfcn.cc (dlopen): Make sure errno is set if an error occurs.
 	(dlsym): Rewrite using RtlQueryProcessDebugInformation instead of

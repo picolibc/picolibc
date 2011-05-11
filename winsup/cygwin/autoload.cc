@@ -399,7 +399,6 @@ LoadDLLfunc (WNetGetProviderNameA, 12, mpr)
 LoadDLLfunc (WNetGetResourceInformationA, 16, mpr)
 LoadDLLfunc (WNetOpenEnumA, 20, mpr)
 
-/* 127 == ERROR_PROC_NOT_FOUND */
 LoadDLLfunc (DsGetDcNameW, 24, netapi32)
 LoadDLLfunc (NetApiBufferFree, 4, netapi32)
 LoadDLLfunc (NetUserGetGroups, 28, netapi32)
