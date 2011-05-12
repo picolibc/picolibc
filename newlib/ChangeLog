@@ -1,5 +1,11 @@
 2011-05-12  Peter Rosin  <peda@lysator.liu.se>
 
+	* libc/time/strptime.c (strptime): Fill in tm_yday when all of tm_year,
+	tm_mon and tm_mday are updated. Fill in tm_mon, tm_mday and tm_wday
+	when both of tm_year and tm_yday are updated.
+
+2011-05-12  Peter Rosin  <peda@lysator.liu.se>
+
 	* libc/time/strptime.c (first_day): Actually return the wday
 	of the first day of the year.
 
