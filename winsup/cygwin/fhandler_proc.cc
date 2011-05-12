@@ -24,6 +24,7 @@ details. */
 #include "tls_pbuf.h"
 #include <sys/utsname.h>
 #include <sys/param.h>
+#include <sys/sysinfo.h>
 #include "ntdll.h"
 #include <winioctl.h>
 #include <wchar.h>
@@ -402,68 +403,27 @@ format_proc_loadavg (void *, char *&destbuf)
 static _off64_t
 format_proc_meminfo (void *, char *&destbuf)
 {
-  unsigned long mem_total = 0UL, mem_free = 0UL, swap_total = 0UL,
-		swap_free = 0UL;
-  MEMORYSTATUS memory_status;
-  GlobalMemoryStatus (&memory_status);
-  mem_total = memory_status.dwTotalPhys;
-  mem_free = memory_status.dwAvailPhys;
-  PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
-  ULONG size = 512;
-  NTSTATUS ret = STATUS_SUCCESS;
+  unsigned long long mem_total, mem_free, swap_total, swap_free;
+  struct sysinfo info;
 
-  spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
-  if (spi)
-    {
-      ret = NtQuerySystemInformation (SystemPagefileInformation, (PVOID) spi,
-				      size, &size);
-      if (ret == STATUS_INFO_LENGTH_MISMATCH)
-	{
-	  free (spi);
-	  spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
-	  if (spi)
-	    ret = NtQuerySystemInformation (SystemPagefileInformation,
-					    (PVOID) spi, size, &size);
-	}
-    }
-  if (!spi || ret || (!ret && GetLastError () == ERROR_PROC_NOT_FOUND))
-    {
-      swap_total = memory_status.dwTotalPageFile - mem_total;
-      swap_free = memory_status.dwAvailPageFile - mem_total;
-    }
-  else
-    {
-      PSYSTEM_PAGEFILE_INFORMATION spp = spi;
-      do
-	{
-	  swap_total += spp->CurrentSize * getsystempagesize ();
-	  swap_free += (spp->CurrentSize - spp->TotalUsed)
-		       * getsystempagesize ();
-	}
-      while (spp->NextEntryOffset
-	     && (spp = (PSYSTEM_PAGEFILE_INFORMATION)
-			   ((char *) spp + spp->NextEntryOffset)));
-    }
-  if (spi)
-    free (spi);
+  sysinfo (&info);
+  mem_total = (unsigned long long) info.totalram * info.mem_unit;
+  mem_free = (unsigned long long) info.freeram * info.mem_unit;
+  swap_total = (unsigned long long) info.totalswap * info.mem_unit;
+  swap_free = (unsigned long long) info.freeswap * info.mem_unit;
+
   destbuf = (char *) crealloc_abort (destbuf, 512);
-  return __small_sprintf (destbuf, "         total:      used:      free:\n"
-				   "Mem:  %10lu %10lu %10lu\n"
-				   "Swap: %10lu %10lu %10lu\n"
-				   "MemTotal:     %10lu kB\n"
-				   "MemFree:      %10lu kB\n"
-				   "MemShared:             0 kB\n"
-				   "HighTotal:             0 kB\n"
-				   "HighFree:              0 kB\n"
-				   "LowTotal:     %10lu kB\n"
-				   "LowFree:      %10lu kB\n"
-				   "SwapTotal:    %10lu kB\n"
-				   "SwapFree:     %10lu kB\n",
-				   mem_total, mem_total - mem_free, mem_free,
-				   swap_total, swap_total - swap_free, swap_free,
-				   mem_total >> 10, mem_free >> 10,
-				   mem_total >> 10, mem_free >> 10,
-				   swap_total >> 10, swap_free >> 10);
+  return sprintf (destbuf, "MemTotal:     %10llu kB\n"
+			   "MemFree:      %10llu kB\n"
+			   "HighTotal:             0 kB\n"
+			   "HighFree:              0 kB\n"
+			   "LowTotal:     %10llu kB\n"
+			   "LowFree:      %10llu kB\n"
+			   "SwapTotal:    %10llu kB\n"
+			   "SwapFree:     %10llu kB\n",
+			   mem_total >> 10, mem_free >> 10,
+			   mem_total >> 10, mem_free >> 10,
+			   swap_total >> 10, swap_free >> 10);
 }
 
 static _off64_t
@@ -1292,7 +1252,7 @@ format_proc_filesystems (void *, char *&destbuf)
 static _off64_t
 format_proc_swaps (void *, char *&destbuf)
 {
-  unsigned long total = 0UL, used = 0UL;
+  unsigned long long total = 0ULL, used = 0ULL;
   char *filename = NULL;
   ssize_t filename_len;
   PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
@@ -1326,14 +1286,14 @@ format_proc_swaps (void *, char *&destbuf)
       PSYSTEM_PAGEFILE_INFORMATION spp = spi;
       do
 	{
-	  total = spp->CurrentSize * getsystempagesize ();
-	  used = spp->TotalUsed * getsystempagesize ();
+	  total = (unsigned long long) spp->CurrentSize * getsystempagesize ();
+	  used = (unsigned long long) spp->TotalUsed * getsystempagesize ();
 
 	  filename_len = cygwin_conv_path (CCP_WIN_W_TO_POSIX, spp->FileName.Buffer, filename, 0);
 	  filename = (char *) malloc (filename_len);
 	  cygwin_conv_path (CCP_WIN_W_TO_POSIX, spp->FileName.Buffer, filename, filename_len);
 
-	  bufptr += sprintf (bufptr, "%-40s%-16s%-8ld%-8ld%-8d\n",
+	  bufptr += sprintf (bufptr, "%-40s%-16s%-8llu%-8llu%-8d\n",
 	                     filename, "file", total >> 10, used >> 10, 0);
 	}
       while (spp->NextEntryOffset

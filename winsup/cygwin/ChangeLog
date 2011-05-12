@@ -1,3 +1,10 @@
+2011-05-12  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* fhandler_proc.cc (format_proc_meminfo): Rewrite to use sysinfo().
+	Support RAM and swap space larger than 4GB.
+	Remove output elements not found with modern Linux kernels.
+	(format_proc_swaps): Support paging files larger than 4GB.
+
 2011-05-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc: Remove useless comment.
