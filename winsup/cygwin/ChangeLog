@@ -1,3 +1,12 @@
+2011-05-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	Based on newlib patch to strptime by Peter Rosin <peda@lysator.liu.se>:
+	* libc/time/strptime.c (is_leap_year): New static function.
+	(first_day): Ditto.
+	(__strptime): Fill in tm_yday when all of tm_year, tm_mon and tm_mday
+	are updated. Fill in tm_mon, tm_mday and tm_wday when both of tm_year
+	and tm_yday are updated.
+
 2011-05-12  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* fhandler_proc.cc (format_proc_meminfo): Rewrite to use sysinfo().

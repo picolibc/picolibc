@@ -58,6 +58,16 @@ __weak_alias(strptime,_strptime)
 #define ALT_O			0x02
 #define	LEGAL_ALT(x)		{ if (alt_format & ~(x)) return NULL; }
 
+static _CONST int _DAYS_BEFORE_MONTH[12] =
+{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+
+#define SET_MDAY 1
+#define SET_MON  2
+#define SET_YEAR 4
+#define SET_WDAY 8
+#define SET_YDAY 16
+#define SET_YMD  (SET_YEAR | SET_MON | SET_MDAY)
+
 static const char gmt[4] = { "GMT" };
 
 typedef struct _era_info_t {
@@ -265,6 +275,22 @@ find_alt_digits (const unsigned char *bp, alt_digits_t *adi, uint *pval)
   return NULL;
 }
 
+static int              
+is_leap_year (int year)
+{               
+  return (year % 4) == 0 && ((year % 100) != 0 || (year % 400) == 0);
+}       
+
+static int      
+first_day (int year)
+{       
+  int ret = 4;
+      
+  while (--year >= 1970)
+    ret = (ret + 365 + is_leap_year (year)) % 7;
+  return ret; 
+}           
+
 /* This simplifies the calls to conv_num enormously. */
 #define ALT_DIGITS	((alt_format & ALT_O) ? *alt_digits : NULL)
 
@@ -286,6 +312,7 @@ __strptime(const char *buf, const char *fmt, struct tm *tm,
 	unsigned long width;
 	const char *new_fmt;
 	uint ulim;
+	int ymd = 0;
 
 	bp = (const u_char *)buf;
 	struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
@@ -360,16 +387,19 @@ literal:
 			new_fmt = (alt_format & ALT_E)
 				  ? _ctloc (era_d_t_fmt) : _ctloc(c_fmt);
 			LEGAL_ALT(ALT_E);
+			ymd |= SET_WDAY | SET_YMD;
 			goto recurse;
 
 		case 'D':	/* The date as "%m/%d/%y". */
 			new_fmt = "%m/%d/%y";
 			LEGAL_ALT(0);
+			ymd |= SET_YMD;
 			goto recurse;
 
 		case 'F':	/* The date as "%Y-%m-%d". */
 			{
 			  LEGAL_ALT(0);
+			  ymd |= SET_YMD;
 			  char *tmp = __strptime ((const char *) bp, "%Y-%m-%d",
 						  tm, era_info, alt_digits);
 			  if (tmp && (uint) (tmp - (char *) bp) > width)
@@ -403,6 +433,7 @@ literal:
 			new_fmt = (alt_format & ALT_E)
 				  ? _ctloc (era_d_fmt) : _ctloc(x_fmt);
 			LEGAL_ALT(ALT_E);
+			ymd |= SET_YMD;
 		    recurse:
 			bp = (const u_char *)__strptime((const char *)bp,
 							new_fmt, tm,
@@ -417,6 +448,7 @@ literal:
 			bp = find_string(bp, &tm->tm_wday, _ctloc(weekday),
 					_ctloc(wday), 7);
 			LEGAL_ALT(0);
+			ymd |= SET_WDAY;
 			continue;
 
 		case 'B':	/* The month, using the locale's form. */
@@ -425,10 +457,12 @@ literal:
 			bp = find_string(bp, &tm->tm_mon, _ctloc(month),
 					_ctloc(mon), 12);
 			LEGAL_ALT(0);
+			ymd |= SET_WDAY;
 			continue;
 
 		case 'C':	/* The century number. */
 			LEGAL_ALT(ALT_E);
+			ymd |= SET_YEAR;
 			if ((alt_format & ALT_E) && *era_info)
 			  {
 			    /* With E modifier, an era.  We potentially
@@ -467,6 +501,7 @@ literal:
 		case 'd':	/* The day of month. */
 		case 'e':
 			LEGAL_ALT(ALT_O);
+			ymd |= SET_MDAY;
 			bp = conv_num(bp, &tm->tm_mday, 1, 31, ALT_DIGITS);
 			continue;
 
@@ -493,6 +528,7 @@ literal:
 			bp = conv_num(bp, &i, 1, 366, NULL);
 			tm->tm_yday = i - 1;
 			LEGAL_ALT(0);
+			ymd |= SET_YDAY;
 			continue;
 
 		case 'M':	/* The minute. */
@@ -502,6 +538,7 @@ literal:
 
 		case 'm':	/* The month. */
 			LEGAL_ALT(ALT_O);
+			ymd |= SET_MON;
 			i = 1;
 			bp = conv_num(bp, &i, 1, 12, ALT_DIGITS);
 			tm->tm_mon = i - 1;
@@ -532,13 +569,21 @@ literal:
 			 bp = conv_num(bp, &i, 0, 53, ALT_DIGITS);
 			 continue;
 
+		case 'u':	/* The day of week, beginning on monday. */
+			LEGAL_ALT(ALT_O);
+			ymd |= SET_WDAY;
+			bp = conv_num(bp, &i, 1, 7, ALT_DIGITS);
+			tm->tm_wday = i % 7;
+			continue;
 		case 'w':	/* The day of week, beginning on sunday. */
 			LEGAL_ALT(ALT_O);
+			ymd |= SET_WDAY;
 			bp = conv_num(bp, &tm->tm_wday, 0, 6, ALT_DIGITS);
 			continue;
 
 		case 'Y':	/* The year. */
 			LEGAL_ALT(ALT_E);
+			ymd |= SET_YEAR;
 			if ((alt_format & ALT_E) && *era_info)
 			  {
 			    bool gotit = false;
@@ -574,6 +619,7 @@ literal:
 
 		case 'y':	/* The year within 100 years of the epoch. */
 			/* LEGAL_ALT(ALT_E | ALT_O); */
+			ymd |= SET_YEAR;
 			if ((alt_format & ALT_E) && *era_info)
 			  {
 			    /* With E modifier, the offset to the start date
@@ -667,6 +713,52 @@ literal:
 	    tm->tm_year -= TM_YEAR_BASE;
 	  }
 
+	if ((ymd & SET_YMD) == SET_YMD)
+	  {
+	    /* all of tm_year, tm_mon and tm_mday, but... */
+	    if (!(ymd & SET_YDAY))
+	      {
+		/* ...not tm_yday, so fill it in */
+		tm->tm_yday = _DAYS_BEFORE_MONTH[tm->tm_mon] + tm->tm_mday;
+		if (!is_leap_year (tm->tm_year + TM_YEAR_BASE)
+		    || tm->tm_mon < 2)
+		  tm->tm_yday--;
+		ymd |= SET_YDAY;
+	      }
+	  }
+	else if ((ymd & (SET_YEAR | SET_YDAY)) == (SET_YEAR | SET_YDAY))
+	  {
+	    /* both of tm_year and tm_yday, but... */
+	    if (!(ymd & SET_MON))
+	      {
+		/* ...not tm_mon, so fill it in, and/or... */
+		if (tm->tm_yday < _DAYS_BEFORE_MONTH[1])
+		  tm->tm_mon = 0;
+		else
+		  {
+		    int leap = is_leap_year (tm->tm_year + TM_YEAR_BASE);
+		    for (i = 2; i < 12; ++i)
+		      if (tm->tm_yday < _DAYS_BEFORE_MONTH[i] + leap)
+			break;
+		    tm->tm_mon = i - 1;
+		  }
+	      }
+	    if (!(ymd & SET_MDAY))
+	      {
+		/* ...not tm_mday, so fill it in */
+		tm->tm_mday = tm->tm_yday - _DAYS_BEFORE_MONTH[tm->tm_mon];
+		if (!is_leap_year (tm->tm_year + TM_YEAR_BASE)
+		    || tm->tm_mon < 2)
+		  tm->tm_mday++;
+	      }
+	  }
+
+	if ((ymd & (SET_YEAR | SET_YDAY | SET_WDAY)) == (SET_YEAR | SET_YDAY))
+	  {
+	    /* fill in tm_wday */
+	    int fday = first_day (tm->tm_year + TM_YEAR_BASE);
+	    tm->tm_wday = (fday + tm->tm_yday) % 7;
+	  }
 	return (char *) bp;
 }
 
