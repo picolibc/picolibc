@@ -78,8 +78,8 @@ first_day (int year)
 {
     int ret = 4;
 
-    for (; year > 1970; --year)
-	ret = (ret + 365 + is_leap_year (year) ? 1 : 0) % 7;
+    while (--year >= 1970)
+	ret = (ret + 365 + is_leap_year (year)) % 7;
     return ret;
 }
 

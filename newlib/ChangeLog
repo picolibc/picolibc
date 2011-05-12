@@ -1,3 +1,8 @@
+2011-05-12  Peter Rosin  <peda@lysator.liu.se>
+
+	* libc/time/strptime.c (first_day): Actually return the wday
+	of the first day of the year.
+
 2011-05-10  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/locale/lmessages.c (_C_messages_locale): Add missing comma.
