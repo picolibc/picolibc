@@ -1,3 +1,27 @@
+2011-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (struct heap_info::heap): Convert base to
+	uintptr_t.  Add heap_id, end, flags members.
+	(heap_info::heap_vm_chunks): Rename from heaps.
+	(heap_info::heap_info): Rearrange using RtlQueryProcessDebugInformation
+	to get information of heap virtual memory blocks.  Store heap id and
+	flags, as well as end address of each block.
+	(heap_info::fill_if_match): Check incoming base address against full
+	address range of heap chunks.  Convert flag values in extra heap
+	information.
+	(format_process_maps): Change order so that heap check is done before
+	MEM_MAPPED check since there are shareable heaps.
+	* ntdll.h (PDI_HEAP_BLOCKS): Define.
+	(HEAP_FLAG_NOSERIALIZE): Define.
+	(HEAP_FLAG_GROWABLE): Define.
+	(HEAP_FLAG_EXCEPTIONS): Define.
+	(HEAP_FLAG_NONDEFAULT): Define.
+	(HEAP_FLAG_SHAREABLE): Define.
+	(HEAP_FLAG_EXECUTABLE): Define.
+	(HEAP_FLAG_DEBUGGED): Define.
+	(struct _DEBUG_HEAP_ARRAY): Define.
+	(struct _DEBUG_HEAP_BLOCK): Define.
+
 2011-05-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	Based on newlib patch to strptime by Peter Rosin <peda@lysator.liu.se>:

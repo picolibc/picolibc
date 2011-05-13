@@ -614,34 +614,68 @@ struct heap_info
   struct heap
   {
     heap *next;
-    void *base;
+    unsigned heap_id;
+    uintptr_t base;
+    uintptr_t end;
+    unsigned long flags;
   };
-  heap *heaps;
+  heap *heap_vm_chunks;
 
   heap_info (DWORD pid)
-    : heaps (0)
+    : heap_vm_chunks (0)
   {
-    HANDLE hHeapSnap = CreateToolhelp32Snapshot (TH32CS_SNAPHEAPLIST, pid);
-    HEAPLIST32 hl;
-    hl.dwSize = sizeof(hl);
+    PDEBUG_BUFFER buf;
+    NTSTATUS status;
+    PDEBUG_HEAP_ARRAY harray;
 
-    if (hHeapSnap != INVALID_HANDLE_VALUE && Heap32ListFirst (hHeapSnap, &hl))
-      do
-	{
-	  heap *h = (heap *) cmalloc (HEAP_FHANDLER, sizeof (heap));
-	  *h = (heap) {heaps, (void*) hl.th32HeapID};
-	  heaps = h;
-	} while (Heap32ListNext (hHeapSnap, &hl));
-    CloseHandle (hHeapSnap);
+    buf = RtlCreateQueryDebugBuffer (0, FALSE);
+    if (!buf)
+      return;
+    status = RtlQueryProcessDebugInformation (pid, PDI_HEAPS | PDI_HEAP_BLOCKS,
+					      buf);
+    if (NT_SUCCESS (status)
+	&& (harray = (PDEBUG_HEAP_ARRAY) buf->HeapInformation) != NULL)
+      for (ULONG hcnt = 0; hcnt < harray->Count; ++hcnt)
+      	{
+	  PDEBUG_HEAP_BLOCK barray = (PDEBUG_HEAP_BLOCK)
+				     harray->Heaps[hcnt].Blocks;
+	  if (!barray)
+	    continue;
+	  for (ULONG bcnt = 0; bcnt < harray->Heaps[hcnt].BlockCount; ++bcnt)
+	    if (barray[bcnt].Flags & 2)
+	      {
+		heap *h = (heap *) cmalloc (HEAP_FHANDLER, sizeof (heap));
+		*h = (heap) { heap_vm_chunks,
+			      hcnt, barray[bcnt].Address,
+			      barray[bcnt].Address + barray[bcnt].Size,
+			      harray->Heaps[hcnt].Flags };
+		heap_vm_chunks = h;
+	      }
+	}
+    RtlDestroyQueryDebugBuffer (buf);
   }
   
-  char *fill_if_match (void *base, char *dest )
+  char *fill_if_match (void *base, ULONG type, char *dest )
   {
-    long count = 0;
-    for (heap *h = heaps; h && ++count; h = h->next)
-      if (base == h->base)
+    for (heap *h = heap_vm_chunks; h; h = h->next)
+      if ((uintptr_t) base >= h->base && (uintptr_t) base < h->end)
 	{
-	  __small_sprintf (dest, "[heap %ld]", count);
+	  char *p;
+	  __small_sprintf (dest, "[heap %ld", h->heap_id);
+	  p = strchr (dest, '\0');
+	  if (!(h->flags & HEAP_FLAG_NONDEFAULT))
+	    p = stpcpy (p, " default");
+	  if ((h->flags & HEAP_FLAG_SHAREABLE) && (type & MEM_MAPPED))
+	    p = stpcpy (p, " share");
+	  if (h->flags & HEAP_FLAG_EXECUTABLE)
+	    p = stpcpy (p, " exec");
+	  if (h->flags & HEAP_FLAG_GROWABLE)
+	    p = stpcpy (p, " grow");
+	  if (h->flags & HEAP_FLAG_NOSERIALIZE)
+	    p = stpcpy (p, " noserial");
+	  if (h->flags == HEAP_FLAG_DEBUGGED)
+	    p = stpcpy (p, " debug");
+	  stpcpy (p, "]");
 	  return dest;
 	}
     return 0;
@@ -650,7 +684,7 @@ struct heap_info
   ~heap_info () 
   {
     heap *n = 0;
-    for (heap *m = heaps; m; m = n)
+    for (heap *m = heap_vm_chunks; m; m = n)
       {
 	n = m->next;
 	cfree (m);
@@ -777,11 +811,13 @@ format_process_maps (void *data, char *&destbuf)
 		    sys_wcstombs (posix_modname, NT_MAX_PATH, dosname);
 		  stat64 (posix_modname, &st);
 		}
-	      else if (mb.Type & MEM_MAPPED)
-		strcpy (posix_modname, "[shareable]");
-	      else if (!(mb.Type & MEM_PRIVATE
-			 && heaps.fill_if_match (cur.abase, posix_modname)))
-		posix_modname[0] = 0;
+	      else if (!heaps.fill_if_match (cur.abase, mb.Type, posix_modname))
+		{
+		  if (mb.Type & MEM_MAPPED)
+		    strcpy (posix_modname, "[shareable]");
+		  else
+		    posix_modname[0] = 0;
+		}
 	    }
 	}
     }
