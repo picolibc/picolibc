@@ -1,3 +1,7 @@
+2011-05-16  Alan Modra  <amodra@gmail.com>
+
+	* bfdlink.h (struct bfd_link_hash_entry): Remove u.undef.weak field.
+
 2011-05-09  Paul Brook  <paul@codesourcery.com>
 
 	* elf/tic6x.h (ELF_STRING_C6000_unwind,
