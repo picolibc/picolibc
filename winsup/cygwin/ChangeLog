@@ -1,5 +1,9 @@
 2011-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc (thread_wrapper): Add comments to assembler code.
+
+2011-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (pthread_attr_getguardsize): Export.
 	(pthread_attr_setguardsize): Export.
 	(pthread_attr_setstack): Export.

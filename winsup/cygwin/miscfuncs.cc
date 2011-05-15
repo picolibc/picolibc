@@ -421,15 +421,16 @@ thread_wrapper (VOID *arg)
 					       + wrapper_arg.stacksize
 					       - sizeof (PVOID));
       __asm__ ("\n\
-	       movl %[WRAPPER_ARG], %%ebx \n\
-	       movl (%%ebx), %%eax \n\
-	       movl 4(%%ebx), %%ecx \n\
-	       movl 8(%%ebx), %%edx \n\
-	       xorl %%ebp, %%ebp \n\
-	       movl %%edx, %%esp \n\
-	       pushl %%ecx \n\
-	       pushl %%eax \n\
-	       jmp  *%%eax \n" : : [WRAPPER_ARG] "r" (&wrapper_arg));
+	       movl  %[WRAPPER_ARG], %%ebx # Load &wrapper_arg into ebx  \n\
+	       movl  (%%ebx), %%eax        # Load thread func into eax   \n\
+	       movl  4(%%ebx), %%ecx       # Load thread arg into ecx    \n\
+	       movl  8(%%ebx), %%edx       # Load stackbase into edx     \n\
+	       xorl  %%ebp, %%ebp          # Set ebp to 0                \n\
+	       movl  %%edx, %%esp          # Set esp to stackbase        \n\
+	       pushl %%ecx                 # Push thread arg onto stack  \n\
+	       pushl %%eax                 # Push thread func onto stack \n\
+	       jmp  *%%eax                 # Jump to thread func         \n"
+	       : : [WRAPPER_ARG] "r" (&wrapper_arg));
 
     }
   if (wrapper_arg.guardsize)
@@ -446,12 +447,13 @@ thread_wrapper (VOID *arg)
 	system_printf ("VirtualAlloc, %E");
     }
   __asm__ ("\n\
-	   movl %[WRAPPER_ARG], %%ebx \n\
-	   movl (%%ebx), %%eax \n\
-	   movl 4(%%ebx), %%ecx \n\
-	   pushl %%ecx \n\
-	   pushl %%eax \n\
-	   jmp  *%%eax \n" : : [WRAPPER_ARG] "r" (&wrapper_arg));
+	   movl  %[WRAPPER_ARG], %%ebx     # Load &wrapper_arg into ebx  \n\
+	   movl  (%%ebx), %%eax            # Load thread func into eax   \n\
+	   movl  4(%%ebx), %%ecx           # Load thread arg into ecx    \n\
+	   pushl %%ecx                     # Push thread arg onto stack  \n\
+	   pushl %%eax                     # Push thread func onto stack \n\
+	   jmp  *%%eax                     # Jump to thread func         \n"
+	   : : [WRAPPER_ARG] "r" (&wrapper_arg));
   /* Never reached. */
   return ERROR_INVALID_FUNCTION;
 }
