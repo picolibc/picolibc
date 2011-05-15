@@ -1,3 +1,7 @@
+2011-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winbase.h (STACK_SIZE_PARAM_IS_A_RESERVATION): Define.
+
 2011-04-21  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/windef.h (PACKED): Remove macro.
