@@ -1,3 +1,8 @@
+2011-05-15  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/features.h (_POSIX_THREAD_ATTR_STACKADDR): Define
+	to 200112L for Cygwin.
+
 2011-05-12  Peter Rosin  <peda@lysator.liu.se>
 
 	* libc/time/strptime.c (strptime): Fill in tm_yday when all of tm_year,
