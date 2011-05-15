@@ -622,11 +622,15 @@ typedef struct _PEB
   ULONG SessionId;
 } PEB, *PPEB;
 
-/* Simplifed definition, just to get the PEB pointer. */
+/* Simplified definition, just to get the TIB and the PEB pointer. */
 typedef struct _TEB
 {
-  PVOID dummy[12];
-  PPEB                    Peb;
+  NT_TIB Tib;
+  PVOID EnvironmentPointer;
+  CLIENT_ID ClientId;
+  PVOID ActiveRpcHandle;
+  PVOID ThreadLocalStoragePointer;
+  PPEB Peb;
   /* A lot more follows... */
 } TEB, *PTEB;
 
@@ -1111,9 +1115,7 @@ extern "C"
 				ULONG, ULONG *);
   NTSTATUS NTAPI NtQuerySystemInformation (SYSTEM_INFORMATION_CLASS,
 					   PVOID, ULONG, PULONG);
-
   NTSTATUS WINAPI NtQuerySystemTime (PLARGE_INTEGER);
-
   NTSTATUS NTAPI NtQuerySecurityObject (HANDLE, SECURITY_INFORMATION,
 					PSECURITY_DESCRIPTOR, ULONG, PULONG);
   NTSTATUS NTAPI NtQuerySymbolicLinkObject (HANDLE, PUNICODE_STRING, PULONG);

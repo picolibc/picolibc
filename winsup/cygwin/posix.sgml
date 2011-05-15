@@ -532,6 +532,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_atfork
     pthread_attr_destroy
     pthread_attr_getdetachstate
+    pthread_attr_getguardsize
     pthread_attr_getinheritsched
     pthread_attr_getschedparam
     pthread_attr_getschedpolicy
@@ -540,10 +541,12 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_attr_getstacksize
     pthread_attr_init
     pthread_attr_setdetachstate
+    pthread_attr_setguardsize
     pthread_attr_setinheritsched
     pthread_attr_setschedparam
     pthread_attr_setschedpolicy
     pthread_attr_setscope
+    pthread_attr_setstack
     pthread_attr_setstacksize
     pthread_cancel
     pthread_cond_broadcast
@@ -1237,6 +1240,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     mktemp			(SUSv3)
     on_exit			(SunOS)
     pthread_attr_getstackaddr	(SUSv3)
+    pthread_attr_setstackaddr	(SUSv3)
     pthread_continue		(XPG2)
     pthread_getsequence_np	(Tru64)
     pthread_suspend		(XPG2)
@@ -1379,9 +1383,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     posix_trace[...]
     posix_typed_[...]
     powl
-    pthread_attr_getguardsize
-    pthread_attr_setguardsize
-    pthread_attr_setstack
     pthread_barrier[...]
     pthread_condattr_getclock
     pthread_condattr_setclock

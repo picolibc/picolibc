@@ -410,12 +410,14 @@ details. */
       242: Export psiginfo, psignal, sys_siglist.
       243: Export sysinfo.
       244: Export clock_settime.
+      245: Export pthread_attr_getguardsize, pthread_attr_setguardsize,
+	   pthread_attr_setstack, pthread_attr_setstackaddr.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 244
+#define CYGWIN_VERSION_API_MINOR 245
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

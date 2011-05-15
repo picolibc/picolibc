@@ -1,7 +1,7 @@
 /* init.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -115,7 +115,7 @@ extern void __stdcall dll_crt0_0 ();
 extern "C" BOOL WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
-  BOOL wow64_test_stack_marker;
+  PNT_TIB tib;
 
   switch (reason)
     {
@@ -131,9 +131,10 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	 the auto load address of DLLs?
 	 Check if we're running in WOW64 on a 64 bit machine *and* are
 	 spawned by a genuine 64 bit process.  If so, respawn. */
+      tib = &NtCurrentTeb ()->Tib;
       if (wincap.is_wow64 ()
-	  && &wow64_test_stack_marker >= (PBOOL) 0x400000
-	  && &wow64_test_stack_marker <= (PBOOL) 0x10000000)
+	  && tib->StackLimit >= (PBOOL) 0x400000
+	  && tib->StackBase <= (PBOOL) 0x10000000)
 	respawn_wow64_process ();
 
       dll_crt0_0 ();
@@ -149,7 +150,10 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	munge_threadfunc ();
       break;
     case DLL_THREAD_DETACH:
-      if (dll_finished_loading && (void *) &_my_tls > (void *) &wow64_test_stack_marker
+      tib = &NtCurrentTeb ()->Tib;
+      if (dll_finished_loading
+	  && (PVOID) &_my_tls >= tib->StackLimit
+	  && (PVOID) &_my_tls < tib->StackBase
 	  && _my_tls.isinitialized ())
 	_my_tls.remove (0);
       break;

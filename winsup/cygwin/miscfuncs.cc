@@ -1,7 +1,7 @@
 /* miscfuncs.cc: misc funcs that don't belong anywhere else
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -15,12 +15,17 @@ details. */
 #include <assert.h>
 #include <alloca.h>
 #include <limits.h>
+#include <sys/param.h>
 #include <wchar.h>
 #include <wingdi.h>
 #include <winuser.h>
 #include <winnls.h>
 #include "cygtls.h"
 #include "ntdll.h"
+#include "path.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 
 long tls_ix = -1;
 
@@ -375,4 +380,139 @@ slashify (const char *src, char *dst, bool trailing_slash_p)
       && !isdirsep (src[-1]))
     *dst++ = '/';
   *dst++ = 0;
+}
+
+/* CygwinCreateThread.
+
+   Replacement function for CreateThread.  What we do here is to remove
+   parameters we don't use and instead to add parameters we need to make
+   the function pthreads compatible. */
+
+struct thread_wrapper_arg
+{
+  LPTHREAD_START_ROUTINE func;
+  PVOID arg;
+  PVOID stackaddr;
+  ULONG stacksize;
+  ULONG guardsize;
+};
+
+DWORD WINAPI
+thread_wrapper (VOID *arg)
+{
+  if (!arg)
+    return ERROR_INVALID_PARAMETER;
+
+  thread_wrapper_arg wrapper_arg = *(thread_wrapper_arg *) arg;
+  cfree (arg);
+
+  if (wrapper_arg.stackaddr)
+    {
+      /* If the application provided the stack, we must make sure that
+	 it's actually used by the thread function.  So what we do here is
+	 to compute the stackbase of the application-provided stack and
+	 change the stack pointer accordingly.
+
+	 NOTE: _my_tls is on the stack created by CreateThread!  It's
+	       unlikely the tls structure will ever exceed 64K, but if
+	       so, we have to raise the size of the stack in the call
+	       to CreateThread, too. */
+      wrapper_arg.stackaddr = (PVOID) ((PBYTE) wrapper_arg.stackaddr
+					       + wrapper_arg.stacksize
+					       - sizeof (PVOID));
+      __asm__ ("\n\
+	       movl %[WRAPPER_ARG], %%ebx \n\
+	       movl (%%ebx), %%eax \n\
+	       movl 4(%%ebx), %%ecx \n\
+	       movl 8(%%ebx), %%edx \n\
+	       xorl %%ebp, %%ebp \n\
+	       movl %%edx, %%esp \n\
+	       pushl %%ecx \n\
+	       pushl %%eax \n\
+	       jmp  *%%eax \n" : : [WRAPPER_ARG] "r" (&wrapper_arg));
+
+    }
+  if (wrapper_arg.guardsize)
+    {
+      /* Set up POSIX guard pages.  Note that this is not the same as the
+	 PAGE_GUARD protection.  Rather, the POSIX guard pages are a
+	 PAGE_NOACCESS protected area which is supposed to guard against
+	 stack overflow and to trigger a SIGSEGV if that happens. */
+      PNT_TIB tib = &NtCurrentTeb ()->Tib;
+      wrapper_arg.stackaddr = (PVOID) ((PBYTE) tib->StackBase
+				       - wrapper_arg.stacksize);
+      if (!VirtualAlloc (wrapper_arg.stackaddr, wrapper_arg.guardsize,
+			 MEM_COMMIT, PAGE_NOACCESS))
+	system_printf ("VirtualAlloc, %E");
+    }
+  __asm__ ("\n\
+	   movl %[WRAPPER_ARG], %%ebx \n\
+	   movl (%%ebx), %%eax \n\
+	   movl 4(%%ebx), %%ecx \n\
+	   pushl %%ecx \n\
+	   pushl %%eax \n\
+	   jmp  *%%eax \n" : : [WRAPPER_ARG] "r" (&wrapper_arg));
+  /* Never reached. */
+  return ERROR_INVALID_FUNCTION;
+}
+
+/* FIXME: This should be settable via setrlimit (RLIMIT_STACK). */
+#define DEFAULT_STACKSIZE (512 * 1024)
+
+HANDLE WINAPI
+CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
+		    PVOID stackaddr, ULONG stacksize, ULONG guardsize,
+		    DWORD creation_flags, LPDWORD thread_id)
+{
+  ULONG real_stacksize = 0;
+  ULONG real_guardsize = 0;
+  thread_wrapper_arg *wrapper_arg;
+  
+  wrapper_arg = (thread_wrapper_arg *) ccalloc (HEAP_STR, 1,
+						sizeof *wrapper_arg);
+  if (!wrapper_arg)
+    {
+      SetLastError (ERROR_OUTOFMEMORY);
+      return NULL;
+    }
+  wrapper_arg->func = thread_func;
+  wrapper_arg->arg = thread_arg;
+
+  /* Set stacksize. */
+  real_stacksize = stacksize ?: DEFAULT_STACKSIZE;
+  if (real_stacksize < PTHREAD_STACK_MIN)
+    real_stacksize = PTHREAD_STACK_MIN;
+  if (stackaddr)
+    {
+      wrapper_arg->stackaddr = stackaddr;
+      wrapper_arg->stacksize = real_stacksize;
+      real_stacksize = PTHREAD_STACK_MIN;
+    }
+  else
+    {
+      /* If not, we have to create the stack here. */
+      real_stacksize = roundup2 (real_stacksize, wincap.page_size ());
+      /* If no guardsize has been specified by the application, use the
+	 system pagesize as default. */
+      real_guardsize = (guardsize != 0xffffffff)
+		       ? guardsize : wincap.page_size ();
+      if (real_guardsize)
+	real_guardsize = roundup2 (real_guardsize, wincap.page_size ());
+      /* If the default stacksize is used and guardsize has not been specified,
+	 don't add a guard page to the size. */
+      if (stacksize && guardsize != 0xffffffff)
+	real_stacksize += real_guardsize;
+      /* Now roundup the result to the next allocation boundary. */
+      real_stacksize = roundup2 (real_stacksize,
+				 wincap.allocation_granularity ());
+
+      wrapper_arg->stacksize = real_stacksize;
+      wrapper_arg->guardsize = real_guardsize;
+    }
+  /* Use the STACK_SIZE_PARAM_IS_A_RESERVATION parameter to make sure the
+     stack size is exactly the size we want. */
+  return CreateThread (&sec_none_nih, real_stacksize, thread_wrapper,
+		       wrapper_arg,
+		       creation_flags | STACK_SIZE_PARAM_IS_A_RESERVATION,
+		       thread_id);
 }

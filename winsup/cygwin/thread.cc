@@ -23,9 +23,6 @@ details. */
 
    R.Collins, April 2001.  */
 
-#ifdef HAVE_CONFIG_H
-#endif
-
 #include "winsup.h"
 #include "miscfuncs.h"
 #include "path.h"
@@ -38,6 +35,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
+#include "miscfuncs.h"
 
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
@@ -425,7 +423,9 @@ pthread::precreate (pthread_attr *newattr)
       attr.joinable = newattr->joinable;
       attr.contentionscope = newattr->contentionscope;
       attr.inheritsched = newattr->inheritsched;
+      attr.stackaddr = newattr->stackaddr;
       attr.stacksize = newattr->stacksize;
+      attr.guardsize = newattr->guardsize;
     }
 
   if (!pthread_mutex::is_good_object (&verifyable_mutex_obj))
@@ -455,8 +455,9 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   arg = threadarg;
 
   mutex.lock ();
-  win32_obj_id = ::CreateThread (&sec_none_nih, attr.stacksize,
-				thread_init_wrapper, this, 0, &thread_id);
+  win32_obj_id = CygwinCreateThread (thread_init_wrapper, this,
+				     attr.stackaddr, attr.stacksize,
+				     attr.guardsize, 0, &thread_id);
 
   if (!win32_obj_id)
     {
@@ -1087,7 +1088,8 @@ pthread::resume ()
 
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
 joinable (PTHREAD_CREATE_JOINABLE), contentionscope (PTHREAD_SCOPE_PROCESS),
-inheritsched (PTHREAD_INHERIT_SCHED), stackaddr (NULL), stacksize (0)
+inheritsched (PTHREAD_INHERIT_SCHED), stackaddr (NULL), stacksize (0),
+guardsize (0xffffffff)
 {
   schedparam.sched_priority = 0;
 }
@@ -2240,6 +2242,20 @@ pthread_attr_setscope (pthread_attr_t *attr, int contentionscope)
 }
 
 extern "C" int
+pthread_attr_setstack (pthread_attr_t *attr, void *addr, size_t size)
+{
+  if (!pthread_attr::is_good_object (attr))
+    return EINVAL;
+  if (addr == NULL)
+    return EINVAL;    
+  if (size < PTHREAD_STACK_MIN)
+    return EINVAL;    
+  (*attr)->stackaddr = addr;
+  (*attr)->stacksize = size;
+  return 0;
+}
+
+extern "C" int
 pthread_attr_getstack (const pthread_attr_t *attr, void **addr, size_t *size)
 {
   if (!pthread_attr::is_good_object (attr))
@@ -2247,6 +2263,17 @@ pthread_attr_getstack (const pthread_attr_t *attr, void **addr, size_t *size)
   /* uses lowest address of stack on all platforms */
   *addr = (void *)((int)(*attr)->stackaddr - (*attr)->stacksize);
   *size = (*attr)->stacksize;
+  return 0;
+}
+
+extern "C" int
+pthread_attr_setstackaddr (pthread_attr_t *attr, void *addr)
+{
+  if (!pthread_attr::is_good_object (attr))
+    return EINVAL;
+  if (addr == NULL)
+    return EINVAL;    
+  (*attr)->stackaddr = addr;
   return 0;
 }
 
@@ -2278,6 +2305,27 @@ pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *size)
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   *size = (*attr)->stacksize;
+  return 0;
+}
+
+extern "C" int
+pthread_attr_setguardsize (pthread_attr_t *attr, size_t size)
+{
+  if (!pthread_attr::is_good_object (attr))
+    return EINVAL;
+  /* We don't support a guardsize of more than 1 Meg. */
+  if (size > 1024 * 1024)
+    return EINVAL;
+  (*attr)->guardsize = size;
+  return 0;
+}
+
+extern "C" int
+pthread_attr_getguardsize (const pthread_attr_t *attr, size_t *size)
+{
+  if (!pthread_attr::is_good_object (attr))
+    return EINVAL;
+  *size = (*attr)->guardsize;
   return 0;
 }
 
@@ -2429,6 +2477,7 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
   (*attr)->contentionscope = thread->attr.contentionscope;
   (*attr)->inheritsched = thread->attr.inheritsched;
   (*attr)->schedparam = thread->attr.schedparam;
+  (*attr)->guardsize = thread->attr.guardsize;
 
   tbi = (PTHREAD_BASIC_INFORMATION) malloc (sizeof_tbi);
   ret = NtQueryInformationThread (thread->win32_obj_id, ThreadBasicInformation,

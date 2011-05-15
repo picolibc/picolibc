@@ -1,3 +1,41 @@
+2011-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (pthread_attr_getguardsize): Export.
+	(pthread_attr_setguardsize): Export.
+	(pthread_attr_setstack): Export.
+	(pthread_attr_setstackaddr): Export.
+	* init.cc (dll_entry): Remove wow64_test_stack_marker.  Check for
+	unusual stack address by testing stack addresses from current TEB.
+	Check validity of _my_tls by testing if it's within the stack as
+	given in current TEB.
+	* miscfuncs.cc (struct thread_wrapper_arg): New structure used to
+	push all required information to thread_wrapper function.
+	(thread_wrapper): Wrapper function for actual thread function.
+	If an application stack has been given, change %ebp and %esp so that
+	the thread function runs on that stack.  If the thread has been created
+	by CygwinCreateThread, set up the POSIX guard pages if necessary.
+	(CygwinCreateThread): New function.
+	* miscfuncs.h (CygwinCreateThread): Declare.
+	* ntdll.h (struct _TEB): Define all members up to Peb.
+	* posix.sgml (std-susv4): Move pthread_attr_getguardsize,
+	pthread_attr_setguardsize and pthread_attr_setstack here.
+	(std-deprec): Add pthread_attr_setstackaddr.
+	* sysconf.cc (sca): Set _SC_THREAD_ATTR_STACKADDR to
+	_POSIX_THREAD_ATTR_STACKADDR.
+	* thread.cc (pthread::precreate): Copy pthread_attr stackaddr and
+	guardsize members.
+	(pthread::create): Call CygwinCreateThread.
+	(pthread_attr::pthread_attr): Initialize guardsize.
+	(pthread_attr_setstack): New function.
+	(pthread_attr_setstackaddr): New function.
+	(pthread_attr_setguardsize): New function.
+	(pthread_attr_getguardsize): New function.
+	(pthread_getattr_np): Copy attr.guardsize.
+	* thread.h (pthread_attr): Add member guardsize.
+	* include/pthread.h (pthread_attr_getguardsize): Declare.
+	(pthread_attr_setguardsize): Declare.
+	* include/cygwin/version.h: Bump API minor number.
+
 2011-05-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc (struct heap_info::heap): Convert base to

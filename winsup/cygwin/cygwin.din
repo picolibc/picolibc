@@ -1174,6 +1174,7 @@ psignal SIGFE
 pthread_atfork SIGFE
 pthread_attr_destroy SIGFE
 pthread_attr_getdetachstate SIGFE
+pthread_attr_getguardsize SIGFE
 pthread_attr_getinheritsched SIGFE
 pthread_attr_getschedparam SIGFE
 pthread_attr_getschedpolicy SIGFE
@@ -1183,10 +1184,13 @@ pthread_attr_getstackaddr SIGFE
 pthread_attr_getstacksize SIGFE
 pthread_attr_init SIGFE
 pthread_attr_setdetachstate SIGFE
+pthread_attr_setguardsize SIGFE
 pthread_attr_setinheritsched SIGFE
 pthread_attr_setschedparam SIGFE
 pthread_attr_setschedpolicy SIGFE
 pthread_attr_setscope SIGFE
+pthread_attr_setstack SIGFE
+pthread_attr_setstackaddr SIGFE
 pthread_attr_setstacksize SIGFE
 pthread_cancel SIGFE
 _pthread_cleanup_pop SIGFE

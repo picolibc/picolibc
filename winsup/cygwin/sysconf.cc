@@ -140,8 +140,8 @@ static struct
   {cons, {c:-1L}},			/*  40, _SC_THREAD_THREADS_MAX */
   {cons, {c:TTY_NAME_MAX}},		/*  41, _SC_TTY_NAME_MAX */
   {cons, {c:_POSIX_THREADS}},		/*  42, _SC_THREADS */
-  {cons, {c:-1L}},			/*  43, _SC_THREAD_ATTR_STACKADDR */
-  {cons, {c:_POSIX_THREAD_ATTR_STACKSIZE}},	/*  44, _SC_THREAD_ATTR_STACKSIZE */
+  {cons, {c:_POSIX_THREAD_ATTR_STACKADDR}},/*  43, _SC_THREAD_ATTR_STACKADDR */
+  {cons, {c:_POSIX_THREAD_ATTR_STACKSIZE}},/*  44, _SC_THREAD_ATTR_STACKSIZE */
   {cons, {c:_POSIX_THREAD_PRIORITY_SCHEDULING}},	/*  45, _SC_THREAD_PRIORITY_SCHEDULING */
   {cons, {c:-1L}},			/*  46, _SC_THREAD_PRIO_INHERIT */
   {cons, {c:-1L}},			/*  47, _SC_THREAD_PRIO_PROTECT */

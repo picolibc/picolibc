@@ -252,6 +252,7 @@ public:
   struct sched_param schedparam;
   void *stackaddr;
   size_t stacksize;
+  size_t guardsize;
 
   pthread_attr ();
   ~pthread_attr ();
