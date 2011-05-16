@@ -659,6 +659,34 @@ mmap_areas::del_list (mmap_list *ml)
   cfree (ml);
 }
 
+/* This function allows an external function to test if a given memory
+   region is part of an mmapped memory region. */
+bool
+is_mmapped_region (caddr_t start_addr, caddr_t end_address)
+{
+  bool ret = false;
+
+  size_t len = end_address - start_addr;
+
+  LIST_LOCK ();
+  mmap_list *map_list = mmapped_areas.get_list_by_fd (-1, NULL);
+
+  mmap_record *rec;
+  caddr_t u_addr;
+  DWORD u_len;
+
+  LIST_FOREACH (rec, &map_list->recs, mr_next)
+    {
+      if (rec->match (start_addr, len, u_addr, u_len))
+	{
+	  ret = true;
+	  break;
+	}
+    }
+  LIST_UNLOCK ();
+  return ret;
+}
+
 /* This function is called from exception_handler when a segmentation
    violation has occurred.  It should also be called from all Cygwin
    functions that want to support passing noreserve mmap page addresses
@@ -677,6 +705,7 @@ mmap_areas::del_list (mmap_list *ml)
    On MAP_NORESERVE_COMMITED, the exeception handler should return 0 to
    allow the application to retry the memory access, or the calling Cygwin
    function should retry the Windows system call. */
+
 mmap_region_status
 mmap_is_attached_or_noreserve (void *addr, size_t len)
 {

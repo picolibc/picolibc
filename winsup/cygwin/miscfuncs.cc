@@ -410,16 +410,17 @@ thread_wrapper (VOID *arg)
     {
       /* If the application provided the stack, we must make sure that
 	 it's actually used by the thread function.  So what we do here is
-	 to compute the stackbase of the application-provided stack and
-	 change the stack pointer accordingly.
-
-	 NOTE: _my_tls is on the stack created by CreateThread!  It's
-	       unlikely the tls structure will ever exceed 64K, but if
-	       so, we have to raise the size of the stack in the call
-	       to CreateThread, too. */
+	 to compute the stackbase of the application-provided stack, move
+	 _my_tls to the stackbase, and change the stack pointer accordingly. */
       wrapper_arg.stackaddr = (PVOID) ((PBYTE) wrapper_arg.stackaddr
-					       + wrapper_arg.stacksize
-					       - sizeof (PVOID));
+					       + wrapper_arg.stacksize);
+      _tlsbase = (char *) wrapper_arg.stackaddr;
+      wrapper_arg.stackaddr = (PVOID) ((PBYTE) wrapper_arg.stackaddr
+					       - CYGTLS_PADSIZE);
+      _tlstop = (char *) wrapper_arg.stackaddr;
+      _my_tls.init_thread ((char *) wrapper_arg.stackaddr,
+			   (DWORD (*)(void*, void*)) wrapper_arg.func);
+      wrapper_arg.stackaddr = (PVOID) (_tlstop - sizeof (PVOID));
       __asm__ ("\n\
 	       movl  %[WRAPPER_ARG], %%ebx # Load &wrapper_arg into ebx  \n\
 	       movl  (%%ebx), %%eax        # Load thread func into eax   \n\

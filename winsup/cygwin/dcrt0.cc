@@ -398,6 +398,15 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
   int newlen;
   bool guard;
 
+  /* First check if the requested stack area is part of the user heap
+     or part of a mmaped region.  If so, we have been started from a
+     pthread with an application-provided stack, and the stack has just
+     to be used as is. */
+  if ((stacktop >= cygheap->user_heap.base
+      && stackbottom <= cygheap->user_heap.max)
+      || is_mmapped_region ((caddr_t) stacktop, (caddr_t) stackbottom))
+    return;
+
   if (!VirtualQuery ((LPCVOID) &b, &m, sizeof m))
     api_fatal ("fork: couldn't get stack info, %E");
 
