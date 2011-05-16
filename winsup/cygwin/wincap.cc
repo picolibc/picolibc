@@ -24,7 +24,6 @@ details. */
 #define wincap_minimal wincap_2000
 
 wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
   has_physical_mem_access:true,
@@ -55,7 +54,6 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  heapslop:0x0,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
   has_physical_mem_access:true,
@@ -86,7 +84,6 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
-  heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
   has_physical_mem_access:true,
@@ -117,7 +114,6 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  heapslop:0x0,
   max_sys_priv:SE_MANAGE_VOLUME_PRIVILEGE,
   is_server:false,
   has_physical_mem_access:true,
@@ -148,7 +144,6 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  heapslop:0x0,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
   has_physical_mem_access:true,
@@ -179,7 +174,6 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  heapslop:0x4,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
   has_physical_mem_access:false,
@@ -210,7 +204,6 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
-  heapslop:0x4,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
   has_physical_mem_access:false,
@@ -241,7 +234,6 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  heapslop:0x4,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
   has_physical_mem_access:false,

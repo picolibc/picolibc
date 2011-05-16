@@ -1,5 +1,16 @@
 2011-05-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* heap.cc (heap_init): Rewrite initial heap allocation to use addresses
+	beyond 0x20000000.  Explain why and how.
+	* shared.cc (shared_info::heap_slop_size): Remove.
+	* shared_info.h (class shared_info): Remove heap_slop_inited and
+	heap_slop members.  Remove heap_slop_size declaration.
+	(CURR_SHARED_MAGIC): Update.
+	* wincap.cc: Throughout, drop heapslop.
+	* wincap.h (struct wincaps): Drop heapslop.
+
+2011-05-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (child_info_fork::alloc_stack_hard_way): Check if the
 	requested stack is application-provided within the user heap or an
 	mmapped region.  If so, just use it.  Add comment to explain why.

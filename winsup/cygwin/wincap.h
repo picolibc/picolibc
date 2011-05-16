@@ -14,7 +14,6 @@ details. */
 
 struct wincaps
 {
-  DWORD    heapslop;
   DWORD    max_sys_priv;
   unsigned is_server                                    : 1;
   unsigned has_physical_mem_access                      : 1;
@@ -64,7 +63,6 @@ public:
 
 #define IMPLEMENT(cap) cap() const { return ((wincaps *) this->caps)->cap; }
 
-  DWORD IMPLEMENT (heapslop)
   DWORD IMPLEMENT (max_sys_priv)
   bool  IMPLEMENT (is_server)
   bool  IMPLEMENT (has_physical_mem_access)
