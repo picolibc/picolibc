@@ -201,7 +201,7 @@ getlogin_r (char *name, size_t namesize)
 extern "C" char *
 getlogin (void)
 {
-  return strcpy (_my_tls.locals.username, cygheap->user.name ());
+  return strcpy (__getlogin_username, cygheap->user.name ());
 }
 
 extern "C" __uid32_t

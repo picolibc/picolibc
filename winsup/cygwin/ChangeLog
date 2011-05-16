@@ -1,5 +1,14 @@
 2011-05-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.h (struct _local_storage): Remove unused members rarg and
+	_localtime_buf.  Remove username in favor of a global buffer.  Reorder
+	slightly to keep the net.cc stuff together.
+	* globals.cc (__getlogin_username): New global char buffer.
+	* tlsoffsets.h: Regenerate.
+	* uinfo.cc (getlogin): Copy username into __getlogin_username.
+
+2011-05-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* heap.cc (heap_init): Rewrite initial heap allocation to use addresses
 	beyond 0x20000000.  Explain why and how.
 	* shared.cc (shared_info::heap_slop_size): Remove.

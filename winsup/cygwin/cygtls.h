@@ -1,6 +1,6 @@
 /* cygtls.h
 
-   Copyright 2003, 2004, 2005, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -82,9 +82,6 @@ struct _local_storage
   char *namearray[2];
   int grp_pos;
 
-  /* console.cc */
-  unsigned rarg;
-
   /* dlfcn.cc */
   int dl_error;
   char dl_buffer[256];
@@ -116,15 +113,12 @@ struct _local_storage
 
   /* times.cc */
   char timezone_buf[20];
-  struct tm _localtime_buf;
 
-  /* uinfo.cc */
-  char username[UNLEN + 1];
+  /* strsig.cc */
+  char signamebuf[sizeof ("Unknown signal 4294967295   ")];
 
   /* net.cc */
   char *ntoa_buf;			// note: malloced
-  char signamebuf[sizeof ("Unknown signal 4294967295   ")];
-
   unionent *hostent_buf;		// note: malloced
   unionent *protoent_buf;		// note: malloced
   unionent *servent_buf;		// note: malloced
