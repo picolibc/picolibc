@@ -187,7 +187,7 @@ uinfo_init ()
 extern "C" int
 getlogin_r (char *name, size_t namesize)
 {
-  char *login = getlogin ();
+  const char *login = cygheap->user.name ();
   size_t len = strlen (login) + 1;
   if (len > namesize)
     return ERANGE;
@@ -201,7 +201,14 @@ getlogin_r (char *name, size_t namesize)
 extern "C" char *
 getlogin (void)
 {
-  return strcpy (__getlogin_username, cygheap->user.name ());
+  static char username[UNLEN];
+  int ret = getlogin_r (username, UNLEN);
+  if (ret)
+    {
+      set_errno (ret);
+      return NULL;
+    }
+  return username;
 }
 
 extern "C" __uid32_t

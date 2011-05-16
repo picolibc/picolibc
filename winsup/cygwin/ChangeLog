@@ -1,5 +1,12 @@
 2011-05-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* globals.cc (__getlogin_username): Remove.
+	* uinfo.cc (getlogin_r): Fetch username from cygheap.
+	(getlogin): Add static buffer username and fetch username from
+	getlogin_r.
+
+2011-05-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.h (struct _local_storage): Remove unused members rarg and
 	_localtime_buf.  Remove username in favor of a global buffer.  Reorder
 	slightly to keep the net.cc stuff together.

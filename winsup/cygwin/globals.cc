@@ -56,9 +56,6 @@ bool display_title;
 bool strip_title_path;
 bool allow_glob = true;
 
-/* Static getlogin buffer. */
-char __getlogin_username[UNLEN + 1];
-
 bool NO_COPY in_forkee;
 
 int __argc_safe;
