@@ -1,3 +1,11 @@
+2011-05-16  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/time.h (CLOCK_PROCESS_CPUTIME_ID): Rename from
+	CLOCK_PROCESS_CPUTIME.
+	(CLOCK_THREAD_CPUTIME_ID): Rename from CLOCK_THREAD_CPUTIME.
+	* libc/include/sys/features.h [__CYGWIN__] (_POSIX_CPUTIME): Define.
+	(_POSIX_THREAD_CPUTIME): Define.
+
 2011-05-16  Christian Bruel  <christian.bruel@st.com>
 
 	* libc/stdlib/strtod.c (_strtod_r): Fix nf/nd counts to not exceed
