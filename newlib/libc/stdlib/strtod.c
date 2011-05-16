@@ -309,8 +309,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
         }
 	nd0 = nd;
 	if (strncmp (s, _localeconv_r (ptr)->decimal_point,
-		     strlen (_localeconv_r (ptr)->decimal_point)) == 0)
-		{
+		     strlen (_localeconv_r (ptr)->decimal_point)) == 0) {
 		decpt = 1;
 		c = *(s += strlen (_localeconv_r (ptr)->decimal_point));
 		if (!nd) {
@@ -328,25 +327,28 @@ _DEFUN (_strtod_r, (ptr, s00, se),
  have_dig:
 			nz++;
 			if (c -= '0') {
-				nf += nz;
 				for(i = 1; i < nz; i++) {
-					if (nd++ <= DBL_DIG + 1) {
-						if (nd < 10)
+					if (nd <= DBL_DIG + 1) {
+						if (nd + i < 10)
 							y *= 10;
 						else
 							z *= 10;
 					}
 				}
-				if (nd++ <= DBL_DIG + 1) {
-					if (nd < 10)
+				if (nd <= DBL_DIG + 1) {
+					if (nd + i < 10)
 						y = 10*y + c;
 					else
 						z = 10*z + c;
 				}
-				nz = 0;
+				if (nd <= DBL_DIG + 1) {
+					nf += nz;
+					nd += nz;
 				}
+				nz = 0;
 			}
 		}
+	}
  dig_done:
 	e = 0;
 	if (c == 'e' || c == 'E') {

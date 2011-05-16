@@ -1,3 +1,8 @@
+2011-05-16  Christian Bruel  <christian.bruel@st.com>
+
+	* libc/stdlib/strtod.c (_strtod_r): Fix nf/nd counts to not exceed
+	DBL_DIG.
+
 2011-05-15  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/features.h (_POSIX_THREAD_ATTR_STACKADDR): Define
