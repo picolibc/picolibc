@@ -19,6 +19,18 @@ pthread_spin_lock, pthread_spin_trylock, pthread_spin_unlock.
 </para></listitem>
 
 <listitem><para>
+Pthread stack address management.  New APIs: pthread_attr_getstack,
+pthread_attr_getstackaddr, pthread_attr_getguardsize, pthread_attr_setstack,
+pthread_attr_setstackaddr, pthread_attr_setguardsize, pthread_getattr_np.
+</para></listitem>
+
+<listitem><para>
+clock_gettime(3) and clock_getres(3) accept per-process and per-thread CPU-time
+clocks, including CLOCK_PROCESS_CPUTIME_ID and CLOCK_THREAD_CPUTIME_ID.
+New APIs: clock_getcpuclockid, pthread_getcpuclockid.
+</para></listitem>
+
+<listitem><para>
 /proc/loadavg now shows the number of currently running processes and the
 total number of processes.
 </para></listitem>
@@ -40,9 +52,7 @@ as well as the version of GCC used when compiling.
 
 <listitem><para>
 Other new API: clock_settime, ppoll, psiginfo, psignal, sys_siglist,
-pthread_attr_getstack, pthread_attr_getstackaddr, pthread_attr_getguardsize,
-pthread_attr_setstack, pthread_attr_setstackaddr, pthread_attr_setguardsize,
-pthread_getattr_np, pthread_setschedprio, sysinfo.
+pthread_setschedprio, sysinfo.
 </para></listitem>
 
 </itemizedlist>
