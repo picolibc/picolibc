@@ -90,8 +90,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     cimagf
     clearerr
     clock
-    clock_getres		(see chapter "Implementation Notes")
-    clock_gettime		(see chapter "Implementation Notes")
+    clock_getcpuclockid
+    clock_getres
+    clock_gettime
     clock_settime		(see chapter "Implementation Notes")
     clog
     clogf
@@ -564,6 +565,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_equal
     pthread_exit
     pthread_getconcurrency
+    pthread_getcpuclockid
     pthread_getschedparam
     pthread_getspecific
     pthread_join
@@ -836,7 +838,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     tgamma
     tgammaf
     time
-    timer_create
+    timer_create		(see chapter "Implementation Notes")
     timer_delete
     timer_gettime
     timer_settime
@@ -1292,7 +1294,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     ceill
     cexpl
     cimagl
-    clock_getcpuclockid
     clogl
     conjl
     copysignl
@@ -1386,7 +1387,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_barrier[...]
     pthread_condattr_getclock
     pthread_condattr_setclock
-    pthread_getcpuclockid
     pthread_mutexattr_getrobust
     pthread_mutexattr_setrobust
     pthread_mutex_consistent
@@ -1441,9 +1441,8 @@ by keeping track of the current root and accomodating this in the file
 related function calls.  A real chroot functionality is not supported by
 Windows however.</para>
 
-<para><function>clock_getres</function> and <function>clock_gettime</function>
-only support CLOCK_REALTIME and CLOCK_MONOTONIC for now.  <function>clock_setres</function>
-and <function>clock_settime</function> only support CLOCK_REALTIME.</para>
+<function>clock_setres</function>, <function>clock_settime</function>, and
+<function>timer_create</function> only support CLOCK_REALTIME.</para>
 
 <para>BSD file locks created via <function>flock</function> are not
 propagated to the parent process and sibling processes.  The locks are

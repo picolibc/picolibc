@@ -13,6 +13,14 @@ details. */
 
 #include <mmsystem.h>
 
+/* Conversions for per-process and per-thread clocks */
+#define PID_TO_CLOCKID(pid) (pid * 8 + CLOCK_PROCESS_CPUTIME_ID)
+#define CLOCKID_TO_PID(cid) ((cid - CLOCK_PROCESS_CPUTIME_ID) / 8)
+#define CLOCKID_IS_PROCESS(cid) ((cid % 8) == CLOCK_PROCESS_CPUTIME_ID)
+#define THREADID_TO_CLOCKID(tid) (tid * 8 + CLOCK_THREAD_CPUTIME_ID)
+#define CLOCKID_TO_THREADID(cid) ((cid - CLOCK_THREAD_CPUTIME_ID) / 8)
+#define CLOCKID_IS_THREAD(cid) ((cid % 8) == CLOCK_THREAD_CPUTIME_ID)
+
 /* Largest delay in ms for sleep and alarm calls.
    Allow actual delay to exceed requested delay by 10 s.
    Express as multiple of 1000 (i.e. seconds) + max resolution

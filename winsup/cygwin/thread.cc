@@ -2510,6 +2510,15 @@ pthread_getconcurrency ()
   return MT_INTERFACE->concurrency;
 }
 
+extern "C" int
+pthread_getcpuclockid (pthread_t thread, clockid_t *clk_id)
+{
+  if (!pthread::is_good_object (&thread))
+    return (ESRCH);
+  *clk_id = (clockid_t) THREADID_TO_CLOCKID (thread->getsequence_np ());
+  return 0;
+}
+
 /* keep this in sync with sched.cc */
 extern "C" int
 pthread_getschedparam (pthread_t thread, int *policy,

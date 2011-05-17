@@ -300,6 +300,13 @@ timer_create (clockid_t clock_id, struct sigevent *evp, timer_t *timerid)
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
+
+  if (CLOCKID_IS_PROCESS (clock_id) || CLOCKID_IS_THREAD (clock_id))
+    {
+      set_errno (ENOTSUP);
+      return -1;
+    }
+
   if (clock_id != CLOCK_REALTIME)
     {
       set_errno (EINVAL);

@@ -938,6 +938,7 @@ typedef enum _EVENT_INFORMATION_CLASS
 typedef enum _THREAD_INFORMATION_CLASS
 {
   ThreadBasicInformation = 0,
+  ThreadTimes = 1,
   ThreadImpersonationToken = 5
 } THREAD_INFORMATION_CLASS, *PTHREAD_INFORMATION_CLASS;
 

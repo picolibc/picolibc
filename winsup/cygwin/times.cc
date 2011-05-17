@@ -15,6 +15,7 @@ details. */
 #include <sys/timeb.h>
 #include <utime.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -22,6 +23,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
+#include "thread.h"
 #include "cygtls.h"
 #include "ntdll.h"
 
@@ -594,6 +596,63 @@ hires_ms::nsecs ()
 extern "C" int
 clock_gettime (clockid_t clk_id, struct timespec *tp)
 {
+  if (CLOCKID_IS_PROCESS (clk_id))
+    {
+      pid_t pid = CLOCKID_TO_PID (clk_id);
+      HANDLE hProcess;
+      KERNEL_USER_TIMES kut;
+      ULONG sizeof_kut = sizeof (KERNEL_USER_TIMES);
+      long long x;
+
+      if (pid == 0)
+        pid = getpid ();
+
+      pinfo p (pid);
+      if (!p->exists ())
+        {
+          set_errno (EINVAL);
+          return -1;
+        }
+
+      hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, 0, p->dwProcessId);
+      NtQueryInformationProcess (hProcess, ProcessTimes, &kut, sizeof_kut, &sizeof_kut);
+
+      x = kut.KernelTime.QuadPart + kut.UserTime.QuadPart;
+      tp->tv_sec = x / (long long) NSPERSEC;
+      tp->tv_nsec = (x % (long long) NSPERSEC) * 100LL;
+
+      CloseHandle (hProcess);
+      return 0;
+    }
+
+  if (CLOCKID_IS_THREAD (clk_id))
+    {
+      long thr_id = CLOCKID_TO_THREADID (clk_id);
+      HANDLE hThread;
+      KERNEL_USER_TIMES kut;
+      ULONG sizeof_kut = sizeof (KERNEL_USER_TIMES);
+      long long x;
+
+      if (thr_id == 0)
+        thr_id = pthread::self ()->getsequence_np ();
+
+      hThread = OpenThread (THREAD_QUERY_INFORMATION, 0, thr_id);
+      if (!hThread)
+        {
+          set_errno (EINVAL);
+          return -1;
+        }
+
+      NtQueryInformationThread (hThread, ThreadTimes, &kut, sizeof_kut, &sizeof_kut);
+
+      x = kut.KernelTime.QuadPart + kut.UserTime.QuadPart;
+      tp->tv_sec = x / (long long) NSPERSEC;
+      tp->tv_nsec = (x % (long long) NSPERSEC) * 100LL;
+
+      CloseHandle (hThread);
+      return 0;
+    }
+
   switch (clk_id)
     {
       case CLOCK_REALTIME:
@@ -629,6 +688,16 @@ extern "C" int
 clock_settime (clockid_t clk_id, const struct timespec *tp)
 {
   struct timeval tv;
+
+  if (CLOCKID_IS_PROCESS (clk_id) || CLOCKID_IS_THREAD (clk_id))
+    /* According to POSIX, the privileges to set a particular clock
+     * are implementation-defined.  On Linux, CPU-time clocks are not
+     * settable; do the same here.
+     */
+    {
+      set_errno (EPERM);
+      return -1;
+    }
 
   if (clk_id != CLOCK_REALTIME)
     {
@@ -702,6 +771,16 @@ hires_ms::resolution ()
 extern "C" int
 clock_getres (clockid_t clk_id, struct timespec *tp)
 {
+  if (CLOCKID_IS_PROCESS (clk_id) || CLOCKID_IS_THREAD (clk_id))
+    {
+      ULONG coarsest, finest, actual;
+
+      NtQueryTimerResolution (&coarsest, &finest, &actual);
+      tp->tv_sec = coarsest / NSPERSEC;
+      tp->tv_nsec = (coarsest % NSPERSEC) * 100;
+      return 0;
+    }
+
   switch (clk_id)
     {
       case CLOCK_REALTIME:
@@ -774,5 +853,14 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
   if (!minperiod)
     minperiod = 1L;
   period_set = true;
+  return 0;
+}
+
+extern "C" int
+clock_getcpuclockid (pid_t pid, clockid_t *clk_id)
+{
+  if (pid != 0 && !pinfo (pid)->exists ())
+    return (ESRCH);
+  *clk_id = (clockid_t) PID_TO_CLOCKID (pid);
   return 0;
 }

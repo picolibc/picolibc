@@ -217,6 +217,7 @@ clearerr SIGFE
 _clearerr = clearerr SIGFE
 clock SIGFE
 _clock = clock SIGFE
+clock_getcpuclockid SIGFE
 clock_getres SIGFE
 clock_gettime SIGFE
 clock_setres SIGFE
@@ -1212,6 +1213,7 @@ pthread_equal SIGFE
 pthread_exit SIGFE
 pthread_getattr_np SIGFE
 pthread_getconcurrency SIGFE
+pthread_getcpuclockid SIGFE
 pthread_getschedparam SIGFE
 pthread_getsequence_np SIGFE
 pthread_getspecific SIGFE

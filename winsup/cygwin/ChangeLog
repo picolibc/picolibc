@@ -1,3 +1,31 @@
+2011-05-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (clock_getcpuclockid): Export.
+	(pthread_getcpuclockid): Export.
+	* hires.h (PID_TO_CLOCKID): New macro.
+	(CLOCKID_TO_PID): New macro.
+	(CLOCKID_IS_PROCESS): New macro.
+	(THREADID_TO_CLOCKID): New macro.
+	(CLOCKID_TO_THREADID): New macro.
+	(CLOCKID_IS_THREAD): New macro.
+	* ntdll.h (enum _THREAD_INFORMATION_CLASS): Add ThreadTimes.
+	* posix.sgml (std-notimpl): Add clock_getcpuclockid and
+	pthread_getcpuclockid from here...
+	(std-susv4): ... to here.
+	(std-notes): Remove limitations of clock_getres and clock_gettime.
+	Note limitation of timer_create to CLOCK_REALTIME.
+	* sysconf.cc (sca): Set _SC_CPUTIME to _POSIX_CPUTIME, and
+	_SC_THREAD_CPUTIME to _POSIX_THREAD_CPUTIME.
+	* thread.cc (pthread_getcpuclockid): New function.
+	* timer.cc (timer_create): Set errno to ENOTSUP for CPU-time clocks.
+	* times.cc (clock_gettime): Handle CLOCK_PROCESS_CPUTIME_ID and
+	CLOCK_THREAD_CPUTIME_ID.
+	(clock_getres): Ditto.
+	(clock_settime): Set errno to EPERM for CPU-time clocks.
+	(clock_getcpuclockid): New function.
+	* include/pthread.h (pthread_getcpuclockid): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2011-05-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (thread_wrapper): Remove unused _cygtls record.
