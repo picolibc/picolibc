@@ -1,3 +1,8 @@
+2011-05-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (thread_wrapper): Remove unused _cygtls record.
+	* mmap.cc (is_mmapped_region): Avoid crash if no mmaps exist.
+
 2011-05-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* globals.cc (__getlogin_username): Remove.

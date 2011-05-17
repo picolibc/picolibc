@@ -664,16 +664,18 @@ mmap_areas::del_list (mmap_list *ml)
 bool
 is_mmapped_region (caddr_t start_addr, caddr_t end_address)
 {
-  bool ret = false;
-
   size_t len = end_address - start_addr;
 
   LIST_LOCK ();
   mmap_list *map_list = mmapped_areas.get_list_by_fd (-1, NULL);
 
+  if (!map_list)
+    return false;
+
   mmap_record *rec;
   caddr_t u_addr;
   DWORD u_len;
+  bool ret = false;
 
   LIST_FOREACH (rec, &map_list->recs, mr_next)
     {

@@ -412,6 +412,7 @@ thread_wrapper (VOID *arg)
 	 it's actually used by the thread function.  So what we do here is
 	 to compute the stackbase of the application-provided stack, move
 	 _my_tls to the stackbase, and change the stack pointer accordingly. */
+      _my_tls.remove (0);
       wrapper_arg.stackaddr = (PVOID) ((PBYTE) wrapper_arg.stackaddr
 					       + wrapper_arg.stacksize);
       _tlsbase = (char *) wrapper_arg.stackaddr;
