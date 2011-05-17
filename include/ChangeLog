@@ -1,3 +1,9 @@
+2011-05-17  Alan Modra  <amodra@gmail.com>
+
+	PR ld/12760
+	* bfdlink.h (struct bfd_link_callbacks <notice>): Add "flags" and
+	"string" param.
+
 2011-05-16  Alan Modra  <amodra@gmail.com>
 
 	* bfdlink.h (struct bfd_link_hash_entry): Remove u.undef.weak field.

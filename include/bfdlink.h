@@ -573,10 +573,13 @@ struct bfd_link_callbacks
   /* A function which is called when a symbol in notice_hash is
      defined or referenced.  H is the symbol.  ABFD, SECTION and
      ADDRESS are the (new) value of the symbol.  If SECTION is
-     bfd_und_section, this is a reference.  */
+     bfd_und_section, this is a reference.  FLAGS are the symbol
+     BSF_* flags.  STRING is the name of the symbol to indirect to if
+     the sym is indirect, or the warning string if a warning sym.  */
   bfd_boolean (*notice)
     (struct bfd_link_info *, struct bfd_link_hash_entry *h,
-     bfd *abfd, asection *section, bfd_vma address);
+     bfd *abfd, asection *section, bfd_vma address, flagword flags,
+     const char *string);
   /* Error or warning link info message.  */
   void (*einfo)
     (const char *fmt, ...);
