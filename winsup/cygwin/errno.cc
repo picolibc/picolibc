@@ -13,6 +13,13 @@ details. */
 #define sys_nerr FOOsys_nerr
 #define _sys_errlist FOO_sys_errlist
 #define strerror_r FOO_strerror_r
+#define __INSIDE_CYGWIN__
+#include <errno.h>
+#include <error.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "winsup.h"
 #include "cygtls.h"
 #include "ntdll.h"
@@ -416,4 +423,68 @@ __xpg_strerror_r (int errnum, char *buf, size_t n)
     }
   strcpy (buf, error);
   return result;
+}
+
+unsigned int error_message_count = 0;
+int error_one_per_line = 0;
+void (*error_print_progname) (void) = NULL;
+
+static void
+_verror (int status, int errnum, const char *filename, unsigned int lineno, const char *fmt, va_list ap)
+{
+  error_message_count++;
+
+  fflush (stdout);
+
+  if (error_print_progname)
+    (*error_print_progname) ();
+  else
+    fprintf (stderr, "%s:%s", program_invocation_name, filename ? "" : " ");
+
+  if (filename)
+    fprintf (stderr, "%s:%d: ", filename, lineno);
+
+  vfprintf (stderr, fmt, ap);
+
+  if (errnum != 0)
+    fprintf (stderr, ": %s", strerror (errnum));
+
+  fprintf (stderr, "\n");
+
+  if (status != 0)
+    exit (status);
+}
+
+extern "C" void
+error (int status, int errnum, const char *fmt, ...)
+{
+  va_list ap;
+  va_start (ap, fmt);
+  _verror (status, errnum, NULL, 0, fmt, ap);
+  va_end (ap);
+}
+
+extern "C" void
+error_at_line (int status, int errnum, const char *filename, unsigned int lineno, const char *fmt, ...)
+{
+  va_list ap;
+
+  if (error_one_per_line != 0)
+    {
+      static const char *last_filename;
+      static unsigned int last_lineno;
+
+      /* strcmp(3) will SEGV if filename or last_filename are NULL */
+      if (lineno == last_lineno
+          && ((!filename && !last_filename)
+              || (filename && last_filename && strcmp (filename, last_filename) == 0)))
+        return;
+
+      last_filename = filename;
+      last_lineno = lineno;
+    }
+
+  va_start (ap, fmt);
+  _verror (status, errnum, filename, lineno, fmt, ap);
+  va_end (ap);
 }

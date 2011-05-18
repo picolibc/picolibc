@@ -1089,6 +1089,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     envz_merge
     envz_remove
     envz_strip
+    error
+    error_at_line
     euidaccess
     execvpe
     exp10

@@ -10,6 +10,9 @@ __ctype_ptr__ DATA
 __cygwin_environ DATA
 __cygwin_user_data DATA
 _daylight DATA
+error_message_count DATA
+error_one_per_line DATA
+error_print_progname DATA
 h_errno DATA
 _impure_ptr DATA
 in6addr_any DATA
@@ -389,6 +392,8 @@ erff NOSIGFE
 _erff = erff NOSIGFE
 err SIGFE
 __errno NOSIGFE
+error SIGFE
+error_at_line SIGFE
 errx SIGFE
 euidaccess SIGFE
 execl SIGFE

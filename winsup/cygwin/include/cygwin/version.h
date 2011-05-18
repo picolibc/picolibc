@@ -414,12 +414,14 @@ details. */
 	   pthread_attr_setstack, pthread_attr_setstackaddr.
       246: Add CLOCK_PROCESS_CPUTIME_ID, CLOCK_THREAD_CPUTIME_ID.
 	   Export clock_getcpuclockid, pthread_getcpuclockid.
+      247: Export error, error_at_line, error_message_count, error_one_per_line,
+	   error_print_progname.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 246
+#define CYGWIN_VERSION_API_MINOR 247
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -1,5 +1,22 @@
 2011-05-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
+	* cygwin.din (error): Export.
+	(error_at_line): Export.
+	(error_message_count): Export.
+	(error_one_per_line): Export.
+	(error_print_progname): Export.
+	* errno.cc (error_message_count): Define.
+	(error_one_per_line): Define.
+	(error_print_progname): Define.
+	(_verror): New static function.
+	(error): New function.
+	(error_at_line): New function.
+	* posix.sgml (std-gnu): Add error, error_at_line.
+	* include/error.h: New header.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2011-05-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
 	* cygwin.din (clock_getcpuclockid): Export.
 	(pthread_getcpuclockid): Export.
 	* hires.h (PID_TO_CLOCKID): New macro.
