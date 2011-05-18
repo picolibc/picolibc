@@ -31,6 +31,11 @@ New APIs: clock_getcpuclockid, pthread_getcpuclockid.
 </para></listitem>
 
 <listitem><para>
+GNU/glibc error.h error reporting functions.  New APIs: error, error_at_line.
+New exports: error_message_count, error_one_per_line, error_print_progname.
+</para></listitem>
+
+<listitem><para>
 /proc/loadavg now shows the number of currently running processes and the
 total number of processes.
 </para></listitem>

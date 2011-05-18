@@ -1,5 +1,9 @@
 2011-05-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
+	* new-features.sgml (ov-new1.7.10): Document error.h functions.
+
+2011-05-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
 	* new-features.sgml (ov-new1.7.10): Document CPU-time clock support.
 	Move pthread stack management APIs to separate listitem.
 
