@@ -1,3 +1,11 @@
+2011-05-18  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* posix.sgml (std-susv4): Remove chroot, futimes, hstrerror.
+	(std-deprec): Add chroot.
+	(std-bsd): Add futimes, hstrerror.
+	(std-notimpl): Add clock_nanosleep, nexttoward, nexttowardf.
+	Remove initstate, which is implemented and listed in std-susv4.
+
 2011-05-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin.din (error): Export.

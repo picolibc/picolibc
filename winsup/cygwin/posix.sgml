@@ -85,7 +85,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     chdir
     chmod
     chown
-    chroot			(see chapter "Implementation Notes")
     cimag
     cimagf
     clearerr
@@ -260,7 +259,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     ftw
     funlockfile
     futimens
-    futimes
     fwide
     fwprintf
     fwrite
@@ -331,7 +329,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     hcreate
     hdestroy
     hsearch
-    hstrerror
     htonl
     htons
     hypot
@@ -983,6 +980,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fts_set
     fts_set_clientptr
     funopen
+    futimes
     gamma
     gamma_r
     gammaf
@@ -994,6 +992,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getprogname
     getusershell
     herror
+    hstrerror
     inet_aton
     inet_makeaddr
     inet_netof
@@ -1221,6 +1220,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     bcmp			(POSIX.1-2001, SUSv3)
     bcopy			(SUSv3)
     bzero			(SUSv3)
+    chroot			(SUSv2) (see chapter "Implementation Notes")
     clock_setres		(QNX, VxWorks) (see chapter "Implementation Notes")
     cuserid			(POSIX.1-1988, SUSv2)
     ecvt			(SUSv3)
@@ -1296,6 +1296,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     ceill
     cexpl
     cimagl
+    clock_nanosleep
     clogl
     conjl
     copysignl
@@ -1337,7 +1338,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getpmsg
     hypotl
     ilogbl
-    initstate
     isalnum_l
     isalpha_l
     isastream
@@ -1380,6 +1380,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     nearbyintl
     newlocale
     nextafterl
+    nexttoward
+    nexttowardf
     nexttowardl
     posix_mem_offset
     posix_spawn[...]
