@@ -11,12 +11,19 @@ INDEX
 	fpurge
 INDEX
 	_fpurge_r
+INDEX
+	__fpurge
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fpurge(FILE *<[fp]>);
 
 	int _fpurge_r(struct _reent *<[reent]>, FILE *<[fp]>);
+
+	#include <stdio.h>
+	#include <stdio_ext.h>
+	void  __fpurge(FILE *<[fp]>);
+
 
 DESCRIPTION
 Use <<fpurge>> to clear all buffers of the given stream.  For output
@@ -25,6 +32,8 @@ this discards any data from <<ungetc>> and any data retrieved from disk
 but not yet read via <<getc>>.  This is more severe than <<fflush>>,
 and generally is only needed when manually altering the underlying file
 descriptor of a stream.
+
+<<__fpurge>> behaves exactly like <<fpurge>> but does not return a value.
 
 The alternate function <<_fpurge_r>> is a reentrant version, where the
 extra argument <[reent]> is a pointer to a reentrancy structure, and
@@ -42,6 +51,9 @@ No supporting OS subroutines are required.
 
 #include <_ansi.h>
 #include <stdio.h>
+#ifndef __rtems__
+#include <stdio_ext.h>
+#endif
 #include <errno.h>
 #include "local.h"
 
@@ -86,5 +98,16 @@ _DEFUN(fpurge, (fp),
 {
   return _fpurge_r (_REENT, fp);
 }
+
+#ifndef __rtems__
+
+void
+_DEFUN(__fpurge, (fp),
+       register FILE * fp)
+{
+  _fpurge_r (_REENT, fp);
+}
+
+#endif
 
 #endif /* _REENT_ONLY */

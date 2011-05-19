@@ -1,3 +1,8 @@
+2011-05-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/stdio_ext.h: New header.
+	* libc/stdio/fpurge.c [!__rtems__] (__fpurge): New function.
+
 2011-05-19  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
 
 	* Makefile.am (install-data-local): Fix condition and rm call.
