@@ -56,7 +56,7 @@ as well as the version of GCC used when compiling.
 </para></listitem>
 
 <listitem><para>
-Other new API: clock_settime, ppoll, psiginfo, psignal, sys_siglist,
+Other new API: clock_settime, __fpurge, ppoll, psiginfo, psignal, sys_siglist,
 pthread_setschedprio, sysinfo.
 </para></listitem>
 
