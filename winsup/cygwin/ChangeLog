@@ -1,5 +1,10 @@
 2011-05-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
+	* thread.cc: Mark psiginfo and psignal as available in list of
+	optional cancellation points.
+
+2011-05-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
 	* cygwin.din (__fpurge): Export.
 	* posix.sgml (std-solaris): Add __fpurge.
 	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
