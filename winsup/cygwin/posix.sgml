@@ -1146,6 +1146,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 <sect1 id="std-solaris"><title>System interfaces compatible with Solaris or SunOS functions:</title>
 
 <screen>
+    __fpurge
     acl
     aclcheck
     aclfrommode

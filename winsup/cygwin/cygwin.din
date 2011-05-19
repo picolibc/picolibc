@@ -582,6 +582,7 @@ __fpclassifyf NOSIGFE
 fprintf SIGFE
 _fprintf = fprintf SIGFE
 fpurge SIGFE
+__fpurge SIGFE
 fputc SIGFE
 _fputc = fputc SIGFE
 fputs SIGFE

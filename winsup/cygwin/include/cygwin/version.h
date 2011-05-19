@@ -416,12 +416,13 @@ details. */
 	   Export clock_getcpuclockid, pthread_getcpuclockid.
       247: Export error, error_at_line, error_message_count, error_one_per_line,
 	   error_print_progname.
+      248: Export __fpurge.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 247
+#define CYGWIN_VERSION_API_MINOR 248
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
