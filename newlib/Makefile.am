@@ -331,8 +331,8 @@ endif
 	    else true; fi ; \
 	  done ; \
 	  for i in $(NO_INCLUDE_LIST); do \
-	    if [ -f $(DESTDIR)$(tooldir)/include/$$i]; then \
-		-rm $(DESTDIR)$(tooldir)/include/$$i; \
+	    if [ -f $(DESTDIR)$(tooldir)/include/$$i ]; then \
+		rm $(DESTDIR)$(tooldir)/include/$$i; \
 	    else true; fi ; \
 	  done ; \
 	else true; fi

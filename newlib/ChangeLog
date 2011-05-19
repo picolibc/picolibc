@@ -1,3 +1,8 @@
+2011-05-19  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	* Makefile.am (install-data-local): Fix condition and rm call.
+	* Makefile.in: Regenerate.
+
 2011-05-16  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/time.h (CLOCK_PROCESS_CPUTIME_ID): Rename from
