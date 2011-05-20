@@ -392,14 +392,11 @@ child_info NO_COPY *child_proc_info = NULL;
 void
 child_info_fork::alloc_stack_hard_way (volatile char *b)
 {
-  void *new_stack_pointer;
-  MEMORY_BASIC_INFORMATION m;
-  void *newbase;
-  int newlen;
-  bool guard;
+  void *stack_ptr;
+  DWORD stacksize;
 
   /* First check if the requested stack area is part of the user heap
-     or part of a mmaped region.  If so, we have been started from a
+     or part of a mmapped region.  If so, we have been started from a
      pthread with an application-provided stack, and the stack has just
      to be used as is. */
   if ((stacktop >= cygheap->user_heap.base
@@ -407,46 +404,33 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
       || is_mmapped_region ((caddr_t) stacktop, (caddr_t) stackbottom))
     return;
 
-  if (!VirtualQuery ((LPCVOID) &b, &m, sizeof m))
-    api_fatal ("fork: couldn't get stack info, %E");
-
-  LPBYTE curbot = (LPBYTE) m.BaseAddress + m.RegionSize;
-
-  if (stacktop > (LPBYTE) m.AllocationBase && stacktop < curbot)
-    {
-      newbase = curbot;
-      newlen = (LPBYTE) stackbottom - (LPBYTE) curbot;
-      guard = false;
-    }
-  else
-    {
-      newbase = (LPBYTE) stacktop - (128 * 1024);
-      newlen = (LPBYTE) stackbottom - (LPBYTE) newbase;
-      guard = true;
-    }
-
-  if (!VirtualAlloc (newbase, newlen, MEM_RESERVE, PAGE_NOACCESS))
+  /* First, try to reserve the entire stack. */
+  stacksize = (char *) stackbottom - (char *) stackaddr;
+  if (!VirtualAlloc (stackaddr, stacksize, MEM_RESERVE, PAGE_NOACCESS))
     api_fatal ("fork: can't reserve memory for stack %p - %p, %E",
-		stacktop, stackbottom);
-  new_stack_pointer = (void *) ((LPBYTE) stackbottom - (stacksize += 8192));
-  if (!VirtualAlloc (new_stack_pointer, stacksize, MEM_COMMIT,
-		     PAGE_EXECUTE_READWRITE))
+	       stackaddr, stackbottom);
+  stacksize = (char *) stackbottom - (char *) stacktop;
+  stack_ptr = VirtualAlloc (stacktop, stacksize, MEM_COMMIT,
+			    PAGE_EXECUTE_READWRITE);
+  if (!stack_ptr)
     api_fatal ("fork: can't commit memory for stack %p(%d), %E",
-	       new_stack_pointer, stacksize);
-  if (!VirtualQuery ((LPCVOID) new_stack_pointer, &m, sizeof m))
-    api_fatal ("fork: couldn't get new stack info, %E");
-
-  if (guard)
+	       stacktop, stacksize);
+  if (guardsize != (size_t) -1)
     {
-      m.BaseAddress = (LPBYTE) m.BaseAddress - 1;
-      if (!VirtualAlloc ((LPVOID) m.BaseAddress, 1, MEM_COMMIT,
-			 CYGWIN_GUARD))
-	api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
-		   m.BaseAddress);
+      /* Allocate PAGE_GUARD page if it still fits. */
+      if (stack_ptr > stackaddr)
+	{
+	  stack_ptr = (void *) ((LPBYTE) stack_ptr
+					- wincap.page_size ());
+	  if (!VirtualAlloc (stack_ptr, wincap.page_size (), MEM_COMMIT,
+			     CYGWIN_GUARD))
+	    api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
+		       stack_ptr);
+	}
+      /* Allocate POSIX guard pages. */
+      if (guardsize > 0)
+	VirtualAlloc (stackaddr, guardsize, MEM_COMMIT, PAGE_NOACCESS);
     }
-  if (!VirtualQuery ((LPCVOID) m.BaseAddress, &m, sizeof m))
-    api_fatal ("fork: couldn't get new stack info, %E");
-  stacktop = m.BaseAddress;
   b[0] = '\0';
 }
 
@@ -473,7 +457,7 @@ child_info_fork::alloc_stack ()
       char *st = (char *) stacktop - 4096;
       while (_tlstop >= st)
 	esp = getstack (esp);
-      stacksize = 0;
+      stackaddr = 0;
     }
 }
 
@@ -811,7 +795,7 @@ dll_crt0_1 (void *)
 
 	 NOTE: Don't do anything that involves the stack until you've completed
 	 this step. */
-      if (fork_info->stacksize)
+      if (fork_info->stackaddr)
 	{
 	  _tlsbase = (char *) fork_info->stackbottom;
 	  _tlstop = (char *) fork_info->stacktop;

@@ -622,7 +622,7 @@ typedef struct _PEB
   ULONG SessionId;
 } PEB, *PPEB;
 
-/* Simplified definition, just to get the TIB and the PEB pointer. */
+/* Simplified definition, just to get stuff we're interested in. */
 typedef struct _TEB
 {
   NT_TIB Tib;
@@ -631,6 +631,32 @@ typedef struct _TEB
   PVOID ActiveRpcHandle;
   PVOID ThreadLocalStoragePointer;
   PPEB Peb;
+  ULONG LastErrorValue;
+  ULONG CountOfOwnedCriticalSections;
+  PVOID _reserved1[2];
+  ULONG _reserved2[31];
+  PVOID WOW32Reserved;
+  ULONG CurrentLocale;
+  ULONG FpSoftwareStatusRegister;
+  PVOID SystemReserved1[54];
+  LONG ExceptionCode;
+  PVOID ActivationContextStackPointer;
+  UCHAR SpareBytes1[36];
+  ULONG TxFsContext;
+  ULONG GdiTebBatch[312];
+  CLIENT_ID RealClientId;
+  PVOID GdiCachedProcessHandle;
+  ULONG GdiClientPID;
+  ULONG GdiClientTID;
+  PVOID GdiThreadLocalInfo;
+  ULONG Win32ClientInfo[62];
+  PVOID glDispatchTable[233];
+  ULONG glReserved1[29];
+  PVOID glReserved2[6];
+  ULONG LastStatusValue;
+  UNICODE_STRING StaticUnicodeString;
+  WCHAR StaticUnicodeBuffer[261];
+  PVOID DeallocationStack;
   /* A lot more follows... */
 } TEB, *PTEB;
 

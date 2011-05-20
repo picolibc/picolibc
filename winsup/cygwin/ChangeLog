@@ -1,3 +1,35 @@
+2011-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
+	(class child_info_fork): Remove stacksize, add stackaddr and guardsize
+	members.
+	* dcrt0.cc (child_info_fork::alloc_stack_hard_way): Partial rewrite
+	to regenerate the stack exactly as in the parent.
+	(child_info_fork::alloc_stack): Set stackaddr to 0, rather than
+	stacksize.
+	(dll_crt0_1): Check for stackaddr before changing the stack addresses
+	in the TEB.
+	* fork.cc (frok::child): Check for stackaddr here.
+	(frok::parent): Set ch.stackaddr and ch.guardsize if not called from
+	the main thread.
+	* init.cc (dll_entry): Replace pointer to NT_TIB with pointer to TEB.
+	Fix incorrectly changed address test before removing _my_tls.
+	Set StackLimit to NULL on Windows 2000.  Explain why.
+	* miscfuncs.cc (struct thread_wrapper_arg): Store stackbase rather
+	than stacksize, store commitaddr, remove guardsize.  Store all pointers
+	as char * for easier address arithmetic.
+	(thread_wrapper): Rewrite to remove OS stack before calling thread
+	function.  Add lots of comments to explain what we do.
+	(CygwinCreateThread): Reserve our own stack in case we got no
+	application stack.  Add comments.
+	* ntdll.h (struct _TEB): Extend defintion up to DeallocationStack
+	member.
+	* thread.cc (pthread_attr::pthread_attr): Use "(size_t) -1"
+	rather then 0xffffffff.
+	* wincap.h (wincaps::has_stack_size_param_is_a_reservation): New
+	element.
+	* wincap.cc: Implement above element throughout.
+
 2011-05-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* thread.cc: Mark psiginfo and psignal as available in list of

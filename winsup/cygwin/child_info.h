@@ -37,7 +37,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xe850717aU
+#define CURR_CHILD_INFO_MAGIC 0xbdf5842aU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -80,10 +80,12 @@ class child_info_fork: public child_info
 {
 public:
   HANDLE forker_finished;// for synchronization with child
-  DWORD stacksize;	// size of parent stack
   jmp_buf jmp;		// where child will jump to
+  void *stackaddr;	// address of parent stack
   void *stacktop;	// location of top of parent stack
   void *stackbottom;	// location of bottom of parent stack
+  size_t guardsize;     // size of POSIX guard region or (size_t) -1 if
+			// user stack
   char filler[4];
   child_info_fork ();
   void handle_fork () __attribute__ ((regparm (1)));;

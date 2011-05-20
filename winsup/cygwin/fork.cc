@@ -25,6 +25,7 @@ details. */
 #include "tls_pbuf.h"
 #include "dll_init.h"
 #include "cygmalloc.h"
+#include "ntdll.h"
 
 #define NPIDS_HELD 4
 
@@ -178,7 +179,7 @@ frok::child (volatile char * volatile here)
   /* If we've played with the stack, stacksize != 0.  That means that
      fork() was invoked from other than the main thread.  Make sure that
      the threadinfo information is properly set up.  */
-  if (fork_info->stacksize)
+  if (fork_info->stackaddr)
     {
       _main_tls = &_my_tls;
       _main_tls->init_thread (NULL, NULL);
@@ -327,10 +328,33 @@ frok::parent (volatile char * volatile stack_here)
   ch.forker_finished = forker_finished;
 
   ch.stackbottom = _tlsbase;
-  ch.stacktop = (void *) stack_here;
-  ch.stacksize = (char *) ch.stackbottom - (char *) stack_here;
-  debug_printf ("stack - bottom %p, top %p, size %d",
-		ch.stackbottom, ch.stacktop, ch.stacksize);
+  ch.stacktop = (void *) _tlstop;
+  ch.stackaddr = 0;
+  ch.guardsize = 0;
+  if (&_my_tls != _main_tls)
+    {
+      /* We have not been started from the main thread.  Fetch the
+	 information required to set up the thread stack identically
+	 in the child. */
+      PTEB teb = NtCurrentTeb ();
+      if (!teb->DeallocationStack)
+      	{
+	  /* Pthread with application-provided stack.  Don't set up a
+	     PAGE_GUARD page.  guardsize == -1 is used in alloc_stack_hard_way
+	     to recognize this type of stack. */
+	  ch.stackaddr = _my_tls.tid->attr.stackaddr;
+	  ch.guardsize = (size_t) -1;
+	}
+      else
+	{
+	  ch.stackaddr = teb->DeallocationStack;
+	  /* If it's a pthread, fetch guardsize from thread attributes. */
+	  if (_my_tls.tid)
+	    ch.guardsize = _my_tls.tid->attr.guardsize;
+	}
+    }
+  debug_printf ("stack - bottom %p, top %p, addr %p, guardsize %p",
+		ch.stackbottom, ch.stacktop, ch.stackaddr, ch.guardsize);
 
   PROCESS_INFORMATION pi;
   STARTUPINFOW si;

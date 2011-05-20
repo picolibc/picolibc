@@ -1089,7 +1089,7 @@ pthread::resume ()
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
 joinable (PTHREAD_CREATE_JOINABLE), contentionscope (PTHREAD_SCOPE_PROCESS),
 inheritsched (PTHREAD_INHERIT_SCHED), stackaddr (NULL), stacksize (0),
-guardsize (0xffffffff)
+guardsize ((size_t) -1)
 {
   schedparam.sched_priority = 0;
 }

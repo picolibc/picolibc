@@ -26,6 +26,8 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "pinfo.h"
+#include "exception.h"
 
 long tls_ix = -1;
 
@@ -392,72 +394,109 @@ struct thread_wrapper_arg
 {
   LPTHREAD_START_ROUTINE func;
   PVOID arg;
-  PVOID stackaddr;
-  ULONG stacksize;
-  ULONG guardsize;
+  char *stackaddr;
+  char *stackbase;
+  char *commitaddr;
 };
 
 DWORD WINAPI
 thread_wrapper (VOID *arg)
 {
+  /* Just plain paranoia. */
   if (!arg)
     return ERROR_INVALID_PARAMETER;
 
+  /* Fetch thread wrapper info and free from cygheap. */
   thread_wrapper_arg wrapper_arg = *(thread_wrapper_arg *) arg;
   cfree (arg);
 
-  if (wrapper_arg.stackaddr)
-    {
-      /* If the application provided the stack, we must make sure that
-	 it's actually used by the thread function.  So what we do here is
-	 to compute the stackbase of the application-provided stack, move
-	 _my_tls to the stackbase, and change the stack pointer accordingly. */
-      _my_tls.remove (0);
-      wrapper_arg.stackaddr = (PVOID) ((PBYTE) wrapper_arg.stackaddr
-					       + wrapper_arg.stacksize);
-      _tlsbase = (char *) wrapper_arg.stackaddr;
-      wrapper_arg.stackaddr = (PVOID) ((PBYTE) wrapper_arg.stackaddr
-					       - CYGTLS_PADSIZE);
-      _tlstop = (char *) wrapper_arg.stackaddr;
-      _my_tls.init_thread ((char *) wrapper_arg.stackaddr,
-			   (DWORD (*)(void*, void*)) wrapper_arg.func);
-      wrapper_arg.stackaddr = (PVOID) (_tlstop - sizeof (PVOID));
-      __asm__ ("\n\
-	       movl  %[WRAPPER_ARG], %%ebx # Load &wrapper_arg into ebx  \n\
-	       movl  (%%ebx), %%eax        # Load thread func into eax   \n\
-	       movl  4(%%ebx), %%ecx       # Load thread arg into ecx    \n\
-	       movl  8(%%ebx), %%edx       # Load stackbase into edx     \n\
-	       xorl  %%ebp, %%ebp          # Set ebp to 0                \n\
-	       movl  %%edx, %%esp          # Set esp to stackbase        \n\
-	       pushl %%ecx                 # Push thread arg onto stack  \n\
-	       pushl %%eax                 # Push thread func onto stack \n\
-	       jmp  *%%eax                 # Jump to thread func         \n"
-	       : : [WRAPPER_ARG] "r" (&wrapper_arg));
+  /* Remove _cygtls from this stack since it won't be used anymore. */
+  _cygtls *tls;
+  tls = &_my_tls;
+  _my_tls.remove (0);
 
-    }
-  if (wrapper_arg.guardsize)
+  /* Set stack values in TEB */
+  PTEB teb = NtCurrentTeb ();
+  teb->Tib.StackBase = wrapper_arg.stackbase;
+  teb->Tib.StackLimit = wrapper_arg.commitaddr ?: wrapper_arg.stackaddr;
+  /* Set DeallocationStack value.  If we have an application-provided stack,
+     we set DeallocationStack to NULL, so NtTerminateThread does not deallocate
+     any stack.  If we created the stack in CygwinCreateThread, we set
+     DeallocationStack to the stackaddr of our own stack, so it's automatically
+     deallocated when the thread is terminated. */
+  char *dealloc_addr = (char *) teb->DeallocationStack;
+  teb->DeallocationStack = wrapper_arg.commitaddr ? wrapper_arg.stackaddr
+						  : NULL;
+  /* Store the OS-provided DeallocationStack address in wrapper_arg.stackaddr.
+     The below assembler code will release the OS stack after switching to our
+     new stack. */
+  wrapper_arg.stackaddr = dealloc_addr;
+
+  /* Initialize new _cygtls. */
+  _my_tls.init_thread (wrapper_arg.stackbase - CYGTLS_PADSIZE,
+		       (DWORD (*)(void*, void*)) wrapper_arg.func);
+
+  /* Copy exception list over to new stack.  I'm not quite sure how the
+     exception list is extended by Windows itself.  What's clear is that it
+     always grows downwards and that it starts right at the stackbase.
+     Therefore we first count the number of exception records and place
+     the copy at the stackbase, too, so there's still a lot of room to
+     extend the list up to where our _cygtls region starts. */
+  _exception_list *old_start = (_exception_list *) teb->Tib.ExceptionList;
+  unsigned count = 0;
+  teb->Tib.ExceptionList = NULL;
+  for (_exception_list *e_ptr = old_start;
+       e_ptr && e_ptr != (_exception_list *) -1;
+       e_ptr = e_ptr->prev)
+    ++count;
+  if (count)
     {
-      /* Set up POSIX guard pages.  Note that this is not the same as the
-	 PAGE_GUARD protection.  Rather, the POSIX guard pages are a
-	 PAGE_NOACCESS protected area which is supposed to guard against
-	 stack overflow and to trigger a SIGSEGV if that happens. */
-      PNT_TIB tib = &NtCurrentTeb ()->Tib;
-      wrapper_arg.stackaddr = (PVOID) ((PBYTE) tib->StackBase
-				       - wrapper_arg.stacksize);
-      if (!VirtualAlloc (wrapper_arg.stackaddr, wrapper_arg.guardsize,
-			 MEM_COMMIT, PAGE_NOACCESS))
-	system_printf ("VirtualAlloc, %E");
+      _exception_list *new_start = (_exception_list *) wrapper_arg.stackbase
+						       - count;
+      teb->Tib.ExceptionList = (struct _EXCEPTION_REGISTRATION_RECORD *)
+			       new_start;
+      while (true)
+	{
+	  new_start->handler = old_start->handler;
+	  if (old_start->prev == (_exception_list *) -1)
+	    {
+	      new_start->prev = (_exception_list *) -1;
+	      break;
+	    }
+	  new_start->prev = new_start + 1;
+	  new_start = new_start->prev;
+	  old_start = old_start->prev;
+	}
     }
+
   __asm__ ("\n\
-	   movl  %[WRAPPER_ARG], %%ebx     # Load &wrapper_arg into ebx  \n\
-	   movl  (%%ebx), %%eax            # Load thread func into eax   \n\
-	   movl  4(%%ebx), %%ecx           # Load thread arg into ecx    \n\
-	   pushl %%ecx                     # Push thread arg onto stack  \n\
-	   pushl %%eax                     # Push thread func onto stack \n\
-	   jmp  *%%eax                     # Jump to thread func         \n"
-	   : : [WRAPPER_ARG] "r" (&wrapper_arg));
-  /* Never reached. */
-  return ERROR_INVALID_FUNCTION;
+	   movl  %[WRAPPER_ARG], %%ebx # Load &wrapper_arg into ebx  \n\
+	   movl  (%%ebx), %%eax        # Load thread func into eax   \n\
+	   movl  4(%%ebx), %%ecx       # Load thread arg into ecx    \n\
+	   movl  8(%%ebx), %%edx       # Load stackaddr into edx     \n\
+	   movl  12(%%ebx), %%ebx      # Load stackbase into ebx     \n\
+	   subl  %[CYGTLS], %%ebx      # Subtract CYGTLS_PADSIZE     \n\
+	   subl  $4, %%ebx             # Subtract another 4 bytes    \n\
+	   movl  %%ebx, %%esp          # Set esp                     \n\
+	   xorl  %%ebp, %%ebp          # Set ebp to 0                \n\
+	   # Now we moved to the new stack.  Save thread func address\n\
+	   # and thread arg on new stack                             \n\
+	   pushl %%ecx                 # Push thread arg onto stack  \n\
+	   pushl %%eax                 # Push thread func onto stack \n\
+	   # Now it's safe to release the OS stack.                  \n\
+	   pushl $0x8000               # dwFreeType: MEM_RELEASE     \n\
+	   pushl $0x0                  # dwSize:     0               \n\
+	   pushl %%edx                 # lpAddress:  stackaddr       \n\
+	   call _VirtualFree@12        # Shoot                       \n\
+	   # All set.  We can pop the thread function address from   \n\
+	   # the stack and call it.  The thread arg is still on the  \n\
+	   # stack in the expected spot.                             \n\
+	   popl  %%eax                 # Pop thread_func address     \n\
+	   call  *%%eax                # Call thread func            \n"
+	   : : [WRAPPER_ARG] "r" (&wrapper_arg),
+	       [CYGTLS] "i" (CYGTLS_PADSIZE));
+  /* Never return from here. */
+  ExitThread (0);
 }
 
 /* FIXME: This should be settable via setrlimit (RLIMIT_STACK). */
@@ -468,9 +507,11 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 		    PVOID stackaddr, ULONG stacksize, ULONG guardsize,
 		    DWORD creation_flags, LPDWORD thread_id)
 {
+  PVOID real_stackaddr = NULL;
   ULONG real_stacksize = 0;
   ULONG real_guardsize = 0;
   thread_wrapper_arg *wrapper_arg;
+  HANDLE thread = NULL;
   
   wrapper_arg = (thread_wrapper_arg *) ccalloc (HEAP_STR, 1,
 						sizeof *wrapper_arg);
@@ -488,9 +529,8 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
     real_stacksize = PTHREAD_STACK_MIN;
   if (stackaddr)
     {
-      wrapper_arg->stackaddr = stackaddr;
-      wrapper_arg->stacksize = real_stacksize;
-      real_stacksize = PTHREAD_STACK_MIN;
+      wrapper_arg->stackaddr = (char *) stackaddr;
+      wrapper_arg->stackbase = (char *) stackaddr + real_stacksize;
     }
   else
     {
@@ -498,25 +538,68 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
       real_stacksize = roundup2 (real_stacksize, wincap.page_size ());
       /* If no guardsize has been specified by the application, use the
 	 system pagesize as default. */
-      real_guardsize = (guardsize != 0xffffffff)
+      real_guardsize = (guardsize != (ULONG) -1)
 		       ? guardsize : wincap.page_size ();
       if (real_guardsize)
 	real_guardsize = roundup2 (real_guardsize, wincap.page_size ());
       /* If the default stacksize is used and guardsize has not been specified,
-	 don't add a guard page to the size. */
-      if (stacksize && guardsize != 0xffffffff)
+	 don't add a guard page to the size.  Same if stacksize is only
+	 PTHREAD_STACK_MIN. */
+      if (stacksize && guardsize != (ULONG) -1
+	  && real_stacksize > PTHREAD_STACK_MIN)
 	real_stacksize += real_guardsize;
       /* Now roundup the result to the next allocation boundary. */
       real_stacksize = roundup2 (real_stacksize,
 				 wincap.allocation_granularity ());
-
-      wrapper_arg->stacksize = real_stacksize;
-      wrapper_arg->guardsize = real_guardsize;
+      /* Reserve stack.
+         FIXME? If the TOP_DOWN method tends to collide too much with
+	 other stuff, we should provide our own mechanism to find a 
+	 suitable place for the stack.  Top down from the start of 
+	 the Cygwin DLL comes to mind. */
+      real_stackaddr = VirtualAlloc (NULL, real_stacksize,
+				     MEM_RESERVE | MEM_TOP_DOWN,
+				     PAGE_EXECUTE_READWRITE);
+      if (!real_stackaddr)
+	return NULL;
+      /* Set up committed region.  In contrast to the OS we commit 64K and
+	 set up just a single guard page at the end. */
+      char *commitaddr = (char *) real_stackaddr
+				  + real_stacksize
+				  - wincap.allocation_granularity ();
+      if (!VirtualAlloc (commitaddr, wincap.page_size (), MEM_COMMIT,
+			 PAGE_EXECUTE_READWRITE | PAGE_GUARD))
+	goto err;
+      commitaddr += wincap.page_size ();
+      if (!VirtualAlloc (commitaddr, wincap.allocation_granularity ()
+				     - wincap.page_size (), MEM_COMMIT,
+			 PAGE_EXECUTE_READWRITE))
+	goto err;
+      if (real_guardsize)
+	VirtualAlloc (real_stackaddr, real_guardsize, MEM_COMMIT,
+		      PAGE_NOACCESS);
+      wrapper_arg->stackaddr = (char *) real_stackaddr;
+      wrapper_arg->stackbase = (char *) real_stackaddr + real_stacksize;
+      wrapper_arg->commitaddr = commitaddr;
     }
-  /* Use the STACK_SIZE_PARAM_IS_A_RESERVATION parameter to make sure the
-     stack size is exactly the size we want. */
-  return CreateThread (&sec_none_nih, real_stacksize, thread_wrapper,
-		       wrapper_arg,
-		       creation_flags | STACK_SIZE_PARAM_IS_A_RESERVATION,
-		       thread_id);
+  /* Use the STACK_SIZE_PARAM_IS_A_RESERVATION parameter so only the
+     minimum size for a thread stack is reserved by the OS.  This doesn't
+     work on Windows 2000, but we deallocate the OS stack in thread_wrapper
+     anyway, so this should be a problem only in a tight memory condition.
+     Note that we reserve a 256K stack, not 64K, otherwise the thread creation
+     might crash the process due to a stack overflow. */
+  thread = CreateThread (&sec_none_nih, 4 * PTHREAD_STACK_MIN,
+			 thread_wrapper, wrapper_arg,
+			 creation_flags | STACK_SIZE_PARAM_IS_A_RESERVATION,
+			 thread_id);
+
+err:
+  if (!thread && real_stackaddr)
+    {
+      /* Don't report the wrong error even though VirtualFree is very unlikely
+	 to fail. */
+      DWORD err = GetLastError ();
+      VirtualFree (real_stackaddr, 0, MEM_RELEASE);
+      SetLastError (err);
+    }
+  return thread;
 }
