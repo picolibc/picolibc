@@ -411,8 +411,6 @@ thread_wrapper (VOID *arg)
   cfree (arg);
 
   /* Remove _cygtls from this stack since it won't be used anymore. */
-  _cygtls *tls;
-  tls = &_my_tls;
   _my_tls.remove (0);
 
   /* Set stack values in TEB */
