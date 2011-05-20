@@ -527,6 +527,7 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
     real_stacksize = PTHREAD_STACK_MIN;
   if (stackaddr)
     {
+      /* If the application provided the stack, just use it. */
       wrapper_arg->stackaddr = (char *) stackaddr;
       wrapper_arg->stackbase = (char *) stackaddr + real_stacksize;
     }
