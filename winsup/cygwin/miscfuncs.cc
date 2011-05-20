@@ -541,11 +541,9 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 		       ? guardsize : wincap.page_size ();
       if (real_guardsize)
 	real_guardsize = roundup2 (real_guardsize, wincap.page_size ());
-      /* If the default stacksize is used and guardsize has not been specified,
-	 don't add a guard page to the size.  Same if stacksize is only
-	 PTHREAD_STACK_MIN. */
-      if (stacksize && guardsize != (ULONG) -1
-	  && real_stacksize > PTHREAD_STACK_MIN)
+      /* Add the guardsize to the stacksize, but only if the stacksize and
+	 the guardsize have been explicitely specified. */
+      if (stacksize || guardsize != (ULONG) -1)
 	real_stacksize += real_guardsize;
       /* Now roundup the result to the next allocation boundary. */
       real_stacksize = roundup2 (real_stacksize,

@@ -1,5 +1,10 @@
 2011-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc (CygwinCreateThread): Fix condition for adding the
+	guardsize to the stacksize.  Fix accompanying comment.
+
+2011-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* miscfuncs.cc (CygwinCreateThread): Add accidentally missing comment.
 
 2011-05-20  Corinna Vinschen  <corinna@vinschen.de>
