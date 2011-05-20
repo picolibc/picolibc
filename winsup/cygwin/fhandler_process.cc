@@ -615,14 +615,14 @@ struct heap_info
   {
     heap *next;
     unsigned heap_id;
-    uintptr_t base;
-    uintptr_t end;
+    char *base;
+    char *end;
     unsigned long flags;
   };
   heap *heap_vm_chunks;
 
   heap_info (DWORD pid)
-    : heap_vm_chunks (0)
+    : heap_vm_chunks (NULL)
   {
     PDEBUG_BUFFER buf;
     NTSTATUS status;
@@ -646,8 +646,8 @@ struct heap_info
 	      {
 		heap *h = (heap *) cmalloc (HEAP_FHANDLER, sizeof (heap));
 		*h = (heap) { heap_vm_chunks,
-			      hcnt, barray[bcnt].Address,
-			      barray[bcnt].Address + barray[bcnt].Size,
+			      hcnt, (char *) barray[bcnt].Address,
+			      (char *) barray[bcnt].Address + barray[bcnt].Size,
 			      harray->Heaps[hcnt].Flags };
 		heap_vm_chunks = h;
 	      }
@@ -655,18 +655,16 @@ struct heap_info
     RtlDestroyQueryDebugBuffer (buf);
   }
   
-  char *fill_if_match (void *base, ULONG type, char *dest )
+  char *fill_if_match (char *base, ULONG type, char *dest)
   {
     for (heap *h = heap_vm_chunks; h; h = h->next)
-      if ((uintptr_t) base >= h->base && (uintptr_t) base < h->end)
+      if (base >= h->base && base < h->end)
 	{
-	  char *p;
-	  __small_sprintf (dest, "[heap %ld", h->heap_id);
-	  p = strchr (dest, '\0');
+	  char *p = dest + __small_sprintf (dest, "[heap %ld", h->heap_id);
 	  if (!(h->flags & HEAP_FLAG_NONDEFAULT))
 	    p = stpcpy (p, " default");
 	  if ((h->flags & HEAP_FLAG_SHAREABLE) && (type & MEM_MAPPED))
-	    p = stpcpy (p, " share");
+	    p = stpcpy (p, " shared");
 	  if (h->flags & HEAP_FLAG_EXECUTABLE)
 	    p = stpcpy (p, " exec");
 	  if (h->flags & HEAP_FLAG_GROWABLE)
@@ -685,6 +683,107 @@ struct heap_info
   {
     heap *n = 0;
     for (heap *m = heap_vm_chunks; m; m = n)
+      {
+	n = m->next;
+	cfree (m);
+      }
+  }
+};
+
+struct stack_info
+{
+  struct stack
+  {
+    stack *next;
+    ULONG thread_id;
+    char *start;
+    char *end;
+  };
+  stack *stacks;
+
+  stack_info (DWORD pid, HANDLE process)
+    : stacks (NULL)
+  {
+    NTSTATUS status;
+    PVOID buf = NULL;
+    size_t size = 50 * (sizeof (SYSTEM_PROCESSES)
+			+ 16 * sizeof (SYSTEM_THREADS));
+    PSYSTEM_PROCESSES proc;
+    PSYSTEM_THREADS thread;
+
+    do
+      {
+	buf = realloc (buf, size);
+	status = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+					   buf, size, NULL);
+      	size <<= 1;
+      }
+    while (status == STATUS_INFO_LENGTH_MISMATCH);
+    if (!NT_SUCCESS (status))
+      {
+	if (buf)
+	  free (buf);
+	debug_printf ("NtQuerySystemInformation, %p", status);
+	return;
+      }
+    proc = (PSYSTEM_PROCESSES) buf;
+    while (true)
+      {
+	if (proc->ProcessId == pid)
+	  break;
+	if (!proc->NextEntryDelta)
+	  {
+	    free (buf);
+	    return;
+	  }
+	proc = (PSYSTEM_PROCESSES) ((PBYTE) proc + proc->NextEntryDelta);
+      }
+    thread = proc->Threads;
+    for (ULONG i = 0; i < proc->ThreadCount; ++i)
+      {
+	THREAD_BASIC_INFORMATION tbi;
+	TEB teb;
+	HANDLE thread_h;
+	
+	if (!(thread_h = OpenThread (THREAD_QUERY_INFORMATION, FALSE,
+				     (ULONG) thread[i].ClientId.UniqueThread)))
+	  continue;
+	status = NtQueryInformationThread (thread_h, ThreadBasicInformation,
+					   &tbi, sizeof tbi, NULL);
+	CloseHandle (thread_h);
+	if (!NT_SUCCESS (status))
+	  continue;
+	if (!ReadProcessMemory (process, (PVOID) tbi.TebBaseAddress,
+				&teb, sizeof teb, NULL))
+	  continue;
+	stack *s = (stack *) cmalloc (HEAP_FHANDLER, sizeof (stack));
+	*s = (stack) { stacks, (ULONG) thread[i].ClientId.UniqueThread,
+		       (char *) (teb.DeallocationStack ?: teb.Tib.StackLimit),
+		       (char *) teb.Tib.StackBase };
+	stacks = s;
+      }
+    free (buf);
+  }
+  
+  char *fill_if_match (char *base, ULONG type, char *dest)
+  {
+    for (stack *s = stacks; s; s = s->next)
+      if (base >= s->start && base < s->end)
+	{
+	  char *p = dest + __small_sprintf (dest, "[stack (tid %ld)",
+					    s->thread_id);
+	  if (type & MEM_MAPPED)
+	    p = stpcpy (p, " shared");
+	  stpcpy (p, "]");
+	  return dest;
+	}
+    return 0;
+  }
+  
+  ~stack_info () 
+  {
+    stack *n = 0;
+    for (stack *m = stacks; m; m = n)
       {
 	n = m->next;
 	cfree (m);
@@ -720,6 +819,7 @@ format_process_maps (void *data, char *&destbuf)
   MEMORY_BASIC_INFORMATION mb;
   dos_drive_mappings drive_maps;
   heap_info heaps (p->dwProcessId);
+  stack_info stacks (p->dwProcessId, proc);
   struct __stat64 st;
   long last_pass = 0;
 
@@ -811,7 +911,10 @@ format_process_maps (void *data, char *&destbuf)
 		    sys_wcstombs (posix_modname, NT_MAX_PATH, dosname);
 		  stat64 (posix_modname, &st);
 		}
-	      else if (!heaps.fill_if_match (cur.abase, mb.Type, posix_modname))
+	      else if (!stacks.fill_if_match (cur.abase, mb.Type,
+					      posix_modname)
+		       && !heaps.fill_if_match (cur.abase, mb.Type,
+						posix_modname))
 		{
 		  if (mb.Type & MEM_MAPPED)
 		    strcpy (posix_modname, "[shareable]");

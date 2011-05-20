@@ -1,5 +1,12 @@
 2011-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_process.cc (struct heap_info): Change type of base and end
+	members to char *.  Print "shared" rather than "share".
+	(struct stack_info): New class to fetch process stack information.
+	(format_process_maps): Initialize and check for stack information.
+
+2011-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* miscfuncs.cc (thread_wrapper): Remove statements added for debugging
 	purposes.
 
