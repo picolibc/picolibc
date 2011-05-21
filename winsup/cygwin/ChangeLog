@@ -1,3 +1,20 @@
+2011-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (struct dos_drive_mappings): Use malloc/free
+	rather than cmalloc/cfree.  Check return value from malloc before
+	using it.
+	(struct heap_info): Ditto.
+	(struct thread_info): Ditto.  Rename from stack_info.  Rename members
+	and local variables accordingly.
+	(thread_info::thread_info): Store stack and TEB addresses.
+	(thread_info::fill_if_match): Print "teb" if a TEB address has been
+	found.  Special case for WOW64, explain why.
+	(format_process_maps): Fetch PEB address.  Print MEM_RESERVE regions
+	with equal signs to distinguish them from PAGE_NOACCESS regions.  Fix
+	printing of 'p' and 's' to differ between MEM_PRIVATE and MEM_MAPPED
+	pages, as on Linux.  Print 'g' instead of 'p for PAGE_GUARD pages.
+	Print PEB and SharedUserData area if recognized.
+
 2011-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (CygwinCreateThread): Fix condition for adding the

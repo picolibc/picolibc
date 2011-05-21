@@ -572,13 +572,15 @@ struct dos_drive_mappings
 	    size_t plen = wcslen (pbuf);
 	    size_t psize = plen * sizeof (wchar_t);
 	    debug_printf ("DOS drive %ls maps to %ls", drive, pbuf);
-	    mapping *m = (mapping*) cmalloc (HEAP_FHANDLER,
-					     sizeof (mapping) + psize);
-	    m->next = mappings;
-	    m->len = plen;
-	    m->drive_letter = *drive;
-	    memcpy (m->mapping, pbuf, psize + sizeof (wchar_t));
-	    mappings = m;
+	    mapping *m = (mapping*) malloc (sizeof (mapping) + psize);
+	    if (m)
+	      {
+		m->next = mappings;
+		m->len = plen;
+		m->drive_letter = *drive;
+		memcpy (m->mapping, pbuf, psize + sizeof (wchar_t));
+		mappings = m;
+	      }
 	  }
 	else
 	  debug_printf ("Unable to determine the native mapping for %ls "
@@ -604,7 +606,7 @@ struct dos_drive_mappings
     for (mapping *m = mappings; m; m = n)
       {
 	n = m->next;
-	cfree (m);
+	free (m);
       }
   }
 };
@@ -644,12 +646,16 @@ struct heap_info
 	  for (ULONG bcnt = 0; bcnt < harray->Heaps[hcnt].BlockCount; ++bcnt)
 	    if (barray[bcnt].Flags & 2)
 	      {
-		heap *h = (heap *) cmalloc (HEAP_FHANDLER, sizeof (heap));
-		*h = (heap) { heap_vm_chunks,
-			      hcnt, (char *) barray[bcnt].Address,
-			      (char *) barray[bcnt].Address + barray[bcnt].Size,
-			      harray->Heaps[hcnt].Flags };
-		heap_vm_chunks = h;
+		heap *h = (heap *) malloc (sizeof (heap));
+		if (h)
+		  {
+		    *h = (heap) { heap_vm_chunks,
+				  hcnt, (char *) barray[bcnt].Address,
+				  (char *) barray[bcnt].Address
+					   + barray[bcnt].Size,
+				  harray->Heaps[hcnt].Flags };
+		    heap_vm_chunks = h;
+		  }
 	      }
 	}
     RtlDestroyQueryDebugBuffer (buf);
@@ -685,24 +691,25 @@ struct heap_info
     for (heap *m = heap_vm_chunks; m; m = n)
       {
 	n = m->next;
-	cfree (m);
+	free (m);
       }
   }
 };
 
-struct stack_info
+struct thread_info
 {
-  struct stack
+  struct region
   {
-    stack *next;
+    region *next;
     ULONG thread_id;
     char *start;
     char *end;
+    bool teb;
   };
-  stack *stacks;
+  region *regions;
 
-  stack_info (DWORD pid, HANDLE process)
-    : stacks (NULL)
+  thread_info (DWORD pid, HANDLE process)
+    : regions (NULL)
   {
     NTSTATUS status;
     PVOID buf = NULL;
@@ -753,25 +760,46 @@ struct stack_info
 	CloseHandle (thread_h);
 	if (!NT_SUCCESS (status))
 	  continue;
+	region *r = (region *) malloc (sizeof (region));
+	if (r)
+	  {
+	    *r = (region) { regions, (ULONG) thread[i].ClientId.UniqueThread,
+			    (char *) tbi.TebBaseAddress,
+			    (char *) tbi.TebBaseAddress + wincap.page_size (),
+			    true };
+	    regions = r;
+	  }
 	if (!ReadProcessMemory (process, (PVOID) tbi.TebBaseAddress,
 				&teb, sizeof teb, NULL))
 	  continue;
-	stack *s = (stack *) cmalloc (HEAP_FHANDLER, sizeof (stack));
-	*s = (stack) { stacks, (ULONG) thread[i].ClientId.UniqueThread,
-		       (char *) (teb.DeallocationStack ?: teb.Tib.StackLimit),
-		       (char *) teb.Tib.StackBase };
-	stacks = s;
+	r = (region *) malloc (sizeof (region));
+	if (r)
+	  {
+	    *r = (region) { regions, (ULONG) thread[i].ClientId.UniqueThread,
+			    (char *) (teb.DeallocationStack
+				      ?: teb.Tib.StackLimit),
+			    (char *) teb.Tib.StackBase,
+			    false };
+	    regions = r;
+	  }
       }
     free (buf);
   }
   
   char *fill_if_match (char *base, ULONG type, char *dest)
   {
-    for (stack *s = stacks; s; s = s->next)
-      if (base >= s->start && base < s->end)
+    for (region *r = regions; r; r = r->next)
+      if ((base >= r->start && base < r->end)
+	  /* Special case WOW64.  The TEB is 8K within the region reserved
+	     for it.  No idea what the lower 8K are used for. */
+	  || (r->teb && wincap.is_wow64 ()
+	      && r->start == base + 2 * wincap.page_size ()))
 	{
-	  char *p = dest + __small_sprintf (dest, "[stack (tid %ld)",
-					    s->thread_id);
+	  char *p;
+
+	  p = dest + __small_sprintf (dest, "[%s (tid %ld)",
+				      r->teb ? "teb" : "stack",
+				      r->thread_id);
 	  if (type & MEM_MAPPED)
 	    p = stpcpy (p, " shared");
 	  stpcpy (p, "]");
@@ -780,13 +808,13 @@ struct stack_info
     return 0;
   }
   
-  ~stack_info () 
+  ~thread_info () 
   {
-    stack *n = 0;
-    for (stack *m = stacks; m; m = n)
+    region *n = 0;
+    for (region *m = regions; m; m = n)
       {
 	n = m->next;
-	cfree (m);
+	free (m);
       }
   }
 };
@@ -800,6 +828,15 @@ format_process_maps (void *data, char *&destbuf)
 			     p->dwProcessId);
   if (!proc)
     return 0;
+
+  NTSTATUS status;
+  PROCESS_BASIC_INFORMATION pbi;
+  PPEB peb = NULL;
+
+  status = NtQueryInformationProcess (proc, ProcessBasicInformation,
+				      &pbi, sizeof pbi, NULL);
+  if (NT_SUCCESS (status))
+    peb = pbi.PebBaseAddress;
 
   _off64_t len = 0;
   
@@ -819,7 +856,7 @@ format_process_maps (void *data, char *&destbuf)
   MEMORY_BASIC_INFORMATION mb;
   dos_drive_mappings drive_maps;
   heap_info heaps (p->dwProcessId);
-  stack_info stacks (p->dwProcessId, proc);
+  thread_info threads (p->dwProcessId, proc);
   struct __stat64 st;
   long last_pass = 0;
 
@@ -841,19 +878,27 @@ format_process_maps (void *data, char *&destbuf)
        VirtualQueryEx (proc, i, &mb, sizeof(mb)) || (1 == ++last_pass);
        i = cur.rend)
     {
+      if (last_pass)
+      	posix_modname[0] = '\0';
       if (mb.State == MEM_FREE)
 	a.word = 0;
+      else if (mb.State == MEM_RESERVE)
+	{
+	  char *p = stpcpy (a.flags, "===");
+	  stpcpy (p, (mb.Type & MEM_MAPPED) ? "s" : "p");
+	}
       else
 	{
 	  static DWORD const RW = (PAGE_EXECUTE_READWRITE | PAGE_READWRITE
 				   | PAGE_EXECUTE_WRITECOPY | PAGE_WRITECOPY);
 	  DWORD p = mb.Protect;
 	  a = (access) {{
-	      (p & (RW | PAGE_EXECUTE_READ | PAGE_READONLY))?	'r' : '-',
-	      (p & (RW))?					'w' : '-',
+	      (p & (RW | PAGE_EXECUTE_READ | PAGE_READONLY))   ? 'r' : '-',
+	      (p & (RW))				       ? 'w' : '-',
 	      (p & (PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_READ
-		    | PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE))?	'x' : '-',
-	      (p & (PAGE_GUARD))? 				's' : 'p',
+		    | PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE))  ? 'x' : '-',
+	      (mb.Type & MEM_MAPPED)			       ? 's'
+	      : (p & PAGE_GUARD)			       ? 'g' : 'p',
 	      '\0', // zero-fill the remaining bytes
 	    }};
 	}
@@ -895,7 +940,7 @@ format_process_maps (void *data, char *&destbuf)
 	  // start of a new region (but possibly still the same allocation)
 	  cur = next;
 	  // if a new allocation, figure out what kind it is 
-	  if (newbase && !last_pass)
+	  if (newbase && !last_pass && mb.State != MEM_FREE)
 	    {
 	      st.st_dev = 0;
 	      st.st_ino = 0;
@@ -911,13 +956,15 @@ format_process_maps (void *data, char *&destbuf)
 		    sys_wcstombs (posix_modname, NT_MAX_PATH, dosname);
 		  stat64 (posix_modname, &st);
 		}
-	      else if (!stacks.fill_if_match (cur.abase, mb.Type,
-					      posix_modname)
+	      else if (!threads.fill_if_match (cur.abase, mb.Type,
+					       posix_modname)
 		       && !heaps.fill_if_match (cur.abase, mb.Type,
 						posix_modname))
 		{
-		  if (mb.Type & MEM_MAPPED)
-		    strcpy (posix_modname, "[shareable]");
+		  if (cur.abase == (char *) peb)
+		    strcpy (posix_modname, "[peb]");
+		  else if (cur.abase == (char *) &SharedUserData)
+		    strcpy (posix_modname, "[shared-user-data]");
 		  else
 		    posix_modname[0] = 0;
 		}
