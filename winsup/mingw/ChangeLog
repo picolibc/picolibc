@@ -1,3 +1,9 @@
+2011-05-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/wchar.h: Include stdio.h to grab definition of FILENAME_MAX.
+
+	Thanks to Jim Bell for the report and Greg Chicares for the fix.
+
 2011-01-07  Jacky Lai  <crazyjacky@users.sourceforge.net>
 
 	Correct hexadecimal formatting of double and long double values.

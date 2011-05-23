@@ -367,6 +367,7 @@ struct __wfinddata64_t {
 };
 #endif
 #if __MSVCRT_VERSION__ >= 0x0800
+#include <stdio.h>
 struct __wfinddata32_t {
 	unsigned	attrib;
 	__time32_t	time_create;
