@@ -1,3 +1,9 @@
+2011-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (thread_info::fill_if_match): Reformat.
+	(format_process_maps): Ditto.  Fetch pointer to procinfo structure
+	from mapped process.  Print info about global shared Cygwin regions.
+
 2011-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc (struct dos_drive_mappings): Use malloc/free

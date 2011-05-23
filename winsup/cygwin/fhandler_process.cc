@@ -795,11 +795,9 @@ struct thread_info
 	  || (r->teb && wincap.is_wow64 ()
 	      && r->start == base + 2 * wincap.page_size ()))
 	{
-	  char *p;
-
-	  p = dest + __small_sprintf (dest, "[%s (tid %ld)",
-				      r->teb ? "teb" : "stack",
-				      r->thread_id);
+	  char *p = dest + __small_sprintf (dest, "[%s (tid %ld)",
+					    r->teb ? "teb" : "stack",
+					    r->thread_id);
 	  if (type & MEM_MAPPED)
 	    p = stpcpy (p, " shared");
 	  stpcpy (p, "]");
@@ -824,8 +822,7 @@ format_process_maps (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
   HANDLE proc = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-			     FALSE,
-			     p->dwProcessId);
+			     FALSE, p->dwProcessId);
   if (!proc)
     return 0;
 
@@ -833,10 +830,16 @@ format_process_maps (void *data, char *&destbuf)
   PROCESS_BASIC_INFORMATION pbi;
   PPEB peb = NULL;
 
+  memset (&pbi, 0, sizeof (pbi));
   status = NtQueryInformationProcess (proc, ProcessBasicInformation,
 				      &pbi, sizeof pbi, NULL);
   if (NT_SUCCESS (status))
     peb = pbi.PebBaseAddress;
+  /* myself is in the same spot in every process, so is the pointer to the
+     procinfo.  But make sure the destructor doesn't try to release procinfo! */
+  pinfo proc_pinfo;
+  if (ReadProcessMemory (proc, &myself, &proc_pinfo, sizeof proc_pinfo, NULL))
+    proc_pinfo.preserve ();
 
   _off64_t len = 0;
   
@@ -965,6 +968,12 @@ format_process_maps (void *data, char *&destbuf)
 		    strcpy (posix_modname, "[peb]");
 		  else if (cur.abase == (char *) &SharedUserData)
 		    strcpy (posix_modname, "[shared-user-data]");
+		  else if (cur.abase == (char *) cygwin_shared)
+		    strcpy (posix_modname, "[cygwin-shared]");
+		  else if (cur.abase == (char *) user_shared)
+		    strcpy (posix_modname, "[cygwin-user-shared]");
+		  else if (cur.abase == (char *) *proc_pinfo)
+		    strcpy (posix_modname, "[procinfo]");
 		  else
 		    posix_modname[0] = 0;
 		}
