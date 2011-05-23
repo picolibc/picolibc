@@ -1,3 +1,9 @@
+2011-05-22  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/wingdi.h (GCP_RESULTSW):  Correct defintion.
+
+	Thanks to Albrecht Schlosser for the report and the fix.
+
 2011-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winbase.h (STACK_SIZE_PARAM_IS_A_RESERVATION): Define.

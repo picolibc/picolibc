@@ -2285,7 +2285,7 @@ typedef struct tagGCP_RESULTSW {
 	UINT *lpOrder;
 	INT *lpDx;
 	INT *lpCaretPos;
-	LPWSTR lpClass;
+	LPSTR lpClass;
 	LPWSTR lpGlyphs;
 	UINT nGlyphs;
 	UINT nMaxFit;
