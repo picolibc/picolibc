@@ -28,7 +28,9 @@
 #define __MINGW32_PATCHLEVEL        0
 
 #if __GNUC__ >= 3
+#ifndef __PCC__
 #pragma GCC system_header
+#endif
 #endif
 
 /* These are defined by the user (or the compiler)

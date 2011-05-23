@@ -1,3 +1,10 @@
+2011-05-22  Antoine LECA  <antoinel@users.sourceforge.net>
+
+	* include/_mingw.h:  Define GCC system_header only if PCC is not defined.
+	* include/stdlib.h:  Fix a long-standing typo which prevented correct use of
+	the MB_CUR_MAX macro/variable when DECLSPEC is not supported and <stdlib.h>
+	is included before <ctype.h>.
+
 2011-05-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/wchar.h: Include stdio.h to grab definition of FILENAME_MAX.
