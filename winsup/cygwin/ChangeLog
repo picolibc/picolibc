@@ -2,6 +2,7 @@
 
 	* errno.cc (strerror): Print unknown errno as int.
 	(__xpg_strerror_r): Likewise, and don't clobber strerror buffer.
+	* cygtls.h (strerror_buf): Resize to allow '-'.
 
 2011-05-23  Corinna Vinschen  <corinna@vinschen.de>
 

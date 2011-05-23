@@ -108,8 +108,8 @@ struct _local_storage
     HANDLE *w4;				// note: malloced
   } select;
 
-  /* strerror */
-  char strerror_buf[sizeof ("Unknown error 4294967295")];
+  /* strerror errno.cc */
+  char strerror_buf[sizeof ("Unknown error -2147483648")];
 
   /* times.cc */
   char timezone_buf[20];
