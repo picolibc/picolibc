@@ -1,3 +1,8 @@
+2011-05-23  Eric Blake  <eblake@redhat.com>
+
+	* errno.cc (strerror): Print unknown errno as int.
+	(__xpg_strerror_r): Likewise, and don't clobber strerror buffer.
+
 2011-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc (thread_info::fill_if_match): Reformat.

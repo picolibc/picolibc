@@ -382,8 +382,8 @@ strerror (int errnum)
   char *errstr = strerror_worker (errnum);
   if (!errstr)
     {
-      __small_sprintf (errstr = _my_tls.locals.strerror_buf, "Unknown error %u",
-		       (unsigned) errnum);
+      __small_sprintf (errstr = _my_tls.locals.strerror_buf, "Unknown error %d",
+                       errnum);
       errno = _impure_ptr->_errno = EINVAL;
     }
   return errstr;
@@ -409,10 +409,10 @@ __xpg_strerror_r (int errnum, char *buf, size_t n)
     return ERANGE;
   int result = 0;
   char *error = strerror_worker (errnum);
+  char tmp[sizeof "Unknown error -2147483648"];
   if (!error)
     {
-      __small_sprintf (error = _my_tls.locals.strerror_buf, "Unknown error %u",
-		       (unsigned) errnum);
+      __small_sprintf (error = tmp, "Unknown error %d", errnum);
       result = EINVAL;
     }
   if (strlen (error) >= n)
