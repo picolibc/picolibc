@@ -1,6 +1,6 @@
 2011-05-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
-	* include/time.h (daytime, timezone, tzname): Rework guards to expose when
+	* include/time.h (daylight, timezone, tzname): Rework guards to expose when
 	compiles with __STRICT_ANSI__.
 
 	Thanks to Felipe Contreras for the report.
