@@ -440,10 +440,10 @@ _CRTIMP __int64 __cdecl __MINGW_NOTHROW	_wtoi64(const wchar_t *);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _i64tow(__int64, wchar_t *, int);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _ui64tow(unsigned __int64, wchar_t *, int);
 
-_CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotl(unsigned int, int) __MINGW_ATTRIB_CONST;
-_CRTIMP unsigned int __cdecl __MINGW_NOTHROW _rotr(unsigned int, int) __MINGW_ATTRIB_CONST;
-_CRTIMP unsigned long __cdecl __MINGW_NOTHROW _lrotl(unsigned long, int) __MINGW_ATTRIB_CONST;
-_CRTIMP unsigned long __cdecl __MINGW_NOTHROW _lrotr(unsigned long, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned int __cdecl __MINGW_NOTHROW (_rotl)(unsigned int, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned int __cdecl __MINGW_NOTHROW (_rotr)(unsigned int, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned long __cdecl __MINGW_NOTHROW (_lrotl)(unsigned long, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned long __cdecl __MINGW_NOTHROW (_lrotr)(unsigned long, int) __MINGW_ATTRIB_CONST;
 
 _CRTIMP int __cdecl __MINGW_NOTHROW _set_error_mode (int);
 

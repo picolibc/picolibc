@@ -1,3 +1,10 @@
+2011-05-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/stdlib.h (_rotl, _lrotl, _rotr, _lrotr): Resolve conflict with gcc
+	by wrapping the functions in brackets.
+
+	Thanks to Kai Tietz for the report.
+
 2011-05-22  A.B., Khalid  <abkhd@users.sourceforge.net>
 
 	* Makefile.in: Add support for msvcr100.dll.
