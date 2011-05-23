@@ -1,3 +1,10 @@
+2011-05-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/time.h (daytime, timezone, tzname): Rework guards to expose when
+	compiles with __STRICT_ANSI__.
+
+	Thanks to Felipe Contreras for the report.
+
 2011-05-22  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/stdlib.h (strtod): Remove possible static declaration to resolve

@@ -216,6 +216,8 @@ __MINGW_IMPORT char*	_tzname[2];
 
 #endif /* not __MSVCRT__ */
 
+#endif	/* Not __STRICT_ANSI__ */
+
 #ifndef _NO_OLDNAMES
 
 #ifdef __MSVCRT__
@@ -240,7 +242,6 @@ __MINGW_IMPORT char 	*tzname[2];
 #endif /* not __MSVCRT__ */
 
 #endif	/* Not _NO_OLDNAMES */
-#endif	/* Not __STRICT_ANSI__ */
 
 #ifndef _WTIME_DEFINED
 /* wide function prototypes, also declared in wchar.h */
