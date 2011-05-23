@@ -240,6 +240,7 @@ LIBS = libcrtdll.a \
        libmsvcr71.a libmsvcr71d.a \
        libmsvcr80.a libmsvcr80d.a \
        libmsvcr90.a libmsvcr90d.a \
+       libmsvcr100.a libmsvcr100d.a \
        libmingw32.a \
        libcoldname.a \
        libmoldname.a   libmoldnamed.a \
@@ -247,6 +248,7 @@ LIBS = libcrtdll.a \
        libmoldname71.a libmoldname71d.a \
        libmoldname80.a libmoldname80d.a \
        libmoldname90.a libmoldname90d.a \
+       libmoldname100.a libmoldname100d.a \
        $(LIBM_A) \
        libmingwthrd_old.a \
        libmingwthrd.a
@@ -320,7 +322,8 @@ msvcrt.def  msvcrtd.def \
 msvcr70.def msvcr70d.def \
 msvcr71.def msvcr71d.def \
 msvcr80.def msvcr80d.def \
-msvcr90.def msvcr90d.def: msvcrt.def.in
+msvcr90.def msvcr90d.def \
+msvcr100.def msvcr100d.def: msvcrt.def.in
 	V=`echo $@ | sed -e 's|[a-z]*\([0-9]*\).*|\1|'`; \
 	test -z "$$V" && V=60; \
 	V="0x0$${V}0"; \
@@ -361,7 +364,8 @@ libmoldname.a libmoldnamed.a: moldname-msvcrt.def $(MOLD_OBJS)
 libmoldname70.a libmoldname70d.a \
 libmoldname71.a libmoldname71d.a \
 libmoldname80.a libmoldname80d.a \
-libmoldname90.a libmoldname90d.a: moldname-msvcrt.def $(MOLD_OBJS)
+libmoldname90.a libmoldname90d.a \
+libmoldname100.a libmoldname100d.a: moldname-msvcrt.def $(MOLD_OBJS)
 	$(DLLTOOL) --as $(AS) -k -U	\
 		--dllname msvcr$(@:libmoldname%a=%)dll  \
 		--def moldname-msvcrt.def	\

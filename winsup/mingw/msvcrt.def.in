@@ -148,7 +148,7 @@ _cprintf
 _cputs
 _creat
 _cscanf
-#if  !(__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || msvcr90d__)
+#if  !(__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || msvcr90d__ || __msvcr100__ || __msvcr100d__)
 _ctype DATA
 #endif
 _cwait
@@ -822,7 +822,7 @@ _wcstoui64
 _wctype
 _wtof
 _get_heap_handle
-#if ( __msvcr70__ || __msvcr70d__ ||  __msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
+#if ( __msvcr70__ || __msvcr70d__ ||  __msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__ || __msvcr100__ || __msvcr100d__)
 ; msvcr70.dll and later
 __buffer_overrun
 __lc_clike
@@ -831,13 +831,13 @@ __set_buffer_overrun_handler
 _CRT_RTC_INIT
 _set_security_error_handler
 #endif  /* 7.0 */
-#if  (__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
+#if  (__msvcr71__ || __msvcr71d__ || __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__ || __msvcr100__ || __msvcr100d__)
 ; msvcr71.dll
 __CppXcptFilter
 __CxxCallUnwindVecDtor
 _set_purecall_handler
 #endif /* 7.1  */
-#if ( __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__)
+#if ( __msvcr80__ || __msvcr80d__ || __msvcr90__ || __msvcr90d__ || __msvcr100__ || __msvcr100d__)
 ; msvcr80.dll
 _get_output_format
 _set_output_format

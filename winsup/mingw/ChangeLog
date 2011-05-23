@@ -1,3 +1,8 @@
+2011-05-22  A.B., Khalid  <abkhd@users.sourceforge.net>
+
+	* Makefile.in: Add support for msvcr100.dll.
+	* msvcrt.def.in: Ditto.
+
 2011-05-22  Antoine LECA  <antoinel@users.sourceforge.net>
 
 	* mingwex/mingw-fseek.c: The anonymous union feature for LARGE_INTEGER is
