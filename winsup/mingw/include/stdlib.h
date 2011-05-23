@@ -310,11 +310,6 @@ _CRTIMP long __cdecl __MINGW_NOTHROW _wtol (const wchar_t *);
 #endif
 #if !defined __NO_ISOCEXT  /*  in libmingwex.a */
 double __cdecl __MINGW_NOTHROW __strtod (const char*, char**);
-#ifdef __cplusplus
-/* We require a function with external linkage. */
-#else
-static
-#endif /* Not __cplusplus */
 __inline__ double __cdecl __MINGW_NOTHROW
 strtod (const char* __restrict__ __nptr, char** __restrict__ __endptr)
 {
