@@ -47,16 +47,16 @@ __mingw_fwrite (const void *buffer, size_t size, size_t count, FILE *fp)
       LARGE_INTEGER current_position = {{0LL}};
       __mingw_fseek_called = 0;
       fflush (fp);
-      actual_length.LowPart = GetFileSize ((HANDLE) _get_osfhandle (fileno (fp)), 
-					   &actual_length.HighPart);
-      if (actual_length.LowPart == 0xFFFFFFFF 
+      actual_length.u.LowPart = GetFileSize ((HANDLE) _get_osfhandle (fileno (fp)), 
+					     &actual_length.u.HighPart);
+      if (actual_length.u.LowPart == 0xFFFFFFFF 
           && GetLastError() != NO_ERROR )
         return -1;
-      current_position.LowPart = SetFilePointer ((HANDLE) _get_osfhandle (fileno (fp)),
-                                         	 current_position.LowPart,
-					 	 &current_position.HighPart,
+      current_position.u.LowPart = SetFilePointer ((HANDLE) _get_osfhandle (fileno (fp)),
+						   current_position.u.LowPart,
+						   &current_position.u.HighPart,
 						 FILE_CURRENT);
-      if (current_position.LowPart == 0xFFFFFFFF 
+      if (current_position.u.LowPart == 0xFFFFFFFF 
           && GetLastError() != NO_ERROR )
         return -1;
 
@@ -102,5 +102,5 @@ __mingw_fwrite (const void *buffer, size_t size, size_t count, FILE *fp)
 	    FlushFileBuffers ((HANDLE) _get_osfhandle (fileno (fp)));
 	}
     }
-  return fwrite (buffer, size, count, fp);
+  return (fwrite) (buffer, size, count, fp);
 }
