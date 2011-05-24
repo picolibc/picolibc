@@ -147,7 +147,7 @@ extern const struct s390_operand s390_operands[];
    the instruction may be optional.  */
 #define S390_OPERAND_OPTIONAL 0x400
 
-/* The operand needs to be an even register number.  */
-#define S390_OPERAND_REG_EVEN 0x800
+/* The operand needs to be a valid GP or FP register pair.  */
+#define S390_OPERAND_REG_PAIR 0x800
 
 	#endif /* S390_H */
