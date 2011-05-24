@@ -1,3 +1,7 @@
+2011-05-24  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* opcode/s390.h: Add S390_OPCODE_REG_EVEN flag.
+
 2011-05-17  Alan Modra  <amodra@gmail.com>
 
 	PR ld/12760
