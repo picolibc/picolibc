@@ -1,3 +1,9 @@
+2011-05-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/stdlib.h (strtod): Declare as extern to resolve compilation issues.
+
+	Thanks to cgf for the report.
+
 2011-05-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/time.h (daylight, timezone, tzname): Rework guards to expose when
