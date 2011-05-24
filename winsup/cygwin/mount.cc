@@ -558,12 +558,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 				unsigned *flags)
 {
   bool chroot_ok = !cygheap->root.exists ();
-  while (sys_mount_table_counter < cygwin_shared->sys_mount_table_counter)
-    {
-      int current = cygwin_shared->sys_mount_table_counter;
-      init ();
-      sys_mount_table_counter = current;
-    }
+
   MALLOC_CHECK;
 
   dev.devn = FH_FS;

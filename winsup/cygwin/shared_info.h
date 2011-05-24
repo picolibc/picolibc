@@ -30,7 +30,7 @@ public:
 /* Data accessible to all tasks */
 
 
-#define CURR_SHARED_MAGIC 0xb41ae342U
+#define CURR_SHARED_MAGIC 0x34e5bfa7U
 
 #define USER_VERSION   1
 #define CURR_USER_MAGIC 0x6112afb3U
@@ -44,7 +44,6 @@ class shared_info
   DWORD cb;
  public:
   DWORD heap_chunk;
-  DWORD sys_mount_table_counter;
   tty_list tty;
   LONG last_used_bindresvport;
   DWORD obcaseinsensitive;

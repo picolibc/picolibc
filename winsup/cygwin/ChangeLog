@@ -1,5 +1,12 @@
 2011-05-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::conv_to_win32_path): Remove unused code.
+	* mount.h (class mount_info): Remove sys_mount_table_counter member.
+	* shared_info.h (class shared_info): Ditto.
+	(CURR_SHARED_MAGIC): Update.
+
+2011-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* pinfo.h (struct _pinfo): Reduce size of progname array slightly.
 	Explain why.
 

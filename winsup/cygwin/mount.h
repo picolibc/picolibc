@@ -146,7 +146,6 @@ struct device;
 class mount_info
 {
  public:
-  DWORD sys_mount_table_counter;
   int nmounts;
   mount_item mount[MAX_MOUNTS];
 
