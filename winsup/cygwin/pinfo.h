@@ -64,8 +64,12 @@ public:
     signals.  */
   DWORD dwProcessId;
 
-  /* Used to spawn a child for fork(), among other things. */
-  WCHAR progname[NT_MAX_PATH];
+  /* Used to spawn a child for fork(), among other things.  The other
+     members of _pinfo take only a bit over 200 bytes.  So cut off a
+     couple of bytes from progname to allow the _pinfo structure not
+     to exceed 64K.  Otherwise it blocks another 64K block of VM for
+     the process.  */
+  WCHAR progname[NT_MAX_PATH - 512];
 
   /* User information.
      The information is derived from the GetUserName system call,
