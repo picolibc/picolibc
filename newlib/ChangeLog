@@ -1,3 +1,14 @@
+2011-05-25  Eric Blake  <eblake@redhat.com>
+
+	* libc/string/strerror.c (strerror): Split body into...
+	(_strerror_r): ...new reentrant function.
+	* libc/string/u_strerr.c (_user_strerror): Update signature.
+	* libc/include/stdio.h (_strerror_r): New prototype.
+	* libc/posix/collate.c (__collate_err): Adjust callers.
+	* libc/stdio/perror.c (_perror_r): Likewise.
+	* libc/string/strerror_r.c (strerror_r): Likewise.
+	* libc/string/xpg_strerror_r.c (__xpg_strerror_r): Likewise.
+
 2011-05-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/stdio_ext.h: New header.

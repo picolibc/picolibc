@@ -10,10 +10,11 @@ _DEFUN (__xpg_strerror_r, (errnum, buffer, n),
 	size_t n)
 {
   char *error;
+  int result = 0;
 
   if (!n)
     return ERANGE;
-  error = strerror (errnum);
+  error = _strerror_r (_REENT, errnum, 1, &result);
   if (strlen (error) >= n)
     {
       memcpy (buffer, error, n - 1);
@@ -21,5 +22,5 @@ _DEFUN (__xpg_strerror_r, (errnum, buffer, n),
       return ERANGE;
     }
   strcpy (buffer, error);
-  return *error ? 0 : EINVAL;
+  return (result || *error) ? result : EINVAL;
 }

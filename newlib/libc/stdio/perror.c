@@ -73,6 +73,7 @@ _DEFUN(_perror_r, (ptr, s),
        _CONST char *s)
 {
   char *error;
+  int dummy;
 
   _REENT_SMALL_CHECK_INIT (ptr);
   if (s != NULL && *s != '\0')
@@ -81,7 +82,7 @@ _DEFUN(_perror_r, (ptr, s),
       fputs (": ", _stderr_r (ptr));
     }
 
-  if ((error = strerror (ptr->_errno)) != NULL)
+  if ((error = _strerror_r (ptr, ptr->_errno, 1, &dummy)) != NULL)
     fputs (error, _stderr_r (ptr));
 
   fputc ('\n', _stderr_r (ptr));

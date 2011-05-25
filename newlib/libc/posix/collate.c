@@ -177,12 +177,13 @@ __collate_err(int ex, const char *f)
 {
 	const char *s;
 	int serrno = errno;
+	int dummy;
 
 	/* Be careful to change write counts if you change the strings */
 	write(STDERR_FILENO, "collate_error: ", 15);
 	write(STDERR_FILENO, f, strlen(f));
 	write(STDERR_FILENO, ": ", 2);
-	s = strerror(serrno);
+	s = _strerror_r(_REENT, serrno, 1, &dummy);
 	write(STDERR_FILENO, s, strlen(s));
 	write(STDERR_FILENO, "\n", 1);
 	exit(ex);

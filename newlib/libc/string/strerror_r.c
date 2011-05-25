@@ -43,7 +43,9 @@ PORTABILITY
 <<strerror_r>> with a <[char *]> result is a GNU extension.
 <<strerror_r>> with an <[int]> result is required by POSIX 2001.
 This function is compliant only if <<_user_strerror>> is not provided,
-or if it is thread-safe and does not modify <<errno>>.
+or if it is thread-safe and uses separate storage according to whether
+the second argument of that function is non-zero.  For more details
+on <<_user_strerror>>, see the <<strerror>> documentation.
 
 POSIX states that the contents of <[buf]> are unspecified on error,
 although this implementation guarantees a NUL-terminated string for
@@ -55,7 +57,7 @@ provides only an empty string (unless you provide <<_user_strerror>>).
 POSIX also recommends that unknown <[errnum]> fail with EINVAL even
 when providing such a message, however it is not a requirement and
 this implementation will return success if <<_user_strerror>> provided
-a non-empty alternate string.
+a non-empty alternate string without assigning into its third argument.
 
 <<strerror_r>> requires no supporting OS subroutines.
 
@@ -75,7 +77,7 @@ _DEFUN (strerror_r, (errnum, buffer, n),
 	char *buffer _AND
 	size_t n)
 {
-  char *error = strerror (errnum);
+  char *error = _strerror_r (_REENT, errnum, 1, NULL);
 
   if (strlen (error) >= n)
     return error;

@@ -96,6 +96,9 @@ char  *_EXFUN(strsignal, (int __signo));
 int     _EXFUN(strtosigno, (const char *__name));
 #endif
 
+/* Recursive version of strerror.  */
+char *	_EXFUN(_strerror_r, (struct _reent *, int, int, int *));
+
 /* These function names are used on Windows and perhaps other systems.  */
 #ifndef strcmpi
 #define strcmpi strcasecmp
