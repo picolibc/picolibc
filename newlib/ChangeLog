@@ -7,7 +7,7 @@
 	* libc/string/strerror.c (strerror): Split body into...
 	(_strerror_r): ...new reentrant function.
 	* libc/string/u_strerr.c (_user_strerror): Update signature.
-	* libc/include/stdio.h (_strerror_r): New prototype.
+	* libc/include/string.h (_strerror_r): New prototype.
 	* libc/posix/collate.c (__collate_err): Adjust callers.
 	* libc/stdio/perror.c (_perror_r): Likewise.
 	* libc/string/strerror_r.c (strerror_r): Likewise.
