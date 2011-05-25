@@ -33,6 +33,9 @@ This implementation of <<strerror>> prints out the following strings
 for each of the values defined in `<<errno.h>>':
 
 o+
+o 0
+Success
+
 o E2BIG
 Arg list too long
 
@@ -361,6 +364,9 @@ _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
 
   switch (errnum)
     {
+    case 0:
+      error = "Success";
+      break;
 /* go32 defines EPERM as EACCES */
 #if defined (EPERM) && (!defined (EACCES) || (EPERM != EACCES))
     case EPERM:
