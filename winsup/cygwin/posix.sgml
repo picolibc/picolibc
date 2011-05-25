@@ -1446,8 +1446,8 @@ by keeping track of the current root and accomodating this in the file
 related function calls.  A real chroot functionality is not supported by
 Windows however.</para>
 
-<function>clock_setres</function>, <function>clock_settime</function>, and
-<function>timer_create</function> only support CLOCK_REALTIME.</para>
+<para><function>clock_setres</function>, <function>clock_settime</function>,
+and <function>timer_create</function> only support CLOCK_REALTIME.</para>
 
 <para>BSD file locks created via <function>flock</function> are not
 propagated to the parent process and sibling processes.  The locks are
