@@ -115,7 +115,7 @@ extern void __stdcall dll_crt0_0 ();
 extern "C" BOOL WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
-  PTEB teb;
+  BOOL wow64_test_stack_marker;
 
   switch (reason)
     {
@@ -131,10 +131,9 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	 the auto load address of DLLs?
 	 Check if we're running in WOW64 on a 64 bit machine *and* are
 	 spawned by a genuine 64 bit process.  If so, respawn. */
-      teb = NtCurrentTeb ();
       if (wincap.is_wow64 ()
-	  && teb->Tib.StackLimit >= (PBOOL) 0x400000
-	  && teb->Tib.StackBase <= (PBOOL) 0x10000000)
+	  && &wow64_test_stack_marker >= (PBOOL) 0x400000
+	  && &wow64_test_stack_marker <= (PBOOL) 0x10000000)
 	respawn_wow64_process ();
 
       dll_crt0_0 ();
@@ -150,19 +149,17 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	munge_threadfunc ();
       break;
     case DLL_THREAD_DETACH:
-      teb = NtCurrentTeb ();
       if (dll_finished_loading
-	  && (PVOID) &teb >= teb->Tib.StackLimit
-	  && (PVOID) &teb < teb->Tib.StackBase
+	  && (PVOID) &_my_tls > (PVOID) &wow64_test_stack_marker
 	  && _my_tls.isinitialized ())
 	_my_tls.remove (0);
       /* Windows 2000 has a bug in NtTerminateThread.  Instead of releasing
 	 the stack at teb->DeallocationStack it uses the value of
 	 teb->Tib.StackLimit to evaluate the stack address.  So we just claim
 	 there is no stack. */
-      if (teb->DeallocationStack == NULL
+      if (NtCurrentTeb ()->DeallocationStack == NULL
 	  && !wincap.has_stack_size_param_is_a_reservation ())
-	teb->Tib.StackLimit = NULL;
+	NtCurrentTeb ()->Tib.StackLimit = NULL;
       break;
     }
 
