@@ -1,3 +1,12 @@
+2011-05-25  Eric Blake  <eblake@redhat.com>
+
+	* cygtls.h (strerror_r_buf): New buffer.
+	* errno.cc (strerror): Move guts...
+	(_strerror_r): ...to new function demanded by newlib.
+	(strerror_r): Don't clobber strerror buffer.
+	(_user_strerror): Drop unused declaration.
+	* tlsoffsets.h: Regenerate.
+
 2011-05-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* init.cc (dll_entry): Reinstantiate wow64_test_stack_marker and

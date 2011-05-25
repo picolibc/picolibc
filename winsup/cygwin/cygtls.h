@@ -110,6 +110,7 @@ struct _local_storage
 
   /* strerror errno.cc */
   char strerror_buf[sizeof ("Unknown error -2147483648")];
+  char strerror_r_buf[sizeof ("Unknown error -2147483648")];
 
   /* times.cc */
   char timezone_buf[20];

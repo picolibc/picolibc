@@ -360,8 +360,6 @@ seterrno (const char *file, int line)
   seterrno_from_win_error (file, line, GetLastError ());
 }
 
-extern char *_user_strerror _PARAMS ((int));
-
 static char *
 strerror_worker (int errnum)
 {
@@ -373,20 +371,36 @@ strerror_worker (int errnum)
   return res;
 }
 
+/* Newlib requires this override for perror and friends to avoid
+   clobbering strerror() buffer, without having to differentiate
+   between strerror_r signatures.  This function is intentionally not
+   exported, so that only newlib can use it.  */
+extern "C" char *
+_strerror_r (struct _reent *, int errnum, int internal, int *errptr)
+{
+  char *errstr = strerror_worker (errnum);
+  if (!errstr)
+    {
+      errstr = internal ? _my_tls.locals.strerror_r_buf
+        : _my_tls.locals.strerror_buf;
+      __small_sprintf (errstr, "Unknown error %d", errnum);
+      if (errptr)
+        *errptr = EINVAL;
+    }
+  return errstr;
+}
+
 /* strerror: convert from errno values to error strings.  Newlib's
    strerror_r returns "" for unknown values, so we override it to
    provide a nicer thread-safe result string and set errno.  */
 extern "C" char *
 strerror (int errnum)
 {
-  char *errstr = strerror_worker (errnum);
-  if (!errstr)
-    {
-      __small_sprintf (errstr = _my_tls.locals.strerror_buf, "Unknown error %d",
-                       errnum);
-      errno = _impure_ptr->_errno = EINVAL;
-    }
-  return errstr;
+  int error = 0;
+  char *result = _strerror_r (NULL, errnum, 0, &error);
+  if (error)
+    set_errno (error);
+  return result;
 }
 
 /* Newlib's <string.h> provides declarations for two strerror_r
@@ -396,10 +410,13 @@ strerror (int errnum)
 extern "C" char *
 strerror_r (int errnum, char *buf, size_t n)
 {
-  char *error = strerror (errnum);
-  if (strlen (error) >= n)
-    return error;
-  return strcpy (buf, error);
+  int error = 0;
+  char *errstr = _strerror_r (NULL, errnum, 1, &error);
+  if (error)
+    set_errno (error);
+  if (strlen (errstr) >= n)
+    return errstr;
+  return strcpy (buf, errstr);
 }
 
 extern "C" int
