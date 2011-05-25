@@ -4,9 +4,11 @@
 
 <!--
 
-<para>GNUPro&trade;, the GNUPro&trade; logo, and the Red Hat
+<para>Cygwin&trade;, GNUPro&trade;, the GNUPro&trade; logo, and the Red Hat
 logo are trademarks of Red Hat, Inc.  All other brand and product
 names are trademarks of their respective owners.</para>
+
+-->
 
 <para>Permission is granted to make and distribute verbatim copies of
 this documentation provided the copyright notice and this permission
@@ -22,9 +24,5 @@ this documentation into another language, under the above conditions
 for modified versions, except that this permission notice may be
 stated in a translation approved by the Free Software
 Foundation.</para>
-
-<para>This documentation has been prepared by Red Hat, Inc.
-Technical Publications.</para>
--->
 
 </legalnotice>
