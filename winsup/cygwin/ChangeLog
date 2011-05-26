@@ -1,3 +1,7 @@
+2011-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.h (MAX_MOUNTS): Raise to 64.
+
 2011-05-25  Eric Blake  <eblake@redhat.com>
 
 	* cygtls.h (strerror_r_buf): New buffer.

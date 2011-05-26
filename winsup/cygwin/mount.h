@@ -135,7 +135,7 @@ class mount_item
    higher numbered registry entries.  Don't change this number willy-nilly.
    What we need is to have a more dynamic allocation scheme, but the current
    scheme should be satisfactory for a long while yet.  */
-#define MAX_MOUNTS 30
+#define MAX_MOUNTS 64
 
 class reg_key;
 struct device;
