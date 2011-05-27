@@ -1,3 +1,8 @@
+2011-05-27  Nick Clifton  <nickc@redhat.com>
+
+	* v8500/sbrk.c (_sbrk): Tidy code.
+	Base start of heap on the "heap_start" symbol.
+
 2011-03-26  Mike Frysinger  <vapier@gentoo.org>
 
 	* bfin/include/builtins.h (__builtin_raise): Change constraint to n.

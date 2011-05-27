@@ -3,34 +3,27 @@
 #include <sys/stat.h>
 #include "sys/syscall.h"
 
-int errno;
-
-int __trap0 (int function, int p1, int p2, int p3);
-
-#define TRAP0(f, p1, p2, p3) __trap0(f, (int)(p1), (int)(p2), (int)(p3))
-
 caddr_t
 _sbrk (int incr)
 {
-  extern char end;		/* Defined by the linker */
-  static char *heap_end;
-  char *prev_heap_end;
-#if 0
-  char *sp = (char *)stack_ptr;
-#else
-  char *sp = (char *)&sp;
-#endif
+  extern char   heap_start;		/* Defined by the linker script. */
+  static char * heap_end = NULL;
+  char *        prev_heap_end;
+  char *        sp = (char *) & sp;
 
-  if (heap_end == 0)
-    {
-      heap_end = &end;
-    }
+  if (heap_end == NULL)
+    heap_end = & heap_start;
+
   prev_heap_end = heap_end;
+
   if (heap_end + incr > sp)
     {
-      _write (1, "Heap and stack collision\n", 25);
+#define MESSAGE "Heap and stack collision\n"
+      _write (1, MESSAGE, sizeof MESSAGE);
       abort ();
     }
+
   heap_end += incr;
+
   return (caddr_t) prev_heap_end;
 }

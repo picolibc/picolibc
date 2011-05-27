@@ -1,3 +1,8 @@
+2011-05-27  Nick Clifton  <nickc@redhat.com>
+
+	* libc/sys/sysnecv850/sbrk.c (_sbrk): Tidy code.
+	Base start of heap on the "heap_start" symbol.
+
 2011-05-25  Eric Blake  <eblake@redhat.com>
 
 	* libc/string/strerror.c (_strerror_r): Report "Success" for 0.
