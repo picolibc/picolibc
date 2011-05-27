@@ -1,3 +1,11 @@
+2011-05-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared.cc (offsets): Reorder so that console_state is lowest in
+	memory.  Explain why.
+	(open_shared): Accommodate reordering of offsets array.
+	* shared_info.h (shared_locations): Reorder SH_SHARED_CONSOLE after
+	SH_MYSELF.
+
 2011-05-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.h (MAX_MOUNTS): Raise to 64.

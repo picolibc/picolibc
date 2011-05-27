@@ -204,18 +204,24 @@ shared_name (WCHAR *ret_buf, const WCHAR *str, int num)
 #define page_const (65535)
 #define pround(n) (((size_t) (n) + page_const) & ~page_const)
 
+/* The order in offsets is so that the constant blocks shared_info
+   and user_info are right below the cygwin DLL, then the pinfo block
+   which changes with each process.  Below that is the console_state,
+   an optional block which only exists when running in a Windows console
+   window.  Therefore, if we are not running in a console, we have 64K
+   more of contiguous memory below the Cygwin DLL. */
 static ptrdiff_t offsets[] =
 {
+  - pround (sizeof (shared_info)),
+  - pround (sizeof (shared_info))
+  - pround (sizeof (user_info)),
   - pround (sizeof (shared_info))
   - pround (sizeof (user_info))
-  - pround (sizeof (console_state))
   - pround (sizeof (_pinfo)),
+  - pround (sizeof (shared_info))
   - pround (sizeof (user_info))
-  - pround (sizeof (console_state))
-  - pround (sizeof (_pinfo)),
-  - pround (sizeof (console_state))
-  - pround (sizeof (_pinfo)),
-  - pround (sizeof (_pinfo)),
+  - pround (sizeof (_pinfo))
+  - pround (sizeof (console_state)),
   0
 };
 
@@ -269,8 +275,7 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 	return NULL;
     }
 
-  shared = (shared_info *)
-    MapViewOfFileEx (shared_h, access, 0, 0, 0, addr);
+  shared = (shared_info *) MapViewOfFileEx (shared_h, access, 0, 0, 0, addr);
 
   if (!shared && addr)
     {
@@ -292,7 +297,7 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
       offsets[0] = (caddr_t) shared - (caddr_t) cygwin_hmodule;
       for (int i = SH_USER_SHARED + 1; i < SH_TOTAL_SIZE; i++)
 	{
-	  unsigned size = offsets[i + 1] - offsets[i];
+	  unsigned size = offsets[i] - offsets[i + 1];
 	  offsets[i] += delta;
 	  if (!VirtualAlloc (off_addr (i), size, MEM_RESERVE, PAGE_NOACCESS))
 	    continue;  /* oh well */
