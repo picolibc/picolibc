@@ -1,5 +1,11 @@
 2011-05-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* fhandler.cc (handler_base_overlapped::wait_overlapped): Rework to
+	attempt to properly set errno and bytes read for non-blocking case.
+	Change to just rely on res to indicate error conditions.
+
+2011-05-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Don't set
 	io_pending unless ReadFile has returned an error.  (this is a partial fix,
 	accidentally checked in)

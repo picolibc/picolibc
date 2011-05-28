@@ -1810,15 +1810,21 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
   DWORD err = GetLastError ();
   if (nonblocking)
     {
-      if (!inres && err != ERROR_IO_PENDING)
+      if (inres)
+	res = overlapped_success;
+      else if (err != ERROR_IO_PENDING)
 	res = overlapped_error;
       else
 	{
-	  io_pending = !inres && err == ERROR_IO_PENDING;
-	  if (writing && !inres)
+	  if (writing)
 	    *bytes = len;
+	  else
+	    {
+	      set_errno (EAGAIN);
+	      *bytes = (DWORD) -1;
+	    }
 	  res = overlapped_success;
-	  err = 0;
+	  io_pending = true;
 	}
     }
   else if (!inres && err != ERROR_IO_PENDING)
@@ -1849,9 +1855,8 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	    {
 	      set_errno (EINTR);
 	      res = overlapped_error;
+	      err = 0;
 	    }
-	  *bytes = (DWORD) -1;
-	  err = 0;
 	}
       else if (canceled)
 	pthread::static_cancel_self ();
@@ -1863,13 +1868,12 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	}
       else
 	{
-	  err = 0;
 	  debug_printf ("normal %s, %u bytes", writing ? "write" : "read", *bytes);
 	  res = overlapped_success;
 	}
     }
 
-  if (!err)
+  if (res != overlapped_error)
     /* nothing to do */;
   else if (err == ERROR_HANDLE_EOF || err == ERROR_BROKEN_PIPE)
     {
@@ -1883,7 +1887,8 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       HANDLE h = writing ? get_output_handle () : get_handle ();
       CancelIo (h);
       ResetEvent (get_overlapped ());
-      __seterrno_from_win_error (err);
+      if (err)
+	__seterrno_from_win_error (err);
       *bytes = (DWORD) -1;
     }
 
