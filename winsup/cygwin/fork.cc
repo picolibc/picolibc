@@ -37,11 +37,13 @@ class frok
 {
   bool load_dlls;
   child_info_fork ch;
-  const char *error;
+  const char *errmsg;
   int child_pid;
   int this_errno;
+  HANDLE hchild;
   int __stdcall parent (volatile char * volatile here);
   int __stdcall child (volatile char * volatile here);
+  bool error (const char *fmt, ...);
   friend int fork ();
 };
 
@@ -163,6 +165,27 @@ sync_with_parent (const char *s, bool hang_self)
     }
 }
 
+bool
+frok::error (const char *fmt, ...)
+{
+  DWORD exit_code = ch.exit_code;
+  if (!exit_code && hchild)
+    {
+      exit_code = ch.proc_retry (hchild);
+      if (!exit_code)
+	return false;
+    }
+  if (exit_code != EXITCODE_FORK_FAILED)
+    {
+      va_list ap;
+      static char buf[NT_MAX_PATH + 256];
+      va_start (ap, fmt);
+      __small_vsprintf (buf, fmt, ap);
+      errmsg = buf;
+    }
+  return true;
+}
+
 int __stdcall
 frok::child (volatile char * volatile here)
 {
@@ -282,14 +305,15 @@ frok::parent (volatile char * volatile stack_here)
   HANDLE forker_finished;
   DWORD rc;
   child_pid = -1;
-  error = NULL;
   this_errno = 0;
   bool fix_impersonation = false;
   pinfo child;
-  static char errbuf[NT_MAX_PATH + 256];
 
   int c_flags = GetPriorityClass (GetCurrentProcess ());
   debug_printf ("priority class %d", c_flags);
+
+  errmsg = NULL;
+  hchild = NULL;
 
   /* If we don't have a console, then don't create a console for the
      child either.  */
@@ -319,7 +343,7 @@ frok::parent (volatile char * volatile stack_here)
   if (forker_finished == NULL)
     {
       this_errno = geterrno_from_win_error ();
-      error = "unable to allocate forker_finished event";
+      error ("unable to allocate forker_finished event");
       return -1;
     }
 
@@ -376,6 +400,7 @@ frok::parent (volatile char * volatile stack_here)
 
   while (1)
     {
+      hchild = NULL;
       rc = CreateProcessW (myself->progname, /* image to run */
 			   myself->progname, /* what we send in arg0 */
 			   &sec_none_nih,
@@ -390,8 +415,7 @@ frok::parent (volatile char * volatile stack_here)
       if (!rc)
 	{
 	  this_errno = geterrno_from_win_error ();
-	  __small_sprintf (errbuf, "CreateProcessW failed for '%W'", myself->progname);
-	  error = errbuf;
+	  error ("CreateProcessW failed for '%W'", myself->progname);
 	  memset (&pi, 0, sizeof (pi));
 	  goto cleanup;
 	}
@@ -403,24 +427,21 @@ frok::parent (volatile char * volatile stack_here)
 	}
 
       CloseHandle (pi.hThread);
+      hchild = pi.hProcess;
 
       /* Protect the handle but name it similarly to the way it will
 	 be called in subproc handling. */
-      ProtectHandle1 (pi.hProcess, childhProc);
+      ProtectHandle1 (hchild, childhProc);
 
       strace.write_childpid (ch, pi.dwProcessId);
 
       /* Wait for subproc to initialize itself. */
-      if (!ch.sync (pi.dwProcessId, pi.hProcess, FORK_WAIT_TIMEOUT))
+      if (!ch.sync (pi.dwProcessId, hchild, FORK_WAIT_TIMEOUT))
 	{
-	  DWORD exit_code = ch.proc_retry (pi.hProcess);
-	  if (!exit_code)
+	  if (!error ("forked process died unexpectedly, retry %d, exit code %d",
+		      ch.retry, ch.exit_code))
 	    continue;
 	  this_errno = EAGAIN;
-	  /* Not thread safe, but do we care? */
-	  __small_sprintf (errbuf, "died waiting for longjmp before initialization, "
-			   "retry %d, exit code %p", ch.retry, exit_code);
-	  error = errbuf;
 	  goto cleanup;
 	}
       break;
@@ -436,11 +457,7 @@ frok::parent (volatile char * volatile stack_here)
   if (!child)
     {
       this_errno = get_errno () == ENOMEM ? ENOMEM : EAGAIN;
-#ifdef DEBUGGING
-      error = "pinfo failed";
-#else
       syscall_printf ("pinfo failed");
-#endif
       goto cleanup;
     }
 
@@ -453,7 +470,7 @@ frok::parent (volatile char * volatile stack_here)
 
   /* Fill in fields in the child's process table entry.  */
   child->dwProcessId = pi.dwProcessId;
-  child.hProcess = pi.hProcess;
+  child.hProcess = hchild;
 
   /* Hopefully, this will succeed.  The alternative to doing things this
      way is to reserve space prior to calling CreateProcess and then fill
@@ -462,16 +479,16 @@ frok::parent (volatile char * volatile stack_here)
      we can't actually record the pid in the internal table. */
   if (!child.remember (false))
     {
-      TerminateProcess (pi.hProcess, 1);
+      TerminateProcess (hchild, 1);
       this_errno = EAGAIN;
 #ifdef DEBUGGING0
-      error = "child.remember failed";
+      error ("child remember failed");
 #endif
       goto cleanup;
     }
 
 #ifndef NO_SLOW_PID_REUSE
-  slow_pid_reuse (pi.hProcess);
+  slow_pid_reuse (hchild);
 #endif
 
   /* CHILD IS STOPPED */
@@ -494,7 +511,7 @@ frok::parent (volatile char * volatile stack_here)
       impure_beg = _impure_ptr;
       impure_end = _impure_ptr + 1;
     }
-  rc = child_copy (pi.hProcess, true,
+  rc = child_copy (hchild, true,
 		   "stack", stack_here, ch.stackbottom,
 		   impure, impure_beg, impure_end,
 		   NULL);
@@ -505,11 +522,7 @@ frok::parent (volatile char * volatile stack_here)
   if (!rc)
     {
       this_errno = get_errno ();
-      DWORD exit_code;
-      if (!GetExitCodeProcess (pi.hProcess, &exit_code))
-	exit_code = 0xdeadbeef;
-      __small_sprintf (errbuf, "pid %u, exitval %p", pi.dwProcessId, exit_code);
-      error = errbuf;
+      error ("pid %u, exitval %p", pi.dwProcessId, ch.exit_code);
       goto cleanup;
     }
 
@@ -517,29 +530,23 @@ frok::parent (volatile char * volatile stack_here)
   for (dll *d = dlls.istart (DLL_LINK); d; d = dlls.inext ())
     {
       debug_printf ("copying data/bss of a linked dll");
-      if (!child_copy (pi.hProcess, true,
+      if (!child_copy (hchild, true,
 		       "linked dll data", d->p.data_start, d->p.data_end,
 		       "linked dll bss", d->p.bss_start, d->p.bss_end,
 		       NULL))
 	{
 	  this_errno = get_errno ();
-#ifdef DEBUGGING
-	  DWORD exit_code;
-	  if (!GetExitCodeProcess (pi.hProcess, &exit_code))
-	    exit_code = 0xdeadbeef;
-	  __small_sprintf (errbuf, "pid %u, exitval %p", pi.dwProcessId, exit_code);
-	  error = errbuf;
-#endif
+	  error ("couldn't copy linked dll data/bss");
 	  goto cleanup;
 	}
     }
 
   /* Start thread, and then wait for it to reload dlls.  */
   resume_child (forker_finished);
-  if (!ch.sync (child->pid, pi.hProcess, FORK_WAIT_TIMEOUT))
+  if (!ch.sync (child->pid, hchild, FORK_WAIT_TIMEOUT))
     {
       this_errno = EAGAIN;
-      error = "died waiting for dll loading";
+      error ("died waiting for dll loading");
       goto cleanup;
     }
 
@@ -553,14 +560,14 @@ frok::parent (volatile char * volatile stack_here)
       for (dll *d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
 	{
 	  debug_printf ("copying data/bss for a loaded dll");
-	  if (!child_copy (pi.hProcess, true,
+	  if (!child_copy (hchild, true,
 			   "loaded dll data", d->p.data_start, d->p.data_end,
 			   "loaded dll bss", d->p.bss_start, d->p.bss_end,
 			   NULL))
 	    {
 	      this_errno = get_errno ();
 #ifdef DEBUGGING
-	      error = "copying data/bss for a loaded dll";
+	      error ("copying data/bss for a loaded dll");
 #endif
 	      goto cleanup;
 	    }
@@ -582,8 +589,8 @@ cleanup:
     __malloc_unlock ();
 
   /* Remember to de-allocate the fd table. */
-  if (pi.hProcess && !child.hProcess)
-    ForceCloseHandle1 (pi.hProcess, childhProc);
+  if (hchild && !child.hProcess)
+    ForceCloseHandle1 (hchild, childhProc);
   if (forker_finished)
     ForceCloseHandle (forker_finished);
   debug_printf ("returning -1");
@@ -637,6 +644,7 @@ fork ()
     else
       {
 	res = grouped.child (esp);
+	in_forkee = false;
 	ischild = true;	/* might have been reset by fork mem copy */
       }
   }
@@ -649,13 +657,13 @@ fork ()
     }
   else if (res < 0)
     {
-      if (!grouped.error)
+      if (!grouped.errmsg)
 	syscall_printf ("fork failed - child pid %d, errno %d", grouped.child_pid, grouped.this_errno);
       else
 	{
-	  char buf[strlen (grouped.error) + sizeof ("child %d - , errno 4294967295  ")];
+	  char buf[strlen (grouped.errmsg) + sizeof ("child %d - , errno 4294967295  ")];
 	  strcpy (buf, "child %d - ");
-	  strcat (buf, grouped.error);
+	  strcat (buf, grouped.errmsg);
 	  strcat (buf, ", errno %d");
 	  system_printf (buf, grouped.child_pid, grouped.this_errno);
 	}

@@ -912,6 +912,9 @@ child_info::proc_retry (HANDLE h)
       if (retry-- > 0)
 	exit_code = 0;
       break;
+    case EXITCODE_FORK_FAILED: /* windows prevented us from forking */
+      break;
+      
     /* Count down non-recognized exit codes more quickly since they aren't
        due to known conditions.  */
     default:

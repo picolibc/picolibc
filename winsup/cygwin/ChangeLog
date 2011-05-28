@@ -1,4 +1,18 @@
 2011-05-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
+	    Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
+
+	* dll_init.c (dll_list::load_after_fork): Don't clear in_forkee here.
+	* fork.cc (frok::errmsg): Rename from 'error'.
+	(frok::error): New function.  Handle conditional printing of error
+	messages.
+	(frok::parent): Record hchild handle for use by error function.  Use
+	throughout.  Use error function rather than setting error pointer
+	directly.
+	(fork): Clear is_forkee here.  Accommodate rename of 'error' to
+	'errmsg'.
+	* sigproc.cc (child_info::proc_retry): Detect EXITCODE_FORK_FAILED.
+
+2011-05-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.cc (handler_base_overlapped::wait_overlapped): Rework to
 	attempt to properly set errno and bytes read for non-blocking case.

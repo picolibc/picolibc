@@ -387,7 +387,6 @@ dll_list::load_after_fork (HANDLE parent)
             preferred_block = reserve_at (d->name, (DWORD) h);
 
 	}
-  in_forkee = false;
 }
 
 struct dllcrt0_info
