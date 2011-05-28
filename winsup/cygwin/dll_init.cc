@@ -116,18 +116,6 @@ dll_list::operator[] (const PWCHAR name)
   return NULL;
 }
 
-/* Look for a dll based on is short name only (no path) */
-dll *
-dll_list::find_by_modname (const PWCHAR name)
-{
-  dll *d = &start;
-  while ((d = d->next) != NULL)
-    if (!wcscasecmp (name, d->modname))
-      return d;
-
-  return NULL;
-}
-
 #define RETRIES 1000
 
 /* Allocate space for a dll struct. */
@@ -173,14 +161,14 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       d->handle = h;
       d->has_dtors = true;
       d->p = p;
-      d->image_size = ((pefile*)h)->optional_hdr ()->SizeOfImage;
-      d->ndeps = 0;
-      d->deps = NULL;
-      d->modname = wcsrchr (d->name, L'\\');
-      if (d->modname)
-	d->modname++;
       d->type = type;
-      append (d);
+      if (end == NULL)
+	end = &start;	/* Point to "end" of dll chain. */
+      end->next = d;	/* Standard linked list stuff. */
+      d->next = NULL;
+      d->prev = end;
+      end = d;
+      tot++;
       if (type == DLL_LOAD)
 	loaded_dlls++;
     }
@@ -188,119 +176,6 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   assert (p->envptr != NULL);
   return d;
 }
-
-void
-dll_list::append (dll* d)
-{
-  if (end == NULL)
-    end = &start;	/* Point to "end" of dll chain. */
-  end->next = d;	/* Standard linked list stuff. */
-  d->next = NULL;
-  d->prev = end;
-  end = d;
-  tot++;
-}
-
-void dll_list::populate_deps (dll* d)
-{
-  WCHAR wmodname[NT_MAX_PATH];
-  pefile* pef = (pefile*) d->handle;
-  PIMAGE_DATA_DIRECTORY dd = pef->idata_dir (IMAGE_DIRECTORY_ENTRY_IMPORT);
-  /* Annoyance: calling crealloc with a NULL pointer will use the
-     wrong heap and crash, so we have to replicate some code */
-  long maxdeps = 4;
-  d->deps = (dll**) cmalloc (HEAP_2_DLL, maxdeps*sizeof (dll*));
-  d->ndeps = 0;
-  for (PIMAGE_IMPORT_DESCRIPTOR id=
-	(PIMAGE_IMPORT_DESCRIPTOR) pef->rva (dd->VirtualAddress);
-      dd->Size && id->Name;
-      id++)
-    {
-      char* modname = pef->rva (id->Name);
-      sys_mbstowcs (wmodname, NT_MAX_PATH, modname);
-      if (dll* dep = find_by_modname (wmodname))
-	{
-	  if (d->ndeps >= maxdeps)
-	    {
-	      maxdeps = 2*(1+maxdeps);
-	      d->deps = (dll**) crealloc (d->deps, maxdeps*sizeof (dll*));
-	    }
-	  d->deps[d->ndeps++] = dep;
-	}
-    }
-  
-  /* add one to differentiate no deps from unknown */
-  d->ndeps++;
-}
-
-
-void
-dll_list::topsort ()
-{
-  /* Anything to do? */
-  if (!end)
-    return;
-  
-  /* make sure we have all the deps available */
-  dll* d = &start;
-  while ((d = d->next))
-    if (!d->ndeps)
-      populate_deps (d);
-  
-  /* unlink head and tail pointers so the sort can rebuild the list */
-  d = start.next;
-  start.next = end = NULL;
-  topsort_visit (d, true);
-
-  /* clear node markings made by the sort */
-  d = &start;
-  while ((d = d->next))
-    {
-      debug_printf ("%W", d->modname);
-      for (int i=1; i < -d->ndeps; i++)
-	debug_printf ("-> %W", d->deps[i-1]->modname);
-
-      /* It would be really nice to be able to keep this information
-	 around for next time, but we don't have an easy way to
-	 invalidate cached dependencies when a module unloads. */
-      d->ndeps = 0;
-      cfree (d->deps);
-      d->deps = NULL;
-    }
-}
-
-/* A recursive in-place topological sort. The result is ordered so that
-   dependencies of a dll appear before it in the list.
-
-   NOTE: this algorithm is guaranteed to terminate with a "partial
-   order" of dlls but does not do anything smart about cycles: an
-   arbitrary dependent dll will necessarily appear first. Perhaps not
-   surprisingly, Windows ships several dlls containing dependency
-   cycles, including SspiCli/RPCRT4.dll and a lovely tangle involving
-   USP10/LPK/GDI32/USER32.dll). Fortunately, we don't care about
-   Windows DLLs here, and cygwin dlls should behave better */
-void
-dll_list::topsort_visit (dll* d, bool seek_tail)
-{
-  /* Recurse to the end of the dll chain, then visit nodes as we
-     unwind. We do this because once we start visiting nodes we can no
-     longer trust any _next_ pointers.
-
-     We "mark" visited nodes (to avoid revisiting them) by negating
-     ndeps (undone once the sort completes). */
-  if (seek_tail && d->next)
-    topsort_visit (d->next, true);
-  
-  if (d->ndeps > 0)
-    {
-      d->ndeps = -d->ndeps;
-      for (long i=1; i < -d->ndeps; i++)
-	topsort_visit (d->deps[i-1], false);
-
-      append (d);
-    }
-}
-
 
 dll *
 dll_list::find (void *retaddr)
@@ -417,33 +292,21 @@ release_upto (const PWCHAR name, DWORD here)
       }
 }
 
-/* Reserve the chunk of free address space starting _here_ and (usually)
-   covering at least _dll_size_ bytes. However, we must take care not
-   to clobber the dll's target address range because it often overlaps.
- */
+/* Mark one page at "here" as reserved.  This may force
+   Windows NT to load a DLL elsewhere. */
 static DWORD
-reserve_at (const PWCHAR name, DWORD here, DWORD dll_base, DWORD dll_size)
+reserve_at (const PWCHAR name, DWORD here)
 {
   DWORD size;
   MEMORY_BASIC_INFORMATION mb;
 
   if (!VirtualQuery ((void *) here, &mb, sizeof (mb)))
-    api_fatal ("couldn't examine memory at %08lx while mapping %W, %E",
-	       here, name);
+    size = 64 * 1024;
+
   if (mb.State != MEM_FREE)
     return 0;
 
   size = mb.RegionSize;
-  
-  // don't clobber the space where we want the dll to land
-  DWORD end = here + size;
-  DWORD dll_end = dll_base + dll_size;
-  if (dll_base < here && dll_end > here)
-      here = dll_end; // the dll straddles our left edge
-  else if (dll_base >= here && dll_base < end)
-      end = dll_base; // the dll overlaps partly or fully to our right
-  
-  size = end - here;
   if (!VirtualAlloc ((void *) here, size, MEM_RESERVE, PAGE_NOACCESS))
     api_fatal ("couldn't allocate memory %p(%d) for '%W' alignment, %E\n",
                here, size, name);
@@ -521,8 +384,7 @@ dll_list::load_after_fork (HANDLE parent)
              can in the child, due to differences in the load ordering.
              Block memory at it's preferred address and try again. */
           if ((DWORD) h > (DWORD) d->handle)
-            preferred_block = reserve_at (d->name, (DWORD) h,
-					  (DWORD) d->handle, d->image_size);
+            preferred_block = reserve_at (d->name, (DWORD) h);
 
 	}
 }

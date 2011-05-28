@@ -1,41 +1,5 @@
 2011-05-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
-
-	* dll_init.cc (reserve_upto): Remove.
-	(release_upto): Ditto.
-	(dll_list::reserve_space): New function to reserve space needed by
-	DLL_LOAD dlls early in the fork process.
-	(dll_list::load_after_fork): Rewrite to use recursion for tracking
-	reservations made while trying to make dlls land where they belong.
-	(dll_list::load_after_fork_impl): Ditto.
-	(dll_list::alloc): Initialize image base field.
-	* dll_init.h (struct dll_list): declare new functions.
-	(dll::image_size): New member.
-
-2011-05-28  Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
-
-	* dll_init.cc (dll_list::find_by_modname): New function to search the
-	dll list for a module name only (no path).
-	(dll_list::alloc): Initialize newly-added members of struct dll.
-	(dll_list::append): New function to factor out the append operation
-	(used by dll_list::topsort).
-	(dll_list::populate_deps): New function to identify dll dependencies.
-	(dll_list::topsort): New function to sort the dll list topologically by
-	dependencies.
-	(dll_list::topsort_visit): New helper function for the above.
-	* dll_init.h (dll::ndeps): New class member.
-	(dll::deps): Ditto.
-	(dll::modname): Ditto.
-	(dll_list::find_by_modname): New function related to topsort.
-	(dll_list::populate_all_deps): Ditto.
-	(dll_list::populate_deps): Ditto.
-	(dll_list::topsort): Ditto.
-	(dll_list::topsort_visit): Ditto.
-	(dll_list::append): Ditto.
-	(pefile): New struct allowing simple introspection of dll images.
-	* fork.cc (fork): Topologically sort the dll list before forking.
-
-2011-05-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
-	    
+	    Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
 
 	* dll_init.c (dll_list::load_after_fork): Don't clear in_forkee here.
 	* fork.cc (frok::errmsg): Rename from 'error'.
