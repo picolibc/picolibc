@@ -1,3 +1,12 @@
+2011-05-28  Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
+
+	* dll_init.cc (dll_list::alloc): Initialize dll::image_size.
+	(reserve_at): Don't reserve space needed by the target dll if the
+	latter overlaps the free region to be blocked.
+	(dll_list::load_after_fork): Use new version of reserve_at.
+	* dll_init.h (dll::image_size): New member.
+	(pefile): New struct.
+
 2011-05-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
 	    Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
 

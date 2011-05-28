@@ -161,6 +161,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       d->handle = h;
       d->has_dtors = true;
       d->p = p;
+      d->image_size = ((pefile*)h)->optional_hdr ()->SizeOfImage;
       d->type = type;
       if (end == NULL)
 	end = &start;	/* Point to "end" of dll chain. */
@@ -292,21 +293,33 @@ release_upto (const PWCHAR name, DWORD here)
       }
 }
 
-/* Mark one page at "here" as reserved.  This may force
-   Windows NT to load a DLL elsewhere. */
+/* Reserve the chunk of free address space starting _here_ and (usually)
+   covering at least _dll_size_ bytes. However, we must take care not
+   to clobber the dll's target address range because it often overlaps.
+ */
 static DWORD
-reserve_at (const PWCHAR name, DWORD here)
+reserve_at (const PWCHAR name, DWORD here, DWORD dll_base, DWORD dll_size)
 {
   DWORD size;
   MEMORY_BASIC_INFORMATION mb;
 
   if (!VirtualQuery ((void *) here, &mb, sizeof (mb)))
-    size = 64 * 1024;
-
+    api_fatal ("couldn't examine memory at %08lx while mapping %W, %E",
+	       here, name);
   if (mb.State != MEM_FREE)
     return 0;
 
   size = mb.RegionSize;
+  
+  // don't clobber the space where we want the dll to land
+  DWORD end = here + size;
+  DWORD dll_end = dll_base + dll_size;
+  if (dll_base < here && dll_end > here)
+      here = dll_end; // the dll straddles our left edge
+  else if (dll_base >= here && dll_base < end)
+      end = dll_base; // the dll overlaps partly or fully to our right
+  
+  size = end - here;
   if (!VirtualAlloc ((void *) here, size, MEM_RESERVE, PAGE_NOACCESS))
     api_fatal ("couldn't allocate memory %p(%d) for '%W' alignment, %E\n",
                here, size, name);
@@ -384,7 +397,8 @@ dll_list::load_after_fork (HANDLE parent)
              can in the child, due to differences in the load ordering.
              Block memory at it's preferred address and try again. */
           if ((DWORD) h > (DWORD) d->handle)
-            preferred_block = reserve_at (d->name, (DWORD) h);
+            preferred_block = reserve_at (d->name, (DWORD) h,
+					  (DWORD) d->handle, d->image_size);
 
 	}
 }
