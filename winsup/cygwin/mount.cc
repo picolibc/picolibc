@@ -561,7 +561,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 
   MALLOC_CHECK;
 
-  dev.devn = FH_FS;
+  dev = FH_FS;
 
   *flags = 0;
   debug_printf ("conv_to_win32_path (%s)", src_path);
@@ -619,11 +619,11 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
   if (isproc (src_path))
     {
       dev = *proc_dev;
-      dev.devn = fhandler_proc::get_proc_fhandler (src_path);
-      if (dev.devn == FH_BAD)
+      dev = fhandler_proc::get_proc_fhandler (src_path);
+      if (dev == FH_BAD)
 	return ENOENT;
       set_flags (flags, PATH_BINARY);
-      if (isprocsys_dev (dev.devn))
+      if (isprocsys_dev (dev))
 	{
 	  if (src_path[procsys_len])
 	    backslashify (src_path + procsys_len, dst, 0);

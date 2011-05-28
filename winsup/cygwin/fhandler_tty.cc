@@ -58,7 +58,7 @@ fhandler_tty_master::fhandler_tty_master ()
 int
 fhandler_tty_slave::get_unit ()
 {
-  return dev () == FH_TTY ? myself->ctty : dev ().minor;
+  return dev ().get_minor ();
 }
 
 void
@@ -300,7 +300,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	    {
 	      if (!PeekNamedPipe (handle, NULL, 0, NULL, &n, NULL))
 		{
-		  termios_printf ("PeekNamedPipe failed, %E");
+		  termios_printf ("PeekNamedPipe(%p) failed, %E", handle);
 		  goto err;
 		}
 	      if (n > 0)
@@ -469,11 +469,11 @@ process_ioctl (void *)
 /**********************************************************************/
 /* Tty slave stuff */
 
-fhandler_tty_slave::fhandler_tty_slave (int ntty)
+fhandler_tty_slave::fhandler_tty_slave (int unit)
   : fhandler_tty_common (), inuse (NULL)
 {
-  if (ntty >= 0)
-    dev ().parse (DEV_TTYS_MAJOR, ntty);
+  if (unit >= 0)
+    dev ().parse (DEV_TTYS_MAJOR, unit);
 }
 
 /* FIXME: This function needs to close handles when it has
@@ -1086,7 +1086,8 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
   termios_printf ("ioctl (%x)", cmd);
 
   if (myself->pgid && get_ttyp ()->getpgid () != myself->pgid
-      && myself->ctty == get_unit () && (get_ttyp ()->ti.c_lflag & TOSTOP))
+      && (unsigned) myself->ctty == FHDEV (DEV_TTYS_MAJOR, get_unit ())
+      && (get_ttyp ()->ti.c_lflag & TOSTOP))
     {
       /* background process */
       termios_printf ("bg ioctl pgid %d, tpgid %d, %s", myself->pgid,
@@ -1390,11 +1391,11 @@ int
 fhandler_pty_master::open (int flags, mode_t)
 {
   /* Note that allocate returns with the tty lock set if it was successful. */
-  int ntty = cygwin_shared->tty.allocate (false);
-  if (ntty < 0)
+  int unit = cygwin_shared->tty.allocate (false);
+  if (unit < 0)
     return 0;
 
-  dev().devn = FHDEV (DEV_TTYM_MAJOR, ntty);
+  dev().parse (DEV_TTYM_MAJOR, unit);
   if (!setup (true))
     {
       lock_ttys::release ();
@@ -1631,7 +1632,10 @@ fhandler_tty_master::init_console ()
 {
   console = (fhandler_console *) build_fh_dev (*console_dev, "/dev/ttym_console");
   if (console == NULL)
-    return -1;
+    {
+      termios_printf ("console creation failed?");
+      return -1;
+    }
 
   console->init (NULL, GENERIC_READ | GENERIC_WRITE, O_BINARY);
   cygheap->manage_console_count ("fhandler_tty_master::init_console", -1, true);
@@ -1857,11 +1861,11 @@ fhandler_pty_master::setup (bool ispty)
     goto err;
 
   char buf[MAX_PATH];
-  errstr = shared_name (buf, OUTPUT_MUTEX, t.ntty);
+  errstr = shared_name (buf, OUTPUT_MUTEX, t.get_unit ());
   if (!(output_mutex = CreateMutex (&sa, FALSE, buf)))
     goto err;
 
-  errstr = shared_name (buf, INPUT_MUTEX, t.ntty);
+  errstr = shared_name (buf, INPUT_MUTEX, t.get_unit ());
   if (!(input_mutex = CreateMutex (&sa, FALSE, buf)))
     goto err;
 
@@ -1893,7 +1897,7 @@ fhandler_pty_master::setup (bool ispty)
   t.winsize.ws_row = 25;
   t.master_pid = myself->pid;
 
-  termios_printf ("tty%d opened - from_slave %p, to_slave %p", t.ntty,
+  termios_printf ("tty%d opened - from_slave %p, to_slave %p", t.get_unit (),
 		  get_io_handle (), get_output_handle ());
   return true;
 

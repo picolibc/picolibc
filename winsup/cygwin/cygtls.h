@@ -133,6 +133,7 @@ struct _local_storage
 
   /* All functions requiring temporary path buffers. */
   tls_pathbuf pathbufs;
+  char ttybuf[32];
 };
 
 typedef struct struct_waitq

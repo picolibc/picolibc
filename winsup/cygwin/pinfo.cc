@@ -187,10 +187,10 @@ pinfo::exit (DWORD n)
     }
 
   sigproc_terminate (ES_FINAL);
-  if (myself->ctty >= 0 && myself->ctty != TTY_CONSOLE)
+  if (myself->ctty > 0 && !iscons_dev (myself->ctty))
     {
       lock_ttys here;
-      tty *t = cygwin_shared->tty[myself->ctty];
+      tty *t = cygwin_shared->tty[device::minor(myself->ctty)];
       if (!t->slave_alive ())
 	t->setpgid (0);
     }
@@ -361,12 +361,14 @@ pinfo::set_acl()
 const char *
 _pinfo::_ctty (char *buf)
 {
-  if (ctty == TTY_CONSOLE)
-    strcpy (buf, "ctty /dev/console");
-  else if (ctty < 0)
+  if (ctty <= 0)
     strcpy (buf, "no ctty");
   else
-    __small_sprintf (buf, "ctty /dev/tty%d", ctty);
+    {
+      device d;
+      d.parse (ctty);
+      __small_sprintf (buf, "ctty %s", d.name);
+    }
   return buf;
 }
 
@@ -374,12 +376,12 @@ void
 _pinfo::set_ctty (tty_min *tc, int flags, fhandler_termios *fh)
 {
   debug_printf ("old %s, ctty %d, tc->ntty %d flags & O_NOCTTY %p", __ctty (), ctty, tc->ntty, flags & O_NOCTTY);
-  if ((ctty < 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
+  if ((ctty <= 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc->ntty;
       if (cygheap->ctty != fh->archetype)
 	{
-	  debug_printf ("/dev/tty%d cygheap->ctty %p, archetype %p", ctty, cygheap->ctty, fh->archetype);
+	  debug_printf ("cygheap->ctty %p, archetype %p", cygheap->ctty, fh->archetype);
 	  if (!cygheap->ctty)
 	    syscall_printf ("ctty was NULL");
 	  else

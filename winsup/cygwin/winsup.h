@@ -133,7 +133,6 @@ extern int cygserver_running;
 #define SIGTOMASK(sig)	(1 << ((sig) - 1))
 
 #define set_api_fatal_return(n) do {extern int __api_fatal_exit_val; __api_fatal_exit_val = (n);} while (0)
-#define api_fatal(fmt, args...) __api_fatal (fmt,## args)
 
 #undef issep
 #define issep(ch) (strchr (" \t\n\r", (ch)) != NULL)
@@ -239,7 +238,8 @@ void __set_winsock_errno (const char *fn, int ln) __attribute__ ((regparm(2)));
 extern bool wsock_started;
 
 /* Printf type functions */
-extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
+extern "C" void vapi_fatal (const char *, va_list ap) __attribute__ ((noreturn));
+extern "C" void api_fatal (const char *, ...) __attribute__ ((noreturn));
 int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__ ((regparm (2)))*/;
 int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
 int __small_swprintf (PWCHAR dst, const WCHAR *fmt, ...) /*__attribute__ ((regparm (2)))*/;

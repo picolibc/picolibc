@@ -1,3 +1,153 @@
+2011-05-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* autoload.cc: Call _api_fatal in asm.
+	* child_info.h: Redefine CURR_CHILD_INFO_MAGIC.
+	(child_info_fork::abort): Rename from handle_failure.  Change
+	arguments.
+	* cygtls.h (_local_storage::ttybuf): New field.
+	* dcrt0.cc (vapi_fatal): Split api_fatal.  Add "in forked process" to
+	message when appropriate.
+	(api_fatal): Use vapi_fatal.
+	* devices.h: Make multiple inclusion safe.
+	(fh_devices): Add FH_CONS* stuff.  Reorder slightly.
+	(device): Eliminate anonymous union.  Add more ways to access
+	minor/major.
+	(device::setunit): Accommodate no-longer-anonymous union.
+	(device::is_fs): Ditto.
+	(device::is_fs_special): Ditto.
+	(device::major): New function.
+	(device::minor): Ditto.
+	(device::is_device): New function.
+	(device::not_device): Ditto.
+	(device::operator int): New operator.
+	(device::operator fh_devices): Ditto.
+	(device::operator bool): Ditto.
+	(device::operator DWORD): Ditto.
+	(device::operator =): Ditto.
+	(isproc_dev): New function.
+	(isprocsys_dev): Ditto.
+	(iscons_dev): Ditto.
+	(istty_slave_dev): Ditto.
+	* devices.in: Add new "/dev/cons*" strings.  Accommodate
+	no-longer-anonymous union throughout.
+	(BRACK): Use more precise method for initialization.
+	* devices.cc: Regenerate.
+	* dtable.cc (dtable::stdio_init): Use get_cttyp instead of get_tty.
+	(dtable::find_archetype): Use new DWORD operator in device to test
+	archetypes.
+	(dtable::init_std_file_from_handle): Use different method to initialize
+	'dev'.  Adapt to different ctty handling and accommodate /dev/cons*.
+	(fh_alloc): Accommodate no-longer-anonymous union.  Adapt to new
+	/dev/cons*.
+	(build_fh_pc): Make debugging output more useful.
+	* exceptions.cc (ctrl_c_handler): Use get_cttyp instead of get_tty.
+	* external.cc (fillout_pinfo): Accommodate new cons* stuff.
+	* fhandler.cc (fhandler_base::read): Eliminate is_slow() test.
+	* fhandler.h (fhandler_base::*): Adapt to changes in device.h.
+	(fhandler_*::is_slow): Delete.
+	( fhandler_proc::get_proc_fhandler): Return fh_devices type.
+	* fhandler_console.cc (open_shared_console): New function.
+	(console_unit): New class.
+	(console_unit::console_unit): New constructor.
+	(enum_windows): New function.  Declare as friend to console_unit.
+	(fhandler_console::set_unit): New function.
+	(fhandler_console::get_tty_stuff): Call set_unit to set the unit number
+	and determine if initialization is needed.  Eliminate flags parameter.
+	(tty_list::get_cttyp): Rename (sorta) from get_tty.  Return pointer to
+	correct tty_min.
+	(fhandler_console::open): Adapt to elimination of argument to
+	get_tty_stuff.
+	(fhandler_console::output_tcsetattr): Properly detect error condition.
+	(fhandler_console::fixup_after_fork_exec): Adapt to get_tty_stuff()
+	setting tc automatically.
+	* fhandler_proc.cc: Use FH_BAD rather than 0 throughout where using
+	fh_devices enum.
+	(fhandler_proc::get_proc_fhandler): Return fh_devices.  Adapt to
+	devices.h changes.
+	* fhandler_process.cc: Adapt to devices.h changes.  Use FH_BAD rather
+	than 0 throughout where using fh_devices enum.
+	* fhandler_procnet.cc: Ditto.
+	* fhandler_procsys.cc: Ditto.
+	* fhandler_procsysvipc.cc: Ditto.
+	* fhandler_tape.cc (fhandler_dev_tape::fhandler_dev_tape): Ditto.
+	* fhandler_termios.cc (handler_termios::bg_check): Use tc->ttyname()
+	rather than assuming that we can construct a tty.
+	* fhandler_tty.cc (fhandler_tty_master::fhandler_tty_master): Just
+	return get_minor() of dev.
+	(fhandler_pty_master::process_slave_output): Add slightly more
+	debugging info.
+	(fhandler_tty_slave::fhandler_tty_slave): Change name from ntty to
+	unit.
+	(fhandler_pty_master::open): Ditto.
+	(fhandler_tty_slave::ioctl): Adapt to change which causes ctty to
+	represent a complete device.
+	(fhandler_tty_master::init_console): Add debugging for failure path.
+	(fhandler_pty_master::setup): Use get_unit() to retrieve unit number
+	rather than relying on raw ntty.
+	(fhandler_pty_master::setup): Ditto.
+	* fhandler_virtual.h (virt_tab_t): Redefine fhandler as fh_devices.
+	* fork.cc: Remove obsolete vfork stuff.
+	(frok::child): Don't assume that a ctty == 0 is valid.
+	* mount.cc (mount_info::conv_to_win32_path): Adapt to device struct
+	changes.
+	(mount_info::conv_to_win32_path): Ditto.
+	* path.cc (path_conv::check): Retrive major/minor numbers via a method
+	rather than accessing them directly from device.  Rely on dev operators
+	to set/retrieve device information as required by device struct change.
+	* path.h (isproc_dev): Move to devices.h.
+	(isprocsys_dev): Ditto.
+	(isvirtual_dev): Ditto.
+	(path_conv:{isdevice,isfifo,isspecial,iscygdrive,issocket,get_devn,get_unitn}):
+	Use device methods to access/manipulate devices.
+	* pinfo.cc (pinfo::exit): Don't assume that ctty == 0 is valid.  Use
+	iscons_dev to determine if a device is a console.
+	(_pinfo::_ctty): Use device::parse to generate tty/cons name.
+	(_pinfo::set_ctty): Don't assume that ctty == 0 is valid.  Remove
+	redundant info from debugging.
+	* shared.cc (offsets): Remove console offset.
+	* shared_info.h (shared_locations): Ditto.
+	* syscalls.cc (umask): Use device methods to manipulate device
+	information.
+	(ctermid): Use device::parse to generate term device name.
+	* tlsoffsets.h: Regenerate.
+	* tty.cc (ttyslot): Return minor number of ctty since ctty now
+	represents a full device.
+	(tty::create_master): Set ctty to a complete device.
+	(tty_list::attach): Rework to detect new /dev/cons* stuff.
+	(tty_list::terminate): Adapt to changes to ctty.
+	(tty_list::init): Adapt to change to setntty - pass in device major
+	number.
+	(tty::exists): Use get_unit() to retrive tty unit number.
+	(tty::open_mutex): Ditto.
+	(tty::open_inuse): Ditto.
+	(tty::create_inuse): Ditto.
+	(tty::get_event): Ditto.
+	(tty_min::ttyname): Define new function.
+	* tty.h (tty_min::ntty): Redefine as fh_devices.
+	(tty::exists): Use get_unit() to retrive tty unit number.
+	(tty::open_mutex): Ditto.
+	(tty::open_inuse): Ditto.
+	(tty::create_inuse): Ditto.
+	(tty::get_event): Ditto.
+	(tty_min::ttyname): Declare new function.
+	(tty::getntty): Declare as const.
+	(tty_list::operator []): Assure that only minor part of argument is
+	used.
+
+	* dll_init.cc (dll_list::alloc): Detect mismatch of data segments early
+	issuing an explicit error message if necessary.
+	* heap.cc (heap_init): Adapt to changes from fork->handle_failure to
+	fork->abort.
+	* pinfo.h (EXITCODE_FORK_FAILED): New enum.  (from Ryan Johnson)
+	* sigproc.cc (child_info_fork::abort): Rename from handle_failure.
+	Change arguments to allow passing in a printf-like message.
+	* winsup.h (api_fatal): Delete macro definition.
+	(api_fatal): Redefine from __api_fatal.
+	(vapi_fatal): Declare new function.
+	* include/sys/strace.h (strace_vprintf): Define new macro.
+
+	* ntdll.h (_SYSTEM_INFORMATION_CLASS): Add SystemHandleInformation.
+
 2011-05-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared.cc (offsets): Reorder so that console_state is lowest in

@@ -153,7 +153,7 @@ dtable::stdio_init ()
 
   if (myself->cygstarted || ISSTATE (myself, PID_CYGPARENT))
     {
-      tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);
+      tty_min *t = cygwin_shared->tty.get_cttyp ();
       if (t && t->getpgid () == myself->pid && t->gethwnd ())
 	init_console_handler (true);
       return;
@@ -196,7 +196,7 @@ fhandler_base *
 dtable::find_archetype (device& dev)
 {
   for (unsigned i = 0; i < farchetype; i++)
-    if (archetypes[i]->get_device () == (unsigned) dev)
+    if (archetypes[i]->get_device () == (DWORD) dev)
       return archetypes[i];
   return NULL;
 }
@@ -268,9 +268,8 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
   CONSOLE_SCREEN_BUFFER_INFO buf;
   DCB dcb;
   unsigned bin = O_BINARY;
-  device dev;
+  device dev = {};
 
-  dev.devn = 0;		/* FIXME: device */
   first_fd_for_open = 0;
 
   if (!not_open (fd))
@@ -311,9 +310,9 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
     {
       /* Console I/O */
       if (!ISSTATE (myself, PID_USETTY))
-	dev = *console_dev;
-      else if (myself->ctty >= 0)
-	dev.parse (DEV_TTYS_MAJOR, myself->ctty);
+	dev.parse (FH_CONSOLE);
+      else if (myself->ctty > 0)
+	dev.parse (myself->ctty);
       else
 	dev.parse (FH_TTY);
     }
@@ -352,7 +351,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       /* Console windows are not kernel objects, so the access mask returned
 	 by NtQueryInformationFile is meaningless.  CMD always hands down
 	 stdin handles as R/O handles, but our tty slave sides are R/W. */
-      if (dev == FH_TTY || dev == FH_CONSOLE || dev.major == DEV_TTYS_MAJOR)
+      if (dev == FH_TTY || dev == FH_CONSOLE || dev.get_major () == DEV_TTYS_MAJOR)
       	access |= GENERIC_READ | GENERIC_WRITE;
       else if (NT_SUCCESS (NtQueryInformationFile (handle, &io, &fai,
 						   sizeof fai,
@@ -431,10 +430,10 @@ fh_alloc (device dev)
 {
   fhandler_base *fh = fh_unset;
 
-  switch (dev.major)
+  switch (dev.get_major ())
     {
     case DEV_TTYS_MAJOR:
-      fh = cnew (fhandler_tty_slave) (dev.minor);
+      fh = cnew (fhandler_tty_slave) (dev.get_minor ());
       break;
     case DEV_TTYM_MAJOR:
       fh = cnew (fhandler_tty_master) ();
@@ -460,8 +459,11 @@ fh_alloc (device dev)
     case DEV_SERIAL_MAJOR:
       fh = cnew (fhandler_serial) ();
       break;
+    case DEV_CONS_MAJOR:
+      fh = cnew (fhandler_console) ();
+      break;
     default:
-      switch (dev)
+      switch ((int) dev)
 	{
 	case FH_CONSOLE:
 	case FH_CONIN:
@@ -538,7 +540,7 @@ fh_alloc (device dev)
 	  break;
 	case FH_TTY:
 	  {
-	    if (myself->ctty == TTY_CONSOLE)
+	    if (iscons_dev (myself->ctty))
 	      fh = cnew (fhandler_console) ();
 	    else
 	      fh = cnew (fhandler_tty_slave) (myself->ctty);
@@ -570,10 +572,10 @@ build_fh_pc (path_conv& pc, bool set_name)
   if (!fh->use_archetype ())
     /* doesn't use archetypes */;
   else if ((fh->archetype = cygheap->fdtab.find_archetype (fh->dev ())))
-    debug_printf ("found an archetype for %s(%d/%d)", fh->get_name (), fh->dev ().major, fh->dev ().minor);
+    debug_printf ("found an archetype for %s(%d/%d)", fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor ());
   else
     {
-      debug_printf ("creating an archetype for %s(%d/%d)", fh->get_name (), fh->dev ().major, fh->dev ().minor);
+      debug_printf ("creating an archetype for %s(%d/%d)", fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor ());
       fh->archetype = fh_alloc (fh->pc.dev);
       *fh->archetype = *fh;
       fh->archetype->archetype = NULL;

@@ -996,7 +996,7 @@ ctrl_c_handler (DWORD type)
   if (!pinfo (cygwin_pid (GetCurrentProcessId ())))
     return TRUE;
 
-  tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);
+  tty_min *t = cygwin_shared->tty.get_cttyp ();
   /* Ignore this if we're not the process group leader since it should be handled
      *by* the process group leader. */
   if (myself->ctty != -1 && t->getpgid () == myself->pid &&

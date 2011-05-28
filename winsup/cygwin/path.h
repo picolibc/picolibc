@@ -17,14 +17,6 @@ details. */
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
-#define isproc_dev(devn) \
-  (devn >= FH_PROC_MIN_MINOR && devn <= FH_PROC_MAX_MINOR)
-
-#define isprocsys_dev(devn) (devn == FH_PROCSYS)
-
-#define isvirtual_dev(devn) \
-  (isproc_dev (devn) || devn == FH_CYGDRIVE || devn == FH_NETDRIVE)
-
 inline bool
 has_attribute (DWORD attributes, DWORD attribs_to_test)
 {
@@ -173,15 +165,15 @@ class path_conv
   int issymlink () const {return path_flags & PATH_SYMLINK;}
   int is_lnk_symlink () const {return path_flags & PATH_LNK;}
   int is_rep_symlink () const {return path_flags & PATH_REP;}
-  int isdevice () const {return dev.devn && dev.devn != FH_FS && dev.devn != FH_FIFO;}
-  int isfifo () const {return dev == FH_FIFO;}
-  int isspecial () const {return dev.devn && dev.devn != FH_FS;}
-  int iscygdrive () const {return dev.devn == FH_CYGDRIVE;}
+  int isdevice () const {return dev.not_device (FH_FS) && dev.not_device (FH_FIFO);}
+  int isfifo () const {return dev.is_device (FH_FIFO);}
+  int isspecial () const {return dev.not_device (FH_FS);}
+  int iscygdrive () const {return dev.is_device (FH_CYGDRIVE);}
   int is_auto_device () const {return isdevice () && !is_fs_special ();}
   int is_fs_device () const {return isdevice () && is_fs_special ();}
   int is_fs_special () const {return dev.is_fs_special ();}
   int is_lnk_special () const {return is_fs_device () || isfifo () || is_lnk_symlink ();}
-  int issocket () const {return dev.devn == FH_UNIX;}
+  int issocket () const {return dev.is_device (FH_UNIX);}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
   void set_cygexec (bool isset)
   {
@@ -298,8 +290,8 @@ class path_conv
     cfree (modifiable_path ());
     cfree ((char *) normalized_path);
   }
-  DWORD get_devn () const {return dev.devn;}
-  short get_unitn () const {return dev.minor;}
+  DWORD get_devn () {return (DWORD) dev;}
+  short get_unitn () const {return dev.get_minor ();}
   DWORD file_attributes () const {return fileattr;}
   void file_attributes (DWORD new_attr) {fileattr = new_attr;}
   DWORD fs_flags () {return fs.flags ();}

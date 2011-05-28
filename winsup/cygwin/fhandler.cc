@@ -693,7 +693,7 @@ fhandler_base::read (void *in_ptr, size_t& len)
   char *ptr = (char *) in_ptr;
   ssize_t copied_chars = get_readahead_into_buffer (ptr, len);
 
-  if (copied_chars && is_slow ())
+  if (copied_chars)
     {
       len = (size_t) copied_chars;
       goto out;
@@ -1814,7 +1814,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	res = overlapped_error;
       else
 	{
-	  io_pending = err == ERROR_IO_PENDING;
+	  io_pending = !inres && err == ERROR_IO_PENDING;
 	  if (writing && !inres)
 	    *bytes = len;
 	  res = overlapped_success;

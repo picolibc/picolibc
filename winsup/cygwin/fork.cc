@@ -234,7 +234,7 @@ frok::child (volatile char * volatile here)
       sync_with_parent ("loaded dlls", true);
     }
 
-  init_console_handler (myself->ctty >= 0);
+  init_console_handler (myself->ctty > 0);
   ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
   pthread::atforkchild ();
@@ -672,85 +672,12 @@ fork_init ()
 }
 #endif /*DEBUGGING*/
 
-#ifdef NEWVFORK
-/* Dummy function to force second assignment below to actually be
-   carried out */
-static vfork_save *
-get_vfork_val ()
-{
-  return vfork_storage.val ();
-}
-#endif
 
 extern "C" int
 vfork ()
 {
-#ifndef NEWVFORK
   debug_printf ("stub called");
   return fork ();
-#else
-  vfork_save *vf = get_vfork_val ();
-  char **esp, **pp;
-
-  if (vf == NULL)
-    vf = vfork_storage.create ();
-  else if (vf->pid)
-    return fork ();
-
-  // FIXME the tls stuff could introduce a signal race if a child process
-  // exits quickly.
-  if (!setjmp (vf->j))
-    {
-      vf->pid = -1;
-      __asm__ volatile ("movl %%esp,%0": "=r" (vf->vfork_esp):);
-      __asm__ volatile ("movl %%ebp,%0": "=r" (vf->vfork_ebp):);
-      for (pp = (char **) vf->frame, esp = vf->vfork_esp;
-	   esp <= vf->vfork_ebp + 2; pp++, esp++)
-	*pp = *esp;
-      vf->ctty = myself->ctty;
-      vf->sid = myself->sid;
-      vf->pgid = myself->pgid;
-      cygheap->ctty_on_hold = cygheap->ctty;
-      vf->console_count = cygheap->console_count;
-      debug_printf ("cygheap->ctty_on_hold %p, cygheap->console_count %d", cygheap->ctty_on_hold, cygheap->console_count);
-      int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
-      debug_printf ("%d = vfork()", res);
-      _my_tls.call_signal_handler ();	// FIXME: racy
-      vf->tls = _my_tls;
-      return res;
-    }
-
-  vf = get_vfork_val ();
-
-  for (pp = (char **) vf->frame, esp = vf->vfork_esp;
-       esp <= vf->vfork_ebp + 2; pp++, esp++)
-    *esp = *pp;
-
-  cygheap->fdtab.vfork_parent_restore ();
-
-  myself->ctty = vf->ctty;
-  myself->sid = vf->sid;
-  myself->pgid = vf->pgid;
-  termios_printf ("cygheap->ctty %p, cygheap->ctty_on_hold %p", cygheap->ctty, cygheap->ctty_on_hold);
-  cygheap->console_count = vf->console_count;
-
-  if (vf->pid < 0)
-    {
-      int exitval = vf->exitval;
-      vf->pid = 0;
-      if ((vf->pid = fork ()) == 0)
-	exit (exitval);
-    }
-
-  int pid = vf->pid;
-  vf->pid = 0;
-  debug_printf ("exiting vfork, pid %d", pid);
-  sig_dispatch_pending ();
-
-  _my_tls.call_signal_handler ();	// FIXME: racy
-  _my_tls = vf->tls;
-  return pid;
-#endif
 }
 
 /* Copy memory from one process to another. */

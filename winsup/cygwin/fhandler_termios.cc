@@ -145,8 +145,8 @@ fhandler_termios::bg_check (int sig)
   if (sig < 0)
     sig = -sig;
 
-  termios_printf ("bg I/O pgid %d, tpgid %d, %s, ntty tty%d", myself->pgid, tc->getpgid (),
-		  myctty (), tc->ntty);
+  termios_printf ("bg I/O pgid %d, tpgid %d, %s, ntty %s", myself->pgid, tc->getpgid (),
+		  myctty (), tc->ttyname ());
 
   if (tc->getsid () == 0)
     {

@@ -78,50 +78,112 @@ beep ()
   MessageBeep (MB_OK);
 }
 
+console_state *
+open_shared_console (HWND hw, HANDLE& h, shared_locations& m)
+{
+  wchar_t namebuf[(sizeof "XXXXXXXXXXXXXXXXXX-consNNNNNNNNNN")];
+  __small_swprintf (namebuf, L"%S-cons%p", &installation_key, hw);
+  h = NULL;
+  return (console_state *) open_shared (namebuf, 0, h,
+					sizeof (*shared_console_info),
+					&m); 
+}
+class console_unit
+{
+  int n;
+  unsigned long bitmask;
+  HWND me;
+
+public:
+  operator int () const {return n;}
+  console_unit (HWND);
+  friend BOOL CALLBACK enum_windows (HWND, LPARAM);
+};
+
+BOOL CALLBACK
+enum_windows (HWND hw, LPARAM lp)
+{
+  console_unit *this1 = (console_unit *) lp;
+  if (hw == this1->me)
+    return TRUE;
+  shared_locations m = SH_JUSTOPEN;
+  HANDLE h;
+  console_state *cs;
+  if ((cs = open_shared_console (hw, h, m)))
+    {
+      this1->bitmask ^= 1 << cs->tty_min_state.getntty ();
+      UnmapViewOfFile ((void *) cs);
+      CloseHandle (h);
+    }
+  return TRUE;
+}
+
+console_unit::console_unit (HWND me0):
+  bitmask (0xffffffff), me (me0)
+{
+  EnumWindows (enum_windows, (LPARAM) this);
+  n = (_minor_t) ffs (bitmask) - 1;
+  if (n < 0)
+    api_fatal ("console device allocation failure - too many consoles in use, max consoles is 32");
+}
+
+
+bool
+fhandler_console::set_unit ()
+{
+  bool need_initializing;
+  if (shared_console_info)
+    need_initializing = false;
+  else
+    {
+      HWND me = GetConsoleWindow ();
+      shared_locations m = SH_JUSTCREATE;
+      shared_console_info = open_shared_console (me, cygheap->console_h, m);
+      ProtectHandleINH (cygheap->console_h);
+      if ((need_initializing = m != SH_JUSTOPEN))
+	{
+	  lock_ttys here;
+	  shared_console_info->tty_min_state.setntty (DEV_CONS_MAJOR, console_unit (me));
+	}
+    }
+
+  dev_state = &shared_console_info->dev_state;
+  return need_initializing;
+}
+
 /* Allocate and initialize the shared record for the current console.
    Returns a pointer to shared_console_info. */
 tty_min *
-fhandler_console::get_tty_stuff (int flags = 0)
+fhandler_console::get_tty_stuff ()
 {
-  if (dev_state)
-    return &shared_console_info->tty_min_state;
+  if (set_unit ())
+      {
 
-  shared_console_info =
-    (console_state *) open_shared (NULL, 0, cygheap->console_h,
-				   sizeof (*shared_console_info),
-				   SH_SHARED_CONSOLE);
-  dev_state = &shared_console_info->dev_state;
-
-  ProtectHandleINH (cygheap->console_h);
-  if (!shared_console_info->tty_min_state.ntty)
-    {
-      shared_console_info->tty_min_state.setntty (TTY_CONSOLE);
-
-      dev_state->scroll_region.Bottom = -1;
-      dev_state->dwLastCursorPosition.X = -1;
-      dev_state->dwLastCursorPosition.Y = -1;
-      dev_state->dwLastMousePosition.X = -1;
-      dev_state->dwLastMousePosition.Y = -1;
-      dev_state->dwLastButtonState = 0;	/* none pressed */
-      dev_state->last_button_code = 3;	/* released */
-      dev_state->underline_color = FOREGROUND_GREEN | FOREGROUND_BLUE;
-      dev_state->dim_color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-      dev_state->meta_mask = LEFT_ALT_PRESSED;
-      /* Set the mask that determines if an input keystroke is modified by
-	 META.  We set this based on the keyboard layout language loaded
-	 for the current thread.  The left <ALT> key always generates
-	 META, but the right <ALT> key only generates META if we are using
-	 an English keyboard because many "international" keyboards
-	 replace common shell symbols ('[', '{', etc.) with accented
-	 language-specific characters (umlaut, accent grave, etc.).  On
-	 these keyboards right <ALT> (called AltGr) is used to produce the
-	 shell symbols and should not be interpreted as META. */
-      if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
-	dev_state->meta_mask |= RIGHT_ALT_PRESSED;
-      dev_state->set_default_attr ();
-      dev_state->backspace_keycode = CERASE;
-      shared_console_info->tty_min_state.sethwnd ((HWND) INVALID_HANDLE_VALUE);
-    }
+	dev_state->scroll_region.Bottom = -1;
+	dev_state->dwLastCursorPosition.X = -1;
+	dev_state->dwLastCursorPosition.Y = -1;
+	dev_state->dwLastMousePosition.X = -1;
+	dev_state->dwLastMousePosition.Y = -1;
+	dev_state->dwLastButtonState = 0;	/* none pressed */
+	dev_state->last_button_code = 3;	/* released */
+	dev_state->underline_color = FOREGROUND_GREEN | FOREGROUND_BLUE;
+	dev_state->dim_color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+	dev_state->meta_mask = LEFT_ALT_PRESSED;
+	/* Set the mask that determines if an input keystroke is modified by
+	   META.  We set this based on the keyboard layout language loaded
+	   for the current thread.  The left <ALT> key always generates
+	   META, but the right <ALT> key only generates META if we are using
+	   an English keyboard because many "international" keyboards
+	   replace common shell symbols ('[', '{', etc.) with accented
+	   language-specific characters (umlaut, accent grave, etc.).  On
+	   these keyboards right <ALT> (called AltGr) is used to produce the
+	   shell symbols and should not be interpreted as META. */
+	if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
+	  dev_state->meta_mask |= RIGHT_ALT_PRESSED;
+	dev_state->set_default_attr ();
+	dev_state->backspace_keycode = CERASE;
+	shared_console_info->tty_min_state.sethwnd ((HWND) INVALID_HANDLE_VALUE);
+      }
 
   return &shared_console_info->tty_min_state;
 }
@@ -129,13 +191,14 @@ fhandler_console::get_tty_stuff (int flags = 0)
 /* Return the tty structure associated with a given tty number.  If the
    tty number is < 0, just return a dummy record. */
 tty_min *
-tty_list::get_tty (int n)
+tty_list::get_cttyp ()
 {
   static tty_min nada;
-  if (n == TTY_CONSOLE)
+  _dev_t n = myself->ctty;
+  if (iscons_dev (n))
     return &shared_console_info->tty_min_state;
-  else if (n >= 0)
-    return &cygwin_shared->tty.ttys[n];
+  else if (n > 0)
+    return &ttys[device::minor (n)];
   else
     return &nada;
 }
@@ -695,7 +758,7 @@ fhandler_console::open (int flags, mode_t)
 {
   HANDLE h;
 
-  tcinit (get_tty_stuff (flags), false);
+  tcinit (get_tty_stuff (), false);
 
   set_io_handle (NULL);
   set_output_handle (NULL);
@@ -847,7 +910,7 @@ fhandler_console::output_tcsetattr (int, struct termios const *t)
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
 
   int res = SetConsoleMode (get_output_handle (), flags) ? 0 : -1;
-  if (!res)
+  if (res)
     __seterrno_from_win_error (GetLastError ());
   syscall_printf ("%d = tcsetattr (,%x) (ENABLE FLAGS %x) (lflag %x oflag %x)",
 		  res, t, flags, t->c_lflag, t->c_oflag);
@@ -974,7 +1037,8 @@ fhandler_console::tcgetattr (struct termios *t)
 fhandler_console::fhandler_console () :
   fhandler_termios ()
 {
-  dev ().parse (FH_CONSOLE);
+  get_tty_stuff ();
+  dev ().parse (shared_console_info->tty_min_state.getntty ());
   trunc_buf.len = 0;
 }
 
@@ -2121,7 +2185,7 @@ set_console_title (char *title)
 void
 fhandler_console::fixup_after_fork_exec (bool execing)
 {
-  get_tty_stuff ();
+  ((fhandler_console *)archetype)->tc = tc = get_tty_stuff ();
 }
 
 // #define WINSTA_ACCESS (WINSTA_READATTRIBUTES | STANDARD_RIGHTS_READ | STANDARD_RIGHTS_WRITE | WINSTA_CREATEDESKTOP | WINSTA_EXITWINDOWS)

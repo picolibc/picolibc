@@ -57,13 +57,14 @@ const device dev_dgram_storage =
 
 const device dev_bad_storage =
   {"", {FH_BAD}, ""};
-#define BRACK(x) {x}
+#define BRACK(x) {devn_int: x}
 
 %storage_here
 }
 %%
 "/dev/tty", BRACK(FH_TTY), "/dev/tty"
 "/dev/tty%(0-63)d", BRACK(FHDEV(DEV_TTYS_MAJOR, {$1})), "/dev/tty{$1}", ttys_dev
+"/dev/cons%(0-63)d", BRACK(FHDEV(DEV_CONS_MAJOR, {$1})), "/dev/cons{$1}", cons_dev
 "/dev/console", BRACK(FH_CONSOLE), "/dev/console", console_dev
 "/dev/ttym", BRACK(FH_TTYM), "/dev/ttym", ttym_dev
 "/dev/ptmx", BRACK(FH_PTYM), "/dev/ptmx"
@@ -127,17 +128,17 @@ device::parse (_major_t major, _minor_t minor)
 {
   _dev_t dev = FHDEV (major, minor);
 
-  devn = 0;
+  d.devn = 0;
 
   for (unsigned i = 0; i < (sizeof (dev_storage) / sizeof (dev_storage[0])); i++)
-    if (dev_storage[i].devn == dev)
+    if (dev_storage[i].d.devn == dev)
       {
 	*this = dev_storage[i];
 	break;
       }
 
   if (!*this)
-    devn = FHDEV (major, minor);
+    d.devn = FHDEV (major, minor);
 }
 
 void

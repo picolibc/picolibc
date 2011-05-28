@@ -1109,13 +1109,10 @@ _exit (int n)
 extern "C" void cygwin_stackdump ();
 
 extern "C" void
-__api_fatal (const char *fmt, ...)
+vapi_fatal (const char *fmt, va_list ap)
 {
   char buf[4096];
-  va_list ap;
-
-  va_start (ap, fmt);
-  int n = __small_sprintf (buf, "%P: *** fatal error - ");
+  int n = __small_sprintf (buf, "%P: *** fatal error %s- ", in_forkee ? "in forked process " : "");
   __small_vsprintf (buf + n, fmt, ap);
   va_end (ap);
   strace.prntf (_STRACE_SYSTEM, NULL, "%s", buf);
@@ -1125,6 +1122,15 @@ __api_fatal (const char *fmt, ...)
 #endif
   cygwin_stackdump ();
   myself.exit (__api_fatal_exit_val);
+}
+
+extern "C" void
+api_fatal (const char *fmt, ...)
+{
+  va_list ap;
+
+  va_start (ap, fmt);
+  vapi_fatal (fmt, ap);
 }
 
 void

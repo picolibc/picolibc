@@ -251,6 +251,7 @@ typedef enum _SYSTEM_INFORMATION_CLASS
   SystemTimeOfDayInformation = 3,
   SystemProcessesAndThreadsInformation = 5,
   SystemProcessorTimes = 8,
+  SystemHandleInformation = 16,
   SystemPagefileInformation = 18,
   /* There are a lot more of these... */
 } SYSTEM_INFORMATION_CLASS;

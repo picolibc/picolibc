@@ -76,7 +76,7 @@ static const virt_tab_t process_tab[] =
   { _VN ("uid"),        FH_PROCESS,   virt_file,      format_process_uid },
   { _VN ("winexename"), FH_PROCESS,   virt_file,      format_process_winexename },
   { _VN ("winpid"),     FH_PROCESS,   virt_file,      format_process_winpid },
-  { NULL, 0,	        0,            virt_none,      NULL }
+  { NULL, 0,	        FH_BAD,       virt_none,      NULL }
 };
 
 static const int PROCESS_LINK_COUNT =
@@ -418,9 +418,11 @@ format_process_gid (void *data, char *&destbuf)
 static _off64_t
 format_process_ctty (void *data, char *&destbuf)
 {
+  device d;
   _pinfo *p = (_pinfo *) data;
-  destbuf = (char *) crealloc_abort (destbuf, 40);
-  return __small_sprintf (destbuf, "%d\n", p->ctty);
+  d.parse (p->ctty);
+  destbuf = (char *) crealloc_abort (destbuf, strlen (d.name) + 2);
+  return __small_sprintf (destbuf, "%s\n", d.name);
 }
 
 static _off64_t
@@ -1108,7 +1110,7 @@ format_process_stat (void *data, char *&destbuf)
 				   "%lu",
 			  p->pid, cmd,
 			  state,
-			  p->ppid, p->pgid, p->sid, makedev (FH_TTYS, p->ctty),
+			  p->ppid, p->pgid, p->sid, p->ctty,
 			  -1, 0, fault_count, fault_count, 0, 0, utime, stime,
 			  utime, stime, priority, 0, 0, 0,
 			  start_time, vmsize,

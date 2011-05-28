@@ -1,6 +1,6 @@
 /* fhandler_virtual.h: Header for virtual fhandlers
 
-   Copyright 2009, 2010 Red Hat, Inc.
+   Copyright 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,7 +11,7 @@ details. */
 struct virt_tab_t {
   const char *name;
   size_t name_len;
-  __dev32_t fhandler;
+  fh_devices fhandler;
   virtual_ftype_t type;
   _off64_t (*format_func)(void *data, char *&);
 };

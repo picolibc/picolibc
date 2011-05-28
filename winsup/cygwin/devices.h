@@ -8,6 +8,9 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _DEVICES_H
+#define _DEVICES_H
+
 typedef unsigned short _major_t;
 typedef unsigned short _minor_t;
 typedef mode_t _mode_t;
@@ -17,6 +20,7 @@ typedef __dev32_t _dev_t;
 #define _minor(dev) ((dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
 #define _major(dev) ((dev) >> (sizeof (_major_t) * 8))
 
+#define MAX_CONSOLES 31
 enum fh_devices
 {
   FH_TTY     = FHDEV (5, 0),
@@ -24,6 +28,10 @@ enum fh_devices
   FH_PTYM    = FHDEV (5, 2),	/* /dev/ptmx */
   FH_CONIN   = FHDEV (5, 255),
   FH_CONOUT  = FHDEV (5, 254),
+
+  DEV_CONS_MAJOR = 3,
+  FH_CONS     = FHDEV (DEV_CONS_MAJOR, 0),
+  FH_CONS_MAX = FHDEV (DEV_CONS_MAJOR, MAX_CONSOLES),
 
   DEV_TTYM_MAJOR = 128,
   FH_TTYM    = FHDEV (DEV_TTYM_MAJOR, 0),
@@ -40,17 +48,17 @@ enum fh_devices
   FH_CLIPBOARD=FHDEV (13, 254),
 
   /* begin /proc directories */
-  FH_PROC_MAX_MINOR = FHDEV (0, 255),
-
-  FH_PROC    = FHDEV (0, 255),
-  FH_PROCESS = FHDEV (0, 254),
-  FH_REGISTRY= FHDEV (0, 253),
-  FH_PROCNET = FHDEV (0, 252),
-  FH_PROCESSFD = FHDEV (0, 251),
-  FH_PROCSYS = FHDEV (0, 250),
-  FH_PROCSYSVIPC = FHDEV (0, 249),
 
   FH_PROC_MIN_MINOR = FHDEV (0, 200),
+  FH_PROCSYSVIPC = FHDEV (0, 249),
+  FH_PROCSYS = FHDEV (0, 250),
+  FH_PROCESSFD = FHDEV (0, 251),
+  FH_PROCNET = FHDEV (0, 252),
+  FH_REGISTRY= FHDEV (0, 253),
+  FH_PROCESS = FHDEV (0, 254),
+  FH_PROC    = FHDEV (0, 255),
+  FH_PROC_MAX_MINOR = FHDEV (0, 255),
+
   /* end /proc directories */
 
   FH_PIPE    = FHDEV (0, 199),
@@ -245,15 +253,18 @@ enum fh_devices
 struct device
 {
   const char *name;
-  union
+  union __cygwin_dev
   {
     _dev_t devn;
+    DWORD devn_dword;
+    int devn_int;
+    fh_devices devn_fh_devices;
     struct
     {
       _minor_t minor;
       _major_t major;
     };
-  };
+  } d;
   const char *native;
   _mode_t mode;
   bool dev_on_fs;
@@ -264,14 +275,40 @@ struct device
   void parsedisk (int, int);
   inline bool setunit (unsigned n)
   {
-    minor = n;
+    d.minor = n;
     return true;
   }
   static void init ();
-  inline operator int () const {return devn;}
+
+  static _major_t major (_dev_t n)
+  {
+    __cygwin_dev d;
+    d.devn = n;
+    return d.major;
+  }
+  static _minor_t minor (_dev_t n)
+  {
+    __cygwin_dev d;
+    d.devn = n;
+    return d.minor;
+  }
+  static _major_t major (int n) {return major ((_dev_t) n);}
+  static _minor_t minor (int n) {return minor ((_dev_t) n);}
+
+  bool is_device (_dev_t n) const {return n == d.devn; }
+  bool not_device (_dev_t n) const {return d.devn && n != d.devn; }
+
+  _minor_t get_minor () const {return d.minor;}
+  _minor_t get_major () const {return d.major;}
+
+  inline operator int () {return d.devn_int;}
+  inline operator fh_devices () {return d.devn_fh_devices;}
+  inline operator bool () {return !!d.devn_int;}
+  inline operator DWORD& () {return d.devn_dword;}
+  fh_devices operator = (fh_devices n) {return d.devn_fh_devices = n;}
   inline void setfs (bool x) {dev_on_fs = x;}
-  inline bool isfs () const {return dev_on_fs || devn == FH_FS;}
-  inline bool is_fs_special () const {return dev_on_fs && devn != FH_FS;}
+  inline bool isfs () const {return dev_on_fs || d.devn == FH_FS;}
+  inline bool is_fs_special () const {return dev_on_fs && d.devn != FH_FS;}
 };
 
 extern const device *console_dev;
@@ -302,3 +339,16 @@ extern const device dev_fh_storage;
 #define fh_dev (&dev_fh_storage)
 extern const device dev_fs_storage;
 #define fs_dev (&dev_fs_storage)
+
+#define isproc_dev(devn) \
+  (devn >= FH_PROC_MIN_MINOR && devn <= FH_PROC_MAX_MINOR)
+
+#define isprocsys_dev(devn) (devn == FH_PROCSYS)
+
+#define isvirtual_dev(devn) \
+  (isproc_dev (devn) || devn == FH_CYGDRIVE || devn == FH_NETDRIVE)
+
+#define iscons_dev(n)  (device::major (n) == DEV_CONS_MAJOR)
+
+#define istty_slave_dev(n) (device::major (n) == DEV_TTYS_MAJOR)
+#endif /*_DEVICES_H*/

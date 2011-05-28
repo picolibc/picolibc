@@ -150,7 +150,7 @@ noload:									\n\
 	leal	8(%edx),%eax	# Location of name of function		\n\
 	pushl	%eax							\n\
 	pushl	$msg1		# The message				\n\
-	call	___api_fatal	# Print message. Never returns		\n\
+	call	_api_fatal	# Print message. Never returns		\n\
 									\n\
 	.globl	dll_func_load						\n\
 dll_func_load:								\n\
@@ -430,6 +430,7 @@ LoadDLLfunc (CreateWindowStationW, 16, user32)
 LoadDLLfunc (DefWindowProcW, 16, user32)
 LoadDLLfunc (DispatchMessageW, 4, user32)
 LoadDLLfunc (EmptyClipboard, 0, user32)
+LoadDLLfunc (EnumWindows, 8, user32)
 LoadDLLfunc (GetClipboardData, 4, user32)
 LoadDLLfunc (GetForegroundWindow, 0, user32)
 LoadDLLfunc (GetKeyboardLayout, 4, user32)

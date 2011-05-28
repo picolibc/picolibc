@@ -1,6 +1,6 @@
 /* tty.h: shared tty info for cygwin
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2006, 2009, 2010 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2006, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,7 +13,7 @@ details. */
 #define INP_BUFFER_SIZE 256
 #define OUT_BUFFER_SIZE 256
 #define NTTYS		128
-#define real_tty_attached(p)	((p)->ctty >= 0 && (p)->ctty != TTY_CONSOLE)
+#define real_tty_attached(p)	((p)->ctty >= 0 && !iscons_dev ((p)->ctty))
 
 /* Input/Output/ioctl events */
 
@@ -33,6 +33,7 @@ details. */
 #define MIN_CTRL_C_SLOP 50
 #endif
 
+#include <devices.h>
 class tty_min
 {
   pid_t sid;	/* Session ID of tty */
@@ -45,7 +46,7 @@ class tty_min
 public:
   pid_t pgid;
   int output_stopped;
-  int ntty;
+  fh_devices ntty;
   DWORD last_ctrl_c;	/* tick count of last ctrl-c */
   HWND hwnd;		/* Console window handle tty belongs to */
 
@@ -70,14 +71,17 @@ public:
   int ioctl_retval;
   int write_error;
 
-  void setntty (int n) {ntty = n;}
-  pid_t getpgid () {return pgid;}
+  void setntty (_major_t t, int n) {ntty = (fh_devices) FHDEV (t, n);} 
+  int getntty () const {return ntty;}
+  int get_unit () const {return device::minor (ntty);}
+  pid_t getpgid () const {return pgid;}
   void setpgid (int pid) {pgid = pid;}
-  int getsid () {return sid;}
+  int getsid () const {return sid;}
   void setsid (pid_t tsid) {sid = tsid;}
   void kill_pgrp (int sig);
-  HWND gethwnd () {return hwnd;}
+  HWND gethwnd () const {return hwnd;}
   void sethwnd (HWND wnd) {hwnd = wnd;}
+  const char *ttyname () __attribute ((regparm (1)));
 };
 
 class fhandler_pty_master;
@@ -117,13 +121,13 @@ class tty_list
   static HANDLE mutex;
 
 public:
-  tty * operator [](int n) {return ttys + n;}
+  tty * operator [](int n) {return ttys + device::minor (n);}
   int allocate (bool); /* true if allocate a tty, pty otherwise */
   int connect (int);
   void terminate ();
   void init ();
-  tty_min *get_tty (int n);
-  int __stdcall attach (int);
+  tty_min *get_cttyp ();
+  int __stdcall attach (int n) __attribute__ ((regparm (2)));
   static void __stdcall init_session ();
   friend class lock_ttys;
 };

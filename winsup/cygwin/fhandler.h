@@ -200,10 +200,10 @@ class fhandler_base
   /* Non-virtual simple accessor functions. */
   void set_io_handle (HANDLE x) { io_handle = x; }
 
-  DWORD& get_device () { return dev ().devn; }
-  DWORD get_major () { return dev ().major; }
-  DWORD get_minor () { return dev ().minor; }
-  virtual int get_unit () { return dev ().minor; }
+  DWORD& get_device () { return dev (); }
+  DWORD get_major () { return dev ().get_major (); }
+  DWORD get_minor () { return dev ().get_minor (); }
+  virtual int get_unit () { return dev ().get_minor (); }
 
   int get_access () const { return access; }
   void set_access (int x) { access = x; }
@@ -414,7 +414,6 @@ public:
   virtual void seekdir (DIR *, long);
   virtual void rewinddir (DIR *);
   virtual int closedir (DIR *);
-  virtual bool is_slow () {return false;}
   bool is_auto_device () {return isdevice () && !dev ().isfs ();}
   bool is_fs_special () {return pc.is_fs_special ();}
   bool issymlink () {return pc.issymlink ();}
@@ -906,7 +905,6 @@ class fhandler_serial: public fhandler_base
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
-  bool is_slow () {return true;}
   size_t size () const { return sizeof (*this);}
 };
 
@@ -1109,8 +1107,8 @@ class fhandler_console: public fhandler_termios
   void set_close_on_exec (bool val);
   void set_input_state ();
   void send_winch_maybe ();
-  tty_min *get_tty_stuff (int);
-  bool is_slow () {return true;}
+  tty_min *get_tty_stuff ();
+  bool set_unit ();
   static bool need_invisible ();
   static bool has_a () {return !invisible_console;}
   size_t size () const { return sizeof (*this);}
@@ -1144,7 +1142,6 @@ class fhandler_tty_common: public fhandler_termios
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
-  bool is_slow () {return true;}
 };
 
 class fhandler_tty_slave: public fhandler_tty_common
@@ -1435,7 +1432,7 @@ class fhandler_proc: public fhandler_virtual
   fhandler_proc ();
   virtual_ftype_t exists();
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
-  static DWORD get_proc_fhandler(const char *path);
+  static fh_devices get_proc_fhandler (const char *path);
 
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));

@@ -1369,7 +1369,7 @@ umask (mode_t mask)
 int
 chmod_device (path_conv& pc, mode_t mode)
 {
-  return mknod_worker (pc.get_win32 (), pc.dev.mode & S_IFMT, mode, pc.dev.major, pc.dev.minor);
+  return mknod_worker (pc.get_win32 (), pc.dev.mode & S_IFMT, mode, pc.dev.get_major (), pc.dev.get_minor ());
 }
 
 #define FILTERED_MODE(m)	((m) & (S_ISUID | S_ISGID | S_ISVTX \
@@ -2370,13 +2370,16 @@ ttyname (int fd)
 extern "C" char *
 ctermid (char *str)
 {
-  static NO_COPY char buf[16];
   if (str == NULL)
-    str = buf;
-  if (!real_tty_attached (myself))
-    strcpy (str, "/dev/conin");
+    str = _my_tls.locals.ttybuf;
+  if (myself->ctty < 0)
+    strcpy (str, "no tty");
   else
-    __small_sprintf (str, "/dev/tty%d", myself->ctty);
+    {
+      device d;
+      d.parse (myself->ctty);
+      strcpy (str, d.name);
+    }
   return str;
 }
 

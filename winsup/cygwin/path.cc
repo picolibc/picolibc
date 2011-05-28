@@ -712,7 +712,7 @@ path_conv::check (const char *src, unsigned opt,
 
 	  sym.pflags |= pflags_or;
 
-	  if (dev.major == DEV_CYGDRIVE_MAJOR)
+	  if (dev.get_major () == DEV_CYGDRIVE_MAJOR)
 	    {
 	      if (!component)
 		fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
@@ -720,13 +720,13 @@ path_conv::check (const char *src, unsigned opt,
 		{
 		  fileattr = getfileattr (THIS_path,
 					  sym.pflags & MOUNT_NOPOSIX);
-		  dev.devn = FH_FS;
+		  dev = FH_FS;
 		}
 	      goto out;
 	    }
 	  else if (dev == FH_DEV)
 	    {
-	      dev.devn = FH_FS;
+	      dev = FH_FS;
 #if 0
 	      fileattr = getfileattr (THIS_path, sym.pflags & MOUNT_NOPOSIX);
 	      if (!component && fileattr == INVALID_FILE_ATTRIBUTES)
@@ -736,7 +736,7 @@ path_conv::check (const char *src, unsigned opt,
 		}
 #endif
 	    }
-	  else if (isvirtual_dev (dev.devn))
+	  else if (isvirtual_dev (dev))
 	    {
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
 	      fhandler_virtual *fh = (fhandler_virtual *) build_fh_dev (dev, path_copy);
@@ -804,12 +804,12 @@ path_conv::check (const char *src, unsigned opt,
 		      fileattr = INVALID_FILE_ATTRIBUTES;
 		    goto virtual_component_retry;
 		}
-	      if (component == 0 || dev.devn != FH_NETDRIVE)
+	      if (component == 0 || dev != FH_NETDRIVE)
 		path_flags |= PATH_RO;
 	      goto out;
 	    }
 	  /* devn should not be a device.  If it is, then stop parsing now. */
-	  else if (dev.devn != FH_FS)
+	  else if (dev != FH_FS)
 	    {
 	      fileattr = 0;
 	      path_flags = sym.pflags;
@@ -1008,7 +1008,7 @@ out:
   set_path (THIS_path);
   if (add_ext)
     add_ext_from_sym (sym);
-  if (dev.devn == FH_NETDRIVE && component)
+  if (dev == FH_NETDRIVE && component)
     {
       /* This case indicates a non-existant resp. a non-retrievable
 	 share.  This happens for instance if the share is a printer.
@@ -1017,7 +1017,7 @@ out:
 	 is used on it. */
       dev.parse (FH_FS);
     }
-  else if (isproc_dev (dev.devn) && fileattr == INVALID_FILE_ATTRIBUTES)
+  else if (isproc_dev (dev) && fileattr == INVALID_FILE_ATTRIBUTES)
     {
       /* FIXME: Usually we don't set error to ENOENT if a file doesn't
          exist.  This is typically indicated by the fileattr content.

@@ -1180,7 +1180,7 @@ fhandler_dev_tape::unlock (int ret)
 fhandler_dev_tape::fhandler_dev_tape ()
   : fhandler_dev_raw ()
 {
-  debug_printf ("unit: %d", dev ().minor);
+  debug_printf ("unit: %d", dev ().get_minor ());
 }
 
 int

@@ -1,7 +1,7 @@
 /* tty.cc
 
    Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009,
-   2010 Red Hat, Inc.
+   2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -55,7 +55,7 @@ ttyslot (void)
 {
   if (NOTSTATE (myself, PID_USETTY))
     return -1;
-  return myself->ctty;
+  return device::minor (myself->ctty);
 }
 
 HANDLE NO_COPY tty_list::mutex = NULL;
@@ -119,21 +119,24 @@ tty::create_master (int ttynum)
       strncpy (our_utmp.ut_id, our_utmp.ut_line + len, UT_IDLEN);
       our_utmp.ut_type = USER_PROCESS;
       our_utmp.ut_pid = myself->pid;
-      myself->ctty = ttynum;
+      myself->ctty = FHDEV (DEV_TTYS_MAJOR, ttynum);
       login (&our_utmp);
     }
 }
 
 int __stdcall
-tty_list::attach (int num)
+tty_list::attach (int n)
 {
-  if (num != -1)
-    {
-      return connect (num);
-    }
-  if (NOTSTATE (myself, PID_USETTY))
-    return -1;
-  return allocate (true);
+  int res;
+  if (iscons_dev (n))
+    res = -1;
+  else if (n != -1)
+    res = connect (device::minor (n));
+  else if (ISSTATE (myself, PID_USETTY))
+    res = allocate (true);
+  else
+    res = -1;
+  return res;
 }
 
 void
@@ -141,10 +144,10 @@ tty_list::terminate ()
 {
   if (NOTSTATE (myself, PID_USETTY))
     return;
-  int ttynum = myself->ctty;
+  int ttynum = device::minor (myself->ctty);
 
   /* Keep master running till there are connected clients */
-  if (ttynum != -1 && tty_master && ttys[ttynum].master_pid == myself->pid)
+  if (myself->ctty != -1 && tty_master && ttys[ttynum].master_pid == myself->pid)
     {
       tty *t = ttys + ttynum;
       /* Wait for children which rely on tty handling in this process to
@@ -202,7 +205,7 @@ tty_list::init ()
   for (int i = 0; i < NTTYS; i++)
     {
       ttys[i].init ();
-      ttys[i].setntty (i);
+      ttys[i].setntty (DEV_TTYS_MAJOR, i);
     }
 }
 
@@ -292,7 +295,7 @@ tty::exists ()
   /* Attempt to open the from-master side of the tty.  If it is accessible
      then it exists although it may have been privileges to actually use it. */
   char pipename[sizeof("ttyNNNN-from-master")];
-  __small_sprintf (pipename, "tty%d-from-master", ntty);
+  __small_sprintf (pipename, "tty%d-from-master", get_unit ());
   HANDLE r, w;
   int res = fhandler_pipe::create_selectable (&sec_none_nih, r, w, 0, pipename);
   if (res)
@@ -323,7 +326,7 @@ HANDLE
 tty::open_mutex (const char *mutex, ACCESS_MASK access)
 {
   char buf[MAX_PATH];
-  shared_name (buf, mutex, ntty);
+  shared_name (buf, mutex, get_unit ());
   return OpenMutex (access, TRUE, buf);
 }
 
@@ -331,7 +334,7 @@ HANDLE
 tty::open_inuse (ACCESS_MASK access)
 {
   char buf[MAX_PATH];
-  shared_name (buf, TTY_SLAVE_ALIVE, ntty);
+  shared_name (buf, TTY_SLAVE_ALIVE, get_unit ());
   return OpenEvent (access, FALSE, buf);
 }
 
@@ -341,7 +344,7 @@ tty::create_inuse (PSECURITY_ATTRIBUTES sa)
   HANDLE h;
   char buf[MAX_PATH];
 
-  shared_name (buf, TTY_SLAVE_ALIVE, ntty);
+  shared_name (buf, TTY_SLAVE_ALIVE, get_unit ());
   h = CreateEvent (sa, TRUE, FALSE, buf);
   termios_printf ("%s %p", buf, h);
   if (!h)
@@ -366,7 +369,7 @@ tty::get_event (const char *fmt, PSECURITY_ATTRIBUTES sa, BOOL manual_reset)
   HANDLE hev;
   char buf[MAX_PATH];
 
-  shared_name (buf, fmt, ntty);
+  shared_name (buf, fmt, get_unit ());
   if (!sa)
     sa = &sec_all;
   if (!(hev = CreateEvent (sa, manual_reset, FALSE, buf)))
@@ -393,4 +396,12 @@ void
 lock_ttys::release ()
 {
   ReleaseMutex (tty_list::mutex);
+}
+
+const char *
+tty_min::ttyname ()
+{
+  device d;
+  d.parse (ntty);
+  return d.name;
 }

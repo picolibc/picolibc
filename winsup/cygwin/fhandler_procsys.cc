@@ -271,7 +271,7 @@ fhandler_procsys::fstat (struct __stat64 *buf)
   buf->st_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
   buf->st_uid = 544;
   buf->st_gid = 18;
-  buf->st_dev = buf->st_rdev = dev ().devn;
+  buf->st_dev = buf->st_rdev = (int) dev ();
   buf->st_ino = get_ino ();
   switch (exists (buf))
     {

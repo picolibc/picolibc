@@ -19,6 +19,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
+#include "child_info.h"
 #include "cygtls.h"
 #include "exception.h"
 #include <wchar.h>
@@ -131,6 +132,21 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
     {
       if (!in_forkee)
 	d->count++;	/* Yes.  Bump the usage count. */
+      else
+	{
+	  if (d->p.data_start != p->data_start)
+	    fork_info->abort ("data segment start: parent(%p) != child(%p)",
+			      d->p.data_start, p->data_start);
+	  else if (d->p.data_end != p->data_end)
+	    fork_info->abort ("data segment end: parent(%p) != child(%p)",
+			      d->p.data_end, p->data_end);
+	  else if (d->p.bss_start != p->bss_start)
+	    fork_info->abort ("data segment start: parent(%p) != child(%p)",
+			      d->p.bss_start, p->bss_start);
+	  else if (d->p.bss_end != p->bss_end)
+	    fork_info->abort ("bss segment end: parent(%p) != child(%p)",
+			      d->p.bss_end, p->bss_end);
+	}
       d->p = p;
     }
   else

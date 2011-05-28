@@ -68,7 +68,7 @@ static const virt_tab_t proc_tab[] = {
   { _VN ("sysvipc"),	 FH_PROCSYSVIPC,	virt_directory,	NULL },
   { _VN ("uptime"),	 FH_PROC,	virt_file,	format_proc_uptime },
   { _VN ("version"),	 FH_PROC,	virt_file,	format_proc_version },
-  { NULL, 0,	   	 0,		virt_none,	NULL }
+  { NULL, 0,	   	 FH_BAD,	virt_none,	NULL }
 };
 
 #define PROC_DIR_COUNT 4
@@ -96,7 +96,7 @@ virt_tab_t *
 virt_tab_search (const char *path, bool prefix, const virt_tab_t *table,
 		 size_t nelem)
 {
-  virt_tab_t key = { path, 0, 0, virt_none, NULL };
+  virt_tab_t key = { path, 0, FH_BAD, virt_none, NULL };
   virt_tab_t *entry = (virt_tab_t *) bsearch (&key, table, nelem,
 					      sizeof (virt_tab_t),
 					      proc_tab_cmp);
@@ -108,7 +108,7 @@ virt_tab_search (const char *path, bool prefix, const virt_tab_t *table,
 
 /* Auxillary function that returns the fhandler associated with the given
    path. */
-DWORD
+fh_devices
 fhandler_proc::get_proc_fhandler (const char *path)
 {
   debug_printf ("get_proc_fhandler(%s)", path);
@@ -1149,7 +1149,7 @@ format_proc_partitions (void *, char *&destbuf)
 	}
       dev.parsedisk (drive_num, 0);
       bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
-				 dev.major, dev.minor,
+				 dev.get_major (), dev.get_minor (),
 				 size >> 10, dev.name + 5);
       /* Fetch drive layout info to get size of all partitions on the disk. */
       if (wincap.has_disk_ex_ioctls ()
@@ -1202,7 +1202,7 @@ format_proc_partitions (void *, char *&destbuf)
 	      continue;
 	    dev.parsedisk (drive_num, part_num);
 	    bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
-				       dev.major, dev.minor,
+				       dev.get_major (), dev.get_minor (),
 				       size >> 10, dev.name + 5);
 	  }
       NtClose (devhdl);
