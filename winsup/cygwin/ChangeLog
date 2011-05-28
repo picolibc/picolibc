@@ -1,3 +1,16 @@
+2011-05-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dll_init.cc (reserve_upto): Remove.
+	(release_upto): Ditto.
+	(dll_list::reserve_space): New function to reserve space needed by
+	DLL_LOAD dlls early in the fork process.
+	(dll_list::load_after_fork): Rewrite to use recursion for tracking
+	reservations made while trying to make dlls land where they belong.
+	(dll_list::load_after_fork_impl): Ditto.
+	(dll_list::alloc): Initialize image base field.
+	* dll_init.h (struct dll_list): declare new functions.
+	(dll::image_size): New member.
+
 2011-05-28  Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
 
 	* dll_init.cc (dll_list::find_by_modname): New function to search the

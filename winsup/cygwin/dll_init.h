@@ -52,6 +52,7 @@ struct dll
   int count;
   bool has_dtors;
   dll_type type;
+  DWORD image_size;
   long ndeps;
   dll** deps;
   PWCHAR modname;
