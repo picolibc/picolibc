@@ -625,7 +625,7 @@ fork ()
        the thread-local storage.  A process forking too deeply will run into
        the problem to be out of temporary TLS path buffers. */
     tmp_pathbuf tp;
-
+  
     if (!held_everything)
       {
 	if (exit_state)
@@ -633,6 +633,12 @@ fork ()
 	set_errno (EAGAIN);
 	return -1;
       }
+
+    /* Put the dll list in topological dependency ordering, in
+       hopes that the child will have a better shot at loading dlls
+       properly if it only has to deal with one at a time.
+    */
+    dlls.topsort ();
 
     ischild = !!setjmp (grouped.ch.jmp);
 

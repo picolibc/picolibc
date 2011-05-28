@@ -52,6 +52,9 @@ struct dll
   int count;
   bool has_dtors;
   dll_type type;
+  long ndeps;
+  dll** deps;
+  PWCHAR modname;
   WCHAR name[1];
   void detach ();
   int init ();
@@ -84,6 +87,13 @@ public:
   void detach (void *);
   void init ();
   void load_after_fork (HANDLE);
+  dll *find_by_modname (const PWCHAR name);
+  void populate_all_deps ();
+  void populate_deps (dll* d);
+  void topsort ();
+  void topsort_visit (dll* d, bool goto_tail);
+  void append (dll* d);
+  
   dll *inext ()
   {
     while ((hold = hold->next))
@@ -107,6 +117,25 @@ public:
   }
   friend void dll_global_dtors ();
   dll_list () { protect.init ("dll_list"); }
+};
+
+/* References:
+   http://msdn.microsoft.com/en-us/windows/hardware/gg463125
+   http://msdn.microsoft.com/en-us/library/ms809762.aspx
+*/
+/* FIXME: Integrate with other similar uses in source. */
+struct pefile
+{
+  IMAGE_DOS_HEADER dos_hdr;
+
+  char* rva (long offset) { return (char*) this + offset; }
+  PIMAGE_NT_HEADERS32 pe_hdr () { return (PIMAGE_NT_HEADERS32) rva (dos_hdr.e_lfanew); }
+  PIMAGE_OPTIONAL_HEADER32 optional_hdr () { return &pe_hdr ()->OptionalHeader; }
+  PIMAGE_DATA_DIRECTORY idata_dir (DWORD which)
+  {
+    PIMAGE_OPTIONAL_HEADER32 oh = optional_hdr ();
+    return (which < oh->NumberOfRvaAndSizes)? oh->DataDirectory + which : 0;
+  }
 };
 
 extern dll_list dlls;
