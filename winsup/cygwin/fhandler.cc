@@ -1873,7 +1873,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	}
     }
 
-  if (res != overlapped_error)
+  if (res == overlapped_success)
     /* nothing to do */;
   else if (err == ERROR_HANDLE_EOF || err == ERROR_BROKEN_PIPE)
     {
@@ -1887,7 +1887,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       HANDLE h = writing ? get_output_handle () : get_handle ();
       CancelIo (h);
       ResetEvent (get_overlapped ());
-      if (err)
+      if (res == overlapped_error)
 	__seterrno_from_win_error (err);
       *bytes = (DWORD) -1;
     }

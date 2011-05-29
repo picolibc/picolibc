@@ -1,3 +1,8 @@
+2011-05-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.cc (fhandler_overlapped::wait_overlapped): Make sure that
+	I/O is cancelled on signal.
+
 2011-05-28  Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
 
 	* dll_init.cc (dll_list::alloc): Initialize dll::image_size.
