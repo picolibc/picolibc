@@ -1,3 +1,18 @@
+2011-05-29  Alan Modra  <amodra@gmail.com>
+
+	Apply from mainline
+	2011-05-17  Alan Modra  <amodra@gmail.com>
+	PR ld/12760
+	* bfdlink.h (struct bfd_link_callbacks <notice>): Add "flags" and
+	"string" param.
+
+	2011-05-16  Alan Modra  <amodra@gmail.com>
+	* bfdlink.h (struct bfd_link_hash_entry): Remove u.undef.weak field.
+
+	2011-04-25  Jan Kratochvil  <jan.kratochvil@redhat.com>
+	* bfdlink.h (ENUM_BITFIELD): Remove.
+	* ansidecl.h (ENUM_BITFIELD): New, from gcc/system.h.
+
 2011-04-27  Alan Modra  <amodra@gmail.com>
 
 	Backport from mainline.
