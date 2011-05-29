@@ -1,3 +1,8 @@
+2011-05-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* ps.cc (ttynam): Accommodate new console numbering.
+	(main): Ditto.
+
 2011-05-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* locale.cc (print_locale_with_codeset): Align printing of locale names

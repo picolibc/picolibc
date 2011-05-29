@@ -198,12 +198,15 @@ to_time_t (FILETIME *ptr)
 static const char *
 ttynam (int ntty)
 {
-  static char buf[5];
+  static char buf[9];
+  char buf0[9];
   if (ntty < 0)
-    return "   ?";
-  if (ntty == TTY_CONSOLE)
-    return " con";
-  sprintf (buf, "%4d", ntty);
+    strcpy (buf0, "?");
+  else if (ntty & 0xffff0000)
+    sprintf (buf0, "cons%d", ntty & 0xff);
+  else
+    sprintf (buf0, "tty%d", ntty);
+  sprintf (buf, " %-7s", buf0);
   return buf;
 }
 
@@ -261,11 +264,11 @@ main (int argc, char *argv[])
   int aflag, lflag, fflag, sflag, uid, proc_id;
   bool found_proc_id = true;
   cygwin_getinfo_types query = CW_GETPINFO;
-  const char *dtitle = "    PID TTY     STIME COMMAND\n";
+  const char *dtitle = "    PID  TTY        STIME COMMAND\n";
   const char *dfmt   = "%7d%4s%10s %s\n";
-  const char *ftitle = "     UID     PID    PPID TTY     STIME COMMAND\n";
+  const char *ftitle = "     UID     PID    PPID  TTY        STIME COMMAND\n";
   const char *ffmt   = "%8.8s%8d%8d%4s%10s %s\n";
-  const char *ltitle = "      PID    PPID    PGID     WINPID  TTY  UID    STIME COMMAND\n";
+  const char *ltitle = "      PID    PPID    PGID     WINPID   TTY     UID    STIME COMMAND\n";
   const char *lfmt   = "%c %7d %7d %7d %10u %4s %4u %8s %s\n";
   char ch;
   PUNICODE_STRING uni = NULL;
