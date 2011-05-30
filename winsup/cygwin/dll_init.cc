@@ -116,6 +116,18 @@ dll_list::operator[] (const PWCHAR name)
   return NULL;
 }
 
+/* Look for a dll based on is short name only (no path) */
+dll *
+dll_list::find_by_modname (const PWCHAR name)
+{
+  dll *d = &start;
+  while ((d = d->next) != NULL)
+    if (!wcscasecmp (name, d->modname))
+      return d;
+
+  return NULL;
+}
+
 #define RETRIES 1000
 
 /* Allocate space for a dll struct. */
@@ -161,15 +173,14 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       d->handle = h;
       d->has_dtors = true;
       d->p = p;
+      d->ndeps = 0;
+      d->deps = NULL;
+      d->modname = wcsrchr (d->name, L'\\');
+      if (d->modname)
+       d->modname++;
       d->image_size = ((pefile*)h)->optional_hdr ()->SizeOfImage;
       d->type = type;
-      if (end == NULL)
-	end = &start;	/* Point to "end" of dll chain. */
-      end->next = d;	/* Standard linked list stuff. */
-      d->next = NULL;
-      d->prev = end;
-      end = d;
-      tot++;
+      append (d);
       if (type == DLL_LOAD)
 	loaded_dlls++;
     }
@@ -177,6 +188,119 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   assert (p->envptr != NULL);
   return d;
 }
+
+void
+dll_list::append (dll* d)
+{
+  if (end == NULL)
+    end = &start;	/* Point to "end" of dll chain. */
+  end->next = d;	/* Standard linked list stuff. */
+  d->next = NULL;
+  d->prev = end;
+  end = d;
+  tot++;
+}
+
+void dll_list::populate_deps (dll* d)
+{
+  WCHAR wmodname[NT_MAX_PATH];
+  pefile* pef = (pefile*) d->handle;
+  PIMAGE_DATA_DIRECTORY dd = pef->idata_dir (IMAGE_DIRECTORY_ENTRY_IMPORT);
+  /* Annoyance: calling crealloc with a NULL pointer will use the
+     wrong heap and crash, so we have to replicate some code */
+  long maxdeps = 4;
+  d->deps = (dll**) cmalloc (HEAP_2_DLL, maxdeps*sizeof (dll*));
+  d->ndeps = 0;
+  for (PIMAGE_IMPORT_DESCRIPTOR id=
+	(PIMAGE_IMPORT_DESCRIPTOR) pef->rva (dd->VirtualAddress);
+      dd->Size && id->Name;
+      id++)
+    {
+      char* modname = pef->rva (id->Name);
+      sys_mbstowcs (wmodname, NT_MAX_PATH, modname);
+      if (dll* dep = find_by_modname (wmodname))
+	{
+	  if (d->ndeps >= maxdeps)
+	    {
+	      maxdeps = 2*(1+maxdeps);
+	      d->deps = (dll**) crealloc (d->deps, maxdeps*sizeof (dll*));
+	    }
+	  d->deps[d->ndeps++] = dep;
+	}
+    }
+  
+  /* add one to differentiate no deps from unknown */
+  d->ndeps++;
+}
+
+
+void
+dll_list::topsort ()
+{
+  /* Anything to do? */
+  if (!end)
+    return;
+  
+  /* make sure we have all the deps available */
+  dll* d = &start;
+  while ((d = d->next))
+    if (!d->ndeps)
+      populate_deps (d);
+  
+  /* unlink head and tail pointers so the sort can rebuild the list */
+  d = start.next;
+  start.next = end = NULL;
+  topsort_visit (d, true);
+
+  /* clear node markings made by the sort */
+  d = &start;
+  while ((d = d->next))
+    {
+      debug_printf ("%W", d->modname);
+      for (int i=1; i < -d->ndeps; i++)
+	debug_printf ("-> %W", d->deps[i-1]->modname);
+
+      /* It would be really nice to be able to keep this information
+	 around for next time, but we don't have an easy way to
+	 invalidate cached dependencies when a module unloads. */
+      d->ndeps = 0;
+      cfree (d->deps);
+      d->deps = NULL;
+    }
+}
+
+/* A recursive in-place topological sort. The result is ordered so that
+   dependencies of a dll appear before it in the list.
+
+   NOTE: this algorithm is guaranteed to terminate with a "partial
+   order" of dlls but does not do anything smart about cycles: an
+   arbitrary dependent dll will necessarily appear first. Perhaps not
+   surprisingly, Windows ships several dlls containing dependency
+   cycles, including SspiCli/RPCRT4.dll and a lovely tangle involving
+   USP10/LPK/GDI32/USER32.dll). Fortunately, we don't care about
+   Windows DLLs here, and cygwin dlls should behave better */
+void
+dll_list::topsort_visit (dll* d, bool seek_tail)
+{
+  /* Recurse to the end of the dll chain, then visit nodes as we
+     unwind. We do this because once we start visiting nodes we can no
+     longer trust any _next_ pointers.
+
+     We "mark" visited nodes (to avoid revisiting them) by negating
+     ndeps (undone once the sort completes). */
+  if (seek_tail && d->next)
+    topsort_visit (d->next, true);
+  
+  if (d->ndeps > 0)
+    {
+      d->ndeps = -d->ndeps;
+      for (long i=1; i < -d->ndeps; i++)
+	topsort_visit (d->deps[i-1], false);
+
+      append (d);
+    }
+}
+
 
 dll *
 dll_list::find (void *retaddr)
@@ -322,7 +446,7 @@ reserve_at (const PWCHAR name, DWORD here, DWORD dll_base, DWORD dll_size)
   size = end - here;
   if (!VirtualAlloc ((void *) here, size, MEM_RESERVE, PAGE_NOACCESS))
     api_fatal ("couldn't allocate memory %p(%d) for '%W' alignment, %E\n",
-               here, size, name);
+	       here, size, name);
   return here;
 }
 
@@ -332,7 +456,7 @@ release_at (const PWCHAR name, DWORD here)
 {
   if (!VirtualFree ((void *) here, 0, MEM_RELEASE))
     api_fatal ("couldn't release memory %p for '%W' alignment, %E\n",
-               here, name);
+	       here, name);
 }
 
 /* Reload DLLs after a fork.  Iterates over the list of dynamically loaded
@@ -368,13 +492,13 @@ dll_list::load_after_fork (HANDLE parent)
 	  /* If we reached here on the second iteration of the for loop
 	     then there is a lot of memory to release. */
 	  if (i > 0)
-            {
-              release_upto (d->name, (DWORD) d->handle);
+	    {
+	      release_upto (d->name, (DWORD) d->handle);
 
-              if (preferred_block)
-                release_at (d->name, preferred_block);
-              preferred_block = 0;
-            }
+	      if (preferred_block)
+		release_at (d->name, preferred_block);
+	      preferred_block = 0;
+	    }
 
 	  if (h == d->handle)
 	    break;		/* Success */
@@ -385,19 +509,19 @@ dll_list::load_after_fork (HANDLE parent)
 		       d->name, d->handle, h);
 
 	  /* Dll loaded in the wrong place.  Dunno why this happens but it
-             always seems to happen when there are multiple DLLs with the
-             same base address.  In the "forked" process, the relocated DLL
-             may load at a different address. So, block all of the memory up
-             to the relocated load address and try again. */
+	     always seems to happen when there are multiple DLLs with the
+	     same base address.  In the "forked" process, the relocated DLL
+	     may load at a different address. So, block all of the memory up
+	     to the relocated load address and try again. */
 	  reserve_upto (d->name, (DWORD) d->handle);
 
-          /* Also, if the DLL loaded at a higher address than wanted (probably
-             it's base address), reserve the memory at that address. This can
-             happen if it couldn't load at the preferred base in the parent, but
-             can in the child, due to differences in the load ordering.
-             Block memory at it's preferred address and try again. */
-          if ((DWORD) h > (DWORD) d->handle)
-            preferred_block = reserve_at (d->name, (DWORD) h,
+	  /* Also, if the DLL loaded at a higher address than wanted (probably
+	     it's base address), reserve the memory at that address. This can
+	     happen if it couldn't load at the preferred base in the parent, but
+	     can in the child, due to differences in the load ordering.
+	     Block memory at it's preferred address and try again. */
+	  if ((DWORD) h > (DWORD) d->handle)
+	    preferred_block = reserve_at (d->name, (DWORD) h,
 					  (DWORD) d->handle, d->image_size);
 
 	}

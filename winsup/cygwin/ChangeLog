@@ -1,3 +1,34 @@
+2011-05-30  Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
+
+	* dll_init.cc (dll_list::find_by_modname): New function to search the
+	dll list for a module name only (no path).
+	(dll_list::alloc): Initialize newly-added members of struct dll.
+	(dll_list::append): New function to factor out the append operation
+	(used by dll_list::topsort).
+	(dll_list::populate_deps): New function to identify dll dependencies.
+	(dll_list::topsort): New function to sort the dll list topologically by
+	dependencies.
+	(dll_list::topsort_visit): New helper function for the above.
+	* dll_init.h (dll::ndeps): New class member.
+	(dll::deps): Ditto.
+	(dll::modname): Ditto.
+	(dll_list::find_by_modname): New function related to topsort.
+	(dll_list::populate_all_deps): Ditto.
+	(dll_list::populate_deps): Ditto.
+	(dll_list::topsort): Ditto.
+	(dll_list::topsort_visit): Ditto.
+	(dll_list::append): Ditto.
+	(pefile): New struct allowing simple introspection of dll images.
+	* fork.cc (fork): Topologically sort the dll list before forking
+
+2011-05-30  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Refresh.
+	(child_info::refresh_cygheap): New function.
+	* spawn.cc (spawn_guts): Call refresh_cygheap before creating a new
+	process to ensure that cygheap_max is up-to-date.
+	* fork.cc (frok::parent): Ditto.
+
 2011-05-30  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* cygheap.cc (cygheap_dummy): Rename from cygheap_at_start.
@@ -926,7 +957,7 @@
 
 	* fhandler.h (fhandler_dev_tape::_lock): Add bool parameter.
 	* fhandler_tape.cc (lock): Call _lock with false argument.
-	(_lock): Take bool cancelable parameter.  Handle O_NONBLOCK. 
+	(_lock): Take bool cancelable parameter.  Handle O_NONBLOCK.
 	Make cancelable if cancelabe parameter is true.
 	(fhandler_dev_tape::raw_read): Call _lock with true argument.
 	(fhandler_dev_tape::raw_write): Ditto.
@@ -1125,7 +1156,7 @@
 	(close): Ditto.
 	(fsync): Ditto.
 	* termios.cc (tcdrain): Ditto.
-	* thread.cc: Align list of cancellation points with above changes. 
+	* thread.cc: Align list of cancellation points with above changes.
 	Mark not-implemented functions, too.
 	(cancelable_wait): Don't set unused object indices to WAIT_FAILED
 	since that could result in wrong behaviour.  Set them to the invalid
@@ -1387,7 +1418,7 @@
 	* path.h (isproc_dev): Use FH_PROC_MAX_MINOR rather than FH_PROC.
 
 2011-04-19  Peter Rosin  <peda@lysator.liu.se>
-	
+
 	* select.cc (pipe_cleanup): Make sure that device_specific_pipe is
 	always deleted regardless of whether it has a unique thread associated
 	with it.
@@ -1422,7 +1453,7 @@
 	(get_registry_hive_path): Use RtlQueryRegistryValues to fetch path from
 	registry.
 	(load_registry_hive): Drop useless check for user hive being available.
-	Load hive using NtLoadKey. 
+	Load hive using NtLoadKey.
 	* registry.h: Accommodate above changes.
 	* sched.cc (sched_rr_get_interval): Use wide char arguments in reg_key
 	functions.
@@ -2574,7 +2605,7 @@
 	to implement ondemand partition locking.
 	(fhandler_dev_floppy::write_file): Call lock_partition from here if
 	writing failed due to a potential write restriction on a disk
-	partition.  
+	partition.
 	(fhandler_dev_floppy::open): Don't lock partitions here.
 	(fhandler_dev_floppy::close): Keep track of partition handle reference
 	count.  Close handles and remove partitions pointer ony if count is 0.
@@ -2588,7 +2619,7 @@
 	method.
 	* fhandler_floppy.cc (fhandler_dev_floppy::fhandler_dev_floppy): Zero
 	out partitions array.
-	(fhandler_dev_floppy::open): Fix "entire disk" condition for call to 
+	(fhandler_dev_floppy::open): Fix "entire disk" condition for call to
 	DeviceIoControl (FSCTL_ALLOW_EXTENDED_DASD_IO).
 	When opening disks for writing, call DeviceIoControl (FSCTL_LOCK_VOLUME)
 	on all affected disk partitions starting with Vista.
@@ -2611,4 +2642,4 @@
 2011-01-02  Christopher Faylor  <me+cygwin@cgf.cx>
 
 	* ChangeLog-2010: Create from ChangeLog.
-	* ChangeLog: Start fresh. 
+	* ChangeLog: Start fresh.

@@ -38,7 +38,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0x76ca2aaeU
+#define CURR_CHILD_INFO_MAGIC 0xeef5640dU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -65,6 +65,7 @@ public:
   child_info (unsigned, child_info_types, bool);
   child_info (): subproc_ready (NULL), parent (NULL) {}
   ~child_info ();
+  void refresh_cygheap () { cygheap_max = ::cygheap_max; }
   void ready (bool);
   bool sync (int, HANDLE&, DWORD) __attribute__ ((regparm (3)));
   DWORD proc_retry (HANDLE) __attribute__ ((regparm (2)));

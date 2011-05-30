@@ -397,6 +397,7 @@ frok::parent (volatile char * volatile stack_here)
   /* Remove impersonation */
   cygheap->user.deimpersonate ();
   fix_impersonation = true;
+  ch.refresh_cygheap ();
 
   while (1)
     {
@@ -601,7 +602,6 @@ extern "C" int
 fork ()
 {
   frok grouped;
-  /* No cygheap allocation beyond this point. */
 
   debug_printf ("entering");
   grouped.load_dlls = 0;
@@ -634,6 +634,11 @@ fork ()
 	set_errno (EAGAIN);
 	return -1;
       }
+
+    /* Put the dll list in topological dependency ordering, in
+       hopes that the child will have a better shot at loading dlls
+       properly if it only has to deal with one at a time.  */
+    dlls.topsort ();
 
     ischild = !!setjmp (grouped.ch.jmp);
 

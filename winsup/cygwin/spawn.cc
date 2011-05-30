@@ -560,6 +560,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 	  || cygheap->fdtab.need_fixup_before ()))
     c_flags |= CREATE_SUSPENDED;
 
+  ch.refresh_cygheap ();
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
      effective vs. real ids.

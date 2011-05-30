@@ -52,6 +52,9 @@ struct dll
   int count;
   bool has_dtors;
   dll_type type;
+  long ndeps;
+  dll** deps;
+  PWCHAR modname;
   DWORD image_size;
   WCHAR name[1];
   void detach ();
@@ -85,6 +88,13 @@ public:
   void detach (void *);
   void init ();
   void load_after_fork (HANDLE);
+  dll *find_by_modname (const PWCHAR name);
+  void populate_all_deps ();
+  void populate_deps (dll* d);
+  void topsort ();
+  void topsort_visit (dll* d, bool goto_tail);
+  void append (dll* d);
+  
   dll *inext ()
   {
     while ((hold = hold->next))
