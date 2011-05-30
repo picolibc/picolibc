@@ -1,3 +1,11 @@
+2011-05-30  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* cygheap.cc (cygheap_dummy): Rename from cygheap_at_start.
+	(cygheap): Accommodate name change to cygheap_dummy.
+	(cygheap_init): Ditto.
+	(cygheap_fixup_in_child): Simplify slightly.
+	* fork.cc (fork): Add an advisory comment.
+
 2011-05-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.cc (fhandler_overlapped::wait_overlapped): Make sure that

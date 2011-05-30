@@ -26,12 +26,12 @@
 #include <unistd.h>
 #include <wchar.h>
 
-static mini_cygheap NO_COPY cygheap_at_start =
+static mini_cygheap NO_COPY cygheap_dummy =
 {
   {__utf8_mbtowc, __utf8_wctomb}
 };
 
-init_cygheap NO_COPY *cygheap = (init_cygheap *) &cygheap_at_start;
+init_cygheap NO_COPY *cygheap = (init_cygheap *) &cygheap_dummy;
 void NO_COPY *cygheap_max;
 
 extern "C" char  _cygheap_end[];
@@ -61,8 +61,7 @@ static void *__stdcall _csbrk (int);
 void __stdcall
 cygheap_fixup_in_child (bool execed)
 {
-  cygheap_max = child_proc_info->cygheap;
-  cygheap = (init_cygheap *) cygheap_max;
+  cygheap_max = cygheap = (init_cygheap *) _cygheap_start;
   _csbrk ((char *) child_proc_info->cygheap_max - (char *) cygheap);
   child_copy (child_proc_info->parent, false, "cygheap", cygheap, cygheap_max, NULL);
   cygheap_init ();
@@ -156,7 +155,7 @@ void __stdcall
 cygheap_init ()
 {
   cygheap_protect.init ("cygheap_protect");
-  if (cygheap == &cygheap_at_start)
+  if (cygheap == &cygheap_dummy)
     {
       cygheap = (init_cygheap *) memset (_cygheap_start, 0,
 					 sizeof (*cygheap));

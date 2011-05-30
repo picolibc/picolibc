@@ -601,6 +601,7 @@ extern "C" int
 fork ()
 {
   frok grouped;
+  /* No cygheap allocation beyond this point. */
 
   debug_printf ("entering");
   grouped.load_dlls = 0;
