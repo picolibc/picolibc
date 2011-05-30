@@ -179,6 +179,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       if (d->modname)
        d->modname++;
       d->image_size = ((pefile*)h)->optional_hdr ()->SizeOfImage;
+      d->preferred_base = (void*) ((pefile*)h)->optional_hdr()->ImageBase;
       d->type = type;
       append (d);
       if (type == DLL_LOAD)
@@ -228,7 +229,7 @@ void dll_list::populate_deps (dll* d)
 	  d->deps[d->ndeps++] = dep;
 	}
     }
-  
+
   /* add one to differentiate no deps from unknown */
   d->ndeps++;
 }
@@ -240,13 +241,13 @@ dll_list::topsort ()
   /* Anything to do? */
   if (!end)
     return;
-  
+
   /* make sure we have all the deps available */
   dll* d = &start;
   while ((d = d->next))
     if (!d->ndeps)
       populate_deps (d);
-  
+
   /* unlink head and tail pointers so the sort can rebuild the list */
   d = start.next;
   start.next = end = NULL;
@@ -290,7 +291,7 @@ dll_list::topsort_visit (dll* d, bool seek_tail)
      ndeps (undone once the sort completes). */
   if (seek_tail && d->next)
     topsort_visit (d->next, true);
-  
+
   if (d->ndeps > 0)
     {
       d->ndeps = -d->ndeps;
@@ -366,56 +367,6 @@ dll_list::init ()
 
 #define A64K (64 * 1024)
 
-/* Mark every memory address up to "here" as reserved.  This may force
-   Windows NT to load a DLL in the next available, lowest slot. */
-static void
-reserve_upto (const PWCHAR name, DWORD here)
-{
-  DWORD size;
-  MEMORY_BASIC_INFORMATION mb;
-  for (DWORD start = 0x10000; start < here; start += size)
-    if (!VirtualQuery ((void *) start, &mb, sizeof (mb)))
-      size = A64K;
-    else
-      {
-	size = A64K * ((mb.RegionSize + A64K - 1) / A64K);
-	start = A64K * (((DWORD) mb.BaseAddress + A64K - 1) / A64K);
-
-	if (start + size > here)
-	  size = here - start;
-	if (mb.State == MEM_FREE &&
-	    !VirtualAlloc ((void *) start, size, MEM_RESERVE, PAGE_NOACCESS))
-	  api_fatal ("couldn't allocate memory %p(%d) for '%W' alignment, %E\n",
-		     start, size, name);
-      }
-}
-
-/* Release all of the memory previously allocated by "upto" above.
-   Note that this may also free otherwise reserved memory.  If that becomes
-   a problem, we'll have to keep track of the memory that we reserve above. */
-static void
-release_upto (const PWCHAR name, DWORD here)
-{
-  DWORD size;
-  MEMORY_BASIC_INFORMATION mb;
-  for (DWORD start = 0x10000; start < here; start += size)
-    if (!VirtualQuery ((void *) start, &mb, sizeof (mb)))
-      size = 64 * 1024;
-    else
-      {
-	size = mb.RegionSize;
-	if (!(mb.State == MEM_RESERVE && mb.AllocationProtect == PAGE_NOACCESS
-	    && (((void *) start < cygheap->user_heap.base
-		 || (void *) start > cygheap->user_heap.top)
-		 && ((void *) start < (void *) cygheap
-		     || (void *) start
-			> (void *) ((char *) cygheap + CYGHEAPSIZE)))))
-	  continue;
-	if (!VirtualFree ((void *) start, 0, MEM_RELEASE))
-	  api_fatal ("couldn't release memory %p(%d) for '%W' alignment, %E\n",
-		     start, size, name);
-      }
-}
 
 /* Reserve the chunk of free address space starting _here_ and (usually)
    covering at least _dll_size_ bytes. However, we must take care not
@@ -434,7 +385,7 @@ reserve_at (const PWCHAR name, DWORD here, DWORD dll_base, DWORD dll_size)
     return 0;
 
   size = mb.RegionSize;
-  
+
   // don't clobber the space where we want the dll to land
   DWORD end = here + size;
   DWORD dll_end = dll_base + dll_size;
@@ -442,7 +393,7 @@ reserve_at (const PWCHAR name, DWORD here, DWORD dll_base, DWORD dll_size)
       here = dll_end; // the dll straddles our left edge
   else if (dll_base >= here && dll_base < end)
       end = dll_base; // the dll overlaps partly or fully to our right
-  
+
   size = end - here;
   if (!VirtualAlloc ((void *) here, size, MEM_RESERVE, PAGE_NOACCESS))
     api_fatal ("couldn't allocate memory %p(%d) for '%W' alignment, %E\n",
@@ -459,72 +410,130 @@ release_at (const PWCHAR name, DWORD here)
 	       here, name);
 }
 
+/* Step 1: Reserve memory for all DLL_LOAD dlls. This is to prevent
+   anything else from taking their spot as we compensate for Windows
+   randomly relocating things.
+
+   NOTE: because we can't depend on LoadLibraryExW to do the right
+   thing, we have to do a vanilla VirtualAlloc instead. One possible
+   optimization might attempt a LoadLibraryExW first, in case it lands
+   in the right place, but then we have to find a way of tracking
+   which dlls ended up needing VirtualAlloc after all.  */
+void
+dll_list::reserve_space ()
+{
+  for (dll* d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
+    if (!VirtualAlloc (d->handle, d->image_size, MEM_RESERVE, PAGE_NOACCESS))
+      fork_info->abort ("address space needed by '%W' (%08lx) is already occupied",
+			d->modname, d->handle);
+}
+
 /* Reload DLLs after a fork.  Iterates over the list of dynamically loaded
    DLLs and attempts to load them in the same place as they were loaded in the
    parent. */
 void
 dll_list::load_after_fork (HANDLE parent)
 {
-  DWORD preferred_block = 0;
+  // moved to frok::child for performance reasons:
+  // dll_list::reserve_space();
 
-  for (dll *d = &dlls.start; (d = d->next) != NULL; )
-    if (d->type == DLL_LOAD)
-      for (int i = 0; i < 2; i++)
+  load_after_fork_impl (parent, dlls.istart (DLL_LOAD), 0);
+}
+
+static int const DLL_RETRY_MAX = 6;
+void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
+{
+  /* Step 2: For each dll which did not map at its preferred base
+     address in the parent, try to coerce it to land at the same spot
+     as before. If not, unload it, reserve the memory around it, and
+     try again. Use recursion to remember blocked regions address
+     space so we can release them later.
+
+     We DONT_RESOLVE_DLL_REFERENCES at first in case the DLL lands in
+     the wrong spot;
+
+     NOTE: This step skips DLLs which loaded at their preferred
+     address in the parent because they should behave (we already
+     verified that their preferred address in the child is
+     available). However, this may fail on a Vista/Win7 machine with
+     ASLR active, because the ASLR base address will usually not equal
+     the preferred base recorded in the dll. In this case, we should
+     make the LoadLibraryExW call unconditional.
+   */
+  for ( ; d; d = dlls.inext ())
+    if (d->handle != d->preferred_base)
+      {
+	/* See if the DLL will load in proper place. If not, unload it,
+	   reserve the memory around it, and try again.
+
+	   If this is the first attempt, we need to release the
+	   dll's protective reservation from step 1
+	 */
+	if (!retries && !VirtualFree (d->handle, 0, MEM_RELEASE))
+	  api_fatal ("unable to release protective reservation for %W (%08lx), %E",
+		     d->modname, d->handle);
+	
+	HMODULE h = LoadLibraryExW (d->name, NULL, DONT_RESOLVE_DLL_REFERENCES);
+	if (!h)
+	  api_fatal ("unable to create interim mapping for %W, %E", d->name);
+	if (h != d->handle)
+	  {
+	    sigproc_printf ("%W loaded in wrong place: %08lx != %08lx",
+			    d->modname, h, d->handle);
+	    FreeLibrary (h);
+	    DWORD reservation = reserve_at (d->modname, (DWORD) h,
+					    (DWORD) d->handle, d->image_size);
+	    if (!reservation)
+	      api_fatal ("unable to block off %p to prevent %W from loading there",
+			 h, d->modname);
+
+	    if (retries < DLL_RETRY_MAX)
+	      load_after_fork_impl (parent, d, retries+1);
+	    else
+	      fork_info->abort ("unable to remap %W to same address as parent (%08lx)",
+				d->modname, d->handle);
+
+	    /* once the above returns all the dlls are mapped; release
+	       the reservation and continue unwinding */
+	    sigproc_printf ("releasing blocked space at %08lx", reservation);
+	    release_at (d->modname, reservation);
+	    return;
+	  }
+      }
+
+  /* Step 3: try to load each dll for real after either releasing the
+     protective reservation (for well-behaved dlls) or unloading the
+     interim mapping (for rebased dlls) . The dll list is sorted in
+     dependency order, so we shouldn't pull in any additional dlls
+     outside our control.
+
+     It stinks that we can't invert the order of the initial LoadLibrary
+     and FreeLibrary since Microsoft documentation seems to imply that
+     should do what we want.  However, once a library is loaded as
+     above, the second LoadLibrary will not execute its startup code
+     unless it is first unloaded. */
+  for (dll *d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
+    {
+      if (d->handle == d->preferred_base)
 	{
-	  /* See if DLL will load in proper place.  If so, free it and reload
-	     it the right way.
-	     It stinks that we can't invert the order of the initial LoadLibrary
-	     and FreeLibrary since Microsoft documentation seems to imply that
-	     should do what we want.  However, once a library is loaded as
-	     above, the second LoadLibrary will not execute its startup code
-	     unless it is first unloaded. */
-	  HMODULE h = LoadLibraryExW (d->name, NULL, DONT_RESOLVE_DLL_REFERENCES);
-
-	  if (!h)
-	    system_printf ("can't reload %W, %E", d->name);
-	  else
-	    {
-	      FreeLibrary (h);
-	      if (h == d->handle)
-		h = LoadLibraryW (d->name);
-	    }
-
-	  /* If we reached here on the second iteration of the for loop
-	     then there is a lot of memory to release. */
-	  if (i > 0)
-	    {
-	      release_upto (d->name, (DWORD) d->handle);
-
-	      if (preferred_block)
-		release_at (d->name, preferred_block);
-	      preferred_block = 0;
-	    }
-
-	  if (h == d->handle)
-	    break;		/* Success */
-
-	  if (i > 0)
-	    /* We tried once to relocate the dll and it failed. */
-	    api_fatal ("unable to remap %W to same address as parent: %p != %p",
-		       d->name, d->handle, h);
-
-	  /* Dll loaded in the wrong place.  Dunno why this happens but it
-	     always seems to happen when there are multiple DLLs with the
-	     same base address.  In the "forked" process, the relocated DLL
-	     may load at a different address. So, block all of the memory up
-	     to the relocated load address and try again. */
-	  reserve_upto (d->name, (DWORD) d->handle);
-
-	  /* Also, if the DLL loaded at a higher address than wanted (probably
-	     it's base address), reserve the memory at that address. This can
-	     happen if it couldn't load at the preferred base in the parent, but
-	     can in the child, due to differences in the load ordering.
-	     Block memory at it's preferred address and try again. */
-	  if ((DWORD) h > (DWORD) d->handle)
-	    preferred_block = reserve_at (d->name, (DWORD) h,
-					  (DWORD) d->handle, d->image_size);
-
+	  if (!VirtualFree (d->handle, 0, MEM_RELEASE))
+	    api_fatal ("unable to release protective reservation for %W (%08lx), %E",
+		       d->modname, d->handle);
 	}
+      else
+	{
+	  /* Free the library using our parent's handle: it's identical
+	     to ours our we wouldn't have gotten this far */
+	  if (!FreeLibrary (d->handle))
+	    api_fatal ("unable to unload interim mapping of %W, %E", d->modname);
+	}
+      HMODULE h = LoadLibraryW (d->name);
+      if (!h)
+	api_fatal ("unable to map %W, %E", d->name);
+      if (h != d->handle)
+	api_fatal ("unable to map %W to same address as parent: %p != %p",
+		   d->modname, d->handle, h);
+    }
 }
 
 struct dllcrt0_info

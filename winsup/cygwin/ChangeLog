@@ -1,3 +1,20 @@
+2011-05-30  Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
+
+	* dll_init.cc (reserve_upto): Remove.
+	(release_upto): Ditto.
+	(dll_list::reserve_space): New function to reserve space needed by
+	DLL_LOAD dlls early in the fork process.
+	(dll_list::load_after_fork): Rewrite to use recursion to
+	track reservations it makes while trying to make dlls land where they
+	belong.
+	(dll_list::load_after_fork_impl): New function used by load_after_fork.
+	(dll_list::alloc): Initialize image base field.
+	* dll_init.h (dll_list::prefered_base): New field.
+	(dll_list::reserve_space): Declare new function.
+	(dll_list::load_after_fork): Declare new function.
+	* fork.cc (frok::child): call dll_list::reserve_space early, so we can
+	retry if it fails.
+
 2011-05-30  Tor Perkins  <cygwin@noid.net>
 
 	* fhandler_termios.cc (fhandler_termios::bg_check): Do not return EIO

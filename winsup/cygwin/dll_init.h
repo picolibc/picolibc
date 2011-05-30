@@ -56,6 +56,7 @@ struct dll
   dll** deps;
   PWCHAR modname;
   DWORD image_size;
+  void* preferred_base;
   WCHAR name[1];
   void detach ();
   int init ();
@@ -88,6 +89,8 @@ public:
   void detach (void *);
   void init ();
   void load_after_fork (HANDLE);
+  void reserve_space ();
+  void load_after_fork_impl (HANDLE, dll* which, int retries);
   dll *find_by_modname (const PWCHAR name);
   void populate_all_deps ();
   void populate_deps (dll* d);
