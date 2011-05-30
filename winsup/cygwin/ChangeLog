@@ -1,3 +1,12 @@
+2011-05-30  Tor Perkins  <cygwin@noid.net>
+
+	* fhandler_termios.cc (fhandler_termios::bg_check): Do not return EIO
+	when a process group has no leader as this is allowed and does not
+	imply an orphaned process group.  Add a test for orphaned process
+	groups.
+	(tty_min::is_orphaned_process_group): Define new function.
+	* tty.h (tty_min::is_orphaned_process_group): Define new function.
+
 2011-05-30  Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
 
 	* dll_init.cc (dll_list::find_by_modname): New function to search the

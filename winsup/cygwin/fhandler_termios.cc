@@ -112,6 +112,26 @@ fhandler_pty_master::tcgetpgrp ()
   return tc->pgid;
 }
 
+int
+tty_min::is_orphaned_process_group (int pgid)
+{
+  /* An orphaned process group is a process group in which the parent
+     of every member is either itself a member of the group or is not
+     a member of the group's session. */
+  winpids pids ((DWORD) PID_MAP_RW);
+  for (unsigned i = 0; i < pids.npids; i++)
+    {
+      _pinfo *p = pids[i];
+      if (!p->exists () || p->pgid != pgid)
+        continue;
+      pinfo ppid (p->ppid);
+      if (ppid->pgid != pgid &&
+          ppid->sid == myself->sid)
+        return 0;
+    }
+  return 1;
+}
+
 void
 tty_min::kill_pgrp (int sig)
 {
@@ -158,36 +178,35 @@ fhandler_termios::bg_check (int sig)
       return bg_eof;
     }
 
-  /* If the process group is no more or if process is ignoring or blocks 'sig',
-     return with error */
-  int pgid_gone = !pid_exists (myself->pgid);
   int sigs_ignored =
     ((void *) global_sigs[sig].sa_handler == (void *) SIG_IGN) ||
     (_main_tls->sigmask & SIGTOMASK (sig));
 
-  if (pgid_gone)
-    goto setEIO;
-  else if (!sigs_ignored)
-    /* nothing */;
-  else if (sig == SIGTTOU)
-    return bg_ok;		/* Just allow the output */
-  else
-    goto setEIO;	/* This is an output error */
-
-  /* Don't raise a SIGTT* signal if we have already been interrupted
-     by another signal. */
-  if (!IsEventSignalled (signal_arrived))
+  /* If the process is ignoring SIGTT*, then background IO is OK.  If
+     the process is not ignoring SIGTT*, then the sig is to be sent to
+     all processes in the process group (unless the process group of the
+     process is orphaned, in which case we return EIO). */
+  if (sigs_ignored)
+    return bg_ok;   /* Just allow the IO */
+  else if ( tc->is_orphaned_process_group (myself->pgid) )
     {
-      siginfo_t si = {0};
-      si.si_signo = sig;
-      si.si_code = SI_KERNEL;
-      kill_pgrp (myself->pgid, si);
+      termios_printf ("process group is orphaned");
+      set_errno (EIO);   /* This is an IO error */
+      return bg_error;
     }
-  return bg_signalled;
-
-setEIO:
-  set_errno (EIO);
-  return bg_error;
+  else
+    {
+      /* Don't raise a SIGTT* signal if we have already been
+	 interrupted by another signal. */
+      if (WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
+	{
+	  siginfo_t si = {0};
+	  si.si_signo = sig;
+	  si.si_code = SI_KERNEL;
+	  kill_pgrp (myself->pgid, si);
+	}
+      return bg_signalled;
+    } 
 }
 
 #define set_input_done(x) input_done = input_done || (x)

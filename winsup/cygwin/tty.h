@@ -78,7 +78,8 @@ public:
   void setpgid (int pid) {pgid = pid;}
   int getsid () const {return sid;}
   void setsid (pid_t tsid) {sid = tsid;}
-  void kill_pgrp (int sig);
+  void kill_pgrp (int);
+  int is_orphaned_process_group (int);
   HWND gethwnd () const {return hwnd;}
   void sethwnd (HWND wnd) {hwnd = wnd;}
   const char *ttyname () __attribute ((regparm (1)));
