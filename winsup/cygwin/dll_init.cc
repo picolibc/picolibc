@@ -199,7 +199,6 @@ dll_list::append (dll* d)
   d->next = NULL;
   d->prev = end;
   end = d;
-  tot++;
 }
 
 void dll_list::populate_deps (dll* d)

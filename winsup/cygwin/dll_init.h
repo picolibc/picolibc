@@ -80,7 +80,6 @@ class dll_list
   static muto protect;
 public:
   dll start;
-  int tot;
   int loaded_dlls;
   int reload_on_fork;
   dll *operator [] (const PWCHAR name);
@@ -92,7 +91,6 @@ public:
   void reserve_space ();
   void load_after_fork_impl (HANDLE, dll* which, int retries);
   dll *find_by_modname (const PWCHAR name);
-  void populate_all_deps ();
   void populate_deps (dll* d);
   void topsort ();
   void topsort_visit (dll* d, bool goto_tail);
