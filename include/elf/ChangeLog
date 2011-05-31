@@ -1,3 +1,7 @@
+2011-05-31  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (arm_st_branch_type): Add ST_BRANCH_UNKNOWN.
+
 2011-04-15  Sergio Durigan Junior  <sergiodj@redhat.com>
 
 	* common.h (NT_STAPSDT): New define.
