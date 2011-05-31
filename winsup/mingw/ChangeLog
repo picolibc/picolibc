@@ -1,3 +1,12 @@
+2011-05-31  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Correct checking for short option matches in getopt_long_only().
+
+	* mingwex/getopt.c (getopt_verify): New static inline function.
+	(getopt_parse) [getopt_mode_long_only]: Use it, to validate as a
+	possible short option match after failing to match, or ambiguously
+	matching as a long option.
+
 2011-05-24  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/stdlib.h (strtod): Declare as extern to resolve compilation issues.
