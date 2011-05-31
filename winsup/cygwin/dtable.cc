@@ -712,7 +712,7 @@ dtable::select_write (int fd, select_stuff *ss)
   s->fd = fd;
   s->fh = fh;
   s->thread_errno = 0;
-  debug_printf ("%s fd %d", fh->get_name ());
+  debug_printf ("%s fd %d", fh->get_name (), fd);
   return true;
 }
 

@@ -1,5 +1,23 @@
 2011-05-30  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* dtable.cc (dtable::select_write): Add missing argument to
+	debug_printf.
+
+	* fhandler.cc (fhandler_base_overlapped::setup_overlapped): Explicitly
+	set io_pending to false.
+	(fhandler_base_overlapped::has_ongoing_io): Call GetOverlappedResult
+	to force completion of I/O.
+	(fhandler_base_overlapped::wait_overlapped): Rewrite to correctly deal
+	with nonblocking reads and to make more race proof.
+	(fhandler_base_overlapped::raw_write): Deal with new enum values.
+	(fhandler_base_overlapped::raw_read): Ditto.  Don't deal with ongoing
+	I/O here since it makes no sense in the read context.
+	* fhandler.h (enum wait_return): Add overlapped_unknown,
+	overlapped_nonblocking_no_data.
+	* pipe.cc (pipe): Add debugging output.
+
+2011-05-30  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* dll_init.cc (dll_list::append): Eliminate increment of unused tot
 	variable.
 	* dll_init.h (dll_list::tot): Delete.

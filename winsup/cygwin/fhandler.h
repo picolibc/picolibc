@@ -578,8 +578,10 @@ class fhandler_base_overlapped: public fhandler_base
 protected:
   enum wait_return
   {
-    overlapped_success = 0,
+    overlapped_unknown = 0,
+    overlapped_success,
     overlapped_signal,
+    overlapped_nonblocking_no_data,
     overlapped_error
   };
   bool io_pending;

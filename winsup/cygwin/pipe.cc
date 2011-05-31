@@ -378,6 +378,7 @@ pipe (int filedes[2])
       fdout = fhs[1];
       filedes[0] = fdin;
       filedes[1] = fdout;
+      debug_printf ("%d, %d", (int) fdin, (int) fdout);
     }
 
   return res;

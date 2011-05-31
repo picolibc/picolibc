@@ -1770,6 +1770,7 @@ fhandler_base_overlapped::setup_overlapped ()
   memset (ov, 0, sizeof (*ov));
   set_overlapped (ov);
   ov->hEvent = CreateEvent (&sec_none_nih, true, true, NULL);
+  io_pending = false;
   return ov->hEvent ? 0 : -1;
 }
 
@@ -1791,12 +1792,15 @@ fhandler_base_overlapped::has_ongoing_io ()
 {
   if (!io_pending)
     return false;
+
   if (!IsEventSignalled (get_overlapped ()->hEvent))
     {
       set_errno (EAGAIN);
       return true;
     }
   io_pending = false;
+  DWORD nbytes;
+  GetOverlappedResult (get_output_handle (), get_overlapped (), &nbytes, 0);
   return false;
 }
 
@@ -1806,75 +1810,74 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
   if (!get_overlapped ())
     return inres ? overlapped_success : overlapped_error;
 
-  wait_return res;
-  DWORD err = GetLastError ();
-  if (nonblocking)
-    {
-      if (inres)
-	res = overlapped_success;
-      else if (err != ERROR_IO_PENDING)
-	res = overlapped_error;
-      else
-	{
-	  if (writing)
-	    *bytes = len;
-	  else
-	    {
-	      set_errno (EAGAIN);
-	      *bytes = (DWORD) -1;
-	    }
-	  res = overlapped_success;
-	  io_pending = true;
-	}
-    }
-  else if (!inres && err != ERROR_IO_PENDING)
+  wait_return res = overlapped_unknown;
+  DWORD err;
+  if (inres)
+    /* handle below */;
+  else if ((err = GetLastError ()) != ERROR_IO_PENDING)
     res = overlapped_error;
+  else if (!nonblocking)
+    /* handle below */;
+  else if (!writing)
+    SetEvent (get_overlapped ()->hEvent);	/* Force immediate WFMO return */
   else
     {
-#ifdef DEBUGGING
-      if (!get_overlapped ()->hEvent)
-	system_printf ("hEvent is zero?");
-#endif
+      *bytes = len;				/* Assume that this worked */
+      io_pending = true;			/*  but don't allow subsequent */
+      res = overlapped_success;			/*  writes until completed */
+    }
+  if (res == overlapped_unknown)
+    {
       HANDLE w4[3] = { get_overlapped ()->hEvent, signal_arrived,
 		       pthread::get_cancel_event () };
       DWORD n = w4[2] ? 3 : 2;
       HANDLE h = writing ? get_output_handle () : get_handle ();
       DWORD wfres = WaitForMultipleObjects (n, w4, false, INFINITE);
-      if (wfres != WAIT_OBJECT_0)
-	CancelIo (h);
-      *bytes = 0;
+      /* Cancelling here to prevent races.  It's possible that the I/O has
+	 completed already, in which case this is a no-op.  Otherwise,
+	 WFMO returned because 1) This is a non-blocking call, 2) a signal
+	 arrived, or 3) the operation was cancelled.  These cases may be
+	 overridden by the return of GetOverlappedResult which could detect
+	 that I/O completion occurred.  */
+      CancelIo (h);
       BOOL wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
-      bool signalled = !wores && (wfres == WAIT_OBJECT_0 + 1);
-      bool canceled = !wores && (wfres == WAIT_OBJECT_0 + 2);
-      if (signalled)
+      err = GetLastError ();
+      ResetEvent (get_overlapped ()->hEvent);	/* Probably not needed but CYA */
+      debug_printf ("wfres %d, wores %d, bytes %u", wfres, wores, *bytes);
+      if (wores)
+	res = overlapped_success;	/* operation succeeded */
+      else if (wfres == WAIT_OBJECT_0 + 1)
 	{
-	  debug_printf ("got a signal");
 	  if (_my_tls.call_signal_handler ())
 	    res = overlapped_signal;
 	  else
 	    {
-	      set_errno (EINTR);
+	      err = ERROR_INVALID_AT_INTERRUPT_TIME; /* forces an EINTR below */
+	      debug_printf ("unhandled signal");
 	      res = overlapped_error;
-	      err = 0;
 	    }
 	}
-      else if (canceled)
-	pthread::static_cancel_self ();
-      else if (!wores)
-	{
-	  err = GetLastError ();
-	  debug_printf ("GetOverLappedResult failed, bytes %u", *bytes);
-	  res = overlapped_error;
-	}
+      else if (nonblocking)
+	res = overlapped_nonblocking_no_data;	/* more handling below */
+      else if (wfres == WAIT_OBJECT_0 + 2)
+	pthread::static_cancel_self ();		/* never returns */
       else
 	{
-	  debug_printf ("normal %s, %u bytes", writing ? "write" : "read", *bytes);
-	  res = overlapped_success;
+	  debug_printf ("GetOverLappedResult failed, h %p, bytes %u, w4: %p, %p, %p %E", h, *bytes, w4[0], w4[1], w4[2]);
+	  res = overlapped_error;
 	}
     }
 
   if (res == overlapped_success)
-    /* nothing to do */;
+    debug_printf ("normal %s, %u bytes", writing ? "write" : "read", *bytes);
+  else if (res == overlapped_signal)
+    debug_printf ("handled signal");
+  else if (res == overlapped_nonblocking_no_data)
+    {
+      *bytes = (DWORD) -1;
+      set_errno (EAGAIN);
+      debug_printf ("no data to read for nonblocking I/O");
+    }
   else if (err == ERROR_HANDLE_EOF || err == ERROR_BROKEN_PIPE)
     {
       debug_printf ("EOF");
@@ -1883,17 +1886,11 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
     }
   else
     {
-      debug_printf ("err %u", err);
-      HANDLE h = writing ? get_output_handle () : get_handle ();
-      CancelIo (h);
-      ResetEvent (get_overlapped ());
+      debug_printf ("res %u, err %u", (unsigned) res, err);
       *bytes = (DWORD) -1;
-      if (res == overlapped_error)
-	{
-	  __seterrno_from_win_error (err);
-	  if (writing && (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE))
-	    raise (SIGPIPE);
-	}
+      __seterrno_from_win_error (err);
+      if (writing && (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE))
+	raise (SIGPIPE);
     }
 
   return res;
@@ -1903,29 +1900,24 @@ void __stdcall __attribute__ ((regparm (3)))
 fhandler_base_overlapped::raw_read (void *ptr, size_t& len)
 {
   DWORD nbytes;
-  if (has_ongoing_io ())
-    nbytes = (DWORD) -1;
-  else
+  bool keep_looping;
+  do
     {
-      bool keep_looping;
-      do
+      bool res = ReadFile (get_handle (), ptr, len, &nbytes,
+			   get_overlapped ());
+      switch (wait_overlapped (res, false, &nbytes, is_nonblocking ()))
 	{
-	  bool res = ReadFile (get_handle (), ptr, len, &nbytes,
-			       get_overlapped ());
-	  switch (wait_overlapped (res, false, &nbytes, is_nonblocking ()))
-	    {
-	    case overlapped_signal:
-	      keep_looping = true;
-	      break;
-	    default:	/* Added to quiet gcc */
-	    case overlapped_success:
-	    case overlapped_error:
-	      keep_looping = false;
-	      break;
-	    }
+	case overlapped_signal:
+	  keep_looping = true;
+	  break;
+	default:	/* Added to quiet gcc */
+	case overlapped_success:
+	case overlapped_error:
+	  keep_looping = false;
+	  break;
 	}
-      while (keep_looping);
     }
+  while (keep_looping);
   len = (size_t) nbytes;
 }
 
@@ -1972,6 +1964,8 @@ fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
 	      break;			/* keep looping */
 	    case overlapped_error:
 	      len = 0;		/* terminate loop */
+	    case overlapped_unknown:
+	    case overlapped_nonblocking_no_data:
 	      break;
 	    }
 	}
