@@ -229,6 +229,8 @@
 			ARM_FEATURE (ARM_AEXT_V7A | ARM_EXT_MP | ARM_EXT_SEC \
 				     | ARM_EXT_DIV | ARM_EXT_ADIV \
 				     | ARM_EXT_VIRT, 0)
+/* v7-r+idiv.  */
+#define ARM_ARCH_V7R_IDIV	ARM_FEATURE (ARM_AEXT_V7R | ARM_EXT_ADIV, 0)
 /* Features that are present in v6M and v6S-M but not other v6 cores.  */
 #define ARM_ARCH_V6M_ONLY ARM_FEATURE (ARM_AEXT_V6M_ONLY, 0)
 

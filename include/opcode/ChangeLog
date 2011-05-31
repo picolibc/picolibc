@@ -1,3 +1,7 @@
+2011-05-31  Paul Brook  <paul@codesourcery.com>
+
+	* opcode/arm.h (ARM_ARCH_V7R_IDIV): Define.
+
 2011-04-18  Julian Brown  <julian@codesourcery.com>
 
 	* arm.h (ARM_AEXT_V7_ARM): Remove ARM_EXT_OS from bitmask.
