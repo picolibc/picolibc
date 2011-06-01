@@ -1,3 +1,10 @@
+2011-05-31  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* select.cc (pipe_data_available): New function - uses
+	NtQueryInformationFile to return information about pipes.
+	(peek_pipe): Rewrite to use pipe_data_available for both read and write
+	tests.
+
 2011-05-30  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dtable.cc (dtable::select_write): Add missing argument to

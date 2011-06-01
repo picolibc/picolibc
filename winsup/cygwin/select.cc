@@ -474,25 +474,70 @@ no_verify (select_record *, fd_set *, fd_set *, fd_set *)
 }
 
 static int
+pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
+{
+  IO_STATUS_BLOCK iosb = {0};
+  FILE_PIPE_LOCAL_INFORMATION fpli = {0};
+
+  bool res = false;
+  if (NtQueryInformationFile (h,
+			      &iosb,
+			      &fpli,
+			      sizeof (fpli),
+			      FilePipeLocalInformation))
+    {
+      /* If NtQueryInformationFile fails, optimistically assume the
+	 pipe is writable.  This could happen if we somehow
+	 inherit a pipe that doesn't permit FILE_READ_ATTRIBUTES
+	 access on the write end.  */
+      select_printf ("fd %d, %s, NtQueryInformationFile failed",
+		     fd, fh->get_name ());
+      res = writing ? true : -1;
+    }
+  else if (!writing)
+    {
+      res = !!fpli.ReadDataAvailable;
+      select_printf ("fd %d, %s, read avail %u", fd, fh->get_name (), fpli.ReadDataAvailable);
+    }
+  else
+    {
+      /* If there is anything available in the pipe buffer then signal
+	 that.  This means that a pipe could still block since you could
+	 be trying to write more to the pipe than is available in the
+	 buffer but that is the hazard of select().  */
+      if ((fpli.WriteQuotaAvailable = (fpli.OutboundQuota - fpli.ReadDataAvailable)))
+	{
+	  select_printf ("fd %d, %s, write: size %lu, avail %lu", fd,
+			 fh->get_name (), fpli.OutboundQuota,
+			 fpli.WriteQuotaAvailable);
+	  res = true;
+	}
+      /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
+	 the pipe writable only if it is completely empty, to minimize the
+	 probability that a subsequent write will block.  */
+      else if (fpli.OutboundQuota < PIPE_BUF &&
+	       fpli.WriteQuotaAvailable == fpli.OutboundQuota)
+	{
+	  select_printf ("fd, %s, write tiny pipe: size %lu, avail %lu",
+			 fd, fh->get_name (), fpli.OutboundQuota,
+			 fpli.WriteQuotaAvailable);
+	  res = true;
+	}
+    }
+  return res;
+}
+
+static int
 peek_pipe (select_record *s, bool from_select)
 {
   HANDLE h;
   set_handle_or_return_if_not_open (h, s);
 
-  int n = 0;
   int gotone = 0;
   fhandler_base *fh = (fhandler_base *) s->fh;
 
-  /* Don't check if this is a non-blocking fd and I/O is still active.
-     That could give a false-positive with peek_pipe and friends. */
-  if (fh->has_ongoing_io ())
-    return 0;
-
-  /* Don't perform complicated tests if we don't need to. */
-  if (!s->read_selected && !s->except_selected)
-    goto out;
-
-  if (s->read_selected)
+  DWORD dev = fh->get_device ();
+  if (s->read_selected && dev != FH_PIPEW)
     {
       if (s->read_ready)
 	{
@@ -524,106 +569,37 @@ peek_pipe (select_record *s, bool from_select)
 	  gotone = s->read_ready = true;
 	  goto out;
 	}
-    }
+      int n = pipe_data_available (s->fd, fh, h, false);
 
-  if (fh->get_device () == FH_PIPEW)
-    select_printf ("%s, select for read/except on write end of pipe",
-		   fh->get_name ());
-  else if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
-    switch (GetLastError ())
-      {
-      case ERROR_BAD_PIPE:
-      case ERROR_PIPE_BUSY:
-      case ERROR_NO_DATA:
-      case ERROR_PIPE_NOT_CONNECTED:
-	n = 0;
-	break;
-      default:
-	select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
-	n = -1;
-	break;
-      }
-
-  if (n < 0)
-    {
-      select_printf ("%s, n %d", fh->get_name (), n);
-      if (s->except_selected)
-	gotone += s->except_ready = true;
-      if (s->read_selected)
-	gotone += s->read_ready = true;
-    }
-  if (n > 0 && s->read_selected)
-    {
-      select_printf ("%s, ready for read: avail %d", fh->get_name (), n);
-      gotone += s->read_ready = true;
-    }
-  if (!gotone && s->fh->hit_eof ())
-    {
-      select_printf ("%s, saw EOF", fh->get_name ());
-      if (s->except_selected)
-	gotone += s->except_ready = true;
-      if (s->read_selected)
-	gotone += s->read_ready = true;
+      if (n < 0)
+	{
+	  select_printf ("read: %s, n %d", fh->get_name (), n);
+	  if (s->except_selected)
+	    gotone += s->except_ready = true;
+	  if (s->read_selected)
+	    gotone += s->read_ready = true;
+	}
+      else if (n > 0)
+	{
+	  select_printf ("read: %s, ready for read: avail %d", fh->get_name (), n);
+	  gotone += s->read_ready = true;
+	}
+      if (!gotone && s->fh->hit_eof ())
+	{
+	  select_printf ("read: %s, saw EOF", fh->get_name ());
+	  if (s->except_selected)
+	    gotone += s->except_ready = true;
+	  if (s->read_selected)
+	    gotone += s->read_ready = true;
+	}
     }
 
 out:
-  if (s->write_selected)
+  if (s->write_selected && dev != FH_PIPER)
     {
-      if (s->write_ready)
-	{
-	  select_printf ("%s, already ready for write", fh->get_name ());
-	  gotone++;
-	}
-      /* Do we need to do anything about SIGTTOU here? */
-      else if (fh->get_device () == FH_PIPER)
-	select_printf ("%s, select for write on read end of pipe",
-		       fh->get_name ());
-      else
-	{
-	  IO_STATUS_BLOCK iosb = {0};
-	  FILE_PIPE_LOCAL_INFORMATION fpli = {0};
-
-	  if (NtQueryInformationFile (h,
-				      &iosb,
-				      &fpli,
-				      sizeof (fpli),
-				      FilePipeLocalInformation))
-	    {
-	      /* If NtQueryInformationFile fails, optimistically assume the
-		 pipe is writable.  This could happen if we somehow
-		 inherit a pipe that doesn't permit FILE_READ_ATTRIBUTES
-		 access on the write end.  */
-	      select_printf ("%s, NtQueryInformationFile failed",
-			     fh->get_name ());
-	      gotone += s->write_ready = true;
-	    }
-	  /* If there is anything available in the pipe buffer then signal
-	     that.  This means that a pipe could still block since you could
-	     be trying to write more to the pipe than is available in the
-	     buffer but that is the hazard of select().  */
-	  else if ((fpli.WriteQuotaAvailable = (fpli.OutboundQuota - fpli.ReadDataAvailable)))
-	    {
-	      select_printf ("%s, ready for write: size %lu, avail %lu",
-			     fh->get_name (),
-			     fpli.OutboundQuota,
-			     fpli.WriteQuotaAvailable);
-	      gotone += s->write_ready = true;
-	    }
-	  /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
-	     the pipe writable only if it is completely empty, to minimize the
-	     probability that a subsequent write will block.  */
-	  else if (fpli.OutboundQuota < PIPE_BUF &&
-		   fpli.WriteQuotaAvailable == fpli.OutboundQuota)
-	    {
-	      select_printf ("%s, tiny pipe: size %lu, avail %lu",
-			     fh->get_name (),
-			     fpli.OutboundQuota,
-			     fpli.WriteQuotaAvailable);
-	      gotone += s->write_ready = true;
-	    }
-	}
+      gotone += s->write_ready =  pipe_data_available (s->fd, fh, h, true);
+      select_printf ("write: %s, gotone %d", fh->get_name (), gotone);
     }
-
   return gotone;
 }
 
