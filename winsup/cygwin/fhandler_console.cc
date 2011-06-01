@@ -127,7 +127,6 @@ console_unit::console_unit (HWND me0):
     api_fatal ("console device allocation failure - too many consoles in use, max consoles is 32");
 }
 
-
 bool
 fhandler_console::set_unit ()
 {
@@ -193,14 +192,13 @@ fhandler_console::get_tty_stuff ()
 tty_min *
 tty_list::get_cttyp ()
 {
-  static tty_min nada;
   _dev_t n = myself->ctty;
   if (iscons_dev (n))
-    return &shared_console_info->tty_min_state;
-  else if (n > 0)
+    return shared_console_info ? &shared_console_info->tty_min_state : NULL;
+  else if (istty_slave_dev (n))
     return &ttys[device::minor (n)];
   else
-    return &nada;
+    return NULL;
 }
 
 inline DWORD

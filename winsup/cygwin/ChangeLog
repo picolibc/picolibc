@@ -1,5 +1,11 @@
 2011-05-31  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* exceptions.cc (ctrl_c_handler): Simplify test for no parent tty.
+	* fhandler_console.cc (fhandler_console::get_tty_stuff): Return NULL if
+	ctty is not tty/console.  Improve test for slave tty/pty device.
+
+2011-05-31  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* external.cc (fillout_pinfo): Don't truncate ctty if it's < 0.
 
 	* select.cc (pipe_data_available): Avoid printing debug info by default
