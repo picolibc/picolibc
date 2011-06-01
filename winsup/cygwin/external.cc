@@ -76,7 +76,7 @@ fillout_pinfo (pid_t pid, int winpid)
 	}
       else if (nextpid || p->pid == pid || (winpid && thispid == (DWORD) pid))
 	{
-	  ep.ctty = iscons_dev (p->ctty) ? p->ctty : device::minor (p->ctty);
+	  ep.ctty = (p->ctty < 0 || iscons_dev (p->ctty)) ? p->ctty : device::minor (p->ctty);
 	  ep.pid = p->pid;
 	  ep.ppid = p->ppid;
 	  ep.dwProcessId = p->dwProcessId;

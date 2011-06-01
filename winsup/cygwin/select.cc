@@ -497,7 +497,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
   else if (!writing)
     {
       res = !!fpli.ReadDataAvailable;
-      select_printf ("fd %d, %s, read avail %u", fd, fh->get_name (), fpli.ReadDataAvailable);
+      paranoid_printf ("fd %d, %s, read avail %u", fd, fh->get_name (), fpli.ReadDataAvailable);
     }
   else
     {
@@ -507,7 +507,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 	 buffer but that is the hazard of select().  */
       if ((fpli.WriteQuotaAvailable = (fpli.OutboundQuota - fpli.ReadDataAvailable)))
 	{
-	  select_printf ("fd %d, %s, write: size %lu, avail %lu", fd,
+	  paranoid_printf ("fd %d, %s, write: size %lu, avail %lu", fd,
 			 fh->get_name (), fpli.OutboundQuota,
 			 fpli.WriteQuotaAvailable);
 	  res = true;

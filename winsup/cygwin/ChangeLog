@@ -1,5 +1,12 @@
 2011-05-31  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* external.cc (fillout_pinfo): Don't truncate ctty if it's < 0.
+
+	* select.cc (pipe_data_available): Avoid printing debug info by default
+	or suffer very large strace files.
+
+2011-05-31  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* select.cc (pipe_data_available): New function - uses
 	NtQueryInformationFile to return information about pipes.
 	(peek_pipe): Rewrite to use pipe_data_available for both read and write
