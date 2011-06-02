@@ -1,6 +1,6 @@
 /* COFF information for the Intel i860.
    
-   Copyright 2001, 2003, 2010 Free Software Foundation, Inc.
+   Copyright 2001, 2003, 2010, 2011 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ struct external_reloc
 #define RELSZ 10
 
 /* The relocation directory entry types.
-     PAIR   : The low half that follows relates to the preceeding HIGH[ADJ].
+     PAIR   : The low half that follows relates to the preceding HIGH[ADJ].
      HIGH   : The high half of a 32-bit constant.
      LOWn   : The low half, insn bits 15..(n-1), 2^n-byte aligned. 
      SPLITn : The low half, insn bits 20..16 and 10..(n-1), 2^n-byte aligned. 

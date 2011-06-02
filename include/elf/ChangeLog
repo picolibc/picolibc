@@ -1,3 +1,8 @@
+2011-06-02  Nick Clifton  <nickc@redhat.com>
+
+	* common.h: Fix spelling mistake in comment.
+	* reloc-macros.h: Likewise.
+
 2011-05-31  Paul Brook  <paul@codesourcery.com>
 
 	* arm.h (arm_st_branch_type): Add ST_BRANCH_UNKNOWN.
