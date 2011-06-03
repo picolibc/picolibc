@@ -1666,11 +1666,11 @@ if test "x$with_cloog" != "xno" -a "${ENABLE_CLOOG_CHECK}" = "yes"; then
   CFLAGS="$CFLAGS $clooginc $gmpinc $pplinc"
   AC_MSG_CHECKING([for version 0.15.5 (or later revision) of CLooG])
   AC_TRY_COMPILE([#include "cloog/cloog.h"],[
-  #if CLOOG_VERSION_MAJOR != 0 || CLOOG_VERSION_MINOR != 15 || CLOOG_VERSION_REVISION < 5
+  #if ((CLOOG_VERSION_MAJOR < 0) || (CLOOG_VERSION_MAJOR == 0 && CLOOG_VERSION_MINOR < 15) || (CLOOG_VERSION_MAJOR == 0 && CLOOG_VERSION_MINOR == 15 && CLOOG_VERSION_REVISION < 5))
   choke me
   #endif
   ], [AC_TRY_COMPILE([#include "cloog/cloog.h"],[
-  #if CLOOG_VERSION_MAJOR != 0 || CLOOG_VERSION_MINOR != 15 || CLOOG_VERSION_REVISION < 9
+  #if ((CLOOG_VERSION_MAJOR < 0) || (CLOOG_VERSION_MAJOR == 0 && CLOOG_VERSION_MINOR < 15) || (CLOOG_VERSION_MAJOR == 0 && CLOOG_VERSION_MINOR == 15 && CLOOG_VERSION_REVISION < 5))
   choke me
   #endif
   ], [AC_MSG_RESULT([yes])], [AC_MSG_RESULT([buggy but acceptable])])],

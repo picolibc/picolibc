@@ -1,3 +1,9 @@
+2011-06-03  Nick Clifton  <nickc@redhat.com>
+
+	PR binutils/12665
+	* configure.ac: Correct for minimum CLOOG version.
+	* configure: Regenerate.
+
 2010-12-10  Tristan Gingold  <gingold@adacore.com>
 
 	* src-release (ETC_SUPPORT): add gnu-oids.texi
