@@ -404,7 +404,7 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_termios *fh)
       syscall_printf ("attaching %s sid %d, pid %d, pgid %d, tty->pgid %d, tty->sid %d",
 		      __ctty (), sid, pid, pgid, tc->getpgid (), tc->getsid ());
       if (!cygwin_finished_initializing && !myself->cygstarted
-	  && myself->pgid == myself->pid)
+	  && myself->pgid == myself->pid && tc->getpgid () && tc->getsid ())
 	{
 	  myself->pgid = tc->getpgid ();
 	  myself->sid = tc->getsid ();
