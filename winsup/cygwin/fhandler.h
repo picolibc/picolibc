@@ -12,6 +12,7 @@ details. */
 #ifndef _FHANDLER_H_
 #define _FHANDLER_H_
 
+#include "tty.h"
 /* fcntl flags used only internaly. */
 #define O_NOSYMLINK 0x080000
 #define O_DIROPEN   0x100000
@@ -925,7 +926,8 @@ class fhandler_termios: public fhandler_base
   virtual void doecho (const void *, DWORD) {};
   virtual int accept_input () {return 1;};
  public:
-  tty_min *tc;
+  tty_min *_tc;
+  virtual tty_min *tc () const {return _tc; }
   fhandler_termios () :
   fhandler_base ()
   {
@@ -934,9 +936,9 @@ class fhandler_termios: public fhandler_base
   HANDLE& get_output_handle () { return output_handle; }
   line_edit_status line_edit (const char *rptr, int nread, termios&);
   void set_output_handle (HANDLE h) { output_handle = h; }
-  void tcinit (tty_min *this_tc, bool force);
+  void tcinit (bool force);
   bool is_tty () const { return true; }
-  tty *get_ttyp () { return (tty *) tc; }
+  tty *get_ttyp () { return (tty *) tc (); }
   void sigflush ();
   int tcgetpgrp ();
   int tcsetpgrp (int pid);
@@ -1041,9 +1043,15 @@ class dev_console
 /* This is a input and output console handle */
 class fhandler_console: public fhandler_termios
 {
- private:
+public:
+  struct console_state
+  {
+    tty_min tty_min_state;
+    dev_console dev_state;
+  };
+private:
   static const unsigned MAX_WRITE_CHARS;
-  static dev_console *dev_state;
+  static console_state *shared_console_info;
   static bool invisible_console;
 
   /* Used when we encounter a truncated multi-byte sequence.  The
@@ -1075,9 +1083,16 @@ class fhandler_console: public fhandler_termios
   void set_cursor_maybe ();
   static bool create_invisible_console (HWINSTA);
   static bool create_invisible_console_workaround ();
+  static console_state *open_shared_console (HWND, HANDLE&, bool&);
+  tty_min *tc () const {return &(shared_console_info->tty_min_state);}
 
  public:
   fhandler_console ();
+  static console_state *open_shared_console (HWND hw, HANDLE& h)
+  {
+    bool createit = false;
+    return open_shared_console (hw, h, createit);
+  }
 
   fhandler_console* is_console () { return this; }
 
@@ -1098,7 +1113,7 @@ class fhandler_console: public fhandler_termios
   int ioctl (unsigned int cmd, void *);
   int init (HANDLE, DWORD, mode_t);
   bool mouse_aware (MOUSE_EVENT_RECORD& mouse_event);
-  bool focus_aware () {return dev_state->use_focus;}
+  bool focus_aware () {return shared_console_info->dev_state.use_focus;}
 
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
@@ -1114,6 +1129,7 @@ class fhandler_console: public fhandler_termios
   static bool need_invisible ();
   static bool has_a () {return !invisible_console;}
   size_t size () const { return sizeof (*this);}
+  friend tty_min * tty_list::get_cttyp ();
 };
 
 class fhandler_tty_common: public fhandler_termios

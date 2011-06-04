@@ -1883,13 +1883,15 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       debug_printf ("EOF");
       *bytes = 0;
       res = overlapped_success;
+      if (writing && err == ERROR_BROKEN_PIPE)
+	raise (SIGPIPE);
     }
   else
     {
       debug_printf ("res %u, err %u", (unsigned) res, err);
       *bytes = (DWORD) -1;
       __seterrno_from_win_error (err);
-      if (writing && (err == ERROR_NO_DATA || err == ERROR_BROKEN_PIPE))
+      if (writing && err == ERROR_NO_DATA)
 	raise (SIGPIPE);
     }
 

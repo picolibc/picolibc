@@ -68,7 +68,7 @@ fhandler_tty_master::set_winsize (bool sendSIGWINCH)
   console->ioctl (TIOCGWINSZ, &w);
   get_ttyp ()->winsize = w;
   if (sendSIGWINCH)
-    tc->kill_pgrp (SIGWINCH);
+    tc ()->kill_pgrp (SIGWINCH);
 }
 
 int
@@ -493,7 +493,9 @@ fhandler_tty_slave::open (int flags, mode_t)
   for (HANDLE **h = handles; *h; h++)
     **h = NULL;
 
-  tcinit (cygwin_shared->tty[get_unit ()], false);
+  _tc = cygwin_shared->tty[get_unit ()];
+
+  tcinit (false);
 
   cygwin_shared->tty.attach (get_unit ());
 
@@ -716,7 +718,7 @@ fhandler_tty_slave::init (HANDLE h, DWORD a, mode_t)
 	 tty process group leader.
 	 TODO: Investigate how SIGTTIN should be handled with pure-windows
 	 programs. */
-      pinfo p (tc->getpgid ());
+      pinfo p (tc ()->getpgid ());
       /* We should only grab this when the process group owner for this
 	 tty is a non-cygwin process or we've been started directly
 	 from a non-Cygwin process with no Cygwin ancestry.  */
@@ -724,7 +726,7 @@ fhandler_tty_slave::init (HANDLE h, DWORD a, mode_t)
 	{
 	  termios_printf ("Setting process group leader to %d since %W(%d) is not a cygwin process",
 			  myself->pgid, p->progname, p->pid);
-	  tc->setpgid (myself->pgid);
+	  tc ()->setpgid (myself->pgid);
 	}
     }
 
@@ -1248,7 +1250,7 @@ fhandler_tty_slave::fch_open_handles ()
 {
   char buf[MAX_PATH];
 
-  tc = cygwin_shared->tty[get_unit ()];
+  _tc = cygwin_shared->tty[get_unit ()];
   shared_name (buf, INPUT_AVAILABLE_EVENT, get_unit ());
   input_available_event = OpenEvent (READ_CONTROL | WRITE_DAC | WRITE_OWNER,
 				     TRUE, buf);
@@ -1496,7 +1498,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 {
   int i;
   char *p = (char *) ptr;
-  termios ti = tc->ti;
+  termios ti = tc ()->ti;
 
   bg_check_types bg = bg_check (SIGTTOU);
   if (bg <= bg_eof)
@@ -1796,8 +1798,9 @@ fhandler_pty_master::setup (bool ispty)
   SECURITY_ATTRIBUTES sa = { sizeof (SECURITY_ATTRIBUTES), NULL, TRUE };
 
   tty& t = *cygwin_shared->tty[get_unit ()];
+  _tc = (tty_min *)&t;
 
-  tcinit (&t, true);		/* Set termios information.  Force initialization. */
+  tcinit (true);		/* Set termios information.  Force initialization. */
 
   const char *errstr = NULL;
   DWORD pipe_mode = PIPE_NOWAIT;

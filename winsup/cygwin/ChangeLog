@@ -1,3 +1,61 @@
+2011-06-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Only raise
+	SIGPIPE when writing.
+
+	* fhandler.h: Include "tty.h".
+	(fhandler_termios::_tc): Rename from tc.
+	(fhandler_termios::tc): New method.
+	(fhandler_termios::tcinit): Remove an argument.
+	(fhandler_termios::get_ttyp): Use method to retrieve value.
+	(fhandler_console::console_state): Move here.
+	(fhandler_console::dev_state): Delete.
+	(fhandler_console::shared_console_info): Define.
+	(fhandler_console::open_shared_console): Move this function under
+	fhandler_console umbrella.
+	(fhandler_console::tc): Define.  Return static value.
+	(fhandler_console::focus_aware): Accommodate deletion of dev_state.
+	(fhandler_console): Add tty_list::get_cttyp as a friend.
+	* fhandler_console.cc (dev_state): Redefine as a pointer within
+	shared_console_info and change dev-> to dev. throughout.
+	(fhandler_console::shared_console_info): Move into fhandler_console.
+	(fhandler_console::open_shared_console): Move into fhandler_console
+	change argument to simple bool.
+	(enum_windows): Accommodate changes to console_state and
+	open_shared_console.
+	(console_unit::console_unit): Ditto.
+	(fhandler_console::get_tty_stuff): Accommodate change to dev_state.
+	(tty_list::get_cttyp): Accommodate change to
+	handler_console::shared_console_info.
+	(fhandler_console::read): Accommodate change from tc to tc ().
+	(fhandler_console::set_input_state): Ditto.
+	(fhandler_console::open): Accommodate tcinit argument change and change
+	from tc to tc().
+	(fhandler_console::input_tcsetattr): Accomodate change from tc to tc().
+	(fhandler_console::input_tcsetattr): Ditto.
+	(fhandler_console::write_normal): Ditto.
+	(fhandler_console::init): Ditto.
+	(fhandler_console::igncr_enabled): Ditto.
+	* fhandler_termios.cc (fhandler_termios::tcinit): Remove first argument.
+	Expect tc() to have been set up first.  Use tc() rather than tc.
+	(fhandler_termios::tcsetpgrp): Accomodate change from tc to tc().
+	(fhandler_termios::tcgetpgrp): Ditto.
+	(fhandler_termios::bg_check): Ditto.
+	(fhandler_termios::line_edit: Ditto.
+	(fhandler_tty_master::set_winsize): Ditto.
+	(fhandler_tty_slave::open): Ditto.
+	(fhandler_tty_slave::init): Ditto.
+	(fhandler_pty_master::write): Ditto.
+	(fhandler_pty_master::setup): Ditto.  Accommodate change in arguments
+	to tcinit.
+	(fhandler_tty_slave::fch_open_handles): Set _tc directly.
+	(tty_min::is_orphaned_process_group): Don't assume that parent pid
+	exists.
+	* pinfo.cc (_pinfo::set_ctty): Reset myself->{pgid,sid} here if we were
+	started by a non-Cygwin process but the tty exists.
+	* shared_info.h (console_state): Delete from here.
+	* tty.h: Make multiple inclusion safe.
+
 2011-05-31  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* exceptions.cc (ctrl_c_handler): Simplify test for no parent tty.

@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _TTY_H
+#define _TTY_H
 /* tty tables */
 
 #define INP_BUFFER_SIZE 256
@@ -148,3 +150,4 @@ public:
 };
 
 extern "C" int ttyslot (void);
+#endif /*_TTY_H*/

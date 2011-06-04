@@ -79,14 +79,6 @@ void __stdcall shared_destroy ();
 	     (((DWORD) ((p) + 1) + system_info.dwAllocationGranularity - 1) / \
 	      system_info.dwAllocationGranularity)))
 
-#ifdef _FHANDLER_H_
-struct console_state
-{
-  tty_min tty_min_state;
-  dev_console dev_state;
-};
-#endif
-
 HANDLE get_shared_parent_dir ();
 HANDLE get_session_parent_dir ();
 char *__stdcall shared_name (char *, const char *, int);
