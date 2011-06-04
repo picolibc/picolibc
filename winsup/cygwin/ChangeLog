@@ -1,5 +1,10 @@
 2011-06-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* ntdll.h (FILE_PIPE_*): Define constants.
+	* select.cc (pipe_data_available): Detect closing state.
+
+2011-06-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* pinfo.cc (_pinfo::set_ctty): Don't reset myself->{pgid,sid} if
 	terminal has no pgid or sid settings.
 

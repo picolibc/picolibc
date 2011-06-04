@@ -524,7 +524,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 	  res = true;
 	}
     }
-  return res;
+  return res ?: -!!(fpli.NamedPipeState & FILE_PIPE_CLOSING_STATE);
 }
 
 static int
