@@ -1,3 +1,11 @@
+2011-06-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler_console.cc (fhandler_console::open_shared_console): Don't
+	zero handle to open_shared since it is supposed to be an input.
+	(enum_windows): Set handle input to open_shared to NULL since it does
+	not represent any previously opened shared region.
+	* shared.cc (open_shared): Tweak debugging output.
+
 2011-06-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* ntdll.h (FILE_PIPE_*): Define constants.

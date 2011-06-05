@@ -301,7 +301,7 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
       offsets[SH_TOTAL_SIZE] += delta;
     }
 
-  debug_printf ("name %W, n %d, shared %p (wanted %p), h %p", mapname, n, shared, addr, shared_h);
+  debug_printf ("name %W, n %d, shared %p (wanted %p), h %p, *m %d", mapname, n, shared, addr, shared_h, *m);
 
   return shared;
 }

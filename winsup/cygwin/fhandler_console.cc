@@ -82,7 +82,6 @@ fhandler_console::open_shared_console (HWND hw, HANDLE& h, bool& create)
 {
   wchar_t namebuf[(sizeof "XXXXXXXXXXXXXXXXXX-consNNNNNNNNNN")];
   __small_swprintf (namebuf, L"%S-cons%p", &installation_key, hw);
-  h = NULL;
 
   shared_locations m = create ? SH_JUSTCREATE: SH_JUSTOPEN;
   console_state *res = (console_state *)
@@ -108,7 +107,7 @@ enum_windows (HWND hw, LPARAM lp)
   console_unit *this1 = (console_unit *) lp;
   if (hw == this1->me)
     return TRUE;
-  HANDLE h;
+  HANDLE h = NULL;
   fhandler_console::console_state *cs;
   if ((cs = fhandler_console::open_shared_console (hw, h)))
     {
