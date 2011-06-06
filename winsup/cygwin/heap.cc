@@ -76,7 +76,7 @@ heap_init ()
 		    }
 		}
 	      /* Since VirtualAlloc only reserves at allocation granularity
-	         boundaries, we round up here, too.  Otherwise we might end
+		 boundaries, we round up here, too.  Otherwise we might end
 		 up at a bogus page-aligned address. */
 	      start_address = roundup2 (start_address + mbi.RegionSize,
 					wincap.allocation_granularity ());

@@ -27,8 +27,8 @@ details. */
 	  continue; \
 	case MMAP_RAISE_SIGBUS: \
 	  raise(SIGBUS); \
- 	default: \
- 	  break; \
+	default: \
+	  break; \
 	} \
       break; \
     } \

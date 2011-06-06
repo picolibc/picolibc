@@ -1,4 +1,4 @@
-/* cygxdr.h: 
+/* cygxdr.h:
 
    Copyright 2010 Red Hat, Inc.
 

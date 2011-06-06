@@ -132,7 +132,7 @@ fs_info_cache::genhash (PFILE_FS_VOLUME_INFORMATION pffvi)
   uint32_t hash = 0;
   const uint16_t *p = (const uint16_t *) pffvi;
   const uint16_t *end = (const uint16_t *)
-		        ((const uint8_t *) p + sizeof *pffvi
+			((const uint8_t *) p + sizeof *pffvi
 			 + pffvi->VolumeLabelLength  - sizeof (WCHAR));
   pffvi->__dummy = 0;	/* This member can have random values! */
   while (p < end)
@@ -193,14 +193,14 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
       InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL,
 				  NULL);
       /* Note: Don't use the FILE_OPEN_REPARSE_POINT flag here.  The reason
-         is that symlink_info::check relies on being able to open a handle
+	 is that symlink_info::check relies on being able to open a handle
 	 to the target of a volume mount point. */
       status = NtOpenFile (&vol, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   FILE_OPEN_FOR_BACKUP_INTENT);
       /* At least one filesystem (HGFS, VMware shared folders) doesn't like
-         to be opened with access set to just READ_CONTROL. */
+	 to be opened with access set to just READ_CONTROL. */
       if (status == STATUS_INVALID_PARAMETER)
-      	{
+	{
 	  access |= FILE_READ_DATA;
 	  status = NtOpenFile (&vol, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_FOR_BACKUP_INTENT);
@@ -405,7 +405,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   if (!got_fs ())
     {
       /* The filesystem name is only used in fillout_mntent and only if
-         the filesystem isn't one of the well-known filesystems anyway. */
+	 the filesystem isn't one of the well-known filesystems anyway. */
       sys_wcstombs (fsn, sizeof fsn, ffai_buf.ffai.FileSystemName,
 		    ffai_buf.ffai.FileSystemNameLength / sizeof (WCHAR));
       strlwr (fsn);
@@ -1083,7 +1083,7 @@ fstab_list_flags ()
     {
       char *bp = buf;
       for (o = oopts; o < (oopts + (sizeof (oopts) / sizeof (oopts[0]))); o++)
-      	{
+	{
 	  bp = stpcpy (bp, o->name);
 	  *bp++ = ',';
 	}

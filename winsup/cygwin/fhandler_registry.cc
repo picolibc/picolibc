@@ -330,11 +330,11 @@ fhandler_registry::exists ()
 	  if (hKey == HKEY_PERFORMANCE_DATA)
 	    {
 	      /* RegEnumValue () returns garbage for this key.
-	         RegQueryValueEx () returns a PERF_DATA_BLOCK even
-	         if a value does not contain any counter objects.
-	         So allow access to the generic names and to
-	         (blank separated) lists of counter numbers.
-	         Never allow access to "Add", see above comment.  */
+		 RegQueryValueEx () returns a PERF_DATA_BLOCK even
+		 if a value does not contain any counter objects.
+		 So allow access to the generic names and to
+		 (blank separated) lists of counter numbers.
+		 Never allow access to "Add", see above comment.  */
 	      for (int i = 0; i < PERF_DATA_FILE_COUNT
 			      && file_type == virt_none; i++)
 		{
@@ -574,7 +574,7 @@ fhandler_registry::readdir (DIR *dir, dirent *de)
   if ((HKEY) dir->__handle == HKEY_PERFORMANCE_DATA)
     {
       /* RegEnumValue () returns garbage for this key,
-         simulate only a minimal listing of the generic names.  */
+	 simulate only a minimal listing of the generic names.  */
       if (dir->__d_position >= SPECIAL_DOT_FILE_COUNT + PERF_DATA_FILE_COUNT)
 	goto out;
       strcpy (de->d_name, perf_data_files[dir->__d_position - SPECIAL_DOT_FILE_COUNT]);

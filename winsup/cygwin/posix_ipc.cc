@@ -224,7 +224,7 @@ restart1:
       break;
     case WAIT_OBJECT_0 + 2:
       if (timer_idx != 2)
-      	pthread::static_cancel_self ();
+	pthread::static_cancel_self ();
       /*FALLTHRU*/
     case WAIT_OBJECT_0 + 3:
       ret = ETIMEDOUT;
@@ -587,7 +587,7 @@ err:
   if (mqinfo)
     {
       if (mqinfo->mqi_lock)
-      	ipc_mutex_close (mqinfo->mqi_lock);
+	ipc_mutex_close (mqinfo->mqi_lock);
       if (mqinfo->mqi_waitsend)
 	ipc_cond_close (mqinfo->mqi_waitsend);
       if (mqinfo->mqi_waitrecv)

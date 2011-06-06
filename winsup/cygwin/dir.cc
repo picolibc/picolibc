@@ -303,7 +303,7 @@ mkdir (const char *dir, mode_t mode)
       char *p = stpcpy (buf = tp.c_get (), dir) - 1;
       dir = buf;
       while (p > dir && isdirsep (*p))
-        *p-- = '\0';
+	*p-- = '\0';
     }
   if (!(fh = build_fh_name (dir, PC_SYM_NOFOLLOW)))
     goto done;   /* errno already set */;

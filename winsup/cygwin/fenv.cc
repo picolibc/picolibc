@@ -227,7 +227,7 @@ feclearexcept (int excepts)
   return fesetenv (&fenv);
 }
 
-/*  This function raises the supported exceptions indicated by 
+/*  This function raises the supported exceptions indicated by
    excepts.  If more than one exception bit in excepts is set the order
    in which the exceptions are raised is undefined except that overflow
    (FE_OVERFLOW) or underflow (FE_UNDERFLOW) are raised before inexact

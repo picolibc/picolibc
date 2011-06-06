@@ -49,7 +49,7 @@ fhandler_mailslot::get_object_attr (OBJECT_ATTRIBUTES &attr,
 				    PUNICODE_STRING path,
 				    int flags)
 {
-  
+
   RtlCopyUnicodeString (path, pc.get_nt_native_path ());
   RtlAppendUnicodeStringToString (path, &installation_key);
   InitializeObjectAttributes (&attr, path,
@@ -72,7 +72,7 @@ fhandler_mailslot::open (int flags, mode_t mode)
   UNICODE_STRING path;
 
   tp.u_get (&path);
-  
+
   switch (flags & O_ACCMODE)
     {
     case O_RDONLY:	/* Server */

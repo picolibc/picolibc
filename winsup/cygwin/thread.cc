@@ -1403,7 +1403,7 @@ pthread_rwlock::rdlock ()
       if (reader->n < ULONG_MAX)
 	++reader->n;
       else
-      	errno = EAGAIN;
+	errno = EAGAIN;
       goto DONE;
     }
 
@@ -1546,7 +1546,7 @@ pthread_rwlock::unlock ()
 	  goto DONE;
 	}
       if (--reader->n > 0)
-      	goto DONE;
+	goto DONE;
 
       remove_reader (reader);
       delete reader;
@@ -2247,9 +2247,9 @@ pthread_attr_setstack (pthread_attr_t *attr, void *addr, size_t size)
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   if (addr == NULL)
-    return EINVAL;    
+    return EINVAL;
   if (size < PTHREAD_STACK_MIN)
-    return EINVAL;    
+    return EINVAL;
   (*attr)->stackaddr = addr;
   (*attr)->stacksize = size;
   return 0;
@@ -2272,7 +2272,7 @@ pthread_attr_setstackaddr (pthread_attr_t *attr, void *addr)
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   if (addr == NULL)
-    return EINVAL;    
+    return EINVAL;
   (*attr)->stackaddr = addr;
   return 0;
 }
@@ -2294,7 +2294,7 @@ pthread_attr_setstacksize (pthread_attr_t *attr, size_t size)
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   if (size < PTHREAD_STACK_MIN)
-    return EINVAL;    
+    return EINVAL;
   (*attr)->stacksize = size;
   return 0;
 }
@@ -2481,7 +2481,7 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
 
   tbi = (PTHREAD_BASIC_INFORMATION) malloc (sizeof_tbi);
   ret = NtQueryInformationThread (thread->win32_obj_id, ThreadBasicInformation,
-                                  tbi, sizeof_tbi, NULL);
+				  tbi, sizeof_tbi, NULL);
 
   if (NT_SUCCESS (ret))
     {
@@ -2493,7 +2493,7 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
   else
     {
       debug_printf ("NtQueryInformationThread(ThreadBasicInformation), "
-                    "status %p", ret);
+		    "status %p", ret);
       (*attr)->stackaddr = thread->attr.stackaddr;
       (*attr)->stacksize = thread->attr.stacksize;
     }
@@ -3579,7 +3579,7 @@ semaphore::open (unsigned long long hash, LUID luid, int fd, int oflag,
   semaphores.mx.lock ();
   for (semaphore *sema = semaphores.head; sema; sema = sema->next)
     if (sema->fd >= 0 && sema->hash == hash
-    	&& sema->luid.HighPart == luid.HighPart
+	&& sema->luid.HighPart == luid.HighPart
 	&& sema->luid.LowPart == sema->luid.LowPart)
       {
 	wasopen = true;

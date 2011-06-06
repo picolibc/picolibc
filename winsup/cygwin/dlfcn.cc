@@ -76,7 +76,7 @@ dlopen (const char *name, int)
     {
       ret = (void *) GetModuleHandle (NULL); /* handle for the current module */
       if (!ret)
-      	__seterrno ();
+	__seterrno ();
     }
   else
     {

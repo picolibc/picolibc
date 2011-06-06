@@ -86,9 +86,9 @@ char *old_title;
    Rather, the strings are placed in the R/O section .rdata, so we get
    a SEGV if some code erroneously tries to overwrite these strings. */
 #define _ROU(_s) \
-        { Length: sizeof (_s) - sizeof (WCHAR), \
-          MaximumLength: sizeof (_s), \
-          Buffer: (PWSTR) (_s) }
+	{ Length: sizeof (_s) - sizeof (WCHAR), \
+	  MaximumLength: sizeof (_s), \
+	  Buffer: (PWSTR) (_s) }
 UNICODE_STRING _RDATA ro_u_empty = _ROU (L"");
 UNICODE_STRING _RDATA ro_u_lnk = _ROU (L".lnk");
 UNICODE_STRING _RDATA ro_u_exe = _ROU (L".exe");

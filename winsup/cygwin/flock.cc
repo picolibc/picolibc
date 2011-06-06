@@ -216,17 +216,17 @@ get_obj_handle_count (HANDLE h)
 class lockf_t
 {
   public:
-    short           lf_flags; /* Semantics: F_POSIX, F_FLOCK, F_WAIT */
-    short           lf_type;  /* Lock type: F_RDLCK, F_WRLCK */
-    _off64_t        lf_start; /* Byte # of the start of the lock */
-    _off64_t        lf_end;   /* Byte # of the end of the lock (-1=EOF) */
+    short	   lf_flags; /* Semantics: F_POSIX, F_FLOCK, F_WAIT */
+    short	   lf_type;  /* Lock type: F_RDLCK, F_WRLCK */
+    _off64_t	    lf_start; /* Byte # of the start of the lock */
+    _off64_t	    lf_end;   /* Byte # of the end of the lock (-1=EOF) */
     long long       lf_id;    /* Cygwin PID for POSIX locks, a unique id per
 				 file table entry for BSD flock locks. */
-    DWORD           lf_wid;   /* Win PID of the resource holding the lock */
+    DWORD	   lf_wid;   /* Win PID of the resource holding the lock */
     class lockf_t **lf_head;  /* Back pointer to the head of the lockf_t list */
     class inode_t  *lf_inode; /* Back pointer to the inode_t */
     class lockf_t  *lf_next;  /* Pointer to the next lock on this inode_t */
-    HANDLE          lf_obj;   /* Handle to the lock event object. */
+    HANDLE	   lf_obj;   /* Handle to the lock event object. */
 
     lockf_t ()
     : lf_flags (0), lf_type (0), lf_start (0), lf_end (0), lf_id (0),
@@ -263,17 +263,17 @@ class inode_t
 
   public:
     LIST_ENTRY (inode_t)  i_next;
-    lockf_t              *i_lockf;  /* List of locks of this process. */
-    lockf_t              *i_all_lf; /* Temp list of all locks for this file. */
+    lockf_t	     *i_lockf;  /* List of locks of this process. */
+    lockf_t	     *i_all_lf; /* Temp list of all locks for this file. */
 
-    __dev32_t             i_dev;    /* Device ID */
-    __ino64_t             i_ino;    /* inode number */
+    __dev32_t	     i_dev;    /* Device ID */
+    __ino64_t	     i_ino;    /* inode number */
 
   private:
-    HANDLE                i_dir;
-    HANDLE                i_mtx;
-    unsigned long	  i_wait;   /* Number of blocked threads waiting for
-				       a blocking lock. */
+    HANDLE	     i_dir;
+    HANDLE	     i_mtx;
+    unsigned long    i_wait;   /* Number of blocked threads waiting for
+				  a blocking lock. */
 
   public:
     inode_t (__dev32_t dev, __ino64_t ino);

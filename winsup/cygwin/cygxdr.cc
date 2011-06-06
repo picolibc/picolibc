@@ -1,4 +1,4 @@
-/* cygxdr.cc: 
+/* cygxdr.cc:
 
    Copyright 2010 Red Hat, Inc.
 

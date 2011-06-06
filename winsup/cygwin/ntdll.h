@@ -1024,7 +1024,7 @@ typedef enum _KEY_VALUE_INFORMATION_CLASS
   KeyValueFullInformation,
   KeyValuePartialInformation
 } KEY_VALUE_INFORMATION_CLASS, *PKEY_VALUE_INFORMATION_CLASS;
- 
+
 typedef struct _KEY_VALUE_PARTIAL_INFORMATION
 {
   ULONG TitleIndex;
@@ -1204,7 +1204,7 @@ extern "C"
 				      BOOLEAN);
   NTSTATUS NTAPI RtlConvertSidToUnicodeString (PUNICODE_STRING, PSID, BOOLEAN);
   NTSTATUS NTAPI RtlConvertToAutoInheritSecurityObject (PSECURITY_DESCRIPTOR,
-  							PSECURITY_DESCRIPTOR,
+							PSECURITY_DESCRIPTOR,
 							PSECURITY_DESCRIPTOR *,
 							GUID *, BOOLEAN,
 							PGENERIC_MAPPING);
@@ -1237,9 +1237,9 @@ extern "C"
   NTSTATUS NTAPI RtlGetDaclSecurityDescriptor (PSECURITY_DESCRIPTOR, PBOOLEAN,
 					       PACL *, PBOOLEAN);
   NTSTATUS NTAPI RtlGetGroupSecurityDescriptor (PSECURITY_DESCRIPTOR, PSID *,
-  						PBOOLEAN);
+						PBOOLEAN);
   NTSTATUS NTAPI RtlGetOwnerSecurityDescriptor (PSECURITY_DESCRIPTOR, PSID *,
-  						PBOOLEAN);
+						PBOOLEAN);
   PSID_IDENTIFIER_AUTHORITY NTAPI RtlIdentifierAuthoritySid (PSID);
   VOID NTAPI RtlInitEmptyUnicodeString (PUNICODE_STRING, PCWSTR, USHORT);
   NTSTATUS NTAPI RtlInitializeSid (PSID, PSID_IDENTIFIER_AUTHORITY, UCHAR);
@@ -1268,9 +1268,9 @@ extern "C"
   NTSTATUS NTAPI RtlSetDaclSecurityDescriptor (PSECURITY_DESCRIPTOR, BOOLEAN,
 					       PACL, BOOLEAN);
   NTSTATUS NTAPI RtlSetGroupSecurityDescriptor (PSECURITY_DESCRIPTOR, PSID,
-  						BOOLEAN);
+						BOOLEAN);
   NTSTATUS NTAPI RtlSetOwnerSecurityDescriptor (PSECURITY_DESCRIPTOR, PSID,
-  						BOOLEAN);
+						BOOLEAN);
   PUCHAR NTAPI RtlSubAuthorityCountSid (PSID);
   PULONG NTAPI RtlSubAuthoritySid (PSID, ULONG);
   NTSTATUS NTAPI RtlUnicodeStringToAnsiString (PANSI_STRING, PUNICODE_STRING,

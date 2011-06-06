@@ -382,10 +382,10 @@ _strerror_r (struct _reent *, int errnum, int internal, int *errptr)
   if (!errstr)
     {
       errstr = internal ? _my_tls.locals.strerror_r_buf
-        : _my_tls.locals.strerror_buf;
+	: _my_tls.locals.strerror_buf;
       __small_sprintf (errstr, "Unknown error %d", errnum);
       if (errptr)
-        *errptr = EINVAL;
+	*errptr = EINVAL;
     }
   return errstr;
 }
@@ -493,9 +493,9 @@ error_at_line (int status, int errnum, const char *filename, unsigned int lineno
 
       /* strcmp(3) will SEGV if filename or last_filename are NULL */
       if (lineno == last_lineno
-          && ((!filename && !last_filename)
-              || (filename && last_filename && strcmp (filename, last_filename) == 0)))
-        return;
+	  && ((!filename && !last_filename)
+	      || (filename && last_filename && strcmp (filename, last_filename) == 0)))
+	return;
 
       last_filename = filename;
       last_lineno = lineno;

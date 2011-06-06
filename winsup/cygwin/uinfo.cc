@@ -86,7 +86,7 @@ cygheap_user::init ()
   /* Standard way to build a security descriptor with the usual DACL */
   PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
   psd = (PSECURITY_DESCRIPTOR)
-  		(sec_user_nih (sa_buf, sid()))->lpSecurityDescriptor;
+		(sec_user_nih (sa_buf, sid()))->lpSecurityDescriptor;
 
   BOOLEAN acl_exists, dummy;
   TOKEN_DEFAULT_DACL dacl;
@@ -326,7 +326,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3, (LPBYTE *) &ui)))
 		{
 		  sys_wcstombs (homepath_env_buf, NT_MAX_PATH,
-		  		ui->usri3_home_dir);
+				ui->usri3_home_dir);
 		  if (!homepath_env_buf[0])
 		    {
 		      sys_wcstombs (homepath_env_buf, NT_MAX_PATH,

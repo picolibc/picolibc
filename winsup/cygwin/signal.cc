@@ -101,34 +101,34 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
   while (!done)
     {
       /* Divide user's input into transactions no larger than 49.7
-         days at a time.  */
+	 days at a time.  */
       if (sec > HIRES_DELAY_MAX / 1000)
-        {
-          req = ((HIRES_DELAY_MAX + resolution - 1)
-                 / resolution * resolution);
-          sec -= HIRES_DELAY_MAX / 1000;
-        }
+	{
+	  req = ((HIRES_DELAY_MAX + resolution - 1)
+		 / resolution * resolution);
+	  sec -= HIRES_DELAY_MAX / 1000;
+	}
       else
-        {
-          req = ((sec * 1000 + (rqtp->tv_nsec + 999999) / 1000000
-                  + resolution - 1) / resolution) * resolution;
-          sec = 0;
-          done = true;
-        }
+	{
+	  req = ((sec * 1000 + (rqtp->tv_nsec + 999999) / 1000000
+		  + resolution - 1) / resolution) * resolution;
+	  sec = 0;
+	  done = true;
+	}
 
       DWORD end_time = gtod.dmsecs () + req;
       syscall_printf ("nanosleep (%ld)", req);
 
       int rc = cancelable_wait (signal_arrived, req);
       if ((rem = end_time - gtod.dmsecs ()) > HIRES_DELAY_MAX)
-        rem = 0;
+	rem = 0;
       if (rc == WAIT_OBJECT_0)
-        {
-          _my_tls.call_signal_handler ();
-          set_errno (EINTR);
-          res = -1;
-          break;
-        }
+	{
+	  _my_tls.call_signal_handler ();
+	  set_errno (EINTR);
+	  res = -1;
+	  break;
+	}
     }
 
   if (rmtp)
@@ -136,14 +136,14 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
       rmtp->tv_sec = sec + rem / 1000;
       rmtp->tv_nsec = (rem % 1000) * 1000000;
       if (sec)
-        {
-          rmtp->tv_nsec += rqtp->tv_nsec;
-          if (rmtp->tv_nsec >= 1000000000)
-            {
-              rmtp->tv_nsec -= 1000000000;
-              rmtp->tv_sec++;
-            }
-        }
+	{
+	  rmtp->tv_nsec += rqtp->tv_nsec;
+	  if (rmtp->tv_nsec >= 1000000000)
+	    {
+	      rmtp->tv_nsec -= 1000000000;
+	      rmtp->tv_sec++;
+	    }
+	}
     }
 
   syscall_printf ("%d = nanosleep (%ld, %ld)", res, req, rem);

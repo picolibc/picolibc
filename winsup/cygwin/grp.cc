@@ -346,7 +346,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
     hToken = cygheap->user.primary_token ();
   else
     hToken = hProcToken;
-  
+
   status = NtQueryInformationToken (hToken, TokenGroups, NULL, 0, &size);
   if (NT_SUCCESS (status) || status == STATUS_BUFFER_TOO_SMALL)
     {

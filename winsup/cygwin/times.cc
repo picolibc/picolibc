@@ -605,14 +605,14 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
       long long x;
 
       if (pid == 0)
-        pid = getpid ();
+	pid = getpid ();
 
       pinfo p (pid);
       if (!p->exists ())
-        {
-          set_errno (EINVAL);
-          return -1;
-        }
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
 
       hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, 0, p->dwProcessId);
       NtQueryInformationProcess (hProcess, ProcessTimes, &kut, sizeof_kut, &sizeof_kut);
@@ -634,14 +634,14 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
       long long x;
 
       if (thr_id == 0)
-        thr_id = pthread::self ()->getsequence_np ();
+	thr_id = pthread::self ()->getsequence_np ();
 
       hThread = OpenThread (THREAD_QUERY_INFORMATION, 0, thr_id);
       if (!hThread)
-        {
-          set_errno (EINVAL);
-          return -1;
-        }
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
 
       NtQueryInformationThread (hThread, ThreadTimes, &kut, sizeof_kut, &sizeof_kut);
 
@@ -656,29 +656,29 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
   switch (clk_id)
     {
       case CLOCK_REALTIME:
-        {
-          LONGLONG now = gtod.nsecs ();
-          if (now == (LONGLONG) -1)
-            return -1;
-          tp->tv_sec = now / NSPERSEC;
-          tp->tv_nsec = (now % NSPERSEC) * (1000000000 / NSPERSEC);
-          break;
-        }
+	{
+	  LONGLONG now = gtod.nsecs ();
+	  if (now == (LONGLONG) -1)
+	    return -1;
+	  tp->tv_sec = now / NSPERSEC;
+	  tp->tv_nsec = (now % NSPERSEC) * (1000000000 / NSPERSEC);
+	  break;
+	}
 
       case CLOCK_MONOTONIC:
-        {
-          LONGLONG now = ntod.nsecs ();
-          if (now == (LONGLONG) -1)
-            return -1;
+	{
+	  LONGLONG now = ntod.nsecs ();
+	  if (now == (LONGLONG) -1)
+	    return -1;
 
-          tp->tv_sec = now / 1000000000;
-          tp->tv_nsec = (now % 1000000000);
-          break;
-        }
+	  tp->tv_sec = now / 1000000000;
+	  tp->tv_nsec = (now % 1000000000);
+	  break;
+	}
 
       default:
-        set_errno (EINVAL);
-        return -1;
+	set_errno (EINVAL);
+	return -1;
     }
 
   return 0;
@@ -784,24 +784,24 @@ clock_getres (clockid_t clk_id, struct timespec *tp)
   switch (clk_id)
     {
       case CLOCK_REALTIME:
-        {
-          DWORD period = gtod.resolution ();
-          tp->tv_sec = period / 1000;
-          tp->tv_nsec = (period % 1000) * 1000000;
-          break;
-        }
+	{
+	  DWORD period = gtod.resolution ();
+	  tp->tv_sec = period / 1000;
+	  tp->tv_nsec = (period % 1000) * 1000000;
+	  break;
+	}
 
       case CLOCK_MONOTONIC:
-        {
-          LONGLONG period = ntod.resolution ();
-          tp->tv_sec = period / 1000000000;
-          tp->tv_nsec = period % 1000000000;
-          break;
-        }
+	{
+	  LONGLONG period = ntod.resolution ();
+	  tp->tv_sec = period / 1000000000;
+	  tp->tv_nsec = period % 1000000000;
+	  break;
+	}
 
       default:
-        set_errno (EINVAL);
-        return -1;
+	set_errno (EINVAL);
+	return -1;
     }
 
   return 0;

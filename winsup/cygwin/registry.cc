@@ -189,7 +189,6 @@ reg_key::get_string (PCWSTR name, PWCHAR dst, size_t max, PCWSTR def)
 	wcpncpy (dst, def, max);
       else
 	wcpncpy (dst, (PWCHAR) vbuf->Data, max);
-      
     }
   return status;
 }

@@ -222,7 +222,7 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
       SetLastError (RtlNtStatusToDosError (ret));
     }
   debug_printf ("%p (status %p) = NtMapViewOfSection (h:%x, addr:%x, len:%u,"
-  		" off:%X, protect:%x, type:%x)",
+		" off:%X, protect:%x, type:%x)",
 		base, ret, h, addr, len, off, protect, 0);
   return base;
 }

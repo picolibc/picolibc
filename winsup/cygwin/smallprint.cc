@@ -190,7 +190,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		    if (l_opt && ((*(unsigned char *)s <= 0x1f && *s != '\n')
 				  || *(unsigned char *)s >= 0x7f))
 		      {
-		      	*dst++ = '\\';
+			*dst++ = '\\';
 			*dst++ = 'x';
 			*dst++ = hex_str[*(unsigned char *)s >> 4];
 			*dst++ = hex_str[*(unsigned char *)s++ & 0xf];

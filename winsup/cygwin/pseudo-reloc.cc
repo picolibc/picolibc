@@ -227,7 +227,7 @@ do_pseudo_reloc (void * start, void * end, void * base)
       runtime_pseudo_reloc_item_v1 * o;
       for (o = (runtime_pseudo_reloc_item_v1 *) v2_hdr;
 	   o < (runtime_pseudo_reloc_item_v1 *)end;
-           o++)
+	   o++)
 	{
 	  DWORD newval;
 	  reloc_target = (ptrdiff_t) base + o->target;
@@ -272,7 +272,7 @@ do_pseudo_reloc (void * start, void * end, void * base)
        * supported.
        */
       switch ((r->flags & 0xff))
-        {
+	{
 	case 8:
 	  reldata = (ptrdiff_t) (*((unsigned char *)reloc_target));
 	  if ((reldata & 0x80) != 0)
@@ -300,7 +300,7 @@ do_pseudo_reloc (void * start, void * end, void * base)
 	  __report_error ("  Unknown pseudo relocation bit size %d.\n",
 		  (int) (r->flags & 0xff));
 	  break;
-        }
+	}
 
       /* Adjust the relocation value */
       reldata -= ((ptrdiff_t) base + r->sym);

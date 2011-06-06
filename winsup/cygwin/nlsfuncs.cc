@@ -116,7 +116,7 @@ __get_lcid_from_locale (const char *name)
 	    { "tg-TJ" , L"tg-Cyrl-TJ"  },
 	    { "tzm-DZ", L"tzm-Latn-DZ" },
 	    { "uz-UZ" , L"uz-Latn-UZ"  },
-	    { NULL    , NULL          }
+	    { NULL    , NULL	       }
 	  };
 	  for (int i = 0; sc_only_locale[i].loc
 			  && sc_only_locale[i].loc[0] <= locale[0]; ++i)
@@ -197,8 +197,8 @@ __get_lcid_from_locale (const char *name)
 	LCID	    lcid;
       } ambiguous_locale[] = {
 	{ "bs_BA", MAKELANGID (LANG_BOSNIAN, 0x05)			    },
-        { "nn_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_NYNORSK)   },
-        { "no_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_BOKMAL)    },
+	{ "nn_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_NYNORSK)   },
+	{ "no_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_BOKMAL)    },
 	{ "sr_BA", MAKELANGID (LANG_BOSNIAN,
 			       SUBLANG_SERBIAN_BOSNIA_HERZEGOVINA_CYRILLIC) },
 	{ "sr_CS", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC)      },
@@ -300,16 +300,16 @@ lc_mbstowcs (mbtowc_p f_mbtowc, const char *charset,
   while (n > 0)
     {
       bytes = f_mbtowc (_REENT, pwcs, t, 6 /* fake, always enough */,
-      			charset, &state);
+			charset, &state);
       if (bytes == (size_t) -1)
-        {
-          state.__count = 0;
-          bytes = 1;
+	{
+	  state.__count = 0;
+	  bytes = 1;
 	  if (pwcs)
 	    *pwcs = L' ';
-        }
+	}
       else if (bytes == 0)
-        break;
+	break;
       t += bytes;
       ++ret;
       if (pwcs)
@@ -477,10 +477,10 @@ conv_grouping (LCID lcid, LCTYPE type, char **lc_ptr)
   for (char *c = buf; *c; ++c)
     {
       if (*c < '0' || *c > '9')
-      	continue;
+	continue;
       char val = *c - '0';
       if (!val)
-      	{
+	{
 	  repeat = true;
 	  break;
 	}
@@ -525,7 +525,7 @@ __set_lc_time_from_win (const char *name,
   /* codeset */
   _time_locale->codeset = lc_time_ptr;
   lc_time_ptr = stpcpy (lc_time_ptr, charset) + 1;
-  
+
   if (lcid)
     {
       char locale[ENCODING_LEN + 1];
@@ -559,7 +559,7 @@ __set_lc_time_from_win (const char *name,
 	 The workaround is to use LOCALE_SMONTHNAME* in these locales,
 	 even for the abbreviated month name. */
       const LCTYPE mon_base =
-      		lcid == MAKELANGID (LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN)
+		lcid == MAKELANGID (LANG_JAPANESE, SUBLANG_JAPANESE_JAPAN)
 		|| lcid == MAKELANGID (LANG_KOREAN, SUBLANG_KOREAN)
 		? LOCALE_SMONTHNAME1 : LOCALE_SABBREVMONTHNAME1;
       for (int i = 0; i < 12; ++i)
@@ -726,12 +726,12 @@ __set_lc_time_from_win (const char *name,
       if (!era)
 	{
 	  _time_locale->wera =
-	  _time_locale->wera_d_fmt = 
+	  _time_locale->wera_d_fmt =
 	  _time_locale->wera_d_t_fmt =
 	  _time_locale->wera_t_fmt =
 	  _time_locale->walt_digits = (const wchar_t *) lc_time_ptr;
 	  _time_locale->era =
-	  _time_locale->era_d_fmt = 
+	  _time_locale->era_d_fmt =
 	  _time_locale->era_d_t_fmt =
 	  _time_locale->era_t_fmt =
 	  _time_locale->alt_digits = (const char *) lc_time_ptr;
@@ -816,7 +816,7 @@ __set_lc_ctype_from_win (const char *name,
     }
 
   char *tmp = (char *) realloc (new_lc_ctype_buf,
-  				lc_ctype_ptr - new_lc_ctype_buf);
+				lc_ctype_ptr - new_lc_ctype_buf);
   if (!tmp)
     {
       free (new_lc_ctype_buf);
@@ -874,9 +874,9 @@ __set_lc_numeric_from_win (const char *name,
   /* codeset */
   _numeric_locale->codeset = lc_numeric_ptr;
   lc_numeric_ptr = stpcpy (lc_numeric_ptr, charset) + 1;
-  
+
   char *tmp = (char *) realloc (new_lc_numeric_buf,
-  				lc_numeric_ptr - new_lc_numeric_buf);
+				lc_numeric_ptr - new_lc_numeric_buf);
   if (!tmp)
     {
       free (new_lc_numeric_buf);
@@ -1003,7 +1003,7 @@ __set_lc_monetary_from_win (const char *name,
   lc_monetary_ptr = stpcpy (lc_monetary_ptr, charset) + 1;
 
   char *tmp = (char *) realloc (new_lc_monetary_buf,
-  				lc_monetary_ptr - new_lc_monetary_buf);
+				lc_monetary_ptr - new_lc_monetary_buf);
   if (!tmp)
     {
       free (new_lc_monetary_buf);
@@ -1298,7 +1298,7 @@ __set_charset_from_locale (const char *locale, char *charset)
 	  || lcid == 0x241a		/* sr_RS (Serbian Language/Serbia) */
 	  || lcid == 0x2c1a		/* sr_ME (Serbian Language/Montenegro)*/
 	  || lcid == 0x0442)		/* tk_TM (Turkmen/Turkmenistan) */
-      	cs = "UTF-8";
+	cs = "UTF-8";
       else if (lcid == 0x041c)		/* sq_AL (Albanian/Albania) */
 	cs = "ISO-8859-1";
       else
@@ -1317,11 +1317,11 @@ __set_charset_from_locale (const char *locale, char *charset)
 						 IQTElif alphabet */
 	  || (lcid == 0x0444 && has_modifier ("@iqtelif"))
 	  || lcid == 0x0450)		/* mn_MN (Mongolian/Mongolia) */
-      	cs = "UTF-8";
+	cs = "UTF-8";
       else if (lcid == 0x0423)		/* be_BY (Belarusian/Belarus) */
 	cs = has_modifier ("@latin") ? "UTF-8" : "CP1251";
       else if (lcid == 0x0402)		/* bg_BG (Bulgarian/Bulgaria) */
-      	cs = "CP1251";
+	cs = "CP1251";
       else if (lcid == 0x0422)		/* uk_UA (Ukrainian/Ukraine) */
 	cs = "KOI8-U";
       else
@@ -1342,7 +1342,7 @@ __set_charset_from_locale (const char *locale, char *charset)
 	       || lcid == 0x0488	/* wo_SN (Wolof/Senegal) */
 	       || lcid == 0x046a	/* yo_NG (Yoruba/Nigeria) */
 	       || lcid == 0x085d)	/* iu_CA (Inuktitut/Canada) */
-      	cs = "UTF-8";
+	cs = "UTF-8";
       else if (lcid == 0x042e)		/* hsb_DE (Upper Sorbian/Germany) */
 	cs = "ISO-8859-2";
       else if (lcid == 0x0491		/* gd_GB (Scots Gaelic/Great Britain) */
@@ -1358,7 +1358,7 @@ __set_charset_from_locale (const char *locale, char *charset)
       break;
     case 1254:
       if (lcid == 0x042c)		/* az_AZ (Azeri/Azerbaijan) */
-      	cs = "UTF-8";
+	cs = "UTF-8";
       else if (lcid == 0x0443)		/* uz_UZ (Uzbek/Uzbekistan) */
 	cs = "ISO-8859-1";
       else
@@ -1406,7 +1406,7 @@ __set_charset_from_locale (const char *locale, char *charset)
    which is part of the gettext package, and if it finds the locale alias
    in that file, it replaces the locale with the correct locale string from
    that file.
-   
+ 
    If successful, it returns a pointer to new_locale, NULL otherwise.*/
 extern "C" char *
 __set_locale_from_locale_alias (const char *locale, char *new_locale)

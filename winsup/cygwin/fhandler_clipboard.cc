@@ -99,7 +99,7 @@ set_clipboard (const void *buf, size_t len)
       HANDLE ret = SetClipboardData (cygnativeformat, hmem);
       CloseClipboard ();
       /* According to MSDN, hmem must not be free'd after transferring the
-         data to the clipboard via SetClipboardData. */
+	 data to the clipboard via SetClipboardData. */
       /* GlobalFree (hmem); */
       if (!ret)
 	{
@@ -130,7 +130,7 @@ set_clipboard (const void *buf, size_t len)
       HANDLE ret = SetClipboardData (CF_UNICODETEXT, hmem);
       CloseClipboard ();
       /* According to MSDN, hmem must not be free'd after transferring the
-         data to the clipboard via SetClipboardData. */
+	 data to the clipboard via SetClipboardData. */
       /* GlobalFree (hmem); */
       if (!ret)
 	{
@@ -163,7 +163,7 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
       if (set_clipboard (membuffer, msize))
 	{
 	  /* FIXME: membuffer is now out of sync with pos, but msize
-	            is used above */
+		    is used above */
 	  return -1;
 	}
 

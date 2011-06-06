@@ -201,7 +201,7 @@ open_local_policy (ACCESS_MASK access)
     {
       __seterrno_from_nt_status (status);
       /* Some versions of Windows set the lsa handle to NULL when
-         LsaOpenPolicy fails. */
+	 LsaOpenPolicy fails. */
       lsa = INVALID_HANDLE_VALUE;
     }
   return lsa;
@@ -340,7 +340,7 @@ get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
 	  if (!bg_ptr)
 	    {
 	      /* Retrieve name of builtin group from system since it's
-	         localized. */
+		 localized. */
 	      glen = 2 * GNLEN + 2;
 	      if (!LookupAccountSidW (NULL, well_known_builtin_sid,
 				      builtin_grp, &glen, domain, &domlen, &use))
@@ -552,7 +552,7 @@ get_system_priv_list (size_t &size)
 {
   ULONG max_idx = 0;
   while (max_idx < SYSTEM_PRIVILEGES_COUNT
-  	 && sys_privs[max_idx] != wincap.max_sys_priv ())
+	 && sys_privs[max_idx] != wincap.max_sys_priv ())
     ++max_idx;
   if (max_idx >= SYSTEM_PRIVILEGES_COUNT)
     api_fatal ("Coding error: wincap privilege %u doesn't exist in sys_privs",

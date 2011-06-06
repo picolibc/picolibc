@@ -368,7 +368,7 @@ frok::parent (volatile char * volatile stack_here)
 	 in the child. */
       PTEB teb = NtCurrentTeb ();
       if (!teb->DeallocationStack)
-      	{
+	{
 	  /* Pthread with application-provided stack.  Don't set up a
 	     PAGE_GUARD page.  guardsize == -1 is used in alloc_stack_hard_way
 	     to recognize this type of stack. */

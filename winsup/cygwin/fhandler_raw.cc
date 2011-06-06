@@ -148,7 +148,7 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 		     || (op->rd_parm > 1 && (op->rd_parm % 512))
 		     || (get_flags () & O_DIRECT))
 	      /* The conditions for a *valid* parameter are these:
-	         - If there's still data in the current buffer, it must
+		 - If there's still data in the current buffer, it must
 		   fit in the new buffer.
 		 - The new size is either 0 or 1, both indicating unbufferd
 		   I/O, or the new buffersize must be a multiple of 512.

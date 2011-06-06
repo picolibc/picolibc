@@ -188,7 +188,7 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
 {
   DWORD bytes_read;
 
-  /* The simple case.  We have only a single partition open anyway. 
+  /* The simple case.  We have only a single partition open anyway.
      Try to lock the partition so that a subsequent write succeeds.
      If there's some file handle open on one of the affected partitions,
      this fails, but that's how it works on Vista and later... */
@@ -225,7 +225,7 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
   PDRIVE_LAYOUT_INFORMATION_EX pdlix = (PDRIVE_LAYOUT_INFORMATION_EX)
 				       alloca (size);
   BOOL found = FALSE;
-  
+
   /* Fetch current file pointer position on disk. */
   status = NtQueryInformationFile (get_handle (), &io, &fpi, sizeof fpi,
 				   FilePositionInformation);
@@ -237,7 +237,7 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
     }
   /* Fetch drive layout to get start and end positions of partitions on disk. */
   if (!DeviceIoControl (get_handle (), IOCTL_DISK_GET_DRIVE_LAYOUT_EX, NULL, 0,
-  			pdlix, size, &bytes_read, NULL))
+			pdlix, size, &bytes_read, NULL))
     {
       debug_printf ("DeviceIoControl(IOCTL_DISK_GET_DRIVE_LAYOUT_EX): %E");
       return FALSE;
@@ -250,7 +250,7 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
       /* A partition number of 0 denotes an extended partition or one of the
 	 aforementioned filler entries.  Just skip. */
       if (ppie->PartitionNumber == 0)
-      	continue;
+	continue;
       /* Check if our writing range affects this partition. */
       if (fpi.CurrentByteOffset.QuadPart   < ppie->StartingOffset.QuadPart
 					     + ppie->PartitionLength.QuadPart
@@ -376,7 +376,7 @@ fhandler_dev_floppy::open (int flags, mode_t)
 	  return 0;
 	}
       /* If we're trying to access a CD/DVD drive, or an entire disk,
-         make sure we're actually allowed to read *all* of the device.
+	 make sure we're actually allowed to read *all* of the device.
 	 This is actually documented in the MSDN CreateFile man page. */
       if (get_major () != DEV_FLOPPY_MAJOR
 	  && (get_major () == DEV_CDROM_MAJOR || get_minor () % 16 == 0)

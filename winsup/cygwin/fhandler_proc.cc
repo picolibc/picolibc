@@ -391,8 +391,8 @@ format_proc_loadavg (void *, char *&destbuf)
     switch (get_process_state (i)) {
       case 'O':
       case 'R':
-        running++;
-        break;
+	running++;
+	break;
     }
 
   destbuf = (char *) crealloc_abort (destbuf, 16);
@@ -514,7 +514,7 @@ format_proc_stat (void *, char *&destbuf)
       if (!NT_SUCCESS (ret))
 	{
 	  debug_printf ("NtQuerySystemInformation(SystemPerformanceInformation)"
-	  		", status %p", ret);
+			", status %p", ret);
 	  memset (spi, 0, sizeof_spi);
 	}
       ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
@@ -1241,8 +1241,8 @@ format_proc_filesystems (void *, char *&destbuf)
   /* start at 1 to skip type "none" */
   for (int i = 1; fs_names[i].name; i++)
     bufptr += __small_sprintf(bufptr, "%s\t%s\n",
-                              fs_names[i].block_device ? "" : "nodev",
-                              fs_names[i].name);
+			      fs_names[i].block_device ? "" : "nodev",
+			      fs_names[i].name);
 
   destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
   memcpy (destbuf, buf, bufptr - buf);
@@ -1279,7 +1279,7 @@ format_proc_swaps (void *, char *&destbuf)
     }
 
   bufptr += __small_sprintf (bufptr,
-                             "Filename\t\t\t\tType\t\tSize\tUsed\tPriority\n");
+			     "Filename\t\t\t\tType\t\tSize\tUsed\tPriority\n");
 
   if (spi && !ret && GetLastError () != ERROR_PROC_NOT_FOUND)
     {
@@ -1294,7 +1294,7 @@ format_proc_swaps (void *, char *&destbuf)
 	  cygwin_conv_path (CCP_WIN_W_TO_POSIX, spp->FileName.Buffer, filename, filename_len);
 
 	  bufptr += sprintf (bufptr, "%-40s%-16s%-8llu%-8llu%-8d\n",
-	                     filename, "file", total >> 10, used >> 10, 0);
+			     filename, "file", total >> 10, used >> 10, 0);
 	}
       while (spp->NextEntryOffset
 	     && (spp = (PSYSTEM_PAGEFILE_INFORMATION)

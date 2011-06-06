@@ -471,7 +471,7 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	if (!retries && !VirtualFree (d->handle, 0, MEM_RELEASE))
 	  api_fatal ("unable to release protective reservation for %W (%08lx), %E",
 		     d->modname, d->handle);
-	
+
 	HMODULE h = LoadLibraryExW (d->name, NULL, DONT_RESOLVE_DLL_REFERENCES);
 	if (!h)
 	  api_fatal ("unable to create interim mapping for %W, %E", d->name);

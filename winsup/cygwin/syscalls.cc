@@ -557,7 +557,7 @@ unlink_nt (path_conv &pc)
       FILE_STANDARD_INFORMATION fsi;
 
       /* If possible, hide the non-atomicity of the "remove R/O flag, remove
-         link to file" operation behind a transaction. */
+	 link to file" operation behind a transaction. */
       if (wincap.has_transactions ()
 	  && (pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
 	start_transaction (old_trans, trans);
@@ -569,7 +569,7 @@ unlink_nt (path_conv &pc)
 	  NtSetAttributesFile (fh_ro, pc.file_attributes ()
 				      & ~FILE_ATTRIBUTE_READONLY);
 	  pc.init_reopen_attr (&attr, fh_ro);
-      	}
+	}
       if (pc.is_lnk_symlink ())
 	{
 	  status = NtQueryInformationFile (fh_ro, &io, &fsi, sizeof fsi,
@@ -598,7 +598,7 @@ unlink_nt (path_conv &pc)
 	 times out.  Opening the file with FILE_SHARE_VALID_FLAGS will work,
 	 though, and it is then possible to delete the file quite normally.
 
-         NFS implements its own mechanism to remove in-use files which
+	 NFS implements its own mechanism to remove in-use files which
 	 looks quite similar to what we do in try_to_bin for remote files.
 	 That's why we don't call try_to_bin on NFS.
 
@@ -711,7 +711,7 @@ unlink_nt (path_conv &pc)
   if (fh)
     {
       if (access & FILE_WRITE_ATTRIBUTES)
-      	{
+	{
 	  /* Restore R/O attribute if setting the delete dispostion failed. */
 	  if (!NT_SUCCESS (status))
 	    NtSetAttributesFile (fh, pc.file_attributes ());
@@ -1547,11 +1547,11 @@ sync ()
     }
   /* Traverse \Device directory ... */
   PDIRECTORY_BASIC_INFORMATION dbi = (PDIRECTORY_BASIC_INFORMATION)
-                                     alloca (640);
+				     alloca (640);
   BOOLEAN restart = TRUE;
   ULONG context = 0;
   while (NT_SUCCESS (NtQueryDirectoryObject (devhdl, dbi, 640, TRUE, restart,
-                                             &context, NULL)))
+					     &context, NULL)))
     {
       restart = FALSE;
       /* ... and call sync_worker for each HarddiskVolumeX entry. */
@@ -1817,16 +1817,16 @@ rename (const char *oldpath, const char *newpath)
       char *p = stpcpy (buf = tp.c_get (), oldpath) - 1;
       oldpath = buf;
       while (p >= oldpath && isdirsep (*p))
-        *p-- = '\0';
+	*p-- = '\0';
       olen = p + 1 - oldpath;
       if (!olen)
-        {
-          /* The root directory cannot be renamed.  This also rejects
-             the corner case of rename("/","/"), even though it is the
-             same file.  */
-          set_errno (EINVAL);
-          goto out;
-        }
+	{
+	  /* The root directory cannot be renamed.  This also rejects
+	     the corner case of rename("/","/"), even though it is the
+	     same file.  */
+	  set_errno (EINVAL);
+	  goto out;
+	}
       old_dir_requested = true;
     }
   oldpc.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
@@ -1874,13 +1874,13 @@ rename (const char *oldpath, const char *newpath)
       char *p = stpcpy (buf = tp.c_get (), newpath) - 1;
       newpath = buf;
       while (p >= newpath && isdirsep (*p))
-        *p-- = '\0';
+	*p-- = '\0';
       nlen = p + 1 - newpath;
       if (!nlen) /* The root directory is never empty.  */
-        {
-          set_errno (ENOTEMPTY);
-          goto out;
-        }
+	{
+	  set_errno (ENOTEMPTY);
+	  goto out;
+	}
       new_dir_requested = true;
     }
   newpc.check (newpath, PC_SYM_NOFOLLOW, stat_suffixes);
@@ -1895,7 +1895,7 @@ rename (const char *oldpath, const char *newpath)
       goto out;
     }
   if (new_dir_requested && !(newpc.exists ()
-                             ? newpc.isdir () : oldpc.isdir ()))
+			     ? newpc.isdir () : oldpc.isdir ()))
     {
       /* Reject rename("file1","file2/"), but allow rename("dir","d/").  */
       set_errno (newpc.exists () ? ENOTDIR : ENOENT);
@@ -2844,11 +2844,11 @@ seteuid32 (__uid32_t uid)
      like this:
 
        cygwin_internal(CW_SET_EXTERNAL_TOKEN, restricted_token,
-                       CW_TOKEN_RESTRICTED);
+		       CW_TOKEN_RESTRICTED);
        setuid (getuid ());
        [...do stuff with restricted rights...]
        cygwin_internal(CW_SET_EXTERNAL_TOKEN, INVALID_HANDLE_VALUE,
-                       CW_TOKEN_RESTRICTED);
+		       CW_TOKEN_RESTRICTED);
        setuid (getuid ());
 
     Note that using the current uid is a requirement!  Starting with Windows

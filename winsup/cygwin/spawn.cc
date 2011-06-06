@@ -521,7 +521,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 					  real_path.get_nt_native_path ());
 	}
       else
-      	{
+	{
 	  set_errno (ENAMETOOLONG);
 	  res = -1;
 	  goto out;

@@ -145,13 +145,13 @@ tty_min::is_orphaned_process_group (int pgid)
       _pinfo *p = pids[i];
       termios_printf ("checking pid %d - has pgid %d\n", p->pid, p->pgid);
       if (!p || !p->exists () || p->pgid != pgid)
-        continue;
+	continue;
       pinfo ppid (p->ppid);
       if (!ppid)
 	continue;
       termios_printf ("ppid->pgid %d, ppid->sid %d", ppid->pgid, ppid->sid);
       if (ppid->pgid != pgid && ppid->sid == myself->sid)
-        return 0;
+	return 0;
     }
   return 1;
 }
@@ -208,7 +208,7 @@ fhandler_termios::bg_check (int sig)
 	  kill_pgrp (myself->pgid, si);
 	}
       return bg_signalled;
-    } 
+    }
 }
 
 #define set_input_done(x) input_done = input_done || (x)

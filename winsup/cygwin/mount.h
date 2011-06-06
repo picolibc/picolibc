@@ -67,7 +67,7 @@ class fs_info
   void clear ()
   {
     memset (&status, 0 , sizeof status);
-    sernum = 0UL; 
+    sernum = 0UL;
     fsn[0] = '\0';
   }
   fs_info () { clear (); }

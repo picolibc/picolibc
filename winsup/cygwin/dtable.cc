@@ -306,7 +306,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	dev = *pipew_dev;
     }
   else if (GetConsoleScreenBufferInfo (handle, &buf)
-  	   || GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
+	   || GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
     {
       /* Console I/O */
       if (!ISSTATE (myself, PID_USETTY))
@@ -352,7 +352,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	 by NtQueryInformationFile is meaningless.  CMD always hands down
 	 stdin handles as R/O handles, but our tty slave sides are R/W. */
       if (dev == FH_TTY || dev == FH_CONSOLE || dev.get_major () == DEV_TTYS_MAJOR)
-      	access |= GENERIC_READ | GENERIC_WRITE;
+	access |= GENERIC_READ | GENERIC_WRITE;
       else if (NT_SUCCESS (NtQueryInformationFile (handle, &io, &fai,
 						   sizeof fai,
 						   FileAccessInformation)))
@@ -950,11 +950,12 @@ dtable::fixup_before_fork (DWORD target_proc_id)
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
       {
-        debug_printf ("fd %d (%s)", i, fh->get_name ());
-        fh->fixup_before_fork_exec (target_proc_id);
+	debug_printf ("fd %d (%s)", i, fh->get_name ());
+	fh->fixup_before_fork_exec (target_proc_id);
       }
   unlock ();
-} 
+}
+
 void
 dtable::fixup_before_exec (DWORD target_proc_id)
 {
@@ -963,9 +964,8 @@ dtable::fixup_before_exec (DWORD target_proc_id)
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL && !fh->close_on_exec ())
       {
-        debug_printf ("fd %d (%s)", i, fh->get_name ());
-        fh->fixup_before_fork_exec (target_proc_id);
+	debug_printf ("fd %d (%s)", i, fh->get_name ());
+	fh->fixup_before_fork_exec (target_proc_id);
       }
   unlock ();
-} 
-
+}

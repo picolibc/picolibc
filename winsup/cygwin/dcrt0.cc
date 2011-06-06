@@ -239,7 +239,7 @@ globify (char *word, char **&argv, int &argc, int &argvlen)
 	    else
 	      {
 		--s;
-	      	while (cnt-- > 0)
+		while (cnt-- > 0)
 		  *p++ = *++s;
 	      }
 	  }
@@ -643,7 +643,7 @@ child_info_spawn::handle_spawn ()
   fixup_lockf_after_exec ();
 }
 
-/* Retrieve and store system directory for later use.  Note that the 
+/* Retrieve and store system directory for later use.  Note that the
    directory is stored with a trailing backslash! */
 static void
 init_windows_system_directory ()

@@ -330,7 +330,7 @@ fhandler_process::fill_filebuf ()
   if (process_tab[fileid].format_func)
     {
       if (process_tab[fileid].fhandler == FH_PROCESSFD)
-        {
+	{
 	  process_fd_t fd = { path, p };
 	  filesize = process_tab[fileid].format_func (&fd, filebuf);
 	}
@@ -540,7 +540,7 @@ struct dos_drive_mappings
     wchar_t mapping[1];
   };
   mapping *mappings;
-  
+
   dos_drive_mappings ()
     : mappings(0)
   {
@@ -552,7 +552,7 @@ struct dos_drive_mappings
        The annoying part is, QueryDosDeviceW wants only "x:" rather
        than the "x:\" we get back from GetLogicalDriveStringsW, so
        we'll have to strip out the trailing slash for each mapping.
-       
+
        The returned mapping a native NT pathname (\Device\...) which
        we can use to fix up the output of GetMappedFileNameW
     */
@@ -588,7 +588,7 @@ struct dos_drive_mappings
 	  debug_printf ("Unable to determine the native mapping for %ls "
 			"(error %lu)", drive, GetLastError ());
   }
-  
+
   wchar_t *fixup_if_match (wchar_t *path)
   {
     for (mapping *m = mappings; m; m = m->next)
@@ -601,7 +601,7 @@ struct dos_drive_mappings
 	}
     return path;
   }
-  
+
   ~dos_drive_mappings ()
   {
     mapping *n = 0;
@@ -640,7 +640,7 @@ struct heap_info
     if (NT_SUCCESS (status)
 	&& (harray = (PDEBUG_HEAP_ARRAY) buf->HeapInformation) != NULL)
       for (ULONG hcnt = 0; hcnt < harray->Count; ++hcnt)
-      	{
+	{
 	  PDEBUG_HEAP_BLOCK barray = (PDEBUG_HEAP_BLOCK)
 				     harray->Heaps[hcnt].Blocks;
 	  if (!barray)
@@ -662,7 +662,7 @@ struct heap_info
 	}
     RtlDestroyQueryDebugBuffer (buf);
   }
-  
+
   char *fill_if_match (char *base, ULONG type, char *dest)
   {
     for (heap *h = heap_vm_chunks; h; h = h->next)
@@ -686,8 +686,8 @@ struct heap_info
 	}
     return 0;
   }
-  
-  ~heap_info () 
+
+  ~heap_info ()
   {
     heap *n = 0;
     for (heap *m = heap_vm_chunks; m; m = n)
@@ -725,7 +725,7 @@ struct thread_info
 	buf = realloc (buf, size);
 	status = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
 					   buf, size, NULL);
-      	size <<= 1;
+	size <<= 1;
       }
     while (status == STATUS_INFO_LENGTH_MISMATCH);
     if (!NT_SUCCESS (status))
@@ -753,7 +753,7 @@ struct thread_info
 	THREAD_BASIC_INFORMATION tbi;
 	TEB teb;
 	HANDLE thread_h;
-	
+
 	if (!(thread_h = OpenThread (THREAD_QUERY_INFORMATION, FALSE,
 				     (ULONG) thread[i].ClientId.UniqueThread)))
 	  continue;
@@ -787,7 +787,7 @@ struct thread_info
       }
     free (buf);
   }
-  
+
   char *fill_if_match (char *base, ULONG type, char *dest)
   {
     for (region *r = regions; r; r = r->next)
@@ -807,8 +807,8 @@ struct thread_info
 	}
     return 0;
   }
-  
-  ~thread_info () 
+
+  ~thread_info ()
   {
     region *n = 0;
     for (region *m = regions; m; m = n)
@@ -844,7 +844,7 @@ format_process_maps (void *data, char *&destbuf)
     proc_pinfo.preserve ();
 
   _off64_t len = 0;
-  
+
   union access
   {
     char flags[8];
@@ -857,7 +857,7 @@ format_process_maps (void *data, char *&destbuf)
     char *rbase;
     char *rend;
   } cur = {{{'\0'}}, (char *)1, 0, 0};
-  
+
   MEMORY_BASIC_INFORMATION mb;
   dos_drive_mappings drive_maps;
   heap_info heaps (p->dwProcessId);
@@ -875,7 +875,7 @@ format_process_maps (void *data, char *&destbuf)
       cfree (destbuf);
       destbuf = NULL;
     }
-  
+
   /* Iterate over each VM region in the address space, coalescing
      memory regions with the same permissions. Once we run out, do one
      last_pass to trigger output of the last accumulated region. */
@@ -884,7 +884,7 @@ format_process_maps (void *data, char *&destbuf)
        i = cur.rend)
     {
       if (last_pass)
-      	posix_modname[0] = '\0';
+	posix_modname[0] = '\0';
       if (mb.State == MEM_FREE)
 	a.word = 0;
       else if (mb.State == MEM_RESERVE)
@@ -913,7 +913,7 @@ format_process_maps (void *data, char *&destbuf)
 		      (char *) mb.BaseAddress,
 		      (char *) mb.BaseAddress+mb.RegionSize
       };
-      
+
       /* Windows permissions are more fine-grained than the unix rwxp,
 	 so we reduce clutter by manually coalescing regions sharing
 	 the same allocation base and effective permissions. */
@@ -944,7 +944,7 @@ format_process_maps (void *data, char *&destbuf)
 	    }
 	  // start of a new region (but possibly still the same allocation)
 	  cur = next;
-	  // if a new allocation, figure out what kind it is 
+	  // if a new allocation, figure out what kind it is
 	  if (newbase && !last_pass && mb.State != MEM_FREE)
 	    {
 	      st.st_dev = 0;
@@ -1247,7 +1247,7 @@ format_process_mounts (void *data, char *&destbuf)
       cygsid p_sid;
 
       if (!p_sid.getfrompw (internal_getpwuid (p->uid)))
-      	return 0;
+	return 0;
       p_sid.string (sid_string);
       u_shared = (user_info *) open_shared (sid_string, USER_VERSION, u_hdl,
 					    sizeof (user_info), SH_JUSTOPEN,
@@ -1322,7 +1322,7 @@ get_process_state (DWORD dwProcessId)
 	  state = 'S';
 	  for (unsigned i = 0; i < sp->ThreadCount; i++)
 	    {
-              /* FIXME: at some point we should consider generating 'O' */
+	      /* FIXME: at some point we should consider generating 'O' */
 	      if (st->State == StateRunning ||
 		  st->State == StateReady)
 		{
@@ -1369,7 +1369,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
 				  (PVOID) p, n, (length = ULONG_MAX, &length));
       if (ret == STATUS_INFO_LENGTH_MISMATCH
 	  || (!NT_SUCCESS (ret) && length > n))
-      	{
+	{
 	  ret = STATUS_INFO_LENGTH_MISMATCH;
 	  n <<= 1;
 	  PMEMORY_WORKING_SET_LIST new_p = (PMEMORY_WORKING_SET_LIST)

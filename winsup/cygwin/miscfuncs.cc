@@ -510,7 +510,7 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
   ULONG real_guardsize = 0;
   thread_wrapper_arg *wrapper_arg;
   HANDLE thread = NULL;
-  
+
   wrapper_arg = (thread_wrapper_arg *) ccalloc (HEAP_STR, 1,
 						sizeof *wrapper_arg);
   if (!wrapper_arg)
@@ -549,9 +549,9 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
       real_stacksize = roundup2 (real_stacksize,
 				 wincap.allocation_granularity ());
       /* Reserve stack.
-         FIXME? If the TOP_DOWN method tends to collide too much with
-	 other stuff, we should provide our own mechanism to find a 
-	 suitable place for the stack.  Top down from the start of 
+	 FIXME? If the TOP_DOWN method tends to collide too much with
+	 other stuff, we should provide our own mechanism to find a
+	 suitable place for the stack.  Top down from the start of
 	 the Cygwin DLL comes to mind. */
       real_stackaddr = VirtualAlloc (NULL, real_stacksize,
 				     MEM_RESERVE | MEM_TOP_DOWN,

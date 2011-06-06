@@ -1233,7 +1233,7 @@ fhandler_tty_slave::fstat (struct __stat64 *st)
 			       &st->st_mode))
     {
       /* If we can't access the ACL, or if the tty doesn't actually exist,
-         then fake uid and gid to strict, system-like values. */
+	 then fake uid and gid to strict, system-like values. */
       st->st_mode = S_IFCHR | S_IRUSR | S_IWUSR;
       st->st_uid = 18;
       st->st_gid = 544;
@@ -1690,7 +1690,7 @@ fhandler_pty_master::pty_master_thread ()
       HANDLE client = NULL;
 
       if (!ReadFile (master_ctl, &req, sizeof req, &len, NULL))
-      	{
+	{
 	  termios_printf ("ReadFile, %E");
 	  goto reply;
 	}

@@ -85,7 +85,7 @@ fhandler_console::open_shared_console (HWND hw, HANDLE& h, bool& create)
 
   shared_locations m = create ? SH_JUSTCREATE: SH_JUSTOPEN;
   console_state *res = (console_state *)
-    open_shared (namebuf, 0, h, sizeof (*shared_console_info), &m); 
+    open_shared (namebuf, 0, h, sizeof (*shared_console_info), &m);
   create = m == SH_JUSTCREATE;
   return res;
 }
@@ -300,9 +300,9 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
 	 || mouse_event.dwEventFlags == MOUSE_WHEELED
 	 || (mouse_event.dwEventFlags == MOUSE_MOVED
 	     && (dev_state.dwMousePosition.X != dev_state.dwLastMousePosition.X
-	         || dev_state.dwMousePosition.Y != dev_state.dwLastMousePosition.Y)
+		 || dev_state.dwMousePosition.Y != dev_state.dwLastMousePosition.Y)
 	     && ((dev_state.use_mouse >= 2 && mouse_event.dwButtonState)
-	         || dev_state.use_mouse >= 3));
+		 || dev_state.use_mouse >= 3));
 }
 
 void __stdcall
@@ -516,14 +516,14 @@ restart:
 	  send_winch_maybe ();
 	  {
 	    MOUSE_EVENT_RECORD& mouse_event = input_rec.Event.MouseEvent;
-	    /* As a unique guard for mouse report generation, 
-	       call mouse_aware() which is common with select(), so the result 
-	       of select() and the actual read() will be consistent on the 
-	       issue of whether input (i.e. a mouse escape sequence) will 
+	    /* As a unique guard for mouse report generation,
+	       call mouse_aware() which is common with select(), so the result
+	       of select() and the actual read() will be consistent on the
+	       issue of whether input (i.e. a mouse escape sequence) will
 	       be available or not */
 	    if (mouse_aware (mouse_event))
 	      {
-		/* Note: Reported mouse position was already retrieved by 
+		/* Note: Reported mouse position was already retrieved by
 		   mouse_aware() and adjusted by window scroll buffer offset */
 
 		/* Treat the double-click event like a regular button press */
@@ -1223,7 +1223,7 @@ bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
 	: dev_state.vt100_graphics_mode_G0)
     for (DWORD i = 0; i < len; i ++)
       if (buf[i] >= (unsigned char) '`' && buf[i] <= (unsigned char) '~')
-        buf[i] = __vt100_conv[buf[i] - (unsigned char) '`'];
+	buf[i] = __vt100_conv[buf[i] - (unsigned char) '`'];
 
   while (len > 0)
     {
@@ -1613,15 +1613,15 @@ fhandler_console::char_command (char c)
       break;
     case 'c':				/* u9 - Terminal enquire string */
       if (dev_state.saw_greater_than_sign)
-	/* Generate Secondary Device Attribute report, using 67 = ASCII 'C' 
-	   to indicate Cygwin (convention used by Rxvt, Urxvt, Screen, Mintty), 
+	/* Generate Secondary Device Attribute report, using 67 = ASCII 'C'
+	   to indicate Cygwin (convention used by Rxvt, Urxvt, Screen, Mintty),
 	   and cygwin version for terminal version. */
 	__small_sprintf (buf, "\033[>67;%d%02d;0c", CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR);
       else
 	strcpy (buf, "\033[?6c");
-      /* The generated report needs to be injected for read-ahead into the 
-         fhandler_console object associated with standard input.
-         The current call does not work. */
+      /* The generated report needs to be injected for read-ahead into the
+	 fhandler_console object associated with standard input.
+	 The current call does not work. */
       puts_readahead (buf);
       break;
     case 'n':
@@ -2117,16 +2117,16 @@ get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
   for (int i = 0; keytable[i].vk; i++)
     if (input_rec.Event.KeyEvent.wVirtualKeyCode == keytable[i].vk)
       {
-        if ((input_rec.Event.KeyEvent.dwControlKeyState &
+	if ((input_rec.Event.KeyEvent.dwControlKeyState &
 		(LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
 	    && keytable[i].val[modifier_index] != NULL)
-          { /* Generic ESC prefixing if Alt is pressed */
+	  { /* Generic ESC prefixing if Alt is pressed */
 	    tmp[0] = '\033';
 	    strcpy (tmp + 1, keytable[i].val[modifier_index]);
 	    return tmp;
-          }
-        else
-          return keytable[i].val[modifier_index];
+	  }
+	else
+	  return keytable[i].val[modifier_index];
       }
 
   if (input_rec.Event.KeyEvent.uChar.AsciiChar)
@@ -2204,7 +2204,7 @@ fhandler_console::create_invisible_console (HWINSTA horig)
       termios_printf ("SetProcessWindowStation %d, %E", b);
     }
   b = AllocConsole ();	/* will cause flashing if CreateWindowStation
-	 		   failed */
+			   failed */
   if (!h)
     SetParent (GetConsoleWindow (), HWND_MESSAGE);
   if (horig && h && h != horig && SetProcessWindowStation (horig))

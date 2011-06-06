@@ -78,7 +78,7 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
       size_t nlen;
 
       /* For compatibility with Linux, we only allow user xattrs and
-         return EOPNOTSUPP otherwise. */
+	 return EOPNOTSUPP otherwise. */
       if (ascii_strncasematch (name, "user.", 5))
 	name += 5;
       else

@@ -44,12 +44,12 @@ static _off64_t format_procsysvipc_shm (void *, char *&);
 
 static const virt_tab_t procsysvipc_tab[] =
 {
-  { _VN ("."),          FH_PROCSYSVIPC,   virt_directory, NULL },
-  { _VN (".."),         FH_PROCSYSVIPC,   virt_directory, NULL },
-  { _VN ("msg"),        FH_PROCSYSVIPC,   virt_file,   format_procsysvipc_msg },
-  { _VN ("sem"),        FH_PROCSYSVIPC,   virt_file,   format_procsysvipc_sem },
-  { _VN ("shm"),        FH_PROCSYSVIPC,   virt_file,   format_procsysvipc_shm },
-  { NULL, 0,	        FH_BAD,           virt_none,      NULL }
+  { _VN ("."),		FH_PROCSYSVIPC,   virt_directory, NULL },
+  { _VN (".."),		FH_PROCSYSVIPC,   virt_directory, NULL },
+  { _VN ("msg"),	FH_PROCSYSVIPC,   virt_file,   format_procsysvipc_msg },
+  { _VN ("sem"),	FH_PROCSYSVIPC,   virt_file,   format_procsysvipc_sem },
+  { _VN ("shm"),	FH_PROCSYSVIPC,   virt_file,   format_procsysvipc_shm },
+  { NULL, 0,		FH_BAD,		  virt_none,   NULL }
 };
 
 static const int PROCSYSVIPC_LINK_COUNT =
@@ -77,10 +77,10 @@ fhandler_procsysvipc::exists ()
   if (entry)
     {
       if (entry->type == virt_file)
-        {
-          if (cygserver_running != CYGSERVER_OK)
-            return virt_none;
-        }
+	{
+	  if (cygserver_running != CYGSERVER_OK)
+	    return virt_none;
+	}
 	  fileid = entry - procsysvipc_tab;
 	  return entry->type;
 	}
@@ -233,26 +233,26 @@ format_procsysvipc_msg (void *, char *&destbuf)
   msgctl (msginfo.msgmni, IPC_INFO, (struct msqid_ds *) xmsqids);
 
   bufptr += __small_sprintf (bufptr,
-            "       key      msqid perms      cbytes       qnum lspid lrpid   uid   gid  cuid  cgid      stime      rtime      ctime\n");
+	    "       key      msqid perms      cbytes       qnum lspid lrpid   uid   gid  cuid  cgid      stime      rtime      ctime\n");
 
   for (int i = 0; i < msginfo.msgmni; i++) {
     if (xmsqids[i].msg_qbytes != 0) {
        bufptr += sprintf (bufptr,
-                 "%10llu %10u %5o %11lu %10lu %5d %5d %5lu %5lu %5lu %5lu %10ld %10ld %10ld\n",
-                 xmsqids[i].msg_perm.key,
-                 IXSEQ_TO_IPCID(i, xmsqids[i].msg_perm),
-                 xmsqids[i].msg_perm.mode,
-                 xmsqids[i].msg_cbytes,
-                 xmsqids[i].msg_qnum,
-                 xmsqids[i].msg_lspid,
-                 xmsqids[i].msg_lrpid,
-                 xmsqids[i].msg_perm.uid,
-                 xmsqids[i].msg_perm.gid,
-                 xmsqids[i].msg_perm.cuid,
-                 xmsqids[i].msg_perm.cgid,
-                 xmsqids[i].msg_stime,
-                 xmsqids[i].msg_rtime,
-                 xmsqids[i].msg_ctime);
+		 "%10llu %10u %5o %11lu %10lu %5d %5d %5lu %5lu %5lu %5lu %10ld %10ld %10ld\n",
+		 xmsqids[i].msg_perm.key,
+		 IXSEQ_TO_IPCID(i, xmsqids[i].msg_perm),
+		 xmsqids[i].msg_perm.mode,
+		 xmsqids[i].msg_cbytes,
+		 xmsqids[i].msg_qnum,
+		 xmsqids[i].msg_lspid,
+		 xmsqids[i].msg_lrpid,
+		 xmsqids[i].msg_perm.uid,
+		 xmsqids[i].msg_perm.gid,
+		 xmsqids[i].msg_perm.cuid,
+		 xmsqids[i].msg_perm.cgid,
+		 xmsqids[i].msg_stime,
+		 xmsqids[i].msg_rtime,
+		 xmsqids[i].msg_ctime);
     }
   }
 
@@ -280,21 +280,21 @@ format_procsysvipc_sem (void *, char *&destbuf)
   semctl (seminfo.semmni, 0, IPC_INFO, semun);
 
   bufptr += __small_sprintf (bufptr,
-            "       key      semid perms      nsems   uid   gid  cuid  cgid      otime      ctime\n");
+	    "       key      semid perms      nsems   uid   gid  cuid  cgid      otime      ctime\n");
   for (int i = 0; i < seminfo.semmni; i++) {
     if ((xsemids[i].sem_perm.mode & SEM_ALLOC) != 0) {
       bufptr += sprintf (bufptr,
-                "%10llu %10u %5o %10d %5lu %5lu %5lu %5lu %10ld %10ld\n",
-                xsemids[i].sem_perm.key,
-                IXSEQ_TO_IPCID(i, xsemids[i].sem_perm),
-                xsemids[i].sem_perm.mode,
-                xsemids[i].sem_nsems,
-                xsemids[i].sem_perm.uid,
-                xsemids[i].sem_perm.gid,
-                xsemids[i].sem_perm.cuid,
-                xsemids[i].sem_perm.cgid,
-                xsemids[i].sem_otime,
-                xsemids[i].sem_ctime);
+		"%10llu %10u %5o %10d %5lu %5lu %5lu %5lu %10ld %10ld\n",
+		xsemids[i].sem_perm.key,
+		IXSEQ_TO_IPCID(i, xsemids[i].sem_perm),
+		xsemids[i].sem_perm.mode,
+		xsemids[i].sem_nsems,
+		xsemids[i].sem_perm.uid,
+		xsemids[i].sem_perm.gid,
+		xsemids[i].sem_perm.cuid,
+		xsemids[i].sem_perm.cgid,
+		xsemids[i].sem_otime,
+		xsemids[i].sem_ctime);
     }
   }
 
@@ -319,25 +319,25 @@ format_procsysvipc_shm (void *, char *&destbuf)
   shmctl (shminfo.shmmni, IPC_INFO, (struct shmid_ds *) xshmids);
 
   bufptr += __small_sprintf (bufptr,
-            "       key      shmid perms       size  cpid  lpid nattch   uid   gid  cuid  cgid      atime      dtime      ctime\n");
+	    "       key      shmid perms       size  cpid  lpid nattch   uid   gid  cuid  cgid      atime      dtime      ctime\n");
   for (int i = 0; i < shminfo.shmmni; i++) {
     if (xshmids[i].shm_perm.mode & 0x0800) {
       bufptr += sprintf (bufptr,
-                "%10llu %10u %5o %10u %5d %5d %6u %5lu %5lu %5lu %5lu %10ld %10ld %10ld\n",
-                xshmids[i].shm_perm.key,
-                IXSEQ_TO_IPCID(i, xshmids[i].shm_perm),
-                xshmids[i].shm_perm.mode,
-                xshmids[i].shm_segsz,
-                xshmids[i].shm_cpid,
-                xshmids[i].shm_lpid,
-                xshmids[i].shm_nattch,
-                xshmids[i].shm_perm.uid,
-                xshmids[i].shm_perm.gid,
-                xshmids[i].shm_perm.cuid,
-                xshmids[i].shm_perm.cgid,
-                xshmids[i].shm_atime,
-                xshmids[i].shm_dtime,
-                xshmids[i].shm_ctime);
+		"%10llu %10u %5o %10u %5d %5d %6u %5lu %5lu %5lu %5lu %10ld %10ld %10ld\n",
+		xshmids[i].shm_perm.key,
+		IXSEQ_TO_IPCID(i, xshmids[i].shm_perm),
+		xshmids[i].shm_perm.mode,
+		xshmids[i].shm_segsz,
+		xshmids[i].shm_cpid,
+		xshmids[i].shm_lpid,
+		xshmids[i].shm_nattch,
+		xshmids[i].shm_perm.uid,
+		xshmids[i].shm_perm.gid,
+		xshmids[i].shm_perm.cuid,
+		xshmids[i].shm_perm.cgid,
+		xshmids[i].shm_atime,
+		xshmids[i].shm_dtime,
+		xshmids[i].shm_ctime);
 		}
 	}
 

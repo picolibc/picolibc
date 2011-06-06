@@ -95,7 +95,7 @@ public:
   void topsort ();
   void topsort_visit (dll* d, bool goto_tail);
   void append (dll* d);
-  
+
   dll *inext ()
   {
     while ((hold = hold->next))

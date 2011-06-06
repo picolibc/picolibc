@@ -72,7 +72,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 			   pc.get_object_attr (attr, sec_none_nih), &io,
 			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
       if (!NT_SUCCESS (status))
-      	{
+	{
 	  sd.free ();
 	  __seterrno_from_nt_status (status);
 	  return -1;
@@ -167,7 +167,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 	  return 0;
 	}
       /* ... and create a new security descriptor in which all inherited ACEs
-         are marked with the INHERITED_ACE flag.  For a description of the
+	 are marked with the INHERITED_ACE flag.  For a description of the
 	 undocumented RtlConvertToAutoInheritSecurityObject function from
 	 ntdll.dll see the MSDN man page for the advapi32 function
 	 ConvertToAutoInheritPrivateObjectSecurity.  Fortunately the latter
@@ -182,7 +182,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 	  return 0;
 	}
       /* Eventually copy the new security descriptor into sd and delete the
-      	 original one created by RtlConvertToAutoInheritSecurityObject from
+	 original one created by RtlConvertToAutoInheritSecurityObject from
 	 the heap. */
       len = RtlLengthSecurityDescriptor (nsd);
       memcpy ((PSECURITY_DESCRIPTOR) sd, nsd, len);
@@ -989,14 +989,14 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
   if (!tok)
     {
       if (!DuplicateTokenEx (hProcToken, MAXIMUM_ALLOWED, NULL,
-		            SecurityImpersonation, TokenImpersonation,
+			    SecurityImpersonation, TokenImpersonation,
 			    &hProcImpToken))
-         {
-            __seterrno ();
-            return ret;
-         } 
+	 {
+	    __seterrno ();
+	    return ret;
+	 }
       tok = hProcImpToken;
-    } 
+    }
 
   status = NtAccessCheck (sd, tok, desired, &mapping, pset, &plen, &granted,
 			  &allow);

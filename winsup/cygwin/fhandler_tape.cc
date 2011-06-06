@@ -1449,7 +1449,7 @@ fhandler_dev_tape::dup (fhandler_base *child)
   lock (-1);
   fhandler_dev_tape *fh = (fhandler_dev_tape *) child;
   if (!DuplicateHandle (GetCurrentProcess (), mt_mtx,
-  			GetCurrentProcess (), &fh->mt_mtx,
+			GetCurrentProcess (), &fh->mt_mtx,
 			0, TRUE, DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("dup(%s) failed, mutex handle %x, %E",

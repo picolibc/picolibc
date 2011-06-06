@@ -508,7 +508,7 @@ search_wsa_event_slot (LONG new_serial_number)
     {
       HANDLE searchmtx;
       RtlInitUnicodeString (&uname, sock_shared_name (searchname,
-      					wsa_events[slot].serial_number));
+					wsa_events[slot].serial_number));
       InitializeObjectAttributes (&attr, &uname, 0, get_session_parent_dir (),
 				  NULL);
       status = NtOpenMutant (&searchmtx, READ_CONTROL, &attr);
@@ -723,7 +723,7 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
       fhandler_base::fixup_after_fork (parent);
       return;
     }
-    
+
   SOCKET new_sock = WSASocketW (FROM_PROTOCOL_INFO, FROM_PROTOCOL_INFO,
 				FROM_PROTOCOL_INFO, prot_info_ptr, 0,
 				WSA_FLAG_OVERLAPPED);
@@ -735,7 +735,7 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
   else
     {
       /* Even though the original socket was not inheritable, the duplicated
-         socket is potentially inheritable again. */
+	 socket is potentially inheritable again. */
       SetHandleInformation ((HANDLE) new_sock, HANDLE_FLAG_INHERIT, 0);
       set_io_handle ((HANDLE) new_sock);
       debug_printf ("WSASocket succeeded (%lx)", new_sock);
@@ -1219,7 +1219,7 @@ fhandler_socket::accept4 (struct sockaddr *peer, int *len, int flags)
 	  if (peer)
 	    {
 	      if (get_addr_family () == AF_LOCAL)
-	      	{
+		{
 		  /* FIXME: Right now we have no way to determine the
 		     bound socket name of the peer's socket.  For now
 		     we just fake an unbound socket on the other side. */
@@ -1257,7 +1257,7 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
       sun.sun_family = AF_LOCAL;
       sun.sun_path[0] = '\0';
       if (get_sun_path ())
-      	strncat (sun.sun_path, get_sun_path (), UNIX_PATH_LEN - 1);
+	strncat (sun.sun_path, get_sun_path (), UNIX_PATH_LEN - 1);
       memcpy (name, &sun, min (*namelen, (int) SUN_LEN (&sun) + 1));
       *namelen = (int) SUN_LEN (&sun) + (get_sun_path () ? 1 : 0);
       res = 0;
@@ -1331,7 +1331,7 @@ fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
       sun.sun_family = AF_LOCAL;
       sun.sun_path[0] = '\0';
       if (get_peer_sun_path ())
-      	strncat (sun.sun_path, get_peer_sun_path (), UNIX_PATH_LEN - 1);
+	strncat (sun.sun_path, get_peer_sun_path (), UNIX_PATH_LEN - 1);
       memcpy (name, &sun, min (*namelen, (int) SUN_LEN (&sun) + 1));
       *namelen = (int) SUN_LEN (&sun) + (get_peer_sun_path () ? 1 : 0);
     }
@@ -1437,7 +1437,7 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
 	res = WSARecvMsg (get_socket (), wsamsg, &wret, NULL, NULL);
       /* This is working around a really weird problem in WinSock.
 
-         Assume you create a socket, fork the process (thus duplicating
+	 Assume you create a socket, fork the process (thus duplicating
 	 the socket), connect the socket in the child, then call recv
 	 on the original socket handle in the parent process.
 	 In this scenario, calls to WinSock's recvfrom and WSARecvFrom
@@ -1449,7 +1449,7 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
 	 is bound locally, but in the parent process, WinSock doesn't know
 	 about that and fails, while the same test is omitted in the recv
 	 functions.
-	 
+
 	 This also covers another weird case: Winsock returns WSAEFAULT if
 	 namelen is a valid pointer while name is NULL.  Both parameters are
 	 ignored for TCP sockets, so this only occurs when using UDP socket. */
@@ -1610,7 +1610,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
       /* FIXME: Look for a way to split a message into the least number of
 		pieces to minimize the number of WsaSendTo calls. */
       if (get_socket_type () == SOCK_STREAM)
-      	{
+	{
 	  buf.buf = wsamsg->lpBuffers[i].buf + off;
 	  buf.len = wsamsg->lpBuffers[i].len - off;
 	  /* See net.cc:fdsock() and MSDN KB 823764 */
@@ -1811,7 +1811,7 @@ fhandler_socket::close ()
 #define CONV_OLD_TO_NEW_SIO(old) (((old)&0xff00ffff)|(((long)sizeof(struct ifreq)&IOCPARM_MASK)<<16))
 
 struct __old_ifreq {
-#define __OLD_IFNAMSIZ        16
+#define __OLD_IFNAMSIZ	16
   union {
     char    ifrn_name[__OLD_IFNAMSIZ];   /* if name, e.g. "en0" */
   } ifr_ifrn;

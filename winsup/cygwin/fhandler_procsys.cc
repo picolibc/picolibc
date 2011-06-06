@@ -90,7 +90,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
     {
       /* If requested, check permissions. */
       if (buf)
-      	get_object_attribute (h, &buf->st_uid, &buf->st_gid, &buf->st_mode);
+	get_object_attribute (h, &buf->st_uid, &buf->st_gid, &buf->st_mode);
       NtClose (h);
       return virt_symlink;
     }
@@ -103,7 +103,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
     {
       /* If requested, check permissions. */
       if (buf)
-      	get_object_attribute (h, &buf->st_uid, &buf->st_gid, &buf->st_mode);
+	get_object_attribute (h, &buf->st_uid, &buf->st_gid, &buf->st_mode);
       NtClose (h);
       return virt_directory;
     }
@@ -168,7 +168,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
       /* If requested, check permissions.  If this is a parent handle from
 	 the above desperate parent check, skip. */
       if (buf && !desperate_parent_check)
-      	get_object_attribute (h, &buf->st_uid, &buf->st_gid, &buf->st_mode);
+	get_object_attribute (h, &buf->st_uid, &buf->st_gid, &buf->st_mode);
 
       /* Check for the device type. */
       status = NtQueryVolumeInformationFile (h, &io, &ffdi, sizeof ffdi,

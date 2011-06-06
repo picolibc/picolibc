@@ -376,9 +376,9 @@ sysinfo (struct sysinfo *info)
       debug_printf ("NtQuerySystemInformation(SystemPagefileInformation), "
 		  "status %p", ret);
       totalswap = (memory_status.ullTotalPageFile - memory_status.ullTotalPhys)
-                        / getsystempagesize ();
+			/ getsystempagesize ();
       freeswap = (memory_status.ullAvailPageFile - memory_status.ullTotalPhys)
-                        / getsystempagesize ();
+			/ getsystempagesize ();
     }
   else
     {

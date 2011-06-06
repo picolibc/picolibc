@@ -1,4 +1,4 @@
-/* Fhandler_dev_dsp: code to emulate OSS sound model /dev/dsp
+/* fhandler_dev_dsp: code to emulate OSS sound model /dev/dsp
 
    Copyright 2001, 2002, 2003, 2004, 2008, 2011 Red Hat, Inc
 
@@ -867,7 +867,7 @@ fhandler_dev_dsp::Audio_in::read (char *pSampleData, int &nBytes)
   while (bytes_to_read != 0)
     { // Block till next sound has been read
       if (!waitfordata ())
-      	{
+	{
 	  if (nBytes)
 	    return true;
 	  nBytes = -1;

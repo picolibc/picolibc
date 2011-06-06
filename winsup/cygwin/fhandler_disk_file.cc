@@ -172,7 +172,7 @@ readdir_check_reparse_point (POBJECT_ATTRIBUTES attr)
 	{
 	  if (rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
 	    {
-	      RtlInitCountedUnicodeString (&subst, 
+	      RtlInitCountedUnicodeString (&subst,
 		  (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
 			    + rp->MountPointReparseBuffer.SubstituteNameOffset),
 		  rp->MountPointReparseBuffer.SubstituteNameLength);
@@ -180,7 +180,7 @@ readdir_check_reparse_point (POBJECT_ATTRIBUTES attr)
 	      if (RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE))
 		ret = DT_DIR;
 	      else
-	      	ret = DT_LNK;
+		ret = DT_LNK;
 	    }
 	  else if (rp->ReparseTag == IO_REPARSE_TAG_SYMLINK)
 	    ret = DT_LNK;
@@ -349,7 +349,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
     {
       PFILE_NETWORK_OPEN_INFORMATION pfnoi = pc.fnoi ();
       status = NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
-                                      FileNetworkOpenInformation);
+				      FileNetworkOpenInformation);
       if (!NT_SUCCESS (status))
        {
 	 debug_printf ("%p = NtQueryInformationFile(%S, "
@@ -615,7 +615,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	      IO_STATUS_BLOCK io;
 
 	      /* We have to re-open the file.  Either the file is not opened
-	      	 for reading, or the read will change the file position of the
+		 for reading, or the read will change the file position of the
 		 original handle. */
 	      pc.init_reopen_attr (&attr, h);
 	      status = NtOpenFile (&h, SYNCHRONIZE | FILE_READ_DATA,
@@ -910,7 +910,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 	attrib = S_IFLNK | STD_RBITS | STD_WBITS;
       res = set_file_attribute (get_handle (), pc, uid, gid, attrib);
       /* If you're running a Samba server which has no winbidd running, the
-         uid<->SID mapping is disfunctional.  Even trying to chown to your
+	 uid<->SID mapping is disfunctional.  Even trying to chown to your
 	 own account fails since the account used on the server is the UNIX
 	 account which gets used for the standard user mapping.  This is a
 	 default mechanism which doesn't know your real Windows SID.
@@ -1036,7 +1036,7 @@ cant_access_acl:
 	      res = getacl (get_stat_handle (), pc, nentries, aclbufp);
 	      /* For this ENOSYS case, see security.cc:get_file_attribute(). */
 	      if (res == -1 && get_errno () == ENOSYS)
-	      	goto cant_access_acl;
+		goto cant_access_acl;
 	    break;
 	  case GETACLCNT:
 	    res = getacl (get_stat_handle (), pc, 0, NULL);
@@ -1611,7 +1611,8 @@ fhandler_disk_file::rmdir ()
       FILE_BASIC_INFORMATION fbi;
       NTSTATUS q_status;
 
-      q_status = NtQueryAttributesFile (pc.get_object_attr (attr, sec_none_nih),                                        &fbi);
+      q_status = NtQueryAttributesFile (pc.get_object_attr (attr, sec_none_nih),
+					&fbi);
       if (!NT_SUCCESS (status) && q_status == STATUS_OBJECT_NAME_NOT_FOUND)
 	status = STATUS_SUCCESS;
       else if (NT_SUCCESS (status) && NT_SUCCESS (q_status))
@@ -2104,9 +2105,9 @@ go_ahead:
 					  pc.objcaseinsensitive (),
 					  get_handle (), NULL);
 	      /* FILE_OPEN_REPARSE_POINT on NFS is a no-op, so the normal
-	         NtOpenFile here returns the inode number of the symlink target,
+		 NtOpenFile here returns the inode number of the symlink target,
 		 rather than the inode number of the symlink itself.
-		 
+
 		 Worse, trying to open a symlink without setting the special
 		 "ActOnSymlink" EA triggers a bug in Windows 7 which results
 		 in a timeout of up to 20 seconds, followed by two exceptions

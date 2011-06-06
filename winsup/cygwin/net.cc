@@ -498,12 +498,12 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
      scanners or other network-oriented software replace normal sockets
      with their own kind, which is running through a filter driver called
      "layered service provider" (LSP).
-     
+
      LSP sockets are not kernel objects.  They are typically not marked as
      inheritable, nor are they IFS handles.  They are in fact not inheritable
      to child processes, and it does not help to mark them inheritable via
      SetHandleInformation.  Subsequent socket calls in the child process fail
-     with error 10038, WSAENOTSOCK. 
+     with error 10038, WSAENOTSOCK.
 
      The only way up to Windows Server 2003 to make these sockets usable in
      child processes is to duplicate them via WSADuplicateSocket/WSASocket
@@ -511,7 +511,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
      we only do this on affected systems.  If we recognize a non-inheritable
      socket we switch to inheritance/dup via WSADuplicateSocket/WSASocket for
      that socket.
-     
+ 
      Starting with Vista there's another neat way to workaround these annoying
      LSP sockets.  WSAIoctl allows to fetch the underlying base socket, which
      is a normal, inheritable IFS handle.  So we fetch the base socket,
@@ -531,7 +531,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
       ret = WSAIoctl (soc, SIO_BASE_HANDLE, NULL, 0, (void *) &base_soc,
 		      sizeof (base_soc), &bret, NULL, NULL);
       if (ret)
-      	debug_printf ("WSAIoctl: %lu", WSAGetLastError ());
+	debug_printf ("WSAIoctl: %lu", WSAGetLastError ());
       else if (base_soc != soc
 	       && GetHandleInformation ((HANDLE) base_soc, &flags)
 	       && (flags & HANDLE_FLAG_INHERIT))
@@ -728,7 +728,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	optname = convert_ws1_ip_optname (optname);
 
       /* Per POSIX we must not be able to reuse a complete duplicate of a
-         local TCP address (same IP, same port), even if SO_REUSEADDR has been
+	 local TCP address (same IP, same port), even if SO_REUSEADDR has been
 	 set.  That's unfortunately possible in WinSock, and this has never
 	 been changed to maintain backward compatibility.  Instead, the
 	 SO_EXCLUSIVEADDRUSE option has been added to allow an application to
@@ -842,7 +842,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 	    case SO_KEEPALIVE:
 	    case SO_DONTROUTE:
 	      /* Regression in Vista and later:  instead of a 4 byte BOOL
-	         value, a 1 byte BOOLEAN value is returned, in contrast
+		 value, a 1 byte BOOLEAN value is returned, in contrast
 		 to older systems and the documentation.  Since an int
 		 type is expected by the calling application, we convert
 		 the result here. */
