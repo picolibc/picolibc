@@ -1448,7 +1448,7 @@ fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 		  status = NtReadFile (get_handle (), NULL, NULL, NULL, &io,
 				       buf, count, &off, NULL);
 		  if (NT_SUCCESS (status))
-		    return io.Information;
+		    goto success;
 		  break;
 		case MMAP_RAISE_SIGBUS:
 		  raise (SIGBUS);
@@ -1459,8 +1459,12 @@ fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 	  __seterrno_from_nt_status (status);
 	  return -1;
 	}
+
+success:
+      lseek (-io.Information, SEEK_CUR);
       return io.Information;
     }
+
   /* Text mode stays slow and non-atomic. */
   ssize_t res;
   _off64_t curpos = lseek (0, SEEK_CUR);
