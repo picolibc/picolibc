@@ -206,18 +206,22 @@ shared_name (WCHAR *ret_buf, const WCHAR *str, int num)
 
 /* The order in offsets is so that the constant blocks shared_info
    and user_info are right below the cygwin DLL, then the pinfo block
-   which changes with each process.  */
+   which changes with each process.  Below that is the console_state,
+   an optional block which only exists when running in a Windows console
+   window.  Therefore, if we are not running in a console, we have 64K
+   more of contiguous memory below the Cygwin DLL. */
 static ptrdiff_t offsets[] =
 {
-  - pround (sizeof (shared_info)),
-  - pround (sizeof (shared_info))
+  - pround (sizeof (shared_info)),		/* SH_CYGWIN_SHARED */
+  - pround (sizeof (shared_info))		/* SH_USER_SHARED */
   - pround (sizeof (user_info)),
-  - pround (sizeof (shared_info))
+  - pround (sizeof (shared_info))		/* SH_MYSELF */
   - pround (sizeof (user_info))
   - pround (sizeof (_pinfo)),
-  - pround (sizeof (shared_info))
+  - pround (sizeof (shared_info))		/* SH_SHARED_CONSOLE */
   - pround (sizeof (user_info))
-  - pround (sizeof (_pinfo)),
+  - pround (sizeof (_pinfo))
+  - pround (sizeof (fhandler_console::console_state)),
   0
 };
 

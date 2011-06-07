@@ -1,3 +1,10 @@
+2011-06-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler_console.cc (fhandler_console::open_shared_console):
+	Semi-revert to using fixed location for console stuff.
+	* shared.cc (offsets): Ditto.  Comment.
+	* shared_info (shared_locations): Re-add SH_SHARED_CONSOLE.
+
 2011-06-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::pread): Reset windows file

@@ -83,10 +83,10 @@ fhandler_console::open_shared_console (HWND hw, HANDLE& h, bool& create)
   wchar_t namebuf[(sizeof "XXXXXXXXXXXXXXXXXX-consNNNNNNNNNN")];
   __small_swprintf (namebuf, L"%S-cons%p", &installation_key, hw);
 
-  shared_locations m = create ? SH_JUSTCREATE: SH_JUSTOPEN;
+  shared_locations m = create ? SH_SHARED_CONSOLE : SH_JUSTOPEN;
   console_state *res = (console_state *)
     open_shared (namebuf, 0, h, sizeof (*shared_console_info), &m);
-  create = m == SH_JUSTCREATE;
+  create = m != SH_JUSTOPEN;
   return res;
 }
 class console_unit
