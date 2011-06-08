@@ -1,5 +1,9 @@
 2011-06-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* environ.cc (tty_is_gone): Add missing space to message.
+
+2011-06-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* environ.cc (settings::set_process_state): Delete.
 	(tty_is_gone): New function.
 	(known): Change "tty" to call tty_is_gone().  Remove unneeded '&' from

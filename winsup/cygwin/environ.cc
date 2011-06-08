@@ -570,7 +570,7 @@ tty_is_gone (const char *buf)
     {
       small_printf ("\"tty\" option detected in CYGWIN environment variable.\n"
 		    "CYGWIN=tty is no longer supported.  Please remove it from your\n"
-		    "CYGWIN environment variable and use a terminal emulator like mintty,"
+		    "CYGWIN environment variable and use a terminal emulator like mintty, "
 		    "xterm, or rxvt\n");
       user_shared->warned_notty = 1;
     }
