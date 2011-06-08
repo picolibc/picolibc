@@ -15,6 +15,8 @@ details. */
 #include "limits.h"
 #include "mount.h"
 
+#define CURR_USER_MAGIC 0x6467403bU
+
 class user_info
 {
   void initialize ();
@@ -22,10 +24,12 @@ public:
   LONG version;
   DWORD cb;
   bool warned_msdos;
+  bool warned_notty;
   mount_info mountinfo;
   friend void dll_crt0_1 (void *);
   static void create (bool);
 };
+
 /******** Shared Info ********/
 /* Data accessible to all tasks */
 
@@ -33,7 +37,6 @@ public:
 #define CURR_SHARED_MAGIC 0x34e5bfa7U
 
 #define USER_VERSION   1
-#define CURR_USER_MAGIC 0x6112afb3U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between

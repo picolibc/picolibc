@@ -29,6 +29,7 @@ details. */
 #include "registry.h"
 #include "environ.h"
 #include "child_info.h"
+#include "shared_info.h"
 #include "ntdll.h"
 
 extern bool dos_file_warning;
@@ -529,8 +530,7 @@ enum settings
   {
     justset,
     isfunc,
-    setbit,
-    set_process_state,
+    setbit
   };
 
 /* When BUF is:
@@ -563,6 +563,19 @@ set_proc_retry (const char *buf)
   child_info::retry_count = strtoul (buf, NULL, 0);
 }
 
+static void
+tty_is_gone (const char *buf)
+{
+  if (!user_shared->warned_notty)
+    {
+      small_printf ("\"tty\" option detected in CYGWIN environment variable.\n"
+		    "CYGWIN=tty is no longer supported.  Please remove it from your\n"
+		    "CYGWIN environment variable and use a terminal emulator like mintty,"
+		    "xterm, or rxvt\n");
+      user_shared->warned_notty = 1;
+    }
+}
+
 /* The structure below is used to set up an array which is used to
    parse the CYGWIN environment variable or, if enabled, options from
    the registry.  */
@@ -588,14 +601,14 @@ static struct parse_thing
 {
   {"dosfilewarning", {&dos_file_warning}, justset, NULL, {{false}, {true}}},
   {"envcache", {&envcache}, justset, NULL, {{true}, {false}}},
-  {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
+  {"error_start", {func: error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
-  {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
+  {"glob", {func: glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
   {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
   {"title", {&display_title}, justset, NULL, {{false}, {true}}},
-  {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},
+  {"tty", {func: tty_is_gone}, isfunc, NULL, {{0}, {0}}},
   {"upcaseenv", {&create_upcaseenv}, justset, NULL, {{false}, {true}}},
   {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
   {NULL, {0}, justset, 0, {{0}, {0}}}
@@ -665,9 +678,6 @@ parse_options (char *buf)
 		  *k->setting.x = strtol (eq, NULL, 0);
 		debug_printf ("%s %d", k->name, *k->setting.x);
 		break;
-	      case set_process_state:
-		k->setting.x = &myself->process_state;
-		/* fall through */
 	      case setbit:
 		*k->setting.x &= ~k->values[istrue].i;
 		if (istrue || (eq && strtol (eq, NULL, 0)))

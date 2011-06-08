@@ -1,3 +1,13 @@
+2011-06-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* environ.cc (settings::set_process_state): Delete.
+	(tty_is_gone): New function.
+	(known): Change "tty" to call tty_is_gone().  Remove unneeded '&' from
+	beginning of function address.
+	(parse_options): Remove set_process_state handling.
+	* shared_info.h (CURR_USER_MAGIC): Reset.
+	(user_info::warned_notty): New member.
+
 2011-06-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler_console.cc (fhandler_console::open_shared_console):
