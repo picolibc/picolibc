@@ -2000,11 +2000,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    if (*src < ' ')
 	      {
 		if (*src == '\007' && dev_state.state_ == gettitle)
-		  {
-		    if (old_title)
-		      strcpy (old_title, dev_state.my_title_buf);
-		    set_console_title (dev_state.my_title_buf);
-		  }
+		  set_console_title (dev_state.my_title_buf);
 		dev_state.state_ = normal;
 	      }
 	    else if (n < TITLESIZE)

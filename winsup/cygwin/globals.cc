@@ -41,7 +41,6 @@ enum exit_states
     ES_HUP_PGRP,
     ES_HUP_SID,
     ES_EXEC_EXIT,
-    ES_TITLE,
     ES_TTY_TERMINATE,
     ES_FINAL
   };
@@ -52,8 +51,6 @@ exit_states NO_COPY exit_state;
 int NO_COPY dynamically_loaded;
 
 /* Some CYGWIN environment variable variables. */
-bool display_title;
-bool strip_title_path;
 bool allow_glob = true;
 
 bool NO_COPY in_forkee;
@@ -72,8 +69,6 @@ bool NO_COPY cygwin_finished_initializing;
 bool NO_COPY _cygwin_testing;
 
 char NO_COPY almost_null[1];
-
-char *old_title;
 
 /* Define globally used, but readonly variables using the _RDATA attribute. */
 #define _RDATA __attribute__ ((section(".rdata")))

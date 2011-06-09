@@ -48,8 +48,6 @@ extern "C" void __sinit (_reent *);
 static int NO_COPY envc;
 static char NO_COPY **envp;
 
-static char title_buf[TITLESIZE + 1];
-
 bool NO_COPY jit_debug;
 
 static void
@@ -635,11 +633,6 @@ child_info_spawn::handle_spawn ()
   child_proc_info->parent = NULL;
 
   signal_fixup_after_exec ();
-  if (moreinfo->old_title)
-    {
-      old_title = strcpy (title_buf, moreinfo->old_title);
-      cfree (moreinfo->old_title);
-    }
   fixup_lockf_after_exec ();
 }
 
@@ -814,9 +807,6 @@ dll_crt0_1 (void *)
 #endif
   pinfo_init (envp, envc);
 
-  if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
-    old_title = title_buf;
-
   /* Allocate cygheap->fdtab */
   dtable_init ();
 
@@ -871,18 +861,6 @@ dll_crt0_1 (void *)
       char *cp = strchr (__progname, '\0') - 4;
       if (cp > __progname && ascii_strcasematch (cp, ".exe"))
 	*cp = '\0';
-    }
-
-  /* Set new console title if appropriate. */
-
-  if (display_title && !dynamically_loaded)
-    {
-      char *cp = __progname;
-      if (strip_title_path)
-	for (char *ptr = cp; *ptr && *ptr != ' '; ptr++)
-	  if (isdirsep (*ptr))
-	    cp = ptr + 1;
-      set_console_title (cp);
     }
 
   (void) xdr_set_vprintf (&cygxdr_vwarnx);
@@ -1065,14 +1043,6 @@ do_exit (int status)
 	    tp->kill_pgrp (SIGHUP);
 	}
 
-    }
-
-  if (exit_state < ES_TITLE)
-    {
-      exit_state = ES_TITLE;
-      /* restore console title */
-      if (old_title && display_title)
-	set_console_title (old_title);
     }
 
   if (exit_state < ES_TTY_TERMINATE)

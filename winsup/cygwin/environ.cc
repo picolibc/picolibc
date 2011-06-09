@@ -123,8 +123,6 @@ static struct parse_thing
   {"glob", {func: glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
-  {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
-  {"title", {&display_title}, justset, NULL, {{false}, {true}}},
   {"tty", {func: tty_is_gone}, isfunc, NULL, {{0}, {0}}},
   {"upcaseenv", {&create_upcaseenv}, justset, NULL, {{false}, {true}}},
   {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},

@@ -1,5 +1,23 @@
 2011-06-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
+	(child_info::old_title): Delete.
+	(child_info::~child_info_spawn): Remove recording of old_title.
+	* dcrt0.cc (title_buf): Delete.
+	(child_info_spawn::handle_spawn): Remove recording of old_title.
+	(dll_crt0_1): Get rid of all title handling.
+	(do_exit): Ditto.
+	* environ.cc (known): Delete strip_title and title.
+	* fhandler_console.cc (fhandler_console::write): Remove recording of
+	old_title.
+	* globals.cc (exit_states): Remove ES_TITLE.
+	(display_title): Delete.
+	(strip_title_path): Delete.
+	(old_title): Delete.
+	* spawn.cc (spawn_guts): Remove old_title accommodation.
+
+2011-06-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* environ.cc (envcache): Delete.
 	(known): Remove envcache.
 	(getwinenv): Don't honor envcache setting.

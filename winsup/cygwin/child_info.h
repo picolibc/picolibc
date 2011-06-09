@@ -38,7 +38,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xeef5640dU
+#define CURR_CHILD_INFO_MAGIC 0x29afd207U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -101,7 +101,6 @@ class fhandler_base;
 class cygheap_exec_info
 {
 public:
-  char *old_title;
   int argc;
   char **argv;
   int envc;
@@ -121,8 +120,6 @@ public:
   {
     if (moreinfo)
       {
-	if (moreinfo->old_title)
-	  cfree (moreinfo->old_title);
 	if (moreinfo->envp)
 	  {
 	    for (char **e = moreinfo->envp; *e; e++)
