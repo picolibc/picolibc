@@ -1,5 +1,11 @@
 2011-06-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* environ.cc (envcache): Delete.
+	(known): Remove envcache.
+	(getwinenv): Don't honor envcache setting.
+
+2011-06-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* environ.c: Move code earlier to allow:
 	(_addenv): Call parse_options() when CYGWIN environment variable is
 	being changed.

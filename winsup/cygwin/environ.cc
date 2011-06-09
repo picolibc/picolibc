@@ -36,7 +36,6 @@ extern bool dos_file_warning;
 extern bool ignore_case_with_glob;
 extern bool allow_winsymlinks;
 bool reset_com = false;
-static bool envcache = true;
 static bool create_upcaseenv = false;
 
 static char **lastenviron;
@@ -119,7 +118,6 @@ static struct parse_thing
   } known[] NO_COPY =
 {
   {"dosfilewarning", {&dos_file_warning}, justset, NULL, {{false}, {true}}},
-  {"envcache", {&envcache}, justset, NULL, {{true}, {false}}},
   {"error_start", {func: error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
   {"glob", {func: glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
@@ -349,7 +347,7 @@ getwinenv (const char *env, const char *in_posix, win_env *temp)
 	if (!cur_environ () || !(val = in_posix ?: getenv (we->name)))
 	  debug_printf ("can't set native for %s since no environ yet",
 			we->name);
-	else if (!envcache || !we->posix || strcmp (val, we->posix) != 0)
+	else if (!we->posix || strcmp (val, we->posix) != 0)
 	  {
 	    if (temp)
 	      {
