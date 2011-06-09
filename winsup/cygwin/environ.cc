@@ -41,6 +41,184 @@ static bool create_upcaseenv = false;
 
 static char **lastenviron;
 
+/* Parse CYGWIN options */
+
+static NO_COPY bool export_settings = false;
+
+enum settings
+  {
+    justset,
+    isfunc,
+    setbit
+  };
+
+/* When BUF is:
+   null or empty: disables globbing
+   "ignorecase": enables case-insensitive globbing
+   anything else: enables case-sensitive globbing */
+static void
+glob_init (const char *buf)
+{
+  if (!buf || !*buf)
+    {
+      allow_glob = false;
+      ignore_case_with_glob = false;
+    }
+  else if (ascii_strncasematch (buf, "ignorecase", 10))
+    {
+      allow_glob = true;
+      ignore_case_with_glob = true;
+    }
+  else
+    {
+      allow_glob = true;
+      ignore_case_with_glob = false;
+    }
+}
+
+static void
+set_proc_retry (const char *buf)
+{
+  child_info::retry_count = strtoul (buf, NULL, 0);
+}
+
+static void
+tty_is_gone (const char *buf)
+{
+  if (!user_shared->warned_notty)
+    {
+      small_printf ("\"tty\" option detected in CYGWIN environment variable.\n"
+		    "CYGWIN=tty is no longer supported.  Please remove it from your\n"
+		    "CYGWIN environment variable and use a terminal emulator like mintty, "
+		    "xterm, or rxvt\n");
+      user_shared->warned_notty = 1;
+    }
+}
+
+/* The structure below is used to set up an array which is used to
+   parse the CYGWIN environment variable or, if enabled, options from
+   the registry.  */
+static struct parse_thing
+  {
+    const char *name;
+    union parse_setting
+      {
+	bool *b;
+	DWORD *x;
+	int *i;
+	void (*func)(const char *);
+      } setting;
+
+    enum settings disposition;
+    char *remember;
+    union parse_values
+      {
+	DWORD i;
+	const char *s;
+      } values[2];
+  } known[] NO_COPY =
+{
+  {"dosfilewarning", {&dos_file_warning}, justset, NULL, {{false}, {true}}},
+  {"envcache", {&envcache}, justset, NULL, {{true}, {false}}},
+  {"error_start", {func: error_start_init}, isfunc, NULL, {{0}, {0}}},
+  {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
+  {"glob", {func: glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
+  {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
+  {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
+  {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
+  {"title", {&display_title}, justset, NULL, {{false}, {true}}},
+  {"tty", {func: tty_is_gone}, isfunc, NULL, {{0}, {0}}},
+  {"upcaseenv", {&create_upcaseenv}, justset, NULL, {{false}, {true}}},
+  {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
+  {NULL, {0}, justset, 0, {{0}, {0}}}
+};
+
+/* Parse a string of the form "something=stuff somethingelse=more-stuff",
+   silently ignoring unknown "somethings".  */
+static void __stdcall
+parse_options (const char *inbuf)
+{
+  int istrue;
+  char *p, *lasts;
+  parse_thing *k;
+
+  if (inbuf == NULL)
+    {
+      tmp_pathbuf tp;
+      char *newbuf = tp.c_get ();
+      newbuf[0] = '\0';
+      for (k = known; k->name != NULL; k++)
+	if (k->remember)
+	  {
+	    strcat (strcat (newbuf, " "), k->remember);
+	    free (k->remember);
+	    k->remember = NULL;
+	  }
+
+      if (export_settings)
+	{
+	  debug_printf ("%s", newbuf + 1);
+	  setenv ("CYGWIN", newbuf + 1, 1);
+	}
+      return;
+    }
+
+  char *buf = strcpy ((char *) alloca (strlen (inbuf) + 1), inbuf);
+  for (p = strtok_r (buf, " \t", &lasts);
+       p != NULL;
+       p = strtok_r (NULL, " \t", &lasts))
+    {
+      char *keyword_here = p;
+      if (!(istrue = !ascii_strncasematch (p, "no", 2)))
+	p += 2;
+      else if (!(istrue = *p != '-'))
+	p++;
+
+      char ch, *eq;
+      if ((eq = strchr (p, '=')) != NULL || (eq = strchr (p, ':')) != NULL)
+	ch = *eq, *eq++ = '\0';
+      else
+	ch = 0;
+
+      for (parse_thing *k = known; k->name != NULL; k++)
+	if (ascii_strcasematch (p, k->name))
+	  {
+	    switch (k->disposition)
+	      {
+	      case isfunc:
+		k->setting.func ((!eq || !istrue) ?
+		  k->values[istrue].s : eq);
+		debug_printf ("%s (called func)", k->name);
+		break;
+	      case justset:
+		if (!istrue || !eq)
+		  *k->setting.x = k->values[istrue].i;
+		else
+		  *k->setting.x = strtol (eq, NULL, 0);
+		debug_printf ("%s %d", k->name, *k->setting.x);
+		break;
+	      case setbit:
+		*k->setting.x &= ~k->values[istrue].i;
+		if (istrue || (eq && strtol (eq, NULL, 0)))
+		  *k->setting.x |= k->values[istrue].i;
+		debug_printf ("%s %x", k->name, *k->setting.x);
+		break;
+	      }
+
+	    if (eq)
+	      *--eq = ch;
+
+	    int n = eq - p;
+	    p = strdup (keyword_here);
+	    if (n > 0)
+	      p[n] = ':';
+	    k->remember = p;
+	    break;
+	  }
+      }
+  debug_printf ("returning");
+}
+
 /* Helper functions for the below environment variables which have to
    be converted Win32<->POSIX. */
 extern "C" ssize_t env_PATH_to_posix (const void *, void *, size_t);
@@ -383,6 +561,8 @@ _addenv (const char *name, const char *value, int overwrite)
   win_env *spenv;
   if ((spenv = getwinenv (envhere)))
     spenv->add_cache (value);
+  if (strcmp (name, "CYGWIN") == 0)
+    parse_options (value);
 
   MALLOC_CHECK;
   return 0;
@@ -520,184 +700,6 @@ ucenv (char *p, const char *eq)
 	      break;
 	    }
     }
-}
-
-/* Parse CYGWIN options */
-
-static NO_COPY bool export_settings = false;
-
-enum settings
-  {
-    justset,
-    isfunc,
-    setbit
-  };
-
-/* When BUF is:
-   null or empty: disables globbing
-   "ignorecase": enables case-insensitive globbing
-   anything else: enables case-sensitive globbing */
-static void
-glob_init (const char *buf)
-{
-  if (!buf || !*buf)
-    {
-      allow_glob = false;
-      ignore_case_with_glob = false;
-    }
-  else if (ascii_strncasematch (buf, "ignorecase", 10))
-    {
-      allow_glob = true;
-      ignore_case_with_glob = true;
-    }
-  else
-    {
-      allow_glob = true;
-      ignore_case_with_glob = false;
-    }
-}
-
-static void
-set_proc_retry (const char *buf)
-{
-  child_info::retry_count = strtoul (buf, NULL, 0);
-}
-
-static void
-tty_is_gone (const char *buf)
-{
-  if (!user_shared->warned_notty)
-    {
-      small_printf ("\"tty\" option detected in CYGWIN environment variable.\n"
-		    "CYGWIN=tty is no longer supported.  Please remove it from your\n"
-		    "CYGWIN environment variable and use a terminal emulator like mintty, "
-		    "xterm, or rxvt\n");
-      user_shared->warned_notty = 1;
-    }
-}
-
-/* The structure below is used to set up an array which is used to
-   parse the CYGWIN environment variable or, if enabled, options from
-   the registry.  */
-static struct parse_thing
-  {
-    const char *name;
-    union parse_setting
-      {
-	bool *b;
-	DWORD *x;
-	int *i;
-	void (*func)(const char *);
-      } setting;
-
-    enum settings disposition;
-    char *remember;
-    union parse_values
-      {
-	DWORD i;
-	const char *s;
-      } values[2];
-  } known[] NO_COPY =
-{
-  {"dosfilewarning", {&dos_file_warning}, justset, NULL, {{false}, {true}}},
-  {"envcache", {&envcache}, justset, NULL, {{true}, {false}}},
-  {"error_start", {func: error_start_init}, isfunc, NULL, {{0}, {0}}},
-  {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
-  {"glob", {func: glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
-  {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
-  {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
-  {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
-  {"title", {&display_title}, justset, NULL, {{false}, {true}}},
-  {"tty", {func: tty_is_gone}, isfunc, NULL, {{0}, {0}}},
-  {"upcaseenv", {&create_upcaseenv}, justset, NULL, {{false}, {true}}},
-  {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
-  {NULL, {0}, justset, 0, {{0}, {0}}}
-};
-
-/* Parse a string of the form "something=stuff somethingelse=more-stuff",
-   silently ignoring unknown "somethings".  */
-static void __stdcall
-parse_options (char *buf)
-{
-  int istrue;
-  char *p, *lasts;
-  parse_thing *k;
-
-  if (buf == NULL)
-    {
-      tmp_pathbuf tp;
-      char *newbuf = tp.c_get ();
-      newbuf[0] = '\0';
-      for (k = known; k->name != NULL; k++)
-	if (k->remember)
-	  {
-	    strcat (strcat (newbuf, " "), k->remember);
-	    free (k->remember);
-	    k->remember = NULL;
-	  }
-
-      if (export_settings)
-	{
-	  debug_printf ("%s", newbuf + 1);
-	  setenv ("CYGWIN", newbuf + 1, 1);
-	}
-      return;
-    }
-
-  buf = strcpy ((char *) alloca (strlen (buf) + 1), buf);
-  for (p = strtok_r (buf, " \t", &lasts);
-       p != NULL;
-       p = strtok_r (NULL, " \t", &lasts))
-    {
-      char *keyword_here = p;
-      if (!(istrue = !ascii_strncasematch (p, "no", 2)))
-	p += 2;
-      else if (!(istrue = *p != '-'))
-	p++;
-
-      char ch, *eq;
-      if ((eq = strchr (p, '=')) != NULL || (eq = strchr (p, ':')) != NULL)
-	ch = *eq, *eq++ = '\0';
-      else
-	ch = 0;
-
-      for (parse_thing *k = known; k->name != NULL; k++)
-	if (ascii_strcasematch (p, k->name))
-	  {
-	    switch (k->disposition)
-	      {
-	      case isfunc:
-		k->setting.func ((!eq || !istrue) ?
-		  k->values[istrue].s : eq);
-		debug_printf ("%s (called func)", k->name);
-		break;
-	      case justset:
-		if (!istrue || !eq)
-		  *k->setting.x = k->values[istrue].i;
-		else
-		  *k->setting.x = strtol (eq, NULL, 0);
-		debug_printf ("%s %d", k->name, *k->setting.x);
-		break;
-	      case setbit:
-		*k->setting.x &= ~k->values[istrue].i;
-		if (istrue || (eq && strtol (eq, NULL, 0)))
-		  *k->setting.x |= k->values[istrue].i;
-		debug_printf ("%s %x", k->name, *k->setting.x);
-		break;
-	      }
-
-	    if (eq)
-	      *--eq = ch;
-
-	    int n = eq - p;
-	    p = strdup (keyword_here);
-	    if (n > 0)
-	      p[n] = ':';
-	    k->remember = p;
-	    break;
-	  }
-      }
-  debug_printf ("returning");
 }
 
 /* Set options from the registry. */
