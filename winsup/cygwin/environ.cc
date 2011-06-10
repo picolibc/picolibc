@@ -36,7 +36,6 @@ extern bool dos_file_warning;
 extern bool ignore_case_with_glob;
 extern bool allow_winsymlinks;
 bool reset_com = false;
-static bool create_upcaseenv = false;
 
 static char **lastenviron;
 
@@ -124,7 +123,6 @@ static struct parse_thing
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
   {"tty", {func: tty_is_gone}, isfunc, NULL, {{0}, {0}}},
-  {"upcaseenv", {&create_upcaseenv}, justset, NULL, {{false}, {true}}},
   {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
   {NULL, {0}, justset, 0, {{0}, {0}}}
 };
@@ -661,41 +659,24 @@ static const char idx_arr[] = "ACHNOPSTW";
    starts. */
 static const int start_at[] = { 0, 1, 4, 7, 8, 9, 16, 18, 22 };
 
-/* Turn environment variable part of a=b string into uppercase.
-   Conditionally controlled by upcaseenv CYGWIN setting.  */
+/* Turn environment variable part of a=b string into uppercase - for some
+   environment variables only. */
 static __inline__ void
 ucenv (char *p, const char *eq)
 {
-  if (create_upcaseenv)
-    {
-      /* Amazingly, NT has a case sensitive environment name list,
-	 but only sometimes.
-	 It's normal to have NT set your "Path" to something.
-	 Later, you set "PATH" to something else.  This alters "Path".
-	 But if you try and do a naive getenv on "PATH" you'll get nothing.
-
-	 So we upper case the labels here to prevent confusion later but
-	 we only do it for processes that are started by non-Cygwin programs. */
-      for (; p < eq; p++)
-	if (islower (*p))
-	  *p = cyg_toupper (*p);
-    }
-  else
-    {
-      /* Hopefully as quickly as possible - only upcase specific set of important
-	 Windows variables. */
-      char first = cyg_toupper (*p);
-      const char *idx = strchr (idx_arr, first);
-      if (idx)
-	for (size_t i = start_at[idx - idx_arr];
-	     i < RENV_SIZE && renv_arr[i].name[0] == first;
-	     ++i)
-	  if (strncasematch (p, renv_arr[i].name, renv_arr[i].namelen))
-	    {
-	      strncpy (p, renv_arr[i].name, renv_arr[i].namelen);
-	      break;
-	    }
-    }
+  /* Hopefully as quickly as possible - only upper case specific set of important
+     Windows variables. */
+  char first = cyg_toupper (*p);
+  const char *idx = strchr (idx_arr, first);
+  if (idx)
+    for (size_t i = start_at[idx - idx_arr];
+	 i < RENV_SIZE && renv_arr[i].name[0] == first;
+	 ++i)
+      if (strncasematch (p, renv_arr[i].name, renv_arr[i].namelen))
+	{
+	  strncpy (p, renv_arr[i].name, renv_arr[i].namelen);
+	  break;
+	}
 }
 
 /* Set options from the registry. */
@@ -788,15 +769,6 @@ environ_init (char **envp, int envc)
   /* Allocate space for environment + trailing NULL + CYGWIN env. */
   lastenviron = envp = (char **) malloc ((4 + (envc = 100)) * sizeof (char *));
 
-  /* We also need the CYGWIN variable early to know the value of the
-     CYGWIN=upcaseenv setting for the below loop. */
-  if ((i = GetEnvironmentVariableA ("CYGWIN", NULL, 0)))
-    {
-      char *buf = (char *) alloca (i);
-      GetEnvironmentVariableA ("CYGWIN", buf, i);
-      parse_options (buf);
-    }
-
   rawenv = GetEnvironmentStringsW ();
   if (!rawenv)
     {
@@ -818,7 +790,7 @@ environ_init (char **envp, int envc)
       if (*newp == '=')
 	*newp = '!';
       char *eq = strechr (newp, '=');
-      ucenv (newp, eq);	/* (possibly conditionally) uppercase env vars. */
+      ucenv (newp, eq);	/* uppercase env vars which need it */
       if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
 	sawTERM = 1;
       if (*eq && conv_start_chars[(unsigned char) envp[i][0]])

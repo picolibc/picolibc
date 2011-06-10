@@ -1,3 +1,10 @@
+2011-06-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* environ.cc (create_upcaseenv): Delete.
+	(ucenv): Don't honor create_upcaseenv.
+	(environ_init): Remove early retrieval of CYGWIN environment variable.
+	Change comment to reflect new behavior.
+
 2011-06-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
