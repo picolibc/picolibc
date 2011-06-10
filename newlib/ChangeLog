@@ -1,3 +1,8 @@
+2011-06-09  Yaakov Selkowitz  <yselkowitz@...>
+
+	* libc/include/string.h (strdupa): New macro function.
+	(strndupa): New macro function.
+
 2011-05-27  Nick Clifton  <nickc@redhat.com>
 
 	* libc/sys/sysnecv850/sbrk.c (_sbrk): Tidy code.

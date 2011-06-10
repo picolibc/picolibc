@@ -99,6 +99,20 @@ int     _EXFUN(strtosigno, (const char *__name));
 /* Recursive version of strerror.  */
 char *	_EXFUN(_strerror_r, (struct _reent *, int, int, int *));
 
+#if defined _GNU_SOURCE && defined __GNUC__
+#define strdupa(__s) \
+	(__extension__ ({const char *__in = (__s); \
+			 size_t __len = strlen (__in) + 1; \
+			 char * __out = (char *) __builtin_alloca (__len); \
+			 (char *) memcpy (__out, __in, __len);}))
+#define strndupa(__s, __n) \
+	(__extension__ ({const char *__in = (__s); \
+			 size_t __len = strnlen (__in, (__n)) + 1; \
+			 char *__out = (char *) __builtin_alloca (__len); \
+			 __out[__len-1] = '\0'; \
+			 (char *) memcpy (__out, __in, __len-1);}))
+#endif /* _GNU_SOURCE && __GNUC__ */
+
 /* These function names are used on Windows and perhaps other systems.  */
 #ifndef strcmpi
 #define strcmpi strcasecmp
