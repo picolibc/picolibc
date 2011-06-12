@@ -620,7 +620,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
     {
       dev = *proc_dev;
       dev = fhandler_proc::get_proc_fhandler (src_path);
-      if (dev == FH_BAD)
+      if (dev == FH_NADA)
 	return ENOENT;
       set_flags (flags, PATH_BINARY);
       if (isprocsys_dev (dev))

@@ -131,8 +131,18 @@ bool
 fhandler_console::set_unit ()
 {
   bool created;
+  fh_devices devset;
   if (shared_console_info)
-    created = false;
+    {
+      fh_devices this_unit = dev ();
+      fh_devices shared_unit = 
+	(fh_devices) shared_console_info->tty_min_state.getntty ();
+      created = false;
+      devset = (shared_unit == this_unit || this_unit == FH_CONSOLE
+		|| this_unit == FH_CONIN || this_unit == FH_CONOUT
+		|| this_unit == FH_TTY) ?
+		shared_unit : FH_ERROR;
+    }
   else
     {
       HWND me = GetConsoleWindow ();
@@ -144,14 +154,15 @@ fhandler_console::set_unit ()
 	  lock_ttys here;
 	  shared_console_info->tty_min_state.setntty (DEV_CONS_MAJOR, console_unit (me));
 	}
+      devset = (fh_devices) shared_console_info->tty_min_state.getntty ();
     }
 
+  dev ().parse (devset);
   return created;
 }
 
-/* Allocate and initialize the shared record for the current console.
-   Returns a pointer to shared_console_info. */
-tty_min *
+/* Allocate and initialize the shared record for the current console. */
+void
 fhandler_console::get_tty_stuff ()
 {
   if (set_unit ())
@@ -182,8 +193,6 @@ fhandler_console::get_tty_stuff ()
 	dev_state.backspace_keycode = CERASE;
 	shared_console_info->tty_min_state.sethwnd ((HWND) INVALID_HANDLE_VALUE);
       }
-
-  return &shared_console_info->tty_min_state;
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -756,6 +765,12 @@ fhandler_console::open (int flags, mode_t)
 {
   HANDLE h;
 
+  if (dev () == FH_ERROR)
+    {
+      set_errno (EPERM);	/* constructor found an error */
+      return 0;
+    }
+
   tcinit (false);
 
   set_io_handle (NULL);
@@ -1033,11 +1048,12 @@ fhandler_console::tcgetattr (struct termios *t)
   return res;
 }
 
-fhandler_console::fhandler_console () :
+fhandler_console::fhandler_console (fh_devices unit) :
   fhandler_termios ()
 {
+  if (unit > 0)
+    dev ().parse (unit);
   get_tty_stuff ();
-  dev ().parse (shared_console_info->tty_min_state.getntty ());
   trunc_buf.len = 0;
 }
 

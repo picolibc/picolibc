@@ -49,7 +49,7 @@ static const virt_tab_t procsysvipc_tab[] =
   { _VN ("msg"),	FH_PROCSYSVIPC,   virt_file,   format_procsysvipc_msg },
   { _VN ("sem"),	FH_PROCSYSVIPC,   virt_file,   format_procsysvipc_sem },
   { _VN ("shm"),	FH_PROCSYSVIPC,   virt_file,   format_procsysvipc_shm },
-  { NULL, 0,		FH_BAD,		  virt_none,   NULL }
+  { NULL, 0,		FH_NADA,		  virt_none,   NULL }
 };
 
 static const int PROCSYSVIPC_LINK_COUNT =

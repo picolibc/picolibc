@@ -247,7 +247,8 @@ enum fh_devices
   FH_STREAM = FHDEV (DEV_TCP_MAJOR, 121),
   FH_DGRAM = FHDEV (DEV_TCP_MAJOR, 122),
 
-  FH_BAD     = FHDEV (0, 0)
+  FH_NADA     = FHDEV (0, 0),
+  FH_ERROR   = FHDEV (255, 255)	/* Set by fh constructor when error detected */
 };
 
 struct device
@@ -348,7 +349,11 @@ extern const device dev_fs_storage;
 #define isvirtual_dev(devn) \
   (isproc_dev (devn) || devn == FH_CYGDRIVE || devn == FH_NETDRIVE)
 
-#define iscons_dev(n)  (device::major (n) == DEV_CONS_MAJOR)
+#define iscons_dev(n) \
+  ((device::major ((int) (n)) == DEV_CONS_MAJOR) \
+   || (((int) n) == FH_CONSOLE) \
+   || (((int) n) == FH_CONIN) \
+   || (((int) n) == FH_CONOUT))
 
 #define istty_slave_dev(n) (device::major (n) == DEV_TTYS_MAJOR)
 #endif /*_DEVICES_H*/

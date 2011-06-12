@@ -1087,7 +1087,7 @@ private:
   tty_min *tc () const {return &(shared_console_info->tty_min_state);}
 
  public:
-  fhandler_console ();
+  fhandler_console (fh_devices);
   static console_state *open_shared_console (HWND hw, HANDLE& h)
   {
     bool createit = false;
@@ -1124,7 +1124,7 @@ private:
   void set_close_on_exec (bool val);
   void set_input_state ();
   void send_winch_maybe ();
-  tty_min *get_tty_stuff ();
+  void get_tty_stuff ();
   bool set_unit ();
   static bool need_invisible ();
   static bool has_a () {return !invisible_console;}

@@ -76,7 +76,7 @@ static const virt_tab_t process_tab[] =
   { _VN ("uid"),        FH_PROCESS,   virt_file,      format_process_uid },
   { _VN ("winexename"), FH_PROCESS,   virt_file,      format_process_winexename },
   { _VN ("winpid"),     FH_PROCESS,   virt_file,      format_process_winpid },
-  { NULL, 0,	        FH_BAD,       virt_none,      NULL }
+  { NULL, 0,	        FH_NADA,       virt_none,      NULL }
 };
 
 static const int PROCESS_LINK_COUNT =

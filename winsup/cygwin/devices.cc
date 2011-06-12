@@ -60,7 +60,10 @@ const device dev_dgram_storage =
   {"", {FH_DGRAM}, ""};
 
 const device dev_bad_storage =
-  {"", {FH_BAD}, ""};
+  {"", {FH_NADA}, ""};
+
+const device dev_error_storage =
+  {"", {FH_ERROR}, ""};
 #define BRACK(x) {devn_int: x}
 
 static const device dev_storage[] =

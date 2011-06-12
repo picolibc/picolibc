@@ -1,3 +1,25 @@
+2011-06-12  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	Rename FH_BAD to FH_NADA throughout.
+	* devices.h (FH_ERROR): New value.
+	(iscons_dev): Extend to detect all the console device types.
+	* devices.in: Set aside storage for FH_ERROR.
+	* dtable.cc (dtable::init_std_file_from_handle): Use iscons_dev to
+	detect when device is a console.
+	(fh_alloc): Pass device to console constructor.
+	(build_fh_pc): Short circuit when we detect that the constructor saw an
+	error.
+	* fhandler.h (fhandler_console::fhandler_console): Accept fh_devices
+	parameter.
+	(get_tty_stuff): Change to void.
+	* fhandler_console (fhandler_console::set_unit): Set device to FH_ERROR
+	on attempt to access anything other than the current console.
+	(fhandler_console::get_tty_stuff): Change to void return.
+	(fhandler_console::open): Return EPERM on FH_ERROR device type.
+	(fhandler_console::fhandler_console): Set the device type appropriately
+	before calling get_tty_stuff and rely on that function to reset it if
+	necessary.
+
 2011-06-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* environ.cc (create_upcaseenv): Delete.

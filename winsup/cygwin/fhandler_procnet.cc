@@ -42,7 +42,7 @@ static const virt_tab_t procnet_tab[] =
   { _VN ("."),	      FH_PROCNET, virt_directory, NULL },
   { _VN (".."),       FH_PROCNET, virt_directory, NULL },
   { _VN ("if_inet6"), FH_PROCNET, virt_file,      format_procnet_ifinet6 },
-  { NULL, 0,	      FH_BAD,	  virt_none,      NULL }
+  { NULL, 0,	      FH_NADA,	  virt_none,      NULL }
 };
 
 static const int PROCNET_LINK_COUNT =
