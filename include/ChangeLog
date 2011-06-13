@@ -1,11 +1,7 @@
-2011-05-24  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+2011-06-13  Walter Lee  <walt@tilera.com>
 
-	* opcode/s390.h: Replace S390_OPERAND_REG_EVEN with
-	S390_OPERAND_REG_PAIR.
-
-2011-05-24  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
-
-	* opcode/s390.h: Add S390_OPCODE_REG_EVEN flag.
+	* dis-asm.h (print_insn_tilegx): Declare.
+	(print_insn_tilepro): Likewise.
 
 2011-05-17  Alan Modra  <amodra@gmail.com>
 
@@ -96,19 +92,10 @@
 
 	* dwarf2.h: Update value for DW_AT_hi_user.
 
-2010-11-25  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
-
-	* opcode/s390.h (enum s390_opcode_cpu_val): Add S390_OPCODE_MAXCPU.
-
 2010-11-16  Ian Lance Taylor  <iant@google.com>
 
 	* simple-object.h (simple_object_attributes_merge): Declare,
 	replacing simple_object_attributes_compare.
-
-2010-11-16  Jie Zhang  <jie.zhang@analog.com>
-
-	* elf/bfin.h (EF_BFIN_CODE_IN_L1): Define.
-	(EF_BFIN_DATA_IN_L1): Define.
 
 2010-11-04  Ian Lance Taylor  <iant@google.com>
 

@@ -1,3 +1,9 @@
+2011-06-13  Walter Lee  <walt@tilera.com>
+
+	* common.h: Add EM_TILEGX.
+	* tilegx.h: New file.
+	* tilepro.h: New file.
+
 2011-06-09  Tristan Gingold  <gingold@adacore.com>
 
 	* ia64.h (Elf64_External_VMS_ORIG_DYN_Note): New struct.
@@ -55,6 +61,11 @@
 	* arm.h (R_ARM_TLS_DESC, R_ARM_TLS_GOTDESC, R_ARM_TLS_CALL,
 	R_ARM_TLS_DESCSEQ, T_ARM_THM_TLS_CALL, R_ARM_THM_TLS_DESCSEQ): New
 	relocations.
+
+2010-11-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin.h (EF_BFIN_CODE_IN_L1): Define.
+	(EF_BFIN_DATA_IN_L1): Define.
 
 2010-11-11  Mingming Sun  <mingm.sun@gmail.com>
 
