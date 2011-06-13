@@ -1,3 +1,8 @@
+2011-06-13  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* demangle.h (DMGL_RET_POSTFIX): Extend the comment.
+	(DMGL_RET_DROP): New.
+
 2011-06-13  Walter Lee  <walt@tilera.com>
 
 	* dis-asm.h (print_insn_tilegx): Declare.
