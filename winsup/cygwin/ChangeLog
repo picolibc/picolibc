@@ -1,3 +1,8 @@
+2011-06-13  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler_tty_slave.cc (fhandler_tty_slave::fhandler_tty_slave):
+	Revert previous change since unit 0 is perfectly valid.
+
 2011-06-12  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	Rename FH_BAD to FH_NADA throughout.

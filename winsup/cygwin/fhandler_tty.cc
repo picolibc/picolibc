@@ -472,7 +472,7 @@ process_ioctl (void *)
 fhandler_tty_slave::fhandler_tty_slave (int unit)
   : fhandler_tty_common (), inuse (NULL)
 {
-  if (unit > 0)
+  if (unit >= 0)
     dev ().parse (DEV_TTYS_MAJOR, unit);
 }
 
