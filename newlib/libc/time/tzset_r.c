@@ -28,6 +28,8 @@ _DEFUN (_tzset_r, (reent_ptr),
 	_daylight = 0;
 	_tzname[0] = "GMT";
 	_tzname[1] = "GMT";
+	free(prev_tzenv);
+	prev_tzenv = NULL;
 	TZ_UNLOCK;
 	return;
       }
@@ -80,8 +82,10 @@ _DEFUN (_tzset_r, (reent_ptr),
   tzenv += n;
   
   if (sscanf (tzenv, "%10[^0-9,+-]%n", __tzname_dst, &n) <= 0)
-    {
+    { /* No dst */
       _tzname[1] = _tzname[0];
+      _timezone = tz->__tzrule[0].offset;
+      _daylight = 0;
       TZ_UNLOCK;
       return;
     }
