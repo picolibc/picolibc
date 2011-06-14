@@ -113,7 +113,8 @@ extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite64,(struct _reent *, void *,
     }						\
   while (0)
 
-/* Return true iff the given FILE cannot be written now.  */
+/* Return true and set errno and stream error flag iff the given FILE
+   cannot be written now.  */
 
 #define	cantwrite(ptr, fp)                                     \
   ((((fp)->_flags & __SWR) == 0 || (fp)->_bf._base == NULL) && \

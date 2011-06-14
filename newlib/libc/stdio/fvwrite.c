@@ -61,11 +61,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 
   /* make sure we can write */
   if (cantwrite (ptr, fp))
-    {
-      fp->_flags |= __SERR;
-      ptr->_errno = EBADF;
-      return EOF;
-    }
+    return EOF;
 
   iov = uio->uio_iov;
   len = 0;

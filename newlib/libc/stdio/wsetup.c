@@ -20,12 +20,13 @@
 #include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "local.h"
 
 /*
  * Various output routines call wsetup to be sure it is safe to write,
  * because either _flags does not include __SWR, or _buf is NULL.
- * _wsetup returns 0 if OK to write, nonzero otherwise.
+ * _wsetup returns 0 if OK to write, nonzero and set errno otherwise.
  */
 
 int
@@ -44,7 +45,11 @@ _DEFUN(__swsetup_r, (ptr, fp),
   if ((fp->_flags & __SWR) == 0)
     {
       if ((fp->_flags & __SRW) == 0)
-	return EOF;
+        {
+	  ptr->_errno = EBADF;
+	  fp->_flags |= __SERR;
+	  return EOF;
+        }
       if (fp->_flags & __SRD)
 	{
 	  /* clobber any ungetc data */
@@ -62,7 +67,7 @@ _DEFUN(__swsetup_r, (ptr, fp),
    * A string I/O file should not explicitly allocate a buffer
    * unless asprintf is being used.
    */
-  if (fp->_bf._base == NULL 
+  if (fp->_bf._base == NULL
         && (!(fp->_flags & __SSTR) || (fp->_flags & __SMBF)))
     __smakebuf_r (ptr, fp);
 
@@ -79,5 +84,11 @@ _DEFUN(__swsetup_r, (ptr, fp),
   else
     fp->_w = fp->_flags & __SNBF ? 0 : fp->_bf._size;
 
-  return (!fp->_bf._base && (fp->_flags & __SMBF)) ? EOF : 0;
+  if (!fp->_bf._base && (fp->_flags & __SMBF))
+    {
+      /* __smakebuf_r set errno, but not flag */
+      fp->_flags |= __SERR;
+      return EOF;
+    }
+  return 0;
 }

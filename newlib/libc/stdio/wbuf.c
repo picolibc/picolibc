@@ -54,11 +54,7 @@ _DEFUN(__swbuf_r, (ptr, c, fp),
 
   fp->_w = fp->_lbfsize;
   if (cantwrite (ptr, fp))
-    {
-      fp->_flags |= __SERR;
-      ptr->_errno = EBADF;
-      return EOF;
-    }
+    return EOF;
   c = (unsigned char) c;
 
   ORIENT (fp, -1);
