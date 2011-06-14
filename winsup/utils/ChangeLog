@@ -1,3 +1,7 @@
+2011-06-14  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* mingw: Force use of bash.
+
 2011-05-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* ps.cc (ttynam): Accommodate new console numbering.

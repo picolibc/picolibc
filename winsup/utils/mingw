@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Front-end kludge to cause a Cygwin gcc to default to
 # an installed version of the MinGW components.
 
