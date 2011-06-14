@@ -285,6 +285,7 @@ the "C" locale settings.
 #  define CQ(a)		a		/* character constant qualifier */
 #  define SFLG				/* %s flag (null for normal char) */
 #  define _ctloc(x) (ctloclen = strlen (ctloc = _CurrentTimeLocale->x), ctloc)
+#  define snprintf	sniprintf	/* avoid to pull in FP functions. */
 #  define TOLOWER(c)	tolower((int)(unsigned char)(c))
 #  define STRTOUL(c,p,b) strtoul((c),(p),(b))
 #  define STRCPY(a,b)	strcpy((a),(b))

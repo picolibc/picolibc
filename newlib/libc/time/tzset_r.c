@@ -7,6 +7,8 @@
 #include <sys/time.h>
 #include "local.h"
 
+#define sscanf siscanf	/* avoid to pull in FP functions. */
+
 static char __tzname_std[11];
 static char __tzname_dst[11];
 static char *prev_tzenv = NULL;
