@@ -886,7 +886,7 @@ fhandler_console::select_except (select_stuff *ss)
 }
 
 select_record *
-fhandler_tty_common::select_read (select_stuff *ss)
+fhandler_pty_common::select_read (select_stuff *ss)
 {
   if (!ss->device_specific_pipe
       && (ss->device_specific_pipe = new select_pipe_info) == NULL)
@@ -903,7 +903,7 @@ fhandler_tty_common::select_read (select_stuff *ss)
 }
 
 select_record *
-fhandler_tty_common::select_write (select_stuff *ss)
+fhandler_pty_common::select_write (select_stuff *ss)
 {
   if (!ss->device_specific_pipe
       && (ss->device_specific_pipe = new select_pipe_info) == NULL)
@@ -919,7 +919,7 @@ fhandler_tty_common::select_write (select_stuff *ss)
 }
 
 select_record *
-fhandler_tty_common::select_except (select_stuff *ss)
+fhandler_pty_common::select_except (select_stuff *ss)
 {
   if (!ss->device_specific_pipe
       && (ss->device_specific_pipe = new select_pipe_info) == NULL)
@@ -944,7 +944,7 @@ verify_tty_slave (select_record *me, fd_set *readfds, fd_set *writefds,
 }
 
 select_record *
-fhandler_tty_slave::select_read (select_stuff *ss)
+fhandler_pty_slave::select_read (select_stuff *ss)
 {
   select_record *s = ss->start.next;
   s->h = input_available_event;

@@ -294,9 +294,6 @@ struct init_cygheap: public mini_cygheap
   struct sigaction *sigs;
 
   fhandler_termios *ctty;	/* Current tty */
-#ifdef NEWVFORK
-  fhandler_tty_slave *ctty_on_hold;
-#endif
   struct _cygtls **threadlist;
   size_t sthreads;
   pid_t pid;			/* my pid */

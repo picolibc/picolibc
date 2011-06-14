@@ -49,8 +49,6 @@ details. */
 #define srTop (dev_state.info.winTop + dev_state.scroll_region.Top)
 #define srBottom ((dev_state.scroll_region.Bottom < 0) ? dev_state.info.winBottom : dev_state.info.winTop + dev_state.scroll_region.Bottom)
 
-#define use_tty ISSTATE (myself, PID_USETTY)
-
 const char *get_nonascii_key (INPUT_RECORD&, char *);
 
 const unsigned fhandler_console::MAX_WRITE_CHARS = 16384;
@@ -191,7 +189,7 @@ fhandler_console::get_tty_stuff ()
 	  dev_state.meta_mask |= RIGHT_ALT_PRESSED;
 	dev_state.set_default_attr ();
 	dev_state.backspace_keycode = CERASE;
-	shared_console_info->tty_min_state.sethwnd ((HWND) INVALID_HANDLE_VALUE);
+	shared_console_info->tty_min_state.is_console = true;
       }
 }
 
@@ -265,13 +263,9 @@ fhandler_console::send_winch_maybe ()
 
   if (y != dev_state.info.dwWinSize.Y || x != dev_state.info.dwWinSize.X)
     {
-      extern fhandler_tty_master *tty_master;
       dev_state.scroll_region.Top = 0;
       dev_state.scroll_region.Bottom = -1;
-      if (tty_master)
-	tty_master->set_winsize (true);
-      else
-	tc ()->kill_pgrp (SIGWINCH);
+      tc ()->kill_pgrp (SIGWINCH);
     }
 }
 
@@ -975,13 +969,6 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
   if (t->c_lflag & ISIG)
     {
       flags |= ENABLE_PROCESSED_INPUT;
-    }
-
-  if (use_tty)
-    {
-      flags = 0; // ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
-      tc ()->ti.c_iflag = 0;
-      tc ()->ti.c_lflag = 0;
     }
 
   flags |= ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;

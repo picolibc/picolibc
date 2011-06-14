@@ -231,7 +231,7 @@ proc_subproc (DWORD what, DWORD val)
 	  vchild->sid = myself->sid;
 	  vchild->ctty = myself->ctty;
 	  vchild->cygstarted = true;
-	  vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
+	  vchild->process_state |= PID_INITIALIZING;
 	}
       if (what == PROC_DETACHED_CHILD)
 	break;

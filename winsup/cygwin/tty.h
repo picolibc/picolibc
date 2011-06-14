@@ -19,9 +19,6 @@ details. */
 
 /* Input/Output/ioctl events */
 
-#define OUTPUT_DONE_EVENT	"cygtty.output.done"
-#define IOCTL_REQUEST_EVENT	"cygtty.ioctl.request"
-#define IOCTL_DONE_EVENT	"cygtty.ioctl.done"
 #define RESTART_OUTPUT_EVENT	"cygtty.output.restart"
 #define INPUT_AVAILABLE_EVENT	"cygtty.input.avail"
 #define OUTPUT_MUTEX		"cygtty.output.mutex"
@@ -50,7 +47,7 @@ public:
   int output_stopped;
   fh_devices ntty;
   DWORD last_ctrl_c;	/* tick count of last ctrl-c */
-  HWND hwnd;		/* Console window handle tty belongs to */
+  bool is_console;
 
   IMPLEMENT_STATUS_FLAG (bool, initialized)
   IMPLEMENT_STATUS_FLAG (bool, rstcons)
@@ -82,8 +79,6 @@ public:
   void setsid (pid_t tsid) {sid = tsid;}
   void kill_pgrp (int);
   int is_orphaned_process_group (int);
-  HWND gethwnd () const {return hwnd;}
-  void sethwnd (HWND wnd) {hwnd = wnd;}
   const char *ttyname () __attribute ((regparm (1)));
 };
 
@@ -125,9 +120,8 @@ class tty_list
 
 public:
   tty * operator [](int n) {return ttys + device::minor (n);}
-  int allocate (bool); /* true if allocate a tty, pty otherwise */
+  int allocate ();	/* allocate a pty */
   int connect (int);
-  void terminate ();
   void init ();
   tty_min *get_cttyp ();
   int __stdcall attach (int n) __attribute__ ((regparm (2)));

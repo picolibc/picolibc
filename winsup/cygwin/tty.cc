@@ -23,7 +23,7 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 
-extern fhandler_tty_master *tty_master;
+HANDLE NO_COPY tty_list::mutex = NULL;
 
 extern "C" int
 posix_openpt (int oflags)
@@ -53,21 +53,18 @@ revoke (char *ttyname)
 extern "C" int
 ttyslot (void)
 {
-  if (NOTSTATE (myself, PID_USETTY))
+  if (myself->ctty <= 0 || iscons_dev (myself->ctty))
     return -1;
   return device::minor (myself->ctty);
 }
-
-HANDLE NO_COPY tty_list::mutex = NULL;
 
 void __stdcall
 tty_list::init_session ()
 {
   char mutex_name[MAX_PATH];
-  /* tty_list::mutex is used while searching for a tty slot. It's necessary
-     while finding console window handle */
-
   char *name = shared_name (mutex_name, "tty_list::mutex", 0);
+
+  /* tty_list::mutex is used while searching for a tty slot */
   if (!(mutex = CreateMutex (&sec_all_nih, FALSE, name)))
     api_fatal ("can't create tty_list::mutex '%s', %E", name);
   ProtectHandle (mutex);
@@ -78,50 +75,6 @@ tty::init_session ()
 {
   if (!myself->cygstarted && NOTSTATE (myself, PID_CYGPARENT))
     cygheap->fdtab.get_debugger_info ();
-
-  if (NOTSTATE (myself, PID_USETTY))
-    return;
-  if (myself->ctty != -1)
-    /* nothing to do */;
-  else if (NOTSTATE (myself, PID_CYGPARENT))
-    myself->ctty = cygwin_shared->tty.attach (myself->ctty);
-  else
-    return;
-  if (myself->ctty == -1)
-    termios_printf ("Can't attach to tty");
-}
-
-/* Create session's master tty */
-
-void __stdcall
-tty::create_master (int ttynum)
-{
-  device ttym = *ttym_dev;
-  ttym.setunit (ttynum); /* CGF FIXME device */
-  tty_master = (fhandler_tty_master *) build_fh_dev (ttym);
-  if (tty_master->init ())
-    api_fatal ("can't create master tty");
-  else
-    {
-      /* Log utmp entry */
-      struct utmp our_utmp;
-      DWORD len = sizeof our_utmp.ut_host;
-
-      bzero ((char *) &our_utmp, sizeof (utmp));
-      time (&our_utmp.ut_time);
-      strncpy (our_utmp.ut_name, getlogin (), sizeof (our_utmp.ut_name));
-      GetComputerName (our_utmp.ut_host, &len);
-      __small_sprintf (our_utmp.ut_line, "tty%d", ttynum);
-      if ((len = strlen (our_utmp.ut_line)) >= UT_IDLEN)
-	len -= UT_IDLEN;
-      else
-	len = 0;
-      strncpy (our_utmp.ut_id, our_utmp.ut_line + len, UT_IDLEN);
-      our_utmp.ut_type = USER_PROCESS;
-      our_utmp.ut_pid = myself->pid;
-      myself->ctty = FHDEV (DEV_TTYS_MAJOR, ttynum);
-      login (&our_utmp);
-    }
 }
 
 int __stdcall
@@ -132,54 +85,9 @@ tty_list::attach (int n)
     res = -1;
   else if (n != -1)
     res = connect (device::minor (n));
-  else if (ISSTATE (myself, PID_USETTY))
-    res = allocate (true);
   else
     res = -1;
   return res;
-}
-
-void
-tty_list::terminate ()
-{
-  if (NOTSTATE (myself, PID_USETTY))
-    return;
-  int ttynum = device::minor (myself->ctty);
-
-  /* Keep master running till there are connected clients */
-  if (myself->ctty != -1 && tty_master && ttys[ttynum].master_pid == myself->pid)
-    {
-      tty *t = ttys + ttynum;
-      /* Wait for children which rely on tty handling in this process to
-	 go away */
-      for (int i = 0; ; i++)
-	{
-	  if (!t->slave_alive ())
-	    break;
-	  if (i >= 100)
-	    {
-	      small_printf ("waiting for children using tty%d to terminate\n",
-			    ttynum);
-	      i = 0;
-	    }
-
-	  Sleep (200);
-	}
-
-      lock_ttys here ();
-      CloseHandle (tty_master->from_master);
-      CloseHandle (tty_master->to_master);
-
-      termios_printf ("tty %d master about to finish", ttynum);
-      CloseHandle (tty_master->get_io_handle ());
-      CloseHandle (tty_master->get_output_handle ());
-
-      t->init ();
-
-      char buf[20];
-      __small_sprintf (buf, "tty%d", ttynum);
-      logout (buf);
-    }
 }
 
 int
@@ -209,82 +117,32 @@ tty_list::init ()
     }
 }
 
-/* Search for tty class for our console. Allocate new tty if our process is
-   the only cygwin process in the current console.
+/* Search for a free tty and allocate it.
    Return tty number or -1 if error.
-   If with_console == 0, just find a free tty.
  */
 int
-tty_list::allocate (bool with_console)
+tty_list::allocate ()
 {
-  HWND console;
-  int freetty = -1;
-  HANDLE hmaster = NULL;
-
   lock_ttys here;
+  int freetty = -1;
 
-  if (!with_console)
-    console = NULL;
-  else if (!(console = GetConsoleWindow ()))
-    {
-      termios_printf ("Can't find console window");
-      goto out;
-    }
-
-  /* Is a tty allocated for console? */
+  tty *t = NULL;
   for (int i = 0; i < NTTYS; i++)
-    {
-      if (!ttys[i].exists ())
-	{
-	  if (freetty < 0)	/* Scanning? */
-	    freetty = i;	/* Yes. */
-	  if (!with_console)	/* Do we want to attach this to a console? */
-	    break;		/* No.  We've got one. */
-	}
+    if (!ttys[i].exists ())
+      {
+	t = ttys + i;
+	t->init ();
+	t->setsid (-1);
+	freetty = i;
+	break;
+      }
 
-      /* FIXME: Is this right?  We can potentially query a "nonexistent"
-	 tty slot after falling through from the above? */
-      if (with_console && ttys[i].gethwnd () == console)
-	{
-	  termios_printf ("console %x already associated with tty%d",
-		console, i);
-	  /* Is the master alive? */
-	  hmaster = OpenProcess (PROCESS_DUP_HANDLE, FALSE, ttys[i].master_pid);
-	  if (hmaster)
-	    {
-	      CloseHandle (hmaster);
-	      freetty = i;
-	      goto out;
-	    }
-	  /* Master is dead */
-	  freetty = i;
-	  break;
-	}
-    }
-
-  /* There is no tty allocated to console; allocate the first free found */
-  if (freetty == -1)
-    goto out;
-
-  tty *t;
-  t = ttys + freetty;
-  t->init ();
-  t->setsid (-1);
-  t->sethwnd (console);
-
-out:
   if (freetty < 0)
     system_printf ("No tty allocated");
-  else if (!with_console)
+  else
     {
       termios_printf ("tty%d allocated", freetty);
       here.dont_release (); /* exit with mutex still held -- caller has more work to do */
-    }
-  else
-    {
-      termios_printf ("console %p associated with tty%d", console, freetty);
-      if (!hmaster)
-	tty::create_master (freetty);
     }
   return freetty;
 }
@@ -358,9 +216,9 @@ tty::init ()
   output_stopped = 0;
   setsid (0);
   pgid = 0;
-  hwnd = NULL;
-  was_opened = 0;
+  was_opened = false;
   master_pid = 0;
+  is_console = false;
 }
 
 HANDLE

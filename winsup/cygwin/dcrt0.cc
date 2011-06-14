@@ -1045,12 +1045,6 @@ do_exit (int status)
 
     }
 
-  if (exit_state < ES_TTY_TERMINATE)
-    {
-      exit_state = ES_TTY_TERMINATE;
-      cygwin_shared->tty.terminate ();
-    }
-
   myself.exit (n);
 }
 

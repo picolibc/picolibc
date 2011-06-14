@@ -901,7 +901,7 @@ class fhandler_serial: public fhandler_base
   void fixup_after_exec ();
 
   /* We maintain a pgrp so that tcsetpgrp and tcgetpgrp work, but we
-     don't use it for permissions checking.  fhandler_tty_slave does
+     don't use it for permissions checking.  fhandler_pty_slave does
      permission checking on pgrps.  */
   virtual int tcgetpgrp () { return pgrp_; }
   virtual int tcsetpgrp (const pid_t pid) { pgrp_ = pid; return 0; }
@@ -1132,22 +1132,16 @@ private:
   friend tty_min * tty_list::get_cttyp ();
 };
 
-class fhandler_tty_common: public fhandler_termios
+class fhandler_pty_common: public fhandler_termios
 {
  public:
-  fhandler_tty_common ()
-    : fhandler_termios (), output_done_event (NULL),
-    ioctl_request_event (NULL), ioctl_done_event (NULL), output_mutex (NULL),
+  fhandler_pty_common ()
+    : fhandler_termios (),
+      output_mutex (NULL),
     input_mutex (NULL), input_available_event (NULL)
   {
     // nothing to do
   }
-  HANDLE output_done_event;	// Raised by master when tty's output buffer
-				// written. Write status in tty::write_retval.
-  HANDLE ioctl_request_event;	// Raised by slave to perform ioctl() request.
-				// Ioctl() request in tty::cmd/arg.
-  HANDLE ioctl_done_event;	// Raised by master on ioctl() completion.
-				// Ioctl() status in tty::ioctl_retval.
   HANDLE output_mutex, input_mutex;
   HANDLE input_available_event;
 
@@ -1162,7 +1156,7 @@ class fhandler_tty_common: public fhandler_termios
   select_record *select_except (select_stuff *);
 };
 
-class fhandler_tty_slave: public fhandler_tty_common
+class fhandler_pty_slave: public fhandler_pty_common
 {
   HANDLE inuse;			// used to indicate that a tty is in use
 
@@ -1173,7 +1167,7 @@ class fhandler_tty_slave: public fhandler_tty_common
 
  public:
   /* Constructor */
-  fhandler_tty_slave (int);
+  fhandler_pty_slave (int);
 
   bool use_archetype () const {return true;}
   int open (int flags, mode_t mode = 0);
@@ -1201,7 +1195,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   size_t size () const { return sizeof (*this);}
 };
 
-class fhandler_pty_master: public fhandler_tty_common
+class fhandler_pty_master: public fhandler_pty_common
 {
   int pktmode;			// non-zero if pty in a packet mode.
   HANDLE master_ctl;		// Control socket for handle duplication
@@ -1210,6 +1204,7 @@ class fhandler_pty_master: public fhandler_tty_common
 public:
   int need_nl;			// Next read should start with \n
   DWORD dwProcessId;		// Owner of master handles
+  HANDLE from_master, to_master;
 
   /* Constructor */
   fhandler_pty_master ();
@@ -1232,29 +1227,12 @@ public:
 
   char *ptsname ();
 
-  HANDLE from_master, to_master;
   bool hit_eof ();
-  bool setup (bool);
+  bool setup ();
   int dup (fhandler_base *);
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
   int tcgetpgrp ();
-  virtual bool is_tty_master () const {return false;}
-  size_t size () const { return sizeof (*this);}
-};
-
-class fhandler_tty_master: public fhandler_pty_master
-{
- public:
-  /* Constructor */
-  fhandler_console *console;	// device handler to perform real i/o.
-  bool use_archetype () const {return false;}
-
-  fhandler_tty_master ();
-  int init ();
-  int init_console ();
-  void set_winsize (bool);
-  bool is_tty_master () const {return true;}
   size_t size () const { return sizeof (*this);}
 };
 
@@ -1567,7 +1545,7 @@ struct fhandler_nodevice: public fhandler_base
 #define report_tty_counts(fh, call, use_op) \
   termios_printf ("%s %s, %susecount %d",\
 		  fh->ttyname (), call,\
-		  use_op, ((fhandler_tty_slave *) (fh->archetype ?: fh))->usecount);
+		  use_op, ((fhandler_pty_slave *) (fh->archetype ?: fh))->usecount);
 
 typedef union
 {
@@ -1599,9 +1577,8 @@ typedef union
   char __serial[sizeof (fhandler_serial)];
   char __socket[sizeof (fhandler_socket)];
   char __termios[sizeof (fhandler_termios)];
-  char __tty_common[sizeof (fhandler_tty_common)];
-  char __tty_master[sizeof (fhandler_tty_master)];
-  char __tty_slave[sizeof (fhandler_tty_slave)];
+  char __pty_common[sizeof (fhandler_pty_common)];
+  char __pty_slave[sizeof (fhandler_pty_slave)];
   char __virtual[sizeof (fhandler_virtual)];
   char __windows[sizeof (fhandler_windows)];
 } fhandler_union;

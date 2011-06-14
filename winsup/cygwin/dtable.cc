@@ -154,7 +154,7 @@ dtable::stdio_init ()
   if (myself->cygstarted || ISSTATE (myself, PID_CYGPARENT))
     {
       tty_min *t = cygwin_shared->tty.get_cttyp ();
-      if (t && t->getpgid () == myself->pid && t->gethwnd ())
+      if (t && t->getpgid () == myself->pid && t->is_console)
 	init_console_handler (true);
       return;
     }
@@ -309,12 +309,10 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	   || GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
     {
       /* Console I/O */
-      if (!ISSTATE (myself, PID_USETTY))
-	dev.parse (FH_CONSOLE);
-      else if (myself->ctty > 0)
+      if (myself->ctty > 0)
 	dev.parse (myself->ctty);
       else
-	dev.parse (FH_TTY);
+	dev.parse (FH_CONSOLE);
     }
   else if (GetCommState (handle, &dcb))
     /* FIXME: Not right - assumes ttyS0 */
@@ -433,10 +431,7 @@ fh_alloc (device dev)
   switch (dev.get_major ())
     {
     case DEV_TTYS_MAJOR:
-      fh = cnew (fhandler_tty_slave) (dev.get_minor ());
-      break;
-    case DEV_TTYM_MAJOR:
-      fh = cnew (fhandler_tty_master) ();
+      fh = cnew (fhandler_pty_slave) (dev.get_minor ());
       break;
     case DEV_CYGDRIVE_MAJOR:
       fh = cnew (fhandler_cygdrive) ();
@@ -543,7 +538,7 @@ fh_alloc (device dev)
 	    if (iscons_dev (myself->ctty))
 	      fh = cnew (fhandler_console) (dev);
 	    else
-	      fh = cnew (fhandler_tty_slave) (myself->ctty);
+	      fh = cnew (fhandler_pty_slave) (myself->ctty);
 	    break;
 	  }
 	case FH_KMSG:

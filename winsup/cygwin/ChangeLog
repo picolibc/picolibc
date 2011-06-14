@@ -1,3 +1,68 @@
+2011-06-14  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* cygheap.h (init_cygheap::ctty_on_hold): Remove conditionalized
+	variable.
+	* dcrt0.cc (do_exit): Remove code which handled CYGWIN=tty style ttys.
+	* devices.in: Remove "/dev/ttym".
+	* dtable.cc: Rename tty to pty where appropriate throughout.
+	(dtable::stdio_init): Use new t->is_console rather than using
+	now-deleted hwnd element in tty structure.
+	(dtable::init_std_file_from_handle): Remove code which handled
+	CYGWIN=tty style ttys.
+	(fh_alloc): Ditto.
+	* fhandler.h: Rename tty to pty where appropriate.
+	(fhandler_pty_common): Delete output_done_event, ioctl_request_event,
+	ioctl_done_event.
+	(fhandler_pty_master::setup): Delete argument.
+	(fhandler_tty_master): Delete.
+	(fhandler_union): Delete __tty_master.
+	* fhandler_console.cc (use_tty): Delete.
+	(fhandler_console::get_tty_stuff): Set is_console to true rather than
+	calling sethwnd.
+	(fhandler_console::send_winch_maybe): Remove CYGWIN=tty considerations.
+	(fhandler_console::input_tcsetattr): Ditto.
+	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Use new
+	t->is_console rather than using now-deleted hwnd element in tty
+	structure.
+	* fhandler_tty.cc: Rename tty to pty where appropriate throughout.
+	(tty_master): Delete.
+	(process_input): Ditto.
+	(process_output): Ditto.
+	(process_ioctl): Ditto.
+	(fhandler_tty_master::*): Ditto.
+	(fhandler_pty_master::process_slave_output): Remove CYGWIN=tty
+	considerations.
+	(fhandler_pty_slave::open): Ditto for *_done_event.
+	(fhandler_pty_slave::write): Ditto.
+	(fhandler_pty_slave::ioctl): Ditto.
+	(fhandler_pty_slave::fch_open_handles): Ditto.
+	(fhandler_pty_slave::fch_set_sd): Ditto.
+	(fhandler_pty_slave::fch_close_handles): Ditto.
+	(fhandler_pty_common::close): Ditto.
+	(fhandler_pty_master::setup): Ditto.  Remove now-unneeded ispty
+	parameter.
+	(fhandler_pty_master::open): Reflect argument removal for
+	tty::allocate.
+	* select.cc: Rename tty to pty where appropriate throughout.
+	* sigproc.cc (proc_subproc): Remove CYGWIN=tty considerations.
+	* tty.cc (ttyslot): Accommodate CYGWIN=tty removal.
+	(tty_list::init_session): Ditto.
+	(tty_list::attach): Ditto.
+	(tty::create_master): Delete.
+	(tty_list::terminate): Ditto.
+	(tty_list::allocate): Delete "with_console" parameter.  Remove
+	CYGWIN=tty considerations.
+	(tty::init): Set is_console = false.  Use 'false' for was_opened since
+	it is a boolean.
+	* tty.h (*_{DONE,REQUEST}_EVENT): Delete.
+	(tty_min::is_console): Declare new field which replaces hwnd.
+	(tty_min::gethwnd): Delete.
+	(tty_min::sethwnd): Ditto.
+	(tty_list::allocate): Delete parameter.
+	(tty_list::terminate): Delete declaration.
+	* include/sys/cygwin.h (PID_USETTY): Redefine to PID_UNUSED1 and change
+	comment to reflect its availability.
+
 2011-06-13  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler_tty_slave.cc (fhandler_tty_slave::fhandler_tty_slave):

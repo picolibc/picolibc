@@ -2645,7 +2645,6 @@ static const device dev_storage[] =
   {"/dev/ttyS61", BRACK(FHDEV(DEV_SERIAL_MAJOR, 61)), "\\??\\COM62"},
   {"/dev/ttyS62", BRACK(FHDEV(DEV_SERIAL_MAJOR, 62)), "\\??\\COM63"},
   {"/dev/ttyS63", BRACK(FHDEV(DEV_SERIAL_MAJOR, 63)), "\\??\\COM64"},
-  {"/dev/ttym", BRACK(FH_TTYM), "/dev/ttym"},
   {"/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom"},
   {"/dev/windows", BRACK(FH_WINDOWS), "/dev/windows"},
   {"/dev/zero", BRACK(FH_ZERO), "/dev/zero"}
@@ -2653,9 +2652,8 @@ static const device dev_storage[] =
 
 const device *cons_dev = dev_storage + 20;
 const device *console_dev = dev_storage + 84;
-const device *ttym_dev = dev_storage + 2577;
 const device *ttys_dev = dev_storage + 2449;
-const device *urandom_dev = dev_storage + 2578;
+const device *urandom_dev = dev_storage + 2577;
 
 
 static KR_device_t KR_find_keyword (const char *KR_keyword, int KR_length)
@@ -3839,21 +3837,6 @@ return	NULL;
         case 'y':
           switch (KR_keyword [8])
             {
-            case 'm':
-              if (strncmp (KR_keyword, "/dev/ttym", 9) == 0)
-                {
-{
-return dev_storage + 2577;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
             case '9':
               switch (KR_keyword [5])
                 {
@@ -5358,7 +5341,7 @@ return	NULL;
               if (strncmp (KR_keyword, "/dev/zero", 9) == 0)
                 {
 {
-return dev_storage + 2580;
+return dev_storage + 2579;
 
 }
                 }
@@ -44583,7 +44566,7 @@ return	NULL;
           if (strncmp (KR_keyword, "/dev/windows", 12) == 0)
             {
 {
-return dev_storage + 2579;
+return dev_storage + 2578;
 
 }
             }
@@ -44598,7 +44581,7 @@ return	NULL;
           if (strncmp (KR_keyword, "/dev/urandom", 12) == 0)
             {
 {
-return dev_storage + 2578;
+return dev_storage + 2577;
 
 }
             }
