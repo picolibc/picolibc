@@ -49,8 +49,6 @@ case "${target}" in
 	;;
   arm-*-*)
 	;;
-  strongarm-*-*)
-	;;
   bfin-*-*)
 	;;
   cris-*-* | crisv32-*-*)
@@ -76,10 +74,6 @@ case "${target}" in
   sparc-sun-sunos*)
 	;;
   sparc64-*-*)
-	;;
-  thumb-*-pe)
-	;;
-  thumb-*-*)
 	;;
   v850*-*-*)
 	;;

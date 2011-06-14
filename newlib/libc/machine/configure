@@ -651,6 +651,7 @@ ELIX_LEVEL_1_TRUE
 ELIX_LEVEL_0_FALSE
 ELIX_LEVEL_0_TRUE
 LDFLAGS
+NO_INCLUDE_LIST
 NEWLIB_CFLAGS
 CCASFLAGS
 CCAS
@@ -816,7 +817,6 @@ v850
 w65
 x86_64
 xc16x
-xscale
 xstormy16
 z8k'
 
@@ -3692,6 +3692,9 @@ fi
 newlib_cflags="${newlib_cflags} -fno-builtin"
 
 NEWLIB_CFLAGS=${newlib_cflags}
+
+
+NO_INCLUDE_LIST=${noinclude}
 
 
 LDFLAGS=${ldflags}
@@ -9660,10 +9663,6 @@ if test -z "$aix_libpath"; then aix_libpath="/usr/lib:/lib"; fi
       hardcode_shlibpath_var=no
       ;;
 
-    freebsd1*)
-      ld_shlibs=no
-      ;;
-
     # FreeBSD 2.2.[012] allows us to include c++rt0.o to get C++ constructor
     # support.  Future versions do this automatically, but an explicit c++rt0.o
     # does not break anything, and helps significantly (at the cost of a little
@@ -10582,10 +10581,6 @@ dgux*)
   shlibpath_var=LD_LIBRARY_PATH
   ;;
 
-freebsd1*)
-  dynamic_linker=no
-  ;;
-
 freebsd* | dragonfly*)
   # DragonFly does not have aout.  When/if they implement a new
   # versioning mechanism, adjust this.
@@ -11445,7 +11440,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11448 "configure"
+#line 11443 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11551,7 +11546,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11554 "configure"
+#line 11549 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11877,8 +11872,6 @@ subdirs="$subdirs a29k"
 	x86_64) subdirs="$subdirs x86_64"
  ;;
 	xc16x) subdirs="$subdirs xc16x"
- ;;
-	xscale) subdirs="$subdirs xscale"
  ;;
 	xstormy16) subdirs="$subdirs xstormy16"
  ;;

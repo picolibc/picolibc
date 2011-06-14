@@ -124,7 +124,7 @@ case "${target}" in
   rx*-*-elf)
 	AC_CONFIG_SUBDIRS([rx])
 	;;
-  strongarm-*-elf | strongarm-*-coff | arm*-*-elf | arm*-*-coff | ep9312-*-elf | ep9312-*-coff | xscale-*-elf | xscale-*-coff | *arm-*-*)
+  arm*-*-elf | arm*-*-coff | arm-*-*)
 	AC_CONFIG_SUBDIRS([arm])
 	;;
   spu-*-elf)
