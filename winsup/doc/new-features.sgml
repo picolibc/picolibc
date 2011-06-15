@@ -9,6 +9,17 @@ Drop support for Windows NT4.
 </para></listitem>
 
 <listitem><para>
+The CYGWIN environment variable options "envcache", "strip_title", "title",
+"tty", and "upcaseenv" have been removed.
+</para></listitem>
+
+<listitem><para>
+The CYGWIN=tty mode using pipes to communicate with the console in a pseudo
+tty-like mode has been removed.  Either just use the normal Windows console
+as is, or use a terminal application like <command>mintty</command>.
+</para></listitem>
+
+<listitem><para>
 The passwd command now allows an administrator to use the -R command for
 other user accounts:  passwd -R username.
 </para></listitem>
