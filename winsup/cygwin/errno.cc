@@ -167,7 +167,7 @@ const char *_sys_errlist[] NO_COPY_INIT =
 /* ENOENT 2 */		  "No such file or directory",
 /* ESRCH 3 */		  "No such process",
 /* EINTR 4 */		  "Interrupted system call",
-/* EIO 5 */		  "Input/Output error",
+/* EIO 5 */		  "Input/output error",
 /* ENXIO 6 */		  "No such device or address",
 /* E2BIG 7 */		  "Argument list too long",
 /* ENOEXEC 8 */		  "Exec format error",

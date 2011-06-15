@@ -1,3 +1,7 @@
+2011-06-15  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* errno.cc (EIO): Lowercase "o" representative string.
+
 2011-06-14  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* cygheap.h (init_cygheap::ctty_on_hold): Remove conditionalized
