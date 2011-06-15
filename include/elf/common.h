@@ -539,6 +539,8 @@
 					/*   note name must be "LINUX".  */
 #define NT_S390_PREFIX	0x305		/* S390 prefix register */
 					/*   note name must be "LINUX".  */
+#define NT_ARM_VFP	0x400		/* ARM VFP registers */
+					/*   note name must be "LINUX".  */
 
 /* Note segments for core files on dir-style procfs systems.  */
 
