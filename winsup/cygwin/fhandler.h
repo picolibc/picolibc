@@ -1140,7 +1140,7 @@ class fhandler_pty_common: public fhandler_termios
       output_mutex (NULL),
     input_mutex (NULL), input_available_event (NULL)
   {
-    // nothing to do
+    pc.file_attributes (FILE_ATTRIBUTE_NORMAL);
   }
   HANDLE output_mutex, input_mutex;
   HANDLE input_available_event;

@@ -375,7 +375,7 @@ _pinfo::_ctty (char *buf)
 void
 _pinfo::set_ctty (tty_min *tc, int flags, fhandler_termios *fh)
 {
-  debug_printf ("old %s, ctty %d, tc->ntty %d flags & O_NOCTTY %p", __ctty (), ctty, tc->ntty, flags & O_NOCTTY);
+  debug_printf ("old %s, ctty device number %p, tc->ntty device number %p flags & O_NOCTTY %p", __ctty (), ctty, tc->ntty, flags & O_NOCTTY);
   if ((ctty <= 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc->ntty;

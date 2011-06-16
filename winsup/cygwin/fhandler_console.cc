@@ -156,6 +156,8 @@ fhandler_console::set_unit ()
     }
 
   dev ().parse (devset);
+  if (devset != FH_ERROR)
+    pc.file_attributes (FILE_ATTRIBUTE_NORMAL);
   return created;
 }
 
