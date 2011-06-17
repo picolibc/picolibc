@@ -1,5 +1,13 @@
 2011-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (dll_crt0_1): Call strace.dll_info after call to pinfo_init.
+	* strace.cc (strace::hello): Drop printing DLL information here since
+	application info is not always available at this point.
+	(strace::dll_info): New method to print DLL info.
+	* include/sys/strace.h (strace::dll_info): Declare.
+
+2011-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (handle_to_fn): Accommodate name change of pty named pipes,
 	otherwise ptys are not recognized.
 

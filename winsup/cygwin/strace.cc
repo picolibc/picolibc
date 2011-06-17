@@ -57,6 +57,18 @@ strace::hello ()
 	}
       prntf (1, NULL, "**********************************************");
       prntf (1, NULL, "Program name: %W %s", myself->progname, pidbuf);
+      prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
+      if (cygheap)
+	prntf (1, NULL, "Heap size:    %u", cygheap->user_heap.chunk);
+      prntf (1, NULL, "**********************************************");
+    }
+}
+
+void
+strace::dll_info ()
+{
+  if (active ())
+    {
       prntf (1, NULL, "App version:  %d.%d, api: %d.%d",
 	     user_data->dll_major, user_data->dll_minor,
 	     user_data->api_major, user_data->api_minor);
@@ -64,10 +76,6 @@ strace::hello ()
 	     cygwin_version.dll_major, cygwin_version.dll_minor,
 	     cygwin_version.api_major, cygwin_version.api_minor);
       prntf (1, NULL, "DLL build:    %s", cygwin_version.dll_build_date);
-      prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
-      if (cygheap)
-	prntf (1, NULL, "Heap size:    %u", cygheap->user_heap.chunk);
-      prntf (1, NULL, "**********************************************");
     }
 }
 

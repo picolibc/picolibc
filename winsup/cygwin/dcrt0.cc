@@ -806,6 +806,7 @@ dll_crt0_1 (void *)
   }
 #endif
   pinfo_init (envp, envc);
+  strace.dll_info ();
 
   /* Allocate cygheap->fdtab */
   dtable_init ();

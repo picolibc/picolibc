@@ -46,6 +46,7 @@ public:
   int lmicrosec;
   bool execing;
   void hello () __attribute__ ((regparm (1)));
+  void dll_info () __attribute__ ((regparm (1)));
   void prntf (unsigned, const char *func, const char *, ...) /*__attribute__ ((regparm(3)))*/;
   void vprntf (unsigned, const char *func, const char *, va_list ap) /*__attribute__ ((regparm(3)))*/;
   void wm (int message, int word, int lon) __attribute__ ((regparm(3)));
