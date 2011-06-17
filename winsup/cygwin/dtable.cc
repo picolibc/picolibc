@@ -856,9 +856,9 @@ handle_to_fn (HANDLE h, char *posix_fn)
 	  if (*w32 != L'-')
 	    return false;
 	  ++w32;
-	  bool istty = wcsncmp (w32, L"tty", WCLEN (L"tty")) == 0;
+	  bool istty = wcsncmp (w32, L"pty", WCLEN (L"pty")) == 0;
 	  if (istty)
-	    decode_tty (posix_fn, w32 + WCLEN (L"tty"));
+	    decode_tty (posix_fn, w32 + WCLEN (L"pty"));
 	  else if (wcsncmp (w32, L"pipe", WCLEN (L"pipe")) == 0)
 	    strcpy (posix_fn, "/dev/pipe");
 	  return istty;
