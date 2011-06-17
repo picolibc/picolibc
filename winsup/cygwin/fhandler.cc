@@ -492,7 +492,6 @@ fhandler_base::open (int flags, mode_t mode)
   ULONG file_attributes = 0;
   ULONG shared = (get_major () == DEV_TAPE_MAJOR ? 0 : FILE_SHARE_VALID_FLAGS);
   ULONG create_disposition;
-  ULONG create_options = FILE_OPEN_FOR_BACKUP_INTENT;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   NTSTATUS status;
@@ -503,6 +502,7 @@ fhandler_base::open (int flags, mode_t mode)
 
   pc.get_object_attr (attr, *sec_none_cloexec (flags));
 
+  options = FILE_OPEN_FOR_BACKUP_INTENT;
   switch (query_open ())
     {
       case query_read_control:
@@ -528,12 +528,12 @@ fhandler_base::open (int flags, mode_t mode)
 	else
 	  access = GENERIC_READ | GENERIC_WRITE;
 	if (flags & O_SYNC)
-	  create_options |= FILE_WRITE_THROUGH;
+	  options |= FILE_WRITE_THROUGH;
 	if (flags & O_DIRECT)
-	  create_options |= FILE_NO_INTERMEDIATE_BUFFERING;
+	  options |= FILE_NO_INTERMEDIATE_BUFFERING;
 	if (get_major () != DEV_SERIAL_MAJOR && get_major () != DEV_TAPE_MAJOR)
 	  {
-	    create_options |= FILE_SYNCHRONOUS_IO_NONALERT;
+	    options |= FILE_SYNCHRONOUS_IO_NONALERT;
 	    access |= SYNCHRONIZE;
 	  }
 	break;
@@ -574,7 +574,7 @@ fhandler_base::open (int flags, mode_t mode)
       /* Add the reparse point flag to native symlinks, otherwise we open the
 	 target, not the symlink.  This would break lstat. */
       if (pc.is_rep_symlink ())
-	create_options |= FILE_OPEN_REPARSE_POINT;
+	options |= FILE_OPEN_REPARSE_POINT;
 
       /* Starting with Windows 2000, when trying to overwrite an already
 	 existing file with FILE_ATTRIBUTE_HIDDEN and/or FILE_ATTRIBUTE_SYSTEM
@@ -626,7 +626,7 @@ fhandler_base::open (int flags, mode_t mode)
     }
 
   status = NtCreateFile (&fh, access, &attr, &io, NULL, file_attributes, shared,
-			 create_disposition, create_options, p, plen);
+			 create_disposition, options, p, plen);
   if (!NT_SUCCESS (status))
     {
       /* Trying to create a directory should return EISDIR, not ENOENT. */
@@ -672,7 +672,7 @@ done:
   debug_printf ("%x = NtCreateFile "
 		"(%p, %x, %S, io, NULL, %x, %x, %x, %x, NULL, 0)",
 		status, fh, access, pc.get_nt_native_path (), file_attributes,
-		shared, create_disposition, create_options);
+		shared, create_disposition, options);
 
   syscall_printf ("%d = fhandler_base::open (%S, %p)",
 		  res, pc.get_nt_native_path (), flags);

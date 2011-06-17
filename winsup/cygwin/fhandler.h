@@ -152,7 +152,9 @@ class fhandler_base
   } status, open_status;
 
  private:
-  int access;
+  ACCESS_MASK access;
+  ULONG options;
+
   HANDLE io_handle;
 
   __ino64_t ino;	/* file ID or hashed filename, depends on FS. */
@@ -206,8 +208,11 @@ class fhandler_base
   DWORD get_minor () { return dev ().get_minor (); }
   virtual int get_unit () { return dev ().get_minor (); }
 
-  int get_access () const { return access; }
-  void set_access (int x) { access = x; }
+  ACCESS_MASK get_access () const { return access; }
+  void set_access (ACCESS_MASK x) { access = x; }
+
+  ULONG get_options () const { return options; }
+  void set_options (ULONG x) { options = x; }
 
   int get_flags () { return openflags; }
   void set_flags (int x, int supplied_bin = 0);
@@ -801,13 +806,19 @@ class fhandler_dev_tape: public fhandler_dev_raw
 
 class fhandler_disk_file: public fhandler_base
 {
+  HANDLE prw_handle;
   int readdir_helper (DIR *, dirent *, DWORD, DWORD, PUNICODE_STRING fname) __attribute__ ((regparm (3)));
+
+  int prw_open (bool);
 
  public:
   fhandler_disk_file ();
   fhandler_disk_file (path_conv &pc);
 
   int open (int flags, mode_t mode);
+  int close ();
+  int dup (fhandler_base *child);
+  void fixup_after_fork (HANDLE parent);
   int lock (int, struct __flock64 *);
   bool isdevice () const { return false; }
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));

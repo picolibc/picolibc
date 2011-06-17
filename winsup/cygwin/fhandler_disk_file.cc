@@ -1356,12 +1356,12 @@ fhandler_base::utimens_fs (const struct timespec *tvp)
 }
 
 fhandler_disk_file::fhandler_disk_file () :
-  fhandler_base ()
+  fhandler_base (), prw_handle (NULL)
 {
 }
 
 fhandler_disk_file::fhandler_disk_file (path_conv &pc) :
-  fhandler_base ()
+  fhandler_base (), prw_handle (NULL)
 {
   set_name (pc);
 }
@@ -1370,6 +1370,35 @@ int
 fhandler_disk_file::open (int flags, mode_t mode)
 {
   return open_fs (flags, mode);
+}
+
+int
+fhandler_disk_file::close ()
+{
+  if (prw_handle)
+    NtClose (prw_handle);
+  return fhandler_base::close ();
+}
+
+int
+fhandler_disk_file::dup (fhandler_base *child)
+{
+  fhandler_disk_file *fhc = (fhandler_disk_file *) child;
+
+  int ret = fhandler_base::dup (child);
+  if (!ret && prw_handle
+      && !DuplicateHandle (GetCurrentProcess (), prw_handle,
+			   GetCurrentProcess (), &fhc->prw_handle,
+			   0, TRUE, DUPLICATE_SAME_ACCESS))
+    prw_handle = NULL;
+  return ret;
+}
+
+void
+fhandler_disk_file::fixup_after_fork (HANDLE parent)
+{
+  prw_handle = NULL;
+  fhandler_base::fixup_after_fork (parent);
 }
 
 int
@@ -1412,6 +1441,73 @@ out:
   return res;
 }
 
+/* POSIX demands that pread/pwrite don't change the current file position.
+   While NtReadFile/NtWriteFile support atomic seek-and-io, both change the
+   file pointer if the file handle has been opened for synchonous I/O.
+   Using this handle for pread/pwrite would break atomicity, because the
+   read/write operation would have to be followed by a seek back to the old
+   file position.  What we do is to open another handle to the file on the
+   first call to either pread or pwrite.  This is used for any subsequent
+   pread/pwrite.  Thus the current file position of the "normal" file
+   handle is not touched.
+   
+   FIXME:
+
+   Note that this is just a hack.  The problem with this approach is that
+   a change to the file permissions might disallow to open the file with
+   the required permissions to read or write.  This appears to be a border case,
+   but that's exactly what git does.  It creates the file for reading and
+   writing and after writing it, it chmods the file to read-only.  Then it
+   calls pread on the file to examine the content.  This works, but if git
+   would use the original handle to pwrite to the file, it would be broken
+   with our approach.
+
+   One way to implement this is to open the pread/pwrite handle right at
+   file open time.  We would simply maintain two handles, which wouldn't
+   be much of a problem given how we do that for other fhandler types as
+   well.
+
+   However, ultimately fhandler_disk_file should become a derived class of
+   fhandler_base_overlapped.  Each raw_read or raw_write would fetch the
+   actual file position, read/write from there, and then set the file
+   position again.  Fortunately, while the file position is not maintained
+   by the I/O manager, it can be fetched and set to a new value by all
+   processes holding a handle to that file object.  Pread and pwrite differ
+   from raw_read and raw_write just by not touching the current file pos.
+   Actually they could be merged with raw_read/raw_write if we add a position
+   parameter to the latter. */
+
+int
+fhandler_disk_file::prw_open (bool write)
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  OBJECT_ATTRIBUTES attr;
+
+  /* First try to open with the original access mask */
+  ACCESS_MASK access = get_access ();
+  pc.init_reopen_attr (&attr, get_handle ());
+  status = NtOpenFile (&prw_handle, access, &attr, &io,
+		       FILE_SHARE_VALID_FLAGS, get_options ());
+  if (status == STATUS_ACCESS_DENIED)
+    {
+      /* If we get an access denied, chmod has been called.  Try again
+	 with just the required rights to perform the called function. */
+      access &= write ? ~GENERIC_READ : ~GENERIC_WRITE;
+      status = NtOpenFile (&prw_handle, access, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, get_options ());
+    }
+  debug_printf ("%x = NtOpenFile (%p, %x, %S, io, %x, %x)",
+		status, prw_handle, access, pc.get_nt_native_path (),
+		FILE_SHARE_VALID_FLAGS, get_options ());
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  return 0;
+}
+
 ssize_t __stdcall
 fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 {
@@ -1429,7 +1525,9 @@ fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
       IO_STATUS_BLOCK io;
       LARGE_INTEGER off = { QuadPart:offset };
 
-      status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, buf, count,
+      if (!prw_handle && prw_open (false))
+	goto non_atomic;
+      status = NtReadFile (prw_handle, NULL, NULL, NULL, &io, buf, count,
 			   &off, NULL);
       if (!NT_SUCCESS (status))
 	{
@@ -1440,15 +1538,15 @@ fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 	    }
 	  if (status == (NTSTATUS) STATUS_ACCESS_VIOLATION)
 	    {
-	      if (is_at_eof (get_handle ()))
+	      if (is_at_eof (prw_handle))
 		return 0;
 	      switch (mmap_is_attached_or_noreserve (buf, count))
 		{
 		case MMAP_NORESERVE_COMMITED:
-		  status = NtReadFile (get_handle (), NULL, NULL, NULL, &io,
+		  status = NtReadFile (prw_handle, NULL, NULL, NULL, &io,
 				       buf, count, &off, NULL);
 		  if (NT_SUCCESS (status))
-		    goto success;
+		    return io.Information;
 		  break;
 		case MMAP_RAISE_SIGBUS:
 		  raise (SIGBUS);
@@ -1459,12 +1557,9 @@ fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 	  __seterrno_from_nt_status (status);
 	  return -1;
 	}
-
-success:
-      lseek (-io.Information, SEEK_CUR);
-      return io.Information;
     }
 
+non_atomic:
   /* Text mode stays slow and non-atomic. */
   ssize_t res;
   _off64_t curpos = lseek (0, SEEK_CUR);
@@ -1499,7 +1594,9 @@ fhandler_disk_file::pwrite (void *buf, size_t count, _off64_t offset)
       IO_STATUS_BLOCK io;
       LARGE_INTEGER off = { QuadPart:offset };
 
-      status = NtWriteFile (get_handle (), NULL, NULL, NULL, &io, buf, count,
+      if (!prw_handle && prw_open (true))
+	goto non_atomic;
+      status = NtWriteFile (prw_handle, NULL, NULL, NULL, &io, buf, count,
 			    &off, NULL);
       if (!NT_SUCCESS (status))
 	{
@@ -1508,6 +1605,8 @@ fhandler_disk_file::pwrite (void *buf, size_t count, _off64_t offset)
 	}
       return io.Information;
     }
+
+non_atomic:
   /* Text mode stays slow and non-atomic. */
   int res;
   _off64_t curpos = lseek (0, SEEK_CUR);

@@ -1,5 +1,29 @@
 2011-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Drop local create_options variable.
+	Use options member instead.
+	* fhandler.h (class fhandler_base): Change type of access member to
+	ACCESS_MASK.  Change get_access and set_access methods accordingly.
+	Add options member.  Add get_options and set_options methods.
+	(class fhandler_disk_file): Add prw_handle.
+	(fhandler_disk_file::prw_open): Declare.
+	(fhandler_disk_file::close): Declare.
+	(fhandler_disk_file::dup): Declare.
+	(fhandler_disk_file::fixup_after_fork): Declare.
+	* fhandler_disk_file.cc (fhandler_disk_file::fhandler_disk_file):
+	Initialize prw_handle to NULL.
+	(fhandler_disk_file::close): Close prw_handle.
+	(fhandler_disk_file::dup): New method.
+	(fhandler_disk_file::fixup_after_fork): Set prw_handle to NULL since
+	prw_handle is not inherited.
+	(fhandler_disk_file::prw_open): New method.  Add long comment to
+	explain current behaviour.
+	(fhandler_disk_file::pread): Revert previous change.  Change to use
+	prw_handle if possible.
+	(fhandler_disk_file::pwrite): Change to use prw_handle if possible.
+
+2011-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (dll_crt0_1): Call strace.dll_info after call to pinfo_init.
 	* strace.cc (strace::hello): Drop printing DLL information here since
 	application info is not always available at this point.
