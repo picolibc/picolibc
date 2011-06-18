@@ -1,3 +1,8 @@
+2011-06-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (normalize_win32_path): Skip all slashes after recognizing
+	a ".." path component.  Add comment.
+
 2011-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Drop local create_options variable.

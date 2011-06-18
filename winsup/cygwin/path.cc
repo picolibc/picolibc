@@ -1258,7 +1258,8 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
 	      while (tail > dst + 1 && tail[-1] != '\\' && tail[-2] != ':')
 		tail--;
 	      src += 2;
-	      if (isdirsep (*src))
+	      /* Skip /'s to the next path component. */
+	      while (isdirsep (*src))
 		src++;
 	    }
 	}
