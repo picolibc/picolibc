@@ -41,13 +41,13 @@
 #define M_IH    11
 #define M_IU    12
 
-static inline int is_macmod_pmove(int x)
+static inline int is_macmod_pmove (int x)
 {
   return (x == 0) || (x == M_IS) || (x == M_FU) || (x == M_S2RND)
          || (x == M_ISS2) || (x == M_IU);
 }
 
-static inline int is_macmod_hmove(int x)
+static inline int is_macmod_hmove (int x)
 {
   return (x == 0) || (x == M_IS) || (x == M_FU) || (x == M_IU) || (x == M_T)
          || (x == M_TFU) || (x == M_S2RND) || (x == M_ISS2) || (x == M_IH);
