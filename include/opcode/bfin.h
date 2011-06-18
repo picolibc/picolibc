@@ -53,6 +53,12 @@ static inline int is_macmod_hmove (int x)
          || (x == M_TFU) || (x == M_S2RND) || (x == M_ISS2) || (x == M_IH);
 }
 
+static inline int is_macmod_signed (int x)
+{
+  return (x == 0) || (x == M_IS) || (x == M_T) || (x == M_S2RND)
+         || (x == M_ISS2) || (x == M_IH) || (x == M_W32);
+}
+
 /*   dsp32mac
 +----+----+---+---|---+----+----+---|---+---+---+---|---+---+---+---+
 | 1  | 1  | 0 | 0 |.M.| 0  | 0  |.mmod..........|.MM|.P.|.w1|.op1...|
