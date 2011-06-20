@@ -1,3 +1,9 @@
+2011-06-20  Jakub Jelinek  <jakub@redhat.com>
+
+	PR ld/12570
+	* bfdlink.h (struct bfd_link_info): Add no_ld_generated_unwind_info
+	option.
+
 2011-06-13  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* demangle.h (DMGL_RET_POSTFIX): Extend the comment.

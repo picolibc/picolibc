@@ -353,6 +353,10 @@ struct bfd_link_info
      --dynamic-list command line options.  */
   unsigned int dynamic: 1;
 
+  /* FALSE if .eh_frame unwind info should be generated for PLT and other
+     linker created sections, TRUE if it should be omitted.  */
+  unsigned int no_ld_generated_unwind_info: 1;
+
   /* Non-NULL if .note.gnu.build-id section should be created.  */
   char *emit_note_gnu_build_id;
 
