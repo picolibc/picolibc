@@ -1,3 +1,11 @@
+2011-06-22  Mike Frysinger  <vapier@gentoo.org>
+
+	* bfin/syscalls.c (do_syscall): Delete local variable definitions.
+	Declare result, result2, errcode local ints.  Delete asm inputs
+	and outputs.  Set output constraints to q0/result, q1/result2, and
+	q2/errcode.  Set input constraints to qA/reason and q0/arg.  Set
+	errno to errcode.
+
 2011-06-21  Mike Frysinger  <vapier@gentoo.org>
 
 	* bfin/syscalls.c: Trim trailing whitespace.

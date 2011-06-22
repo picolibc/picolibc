@@ -32,10 +32,15 @@ register char *stack_ptr asm ("SP");
 static inline int
 do_syscall (int reason, void *arg)
 {
-  register int r asm ("P0") = reason;
-  register void *a asm ("R0") = arg;
-  register int result asm ("R0");
-  asm volatile ("excpt 0;" : "=r" (result) : "a" (r), "r" (a) : "memory", "CC");
+  int result, result2, errcode;
+  asm volatile ("excpt 0;"
+		: "=q0" (result),
+		  "=q1" (result2),
+		  "=q2" (errcode)
+		: "qA" (reason),
+		  "q0" (arg)
+		: "memory", "CC");
+  errno = errcode;
   return result;
 }
 
