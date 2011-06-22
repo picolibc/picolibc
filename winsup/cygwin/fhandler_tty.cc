@@ -1586,7 +1586,7 @@ fhandler_pty_master::setup ()
   /* Create communication pipes */
   char pipename[sizeof("ptyNNNN-from-master")];
   __small_sprintf (pipename, "pty%d-from-master", get_unit ());
-  res = fhandler_pipe::create_selectable (&sec_none, from_master,
+  res = fhandler_pipe::create_selectable (&sec_none_nih, from_master,
 					  get_output_handle (), 128 * 1024,
 					  pipename);
   if (res)
@@ -1600,7 +1600,7 @@ fhandler_pty_master::setup ()
 		    get_output_handle ());
 
   __small_sprintf (pipename, "pty%d-to-master", get_unit ());
-  res = fhandler_pipe::create_selectable (&sec_none, get_io_handle (),
+  res = fhandler_pipe::create_selectable (&sec_none_nih, get_io_handle (),
 					  to_master, 128 * 1024, pipename);
   if (res)
     {

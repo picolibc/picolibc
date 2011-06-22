@@ -1,5 +1,10 @@
 2011-06-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_tty.cc (fhandler_pty_master::setup): Create pty pipes
+	non-inheritable.
+
+2011-06-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_tty.cc (fhandler_pty_master::setup): Fix crash in debug
 	output.
 
