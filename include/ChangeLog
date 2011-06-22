@@ -1,5 +1,10 @@
 2011-06-22  Jakub Jelinek  <jakub@redhat.com>
 
+	PR debug/47858
+	* dwarf2.h (enum dwarf_location_atom): Add DW_OP_GNU_parameter_ref.
+
+2011-06-22  Jakub Jelinek  <jakub@redhat.com>
+
 	* dwarf2.h (enum dwarf_location_atom): Add DW_OP_GNU_parameter_ref.
 
 2011-06-20  Jakub Jelinek  <jakub@redhat.com>
