@@ -1,3 +1,8 @@
+2011-06-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_pty_master::setup): Fix crash in debug
+	output.
+
 2011-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (normalize_win32_path): Skip all slashes after recognizing

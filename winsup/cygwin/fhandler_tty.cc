@@ -1676,7 +1676,8 @@ err:
   close_maybe (from_master);
   close_maybe (to_master);
   close_maybe (master_ctl);
-  termios_printf ("tty%d open failed - failed to create %s", errstr);
+  termios_printf ("tty%d open failed - failed to create %s", t.get_unit (),
+		  errstr);
   return false;
 }
 
