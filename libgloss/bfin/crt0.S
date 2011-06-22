@@ -45,15 +45,15 @@ L$L$clear_bss:
 	/*  Parse string at r1 */
 
 	p0.l = __init;
-	p0.h = __init; 
-	P3 = P4; 
+	p0.h = __init;
+	P3 = P4;
 	call	(p0)
 
 	p0.l = _atexit;
 	p0.h = _atexit;
 #ifdef __BFIN_FDPIC__
-	r0 = [P4 + __fini@FUNCDESC_GOT17M4]  ; 
-	P3 = P4; 
+	r0 = [P4 + __fini@FUNCDESC_GOT17M4];
+	P3 = P4;
 #else
 	r0.l = __fini;
 	r0.h = __fini;
@@ -61,12 +61,12 @@ L$L$clear_bss:
 	call	(p0)
 
 	p0.l = ___setup_argv_and_call_main;
-	p0.h = ___setup_argv_and_call_main; 
-	P3 = P4; 
+	p0.h = ___setup_argv_and_call_main;
+	P3 = P4;
 	call	(p0)
 
 	p0.l = _exit;
-	p0.h = _exit; 
-	P3 = P4; 
+	p0.h = _exit;
+	P3 = P4;
 	jump	(p0)		/* Should not return.  */
 	nop;

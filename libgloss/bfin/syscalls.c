@@ -47,7 +47,7 @@ _read (int file, char *ptr, int len)
   block[0] = file;
   block[1] = (int) ptr;
   block[2] = len;
-  
+
   return do_syscall (SYS_read, block);
 }
 
@@ -66,11 +66,11 @@ int
 _write (int file, char *ptr, int len)
 {
   int block[3];
-  
+
   block[0] = file;
   block[1] = (int) ptr;
   block[2] = len;
-  
+
   return do_syscall (SYS_write, block);
 }
 
@@ -123,9 +123,9 @@ _sbrk (int incr)
 
   if (heap_end == NULL)
     heap_end = &end;
-  
+
   prev_heap_end = heap_end;
-  
+
   if (heap_end + incr > stack_ptr)
     {
       /* Some of the libstdc++-v3 tests rely upon detecting
@@ -134,14 +134,14 @@ _sbrk (int incr)
       extern void abort (void);
 
       _write (1, "_sbrk: Heap and stack collision\n", 32);
-      
+
       abort ();
 #else
       errno = ENOMEM;
       return (caddr_t) -1;
 #endif
     }
-  
+
   heap_end += incr;
 
   return (caddr_t) prev_heap_end;
@@ -201,7 +201,7 @@ _gettimeofday (struct timeval *tv, void *tz)
 }
 
 /* Return a clock that ticks at 100Hz.  */
-clock_t 
+clock_t
 _times (struct tms * tp)
 {
   return -1;
