@@ -457,7 +457,8 @@ restart:
 	    }
 	  /* Allow Ctrl-Space to emit ^@ */
 	  else if (input_rec.Event.KeyEvent.wVirtualKeyCode == VK_SPACE
-		   && (control_key_state & CTRL_PRESSED))
+		   && (control_key_state & CTRL_PRESSED)
+		   && !(control_key_state & ALT_PRESSED))
 	    toadd = "";
 	  else if (wch == 0
 	      /* arrow/function keys */
