@@ -208,6 +208,8 @@ _DEFUN(mktime, (tim_p),
   tm_isdst = tim_p->tm_isdst > 0  ?  1 : tim_p->tm_isdst;
   isdst = tm_isdst;
 
+  TZ_LOCK;
+
   if (_daylight)
     {
       int y = tim_p->tm_year + YEAR_BASE;
@@ -256,6 +258,8 @@ _DEFUN(mktime, (tim_p),
     tim += (time_t) tz->__tzrule[1].offset;
   else /* otherwise assume std time */
     tim += (time_t) tz->__tzrule[0].offset;
+
+  TZ_UNLOCK;
 
   /* reset isdst flag to what we have calculated */
   tim_p->tm_isdst = isdst;

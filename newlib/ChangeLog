@@ -1,3 +1,8 @@
+2011-06-25  Andreas Becker  <becker@se-elektronic.de>
+
+	* libc/time/mktime.c (mktime): Lock global timezone info while
+	accessing it.
+
 2011-06-14  Philip Munts  <phil@munts.net>
 
 	* libc/time/asctime_r.c (asctime_r): Replace call to sprintf with call
