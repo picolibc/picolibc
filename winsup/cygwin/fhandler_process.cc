@@ -668,7 +668,7 @@ struct heap_info
     for (heap *h = heap_vm_chunks; h; h = h->next)
       if (base >= h->base && base < h->end)
 	{
-	  char *p = dest + __small_sprintf (dest, "[heap %ld", h->heap_id);
+	  char *p = dest + __small_sprintf (dest, "[win heap %ld", h->heap_id);
 	  if (!(h->flags & HEAP_FLAG_NONDEFAULT))
 	    p = stpcpy (p, " default");
 	  if ((h->flags & HEAP_FLAG_SHAREABLE) && (type & MEM_MAPPED))
@@ -976,6 +976,8 @@ format_process_maps (void *data, char *&destbuf)
 		    strcpy (posix_modname, "[cygwin-user-shared]");
 		  else if (cur.abase == (char *) *proc_pinfo)
 		    strcpy (posix_modname, "[procinfo]");
+		  else if (cur.abase == cygheap->user_heap.base)
+		    strcpy (posix_modname, "[heap]");
 		  else
 		    posix_modname[0] = 0;
 		}

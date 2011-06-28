@@ -1,3 +1,9 @@
+2011-06-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (heap_info::fill_if_match): Rename info to
+	note that this heap is a Windows heap.
+	(format_process_maps): Print info about application heap.
+
 2011-06-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (fhandler_console::read): Don't generate ^@ on
