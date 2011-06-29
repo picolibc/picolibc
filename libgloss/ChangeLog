@@ -1,3 +1,7 @@
+2011-06-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* arm/Makefile.in: Add $CFLAGS to compile commands for specified .o targets.
+
 2011-06-22  Mike Frysinger  <vapier@gentoo.org>
 
 	* bfin/syscalls.c (do_syscall): Delete local variable definitions.

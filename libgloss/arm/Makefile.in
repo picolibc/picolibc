@@ -107,25 +107,25 @@ redboot-crt0.o: redboot-crt0.S
 redboot-syscalls.o: redboot-syscalls.c $(srcdir)/../syscall.h
 
 rdpmon-crt0.o: crt0.S
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDP_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDP_MONITOR -o $@ -c $<
 
 rdimon-crt0.o: crt0.S
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-trap.o: trap.S
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-_exit.o: _exit.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-_kill.o: _kill.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-syscalls.o: syscalls.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-libcfunc.o: libcfunc.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 $(LINUX_BSP): $(LINUX_OBJS)
 	${AR} ${ARFLAGS} $@ $^
