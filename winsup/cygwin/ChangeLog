@@ -1,3 +1,12 @@
+2011-06-30  Ryan Johnson  <ryan.johnson@cs.utoronto.ca>
+
+	* dtable.cc (fh_oom): Remove.
+	(fh_calloc): Remove.
+	(cnew): Redefine to handle NULL returns from cmalloc.
+	(build_fh_name): Accommodate new definition of cnew.  Remove unneeded
+	test for fh_oom.
+	(fh_alloc): Ditto.
+
 2011-06-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (fhandler_console::read): Add comment.

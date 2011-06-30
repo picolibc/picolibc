@@ -393,17 +393,11 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
     }
 }
 
-/* This is a workaround for the fact that the placement new operator
-   always calls the constructor, even if the placement pointer is NULL. */
-static fhandler_union fh_oom;
-static void *
-fh_calloc (size_t size)
-{
-  void *ret = ccalloc (HEAP_FHANDLER, 1, size);
-  return ret ?: (void *) &fh_oom;
-}
-
-#define cnew(name) new (fh_calloc (sizeof (name))) name
+#define cnew(name, ...) \
+  ({ \
+    void* ptr = (void*) ccalloc (HEAP_FHANDLER, 1, sizeof (name)); \
+    ptr? new(ptr) name(__VA_ARGS__) : NULL; \
+  })
 
 fhandler_base *
 build_fh_name (const char *name, unsigned opt, suffix_info *si)
@@ -411,8 +405,8 @@ build_fh_name (const char *name, unsigned opt, suffix_info *si)
   path_conv pc (name, opt | PC_NULLEMPTY | PC_POSIX, si);
   if (pc.error)
     {
-      fhandler_base *fh = cnew (fhandler_nodevice) ();
-      if (fh != (fhandler_base *) &fh_oom)
+      fhandler_base *fh = cnew (fhandler_nodevice);
+      if (fh)
 	fh->set_error (pc.error);
       set_errno (fh ? pc.error : EMFILE);
       return fh;
@@ -441,10 +435,10 @@ fh_alloc (device dev)
   switch (dev.get_major ())
     {
     case DEV_TTYS_MAJOR:
-      fh = cnew (fhandler_pty_slave) (dev.get_minor ());
+      fh = cnew (fhandler_pty_slave, dev.get_minor ());
       break;
     case DEV_CYGDRIVE_MAJOR:
-      fh = cnew (fhandler_cygdrive) ();
+      fh = cnew (fhandler_cygdrive);
       break;
     case DEV_FLOPPY_MAJOR:
     case DEV_CDROM_MAJOR:
@@ -456,16 +450,16 @@ fh_alloc (device dev)
     case DEV_SD5_MAJOR:
     case DEV_SD6_MAJOR:
     case DEV_SD7_MAJOR:
-      fh = cnew (fhandler_dev_floppy) ();
+      fh = cnew (fhandler_dev_floppy);
       break;
     case DEV_TAPE_MAJOR:
-      fh = cnew (fhandler_dev_tape) ();
+      fh = cnew (fhandler_dev_tape);
       break;
     case DEV_SERIAL_MAJOR:
-      fh = cnew (fhandler_serial) ();
+      fh = cnew (fhandler_serial);
       break;
     case DEV_CONS_MAJOR:
-      fh = cnew (fhandler_console) (dev);
+      fh = cnew (fhandler_console, dev);
       break;
     default:
       switch ((int) dev)
@@ -473,21 +467,21 @@ fh_alloc (device dev)
 	case FH_CONSOLE:
 	case FH_CONIN:
 	case FH_CONOUT:
-	  fh = cnew (fhandler_console) (dev);
+	  fh = cnew (fhandler_console, dev);
 	  break;
 	case FH_PTYM:
-	  fh = cnew (fhandler_pty_master) ();
+	  fh = cnew (fhandler_pty_master);
 	  break;
 	case FH_WINDOWS:
-	  fh = cnew (fhandler_windows) ();
+	  fh = cnew (fhandler_windows);
 	  break;
 	case FH_FIFO:
-	  fh = cnew (fhandler_fifo) ();
+	  fh = cnew (fhandler_fifo);
 	  break;
 	case FH_PIPE:
 	case FH_PIPER:
 	case FH_PIPEW:
-	  fh = cnew (fhandler_pipe) ();
+	  fh = cnew (fhandler_pipe);
 	  break;
 	case FH_TCP:
 	case FH_UDP:
@@ -495,72 +489,70 @@ fh_alloc (device dev)
 	case FH_UNIX:
 	case FH_STREAM:
 	case FH_DGRAM:
-	  fh = cnew (fhandler_socket) ();
+	  fh = cnew (fhandler_socket);
 	  break;
 	case FH_FS:
-	  fh = cnew (fhandler_disk_file) ();
+	  fh = cnew (fhandler_disk_file);
 	  break;
 	case FH_NULL:
-	  fh = cnew (fhandler_dev_null) ();
+	  fh = cnew (fhandler_dev_null);
 	  break;
 	case FH_ZERO:
 	case FH_FULL:
-	  fh = cnew (fhandler_dev_zero) ();
+	  fh = cnew (fhandler_dev_zero);
 	  break;
 	case FH_RANDOM:
 	case FH_URANDOM:
-	  fh = cnew (fhandler_dev_random) ();
+	  fh = cnew (fhandler_dev_random);
 	  break;
 	case FH_MEM:
 	case FH_PORT:
-	  fh = cnew (fhandler_dev_mem) ();
+	  fh = cnew (fhandler_dev_mem);
 	  break;
 	case FH_CLIPBOARD:
-	  fh = cnew (fhandler_dev_clipboard) ();
+	  fh = cnew (fhandler_dev_clipboard);
 	  break;
 	case FH_OSS_DSP:
-	  fh = cnew (fhandler_dev_dsp) ();
+	  fh = cnew (fhandler_dev_dsp);
 	  break;
 	case FH_PROC:
-	  fh = cnew (fhandler_proc) ();
+	  fh = cnew (fhandler_proc);
 	  break;
 	case FH_REGISTRY:
-	  fh = cnew (fhandler_registry) ();
+	  fh = cnew (fhandler_registry);
 	  break;
 	case FH_PROCESS:
 	case FH_PROCESSFD:
-	  fh = cnew (fhandler_process) ();
+	  fh = cnew (fhandler_process);
 	  break;
 	case FH_PROCNET:
-	  fh = cnew (fhandler_procnet) ();
+	  fh = cnew (fhandler_procnet);
 	  break;
 	case FH_PROCSYS:
-	  fh = cnew (fhandler_procsys) ();
+	  fh = cnew (fhandler_procsys);
 	  break;
 	case FH_PROCSYSVIPC:
-	  fh = cnew (fhandler_procsysvipc) ();
+	  fh = cnew (fhandler_procsysvipc);
 	  break;
 	case FH_NETDRIVE:
-	  fh = cnew (fhandler_netdrive) ();
+	  fh = cnew (fhandler_netdrive);
 	  break;
 	case FH_TTY:
 	  {
 	    if (iscons_dev (myself->ctty))
-	      fh = cnew (fhandler_console) (dev);
+	      fh = cnew (fhandler_console, dev);
 	    else
-	      fh = cnew (fhandler_pty_slave) (myself->ctty);
+	      fh = cnew (fhandler_pty_slave, myself->ctty);
 	    break;
 	  }
 	case FH_KMSG:
-	  fh = cnew (fhandler_mailslot) ();
+	  fh = cnew (fhandler_mailslot);
 	  break;
       }
     }
 
   if (fh == fh_unset)
-    fh = cnew (fhandler_nodevice) ();
-  if (fh == (fhandler_base *) &fh_oom)
-    fh = NULL;
+    fh = cnew (fhandler_nodevice);
   return fh;
 }
 
