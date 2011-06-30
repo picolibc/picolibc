@@ -1,5 +1,11 @@
 2011-06-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_console.cc (fhandler_console::read): Add comment.
+	(fhandler_console::input_tcsetattr): Don't set ENABLE_PROCESSED_INPUT
+	if IGNBRK flag is set.
+
+2011-06-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (fh_oom): New static fhandler storage.
 	(fh_calloc): New static function.  Add a comment to explain why this
 	is needed.

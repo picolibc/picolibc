@@ -441,6 +441,7 @@ restart:
 	  if (control_key_state & LEFT_ALT_PRESSED)
 	    dev_state.nModifiers |= 8;
 
+	  /* Allow Backspace to emit ^? and escape sequences. */
 	  if (input_rec.Event.KeyEvent.wVirtualScanCode == 14)
 	    {
 	      char c = dev_state.backspace_keycode;
@@ -969,7 +970,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
       flags &= ~ENABLE_ECHO_INPUT;
     }
 
-  if (t->c_lflag & ISIG)
+  if ((t->c_lflag & ISIG) && !(t->c_iflag & IGNBRK))
     {
       flags |= ENABLE_PROCESSED_INPUT;
     }
