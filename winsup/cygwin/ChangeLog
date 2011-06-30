@@ -1,3 +1,16 @@
+2011-06-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (fh_oom): New static fhandler storage.
+	(fh_calloc): New static function.  Add a comment to explain why this
+	is needed.
+	(cnew): Call fh_calloc as placement argument.
+	(build_fh_name): Check return code from cnew against address of
+	fh_oom to test for out of memory condition.
+	(fh_alloc): Ditto.
+	(build_fh_pc): Avoid a crash due to useing a NULL fhandler.
+	* pipe.cc (fhandler_pipe::create): Check if build_fh_dev returned a
+	valid pointer before using it.
+
 2011-06-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc (heap_info::fill_if_match): Rename info to

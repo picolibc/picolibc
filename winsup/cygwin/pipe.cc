@@ -303,19 +303,23 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
 {
   HANDLE r, w;
   SECURITY_ATTRIBUTES *sa = sec_none_cloexec (mode);
-  int res;
+  int res = -1;
 
   int ret = create_selectable (sa, r, w, psize);
   if (ret)
+    __seterrno_from_win_error (ret);
+  else if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)
     {
-      __seterrno_from_win_error (ret);
-      res = -1;
+      CloseHandle (r);
+      CloseHandle (w);
+    }
+  else if ((fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev)) == NULL)
+    {
+      delete fhs[0];
+      CloseHandle (w);
     }
   else
     {
-      fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev);
-      fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev);
-
       mode |= mode & O_TEXT ?: O_BINARY;
       fhs[0]->init (r, FILE_CREATE_PIPE_INSTANCE | GENERIC_READ, mode);
       fhs[1]->init (w, FILE_CREATE_PIPE_INSTANCE | GENERIC_WRITE, mode);

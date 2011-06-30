@@ -393,7 +393,17 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
     }
 }
 
-#define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
+/* This is a workaround for the fact that the placement new operator
+   always calls the constructor, even if the placement pointer is NULL. */
+static fhandler_union fh_oom;
+static void *
+fh_calloc (size_t size)
+{
+  void *ret = ccalloc (HEAP_FHANDLER, 1, size);
+  return ret ?: (void *) &fh_oom;
+}
+
+#define cnew(name) new (fh_calloc (sizeof (name))) name
 
 fhandler_base *
 build_fh_name (const char *name, unsigned opt, suffix_info *si)
@@ -402,7 +412,7 @@ build_fh_name (const char *name, unsigned opt, suffix_info *si)
   if (pc.error)
     {
       fhandler_base *fh = cnew (fhandler_nodevice) ();
-      if (fh)
+      if (fh != (fhandler_base *) &fh_oom)
 	fh->set_error (pc.error);
       set_errno (fh ? pc.error : EMFILE);
       return fh;
@@ -549,6 +559,8 @@ fh_alloc (device dev)
 
   if (fh == fh_unset)
     fh = cnew (fhandler_nodevice) ();
+  if (fh == (fhandler_base *) &fh_oom)
+    fh = NULL;
   return fh;
 }
 
@@ -558,7 +570,10 @@ build_fh_pc (path_conv& pc, bool set_name)
   fhandler_base *fh = fh_alloc (pc.dev);
 
   if (!fh)
-    set_errno (EMFILE);
+    {
+      set_errno (EMFILE);
+      goto out;
+    }
   else if (fh->dev () == FH_ERROR)
     goto out;
   else if (fh->dev () != FH_NADA)
