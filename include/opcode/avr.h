@@ -68,7 +68,7 @@
 #define AVR_ISA_AVR6   (AVR_ISA_1200 | AVR_ISA_LPM | AVR_ISA_LPMX | \
                         AVR_ISA_SRAM | AVR_ISA_MEGA | AVR_ISA_MUL | \
                         AVR_ISA_ELPM | AVR_ISA_ELPMX | AVR_ISA_SPM | \
-                        AVR_ISA_SPM | AVR_ISA_BRK | AVR_ISA_EIND | \
+                        AVR_ISA_SPMX | AVR_ISA_BRK | AVR_ISA_EIND | \
                         AVR_ISA_MOVW)
 
 #define REGISTER_P(x) ((x) == 'r'		\

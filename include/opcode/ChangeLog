@@ -1,3 +1,7 @@
+2011-07-01  Nick Clifton  <nickc@redhat.com>
+
+	* avr.h (AVR_ISA_AVR6): Fix typo, adding AVR_ISA_SPMX.
+
 2011-06-18  Robin Getz  <robin.getz@analog.com>
 
 	* bfin.h (is_macmod_signed): New func
