@@ -1,3 +1,8 @@
+2011-07-01  Eric B. Weddington  <eric.weddington@atmel.com>
+
+	* avr.h (AVR_ISA_AVR6): Remove AVR_ISA_SPMX as it was actually
+	a duplicate of AVR_ISA_SPM.
+
 2011-07-01  Nick Clifton  <nickc@redhat.com>
 
 	* avr.h (AVR_ISA_AVR6): Fix typo, adding AVR_ISA_SPMX.
