@@ -117,7 +117,7 @@ _kill (int n, int m)
 int
 _getpid (int n)
 {
-  return 1;
+  return do_syscall (SYS_getpid, &n);
 }
 
 caddr_t
@@ -156,40 +156,41 @@ _sbrk (int incr)
 extern void memset (struct stat *, int, unsigned int);
 
 int
-_fstat (int file, struct stat * st)
+_fstat (int file, struct stat *st)
 {
-  memset (st, 0, sizeof (* st));
-  st->st_mode = S_IFCHR;
-  st->st_blksize = 1024;
-  return 0;
+  int block[2];
+
+  block[0] = file;
+  block[1] = (int) st;
+
+  return do_syscall (SYS_fstat, block);
 }
 
 int _stat (const char *fname, struct stat *st)
 {
-  int file;
+  int block[2];
 
-  /* The best we can do is try to open the file readonly.  If it exists,
-     then we can guess a few things about it.  */
-  if ((file = _open (fname, O_RDONLY)) < 0)
-    return -1;
+  block[0] = (int) fname;
+  block[1] = (int) st;
 
-  memset (st, 0, sizeof (* st));
-  st->st_mode = S_IFREG | S_IREAD;
-  st->st_blksize = 1024;
-  _close (file); /* Not interested in the error.  */
-  return 0;
+  return do_syscall (SYS_stat, block);
 }
 
 int
-_link (void)
+_link (const char *existing, const char *new)
 {
-  return -1;
+  int block[2];
+
+  block[0] = (int) existing;
+  block[1] = (int) new;
+
+  return do_syscall (SYS_link, block);
 }
 
 int
-_unlink (void)
+_unlink (const char *path)
 {
-  return -1;
+  return do_syscall (SYS_unlink, path);
 }
 
 void

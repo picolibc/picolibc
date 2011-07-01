@@ -1,5 +1,18 @@
 2011-07-01  Mike Frysinger  <vapier@gentoo.org>
 
+	* bfin/syscalls.c (_getpid): Call do_syscall with func argument n and
+	return the result.
+	(_fstat): Delete stub body.  Add block array and assign file/st to it.
+	Call do_syscall with result.
+	(_stat): Delete stub body.  Add block array and assign fname/st to
+	it.  Call do_syscall with result.
+	(_link): Change func arguments to accept two strings.  Add block array
+	and assign existing/new to it.  Call do_syscall with result.
+	(_unlink): Change func arguments to accept a string.  Call do_syscall
+	with new argument.
+
+2011-07-01  Mike Frysinger  <vapier@gentoo.org>
+
 	* bfin/syscalls.c (_lseek): Change 3rd arg name to whence.  Increase
 	block array to 3 elements.  Set 3rd element to whence.
 
