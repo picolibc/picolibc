@@ -57,12 +57,13 @@ _read (int file, char *ptr, int len)
 }
 
 int
-_lseek (int file, int ptr, int dir)
+_lseek (int file, int ptr, int whence)
 {
-  int block[2];
+  int block[3];
 
   block[0] = file;
   block[1] = ptr;
+  block[2] = whence;
 
   return do_syscall (SYS_lseek, block);
 }

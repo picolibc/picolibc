@@ -1,3 +1,8 @@
+2011-07-01  Mike Frysinger  <vapier@gentoo.org>
+
+	* bfin/syscalls.c (_lseek): Change 3rd arg name to whence.  Increase
+	block array to 3 elements.  Set 3rd element to whence.
+
 2011-06-29  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* arm/Makefile.in: Add $CFLAGS to compile commands for specified .o targets.
