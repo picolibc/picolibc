@@ -396,7 +396,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 #define cnew(name, ...) \
   ({ \
     void* ptr = (void*) ccalloc (HEAP_FHANDLER, 1, sizeof (name)); \
-    ptr? new(ptr) name(__VA_ARGS__) : NULL; \
+    ptr ? new (ptr) name (__VA_ARGS__) : NULL; \
   })
 
 fhandler_base *
