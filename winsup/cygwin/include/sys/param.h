@@ -19,18 +19,22 @@
 #define NOFILE		8192
 
 /* Max number of groups; must keep in sync with NGROUPS_MAX in limits.h */
-#define NGROUPS		1024
+#define NGROUPS		NGROUPS_MAX
 
 /* Ticks/second for system calls such as times() */
 /* FIXME: is this the appropriate value? */
 #define HZ		1000
 
-/* Max hostname size that can be dealt with */
-/* FIXME: is this the appropriate value? */
-#define MAXHOSTNAMELEN	64
+/* Max hostname size that can be dealt with (== Win32 MAX_HOSTNAME_LEN) */
+#define MAXHOSTNAMELEN	128
 
-/* The Posix version is PATH_MAX.  MAXPATHLEN is the BSD variant. */
+/* Maximum path length including trailing NUL; the Posix version is PATH_MAX.
+   MAXPATHLEN is the BSD variant. */
 #define MAXPATHLEN      PATH_MAX
+
+/* Maximum number of nested symlinks; the Posix version is SYMLOOP_MAX.
+   MAXSYMLINKS is the BSD variant. */
+#define MAXSYMLINKS	SYMLOOP_MAX
 
 /* This is the number of bytes per block given in the st_blocks stat member.
    It should be in sync with S_BLKSIZE in sys/stat.h.  S_BLKSIZE is the

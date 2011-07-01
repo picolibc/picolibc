@@ -1,5 +1,13 @@
 2011-07-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/sys/param.h (NGROUPS): Redefine as NGROUPS_MAX.
+	(MAXHOSTNAMELEN): Redefine with same value as MAX_HOSTNAME_LEN.  Change
+	comment.
+	(MAXPATHLEN): Improve comment.
+	(MAXSYMLINKS): Define and add comment.
+
+2011-07-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): Move NFS-specific code into the
 	code block handling FH_FS stuff.
 
