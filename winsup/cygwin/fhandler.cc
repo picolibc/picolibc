@@ -539,21 +539,6 @@ fhandler_base::open (int flags, mode_t mode)
 	break;
     }
 
-  if (pc.fs_is_nfs ())
-    {
-      /* Make sure we can read EAs of files on an NFS share.  Also make
-	 sure that we're going to act on the file itself, even if it's a
-	 a symlink. */
-      access |= FILE_READ_EA;
-      if (query_open ())
-	{
-	  if (query_open () >= query_write_control)
-	    access |=  FILE_WRITE_EA;
-	  plen = sizeof nfs_aol_ffei;
-	  p = (PFILE_FULL_EA_INFORMATION) &nfs_aol_ffei;
-	}
-    }
-
   if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))
     {
       if (flags & O_CREAT)
@@ -575,6 +560,21 @@ fhandler_base::open (int flags, mode_t mode)
 	 target, not the symlink.  This would break lstat. */
       if (pc.is_rep_symlink ())
 	options |= FILE_OPEN_REPARSE_POINT;
+
+      if (pc.fs_is_nfs ())
+	{
+	  /* Make sure we can read EAs of files on an NFS share.  Also make
+	     sure that we're going to act on the file itself, even if it's a
+	     a symlink. */
+	  access |= FILE_READ_EA;
+	  if (query_open ())
+	    {
+	      if (query_open () >= query_write_control)
+		access |=  FILE_WRITE_EA;
+	      plen = sizeof nfs_aol_ffei;
+	      p = (PFILE_FULL_EA_INFORMATION) &nfs_aol_ffei;
+	    }
+	}
 
       /* Starting with Windows 2000, when trying to overwrite an already
 	 existing file with FILE_ATTRIBUTE_HIDDEN and/or FILE_ATTRIBUTE_SYSTEM
