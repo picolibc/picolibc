@@ -1,6 +1,7 @@
 2011-07-03  Samuel Thibault  <samuel.thibault@gnu.org>
 	    Thomas Schwinge  <thomas@schwinge.name>
 
+	PR binutils/12913
 	* common.h (ELFOSABI_GNU): Define, replaces...
 	(ELFOSABI_LINUX): ... this, kept as an alias.
 	(ELFOSABI_HURD): Remove.
