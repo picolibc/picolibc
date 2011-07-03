@@ -1,3 +1,10 @@
+2011-07-03  Samuel Thibault  <samuel.thibault@gnu.org>
+	    Thomas Schwinge  <thomas@schwinge.name>
+
+	* common.h (ELFOSABI_GNU): Define, replaces...
+	(ELFOSABI_LINUX): ... this, kept as an alias.
+	(ELFOSABI_HURD): Remove.
+
 2011-06-15  Ulrich Weigand  <ulrich.weigand@linaro.org>
 
 	* common.h (NT_ARM_VFP): Define.

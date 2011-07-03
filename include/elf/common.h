@@ -62,8 +62,8 @@
 #define ELFOSABI_NONE	      0	/* UNIX System V ABI */
 #define ELFOSABI_HPUX	      1	/* HP-UX operating system */
 #define ELFOSABI_NETBSD	      2	/* NetBSD */
-#define ELFOSABI_LINUX	      3	/* GNU/Linux */
-#define ELFOSABI_HURD	      4	/* GNU/Hurd */
+#define ELFOSABI_GNU	      3	/* GNU */
+#define ELFOSABI_LINUX	      3	/* Alias for ELFOSABI_GNU */
 #define ELFOSABI_SOLARIS      6	/* Solaris */
 #define ELFOSABI_AIX	      7	/* AIX */
 #define ELFOSABI_IRIX	      8	/* IRIX */
