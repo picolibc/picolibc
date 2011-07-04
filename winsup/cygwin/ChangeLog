@@ -1,3 +1,7 @@
+2011-07-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* environ.cc (tty_is_gone): Wrap warning at 80 characters.
+
 2011-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	Throughout, open console handles with sharing for reading and writing.
