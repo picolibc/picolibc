@@ -1,5 +1,10 @@
 2011-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dtable.cc (dtable::init_std_file_from_handle): Change test for console
+	device in call to fh->init to avoid conhost crash on W7.
+
+2011-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (environ_init): Reinstantiate on-the-fly CYGWIN variable
 	test and call to parse_options if found.
 

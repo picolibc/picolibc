@@ -383,7 +383,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	 This needs further investigation but the workaround not to close
 	 the handles will have a marginal hit of three extra handles per
 	 process at most. */
-      if (!fh->init (dev == FH_CONSOLE && wincap.has_console_handle_problem ()
+      if (!fh->init (iscons_dev (dev) && wincap.has_console_handle_problem ()
 		     ? INVALID_HANDLE_VALUE : handle, access, bin))
 	api_fatal ("couldn't initialize fd %d for %s", fd, fh->get_name ());
 
