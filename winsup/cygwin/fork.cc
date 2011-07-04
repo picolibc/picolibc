@@ -324,9 +324,9 @@ frok::parent (volatile char * volatile stack_here)
   /* If we don't have a console, then don't create a console for the
      child either.  */
   HANDLE console_handle = CreateFile ("CONOUT$", GENERIC_WRITE,
-				      FILE_SHARE_WRITE, &sec_none_nih,
-				      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-				      NULL);
+				      FILE_SHARE_READ | FILE_SHARE_WRITE,
+				      &sec_none_nih, OPEN_EXISTING,
+				      FILE_ATTRIBUTE_NORMAL, NULL);
 
   if (console_handle != INVALID_HANDLE_VALUE)
     CloseHandle (console_handle);

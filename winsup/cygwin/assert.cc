@@ -33,8 +33,8 @@ __assert_func (const char *file, int line, const char *func,
   /* If we don't have a console in a Windows program, then bring up a
      message box for the assertion failure.  */
 
-  h = CreateFile ("CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, &sec_none_nih,
-		  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  h = CreateFile ("CONOUT$", GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		  &sec_none_nih, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (h == INVALID_HANDLE_VALUE)
     {
       PWCHAR buf = (PWCHAR) alloca ((100 + strlen (failedexpr))

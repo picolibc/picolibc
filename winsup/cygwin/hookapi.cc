@@ -174,7 +174,7 @@ find_first_notloaded_dll (path_conv& pc)
 
   status = NtOpenFile (&h, SYNCHRONIZE | GENERIC_READ,
 		       pc.get_object_attr (attr, sec_none_nih),
-		       &io, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		       &io, FILE_SHARE_VALID_FLAGS,
 		       FILE_SYNCHRONOUS_IO_NONALERT
 		       | FILE_OPEN_FOR_BACKUP_INTENT
 		       | FILE_NON_DIRECTORY_FILE);

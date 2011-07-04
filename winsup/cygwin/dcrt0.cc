@@ -95,12 +95,12 @@ insert_file (char *name, char *&cmd)
   PWCHAR wname = tp.w_get ();
   sys_mbstowcs (wname, NT_MAX_PATH, name + 1);
   f = CreateFileW (wname,
-		   GENERIC_READ,	 /* open for reading	*/
-		   FILE_SHARE_READ,      /* share for reading	*/
-		   &sec_none_nih,	 /* default security	*/
-		   OPEN_EXISTING,	 /* existing file only	*/
-		   FILE_ATTRIBUTE_NORMAL,/* normal file		*/
-		   NULL);		 /* no attr. template	*/
+		   GENERIC_READ,		/* open for reading	*/
+		   FILE_SHARE_VALID_FLAGS,      /* share for reading	*/
+		   &sec_none_nih,		/* default security	*/
+		   OPEN_EXISTING,		/* existing file only	*/
+		   FILE_ATTRIBUTE_NORMAL,	/* normal file		*/
+		   NULL);			/* no attr. template	*/
 
   if (f == INVALID_HANDLE_VALUE)
     {

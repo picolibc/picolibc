@@ -1,5 +1,12 @@
 2011-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	Throughout, open console handles with sharing for reading and writing.
+	* dcrt0.cc (insert_file): Open file with full sharing allowed.
+	* hookapi.cc (find_first_notloaded_dll): Ditto.
+	* spawn.cc (av::fixup): Ditto.
+
+2011-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::init_std_file_from_handle): Change test for console
 	device in call to fh->init to avoid conhost crash on W7.
 
