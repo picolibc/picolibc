@@ -793,6 +793,8 @@ environ_init (char **envp, int envc)
       ucenv (newp, eq);	/* uppercase env vars which need it */
       if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
 	sawTERM = 1;
+      else if (*newp == 'C' && strncmp (newp, "CYGWIN=", 7) == 0)
+	parse_options (newp + 7);
       if (*eq && conv_start_chars[(unsigned char) envp[i][0]])
 	posify (envp + i, *++eq ? eq : --eq, tmpbuf);
       debug_printf ("%p: %s", envp[i], envp[i]);

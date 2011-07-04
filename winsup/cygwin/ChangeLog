@@ -1,3 +1,8 @@
+2011-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (environ_init): Reinstantiate on-the-fly CYGWIN variable
+	test and call to parse_options if found.
+
 2011-07-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.cc (fhandler_base::open_with_arch): Call close_on_exec last
