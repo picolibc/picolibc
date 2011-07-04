@@ -453,7 +453,6 @@ int
 fhandler_base::open_with_arch (int flags, mode_t mode)
 {
   int res;
-  close_on_exec (flags & O_CLOEXEC);
   if (!(res = (archetype && archetype->io_handle)
 	|| open (flags, (mode & 07777) & ~cygheap->umask)))
     {
@@ -480,6 +479,7 @@ fhandler_base::open_with_arch (int flags, mode_t mode)
       open_setup (flags);
     }
 
+  close_on_exec (flags & O_CLOEXEC);
   return res;
 }
 

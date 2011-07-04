@@ -1,3 +1,14 @@
+2011-07-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.cc (fhandler_base::open_with_arch): Call close_on_exec last
+	to avoid setting close_on_exec for archetype.
+	* fhandler_tty.cc (fhandler_pty_master::setup): Protect {from,to}_pty
+	handles.  Use consistent naming in debug output.  Use inheritable
+	handles and...
+	(fhandler_pty_master::fixup_after_fork): ...avoid duplicating handles
+	here.
+	(fhandler_pty_slave::open): Don't set close_on_exec flag here.
+
 2011-07-01  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dtable.cc (cnew): Fix whitespace.

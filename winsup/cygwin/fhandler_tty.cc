@@ -514,7 +514,6 @@ fhandler_pty_slave::open (int flags, mode_t)
 
   set_io_handle (from_master_local);
   set_output_handle (to_master_local);
-  set_close_on_exec (!!(flags & O_CLOEXEC));
 
   set_open_status ();
   if (cygheap->manage_console_count ("fhandler_pty_slave::open", 1) == 1)
@@ -537,7 +536,7 @@ fhandler_pty_slave::open_setup (int flags)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   myself->set_ctty (get_ttyp (), flags, this);
-  cygheap->manage_console_count ("fhandler_pty_slave::setup", 1);
+  cygheap->manage_console_count ("fhandler_pty_slave::open_setup", 1);
   report_tty_counts (this, "opened", "");
 }
 
@@ -1586,7 +1585,7 @@ fhandler_pty_master::setup ()
   /* Create communication pipes */
   char pipename[sizeof("ptyNNNN-from-master")];
   __small_sprintf (pipename, "pty%d-from-master", get_unit ());
-  res = fhandler_pipe::create_selectable (&sec_none_nih, from_master,
+  res = fhandler_pipe::create_selectable (&sec_none, from_master,
 					  get_output_handle (), 128 * 1024,
 					  pipename);
   if (res)
@@ -1595,12 +1594,13 @@ fhandler_pty_master::setup ()
       goto err;
     }
 
+  ProtectHandle1 (get_output_handle (), to_pty);
   if (!SetNamedPipeHandleState (get_output_handle (), &pipe_mode, NULL, NULL))
     termios_printf ("can't set output_handle(%p) to non-blocking mode",
 		    get_output_handle ());
 
   __small_sprintf (pipename, "pty%d-to-master", get_unit ());
-  res = fhandler_pipe::create_selectable (&sec_none_nih, get_io_handle (),
+  res = fhandler_pipe::create_selectable (&sec_none, get_io_handle (),
 					  to_master, 128 * 1024, pipename);
   if (res)
     {
@@ -1608,6 +1608,7 @@ fhandler_pty_master::setup ()
       goto err;
     }
 
+  ProtectHandle1 (get_io_handle (), from_pty);
   need_nl = 0;
 
   /* Create security attribute.  Default permissions are 0620. */
@@ -1662,7 +1663,7 @@ fhandler_pty_master::setup ()
   t.winsize.ws_row = 25;
   t.master_pid = myself->pid;
 
-  termios_printf ("tty%d opened - from_slave %p, to_slave %p", t.get_unit (),
+  termios_printf ("tty%d opened - from_pty %p, to_pty %p", t.get_unit (),
 		  get_io_handle (), get_output_handle ());
   return true;
 
@@ -1689,12 +1690,6 @@ fhandler_pty_master::fixup_after_fork (HANDLE parent)
   if (arch->dwProcessId != wpid)
     {
       tty& t = *get_ttyp ();
-      if (!DuplicateHandle (parent, arch->from_master, GetCurrentProcess (),
-			    &arch->from_master, 0, false, DUPLICATE_SAME_ACCESS))
-	system_printf ("couldn't duplicate from_parent(%p), %E", arch->from_master);
-      if (!DuplicateHandle (parent, arch->to_master, GetCurrentProcess (),
-			    &arch->to_master, 0, false, DUPLICATE_SAME_ACCESS))
-	system_printf ("couldn't duplicate to_parent(%p), %E", arch->from_master);
       if (myself->pid == t.master_pid)
 	{
 	  t.from_master = arch->from_master;
