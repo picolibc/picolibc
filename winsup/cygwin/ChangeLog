@@ -1,5 +1,12 @@
 2011-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_console.cc (fhandler_console::input_tcsetattr): Make
+	ENABLE_PROCESSED_INPUT flag only depending on value of IGNBRK.
+	(fhandler_console::tcgetattr): Don't set ISIG depending on
+	ENABLE_PROCESSED_INPUT, set IGNBRK instead.
+
+2011-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (get_file_sd): Fix comment.
 
 2011-07-05  Corinna Vinschen  <corinna@vinschen.de>
