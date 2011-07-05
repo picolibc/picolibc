@@ -1,5 +1,9 @@
 2011-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (get_file_sd): Fix comment.
+
+2011-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): Never create files with WRITE_DAC
 	access.  Explain why.
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Improve debug

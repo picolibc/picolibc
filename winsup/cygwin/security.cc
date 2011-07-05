@@ -117,7 +117,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
      directories' SD used NtQuerySecurityObject, rather than GetSecurityInfo
      as well.  See http://cygwin.com/ml/cygwin-developers/2011-03/msg00027.html
      for the solution.  This problem does not occur with the below code, so
-     the workaround could be removed. */
+     the workaround has been removed. */
   if (justcreated)
     {
       SECURITY_DESCRIPTOR_CONTROL ctrl;
