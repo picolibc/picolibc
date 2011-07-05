@@ -659,10 +659,15 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     }
 
  done:
-  syscall_printf ("0 = fstat (%S, %p) st_atime=%x st_size=%D, st_mode=%p, "
-		  "st_ino=%D, sizeof=%d",
-		  pc.get_nt_native_path (), buf, buf->st_atime, buf->st_size,
-		  buf->st_mode, buf->st_ino, sizeof (*buf));
+  syscall_printf ("0 = fstat (%S, %p) st_size=%D, st_mode=%p, st_ino=%D"
+		  "st_atim=%x.%x st_ctim=%x.%x "
+		  "st_mtim=%x.%x st_birthtim=%x.%x",
+		  pc.get_nt_native_path (), buf,
+		  buf->st_size, buf->st_mode, buf->st_ino,
+		  buf->st_atim.tv_sec, buf->st_atim.tv_nsec,
+		  buf->st_ctim.tv_sec, buf->st_ctim.tv_nsec,
+		  buf->st_mtim.tv_sec, buf->st_mtim.tv_nsec,
+		  buf->st_birthtim.tv_sec, buf->st_birthtim.tv_nsec);
   return 0;
 }
 
