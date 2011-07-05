@@ -1653,11 +1653,15 @@ fhandler_disk_file::mkdir (mode_t mode)
       nfs_attr->type = NF3DIR;
       nfs_attr->mode = (mode & 07777) & ~cygheap->umask;
     }
-  else if (has_acls ())
+  else if (has_acls () && !isremote ())
     /* If the filesystem supports ACLs, we will overwrite the DACL after the
        call to NtCreateFile.  This requires a handle with READ_CONTROL and
        WRITE_DAC access, otherwise get_file_sd and set_file_sd both have to
-       open the file again. */
+       open the file again.
+       FIXME: On remote NTFS shares open sometimes fails because even the
+       creator of the file doesn't have the right to change the DACL.
+       I don't know what setting that is or howq to recognize such a share,
+       so for now we don't request WRITE_DAC on remote drives. */
     access |= READ_CONTROL | WRITE_DAC;
   status = NtCreateFile (&dir, access, pc.get_object_attr (attr, sa), &io, NULL,
 			 FILE_ATTRIBUTE_DIRECTORY, FILE_SHARE_VALID_FLAGS,

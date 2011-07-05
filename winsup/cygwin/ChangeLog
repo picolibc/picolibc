@@ -1,3 +1,12 @@
+2011-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Don't open file with WRITE_DAC
+	access on remote filesystem.  Explain why.
+	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): Ditto for
+	directories.
+	* fhandler_socket.cc (fhandler_socket::bind): Ditto for sockets.
+	* path.cc (symlink_worker): Ditto for symlinks.
+
 2011-07-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* environ.cc (tty_is_gone): Wrap warning at 80 characters.

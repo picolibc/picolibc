@@ -970,8 +970,12 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       /* If the filesystem supports ACLs, we will overwrite the DACL after the
 	 call to NtCreateFile.  This requires a handle with READ_CONTROL and
 	 WRITE_DAC access, otherwise get_file_sd and set_file_sd both have to
-	 open the file again. */
-      if (pc.has_acls ())
+	 open the file again.
+	 FIXME: On remote NTFS shares open sometimes fails because even the
+	 creator of the file doesn't have the right to change the DACL.
+	 I don't know what setting that is or howq to recognize such a share,
+	 so for now we don't request WRITE_DAC on remote drives. */
+      if (pc.has_acls () && !pc.isremote ())
 	access |= READ_CONTROL | WRITE_DAC;
 
       status = NtCreateFile (&fh, access, pc.get_object_attr (attr, sa), &io,

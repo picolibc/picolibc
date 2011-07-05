@@ -613,11 +613,16 @@ fhandler_base::open (int flags, mode_t mode)
 	    /* If mode has no write bits set, and ACLs are not used, we set
 	       the DOS R/O attribute. */
 	    file_attributes |= FILE_ATTRIBUTE_READONLY;
-	  else if (!exists () && has_acls ())
+	  else if (!exists () && has_acls () && !isremote ())
 	    /* If we are about to create the file and the filesystem supports
 	       ACLs, we will overwrite the DACL after the call to NtCreateFile.
 	       This requires a handle with additional WRITE_DAC access,
-	       otherwise set_file_sd has to open the file again. */
+	       otherwise set_file_sd has to open the file again.
+	       FIXME: On remote NTFS shares open sometimes fails because even
+	       the creator of the file doesn't have the right to change the
+	       DACL.  I don't know what setting that is or howq to recognize
+	       such a share, so for now we don't request WRITE_DAC on remote
+	       drives. */
 	    access |= WRITE_DAC;
 
 	  /* The file attributes are needed for later use in, e.g. fchmod. */
