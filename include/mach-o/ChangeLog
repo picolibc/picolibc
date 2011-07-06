@@ -1,0 +1,4 @@
+2011-07-06  Tristan Gingold  <gingold@adacore.com>
+
+	* loader.h: New file.
+
