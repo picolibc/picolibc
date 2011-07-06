@@ -1,3 +1,10 @@
+2011-07-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* exceptions.cc (_cygtls::interrupt_now): Back out previous change
+	since it could theoretically cause a non-CTRL-C-able program if a
+	program has suffered memory corruption.
+	(setup_handler): Ditto.
+
 2011-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sched.c (sched_yield): Just call SwitchToThread because yield now
