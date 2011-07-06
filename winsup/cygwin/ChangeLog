@@ -1,5 +1,12 @@
 2011-07-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* exceptions.cc (_cygtls::interrupt_now): Don't check for spinning
+	here.
+	(setup_handler): Check for spinning here, assuming that it is
+	transitory and should not affect the retry loop.
+
+2011-07-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* exceptions.cc (CALL_HANDLER_RETRY_INNER): Rename to reflect different
 	functionality.
 	(CALL_HANDLER_RETRY_OUTER): New define.

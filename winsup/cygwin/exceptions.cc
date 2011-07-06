@@ -777,9 +777,8 @@ _cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
 
   /* Delay the interrupt if we are
      1) somehow inside the DLL
-     2) in _sigfe (spinning is true) and about to enter cygwin DLL
-     3) in a Windows DLL.  */
-  if (incyg || spinning || inside_kernel (cx))
+     2) in a Windows DLL.  */
+  if (incyg ||inside_kernel (cx))
     interrupted = false;
   else
     {
@@ -883,8 +882,15 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
 	  if (!GetThreadContext (hth, &cx))
 	    system_printf ("couldn't get context of thread, %E");
-	  else
+	  else if (!tls->spinning)
 	    interrupted = tls->interrupt_now (&cx, sig, handler, siga);
+	  else
+	    {
+	      /* We should be out of this state very soon so force a retry
+		 without incrementing loop counter.  */
+	      i--;
+	      interrupted = false;
+	    }
 
 	  tls->unlock ();
 	  res = ResumeThread (hth);
