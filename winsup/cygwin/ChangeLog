@@ -1,3 +1,13 @@
+2011-07-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* exceptions.cc (CALL_HANDLER_RETRY_INNER): Rename to reflect different
+	functionality.
+	(CALL_HANDLER_RETRY_OUTER): New define.
+	(setup_handler): Add outer loop to signal handler to try harder to
+	deliver the signal.
+	* miscfuncs.cc (yield): Drop priority and use SleepEx() to force thread
+	rescheduling rather than relying on SwitchToThread().
+
 2011-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sigproc.cc (wait_sig): Fix debug output.

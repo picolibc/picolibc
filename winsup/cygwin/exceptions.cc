@@ -32,7 +32,8 @@ details. */
 #include "ntdll.h"
 #include "exception.h"
 
-#define CALL_HANDLER_RETRY 20
+#define CALL_HANDLER_RETRY_OUTER 10
+#define CALL_HANDLER_RETRY_INNER 10
 
 char debugger_command[2 * NT_MAX_PATH + 20];
 
@@ -848,52 +849,54 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
       goto out;
     }
 
-  for (int i = 0; i < CALL_HANDLER_RETRY; i++)
+  for (int n = 0; n < CALL_HANDLER_RETRY_OUTER; n++)
     {
-      tls->lock ();
-      if (tls->incyg)
+      for (int i = 0; i < CALL_HANDLER_RETRY_INNER; i++)
 	{
-	  sigproc_printf ("controlled interrupt. stackptr %p, stack %p, stackptr[-1] %p",
-			  tls->stackptr, tls->stack, tls->stackptr[-1]);
-	  tls->interrupt_setup (sig, handler, siga);
-	  interrupted = true;
+	  tls->lock ();
+	  if (tls->incyg)
+	    {
+	      sigproc_printf ("controlled interrupt. stackptr %p, stack %p, stackptr[-1] %p",
+			      tls->stackptr, tls->stack, tls->stackptr[-1]);
+	      tls->interrupt_setup (sig, handler, siga);
+	      interrupted = true;
+	      tls->unlock ();
+	      break;
+	    }
+
+	  DWORD res;
+	  HANDLE hth = (HANDLE) *tls;
+
+	  /* Suspend the thread which will receive the signal.
+	     If one of these conditions is not true we loop.
+	     If the thread is already suspended (which can occur when a program
+	     has called SuspendThread on itself) then just queue the signal. */
+
+	  sigproc_printf ("suspending thread");
+	  res = SuspendThread (hth);
+	  /* Just set pending if thread is already suspended */
+	  if (res)
+	    {
+	      ResumeThread (hth);
+	      goto out;
+	    }
+	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	  if (!GetThreadContext (hth, &cx))
+	    system_printf ("couldn't get context of thread, %E");
+	  else
+	    interrupted = tls->interrupt_now (&cx, sig, handler, siga);
+
 	  tls->unlock ();
-	  break;
+	  res = ResumeThread (hth);
+	  if (interrupted)
+	    goto out;
+
+	  sigproc_printf ("couldn't interrupt.  trying again.");
+	  yield ();
 	}
-
-      DWORD res;
-      HANDLE hth = (HANDLE) *tls;
-
-      /* Suspend the thread which will receive the signal.
-	 For Windows 95, we also have to ensure that the addresses returned by
-	 GetThreadContext are valid.
-	 If one of these conditions is not true we loop for a fixed number of times
-	 since we don't want to stall the signal handler.  FIXME: Will this result in
-	 noticeable delays?
-	 If the thread is already suspended (which can occur when a program has called
-	 SuspendThread on itself) then just queue the signal. */
-
-      sigproc_printf ("suspending thread");
-      res = SuspendThread (hth);
-      /* Just set pending if thread is already suspended */
-      if (res)
-	{
-	  ResumeThread (hth);
-	  break;
-	}
-      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-      if (!GetThreadContext (hth, &cx))
-	system_printf ("couldn't get context of thread, %E");
-      else
-	interrupted = tls->interrupt_now (&cx, sig, handler, siga);
-
-      tls->unlock ();
-      res = ResumeThread (hth);
-      if (interrupted)
-	break;
-
-      sigproc_printf ("couldn't interrupt.  trying again.");
-      yield ();
+      /* Hit here if we couldn't deliver the signal.  Take a more drastic
+	 action before trying again. */
+      Sleep (1);
     }
 
 out:

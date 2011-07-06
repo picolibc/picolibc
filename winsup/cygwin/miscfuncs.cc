@@ -235,11 +235,21 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
   return (ssize_t) tot;
 }
 
+/* Try hard to schedule another thread. */
 void
 yield ()
 {
-  for (int i = 0; i < 3; i++)
-    SwitchToThread ();
+  for (int i = 0; i < 2; i++)
+    {
+      int prio = GetThreadPriority (GetCurrentThread ());
+      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
+      /* MSDN implies that SleepEx(0,...) will force scheduling of other
+	 threads.  Unlike SwitchToThread() the documentation does not mention
+	 other cpus so, presumably (hah!), this + using a lower priority will
+	 stall this thread temporarily and cause another to run.  */
+      SleepEx (0, false);
+      SetThreadPriority (GetCurrentThread (), prio);
+    }
 }
 
 /* Get a default value for the nice factor.  When changing these values,
