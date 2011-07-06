@@ -1236,7 +1236,7 @@ wait_sig (VOID *)
 		    {
 #ifdef DEBUGGING2
 		      if (!sigres)
-			system_printf ("Failed to arm signal %d from pid %d", pack.sig, pack.pid);
+			system_printf ("Failed to arm signal %d from pid %d", pack.si.si_signo, pack.pid);
 #endif
 		      sigq.add (pack);	// FIXME: Shouldn't add this in !sh condition
 		    }

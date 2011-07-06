@@ -1,3 +1,7 @@
+2011-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sigproc.cc (wait_sig): Fix debug output.
+
 2011-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (fhandler_console::input_tcsetattr): Make
