@@ -483,7 +483,7 @@ sched_setscheduler (pid_t pid, int policy,
 int
 sched_yield ()
 {
-  yield ();
+  SwitchToThread ();
   return 0;
 }
 }
