@@ -357,6 +357,9 @@ struct bfd_link_info
      linker created sections, TRUE if it should be omitted.  */
   unsigned int no_ld_generated_unwind_info: 1;
 
+  /* TRUE if we are loading LTO outputs.  */
+  unsigned int loading_lto_outputs: 1;
+
   /* Non-NULL if .note.gnu.build-id section should be created.  */
   char *emit_note_gnu_build_id;
 

@@ -1,3 +1,8 @@
+2011-07-09  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/12942
+	* bfdlink.h (bfd_link_info): Add loading_lto_outputs.
+
 2011-07-01  Joel Brobecker  <brobecker@adacore.com>
 
 	* filenames.h (HAVE_CASE_INSENSITIVE_FILE_SYSTEM): Define
