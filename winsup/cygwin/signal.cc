@@ -174,7 +174,10 @@ usleep (useconds_t useconds)
 extern "C" int
 sigprocmask (int how, const sigset_t *set, sigset_t *oldset)
 {
-  return handle_sigprocmask (how, set, oldset, _my_tls.sigmask);
+  int res = handle_sigprocmask (how, set, oldset, _my_tls.sigmask);
+  if (res)
+    set_errno (res);
+  return res ? -1 : 0;
 }
 
 int __stdcall
@@ -184,13 +187,12 @@ handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& op
   if (how != SIG_BLOCK && how != SIG_UNBLOCK && how != SIG_SETMASK)
     {
       syscall_printf ("Invalid how value %d", how);
-      set_errno (EINVAL);
-      return -1;
+      return EINVAL;
     }
 
   myfault efault;
   if (efault.faulted (EFAULT))
-    return -1;
+    return EFAULT;
 
   if (oldset)
     *oldset = opmask;

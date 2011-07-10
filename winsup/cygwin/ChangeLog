@@ -1,3 +1,9 @@
+2011-07-09  Eric Blake  <eblake@redhat.com>
+
+	* signal.cc (handle_sigprocmask): Return error rather than setting
+	errno, for pthread_sigmask.
+	(sigprocmask): Adjust caller.
+
 2011-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (yield): Drop thread priority only once.
