@@ -1,3 +1,7 @@
+2011-07-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/netdb.h (gethostbyname2): Declare.
+
 2011-07-09  Eric Blake  <eblake@redhat.com>
 
 	* signal.cc (handle_sigprocmask): Return error rather than setting

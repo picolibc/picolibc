@@ -188,6 +188,7 @@ void		endservent (void);
 void		endrpcent  (void);
 struct hostent	*gethostbyaddr (const char *, int, int);
 struct hostent	*gethostbyname (const char *);
+struct hostent	*gethostbyname2 (const char *, int);
 struct hostent	*gethostent (void);
 struct netent	*getnetbyaddr (long, int); /* u_long? */
 struct netent	*getnetbyname (const char *);
