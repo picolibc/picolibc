@@ -1,3 +1,9 @@
+2011-07-11  Catherine Moore  <clm@codesourcery.com>
+
+	* bfdlink.h (flag_type): New enumeration.
+	(flag_info_list): New structure.
+	(flag_info): New structure.
+
 2011-07-09  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR ld/12942

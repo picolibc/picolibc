@@ -224,6 +224,26 @@ enum report_method
   RM_GENERATE_ERROR
 };
 
+typedef enum {with_flags, without_flags} flag_type;
+
+/* A section flag list.  */
+struct flag_info_list
+{
+  flag_type with; 
+  const char *name;
+  bfd_boolean valid;
+  struct flag_info_list *next;
+};
+
+/* Section flag info.  */
+struct flag_info
+{
+  flagword only_with_flags;
+  flagword not_with_flags;
+  struct flag_info_list *flag_list;
+  bfd_boolean flags_initialized;
+};
+
 struct bfd_elf_dynamic_list;
 
 /* This structure holds all the information needed to communicate

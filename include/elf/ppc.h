@@ -166,6 +166,10 @@ END_RELOC_NUMBERS (R_PPC_max)
 #define	EF_PPC_RELOCATABLE	0x00010000	/* PowerPC -mrelocatable flag.  */
 #define	EF_PPC_RELOCATABLE_LIB	0x00008000	/* PowerPC -mrelocatable-lib flag.  */
 
+/* This bit is reserved by BFD for processor specific stuff.  Name
+   it properly so that we can easily stay consistent elsewhere.  */
+#define SEC_PPC_VLE		SEC_TIC54X_BLOCK
+
 /* Processor specific section headers, sh_type field.  */
 
 #define SHT_ORDERED		SHT_HIPROC	/* Link editor is to sort the \
