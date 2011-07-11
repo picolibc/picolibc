@@ -959,9 +959,6 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
     {
     case TIOCGWINSZ:
     case TIOCSWINSZ:
-    case TIOCLINUX:
-    case KDGKBMETA:
-    case KDSKBMETA:
       break;
     case FIONBIO:
       set_nonblocking (*(int *) arg);
@@ -991,7 +988,6 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
 
   get_ttyp ()->cmd = cmd;
   get_ttyp ()->ioctl_retval = 0;
-  int val;
   switch (cmd)
     {
     case TIOCGWINSZ:
@@ -1007,17 +1003,6 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
 	  get_ttyp ()->winsize = *(struct winsize *) arg;
 	  killsys (-get_ttyp ()->getpgid (), SIGWINCH);
 	}
-      break;
-    case TIOCLINUX:
-      val = *(unsigned char *) arg;
-      if (val != 6)
-	get_ttyp ()->ioctl_retval = -EINVAL;
-      break;
-    case KDGKBMETA:
-      get_ttyp ()->ioctl_retval = -EINVAL;
-      break;
-    case KDSKBMETA:
-      get_ttyp ()->ioctl_retval = -EINVAL;
       break;
     }
 

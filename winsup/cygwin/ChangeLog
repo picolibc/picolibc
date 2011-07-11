@@ -1,3 +1,9 @@
+2011-07-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler_tty.cc (fhandler_pty_slave::ioctl): Remove erroneous support
+	for TIOCLINUX for pty.  Get rid of unneeded EINVAL handling in wake of
+	tty removal.  Remove now-unneeded variable.
+
 2011-07-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/netdb.h (gethostbyname2): Declare.
