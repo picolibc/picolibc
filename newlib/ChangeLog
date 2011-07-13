@@ -1,3 +1,8 @@
+2011-07-13  Hans-Peter Nilsson <hp@axis.com>
+
+	* libm/complex/cacos.c: Use temporaries and correct sequencing
+	error in previous reordering change.
+
 2011-06-25  Andreas Becker  <becker@se-elektronic.de>
 
 	* libc/time/mktime.c (mktime): Lock global timezone info while
