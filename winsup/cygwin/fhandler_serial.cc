@@ -81,7 +81,17 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	    }
 	  else if (GetLastError () != ERROR_IO_PENDING)
 	    goto err;
-	  else if (!is_nonblocking ())
+	  else if (is_nonblocking ())
+	    {
+	      PurgeComm (get_handle (), PURGE_RXABORT);
+	      if (tot == 0)
+		{
+		  tot = -1;
+		  set_errno (EAGAIN);
+		}
+	      goto out;
+	    }
+	  else
 	    {
 	      HANDLE w4[3] = { io_status.hEvent, signal_arrived,
 			       pthread::get_cancel_event () };
@@ -124,6 +134,16 @@ restart:
 	/* Got something */;
       else if (GetLastError () != ERROR_IO_PENDING)
 	goto err;
+      else if (is_nonblocking ())
+	{
+	  PurgeComm (get_handle (), PURGE_RXABORT);
+	  if (tot == 0)
+	    {
+	      tot = -1;
+	      set_errno (EAGAIN);
+	    }
+	  goto out;
+	}
       else if (!GetOverlappedResult (get_handle (), &io_status, &n, TRUE))
 	goto err;
 
