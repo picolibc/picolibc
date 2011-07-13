@@ -1,5 +1,6 @@
+#include "arm.h"
         /* Run-time exception support */
-#if !defined(__thumb2__)
+#ifndef THUMB_V7_V6M
 #include "swi.h"
 
 /* .text is used instead of .section .text so it works with arm-aout too.  */

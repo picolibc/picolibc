@@ -8,10 +8,11 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include "arm.h"
 
 static int _main(int argc, char *argv[]) __attribute__((noreturn));
 
-#if __thumb__ && !__thumb2__
+#if defined(__thumb__) && !defined(THUMB_V7_V6M)
 asm("\n"
 	".code 32\n"
 	".global _start\n"

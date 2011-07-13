@@ -1,3 +1,12 @@
+2011-07-13  Bin Cheng <bin.cheng@arm.com>
+
+	* arm/crt0.S: Support armv6-m processors in libgloss.
+	* arm/swi.h: Likewise.
+	* arm/trap.S: Likewise.
+	* arm/redboot-crt0.S: Likewise.
+	* arm/linux-crt0.c: Likewise.
+	* arm/arm.h: New.
+
 2011-07-01  Mike Frysinger  <vapier@gentoo.org>
 
 	* bfin/syscalls.c (_getpid): Call do_syscall with func argument n and
