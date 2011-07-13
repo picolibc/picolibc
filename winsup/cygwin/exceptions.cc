@@ -861,7 +861,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	      tls->interrupt_setup (sig, handler, siga);
 	      interrupted = true;
 	      tls->unlock ();
-	      break;
+	      goto out;
 	    }
 
 	  DWORD res;
