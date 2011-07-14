@@ -970,7 +970,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
       flags &= ~ENABLE_ECHO_INPUT;
     }
 
-  if (!(t->c_iflag & IGNBRK))
+  if ((t->c_lflag & ISIG) && !(t->c_iflag & IGNBRK))
     {
       flags |= ENABLE_PROCESSED_INPUT;
     }
@@ -1025,7 +1025,9 @@ fhandler_console::tcgetattr (struct termios *t)
       if (flags & ENABLE_LINE_INPUT)
 	t->c_lflag |= ICANON;
 
-      if (!(flags & ENABLE_PROCESSED_INPUT))
+      if (flags & ENABLE_PROCESSED_INPUT)
+	t->c_lflag |= ISIG;
+      else
 	t->c_iflag |= IGNBRK;
 
       /* What about ENABLE_WINDOW_INPUT

@@ -1,3 +1,10 @@
+2011-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (fhandler_console::input_tcsetattr): Revert to
+	setting ENABLE_PROCESSED_INPUT depending on ISIG and IGNBRK.
+	(fhandler_console::tcgetattr): Set ISIG depending on
+	ENABLE_PROCESSED_INPUT as well.
+
 2011-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_serial.cc (fhandler_serial::raw_read): Handle non-blocking
