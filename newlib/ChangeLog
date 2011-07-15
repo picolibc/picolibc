@@ -1,3 +1,16 @@
+2011-07-15  Matt Johnson  <johnso87@crhc.illinois.edu>
+
+	* libc/stdio/fscanf.c (fscanf): Call _vfscanf_r instead of __svfscanf_r
+	to make sure CHECK_INIT is called.
+	(_fscanf_r): Ditto.
+	* /libc/stdio/scanf.c (scanf): Ditto.
+	(_scanf_r): Ditto.
+	* libc/stdio/fwscanf.c (fwscanf): Call _vfwscanf_r instead of
+	__svfwscanf_r to make sure CHECK_INIT is called.
+	(_fwscanf_r): Ditto.
+	* libc/stdio/wscanf.c (wscanf): Ditto.
+	(_wscanf_r): Ditto.
+
 2011-07-13  Hans-Peter Nilsson <hp@axis.com>
 
 	* libm/complex/cacos.c: Use temporaries and correct sequencing

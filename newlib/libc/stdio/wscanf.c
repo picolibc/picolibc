@@ -32,7 +32,7 @@ wscanf(_CONST wchar_t *fmt, ...)
 
   _REENT_SMALL_CHECK_INIT (_REENT);
   va_start (ap, fmt);
-  ret = __svfwscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
+  ret = _vfwscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
   va_end (ap);
   return ret;
 }
@@ -47,7 +47,7 @@ _wscanf_r(struct _reent *ptr, _CONST wchar_t *fmt, ...)
 
   _REENT_SMALL_CHECK_INIT (ptr);
   va_start (ap, fmt);
-  ret = __svfwscanf_r (ptr, _stdin_r (ptr), fmt, ap);
+  ret = _vfwscanf_r (ptr, _stdin_r (ptr), fmt, ap);
   va_end (ap);
   return (ret);
 }

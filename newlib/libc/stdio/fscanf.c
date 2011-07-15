@@ -45,7 +45,7 @@ fscanf(FILE *fp, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = __svfscanf_r (_REENT, fp, fmt, ap);
+  ret = _vfscanf_r (_REENT, fp, fmt, ap);
   va_end (ap);
   return ret;
 }
@@ -71,7 +71,7 @@ _fscanf_r(ptr, FILE *fp, fmt, va_alist)
 #else
   va_start (ap);
 #endif
-  ret = __svfscanf_r (ptr, fp, fmt, ap);
+  ret = _vfscanf_r (ptr, fp, fmt, ap);
   va_end (ap);
   return (ret);
 }

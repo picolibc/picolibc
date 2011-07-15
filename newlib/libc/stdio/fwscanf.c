@@ -31,7 +31,7 @@ fwscanf (FILE *fp, _CONST wchar_t *fmt, ...)
   va_list ap;
 
   va_start (ap, fmt);
-  ret = __svfwscanf_r (_REENT, fp, fmt, ap);
+  ret = _vfwscanf_r (_REENT, fp, fmt, ap);
   va_end (ap);
   return ret;
 }
@@ -45,7 +45,7 @@ _fwscanf_r (struct _reent *ptr, FILE *fp, _CONST wchar_t *fmt, ...)
   va_list ap;
 
   va_start (ap, fmt);
-  ret = __svfwscanf_r (ptr, fp, fmt, ap);
+  ret = _vfwscanf_r (ptr, fp, fmt, ap);
   va_end (ap);
   return (ret);
 }
