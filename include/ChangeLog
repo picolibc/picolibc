@@ -1,7 +1,13 @@
+2011-07-15  Alan Modra  <amodra@gmail.com>
+
+	* bfdlink.h (struct bfd_link_info): Use ENUM_BITFIELD for strip,
+	discard, common_skip_ar_symbols, unresolved_syms_in_objects, and
+	unresolved_syms_in_shared_libs fields.  Move emit_note_gnu_build_id
+	out of bitfields.  Reorder bitfields.
+
 2011-07-13  Sriraman Tallam  <tmsriram@google.com>
-	
-	* plugin-api.h
-	(ld_plugin_section): New struct.
+
+	* plugin-api.h (ld_plugin_section): New struct.
 	(ld_plugin_get_section_count): New typedef.
 	(ld_plugin_get_section_type): New typedef.
 	(ld_plugin_get_section_name): New typedef.
