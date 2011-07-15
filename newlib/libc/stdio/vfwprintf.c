@@ -240,7 +240,7 @@ extern int _EXFUN(_ldcheck,(_LONG_DOUBLE *));
 # endif /* !_NO_LONGDBL */
 
 static wchar_t *wcvt(struct _reent *, _PRINTF_FLOAT_TYPE, int, int, wchar_t *,
-		    int *, int, int *, wchar_t *);
+		    int *, int, int *, wchar_t *, int);
 
 static int wexponent(wchar_t *, int, int);
 
@@ -996,7 +996,23 @@ reswitch:	switch (ch) {
 			flags |= FPT;
 
 			cp = wcvt (data, _fpvalue, prec, flags, &softsign,
-				   &expt, ch, &ndig, cp);
+				   &expt, ch, &ndig, cp, BUF);
+
+			/* If buf is not large enough for the converted wchar_t
+			   sequence, call wcvt again with a malloced new buffer.
+			   This should happen fairly rarely.
+			 */
+			if (cp == buf && ndig > BUF && malloc_buf == NULL) {
+				if ((malloc_buf =
+				    (wchar_t *)_malloc_r (data, ndig * sizeof (wchar_t)))
+				    == NULL)
+				  {
+				    fp->_flags |= __SERR;
+				    goto error;
+				  }
+				cp = wcvt (data, _fpvalue, prec, flags, &softsign,
+					   &expt, ch, &ndig, malloc_buf, ndig);
+			}
 
 			if (ch == L'g' || ch == L'G') {
 				if (expt <= -4 || expt > prec)
@@ -1450,11 +1466,15 @@ error:
    to whether trailing zeros must be included.  Set *SIGN to nonzero
    if VALUE was negative.  Set *DECPT to the exponent plus one.  Set
    *LENGTH to the length of the returned string.  CH must be one of
-   [aAeEfFgG]; if it is [aA], then the return string lives in BUF,
-   otherwise the return value shares the mprec reentrant storage.  */
+   [aAeEfFgG]; different from vfprintf.c:cvt(), the return string
+   lives in BUF regardless of CH.  LEN is the length of BUF, except
+   when CH is [aA], in which case LEN is not in use.  If BUF is not
+   large enough for the converted string, only the first LEN number
+   of characters will be returned in BUF, but *LENGTH will be set to
+   the full length of the string before the truncation.  */
 static wchar_t *
 wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
-     wchar_t *sign, int *decpt, int ch, int *length, wchar_t *buf)
+     wchar_t *sign, int *decpt, int ch, int *length, wchar_t *buf, int len)
 {
 	int mode, dsgn;
 # ifdef _NO_LONGDBL
@@ -1548,12 +1568,13 @@ wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		while (rve < bp)
 			*rve++ = '0';
 	  }
+
+	  *length = rve - digits; /* full length of the string */
 #ifdef _MB_CAPABLE
-	  *length = _mbsnrtowcs_r (data, buf, (const char **) &digits,
-				   rve - digits, BUF, NULL);
+	  _mbsnrtowcs_r (data, buf, (const char **) &digits, *length,
+			 len, NULL);
 #else
-	  *length = rve - digits;
-	  for (i = 0; i < *length && i < BUF; ++i)
+	  for (i = 0; i < *length && i < len; ++i)
 	    buf[i] = (wchar_t) digits[i];
 #endif
 	  return buf;

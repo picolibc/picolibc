@@ -1,3 +1,16 @@
+2011-07-15  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* libc/stdio/vfwprintf.c (wcvt): Add a new parameter len of type
+	int.  *length is set to the value of (rev - digits) regardless
+	of whether _MB_CAPABLE is defined or not.  Replace BUF with len
+	in calling _mbsnrtowcs_r and also in the loop where _MB_CAPABLE
+	is not defined.
+	(_VFWPRINTF_R): Call wcvt with an extra argument.  Call wcvt
+	again with allocated new buffer if buf is not large enough for
+	the conversion.
+	* testsuite/newlib.stdio/stdio.exp: New.
+	* testsuite/newlib.stdio/swprintf.c: Likewise.
+
 2011-07-15  Matt Johnson  <johnso87@crhc.illinois.edu>
 
 	* libc/stdio/fscanf.c (fscanf): Call _vfscanf_r instead of __svfscanf_r
