@@ -1,6 +1,6 @@
 2011-07-15  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
-	* cygwinenv.sgml (using-cygwinenv): Clarify "glob" works.
+	* cygwinenv.sgml (using-cygwinenv): Clarify how "glob" works.
 
 2011-06-15  Corinna Vinschen  <corinna@vinschen.de>
 
