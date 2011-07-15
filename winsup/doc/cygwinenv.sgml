@@ -37,10 +37,12 @@ There is no default set.
 
 <listitem>
 <para><envar>(no)glob[:ignorecase]</envar> - if set, command line arguments
-containing UNIX-style file wildcard characters (brackets, question mark,
+containing UNIX-style file wildcard characters (brackets, braces, question mark,
 asterisk, escaped with \) are expanded into lists of files that match 
 those wildcards.
-This is applicable only to programs running from a DOS command line prompt.
+This is applicable only to programs run from non-Cygwin programs such as a CMD prompt.
+That means that this setting does not affect globbing operations for shells such as
+bash, sh, tcsh, zsh, etc.
 Default is set.</para>
 <para>This option also accepts an optional <literal>[no]ignorecase</literal> modifer.
 If supplied, wildcard matching is case insensitive.  The default is <literal>noignorecase</literal></para>

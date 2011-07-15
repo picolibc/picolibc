@@ -1,3 +1,7 @@
+2011-07-15  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* cygwinenv.sgml (using-cygwinenv): Clarify "glob" works.
+
 2011-06-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml (using-cygwinenv): Move envcache, strip_title, title,
