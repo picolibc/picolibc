@@ -26,6 +26,14 @@ details. */
 #undef CHAR_BIT
 #define CHAR_BIT 8
 
+/* Number of bits in a `long'.  */
+#undef LONG_BIT
+#define LONG_BIT 32
+
+/* Number of bits in a `int'.  */
+#undef WORD_BIT
+#define WORD_BIT 32
+
 /* Maximum length of a multibyte character.  */
 #ifndef MB_LEN_MAX
 /* TODO: This is newlib's max value.  We should probably rather define our

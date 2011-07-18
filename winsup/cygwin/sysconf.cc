@@ -219,10 +219,13 @@ static struct
   {cons, {c:_POSIX2_SW_DEV}},		/* 119, _SC_2_SW_DEV */
   {cons, {c:_POSIX2_UPE}},		/* 120, _SC_2_UPE */
   {cons, {c:_POSIX2_VERSION}},		/* 121, _SC_2_VERSION */
+  {cons, {c:-1L}},			/* 122, _SC_THREAD_ROBUST_PRIO_INHERIT */
+  {cons, {c:-1L}},			/* 123, _SC_THREAD_ROBUST_PRIO_PROTECT */
+  {cons, {c:-1L}},			/* 124, _SC_XOPEN_UUCP */
 };
 
 #define SC_MIN _SC_ARG_MAX
-#define SC_MAX _SC_2_VERSION
+#define SC_MAX _SC_XOPEN_UUCP
 
 /* sysconf: POSIX 4.8.1.1 */
 /* Allows a portable app to determine quantities of resources or
@@ -259,7 +262,7 @@ static struct
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_CFLAGS */
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LDFLAGS */
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LIBS */
-  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LINTFLAGS */
+  {0, NULL},				/* _CS_XBS5_ILP32_OFF32_LINTFLAGS */
   {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS */
   {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS */
   {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_LIBS */
@@ -273,10 +276,13 @@ static struct
   {0, NULL},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LIBS */
   {0, NULL},				/* _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS */
   {ls ("POSIX_V6_ILP32_OFFBIG")},	/* _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS */
+  {ls ("")},				/* _CS_POSIX_V7_THREADS_CFLAGS */
+  {ls ("")},				/* _CS_POSIX_V7_THREADS_LDFLAGS */
+  {ls ("POSIXLY_CORRECT=1")},		/* _CS_V7_ENV */
 };
 
 #define CS_MIN _CS_PATH
-#define CS_MAX _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS
+#define CS_MAX _CS_V7_ENV
 
 extern "C" size_t
 confstr (int in, char *buf, size_t len)

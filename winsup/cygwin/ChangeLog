@@ -1,3 +1,14 @@
+2011-07-18  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* sysconf.cc (sca): Return -1 for _SC_THREAD_ROBUST_PRIO_INHERIT,
+	_SC_THREAD_ROBUST_PRIO_PROTECT, and _SC_XOPEN_UUCP.
+	(SC_MAX): Redefine accordingly.
+	(csa): Return strings for _CS_POSIX_V7_THREADS_CFLAGS,
+	_CS_POSIX_V7_THREADS_LDFLAGS, and _CS_V7_ENV.
+	(CS_MAX): Redefine accordingly.
+	* include/limits.h (LONG_BIT): Define.
+	(WORD_BIT): Define.
+
 2011-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* heap.cc (heap_init): Change type of largest_found to PVOID.  Start
