@@ -1,3 +1,9 @@
+2011-07-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* heap.cc (heap_init): Change type of largest_found to PVOID.  Start
+	querying memory at 0x20000000.  Use largest_found pointer when trying
+	to allocate largest free memory area found.
+
 2011-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (fhandler_console::input_tcsetattr): Revert to

@@ -43,7 +43,7 @@ heap_init ()
 	 This should work right from the start in 99% of the cases.  But,
 	 there's always a but.  Read on... */
       uintptr_t start_address = 0x20000000L;
-      uintptr_t largest_found = 0;
+      PVOID largest_found = NULL;
       size_t largest_found_size = 0;
       SIZE_T ret;
       MEMORY_BASIC_INFORMATION mbi;
@@ -60,8 +60,8 @@ heap_init ()
 	  /* Ok, so we are at the 1% which didn't work with 0x20000000 out
 	     of the box.  What we do now is to search for the next free
 	     region which matches our desired heap size.  While doing that,
-	     we keep track of the largest region we found. */
-	  start_address += wincap.allocation_granularity ();
+	     we keep track of the largest region we found, including the
+	     region starting at 0x20000000. */
 	  while ((ret = VirtualQuery ((LPCVOID) start_address, &mbi,
 				      sizeof mbi)) != 0)
 	    {
@@ -71,7 +71,7 @@ heap_init ()
 		    break;
 		  if (mbi.RegionSize > largest_found_size)
 		    {
-		      largest_found = (uintptr_t) mbi.BaseAddress;
+		      largest_found = mbi.BaseAddress;
 		      largest_found_size = mbi.RegionSize;
 		    }
 		}
@@ -91,8 +91,7 @@ heap_init ()
 		{
 		  cygheap->user_heap.chunk = largest_found_size;
 		  cygheap->user_heap.base =
-			VirtualAlloc ((LPVOID) start_address,
-				      cygheap->user_heap.chunk,
+			VirtualAlloc (largest_found, cygheap->user_heap.chunk,
 				      alloctype, PAGE_NOACCESS);
 		}
 	      /* Last resort (but actually we are probably broken anyway):
