@@ -1,3 +1,8 @@
+2011-07-19  Ralf Corsépius <ralf.corsepius@rtems.org>
+
+	* libc/locale/lmessages.c (_C_messages_locale):
+	Move __HAVE_LOCALE_INFO_EXTENDED__ before codeset.
+
 2011-07-19  Matt Johnson  <johnso87@crhc.illinois.edu>
 
 	* libc/reent/sbrkr.c: Define _sbrk_r independently of the definition
