@@ -1,3 +1,8 @@
+2011-07-19  Matt Johnson  <johnso87@crhc.illinois.edu>
+
+	* libc/reent/sbrkr.c: Define _sbrk_r independently of the definition
+	of MALLOC_PROVIDED.
+
 2011-07-15  Yufeng Zhang  <yufeng.zhang@arm.com>
 
 	* libc/stdio/vfwprintf.c (wcvt): Add a new parameter len of type

@@ -13,9 +13,7 @@
 #endif
 #endif
 
-/* If MALLOC_PROVIDED is defined, we don't need this function.  */
-
-#if defined (REENTRANT_SYSCALLS_PROVIDED) || defined (MALLOC_PROVIDED)
+#if defined (REENTRANT_SYSCALLS_PROVIDED)
 
 int _dummy_sbrk_syscalls = 1;
 
