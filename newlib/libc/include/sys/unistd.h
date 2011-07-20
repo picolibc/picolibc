@@ -487,10 +487,11 @@ int	_EXFUN(unlinkat, (int, const char *, int));
 #define _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS       16
 #define _CS_POSIX_V7_WIDTH_RESTRICTED_ENVS    17
 #define _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS    _CS_POSIX_V7_WIDTH_RESTRICTED_ENVS
+#define _CS_XBS5_WIDTH_RESTRICTED_ENVS        _CS_POSIX_V7_WIDTH_RESTRICTED_ENVS
 #define _CS_POSIX_V7_THREADS_CFLAGS           18
 #define _CS_POSIX_V7_THREADS_LDFLAGS          19
 #define _CS_V7_ENV                            20
-#define _CS_V6_ENV                           _CS_V6_ENV
+#define _CS_V6_ENV                            _CS_V7_ENV
 #endif
 
 #ifndef __CYGWIN__

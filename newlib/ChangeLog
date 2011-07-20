@@ -1,3 +1,8 @@
+2011-07-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/sys/unistd.h (_CS_XBS5_WIDTH_RESTRICTED_ENVS): Define.
+	(_CS_V6_ENV): Fix definition.
+
 2011-07-19  Ralf Corsépius <ralf.corsepius@rtems.org>
 
 	* libc/locale/lmessages.c (_C_messages_locale):
