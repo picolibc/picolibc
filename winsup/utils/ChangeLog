@@ -1,3 +1,8 @@
+2011-07-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* Makefile.in (CYGWIN_BINS): Add getconf.
+	(getconf.c): New file.
+
 2011-06-14  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* mingw: Force use of bash.
