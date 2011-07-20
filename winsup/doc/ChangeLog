@@ -1,3 +1,7 @@
+2011-07-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* new-features.sgml (ov-new1.7.10): Document getconf(1).
+
 2011-07-15  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* cygwinenv.sgml (using-cygwinenv): Clarify how "glob" works.

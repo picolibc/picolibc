@@ -20,6 +20,11 @@ as is, or use a terminal application like <command>mintty</command>.
 </para></listitem>
 
 <listitem><para>
+New <command>getconf</command> command for querying confstr(3), pathconf(3),
+sysconf(3), and limits.h configuration.
+</para></listitem>
+
+<listitem><para>
 The passwd command now allows an administrator to use the -R command for
 other user accounts:  passwd -R username.
 </para></listitem>
