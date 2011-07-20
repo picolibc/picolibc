@@ -102,7 +102,7 @@ extern "C" {
 /* #define _POSIX_ASYNCHRONOUS_IO		    -1 */
 /* #define _POSIX_BARRIERS			    -1 */
 #define _POSIX_CHOWN_RESTRICTED			     1
-/* #define _POSIX_CLOCK_SELECTION		    -1 */
+#define _POSIX_CLOCK_SELECTION			200112L
 #define _POSIX_CPUTIME			    	200112L
 #define _POSIX_FSYNC				200112L
 #define _POSIX_IPV6				200112L

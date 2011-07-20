@@ -175,6 +175,22 @@ int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
 #endif
 #endif /* _POSIX_TIMERS */
 
+#if defined(_POSIX_CLOCK_SELECTION)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int _EXFUN(clock_nanosleep,
+  (clockid_t clock_id, int flags, const struct timespec *rqtp,
+   struct timespec *rmtp));
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _POSIX_CLOCK_SELECTION */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

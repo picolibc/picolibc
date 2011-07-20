@@ -1,3 +1,10 @@
+2011-07-20  Yaakov Selkowitz  <yselkowitz@...>
+
+	* libc/include/time.h [_POSIX_CLOCK_SELECTION] (clock_nanosleep):
+	Declare.
+	* libc/include/sys/features.h [__CYGWIN__] (_POSIX_CLOCK_SELECTION):
+	Define.
+
 2011-07-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/sys/unistd.h (_CS_XBS5_WIDTH_RESTRICTED_ENVS): Define.
