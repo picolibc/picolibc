@@ -1,5 +1,11 @@
 2011-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* heap.cc (eval_start_address): Simplify test for large address
+	awareness of executable, which works for 32 and 64 bit systems.
+	Change comment accordingly.
+
+2011-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* heap.cc (eval_start_address): New static function to evaluate the
 	best start address for the application heap.
 	(heap_init): Call eval_start_address to fetch the start value for

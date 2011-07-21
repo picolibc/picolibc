@@ -17,6 +17,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "child_info.h"
+#include "ntdll.h"
 #include <sys/param.h>
 
 #define assert(x)
@@ -34,21 +35,23 @@ eval_start_address ()
      safe region starting at 0x20000000.  This should work right from the start
      in 99% of the cases. */
   uintptr_t start_address = 0x20000000L;
-  if (wincap.is_wow64 ())
+  if ((uintptr_t) NtCurrentTeb () >= 0xbf000000L)
     {
-      /* However, if we're running on a 64 bit system, we test here if the
-	 executable is large address aware.  If so, the application gets a
-	 4 Gigs virtual address space, with almost all of the upper 2 Gigs
-	 being unused by Windows (only PEB and TEBs are allocated here,
-	 apparently).  So what we do here is to test if the large address
-	 awareness flag is set in the file header and, if so, allocate our
-	 heap in that region.  What we get are 1.999 Gigs free for heap,
-	 thread stacks, and shared memory regions. */
-      PIMAGE_DOS_HEADER idh = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
-      PIMAGE_NT_HEADERS32 inh = (PIMAGE_NT_HEADERS32)
-				((PBYTE) idh + idh->e_lfanew);
-      if (inh->FileHeader.Characteristics & IMAGE_FILE_LARGE_ADDRESS_AWARE)
-	start_address = 0x80000000L;
+      /* However, if we're running on a /3GB enabled 32 bit system or on
+	 a 64 bit system, and the executable is large address aware, then
+	 we know that we have spare 1 Gig (32 bit) or even 2 Gigs (64 bit)
+	 virtual address space.  This memory region is practically unused
+	 by Windows, only PEB and TEBs are allocated top-down here.  We use
+	 the current TEB address as very simple test that this is a large
+	 address aware executable.
+	 The above test for an address beyond 0xbf000000 is supposed to
+	 make sure that we really have 3GB on a 32 bit system.  XP and
+	 later support smaller large address regions, but then it's not
+	 that interesting for us to use it for the heap.
+	 If the region is big enough, the heap gets allocated at its
+	 start.  What we get are 0.999 or 1.999 Gigs of free contiguous
+	 memory for heap, thread stacks, and shared memory regions. */
+      start_address = 0x80000000L;
     }
   return start_address;
 }
