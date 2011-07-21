@@ -1209,8 +1209,10 @@ pthread_cond_signal SIGFE
 pthread_cond_timedwait SIGFE
 pthread_cond_wait SIGFE
 pthread_condattr_destroy SIGFE
+pthread_condattr_getclock SIGFE
 pthread_condattr_getpshared SIGFE
 pthread_condattr_init SIGFE
+pthread_condattr_setclock SIGFE
 pthread_condattr_setpshared SIGFE
 pthread_continue SIGFE
 pthread_create SIGFE

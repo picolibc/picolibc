@@ -1099,7 +1099,8 @@ pthread_attr::~pthread_attr ()
 }
 
 pthread_condattr::pthread_condattr ():verifyable_object
-  (PTHREAD_CONDATTR_MAGIC), shared (PTHREAD_PROCESS_PRIVATE)
+  (PTHREAD_CONDATTR_MAGIC), shared (PTHREAD_PROCESS_PRIVATE),
+  clock_id (CLOCK_REALTIME)
 {
 }
 
@@ -1124,17 +1125,21 @@ pthread_cond::init_mutex ()
 
 pthread_cond::pthread_cond (pthread_condattr *attr) :
   verifyable_object (PTHREAD_COND_MAGIC),
-  shared (0), waiting (0), pending (0), sem_wait (NULL),
-  mtx_cond(NULL), next (NULL)
+  shared (0), clock_id (CLOCK_REALTIME), waiting (0), pending (0),
+  sem_wait (NULL), mtx_cond(NULL), next (NULL)
 {
   pthread_mutex *verifyable_mutex_obj;
 
   if (attr)
-    if (attr->shared != PTHREAD_PROCESS_PRIVATE)
-      {
-	magic = 0;
-	return;
-      }
+    {
+      clock_id = attr->clock_id;
+
+      if (attr->shared != PTHREAD_PROCESS_PRIVATE)
+	{
+	  magic = 0;
+	  return;
+	}
+    }
 
   verifyable_mutex_obj = &mtx_in;
   if (!pthread_mutex::is_good_object (&verifyable_mutex_obj))
@@ -2716,7 +2721,7 @@ extern "C" int
 pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 			const struct timespec *abstime)
 {
-  struct timeval tv;
+  struct timespec tp;
   DWORD waitlength;
 
   myfault efault;
@@ -2731,17 +2736,18 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
       || abstime->tv_nsec > 999999999)
     return EINVAL;
 
-  gettimeofday (&tv, NULL);
+  clock_gettime ((*cond)->clock_id, &tp);
+
   /* Check for immediate timeout before converting to microseconds, since
      the resulting value can easily overflow long.  This also allows to
      evaluate microseconds directly in DWORD. */
-  if (tv.tv_sec > abstime->tv_sec
-      || (tv.tv_sec == abstime->tv_sec
-	  && tv.tv_usec > abstime->tv_nsec / 1000))
+  if (tp.tv_sec > abstime->tv_sec
+      || (tp.tv_sec == abstime->tv_sec
+	  && tp.tv_nsec > abstime->tv_nsec))
     return ETIMEDOUT;
 
-  waitlength = (abstime->tv_sec - tv.tv_sec) * 1000;
-  waitlength += (abstime->tv_nsec / 1000 - tv.tv_usec) / 1000;
+  waitlength = (abstime->tv_sec - tp.tv_sec) * 1000;
+  waitlength += (abstime->tv_nsec - tp.tv_nsec) / 1000000;
   return __pthread_cond_dowait (cond, mutex, waitlength);
 }
 
@@ -2789,6 +2795,32 @@ pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
   if (pshared != PTHREAD_PROCESS_PRIVATE)
     return EINVAL;
   (*attr)->shared = pshared;
+  return 0;
+}
+
+extern "C" int
+pthread_condattr_getclock (const pthread_condattr_t *attr, clockid_t *clock_id)
+{
+  if (!pthread_condattr::is_good_object (attr))
+    return EINVAL;
+  *clock_id = (*attr)->clock_id;
+  return 0;
+}
+
+extern "C" int
+pthread_condattr_setclock (pthread_condattr_t *attr, clockid_t clock_id)
+{
+  if (!pthread_condattr::is_good_object (attr))
+    return EINVAL;
+  switch (clock_id)
+    {
+    case CLOCK_REALTIME:
+    case CLOCK_MONOTONIC:
+      break;
+    default:
+      return EINVAL;
+    }
+  (*attr)->clock_id = clock_id;
   return 0;
 }
 

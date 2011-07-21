@@ -488,6 +488,7 @@ class pthread_condattr: public verifyable_object
 public:
   static bool is_good_object(pthread_condattr_t const *);
   int shared;
+  clockid_t clock_id;
 
   pthread_condattr ();
   ~pthread_condattr ();
@@ -504,6 +505,7 @@ public:
   static int init (pthread_cond_t *, const pthread_condattr_t *);
 
   int shared;
+  clockid_t clock_id;
 
   unsigned long waiting;
   unsigned long pending;

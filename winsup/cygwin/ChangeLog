@@ -1,3 +1,24 @@
+2011-07-21  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (pthread_condattr_getclock): Export.
+	(pthread_condattr_setclock): Export.
+	* posix.sgml (std-notimpl): Move pthread_condattr_getclock and
+	pthread_condattr_setclock from here...
+	(std-susv4): ... to here.
+	* sysconf.cc (sca): Set _SC_CLOCK_SELECTION to _POSIX_CLOCK_SELECTION.
+	* thread.cc: (pthread_condattr::pthread_condattr): Initialize clock_id.
+	(pthread_cond::pthread_cond): Initialize clock_id.
+	(pthread_cond_timedwait): Use clock_gettime() instead of gettimeofday()
+	in order to support all allowed clocks.
+	(pthread_condattr_getclock): New function.
+	(pthread_condattr_setclock): New function.
+	* thread.h (class pthread_condattr): Add clock_id member.
+	(class pthread_cond): Ditto.
+	* include/pthread.h: Remove obsolete comment.
+	(pthread_condattr_getclock): Declare.
+	(pthread_condattr_setclock): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2011-07-18  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* sysconf.cc (sca): Return -1 for _SC_THREAD_ROBUST_PRIO_INHERIT,

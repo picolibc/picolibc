@@ -158,7 +158,7 @@ static struct
   {cons, {c:BC_DIM_MAX}},		/*  58, _SC_BC_DIM_MAX */
   {cons, {c:BC_SCALE_MAX}},		/*  59, _SC_BC_SCALE_MAX */
   {cons, {c:BC_STRING_MAX}},		/*  60, _SC_BC_STRING_MAX */
-  {cons, {c:-1L}},			/*  61, _SC_CLOCK_SELECTION */
+  {cons, {c:_POSIX_CLOCK_SELECTION}},	/*  61, _SC_CLOCK_SELECTION */
   {nsup, {c:0}},			/*  62, _SC_COLL_WEIGHTS_MAX */
   {cons, {c:_POSIX_CPUTIME}},		/*  63, _SC_CPUTIME */
   {cons, {c:EXPR_NEST_MAX}},		/*  64, _SC_EXPR_NEST_MAX */

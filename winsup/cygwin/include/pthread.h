@@ -27,12 +27,6 @@ extern "C"
 /* Defines. (These are correctly defined here as per
    http://www.opengroup.org/onlinepubs/7908799/xsh/pthread.h.html */
 
-/* FIXME: this should allocate a new cond variable, and return the value  that
- would normally be written to the passed parameter of pthread_cond_init(lvalue, NULL); */
-/* #define PTHREAD_COND_INITIALIZER 0 */
-
-/* the default : joinable */
-
 #define PTHREAD_CANCEL_ASYNCHRONOUS 1
 /* defaults are enable, deferred */
 #define PTHREAD_CANCEL_ENABLE 0
@@ -132,8 +126,10 @@ int pthread_cond_timedwait (pthread_cond_t *,
 			    pthread_mutex_t *, const struct timespec *);
 int pthread_cond_wait (pthread_cond_t *, pthread_mutex_t *);
 int pthread_condattr_destroy (pthread_condattr_t *);
+int pthread_condattr_getclock (const pthread_condattr_t *, clockid_t *);
 int pthread_condattr_getpshared (const pthread_condattr_t *, int *);
 int pthread_condattr_init (pthread_condattr_t *);
+int pthread_condattr_setclock (pthread_condattr_t *, clockid_t);
 int pthread_condattr_setpshared (pthread_condattr_t *, int);
 
 int pthread_create (pthread_t *, const pthread_attr_t *,
