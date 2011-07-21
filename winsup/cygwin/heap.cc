@@ -25,6 +25,34 @@ static unsigned page_const;
 
 #define MINHEAP_SIZE (4 * 1024 * 1024)
 
+static uintptr_t
+eval_start_address ()
+{
+  /* Starting with Vista, Windows performs heap ASLR.  This spoils the entire
+     region below 0x20000000 for us, because that region is used by Windows
+     to randomize heap and stack addresses.  Therefore we put our heap into a
+     safe region starting at 0x20000000.  This should work right from the start
+     in 99% of the cases. */
+  uintptr_t start_address = 0x20000000L;
+  if (wincap.is_wow64 ())
+    {
+      /* However, if we're running on a 64 bit system, we test here if the
+	 executable is large address aware.  If so, the application gets a
+	 4 Gigs virtual address space, with almost all of the upper 2 Gigs
+	 being unused by Windows (only PEB and TEBs are allocated here,
+	 apparently).  So what we do here is to test if the large address
+	 awareness flag is set in the file header and, if so, allocate our
+	 heap in that region.  What we get are 1.999 Gigs free for heap,
+	 thread stacks, and shared memory regions. */
+      PIMAGE_DOS_HEADER idh = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
+      PIMAGE_NT_HEADERS32 inh = (PIMAGE_NT_HEADERS32)
+				((PBYTE) idh + idh->e_lfanew);
+      if (inh->FileHeader.Characteristics & IMAGE_FILE_LARGE_ADDRESS_AWARE)
+	start_address = 0x80000000L;
+    }
+  return start_address;
+}
+
 /* Initialize the heap at process start up.  */
 void
 heap_init ()
@@ -36,13 +64,7 @@ heap_init ()
   page_const = wincap.page_size ();
   if (!cygheap->user_heap.base)
     {
-      /* Starting with Vista, Windows performs heap ASLR.  This spoils
-	 the entire region below 0x20000000 for us, because that region
-	 is used by Windows to randomize heap and stack addresses.
-	 Therefore we put our heap into a safe region starting at 0x20000000.
-	 This should work right from the start in 99% of the cases.  But,
-	 there's always a but.  Read on... */
-      uintptr_t start_address = 0x20000000L;
+      uintptr_t start_address = eval_start_address ();
       PVOID largest_found = NULL;
       size_t largest_found_size = 0;
       SIZE_T ret;

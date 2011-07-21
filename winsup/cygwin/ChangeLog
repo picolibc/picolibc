@@ -1,3 +1,10 @@
+2011-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* heap.cc (eval_start_address): New static function to evaluate the
+	best start address for the application heap.
+	(heap_init): Call eval_start_address to fetch the start value for
+	start_address.  Move preceeding comment to eval_start_address.
+
 2011-07-21  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin.din (pthread_condattr_getclock): Export.
