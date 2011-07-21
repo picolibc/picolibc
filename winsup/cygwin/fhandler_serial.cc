@@ -17,6 +17,7 @@ details. */
 #include "fhandler.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include <asm/socket.h>
 #include <ddk/ntddser.h>
 
 /**********************************************************************/
@@ -454,12 +455,12 @@ fhandler_serial::switch_modem_lines (int set, int clr)
 
 /* ioctl: */
 int
-fhandler_serial::ioctl (unsigned int cmd, void *buffer)
+fhandler_serial::ioctl (unsigned int cmd, void *buf)
 {
   int res = 0;
 
-# define ibuffer ((int) buffer)
-# define ipbuffer (*(int *) buffer)
+# define ibuf ((int) buf)
+# define ipbuf (*(int *) buf)
 
   DWORD ev;
   COMSTAT st;
@@ -472,7 +473,7 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
     switch (cmd)
       {
       case TCFLSH:
-	res = tcflush (ibuffer);
+	res = tcflush (ibuf);
 	break;
       case TIOCMGET:
 	DWORD modem_lines;
@@ -483,40 +484,40 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 	  }
 	else
 	  {
-	    ipbuffer = 0;
+	    ipbuf = 0;
 	    if (modem_lines & MS_CTS_ON)
-	      ipbuffer |= TIOCM_CTS;
+	      ipbuf |= TIOCM_CTS;
 	    if (modem_lines & MS_DSR_ON)
-	      ipbuffer |= TIOCM_DSR;
+	      ipbuf |= TIOCM_DSR;
 	    if (modem_lines & MS_RING_ON)
-	      ipbuffer |= TIOCM_RI;
+	      ipbuf |= TIOCM_RI;
 	    if (modem_lines & MS_RLSD_ON)
-	      ipbuffer |= TIOCM_CD;
+	      ipbuf |= TIOCM_CD;
 
 	    DWORD cb;
 	    DWORD mcr;
 	    if (!DeviceIoControl (get_handle (), IOCTL_SERIAL_GET_DTRRTS,
 				  NULL, 0, &mcr, 4, &cb, 0) || cb != 4)
-	      ipbuffer |= rts | dtr;
+	      ipbuf |= rts | dtr;
 	    else
 	      {
 		if (mcr & 2)
-		  ipbuffer |= TIOCM_RTS;
+		  ipbuf |= TIOCM_RTS;
 		if (mcr & 1)
-		  ipbuffer |= TIOCM_DTR;
+		  ipbuf |= TIOCM_DTR;
 	      }
 	  }
 	break;
       case TIOCMSET:
-	if (switch_modem_lines (ipbuffer, ~ipbuffer))
+	if (switch_modem_lines (ipbuf, ~ipbuf))
 	  res = -1;
 	break;
       case TIOCMBIS:
-	if (switch_modem_lines (ipbuffer, 0))
+	if (switch_modem_lines (ipbuf, 0))
 	  res = -1;
 	break;
       case TIOCMBIC:
-	if (switch_modem_lines (0, ipbuffer))
+	if (switch_modem_lines (0, ipbuf))
 	  res = -1;
 	break;
       case TIOCCBRK:
@@ -541,21 +542,24 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 	   res = -1;
 	 }
        else
-	 ipbuffer = st.cbInQue;
+	 ipbuf = st.cbInQue;
        break;
      case TIOCGWINSZ:
-       ((struct winsize *) buffer)->ws_row = 0;
-       ((struct winsize *) buffer)->ws_col = 0;
+       ((struct winsize *) buf)->ws_row = 0;
+       ((struct winsize *) buf)->ws_col = 0;
+       break;
+     case FIONREAD:
+       set_errno (ENOTSUP);
+       res = -1;
        break;
      default:
-       set_errno (ENOSYS);
-       res = -1;
+       res = fhandler_base::ioctl (cmd, buf);
        break;
      }
 
-  termios_printf ("%d = ioctl (%p, %p)", res, cmd, buffer);
-# undef ibuffer
-# undef ipbuffer
+  termios_printf ("%d = ioctl (%p, %p)", res, cmd, buf);
+# undef ibuf
+# undef ipbuf
   return res;
 }
 

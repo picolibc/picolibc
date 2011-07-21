@@ -155,8 +155,7 @@ fhandler_windows::ioctl (unsigned int cmd, void *val)
       hWnd_ = * ((HWND *) val);
       break;
     default:
-      set_errno (EINVAL);
-      return -1;
+      return fhandler_base::ioctl (cmd, val);
     }
   return 0;
 }

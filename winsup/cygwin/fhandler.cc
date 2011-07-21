@@ -28,6 +28,7 @@ details. */
 #include "ntdll.h"
 #include "cygtls.h"
 #include "sigproc.h"
+#include <asm/socket.h>
 
 #define MAX_OVERLAPPED_WRITE_LEN (64 * 1024 * 1024)
 #define MIN_OVERLAPPED_WRITE_LEN (1 * 1024 * 1024)
@@ -1150,6 +1151,10 @@ fhandler_base::ioctl (unsigned int cmd, void *buf)
     case FIONBIO:
       set_nonblocking (*(int *) buf);
       res = 0;
+      break;
+    case FIONREAD:
+      set_errno (ENOTTY);
+      res = -1;
       break;
     default:
       set_errno (EINVAL);

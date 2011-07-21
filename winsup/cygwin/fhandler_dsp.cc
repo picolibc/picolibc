@@ -1170,11 +1170,11 @@ fhandler_dev_dsp::close ()
 }
 
 int
-fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
+fhandler_dev_dsp::ioctl (unsigned int cmd, void *buf)
 {
   debug_printf ("audio_in=%08x audio_out=%08x",
 		(int)audio_in_, (int)audio_out_);
-  int *intptr = (int *) ptr;
+  int *intbuf = (int *) buf;
   switch (cmd)
     {
 #define CASE(a) case a : debug_printf ("/dev/dsp: ioctl %s", #a);
@@ -1189,13 +1189,13 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	/* This is valid even if audio_X is NULL */
 	if (IS_WRITE ())
 	  {
-	    *intptr = audio_out_->blockSize (audiofreq_,
+	    *intbuf = audio_out_->blockSize (audiofreq_,
 					     audiobits_,
 					     audiochannels_);
 	  }
 	else
 	  { // I am very sure that IS_READ is valid
-	    *intptr = audio_in_->blockSize (audiofreq_,
+	    *intbuf = audio_in_->blockSize (audiofreq_,
 					    audiobits_,
 					    audiochannels_);
 	  }
@@ -1204,10 +1204,10 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
       CASE (SNDCTL_DSP_SETFMT)
       {
 	int nBits;
-	switch (*intptr)
+	switch (*intbuf)
 	  {
 	  case AFMT_QUERY:
-	    *intptr = audioformat_;
+	    *intbuf = audioformat_;
 	    return 0;
 	    break;
 	  case AFMT_U16_BE:
@@ -1229,11 +1229,11 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	    if (audio_out_->query (audiofreq_, nBits, audiochannels_))
 	      {
 		audiobits_ = nBits;
-		audioformat_ = *intptr;
+		audioformat_ = *intbuf;
 	      }
 	    else
 	      {
-		*intptr = audiobits_;
+		*intbuf = audiobits_;
 		return -1;
 	      }
 	  }
@@ -1243,11 +1243,11 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	    if (audio_in_->query (audiofreq_, nBits, audiochannels_))
 	      {
 		audiobits_ = nBits;
-		audioformat_ = *intptr;
+		audioformat_ = *intbuf;
 	      }
 	    else
 	      {
-		*intptr = audiobits_;
+		*intbuf = audiobits_;
 		return -1;
 	      }
 	  }
@@ -1258,22 +1258,22 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	if (IS_WRITE ())
 	  {
 	    close_audio_out ();
-	    if (audio_out_->query (*intptr, audiobits_, audiochannels_))
-	      audiofreq_ = *intptr;
+	    if (audio_out_->query (*intbuf, audiobits_, audiochannels_))
+	      audiofreq_ = *intbuf;
 	    else
 	      {
-		*intptr = audiofreq_;
+		*intbuf = audiofreq_;
 		return -1;
 	      }
 	  }
 	if (IS_READ ())
 	  {
 	    close_audio_in ();
-	    if (audio_in_->query (*intptr, audiobits_, audiochannels_))
-	      audiofreq_ = *intptr;
+	    if (audio_in_->query (*intbuf, audiobits_, audiochannels_))
+	      audiofreq_ = *intbuf;
 	    else
 	      {
-		*intptr = audiofreq_;
+		*intbuf = audiofreq_;
 		return -1;
 	      }
 	  }
@@ -1281,15 +1281,15 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 
       CASE (SNDCTL_DSP_STEREO)
       {
-	int nChannels = *intptr + 1;
+	int nChannels = *intbuf + 1;
 	int res = ioctl (SNDCTL_DSP_CHANNELS, &nChannels);
-	*intptr = nChannels - 1;
+	*intbuf = nChannels - 1;
 	return res;
       }
 
       CASE (SNDCTL_DSP_CHANNELS)
       {
-	int nChannels = *intptr;
+	int nChannels = *intbuf;
 
 	if (IS_WRITE ())
 	  {
@@ -1298,7 +1298,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	      audiochannels_ = nChannels;
 	    else
 	      {
-		*intptr = audiochannels_;
+		*intbuf = audiochannels_;
 		return -1;
 	      }
 	  }
@@ -1309,7 +1309,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	      audiochannels_ = nChannels;
 	    else
 	      {
-		*intptr = audiochannels_;
+		*intbuf = audiochannels_;
 		return -1;
 	      }
 	  }
@@ -1323,10 +1323,10 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	    set_errno(EBADF);
 	    return -1;
 	  }
-	audio_buf_info *p = (audio_buf_info *) ptr;
+	audio_buf_info *p = (audio_buf_info *) buf;
 	audio_out_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
-	debug_printf ("ptr=%p frags=%d fragsize=%d bytes=%d",
-		      ptr, p->fragments, p->fragsize, p->bytes);
+	debug_printf ("buf=%p frags=%d fragsize=%d bytes=%d",
+		      buf, p->fragments, p->fragsize, p->bytes);
 	return 0;
       }
 
@@ -1337,10 +1337,10 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	    set_errno(EBADF);
 	    return -1;
 	  }
-	audio_buf_info *p = (audio_buf_info *) ptr;
+	audio_buf_info *p = (audio_buf_info *) buf;
 	audio_in_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
-	debug_printf ("ptr=%p frags=%d fragsize=%d bytes=%d",
-		      ptr, p->fragments, p->fragsize, p->bytes);
+	debug_printf ("buf=%p frags=%d fragsize=%d bytes=%d",
+		      buf, p->fragments, p->fragsize, p->bytes);
 	return 0;
       }
 
@@ -1350,11 +1350,11 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	return 0;
 
       CASE (SNDCTL_DSP_GETFMTS)
-	*intptr = AFMT_S16_LE | AFMT_U8; // only native formats returned here
+	*intbuf = AFMT_S16_LE | AFMT_U8; // only native formats returned here
 	return 0;
 
       CASE (SNDCTL_DSP_GETCAPS)
-	*intptr = DSP_CAP_BATCH | DSP_CAP_DUPLEX;
+	*intbuf = DSP_CAP_BATCH | DSP_CAP_DUPLEX;
 	return 0;
 
       CASE (SNDCTL_DSP_POST)
@@ -1366,13 +1366,11 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	return 0;
 
     default:
-      debug_printf ("/dev/dsp: ioctl 0x%08x not handled yet! FIXME:", cmd);
+      return fhandler_base::ioctl (cmd, buf);
       break;
 
 #undef CASE
-    };
-  set_errno (EINVAL);
-  return -1;
+    }
 }
 
 void

@@ -980,8 +980,7 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
       retval = this->tcsetpgrp ((pid_t) arg);
       goto out;
     default:
-      set_errno (EINVAL);
-      return -1;
+      return fhandler_base::ioctl (cmd, arg);
     }
 
   acquire_output_mutex (INFINITE);
