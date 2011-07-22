@@ -1391,6 +1391,13 @@ ENDIF raw_cxx +]
 [+ ENDFOR recursive_targets +]
 [+ ENDFOR target_modules +]
 
+@if target-libmudflap
+.PHONY: check-target-libmudflap-c++
+check-target-libmudflap-c++:
+	$(MAKE) RUNTESTFLAGS="$(RUNTESTFLAGS) c++frags.exp" check-target-libmudflap
+
+@endif target-libmudflap
+
 # ----------
 # GCC module
 # ----------
