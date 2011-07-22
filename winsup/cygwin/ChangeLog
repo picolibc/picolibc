@@ -1,3 +1,11 @@
+2011-07-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_pty_slave::ioctl): Drop FIONBIO case.
+	Handle FIONREAD.
+	(fhandler_pty_master::ioctl): Ditto.  Call fhandler_base::ioctl to
+	decode default condition.
+	* fhandler_console.cc (fhandler_console::ioctl): Handle FIONREAD.
+
 2011-07-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

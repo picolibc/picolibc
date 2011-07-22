@@ -32,6 +32,7 @@ details. */
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include "registry.h"
+#include <asm/socket.h>
 
 /* Don't make this bigger than NT_MAX_PATH as long as the temporary buffer
    is allocated using tmp_pathbuf!!! */
@@ -887,11 +888,20 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	    *(unsigned char *) buf = (unsigned char) dev_state.nModifiers;
 	    return 0;
 	  }
-	else
-	  {
-	    set_errno (EINVAL);
-	    return -1;
-	  }
+	set_errno (EINVAL);
+	return -1;
+      case FIONREAD:
+	{
+	  DWORD n;
+	  if (!GetNumberOfConsoleInputEvents (get_io_handle (), &n))
+	    {
+	      __seterrno ();
+	      return -1;
+	    }
+	  *(int *) buf = (int) n;
+	  return 0;
+	}
+	break;
     }
 
   return fhandler_base::ioctl (cmd, buf);

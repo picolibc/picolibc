@@ -24,6 +24,7 @@ details. */
 #include "shared_info.h"
 #include "cygthread.h"
 #include "child_info.h"
+#include <asm/socket.h>
 
 #define close_maybe(h) \
   do { \
@@ -960,10 +961,6 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
     case TIOCGWINSZ:
     case TIOCSWINSZ:
       break;
-    case FIONBIO:
-      set_nonblocking (*(int *) arg);
-      retval = 0;
-      goto out;
     case TIOCGPGRP:
       {
 	pid_t pid = this->tcgetpgrp ();
@@ -978,6 +975,21 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
       goto out;
     case TIOCSPGRP:
       retval = this->tcsetpgrp ((pid_t) arg);
+      goto out;
+    case FIONREAD:
+      {
+	int n;
+	if (!PeekNamedPipe (get_handle (), NULL, 0, NULL, (DWORD *) &n, NULL))
+	  {
+	    __seterrno ();
+	    retval = -1;
+	  }
+	else
+	  {
+	    *(int *) arg = n;
+	    retval = 0;
+	  }
+      }
       goto out;
     default:
       return fhandler_base::ioctl (cmd, arg);
@@ -1364,12 +1376,19 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
       break;
     case TIOCSPGRP:
       return this->tcsetpgrp ((pid_t) arg);
-    case FIONBIO:
-      set_nonblocking (*(int *) arg);
+    case FIONREAD:
+      {
+	int n;
+	if (!PeekNamedPipe (to_master, NULL, 0, NULL, (DWORD *) &n, NULL))
+	  {
+	    __seterrno ();
+	    return -1;
+	  }
+	*(int *) arg = n;
+      }
       break;
     default:
-      set_errno (EINVAL);
-      return -1;
+      return fhandler_base::ioctl (cmd, arg);
     }
   return 0;
 }
