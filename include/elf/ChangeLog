@@ -1,3 +1,7 @@
+2011-07-22  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* common.h (EM_K1OM): New.
+
 2011-07-03  Samuel Thibault  <samuel.thibault@gnu.org>
 	    Thomas Schwinge  <thomas@schwinge.name>
 
