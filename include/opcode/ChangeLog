@@ -1,3 +1,9 @@
+2011-07-24  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h (INSN_TRAP): Rename to...
+	(INSN_NO_DELAY_SLOT): ... this.
+	(INSN_SYNC): Remove macro.
+
 2011-07-01  Eric B. Weddington  <eric.weddington@atmel.com>
 
 	* avr.h (AVR_ISA_AVR6): Remove AVR_ISA_SPMX as it was actually

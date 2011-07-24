@@ -489,8 +489,9 @@ struct mips_opcode
 #define INSN_WRITE_HI		    0x01000000
 /* Modifies the LO register.  */
 #define INSN_WRITE_LO		    0x02000000
-/* Takes a trap (easier to keep out of delay slot).  */
-#define INSN_TRAP                   0x04000000
+/* Not to be placed in a branch delay slot, either architecturally
+   or for ease of handling (such as with instructions that take a trap).  */
+#define INSN_NO_DELAY_SLOT	    0x04000000
 /* Instruction stores value into memory.  */
 #define INSN_STORE_MEMORY	    0x08000000
 /* Instruction uses single precision floating point.  */
@@ -499,8 +500,6 @@ struct mips_opcode
 #define FP_D			    0x20000000
 /* Instruction is part of the tx39's integer multiply family.    */
 #define INSN_MULT                   0x40000000
-/* Instruction synchronize shared memory.  */
-#define INSN_SYNC		    0x80000000
 /* Instruction is actually a macro.  It should be ignored by the
    disassembler, and requires special treatment by the assembler.  */
 #define INSN_MACRO                  0xffffffff
