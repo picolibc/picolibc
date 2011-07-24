@@ -102,6 +102,48 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
   /* These relocations are specific to VxWorks.  */
   RELOC_NUMBER (R_MIPS_COPY, 126)
   RELOC_NUMBER (R_MIPS_JUMP_SLOT, 127)
+
+  /* These relocations are specific to microMIPS.  */
+  FAKE_RELOC (R_MICROMIPS_min, 130)
+  RELOC_NUMBER (R_MICROMIPS_26_S1, 133)
+  RELOC_NUMBER (R_MICROMIPS_HI16, 134)
+  RELOC_NUMBER (R_MICROMIPS_LO16, 135)
+  RELOC_NUMBER (R_MICROMIPS_GPREL16, 136)	/* In Elf 64:
+						   alias R_MICROMIPS_GPREL */
+  RELOC_NUMBER (R_MICROMIPS_LITERAL, 137)
+  RELOC_NUMBER (R_MICROMIPS_GOT16, 138)		/* In Elf 64:
+						   alias R_MICROMIPS_GOT */
+  RELOC_NUMBER (R_MICROMIPS_PC7_S1, 139)
+  RELOC_NUMBER (R_MICROMIPS_PC10_S1, 140)
+  RELOC_NUMBER (R_MICROMIPS_PC16_S1, 141)
+  RELOC_NUMBER (R_MICROMIPS_CALL16, 142)	/* In Elf 64:
+						   alias R_MICROMIPS_CALL */
+  RELOC_NUMBER (R_MICROMIPS_GOT_DISP, 145)
+  RELOC_NUMBER (R_MICROMIPS_GOT_PAGE, 146)
+  RELOC_NUMBER (R_MICROMIPS_GOT_OFST, 147)
+  RELOC_NUMBER (R_MICROMIPS_GOT_HI16, 148)
+  RELOC_NUMBER (R_MICROMIPS_GOT_LO16, 149)
+  RELOC_NUMBER (R_MICROMIPS_SUB, 150)
+  RELOC_NUMBER (R_MICROMIPS_HIGHER, 151)
+  RELOC_NUMBER (R_MICROMIPS_HIGHEST, 152)
+  RELOC_NUMBER (R_MICROMIPS_CALL_HI16, 153)
+  RELOC_NUMBER (R_MICROMIPS_CALL_LO16, 154)
+  RELOC_NUMBER (R_MICROMIPS_SCN_DISP, 155)
+  RELOC_NUMBER (R_MICROMIPS_JALR, 156)
+  RELOC_NUMBER (R_MICROMIPS_HI0_LO16, 157)
+  /* TLS relocations.  */
+  RELOC_NUMBER (R_MICROMIPS_TLS_GD, 162)
+  RELOC_NUMBER (R_MICROMIPS_TLS_LDM, 163)
+  RELOC_NUMBER (R_MICROMIPS_TLS_DTPREL_HI16, 164)
+  RELOC_NUMBER (R_MICROMIPS_TLS_DTPREL_LO16, 165)
+  RELOC_NUMBER (R_MICROMIPS_TLS_GOTTPREL, 166)
+  RELOC_NUMBER (R_MICROMIPS_TLS_TPREL_HI16, 169)
+  RELOC_NUMBER (R_MICROMIPS_TLS_TPREL_LO16, 170)
+  /* microMIPS GP- and PC-relative relocations. */
+  RELOC_NUMBER (R_MICROMIPS_GPREL7_S2, 172)
+  RELOC_NUMBER (R_MICROMIPS_PC23_S2, 173)
+  FAKE_RELOC (R_MICROMIPS_max, 174)
+
   /* This was a GNU extension used by embedded-PIC.  It was co-opted by
      mips-linux for exception-handling data.  It is no longer used, but
      should continue to be supported by the linker for backward
@@ -146,6 +188,9 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 
 /* Use MIPS-16 ISA extensions */
 #define EF_MIPS_ARCH_ASE_M16	0x04000000
+
+/* Use MICROMIPS ISA extensions.  */
+#define EF_MIPS_ARCH_ASE_MICROMIPS	0x02000000
 
 /* Indicates code compiled for a 64-bit machine in 32-bit mode.
    (regs are 32-bits wide.) */
@@ -733,24 +778,49 @@ extern void bfd_mips_elf32_swap_reginfo_out
 #define STO_HIDDEN		STV_HIDDEN
 #define STO_PROTECTED		STV_PROTECTED
 
+/* Two topmost bits denote the MIPS ISA for .text symbols:
+   + 00 -- standard MIPS code,
+   + 10 -- microMIPS code,
+   + 11 -- MIPS16 code; requires the following two bits to be set too.
+   Note that one of the MIPS16 bits overlaps with STO_MIPS_PIC.  See below
+   for details.  */
+#define STO_MIPS_ISA		(3 << 6)
+
+/* The mask spanning the rest of MIPS psABI flags.  At most one is expected
+   to be set except for STO_MIPS16.  */
+#define STO_MIPS_FLAGS		(~(STO_MIPS_ISA | ELF_ST_VISIBILITY (-1)))
+
 /* The MIPS psABI was updated in 2008 with support for PLTs and copy
    relocs.  There are therefore two types of nonzero SHN_UNDEF functions:
    PLT entries and traditional MIPS lazy binding stubs.  We mark the former
    with STO_MIPS_PLT to distinguish them from the latter.  */
 #define STO_MIPS_PLT		0x8
+#define ELF_ST_IS_MIPS_PLT(other) (((other) & STO_MIPS_FLAGS) == STO_MIPS_PLT)
+#define ELF_ST_SET_MIPS_PLT(other) (((other) & ~STO_MIPS_FLAGS) | STO_MIPS_PLT)
 
 /* This value is used to mark PIC functions in an object that mixes
-   PIC and non-PIC.  */
+   PIC and non-PIC.  Note that this bit overlaps with STO_MIPS16,
+   although MIPS16 symbols are never considered to be MIPS_PIC.  */
 #define STO_MIPS_PIC		0x20
-#define ELF_ST_IS_MIPS_PIC(OTHER) \
-  (((OTHER) & ~ELF_ST_VISIBILITY (-1)) == STO_MIPS_PIC)
-#define ELF_ST_SET_MIPS_PIC(OTHER) \
-  (STO_MIPS_PIC | ELF_ST_VISIBILITY (OTHER))
+#define ELF_ST_IS_MIPS_PIC(other) (((other) & STO_MIPS_FLAGS) == STO_MIPS_PIC)
+#define ELF_ST_SET_MIPS_PIC(other) (((other) & ~STO_MIPS_FLAGS) | STO_MIPS_PIC)
 
 /* This value is used for a mips16 .text symbol.  */
 #define STO_MIPS16		0xf0
-#define ELF_ST_IS_MIPS16(OTHER) (((OTHER) & 0xf0) == STO_MIPS16)
-#define ELF_ST_SET_MIPS16(OTHER) (((OTHER) & ~0xf0) | STO_MIPS16)
+#define ELF_ST_IS_MIPS16(other) (((other) & STO_MIPS16) == STO_MIPS16)
+#define ELF_ST_SET_MIPS16(other) ((other) | STO_MIPS16)
+
+/* This value is used for a microMIPS .text symbol.  To distinguish from
+   STO_MIPS16, we set top two bits to be 10 to denote STO_MICROMIPS.  The
+   mask is STO_MIPS_ISA.  */
+#define STO_MICROMIPS		(2 << 6)
+#define ELF_ST_IS_MICROMIPS(other) (((other) & STO_MIPS_ISA) == STO_MICROMIPS)
+#define ELF_ST_SET_MICROMIPS(other) (((other) & ~STO_MIPS_ISA) | STO_MICROMIPS)
+
+/* Whether code compression (either of the MIPS16 or the microMIPS ASEs)
+   has been indicated for a .text symbol.  */
+#define ELF_ST_IS_COMPRESSED(other) \
+  (ELF_ST_IS_MIPS16 (other) || ELF_ST_IS_MICROMIPS (other))
 
 /* This bit is used on Irix to indicate a symbol whose definition
    is optional - if, at final link time, it cannot be found, no
