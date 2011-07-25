@@ -892,13 +892,21 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	return -1;
       case FIONREAD:
 	{
+	  /* Per MSDN, max size of buffer required is below 64K. */
+#define	  INREC_SIZE	(65536 / sizeof (INPUT_RECORD))
+
 	  DWORD n;
-	  if (!GetNumberOfConsoleInputEvents (get_io_handle (), &n))
+	  int ret = 0;
+	  INPUT_RECORD inp[INREC_SIZE];
+	  if (!PeekConsoleInputW (get_io_handle (), inp, INREC_SIZE, &n))
 	    {
-	      __seterrno ();
+	      set_errno (EINVAL);
 	      return -1;
 	    }
-	  *(int *) buf = (int) n;
+	  while (n-- > 0)
+	    if (inp[n].EventType == KEY_EVENT && inp[n].Event.KeyEvent.bKeyDown)
+	      ++ret;
+	  *(int *) buf = ret;
 	  return 0;
 	}
 	break;

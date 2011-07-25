@@ -981,7 +981,7 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
 	int n;
 	if (!PeekNamedPipe (get_handle (), NULL, 0, NULL, (DWORD *) &n, NULL))
 	  {
-	    __seterrno ();
+	    set_errno (EINVAL);
 	    retval = -1;
 	  }
 	else
@@ -1381,7 +1381,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	int n;
 	if (!PeekNamedPipe (to_master, NULL, 0, NULL, (DWORD *) &n, NULL))
 	  {
-	    __seterrno ();
+	    set_errno (EINVAL);
 	    return -1;
 	  }
 	*(int *) arg = n;

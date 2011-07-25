@@ -1,3 +1,11 @@
+2011-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (fhandler_console::ioctl): Fetch console events
+	using PeekConsoleInput and return only key down events in buf.
+	* fhandler_tty.cc (fhandler_pty_slave::ioctl): Always return EINVAL
+	if PeekNamedPipe fails.
+	(fhandler_pty_master::ioctl): Ditto.
+
 2011-07-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_pty_slave::ioctl): Drop FIONBIO case.
