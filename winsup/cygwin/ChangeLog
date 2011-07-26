@@ -1,5 +1,15 @@
 2011-07-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (__DIR_mounts::eval_ino): Create path_conv
+	with PC_KEEP_HANDLE flag.
+	* path.h (path_conv::operator =): Duplicate UNICODE path as well.
+	* security.cc (check_file_access): Use path_conv handle if available.
+	* syscalls.cc (access): Create fhandler with PC_KEEP_HANDLE flag set.
+	(euidaccess): Ditto.
+	(faccessat): Ditto.
+
+2011-07-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h: Fix typo in comment.
 	* path.cc: Ditto.
 

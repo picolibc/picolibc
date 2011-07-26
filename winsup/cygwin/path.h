@@ -282,7 +282,13 @@ class path_conv
     path = cstrdup (pc.path);
     conv_handle.dup (pc.conv_handle);
     normalized_path = cstrdup(pc.normalized_path);
-    wide_path = NULL;
+    if (pc.wide_path)
+      {
+	wide_path = cwcsdup (uni_path.Buffer);
+	if (!wide_path)
+	  api_fatal ("cwcsdup would have returned NULL");
+	uni_path.Buffer = wide_path;
+      }
     return *this;
   }
   void free_strings ()

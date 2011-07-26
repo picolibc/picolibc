@@ -1063,7 +1063,7 @@ check_file_access (path_conv &pc, int flags, bool effective)
     desired |= FILE_WRITE_DATA;
   if (flags & X_OK)
     desired |= FILE_EXECUTE;
-  if (!get_file_sd (NULL, pc, sd, false))
+  if (!get_file_sd (pc.handle (), pc, sd, false))
     ret = check_access (sd, file_mapping, desired, flags, effective);
   debug_printf ("flags %x, ret %d", flags, ret);
   return ret;

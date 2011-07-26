@@ -52,7 +52,7 @@ class __DIR_mounts
 	*c++ = '/';
       sys_wcstombs (c, mounts[idx].Length + 1,
 		    mounts[idx].Buffer, mounts[idx].Length / sizeof (WCHAR));
-      path_conv pc (fname, PC_SYM_NOFOLLOW | PC_POSIX);
+      path_conv pc (fname, PC_SYM_NOFOLLOW | PC_POSIX | PC_KEEP_HANDLE);
       if (!stat_worker (pc, &st))
 	ino = st.st_ino;
       return ino;

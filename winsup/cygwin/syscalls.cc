@@ -1677,7 +1677,8 @@ access (const char *fn, int flags)
     set_errno (EINVAL);
   else
     {
-      fhandler_base *fh = build_fh_name (fn, PC_SYM_FOLLOW, stat_suffixes);
+      fhandler_base *fh = build_fh_name (fn, PC_SYM_FOLLOW | PC_KEEP_HANDLE,
+					 stat_suffixes);
       if (fh)
 	{
 	  res =  fh->fhaccess (flags, false);
@@ -1700,7 +1701,8 @@ euidaccess (const char *fn, int flags)
     set_errno (EINVAL);
   else
     {
-      fhandler_base *fh = build_fh_name (fn, PC_SYM_FOLLOW, stat_suffixes);
+      fhandler_base *fh = build_fh_name (fn, PC_SYM_FOLLOW | PC_KEEP_HANDLE,
+					 stat_suffixes);
       if (fh)
 	{
 	  res =  fh->fhaccess (flags, true);
@@ -4152,6 +4154,7 @@ faccessat (int dirfd, const char *pathname, int mode, int flags)
       else
 	{
 	  fhandler_base *fh = build_fh_name (path,
+					     PC_KEEP_HANDLE |
 					     (flags & AT_SYMLINK_NOFOLLOW)
 					     ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
 					     stat_suffixes);
