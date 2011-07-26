@@ -50,7 +50,7 @@ struct dirent {
 
 int scandir ( const char *dirname,
    struct dirent *** namelist,
-   int (*select)(struct dirent *),
+   int (*select)(const struct dirent *),
    int (*dcomp)(const struct dirent **, const struct dirent **)
 );
 
