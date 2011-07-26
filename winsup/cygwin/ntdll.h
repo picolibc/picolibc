@@ -1345,7 +1345,7 @@ extern "C"
 				 ? prefix->Length : path->Length);
     return RtlEqualUnicodeString (&p, prefix, caseinsensitive);
   }
-  /* Check if sufffix is a sufffix of path. */
+  /* Check if suffix is a suffix of path. */
   inline
   BOOL NTAPI RtlEqualUnicodePathSuffix (PUNICODE_STRING path,
 					PUNICODE_STRING suffix,

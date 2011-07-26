@@ -427,7 +427,7 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath, bool dos)
   if (dos)
     {
       /* Unfortunately we can't just use transform_chars with the tfx_rev_chars
-	 table since only leading and trainlig spaces and dots are affected.
+	 table since only leading and trailing spaces and dots are affected.
 	 So we step to every backslash and fix surrounding dots and spaces.
 	 That makes these broken filesystems a bit slower, but, hey. */
       PWCHAR cp = upath.Buffer + 7;

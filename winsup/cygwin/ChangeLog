@@ -1,3 +1,8 @@
+2011-07-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h: Fix typo in comment.
+	* path.cc: Ditto.
+
 2011-07-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (fhandler_console::ioctl): Fetch console events
