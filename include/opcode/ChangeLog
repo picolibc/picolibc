@@ -1,3 +1,9 @@
+2011-07-29  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h: Clarify the description of microMIPS instruction
+	manipulation macros.
+	(MICROMIPSOP_MASK_MAJOR, MICROMIPSOP_SH_MAJOR): Remove macros.
+
 2011-07-24  Chao-ying Fu  <fu@mips.com>
             Maciej W. Rozycki  <macro@codesourcery.com>
 
