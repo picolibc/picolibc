@@ -1,3 +1,7 @@
+2011-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winsock2.h (SIO_UDP_CONNRESET): Define.
+
 2011-05-22  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	* include/wingdi.h (GCP_RESULTSW):  Correct defintion.
