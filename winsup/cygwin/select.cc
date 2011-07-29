@@ -23,7 +23,7 @@ details. */
 #include <winuser.h>
 #include <netdb.h>
 #define USE_SYS_TYPES_FD_SET
-#include <winsock.h>
+#include <winsock2.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"

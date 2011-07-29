@@ -639,6 +639,23 @@ cygwin_socket (int af, int type, int protocol)
 	  ((fhandler_socket *) fd)->set_nonblocking (true);
 	if (flags & SOCK_CLOEXEC)
 	  ((fhandler_socket *) fd)->set_close_on_exec (true);
+	if (type == SOCK_DGRAM)
+	  {
+	    /* Workaround the problem that a missing listener on a UDP socket
+	       in a call to sendto will result in select/WSAEnumNetworkEvents
+	       reporting that the socket has pending data and a subsequent call
+	       to recvfrom will return -1 with error set to WSAECONNRESET.
+
+	       This problem is a regression introduced in Windows 2000.
+	       Instead of fixing the problem, a new socket IOCTL code has
+	       been added, see http://support.microsoft.com/kb/263823 */
+	    BOOL cr = FALSE;
+	    DWORD blen;
+	    if (WSAIoctl (soc, SIO_UDP_CONNRESET, &cr, sizeof cr, NULL, 0,
+			  &blen, NULL, NULL) == SOCKET_ERROR)
+	      debug_printf ("Reset SIO_UDP_CONNRESET: WinSock error %lu",
+			    WSAGetLastError ());
+	  }
 	res = fd;
       }
   }
@@ -723,7 +740,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
     res = -1;
   else
     {
-      /* Old applications still use the old Winsock1 IPPROTO_IP values. */
+      /* Old applications still use the old WinSock1 IPPROTO_IP values. */
       if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
 	optname = convert_ws1_ip_optname (optname);
 
@@ -822,7 +839,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
     }
   else
     {
-      /* Old applications still use the old Winsock1 IPPROTO_IP values. */
+      /* Old applications still use the old WinSock1 IPPROTO_IP values. */
       if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
 	optname = convert_ws1_ip_optname (optname);
       res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
@@ -3345,7 +3362,7 @@ ga_aistruct (struct addrinfo ***paipnext, const struct addrinfo *hintsp,
 
 /* Cygwin specific: The ga_clone function is split up to allow an easy
    duplication of addrinfo structs.  This is used to duplicate the
-   structures from Winsock, so that we have the allocation of the structs
+   structures from WinSock, so that we have the allocation of the structs
    returned to the application under control.  This is especially helpful
    for the AI_V4MAPPED case prior to Vista. */
 static struct addrinfo *
@@ -4271,7 +4288,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 		    | AI_NUMERICSERV | AI_ADDRCONFIG | AI_V4MAPPED)))
     return EAI_BADFLAGS;
   /* AI_NUMERICSERV is not supported in our replacement getaddrinfo, nor
-     is it supported by Winsock prior to Vista.  We just check the servname
+     is it supported by WinSock prior to Vista.  We just check the servname
      parameter by ourselves here. */
   if (hints && (hints->ai_flags & AI_NUMERICSERV))
     {
@@ -4364,7 +4381,7 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
     return ipv4_getnameinfo (sa, salen, host, hostlen, serv, servlen, flags);
 
   /* When the incoming port number does not resolve to a well-known service,
-     Winsock's getnameinfo up to Windows 2003 returns with error WSANO_DATA
+     WinSock's getnameinfo up to Windows 2003 returns with error WSANO_DATA
      instead of setting `serv' to the numeric port number string, as required
      by RFC 3493.  This is fixed on Vista and later.  To avoid the error on
      systems up to Windows 2003, we check if the port number resolves

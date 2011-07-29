@@ -1,3 +1,12 @@
+2011-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	Throughout change "WinSock" to "Winsock" in comments.
+	* fhandler_socket.cc (fhandler_socket::sendmsg): Add missing call to
+	get_inet_addr to convert AF_LOCAL to AF_INET sockets.
+	* net.cc (cygwin_socket): Workaround UDP Winsock problem.  Add comment
+	to explain why.
+	* select.cc: Include winsock2.h rather than winsock.h.
+
 2011-07-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (__DIR_mounts::eval_ino): Create path_conv

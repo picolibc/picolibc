@@ -1129,7 +1129,7 @@ fhandler_socket::listen (int backlog)
     {
       /* It's perfectly valid to call listen on an unbound INET socket.
 	 In this case the socket is automatically bound to an unused
-	 port number, listening on all interfaces.  On Winsock, listen
+	 port number, listening on all interfaces.  On WinSock, listen
 	 fails with WSAEINVAL when it's called on an unbound socket.
 	 So we have to bind manually here to have POSIX semantics. */
       if (get_addr_family () == AF_INET)
@@ -1283,7 +1283,7 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 	{
 	  if (WSAGetLastError () == WSAEINVAL)
 	    {
-	      /* Winsock returns WSAEINVAL if the socket is locally
+	      /* WinSock returns WSAEINVAL if the socket is locally
 		 unbound.  Per SUSv3 this is not an error condition.
 		 We're faking a valid return value here by creating the
 		 same content in the sockaddr structure as on Linux. */
@@ -1454,7 +1454,7 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg)
 	 about that and fails, while the same test is omitted in the recv
 	 functions.
 
-	 This also covers another weird case: Winsock returns WSAEFAULT if
+	 This also covers another weird case: WinSock returns WSAEFAULT if
 	 namelen is a valid pointer while name is NULL.  Both parameters are
 	 ignored for TCP sockets, so this only occurs when using UDP socket. */
       else if (!wsamsg->name || get_socket_type () == SOCK_STREAM)
@@ -1698,9 +1698,17 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 int
 fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
 {
+  /* TODO: Descriptor passing on AF_LOCAL sockets. */
+
+  struct sockaddr_storage sst;
+  int len = 0;
+
   pthread_testcancel ();
 
-  /* TODO: Descriptor passing on AF_LOCAL sockets. */
+  if (msg->msg_name
+      && get_inet_addr ((struct sockaddr *) msg->msg_name, msg->msg_namelen,
+			&sst, &len) == SOCKET_ERROR)
+    return SOCKET_ERROR;
 
   WSABUF wsabuf[msg->msg_iovlen];
   WSABUF *wsaptr = wsabuf;
@@ -1710,7 +1718,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
       wsaptr->len = iovptr->iov_len;
       (wsaptr++)->buf = (char *) (iovptr++)->iov_base;
     }
-  WSAMSG wsamsg = { (struct sockaddr *) msg->msg_name, msg->msg_namelen,
+  WSAMSG wsamsg = { msg->msg_name ? (struct sockaddr *) &sst : NULL, len,
 		    wsabuf, msg->msg_iovlen,
 		    /* Disappointing but true:  Even if WSASendMsg is
 		       supported, it's only supported for datagram and
@@ -1730,7 +1738,7 @@ fhandler_socket::shutdown (int how)
 
   /* Linux allows to call shutdown for any socket, even if it's not connected.
      This also disables to call accept on this socket, if shutdown has been
-     called with the SHUT_RD or SHUT_RDWR parameter.  In contrast, Winsock
+     called with the SHUT_RD or SHUT_RDWR parameter.  In contrast, WinSock
      only allows to call shutdown on a connected socket.  The accept function
      is in no way affected.  So, what we do here is to fake success, and to
      change the event settings so that an FD_CLOSE event is triggered for the
