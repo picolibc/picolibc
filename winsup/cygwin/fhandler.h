@@ -614,6 +614,7 @@ public:
 
   int close ();
   int dup (fhandler_base *child);
+  virtual size_t size () const { return sizeof (*this);}	/* probably not needed */
 };
 
 class fhandler_pipe: public fhandler_base_overlapped
@@ -958,6 +959,7 @@ class fhandler_termios: public fhandler_base
   virtual void __release_output_mutex (const char *fn, int ln) {}
   void echo_erase (int force = 0);
   virtual _off64_t lseek (_off64_t, int);
+  virtual size_t size () const { return sizeof (*this);}	/* probably not needed */
 };
 
 enum ansi_intensity
@@ -1165,6 +1167,7 @@ class fhandler_pty_common: public fhandler_termios
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
+  virtual size_t size () const { return sizeof (*this);}	/* probably not needed */
 };
 
 class fhandler_pty_slave: public fhandler_pty_common
