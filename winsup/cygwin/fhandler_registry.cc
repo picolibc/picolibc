@@ -1028,12 +1028,17 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
 int
 fhandler_registry::dup (fhandler_base *child)
 {
-  int ret = fhandler_virtual::dup (child);
+  debug_printf ("here");
+  fhandler_registry *fhs = (fhandler_registry *) child;
+
+  int ret = fhandler_virtual::dup (fhs);
   /* Pseudo registry handles can't be duplicated using DuplicateHandle.
      Therefore those fhandlers are marked with the nohandle flag.  This
      allows fhandler_base::dup to succeed as usual for nohandle fhandlers.
      Here we just have to fix up by copying the pseudo handle value. */
   if ((HKEY) get_handle () >= HKEY_CLASSES_ROOT)
-    child->set_io_handle (get_handle ());
+    fhs->set_io_handle (get_handle ());
+  if (value_name)
+    fhs->value_name = cwcsdup (value_name);
   return ret;
 }
