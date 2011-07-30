@@ -4,6 +4,7 @@
 	* cygthread.h (cygthread::create): Use correct regparm.
 	(cygthread::standalone): Delete from class and from all constructors.
 	(cygthread::cygthread): Use three only arguments for detached threads,
+	(cygthread::async_create): Declare.
 	and start the thread via QueueUserAPC/async_create.
 	* dcrt0.cc (dll_crt0_0): Remove handling for
 	wincap.has_buggy_thread_startup.
