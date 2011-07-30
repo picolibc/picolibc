@@ -186,6 +186,17 @@ out:
   return info;
 }
 
+/* This function is called via QueueUserAPC.  Apparently creating threads
+   asynchronously is a huge performance win on Win64.  */
+void CALLBACK
+cygthread::async_create (ULONG_PTR arg)
+{
+  cygthread *that = (cygthread *) arg;
+  that->create ();
+  ::SetThreadPriority (that->h, THREAD_PRIORITY_HIGHEST);
+  that->zap_h ();
+}
+
 void
 cygthread::create ()
 {

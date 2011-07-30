@@ -31,8 +31,8 @@ class cygthread
   bool is_freerange;
   static bool exiting;
   HANDLE notify_detached;
-  bool standalone;
-  void create () __attribute__ ((regparm(2)));
+  void create () __attribute__ ((regparm (1)));
+  static void CALLBACK async_create (ULONG_PTR);
  public:
   bool terminate_thread ();
   static DWORD WINAPI stub (VOID *);
@@ -44,33 +44,27 @@ class cygthread
   void release (bool);
   cygthread (LPTHREAD_START_ROUTINE start, unsigned n, LPVOID param, const char *name, HANDLE notify = NULL)
   : __name (name), func (start), arglen (n), arg (param),
-  notify_detached (notify), standalone (false)
+  notify_detached (notify)
   {
     create ();
   }
-  cygthread (LPVOID_THREAD_START_ROUTINE start, LPVOID param, const char *name, HANDLE notify = NULL)
+  cygthread (LPVOID_THREAD_START_ROUTINE start, LPVOID param, const char *name)
   : __name (name), func ((LPTHREAD_START_ROUTINE) start), arglen (0),
-    arg (param), notify_detached (notify), standalone (true)
+    arg (param), notify_detached (NULL)
   {
-    create ();
-    /* This is a neverending/high-priority thread */
-    ::SetThreadPriority (h, THREAD_PRIORITY_HIGHEST);
-    zap_h ();
+    QueueUserAPC (async_create, GetCurrentThread (), (ULONG_PTR) this);
   }
   cygthread (LPTHREAD_START_ROUTINE start, LPVOID param, const char *name, HANDLE notify = NULL)
   : __name (name), func (start), arglen (0), arg (param),
-  notify_detached (notify), standalone (false)
+  notify_detached (notify)
   {
     create ();
   }
-  cygthread (LPVOID_THREAD_START_ROUTINE start, unsigned n, LPVOID param, const char *name, HANDLE notify = NULL)
+  cygthread (LPVOID_THREAD_START_ROUTINE start, unsigned n, LPVOID param, const char *name)
   : __name (name), func ((LPTHREAD_START_ROUTINE) start), arglen (n),
-    arg (param), notify_detached (notify), standalone (true)
+    arg (param), notify_detached (NULL)
   {
-    create ();
-    /* This is a neverending/high-priority thread */
-    ::SetThreadPriority (h, THREAD_PRIORITY_HIGHEST);
-    zap_h ();
+    QueueUserAPC (async_create, GetCurrentThread (), (ULONG_PTR) this);
   }
   cygthread () {};
   static void init ();

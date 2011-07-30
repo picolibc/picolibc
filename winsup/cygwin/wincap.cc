@@ -47,7 +47,6 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:false,
@@ -78,7 +77,6 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:false,
@@ -109,7 +107,6 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
@@ -140,7 +137,6 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
@@ -171,7 +167,6 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
@@ -202,7 +197,6 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:false,
   has_localenames:false,
-  has_buggy_thread_startup:false,
   has_fast_cwd:false,
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
@@ -233,7 +227,6 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:false,
   has_always_all_codepages:true,
   has_localenames:true,
-  has_buggy_thread_startup:true,
   has_fast_cwd:true,
   has_restricted_raw_disk_access:true,
   use_dont_resolve_hack:false,
@@ -264,7 +257,6 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_broken_alloc_console:true,
   has_always_all_codepages:true,
   has_localenames:true,
-  has_buggy_thread_startup:false,
   has_fast_cwd:true,
   has_restricted_raw_disk_access:true,
   use_dont_resolve_hack:false,
@@ -358,8 +350,6 @@ wincapc::init ()
       ((wincaps *)caps)->has_restricted_stack_args = false;
     }
 
-  if (!wow64)
-    ((wincaps *) caps)->has_buggy_thread_startup = false;
   __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,
 		   version.dwMinorVersion);
 }
