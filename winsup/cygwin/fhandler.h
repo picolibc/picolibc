@@ -1317,7 +1317,6 @@ class fhandler_dev_mem: public fhandler_base
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
-  int dup (fhandler_base *child);
 
   HANDLE mmap (caddr_t *addr, size_t len, int prot, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);

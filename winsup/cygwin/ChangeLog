@@ -1,3 +1,16 @@
+2011-07-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_mem): Remove dup method declaration.
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::dup): Accommodate the
+	fact that the entire fhandler gets copied over to the child in
+	operator =.
+	* fhandler_floppy.cc (fhandler_dev_floppy::dup): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::dup): Ditto.
+	* fhandler_serial.cc (fhandler_serial::dup): Ditto.
+	* fhandler_socket.cc (fhandler_socket::dup): Ditto.
+	* fhandler_virtual.cc (fhandler_virtual::dup): Ditto.
+	* fhandler_mem.cc (fhandler_dev_mem::dup): Ditto.  Remove entirely.
+
 2011-07-30  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* cygthread.cc (cygthread::async_create): Define new function.

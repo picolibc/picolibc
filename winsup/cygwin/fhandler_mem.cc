@@ -263,18 +263,3 @@ fhandler_dev_mem::fstat (struct __stat64 *buf)
 
   return 0;
 }
-
-int
-fhandler_dev_mem::dup (fhandler_base *child)
-{
-  int ret = fhandler_base::dup (child);
-
-  if (! ret)
-    {
-      fhandler_dev_mem *fhc = (fhandler_dev_mem *) child;
-
-      fhc->mem_size = mem_size;
-      fhc->pos = pos;
-    }
-  return ret;
-}

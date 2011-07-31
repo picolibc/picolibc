@@ -89,7 +89,6 @@ fhandler_dev_raw::dup (fhandler_base *child)
     {
       fhandler_dev_raw *fhc = (fhandler_dev_raw *) child;
 
-      fhc->devbufsiz = devbufsiz;
       if (devbufsiz > 1L)
 	fhc->devbuf = new char [devbufsiz];
       fhc->devbufstart = 0;

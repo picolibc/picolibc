@@ -770,28 +770,11 @@ fhandler_socket::dup (fhandler_base *child)
       NtClose (fhs->wsock_mtx);
       return -1;
     }
-  fhs->wsock_events = wsock_events;
-
-  fhs->rmem (rmem ());
-  fhs->wmem (wmem ());
-  fhs->addr_family = addr_family;
-  fhs->set_socket_type (get_socket_type ());
   if (get_addr_family () == AF_LOCAL)
     {
       fhs->set_sun_path (get_sun_path ());
       fhs->set_peer_sun_path (get_peer_sun_path ());
-      if (get_socket_type () == SOCK_STREAM)
-	{
-	  fhs->sec_pid = sec_pid;
-	  fhs->sec_uid = sec_uid;
-	  fhs->sec_gid = sec_gid;
-	  fhs->sec_peer_pid = sec_peer_pid;
-	  fhs->sec_peer_uid = sec_peer_uid;
-	  fhs->sec_peer_gid = sec_peer_gid;
-	}
     }
-  fhs->connect_state (connect_state ());
-
   if (!need_fixup_before ())
     {
       int ret = fhandler_base::dup (child);
@@ -806,14 +789,14 @@ fhandler_socket::dup (fhandler_base *child)
   cygheap->user.deimpersonate ();
   fhs->init_fixup_before ();
   fhs->set_io_handle (get_io_handle ());
-  if (!fhs->fixup_before_fork_exec (GetCurrentProcessId ()))
+  int ret = fhs->fixup_before_fork_exec (GetCurrentProcessId ());
+  cygheap->user.reimpersonate ();
+  if (!ret)
     {
-      cygheap->user.reimpersonate ();
       fhs->fixup_after_fork (GetCurrentProcess ());
       if (fhs->get_io_handle() != (HANDLE) INVALID_SOCKET)
 	return 0;
     }
-  cygheap->user.reimpersonate ();
   cygheap->fdtab.dec_need_fixup_before ();
   NtClose (fhs->wsock_evt);
   NtClose (fhs->wsock_mtx);

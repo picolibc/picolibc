@@ -407,21 +407,10 @@ fhandler_dev_floppy::close ()
 int
 fhandler_dev_floppy::dup (fhandler_base *child)
 {
-  fhandler_dev_floppy *fhc = (fhandler_dev_floppy *) child;
-
   int ret = fhandler_dev_raw::dup (child);
 
-  if (!ret)
-    {
-      fhc->drive_size = drive_size;
-      fhc->bytes_per_sector = bytes_per_sector;
-      if (partitions)
-	{
-	  InterlockedIncrement (&partitions->refcnt);
-	  fhc->partitions = partitions;
-	}
-      fhc->eom_detected (eom_detected ());
-    }
+  if (!ret && partitions)
+    InterlockedIncrement (&partitions->refcnt);
   return ret;
 }
 

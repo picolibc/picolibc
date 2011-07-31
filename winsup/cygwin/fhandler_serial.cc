@@ -1176,7 +1176,5 @@ fhandler_serial::dup (fhandler_base *child)
 {
   fhandler_serial *fhc = (fhandler_serial *) child;
   fhc->overlapped_setup ();
-  fhc->vmin_ = vmin_;
-  fhc->vtime_ = vtime_;
   return fhandler_base::dup (child);
 }

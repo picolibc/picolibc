@@ -50,11 +50,6 @@ fhandler_dev_clipboard::dup (fhandler_base * child)
 
   if (!fhc->open (get_flags (), 0))
     system_printf ("error opening clipboard, %E");
-
-  fhc->membuffer = membuffer;
-  fhc->pos = pos;
-  fhc->msize = msize;
-
   return 0;
 }
 
