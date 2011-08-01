@@ -1,3 +1,9 @@
+2011-08-01  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/types.h: XML and RTEMS define
+	_UNIX98_THREAD_MUTEX_ATTRIBUTES and can use the standard
+	definitions. This avoids redefinition warnings.
+
 2011-07-26  Ralf Corsépius <ralf.corsepius@rtems.org>
 
 	* libc/sys/rtems/sys/dirent.h (scandir):
