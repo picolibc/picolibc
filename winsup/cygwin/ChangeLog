@@ -1,3 +1,9 @@
+2011-07-31  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* sigproc.cc (pending_signals::pending): Define new function.
+	(sig_dispatch_pending): Avoid calling sig_send if there are no pending
+	signals.
+
 2011-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_dev_mem): Remove dup method declaration.

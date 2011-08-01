@@ -88,6 +88,7 @@ public:
   void reset () {curr = &start; prev = &start;}
   void add (sigpacket&);
   void del ();
+  bool pending () const {return !!start.next;}
   sigpacket *next ();
   sigpacket *save () const {return curr;}
   void restore (sigpacket *saved) {curr = saved;}
@@ -431,7 +432,13 @@ sig_dispatch_pending (bool fast)
       return;
     }
 
-  sig_send (myself, fast ? __SIGFLUSHFAST : __SIGFLUSH);
+  /* Non-atomically test for any signals pending and wake up wait_sig if any are
+     found.  It's ok if there's a race here since the next call to this function
+     should catch it.
+     FIXME: Eventually, wait_sig should wake up on its own to deal with pending
+     signals. */
+  if (sigq.pending ())
+    sig_send (myself, fast ? __SIGFLUSHFAST : __SIGFLUSH);
 }
 
 void __stdcall
