@@ -1,5 +1,10 @@
 2011-07-31  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* dll_init.cc (dll_list::load_after_fork_impl): Add a hint to an error
+	message.
+
+2011-07-31  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sigproc.cc (pending_signals::pending): Define new function.
 	(sig_dispatch_pending): Avoid calling sig_send if there are no pending
 	signals.

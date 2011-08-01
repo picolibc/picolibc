@@ -489,7 +489,7 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	    if (retries < DLL_RETRY_MAX)
 	      load_after_fork_impl (parent, d, retries+1);
 	    else
-	      fork_info->abort ("unable to remap %W to same address as parent (%08lx)",
+	      fork_info->abort ("unable to remap %W to same address as parent (%08lx) - try running rebaseall",
 				d->modname, d->handle);
 
 	    /* once the above returns all the dlls are mapped; release
