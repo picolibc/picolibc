@@ -1665,7 +1665,7 @@ fhandler_disk_file::mkdir (mode_t mode)
        open the file again.
        FIXME: On remote NTFS shares open sometimes fails because even the
        creator of the file doesn't have the right to change the DACL.
-       I don't know what setting that is or howq to recognize such a share,
+       I don't know what setting that is or how to recognize such a share,
        so for now we don't request WRITE_DAC on remote drives. */
     access |= READ_CONTROL | WRITE_DAC;
   status = NtCreateFile (&dir, access, pc.get_object_attr (attr, sa), &io, NULL,

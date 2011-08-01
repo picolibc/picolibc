@@ -4153,14 +4153,14 @@ faccessat (int dirfd, const char *pathname, int mode, int flags)
 	set_errno (EINVAL);
       else
 	{
-	  fhandler_base *fh = build_fh_name (path,
-					     PC_KEEP_HANDLE |
-					     (flags & AT_SYMLINK_NOFOLLOW)
-					     ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
+	  fhandler_base *fh = build_fh_name (path, (flags & AT_SYMLINK_NOFOLLOW
+						    ? PC_SYM_NOFOLLOW
+						    : PC_SYM_FOLLOW)
+						   | PC_KEEP_HANDLE,
 					     stat_suffixes);
 	  if (fh)
 	    {
-	      res =  fh->fhaccess (mode, flags & AT_EACCESS);
+	      res =  fh->fhaccess (mode, !!(flags & AT_EACCESS));
 	      delete fh;
 	    }
 	}

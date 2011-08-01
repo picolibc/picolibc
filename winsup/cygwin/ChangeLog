@@ -1,3 +1,13 @@
+2011-08-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (faccessat): Fix parens in flag expression when calling
+	build_fh_name.
+
+	* fhandler_disk_file.cc (fhandler_disk_file::mkdir): Fix typo in
+	comment.
+	* fhandler_socket.cc (fhandler_socket::bind): Ditto.
+	* path.cc (symlink_worker): Ditto.
+
 2011-07-31  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dll_init.cc (dll_list::load_after_fork_impl): Add a hint to an error
