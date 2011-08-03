@@ -577,7 +577,7 @@ pthread::cancel ()
 
     * accept ()
     o aio_suspend ()
-    o clock_nanosleep ()
+    * clock_nanosleep ()
     * close ()
     * connect ()
     * creat ()

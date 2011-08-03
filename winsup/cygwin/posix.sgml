@@ -92,6 +92,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     clock_getcpuclockid
     clock_getres
     clock_gettime
+    clock_nanosleep		(see chapter "Implementation Notes")
     clock_settime		(see chapter "Implementation Notes")
     clog
     clogf
@@ -1299,7 +1300,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     ceill
     cexpl
     cimagl
-    clock_nanosleep
     clogl
     conjl
     copysignl
@@ -1446,8 +1446,10 @@ by keeping track of the current root and accomodating this in the file
 related function calls.  A real chroot functionality is not supported by
 Windows however.</para>
 
-<para><function>clock_setres</function>, <function>clock_settime</function>,
-and <function>timer_create</function> only support CLOCK_REALTIME.</para>
+<para><function>clock_nanosleep</function> currently supports only
+CLOCK_REALTIME and CLOCK_MONOTONIC.  <function>clock_setres</function>,
+<function>clock_settime</function>, and <function>timer_create</function>
+currently support only CLOCK_REALTIME.</para>
 
 <para>BSD file locks created via <function>flock</function> are not
 propagated to the parent process and sibling processes.  The locks are

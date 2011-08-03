@@ -418,12 +418,13 @@ details. */
 	   error_print_progname.
       248: Export __fpurge.
       249: Export pthread_condattr_getclock, pthread_condattr_setclock.
+      250: Export clock_nanosleep.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 249
+#define CYGWIN_VERSION_API_MINOR 250
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

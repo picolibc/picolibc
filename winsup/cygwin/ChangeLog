@@ -1,3 +1,19 @@
+2011-08-03  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (clock_nanosleep): Export.
+	* posix.sgml (std-notimpl): Move clock_nanosleep from here...
+	(std-susv4): ... to here.
+	(std-notes): Note limitations of clock_nanosleep.
+	* signal.cc (clock_nanosleep): Renamed from nanosleep, adding clock_id
+	and flags arguments and changing return values throughout.
+	Improve checks for illegal rqtp values.  Add support for
+	CLOCK_MONOTONIC and TIMER_ABSTIME.
+	(nanosleep): Rewrite in terms of clock_nanosleep.
+	(sleep): Ditto.
+	(usleep): Ditto.
+	* thread.cc: Mark clock_nanosleep in list of cancellation points.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2011-08-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dll_init.cc: Use fabort in favor of api_fatal and fork_info->abort

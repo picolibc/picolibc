@@ -223,6 +223,7 @@ _clock = clock SIGFE
 clock_getcpuclockid SIGFE
 clock_getres SIGFE
 clock_gettime SIGFE
+clock_nanosleep SIGFE
 clock_setres SIGFE
 clock_settime SIGFE
 clog NOSIGFE

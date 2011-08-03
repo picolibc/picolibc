@@ -81,43 +81,95 @@ signal (int sig, _sig_func_ptr func)
 }
 
 extern "C" int
-nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
+clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
+		 struct timespec *rmtp)
 {
+  const bool abstime = (flags & TIMER_ABSTIME) ? true : false;
   int res = 0;
   sig_dispatch_pending ();
   pthread_testcancel ();
 
-  if ((unsigned int) rqtp->tv_nsec > 999999999)
+  if (rqtp->tv_sec < 0 || rqtp->tv_nsec < 0 || rqtp->tv_nsec > 999999999L)
+    return EINVAL;
+
+  /* Explicitly disallowed by POSIX. Needs to be checked first to avoid
+     being caught by the following test. */
+  if (clk_id == CLOCK_THREAD_CPUTIME_ID)
+    return EINVAL;
+
+  /* support for CPU-time clocks is optional */
+  if (CLOCKID_IS_PROCESS (clk_id) || CLOCKID_IS_THREAD (clk_id))
+    return ENOTSUP;
+
+  switch (clk_id)
     {
-      set_errno (EINVAL);
-      return -1;
+    case CLOCK_REALTIME:
+    case CLOCK_MONOTONIC:
+      break;
+    default:
+      /* unknown or illegal clock ID */
+      return EINVAL;
     }
+
   LARGE_INTEGER timeout;
 
   timeout.QuadPart = (LONGLONG) rqtp->tv_sec * NSPERSEC
 		     + ((LONGLONG) rqtp->tv_nsec + 99LL) / 100LL;
-  timeout.QuadPart *= -1LL;
 
-  syscall_printf ("nanosleep (%ld.%09ld)", rqtp->tv_sec, rqtp->tv_nsec);
+  if (abstime)
+    {
+      struct timespec tp;
+
+      clock_gettime (clk_id, &tp);
+      /* Check for immediate timeout */
+      if (tp.tv_sec > rqtp->tv_sec
+          || (tp.tv_sec == rqtp->tv_sec && tp.tv_nsec > rqtp->tv_nsec))
+	return 0;
+
+      if (clk_id == CLOCK_REALTIME)
+	timeout.QuadPart += FACTOR;
+      else
+	{
+	  /* other clocks need to be handled with a relative timeout */
+	  timeout.QuadPart -= tp.tv_sec * NSPERSEC + tp.tv_nsec / 100LL;
+	  timeout.QuadPart *= -1LL;
+	}
+    }
+  else /* !abstime */
+    timeout.QuadPart *= -1LL;
+
+  syscall_printf ("clock_nanosleep (%ld.%09ld)", rqtp->tv_sec, rqtp->tv_nsec);
 
   int rc = cancelable_wait (signal_arrived, &timeout);
   if (rc == WAIT_OBJECT_0)
     {
       _my_tls.call_signal_handler ();
-      set_errno (EINTR);
-      res = -1;
+      res = EINTR;
     }
 
-  if (rmtp)
+  /* according to POSIX, rmtp is used only if !abstime */
+  if (rmtp && !abstime)
     {
       rmtp->tv_sec = (time_t) (timeout.QuadPart / NSPERSEC);
       rmtp->tv_nsec = (long) ((timeout.QuadPart % NSPERSEC) * 100LL);
     }
 
-  syscall_printf ("%d = nanosleep (%ld.%09ld, %ld.%09.ld)", res, rqtp->tv_sec,
-		  rqtp->tv_nsec, rmtp ? rmtp->tv_sec : 0,
-		  rmtp ? rmtp->tv_nsec : 0);
+  syscall_printf ("%d = clock_nanosleep (%lu, %d, %ld.%09ld, %ld.%09.ld)",
+		  res, clk_id, flags, rqtp->tv_sec, rqtp->tv_nsec,
+		  rmtp ? rmtp->tv_sec : 0, rmtp ? rmtp->tv_nsec : 0);
   return res;
+}
+
+extern "C" int
+nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
+{
+  int res = clock_nanosleep (CLOCK_REALTIME, 0, rqtp, rmtp);
+  if (res != 0)
+    {
+      set_errno (res);
+      return -1;
+    }
+  return 0;
 }
 
 extern "C" unsigned int
@@ -126,7 +178,7 @@ sleep (unsigned int seconds)
   struct timespec req, rem;
   req.tv_sec = seconds;
   req.tv_nsec = 0;
-  if (nanosleep (&req, &rem))
+  if (clock_nanosleep (CLOCK_REALTIME, 0, &req, &rem))
     return rem.tv_sec + (rem.tv_nsec > 0);
   return 0;
 }
@@ -137,8 +189,13 @@ usleep (useconds_t useconds)
   struct timespec req;
   req.tv_sec = useconds / 1000000;
   req.tv_nsec = (useconds % 1000000) * 1000;
-  int res = nanosleep (&req, NULL);
-  return res;
+  int res = clock_nanosleep (CLOCK_REALTIME, 0, &req, NULL);
+  if (res != 0)
+    {
+      set_errno (res);
+      return -1;
+    }
+  return 0;
 }
 
 extern "C" int
