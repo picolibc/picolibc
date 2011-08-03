@@ -28,6 +28,8 @@ details. */
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 
+#define fabort fork_info->abort
+
 dll_list dlls;
 
 muto dll_list::protect;
@@ -147,17 +149,17 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       else
 	{
 	  if (d->p.data_start != p->data_start)
-	    fork_info->abort ("data segment start: parent(%p) != child(%p)",
-			      d->p.data_start, p->data_start);
+	    fabort ("data segment start: parent(%p) != child(%p)",
+		    d->p.data_start, p->data_start);
 	  else if (d->p.data_end != p->data_end)
-	    fork_info->abort ("data segment end: parent(%p) != child(%p)",
-			      d->p.data_end, p->data_end);
+	    fabort ("data segment end: parent(%p) != child(%p)",
+		    d->p.data_end, p->data_end);
 	  else if (d->p.bss_start != p->bss_start)
-	    fork_info->abort ("data segment start: parent(%p) != child(%p)",
-			      d->p.bss_start, p->bss_start);
+	    fabort ("data segment start: parent(%p) != child(%p)",
+		    d->p.bss_start, p->bss_start);
 	  else if (d->p.bss_end != p->bss_end)
-	    fork_info->abort ("bss segment end: parent(%p) != child(%p)",
-			      d->p.bss_end, p->bss_end);
+	    fabort ("bss segment end: parent(%p) != child(%p)",
+		    d->p.bss_end, p->bss_end);
 	}
       d->p = p;
     }
@@ -256,9 +258,11 @@ dll_list::topsort ()
   d = &start;
   while ((d = d->next))
     {
-      debug_printf ("%W", d->modname);
-      for (int i=1; i < -d->ndeps; i++)
-	debug_printf ("-> %W", d->deps[i-1]->modname);
+#ifdef DEBUGGING
+      paranoid_printf ("%W", d->modname);
+      for (int i = 1; i < -d->ndeps; i++)
+	paranoid_printf ("-> %W", d->deps[i - 1]->modname);
+#endif
 
       /* It would be really nice to be able to keep this information
 	 around for next time, but we don't have an easy way to
@@ -294,8 +298,8 @@ dll_list::topsort_visit (dll* d, bool seek_tail)
   if (d->ndeps > 0)
     {
       d->ndeps = -d->ndeps;
-      for (long i=1; i < -d->ndeps; i++)
-	topsort_visit (d->deps[i-1], false);
+      for (long i = 1; i < -d->ndeps; i++)
+	topsort_visit (d->deps[i - 1], false);
 
       append (d);
     }
@@ -378,8 +382,8 @@ reserve_at (const PWCHAR name, DWORD here, DWORD dll_base, DWORD dll_size)
   MEMORY_BASIC_INFORMATION mb;
 
   if (!VirtualQuery ((void *) here, &mb, sizeof (mb)))
-    api_fatal ("couldn't examine memory at %08lx while mapping %W, %E",
-	       here, name);
+    fabort ("couldn't examine memory at %08lx while mapping %W, %E",
+	    here, name);
   if (mb.State != MEM_FREE)
     return 0;
 
@@ -395,8 +399,8 @@ reserve_at (const PWCHAR name, DWORD here, DWORD dll_base, DWORD dll_size)
 
   size = end - here;
   if (!VirtualAlloc ((void *) here, size, MEM_RESERVE, PAGE_NOACCESS))
-    api_fatal ("couldn't allocate memory %p(%d) for '%W' alignment, %E\n",
-	       here, size, name);
+    fabort ("couldn't allocate memory %p(%d) for '%W' alignment, %E\n",
+	    here, size, name);
   return here;
 }
 
@@ -405,8 +409,8 @@ static void
 release_at (const PWCHAR name, DWORD here)
 {
   if (!VirtualFree ((void *) here, 0, MEM_RELEASE))
-    api_fatal ("couldn't release memory %p for '%W' alignment, %E\n",
-	       here, name);
+    fabort ("couldn't release memory %p for '%W' alignment, %E\n",
+	    here, name);
 }
 
 /* Step 1: Reserve memory for all DLL_LOAD dlls. This is to prevent
@@ -423,8 +427,8 @@ dll_list::reserve_space ()
 {
   for (dll* d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
     if (!VirtualAlloc (d->handle, d->image_size, MEM_RESERVE, PAGE_NOACCESS))
-      fork_info->abort ("address space needed by '%W' (%08lx) is already occupied",
-			d->modname, d->handle);
+      fabort ("address space needed by '%W' (%08lx) is already occupied",
+	      d->modname, d->handle);
 }
 
 /* Reload DLLs after a fork.  Iterates over the list of dynamically loaded
@@ -469,12 +473,13 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	   dll's protective reservation from step 1
 	 */
 	if (!retries && !VirtualFree (d->handle, 0, MEM_RELEASE))
-	  api_fatal ("unable to release protective reservation for %W (%08lx), %E",
-		     d->modname, d->handle);
+	  fabort ("unable to release protective reservation for %W (%08lx), %E",
+		  d->modname, d->handle);
 
 	HMODULE h = LoadLibraryExW (d->name, NULL, DONT_RESOLVE_DLL_REFERENCES);
 	if (!h)
-	  api_fatal ("unable to create interim mapping for %W, %E", d->name);
+	  fabort ("unable to create interim mapping for %W, %E",
+		  d->name);
 	if (h != d->handle)
 	  {
 	    sigproc_printf ("%W loaded in wrong place: %08lx != %08lx",
@@ -483,14 +488,14 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	    DWORD reservation = reserve_at (d->modname, (DWORD) h,
 					    (DWORD) d->handle, d->image_size);
 	    if (!reservation)
-	      api_fatal ("unable to block off %p to prevent %W from loading there",
-			 h, d->modname);
+	      fabort ("unable to block off %p to prevent %W from loading there",
+		      h, d->modname);
 
 	    if (retries < DLL_RETRY_MAX)
 	      load_after_fork_impl (parent, d, retries+1);
 	    else
-	      fork_info->abort ("unable to remap %W to same address as parent (%08lx) - try running rebaseall",
-				d->modname, d->handle);
+	       fabort ("unable to remap %W to same address as parent (%08lx) - try running rebaseall",
+		       d->modname, d->handle);
 
 	    /* once the above returns all the dlls are mapped; release
 	       the reservation and continue unwinding */
@@ -504,34 +509,29 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
      protective reservation (for well-behaved dlls) or unloading the
      interim mapping (for rebased dlls) . The dll list is sorted in
      dependency order, so we shouldn't pull in any additional dlls
-     outside our control.
-
-     It stinks that we can't invert the order of the initial LoadLibrary
-     and FreeLibrary since Microsoft documentation seems to imply that
-     should do what we want.  However, once a library is loaded as
-     above, the second LoadLibrary will not execute its startup code
-     unless it is first unloaded. */
+     outside our control.  */
   for (dll *d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
     {
       if (d->handle == d->preferred_base)
 	{
 	  if (!VirtualFree (d->handle, 0, MEM_RELEASE))
-	    api_fatal ("unable to release protective reservation for %W (%08lx), %E",
-		       d->modname, d->handle);
+	    fabort ("unable to release protective reservation for %W (%08lx), %E",
+		    d->modname, d->handle);
 	}
       else
 	{
 	  /* Free the library using our parent's handle: it's identical
-	     to ours our we wouldn't have gotten this far */
+	     to ours or we wouldn't have gotten this far */
 	  if (!FreeLibrary (d->handle))
-	    api_fatal ("unable to unload interim mapping of %W, %E", d->modname);
+	    fabort ("unable to unload interim mapping of %W, %E",
+		    d->modname);
 	}
       HMODULE h = LoadLibraryW (d->name);
       if (!h)
-	api_fatal ("unable to map %W, %E", d->name);
+	fabort ("unable to map %W, %E", d->name);
       if (h != d->handle)
-	api_fatal ("unable to map %W to same address as parent: %p != %p",
-		   d->modname, d->handle, h);
+	fabort ("unable to map %W to same address as parent: %p != %p",
+		d->modname, d->handle, h);
     }
 }
 

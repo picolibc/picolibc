@@ -1,3 +1,16 @@
+2011-08-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dll_init.cc: Use fabort in favor of api_fatal and fork_info->abort
+	where appropriate throughout.
+	(fabort): Define.
+	(dll_list::topsort): Don't print sorting information.  Fix formatting.
+	(dll_list::topsort_visit): Fix formatting.
+	(dll_list::load_after_fork_impl): Perform comment fixups.
+	* sigproc.cc (child_info_fork::abort): (for now?) Always print cause of
+	fork failure.
+	* include/sys/strace.h (strace_vprintf): Remove _STRACE_NOTALL when
+	printing.  We really do want to see this.
+
 2011-08-03  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygtls.h (struct _local_storage): Add cw_timer member.

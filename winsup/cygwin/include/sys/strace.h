@@ -120,7 +120,7 @@ void strace_printf (unsigned, const char *func, const char *, ...);
 #define strace_vprintf(what, fmt, arg) \
     ((void) ({\
 	if ((_STRACE_ ## what & _STRACE_SYSTEM) || strace.active ()) \
-	  strace.vprntf((_STRACE_ ## what) | _STRACE_NOTALL, __PRETTY_FUNCTION__, fmt, arg); \
+	  strace.vprntf((_STRACE_ ## what), __PRETTY_FUNCTION__, fmt, arg); \
 	0; \
     }))
 #endif /*NOSTRACE*/

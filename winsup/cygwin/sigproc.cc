@@ -944,7 +944,7 @@ child_info_fork::abort (const char *fmt, ...)
     {
       va_list ap;
       va_start (ap, fmt);
-      strace_vprintf (SIGP, fmt, ap);
+      strace_vprintf (SYSTEM, fmt, ap);
       ExitProcess (EXITCODE_FORK_FAILED);
     }
   if (retry > 0)
