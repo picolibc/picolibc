@@ -1,3 +1,8 @@
+2011-08-03  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* new-features.sgml (ov-new1.7.10): Document new POSIX Clock Selection
+	option APIs.
+
 2011-07-20  Andy Koppe  <andy.koppe@gmail.com>
 
 	* setup-net.sgml (setup-packages): Reflect removal of Prev button.

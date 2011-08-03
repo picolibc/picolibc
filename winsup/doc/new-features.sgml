@@ -41,6 +41,11 @@ pthread_attr_setstackaddr, pthread_attr_setguardsize, pthread_getattr_np.
 </para></listitem>
 
 <listitem><para>
+POSIX Clock Selection option.  New APIs: clock_nanosleep,
+pthread_condattr_getclock, pthread_condattr_setclock.
+</para></listitem>
+
+<listitem><para>
 clock_gettime(3) and clock_getres(3) accept per-process and per-thread CPU-time
 clocks, including CLOCK_PROCESS_CPUTIME_ID and CLOCK_THREAD_CPUTIME_ID.
 New APIs: clock_getcpuclockid, pthread_getcpuclockid.
