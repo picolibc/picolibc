@@ -1315,6 +1315,9 @@ extern int bfd_mips_num_opcodes;
 
 /* The following flags have the same value for the mips16 opcode
    table:
+
+   INSN_ISA3
+
    INSN_UNCOND_BRANCH_DELAY
    INSN_COND_BRANCH_DELAY
    INSN_COND_BRANCH_LIKELY (never used)
@@ -1323,7 +1326,7 @@ extern int bfd_mips_num_opcodes;
    INSN_WRITE_HI
    INSN_WRITE_LO
    INSN_TRAP
-   INSN_ISA3
+   FP_D (never used)
    */
 
 extern const struct mips_opcode mips16_opcodes[];

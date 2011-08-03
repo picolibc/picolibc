@@ -1,3 +1,8 @@
+2011-08-03  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h: Document the use of FP_D in MIPS16 mode.  Adjust the
+	order of flags documented.
+
 2011-07-29  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h: Clarify the description of microMIPS instruction
