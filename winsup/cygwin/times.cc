@@ -27,10 +27,6 @@ details. */
 #include "cygtls.h"
 #include "ntdll.h"
 
-/* 100ns difference between WIndows and UNIX timebase. */
-#define FACTOR (0x19db1ded53e8000LL)
-/* # of 100ns intervals per second. */
-#define NSPERSEC 10000000LL
 /* Max allowed diversion in 100ns of internal timer from system time.  If
    this difference is exceeded, the internal timer gets re-primed. */
 #define JITTER (40 * 10000LL)
@@ -737,7 +733,7 @@ hires_ms::resolution ()
 
       status = NtQueryTimerResolution (&coarsest, &finest, &actual);
       if (NT_SUCCESS (status))
-	minperiod = (DWORD) actual / 10000L;
+	minperiod = (DWORD) actual;
       else
 	{
 	  /* Try to empirically determine current timer resolution */
@@ -757,13 +753,9 @@ hires_ms::resolution ()
 	      period += now - then;
 	    }
 	  SetThreadPriority (GetCurrentThread (), priority);
-	  period /= 40000L;
+	  period /= 4L;
 	  minperiod = (DWORD) period;
 	}
-      /* The resolution can be as low as 5000 100ns intervals on recent OSes.
-	 We have to make sure that the resolution in ms is never 0. */
-      if (!minperiod)
-	minperiod = 1L;
     }
   return minperiod;
 }
@@ -786,8 +778,8 @@ clock_getres (clockid_t clk_id, struct timespec *tp)
       case CLOCK_REALTIME:
 	{
 	  DWORD period = gtod.resolution ();
-	  tp->tv_sec = period / 1000;
-	  tp->tv_nsec = (period % 1000) * 1000000;
+	  tp->tv_sec = period / NSPERSEC;
+	  tp->tv_nsec = (period % NSPERSEC) * 100;
 	  break;
 	}
 
@@ -838,7 +830,7 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
     }
 
   if (period_set
-      && NT_SUCCESS (NtSetTimerResolution (minperiod * 10000L, FALSE, &actual)))
+      && NT_SUCCESS (NtSetTimerResolution (minperiod, FALSE, &actual)))
     period_set = false;
 
   status = NtSetTimerResolution (period, TRUE, &actual);
@@ -847,11 +839,7 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  minperiod = actual / 10000L;
-  /* The resolution can be as low as 5000 100ns intervals on recent OSes.
-     We have to make sure that the resolution in ms is never 0. */
-  if (!minperiod)
-    minperiod = 1L;
+  minperiod = actual;
   period_set = true;
   return 0;
 }

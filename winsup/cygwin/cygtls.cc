@@ -98,6 +98,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
   thread_id = GetCurrentThreadId ();
   initialized = CYGTLS_INITIALIZED;
   errno_addr = &(local_clib._errno);
+  locals.cw_timer = NULL;
 
   if ((void *) func == (void *) cygthread::stub
       || (void *) func == (void *) cygthread::simplestub)
@@ -127,6 +128,7 @@ _cygtls::fixup_after_fork ()
     }
   stacklock = spinning = 0;
   locals.select.sockevt = NULL;
+  locals.cw_timer = NULL;
   wq.thread_ev = NULL;
 }
 

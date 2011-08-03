@@ -37,7 +37,8 @@ enum cw_cancel_action
   cw_no_cancel
 };
 
-DWORD cancelable_wait (HANDLE, DWORD, const cw_cancel_action = cw_cancel_self,
+DWORD cancelable_wait (HANDLE, PLARGE_INTEGER timeout = NULL,
+		       const cw_cancel_action = cw_cancel_self,
 		       const enum cw_sig_wait = cw_sig_nosig)
   __attribute__ ((regparm (3)));
 
@@ -70,7 +71,7 @@ public:
   void lock ()
   {
     if (InterlockedIncrement ((long *) &lock_counter) != 1)
-      cancelable_wait (win32_obj_id, INFINITE, cw_no_cancel, cw_sig_resume);
+      cancelable_wait (win32_obj_id, NULL, cw_no_cancel, cw_sig_resume);
   }
 
   void unlock ()
@@ -517,7 +518,7 @@ public:
   pthread_mutex_t mtx_cond;
 
   void unblock (const bool all);
-  int wait (pthread_mutex_t mutex, DWORD dwMilliseconds = INFINITE);
+  int wait (pthread_mutex_t mutex, PLARGE_INTEGER timeout = NULL);
 
   pthread_cond (pthread_condattr *);
   ~pthread_cond ();

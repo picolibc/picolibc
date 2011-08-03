@@ -29,6 +29,11 @@ details. */
    and rounding won't exceed HIRES_DELAY_MAX */
 #define HIRES_DELAY_MAX ((((UINT_MAX - 10000) / 1000) * 1000) + 10)
 
+/* 100ns difference between Windows and UNIX timebase. */
+#define FACTOR (0x19db1ded53e8000LL)
+/* # of 100ns intervals per second. */
+#define NSPERSEC 10000000LL
+
 class hires_base
 {
  protected:

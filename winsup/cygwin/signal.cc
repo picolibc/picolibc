@@ -92,61 +92,31 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
       set_errno (EINVAL);
       return -1;
     }
-  unsigned int sec = rqtp->tv_sec;
-  DWORD resolution = gtod.resolution ();
-  bool done = false;
-  DWORD req;
-  DWORD rem;
+  LARGE_INTEGER timeout;
 
-  while (!done)
+  timeout.QuadPart = (LONGLONG) rqtp->tv_sec * NSPERSEC
+		     + ((LONGLONG) rqtp->tv_nsec + 99LL) / 100LL;
+  timeout.QuadPart *= -1LL;
+
+  syscall_printf ("nanosleep (%ld.%09ld)", rqtp->tv_sec, rqtp->tv_nsec);
+
+  int rc = cancelable_wait (signal_arrived, &timeout);
+  if (rc == WAIT_OBJECT_0)
     {
-      /* Divide user's input into transactions no larger than 49.7
-	 days at a time.  */
-      if (sec > HIRES_DELAY_MAX / 1000)
-	{
-	  req = ((HIRES_DELAY_MAX + resolution - 1)
-		 / resolution * resolution);
-	  sec -= HIRES_DELAY_MAX / 1000;
-	}
-      else
-	{
-	  req = ((sec * 1000 + (rqtp->tv_nsec + 999999) / 1000000
-		  + resolution - 1) / resolution) * resolution;
-	  sec = 0;
-	  done = true;
-	}
-
-      DWORD end_time = gtod.dmsecs () + req;
-      syscall_printf ("nanosleep (%ld)", req);
-
-      int rc = cancelable_wait (signal_arrived, req);
-      if ((rem = end_time - gtod.dmsecs ()) > HIRES_DELAY_MAX)
-	rem = 0;
-      if (rc == WAIT_OBJECT_0)
-	{
-	  _my_tls.call_signal_handler ();
-	  set_errno (EINTR);
-	  res = -1;
-	  break;
-	}
+      _my_tls.call_signal_handler ();
+      set_errno (EINTR);
+      res = -1;
     }
 
   if (rmtp)
     {
-      rmtp->tv_sec = sec + rem / 1000;
-      rmtp->tv_nsec = (rem % 1000) * 1000000;
-      if (sec)
-	{
-	  rmtp->tv_nsec += rqtp->tv_nsec;
-	  if (rmtp->tv_nsec >= 1000000000)
-	    {
-	      rmtp->tv_nsec -= 1000000000;
-	      rmtp->tv_sec++;
-	    }
-	}
+      rmtp->tv_sec = (time_t) (timeout.QuadPart / NSPERSEC);
+      rmtp->tv_nsec = (long) ((timeout.QuadPart % NSPERSEC) * 100LL);
     }
 
-  syscall_printf ("%d = nanosleep (%ld, %ld)", res, req, rem);
+  syscall_printf ("%d = nanosleep (%ld.%09ld, %ld.%09.ld)", res, rqtp->tv_sec,
+		  rqtp->tv_nsec, rmtp ? rmtp->tv_sec : 0,
+		  rmtp ? rmtp->tv_nsec : 0);
   return res;
 }
 

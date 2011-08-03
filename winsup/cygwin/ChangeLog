@@ -1,3 +1,38 @@
+2011-08-03  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygtls.h (struct _local_storage): Add cw_timer member.
+	* cygtls.cc (_cygtls::init_thread): Initialize locals.cw_timer.
+	(_cygtls::fixup_after_fork): Ditto.
+	* tlsoffsets.h: Regenerate.
+	* ntdll.h (enum _TIMER_INFORMATION_CLASS): Define.
+	(struct _TIMER_BASIC_INFORMATION): Define.
+	(NtQueryTimer): Declare function.
+	* thread.h (cancelable_wait): Change timeout argument to
+	PLARGE_INTEGER and provide NULL default.
+	(fast_mutex::lock): Adjust accordingly.
+	(pthread_cond::wait): Change timeout argument to PLARGE_INTEGER
+	and default to NULL.
+	* thread.cc (cancelable_wait): Change timeout argument to
+	PLARGE_INTEGER.  Initialize _cygtls.locals.cw_timer if needed.
+	Use NT waitable timers for handling timeout.  Return remaining time
+	to timeout argument if timeout was relative.
+	(pthread_cond::wait): Change timeout argument to PLARGE_INTEGER.
+	Adjust to change in cancelable_wait.
+	(pthread_mutex::lock): Adjust to change in cancelable_wait.
+	(pthread_spinlock::lock): Ditto.
+	(pthread::join): Ditto.
+	(__pthread_cond_dowait): Change waitlength argument to PLARGE_INTEGER.
+	Adjust to changes in cancelable_wait and pthread_cond::wait.
+	(pthread_cond_timedwait): Adjust to change in __pthread_cond_dowait.
+	(pthread_cond_wait): Ditto.
+	(semaphore::_timedwait): Adjust to change in cancelable_wait.
+	(semaphore::_wait): Ditto.
+	* exceptions.cc (handle_sigsuspend): Ditto.
+	* signal.cc (nanosleep): Ditto.
+	* wait.cc (wait4): Ditto. Fix copyright dates.
+	* times.cc (FACTOR, NSPERSEC): Move from here...
+	* hires.h (FACTOR, NSPERSEC): ...to here.
+
 2011-08-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (faccessat): Fix parens in flag expression when calling

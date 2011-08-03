@@ -131,6 +131,9 @@ struct _local_storage
   int setmode_file;
   int setmode_mode;
 
+  /* thread.cc */
+  HANDLE cw_timer;
+
   /* All functions requiring temporary path buffers. */
   tls_pathbuf pathbufs;
   char ttybuf[32];

@@ -719,7 +719,7 @@ handle_sigsuspend (sigset_t tempmask)
   sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
-  cancelable_wait (signal_arrived, INFINITE);
+  cancelable_wait (signal_arrived);
 
   set_sig_errno (EINTR);	// Per POSIX
 

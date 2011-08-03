@@ -906,13 +906,13 @@ pthread::static_cancel_self ()
 }
 
 DWORD
-cancelable_wait (HANDLE object, DWORD timeout,
+cancelable_wait (HANDLE object, PLARGE_INTEGER timeout,
 		 const cw_cancel_action cancel_action,
 		 const enum cw_sig_wait sig_wait)
 {
   DWORD res;
   DWORD num = 0;
-  HANDLE wait_objects[3];
+  HANDLE wait_objects[4];
   pthread_t thread = pthread::self ();
 
   /* Do not change the wait order.
@@ -939,15 +939,30 @@ cancelable_wait (HANDLE object, DWORD timeout,
       wait_objects[sig_n] = signal_arrived;
     }
 
+  DWORD timeout_n;
+  if (!timeout)
+    timeout_n = WAIT_TIMEOUT + 1;
+  else
+    {
+      timeout_n = WAIT_OBJECT_0 + num++;
+      if (!_my_tls.locals.cw_timer)
+	NtCreateTimer (&_my_tls.locals.cw_timer, TIMER_ALL_ACCESS, NULL,
+		       NotificationTimer);
+      NtSetTimer (_my_tls.locals.cw_timer, timeout, NULL, NULL, FALSE, 0, NULL);
+      wait_objects[timeout_n] = _my_tls.locals.cw_timer;
+    }
+
   while (1)
     {
-      res = WaitForMultipleObjects (num, wait_objects, FALSE, timeout);
+      res = WaitForMultipleObjects (num, wait_objects, FALSE, INFINITE);
       if (res == cancel_n)
 	{
 	  if (cancel_action == cw_cancel_self)
 	    pthread::static_cancel_self ();
 	  res = WAIT_CANCELED;
 	}
+      else if (res == timeout_n)
+	res = WAIT_TIMEOUT;
       else if (res != sig_n)
 	/* all set */;
       else if (sig_wait == cw_sig_eintr)
@@ -959,6 +974,21 @@ cancelable_wait (HANDLE object, DWORD timeout,
 	}
       break;
     }
+
+  if (timeout)
+    {
+      const size_t sizeof_tbi = sizeof (TIMER_BASIC_INFORMATION);
+      PTIMER_BASIC_INFORMATION tbi = (PTIMER_BASIC_INFORMATION) malloc (sizeof_tbi);
+
+      NtQueryTimer (_my_tls.locals.cw_timer, TimerBasicInformation, tbi,
+		    sizeof_tbi, NULL);
+      /* if timer expired, TimeRemaining is negative and represents the
+	  system uptime when signalled */
+      if (timeout->QuadPart < 0LL)
+	timeout->QuadPart = tbi->SignalState ? 0LL : tbi->TimeRemaining.QuadPart;
+      NtCancelTimer (_my_tls.locals.cw_timer, NULL);
+    }
+
   return res;
 }
 
@@ -1228,7 +1258,7 @@ pthread_cond::unblock (const bool all)
 }
 
 int
-pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
+pthread_cond::wait (pthread_mutex_t mutex, PLARGE_INTEGER timeout)
 {
   DWORD rv;
 
@@ -1249,7 +1279,7 @@ pthread_cond::wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
   ++mutex->condwaits;
   mutex->unlock ();
 
-  rv = cancelable_wait (sem_wait, dwMilliseconds, cw_no_cancel_self, cw_sig_eintr);
+  rv = cancelable_wait (sem_wait, timeout, cw_no_cancel_self, cw_sig_eintr);
 
   mtx_out.lock ();
 
@@ -1764,7 +1794,7 @@ pthread_mutex::lock ()
   else if (type == PTHREAD_MUTEX_NORMAL /* potentially causes deadlock */
 	   || !pthread::equal (owner, self))
     {
-      cancelable_wait (win32_obj_id, INFINITE, cw_no_cancel, cw_sig_resume);
+      cancelable_wait (win32_obj_id, NULL, cw_no_cancel, cw_sig_resume);
       set_owner (self);
     }
   else
@@ -1899,8 +1929,13 @@ pthread_spinlock::lock ()
 	}
       else if (pthread::equal (owner, self))
 	result = EDEADLK;
-      else /* Minimal timeout to minimize CPU usage while still spinning. */
-	cancelable_wait (win32_obj_id, 1L, cw_no_cancel, cw_sig_resume);
+      else
+	{
+	  /* Minimal timeout to minimize CPU usage while still spinning. */
+	  LARGE_INTEGER timeout;
+	  timeout.QuadPart = -10000LL;
+	  cancelable_wait (win32_obj_id, &timeout, cw_no_cancel, cw_sig_resume);
+	}
     }
   while (result == -1);
   pthread_printf ("spinlock %p, self %p, owner %p", this, self, owner);
@@ -2377,7 +2412,7 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->mutex.unlock ();
 
-      switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, cw_no_cancel_self, cw_sig_resume))
+      switch (cancelable_wait ((*thread)->win32_obj_id, NULL, cw_no_cancel_self, cw_sig_resume))
 	{
 	case WAIT_OBJECT_0:
 	  if (return_val)
@@ -2702,7 +2737,7 @@ pthread_cond_signal (pthread_cond_t *cond)
 
 static int
 __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
-		       DWORD waitlength)
+		       PLARGE_INTEGER waitlength)
 {
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
@@ -2722,7 +2757,7 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 			const struct timespec *abstime)
 {
   struct timespec tp;
-  DWORD waitlength;
+  LARGE_INTEGER timeout;
 
   myfault efault;
   if (efault.faulted ())
@@ -2738,17 +2773,27 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 
   clock_gettime ((*cond)->clock_id, &tp);
 
-  /* Check for immediate timeout before converting to microseconds, since
-     the resulting value can easily overflow long.  This also allows to
-     evaluate microseconds directly in DWORD. */
+  /* Check for immediate timeout before converting */
   if (tp.tv_sec > abstime->tv_sec
       || (tp.tv_sec == abstime->tv_sec
 	  && tp.tv_nsec > abstime->tv_nsec))
     return ETIMEDOUT;
 
-  waitlength = (abstime->tv_sec - tp.tv_sec) * 1000;
-  waitlength += (abstime->tv_nsec - tp.tv_nsec) / 1000000;
-  return __pthread_cond_dowait (cond, mutex, waitlength);
+  timeout.QuadPart = abstime->tv_sec * NSPERSEC
+		      + (abstime->tv_nsec + 99LL) / 100LL;
+
+  switch ((*cond)->clock_id)
+    {
+    case CLOCK_REALTIME:
+      timeout.QuadPart += FACTOR;
+      break;
+    default:
+      /* other clocks must be handled as relative timeout */
+      timeout.QuadPart -= tp.tv_sec * NSPERSEC + tp.tv_nsec / 100LL;
+      timeout.QuadPart *= -1LL;
+      break;
+    }
+  return __pthread_cond_dowait (cond, mutex, &timeout);
 }
 
 extern "C" int
@@ -2756,7 +2801,7 @@ pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
   pthread_testcancel ();
 
-  return __pthread_cond_dowait (cond, mutex, INFINITE);
+  return __pthread_cond_dowait (cond, mutex, NULL);
 }
 
 extern "C" int
@@ -3439,8 +3484,7 @@ semaphore::_trywait ()
 int
 semaphore::_timedwait (const struct timespec *abstime)
 {
-  struct timeval tv;
-  long waitlength;
+  LARGE_INTEGER timeout;
 
   myfault efault;
   if (efault.faulted ())
@@ -3453,12 +3497,10 @@ semaphore::_timedwait (const struct timespec *abstime)
       return -1;
     }
 
-  gettimeofday (&tv, NULL);
-  waitlength = abstime->tv_sec * 1000 + abstime->tv_nsec / (1000 * 1000);
-  waitlength -= tv.tv_sec * 1000 + tv.tv_usec / 1000;
-  if (waitlength < 0)
-    waitlength = 0;
-  switch (cancelable_wait (win32_obj_id, waitlength, cw_cancel_self, cw_sig_eintr))
+  timeout.QuadPart = abstime->tv_sec * NSPERSEC
+		     + (abstime->tv_nsec + 99) / 100 + FACTOR;
+
+  switch (cancelable_wait (win32_obj_id, &timeout, cw_cancel_self, cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
@@ -3480,7 +3522,7 @@ semaphore::_timedwait (const struct timespec *abstime)
 int
 semaphore::_wait ()
 {
-  switch (cancelable_wait (win32_obj_id, INFINITE, cw_cancel_self, cw_sig_eintr))
+  switch (cancelable_wait (win32_obj_id, NULL, cw_cancel_self, cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
