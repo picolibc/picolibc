@@ -2812,6 +2812,8 @@ socketpair (int family, int type, int protocol, int *sb)
 	    sb[1] = sb1;
 	    res = 0;
 	  }
+	else
+	  sb0.release ();
       }
 
     if (res == -1)
