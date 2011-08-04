@@ -1,3 +1,7 @@
+2011-08-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-using.xml (faq.using.bloda): Add NVIDIA.  Change wording slightly.
+
 2011-08-03  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* new-features.sgml (ov-new1.7.10): Document new POSIX Clock Selection

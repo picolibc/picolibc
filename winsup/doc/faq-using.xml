@@ -1129,7 +1129,8 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>Earthlink Total-Access</para></listitem>
 <listitem><para>Spybot S&amp;D TeaTimer</para></listitem>
 <listitem><para>AR Soft RAM Disk</para></listitem>
-<listitem><para>ATI Catalyst drivers</para></listitem>
+<listitem><para>ATI Catalyst (some versions)</para></listitem>
+<listitem><para>NVIDIA GeForce (some versions)</para></listitem>
 <listitem><para>Windows LiveOneCare</para></listitem>
 <listitem><para>Webroot Spy Sweeper with Antivirus</para></listitem>
 <listitem><para>COMODO Firewall Pro</para></listitem>
