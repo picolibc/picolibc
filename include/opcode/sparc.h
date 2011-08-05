@@ -131,6 +131,8 @@ typedef struct sparc_opcode
 	f	frs2 floating point register.
 	B	frs2 floating point register (double/even).
 	R	frs2 floating point register (quad/multiple of 4).
+	4	frs3 floating point register.
+	5	frs3 floating point register (doube/even).
 	g	frsd floating point register.
 	H	frsd floating point register (double/even).
 	J	frsd floating point register (quad/multiple of 4).
@@ -187,15 +189,14 @@ typedef struct sparc_opcode
 	0	32/64 bit immediate for set or setx (v9) insns
 	_	Ancillary state register in rd (v9a)
 	/	Ancillary state register in rs1 (v9a)
-
-  The following chars are unused: (note: ,[] are used as punctuation)
-  [45].  */
+	(	entire floating point state register (%efsr).  */
 
 #define OP2(x)		(((x) & 0x7) << 22)  /* Op2 field of format2 insns.  */
 #define OP3(x)		(((x) & 0x3f) << 19) /* Op3 field of format3 insns.  */
 #define OP(x)		((unsigned) ((x) & 0x3) << 30) /* Op field of all insns.  */
 #define OPF(x)		(((x) & 0x1ff) << 5) /* Opf field of float insns.  */
 #define OPF_LOW5(x)	OPF ((x) & 0x1f)     /* V9.  */
+#define OPF_LOW4(x)	OPF ((x) & 0xf)      /* V9.  */
 #define F3F(x, y, z)	(OP (x) | OP3 (y) | OPF (z)) /* Format3 float insns.  */
 #define F3I(x)		(((x) & 0x1) << 13)  /* Immediate field of format 3 insns.  */
 #define F2(x, y)	(OP (x) | OP2(y))    /* Format 2 insns.  */
@@ -207,6 +208,7 @@ typedef struct sparc_opcode
 #define SIMM13(x)	((x) & 0x1fff)       /* Simm13 field.  */
 #define RD(x)		(((x) & 0x1f) << 25) /* Destination register field.  */
 #define RS1(x)		(((x) & 0x1f) << 14) /* Rs1 field.  */
+#define RS3(x)		(((x) & 0x1f) << 9)  /* Rs3 field.  */
 #define ASI_RS2(x)	(SIMM13 (x))
 #define MEMBAR(x)	((x) & 0x7f)
 #define SLCPOP(x)	(((x) & 0x7f) << 6)  /* Sparclet cpop.  */

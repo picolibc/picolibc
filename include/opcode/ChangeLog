@@ -1,3 +1,8 @@
+2011-08-05  David S. Miller  <davem@davemloft.net>
+
+	* sparc.h: Document new format codes '4', '5', and '('.
+	(OPF_LOW4, RS3): New macros.
+
 2011-08-03  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h: Document the use of FP_D in MIPS16 mode.  Adjust the
