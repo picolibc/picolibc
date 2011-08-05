@@ -1,3 +1,13 @@
+2011-08-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winnt.h (IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE,
+	IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY,
+	IMAGE_DLLCHARACTERISTICS_NX_COMPAT): Fix typo in definitions.
+	(IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE,
+	IMAGE_DLL_CHARACTERISTICS_FORCE_INTEGRITY,
+	IMAGE_DLL_CHARACTERISTICS_NX_COMPAT): Keep broken definitions for
+	backward compatibility.
+
 2011-07-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winsock2.h (SIO_UDP_CONNRESET): Define.
