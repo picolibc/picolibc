@@ -842,6 +842,11 @@ format_process_maps (void *data, char *&destbuf)
   pinfo proc_pinfo;
   if (ReadProcessMemory (proc, &myself, &proc_pinfo, sizeof proc_pinfo, NULL))
     proc_pinfo.preserve ();
+  /* The heap info on the cygheap is also in the same spot in each process
+     because the cygheap is located at the same address. */
+  user_heap_info user_heap;
+  ReadProcessMemory (proc, &cygheap->user_heap, &user_heap,
+		     sizeof user_heap, NULL);
 
   _off64_t len = 0;
 
@@ -976,7 +981,7 @@ format_process_maps (void *data, char *&destbuf)
 		    strcpy (posix_modname, "[cygwin-user-shared]");
 		  else if (cur.abase == (char *) *proc_pinfo)
 		    strcpy (posix_modname, "[procinfo]");
-		  else if (cur.abase == cygheap->user_heap.base)
+		  else if (cur.abase == user_heap.base)
 		    strcpy (posix_modname, "[heap]");
 		  else
 		    posix_modname[0] = 0;

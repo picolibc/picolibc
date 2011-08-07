@@ -1,3 +1,8 @@
+2011-08-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (format_process_maps): Actually print info about
+	the application heap of the printed process, not of the current process.
+
 2011-08-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (socketpair): Release sb0 if there's no space left for sb1.
