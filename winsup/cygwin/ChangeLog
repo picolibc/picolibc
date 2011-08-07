@@ -1,5 +1,10 @@
 2011-08-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* resource.cc (getrlimit): Just return RLIM_INFINITY in a request for
+	RLIMIT_AS.
+
+2011-08-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_process.cc (format_process_maps): Actually print info about
 	the application heap of the printed process, not of the current process.
 

@@ -14,6 +14,7 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
+#include <sys/param.h>
 #include "pinfo.h"
 #include "psapi.h"
 #include "cygtls.h"
@@ -128,6 +129,7 @@ getrlimit (int resource, struct rlimit *rlp)
     case RLIMIT_CPU:
     case RLIMIT_FSIZE:
     case RLIMIT_DATA:
+    case RLIMIT_AS:
       break;
     case RLIMIT_STACK:
       if (!VirtualQuery ((LPCVOID) &m, &m, sizeof m))
@@ -147,10 +149,6 @@ getrlimit (int resource, struct rlimit *rlp)
       break;
     case RLIMIT_CORE:
       rlp->rlim_cur = cygheap->rlim_core;
-      break;
-    case RLIMIT_AS:
-      rlp->rlim_cur = 0x80000000UL;
-      rlp->rlim_max = 0x80000000UL;
       break;
     default:
       set_errno (EINVAL);
