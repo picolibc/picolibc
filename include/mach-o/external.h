@@ -249,6 +249,12 @@ struct mach_o_dyld_info_command_external
   unsigned char export_size[4];
 };
 
+struct mach_o_version_min_command_external
+{
+  unsigned char version[4];
+  unsigned char reserved[4];
+};
+
 struct mach_o_fat_header_external
 {
   unsigned char magic[4];
