@@ -1,3 +1,8 @@
+2011-08-08  Mike Stump <mikestump@comcast.net>
+
+	* Makefile.in: Make stmp-bsp and install consistent with
+	subdir_do target with regards to error handling.
+
 2011-07-13  Bin Cheng <bin.cheng@arm.com>
 
 	* arm/crt0.S: Support armv6-m processors in libgloss.
