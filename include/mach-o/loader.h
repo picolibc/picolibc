@@ -22,33 +22,7 @@
 #ifndef _MACH_O_LOADER_H
 #define _MACH_O_LOADER_H
 
-/* Symbol n_type values.  */
-#define BFD_MACH_O_N_STAB  0xe0	/* If any of these bits set, a symbolic debugging entry.  */
-#define BFD_MACH_O_N_PEXT  0x10	/* Private external symbol bit.  */
-#define BFD_MACH_O_N_TYPE  0x0e	/* Mask for the type bits.  */
-#define BFD_MACH_O_N_EXT   0x01	/* External symbol bit, set for external symbols.  */
-#define BFD_MACH_O_N_UNDF  0x00	/* Undefined, n_sect == NO_SECT.  */
-#define BFD_MACH_O_N_ABS   0x02	/* Absolute, n_sect == NO_SECT.  */
-#define BFD_MACH_O_N_INDR  0x0a	/* Indirect.  */
-#define BFD_MACH_O_N_PBUD  0x0c /* Prebound undefined (defined in a dylib).  */
-#define BFD_MACH_O_N_SECT  0x0e	/* Defined in section number n_sect.  */
-
-#define BFD_MACH_O_NO_SECT 0	/* Symbol not in any section of the image.  */
-
-/* Symbol n_desc reference flags.  */
-#define BFD_MACH_O_REFERENCE_MASK 				0x0f
-#define BFD_MACH_O_REFERENCE_FLAG_UNDEFINED_NON_LAZY		0x00
-#define BFD_MACH_O_REFERENCE_FLAG_UNDEFINED_LAZY		0x01
-#define BFD_MACH_O_REFERENCE_FLAG_DEFINED			0x02
-#define BFD_MACH_O_REFERENCE_FLAG_PRIVATE_DEFINED		0x03
-#define BFD_MACH_O_REFERENCE_FLAG_PRIVATE_UNDEFINED_NON_LAZY	0x04
-#define BFD_MACH_O_REFERENCE_FLAG_PRIVATE_UNDEFINED_LAZY	0x05
-
-#define BFD_MACH_O_REFERENCED_DYNAMICALLY			0x10
-#define BFD_MACH_O_N_DESC_DISCARDED				0x20
-#define BFD_MACH_O_N_NO_DEAD_STRIP				0x20
-#define BFD_MACH_O_N_WEAK_REF					0x40
-#define BFD_MACH_O_N_WEAK_DEF					0x80
+/* Constants for header. */
 
 typedef enum bfd_mach_o_mach_header_magic
 {
@@ -58,82 +32,6 @@ typedef enum bfd_mach_o_mach_header_magic
   BFD_MACH_O_MH_CIGAM_64 = 0xcffaedfe
 }
 bfd_mach_o_mach_header_magic;
-
-typedef enum bfd_mach_o_ppc_thread_flavour
-{
-  BFD_MACH_O_PPC_THREAD_STATE      = 1,
-  BFD_MACH_O_PPC_FLOAT_STATE       = 2,
-  BFD_MACH_O_PPC_EXCEPTION_STATE   = 3,
-  BFD_MACH_O_PPC_VECTOR_STATE      = 4,
-  BFD_MACH_O_PPC_THREAD_STATE64    = 5,
-  BFD_MACH_O_PPC_EXCEPTION_STATE64 = 6,
-  BFD_MACH_O_PPC_THREAD_STATE_NONE = 7
-}
-bfd_mach_o_ppc_thread_flavour;
-
-/* Defined in <mach/i386/thread_status.h> */
-typedef enum bfd_mach_o_i386_thread_flavour
-{
-  BFD_MACH_O_x86_THREAD_STATE32    = 1,
-  BFD_MACH_O_x86_FLOAT_STATE32     = 2,
-  BFD_MACH_O_x86_EXCEPTION_STATE32 = 3,
-  BFD_MACH_O_x86_THREAD_STATE64    = 4,
-  BFD_MACH_O_x86_FLOAT_STATE64     = 5,
-  BFD_MACH_O_x86_EXCEPTION_STATE64 = 6,
-  BFD_MACH_O_x86_THREAD_STATE      = 7,
-  BFD_MACH_O_x86_FLOAT_STATE       = 8,
-  BFD_MACH_O_x86_EXCEPTION_STATE   = 9,
-  BFD_MACH_O_x86_DEBUG_STATE32     = 10,
-  BFD_MACH_O_x86_DEBUG_STATE64     = 11,
-  BFD_MACH_O_x86_DEBUG_STATE       = 12,
-  BFD_MACH_O_x86_THREAD_STATE_NONE = 13
-}
-bfd_mach_o_i386_thread_flavour;
-
-#define BFD_MACH_O_LC_REQ_DYLD 0x80000000
-
-typedef enum bfd_mach_o_load_command_type
-{
-  BFD_MACH_O_LC_SEGMENT = 0x1,		/* File segment to be mapped.  */
-  BFD_MACH_O_LC_SYMTAB = 0x2,		/* Link-edit stab symbol table info (obsolete).  */
-  BFD_MACH_O_LC_SYMSEG = 0x3,		/* Link-edit gdb symbol table info.  */
-  BFD_MACH_O_LC_THREAD = 0x4,		/* Thread.  */
-  BFD_MACH_O_LC_UNIXTHREAD = 0x5,	/* UNIX thread (includes a stack).  */
-  BFD_MACH_O_LC_LOADFVMLIB = 0x6,	/* Load a fixed VM shared library.  */
-  BFD_MACH_O_LC_IDFVMLIB = 0x7,		/* Fixed VM shared library id.  */
-  BFD_MACH_O_LC_IDENT = 0x8,		/* Object identification information (obsolete).  */
-  BFD_MACH_O_LC_FVMFILE = 0x9,		/* Fixed VM file inclusion.  */
-  BFD_MACH_O_LC_PREPAGE = 0xa,		/* Prepage command (internal use).  */
-  BFD_MACH_O_LC_DYSYMTAB = 0xb,		/* Dynamic link-edit symbol table info.  */
-  BFD_MACH_O_LC_LOAD_DYLIB = 0xc,	/* Load a dynamically linked shared library.  */
-  BFD_MACH_O_LC_ID_DYLIB = 0xd,		/* Dynamically linked shared lib identification.  */
-  BFD_MACH_O_LC_LOAD_DYLINKER = 0xe,	/* Load a dynamic linker.  */
-  BFD_MACH_O_LC_ID_DYLINKER = 0xf,	/* Dynamic linker identification.  */
-  BFD_MACH_O_LC_PREBOUND_DYLIB = 0x10,	/* Modules prebound for a dynamically.  */
-  BFD_MACH_O_LC_ROUTINES = 0x11,	/* Image routines.  */
-  BFD_MACH_O_LC_SUB_FRAMEWORK = 0x12,	/* Sub framework.  */
-  BFD_MACH_O_LC_SUB_UMBRELLA = 0x13,	/* Sub umbrella.  */
-  BFD_MACH_O_LC_SUB_CLIENT = 0x14,	/* Sub client.  */
-  BFD_MACH_O_LC_SUB_LIBRARY = 0x15,   	/* Sub library.  */
-  BFD_MACH_O_LC_TWOLEVEL_HINTS = 0x16,	/* Two-level namespace lookup hints.  */
-  BFD_MACH_O_LC_PREBIND_CKSUM = 0x17, 	/* Prebind checksum.  */
-  /* Load a dynamically linked shared library that is allowed to be
-       missing (weak).  */
-  BFD_MACH_O_LC_LOAD_WEAK_DYLIB = 0x18,
-  BFD_MACH_O_LC_SEGMENT_64 = 0x19,	/* 64-bit segment of this file to be 
-                                           mapped.  */
-  BFD_MACH_O_LC_ROUTINES_64 = 0x1a,     /* Address of the dyld init routine 
-                                           in a dylib.  */
-  BFD_MACH_O_LC_UUID = 0x1b,            /* 128-bit UUID of the executable.  */
-  BFD_MACH_O_LC_RPATH = 0x1c,		/* Run path addiions.  */
-  BFD_MACH_O_LC_CODE_SIGNATURE = 0x1d,	/* Local of code signature.  */
-  BFD_MACH_O_LC_SEGMENT_SPLIT_INFO = 0x1e, /* Local of info to split seg.  */
-  BFD_MACH_O_LC_REEXPORT_DYLIB = 0x1f,  /* Load and re-export lib.  */
-  BFD_MACH_O_LC_LAZY_LOAD_DYLIB = 0x20, /* Delay load of lib until use.  */
-  BFD_MACH_O_LC_ENCRYPTION_INFO = 0x21, /* Encrypted segment info.  */
-  BFD_MACH_O_LC_DYLD_INFO = 0x22	/* Compressed dyld information.  */
-}
-bfd_mach_o_load_command_type;
 
 #define BFD_MACH_O_CPU_IS64BIT 0x1000000
 
@@ -180,31 +78,81 @@ bfd_mach_o_filetype;
 
 typedef enum bfd_mach_o_header_flags
 {
-  BFD_MACH_O_MH_NOUNDEFS		= 0x000001,
-  BFD_MACH_O_MH_INCRLINK		= 0x000002,
-  BFD_MACH_O_MH_DYLDLINK		= 0x000004,
-  BFD_MACH_O_MH_BINDATLOAD		= 0x000008,
-  BFD_MACH_O_MH_PREBOUND		= 0x000010,
-  BFD_MACH_O_MH_SPLIT_SEGS		= 0x000020,
-  BFD_MACH_O_MH_LAZY_INIT		= 0x000040,
-  BFD_MACH_O_MH_TWOLEVEL		= 0x000080,
-  BFD_MACH_O_MH_FORCE_FLAT		= 0x000100,
-  BFD_MACH_O_MH_NOMULTIDEFS		= 0x000200,
-  BFD_MACH_O_MH_NOFIXPREBINDING		= 0x000400,
-  BFD_MACH_O_MH_PREBINDABLE		= 0x000800,
-  BFD_MACH_O_MH_ALLMODSBOUND		= 0x001000,
-  BFD_MACH_O_MH_SUBSECTIONS_VIA_SYMBOLS = 0x002000,
-  BFD_MACH_O_MH_CANONICAL		= 0x004000,
-  BFD_MACH_O_MH_WEAK_DEFINES		= 0x008000,
-  BFD_MACH_O_MH_BINDS_TO_WEAK		= 0x010000,
-  BFD_MACH_O_MH_ALLOW_STACK_EXECUTION	= 0x020000,
-  BFD_MACH_O_MH_ROOT_SAFE		= 0x040000,
-  BFD_MACH_O_MH_SETUID_SAFE		= 0x080000,
-  BFD_MACH_O_MH_NO_REEXPORTED_DYLIBS	= 0x100000,
-  BFD_MACH_O_MH_PIE			= 0x200000
+  BFD_MACH_O_MH_NOUNDEFS		= 0x0000001,
+  BFD_MACH_O_MH_INCRLINK		= 0x0000002,
+  BFD_MACH_O_MH_DYLDLINK		= 0x0000004,
+  BFD_MACH_O_MH_BINDATLOAD		= 0x0000008,
+  BFD_MACH_O_MH_PREBOUND		= 0x0000010,
+  BFD_MACH_O_MH_SPLIT_SEGS		= 0x0000020,
+  BFD_MACH_O_MH_LAZY_INIT		= 0x0000040,
+  BFD_MACH_O_MH_TWOLEVEL		= 0x0000080,
+  BFD_MACH_O_MH_FORCE_FLAT		= 0x0000100,
+  BFD_MACH_O_MH_NOMULTIDEFS		= 0x0000200,
+  BFD_MACH_O_MH_NOFIXPREBINDING		= 0x0000400,
+  BFD_MACH_O_MH_PREBINDABLE		= 0x0000800,
+  BFD_MACH_O_MH_ALLMODSBOUND		= 0x0001000,
+  BFD_MACH_O_MH_SUBSECTIONS_VIA_SYMBOLS = 0x0002000,
+  BFD_MACH_O_MH_CANONICAL		= 0x0004000,
+  BFD_MACH_O_MH_WEAK_DEFINES		= 0x0008000,
+  BFD_MACH_O_MH_BINDS_TO_WEAK		= 0x0010000,
+  BFD_MACH_O_MH_ALLOW_STACK_EXECUTION	= 0x0020000,
+  BFD_MACH_O_MH_ROOT_SAFE		= 0x0040000,
+  BFD_MACH_O_MH_SETUID_SAFE		= 0x0080000,
+  BFD_MACH_O_MH_NO_REEXPORTED_DYLIBS	= 0x0100000,
+  BFD_MACH_O_MH_PIE			= 0x0200000,
+  BFD_MACH_O_MH_DEAD_STRIPPABLE_DYLIB   = 0x0400000,
+  BFD_MACH_O_MH_HAS_TLV_DESCRIPTORS     = 0x0800000,
+  BFD_MACH_O_MH_NO_HEAP_EXECUTION       = 0x1000000
 }
 bfd_mach_o_header_flags;
+
+/* Load command constants.  */
+#define BFD_MACH_O_LC_REQ_DYLD 0x80000000
 
+typedef enum bfd_mach_o_load_command_type
+{
+  BFD_MACH_O_LC_SEGMENT = 0x1,		/* File segment to be mapped.  */
+  BFD_MACH_O_LC_SYMTAB = 0x2,		/* Link-edit stab symbol table info (obsolete).  */
+  BFD_MACH_O_LC_SYMSEG = 0x3,		/* Link-edit gdb symbol table info.  */
+  BFD_MACH_O_LC_THREAD = 0x4,		/* Thread.  */
+  BFD_MACH_O_LC_UNIXTHREAD = 0x5,	/* UNIX thread (includes a stack).  */
+  BFD_MACH_O_LC_LOADFVMLIB = 0x6,	/* Load a fixed VM shared library.  */
+  BFD_MACH_O_LC_IDFVMLIB = 0x7,		/* Fixed VM shared library id.  */
+  BFD_MACH_O_LC_IDENT = 0x8,		/* Object identification information (obsolete).  */
+  BFD_MACH_O_LC_FVMFILE = 0x9,		/* Fixed VM file inclusion.  */
+  BFD_MACH_O_LC_PREPAGE = 0xa,		/* Prepage command (internal use).  */
+  BFD_MACH_O_LC_DYSYMTAB = 0xb,		/* Dynamic link-edit symbol table info.  */
+  BFD_MACH_O_LC_LOAD_DYLIB = 0xc,	/* Load a dynamically linked shared library.  */
+  BFD_MACH_O_LC_ID_DYLIB = 0xd,		/* Dynamically linked shared lib identification.  */
+  BFD_MACH_O_LC_LOAD_DYLINKER = 0xe,	/* Load a dynamic linker.  */
+  BFD_MACH_O_LC_ID_DYLINKER = 0xf,	/* Dynamic linker identification.  */
+  BFD_MACH_O_LC_PREBOUND_DYLIB = 0x10,	/* Modules prebound for a dynamically.  */
+  BFD_MACH_O_LC_ROUTINES = 0x11,	/* Image routines.  */
+  BFD_MACH_O_LC_SUB_FRAMEWORK = 0x12,	/* Sub framework.  */
+  BFD_MACH_O_LC_SUB_UMBRELLA = 0x13,	/* Sub umbrella.  */
+  BFD_MACH_O_LC_SUB_CLIENT = 0x14,	/* Sub client.  */
+  BFD_MACH_O_LC_SUB_LIBRARY = 0x15,   	/* Sub library.  */
+  BFD_MACH_O_LC_TWOLEVEL_HINTS = 0x16,	/* Two-level namespace lookup hints.  */
+  BFD_MACH_O_LC_PREBIND_CKSUM = 0x17, 	/* Prebind checksum.  */
+  /* Load a dynamically linked shared library that is allowed to be
+       missing (weak).  */
+  BFD_MACH_O_LC_LOAD_WEAK_DYLIB = 0x18,
+  BFD_MACH_O_LC_SEGMENT_64 = 0x19,	/* 64-bit segment of this file to be 
+                                           mapped.  */
+  BFD_MACH_O_LC_ROUTINES_64 = 0x1a,     /* Address of the dyld init routine 
+                                           in a dylib.  */
+  BFD_MACH_O_LC_UUID = 0x1b,            /* 128-bit UUID of the executable.  */
+  BFD_MACH_O_LC_RPATH = 0x1c,		/* Run path addiions.  */
+  BFD_MACH_O_LC_CODE_SIGNATURE = 0x1d,	/* Local of code signature.  */
+  BFD_MACH_O_LC_SEGMENT_SPLIT_INFO = 0x1e, /* Local of info to split seg.  */
+  BFD_MACH_O_LC_REEXPORT_DYLIB = 0x1f,  /* Load and re-export lib.  */
+  BFD_MACH_O_LC_LAZY_LOAD_DYLIB = 0x20, /* Delay load of lib until use.  */
+  BFD_MACH_O_LC_ENCRYPTION_INFO = 0x21, /* Encrypted segment info.  */
+  BFD_MACH_O_LC_DYLD_INFO = 0x22	/* Compressed dyld information.  */
+}
+bfd_mach_o_load_command_type;
+
+/* Section constants.  */
 /* Constants for the type of a section.  */
 
 typedef enum bfd_mach_o_section_type
@@ -325,5 +273,68 @@ typedef enum bfd_mach_o_section_attribute
   BFD_MACH_O_S_ATTR_PURE_INSTRUCTIONS = 0x80000000
 }
 bfd_mach_o_section_attribute;
+
+/* Symbol constants.  */
+
+/* Symbol n_type values.  */
+#define BFD_MACH_O_N_STAB  0xe0	/* If any of these bits set, a symbolic debugging entry.  */
+#define BFD_MACH_O_N_PEXT  0x10	/* Private external symbol bit.  */
+#define BFD_MACH_O_N_TYPE  0x0e	/* Mask for the type bits.  */
+#define BFD_MACH_O_N_EXT   0x01	/* External symbol bit, set for external symbols.  */
+#define BFD_MACH_O_N_UNDF  0x00	/* Undefined, n_sect == NO_SECT.  */
+#define BFD_MACH_O_N_ABS   0x02	/* Absolute, n_sect == NO_SECT.  */
+#define BFD_MACH_O_N_INDR  0x0a	/* Indirect.  */
+#define BFD_MACH_O_N_PBUD  0x0c /* Prebound undefined (defined in a dylib).  */
+#define BFD_MACH_O_N_SECT  0x0e	/* Defined in section number n_sect.  */
+
+#define BFD_MACH_O_NO_SECT 0	/* Symbol not in any section of the image.  */
+
+/* Symbol n_desc reference flags.  */
+#define BFD_MACH_O_REFERENCE_MASK 				0x0f
+#define BFD_MACH_O_REFERENCE_FLAG_UNDEFINED_NON_LAZY		0x00
+#define BFD_MACH_O_REFERENCE_FLAG_UNDEFINED_LAZY		0x01
+#define BFD_MACH_O_REFERENCE_FLAG_DEFINED			0x02
+#define BFD_MACH_O_REFERENCE_FLAG_PRIVATE_DEFINED		0x03
+#define BFD_MACH_O_REFERENCE_FLAG_PRIVATE_UNDEFINED_NON_LAZY	0x04
+#define BFD_MACH_O_REFERENCE_FLAG_PRIVATE_UNDEFINED_LAZY	0x05
+
+#define BFD_MACH_O_REFERENCED_DYNAMICALLY			0x10
+#define BFD_MACH_O_N_DESC_DISCARDED				0x20
+#define BFD_MACH_O_N_NO_DEAD_STRIP				0x20
+#define BFD_MACH_O_N_WEAK_REF					0x40
+#define BFD_MACH_O_N_WEAK_DEF					0x80
+
+/* Thread constants.  */
+
+typedef enum bfd_mach_o_ppc_thread_flavour
+{
+  BFD_MACH_O_PPC_THREAD_STATE      = 1,
+  BFD_MACH_O_PPC_FLOAT_STATE       = 2,
+  BFD_MACH_O_PPC_EXCEPTION_STATE   = 3,
+  BFD_MACH_O_PPC_VECTOR_STATE      = 4,
+  BFD_MACH_O_PPC_THREAD_STATE64    = 5,
+  BFD_MACH_O_PPC_EXCEPTION_STATE64 = 6,
+  BFD_MACH_O_PPC_THREAD_STATE_NONE = 7
+}
+bfd_mach_o_ppc_thread_flavour;
+
+/* Defined in <mach/i386/thread_status.h> */
+typedef enum bfd_mach_o_i386_thread_flavour
+{
+  BFD_MACH_O_x86_THREAD_STATE32    = 1,
+  BFD_MACH_O_x86_FLOAT_STATE32     = 2,
+  BFD_MACH_O_x86_EXCEPTION_STATE32 = 3,
+  BFD_MACH_O_x86_THREAD_STATE64    = 4,
+  BFD_MACH_O_x86_FLOAT_STATE64     = 5,
+  BFD_MACH_O_x86_EXCEPTION_STATE64 = 6,
+  BFD_MACH_O_x86_THREAD_STATE      = 7,
+  BFD_MACH_O_x86_FLOAT_STATE       = 8,
+  BFD_MACH_O_x86_EXCEPTION_STATE   = 9,
+  BFD_MACH_O_x86_DEBUG_STATE32     = 10,
+  BFD_MACH_O_x86_DEBUG_STATE64     = 11,
+  BFD_MACH_O_x86_DEBUG_STATE       = 12,
+  BFD_MACH_O_x86_THREAD_STATE_NONE = 13
+}
+bfd_mach_o_i386_thread_flavour;
 
 #endif /* _MACH_O_LOADER_H */

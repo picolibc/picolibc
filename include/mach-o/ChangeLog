@@ -1,3 +1,10 @@
+2011-08-08  Tristan Gingold  <gingold@adacore.com>
+
+	* loader.h: Reorder declarations.
+	* x86-64.h: New file.
+	* external.h: New file.
+	* reloc.h: New file.
+
 2011-07-06  Tristan Gingold  <gingold@adacore.com>
 
 	* loader.h: New file.
