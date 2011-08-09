@@ -1,3 +1,12 @@
+2011-08-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (STATUS_NOT_FOUND): Define.
+	* ntea.cc (read_ea): Return correct ENOTSUP rather than EOPNOTSUPP.
+	Handle STATUS_INVALID_DEVICE_REQUEST and STATUS_NOT_FOUND.  Explain
+	why.  Convert conditional to switch statement.
+	(write_ea): Return correct ENOTSUP rather than EOPNOTSUPP.  Handle
+	STATUS_INVALID_DEVICE_REQUEST.  Convert conditional to switch statement.
+
 2011-08-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* resource.cc (getrlimit): Just return RLIM_INFINITY in a request for

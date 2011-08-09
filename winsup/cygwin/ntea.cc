@@ -1,6 +1,6 @@
 /* ntea.cc: code for manipulating Extended Attributes
 
-   Copyright 1997, 1998, 2000, 2001, 2006, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2006, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -78,12 +78,12 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
       size_t nlen;
 
       /* For compatibility with Linux, we only allow user xattrs and
-	 return EOPNOTSUPP otherwise. */
+	 return ENOTSUP otherwise. */
       if (ascii_strncasematch (name, "user.", 5))
 	name += 5;
       else
 	{
-	  set_errno (EOPNOTSUPP);
+	  set_errno (ENOTSUP);
 	  goto out;
 	}
 
@@ -117,14 +117,32 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
     }
   if (!NT_SUCCESS (status))
     {
-      if (status == STATUS_NO_EAS_ON_FILE)
-	ret = 0;
-      else if (status == STATUS_NONEXISTENT_EA_ENTRY)
-	/* Actually this error code is either never generated, or it was only
-	   generated in some old and long forgotton NT version.  See below. */
-	set_errno (ENOATTR);
-      else
-	__seterrno_from_nt_status (status);
+      switch (status)
+	{
+	case STATUS_NO_EAS_ON_FILE:
+	  ret = 0;
+	  break;
+	case STATUS_INVALID_DEVICE_REQUEST:
+	  set_errno (ENOTSUP);
+	  break;
+	case STATUS_NOT_FOUND:
+	  /* STATUS_NOT_FOUND is returned when calling NtQueryEaFile on NFS.
+	     In theory this should mean that the file just has no EAs, but in
+	     fact NFS doesn't support EAs, other than the EAs which are used
+	     for NFS requests.  We're playing safe and convert STATUS_NOT_FOUND
+	     to ENOATTR, unless we're on NFS, where we convert it to ENOTSUP. */
+	  set_errno (pc.fs_is_nfs () ? ENOTSUP : ENOATTR);
+	  break;
+	case STATUS_NONEXISTENT_EA_ENTRY:
+	  /* Actually STATUS_NONEXISTENT_EA_ENTRY is either never generated, or
+	     it was only generated in some old and long forgotton NT version.
+	     See below.  For safty reasons, we handle it here, nevertheless. */
+	  set_errno (ENOATTR);
+	  break;
+	default:
+	  __seterrno_from_nt_status (status);
+	  break;
+	}
       goto out;
     }
   if (name)
@@ -235,10 +253,10 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
     }
 
   /* For compatibility with Linux, we only allow user xattrs and
-     return EOPNOTSUPP otherwise. */
+     return ENOTSUP otherwise. */
   if (!ascii_strncasematch (name, "user.", 5))
     {
-      set_errno (EOPNOTSUPP);
+      set_errno (ENOTSUP);
       goto out;
     }
 
@@ -298,18 +316,27 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
     }
   if (!NT_SUCCESS (status))
     {
-      /* STATUS_EA_TOO_LARGE has a matching Win32 error ERROR_EA_TABLE_FULL.
-	 Too bad RtlNtStatusToDosError does not translate STATUS_EA_TOO_LARGE
-	 to ERROR_EA_TABLE_FULL, but to ERROR_EA_LIST_INCONSISTENT.  This
-	 error code is also returned for STATUS_EA_LIST_INCONSISTENT, which
-	 means the incoming EA list is... inconsistent.  For obvious reasons
-	 we translate ERROR_EA_LIST_INCONSISTENT to EINVAL, so we have to
-	 handle STATUS_EA_TOO_LARGE explicitely here, to get the correct
-	 mapping to ENOSPC. */
-      if (status == STATUS_EA_TOO_LARGE)
-	set_errno (ENOSPC);
-      else
-	__seterrno_from_nt_status (status);
+      switch (status)
+	{
+	case STATUS_EA_TOO_LARGE:
+	  /* STATUS_EA_TOO_LARGE has a matching Win32 error ERROR_EA_TABLE_FULL.
+	     For some unknown reason RtlNtStatusToDosError does not translate
+	     STATUS_EA_TOO_LARGE to ERROR_EA_TABLE_FULL, but instead to
+	     ERROR_EA_LIST_INCONSISTENT.  This error code is also returned for
+	     STATUS_EA_LIST_INCONSISTENT, which means the incoming EA list is...
+	     inconsistent.  For obvious reasons we translate
+	     ERROR_EA_LIST_INCONSISTENT to EINVAL, so we have to handle
+	     STATUS_EA_TOO_LARGE explicitely here, to get the correct mapping
+	     to ENOSPC. */
+	  set_errno (ENOSPC);
+	  break;
+	case STATUS_INVALID_DEVICE_REQUEST:
+	  set_errno (ENOTSUP);
+	  break;
+	default:
+	  __seterrno_from_nt_status (status);
+	  break;
+	}
     }
   else
     ret = 0;
