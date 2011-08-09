@@ -1,3 +1,13 @@
+2011-08-09  Chao-ying Fu  <fu@mips.com>
+            Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h (OP_MASK_3BITPOS, OP_SH_3BITPOS): New macros.
+	(OP_MASK_OFFSET12, OP_SH_OFFSET12): Redefine.
+	(INSN_ASE_MASK): Add the MCU bit.
+	(INSN_MCU): New macro.
+	(M_ACLR_AB, M_ACLR_OB, M_ASET_AB, M_ASET_OB): New enum values.
+	(MICROMIPSOP_MASK_3BITPOS, MICROMIPSOP_SH_3BITPOS): New macros.
+
 2011-08-09  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h (INSN_WRITE_GPR_S, INSN2_WRITE_GPR_MB): New macros.
