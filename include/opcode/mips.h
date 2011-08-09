@@ -585,6 +585,8 @@ struct mips_opcode
 #define FP_D			    0x20000000
 /* Instruction is part of the tx39's integer multiply family.    */
 #define INSN_MULT                   0x40000000
+/* Modifies the general purpose register in MICROMIPSOP_*_RS.  */
+#define INSN_WRITE_GPR_S	    0x80000000
 /* Instruction is actually a macro.  It should be ignored by the
    disassembler, and requires special treatment by the assembler.  */
 #define INSN_MACRO                  0xffffffff
@@ -622,46 +624,46 @@ struct mips_opcode
 #define INSN2_BRANCH_DELAY_16BIT    0x00000400
 /* Instruction has a branch delay slot that requires a 32-bit instruction.  */
 #define INSN2_BRANCH_DELAY_32BIT    0x00000800
-/* Modifies the general purpose register in MICROMIPSOP_*_RS.  */
-#define INSN2_WRITE_GPR_S	    0x00001000
 /* Reads the floating point register in MICROMIPSOP_*_FD.  */
-#define INSN2_READ_FPR_D	    0x00002000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MB.  */
-#define INSN2_MOD_GPR_MB	    0x00004000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MC.  */
-#define INSN2_MOD_GPR_MC	    0x00008000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MD.  */
-#define INSN2_MOD_GPR_MD	    0x00010000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_ME.  */
-#define INSN2_MOD_GPR_ME	    0x00020000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MF.  */
-#define INSN2_MOD_GPR_MF	    0x00040000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MG.  */
-#define INSN2_MOD_GPR_MG	    0x00080000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MJ.  */
-#define INSN2_MOD_GPR_MJ	    0x00100000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MP.  */
-#define INSN2_MOD_GPR_MP	    0x00200000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MQ.  */
-#define INSN2_MOD_GPR_MQ	    0x00400000
+#define INSN2_READ_FPR_D	    0x00001000
+/* Modifies the general purpose register in MICROMIPSOP_*_MB.  */
+#define INSN2_WRITE_GPR_MB	    0x00002000
+/* Reads the general purpose register in MICROMIPSOP_*_MC.  */
+#define INSN2_READ_GPR_MC	    0x00004000
+/* Reads/writes the general purpose register in MICROMIPSOP_*_MD.  */
+#define INSN2_MOD_GPR_MD	    0x00008000
+/* Reads the general purpose register in MICROMIPSOP_*_ME.  */
+#define INSN2_READ_GPR_ME	    0x00010000
+/* Reads/writes the general purpose register in MICROMIPSOP_*_MF.  */
+#define INSN2_MOD_GPR_MF	    0x00020000
+/* Reads the general purpose register in MICROMIPSOP_*_MG.  */
+#define INSN2_READ_GPR_MG	    0x00040000
+/* Reads the general purpose register in MICROMIPSOP_*_MJ.  */
+#define INSN2_READ_GPR_MJ	    0x00080000
+/* Modifies the general purpose register in MICROMIPSOP_*_MJ.  */
+#define INSN2_WRITE_GPR_MJ	    0x00100000
+/* Reads the general purpose register in MICROMIPSOP_*_MP.  */
+#define INSN2_READ_GPR_MP	    0x00200000
+/* Modifies the general purpose register in MICROMIPSOP_*_MP.  */
+#define INSN2_WRITE_GPR_MP	    0x00400000
+/* Reads the general purpose register in MICROMIPSOP_*_MQ.  */
+#define INSN2_READ_GPR_MQ	    0x00800000
 /* Reads/Writes the stack pointer ($29).  */
-#define INSN2_MOD_SP		    0x00800000
+#define INSN2_MOD_SP		    0x01000000
 /* Reads the RA ($31) register.  */
-#define INSN2_READ_GPR_31	    0x01000000
+#define INSN2_READ_GPR_31	    0x02000000
 /* Reads the global pointer ($28).  */
-#define INSN2_READ_GP		    0x02000000
+#define INSN2_READ_GP		    0x04000000
 /* Reads the program counter ($pc).  */
-#define INSN2_READ_PC		    0x04000000
+#define INSN2_READ_PC		    0x08000000
 /* Is an unconditional branch insn. */
-#define INSN2_UNCOND_BRANCH	    0x08000000
+#define INSN2_UNCOND_BRANCH	    0x10000000
 /* Is a conditional branch insn. */
-#define INSN2_COND_BRANCH	    0x10000000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MH/I.  */
-#define INSN2_MOD_GPR_MHI	    0x20000000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MM.  */
-#define INSN2_MOD_GPR_MM	    0x40000000
-/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MN.  */
-#define INSN2_MOD_GPR_MN	    0x80000000
+#define INSN2_COND_BRANCH	    0x20000000
+/* Modifies the general purpose registers in MICROMIPSOP_*_MH/I.  */
+#define INSN2_WRITE_GPR_MHI	    0x40000000
+/* Reads the general purpose registers in MICROMIPSOP_*_MM/N.  */
+#define INSN2_READ_GPR_MMN	    0x80000000
 
 /* Masks used to mark instructions to indicate which MIPS ISA level
    they were introduced in.  INSN_ISA_MASK masks an enumeration that

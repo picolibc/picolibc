@@ -1,3 +1,23 @@
+2011-08-09  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h (INSN_WRITE_GPR_S, INSN2_WRITE_GPR_MB): New macros.
+	(INSN2_READ_GPR_MC, INSN2_READ_GPR_ME): Likewise.
+	(INSN2_WRITE_GPR_MF, INSN2_READ_GPR_MG): Likewise.
+	(INSN2_READ_GPR_MJ, INSN2_WRITE_GPR_MJ): Likewise.
+	(INSN2_READ_GPR_MP, INSN2_WRITE_GPR_MP): Likewise.
+	(INSN2_READ_GPR_MQ, INSN2_WRITE_GPR_MHI): Likewise.
+	(INSN2_READ_GPR_MMN): Likewise.
+	(INSN2_READ_FPR_D): Change the bit used.
+	(INSN2_MOD_GPR_MD, INSN2_MOD_GPR_MF): Likewise.
+	(INSN2_MOD_SP, INSN2_READ_GPR_31, INSN2_READ_GP): Likewise.
+	(INSN2_READ_PC, INSN2_UNCOND_BRANCH): Likewise.
+	(INSN2_COND_BRANCH): Likewise.
+	(INSN2_WRITE_GPR_S, INSN2_MOD_GPR_MB): Remove macros.
+	(INSN2_MOD_GPR_MC, INSN2_MOD_GPR_ME, INSN2_MOD_GPR_MG): Likewise.
+	(INSN2_MOD_GPR_MJ, INSN2_MOD_GPR_MP, INSN2_MOD_GPR_MQ): Likewise.
+	(INSN2_MOD_GPR_MHI, INSN2_MOD_GPR_MM): Likewise.
+	(INSN2_MOD_GPR_MN): Likewise.
+
 2011-08-05  David S. Miller  <davem@davemloft.net>
 
 	* sparc.h: Document new format codes '4', '5', and '('.
