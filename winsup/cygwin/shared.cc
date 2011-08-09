@@ -444,34 +444,3 @@ memory_init (bool init_cygheap)
   shared_info::create ();	/* Initialize global shared memory */
   user_info::create (false);	/* Initialize per-user shared memory */
 }
-
-unsigned
-shared_info::heap_chunk_size ()
-{
-  if (!heap_chunk)
-    {
-      /* Fetch from registry, first user then local machine.  */
-      for (int i = 0; i < 2; i++)
-	{
-	  reg_key reg (i, KEY_READ, NULL);
-
-	  /* Note that reserving a huge amount of heap space does not result in
-	     the use of swap since we are not committing it. */
-	  /* FIXME: We should not be restricted to a fixed size heap no matter
-	     what the fixed size is. */
-
-	  if ((heap_chunk = reg.get_dword (L"heap_chunk_in_mb", 0)))
-	    break;
-	  heap_chunk = 384; /* Default */
-	}
-
-      if (heap_chunk < 4)
-	heap_chunk = 4 * 1024 * 1024;
-      else
-	heap_chunk <<= 20;
-      if (!heap_chunk)
-	heap_chunk = 384 * 1024 * 1024;
-    }
-
-  return heap_chunk;
-}

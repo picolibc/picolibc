@@ -56,6 +56,30 @@ eval_start_address ()
   return start_address;
 }
 
+static unsigned
+eval_initial_heap_size ()
+{
+  PIMAGE_DOS_HEADER dosheader;
+  PIMAGE_NT_HEADERS32 ntheader;
+  unsigned size;
+
+  dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
+  ntheader = (PIMAGE_NT_HEADERS32) ((PBYTE) dosheader + dosheader->e_lfanew);
+  /* LoaderFlags is an obsolete DWORD member of the PE/COFF file header.
+     It's value is ignored by the loader, so we're free to use it for
+     Cygwin.  If it's 0, we default to the usual 384 Megs.  Otherwise,
+     we use it as the default initial heap size in megabyte.  Valid values
+     are between 4 and 2048 Megs. */
+  size = ntheader->OptionalHeader.LoaderFlags;
+  if (size == 0)
+    size = 384;
+  else if (size < 4)
+    size = 4;
+  else if (size > 2048)
+    size = 2048;
+  return size << 20;
+}
+
 /* Initialize the heap at process start up.  */
 void
 heap_init ()
@@ -73,7 +97,7 @@ heap_init ()
       SIZE_T ret;
       MEMORY_BASIC_INFORMATION mbi;
 
-      cygheap->user_heap.chunk = cygwin_shared->heap_chunk_size ();
+      cygheap->user_heap.chunk = eval_initial_heap_size ();
       do
 	{
 	  cygheap->user_heap.base = VirtualAlloc ((LPVOID) start_address,

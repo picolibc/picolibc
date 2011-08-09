@@ -1,5 +1,15 @@
 2011-08-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* heap.cc (eval_initial_heap_size): New function fetching the heap
+	size from the LoaderFlags field in the PE/COFF header.
+	(heap_init): Call eval_initial_heap_size rather than
+	cygwin_shared->heap_chunk_size to fetch the initial heap size.
+	* shared.cc (shared_info::heap_chunk_size): Remove.
+	* shared_info.h (class shared_info): Drop heap_chunk member.
+	(CURR_SHARED_MAGIC): Update.
+
+2011-08-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h (STATUS_NOT_FOUND): Define.
 	* ntea.cc (read_ea): Return correct ENOTSUP rather than EOPNOTSUPP.
 	Handle STATUS_INVALID_DEVICE_REQUEST and STATUS_NOT_FOUND.  Explain
