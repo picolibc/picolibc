@@ -1,3 +1,11 @@
+2011-08-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (format_process_status): Always print process name
+	even for zombies.
+	(get_mem_values): Fix loop fetching working set list to avoid out of
+	memory conditions.  Return all mem values set to 0 for zombies.
+	* ntdll.h (STATUS_PROCESS_IS_TERMINATING): Define.
+
 2011-08-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* heap.cc (eval_initial_heap_size): New function fetching the heap

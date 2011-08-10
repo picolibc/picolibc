@@ -1135,21 +1135,16 @@ format_process_status (void *data, char *&destbuf)
   const char *state_str = "unknown";
   unsigned long vmsize = 0UL, vmrss = 0UL, vmdata = 0UL, vmlib = 0UL, vmtext = 0UL,
 		vmshare = 0UL;
-  if (p->process_state & PID_EXITED)
-    strcpy (cmd, "<defunct>");
-  else
+  PWCHAR last_slash = wcsrchr (p->progname, L'\\');
+  wcscpy (wcmd, last_slash ? last_slash + 1 : p->progname);
+  sys_wcstombs (cmd, NAME_MAX + 1, wcmd);
+  int len = strlen (cmd);
+  if (len > 4)
     {
-      PWCHAR last_slash = wcsrchr (p->progname, L'\\');
-      wcscpy (wcmd, last_slash ? last_slash + 1 : p->progname);
-      sys_wcstombs (cmd, NAME_MAX + 1, wcmd);
-      int len = strlen (cmd);
-      if (len > 4)
-	{
-	  char *s = cmd + len - 4;
-	  if (ascii_strcasematch (s, ".exe"))
-	    *s = 0;
-	 }
-    }
+      char *s = cmd + len - 4;
+      if (ascii_strcasematch (s, ".exe"))
+	*s = 0;
+     }
   /*
    * Note: under Windows, a _process_ is always running - it's only _threads_
    * that get suspended. Therefore the default state is R (runnable).
@@ -1370,27 +1365,29 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
       debug_printf ("OpenProcess, %E");
       return false;
     }
-  do
+  while (true)
     {
       ret = NtQueryVirtualMemory (hProcess, 0, MemoryWorkingSetList,
 				  (PVOID) p, n, (length = ULONG_MAX, &length));
-      if (ret == STATUS_INFO_LENGTH_MISMATCH
-	  || (!NT_SUCCESS (ret) && length > n))
-	{
-	  ret = STATUS_INFO_LENGTH_MISMATCH;
-	  n <<= 1;
-	  PMEMORY_WORKING_SET_LIST new_p = (PMEMORY_WORKING_SET_LIST)
-					   realloc (p, n);
-	  if (!new_p)
-	    goto out;
-	  p = new_p;
-	}
+      if (ret != STATUS_INFO_LENGTH_MISMATCH)
+	break;
+      n <<= 1;
+      PMEMORY_WORKING_SET_LIST new_p = (PMEMORY_WORKING_SET_LIST)
+				       realloc (p, n);
+      if (!new_p)
+	goto out;
+      p = new_p;
     }
-  while (!NT_SUCCESS (ret));
   if (!NT_SUCCESS (ret))
     {
       debug_printf ("NtQueryVirtualMemory: ret %p", ret);
-      __seterrno_from_nt_status (ret);
+      if (ret == STATUS_PROCESS_IS_TERMINATING)
+	{
+	  *vmsize = *vmrss = *vmtext = *vmdata = *vmlib = *vmshare = 0;
+	  res = true;
+	}
+      else
+	__seterrno_from_nt_status (ret);
       goto out;
     }
   mwsl = (MEMORY_WORKING_SET_LIST *) p;
