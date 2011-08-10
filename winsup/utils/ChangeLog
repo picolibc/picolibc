@@ -1,3 +1,8 @@
+2011-08-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ps.cc (main): Don't overwrite process name, just attach <defunct>
+	to it for zombie processes.
+
 2011-07-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* Makefile.in (CYGWIN_BINS): Add getconf.

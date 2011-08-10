@@ -1,7 +1,7 @@
 /* ps.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2008, 2009, 2010 Red Hat, Inc.
+   2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -397,10 +397,8 @@ main (int argc, char *argv[])
 
       /* Maximum possible path length under NT.  There's no official define
          for that value. */
-      char pname[NT_MAX_PATH];
-      if (p->process_state & PID_EXITED || (p->exitcode & ~0xffff))
-	strcpy (pname, "<defunct>");
-      else if (p->ppid)
+      char pname[NT_MAX_PATH + sizeof (" <defunct>")];
+      if (p->ppid)
 	{
 	  char *s;
 	  pname[0] = '\0';
@@ -413,6 +411,8 @@ main (int argc, char *argv[])
 	  s = strchr (pname, '\0') - 4;
 	  if (s > pname && strcasecmp (s, ".exe") == 0)
 	    *s = '\0';
+	  if (p->process_state & PID_EXITED || (p->exitcode & ~0xffff))
+	    strcat (pname, " <defunct>");
 	}
       else if (query == CW_GETPINFO_FULL)
 	{
