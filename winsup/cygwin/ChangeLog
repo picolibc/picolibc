@@ -1,3 +1,12 @@
+2011-08-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* (winpids::add): Make sure to store always a Windows PID in
+	pidlist, even if pid is a Cygwin PID.
+	(winpids::enum_processes): Fetch Cygwin processes from listing of
+	shared cygwin object dir in the native NT namespace.  Only if winpid
+	is true, fetch Windows processes using an additional call to
+	NtQuerySystemInformation.
+
 2011-08-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc (format_process_status): Always print process name

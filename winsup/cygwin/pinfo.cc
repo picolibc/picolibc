@@ -1212,44 +1212,87 @@ out:
 	}
     }
   if (p || winpid)
-    pidlist[nelem++] = pid;
+    pidlist[nelem++] = !p ? pid : p->dwProcessId;
 }
 
 DWORD
 winpids::enum_processes (bool winpid)
 {
-  static DWORD szprocs;
-  static SYSTEM_PROCESSES *procs;
-
   DWORD nelem = 0;
-  if (!szprocs)
-    procs = (SYSTEM_PROCESSES *) malloc (sizeof (*procs) + (szprocs = 200 * sizeof (*procs)));
-
-  NTSTATUS res;
-  for (;;)
+  DWORD cygwin_pid_nelem = 0;
+  NTSTATUS status;
+  ULONG context;
+  struct fdbi
     {
-      res = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
-				      procs, szprocs, NULL);
-      if (res == 0)
-	break;
+      DIRECTORY_BASIC_INFORMATION dbi;
+      WCHAR buf[2][NAME_MAX + 1];
+    } f;
+  HANDLE dir = get_shared_parent_dir ();
+  BOOLEAN restart = TRUE;
 
-      if (res == STATUS_INFO_LENGTH_MISMATCH)
-	procs =  (SYSTEM_PROCESSES *) realloc (procs, szprocs += 200 * sizeof (*procs));
-      else
+  do
+    {
+      status = NtQueryDirectoryObject (dir, &f, sizeof f, TRUE, restart,
+				       &context, NULL);
+      if (NT_SUCCESS (status))
 	{
-	  system_printf ("error %p reading system process information", res);
-	  return 0;
+	  restart = FALSE;
+	  f.dbi.ObjectName.Buffer[f.dbi.ObjectName.Length / sizeof (WCHAR)]
+	    = L'\0';
+	  if (wcsncmp (f.dbi.ObjectName.Buffer, L"cygpid.", 7) == 0)
+	    {
+	      DWORD pid = wcstoul (f.dbi.ObjectName.Buffer + 7, NULL, 10);
+	      add (nelem, false, pid);
+	    }
 	}
     }
+  while (NT_SUCCESS (status));
+  cygwin_pid_nelem = nelem;
 
-  SYSTEM_PROCESSES *px = procs;
-  for (;;)
+  if (winpid)
     {
-      if (px->ProcessId)
-	add (nelem, winpid, px->ProcessId);
-      if (!px->NextEntryDelta)
-	break;
-      px = (SYSTEM_PROCESSES *) ((char *) px + px->NextEntryDelta);
+      static DWORD szprocs;
+      static SYSTEM_PROCESSES *procs;
+
+      if (!szprocs)
+	procs = (SYSTEM_PROCESSES *) malloc (sizeof (*procs) + (szprocs = 200 * sizeof (*procs)));
+
+      NTSTATUS res;
+      for (;;)
+	{
+	  res = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+					  procs, szprocs, NULL);
+	  if (res == 0)
+	    break;
+
+	  if (res == STATUS_INFO_LENGTH_MISMATCH)
+	    procs =  (SYSTEM_PROCESSES *) realloc (procs, szprocs += 200 * sizeof (*procs));
+	  else
+	    {
+	      system_printf ("error %p reading system process information", res);
+	      return 0;
+	    }
+	}
+
+      SYSTEM_PROCESSES *px = procs;
+      for (;;)
+	{
+	  if (px->ProcessId)
+	    {
+	      bool do_add = true;
+	      for (unsigned i = 0; i < cygwin_pid_nelem; ++i)
+		if (pidlist[i] == px->ProcessId)
+		  {
+		    do_add = false;
+		    break;
+		  }
+	      if (do_add)
+		add (nelem, true, px->ProcessId);
+	    }
+	  if (!px->NextEntryDelta)
+	    break;
+	  px = (SYSTEM_PROCESSES *) ((char *) px + px->NextEntryDelta);
+	}
     }
 
   return nelem;
