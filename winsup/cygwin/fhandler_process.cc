@@ -143,8 +143,13 @@ fhandler_process::fstat (struct __stat64 *buf)
   fhandler_base::fstat (buf);
   path += proc_len + 1;
   pid = atoi (path);
+
   pinfo p (pid);
-  if (!p)
+  /* If p->pid != pid, then pid is actually the Windows PID for an execed
+     Cygwin process, and the pinfo entry is the additional entry created
+     at exec time.  We don't want to enable the user to access a process
+     entry by using the Win32 PID, though. */
+  if (!p || p->pid != pid)
     {
       set_errno (ENOENT);
       return -1;
@@ -320,8 +325,11 @@ fhandler_process::fill_filebuf ()
     pid = atoi (path);
 
   pinfo p (pid);
-
-  if (!p)
+  /* If p->pid != pid, then pid is actually the Windows PID for an execed
+     Cygwin process, and the pinfo entry is the additional entry created
+     at exec time.  We don't want to enable the user to access a process
+     entry by using the Win32 PID, though. */
+  if (!p || p->pid != pid)
     {
       set_errno (ENOENT);
       return false;

@@ -1,5 +1,12 @@
 2011-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (fhandler_proc::get_proc_fhandler): Don't allow to
+	access process info by using the Windows PID.
+	* fhandler_process.cc (fhandler_process::fstat): Ditto.
+	(fhandler_process::fill_filebuf): Ditto.
+
+2011-08-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* (winpids::add): Make sure to store always a Windows PID in
 	pidlist, even if pid is a Cygwin PID.
 	(winpids::enum_processes): Fetch Cygwin processes from listing of
