@@ -236,7 +236,7 @@ fhandler_proc::opendir (int fd)
 int
 fhandler_proc::closedir (DIR *dir)
 {
-  free (dir->__handle);
+  delete (winpids *) dir->__handle;
   return fhandler_virtual::closedir (dir);
 }
 

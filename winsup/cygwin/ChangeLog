@@ -1,10 +1,18 @@
 2011-08-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (fhandler_proc::closedir): Don't free, but delete
+	instead.
+
+2011-08-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_proc::opendir): Declare.
 	(fhandler_proc::closedir): Declare.
 	* fhandler_proc.cc (fhandler_proc::opendir): New method.  Fetch list
-	of active processes here once to avoid potential duplicates.
-	(fhandler_proc::closedir): New method.
+	of active processes here once to avoid potential duplicates and store
+	in dir->__handle.
+	(fhandler_proc::closedir): New method.  Free dir->__handle.
+	(fhandler_proc::readdir): Convert pinfo into a reference to the winpids
+	entry in dir->__handle.
 
 2011-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
