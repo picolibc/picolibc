@@ -332,20 +332,6 @@ nice_to_winprio (int &nice)
   return prio;
 }
 
-#undef CreatePipe
-bool
-create_pipe (PHANDLE hr,PHANDLE hw, LPSECURITY_ATTRIBUTES sa, DWORD n)
-{
-  for (int i = 0; i < 10; i++)
-    if (CreatePipe (hr, hw, sa, n))
-      return true;
-    else if (GetLastError () == ERROR_PIPE_BUSY && i < 9)
-      Sleep (10);
-    else
-      break;
-  return false;
-}
-
 /* backslashify: Convert all forward slashes in src path to back slashes
    in dst path.  Add a trailing slash to dst when trailing_slash_p arg
    is set to 1. */
