@@ -1,3 +1,11 @@
+2011-08-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_proc::opendir): Declare.
+	(fhandler_proc::closedir): Declare.
+	* fhandler_proc.cc (fhandler_proc::opendir): New method.  Fetch list
+	of active processes here once to avoid potential duplicates.
+	(fhandler_proc::closedir): New method.
+
 2011-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (fhandler_proc::get_proc_fhandler): Don't allow to

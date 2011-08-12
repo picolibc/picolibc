@@ -220,6 +220,26 @@ fhandler_proc::fstat (struct __stat64 *buf)
   return -1;
 }
 
+DIR *
+fhandler_proc::opendir (int fd)
+{
+  DIR *dir = fhandler_virtual::opendir (fd);
+  if (dir && !(dir->__handle = (void *) new winpids ((DWORD) 0)))
+    {
+      free (dir);
+      dir = NULL;
+      set_errno (ENOMEM);
+    }
+  return dir;
+}
+
+int
+fhandler_proc::closedir (DIR *dir)
+{
+  free (dir->__handle);
+  return fhandler_virtual::closedir (dir);
+}
+
 int
 fhandler_proc::readdir (DIR *dir, dirent *de)
 {
@@ -232,7 +252,7 @@ fhandler_proc::readdir (DIR *dir, dirent *de)
     }
   else
     {
-      winpids pids ((DWORD) 0);
+      winpids &pids = *(winpids *) dir->__handle;
       int found = 0;
       res = ENMFILE;
       for (unsigned i = 0; i < pids.npids; i++)

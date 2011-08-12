@@ -1440,6 +1440,8 @@ class fhandler_proc: public fhandler_virtual
  public:
   fhandler_proc ();
   virtual_ftype_t exists();
+  DIR *opendir (int fd) __attribute__ ((regparm (2)));
+  int closedir (DIR *);
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   static fh_devices get_proc_fhandler (const char *path);
 
