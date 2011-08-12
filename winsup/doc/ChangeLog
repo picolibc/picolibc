@@ -1,3 +1,11 @@
+2011-08-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.10): Document large address awareness
+	of heap and new way to set the default heap size per executable.
+	* setup2.sgml (setup-maxmem): Revamp to explain new method of
+	allocating more heap on a per-executable basis.  Drop outdated stuff.
+	Keep shortened description of heap_chunk_in_mb as note.
+
 2011-08-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-using.xml (faq.using.bloda): Add NVIDIA.  Change wording slightly.

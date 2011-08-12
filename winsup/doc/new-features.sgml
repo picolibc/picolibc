@@ -14,6 +14,20 @@ The CYGWIN environment variable options "envcache", "strip_title", "title",
 </para></listitem>
 
 <listitem><para>
+If the executable (and the system) is large address aware, the application heap
+will be placed in the large memory area.  The <command>peflags</command> tool
+from the <literal>rebase</literal> package can be used to set the large
+address awareness flag in the executable file header.
+</para></listitem>
+
+<listitem><para>
+The registry setting "heap_chunk_in_mb" has been removed, in favor of a new
+per-executable setting in the executable file header which can be set using the
+<command>peflags</command> tool.  See <xref linkend="setup-maxmem"></xref>
+for more information.
+</para></listitem>
+
+<listitem><para>
 The CYGWIN=tty mode using pipes to communicate with the console in a pseudo
 tty-like mode has been removed.  Either just use the normal Windows console
 as is, or use a terminal application like <command>mintty</command>.
