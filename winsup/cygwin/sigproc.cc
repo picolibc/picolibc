@@ -608,7 +608,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 
 	  HANDLE& tome = si._si_commune._si_write_handle;
 	  HANDLE& fromthem = si._si_commune._si_read_handle;
-	  if (!CreatePipe (&fromthem, &tome, &sec_all_nih, 0))
+	  if (!CreatePipeOverlapped (&fromthem, &tome, &sec_all_nih))
 	    {
 	      sigproc_printf ("CreatePipe for __SIGCOMMUNE failed, %E");
 	      __seterrno ();

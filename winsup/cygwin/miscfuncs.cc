@@ -332,6 +332,57 @@ nice_to_winprio (int &nice)
   return prio;
 }
 
+/* Minimal overlapped pipe I/O implementation for signal and commune stuff. */
+
+BOOL WINAPI
+CreatePipeOverlapped (PHANDLE hr, PHANDLE hw, LPSECURITY_ATTRIBUTES sa)
+{
+  int ret = fhandler_pipe::create_selectable (sa, *hr, *hw, 0);
+  if (ret)
+    SetLastError (ret);
+  return ret == 0;
+}
+
+BOOL WINAPI
+ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len, LPDWORD ret_len,
+		    DWORD timeout)
+{             
+  OVERLAPPED ov;
+  BOOL ret;   
+            
+  memset (&ov, 0, sizeof ov);
+  ov.hEvent = CreateEvent (NULL, TRUE, FALSE, NULL);
+  ret = ReadFile (h, buf, len, NULL, &ov);
+  if (ret || GetLastError () == ERROR_IO_PENDING)
+    {
+      if (!ret && WaitForSingleObject (ov.hEvent, timeout) != WAIT_OBJECT_0)
+	CancelIo (h);
+      ret = GetOverlappedResult (h, &ov, ret_len, FALSE);
+    }     
+  CloseHandle (ov.hEvent);
+  return ret; 
+}             
+            
+BOOL WINAPI
+WritePipeOverlapped (HANDLE h, PCVOID buf, DWORD len, LPDWORD ret_len,
+		     DWORD timeout)
+{
+  OVERLAPPED ov; 
+  BOOL ret; 
+
+  memset (&ov, 0, sizeof ov);
+  ov.hEvent = CreateEvent (NULL, TRUE, FALSE, NULL);
+  ret = WriteFile (h, buf, len, NULL, &ov);
+  if (ret || GetLastError () == ERROR_IO_PENDING)
+    {
+      if (!ret && WaitForSingleObject (ov.hEvent, timeout) != WAIT_OBJECT_0)
+	CancelIo (h);
+      ret = GetOverlappedResult (h, &ov, ret_len, FALSE);
+    }     
+  CloseHandle (ov.hEvent);
+  return ret;
+}
+
 /* backslashify: Convert all forward slashes in src path to back slashes
    in dst path.  Add a trailing slash to dst when trailing_slash_p arg
    is set to 1. */

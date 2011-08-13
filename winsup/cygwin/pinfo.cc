@@ -483,16 +483,17 @@ commune_process (void *arg)
 	    n += strlen (argv[i]) + 1;
 	  }
 	argv[__argc_safe] = NULL;
-	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
+	if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
 	  {
 	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
-	    sigproc_printf ("WriteFile sizeof argv failed, %E");
+	    sigproc_printf ("WritePipeOverlapped sizeof argv failed, %E");
 	  }
 	else
 	  for (const char **a = argv; *a; a++)
-	    if (!WriteFile (tothem, *a, strlen (*a) + 1, &nr, NULL))
+	    if (!WritePipeOverlapped (tothem, *a, strlen (*a) + 1, &nr, 1000L))
 	      {
-		sigproc_printf ("WriteFile arg %d failed, %E", a - argv);
+		sigproc_printf ("WritePipeOverlapped arg %d failed, %E",
+				a - argv);
 		break;
 	      }
 	break;
@@ -501,10 +502,10 @@ commune_process (void *arg)
       {
 	sigproc_printf ("processing PICOM_CWD");
 	unsigned int n = strlen (cygheap->cwd.get (path, 1, 1, NT_MAX_PATH)) + 1;
-	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
-	  sigproc_printf ("WriteFile sizeof cwd failed, %E");
-	else if (!WriteFile (tothem, path, n, &nr, NULL))
-	  sigproc_printf ("WriteFile cwd failed, %E");
+	if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped sizeof cwd failed, %E");
+	else if (!WritePipeOverlapped (tothem, path, n, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped cwd failed, %E");
 	break;
       }
     case PICOM_ROOT:
@@ -515,10 +516,10 @@ commune_process (void *arg)
 	  n = strlen (strcpy (path, cygheap->root.posix_path ())) + 1;
 	else
 	  n = strlen (strcpy (path, "/")) + 1;
-	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
-	  sigproc_printf ("WriteFile sizeof root failed, %E");
-	else if (!WriteFile (tothem, path, n, &nr, NULL))
-	  sigproc_printf ("WriteFile root failed, %E");
+	if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped sizeof root failed, %E");
+	else if (!WritePipeOverlapped (tothem, path, n, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped root failed, %E");
 	break;
       }
     case PICOM_FDS:
@@ -530,13 +531,13 @@ commune_process (void *arg)
 	while ((fd = cfd.next ()) >= 0)
 	  n += sizeof (int);
 	cfd.rewind ();
-	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
-	  sigproc_printf ("WriteFile sizeof fds failed, %E");
+	if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped sizeof fds failed, %E");
 	else
 	  while ((fd = cfd.next ()) >= 0)
-	    if (!WriteFile (tothem, &fd, sizeof fd, &nr, NULL))
+	    if (!WritePipeOverlapped (tothem, &fd, sizeof fd, &nr, 1000L))
 	      {
-		sigproc_printf ("WriteFile fd %d failed, %E", fd);
+		sigproc_printf ("WritePipeOverlapped fd %d failed, %E", fd);
 		break;
 	      }
 	break;
@@ -552,14 +553,14 @@ commune_process (void *arg)
 	    {
 	      fhandler_pipe *fh = cfd;
 	      n = sizeof *fh;
-	      if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
-		sigproc_printf ("WriteFile sizeof hdl failed, %E");
-	      else if (!WriteFile (tothem, fh, n, &nr, NULL))
-		sigproc_printf ("WriteFile hdl failed, %E");
+	      if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
+		sigproc_printf ("WritePipeOverlapped sizeof hdl failed, %E");
+	      else if (!WritePipeOverlapped (tothem, fh, n, &nr, 1000L))
+		sigproc_printf ("WritePipeOverlapped hdl failed, %E");
 	      break;
 	    }
-	if (!n && !WriteFile (tothem, &n, sizeof n, &nr, NULL))
-	  sigproc_printf ("WriteFile sizeof hdl failed, %E");
+	if (!n && !WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped sizeof hdl failed, %E");
 	break;
       }
     case PICOM_FD:
@@ -572,10 +573,10 @@ commune_process (void *arg)
 	  n = strlen (strcpy (path, "")) + 1;
 	else
 	  n = strlen (cfd->get_proc_fd_name (path)) + 1;
-	if (!WriteFile (tothem, &n, sizeof n, &nr, NULL))
-	  sigproc_printf ("WriteFile sizeof fd failed, %E");
-	else if (!WriteFile (tothem, path, n, &nr, NULL))
-	  sigproc_printf ("WriteFile fd failed, %E");
+	if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped sizeof fd failed, %E");
+	else if (!WritePipeOverlapped (tothem, path, n, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped fd failed, %E");
 	break;
       }
     }
@@ -655,7 +656,8 @@ _pinfo::commune_request (__uint32_t code, ...)
     case PICOM_FDS:
     case PICOM_FD:
     case PICOM_PIPE_FHANDLER:
-      if (!ReadFile (fromthem, &n, sizeof n, &nr, NULL) || nr != sizeof n)
+      if (!ReadPipeOverlapped (fromthem, &n, sizeof n, &nr, 500L)
+	  || nr != sizeof n)
 	{
 	  __seterrno ();
 	  goto err;
@@ -666,7 +668,9 @@ _pinfo::commune_request (__uint32_t code, ...)
 	{
 	  res.s = (char *) cmalloc_abort (HEAP_COMMUNE, n);
 	  char *p;
-	  for (p = res.s; n && ReadFile (fromthem, p, n, &nr, NULL); p += nr, n -= nr)
+	  for (p = res.s;
+	       n && ReadPipeOverlapped (fromthem, p, n, &nr, 500L);
+	       p += nr, n -= nr)
 	    continue;
 	  if (n)
 	    {

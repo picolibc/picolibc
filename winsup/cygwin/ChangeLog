@@ -1,3 +1,15 @@
+2011-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (CreatePipeOverlapped): New function.
+	(ReadPipeOverlapped): Ditto.
+	(WritePipeOverlapped): Ditto.
+	* miscfuncs.h: Declare new functions.
+	* pinfo.cc (commune_process): Call WritePipeOverlapped instead of
+	WriteFile.  Set timeout to 1 sec.
+	(_pinfo::commune_request): Call ReadPipeOverlapped instead of ReadFile.
+	Set timeout to 0.5 secs.
+	* sigproc.cc (sig_send): Create pipe using CreatePipeOverlapped.
+
 2011-08-12  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* miscfuncs.cc (create_pipe): Delete obsolete function.

@@ -17,6 +17,13 @@ DWORD nice_to_winprio (int &) __attribute__ ((regparm (1)));
 bool __stdcall create_pipe (PHANDLE, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD)
   __attribute__ ((regparm (3)));
 
+BOOL WINAPI CreatePipeOverlapped (PHANDLE read_handle, PHANDLE write_handle,
+				  LPSECURITY_ATTRIBUTES sa);
+BOOL WINAPI ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len,
+				LPDWORD ret_len, DWORD timeout);
+BOOL WINAPI WritePipeOverlapped (HANDLE h, PCVOID buf, DWORD len,
+				 LPDWORD ret_len, DWORD timeout);
+
 extern "C" void yield ();
 
 void backslashify (const char *, char *, bool);
