@@ -1,3 +1,9 @@
+2011-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pipe.cc (pipe): Just call _pipe with O_BINARY mode.  Move code to
+	generate normalized pathnames from here...
+	(_pipe): ...to here.
+
 2011-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (CreatePipeOverlapped): New function.

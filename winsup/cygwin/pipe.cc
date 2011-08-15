@@ -364,11 +364,11 @@ fhandler_pipe::fstatvfs (struct statvfs *sfs)
 }
 
 extern "C" int
-pipe (int filedes[2])
+_pipe (int filedes[2], unsigned int psize, int mode)
 {
   fhandler_pipe *fhs[2];
-  int res = fhandler_pipe::create (fhs, DEFAULT_PIPEBUFSIZE, O_BINARY);
-  if (res == 0)
+  int res = fhandler_pipe::create (fhs, psize, mode);
+  if (!res)
     {
       cygheap_fdnew fdin;
       cygheap_fdnew fdout (fdin, false);
@@ -383,27 +383,13 @@ pipe (int filedes[2])
       filedes[1] = fdout;
       debug_printf ("%d, %d", (int) fdin, (int) fdout);
     }
-
   return res;
 }
 
 extern "C" int
-_pipe (int filedes[2], unsigned int psize, int mode)
+pipe (int filedes[2])
 {
-  fhandler_pipe *fhs[2];
-  int res = fhandler_pipe::create (fhs, psize, mode);
-  /* This type of pipe is not interruptible so set the appropriate flag. */
-  if (!res)
-    {
-      cygheap_fdnew fdin;
-      cygheap_fdnew fdout (fdin, false);
-      fdin = fhs[0];
-      fdout = fhs[1];
-      filedes[0] = fdin;
-      filedes[1] = fdout;
-    }
-
-  return res;
+  return _pipe (filedes, DEFAULT_PIPEBUFSIZE, O_BINARY);
 }
 
 extern "C" int
