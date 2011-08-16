@@ -67,10 +67,10 @@ get_full_path_of_dll (const char* str, path_conv &real_filename)
   return false;
 }
 
-void *
-dlopen (const char *name, int)
+extern "C" void *
+dlopen (const char *name, int flags)
 {
-  void *ret;
+  void *ret = NULL;
 
   if (name == NULL)
     {
@@ -82,16 +82,14 @@ dlopen (const char *name, int)
     {
       /* handle for the named library */
       path_conv pc;
-      if (!get_full_path_of_dll (name, pc))
-	ret = NULL;
-      else
+      if (get_full_path_of_dll (name, pc))
 	{
 	  tmp_pathbuf tp;
 	  wchar_t *path = tp.w_get ();
 
 	  pc.get_wide_win32_path (path);
 	  /* Check if the last path component contains a dot.  If so,
-	     leave the filename alone.  Otherwise add a traiing dot
+	     leave the filename alone.  Otherwise add a trailing dot
 	     to override LoadLibrary's automatic adding of a ".dll" suffix. */
 	  wchar_t *last_bs = wcsrchr (path, L'\\');
 	  if (last_bs && !wcschr (last_bs, L'.'))
@@ -113,7 +111,23 @@ dlopen (const char *name, int)
 	  struct per_process_cxx_malloc *tmp_malloc;
 	  tmp_malloc = __cygwin_user_data.cxx_malloc;
 
-	  ret = (void *) LoadLibraryW (path);
+	  if (!(flags & RTLD_NOLOAD)
+	      || (ret = GetModuleHandleW (path)) != NULL)
+	    {
+	      ret = (void *) LoadLibraryW (path);
+	      if (ret && (flags & RTLD_NODELETE)
+		  && !GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_PIN, path,
+					  (HMODULE *) &ret))
+		{
+		  /* Windows 2000 is missing the GetModuleHandleEx call, so we
+		     just use a trick.  Call LoadLibrary 10 times more if the
+		     RTLD_NODELETE flag has been specified.  That makes it
+		     unlikely (but not impossible) that dlclose will actually
+		     free the library. */
+		  for (int i = 0; i < 10; ++i)
+		    LoadLibraryW (path);
+		}
+	    }
 
 	  /* Restore original cxx_malloc pointer. */
 	  __cygwin_user_data.cxx_malloc = tmp_malloc;
@@ -130,7 +144,7 @@ dlopen (const char *name, int)
   return ret;
 }
 
-void *
+extern "C" void *
 dlsym (void *handle, const char *name)
 {
   void *ret = NULL;
@@ -176,7 +190,7 @@ dlsym (void *handle, const char *name)
   return ret;
 }
 
-int
+extern "C" int
 dlclose (void *handle)
 {
   int ret;
@@ -191,7 +205,7 @@ dlclose (void *handle)
   return ret;
 }
 
-char *
+extern "C" char *
 dlerror ()
 {
   char *res;

@@ -1,3 +1,14 @@
+2011-08-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetModuleHandleExW): Define.
+	* dlfcn.cc: Throughout mark exported symbols as extern "C".
+	(dlopen): Unignore flags argument.  Define ret to NULL.  Fix typo in
+	comment.  Support Glibc flags RTLD_NOLOAD and RTLD_NODELETE.
+	* include/dlfcn.h:  Clean up comments.
+	(RTLD_NODELETE): Define.
+	(RTLD_NOLOAD): Define.
+	(RTLD_DEEPBIND): Define.
+
 2011-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pipe.cc (pipe): Just call _pipe with O_BINARY mode.  Move code to

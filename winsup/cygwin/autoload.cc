@@ -390,6 +390,7 @@ LoadDLLfunc (GetNetworkParams, 8, iphlpapi)
 LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 
 LoadDLLfuncEx (AttachConsole, 4, kernel32, 1)
+LoadDLLfuncEx (GetModuleHandleExW, 12, kernel32, 1)
 LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
 
