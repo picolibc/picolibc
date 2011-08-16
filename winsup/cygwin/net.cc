@@ -1198,57 +1198,34 @@ gethostby_helper (const char *name, const int af, const int type,
   string_ptr = (char *) (ret->h_addr_list + address_count + 1);
 
   /* Rescan the answers */
-  ancount = alias_count + address_count; /* Valid records */
   alias_count = address_count = 0;
+  prevptr->set_next (prevptr + 1);
 
-  for (i = 0, curptr = anptr; i < ancount; i++, curptr = curptr->next ())
+  for (curptr = anptr; curptr <= prevptr; curptr = curptr->next ())
     {
       antype = curptr->type;
       if (antype == ns_t_cname)
 	{
-	  complen = dn_expand (msg, eomsg, curptr->name (), string_ptr, string_size);
-#ifdef DEBUGGING
-	  if (complen != curptr->complen)
-	    goto debugging;
-#endif
+	  dn_expand (msg, eomsg, curptr->name (), string_ptr, curptr->namelen1);
 	  ret->h_aliases[alias_count++] = string_ptr;
-	  namelen1 = curptr->namelen1;
-	  string_ptr += namelen1;
-	  string_size -= namelen1;
-	  continue;
+	  string_ptr += curptr->namelen1;
 	}
-      if (antype == type)
+      else
+	{
+	  if (address_count == 0)
 	    {
-	      if (address_count == 0)
-		{
-		  complen = dn_expand (msg, eomsg, curptr->name(), string_ptr, string_size);
-#ifdef DEBUGGING
-		  if (complen != curptr->complen)
-		    goto debugging;
-#endif
-		  ret->h_name = string_ptr;
-		  namelen1 = curptr->namelen1;
-		  string_ptr += namelen1;
-		  string_size -= namelen1;
-		}
-	      ret->h_addr_list[address_count++] = string_ptr;
-	      if (addrsize_in != addrsize_out)
-		memcpy4to6 (string_ptr, curptr->data);
-	      else
-		memcpy (string_ptr, curptr->data, addrsize_in);
-	      string_ptr += addrsize_out;
-	      string_size -= addrsize_out;
-	      continue;
+	      dn_expand (msg, eomsg, curptr->name (), string_ptr, curptr->namelen1);
+	      ret->h_name = string_ptr;
+	      string_ptr += curptr->namelen1;
 	    }
-#ifdef DEBUGGING
-      /* Should not get here */
-      goto debugging;
-#endif
+	  ret->h_addr_list[address_count++] = string_ptr;
+	  if (addrsize_in != addrsize_out)
+	    memcpy4to6 (string_ptr, curptr->data);
+	  else
+	    memcpy (string_ptr, curptr->data, addrsize_in);
+	  string_ptr += addrsize_out;
+	}
     }
-#ifdef DEBUGGING
-  if (string_size < 0)
-    goto debugging;
-#endif
 
   free (msg);
 
@@ -1263,16 +1240,6 @@ gethostby_helper (const char *name, const int af, const int type,
      Should it be NO_RECOVERY ? */
   h_errno = TRY_AGAIN;
   return NULL;
-
-
-#ifdef DEBUGGING
- debugging:
-   system_printf ("Please debug.");
-   free (msg);
-   free (ret);
-   h_errno = NO_RECOVERY;
-   return NULL;
-#endif
 }
 
 /* gethostbyname2: standards? */

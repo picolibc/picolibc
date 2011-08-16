@@ -1,3 +1,8 @@
+2011-08-16  Pierre Humblet <Pierre.Humblet@ieee.org>
+
+	* net.cc (gethostby_helper): Remove DEBUGGING code from and
+	streamline the second pass.
+
 2011-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dlfcn.cc (dlopen): Reimplement RTLD_NODELETE for Windows 2000 using
