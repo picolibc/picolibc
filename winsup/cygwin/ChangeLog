@@ -1,5 +1,16 @@
 2011-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dlfcn.cc (dlopen): Reimplement RTLD_NODELETE for Windows 2000 using
+	internal datastructures.  Explain the code.
+	* ntdll.h (struct _LDR_DATA_TABLE_ENTRY): Define.
+	(struct _PEB_LDR_DATA): Define.
+	(struct _PEB): Change PVOID LoaderData to PPEB_LDR_DATA Ldr.
+
+	* fhandler_process.cc (format_process_maps): Call NtQueryVirtualMemory
+	with valid return length pointer.  Explain why.
+
+2011-08-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
 
 2011-08-16  Corinna Vinschen  <corinna@vinschen.de>

@@ -579,6 +579,34 @@ typedef struct _KERNEL_USER_TIMES
   LARGE_INTEGER UserTime;
 } KERNEL_USER_TIMES, *PKERNEL_USER_TIMES;
 
+typedef struct _LDR_DATA_TABLE_ENTRY
+{
+  LIST_ENTRY InLoadOrderLinks;
+  LIST_ENTRY InMemoryOrderLinks;
+  LIST_ENTRY InInitializationOrderLinks;
+  PVOID DllBase;
+  PVOID EntryPoint;
+  ULONG SizeOfImage;
+  UNICODE_STRING FullDllName;
+  UNICODE_STRING BaseDllName;
+  ULONG Flags;
+  WORD LoadCount;
+  /* More follows.  Left out since it's just not used.  The aforementioned
+     part of the structure is stable from at least NT4 up to Windows 7,
+     including WOW64. */
+} LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;
+
+typedef struct _PEB_LDR_DATA
+{
+  ULONG Length;
+  UCHAR Initialized;
+  PVOID SsHandle;
+  LIST_ENTRY InLoadOrderModuleList;
+  LIST_ENTRY InMemoryOrderModuleList;
+  LIST_ENTRY InInitializationOrderModuleList;
+  PVOID EntryInProgress;
+} PEB_LDR_DATA, *PPEB_LDR_DATA;
+
 typedef struct _RTL_USER_PROCESS_PARAMETERS
 {
   ULONG AllocationSize;
@@ -616,7 +644,7 @@ typedef struct _PEB
   BYTE Reserved1[2];
   BYTE BeingDebugged;
   BYTE Reserved2[9];
-  PVOID LoaderData;
+  PPEB_LDR_DATA Ldr;
   PRTL_USER_PROCESS_PARAMETERS ProcessParameters;
   BYTE Reserved3[4];
   PVOID ProcessHeap;

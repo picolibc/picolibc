@@ -960,12 +960,16 @@ format_process_maps (void *data, char *&destbuf)
 	  // if a new allocation, figure out what kind it is
 	  if (newbase && !last_pass && mb.State != MEM_FREE)
 	    {
+	      /* If the return length pointer is missing, NtQueryVirtualMemory
+		 returns with STATUS_ACCESS_VIOLATION on Windows 2000. */
+	      ULONG ret_len = 0;
+
 	      st.st_dev = 0;
 	      st.st_ino = 0;
 	      if ((mb.Type & (MEM_MAPPED | MEM_IMAGE))
-		  && NT_SUCCESS (NtQueryVirtualMemory (proc, cur.abase,
+		  && NT_SUCCESS (status = NtQueryVirtualMemory (proc, cur.abase,
 						       MemorySectionName,
-						       msi, 65536, NULL)))
+						       msi, 65536, &ret_len)))
 		{
 		  PWCHAR dosname =
 		      drive_maps.fixup_if_match (msi->SectionFileName.Buffer);

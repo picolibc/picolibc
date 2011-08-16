@@ -120,12 +120,27 @@ dlopen (const char *name, int flags)
 					  (HMODULE *) &ret))
 		{
 		  /* Windows 2000 is missing the GetModuleHandleEx call, so we
-		     just use a trick.  Call LoadLibrary 10 times more if the
-		     RTLD_NODELETE flag has been specified.  That makes it
-		     unlikely (but not impossible) that dlclose will actually
-		     free the library. */
-		  for (int i = 0; i < 10; ++i)
-		    LoadLibraryW (path);
+		     use a non-documented way to set the DLL to "don't free".
+		     This is how it works:  Fetch the Windows Loader data from
+		     the PEB.  Iterate backwards through the list of loaded
+		     DLLs and compare the DllBase address with the address
+		     returned by LoadLibrary.  If they are equal we found the
+		     right entry.  Now set the LoadCount to -1, which is the
+		     marker for a DLL which should never be free'd. */
+		  PPEB_LDR_DATA ldr = NtCurrentTeb ()->Peb->Ldr;
+
+		  for (PLDR_DATA_TABLE_ENTRY entry = (PLDR_DATA_TABLE_ENTRY)
+					     ldr->InLoadOrderModuleList.Blink;
+		       entry && entry->DllBase;
+		       entry = (PLDR_DATA_TABLE_ENTRY)
+			       entry->InLoadOrderLinks.Blink)
+		    {
+		      if (entry->DllBase == ret)
+			{
+			  entry->LoadCount = (WORD) -1;
+			  break;
+			}
+		    }
 		}
 	    }
 
