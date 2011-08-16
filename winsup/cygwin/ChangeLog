@@ -1,5 +1,9 @@
 2011-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2011-08-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (GetModuleHandleExW): Define.
 	* dlfcn.cc: Throughout mark exported symbols as extern "C".
 	(dlopen): Unignore flags argument.  Define ret to NULL.  Fix typo in
