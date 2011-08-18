@@ -110,7 +110,7 @@ respawn_wow64_process ()
     }
 }
 
-extern void __stdcall dll_crt0_0 ();
+void dll_crt0_0 ();
 
 extern "C" BOOL WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)

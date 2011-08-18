@@ -1,3 +1,8 @@
+2011-08-18  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_0): Remove unneeded __stdcall decoration.
+	* init.cc: Reflect change to dll_crt0_0 in declaration.
+
 2011-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::get_debugger_info): Add missing braces.

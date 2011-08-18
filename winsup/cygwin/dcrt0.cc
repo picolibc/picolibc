@@ -649,7 +649,7 @@ init_windows_system_directory ()
   windows_system_directory[windows_system_directory_length] = L'\0';
 }
 
-void __stdcall
+void
 dll_crt0_0 ()
 {
   init_windows_system_directory ();
