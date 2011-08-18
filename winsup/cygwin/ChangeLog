@@ -1,3 +1,8 @@
+2011-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::get_debugger_info): Add missing braces.
+	(dtable::stdio_init): Fix incorrect negation of not_open(2) condition.
+
 2011-08-16  Pierre Humblet <Pierre.Humblet@ieee.org>
 
 	* net.cc (gethostby_helper): Remove DEBUGGING code from and
