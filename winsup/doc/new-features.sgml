@@ -77,6 +77,11 @@ total number of processes.
 </para></listitem>
 
 <listitem><para>
+Added /proc/devices and /proc/misc, which lists supported device types and
+their device numbers.
+</para></listitem>
+
+<listitem><para>
 Added /proc/swaps, which shows the location and size of Windows paging file(s).
 </para></listitem>
 
