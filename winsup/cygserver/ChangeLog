@@ -1,3 +1,8 @@
+2011-08-18  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* sysv_shm.cc (ACCESSPERMS): Remove to fix redefined warning, as
+	this is now defined in <sys/stat.h>.
+
 2011-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.in: Remove AC_ALLOCA test and test for __builtin_memset.
