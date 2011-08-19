@@ -1,5 +1,14 @@
 2011-08-19  Ralf Corsépius <ralf.corsepius@rtems.org>
 
+	* libc/stdio/vasiprintf.c: Include "local.h" for "_svfiprintf_r".
+	* libc/stdio/vasprintf.c Include "local.h" for "_svfprintf_r".
+	* libc/stdio/vsiprintf.c: Include "local.h" for "_svfiprintf_r".
+	* libc/stdio/vsniprintf.c: Include "local.h" for "_svfiprintf_r".
+	* libc/stdio/vsnprintf.c: Include "local.h" for "_svfprintf_r"
+	* libc/stdio/vsprintf.c: Include "local.h" for "_svfprintf_r"
+
+2011-08-19  Ralf Corsépius <ralf.corsepius@rtems.org>
+
 	* libc/string/bcmp.c: Include <strings.h> for "bcmp".
 	* libc/string/bcopy.c: Include <strings.h> for "bcopy".
 	* libc/string/strcasestr.c: Include <strings.h> for "strncasecmp".
