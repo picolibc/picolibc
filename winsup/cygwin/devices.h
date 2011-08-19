@@ -44,8 +44,9 @@ enum fh_devices
   DEV_SERIAL_MAJOR = 117,
   FH_SERIAL  = FHDEV (117, 0),	/* /dev/ttyS? */
 
-  FH_WINDOWS = FHDEV (13, 255),
-  FH_CLIPBOARD=FHDEV (13, 254),
+  DEV_MISC_MAJOR = 13,
+  FH_WINDOWS = FHDEV (DEV_MISC_MAJOR, 255),
+  FH_CLIPBOARD=FHDEV (DEV_MISC_MAJOR, 254),
 
   /* begin /proc directories */
 
@@ -225,16 +226,19 @@ enum fh_devices
   FH_SDDW    = FHDEV (DEV_SD7_MAJOR, 224),
   FH_SDDX    = FHDEV (DEV_SD7_MAJOR, 240),
 
-  FH_MEM     = FHDEV (1, 1),
-  FH_KMEM    = FHDEV (1, 2),	/* not implemented yet */
-  FH_NULL    = FHDEV (1, 3),
-  FH_PORT    = FHDEV (1, 4),
-  FH_ZERO    = FHDEV (1, 5),
-  FH_FULL    = FHDEV (1, 7),
-  FH_RANDOM  = FHDEV (1, 8),
-  FH_URANDOM = FHDEV (1, 9),
-  FH_KMSG    = FHDEV (1, 11),
-  FH_OSS_DSP = FHDEV (14, 3),
+  DEV_MEM_MAJOR = 1,
+  FH_MEM     = FHDEV (DEV_MEM_MAJOR, 1),
+  FH_KMEM    = FHDEV (DEV_MEM_MAJOR, 2),	/* not implemented yet */
+  FH_NULL    = FHDEV (DEV_MEM_MAJOR, 3),
+  FH_PORT    = FHDEV (DEV_MEM_MAJOR, 4),
+  FH_ZERO    = FHDEV (DEV_MEM_MAJOR, 5),
+  FH_FULL    = FHDEV (DEV_MEM_MAJOR, 7),
+  FH_RANDOM  = FHDEV (DEV_MEM_MAJOR, 8),
+  FH_URANDOM = FHDEV (DEV_MEM_MAJOR, 9),
+  FH_KMSG    = FHDEV (DEV_MEM_MAJOR, 11),
+
+  DEV_SOUND_MAJOR = 14,
+  FH_OSS_DSP = FHDEV (DEV_SOUND_MAJOR, 3),
 
   DEV_CYGDRIVE_MAJOR = 98,
   FH_CYGDRIVE= FHDEV (DEV_CYGDRIVE_MAJOR, 0),

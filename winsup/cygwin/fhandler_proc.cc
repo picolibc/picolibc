@@ -46,15 +46,19 @@ static _off64_t format_proc_self (void *, char *&);
 static _off64_t format_proc_mounts (void *, char *&);
 static _off64_t format_proc_filesystems (void *, char *&);
 static _off64_t format_proc_swaps (void *, char *&);
+static _off64_t format_proc_devices (void *, char *&);
+static _off64_t format_proc_misc (void *, char *&);
 
 /* names of objects in /proc */
 static const virt_tab_t proc_tab[] = {
   { _VN ("."),		 FH_PROC,	virt_directory,	NULL },
   { _VN (".."),		 FH_PROC,	virt_directory,	NULL },
   { _VN ("cpuinfo"),	 FH_PROC,	virt_file,	format_proc_cpuinfo },
+  { _VN ("devices"),	 FH_PROC,	virt_file,	format_proc_devices },
   { _VN ("filesystems"), FH_PROC,	virt_file,	format_proc_filesystems },
   { _VN ("loadavg"),	 FH_PROC,	virt_file,	format_proc_loadavg },
   { _VN ("meminfo"),	 FH_PROC,	virt_file,	format_proc_meminfo },
+  { _VN ("misc"),	 FH_PROC,	virt_file,	format_proc_misc },
   { _VN ("mounts"),	 FH_PROC,	virt_symlink,	format_proc_mounts },
   { _VN ("net"),	 FH_PROCNET,	virt_directory,	NULL },
   { _VN ("partitions"),  FH_PROC,	virt_file,	format_proc_partitions },
@@ -1329,6 +1333,67 @@ format_proc_swaps (void *, char *&destbuf)
 
   if (spi)
     free (spi);
+
+  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
+  memcpy (destbuf, buf, bufptr - buf);
+  return bufptr - buf;
+}
+
+static _off64_t
+format_proc_devices (void *, char *&destbuf)
+{
+  tmp_pathbuf tp;
+  char *buf = tp.c_get ();
+  char *bufptr = buf;
+
+  bufptr += __small_sprintf (bufptr,
+			     "Character devices:\n"
+			     "%3d mem\n"
+			     "%3d cons\n"
+			     "%3d /dev/tty\n"
+			     "%3d /dev/console\n"
+			     "%3d /dev/ptmx\n"
+			     "%3d st\n"
+			     "%3d misc\n"
+			     "%3d sound\n"
+			     "%3d ttyS\n"
+			     "%3d tty\n"
+			     "\n"
+			     "Block devices:\n"
+			     "%3d fd\n"
+			     "%3d sd\n"
+			     "%3d sr\n"
+			     "%3d sd\n"
+			     "%3d sd\n"
+			     "%3d sd\n"
+			     "%3d sd\n"
+			     "%3d sd\n"
+			     "%3d sd\n"
+			     "%3d sd\n",
+			     DEV_MEM_MAJOR, DEV_CONS_MAJOR, _major (FH_TTY),
+			     _major (FH_CONSOLE), _major (FH_PTYM),
+			     DEV_TAPE_MAJOR, DEV_MISC_MAJOR, DEV_SOUND_MAJOR,
+			     DEV_SERIAL_MAJOR, DEV_TTYS_MAJOR, DEV_FLOPPY_MAJOR,
+			     DEV_SD_MAJOR, DEV_CDROM_MAJOR, DEV_SD1_MAJOR,
+			     DEV_SD2_MAJOR, DEV_SD3_MAJOR, DEV_SD4_MAJOR,
+			     DEV_SD5_MAJOR, DEV_SD6_MAJOR, DEV_SD7_MAJOR);
+
+  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
+  memcpy (destbuf, buf, bufptr - buf);
+  return bufptr - buf;
+}
+
+static _off64_t
+format_proc_misc (void *, char *&destbuf)
+{
+  tmp_pathbuf tp;
+  char *buf = tp.c_get ();
+  char *bufptr = buf;
+
+  bufptr += __small_sprintf (bufptr,
+			     "%3d clipboard\n"
+			     "%3d windows\n",
+			     _minor (FH_CLIPBOARD), _minor (FH_WINDOWS));
 
   destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
   memcpy (destbuf, buf, bufptr - buf);

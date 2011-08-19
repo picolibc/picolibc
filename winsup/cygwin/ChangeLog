@@ -1,3 +1,12 @@
+2011-08-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* devices.h (fh_devices): Define DEV_MISC_MAJOR, DEV_MEM_MAJOR,
+	DEV_SOUND_MAJOR.  Use throughout.
+	* fhandler_proc.cc (proc_tab): Add /proc/devices and /proc/misc
+	virtual files.
+	(format_proc_devices): New function.
+	(format_proc_misc): New function.
+
 2011-08-19  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dtable.cc: Mark some const variables as static.
