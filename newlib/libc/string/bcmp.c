@@ -36,6 +36,7 @@ QUICKREF
 */
 
 #include <string.h>
+#include <strings.h>
 
 int
 _DEFUN (bcmp, (m1, m2, n),

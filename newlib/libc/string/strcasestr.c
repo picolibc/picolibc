@@ -76,6 +76,7 @@ QUICKREF
 
 #include <ctype.h>
 #include <string.h>
+#include <strings.h>
 
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
 # define RETURN_TYPE char *

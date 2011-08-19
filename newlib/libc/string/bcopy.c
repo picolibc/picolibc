@@ -27,6 +27,7 @@ QUICKREF
 */
 
 #include <string.h>
+#include <strings.h>
 
 void
 _DEFUN (bcopy, (b1, b2, length),

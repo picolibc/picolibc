@@ -1,3 +1,10 @@
+2011-08-19  Ralf Corsépius <ralf.corsepius@rtems.org>
+
+	* libc/string/bcmp.c: Include <strings.h> for "bcmp".
+	* libc/string/bcopy.c: Include <strings.h> for "bcopy".
+	* libc/string/strcasestr.c: Include <strings.h> for "strncasecmp".
+	* libc/time/strptime.c: Include <strings.h> for "strncasecmp".
+
 2011-08-19  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/process.h: Remove exec family function declarations.
