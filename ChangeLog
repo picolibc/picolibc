@@ -1,3 +1,7 @@
+2011-08-19  Joel Brobecker  <brobecker@adacore.com>
+
+	* src-release (GDB_SUPPORT_DIRS): Add 'cpu'.
+
 2011-05-17  Joseph Myers  <joseph@codesourcery.com>
 
 	* configure.ac (avr-*-*): Add comment about why libssp is disabled.

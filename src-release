@@ -269,7 +269,7 @@ gnats.tar.bz2: $(DIST_SUPPORT) $(GNATS_SUPPORT_DIRS) gnats
 		SUPPORT_FILES="$(GNATS_SUPPORT_DIRS)"
 
 .PHONY: gdb.tar.bz2
-GDB_SUPPORT_DIRS= bfd include libiberty opcodes readline sim intl libdecnumber
+GDB_SUPPORT_DIRS= bfd include libiberty opcodes readline sim intl libdecnumber cpu
 gdb.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f $(SELF) gdb-taz TOOL=gdb \
 		MD5PROG="$(MD5PROG)" \
