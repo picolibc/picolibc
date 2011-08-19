@@ -38,12 +38,12 @@ static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 static bool handle_to_fn (HANDLE, char *);
 
 #define WCLEN(x) ((sizeof (x) / sizeof (WCHAR)) - 1)
-char unknown_file[] = "some disk file";
-const WCHAR DEV_NULL[] = L"\\Device\\Null";
+static const char unknown_file[] = "some disk file";
+static const WCHAR DEV_NULL[] = L"\\Device\\Null";
 static const WCHAR DEV_SOCKET[] = L"\\Device\\Afd";
 
-const WCHAR DEVICE_PREFIX[] = L"\\device\\";
-const size_t DEVICE_PREFIX_LEN WCLEN (DEVICE_PREFIX);
+static const WCHAR DEVICE_PREFIX[] = L"\\device\\";
+static const size_t DEVICE_PREFIX_LEN WCLEN (DEVICE_PREFIX);
 
 static const WCHAR DEV_NAMED_PIPE[] = L"\\Device\\NamedPipe\\";
 static const size_t DEV_NAMED_PIPE_LEN = WCLEN (DEV_NAMED_PIPE);

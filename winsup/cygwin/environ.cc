@@ -268,7 +268,49 @@ static win_env conv_envvars[] =
     {NULL, 0, NULL, NULL, 0, 0}
   };
 
-static unsigned char conv_start_chars[256] = {0};
+#define WC ((unsigned char) 1)
+/* Note:  You *must* fill in this array setting the ordinal value of the first
+   character of the above environment variable names to 1.
+   This table is intended to speed up lookup of these variables. */
+
+static const unsigned char conv_start_chars[256]
+  __attribute__((section (".cygwin_dll_common"), shared)) =
+  {
+    0,        0,        0,        0,        0,        0,        0,        0,
+    0,        0,        0,        0,        0,        0,        0,        0,
+    0,        0,        0,        0,        0,        0,        0,        0,
+    0,        0,        0,        0,        0,        0,        0,        0,
+    0,        0,        0,        0,        0,        0,        0,        0,
+    0,        0,        0,        0,        0,        0,        0,        0,
+    0,        0,        0,        0,        0,        0,        0,        0,
+    0,        0,        0,        0,        0,        0,        0,        0,
+/*            A         B         C         D         E         F         G */
+    0,        0,        0,        0,        0,        0,        0,        0,
+    /*  72 */
+/*  H         I         J         K         L         M         N         O */
+    WC,       0,        0,        0,        WC,       0,        0,        0,
+    /*  80 */
+/*  P         Q         R         S         T         U         V         W */
+    WC,       0,        0,        0,        WC,       0,        0,        0,
+    /*  88 */
+/*  x         Y         Z                                                   */
+    0,        0,        0,        0,        0,        0,        0,        0,
+    /*  96 */
+/*            a         b         c         d         e         f         g */
+    0,        0,        0,        0,        0,        0,        0,        0,
+    /* 104 */
+/*  h         i         j         k         l         m         n         o */
+    WC,       0,        0,        0,        WC,       0,        0,        0,
+    /* 112 */
+/*  p         q         r         s         t         u         v         w */
+    WC,       0,        0,        0,        WC,       0,        0,        0, 
+  };
+
+static inline char
+match_first_char (const char *s, unsigned char m)
+{
+  return conv_start_chars[(unsigned) *s] & m;
+}
 
 struct win_env&
 win_env::operator = (struct win_env& x)
@@ -332,7 +374,7 @@ win_env::add_cache (const char *in_posix, const char *in_native)
 win_env * __stdcall
 getwinenv (const char *env, const char *in_posix, win_env *temp)
 {
-  if (!conv_start_chars[(unsigned char)*env])
+  if (!match_first_char (env, WC))
     return NULL;
 
   for (int i = 0; conv_envvars[i].name != NULL; i++)
@@ -359,8 +401,8 @@ getwinenv (const char *env, const char *in_posix, win_env *temp)
 
 /* Convert windows path specs to POSIX, if appropriate.
  */
-static void __stdcall
-posify (char **here, const char *value, char *outenv)
+inline static void
+posify_maybe (char **here, const char *value, char *outenv)
 {
   char *src = *here;
   win_env *conv;
@@ -653,6 +695,7 @@ static struct renv {
 	{ NL("WINDIR=") }			// 22
 };
 #define RENV_SIZE (sizeof (renv_arr) / sizeof (renv_arr[0]))
+
 /* Set of first characters of the above list of variables. */
 static const char idx_arr[] = "ACHNOPSTW";
 /* Index into renv_arr at which the variables with this specific character
@@ -729,13 +772,6 @@ environ_init (char **envp, int envc)
   if (efault.faulted ())
     api_fatal ("internal error reading the windows environment - too many environment variables?");
 
-  if (!conv_start_chars[0])
-    for (int i = 0; conv_envvars[i].name != NULL; i++)
-      {
-	conv_start_chars[(int) cyg_tolower (conv_envvars[i].name[0])] = 1;
-	conv_start_chars[(int) cyg_toupper (conv_envvars[i].name[0])] = 1;
-      }
-
   char *tmpbuf = tp.t_get ();
   got_something_from_registry = regopt (L"default", tmpbuf);
   if (myself->progname[0])
@@ -795,8 +831,8 @@ environ_init (char **envp, int envc)
 	sawTERM = 1;
       else if (*newp == 'C' && strncmp (newp, "CYGWIN=", 7) == 0)
 	parse_options (newp + 7);
-      if (*eq && conv_start_chars[(unsigned char) envp[i][0]])
-	posify (envp + i, *++eq ? eq : --eq, tmpbuf);
+      if (*eq)
+	posify_maybe (envp + i, *++eq ? eq : --eq, tmpbuf);
       debug_printf ("%p: %s", envp[i], envp[i]);
     }
 

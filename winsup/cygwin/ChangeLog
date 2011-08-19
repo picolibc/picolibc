@@ -1,3 +1,14 @@
+2011-08-19  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dtable.cc: Mark some const variables as static.
+	* environ.cc (conv_start_chars): Move to shared cygwin region and
+	initialize at compile time.
+	(match_first_char): New generic function for querying conv_start_chars.
+	(posify_maybe): Rename from posify.
+	(environ_init): Remove conv_envvars initialization.  Don't check
+	conv_start_chars, just allow posify_maybe to make the decision.
+	* fhandler_console.cc (__vt100_conv): Fix formatting.  Mark as const.
+
 2011-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (fhandler_console::read): Recognize backspace key
