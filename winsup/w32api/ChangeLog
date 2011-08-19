@@ -1,3 +1,7 @@
+2011-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winuser.h: Ad missing MAPVK_xxx definitions.
+
 2011-08-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winnt.h (IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE,
