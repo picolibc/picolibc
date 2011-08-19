@@ -156,7 +156,7 @@ SECTIONS
     LONG (0);
     PROVIDE (__eh_frame_end = .);
   }
-  .gcc_except_table : { *(.gcc_except_table) }
+  .gcc_except_table : { *(.gcc_except_table)  *(.gcc_except_table.*) }
   .hash          : { *(.hash)		}
   .dynsym        : { *(.dynsym)		}
   .dynstr        : { *(.dynstr)		}

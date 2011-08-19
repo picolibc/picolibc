@@ -1,3 +1,8 @@
+2011-08-19  Nick Clifton  <nickc@redhat.com>
+
+	* iq2000/sim.ld (.gcc_except_table): Include .gcc_except_table.foo
+	sections as well.
+
 2011-08-08  Mike Stump <mikestump@comcast.net>
 
 	* Makefile.in: Make stmp-bsp and install consistent with
