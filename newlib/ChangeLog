@@ -1,3 +1,9 @@
+2011-08-19  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/time/mktime.c (validate_structure): Account for tm_mon possibly
+	being given as negative.
+	(mktime): Set tm_isdst=0 when !daylight.
+
 2011-08-01  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/types.h: XML and RTEMS define

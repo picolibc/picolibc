@@ -107,7 +107,7 @@ _DEFUN(validate_structure, (tim_p),
         }
     }
 
-  if (tim_p->tm_mon > 11)
+  if (tim_p->tm_mon < 0 || tim_p->tm_mon > 11)
     {
       res = div (tim_p->tm_mon, 12);
       tim_p->tm_year += res.quot;
@@ -159,7 +159,7 @@ _DEFUN(mktime, (tim_p),
 {
   time_t tim = 0;
   long days = 0;
-  int year, isdst, tm_isdst;
+  int year, isdst=0;
   __tzinfo_type *tz = __gettzinfo ();
 
   /* validate structure */
@@ -204,15 +204,16 @@ _DEFUN(mktime, (tim_p),
   /* compute total seconds */
   tim += (days * _SEC_IN_DAY);
 
-  /* Convert user positive into 1 */
-  tm_isdst = tim_p->tm_isdst > 0  ?  1 : tim_p->tm_isdst;
-  isdst = tm_isdst;
-
   TZ_LOCK;
 
   if (_daylight)
     {
+      int tm_isdst;
       int y = tim_p->tm_year + YEAR_BASE;
+      /* Convert user positive into 1 */
+      tm_isdst = tim_p->tm_isdst > 0  ?  1 : tim_p->tm_isdst;
+      isdst = tm_isdst;
+
       if (y == tz->__tzyear || __tzcalc_limits (y))
 	{
 	  /* calculate start of dst in dst local time and 
