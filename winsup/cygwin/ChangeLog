@@ -1,3 +1,9 @@
+2011-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (fhandler_console::read): Recognize backspace key
+	using the device independent key code, rather than the device dependent
+	scan code.
+
 2011-08-18  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_0): Remove unneeded __stdcall decoration.

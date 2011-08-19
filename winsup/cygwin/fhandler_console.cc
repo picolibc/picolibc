@@ -443,7 +443,7 @@ restart:
 	    dev_state.nModifiers |= 8;
 
 	  /* Allow Backspace to emit ^? and escape sequences. */
-	  if (input_rec.Event.KeyEvent.wVirtualScanCode == 14)
+	  if (input_rec.Event.KeyEvent.wVirtualKeyCode == VK_BACK)
 	    {
 	      char c = dev_state.backspace_keycode;
 	      nread = 0;
