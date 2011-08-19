@@ -1,4 +1,5 @@
-/* process.h.  This file comes with MSDOS and WIN32 systems.  */
+/* process.h.  Define spawn family of functions as provided by Cygwin.
+   The original file of this name is a MS/DOS invention. */
 
 #ifndef __PROCESS_H_
 #define __PROCESS_H_
@@ -7,15 +8,7 @@
 extern "C" {
 #endif
 
-int execl(const char *path, const char *argv0, ...);
-int execle(const char *path, const char *argv0, ... /*, char * const *envp */);
-int execlp(const char *path, const char *argv0, ...);
-int execlpe(const char *path, const char *argv0, ... /*, char * const *envp */);
-
-int execv(const char *path, char * const *argv);
-int execve(const char *path, char * const *argv, char * const *envp);
-int execvp(const char *path, char * const *argv);
-int execvpe(const char *path, char * const *argv, char * const *envp);
+/* For the exec functions, include unistd.h. */
 
 int spawnl(int mode, const char *path, const char *argv0, ...);
 int spawnle(int mode, const char *path, const char *argv0, ... /*, char * const *envp */);

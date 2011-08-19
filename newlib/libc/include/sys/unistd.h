@@ -46,6 +46,9 @@ int	_EXFUN(euidaccess, (const char *__path, int __mode));
 int     _EXFUN(execl, (const char *__path, const char *, ... ));
 int     _EXFUN(execle, (const char *__path, const char *, ... ));
 int     _EXFUN(execlp, (const char *__file, const char *, ... ));
+#if defined(__CYGWIN__)
+int     _EXFUN(execlpe, (const char *__file, const char *, ... ));
+#endif
 int     _EXFUN(execv, (const char *__path, char * const __argv[] ));
 int     _EXFUN(execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 int     _EXFUN(execvp, (const char *__file, char * const __argv[] ));
