@@ -1,5 +1,13 @@
 2011-08-19  Ralf Corsépius <ralf.corsepius@rtems.org>
 
+	* libc/sys/rtems/crt0.c: Rework RTEMS_STUB macro.
+	Include <unistd.h>.
+	Remove C++-style comments.
+	Remove hppa, a29k.
+	Add clock_gettime, gettimeofday, sched_yield.
+
+2011-08-19  Ralf Corsépius <ralf.corsepius@rtems.org>
+
 	* libc/stdio/vasiprintf.c: Include "local.h" for "_svfiprintf_r".
 	* libc/stdio/vasprintf.c Include "local.h" for "_svfprintf_r".
 	* libc/stdio/vsiprintf.c: Include "local.h" for "_svfiprintf_r".
