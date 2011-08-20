@@ -1,5 +1,9 @@
 2011-08-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* tlssup.c: Remove mingwm10.dll fallback.
+
+2011-08-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* include/sys/types.h (ssize_t): Defined as int as opposed to long.
 
 	Thanks to bvassche for the report.
