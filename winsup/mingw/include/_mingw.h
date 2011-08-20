@@ -22,9 +22,9 @@
  */
 #define __MINGW_H
 
-#define __MINGW32_VERSION           3.18
+#define __MINGW32_VERSION           3.19
 #define __MINGW32_MAJOR_VERSION     3
-#define __MINGW32_MINOR_VERSION     18
+#define __MINGW32_MINOR_VERSION     19
 #define __MINGW32_PATCHLEVEL        0
 
 #if __GNUC__ >= 3

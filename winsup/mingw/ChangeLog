@@ -1,3 +1,7 @@
+2011-08-20 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	* include/_mingw.h: Increment version to 3.19.
+
 2011-08-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/float.h: Modify guard to accomodate CLang.
