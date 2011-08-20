@@ -1,3 +1,9 @@
+2011-08-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (format_process_maps): Define page protection
+	shortcuts RO, X, and WC.  Use in creating access flag string.  Don't
+	set type flag to 's' for copy-on-write pages, as on Linux.
+
 2011-08-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* devices.h (fh_devices): Define DEV_MISC_MAJOR, DEV_MEM_MAJOR,

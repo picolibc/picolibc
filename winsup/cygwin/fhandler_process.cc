@@ -907,16 +907,19 @@ format_process_maps (void *data, char *&destbuf)
 	}
       else
 	{
+	  static DWORD const RO = (PAGE_EXECUTE_READ | PAGE_READONLY);
 	  static DWORD const RW = (PAGE_EXECUTE_READWRITE | PAGE_READWRITE
 				   | PAGE_EXECUTE_WRITECOPY | PAGE_WRITECOPY);
+	  static DWORD const X = (PAGE_EXECUTE | PAGE_EXECUTE_READ
+				  | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY);
+	  static DWORD const WC = (PAGE_EXECUTE_WRITECOPY | PAGE_WRITECOPY);
 	  DWORD p = mb.Protect;
 	  a = (access) {{
-	      (p & (RW | PAGE_EXECUTE_READ | PAGE_READONLY))   ? 'r' : '-',
-	      (p & (RW))				       ? 'w' : '-',
-	      (p & (PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_READ
-		    | PAGE_EXECUTE_WRITECOPY | PAGE_EXECUTE))  ? 'x' : '-',
-	      (mb.Type & MEM_MAPPED)			       ? 's'
-	      : (p & PAGE_GUARD)			       ? 'g' : 'p',
+	      (p & (RO | RW))				? 'r' : '-',
+	      (p & (RW))				? 'w' : '-',
+	      (p & (X))					? 'x' : '-',
+	      (mb.Type & MEM_MAPPED) && !(p & (WC))	? 's'
+	      : (p & PAGE_GUARD)			? 'g' : 'p',
 	      '\0', // zero-fill the remaining bytes
 	    }};
 	}
