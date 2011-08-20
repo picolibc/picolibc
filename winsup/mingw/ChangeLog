@@ -1,3 +1,9 @@
+2011-08-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
+	* include/sys/types.h (ssize_t): Defined as int as opposed to long.
+
+	Thanks to bvassche for the report.
+
 2011-05-31  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Correct checking for short option matches in getopt_long_only().
