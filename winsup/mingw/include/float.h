@@ -26,7 +26,8 @@
  * _FLOAT_H___ macro, may be found first, thus...
  *
  */
-#ifndef _FLOAT_H___
+#if !defined(_FLOAT_H___) && !defined(__FLOAT_H)
+
  /*
   * ...when we didn't find the GCC-supplied header first, we want to pull
   * it in now; include_next should achieve this, (and we must rely on the

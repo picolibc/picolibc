@@ -1,5 +1,11 @@
 2011-08-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
+	* include/float.h: Modify guard to accomodate CLang.
+
+	Thanks to Ruben Van Boxem for the report.
+
+2011-08-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
+
 	* tlssup.c: Remove mingwm10.dll fallback.
 
 2011-08-19  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
