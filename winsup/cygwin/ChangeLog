@@ -1,3 +1,7 @@
+2011-08-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dtable.cc (conv_start_chars): Remove unneeded section attribute.
+
 2011-08-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/paths.h (_PATH_MAILDIR): Define.

@@ -273,8 +273,7 @@ static win_env conv_envvars[] =
    character of the above environment variable names to 1.
    This table is intended to speed up lookup of these variables. */
 
-static const unsigned char conv_start_chars[256]
-  __attribute__((section (".cygwin_dll_common"), shared)) =
+static const unsigned char conv_start_chars[256] =
   {
     0,        0,        0,        0,        0,        0,        0,        0,
     0,        0,        0,        0,        0,        0,        0,        0,
