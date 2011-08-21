@@ -88,7 +88,8 @@ ldh.exe: MINGW_LDFLAGS := -nostdlib -lkernel32
 LIBICONV := @libiconv@
 libbfd   := ${shell $(CC) -B$(bupdir2)/bfd/ --print-file-name=libbfd.a}
 libintl  := ${shell $(CC) -B$(bupdir2)/intl/ --print-file-name=libintl.a}
-build_dumper := ${shell test -r $(libbfd) -a -r $(libintl) -a -n "$(LIBICONV)" && echo 1}
+bfdlink	 := $(shell ${CC} -xc /dev/null -o /dev/null -c -B${bupdir2}/bfd/ -include bfd.h 2>&1)
+build_dumper := ${shell test -r $(libbfd) -a -r $(libintl) -a -n "$(LIBICONV)" -a -z "${bfdlink}" && echo 1}
 ifdef build_dumper
 CYGWIN_BINS += dumper.exe
 dumper.o module_info.o parse_pe.o: CXXFLAGS += -I$(bupdir2)/bfd -I$(updir1)/include
@@ -180,8 +181,9 @@ $(MINGW_LIB): $(mingw_build)/Makefile
 	@$(MAKE) -C $(@D) $(@F)
 
 warn_dumper:
-	@echo '*** Not building dumper.exe since some required libraries are'
-	@echo '*** missing: libbfd.a and libintl.a.'
+	@echo '*** Not building dumper.exe since some required libraries or'
+	@echo '*** or headers are missing.  Potential candidates are:'
+	@echo '***   bfd.h, libbfd.a, libiconv.a, or libintl.a'
 	@echo '*** If you need this program, check out the naked-bfd and naked-intl'
 	@echo '*** sources from sourceware.org.  Then, configure and build these'
 	@echo '*** libraries.  Otherwise, you can safely ignore this warning.'
