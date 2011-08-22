@@ -40,7 +40,7 @@ QUICKREF
 	strncasecmp
 */
 
-#include <string.h>
+#include <strings.h>
 #include <ctype.h>
 
 int 

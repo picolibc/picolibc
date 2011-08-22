@@ -24,7 +24,7 @@ PORTABILITY
 
 No supporting OS subroutines are required.  */
 
-#include <_ansi.h>
+#include <strings.h>
 
 int
 _DEFUN(ffs, (word),

@@ -34,6 +34,7 @@ QUICKREF
 */
 
 #include <string.h>
+#include <strings.h>
 
 char *
 _DEFUN (rindex, (s, c),

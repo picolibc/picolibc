@@ -1,3 +1,16 @@
+2011-08-22  Ralf Corsépius <ralf.corsepius@rtems.org>
+
+	* libc/string/index.c: Include <strings.h> for "index".
+	* libc/string/rindex.c: Include <strings.h> for "rindex".
+	* libc/string/strcasecmp.c: Include <strings.h> for "strcasecmp".
+	Don't include <string.h>.
+	* libc/string/strncasecmp.c: Include <strings.h> for "strncasecmp".
+	Don't include <string.h>.
+	* libc/string/bzero.c: Include <strings.h> for "bzero".
+	Don't include <string.h>
+	* libc/misc/ffs.c: Include <strings.h> for "ffs".
+	Don't include <_ansi.h>.
+
 2011-08-19  Ralf Corsépius <ralf.corsepius@rtems.org>
 
 	* libc/sys/rtems/crt0.c: Rework RTEMS_STUB macro.
