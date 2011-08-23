@@ -6,11 +6,11 @@ INDEX
 	strcasecmp
 
 ANSI_SYNOPSIS
-	#include <string.h>
+	#include <strings.h>
 	int strcasecmp(const char *<[a]>, const char *<[b]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
+	#include <strings.h>
 	int strcasecmp(<[a]>, <[b]>)
 	char *<[a]>;
 	char *<[b]>;

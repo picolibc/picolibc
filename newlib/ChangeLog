@@ -1,5 +1,12 @@
 2011-08-23  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
+	* libc/misc/ffs.c, libc/string/bcmp.c, libc/string/bcopy.c,
+	libc/string/bzero.c, libc/string/index.c, libc/string/rindex.c,
+	libc/string/strcasecmp.c, libc/string/strncasecmp.c:
+	Let synopsis reference "#include <strings.h>".
+
+2011-08-23  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
 	* libc/posix/regexec.c: Define "nope" only #ifndef NDEBUG.
 	* libc/stdio/vfscanf.c: Define "state" only #ifdef _MB_CAPABLE.
 	* libc/string/wcwidth.c: Include <wctypes.h> for "iswprint" and

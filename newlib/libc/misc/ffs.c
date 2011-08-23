@@ -6,9 +6,11 @@ INDEX
 	ffs
 
 ANSI_SYNOPSIS
+	#include <strings.h>
 	int ffs(int <[word]>);
 
 TRAD_SYNOPSIS
+	#include <strings.h>
 	int ffs(<[word]>);
 
 DESCRIPTION

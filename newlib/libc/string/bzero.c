@@ -6,11 +6,11 @@ INDEX
 	bzero
 
 ANSI_SYNOPSIS
-	#include <string.h>
+	#include <strings.h>
 	void bzero(void *<[b]>, size_t <[length]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
+	#include <strings.h>
 	void bzero(<[b]>, <[length]>)
 	void *<[b]>;
 	size_t <[length]>;

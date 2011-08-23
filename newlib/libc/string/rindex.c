@@ -10,7 +10,7 @@ ANSI_SYNOPSIS
 	char * rindex(const char *<[string]>, int <[c]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
+	#include <strings.h>
 	char * rindex(<[string]>, <[c]>);
 	char *<[string]>;
 	int *<[c]>;

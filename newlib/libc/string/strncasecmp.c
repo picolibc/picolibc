@@ -6,11 +6,11 @@ INDEX
 	strncasecmp
 
 ANSI_SYNOPSIS
-	#include <string.h>
+	#include <strings.h>
 	int strncasecmp(const char *<[a]>, const char * <[b]>, size_t <[length]>);
 
 TRAD_SYNOPSIS
-	#include <string.h>
+	#include <strings.h>
 	int strncasecmp(<[a]>, <[b]>, <[length]>)
 	char *<[a]>;
 	char *<[b]>;
