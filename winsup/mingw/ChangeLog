@@ -1,5 +1,9 @@
 2011-08-23 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
+	* include/_mingw.h: Increment version to 3.20.
+
+2011-08-23 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
 	* tlsmthread.c: Update to reflect changes in tlssup.c.
 	* tlssup.c: code clean-up.
 
