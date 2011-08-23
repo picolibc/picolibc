@@ -110,7 +110,7 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
               ENV_UNLOCK;
 	      return (-1);
             }
-	  bcopy ((char *) *p_environ, (char *) P, cnt * sizeof (char *));
+	  memcpy((char *) P,(char *) *p_environ, cnt * sizeof (char *));
 	  *p_environ = P;
 	}
       (*p_environ)[cnt + 1] = NULL;

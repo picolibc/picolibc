@@ -1,5 +1,10 @@
 2011-08-23  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
+	* libc/stdlib/putenv_r.c: Use "strchr" instead of obsolete "index".
+	* libc/stdlib/setenv_r.c: Use "memcpy" instead of obsolete "bcopy".
+
+2011-08-23  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
 	* libc/misc/ffs.c, libc/string/bcmp.c, libc/string/bcopy.c,
 	libc/string/bzero.c, libc/string/index.c, libc/string/rindex.c,
 	libc/string/strcasecmp.c, libc/string/strncasecmp.c:

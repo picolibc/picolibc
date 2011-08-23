@@ -43,7 +43,7 @@ _DEFUN (_putenv_r, (reent_ptr, str),
   if (!p)
     return 1;
 
-  if (!(equal = index (p, '=')))
+  if (!(equal = strchr (p, '=')))
     {
       (void) _free_r (reent_ptr, p);
       return 1;
