@@ -1585,7 +1585,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
   WSABUF buf;
   bool use_sendmsg = false;
   DWORD wait_flags = flags & MSG_DONTWAIT;
-  bool nosignal = !(flags & MSG_NOSIGNAL);
+  bool nosignal = !!(flags & MSG_NOSIGNAL);
 
   flags &= (MSG_OOB | MSG_DONTROUTE);
   if (wsamsg->Control.len > 0)
@@ -1648,7 +1648,8 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	 EPIPE is generated if the local end has been shut down on a connection
 	 oriented socket.  In this case the process will also receive a SIGPIPE
 	 unless MSG_NOSIGNAL is set.  */
-      if (get_errno () == ESHUTDOWN && get_socket_type () == SOCK_STREAM)
+      if ((get_errno () == ECONNABORTED || get_errno () == ESHUTDOWN)
+	  && get_socket_type () == SOCK_STREAM)
 	{
 	  set_errno (EPIPE);
 	  if (!nosignal)

@@ -1,3 +1,9 @@
+2011-08-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::send_internal): Fix setting
+	nosignal flag.  Convert ECONNABORTED on connection-oriented socket
+	to EPIPE, too.
+
 2011-08-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dtable.cc (conv_start_chars): Remove unneeded section attribute.
