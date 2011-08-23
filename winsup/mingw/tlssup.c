@@ -60,9 +60,9 @@ _CRTALLOC(".tls") const IMAGE_TLS_DIRECTORY _tls_used = {
 
 #ifndef __CRT_THREAD
 #ifdef HAVE_ATTRIBUTE_THREAD
-#define __CRT_THREAD	__declspec(thread)
+#define __CRT_THREAD  __declspec(thread)
 #else
-#define __CRT_THREAD    __thread
+#define __CRT_THREAD  __thread
 #endif
 #endif
 
@@ -84,7 +84,6 @@ BOOL WINAPI
 __dyn_tls_init (HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
 {
   _PVFV *pfunc;
-  int nfuncs, ifunc;
 
   /* We don't let us trick here.  */
   if (_CRT_MT != 2)
@@ -97,10 +96,8 @@ __dyn_tls_init (HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
       return TRUE;
     }
 
-  nfuncs = &__xd_z - (&__xd_a + 1);
-  for (ifunc = 0; ifunc < nfuncs; ++ifunc)
+  for (pfunc = &__xd_a + 1; pfunc != &__xd_z; ++pfunc)
     {
-      pfunc = (&__xd_a + 1) + ifunc;
       if (*pfunc != NULL)
         (*pfunc)();
     }
@@ -127,7 +124,7 @@ __tlregdtor (_PVFV func)
     {
       TlsDtorNode *pnode = (TlsDtorNode *) malloc (sizeof (TlsDtorNode));
       if (pnode == NULL)
-	return -1;
+        return -1;
       pnode->count = 0;
       pnode->next = dtor_list;
       dtor_list = pnode;
@@ -160,13 +157,13 @@ __dyn_tls_dtor (HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
       for (pnode = dtor_list; pnode != NULL; pnode = pnext)
         {
           for (i = pnode->count - 1; i >= 0; --i)
-	    {
-	      if (pnode->funcs[i] != NULL)
-	        (*pnode->funcs[i])();
-	    }
+            {
+              if (pnode->funcs[i] != NULL)
+                (*pnode->funcs[i])();
+            }
           pnext = pnode->next;
           if (pnext != NULL)
-	    free ((void *) pnode);
+            free ((void *) pnode);
         }
     }
 #endif
