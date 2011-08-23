@@ -78,7 +78,13 @@
  *  Invariant values
  */
 
+#ifdef __SIZE_MAX__
+#define SSIZE_MAX		(__SIZE_MAX__ >> 1)
+#elif defined(__SIZEOF_SIZE_T__) && defined(__CHAR_BIT__)
+#define SSIZE_MAX               ((1UL << (__SIZEOF_SIZE_T__ * __CHAR_BIT__ - 1)) - 1)
+#else /* historic fallback, wrong in most cases */
 #define SSIZE_MAX               32767
+#endif
 
 /*
  *  Maximum Values

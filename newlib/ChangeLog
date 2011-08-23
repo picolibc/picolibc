@@ -1,3 +1,8 @@
+2011-08-23  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* libc/sys/rtems/include/limits.h: Compute SSIZE_MAX based on
+	__SIZE_MAX__, __SIZEOF_SIZE_T__ and __CHAR_BIT__.
+
 2011-08-22  Ralf Corsépius <ralf.corsepius@rtems.org>
 
 	* libc/string/index.c: Include <strings.h> for "index".
