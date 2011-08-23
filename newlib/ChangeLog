@@ -1,5 +1,12 @@
 2011-08-23  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
+	* libc/posix/regexec.c: Define "nope" only #ifndef NDEBUG.
+	* libc/stdio/vfscanf.c: Define "state" only #ifdef _MB_CAPABLE.
+	* libc/string/wcwidth.c: Include <wctypes.h> for "iswprint" and
+	"iswcntrl".
+
+2011-08-23  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
 	* libc/sys/rtems/include/limits.h: Compute SSIZE_MAX based on
 	__SIZE_MAX__, __SIZEOF_SIZE_T__ and __CHAR_BIT__.
 

@@ -453,7 +453,9 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   wchar_t wc;                   /* wchar to use to read format string */
   wchar_t *wcp;                 /* handy wide character pointer */
   size_t mbslen;                /* length of converted multibyte sequence */
+#ifdef _MB_CAPABLE
   mbstate_t state;              /* value to keep track of multibyte state */
+#endif
 
   #define CCFN_PARAMS	_PARAMS((struct _reent *, const char *, char **, int))
   u_long (*ccfn)CCFN_PARAMS=0;	/* conversion function (strtol/strtoul) */

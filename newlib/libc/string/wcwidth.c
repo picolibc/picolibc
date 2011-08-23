@@ -94,6 +94,9 @@ PORTABILITY
 
 #include <_ansi.h>
 #include <wchar.h>
+#ifndef _MB_CAPABLE
+#include <wctype.h> /* iswprint, iswcntrl */
+#endif
 #include "local.h"
 
 #ifdef _MB_CAPABLE
