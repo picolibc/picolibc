@@ -1,5 +1,11 @@
 2011-08-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* poll.cc (poll): Don't return prematurely if invalid fds have been
+	encountered.  Enforce timeout set to 0 in case of invalid fds.  Take
+	number of invalid fds into account when returning.
+
+2011-08-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::send_internal): Fix setting
 	nosignal flag.  Convert ECONNABORTED on connection-oriented socket
 	to EPIPE, too.
