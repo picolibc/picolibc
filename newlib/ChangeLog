@@ -1,3 +1,7 @@
+2011-08-24  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/time/mktm_r.c (_mktm_r): Fix computing tm_year.
+
 2011-08-23  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libc/stdlib/putenv_r.c: Use "strchr" instead of obsolete "index".
