@@ -1,3 +1,8 @@
+2011-08-24  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* thread.cc (pthread::exit): Create dummy tls structure to hold
+	_main_tls contents if we've asked _main_tls to exit.
+
 2011-08-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* poll.cc (poll): Don't return prematurely if invalid fds have been

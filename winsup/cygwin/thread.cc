@@ -517,7 +517,16 @@ pthread::exit (void *value_ptr)
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     ::exit (0);
   else
-    ExitThread (0);
+    {
+      if (cygtls == _main_tls)
+	{
+	  _cygtls *dummy = (_cygtls *) malloc (sizeof (_cygtls));
+	  *dummy = *_main_tls;
+	  _main_tls = dummy;
+	  _main_tls->initialized = false;
+	}
+      ExitThread (0);
+    }
 }
 
 int
