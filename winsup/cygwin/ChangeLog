@@ -1,3 +1,8 @@
+2011-08-25  Rafal Zwierz  <rzwierz@googlemail.com>
+
+	* cygthread.cc (cygthread::simplestub): Notify that the thread has
+	detached also in freerange thread case.
+
 2011-08-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Never open files with

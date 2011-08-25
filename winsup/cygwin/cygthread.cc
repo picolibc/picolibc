@@ -136,7 +136,11 @@ cygthread::simplestub (VOID *arg)
   cygthread *info = (cygthread *) arg;
   _my_tls._ctinfo = info;
   info->stack_ptr = &arg;
+  HANDLE notify = info->notify_detached;
   info->callfunc (true);
+  if (notify)
+     SetEvent (notify);
+    
   return 0;
 }
 
