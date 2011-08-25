@@ -540,20 +540,12 @@ fhandler_base::open (int flags, mode_t mode)
 	break;
     }
 
-  if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))
-    {
-      if (flags & O_CREAT)
-	create_disposition = FILE_OVERWRITE_IF;
-      else
-	create_disposition = FILE_OVERWRITE;
-    }
-  else if (flags & O_CREAT)
-    create_disposition = FILE_OPEN_IF;
-  else
-    create_disposition = FILE_OPEN;
-
+  /* Don't use the FILE_OVERWRITE{_IF} flags here.  See below for an
+     explanation, why that's not such a good idea. */
   if ((flags & O_EXCL) && (flags & O_CREAT))
     create_disposition = FILE_CREATE;
+  else
+    create_disposition = (flags & O_CREAT) ? FILE_OPEN_IF : FILE_OPEN;
 
   if (get_device () == FH_FS)
     {
@@ -663,6 +655,32 @@ fhandler_base::open (int flags, mode_t mode)
      http://lists.samba.org/archive/samba-technical/2008-July/060247.html */
   if (io.Information == FILE_CREATED && has_acls ())
     set_file_attribute (fh, pc, ILLEGAL_UID, ILLEGAL_GID, S_JUSTCREATED | mode);
+
+  /* If you O_TRUNC a file on Linux, the data is truncated, but the EAs are
+     preserved.  If you open a file on Windows with FILE_OVERWRITE{_IF} or
+     FILE_SUPERSEDE, all streams are truncated, including the EAs.  So we don't
+     use the FILE_OVERWRITE{_IF} flags, but instead just open the file and set
+     the size of the data stream explicitely to 0.  Apart from being more Linux
+     compatible, this implementation has the pleasant side-effect to be more
+     than 5% faster than using FILE_OVERWRITE{_IF} (tested on W7 32 bit). */
+  if ((flags & O_TRUNC)
+      && (flags & O_ACCMODE) != O_RDONLY
+      && io.Information != FILE_CREATED
+      && get_device () == FH_FS)
+    {
+      FILE_END_OF_FILE_INFORMATION feofi = { EndOfFile:{ QuadPart:0 } };
+      status = NtSetInformationFile (fh, &io, &feofi, sizeof feofi,
+				     FileEndOfFileInformation);
+      /* In theory, truncating the file should never fail, since the opened
+	 handle has FILE_READ_DATA permissions, which is all you need to
+	 be allowed to truncate a file.  Better safe than sorry. */
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  NtClose (fh);
+	  goto done;
+	}
+    }
 
   set_io_handle (fh);
   set_flags (flags, pc.binmode ());
