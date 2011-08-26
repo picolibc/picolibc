@@ -1,3 +1,7 @@
+2011-08-26  Steven Abner  <pheonix@zoomtown.com>
+
+	* libc/time/mktm_r.c (_mktm_r): Fix previous fix.
+
 2011-08-24  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/time/mktm_r.c (_mktm_r): Fix computing tm_year.

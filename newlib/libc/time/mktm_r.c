@@ -182,7 +182,7 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
 		{
 		  res->tm_mon = 11;
 		  res->tm_year -= 1;
-		  res->tm_yday = 364 + isleap(res->tm_year);
+		  res->tm_yday = 364 + isleap(res->tm_year + 1900);
 		}
 	      res->tm_mday = ip[res->tm_mon];
 	    }
@@ -254,4 +254,3 @@ _DEFUN (__tzcalc_limits, (year),
 
   return 1;
 }
-
