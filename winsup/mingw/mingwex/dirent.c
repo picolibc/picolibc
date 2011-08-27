@@ -28,6 +28,60 @@
 #define SUFFIX	_T("*")
 #define	SLASH	_T("\\")
 
+struct __dirstream_t
+{
+  /* Actual (private) declaration for opaque data type "DIR". */
+
+    /* disk transfer area for this dir */
+    struct _finddata_t	dd_dta;
+
+    /* dirent struct to return from dir (NOTE: this makes this thread
+     * safe as long as only one thread uses a particular DIR struct at
+     * a time) */
+    struct dirent	dd_dir;
+
+    /* _findnext handle */
+    intptr_t		dd_handle;
+
+    /*
+     * Status of search:
+     *   (type is now int -- was short in older versions).
+     *   0 = not started yet (next entry to read is first entry)
+     *  -1 = off the end
+     *   positive = 0 based index of next entry
+     */
+    int			dd_stat;
+
+    /* given path for dir with search pattern (struct is extended) */
+    char		dd_name[1];
+};
+
+struct __wdirstream_t
+{
+  /* Actual (private) declaration for opaque data type "_WDIR". */
+
+    /* disk transfer area for this dir */
+    struct _wfinddata_t	dd_dta;
+
+    /* dirent struct to return from dir (NOTE: this makes this thread
+     * safe as long as only one thread uses a particular DIR struct at
+     * a time) */
+    struct _wdirent	dd_dir;
+
+    /* _findnext handle */
+    intptr_t		dd_handle;
+
+    /*
+     * Status of search:
+     *   0 = not started yet (next entry to read is first entry)
+     *  -1 = off the end
+     *   positive = 0 based index of next entry
+     */
+    int			dd_stat;
+
+    /* given path for dir with search pattern (struct is extended) */
+    wchar_t		dd_name[1];
+};
 
 /* Helper for opendir().  */
 static inline unsigned _tGetFileAttributes (const _TCHAR * tPath)

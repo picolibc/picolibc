@@ -28,34 +28,10 @@ struct dirent
 };
 
 /*
- * This is an internal data structure. Good programmers will not use it
- * except as an argument to one of the functions below.
- * dd_stat field is now int (was short in older versions).
+ * This opaque data type represents the private structure
+ * through which a directory stream is referenced.
  */
-typedef struct
-{
-	/* disk transfer area for this dir */
-	struct _finddata_t	dd_dta;
-
-	/* dirent struct to return from dir (NOTE: this makes this thread
-	 * safe as long as only one thread uses a particular DIR struct at
-	 * a time) */
-	struct dirent		dd_dir;
-
-	/* _findnext handle */
-	intptr_t		dd_handle;
-
-	/*
-	 * Status of search:
-	 *   0 = not started yet (next entry to read is first entry)
-	 *  -1 = off the end
-	 *   positive = 0 based index of next entry
-	 */
-	int			dd_stat;
-
-	/* given path for dir with search pattern (struct is extended) */
-	char			dd_name[1];
-} DIR;
+typedef struct __dirstream_t DIR;
 
 DIR* __cdecl __MINGW_NOTHROW opendir (const char*);
 struct dirent* __cdecl __MINGW_NOTHROW readdir (DIR*);
@@ -76,33 +52,10 @@ struct _wdirent
 };
 
 /*
- * This is an internal data structure. Good programmers will not use it
- * except as an argument to one of the functions below.
+ * This opaque data type represents the private structure
+ * through which a wide directory stream is referenced.
  */
-typedef struct
-{
-	/* disk transfer area for this dir */
-	struct _wfinddata_t	dd_dta;
-
-	/* dirent struct to return from dir (NOTE: this makes this thread
-	 * safe as long as only one thread uses a particular DIR struct at
-	 * a time) */
-	struct _wdirent		dd_dir;
-
-	/* _findnext handle */
-	intptr_t		dd_handle;
-
-	/*
-	 * Status of search:
-	 *   0 = not started yet (next entry to read is first entry)
-	 *  -1 = off the end
-	 *   positive = 0 based index of next entry
-	 */
-	int			dd_stat;
-
-	/* given path for dir with search pattern (struct is extended) */
-	wchar_t			dd_name[1];
-} _WDIR;
+typedef struct __wdirstream_t _WDIR;
 
 _WDIR* __cdecl __MINGW_NOTHROW _wopendir (const wchar_t*);
 struct _wdirent*  __cdecl __MINGW_NOTHROW _wreaddir (_WDIR*);
