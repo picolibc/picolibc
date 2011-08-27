@@ -672,7 +672,7 @@ fhandler_base::open (int flags, mode_t mode)
       status = NtSetInformationFile (fh, &io, &feofi, sizeof feofi,
 				     FileEndOfFileInformation);
       /* In theory, truncating the file should never fail, since the opened
-	 handle has FILE_READ_DATA permissions, which is all you need to
+	 handle has FILE_WRITE_DATA permissions, which is all you need to
 	 be allowed to truncate a file.  Better safe than sorry. */
       if (!NT_SUCCESS (status))
 	{
@@ -1130,10 +1130,6 @@ fhandler_base::close ()
   int res = -1;
 
   syscall_printf ("closing '%s' handle %p", get_name (), get_handle ());
-  /* Delete all POSIX locks on the file.  Delete all flock locks on the
-     file if this is the last reference to this file. */
-  if (unique_id)
-    del_my_locks (on_close);
   if (nohandle () || CloseHandle (get_handle ()))
     res = 0;
   else

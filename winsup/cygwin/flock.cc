@@ -106,6 +106,7 @@
 #include "sigproc.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"
+#include "miscfuncs.h"
 #include "ntdll.h"
 #include <sys/queue.h>
 #include <wchar.h>
@@ -212,21 +213,29 @@ get_obj_handle_count (HANDLE h)
   return hdl_cnt;
 }
 
+/* Helper struct to construct a local OBJECT_ATTRIBUTES on the stack. */
+struct lockfattr_t
+{
+  OBJECT_ATTRIBUTES attr;
+  UNICODE_STRING uname;
+  WCHAR name[LOCK_OBJ_NAME_LEN + 1];
+};
+
 /* Per lock class. */
 class lockf_t
 {
   public:
-    short	   lf_flags; /* Semantics: F_POSIX, F_FLOCK, F_WAIT */
-    short	   lf_type;  /* Lock type: F_RDLCK, F_WRLCK */
+    short	    lf_flags; /* Semantics: F_POSIX, F_FLOCK, F_WAIT */
+    short	    lf_type;  /* Lock type: F_RDLCK, F_WRLCK */
     _off64_t	    lf_start; /* Byte # of the start of the lock */
     _off64_t	    lf_end;   /* Byte # of the end of the lock (-1=EOF) */
     long long       lf_id;    /* Cygwin PID for POSIX locks, a unique id per
 				 file table entry for BSD flock locks. */
-    DWORD	   lf_wid;   /* Win PID of the resource holding the lock */
+    DWORD	    lf_wid;   /* Win PID of the resource holding the lock */
     class lockf_t **lf_head;  /* Back pointer to the head of the lockf_t list */
     class inode_t  *lf_inode; /* Back pointer to the inode_t */
     class lockf_t  *lf_next;  /* Pointer to the next lock on this inode_t */
-    HANDLE	   lf_obj;   /* Handle to the lock event object. */
+    HANDLE	    lf_obj;   /* Handle to the lock event object. */
 
     lockf_t ()
     : lf_flags (0), lf_type (0), lf_start (0), lf_end (0), lf_id (0),
@@ -251,8 +260,12 @@ class lockf_t
     void operator delete (void *p)
     { cfree (p); }
 
+    POBJECT_ATTRIBUTES create_lock_obj_attr (lockfattr_t *attr,
+					     ULONG flags);
+
     void create_lock_obj ();
     bool open_lock_obj ();
+    void close_lock_obj () { NtClose (lf_obj); lf_obj = NULL; }
     void del_lock_obj (HANDLE fhdl, bool signal = false);
 };
 
@@ -542,47 +555,72 @@ inode_t::get_all_locks_list ()
   return i_all_lf;
 }
 
+/* Create the lock object name.  The name is constructed from the lock
+   properties which identify it uniquely, all values in hex. */
+POBJECT_ATTRIBUTES
+lockf_t::create_lock_obj_attr (lockfattr_t *attr, ULONG flags)
+{
+  __small_swprintf (attr->name, L"%02x-%01x-%016X-%016X-%016X-%08x",
+		    lf_flags & (F_POSIX | F_FLOCK), lf_type, lf_start, lf_end,
+		    lf_id, lf_wid);
+  RtlInitCountedUnicodeString (&attr->uname, attr->name,
+			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
+  InitializeObjectAttributes (&attr->attr, &attr->uname, flags, lf_inode->i_dir,
+			      everyone_sd (FLOCK_EVENT_ACCESS));
+  return &attr->attr;
+}
+
 /* Create the lock event object in the file's subdir in the NT global
-   namespace.  The name is constructed from the lock properties which
-   identify it uniquely, all values in hex.  See the __small_swprintf
-   call right at the start.  */
+   namespace. */
 void
 lockf_t::create_lock_obj ()
 {
-  WCHAR name[LOCK_OBJ_NAME_LEN + 1];
-  UNICODE_STRING uname;
-  OBJECT_ATTRIBUTES attr;
+  lockfattr_t attr;
   NTSTATUS status;
 
-  __small_swprintf (name, L"%02x-%01x-%016X-%016X-%016X-%08x",
-			  lf_flags & (F_POSIX | F_FLOCK), lf_type, lf_start,
-			  lf_end, lf_id, lf_wid);
-  RtlInitCountedUnicodeString (&uname, name,
-			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
-  InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT, lf_inode->i_dir,
-			      everyone_sd (FLOCK_EVENT_ACCESS));
-  status = NtCreateEvent (&lf_obj, CYG_EVENT_ACCESS, &attr,
-			  NotificationEvent, FALSE);
-  if (!NT_SUCCESS (status))
-    api_fatal ("NtCreateEvent(lock): %p", status);
+  do
+    {
+      status = NtCreateEvent (&lf_obj, CYG_EVENT_ACCESS,
+			      create_lock_obj_attr (&attr, OBJ_INHERIT),
+			      NotificationEvent, FALSE);
+      if (!NT_SUCCESS (status))
+	{
+	  if (status != STATUS_OBJECT_NAME_COLLISION || (lf_flags & F_POSIX))
+	    api_fatal ("NtCreateEvent(lock): %p", status);
+	  /* If we get a STATUS_OBJECT_NAME_COLLISION in the F_FLOCK case, the
+	     event still exists because some other process is waiting for it
+	     in lf_setlock.  If so, open the event and check the signal state.
+	     If we can't open it, it has been closed in the meantime, so just
+	     try again.  If we can open it and the object is not signalled,
+	     it's surely a bug in the code somewhere.  Otherwise, close the
+	     event and retry to create an event with another name. */
+	  if (open_lock_obj ())
+	    {
+	      if (!IsEventSignalled (lf_obj))
+		api_fatal ("NtCreateEvent(lock): %p", status);
+	      close_lock_obj ();
+	      /* Change the lf_wid member to generate another name for the
+		 event, so as not to colide with the still-in-use event.
+		 Changing lf_wid is ok, because the Windows PID is not used
+		 for synchronization in the F_FLOCK case.
+		 What we do here is to increment the highest byte in lf_wid. */
+	      lf_wid = ((lf_wid & 0xff000000) + (1 << 24))
+		       | (lf_wid & 0xffffff);
+	    }
+	}
+    }
+  while (!NT_SUCCESS (status));
 }
 
 /* Open a lock event object for SYNCHRONIZE access (to wait for it). */
 bool
 lockf_t::open_lock_obj ()
 {
-  WCHAR name[LOCK_OBJ_NAME_LEN + 1];
-  UNICODE_STRING uname;
-  OBJECT_ATTRIBUTES attr;
+  lockfattr_t attr;
   NTSTATUS status;
 
-  __small_swprintf (name, L"%02x-%01x-%016X-%016X-%016X-%08x",
-			  lf_flags & (F_POSIX | F_FLOCK), lf_type, lf_start,
-			  lf_end, lf_id, lf_wid);
-  RtlInitCountedUnicodeString (&uname, name,
-			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
-  InitializeObjectAttributes (&attr, &uname, 0, lf_inode->i_dir, NULL);
-  status = NtOpenEvent (&lf_obj, FLOCK_EVENT_ACCESS, &attr);
+  status = NtOpenEvent (&lf_obj, FLOCK_EVENT_ACCESS,
+			create_lock_obj_attr (&attr, 0));
   if (!NT_SUCCESS (status))
     {
       SetLastError (RtlNtStatusToDosError (status));
@@ -591,9 +629,9 @@ lockf_t::open_lock_obj ()
   return lf_obj != NULL;
 }
 
-/* Close a lock event handle.  The important thing here is to signal it
-   before closing the handle.  This way all threads waiting for this
-   lock can wake up. */
+/* Delete a lock event handle.  The important thing here is to signal it
+   before closing the handle.  This way all threads waiting for this lock
+   can wake up. */
 void
 lockf_t::del_lock_obj (HANDLE fhdl, bool signal)
 {
@@ -608,9 +646,8 @@ lockf_t::del_lock_obj (HANDLE fhdl, bool signal)
 	 handle/descriptor to the same FILE_OBJECT/file table entry. */
       if ((lf_flags & F_POSIX) || signal
 	  || (fhdl && get_obj_handle_count (fhdl) <= 1))
-	SetEvent (lf_obj);
-      NtClose (lf_obj);
-      lf_obj = NULL;
+	NtSetEvent (lf_obj, NULL);
+      close_lock_obj ();
     }
 }
 
@@ -643,7 +680,6 @@ int
 fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
 {
   _off64_t start, end, oadd;
-  lockf_t *n;
   int error = 0;
 
   short a_flags = fl->l_type & (F_POSIX | F_FLOCK);
@@ -758,13 +794,14 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
       end = start + oadd;
     }
 
+restart:	/* Entry point after a restartable signal came in. */
+
   inode_t *node = inode_t::get (get_dev (), get_ino (), true);
   if (!node)
     {
       set_errno (ENOLCK);
       return -1;
     }
-  need_fork_fixup (true);
 
   /* Unlock the fd table which has been locked in fcntl_worker/lock_worker,
      otherwise a blocking F_SETLKW never wakes up on a signal. */
@@ -844,7 +881,7 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
     }
   for (lock = clean; lock != NULL; )
     {
-      n = lock->lf_next;
+      lockf_t *n = lock->lf_next;
       lock->del_lock_obj (get_handle (), a_op == F_UNLCK);
       delete lock;
       lock = n;
@@ -859,12 +896,23 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
     }
   else
     node->UNLOCK ();
-  if (error)
+  switch (error)
     {
-      set_errno (error);
-      return -1;
+    case 0:		/* All is well. */
+      need_fork_fixup (true);
+      return 0;
+    case EINTR:		/* Signal came in. */
+      if (_my_tls.call_signal_handler ())
+	goto restart;
+      break;
+    case ECANCELED:	/* The thread has been sent a cancellation request. */
+      pthread::static_cancel_self ();
+      /*NOTREACHED*/
+    default:
+      break;
     }
-  return 0;
+  set_errno (error);
+  return -1;
 }
 
 /*
@@ -961,10 +1009,8 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
       HANDLE cancel_event = pthread::get_cancel_event ();
 
       int wait_count = 0;
-      /* The lock is always the first object. */
-      const DWORD WAIT_UNLOCKED = WAIT_OBJECT_0;
-      /* All other wait objects are variable.  */
-      DWORD WAIT_PROC_EXITED = WAIT_TIMEOUT + 1;
+      /* The lock event is always the first object, all other wait objects
+	 are variable.  */
       DWORD WAIT_SIGNAL_ARRIVED = WAIT_TIMEOUT + 1;
       DWORD WAIT_THREAD_CANCELED = WAIT_TIMEOUT + 1;
 
@@ -985,7 +1031,6 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 
 	  HANDLE w4[4] = { obj, proc, signal_arrived, cancel_event };
 	  wait_count = 3;
-	  WAIT_PROC_EXITED = WAIT_OBJECT_0 + 1;
 	  WAIT_SIGNAL_ARRIVED = WAIT_OBJECT_0 + 2;
 	  if (cancel_event)
 	    {
@@ -1012,45 +1057,34 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	  node->UNLOCK ();
 	  /* Unfortunately, since BSD flock locks are not attached to a
 	     specific process, we can't recognize an abandoned lock by
-	     sync'ing with a process.  We have to find out if we're the only
-	     process left accessing this event object. */
-	  do
-	    {
-	      ret = WaitForMultipleObjects (wait_count, w4, FALSE, 100L);
-	    }
-	  while (ret == WAIT_TIMEOUT && get_obj_handle_count (obj) > 1);
-	  /* There's a good chance that the above loop is left with
-	     ret == WAIT_TIMEOUT if another process closes the file handle
-	     associated with this lock.  This is for all practical purposes
-	     equivalent to a signalled lock object. */
-	  if (ret == WAIT_TIMEOUT)
-	    ret = WAIT_OBJECT_0;
+	     sync'ing with a process.  We have to make sure we're the only
+	     process left accessing this event object, or that the event
+	     object is in a signalled state. */
+	  ret = WaitForMultipleObjects (wait_count, w4, FALSE, 100L);
 	}
       node->LOCK ();
       node->unwait ();
       NtClose (obj);
       SetThreadPriority (GetCurrentThread (), old_prio);
-      if (ret == WAIT_UNLOCKED)
-	; /* The lock object has been set to signalled. */
-      else if (ret == WAIT_PROC_EXITED)
-	; /* For POSIX locks, the process holding the lock has exited. */
-      else if (ret == WAIT_SIGNAL_ARRIVED)
+      if (ret == WAIT_SIGNAL_ARRIVED)
 	{
 	  /* A signal came in. */
-	  if (!_my_tls.call_signal_handler ())
-	    return EINTR;
+	  lock->lf_next = *clean;
+	  *clean = lock;
+	  return EINTR;
 	}
       else if (ret == WAIT_THREAD_CANCELED)
 	{
 	  /* The thread has been sent a cancellation request. */
-	  pthread::static_cancel_self ();
+	  lock->lf_next = *clean;
+	  *clean = lock;
+	  return ECANCELED;
 	}
       else
-	{
-	  system_printf ("Shouldn't happen! ret = %lu, error: %lu\n",
-			 ret, GetLastError ());
-	  return geterrno_from_win_error ();
-	}
+	/* The lock object has been set to signalled or ...
+	   for POSIX locks, the process holding the lock has exited, or ...
+	   Just a timeout.  Just retry. */
+	continue;
     }
   allow_others_to_sync ();
   /*
@@ -1268,7 +1302,7 @@ lf_getlock (lockf_t *lock, inode_t *node, struct __flock64 *fl)
   if ((block = lf_getblock (lock, node)))
     {
       if (block->lf_obj)
-	NtClose (block->lf_obj);
+	block->close_lock_obj ();
       fl->l_type = block->lf_type;
       fl->l_whence = SEEK_SET;
       fl->l_start = block->lf_start;
@@ -1296,8 +1330,6 @@ lf_getblock (lockf_t *lock, inode_t *node)
   lockf_t **prev, *overlap;
   lockf_t *lf = node->get_all_locks_list ();
   int ovcase;
-  NTSTATUS status;
-  EVENT_BASIC_INFORMATION ebi;
 
   prev = lock->lf_head;
   while ((ovcase = lf_findoverlap (lf, lock, OTHERS, &prev, &overlap)))
@@ -1308,17 +1340,18 @@ lf_getblock (lockf_t *lock, inode_t *node)
       if ((lock->lf_type == F_WRLCK || overlap->lf_type == F_WRLCK))
 	{
 	  /* Open the event object for synchronization. */
-	  if (!overlap->open_lock_obj () || (overlap->lf_flags & F_POSIX))
-	    return overlap;
-	  /* In case of BSD flock locks, check if the event object is
-	     signalled.  If so, the overlap doesn't actually exist anymore.
-	     There are just a few open handles left. */
-	  status = NtQueryEvent (overlap->lf_obj, EventBasicInformation,
-				 &ebi, sizeof ebi, NULL);
-	  if (!NT_SUCCESS (status) || ebi.SignalState == 0)
-	    return overlap;
-	  NtClose (overlap->lf_obj);
-	  overlap->lf_obj = NULL;
+	  if (overlap->open_lock_obj ())
+	    {
+	      /* If we found a POSIX lock, it will block us. */
+	      if (overlap->lf_flags & F_POSIX)
+		return overlap;
+	      /* In case of BSD flock locks, check if the event object is
+		 signalled.  If so, the overlap doesn't actually exist anymore.
+		 There are just a few open handles left. */
+	      if (!IsEventSignalled (overlap->lf_obj))
+		return overlap;
+	      overlap->close_lock_obj ();
+	    }
 	}
       /*
        * Nope, point to the next one on the list and

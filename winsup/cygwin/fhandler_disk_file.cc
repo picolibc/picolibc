@@ -1380,8 +1380,12 @@ fhandler_disk_file::open (int flags, mode_t mode)
 int
 fhandler_disk_file::close ()
 {
+  /* Close extra pread/pwrite handle, if it exists. */
   if (prw_handle)
     NtClose (prw_handle);
+  /* Delete all POSIX locks on the file.  Delete all flock locks on the
+     file if this is the last reference to this file. */
+  del_my_locks (on_close);
   return fhandler_base::close ();
 }
 

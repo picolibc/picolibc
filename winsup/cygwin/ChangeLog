@@ -1,3 +1,32 @@
+2011-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Fix typo in comment.
+	(fhandler_base::close): Move call to del_my_locks from here...
+	* fhandler_disk_file.cc (fhandler_disk_file::open): ...to here.
+	* flock.cc (struct lockfattr_t): New type.
+	(lockf_t::close_lock_obj): New method, use throughout.
+	(lockf_t::create_lock_obj_attr): New method.
+	(lockf_t::create_lock_obj): Use create_lock_obj_attr method.  Handle
+	STATUS_OBJECT_NAME_COLLISION in F_FLOCK case gracefully.  Add lengthy
+	comments to explain why and how.
+	(lockf_t::open_lock_obj): Use create_lock_obj_attr method.
+	(lockf_t::del_lock_obj): Call NtSetEvent rather than SetEvent for
+	symmetry.
+	(fhandler_disk_file::lock): Define n only where it's used.  Call
+	need_fork_fixup only if call was successful.  Handle EINTR and
+	ECANCELED return values from lf_setlock.
+	(lf_setlock): Drop WAIT_UNLOCKED and WAIT_PROC_EXITED.  Don't wait
+	for event object handle count to become <= 1 in F_LOCK case.
+	Simplify WFMO return value handling.  Don't handle signal and cancel
+	events here; just return with appropriate error code instead.
+	(lf_getblock): Ignore locks for which the handle can't be opened.
+	Use IsEventSignalled.
+	* ntdll.h (STATUS_INVALID_INFO_CLASS): Undef if defined elsewhere to
+	make sure the definition is casted to NTSTATUS.
+	(STATUS_INVALID_HANDLE): Define and ditto.
+	(STATUS_OBJECT_NAME_COLLISION): Define.
+	(NtSetEvent): Declare.
+
 2011-08-25  Rafal Zwierz  <rzwierz@googlemail.com>
 
 	* cygthread.cc (cygthread::simplestub): Notify that the thread has
