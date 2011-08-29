@@ -1,3 +1,41 @@
+2011-08-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (LOCK_OBJ_NAME_LEN): Change to accommodate extra lf_ver
+	field.
+	(class lockf_t): Add lf_ver field.
+	(lockf_t::lockf_t): Initialize lf_ver to 0.
+	(class inode_t): Change i_wait to i_cnt.  Change comment to explain
+	change in usage.
+	(inode_t:use): Rename from wait.  Make private.
+	(inode_t::unuse): Rename from unwait.  Make private.
+	(inode_t::inuse): Rename from waiting.  Make private.
+	(inode_t::notused): New public method to set use count to 0.
+	(inode_t::unlock_and_remove): New method to unlock node and to delete
+	it if it's unused in current process.
+	(fhandler_base::del_my_locks): Drop global list lock.  Drop variable
+	no_locks_left.  Simpify unlocking and removing node by just calling
+	unlock_and_remove.
+	(fixup_lockf_after_exec): Call notused method for each node.
+	(inode_t::get): Call use method.  Lock node only if outside of list
+	lock.
+	(inode_t::get_all_locks_list): Accommodate additional lf_ver field
+	when creating lockf_t structure from object name.
+	(lockf_t::create_lock_obj_attr): Accommodate additional lf_ver field
+	when creating object name from lockf_t structure.  Handle
+	STATUS_OBJECT_NAME_COLLISION gracefully in F_POSIX case as well.
+	Change comment accordingly.  Increment lf_ver field rather than high
+	byte of lf_wid field.  Simplify comment.
+	(fhandler_disk_file::lock): Always call unlock_and_remove rather than
+	just UNLOCK on node.
+	(lf_setlock): Move ret definition where it's used.  Drop unneeded
+	tests for obj being not NULL.  Only check for deadlock condition if the
+	lock we're trying to establish is a POSIX lock.  Revamp object
+	collecting and wait code to cover all cases.  Don't return with EDEADLK
+	if blocking process can't be opened for synchronization in F_POSIX case,
+	rather just wait like in F_FLOCK case.  Change system_printf to
+	debug_printf in that case.  Only run WaitForMultipleObjects with high
+	priority.  Close obj and process handles prior to locking node.
+
 2011-08-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Fix typo in comment.

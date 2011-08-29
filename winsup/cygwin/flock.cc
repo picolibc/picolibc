@@ -124,7 +124,7 @@ static NO_COPY muto lockf_guard;
 #define INODE_LIST_LOCK()	(lockf_guard.init ("lockf_guard")->acquire ())
 #define INODE_LIST_UNLOCK()	(lockf_guard.release ())
 
-#define LOCK_OBJ_NAME_LEN	64
+#define LOCK_OBJ_NAME_LEN	69
 
 #define FLOCK_INODE_DIR_ACCESS	(DIRECTORY_QUERY \
 				 | DIRECTORY_TRAVERSE \
@@ -232,6 +232,10 @@ class lockf_t
     long long       lf_id;    /* Cygwin PID for POSIX locks, a unique id per
 				 file table entry for BSD flock locks. */
     DWORD	    lf_wid;   /* Win PID of the resource holding the lock */
+    uint16_t	    lf_ver;   /* Version number of the lock.  If a released
+				 lock event yet exists because another process
+				 is still waiting for it, we use the version
+				 field to distinguish old from new locks. */
     class lockf_t **lf_head;  /* Back pointer to the head of the lockf_t list */
     class inode_t  *lf_inode; /* Back pointer to the inode_t */
     class lockf_t  *lf_next;  /* Pointer to the next lock on this inode_t */
@@ -239,13 +243,14 @@ class lockf_t
 
     lockf_t ()
     : lf_flags (0), lf_type (0), lf_start (0), lf_end (0), lf_id (0),
-      lf_wid (0), lf_head (NULL), lf_inode (NULL),
+      lf_wid (0), lf_ver (0), lf_head (NULL), lf_inode (NULL),
       lf_next (NULL), lf_obj (NULL)
     {}
-    lockf_t (class inode_t *node, class lockf_t **head, short flags, short type,
-	   _off64_t start, _off64_t end, long long id, DWORD wid)
+    lockf_t (class inode_t *node, class lockf_t **head,
+	     short flags, short type, _off64_t start, _off64_t end,
+	     long long id, DWORD wid, uint16_t ver)
     : lf_flags (flags), lf_type (type), lf_start (start), lf_end (end),
-      lf_id (id), lf_wid (wid), lf_head (head), lf_inode (node),
+      lf_id (id), lf_wid (wid), lf_ver (ver), lf_head (head), lf_inode (node),
       lf_next (NULL), lf_obj (NULL)
     {}
     ~lockf_t ();
@@ -275,18 +280,21 @@ class inode_t
   friend class lockf_t;
 
   public:
-    LIST_ENTRY (inode_t)  i_next;
-    lockf_t	     *i_lockf;  /* List of locks of this process. */
-    lockf_t	     *i_all_lf; /* Temp list of all locks for this file. */
+    LIST_ENTRY (inode_t) i_next;
+    lockf_t		*i_lockf;  /* List of locks of this process. */
+    lockf_t		*i_all_lf; /* Temp list of all locks for this file. */
 
-    __dev32_t	     i_dev;    /* Device ID */
-    __ino64_t	     i_ino;    /* inode number */
+    __dev32_t		 i_dev;    /* Device ID */
+    __ino64_t		 i_ino;    /* inode number */
 
   private:
-    HANDLE	     i_dir;
-    HANDLE	     i_mtx;
-    unsigned long    i_wait;   /* Number of blocked threads waiting for
-				  a blocking lock. */
+    HANDLE		 i_dir;
+    HANDLE		 i_mtx;
+    uint32_t		 i_cnt;    /* # of threads referencing this instance. */
+
+    void use () { ++i_cnt; }
+    void unuse () { if (i_cnt > 0) --i_cnt; }
+    bool inuse () { return i_cnt > 0; }
 
   public:
     inode_t (__dev32_t dev, __ino64_t ino);
@@ -302,9 +310,9 @@ class inode_t
     void LOCK () { WaitForSingleObject (i_mtx, INFINITE); }
     void UNLOCK () { ReleaseMutex (i_mtx); }
 
-    void wait () { ++i_wait; }
-    void unwait () { if (i_wait > 0) --i_wait; }
-    bool waiting () { return i_wait > 0; }
+    void notused () { i_cnt = 0; }
+
+    void unlock_and_remove ();
 
     lockf_t *get_all_locks_list ();
 
@@ -318,6 +326,20 @@ inode_t::~inode_t ()
     delete lock;
   NtClose (i_mtx);
   NtClose (i_dir);
+}
+
+void
+inode_t::unlock_and_remove ()
+{
+  UNLOCK ();
+  INODE_LIST_LOCK ();
+  unuse ();
+  if (i_lockf == NULL && !inuse ())
+    {
+      LIST_REMOVE (this, i_next);
+      delete this;
+    }
+  INODE_LIST_UNLOCK ();
 }
 
 bool
@@ -364,7 +386,6 @@ inode_t::del_my_locks (long long id, HANDLE fhdl)
 void
 fhandler_base::del_my_locks (del_lock_called_from from)
 {
-  INODE_LIST_LOCK ();
   inode_t *node = inode_t::get (get_dev (), get_ino (), false);
   if (node)
     {
@@ -377,19 +398,10 @@ fhandler_base::del_my_locks (del_lock_called_from from)
 	 entry and there are no threads which require signalling, or we have
 	 a parent process still accessing the file object and signalling the
 	 lock event would be premature. */
-      bool no_locks_left =
-	node->del_my_locks (from == after_fork ? 0 : get_unique_id (),
-			    from == after_exec ? NULL : get_handle ());
-      if (no_locks_left)
-	{
-	  LIST_REMOVE (node, i_next);
-	  node->UNLOCK ();
-	  delete node;
-	}
-      else
-	node->UNLOCK ();
+      node->del_my_locks (from == after_fork ? 0 : get_unique_id (),
+			  from == after_exec ? NULL : get_handle ());
+      node->unlock_and_remove ();
     }
-  INODE_LIST_UNLOCK ();
 }
 
 /* Called in an execed child.  The exec'ed process must allow SYNCHRONIZE
@@ -408,6 +420,7 @@ fixup_lockf_after_exec ()
     allow_others_to_sync ();
   LIST_FOREACH_SAFE (node, &cygheap->inode_list, i_next, next_node)
     {
+      node->notused ();
       int cnt = 0;
       cygheap_fdenum cfd (true);
       while (cfd.next () >= 0)
@@ -428,6 +441,7 @@ fixup_lockf_after_exec ()
 	      {
 		lock->del_lock_obj (NULL);
 		lock->lf_wid = myself->dwProcessId;
+		lock->lf_ver = 0;
 		lock->create_lock_obj ();
 	      }
 	  node->UNLOCK ();
@@ -455,13 +469,15 @@ inode_t::get (__dev32_t dev, __ino64_t ino, bool create_if_missing)
 	LIST_INSERT_HEAD (&cygheap->inode_list, node, i_next);
     }
   if (node)
-    node->LOCK ();
+    node->use ();
   INODE_LIST_UNLOCK ();
+  if (node)
+    node->LOCK ();
   return node;
 }
 
 inode_t::inode_t (__dev32_t dev, __ino64_t ino)
-: i_lockf (NULL), i_all_lf (NULL), i_dev (dev), i_ino (ino), i_wait (0L)
+: i_lockf (NULL), i_all_lf (NULL), i_dev (dev), i_ino (ino), i_cnt (0L)
 {
   HANDLE parent_dir;
   WCHAR name[48];
@@ -516,8 +532,8 @@ inode_t::get_all_locks_list ()
       if (f.dbi.ObjectName.Length != LOCK_OBJ_NAME_LEN * sizeof (WCHAR))
 	continue;
       wchar_t *wc = f.dbi.ObjectName.Buffer, *endptr;
-      /* "%02x-%01x-%016X-%016X-%016X-%08x",
-	 lf_flags, lf_type, lf_start, lf_end, lf_id, lf_wid */
+      /* "%02x-%01x-%016X-%016X-%016X-%08x-%04x",
+	 lf_flags, lf_type, lf_start, lf_end, lf_id, lf_wid, lf_ver */
       wc[LOCK_OBJ_NAME_LEN] = L'\0';
       short flags = wcstol (wc, &endptr, 16);
       if ((flags & ~(F_FLOCK | F_POSIX)) != 0
@@ -537,6 +553,9 @@ inode_t::get_all_locks_list ()
 	  || ((flags & F_POSIX) && (id < 1 || id > ULONG_MAX)))
 	continue;
       DWORD wid = wcstoul (endptr + 1, &endptr, 16);
+      if (!endptr || *endptr != L'-')
+	continue;
+      uint16_t ver = wcstoul (endptr + 1, &endptr, 16);
       if (endptr && *endptr != L'\0')
 	continue;
       if (lock - i_all_lf >= MAX_LOCKF_CNT)
@@ -547,7 +566,8 @@ inode_t::get_all_locks_list ()
 	}
       if (lock > i_all_lf)
 	lock[-1].lf_next = lock;
-      new (lock++) lockf_t (this, &i_all_lf, flags, type, start, end, id, wid);
+      new (lock++) lockf_t (this, &i_all_lf,
+			    flags, type, start, end, id, wid, ver);
     }
   /* If no lock has been found, return NULL. */
   if (lock == i_all_lf)
@@ -560,9 +580,9 @@ inode_t::get_all_locks_list ()
 POBJECT_ATTRIBUTES
 lockf_t::create_lock_obj_attr (lockfattr_t *attr, ULONG flags)
 {
-  __small_swprintf (attr->name, L"%02x-%01x-%016X-%016X-%016X-%08x",
+  __small_swprintf (attr->name, L"%02x-%01x-%016X-%016X-%016X-%08x-%04x",
 		    lf_flags & (F_POSIX | F_FLOCK), lf_type, lf_start, lf_end,
-		    lf_id, lf_wid);
+		    lf_id, lf_wid, lf_ver);
   RtlInitCountedUnicodeString (&attr->uname, attr->name,
 			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
   InitializeObjectAttributes (&attr->attr, &attr->uname, flags, lf_inode->i_dir,
@@ -585,27 +605,22 @@ lockf_t::create_lock_obj ()
 			      NotificationEvent, FALSE);
       if (!NT_SUCCESS (status))
 	{
-	  if (status != STATUS_OBJECT_NAME_COLLISION || (lf_flags & F_POSIX))
+	  if (status != STATUS_OBJECT_NAME_COLLISION)
 	    api_fatal ("NtCreateEvent(lock): %p", status);
-	  /* If we get a STATUS_OBJECT_NAME_COLLISION in the F_FLOCK case, the
-	     event still exists because some other process is waiting for it
-	     in lf_setlock.  If so, open the event and check the signal state.
-	     If we can't open it, it has been closed in the meantime, so just
-	     try again.  If we can open it and the object is not signalled,
-	     it's surely a bug in the code somewhere.  Otherwise, close the
-	     event and retry to create an event with another name. */
+	  /* If we get a STATUS_OBJECT_NAME_COLLISION, the event still exists
+	     because some other process is waiting for it in lf_setlock.
+	     If so, check the event's signal state.  If we can't open it, it
+	     has been closed in the meantime, so just try again.  If we can
+	     open it and the object is not signalled, it's surely a bug in the
+	     code somewhere.  Otherwise, close the event and retry to create
+	     a new event with another name. */
 	  if (open_lock_obj ())
 	    {
 	      if (!IsEventSignalled (lf_obj))
 		api_fatal ("NtCreateEvent(lock): %p", status);
 	      close_lock_obj ();
-	      /* Change the lf_wid member to generate another name for the
-		 event, so as not to colide with the still-in-use event.
-		 Changing lf_wid is ok, because the Windows PID is not used
-		 for synchronization in the F_FLOCK case.
-		 What we do here is to increment the highest byte in lf_wid. */
-	      lf_wid = ((lf_wid & 0xff000000) + (1 << 24))
-		       | (lf_wid & 0xffffff);
+	      /* Increment the lf_ver field until we have no collision. */
+	      ++lf_ver;
 	    }
 	}
     }
@@ -836,7 +851,7 @@ restart:	/* Entry point after a restartable signal came in. */
       clean = new lockf_t ();
       if (!clean)
 	{
-	  node->UNLOCK ();
+	  node->unlock_and_remove ();
 	  set_errno (ENOLCK);
 	  return -1;
 	}
@@ -847,10 +862,10 @@ restart:	/* Entry point after a restartable signal came in. */
   lockf_t *lock = new lockf_t (node, head, a_flags, type, start, end,
 			       (a_flags & F_FLOCK) ? get_unique_id ()
 						   : getpid (),
-			       myself->dwProcessId);
+			       myself->dwProcessId, 0);
   if (!lock)
     {
-      node->UNLOCK ();
+      node->unlock_and_remove ();
       set_errno (ENOLCK);
       return -1;
     }
@@ -886,16 +901,7 @@ restart:	/* Entry point after a restartable signal came in. */
       delete lock;
       lock = n;
     }
-  if (node->i_lockf == NULL && !node->waiting ())
-    {
-      INODE_LIST_LOCK ();
-      LIST_REMOVE (node, i_next);
-      node->UNLOCK ();
-      delete node;
-      INODE_LIST_UNLOCK ();
-    }
-  else
-    node->UNLOCK ();
+  node->unlock_and_remove ();
   switch (error)
     {
     case 0:		/* All is well. */
@@ -940,7 +946,6 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
   node->i_all_lf = (lockf_t *) (void *) tp.w_get ();
   while ((block = lf_getblock(lock, node)))
     {
-      DWORD ret;
       HANDLE obj = block->lf_obj;
       block->lf_obj = NULL;
 
@@ -949,10 +954,9 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
        */
       if ((lock->lf_flags & F_WAIT) == 0)
 	{
+	  NtClose (obj);
 	  lock->lf_next = *clean;
 	  *clean = lock;
-	  if (obj)
-	    NtClose (obj);
 	  return EAGAIN;
 	}
       /*
@@ -970,13 +974,13 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 		waiting for one of our locks.  This method isn't overly
 		intelligent.  If it turns out to be too dumb, we might
 		have to remove it or to find another method. */
-      for (lockf_t *lk = node->i_lockf; lk; lk = lk->lf_next)
-	if ((lk->lf_flags & F_POSIX) && get_obj_handle_count (lk->lf_obj) > 1)
-	  {
-	    if (obj)
+      if (lock->lf_flags & F_POSIX)
+	for (lockf_t *lk = node->i_lockf; lk; lk = lk->lf_next)
+	  if ((lk->lf_flags & F_POSIX) && get_obj_handle_count (lk->lf_obj) > 1)
+	    {
 	      NtClose (obj);
-	    return EDEADLK;
-	  }
+	      return EDEADLK;
+	    }
 
       /*
        * For flock type locks, we must first remove
@@ -996,76 +1000,50 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
        */
       /* Cygwin:  No locked list.  See deadlock recognition above. */
 
-      /* Wait for the blocking object and its holding process. */
-      if (!obj)
-	{
-	  /* We can't synchronize on the lock event object.
-	     Treat this as a deadlock-like situation for now. */
-	  system_printf ("Can't sync with lock object hold by "
-			 "Win32 pid %lu: %E", block->lf_wid);
-	  return EDEADLK;
-	}
+      node->UNLOCK ();
 
-      HANDLE cancel_event = pthread::get_cancel_event ();
+      /* Create list of objects to wait for. */
+      HANDLE w4[4] = { obj, NULL, NULL, NULL };
+      DWORD wait_count = 1;
 
-      int wait_count = 0;
-      /* The lock event is always the first object, all other wait objects
-	 are variable.  */
-      DWORD WAIT_SIGNAL_ARRIVED = WAIT_TIMEOUT + 1;
-      DWORD WAIT_THREAD_CANCELED = WAIT_TIMEOUT + 1;
-
-      SetThreadPriority (GetCurrentThread (), priority);
+      HANDLE proc = NULL;
       if (lock->lf_flags & F_POSIX)
 	{
-	  HANDLE proc = OpenProcess (SYNCHRONIZE, FALSE, block->lf_wid);
+	  proc = OpenProcess (SYNCHRONIZE, FALSE, block->lf_wid);
 	  if (!proc)
-	    {
-	      /* If we can't synchronize on the process holding the lock,
-		 we will never recognize when the lock has been abandoned.
-		 Treat this as a deadlock-like situation for now. */
-	      system_printf ("Can't sync with process holding a lock "
-			     "(Win32 pid %lu): %E", block->lf_wid);
-	      NtClose (obj);
-	      return EDEADLK;
-	    }
-
-	  HANDLE w4[4] = { obj, proc, signal_arrived, cancel_event };
-	  wait_count = 3;
-	  WAIT_SIGNAL_ARRIVED = WAIT_OBJECT_0 + 2;
-	  if (cancel_event)
-	    {
-	      wait_count = 4;
-	      WAIT_THREAD_CANCELED = WAIT_OBJECT_0 + 3;
-	    }
-	  node->wait ();
-	  node->UNLOCK ();
-	  ret = WaitForMultipleObjects (wait_count, w4, FALSE, INFINITE);
-	  CloseHandle (proc);
+	    debug_printf ("Can't sync with process holding a POSIX lock "
+			  "(Win32 pid %lu): %E", block->lf_wid);
+	  else
+	    w4[wait_count++] = proc;
 	}
-      else
+      DWORD WAIT_SIGNAL_ARRIVED = WAIT_OBJECT_0 + wait_count;
+      w4[wait_count++] = signal_arrived;
+
+      DWORD WAIT_THREAD_CANCELED = WAIT_TIMEOUT + 1;
+      HANDLE cancel_event = pthread::get_cancel_event ();
+      if (cancel_event)
 	{
-	  HANDLE w4[3] = { obj, signal_arrived, cancel_event };
-	  wait_count = 2;
-	  WAIT_SIGNAL_ARRIVED = WAIT_OBJECT_0 + 1;
-	  if (cancel_event)
-	    {
-	      wait_count = 3;
-	      WAIT_THREAD_CANCELED = WAIT_OBJECT_0 + 2;
-	    }
-
-	  node->wait ();
-	  node->UNLOCK ();
-	  /* Unfortunately, since BSD flock locks are not attached to a
-	     specific process, we can't recognize an abandoned lock by
-	     sync'ing with a process.  We have to make sure we're the only
-	     process left accessing this event object, or that the event
-	     object is in a signalled state. */
-	  ret = WaitForMultipleObjects (wait_count, w4, FALSE, 100L);
+	  WAIT_THREAD_CANCELED = WAIT_OBJECT_0 + wait_count;
+	  w4[wait_count++] = cancel_event;
 	}
-      node->LOCK ();
-      node->unwait ();
-      NtClose (obj);
+
+      /* Wait for the blocking object and, for POSIX locks, its holding process.
+         Unfortunately, since BSD flock locks are not attached to a specific
+	 process, we can't recognize an abandoned lock by sync'ing with the
+	 creator process.  We have to make sure the event object is in a
+	 signalled state, or that it has gone away.  The latter we can only
+	 recognize by retrying to fetch the block list, so we must not wait
+	 infinitely.  Same problem for POSIX locks if the process has already
+	 exited at the time we're trying to open the process. */
+      SetThreadPriority (GetCurrentThread (), priority);
+      DWORD ret = WaitForMultipleObjects (wait_count, w4, FALSE,
+					  proc ? INFINITE : 100L);
       SetThreadPriority (GetCurrentThread (), old_prio);
+      /* Always close handles before locking the node. */
+      NtClose (obj);
+      if (proc)
+	CloseHandle (proc);
+      node->LOCK ();
       if (ret == WAIT_SIGNAL_ARRIVED)
 	{
 	  /* A signal came in. */
@@ -1083,7 +1061,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
       else
 	/* The lock object has been set to signalled or ...
 	   for POSIX locks, the process holding the lock has exited, or ...
-	   Just a timeout.  Just retry. */
+	   just a timeout.  Just retry. */
 	continue;
     }
   allow_others_to_sync ();
