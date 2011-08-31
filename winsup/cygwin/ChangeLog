@@ -1,3 +1,8 @@
+2011-08-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (inode_t::unlock_and_remove_if_unused): Rename from
+	unlock_and_remove.
+
 2011-08-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (LOCK_OBJ_NAME_LEN): Change to accommodate extra lf_ver

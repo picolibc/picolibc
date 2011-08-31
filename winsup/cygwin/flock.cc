@@ -312,7 +312,7 @@ class inode_t
 
     void notused () { i_cnt = 0; }
 
-    void unlock_and_remove ();
+    void unlock_and_remove_if_unused ();
 
     lockf_t *get_all_locks_list ();
 
@@ -329,7 +329,7 @@ inode_t::~inode_t ()
 }
 
 void
-inode_t::unlock_and_remove ()
+inode_t::unlock_and_remove_if_unused ()
 {
   UNLOCK ();
   INODE_LIST_LOCK ();
@@ -400,7 +400,7 @@ fhandler_base::del_my_locks (del_lock_called_from from)
 	 lock event would be premature. */
       node->del_my_locks (from == after_fork ? 0 : get_unique_id (),
 			  from == after_exec ? NULL : get_handle ());
-      node->unlock_and_remove ();
+      node->unlock_and_remove_if_unused ();
     }
 }
 
@@ -851,7 +851,7 @@ restart:	/* Entry point after a restartable signal came in. */
       clean = new lockf_t ();
       if (!clean)
 	{
-	  node->unlock_and_remove ();
+	  node->unlock_and_remove_if_unused ();
 	  set_errno (ENOLCK);
 	  return -1;
 	}
@@ -865,7 +865,7 @@ restart:	/* Entry point after a restartable signal came in. */
 			       myself->dwProcessId, 0);
   if (!lock)
     {
-      node->unlock_and_remove ();
+      node->unlock_and_remove_if_unused ();
       set_errno (ENOLCK);
       return -1;
     }
@@ -901,7 +901,7 @@ restart:	/* Entry point after a restartable signal came in. */
       delete lock;
       lock = n;
     }
-  node->unlock_and_remove ();
+  node->unlock_and_remove_if_unused ();
   switch (error)
     {
     case 0:		/* All is well. */
