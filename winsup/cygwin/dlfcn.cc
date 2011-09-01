@@ -36,8 +36,20 @@ check_path_access (const char *mywinenv, const char *name, path_conv& buf)
   return find_exec (name, buf, mywinenv, FE_NNF | FE_NATIVE | FE_CWD | FE_DLL);
 }
 
-/* Search LD_LIBRARY_PATH for dll, if it exists.
-   Return Windows version of given path. */
+/* Search LD_LIBRARY_PATH for dll, if it exists.  Search /usr/bin and /usr/lib
+   by default.  Return valid full path in path_conv real_filename. */
+static inline bool
+gfpod_helper (const char *name, path_conv &real_filename)
+{
+  if (isabspath (name))
+    real_filename.check (name, PC_SYM_FOLLOW | PC_NULLEMPTY);
+  else if (!check_path_access ("LD_LIBRARY_PATH=", name, real_filename))
+    check_path_access ("/usr/bin:/usr/lib", name, real_filename);
+  if (!real_filename.exists ())
+    real_filename.error = ENOENT;
+  return !real_filename.error;
+}
+
 static bool __stdcall
 get_full_path_of_dll (const char* str, path_conv &real_filename)
 {
@@ -55,11 +67,39 @@ get_full_path_of_dll (const char* str, path_conv &real_filename)
 
   strcpy (name, str);	/* Put it somewhere where we can manipulate it. */
 
-  if (isabspath (name) ||
-      (check_path_access ("LD_LIBRARY_PATH=", name, real_filename)
-       ?: check_path_access ("/usr/lib", name, real_filename)) == NULL)
-    real_filename.check (name, PC_SYM_FOLLOW | PC_NOFULL | PC_NULLEMPTY);
+  char *basename = strrchr (name, '/');
+  basename = basename ? basename + 1 : name;
+  char *suffix = strrchr (name, '.');
+  if (suffix && suffix < basename)
+    suffix = NULL;
 
+  /* Is suffix ".so"? */
+  if (suffix && !strcmp (suffix, ".so"))
+    {
+      /* Does the file exist? */
+      if (gfpod_helper (name, real_filename))
+	return true;
+      /* No, replace ".so" with ".dll". */
+      strcpy (suffix, ".dll");
+    }
+  /* Does the filename start with "lib"? */
+  if (!strncmp (basename, "lib", 3))
+    {
+      /* Yes, replace "lib" with "cyg". */
+      strncpy (basename, "cyg", 3);
+      /* Does the file exist? */
+      if (gfpod_helper (name, real_filename))
+	return true;
+      /* No, revert back to "lib". */
+      strncpy (basename, "lib", 3);
+    }
+  if (gfpod_helper (name, real_filename))
+    return true;
+
+  /* If nothing worked, create a relative path from the original incoming
+     filename and let LoadLibrary search for it using the system default
+     DLL search path. */
+  real_filename.check (str, PC_SYM_FOLLOW | PC_NOFULL | PC_NULLEMPTY);
   if (!real_filename.error)
     return true;
 
