@@ -1,3 +1,8 @@
+2011-09-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_getsockopt): Drop erroneous double conversion of error
+	code returned by SOL_SOCKET/SO_ERROR.  Fix error handling.
+
 2011-09-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lc_msg.h: Regenerate.

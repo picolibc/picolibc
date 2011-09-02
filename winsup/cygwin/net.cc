@@ -844,8 +844,9 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 	optname = convert_ws1_ip_optname (optname);
       res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
 			(int *) optlen);
-
-      if (level == SOL_SOCKET)
+      if (res == SOCKET_ERROR)
+	set_winsock_errno ();
+      else if (level == SOL_SOCKET)
 	{
 	  switch (optname)
 	    {
@@ -873,16 +874,6 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 	      break;
 	    }
 	}
-      if (optname == SO_ERROR)
-	{
-	  int *e = (int *) optval;
-
-	  debug_printf ("WinSock SO_ERROR = %d", *e);
-	  *e = find_winsock_errno (*e);
-	}
-
-      if (res)
-	set_winsock_errno ();
     }
 
   syscall_printf ("%d = getsockopt (%d, %d, 0x%x, %p, %p)",
