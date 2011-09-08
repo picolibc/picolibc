@@ -1,4 +1,4 @@
-# Copyright (C) 2002 by Red Hat, Incorporated. All rights reserved.
+# Copyright (C) 2002, 2011 by Red Hat, Incorporated. All rights reserved.
 #
 # Permission to use, copy, modify, and distribute this software
 # is freely granted, provided that this notice is preserved.
@@ -82,5 +82,9 @@ proc newlib_include_flags { args } {
 	return ""
     }
 
-    return " -I$objdir/targ-include"
+    set newlib_dir [lookfor_file ${srcdir} newlib/libc/include/assert.h]
+    if { ${newlib_dir} != "" } {
+        set newlib_dir [file dirname ${newlib_dir}]
+    }
+    return " -I$objdir/targ-include -I$objdir -I${newlib_dir}"
 }
