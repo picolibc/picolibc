@@ -27,6 +27,7 @@ details. */
 #include "path.h"
 #undef cygwin_internal
 #include "loadlib.h"
+#include "ddk/ntapi.h"
 
 /* we *know* we're being built with GCC */
 #define alloca __builtin_alloca
@@ -293,6 +294,9 @@ load_cygwin ()
   return 1;
 }
 
+#define DEBUG_PROCESS_DETACH_ON_EXIT    0x00000001
+#define DEBUG_PROCESS_ONLY_THIS_PROCESS 0x00000002
+
 static void
 attach_process (pid_t pid)
 {
@@ -302,6 +306,23 @@ attach_process (pid_t pid)
 
   if (!DebugActiveProcess (child_pid))
     error (0, "couldn't attach to pid %d for debugging", child_pid);
+
+  if (forkdebug)
+    {
+      HANDLE h = OpenProcess(PROCESS_ALL_ACCESS, FALSE, child_pid);
+
+      if (h)
+        {
+          /* Try to turn off DEBUG_ONLY_THIS_PROCESS so we can follow forks */
+          /* This is only supported on XP and later */
+          ULONG DebugFlags = DEBUG_PROCESS_DETACH_ON_EXIT;
+          NTSTATUS status = NtSetInformationProcess(h, ProcessDebugFlags, &DebugFlags, sizeof(DebugFlags));
+          if (status)
+            warn (0, "Could not clear DEBUG_ONLY_THIS_PROCESS (%x), will not trace child processes", status);
+
+          CloseHandle(h);
+        }
+    }
 
   return;
 }
@@ -467,9 +488,6 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 
   if (special == _STRACE_CHILD_PID)
     {
-      if (!DebugActiveProcess (n))
-	error (0, "couldn't attach to subprocess %d for debugging, "
-	       "windows error %d", n, GetLastError ());
       return;
     }
 

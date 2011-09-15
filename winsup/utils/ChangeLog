@@ -1,3 +1,11 @@
+2011-09-12  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* strace.cc (attach_process): Try to turn off DEBUG_ONLY_THIS_PROCESS
+	if Attaching to a process with the trace-children flag set.
+	(handle_output_debug_string): Apparently we don't need to explicitly
+	attach for debugging when a child process starts
+	* Makefile.in (strace.exe): Link with ntdll
+
 2011-08-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* Makefile.in: Check for header file existence when building dumper.exe
