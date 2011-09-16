@@ -1,3 +1,8 @@
+2011-09-15  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/12975
+	* bfdlink.h (bfd_link_info): Add version_info.
+
 2011-07-25  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
 
 	* xregex.h (regoff_t): Define.
