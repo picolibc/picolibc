@@ -1,6 +1,6 @@
 /* Definitions for opcode table for the sparc.
    Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000, 2002,
-   2003, 2005, 2010, 2011 Free Software Foundation, Inc.
+   2003, 2005, 2010 Free Software Foundation, Inc.
 
    This file is part of GAS, the GNU Assembler, GDB, the GNU debugger, and
    the GNU Binutils.
@@ -98,37 +98,18 @@ typedef struct sparc_opcode
   unsigned long lose;	/* Bits that must not be set.  */
   const char *args;
   /* This was called "delayed" in versions before the flags.  */
-  unsigned int flags;
+  char flags;
   short architecture;	/* Bitmask of sparc_opcode_arch_val's.  */
 } sparc_opcode;
 
+#define	F_DELAYED	1	/* Delayed branch.  */
+#define	F_ALIAS		2	/* Alias for a "real" instruction.  */
+#define	F_UNBR		4	/* Unconditional branch.  */
+#define	F_CONDBR	8	/* Conditional branch.  */
+#define	F_JSR		16	/* Subroutine call.  */
+#define F_FLOAT		32	/* Floating point instruction (not a branch).  */
+#define F_FBR		64	/* Floating point branch.  */
 /* FIXME: Add F_ANACHRONISTIC flag for v9.  */
-#define	F_DELAYED	0x00000001 /* Delayed branch.  */
-#define	F_ALIAS		0x00000002 /* Alias for a "real" instruction.  */
-#define	F_UNBR		0x00000004 /* Unconditional branch.  */
-#define	F_CONDBR	0x00000008 /* Conditional branch.  */
-#define	F_JSR		0x00000010 /* Subroutine call.  */
-#define F_FLOAT		0x00000020 /* Floating point instruction (not a branch).  */
-#define F_FBR		0x00000040 /* Floating point branch.  */
-#define F_MUL32		0x00000100 /* umul/umulcc/smul/smulcc insns */
-#define F_DIV32		0x00000200 /* udiv/udivcc/sdiv/sdivcc insns */
-#define F_FSMULD	0x00000400 /* 'fsmuld' insn */
-#define F_V8PLUS	0x00000800 /* v9 insns available to 32bit */
-#define F_POPC		0x00001000 /* 'popc' insn */
-#define F_VIS		0x00002000 /* VIS insns */
-#define F_VIS2		0x00004000 /* VIS2 insns */
-#define F_ASI_BLK_INIT	0x00008000 /* block init ASIs */
-#define F_FMAF		0x00010000 /* fused multiply-add */
-#define F_VIS3		0x00020000 /* VIS3 insns */
-#define F_HPC		0x00040000 /* HPC insns */
-#define F_RANDOM	0x00080000 /* 'random' insn */
-#define F_TRANS		0x00100000 /* transaction insns */
-#define F_FJFMAU	0x00200000 /* unfused multiply-add */
-#define F_IMA		0x00400000 /* integer multiply-add */
-#define F_ASI_CACHE_SPARING \
-			0x00800000 /* cache sparing ASIs */
-
-#define F_HWCAP_MASK	0x00ffff00
 
 /* All sparc opcodes are 32 bits, except for the `set' instruction (really a
    macro), which is 64 bits. It is handled as a special case.
@@ -150,8 +131,6 @@ typedef struct sparc_opcode
 	f	frs2 floating point register.
 	B	frs2 floating point register (double/even).
 	R	frs2 floating point register (quad/multiple of 4).
-	4	frs3 floating point register.
-	5	frs3 floating point register (doube/even).
 	g	frsd floating point register.
 	H	frsd floating point register (double/even).
 	J	frsd floating point register (quad/multiple of 4).
@@ -208,14 +187,15 @@ typedef struct sparc_opcode
 	0	32/64 bit immediate for set or setx (v9) insns
 	_	Ancillary state register in rd (v9a)
 	/	Ancillary state register in rs1 (v9a)
-	(	entire floating point state register (%efsr).  */
+
+  The following chars are unused: (note: ,[] are used as punctuation)
+  [45].  */
 
 #define OP2(x)		(((x) & 0x7) << 22)  /* Op2 field of format2 insns.  */
 #define OP3(x)		(((x) & 0x3f) << 19) /* Op3 field of format3 insns.  */
 #define OP(x)		((unsigned) ((x) & 0x3) << 30) /* Op field of all insns.  */
 #define OPF(x)		(((x) & 0x1ff) << 5) /* Opf field of float insns.  */
 #define OPF_LOW5(x)	OPF ((x) & 0x1f)     /* V9.  */
-#define OPF_LOW4(x)	OPF ((x) & 0xf)      /* V9.  */
 #define F3F(x, y, z)	(OP (x) | OP3 (y) | OPF (z)) /* Format3 float insns.  */
 #define F3I(x)		(((x) & 0x1) << 13)  /* Immediate field of format 3 insns.  */
 #define F2(x, y)	(OP (x) | OP2(y))    /* Format 2 insns.  */
@@ -227,7 +207,6 @@ typedef struct sparc_opcode
 #define SIMM13(x)	((x) & 0x1fff)       /* Simm13 field.  */
 #define RD(x)		(((x) & 0x1f) << 25) /* Destination register field.  */
 #define RS1(x)		(((x) & 0x1f) << 14) /* Rs1 field.  */
-#define RS3(x)		(((x) & 0x1f) << 9)  /* Rs3 field.  */
 #define ASI_RS2(x)	(SIMM13 (x))
 #define MEMBAR(x)	((x) & 0x7f)
 #define SLCPOP(x)	(((x) & 0x7f) << 6)  /* Sparclet cpop.  */

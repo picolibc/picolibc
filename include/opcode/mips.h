@@ -187,12 +187,6 @@
 #define OP_SH_MTACC_D		13
 #define OP_MASK_MTACC_D		0x3
 
-/* MIPS MCU ASE */
-#define OP_MASK_3BITPOS		0x7
-#define OP_SH_3BITPOS		12
-#define OP_MASK_OFFSET12	0xfff
-#define OP_SH_OFFSET12		0
-
 #define	OP_OP_COP0		0x10
 #define	OP_OP_COP1		0x11
 #define	OP_OP_COP2		0x12
@@ -257,6 +251,8 @@
 #define OP_SH_CODE10		0
 #define OP_MASK_TRAP		0
 #define OP_SH_TRAP		0
+#define OP_MASK_OFFSET12	0
+#define OP_SH_OFFSET12		0
 #define OP_MASK_OFFSET10	0
 #define OP_SH_OFFSET10		0
 #define OP_MASK_RS3		0
@@ -477,10 +473,6 @@ struct mips_opcode
    "+t" 5 bit coprocessor 0 destination register (OP_*_RT)
    "+T" 5 bit coprocessor 0 destination register (OP_*_RT) - disassembly only
 
-   MCU ASE usage:
-   "~" 12 bit offset (OP_*_OFFSET12)
-   "\" 3 bit position for aset and aclr (OP_*_3BITPOS)
-
    UDI immediates:
    "+1" UDI immediate bits 6-10
    "+2" UDI immediate bits 6-15
@@ -516,7 +508,7 @@ struct mips_opcode
 
    Characters used so far, for quick reference when adding more:
    "1234567890"
-   "%[]<>(),+:'@!$*&\~"
+   "%[]<>(),+:'@!$*&"
    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
    "abcdefghijklopqrstuvwxz"
 
@@ -593,8 +585,6 @@ struct mips_opcode
 #define FP_D			    0x20000000
 /* Instruction is part of the tx39's integer multiply family.    */
 #define INSN_MULT                   0x40000000
-/* Modifies the general purpose register in MICROMIPSOP_*_RS.  */
-#define INSN_WRITE_GPR_S	    0x80000000
 /* Instruction is actually a macro.  It should be ignored by the
    disassembler, and requires special treatment by the assembler.  */
 #define INSN_MACRO                  0xffffffff
@@ -632,46 +622,46 @@ struct mips_opcode
 #define INSN2_BRANCH_DELAY_16BIT    0x00000400
 /* Instruction has a branch delay slot that requires a 32-bit instruction.  */
 #define INSN2_BRANCH_DELAY_32BIT    0x00000800
+/* Modifies the general purpose register in MICROMIPSOP_*_RS.  */
+#define INSN2_WRITE_GPR_S	    0x00001000
 /* Reads the floating point register in MICROMIPSOP_*_FD.  */
-#define INSN2_READ_FPR_D	    0x00001000
-/* Modifies the general purpose register in MICROMIPSOP_*_MB.  */
-#define INSN2_WRITE_GPR_MB	    0x00002000
-/* Reads the general purpose register in MICROMIPSOP_*_MC.  */
-#define INSN2_READ_GPR_MC	    0x00004000
-/* Reads/writes the general purpose register in MICROMIPSOP_*_MD.  */
-#define INSN2_MOD_GPR_MD	    0x00008000
-/* Reads the general purpose register in MICROMIPSOP_*_ME.  */
-#define INSN2_READ_GPR_ME	    0x00010000
-/* Reads/writes the general purpose register in MICROMIPSOP_*_MF.  */
-#define INSN2_MOD_GPR_MF	    0x00020000
-/* Reads the general purpose register in MICROMIPSOP_*_MG.  */
-#define INSN2_READ_GPR_MG	    0x00040000
-/* Reads the general purpose register in MICROMIPSOP_*_MJ.  */
-#define INSN2_READ_GPR_MJ	    0x00080000
-/* Modifies the general purpose register in MICROMIPSOP_*_MJ.  */
-#define INSN2_WRITE_GPR_MJ	    0x00100000
-/* Reads the general purpose register in MICROMIPSOP_*_MP.  */
-#define INSN2_READ_GPR_MP	    0x00200000
-/* Modifies the general purpose register in MICROMIPSOP_*_MP.  */
-#define INSN2_WRITE_GPR_MP	    0x00400000
-/* Reads the general purpose register in MICROMIPSOP_*_MQ.  */
-#define INSN2_READ_GPR_MQ	    0x00800000
+#define INSN2_READ_FPR_D	    0x00002000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MB.  */
+#define INSN2_MOD_GPR_MB	    0x00004000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MC.  */
+#define INSN2_MOD_GPR_MC	    0x00008000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MD.  */
+#define INSN2_MOD_GPR_MD	    0x00010000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_ME.  */
+#define INSN2_MOD_GPR_ME	    0x00020000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MF.  */
+#define INSN2_MOD_GPR_MF	    0x00040000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MG.  */
+#define INSN2_MOD_GPR_MG	    0x00080000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MJ.  */
+#define INSN2_MOD_GPR_MJ	    0x00100000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MP.  */
+#define INSN2_MOD_GPR_MP	    0x00200000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MQ.  */
+#define INSN2_MOD_GPR_MQ	    0x00400000
 /* Reads/Writes the stack pointer ($29).  */
-#define INSN2_MOD_SP		    0x01000000
+#define INSN2_MOD_SP		    0x00800000
 /* Reads the RA ($31) register.  */
-#define INSN2_READ_GPR_31	    0x02000000
+#define INSN2_READ_GPR_31	    0x01000000
 /* Reads the global pointer ($28).  */
-#define INSN2_READ_GP		    0x04000000
+#define INSN2_READ_GP		    0x02000000
 /* Reads the program counter ($pc).  */
-#define INSN2_READ_PC		    0x08000000
+#define INSN2_READ_PC		    0x04000000
 /* Is an unconditional branch insn. */
-#define INSN2_UNCOND_BRANCH	    0x10000000
+#define INSN2_UNCOND_BRANCH	    0x08000000
 /* Is a conditional branch insn. */
-#define INSN2_COND_BRANCH	    0x20000000
-/* Modifies the general purpose registers in MICROMIPSOP_*_MH/I.  */
-#define INSN2_WRITE_GPR_MHI	    0x40000000
-/* Reads the general purpose registers in MICROMIPSOP_*_MM/N.  */
-#define INSN2_READ_GPR_MMN	    0x80000000
+#define INSN2_COND_BRANCH	    0x10000000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MH/I.  */
+#define INSN2_MOD_GPR_MHI	    0x20000000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MM.  */
+#define INSN2_MOD_GPR_MM	    0x40000000
+/* Reads/Writes the general purpose registers in MICROMIPSOP_*_MN.  */
+#define INSN2_MOD_GPR_MN	    0x80000000
 
 /* Masks used to mark instructions to indicate which MIPS ISA level
    they were introduced in.  INSN_ISA_MASK masks an enumeration that
@@ -719,7 +709,7 @@ static const unsigned int mips_isa_table[] =
 #define INSN_OCTEON		  0x00000800
 
 /* Masks used for MIPS-defined ASEs.  */
-#define INSN_ASE_MASK		  0x3c00f010
+#define INSN_ASE_MASK		  0x3c00f000
 
 /* DSP ASE */ 
 #define INSN_DSP                  0x00001000
@@ -767,9 +757,6 @@ static const unsigned int mips_isa_table[] =
 #define INSN_LOONGSON_3A          0x00000400
 /* RMI Xlr instruction */
 #define INSN_XLR              	  0x00000020
-
-/* MCU (MicroController) ASE */
-#define INSN_MCU		  0x00000010
 
 /* MIPS ISA defines, use instead of hardcoding ISA level.  */
 
@@ -873,13 +860,9 @@ static const unsigned int mips_isa_table[] =
 enum
 {
   M_ABS,
-  M_ACLR_AB,
-  M_ACLR_OB,
   M_ADD_I,
   M_ADDU_I,
   M_AND_I,
-  M_ASET_AB,
-  M_ASET_OB,
   M_BALIGN,
   M_BC1FL,
   M_BC1TL,
@@ -1332,9 +1315,6 @@ extern int bfd_mips_num_opcodes;
 
 /* The following flags have the same value for the mips16 opcode
    table:
-
-   INSN_ISA3
-
    INSN_UNCOND_BRANCH_DELAY
    INSN_COND_BRANCH_DELAY
    INSN_COND_BRANCH_LIKELY (never used)
@@ -1343,7 +1323,7 @@ extern int bfd_mips_num_opcodes;
    INSN_WRITE_HI
    INSN_WRITE_LO
    INSN_TRAP
-   FP_D (never used)
+   INSN_ISA3
    */
 
 extern const struct mips_opcode mips16_opcodes[];
@@ -1381,8 +1361,6 @@ extern const int bfd_mips16_num_opcodes;
 #define MICROMIPSOP_SH_SEL		11
 #define MICROMIPSOP_MASK_OFFSET12	0xfff
 #define MICROMIPSOP_SH_OFFSET12		0
-#define MICROMIPSOP_MASK_3BITPOS	0x7
-#define MICROMIPSOP_SH_3BITPOS		21
 #define MICROMIPSOP_MASK_STYPE		0x1f
 #define MICROMIPSOP_SH_STYPE		16
 #define MICROMIPSOP_MASK_OFFSET10	0x3ff
@@ -1608,7 +1586,6 @@ extern const int bfd_mips16_num_opcodes;
    "<" 5-bit shift amount (MICROMIPSOP_*_SHAMT)
    ">" shift amount between 32 and 63, stored after subtracting 32
        (MICROMIPSOP_*_SHAMT)
-   "\" 3-bit position for ASET and ACLR (MICROMIPSOP_*_3BITPOS)
    "|" 4-bit trap code (MICROMIPSOP_*_TRAP)
    "~" 12-bit signed offset (MICROMIPSOP_*_OFFSET12)
    "a" 26-bit target address (MICROMIPSOP_*_TARGET)
@@ -1698,7 +1675,7 @@ extern const int bfd_mips16_num_opcodes;
 
    Characters used so far, for quick reference when adding more:
    "1234567890"
-   "<>(),+.\|~"
+   "<>(),+.|~"
    "ABCDEFGHI KLMN   RST V    "
    "abcd f hijklmnopqrstuvw yz"
 

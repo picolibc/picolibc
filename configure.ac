@@ -1020,7 +1020,7 @@ case "${target}" in
     fi
     ;;
   tic6x-*-*)
-    noconfigdirs="$noconfigdirs sim"
+    noconfigdirs="$noconfigdirs gdb sim"
     ;;
   tilepro-*-* | tilegx-*-*)
     noconfigdirs="$noconfigdirs sim"

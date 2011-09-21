@@ -1,13 +1,3 @@
-2011-09-21  David S. Miller  <davem@davemloft.net>
-
-	* sparc.h (Tag_GNU_Sparc_HWCAPS): New object attribute.
-	(ELF_SPARC_HWCAP_*): New HWCAPS bitmask values.
-
-2011-08-12  H.J. Lu  <hongjiu.lu@intel.com>
-
-	PR ld/13082
-	* x86-64.h (R_X86_64_RELATIVE64): New.
-
 2011-07-24  Chao-ying Fu  <fu@mips.com>
             Maciej W. Rozycki  <macro@codesourcery.com>
 
