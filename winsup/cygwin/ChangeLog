@@ -1,3 +1,8 @@
+2011-09-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* tty.cc (grantpt): Check for valid fd.
+	(unlockpt): Ditto.
+
 2011-09-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_getsockopt): Drop erroneous double conversion of error

@@ -34,13 +34,15 @@ posix_openpt (int oflags)
 extern "C" int
 grantpt (int fd)
 {
-  return 0;
+  cygheap_fdget cfd (fd);
+  return cfd < 0 ? -1 : 0;
 }
 
 extern "C" int
 unlockpt (int fd)
 {
-  return 0;
+  cygheap_fdget cfd (fd);
+  return cfd < 0 ? -1 : 0;
 }
 
 extern "C" int
