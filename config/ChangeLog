@@ -1,11 +1,3 @@
-2011-08-22  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
-
-	* picflag.m4: New file.
-
-2011-07-18  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
-
-	* elf.m4 (target_elf): Remove *-netware*.
-
 2011-04-20  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* bootstrap-lto.mk: Remove obsolete requirement.
