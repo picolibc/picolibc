@@ -1,6 +1,6 @@
 /* Definitions for opcode table for the sparc.
    Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 2000, 2002,
-   2003, 2005, 2010 Free Software Foundation, Inc.
+   2003, 2005, 2010, 2011 Free Software Foundation, Inc.
 
    This file is part of GAS, the GNU Assembler, GDB, the GNU debugger, and
    the GNU Binutils.
@@ -98,18 +98,37 @@ typedef struct sparc_opcode
   unsigned long lose;	/* Bits that must not be set.  */
   const char *args;
   /* This was called "delayed" in versions before the flags.  */
-  char flags;
+  unsigned int flags;
   short architecture;	/* Bitmask of sparc_opcode_arch_val's.  */
 } sparc_opcode;
 
-#define	F_DELAYED	1	/* Delayed branch.  */
-#define	F_ALIAS		2	/* Alias for a "real" instruction.  */
-#define	F_UNBR		4	/* Unconditional branch.  */
-#define	F_CONDBR	8	/* Conditional branch.  */
-#define	F_JSR		16	/* Subroutine call.  */
-#define F_FLOAT		32	/* Floating point instruction (not a branch).  */
-#define F_FBR		64	/* Floating point branch.  */
 /* FIXME: Add F_ANACHRONISTIC flag for v9.  */
+#define	F_DELAYED	0x00000001 /* Delayed branch.  */
+#define	F_ALIAS		0x00000002 /* Alias for a "real" instruction.  */
+#define	F_UNBR		0x00000004 /* Unconditional branch.  */
+#define	F_CONDBR	0x00000008 /* Conditional branch.  */
+#define	F_JSR		0x00000010 /* Subroutine call.  */
+#define F_FLOAT		0x00000020 /* Floating point instruction (not a branch).  */
+#define F_FBR		0x00000040 /* Floating point branch.  */
+#define F_MUL32		0x00000100 /* umul/umulcc/smul/smulcc insns */
+#define F_DIV32		0x00000200 /* udiv/udivcc/sdiv/sdivcc insns */
+#define F_FSMULD	0x00000400 /* 'fsmuld' insn */
+#define F_V8PLUS	0x00000800 /* v9 insns available to 32bit */
+#define F_POPC		0x00001000 /* 'popc' insn */
+#define F_VIS		0x00002000 /* VIS insns */
+#define F_VIS2		0x00004000 /* VIS2 insns */
+#define F_ASI_BLK_INIT	0x00008000 /* block init ASIs */
+#define F_FMAF		0x00010000 /* fused multiply-add */
+#define F_VIS3		0x00020000 /* VIS3 insns */
+#define F_HPC		0x00040000 /* HPC insns */
+#define F_RANDOM	0x00080000 /* 'random' insn */
+#define F_TRANS		0x00100000 /* transaction insns */
+#define F_FJFMAU	0x00200000 /* unfused multiply-add */
+#define F_IMA		0x00400000 /* integer multiply-add */
+#define F_ASI_CACHE_SPARING \
+			0x00800000 /* cache sparing ASIs */
+
+#define F_HWCAP_MASK	0x00ffff00
 
 /* All sparc opcodes are 32 bits, except for the `set' instruction (really a
    macro), which is 64 bits. It is handled as a special case.

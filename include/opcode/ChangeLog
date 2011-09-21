@@ -1,3 +1,10 @@
+2011-09-21  David S. Miller  <davem@davemloft.net>
+
+	* sparc.h (struct sparc_opcode): Expand 'flags' to unsigned int.
+	(F_MUL32, F_DIV32, F_FSMULD, F_V8PLUS, F_POPC, F_VIS, F_VIS2,
+	F_ASI_BLK_INIT, F_FMAF, F_VIS3, F_HPC, F_RANDOM, F_TRANS,
+	F_FJFMAU, F_IMA, F_ASI_CACHE_SPARING): New flag bits.
+
 2011-08-09  Chao-ying Fu  <fu@mips.com>
             Maciej W. Rozycki  <macro@codesourcery.com>
 

@@ -1,5 +1,6 @@
 /* SPARC ELF support for BFD.
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2008, 2010
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2008, 2010,
+   2011
    Free Software Foundation, Inc.
    By Doug Evans, Cygnus Support, <dje@cygnus.com>.
 
@@ -184,5 +185,32 @@ END_RELOC_NUMBERS (R_SPARC_max)
 /* Values for Elf64_Dyn.d_tag.  */
 
 #define DT_SPARC_REGISTER	0x70000001
+
+/* Object attribute tags.  */
+enum
+{
+  /* 0-3 are generic.  */
+  Tag_GNU_Sparc_HWCAPS = 4,
+};
+
+/* These values match the AV_SPARC_* hwcap bits defined under Solaris.  */
+#define ELF_SPARC_HWCAP_MUL32	0x00000001 /* umul/umulcc/smul/smulcc insns */
+#define ELF_SPARC_HWCAP_DIV32	0x00000002 /* udiv/udivcc/sdiv/sdivcc insns */
+#define ELF_SPARC_HWCAP_FSMULD	0x00000004 /* 'fsmuld' insn */
+#define ELF_SPARC_HWCAP_V8PLUS	0x00000008 /* v9 insns available to 32bit */
+#define ELF_SPARC_HWCAP_POPC	0x00000010 /* 'popc' insn */
+#define ELF_SPARC_HWCAP_VIS	0x00000020 /* VIS insns */
+#define ELF_SPARC_HWCAP_VIS2	0x00000040 /* VIS2 insns */
+#define ELF_SPARC_HWCAP_ASI_BLK_INIT	\
+				0x00000080 /* block init ASIs */
+#define ELF_SPARC_HWCAP_FMAF	0x00000100 /* fused multiply-add */
+#define ELF_SPARC_HWCAP_VIS3	0x00000400 /* VIS3 insns */
+#define ELF_SPARC_HWCAP_HPC	0x00000800 /* HPC insns */
+#define ELF_SPARC_HWCAP_RANDOM	0x00001000 /* 'random' insn */
+#define ELF_SPARC_HWCAP_TRANS	0x00002000 /* transaction insns */
+#define ELF_SPARC_HWCAP_FJFMAU	0x00004000 /* unfused multiply-add */
+#define ELF_SPARC_HWCAP_IMA	0x00008000 /* integer multiply-add */
+#define ELF_SPARC_HWCAP_ASI_CACHE_SPARING \
+				0x00010000 /* cache sparing ASIs */
 
 #endif /* _ELF_SPARC_H */
