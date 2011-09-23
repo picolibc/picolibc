@@ -1,3 +1,9 @@
+2011-09-23  Cary Coutant  <ccoutant@google.com>
+
+	PR 40831
+	* demangle.h (enum demangle_component_type): Add
+	DEMANGLE_COMPONENT_CLONE.
+
 2011-09-15  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR ld/12975
