@@ -155,13 +155,7 @@ enum ld_plugin_symbol_resolution
   LDPR_RESOLVED_EXEC,
 
   /* This symbol was resolved by a definition in a shared object.  */
-  LDPR_RESOLVED_DYN,
-
-  /* This is the prevailing definition of the symbol, with no
-     references from regular objects.  It is only referenced from IR
-     code, but the symbol is exported and may be referenced from
-     a dynamic object (not seen at link time).  */
-  LDPR_PREVAILING_DEF_IRONLY_EXP
+  LDPR_RESOLVED_DYN
 };
 
 /* The plugin library's "claim file" handler.  */
@@ -353,8 +347,7 @@ enum ld_plugin_tag
   LDPT_GET_INPUT_SECTION_NAME,
   LDPT_GET_INPUT_SECTION_CONTENTS,
   LDPT_UPDATE_SECTION_ORDER,
-  LDPT_ALLOW_SECTION_ORDERING,
-  LDPT_GET_SYMBOLS_V2
+  LDPT_ALLOW_SECTION_ORDERING
 };
 
 /* The plugin transfer vector.  */
