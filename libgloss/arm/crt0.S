@@ -34,6 +34,16 @@
 \name:
 .endm
 #endif
+
+.macro indirect_call reg
+#ifdef HAVE_CALL_INDIRECT
+	blx \reg
+#else
+	mov	lr, pc
+	mov	pc, \reg
+#endif
+.endm
+
 	.align 	0
 
 	FUNC_START	_mainCRTStartup
@@ -213,22 +223,12 @@ __change_mode:
 	ldr	r3, .Lhwinit
 	cmp	r3, #0
 	beq	.LC24
-#if defined(__thumb__) || defined(__thumb2__)
-	blx   r3
-#else
-	mov	lr, pc
-	mov	pc, r3
-#endif
+	indirect_call r3
 .LC24:	
 	ldr	r3, .Lswinit
 	cmp	r3, #0
 	beq	.LC25
-#if defined(__thumb__) || defined(__thumb2__)
-	blx   r3
-#else
-	mov	lr, pc
-	mov	pc, r3
-#endif
+	indirect_call r3
 
 .LC25:	
 	movs	r0, #0		/*  no arguments  */

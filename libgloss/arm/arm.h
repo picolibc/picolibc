@@ -50,4 +50,13 @@
 # define THUMB_V7M_V6M
 #endif
 
+/* Defined if this target supports the BLX Rm instruction.  */
+#if  !defined(__ARM_ARCH_2__)   \
+  && !defined(__ARM_ARCH_3__)	\
+  && !defined(__ARM_ARCH_3M__)	\
+  && !defined(__ARM_ARCH_4__)	\
+  && !defined(__ARM_ARCH_4T__)
+# define HAVE_CALL_INDIRECT
+#endif
+
 #endif /* _LIBGLOSS_ARM_H */

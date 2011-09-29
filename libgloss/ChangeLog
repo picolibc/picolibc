@@ -1,3 +1,9 @@
+2011-09-29  Bin Cheng  <bin.cheng@arm.com>
+
+	* arm/arm.h (HAVE_CALL_INDIRECT): Define.
+        * arm/crt0.S (indirect_call): New macro.  Encodes indirect
+	function calls.  Does not use blx for pre-armv5 targets.
+
 2011-08-19  Nick Clifton  <nickc@redhat.com>
 
 	* iq2000/sim.ld (.gcc_except_table): Include .gcc_except_table.foo
