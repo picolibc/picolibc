@@ -1,3 +1,12 @@
+2011-09-29  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* libc/machine/arm/memcpy.S: New file.  Contains a hand coded
+	memcpy function optimized for the cortex-a15.
+	* libc/machine/arm/memcpy-stub.c: New file.
+	* libc/machine/arm/Makefile.am (lib_a_SOURCES): Add memcpy-stub.c,
+	memcpy.S.
+	* libc/machine/arm/Makefile.in: Regenerate.
+
 2011-09-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* testsuite/lib/flags.exp: Add logic to add the
