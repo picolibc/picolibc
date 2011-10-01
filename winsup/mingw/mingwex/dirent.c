@@ -28,23 +28,32 @@
 #define SUFFIX	_T("*")
 #define	SLASH	_T("\\")
 
-struct __dirstream_t
+union __dirstream_t
 {
   /* Actual (private) declaration for opaque data type "DIR". */
 
-    /* disk transfer area for this dir */
-    struct _finddata_t	dd_dta;
+  /* dirent struct to return from dir (NOTE: this makes this thread
+   * safe as long as only one thread uses a particular DIR struct at
+   * a time) */
+  struct dirent	dd_dir;
 
-    /* dirent struct to return from dir (NOTE: this makes this thread
-     * safe as long as only one thread uses a particular DIR struct at
-     * a time) */
-    struct dirent	dd_dir;
+  struct __dirstream_private_t
+  {
+    /* Three padding fields, matching the head of dd_dir...
+     */
+    long		dd_ino;		/* Always zero. */
+    unsigned short	dd_reclen;	/* Always zero. */
+    unsigned short	dd_namlen;	/* Length of name in d_name. */
+
+    /* ...to keep the start of this disk transfer area for this dir
+     * aligned at the offset of the dd_dir.d_type field
+     */
+    struct _finddata_t	dd_dta;
 
     /* _findnext handle */
     intptr_t		dd_handle;
 
-    /*
-     * Status of search:
+    /* Status of search:
      *   (type is now int -- was short in older versions).
      *   0 = not started yet (next entry to read is first entry)
      *  -1 = off the end
@@ -54,25 +63,36 @@ struct __dirstream_t
 
     /* given path for dir with search pattern (struct is extended) */
     char		dd_name[1];
+
+  } dd_private;
 };
 
-struct __wdirstream_t
+union __wdirstream_t
 {
   /* Actual (private) declaration for opaque data type "_WDIR". */
 
-    /* disk transfer area for this dir */
-    struct _wfinddata_t	dd_dta;
+  /* dirent struct to return from dir (NOTE: this makes this thread
+   * safe as long as only one thread uses a particular DIR struct at
+   * a time) */
+  struct _wdirent	dd_dir;
 
-    /* dirent struct to return from dir (NOTE: this makes this thread
-     * safe as long as only one thread uses a particular DIR struct at
-     * a time) */
-    struct _wdirent	dd_dir;
+  struct __wdirstream_private_t
+  {
+    /* Three padding fields, matching the head of dd_dir...
+     */
+    long		dd_ino;		/* Always zero. */
+    unsigned short	dd_reclen;	/* Always zero. */
+    unsigned short	dd_namlen;	/* Length of name in d_name. */
+
+    /* ...to keep the start of this disk transfer area for this dir
+     * aligned at the offset of the dd_dir.d_type field
+     */
+    struct _wfinddata_t	dd_dta;
 
     /* _findnext handle */
     intptr_t		dd_handle;
 
-    /*
-     * Status of search:
+    /* Status of search:
      *   0 = not started yet (next entry to read is first entry)
      *  -1 = off the end
      *   positive = 0 based index of next entry
@@ -81,7 +101,26 @@ struct __wdirstream_t
 
     /* given path for dir with search pattern (struct is extended) */
     wchar_t		dd_name[1];
+
+  } dd_private;
 };
+
+/* We map the BSD d_type field in the returned dirent structure
+ * from the Microsoft _finddata_t dd_dta.attrib bits, which are:
+ *
+ *   _A_NORMAL	(0x0000)	normal file: best fit for DT_REG
+ *   _A_RDONLY	(0x0001)	read-only: no BSD d_type equivalent
+ *   _A_HIDDEN	(0x0002)	hidden entity: no BSD equivalent
+ *   _A_SYSTEM	(0x0004)	system entity: no BSD equivalent
+ *   _A_VOLID	(0x0008)	volume label: no BSD equivalent
+ *   _A_SUBDIR	(0x0010)	directory: best fit for DT_DIR
+ *   _A_ARCH	(0x0020)	"dirty": no BSD equivalent
+ *
+ * Of these, _A_RDONLY, _A_HIDDEN, _A_SYSTEM, and _A_ARCH are
+ * modifier bits, rather than true entity type specifiers; we
+ * will ignore them in the mapping, by applying this mask:
+ */
+#define DT_IGNORED	(_A_RDONLY | _A_HIDDEN | _A_SYSTEM | _A_ARCH)
 
 /* Helper for opendir().  */
 static inline unsigned _tGetFileAttributes (const _TCHAR * tPath)
@@ -161,27 +200,27 @@ _topendir (const _TCHAR *szPath)
     }
 
   /* Create the search expression. */
-  _tcscpy (nd->dd_name, szFullPath);
+  _tcscpy (nd->dd_private.dd_name, szFullPath);
 
   /* Add on a slash if the path does not end with one. */
-  if (nd->dd_name[0] != _T('\0')
-      && _tcsrchr (nd->dd_name, _T('/')) != nd->dd_name
-					    + _tcslen (nd->dd_name) - 1
-      && _tcsrchr (nd->dd_name, _T('\\')) != nd->dd_name
-      					     + _tcslen (nd->dd_name) - 1)
+  if (nd->dd_private.dd_name[0] != _T('\0')
+      && _tcsrchr (nd->dd_private.dd_name, _T('/')) != nd->dd_private.dd_name
+					    + _tcslen (nd->dd_private.dd_name) - 1
+      && _tcsrchr (nd->dd_private.dd_name, _T('\\')) != nd->dd_private.dd_name
+      					     + _tcslen (nd->dd_private.dd_name) - 1)
     {
-      _tcscat (nd->dd_name, SLASH);
+      _tcscat (nd->dd_private.dd_name, SLASH);
     }
 
   /* Add on the search pattern */
-  _tcscat (nd->dd_name, SUFFIX);
+  _tcscat (nd->dd_private.dd_name, SUFFIX);
 
   /* Initialize handle to -1 so that a premature closedir doesn't try
    * to call _findclose on it. */
-  nd->dd_handle = -1;
+  nd->dd_private.dd_handle = -1;
 
   /* Initialize the status. */
-  nd->dd_stat = 0;
+  nd->dd_private.dd_stat = 0;
 
   /* Initialize the dirent structure. ino and reclen are invalid under
    * Win32, and name simply points at the appropriate part of the
@@ -213,33 +252,33 @@ _treaddir (_TDIR * dirp)
       return (struct _tdirent *) 0;
     }
 
-  if (dirp->dd_stat < 0)
+  if (dirp->dd_private.dd_stat < 0)
     {
       /* We have already returned all files in the directory
        * (or the structure has an invalid dd_stat). */
       return (struct _tdirent *) 0;
     }
-  else if (dirp->dd_stat == 0)
+  else if (dirp->dd_private.dd_stat == 0)
     {
       /* We haven't started the search yet. */
       /* Start the search */
-      dirp->dd_handle = _tfindfirst (dirp->dd_name, &(dirp->dd_dta));
+      dirp->dd_private.dd_handle = _tfindfirst (dirp->dd_private.dd_name, &(dirp->dd_private.dd_dta));
 
-      if (dirp->dd_handle == -1)
+      if (dirp->dd_private.dd_handle == -1)
 	{
 	  /* Whoops! Seems there are no files in that
 	   * directory. */
-	  dirp->dd_stat = -1;
+	  dirp->dd_private.dd_stat = -1;
 	}
       else
 	{
-	  dirp->dd_stat = 1;
+	  dirp->dd_private.dd_stat = 1;
 	}
     }
   else
     {
       /* Get the next search entry. */
-      if (_tfindnext (dirp->dd_handle, &(dirp->dd_dta)))
+      if (_tfindnext (dirp->dd_private.dd_handle, &(dirp->dd_private.dd_dta)))
 	{
 	  /* We are off the end or otherwise error.	
 	     _findnext sets errno to ENOENT if no more file
@@ -247,25 +286,46 @@ _treaddir (_TDIR * dirp)
 	  DWORD winerr = GetLastError ();
 	  if (winerr == ERROR_NO_MORE_FILES)
 	    errno = 0;	
-	  _findclose (dirp->dd_handle);
-	  dirp->dd_handle = -1;
-	  dirp->dd_stat = -1;
+	  _findclose (dirp->dd_private.dd_handle);
+	  dirp->dd_private.dd_handle = -1;
+	  dirp->dd_private.dd_stat = -1;
 	}
       else
 	{
 	  /* Update the status to indicate the correct
 	   * number. */
-	  dirp->dd_stat++;
+	  dirp->dd_private.dd_stat++;
 	}
     }
 
-  if (dirp->dd_stat > 0)
+  if (dirp->dd_private.dd_stat > 0)
     {
       /* Successfully got an entry. Everything about the file is
        * already appropriately filled in except the length of the
-       * file name. */
-      dirp->dd_dir.d_namlen = _tcslen (dirp->dd_dta.name);
-      _tcscpy (dirp->dd_dir.d_name, dirp->dd_dta.name);
+       * file name...
+       */
+      dirp->dd_dir.d_namlen = _tcslen (dirp->dd_dir.d_name);
+      /*
+       * ...and the attributes returned in the dd_dta.attrib field;
+       * these require adjustment to their BSD equivalents, which are
+       * returned via the union with the dd_dir.d_type field:
+       */
+      switch( dirp->dd_dir.d_type &= ~DT_IGNORED )
+	{
+	  case DT_REG:
+	  case DT_DIR:
+	    /* After stripping out the modifier bits in DT_IGNORED,
+	     * (which we ALWAYS ignore), this pair require no further
+	     * adjustment...
+	     */
+	    break;
+
+	  default:
+	    /* ...while nothing else has an appropriate equivalent
+	     * in the BSD d_type identification model.
+	     */
+	    dirp->dd_dir.d_type = DT_UNKNOWN;
+	}
       return &dirp->dd_dir;
     }
 
@@ -292,9 +352,9 @@ _tclosedir (_TDIR * dirp)
       return -1;
     }
 
-  if (dirp->dd_handle != -1)
+  if (dirp->dd_private.dd_handle != -1)
     {
-      rc = _findclose (dirp->dd_handle);
+      rc = _findclose (dirp->dd_private.dd_handle);
     }
 
   /* Delete the dir structure. */
@@ -320,13 +380,13 @@ _trewinddir (_TDIR * dirp)
       return;
     }
 
-  if (dirp->dd_handle != -1)
+  if (dirp->dd_private.dd_handle != -1)
     {
-      _findclose (dirp->dd_handle);
+      _findclose (dirp->dd_private.dd_handle);
     }
 
-  dirp->dd_handle = -1;
-  dirp->dd_stat = 0;
+  dirp->dd_private.dd_handle = -1;
+  dirp->dd_private.dd_stat = 0;
 }
 
 /*
@@ -345,7 +405,7 @@ _ttelldir (_TDIR * dirp)
       errno = EFAULT;
       return -1;
     }
-  return dirp->dd_stat;
+  return dirp->dd_private.dd_stat;
 }
 
 /*
@@ -377,19 +437,19 @@ _tseekdir (_TDIR * dirp, long lPos)
   else if (lPos == -1)
     {
       /* Seek past end. */
-      if (dirp->dd_handle != -1)
+      if (dirp->dd_private.dd_handle != -1)
 	{
-	  _findclose (dirp->dd_handle);
+	  _findclose (dirp->dd_private.dd_handle);
 	}
-      dirp->dd_handle = -1;
-      dirp->dd_stat = -1;
+      dirp->dd_private.dd_handle = -1;
+      dirp->dd_private.dd_stat = -1;
     }
   else
     {
       /* Rewind and read forward to the appropriate index. */
       _trewinddir (dirp);
 
-      while ((dirp->dd_stat < lPos) && _treaddir (dirp))
+      while ((dirp->dd_private.dd_stat < lPos) && _treaddir (dirp))
 	;
     }
 }

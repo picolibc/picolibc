@@ -1,3 +1,29 @@
+2011-10-01  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Rationalise structure layout; add dirent.d_type field.
+
+	* include/dirent.h (struct dirent): Rearrange; add d_type field.
+	Add extra padding fields between d_type and d_name, to represent a
+	union with a _finddata_t struct, aligned at the d_type field.
+	(struct _wdirent): Likewise, with _wfinddata_t aligned at d_type.
+	(DT_REG, DT_DIR): New macros; define them to be equivalent to...
+	(_A_NORMAL, _A_SUBDIR): ...these Microsoft attributes respectively.
+	(DT_BLK, DT_CHR, DT_FIFO, DT_LNK, DT_SOCK): New macros; define them.
+	They have little relevance on Win32, so don't use them, substitute...
+	(DT_UNKNOWN): ...this new catch-all macro instead; define it.
+	(struct __dirstream_t): Change declaration; replace by opaque union.
+	(struct __wdirstream_t): Likewise.
+
+	* mingwex/dirent.c (struct __dirstream_t): Redefine as union; map...
+	(struct dirent, struct __dirstream_private_t): ...these to a common
+	address; the latter encapsulates the private data into...
+	(dd_private): ...this new member; update all references accordingly.
+	Adjust field layout to align with corresponding dirent fields.
+	(struct __wdirstream_t): Similarly redefine as union, mapping...
+	(struct _wdirent, struct __wdirstream_private_t): ...these.
+	(_treaddir): Set dirent.d_type to appropriate selection from...
+	(DT_REG, DT_DIR, DT_UNKNOWN): ...these.
+
 2011-08-27  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Don't expose implementation detail for opaque DIRENT structures.
@@ -3071,7 +3097,7 @@
 2002-09-17 Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/time.h (__need_NULL): Define before including
-	stddef.h. Thanks to: Rüdiger Dehmel <de@lmnet.de>.
+	stddef.h. Thanks to: RÃ¼diger Dehmel <de@lmnet.de>.
 
 2002-09-16 Ranjit Matthew <rmathew@hotmail.com>
 
