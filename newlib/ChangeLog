@@ -1,3 +1,7 @@
+2011-10-04  Nick Clifton  <nickc@redhat.com>
+
+	* libc/machine/arm/memcpy.S: Fix unaligned access copying.
+
 2011-09-29  Greta Yorsh  <Greta.Yorsh@arm.com>
 
 	* libc/machine/arm/memcpy.S: New file.  Contains a hand coded

@@ -364,7 +364,7 @@ src_not_word_aligned:
 #ifdef __ARM_FEATURE_UNALIGNED
        /* Copy word by word using LDR when alignment can be done in hardware,
           i.e., SCTLR.A is set, supporting unaligned access in LDR and STR.  */
-        cmp     r2, #60
+        subs    r2, r2, #60
         blt     8f
 
 7:
@@ -380,12 +380,18 @@ src_not_word_aligned:
         bge     7b
 
 8:
-       /* Get here if there is less than 64 btyes to copy,
-          where the number of bytes to copy is r2 + 4.  */
+        /* Get here if less than 64 bytes to copy, -64 <= r2 < 0.
+           Check if there is more than 3 bytes to copy.  */
+        adds    r2, r2, #60
+        blt     copy_less_than_4
+
+9:      
+       /* Get here if there is less than 64 but at least 4 bytes to copy,
+          where the number of bytes to copy is r2+4.  */
         ldr     r3, [r1], #4
         str     r3, [r0], #4
         subs    r2, r2, #4
-        bge     8b
+        bge     9b
 
         b       copy_less_than_4
 
