@@ -1,3 +1,7 @@
+2011-10-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (socketpair): Bind first socket to loopback only as well.
+
 2011-09-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* tty.cc (grantpt): Check for valid fd.

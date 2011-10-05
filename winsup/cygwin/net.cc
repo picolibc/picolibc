@@ -2630,7 +2630,7 @@ socketpair (int family, int type, int protocol, int *sb)
   /* bind the socket to any unused port */
   sock_in.sin_family = AF_INET;
   sock_in.sin_port = 0;
-  sock_in.sin_addr.s_addr = INADDR_ANY;
+  sock_in.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
   if (bind (newsock, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0)
     {
       debug_printf ("bind failed");
