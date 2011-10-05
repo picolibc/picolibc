@@ -1,3 +1,12 @@
+2011-10-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (create_winenv): Rename from sync_winenv.  Take
+	environment pointer as parameter and return pointer to corresponding
+	win32 environment block if != NULL.  Otherwise just sync as before.
+	(cygwin_internal): Add CW_CVT_ENV_TO_WINENV case.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_CVT_ENV_TO_WINENV.
+
 2011-10-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (socketpair): Bind first socket to loopback only as well.

@@ -132,12 +132,12 @@ check_ntsec (const char *filename)
 }
 
 /* Copy cygwin environment variables to the Windows environment. */
-static void
-sync_winenv ()
+static PWCHAR
+create_winenv (const char * const *env)
 {
   int unused_envc;
   PWCHAR envblock = NULL;
-  char **envp = build_env (cur_environ (), envblock, unused_envc, false);
+  char **envp = build_env (env ?: cur_environ (), envblock, unused_envc, false);
   PWCHAR p = envblock;
 
   if (envp)
@@ -146,8 +146,12 @@ sync_winenv ()
 	cfree (*e);
       cfree (envp);
     }
+  /* If we got an env block, just return pointer to win env. */
+  if (env)
+    return envblock;
+  /* Otherwise sync win env of current process with its posix env. */
   if (!p)
-    return;
+    return NULL;
   while (*p)
     {
       PWCHAR eq = wcschr (p, L'=');
@@ -160,6 +164,7 @@ sync_winenv ()
       p = wcschr (p, L'\0') + 1;
     }
   free (envblock);
+  return NULL;
 }
 
 /*
@@ -419,7 +424,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	try_to_debug ();
 	break;
       case CW_SYNC_WINENV:
-	sync_winenv ();
+	create_winenv (NULL);
 	res = 0;
 	break;
       case CW_CYGTLS_PADSIZE:
@@ -513,6 +518,13 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	{
 	  int err = va_arg (arg, int);
 	  res = (uintptr_t) strerror (err);
+	}
+	break;
+
+      case CW_CVT_ENV_TO_WINENV:
+	{
+	  char **posix_env = va_arg (arg, char **);
+	  res = (uintptr_t) create_winenv (posix_env);
 	}
 	break;
 
