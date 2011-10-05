@@ -116,7 +116,8 @@ END_RELOC_NUMBERS (R_RX_max)
 
 /* Values for the e_flags field in the ELF header.  */
 #define E_FLAG_RX_64BIT_DOUBLES		(1 << 0)
-#define E_FLAG_RX_DSP			(1 << 1) /* Defined in the RX CPU Object file specification, but not explained.  */
+#define E_FLAG_RX_DSP			(1 << 1) /* Defined in the RX CPU Object file specification, but not explained. */
+#define E_FLAG_RX_PID			(1 << 2) /* Unofficial - DJ */
 
 /* These define the addend field of R_RX_RH_RELAX relocations.  */
 #define	RX_RELAXA_IMM6	0x00000010	/* Imm8/16/24/32 at bit offset 6.  */
