@@ -1,6 +1,6 @@
 /* sys/wait.h
 
-   Copyright 1997, 1998, 2001, 2002, 2003, 2004, 2006 Red Hat, Inc.
+   Copyright 1997, 1998, 2001, 2002, 2003, 2004, 2006, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -19,10 +19,25 @@ details. */
 extern "C" {
 #endif
 
-pid_t wait (int *);
-pid_t waitpid (pid_t, int *, int);
-pid_t wait3 (int *__status, int __options, struct rusage *__rusage);
-pid_t wait4 (pid_t __pid, int *__status, int __options, struct rusage *__rusage);
+#ifdef __cplusplus
+
+typedef int *__wait_status_ptr_t;
+
+#else /* !__cplusplus */
+
+/* Allow `int' and `union wait' for the status.  */
+typedef union
+  {
+    int *__int_ptr;
+    union wait *__union_wait_ptr;
+  } __wait_status_ptr_t  __attribute__ ((__transparent_union__));
+
+#endif /* __cplusplus */
+
+pid_t wait (__wait_status_ptr_t __status);
+pid_t waitpid (pid_t __pid, __wait_status_ptr_t __status, int __options);
+pid_t wait3 (__wait_status_ptr_t __status, int __options, struct rusage *__rusage);
+pid_t wait4 (pid_t __pid, __wait_status_ptr_t __status, int __options, struct rusage *__rusage);
 
 union wait
   {
@@ -49,7 +64,34 @@ union wait
 #define	w_stopval	__wait_stopped.__w_stopval
 
 #ifdef __cplusplus
-};
+}
 #endif
 
-#endif
+/* Used in cygwin/wait.h, redefine to accept `int' and `union wait'.  */
+#undef __wait_status_to_int
+
+#ifdef __cplusplus
+
+inline int __wait_status_to_int (int __status)
+  { return __status; }
+inline int __wait_status_to_int (const union wait & __status)
+  { return __status.w_status; }
+
+/* C++ wait() variants for `union wait'.  */
+inline pid_t wait (union wait *__status)
+  { return wait ((int *) __status); }
+inline pid_t waitpid (pid_t __pid, union wait *__status, int __options)
+  { return waitpid(__pid, (int *) __status, __options); }
+inline pid_t wait3 (union wait *__status, int __options, struct rusage *__rusage)
+  { return wait3 ((int *) __status, __options, __rusage); }
+inline pid_t wait4 (pid_t __pid, union wait *__status, int __options, struct rusage *__rusage)
+  { return wait4 (__pid, (int *) __status, __options, __rusage); }
+
+#else /* !__cplusplus */
+
+#define __wait_status_to_int(__status)  (__extension__ \
+  (((union { __typeof(__status) __in; int __out; }) { .__in = (__status) }).__out))
+
+#endif /* __cplusplus */
+
+#endif /* _SYS_WAIT_H */

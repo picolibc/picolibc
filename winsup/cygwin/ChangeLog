@@ -1,3 +1,13 @@
+2011-10-06  Christian Franke  <franke@computer.org>
+
+	* include/cygwin/wait.h: Use new __wait_status_to_int()
+	macro to access status value in W*() status checks.
+	Fix status description.
+	* include/sys/wait.h: Allow `int' and `union wait' as
+	wait status parameter.  Change __wait_status_to_int()
+	macro and wait () prototypes accordingly.  Add inline
+	functions for C++.  Remove extra `;'.
+
 2011-10-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (create_winenv): Rename from sync_winenv.  Take
