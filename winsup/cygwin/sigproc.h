@@ -23,7 +23,8 @@ enum
   __SIGFLUSHFAST    = -(NSIG + 6),
   __SIGHOLD	    = -(NSIG + 7),
   __SIGNOHOLD	    = -(NSIG + 8),
-  __SIGEXIT	    = -(NSIG + 9)
+  __SIGEXIT	    = -(NSIG + 9),
+  __SIGSETPGRP	    = -(NSIG + 10)
 };
 #endif
 

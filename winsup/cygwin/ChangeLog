@@ -1,3 +1,12 @@
+2011-10-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Send __SIGSETPGRP
+	pseudo signal to process group instead of just calling
+	init_console_handler.
+	* sigproc.cc (wait_sig): Call init_console_handler here on __SIGSETPGRP
+	signal.
+	* sigproc.h (__SIGSETPGRP): Define.
+
 2011-10-06  Christian Franke  <franke@computer.org>
 
 	* include/cygwin/wait.h: Use new __wait_status_to_int()

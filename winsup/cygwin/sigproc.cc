@@ -1225,6 +1225,9 @@ wait_sig (VOID *)
 	  my_sendsig = NULL;
 	  sigproc_printf ("saw __SIGEXIT");
 	  break;	/* handle below */
+	case __SIGSETPGRP:
+	  init_console_handler (true);
+	  break;
 	default:
 	  if (pack.si.si_signo < 0)
 	    sig_clear (-pack.si.si_signo);
