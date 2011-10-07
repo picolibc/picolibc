@@ -1,3 +1,8 @@
+2011-10-07  Nick Clifton  <nickc@redhat.com>
+
+	* rx/crt0.S: Initialise the PID address register.
+	(__pid_base): Define weakly.
+
 2011-09-29  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
 
 	* arm/crt0.s: Support 0 heap base response from HeapInfo syscall.

@@ -1,4 +1,4 @@
-/* Copyright (c) 2008, 2009 Red Hat Incorporated.
+/* Copyright (c) 2008, 2009, 2011 Red Hat Incorporated.
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -50,11 +50,20 @@ _start:
 	mov	#__bsssize, r3
 	sstr.l
 
-	/* Initialise the small data area pointer.
-	   The register used here must agree with the definition of
-	   GP_BASE_REGNUM in gcc/config/rx/rx.h.  */
+	/* Initialize data pointer register(s).
+           Note: The registers used here should agree with the definition of
+	   GP_BASE_REGNUM in gcc/config/rx/rx.h.
+           Note: We are assuming that -mint-register has not been used when
+	   compiling the application.  */
+#ifdef _RX_PID
+	/* Initialise the constant data pointer and small data pointers.  */
+	mov	#__pid_base, r13
+	mov	#__gp, r12
+#else
+	/* Initialise the small data area pointer.  */
 	mov	#__gp, r13
-
+#endif
+	
 	bsr.a	__rx_init
 
 #ifdef PROFILE_SUPPORT	/* Defined in gcrt0.S.  */
@@ -128,6 +137,12 @@ __rx_init:
 	.global __rx_fini
 __rx_fini:
 	bsr.a	_rx_run_fini_array
+
+        .section .rodata
+        .balign 4
+        .global __pid_base
+	.weak   __pid_base
+__pid_base:   
 
         .section .sdata
         .balign 4
