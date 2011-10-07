@@ -1,4 +1,11 @@
 2011-10-07  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.h (fhandler_console::tc_getpgid): New function.
+	* spawn.cc (spawn_guts): Add logic to put pure-windows processes "in
+	the background" when they are started that way.
+
+2011-10-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/cygwin.h (cygwin_getinfo_types): Define values
 	additionally as preprocessor symbols.

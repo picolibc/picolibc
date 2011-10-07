@@ -1100,6 +1100,7 @@ private:
   tty_min *tc () const {return &(shared_console_info->tty_min_state);}
 
  public:
+  static pid_t tc_getpgid () {return shared_console_info->tty_min_state.getpgid ();}
   fhandler_console (fh_devices);
   static console_state *open_shared_console (HWND hw, HANDLE& h)
   {

@@ -558,7 +558,17 @@ spawn_guts (const char *prog_arg, const char *const *argv,
       && (!ch.iscygwin () || mode != _P_OVERLAY
 	  || cygheap->fdtab.need_fixup_before ()))
     c_flags |= CREATE_SUSPENDED;
-
+  /* If a native application should be spawned, we test here if the spawning
+     process is running in a console and, if so, if it's a foreground or
+     background process.  If it's a background process, we start the native
+     process with the CREATE_NEW_PROCESS_GROUP flag set.  This lets the native
+     process ignore Ctrl-C by default.  If we don't do that, pressing Ctrl-C
+     in a console will break native processes running in the background,
+     because the Ctrl-C event is sent to all processes in the console, unless
+     they ignore it explicitely.  CREATE_NEW_PROCESS_GROUP does that for us. */
+  if (!ch.iscygwin () && myself->ctty >= 0 && iscons_dev (myself->ctty)
+      && fhandler_console::tc_getpgid () != getpgrp ())
+    c_flags |= CREATE_NEW_PROCESS_GROUP;
   ch.refresh_cygheap ();
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
