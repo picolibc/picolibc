@@ -1531,6 +1531,7 @@ class fhandler_process: public fhandler_proc
   fhandler_process ();
   virtual_ftype_t exists();
   DIR *opendir (int fd) __attribute__ ((regparm (2)));
+  int closedir (DIR *);
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));

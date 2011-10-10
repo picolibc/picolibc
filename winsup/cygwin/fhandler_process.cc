@@ -210,6 +210,12 @@ fhandler_process::opendir (int fd)
 }
 
 int
+fhandler_process::closedir (DIR *dir)
+{
+  return fhandler_virtual::closedir (dir);
+}
+
+int
 fhandler_process::readdir (DIR *dir, dirent *de)
 {
   int res = ENMFILE;
