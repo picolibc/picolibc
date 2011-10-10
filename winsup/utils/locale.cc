@@ -32,6 +32,7 @@
 #include <langinfo.h>
 #include <limits.h>
 #include <sys/cygwin.h>
+#include <cygwin/version.h>
 #define WINVER 0x0601
 #include <windows.h>
 
@@ -40,44 +41,72 @@
 
 extern char *__progname;
 
-void usage (FILE *, int) __attribute__ ((noreturn));
+void
+usage ()
+{
+  printf (
+"Usage: %1$s [-amvhV]\n"
+"   or: %1$s [-ck] NAME\n"
+"   or: %1$s [-usfnU]\n"
+"Get locale-specific information.\n"
+"\n"
+"System information:\n"
+"\n"
+"  -a, --all-locales    List all available supported locales\n"
+"  -m, --charmaps       List all available character maps\n"
+"  -v, --verbose        More verbose output\n"
+"\n"
+"Modify output format:\n"
+"\n"
+"  -c, --category-name  List information about given category NAME\n"
+"  -k, --keyword-name   Print information about given keyword NAME\n"
+"\n"
+"Default locale information:\n"
+"\n"
+"  -u, --user           Print locale of user's default UI language\n"
+"  -s, --system         Print locale of system default UI language\n"
+"  -f, --format         Print locale of user's regional format settings\n"
+"                       (time, numeric & monetary)\n"
+"  -n, --no-unicode     Print system default locale for non-Unicode programs\n"
+"  -U, --utf            Attach \".UTF-8\" to the result\n"
+"\n"
+"Other options:\n"
+"\n"
+"  -h, --help           This text\n"
+"  -V, --version        Print program version and exit\n\n",
+  __progname);
+}
 
 void
-usage (FILE * stream, int status)
+print_version ()
 {
-  fprintf (stream,
-	   "Usage: %s [-amsuUvh]\n"
-	   "   or: %s [-ck] NAME\n"
-	   "Get locale-specific information.\n"
-	   "\n"
-	   "Options:\n"
-	   "\n"
-	   "  -a, --all-locales    List all available supported locales\n"
-	   "  -c, --category-name  List information about given category NAME\n"
-	   "  -k, --keyword-name   Print information about given keyword NAME\n"
-	   "  -m, --charmaps       List all available character maps\n"
-	   "  -s, --system         Print system default locale\n"
-	   "  -u, --user           Print user's default locale\n"
-	   "  -U, --utf            Attach \".UTF-8\" to the result\n"
-	   "  -v, --verbose        More verbose output\n"
-	   "  -h, --help           This text\n",
-	   __progname, __progname);
-  exit (status);
+  printf ("%s (cygwin) %d.%d.%d\n"
+	  "Get locale-specific information.\n"
+	  "Copyright 2011 Red Hat, Inc.\n"
+	  "Compiled on %s\n",
+	  __progname,
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  __DATE__);
 }
 
 struct option longopts[] = {
   {"all-locales", no_argument, NULL, 'a'},
   {"category-name", no_argument, NULL, 'c'},
+  {"format", no_argument, NULL, 'f'},
+  {"help", no_argument, NULL, 'h'},
   {"keyword-name", no_argument, NULL, 'k'},
   {"charmaps", no_argument, NULL, 'm'},
+  {"no-unicode", no_argument, NULL, 'n'},
   {"system", no_argument, NULL, 's'},
   {"user", no_argument, NULL, 'u'},
   {"utf", no_argument, NULL, 'U'},
   {"verbose", no_argument, NULL, 'v'},
-  {"help", no_argument, NULL, 'h'},
+  {"version", no_argument, NULL, 'V'},
   {0, no_argument, NULL, 0}
 };
-const char *opts = "achkmsuUv";
+const char *opts = "acfhkmnsuUvV";
 
 int
 getlocale (LCID lcid, char *name)
@@ -772,10 +801,16 @@ main (int argc, char **argv)
 	maps = 1;
 	break;
       case 's':
-      	lcid = LOCALE_SYSTEM_DEFAULT;
+      	lcid = GetSystemDefaultUILanguage ();
 	break;
       case 'u':
-      	lcid = LOCALE_USER_DEFAULT;
+      	lcid = GetUserDefaultUILanguage ();
+	break;
+      case 'f':
+      	lcid = GetUserDefaultLCID ();
+	break;
+      case 'n':
+      	lcid = GetSystemDefaultLCID ();
 	break;
       case 'U':
       	utf = ".UTF-8";
@@ -784,11 +819,16 @@ main (int argc, char **argv)
 	verbose = 1;
 	break;
       case 'h':
-	usage (stdout, 0);
-	break;
+	usage ();
+	return 0;
+      case 'V':
+	print_version ();
+	return 0;
       default:
-	usage (stderr, 1);
-	break;
+	fprintf (stderr,
+		 "Try `%1$s --help' or `%1$s -h' for more information.\n",
+		 __progname);
+	return 1;
       }
   if (all)
     print_all_locales (verbose);

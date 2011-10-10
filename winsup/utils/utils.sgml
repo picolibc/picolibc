@@ -606,37 +606,64 @@ SIGUSR2     31    user defined signal 2
 <sect2 id="locale"><title>locale</title>
 
 <screen>
-Usage: locale [-amsuUvh]
+Usage: locale [-amvhV]
    or: locale [-ck] NAME
+   or: locale [-usfnU]
 Get locale-specific information.
 
-Options:
+System information:
 
   -a, --all-locales    List all available supported locales
+  -m, --charmaps       List all available character maps
+  -v, --verbose        More verbose output
+
+Modify output format:
+
   -c, --category-name  List information about given category NAME
   -k, --keyword-name   Print information about given keyword NAME
-  -m, --charmaps       List all available character maps
-  -s, --system         Print system default locale
-  -u, --user           Print user's default locale
-  -U, --utf            Attach ".UTF-8" to the result
-  -v, --verbose        More verbose output
+
+Default locale information:
+
+  -u, --user           Print locale of user's default UI language
+  -s, --system         Print locale of system default UI language
+  -f, --format         Print locale of user's regional format settings
+                       (time, numeric &amp; monetary)
+  -n, --no-unicode     Print system default locale for non-Unicode programs
+  -U, --utf            Attach \".UTF-8\" to the result
+
+Other options:
+
   -h, --help           This text
+  -V, --version        Print program version and exit
 </screen>
 
 <para><command>locale</command> without parameters prints information about
 the current locale environment settings.</para>
 
+<para>The <literal>-u</literal>, <literal>-s</literal>, <literal>-f</literal>,
+and <literal>-n</literal> options can be used to request the various Windows
+locale settings.  The purpose is to use this command in scripts to set the
+POSIX locale variables.</para>
+
 <para>The <literal>-u</literal> option prints the current user's Windows
-default locale to stdout.  The <literal>-s</literal> option prints the
-systems default locale instead.  With the <literal>-U</literal> option
-<command>locale</command> appends a ".UTF-8".  This can be used in scripts
-to set the Cygwin locale to the Windows user or system default, for instance:
-</para>
+UI locale to stdout.  In Windows Vista and Windows 7 this setting is called
+the "Display Language"; there was no corresponding user setting in Windows XP.
+The <literal>-s</literal> option prints the systems default instead.
+The <literal>-f</literal> option prints the user's setting for time, date,
+number and currency.  That's equivalent to the setting in the "Formats" or
+"Regional Options" tab in the "Region and Language" or "Regional and Language
+Options" dialog.  With the <literal>-U</literal> option
+<command>locale</command> appends a ".UTF-8".</para>
+
+<para>Usage example:</para>
 
 <screen>
 bash$ export LANG=$(locale -uU)
 bash$ echo $LANG
 en_US.UTF-8
+bash$ export LC_TIME=$(locale -fU)
+bash$ echo $LC_TIME
+de_DE.UTF-8
 </screen>
 
 <para>The <literal>-a</literal> option is helpful to learn which locales

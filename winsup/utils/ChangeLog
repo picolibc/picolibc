@@ -1,3 +1,19 @@
+2011-10-10  Andy Koppe <andy.koppe@gmail.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* locale.cc (usage): Restructure, rephrase, add new options.  Drop
+	arguments, don't exit.
+	(print_version): New function.
+	(longopts): Add -f, -n, and -V options.  Reorder.
+	(opts): Add -f, -n, and -V options.
+	(main): Call GetSystemDefaultUILanguage for -s option.  Call
+	GetUserDefaultUILanguage for -u option.  Add -f and -n options and
+	call GetUserDefaultLCID and GetSystemDefaultLCID respectively.  Return
+	0 after calling usage in -h case.  Add -V option and call print_version.
+	Don't print full usage in default case, rather just a short help message
+	similar to GNU tools.
+	* utils.sgml (locale): Align to above changes.  Rephrase description.
+
 2011-10-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (check_keys): Use UNICODE Win32 functions.
