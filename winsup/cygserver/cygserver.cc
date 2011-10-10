@@ -1,6 +1,6 @@
 /* cygserver.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2007 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2011 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -449,16 +449,22 @@ static void
 print_usage (const char *const pgm)
 {
   log (LOG_NOTICE, "Usage: %s [OPTIONS]\n"
+"\n"
+"Cygwin background service daemon\n"
+"\n"
 "Configuration option:\n"
+"\n"
 "  -f, --config-file <file>      Use <file> as config file.  Default is\n"
 "                                " DEF_CONFIG_FILE "\n"
 "\n"
 "Performance options:\n"
+"\n"
 "  -c, --cleanup-threads <num>   Number of cleanup threads to use.\n"
 "  -p, --process-cache <num>     Size of process cache.\n"
 "  -r, --request-threads <num>   Number of request threads to use.\n"
 "\n"
 "Logging options:\n"
+"\n"
 "  -d, --debug                   Log debug messages to stderr.\n"
 "  -e, --stderr                  Log to stderr (default if stderr is a tty).\n"
 "  -E, --no-stderr               Don't log to stderr (see -y, -Y options).\n"
@@ -467,14 +473,16 @@ print_usage (const char *const pgm)
 "  -Y, --no-syslog               Don't log to syslog (See -e, -E options).\n"
 "\n"
 "Support options:\n"
+"\n"
 "  -m, --no-sharedmem            Don't start XSI Shared Memory support.\n"
 "  -q, --no-msgqueues            Don't start XSI Message Queue support.\n"
 "  -s, --no-semaphores           Don't start XSI Semaphore support.\n"
 "\n"
 "Miscellaneous:\n"
+"\n"
 "  -S, --shutdown                Shutdown the daemon.\n"
 "  -h, --help                    Output usage information and exit.\n"
-"  -v, --version                 Output version information and exit."
+"  -V, --version                 Output version information and exit.\n"
 , pgm);
 }
 
@@ -485,27 +493,16 @@ print_usage (const char *const pgm)
 static void
 print_version ()
 {
-  char buf[200];
-  snprintf (buf, sizeof (buf), "%d.%d.%d(%d.%d/%d/%d)-(%d.%d.%d.%d) %s",
-	    cygwin_version.dll_major / 1000,
-	    cygwin_version.dll_major % 1000,
-	    cygwin_version.dll_minor,
-	    cygwin_version.api_major,
-	    cygwin_version.api_minor,
-	    cygwin_version.shared_data,
-	    CYGWIN_SERVER_VERSION_MAJOR,
-	    CYGWIN_SERVER_VERSION_API,
-	    CYGWIN_SERVER_VERSION_MINOR,
-	    CYGWIN_SERVER_VERSION_PATCH,
-	    cygwin_version.mount_registry,
-	    cygwin_version.dll_build_date);
-
-  log (LOG_INFO, "(cygwin) %s\n"
-		  "API version %s\n"
-		  "Copyright 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.\n"
-		  "Compiled on %s\n"
-		  "Default configuration file is %s",
-		  SERVER_VERSION, buf, __DATE__, DEF_CONFIG_FILE);
+  log (LOG_INFO,
+       "cygserver (cygwin) %d.%d.%d\n"
+       "Cygwin background service daemon\n"
+       "Copyright (C) 2001 - %s Red Hat, Inc.\n"
+       "This is free software; see the source for copying conditions.  There is NO\n"
+       "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+       CYGWIN_VERSION_DLL_MAJOR / 1000,
+       CYGWIN_VERSION_DLL_MAJOR % 1000,
+       CYGWIN_VERSION_DLL_MINOR,
+       strrchr (__DATE__, ' ') + 1);
 }
 
 /*
@@ -529,13 +526,13 @@ main (const int argc, char *argv[])
     {"request-threads", required_argument, NULL, 'r'},
     {"no-semaphores", no_argument, NULL, 's'},
     {"shutdown", no_argument, NULL, 'S'},
-    {"version", no_argument, NULL, 'v'},
+    {"version", no_argument, NULL, 'V'},
     {"syslog", no_argument, NULL, 'y'},
     {"no-syslog", no_argument, NULL, 'Y'},
     {0, no_argument, NULL, 0}
   };
 
-  const char opts[] = "c:deEf:hl:mp:qr:sSvyY";
+  const char opts[] = "c:deEf:hl:mp:qr:sSVyY";
 
   long cleanup_threads = 0;
   long request_threads = 0;
@@ -630,7 +627,7 @@ main (const int argc, char *argv[])
 	shutdown = true;
 	break;
 
-      case 'v':
+      case 'V':
 	print_version ();
 	return 0;
 

@@ -1,3 +1,9 @@
+2011-10-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.cc (print_usage): Align output to utilities in utils
+	directory.
+	(print_version): Ditto.
+
 2011-08-18  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* sysv_shm.cc (ACCESSPERMS): Remove to fix redefined warning, as
