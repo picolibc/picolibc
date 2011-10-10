@@ -103,6 +103,7 @@ tty_list::connect (int ttynum)
   if (!ttys[ttynum].exists ())
     {
       termios_printf ("tty %d was not allocated", ttynum);
+      set_errno (ENXIO);
       return -1;
     }
 

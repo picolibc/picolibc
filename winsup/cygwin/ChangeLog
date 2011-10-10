@@ -1,3 +1,9 @@
+2011-10-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* syscalls.cc (open): Add temporary kludge to avoid assigning the
+	controlling tty on open unless the open is for stdin/stdout/stderr.
+	* tty.cc (tty_list::connect): Set ENXIO when can't find a tty.
+
 2011-10-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_process::closedir): Declare.

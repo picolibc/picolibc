@@ -1130,6 +1130,12 @@ open (const char *unix_path, int flags, ...)
 
       if (fd >= 0)
 	{
+	  /* This is a temporary kludge until all utilities can catch up with
+	     a change in behavior that implements linux functionality:  opening
+	     a tty should not automatically cause it to become the controlling
+	     tty for the process.  */
+	  if (fd > 2)
+	    flags |= O_NOCTTY;
 	  if (!(fh = build_fh_name (unix_path,
 				    (flags & (O_NOFOLLOW | O_EXCL))
 				    ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
