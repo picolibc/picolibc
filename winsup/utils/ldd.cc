@@ -46,8 +46,6 @@
 #define STATUS_DLL_NOT_FOUND (0xC0000135L)
 #endif
 
-#define VERSION "1.0"
-
 struct option longopts[] =
 {
   {"help", no_argument, NULL, 'h'},
