@@ -1,3 +1,8 @@
+2011-10-10  Nick Clifton  <nickc@redhat.com>
+
+	* libc/sys/arm/crt0.S: Synchronise with libgloss version.
+	* libc/sys/arm/arm.h: Imported from libgloss.
+
 2011-10-04  Greta Yorsh  <Greta.Yorsh@arm.com>
 
 	* testsuite/newlib.string/memcpy-1.c: New test.
