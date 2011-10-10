@@ -166,7 +166,7 @@
   </para>
 </listitem>
 <listitem>
-  <screen>-v, --version</screen>
+  <screen>-V, --version</screen>
   <para>  
     Output version information and exit.
   </para>
