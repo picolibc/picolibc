@@ -1,3 +1,7 @@
+2011-10-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* ldd.cc: Update copyright.
+
 2011-10-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Align usage output, version output, as well as usage and version
