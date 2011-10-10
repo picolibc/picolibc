@@ -1958,7 +1958,7 @@ dump_sysinfo ()
 static int
 check_keys ()
 {
-  HANDLE h = CreateFileA ("CONIN$", GENERIC_READ | GENERIC_WRITE,
+  HANDLE h = CreateFileW (L"CONIN$", GENERIC_READ | GENERIC_WRITE,
 			  FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
 			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -1984,14 +1984,14 @@ check_keys ()
   INPUT_RECORD in, prev_in;
 
   // Drop first <RETURN> key
-  ReadConsoleInput (h, &in, 1, &mode);
+  ReadConsoleInputW (h, &in, 1, &mode);
 
   memset (&in, 0, sizeof in);
 
   do
     {
       prev_in = in;
-      if (!ReadConsoleInput (h, &in, 1, &mode))
+      if (!ReadConsoleInputW (h, &in, 1, &mode))
 	display_error ("check_keys: ReadConsoleInput()");
 
       if (!memcmp (&in, &prev_in, sizeof in))
@@ -2000,12 +2000,12 @@ check_keys ()
       switch (in.EventType)
 	{
 	case KEY_EVENT:
-	  printf ("%s %ux VK: 0x%02x VS: 0x%02x A: 0x%02x CTRL: ",
+	  printf ("%s %ux VK: 0x%04x VS: 0x%04x C: 0x%04x CTRL: ",
 		  in.Event.KeyEvent.bKeyDown ? "Pressed " : "Released",
 		  in.Event.KeyEvent.wRepeatCount,
 		  in.Event.KeyEvent.wVirtualKeyCode,
 		  in.Event.KeyEvent.wVirtualScanCode,
-		  (unsigned char) in.Event.KeyEvent.uChar.AsciiChar);
+		  (unsigned char) in.Event.KeyEvent.uChar.UnicodeChar);
 	  fputs (in.Event.KeyEvent.dwControlKeyState & CAPSLOCK_ON ?
 		 "CL " : "-- ", stdout);
 	  fputs (in.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY ?
@@ -2033,7 +2033,7 @@ check_keys ()
     }
   while (in.EventType != KEY_EVENT ||
 	 in.Event.KeyEvent.bKeyDown != FALSE ||
-	 in.Event.KeyEvent.uChar.AsciiChar != 'q');
+	 in.Event.KeyEvent.uChar.UnicodeChar != L'q');
 
   CloseHandle (h);
   return 0;

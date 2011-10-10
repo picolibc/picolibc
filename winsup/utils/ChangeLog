@@ -1,3 +1,7 @@
+2011-10-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (check_keys): Use UNICODE Win32 functions.
+
 2011-09-12  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* strace.cc (attach_process): Try to turn off DEBUG_ONLY_THIS_PROCESS
