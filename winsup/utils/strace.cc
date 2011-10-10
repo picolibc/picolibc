@@ -1,7 +1,7 @@
 /* strace.cc
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010 Red Hat Inc.
+   2009, 2010, 2011 Red Hat Inc.
 
    Written by Chris Faylor <cgf@redhat.com>
 
@@ -24,6 +24,7 @@ details. */
 #include <errno.h>
 #include "cygwin/include/sys/strace.h"
 #include "cygwin/include/sys/cygwin.h"
+#include "cygwin/include/cygwin/version.h"
 #include "path.h"
 #undef cygwin_internal
 #include "loadlib.h"
@@ -31,9 +32,6 @@ details. */
 
 /* we *know* we're being built with GCC */
 #define alloca __builtin_alloca
-
-// Version string.
-static const char version[] = "$Revision$";
 
 static const char *pgm;
 static int forkdebug = 1;
@@ -678,7 +676,8 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	  remove_child (ev.dwProcessId);
 	  break;
 	case EXCEPTION_DEBUG_EVENT:
-	  if (ev.u.Exception.ExceptionRecord.ExceptionCode != STATUS_BREAKPOINT)
+	  if (ev.u.Exception.ExceptionRecord.ExceptionCode
+	      != (DWORD) STATUS_BREAKPOINT)
 	    {
 	      status = DBG_EXCEPTION_NOT_HANDLED;
 	      if (ev.u.Exception.dwFirstChance)
@@ -850,6 +849,7 @@ usage (FILE *where = stderr)
   fprintf (where, "\
 Usage: %s [OPTIONS] <command-line>\n\
 Usage: %s [OPTIONS] -p <pid>\n\
+\n\
 Trace system calls and signals\n\
 \n\
   -b, --buffer-size=SIZE       set size of output file buffer\n\
@@ -868,7 +868,7 @@ Trace system calls and signals\n\
   -T, --toggle                 toggle tracing in a process already being\n\
                                traced. Requires -p <pid>\n\
   -u, --usecs                  toggle printing of microseconds timestamp\n\
-  -v, --version                output version information and exit\n\
+  -V, --version                output version information and exit\n\
   -w, --new-window             spawn program under test in a new window\n\
 \n", pgm, pgm);
   if ( where == stdout)
@@ -903,7 +903,7 @@ Trace system calls and signals\n\
                                          non-checked-in code\n\
 ");
   if (where == stderr)
-    fprintf (stderr, "Try '%s --help' for more information.\n", pgm);
+    fprintf (stderr, "Try `%s --help' for more information.\n", pgm);
   exit (where == stderr ? 1 : 0 );
 }
 
@@ -923,33 +923,24 @@ struct option longopts[] = {
   {"trace-children", no_argument, NULL, 'f'},
   {"translate-error-numbers", no_argument, NULL, 'n'},
   {"usecs", no_argument, NULL, 'u'},
-  {"version", no_argument, NULL, 'v'},
+  {"version", no_argument, NULL, 'V'},
   {NULL, 0, NULL, 0}
 };
 
-static const char *const opts = "+b:dhHfm:no:p:qS:tTuvw";
+static const char *const opts = "+b:dhHfm:no:p:qS:tTuVw";
 
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-%s (cygwin) %.*s\n\
-System Trace\n\
-Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.\n\
-Compiled on %s\n\
-", pgm, len, v, __DATE__);
+  printf ("strace (cygwin) %d.%d.%d\n"
+          "System Trace\n"
+          "Copyright (C) 2000 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 int
@@ -1040,15 +1031,15 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 	show_usecs ^= 1;
 	delta ^= 1;
 	break;
-      case 'v':
+      case 'V':
 	// Print version info and exit
 	print_version ();
 	return 0;
       case 'w':
 	new_window ^= 1;
 	break;
-      case '?':
-	fprintf (stderr, "Try '%s --help' for more information.\n", pgm);
+      default:
+	fprintf (stderr, "Try `%s --help' for more information.\n", pgm);
 	exit (1);
       }
 

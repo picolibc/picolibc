@@ -1,7 +1,7 @@
 /* regtool.cc
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010 Red Hat Inc.
+   2009, 2010, 2011 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -19,6 +19,7 @@ details. */
 #define WINVER 0x0502
 #include <windows.h>
 #include <sys/cygwin.h>
+#include <cygwin/version.h>
 #include "loadlib.h"
 
 #define DEFAULT_KEY_SEPARATOR '\\'
@@ -33,7 +34,6 @@ char key_sep = DEFAULT_KEY_SEPARATOR;
 #define LIST_VALS	0x02
 #define LIST_ALL	(LIST_KEYS | LIST_VALS)
 
-static const char version[] = "$Revision$";
 static char *prog_name;
 
 static struct option longopts[] =
@@ -95,12 +95,14 @@ usage (FILE *where = stderr)
 {
   fprintf (where, ""
   "Usage: %s [OPTION] ACTION KEY [data...]\n"
+  "\n"
   "View or edit the Win32 registry\n"
   "\n", prog_name);
   if (where == stdout)
     {
       fprintf (where, ""
       "Actions:\n"
+      "\n"
       " add KEY\\SUBKEY             add new SUBKEY\n"
       " check KEY                  exit 0 if KEY exists, 1 if not\n"
       " get KEY\\VALUE              prints VALUE to stdout\n"
@@ -114,16 +116,19 @@ usage (FILE *where = stderr)
       "\n");
       fprintf (where, ""
       "Options for 'list' Action:\n"
+      "\n"
       " -k, --keys           print only KEYs\n"
       " -l, --list           print only VALUEs\n"
       " -p, --postfix        like ls -p, appends '\\' postfix to KEY names\n"
       "\n"
       "Options for 'get' Action:\n"
+      "\n"
       " -b, --binary         print data as printable hex bytes\n"
       " -n, --none           print data as stream of bytes as stored in registry\n"
       " -x, --hex            print numerical data as hex numbers\n"
       "\n"
       "Options for 'set' Action:\n"
+      "\n"
       " -b, --binary         set type to REG_BINARY (hex args or '-')\n"
       " -d, --dword          set type to REG_DWORD\n"
       " -D, --dword-be       set type to REG_DWORD_BIG_ENDIAN\n"
@@ -135,9 +140,11 @@ usage (FILE *where = stderr)
       " -s, --string         set type to REG_SZ\n"
       "\n"
       "Options for 'set' and 'unset' Actions:\n"
+      "\n"
       " -K<c>, --key-separator[=]<c>  set key-value separator to <c> instead of '\\'\n"
       "\n"
       "Other Options:\n"
+      "\n"
       " -h, --help     output usage information and exit\n"
       " -q, --quiet    no error output, just nonzero return if KEY/VALUE missing\n"
       " -v, --verbose  verbose output, including VALUE contents when applicable\n"
@@ -158,37 +165,28 @@ usage (FILE *where = stderr)
       "as separator and the backslash can be used as escape character.\n");
       fprintf (where, ""
       "Example:\n"
-      "%s list '/machine/SOFTWARE/Classes/MIME/Database/Content Type/audio\\/wav'\n", prog_name);
+      "%s list '/machine/SOFTWARE/Classes/MIME/Database/Content Type/audio\\/wav'\n\n", prog_name);
     }
   if (where == stderr)
     fprintf (where,
     "ACTION is one of add, check, get, list, remove, set, unset, load, unload, save\n"
     "\n"
-    "Try '%s --help' for more information.\n", prog_name);
+    "Try `%s --help' for more information.\n", prog_name);
   exit (where == stderr ? 1 : 0);
 }
 
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-%s (cygwin) %.*s\n\
-Registry Tool\n\
-Copyright 2000-2009 Red Hat, Inc.\n\
-Compiled on %s\n\
-", prog_name, len, v, __DATE__);
+  printf ("regtool (cygwin) %d.%d.%d\n"
+          "Registry tool\n"
+          "Copyright (C) 2000 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 void
@@ -907,13 +905,8 @@ main (int argc, char **_argv)
   int g;
 
   setlocale (LC_ALL, "");
-  prog_name = strrchr (_argv[0], '/');
-  if (prog_name == NULL)
-    prog_name = strrchr (_argv[0], '\\');
-  if (prog_name == NULL)
-    prog_name = _argv[0];
-  else
-    prog_name++;
+
+  prog_name = program_invocation_short_name;
 
   while ((g = getopt_long (argc, _argv, opts, longopts, NULL)) != EOF)
     switch (g)
@@ -978,7 +971,9 @@ main (int argc, char **_argv)
 	  key_sep = *optarg;
 	  break;
 	default :
-	  usage ();
+	  fprintf (stderr, "Try `%s --help' for more information.\n",
+		   prog_name);
+	  return 1;
 	}
 
   if ((_argv[optind] == NULL) || (_argv[optind+1] == NULL))

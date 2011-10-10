@@ -1,6 +1,6 @@
 /* umount.cc
 
-   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2008 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2008, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -15,33 +15,34 @@ details. */
 #include <stdlib.h>
 #include <errno.h>
 #include <getopt.h>
+#include <cygwin/version.h>
 
 static void remove_all_user_mounts ();
 
-static const char version[] = "$Revision$";
 static const char *progname;
 
 struct option longopts[] =
 {
   {"help", no_argument, NULL, 'h' },
   {"remove-user-mounts", no_argument, NULL, 'U'},
-  {"version", no_argument, NULL, 'v'},
+  {"version", no_argument, NULL, 'V'},
   {NULL, 0, NULL, 0}
 };
 
-char opts[] = "hUv";
+char opts[] = "hUV";
 
 static void
 usage (FILE *where = stderr)
 {
   fprintf (where, "\
 Usage: %s [OPTION] [<posixpath>]\n\
+\n\
 Unmount filesystems\n\
 \n\
   -h, --help                    output usage information and exit\n\
   -U, --remove-user-mounts      remove all user mounts\n\
-  -v, --version                 output version information and exit\n\
-", progname);
+  -V, --version                 output version information and exit\n\
+\n", progname);
   exit (where == stderr ? 1 : 0);
 }
 
@@ -55,24 +56,15 @@ error (const char *path)
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-%s (cygwin) %.*s\n\
-Filesystem Utility\n\
-Copyright 1996, 1998, 1999, 2000, 2001, 2002\n\
-Compiled on %s\n\
-", progname, len, v, __DATE__);
+  printf ("umount (cygwin) %d.%d.%d\n"
+          "Unmount filesystem utility\n"
+          "Copyright (C) 1996 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 int
@@ -87,13 +79,7 @@ main (int argc, char **argv)
     saw_remove_all_user_mounts
   } do_what = nada;
 
-  progname = strrchr (argv[0], '/');
-  if (progname == NULL)
-    progname = strrchr (argv[0], '\\');
-  if (progname == NULL)
-    progname = argv[0];
-  else
-    progname++;
+  progname = program_invocation_short_name;
 
   if (argc == 1)
     usage ();
@@ -108,11 +94,12 @@ main (int argc, char **argv)
 	  usage ();
 	do_what = saw_remove_all_user_mounts;
 	break;
-      case 'v':
+      case 'V':
 	print_version ();
 	exit (0);
       default:
-	usage ();
+	fprintf (stderr, "Try `%s --help' for more information.\n", progname);
+	exit (1);
       }
 
   switch (do_what)

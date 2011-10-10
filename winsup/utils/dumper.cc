@@ -1,6 +1,6 @@
 /* dumper.cc
 
-   Copyright 1999, 2001, 2002, 2004, 2006, 2007 Red Hat Inc.
+   Copyright 1999, 2001, 2002, 2004, 2006, 2007, 2011 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -26,8 +26,10 @@
 #include <elf/external.h>
 #include <sys/procfs.h>
 #include <sys/cygwin.h>
+#include <cygwin/version.h>
 #include <getopt.h>
 #include <stdarg.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -46,8 +48,6 @@ typedef struct _note_header
 __attribute__ ((packed))
 #endif
   note_header;
-
-static const char version[] = "$Revision$";
 
 BOOL verbose = FALSE;
 
@@ -842,14 +842,15 @@ static void
 usage (FILE *stream, int status)
 {
   fprintf (stream, "\
-Usage: dumper [OPTION] FILENAME WIN32PID\n\
+Usage: %s [OPTION] FILENAME WIN32PID\n\
+\n\
 Dump core from WIN32PID to FILENAME.core\n\
 \n\
  -d, --verbose  be verbose while dumping\n\
  -h, --help     output help information and exit\n\
  -q, --quiet    be quiet while dumping (default)\n\
- -v, --version  output version information and exit\n\
-");
+ -V, --version  output version information and exit\n\
+\n", program_invocation_short_name);
   exit (status);
 }
 
@@ -857,29 +858,23 @@ struct option longopts[] = {
   {"verbose", no_argument, NULL, 'd'},
   {"help", no_argument, NULL, 'h'},
   {"quiet", no_argument, NULL, 'q'},
-  {"version", no_argument, 0, 'v'},
+  {"version", no_argument, 0, 'V'},
   {0, no_argument, NULL, 0}
 };
+const char *opts = "dhqV";
 
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-dumper (cygwin) %.*s\n\
-Core Dumper for Cygwin\n\
-Copyright 1999, 2001, 2002 Red Hat, Inc.\n", len, v);
+  printf ("dumper (cygwin) %d.%d.%d\n"
+          "Core Dumper for Cygwin\n"
+          "Copyright (C) 1999 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 int
@@ -889,7 +884,7 @@ main (int argc, char **argv)
   const char *p = "";
   DWORD pid;
 
-  while ((opt = getopt_long (argc, argv, "dqhv", longopts, NULL) ) != EOF)
+  while ((opt = getopt_long (argc, argv, opts, longopts, NULL) ) != EOF)
     switch (opt)
       {
       case 'd':
@@ -900,12 +895,13 @@ main (int argc, char **argv)
 	break;
       case 'h':
 	usage (stdout, 0);
-      case 'v':
-       print_version ();
-       exit (0);
+      case 'V':
+	print_version ();
+	exit (0);
       default:
-	usage (stderr, 1);
-	break;
+	fprintf (stderr, "Try `%s --help' for more information.\n",
+		 program_invocation_short_name);
+	exit (1);
       }
 
   if (argv && *(argv + optind) && *(argv + optind +1))

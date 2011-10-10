@@ -10,6 +10,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include <errno.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -20,6 +21,7 @@ details. */
 #include <grp.h>
 #include <sys/types.h>
 #include <sys/acl.h>
+#include <cygwin/version.h>
 
 #ifndef BOOL
 #define BOOL int
@@ -37,7 +39,6 @@ details. */
 #define ILLEGAL_MODE ((mode_t)0xffffffff)
 #endif
 
-static const char version[] = "$Revision$";
 static char *prog_name;
 
 typedef enum {
@@ -291,6 +292,7 @@ usage (FILE * stream)
   fprintf (stream, ""
             "Usage: %s [-r] (-f ACL_FILE | -s acl_entries) FILE...\n"
             "       %s [-r] ([-d acl_entries] [-m acl_entries]) FILE...\n"
+            "\n"
             "Modify file and directory access control lists (ACLs)\n"
             "\n"
             "  -d, --delete     delete one or more specified ACL entries\n"
@@ -302,11 +304,10 @@ usage (FILE * stream)
             "  -s, --substitute substitute specified ACL entries for the\n"
             "                   ACL of FILE\n"
             "  -h, --help       output usage information and exit\n"
-            "  -v, --version    output version information and exit\n"
+            "  -V, --version    output version information and exit\n"
             "\n"
             "At least one of (-d, -f, -m, -s) must be specified\n"
-            "\n"
-            "", prog_name, prog_name);
+            "\n", prog_name, prog_name);
   if (stream == stdout) 
   {
     printf(""
@@ -387,7 +388,7 @@ usage (FILE * stream)
             "permissions according to the combination of the current umask,\n"
             "the explicit permissions requested and the default ACL entries\n"
             "Note: Under Cygwin, the default ACL entries are not taken into\n"
-            "account currently.\n", prog_name);
+            "account currently.\n\n", prog_name);
   }
   else
     fprintf(stream, "Try '%s --help' for more information.\n", prog_name);
@@ -400,31 +401,23 @@ struct option longopts[] = {
   {"replace", no_argument, NULL, 'r'},
   {"substitute", required_argument, NULL, 's'},
   {"help", no_argument, NULL, 'h'},
-  {"version", no_argument, NULL, 'v'},
+  {"version", no_argument, NULL, 'V'},
   {0, no_argument, NULL, 0}
 };
+const char *opts = "d:f:hm:rs:V";
 
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-setfacl (cygwin) %.*s\n\
-ACL Modification Utility\n\
-Copyright 2000, 2001, 2002 Red Hat, Inc.\n\
-Compiled on %s\n\
-", len, v, __DATE__);
+  printf ("setfacl (cygwin) %d.%d.%d\n"
+          "POSIX ACL modification utility\n"
+          "Copyright (C) 2000 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 int
@@ -437,16 +430,10 @@ main (int argc, char **argv)
   int aclidx = 0;
   int ret = 0;
 
-  prog_name = strrchr (argv[0], '/');
-  if (prog_name == NULL)
-    prog_name = strrchr (argv[0], '\\');
-  if (prog_name == NULL)
-    prog_name = argv[0];
-  else
-    prog_name++;
+  prog_name = program_invocation_short_name;
 
   memset (acls, 0, sizeof acls);
-  while ((c = getopt_long (argc, argv, "d:f:hm:rs:v", longopts, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (c)
       {
       case 'd':
@@ -521,11 +508,11 @@ main (int argc, char **argv)
             return 2;
           }
         break;
-      case 'v':
+      case 'V':
         print_version ();
         return 0;
       default:
-        usage (stderr);
+        fprintf (stderr, "Try `%s --help' for more information.\n", prog_name);
         return 1;
       }
   if (action == NoAction)

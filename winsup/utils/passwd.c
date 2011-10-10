@@ -24,6 +24,7 @@ details. */
 #include <getopt.h>
 #include <pwd.h>
 #include <sys/cygwin.h>
+#include <cygwin/version.h>
 #include <sys/types.h>
 #include <time.h>
 #include <errno.h>
@@ -32,7 +33,6 @@ details. */
 
 #define USER_PRIV_ADMIN		 2
 
-static const char version[] = "$Revision$";
 static char *prog_name;
 
 static struct option longopts[] =
@@ -49,7 +49,7 @@ static struct option longopts[] =
   {"pwd-not-required", no_argument, NULL, 'p'},
   {"pwd-required", no_argument, NULL, 'P'},
   {"unlock", no_argument, NULL, 'u'},
-  {"version", no_argument, NULL, 'v'},
+  {"version", no_argument, NULL, 'V'},
   {"maxage", required_argument, NULL, 'x'},
   {"length", required_argument, NULL, 'L'},
   {"status", no_argument, NULL, 'S'},
@@ -57,7 +57,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "cCd:eEhi:ln:pPuvx:L:SR";
+static char opts[] = "cCd:eEhi:ln:pPuVx:L:SR";
 
 int
 eprint (int with_name, const char *fmt, ...)
@@ -255,6 +255,7 @@ usage (FILE * stream, int status)
 {
   fprintf (stream, ""
   "Usage: %s [OPTION] [USER]\n"
+  "\n"
   "Change USER's password or password attributes.\n"
   "\n"
   "User operations:\n"
@@ -286,7 +287,7 @@ usage (FILE * stream, int status)
   "  -S, --status             display password status for USER (locked, expired,\n"
   "                           etc.) plus global system password settings.\n"
   "  -h, --help               output usage information and exit.\n"
-  "  -v, --version            output version information and exit.\n"
+  "  -V, --version            output version information and exit.\n"
   "\n"
   "If no option is given, change USER's password.  If no user name is given,\n"
   "operate on current user.  System operations must not be mixed with user\n"
@@ -299,9 +300,7 @@ usage (FILE * stream, int status)
   "secure.  Use this feature only if the machine is adequately locked down.\n"
   "Don't use this feature if you don't need network access within a remote\n"
   "session.  You can delete your stored password by using `passwd -R' and\n"
-  "specifying an empty password.\n"
-  "\n"
-  "Report bugs to <cygwin@cygwin.com>\n", prog_name);
+  "specifying an empty password.\n\n", prog_name);
   exit (status);
 }
 
@@ -351,30 +350,21 @@ caller_is_admin ()
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-%s (cygwin) %.*s\n\
-Password Utility\n\
-Copyright 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.\n\
-Compiled on %s\n\
-", prog_name, len, v, __DATE__);
+  printf ("passwd (cygwin) %d.%d.%d\n"
+          "Password Utility\n"
+          "Copyright (C) 1999 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 int
 main (int argc, char **argv)
 {
-  char *c, *logonserver;
+  char *logonserver;
   char user[UNLEN + 1], oldpwd[_PASSWORD_LEN + 1], newpwd[_PASSWORD_LEN + 1];
   int ret = 0;
   int cnt = 0;
@@ -397,16 +387,7 @@ main (int argc, char **argv)
   int myself = 0;
   LPWSTR server = NULL;
 
-  prog_name = strrchr (argv[0], '/');
-  if (prog_name == NULL)
-    prog_name = strrchr (argv[0], '\\');
-  if (prog_name == NULL)
-    prog_name = argv[0];
-  else
-    prog_name++;
-  c = strrchr (prog_name, '.');
-  if (c)
-    *c = '\0';
+  prog_name = program_invocation_short_name;
 
   /* Use locale from environment.  If not set or set to "C", use UTF-8. */
   setlocale (LC_CTYPE, "");
@@ -500,7 +481,7 @@ main (int argc, char **argv)
 	Popt = 1;
         break;
 
-      case 'v':
+      case 'V':
 	print_version ();
         exit (0);
         break;
@@ -539,7 +520,8 @@ main (int argc, char **argv)
       	break;
 
       default:
-        usage (stderr, 1);
+        fprintf (stderr, "Try `%s --help' for more information.\n", prog_name);
+	return 1;
       }
 
   if (Ropt)

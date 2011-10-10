@@ -36,6 +36,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <getopt.h>
+#include <cygwin/version.h>
 
 struct conf_variable
 {
@@ -467,14 +469,47 @@ printvar (const struct conf_variable *cp, const char *pathname)
 }
 
 static void
-usage (void)
+usage (int ret)
 {
-  fprintf (stderr,
-           "Usage: %s [-v specification] variable_name [pathname]\n"
-           "       %s -a [pathname]\n",
-           program_invocation_short_name, program_invocation_short_name);
-  exit (EXIT_FAILURE);
+  fprintf (ret ? stderr : stdout, 
+"Usage: %1$s [-v specification] variable_name [pathname]\n"
+"       %1$s -a [pathname]\n"
+"\n"
+"Get configuration values\n"
+"\n"
+"  -v specification     Indicate specific version for which configuration\n"
+"                       values shall be fetched.\n"
+"  -a, --all            Print all known configuration values\n"
+"\n"
+"Other options:\n"
+"\n"
+"  -h, --help           This text\n"
+"  -V, --version        Print program version and exit\n"
+"\n", program_invocation_short_name);
+  exit (ret);
 }
+
+static void
+print_version ()
+{
+  printf ("getconf (cygwin) %d.%d.%d\n"
+          "Get configuration values\n"
+          "Copyright (C) 2011 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
+}
+
+struct option longopts[] = {
+  {"all", no_argument, NULL, 'a'},
+  {"help", no_argument, NULL, 'h'},
+  {"version", no_argument, NULL, 'V'},
+  {0, no_argument, NULL, 0}
+};
+const char *opts = "ahvV";
 
 int
 main (int argc, char **argv)
@@ -487,7 +522,7 @@ main (int argc, char **argv)
 
   setlocale (LC_ALL, "");
 
-  while ((ch = getopt (argc, argv, "av")) != -1)
+  while ((ch = getopt_long (argc, argv, opts, longopts, NULL)) != -1)
     {
       switch (ch)
         {
@@ -497,9 +532,15 @@ main (int argc, char **argv)
         case 'v':
           v_flag = 1;
           break;
-        case '?':
+        case 'h':
+          usage (0);
+	case 'V':
+	  print_version ();
+	  return 0;
         default:
-          usage ();
+	  fprintf (stderr, "Try `%s --help' for more information.\n",
+		   program_invocation_short_name);
+	  return 1;
         }
     }
   argc -= optind;
@@ -508,7 +549,7 @@ main (int argc, char **argv)
   if (v_flag)
     {
       if (a_flag || argc < 2)
-        usage ();
+        usage (1);
       for (sp = spec_table; sp->name != NULL; sp++)
         {
           if (strcmp (argv[0], sp->name) == 0)
@@ -527,7 +568,7 @@ main (int argc, char **argv)
   if (!a_flag)
     {
       if (argc == 0)
-        usage ();
+        usage (1);
       varname = argv[0];
       argc--;
       argv++;
@@ -536,7 +577,7 @@ main (int argc, char **argv)
     varname = NULL;
 
   if (argc > 1)
-    usage ();
+    usage (1);
   pathname = argv[0];  /* may be NULL */
 
   found = 0;
@@ -551,7 +592,7 @@ main (int argc, char **argv)
               found = 1;
             }
           else if (!a_flag)
-            usage ();
+            usage (1);
         }
     }
 

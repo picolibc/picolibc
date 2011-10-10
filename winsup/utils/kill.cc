@@ -1,6 +1,6 @@
 /* kill.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -16,10 +16,10 @@ details. */
 #include <errno.h>
 #include <windows.h>
 #include <sys/cygwin.h>
+#include <cygwin/version.h>
 #include <getopt.h>
 #include <limits.h>
 
-static const char version[] = "$Revision$";
 static char *prog_name;
 
 static struct option longopts[] =
@@ -28,50 +28,42 @@ static struct option longopts[] =
   {"list", optional_argument, NULL, 'l'},
   {"force", no_argument, NULL, 'f'},
   {"signal", required_argument, NULL, 's'},
-  {"version", no_argument, NULL, 'v'},
+  {"version", no_argument, NULL, 'V'},
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "hl::fs:v";
+static char opts[] = "hl::fs:V";
 
 static void
 usage (FILE *where = stderr)
 {
   fprintf (where , ""
-	"Usage: %s [-f] [-signal] [-s signal] pid1 [pid2 ...]\n"
-	"       %s -l [signal]\n"
+	"Usage: %1$s [-f] [-signal] [-s signal] pid1 [pid2 ...]\n"
+	"       %1$s -l [signal]\n"
+	"\n"
 	"Send signals to processes\n"
 	"\n"
 	" -f, --force     force, using win32 interface if necessary\n"
 	" -l, --list      print a list of signal names\n"
-	" -s, --signal    send signal (use %s --list for a list)\n"
+	" -s, --signal    send signal (use %1$s --list for a list)\n"
 	" -h, --help      output usage information and exit\n"
-	" -v, --version   output version information and exit\n"
-	"", prog_name, prog_name, prog_name);
+	" -V, --version   output version information and exit\n"
+	"\n", prog_name);
   exit (where == stderr ? 1 : 0);
 }
 
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-%s (cygwin) %.*s\n\
-Process Signaller\n\
-Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
-Compiled on %s\n\
-", prog_name, len, v, __DATE__);
+  printf ("kill (cygwin) %d.%d.%d\n"
+          "Process Signaller\n"
+          "Copyright (C) 1996 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 static const char *
@@ -110,8 +102,9 @@ test_for_unknown_sig (int sig, const char *sigstr)
 {
   if (sig < 0 || sig > NSIG)
     {
-      fprintf (stderr, "%s: unknown signal: %s\n", prog_name, sigstr);
-      usage ();
+      fprintf (stderr, "%1$s: unknown signal: %2$s\n"
+		       "Try `%1$s --help' for more information.\n",
+	       prog_name, sigstr);
       exit (1);
     }
 }
@@ -195,13 +188,7 @@ main (int argc, char **argv)
   int ret = 0;
   char *gotasig = NULL;
 
-  prog_name = strrchr (argv[0], '/');
-  if (prog_name == NULL)
-    prog_name = strrchr (argv[0], '\\');
-  if (prog_name == NULL)
-    prog_name = argv[0];
-  else
-    prog_name++;
+  prog_name = program_invocation_short_name;
 
   if (argc == 1)
     usage ();
@@ -243,7 +230,7 @@ main (int argc, char **argv)
 	case 'h':
 	  usage (stdout);
 	  break;
-	case 'v':
+	case 'V':
 	  print_version ();
 	  break;
 	case '?':

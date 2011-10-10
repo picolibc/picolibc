@@ -23,6 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+#include <errno.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <getopt.h>
@@ -39,8 +40,6 @@
 #define LOCALE_ALIAS		"/usr/share/locale/locale.alias"
 #define LOCALE_ALIAS_LINE_LEN	255
 
-extern char *__progname;
-
 void
 usage ()
 {
@@ -48,6 +47,7 @@ usage ()
 "Usage: %1$s [-amvhV]\n"
 "   or: %1$s [-ck] NAME\n"
 "   or: %1$s [-usfnU]\n"
+"\n"
 "Get locale-specific information.\n"
 "\n"
 "System information:\n"
@@ -74,21 +74,21 @@ usage ()
 "\n"
 "  -h, --help           This text\n"
 "  -V, --version        Print program version and exit\n\n",
-  __progname);
+  program_invocation_short_name);
 }
 
 void
 print_version ()
 {
-  printf ("%s (cygwin) %d.%d.%d\n"
-	  "Get locale-specific information.\n"
-	  "Copyright 2011 Red Hat, Inc.\n"
-	  "Compiled on %s\n",
-	  __progname,
+  printf ("locale (cygwin) %d.%d.%d\n"
+	  "Get locale-specific information\n"
+	  "Copyright (C) 2010 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	  CYGWIN_VERSION_DLL_MAJOR / 1000,
 	  CYGWIN_VERSION_DLL_MAJOR % 1000,
 	  CYGWIN_VERSION_DLL_MINOR,
-	  __DATE__);
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 struct option longopts[] = {
@@ -785,7 +785,7 @@ main (int argc, char **argv)
   char name[32];
 
   setlocale (LC_ALL, "");
-  while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+  while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != -1)
     switch (opt)
       {
       case 'a':
@@ -825,9 +825,8 @@ main (int argc, char **argv)
 	print_version ();
 	return 0;
       default:
-	fprintf (stderr,
-		 "Try `%1$s --help' or `%1$s -h' for more information.\n",
-		 __progname);
+	fprintf (stderr, "Try `%s --help' for more information.\n",
+		 program_invocation_short_name);
 	return 1;
       }
   if (all)

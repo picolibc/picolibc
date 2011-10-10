@@ -1,6 +1,6 @@
 /* getfacl.c
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2009 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2009, 2011 Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -18,10 +18,10 @@ details. */
 #include <sys/types.h>
 #include <sys/acl.h>
 #include <sys/stat.h>
+#include <cygwin/version.h>
 #include <string.h>
 #include <errno.h>
 
-static const char version[] = "$Revision$";
 static char *prog_name;
 
 char *
@@ -66,6 +66,7 @@ static void
 usage (FILE * stream)
 {
   fprintf (stream, "Usage: %s [-adn] FILE [FILE2...]\n"
+            "\n"
             "Display file and directory access control lists (ACLs).\n"
             "\n"
             "  -a, --all      display the filename, the owner, the group, and\n"
@@ -74,7 +75,7 @@ usage (FILE * stream)
             "                 the default ACL of the directory, if it exists\n"
             "  -h, --help     output usage information and exit\n"
             "  -n, --noname   display user and group IDs instead of names\n"
-            "  -v, --version  output version information and exit\n"
+            "  -V, --version  output version information and exit\n"
             "\n"
             "When multiple files are specified on the command line, a blank\n"
             "line separates the ACLs for each file.\n", prog_name);
@@ -114,31 +115,23 @@ struct option longopts[] = {
   {"dir", no_argument, NULL, 'd'},
   {"help", no_argument, NULL, 'h'},
   {"noname", no_argument, NULL, 'n'},
-  {"version", no_argument, NULL, 'v'},
+  {"version", no_argument, NULL, 'V'},
   {0, no_argument, NULL, 0}
 };
+const char *opts = "adhnV";
 
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-getfacl (cygwin) %.*s\n\
-ACL Utility\n\
-Copyright (c) 2000, 2001, 2002, 2003, 2004, 2009 Red Hat, Inc.\n\
-Compiled on %s\n\
-", len, v, __DATE__);
+  printf ("getfacl (cygwin) %d.%d.%d\n"
+          "Get POSIX ACL information\n"
+          "Copyright (C) 2000 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 int
@@ -152,15 +145,9 @@ main (int argc, char **argv)
   struct stat st;
   aclent_t acls[MAX_ACL_ENTRIES];
 
-  prog_name = strrchr (argv[0], '/');
-  if (prog_name == NULL)
-    prog_name = strrchr (argv[0], '\\');
-  if (prog_name == NULL)
-    prog_name = argv[0];
-  else
-    prog_name++;
+  prog_name = program_invocation_short_name;
 
-  while ((c = getopt_long (argc, argv, "adhnv", longopts, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (c)
       {
       case 'a':
@@ -175,11 +162,11 @@ main (int argc, char **argv)
       case 'n':
 	nopt = 1;
 	break;
-      case 'v':
+      case 'V':
 	print_version ();
 	return 0;
       default:
-	usage (stderr);
+	fprintf (stderr, "Try `%s --help' for more information.\n", prog_name);
 	return 1;
       }
   if (optind > argc - 1)

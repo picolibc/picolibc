@@ -9,6 +9,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include <errno.h>
 #include <stdio.h>
 #include <wchar.h>
 #include <windows.h>
@@ -19,6 +20,7 @@ details. */
 #include <pwd.h>
 #include <limits.h>
 #include <sys/cygwin.h>
+#include <cygwin/version.h>
 #include <tlhelp32.h>
 #include <psapi.h>
 #include <ddk/ntapi.h>
@@ -29,7 +31,6 @@ details. */
    for that value.  Note that PATH_MAX is only 4K. */
 #define NT_MAX_PATH 32768
 
-static const char version[] = "$Revision$";
 static char *prog_name;
 
 static struct option longopts[] =
@@ -42,12 +43,12 @@ static struct option longopts[] =
   {"process", required_argument, NULL, 'p'},
   {"summary", no_argument, NULL, 's' },
   {"user", required_argument, NULL, 'u'},
-  {"version", no_argument, NULL, 'v'},
+  {"version", no_argument, NULL, 'V'},
   {"windows", no_argument, NULL, 'W'},
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "aefhlp:su:vW";
+static char opts[] = "aefhlp:su:VW";
 
 typedef BOOL (WINAPI *ENUMPROCESSMODULES)(
   HANDLE hProcess,      // handle to the process
@@ -214,7 +215,8 @@ static void
 usage (FILE * stream, int status)
 {
   fprintf (stream, "\
-Usage: %s [-aefls] [-u UID] [-p PID]\n\
+Usage: %1$s [-aefls] [-u UID] [-p PID]\n\
+\n\
 Report process status\n\
 \n\
  -a, --all       show processes of all users\n\
@@ -225,34 +227,26 @@ Report process status\n\
  -p, --process   show information for specified PID\n\
  -s, --summary   show process summary\n\
  -u, --user      list processes owned by UID\n\
- -v, --version   output version information and exit\n\
+ -V, --version   output version information and exit\n\
  -W, --windows   show windows as well as cygwin processes\n\
-With no options, %s outputs the long format by default\n",
-	   prog_name, prog_name);
+\n\
+With no options, %1$s outputs the long format by default\n\n",
+	   prog_name);
   exit (status);
 }
 
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-%s (cygwin) %.*s\n\
-Process Statistics\n\
-Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
-Compiled on %s\n\
-", prog_name, len, v, __DATE__);
+  printf ("ps (cygwin) %d.%d.%d\n"
+          "Show process statistics\n"
+          "Copyright (C) 1996 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 char dosdevs[32000];
@@ -278,13 +272,7 @@ main (int argc, char *argv[])
   proc_id = -1;
   lflag = 1;
 
-  prog_name = strrchr (argv[0], '/');
-  if (prog_name == NULL)
-    prog_name = strrchr (argv[0], '\\');
-  if (prog_name == NULL)
-    prog_name = argv[0];
-  else
-    prog_name++;
+  prog_name = program_invocation_short_name;
 
   while ((ch = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (ch)
@@ -324,7 +312,7 @@ main (int argc, char *argv[])
 	      }
 	  }
 	break;
-      case 'v':
+      case 'V':
 	print_version ();
 	exit (0);
 	break;
@@ -334,7 +322,8 @@ main (int argc, char *argv[])
 	break;
 
       default:
-	usage (stderr, 1);
+	fprintf (stderr, "Try `%s --help' for more information.\n", prog_name);
+	exit (1);
       }
 
   if (sflag)

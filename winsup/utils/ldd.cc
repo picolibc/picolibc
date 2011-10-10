@@ -33,6 +33,7 @@
 #include <wchar.h>
 #include <locale.h>
 #include <sys/cygwin.h>
+#include <cygwin/version.h>
 #include <unistd.h>
 #include <libgen.h>
 
@@ -49,18 +50,20 @@
 
 struct option longopts[] =
 {
-  {"help", no_argument, NULL, 0},
-  {"version", no_argument, NULL, 0},
+  {"help", no_argument, NULL, 'h'},
+  {"verbose", no_argument, NULL, 'v'},
+  {"version", no_argument, NULL, 'V'},
   {"data-relocs", no_argument, NULL, 'd'},
   {"function-relocs", no_argument, NULL, 'r'},
   {"unused", no_argument, NULL, 'u'},
   {0, no_argument, NULL, 0}
 };
+const char *opts = "dhruvV";
 
 static int process_file (const wchar_t *);
 
 static int
-usage (const char *fmt, ...)
+error (const char *fmt, ...)
 {
   va_list ap;
   va_start (ap, fmt);
@@ -68,6 +71,38 @@ usage (const char *fmt, ...)
   vfprintf (stderr, fmt, ap);
   fprintf (stderr, "\nTry `ldd --help' for more information.\n");
   exit (1);
+}
+
+static void
+usage ()
+{
+  printf ("Usage: %s [OPTION]... FILE...\n\
+\n\
+Print shared library dependencies\n\
+\n\
+  -h, --help              print this help and exit\n\
+  -V, --version           print version information and exit\n\
+  -r, --function-relocs   process data and function relocations\n\
+                          (currently unimplemented)\n\
+  -u, --unused            print unused direct dependencies\n\
+                          (currently unimplemented)\n\
+  -v, --verbose           print all information\n\
+                          (currently unimplemented)\n",
+	   program_invocation_short_name);
+}
+
+static void
+print_version ()
+{
+  printf ("ldd (cygwin) %d.%d.%d\n"
+          "Print shared library dependencies\n"
+          "Copyright (C) 2009 - %s Chris Faylor\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 #define print_errno_error_and_return(__fn) \
@@ -338,51 +373,37 @@ report (const char *in_fn, bool multiple)
   return 0;
 }
 
-
 int
 main (int argc, char **argv)
 {
   int optch;
-  int index;
 
   /* Use locale from environment.  If not set or set to "C", use UTF-8. */
   setlocale (LC_CTYPE, "");
   if (!strcmp (setlocale (LC_CTYPE, NULL), "C"))
     setlocale (LC_CTYPE, "en_US.UTF-8");
-  while ((optch = getopt_long (argc, argv, "dru", longopts, &index)) != -1)
+  while ((optch = getopt_long (argc, argv, opts, longopts, NULL)) != -1)
     switch (optch)
       {
       case 'd':
       case 'r':
       case 'u':
-	usage ("option not implemented `-%c'", optch);
+	error ("option not implemented `-%c'", optch);
 	exit (1);
-      case 0:
-	if (index == 1)
-	  {
-	    printf ("ldd (Cygwin) %s\nCopyright (C) 2009 Chris Faylor\n"
-		    "This is free software; see the source for copying conditions.  There is NO\n"
-		    "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-		    VERSION);
-	    exit (0);
-	  }
-	else
-	  {
-	    puts ("Usage: ldd [OPTION]... FILE...\n\
-      --help              print this help and exit\n\
-      --version           print version information and exit\n\
-  -r, --function-relocs   process data and function relocations\n\
-                          (currently unimplemented)\n\
-  -u, --unused            print unused direct dependencies\n\
-                          (currently unimplemented)\n\
-  -v, --verbose           print all information\n\
-                          (currently unimplemented)");
-	    exit (0);
-	  }
+      case 'h':
+	usage ();
+	exit (0);
+      case 'V':
+	print_version ();
+	return 0;
+      default:
+	fprintf (stderr, "Try `%s --help' for more information.\n",
+		 program_invocation_short_name);
+	return 1;
       }
   argv += optind;
   if (!*argv)
-    usage("missing file arguments");
+    error ("missing file arguments");
 
   int ret = 0;
   bool multiple = !!argv[1];

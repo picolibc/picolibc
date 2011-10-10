@@ -22,9 +22,11 @@
 #include "path.h"
 #include "wide_path.h"
 #include <getopt.h>
+#include "cygwin/include/cygwin/version.h"
 #include "cygwin/include/sys/cygwin.h"
 #include "cygwin/include/mntent.h"
 #include "cygwin/cygprops.h"
+#include "cygwin/version.h"
 #undef cygwin_internal
 #include "loadlib.h"
 
@@ -63,8 +65,6 @@ void package_list (int, char **);
 void dump_dodgy_apps (int verbose);
 /* Forward declaration */
 static void usage (FILE *, int);
-
-static const char version[] = "$Revision$";
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -2237,24 +2237,15 @@ static char opts[] = "cdsrvkflphV";
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-cygcheck version %.*s\n\
-System Checker for Cygwin\n\
-Copyright (C) 1998 - 2008 Red Hat, Inc.\n\
-Compiled on %s\n\
-", len, v, __DATE__);
+  printf ("cygcheck (cygwin) %d.%d.%d\n"
+	  "System Checker for Cygwin\n"
+	  "Copyright (C) 1998 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 void
@@ -2376,8 +2367,10 @@ main (int argc, char **argv)
 	print_version ();
 	exit (0);
       default:
-	usage (stderr, 1);
-       /*NOTREACHED*/}
+	fprintf (stderr, "Try `cygcheck --help' for more information.\n");
+	exit (1);
+       /*NOTREACHED*/
+    }
   argc -= optind;
   argv += optind;
   if (posixly == NULL)

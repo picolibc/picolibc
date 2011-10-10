@@ -22,6 +22,7 @@ details. */
 #include <io.h>
 #include <sys/fcntl.h>
 #include <sys/cygwin.h>
+#include <cygwin/version.h>
 #include <ctype.h>
 #include <errno.h>
 #include <ddk/ntddk.h>
@@ -29,8 +30,6 @@ details. */
 #include <ddk/ntifs.h>
 #include "wide_path.h"
 #include "loadlib.h"
-
-static const char version[] = "$Revision$";
 
 static char *prog_name;
 static char *file_arg, *output_arg;
@@ -57,7 +56,7 @@ static struct option long_options[] = {
   {(char *) "short-name", no_argument, NULL, 's'},
   {(char *) "type", required_argument, NULL, 't'},
   {(char *) "unix", no_argument, NULL, 'u'},
-  {(char *) "version", no_argument, NULL, 'v'},
+  {(char *) "version", no_argument, NULL, 'V'},
   {(char *) "windows", no_argument, NULL, 'w'},
   {(char *) "allusers", no_argument, NULL, 'A'},
   {(char *) "desktop", no_argument, NULL, 'D'},
@@ -71,27 +70,31 @@ static struct option long_options[] = {
   {0, no_argument, 0, 0}
 };
 
-static char options[] = "ac:df:hilmMopst:uvwAC:DHOPSWF:";
+static char options[] = "ac:df:hilmMopst:uVwAC:DHOPSWF:";
 
 static void
 usage (FILE * stream, int status)
 {
   if (!ignore_flag || !status)
     fprintf (stream, "\
-Usage: %s (-d|-m|-u|-w|-t TYPE) [-f FILE] [OPTION]... NAME...\n\
-       %s [-c HANDLE] \n\
-       %s [-ADHOPSW] \n\
-       %s [-F ID] \n\
+Usage: %1$s (-d|-m|-u|-w|-t TYPE) [-f FILE] [OPTION]... NAME...\n\
+       %1$s [-c HANDLE] \n\
+       %1$s [-ADHOPSW] \n\
+       %1$s [-F ID] \n\
+\n\
 Convert Unix and Windows format paths, or output system path information\n\
 \n\
 Output type options:\n\
+\n\
   -d, --dos             print DOS (short) form of NAMEs (C:\\PROGRA~1\\)\n\
   -m, --mixed           like --windows, but with regular slashes (C:/WINNT)\n\
   -M, --mode            report on mode of file (binmode or textmode)\n\
   -u, --unix            (default) print Unix form of NAMEs (/cygdrive/c/winnt)\n\
   -w, --windows         print Windows form of NAMEs (C:\\WINNT)\n\
   -t, --type TYPE       print TYPE form: 'dos', 'mixed', 'unix', or 'windows'\n\
+\n\
 Path conversion options:\n\
+\n\
   -a, --absolute        output absolute path\n\
   -l, --long-name       print Windows long form of NAMEs (with -w, -m only)\n\
   -p, --path            NAME is a PATH list (i.e., '/bin:/usr/bin')\n\
@@ -99,9 +102,11 @@ Path conversion options:\n\
   -C, --codepage CP     print DOS, Windows, or mixed pathname in Windows\n\
                         codepage CP.  CP can be a numeric codepage identifier,\n\
                         or one of the reserved words ANSI, OEM, or UTF8.\n\
-                        If this option is missing, %s defaults to the\n\
+                        If this option is missing, %1$s defaults to the\n\
                         character set defined by the current locale.\n\
+\n\
 System information:\n\
+\n\
   -A, --allusers        use `All Users' instead of current user for -D, -O, -P\n\
   -D, --desktop         output `Desktop' directory and exit\n\
   -H, --homeroot        output `Profiles' directory (home root) and exit\n\
@@ -110,7 +115,7 @@ System information:\n\
   -S, --sysdir          output system directory and exit\n\
   -W, --windir          output `Windows' directory and exit\n\
   -F, --folder ID       output special folder with numeric ID and exit\n\
-", prog_name, prog_name, prog_name, prog_name, prog_name);
+", prog_name);
   if (ignore_flag)
     /* nothing to do */;
   else if (stream != stdout)
@@ -118,14 +123,16 @@ System information:\n\
   else
     {
       fprintf (stream, "\
+\n\
 Other options:\n\
+\n\
   -f, --file FILE       read FILE for input; use - to read from STDIN\n\
   -o, --option          read options from FILE as well (for use with --file)\n\
   -c, --close HANDLE    close HANDLE (for use in captured process)\n\
   -i, --ignore          ignore missing argument\n\
   -h, --help            output usage information and exit\n\
-  -v, --version         output version information and exit\n\
-");
+  -V, --version         output version information and exit\n\
+\n");
     }
   exit (ignore_flag ? 0 : status);
 }
@@ -374,8 +381,8 @@ get_short_paths (char *path)
       len = GetShortPathNameW (wpath, NULL, 0);
       if (!len)
 	{
-	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
-		   next);
+	  fprintf (stderr, "%s: cannot create short name of %s\n",
+		   prog_name, next);
 	  exit (2);
 	}
       acc += len + 1;
@@ -393,8 +400,8 @@ get_short_paths (char *path)
       len = GetShortPathNameW (wpath, sptr, acc);
       if (!len)
 	{
-	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
-		   ptr);
+	  fprintf (stderr, "%s: cannot create short name of %s\n",
+		   prog_name, ptr);
 	  exit (2);
 	}
 
@@ -426,8 +433,8 @@ get_short_name (const char *filename)
   DWORD len = GetShortPathNameW (wpath, buf, 32768);
   if (!len)
     {
-      fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
-	       filename);
+      fprintf (stderr, "%s: cannot create short name of %s\n",
+	       prog_name, filename);
       exit (2);
     }
   len = my_wcstombs (NULL, buf, 0) + 1;
@@ -515,8 +522,8 @@ get_long_name (const char *filename, DWORD& len)
 
       if (err == ERROR_INVALID_PARAMETER)
 	{
-	  fprintf (stderr, "%s: cannot create long name of %s\n", prog_name,
-		   filename);
+	  fprintf (stderr, "%s: cannot create long name of %s\n",
+		   prog_name, filename);
 	  exit (2);
 	}
       else if (err == ERROR_FILE_NOT_FOUND)
@@ -698,7 +705,8 @@ do_sysfolders (char option)
 
   if (!buf[0])
     {
-      fprintf (stderr, "%s: failed to retrieve special folder path\n", prog_name);
+      fprintf (stderr, "%s: failed to retrieve special folder path\n",
+	       prog_name);
     }
   else if (!windows_flag)
     {
@@ -733,8 +741,8 @@ report_mode (char *filename)
       printf ("%s: text\n", filename);
       break;
     default:
-      fprintf (stderr, "%s: file '%s' - %s\n", prog_name, filename,
-	       strerror (errno));
+      fprintf (stderr, "%s: file '%s' - %s\n", prog_name,
+	       filename, strerror (errno));
       break;
     }
 }
@@ -762,7 +770,8 @@ do_pathconv (char *filename)
 	exit (0);
       else
 	{
-	  fprintf (stderr, "%s: can't convert empty path\n", prog_name);
+	  fprintf (stderr, "%s: can't convert empty path\n",
+		   prog_name);
 	  exit (1);
 	}
     }
@@ -863,25 +872,15 @@ do_pathconv (char *filename)
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-cygpath (cygwin) %.*s\n\
-Path Conversion Utility\n\
-Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, \n\
-          2007, 2008, 2009, 2010 Red Hat, Inc.\n\
-Compiled on %s\n\
-", len, v, __DATE__);
+  printf ("cygpath (cygwin) %d.%d.%d\n"
+	  "Path Conversion Utility\n"
+	  "Copyright (C) 1998 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 static int
@@ -1035,13 +1034,14 @@ do_options (int argc, char **argv, int from_file)
 	  usage (stdout, 0);
 	  break;
 
-	case 'v':
+	case 'V':
 	  print_version ();
 	  exit (0);
 
 	default:
-	  usage (stderr, 1);
-	  break;
+	  fprintf (stderr, "Try `%s --help' for more information.\n",
+		   prog_name);
+	  exit (1);
 	}
     }
 
@@ -1099,13 +1099,7 @@ main (int argc, char **argv)
   int o;
 
   setlocale (LC_CTYPE, "");
-  prog_name = strrchr (argv[0], '/');
-  if (!prog_name)
-    prog_name = strrchr (argv[0], '\\');
-  if (!prog_name)
-    prog_name = argv[0];
-  else
-    prog_name++;
+  prog_name = program_invocation_short_name;
 
   o = do_options (argc, argv, 0);
 

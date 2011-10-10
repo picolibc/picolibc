@@ -1,7 +1,7 @@
 /* mkgroup.c:
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -10,6 +10,7 @@
    details. */
 
 #define _WIN32_WINNT 0x0600
+#include <errno.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <wchar.h>
@@ -21,6 +22,7 @@
 #include <io.h>
 #include <sys/fcntl.h>
 #include <sys/cygwin.h>
+#include <cygwin/version.h>
 #include <windows.h>
 #include <lm.h>
 #include <wininet.h>
@@ -33,10 +35,6 @@
 #define print_win_error(x) _print_win_error(x, __LINE__)
 
 #define MAX_SID_LEN 40
-
-static const char version[] = "$Revision$";
-
-extern char *__progname __declspec(dllimport);
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
@@ -230,7 +228,7 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
   if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
     {
       fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
-	       __progname, d_or_m);
+	       program_invocation_short_name, d_or_m);
       return;
     }
   servername = machine;
@@ -252,7 +250,7 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 	  ret = mbstowcs (p, gstr, GNLEN + 1);
 	  if (ret < 1 || ret >= GNLEN + 1)
 	    fprintf (stderr, "%s: Invalid group name '%s'.  Skipping...\n",
-		     __progname, gstr);
+		     program_invocation_short_name, gstr);
 	  else if (LookupAccountNameW (servername, grp,
 				       psid = (PSID) psid_buffer,
 				       (sidlen = MAX_SID_LEN, &sidlen),
@@ -282,7 +280,8 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 		   || (stop = strtol (p, &p, 10)) < start || *p)
 	    {
 	      fprintf (stderr, "%s: Malformed unix group list entry '%s'.  "
-			       "Skipping...\n", __progname, gstr);
+			       "Skipping...\n",
+			       program_invocation_short_name, gstr);
 	      continue;
 	    }
 	  for (; start <= stop; ++ start)
@@ -337,7 +336,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
       if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
 	{
 	  fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
-		   __progname, d_or_m);
+		   program_invocation_short_name, d_or_m);
 	  return 1;
 	}
       servername = machine;
@@ -492,7 +491,7 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
       if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
 	{
 	  fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
-		   __progname, d_or_m);
+		   program_invocation_short_name, d_or_m);
 	  return;
 	}
       servername = machine;
@@ -634,10 +633,12 @@ static int
 usage (FILE * stream)
 {
   fprintf (stream,
-"Usage: mkgroup [OPTION]...\n"
+"Usage: %s [OPTION]...\n"
+"\n"
 "Print /etc/group file to stdout\n"
 "\n"
 "Options:\n"
+"\n"
 "   -l,--local [machine[,offset]]\n"
 "                           print local groups with gid offset offset\n"
 "                           (from local machine if no machine specified)\n"
@@ -669,7 +670,8 @@ usage (FILE * stream)
 "   -v,--version            print version information and exit\n"
 "\n"
 "Default is to print local groups on stand-alone machines, plus domain\n"
-"groups on domain controllers and domain member machines.\n");
+"groups on domain controllers and domain member machines.\n"
+"\n", program_invocation_short_name);
   return 1;
 }
 
@@ -688,33 +690,24 @@ struct option longopts[] = {
   {"separator", required_argument, NULL, 'S'},
   {"users", no_argument, NULL, 'u'},
   {"unix", required_argument, NULL, 'U'},
-  {"version", no_argument, NULL, 'v'},
+  {"version", no_argument, NULL, 'V'},
   {0, no_argument, NULL, 0}
 };
 
-static char opts[] = "bcCd::D::g:hl::L::o:sS:uU:v";
+static char opts[] = "bcCd::D::g:hl::L::o:sS:uU:V";
 
 static void
 print_version ()
 {
-  const char *v = strchr (version, ':');
-  int len;
-  if (!v)
-    {
-      v = "?";
-      len = 1;
-    }
-  else
-    {
-      v += 2;
-      len = strchr (v, ' ') - v;
-    }
-  printf ("\
-mkgroup (cygwin) %.*s\n\
-group File Generator\n\
-Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.\n\
-Compiled on %s\n\
-", len, v, __DATE__);
+  printf ("mkgroup (cygwin) %d.%d.%d\n"
+          "Group File Generator\n"
+          "Copyright (C) 1997 - %s Red Hat, Inc.\n"
+          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+          CYGWIN_VERSION_DLL_MAJOR / 1000,
+          CYGWIN_VERSION_DLL_MAJOR % 1000,
+          CYGWIN_VERSION_DLL_MINOR,
+          strrchr (__DATE__, ' ') + 1);
 }
 
 static PPOLICY_PRIMARY_DOMAIN_INFO p_dom;
@@ -795,7 +788,8 @@ main (int argc, char **argv)
 	if (print_domlist >= 32)
 	  {
 	    fprintf (stderr, "%s: Can not enumerate from more than 32 "
-			     "domains and machines.\n", __progname);
+			     "domains and machines.\n",
+			     program_invocation_short_name);
 	    return 1;
 	  }
 	domlist[print_domlist].domain = (c == 'd' || c == 'D');
@@ -812,7 +806,8 @@ main (int argc, char **argv)
 		      && (!opt[off] || opt[off] == ','))))
 	    {
 	      fprintf (stderr, "%s: Duplicate %s '%s'.  Skipping...\n",
-		       __progname, domlist[i].domain ? "domain" : "machine",
+		       program_invocation_short_name,
+		       domlist[i].domain ? "domain" : "machine",
 		       domlist[i].str);
 	      goto skip;
 	    }
@@ -827,7 +822,7 @@ main (int argc, char **argv)
 		    , *ep))
 	      {
 		fprintf (stderr, "%s: Malformed machine,offset string '%s'.  "
-			 "Skipping...\n", __progname, opt);
+			 "Skipping...\n", program_invocation_short_name, opt);
 		break;
 	      }
 	    *p = '\0';
@@ -840,13 +835,14 @@ skip:
 	if (strlen (sep_char) > 1)
 	  {
 	    fprintf (stderr, "%s: Only one character allowed as domain\\user "
-			     "separator character.\n", __progname);
+			     "separator character.\n",
+			     program_invocation_short_name);
 	    return 1;
 	  }
 	if (*sep_char == ':')
 	  {
 	    fprintf (stderr, "%s: Colon not allowed as domain\\user separator "
-			     "character.\n", __progname);
+			     "character.\n", program_invocation_short_name);
 	    return 1;
 	  }
 	break;
@@ -875,11 +871,11 @@ skip:
       case 'h':
 	usage (stdout);
 	return 0;
-      case 'v':
+      case 'V':
 	print_version ();
 	return 0;
       default:
-	fprintf (stderr, "Try '%s --help' for more information.\n", argv[0]);
+	fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
 	return 1;
       }
 
