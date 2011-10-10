@@ -1,3 +1,9 @@
+2011-10-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler_tty.cc (fhandler_pty_slave::open): Clarify debugging output.
+	(fhandler_pty_slave::open): Change ENOENT to ENXIO when can't open a
+	tty.
+
 2011-10-07  Corinna Vinschen  <corinna@vinschen.de>
 	    Christopher Faylor  <me.cygwin2011@cgf.cx>
 

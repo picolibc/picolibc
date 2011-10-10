@@ -457,7 +457,7 @@ fhandler_pty_slave::open (int flags, mode_t)
 	{
 	  pty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE, p->dwProcessId);
 	  if (pty_owner)
-	    termios_printf ("dup handles directly since I'm allmighty.");
+	    termios_printf ("dup handles directly since I'm the owner");
 	}
     }
   if (pty_owner)
@@ -522,7 +522,10 @@ fhandler_pty_slave::open (int flags, mode_t)
   return 1;
 
 err:
-  __seterrno ();
+  if (GetLastError () == ERROR_FILE_NOT_FOUND)
+    set_errno (ENXIO);
+  else
+    __seterrno ();
 err_no_errno:
   termios_printf (errmsg);
 err_no_msg:
