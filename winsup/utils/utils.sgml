@@ -484,15 +484,31 @@ Other options:
 
 <para>The <command>getconf</command> utility prints the value of the
 configuration variable specified by <literal>variable_name</literal>.
-If <literal>pathname</literal> is given, <command>getconf</command> prints
-the value of the configuration variable for the specified pathname.</para>
+If no <literal>pathname</literal> is given, <command>getconf</command>
+serves as a wrapper for the <literal>confstr</literal> and
+<literal>sysconf</literal> functions, supporting the symbolic constants
+defined in the <literal>limits.h</literal> and <literal>unistd.h</literal>
+headers, without their respective <literal>_CS_</literal> or
+<literal>_SC_</literal> prefixes.
+</para>
+
+<para>If <literal>pathname</literal> is given, <command>getconf</command>
+prints the value of the configuration variable for the specified pathname.
+In this form, <command>getconf</command> serves as a wrapper for the
+<literal>pathconf</literal> function, supporting the symbolic constants defined
+in the <literal>unistd.h</literal> header, without the <literal>_PC_</literal> 
+prefix. </para>
 
 <para>If you specify the <literal>-v</literal> option, the parameter
 denotes a specification for which the value of the configuration variable
-should be printed.</para>
+should be printed. Note that the only specifications supported by Cygwin
+are <literal>POSIX_V7_ILP32_OFFBIG</literal> and the legacy
+<literal>POSIX_V6_ILP32_OFFBIG</literal> and
+<literal>XBS5_ILP32_OFFBIG</literal> equivalents.</para>
 
 <para>Use the <literal>-a</literal> option to print a list of all available
-configuration variables.</para>
+configuration variables for the system, or given <literal>pathname</literal>,
+and their values.</para>
 
 </sect2>
 
