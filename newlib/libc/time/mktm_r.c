@@ -216,10 +216,13 @@ _DEFUN (__tzcalc_limits, (year),
   
   for (i = 0; i < 2; ++i)
     {
-      if (tz->__tzrule[i].ch == 'J')
+	if (tz->__tzrule[i].ch == 'J') {
+        /* The Julian day n (1 <= n <= 365). */
 	days = year_days + tz->__tzrule[i].d + 
 		(isleap(year) && tz->__tzrule[i].d >= 60);
-      else if (tz->__tzrule[i].ch == 'D')
+        /* Convert to yday */
+        --days;
+	} else if (tz->__tzrule[i].ch == 'D')
 	days = year_days + tz->__tzrule[i].d;
       else
 	{

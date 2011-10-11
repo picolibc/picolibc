@@ -1,3 +1,9 @@
+2011-10-11  Steven Abner <pheonix@zoomtown.com>
+
+	* libc/time/mktm_r.c: (__tzcalc_limits) Fix Julian day calculation.
+	* libc/time/mktime.c: (mktime) Fix tm_yday, tm_mday updating when
+	timezone causes roll over.
+
 2011-10-10  Nick Clifton  <nickc@redhat.com>
 
 	* libc/sys/arm/crt0.S: Synchronise with libgloss version.
