@@ -541,10 +541,14 @@ fh_alloc (device dev)
 	  break;
 	case FH_TTY:
 	  {
-	    if (iscons_dev (myself->ctty))
-	      fh = cnew (fhandler_console, dev);
-	    else
-	      fh = cnew (fhandler_pty_slave, myself->ctty);
+	    if (myself->ctty > 0)
+	      {
+		if (iscons_dev (myself->ctty))
+		  fh = cnew (fhandler_console, dev);
+		else
+		  fh = cnew (fhandler_pty_slave, myself->ctty);
+		fh->dev () = FH_TTY;
+	      }
 	    break;
 	  }
 	case FH_KMSG:
