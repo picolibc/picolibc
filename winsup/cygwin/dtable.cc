@@ -547,8 +547,8 @@ fh_alloc (device dev)
 		  fh = cnew (fhandler_console, dev);
 		else
 		  fh = cnew (fhandler_pty_slave, myself->ctty);
-		fh->dev () = FH_TTY;
 	      }
+	      ((fhandler_termios *) fh)->is_dev_tty (true);
 	    break;
 	  }
 	case FH_KMSG:

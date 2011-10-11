@@ -1712,21 +1712,14 @@ _tanh = tanh NOSIGFE
 tanhf NOSIGFE
 _tanhf = tanhf NOSIGFE
 tcdrain SIGFE
-_tcdrain = tcdrain SIGFE
 tcflow SIGFE
-_tcflow = tcflow SIGFE
 tcflush SIGFE
-_tcflush = tcflush SIGFE
 tcgetattr SIGFE
-_tcgetattr = tcgetattr SIGFE
 tcgetpgrp SIGFE
-_tcgetpgrp = tcgetpgrp SIGFE
+tcgetsid SIGFE
 tcsendbreak SIGFE
-_tcsendbreak = tcsendbreak SIGFE
 tcsetattr SIGFE
-_tcsetattr = tcsetattr SIGFE
 tcsetpgrp SIGFE
-_tcsetpgrp = tcsetpgrp SIGFE
 tdelete SIGFE
 tdestroy NOSIGFE
 telldir SIGFE

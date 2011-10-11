@@ -839,8 +839,11 @@ fhandler_console::close ()
 }
 
 int
-fhandler_console::ioctl (unsigned int cmd, void *buf)
+fhandler_console::ioctl (unsigned int cmd, void *arg)
 {
+  int res = ioctl_termios (cmd, (int) arg);
+  if (res <= 0)
+    return res;
   switch (cmd)
     {
       case TIOCGWINSZ:
@@ -851,11 +854,11 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	  {
 	    /* *not* the buffer size, the actual screen size... */
 	    /* based on Left Top Right Bottom of srWindow */
-	    ((struct winsize *) buf)->ws_row = dev_state.info.dwWinSize.Y;
-	    ((struct winsize *) buf)->ws_col = dev_state.info.dwWinSize.X;
+	    ((struct winsize *) arg)->ws_row = dev_state.info.dwWinSize.Y;
+	    ((struct winsize *) arg)->ws_col = dev_state.info.dwWinSize.X;
 	    syscall_printf ("WINSZ: (row=%d,col=%d)",
-			   ((struct winsize *) buf)->ws_row,
-			   ((struct winsize *) buf)->ws_col);
+			   ((struct winsize *) arg)->ws_row,
+			   ((struct winsize *) arg)->ws_col);
 	    return 0;
 	  }
 	else
@@ -869,12 +872,12 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	bg_check (SIGTTOU);
 	return 0;
       case KDGKBMETA:
-	*(int *) buf = (dev_state.metabit) ? K_METABIT : K_ESCPREFIX;
+	*(int *) arg = (dev_state.metabit) ? K_METABIT : K_ESCPREFIX;
 	return 0;
       case KDSKBMETA:
-	if ((int) buf == K_METABIT)
+	if ((int) arg == K_METABIT)
 	  dev_state.metabit = TRUE;
-	else if ((int) buf == K_ESCPREFIX)
+	else if ((int) arg == K_ESCPREFIX)
 	  dev_state.metabit = FALSE;
 	else
 	  {
@@ -883,9 +886,9 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	  }
 	return 0;
       case TIOCLINUX:
-	if (*(unsigned char *) buf == 6)
+	if (*(unsigned char *) arg == 6)
 	  {
-	    *(unsigned char *) buf = (unsigned char) dev_state.nModifiers;
+	    *(unsigned char *) arg = (unsigned char) dev_state.nModifiers;
 	    return 0;
 	  }
 	set_errno (EINVAL);
@@ -906,13 +909,13 @@ fhandler_console::ioctl (unsigned int cmd, void *buf)
 	  while (n-- > 0)
 	    if (inp[n].EventType == KEY_EVENT && inp[n].Event.KeyEvent.bKeyDown)
 	      ++ret;
-	  *(int *) buf = ret;
+	  *(int *) arg = ret;
 	  return 0;
 	}
 	break;
     }
 
-  return fhandler_base::ioctl (cmd, buf);
+  return fhandler_base::ioctl (cmd, arg);
 }
 
 int

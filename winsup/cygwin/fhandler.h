@@ -377,6 +377,7 @@ public:
   virtual int tcgetattr (struct termios *t);
   virtual int tcsetpgrp (const pid_t pid);
   virtual int tcgetpgrp ();
+  virtual int tcgetsid ();
   virtual bool is_tty () const { return false; }
   virtual bool ispipe () const { return false; }
   virtual pid_t get_popen_pid () const {return 0;}
@@ -426,6 +427,7 @@ public:
   bool device_access_denied (int) __attribute__ ((regparm (2)));
   int fhaccess (int flags, bool) __attribute__ ((regparm (3)));
   virtual bool __stdcall has_ongoing_io () __attribute__ ((regparm (1))) {return false;}
+  virtual bool is_dev_tty () const { return false; }
 };
 
 struct wsa_event
@@ -934,15 +936,20 @@ class tty_min;
 class fhandler_termios: public fhandler_base
 {
  protected:
+  bool opened_as_dev_tty;
   HANDLE output_handle;
   virtual void doecho (const void *, DWORD) {};
   virtual int accept_input () {return 1;};
+  int ioctl_termios (int, int);
  public:
+  bool is_dev_tty () const { return opened_as_dev_tty; }
+  bool is_dev_tty (bool val) { return opened_as_dev_tty = val; }
   tty_min *_tc;
   virtual tty_min *tc () const {return _tc; }
   fhandler_termios () :
   fhandler_base ()
   {
+    opened_as_dev_tty = false;
     need_fork_fixup (true);
   }
   HANDLE& get_output_handle () { return output_handle; }
@@ -959,6 +966,7 @@ class fhandler_termios: public fhandler_base
   virtual void __release_output_mutex (const char *fn, int ln) {}
   void echo_erase (int force = 0);
   virtual _off64_t lseek (_off64_t, int);
+  int tcgetsid ();
   virtual size_t size () const { return sizeof (*this);}	/* probably not needed */
 };
 
@@ -1159,6 +1167,7 @@ class fhandler_pty_common: public fhandler_termios
   HANDLE output_mutex, input_mutex;
   HANDLE input_available_event;
 
+  bool use_archetype () const {return true;}
   DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
   void __release_output_mutex (const char *fn, int ln);
 
@@ -1184,7 +1193,6 @@ class fhandler_pty_slave: public fhandler_pty_common
   /* Constructor */
   fhandler_pty_slave (int);
 
-  bool use_archetype () const {return true;}
   int open (int flags, mode_t mode = 0);
   void open_setup (int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
@@ -1224,7 +1232,6 @@ public:
   /* Constructor */
   fhandler_pty_master ();
 
-  virtual bool use_archetype () const {return true;}
   DWORD pty_master_thread ();
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);

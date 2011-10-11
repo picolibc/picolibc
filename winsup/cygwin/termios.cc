@@ -195,17 +195,30 @@ tcgetattr (int fd, struct termios *in_t)
 extern "C" int
 tcgetpgrp (int fd)
 {
-  int res = -1;
+  int res;
 
   cygheap_fdget cfd (fd);
   if (cfd < 0)
-    /* saw an error */;
-  else if (!cfd->is_tty ())
-    set_errno (ENOTTY);
+    res = -1;
   else
     res = cfd->tcgetpgrp ();
 
   termios_printf ("%d = tcgetpgrp (%d)", res, fd);
+  return res;
+}
+
+extern "C" int
+tcgetsid (int fd)
+{
+  int res;
+
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = -1;
+  else
+    res = cfd->tcgetsid ();
+
+  termios_printf ("%d = tcgetsid (%d)", res, fd);
   return res;
 }
 

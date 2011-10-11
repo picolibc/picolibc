@@ -1167,6 +1167,7 @@ fhandler_base::ioctl (unsigned int cmd, void *buf)
       res = 0;
       break;
     case FIONREAD:
+    case TIOCSCTTY:
       set_errno (ENOTTY);
       res = -1;
       break;
@@ -1190,8 +1191,6 @@ fhandler_base::lock (int, struct __flock64 *)
 int __stdcall
 fhandler_base::fstat (struct __stat64 *buf)
 {
-  debug_printf ("here");
-
   if (is_fs_special ())
     return fstat_fs (buf);
 
@@ -1386,6 +1385,13 @@ fhandler_base::tcsetpgrp (const pid_t)
 
 int
 fhandler_base::tcgetpgrp ()
+{
+  set_errno (ENOTTY);
+  return -1;
+}
+
+int
+fhandler_base::tcgetsid ()
 {
   set_errno (ENOTTY);
   return -1;

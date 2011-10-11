@@ -145,7 +145,7 @@ fhandler_pty_master::accept_input ()
       rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
       if (!rc)
 	{
-	  debug_printf ("error writing to pipe %E");
+	  debug_printf ("error writing to pipe %p %E", get_output_handle ());
 	  get_ttyp ()->read_retval = -1;
 	  ret = -1;
 	}
@@ -947,6 +947,9 @@ int
 fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
 {
   termios_printf ("ioctl (%x)", cmd);
+  int res = ioctl_termios (cmd, (int) arg);
+  if (res <= 0)
+    return res;
 
   if (myself->pgid && get_ttyp ()->getpgid () != myself->pgid
       && (unsigned) myself->ctty == FHDEV (DEV_TTYS_MAJOR, get_unit ())
@@ -1358,6 +1361,10 @@ fhandler_pty_master::tcflush (int queue)
 int
 fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 {
+  int res = ioctl_termios (cmd, (int) arg);
+  if (res <= 0)
+    return res;
+
   switch (cmd)
     {
     case TIOCPKT:

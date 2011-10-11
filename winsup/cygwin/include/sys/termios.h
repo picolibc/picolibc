@@ -19,6 +19,7 @@ details. */
 #define	TIOCMBIC	0x5417
 #define	TIOCMSET	0x5418
 #define	TIOCINQ		0x541B
+#define TIOCSCTTY	0x540E
 
 /* TIOCINQ is utilized instead of FIONREAD which has been
 accupied for other purposes under CYGWIN.
@@ -327,6 +328,7 @@ int tcsendbreak (int, int);
 int tcdrain (int);
 int tcflush (int, int);
 int tcflow (int, int);
+int tcgetsid (int);
 void cfmakeraw (struct termios *);
 speed_t cfgetispeed(const struct termios *);
 speed_t cfgetospeed(const struct termios *);

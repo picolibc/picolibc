@@ -400,3 +400,37 @@ fhandler_termios::sigflush ()
   if (get_ttyp () && !(get_ttyp ()->ti.c_lflag & NOFLSH))
     tcflush (TCIFLUSH);
 }
+
+int
+fhandler_termios::tcgetsid ()
+{
+  if (myself->ctty != -1 && myself->ctty == tc ()->ntty)
+    return tc ()->getsid ();
+  set_errno (ENOTTY);
+  return -1;
+}
+
+int
+fhandler_termios::ioctl_termios (int cmd, int arg)
+{
+  if (cmd != TIOCSCTTY)
+    return 1;		/* Not handled by this function */
+
+  if (arg != 0 && arg != 1)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  termios_printf ("myself->ctty %d, myself->sid %d, myself->pid %d, arg %d, tc()->getsid () %d\n",
+		  myself->ctty, myself->sid, myself->pid, arg, tc ()->getsid ());
+  if (myself->ctty > 0 || myself->sid != myself->pid || (!arg && tc ()->getsid () > 0))
+    {
+      set_errno (EPERM);
+      return -1;
+    }
+
+  myself->ctty = -1;
+  myself->set_ctty (tc (), 0, this);
+  return 0;
+}

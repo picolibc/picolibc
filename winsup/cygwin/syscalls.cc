@@ -1134,7 +1134,7 @@ open (const char *unix_path, int flags, ...)
 	     a change in behavior that implements linux functionality:  opening
 	     a tty should not automatically cause it to become the controlling
 	     tty for the process.  */
-	  if (fd > 2)
+	  if (0 && fd > 2)
 	    flags |= O_NOCTTY;
 	  if (!(fh = build_fh_name (unix_path,
 				    (flags & (O_NOFOLLOW | O_EXCL))
@@ -1600,9 +1600,10 @@ stat_worker (path_conv &pc, struct __stat64 *buf)
 	  if (!buf->st_ino)
 	    buf->st_ino = fh->get_ino ();
 	  if (!buf->st_dev)
-	    buf->st_dev = fh->get_device ();
+	    buf->st_dev = fh->is_dev_tty () ? FH_TTY : fh->get_device ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
+debug_printf ("is_dev_tty %d, st_dev %p\n", fh->is_dev_tty (), buf->st_dev);
 	}
       delete fh;
     }

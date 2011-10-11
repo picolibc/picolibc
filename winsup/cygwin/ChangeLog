@@ -1,5 +1,37 @@
 2011-10-11  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* cygwin.din: Remove some _tc* exports.  Add tcgetsid().
+	* dtable.cc (fh_alloc): Revert ill-advised setting of major/minor.  Use
+	new is_dev_tty to remember that this device was opened as /dev/tty.
+	* fhandler.cc (fhandler_base::fstat): Remove leftover debugging
+	statement.
+	(fhandler_base::tcgetsid): New function.
+	* fhandler.h ((fhandler_base::tcgetsid): Declare new function.
+	(fhandler_base::is_dev_tty): Ditto.
+	(fhandler_termios::opened_as_dev_tty): Declare new field.
+	(fhandler_termios::is_dev_tty): Declare new function.
+	(fhandler_termios::tcgetsid): Ditto.
+	(fhandler_pty_common::use_archetype): Move here from subclass.
+	(fhandler_pty_slave::use_archetype): Move up.
+	(fhandler_pty_master::use_archetype): Ditto.
+	* fhandler_console.cc (fhandler_console::ioctl): Rename second argument
+	from `buf' to `arg' for consistency.  Call ioctl_termios for common
+	fhandler_termios ioctl handling.
+	* fhandler_tty.cc (fhandler_pty_slave::ioctl): Call ioctl_termios for
+	common fhandler_termios ioctl handling.
+	(fhandler_pty_master::ioctl): Ditto.
+	* fhandler_termios.cc (fhandler_termios::tcgetsid): Implement new
+	function.
+	(fhandler_termios::ioctl_termios): Ditto.  Implements TIOCSCTTY
+	handling.
+	* syscalls.cc (stat_worker): Set /dev/tty device info when appropriate.
+	* termios.cc (tcgetpgrp): Avoid extraneous "isatty" check.
+	(tcgetsid): Implement new function.
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 253.
+	* include/sys/termios.h (TIOCSCTTY): Define.
+
+2011-10-11  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* dtable.cc (fh_alloc): Don't parse /dev/tty if ctty is < 0.  Reset
 	major/minor from the specific tty to those for /dev/tty.
 
