@@ -1175,9 +1175,19 @@ fhandler_console::cursor_set (bool rel_to_top, int x, int y)
   COORD pos;
 
   dev_state.fillin_info (get_output_handle ());
+#if 0
+  /* Setting y to the current winBottom here is the reason that the window
+     isn't scrolled back to the current cursor position like it's done in
+     any other terminal.  Rather, the curser is forced to the bottom of the
+     currently scrolled region.  This breaks the console buffer content if
+     output is generated while the user had the window scrolled back.  This
+     behaviour is very old, it has no matching ChangeLog entry.
+     Just disable for now but keep the code in for future reference. */
   if (y > dev_state.info.winBottom)
     y = dev_state.info.winBottom;
-  else if (y < 0)
+  else
+#endif
+  if (y < 0)
     y = 0;
   else if (rel_to_top)
     y += dev_state.info.winTop;

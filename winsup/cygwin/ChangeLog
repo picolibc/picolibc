@@ -1,3 +1,8 @@
+2011-10-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (fhandler_console::cursor_set): Disable forcing
+	y to the current winBottom position.  Explain why.
+
 2011-10-11  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* cygwin.din: Remove some _tc* exports.  Add tcgetsid().
