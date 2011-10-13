@@ -1,3 +1,17 @@
+2011-10-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (copy_cwd_str): Move up in file to be accessible from
+	class fcwd_access_t.
+	(class fcwd_access_t): New class to consolidate and hide the details
+	of the various FAST_CWD implementations.  Add implementation for
+	Windows 8 Developer Preview.
+	(fast_cwd_version): Make static private member of fcwd_access_t.
+	(fast_cwd_ptr): Change base type to fcwd_access_t.
+	(find_fast_cwd_pointer): Return fcwd_access_t**.
+	(find_fast_cwd): Ditto.  Rip out all FAST_CWD implementations and use
+	fcwd_access_t methods instead.
+	(cwdstuff::override_win32_cwd): Ditto.
+
 2011-10-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc (fhandler_console::cursor_set): Disable forcing
