@@ -1,3 +1,8 @@
+2011-10-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Add Windows 8 recognition.  Note as
+	unsupported.  Update products array.
+
 2011-10-11  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* utils.sgml (getconf): Expand documentation.

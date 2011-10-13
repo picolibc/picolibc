@@ -1433,6 +1433,12 @@ dump_sysinfo ()
 	  else if (osversion.dwMinorVersion == 1)
 	    strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
 			    ? "7" : "2008 R2");
+	  else if (osversion.dwMinorVersion == 2)
+	    {
+	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+			      ? "8" : "Server 8");
+	      strcat (osname, " (not yet supported!)");
+	    }
 	  DWORD prod;
 	  if (GetProductInfo (osversion.dwMajorVersion,
 			      osversion.dwMinorVersion,
@@ -1460,7 +1466,7 @@ dump_sysinfo ()
  /* 0x0000000d */ " Server Standard Core",
  /* 0x0000000e */ " Server Enterprise Core",
  /* 0x0000000f */ " Server Enterprise for Itanium-based Systems",
- /* 0x00000000 */ " Business N",
+ /* 0x00000010 */ " Business N",
  /* 0x00000011 */ " Web Server",
  /* 0x00000012 */ " HPC Edition",
  /* 0x00000013 */ " Home Server",
@@ -1478,7 +1484,7 @@ dump_sysinfo ()
  /* 0x0000001f */ " Essential Business Server Security Server"
  /* 0x00000020 */ " Essential Business Server Messaging Server",
  /* 0x00000021 */ " Server Foundation",
- /* 0x00000022 */ "",
+ /* 0x00000022 */ " Home Server 2011",
  /* 0x00000023 */ " without Hyper-V for Windows Essential Server Solutions",
  /* 0x00000024 */ " Server Standard without Hyper-V",
  /* 0x00000025 */ " Server Datacenter without Hyper-V",
@@ -1494,13 +1500,13 @@ dump_sysinfo ()
  /* 0x0000002f */ " Starter N",
  /* 0x00000030 */ " Professional",
  /* 0x00000031 */ " Professional N",
- /* 0x00000032 */ "",
+ /* 0x00000032 */ " Home Server 2011",
  /* 0x00000033 */ "",
  /* 0x00000034 */ "",
  /* 0x00000035 */ "",
  /* 0x00000036 */ "",
  /* 0x00000037 */ "",
- /* 0x00000038 */ "",
+ /* 0x00000038 */ " Multipoint Server",
  /* 0x00000039 */ "",
  /* 0x0000003a */ "",
  /* 0x0000003b */ "",
