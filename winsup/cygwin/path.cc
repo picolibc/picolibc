@@ -3665,9 +3665,13 @@ find_fast_cwd_pointer ()
   /* Find first "push edi" instruction. */
   const uint8_t *pushedi = (const uint8_t *) memchr (use_cwd, 0x57, 32);
   /* ...which should be followed by "mov edi, crit-sect-addr" then
-     "push edi". */
+     "push edi", or by just a single "push crit-sect-addr". */
   const uint8_t *movedi = pushedi + 1;
-  if (movedi[0] != 0xbf || movedi[5] != 0x57)
+  if (movedi[0] == 0xbf && movedi[5] == 0x57)
+    rcall = movedi + 6;
+  else if (movedi[0] == 0x68)
+    rcall = movedi + 5;
+  else
     return NULL;
   /* Compare the address used for the critical section with the known
      PEB lock as stored in the PEB. */
@@ -3676,7 +3680,6 @@ find_fast_cwd_pointer ()
     return NULL;
   /* To check we are seeing the right code, we check our expectation that
      the next instruction is a relative call into RtlEnterCriticalSection. */
-  rcall = movedi + 6;
   if (rcall[0] != 0xe8)
     return NULL;
   /* Check that this is a relative call to RtlEnterCriticalSection. */

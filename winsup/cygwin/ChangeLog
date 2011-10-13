@@ -1,5 +1,10 @@
 2011-10-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (find_fast_cwd_pointer): Allow 'push crit-sect-addr' instead
+	of 'mov edi, crit-sect-addr; push edi' and set rcall accordingly.
+
+2011-10-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (copy_cwd_str): Move up in file to be accessible from
 	class fcwd_access_t.
 	(class fcwd_access_t): New class to consolidate and hide the details
