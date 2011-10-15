@@ -14,7 +14,7 @@ details. */
 
 #define INP_BUFFER_SIZE 256
 #define OUT_BUFFER_SIZE 256
-#define NTTYS		128
+#define NTTYS		64
 #define real_tty_attached(p)	((p)->ctty >= 0 && !iscons_dev ((p)->ctty))
 
 /* Input/Output/ioctl events */
@@ -107,6 +107,7 @@ public:
   inline HANDLE open_input_mutex (ACCESS_MASK access)
     { return open_mutex (INPUT_MUTEX, access); }
   bool exists ();
+  bool not_allocated (HANDLE&, HANDLE&);
   void set_master_closed () {master_pid = -1;}
   static void __stdcall create_master (int);
   static void __stdcall init_session ();
@@ -120,7 +121,7 @@ class tty_list
 
 public:
   tty * operator [](int n) {return ttys + device::minor (n);}
-  int allocate ();	/* allocate a pty */
+  int allocate (HANDLE& r, HANDLE& w);	/* allocate a pty */
   int connect (int);
   void init ();
   tty_min *get_cttyp ();

@@ -21,6 +21,8 @@ details. */
 #include "cygtls.h"
 #include "ntdll.h"
 
+fhandler_termios *fhandler_termios::last;
+
 /* Common functions shared by tty/console */
 
 void
@@ -411,10 +413,12 @@ fhandler_termios::tcgetsid ()
 }
 
 int
-fhandler_termios::ioctl_termios (int cmd, int arg)
+fhandler_termios::ioctl (int cmd, void *varg)
 {
   if (cmd != TIOCSCTTY)
     return 1;		/* Not handled by this function */
+
+  int arg = (int) varg;
 
   if (arg != 0 && arg != 1)
     {
@@ -431,6 +435,6 @@ fhandler_termios::ioctl_termios (int cmd, int arg)
     }
 
   myself->ctty = -1;
-  myself->set_ctty (tc (), 0, this);
+  myself->set_ctty (this, 0);
   return 0;
 }

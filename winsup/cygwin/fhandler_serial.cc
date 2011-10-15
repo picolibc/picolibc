@@ -1172,9 +1172,9 @@ fhandler_serial::fixup_after_exec ()
 }
 
 int
-fhandler_serial::dup (fhandler_base *child)
+fhandler_serial::dup (fhandler_base *child, int flags)
 {
   fhandler_serial *fhc = (fhandler_serial *) child;
   fhc->overlapped_setup ();
-  return fhandler_base::dup (child);
+  return fhandler_base::dup (child, flags);
 }

@@ -405,9 +405,9 @@ fhandler_dev_floppy::close ()
 }
 
 int
-fhandler_dev_floppy::dup (fhandler_base *child)
+fhandler_dev_floppy::dup (fhandler_base *child, int flags)
 {
-  int ret = fhandler_dev_raw::dup (child);
+  int ret = fhandler_dev_raw::dup (child, flags);
 
   if (!ret && partitions)
     InterlockedIncrement (&partitions->refcnt);

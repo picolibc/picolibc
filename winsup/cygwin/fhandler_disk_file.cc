@@ -1390,11 +1390,11 @@ fhandler_disk_file::close ()
 }
 
 int
-fhandler_disk_file::dup (fhandler_base *child)
+fhandler_disk_file::dup (fhandler_base *child, int flags)
 {
   fhandler_disk_file *fhc = (fhandler_disk_file *) child;
 
-  int ret = fhandler_base::dup (child);
+  int ret = fhandler_base::dup (child, flags);
   if (!ret && prw_handle
       && !DuplicateHandle (GetCurrentProcess (), prw_handle,
 			   GetCurrentProcess (), &fhc->prw_handle,

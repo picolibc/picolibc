@@ -44,7 +44,7 @@ fhandler_dev_clipboard::fhandler_dev_clipboard ()
  */
 
 int
-fhandler_dev_clipboard::dup (fhandler_base * child)
+fhandler_dev_clipboard::dup (fhandler_base * child, int)
 {
   fhandler_dev_clipboard *fhc = (fhandler_dev_clipboard *) child;
 

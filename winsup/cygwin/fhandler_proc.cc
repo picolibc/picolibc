@@ -1371,7 +1371,7 @@ format_proc_devices (void *, char *&destbuf)
 			     "%3d sd\n"
 			     "%3d sd\n",
 			     DEV_MEM_MAJOR, DEV_CONS_MAJOR, _major (FH_TTY),
-			     _major (FH_CONSOLE), _major (FH_PTYM),
+			     _major (FH_CONSOLE), _major (FH_PTMX),
 			     DEV_TAPE_MAJOR, DEV_MISC_MAJOR, DEV_SOUND_MAJOR,
 			     DEV_SERIAL_MAJOR, DEV_TTYS_MAJOR, DEV_FLOPPY_MAJOR,
 			     DEV_SD_MAJOR, DEV_CDROM_MAJOR, DEV_SD1_MAJOR,

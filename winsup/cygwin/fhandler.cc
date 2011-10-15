@@ -37,17 +37,15 @@ static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
 struct __cygwin_perfile *perfile_table;
 
-inline fhandler_base&
-fhandler_base::operator =(fhandler_base& x)
+void
+fhandler_base::reset (const fhandler_base *from)
 {
-  memcpy (this, &x, size ());
-  pc = x.pc;
+  pc = from->pc;
   rabuf = NULL;
   ralen = 0;
   raixget = 0;
   raixput = 0;
   rabuflen = 0;
-  return *this;
 }
 
 int
@@ -462,17 +460,17 @@ fhandler_base::open_with_arch (int flags, mode_t mode)
     }
   else if (archetype)
     {
-      if (!archetype->io_handle)
+      if (!archetype->get_io_handle ())
 	{
-	  usecount = 0;
-	  *archetype = *this;
+	  copyto (archetype);
 	  archetype_usecount (1);
 	  archetype->archetype = NULL;
+	  usecount = 0;
 	}
       else
 	{
 	  fhandler_base *arch = archetype;
-	  *this = *archetype;
+	  archetype->copyto (this);
 	  archetype = arch;
 	  archetype_usecount (1);
 	  usecount = 0;
@@ -1259,7 +1257,7 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
 }
 
 int
-fhandler_base::dup (fhandler_base *child)
+fhandler_base::dup (fhandler_base *child, int)
 {
   debug_printf ("in fhandler_base dup");
 
@@ -1283,9 +1281,9 @@ fhandler_base::dup (fhandler_base *child)
 }
 
 int
-fhandler_base_overlapped::dup (fhandler_base *child)
+fhandler_base_overlapped::dup (fhandler_base *child, int flags)
 {
-  int res = fhandler_base::dup (child) ||
+  int res = fhandler_base::dup (child, flags) ||
 	    ((fhandler_base_overlapped *) child)->setup_overlapped ();
   return res;
 }

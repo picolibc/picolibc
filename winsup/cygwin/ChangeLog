@@ -1,3 +1,117 @@
+2011-10-15  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* cygerrno.h (__set_errno): Modify debugging output to make searching
+	strace logs easier.
+
+	Throughout, change /dev/tty* to /dev/pty*.
+	Throughout, add flags argument to fhandler_*::dup methods.
+	* devices.in: Rename (temporarily?) /dev/ttyN to /dev/ptyN.  Add
+	/dev/ptymN devices for pty masters.
+	* devices.cc: Regenerate.
+	* devices.h (MAX_CONSOLES): Set to max number supported by devices.in.
+	(fh_devices::FH_PTMX): Rename from FH_PTYM.
+	(device::operator int): Return by reference.
+	* dtable.cc (fh_alloc): Take pc as an argument rather than just the
+	device.  This makes debugging easier since more information is
+	available.  Actually implement handling for already-allocated pty
+	master devices.  Make different decisions when generating fhandler for
+	not-opened devices.  Add kludge to deal with opening /dev/tty.
+	(cnew_no_ctor): New macro.
+	(build_fh_pc): Make debugging output more verbose.  Use new clone()
+	fhandler interface to duplicate archetypes.  Reset last term opened.
+	(dtable::dup_worker): Use Use new clone() fhandler interface to
+	duplicate archetypes.  Pass flags to child dup handler.
+	(dtable::dup3): Set O_NOCTTY flag if newfd is not stdin/stdout/stderr.
+	* fhandler.cc (fhandler_base::reset): Rename from operator =() and
+	reduce functionality and sense of copy direction.
+	(fhandler_base::open_with_arch): Use published interface to query
+	io_handle().  Use new copyto() fhandler method to copy from/to found
+	archetype.
+	* fhandler.h: Throughout, delete size(), add copyout, clone, and
+	fhandler_* (void *) methods.
+	(fhandler_base::reset): Rename from operator =().
+	(fhandler_termios::is_dev_tty): Delete.
+	(fhandler_termios): change "protected" region to "private".
+	(fhandler_termios::is_dev_tty): Delete.
+	(fhandler_termios): Rearrange protected/public.
+	(fhandler_termios::fhandler_termios): Remember last fhandler_termios
+	"opened".
+	(fhandler_termios::~fhandler_termios): Forget last fhandler_termios
+	opened.
+	(ioctl): Rename from ioctl_termios.  Take a void * argument.  Reflect
+	argument change in pinfo::set_ctty.
+	(fhandler_console::dup): Declare new function.  Set ctty here if
+	appropriate.
+	(fhandler_pty_master::from_master): Privatize.
+	(fhandler_pty_master::to_master): Ditto.
+	(fhandler_pty_master::dwProcessId): Ditto.
+	(fhandler_pty_master::fhandler_pty_master): Add an `int' argument.
+	(fhandler_pty_master::open_setup): Declare new function.
+	(fhandler_pty_master::~fhandler_pty_master): Declare new method.
+	(fhandler_nodevice): Remove commented out function declaration.
+	* fhandler_console.cc: Use get_ttyp() instead of tc() throughout.
+	(fhandler_console::dup): Define new function to set controlling ctty on
+	dup, as appropriate.
+	(fhandler_console::ioctl): Reflect ioctl_termios name change.
+	(fhandler_console::setup): Rename from get_tty_stuff.
+	(fhandler_console::open_setup): Reflect argument change in
+	pinfo::set_ctty.
+	(fhandler_console::fhandler_console): Set _tc here.
+	* fhandler_termios.cc (handler_termios::ioctl): Rename.  Take a void *
+	arg like other ioctl functions.
+	* fhandler_tty.cc (fhandler_pty_slave::dup): Call myself->set_ctty to
+	potentially reset the controlling terminal.
+	(fhandler_pty_slave::ioctl): Reflect name/arg change for ioctl_termios.
+	(fhandler_pty_slave::fhandler_pty_slave): Take a "unit" argument.  Call
+	setup() here so that we will know the unit number of this fhandler as
+	soon as possible.  Set the unit as appropriate.
+	(handler_pty_master::open): Move most stuff to constructor and
+	open_setup.
+	(handler_pty_slave::open_setup): Reflect argument change in
+	pinfo::set_ctty.
+	(handler_pty_master::open_setup): Define new function.
+	(fhandler_pty_master::cleanup): Clear handles as a flag that the
+	destructor does not have to do "close" operations.
+	(fhandler_pty_master::close): Ditto.
+	(fhandler_pty_master::~fhandler_pty_master): Define new method.
+	(fhandler_pty_master::ioctl): Reflect name/arg change for
+	ioctl_termios.
+	(fhandler_pty_master::setup): Allocate tty here.  Rely on handles being
+	returned from allocated test rather than opening them here.  Avoid
+	setting _need_nl here since it is already zeroed in the constructor.
+	Set up device information with DEV_TTYM_MAJOR.
+	* path.h (path_conv &operator =): Take a const argument.
+	(path_conv::dup): Ditto.
+	(pathconv_arg::PC_OPEN): New enum.
+	(pathconv_arg::PC_CTTY): Ditto.
+	(path_types::PATH_CTTY): Ditto.
+	(path_types::PATH_OPEN): Ditto.
+	(path_conv::isopen): New method.
+	(path_conv::isctty_capable): Ditto.
+	* path.cc (path_conv::check): Set PATH_OPEN and PATH_CTTY as
+	appropriate.
+	* pipe.cc (fhandler_pipe::open): Use copyto to copy pipe handle.
+	* syscall.cc (open): Reinstate fd > 2 check to disallow resetting ctty
+	on non-std* handles.
+	* tty.cc (tty_list::allocate): Pass out handles for allocated tty.  use
+	`not_allocated' to find unallocated ttys.  Avoid keeping the lock since
+	the allocation of the tty should be sufficient to prevent multiple
+	access.
+	(tty::not_allocated): Clarify comment.  Rename.  Return handles when an
+	unused tty is found.  Simply test for existing tty.
+	(tty::exists): Rewrite to use `not_allocated'.
+	* tty.h (NTTYS): Reset down to actual number supported by devices.in.
+	(tty::not_allocated): Declare new function.
+	(tty_list::allocate): Pass out read/write tty handles.  Zero them when
+	not found.
+	* fhandler_proc.cc: Reflect name change from FH_PTYM -> FH_PTMX.
+	* pinfo.h (pinfo::set_ctty): Reduce/reorder arguments passed in.
+	* pinfo.cc (pinfo::set_ctty): Ditto.  Just use tc() built into the
+	passed-in fhandler_termios pointer.  Return true if ctty is assigned.
+	* syscalls.cc (open): Call build_fh_pc with PC_OPEN flag.  Set PC_CTTY
+	if appropriate.
+	(stat_worker): Remove is_dev_tty () stuff.
+
 2011-10-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc (dos_drive_mappings::fixup_if_match): Convert
@@ -63,6 +177,11 @@
 	(fhandler_base::tcgetsid): New function.
 	* fhandler.h ((fhandler_base::tcgetsid): Declare new function.
 	(fhandler_base::is_dev_tty): Ditto.
+	(fhandler_termios): Rearrange protected/public.
+	(fhandler_termios::fhandler_termios): Remember last fhandler_termios
+	"opened".
+	(fhandler_termios::~fhandler_termios): Forget last fhandler_termios
+	opened.
 	(fhandler_termios::opened_as_dev_tty): Declare new field.
 	(fhandler_termios::is_dev_tty): Declare new function.
 	(fhandler_termios::tcgetsid): Ditto.

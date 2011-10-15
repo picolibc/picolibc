@@ -539,7 +539,7 @@ void
 fhandler_pty_slave::open_setup (int flags)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
-  myself->set_ctty (get_ttyp (), flags, this);
+  myself->set_ctty (this, flags);
   cygheap->manage_console_count ("fhandler_pty_slave::open_setup", 1);
   report_tty_counts (this, "opened", "");
 }
@@ -614,7 +614,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   if (bg <= bg_eof)
     return (ssize_t) bg;
 
-  termios_printf ("tty%d, write(%x, %d)", get_unit (), ptr, len);
+  termios_printf ("pty%d, write(%x, %d)", get_unit (), ptr, len);
 
   push_process_state process_state (PID_TTYOU);
 
@@ -891,15 +891,16 @@ out:
 }
 
 int
-fhandler_pty_slave::dup (fhandler_base *child)
+fhandler_pty_slave::dup (fhandler_base *child, int flags)
 {
+  myself->set_ctty (this, flags);
   cygheap->manage_console_count ("fhandler_pty_slave::dup", 1);
   report_tty_counts (child, "duped slave", "");
   return 0;
 }
 
 int
-fhandler_pty_master::dup (fhandler_base *child)
+fhandler_pty_master::dup (fhandler_base *child, int)
 {
   report_tty_counts (child, "duped master", "");
   return 0;
@@ -947,7 +948,7 @@ int
 fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
 {
   termios_printf ("ioctl (%x)", cmd);
-  int res = ioctl_termios (cmd, (int) arg);
+  int res = fhandler_termios::ioctl (cmd, arg);
   if (res <= 0)
     return res;
 
@@ -1184,35 +1185,32 @@ errout:
 /*******************************************************
  fhandler_pty_master
 */
-fhandler_pty_master::fhandler_pty_master ()
-  : fhandler_pty_common (), pktmode (0), need_nl (0), dwProcessId (0)
+fhandler_pty_master::fhandler_pty_master (int unit)
+  : fhandler_pty_common (), pktmode (0), master_ctl (NULL),
+    master_thread (NULL), from_master (NULL), to_master (NULL),
+    dwProcessId (0), need_nl (0)
 {
+  if (unit >= 0)
+    dev ().parse (DEV_TTYM_MAJOR, unit);
+  else if (!setup ())
+    dev ().parse (FH_ERROR);
 }
 
 int
 fhandler_pty_master::open (int flags, mode_t)
 {
-  /* Note that allocate returns with the tty lock set if it was successful. */
-  int unit = cygwin_shared->tty.allocate ();
-  if (unit < 0)
-    return 0;
-
-  dev().parse (DEV_TTYM_MAJOR, unit);
-  if (!setup ())
-    {
-      lock_ttys::release ();
-      return 0;
-    }
-  lock_ttys::release ();
-  set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
-
   dwProcessId = GetCurrentProcessId ();
-
-  char buf[sizeof ("opened pty master for ttyNNNNNNNNNNN")];
-  __small_sprintf (buf, "opened pty master for tty%d", get_unit ());
-  report_tty_counts (this, buf, "");
   return 1;
+}
+
+void
+fhandler_pty_master::open_setup (int flags)
+{
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
+  char buf[sizeof ("opened pty master for ptyNNNNNNNNNNN")];
+  __small_sprintf (buf, "opened pty master for pty%d", get_unit ());
+  report_tty_counts (this, buf, "");
 }
 
 _off64_t
@@ -1225,7 +1223,7 @@ fhandler_pty_common::lseek (_off64_t, int)
 int
 fhandler_pty_common::close ()
 {
-  termios_printf ("tty%d <%p,%p> closing", get_unit (), get_handle (), get_output_handle ());
+  termios_printf ("pty%d <%p,%p> closing", get_unit (), get_handle (), get_output_handle ());
   if (!ForceCloseHandle (input_mutex))
     termios_printf ("CloseHandle (input_mutex<%p>), %E", input_mutex);
   if (!ForceCloseHandle (output_mutex))
@@ -1245,6 +1243,8 @@ void
 fhandler_pty_master::cleanup ()
 {
   report_tty_counts (this, "closing master", "");
+  if (archetype)
+    from_master = to_master = NULL;
 }
 
 int
@@ -1272,11 +1272,14 @@ fhandler_pty_master::close ()
 	  CloseHandle (master_ctl);
 	  master_thread->detach ();
 	}
-      if (!ForceCloseHandle (from_master))
-	termios_printf ("error closing from_master %p, %E", from_master);
-      if (!ForceCloseHandle (to_master))
-	termios_printf ("error closing from_master %p, %E", to_master);
     }
+
+  if (!ForceCloseHandle (from_master))
+    termios_printf ("error closing from_master %p, %E", from_master);
+  if (!ForceCloseHandle (to_master))
+    termios_printf ("error closing from_master %p, %E", to_master);
+  from_master = to_master = NULL;
+
   fhandler_pty_common::close ();
 
   if (hExeced || get_ttyp ()->master_pid != myself->pid)
@@ -1285,6 +1288,15 @@ fhandler_pty_master::close ()
     get_ttyp ()->set_master_closed ();
 
   return 0;
+}
+
+/* This is just to catch error conditions.  Since the constructor 
+   ctually opens some handles, and stat() does not open an fd, they need
+   to be closed when the fhandler goes away. */
+fhandler_pty_master::~fhandler_pty_master ()
+{
+  if (from_master && to_master)
+    close_with_arch ();
 }
 
 ssize_t __stdcall
@@ -1361,7 +1373,7 @@ fhandler_pty_master::tcflush (int queue)
 int
 fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 {
-  int res = ioctl_termios (cmd, (int) arg);
+  int res = fhandler_termios::ioctl (cmd, arg);
   if (res <= 0)
     return res;
 
@@ -1408,7 +1420,7 @@ fhandler_pty_master::ptsname ()
 {
   static char buf[TTY_NAME_MAX];
 
-  __small_sprintf (buf, "/dev/tty%d", get_unit ());
+  __small_sprintf (buf, "/dev/pty%d", get_unit ());
   return buf;
 }
 
@@ -1587,32 +1599,27 @@ fhandler_pty_master::setup ()
   security_descriptor sd;
   SECURITY_ATTRIBUTES sa = { sizeof (SECURITY_ATTRIBUTES), NULL, TRUE };
 
-  tty& t = *cygwin_shared->tty[get_unit ()];
-  _tc = (tty_min *)&t;
+  /* Find an unallocated pty to use. */
+  int unit = cygwin_shared->tty.allocate (from_master, get_output_handle ());
+  if (unit < 0)
+    return false;
+
+  ProtectHandle1 (get_output_handle (), to_pty);
+
+  tty& t = *cygwin_shared->tty[unit];
+  _tc = (tty_min *) &t;
 
   tcinit (true);		/* Set termios information.  Force initialization. */
 
   const char *errstr = NULL;
   DWORD pipe_mode = PIPE_NOWAIT;
 
-  /* Create communication pipes */
-  char pipename[sizeof("ptyNNNN-from-master")];
-  __small_sprintf (pipename, "pty%d-from-master", get_unit ());
-  res = fhandler_pipe::create_selectable (&sec_none, from_master,
-					  get_output_handle (), 128 * 1024,
-					  pipename);
-  if (res)
-    {
-      errstr = "input pipe";
-      goto err;
-    }
-
-  ProtectHandle1 (get_output_handle (), to_pty);
   if (!SetNamedPipeHandleState (get_output_handle (), &pipe_mode, NULL, NULL))
     termios_printf ("can't set output_handle(%p) to non-blocking mode",
 		    get_output_handle ());
 
-  __small_sprintf (pipename, "pty%d-to-master", get_unit ());
+  char pipename[sizeof("ptyNNNN-from-master")];
+  __small_sprintf (pipename, "pty%d-to-master", unit);
   res = fhandler_pipe::create_selectable (&sec_none, get_io_handle (),
 					  to_master, 128 * 1024, pipename);
   if (res)
@@ -1622,7 +1629,6 @@ fhandler_pty_master::setup ()
     }
 
   ProtectHandle1 (get_io_handle (), from_pty);
-  need_nl = 0;
 
   /* Create security attribute.  Default permissions are 0620. */
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
@@ -1642,18 +1648,18 @@ fhandler_pty_master::setup ()
     goto err;
 
   char buf[MAX_PATH];
-  errstr = shared_name (buf, OUTPUT_MUTEX, t.get_unit ());
+  errstr = shared_name (buf, OUTPUT_MUTEX, unit);
   if (!(output_mutex = CreateMutex (&sa, FALSE, buf)))
     goto err;
 
-  errstr = shared_name (buf, INPUT_MUTEX, t.get_unit ());
+  errstr = shared_name (buf, INPUT_MUTEX, unit);
   if (!(input_mutex = CreateMutex (&sa, FALSE, buf)))
     goto err;
 
   /* Create master control pipe which allows the master to duplicate
      the pty pipe handles to processes which deserve it. */
   __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-pty%d-master-ctl",
-		   &installation_key, get_unit ());
+		   &installation_key, unit);
   master_ctl = CreateNamedPipe (buf, PIPE_ACCESS_DUPLEX,
 				PIPE_WAIT | PIPE_TYPE_MESSAGE
 				| PIPE_READMODE_MESSAGE, 1, 4096, 4096,
@@ -1676,7 +1682,9 @@ fhandler_pty_master::setup ()
   t.winsize.ws_row = 25;
   t.master_pid = myself->pid;
 
-  termios_printf ("tty%d opened - from_pty %p, to_pty %p", t.get_unit (),
+  dev ().parse (DEV_TTYM_MAJOR, unit);
+
+  termios_printf ("this %p, pty%d opened - from_pty %p, to_pty %p", this, unit,
 		  get_io_handle (), get_output_handle ());
   return true;
 
@@ -1690,8 +1698,7 @@ err:
   close_maybe (from_master);
   close_maybe (to_master);
   close_maybe (master_ctl);
-  termios_printf ("tty%d open failed - failed to create %s", t.get_unit (),
-		  errstr);
+  termios_printf ("pty%d open failed - failed to create %s", unit, errstr);
   return false;
 }
 

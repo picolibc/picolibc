@@ -1118,6 +1118,12 @@ out:
   if (saw_symlinks)
     set_has_symlinks ();
 
+  if (opt & PC_OPEN)
+    path_flags |= PATH_OPEN;
+
+  if (opt & PC_CTTY)
+    path_flags |= PATH_CTTY;
+
   if ((opt & PC_POSIX))
     {
       if (tail < path_end && tail > path_copy + 1)

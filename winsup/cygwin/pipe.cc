@@ -86,10 +86,10 @@ fhandler_pipe::open (int flags, mode_t mode)
 	      set_errno (EACCES);
 	      return 0;
 	    }
-	  *this = *(fhandler_pipe *) cfd;
+	  cfd->copyto (this);
 	  set_io_handle (NULL);
 	  pc.reset_conv_handle ();
-	  if (!cfd->dup (this))
+	  if (!cfd->dup (this, flags))
 	    return 1;
 	  return 0;
 	}
@@ -172,13 +172,13 @@ fhandler_pipe::get_proc_fd_name (char *buf)
 }
 
 int
-fhandler_pipe::dup (fhandler_base *child)
+fhandler_pipe::dup (fhandler_base *child, int flags)
 {
   fhandler_pipe *ftp = (fhandler_pipe *) child;
   ftp->set_popen_pid (0);
 
   int res;
-  if (get_handle () && fhandler_base_overlapped::dup (child))
+  if (get_handle () && fhandler_base_overlapped::dup (child, flags))
     res = -1;
   else
     res = 0;

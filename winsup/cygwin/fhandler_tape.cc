@@ -1444,7 +1444,7 @@ fhandler_dev_tape::fstat (struct __stat64 *buf)
 }
 
 int
-fhandler_dev_tape::dup (fhandler_base *child)
+fhandler_dev_tape::dup (fhandler_base *child, int flags)
 {
   lock (-1);
   fhandler_dev_tape *fh = (fhandler_dev_tape *) child;
@@ -1468,7 +1468,7 @@ fhandler_dev_tape::dup (fhandler_base *child)
       __seterrno ();
       return unlock (-1);
     }
-  return unlock (fhandler_dev_raw::dup (child));
+  return unlock (fhandler_dev_raw::dup (child, flags));
 }
 
 void

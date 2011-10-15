@@ -750,7 +750,7 @@ fhandler_socket::fixup_after_exec ()
 }
 
 int
-fhandler_socket::dup (fhandler_base *child)
+fhandler_socket::dup (fhandler_base *child, int flags)
 {
   debug_printf ("here");
   fhandler_socket *fhs = (fhandler_socket *) child;
@@ -777,7 +777,7 @@ fhandler_socket::dup (fhandler_base *child)
     }
   if (!need_fixup_before ())
     {
-      int ret = fhandler_base::dup (child);
+      int ret = fhandler_base::dup (child, flags);
       if (ret)
 	{
 	  NtClose (fhs->wsock_evt);

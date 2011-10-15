@@ -66,10 +66,11 @@ const device dev_error_storage =
 }
 %%
 "/dev/tty", BRACK(FH_TTY), "/dev/tty"
-"/dev/tty%(0-63)d", BRACK(FHDEV(DEV_TTYS_MAJOR, {$1})), "/dev/tty{$1}", ttys_dev
+"/dev/pty%(0-63)d", BRACK(FHDEV(DEV_TTYS_MAJOR, {$1})), "/dev/pty{$1}", ttys_dev
+"/dev/ptym%(0-63)d", BRACK(FHDEV(DEV_TTYM_MAJOR, {$1})), "/dev/ptym{$1}", ttym_dev
 "/dev/cons%(0-63)d", BRACK(FHDEV(DEV_CONS_MAJOR, {$1})), "/dev/cons{$1}", cons_dev
 "/dev/console", BRACK(FH_CONSOLE), "/dev/console", console_dev
-"/dev/ptmx", BRACK(FH_PTYM), "/dev/ptmx"
+"/dev/ptmx", BRACK(FH_PTMX), "/dev/ptmx"
 "/dev/windows", BRACK(FH_WINDOWS), "/dev/windows"
 "/dev/dsp", BRACK(FH_OSS_DSP), "/dev/dsp"
 "/dev/conin", BRACK(FH_CONIN), "/dev/conin"

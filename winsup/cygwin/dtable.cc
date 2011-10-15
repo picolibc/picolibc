@@ -113,7 +113,7 @@ dtable::get_debugger_info ()
   extern bool jit_debug;
   if (!jit_debug && being_debugged ())
     {
-      char std[3][sizeof ("/dev/ttyNNNN")];
+      char std[3][sizeof ("/dev/ptyNNNN")];
       std[0][0] = std[1][0] = std [2][0] = '\0';
       char buf[sizeof ("cYgstd %x") + 32];
       sprintf (buf, "cYgstd %x %x %x", (unsigned) &std, sizeof (std[0]), 3);
@@ -401,6 +401,12 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
     ptr ? new (ptr) name (__VA_ARGS__) : NULL; \
   })
 
+#define cnew_no_ctor(name, ...) \
+  ({ \
+    void* ptr = (void*) ccalloc (HEAP_FHANDLER, 1, sizeof (name)); \
+    ptr ? new (ptr) name (ptr) : NULL; \
+  })
+
 fhandler_base *
 build_fh_name (const char *name, unsigned opt, suffix_info *si)
 {
@@ -429,15 +435,20 @@ build_fh_dev (const device& dev, const char *unix_name)
 }
 
 #define fh_unset ((fhandler_base *) 1)
+
 static fhandler_base *
-fh_alloc (device dev)
+fh_alloc (path_conv& pc)
 {
   fhandler_base *fh = fh_unset;
+  fhandler_base *fhraw = NULL;
 
-  switch (dev.get_major ())
+  switch (pc.dev.get_major ())
     {
     case DEV_TTYS_MAJOR:
-      fh = cnew (fhandler_pty_slave, dev.get_minor ());
+      fh = cnew (fhandler_pty_slave, pc.dev.get_minor ());
+      break;
+    case DEV_TTYM_MAJOR:
+      fh = cnew (fhandler_pty_master, pc.dev.get_minor ());
       break;
     case DEV_CYGDRIVE_MAJOR:
       fh = cnew (fhandler_cygdrive);
@@ -461,18 +472,21 @@ fh_alloc (device dev)
       fh = cnew (fhandler_serial);
       break;
     case DEV_CONS_MAJOR:
-      fh = cnew (fhandler_console, dev);
+      fh = cnew (fhandler_console, pc.dev);
       break;
     default:
-      switch ((int) dev)
+      switch ((int) pc.dev)
 	{
 	case FH_CONSOLE:
 	case FH_CONIN:
 	case FH_CONOUT:
-	  fh = cnew (fhandler_console, dev);
+	  fh = cnew (fhandler_console, pc.dev);
 	  break;
-	case FH_PTYM:
-	  fh = cnew (fhandler_pty_master);
+	case FH_PTMX:
+	  if (pc.isopen ())
+	    fh = cnew (fhandler_pty_master, -1);
+	  else
+	    fhraw = cnew_no_ctor (fhandler_pty_master, -1); 
 	  break;
 	case FH_WINDOWS:
 	  fh = cnew (fhandler_windows);
@@ -540,40 +554,52 @@ fh_alloc (device dev)
 	  fh = cnew (fhandler_netdrive);
 	  break;
 	case FH_TTY:
-	  {
-	    if (myself->ctty > 0)
-	      {
-		if (iscons_dev (myself->ctty))
-		  fh = cnew (fhandler_console, dev);
-		else
-		  fh = cnew (fhandler_pty_slave, myself->ctty);
-	      }
-	      ((fhandler_termios *) fh)->is_dev_tty (true);
-	    break;
-	  }
+	  if (!pc.isopen ())
+	    fhraw = cnew_no_ctor (fhandler_console, -1); 
+	  else if (myself->ctty <= 0
+		   && !myself->set_ctty (fhandler_termios::last, 0))
+	    /* no tty assigned */;
+	  else if (iscons_dev (myself->ctty))
+	    fh = cnew (fhandler_console, pc.dev);
+	  else
+	    fh = cnew (fhandler_pty_slave, myself->ctty);
+	  break;
 	case FH_KMSG:
 	  fh = cnew (fhandler_mailslot);
 	  break;
       }
     }
 
+  /* If `fhraw' is set that means that this fhandler is just a dummy
+     set up for stat().  Mock it up for use by stat without actually
+     trying to do any real initialization.  */
+  if (fhraw)
+    {
+      fh = fhraw;
+      fh->set_name (pc);
+      if (fh->use_archetype ())
+	fh->archetype = fh;
+    }
   if (fh == fh_unset)
     fh = cnew (fhandler_nodevice);
+  else if (fh->dev () == FH_ERROR)
+    {
+      delete fh;
+      fh = NULL;
+    }
   return fh;
 }
 
 fhandler_base *
 build_fh_pc (path_conv& pc, bool set_name)
 {
-  fhandler_base *fh = fh_alloc (pc.dev);
+  fhandler_base *fh = fh_alloc (pc);
 
   if (!fh)
     {
-      set_errno (EMFILE);
+      set_errno (ENXIO);
       goto out;
     }
-  else if (fh->dev () == FH_ERROR)
-    goto out;
   else if (fh->dev () != FH_NADA)
     fh->set_name (fh->dev ().name);
   else if (set_name)
@@ -582,18 +608,25 @@ build_fh_pc (path_conv& pc, bool set_name)
   if (!fh->use_archetype ())
     /* doesn't use archetypes */;
   else if ((fh->archetype = cygheap->fdtab.find_archetype (fh->dev ())))
-    debug_printf ("found an archetype for %s(%d/%d)", fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor ());
+    debug_printf ("found an archetype for %s(%d/%d) io_handle %p", fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor (),
+		  fh->archetype->get_io_handle ());
   else
     {
-      debug_printf ("creating an archetype for %s(%d/%d)", fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor ());
-      fh->archetype = fh_alloc (fh->pc.dev);
-      *fh->archetype = *fh;
+      fh->archetype = fh->clone ();
+      debug_printf ("created an archetype (%p) for %s(%d/%d)", fh->archetype, fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor ());
       fh->archetype->archetype = NULL;
       *cygheap->fdtab.add_archetype () = fh->archetype;
     }
 
+  /* The fhandler_termios constructor keeps track of the last tty-like thing
+     opened but we're only interested in this if we don't have a controlling
+     terminal since we could potentially want to open it if /dev/tty is
+     referenced. */
+  if (myself->ctty > 0 || !fh->is_tty () || !pc.isctty_capable ())
+    fhandler_termios::last = NULL;
+
 out:
-  debug_printf ("fh %p", fh);
+  debug_printf ("fh %p, dev %p", fh, (DWORD) fh->dev ());
   return fh;
 }
 
@@ -603,16 +636,16 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
   /* Don't call set_name in build_fh_pc.  It will be called in
      fhandler_base::operator= below.  Calling it twice will result
      in double allocation. */
-  fhandler_base *newfh = build_fh_pc (oldfh->pc, false);
+  fhandler_base *newfh = oldfh->clone ();
   if (!newfh)
     debug_printf ("build_fh_pc failed");
   else
     {
-      *newfh = *oldfh;
       if (!oldfh->archetype)
 	newfh->set_io_handle (NULL);
+
       newfh->pc.reset_conv_handle ();
-      if (oldfh->dup (newfh))
+      if (oldfh->dup (newfh, flags))
 	{
 	  delete newfh;
 	  newfh = NULL;
@@ -625,6 +658,14 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
 	  /* The O_CLOEXEC flag enforces close-on-exec behaviour. */
 	  newfh->set_close_on_exec (!!(flags & O_CLOEXEC));
 	  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
+#ifdef DEBUGGING
+	  debug_printf ("duped output_handles old %p, new %p",
+			oldfh->get_output_handle (),
+			newfh->get_output_handle ());
+	  debug_printf ("duped output_handles archetype old %p, archetype new %p",
+			oldfh->archetype->get_output_handle (),
+			newfh->archetype->get_output_handle ());
+#endif /*DEBUGGING*/
 	}
     }
   return newfh;
@@ -658,6 +699,13 @@ dtable::dup3 (int oldfd, int newfd, int flags)
       set_errno (EINVAL);
       return -1;
     }
+
+  /* This is a temporary kludge until all utilities can catch up with
+     a change in behavior that implements linux functionality:  opening
+     a tty should not automatically cause it to become the controlling
+     tty for the process.  */
+  if (newfd > 2)
+    flags |= O_NOCTTY;
 
   if ((newfh = dup_worker (fds[oldfd], flags)) == NULL)
     {
@@ -817,7 +865,7 @@ static void
 decode_tty (char *buf, WCHAR *w32)
 {
   int ttyn = wcstol (w32, NULL, 10);
-  __small_sprintf (buf, "/dev/tty%d", ttyn);
+  __small_sprintf (buf, "/dev/pty%d", ttyn);
 }
 
 /* Try to derive posix filename from given handle.  Return true if

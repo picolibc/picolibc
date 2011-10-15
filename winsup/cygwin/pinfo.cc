@@ -372,13 +372,14 @@ _pinfo::_ctty (char *buf)
   return buf;
 }
 
-void
-_pinfo::set_ctty (tty_min *tc, int flags, fhandler_termios *fh)
+bool
+_pinfo::set_ctty (fhandler_termios *fh, int flags)
 {
-  debug_printf ("old %s, ctty device number %p, tc->ntty device number %p flags & O_NOCTTY %p", __ctty (), ctty, tc->ntty, flags & O_NOCTTY);
-  if ((ctty <= 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
+  tty_min& tc = *fh->tc ();
+  debug_printf ("old %s, ctty device number %p, tc.ntty device number %p flags & O_NOCTTY %p", __ctty (), ctty, tc.ntty, flags & O_NOCTTY);
+  if (fh && &tc && (ctty <= 0 || ctty == tc.ntty) && !(flags & O_NOCTTY))
     {
-      ctty = tc->ntty;
+      ctty = tc.ntty;
       if (cygheap->ctty != fh->archetype)
 	{
 	  debug_printf ("cygheap->ctty %p, archetype %p", cygheap->ctty, fh->archetype);
@@ -402,34 +403,35 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_termios *fh)
 
       lock_ttys here;
       syscall_printf ("attaching %s sid %d, pid %d, pgid %d, tty->pgid %d, tty->sid %d",
-		      __ctty (), sid, pid, pgid, tc->getpgid (), tc->getsid ());
+		      __ctty (), sid, pid, pgid, tc.getpgid (), tc.getsid ());
       if (!cygwin_finished_initializing && !myself->cygstarted
-	  && myself->pgid == myself->pid && tc->getpgid () && tc->getsid ())
+	  && myself->pgid == myself->pid && tc.getpgid () && tc.getsid ())
 	{
-	  myself->pgid = tc->getpgid ();
-	  myself->sid = tc->getsid ();
+	  myself->pgid = tc.getpgid ();
+	  myself->sid = tc.getsid ();
 	}
 
-      pinfo p (tc->getsid ());
+      pinfo p (tc.getsid ());
       if (sid == pid && (!p || p->pid == pid || !p->exists ()))
 	{
 #ifdef DEBUGGING
 	  debug_printf ("resetting %s sid.  Was %d, now %d.  pgid was %d, now %d.",
-			   __ctty (), tc->getsid (), sid, tc->getpgid (), pgid);
+			   __ctty (), tc.getsid (), sid, tc.getpgid (), pgid);
 #else
 	  paranoid_printf ("resetting %s sid.  Was %d, now %d.  pgid was %d, now %d.",
-			   __ctty (), tc->getsid (), sid, tc->getpgid (), pgid);
+			   __ctty (), tc.getsid (), sid, tc.getpgid (), pgid);
 #endif
 	  /* We are the session leader */
-	  tc->setsid (sid);
-	  tc->setpgid (pgid);
+	  tc.setsid (sid);
+	  tc.setpgid (pgid);
 	}
       else
-	sid = tc->getsid ();
-      if (tc->getpgid () == 0)
-	  tc->setpgid (pgid);
+	sid = tc.getsid ();
+      if (tc.getpgid () == 0)
+	  tc.setpgid (pgid);
     }
-    debug_printf ("cygheap->ctty now %p, archetype %p", cygheap->ctty, fh->archetype);
+  debug_printf ("cygheap->ctty now %p, archetype %p", cygheap->ctty, fh->archetype);
+  return ctty > 0;
 }
 
 /* Test to determine if a process really exists and is processing signals.

@@ -102,7 +102,7 @@ tty_list::connect (int ttynum)
     }
   if (!ttys[ttynum].exists ())
     {
-      termios_printf ("tty %d was not allocated", ttynum);
+      termios_printf ("pty %d was not allocated", ttynum);
       set_errno (ENXIO);
       return -1;
     }
@@ -124,14 +124,14 @@ tty_list::init ()
    Return tty number or -1 if error.
  */
 int
-tty_list::allocate ()
+tty_list::allocate (HANDLE& r, HANDLE& w)
 {
   lock_ttys here;
   int freetty = -1;
 
   tty *t = NULL;
   for (int i = 0; i < NTTYS; i++)
-    if (!ttys[i].exists ())
+    if (ttys[i].not_allocated (r, w))
       {
 	t = ttys + i;
 	t->init ();
@@ -140,38 +140,46 @@ tty_list::allocate ()
 	break;
       }
 
-  if (freetty < 0)
-    system_printf ("No tty allocated");
+  if (freetty >= 0)
+    termios_printf ("pty%d allocated", freetty);
   else
     {
-      termios_printf ("tty%d allocated", freetty);
-      here.dont_release (); /* exit with mutex still held -- caller has more work to do */
+      system_printf ("No pty allocated");
+      r = w = NULL;
     }
+
   return freetty;
+}
+
+bool
+tty::not_allocated (HANDLE& r, HANDLE& w)
+{
+  /* Attempt to open the from-master side of the tty.  If it is accessible
+     then it exists although we may not have privileges to actually use it. */
+  char pipename[sizeof("ptyNNNN-from-master")];
+  __small_sprintf (pipename, "pty%d-from-master", get_unit ());
+  /* fhandler_pipe::create_selectable returns 0 when creation succeeds */
+  return fhandler_pipe::create_selectable (&sec_none, r, w, 128 * 1024,
+					   pipename) == 0;
 }
 
 bool
 tty::exists ()
 {
-  /* Attempt to open the from-master side of the tty.  If it is accessible
-     then it exists although it may have been privileges to actually use it. */
-  char pipename[sizeof("ttyNNNN-from-master")];
-  __small_sprintf (pipename, "tty%d-from-master", get_unit ());
   HANDLE r, w;
-  int res = fhandler_pipe::create_selectable (&sec_none_nih, r, w, 0, pipename);
-  if (res)
-    return true;
+  bool res;
+  if (!not_allocated (r, w))
+    res = true;
 
-  CloseHandle (r);
-  CloseHandle (w);
-
-  HANDLE h = open_output_mutex (READ_CONTROL);
-  if (h)
+  else
     {
-      CloseHandle (h);
-      return true;
+      /* Handles are left open when not_allocated finds a non-open "tty" */
+      CloseHandle (r);
+      CloseHandle (w);
+      res = false;
     }
-  return slave_alive ();
+  debug_printf ("exists %d", res);
+  return res;
 }
 
 bool

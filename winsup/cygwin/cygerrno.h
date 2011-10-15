@@ -25,7 +25,7 @@ int __stdcall geterrno_from_nt_status (NTSTATUS status, int deferrno = 13 /*EACC
 inline int
 __set_errno (const char *fn, int ln, int val)
 {
-  debug_printf ("%s:%d val %d", fn, ln, val);
+  debug_printf ("%s:%d setting errno %d", fn, ln, val);
   return errno = _impure_ptr->_errno = val;
 }
 #define set_errno(val) __set_errno (__PRETTY_FUNCTION__, __LINE__, (val))

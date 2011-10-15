@@ -1134,12 +1134,16 @@ open (const char *unix_path, int flags, ...)
 	     a change in behavior that implements linux functionality:  opening
 	     a tty should not automatically cause it to become the controlling
 	     tty for the process.  */
-	  if (0 && fd > 2)
-	    flags |= O_NOCTTY;
-	  if (!(fh = build_fh_name (unix_path,
-				    (flags & (O_NOFOLLOW | O_EXCL))
-				    ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
-				    stat_suffixes)))
+	  int opt = PC_OPEN | ((flags & (O_NOFOLLOW | O_EXCL))
+			       ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
+	  if (!(flags & O_NOCTTY)&& fd > 2)
+	    {
+	      flags |= O_NOCTTY;
+	      opt |= PC_CTTY;	/* flag that, if opened, this fhandler could
+				   later be capable of being a controlling
+				   terminal if /dev/tty is opened. */
+	    }
+	  if (!(fh = build_fh_name (unix_path, opt, stat_suffixes)))
 	    res = -1;		// errno already set
 	  else if ((flags & O_NOFOLLOW) && fh->issymlink ())
 	    {
@@ -1600,10 +1604,9 @@ stat_worker (path_conv &pc, struct __stat64 *buf)
 	  if (!buf->st_ino)
 	    buf->st_ino = fh->get_ino ();
 	  if (!buf->st_dev)
-	    buf->st_dev = fh->is_dev_tty () ? FH_TTY : fh->get_device ();
+	    buf->st_dev = fh->get_device ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
-debug_printf ("is_dev_tty %d, st_dev %p\n", fh->is_dev_tty (), buf->st_dev);
 	}
       delete fh;
     }
@@ -1620,7 +1623,8 @@ extern "C" int
 stat64 (const char *name, struct __stat64 *buf)
 {
   syscall_printf ("entering");
-  path_conv pc (name, PC_SYM_FOLLOW | PC_POSIX | PC_KEEP_HANDLE, stat_suffixes);
+  path_conv pc (name, PC_SYM_FOLLOW | PC_POSIX | PC_KEEP_HANDLE,
+		stat_suffixes);
   return stat_worker (pc, buf);
 }
 

@@ -51,6 +51,8 @@ enum pathconv_arg
   PC_NULLEMPTY		= 0x0020,
   PC_POSIX		= 0x0080,
   PC_NOWARN		= 0x0100,
+  PC_OPEN		= 0x0200,	/* use open semantics */
+  PC_CTTY		= 0x0400,	/* could later be used as ctty */
   PC_KEEP_HANDLE	= 0x00400000,
   PC_NO_ACCESS_CHECK	= 0x00800000
 };
@@ -74,6 +76,8 @@ enum path_types
   PATH_IHASH		= MOUNT_IHASH,
   PATH_ALL_EXEC		= (PATH_CYGWIN_EXEC | PATH_EXEC),
   PATH_NO_ACCESS_CHECK	= PC_NO_ACCESS_CHECK,
+  PATH_CTTY		= 0x00400000,	/* could later be used as ctty */
+  PATH_OPEN		= 0x00800000,	/* use open semantics */
   PATH_LNK		= 0x01000000,
   PATH_TEXT		= 0x02000000,
   PATH_REP		= 0x04000000,
@@ -111,7 +115,7 @@ public:
       CloseHandle (hdl);
     set (NULL);
   }
-  inline void dup (path_conv_handle &pch)
+  inline void dup (const path_conv_handle &pch)
   {
     if (!DuplicateHandle (GetCurrentProcess (), pch.handle (),
 			  GetCurrentProcess (), &hdl,
@@ -175,6 +179,8 @@ class path_conv
   int is_lnk_special () const {return is_fs_device () || isfifo () || is_lnk_symlink ();}
   int issocket () const {return dev.is_device (FH_UNIX);}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
+  int isopen () const {return path_flags & PATH_OPEN;}
+  int isctty_capable () const {return path_flags & PATH_CTTY;}
   void set_cygexec (bool isset)
   {
     if (isset)
@@ -276,7 +282,7 @@ class path_conv
   PWCHAR get_wide_win32_path (PWCHAR wc);
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
-  path_conv &operator =(path_conv& pc)
+  path_conv &operator =(const path_conv& pc)
   {
     memcpy (this, &pc, sizeof pc);
     path = cstrdup (pc.path);

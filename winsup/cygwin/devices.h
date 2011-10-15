@@ -20,12 +20,12 @@ typedef __dev32_t _dev_t;
 #define _minor(dev) ((dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
 #define _major(dev) ((dev) >> (sizeof (_major_t) * 8))
 
-#define MAX_CONSOLES 31
+#define MAX_CONSOLES 63
 enum fh_devices
 {
   FH_TTY     = FHDEV (5, 0),
   FH_CONSOLE = FHDEV (5, 1),
-  FH_PTYM    = FHDEV (5, 2),	/* /dev/ptmx */
+  FH_PTMX    = FHDEV (5, 2),
   FH_CONIN   = FHDEV (5, 255),
   FH_CONOUT  = FHDEV (5, 254),
 
@@ -306,7 +306,7 @@ struct device
   _minor_t get_minor () const {return d.minor;}
   _minor_t get_major () const {return d.major;}
 
-  inline operator int () {return d.devn_int;}
+  inline operator int& () {return d.devn_int;}
   inline operator fh_devices () {return d.devn_fh_devices;}
   inline operator bool () {return !!d.devn_int;}
   inline operator DWORD& () {return d.devn_dword;}

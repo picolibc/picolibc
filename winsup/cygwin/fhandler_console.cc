@@ -164,7 +164,7 @@ fhandler_console::set_unit ()
 
 /* Allocate and initialize the shared record for the current console. */
 void
-fhandler_console::get_tty_stuff ()
+fhandler_console::setup ()
 {
   if (set_unit ())
       {
@@ -268,7 +268,7 @@ fhandler_console::send_winch_maybe ()
     {
       dev_state.scroll_region.Top = 0;
       dev_state.scroll_region.Bottom = -1;
-      tc ()->kill_pgrp (SIGWINCH);
+      get_ttyp ()->kill_pgrp (SIGWINCH);
     }
 }
 
@@ -336,7 +336,7 @@ fhandler_console::read (void *pv, size_t& buflen)
   DWORD timeout = is_nonblocking () ? 0 : INFINITE;
   char tmp[60];
 
-  termios ti = tc ()->ti;
+  termios ti = get_ttyp ()->ti;
   for (;;)
     {
       int bgres;
@@ -684,8 +684,8 @@ sig_exit:
 void
 fhandler_console::set_input_state ()
 {
-  if (tc ()->rstcons ())
-    input_tcsetattr (0, &tc ()->ti);
+  if (get_ttyp ()->rstcons ())
+    input_tcsetattr (0, &get_ttyp ()->ti);
 }
 
 bool
@@ -760,6 +760,13 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
 }
 
 int
+fhandler_console::dup (fhandler_base *child, int flags)
+{
+  myself->set_ctty (this, flags);
+  return 0;
+}
+
+int
 fhandler_console::open (int flags, mode_t)
 {
   HANDLE h;
@@ -806,7 +813,7 @@ fhandler_console::open (int flags, mode_t)
       dev_state.set_default_attr ();
     }
 
-  tc ()->rstcons (false);
+  get_ttyp ()->rstcons (false);
   set_open_status ();
 
   DWORD cflags;
@@ -825,7 +832,7 @@ fhandler_console::open_setup (int flags)
 {
   cygheap->manage_console_count ("fhandler_console::open", 1);
   set_flags ((flags & ~O_TEXT) | O_BINARY);
-  myself->set_ctty (&shared_console_info->tty_min_state, flags, this);
+  myself->set_ctty (this, flags);
 }
 
 int
@@ -841,7 +848,7 @@ fhandler_console::close ()
 int
 fhandler_console::ioctl (unsigned int cmd, void *arg)
 {
-  int res = ioctl_termios (cmd, (int) arg);
+  int res = fhandler_termios::ioctl (cmd, arg);
   if (res <= 0)
     return res;
   switch (cmd)
@@ -970,8 +977,8 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
      available.  We've got ECHO and ICANON, they've
      got ENABLE_ECHO_INPUT and ENABLE_LINE_INPUT. */
 
-  termios_printf ("this %p, tc () %p, t %p", this, tc (), t);
-  tc ()->ti = *t;
+  termios_printf ("this %p, get_ttyp () %p, t %p", this, get_ttyp (), t);
+  get_ttyp ()->ti = *t;
 
   if (t->c_lflag & ECHO)
     {
@@ -1010,7 +1017,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
 		      res, t, flags, t->c_lflag, t->c_iflag);
     }
 
-  tc ()->rstcons (false);
+  get_ttyp ()->rstcons (false);
   return res;
 }
 
@@ -1027,7 +1034,7 @@ int
 fhandler_console::tcgetattr (struct termios *t)
 {
   int res;
-  *t = tc ()->ti;
+  *t = get_ttyp ()->ti;
 
   t->c_cflag |= CS8;
 
@@ -1067,8 +1074,9 @@ fhandler_console::fhandler_console (fh_devices unit) :
 {
   if (unit > 0)
     dev ().parse (unit);
-  get_tty_stuff ();
+  setup ();
   trunc_buf.len = 0;
+  _tc = &(shared_console_info->tty_min_state);
 }
 
 void
@@ -1866,7 +1874,7 @@ do_print:
 		  y--;
 		}
 	    }
-	  cursor_set (false, ((tc ()->ti.c_oflag & ONLCR) ? 0 : x), y + 1);
+	  cursor_set (false, ((get_ttyp ()->ti.c_oflag & ONLCR) ? 0 : x), y + 1);
 	  break;
 	case BAK:
 	  cursor_rel (-1, 0);
@@ -2192,13 +2200,13 @@ fhandler_console::init (HANDLE h, DWORD a, mode_t bin)
   if (h && h != INVALID_HANDLE_VALUE)
     CloseHandle (h);	/* Reopened by open */
 
-  return !tcsetattr (0, &tc ()->ti);
+  return !tcsetattr (0, &get_ttyp ()->ti);
 }
 
 int
 fhandler_console::igncr_enabled ()
 {
-  return tc ()->ti.c_iflag & IGNCR;
+  return get_ttyp ()->ti.c_iflag & IGNCR;
 }
 
 void
