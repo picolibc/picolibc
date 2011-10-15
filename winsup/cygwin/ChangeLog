@@ -1,5 +1,10 @@
 2011-10-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_process.cc (dos_drive_mappings::fixup_if_match): Convert
+	native NT network paths into DOS UNC paths.
+
+2011-10-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (get_token_group_sidlist): Add CONSOLE LOGON SID on
 	systems supporting it.  Never add SERVICE SID but keep code in for
 	future reference.  Explain why.

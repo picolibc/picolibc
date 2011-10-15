@@ -605,6 +605,14 @@ struct dos_drive_mappings
 
   wchar_t *fixup_if_match (wchar_t *path)
   {
+    /* Check for network drive first. */
+    if (!wcsncmp (path, L"\\Device\\Mup\\", 12))
+      {
+	path += 10;
+	path[0] = L'\\';
+	return path;
+      }
+    /* Then test local drives. */
     for (mapping *m = mappings; m; m = m->next)
       if (!wcsncmp (m->mapping, path, m->len))
 	{
