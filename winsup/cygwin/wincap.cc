@@ -51,6 +51,7 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:false,
   has_stack_size_param_is_a_reservation:false,
+  has_console_logon_sid:false,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -81,6 +82,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:false,
   has_stack_size_param_is_a_reservation:false,
+  has_console_logon_sid:false,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -111,6 +113,7 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
   has_stack_size_param_is_a_reservation:true,
+  has_console_logon_sid:false,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -141,6 +144,7 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
   has_stack_size_param_is_a_reservation:true,
+  has_console_logon_sid:false,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -171,6 +175,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
   has_stack_size_param_is_a_reservation:true,
+  has_console_logon_sid:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -201,6 +206,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_raw_disk_access:false,
   use_dont_resolve_hack:true,
   has_stack_size_param_is_a_reservation:true,
+  has_console_logon_sid:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -231,6 +237,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_raw_disk_access:true,
   use_dont_resolve_hack:false,
   has_stack_size_param_is_a_reservation:true,
+  has_console_logon_sid:false,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -261,6 +268,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_restricted_raw_disk_access:true,
   use_dont_resolve_hack:false,
   has_stack_size_param_is_a_reservation:true,
+  has_console_logon_sid:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));

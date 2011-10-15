@@ -41,6 +41,7 @@ struct wincaps
   unsigned has_restricted_raw_disk_access		: 1;
   unsigned use_dont_resolve_hack			: 1;
   unsigned has_stack_size_param_is_a_reservation	: 1;
+  unsigned has_console_logon_sid			: 1;
 };
 
 class wincapc
@@ -90,6 +91,7 @@ public:
   bool	IMPLEMENT (has_restricted_raw_disk_access)
   bool	IMPLEMENT (use_dont_resolve_hack)
   bool	IMPLEMENT (has_stack_size_param_is_a_reservation)
+  bool	IMPLEMENT (has_console_logon_sid)
 
 #undef IMPLEMENT
 };

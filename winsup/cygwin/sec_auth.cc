@@ -416,6 +416,8 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
   if (my_grps)
     {
       grp_list += well_known_local_sid;
+      if (wincap.has_console_logon_sid ())
+	grp_list += well_known_console_logon_sid;
       if (sid_in_token_groups (my_grps, well_known_dialup_sid))
 	grp_list *= well_known_dialup_sid;
       if (sid_in_token_groups (my_grps, well_known_network_sid))
@@ -423,8 +425,15 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
       if (sid_in_token_groups (my_grps, well_known_batch_sid))
 	grp_list *= well_known_batch_sid;
       grp_list *= well_known_interactive_sid;
+#if 0
+      /* Don't add the SERVICE group when switching the user context.
+	 That's much too dangerous, since the service group adds the
+	 SE_IMPERSONATE_NAME privilege to the user.  After all, the
+	 process started with this token is not the service process
+	 anymore anyway. */
       if (sid_in_token_groups (my_grps, well_known_service_sid))
 	grp_list *= well_known_service_sid;
+#endif
       if (sid_in_token_groups (my_grps, well_known_this_org_sid))
 	grp_list *= well_known_this_org_sid;
       grp_list *= well_known_users_sid;
@@ -578,7 +587,7 @@ get_system_priv_list (size_t &size)
 
 static PTOKEN_PRIVILEGES
 get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
-	       size_t &size)
+	       size_t &size, cygpsid *mandatory_integrity_sid)
 {
   PLSA_UNICODE_STRING privstrs;
   ULONG cnt;
@@ -586,7 +595,14 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
   NTSTATUS ret;
 
   if (usersid == well_known_system_sid)
-    return get_system_priv_list (size);
+    {
+      if (mandatory_integrity_sid)
+	*mandatory_integrity_sid = mandatory_system_integrity_sid;
+      return get_system_priv_list (size);
+    }
+
+  if (mandatory_integrity_sid)
+    *mandatory_integrity_sid = mandatory_medium_integrity_sid;
 
   for (int grp = -1; grp < grp_list.count (); ++grp)
     {
@@ -605,8 +621,9 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
 	  LUID priv;
 	  PTOKEN_PRIVILEGES tmp;
 	  DWORD tmp_count;
+	  bool high_integrity;
 
-	  if (!privilege_luid (privstrs[i].Buffer, &priv))
+	  if (!privilege_luid (privstrs[i].Buffer, priv, high_integrity))
 	    continue;
 
 	  if (privs)
@@ -637,6 +654,8 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
 	  privs->Privileges[privs->PrivilegeCount].Attributes =
 	    SE_PRIVILEGE_ENABLED | SE_PRIVILEGE_ENABLED_BY_DEFAULT;
 	  ++privs->PrivilegeCount;
+	  if (mandatory_integrity_sid && high_integrity)
+	    *mandatory_integrity_sid = mandatory_high_integrity_sid;
 
 	next_account_right:
 	  ;
@@ -805,6 +824,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   HANDLE primary_token = INVALID_HANDLE_VALUE;
 
   PTOKEN_GROUPS my_tok_gsids = NULL;
+  cygpsid mandatory_integrity_sid;
   ULONG size;
   size_t psize = 0;
 
@@ -888,25 +908,21 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   if (auth_pos >= 0)
     new_tok_gsids->Groups[auth_pos].Attributes |= SE_GROUP_LOGON_ID;
 
-  /* On systems supporting Mandatory Integrity Control, add a MIC SID. */
+  /* Retrieve list of privileges of that user.  Based on the usersid and
+     the returned privileges, get_priv_list sets the mandatory_integrity_sid
+     pointer to the correct MIC SID for UAC. */
+  if (!(privs = get_priv_list (lsa, usersid, tmp_gsids, psize,
+			       &mandatory_integrity_sid)))
+    goto out;
+
+  /* On systems supporting Mandatory Integrity Control, add the MIC SID. */
   if (wincap.has_mandatory_integrity_control ())
     {
       new_tok_gsids->Groups[new_tok_gsids->GroupCount].Attributes =
 	SE_GROUP_INTEGRITY | SE_GROUP_INTEGRITY_ENABLED;
-      if (usersid == well_known_system_sid)
-	new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
-	  = mandatory_system_integrity_sid;
-      else if (tmp_gsids.contains (well_known_admins_sid))
-	new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
-	  = mandatory_high_integrity_sid;
-      else
-	new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
-	  = mandatory_medium_integrity_sid;
+      new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
+	= mandatory_integrity_sid;
     }
-
-  /* Retrieve list of privileges of that user. */
-  if (!(privs = get_priv_list (lsa, usersid, tmp_gsids, psize)))
-    goto out;
 
   /* Let's be heroic... */
   status = NtCreateToken (&token, TOKEN_ALL_ACCESS, &oa, TokenImpersonation,
@@ -1035,8 +1051,9 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     if ((tmpidx = tmp_gsids.next_non_well_known_sid (tmpidx)) >= 0)
       gsize += RtlLengthSid (tmp_gsids.sids[tmpidx]);
 
-  /* Retrieve list of privileges of that user. */
-  if (!(privs = get_priv_list (lsa, usersid, tmp_gsids, psize)))
+  /* Retrieve list of privileges of that user.  The MIC SID is created by
+     the LSA here. */
+  if (!(privs = get_priv_list (lsa, usersid, tmp_gsids, psize, NULL)))
     goto out;
 
   /* Create DefaultDacl. */

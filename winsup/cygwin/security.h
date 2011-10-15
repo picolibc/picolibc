@@ -330,6 +330,7 @@ public:
 extern cygpsid well_known_null_sid;
 extern cygpsid well_known_world_sid;
 extern cygpsid well_known_local_sid;
+extern cygpsid well_known_console_logon_sid;
 extern cygpsid well_known_creator_owner_sid;
 extern cygpsid well_known_creator_group_sid;
 extern cygpsid well_known_dialup_sid;
@@ -349,7 +350,7 @@ extern cygpsid mandatory_high_integrity_sid;
 extern cygpsid mandatory_system_integrity_sid;
 extern cygpsid well_known_samba_unix_user_fake_sid;
 
-bool privilege_luid (const PWCHAR pname, LUID *luid);
+bool privilege_luid (const PWCHAR pname, LUID &luid, bool &high_integrity);
 
 inline BOOL
 well_known_sid_type (SID_NAME_USE type)

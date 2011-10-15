@@ -1,3 +1,29 @@
+2011-10-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (get_token_group_sidlist): Add CONSOLE LOGON SID on
+	systems supporting it.  Never add SERVICE SID but keep code in for
+	future reference.  Explain why.
+	(get_priv_list): Add cygpsid pointer parameter.  Point it to the
+	mandatory integrity SID which matches account and privileges.
+	(create_token): Fetch mandatory integrity SID from call to
+	get_priv_list.
+	(lsaauth): Call get_priv_list with additional NULL pointer.  Change
+	comment accordingly.
+	* sec_helper.cc (well_known_console_logon_sid): New static SID.
+	(cygpriv): Change to structure containing extra flag to store info
+	about required integrity level.
+	(privilege_luid): Accommodate changes to cygpriv.  Return integrity
+	level in new high_integrity parameter.
+	(privilege_name): Accommodate changes to cygpriv.
+	(set_privilege): Drop trailing \n from debug output.
+	(set_cygwin_privileges): Don't set SE_CREATE_GLOBAL_PRIVILEGE anymore
+	since it's just not needed, but keep code in for future reference.
+	Change comment accordingly.
+	* security.h (well_known_console_logon_sid): Declare.
+	(privilege_luid): Align declaration to above change.
+	* wincap.h (wincaps::has_console_logon_sid): New element.
+	* wincap.cc: Implement above element throughout.
+
 2011-10-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (find_fast_cwd_pointer): Allow 'push crit-sect-addr' instead
