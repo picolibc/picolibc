@@ -894,7 +894,18 @@ dll_crt0_1 (void *)
   _setlocale_r (_REENT, LC_CTYPE, "C");
 
   if (user_data->main)
-    cygwin_exit (user_data->main (__argc, __argv, *user_data->envptr));
+    {
+      /* Create a copy of Cygwin's version of __argv so that, if the user makes
+	 a change to an element of argv[] it does not affect Cygwin's argv.
+	 Changing the the contents of what argv[n] points to will still
+	 affect Cygwin.  This is similar (but not exactly like) Linux. */
+      char *newargv[__argc + 1];
+      char **nav = newargv;
+      char **oav = __argv;
+      while ((*nav++ = *oav++) != NULL)
+	continue;
+      cygwin_exit (user_data->main (__argc, newargv, *user_data->envptr));
+    }
   __asm__ ("				\n\
 	.global __cygwin_exit_return	\n\
 __cygwin_exit_return:			\n\

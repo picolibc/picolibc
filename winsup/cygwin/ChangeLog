@@ -1,5 +1,9 @@
 2011-10-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* dcrt0.cc (dll_crt0_1): Copy argv before passing to main().
+
+2011-10-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sigproc.cc (proc_terminate): Avoid setting ppid to 1 if we're execing.
 
 2011-10-15  Christopher Faylor  <me.cygwin2011@cgf.cx>
