@@ -374,7 +374,15 @@ proc_terminate ()
       int i;
       for (i = 0; i < nprocs; i++)
 	{
-	  procs[i]->ppid = 1;
+	  extern child_info_spawn *chExeced;
+	  /* Don't reset the ppid to 1 if this pid is still going to be
+	     associated with a process.
+	     FIXME: The problem with this simplistic approach is that the
+	     ppid for any surviving children will never be set to 1 in
+	     this scenario.  A potential fix would be to move procs into
+	     cygheap but that would complicate startup.  What else is new? */
+	  if (!chExeced)
+	    procs[i]->ppid = 1;
 	  if (procs[i].wait_thread)
 	    {
 	      // CloseHandle (procs[i].rd_proc_pipe);

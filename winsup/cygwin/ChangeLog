@@ -1,3 +1,7 @@
+2011-10-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* sigproc.cc (proc_terminate): Avoid setting ppid to 1 if we're execing.
+
 2011-10-15  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* cygerrno.h (__set_errno): Modify debugging output to make searching
