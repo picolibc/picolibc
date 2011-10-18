@@ -3626,8 +3626,9 @@ public:
 fcwd_access_t::fcwd_version_t fcwd_access_t::fast_cwd_version
   __attribute__((section (".cygwin_dll_common"), shared))
   = fcwd_access_t::FCWD_W7;
-/* fast_cwd_ptr is a pointer to the global pointer in ntdll.dll pointing
-   to the FAST_CWD structure which constitutes the CWD.
+/* fast_cwd_ptr is a pointer to the global RtlpCurDirRef pointer in
+   ntdll.dll pointing to the FAST_CWD structure which constitutes the CWD.
+   Unfortunately RtlpCurDirRef is not exported from ntdll.dll.
    We put the pointer into the common shared DLL segment.  This allows to
    restrict the call to find_fast_cwd_pointer() to once per Cygwin session
    per user session.  This works, because ASLR randomizes the load address
@@ -3718,9 +3719,18 @@ find_fast_cwd ()
     }
   else
     {
-      /* If we couldn't fetch fast_cwd_ptr, or if fast_cwd_ptr is NULL(*) we
-	 have to figure out the version from the Buffer pointer in the
-	 ProcessParameters. */
+      /* If we couldn't fetch fast_cwd_ptr, or if fast_cwd_ptr is NULL(*)
+	 we have to figure out the version from the Buffer pointer in the
+	 ProcessParameters.
+	 
+	 (*) This is very unlikely to happen when starting the first
+	 Cygwin process, since it only happens when starting the
+	 process in a directory which can't be used as CWD by Win32, or
+	 if the directory doesn't exist.  But *if* it happens, we have
+	 no valid FAST_CWD structure, even though upp_cwd_str.Buffer is
+	 not NULL in that case.  So we let the OS create a valid
+	 FAST_CWD structure temporarily to have something to work with.
+	 We know the pipe FS works. */
       PEB &peb = *NtCurrentTeb ()->Peb;
 
       if (f_cwd_ptr	/* so *f_cwd_ptr == NULL */

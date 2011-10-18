@@ -1,3 +1,8 @@
+2011-10-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc: Extend two comments.  Mention the name RtlpCurDirRef
+	for reference.
+
 2011-10-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_1): Copy argv before passing to main().
