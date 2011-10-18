@@ -55,7 +55,9 @@ lib_a_LIBADD =
 am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-access.$(OBJEXT) \
 	lib_a-strlen.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
 	lib_a-strcpy.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
-	lib_a-memcpy-stub.$(OBJEXT)
+	lib_a-memcpy-stub.$(OBJEXT) lib_a-memchr-stub.$(OBJEXT) \
+	lib_a-memchr.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
+	lib_a-strlen-armv7.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -176,7 +178,10 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = setjmp.S access.c strlen.c strcmp.c strcpy.c memcpy.S memcpy-stub.c
+lib_a_SOURCES = setjmp.S access.c strlen.c strcmp.c strcpy.c \
+	        memcpy.S memcpy-stub.c memchr-stub.c memchr.S \
+		strlen.c strlen-armv7.S
+
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -251,6 +256,18 @@ lib_a-memcpy.o: memcpy.S
 lib_a-memcpy.obj: memcpy.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.obj `if test -f 'memcpy.S'; then $(CYGPATH_W) 'memcpy.S'; else $(CYGPATH_W) '$(srcdir)/memcpy.S'; fi`
 
+lib_a-memchr.o: memchr.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memchr.o `test -f 'memchr.S' || echo '$(srcdir)/'`memchr.S
+
+lib_a-memchr.obj: memchr.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memchr.obj `if test -f 'memchr.S'; then $(CYGPATH_W) 'memchr.S'; else $(CYGPATH_W) '$(srcdir)/memchr.S'; fi`
+
+lib_a-strlen-armv7.o: strlen-armv7.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strlen-armv7.o `test -f 'strlen-armv7.S' || echo '$(srcdir)/'`strlen-armv7.S
+
+lib_a-strlen-armv7.obj: strlen-armv7.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strlen-armv7.obj `if test -f 'strlen-armv7.S'; then $(CYGPATH_W) 'strlen-armv7.S'; else $(CYGPATH_W) '$(srcdir)/strlen-armv7.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
@@ -286,6 +303,12 @@ lib_a-memcpy-stub.o: memcpy-stub.c
 
 lib_a-memcpy-stub.obj: memcpy-stub.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy-stub.obj `if test -f 'memcpy-stub.c'; then $(CYGPATH_W) 'memcpy-stub.c'; else $(CYGPATH_W) '$(srcdir)/memcpy-stub.c'; fi`
+
+lib_a-memchr-stub.o: memchr-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memchr-stub.o `test -f 'memchr-stub.c' || echo '$(srcdir)/'`memchr-stub.c
+
+lib_a-memchr-stub.obj: memchr-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memchr-stub.obj `if test -f 'memchr-stub.c'; then $(CYGPATH_W) 'memchr-stub.c'; else $(CYGPATH_W) '$(srcdir)/memchr-stub.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

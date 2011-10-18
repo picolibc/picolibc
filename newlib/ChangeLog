@@ -1,3 +1,20 @@
+2011-10-18  Dr David Alan Gilbert  <david.gilbert@linaro.org>
+
+	* libc/machine/arm/Makefile.am (lib_a_SOURCES): Add memchr-stub.c,
+	memchr.S.
+	* libc/machine/arm/arm_asm.h: Add ifdef to allow it to be included
+	in .S files.
+	* libc/machine/arm/memchr-stub.c: New file - just selects what to
+	compile.
+	* libc/machine/arm/memchr.S: New file - ARMv6t2/v7 version.
+
+	* libc/machine/arm/Makefile.am (lib_a_SOURCES): Add strlen-armv7.S.
+	* libc/machine/arm/strlen-armv7.S: New file.
+	* libc/machine/arm/strlen.c: Add ifdef optimised code so it isn't
+	for v7 or 6t2.
+
+	* libc/machine/arm/Makefile.in: Regenerate.
+
 2011-10-11  Steven Abner <pheonix@zoomtown.com>
 
 	* libc/time/mktm_r.c: (__tzcalc_limits) Fix Julian day calculation.

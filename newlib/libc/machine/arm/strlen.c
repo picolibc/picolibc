@@ -60,6 +60,8 @@ strlen (const char* str)
 }
 #else
 
+#if !(defined(_ISA_ARM_7) || defined(__ARM_ARCH_6T2__))
+
 size_t __attribute__((naked))
 strlen (const char* str)
 {
@@ -177,4 +179,5 @@ strlen (const char* str)
 #endif
        "RETURN");
 }
+#endif
 #endif
