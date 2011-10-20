@@ -430,6 +430,7 @@ public:
 
   virtual void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_base *> (x) = *this;
     x->reset (this);
   }
@@ -596,6 +597,7 @@ class fhandler_socket: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_socket *> (x) = *this;
     x->reset (this);
   }
@@ -649,6 +651,7 @@ public:
 
   virtual void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_base_overlapped *> (x) = *this;
     x->reset (this);
   }
@@ -694,6 +697,7 @@ public:
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_pipe *> (x) = *this;
     x->reset (this);
   }
@@ -743,6 +747,7 @@ public:
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_fifo *> (x) = *this;
     x->reset (this);
   }
@@ -771,6 +776,7 @@ class fhandler_mailslot : public fhandler_base_overlapped
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_mailslot *> (x) = *this;
     x->reset (this);
   }
@@ -819,6 +825,7 @@ class fhandler_dev_raw: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_dev_raw *> (x) = *this;
     x->reset (this);
   }
@@ -878,6 +885,7 @@ class fhandler_dev_floppy: public fhandler_dev_raw
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_dev_floppy *> (x) = *this;
     x->reset (this);
   }
@@ -925,6 +933,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_dev_tape *> (x) = *this;
     x->reset (this);
   }
@@ -990,6 +999,7 @@ class fhandler_disk_file: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_disk_file *> (x) = *this;
     x->reset (this);
   }
@@ -1027,6 +1037,7 @@ class fhandler_cygdrive: public fhandler_disk_file
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_cygdrive *> (x) = *this;
     x->reset (this);
   }
@@ -1090,6 +1101,7 @@ class fhandler_serial: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_serial *> (x) = *this;
     x->reset (this);
   }
@@ -1154,6 +1166,7 @@ class fhandler_termios: public fhandler_base
 
   virtual void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_termios *> (x) = *this;
     x->reset (this);
   }
@@ -1352,6 +1365,7 @@ private:
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_console *> (x) = *this;
     x->reset (this);
   }
@@ -1394,6 +1408,7 @@ class fhandler_pty_common: public fhandler_termios
 
   virtual void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_pty_common *> (x) = *this;
     x->reset (this);
   }
@@ -1447,6 +1462,7 @@ class fhandler_pty_slave: public fhandler_pty_common
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_pty_slave *> (x) = *this;
     x->reset (this);
   }
@@ -1504,6 +1520,7 @@ public:
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_pty_master *> (x) = *this;
     x->reset (this);
   }
@@ -1530,6 +1547,7 @@ class fhandler_dev_null: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_dev_null *> (x) = *this;
     x->reset (this);
   }
@@ -1564,6 +1582,7 @@ class fhandler_dev_zero: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_dev_zero *> (x) = *this;
     x->reset (this);
   }
@@ -1601,6 +1620,7 @@ class fhandler_dev_random: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_dev_random *> (x) = *this;
     x->reset (this);
   }
@@ -1640,6 +1660,7 @@ class fhandler_dev_mem: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_dev_mem *> (x) = *this;
     x->reset (this);
   }
@@ -1675,6 +1696,7 @@ class fhandler_dev_clipboard: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_dev_clipboard *> (x) = *this;
     x->reset (this);
   }
@@ -1713,6 +1735,7 @@ class fhandler_windows: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_windows *> (x) = *this;
     x->reset (this);
   }
@@ -1759,6 +1782,7 @@ class fhandler_dev_dsp: public fhandler_base
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_dev_dsp *> (x) = *this;
     x->reset (this);
   }
@@ -1809,6 +1833,7 @@ class fhandler_virtual : public fhandler_base
 
   virtual void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_virtual *> (x) = *this;
     x->reset (this);
   }
@@ -1840,6 +1865,7 @@ class fhandler_proc: public fhandler_virtual
 
   virtual void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_proc *> (x) = *this;
     x->reset (this);
   }
@@ -1875,6 +1901,7 @@ class fhandler_procsys: public fhandler_virtual
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_procsys *> (x) = *this;
     x->reset (this);
   }
@@ -1903,6 +1930,7 @@ class fhandler_procsysvipc: public fhandler_proc
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_procsysvipc *> (x) = *this;
     x->reset (this);
   }
@@ -1932,6 +1960,7 @@ class fhandler_netdrive: public fhandler_virtual
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_netdrive *> (x) = *this;
     x->reset (this);
   }
@@ -1971,6 +2000,7 @@ class fhandler_registry: public fhandler_proc
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_registry *> (x) = *this;
     x->reset (this);
   }
@@ -2002,6 +2032,7 @@ class fhandler_process: public fhandler_proc
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_process *> (x) = *this;
     x->reset (this);
   }
@@ -2030,6 +2061,7 @@ class fhandler_procnet: public fhandler_proc
 
   void copyto (fhandler_base *x)
   {
+    x->pc.free_strings ();
     *reinterpret_cast<fhandler_procnet *> (x) = *this;
     x->reset (this);
   }

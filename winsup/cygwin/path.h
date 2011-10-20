@@ -282,12 +282,21 @@ class path_conv
   PWCHAR get_wide_win32_path (PWCHAR wc);
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
-# define cfree_maybe(x) if (x) cfree ((void *) (x))
+# define cfree_and_null(x) \
+  if (x) \
+    { \
+      cfree ((void *) (x)); \
+      (x) = NULL; \
+    }
+  void free_strings ()
+  {
+    cfree_and_null (path);
+    cfree_and_null (normalized_path);
+    cfree_and_null (wide_path);
+  }
   path_conv &operator =(const path_conv& pc)
   {
-    cfree_maybe (path);
-    cfree_maybe (normalized_path);
-    cfree_maybe (wide_path);
+    free_strings ();
     memcpy (this, &pc, sizeof pc);
     path = cstrdup (pc.path);
     conv_handle.dup (pc.conv_handle);
