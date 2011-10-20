@@ -232,8 +232,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   status = NtQueryInformationFile (fh, &io, pfni, 65536, FileNameInformation);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryInformationFile (FileNameInformation) failed, %08x",
-		    status);
+      debug_printf ("NtQueryInformationFile (%S, FileNameInformation) "
+		    "failed, status = %p", pc.get_nt_native_path (), status);
       goto out;
     }
   /* The filename could change, the parent dir not.  So we split both paths
@@ -277,7 +277,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtOpenFile (%S) failed, %08x", &root, status);
+	  debug_printf ("NtOpenFile (%S) failed, status = %p", &root, status);
 	  goto out;
 	}
 
@@ -320,8 +320,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 				   FileInternalInformation);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryInformationFile (FileInternalInformation) failed, "
-		    "%08x", status);
+      debug_printf ("NtQueryInformationFile (%S, FileInternalInformation) "
+		    "failed, status = %p", pc.get_nt_native_path (), status);
       goto out;
     }
   RtlInt64ToHexUnicodeString (pfii->FileId.QuadPart, &recycler, TRUE);
@@ -343,7 +343,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtOpenFile (%S) failed, %08x", &recycler, status);
+	  debug_printf ("NtOpenFile (%S) failed, status = %p",
+	  		&recycler, status);
 	  goto out;
 	}
       /* Then check if recycler exists by opening and potentially creating it.
@@ -364,7 +365,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 			     FILE_DIRECTORY_FILE, NULL, 0);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtCreateFile (%S) failed, %08x", &recycler, status);
+	  debug_printf ("NtCreateFile (%S) failed, status = %p",
+	  		&recycler, status);
 	  goto out;
 	}
       /* Next, if necessary, check if the recycler/SID dir exists and
@@ -381,7 +383,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 				 FILE_DIRECTORY_FILE, NULL, 0);
 	  if (!NT_SUCCESS (status))
 	    {
-	      debug_printf ("NtCreateFile (%S) failed, %08x",
+	      debug_printf ("NtCreateFile (%S) failed, status = %p",
 			    &recycler, status);
 	      goto out;
 	    }
@@ -400,13 +402,15 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 				 FILE_SYNCHRONOUS_IO_NONALERT
 				 | FILE_NON_DIRECTORY_FILE, NULL, 0);
 	  if (!NT_SUCCESS (status))
-	    debug_printf ("NtCreateFile (%S) failed, %08x", &recycler, status);
+	    debug_printf ("NtCreateFile (%S) failed, status = %p",
+			  &recycler, status);
 	  else
 	    {
 	      status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io, desktop_ini,
 				    sizeof desktop_ini - 1, NULL, NULL);
 	      if (!NT_SUCCESS (status))
-		debug_printf ("NtWriteFile (%S) failed, %08x", &fname, status);
+		debug_printf ("NtWriteFile (%S) failed, status = %p",
+			      &fname, status);
 	      NtClose (tmp_fh);
 	    }
 	  if (!wincap.has_recycle_dot_bin ()) /* No INFO2 file since Vista */
@@ -419,14 +423,14 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 				     FILE_SYNCHRONOUS_IO_NONALERT
 				     | FILE_NON_DIRECTORY_FILE, NULL, 0);
 		if (!NT_SUCCESS (status))
-		  debug_printf ("NtCreateFile (%S) failed, %08x",
+		  debug_printf ("NtCreateFile (%S) failed, status = %p",
 				&recycler, status);
 		else
 		{
 		  status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io, info2,
 					sizeof info2, NULL, NULL);
 		  if (!NT_SUCCESS (status))
-		    debug_printf ("NtWriteFile (%S) failed, %08x",
+		    debug_printf ("NtWriteFile (%S) failed, status = %p",
 				  &fname, status);
 		  NtClose (tmp_fh);
 		}
@@ -485,17 +489,17 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 				 FileRenameInformation);
   NtClose (tmp_fh);
   if (!NT_SUCCESS (status))
-    debug_printf ("Overwriting with another file failed, status = %p",
-		  status);
+    debug_printf ("Overwriting with another file failed, status = %p", status);
 
 out:
   if (rootdir)
     NtClose (rootdir);
+  debug_printf ("%S, return status %d", pc.get_nt_native_path (), bin_stat);
   return bin_stat;
 }
 
 static NTSTATUS
-check_dir_not_empty (HANDLE dir)
+check_dir_not_empty (HANDLE dir, path_conv &pc)
 {
   IO_STATUS_BLOCK io;
   const ULONG bufsiz = 3 * sizeof (FILE_NAMES_INFORMATION)
@@ -507,8 +511,8 @@ check_dir_not_empty (HANDLE dir)
 					  FALSE, NULL, TRUE);
   if (!NT_SUCCESS (status))
     {
-      syscall_printf ("Checking if directory is empty failed, "
-		      "status = %p", status);
+      debug_printf ("Checking if directory %S is empty failed, status = %p",
+		    pc.get_nt_native_path (), status);
       return status;
     }
   int cnt = 1;
@@ -516,11 +520,20 @@ check_dir_not_empty (HANDLE dir)
     {
       if (++cnt > 2)
 	{
-	  syscall_printf ("Directory not empty");
+	  if (strace.active ())
+	    {
+	      UNICODE_STRING fname;
+
+	      pfni = (PFILE_NAMES_INFORMATION)
+		     ((caddr_t) pfni + pfni->NextEntryOffset);
+	      RtlInitCountedUnicodeString(&fname, pfni->FileName,
+					  pfni->FileNameLength);
+	      debug_printf ("Directory %S not empty, found file <%S>",
+			    pc.get_nt_native_path (), &fname);
+	    }
 	  return STATUS_DIRECTORY_NOT_EMPTY;
 	}
-      pfni = (PFILE_NAMES_INFORMATION)
-	     ((caddr_t) pfni + pfni->NextEntryOffset);
+      pfni = (PFILE_NAMES_INFORMATION) ((caddr_t) pfni + pfni->NextEntryOffset);
     }
   return STATUS_SUCCESS;
 }
@@ -538,6 +551,8 @@ unlink_nt (path_conv &pc)
 
   bin_status bin_stat = dont_move;
 
+  syscall_printf ("Trying to delete %S, isdir = %d",
+		  pc.get_nt_native_path (), pc.isdir ());
   ACCESS_MASK access = DELETE;
   ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT;
   /* Add the reparse point flag to native symlinks, otherwise we remove the
@@ -566,10 +581,19 @@ unlink_nt (path_conv &pc)
 			   FILE_SHARE_VALID_FLAGS, flags);
       if (NT_SUCCESS (status))
 	{
-	  NtSetAttributesFile (fh_ro, pc.file_attributes ()
-				      & ~FILE_ATTRIBUTE_READONLY);
+	  debug_printf ("Opening %S for removing R/O succeeded",
+			pc.get_nt_native_path ());
+	  NTSTATUS status2 = NtSetAttributesFile (fh_ro,
+						  pc.file_attributes ()
+						  & ~FILE_ATTRIBUTE_READONLY);
+	  if (!NT_SUCCESS (status2))
+	    debug_printf ("Removing R/O on %S failed, status = %p",
+			  pc.get_nt_native_path (), status2);
 	  pc.init_reopen_attr (&attr, fh_ro);
 	}
+      else
+	debug_printf ("Opening %S for removing R/O failed, status = %p",
+		      pc.get_nt_native_path (), status);
       if (pc.is_lnk_symlink ())
 	{
 	  status = NtQueryInformationFile (fh_ro, &io, &fsi, sizeof fsi,
@@ -605,6 +629,8 @@ unlink_nt (path_conv &pc)
 	 Netapp filesystems don't understand the "move and delete" method
 	 at all and have all kinds of weird effects.  Just setting the delete
 	 dispositon usually works fine, though. */
+      debug_printf ("Sharing violation when opening %S",
+		    pc.get_nt_native_path ());
       if (!pc.fs_is_nfs () && !pc.fs_is_netapp ())
 	bin_stat = move_to_bin;
       if (!pc.isdir () || pc.isremote ())
@@ -629,7 +655,7 @@ unlink_nt (path_conv &pc)
 			       flags | FILE_SYNCHRONOUS_IO_NONALERT);
 	  if (NT_SUCCESS (status))
 	    {
-	      status = check_dir_not_empty (fh);
+	      status = check_dir_not_empty (fh, pc);
 	      if (!NT_SUCCESS (status))
 		{
 		  NtClose (fh);
@@ -646,11 +672,12 @@ unlink_nt (path_conv &pc)
     {
       if (status == STATUS_DELETE_PENDING)
 	{
-	  syscall_printf ("Delete already pending");
+	  debug_printf ("Delete %S already pending", pc.get_nt_native_path ());
 	  status = 0;
 	  goto out;
 	}
-      syscall_printf ("Opening file for delete failed, status = %p", status);
+      debug_printf ("Opening %S for delete failed, status = %p",
+		    pc.get_nt_native_path (), status);
       goto out;
     }
   /* Try to move to bin if a sharing violation occured.  If that worked,
@@ -666,8 +693,24 @@ unlink_nt (path_conv &pc)
 				 FileDispositionInformation);
   if (!NT_SUCCESS (status))
     {
-      syscall_printf ("Setting delete disposition failed, status = %p",
-		      status);
+      debug_printf ("Setting delete disposition on %S failed, status = %p",
+		    pc.get_nt_native_path (), status);
+      if (status == STATUS_DIRECTORY_NOT_EMPTY)
+	{
+	  pc.get_object_attr (attr, sec_none_nih);
+	  NtClose (fh);
+	  status = NtOpenFile (&fh, access | FILE_LIST_DIRECTORY | SYNCHRONIZE,
+			       &attr, &io, FILE_SHARE_VALID_FLAGS,
+			       flags | FILE_SYNCHRONOUS_IO_NONALERT);
+	  if (NT_SUCCESS (status))
+	    check_dir_not_empty (fh, pc);
+	  else
+	    {
+	      fh = NULL;
+	      debug_printf ("Opening dir %S for check_dir_not_empty failed, "
+			    "status = %p", pc.get_nt_native_path (), status);
+	    }
+	}
       /* Trying to delete a hardlink to a file in use by the system in some
 	 way (for instance, font files) by setting the delete disposition fails
 	 with STATUS_CANNOT_DELETE.  Strange enough, deleting these hardlinks
@@ -684,6 +727,8 @@ unlink_nt (path_conv &pc)
 	{
 	  HANDLE fh2;
 
+	  debug_printf ("Cannot delete %S, try delete-on-close",
+			pc.get_nt_native_path ());
 	  /* Re-open from handle so we open the correct file no matter if it
 	     has been moved to the bin or not. */
 	  pc.init_reopen_attr (&attr, fh);
@@ -693,8 +738,8 @@ unlink_nt (path_conv &pc)
 			       flags | FILE_DELETE_ON_CLOSE);
 	  if (!NT_SUCCESS (status))
 	    {
-	      syscall_printf ("Setting delete-on-close failed, status = %p",
-			      status);
+	      debug_printf ("Setting delete-on-close on %S failed, status = %p",
+			    pc.get_nt_native_path (), status);
 	      /* This is really the last chance.  If it hasn't been moved
 		 to the bin already, try it now.  If moving to the bin
 		 succeeds, we got rid of the file in some way, even if
@@ -740,6 +785,7 @@ out:
       && (pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
     stop_transaction (status, old_trans, trans);
 
+  syscall_printf ("%S, return status = %p", pc.get_nt_native_path (), status);
   return status;
 }
 
@@ -767,13 +813,13 @@ unlink (const char *ourname)
 
   if (!win32_name.exists ())
     {
-      syscall_printf ("unlinking a nonexistent file");
+      debug_printf ("unlinking a nonexistent file");
       set_errno (ENOENT);
       goto done;
     }
   else if (win32_name.isdir ())
     {
-      syscall_printf ("unlinking a directory");
+      debug_printf ("unlinking a directory");
       set_errno (EPERM);
       goto done;
     }

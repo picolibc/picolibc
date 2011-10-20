@@ -1,3 +1,14 @@
+2011-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (try_to_bin): Improve debug output.
+	(check_dir_not_empty): Take additional path_conv argument.  Improve
+	debug output.  Change syscall_printf to debug_printf.
+	(unlink_nt): Improve debug output.  Change syscall_printf to
+	debug_printf.
+	(unlink): Change syscall_printf to debug_printf.
+
+	* cygthread.h: Fix copyright dates.
+
 2011-10-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc: Extend two comments.  Mention the name RtlpCurDirRef
