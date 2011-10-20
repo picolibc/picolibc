@@ -116,7 +116,7 @@ tty_list::init ()
   for (int i = 0; i < NTTYS; i++)
     {
       ttys[i].init ();
-      ttys[i].setntty (DEV_TTYS_MAJOR, i);
+      ttys[i].setntty (DEV_PTYS_MAJOR, i);
     }
 }
 

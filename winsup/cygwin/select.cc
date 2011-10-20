@@ -548,7 +548,7 @@ peek_pipe (select_record *s, bool from_select)
 
       switch (fh->get_major ())
 	{
-	case DEV_TTYM_MAJOR:
+	case DEV_PTYM_MAJOR:
 	  if (((fhandler_pty_master *) fh)->need_nl)
 	    {
 	      gotone = s->read_ready = true;

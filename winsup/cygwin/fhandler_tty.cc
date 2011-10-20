@@ -359,7 +359,7 @@ fhandler_pty_slave::fhandler_pty_slave (int unit)
   : fhandler_pty_common (), inuse (NULL)
 {
   if (unit >= 0)
-    dev ().parse (DEV_TTYS_MAJOR, unit);
+    dev ().parse (DEV_PTYS_MAJOR, unit);
 }
 
 int
@@ -953,7 +953,7 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
     return res;
 
   if (myself->pgid && get_ttyp ()->getpgid () != myself->pgid
-      && (unsigned) myself->ctty == FHDEV (DEV_TTYS_MAJOR, get_unit ())
+      && (unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_unit ())
       && (get_ttyp ()->ti.c_lflag & TOSTOP))
     {
       /* background process */
@@ -1191,9 +1191,13 @@ fhandler_pty_master::fhandler_pty_master (int unit)
     dwProcessId (0), need_nl (0)
 {
   if (unit >= 0)
-    dev ().parse (DEV_TTYM_MAJOR, unit);
+    dev ().parse (DEV_PTYM_MAJOR, unit);
   else if (!setup ())
-    dev ().parse (FH_ERROR);
+    {
+      dev ().parse (FH_ERROR);
+      return; 
+    }
+  set_name ("/dev/ptmx");
 }
 
 int
@@ -1682,7 +1686,7 @@ fhandler_pty_master::setup ()
   t.winsize.ws_row = 25;
   t.master_pid = myself->pid;
 
-  dev ().parse (DEV_TTYM_MAJOR, unit);
+  dev ().parse (DEV_PTYM_MAJOR, unit);
 
   termios_printf ("this %p, pty%d opened - from_pty %p, to_pty %p", this, unit,
 		  get_io_handle (), get_output_handle ());

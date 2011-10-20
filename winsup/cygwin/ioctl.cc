@@ -38,7 +38,7 @@ ioctl (int fd, int cmd, ...)
   /* FIXME: This stinks.  There are collisions between cmd types
      depending on whether fd is associated with a pty master or not.
      Something to fix for Cygwin2.  CGF 2006-06-04 */
-  if (cfd->is_tty () && cfd->get_major () != DEV_TTYM_MAJOR)
+  if (cfd->is_tty () && cfd->get_major () != DEV_PTYM_MAJOR)
     switch (cmd)
       {
 	case TCGETA:

@@ -34,7 +34,7 @@ details. */
 #include "winf.h"
 #include "ntdll.h"
 
-static suffix_info exe_suffixes[] =
+static suffix_info NO_COPY exe_suffixes[] =
 {
   suffix_info ("", 1),
   suffix_info (".exe", 1),
@@ -56,7 +56,7 @@ static suffix_info dll_suffixes[] =
 };
 #endif
 
-child_info_spawn *chExeced;
+child_info_spawn NO_COPY *chExeced;
 
 /* Add .exe to PROG if not already present and see if that exists.
    If not, return PROG (converted from posix to win32 rules if necessary).

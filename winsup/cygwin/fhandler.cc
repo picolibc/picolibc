@@ -469,8 +469,19 @@ fhandler_base::open_with_arch (int flags, mode_t mode)
 	}
       else
 	{
+	  char *name;
+	  /* Preserve any name (like /dev/tty) derived from build_fh_pc. */
+	  if (!get_name ())
+	    name = NULL;
+	  else
+	    {
+	      name = (char *) alloca (strlen (get_name ()) + 1);
+	      strcpy (name, get_name ());
+	    }
 	  fhandler_base *arch = archetype;
 	  archetype->copyto (this);
+	  if (name)
+	    set_name (name);
 	  archetype = arch;
 	  archetype_usecount (1);
 	  usecount = 0;

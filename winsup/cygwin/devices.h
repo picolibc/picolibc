@@ -33,13 +33,13 @@ enum fh_devices
   FH_CONS     = FHDEV (DEV_CONS_MAJOR, 0),
   FH_CONS_MAX = FHDEV (DEV_CONS_MAJOR, MAX_CONSOLES),
 
-  DEV_TTYM_MAJOR = 128,
-  FH_TTYM    = FHDEV (DEV_TTYM_MAJOR, 0),
-  FH_TTYM_MAX= FHDEV (DEV_TTYM_MAJOR, 255),
+  DEV_PTYM_MAJOR = 128,
+  FH_PTYM    = FHDEV (DEV_PTYM_MAJOR, 0),
+  FH_PTYM_MAX= FHDEV (DEV_PTYM_MAJOR, 255),
 
-  DEV_TTYS_MAJOR = 136,
-  FH_TTYS    = FHDEV (DEV_TTYS_MAJOR, 0),	/* FIXME: Should separate ttys and ptys */
-  FH_TTYS_MAX= FHDEV (DEV_TTYS_MAJOR, 255),	/* FIXME: Should separate ttys and ptys */
+  DEV_PTYS_MAJOR = 136,
+  FH_PTYS    = FHDEV (DEV_PTYS_MAJOR, 0),	/* FIXME: Should separate ttys and ptys */
+  FH_PTYS_MAX= FHDEV (DEV_PTYS_MAJOR, 255),	/* FIXME: Should separate ttys and ptys */
 
   DEV_SERIAL_MAJOR = 117,
   FH_SERIAL  = FHDEV (117, 0),	/* /dev/ttyS? */
@@ -317,8 +317,8 @@ struct device
 };
 
 extern const device *console_dev;
-extern const device *ttym_dev;
-extern const device *ttys_dev;
+extern const device *ptmx_dev;
+extern const device *ptys_dev;
 extern const device *urandom_dev;
 
 extern const device dev_dgram_storage;
@@ -359,5 +359,5 @@ extern const device dev_fs_storage;
    || (((int) n) == FH_CONIN) \
    || (((int) n) == FH_CONOUT))
 
-#define istty_slave_dev(n) (device::major (n) == DEV_TTYS_MAJOR)
+#define istty_slave_dev(n) (device::major (n) == DEV_PTYS_MAJOR)
 #endif /*_DEVICES_H*/

@@ -351,7 +351,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       /* Console windows are not kernel objects, so the access mask returned
 	 by NtQueryInformationFile is meaningless.  CMD always hands down
 	 stdin handles as R/O handles, but our tty slave sides are R/W. */
-      if (dev == FH_TTY || iscons_dev (dev) || dev.get_major () == DEV_TTYS_MAJOR)
+      if (dev == FH_TTY || iscons_dev (dev) || dev.get_major () == DEV_PTYS_MAJOR)
 	access |= GENERIC_READ | GENERIC_WRITE;
       else if (NT_SUCCESS (NtQueryInformationFile (handle, &io, &fai,
 						   sizeof fai,
@@ -444,10 +444,10 @@ fh_alloc (path_conv& pc)
 
   switch (pc.dev.get_major ())
     {
-    case DEV_TTYS_MAJOR:
+    case DEV_PTYS_MAJOR:
       fh = cnew (fhandler_pty_slave, pc.dev.get_minor ());
       break;
-    case DEV_TTYM_MAJOR:
+    case DEV_PTYM_MAJOR:
       fh = cnew (fhandler_pty_master, pc.dev.get_minor ());
       break;
     case DEV_CYGDRIVE_MAJOR:
@@ -559,10 +559,14 @@ fh_alloc (path_conv& pc)
 	  else if (myself->ctty <= 0
 		   && !myself->set_ctty (fhandler_termios::last, 0))
 	    /* no tty assigned */;
-	  else if (iscons_dev (myself->ctty))
-	    fh = cnew (fhandler_console, pc.dev);
 	  else
-	    fh = cnew (fhandler_pty_slave, myself->ctty);
+	    {
+	      if (iscons_dev (myself->ctty))
+		fh = cnew (fhandler_console, pc.dev);
+	      else
+		fh = cnew (fhandler_pty_slave, myself->ctty);
+	      fh->set_name ("/dev/tty");
+	    }
 	  break;
 	case FH_KMSG:
 	  fh = cnew (fhandler_mailslot);
@@ -600,6 +604,8 @@ build_fh_pc (path_conv& pc, bool set_name)
       set_errno (ENXIO);
       goto out;
     }
+  else if (fh->get_name ())
+    /* already got one */;
   else if (fh->dev () != FH_NADA)
     fh->set_name (fh->dev ().name);
   else if (set_name)

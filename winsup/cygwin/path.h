@@ -282,8 +282,12 @@ class path_conv
   PWCHAR get_wide_win32_path (PWCHAR wc);
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
+# define cfree_maybe(x) if (x) cfree ((void *) (x))
   path_conv &operator =(const path_conv& pc)
   {
+    cfree_maybe (path);
+    cfree_maybe (normalized_path);
+    cfree_maybe (wide_path);
     memcpy (this, &pc, sizeof pc);
     path = cstrdup (pc.path);
     conv_handle.dup (pc.conv_handle);
@@ -296,11 +300,6 @@ class path_conv
 	uni_path.Buffer = wide_path;
       }
     return *this;
-  }
-  void free_strings ()
-  {
-    cfree (modifiable_path ());
-    cfree ((char *) normalized_path);
   }
   DWORD get_devn () {return (DWORD) dev;}
   short get_unitn () const {return dev.get_minor ();}

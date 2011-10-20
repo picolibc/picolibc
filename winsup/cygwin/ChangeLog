@@ -1,3 +1,24 @@
+2011-10-20  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	Throughout change TTY_* to PTY_*, tty_* to pty_*, and ttym_* to ptmx_*.
+	* devices.cc: Regenerate.
+	* dtable.cc: (fh_alloc): Preserve /dev/tty name when that's what we
+	opened.
+	(build_fh_pc): Preserve any existing name.
+	* fhandler.cc (fhandler_base::open_with_arch): Ditto.
+	* fhandler_tty.cc (fhandler_pty_master::fhandler_pty_master): Force the
+	name to /dev/ptmx while preserving other pty master device information.
+	* path.h (cfree_maybe): New macro.
+	(path_conv::operator =): Free any allocated strings in target.
+	(path_conv::free_strings): Delete unused function.
+
+	* sigproc.cc (proc_terminate): Remove previous accommodation for execed
+	processes since it didn't have the desired effect.  Change comment to a
+	FIXME.
+
+	* spawn.cc (chExeced): Mark NO_COPY.
+	(exe_suffixes): Ditto.
+
 2011-10-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (try_to_bin): Improve debug output.
