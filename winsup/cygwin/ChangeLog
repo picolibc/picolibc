@@ -12,6 +12,13 @@
 
 2011-10-20  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* fhandler.h (fhandler*::copyto): Free path_conv strings first.
+	* path.h (cfree_and_null): Rename and expand from cfree_maybe.
+	(path_conv &operator =): Call free_strings rather than freeing strings
+	directly.
+
+2011-10-20  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	Throughout change TTY_* to PTY_*, tty_* to pty_*, and ttym_* to ptmx_*.
 	* devices.cc: Regenerate.
 	* dtable.cc: (fh_alloc): Preserve /dev/tty name when that's what we
