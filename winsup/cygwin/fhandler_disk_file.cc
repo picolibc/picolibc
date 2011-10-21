@@ -1727,7 +1727,8 @@ fhandler_disk_file::rmdir ()
 					&fbi);
       if (!NT_SUCCESS (status) && q_status == STATUS_OBJECT_NAME_NOT_FOUND)
 	status = STATUS_SUCCESS;
-      else if (NT_SUCCESS (status) && NT_SUCCESS (q_status))
+      else if (pc.fs_is_samba ()
+	       && NT_SUCCESS (status) && NT_SUCCESS (q_status))
 	status = STATUS_DIRECTORY_NOT_EMPTY;
     }
   if (!NT_SUCCESS (status))

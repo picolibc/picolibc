@@ -645,7 +645,7 @@ unlink_nt (path_conv &pc)
 	     have to move it back.  That's bad, because the directory would
 	     be moved around which results in a temporary inconsistent state.
 	     So, what we do here is to test if the directory is empty.  If
-	     not, we bail out with ERROR_DIR_NOT_EMTPY.  The below code
+	     not, we bail out with STATUS_DIRECTORY_NOT_EMPTY.  The below code
 	     tests for at least three entries in the directory, ".", "..",
 	     and another one.  Three entries means, not empty.  This doesn't
 	     work for the root directory of a drive, but the root dir can

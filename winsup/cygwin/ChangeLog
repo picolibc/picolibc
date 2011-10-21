@@ -1,5 +1,13 @@
 2011-10-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::rmdir): Check invalid
+	success only on Samba shares.
+	* mount.cc (fs_info::update): Drop has_buggy_basic_info flag for
+	NcFsd.
+	* syscalls.cc (unlink_nt): Fix typo in comment.
+
+2011-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* globals.cc (ro_u_ncfsd): New R/O unicode string.
 	* mount.cc (fs_info::update): Check for "NcFsd" FS.  Set flags and
 	change comments accordingly.

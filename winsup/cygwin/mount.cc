@@ -379,14 +379,14 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     Know example: EMC NS-702.  We just don't use that info class on
 	     any remote CIFS.  */
 	  has_buggy_fileid_dirinfo (is_cifs () || is_unixfs ());
-	  /* NWFS/NcFsd is known to have a broken FileBasicInformation info
+	  /* NWFS is known to have a broken FileBasicInformation info
 	     class.  It can't be used to fetch information, only to set
 	     information.  Therefore, for NWFS we have to fallback to the
 	     FileNetworkOpenInformation info class.  Unfortunately we can't
 	     use FileNetworkOpenInformation all the time since that fails on
 	     other filesystems like NFS.
 	     UNUSED, but keep in for information purposes. */
-	  has_buggy_basic_info (is_nwfs () || is_ncfsd ());
+	  has_buggy_basic_info (is_nwfs ());
 	  /* Netapp and NWFS/NcFsd are too dumb to allow non-DOS filenames
 	     containing trailing dots and spaces when accessed from Windows
 	     clients.  We subsume CIFS into this class of filesystems right
