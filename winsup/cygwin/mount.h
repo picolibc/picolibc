@@ -1,7 +1,7 @@
 /* mount.h: mount definitions.
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -28,6 +28,7 @@ enum fs_info_type
   mvfs,
   cifs,
   nwfs,
+  ncfsd,
   /* Always last. */
   max_fs_type
 };
@@ -97,6 +98,7 @@ class fs_info
   IMPLEMENT_FS_FLAG (mvfs)
   IMPLEMENT_FS_FLAG (cifs)
   IMPLEMENT_FS_FLAG (nwfs)
+  IMPLEMENT_FS_FLAG (ncfsd)
   fs_info_type what_fs () const { return status.fs_type; }
 
   ULONG serial_number () const { return sernum; }

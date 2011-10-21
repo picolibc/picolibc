@@ -360,7 +360,9 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     and stuff like that. */
 	  && !is_mvfs (RtlEqualUnicodePathPrefix (&fsname, &ro_u_mvfs, FALSE))
 	  /* NWFS == Novell Netware FS.  Broken info class, see below. */
+	  /* NcFsd == Novell Netware FS via own driver since Windows Vista. */
 	  && !is_nwfs (RtlEqualUnicodeString (&fsname, &ro_u_nwfs, FALSE))
+	  && !is_ncfsd (RtlEqualUnicodeString (&fsname, &ro_u_ncfsd, FALSE))
 	  /* UNIXFS == TotalNet Advanced Server (TAS).  Doesn't support
 	     FileIdBothDirectoryInformation.  See below. */
 	  && !is_unixfs (RtlEqualUnicodeString (&fsname, &ro_u_unixfs, FALSE)))
@@ -377,22 +379,23 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     Know example: EMC NS-702.  We just don't use that info class on
 	     any remote CIFS.  */
 	  has_buggy_fileid_dirinfo (is_cifs () || is_unixfs ());
-	  /* NWFS is known to have a broken FileBasicInformation info class.
-	     It can't be used to fetch information, only to set information.
-	     Therefore, for NWFS we have to fallback to the
+	  /* NWFS/NcFsd is known to have a broken FileBasicInformation info
+	     class.  It can't be used to fetch information, only to set
+	     information.  Therefore, for NWFS we have to fallback to the
 	     FileNetworkOpenInformation info class.  Unfortunately we can't
 	     use FileNetworkOpenInformation all the time since that fails on
 	     other filesystems like NFS.
 	     UNUSED, but keep in for information purposes. */
-	  has_buggy_basic_info (is_nwfs ());
-	  /* Netapp and NWFS are too dumb to allow non-DOS filenames
+	  has_buggy_basic_info (is_nwfs () || is_ncfsd ());
+	  /* Netapp and NWFS/NcFsd are too dumb to allow non-DOS filenames
 	     containing trailing dots and spaces when accessed from Windows
 	     clients.  We subsume CIFS into this class of filesystems right
 	     away since at least some of them are not capable either. */
-	  has_dos_filenames_only (is_netapp () || is_nwfs () || is_cifs ());
+	  has_dos_filenames_only (is_netapp () || is_nwfs ()
+				  || is_ncfsd () || is_cifs ());
 	  /* NWFS does not grok re-opening a file by handle.  It only
 	     supports this if the filename is non-null and the handle is
-	     the handle to a directory. */
+	     the handle to a directory. NcFsd IR10 is supposed to be ok. */
 	  has_buggy_reopen (is_nwfs ());
 	}
     }
@@ -1584,7 +1587,8 @@ fs_names_t fs_names[] = {
     { "unixfs", false },
     { "mvfs", false },
     { "cifs", false },
-    { "nwfs", false }
+    { "nwfs", false },
+    { "ncfsd", false }
 };
 
 static mntent *

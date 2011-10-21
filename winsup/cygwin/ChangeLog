@@ -1,3 +1,15 @@
+2011-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* globals.cc (ro_u_ncfsd): New R/O unicode string.
+	* mount.cc (fs_info::update): Check for "NcFsd" FS.  Set flags and
+	change comments accordingly.
+	(fs_names): Add entry for NcFsd FS.
+	* mount.h (enum fs_info_type): Add ncfsd.
+	(class fs_info): Add ncfsd flag and accessor methods.
+	* path.h (class path_conv): Add fs_is_ncfsd method.
+	* syscalls.cc (unlink_nt): Experimentally try delete-on-close on NcFsd
+	in STATUS_CANNOT_DELETE case.
+
 2011-10-20  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	Throughout change TTY_* to PTY_*, tty_* to pty_*, and ttym_* to ptmx_*.

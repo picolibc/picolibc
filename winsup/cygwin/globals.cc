@@ -105,6 +105,7 @@ UNICODE_STRING _RDATA ro_u_sunwnfs = _ROU (L"SUNWNFS");
 UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
 UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
 UNICODE_STRING _RDATA ro_u_nwfs = _ROU (L"NWFS");
+UNICODE_STRING _RDATA ro_u_ncfsd = _ROU (L"NcFsd");
 UNICODE_STRING _RDATA ro_u_volume = _ROU (L"\\??\\Volume{");
 UNICODE_STRING _RDATA ro_u_pipedir = _ROU (L"\\\\?\\PIPE\\");
 UNICODE_STRING _RDATA ro_u_globalroot = _ROU (L"\\\\.\\GLOBALROOT");

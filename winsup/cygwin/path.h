@@ -325,6 +325,7 @@ class path_conv
   bool fs_is_mvfs () const {return fs.is_mvfs ();}
   bool fs_is_cifs () const {return fs.is_cifs ();}
   bool fs_is_nwfs () const {return fs.is_nwfs ();}
+  bool fs_is_ncfsd () const {return fs.is_ncfsd ();}
   ULONG fs_serial_number () const {return fs.serial_number ();}
   inline const char *set_path (const char *p)
   {

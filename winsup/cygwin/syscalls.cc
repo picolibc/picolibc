@@ -723,7 +723,8 @@ unlink_nt (path_conv &pc)
 	 error 59, ERROR_UNEXP_NET_ERR when trying to access the file.
 	 Microsoft KB 837665 describes this problem as a bug in 2K3, but
 	 I have reproduced it on other systems. */
-      if (status == STATUS_CANNOT_DELETE && !pc.isremote ())
+      if (status == STATUS_CANNOT_DELETE
+	  && (!pc.isremote () || pc.fs_is_ncfsd ()))
 	{
 	  HANDLE fh2;
 
