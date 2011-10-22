@@ -40,7 +40,7 @@ struct __cygwin_perfile *perfile_table;
 void
 fhandler_base::reset (const fhandler_base *from)
 {
-  pc = from->pc;
+  pc << from->pc;
   rabuf = NULL;
   ralen = 0;
   raixget = 0;
@@ -148,7 +148,7 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
 void
 fhandler_base::set_name (path_conv &in_pc)
 {
-  pc = in_pc;
+  pc << in_pc;
 }
 
 char *fhandler_base::get_proc_fd_name (char *buf)

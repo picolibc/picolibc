@@ -1,3 +1,38 @@
+2011-10-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dtable.cc (dtable::delete_archetype): Improve debugging output.
+	(dtable::init_std_file_from_handle): Close console handle early, before
+	initialization.  Build up openflags for passing to open_setup, just to
+	be safe.
+	(last_tty_dev): New variable.
+	(fh_last_tty_dev): New macro.
+	(fh_alloc): Try again to keep track of previously opened tty, this time
+	by just saving the device and using that to potentially open an
+	archetype.  Avoid setting the "/dev/tty" name if the creation of the
+	fhandler failed.
+	(build_fh_pc): Remove unused second argument.  Reorganize how and where
+	the name is set.  Set last_tty_dev as appropriate.  Avoid a NULL
+	dereference in a debug printf.
+	* dtable.h (build_fh_pc): Reflect removal of second parameter.
+	* fhandler.cc (fhandler_base::reset): Use new '<<' operator to copy pc
+	since it preserves any potentially previously set name.
+	(fhandler_base::set_name): Ditto.
+	* fhandler.h (fhandler_*::clone): Throughout use ccalloc to allocate
+	new fhandler, primarily to make sure that pc field is properly zeroed.
+	(fhandler_termios::last): Eliminate.
+	(fhandler_termios): Remove setting of last.
+	(fhandler_base::~fhandler_termios): Ditto.
+	* fhandler_console.cc (fhandler_console::open): Don't make decisions
+	about opening close-on-exec handles here since it makes no sense for
+	archetypes.
+	(fhandler_console::init): Assume that input handle has already been
+	opened.
+	* fhandler_termios.cc (fhandler_termios::last): Delete.
+	* path.h (path_conv::eq_worker): New function.  Move bulk of operator =
+	here.
+	(operator <<): New function.
+	(operator =): Use eq_worker to perform old functionality.
+
 2011-10-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::rmdir): Check invalid

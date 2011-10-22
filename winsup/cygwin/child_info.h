@@ -40,6 +40,8 @@ enum child_status
 /* Change this value if you get a message indicating that it is out-of-sync. */
 #define CURR_CHILD_INFO_MAGIC 0x29afd207U
 
+#define NPROCS	256
+
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
    different cygwin versions. */
@@ -54,6 +56,8 @@ public:
   HANDLE subproc_ready;	// used for synchronization with parent
   HANDLE user_h;
   HANDLE parent;
+  int nprocs;
+  pid_t children[NPROCS];
   init_cygheap *cygheap;
   void *cygheap_max;
   DWORD cygheap_reserve_sz;

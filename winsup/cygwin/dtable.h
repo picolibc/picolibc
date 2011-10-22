@@ -95,7 +95,7 @@ public:
 
 fhandler_base *build_fh_dev (const device&, const char * = NULL);
 fhandler_base *build_fh_name (const char *, unsigned = 0, suffix_info * = NULL);
-fhandler_base *build_fh_pc (path_conv& pc, bool set_name = true);
+fhandler_base *build_fh_pc (path_conv& pc);
 
 void dtable_init ();
 void stdio_init ();

@@ -217,7 +217,8 @@ dtable::delete_archetype (fhandler_base *fh)
   for (unsigned i = 0; i < farchetype; i++)
     if (fh == archetypes[i])
       {
-	debug_printf ("deleting element %d for %s", i, fh->get_name ());
+	debug_printf ("deleting element %d for %s(%d/%d)", i, fh->get_name (),
+		      fh->dev ().get_major (), fh->dev ().get_minor ());
 	if (i < --farchetype)
 	  archetypes[i] = archetypes[farchetype];
 	break;
@@ -314,7 +315,11 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       if (myself->ctty > 0)
 	dev.parse (myself->ctty);
       else
-	dev.parse (FH_CONSOLE);
+	{
+	  dev.parse (FH_CONSOLE);
+	  CloseHandle (handle);
+	  handle = INVALID_HANDLE_VALUE;
+	}
     }
   else if (GetCommState (handle, &dcb))
     /* FIXME: Not right - assumes ttyS0 */
@@ -347,48 +352,48 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 
       IO_STATUS_BLOCK io;
       FILE_ACCESS_INFORMATION fai;
+      int openflags = O_BINARY;
 
       /* Console windows are not kernel objects, so the access mask returned
 	 by NtQueryInformationFile is meaningless.  CMD always hands down
 	 stdin handles as R/O handles, but our tty slave sides are R/W. */
-      if (dev == FH_TTY || iscons_dev (dev) || dev.get_major () == DEV_PTYS_MAJOR)
-	access |= GENERIC_READ | GENERIC_WRITE;
-      else if (NT_SUCCESS (NtQueryInformationFile (handle, &io, &fai,
-						   sizeof fai,
-						   FileAccessInformation)))
+      if (!iscons_dev (dev) && fh->is_tty ())
 	{
-	  if (fai.AccessFlags & FILE_READ_DATA)
-	    access |= GENERIC_READ;
+	  openflags |= O_RDWR;
+	  access |= GENERIC_READ | GENERIC_WRITE;
+	}
+      else if (!iscons_dev (dev)
+	       && NT_SUCCESS (NtQueryInformationFile (handle, &io, &fai,
+						      sizeof fai,
+						      FileAccessInformation)))
+	{
 	  if (fai.AccessFlags & FILE_WRITE_DATA)
-	    access |= GENERIC_WRITE;
+	    {
+	      openflags |= O_WRONLY;
+	      access |= GENERIC_WRITE;
+	    }
+	  if (fai.AccessFlags & FILE_READ_DATA)
+	    {
+	      openflags |= openflags & O_WRONLY ? O_RDWR : O_RDONLY;
+	      access |= GENERIC_READ;
+	    }
 	}
       else if (fd == 0)
-	access |= GENERIC_READ;
+	{
+	  openflags |= O_RDONLY;
+	  access |= GENERIC_READ;
+	}
       else
-	access |= GENERIC_WRITE;  /* Should be rdwr for stderr but not sure that's
-				    possible for some versions of handles */
-      /* FIXME: Workaround Windows 7 issue.  If the parent process of
-	 the process tree closes the original handles to the console window,
-	 strange problems occur when starting child processes later on if
-	 stdio redirection is used.
-
-	 CV 2009-08-08:  It looks like this problem has been fixed only
-	 half-heartedly in RTM.  Unfortunately the new implementation
-	 has still a problem which now also occurs on the 32 bit release
-	 of Windows 7.  It's still not quite clear what happens but it's
-	 easily reproducible.  Just start X via the start menu entry.
-	 This opens an xterm window with a shell.  Exit from the shell,
-	 and you get a Windows error box reporting a crash in the
-	 Console Window Host application (conhost.exe) due to an access
-	 violation.
-
-	 This needs further investigation but the workaround not to close
-	 the handles will have a marginal hit of three extra handles per
-	 process at most. */
-      if (!fh->init (iscons_dev (dev) && wincap.has_console_handle_problem ()
-		     ? INVALID_HANDLE_VALUE : handle, access, bin))
+	{
+	  openflags |= O_WRONLY;
+	  access |= GENERIC_WRITE;  /* Should be rdwr for stderr but not sure that's
+				       possible for some versions of handles */
+	}
+      if (!fh->init (handle, access, bin))
 	api_fatal ("couldn't initialize fd %d for %s", fd, fh->get_name ());
 
+      fh->open_setup (openflags);
+      fh->usecount = 0;
       cygheap->fdtab[fd] = fh;
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
@@ -435,6 +440,8 @@ build_fh_dev (const device& dev, const char *unix_name)
 }
 
 #define fh_unset ((fhandler_base *) 1)
+static device last_tty_dev;
+#define fh_last_tty_dev ((fhandler_termios *) cygheap->fdtab.find_archetype (last_tty_dev))
 
 static fhandler_base *
 fh_alloc (path_conv& pc)
@@ -555,17 +562,22 @@ fh_alloc (path_conv& pc)
 	  break;
 	case FH_TTY:
 	  if (!pc.isopen ())
-	    fhraw = cnew_no_ctor (fhandler_console, -1); 
-	  else if (myself->ctty <= 0
-		   && !myself->set_ctty (fhandler_termios::last, 0))
-	    /* no tty assigned */;
-	  else
 	    {
+	      fhraw = cnew_no_ctor (fhandler_console, -1); 
+	      debug_printf ("not called from open for /dev/tty");
+	    }
+	  else if (myself->ctty <= 0 && last_tty_dev
+		   && !myself->set_ctty (fh_last_tty_dev, 0))
+	    debug_printf ("no /dev/tty assigned");
+	  else if (myself->ctty > 0)
+	    {
+	      debug_printf ("determining /dev/tty assignment for ctty %p", myself->ctty);
 	      if (iscons_dev (myself->ctty))
 		fh = cnew (fhandler_console, pc.dev);
 	      else
 		fh = cnew (fhandler_pty_slave, myself->ctty);
-	      fh->set_name ("/dev/tty");
+	      if (fh->dev () != FH_NADA)
+		fh->set_name ("/dev/tty");
 	    }
 	  break;
 	case FH_KMSG:
@@ -595,7 +607,7 @@ fh_alloc (path_conv& pc)
 }
 
 fhandler_base *
-build_fh_pc (path_conv& pc, bool set_name)
+build_fh_pc (path_conv& pc)
 {
   fhandler_base *fh = fh_alloc (pc);
 
@@ -604,35 +616,38 @@ build_fh_pc (path_conv& pc, bool set_name)
       set_errno (ENXIO);
       goto out;
     }
-  else if (fh->get_name ())
-    /* already got one */;
-  else if (fh->dev () != FH_NADA)
-    fh->set_name (fh->dev ().name);
-  else if (set_name)
-    fh->set_name (pc);
 
   if (!fh->use_archetype ())
-    /* doesn't use archetypes */;
+    fh->set_name (pc);
   else if ((fh->archetype = cygheap->fdtab.find_archetype (fh->dev ())))
-    debug_printf ("found an archetype for %s(%d/%d) io_handle %p", fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor (),
-		  fh->archetype->get_io_handle ());
+    {
+      debug_printf ("found an archetype for %s(%d/%d) io_handle %p", fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor (),
+		    fh->archetype->get_io_handle ());
+      if (!fh->get_name ())
+	fh->set_name (fh->archetype->dev ().name);
+    }
+  else if (cygwin_finished_initializing && !pc.isopen ())
+    fh->set_name (pc);
   else
     {
+      if (!fh->get_name ())
+	fh->set_name (fh->dev ().name);
       fh->archetype = fh->clone ();
       debug_printf ("created an archetype (%p) for %s(%d/%d)", fh->archetype, fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor ());
       fh->archetype->archetype = NULL;
       *cygheap->fdtab.add_archetype () = fh->archetype;
     }
 
-  /* The fhandler_termios constructor keeps track of the last tty-like thing
-     opened but we're only interested in this if we don't have a controlling
-     terminal since we could potentially want to open it if /dev/tty is
-     referenced. */
+
+  /* Keep track of the last tty-like thing opened.  We could potentially want
+     to open it if /dev/tty is referenced. */
   if (myself->ctty > 0 || !fh->is_tty () || !pc.isctty_capable ())
-    fhandler_termios::last = NULL;
+    last_tty_dev = FH_NADA;
+  else
+    last_tty_dev = fh->dev ();
 
 out:
-  debug_printf ("fh %p, dev %p", fh, (DWORD) fh->dev ());
+  debug_printf ("fh %p, dev %p", fh, fh ? (DWORD) fh->dev () : 0);
   return fh;
 }
 
@@ -668,9 +683,10 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
 	  debug_printf ("duped output_handles old %p, new %p",
 			oldfh->get_output_handle (),
 			newfh->get_output_handle ());
-	  debug_printf ("duped output_handles archetype old %p, archetype new %p",
-			oldfh->archetype->get_output_handle (),
-			newfh->archetype->get_output_handle ());
+	  if (oldfh->archetype)
+	    debug_printf ("duped output_handles archetype old %p, archetype new %p",
+			  oldfh->archetype->get_output_handle (),
+			  newfh->archetype->get_output_handle ());
 #endif /*DEBUGGING*/
 	}
     }

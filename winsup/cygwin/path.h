@@ -16,6 +16,7 @@ details. */
 
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <alloca.h>
 
 inline bool
 has_attribute (DWORD attributes, DWORD attribs_to_test)
@@ -294,11 +295,12 @@ class path_conv
     cfree_and_null (normalized_path);
     cfree_and_null (wide_path);
   }
-  path_conv &operator =(const path_conv& pc)
+  path_conv& eq_worker (const path_conv& pc, const char *in_path,
+			const char *in_normalized_path)
   {
     free_strings ();
     memcpy (this, &pc, sizeof pc);
-    path = cstrdup (pc.path);
+    path = cstrdup (in_path);
     conv_handle.dup (pc.conv_handle);
     normalized_path = cstrdup(pc.normalized_path);
     if (pc.wide_path)
@@ -309,6 +311,32 @@ class path_conv
 	uni_path.Buffer = wide_path;
       }
     return *this;
+  }
+
+  path_conv &operator << (const path_conv& pc)
+  {
+    const char *save_path;
+    const char *save_normalized_path;
+    if (!path)
+      save_path = pc.path;
+    else
+      {
+	save_path = (char *) alloca (strlen (path) + 1);
+	strcpy ((char *) save_path, path);
+      }
+    if (!normalized_path)
+      save_normalized_path = pc.normalized_path;
+    else
+      {
+	save_normalized_path = (char *) alloca (strlen (normalized_path) + 1);
+	strcpy ((char *) save_normalized_path, path);
+      }
+    return eq_worker (pc, save_path, save_normalized_path);
+  }
+
+  path_conv &operator =(const path_conv& pc)
+  {
+    return eq_worker (pc, pc.path, pc.normalized_path);
   }
   DWORD get_devn () {return (DWORD) dev;}
   short get_unitn () const {return dev.get_minor ();}

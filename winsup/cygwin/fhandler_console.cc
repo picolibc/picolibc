@@ -784,7 +784,7 @@ fhandler_console::open (int flags, mode_t)
 
   /* Open the input handle as handle_ */
   h = CreateFile ("CONIN$", GENERIC_READ | GENERIC_WRITE,
-		  FILE_SHARE_READ | FILE_SHARE_WRITE, sec_none_cloexec (flags),
+		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
 		  OPEN_EXISTING, 0, 0);
 
   if (h == INVALID_HANDLE_VALUE)
@@ -795,7 +795,7 @@ fhandler_console::open (int flags, mode_t)
   set_io_handle (h);
 
   h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
-		  FILE_SHARE_READ | FILE_SHARE_WRITE, sec_none_cloexec (flags),
+		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
 		  OPEN_EXISTING, 0, 0);
 
   if (h == INVALID_HANDLE_VALUE)
@@ -2197,8 +2197,6 @@ fhandler_console::init (HANDLE h, DWORD a, mode_t bin)
   if (a == (GENERIC_READ | GENERIC_WRITE))
     flags = O_RDWR;
   open_with_arch (flags | O_BINARY | (h ? 0 : O_NOCTTY));
-  if (h && h != INVALID_HANDLE_VALUE)
-    CloseHandle (h);	/* Reopened by open */
 
   return !tcsetattr (0, &get_ttyp ()->ti);
 }

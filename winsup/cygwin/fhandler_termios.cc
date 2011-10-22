@@ -21,8 +21,6 @@ details. */
 #include "cygtls.h"
 #include "ntdll.h"
 
-fhandler_termios *fhandler_termios::last;
-
 /* Common functions shared by tty/console */
 
 void

@@ -437,7 +437,7 @@ public:
 
   virtual fhandler_base *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_base)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_base)); 
     fhandler_base *fh = new (ptr) fhandler_base (ptr); 
     copyto (fh);
     return fh;
@@ -604,7 +604,7 @@ class fhandler_socket: public fhandler_base
 
   fhandler_socket *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_socket)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_socket)); 
     fhandler_socket *fh = new (ptr) fhandler_socket (ptr); 
     copyto (fh);
     return fh;
@@ -658,7 +658,7 @@ public:
 
   virtual fhandler_base_overlapped *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_base_overlapped)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_base_overlapped)); 
     fhandler_base_overlapped *fh = new (ptr) fhandler_base_overlapped (ptr); 
     copyto (fh);
     return fh;
@@ -704,7 +704,7 @@ public:
 
   fhandler_pipe *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_pipe)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_pipe)); 
     fhandler_pipe *fh = new (ptr) fhandler_pipe (ptr); 
     copyto (fh);
     return fh;
@@ -754,7 +754,7 @@ public:
 
   fhandler_fifo *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_fifo)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_fifo)); 
     fhandler_fifo *fh = new (ptr) fhandler_fifo (ptr); 
     copyto (fh);
     return fh;
@@ -783,7 +783,7 @@ class fhandler_mailslot : public fhandler_base_overlapped
 
   fhandler_mailslot *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_mailslot)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_mailslot)); 
     fhandler_mailslot *fh = new (ptr) fhandler_mailslot (ptr); 
     copyto (fh);
     return fh;
@@ -832,7 +832,7 @@ class fhandler_dev_raw: public fhandler_base
 
   fhandler_dev_raw *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_dev_raw)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_raw)); 
     fhandler_dev_raw *fh = new (ptr) fhandler_dev_raw (ptr); 
     copyto (fh);
     return fh;
@@ -892,7 +892,7 @@ class fhandler_dev_floppy: public fhandler_dev_raw
 
   fhandler_dev_floppy *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_dev_floppy)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_floppy)); 
     fhandler_dev_floppy *fh = new (ptr) fhandler_dev_floppy (ptr); 
     copyto (fh);
     return fh;
@@ -940,7 +940,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
 
   fhandler_dev_tape *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_dev_tape)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_tape)); 
     fhandler_dev_tape *fh = new (ptr) fhandler_dev_tape (ptr); 
     copyto (fh);
     return fh;
@@ -1006,7 +1006,7 @@ class fhandler_disk_file: public fhandler_base
 
   fhandler_disk_file *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_disk_file)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_disk_file)); 
     fhandler_disk_file *fh = new (ptr) fhandler_disk_file (ptr); 
     copyto (fh);
     return fh;
@@ -1044,7 +1044,7 @@ class fhandler_cygdrive: public fhandler_disk_file
 
   fhandler_cygdrive *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_cygdrive)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_cygdrive)); 
     fhandler_cygdrive *fh = new (ptr) fhandler_cygdrive (ptr); 
     copyto (fh);
     return fh;
@@ -1108,7 +1108,7 @@ class fhandler_serial: public fhandler_base
 
   fhandler_serial *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_serial)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_serial)); 
     fhandler_serial *fh = new (ptr) fhandler_serial (ptr); 
     copyto (fh);
     return fh;
@@ -1134,18 +1134,11 @@ class fhandler_termios: public fhandler_base
   tty_min *_tc;
   tty *get_ttyp () {return (tty *) tc ();}
  public:
-  static fhandler_termios *last;
   tty_min*& tc () {return _tc;}
   fhandler_termios () :
   fhandler_base ()
   {
     need_fork_fixup (true);
-    last = this;
-  }
-  ~fhandler_termios ()
-  {
-    if (this == last)
-      last = NULL;
   }
   HANDLE& get_output_handle () { return output_handle; }
   line_edit_status line_edit (const char *rptr, int nread, termios&);
@@ -1173,7 +1166,7 @@ class fhandler_termios: public fhandler_base
 
   virtual fhandler_termios *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_termios)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_termios)); 
     fhandler_termios *fh = new (ptr) fhandler_termios (ptr); 
     copyto (fh);
     return fh;
@@ -1372,7 +1365,7 @@ private:
 
   fhandler_console *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_console)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_console)); 
     fhandler_console *fh = new (ptr) fhandler_console (ptr); 
     copyto (fh);
     return fh;
@@ -1415,7 +1408,7 @@ class fhandler_pty_common: public fhandler_termios
 
   virtual fhandler_pty_common *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_pty_common)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_pty_common)); 
     fhandler_pty_common *fh = new (ptr) fhandler_pty_common (ptr); 
     copyto (fh);
     return fh;
@@ -1469,7 +1462,7 @@ class fhandler_pty_slave: public fhandler_pty_common
 
   fhandler_pty_slave *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_pty_slave)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_pty_slave)); 
     fhandler_pty_slave *fh = new (ptr) fhandler_pty_slave (ptr); 
     copyto (fh);
     return fh;
@@ -1527,7 +1520,7 @@ public:
 
   fhandler_pty_master *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_pty_master)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_pty_master)); 
     fhandler_pty_master *fh = new (ptr) fhandler_pty_master (ptr); 
     copyto (fh);
     return fh;
@@ -1554,7 +1547,7 @@ class fhandler_dev_null: public fhandler_base
 
   fhandler_dev_null *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_dev_null)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_null)); 
     fhandler_dev_null *fh = new (ptr) fhandler_dev_null (ptr); 
     copyto (fh);
     return fh;
@@ -1589,7 +1582,7 @@ class fhandler_dev_zero: public fhandler_base
 
   fhandler_dev_zero *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_dev_zero)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_zero)); 
     fhandler_dev_zero *fh = new (ptr) fhandler_dev_zero (ptr); 
     copyto (fh);
     return fh;
@@ -1627,7 +1620,7 @@ class fhandler_dev_random: public fhandler_base
 
   fhandler_dev_random *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_dev_random)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_random)); 
     fhandler_dev_random *fh = new (ptr) fhandler_dev_random (ptr); 
     copyto (fh);
     return fh;
@@ -1667,7 +1660,7 @@ class fhandler_dev_mem: public fhandler_base
 
   fhandler_dev_mem *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_dev_mem)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_mem)); 
     fhandler_dev_mem *fh = new (ptr) fhandler_dev_mem (ptr); 
     copyto (fh);
     return fh;
@@ -1703,7 +1696,7 @@ class fhandler_dev_clipboard: public fhandler_base
 
   fhandler_dev_clipboard *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_dev_clipboard)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_clipboard)); 
     fhandler_dev_clipboard *fh = new (ptr) fhandler_dev_clipboard (ptr); 
     copyto (fh);
     return fh;
@@ -1742,7 +1735,7 @@ class fhandler_windows: public fhandler_base
 
   fhandler_windows *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_windows)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_windows)); 
     fhandler_windows *fh = new (ptr) fhandler_windows (ptr); 
     copyto (fh);
     return fh;
@@ -1789,7 +1782,7 @@ class fhandler_dev_dsp: public fhandler_base
 
   fhandler_dev_dsp *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_dev_dsp)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_dsp)); 
     fhandler_dev_dsp *fh = new (ptr) fhandler_dev_dsp (ptr); 
     copyto (fh);
     return fh;
@@ -1840,7 +1833,7 @@ class fhandler_virtual : public fhandler_base
 
   virtual fhandler_virtual *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_virtual)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_virtual)); 
     fhandler_virtual *fh = new (ptr) fhandler_virtual (ptr); 
     copyto (fh);
     return fh;
@@ -1872,7 +1865,7 @@ class fhandler_proc: public fhandler_virtual
 
   virtual fhandler_proc *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_proc)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_proc)); 
     fhandler_proc *fh = new (ptr) fhandler_proc (ptr); 
     copyto (fh);
     return fh;
@@ -1908,7 +1901,7 @@ class fhandler_procsys: public fhandler_virtual
 
   fhandler_procsys *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_procsys)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_procsys)); 
     fhandler_procsys *fh = new (ptr) fhandler_procsys (ptr); 
     copyto (fh);
     return fh;
@@ -1937,7 +1930,7 @@ class fhandler_procsysvipc: public fhandler_proc
 
   fhandler_procsysvipc *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_procsysvipc)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_procsysvipc)); 
     fhandler_procsysvipc *fh = new (ptr) fhandler_procsysvipc (ptr); 
     copyto (fh);
     return fh;
@@ -1967,7 +1960,7 @@ class fhandler_netdrive: public fhandler_virtual
 
   fhandler_netdrive *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_netdrive)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_netdrive)); 
     fhandler_netdrive *fh = new (ptr) fhandler_netdrive (ptr); 
     copyto (fh);
     return fh;
@@ -2007,7 +2000,7 @@ class fhandler_registry: public fhandler_proc
 
   fhandler_registry *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_registry)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_registry)); 
     fhandler_registry *fh = new (ptr) fhandler_registry (ptr); 
     copyto (fh);
     return fh;
@@ -2039,7 +2032,7 @@ class fhandler_process: public fhandler_proc
 
   fhandler_process *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_process)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_process)); 
     fhandler_process *fh = new (ptr) fhandler_process (ptr); 
     copyto (fh);
     return fh;
@@ -2068,7 +2061,7 @@ class fhandler_procnet: public fhandler_proc
 
   fhandler_procnet *clone ()
   {
-    void *ptr = (void *) cmalloc (HEAP_FHANDLER, sizeof (fhandler_procnet)); 
+    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_procnet)); 
     fhandler_procnet *fh = new (ptr) fhandler_procnet (ptr); 
     copyto (fh);
     return fh;

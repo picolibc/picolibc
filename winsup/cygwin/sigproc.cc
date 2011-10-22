@@ -33,8 +33,6 @@ details. */
 
 #define no_signals_available(x) (!my_sendsig || ((x) && myself->exitcode & EXITCODE_SET) || (&_my_tls == _sig_tls))
 
-#define NPROCS	256
-
 /*
  * Global variables
  */
