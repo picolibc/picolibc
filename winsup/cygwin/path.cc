@@ -450,15 +450,21 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath, bool dos)
 PUNICODE_STRING
 path_conv::get_nt_native_path ()
 {
-  if (!wide_path)
+  PUNICODE_STRING res;
+  if (wide_path)
+    res = &uni_path;
+  else if (!path)
+    res = NULL;
+  else
     {
       uni_path.Length = 0;
       uni_path.MaximumLength = (strlen (path) + 10) * sizeof (WCHAR);
       wide_path = (PWCHAR) cmalloc_abort (HEAP_STR, uni_path.MaximumLength);
       uni_path.Buffer = wide_path;
       ::get_nt_native_path (path, uni_path, has_dos_filenames_only ());
+      res = &uni_path;
     }
-  return &uni_path;
+  return res;
 }
 
 PWCHAR

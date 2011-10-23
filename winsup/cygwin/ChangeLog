@@ -1,3 +1,8 @@
+2011-10-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* path.cc (path_conv::get_nt_native_path): Avoid dereferencing path
+	when it is NULL.
+
 2011-10-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dtable.cc (dtable::delete_archetype): Improve debugging output.
@@ -32,6 +37,10 @@
 	here.
 	(operator <<): New function.
 	(operator =): Use eq_worker to perform old functionality.
+
+	* child_info.h (NPROCS): Move here from sigproc.cc.
+	(child_info::nprocs): New field.  Not used yet.
+	(child_info::children):: Ditto.
 
 2011-10-21  Corinna Vinschen  <corinna@vinschen.de>
 
