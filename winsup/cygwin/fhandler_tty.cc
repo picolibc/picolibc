@@ -812,7 +812,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
       if (readlen)
 	{
 	  termios_printf ("reading %d bytes (vtime %d)", readlen, vtime);
-	  if (ReadFile (get_handle (), buf, readlen, &n, NULL) == FALSE)
+	  if (!ReadFile (get_handle (), buf, readlen, &n, NULL))
 	    {
 	      termios_printf ("read failed, %E");
 	      raise (SIGHUP);

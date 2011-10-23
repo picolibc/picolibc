@@ -1,5 +1,12 @@
 2011-10-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* fhandler_tty.cc (fhandler_pty_slave::read): Use consistent way for
+	testing ReadFile return.
+	* pipe.cc (fhandler_pipe::create_selectable): Open the write side of
+	the pipe in message-mode to force writing as "chunks".  Explain why.
+
+2011-10-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* path.cc (path_conv::get_nt_native_path): Avoid dereferencing path
 	when it is NULL.
 

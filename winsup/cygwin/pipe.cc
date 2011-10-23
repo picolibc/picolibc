@@ -238,9 +238,15 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 	 It's important to only allow a single instance, to ensure that
 	 the pipe was not created earlier by some other process, even if
 	 the pid has been reused.  We avoid FILE_FLAG_FIRST_PIPE_INSTANCE
-	 because that is only available for Win2k SP2 and WinXP.  */
+	 because that is only available for Win2k SP2 and WinXP.
+
+	 Note that the write side of the pipe is opened as PIPE_TYPE_MESSAGE.
+	 This *seems* to more closely mimic Linux pipe behavior and is
+	 definitely required for pty handling since fhandler_pty_master
+	 writes to the pipe in chunks, terminated by newline when CANON mode
+	 is specified.  */
       r = CreateNamedPipe (pipename, PIPE_ACCESS_INBOUND | overlapped,
-			   PIPE_TYPE_BYTE | PIPE_READMODE_BYTE, 1, psize,
+			   PIPE_TYPE_MESSAGE | PIPE_READMODE_BYTE, 1, psize,
 			   psize, NMPWAIT_USE_DEFAULT_WAIT, sa_ptr);
 
       if (r != INVALID_HANDLE_VALUE)
