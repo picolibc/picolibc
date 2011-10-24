@@ -695,20 +695,22 @@ unlink_nt (path_conv &pc)
     {
       debug_printf ("Setting delete disposition on %S failed, status = %p",
 		    pc.get_nt_native_path (), status);
-      if (status == STATUS_DIRECTORY_NOT_EMPTY)
+      if (strace.active () && status == STATUS_DIRECTORY_NOT_EMPTY)
 	{
+	  NTSTATUS status2;
+
 	  pc.get_object_attr (attr, sec_none_nih);
 	  NtClose (fh);
-	  status = NtOpenFile (&fh, access | FILE_LIST_DIRECTORY | SYNCHRONIZE,
-			       &attr, &io, FILE_SHARE_VALID_FLAGS,
-			       flags | FILE_SYNCHRONOUS_IO_NONALERT);
-	  if (NT_SUCCESS (status))
+	  status2 = NtOpenFile (&fh, access | FILE_LIST_DIRECTORY | SYNCHRONIZE,
+				&attr, &io, FILE_SHARE_VALID_FLAGS,
+				flags | FILE_SYNCHRONOUS_IO_NONALERT);
+	  if (NT_SUCCESS (status2))
 	    check_dir_not_empty (fh, pc);
 	  else
 	    {
 	      fh = NULL;
 	      debug_printf ("Opening dir %S for check_dir_not_empty failed, "
-			    "status = %p", pc.get_nt_native_path (), status);
+			    "status = %p", pc.get_nt_native_path (), status2);
 	    }
 	}
       /* Trying to delete a hardlink to a file in use by the system in some

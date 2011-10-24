@@ -1,5 +1,11 @@
 2011-10-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (unlink_nt): Fix a bug which overwrites the NT status
+	value in case setting the delete disposition returns with
+	STATUS_DIRECTORY_NOT_EMPTY.
+
+2011-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* shared.cc (open_shared): Fix memory reservation of essential shared
 	memory regions.  Drop delta computations since delta is always 0 in
 	non-relocated case.  Add a comment.
