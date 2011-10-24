@@ -293,19 +293,19 @@ open_shared (const WCHAR *name, int n, HANDLE& shared_h, DWORD size,
 
   if (*m == SH_CYGWIN_SHARED && offsets[0])
     {
-      ptrdiff_t delta = (caddr_t) shared - (caddr_t) off_addr (0);
-      offsets[0] = (caddr_t) shared - (caddr_t) cygwin_hmodule;
-      for (int i = SH_USER_SHARED + 1; i < SH_TOTAL_SIZE; i++)
+      /* Reserve subsequent shared memory areas in non-relocated case only.
+	 There's no good reason to reserve the console shmem, because it's
+	 not yet known if we will allocate it at all. */
+      for (int i = SH_USER_SHARED; i < SH_SHARED_CONSOLE; i++)
 	{
-	  unsigned size = offsets[i] - offsets[i + 1];
-	  offsets[i] += delta;
+	  DWORD size = offsets[i - 1] - offsets[i];
 	  if (!VirtualAlloc (off_addr (i), size, MEM_RESERVE, PAGE_NOACCESS))
 	    continue;  /* oh well */
 	}
-      offsets[SH_TOTAL_SIZE] += delta;
     }
 
-  debug_printf ("name %W, n %d, shared %p (wanted %p), h %p, *m %d", mapname, n, shared, addr, shared_h, *m);
+  debug_printf ("name %W, n %d, shared %p (wanted %p), h %p, *m %d",
+		mapname, n, shared, addr, shared_h, *m);
 
   return shared;
 }

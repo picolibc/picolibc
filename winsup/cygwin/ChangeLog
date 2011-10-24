@@ -1,3 +1,9 @@
+2011-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared.cc (open_shared): Fix memory reservation of essential shared
+	memory regions.  Drop delta computations since delta is always 0 in
+	non-relocated case.  Add a comment.
+
 2011-10-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler_tty.cc (fhandler_pty_slave::read): Use consistent way for
