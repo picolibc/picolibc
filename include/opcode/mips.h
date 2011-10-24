@@ -1616,7 +1616,7 @@ extern const int bfd_mips16_num_opcodes;
    "c" 10-bit higher breakpoint code (MICROMIPSOP_*_CODE)
    "d" 5-bit destination register specifier (MICROMIPSOP_*_RD)
    "h" 5-bit PREFX hint (MICROMIPSOP_*_PREFX)
-   "i" 16 bit unsigned immediate (MICROMIPSOP_*_IMMEDIATE)
+   "i" 16-bit unsigned immediate (MICROMIPSOP_*_IMMEDIATE)
    "j" 16-bit signed immediate (MICROMIPSOP_*_DELTA)
    "k" 5-bit cache opcode in target register position (MICROMIPSOP_*_CACHE)
    "n" register list for 32-bit LWM/SWM instruction (MICROMIPSOP_*_RT)
