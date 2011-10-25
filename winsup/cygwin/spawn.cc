@@ -1059,6 +1059,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
       IO_STATUS_BLOCK io;
       HANDLE h;
       NTSTATUS status;
+      LARGE_INTEGER size;
 
       status = NtOpenFile (&h, SYNCHRONIZE | GENERIC_READ,
 			   real_path.get_object_attr (attr, sec_none_nih),
@@ -1069,7 +1070,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
       if (!NT_SUCCESS (status))
 	{
 	  /* File is not readable?  Doesn't mean it's not executable.
-	     Test for executablility and if so, just assume the file is
+	     Test for executability and if so, just assume the file is
 	     a cygwin executable and go ahead. */
 	  if (status == STATUS_ACCESS_DENIED && real_path.has_acls ()
 	      && check_file_access (real_path, X_OK, true) == 0)
@@ -1079,8 +1080,16 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	    }
 	  goto err;
 	}
+      if (!GetFileSizeEx (h, &size))
+	{
+	  NtClose (h);
+	  goto err;
+	}
+      if (size.QuadPart > wincap.allocation_granularity ())
+	size.LowPart = wincap.allocation_granularity ();
 
-      HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY, 0, 0, NULL);
+      HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY,
+				     0, 0, NULL);
       NtClose (h);
       if (!hm)
 	{
@@ -1092,16 +1101,22 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	    }
 	  goto err;
 	}
-      buf = (char *) MapViewOfFile(hm, FILE_MAP_READ, 0, 0, 0);
-      CloseHandle (hm);
+      /* Try to map the first 64K of the image.  That's enough for the local
+	 tests, and it's enough for hook_or_detect_cygwin to compute the IAT
+	 address. */
+      buf = (char *) MapViewOfFile (hm, FILE_MAP_READ, 0, 0, size.LowPart);
       if (!buf)
-	goto err;
+	{
+	  CloseHandle (hm);
+	  goto err;
+	}
 
       {
 	myfault efault;
 	if (efault.faulted ())
 	  {
 	    UnmapViewOfFile (buf);
+	    CloseHandle (hm);
 	    real_path.set_cygexec (false);
 	    break;
 	  }
@@ -1111,13 +1126,16 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	    unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
 	    win16_exe = off < sizeof (IMAGE_DOS_HEADER);
 	    if (!win16_exe)
-	      real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL, subsys));
+	      real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL,
+							      subsys, hm));
 	    else
 	      real_path.set_cygexec (false);
 	    UnmapViewOfFile (buf);
+	    CloseHandle (hm);
 	    break;
 	  }
       }
+      CloseHandle (hm);
 
       debug_printf ("%s is possibly a script", real_path.get_win32 ());
 

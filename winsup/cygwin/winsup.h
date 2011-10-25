@@ -216,7 +216,7 @@ __ino64_t __stdcall hash_path_name (__ino64_t hash, PCWSTR name) __attribute__ (
 __ino64_t __stdcall hash_path_name (__ino64_t hash, const char *name) __attribute__ ((regparm(2)));
 void __stdcall nofinalslash (const char *src, char *dst) __attribute__ ((regparm(2)));
 
-void *hook_or_detect_cygwin (const char *, const void *, WORD&) __attribute__ ((regparm (3)));
+void *hook_or_detect_cygwin (const char *, const void *, WORD&, HANDLE h = NULL) __attribute__ ((regparm (3)));
 
 /* Time related */
 void __stdcall totimeval (struct timeval *, FILETIME *, int, int);

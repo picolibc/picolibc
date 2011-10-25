@@ -10,6 +10,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <sys/param.h>
 #include "ntdll.h"
 #include "cygerrno.h"
 #include "security.h"
@@ -226,7 +227,7 @@ out:
 
 // Top level routine to find the EXE's imports and redirect them
 void *
-hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys)
+hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
 {
   HMODULE hm = fn ? GetModuleHandle (NULL) : (HMODULE) name;
   PIMAGE_NT_HEADERS pExeNTHdr = PEHeaderFromHModule (hm);
@@ -238,15 +239,36 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys)
 
   DWORD importRVA = pExeNTHdr->OptionalHeader.DataDirectory
 		      [IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+  DWORD importRVASize = pExeNTHdr->OptionalHeader.DataDirectory
+			[IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
   if (!importRVA)
     return false;
 
   long delta = fn ? 0 : rvadelta (pExeNTHdr, importRVA);
   if (delta < 0)
     return false;
+  importRVA -= delta;
 
   // Convert imports RVA to a usable pointer
-  PIMAGE_IMPORT_DESCRIPTOR pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA - delta);
+  PIMAGE_IMPORT_DESCRIPTOR pdfirst;
+  char *map = NULL;
+  DWORD offset = 0;
+  if (h && importRVA + importRVASize > wincap.allocation_granularity ())
+    {
+      /* If h is not NULL, the calling function only mapped at most the first
+	 64K of the image.  The IAT is usually at the end of the image, so
+	 what we do here is to map the IAT into our address space if it doesn't
+	 reside in the first 64K anyway.  The offset must be a multiple of the
+	 allocation granularity, though, so we have to map a bit more. */
+      offset = rounddown (importRVA, wincap.allocation_granularity ());
+      DWORD size = importRVA - offset + importRVASize;
+      map = (char *) MapViewOfFile (h, FILE_MAP_READ, 0, offset, size);
+      if (!map)
+	return false;
+      pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map, importRVA - offset);
+    }
+  else
+    pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA);
 
   function_hook fh;
   fh.origfn = NULL;
@@ -256,16 +278,24 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys)
   // Iterate through each import descriptor, and redirect if appropriate
   for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
     {
-      if (!ascii_strcasematch (rva (PSTR, hm, pd->Name - delta), "cygwin1.dll"))
+      if (!ascii_strcasematch (rva (PSTR, map ?: (char *) hm,
+				    pd->Name - delta - offset), "cygwin1.dll"))
 	continue;
       if (!fn)
-	return (void *) "found it";	// just checking if executable used cygwin1.dll
+	{
+	  if (map)
+	    UnmapViewOfFile (map);
+	  return (void *) "found it";	// just checking if executable used cygwin1.dll
+	}
       i = -1;
       while (!fh.origfn && (fh.name = makename (name, buf, i, 1)))
 	RedirectIAT (fh, pd, hm);
       if (fh.origfn)
 	break;
     }
+
+  if (map)
+    UnmapViewOfFile (map);
 
   while (!fh.origfn && (fh.name = makename (name, buf, i, -1)))
     get_export (fh);

@@ -1,3 +1,13 @@
+2011-10-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* hookapi.cc (hook_or_detect_cygwin): Take additional handle
+	to a file mapping as parameter.  If this handle is not NULL,
+	create another file mapping for the IAT.
+	* spawn.cc (av::fixup): Only map the first 64K of an image and
+	keep the mapping handle to use as argument to hook_or_detect_cygwin.
+	* winsup.h (hook_or_detect_cygwin): Add mapping handle as default
+	parameter in declaration.
+
 2011-10-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (unlink_nt): Fix a bug which overwrites the NT status
