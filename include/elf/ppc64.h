@@ -1,5 +1,5 @@
 /* PPC64 ELF support for BFD.
-   Copyright 2003, 2005, 2009, 2010 Free Software Foundation, Inc.
+   Copyright 2003, 2005, 2009, 2010, 2011 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -139,6 +139,7 @@ START_RELOC_NUMBERS (elf_ppc64_reloc_type)
   RELOC_NUMBER (R_PPC64_DTPREL16_HIGHESTA, 106)
   RELOC_NUMBER (R_PPC64_TLSGD,		   107)
   RELOC_NUMBER (R_PPC64_TLSLD,		   108)
+  RELOC_NUMBER (R_PPC64_TOCSAVE,	   109)
 
 #ifndef RELOC_MACROS_GEN_FUNC
 /* Fake relocation only used internally by ld.  */
