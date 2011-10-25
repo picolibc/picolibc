@@ -1,3 +1,7 @@
+2011-10-25  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* dis-asm.h (print_insn_epiphany): Declare.
+
 2011-10-21  Ulrich Drepper  <drepper@gmail.com>
 
 	* obstack.h [!GNUC] (obstack_free): Avoid cast to int.
