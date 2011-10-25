@@ -1,6 +1,10 @@
 2011-10-25  Alan Modra  <amodra@gmail.com>
 
 	Apply mainline patches.
+	2011-10-19  Alan Modra  <amodra@gmail.com>
+	PR ld/13254
+	* bfdlink.h (struct bfd_link_info): Add error_textrel.
+
 	2011-09-26  Cary Coutant  <ccoutant@google.com>
 	gcc PR lto/47247
 	* plugin-api.h (enum ld_plugin_symbol_resolution): Add
