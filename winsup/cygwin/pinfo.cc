@@ -971,19 +971,25 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
 int
 pinfo::wait ()
 {
-  /* FIXME: execed processes should be able to wait for pids that were started
-     by the process which execed them. */
-  if (!CreatePipe (&rd_proc_pipe, &((*this)->wr_proc_pipe), &sec_none_nih, 16))
+  /* If rd_proc_pipe that means we're in an execed process which already has
+     grabbed the read end of the pipe from the previous cygwin process running
+     with this pid.  */
+  if (!rd_proc_pipe)
     {
-      system_printf ("Couldn't create pipe tracker for pid %d, %E",
-		     (*this)->pid);
-      return 0;
-    }
+      /* FIXME: execed processes should be able to wait for pids that were started
+	 by the process which execed them. */
+      if (!CreatePipe (&rd_proc_pipe, &((*this)->wr_proc_pipe), &sec_none_nih, 16))
+	{
+	  system_printf ("Couldn't create pipe tracker for pid %d, %E",
+			 (*this)->pid);
+	  return 0;
+	}
 
-  if (!(*this)->dup_proc_pipe (hProcess))
-    {
-      system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid, hProcess);
-      return 0;
+      if (!(*this)->dup_proc_pipe (hProcess))
+	{
+	  system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid, hProcess);
+	  return 0;
+	}
     }
 
   preserve ();		/* Preserve the shared memory associated with the pinfo */

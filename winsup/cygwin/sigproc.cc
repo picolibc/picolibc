@@ -14,7 +14,6 @@ details. */
 #include <stdlib.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
-#include "pinfo.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -23,6 +22,7 @@ details. */
 #include "shared_info.h"
 #include "cygtls.h"
 #include "sigproc.h"
+#include "pinfo.h"
 #include "ntdll.h"
 
 /*
@@ -129,6 +129,8 @@ signal_fixup_after_exec ()
 static bool
 get_proc_lock (DWORD what, DWORD val)
 {
+  if (!cygwin_finished_initializing)
+    return true;
   Static int lastwhat = -1;
   if (!sync_proc_subproc)
     {
@@ -234,6 +236,9 @@ proc_subproc (DWORD what, DWORD val)
 	}
       if (what == PROC_DETACHED_CHILD)
 	break;
+      /* fall through intentionally */
+
+    case PROC_REATTACH_CHILD:
       procs[nprocs] = vchild;
       rc = procs[nprocs].wait ();
       if (rc)
@@ -379,6 +384,7 @@ proc_terminate ()
 	     set to 1 so we don't do that either.
 	  if (!hExeced)
 	     */
+	  if (!hExeced || ISSTATE (myself, PID_NOTCYGWIN))
 	    procs[i]->ppid = 1;
 	  if (procs[i].wait_thread)
 	    {
@@ -596,8 +602,8 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  goto out;
 	}
       VerifyHandle (hp);
-      if (!DuplicateHandle (hp, dupsig, GetCurrentProcess (), &sendsig, false,
-			    0, DUPLICATE_SAME_ACCESS) || !sendsig)
+      if (!DuplicateHandle (hp, dupsig, GetCurrentProcess (), &sendsig, 0,
+			    false, DUPLICATE_SAME_ACCESS) || !sendsig)
 	{
 	  __seterrno ();
 	  sigproc_printf ("DuplicateHandle failed, %E");
@@ -619,7 +625,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	      __seterrno ();
 	      goto out;
 	    }
-	  if (!DuplicateHandle (GetCurrentProcess (), tome, hp, &tome, false, 0,
+	  if (!DuplicateHandle (GetCurrentProcess (), tome, hp, &tome, 0, false,
 				DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	    {
 	      sigproc_printf ("DuplicateHandle for __SIGCOMMUNE failed, %E");
@@ -807,7 +813,7 @@ child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subpr
      allow the child to duplicate handles from the parent to itself. */
   parent = NULL;
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
-			GetCurrentProcess (), &parent, 0, TRUE,
+			GetCurrentProcess (), &parent, 0, true,
 			DUPLICATE_SAME_ACCESS))
     system_printf ("couldn't create handle to myself for child, %E");
 }
@@ -828,6 +834,42 @@ child_info_fork::child_info_fork () :
 child_info_spawn::child_info_spawn (child_info_types chtype, bool need_subproc_ready) :
   child_info (sizeof *this, chtype, need_subproc_ready)
 {
+}
+
+/* Record any non-reaped subprocesses to be passed to about-to-be-execed
+   process.  FIXME: There is a race here if the process exits while we
+   are recording it.  */
+void
+child_info_spawn::record_children ()
+{
+  /* FIXME: locking */
+  for (nchildren = 0; nchildren < nprocs; nchildren++)
+    {
+      children[nchildren].pid = procs[nchildren]->pid;
+      children[nchildren].rd_proc_pipe = procs[nchildren].rd_proc_pipe;
+    }
+}
+
+/* Reattach non-reaped subprocesses passed in from the cygwin process
+   which previously operated under this pid.  FIXME: Is there a race here
+   if the process exits during cygwin's exec handoff?  */
+void
+child_info_spawn::reattach_children ()
+{
+  for (int i = 0; i < nchildren; i++)
+    {
+      pinfo p (children[i].pid, PID_MAP_RW);
+      if (p)
+	{
+	  if (!DuplicateHandle (parent, children[i].rd_proc_pipe,
+				GetCurrentProcess (), &p.rd_proc_pipe, 0,
+				false, DUPLICATE_SAME_ACCESS))
+	    system_printf ("couldn't duplicate parent %p handles for forked children after exec, %E",
+			   children[i].rd_proc_pipe);
+	  p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, p->pid);
+	  p.reattach ();
+	}
+    }
 }
 
 void

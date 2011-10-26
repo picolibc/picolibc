@@ -546,6 +546,8 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   ch.moreinfo = moreinfo;
   ch.__stdin = __stdin;
   ch.__stdout = __stdout;
+  if (mode == _P_OVERLAY && ch.iscygwin ())
+    ch.record_children ();
 
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);

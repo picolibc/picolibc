@@ -625,6 +625,12 @@ child_info_spawn::handle_spawn ()
     cygheap->fdtab.move_fd (__stdout, 1);
   cygheap->user.groups.clear_supp ();
 
+  /* If we're execing we may have "inherited" a list of children forked by the
+     previous process executing under this pid.  Reattach them here so that we
+     can wait for them.  */
+  if (type == _PROC_EXEC)
+    reattach_children ();
+
   ready (true);
 
   /* Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of

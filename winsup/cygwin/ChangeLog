@@ -1,3 +1,35 @@
+2011-10-25  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* child_info.h (cchildren): New struct.
+	(child_info_spawn::nchildren): Rename from nprocs.
+	(child_info_spawn::children): Change type to cchildren for more
+	bookkeeping possibilities.
+	(child_info_spawn::child_info_spawn): Clear nchildren.
+	(child_info_spawn::record_children): Declare new function.
+	(child_info_spawn::reattach_children): Ditto.
+	* dcrt0.cc (child_info_spawn::handle_spawn): Call reattach_children to
+	gather list of processes we are potentially waiting for.
+	* pinfo.h (pinfo::pinfo): Make sure that rd_proc_pipe is always cleared.
+	(pinfo::reattach): New function.
+	* sigproc.cc: Move pinfo.h earlier so that it can be used in sigproc.h.
+	(get_proc_lock): Don't bother with a lock during DLL initialization.
+	(proc_subproc): Handle PROC_REATTACH_CHILD.
+	(proc_terminate): Orphan children only when we are not an execed
+	process or when the pid is about to be occupied by a non-cygwin
+	process.
+	(child_info_spawn::record_children): Define new function.
+	(child_info_spawn::reattach_children): Ditto.
+	* sigproc.h (procstuff): Define PROC_REATTACH_CHILD and renumber other
+	elements.
+	* spawn.cc (spawn_guts): Record any to-be-waited-for subprocesses if
+	about to exec a cygwin process.
+
+	* sigproc.cc (sig_send): Fix harmless transposition of fifth and six
+	arguments to DuplicateHandle().
+	(child_info::child_info): Ditto.
+
+	* globals.cc (hExeced): Make NO_COPY.
+
 2011-10-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* hookapi.cc (hook_or_detect_cygwin): Take additional handle

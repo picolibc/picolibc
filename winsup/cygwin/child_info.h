@@ -38,9 +38,15 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0x29afd207U
+#define CURR_CHILD_INFO_MAGIC 0xa049a83aU
 
 #define NPROCS	256
+
+struct cchildren
+{
+  pid_t pid;
+  HANDLE rd_proc_pipe;
+};
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -56,8 +62,6 @@ public:
   HANDLE subproc_ready;	// used for synchronization with parent
   HANDLE user_h;
   HANDLE parent;
-  int nprocs;
-  pid_t children[NPROCS];
   init_cygheap *cygheap;
   void *cygheap_max;
   DWORD cygheap_reserve_sz;
@@ -119,6 +123,8 @@ public:
   int __stdin;
   int __stdout;
   char filler[4];
+  int nchildren;
+  cchildren children[NPROCS];
 
   ~child_info_spawn ()
   {
@@ -135,8 +141,10 @@ public:
 	cfree (moreinfo);
       }
   }
-  child_info_spawn (): moreinfo (NULL) {};
+  child_info_spawn (): moreinfo (NULL), nchildren (0) {};
   child_info_spawn (child_info_types, bool);
+  void record_children ();
+  void reattach_children ();
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
   void set (child_info_types ci, bool b) { new (this) child_info_spawn (ci, b);}
   void handle_spawn () __attribute__ ((regparm (1)));

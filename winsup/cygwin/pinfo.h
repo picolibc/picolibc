@@ -147,8 +147,8 @@ public:
   bool waiter_ready;
   class cygthread *wait_thread;
   void init (pid_t, DWORD, HANDLE) __attribute__ ((regparm(3)));
-  pinfo (): procinfo (NULL) {}
-  pinfo (_pinfo *x): procinfo (x), hProcess (NULL) {}
+  pinfo (): procinfo (NULL), rd_proc_pipe (NULL) {}
+  pinfo (_pinfo *x): procinfo (x), rd_proc_pipe (NULL), hProcess (NULL) {}
   pinfo (pid_t n) : rd_proc_pipe (NULL), hProcess (NULL) {init (n, 0, NULL);}
   pinfo (pid_t n, DWORD flag) : rd_proc_pipe (NULL), hProcess (NULL), waiter_ready (0), wait_thread (NULL) {init (n, flag, NULL);}
   void thisproc (HANDLE) __attribute__ ((regparm (2)));
@@ -175,6 +175,11 @@ public:
 #ifndef _SIGPROC_H
   int remember () {system_printf ("remember is not here"); return 0;}
 #else
+  void reattach ()
+  {
+    proc_subproc (PROC_REATTACH_CHILD, (DWORD) this);
+    destroy = false;
+  }
   int remember (bool detach)
   {
     int res = proc_subproc (detach ? PROC_DETACHED_CHILD : PROC_ADDCHILD,
