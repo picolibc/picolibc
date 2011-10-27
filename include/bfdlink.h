@@ -337,6 +337,9 @@ struct bfd_link_info
   /* TRUE if we should warn when adding a DT_TEXTREL to a shared object.  */
   unsigned int warn_shared_textrel: 1;
 
+  /* TRUE if we should error when adding a DT_TEXTREL.  */
+  unsigned int error_textrel: 1;
+
   /* TRUE if .hash section should be created.  */
   unsigned int emit_hash: 1;
 

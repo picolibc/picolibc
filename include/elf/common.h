@@ -401,6 +401,8 @@
 
 #define EM_MICROBLAZE_OLD	0xbaab	/* Old MicroBlaze */
 
+#define EM_ADAPTEVA_EPIPHANY   0x1223  /* Adapteva's Epiphany architecture.  */
+
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version.  */

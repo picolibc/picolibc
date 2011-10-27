@@ -1,3 +1,16 @@
+2011-10-25  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* epiphany.h: New file.
+	* common.h (EM_ADAPTEVA_EPIPHANY): Define.
+
+2011-10-10  Alan Modra  <amodra@gmail.com>
+
+	* ppc64.h (R_PPC64_TOCSAVE): Add.
+
+2011-10-05  DJ Delorie  <dj@redhat.com>
+
+	* rx.h (E_FLAG_RX_PID): New.
+
 2011-09-21  David S. Miller  <davem@davemloft.net>
 
 	* sparc.h (Tag_GNU_Sparc_HWCAPS): New object attribute.
