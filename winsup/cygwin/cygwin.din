@@ -716,6 +716,7 @@ getgrnam SIGFE
 _getgrnam = getgrnam SIGFE
 _getgrnam32 = getgrnam32 SIGFE
 getgrnam_r SIGFE
+getgrouplist SIGFE
 getgroups SIGFE
 _getgroups = getgroups SIGFE
 _getgroups32 = getgroups32 SIGFE

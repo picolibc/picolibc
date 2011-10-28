@@ -13,6 +13,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "cygerrno.h"
@@ -419,40 +420,86 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
   return ret;
 }
 
-extern "C" int
-initgroups32 (const char *name, __gid32_t gid)
+/* Core functionality of initgroups and getgrouplist. */
+static int
+get_groups (const char *user, gid_t gid, cygsidlist &gsids)
 {
   int ret = -1;
 
   cygheap->user.deimpersonate ();
-  struct passwd *pw = internal_getpwnam (name);
+  struct passwd *pw = internal_getpwnam (user);
   struct __group32 *gr = internal_getgrgid (gid);
   cygsid usersid, grpsid;
   if (!usersid.getfrompw (pw) || !grpsid.getfromgr (gr))
     set_errno (EINVAL);
-  else
+  else if (get_server_groups (gsids, usersid, pw))
     {
-      cygsidlist tmp_gsids (cygsidlist_auto, 12);
-      if (get_server_groups (tmp_gsids, usersid, pw))
-	{
-	  tmp_gsids += grpsid;
-	  cygsidlist new_gsids (cygsidlist_alloc, tmp_gsids.count ());
-	  for (int i = 0; i < tmp_gsids.count (); i++)
-	    new_gsids.sids[i] = tmp_gsids.sids[i];
-	  new_gsids.count (tmp_gsids.count ());
-	  cygheap->user.groups.update_supp (new_gsids);
-	  ret = 0;
-	}
+      gsids += grpsid;
+      ret = 0;
     }
   cygheap->user.reimpersonate ();
-  syscall_printf ( "%d = initgroups (%s, %u)", ret, name, gid);
   return ret;
 }
 
 extern "C" int
-initgroups (const char *name, __gid16_t gid)
+initgroups32 (const char *user, __gid32_t gid)
 {
-  return initgroups32 (name, gid16togid32(gid));
+  int ret;
+
+  assert (user != NULL);
+  cygsidlist tmp_gsids (cygsidlist_auto, 12);
+  if (!(ret = get_groups (user, gid, tmp_gsids)))
+    {
+      cygsidlist new_gsids (cygsidlist_alloc, tmp_gsids.count ());
+      for (int i = 0; i < tmp_gsids.count (); i++)
+	new_gsids.sids[i] = tmp_gsids.sids[i];
+      new_gsids.count (tmp_gsids.count ());
+      cygheap->user.groups.update_supp (new_gsids);
+    }
+  syscall_printf ( "%d = initgroups (%s, %u)", ret, user, gid);
+  return ret;
+}
+
+extern "C" int
+initgroups (const char *user, __gid16_t gid)
+{
+  return initgroups32 (user, gid16togid32(gid));
+}
+
+extern "C" int
+getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
+{
+  int ret;
+
+  /* Note that it's not defined if groups or ngroups may be NULL!
+     GLibc does not check the pointers on entry and just uses them.
+     FreeBSD calls assert for ngroups and allows a NULL groups if
+     *ngroups is 0.  We follow FreeBSD's lead here, but always allow
+     a NULL groups pointer. */
+  assert (user != NULL);
+  assert (ngroups != NULL);
+
+  cygsidlist tmp_gsids (cygsidlist_auto, 12);
+  if (!(ret = get_groups (user, gid, tmp_gsids)))
+    {
+      int cnt = 0;
+      for (int i = 0; i < tmp_gsids.count (); i++)
+	{
+	  struct __group32 *gr = internal_getgrsid (tmp_gsids.sids[i]);
+	  if (gr)
+	    {
+	      if (groups && cnt < *ngroups)
+		groups[cnt] = gr->gr_gid;
+	      ++cnt;
+	    }
+	}
+      if (cnt > *ngroups)
+	ret = -1;
+      *ngroups = cnt;
+    }
+  syscall_printf ( "%d = getgrouplist (%s, %u, %p, %d)",
+		  ret, user, gid, groups, *ngroups);
+  return ret;
 }
 
 /* setgroups32: standards? */

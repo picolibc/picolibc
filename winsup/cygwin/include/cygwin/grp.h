@@ -1,6 +1,6 @@
 /* cygwin/grp.h
 
-   Copyright 2002 Red Hat Inc.
+   Copyright 2002, 2011 Red Hat Inc.
    Written by Corinna Vinschen <corinna@vinschen.de>
 
 This file is part of Cygwin.
@@ -40,6 +40,8 @@ struct __group32 * getgrnam32 (const char *name);
 __gid32_t getgid32 ();
 __gid32_t getegid32 ();
 #endif
+
+extern int getgrouplist (const char *, gid_t, gid_t *, int *);
 
 #ifdef __cplusplus
 }

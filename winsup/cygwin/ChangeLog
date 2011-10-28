@@ -1,3 +1,17 @@
+2011-10-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (getgrouplist): Export.
+	* grp.cc (get_groups): New static function to run the core functionality
+	of initgroups and getgrouplist.
+	(initgroups32): Call get_groups and just create supplementary group
+	list in cygheap.  Rename name of first argument to "user".  Add an
+	assertion to test for a NULL user name.
+	(initgroups): Rename name of first argument to "user".
+	(getgrouplist): New function.
+	* posix.sgml (std-bsd): Add getgrouplist.
+	* include/cygwin/grp.h (getgrouplist): Declare.
+	* include/cygwin/version.h: Bump API minor number.
+
 2011-10-25  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* child_info.h (cchildren): New struct.
