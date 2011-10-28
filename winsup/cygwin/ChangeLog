@@ -1,3 +1,8 @@
+2011-10-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* exceptions.cc (sigpacket::process): Avoid a potential deadlock when
+	exiting due to a signal.
+
 2011-10-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (getgrouplist): Export.

@@ -1321,6 +1321,7 @@ exit_sig:
       if (cygheap->rlim_core > 0UL)
 	si.si_signo |= 0x80;
     }
+  SetEvent (signal_arrived);	// To avoid a potential deadlock with proc_lock
   sigproc_printf ("signal %d, about to call do_exit", si.si_signo);
   use_tls->signal_exit (si.si_signo);	/* never returns */
 }
