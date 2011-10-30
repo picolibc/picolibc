@@ -22,7 +22,6 @@
 	(fhandler_fifo::fifo_name): Use new argument when creating a shared
 	name.
 	(fhandler_fifo::open): Rewrite.  Use events to synchronize.
-	(pure_debug_printf): New macro, active only when DEBUGGING.
 	(fhandler_fifo::wait): Rewrite to wait for new fifo events which are
 	supplied as a parameter.
 	(fhandler_fifo::raw_read): Rewrite to use handle mechanism to detect
