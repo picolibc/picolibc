@@ -1,3 +1,52 @@
+2011-10-30  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.h (fhandler_pipe::create_selectable): Remove optional
+	argument, take an options argument for CreateNamedPipe/CreateFile.
+	Change handle arguments to expect pointers.
+	(fhandler_fifo::fifo_state): Delete.
+	(fhandler_fifo::dummy_client): Ditto.
+	(fhandler_fifo::open_nonserver): Ditto.
+	(fhandler_fifo::wait_state): Ditto.
+	(fhandler_fifo::raw_write): Ditto.
+	(fhandler_fifo::read_ready): New field.
+	(fhandler_fifo::write_ready): Ditto.
+	(fhandler_fifo::wait): Modify argument.
+	(fhandler_fifo::fifo_name): Add a new argument.
+	(fhandler_fifo::fixup_after_fork): New function.
+	* fhandler_fifo.cc (fhandler_fifo::fhandler_fifo): Remove
+	initialization of expunged elements.  Initialize new handles to NULL.
+	(fhandler_fifo::open_nonserver): Delete.
+	(fnevent): New macro for creating a named event.
+	(fnpipe): New macro for creating a unique named pipe name.
+	(create_pipe): New macro for simplification of named pipe creation.
+	(fhandler_fifo::fifo_name): Use new argument when creating a shared
+	name.
+	(fhandler_fifo::open): Rewrite.  Use events to synchronize.
+	(pure_debug_printf): New macro, active only when DEBUGGING.
+	(fhandler_fifo::wait): Rewrite to wait for new fifo events which are
+	supplied as a parameter.
+	(fhandler_fifo::raw_read): Rewrite to use handle mechanism to detect
+	client-side disconnect.
+	(fhandler_fifo::raw_write): Delete.
+	(fhandler_fifo::close): Remove accommodations for expunged fields.
+	Close event handles.
+	(fhandler_fifo::dup): Remove accommodations for expunged fields.
+	Duplicate event handles.
+	(fhandler_fifo::fixup_after_fork): New function.  Perform fixups on
+	event handles.
+	(fhandler_fifo::set_close_on_exec): Remove accommodations for expunged
+	fields.  Set inheritance for new handle fields.
+	* miscfuncs.cc (CreatePipeOverlapped): Accommodate changes in
+	fhandler_pipe::create_selectable.
+	* tty.cc (tty::not_allocated): Ditto.
+	* pipe.cc (fhandler_pipe::create): Ditto.
+	(fhandler_pipe::create_selectable): Accept an extra open_mode argument.
+	Pass arguments by reference and allow opening one end of the pipe at a
+	time.
+
+	* sys/strace.h (debug_only_printf): Define new macro which calls
+	debug_printf only when DEBUGGING is defined.
+
 2011-10-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* exceptions.cc (sigpacket::process): Avoid a potential deadlock when

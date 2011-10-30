@@ -197,11 +197,14 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
    Note that the return value is either 0 or GetLastError,
    unlike CreatePipe, which returns a bool for success or failure.  */
 int
-fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
-				  HANDLE& w, DWORD psize, const char *name)
+fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE *r,
+				  HANDLE *w, DWORD psize, const char *name, DWORD open_mode)
 {
   /* Default to error. */
-  r = w = INVALID_HANDLE_VALUE;
+  if (r)
+    *r = NULL;
+  if (w)
+    *w = NULL;
 
   /* Ensure that there is enough pipe buffer space for atomic writes.  */
   if (psize < DEFAULT_PIPEBUFSIZE)
@@ -210,26 +213,24 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
   char pipename[MAX_PATH];
   const size_t len = __small_sprintf (pipename, PIPE_INTRO "%S-",
 				      &installation_key);
+  if (name)
+    strcpy (pipename + len, name);
 
-  /* FIXME: Eventually make ttys work with overlapped I/O. */
-  DWORD overlapped = name ? 0 : FILE_FLAG_OVERLAPPED;
+  open_mode |= PIPE_ACCESS_INBOUND;
 
   /* Retry CreateNamedPipe as long as the pipe name is in use.
      Retrying will probably never be necessary, but we want
      to be as robust as possible.  */
-  DWORD err;
-  do
+  DWORD err = 0;
+  while (r && !*r)
     {
       static volatile ULONG pipe_unique_id;
       if (!name)
 	__small_sprintf (pipename + len, "pipe-%p-%p", myself->pid,
 			InterlockedIncrement ((LONG *) &pipe_unique_id));
-      else
-	strcpy (pipename + len, name);
 
       debug_printf ("CreateNamedPipe: name %s, size %lu", pipename, psize);
 
-      err = 0;
       /* Use CreateNamedPipe instead of CreatePipe, because the latter
 	 returns a write handle that does not permit FILE_READ_ATTRIBUTES
 	 access, on versions of win32 earlier than WinXP SP2.
@@ -245,13 +246,14 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 	 definitely required for pty handling since fhandler_pty_master
 	 writes to the pipe in chunks, terminated by newline when CANON mode
 	 is specified.  */
-      r = CreateNamedPipe (pipename, PIPE_ACCESS_INBOUND | overlapped,
+      *r = CreateNamedPipe (pipename, open_mode,
 			   PIPE_TYPE_MESSAGE | PIPE_READMODE_BYTE, 1, psize,
 			   psize, NMPWAIT_USE_DEFAULT_WAIT, sa_ptr);
 
-      if (r != INVALID_HANDLE_VALUE)
+      if (*r != INVALID_HANDLE_VALUE)
 	{
-	  debug_printf ("pipe read handle %p", r);
+	  debug_printf ("pipe read handle %p", *r);
+	  err = 0;
 	  break;
 	}
 
@@ -261,43 +263,58 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE& r,
 	case ERROR_PIPE_BUSY:
 	  /* The pipe is already open with compatible parameters.
 	     Pick a new name and retry.  */
-	  debug_printf ("pipe busy", name ? ", retrying" : "");
+	  debug_printf ("pipe busy", !name ? ", retrying" : "");
+	  if (!*name)
+	    *r = NULL;
 	  break;
 	case ERROR_ACCESS_DENIED:
 	  /* The pipe is already open with incompatible parameters.
 	     Pick a new name and retry.  */
-	  debug_printf ("pipe access denied%s", name ? ", retrying" : "");
+	  debug_printf ("pipe access denied%s", !name ? ", retrying" : "");
+	  if (!*name)
+	    *r = NULL;
 	  break;
 	default:
 	  {
 	    err = GetLastError ();
-	    debug_printf ("CreatePipe failed, %E");
-	    return err;
+	    debug_printf ("failed, %E");
 	  }
 	}
     }
-  while (!name);
 
   if (err)
-    return err;
-
-  debug_printf ("CreateFile: name %s", pipename);
-
-  /* Open the named pipe for writing.
-     Be sure to permit FILE_READ_ATTRIBUTES access.  */
-  w = CreateFile (pipename, GENERIC_WRITE | FILE_READ_ATTRIBUTES, 0, sa_ptr,
-		  OPEN_EXISTING, overlapped, 0);
-
-  if (!w || w == INVALID_HANDLE_VALUE)
     {
-      /* Failure. */
-      DWORD err = GetLastError ();
-      debug_printf ("CreateFile failed, %E");
-      CloseHandle (r);
+      *r = NULL;
       return err;
     }
 
-  debug_printf ("pipe write handle %p", w);
+  if (!w)
+    debug_printf ("pipe write handle NULL");
+  else
+    {
+      debug_printf ("CreateFile: name %s", pipename);
+
+      /* Open the named pipe for writing.
+	 Be sure to permit FILE_READ_ATTRIBUTES access.  */
+      DWORD access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
+      if ((open_mode & PIPE_ACCESS_DUPLEX) == PIPE_ACCESS_DUPLEX)
+	access |= GENERIC_READ | FILE_WRITE_ATTRIBUTES;
+      *w = CreateFile (pipename, access, 0, sa_ptr, OPEN_EXISTING,
+		      open_mode & FILE_FLAG_OVERLAPPED, 0);
+
+      if (!*w || *w == INVALID_HANDLE_VALUE)
+	{
+	  /* Failure. */
+	  DWORD err = GetLastError ();
+	  debug_printf ("CreateFile failed, %E");
+	  if (r)
+	    CloseHandle (*r);
+	  *w = NULL;
+	  return err;
+	}
+
+      debug_printf ("pipe write handle %p", *w);
+    }
 
   /* Success. */
   return 0;
@@ -310,7 +327,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
   SECURITY_ATTRIBUTES *sa = sec_none_cloexec (mode);
   int res = -1;
 
-  int ret = create_selectable (sa, r, w, psize);
+  int ret = create_selectable (sa, &r, &w, psize, NULL, FILE_FLAG_OVERLAPPED);
   if (ret)
     __seterrno_from_win_error (ret);
   else if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)

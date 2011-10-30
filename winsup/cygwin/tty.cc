@@ -159,8 +159,8 @@ tty::not_allocated (HANDLE& r, HANDLE& w)
   char pipename[sizeof("ptyNNNN-from-master")];
   __small_sprintf (pipename, "pty%d-from-master", get_unit ());
   /* fhandler_pipe::create_selectable returns 0 when creation succeeds */
-  return fhandler_pipe::create_selectable (&sec_none, r, w, 128 * 1024,
-					   pipename) == 0;
+  return fhandler_pipe::create_selectable (&sec_none, &r, &w, 128 * 1024,
+					   pipename, 0) == 0;
 }
 
 bool

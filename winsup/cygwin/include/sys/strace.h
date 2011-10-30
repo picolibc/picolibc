@@ -125,6 +125,11 @@ void strace_printf (unsigned, const char *func, const char *, ...);
     }))
 #endif /*NOSTRACE*/
 
+#ifdef DEBUGGING
+#define debug_only_printf(fmt, args...) debug_printf (fmt , ## args)
+#else
+#define debug_only_printf(fmt, args...) do {} while (0)
+#endif
 #define debug_printf(fmt, args...) strace_printf_wrap(DEBUG, fmt , ## args)
 #define malloc_printf(fmt, args...) strace_printf_wrap1(MALLOC, fmt , ## args)
 #define minimal_printf(fmt, args...) strace_printf_wrap1(MINIMAL, fmt , ## args)

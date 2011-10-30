@@ -1624,8 +1624,8 @@ fhandler_pty_master::setup ()
 
   char pipename[sizeof("ptyNNNN-from-master")];
   __small_sprintf (pipename, "pty%d-to-master", unit);
-  res = fhandler_pipe::create_selectable (&sec_none, get_io_handle (),
-					  to_master, 128 * 1024, pipename);
+  res = fhandler_pipe::create_selectable (&sec_none, &get_io_handle (),
+					  &to_master, 128 * 1024, pipename, 0);
   if (res)
     {
       errstr = "output pipe";

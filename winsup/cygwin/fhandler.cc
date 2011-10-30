@@ -275,8 +275,8 @@ retry:
 
 /* Cover function to WriteFile to provide Posix interface and semantics
    (as much as possible).  */
-static LARGE_INTEGER off_current = { QuadPart:FILE_USE_FILE_POINTER_POSITION };
-static LARGE_INTEGER off_append = { QuadPart:FILE_WRITE_TO_END_OF_FILE };
+static NO_COPY LARGE_INTEGER off_current = { QuadPart:FILE_USE_FILE_POINTER_POSITION };
+static NO_COPY LARGE_INTEGER off_append = { QuadPart:FILE_WRITE_TO_END_OF_FILE };
 
 ssize_t __stdcall
 fhandler_base::raw_write (const void *ptr, size_t len)
@@ -1914,7 +1914,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
     }
   else if (err == ERROR_HANDLE_EOF || err == ERROR_BROKEN_PIPE)
     {
-      debug_printf ("EOF");
+      debug_printf ("EOF, %E");
       *bytes = 0;
       res = overlapped_success;
       if (writing && err == ERROR_BROKEN_PIPE)
