@@ -1,3 +1,8 @@
+2011-11-01  DJ Delorie  <dj@redhat.com>
+
+	* common.h (EM_RL78, EM_78K0R): New.
+	* rl78.h: New.
+
 2011-10-25  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* epiphany.h: New file.
