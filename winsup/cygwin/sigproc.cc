@@ -859,16 +859,15 @@ child_info_spawn::reattach_children ()
   for (int i = 0; i < nchildren; i++)
     {
       pinfo p (children[i].pid, PID_MAP_RW);
-      if (p)
-	{
-	  if (!DuplicateHandle (parent, children[i].rd_proc_pipe,
+      if (!p)
+	/* pid no longer exists */;
+      else if (!DuplicateHandle (parent, children[i].rd_proc_pipe,
 				GetCurrentProcess (), &p.rd_proc_pipe, 0,
 				false, DUPLICATE_SAME_ACCESS))
-	    system_printf ("couldn't duplicate parent %p handles for forked children after exec, %E",
-			   children[i].rd_proc_pipe);
-	  p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, p->pid);
-	  p.reattach ();
-	}
+	debug_printf ("couldn't duplicate parent %p handles for forked children after exec, %E",
+		       children[i].rd_proc_pipe);
+      else if ((p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, p->pid)))
+	p.reattach ();
     }
 }
 

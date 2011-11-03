@@ -1,3 +1,9 @@
+2011-11-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* sigproc.cc (child_info_spawn::reattach_children): Avoid issuing an
+	error when we can't duplicate from "parent" since it is probably ok if
+	children of the previous owner of the pid disappear.
+
 2011-11-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (off_current): Define local in fhandler_base::raw_write.
