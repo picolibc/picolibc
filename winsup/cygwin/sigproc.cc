@@ -936,7 +936,8 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
 	      hProcess = NULL;
 	    }
 	}
-      sigproc_printf ("pid %u, WFMO returned %d, res %d", pid, x, res);
+      sigproc_printf ("pid %u, WFMO returned %d, exit_code %p, res %d", pid, x,
+		      exit_code, res);
     }
   return res;
 }
@@ -946,13 +947,14 @@ child_info::proc_retry (HANDLE h)
 {
   if (!exit_code)
     return EXITCODE_OK;
+  sigproc_printf ("exit_code %p", exit_code);
   switch (exit_code)
     {
     case STILL_ACTIVE:	/* shouldn't happen */
       sigproc_printf ("STILL_ACTIVE?  How'd we get here?");
       break;
     case STATUS_DLL_NOT_FOUND:
-      return exit_code;
+    case STATUS_ACCESS_VIOLATION:
     case STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION: /* pseudo-reloc.c specific */
       return exit_code;
     case STATUS_CONTROL_C_EXIT:

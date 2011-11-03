@@ -1,5 +1,11 @@
 2011-11-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* sigproc.cc (child_info::sync): Report on exit code in strace output.
+	(child_info::proc_retry): Don't consider STATUS_ACCESS_VIOLATION as a
+	restartable event.
+
+2011-11-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sigproc.cc (child_info_spawn::reattach_children): Avoid issuing an
 	error when we can't duplicate from "parent" since it is probably ok if
 	children of the previous owner of the pid disappear.
