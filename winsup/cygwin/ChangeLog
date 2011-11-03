@@ -1,3 +1,11 @@
+2011-11-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (off_current): Define local in fhandler_base::raw_write.
+	Drop erroneous NO_COPY, add _RDATA to make R/O.
+	(off_append): Ditto.
+	* globals.cc (_RDATA): Move definition from here...
+	* winsup.h: ...to here.
+
 2011-10-30  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.h (fhandler_pipe::create_selectable): Remove optional

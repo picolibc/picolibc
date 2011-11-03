@@ -275,14 +275,15 @@ retry:
 
 /* Cover function to WriteFile to provide Posix interface and semantics
    (as much as possible).  */
-static NO_COPY LARGE_INTEGER off_current = { QuadPart:FILE_USE_FILE_POINTER_POSITION };
-static NO_COPY LARGE_INTEGER off_append = { QuadPart:FILE_WRITE_TO_END_OF_FILE };
-
 ssize_t __stdcall
 fhandler_base::raw_write (const void *ptr, size_t len)
 {
   NTSTATUS status;
   IO_STATUS_BLOCK io;
+  static _RDATA LARGE_INTEGER off_current =
+			  { QuadPart:FILE_USE_FILE_POINTER_POSITION };
+  static _RDATA LARGE_INTEGER off_append =
+			  { QuadPart:FILE_WRITE_TO_END_OF_FILE };
 
   status = NtWriteFile (get_output_handle (), NULL, NULL, NULL, &io,
 			(PVOID) ptr, len,

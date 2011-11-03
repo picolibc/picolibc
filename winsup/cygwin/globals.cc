@@ -70,9 +70,6 @@ bool NO_COPY _cygwin_testing;
 
 char NO_COPY almost_null[1];
 
-/* Define globally used, but readonly variables using the _RDATA attribute. */
-#define _RDATA __attribute__ ((section(".rdata")))
-
 /* Heavily-used const UNICODE_STRINGs are defined here once.  The idea is a
    speed improvement by not having to initialize a UNICODE_STRING every time
    we make a string comparison.  The strings are not defined as const,
@@ -122,8 +119,6 @@ cygwin_props_t _RDATA cygwin_props =
   sizeof (cygwin_props_t),
   0
 };
-
-#undef _RDATA
 
 extern "C"
 {
