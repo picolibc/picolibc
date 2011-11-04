@@ -868,6 +868,8 @@ child_info_spawn::reattach_children ()
 		       children[i].rd_proc_pipe);
       else if ((p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, p->pid)))
 	p.reattach ();
+      else
+	CloseHandle (p.rd_proc_pipe);
     }
 }
 
