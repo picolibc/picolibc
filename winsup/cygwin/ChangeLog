@@ -1,5 +1,12 @@
 2011-11-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* pinfo.h (pinfo::reattach): Only set destroy to false when
+	proc_subproc succeeds.  Return true for success.
+	* sigproc.cc (child_info_spawn::reattach_children): Try harder to clean
+	up on error by detecting reattach failures too.
+
+2011-11-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sigproc.cc (child_info_spawn::reattach_children): Clean up handle
 	when can't open parent process or suffer handle leak.
 

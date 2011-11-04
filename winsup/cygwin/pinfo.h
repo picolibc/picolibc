@@ -175,10 +175,11 @@ public:
 #ifndef _SIGPROC_H
   int remember () {system_printf ("remember is not here"); return 0;}
 #else
-  void reattach ()
+  int reattach ()
   {
-    proc_subproc (PROC_REATTACH_CHILD, (DWORD) this);
-    destroy = false;
+    int res = proc_subproc (PROC_REATTACH_CHILD, (DWORD) this);
+    destroy = res ? false : true;
+    return res;
   }
   int remember (bool detach)
   {
