@@ -130,18 +130,21 @@ status_exit (DWORD x)
 	mount_table->conv_to_posix_path (pc.get_win32 (), posix_prog, 1);
 	small_printf ("%s: error while loading shared libraries: %s: cannot open shared object file: No such file or directory\n",
 		      posix_prog, find_first_notloaded_dll (pc));
-	x = 127;
+	x = 127 << 8;
       }
       break;
     case STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION: /* custom error value */
       /* We've already printed the error message in pseudo-reloc.c */
-      x = 127;
+      x = 127 << 8;
+      break;
+    case STATUS_ACCESS_VIOLATION:
+      x = SIGSEGV;
       break;
     default:
       debug_printf ("*** STATUS_%p\n", x);
-      x = 127;
+      x = 127 << 8;
     }
-  return x;
+  return EXITCODE_SET | x;
 }
 
 # define self (*this)
@@ -149,8 +152,9 @@ void
 pinfo::set_exit_code (DWORD x)
 {
   if (x >= 0xc0000000UL)
-    x = status_exit (x);
-  self->exitcode = EXITCODE_SET | (sigExeced ?: (x & 0xff) << 8);
+    self->exitcode = status_exit (x);
+  else
+    self->exitcode = EXITCODE_SET | (sigExeced ?: (x & 0xff) << 8);
 }
 
 void

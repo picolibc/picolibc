@@ -1,3 +1,9 @@
+2011-11-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* pinfo.cc (status_exit): Return complete error code.  Handle
+	STATUS_ACCESS_VIOLATION correctly.
+	(pinfo::set_exit_code): Set self->exitcode directly from status_exit.
+
 2011-11-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* pinfo.h (pinfo::reattach): Only set destroy to false when
