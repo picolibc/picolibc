@@ -346,6 +346,57 @@ cases, stubs of each of these Win32 processes may linger, waiting for
 their exec'd Cygwin process to exit.</para>
 </sect2>
 
+<sect3 id='ov-hi-process-problems'>
+<title>Problems with process creation</title>
+
+<para>The semantics of <literal>fork</literal> require that a forked
+child process have <emphasis>exactly</emphasis> the same address
+space layout as its parent. However, Windows provides no native
+support for cloning address space between processes and several
+features actively undermine a reliable <literal>fork</literal>
+implementation. Three issues are especially prevalent:</para>
+
+<para><itemizedlist>
+<listitem>DLL base address collisions. Unlike *nix shared
+libraries, which use "position-independent code", Windows shared
+libraries assume a fixed base address. Whenever the hard-wired
+address ranges of two DLLs collide (which occurs quite often), the
+Windows loader must "rebase" one of them to a different
+address. However, it may not resolve collisions consistently, and
+may rebase a different dll and/or move it to a different address
+every time. Cygwin can usually compensate for this effect when it
+involves libraries opened dynamically, but collisions among
+statically-linked dlls (dependencies known at compile time) are
+resolved before <literal>cygwin1.dll</literal> initializes and
+cannot be fixed afterward. This problem can only be solved by
+removing the base address conflicts which cause the problem,
+usually using the <literal>rebaseall</literal> tool.</listitem>
+
+<listitem>Address space layout randomization (ASLR). Starting with
+Vista, Windows implements ASLR, which means that thread stacks,
+heap, memory-mapped files, and statically-linked dlls are placed
+at different (random) locations in each process. This behaviour
+interferes with a proper <literal>fork</literal>, and if an
+unmovable object (process heap or system dll) ends up at the wrong
+location, Cygwin can do nothing to compensate (though it will
+retry a few times automatically).</listitem>
+
+<listitem>DLL injection by
+<ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda">
+BLODA</ulink>. Badly-behaved applications which
+inject dlls into other processes often manage to clobber important
+sections of the child's address space, leading to base address
+collisions which rebasing cannot fix. The only way to resolve this
+problem is to remove (usually uninstall) the offending
+app.</listitem></itemizedlist></para>
+
+<para>In summary, current Windows implementations make it
+impossible to implement a perfectly reliable fork, and occasional
+fork failures are inevitable.
+</para>
+
+</sect3>
+
 <sect2 id="ov-hi-signals"><title>Signals</title>
 <para>When
 a Cygwin process starts, the library starts a secondary thread for

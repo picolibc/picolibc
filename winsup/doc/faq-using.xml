@@ -1099,7 +1099,7 @@ it.</para>
 IPv6 stack, see the <ulink url="http://www.microsoft.com/technet/network/ipv6/ipv6faq.mspx">Microsoft TechNet IPv6 FAQ article</ulink>
 </para></answer></qandaentry>
 
-<qandaentry id="faq.using.bloda">
+<qandaentry id="faq.using.bloda" xreflabel="BLODA">
 <question><para>What applications have been found to interfere with Cygwin?</para></question>
 <answer>
 
@@ -1199,3 +1199,39 @@ such as virtual memory paging and file caching.</para>
 </listitem>
 </itemizedlist></para>
 </answer></qandaentry>
+
+<qandaentry id='faq.using.fixing-fork-failures'>
+  <question><para>How do I fix <literal>fork()</literal> failures?</para></question>
+  <answer>
+  <para>Unfortunately, Windows does not use the fork/exec model of process creation
+  found in UNIX-like OSes, so it is difficult for Cygwin to implement a reliable and
+  correct <literal>fork()</literal>, which can lead to error messages such as:</para>
+  <para><itemizedlist>
+    <listitem>unable to remap <emphasis>somedll</emphasis> to same address as parent</listitem>
+    <listitem>couldn't allocate heap</listitem>
+    <listitem>died waiting for dll loading</listitem>
+    <listitem>child -1 - died waiting for longjmp before initialization</listitem>
+    <listitem>STATUS_ACCESS_VIOLATION</listitem>
+    <listitem>resource temporarily unavailable</listitem>
+  </itemizedlist></para>
+  <para>Potential solutions for the above errors:</para>
+  <para><itemizedlist>
+    <listitem>Restart whatever process is trying (and failing) to use
+    <literal>fork()</literal>. Sometimes Windows sets up a process
+    environment that is even more hostile to fork() than usual.</listitem>
+    <listitem>Ensure that you have eliminated (not just disabled) all
+    software on the <xref linkend="faq.using.bloda"/>.
+    </listitem>
+    <listitem>Read the 'rebase' package README in
+    <literal>/usr/share/doc/rebase/</literal>, and follow the
+    instructions there to run 'rebaseall'.</listitem>
+    </itemizedlist></para>
+  <para>Please note that installing new packages or updating existing
+  ones undoes the effects of rebaseall and often causes fork() failures
+  to reappear. If so, just run rebaseall again.
+  </para>
+  <para>See the <ulink url="http://cygwin.com/cygwin-ug-net/highlights.html#ov-hi-process">
+  process creation</ulink> section of the User's Guide for the technical reasons it is so
+  difficult to make <literal>fork()</literal> work reliably.</para>
+</answer>
+</qandaentry>
