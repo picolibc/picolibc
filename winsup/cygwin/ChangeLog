@@ -1,5 +1,10 @@
 2011-11-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* pinfo.cc (status_exit): Recognize STATUS_ILLEGAL_INSTRUCTION.
+	(child_info::proc_retry): Ditto.
+
+2011-11-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* pinfo.cc (status_exit): Return complete error code.  Handle
 	STATUS_ACCESS_VIOLATION correctly.
 	(pinfo::set_exit_code): Set self->exitcode directly from status_exit.

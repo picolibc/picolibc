@@ -960,6 +960,7 @@ child_info::proc_retry (HANDLE h)
       break;
     case STATUS_DLL_NOT_FOUND:
     case STATUS_ACCESS_VIOLATION:
+    case STATUS_ILLEGAL_INSTRUCTION:
     case STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION: /* pseudo-reloc.c specific */
       return exit_code;
     case STATUS_CONTROL_C_EXIT:

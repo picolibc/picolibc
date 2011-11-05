@@ -140,6 +140,9 @@ status_exit (DWORD x)
     case STATUS_ACCESS_VIOLATION:
       x = SIGSEGV;
       break;
+    case STATUS_ILLEGAL_INSTRUCTION:
+      x = SIGILL;
+      break;
     default:
       debug_printf ("*** STATUS_%p\n", x);
       x = 127 << 8;
