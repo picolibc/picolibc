@@ -516,25 +516,57 @@ check_dir_not_empty (HANDLE dir, path_conv &pc)
       return status;
     }
   int cnt = 1;
-  while (pfni->NextEntryOffset)
+  do
     {
-      if (++cnt > 2)
+      while (pfni->NextEntryOffset)
 	{
-	  if (strace.active ())
+	  if (++cnt > 2)
 	    {
 	      UNICODE_STRING fname;
+	      OBJECT_ATTRIBUTES attr;
+	      FILE_BASIC_INFORMATION fbi;
 
 	      pfni = (PFILE_NAMES_INFORMATION)
 		     ((caddr_t) pfni + pfni->NextEntryOffset);
 	      RtlInitCountedUnicodeString(&fname, pfni->FileName,
 					  pfni->FileNameLength);
-	      debug_printf ("Directory %S not empty, found file <%S>",
-			    pc.get_nt_native_path (), &fname);
+	      InitializeObjectAttributes (&attr, &fname, 0, dir, NULL);
+	      status = NtQueryAttributesFile (&attr, &fbi);
+	      /* Intensive testing shows that sometimes directories, for which
+		 the delete disposition has already been set, and the deleting
+		 handle is already closed, can linger in the parent dir for a
+		 couple of ms for no apparent reason (Windows Defender or other
+		 real-time scanners are suspect).
+
+		 A fast rm -r is capable to exploit this problem.  Setting the
+		 delete disposition of the parent dir then fails with
+		 STATUS_DIRECTORY_NOT_EMPTY.  Examining the content of the
+		 affected dir can then show either that the dir is empty, or it
+		 can contain a lingering subdir.  Calling NtQueryAttributesFile
+		 on that subdir returns with STATUS_DELETE_PENDING, or it
+		 disappeared before that call.
+
+		 That's what we do here.  If NtQueryAttributesFile succeeded,
+		 or if the error code does not indicate an already deleted
+		 entry, STATUS_DIRECTORY_NOT_EMPTY is returned.
+
+		 Otherwise STATUS_SUCCESS is returned.  Read on in unlink_nt. */
+	      if (status != STATUS_DELETE_PENDING
+		  && status != STATUS_OBJECT_NAME_NOT_FOUND
+		  && status != STATUS_OBJECT_PATH_NOT_FOUND)
+		{
+		  debug_printf ("Directory %S not empty, found file <%S>, "
+				 "query status = %p",
+				pc.get_nt_native_path (), &fname, status);
+		  return STATUS_DIRECTORY_NOT_EMPTY;
+		}
 	    }
-	  return STATUS_DIRECTORY_NOT_EMPTY;
+	  pfni = (PFILE_NAMES_INFORMATION) ((caddr_t) pfni + pfni->NextEntryOffset);
 	}
-      pfni = (PFILE_NAMES_INFORMATION) ((caddr_t) pfni + pfni->NextEntryOffset);
     }
+  while (NT_SUCCESS (NtQueryDirectoryFile (dir, NULL, NULL, 0, &io, pfni,
+					   bufsiz, FileNamesInformation,
+					   FALSE, NULL, FALSE)));
   return STATUS_SUCCESS;
 }
 
@@ -548,6 +580,7 @@ unlink_nt (path_conv &pc)
   HANDLE old_trans = NULL, trans = NULL;
   ULONG num_links = 1;
   FILE_DISPOSITION_INFORMATION disp = { TRUE };
+  int reopened = 0;
 
   bin_status bin_stat = dont_move;
 
@@ -608,7 +641,16 @@ unlink_nt (path_conv &pc)
      will fail.  That indicates that the file has to be moved to the recycle
      bin so that it actually disappears from its directory even though its
      in use.  Otherwise, if opening doesn't fail, the file is not in use and
-     we can go straight to setting the delete disposition flag. */
+     we can go straight to setting the delete disposition flag.
+     
+     NOTE: The missing sharing modes FILE_SHARE_READ and FILE_SHARE_WRITE do
+	   NOT result in a STATUS_SHARING_VIOLATION, if another handle is
+	   opened for reading/writing metadata only.  In other words, if
+	   another handle is open, but does not have the file open with
+	   FILE_READ_DATA or FILE_WRITE_DATA, the following NtOpenFile call
+	   will succeed.  So, apparently there is no reliable way to find out
+	   if a file is already open elsewhere for other purposes than
+	   reading and writing data.  */
   status = NtOpenFile (&fh, access, &attr, &io, FILE_SHARE_DELETE, flags);
   if (status == STATUS_SHARING_VIOLATION || status == STATUS_LOCK_NOT_GRANTED)
     {
@@ -673,7 +715,7 @@ unlink_nt (path_conv &pc)
       if (status == STATUS_DELETE_PENDING)
 	{
 	  debug_printf ("Delete %S already pending", pc.get_nt_native_path ());
-	  status = 0;
+	  status = STATUS_SUCCESS;
 	  goto out;
 	}
       debug_printf ("Opening %S for delete failed, status = %p",
@@ -685,9 +727,11 @@ unlink_nt (path_conv &pc)
   if (bin_stat == move_to_bin
       && (bin_stat = try_to_bin (pc, fh, access)) == has_been_moved)
     {
-      status = 0;
+      status = STATUS_SUCCESS;
       goto out;
     }
+
+try_again:
   /* Try to set delete disposition. */
   status = NtSetInformationFile (fh, &io, &disp, sizeof disp,
 				 FileDispositionInformation);
@@ -695,17 +739,70 @@ unlink_nt (path_conv &pc)
     {
       debug_printf ("Setting delete disposition on %S failed, status = %p",
 		    pc.get_nt_native_path (), status);
-      if (strace.active () && status == STATUS_DIRECTORY_NOT_EMPTY)
+      if (status == STATUS_DIRECTORY_NOT_EMPTY)
 	{
-	  NTSTATUS status2;
+	  NTSTATUS status2 = STATUS_SUCCESS;
 
-	  pc.get_object_attr (attr, sec_none_nih);
-	  NtClose (fh);
-	  status2 = NtOpenFile (&fh, access | FILE_LIST_DIRECTORY | SYNCHRONIZE,
-				&attr, &io, FILE_SHARE_VALID_FLAGS,
-				flags | FILE_SYNCHRONOUS_IO_NONALERT);
-	  if (NT_SUCCESS (status2))
-	    check_dir_not_empty (fh, pc);
+	  if (!reopened)
+	    {
+	      /* Have to close and reopen the file from scratch, otherwise
+		 we collide with the delete-only sharing mode. */
+	      pc.get_object_attr (attr, sec_none_nih);
+	      NtClose (fh);
+	      status2 = NtOpenFile (&fh, access | FILE_LIST_DIRECTORY
+					 | SYNCHRONIZE,
+				    &attr, &io, FILE_SHARE_VALID_FLAGS,
+				    flags | FILE_SYNCHRONOUS_IO_NONALERT);
+	    }
+	  if (NT_SUCCESS (status2) && reopened < 20)
+	    {
+	      /* Workaround rm -r problem:
+	      
+		 Sometimes a deleted directory lingers in its parent dir
+		 after the deleting handle has already been closed.  This
+		 can break deleting the parent dir.  See the comment in
+		 check_dir_not_empty for more information.
+
+		 What we do here is this:  If check_dir_not_empty returns
+		 STATUS_SUCCESS, the dir is either empty, or only inhabited
+		 by already deleted entries.  If so, we try to move the dir
+		 into the bin.  This usually works.
+		 
+		 However, if we're on a filesystem which doesn't support
+		 the try_to_bin method, or if moving to the bin doesn't work
+		 for some reason, just try to delete the directory again,
+		 with a very short grace period to free the CPU for a while.
+		 This gives the OS time to clean up.  5ms is enough in my
+		 testing to make sure that we don't have to try more than
+		 once in practically all cases.
+		 While this is an extrem bordercase, we don't want to hang
+		 infinitely in case a file in the directory is in the "delete
+		 pending" state but an application holds an open handle to it
+		 for a longer time.  So we don't try this more than 20 times,
+		 which means a process time of 100-120ms. */
+	      if (check_dir_not_empty (fh, pc) == STATUS_SUCCESS)
+		{
+		  if (bin_stat == dont_move)
+		    {
+		      bin_stat = move_to_bin;
+		      if (!pc.fs_is_nfs () && !pc.fs_is_netapp ())
+			{
+			  debug_printf ("Try-to-bin %S",
+					pc.get_nt_native_path ());
+			  bin_stat = try_to_bin (pc, fh, access);
+			}
+		    }
+		  if (bin_stat == has_been_moved)
+		    status = STATUS_SUCCESS;
+		  else
+		    {
+		      debug_printf ("Try %S again", pc.get_nt_native_path ());
+		      ++reopened;
+		      Sleep (5L);
+		      goto try_again;
+		    }
+		}
+	    }
 	  else
 	    {
 	      fh = NULL;
@@ -725,8 +822,8 @@ unlink_nt (path_conv &pc)
 	 error 59, ERROR_UNEXP_NET_ERR when trying to access the file.
 	 Microsoft KB 837665 describes this problem as a bug in 2K3, but
 	 I have reproduced it on other systems. */
-      if (status == STATUS_CANNOT_DELETE
-	  && (!pc.isremote () || pc.fs_is_ncfsd ()))
+      else if (status == STATUS_CANNOT_DELETE
+	       && (!pc.isremote () || pc.fs_is_ncfsd ()))
 	{
 	  HANDLE fh2;
 
@@ -1835,7 +1932,7 @@ rename (const char *oldpath, const char *newpath)
   bool old_explicit_suffix = false, new_explicit_suffix = false;
   size_t olen, nlen;
   bool equal_path;
-  NTSTATUS status = 0;
+  NTSTATUS status = STATUS_SUCCESS;
   HANDLE fh = NULL, nfh;
   HANDLE old_trans = NULL, trans = NULL;
   OBJECT_ATTRIBUTES attr;

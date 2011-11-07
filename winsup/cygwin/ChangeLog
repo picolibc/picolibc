@@ -1,3 +1,15 @@
+2011-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (check_dir_not_empty): Check surplus directory entries
+	by calling NtQueryAttributesFile.  Make STATUS_DIRECTORY_NOT_EMPTY
+	return value dependent on its status code.  Add long comment to explain.
+	(unlink_nt): Add comment to explain flaw in checking the sharing mode.
+	Set status to STATUS_SUCCESS instead of 0.  Add a retry loop to setting
+	the delete disposition and trying to move a directory to bin to
+	workaround rare cases of lingering, already deleted subdirectory
+	entries.  Add long comment to explain.
+	(rename): Set status to STATUS_SUCCESS instead of 0.
+
 2011-11-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* pinfo.cc (status_exit): Recognize STATUS_ILLEGAL_INSTRUCTION.
