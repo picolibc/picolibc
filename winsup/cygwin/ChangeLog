@@ -1,5 +1,9 @@
 2011-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (CHUNK_SIZE): Drop NO_COPY.
+
+2011-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (check_dir_not_empty): Check surplus directory entries
 	by calling NtQueryAttributesFile.  Make STATUS_DIRECTORY_NOT_EMPTY
 	return value dependent on its status code.  Add long comment to explain.

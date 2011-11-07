@@ -33,7 +33,7 @@ details. */
 #define MAX_OVERLAPPED_WRITE_LEN (64 * 1024 * 1024)
 #define MIN_OVERLAPPED_WRITE_LEN (1 * 1024 * 1024)
 
-static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
+static const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
 struct __cygwin_perfile *perfile_table;
 
