@@ -866,7 +866,7 @@ child_info_spawn::reattach_children ()
 				false, DUPLICATE_SAME_ACCESS))
 	debug_printf ("couldn't duplicate parent %p handles for forked children after exec, %E",
 		       children[i].rd_proc_pipe);
-      else if (!(p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, p->pid)))
+      else if (!(p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, p->dwProcessId)))
 	CloseHandle (p.rd_proc_pipe);
       else if (!p.reattach ())
 	{

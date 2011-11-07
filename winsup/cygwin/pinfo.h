@@ -153,7 +153,7 @@ public:
   pinfo (pid_t n, DWORD flag) : rd_proc_pipe (NULL), hProcess (NULL), waiter_ready (0), wait_thread (NULL) {init (n, flag, NULL);}
   void thisproc (HANDLE) __attribute__ ((regparm (2)));
   void release ();
-  int wait () __attribute__ ((regparm (1)));
+  bool wait () __attribute__ ((regparm (1)));
   ~pinfo ()
   {
     if (destroy && procinfo)
@@ -173,6 +173,7 @@ public:
   operator _pinfo * () const {return procinfo;}
   void preserve () { destroy = false; }
 #ifndef _SIGPROC_H
+  int reattach () {system_printf ("reattach is not here"); return 0;}
   int remember () {system_printf ("remember is not here"); return 0;}
 #else
   int reattach ()

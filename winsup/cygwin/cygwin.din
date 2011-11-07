@@ -1277,6 +1277,7 @@ pthread_spin_unlock SIGFE
 pthread_testcancel SIGFE
 pthread_yield = sched_yield SIGFE
 ptsname SIGFE
+ptsname_r SIGFE
 putc SIGFE
 _putc = putc SIGFE
 putc_unlocked SIGFE

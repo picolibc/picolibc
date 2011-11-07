@@ -975,10 +975,10 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
 }
 
 /* function to set up the process pipe and kick off proc_waiter */
-int
+bool
 pinfo::wait ()
 {
-  /* If rd_proc_pipe that means we're in an execed process which already has
+  /* If rd_proc_pipe != NULL we're in an execed process which already has
      grabbed the read end of the pipe from the previous cygwin process running
      with this pid.  */
   if (!rd_proc_pipe)
@@ -989,13 +989,13 @@ pinfo::wait ()
 	{
 	  system_printf ("Couldn't create pipe tracker for pid %d, %E",
 			 (*this)->pid);
-	  return 0;
+	  return false;
 	}
 
       if (!(*this)->dup_proc_pipe (hProcess))
 	{
 	  system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid, hProcess);
-	  return 0;
+	  return false;
 	}
     }
 
@@ -1013,7 +1013,7 @@ pinfo::wait ()
 		      (*this)->pid, (*this)->dwProcessId, rd_proc_pipe);
     }
 
-  return 1;
+  return true;
 }
 
 void

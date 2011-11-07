@@ -1,3 +1,26 @@
+2011-11-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* cygwin.din (ptsname_r): Export.
+	* fhandler.cc (fhandler_base::ptsname_r): Define.
+	* fhandler.h (fhandler_base::ptsname): Delete.
+	(fhandler_base::ptsname_r): Declare.
+	(fhandler_pty_master::ptsname_r): Declare.
+	* fhandler_tty.cc (fhandler_pty_master::ptsname): Delete.
+	(fhandler_pty_master::ptsname_r): New reentrant function derived from
+	previous ptsname.
+	* syscalls.cc (ptsname_r): Implement new function with functionality
+	similar to Linux.
+	(ptsname): Use ptsname_r () to fill out buf.
+	* include/cygwin/stdlib.h (ptsname_r): Declare.
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 255 to
+	reflect export of ptsname_r.
+
+	* pinfo.cc (pinfo::wait): Return bool rather than int.
+	* pinfo.h (info::wait): Ditto.
+	(pinfo::reattach): Define !defined(_SIGPROC_H) case for consistency.
+	* sigproc.cc (child_info_spawn::reattach_children): Use correct
+	dwProcessId rather than pid when duplicating handle.
+
 2011-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (CHUNK_SIZE): Drop NO_COPY.

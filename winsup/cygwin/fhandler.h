@@ -381,7 +381,7 @@ public:
   virtual pid_t get_popen_pid () const {return 0;}
   virtual bool isdevice () const { return true; }
   virtual bool isfifo () const { return false; }
-  virtual char *ptsname () { return NULL;}
+  virtual int ptsname_r (char *, size_t);
   virtual class fhandler_socket *is_socket () { return NULL; }
   virtual class fhandler_console *is_console () { return 0; }
   virtual int is_windows () {return 0; }
@@ -1486,7 +1486,7 @@ public:
   int tcflush (int);
   int ioctl (unsigned int cmd, void *);
 
-  char *ptsname ();
+  int ptsname_r (char *, size_t);
 
   bool hit_eof ();
   bool setup ();

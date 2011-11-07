@@ -1419,13 +1419,19 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
   return 0;
 }
 
-char *
-fhandler_pty_master::ptsname ()
+int
+fhandler_pty_master::ptsname_r (char *buf, size_t buflen)
 {
-  static char buf[TTY_NAME_MAX];
+  char tmpbuf[TTY_NAME_MAX];
 
-  __small_sprintf (buf, "/dev/pty%d", get_unit ());
-  return buf;
+  __small_sprintf (tmpbuf, "/dev/pty%d", get_unit ());
+  if (buflen <= strlen (tmpbuf))
+    {
+      set_errno (ERANGE);
+      return ERANGE;
+    }
+  strcpy (buf, tmpbuf);
+  return 0;
 }
 
 void

@@ -1407,6 +1407,13 @@ fhandler_base::tcgetsid ()
   return -1;
 }
 
+int
+fhandler_base::ptsname_r (char *, size_t)
+{
+  set_errno (ENOTTY);
+  return ENOTTY;
+}
+
 void
 fhandler_base::operator delete (void *p)
 {

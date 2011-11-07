@@ -2906,10 +2906,23 @@ getpgrp (void)
 extern "C" char *
 ptsname (int fd)
 {
+  static char buf[TTY_NAME_MAX];
+  return ptsname_r (fd, buf, sizeof (buf)) == 0 ? buf : NULL;
+}
+
+extern "C" int
+ptsname_r (int fd, char *buf, size_t buflen)
+{
+  if (!buf)
+    {
+      set_errno (EINVAL);
+      return EINVAL;
+    }
+
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     return 0;
-  return (char *) (cfd->ptsname ());
+  return cfd->ptsname_r (buf, buflen);
 }
 
 static int __stdcall

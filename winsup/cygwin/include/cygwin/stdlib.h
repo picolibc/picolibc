@@ -30,6 +30,7 @@ long random (void);
 char *setstate (const char *state);
 void srandom (unsigned);
 char *ptsname (int);
+int ptsname_r(int, char *, size_t);
 int grantpt (int);
 int unlockpt (int);
 #endif /*__STRICT_ANSI__*/
