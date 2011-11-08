@@ -1,3 +1,7 @@
+2011-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix.sgml (std-gnu): Add ptsname_r.
+
 2011-11-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.h (__ptsname): New macro.
