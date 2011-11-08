@@ -1,5 +1,14 @@
 2011-11-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* fhandler.h (__ptsname): New macro.
+	* dtable.cc (decode_tty): Use __ptsname to generate the slave pty name.
+	* fhandler_tty.cc (fhandler_pty_master::ptsname_r): Ditto.
+	* bsdlib.cc: Add needed includes for openpty() changes.
+	(openpty): Use __ptsname to generate the slave pty name.  Close slave
+	fd when aslave == NULL.
+
+2011-11-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* include/cygwin/stdlib.h: Update copyright.
 
 2011-11-07  Christopher Faylor  <me.cygwin2011@cgf.cx>

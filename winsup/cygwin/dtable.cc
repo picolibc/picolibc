@@ -887,7 +887,7 @@ static void
 decode_tty (char *buf, WCHAR *w32)
 {
   int ttyn = wcstol (w32, NULL, 10);
-  __small_sprintf (buf, "/dev/pty%d", ttyn);
+  __ptsname (buf, ttyn);
 }
 
 /* Try to derive posix filename from given handle.  Return true if

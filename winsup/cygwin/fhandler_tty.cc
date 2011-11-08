@@ -1424,7 +1424,7 @@ fhandler_pty_master::ptsname_r (char *buf, size_t buflen)
 {
   char tmpbuf[TTY_NAME_MAX];
 
-  __small_sprintf (tmpbuf, "/dev/pty%d", get_unit ());
+  __ptsname (tmpbuf, get_unit ());
   if (buflen <= strlen (tmpbuf))
     {
       set_errno (ERANGE);

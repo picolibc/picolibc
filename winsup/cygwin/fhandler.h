@@ -1456,6 +1456,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   }
 };
 
+#define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))
 class fhandler_pty_master: public fhandler_pty_common
 {
   int pktmode;			// non-zero if pty in a packet mode.

@@ -35,6 +35,10 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <err.h>
+#include "path.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include "cygtls.h"
 
 extern "C" int
@@ -108,20 +112,25 @@ openpty (int *amaster, int *aslave, char *name, const struct termios *termp,
     {
       grantpt (master);
       unlockpt (master);
-      strcpy (pts, ptsname (master));
+      __ptsname (pts, cygheap->fdtab[master]->get_unit ());
       revoke (pts);
       if ((slave = open (pts, O_RDWR | O_NOCTTY)) >= 0)
 	{
 	  if (amaster)
 	    *amaster = master;
-	  if (aslave)
-	    *aslave = slave;
 	  if (name)
 	    strcpy (name, pts);
 	  if (termp)
 	    tcsetattr (slave, TCSAFLUSH, termp);
 	  if (winp)
 	    ioctl (slave, TIOCSWINSZ, (char *) winp);
+	  /* The man page doesn't say that aslave can be NULL but we have
+	     allowed it for years.  As of 2011-11-08 we now avoid a handle
+	     leak in this case.  */
+	  if (aslave)
+	    *aslave = slave;
+	  else
+	    close (slave);
 	  return 0;
 	}
       close (master);
