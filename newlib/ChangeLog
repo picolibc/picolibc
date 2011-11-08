@@ -1,3 +1,8 @@
+2011-11-08  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/iconv/ccs/Makefile.am: Add missing backslash.
+	* libc/iconv/ccs/Makefile.in: Regenerate.
+
 2011-10-18  Dr David Alan Gilbert  <david.gilbert@linaro.org>
 
 	* libc/machine/arm/Makefile.am (lib_a_SOURCES): Add memchr-stub.c,

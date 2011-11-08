@@ -103,7 +103,18 @@ am__objects_1 = lib_a-ccsbi.$(OBJEXT) lib_a-iso_8859_10.$(OBJEXT) \
 @ELIX_LEVEL_1_TRUE@	lib_a-koi8_r.$(OBJEXT) \
 @ELIX_LEVEL_1_TRUE@	lib_a-koi8_u.$(OBJEXT) \
 @ELIX_LEVEL_1_TRUE@	lib_a-koi8_ru.$(OBJEXT) \
-@ELIX_LEVEL_1_TRUE@	lib_a-koi8_uni.$(OBJEXT)
+@ELIX_LEVEL_1_TRUE@	lib_a-koi8_uni.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-iso_ir_111.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-big5.$(OBJEXT) lib_a-cp775.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-cp850.$(OBJEXT) lib_a-cp852.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-cp855.$(OBJEXT) lib_a-cp866.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-jis_x0212_1990.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-jis_x0201_1976.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-jis_x0208_1990.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-ksx1001.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-cns11643_plane1.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-cns11643_plane2.$(OBJEXT) \
+@ELIX_LEVEL_1_TRUE@	lib_a-cns11643_plane14.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1) $(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -303,7 +314,12 @@ cns11643_plane1.c cns11643_plane2.c cns11643_plane14.c
 @ELIX_LEVEL_1_TRUE@win_1250.c win_1252.c win_1254.c \
 @ELIX_LEVEL_1_TRUE@win_1256.c win_1258.c win_1251.c \
 @ELIX_LEVEL_1_TRUE@win_1253.c win_1255.c win_1257.c \
-@ELIX_LEVEL_1_TRUE@koi8_r.c koi8_u.c koi8_ru.c koi8_uni.c
+@ELIX_LEVEL_1_TRUE@koi8_r.c koi8_u.c koi8_ru.c koi8_uni.c \
+@ELIX_LEVEL_1_TRUE@iso_ir_111.c \
+@ELIX_LEVEL_1_TRUE@big5.c \
+@ELIX_LEVEL_1_TRUE@cp775.c cp850.c cp852.c cp855.c cp866.c \
+@ELIX_LEVEL_1_TRUE@jis_x0212_1990.c jis_x0201_1976.c jis_x0208_1990.c ksx1001.c \
+@ELIX_LEVEL_1_TRUE@cns11643_plane1.c cns11643_plane2.c cns11643_plane14.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
@@ -882,11 +898,6 @@ uninstall-am:
 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
 	uninstall uninstall-am
 
-@ELIX_LEVEL_1_TRUE@iso_ir_111.c \
-@ELIX_LEVEL_1_TRUE@big5.c \
-@ELIX_LEVEL_1_TRUE@cp775.c cp850.c cp852.c cp855.c cp866.c \
-@ELIX_LEVEL_1_TRUE@jis_x0212_1990.c jis_x0201_1976.c jis_x0208_1990.c ksx1001.c \
-@ELIX_LEVEL_1_TRUE@cns11643_plane1.c cns11643_plane2.c cns11643_plane14.c
 
 .c.def:
 	$(CHEW) < $< > $*.def 2> $*.ref

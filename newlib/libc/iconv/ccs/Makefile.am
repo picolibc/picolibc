@@ -29,7 +29,7 @@ iso_8859_9.c iso_8859_11.c \
 win_1250.c win_1252.c win_1254.c \
 win_1256.c win_1258.c win_1251.c \
 win_1253.c win_1255.c win_1257.c \
-koi8_r.c koi8_u.c koi8_ru.c koi8_uni.c
+koi8_r.c koi8_u.c koi8_ru.c koi8_uni.c \
 iso_ir_111.c \
 big5.c \
 cp775.c cp850.c cp852.c cp855.c cp866.c \
