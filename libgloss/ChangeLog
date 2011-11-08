@@ -1,3 +1,7 @@
+2011-11-08  Mike Frysinger  <vapier@gentoo.org>
+
+	* libnosys/Makefile.in (install): Use INSTALL_DATA.
+
 2011-10-07  Nick Clifton  <nickc@redhat.com>
 
 	* rx/crt0.S: Initialise the PID address register.

@@ -132,7 +132,7 @@ distclean maintainer-clean realclean: clean
 install:
 	@for outputs in ${OUTPUTS}; do\
 	 mkdir -p $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
-	 $(INSTALL_PROGRAM) $${outputs} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
+	 $(INSTALL_DATA) $${outputs} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
 	done
 
 info:
