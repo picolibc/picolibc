@@ -1,3 +1,7 @@
+2011-11-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* include/cygwin/stdlib.h: Update copyright.
+
 2011-11-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* cygwin.din (ptsname_r): Export.
