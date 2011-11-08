@@ -1,3 +1,7 @@
+2011-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.10): Document ptsname_r.
+
 2011-11-05  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* faq-using.xml (faq.using.fixing-fork-failures): Add new FAQ.
