@@ -989,6 +989,11 @@ proc_waiter (void *arg)
   return 0;
 }
 
+#ifdef DEBUGGING
+#define warn_printf api_fatal
+#else
+#define warn_printf system_printf
+#endif
 HANDLE
 _pinfo::dup_proc_pipe (HANDLE hProcess)
 {
@@ -1004,8 +1009,8 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
   if (!res && WaitForSingleObject (hProcess, 0) != WAIT_OBJECT_0)
     {
       wr_proc_pipe = orig_wr_proc_pipe;
-      system_printf ("DuplicateHandle failed, pid %d, hProcess %p, wr_proc_pipe %p, %E",
-		     pid, hProcess, wr_proc_pipe);
+      warn_printf ("something failed for pid %d: res %d, hProcess %p, wr_proc_pipe %p vs. %p, %E",
+		   res, pid, hProcess, wr_proc_pipe, orig_wr_proc_pipe);
     }
   else
     {
