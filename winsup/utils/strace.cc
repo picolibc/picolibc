@@ -525,6 +525,9 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
       usecs = dusecs;
     }
 
+#if 1
+  child->saw_stars = 2;
+#else
   if (child->saw_stars == 0)
     {
       FILETIME st;
@@ -582,6 +585,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 	    }
 	}
     }
+#endif
 
   long long d = usecs - child->last_usecs;
   char intbuf[40];

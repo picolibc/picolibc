@@ -1,3 +1,9 @@
+2011-11-14  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* strace.cc (handle_output_debug_string): Disable code which attempted
+	to add stuff in between '****' blocks since they no longer are the
+	first thing output by an straced process.
+
 2011-10-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Add Windows 8 recognition.  Note as
