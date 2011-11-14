@@ -1,3 +1,18 @@
+2011-11-13  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	Throughout, change "sig %d" in strace output to "signal %d" for
+	consistency.
+	* assert.cc (__assert_func): Output assertion string to strace too.
+	* fork.cc (frok::parent): Report ASAP on forked pid in debugging output.
+	* pinfo.cc (pinfo::_pinfo_release): Define new function.
+	(pinfo::init): Use _pinfo_release() rather than release() to release
+	shared memory stuff.
+	(pinfo::wait): Shorten name of process waiting thread for more concise
+	debugging.
+	(pinfo::release): Use pinfo_release to release shared memory part of
+	struct.
+	* pinfo.h (pinfo::__pinfo_release): Declare.
+
 2011-11-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	Throughout use "have_execed" macro rather than "hExeced" global handle.

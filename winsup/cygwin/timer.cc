@@ -1,6 +1,7 @@
 /* timer.cc
 
-   Copyright 2004, 2005 Red Hat, Inc.
+   Copyright 2004, 2005, 2006, 2008, 2010, 2011
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
