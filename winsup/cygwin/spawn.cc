@@ -56,8 +56,6 @@ static suffix_info dll_suffixes[] =
 };
 #endif
 
-child_info_spawn NO_COPY *chExeced;
-
 /* Add .exe to PROG if not already present and see if that exists.
    If not, return PROG (converted from posix to win32 rules if necessary).
    The result is always BUF.
@@ -219,7 +217,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
   return retval;
 }
 
-/* Utility for spawn_guts.  */
+/* Utility for child_info_spawn::worker.  */
 
 static HANDLE
 handle (int fd, bool writing)
@@ -271,10 +269,12 @@ do_cleanup (void *args)
 # undef cleanup
 }
 
+NO_COPY child_info_spawn ch_spawn;
 
 int
-spawn_guts (const char *prog_arg, const char *const *argv,
-	    const char *const envp[], int mode, int __stdin, int __stdout)
+child_info_spawn::worker (const char *prog_arg, const char *const *argv,
+			  const char *const envp[], int mode,
+			  int in__stdin, int in__stdout)
 {
   bool rc;
   pid_t cygpid;
@@ -298,7 +298,7 @@ spawn_guts (const char *prog_arg, const char *const *argv,
       return -1;
     }
 
-  syscall_printf ("spawn_guts (%d, %.9500s)", mode, prog_arg);
+  syscall_printf ("mode = %d, prog_arg = %.9500s", mode, prog_arg);
 
   /* FIXME: This is no error condition on Linux. */
   if (argv == NULL)
@@ -323,7 +323,6 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   pthread_cleanup_push (do_cleanup, (void *) &cleanup);
   av newargv;
   linebuf one_line;
-  child_info_spawn ch;
   PWCHAR envblock = NULL;
   path_conv real_path;
   bool reset_sendsig = false;
@@ -332,7 +331,6 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   PWCHAR runpath = tp.w_get ();
   int c_flags;
   bool wascygexec;
-  cygheap_exec_info *moreinfo;
 
   bool null_app_name = false;
   STARTUPINFOW si = {};
@@ -352,9 +350,9 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 
   child_info_types chtype;
   if (mode != _P_OVERLAY)
-    chtype = PROC_SPAWN;
+    chtype = _CH_SPAWN;
   else
-    chtype = PROC_EXEC;
+    chtype = _CH_EXEC;
 
   moreinfo = (cygheap_exec_info *) ccalloc_abort (HEAP_1_EXEC, 1,
 						  sizeof (cygheap_exec_info));
@@ -384,12 +382,12 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   if (res)
     goto out;
 
-  if (!real_path.iscygexec () && cygheap->cwd.get_error ())
+  if (!real_path.iscygexec () && ::cygheap->cwd.get_error ())
     {
       small_printf ("Error: Current working directory %s.\n"
 		    "Can't start native Windows application from here.\n\n",
-		    cygheap->cwd.get_error_desc ());
-      set_errno (cygheap->cwd.get_error ());
+		    ::cygheap->cwd.get_error_desc ());
+      set_errno (::cygheap->cwd.get_error ());
       res = -1;
       goto out;
     }
@@ -447,8 +445,8 @@ spawn_guts (const char *prog_arg, const char *const *argv,
 
   /* Set up needed handles for stdio */
   si.dwFlags = STARTF_USESTDHANDLES;
-  si.hStdInput = handle ((__stdin < 0 ? 0 : __stdin), false);
-  si.hStdOutput = handle ((__stdout < 0 ? 1 : __stdout), true);
+  si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false);
+  si.hStdOutput = handle ((in__stdout < 0 ? 1 : in__stdout), true);
   si.hStdError = handle (2, true);
 
   si.cb = sizeof (si);
@@ -479,12 +477,12 @@ spawn_guts (const char *prog_arg, const char *const *argv,
       /* Save a copy of a handle to the current process around the first time we
 	 exec so that the pid will not be reused.  Why did I stop cygwin from
 	 generating its own pids again? */
-      if (cygheap->pid_handle)
+      if (::cygheap->pid_handle)
 	/* already done previously */;
       else if (DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
-				GetCurrentProcess (), &cygheap->pid_handle,
+				GetCurrentProcess (), &::cygheap->pid_handle,
 				PROCESS_QUERY_INFORMATION, TRUE, 0))
-	ProtectHandleINH (cygheap->pid_handle);
+	ProtectHandleINH (::cygheap->pid_handle);
       else
 	system_printf ("duplicate to pid_handle failed, %E");
     }
@@ -529,10 +527,10 @@ spawn_guts (const char *prog_arg, const char *const *argv,
   syscall_printf ("null_app_name %d (%W, %.9500W)", null_app_name,
 		  runpath, wone_line);
 
-  cygbench ("spawn-guts");
+  cygbench ("spawn-worker");
 
   if (!real_path.iscygexec())
-    cygheap->fdtab.set_file_pointers_for_exec ();
+    ::cygheap->fdtab.set_file_pointers_for_exec ();
 
   moreinfo->envp = build_env (envp, envblock, moreinfo->envc,
 			      real_path.iscygexec ());
@@ -542,23 +540,21 @@ spawn_guts (const char *prog_arg, const char *const *argv,
       res = -1;
       goto out;
     }
-  ch.set (chtype, real_path.iscygexec ());
-  ch.moreinfo = moreinfo;
-  ch.__stdin = __stdin;
-  ch.__stdout = __stdout;
-  if (mode == _P_OVERLAY && ch.iscygwin ())
-    ch.record_children ();
+  set (chtype, real_path.iscygexec ());
+  __stdin = in__stdin;
+  __stdout = in__stdout;
+  record_children ();
 
-  si.lpReserved2 = (LPBYTE) &ch;
-  si.cbReserved2 = sizeof (ch);
+  si.lpReserved2 = (LPBYTE) this;
+  si.cbReserved2 = sizeof (*this);
 
-  /* Depends on ch.set call above.
+  /* Depends on set call above.
      Some file types might need extra effort in the parent after CreateProcess
      and before copying the datastructures to the child.  So we have to start
      the child in suspend state, unfortunately, to avoid a race condition. */
   if (!newargv.win16_exe
-      && (!ch.iscygwin () || mode != _P_OVERLAY
-	  || cygheap->fdtab.need_fixup_before ()))
+      && (!iscygwin () || mode != _P_OVERLAY
+	  || ::cygheap->fdtab.need_fixup_before ()))
     c_flags |= CREATE_SUSPENDED;
   /* If a native application should be spawned, we test here if the spawning
      process is running in a console and, if so, if it's a foreground or
@@ -568,26 +564,26 @@ spawn_guts (const char *prog_arg, const char *const *argv,
      in a console will break native processes running in the background,
      because the Ctrl-C event is sent to all processes in the console, unless
      they ignore it explicitely.  CREATE_NEW_PROCESS_GROUP does that for us. */
-  if (!ch.iscygwin () && myself->ctty >= 0 && iscons_dev (myself->ctty)
+  if (!iscygwin () && myself->ctty >= 0 && iscons_dev (myself->ctty)
       && fhandler_console::tc_getpgid () != getpgrp ())
     c_flags |= CREATE_NEW_PROCESS_GROUP;
-  ch.refresh_cygheap ();
+  refresh_cygheap ();
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
      effective vs. real ids.
      FIXME: If ruid != euid and ruid != saved_uid we currently give
      up on ruid. The new process will have ruid == euid. */
 loop:
-  cygheap->user.deimpersonate ();
+  ::cygheap->user.deimpersonate ();
 
   if (!real_path.iscygexec () && mode == _P_OVERLAY)
     myself->process_state |= PID_NOTCYGWIN;
 
-  if (!cygheap->user.issetuid ()
-      || (cygheap->user.saved_uid == cygheap->user.real_uid
-	  && cygheap->user.saved_gid == cygheap->user.real_gid
-	  && !cygheap->user.groups.issetgroups ()
-	  && !cygheap->user.setuid_to_restricted))
+  if (!::cygheap->user.issetuid ()
+      || (::cygheap->user.saved_uid == ::cygheap->user.real_uid
+	  && ::cygheap->user.saved_gid == ::cygheap->user.real_gid
+	  && !::cygheap->user.groups.issetgroups ()
+	  && !::cygheap->user.setuid_to_restricted))
     {
       rc = CreateProcessW (runpath,	  /* image name - with full path */
 			   wone_line,	  /* what was passed to exec */
@@ -621,20 +617,20 @@ loop:
 	 risk, but we don't want to disable this behaviour for older
 	 OSes because it's still heavily used by some users.  They have
 	 been warned. */
-      if (!cygheap->user.setuid_to_restricted
+      if (!::cygheap->user.setuid_to_restricted
 	  && wcscasecmp (wstname, L"WinSta0") != 0)
 	{
 	  WCHAR sid[128];
 
 	  sa = sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
-			 cygheap->user.sid ());
+			 ::cygheap->user.sid ());
 	  /* We're creating a window station per user, not per logon session.
 	     First of all we might not have a valid logon session for
 	     the user (logon by create_token), and second, it doesn't
 	     make sense in terms of security to create a new window
 	     station for every logon of the same user.  It just fills up
 	     the system with window stations for no good reason. */
-	  hwst = CreateWindowStationW (cygheap->user.get_windows_id (sid), 0,
+	  hwst = CreateWindowStationW (::cygheap->user.get_windows_id (sid), 0,
 				       GENERIC_READ | GENERIC_WRITE, sa);
 	  if (!hwst)
 	    system_printf ("CreateWindowStation failed, %E");
@@ -651,7 +647,7 @@ loop:
 	    }
 	}
 
-      rc = CreateProcessAsUserW (cygheap->user.primary_token (),
+      rc = CreateProcessAsUserW (::cygheap->user.primary_token (),
 			   runpath,	  /* image name - with full path */
 			   wone_line,	  /* what was passed to exec */
 			   &sec_none_nih, /* process security attrs */
@@ -677,7 +673,7 @@ loop:
   /* Restore impersonation. In case of _P_OVERLAY this isn't
      allowed since it would overwrite child data. */
   if (mode != _P_OVERLAY || !rc)
-    cygheap->user.reimpersonate ();
+    ::cygheap->user.reimpersonate ();
 
   /* Set errno now so that debugging messages from it appear before our
      final debugging message [this is a general rule for debugging
@@ -698,12 +694,12 @@ loop:
     }
 
   if (!(c_flags & CREATE_SUSPENDED))
-    strace.write_childpid (ch, pi.dwProcessId);
+    strace.write_childpid (*this, pi.dwProcessId);
 
   /* Fixup the parent data structures if needed and resume the child's
      main thread. */
-  if (cygheap->fdtab.need_fixup_before ())
-    cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
+  if (::cygheap->fdtab.need_fixup_before ())
+    ::cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
 
   if (mode != _P_OVERLAY)
     cygpid = cygwin_pid (pi.dwProcessId);
@@ -711,7 +707,7 @@ loop:
     cygpid = myself->pid;
 
   /* We print the original program name here so the user can see that too.  */
-  syscall_printf ("%d = spawn_guts (%s, %.9500s)",
+  syscall_printf ("%d = child_info_spawn::worker (%s, %.9500s)",
 		  rc ? cygpid : (unsigned int) -1, prog_arg, one_line.buf);
 
   /* Name the handle similarly to proc_subproc. */
@@ -721,7 +717,6 @@ loop:
   pid_t pid;
   if (mode == _P_OVERLAY)
     {
-      chExeced = &ch;	/* FIXME: there's a race here if a user sneaks in CTRL-C */
       myself->dwProcessId = pi.dwProcessId;
       strace.execing = 1;
       myself.hProcess = hExeced = pi.hProcess;
@@ -747,7 +742,7 @@ loop:
 	  orig_wr_proc_pipe = myself->dup_proc_pipe (pi.hProcess);
 	}
       pid = myself->pid;
-      if (!ch.iscygwin ())
+      if (!iscygwin ())
 	close_all_files ();
     }
   else
@@ -792,16 +787,16 @@ loop:
   if (c_flags & CREATE_SUSPENDED)
     {
       ResumeThread (pi.hThread);
-      strace.write_childpid (ch, pi.dwProcessId);
+      strace.write_childpid (*this, pi.dwProcessId);
     }
   ForceCloseHandle (pi.hThread);
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  if ((mode == _P_DETACH || mode == _P_NOWAIT) && !ch.iscygwin ())
+  if ((mode == _P_DETACH || mode == _P_NOWAIT) && !iscygwin ())
     synced = false;
   else
-    synced = ch.sync (pi.dwProcessId, pi.hProcess, INFINITE);
+    synced = sync (pi.dwProcessId, pi.hProcess, INFINITE);
 
   switch (mode)
     {
@@ -814,7 +809,7 @@ loop:
 	      myself->wr_proc_pipe_owner = GetCurrentProcessId ();
 	      myself->wr_proc_pipe = orig_wr_proc_pipe;
 	    }
-	  if (!ch.proc_retry (pi.hProcess))
+	  if (!proc_retry (pi.hProcess))
 	    {
 	      looped++;
 	      goto loop;
@@ -830,9 +825,10 @@ loop:
 	      extern bool is_toplevel_proc;
 	      is_toplevel_proc = true;
 	      myself.remember (false);
-	      waitpid (myself->pid, &res, 0);
+	      wait_for_myself ();
 	    }
 	}
+      this->cleanup ();
       myself.exit (EXITCODE_NOSET);
       break;
     case _P_WAIT:
@@ -853,11 +849,12 @@ loop:
     }
 
 out:
+debug_printf ("about to call cleanup");
+  this->cleanup ();
   if (envblock)
     free (envblock);
   pthread_cleanup_pop (1);
   return (int) res;
-#undef ch
 }
 
 extern "C" int
@@ -895,8 +892,8 @@ spawnve (int mode, const char *path, const char *const *argv,
   switch (_P_MODE (mode))
     {
     case _P_OVERLAY:
-      spawn_guts (path, argv, envp, mode);
-      /* Errno should be set by spawn_guts.  */
+      ch_spawn.worker (path, argv, envp, mode);
+      /* Errno should be set by worker.  */
       ret = -1;
       break;
     case _P_VFORK:
@@ -905,7 +902,7 @@ spawnve (int mode, const char *path, const char *const *argv,
     case _P_WAIT:
     case _P_DETACH:
     case _P_SYSTEM:
-      ret = spawn_guts (path, argv, envp, mode);
+      ret = ch_spawn.worker (path, argv, envp, mode);
 #ifdef NEWVFORK
       if (vf)
 	{

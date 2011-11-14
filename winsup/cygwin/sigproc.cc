@@ -17,11 +17,11 @@ details. */
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "sigproc.h"
 #include "cygheap.h"
 #include "child_info_magic.h"
 #include "shared_info.h"
 #include "cygtls.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "ntdll.h"
 
@@ -278,8 +278,15 @@ proc_subproc (DWORD what, DWORD val)
       w = waitq_head.next;
       waitq_head.next = wval;	/* Add at the beginning. */
       wval->next = w;		/* Link in rest of the list. */
-      clearing = 0;
+      clearing = false;
       goto scan_wait;
+
+    case PROC_EXEC_CLEANUP:
+      while (nprocs)
+	remove_proc (0);
+      for (w = &waitq_head; w->next != NULL; w = w->next)
+	CloseHandle (w->next->ev);
+      break;
 
     /* Clear all waiting threads.  Called from exceptions.cc prior to
        the main thread's dispatch to a signal handler function.
@@ -374,23 +381,11 @@ proc_terminate ()
       proc_subproc (PROC_CLEARWAIT, 1);
 
       /* Clean out proc processes from the pid list. */
-      int i;
-      for (i = 0; i < nprocs; i++)
+      for (int i = 0; i < nprocs; i++)
 	{
-	  /* FIXME: Resetting the ppid to 1 when this process execs is decidedly
-	     non-UNIXy.  We should, at the very least, keep a list of pids
-	     for the exec process to reset when *it* exits.  However, avoiding
-	     setting ppid when we are exec'ing causes the ppid to *never* be
-	     set to 1 so we don't do that either.
-	  if (!hExeced)
-	     */
-	  if (!hExeced || ISSTATE (myself, PID_NOTCYGWIN))
-	    procs[i]->ppid = 1;
+	  procs[i]->ppid = 1;
 	  if (procs[i].wait_thread)
-	    {
-	      // CloseHandle (procs[i].rd_proc_pipe);
-	      procs[i].wait_thread->terminate_thread ();
-	    }
+	    procs[i].wait_thread->terminate_thread ();
 	  procs[i].release ();
 	}
       nprocs = 0;
@@ -477,10 +472,10 @@ sigproc_init ()
       api_fatal ("couldn't create signal pipe, %E");
   ProtectHandle (my_readsig);
   myself->sendsig = my_sendsig;
-  new cygthread (wait_sig, cygself, "sig");
   /* sync_proc_subproc is used by proc_subproc.  It serializes
      access to the children and proc arrays.  */
   sync_proc_subproc.init ("sync_proc_subproc");
+  new cygthread (wait_sig, cygself, "sig");
 }
 
 /* Called on process termination to terminate signal and process threads.
@@ -545,7 +540,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 
   pack.wakeup = NULL;
   bool wait_for_completion;
-  if (!(its_me = (!hExeced && (p == NULL || p == myself || p == myself_nowait))))
+  if (!(its_me = (!have_execed && (p == NULL || p == myself || p == myself_nowait))))
     {
       /* It is possible that the process is not yet ready to receive messages
        * or that it has exited.  Detect this.
@@ -760,12 +755,12 @@ out:
 }
 
 int child_info::retry_count = 10;
+
 /* Initialize some of the memory block passed to child processes
    by fork/spawn/exec. */
-
-child_info::child_info (unsigned in_cb, child_info_types chtype, bool need_subproc_ready)
+child_info::child_info (unsigned in_cb, child_info_types chtype,
+			bool need_subproc_ready)
 {
-  memset (this, 0, in_cb);
   cb = in_cb;
 
   /* It appears that when running under WOW64 on Vista 64, the first DWORD
@@ -827,13 +822,59 @@ child_info::~child_info ()
 }
 
 child_info_fork::child_info_fork () :
-  child_info (sizeof *this, _PROC_FORK, true)
+  child_info (sizeof *this, _CH_FORK, true)
 {
 }
 
 child_info_spawn::child_info_spawn (child_info_types chtype, bool need_subproc_ready) :
   child_info (sizeof *this, chtype, need_subproc_ready)
 {
+  if (type == _CH_EXEC)
+    {
+      hExeced = NULL;
+      if (myself->wr_proc_pipe)
+	ev = NULL;
+      else if (!(ev = CreateEvent (&sec_none_nih, false, false, NULL)))
+	api_fatal ("couldn't create signalling event for exec, %E");
+
+      get_proc_lock (PROC_EXECING, 0);
+      lock = &sync_proc_subproc;
+      /* exit with lock held */
+    }
+}
+
+void
+child_info_spawn::cleanup ()
+{
+  if (moreinfo)
+    {
+      if (moreinfo->envp)
+	{
+	  for (char **e = moreinfo->envp; *e; e++)
+	    cfree (*e);
+	  cfree (moreinfo->envp);
+	}
+      if (type != _CH_SPAWN && moreinfo->myself_pinfo)
+	CloseHandle (moreinfo->myself_pinfo);
+      cfree (moreinfo);
+    }
+  moreinfo = NULL;
+  nchildren = 0;
+  if (ev)
+    {
+      CloseHandle (ev);
+      ev = NULL;
+    }
+debug_printf ("type %d, type == _CH_EXEC == %d, hExeced %p", type, type == _CH_EXEC, hExeced);
+  if (type == _CH_EXEC)
+    {
+      if (iscygwin () && hExeced)
+{debug_printf ("cleaning up");
+	proc_subproc (PROC_EXEC_CLEANUP, 0);
+}
+      sync_proc_subproc.release ();
+    }
+  type = _CH_NADA;
 }
 
 /* Record any non-reaped subprocesses to be passed to about-to-be-execed
@@ -842,12 +883,12 @@ child_info_spawn::child_info_spawn (child_info_types chtype, bool need_subproc_r
 void
 child_info_spawn::record_children ()
 {
-  /* FIXME: locking */
-  for (nchildren = 0; nchildren < nprocs; nchildren++)
-    {
-      children[nchildren].pid = procs[nchildren]->pid;
-      children[nchildren].rd_proc_pipe = procs[nchildren].rd_proc_pipe;
-    }
+  if (type == _CH_EXEC && iscygwin ())
+    for (nchildren = 0; nchildren < nprocs; nchildren++)
+      {
+	children[nchildren].pid = procs[nchildren]->pid;
+	children[nchildren].p = procs[nchildren];
+      }
 }
 
 /* Reattach non-reaped subprocesses passed in from the cygwin process
@@ -858,21 +899,15 @@ child_info_spawn::reattach_children ()
 {
   for (int i = 0; i < nchildren; i++)
     {
-      pinfo p (children[i].pid, PID_MAP_RW);
+      pinfo p (parent, children[i].p, children[i].pid);
       if (!p)
-	/* pid no longer exists */;
-      else if (!DuplicateHandle (parent, children[i].rd_proc_pipe,
-				GetCurrentProcess (), &p.rd_proc_pipe, 0,
-				false, DUPLICATE_SAME_ACCESS))
-	debug_printf ("couldn't duplicate parent %p handles for forked children after exec, %E",
-		       children[i].rd_proc_pipe);
-      else if (!(p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, p->dwProcessId)))
-	CloseHandle (p.rd_proc_pipe);
+	debug_only_printf ("couldn't reattach child %d from previous process", children[i].pid);
       else if (!p.reattach ())
-	{
-	  CloseHandle (p.hProcess);
-	  CloseHandle (p.rd_proc_pipe);
-	}
+	debug_only_printf ("attach of child process %d failed", children[i].pid);
+      else
+	debug_only_printf ("reattached pid %d<%u>, process handle %p, rd_proc_pipe %p->%p",
+			   p->pid, p->dwProcessId, p.hProcess,
+			   children[i].p.rd_proc_pipe, p.rd_proc_pipe);
     }
 }
 
@@ -888,7 +923,7 @@ child_info::ready (bool execed)
   if (dynamically_loaded)
     sigproc_printf ("not really ready");
   else if (!SetEvent (subproc_ready))
-    api_fatal ("SetEvent failed");
+    api_fatal ("SetEvent failed, %E");
   else
     sigproc_printf ("signalled %p that I was ready", subproc_ready);
 
@@ -935,7 +970,7 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
 	{
 	  res = true;
 	  exit_code = STILL_ACTIVE;
-	  if (type == _PROC_EXEC && myself->wr_proc_pipe)
+	  if (type == _CH_EXEC && myself->wr_proc_pipe)
 	    {
 	      ForceCloseHandle1 (hProcess, childhProc);
 	      hProcess = NULL;
@@ -1040,17 +1075,15 @@ out:
 static bool __stdcall
 remove_proc (int ci)
 {
-  if (procs[ci]->exists ())
+  if (have_execed)
+    procs[ci].wait_thread->terminate_thread ();
+  else if (procs[ci]->exists ())
     return true;
 
   sigproc_printf ("removing procs[%d], pid %d, nprocs %d", ci, procs[ci]->pid,
 		  nprocs);
   if (procs[ci] != myself)
-    {
-      procs[ci].release ();
-      if (procs[ci].hProcess)
-	ForceCloseHandle1 (procs[ci].hProcess, childhProc);
-    }
+    procs[ci].release ();
   if (ci < --nprocs)
     {
       /* Wait for proc_waiter thread to make a copy of this element before
@@ -1101,7 +1134,7 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 
   if (!terminated)
     {
-      sigproc_printf ("stopped child, stopsig %d", child->stopsig);
+      sigproc_printf ("stopped child, stop signal %d", child->stopsig);
       if (child->stopsig == SIGCONT)
 	w->status = __W_CONTINUED;
       else
@@ -1292,7 +1325,7 @@ wait_sig (VOID *)
 	      // We need a per-thread queue since each thread can have its own
 	      // list of blocked signals.  CGF 2005-08-24
 	      if (sigq.sigs[sig].si.si_signo && sigq.sigs[sig].tls == pack.tls)
-		sigproc_printf ("sig %d already queued", pack.si.si_signo);
+		sigproc_printf ("signal %d already queued", pack.si.si_signo);
 	      else
 		{
 		  int sigres = pack.process ();

@@ -19,6 +19,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "child_info.h"
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -851,7 +852,7 @@ fhandler_registry::close ()
 	  res = -1;
 	}
     }
-  if (!hExeced && value_name)
+  if (!have_execed && value_name)
     {
       cfree (value_name);
       value_name = NULL;

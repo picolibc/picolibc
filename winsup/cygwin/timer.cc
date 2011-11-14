@@ -162,7 +162,7 @@ timer_thread (VOID *x)
 	    si.si_signo = tt->evp.sigev_signo;
 	    si.si_sigval.sival_ptr = tt->evp.sigev_value.sival_ptr;
 	    si.si_code = SI_TIMER;
-	    debug_printf ("%p sending sig %d", x, tt->evp.sigev_signo);
+	    debug_printf ("%p sending signal %d", x, tt->evp.sigev_signo);
 	    sig_send (myself_nowait, si);
 	    break;
 	  }

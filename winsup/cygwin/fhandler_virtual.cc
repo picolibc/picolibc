@@ -16,6 +16,8 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "sync.h"
+#include "child_info.h"
 
 #include <dirent.h>
 
@@ -168,7 +170,7 @@ fhandler_virtual::dup (fhandler_base * child, int flags)
 int
 fhandler_virtual::close ()
 {
-  if (!hExeced)
+  if (!have_execed)
     {
       if (filebuf)
 	{

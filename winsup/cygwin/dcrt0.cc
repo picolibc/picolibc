@@ -532,12 +532,12 @@ get_cygwin_startup_info ()
       unsigned should_be_cb = 0;
       switch (res->type)
 	{
-	  case _PROC_FORK:
+	  case _CH_FORK:
 	    in_forkee = true;
 	    should_be_cb = sizeof (child_info_fork);
 	    /* fall through */;
-	  case _PROC_SPAWN:
-	  case _PROC_EXEC:
+	  case _CH_SPAWN:
+	  case _CH_EXEC:
 	    if (!should_be_cb)
 	      should_be_cb = sizeof (child_info_spawn);
 	    if (should_be_cb != res->cb)
@@ -546,7 +546,6 @@ get_cygwin_startup_info ()
 	      multiple_cygwin_problem ("fhandler size", res->fhandler_union_cb, sizeof (fhandler_union));
 	    if (res->isstraced ())
 	      {
-		res->ready (false);
 		for (unsigned i = 0; !being_debugged () && i < 10000; i++)
 		  yield ();
 		strace.hello ();
@@ -555,7 +554,7 @@ get_cygwin_startup_info ()
 	  default:
 	    system_printf ("unknown exec type %d", res->type);
 	    /* intentionally fall through */
-	  case _PROC_WHOOPS:
+	  case _CH_WHOOPS:
 	    res = NULL;
 	    break;
 	}
@@ -628,7 +627,7 @@ child_info_spawn::handle_spawn ()
   /* If we're execing we may have "inherited" a list of children forked by the
      previous process executing under this pid.  Reattach them here so that we
      can wait for them.  */
-  if (type == _PROC_EXEC)
+  if (type == _CH_EXEC)
     reattach_children ();
 
   ready (true);
@@ -692,11 +691,11 @@ dll_crt0_0 ()
       cygwin_user_h = child_proc_info->user_h;
       switch (child_proc_info->type)
 	{
-	  case _PROC_FORK:
+	  case _CH_FORK:
 	    fork_info->handle_fork ();
 	    break;
-	  case _PROC_SPAWN:
-	  case _PROC_EXEC:
+	  case _CH_SPAWN:
+	  case _CH_EXEC:
 	    spawn_info->handle_spawn ();
 	    break;
 	}
@@ -1121,7 +1120,7 @@ multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned vers
 {
   if (_cygwin_testing && (strstr (what, "proc") || strstr (what, "cygheap")))
     {
-      child_proc_info->type = _PROC_WHOOPS;
+      child_proc_info->type = _CH_WHOOPS;
       return;
     }
 

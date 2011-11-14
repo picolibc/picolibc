@@ -64,8 +64,11 @@ cygheap_fixup_in_child (bool execed)
   cygheap_max = cygheap = (init_cygheap *) _cygheap_start;
   _csbrk ((char *) child_proc_info->cygheap_max - (char *) cygheap);
   child_copy (child_proc_info->parent, false, "cygheap", cygheap, cygheap_max, NULL);
+debug_printf ("HERE");
   cygheap_init ();
+debug_printf ("HERE 2");
   debug_fixup_after_fork_exec ();
+debug_printf ("HERE 2, %d", execed);
   if (execed)
     {
       cygheap->hooks.next = NULL;
@@ -83,6 +86,7 @@ cygheap_fixup_in_child (bool execed)
 	    _cfree (ce);		/* Marked by parent for freeing in child */
 	}
     }
+debug_printf ("HERE 3, %d", execed);
 }
 
 int

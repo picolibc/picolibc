@@ -419,7 +419,9 @@ frok::parent (volatile char * volatile stack_here)
 			   &si,
 			   &pi);
 
-      if (!rc)
+      if (rc)
+	debug_printf ("forked pid %u", pi.dwProcessId);
+      else
 	{
 	  this_errno = geterrno_from_win_error ();
 	  error ("CreateProcessW failed for '%W'", myself->progname);

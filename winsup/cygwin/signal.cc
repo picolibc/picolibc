@@ -609,7 +609,7 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
       res = -1;
     }
   CloseHandle (h);
-  sigproc_printf ("returning sig %d", res);
+  sigproc_printf ("returning signal %d", res);
   return res;
 }
 

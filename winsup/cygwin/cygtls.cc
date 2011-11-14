@@ -197,7 +197,7 @@ _cygtls::find_tls (int sig)
 {
   static int NO_COPY threadlist_ix;
 
-  debug_printf ("sig %d\n", sig);
+  debug_printf ("signal %d\n", sig);
   sentry here (INFINITE);
 
   _cygtls *res = NULL;

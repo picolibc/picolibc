@@ -41,8 +41,6 @@ extern "C" {
 extern void sigdelayed ();
 };
 
-extern child_info_spawn *chExeced;
-
 static BOOL WINAPI ctrl_c_handler (DWORD);
 
 /* This is set to indicate that we have already exited.  */
@@ -603,7 +601,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
     }
 
   debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
-  debug_printf ("In cygwin_except_handler sig %d at %p", si.si_signo, in->Eip);
+  debug_printf ("In cygwin_except_handler signal %d at %p", si.si_signo, in->Eip);
 
   bool masked = !!(me.sigmask & SIGTOMASK (si.si_signo));
   if (masked)
@@ -822,7 +820,7 @@ _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
   /* Clear any waiting threads prior to dispatching to handler function */
   int res = SetEvent (signal_arrived);	// For an EINTR case
   proc_subproc (PROC_CLEARWAIT, 1);
-  sigproc_printf ("armed signal_arrived %p, sig %d, res %d", signal_arrived,
+  sigproc_printf ("armed signal_arrived %p, signal %d, res %d", signal_arrived,
 		  sig, res);
 }
 
@@ -844,7 +842,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 
   if (tls->sig)
     {
-      sigproc_printf ("trying to send sig %d but signal %d already armed",
+      sigproc_printf ("trying to send signal %d but signal %d already armed",
 		      sig, tls->sig);
       goto out;
     }
@@ -988,11 +986,8 @@ ctrl_c_handler (DWORD type)
 	}
     }
 
-  if (chExeced)
-    {
-      chExeced->set_saw_ctrl_c ();
-      return TRUE;
-    }
+  if (ch_spawn.set_saw_ctrl_c ())
+    return TRUE;
 
   /* We're only the process group leader when we have a valid pinfo structure.
      If we don't have one, then the parent "stub" will handle the signal. */
@@ -1193,7 +1188,7 @@ sigpacket::process ()
 
   bool masked;
   void *handler;
-  if (!hExeced || (void *) thissig.sa_handler == (void *) SIG_IGN)
+  if (!have_execed || (void *) thissig.sa_handler == (void *) SIG_IGN)
     handler = (void *) thissig.sa_handler;
   else if (tls)
     return 1;
@@ -1332,10 +1327,10 @@ exit_sig:
 void
 _cygtls::signal_exit (int rc)
 {
-  if (hExeced)
+  if (have_execed)
     {
       sigproc_printf ("terminating captive process");
-      TerminateProcess (hExeced, sigExeced = rc);
+      TerminateProcess (ch_spawn, sigExeced = rc);
     }
 
   signal_debugger (rc & 0x7f);
@@ -1343,7 +1338,7 @@ _cygtls::signal_exit (int rc)
     stackdump (thread_context.ebp, 1, 1);
 
   lock_process until_exit (true);
-  if (hExeced || exit_state > ES_PROCESS_LOCKED)
+  if (have_execed || exit_state > ES_PROCESS_LOCKED)
     myself.exit (rc);
 
   /* Starve other threads in a vain attempt to stop them from doing something

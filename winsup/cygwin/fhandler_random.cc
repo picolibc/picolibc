@@ -15,6 +15,10 @@ details. */
 #include "cygerrno.h"
 #include "path.h"
 #include "fhandler.h"
+#include "sync.h"
+#include "dtable.h"
+#include "cygheap.h"
+#include "child_info.h"
 
 #define RANDOM   8
 #define URANDOM  9
@@ -170,7 +174,7 @@ fhandler_dev_random::lseek (_off64_t off, int whence)
 int
 fhandler_dev_random::close ()
 {
-  if (!hExeced && crypt_prov)
+  if (!have_execed && crypt_prov)
     while (!CryptReleaseContext (crypt_prov, 0)
 	   && GetLastError () == ERROR_BUSY)
       Sleep (10);

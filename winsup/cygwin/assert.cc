@@ -51,6 +51,9 @@ __assert_func (const char *file, int line, const char *func,
       small_printf ("assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
 		    failedexpr, file, line,
 		    func ? ", function: " : "", func ? func : "");
+      debug_printf ("assertion \"%s\" failed: file \"%s\", line %d%s%s",
+		    failedexpr, file, line,
+		    func ? ", function: " : "", func ? func : "");
     }
 
 #ifdef DEBUGGING

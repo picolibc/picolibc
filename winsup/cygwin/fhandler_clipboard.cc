@@ -17,6 +17,10 @@ details. */
 #include "cygerrno.h"
 #include "path.h"
 #include "fhandler.h"
+#include "sync.h"
+#include "dtable.h"
+#include "cygheap.h"
+#include "child_info.h"
 
 /*
  * Robert Collins:
@@ -263,7 +267,7 @@ fhandler_dev_clipboard::lseek (_off64_t offset, int whence)
 int
 fhandler_dev_clipboard::close ()
 {
-  if (!hExeced)
+  if (!have_execed)
     {
       eof = true;
       pos = 0;

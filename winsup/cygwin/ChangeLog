@@ -1,3 +1,93 @@
+2011-11-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	Throughout use "have_execed" macro rather than "hExeced" global handle.
+	Throughout rename _PROC_* to _CH_*.
+	* child_info.h: Include "pinfo.h".
+	(child_info_types): Rename _PROC_* -> _CH_* to avoid confusion with
+	similarly named constants.
+	(_PROC_*): Delete unneeded aliases.
+	(PROC_*): Ditto.
+	(CURR_CHILD_INFO_MAGIC): Ditto.
+	(cchildren): Define using "pinfo_minimal".
+	(child_info::set_saw_ctrl_c): Move to
+	(child_info_spawn::set_saw_ctrl_c): Here.
+	(child_info_spawn::lock): New field.
+	(child_info_spawn::hExeced): Ditto.
+	(child_info_spawn::ev): Ditto.
+	(child_info_spawn::~child_info_spawn): Move to sigproc.cc.
+	(child_info_spawn::child_info_spawn): Ditto.
+	(child_info_spawn::cleanup): Declare new function.
+	(child_info_spawn::set_saw_ctrl_c): Move to this class.  Set flag only
+	when execed and return true when we have set the flag.
+	(child_info_spawn::child_info_spawn::signal_myself_exited): New function.
+	(child_info_spawn::wait_for_myself): Ditto.
+	(child_info_spawn::has_execed_cygwin): Ditto.
+	(child_info_spawn::has_execed): Ditto.  Replaces "hExeced" test.
+	(child_info_spawn::operator HANDLE&): New operator.
+	(child_info_spawn::worker): Define old "spawn_guts" as class member.
+	(ch_spawn): Declare.
+	(have_execed): Define.
+	(have_execed_cygwin): Ditto.
+	* cygheap.h: Update comment.
+	* dcrt0.cc (get_cygwin_startup_info): Use _CH_* enums.
+	(child_info_spawn::handle_spawn): Ditto.
+	(dll_crt0_0): Ditto.
+	(multiple_cygwin_problem): Ditto.
+	* exceptions.cc (chExeced): Delete obsolete declaration.
+	(ctrl_c_handler): Reference set_saw_ctrl_c via new ch_spawn global.
+	* globals.cc (hExeced): Delete.
+	* pinfo.cc (pinfo::thisproc): Refer to cygheap as ::cygheap for
+	consistency in handle naming when -DDEBUGGING.
+	(pinfo::init): Accommodate case where myself.h is known but h0 is
+	passed in.
+	(pinfo::pinfo): New constructor for setting up a pinfo passed in by
+	previous exec'or.
+	(pinfo::proc_waiter): Don't handle subprocess if we're in the process
+	of exiting due to an exec of a cygwin process.  Don't close
+	rd_proc_pipe here.  Close it when we actually are finished with the
+	process.  Use new ch_spawn.signal_myself_exited function to let exec
+	stub know that subprocess has exited.
+	(pinfo::wait): Clarify debugging output.
+	(pinfo::release): Use "close_h" to close all handles to avoid races.
+	(winpids::add): Assume that elements of the array do not need to be
+	zeroed and are properly initialized or suffer problems on
+	pinfo::release.  Don't close hProcess since release does that now.
+	* pinfo.h: Update comment.
+	(pinfo_minimal): Move some elements from pinfo here so that
+	child_info_spawn can use them.
+	(pinfo): Inherit from pinfo_minimal.
+	(pinfo::pinfo): Modify to accommodate new pinfo_minimal.
+	(pinfo::allow_remove): New function.
+	* sigproc.cc (proc_subproc): Use boolean values for true/false.
+	Implement PROC_EXEC_CLEANUP.
+	(proc_terminate): Set ppid = 1 since the procs list will only be
+	iterated when the process has not execed.  Don't do any cleanup here
+	since it is now handled in pinfo::release.
+	(sigproc_init): Initialize sync_proc_subproc earlier.
+	(child_info::child_info): Assume that all important fields are properly
+	initialized and avoid memset().
+	(child_info_spawn::child_info_spawn): Specifically test for execing and
+	then set up appropriate fields in the struct.
+	(child_info_spawn::cleanup): Define new function.
+	(child_info_spawn::record_children): Specifically test for being execed
+	here.  Fill in pinfo_minimal part of children array.
+	(child_info_spawn::reattach_children): Use constructor to duplicate
+	information for previous exec'or.  Add more debugging output.
+	(remove_proc): Force deletion of thread when exiting due to exec.  Rely
+	on pinfo::cleanup in release.
+	* sigproc.h (PROC_EXEC_CLEANUP): New enum.
+	(PROC_DETACHED_CHILD): Delete.
+	* spawn.cc (chExeced): Delete.
+	(child_info_spawn::worker): Rename from spawn_guts.  Use elements of
+	child_info_spawn throughout rather than ch.whatever.  Use ::cygheap to
+	refer to global rather than element of child_info.  Use
+	wait_for_myself() rather than waitpid().  Call
+	child_info_spawn::cleanup on function return.
+	(spawnve): Reflect movement of spawn_guts functionality into
+	child_info_spawn::worker.
+	* syscalls.cc (popen): Ditto.
+	* winsup.h (spawn_guts): Delete declaration.
+
 2011-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.sgml (std-gnu): Add ptsname_r.

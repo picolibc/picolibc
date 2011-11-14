@@ -125,7 +125,7 @@ public:
 public:
   HANDLE wr_proc_pipe;
   DWORD wr_proc_pipe_owner;
-  friend class pinfo;
+  friend class pinfo_minimal;
 };
 
 DWORD WINAPI commune_process (void *);
@@ -136,22 +136,36 @@ enum parent_alerter
   __ALERT_ALIVE   =  112
 };
 
-class pinfo
+class pinfo_minimal
 {
   HANDLE h;
-  _pinfo *procinfo;
-  bool destroy;
 public:
-  HANDLE rd_proc_pipe;
   HANDLE hProcess;
+  HANDLE rd_proc_pipe;
+  pinfo_minimal (): h (NULL), hProcess (NULL), rd_proc_pipe (NULL) {}
+  friend class pinfo;
+};
+
+class pinfo: public pinfo_minimal
+{
+  bool destroy;
+  _pinfo *procinfo;
+public:
   bool waiter_ready;
   class cygthread *wait_thread;
+
   void init (pid_t, DWORD, HANDLE) __attribute__ ((regparm(3)));
-  pinfo (): procinfo (NULL), rd_proc_pipe (NULL) {}
-  pinfo (_pinfo *x): procinfo (x), rd_proc_pipe (NULL), hProcess (NULL) {}
-  pinfo (pid_t n) : rd_proc_pipe (NULL), hProcess (NULL) {init (n, 0, NULL);}
-  pinfo (pid_t n, DWORD flag) : rd_proc_pipe (NULL), hProcess (NULL), waiter_ready (0), wait_thread (NULL) {init (n, flag, NULL);}
+  pinfo (_pinfo *x = NULL): pinfo_minimal (), destroy (false), procinfo (x),
+		     waiter_ready (false), wait_thread (NULL) {}
+  pinfo (pid_t n, DWORD flag = 0): pinfo_minimal (), destroy (false),
+				   procinfo (NULL), waiter_ready (false),
+				   wait_thread (NULL) 
+  {
+    init (n, flag, NULL);
+  }
+  pinfo (HANDLE, pinfo_minimal&, pid_t);
   void thisproc (HANDLE) __attribute__ ((regparm (2)));
+  inline void _pinfo_release ();
   void release ();
   bool wait () __attribute__ ((regparm (1)));
   ~pinfo ()
@@ -172,6 +186,7 @@ public:
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
   void preserve () { destroy = false; }
+  void allow_remove () { destroy = true; }
 #ifndef _SIGPROC_H
   int reattach () {system_printf ("reattach is not here"); return 0;}
   int remember () {system_printf ("remember is not here"); return 0;}
@@ -255,9 +270,9 @@ public:
 
 #define _P_VFORK 0
 #define _P_SYSTEM 512
-/* Add this flag in calls to spawn_guts if the calling function is one of
-   'p' type functions: execlp, execvp, spawnlp, spawnvp.  Per POSIX, only
-   these p-type functions fall back to call /bin/sh if the file is not a
+/* Add this flag in calls to child_info_spawn::worker if the calling function
+   is one of 'p' type functions: execlp, execvp, spawnlp, spawnvp.  Per POSIX,
+   only these p-type functions fall back to call /bin/sh if the file is not a
    binary.  The setting of _P_PATH_TYPE_EXEC is used as a bool value in
    av::fixup to decide if the file should be evaluated as a script, or if
    ENOEXEC should be returned. */

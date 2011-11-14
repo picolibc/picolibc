@@ -23,6 +23,7 @@ details. */
 #include "cygheap.h"
 #include "shared_info.h"
 #include "sigproc.h"
+#include "child_info.h"
 
 /* Media changes and bus resets are sometimes reported and the function
    hasn't been executed.  We repeat all functions which return with one
@@ -1236,7 +1237,7 @@ fhandler_dev_tape::close ()
   int ret = 0;
   int cret = 0;
 
-  if (!hExeced)
+  if (!have_execed)
     {
       lock (-1);
       ret = mt.drive (driveno ())->close (get_handle (), is_rewind_device ());

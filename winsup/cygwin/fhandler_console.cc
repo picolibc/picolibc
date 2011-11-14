@@ -33,6 +33,8 @@ details. */
 #include "tls_pbuf.h"
 #include "registry.h"
 #include <asm/socket.h>
+#include "sync.h"
+#include "child_info.h"
 
 /* Don't make this bigger than NT_MAX_PATH as long as the temporary buffer
    is allocated using tmp_pathbuf!!! */
@@ -840,7 +842,7 @@ fhandler_console::close ()
 {
   CloseHandle (get_io_handle ());
   CloseHandle (get_output_handle ());
-  if (!hExeced)
+  if (!have_execed)
     cygheap->manage_console_count ("fhandler_console::close", -1);
   return 0;
 }

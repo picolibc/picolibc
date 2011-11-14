@@ -35,10 +35,12 @@ enum procstuff
 {
   PROC_ADDCHILD		  = 1,	// add a new subprocess to list
   PROC_REATTACH_CHILD	  = 2,	// reattach after exec
-  PROC_DETACHED_CHILD	  = 3,	// set up a detached child
-  PROC_CLEARWAIT	  = 4,	// clear all waits - signal arrived
-  PROC_WAIT		  = 5,	// setup for wait() for subproc
-  PROC_NOTHING		  = 6	// nothing, really
+  PROC_EXEC_CLEANUP	  = 3,	// cleanup waiting children after exec
+  PROC_DETACHED_CHILD	  = 4,	// set up a detached child
+  PROC_CLEARWAIT	  = 5,	// clear all waits - signal arrived
+  PROC_WAIT		  = 6,	// setup for wait() for subproc
+  PROC_EXECING		  = 7,	// used to get a lock when execing
+  PROC_NOTHING		  = 8	// nothing, really
 };
 
 struct sigpacket

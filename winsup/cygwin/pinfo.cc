@@ -77,10 +77,10 @@ pinfo::thisproc (HANDLE h)
   else if (!child_proc_info)	/* child_proc_info is only set when this process
 				   was started by another cygwin process */
     procinfo->start_time = time (NULL); /* Register our starting time. */
-  else if (cygheap->pid_handle)
+  else if (::cygheap->pid_handle)
     {
-      ForceCloseHandle (cygheap->pid_handle);
-      cygheap->pid_handle = NULL;
+      ForceCloseHandle (::cygheap->pid_handle);
+      ::cygheap->pid_handle = NULL;
     }
 }
 
@@ -215,6 +215,24 @@ pinfo::exit (DWORD n)
 }
 # undef self
 
+inline void
+pinfo::_pinfo_release ()
+{
+  if (procinfo)
+    {
+      void *unmap_procinfo = procinfo;
+      procinfo = NULL;
+      UnmapViewOfFile (unmap_procinfo);
+    }
+  HANDLE close_h;
+  if (h)
+    {
+      close_h = h;
+      h = NULL;
+      ForceCloseHandle1 (close_h, pinfo_shared_handle);
+    }
+}
+
 void
 pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 {
@@ -233,7 +251,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
   DWORD access = FILE_MAP_READ
 		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW)
 		    ? FILE_MAP_WRITE : 0);
-  if (!h0)
+  if (!h0 || myself.h)
     shloc = (flag & (PID_IN_USE | PID_EXECED)) ? SH_JUSTCREATE : SH_JUSTOPEN;
   else
     {
@@ -331,7 +349,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
       break;
 
     loop:
-      release ();
+      _pinfo_release ();
       if (h0)
 	yield ();
     }
@@ -344,7 +362,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
   else
     {
       h = h0;
-      release ();
+      _pinfo_release ();
     }
 }
 
@@ -363,6 +381,35 @@ pinfo::set_acl()
     debug_printf ("RtlSetDaclSecurityDescriptor %p", status);
   else if ((status = NtSetSecurityObject (h, DACL_SECURITY_INFORMATION, &sd)))
     debug_printf ("NtSetSecurityObject %p", status);
+}
+
+pinfo::pinfo (HANDLE parent, pinfo_minimal& from, pid_t pid):
+  pinfo_minimal (), destroy (false), procinfo (NULL), waiter_ready (false),
+  wait_thread (NULL) 
+{
+  HANDLE herr;
+  const char *duperr = NULL;
+  if (!DuplicateHandle (parent, herr = from.rd_proc_pipe, GetCurrentProcess (),
+			&rd_proc_pipe, 0, false, DUPLICATE_SAME_ACCESS))
+    duperr = "couldn't duplicate parent rd_proc_pipe handle %p for forked child %d after exec, %E";
+  else if (!DuplicateHandle (parent, herr = from.hProcess, GetCurrentProcess (),
+			     &hProcess, 0, false, DUPLICATE_SAME_ACCESS))
+    duperr = "couldn't duplicate parent process handle %p for forked child %d after exec, %E";
+  else
+    {
+      h = NULL;
+      DuplicateHandle (parent, from.h, GetCurrentProcess (), &h, 0, false,
+		       DUPLICATE_SAME_ACCESS);
+      init (pid, PID_MAP_RW, h);
+      if (*this)
+	return;
+    }
+
+  if (duperr)
+    debug_printf (duperr, herr, pid);
+
+  /* Returning with procinfo == NULL.  Any open handles will be closed by the
+     destructor. */
 }
 
 const char *
@@ -868,6 +915,7 @@ proc_waiter (void *arg)
   si.si_stime = pchildren[rc].rusage_self.ru_stime;
 #endif
   pid_t pid = vchild->pid;
+  bool its_me = vchild == myself;
 
   for (;;)
     {
@@ -881,6 +929,9 @@ proc_waiter (void *arg)
 	  break;
 	}
 
+      if (!its_me && have_execed_cygwin)
+	break;
+
       si.si_uid = vchild->uid;
 
       switch (buf)
@@ -889,8 +940,6 @@ proc_waiter (void *arg)
 	  continue;
 	case 0:
 	  /* Child exited.  Do some cleanup and signal myself.  */
-	  CloseHandle (vchild.rd_proc_pipe);
-	  vchild.rd_proc_pipe = NULL;
 	  vchild.maybe_set_exit_code_from_windows ();
 	  if (WIFEXITED (vchild->exitcode))
 	    si.si_code = CLD_EXITED;
@@ -918,15 +967,8 @@ proc_waiter (void *arg)
 	  continue;
 	}
 
-      /* Special case:  If the "child process" that died is us, then we're
-	 execing.  Just call proc_subproc directly and then exit this loop.
-	 We're done here.  */
-      if (hExeced)
-	{
-	  /* execing.  no signals available now. */
-	  proc_subproc (PROC_CLEARWAIT, 0);
-	  break;
-	}
+      if (its_me && ch_spawn.signal_myself_exited ())
+	break;
 
       /* Send a SIGCHLD to myself.   We do this here, rather than in proc_subproc
 	 to avoid the proc_subproc lock since the signal thread will eventually
@@ -1003,13 +1045,13 @@ pinfo::wait ()
 
   waiter_ready = false;
   /* Fire up a new thread to track the subprocess */
-  cygthread *h = new cygthread (proc_waiter, this, "proc_waiter");
+  cygthread *h = new cygthread (proc_waiter, this, "waitproc");
   if (!h)
     sigproc_printf ("tracking thread creation failed for pid %d", (*this)->pid);
   else
     {
       wait_thread = h;
-      sigproc_printf ("created tracking thread for pid %d, winpid %p, rd_pipe %p",
+      sigproc_printf ("created tracking thread for pid %d, winpid %p, rd_proc_pipe %p",
 		      (*this)->pid, (*this)->dwProcessId, rd_proc_pipe);
     }
 
@@ -1036,7 +1078,7 @@ _pinfo::alert_parent (char sig)
 
      FIXME: Is there a race here if we run this while another thread is attempting
      to exec()? */
-  if (wr_proc_pipe == INVALID_HANDLE_VALUE || !myself->wr_proc_pipe || hExeced)
+  if (wr_proc_pipe == INVALID_HANDLE_VALUE || !myself->wr_proc_pipe || have_execed)
     /* no parent */;
   else
     {
@@ -1059,17 +1101,19 @@ _pinfo::alert_parent (char sig)
 void
 pinfo::release ()
 {
-  if (procinfo)
+  _pinfo_release ();
+  HANDLE close_h;
+  if (rd_proc_pipe)
     {
-      void *unmap_procinfo = procinfo;
-      procinfo = NULL;
-      UnmapViewOfFile (unmap_procinfo);
+      close_h = rd_proc_pipe;
+      rd_proc_pipe = NULL;
+      ForceCloseHandle1 (close_h, rd_proc_pipe);
     }
-  if (h)
+  if (hProcess)
     {
-      HANDLE close_h = h;
-      h = NULL;
-      ForceCloseHandle1 (close_h, pinfo_shared_handle);
+      close_h = hProcess;
+      hProcess = NULL;
+      ForceCloseHandle1 (close_h, childhProc);
     }
 }
 
@@ -1145,15 +1189,15 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
     }
 
   pinfo& p = pinfolist[nelem];
+  memset (&p, 0, sizeof (p));
 
-  /* Open a the process to prevent a subsequent exit from invalidating the
+  /* Open a process to prevent a subsequent exit from invalidating the
      shared memory region. */
   p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, pid);
   _onreturn onreturn (p.hProcess);
 
   /* If we couldn't open the process then we don't have rights to it and should
-     make a copy of the shared memory area if it exists (it may not).
-  */
+     make a copy of the shared memory area if it exists (it may not).  */
   bool perform_copy;
   if (!p.hProcess)
     perform_copy = true;
@@ -1226,8 +1270,7 @@ out:
 	  else
 	    {
 	      *pnew = *p.procinfo;
-	      if ((_pinfo *) p != (_pinfo *) myself)
-		p.release ();
+	      p.release ();
 	      p.procinfo = pnew;
 	      p.destroy = false;
 	    }
@@ -1344,11 +1387,7 @@ winpids::release ()
     if (pinfolist[i] == (_pinfo *) myself)
       continue;
     else if (pinfolist[i].hProcess)
-      {
-	if (pinfolist[i])
-	  pinfolist[i].release ();
-	CloseHandle (pinfolist[i].hProcess);
-      }
+      pinfolist[i].release ();
     else if ((p = pinfolist[i]))
       {
 	pinfolist[i].procinfo = NULL;

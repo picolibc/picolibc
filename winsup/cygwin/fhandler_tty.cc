@@ -547,11 +547,11 @@ fhandler_pty_slave::open_setup (int flags)
 void
 fhandler_pty_slave::cleanup ()
 {
-  /* This used to always call fhandler_pty_common::close when hExeced but that
-     caused multiple closes of the handles associated with this pty.  Since
-     close_all_files is not called until after the cygwin process has synced
-     or before a non-cygwin process has exited, it should be safe to just
-     close this normally.  cgf 2006-05-20 */
+  /* This used to always call fhandler_pty_common::close when we were execing
+     but that caused multiple closes of the handles associated with this pty.
+     Since close_all_files is not called until after the cygwin process has
+     synced or before a non-cygwin process has exited, it should be safe to
+     just close this normally.  cgf 2006-05-20 */
   cygheap->manage_console_count ("fhandler_pty_slave::close", -1);
   report_tty_counts (this, "closed", "");
 }
@@ -1286,8 +1286,8 @@ fhandler_pty_master::close ()
 
   fhandler_pty_common::close ();
 
-  if (hExeced || get_ttyp ()->master_pid != myself->pid)
-    termios_printf ("not clearing: %d, master_pid %d", hExeced, get_ttyp ()->master_pid);
+  if (have_execed || get_ttyp ()->master_pid != myself->pid)
+    termios_printf ("not clearing: %d, master_pid %d", have_execed, get_ttyp ()->master_pid);
   else
     get_ttyp ()->set_master_closed ();
 

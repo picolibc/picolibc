@@ -215,8 +215,8 @@ private:
   int error;		/* This contains an errno number which corresponds
 			   to the problem with this path when trying to start
 			   a native Win32 application.  See cwdstuff::set for
-			   how it gets set.  See spawn_guts for how it's
-			   evaluated. */
+			   how it gets set.  See child_info_spawn::worker for how
+			   it's evaluated. */
   void override_win32_cwd (bool, ULONG);
 
 public:

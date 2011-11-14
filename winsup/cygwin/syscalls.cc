@@ -63,6 +63,8 @@ details. */
 #include "registry.h"
 #include "environ.h"
 #include "tls_pbuf.h"
+#include "sync.h"
+#include "child_info.h"
 
 #undef _close
 #undef _lseek
@@ -106,7 +108,7 @@ close_all_files (bool norelease)
 	  cygheap->fdtab.release (i);
       }
 
-  if (!hExeced && cygheap->ctty)
+  if (!have_execed && cygheap->ctty)
     cygheap->close_ctty ();
 
   if (h)
@@ -4154,8 +4156,8 @@ popen (const char *command, const char *in_type)
       fcntl64 (stdchild, F_SETFD, stdchild_state | FD_CLOEXEC);
 
       /* Start a shell process to run the given command without forking. */
-      pid_t pid = spawn_guts ("/bin/sh", argv, cur_environ (), _P_NOWAIT,
-			       __std[0], __std[1]);
+      pid_t pid = ch_spawn.worker ("/bin/sh", argv, cur_environ (), _P_NOWAIT,
+				   __std[0], __std[1]);
 
       /* Reinstate the close-on-exec state */
       fcntl64 (stdchild, F_SETFD, stdchild_state);

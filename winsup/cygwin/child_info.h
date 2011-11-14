@@ -13,10 +13,11 @@ details. */
 
 enum child_info_types
 {
-  _PROC_EXEC,
-  _PROC_SPAWN,
-  _PROC_FORK,
-  _PROC_WHOOPS
+  _CH_NADA = 0,
+  _CH_EXEC = 1,
+  _CH_SPAWN = 2,
+  _CH_FORK = 3,
+  _CH_WHOOPS = 4
 };
 
 enum child_status
@@ -31,21 +32,18 @@ enum child_status
 
 #define PROC_MAGIC_GENERIC 0xaf00fa00
 
-#define PROC_EXEC (_PROC_EXEC)
-#define PROC_SPAWN (_PROC_SPAWN)
-#define PROC_FORK (_PROC_FORK)
-
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xa049a83aU
+#define CURR_CHILD_INFO_MAGIC 0x941e0a4aU
 
 #define NPROCS	256
 
+#include "pinfo.h"
 struct cchildren
 {
   pid_t pid;
-  HANDLE rd_proc_pipe;
+  pinfo_minimal p;
 };
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
@@ -80,7 +78,6 @@ public:
   bool isstraced () const {return !!(flag & _CI_STRACED);}
   bool iscygwin () const {return !!(flag & _CI_ISCYGWIN);}
   bool saw_ctrl_c () const {return !!(flag & _CI_SAW_CTRL_C);}
-  void set_saw_ctrl_c () {flag |= _CI_SAW_CTRL_C;}
 };
 
 class mount_info;
@@ -118,6 +115,9 @@ public:
 
 class child_info_spawn: public child_info
 {
+  muto *lock;
+  HANDLE hExeced;
+  HANDLE ev;
 public:
   cygheap_exec_info *moreinfo;
   int __stdin;
@@ -126,29 +126,52 @@ public:
   int nchildren;
   cchildren children[NPROCS];
 
-  ~child_info_spawn ()
-  {
-    if (moreinfo)
-      {
-	if (moreinfo->envp)
-	  {
-	    for (char **e = moreinfo->envp; *e; e++)
-	      cfree (*e);
-	    cfree (moreinfo->envp);
-	  }
-	if (type != _PROC_SPAWN && moreinfo->myself_pinfo)
-	  CloseHandle (moreinfo->myself_pinfo);
-	cfree (moreinfo);
-      }
-  }
-  child_info_spawn (): moreinfo (NULL), nchildren (0) {};
+  void cleanup ();
+  child_info_spawn () {};
   child_info_spawn (child_info_types, bool);
   void record_children ();
   void reattach_children ();
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
   void set (child_info_types ci, bool b) { new (this) child_info_spawn (ci, b);}
   void handle_spawn () __attribute__ ((regparm (1)));
+  bool set_saw_ctrl_c ()
+  {
+    if (!has_execed ())
+      return false;
+    flag |= _CI_SAW_CTRL_C;
+    return true;
+  }
+  bool signal_myself_exited ()
+  {
+    if (!ev)
+      return false;
+    else
+      {
+	SetEvent (ev);
+	return true;
+      }
+  }
+  void wait_for_myself () { WaitForSingleObject (ev, INFINITE); }
+  bool has_execed () const
+  {
+    if (hExeced)
+      return true;
+    if (type != _CH_EXEC)
+      return false;
+    lock->acquire ();
+    lock->release ();
+    return !!hExeced;
+  }
+  bool has_execed_cygwin () const { return iscygwin () && has_execed (); }
+  operator HANDLE& () {return hExeced;}
+  int worker (const char *, const char *const *, const char *const [], int,
+	      int = -1, int = -1) __attribute__ ((regparm (3)));;
 };
+
+extern child_info_spawn ch_spawn;
+
+#define have_execed ch_spawn.has_execed ()
+#define have_execed_cygwin ch_spawn.has_execed_cygwin ()
 
 void __stdcall init_child_info (DWORD, child_info *, HANDLE);
 
