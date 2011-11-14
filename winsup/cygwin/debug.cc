@@ -171,7 +171,6 @@ delete_handle (handle_list *hl)
 void
 debug_fixup_after_fork_exec ()
 {
-debug_printf ("BEFORE");
   /* No lock needed at this point */
   handle_list *hl;
   for (hl = &cygheap->debug.starth; hl->next != NULL; /* nothing */)
@@ -179,7 +178,6 @@ debug_printf ("BEFORE");
       hl = hl->next;
     else
       delete_handle (hl);	// removes hl->next
-debug_printf ("AFTER");
 }
 
 static bool __stdcall

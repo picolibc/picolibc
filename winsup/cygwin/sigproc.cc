@@ -865,13 +865,10 @@ child_info_spawn::cleanup ()
       CloseHandle (ev);
       ev = NULL;
     }
-debug_printf ("type %d, type == _CH_EXEC == %d, hExeced %p", type, type == _CH_EXEC, hExeced);
   if (type == _CH_EXEC)
     {
       if (iscygwin () && hExeced)
-{debug_printf ("cleaning up");
 	proc_subproc (PROC_EXEC_CLEANUP, 0);
-}
       sync_proc_subproc.release ();
     }
   type = _CH_NADA;

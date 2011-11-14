@@ -849,7 +849,6 @@ loop:
     }
 
 out:
-debug_printf ("about to call cleanup");
   this->cleanup ();
   if (envblock)
     free (envblock);

@@ -1,5 +1,13 @@
 2011-11-13  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	Remove erroneously checked-in debugging statements.
+	* cygheap.cc (cygheap_fixup_in_child): Here.
+	* debug.cc (delete_handle): Here.
+	* sigproc.cc (child_info_spawn::cleanup): Here.
+	* spawn.cc (child_info_spawn::worker): Here.
+
+2011-11-13  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	Throughout, change "sig %d" in strace output to "signal %d" for
 	consistency.
 	* assert.cc (__assert_func): Output assertion string to strace too.
