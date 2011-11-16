@@ -35,7 +35,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0x941e0a4aU
+#define CURR_CHILD_INFO_MAGIC 0x24f4be4bU
 
 #define NPROCS	256
 
@@ -111,6 +111,11 @@ public:
   int envc;
   char **envp;
   HANDLE myself_pinfo;
+  int nchildren;
+  cchildren children[0];
+  static cygheap_exec_info *alloc ();
+  void record_children ();
+  void reattach_children (HANDLE);
 };
 
 class child_info_spawn: public child_info
@@ -123,8 +128,6 @@ public:
   int __stdin;
   int __stdout;
   char filler[4];
-  int nchildren;
-  cchildren children[NPROCS];
 
   void cleanup ();
   child_info_spawn () {};

@@ -411,8 +411,7 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
   stack_ptr = VirtualAlloc (stacktop, stacksize, MEM_COMMIT,
 			    PAGE_EXECUTE_READWRITE);
   if (!stack_ptr)
-    api_fatal ("fork: can't commit memory for stack %p(%d), %E",
-	       stacktop, stacksize);
+    abort ("can't commit memory for stack %p(%d), %E", stacktop, stacksize);
   if (guardsize != (size_t) -1)
     {
       /* Allocate PAGE_GUARD page if it still fits. */

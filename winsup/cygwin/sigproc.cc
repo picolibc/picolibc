@@ -843,6 +843,14 @@ child_info_spawn::child_info_spawn (child_info_types chtype, bool need_subproc_r
     }
 }
 
+cygheap_exec_info *
+cygheap_exec_info::alloc ()
+{
+ return (cygheap_exec_info *) ccalloc_abort (HEAP_1_EXEC, 1,
+					     sizeof (cygheap_exec_info)
+					     + (nprocs * sizeof (children[0])));
+}
+
 void
 child_info_spawn::cleanup ()
 {
@@ -859,7 +867,6 @@ child_info_spawn::cleanup ()
       cfree (moreinfo);
     }
   moreinfo = NULL;
-  nchildren = 0;
   if (ev)
     {
       CloseHandle (ev);
@@ -877,22 +884,28 @@ child_info_spawn::cleanup ()
 /* Record any non-reaped subprocesses to be passed to about-to-be-execed
    process.  FIXME: There is a race here if the process exits while we
    are recording it.  */
+inline void
+cygheap_exec_info::record_children ()
+{
+  for (nchildren = 0; nchildren < nprocs; nchildren++)
+    {
+      children[nchildren].pid = procs[nchildren]->pid;
+      children[nchildren].p = procs[nchildren];
+    }
+}
+
 void
 child_info_spawn::record_children ()
 {
   if (type == _CH_EXEC && iscygwin ())
-    for (nchildren = 0; nchildren < nprocs; nchildren++)
-      {
-	children[nchildren].pid = procs[nchildren]->pid;
-	children[nchildren].p = procs[nchildren];
-      }
+    moreinfo->record_children ();
 }
 
 /* Reattach non-reaped subprocesses passed in from the cygwin process
    which previously operated under this pid.  FIXME: Is there a race here
    if the process exits during cygwin's exec handoff?  */
-void
-child_info_spawn::reattach_children ()
+inline void
+cygheap_exec_info::reattach_children (HANDLE parent)
 {
   for (int i = 0; i < nchildren; i++)
     {
@@ -906,6 +919,12 @@ child_info_spawn::reattach_children ()
 			   p->pid, p->dwProcessId, p.hProcess,
 			   children[i].p.rd_proc_pipe, p.rd_proc_pipe);
     }
+}
+
+void
+child_info_spawn::reattach_children ()
+{
+  moreinfo->reattach_children (parent);
 }
 
 void

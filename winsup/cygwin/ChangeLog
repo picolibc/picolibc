@@ -1,3 +1,27 @@
+2011-11-15  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
+	(cygheap_exec_info::nchildren): Move from child_info_spawn.
+	(cygheap_exec_info::cchildren): Ditto.
+	(cygheap_exec_info::record_children): Declare new function.
+	(cygheap_exec_info::reattach_children): Ditto.
+	(cygheap_exec_info::alloc): Ditto.
+	(child_info_spawn::nchildren): Move to cygheap_exec_info.
+	(child_info_spawn::cchildren): Ditto.
+	* sigproc.cc (cygheap_exec_info::alloc): Define new function.
+	(child_info_spawn::cleanup): Accommodate move of children info to
+	cygheap_exec_info.
+	(cygheap_exec_info::record_children): Define new function.
+	(cygheap_exec_info::reattach_children): Ditto.
+	(child_info_spawn::record_children): Use
+	cygheap_exec_info function to accomplish this task.
+	(child_info_spawn::reattach_children): Ditto.
+	* spawn.cc (child_info_spawn::worker): Allocate moreinfo using
+	cygheap_exec_info::alloc.
+
+	* dcrt0.cc (child_info_fork::alloc_stack_hard_way): Use abort for the
+	error to avoid a retry.
+
 2011-11-14  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* pinfo.cc (_pinfo::dup_proc_pipe): Fatalize a warning when debugging.

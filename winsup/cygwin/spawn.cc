@@ -354,8 +354,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   else
     chtype = _CH_EXEC;
 
-  moreinfo = (cygheap_exec_info *) ccalloc_abort (HEAP_1_EXEC, 1,
-						  sizeof (cygheap_exec_info));
+  moreinfo = cygheap_exec_info::alloc ();
 
   /* CreateProcess takes one long string that is the command line (sigh).
      We need to quote any argument that has whitespace or embedded "'s.  */
