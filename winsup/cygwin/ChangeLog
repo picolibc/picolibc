@@ -1,3 +1,8 @@
+2011-11-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared.cc (shared_info::create): Open global shared data section
+	non-inheritable to avoid accumulating stray handles in child processes.
+
 2011-11-15  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.

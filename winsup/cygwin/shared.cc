@@ -398,7 +398,8 @@ shared_info::create ()
 					       CYGWIN_VERSION_SHARED_DATA,
 					       cygwin_shared_h,
 					       sizeof (*cygwin_shared),
-					       SH_CYGWIN_SHARED);
+					       SH_CYGWIN_SHARED,
+					       &sec_all_nih);
   cygwin_shared->initialize ();
 }
 
