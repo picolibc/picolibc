@@ -706,17 +706,23 @@ Cygwin supports the following character devices commonly found on POSIX systems:
 /dev/zero
 /dev/full
 
-/dev/console	Pseudo device name for the standard console window created
-		by Windows.  Same as the one used for cmd.exe.  Every one
-		of them has this name.  It's not quite comparable with the
-		console device on UNIX machines.
+/dev/console	Pseudo device name for the current console window of a session.
+		Up to Cygwin 1.7.9, this was the only name for a console.
+		Different consoles were indistinguishable.
+		Cygwin's /dev/console is not quite comparable with the console
+		device on UNIX machines.
 
-/dev/tty	The current tty of a session running in a pseudo tty.
+/dev/cons0      Starting with Cygwin 1.7.10, Console sessions are numbered from 
+/dev/cons1	/dev/cons0 upwards.  Console device names are pseudo device
+...		names, only accessible from processes within this very console
+		session.  This is due to a restriction in Windows.
+
+/dev/tty	The current controlling tty of a session.
+
 /dev/ptmx	Pseudo tty master device.
-/dev/ttym
 
-/dev/tty0	Pseudo ttys are numbered from /dev/tty0 upwards as they are
-/dev/tty1	requested.
+/dev/pty0	Pseudo ttys are numbered from /dev/pty0 upwards as they are
+/dev/pty1	requested.
 ...
 
 /dev/ttyS0	Serial communication devices.  ttyS0 == Win32 COM1,

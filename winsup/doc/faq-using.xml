@@ -113,10 +113,10 @@ information.  For example (on my installation):
 <screen>
 	bash$ cygpath --windows ~/.bashrc
         D:\starksb\.bashrc
-        bash$ cygpath --unix C:/cygwin/bin/cygwin.bat
-        /usr/bin/cygwin.bat
-        bash$ cygpath --unix C:\\cygwin\\bin\\cygwin.bat
-        /usr/bin/cygwin.bat
+        bash$ cygpath --unix C:/cygwin/bin/ls.exe
+        /usr/bin/ls.exe
+        bash$ cygpath --unix C:\\cygwin\\bin\\ls.exe
+        /usr/bin/ls.exe
 </screen>
 Note that bash interprets the backslash '\' as an escape character, so
 you must type it twice in the bash shell if you want it to be recognized
@@ -785,9 +785,7 @@ need in order to run GNU emacs in a terminal window.  If you also want
 to be able to use the X11
 (<ulink url="http://cygwin.com/xfree/">http://cygwin.com/xfree/</ulink>)
 GUI, install the emacs-X11 package.  In either case, you run emacs by
-typing 'emacs' or '/usr/bin/emacs'.  If you run emacs in the cygwin
-console, be sure that your CYGWIN environment variable contains tty.
-See /usr/share/doc/Cygwin/emacs.README for further information.
+typing 'emacs' or '/usr/bin/emacs'.
 </para>
 </answer></qandaentry>
 

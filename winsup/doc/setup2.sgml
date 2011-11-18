@@ -3,31 +3,23 @@
 <sect2 id="setup-env-ov"><title>Overview</title>
 
 <para>
-You may wish to specify settings of several important environment
-variables that affect Cygwin's operation.  Some of these settings need
-to be in effect prior to launching the initial Cygwin session (before
-starting your bash shell, for instance).  They should therefore be set
-in the Windows environment; all Windows environment variables are
-imported when Cygwin starts.  Such settings can be
-placed in a .bat file.  An initial file is named Cygwin.bat and is created
-in the Cygwin root directory that you specified during setup.  Note that
-the "Cygwin" option of the Start Menu points to Cygwin.bat.  Edit
-Cygwin.bat to your liking or create your own .bat files to start
-Cygwin processes.</para>
+All Windows environment variables are imported when Cygwin starts.
+Apart from that, you may wish to specify settings of several important
+environment variables that affect Cygwin's operation.</para>
 
 <para>
-The <envar>CYGWIN</envar> variable is used to configure many global
-settings for the Cygwin runtime system.  Initially you can leave
-<envar>CYGWIN</envar> unset or set it to a value indicating several
-global Cygwin settings, using a syntax like this in the DOS shell,
-before launching bash:</para>
+The <envar>CYGWIN</envar> variable is used to configure a few global
+settings for the Cygwin runtime system.  Typically you can leave
+<envar>CYGWIN</envar> unset, but if you want to set one ore more
+options, you can set it using a syntax like this, depending on the shell
+in which you're setting it.  Here is an example in CMD syntax:</para>
 
 <screen>
-<prompt>C:\&gt;</prompt> <userinput>set CYGWIN=notitle glob</userinput>
+<prompt>C:\&gt;</prompt> <userinput>set CYGWIN=error_start:C:\cygwin\bin\gdb.exe glob</userinput>
 </screen>
 
 <para>
-This is, of course, just an example.  For all possible settings of the
+This is, of course, just an example.  For the recognized settings of the
 <envar>CYGWIN</envar> environment variable, see
 <xref linkend="using-cygwinenv"></xref>.
 </para>
@@ -395,9 +387,10 @@ You don't want to use the default character set?  In that case you have to
 specify the charset explicitly.  For instance, assume you're from Japan and
 don't want to use the japanese default charset EUC-JP, but the Windows
 default charset SJIS.  What you can do, for instance, is to set the
-<envar>LANG</envar> variable in the <filename>C:\cygwin\Cygwin.bat</filename>
-file which is the batch file to start a Cygwin session from the "Cygwin"
-desktop shortcut.</para>
+<envar>LANG</envar> variable in the <command>mintty</command> Cygwin Terminal
+in the "Text" section of its "Options" dialog.  If you're starting your
+Cygwin session via a batch file or a shortcut to a batch file, you can also
+just set LANG there:</para>
 
 <screen>
   @echo off
@@ -443,19 +436,19 @@ every Unicode character.</emphasis></para>
 
 <sect2 id="setup-locale-console"><title>The Windows Console character set</title>
 
-<para>Most of the time the Windows console is used to run Cygwin applications.
-While terminal emulations like <command>xterm</command> or
-<command>mintty</command> have a distinct way to set the character set
+<para>Sometimes the Windows console is used to run Cygwin applications.
+While terminal emulations like the Cygwin Terminal <command>mintty</command>
+or <command>xterm</command> have a distinct way to set the character set
 used for in- and output, the Windows console hasn't such a way, since it's
 not an application in its own right.</para>
 
 <para>This problem is solved in Cygwin as follows.  When a Cygwin
 process is started in a Windows console (either explicitly from cmd.exe,
-or implicitly by, for instance, clicking on the Cygwin desktop icon, or
-running the Cygwin.bat file), the Console character set is determined by the
-setting of the aforementioned internationalization environment variables,
-the same way as described in <xref linkend="setup-locale-how"></xref>.
-</para>
+or implicitly by, for instance, running the
+<filename>C:\cygwin\Cygwin.bat</filename> batch file), the Console character
+set is determined by the setting of the aforementioned
+internationalization environment variables, the same way as described in
+<xref linkend="setup-locale-how"></xref>.  </para>
 
 <para>What is that good for?  Why not switch the console character set with
 the applications requirements?  After all, the application knows if it uses
@@ -473,10 +466,10 @@ problem.</para>
 <sect2 id="setup-locale-problems"><title>Potential Problems when using Locales</title>
 
 <para>
-You can set the above internationalization variables not only in
-<filename>Cygwin.bat</filename> or in the Windows environment, but also
-in your Cygwin shell on the fly, even switch to yet another character
-set, and yet another.  In bash for instance:</para>
+You can set the above internationalization variables not only when
+starting the first Cygwin process, but also in your Cygwin shell on the
+fly, even switch to yet another character set, and yet another.  In bash
+for instance:</para>
 
 <screen>
   <prompt>bash$</prompt> export LC_CTYPE="nl_BE.UTF-8"

@@ -1,3 +1,17 @@
+2011-11-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-using.xml (faq.using.converting-paths): Remove reference to
+	cygwin.bat.
+	(faq.using.emacs): Drop "CYGWIN=tty" setting.
+	* pathnames.sgml (pathnames-posixdevices): Align list of device names
+	with changes in 1.7.10.
+	* setup2.sgml (setup-env-ov): Drop text which assumes that Cygwin
+	processes are started in console window.  Align wording to lessened
+	relevance of $CYGWIN.  Don't use dropped CYGWIN setting in example.
+	(setup-locale-how): Put using console and Cygwin.bat file into
+	perspective.
+	(setup-locale-problems): Ditto.
+
 2011-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.10): Document ptsname_r.
