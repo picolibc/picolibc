@@ -127,15 +127,16 @@ init_installation_root ()
 /* This function returns a handle to the top-level directory in the global
    NT namespace used to implement global objects including shared memory. */
 
+static HANDLE NO_COPY shared_parent_dir;
+
 HANDLE
 get_shared_parent_dir ()
 {
-  static HANDLE dir;
   UNICODE_STRING uname;
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
 
-  if (!dir)
+  if (!shared_parent_dir)
     {
       WCHAR bnoname[MAX_PATH];
       __small_swprintf (bnoname, L"\\BaseNamedObjects\\%s%s-%S",
@@ -143,31 +144,33 @@ get_shared_parent_dir ()
 			_cygwin_testing ? cygwin_version.dll_build_date : "",
 			&installation_key);
       RtlInitUnicodeString (&uname, bnoname);
-      InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
-				  NULL, everyone_sd (CYG_SHARED_DIR_ACCESS));
-      status = NtCreateDirectoryObject (&dir, CYG_SHARED_DIR_ACCESS, &attr);
+      InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF, NULL,
+				  everyone_sd (CYG_SHARED_DIR_ACCESS));
+      status = NtCreateDirectoryObject (&shared_parent_dir,
+					CYG_SHARED_DIR_ACCESS, &attr);
       if (!NT_SUCCESS (status))
 	api_fatal ("NtCreateDirectoryObject(%S): %p", &uname, status);
     }
-  return dir;
+  return shared_parent_dir;
 }
+
+static HANDLE NO_COPY session_parent_dir;
 
 HANDLE
 get_session_parent_dir ()
 {
-  static HANDLE dir;
   UNICODE_STRING uname;
   OBJECT_ATTRIBUTES attr;
   NTSTATUS status;
 
-  if (!dir)
+  if (!session_parent_dir)
     {
       PROCESS_SESSION_INFORMATION psi;
       status = NtQueryInformationProcess (NtCurrentProcess (),
 					  ProcessSessionInformation,
 					  &psi, sizeof psi, NULL);
       if (!NT_SUCCESS (status) || psi.SessionId == 0)
-	dir = get_shared_parent_dir ();
+	session_parent_dir = get_shared_parent_dir ();
       else
 	{
 	  WCHAR bnoname[MAX_PATH];
@@ -177,14 +180,15 @@ get_session_parent_dir ()
 			    _cygwin_testing ? cygwin_version.dll_build_date : "",
 			    &installation_key);
 	  RtlInitUnicodeString (&uname, bnoname);
-	  InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
-				      NULL, everyone_sd(CYG_SHARED_DIR_ACCESS));
-	  status = NtCreateDirectoryObject (&dir, CYG_SHARED_DIR_ACCESS, &attr);
+	  InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF, NULL,
+				      everyone_sd(CYG_SHARED_DIR_ACCESS));
+	  status = NtCreateDirectoryObject (&session_parent_dir,
+					    CYG_SHARED_DIR_ACCESS, &attr);
 	  if (!NT_SUCCESS (status))
 	    api_fatal ("NtCreateDirectoryObject(%S): %p", &uname, status);
 	}
     }
-  return dir;
+  return session_parent_dir;
 }
 
 char * __stdcall

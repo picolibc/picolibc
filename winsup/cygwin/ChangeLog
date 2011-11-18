@@ -1,3 +1,10 @@
+2011-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shared.cc (get_shared_parent_dir): Use global shared_parent_dir
+	instead of local dir variable and create handle not inheritable to
+	avoid accumulating stray handles in child processes.
+	(get_session_parent_dir): Ditto with session_parent_dir variable.
+
 2011-11-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared.cc (shared_info::create): Open global shared data section
