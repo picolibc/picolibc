@@ -1106,7 +1106,7 @@ remove_proc (int ci)
 	 moving it or it may become confused.  The chances are very high that
 	 the proc_waiter thread has already done this by the time we
 	 get here.  */
-      if (!have_execed)
+      if (!have_execed && !exit_state)
 	while (!procs[nprocs].waiter_ready)
 	  yield ();
       procs[ci] = procs[nprocs];

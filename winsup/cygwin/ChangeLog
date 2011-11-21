@@ -1,5 +1,10 @@
 2011-11-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* sigproc.cc (remove_proc): Don't do busy loop when exiting since it
+	doesn't matter.
+
+2011-11-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sigproc.cc (remove_proc): Don't do busy loop when execing since
 	thread could have been terminated prior to setting flag.
 
