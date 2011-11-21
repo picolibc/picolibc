@@ -608,6 +608,8 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
       __seterrno ();
       res = -1;
     }
+
+  _my_tls.event = NULL;
   CloseHandle (h);
   sigproc_printf ("returning signal %d", res);
   return res;

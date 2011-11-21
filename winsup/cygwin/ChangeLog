@@ -1,3 +1,11 @@
+2011-11-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* sigproc.cc (remove_proc): Don't do busy loop when execing since
+	thread could have been terminated prior to setting flag.
+
+	* signal.cc (sigwaitinfo): Zero event before closing to signal other
+	threads that it is no longer available.
+
 2011-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared.cc (get_shared_parent_dir): Use global shared_parent_dir
