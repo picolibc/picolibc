@@ -370,18 +370,17 @@ need to set the LC_ALL, LC_CTYPE or LANG environment variables.</para>
 <question><para>My application prints international characters but I only
 see gray boxes</para></question>
 <answer>
-<para>Very likely you didn't set your console character set to the preferred
-character set before the first Cygwin application was started in the
-console.  To make sure the console is using the desired character set,
-make sure that one of the internationalization environment variables
-LC_ALL, LC_CTYPE, or LANG is set before the first Cygwin process starts.
-You can do that, for instance, by setting the variable in your
-<literal>Cygwin.bat</literal> file from which you start your Cygwin shell.
-</para>
-
-<para>
-For a more detailed explanation see the section
-<ulink url="http://cygwin.com/cygwin-ug-net/setup-locale.html#setup-locale-console">The Windows Console character set</ulink> in the Cygwin User's Guide.</para>
+<para>In the case of Cygwin programs, this likely means that the
+character set as determined by the LC_ALL, LC_CTYPE or LANG environment
+variables does not match the one set on the Text page of the Cygwin Terminal's
+options.  Setting the locale in the terminal's options will set the LANG
+variable accordingly.</para>
+<para>Non-Cygwin programs in the Cygwin Terminal do not usually take
+heed of the locale environment variables.  Instead, they often use the
+so-called console codepage, which can be determined with the command
+<command>cmd /c chcp</command> followed by the appropriate Windows
+codepage number.  The codepage number for Cygwin's default UTF-8 character
+set is 65001.</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.multiple-copies">

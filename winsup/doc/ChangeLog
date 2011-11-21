@@ -1,3 +1,7 @@
+2011-11-21  Andy Koppe  <andy.koppe@gmail.com>
+
+	* faq-using.xml (faq.using.weirdchars): Rewrite.
+
 2011-11-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-using.xml (faq.using.converting-paths): Remove reference to
