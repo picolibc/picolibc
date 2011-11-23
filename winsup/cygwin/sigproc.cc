@@ -464,12 +464,14 @@ void __stdcall
 sigproc_init ()
 {
   char char_sa_buf[1024];
-  PSECURITY_ATTRIBUTES sa_buf = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
-  for (int i = 5;
-       i > 0 && !CreatePipe (&my_readsig, &my_sendsig, sa_buf, 0);
-       i--)
-    if (i == 1)
+  PSECURITY_ATTRIBUTES sa = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
+  DWORD err = fhandler_pipe::create (sa, &my_readsig, &my_sendsig,
+				     sizeof (sigpacket), NULL, 0);
+  if (err)
+    {
+      SetLastError (err);
       api_fatal ("couldn't create signal pipe, %E");
+    }
   ProtectHandle (my_readsig);
   myself->sendsig = my_sendsig;
   /* sync_proc_subproc is used by proc_subproc.  It serializes

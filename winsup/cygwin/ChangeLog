@@ -1,3 +1,22 @@
+2011-11-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.h (fhandler_pipe::create): Rename from the misnamed
+	"create_selectable".  Change return to DWORD.
+	(fhandler_pty_common::pipesize): New constant.
+	* fhandler_fifo.cc (fhandler_fifo::fhandler_fifo): Reflect
+	create_selectable name change.
+	* miscfuncs.cc (CreatePipeOverlapped): Ditto.
+	* pipe.cc (fhandler_pipe::create): Ditto.
+	(fhandler_pipe::create): Rename from the misnamed "create_selectable".
+	Return DWORD.  Only set pipe size to default when it is passed in as
+	zero.
+	* fhandler_tty.cc (fhandler_pty_master::setup): Ditto.  Use
+	fhandler_pty_common::pipesize rather than a raw constant.
+	* tty.cc (tty::not_allocated): Ditto.
+
+	* sigproc.cc (sigproc_init): Use create_selectable to create the signal
+	pipe to get a more appropriate message based pipe.
+
 2011-11-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* sigproc.cc (remove_proc): Don't do busy loop when exiting since it

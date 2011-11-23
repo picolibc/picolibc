@@ -196,9 +196,9 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
    which is used to implement select and nonblocking writes.
    Note that the return value is either 0 or GetLastError,
    unlike CreatePipe, which returns a bool for success or failure.  */
-int
-fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE *r,
-				  HANDLE *w, DWORD psize, const char *name, DWORD open_mode)
+DWORD
+fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
+		       DWORD psize, const char *name, DWORD open_mode)
 {
   /* Default to error. */
   if (r)
@@ -207,7 +207,7 @@ fhandler_pipe::create_selectable (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE *r,
     *w = NULL;
 
   /* Ensure that there is enough pipe buffer space for atomic writes.  */
-  if (psize < DEFAULT_PIPEBUFSIZE)
+  if (!psize)
     psize = DEFAULT_PIPEBUFSIZE;
 
   char pipename[MAX_PATH];
@@ -327,7 +327,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
   SECURITY_ATTRIBUTES *sa = sec_none_cloexec (mode);
   int res = -1;
 
-  int ret = create_selectable (sa, &r, &w, psize, NULL, FILE_FLAG_OVERLAPPED);
+  int ret = create (sa, &r, &w, psize, NULL, FILE_FLAG_OVERLAPPED);
   if (ret)
     __seterrno_from_win_error (ret);
   else if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)

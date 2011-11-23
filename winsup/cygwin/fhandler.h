@@ -690,8 +690,8 @@ public:
   int __stdcall ftruncate (_off64_t, bool) __attribute__ ((regparm (3)));
   int init (HANDLE, DWORD, mode_t);
   static int create (fhandler_pipe *[2], unsigned, int);
-  static int create_selectable (LPSECURITY_ATTRIBUTES, HANDLE *, HANDLE *, DWORD,
-				const char *, DWORD);
+  static DWORD create (LPSECURITY_ATTRIBUTES, HANDLE *, HANDLE *, DWORD,
+		       const char *, DWORD);
   fhandler_pipe (void *) {}
 
   void copyto (fhandler_base *x)
@@ -1370,6 +1370,7 @@ class fhandler_pty_common: public fhandler_termios
   {
     pc.file_attributes (FILE_ATTRIBUTE_NORMAL);
   }
+  static const unsigned pipesize = 128 * 1024;
   HANDLE output_mutex, input_mutex;
   HANDLE input_available_event;
 

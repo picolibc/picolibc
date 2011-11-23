@@ -34,7 +34,7 @@ fhandler_fifo::fhandler_fifo ():
 #define fnevent(w) fifo_name (npbuf, w "-event")
 #define fnpipe() fifo_name (npbuf, "fifo")
 #define create_pipe(r, w) \
-  fhandler_pipe::create_selectable (sa_buf, (r), (w), 0, fnpipe (), open_mode)
+  fhandler_pipe::create (sa_buf, (r), (w), 0, fnpipe (), open_mode)
 
 char *
 fhandler_fifo::fifo_name (char *buf, const char *what)

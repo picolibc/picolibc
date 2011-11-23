@@ -337,8 +337,8 @@ nice_to_winprio (int &nice)
 BOOL WINAPI
 CreatePipeOverlapped (PHANDLE hr, PHANDLE hw, LPSECURITY_ATTRIBUTES sa)
 {
-  int ret = fhandler_pipe::create_selectable (sa, hr, hw, 0, NULL,
-					      FILE_FLAG_OVERLAPPED);
+  int ret = fhandler_pipe::create (sa, hr, hw, 0, NULL,
+				   FILE_FLAG_OVERLAPPED);
   if (ret)
     SetLastError (ret);
   return ret == 0;

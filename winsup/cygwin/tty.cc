@@ -158,9 +158,10 @@ tty::not_allocated (HANDLE& r, HANDLE& w)
      then it exists although we may not have privileges to actually use it. */
   char pipename[sizeof("ptyNNNN-from-master")];
   __small_sprintf (pipename, "pty%d-from-master", get_unit ());
-  /* fhandler_pipe::create_selectable returns 0 when creation succeeds */
-  return fhandler_pipe::create_selectable (&sec_none, &r, &w, 128 * 1024,
-					   pipename, 0) == 0;
+  /* fhandler_pipe::create returns 0 when creation succeeds */
+  return fhandler_pipe::create (&sec_none, &r, &w,
+				fhandler_pty_common::pipesize, pipename,
+				0) == 0;
 }
 
 bool
