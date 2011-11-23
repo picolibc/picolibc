@@ -264,14 +264,14 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 	  /* The pipe is already open with compatible parameters.
 	     Pick a new name and retry.  */
 	  debug_printf ("pipe busy", !name ? ", retrying" : "");
-	  if (!*name)
+	  if (!name)
 	    *r = NULL;
 	  break;
 	case ERROR_ACCESS_DENIED:
 	  /* The pipe is already open with incompatible parameters.
 	     Pick a new name and retry.  */
 	  debug_printf ("pipe access denied%s", !name ? ", retrying" : "");
-	  if (!*name)
+	  if (!name)
 	    *r = NULL;
 	  break;
 	default:

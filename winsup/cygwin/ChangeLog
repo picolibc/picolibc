@@ -1,5 +1,19 @@
 2011-11-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* pipe.cc (fhandler_pipe::create): Avoid derefencing a NULL pointer.
+
+	* child_info.h (child_info): Reorganize some elements so that the ones
+	which are initialized in a constructor are all together.
+	* sigproc.cc (child_info::child_info): Initialize values via the
+	constructor rather than as C statements and make sure that flags is set
+	to zero initially.
+
+	* spawn.cc (child_info_spawn::worker): Use iscygwin() test for
+	determining when to send strace info since it is more foolproof than
+	checking the suspend state.
+
+2011-11-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* fhandler.h (fhandler_pipe::create): Rename from the misnamed
 	"create_selectable".  Change return to DWORD.
 	(fhandler_pty_common::pipesize): New constant.

@@ -57,15 +57,15 @@ public:
   DWORD intro;		// improbable string
   unsigned long magic;	// magic number unique to child_info
   unsigned short type;	// type of record, exec, spawn, fork
+  init_cygheap *cygheap;
+  void *cygheap_max;
+  unsigned char flag;
+  int retry;		// number of times we've tried to start child process
   HANDLE subproc_ready;	// used for synchronization with parent
   HANDLE user_h;
   HANDLE parent;
-  init_cygheap *cygheap;
-  void *cygheap_max;
   DWORD cygheap_reserve_sz;
-  unsigned char flag;
   unsigned fhandler_union_cb;
-  int retry;		// number of times we've tried to start child process
   DWORD exit_code;	// process exit code
   static int retry_count;// retry count;
   child_info (unsigned, child_info_types, bool);

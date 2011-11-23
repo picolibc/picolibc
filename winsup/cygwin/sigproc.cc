@@ -761,10 +761,11 @@ int child_info::retry_count = 10;
 /* Initialize some of the memory block passed to child processes
    by fork/spawn/exec. */
 child_info::child_info (unsigned in_cb, child_info_types chtype,
-			bool need_subproc_ready)
+			bool need_subproc_ready):
+  cb (in_cb), intro (PROC_MAGIC_GENERIC), magic (CHILD_INFO_MAGIC),
+  type (chtype), cygheap (::cygheap), cygheap_max (::cygheap_max),
+  flag (0), retry (child_info::retry_count)
 {
-  cb = in_cb;
-
   /* It appears that when running under WOW64 on Vista 64, the first DWORD
      value in the datastructure lpReserved2 is pointing to (msv_count in
      Cygwin), has to reflect the size of that datastructure as used in the
@@ -790,9 +791,6 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
      datastructure. */
   msv_count = wincap.needs_count_in_si_lpres2 () ? in_cb / 5 : 0;
 
-  intro = PROC_MAGIC_GENERIC;
-  magic = CHILD_INFO_MAGIC;
-  type = chtype;
   fhandler_union_cb = sizeof (fhandler_union);
   user_h = cygwin_user_h;
   if (strace.attached ())
@@ -803,9 +801,6 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
       flag |= _CI_ISCYGWIN;
     }
   sigproc_printf ("subproc_ready %p", subproc_ready);
-  cygheap = ::cygheap;
-  cygheap_max = ::cygheap_max;
-  retry = child_info::retry_count;
   /* Create an inheritable handle to pass to the child process.  This will
      allow the child to duplicate handles from the parent to itself. */
   parent = NULL;

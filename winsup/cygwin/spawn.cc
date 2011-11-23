@@ -692,7 +692,7 @@ loop:
       goto out;
     }
 
-  if (!(c_flags & CREATE_SUSPENDED))
+  if (iscygwin ())
     strace.write_childpid (*this, pi.dwProcessId);
 
   /* Fixup the parent data structures if needed and resume the child's
