@@ -314,8 +314,8 @@ attach_process (pid_t pid)
           /* Try to turn off DEBUG_ONLY_THIS_PROCESS so we can follow forks */
           /* This is only supported on XP and later */
           ULONG DebugFlags = DEBUG_PROCESS_DETACH_ON_EXIT;
-          NTSTATUS status = NtSetInformationProcess(h, ProcessDebugFlags, &DebugFlags, sizeof(DebugFlags));
-          if (status)
+          NTSTATUS status = NtSetInformationProcess (h, ProcessDebugFlags, &DebugFlags, sizeof (DebugFlags));
+          if (!NT_SUCCESS (status))
             warn (0, "Could not clear DEBUG_ONLY_THIS_PROCESS (%x), will not trace child processes", status);
 
           CloseHandle(h);
@@ -486,12 +486,16 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 
   if (special == _STRACE_CHILD_PID)
     {
+      DebugActiveProcess (n);
       return;
     }
 
   if (special == _STRACE_INTERFACE_ACTIVATE_ADDR)
     {
-      if (!WriteProcessMemory (hchild, (LPVOID) n, &strace_active,
+      s = strtok (NULL, " ");
+      if (*s && *s == '1' && !forkdebug)
+	/* don't activate since we are not following forks */;
+      else if (!WriteProcessMemory (hchild, (LPVOID) n, &strace_active,
 			       sizeof (strace_active), &nbytes))
 	error (0, "couldn't write strace flag to subprocess at %p, "
 	       "windows error %d", n, GetLastError ());

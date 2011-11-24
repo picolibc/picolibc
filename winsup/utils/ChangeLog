@@ -1,3 +1,12 @@
+2011-11-24  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* strace.cc (attach_process): Use NT_SUCCESS to figure out if
+	NtSetInformationProcess succeeded.
+	(handle_output_debug_string): Put back DebugActiveProcess since it
+	seems to still be needed (on my system at least).  Detect new format
+	_STRACE_INTERFACE_ACTIVATE_ADDR which informs whether this is a forked
+	process or not.  Use that to decide if forkdebug should be handled.
+
 2011-11-14  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* strace.cc (handle_output_debug_string): Disable code which attempted
