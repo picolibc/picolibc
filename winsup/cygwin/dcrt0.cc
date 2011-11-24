@@ -545,9 +545,10 @@ get_cygwin_startup_info ()
 	      multiple_cygwin_problem ("fhandler size", res->fhandler_union_cb, sizeof (fhandler_union));
 	    if (res->isstraced ())
 	      {
-		for (unsigned i = 0; !being_debugged () && i < 10000; i++)
+		res->ready (false);
+		for (unsigned i = 0; !being_debugged () && i < 1000000; i++)
 		  yield ();
-		strace.hello ();
+		strace.activate (res->type == _CH_FORK);
 	      }
 	    break;
 	  default:

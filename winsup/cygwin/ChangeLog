@@ -1,5 +1,22 @@
 2011-11-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset for previous changes.
+
+	* dcrt0.cc (get_cygwin_startup_info): Signal readiness when stracing
+	since strace::write_child relies on it.  Use strace.activate to notify
+	strace process, passing in arg indicating whether we're forked.
+	* sigproc.cc (wait_sig): Accommodate new strace::activate argument.
+	* spawn.cc (child_info_spawn::worker): Oops.  Previous suspended test
+	was actually correct.  Revert and document.
+	* strace.cc (strace::activate): Send additional flag indicating whether
+	this is an attempt to activate a forked process.
+	(strace::hello): Report on windows pid.
+	* include/sys/strace.h (strace::strace): Make a dummy.
+	(strace::activate): Modify declaration to accept an argument.
+	(strace::write_childpid): Set regparm.
+
+2011-11-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* pipe.cc (fhandler_pipe::create): Avoid derefencing a NULL pointer.
 
 	* child_info.h (child_info): Reorganize some elements so that the ones

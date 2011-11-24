@@ -39,8 +39,8 @@ class strace
   void write (unsigned category, const char *buf, int count);
   unsigned char _active;
 public:
-  void activate ();
-  strace () {activate ();}
+  void activate (bool) __attribute__ ((regparm (2)));;
+  strace () {}
   int microseconds ();
   int version;
   int lmicrosec;
@@ -50,7 +50,7 @@ public:
   void prntf (unsigned, const char *func, const char *, ...) /*__attribute__ ((regparm(3)))*/;
   void vprntf (unsigned, const char *func, const char *, va_list ap) /*__attribute__ ((regparm(3)))*/;
   void wm (int message, int word, int lon) __attribute__ ((regparm(3)));
-  void write_childpid (child_info&, unsigned long) __attribute__ ((regparm (2)));
+  void write_childpid (child_info&, unsigned long) __attribute__ ((regparm (3)));
   bool attached () const {return _active == 3;}
   bool active () const {return _active & 1;}
   unsigned char& active_val () {return _active;}

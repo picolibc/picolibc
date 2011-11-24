@@ -1295,7 +1295,7 @@ wait_sig (VOID *)
 	  talktome (&pack.si);
 	  break;
 	case __SIGSTRACE:
-	  strace.activate ();
+	  strace.activate (false);
 	  strace.hello ();
 	  break;
 	case __SIGPENDING:

@@ -32,12 +32,12 @@ class strace NO_COPY strace;
 #ifndef NOSTRACE
 
 void
-strace::activate ()
+strace::activate (bool isfork)
 {
   if (!dynamically_loaded && !_active && being_debugged ())
     {
       char buf[30];
-      __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR, &_active);
+      __small_sprintf (buf, "cYg%8x %x %d", _STRACE_INTERFACE_ACTIVATE_ADDR, &_active, isfork);
       OutputDebugString (buf);
     }
 }
@@ -47,9 +47,10 @@ strace::hello ()
 {
   if (active ())
     {
-      char pidbuf[40];
+      char pidbuf[80];
       if (myself->progname[0])
-	__small_sprintf (pidbuf, "(pid %d, ppid %d)", myself->pid, myself->ppid ?: 1);
+	__small_sprintf (pidbuf, "(pid %d, ppid %d, windows pid %u)", myself->pid,
+			 myself->ppid ?: 1, GetCurrentProcessId ());
       else
 	{
 	  GetModuleFileNameW (NULL, myself->progname, sizeof (myself->progname));
