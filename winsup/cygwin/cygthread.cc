@@ -258,12 +258,15 @@ cygthread::name (DWORD tid)
 	break;
       }
 
-  if (!res)
+  if (res)
+    /* ok */;
+  else if (!_main_tls)
+    res = "main";
+  else
     {
       __small_sprintf (_my_tls.locals.unknown_thread_name, "unknown (%p)", tid);
       res = _my_tls.locals.unknown_thread_name;
     }
-
   return res;
 }
 

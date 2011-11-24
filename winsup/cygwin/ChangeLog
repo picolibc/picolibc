@@ -1,6 +1,6 @@
 2011-11-24  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
-	* cygthread.h (cygthread::name): Default name to "main" if we are early
+	* cygthread.cc (cygthread::name): Default name to "main" if we are early
 	in the process of setting up the DLL and no name is known.
 	* dcrt0.cc (initial_env): Remove CYGWIN_SLEEP stuff.
 	(get_cygwin_startup_info): Activate strace here as appropriate.
