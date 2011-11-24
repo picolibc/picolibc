@@ -693,8 +693,8 @@ loop:
     }
 
   /* The CREATE_SUSPENDED case is handled below */
-  if (!(c_flags & CREATE_SUSPENDED))
-    strace.write_childpid (*this, pi.dwProcessId);
+  if (iscygwin () && !(c_flags & CREATE_SUSPENDED))
+    strace.write_childpid (pi.dwProcessId);
 
   /* Fixup the parent data structures if needed and resume the child's
      main thread. */
@@ -787,7 +787,8 @@ loop:
   if (c_flags & CREATE_SUSPENDED)
     {
       ResumeThread (pi.hThread);
-      strace.write_childpid (*this, pi.dwProcessId);
+      if (iscygwin ())
+	strace.write_childpid (pi.dwProcessId);
     }
   ForceCloseHandle (pi.hThread);
 

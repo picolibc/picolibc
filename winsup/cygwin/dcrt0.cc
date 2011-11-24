@@ -474,17 +474,8 @@ initial_env ()
     _cygwin_testing = 1;
 
 #ifdef DEBUGGING
-  char buf[NT_MAX_PATH];
   DWORD len;
-
-  if (GetEnvironmentVariableA ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
-    {
-      DWORD ms = atoi (buf);
-      console_printf ("Sleeping %d, pid %u %P\n", ms, GetCurrentProcessId ());
-      Sleep (ms);
-      if (!strace.active () && !dynamically_loaded)
-	strace.hello ();
-    }
+  char buf[NT_MAX_PATH];
   if (GetEnvironmentVariableA ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
     {
       char buf1[NT_MAX_PATH];
@@ -506,7 +497,6 @@ initial_env ()
 	}
     }
 #endif
-
 }
 
 child_info *
@@ -519,7 +509,10 @@ get_cygwin_startup_info ()
 
   if (si.cbReserved2 < EXEC_MAGIC_SIZE || !res
       || res->intro != PROC_MAGIC_GENERIC || res->magic != CHILD_INFO_MAGIC)
-    res = NULL;
+    {
+      strace.activate (false);
+      res = NULL;
+    }
   else
     {
       if ((res->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
@@ -545,8 +538,7 @@ get_cygwin_startup_info ()
 	      multiple_cygwin_problem ("fhandler size", res->fhandler_union_cb, sizeof (fhandler_union));
 	    if (res->isstraced ())
 	      {
-		res->ready (false);
-		for (unsigned i = 0; !being_debugged () && i < 1000000; i++)
+		while (!being_debugged ())
 		  yield ();
 		strace.activate (res->type == _CH_FORK);
 	      }
@@ -657,6 +649,7 @@ init_windows_system_directory ()
 void
 dll_crt0_0 ()
 {
+  child_proc_info = get_cygwin_startup_info ();
   init_windows_system_directory ();
   init_global_security ();
   initial_env ();
@@ -683,7 +676,6 @@ dll_crt0_0 ()
   do_global_ctors (&__CTOR_LIST__, 1);
   cygthread::init ();
 
-  child_proc_info = get_cygwin_startup_info ();
   if (!child_proc_info)
     memory_init (true);
   else

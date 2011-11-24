@@ -793,7 +793,7 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
 
   fhandler_union_cb = sizeof (fhandler_union);
   user_h = cygwin_user_h;
-  if (strace.attached ())
+  if (strace.active ())
     flag |= _CI_STRACED;
   if (need_subproc_ready)
     {
@@ -1296,7 +1296,6 @@ wait_sig (VOID *)
 	  break;
 	case __SIGSTRACE:
 	  strace.activate (false);
-	  strace.hello ();
 	  break;
 	case __SIGPENDING:
 	  *pack.mask = 0;

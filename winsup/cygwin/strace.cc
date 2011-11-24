@@ -39,29 +39,30 @@ strace::activate (bool isfork)
       char buf[30];
       __small_sprintf (buf, "cYg%8x %x %d", _STRACE_INTERFACE_ACTIVATE_ADDR, &_active, isfork);
       OutputDebugString (buf);
-    }
-}
-
-void
-strace::hello ()
-{
-  if (active ())
-    {
-      char pidbuf[80];
-      if (myself->progname[0])
-	__small_sprintf (pidbuf, "(pid %d, ppid %d, windows pid %u)", myself->pid,
-			 myself->ppid ?: 1, GetCurrentProcessId ());
-      else
+      if (_active)
 	{
-	  GetModuleFileNameW (NULL, myself->progname, sizeof (myself->progname));
-	  __small_sprintf (pidbuf, "(windows pid %d)", GetCurrentProcessId ());
+	  char pidbuf[80];
+	  WCHAR progname_buf[NT_MAX_PATH - 512];
+	  WCHAR *progname;
+	  if (myself)
+	    {
+	      __small_sprintf (pidbuf, "(pid %d, ppid %d, windows pid %u)", myself->pid,
+			       myself->ppid ?: 1, GetCurrentProcessId ());
+	      progname = myself->progname;
+	    }
+	  else
+	    {
+	      GetModuleFileNameW (NULL, progname_buf, sizeof (myself->progname));
+	      __small_sprintf (pidbuf, "(windows pid %u)", GetCurrentProcessId ());
+	      progname = progname_buf;
+	    }
+	  prntf (1, NULL, "**********************************************");
+	  prntf (1, NULL, "Program name: %W %s", progname, pidbuf);
+	  prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
+	  if (cygheap && cygheap->user_heap.chunk)
+	    prntf (1, NULL, "Heap size:    %u", cygheap->user_heap.chunk);
+	  prntf (1, NULL, "**********************************************");
 	}
-      prntf (1, NULL, "**********************************************");
-      prntf (1, NULL, "Program name: %W %s", myself->progname, pidbuf);
-      prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
-      if (cygheap)
-	prntf (1, NULL, "Heap size:    %u", cygheap->user_heap.chunk);
-      prntf (1, NULL, "**********************************************");
     }
 }
 
@@ -127,7 +128,7 @@ mypid (char *buf)
   if (myself && myself->pid)
     __small_sprintf (buf, "%d", myself->pid);
   else
-    __small_sprintf (buf, "(%d)", cygwin_pid (GetCurrentProcessId ()));
+    __small_sprintf (buf, "(%d)", GetCurrentProcessId ());
   return buf;
 }
 
@@ -224,13 +225,12 @@ strace::write (unsigned category, const char *buf, int count)
 }
 
 void
-strace::write_childpid (child_info& ch, DWORD pid)
+strace::write_childpid (DWORD pid)
 {
   char buf[30];
 
   if (!attached () || !being_debugged ())
     return;
-  WaitForSingleObject (ch.subproc_ready, 30000);
   __small_sprintf (buf, "cYg%8x %x", _STRACE_CHILD_PID, pid);
   OutputDebugString (buf);
 }

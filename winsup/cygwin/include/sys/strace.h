@@ -45,12 +45,11 @@ public:
   int version;
   int lmicrosec;
   bool execing;
-  void hello () __attribute__ ((regparm (1)));
   void dll_info () __attribute__ ((regparm (1)));
   void prntf (unsigned, const char *func, const char *, ...) /*__attribute__ ((regparm(3)))*/;
   void vprntf (unsigned, const char *func, const char *, va_list ap) /*__attribute__ ((regparm(3)))*/;
   void wm (int message, int word, int lon) __attribute__ ((regparm(3)));
-  void write_childpid (child_info&, unsigned long) __attribute__ ((regparm (3)));
+  void write_childpid (unsigned long) __attribute__ ((regparm (3)));
   bool attached () const {return _active == 3;}
   bool active () const {return _active & 1;}
   unsigned char& active_val () {return _active;}

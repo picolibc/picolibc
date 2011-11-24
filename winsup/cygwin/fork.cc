@@ -193,8 +193,6 @@ frok::child (volatile char * volatile here)
   extern void fixup_lockf_after_fork ();
   extern void fixup_hooks_after_fork ();
   extern void fixup_timers_after_fork ();
-  debug_printf ("child is running.  pid %d, ppid %d, stack here %p",
-		myself->pid, myself->ppid, __builtin_frame_address (0));
 
   /* NOTE: Logically this belongs in dll_list::load_after_fork, but by
      doing it here, before the first sync_with_parent, we can exploit
@@ -203,6 +201,8 @@ frok::child (volatile char * volatile here)
   dlls.reserve_space ();
 
   sync_with_parent ("after longjmp", true);
+  debug_printf ("child is running.  pid %d, ppid %d, stack here %p",
+		myself->pid, myself->ppid, __builtin_frame_address (0));
   sigproc_printf ("hParent %p, load_dlls %d", hParent, load_dlls);
 
   /* If we've played with the stack, stacksize != 0.  That means that
@@ -442,7 +442,7 @@ frok::parent (volatile char * volatile stack_here)
 	 be called in subproc handling. */
       ProtectHandle1 (hchild, childhProc);
 
-      strace.write_childpid (ch, pi.dwProcessId);
+      strace.write_childpid (pi.dwProcessId);
 
       /* Wait for subproc to initialize itself. */
       if (!ch.sync (pi.dwProcessId, hchild, FORK_WAIT_TIMEOUT))
@@ -502,6 +502,7 @@ frok::parent (volatile char * volatile stack_here)
 
   /* CHILD IS STOPPED */
   debug_printf ("child is alive (but stopped)");
+
 
   /* Initialize, in order: stack, dll data, dll bss.
      data, bss, heap were done earlier (in dcrt0.cc)

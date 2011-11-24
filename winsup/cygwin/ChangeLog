@@ -1,3 +1,30 @@
+2011-11-24  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* cygthread.h (cygthread::name): Default name to "main" if we are early
+	in the process of setting up the DLL and no name is known.
+	* dcrt0.cc (initial_env): Remove CYGWIN_SLEEP stuff.
+	(get_cygwin_startup_info): Activate strace here as appropriate.
+	(dll_crt0_0): Move get_cygwin_startup_info as early as possible to
+	avoid missing strace output.
+	* fork.cc (frok::child): Move debugging statement to point where ppid
+	will be set.
+	* pinfo.cc (pinfo::thisproc): Remove obsolete call to strace.hello.
+	Tweak debug output slightly.
+	* select.cc (select_stuff::wait): Allow APCS to be triggered while
+	waiting since we use them now.  Report when that happens.
+	* sigproc.cc (child_info::child_info): Use strace.active() rather than
+	strace.attached().
+	* spawn.cc (child_info_spawn::worker): Only write strace child pid
+	when we know it's a cygwin process.  Accommodate change to write_child
+	argument list.
+	* strace.cc (strace::hello): Delete.  Move functionality...
+	(strace::activate): ...to here.
+	(mypid): Just use raw GetCurrentProcessId () if myself isn't set.
+	(strace::write_childpid): Don't wait for subproc_ready.  Remove arg
+	which was required for it.
+	* include/sys/strace.h (strace::hello): Delete.
+	(strace::write_childpid): Delete first argument.
+
 2011-11-23  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset for previous changes.

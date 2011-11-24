@@ -309,7 +309,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   for (;;)
     {
       if (!windows_used)
-	wait_ret = WaitForMultipleObjects (m, w4, FALSE, ms);
+	wait_ret = WaitForMultipleObjectsEx (m, w4, FALSE, ms, true);
       else
 	/* Using MWMO_INPUTAVAILABLE is the officially supported solution for
 	   the problem that the call to PeekMessage disarms the queue state
@@ -317,10 +317,14 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	   in the queue. */
 	wait_ret = MsgWaitForMultipleObjectsEx (m, w4, ms,
 						QS_ALLINPUT | QS_ALLPOSTMESSAGE,
-						MWMO_INPUTAVAILABLE);
+						MWMO_INPUTAVAILABLE | MWMO_ALERTABLE);
 
       switch (wait_ret)
       {
+	case WAIT_IO_COMPLETION:
+	  syscall_printf ("woke due to apc");
+	  continue;	/* Keep going */
+	  break;
 	case WAIT_OBJECT_0:
 	  cleanup ();
 	  select_printf ("signal received");

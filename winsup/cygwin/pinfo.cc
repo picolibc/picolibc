@@ -64,8 +64,7 @@ pinfo::thisproc (HANDLE h)
   procinfo->dwProcessId = myself_initial.pid;
   procinfo->sendsig = myself_initial.sendsig;
   wcscpy (procinfo->progname, myself_initial.progname);
-  strace.hello ();
-  debug_printf ("myself->dwProcessId %u", procinfo->dwProcessId);
+  debug_printf ("myself dwProcessId %u", procinfo->dwProcessId);
   if (h)
     {
       /* here if execed */
