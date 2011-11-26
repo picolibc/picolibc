@@ -1,6 +1,18 @@
+2011-11-26  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* exceptions.cc (stackdump): Make global.
+	(signal_exit): Move to sigproc.cc.
+	* sigproc.cc (signal_exit): Move here.  Declare stackdump extern.  Set
+	my_sendsig to indicate that signals are no longer available.
+	(my_readsig): Make Static again.
+	(sig_send): Interpret ERROR_BROKEN_PIPE as ESRCH.  Remove special-case
+	EACCESS errno setting, just setting errno generally, even for "its_me"
+	case.
+
 2011-11-25  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
-	* exceptions.cc (sigpacket::process): Move additional processing into...
+	* exceptions.cc (sigpacket::process): Move signal_exit processing
+	into...
 	(_cygtls::signal_exit): ...here.  Close my_readsig and comment on why.
 	* pinfo.cc (pinfo::exit): Move sigproc_terminate earlier.  Set exiting
 	flag in lock_process.

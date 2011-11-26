@@ -279,7 +279,7 @@ stack_info::walk ()
   return 1;
 }
 
-static void
+void
 stackdump (DWORD ebp, int open_file, bool isexception)
 {
   static bool already_dumped;
@@ -1308,48 +1308,6 @@ thread_specific:
 
 exit_sig:
   use_tls->signal_exit (si.si_signo);	/* never returns */
-}
-
-/* Cover function to `do_exit' to handle exiting even in presence of more
-   exceptions.  We used to call exit, but a SIGSEGV shouldn't cause atexit
-   routines to run.  */
-void
-_cygtls::signal_exit (int rc)
-{
-  extern HANDLE my_readsig;
-  ForceCloseHandle (my_readsig); /* Disallow further signal sends */
-  SetEvent (signal_arrived);	 /* Avoid potential deadlock with proc_lock */
-
-  if (rc == SIGQUIT || rc == SIGABRT)
-    {
-      CONTEXT c;
-      c.ContextFlags = CONTEXT_FULL;
-      GetThreadContext (hMainThread, &c);
-      copy_context (&c);
-      if (cygheap->rlim_core > 0UL)
-	rc |= 0x80;
-    }
-
-  if (have_execed)
-    {
-      sigproc_printf ("terminating captive process");
-      TerminateProcess (ch_spawn, sigExeced = rc);
-    }
-
-  signal_debugger (rc & 0x7f);
-  if ((rc & 0x80) && !try_to_debug ())
-    stackdump (thread_context.ebp, 1, 1);
-
-  lock_process until_exit (true);
-  if (have_execed || exit_state > ES_PROCESS_LOCKED)
-    myself.exit (rc);
-
-  /* Starve other threads in a vain attempt to stop them from doing something
-     stupid. */
-  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-
-  sigproc_printf ("about to call do_exit (%x)", rc);
-  do_exit (rc);
 }
 
 void

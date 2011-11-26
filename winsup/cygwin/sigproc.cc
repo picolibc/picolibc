@@ -64,7 +64,7 @@ Static muto sync_proc_subproc;	// Control access to subproc stuff
 _cygtls NO_COPY *_sig_tls;
 
 Static HANDLE my_sendsig;
-HANDLE NO_COPY my_readsig;
+Static HANDLE my_readsig;
 
 /* Function declarations */
 static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
@@ -363,6 +363,50 @@ _cygtls::remove_wq (DWORD wait)
 	  }
       sync_proc_subproc.release ();
     }
+}
+
+/* Cover function to `do_exit' to handle exiting even in presence of more
+   exceptions.  We used to call exit, but a SIGSEGV shouldn't cause atexit
+   routines to run.  */
+void
+_cygtls::signal_exit (int rc)
+{
+  extern void stackdump (DWORD, int, bool);
+
+  my_sendsig = NULL;		 /* Make no_signals_allowed return true */
+  ForceCloseHandle (my_readsig); /* Stop any currently executing sig_sends */
+  SetEvent (signal_arrived);	 /* Avoid potential deadlock with proc_lock */
+
+  if (rc == SIGQUIT || rc == SIGABRT)
+    {
+      CONTEXT c;
+      c.ContextFlags = CONTEXT_FULL;
+      GetThreadContext (hMainThread, &c);
+      copy_context (&c);
+      if (cygheap->rlim_core > 0UL)
+	rc |= 0x80;
+    }
+
+  if (have_execed)
+    {
+      sigproc_printf ("terminating captive process");
+      TerminateProcess (ch_spawn, sigExeced = rc);
+    }
+
+  signal_debugger (rc & 0x7f);
+  if ((rc & 0x80) && !try_to_debug ())
+    stackdump (thread_context.ebp, 1, 1);
+
+  lock_process until_exit (true);
+  if (have_execed || exit_state > ES_PROCESS_LOCKED)
+    myself.exit (rc);
+
+  /* Starve other threads in a vain attempt to stop them from doing something
+     stupid. */
+  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+
+  sigproc_printf ("about to call do_exit (%x)", rc);
+  do_exit (rc);
 }
 
 /* Terminate the wait_subproc thread.
@@ -682,7 +726,6 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	 process is exiting.  */
       if (!its_me)
 	{
-	  __seterrno ();
 	  sigproc_printf ("WriteFile for pipe %p failed, %E", sendsig);
 	  ForceCloseHandle (sendsig);
 	}
@@ -693,8 +736,11 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  else if (!p->exec_sendsig)
 	    system_printf ("error sending signal %d to pid %d, pipe handle %p, %E",
 			   si.si_signo, p->pid, sendsig);
-	  set_errno (EACCES);
 	}
+      if (GetLastError () == ERROR_BROKEN_PIPE)
+	set_errno (ESRCH);
+      else
+	__seterrno ();
       goto out;
     }
 
