@@ -1,5 +1,10 @@
 2011-11-26  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* init.cc (remove): Don't bother calling through thread removal
+	cleanup if we are exiting.
+
+2011-11-26  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* exceptions.cc (stackdump): Make global.
 	(signal_exit): Move to sigproc.cc.
 	* sigproc.cc (signal_exit): Move here.  Declare stackdump extern.  Set
