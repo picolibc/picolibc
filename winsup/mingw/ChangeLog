@@ -1,6 +1,19 @@
+2011-11-26  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Clean up DIRENT errno handling; make it more POSIX conformant.
+
+	* mingwex/dirent.c (errno): Never zero it; POSIX forbids this.
+	(_tclosedir): Save errno at entry; restore it when no more files.
+	(DIRENT_RETURN_NOTHING): New macro; define it; use it in functions
+	with `void' return type, in place of the return arg when invoking...
+	(DIRENT_REJECT): New macro; define it; use it in all functions, to
+	set `errno' and bail out, on detection of an abnormal condition.
+	[errno = EFAULT]: Do not assign as this; POSIX specifies...
+	[errno = EBADF]: ...this instead.
+
 2011-10-01  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
-	Rationalise structure layout; add dirent.d_type field.
+	Rationalise DIRENT structure layout; add dirent.d_type field.
 
 	* include/dirent.h (struct dirent): Rearrange; add d_type field.
 	Add extra padding fields between d_type and d_name, to represent a

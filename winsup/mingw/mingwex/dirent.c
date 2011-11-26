@@ -1,5 +1,6 @@
 /*
  * dirent.c
+ *
  * This file has no copyright assigned and is placed in the Public Domain.
  * This file is a part of the mingw-runtime package.
  * No warranty is given; refer to the file DISCLAIMER within the package.
@@ -9,8 +10,8 @@
  * DIRLIB.H by M. J. Weinstein   Released to public domain 1-Jan-89
  *
  * Updated by Jeremy Bettis <jeremy@hksys.com>
- * Significantly revised and rewinddir, seekdir and telldir added by Colin
- * Peters <colin@fu.is.saga-u.ac.jp>
+ * Significantly revised and rewinddir, seekdir and telldir added
+ * by Colin Peters <colin@fu.is.saga-u.ac.jp>
  *	
  */
 
@@ -26,7 +27,11 @@
 
 #include <tchar.h>
 #define SUFFIX	_T("*")
-#define	SLASH	_T("\\")
+#define SLASH	_T("\\")
+
+#define DIRENT_RETURN_NOTHING
+#define DIRENT_REJECT( chk, err, rtn )	\
+  do { if( chk ){ errno = (err); return rtn; }} while(0)
 
 union __dirstream_t
 {
@@ -153,51 +158,44 @@ _topendir (const _TCHAR *szPath)
   unsigned int rc;
   _TCHAR szFullPath[MAX_PATH];
 	
-  errno = 0;
+  /* Reject any request which passes a NULL or an empty path name;
+   * note that POSIX doesn't specify the handling for the NULL case,
+   * and some implementations may simply fail with a segmentation
+   * fault.  We will fail more gracefully; however, the choice of
+   * EFAULT is not specified by POSIX, for any opendir failure.
+   */
+  DIRENT_REJECT( (!szPath), EFAULT, (_TDIR *)(0) );
+  /*
+   * Conversely, POSIX *does* specify ENOENT for the empty path
+   * name case, where we previously had ENOTDIR; here, we correct
+   * this previous anomaly.
+   */
+  DIRENT_REJECT( (*szPath == _T('\0')), ENOENT, (_TDIR *)(0) );
 
-  if (!szPath)
-    {
-      errno = EFAULT;
-      return (_TDIR *) 0;
-    }
+  /* Attempt to determine if the given path really is a directory.
+   * On error, user may call GetLastError() for more error info
+   */
+  DIRENT_REJECT( ((rc = _tGetFileAttributes (szPath)) == (unsigned int)(-1)),
+      ENOENT, (_TDIR *)(0)
+    );
 
-  if (szPath[0] == _T('\0'))
-    {
-      errno = ENOTDIR;
-      return (_TDIR *) 0;
-    }
-
-  /* Attempt to determine if the given path really is a directory. */
-  rc = _tGetFileAttributes (szPath);
-  if (rc == (unsigned int)-1)
-    {
-      /* call GetLastError for more error info */
-      errno = ENOENT;
-      return (_TDIR *) 0;
-    }
-  if (!(rc & FILE_ATTRIBUTE_DIRECTORY))
-    {
-      /* Error, entry exists but not a directory. */
-      errno = ENOTDIR;
-      return (_TDIR *) 0;
-    }
+  /* Error, entry exists but not a directory.
+   */
+  DIRENT_REJECT( (!(rc & FILE_ATTRIBUTE_DIRECTORY)), ENOTDIR, (_TDIR *)(0) );
 
   /* Make an absolute pathname.  */
   _tfullpath (szFullPath, szPath, MAX_PATH);
 
   /* Allocate enough space to store DIR structure and the complete
    * directory path given. */
-  nd = (_TDIR *) malloc (sizeof (_TDIR) + (_tcslen (szFullPath)
-					   + _tcslen (SLASH)
-					   + _tcslen (SUFFIX) + 1)
-					  * sizeof (_TCHAR));
+  nd = (_TDIR *)(malloc( sizeof( _TDIR )
+	+ (_tcslen( szFullPath ) + _tcslen( SLASH ) + _tcslen( SUFFIX ) + 1)
+	    * sizeof( _TCHAR )
+       ));
 
-  if (!nd)
-    {
-      /* Error, out of memory. */
-      errno = ENOMEM;
-      return (_TDIR *) 0;
-    }
+  /* Error, out of memory.
+   */ 
+  DIRENT_REJECT( (!nd), ENOMEM, (_TDIR *)(0) );
 
   /* Create the search expression. */
   _tcscpy (nd->dd_private.dd_name, szFullPath);
@@ -241,16 +239,15 @@ _topendir (const _TCHAR *szPath)
  * next entry in the directory.
  */
 struct _tdirent *
-_treaddir (_TDIR * dirp)
+_treaddir (_TDIR *dirp)
 {
-  errno = 0;
-
-  /* Check for valid DIR struct. */
-  if (!dirp)
-    {
-      errno = EFAULT;
-      return (struct _tdirent *) 0;
-    }
+  /* Check for a valid DIR stream reference; (we can't really
+   * be certain until we try to read from it, except in the case
+   * of a NULL pointer reference).  Where we lack a valid reference,
+   * POSIX mandates reporting EBADF; we previously had EFAULT, so
+   * this version corrects the former anomaly.
+   */ 
+  DIRENT_REJECT( (!dirp), EBADF, (struct _tdirent *)(0) );
 
   if (dirp->dd_private.dd_stat < 0)
     {
@@ -266,7 +263,7 @@ _treaddir (_TDIR * dirp)
 
       if (dirp->dd_private.dd_handle == -1)
 	{
-	  /* Whoops! Seems there are no files in that
+	  /* Oops! Seems there are no files in that
 	   * directory. */
 	  dirp->dd_private.dd_stat = -1;
 	}
@@ -277,15 +274,27 @@ _treaddir (_TDIR * dirp)
     }
   else
     {
-      /* Get the next search entry. */
+      /* Get the next search entry.  POSIX mandates that this must
+       * return NULL after the last entry has been read, but that it
+       * MUST NOT change errno in this case.  MS-Windows _findnext()
+       * DOES change errno (to ENOENT) after the last entry has been
+       * read, so we must be prepared to restore it to its previous
+       * value, when no actual error has occurred.
+       */
+      int prev_errno = errno;
       if (_tfindnext (dirp->dd_private.dd_handle, &(dirp->dd_private.dd_dta)))
 	{
-	  /* We are off the end or otherwise error.	
-	     _findnext sets errno to ENOENT if no more file
-	     Undo this. */ 
-	  DWORD winerr = GetLastError ();
-	  if (winerr == ERROR_NO_MORE_FILES)
-	    errno = 0;	
+	  /* May be an error, or just the case described above...
+	   */
+	  if( GetLastError() == ERROR_NO_MORE_FILES )
+	    /*
+	     * ...which requires us to reset errno.
+	     */
+	    errno = prev_errno;	
+
+	  /* FIXME: this is just wrong: we should NOT close the DIR
+	   * handle here; it is the responsibility of closedir().
+	   */
 	  _findclose (dirp->dd_private.dd_handle);
 	  dirp->dd_private.dd_handle = -1;
 	  dirp->dd_private.dd_stat = -1;
@@ -341,16 +350,15 @@ _treaddir (_TDIR * dirp)
 int
 _tclosedir (_TDIR * dirp)
 {
-  int rc;
+  int rc = 0;
 
-  errno = 0;
-  rc = 0;
-
-  if (!dirp)
-    {
-      errno = EFAULT;
-      return -1;
-    }
+  /* Attempting to reference a directory stream via a NULL pointer
+   * would cause a segmentation fault; evade this.  Since NULL can
+   * never represent an open directory stream, set the EBADF errno
+   * status, as mandated by POSIX, once again correcting previous
+   * anomalous use of EFAULT in this context.
+   */
+  DIRENT_REJECT( (!dirp), EBADF, -1 );
 
   if (dirp->dd_private.dd_handle != -1)
     {
@@ -372,13 +380,11 @@ _tclosedir (_TDIR * dirp)
 void
 _trewinddir (_TDIR * dirp)
 {
-  errno = 0;
-
-  if (!dirp)
-    {
-      errno = EFAULT;
-      return;
-    }
+  /* Once again, evade a potential segmentation fault on passing
+   * a NULL reference pointer, and again correct previous anomalous
+   * use of EFAULT, where POSIX mandates EBADF for errno reporting.
+   */
+  DIRENT_REJECT( (!dirp), EBADF, DIRENT_RETURN_NOTHING );
 
   if (dirp->dd_private.dd_handle != -1)
     {
@@ -398,13 +404,11 @@ _trewinddir (_TDIR * dirp)
 long
 _ttelldir (_TDIR * dirp)
 {
-  errno = 0;
-
-  if (!dirp)
-    {
-      errno = EFAULT;
-      return -1;
-    }
+  /* Once again, evade a potential segmentation fault on passing
+   * a NULL reference pointer, and again correct previous anomalous
+   * use of EFAULT, where POSIX mandates EBADF for errno reporting.
+   */
+  DIRENT_REJECT( (!dirp), EBADF, -1 );
   return dirp->dd_private.dd_stat;
 }
 
@@ -420,21 +424,17 @@ _ttelldir (_TDIR * dirp)
 void
 _tseekdir (_TDIR * dirp, long lPos)
 {
-  errno = 0;
+  /* Once again, evade a potential segmentation fault on passing
+   * a NULL reference pointer, and again correct previous anomalous
+   * use of EFAULT, where POSIX mandates EBADF for errno reporting.
+   */
+  DIRENT_REJECT( (!dirp), EBADF, DIRENT_RETURN_NOTHING );
 
-  if (!dirp)
-    {
-      errno = EFAULT;
-      return;
-    }
+  /* Seeking to an invalid position.
+   */
+  DIRENT_REJECT( (lPos < -1), EINVAL, DIRENT_RETURN_NOTHING );
 
-  if (lPos < -1)
-    {
-      /* Seeking to an invalid position. */
-      errno = EINVAL;
-      return;
-    }
-  else if (lPos == -1)
+  if (lPos == -1)
     {
       /* Seek past end. */
       if (dirp->dd_private.dd_handle != -1)
