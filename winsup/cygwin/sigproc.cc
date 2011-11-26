@@ -64,7 +64,7 @@ Static muto sync_proc_subproc;	// Control access to subproc stuff
 _cygtls NO_COPY *_sig_tls;
 
 Static HANDLE my_sendsig;
-Static HANDLE my_readsig;
+HANDLE NO_COPY my_readsig;
 
 /* Function declarations */
 static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));

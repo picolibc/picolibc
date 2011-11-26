@@ -181,7 +181,8 @@ void
 pinfo::exit (DWORD n)
 {
   minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
-  lock_process until_exit ();
+  sigproc_terminate (ES_FINAL);
+  lock_process until_exit (true);
   cygthread::terminate ();
 
   if (n != EXITCODE_NOSET)
@@ -192,7 +193,6 @@ pinfo::exit (DWORD n)
       maybe_set_exit_code_from_windows ();
     }
 
-  sigproc_terminate (ES_FINAL);
   if (myself->ctty > 0 && !iscons_dev (myself->ctty))
     {
       lock_ttys here;

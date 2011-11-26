@@ -20,7 +20,6 @@ details. */
 
 #undef WaitForSingleObject
 
-DWORD NO_COPY muto::exiting_thread;
 muto NO_COPY lock_process::locker;
 
 void
@@ -76,10 +75,6 @@ int
 muto::acquire (DWORD ms)
 {
   void *this_tls = &_my_tls;
-#if 0
-  if (exiting_thread)
-    return this_tid == exiting_thread;
-#endif
 
   if (tls != this_tls)
     {

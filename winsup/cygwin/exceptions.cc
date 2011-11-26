@@ -1307,17 +1307,6 @@ thread_specific:
   goto done;
 
 exit_sig:
-  if (si.si_signo == SIGQUIT || si.si_signo == SIGABRT)
-    {
-      CONTEXT c;
-      c.ContextFlags = CONTEXT_FULL;
-      GetThreadContext (hMainThread, &c);
-      use_tls->copy_context (&c);
-      if (cygheap->rlim_core > 0UL)
-	si.si_signo |= 0x80;
-    }
-  SetEvent (signal_arrived);	// To avoid a potential deadlock with proc_lock
-  sigproc_printf ("signal %d, about to call do_exit", si.si_signo);
   use_tls->signal_exit (si.si_signo);	/* never returns */
 }
 
@@ -1327,6 +1316,20 @@ exit_sig:
 void
 _cygtls::signal_exit (int rc)
 {
+  extern HANDLE my_readsig;
+  ForceCloseHandle (my_readsig); /* Disallow further signal sends */
+  SetEvent (signal_arrived);	 /* Avoid potential deadlock with proc_lock */
+
+  if (rc == SIGQUIT || rc == SIGABRT)
+    {
+      CONTEXT c;
+      c.ContextFlags = CONTEXT_FULL;
+      GetThreadContext (hMainThread, &c);
+      copy_context (&c);
+      if (cygheap->rlim_core > 0UL)
+	rc |= 0x80;
+    }
+
   if (have_execed)
     {
       sigproc_printf ("terminating captive process");

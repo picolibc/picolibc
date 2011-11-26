@@ -1,3 +1,17 @@
+2011-11-25  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* exceptions.cc (sigpacket::process): Move additional processing into...
+	(_cygtls::signal_exit): ...here.  Close my_readsig and comment on why.
+	* pinfo.cc (pinfo::exit): Move sigproc_terminate earlier.  Set exiting
+	flag in lock_process.
+	* sigproc.cc (my_readsig): Make global.
+	* sync.cc (muto::exiting_thread): Delete.
+	(muto::acquire): Delete #if 0'ed code.
+	* sync.h (muto::exiting_thread): Delete.
+	(set_exiting_thread): Ditto.
+	(lock_process::lock_process): Don't worry about setting the exiting
+	thread since it had no meaning.
+
 2011-11-24  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* cygthread.cc (cygthread::name): Default name to "main" if we are early
