@@ -150,7 +150,6 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       break;
     case DLL_THREAD_DETACH:
       if (dll_finished_loading
-	  && exit_state < ES_FINAL
 	  && (PVOID) &_my_tls > (PVOID) &wow64_test_stack_marker
 	  && _my_tls.isinitialized ())
 	_my_tls.remove (0);

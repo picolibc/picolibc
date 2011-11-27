@@ -1,6 +1,11 @@
+2011-11-27  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* init.cc (dll_entry): Revert previous change since it caused
+	inexplicable fork problems.
+
 2011-11-26  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
-	* init.cc (remove): Don't bother calling through thread removal
+	* init.cc (dll_entry): Don't bother calling through thread removal
 	cleanup if we are exiting.
 
 2011-11-26  Christopher Faylor  <me.cygwin2011@cgf.cx>
