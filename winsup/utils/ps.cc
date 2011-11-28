@@ -11,6 +11,7 @@ details. */
 
 #include <errno.h>
 #include <stdio.h>
+#include <locale.h>
 #include <wchar.h>
 #include <windows.h>
 #include <time.h>
@@ -21,7 +22,6 @@ details. */
 #include <limits.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
-#include <tlhelp32.h>
 #include <psapi.h>
 #include <ddk/ntapi.h>
 #include <ddk/winddk.h>
@@ -49,112 +49,6 @@ static struct option longopts[] =
 };
 
 static char opts[] = "aefhlp:su:VW";
-
-typedef BOOL (WINAPI *ENUMPROCESSMODULES)(
-  HANDLE hProcess,      // handle to the process
-  HMODULE * lphModule,  // array to receive the module handles
-  DWORD cb,             // size of the array
-  LPDWORD lpcbNeeded    // receives the number of bytes returned
-);
-
-typedef DWORD (WINAPI *GETMODULEFILENAME)(
-  HANDLE hProcess,
-  HMODULE hModule,
-  LPTSTR lpstrFileName,
-  DWORD nSize
-);
-
-typedef HANDLE (WINAPI *CREATESNAPSHOT)(
-    DWORD dwFlags,
-    DWORD th32ProcessID
-);
-
-// Win95 functions
-typedef BOOL (WINAPI *PROCESSWALK)(
-    HANDLE hSnapshot,
-    LPPROCESSENTRY32 lppe
-);
-
-ENUMPROCESSMODULES myEnumProcessModules;
-GETMODULEFILENAME myGetModuleFileNameEx;
-CREATESNAPSHOT myCreateToolhelp32Snapshot;
-PROCESSWALK myProcess32First;
-PROCESSWALK myProcess32Next;
-
-static BOOL WINAPI dummyprocessmodules (
-  HANDLE hProcess,      // handle to the process
-  HMODULE * lphModule,  // array to receive the module handles
-  DWORD cb,             // size of the array
-  LPDWORD lpcbNeeded    // receives the number of bytes returned
-)
-{
-  lphModule[0] = (HMODULE) *lpcbNeeded;
-  *lpcbNeeded = 1;
-  return 1;
-}
-
-static DWORD WINAPI GetModuleFileNameEx95 (
-  HANDLE hProcess,
-  HMODULE hModule,
-  LPTSTR lpstrFileName,
-  DWORD n
-)
-{
-  HANDLE h;
-  DWORD pid = (DWORD) hModule;
-
-  h = myCreateToolhelp32Snapshot (TH32CS_SNAPPROCESS, 0);
-  if (!h)
-    return 0;
-
-  PROCESSENTRY32 proc;
-  proc.dwSize = sizeof (proc);
-  if (myProcess32First(h, &proc))
-    do
-      if (proc.th32ProcessID == pid)
-	{
-	  CloseHandle (h);
-	  strcpy (lpstrFileName, proc.szExeFile);
-	  return 1;
-	}
-    while (myProcess32Next (h, &proc));
-  CloseHandle (h);
-  return 0;
-}
-
-int
-init_win ()
-{
-  OSVERSIONINFO os_version_info;
-
-  memset (&os_version_info, 0, sizeof os_version_info);
-  os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-  GetVersionEx (&os_version_info);
-
-  HMODULE h;
-  if (os_version_info.dwPlatformId == VER_PLATFORM_WIN32_NT)
-    {
-      h = LoadLibrary ("psapi.dll");
-      if (!h)
-	return 0;
-      myEnumProcessModules = (ENUMPROCESSMODULES) GetProcAddress (h, "EnumProcessModules");
-      myGetModuleFileNameEx = (GETMODULEFILENAME) GetProcAddress (h, "GetModuleFileNameExA");
-      if (!myEnumProcessModules || !myGetModuleFileNameEx)
-	return 0;
-      return 1;
-    }
-
-  h = GetModuleHandle("KERNEL32.DLL");
-  myCreateToolhelp32Snapshot = (CREATESNAPSHOT)GetProcAddress (h, "CreateToolhelp32Snapshot");
-  myProcess32First = (PROCESSWALK)GetProcAddress (h, "Process32First");
-  myProcess32Next  = (PROCESSWALK)GetProcAddress (h, "Process32Next");
-  if (!myCreateToolhelp32Snapshot || !myProcess32First || !myProcess32Next)
-    return 0;
-
-  myEnumProcessModules = dummyprocessmodules;
-  myGetModuleFileNameEx = GetModuleFileNameEx95;
-  return 1;
-}
 
 static char *
 start_time (external_pinfo *child)
@@ -206,7 +100,7 @@ ttynam (int ntty)
   else if (ntty & 0xffff0000)
     sprintf (buf0, "cons%d", ntty & 0xff);
   else
-    sprintf (buf0, "tty%d", ntty);
+    sprintf (buf0, "pty%d", ntty);
   sprintf (buf, " %-7s", buf0);
   return buf;
 }
@@ -272,6 +166,8 @@ main (int argc, char *argv[])
   proc_id = -1;
   lflag = 1;
 
+  setlocale (LC_ALL, "");
+
   prog_name = program_invocation_short_name;
 
   while ((ch = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
@@ -335,8 +231,6 @@ main (int argc, char *argv[])
 
   (void) cygwin_internal (CW_LOCK_PINFO, 1000);
 
-  if (query == CW_GETPINFO_FULL && !init_win ())
-    query = CW_GETPINFO;
   if (query == CW_GETPINFO_FULL)
     {
       /* Enable debug privilege to allow to enumerate all processes,
@@ -391,12 +285,7 @@ main (int argc, char *argv[])
 	{
 	  char *s;
 	  pname[0] = '\0';
-	  if (p->version >= EXTERNAL_PINFO_VERSION_32_LP)
-	    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
-			      p->progname_long, pname, NT_MAX_PATH);
-	  else
-	    cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE,
-			      p->progname, pname, NT_MAX_PATH);
+	  strncat (pname, p->progname_long, NT_MAX_PATH);
 	  s = strchr (pname, '\0') - 4;
 	  if (s > pname && strcasecmp (s, ".exe") == 0)
 	    *s = '\0';
@@ -411,7 +300,7 @@ main (int argc, char *argv[])
 	    continue;
 	  HMODULE hm[1000];
 	  DWORD n = p->dwProcessId;
-	  if (!myEnumProcessModules (h, hm, sizeof (hm), &n))
+	  if (!EnumProcessModules (h, hm, sizeof (hm), &n))
 	    n = 0;
 	  /* This occurs when trying to enum modules of a 64 bit process.
 	     GetModuleFileNameEx with a NULL module will return the same error.
@@ -459,8 +348,15 @@ main (int argc, char *argv[])
 	      else
 		strcpy (pname, "*** unknown ***");
 	    }
-	  else if (!n || !myGetModuleFileNameEx (h, hm[0], pname, PATH_MAX))
-	    strcpy (pname, "*** unknown ***");
+	  else
+	    {
+	      wchar_t pwname[NT_MAX_PATH];
+
+	      if (!n || !GetModuleFileNameExW (h, hm[0], pwname, NT_MAX_PATH))
+		strcpy (pname, "*** unknown ***");
+	      else
+	      	wcstombs (pname, pwname, NT_MAX_PATH);
+	    }
 	  FILETIME ct, et, kt, ut;
 	  if (GetProcessTimes (h, &ct, &et, &kt, &ut))
 	    p->start_time = to_time_t (&ct);

@@ -1,3 +1,12 @@
+2011-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ps.cc: Remove all Win 9x considerations.  Use psapi functions
+	directly.  Drop support for older Cygwin DLLs.  Just use progname_long
+	as is since it's already a POSIX path now.  Rename "tty" to "pty" as in
+	the Cygwin DLL.  Call setlocale to make sure wcstombs does the right
+	thing according to the current locale.
+	* Makefile.in (ps.exe): Link against psapi.dll.
+
 2011-11-24  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* strace.cc (attach_process): Use NT_SUCCESS to figure out if
