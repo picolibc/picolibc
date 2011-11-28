@@ -1,5 +1,10 @@
 2011-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* locale.cc (print_locale_with_codeset): Fetch Windows path as UNICODE
+	path and convert that to POSIX.
+
+2011-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ps.cc: Remove all Win 9x considerations.  Use psapi functions
 	directly.  Drop support for older Cygwin DLLs.  Just use progname_long
 	as is since it's already a POSIX path now.  Rename "tty" to "pty" as in

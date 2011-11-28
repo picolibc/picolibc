@@ -154,10 +154,10 @@ print_locale_with_codeset (int verbose, loc_t *locale, bool utf8,
     return;
   if (!sysroot)
     {
-      char sysbuf[PATH_MAX];
+      WCHAR sysbuf[PATH_MAX];
       HMODULE k32 = GetModuleHandleW (L"kernel32.dll");
-      if (GetModuleFileName (k32, sysbuf, PATH_MAX))
-	sysroot = (const char *) cygwin_create_path (CCP_WIN_A_TO_POSIX,
+      if (GetModuleFileNameW (k32, sysbuf, PATH_MAX))
+	sysroot = (const char *) cygwin_create_path (CCP_WIN_W_TO_POSIX,
 						     sysbuf);
       if (!sysroot)
       	sysroot = "kernel32.dll";
