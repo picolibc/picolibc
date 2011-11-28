@@ -1,5 +1,10 @@
 2011-11-28  Corinna Vinschen  <vinschen@redhat.com>
 
+	* external.cc (fillout_pinfo): Store program name as POSIX path in
+	ep.progname_long.
+
+2011-11-28  Corinna Vinschen  <vinschen@redhat.com>
+
 	* pinfo.cc (pinfo::exit): Call TerminateProcess to avoid potential
 	busy loop in ntdll.dll when calling ExitProcess. Only call ExitProcess
 	as a fallback.

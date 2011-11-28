@@ -99,7 +99,7 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.gid32 = p->gid;
 
 	  ep.progname_long = ep_progname_long_buf;
-	  sys_wcstombs(ep.progname_long, NT_MAX_PATH, p->progname);
+	  mount_table->conv_to_posix_path (p->progname, ep.progname_long, 0);
 	  break;
 	}
     }
