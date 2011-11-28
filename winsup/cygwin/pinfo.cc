@@ -210,6 +210,8 @@ pinfo::exit (DWORD n)
   if (!self->cygstarted)
     exitcode = ((exitcode & 0xff) << 8) | ((exitcode >> 8) & 0xff);
   sigproc_printf ("Calling ExitProcess n %p, exitcode %p", n, exitcode);
+  if (!TerminateProcess (GetCurrentProcess (), exitcode))
+    system_printf ("TerminateProcess failed, %E");
   ExitProcess (exitcode);
 }
 # undef self

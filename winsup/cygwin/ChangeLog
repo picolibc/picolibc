@@ -1,3 +1,9 @@
+2011-11-28  Corinna Vinschen  <vinschen@redhat.com>
+
+	* pinfo.cc (pinfo::exit): Call TerminateProcess to avoid potential
+	busy loop in ntdll.dll when calling ExitProcess. Only call ExitProcess
+	as a fallback.
+
 2011-11-27  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* init.cc (dll_entry): Revert previous change since it caused
