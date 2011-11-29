@@ -1,3 +1,29 @@
+2011-11-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* cygheap.cc (cygheap_fixup_in_child): Accommodate new HEAP_3*
+	classifications for cleanup-after-fork.
+	* cygheap_malloc.h (cygheap_types): Add HEAP_2_MAX, HEAP_3_FHANDLER.
+	* fhandler.h: Throughout, change clone to take a cmalloc id.
+	(fhandler_base::delete): Inline.
+	(fhandler_base_overlapped): Mark flush_async_io as a friend.
+	(fhandler_base_overlapped::asio_done): Declare new static member.
+	(fhandler_base_overlapped::asio_close_counter): Ditto.
+	(fhandler_base_overlapped::check_later): Declare new function.
+	(fhandler_base_overlapped::flush_all_async_io): Ditto.
+	* fhandler.cc (fhandler_base_overlapped::asio_done): Declare.
+	(fhandler_base_overlapped::asio_close_counter): Ditto.
+	(flush_async_io): Declare new thread function.
+	(fhandler_base_overlapped::flush_all_async_io): Declare new function.
+	(fhandler_base_overlapped::check_later): Ditto.
+	(fhandler_base_overlapped::close): Call check_later to close
+	nonblocking fd asynchronously.  Assume that this completed
+	successfully.
+	* select.cc (pipe_data_available): Don't consider data to be
+	"available" if fd still has unflushed I/O.
+	* syscalls.cc (close_all_files): Call
+	fhandler_base_overlapped::flush_all_async_io to make sure that all
+	nonblocking pipe I/O has completed.
+
 2011-11-28  Corinna Vinschen  <vinschen@redhat.com>
 
 	* external.cc (fillout_pinfo): Store program name as POSIX path in
@@ -119,8 +145,8 @@
 	fhandler_pty_common::pipesize rather than a raw constant.
 	* tty.cc (tty::not_allocated): Ditto.
 
-	* sigproc.cc (sigproc_init): Use create_selectable to create the signal
-	pipe to get a more appropriate message based pipe.
+	* sigproc.cc (sigproc_init): Use fhandler_pipe::create to create the
+	signal pipe to get a more appropriate message based pipe.
 
 2011-11-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
