@@ -121,6 +121,9 @@ case "${target}" in
   m32c-*-*)
 	AC_CONFIG_SUBDIRS([m32c])
 	;;
+  rl78*-*-elf)
+	AC_CONFIG_SUBDIRS([rl78])
+	;;
   rx*-*-elf)
 	AC_CONFIG_SUBDIRS([rx])
 	;;

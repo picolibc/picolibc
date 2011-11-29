@@ -38,6 +38,7 @@ arm                     Nick Clifton            nickc@redhat.com
 m32c port		DJ Delorie		dj@redhat.com
 mn10300			Nick Clifton		nickc@redhat.com
 moxie			Anthony Green		green@moxielogic.com
+rl78			DJ Delorie		dj@redhat.com
 
 
 			Write After Approval

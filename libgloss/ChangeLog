@@ -1,3 +1,9 @@
+2011-11-28  DJ Delorie  <dj@redhat.com>
+
+	* configure.in: Add rl78.
+	* configure: Regenerate.
+	* rl78: New directory
+
 2011-11-08  Mike Frysinger  <vapier@gentoo.org>
 
 	* libnosys/Makefile.in (install): Use INSTALL_DATA.

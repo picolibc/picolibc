@@ -265,6 +265,12 @@ _BEGIN_STD_C
 #define _JBTYPE unsigned short
 #endif /* __m32c__ */
 
+#ifdef __RL78__
+/* Three banks of registers, SP, CS, ES, PC */
+#define _JBLEN (8*3+8)
+#define _JBTYPE unsigned char
+#endif
+
 #ifdef __RX__
 #define _JBLEN 0x44
 #endif

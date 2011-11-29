@@ -342,6 +342,12 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __RL78__
+#define __IEEE_LITTLE_ENDIAN
+#define __SMALL_BITFIELDS	/* 16 Bit INT */
+#define _DOUBLE_IS_32BITS
+#endif
+
 #ifdef __RX__
 
 #ifdef __RX_BIG_ENDIAN__

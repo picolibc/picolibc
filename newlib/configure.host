@@ -226,6 +226,10 @@ case "${host_cpu}" in
   powerpc*)
 	machine_dir=powerpc
 	;;
+  rl78)
+	machine_dir=rl78
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
+	;;
   rx)
 	machine_dir=rx
 	default_newlib_io_long_long="yes"
