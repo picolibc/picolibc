@@ -1,5 +1,14 @@
 2011-11-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* sync.cc: Fix comment.
+
+2011-11-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dll_init.cc (dll_list::reserve_space): Use %p rather than %lx to show
+	reserved space.
+
+2011-11-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sigproc.cc (remove_proc): Don't terminate the currently executing
 	thread.
 

@@ -69,8 +69,7 @@ muto::~muto ()
 
    Note: The goal here is to minimize, as much as possible, calls to the
    OS.  Hence the use of InterlockedIncrement, etc., rather than (much) more
-   expensive OS mutexes.  Also note that the only two valid "ms" times are
-   0 and INFINITE. */
+   expensive OS mutexes.  */
 int
 muto::acquire (DWORD ms)
 {

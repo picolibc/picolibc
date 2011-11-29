@@ -427,7 +427,7 @@ dll_list::reserve_space ()
 {
   for (dll* d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
     if (!VirtualAlloc (d->handle, d->image_size, MEM_RESERVE, PAGE_NOACCESS))
-      fabort ("address space needed by '%W' (%08lx) is already occupied",
+      fabort ("address space needed by '%W' (%p) is already occupied",
 	      d->modname, d->handle);
 }
 
