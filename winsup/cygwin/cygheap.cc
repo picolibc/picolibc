@@ -70,18 +70,22 @@ cygheap_fixup_in_child (bool execed)
     {
       cygheap->hooks.next = NULL;
       cygheap->user_heap.base = NULL;		/* We can allocate the heap anywhere */
-      /* Walk the allocated memory chain looking for orphaned memory from
-	 previous execs */
-      for (_cmalloc_entry *rvc = cygheap->chain; rvc; rvc = rvc->prev)
-	{
-	  cygheap_entry *ce = (cygheap_entry *) rvc->data;
-	  if (!rvc->ptr || rvc->b >= NBUCKETS || ce->type <= HEAP_1_START)
-	    continue;
-	  else if (ce->type < HEAP_1_MAX)
-	    ce->type += HEAP_1_MAX;	/* Mark for freeing after next exec */
-	  else
-	    _cfree (ce);		/* Marked by parent for freeing in child */
-	}
+    }
+  /* Walk the allocated memory chain looking for orphaned memory from
+     previous execs or forks */
+  for (_cmalloc_entry *rvc = cygheap->chain; rvc; rvc = rvc->prev)
+    {
+      cygheap_entry *ce = (cygheap_entry *) rvc->data;
+      if (!rvc->ptr || rvc->b >= NBUCKETS || ce->type <= HEAP_1_START)
+	continue;
+      else if (ce->type > HEAP_2_MAX)
+	_cfree (ce);		/* Marked for freeing in any child */
+      else if (!execed)
+	continue;
+      else if (ce->type > HEAP_1_MAX)
+	_cfree (ce);		/* Marked for freeing in execed child */
+      else
+	ce->type += HEAP_1_MAX;	/* Mark for freeing after next exec */
     }
 }
 

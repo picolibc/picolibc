@@ -111,6 +111,7 @@ close_all_files (bool norelease)
   if (!have_execed && cygheap->ctty)
     cygheap->close_ctty ();
 
+  fhandler_base_overlapped::flush_all_async_io ();
   if (h)
     SetStdHandle (STD_ERROR_HANDLE, h);
   cygheap->fdtab.unlock ();

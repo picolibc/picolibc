@@ -409,7 +409,7 @@ public:
     raixput = raixget = ralen = rabuflen = 0;
     rabuf = NULL;
   }
-  void operator delete (void *);
+  void operator delete (void *p) {cfree (p);}
   virtual void set_eof () {}
   virtual int mkdir (mode_t mode);
   virtual int rmdir ();
@@ -435,9 +435,9 @@ public:
     x->reset (this);
   }
 
-  virtual fhandler_base *clone ()
+  virtual fhandler_base *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_base));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_base));
     fhandler_base *fh = new (ptr) fhandler_base (ptr);
     copyto (fh);
     return fh;
@@ -602,9 +602,9 @@ class fhandler_socket: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_socket *clone ()
+  fhandler_socket *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_socket));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_socket));
     fhandler_socket *fh = new (ptr) fhandler_socket (ptr);
     copyto (fh);
     return fh;
@@ -613,6 +613,8 @@ class fhandler_socket: public fhandler_base
 
 class fhandler_base_overlapped: public fhandler_base
 {
+  static HANDLE asio_done;
+  static LONG asio_close_counter;
 protected:
   enum wait_return
   {
@@ -647,6 +649,9 @@ public:
   int close ();
   int dup (fhandler_base *child, int);
 
+  void check_later ();
+  static void flush_all_async_io () __attribute__ ((regparm (1)));;
+
   fhandler_base_overlapped (void *) {}
 
   virtual void copyto (fhandler_base *x)
@@ -656,13 +661,15 @@ public:
     x->reset (this);
   }
 
-  virtual fhandler_base_overlapped *clone ()
+  virtual fhandler_base_overlapped *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_base_overlapped));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_base_overlapped));
     fhandler_base_overlapped *fh = new (ptr) fhandler_base_overlapped (ptr);
     copyto (fh);
     return fh;
   }
+
+  friend DWORD WINAPI flush_async_io (void *);
 };
 
 class fhandler_pipe: public fhandler_base_overlapped
@@ -701,9 +708,9 @@ public:
     x->reset (this);
   }
 
-  fhandler_pipe *clone ()
+  fhandler_pipe *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_pipe));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_pipe));
     fhandler_pipe *fh = new (ptr) fhandler_pipe (ptr);
     copyto (fh);
     return fh;
@@ -739,9 +746,9 @@ public:
     x->reset (this);
   }
 
-  fhandler_fifo *clone ()
+  fhandler_fifo *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_fifo));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_fifo));
     fhandler_fifo *fh = new (ptr) fhandler_fifo (ptr);
     copyto (fh);
     return fh;
@@ -768,9 +775,9 @@ class fhandler_mailslot : public fhandler_base_overlapped
     x->reset (this);
   }
 
-  fhandler_mailslot *clone ()
+  fhandler_mailslot *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_mailslot));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_mailslot));
     fhandler_mailslot *fh = new (ptr) fhandler_mailslot (ptr);
     copyto (fh);
     return fh;
@@ -817,9 +824,9 @@ class fhandler_dev_raw: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_dev_raw *clone ()
+  fhandler_dev_raw *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_raw));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_raw));
     fhandler_dev_raw *fh = new (ptr) fhandler_dev_raw (ptr);
     copyto (fh);
     return fh;
@@ -877,9 +884,9 @@ class fhandler_dev_floppy: public fhandler_dev_raw
     x->reset (this);
   }
 
-  fhandler_dev_floppy *clone ()
+  fhandler_dev_floppy *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_floppy));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_floppy));
     fhandler_dev_floppy *fh = new (ptr) fhandler_dev_floppy (ptr);
     copyto (fh);
     return fh;
@@ -925,9 +932,9 @@ class fhandler_dev_tape: public fhandler_dev_raw
     x->reset (this);
   }
 
-  fhandler_dev_tape *clone ()
+  fhandler_dev_tape *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_tape));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_tape));
     fhandler_dev_tape *fh = new (ptr) fhandler_dev_tape (ptr);
     copyto (fh);
     return fh;
@@ -991,9 +998,9 @@ class fhandler_disk_file: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_disk_file *clone ()
+  fhandler_disk_file *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_disk_file));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_disk_file));
     fhandler_disk_file *fh = new (ptr) fhandler_disk_file (ptr);
     copyto (fh);
     return fh;
@@ -1029,9 +1036,9 @@ class fhandler_cygdrive: public fhandler_disk_file
     x->reset (this);
   }
 
-  fhandler_cygdrive *clone ()
+  fhandler_cygdrive *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_cygdrive));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_cygdrive));
     fhandler_cygdrive *fh = new (ptr) fhandler_cygdrive (ptr);
     copyto (fh);
     return fh;
@@ -1093,9 +1100,9 @@ class fhandler_serial: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_serial *clone ()
+  fhandler_serial *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_serial));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_serial));
     fhandler_serial *fh = new (ptr) fhandler_serial (ptr);
     copyto (fh);
     return fh;
@@ -1151,9 +1158,9 @@ class fhandler_termios: public fhandler_base
     x->reset (this);
   }
 
-  virtual fhandler_termios *clone ()
+  virtual fhandler_termios *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_termios));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_termios));
     fhandler_termios *fh = new (ptr) fhandler_termios (ptr);
     copyto (fh);
     return fh;
@@ -1350,9 +1357,9 @@ private:
     x->reset (this);
   }
 
-  fhandler_console *clone ()
+  fhandler_console *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_console));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_console));
     fhandler_console *fh = new (ptr) fhandler_console (ptr);
     copyto (fh);
     return fh;
@@ -1394,9 +1401,9 @@ class fhandler_pty_common: public fhandler_termios
     x->reset (this);
   }
 
-  virtual fhandler_pty_common *clone ()
+  virtual fhandler_pty_common *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_pty_common));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_pty_common));
     fhandler_pty_common *fh = new (ptr) fhandler_pty_common (ptr);
     copyto (fh);
     return fh;
@@ -1448,9 +1455,9 @@ class fhandler_pty_slave: public fhandler_pty_common
     x->reset (this);
   }
 
-  fhandler_pty_slave *clone ()
+  fhandler_pty_slave *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_pty_slave));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_pty_slave));
     fhandler_pty_slave *fh = new (ptr) fhandler_pty_slave (ptr);
     copyto (fh);
     return fh;
@@ -1507,9 +1514,9 @@ public:
     x->reset (this);
   }
 
-  fhandler_pty_master *clone ()
+  fhandler_pty_master *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_pty_master));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_pty_master));
     fhandler_pty_master *fh = new (ptr) fhandler_pty_master (ptr);
     copyto (fh);
     return fh;
@@ -1534,9 +1541,9 @@ class fhandler_dev_null: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_dev_null *clone ()
+  fhandler_dev_null *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_null));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_null));
     fhandler_dev_null *fh = new (ptr) fhandler_dev_null (ptr);
     copyto (fh);
     return fh;
@@ -1569,9 +1576,9 @@ class fhandler_dev_zero: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_dev_zero *clone ()
+  fhandler_dev_zero *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_zero));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_zero));
     fhandler_dev_zero *fh = new (ptr) fhandler_dev_zero (ptr);
     copyto (fh);
     return fh;
@@ -1607,9 +1614,9 @@ class fhandler_dev_random: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_dev_random *clone ()
+  fhandler_dev_random *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_random));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_random));
     fhandler_dev_random *fh = new (ptr) fhandler_dev_random (ptr);
     copyto (fh);
     return fh;
@@ -1647,9 +1654,9 @@ class fhandler_dev_mem: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_dev_mem *clone ()
+  fhandler_dev_mem *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_mem));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_mem));
     fhandler_dev_mem *fh = new (ptr) fhandler_dev_mem (ptr);
     copyto (fh);
     return fh;
@@ -1683,9 +1690,9 @@ class fhandler_dev_clipboard: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_dev_clipboard *clone ()
+  fhandler_dev_clipboard *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_clipboard));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_clipboard));
     fhandler_dev_clipboard *fh = new (ptr) fhandler_dev_clipboard (ptr);
     copyto (fh);
     return fh;
@@ -1722,9 +1729,9 @@ class fhandler_windows: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_windows *clone ()
+  fhandler_windows *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_windows));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_windows));
     fhandler_windows *fh = new (ptr) fhandler_windows (ptr);
     copyto (fh);
     return fh;
@@ -1769,9 +1776,9 @@ class fhandler_dev_dsp: public fhandler_base
     x->reset (this);
   }
 
-  fhandler_dev_dsp *clone ()
+  fhandler_dev_dsp *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_dev_dsp));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_dsp));
     fhandler_dev_dsp *fh = new (ptr) fhandler_dev_dsp (ptr);
     copyto (fh);
     return fh;
@@ -1820,9 +1827,9 @@ class fhandler_virtual : public fhandler_base
     x->reset (this);
   }
 
-  virtual fhandler_virtual *clone ()
+  virtual fhandler_virtual *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_virtual));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_virtual));
     fhandler_virtual *fh = new (ptr) fhandler_virtual (ptr);
     copyto (fh);
     return fh;
@@ -1852,9 +1859,9 @@ class fhandler_proc: public fhandler_virtual
     x->reset (this);
   }
 
-  virtual fhandler_proc *clone ()
+  virtual fhandler_proc *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_proc));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_proc));
     fhandler_proc *fh = new (ptr) fhandler_proc (ptr);
     copyto (fh);
     return fh;
@@ -1888,9 +1895,9 @@ class fhandler_procsys: public fhandler_virtual
     x->reset (this);
   }
 
-  fhandler_procsys *clone ()
+  fhandler_procsys *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_procsys));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_procsys));
     fhandler_procsys *fh = new (ptr) fhandler_procsys (ptr);
     copyto (fh);
     return fh;
@@ -1917,9 +1924,9 @@ class fhandler_procsysvipc: public fhandler_proc
     x->reset (this);
   }
 
-  fhandler_procsysvipc *clone ()
+  fhandler_procsysvipc *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_procsysvipc));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_procsysvipc));
     fhandler_procsysvipc *fh = new (ptr) fhandler_procsysvipc (ptr);
     copyto (fh);
     return fh;
@@ -1947,9 +1954,9 @@ class fhandler_netdrive: public fhandler_virtual
     x->reset (this);
   }
 
-  fhandler_netdrive *clone ()
+  fhandler_netdrive *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_netdrive));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_netdrive));
     fhandler_netdrive *fh = new (ptr) fhandler_netdrive (ptr);
     copyto (fh);
     return fh;
@@ -1987,9 +1994,9 @@ class fhandler_registry: public fhandler_proc
     x->reset (this);
   }
 
-  fhandler_registry *clone ()
+  fhandler_registry *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_registry));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_registry));
     fhandler_registry *fh = new (ptr) fhandler_registry (ptr);
     copyto (fh);
     return fh;
@@ -2019,9 +2026,9 @@ class fhandler_process: public fhandler_proc
     x->reset (this);
   }
 
-  fhandler_process *clone ()
+  fhandler_process *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_process));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_process));
     fhandler_process *fh = new (ptr) fhandler_process (ptr);
     copyto (fh);
     return fh;
@@ -2048,9 +2055,9 @@ class fhandler_procnet: public fhandler_proc
     x->reset (this);
   }
 
-  fhandler_procnet *clone ()
+  fhandler_procnet *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
-    void *ptr = (void *) ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_procnet));
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_procnet));
     fhandler_procnet *fh = new (ptr) fhandler_procnet (ptr);
     copyto (fh);
     return fh;

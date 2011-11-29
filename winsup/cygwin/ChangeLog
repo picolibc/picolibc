@@ -1,3 +1,8 @@
+2011-11-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* sigproc.cc (remove_proc): Don't terminate the currently executing
+	thread.
+
 2011-11-28  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* cygheap.cc (cygheap_fixup_in_child): Accommodate new HEAP_3*

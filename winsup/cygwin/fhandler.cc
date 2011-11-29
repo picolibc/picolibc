@@ -28,6 +28,7 @@ details. */
 #include "ntdll.h"
 #include "cygtls.h"
 #include "sigproc.h"
+#include "shared_info.h"
 #include <asm/socket.h>
 
 #define MAX_OVERLAPPED_WRITE_LEN (64 * 1024 * 1024)
@@ -36,6 +37,9 @@ details. */
 static const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
 struct __cygwin_perfile *perfile_table;
+
+HANDLE NO_COPY fhandler_base_overlapped::asio_done;
+LONG NO_COPY fhandler_base_overlapped::asio_close_counter;
 
 void
 fhandler_base::reset (const fhandler_base *from)
@@ -1152,17 +1156,77 @@ fhandler_base::close ()
   return res;
 }
 
+DWORD WINAPI
+flush_async_io (void *arg)
+{
+  fhandler_base_overlapped *fh = (fhandler_base_overlapped *) arg;
+  debug_only_printf ("waiting for %s I/O for %s",
+		     (fh->get_access () & GENERIC_WRITE) ? "write" : "read",
+		     fh->get_name ());
+  SetEvent (fh->get_overlapped ()->hEvent); /* force has_ongoing_io to block */
+  bool res = fh->has_ongoing_io ();
+  debug_printf ("finished waiting for I/O from %s, res %d", fh->get_name (),
+		res);
+  fh->close ();
+  delete fh;
+
+  InterlockedDecrement (&fhandler_base_overlapped::asio_close_counter);
+  SetEvent (fhandler_base_overlapped::asio_done);
+
+  _my_tls._ctinfo->auto_release ();
+  return 0;
+}
+
+void
+fhandler_base_overlapped::flush_all_async_io ()
+{
+  while (asio_close_counter > 0)
+    if (WaitForSingleObject (asio_done, INFINITE) != WAIT_OBJECT_0)
+      {
+	system_printf ("WaitForSingleObject failed, possible data loss in pipe, %E");
+	break;
+      }
+  asio_close_counter = 0;
+  if (asio_done)
+    CloseHandle (asio_done);
+}
+
+/* Start a thread to handle closing of overlapped asynchronous I/O since
+   Windows amazingly does not seem to always flush I/O on close.  */
+void
+fhandler_base_overlapped::check_later ()
+{
+  set_close_on_exec (true);
+  char buf[MAX_PATH];
+  if (!asio_done
+      && !(asio_done = CreateEvent (&sec_none_nih, false, false,
+				    shared_name (buf, "asio",
+						 GetCurrentProcessId ()))))
+    api_fatal ("CreateEvent failed, %E");
+
+  InterlockedIncrement (&asio_close_counter);
+  if (!new cygthread(flush_async_io, this, "flasio"))
+    api_fatal ("couldn't create a thread to track async I/O, %E");
+  debug_printf ("started thread to handle asynchronous closing for %s", get_name ());
+}
 
 int
 fhandler_base_overlapped::close ()
 {
-  if (is_nonblocking () && io_pending)
+  int res;
+  /* Need to treat non-blocking I/O specially because Windows appears to
+     be brain-dead  */
+  if (is_nonblocking () && has_ongoing_io ())
     {
-      DWORD bytes;
-      wait_overlapped (1, !!(get_access () & GENERIC_WRITE), &bytes, false);
+      clone (HEAP_3_FHANDLER)->check_later ();
+      res = 0;
     }
-  destroy_overlapped ();
-  return fhandler_base::close ();
+  else
+    {
+      destroy_overlapped ();
+      res = fhandler_base::close ();
+    }
+  return res;
 }
 
 int
@@ -1412,12 +1476,6 @@ fhandler_base::ptsname_r (char *, size_t)
 {
   set_errno (ENOTTY);
   return ENOTTY;
-}
-
-void
-fhandler_base::operator delete (void *p)
-{
-  cfree (p);
 }
 
 /* Normal I/O constructor */
@@ -1836,13 +1894,10 @@ fhandler_base_overlapped::has_ongoing_io ()
     return false;
 
   if (!IsEventSignalled (get_overlapped ()->hEvent))
-    {
-      set_errno (EAGAIN);
-      return true;
-    }
+    return true;
   io_pending = false;
   DWORD nbytes;
-  GetOverlappedResult (get_output_handle (), get_overlapped (), &nbytes, 0);
+  GetOverlappedResult (get_output_handle (), get_overlapped (), &nbytes, true);
   return false;
 }
 
@@ -1930,7 +1985,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
     }
   else
     {
-      debug_printf ("res %u, err %u", (unsigned) res, err);
+      debug_printf ("res %u, Win32 Error %u", (unsigned) res, err);
       *bytes = (DWORD) -1;
       __seterrno_from_win_error (err);
       if (writing && err == ERROR_NO_DATA)
@@ -1970,7 +2025,10 @@ fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
 {
   size_t nbytes;
   if (has_ongoing_io ())
-    nbytes = (DWORD) -1;
+    {
+      set_errno (EAGAIN);
+      nbytes = (DWORD) -1;
+    }
   else
     {
       size_t chunk;

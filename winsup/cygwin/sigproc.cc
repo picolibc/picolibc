@@ -1135,7 +1135,10 @@ static bool __stdcall
 remove_proc (int ci)
 {
   if (have_execed)
-    procs[ci].wait_thread->terminate_thread ();
+    {
+      if (_my_tls._ctinfo != procs[ci].wait_thread)
+	procs[ci].wait_thread->terminate_thread ();
+    }
   else if (procs[ci]->exists ())
     return true;
 

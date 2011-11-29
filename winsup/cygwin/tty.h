@@ -15,7 +15,7 @@ details. */
 #define INP_BUFFER_SIZE 256
 #define OUT_BUFFER_SIZE 256
 #define NTTYS		64
-#define real_tty_attached(p)	((p)->ctty >= 0 && !iscons_dev ((p)->ctty))
+#define real_tty_attached(p)	((p)->ctty > 0 && !iscons_dev ((p)->ctty))
 
 /* Input/Output/ioctl events */
 
