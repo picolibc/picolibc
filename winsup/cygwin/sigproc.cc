@@ -134,7 +134,7 @@ get_proc_lock (DWORD what, DWORD val)
   Static int lastwhat = -1;
   if (!sync_proc_subproc)
     {
-      sigproc_printf ("sync_proc_subproc is NULL (1)");
+      sigproc_printf ("sync_proc_subproc is NULL");
       return false;
     }
   if (sync_proc_subproc.acquire (WPSP))
@@ -142,14 +142,9 @@ get_proc_lock (DWORD what, DWORD val)
       lastwhat = what;
       return true;
     }
-  if (!sync_proc_subproc)
-    {
-      sigproc_printf ("sync_proc_subproc is NULL (2)");
-      return false;
-    }
-  system_printf ("Couldn't acquire sync_proc_subproc for(%d,%d), last %d, %E",
-		  what, val, lastwhat);
-  return true;
+  system_printf ("Couldn't acquire %s for(%d,%d), last %d, %E",
+		 sync_proc_subproc.name, what, val, lastwhat);
+  return false;
 }
 
 static bool __stdcall

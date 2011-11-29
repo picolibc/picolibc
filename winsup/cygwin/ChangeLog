@@ -1,5 +1,10 @@
 2011-11-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* sigproc.cc (get_proc_lock): Remove extra NULL check.  Return false on
+	failure.
+
+2011-11-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sync.cc: Fix comment.
 
 2011-11-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
