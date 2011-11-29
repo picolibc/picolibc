@@ -1,3 +1,11 @@
+2011-11-29  Andrew Pinski  <apinski@cavium.com>
+
+	* mips.h (INSN_CHIP_MASK): Update according to INSN_OCTEONP.
+	(INSN_OCTEONP): New macro.
+	(CPU_OCTEONP): New macro.
+	(OPCODE_IS_MEMBER): Add Octeon+.
+	(M_SAA_AB, M_SAAD_AB, M_SAA_OB, M_SAAD_OB): New enum values.
+
 2011-11-01  DJ Delorie  <dj@redhat.com>
 
 	* rl78.h: New file.
