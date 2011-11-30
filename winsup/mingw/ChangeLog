@@ -1,3 +1,9 @@
+2011-11-30  Rodrigo Rivas Costa  <rodrigorivascosta@gmail.com>
+
+	* tlssup.c (__dyn_tls_init): Reapply patch from 3105314.
+
+	Thank you to Earnie for creating the patch file.
+
 2011-11-26  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Clean up DIRENT errno handling; make it more POSIX conformant.
