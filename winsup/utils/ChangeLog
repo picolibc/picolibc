@@ -1,3 +1,15 @@
+2011-12-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c: Drop support for NT4 domains.
+	* mkpasswd.c: Ditto.
+	(psx_dir): Remove.
+	(current_user): Drop support for -m option.  Use $HOME as is since it's
+	a POSIX path anyway.
+	(enum_users): Drop support for -m option.
+	(usage): Mention -m option as ignored.
+	(main): Drop support for -m option.  Mark ignored options as deprecated.
+	* utils.sgml (mkpasswd): Remove description of -m option.
+
 2011-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* locale.cc (print_locale_with_codeset): Fetch Windows path as UNICODE

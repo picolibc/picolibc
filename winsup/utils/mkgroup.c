@@ -39,8 +39,6 @@
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
 
-NET_API_STATUS WINAPI (*dsgetdcname)(LPWSTR,LPWSTR,GUID*,LPWSTR,ULONG,PDOMAIN_CONTROLLER_INFOW*);
-
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
 #endif
@@ -69,58 +67,28 @@ _print_win_error (DWORD code, int line)
     fprintf (stderr, "mkgroup (%d): error %lu", line, code);
 }
 
-static void
-load_dsgetdcname ()
-{
-  HANDLE h = LoadLibrary ("netapi32.dll");
-  if (h)
-    dsgetdcname = (void *) GetProcAddress (h, "DsGetDcNameW");
-}
-
 static PWCHAR
 get_dcname (char *domain)
 {
   static WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   DWORD rc;
-  PWCHAR servername;
   WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
   PDOMAIN_CONTROLLER_INFOW pdci = NULL;
 
-  if (dsgetdcname)
+  if (domain)
     {
-      if (domain)
-	{
-	  mbstowcs (domain_name, domain, strlen (domain) + 1);
-	  rc = dsgetdcname (NULL, domain_name, NULL, NULL, 0, &pdci);
-	}
-      else
-	rc = dsgetdcname (NULL, NULL, NULL, NULL, 0, &pdci);
-      if (rc != ERROR_SUCCESS)
-	{
-	  print_win_error (rc);
-	  return (PWCHAR) -1;
-	}
-      wcscpy (server, pdci->DomainControllerName);
-      NetApiBufferFree (pdci);
+      mbstowcs (domain_name, domain, strlen (domain) + 1);
+      rc = DsGetDcNameW (NULL, domain_name, NULL, NULL, 0, &pdci);
     }
   else
+    rc = DsGetDcNameW (NULL, NULL, NULL, NULL, 0, &pdci);
+  if (rc != ERROR_SUCCESS)
     {
-      rc = NetGetDCName (NULL, NULL, (void *) &servername);
-      if (rc == ERROR_SUCCESS && domain)
-	{
-	  LPWSTR server = servername;
-	  mbstowcs (domain_name, domain, strlen (domain) + 1);
-	  rc = NetGetDCName (server, domain_name, (void *) &servername);
-	  NetApiBufferFree (server);
-	}
-      if (rc != ERROR_SUCCESS)
-	{
-	  print_win_error(rc);
-	  return (PWCHAR) -1;
-	}
-      wcscpy (server, servername);
-      NetApiBufferFree ((PVOID) servername);
+      print_win_error (rc);
+      return (PWCHAR) -1;
     }
+  wcscpy (server, pdci->DomainControllerName);
+  NetApiBufferFree (pdci);
   return server;
 }
 
@@ -757,7 +725,6 @@ main (int argc, char **argv)
   setlocale (LC_CTYPE, "");
   if (!strcmp (setlocale (LC_CTYPE, NULL), "C"))
     setlocale (LC_CTYPE, "en_US.UTF-8");
-  load_dsgetdcname ();
   in_domain = fetch_primary_domain ();
   fetch_current_pgrp_sid ();
 

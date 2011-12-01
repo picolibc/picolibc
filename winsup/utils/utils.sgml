@@ -960,13 +960,13 @@ Options:
                            one of -l, -L, -d, -D must be specified, too
    -p,--path-to-home path  use specified path instead of user account home dir
                            or /home prefix
-   -m,--no-mount           don't use mount points for home dir
    -U,--unix userlist      additionally print UNIX users when using -l or -L\
                            on a UNIX Samba server
                            userlist is a comma-separated list of usernames
                            or uid ranges (root,-25,50-100).
                            (enumerating large ranges can take a long time!)
    -s,--no-sids            (ignored)
+   -m,--no-mount           (ignored)
    -g,--local-groups       (ignored)
    -h,--help               displays this message
    -V,--version            version information and exit
@@ -1013,11 +1013,7 @@ domain/group separator, you can specify another separator using the
 <literal>-S</literal> option, similar to the <command>mkgroup</command>.
 The <literal>-o</literal> option allows for special cases
 (such as multiple domains) where the UIDs might match otherwise.
-The <literal>-m</literal> option bypasses the current
-mount table so that, for example, two users who have a Windows home 
-directory of H: could mount them differently.  For more information on
-SIDs, see <xref linkend="ntsec"></xref> in the Cygwin User's Guide.  The
-<literal>-p</literal> option causes <command>mkpasswd</command> to
+The <literal>-p</literal> option causes <command>mkpasswd</command> to
 use the specified prefix instead of the account home dir or <literal>/home/
 </literal>. For example, this command:
 
