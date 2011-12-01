@@ -369,6 +369,7 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	_flsbuf (int, FILE*);
 
 #if !defined _MT
 
+__CRT_INLINE int __cdecl __MINGW_NOTHROW getc (FILE*);
 __CRT_INLINE int __cdecl __MINGW_NOTHROW getc (FILE* __F)
 {
   return (--__F->_cnt >= 0)
@@ -376,6 +377,7 @@ __CRT_INLINE int __cdecl __MINGW_NOTHROW getc (FILE* __F)
     : _filbuf (__F);
 }
 
+__CRT_INLINE int __cdecl __MINGW_NOTHROW putc (int, FILE*);
 __CRT_INLINE int __cdecl __MINGW_NOTHROW putc (int __c, FILE* __F)
 {
   return (--__F->_cnt >= 0)
@@ -383,6 +385,7 @@ __CRT_INLINE int __cdecl __MINGW_NOTHROW putc (int __c, FILE* __F)
     :  _flsbuf (__c, __F);
 }
 
+__CRT_INLINE int __cdecl __MINGW_NOTHROW getchar (void);
 __CRT_INLINE int __cdecl __MINGW_NOTHROW getchar (void)
 {
   return (--stdin->_cnt >= 0)
@@ -390,6 +393,7 @@ __CRT_INLINE int __cdecl __MINGW_NOTHROW getchar (void)
     : _filbuf (stdin);
 }
 
+__CRT_INLINE int __cdecl __MINGW_NOTHROW putchar(int);
 __CRT_INLINE int __cdecl __MINGW_NOTHROW putchar(int __c)
 {
   return (--stdout->_cnt >= 0)
@@ -532,6 +536,7 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	fileno (FILE*);
 
 #if defined (__MSVCRT__) && !defined (__NO_MINGW_LFS)
 #include <sys/types.h>
+__CRT_INLINE FILE* __cdecl __MINGW_NOTHROW fopen64 (const char*, const char*);
 __CRT_INLINE FILE* __cdecl __MINGW_NOTHROW fopen64 (const char* filename, const char* mode)
 {
   return fopen (filename, mode); 
@@ -544,6 +549,7 @@ int __cdecl __MINGW_NOTHROW __mingw_fseeko64 (FILE *, off64_t, int);
 #define fseeko64(fp, offset, whence)  __mingw_fseeko64(fp, offset, whence)
 #endif
 
+__CRT_INLINE off64_t __cdecl __MINGW_NOTHROW ftello64 (FILE *);
 __CRT_INLINE off64_t __cdecl __MINGW_NOTHROW ftello64 (FILE * stream)
 {
   fpos_t pos;

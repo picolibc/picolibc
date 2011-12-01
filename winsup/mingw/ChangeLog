@@ -1,3 +1,8 @@
+2011-11-30  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/stdio.h (getc, putc, getchar, putchar, fopen64, ftello64): Add
+	function definitions to fix warnings when building GCC.
+
 2011-11-30  Rodrigo Rivas Costa  <rodrigorivascosta@gmail.com>
 
 	* tlssup.c (__dyn_tls_init): Reapply patch from 3105314.
