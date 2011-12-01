@@ -1,3 +1,9 @@
+2011-11-30  Ozkan Sezer  <sezero@users.sourceforge.net>
+
+	* include/io.h (_wfindfirst, _wfindnext, _wfindfirst32, _wfindnext32,
+	_wfindfirsti64, _wfindnexti64, _wfindfirst32i64, _wfindfirst64i32,
+	_wfindnext32i64, _wfindnext64i32, _wfindnext64): Update to use intptr_t.
+
 2011-11-30  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/stdio.h (getc, putc, getchar, putchar, fopen64, ftello64): Add

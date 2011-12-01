@@ -195,7 +195,6 @@ extern "C" {
  * _findclose calls. _findnext also returns -1 if no match could be found,
  * and 0 if a match was found. Call _findclose when you are finished.
  */
-/*  FIXME: Should these all use intptr_t, as per recent MSDN docs?  */
 #if __MSVCRT_VERSION__ >= 0x0800
 /*
 intptr_t _findfirst      (const char *filespec,struct _finddata_t      *fileinfo);
@@ -391,40 +390,40 @@ _CRTIMP int __cdecl __MINGW_NOTHROW _waccess(const wchar_t*, int);
 _CRTIMP int __cdecl __MINGW_NOTHROW _wchmod(const wchar_t*, int);
 _CRTIMP int __cdecl __MINGW_NOTHROW _wcreat(const wchar_t*, int);
 #if __MSVCRT_VERSION__ < 0x0800
-_CRTIMP long __cdecl __MINGW_NOTHROW _wfindfirst(const wchar_t*, struct _wfinddata_t*);
-_CRTIMP int __cdecl __MINGW_NOTHROW _wfindnext(long, struct _wfinddata_t *);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _wfindfirst(const wchar_t*, struct _wfinddata_t*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wfindnext(intptr_t, struct _wfinddata_t *);
 #else
-_CRTIMP long __cdecl __MINGW_NOTHROW	_wfindfirst32 (const wchar_t*, struct __wfinddata32_t*);
-_CRTIMP int  __cdecl __MINGW_NOTHROW	_wfindnext32 (long, struct __wfinddata32_t*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _wfindfirst32 (const wchar_t*, struct __wfinddata32_t*);
+_CRTIMP int  __cdecl __MINGW_NOTHROW	_wfindnext32 (intptr_t, struct __wfinddata32_t*);
 #endif /* __MSVCRT_VERSION__ < 0x0800 */
 _CRTIMP int __cdecl __MINGW_NOTHROW _wunlink(const wchar_t*);
 _CRTIMP int __cdecl __MINGW_NOTHROW _wopen(const wchar_t*, int, ...);
 _CRTIMP int __cdecl __MINGW_NOTHROW _wsopen(const wchar_t*, int, int, ...);
 _CRTIMP wchar_t * __cdecl __MINGW_NOTHROW _wmktemp(wchar_t*);
 #if __MSVCRT_VERSION__ < 0x0800
-_CRTIMP long __cdecl __MINGW_NOTHROW _wfindfirsti64(const wchar_t*, struct _wfinddatai64_t*);
-_CRTIMP int __cdecl __MINGW_NOTHROW _wfindnexti64(long, struct _wfinddatai64_t*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _wfindfirsti64(const wchar_t*, struct _wfinddatai64_t*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wfindnexti64(intptr_t, struct _wfinddatai64_t*);
 #else
-_CRTIMP long __cdecl __MINGW_NOTHROW	_wfindfirst32i64 (const wchar_t*, struct _wfinddata32i64_t*);
-_CRTIMP long __cdecl __MINGW_NOTHROW	_wfindfirst64i32 (const wchar_t*, struct _wfinddata64i32_t*);
-_CRTIMP int  __cdecl __MINGW_NOTHROW	_wfindnext32i64 (long, struct _wfinddata32i64_t*);
-_CRTIMP int  __cdecl __MINGW_NOTHROW	_wfindnext64i32 (long, struct _wfinddata64i32_t*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _wfindfirst32i64 (const wchar_t*, struct _wfinddata32i64_t*);
+_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _wfindfirst64i32 (const wchar_t*, struct _wfinddata64i32_t*);
+_CRTIMP int  __cdecl __MINGW_NOTHROW	_wfindnext32i64 (intptr_t, struct _wfinddata32i64_t*);
+_CRTIMP int  __cdecl __MINGW_NOTHROW	_wfindnext64i32 (intptr_t, struct _wfinddata64i32_t*);
 #endif /* __MSVCRT_VERSION__ < 0x0800 */
 #if __MSVCRT_VERSION__ >= 0x0601
 _CRTIMP intptr_t __cdecl __MINGW_NOTHROW _wfindfirst64(const wchar_t*, struct __wfinddata64_t*); 
-_CRTIMP intptr_t __cdecl __MINGW_NOTHROW _wfindnext64(intptr_t, struct __wfinddata64_t*);
+_CRTIMP int __cdecl __MINGW_NOTHROW _wfindnext64(intptr_t, struct __wfinddata64_t*);
 #endif
 #if __MSVCRT_VERSION__ >= 0x0800
 #ifndef _USE_32BIT_TIME_T
-_CRTALIAS long __cdecl __MINGW_NOTHROW	_wfindfirst (const wchar_t* _v1, struct _wfinddata_t* _v2)	 { return(_wfindfirst64i32 (_v1,(struct _wfinddata64i32_t*)_v2)); }
-_CRTALIAS int  __cdecl __MINGW_NOTHROW	_wfindnext (long _v1, struct _wfinddata_t* _v2)			 { return(_wfindnext64i32  (_v1,(struct _wfinddata64i32_t*)_v2)); }
-_CRTALIAS long __cdecl __MINGW_NOTHROW	_wfindfirsti64 (const wchar_t* _v1, struct _wfinddatai64_t* _v2) { return(_wfindfirst64 (_v1,(struct __wfinddata64_t*)_v2)); }
-_CRTALIAS int  __cdecl __MINGW_NOTHROW	_wfindnexti64 (long _v1, struct _wfinddatai64_t* _v2)		 { return(_wfindnext64  (_v1,(struct __wfinddata64_t*)_v2)); }
+_CRTALIAS intptr_t __cdecl __MINGW_NOTHROW _wfindfirst (const wchar_t* _v1, struct _wfinddata_t* _v2)	 { return(_wfindfirst64i32 (_v1,(struct _wfinddata64i32_t*)_v2)); }
+_CRTALIAS int  __cdecl __MINGW_NOTHROW	_wfindnext (intptr_t _v1, struct _wfinddata_t* _v2)		 { return(_wfindnext64i32  (_v1,(struct _wfinddata64i32_t*)_v2)); }
+_CRTALIAS intptr_t __cdecl __MINGW_NOTHROW _wfindfirsti64 (const wchar_t* _v1, struct _wfinddatai64_t* _v2) { return(_wfindfirst64 (_v1,(struct __wfinddata64_t*)_v2)); }
+_CRTALIAS int  __cdecl __MINGW_NOTHROW	_wfindnexti64 (intptr_t _v1, struct _wfinddatai64_t* _v2)	 { return(_wfindnext64  (_v1,(struct __wfinddata64_t*)_v2)); }
 #else
-_CRTALIAS long __cdecl __MINGW_NOTHROW	_wfindfirst (const wchar_t* _v1, struct _wfinddata_t* _v2)	 { return(_wfindfirst32 (_v1,(struct __wfinddata32_t*)_v2)); }
-_CRTALIAS int  __cdecl __MINGW_NOTHROW	_wfindnext (long _v1, struct _wfinddata_t* _v2)			 { return(_wfindnext32  (_v1,(struct __wfinddata32_t*)_v2)); }
-_CRTALIAS long __cdecl __MINGW_NOTHROW	_wfindfirsti64 (const wchar_t* _v1, struct _wfinddatai64_t* _v2) { return(_wfindfirst32i64 (_v1,(struct _wfinddata32i64_t*)_v2)); }
-_CRTALIAS int  __cdecl __MINGW_NOTHROW	_wfindnexti64 (long _v1, struct _wfinddatai64_t* _v2)		 { return(_wfindnext32i64  (_v1,(struct _wfinddata32i64_t*)_v2)); }
+_CRTALIAS intptr_t __cdecl __MINGW_NOTHROW _wfindfirst (const wchar_t* _v1, struct _wfinddata_t* _v2)	 { return(_wfindfirst32 (_v1,(struct __wfinddata32_t*)_v2)); }
+_CRTALIAS int  __cdecl __MINGW_NOTHROW	_wfindnext (intptr_t _v1, struct _wfinddata_t* _v2)		 { return(_wfindnext32  (_v1,(struct __wfinddata32_t*)_v2)); }
+_CRTALIAS intptr_t __cdecl __MINGW_NOTHROW _wfindfirsti64 (const wchar_t* _v1, struct _wfinddatai64_t* _v2) { return(_wfindfirst32i64 (_v1,(struct _wfinddata32i64_t*)_v2)); }
+_CRTALIAS int  __cdecl __MINGW_NOTHROW	_wfindnexti64 (intptr_t _v1, struct _wfinddatai64_t* _v2)	 { return(_wfindnext32i64  (_v1,(struct _wfinddata32i64_t*)_v2)); }
 #endif /* !_USE_32BIT_TIME_T */
 #endif /* __MSVCRT_VERSION__ >= 0x0800 */
 #endif /* defined (__MSVCRT__) */
@@ -473,8 +472,8 @@ static inline int __mingw_access (const char* __fname, int __mode)
 int 		waccess(const wchar_t *, int);
 int 		wchmod(const wchar_t *, int);
 int 		wcreat(const wchar_t *, int);
-long 		wfindfirst(wchar_t *, struct _wfinddata_t *);
-int 		wfindnext(long, struct _wfinddata_t *);
+intptr_t	wfindfirst(wchar_t *, struct _wfinddata_t *);
+int 		wfindnext(intptr_t, struct _wfinddata_t *);
 int 		wunlink(const wchar_t *);
 int 		wrename(const wchar_t *, const wchar_t *);
 int 		wopen(const wchar_t *, int, ...);
