@@ -50,6 +50,8 @@ enum
   CCP_WIN_A_TO_POSIX,	  /* from is char*, to is char*       */
   CCP_WIN_W_TO_POSIX,	  /* from is wchar_t*, to is char*    */
 
+  CCP_CONVTYPE_MASK = 3,
+
   /* Or these values to the above as needed. */
   CCP_ABSOLUTE = 0,	  /* Request absolute path (default). */
   CCP_RELATIVE = 0x100    /* Request to keep path relative.   */

@@ -1,3 +1,13 @@
+2011-12-02  Corinna Vinschen  <vinschen@redhat.com>
+
+	* path.cc (conv_path_list): Take cygwin_conv_path_t as third parameter.
+	Allow all types of CCP conversions.  Accommodate throughout.
+	(cygwin_conv_path): Use current ANSI or OEM codepage for WIN_A
+	conversions, depending on current file API codepage setting.
+	(cygwin_conv_path_list): Allow all CCP conversion types.
+	* include/sys/cygwin.h (CCP_CONVTYPE_MASK): Add to cygwin_conv_path_t
+	enum for convenience.
+
 2011-11-29  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* sigproc.cc (get_proc_lock): Remove extra NULL check.  Return false on

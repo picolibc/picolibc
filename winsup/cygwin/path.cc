@@ -55,6 +55,7 @@
 #include <wingdi.h>
 #include <winuser.h>
 #include <winnetwk.h>
+#include <winnls.h>
 #include <shlobj.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
@@ -1312,24 +1313,28 @@ nofinalslash (const char *src, char *dst)
 /* conv_path_list: Convert a list of path names to/from Win32/POSIX. */
 
 static int
-conv_path_list (const char *src, char *dst, size_t size, int to_posix)
+conv_path_list (const char *src, char *dst, size_t size,
+		cygwin_conv_path_t what)
 {
   tmp_pathbuf tp;
   char src_delim, dst_delim;
-  cygwin_conv_path_t conv_fn;
   size_t len;
+  bool env_cvt = false;
 
-  if (to_posix)
+  if (what == (cygwin_conv_path_t) ENV_CVT)
+    {
+      what = CCP_WIN_A_TO_POSIX | CCP_RELATIVE;
+      env_cvt = true;
+    }
+  if (what & CCP_WIN_A_TO_POSIX)
     {
       src_delim = ';';
       dst_delim = ':';
-      conv_fn = CCP_WIN_A_TO_POSIX | CCP_RELATIVE;
     }
   else
     {
       src_delim = ':';
       dst_delim = ';';
-      conv_fn = CCP_POSIX_TO_WIN_A | CCP_RELATIVE;
     }
 
   char *srcbuf;
@@ -1355,7 +1360,7 @@ conv_path_list (const char *src, char *dst, size_t size, int to_posix)
       /* Paths in Win32 path lists in the environment (%Path%), are often
 	 enclosed in quotes (usually paths with spaces).  Trailing backslashes
 	 are common, too.  Remove them. */
-      if (to_posix == ENV_CVT && len)
+      if (env_cvt && len)
 	{
 	  if (*srcpath == '"')
 	    {
@@ -1372,16 +1377,16 @@ conv_path_list (const char *src, char *dst, size_t size, int to_posix)
       if (len)
 	{
 	  ++d;
-	  err = cygwin_conv_path (conv_fn, srcpath, d, size - (d - dst));
+	  err = cygwin_conv_path (what, srcpath, d, size - (d - dst));
 	}
-      else if (!to_posix)
+      else if ((what & CCP_CONVTYPE_MASK) == CCP_POSIX_TO_WIN_A)
 	{
 	  ++d;
-	  err = cygwin_conv_path (conv_fn, ".", d, size - (d - dst));
+	  err = cygwin_conv_path (what, ".", d, size - (d - dst));
 	}
       else
 	{
-	  if (to_posix == ENV_CVT)
+	  if (env_cvt)
 	    saw_empty = true;
 	  continue;
 	}
@@ -2947,7 +2952,11 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	  return_with_errno (p.error);
 	PUNICODE_STRING up = p.get_nt_native_path ();
 	buf = tp.c_get ();
-	sys_wcstombs (buf, NT_MAX_PATH, up->Buffer, up->Length / sizeof (WCHAR));
+	UINT cp = AreFileApisANSI () ? CP_ACP : CP_OEMCP;
+	int len = WideCharToMultiByte (cp, WC_NO_BEST_FIT_CHARS,
+				       up->Buffer, up->Length / sizeof (WCHAR),
+				       buf, NT_MAX_PATH, NULL, NULL);
+	buf[len] = '\0';
 	/* Convert native path to standard DOS path. */
 	if (!strncmp (buf, "\\??\\", 4))
 	  {
@@ -2959,12 +2968,14 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	  {
 	    /* Device name points to somewhere else in the NT namespace.
 	       Use GLOBALROOT prefix to convert to Win32 path. */
-	    char *p = buf + sys_wcstombs (buf, NT_MAX_PATH,
-					  ro_u_globalroot.Buffer,
-					  ro_u_globalroot.Length
-					  / sizeof (WCHAR));
-	    sys_wcstombs (p, NT_MAX_PATH - (p - buf),
-			  up->Buffer, up->Length / sizeof (WCHAR));
+	    char *p = buf + WideCharToMultiByte (cp, WC_NO_BEST_FIT_CHARS,
+				       ro_u_globalroot.Buffer,
+				       ro_u_globalroot.Length / sizeof (WCHAR),
+				       buf, NT_MAX_PATH, NULL, NULL);
+	    len = WideCharToMultiByte (cp, WC_NO_BEST_FIT_CHARS,
+				       up->Buffer, up->Length / sizeof (WCHAR),
+				       p, NT_MAX_PATH - (p - buf), NULL, NULL);
+	    p[len] = '\0';
 	  }
 	lsiz = strlen (buf) + 1;
 	/* TODO: Incoming "." is a special case which leads to a trailing
@@ -3036,12 +3047,16 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
       lsiz *= sizeof (WCHAR);
       break;
     case CCP_WIN_A_TO_POSIX:
-      buf = tp.c_get ();
-      error = mount_table->conv_to_posix_path ((const char *) from, buf,
-					       relative);
-      if (error)
-	return_with_errno (error);
-      lsiz = strlen (buf) + 1;
+      {
+	UINT cp = AreFileApisANSI () ? CP_ACP : CP_OEMCP;
+	PWCHAR wbuf = tp.w_get ();
+	MultiByteToWideChar (cp, 0, (const char *) from, -1, wbuf, NT_MAX_PATH);
+	buf = tp.c_get ();
+	error = mount_table->conv_to_posix_path (wbuf, buf, relative);
+	if (error)
+	  return_with_errno (error);
+	lsiz = strlen (buf) + 1;
+      }
       break;
     case CCP_WIN_W_TO_POSIX:
       buf = tp.c_get ();
@@ -3280,35 +3295,63 @@ env_PATH_to_posix (const void *win32, void *posix, size_t size)
 extern "C" int
 cygwin_win32_to_posix_path_list (const char *win32, char *posix)
 {
-  return_with_errno (conv_path_list (win32, posix, MAX_PATH, 1));
+  return_with_errno (conv_path_list (win32, posix, MAX_PATH,
+		     CCP_WIN_A_TO_POSIX | CCP_RELATIVE));
 }
 
 extern "C" int
 cygwin_posix_to_win32_path_list (const char *posix, char *win32)
 {
-  return_with_errno (conv_path_list (posix, win32, MAX_PATH, 0));
+  return_with_errno (conv_path_list (posix, win32, MAX_PATH,
+		     CCP_POSIX_TO_WIN_A | CCP_RELATIVE));
 }
 
 extern "C" ssize_t
 cygwin_conv_path_list (cygwin_conv_path_t what, const void *from, void *to,
 		       size_t size)
 {
-  /* FIXME: Path lists are (so far) always retaining relative paths. */
-  what &= ~CCP_RELATIVE;
-  switch (what)
+  int ret;
+  char *winp = NULL;
+  void *orig_to = NULL;
+  size_t orig_size = (size_t) -1;
+  tmp_pathbuf tp;
+
+  switch (what & CCP_CONVTYPE_MASK)
     {
     case CCP_WIN_W_TO_POSIX:
-    case CCP_POSIX_TO_WIN_W:
-      /*FIXME*/
-      api_fatal ("wide char path lists not yet supported");
+      if (!sys_wcstombs_alloc (&winp, HEAP_NOTHEAP, (const wchar_t *) from,
+			       (size_t) -1))
+	return -1;
+      what = (what & ~CCP_CONVTYPE_MASK) | CCP_WIN_A_TO_POSIX;
+      from = (const void *) winp;
       break;
+    case CCP_POSIX_TO_WIN_W:
+      if (size == 0)
+	return conv_path_list_buf_size ((const char *) from, 0)
+	       * sizeof (WCHAR);
+      what = (what & ~CCP_CONVTYPE_MASK) | CCP_POSIX_TO_WIN_A;
+      orig_to = to;
+      orig_size = size;
+      to = (void *) tp.w_get ();
+      size = 65536;
+      break;
+    }
+  switch (what & CCP_CONVTYPE_MASK)
+    {
     case CCP_WIN_A_TO_POSIX:
     case CCP_POSIX_TO_WIN_A:
       if (size == 0)
 	return conv_path_list_buf_size ((const char *) from,
 					what == CCP_WIN_A_TO_POSIX);
-      return_with_errno (conv_path_list ((const char *) from, (char *) to,
-					 size, what == CCP_WIN_A_TO_POSIX));
+      ret = conv_path_list ((const char *) from, (char *) to, size, what);
+      /* Free winp buffer in case of CCP_WIN_W_TO_POSIX. */
+      if (winp)
+      	free (winp);
+      /* Convert to WCHAR in case of CCP_POSIX_TO_WIN_W. */
+      if (orig_to)
+	sys_mbstowcs ((wchar_t *) orig_to, size / sizeof (WCHAR),
+		      (const char *) to, (size_t) -1);
+      return_with_errno (ret);
       break;
     default:
       break;
