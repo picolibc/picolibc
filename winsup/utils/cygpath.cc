@@ -1,6 +1,6 @@
 /* cygpath.cc -- convert pathnames between Windows and Unix format
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
+   2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -10,6 +10,7 @@ details. */
 
 #define NOCOMATTRIBUTE
 
+#define WINVER 0x0600
 #include <shlobj.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,6 +20,7 @@ details. */
 #include <limits.h>
 #include <getopt.h>
 #include <windows.h>
+#include <userenv.h>
 #include <io.h>
 #include <sys/fcntl.h>
 #include <sys/cygwin.h>
@@ -448,92 +450,15 @@ get_short_name (const char *filename)
   return sbuf;
 }
 
-static DWORD WINAPI
-get_long_path_name_w32impl (LPCWSTR src, LPWSTR sbuf, DWORD)
-{
-  wchar_t *buf1 = (wchar_t *) malloc (32768);
-  wchar_t *buf2 = (wchar_t *) malloc (32768);
-  wchar_t *ptr;
-  const wchar_t *pelem, *next;
-  WIN32_FIND_DATAW w32_fd;
-  DWORD len;
-
-  wcscpy (buf1, src);
-  *buf2 = L'\0';
-  pelem = src;
-  ptr = buf2;
-  while (pelem)
-    {
-      next = pelem;
-      if (*next == L'\\')
-	{
-	  wcscat (ptr++, L"\\");
-	  pelem++;
-	  if (!*pelem)
-	    break;
-	  continue;
-	}
-      pelem = wcschr (next, L'\\');
-      len = pelem ? (pelem++ - next) : wcslen (next);
-      wcsncpy (ptr, next, len);
-      ptr[len] = L'\0';
-      if (next[1] != L':' && wcscmp(next, L".") && wcscmp(next, L".."))
-	{
-	  HANDLE h;
-	  h = FindFirstFileW (buf2, &w32_fd);
-	  if (h != INVALID_HANDLE_VALUE)
-	    {
-	      wcscpy (ptr, w32_fd.cFileName);
-	      FindClose (h);
-	    }
-	}
-      ptr += wcslen (ptr);
-      if (pelem)
-	{
-	  *ptr++ = '\\';
-	  *ptr = 0;
-	}
-    }
-  if (sbuf)
-    wcscpy (sbuf, buf2);
-  SetLastError (0);
-  len = wcslen (buf2) + (sbuf ? 0 : 1);
-  free (buf1);
-  free (buf2);
-  return len;
-}
-
 static char *
 get_long_name (const char *filename, DWORD& len)
 {
   char *sbuf;
   wchar_t buf[32768];
-  static HINSTANCE k32 = GetModuleHandleW (L"kernel32.dll");
-  static DWORD (WINAPI *GetLongPathName) (LPCWSTR, LPWSTR, DWORD) =
-    (DWORD (WINAPI *) (LPCWSTR, LPWSTR, DWORD)) GetProcAddress (k32, "GetLongPathNameW");
-  if (!GetLongPathName)
-    GetLongPathName = get_long_path_name_w32impl;
-
   wide_path wpath (filename);
-  len = GetLongPathName (wpath, buf, 32768);
-  if (len == 0)
-    {
-      DWORD err = GetLastError ();
 
-      if (err == ERROR_INVALID_PARAMETER)
-	{
-	  fprintf (stderr, "%s: cannot create long name of %s\n",
-		   prog_name, filename);
-	  exit (2);
-	}
-      else if (err == ERROR_FILE_NOT_FOUND)
-	get_long_path_name_w32impl (wpath, buf, 32768);
-      else
-	{
-	  buf[0] = L'\0';
-	  wcsncat (buf, wpath, 32767);
-	}
-    }
+  if (!GetLongPathNameW (wpath, buf, 32768))
+    wcscpy (buf, wpath);
   len = my_wcstombs (NULL, buf, 0);
   sbuf = (char *) malloc (len + 1);
   if (!sbuf)
@@ -606,48 +531,37 @@ convert_slashes (char* name)
 }
 
 static bool
-get_special_folder (char* path, int id)
+get_special_folder (PWCHAR wpath, int id)
 {
-  WCHAR wpath[MAX_PATH];
-
-  path[0] = '\0';
-  wpath[0] = L'\0';
   LPITEMIDLIST pidl = 0;
   if (SHGetSpecialFolderLocation (NULL, id, &pidl) != S_OK)
     return false;
   if (!SHGetPathFromIDListW (pidl, wpath) || !wpath[0])
     return false;
-  my_wcstombs (path, wpath, PATH_MAX);
   return true;
 }
 
 static void
 do_sysfolders (char option)
 {
-  char *buf, buf1[PATH_MAX], buf2[PATH_MAX];
-  char *tmp = NULL;
   WCHAR wbuf[MAX_PATH];
-  DWORD len = MAX_PATH;
-  WIN32_FIND_DATAW w32_fd;
-  HINSTANCE k32;
-  BOOL (*GetProfilesDirectoryAPtrW) (LPWSTR, LPDWORD) = 0;
+  char buf[PATH_MAX];
 
-  buf = buf1;
-  buf[0] = 0;
+  wbuf[0] = L'\0';
   switch (option)
     {
     case 'D':
-      get_special_folder (buf, allusers_flag ? CSIDL_COMMON_DESKTOPDIRECTORY
+      get_special_folder (wbuf, allusers_flag ? CSIDL_COMMON_DESKTOPDIRECTORY
 					     : CSIDL_DESKTOPDIRECTORY);
       break;
 
     case 'P':
-      get_special_folder (buf, allusers_flag ? CSIDL_COMMON_PROGRAMS
+      get_special_folder (wbuf, allusers_flag ? CSIDL_COMMON_PROGRAMS
 					     : CSIDL_PROGRAMS);
       break;
 
     case 'O':
-      get_special_folder (buf, allusers_flag ? CSIDL_COMMON_DOCUMENTS
+      get_special_folder (wbuf, allusers_flag ? CSIDL_COMMON_DOCUMENTS
 					     : CSIDL_PERSONAL);
       break;
 
@@ -661,72 +575,64 @@ do_sysfolders (char option)
 		     prog_name, output_arg);
 	    exit (1);
 	  }
-	get_special_folder (buf, val);
+	get_special_folder (wbuf, val);
       }
       break;
 
     case 'H':
-      k32 = LoadLibrary ("userenv.dll");
-      if (k32)
-	GetProfilesDirectoryAPtrW = (BOOL (*) (LPWSTR, LPDWORD))
-	  GetProcAddress (k32, "GetProfilesDirectoryW");
-      if (GetProfilesDirectoryAPtrW)
-	(*GetProfilesDirectoryAPtrW) (wbuf, &len);
-      else
-	{
-	  GetWindowsDirectoryW (wbuf, MAX_PATH);
-	  wcscat (wbuf, L"\\Profiles");
-	}
-      my_wcstombs (buf, wbuf, PATH_MAX);
+      {
+	DWORD len = MAX_PATH;
+	GetProfilesDirectoryW (wbuf, &len);
+      }
       break;
 
     case 'S':
       {
 	HANDLE fh;
+	WIN32_FIND_DATAW w32_fd;
 
 	GetSystemDirectoryW (wbuf, MAX_PATH);
+	/* The path returned by GetSystemDirectoryW is not case preserving.
+	   The below code is a trick to get the correct case of the system
+	   directory from Windows. */
 	if ((fh = FindFirstFileW (wbuf, &w32_fd)) != INVALID_HANDLE_VALUE)
 	  {
 	    FindClose (fh);
 	    wcscpy (wcsrchr (wbuf, L'\\') + 1, w32_fd.cFileName);
 	  }
-	my_wcstombs (buf, wbuf, PATH_MAX);
       }
       break;
 
     case 'W':
-      GetWindowsDirectoryW (wbuf, MAX_PATH);
-      my_wcstombs (buf, wbuf, PATH_MAX);
+      GetSystemWindowsDirectoryW (wbuf, MAX_PATH);
       break;
 
     default:
       usage (stderr, 1);
     }
 
-  if (!buf[0])
+  if (!wbuf[0])
     {
       fprintf (stderr, "%s: failed to retrieve special folder path\n",
 	       prog_name);
     }
   else if (!windows_flag)
     {
-      if (cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, buf, buf2,
-	  PATH_MAX))
-	fprintf (stderr, "%s: error converting \"%s\" - %s\n",
-		 prog_name, buf, strerror (errno));
-      else
-	buf = buf2;
+      if (cygwin_conv_path (CCP_WIN_W_TO_POSIX, wbuf, buf, PATH_MAX))
+	fprintf (stderr, "%s: error converting \"%ls\" - %s\n",
+		 prog_name, wbuf, strerror (errno));
     }
   else
     {
       if (shortname_flag)
-	  tmp = buf = get_short_name (buf);
+	/* System paths are never longer than MAX_PATH.  The buffer pointers
+	   in a call to GetShortPathNameW may point to the same buffer. */
+	GetShortPathNameW (wbuf, wbuf, MAX_PATH);
+      my_wcstombs (buf, wbuf, MAX_PATH);
       if (mixed_flag)
 	convert_slashes (buf);
     }
   printf ("%s\n", buf);
-  if (tmp)
-    free (tmp);
 }
 
 static void
@@ -752,34 +658,23 @@ do_pathconv (char *filename)
 {
   char *buf = NULL, *tmp;
   wchar_t *buf2 = NULL;
-  DWORD len;
+  DWORD len = 32768;
   ssize_t err;
   bool print_tmp = false;
   cygwin_conv_path_t conv_func =
-		      (unix_flag ? CCP_WIN_A_TO_POSIX
-		      		 : (path_flag ? CCP_POSIX_TO_WIN_A
-					      : CCP_POSIX_TO_WIN_W))
-		    | (absolute_flag ? CCP_ABSOLUTE : CCP_RELATIVE);
+		      (unix_flag ? CCP_WIN_W_TO_POSIX : CCP_POSIX_TO_WIN_W)
+		      | (absolute_flag ? CCP_ABSOLUTE : CCP_RELATIVE);
 
-  if (!path_flag)
+  if (!filename || !filename[0])
     {
-      len = strlen (filename);
-      if (len)
-	len = 32768;
-      else if (ignore_flag)
-	exit (0);
-      else
-	{
-	  fprintf (stderr, "%s: can't convert empty path\n",
-		   prog_name);
-	  exit (1);
-	}
+      if (ignore_flag)
+	return;
+      fprintf (stderr, "%s: can't convert empty path\n", prog_name);
+      exit (1);
     }
-  else
-    len = cygwin_conv_path_list (conv_func, filename, NULL, 0);
 
   buf = (char *) malloc (len);
-  if (!unix_flag && !path_flag)
+  if (!unix_flag)
     buf2 = (wchar_t *) malloc (len * sizeof (wchar_t));
   if (buf == NULL)
     {
@@ -789,11 +684,22 @@ do_pathconv (char *filename)
 
   if (path_flag)
     {
-      err = cygwin_conv_path_list (conv_func, filename, buf, len);
+      if (unix_flag)
+	{
+	  wide_path wpath (filename);
+	  err = cygwin_conv_path_list (conv_func, wpath, buf, len);
+	}
+      else
+	err = cygwin_conv_path_list (conv_func, filename, buf2, len);
+      if (err)
+	{
+	  fprintf (stderr, "%s: error converting \"%s\" - %s\n",
+		   prog_name, filename, strerror (errno));
+	  exit (1);
+	}
       if (!unix_flag)
 	{
-	  if (err)
-	    /* oops */;
+	  my_wcstombs (buf, buf2, 32768);
 	  buf = get_device_paths (tmp = buf);
 	  free (tmp);
 	  if (shortname_flag)
@@ -809,17 +715,16 @@ do_pathconv (char *filename)
 	  if (mixed_flag)
 	    convert_slashes (buf);
 	}
-      if (err)
-	{
-	  fprintf (stderr, "%s: error converting \"%s\" - %s\n",
-		   prog_name, filename, strerror (errno));
-	  exit (1);
-	}
     }
   else
     {
-      err = cygwin_conv_path (conv_func, filename,
-			      unix_flag ? (void *) buf : (void *) buf2, len);
+      if (unix_flag)
+	{
+	  wide_path wpath (filename);
+	  err = cygwin_conv_path (conv_func, wpath, (void *) buf, len);
+	}
+      else
+	err = cygwin_conv_path (conv_func, filename, (void *) buf2, len);
       if (err)
 	{
 	  fprintf (stderr, "%s: error converting \"%s\" - %s\n",

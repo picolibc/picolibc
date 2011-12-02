@@ -75,7 +75,7 @@ mount.exe: path-mount.o
 
 # Provide any necessary per-target variable overrides.
 cygcheck.exe: MINGW_LDFLAGS += -lntdll
-cygpath.exe: ALL_LDFLAGS += -lcygwin -lntdll
+cygpath.exe: ALL_LDFLAGS += -lcygwin -luserenv -lntdll
 cygpath.exe: CXXFLAGS += -fno-threadsafe-statics
 ps.exe: ALL_LDFLAGS += -lcygwin -lpsapi -lntdll
 strace.exe: MINGW_LDFLAGS += -lntdll

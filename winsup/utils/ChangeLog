@@ -1,3 +1,20 @@
+2011-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygpath.exe): Add -luserenv to ALL_LDFLAGS.
+	* cygpath.cc: Throughout, use cygwin_conv_path WIN_W rather than WIN_A
+	conversion.
+	(get_long_path_name_w32impl): Remove.
+	(get_long_name): Drop pre-Windows 2000 accommodations.  Just call
+	GetLongPathNameW here directly.
+	(get_special_folder): Convert first parameter to WCHAR buffer pointer.
+	Drop conversion of result from WCHAR * to char *.
+	(do_sysfolders): Accommodate change to get_special_folder and only
+	convert result to char * last.  Drop pre-Windows 2000 accommodations
+	and just call GetProfilesDirectoryW directly.  Replace call to
+	GetWindowsDirectoryW with call to GetSystemWindowsDirectoryW.
+	Just call GetShortPathNameW directly.
+	(do_pathconv): Simplify buffer handling.
+
 2011-12-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c: Drop support for NT4 domains.
