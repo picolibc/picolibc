@@ -3645,7 +3645,7 @@
 	* pinfo.h (_pinfo::set_ctty): Change third parameter to
 	fhandler_termios *.
 
-	* sigproc.cc (handle_sigsuspend): Don't special-case non-main threads.
+	* exceptions.cc (handle_sigsuspend): Don't special-case non-main threads.
 
 2011-04-15  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
