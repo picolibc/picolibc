@@ -1244,7 +1244,7 @@ msync (void *addr, size_t len, int flags)
 
 out:
   LIST_UNLOCK ();
-  syscall_printf ("%d = msync()", ret);
+  syscall_printf ("%R = msync()", ret);
   return ret;
 }
 
@@ -1337,7 +1337,7 @@ mprotect (void *addr, size_t len, int prot)
 
 out:
 
-  syscall_printf ("%d = mprotect ()", ret ? 0 : -1);
+  syscall_printf ("%R = mprotect ()", ret ? 0 : -1);
   return ret ? 0 : -1;
 }
 

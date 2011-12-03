@@ -707,7 +707,7 @@ loop:
     cygpid = myself->pid;
 
   /* We print the original program name here so the user can see that too.  */
-  syscall_printf ("%d = child_info_spawn::worker (%s, %.9500s)",
+  syscall_printf ("%d = child_info_spawn::worker(%s, %.9500s)",
 		  rc ? cygpid : (unsigned int) -1, prog_arg, one_line.buf);
 
   /* Name the handle similarly to proc_subproc. */

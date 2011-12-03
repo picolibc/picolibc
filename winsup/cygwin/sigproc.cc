@@ -1241,7 +1241,7 @@ talktome (siginfo_t *si)
 
   pinfo pi (si->si_pid);
   if (pi)
-    new cygthread (commune_process, size, si, "commune_process");
+    new cygthread (commune_process, size, si, "commune");
 }
 
 void

@@ -137,10 +137,10 @@ dup2 (int oldfd, int newfd)
       cygheap_fdget cfd (oldfd);
       if (cfd < 0)
 	{
-	  syscall_printf ("-1 = dup2 (%d, %d) (oldfd not open)", oldfd, newfd);
+	  syscall_printf ("%R = dup2(%d,%d) (oldfd not open)", -1, oldfd, newfd);
 	  return -1;
 	}
-      syscall_printf ("%d = dup2 (%d, %d) (newfd==oldfd)", oldfd, oldfd, newfd);
+      syscall_printf ("%R = dup2(%d, %d) (newfd==oldfd)", oldfd, oldfd, newfd);
       return oldfd;
     }
   return cygheap->fdtab.dup3 (oldfd, newfd, 0);
@@ -934,7 +934,7 @@ unlink (const char *ourname)
     __seterrno_from_nt_status (status);
 
  done:
-  syscall_printf ("%d = unlink (%s)", res, ourname);
+  syscall_printf ("%R = unlink(%s)", res, ourname);
   return res;
 }
 
@@ -946,7 +946,7 @@ _remove_r (struct _reent *, const char *ourname)
   if (win32_name.error)
     {
       set_errno (win32_name.error);
-      syscall_printf ("-1 = remove (%s)", ourname);
+      syscall_printf ("%R = remove(%s)",-1, ourname);
       return -1;
     }
 
@@ -1074,8 +1074,7 @@ read (int fd, void *ptr, size_t len)
   cfd->read (ptr, res = len);
 
 done:
-  syscall_printf ("%d = read (%d, %p, %d), errno %d", res, fd, ptr, len,
-		  get_errno ());
+  syscall_printf ("%R = read(%d, %p, %d)", res, fd, ptr, len);
   MALLOC_CHECK;
   return (ssize_t) res;
 }
@@ -1119,8 +1118,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
   res = cfd->readv (iov, iovcnt, tot);
 
 done:
-  syscall_printf ("%d = readv (%d, %p, %d), errno %d", res, fd, iov, iovcnt,
-		  get_errno ());
+  syscall_printf ("%R = readv(%d, %p, %d)", res, fd, iov, iovcnt);
   MALLOC_CHECK;
   return res;
 }
@@ -1137,8 +1135,7 @@ pread (int fd, void *ptr, size_t len, _off64_t off)
   else
     res = cfd->pread (ptr, len, off);
 
-  syscall_printf ("%d = pread (%d, %p, %d, %d), errno %d",
-		  res, fd, ptr, len, off, get_errno ());
+  syscall_printf ("%R = pread(%d, %p, %d, %d)", res, fd, ptr, len, off);
   return res;
 }
 
@@ -1173,11 +1170,9 @@ write (int fd, const void *ptr, size_t len)
 
 done:
   if (fd == 1 || fd == 2)
-    paranoid_printf ("%d = write (%d, %p, %d), errno %d",
-		     res, fd, ptr, len, get_errno ());
+    paranoid_printf ("%R = write(%d, %p, %d)", res, fd, ptr, len);
   else
-    syscall_printf ("%d = write (%d, %p, %d), errno %d",
-		    res, fd, ptr, len, get_errno ());
+    syscall_printf ("%R = write(%d, %p, %d)", res, fd, ptr, len);
 
   MALLOC_CHECK;
   return res;
@@ -1223,11 +1218,9 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
 
 done:
   if (fd == 1 || fd == 2)
-    paranoid_printf ("%d = writev (%d, %p, %d), errno %d",
-		     res, fd, iov, iovcnt, get_errno ());
+    paranoid_printf ("%R = writev(%d, %p, %d)", res, fd, iov, iovcnt);
   else
-    syscall_printf ("%d = writev (%d, %p, %d), errno %d",
-		    res, fd, iov, iovcnt, get_errno ());
+    syscall_printf ("%R = writev(%d, %p, %d)", res, fd, iov, iovcnt);
 
   MALLOC_CHECK;
   return res;
@@ -1245,8 +1238,7 @@ pwrite (int fd, void *ptr, size_t len, _off64_t off)
   else
     res = cfd->pwrite (ptr, len, off);
 
-  syscall_printf ("%d = pwrite (%d, %p, %d, %d), errno %d",
-		  res, fd, ptr, len, off, get_errno ());
+  syscall_printf ("%R = pwrite(%d, %p, %d, %d)", res, fd, ptr, len, off);
   return res;
 }
 
@@ -1328,7 +1320,7 @@ open (const char *unix_path, int flags, ...)
 	}
     }
 
-  syscall_printf ("%d = open (%s, %p)", res, unix_path, flags);
+  syscall_printf ("%R = open(%s, %p)", res, unix_path, flags);
   return res;
 }
 
@@ -1387,7 +1379,7 @@ close (int fd)
       cfd.release ();
     }
 
-  syscall_printf ("%d = close (%d)", res, fd);
+  syscall_printf ("%R = close(%d)", res, fd);
   MALLOC_CHECK;
   return res;
 }
@@ -1404,7 +1396,7 @@ isatty (int fd)
     res = 0;
   else
     res = cfd->is_tty ();
-  syscall_printf ("%d = isatty (%d)", res, fd);
+  syscall_printf ("%R = isatty(%d)", res, fd);
   return res;
 }
 EXPORT_ALIAS (isatty, _isatty)
@@ -1433,7 +1425,7 @@ link (const char *oldpath, const char *newpath)
 
   delete fh;
  error:
-  syscall_printf ("%d = link (%s, %s)", res, oldpath, newpath);
+  syscall_printf ("%R = link(%s, %s)", res, oldpath, newpath);
   return res;
 }
 
@@ -1461,7 +1453,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 
   delete fh;
  error:
-  syscall_printf ("%d = %schown (%s,...)",
+  syscall_printf ("%R = %schown(%s,...)",
 		  res, (fmode & PC_SYM_NOFOLLOW) ? "l" : "", name);
   return res;
 }
@@ -1504,7 +1496,7 @@ fchown32 (int fd, __uid32_t uid, __gid32_t gid)
 
   int res = cfd->fchown (uid, gid);
 
-  syscall_printf ("%d = fchown (%s,...)", res, cfd->get_name ());
+  syscall_printf ("%R = fchown(%s,...)", res, cfd->get_name ());
   return res;
 }
 
@@ -1553,7 +1545,7 @@ chmod (const char *path, mode_t mode)
 
   delete fh;
  error:
-  syscall_printf ("%d = chmod (%s, %p)", res, path, mode);
+  syscall_printf ("%R = chmod(%s, %p)", res, path, mode);
   return res;
 }
 
@@ -1613,7 +1605,7 @@ fstat64 (int fd, struct __stat64 *buf)
 	}
     }
 
-  syscall_printf ("%d = fstat (%d, %p)", res, fd, buf);
+  syscall_printf ("%R = fstat(%d, %p)", res, fd, buf);
   return res;
 }
 
@@ -1764,7 +1756,7 @@ stat_worker (path_conv &pc, struct __stat64 *buf)
 
  error:
   MALLOC_CHECK;
-  syscall_printf ("%d = (%S, %p)", res, pc.get_nt_native_path (), buf);
+  syscall_printf ("%d = (%S,%p)", res, pc.get_nt_native_path (), buf);
   return res;
 }
 
@@ -2397,7 +2389,7 @@ out:
     NtClose (fh);
   if (wincap.has_transactions () && trans)
     stop_transaction (status, old_trans, trans);
-  syscall_printf ("%d = rename (%s, %s)", res, oldpath, newpath);
+  syscall_printf ("%R = rename(%s, %s)", res, oldpath, newpath);
   return res;
 }
 
@@ -2674,7 +2666,7 @@ posix_fadvise (int fd, _off64_t offset, _off64_t len, int advice)
     res = cfd->fadvise (offset, len, advice);
   else
     set_errno (EBADF);
-  syscall_printf ("%d = posix_fadvice (%d, %D, %D, %d)",
+  syscall_printf ("%R = posix_fadvice(%d, %D, %D, %d)",
 		  res, fd, offset, len, advice);
   return res;
 }
@@ -2693,7 +2685,7 @@ posix_fallocate (int fd, _off64_t offset, _off64_t len)
       else
 	set_errno (EBADF);
     }
-  syscall_printf ("%d = posix_fallocate (%d, %D, %D)", res, fd, offset, len);
+  syscall_printf ("%R = posix_fallocate(%d, %D, %D)", res, fd, offset, len);
   return res;
 }
 
@@ -2706,7 +2698,7 @@ ftruncate64 (int fd, _off64_t length)
     res = cfd->ftruncate (length, true);
   else
     set_errno (EBADF);
-  syscall_printf ("%d = ftruncate (%d, %D)", res, fd, length);
+  syscall_printf ("%R = ftruncate(%d, %D)", res, fd, length);
   return res;
 }
 
@@ -2731,7 +2723,7 @@ truncate64 (const char *pathname, _off64_t length)
       res = ftruncate64 (fd, length);
       close (fd);
     }
-  syscall_printf ("%d = truncate (%s, %D)", res, pathname, length);
+  syscall_printf ("%R = truncate(%s, %D)", res, pathname, length);
 
   return res;
 }
@@ -2754,7 +2746,7 @@ get_osfhandle (int fd)
   else
     res = -1;
 
-  syscall_printf ("%d = get_osfhandle (%d)", res, fd);
+  syscall_printf ("%R = get_osfhandle(%d)", res, fd);
   return res;
 }
 
@@ -2800,7 +2792,7 @@ statvfs (const char *name, struct statvfs *sfs)
   delete fh;
  error:
   MALLOC_CHECK;
-  syscall_printf ("%d = (%s, %p)", res, name, sfs);
+  syscall_printf ("%R = statvfs(%s,%p)", res, name, sfs);
   return res;
 }
 
@@ -3402,8 +3394,7 @@ chroot (const char *newroot)
       ret = 0;
     }
 
-  syscall_printf ("%d = chroot (%s)", ret ? get_errno () : 0,
-				      newroot ? newroot : "NULL");
+  syscall_printf ("%R = chroot(%s)", ret, newroot ?: "NULL");
   return ret;
 }
 

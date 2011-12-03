@@ -968,7 +968,7 @@ set_file_attribute (HANDLE handle, path_conv &pc,
     }
   else
     ret = 0;
-  syscall_printf ("%d = set_file_attribute (%S, %d, %d, %p)",
+  syscall_printf ("%d = set_file_attribute(%S, %d, %d, %p)",
 		  ret, pc.get_nt_native_path (), uid, gid, attribute);
   return ret;
 }

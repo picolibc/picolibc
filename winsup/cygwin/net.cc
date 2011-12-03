@@ -661,7 +661,7 @@ cygwin_socket (int af, int type, int protocol)
   }
 
 done:
-  syscall_printf ("%d = socket (%d, %d (flags %p), %d)",
+  syscall_printf ("%R = socket(%d, %d (flags %p), %d)",
 		  res, af, type, flags, protocol);
   return res;
 }
@@ -681,7 +681,7 @@ cygwin_sendto (int fd, const void *buf, size_t len, int flags,
   else
     res = fh->sendto (buf, len, flags, to, tolen);
 
-  syscall_printf ("%d = sendto (%d, %p, %d, %x, %p, %d)",
+  syscall_printf ("%R = sendto(%d, %p, %d, %x, %p, %d)",
 		  res, fd, buf, len, flags, to, tolen);
   return res;
 }
@@ -701,7 +701,7 @@ cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
   else if ((res = len) != 0)
     res = fh->recvfrom (buf, len, flags, from, fromlen);
 
-  syscall_printf ("%d = recvfrom (%d, %p, %d, %x, %p, %p)",
+  syscall_printf ("%R = recvfrom(%d, %p, %d, %x, %p, %p)",
 		  res, fd, buf, len, flags, from, fromlen);
   return res;
 }
@@ -816,7 +816,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	  }
     }
 
-  syscall_printf ("%d = setsockopt (%d, %d, %x, %p, %d)",
+  syscall_printf ("%R = setsockopt(%d, %d, %x, %p, %d)",
 		  res, fd, level, optname, optval, optlen);
   return res;
 }
@@ -876,7 +876,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 	}
     }
 
-  syscall_printf ("%d = getsockopt (%d, %d, 0x%x, %p, %p)",
+  syscall_printf ("%R = getsockopt(%d, %d, 0x%x, %p, %p)",
 		  res, fd, level, optname, optval, optlen);
   return res;
 }
@@ -904,7 +904,7 @@ cygwin_connect (int fd, const struct sockaddr *name, socklen_t namelen)
   else
     res = fh->connect (name, namelen);
 
-  syscall_printf ("%d = connect (%d, %p, %d)", res, fd, name, namelen);
+  syscall_printf ("%R = connect(%d, %p, %d)", res, fd, name, namelen);
 
   return res;
 }
@@ -1280,7 +1280,7 @@ cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
   else
     res = fh->accept4 (peer, len, fh->is_nonblocking () ? SOCK_NONBLOCK : 0);
 
-  syscall_printf ("%d = accept (%d, %p, %p)", res, fd, peer, len);
+  syscall_printf ("%R = accept(%d, %p, %p)", res, fd, peer, len);
   return res;
 }
 
@@ -1302,7 +1302,7 @@ accept4 (int fd, struct sockaddr *peer, socklen_t *len, int flags)
   else
     res = fh->accept4 (peer, len, flags);
 
-  syscall_printf ("%d = accept4 (%d, %p, %p, %p)", res, fd, peer, len, flags);
+  syscall_printf ("%R = accept4(%d, %p, %p, %p)", res, fd, peer, len, flags);
   return res;
 }
 
@@ -1319,7 +1319,7 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, socklen_t addrlen)
   else
     res = fh->bind (my_addr, addrlen);
 
-  syscall_printf ("%d = bind (%d, %p, %d)", res, fd, my_addr, addrlen);
+  syscall_printf ("%R = bind(%d, %p, %d)", res, fd, my_addr, addrlen);
   return res;
 }
 
@@ -1337,7 +1337,7 @@ cygwin_getsockname (int fd, struct sockaddr *addr, socklen_t *namelen)
   else
     res = fh->getsockname (addr, namelen);
 
-  syscall_printf ("%d = getsockname (%d, %p, %p)", res, fd, addr, namelen);
+  syscall_printf ("%R =getsockname (%d, %p, %p)", res, fd, addr, namelen);
   return res;
 }
 
@@ -1353,7 +1353,7 @@ cygwin_listen (int fd, int backlog)
   else
     res = fh->listen (backlog);
 
-  syscall_printf ("%d = listen (%d, %d)", res, fd, backlog);
+  syscall_printf ("%R = listen(%d, %d)", res, fd, backlog);
   return res;
 }
 
@@ -1370,7 +1370,7 @@ cygwin_shutdown (int fd, int how)
   else
     res = fh->shutdown (how);
 
-  syscall_printf ("%d = shutdown (%d, %d)", res, fd, how);
+  syscall_printf ("%R = shutdown(%d, %d)", res, fd, how);
   return res;
 }
 
@@ -1436,7 +1436,7 @@ cygwin_getpeername (int fd, struct sockaddr *name, socklen_t *len)
   else
     res = fh->getpeername (name, len);
 
-  syscall_printf ("%d = getpeername (%d) %d", res, fd, (fh ? fh->get_socket () : -1));
+  syscall_printf ("%R = getpeername(%d) %d", res, fd, (fh ? fh->get_socket () : -1));
   return res;
 }
 
@@ -1454,7 +1454,7 @@ cygwin_recv (int fd, void *buf, size_t len, int flags)
   else if ((res = len) != 0)
     res = fh->recvfrom (buf, len, flags, NULL, NULL);
 
-  syscall_printf ("%d = recv (%d, %p, %d, %x)", res, fd, buf, len, flags);
+  syscall_printf ("%R = recv(%d, %p, %d, %x)", res, fd, buf, len, flags);
   return res;
 }
 
@@ -1472,7 +1472,7 @@ cygwin_send (int fd, const void *buf, size_t len, int flags)
   else
     res = fh->sendto (buf, len, flags, NULL, 0);
 
-  syscall_printf ("%d = send (%d, %p, %d, %x)", res, fd, buf, len, flags);
+  syscall_printf ("%R = send(%d, %p, %d, %x)", res, fd, buf, len, flags);
   return res;
 }
 
@@ -2782,7 +2782,7 @@ socketpair (int family, int type, int protocol, int *sb)
   }
 
 done:
-  syscall_printf ("%d = socketpair (...)", res);
+  syscall_printf ("%R = socketpair(...)", res);
   return res;
 }
 
@@ -2816,7 +2816,7 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 	res = fh->recvmsg (msg, flags);
     }
 
-  syscall_printf ("%d = recvmsg (%d, %p, %x)", res, fd, msg, flags);
+  syscall_printf ("%R = recvmsg(%d, %p, %x)", res, fd, msg, flags);
   return res;
 }
 
@@ -2838,7 +2838,7 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 	res = fh->sendmsg (msg, flags);
     }
 
-  syscall_printf ("%d = sendmsg (%d, %p, %x)", res, fd, msg, flags);
+  syscall_printf ("%R = sendmsg(%d, %p, %x)", res, fd, msg, flags);
   return res;
 }
 

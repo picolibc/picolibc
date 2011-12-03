@@ -1,3 +1,22 @@
+2011-12-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	Throughout, remove extra space after function name from debugging
+	output.
+	Throughout, change syscalls to report on return values using new %R
+	format option.
+	* smallprint.cc (__small_vsprintf): Add parsing for %R to report on
+	return values and possible errno from syscalls.
+
+	* errno.cc (errmap): Add PRIVILEGE_NOT_HELD.
+
+	* fhandler_tty.cc (fhandler_pty_master::setup): When creating a thread
+	use shorter name to reduce debuggging output.
+	* select.cc (start_thread_pipe): Ditto.
+	(start_thread_serial): Ditto.
+	(start_thread_socket): Ditto.
+	(start_thread_mailslot): Ditto.
+	* sigproc.cc (talktome): Ditto.
+
 2011-12-03  Corinna Vinschen  <vinschen@redhat.com>
 
 	* fhandler.cc (fhandler_base::open): Fix comment a bit more.

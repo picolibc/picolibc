@@ -707,7 +707,7 @@ done:
 		status, fh, access, pc.get_nt_native_path (), file_attributes,
 		shared, create_disposition, options);
 
-  syscall_printf ("%d = fhandler_base::open (%S, %p)",
+  syscall_printf ("%d = fhandler_base::open(%S, %p)",
 		  res, pc.get_nt_native_path (), flags);
   return res;
 }
@@ -1251,7 +1251,7 @@ fhandler_base::ioctl (unsigned int cmd, void *buf)
       break;
     }
 
-  syscall_printf ("%d = ioctl (%x, %p)", res, cmd, buf);
+  syscall_printf ("%d = ioctl(%x, %p)", res, cmd, buf);
   return res;
 }
 

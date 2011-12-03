@@ -1739,7 +1739,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   NtClose (fh);
 
 done:
-  syscall_printf ("%d = symlink_worker (%s, %s, %d, %d)", res, oldpath,
+  syscall_printf ("%d = symlink_worker(%s, %s, %d, %d)", res, oldpath,
 		  newpath, mk_winsym, isdevice);
   if (has_trailing_dirsep)
     free ((void *) newpath);
@@ -2714,7 +2714,7 @@ restart:
 	NtClose (h);
     }
 
-  syscall_printf ("%d = symlink.check (%s, %p) (%p)",
+  syscall_printf ("%d = symlink.check(%s, %p) (%p)",
 		  res, suffix.path, contents, pflags);
   return res;
 }
@@ -2890,7 +2890,7 @@ chdir (const char *in_dir)
 
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */
-  syscall_printf ("%d = chdir() cygheap->cwd.posix '%s' native '%S'", res,
+  syscall_printf ("%R = chdir() cygheap->cwd.posix '%s' native '%S'", res,
 		  cygheap->cwd.get_posix (), path.get_nt_native_path ());
   MALLOC_CHECK;
   return res;
@@ -2906,7 +2906,7 @@ fchdir (int fd)
   else
     res = -1;
 
-  syscall_printf ("%d = fchdir (%d)", res, fd);
+  syscall_printf ("%R = fchdir(%d)", res, fd);
   return res;
 }
 

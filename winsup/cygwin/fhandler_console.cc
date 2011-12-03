@@ -953,7 +953,7 @@ fhandler_console::output_tcsetattr (int, struct termios const *t)
   int res = SetConsoleMode (get_output_handle (), flags) ? 0 : -1;
   if (res)
     __seterrno_from_win_error (GetLastError ());
-  syscall_printf ("%d = tcsetattr (,%x) (ENABLE FLAGS %x) (lflag %x oflag %x)",
+  syscall_printf ("%d = tcsetattr(,%x) (ENABLE FLAGS %x) (lflag %x oflag %x)",
 		  res, t, flags, t->c_lflag, t->c_oflag);
   return res;
 }
@@ -1015,7 +1015,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
       res = SetConsoleMode (get_io_handle (), flags) ? 0 : -1;
       if (res < 0)
 	__seterrno ();
-      syscall_printf ("%d = tcsetattr (,%x) enable flags %p, c_lflag %p iflag %p",
+      syscall_printf ("%d = tcsetattr(,%x) enable flags %p, c_lflag %p iflag %p",
 		      res, t, flags, t->c_lflag, t->c_iflag);
     }
 
@@ -1066,7 +1066,7 @@ fhandler_console::tcgetattr (struct termios *t)
       /* All the output bits we can ignore */
       res = 0;
     }
-  syscall_printf ("%d = tcgetattr (%p) enable flags %p, t->lflag %p, t->iflag %p",
+  syscall_printf ("%d = tcgetattr(%p) enable flags %p, t->lflag %p, t->iflag %p",
 		 res, t, flags, t->c_lflag, t->c_iflag);
   return res;
 }
@@ -2101,7 +2101,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	}
     }
 
-  syscall_printf ("%d = fhandler_console::write (...)", len);
+  syscall_printf ("%d = fhandler_console::write(...)", len);
 
   return len;
 }

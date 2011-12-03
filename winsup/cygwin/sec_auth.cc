@@ -169,7 +169,7 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
 	hToken = INVALID_HANDLE_VALUE;
     }
   cygheap->user.reimpersonate ();
-  debug_printf ("%d = logon_user(%s,...)", hToken, pw->pw_name);
+  debug_printf ("%R = logon_user(%s,...)", hToken, pw->pw_name);
   return hToken;
 }
 

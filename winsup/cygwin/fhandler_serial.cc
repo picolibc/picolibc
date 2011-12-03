@@ -557,7 +557,7 @@ fhandler_serial::ioctl (unsigned int cmd, void *buf)
        break;
      }
 
-  termios_printf ("%d = ioctl (%p, %p)", res, cmd, buf);
+  termios_printf ("%d = ioctl(%p, %p)", res, cmd, buf);
 # undef ibuf
 # undef ipbuf
   return res;

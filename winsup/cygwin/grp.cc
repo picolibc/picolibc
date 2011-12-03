@@ -456,7 +456,7 @@ initgroups32 (const char *user, __gid32_t gid)
       new_gsids.count (tmp_gsids.count ());
       cygheap->user.groups.update_supp (new_gsids);
     }
-  syscall_printf ( "%d = initgroups (%s, %u)", ret, user, gid);
+  syscall_printf ( "%d = initgroups(%s, %u)", ret, user, gid);
   return ret;
 }
 
@@ -497,7 +497,7 @@ getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
 	ret = -1;
       *ngroups = cnt;
     }
-  syscall_printf ( "%d = getgrouplist (%s, %u, %p, %d)",
+  syscall_printf ( "%d = getgrouplist(%s, %u, %p, %d)",
 		  ret, user, gid, groups, *ngroups);
   return ret;
 }

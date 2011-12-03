@@ -210,7 +210,7 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
 out:
   if (!hdl)
     CloseHandle (h);
-  debug_printf ("%d = read_ea (%S, %s, %p, %lu)",
+  debug_printf ("%d = read_ea(%S, %s, %p, %lu)",
 		ret, attr.ObjectName, name, value, size);
   return ret;
 }
@@ -344,7 +344,7 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
 out:
   if (!hdl)
     CloseHandle (h);
-  debug_printf ("%d = write_ea (%S, %s, %p, %lu, %d)",
+  debug_printf ("%d = write_ea(%S, %s, %p, %lu, %d)",
 		ret, attr.ObjectName, name, value, size, flags);
   return ret;
 }

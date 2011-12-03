@@ -881,7 +881,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
   int rc = normalize_win32_path (src_path, pathbuf, tail);
   if (rc != 0)
     {
-      debug_printf ("%d = conv_to_posix_path (%s)", rc, src_path);
+      debug_printf ("%d = conv_to_posix_path(%s)", rc, src_path);
       return rc;
     }
 
@@ -1801,7 +1801,7 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
       res = mount_table->add_item (w32_path, posix_path, flags);
     }
 
-  syscall_printf ("%d = mount (%s, %s, %p)", res, win32_path, posix_path, flags);
+  syscall_printf ("%R = mount(%s, %s, %p)", res, win32_path, posix_path, flags);
   return res;
 }
 
@@ -1836,7 +1836,7 @@ cygwin_umount (const char *path, unsigned flags)
   if (!(flags & MOUNT_CYGDRIVE))
     res = mount_table->del_item (path, flags & ~MOUNT_SYSTEM);
 
-  syscall_printf ("%d = cygwin_umount (%s, %d)", res,  path, flags);
+  syscall_printf ("%R = cygwin_umount(%s, %d)", res,  path, flags);
   return res;
 }
 

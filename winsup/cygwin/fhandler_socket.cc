@@ -1020,7 +1020,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	  int ret = ::setsockopt (get_socket (), SOL_SOCKET,
 				  ~(SO_REUSEADDR),
 				  (const char *) &on, sizeof on);
-	  debug_printf ("%d = setsockopt (SO_EXCLUSIVEADDRUSE), %E", ret);
+	  debug_printf ("%d = setsockopt(SO_EXCLUSIVEADDRUSE), %E", ret);
 	}
       if (::bind (get_socket (), name, namelen))
 	set_winsock_errno ();
@@ -1998,7 +1998,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	res = ioctlsocket (get_socket (), cmd, (unsigned long *) p);
       break;
     }
-  syscall_printf ("%d = ioctl_socket (%x, %x)", res, cmd, p);
+  syscall_printf ("%d = ioctl_socket(%x, %x)", res, cmd, p);
   return res;
 }
 

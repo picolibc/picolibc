@@ -154,7 +154,7 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
       rmtp->tv_nsec = (long) ((timeout.QuadPart % NSPERSEC) * 100LL);
     }
 
-  syscall_printf ("%d = clock_nanosleep (%lu, %d, %ld.%09ld, %ld.%09.ld)",
+  syscall_printf ("%d = clock_nanosleep(%lu, %d, %ld.%09ld, %ld.%09.ld)",
 		  res, clk_id, flags, rqtp->tv_sec, rqtp->tv_nsec,
 		  rmtp ? rmtp->tv_sec : 0, rmtp ? rmtp->tv_nsec : 0);
   return res;
@@ -376,7 +376,7 @@ kill_pgrp (pid_t pid, siginfo_t& si)
       set_errno (ESRCH);
       res = -1;
     }
-  syscall_printf ("%d = kill (%d, %d)", res, pid, si.si_signo);
+  syscall_printf ("%R = kill(%d, %d)", res, pid, si.si_signo);
   return res;
 }
 

@@ -130,11 +130,10 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
   res = -!SetSystemTime (&st);
   gtod.reset ();
 
-  syscall_printf ("%d = settimeofday (%x, %x)", res, tv, tz);
-
-  if (res != 0)
+  if (res)
     set_errno (EPERM);
 
+  syscall_printf ("%R = settimeofday(%x, %x)", res, tv, tz);
   return res;
 }
 
@@ -332,7 +331,7 @@ time (time_t * ptr)
   if (ptr)
     *ptr = res;
 
-  syscall_printf ("%d = time (%x)", res, ptr);
+  syscall_printf ("%d = time(%x)", res, ptr);
 
   return res;
 }
@@ -380,8 +379,7 @@ utimens_worker (path_conv &win32, const struct timespec *tvp)
     }
 
 error:
-  syscall_printf ("%d = utimes (%S, %p)",
-		  res, win32.get_nt_native_path (), tvp);
+  syscall_printf ("%R = utimes(%S, %p)", res, win32.get_nt_native_path (), tvp);
   return res;
 }
 
@@ -416,7 +414,7 @@ futimens (int fd, const struct timespec *tvp)
     res = cfd->utimens (tvp);
   else
     res = utimens_worker (cfd->pc, tvp);
-  syscall_printf ("%d = futimens (%d, %p)", res, fd, tvp);
+  syscall_printf ("%d = futimens(%d, %p)", res, fd, tvp);
   return res;
 }
 

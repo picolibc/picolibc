@@ -269,7 +269,7 @@ fhandler_proc::readdir (DIR *dir, dirent *de)
 	  }
     }
 
-  syscall_printf ("%d = readdir (%p, %p) (%s)", res, dir, de, de->d_name);
+  syscall_printf ("%d = readdir(%p, %p) (%s)", res, dir, de, de->d_name);
   return res;
 }
 
@@ -376,7 +376,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_proc::open (%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_proc::open(%p, %d)", res, flags, mode);
   return res;
 }
 

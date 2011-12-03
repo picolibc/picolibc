@@ -765,7 +765,7 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 out:
   if (opened)
     NtClose (fh);
-  syscall_printf ("%d = fstatvfs (%s, %p)", ret, get_name (), sfs);
+  syscall_printf ("%d = fstatvfs(%s, %p)", ret, get_name (), sfs);
   return ret;
 }
 
@@ -1445,7 +1445,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
     NtAllocateLocallyUniqueId ((PLUID) &unique_id);
 
 out:
-  syscall_printf ("%d = fhandler_disk_file::open (%S, %p)", res,
+  syscall_printf ("%d = fhandler_disk_file::open(%S, %p)", res,
 		  pc.get_nt_native_path (), flags);
   return res;
 }
@@ -1583,7 +1583,7 @@ non_atomic:
       else
 	res = -1;
     }
-  debug_printf ("%d = pread (%p, %d, %d)\n", res, buf, count, offset);
+  debug_printf ("%d = pread(%p, %d, %d)\n", res, buf, count, offset);
   return res;
 }
 
@@ -1627,7 +1627,7 @@ non_atomic:
       if (lseek (curpos, SEEK_SET) < 0)
 	res = -1;
     }
-  debug_printf ("%d = pwrite (%p, %d, %d)\n", res, buf, count, offset);
+  debug_printf ("%d = pwrite(%p, %d, %d)\n", res, buf, count, offset);
   return res;
 }
 
@@ -2287,7 +2287,7 @@ go_ahead:
       res = 0;
     }
 
-  syscall_printf ("%d = readdir (%p, %p) (L\"%lS\" > \"%ls\") (attr %p > type %d)",
+  syscall_printf ("%d = readdir(%p, %p) (L\"%lS\" > \"%ls\") (attr %p > type %d)",
 		  res, dir, &de, res ? NULL : &fname, res ? "***" : de->d_name,
 		  FileAttributes, de->d_type);
   return res;
@@ -2361,7 +2361,7 @@ fhandler_disk_file::closedir (DIR *dir)
       __seterrno_from_nt_status (status);
       res = -1;
     }
-  syscall_printf ("%d = closedir (%p, %s)", res, dir, get_name ());
+  syscall_printf ("%d = closedir(%p, %s)", res, dir, get_name ());
   return res;
 }
 

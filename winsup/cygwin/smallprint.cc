@@ -73,6 +73,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 
   DWORD err = GetLastError ();
 
+  long Rval = 0;
   while (*fmt)
     {
       int i, n = 0x7fff;
@@ -146,8 +147,14 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  strcpy (dst, "Win32 error ");
 		  dst = __rn (dst + sizeof ("Win32 error"), 10, 0, err, len, pad, LMASK);
 		  break;
+		case 'R':
 		case 'd':
-		  dst = rnarg (dst, 10, addsign, len, pad);
+		  {
+		    long val = va_arg (ap, long);
+		    dst = __rn (dst, 10, addsign, val, len, pad, LMASK);
+		    if (c == 'R')
+		      Rval = val;
+		  }
 		  break;
 		case 'D':
 		  dst = rnargLL (dst, 10, addsign, len, pad);
@@ -240,6 +247,12 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 	      break;
 	    }
 	}
+    }
+  if (Rval < 0)
+    {
+      strcpy (dst, ", errno ");
+      dst += strlen (", errno ");
+      dst = __rn (dst, 10, false, get_errno (), 0, 0, LMASK);
     }
   *dst = 0;
   SetLastError (err);

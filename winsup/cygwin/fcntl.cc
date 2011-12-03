@@ -67,7 +67,7 @@ fcntl64 (int fd, int cmd, ...)
       break;
     }
 done:
-  syscall_printf ("%d = fcntl (%d, %d, %p)", res, fd, cmd, arg);
+  syscall_printf ("%R = fcntl(%d, %d, %p)", res, fd, cmd, arg);
   return res;
 }
 

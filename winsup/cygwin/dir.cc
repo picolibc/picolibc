@@ -257,7 +257,7 @@ closedir (DIR *dir)
   if (dir->__d_cookie != __DIRENT_COOKIE)
     {
       set_errno (EBADF);
-      syscall_printf ("-1 = closedir (%p)", dir);
+      syscall_printf ("%R = closedir(%p)", -1, dir);
       return -1;
     }
 
@@ -271,7 +271,7 @@ closedir (DIR *dir)
   free (dir->__d_dirname);
   free (dir->__d_dirent);
   free (dir);
-  syscall_printf ("%d = closedir (%p)", res);
+  syscall_printf ("%R = closedir(%p)", res);
   return res;
 }
 
@@ -320,7 +320,7 @@ mkdir (const char *dir, mode_t mode)
   delete fh;
 
  done:
-  syscall_printf ("%d = mkdir (%s, %d)", res, dir, mode);
+  syscall_printf ("%R = mkdir(%s, %d)", res, dir, mode);
   return res;
 }
 
@@ -353,6 +353,6 @@ rmdir (const char *dir)
   delete fh;
 
  done:
-  syscall_printf ("%d = rmdir (%s)", res, dir);
+  syscall_printf ("%R = rmdir(%s)", res, dir);
   return res;
 }

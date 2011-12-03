@@ -434,7 +434,7 @@ set_privilege (HANDLE token, DWORD privilege, bool enable)
 
 out:
   if (ret < 0)
-    debug_printf ("%d = set_privilege ((token %x) %W, %d)", ret, token,
+    debug_printf ("%d = set_privilege((token %x) %W, %d)", ret, token,
 		  privilege_name (new_priv.Privileges[0].Luid), enable);
   return ret;
 }

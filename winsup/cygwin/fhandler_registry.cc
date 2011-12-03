@@ -643,7 +643,7 @@ retry:
 
   res = 0;
 out:
-  syscall_printf ("%d = readdir (%p, %p)", res, dir, de);
+  syscall_printf ("%d = readdir(%p, %p)", res, dir, de);
   return res;
 }
 
@@ -690,7 +690,7 @@ fhandler_registry::closedir (DIR * dir)
 	  res = -1;
 	}
     }
-  syscall_printf ("%d = closedir (%p)", res, dir);
+  syscall_printf ("%d = closedir(%p)", res, dir);
   return 0;
 }
 
@@ -833,7 +833,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_registry::open (%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_registry::open(%p, %d)", res, flags, mode);
   return res;
 }
 

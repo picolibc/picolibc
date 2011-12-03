@@ -1033,7 +1033,7 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
     }
 
 out:
-  termios_printf ("%d = ioctl (%x)", retval, cmd);
+  termios_printf ("%d = ioctl(%x)", retval, cmd);
   return retval;
 }
 
@@ -1679,7 +1679,7 @@ fhandler_pty_master::setup ()
       errstr = "pty master control pipe";
       goto err;
     }
-  master_thread = new cygthread (::pty_master_thread, this, "pty_master");
+  master_thread = new cygthread (::pty_master_thread, this, "ptym");
   if (!master_thread)
     {
       errstr = "pty master control thread";

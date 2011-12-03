@@ -40,7 +40,7 @@ tcsendbreak (int fd, int duration)
     res = cfd->tcsendbreak (duration);
 
 out:
-  syscall_printf ("%d = tcsendbreak (%d, %d)", res, fd, duration);
+  syscall_printf ("%R = tcsendbreak(%d, %d)", res, fd, duration);
   return res;
 }
 
@@ -64,7 +64,7 @@ tcdrain (int fd)
     res = cfd->tcdrain ();
 
 out:
-  syscall_printf ("%d = tcdrain (%d)", res, fd);
+  syscall_printf ("%R = tcdrain(%d)", res, fd);
   return res;
 }
 
@@ -86,7 +86,7 @@ tcflush (int fd, int queue)
     res = cfd->tcflush (queue);
 
 out:
-  termios_printf ("%d = tcflush (%d, %d)", res, fd, queue);
+  termios_printf ("%R = tcflush(%d, %d)", res, fd, queue);
   return res;
 }
 
@@ -106,7 +106,7 @@ tcflow (int fd, int action)
     res = cfd->tcflow (action);
 
 out:
-  syscall_printf ("%d = tcflow (%d, %d)", res, fd, action);
+  syscall_printf ("%R = tcflow(%d, %d)", res, fd, action);
   return res;
 }
 
@@ -162,7 +162,7 @@ tcsetattr (int fd, int a, const struct termios *t)
   termios_printf ("iflag %p, oflag %p, cflag %p, lflag %p, VMIN %d, VTIME %d",
 	t->c_iflag, t->c_oflag, t->c_cflag, t->c_lflag, t->c_cc[VMIN],
 	t->c_cc[VTIME]);
-  termios_printf ("%d = tcsetattr (%d, %d, %x)", res, fd, a, t);
+  termios_printf ("%R = tcsetattr(%d, %d, %x)", res, fd, a, t);
   return res;
 }
 
@@ -182,7 +182,7 @@ tcgetattr (int fd, struct termios *in_t)
     __toapp_termios (in_t, t);
 
   if (res)
-    termios_printf ("%d = tcgetattr (%d, %p)", res, fd, in_t);
+    termios_printf ("%R = tcgetattr(%d, %p)", res, fd, in_t);
   else
     termios_printf ("iflag %x, oflag %x, cflag %x, lflag %x, VMIN %d, VTIME %d",
 	  t->c_iflag, t->c_oflag, t->c_cflag, t->c_lflag, t->c_cc[VMIN],
@@ -203,7 +203,7 @@ tcgetpgrp (int fd)
   else
     res = cfd->tcgetpgrp ();
 
-  termios_printf ("%d = tcgetpgrp (%d)", res, fd);
+  termios_printf ("%R = tcgetpgrp(%d)", res, fd);
   return res;
 }
 
@@ -218,7 +218,7 @@ tcgetsid (int fd)
   else
     res = cfd->tcgetsid ();
 
-  termios_printf ("%d = tcgetsid (%d)", res, fd);
+  termios_printf ("%R = tcgetsid(%d)", res, fd);
   return res;
 }
 
@@ -236,7 +236,7 @@ tcsetpgrp (int fd, pid_t pgid)
   else
     res = cfd->tcsetpgrp (pgid);
 
-  termios_printf ("%d = tcsetpgrp (%d, %d)", res, fd, pgid);
+  termios_printf ("%R = tcsetpgrp(%d, %d)", res, fd, pgid);
   return res;
 }
 

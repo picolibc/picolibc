@@ -377,7 +377,7 @@ fhandler_dev_dsp::Audio_out::query (int rate, int bits, int channels)
 
   fillFormat (&format, rate, bits, channels);
   rc = waveOutOpen (NULL, WAVE_MAPPER, &format, 0L, 0L, WAVE_FORMAT_QUERY);
-  debug_printf ("%d = waveOutOpen (freq=%d bits=%d channels=%d)", rc, rate, bits, channels);
+  debug_printf ("%d = waveOutOpen(freq=%d bits=%d channels=%d)", rc, rate, bits, channels);
   return (rc == MMSYSERR_NOERROR);
 }
 
@@ -404,7 +404,7 @@ fhandler_dev_dsp::Audio_out::start ()
   if (rc == MMSYSERR_NOERROR)
     init (bSize);
 
-  debug_printf ("%d = waveOutOpen (freq=%d bits=%d channels=%d)", rc, freq_, bits_, channels_);
+  debug_printf ("%d = waveOutOpen(freq=%d bits=%d channels=%d)", rc, freq_, bits_, channels_);
 
   return (rc == MMSYSERR_NOERROR);
 }
@@ -425,15 +425,15 @@ fhandler_dev_dsp::Audio_out::stop (bool immediately)
 	}
 
       rc = waveOutReset (dev_);
-      debug_printf ("%d = waveOutReset ()", rc);
+      debug_printf ("%d = waveOutReset()", rc);
       while (Qisr2app_->recv (&pHdr))
 	{
 	  rc = waveOutUnprepareHeader (dev_, pHdr, sizeof (WAVEHDR));
-	  debug_printf ("%d = waveOutUnprepareHeader (0x%08x)", rc, pHdr);
+	  debug_printf ("%d = waveOutUnprepareHeader(0x%08x)", rc, pHdr);
 	}
 
       rc = waveOutClose (dev_);
-      debug_printf ("%d = waveOutClose ()", rc);
+      debug_printf ("%d = waveOutClose()", rc);
 
       Qisr2app_->dellock ();
     }
@@ -564,7 +564,7 @@ fhandler_dev_dsp::Audio_out::waitforspace ()
       /* Errors are ignored here. They will probbaly cause a failure
 	 in the subsequent PrepareHeader */
       rc = waveOutUnprepareHeader (dev_, pHdr, sizeof (WAVEHDR));
-      debug_printf ("%d = waveOutUnprepareHeader (0x%08x)", rc, pHdr);
+      debug_printf ("%d = waveOutUnprepareHeader(0x%08x)", rc, pHdr);
     }
   pHdr_ = pHdr;
   bufferIndex_ = 0;
@@ -599,11 +599,11 @@ fhandler_dev_dsp::Audio_out::sendcurrent ()
   // Send internal buffer out to the soundcard
   pHdr->dwBufferLength = bufferIndex_;
   rc = waveOutPrepareHeader (dev_, pHdr, sizeof (WAVEHDR));
-  debug_printf ("%d = waveOutPrepareHeader (0x%08x)", rc, pHdr);
+  debug_printf ("%d = waveOutPrepareHeader(0x%08x)", rc, pHdr);
   if (rc == MMSYSERR_NOERROR)
     {
       rc = waveOutWrite (dev_, pHdr, sizeof (WAVEHDR));
-      debug_printf ("%d = waveOutWrite (0x%08x)", rc, pHdr);
+      debug_printf ("%d = waveOutWrite(0x%08x)", rc, pHdr);
     }
   if (rc == MMSYSERR_NOERROR)
     return true;
@@ -752,7 +752,7 @@ fhandler_dev_dsp::Audio_in::query (int rate, int bits, int channels)
 
   fillFormat (&format, rate, bits, channels);
   rc = waveInOpen (NULL, WAVE_MAPPER, &format, 0L, 0L, WAVE_FORMAT_QUERY);
-  debug_printf ("%d = waveInOpen (freq=%d bits=%d channels=%d)", rc, rate, bits, channels);
+  debug_printf ("%d = waveInOpen(freq=%d bits=%d channels=%d)", rc, rate, bits, channels);
   return (rc == MMSYSERR_NOERROR);
 }
 
@@ -776,7 +776,7 @@ fhandler_dev_dsp::Audio_in::start (int rate, int bits, int channels)
   fillFormat (&format, rate, bits, channels);
   rc = waveInOpen (&dev_, WAVE_MAPPER, &format, (DWORD) waveIn_callback,
 		   (DWORD) this, CALLBACK_FUNCTION);
-  debug_printf ("%d = waveInOpen (rate=%d bits=%d channels=%d)", rc, rate, bits, channels);
+  debug_printf ("%d = waveInOpen(rate=%d bits=%d channels=%d)", rc, rate, bits, channels);
 
   if (rc == MMSYSERR_NOERROR)
     {
@@ -800,16 +800,16 @@ fhandler_dev_dsp::Audio_in::stop ()
 	 we must not call into the wave API from the callback.
 	 Otherwise we end up in a deadlock. */
       rc = waveInReset (dev_);
-      debug_printf ("%d = waveInReset ()", rc);
+      debug_printf ("%d = waveInReset()", rc);
 
       while (Qisr2app_->recv (&pHdr))
 	{
 	  rc = waveInUnprepareHeader (dev_, pHdr, sizeof (WAVEHDR));
-	  debug_printf ("%d = waveInUnprepareHeader (0x%08x)", rc, pHdr);
+	  debug_printf ("%d = waveInUnprepareHeader(0x%08x)", rc, pHdr);
 	}
 
       rc = waveInClose (dev_);
-      debug_printf ("%d = waveInClose ()", rc);
+      debug_printf ("%d = waveInClose()", rc);
 
       Qisr2app_->dellock ();
     }
@@ -820,11 +820,11 @@ fhandler_dev_dsp::Audio_in::queueblock (WAVEHDR *pHdr)
 {
   MMRESULT rc;
   rc = waveInPrepareHeader (dev_, pHdr, sizeof (WAVEHDR));
-  debug_printf ("%d = waveInPrepareHeader (0x%08x)", rc, pHdr);
+  debug_printf ("%d = waveInPrepareHeader(0x%08x)", rc, pHdr);
   if (rc == MMSYSERR_NOERROR)
     {
       rc = waveInAddBuffer (dev_, pHdr, sizeof (WAVEHDR));
-      debug_printf ("%d = waveInAddBuffer (0x%08x)", rc, pHdr);
+      debug_printf ("%d = waveInAddBuffer(0x%08x)", rc, pHdr);
     }
   if (rc == MMSYSERR_NOERROR)
     return true;
@@ -854,7 +854,7 @@ fhandler_dev_dsp::Audio_in::init (unsigned blockSize)
     }
   pHdr_ = NULL;
   rc = waveInStart (dev_);
-  debug_printf ("%d = waveInStart (), queued=%d", rc, i);
+  debug_printf ("%d = waveInStart(), queued=%d", rc, i);
   return (rc == MMSYSERR_NOERROR);
 }
 
@@ -944,7 +944,7 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
       /* Errors are ignored here. They will probbaly cause a failure
 	 in the subsequent PrepareHeader */
       rc = waveInUnprepareHeader (dev_, pHdr, sizeof (WAVEHDR));
-      debug_printf ("%d = waveInUnprepareHeader (0x%08x)", rc, pHdr);
+      debug_printf ("%d = waveInUnprepareHeader(0x%08x)", rc, pHdr);
     }
   pHdr_ = pHdr;
   bufferIndex_ = 0;

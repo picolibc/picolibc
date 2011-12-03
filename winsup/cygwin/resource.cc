@@ -108,7 +108,7 @@ getrusage (int intwho, struct rusage *rusage_in)
       res = -1;
     }
 
-  syscall_printf ("%d = getrusage (%d, %p)", res, intwho, rusage_in);
+  syscall_printf ("%R = getrusage(%d, %p)", res, intwho, rusage_in);
   return res;
 }
 

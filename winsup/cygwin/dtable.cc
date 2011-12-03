@@ -757,7 +757,7 @@ dtable::dup3 (int oldfd, int newfd, int flags)
 done:
   MALLOC_CHECK;
   unlock ();
-  syscall_printf ("%d = dup3 (%d, %d, %p)", res, oldfd, newfd, flags);
+  syscall_printf ("%R = dup3(%d, %d, %p)", res, oldfd, newfd, flags);
 
   return res;
 }

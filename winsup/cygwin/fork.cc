@@ -685,7 +685,7 @@ fork ()
 
       set_errno (grouped.this_errno);
     }
-  syscall_printf ("%d = fork()", res);
+  syscall_printf ("%R = fork()", res);
   return res;
 }
 #ifdef DEBUGGING

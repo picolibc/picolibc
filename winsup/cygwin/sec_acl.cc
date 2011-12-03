@@ -440,7 +440,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, __aclent32_t *aclbufp)
       aclbufp[i].a_perm &= ~(DENY_R | DENY_W | DENY_X);
     aclsort32 (pos, 0, aclbufp);
   }
-  syscall_printf ("%d = getacl (%S)", pos, pc.get_nt_native_path ());
+  syscall_printf ("%R = getacl(%S)", pos, pc.get_nt_native_path ());
   return pos;
 }
 
@@ -462,7 +462,7 @@ acl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
     res = fh->facl (cmd, nentries, aclbufp);
 
   delete fh;
-  syscall_printf ("%d = acl (%s)", res, path);
+  syscall_printf ("%R = acl(%s)", res, path);
   return res;
 }
 
@@ -484,7 +484,7 @@ facl32 (int fd, int cmd, int nentries, __aclent32_t *aclbufp)
       return -1;
     }
   int res = cfd->facl (cmd, nentries, aclbufp);
-  syscall_printf ("%d = facl (%s) )", res, cfd->get_name ());
+  syscall_printf ("%R = facl(%s) )", res, cfd->get_name ());
   return res;
 }
 

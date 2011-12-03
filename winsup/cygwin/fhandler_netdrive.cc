@@ -254,7 +254,7 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
       res = 0;
     }
 out:
-  syscall_printf ("%d = readdir (%p, %p)", res, dir, de);
+  syscall_printf ("%d = readdir(%p, %p)", res, dir, de);
   return res;
 }
 
@@ -318,7 +318,7 @@ fhandler_netdrive::open (int flags, mode_t mode)
   set_flags ((flags & ~O_TEXT) | O_BINARY | O_DIROPEN);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_netdrive::open (%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_netdrive::open(%p, %d)", res, flags, mode);
   return res;
 }
 

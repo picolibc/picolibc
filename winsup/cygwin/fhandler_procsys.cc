@@ -364,7 +364,7 @@ fhandler_procsys::readdir (DIR *dir, dirent *de)
 	  res = 0;
 	}
     }
-  syscall_printf ("%d = readdir (%p, %p)", res, dir, de);
+  syscall_printf ("%d = readdir(%p, %p)", res, dir, de);
   return res;
 }
 
@@ -446,7 +446,7 @@ fhandler_procsys::open (int flags, mode_t mode)
 	  break;
 	}
     }
-  syscall_printf ("%d = fhandler_procsys::open (%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_procsys::open(%p, %d)", res, flags, mode);
   return res;
 }
 

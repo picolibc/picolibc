@@ -1520,7 +1520,7 @@ flock (int fd, int operation)
   if ((res == -1) && ((get_errno () == EAGAIN) || (get_errno () == EACCES)))
     set_errno (EWOULDBLOCK);
 done:
-  syscall_printf ("%d = flock (%d, %d)", res, fd, operation);
+  syscall_printf ("%R = flock(%d, %d)", res, fd, operation);
   return res;
 }
 
@@ -1576,6 +1576,6 @@ lockf (int filedes, int function, _off64_t size)
     }
   res = cfd->lock (cmd, &fl);
 done:
-  syscall_printf ("%d = lockf (%d, %d, %D)", res, filedes, function, size);
+  syscall_printf ("%R = lockf(%d, %d, %D)", res, filedes, function, size);
   return res;
 }
