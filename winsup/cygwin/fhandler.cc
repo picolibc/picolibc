@@ -624,10 +624,10 @@ fhandler_base::open (int flags, mode_t mode)
 	  pc.file_attributes (file_attributes);
 	  /* Never set the WRITE_DAC flag here.  Calls to fstat may return
 	     wrong st_ctime information after calls to fchmod, fchown, etc
-	     because Windows only gurantees to update the metadata when
+	     because Windows only guarantees to update the metadata when
 	     the handle is closed or flushed.  However, flushing the file
-	     on every fstat to enforce POSIXy stat behaviour is exceessivly
-	     slow, compared to open/close the file when changing the file's
+	     on every fstat to enforce POSIXy stat behaviour is excessivly
+	     slow, compared to an extra open/close to change the file's
 	     security descriptor. */
 	}
     }

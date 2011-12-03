@@ -1,3 +1,7 @@
+2011-12-03  Corinna Vinschen  <vinschen@redhat.com>
+
+	* fhandler.cc (fhandler_base::open): Fix typos in comment.
+
 2011-12-02  Corinna Vinschen  <vinschen@redhat.com>
 
 	* path.cc (conv_path_list): Take cygwin_conv_path_t as third parameter.
