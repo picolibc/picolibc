@@ -1346,14 +1346,6 @@ mlock (const void *addr, size_t len)
 {
   int ret = -1;
 
-  /* Instead of using VirtualLock, which does not guarantee that the pages
-     aren't swapped out when the process is inactive, we're using
-     ZwLockVirtualMemory with the LOCK_VM_IN_RAM flag to do what mlock on
-     POSIX systems does.  On NT, this requires SeLockMemoryPrivilege,
-     which is given only to SYSTEM by default. */
-
-  push_thread_privilege (SE_LOCK_MEMORY_PRIVILEGE, true);
-
   /* Align address and length values to page size. */
   size_t pagesize = getpagesize ();
   PVOID base = (PVOID) rounddown((uintptr_t) addr, pagesize);
@@ -1362,7 +1354,7 @@ mlock (const void *addr, size_t len)
   do
     {
       status = NtLockVirtualMemory (NtCurrentProcess (), &base, &size,
-				    LOCK_VM_IN_RAM);
+				    LOCK_VM_IN_WSL);
       if (status == STATUS_WORKING_SET_QUOTA)
 	{
 	  /* The working set is too small, try to increase it so that the
@@ -1402,8 +1394,6 @@ mlock (const void *addr, size_t len)
     }
   while (status == STATUS_WORKING_SET_QUOTA);
 
-  pop_thread_privilege ();
-
   return ret;
 }
 
@@ -1412,20 +1402,16 @@ munlock (const void *addr, size_t len)
 {
   int ret = -1;
 
-  push_thread_privilege (SE_LOCK_MEMORY_PRIVILEGE, true);
-
   /* Align address and length values to page size. */
   size_t pagesize = getpagesize ();
   PVOID base = (PVOID) rounddown((uintptr_t) addr, pagesize);
   ULONG size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len, pagesize);
   NTSTATUS status = NtUnlockVirtualMemory (NtCurrentProcess (), &base, &size,
-					   LOCK_VM_IN_RAM);
+					   LOCK_VM_IN_WSL);
   if (!NT_SUCCESS (status))
     __seterrno_from_nt_status (status);
   else
     ret = 0;
-
-  pop_thread_privilege ();
 
   return ret;
 }
