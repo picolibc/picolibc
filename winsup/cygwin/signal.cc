@@ -23,31 +23,12 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 
-int sigcatchers;	/* FIXME: Not thread safe. */
-
 #define _SA_NORESTART	0x8000
 
-static int sigaction_worker (int, const struct sigaction *, struct sigaction *, bool)
+static int sigaction_worker (int, const struct sigaction *, struct sigaction *, bool, const char *)
   __attribute__ ((regparm (3)));
 
 #define sigtrapped(func) ((func) != SIG_IGN && (func) != SIG_DFL)
-
-static inline void
-set_sigcatchers (void (*oldsig) (int), void (*cursig) (int))
-{
-#ifdef DEBUGGING
-  int last_sigcatchers = sigcatchers;
-#endif
-  if (!sigtrapped (oldsig) && sigtrapped (cursig))
-    sigcatchers++;
-  else if (sigtrapped (oldsig) && !sigtrapped (cursig))
-    sigcatchers--;
-#ifdef DEBUGGING
-  if (last_sigcatchers != sigcatchers)
-    sigproc_printf ("last %d, old %d, cur %p, cur %p", last_sigcatchers,
-		    sigcatchers, oldsig, cursig);
-#endif
-}
 
 extern "C" _sig_func_ptr
 signal (int sig, _sig_func_ptr func)
@@ -73,8 +54,6 @@ signal (int sig, _sig_func_ptr func)
   gs.sa_mask = SIGTOMASK (sig);
   gs.sa_handler = func;
   gs.sa_flags &= ~SA_SIGINFO;
-
-  set_sigcatchers (prev, func);
 
   syscall_printf ("%p = signal (%d, %p)", prev, sig, func);
   return prev;
@@ -407,63 +386,68 @@ abort (void)
 }
 
 static int
-sigaction_worker (int sig, const struct sigaction *newact, struct sigaction *oldact, bool isinternal)
+sigaction_worker (int sig, const struct sigaction *newact,
+		  struct sigaction *oldact, bool isinternal, const char *fnname)
 {
-  sig_dispatch_pending ();
-  /* check that sig is in right range */
-  if (sig < 0 || sig >= NSIG)
+  int res = -1;
+  myfault efault;
+  if (!efault.faulted (EFAULT))
     {
-      set_errno (EINVAL);
-      sigproc_printf ("signal %d, newact %p, oldact %p", sig, newact, oldact);
-      syscall_printf ("SIG_ERR = sigaction signal %d out of range", sig);
-      return -1;
-    }
-
-  struct sigaction oa = global_sigs[sig];
-
-  if (!newact)
-    sigproc_printf ("signal %d, newact %p, oa %p", sig, newact, oa, oa.sa_handler);
-  else
-    {
-      sigproc_printf ("signal %d, newact %p (handler %p), oa %p", sig, newact, newact->sa_handler, oa, oa.sa_handler);
-      if (sig == SIGKILL || sig == SIGSTOP)
+      sig_dispatch_pending ();
+      /* check that sig is in right range */
+      if (sig < 0 || sig >= NSIG)
+	set_errno (EINVAL);
+      else
 	{
-	  set_errno (EINVAL);
-	  return -1;
-	}
-      struct sigaction na = *newact;
-      struct sigaction& gs = global_sigs[sig];
-      if (!isinternal)
-	na.sa_flags &= ~_SA_INTERNAL_MASK;
-      gs = na;
-      if (!(gs.sa_flags & SA_NODEFER))
-	gs.sa_mask |= SIGTOMASK(sig);
-      if (gs.sa_handler == SIG_IGN)
-	sig_clear (sig);
-      if (gs.sa_handler == SIG_DFL && sig == SIGCHLD)
-	sig_clear (sig);
-      set_sigcatchers (oa.sa_handler, gs.sa_handler);
-      if (sig == SIGCHLD)
-	{
-	  myself->process_state &= ~PID_NOCLDSTOP;
-	  if (gs.sa_flags & SA_NOCLDSTOP)
-	    myself->process_state |= PID_NOCLDSTOP;
+	  struct sigaction oa = global_sigs[sig];
+
+	  if (!newact)
+	    sigproc_printf ("signal %d, newact %p, oa %p", sig, newact, oa, oa.sa_handler);
+	  else
+	    {
+	      sigproc_printf ("signal %d, newact %p (handler %p), oa %p", sig, newact, newact->sa_handler, oa, oa.sa_handler);
+	      if (sig == SIGKILL || sig == SIGSTOP)
+		{
+		  set_errno (EINVAL);
+		  goto out;
+		}
+	      struct sigaction na = *newact;
+	      struct sigaction& gs = global_sigs[sig];
+	      if (!isinternal)
+		na.sa_flags &= ~_SA_INTERNAL_MASK;
+	      gs = na;
+	      if (!(gs.sa_flags & SA_NODEFER))
+		gs.sa_mask |= SIGTOMASK(sig);
+	      if (gs.sa_handler == SIG_IGN)
+		sig_clear (sig);
+	      if (gs.sa_handler == SIG_DFL && sig == SIGCHLD)
+		sig_clear (sig);
+	      if (sig == SIGCHLD)
+		{
+		  myself->process_state &= ~PID_NOCLDSTOP;
+		  if (gs.sa_flags & SA_NOCLDSTOP)
+		    myself->process_state |= PID_NOCLDSTOP;
+		}
+	    }
+
+	    if (oldact)
+	      {
+		*oldact = oa;
+		oa.sa_flags &= ~_SA_INTERNAL_MASK;
+	      }
+	    res = 0;
 	}
     }
 
-  if (oldact)
-    {
-      *oldact = oa;
-      oa.sa_flags &= ~_SA_INTERNAL_MASK;
-    }
-
-  return 0;
+out:
+  syscall_printf ("%R = %s(%d, %p, %p)", res, fnname, sig, newact, oldact);
+  return res;
 }
 
 extern "C" int
 sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 {
-  return sigaction_worker (sig, newact, oldact, false);
+  return sigaction_worker (sig, newact, oldact, false, "sigaction");
 }
 
 extern "C" int
@@ -560,7 +544,7 @@ siginterrupt (int sig, int flag)
       act.sa_flags &= ~_SA_NORESTART;
       act.sa_flags |= SA_RESTART;
     }
-  return sigaction_worker (sig, &act, NULL, true);
+  return sigaction_worker (sig, &act, NULL, true, "siginterrupt");
 }
 
 extern "C" int

@@ -1,3 +1,18 @@
+2011-12-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* mmap.cc (mlock): Add standard syscall return value debugging output.
+	(munlock): Ditto.
+	(posix_madvise): Ditto.
+
+	* signal.cc: Remove obsolete sigcatchers stuff throughout.
+	(sigaction_worker): Add function name parameter and use it to show
+	standard syscall return value debugging output.  Also add fault
+	protection.
+	(sigaction): Accommodate extra argument to sigaction_worker.
+	(siginterrupt): Ditto.
+	* syscalls.cc (read): Remove obsolete sigcatchers stuff.
+	(readv): Ditto.
+
 2011-12-03  Corinna Vinschen  <vinschen@redhat.com>
 
 	* mmap.cc (mlock): Drop requesting SE_LOCK_MEMORY_PRIVILEGE.  Drop

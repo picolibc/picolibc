@@ -1066,10 +1066,8 @@ read (int fd, void *ptr, size_t len)
     }
 
   /* Could block, so let user know we at least got here.  */
-  extern int sigcatchers;
-  syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d",
-		  fd, ptr, len, cfd->is_nonblocking () ? "non" : "",
-		  sigcatchers);
+  syscall_printf ("read (%d, %p, %d) %sblocking",
+		  fd, ptr, len, cfd->is_nonblocking () ? "non" : "");
 
   cfd->read (ptr, res = len);
 
@@ -1110,10 +1108,8 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
     }
 
   /* Could block, so let user know we at least got here.  */
-  extern int sigcatchers;
-  syscall_printf ("readv (%d, %p, %d) %sblocking, sigcatchers %d",
-		  fd, iov, iovcnt, cfd->is_nonblocking () ? "non" : "",
-		  sigcatchers);
+  syscall_printf ("readv (%d, %p, %d) %sblocking",
+		  fd, iov, iovcnt, cfd->is_nonblocking () ? "non" : "");
 
   res = cfd->readv (iov, iovcnt, tot);
 

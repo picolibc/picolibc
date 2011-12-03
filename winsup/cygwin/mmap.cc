@@ -1394,6 +1394,7 @@ mlock (const void *addr, size_t len)
     }
   while (status == STATUS_WORKING_SET_QUOTA);
 
+  syscall_printf ("%R = mlock(%p, %u)", ret, addr, len);
   return ret;
 }
 
@@ -1413,28 +1414,37 @@ munlock (const void *addr, size_t len)
   else
     ret = 0;
 
+  syscall_printf ("%R = munlock(%p, %u)", ret, addr, len);
   return ret;
 }
 
 extern "C" int
 posix_madvise (void *addr, size_t len, int advice)
 {
+  int ret;
   /* Check parameters. */
   if (advice < POSIX_MADV_NORMAL || advice > POSIX_MADV_DONTNEED
       || !len)
-    return EINVAL;
-
-  /* Check requested memory area. */
-  MEMORY_BASIC_INFORMATION m;
-  char *p = (char *) addr;
-  char *endp = p + len;
-  while (p < endp)
+    ret = EINVAL;
+  else
     {
-      if (!VirtualQuery (p, &m, sizeof m) || m.State == MEM_FREE)
-	return ENOMEM;
-      p = (char *) m.BaseAddress + m.RegionSize;
+      /* Check requested memory area. */
+      MEMORY_BASIC_INFORMATION m;
+      char *p = (char *) addr;
+      char *endp = p + len;
+      while (p < endp)
+	{
+	  if (!VirtualQuery (p, &m, sizeof m) || m.State == MEM_FREE)
+	    {
+	      ret = ENOMEM;
+	      break;
+	    }
+	  p = (char *) m.BaseAddress + m.RegionSize;
+	}
+      ret = 0;
     }
 
+  syscall_printf ("%d = posix_madvise(%p, %u, %d)", ret, addr, len, advice);
   /* Eventually do nothing. */
   return 0;
 }
