@@ -702,10 +702,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 
   while (len)
     {
-      HANDLE w4[3] = { input_available_event, signal_arrived,
-		       pthread::get_cancel_event () };
-      DWORD cnt = w4[2] ? 3 : 2;
-      switch (WaitForMultipleObjects (cnt, w4, FALSE, time_to_wait))
+      switch (cygWFMO (1, time_to_wait, input_available_event))
 	{
 	case WAIT_OBJECT_0:
 	  break;
@@ -741,8 +738,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	}
       /* Now that we know that input is available we have to grab the
 	 input mutex. */
-      w4[0] = input_mutex;
-      switch (WaitForMultipleObjects (cnt, w4, FALSE, 1000))
+      switch (cygWFMO (1, 1000, input_mutex))
 	{
 	case WAIT_OBJECT_0:
 	case WAIT_ABANDONED_0:

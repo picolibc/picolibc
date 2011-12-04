@@ -133,10 +133,7 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   /* Degenerate case.  No fds to wait for.  Just wait. */
   if (sel.start.next == NULL)
     {
-      HANDLE w4[2] = { signal_arrived, pthread::get_cancel_event () };
-      DWORD cnt = w4[1] ? 2 : 1;
-
-      switch (WaitForMultipleObjects (cnt, w4, FALSE, ms))
+      switch (cygWFMO (0, ms))
 	{
 	case WAIT_OBJECT_0:
 	  select_printf ("signal received");

@@ -1,5 +1,18 @@
 2011-12-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* sigproc.cc (cygWFMO): Don't assume that cancellable event is always
+	available.
+	* fhandler_dsp.cc (fhandler_dev_dsp::Audio_out::waitforspace): Use
+	cygWFMO instead of WaitForMultipleObjects.
+	(fhandler_dev_dsp::Audio_in::waitfordata): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo::wait): Ditto.
+	* fhandler_serial.cc (fhandler_serial::raw_read): Ditto.
+	(fhandler_serial::raw_write): Ditto.
+	* fhandler_tty.cc (fhandler_pty_slave::read): Ditto.
+	* select.cc (cygwin_select): Ditto for degenerate case.
+
+2011-12-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sigproc.h (cygWFMO): Move inside "INSIDE_CYGWIN" #ifdef.
 
 2011-12-04  Christopher Faylor  <me.cygwin2011@cgf.cx>

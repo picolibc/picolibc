@@ -210,15 +210,13 @@ fhandler_fifo::wait (HANDLE h)
   else
     what = "overlapped event";
 #endif
-  HANDLE w4[3] = {h, signal_arrived, pthread::get_cancel_event ()};
-
   /* Set the wait to zero for non-blocking I/O-related events. */
   DWORD wait = ((h == read_ready || h == write_ready)
 		&& get_flags () & O_NONBLOCK) ? 0 : INFINITE;
 
   debug_only_printf ("waiting for %s", what);
   /* Wait for the event.  Set errno, as appropriate if something goes wrong. */
-  switch (WaitForMultipleObjects (3, w4, false, wait))
+  switch (cygWFMO (1, wait))
     {
     case WAIT_OBJECT_0:
       debug_only_printf ("successfully waited for %s", what);

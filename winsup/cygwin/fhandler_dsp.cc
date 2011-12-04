@@ -540,10 +540,8 @@ fhandler_dev_dsp::Audio_out::waitforspace ()
 	  set_errno (EAGAIN);
 	  return false;
 	}
-      HANDLE w4[2] = { signal_arrived, pthread::get_cancel_event () };
-      DWORD cnt = w4[1] ? 2 : 1;
       debug_printf ("100ms");
-      switch (WaitForMultipleObjects (cnt, w4, FALSE, 100))
+      switch (cygWFMO (0, 100))
 	{
 	case WAIT_OBJECT_0:
 	  if (!_my_tls.call_signal_handler ())
@@ -920,10 +918,8 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
 	  set_errno (EAGAIN);
 	  return false;
 	}
-      HANDLE w4[2] = { signal_arrived, pthread::get_cancel_event () };
-      DWORD cnt = w4[1] ? 2 : 1;
       debug_printf ("100ms");
-      switch (WaitForMultipleObjects (cnt, w4, FALSE, 100))
+      switch (cygWFMO (0, 100))
 	{
 	case WAIT_OBJECT_0:
 	  if (!_my_tls.call_signal_handler ())

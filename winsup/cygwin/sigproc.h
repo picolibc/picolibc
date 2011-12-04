@@ -88,11 +88,12 @@ DWORD cygWFMO (DWORD n, DWORD howlong, ...)
   va_start (ap, howlong);
   HANDLE w4[n + 2];
   va_start (ap, howlong);
-  unsigned i;
-  for (i = 0; i < n; i++)
+  for (unsigned i = 0; i < n; i++)
     w4[i] = va_arg (ap, HANDLE);
-  w4[i++] = signal_arrived;
-  w4[i++] = pthread::get_cancel_event ();
+  w4[n++] = signal_arrived;
+  w4[n++] = pthread::get_cancel_event ();
+  if (!w4[n - 1])
+    n--;
   return WaitForMultipleObjects (n, w4, FALSE, howlong);
 }
 #endif

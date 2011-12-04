@@ -94,12 +94,9 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	    }
 	  else
 	    {
-	      HANDLE w4[3] = { io_status.hEvent, signal_arrived,
-			       pthread::get_cancel_event () };
-	      DWORD cnt = w4[2] ? 3 : 2;
 	      overlapped_armed = 1;
 restart:
-	      switch (WaitForMultipleObjects (cnt, w4, FALSE, INFINITE))
+	      switch (cygWFMO (1, INFINITE, io_status.hEvent))
 		{
 		case WAIT_OBJECT_0:
 		  if (!GetOverlappedResult (get_handle (), &io_status, &n,
@@ -205,11 +202,8 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
 
       if (!is_nonblocking ())
 	{
-	  HANDLE w4[3] = { write_status.hEvent, signal_arrived,
-			   pthread::get_cancel_event () };
-	  DWORD cnt = w4[2] ? 3 : 2;
     restart:
-	  switch (WaitForMultipleObjects (cnt, w4, FALSE, INFINITE))
+	  switch (cygWFMO (1, INFINITE, write_status.hEvent))
 	    {
 	    case WAIT_OBJECT_0:
 	      break;
