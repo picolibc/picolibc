@@ -59,21 +59,6 @@ struct sigpacket
 };
 
 extern HANDLE signal_arrived;
-
-static inline
-DWORD cygWFMO (DWORD n, DWORD howlong, ...)
-{
-  va_list ap;
-  va_start (ap, howlong);
-  HANDLE w4[n + 2];
-  va_start (ap, howlong);
-  unsigned i;
-  for (i = 0; i < n; i++)
-    w4[i] = va_arg (ap, HANDLE);
-  w4[i++] = signal_arrived;
-  w4[i++] = pthread::get_cancel_event ();
-  return WaitForMultipleObjects (n, w4, FALSE, howlong);
-}
 extern HANDLE sigCONT;
 
 void __stdcall sig_dispatch_pending (bool fast = false);
@@ -95,6 +80,21 @@ void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
 #ifdef __INSIDE_CYGWIN__
 void __stdcall sigproc_terminate (enum exit_states);
+
+static inline
+DWORD cygWFMO (DWORD n, DWORD howlong, ...)
+{
+  va_list ap;
+  va_start (ap, howlong);
+  HANDLE w4[n + 2];
+  va_start (ap, howlong);
+  unsigned i;
+  for (i = 0; i < n; i++)
+    w4[i] = va_arg (ap, HANDLE);
+  w4[i++] = signal_arrived;
+  w4[i++] = pthread::get_cancel_event ();
+  return WaitForMultipleObjects (n, w4, FALSE, howlong);
+}
 #endif
 bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
 int __stdcall sig_send (_pinfo *, siginfo_t&, class _cygtls *tls = NULL) __attribute__ ((regparm (3)));

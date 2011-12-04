@@ -1,5 +1,9 @@
 2011-12-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* sigproc.h (cygWFMO): Move inside "INSIDE_CYGWIN" #ifdef.
+
+2011-12-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* exceptions.cc (exception::handle): Drop abbreviation for "exception"
 	since I never remember what it stands for.
 	(sig_handle_tty_stop): Remove obsolete call to sig_handle_tty_stop.
