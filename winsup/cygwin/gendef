@@ -232,7 +232,6 @@ _sigdelayed:
 	pushl	%eax			# siginfo
 	pushl	$tls::sig(%ebx)		# signal number
 
-	call	_reset_signal_arrived\@0
 	pushl	\$_sigreturn		# where to return
 	pushl	$tls::func(%ebx)	# user-supplied signal func
 	cmpl	\$0,$tls::threadkill(%ebx)#pthread_kill signal?

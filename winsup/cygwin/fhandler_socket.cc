@@ -127,6 +127,8 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	     some greedy Win32 application.  Therefore we should never wait
 	     endlessly without checking for signals and thread cancel event. */
 	  pthread_testcancel ();
+	  /* Using IsEventSignalled like this is racy since another thread could
+	     be waiting for signal_arrived. */
 	  if (IsEventSignalled (signal_arrived)
 	      && !_my_tls.call_signal_handler ())
 	    {

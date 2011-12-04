@@ -600,7 +600,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
       return 1;
     }
 
-  debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
+  debug_printf ("In cygwin_except_handler exception %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
   debug_printf ("In cygwin_except_handler signal %d at %p", si.si_signo, in->Eip);
 
   bool masked = !!(me.sigmask & SIGTOMASK (si.si_signo));
@@ -755,7 +755,6 @@ sig_handle_tty_stop (int sig)
     {
     case WAIT_OBJECT_0:
     case WAIT_OBJECT_0 + 1:
-      reset_signal_arrived ();
       myself->stopsig = SIGCONT;
       myself->alert_parent (SIGCONT);
       break;
@@ -1325,25 +1324,42 @@ events_terminate ()
 int
 _cygtls::call_signal_handler ()
 {
-  int this_sa_flags = 0;
-  /* Call signal handler.  */
-  while (sig && func)
+  int this_sa_flags = SA_RESTART;
+  while (1)
     {
       lock ();
+      if (sig)
+	pop ();
+      else if (this != _main_tls)
+	{
+	  _main_tls->lock ();
+	  if (_main_tls->sig)
+	    {
+	      sig = _main_tls->sig;
+	      sa_flags = _main_tls->sa_flags;
+	      func = _main_tls->func;
+	      infodata = _main_tls->infodata;
+	      _main_tls->pop ();
+	      _main_tls->sig = 0;
+
+	    }
+	  _main_tls->unlock ();
+	}
+      if (!sig)
+	break;
+
       this_sa_flags = sa_flags;
       int thissig = sig;
       void (*thisfunc) (int) = func;
 
-      pop ();
-      reset_signal_arrived ();
       sigset_t this_oldmask = set_process_mask_delta ();
       int this_errno = saved_errno;
       sig = 0;
       unlock ();	// make sure synchronized
-      incyg = 0;
       if (!(this_sa_flags & SA_SIGINFO))
 	{
 	  void (*sigfunc) (int) = thisfunc;
+	  incyg = false;
 	  sigfunc (thissig);
 	}
       else
@@ -1351,25 +1367,17 @@ _cygtls::call_signal_handler ()
 	  siginfo_t thissi = infodata;
 	  void (*sigact) (int, siginfo_t *, void *) = (void (*) (int, siginfo_t *, void *)) thisfunc;
 	  /* no ucontext_t information provided yet */
+	  incyg = false;
 	  sigact (thissig, &thissi, NULL);
 	}
-      incyg = 1;
+      incyg = true;
       set_signal_mask (this_oldmask, _my_tls.sigmask);
       if (this_errno >= 0)
 	set_errno (this_errno);
     }
 
+  unlock ();
   return this_sa_flags & SA_RESTART;
-}
-
-extern "C" void __stdcall
-reset_signal_arrived ()
-{
-  // NEEDED? WaitForSingleObject (signal_arrived, 10);
-  ResetEvent (signal_arrived);
-  sigproc_printf ("reset signal_arrived");
-  if (_my_tls.stackptr > _my_tls.stack)
-    debug_printf ("stackptr[-1] %p", _my_tls.stackptr[-1]);
 }
 
 void

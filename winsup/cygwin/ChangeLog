@@ -1,3 +1,26 @@
+2011-12-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* exceptions.cc (exception::handle): Drop abbreviation for "exception"
+	since I never remember what it stands for.
+	(sig_handle_tty_stop): Remove obsolete call to sig_handle_tty_stop.
+	(_cygtls::call_signal_handler): Rework to grab signal information from
+	_main_tls if none is set for _my_tls.  Try harder to keep thread
+	locked.
+	(reset_signal_arrived): Delete.
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Use new
+	cygWFMO call to wait for an event + standard cygwin stuff.  Modify
+	debug output to acccomodate new function.
+	* fhandler_console.cc (fhandler_console::read): Replace
+	WaitForMultipleObjects with cygWFMO.
+	* fhandler_socket.cc (get_inet_addr): Add comment.
+	* gendef (_sigdelayed): Remove call to reset_signal_arrived.
+	* sigproc.cc (_cygtls::signal_exit): Don't close my_readsig here unless
+	we're in the signal thread.
+	(create_signal_arrived): Create signal_arrived as auto-reset so that only
+	one thread is woken when a signal arrives.
+	* sigproc.h (cygWFMO): New function.
+	(reset_signal_arrived): Delete declaration.
+
 2011-12-03  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* mmap.cc (mlock): Add standard syscall return value debugging output.

@@ -368,8 +368,18 @@ _cygtls::signal_exit (int rc)
 {
   extern void stackdump (DWORD, int, bool);
 
+  HANDLE myss = my_sendsig;
   my_sendsig = NULL;		 /* Make no_signals_allowed return true */
-  ForceCloseHandle (my_readsig); /* Stop any currently executing sig_sends */
+  if (&_my_tls == _sig_tls)
+    ForceCloseHandle (my_readsig); /* Stop any currently executing sig_sends */
+  else
+    {
+      sigpacket sp = {};
+      sp.si.si_signo = __SIGEXIT;
+      DWORD len;
+      WriteFile (myss, &sp, sizeof (sp), &len, NULL);
+    }
+
   SetEvent (signal_arrived);	 /* Avoid potential deadlock with proc_lock */
 
   if (rc == SIGQUIT || rc == SIGABRT)
@@ -493,7 +503,7 @@ create_signal_arrived ()
     return;
   /* local event signaled when main thread has been dispatched
      to a signal handler function. */
-  signal_arrived = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
   ProtectHandle (signal_arrived);
 }
 

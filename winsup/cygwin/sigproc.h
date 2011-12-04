@@ -59,6 +59,21 @@ struct sigpacket
 };
 
 extern HANDLE signal_arrived;
+
+static inline
+DWORD cygWFMO (DWORD n, DWORD howlong, ...)
+{
+  va_list ap;
+  va_start (ap, howlong);
+  HANDLE w4[n + 2];
+  va_start (ap, howlong);
+  unsigned i;
+  for (i = 0; i < n; i++)
+    w4[i] = va_arg (ap, HANDLE);
+  w4[i++] = signal_arrived;
+  w4[i++] = pthread::get_cancel_event ();
+  return WaitForMultipleObjects (n, w4, FALSE, howlong);
+}
 extern HANDLE sigCONT;
 
 void __stdcall sig_dispatch_pending (bool fast = false);
@@ -69,7 +84,6 @@ int __stdcall handle_sigprocmask (int sig, const sigset_t *set,
 				  sigset_t *oldset, sigset_t& opmask)
   __attribute__ ((regparm (3)));
 
-extern "C" void __stdcall reset_signal_arrived ();
 void __stdcall sig_clear (int) __attribute__ ((regparm (1)));
 void __stdcall sig_set_pending (int) __attribute__ ((regparm (1)));
 int __stdcall handle_sigsuspend (sigset_t);

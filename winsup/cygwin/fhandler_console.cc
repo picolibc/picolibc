@@ -333,8 +333,6 @@ fhandler_console::read (void *pv, size_t& buflen)
       return;
     }
 
-  HANDLE w4[3] = { h, signal_arrived, pthread::get_cancel_event () };
-  DWORD nwait = w4[2] ? 3 : 2;
   DWORD timeout = is_nonblocking () ? 0 : INFINITE;
   char tmp[60];
 
@@ -350,7 +348,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 
       set_cursor_maybe ();	/* to make cursor appear on the screen immediately */
 restart:
-      switch (WaitForMultipleObjects (nwait, w4, FALSE, timeout))
+      switch (cygWFMO (1, timeout, h))
 	{
 	case WAIT_OBJECT_0:
 	  break;

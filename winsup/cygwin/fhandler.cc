@@ -1925,11 +1925,8 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
     }
   if (res == overlapped_unknown)
     {
-      HANDLE w4[3] = { get_overlapped ()->hEvent, signal_arrived,
-		       pthread::get_cancel_event () };
-      DWORD n = w4[2] ? 3 : 2;
       HANDLE h = writing ? get_output_handle () : get_handle ();
-      DWORD wfres = WaitForMultipleObjects (n, w4, false, INFINITE);
+      DWORD wfres = cygWFMO (1, INFINITE, get_overlapped ()->hEvent);
       /* Cancelling here to prevent races.  It's possible that the I/O has
 	 completed already, in which case this is a no-op.  Otherwise,
 	 WFMO returned because 1) This is a non-blocking call, 2) a signal
@@ -1960,7 +1957,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	pthread::static_cancel_self ();		/* never returns */
       else
 	{
-	  debug_printf ("GetOverLappedResult failed, h %p, bytes %u, w4: %p, %p, %p %E", h, *bytes, w4[0], w4[1], w4[2]);
+	  debug_printf ("GetOverLappedResult failed, h %p, bytes %u, %E", h, *bytes);
 	  res = overlapped_error;
 	}
     }
