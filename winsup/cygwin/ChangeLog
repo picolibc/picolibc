@@ -19,7 +19,7 @@
 
 	* exceptions.cc (exception::handle): Drop abbreviation for "exception"
 	since I never remember what it stands for.
-	(sig_handle_tty_stop): Remove obsolete call to sig_handle_tty_stop.
+	(sig_handle_tty_stop): Remove obsolete call to reset_signal_arrived.
 	(_cygtls::call_signal_handler): Rework to grab signal information from
 	_main_tls if none is set for _my_tls.  Try harder to keep thread
 	locked.
