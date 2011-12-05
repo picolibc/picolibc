@@ -1,3 +1,12 @@
+2011-12-05  Corinna Vinschen  <vinschen@redhat.com>
+
+	* mmap.cc (mlock): Replace LOCK_VM_IN_WSL with correct MAP_PROCESS.
+	(munlock): Ditto.
+	* ntdll.h: Rearrange to have all preprocessor definitions at the start
+	of the file.  Add comments to each definition block.
+	(MAP_PROCESS): Rename from LOCK_VM_IN_WSL.
+	(MAP_SYSTEM): Rename from LOCK_VM_IN_RAM.
+
 2011-12-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* sigproc.cc (cygWFMO): Don't assume that cancellable event is always

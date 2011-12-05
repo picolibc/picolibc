@@ -1354,7 +1354,7 @@ mlock (const void *addr, size_t len)
   do
     {
       status = NtLockVirtualMemory (NtCurrentProcess (), &base, &size,
-				    LOCK_VM_IN_WSL);
+				    MAP_PROCESS);
       if (status == STATUS_WORKING_SET_QUOTA)
 	{
 	  /* The working set is too small, try to increase it so that the
@@ -1408,7 +1408,7 @@ munlock (const void *addr, size_t len)
   PVOID base = (PVOID) rounddown((uintptr_t) addr, pagesize);
   ULONG size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len, pagesize);
   NTSTATUS status = NtUnlockVirtualMemory (NtCurrentProcess (), &base, &size,
-					   LOCK_VM_IN_WSL);
+					   MAP_PROCESS);
   if (!NT_SUCCESS (status))
     __seterrno_from_nt_status (status);
   else
