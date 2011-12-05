@@ -1,3 +1,10 @@
+2011-12-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* sigproc.cc (close_my_readsig): New function.
+	(_cygtls::signal_exit): Close my_readsig via close_my_readsig(),
+	avoiding communication with the signal pipe.
+	(wait_sig): Close my_readsig via close_my_readsig().
+
 2011-12-05  Corinna Vinschen  <vinschen@redhat.com>
 
 	* mmap.cc (mlock): Replace LOCK_VM_IN_WSL with correct MAP_PROCESS.

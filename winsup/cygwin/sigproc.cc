@@ -360,6 +360,14 @@ _cygtls::remove_wq (DWORD wait)
     }
 }
 
+inline void
+close_my_readsig ()
+{
+  HANDLE h;
+  if ((h = InterlockedExchangePointer (&my_readsig, NULL)))
+    ForceCloseHandle1 (h, my_readsig);
+}
+
 /* Cover function to `do_exit' to handle exiting even in presence of more
    exceptions.  We used to call exit, but a SIGSEGV shouldn't cause atexit
    routines to run.  */
@@ -368,17 +376,8 @@ _cygtls::signal_exit (int rc)
 {
   extern void stackdump (DWORD, int, bool);
 
-  HANDLE myss = my_sendsig;
   my_sendsig = NULL;		 /* Make no_signals_allowed return true */
-  if (&_my_tls == _sig_tls)
-    ForceCloseHandle (my_readsig); /* Stop any currently executing sig_sends */
-  else
-    {
-      sigpacket sp = {};
-      sp.si.si_signo = __SIGEXIT;
-      DWORD len;
-      WriteFile (myss, &sp, sizeof (sp), &len, NULL);
-    }
+  close_my_readsig ();
 
   SetEvent (signal_arrived);	 /* Avoid potential deadlock with proc_lock */
 
@@ -1422,7 +1421,7 @@ wait_sig (VOID *)
 	break;
     }
 
-  ForceCloseHandle (my_readsig);
+  close_my_readsig ();
   sigproc_printf ("signal thread exiting");
   ExitThread (0);
 }
