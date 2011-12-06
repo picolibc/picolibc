@@ -18,7 +18,7 @@ iconv.def: lib/iconv.def
 	cp lib/iconv.def iconv.def
 
 stmp-def: force
-	(cd lib && make doc)
+	(cd lib && $(MAKE) doc)
 	touch $@
 
 .PHONY: force

@@ -1,3 +1,8 @@
+2011-12-06  Chris Johns  <chrisj@rtems.org>
+
+	* libc/iconv/Makefile.am (stmp-def): Use $(MAKE) rather than make.
+	* libc/iconv/Makefile.in: Regenerate.
+
 2011-11-28  DJ Delorie  <dj@redhat.com>
 
 	* configure.host: Add rl78.
