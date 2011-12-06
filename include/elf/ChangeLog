@@ -1,3 +1,8 @@
+2011-12-06  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* common.h (NT_S390_LAST_BREAK): Define.
+	(NT_S390_SYSTEM_CALL): Likewise.
+
 2011-11-01  DJ Delorie  <dj@redhat.com>
 
 	* common.h (EM_RL78, EM_78K0R): New.
