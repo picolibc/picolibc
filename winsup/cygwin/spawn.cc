@@ -452,7 +452,17 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
   c_flags = GetPriorityClass (GetCurrentProcess ());
   sigproc_printf ("priority class %d", c_flags);
-  c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT;
+  /* We're adding the CREATE_BREAKAWAY_FROM_JOB flag here to workaround issues
+     with the "Program Compatibility Assistant (PCA) Service" observed on
+     Windows 7.  For some reason, when starting long running sessions from
+     mintty, the affected svchost.exe process takes more and more memory and
+     at one point takes over the CPU.  At this point the machine becomes
+     unresponsive.  The only way to get back to normal is to stop the entire
+     mintty session, or to stop the PCA service.  However, a process which
+     is controlled by PCA is part of a compatibility job, which allows child
+     processes to break away from the job.  This helps to avoid this issue. */
+  c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT
+	     | CREATE_BREAKAWAY_FROM_JOB;
 
   if (mode == _P_DETACH)
     c_flags |= DETACHED_PROCESS;
