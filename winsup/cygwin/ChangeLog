@@ -1,5 +1,11 @@
 2011-12-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* select.cc (cygwin_select): Add common introducer and leaver debug
+	output.
+	(select_stuff::poll): Remove unneeded debugging.
+
+2011-12-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* exceptions.cc (ctrl_c_handler): Remove _my_tls.remove since it can
 	cause deadlocks during exec and will eventually be handled anyway.
 

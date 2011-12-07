@@ -94,7 +94,7 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   fd_set *dummy_writefds = allocfd_set (maxfds);
   fd_set *dummy_exceptfds = allocfd_set (maxfds);
 
-  select_printf ("%d, %p, %p, %p, %p", maxfds, readfds, writefds, exceptfds, to);
+  select_printf ("select(%d, %p, %p, %p, %p)", maxfds, readfds, writefds, exceptfds, to);
 
   pthread_testcancel ();
 
@@ -130,6 +130,7 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   fd_set *w = allocfd_set (maxfds);
   fd_set *e = allocfd_set (maxfds);
 
+  int res = 1;
   /* Degenerate case.  No fds to wait for.  Just wait. */
   if (sel.start.next == NULL)
     {
@@ -146,17 +147,25 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	default:
 	  break;
 	}
-      timeout = 1;
+      res = 0;
     }
   else if (sel.always_ready || ms == 0)
-    /* Don't bother waiting. */;
+    res = 0;
   else if ((timeout = sel.wait (r, w, e, ms) < 0))
-    return -1;	/* some kind of error */
+    res = -1;	/* some kind of error */
 
-  copyfd_set (readfds, r, maxfds);
-  copyfd_set (writefds, w, maxfds);
-  copyfd_set (exceptfds, e, maxfds);
-  return timeout ? 0 : sel.poll (readfds, writefds, exceptfds);
+  if (res >= 0)
+    {
+      copyfd_set (readfds, r, maxfds);
+      copyfd_set (writefds, w, maxfds);
+      copyfd_set (exceptfds, e, maxfds);
+      if (res > 0)
+	res = sel.poll (readfds, writefds, exceptfds);
+    }
+
+  syscall_printf ("%R = select (%d, %p, %p, %p, %p)", res, maxfds, readfds,
+		  writefds, exceptfds, to);
+  return res;
 }
 
 extern "C" int
@@ -445,7 +454,6 @@ select_stuff::poll (fd_set *readfds, fd_set *writefds, fd_set *exceptfds)
   while ((s = s->next))
     n += (!s->peek || s->peek (s, true)) ?
 	 set_bits (s, readfds, writefds, exceptfds) : 0;
-  select_printf ("returning %d", n);
   return n;
 }
 
