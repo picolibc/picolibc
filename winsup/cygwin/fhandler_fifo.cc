@@ -216,7 +216,7 @@ fhandler_fifo::wait (HANDLE h)
 
   debug_only_printf ("waiting for %s", what);
   /* Wait for the event.  Set errno, as appropriate if something goes wrong. */
-  switch (cygWFMO (1, wait))
+  switch (cygWFMO (1, wait, h))
     {
     case WAIT_OBJECT_0:
       debug_only_printf ("successfully waited for %s", what);

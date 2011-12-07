@@ -1,3 +1,8 @@
+2011-12-06  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler_fifo.cc (fhandler_fifo::wait): Fix stupid typo and actually
+	wait for the handle.
+
 2011-12-05  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* sigproc.cc (close_my_readsig): New function.
