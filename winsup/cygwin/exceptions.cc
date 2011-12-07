@@ -937,8 +937,6 @@ ctrl_c_handler (DWORD type)
       ExitProcess (STATUS_CONTROL_C_EXIT);
     }
 
-  _my_tls.remove (INFINITE);
-
 #if 0
   if (type == CTRL_C_EVENT || type == CTRL_BREAK_EVENT)
     proc_subproc (PROC_KILLFORKED, 0);

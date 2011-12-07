@@ -1,3 +1,8 @@
+2011-12-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* exceptions.cc (ctrl_c_handler): Remove _my_tls.remove since it can
+	cause deadlocks during exec and will eventually be handled anyway.
+
 2011-12-07  Corinna Vinschen  <vinschen@redhat.com>
 
 	* spawn.cc (child_info_spawn::worker): Add CREATE_BREAKAWAY_FROM_JOB
