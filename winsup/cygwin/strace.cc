@@ -34,7 +34,7 @@ class strace NO_COPY strace;
 void
 strace::activate (bool isfork)
 {
-  if (!dynamically_loaded && !_active && being_debugged ())
+  if (!_active && being_debugged ())
     {
       char buf[30];
       __small_sprintf (buf, "cYg%8x %x %d", _STRACE_INTERFACE_ACTIVATE_ADDR, &_active, isfork);

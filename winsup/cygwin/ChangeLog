@@ -1,3 +1,15 @@
+2011-12-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dll_init.cc (dll_dllcrt0): Don't try to initialize dll data if we're
+	dynamically loaded since fork() doesn't work in that scenario anyway.
+	(dll_dllcrt0_1): Don't accommodate dynamically loaded dlls.
+	* exceptions.cc (ctrl_c_handler): Don't lock the process; there's too
+	much risk of deadlock.
+	* sigproc.cc (_cygtls::remove_wq): Don't try to remove anything from
+	the waitq if there is obviously nothing there.
+	* strace.cc (strace::activate): Allow stracing dynamically loaded
+	cygwin1.dll.
+
 2011-12-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler_termios.cc (tty_min::kill_pgrp): Don't send __SIGSETPGRP

@@ -927,7 +927,6 @@ static BOOL WINAPI
 ctrl_c_handler (DWORD type)
 {
   static bool saw_close;
-  lock_process now;
 
   if (!cygwin_finished_initializing)
     {

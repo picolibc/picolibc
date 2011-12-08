@@ -346,7 +346,7 @@ out1:
 void
 _cygtls::remove_wq (DWORD wait)
 {
-  if (exit_state < ES_FINAL && sync_proc_subproc
+  if (exit_state < ES_FINAL && waitq_head.next && sync_proc_subproc
       && sync_proc_subproc.acquire (wait))
     {
       for (waitq *w = &waitq_head; w->next != NULL; w = w->next)

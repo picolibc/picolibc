@@ -546,12 +546,10 @@ struct dllcrt0_info
 extern "C" int
 dll_dllcrt0 (HMODULE h, per_process *p)
 {
+  if (dynamically_loaded)
+    return 1;
   dllcrt0_info x (h, p);
-
-  if (_my_tls.isinitialized ())
-    dll_dllcrt0_1 (&x);
-  else
-    _my_tls.call ((DWORD (*) (void *, void *)) dll_dllcrt0_1, &x);
+  dll_dllcrt0_1 (&x);
   return x.res;
 }
 
@@ -592,11 +590,7 @@ dll_dllcrt0_1 (VOID *x)
      However, that's just a note for the record; at the moment, we can't
      see any need to worry about this happening.  */
 
-  /* Partially initialize Cygwin guts for non-cygwin apps. */
-  if (dynamically_loaded && user_data->magic_biscuit == 0)
-    dll_crt0 (p);
-  else
-    check_sanity_and_sync (p);
+  check_sanity_and_sync (p);
 
   dll_type type;
 
