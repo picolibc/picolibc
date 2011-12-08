@@ -1,5 +1,10 @@
 2011-12-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* select.cc (cygwin_select): Make sure that poll is called when
+	appropriate.
+
+2011-12-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* dll_init.cc (dll_dllcrt0): Don't try to initialize dll data if we're
 	dynamically loaded since fork() doesn't work in that scenario anyway.
 	(dll_dllcrt0_1): Don't accommodate dynamically loaded dlls.

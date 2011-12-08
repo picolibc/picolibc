@@ -124,7 +124,6 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
   select_printf ("sel.always_ready %d", sel.always_ready);
 
-  int timeout = 0;
   /* Allocate some fd_set structures using the number of fds as a guide. */
   fd_set *r = allocfd_set (maxfds);
   fd_set *w = allocfd_set (maxfds);
@@ -133,34 +132,27 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   int res = 1;
   /* Degenerate case.  No fds to wait for.  Just wait. */
   if (sel.start.next == NULL)
-    {
-      switch (cygWFMO (0, ms))
-	{
-	case WAIT_OBJECT_0:
-	  select_printf ("signal received");
-	  set_sig_errno (EINTR);
-	  return -1;
-	case WAIT_OBJECT_0 + 1:
-	  sel.destroy ();
-	  pthread::static_cancel_self ();
-	  /*NOTREACHED*/
-	default:
-	  break;
-	}
-      res = 0;
-    }
-  else if (sel.always_ready || ms == 0)
-    res = 0;
-  else if ((timeout = sel.wait (r, w, e, ms) < 0))
-    res = -1;	/* some kind of error */
-
-  if (res >= 0)
+    switch (cygWFMO (0, ms))
+      {
+      case WAIT_OBJECT_0:
+	select_printf ("signal received");
+	set_sig_errno (EINTR);
+	res = -1;
+      case WAIT_OBJECT_0 + 1:
+	sel.destroy ();
+	pthread::static_cancel_self ();
+	/*NOTREACHED*/
+      default:
+	res = 0;
+	break;
+      }
+  else if ((sel.always_ready || ms == 0)
+  	   || (res = sel.wait (r, w, e, ms)) == 0)
     {
       copyfd_set (readfds, r, maxfds);
       copyfd_set (writefds, w, maxfds);
       copyfd_set (exceptfds, e, maxfds);
-      if (res > 0)
-	res = sel.poll (readfds, writefds, exceptfds);
+      res = sel.poll (readfds, writefds, exceptfds);
     }
 
   syscall_printf ("%R = select (%d, %p, %p, %p, %p)", res, maxfds, readfds,
