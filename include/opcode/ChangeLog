@@ -1,3 +1,11 @@
+2011-12-08  Andrew Pinski  <apinski@cavium.com>
+            Adam Nemet  <anemet@caviumnetworks.com>
+
+	* mips.h (INSN_CHIP_MASK): Update according to INSN_OCTEON2.
+	(INSN_OCTEON2): New macro.
+	(CPU_OCTEON2): New macro.
+	(OPCODE_IS_MEMBER): Add Octeon2.
+
 2011-11-29  Andrew Pinski  <apinski@cavium.com>
 
 	* mips.h (INSN_CHIP_MASK): Update according to INSN_OCTEONP.

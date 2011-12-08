@@ -713,11 +713,12 @@ static const unsigned int mips_isa_table[] =
   { 0x0001, 0x0003, 0x0607, 0x1e0f, 0x3e1f, 0x0a23, 0x3e63, 0x3ebf, 0x3fff };
 
 /* Masks used for Chip specific instructions.  */
-#define INSN_CHIP_MASK		  0xc3ff0e20
+#define INSN_CHIP_MASK		  0xc3ff0f20
 
 /* Cavium Networks Octeon instructions.  */
 #define INSN_OCTEON		  0x00000800
 #define INSN_OCTEONP		  0x00000200
+#define INSN_OCTEON2		  0x00000100
 
 /* Masks used for MIPS-defined ASEs.  */
 #define INSN_ASE_MASK		  0x3c00f010
@@ -825,6 +826,7 @@ static const unsigned int mips_isa_table[] =
 #define CPU_LOONGSON_3A 3003
 #define CPU_OCTEON	6501
 #define CPU_OCTEONP	6601
+#define CPU_OCTEON2	6502
 #define CPU_XLR     	887682   	/* decimal 'XLR'   */
 
 /* Test for membership in an ISA including chip specific ISAs.  INSN
@@ -863,6 +865,8 @@ static const unsigned int mips_isa_table[] =
 	 && ((insn)->membership & INSN_OCTEON) != 0)			\
      || (cpu == CPU_OCTEONP						\
 	 && ((insn)->membership & INSN_OCTEONP) != 0)			\
+     || (cpu == CPU_OCTEON2						\
+	 && ((insn)->membership & INSN_OCTEON2) != 0)			\
      || (cpu == CPU_XLR && ((insn)->membership & INSN_XLR) != 0)        \
      || 0)	/* Please keep this term for easier source merging.  */
 
