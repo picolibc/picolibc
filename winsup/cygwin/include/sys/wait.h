@@ -77,7 +77,6 @@ inline int __wait_status_to_int (int __status)
   { return __status; }
 inline int __wait_status_to_int (const union wait & __status)
   { return __status.w_status; }
-};
 
 /* C++ wait() variants for `union wait'.  */
 inline pid_t wait (union wait *__status)
@@ -88,6 +87,7 @@ inline pid_t wait3 (union wait *__status, int __options, struct rusage *__rusage
   { return wait3 ((int *) __status, __options, __rusage); }
 inline pid_t wait4 (pid_t __pid, union wait *__status, int __options, struct rusage *__rusage)
   { return wait4 (__pid, (int *) __status, __options, __rusage); }
+};
 
 #else /* !__cplusplus */
 
