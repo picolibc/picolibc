@@ -1,5 +1,10 @@
 2011-12-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* select.cc (cygwin_select): Make sure that 0 is returned when sel.wait
+	times out.
+
+2011-12-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* include/sys/wait.h: Add in all c++ functions.
 
 2011-12-08  Christopher Faylor  <me.cygwin2011@cgf.cx>

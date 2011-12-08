@@ -147,12 +147,12 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	break;
       }
   else if ((sel.always_ready || ms == 0)
-  	   || (res = sel.wait (r, w, e, ms)) == 0)
+  	   || (res = sel.wait (r, w, e, ms)) >= 0)
     {
       copyfd_set (readfds, r, maxfds);
       copyfd_set (writefds, w, maxfds);
       copyfd_set (exceptfds, e, maxfds);
-      res = sel.poll (readfds, writefds, exceptfds);
+      res = (res > 0) ? 0 : sel.poll (readfds, writefds, exceptfds);
     }
 
   syscall_printf ("%R = select (%d, %p, %p, %p, %p)", res, maxfds, readfds,
