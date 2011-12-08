@@ -1,3 +1,7 @@
+2011-12-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* select.cc (select_stuff::wait): Temporarily disallow APCS.
+
 2011-12-08  Christopher Faylor  Christian Franke  <franke@computer.org>
 
 	* include/sys/wait.h: Ensure that C++ functions are only used when
