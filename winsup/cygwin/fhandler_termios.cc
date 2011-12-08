@@ -114,7 +114,7 @@ fhandler_pty_master::tcgetpgrp ()
 void
 tty_min::kill_pgrp (int sig)
 {
-  int killself = 0;
+  bool killself = false;
   winpids pids ((DWORD) PID_MAP_RW);
   siginfo_t si = {0};
   si.si_signo = sig;
@@ -125,7 +125,7 @@ tty_min::kill_pgrp (int sig)
       if (!p->exists () || p->ctty != ntty || p->pgid != pgid)
 	continue;
       if (p == myself)
-	killself++;
+	killself = sig != __SIGSETPGRP;
       else
 	sig_send (p, si);
     }

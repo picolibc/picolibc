@@ -1,5 +1,10 @@
 2011-12-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* fhandler_termios.cc (tty_min::kill_pgrp): Don't send __SIGSETPGRP
+	since presumably we are already initialized.
+
+2011-12-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* select.cc (cygwin_select): Add common introducer and leaver debug
 	output.
 	(select_stuff::poll): Remove unneeded debugging.
