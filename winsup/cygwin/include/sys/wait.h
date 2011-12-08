@@ -72,10 +72,12 @@ union wait
 
 #ifdef __cplusplus
 
+extern "C++" {
 inline int __wait_status_to_int (int __status)
   { return __status; }
 inline int __wait_status_to_int (const union wait & __status)
   { return __status.w_status; }
+};
 
 /* C++ wait() variants for `union wait'.  */
 inline pid_t wait (union wait *__status)
