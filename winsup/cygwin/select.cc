@@ -143,11 +143,14 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	pthread::static_cancel_self ();
 	/*NOTREACHED*/
       default:
-	res = 0;
+	res = 1;
 	break;
       }
-  else if ((sel.always_ready || ms == 0)
-  	   || (res = sel.wait (r, w, e, ms)) >= 0)
+  else if (sel.always_ready || ms == 0)
+    res = 0;
+  else
+    res = sel.wait (r, w, e, ms);
+  if (res >= 0)
     {
       copyfd_set (readfds, r, maxfds);
       copyfd_set (writefds, w, maxfds);
