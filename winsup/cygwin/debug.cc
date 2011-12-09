@@ -221,9 +221,12 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, bool force)
   lock_debug here;
   if (!mark_closed (func, ln, h, name, force))
     return false;
+debug_printf ("here 1");
 
   SetHandleInformation (h, HANDLE_FLAG_PROTECT_FROM_CLOSE, 0);
+debug_printf ("here 2");
   ret = CloseHandle (h);
+debug_printf ("here 3, ret %d", ret);
 
   if (!ret)
     {

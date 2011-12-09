@@ -1,3 +1,8 @@
+2011-12-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* sigproc.cc (signal_exit): Revert reversion of 2011-12-04 change
+	since, otherwise, you see hangs when the signal pipe is closed.
+
 2011-12-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* select.cc (cygwin_select): Fifth time is the charm.

@@ -376,10 +376,26 @@ _cygtls::signal_exit (int rc)
 {
   extern void stackdump (DWORD, int, bool);
 
+  HANDLE myss = my_sendsig;
   my_sendsig = NULL;		 /* Make no_signals_allowed return true */
-  close_my_readsig ();
 
-  SetEvent (signal_arrived);	 /* Avoid potential deadlock with proc_lock */
+  /* This code used to try to always close my_readsig but it ended up
+     blocking for reasons that people in google think make sense.
+     It's possible that it was blocking because ReadFile was still active
+     but it isn't clear why this only caused random hangs rather than
+     consistent hangs.  So, for now at least, avoid closing my_readsig
+     unless this is the signal thread.  */
+  if (&_my_tls == _sig_tls)
+    close_my_readsig ();	/* Stop any currently executing sig_sends */
+  else
+    {
+      sigpacket sp = {};
+      sp.si.si_signo = __SIGEXIT;
+      DWORD len;
+      /* Write a packet to the wait_sig thread which tells it to exit and
+	 close my_readsig.  */
+      WriteFile (myss, &sp, sizeof (sp), &len, NULL);
+    }
 
   if (rc == SIGQUIT || rc == SIGABRT)
     {
