@@ -16,7 +16,7 @@ my $objdump = shift;
 my @objcopy = ((shift));
 my $dll = shift;
 my $dbg = shift;
-xit 0, @objcopy, '-R', '.gnu_debuglink_overlay', '--only-keep-debug', $dll, $dbg;
+xit 0, @objcopy, '-R', '.gnu_debuglink_overlay', '--add-gnu-debuglink=/dev/null', '--only-keep-debug', $dll, $dbg;
 xit 0, @objcopy, '-g', '--add-gnu-debuglink=' . $dbg, $dll;
 open(OBJDUMP, '-|', "$objdump --headers $dll");
 my %section;
