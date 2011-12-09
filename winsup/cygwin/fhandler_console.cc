@@ -348,7 +348,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 
       set_cursor_maybe ();	/* to make cursor appear on the screen immediately */
 restart:
-      switch (cygWFMO (1, timeout, h))
+      switch (cygwait (h, timeout))
 	{
 	case WAIT_OBJECT_0:
 	  break;

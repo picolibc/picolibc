@@ -81,8 +81,8 @@ void __stdcall sigproc_init ();
 #ifdef __INSIDE_CYGWIN__
 void __stdcall sigproc_terminate (enum exit_states);
 
-static inline
-DWORD cygWFMO (DWORD n, DWORD howlong, ...)
+static inline DWORD
+cygwait (DWORD n, DWORD howlong, ...)
 {
   va_list ap;
   va_start (ap, howlong);
@@ -95,6 +95,18 @@ DWORD cygWFMO (DWORD n, DWORD howlong, ...)
   if (!w4[n - 1])
     n--;
   return WaitForMultipleObjects (n, w4, FALSE, howlong);
+}
+
+static inline DWORD
+cygwait (HANDLE h, DWORD wait = INFINITE)
+{
+  return cygwait (1, wait, h);
+}
+
+static inline DWORD
+cygwait (DWORD wait)
+{
+  return cygwait ((DWORD) 0, wait);
 }
 #endif
 bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));

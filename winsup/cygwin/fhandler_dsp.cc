@@ -541,7 +541,7 @@ fhandler_dev_dsp::Audio_out::waitforspace ()
 	  return false;
 	}
       debug_printf ("100ms");
-      switch (cygWFMO (0, 100))
+      switch (cygwait (100))
 	{
 	case WAIT_OBJECT_0:
 	  if (!_my_tls.call_signal_handler ())
@@ -919,7 +919,7 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
 	  return false;
 	}
       debug_printf ("100ms");
-      switch (cygWFMO (0, 100))
+      switch (cygwait (100))
 	{
 	case WAIT_OBJECT_0:
 	  if (!_my_tls.call_signal_handler ())

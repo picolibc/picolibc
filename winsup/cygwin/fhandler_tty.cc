@@ -428,7 +428,7 @@ fhandler_pty_slave::open (int flags, mode_t)
       goto err_no_errno;
     }
 
-  if (get_ttyp ()->master_pid < 0)
+  if (get_ttyp ()->is_master_closed ())
     {
       errmsg = "*** master is closed";
       set_errno (EAGAIN);
@@ -562,6 +562,8 @@ fhandler_pty_slave::close ()
   termios_printf ("closing last open %s handle", ttyname ());
   if (inuse && !CloseHandle (inuse))
     termios_printf ("CloseHandle (inuse), %E");
+  if (!ForceCloseHandle (input_available_event))
+    termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
   return fhandler_pty_common::close ();
 }
 
@@ -702,9 +704,15 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 
   while (len)
     {
-      switch (cygWFMO (1, time_to_wait, input_available_event))
+      switch (cygwait (input_available_event, time_to_wait))
 	{
 	case WAIT_OBJECT_0:
+	  if (get_ttyp ()->is_master_closed ())
+	    {
+	      raise (SIGHUP);
+	      totalread = 0;
+	      goto out;
+	    }
 	  break;
 	case WAIT_OBJECT_0 + 1:
 	  if (totalread > 0)
@@ -738,7 +746,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	}
       /* Now that we know that input is available we have to grab the
 	 input mutex. */
-      switch (cygWFMO (1, 1000, input_mutex))
+      switch (cygwait (input_mutex, 1000))
 	{
 	case WAIT_OBJECT_0:
 	case WAIT_ABANDONED_0:
@@ -811,26 +819,32 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	  if (!ReadFile (get_handle (), buf, readlen, &n, NULL))
 	    {
 	      termios_printf ("read failed, %E");
-	      raise (SIGHUP);
-	    }
-	  /* MSDN states that 5th prameter can be used to determine total
-	     number of bytes in pipe, but for some reason this number doesn't
-	     change after successful read. So we have to peek into the pipe
-	     again to see if input is still available */
-	  if (!PeekNamedPipe (get_handle (), peek_buf, 1, &bytes_in_pipe, NULL, NULL))
-	    {
-	      termios_printf ("PeekNamedPipe failed, %E");
+	      bytes_in_pipe = 0;
 	      raise (SIGHUP);
 	      bytes_in_pipe = 0;
+	      ptr = NULL;
 	    }
-	  if (n)
+	  else
 	    {
-	      len -= n;
-	      totalread += n;
-	      if (ptr)
+	      /* MSDN states that 5th prameter can be used to determine total
+		 number of bytes in pipe, but for some reason this number doesn't
+		 change after successful read. So we have to peek into the pipe
+		 again to see if input is still available */
+	      if (!PeekNamedPipe (get_handle (), peek_buf, 1, &bytes_in_pipe, NULL, NULL))
 		{
-		  memcpy (ptr, buf, n);
-		  ptr = (char *) ptr + n;
+		  termios_printf ("PeekNamedPipe failed, %E");
+		  raise (SIGHUP);
+		  bytes_in_pipe = 0;
+		}
+	      if (n)
+		{
+		  len -= n;
+		  totalread += n;
+		  if (ptr)
+		    {
+		      memcpy (ptr, buf, n);
+		      ptr = (char *) ptr + n;
+		    }
 		}
 	    }
 	}
@@ -1233,9 +1247,6 @@ fhandler_pty_common::close ()
   if (!ForceCloseHandle1 (get_output_handle (), to_pty))
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
-  if (!ForceCloseHandle (input_available_event))
-    termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
-
   return 0;
 }
 
@@ -1285,7 +1296,12 @@ fhandler_pty_master::close ()
   if (have_execed || get_ttyp ()->master_pid != myself->pid)
     termios_printf ("not clearing: %d, master_pid %d", have_execed, get_ttyp ()->master_pid);
   else
-    get_ttyp ()->set_master_closed ();
+    {
+      get_ttyp ()->set_master_closed ();
+      SetEvent (input_available_event);
+    }
+  if (!ForceCloseHandle (input_available_event))
+    termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
 
   return 0;
 }

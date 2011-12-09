@@ -1926,7 +1926,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
   if (res == overlapped_unknown)
     {
       HANDLE h = writing ? get_output_handle () : get_handle ();
-      DWORD wfres = cygWFMO (1, INFINITE, get_overlapped ()->hEvent);
+      DWORD wfres = cygwait (get_overlapped ()->hEvent);
       /* Cancelling here to prevent races.  It's possible that the I/O has
 	 completed already, in which case this is a no-op.  Otherwise,
 	 WFMO returned because 1) This is a non-blocking call, 2) a signal

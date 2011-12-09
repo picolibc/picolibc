@@ -109,6 +109,7 @@ public:
   bool exists ();
   bool not_allocated (HANDLE&, HANDLE&);
   void set_master_closed () {master_pid = -1;}
+  bool is_master_closed () const {return master_pid == -1;}
   static void __stdcall create_master (int);
   static void __stdcall init_session ();
   friend class fhandler_pty_master;

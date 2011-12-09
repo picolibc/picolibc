@@ -96,7 +96,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	    {
 	      overlapped_armed = 1;
 restart:
-	      switch (cygWFMO (1, INFINITE, io_status.hEvent))
+	      switch (cygwait (io_status.hEvent))
 		{
 		case WAIT_OBJECT_0:
 		  if (!GetOverlappedResult (get_handle (), &io_status, &n,
@@ -203,7 +203,7 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
       if (!is_nonblocking ())
 	{
     restart:
-	  switch (cygWFMO (1, INFINITE, write_status.hEvent))
+	  switch (cygwait (write_status.hEvent))
 	    {
 	    case WAIT_OBJECT_0:
 	      break;

@@ -1,5 +1,33 @@
 2011-12-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	Rename cygWFMO to cygwait throughout and use the magic of polymorphism
+	to "wait for stuff".
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Use
+	simplified arg form of cygwait.
+	* fhandler_console.cc (fhandler_console::read): Ditto.
+	* fhandler_audio.cc (fhandler_dev_dsp::Audio_out::waitforspac): Ditto.
+	(fhandler_dev_dsp::Audio_in::waitfordata): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo::wait): Ditto.
+	* fhandler_serial.cc (fhandler_serial::raw_read): Ditto.
+	(fhandler_serial::raw_write): Ditto.
+	* select.cc (cygwin_select): Ditto.
+	* sigproc.h (cygwait): Rename from cygWFMO.  Define two argument and
+	single argument forms of this function.
+
+	* fhandler_tty.cc (fhandler_pty_slave::open): Use method to query if
+	tty is open.
+	(fhandler_pty_slave::read): Send SIGHUP when master is detected as
+	closed.
+	(fhandler_pty_common::close): Close input_available_event in callers
+	since master may need to signal it first.
+	(fhandler_pty_master::close): Lie and set input_available_event when
+	closing, then close input_available_event.
+	(fhandler_pty_slave::close): Close input_available_event explicitly
+	here.
+	* tty.h (tty::is_master_closed): Declare new method.
+
+2011-12-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sigproc.cc (signal_exit): Revert reversion of 2011-12-04 change
 	since, otherwise, you see hangs when the signal pipe is closed.
 

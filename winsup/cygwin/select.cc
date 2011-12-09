@@ -132,7 +132,7 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   int res = 1;
   /* Degenerate case.  No fds to wait for.  Just wait. */
   if (sel.start.next == NULL)
-    switch (cygWFMO (0, ms))
+    switch (cygwait (ms))
       {
       case WAIT_OBJECT_0:
 	select_printf ("signal received");
