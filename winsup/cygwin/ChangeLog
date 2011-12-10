@@ -1,3 +1,8 @@
+2011-12-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* sigproc.h (cygwait): Tweak test for cancellable event to make it a
+	little more clear.
+
 2011-12-09  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* exceptions.cc (ctrl_c_handler): YA in a series or reversions.  Put
