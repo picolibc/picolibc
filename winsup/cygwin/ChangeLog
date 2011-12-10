@@ -86,7 +86,7 @@
 2011-12-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler_termios.cc (tty_min::kill_pgrp): Don't send __SIGSETPGRP
-	since presumably we are already initialized.
+	to ourselves since presumably we are already initialized.
 
 2011-12-07  Christopher Faylor  <me.cygwin2011@cgf.cx>
 

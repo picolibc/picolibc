@@ -91,9 +91,8 @@ cygwait (DWORD n, DWORD howlong, ...)
   for (unsigned i = 0; i < n; i++)
     w4[i] = va_arg (ap, HANDLE);
   w4[n++] = signal_arrived;
-  w4[n++] = pthread::get_cancel_event ();
-  if (!w4[n - 1])
-    n--;
+  if ((w4[n] = pthread::get_cancel_event ()) != NULL)
+    n++;
   return WaitForMultipleObjects (n, w4, FALSE, howlong);
 }
 

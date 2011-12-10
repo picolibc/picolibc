@@ -646,10 +646,89 @@ init_windows_system_directory ()
   windows_system_directory[windows_system_directory_length] = L'\0';
 }
 
+bool NO_COPY wow64_respawn = false;
+
+inline static bool
+wow64_started_from_native64 ()
+{
+  /* On Windows XP 64 and 2003 64 there's a problem with processes running
+     under WOW64.  The first process started from a 64 bit process has an
+     unusual stack address for the main thread.  That is, an address which
+     is in the usual space occupied by the process image, but below the auto
+     load address of DLLs.  If we encounter this situation, check if we
+     really have been started from a 64 bit process here.  If so, we exit
+     early from dll_crt0_0 and respawn first thing in dll_crt0_1.  This
+     ping-pong game is necessary to workaround a problem observed on
+     Windows 2003 R2 64.  Starting with Cygwin 1.7.10 we don't link against
+     advapi32.dll anymore.  However, *any* process linked against advapi32,
+     directly or indirectly, now fails to respawn if respawn_wow_64_process
+     is called during DLL_PROCESS_ATTACH initialization.  In that case
+     CreateProcessW returns with ERROR_ACCESS_DENIED for some reason.
+     Calling CreateProcessW later, inside dll_crt0_1 and so outside of
+     dll initialization works as before, though. */
+  NTSTATUS ret;
+  PROCESS_BASIC_INFORMATION pbi;
+  HANDLE parent;
+
+  ULONG wow64 = TRUE;   /* Opt on the safe side. */
+
+  /* Unfortunately there's no simpler way to retrieve the
+     parent process in NT, as far as I know.  Hints welcome. */
+  ret = NtQueryInformationProcess (NtCurrentProcess (),
+                                   ProcessBasicInformation,
+                                   &pbi, sizeof pbi, NULL);
+  if (NT_SUCCESS (ret)
+      && (parent = OpenProcess (PROCESS_QUERY_INFORMATION,
+                                FALSE,
+                                pbi.InheritedFromUniqueProcessId)))
+    {
+      NtQueryInformationProcess (parent, ProcessWow64Information,
+                                 &wow64, sizeof wow64, NULL);
+      CloseHandle (parent);
+    }
+  return !wow64;
+}
+
+inline static void
+respawn_wow64_process ()
+{
+  /* The parent is a real 64 bit process.  Respawn. */
+  WCHAR path[PATH_MAX];
+  PROCESS_INFORMATION pi;
+  STARTUPINFOW si;
+  DWORD ret = 0;
+
+  GetModuleFileNameW (NULL, path, PATH_MAX);
+  GetStartupInfoW (&si);
+  if (!CreateProcessW (path, GetCommandLineW (), NULL, NULL, TRUE,
+		       CREATE_DEFAULT_ERROR_MODE
+		       | GetPriorityClass (GetCurrentProcess ()),
+		       NULL, NULL, &si, &pi))
+    api_fatal ("Failed to create process <%W> <%W>, %E",
+	       path, GetCommandLineW ());
+  CloseHandle (pi.hThread);
+  if (WaitForSingleObject (pi.hProcess, INFINITE) == WAIT_FAILED)
+    api_fatal ("Waiting for process %d failed, %E", pi.dwProcessId);
+  GetExitCodeProcess (pi.hProcess, &ret);
+  CloseHandle (pi.hProcess);
+  TerminateProcess (GetCurrentProcess (), ret);
+  ExitProcess (ret);
+}
+
 void
 dll_crt0_0 ()
 {
   child_proc_info = get_cygwin_startup_info ();
+  BOOL wow64_test_stack_marker;
+  if (!child_proc_info
+      && wincap.is_wow64 ()
+      /* WOW64 bit process with stack at unusual address?  Check if we
+	 have been started from 64 bit process ans set wow64_respawn.
+	 Full description in wow64_started_from_native64 above. */
+      && &wow64_test_stack_marker >= (PBOOL) 0x400000
+      && &wow64_test_stack_marker <= (PBOOL) 0x10000000
+      && (wow64_respawn = wow64_started_from_native64 ()))
+    return;
   init_windows_system_directory ();
   init_global_security ();
   initial_env ();
@@ -912,6 +991,10 @@ __cygwin_exit_return:			\n\
 extern "C" void __stdcall
 _dll_crt0 ()
 {
+  /* Respawn WOW64 process started from native 64 bit process.  See comment
+     in wow64_started_from_native64 above for a full description. */
+  if (wow64_respawn)
+    respawn_wow64_process ();
 #ifdef __i386__
   _feinitialise ();
 #endif
