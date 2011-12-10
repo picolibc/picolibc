@@ -1,5 +1,10 @@
 2011-12-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* sigproc.h (cygwait): Delete duplicate va_start and add matching
+	va_end.
+
+2011-12-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sigproc.h (cygwait): Tweak test for cancellable event to make it a
 	little more clear.
 

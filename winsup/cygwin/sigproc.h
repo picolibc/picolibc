@@ -85,11 +85,13 @@ static inline DWORD
 cygwait (DWORD n, DWORD howlong, ...)
 {
   va_list ap;
-  va_start (ap, howlong);
   HANDLE w4[n + 2];
+
   va_start (ap, howlong);
   for (unsigned i = 0; i < n; i++)
     w4[i] = va_arg (ap, HANDLE);
+  va_end (ap);
+
   w4[n++] = signal_arrived;
   if ((w4[n] = pthread::get_cancel_event ()) != NULL)
     n++;
