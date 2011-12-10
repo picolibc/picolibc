@@ -137,7 +137,7 @@
 
 2011-12-04  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
-	* sigproc.cc (cygWFMO): Don't assume that cancellable event is always
+	* sigproc.h (cygWFMO): Don't assume that cancellable event is always
 	available.
 	* fhandler_dsp.cc (fhandler_dev_dsp::Audio_out::waitforspace): Use
 	cygWFMO instead of WaitForMultipleObjects.
