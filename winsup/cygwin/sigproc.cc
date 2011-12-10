@@ -396,6 +396,7 @@ _cygtls::signal_exit (int rc)
 	 close my_readsig.  */
       WriteFile (myss, &sp, sizeof (sp), &len, NULL);
     }
+  signal_debugger (rc & 0x7f);
 
   if (rc == SIGQUIT || rc == SIGABRT)
     {
@@ -413,7 +414,6 @@ _cygtls::signal_exit (int rc)
       TerminateProcess (ch_spawn, sigExeced = rc);
     }
 
-  signal_debugger (rc & 0x7f);
   if ((rc & 0x80) && !try_to_debug ())
     stackdump (thread_context.ebp, 1, 1);
 

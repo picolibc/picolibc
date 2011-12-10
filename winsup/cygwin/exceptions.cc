@@ -936,6 +936,13 @@ ctrl_c_handler (DWORD type)
       ExitProcess (STATUS_CONTROL_C_EXIT);
     }
 
+  /* Remove early or we could overthrow the threadlist in cygheap.
+     Deleting this line causes ash to SEGV if CTRL-C is hit repeatedly.
+     I am not exactly sure why that is.  Maybe it's just because this
+     adds some early serialization to ctrl_c_handler which prevents
+     multiple simultaneous calls? */
+  _my_tls.remove (INFINITE);
+
 #if 0
   if (type == CTRL_C_EVENT || type == CTRL_BREAK_EVENT)
     proc_subproc (PROC_KILLFORKED, 0);
@@ -1234,15 +1241,6 @@ sigpacket::process ()
   /* Clear pending SIGCONT on stop signals */
   if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU)
     sig_clear (SIGCONT);
-
-#ifdef CGF
-  if (being_debugged ())
-    {
-      char sigmsg[sizeof (_CYGWIN_SIGNAL_STRING " 0xffffffff")];
-      __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %p", si.si_signo);
-      OutputDebugString (sigmsg);
-    }
-#endif
 
   if (handler == (void *) SIG_DFL)
     {
