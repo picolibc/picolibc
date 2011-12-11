@@ -1,5 +1,14 @@
 2011-12-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* select.cc (select_stuff::wait): Very minor formatting fix.
+	(peek_windows): Report on HWND handle used in queries.
+	* select.h: Update copyright.
+	* sigproc.h (cygwait): Eliminate multi-argument variety since more
+	general implementation may cause odd problems in select.  Also force to
+	always be inline.
+
+2011-12-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* sigproc.h (cygwait): Delete duplicate va_start and add matching
 	va_end.
 

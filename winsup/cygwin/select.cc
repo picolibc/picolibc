@@ -366,8 +366,8 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	    set_errno (s->saw_error ());
 	    return -1;		/* Somebody detected an error */
 	  }
-	else if ((((wait_ret >= m && s->windows_handle) || s->h == w4[wait_ret])) &&
-	    s->verify (s, readfds, writefds, exceptfds))
+	else if ((((wait_ret >= m && s->windows_handle) || s->h == w4[wait_ret]))
+		 && s->verify (s, readfds, writefds, exceptfds))
 	  gotone = true;
 
       select_printf ("gotone %d", gotone);
@@ -1498,11 +1498,11 @@ peek_windows (select_record *me, bool)
   if (PeekMessageW (&m, (HWND) h, 0, 0, PM_NOREMOVE))
     {
       me->read_ready = true;
-      select_printf ("window %d(%p) ready", me->fd, me->fh->get_handle ());
+      select_printf ("window %d(%p) ready", me->fd, h);
       return 1;
     }
 
-  select_printf ("window %d(%p) not ready", me->fd, me->fh->get_handle ());
+  select_printf ("window %d(%p) not ready", me->fd, h);
   return me->write_ready;
 }
 
