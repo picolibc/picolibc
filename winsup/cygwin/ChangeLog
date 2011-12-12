@@ -1,4 +1,8 @@
 2011-12-12  Corinna Vinschen  <vinschen@redhat.com>
+
+	* mount.cc (fs_info::update): Set has_buggy_reopen for Netapps as well.
+
+2011-12-12  Corinna Vinschen  <vinschen@redhat.com>
 	    Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dcrt0.cc (wow64_respawn): New static variable.
