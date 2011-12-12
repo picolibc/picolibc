@@ -1,3 +1,13 @@
+2011-12-11  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* pipe.cc (fhandler_pipe::create): Use debug_printf to print debugging
+	info since this isn't a "syscall".
+	(pipe_worker): New function created from _pipe().
+	(_pipe): Use pipe_worker to create a pipe.  Use standard syscall strace
+	reporting on exit.
+	(pipe): Ditto.
+	(pipe2): Ditto.
+
 2011-12-10  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* select.cc (select_stuff::wait): Very minor formatting fix.

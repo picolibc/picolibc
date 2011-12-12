@@ -348,7 +348,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
       res = 0;
     }
 
-  syscall_printf ("%R = pipe([%p, %p], %d, %p)", res, fhs[0], fhs[1], psize, mode);
+  debug_printf ("%R = pipe([%p, %p], %d, %p)", res, fhs[0], fhs[1], psize, mode);
   return res;
 }
 
@@ -386,8 +386,8 @@ fhandler_pipe::fstatvfs (struct statvfs *sfs)
   return -1;
 }
 
-extern "C" int
-_pipe (int filedes[2], unsigned int psize, int mode)
+static int __attribute__ ((regparm (3)))
+pipe_worker (int filedes[2], unsigned int psize, int mode)
 {
   fhandler_pipe *fhs[2];
   int res = fhandler_pipe::create (fhs, psize, mode);
@@ -404,19 +404,54 @@ _pipe (int filedes[2], unsigned int psize, int mode)
       fdout = fhs[1];
       filedes[0] = fdin;
       filedes[1] = fdout;
-      debug_printf ("%d, %d", (int) fdin, (int) fdout);
+    } 
+  return res;
+}
+
+extern "C" int
+_pipe (int filedes[2], unsigned int psize, int mode)
+{
+  int res = pipe_worker (filedes, psize, mode);
+  int read, write;
+  if (res != 0)
+    read = write = -1;
+  else
+    {
+      read = filedes[0];
+      write = filedes[1];
     }
+  syscall_printf ("%R = _pipe([%d, %d], %u, %p)", res, read, write, psize, mode);
   return res;
 }
 
 extern "C" int
 pipe (int filedes[2])
 {
-  return _pipe (filedes, DEFAULT_PIPEBUFSIZE, O_BINARY);
+  int res = pipe_worker (filedes, DEFAULT_PIPEBUFSIZE, O_BINARY);
+  int read, write;
+  if (res != 0)
+    read = write = -1;
+  else
+    {
+      read = filedes[0];
+      write = filedes[1];
+    }
+  syscall_printf ("%R = pipe([%d, %d])", res, read, write);
+  return res;
 }
 
 extern "C" int
 pipe2 (int filedes[2], int mode)
 {
-  return _pipe (filedes, DEFAULT_PIPEBUFSIZE, mode);
+  int res = pipe_worker (filedes, DEFAULT_PIPEBUFSIZE, mode);
+  int read, write;
+  if (res != 0)
+    read = write = -1;
+  else
+    {
+      read = filedes[0];
+      write = filedes[1];
+    }
+  syscall_printf ("%R = pipe2([%d, %d], %p)", res, read, write, mode);
+  return res;
 }
