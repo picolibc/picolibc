@@ -64,58 +64,12 @@ munge_threadfunc ()
     }
 }
 
-inline static void
-respawn_wow64_process ()
-{
-  NTSTATUS ret;
-  PROCESS_BASIC_INFORMATION pbi;
-  HANDLE parent;
-
-  ULONG wow64 = TRUE;	/* Opt on the safe side. */
-
-  /* Unfortunately there's no simpler way to retrieve the
-     parent process in NT, as far as I know.  Hints welcome. */
-  ret = NtQueryInformationProcess (NtCurrentProcess (),
-				   ProcessBasicInformation,
-				   &pbi, sizeof pbi, NULL);
-  if (NT_SUCCESS (ret)
-      && (parent = OpenProcess (PROCESS_QUERY_INFORMATION,
-				FALSE,
-				pbi.InheritedFromUniqueProcessId)))
-    {
-      NtQueryInformationProcess (parent, ProcessWow64Information,
-				 &wow64, sizeof wow64, NULL);
-      CloseHandle (parent);
-    }
-
-  /* The parent is a real 64 bit process?  Respawn! */
-  if (!wow64)
-    {
-      PROCESS_INFORMATION pi;
-      STARTUPINFOW si;
-      DWORD ret = 0;
-
-      GetStartupInfoW (&si);
-      if (!CreateProcessW (NULL, GetCommandLineW (), NULL, NULL, TRUE,
-			   CREATE_DEFAULT_ERROR_MODE
-			   | GetPriorityClass (GetCurrentProcess ()),
-			   NULL, NULL, &si, &pi))
-	api_fatal ("Failed to create process <%s>, %E", GetCommandLineA ());
-      CloseHandle (pi.hThread);
-      if (WaitForSingleObject (pi.hProcess, INFINITE) == WAIT_FAILED)
-	api_fatal ("Waiting for process %d failed, %E", pi.dwProcessId);
-      GetExitCodeProcess (pi.hProcess, &ret);
-      CloseHandle (pi.hProcess);
-      ExitProcess (ret);
-    }
-}
-
 void dll_crt0_0 ();
 
 extern "C" BOOL WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
-  BOOL wow64_test_stack_marker;
+  BOOL test_stack_marker;
 
   switch (reason)
     {
@@ -125,16 +79,6 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 
       cygwin_hmodule = (HMODULE) h;
       dynamically_loaded = (static_load == NULL);
-
-      /* Is the stack at an unusual address?  That is, an address which
-	 is in the usual space occupied by the process image, but below
-	 the auto load address of DLLs?
-	 Check if we're running in WOW64 on a 64 bit machine *and* are
-	 spawned by a genuine 64 bit process.  If so, respawn. */
-      if (wincap.is_wow64 ()
-	  && &wow64_test_stack_marker >= (PBOOL) 0x400000
-	  && &wow64_test_stack_marker <= (PBOOL) 0x10000000)
-	respawn_wow64_process ();
 
       dll_crt0_0 ();
       _my_oldfunc = TlsAlloc ();
@@ -150,7 +94,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       break;
     case DLL_THREAD_DETACH:
       if (dll_finished_loading
-	  && (PVOID) &_my_tls > (PVOID) &wow64_test_stack_marker
+	  && (PVOID) &_my_tls > (PVOID) &test_stack_marker
 	  && _my_tls.isinitialized ())
 	_my_tls.remove (0);
       /* Windows 2000 has a bug in NtTerminateThread.  Instead of releasing

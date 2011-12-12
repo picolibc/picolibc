@@ -1,3 +1,17 @@
+2011-12-12  Corinna Vinschen  <vinschen@redhat.com>
+	    Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dcrt0.cc (wow64_respawn): New static variable.
+	(wow64_started_from_native64): New function to check if a WOW64
+	process got started from a native 64 bit process.
+	(respawn_wow64_process): New function to respawn process.
+	(dll_crt0_0): When started from a native parent, check if parent
+	is a 64 bit process.  If so, return early.
+	(_dll_crt0): Respawn WOW64 process here if required.
+	* init.cc (respawn_wow64_process): Remove.
+	(dll_entry): Rename wow64_test_stack_marker to test_stack_marker.
+	Drop WOW64 test here.
+
 2011-12-11  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* pipe.cc (fhandler_pipe::create): Use debug_printf to print debugging
