@@ -585,6 +585,32 @@ struct dos_drive_mappings
       for (wchar_t *cur = dbuf; (*drive = *cur); cur = wcschr (cur, L'\0')+1)
 	if (QueryDosDeviceW (drive, pbuf, NT_MAX_PATH))
 	  {
+	    /* The DOS drive mapping can be another symbolic link.  The result
+	       is that the mapping won't work since the section name is the
+	       name after resolving all symbolic links.  So we have to resolve
+	       symbolic links here, too. */
+	    for (int syml_cnt = 0; syml_cnt < SYMLOOP_MAX; ++syml_cnt)
+	      {
+		UNICODE_STRING upath;
+		OBJECT_ATTRIBUTES attr;
+		NTSTATUS status;
+		HANDLE h;
+
+		RtlInitUnicodeString (&upath, pbuf);
+		InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
+					    NULL, NULL);
+		status = NtOpenSymbolicLinkObject (&h, SYMBOLIC_LINK_QUERY,
+						   &attr);
+		if (!NT_SUCCESS (status))
+		  break;
+		RtlInitEmptyUnicodeString (&upath, pbuf,
+					   (NT_MAX_PATH - 1) * sizeof (WCHAR));
+		status = NtQuerySymbolicLinkObject (h, &upath, NULL);
+		NtClose (h);
+		if (!NT_SUCCESS (status))
+		  break;
+		pbuf[upath.Length / sizeof (WCHAR)] = L'\0';
+	      }
 	    size_t plen = wcslen (pbuf);
 	    size_t psize = plen * sizeof (wchar_t);
 	    debug_printf ("DOS drive %ls maps to %ls", drive, pbuf);

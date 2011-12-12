@@ -1,5 +1,10 @@
 2011-12-12  Corinna Vinschen  <vinschen@redhat.com>
 
+	* fhandler_process.cc (dos_drive_mappings::dos_drive_mappings): Fully
+	resolve symbolic links returned by QueryDosDeviceW.  Explain why.
+
+2011-12-12  Corinna Vinschen  <vinschen@redhat.com>
+
 	* mount.cc (fs_info::update): Set has_buggy_reopen for Netapps as well.
 
 2011-12-12  Corinna Vinschen  <vinschen@redhat.com>
