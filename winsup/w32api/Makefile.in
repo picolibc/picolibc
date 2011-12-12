@@ -1,11 +1,13 @@
+# @configure_input@
 #
-#	Makefile.in
 #
-#	This file is part of a free library for the Win32 API.
+# Makefile.in
+#
+# This file is part of a free library for the Win32 API.
 # 
-#	This library is distributed in the hope that it will be useful,
-#	but WITHOUT ANY WARRANTY; without even the implied warranty of
-#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # start config section
 
@@ -48,21 +50,6 @@ TAR = tar
 TARFLAGS = --lzma -
 TARFILEEXT = .tar.lzma
 
-FLAGS_TO_PASS = \
-	AS="$(AS)" \
-	CC="$(CC)" \
-	CPPFLAGS="$(CPPFLAGS)" \
-	CFLAGS="$(CFLAGS)" \
-	CXXFLAGS="$(CXXFLAGS)" \
-	AR="$(AR)" \
-	RANLIB="$(RANLIB)" \
-	LD="$(LD)" \
-	DLLTOOL="$(DLLTOOL)" \
-	TAR="$(TAR)" \
-	TARFLAGS="$(TARFLAGS)" \
-	TARFILEEXT="$(TARFILEEXT)" \
-	WINDRES="$(WINDRES)"
-
 # end config section
 
 SUBDIRS = lib
@@ -79,18 +66,18 @@ all: lib
 
 %-subdirs:
 	for i in $(SUBDIRS); do \
-	  $(MAKE) $(FLAGS_TO_PASS) -C $$i $*; \
+	  $(MAKE) -C $$i $*; \
 	done
 
 lib:
-	$(MAKE) $(FLAGS_TO_PASS) -C $@
+	$(MAKE) -C $@
 
 test:
-	$(MAKE) -C lib test $(FLAGS_TO_PASS)
+	$(MAKE) -C lib test
 
 install uninstall:
 	for i in $(SUBDIRS); do \
-		(cd $$i; $(MAKE) $@ $(FLAGS_TO_PASS)); \
+		(cd $$i; $(MAKE) $@); \
 	done
 
 ifdef SNAPDATE

@@ -1,3 +1,14 @@
+2011-12-12  Keith Marshall  <keithmarshall@users.sf.net>
+
+	* Makefile.in (FLAGS_TO_PASS): Pointless macro; remove it.  (Defaults
+	for all are propagated by configure, and make automatically propagates
+	any user specified overrides.
+
+	* lib/Makefile.in (FLAGS_TO_PASS): Similarly removed, as pointless.
+	(uninstall-ddk, uninstall-directx): Remove improperly used '-C' from
+	make command; the directory to process was previously selected by cd,
+	and not properly specified as argument to '-C'.
+
 2011-12-10  Keith Marshall  <keithmarshall@users.sf.net>
 
 	* aclocal.m4: Redundant file; delete it.

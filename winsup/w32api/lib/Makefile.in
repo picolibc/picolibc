@@ -1,11 +1,13 @@
+# @configure_input@
 #
-#	Makefile.in
 #
-#	This file is part of a free library for the Win32 API.
+# Makefile.in
+#
+# This file is part of a free library for the Win32 API.
 # 
-#	This library is distributed in the hope that it will be useful,
-#	but WITHOUT ANY WARANTY; without even the implied warranty of
-#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 
 # start config section
@@ -91,21 +93,6 @@ RANLIB = @RANLIB@
 AR = @AR@
 LD = @LD@
 
-FLAGS_TO_PASS = \
-	AS="$(AS)" \
-	CC="$(CC)" \
-	CPPFLAGS="$(CPPFLAGS)" \
-	CFLAGS="$(CFLAGS)" \
-	CXXFLAGS="$(CXXFLAGS)" \
-	AR="$(AR)" \
-	RANLIB="$(RANLIB)" \
-	LD="$(LD)" \
-	DLLTOOL="$(DLLTOOL)" \
-	TAR="$(TAR)" \
-	TARFLAGS="$(TARFLAGS)" \
-	TARFILEEXT="$(TARFILEEXT)" \
-	WINDRES="$(WINDRES)"
-
 # end config section
 
 # headers
@@ -148,14 +135,14 @@ all: $(EXTRA_OBJS) $(LIBS) ddk directx
 
 %-subdirs:
 	for i in $(SUBDIRS); do \
-	  $(MAKE) $(FLAGS_TO_PASS) -C $$i $*; \
+	  $(MAKE) -C $$i $*; \
 	done
 
 ddk:
-	$(MAKE) $(FLAGS_TO_PASS) -C $@
+	$(MAKE) -C $@
 
 directx:
-	$(MAKE) $(FLAGS_TO_PASS) -C $@
+	$(MAKE) -C $@
 
 TEST_OPTIONS = $(ALL_CFLAGS) -DWINVER=0x0666  \
 	-Wall -pedantic -Wsystem-headers -c $(srcdir)/test.c -o test.o
@@ -246,10 +233,10 @@ install-headers: $(need-DESTDIR-compatibility)
 	done
 
 install-ddk: install-libraries install-headers
-	cd ddk && $(MAKE) install $(FLAGS_TO_PASS)
+	cd ddk && $(MAKE) install
 
 install-directx: install-libraries install-headers
-	cd directx && $(MAKE) install $(FLAGS_TO_PASS)
+	cd directx && $(MAKE) install
 
 # uninstall headers and libraries from a target specified directory
 uninstall: uninstall-ddk uninstall-directx uninstall-libraries uninstall-headers
@@ -267,10 +254,10 @@ uninstall-headers: $(need-DESTDIR-compatibility)
 	rmdir $(DESTDIR)$(inst_includedir)
 
 uninstall-ddk:
-	cd ddk && $(MAKE) -C uninstall $(FLAGS_TO_PASS)
+	cd ddk && $(MAKE) uninstall
 
 uninstall-directx:
-	cd directx && $(MAKE) -C uninstall $(FLAGS_TO_PASS)
+	cd directx && $(MAKE) uninstall
 
 dist:
 	mkdir $(distdir)/include
