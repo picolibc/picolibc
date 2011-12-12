@@ -1,3 +1,8 @@
+2011-12-12  Akio Idehara  <zbe64533@gmail.com>
+
+	* libc/time/strftime.c (get_era_info): Fix off-by-one error in month
+	calculation.
+
 2011-12-06  Chris Johns  <chrisj@rtems.org>
 
 	* libc/iconv/Makefile.am (stmp-def): Use $(MAKE) rather than make.

@@ -426,7 +426,7 @@ get_era_info (const struct tm *tim_p, const char *era)
       /* Adjust offset for negative gregorian dates. */
       if (stm.tm_year <= -YEAR_BASE)
       	++stm.tm_year;
-      stm.tm_mon = ERA_STRTOL (c + 1, &c, 10);
+      stm.tm_mon = ERA_STRTOL (c + 1, &c, 10) - 1;
       stm.tm_mday = ERA_STRTOL (c + 1, &c, 10);
       stm.tm_hour = stm.tm_min = stm.tm_sec = 0;
       era = c + 1;
@@ -440,7 +440,7 @@ get_era_info (const struct tm *tim_p, const char *era)
       else if (era[0] == '+' && era[1] == '*')
 	{
 	  etm.tm_year = INT_MAX;
-	  etm.tm_mon = 12;
+	  etm.tm_mon = 11;
 	  etm.tm_mday = 31;
 	  etm.tm_hour = 23;
 	  etm.tm_min = etm.tm_sec = 59;
@@ -452,7 +452,7 @@ get_era_info (const struct tm *tim_p, const char *era)
 	  /* Adjust offset for negative gregorian dates. */
 	  if (etm.tm_year <= -YEAR_BASE)
 	    ++etm.tm_year;
-	  etm.tm_mon = ERA_STRTOL (c + 1, &c, 10);
+	  etm.tm_mon = ERA_STRTOL (c + 1, &c, 10) - 1;
 	  etm.tm_mday = ERA_STRTOL (c + 1, &c, 10);
 	  etm.tm_mday = 31;
 	  etm.tm_hour = 23;
