@@ -549,84 +549,88 @@ struct dos_drive_mappings
   struct mapping
   {
     mapping *next;
-    int len;
-    wchar_t drive_letter;
-    wchar_t mapping[1];
+    size_t doslen;
+    size_t ntlen;
+    wchar_t *dospath;
+    wchar_t *ntdevpath;
   };
   mapping *mappings;
 
   dos_drive_mappings ()
     : mappings(0)
   {
-    /* The logical drive strings buffer holds a list of (at most 26)
-       drive names separated by nulls and terminated by a double-null:
+    tmp_pathbuf tp;
+    wchar_t vol[64]; /* Long enough for Volume GUID string */
+    wchar_t *devpath = tp.w_get ();
+    wchar_t *mounts = tp.w_get ();
 
-       "a:\\\0b:\\\0...z:\\\0"
-
-       The annoying part is, QueryDosDeviceW wants only "x:" rather
-       than the "x:\" we get back from GetLogicalDriveStringsW, so
-       we'll have to strip out the trailing slash for each mapping.
-
-       The returned mapping a native NT pathname (\Device\...) which
-       we can use to fix up the output of GetMappedFileNameW
-    */
-    static unsigned const DBUFLEN = 26 * 4;
-    wchar_t dbuf[DBUFLEN + 1];
-    wchar_t pbuf[NT_MAX_PATH];
-    wchar_t drive[] = {L'x', L':', 0};
-    unsigned result = GetLogicalDriveStringsW (DBUFLEN * sizeof (wchar_t),
-					       dbuf);
-    if (!result)
-      debug_printf ("Failed to get logical DOS drive names: %lu",
-		    GetLastError ());
-    else if (result > DBUFLEN)
-      debug_printf ("Too many mapped drive letters: %u", result);
+    /* Iterate over all volumes, fetch the first path from the list of
+       DOS paths the volume is mounted to, or use the GUID volume path
+       otherwise. */
+    HANDLE sh = FindFirstVolumeW (vol, 64);
+    if (sh == INVALID_HANDLE_VALUE)
+      debug_printf ("FindFirstVolumeW, %E");
     else
-      for (wchar_t *cur = dbuf; (*drive = *cur); cur = wcschr (cur, L'\0')+1)
-	if (QueryDosDeviceW (drive, pbuf, NT_MAX_PATH))
-	  {
-	    /* The DOS drive mapping can be another symbolic link.  The result
-	       is that the mapping won't work since the section name is the
-	       name after resolving all symbolic links.  So we have to resolve
-	       symbolic links here, too. */
-	    for (int syml_cnt = 0; syml_cnt < SYMLOOP_MAX; ++syml_cnt)
-	      {
-		UNICODE_STRING upath;
-		OBJECT_ATTRIBUTES attr;
-		NTSTATUS status;
-		HANDLE h;
+      do
+	{
+	  DWORD len;
+	  /* Skip drives which are not mounted. */
+	  if (!GetVolumePathNamesForVolumeNameW (vol, mounts, NT_MAX_PATH, &len)
+	      || mounts[0] == L'\0')
+	    continue;
+	  *wcsrchr (vol, L'\\') = L'\0';
+	  if (QueryDosDeviceW (vol + 4, devpath, NT_MAX_PATH))
+	    {
+	      /* The DOS drive mapping can be another symbolic link.  If so,
+		 the mapping won't work since the section name is the name
+		 after resolving all symlinks.  Resolve symlinks here, too. */
+	      for (int syml_cnt = 0; syml_cnt < SYMLOOP_MAX; ++syml_cnt)
+		{
+		  UNICODE_STRING upath;
+		  OBJECT_ATTRIBUTES attr;
+		  NTSTATUS status;
+		  HANDLE h;
 
-		RtlInitUnicodeString (&upath, pbuf);
-		InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
-					    NULL, NULL);
-		status = NtOpenSymbolicLinkObject (&h, SYMBOLIC_LINK_QUERY,
-						   &attr);
-		if (!NT_SUCCESS (status))
-		  break;
-		RtlInitEmptyUnicodeString (&upath, pbuf,
-					   (NT_MAX_PATH - 1) * sizeof (WCHAR));
-		status = NtQuerySymbolicLinkObject (h, &upath, NULL);
-		NtClose (h);
-		if (!NT_SUCCESS (status))
-		  break;
-		pbuf[upath.Length / sizeof (WCHAR)] = L'\0';
-	      }
-	    size_t plen = wcslen (pbuf);
-	    size_t psize = plen * sizeof (wchar_t);
-	    debug_printf ("DOS drive %ls maps to %ls", drive, pbuf);
-	    mapping *m = (mapping*) malloc (sizeof (mapping) + psize);
-	    if (m)
-	      {
-		m->next = mappings;
-		m->len = plen;
-		m->drive_letter = *drive;
-		memcpy (m->mapping, pbuf, psize + sizeof (wchar_t));
-		mappings = m;
-	      }
-	  }
-	else
-	  debug_printf ("Unable to determine the native mapping for %ls "
-			"(error %lu)", drive, GetLastError ());
+		  RtlInitUnicodeString (&upath, devpath);
+		  InitializeObjectAttributes (&attr, &upath,
+					      OBJ_CASE_INSENSITIVE, NULL, NULL);
+		  status = NtOpenSymbolicLinkObject (&h, SYMBOLIC_LINK_QUERY,
+						     &attr);
+		  if (!NT_SUCCESS (status))
+		    break;
+		  RtlInitEmptyUnicodeString (&upath, devpath, (NT_MAX_PATH - 1)
+							      * sizeof (WCHAR));
+		  status = NtQuerySymbolicLinkObject (h, &upath, NULL);
+		  NtClose (h);
+		  if (!NT_SUCCESS (status))
+		    break;
+		  devpath[upath.Length / sizeof (WCHAR)] = L'\0';
+		}
+	      mapping *m = new mapping ();
+	      if (m)
+		{
+		  m->dospath = wcsdup (mounts);
+		  m->ntdevpath = wcsdup (devpath);
+		  if (!m->dospath || !m->ntdevpath)
+		    {
+		      free (m->dospath);
+		      free (m->ntdevpath);
+		      delete m;
+		      continue;
+		    }
+		  m->doslen = wcslen (m->dospath);
+		  m->dospath[--m->doslen] = L'\0'; /* Drop trailing backslash */
+		  m->ntlen = wcslen (m->ntdevpath);
+		  m->next = mappings;
+		  mappings = m;
+		}
+	    }
+	  else
+	    debug_printf ("Unable to determine the native mapping for %ls "
+			  "(error %lu)", vol, GetLastError ());
+	}
+      while (FindNextVolumeW (sh, vol, 64));
+      FindVolumeClose (sh);
   }
 
   wchar_t *fixup_if_match (wchar_t *path)
@@ -640,11 +644,17 @@ struct dos_drive_mappings
       }
     /* Then test local drives. */
     for (mapping *m = mappings; m; m = m->next)
-      if (!wcsncmp (m->mapping, path, m->len))
+      if (!wcsncmp (m->ntdevpath, path, m->ntlen))
 	{
-	  path += m->len - 2;
-	  path[0] = m->drive_letter;
-	  path[1] = L':';
+	  wchar_t *tmppath;
+
+	  if (m->ntlen > m->doslen)
+	    wcsncpy (path += m->ntlen - m->doslen, m->dospath, m->doslen);
+	  else if ((tmppath = wcsdup (path + m->ntlen)) != NULL)
+	    {
+	      wcpcpy (wcpcpy (path, m->dospath), tmppath);
+	      free (tmppath);
+	    }
 	  break;
 	}
     return path;
@@ -656,7 +666,9 @@ struct dos_drive_mappings
     for (mapping *m = mappings; m; m = n)
       {
 	n = m->next;
-	free (m);
+	free (m->dospath);
+	free (m->ntdevpath);
+	delete m;
       }
   }
 };
