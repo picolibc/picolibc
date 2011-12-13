@@ -1,3 +1,30 @@
+2011-12-13  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dcrt0.cc (init_windows_system_directory): Record
+	system_wow64_directory information.
+	* exceptions.cc (_cygtls::inside_kernel): Modernize comment.  Consider
+	executing a DLL from the Wow64 directory as being "in the kernel".
+	(_cygtls::call_signal_handler): For now, only deal with main_tls
+	signals if main_tls is known to be executing in the cygwin DLL.  To
+	more closely emulate linux, consider the operation to be restartable if
+	not executing in the main thread.
+	* globals.cc (windows_system_directory): Remove NO_COPY.
+	(windows_system_directory_length): Ditto.
+	(system_wow64_directory): New variable.
+	(system_wow64_directory_length): Ditto.
+
+	* select.cc (cygwin_select): Don't issue a EINTR on non-main threads
+	since that seems to be what Linux does.  Add missing break to signal
+	case/switch.
+	(select_stuff::wait): Don't issue a EINTR on non-main threads since
+	that seems to be what Linux does.  Remove now-unneeded accommodation
+	for WAIT_IO_COMPLETION.  Add a comment.
+	* sigproc.h (cygwait): Ditto.  Don't return if signal_received noticed
+	and it's not the main thread.
+
+	* signal.cc (sigprocmask): Add standard syscall debug stuff.
+	* thread.cc (pthread_sigmask): Ditto.
+
 2011-12-13  Corinna Vinschen  <vinschen@redhat.com>
 
 	* netdb.cc (open_system_file): Avoid MS-DOS path warning.

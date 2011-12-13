@@ -129,23 +129,28 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   fd_set *w = allocfd_set (maxfds);
   fd_set *e = allocfd_set (maxfds);
 
-  int res = 1;
+  int res = 0;
   /* Degenerate case.  No fds to wait for.  Just wait. */
   if (sel.start.next == NULL)
-    switch (cygwait (ms))
-      {
-      case WAIT_OBJECT_0:
-	select_printf ("signal received");
-	set_sig_errno (EINTR);
-	res = -1;
-      case WAIT_OBJECT_0 + 1:
-	sel.destroy ();
-	pthread::static_cancel_self ();
-	/*NOTREACHED*/
-      default:
-	res = 1;
-	break;
-      }
+    while (!res)
+      switch (cygwait (ms))
+	{
+	case WAIT_OBJECT_0:
+	  _my_tls.call_signal_handler ();
+	  if (&_my_tls != _main_tls)
+	    continue;		/* Emulate linux behavior */
+	  select_printf ("signal received");
+	  set_sig_errno (EINTR);
+	  res = -1;
+	  break;
+	case WAIT_OBJECT_0 + 1:
+	  sel.destroy ();
+	  pthread::static_cancel_self ();
+	  /*NOTREACHED*/
+	default:
+	  res = 1;	/* temporary flag.  Will be set to zero below. */
+	  break;
+	}
   else if (sel.always_ready || ms == 0)
     res = 0;
   else
@@ -321,12 +326,11 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 						MWMO_INPUTAVAILABLE);
 
       switch (wait_ret)
-      {
-	case WAIT_IO_COMPLETION:
-	  syscall_printf ("woke due to apc");
-	  continue;	/* Keep going */
-	  break;
+	{
 	case WAIT_OBJECT_0:
+	  _my_tls.call_signal_handler ();
+	  if (&_my_tls != _main_tls)
+	    continue;		/* Emulate linux behavior */
 	  cleanup ();
 	  select_printf ("signal received");
 	  set_sig_errno (EINTR);
@@ -338,6 +342,8 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	      destroy ();
 	      pthread::static_cancel_self ();
 	    }
+	  /* This wasn't a cancel event.  It was just a normal object to wait
+	     for.  */
 	  break;
 	case WAIT_FAILED:
 	  cleanup ();
@@ -350,7 +356,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  select_printf ("timed out");
 	  res = 1;
 	  goto out;
-      }
+	}
 
       select_printf ("woke up.  wait_ret %d.  verifying", wait_ret);
       s = &start;

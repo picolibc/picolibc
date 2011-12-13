@@ -182,8 +182,12 @@ sigprocmask (int how, const sigset_t *set, sigset_t *oldset)
 {
   int res = handle_sigprocmask (how, set, oldset, _my_tls.sigmask);
   if (res)
-    set_errno (res);
-  return res ? -1 : 0;
+    {
+      set_errno (res);
+      res = -1;
+    }
+  syscall_printf ("%R = sigprocmask (%d, %p, %p)", res, set, oldset);
+  return res;
 }
 
 int __stdcall

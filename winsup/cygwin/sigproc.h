@@ -100,7 +100,7 @@ cygwait (HANDLE h, DWORD howlong = INFINITE)
     n++;
   DWORD res;
   while ((res = WaitForMultipleObjects (n, w4, FALSE, howlong)) == wait_signal
-	 && _my_tls.call_signal_handler ())
+	 && (_my_tls.call_signal_handler () || &_my_tls != _main_tls))
     continue;
   return res;
 }

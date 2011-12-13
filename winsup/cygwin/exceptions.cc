@@ -326,10 +326,7 @@ _cygtls::inside_kernel (CONTEXT *cx)
   memset (checkdir, 0, size);
 
 # define h ((HMODULE) m.AllocationBase)
-  /* Apparently Windows 95 can sometimes return bogus addresses from
-     GetThreadContext.  These resolve to a strange allocation base.
-     These should *never* be treated as interruptible. */
-  if (!h || m.State != MEM_COMMIT)
+  if (!h || m.State != MEM_COMMIT)	/* Be defensive */
     res = true;
   else if (h == user_data->hmodule)
     res = false;
@@ -340,8 +337,12 @@ _cygtls::inside_kernel (CONTEXT *cx)
       /* Skip potential long path prefix. */
       if (!wcsncmp (checkdir, L"\\\\?\\", 4))
 	checkdir += 4;
-      res = !wcsncasecmp (windows_system_directory, checkdir,
-			  windows_system_directory_length);
+      res = wcsncasecmp (windows_system_directory, checkdir,
+			 windows_system_directory_length) == 0;
+      if (!res && system_wow64_directory_length)
+	res = wcsncasecmp (system_wow64_directory, checkdir,
+			   system_wow64_directory_length) == 0;
+
     }
   sigproc_printf ("pc %p, h %p, inside_kernel %d", cx->Eip, h, res);
 # undef h
@@ -828,7 +829,6 @@ set_sig_errno (int e)
 {
   *_my_tls.errno_addr = e;
   _my_tls.saved_errno = e;
-  // sigproc_printf ("errno %d", e);
 }
 
 static int setup_handler (int, void *, struct sigaction&, _cygtls *tls)
@@ -1328,9 +1328,9 @@ _cygtls::call_signal_handler ()
       else if (this != _main_tls)
 	{
 	  _main_tls->lock ();
-	  if (_main_tls->sig)
+	  if (_main_tls->sig && _main_tls->incyg)
 	    {
-	      paranoid_printf ("Redirecting to main_tls signal %d", _main_tls->sig);
+	      small_printf ("Redirecting to main_tls signal %d", _main_tls->sig);
 	      sig = _main_tls->sig;
 	      sa_flags = _main_tls->sa_flags;
 	      func = _main_tls->func;
@@ -1373,7 +1373,7 @@ _cygtls::call_signal_handler ()
     }
 
   unlock ();
-  return this_sa_flags & SA_RESTART;
+  return this_sa_flags & SA_RESTART || (this != _main_tls);
 }
 
 void

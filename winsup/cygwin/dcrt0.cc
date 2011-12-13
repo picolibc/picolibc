@@ -638,12 +638,23 @@ child_info_spawn::handle_spawn ()
 static void
 init_windows_system_directory ()
 {
-  windows_system_directory_length =
-	GetSystemDirectoryW (windows_system_directory, MAX_PATH);
-  if (windows_system_directory_length == 0)
-    api_fatal ("can't find windows system directory");
-  windows_system_directory[windows_system_directory_length++] = L'\\';
-  windows_system_directory[windows_system_directory_length] = L'\0';
+  if (!windows_system_directory_length)
+    {
+      windows_system_directory_length =
+	    GetSystemDirectoryW (windows_system_directory, MAX_PATH);
+      if (windows_system_directory_length == 0)
+	api_fatal ("can't find windows system directory");
+      windows_system_directory[windows_system_directory_length++] = L'\\';
+      windows_system_directory[windows_system_directory_length] = L'\0';
+
+      system_wow64_directory_length =
+	GetSystemWow64DirectoryW (system_wow64_directory, MAX_PATH);
+      if (system_wow64_directory_length)
+	{
+	  system_wow64_directory[system_wow64_directory_length++] = L'\\';
+	  system_wow64_directory[system_wow64_directory_length] = L'\0';
+	}
+    }
 }
 
 static bool NO_COPY wow64_respawn = false;

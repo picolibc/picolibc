@@ -3087,7 +3087,9 @@ pthread_kill (pthread_t thread, int sig)
 extern "C" int
 pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 {
-  return handle_sigprocmask (operation, set, old_set, _my_tls.sigmask);
+  int res = handle_sigprocmask (operation, set, old_set, _my_tls.sigmask);
+  syscall_printf ("%d = pthread_sigmask(%d, %p, %p)", operation, set, old_set);
+  return res;
 }
 
 /* ID */

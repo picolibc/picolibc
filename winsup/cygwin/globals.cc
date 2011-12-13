@@ -23,8 +23,10 @@ HANDLE NO_COPY hProcToken;
 HANDLE NO_COPY hProcImpToken;
 HMODULE NO_COPY cygwin_hmodule;
 int NO_COPY sigExeced;
-WCHAR NO_COPY windows_system_directory[MAX_PATH];
-UINT NO_COPY windows_system_directory_length;
+WCHAR windows_system_directory[MAX_PATH];
+UINT windows_system_directory_length;
+WCHAR system_wow64_directory[MAX_PATH];
+UINT system_wow64_directory_length;
 
 /* program exit the program */
 
