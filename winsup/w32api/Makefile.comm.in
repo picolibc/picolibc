@@ -1,0 +1,127 @@
+# @configure_input@
+#
+#
+# Makefile.comm.in
+#
+# This file is part of a free library for the Win32 API.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+#
+# Establish the default build rule early, to ensure it is not
+# hijacked by any other common rule defined herein; note that
+# this requires us to specify the real default rule using the
+# alternative name, 'all-default'.
+#
+all: all-default
+
+SHELL = @SHELL@
+
+host_alias = @host@
+build_alias = @build@
+target_alias = @target@
+with_cross_host = @with_cross_host@
+
+# Identify the tools required to build the package.
+# Note that we don't specify associated option flags here,
+# since different settings may be required in individual
+# makefiles which include this common fragment.
+#
+CC = @CC@
+AS = @AS@
+LD = @LD@
+
+CFLAGS = @CFLAGS@
+ALL_CFLAGS = $(CFLAGS) $(INCLUDES)
+
+DLLTOOL = @DLLTOOL@
+DLLTOOL_FLAGS = --as=$(AS) -k
+WINDRES = @WINDRES@
+
+RANLIB = @RANLIB@
+AR = @AR@
+
+# In spite of its general unsuitability for use on MS-Windows hosts,
+# Cygwin is able to, and likes to support the $(DESTDIR) capability;
+# provide a graceful rejection mechanism, for any (non-Cygwin) cases
+# where it cannot be used.
+#
+need-DESTDIR-compatibility = prefix libdir includedir
+.PHONY: $(need-DESTDIR-compatibility) fail-DESTDIR-compatibility
+
+$(need-DESTDIR-compatibility):
+	@test -z "$(DESTDIR)" || case "$($@)" in ?:*) \
+	  $(MAKE) --no-print-directory reject="$@" fail-DESTDIR-compatibility ;; \
+	esac
+
+fail-DESTDIR-compatibility:
+	$(error DESTDIR is not supported when $(reject) contains Win32 path `$($(reject))'; \
+	try `make install $(reject)=$(shell echo '$($(reject))' | sed s,:,:$(DESTDIR),) ...' instead)
+
+# Define the set of generic build rules, which are common to
+# the build processes for all subdirectories.
+#
+%.o: %.c
+	$(CC) -c $(ALL_CFLAGS) -o $@ $<
+
+lib%.a : %.def %.o
+	$(DLLTOOL) $(DLLTOOL_FLAGS) --output-lib $@ --def ${srcdir}/$*.def
+	$(AR) r $@ $*.o
+	$(RANLIB) $@
+
+lib%.a: %.def
+	$(DLLTOOL) $(DLLTOOL_FLAGS) --output-lib $@ --def $<
+
+lib%.a: %.o
+	$(AR) rc $@ $*.o
+	$(RANLIB) $@
+
+# Install headers and libraries in a target specified directory.
+#
+mkinstalldirs = @MKDIR_P@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+ifeq ($(target_alias),$(host_alias))
+  ifeq ($(build_alias),$(host_alias))
+    tooldir = ${exec_prefix}
+  else
+    tooldir = ${exec_prefix}/$(target_alias)
+  endif
+else
+  tooldir = ${exec_prefix}/$(target_alias)
+endif
+ifneq (,$(findstring cygwin,$(target_alias)))
+  inst_includedir = $(tooldir)/include/w32api
+  inst_libdir = $(tooldir)/lib/w32api
+else
+  ifneq (,$(with_cross_host))
+    inst_includedir = $(tooldir)/include/w32api
+    inst_libdir = $(tooldir)/lib
+  else
+    inst_includedir = @includedir@
+    inst_libdir = @libdir@
+  endif
+endif
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+# The "clean" class of rules is common to all subdirs.
+#
+mostlyclean:
+	rm -f *~ *.o *.s
+
+clean:
+	rm -f *.o *.a *.s *~
+
+distclean: clean
+	rm -f config.cache config.status config.log Makefile
+
+maintainer-clean: distclean
+
+# Makefile.comm.in: end of file

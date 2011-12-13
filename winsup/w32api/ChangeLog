@@ -1,5 +1,24 @@
 2011-12-13  Keith Marshall  <keithmarshall@users.sf.net>
 
+	* configure.ac (AC_CONFIG_FILES): Add Makefile.comm
+	(AC_PROG_MKDIR_P): Add, to AC_SUBST result for mkinstalldirs.
+
+	* configure: Regenerated.
+
+	* lib/Makefile.in lib/ddk/Makefile.in lib/directx/Makefile.in:
+	(top_srcdir, top_builddir): Define using value passed by AC_SUBST.
+	(all): Original default goal; rename it as...
+	(all-default): ...this, to facilitate factoring out of common code,
+	which we then reinstate by including ${top_builddir}/Makefile.comm
+
+	* Makefile.comm.in: New include file, containing factored-out code.
+	(all): Redefined default goal; it redirects to renamed original...
+	(all-default): ...i.e. this; as defined in the original makefiles.
+	(CC_FOR_TARGET, AS_FOR_TARGET): Unreferenced macros; delete them.
+	(bindir, program_transform_name, datadir, infodir): Likewise.
+
+2011-12-13  Keith Marshall  <keithmarshall@users.sf.net>
+
 	* lib/ddk/Makefile.in (ddk_includedir): New macro; define it, then use
 	it in install-headers and uninstall-headers rules, in place of...
 	(inst_includedir): ...this; we then redefine this for consistency with

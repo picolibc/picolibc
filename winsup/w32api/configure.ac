@@ -29,7 +29,9 @@ MINGW_AC_CONFIG_SRCDIR([__W32API_VERSION],[include/w32api.h])
 
 AC_CANONICAL_SYSTEM
 
-dnl Find install command
+# Identify commands which are to be used for installation.
+#
+AC_PROG_MKDIR_P
 AC_PROG_INSTALL
 
 # Check for CC and CFLAGS
@@ -72,5 +74,8 @@ else
 fi
 AC_SUBST([BUILDENV])
 
-AC_CONFIG_FILES([Makefile lib/Makefile lib/ddk/Makefile lib/directx/Makefile])
+AC_CONFIG_FILES([Makefile Makefile.comm])
+AC_CONFIG_FILES([lib/Makefile lib/ddk/Makefile lib/directx/Makefile])
 AC_OUTPUT
+
+# configure.ac: end of file
