@@ -37,14 +37,14 @@ endif
 datadir = @datadir@
 infodir = @infodir@
 ifneq (,$(findstring cygwin,$(target_alias)))
-inst_includedir:=$(tooldir)/include/w32api/ddk
+inst_includedir:=$(tooldir)/include/w32api
 inst_libdir:=$(tooldir)/lib/w32api
 else
 ifneq (,$(with_cross_host))
-inst_includedir:=$(tooldir)/include/w32api/ddk
+inst_includedir:=$(tooldir)/include/w32api
 inst_libdir:=$(tooldir)/lib
 else
-inst_includedir:=$(includedir)/ddk
+inst_includedir:=$(includedir)
 inst_libdir:=$(libdir)
 endif
 endif
@@ -159,13 +159,15 @@ install: install-libraries install-headers
 install-libraries: all $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)$(inst_libdir)
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(DESTDIR)$(inst_libdir)/$$i ; \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(inst_libdir)/$$i; \
 	done
 
+ddk_includedir = ${inst_includedir}/ddk
+
 install-headers: $(need-DESTDIR-compatibility)
-	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)
+	$(mkinstalldirs) $(DESTDIR)${ddk_includedir}
 	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../../include/ddk/$$i $(DESTDIR)$(inst_includedir)/$$i ; \
+		$(INSTALL_DATA) $(srcdir)/../../include/ddk/$$i $(DESTDIR)${ddk_includedir}; \
 	done
 
 # uninstall headers and libraries from a target specified directory
@@ -173,27 +175,27 @@ uninstall: uninstall-libraries uninstall-headers
 
 uninstall-libraries: $(need-DESTDIR-compatibility)
 	@for i in $(LIBS); do \
-		rm -f $(DESTDIR)$(inst_libdir)/$$i ; \
+		rm -f $(DESTDIR)$(inst_libdir)/$$i; \
 	done
 	rmdir $(DESTDIR)$(inst_libdir)
 
 uninstall-headers: $(need-DESTDIR-compatibility)
 	@for i in $(HEADERS); do \
-		rm -r $(DESTDIR)$(inst_includedir)/$$i ; \
+		rm -r $(DESTDIR)${ddk_includedir}/$$i; \
 	done
-	rmdir $(DESTDIR)$(inst_includedir)
+	rmdir $(DESTDIR)${ddk_includedir}
 
 
 dist:
 	mkdir $(distdir)/include/ddk
 	chmod 755 $(distdir)/include/ddk
 	@for i in $(HEADERS); do \
-		cp -p $(srcdir)/../../include/ddk/$$i $(distdir)/include/ddk/$$i ; \
+		cp -p $(srcdir)/../../include/ddk/$$i $(distdir)/include/ddk/$$i; \
 	done
 	mkdir $(distdir)/lib/ddk
 	chmod 755 $(distdir)/lib/ddk
 	@for i in $(DISTFILES); do \
-		cp -p $(srcdir)/$$i $(distdir)/lib/ddk/$$i ; \
+		cp -p $(srcdir)/$$i $(distdir)/lib/ddk/$$i; \
 	done
 
 Makefile: Makefile.in ../../config.status ../../configure

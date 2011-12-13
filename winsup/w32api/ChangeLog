@@ -1,3 +1,11 @@
+2011-12-13  Keith Marshall  <keithmarshall@users.sf.net>
+
+	* lib/ddk/Makefile.in (ddk_includedir): New macro; define it, then use
+	it in install-headers and uninstall-headers rules, in place of...
+	(inst_includedir): ...this; we then redefine this for consistency with
+	makefiles in other subdirectories, as a prerequisite to factoring out
+	of common code.
+
 2011-12-12  Keith Marshall  <keithmarshall@users.sf.net>
 
 	* Makefile.in (FLAGS_TO_PASS): Pointless macro; remove it.  (Defaults
