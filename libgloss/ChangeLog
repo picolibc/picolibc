@@ -1,3 +1,10 @@
+2011-12-13  Richard Earnshaw  <rearnsha@arm.com>
+            Thomas Klein  <th.r.klein@web.de>
+
+	* arm/crt0.S: Manually set the target architecture
+	when compiling for Thumb1 on EABI targets.
+	Avoid v6-only Thumb-1 MOV instruction.
+
 2011-11-28  DJ Delorie  <dj@redhat.com>
 
 	* configure.in: Add rl78.
