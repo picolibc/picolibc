@@ -717,8 +717,6 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	case WAIT_OBJECT_0 + 1:
 	  if (totalread > 0)
 	    goto out;
-	  if (_my_tls.call_signal_handler ())
-	    continue;
 	  termios_printf ("wait catched signal");
 	  set_sig_errno (EINTR);
 	  totalread = -1;
@@ -754,8 +752,6 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	case WAIT_OBJECT_0 + 1:
 	  if (totalread > 0)
 	    goto out;
-	  if (_my_tls.call_signal_handler ())
-	    continue;
 	  termios_printf ("wait for mutex catched signal");
 	  set_sig_errno (EINTR);
 	  totalread = -1;

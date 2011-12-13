@@ -620,7 +620,6 @@ protected:
   {
     overlapped_unknown = 0,
     overlapped_success,
-    overlapped_signal,
     overlapped_nonblocking_no_data,
     overlapped_error
   };

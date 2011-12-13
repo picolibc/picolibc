@@ -33,7 +33,7 @@ ioctl (int fd, int cmd, ...)
   char *argp = va_arg (ap, char *);
   va_end (ap);
 
-  debug_printf ("fd %d, cmd %x", fd, cmd);
+  debug_printf ("ioctl(fd %d, cmd %p)", fd, cmd);
   int res;
   /* FIXME: This stinks.  There are collisions between cmd types
      depending on whether fd is associated with a pty master or not.
@@ -58,6 +58,6 @@ ioctl (int fd, int cmd, ...)
   res = cfd->ioctl (cmd, argp);
 
 out:
-  debug_printf ("returning %d", res);
+  syscall_printf ("%R = ioctl(%d, %p, ...)", res, fd, cmd);
   return res;
 }

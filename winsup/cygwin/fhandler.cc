@@ -1942,14 +1942,9 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	res = overlapped_success;	/* operation succeeded */
       else if (wfres == WAIT_OBJECT_0 + 1)
 	{
-	  if (_my_tls.call_signal_handler ())
-	    res = overlapped_signal;
-	  else
-	    {
-	      err = ERROR_INVALID_AT_INTERRUPT_TIME; /* forces an EINTR below */
-	      debug_printf ("unhandled signal");
-	      res = overlapped_error;
-	    }
+	  err = ERROR_INVALID_AT_INTERRUPT_TIME; /* forces an EINTR below */
+	  debug_printf ("unhandled signal");
+	  res = overlapped_error;
 	}
       else if (nonblocking)
 	res = overlapped_nonblocking_no_data;	/* more handling below */
@@ -1964,8 +1959,6 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 
   if (res == overlapped_success)
     debug_printf ("normal %s, %u bytes", writing ? "write" : "read", *bytes);
-  else if (res == overlapped_signal)
-    debug_printf ("handled signal");
   else if (res == overlapped_nonblocking_no_data)
     {
       *bytes = (DWORD) -1;
@@ -2003,9 +1996,6 @@ fhandler_base_overlapped::raw_read (void *ptr, size_t& len)
 			   get_overlapped ());
       switch (wait_overlapped (res, false, &nbytes, is_nonblocking ()))
 	{
-	case overlapped_signal:
-	  keep_looping = true;
-	  break;
 	default:	/* Added to quiet gcc */
 	case overlapped_success:
 	case overlapped_error:
@@ -2059,8 +2049,6 @@ fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
 	      ptr = ((char *) ptr) + chunk;
 	      nbytes += nbytes_now;
 	      /* fall through intentionally */
-	    case overlapped_signal:
-	      break;			/* keep looping */
 	    case overlapped_error:
 	      len = 0;		/* terminate loop */
 	    case overlapped_unknown:

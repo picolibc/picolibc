@@ -95,7 +95,6 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	  else
 	    {
 	      overlapped_armed = 1;
-restart:
 	      switch (cygwait (io_status.hEvent))
 		{
 		case WAIT_OBJECT_0:
@@ -105,8 +104,6 @@ restart:
 		  debug_printf ("n %d, ev %x", n, ev);
 		  break;
 		case WAIT_OBJECT_0 + 1:
-		  if (_my_tls.call_signal_handler ())
-		    goto restart;
 		  tot = -1;
 		  PurgeComm (get_handle (), PURGE_RXABORT);
 		  overlapped_armed = 0;
@@ -202,14 +199,11 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
 
       if (!is_nonblocking ())
 	{
-    restart:
 	  switch (cygwait (write_status.hEvent))
 	    {
 	    case WAIT_OBJECT_0:
 	      break;
 	    case WAIT_OBJECT_0 + 1:
-	      if (_my_tls.call_signal_handler ())
-		goto restart;
 	      PurgeComm (get_handle (), PURGE_TXABORT);
 	      set_sig_errno (EINTR);
 	      ForceCloseHandle (write_status.hEvent);

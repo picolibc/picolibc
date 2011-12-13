@@ -85,13 +85,24 @@ static inline DWORD __attribute__ ((always_inline))
 cygwait (HANDLE h, DWORD howlong = INFINITE)
 {
   HANDLE w4[3];
-  int n = 0;
-  if ((w4[n] = h) != NULL)
-    n++;
+  DWORD n = 0;
+  DWORD wait_signal;
+  if ((w4[n] = h) == NULL)
+    wait_signal = WAIT_OBJECT_0 + 15;	/* Arbitrary.  Don't call signal
+					   handler if only waiting for signal */
+  else
+    {
+      n++;
+      wait_signal = n;
+    }
   w4[n++] = signal_arrived;
   if ((w4[n] = pthread::get_cancel_event ()) != NULL)
     n++;
-  return WaitForMultipleObjects (n, w4, FALSE, howlong);
+  DWORD res;
+  while ((res = WaitForMultipleObjects (n, w4, FALSE, howlong)) == wait_signal
+	 && _my_tls.call_signal_handler ())
+    continue;
+  return res;
 }
 
 static inline DWORD __attribute__ ((always_inline))

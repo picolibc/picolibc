@@ -38,7 +38,7 @@ class cygthread
   static DWORD WINAPI stub (VOID *);
   static DWORD WINAPI simplestub (VOID *);
   static DWORD main_thread_id;
-  static const char * name (DWORD = 0);
+  static const char *name (DWORD = 0);
   void callfunc (bool) __attribute__ ((noinline, regparm (2)));
   void auto_release () {func = NULL;}
   void release (bool);

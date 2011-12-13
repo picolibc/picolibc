@@ -1,3 +1,27 @@
+2011-12-12  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* cygthread.h (cygthread::name): Very minor formatting tweak.
+
+	* exceptions.cc (_cygtls::call_signal_handler): Add paranoid debugging
+	output.
+
+	* sigproc.h (cygwait): Call signal handler when signal is detected and
+	loop as appropriate.
+	* fhandler.h (fhandler_base_overlapped::wait_return): Remove
+	overlapped_signal.
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Remove
+	restartable signal accommodations in light of cygwait improvements.
+	(fhandler_base_overlapped::raw_read): Remove now-obsolete signal loop
+	behavior.
+	(fhandler_base_overlapped::raw_write): Ditto.
+	* fhandler_console.cc (fhandler_console::read): Ditto.
+	* fhandler_serial.cc (fhandler_serial::raw_read): Ditto.
+	(fhandler_serial::raw_write): Ditto.
+	* fhandler_tty.cc (fhandler_pty_slave::read): Ditto.
+
+	* ioctl.cc (ioctl): Add standard syscall introducer and leaver debug
+	output.
+
 2011-12-12  Corinna Vinschen  <vinschen@redhat.com>
 
 	* fhandler_process.cc (dos_drive_mappings): Partially rewrite to

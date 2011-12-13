@@ -347,14 +347,11 @@ fhandler_console::read (void *pv, size_t& buflen)
 	}
 
       set_cursor_maybe ();	/* to make cursor appear on the screen immediately */
-restart:
       switch (cygwait (h, timeout))
 	{
 	case WAIT_OBJECT_0:
 	  break;
 	case WAIT_OBJECT_0 + 1:
-	  if (_my_tls.call_signal_handler ())
-	    goto restart;
 	  goto sig_exit;
 	case WAIT_OBJECT_0 + 2:
 	  process_state.pop ();
