@@ -497,14 +497,8 @@ of the character.  This allows to access all files, even those not
 having a valid representation of their filename in the current character
 set.  To always have a valid string, use the UTF-8 charset by
 setting the environment variable $LANG, $LC_ALL, or $LC_CTYPE to a valid
-POSIX value, for instance in Cygwin.bat like this:
-</para>
-
-<screen>
-set LC_CTYPE=en_US.UTF-8
-</screen>
-
-</listitem>
+POSIX value, such as "en_US.UTF-8".
+</para></listitem>
 
 <listitem><para>
 PATH_MAX is now 4096.  Internally, path names can be as long as the

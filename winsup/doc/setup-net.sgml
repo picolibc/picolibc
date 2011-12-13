@@ -223,13 +223,12 @@ shows progress bars for the current task and total remaining disk space.
 </para>
 </sect2>
 
-<sect2 id="setup-icons"><title>Icons</title>
+<sect2 id="setup-icons"><title>Shortcuts</title>
 <para>
-You may choose to install shortcuts on the Desktop and/or Start Menu
-to start a <literal>bash</literal> shell. If you prefer to use a different
-shell or terminal emulator such as <literal>mintty</literal> or
-<literal>xterm</literal>, you can use these shortcuts as a guide to
-creating your own. 
+You may choose to install "Cygwin Terminal" shortcuts on the Desktop
+and/or Start Menu.  These shortcuts run <command>mintty</command>,
+which will start your default shell as specified
+in <filename>/etc/passwd</filename>.
 </para>
 </sect2>
 

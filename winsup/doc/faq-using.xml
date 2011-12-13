@@ -939,16 +939,6 @@ Emacs or XEmacs from Cygwin Setup.
 </para>
 </answer></qandaentry>
 
-<qandaentry id="faq.using.console-window">
-<question><para>Is there a better alternative to the standard console window?</para></question>
-<answer>
-
-<para>Yes!  Use <command>mintty</command> instead.  <command>mintty</command> is an optional packages in
-Cygwin Setup.  <command>mintty</command> is a Cygwin application providing a native GUI without
-the need of X11.
-</para>
-</answer></qandaentry>
-
 <qandaentry id="faq.using.symlinkstoppedworking">
 <question><para>Why do some of my old symlinks don't work anymore?</para></question>
 <answer>

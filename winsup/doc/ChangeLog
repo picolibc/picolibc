@@ -1,3 +1,11 @@
+2011-12-12  Ken Brown  <kbrown@cornell.edu>
+
+	* faq-using.xml: Remove obsolete entry about the standard console
+	window.
+	* new-features.sgml: Remove obsolete entry which references cygwin.bat.
+	* setup-net.sgml: Clarify new shortcut behavior for the "Cygwin
+	Terminal".
+
 2011-11-21  Andy Koppe  <andy.koppe@gmail.com>
 
 	* faq-using.xml (faq.using.weirdchars): Rewrite.
