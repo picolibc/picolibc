@@ -328,9 +328,6 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       switch (wait_ret)
 	{
 	case WAIT_OBJECT_0:
-	  _my_tls.call_signal_handler ();
-	  if (&_my_tls != _main_tls)
-	    continue;		/* Emulate linux behavior */
 	  cleanup ();
 	  select_printf ("signal received");
 	  set_sig_errno (EINTR);
