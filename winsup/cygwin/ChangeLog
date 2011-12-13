@@ -1,5 +1,9 @@
 2011-12-13  Corinna Vinschen  <vinschen@redhat.com>
 
+	* netdb.cc (open_system_file): Avoid MS-DOS path warning.
+
+2011-12-13  Corinna Vinschen  <vinschen@redhat.com>
+
 	* path.cc (conv_path_list): Fix a condition.
 	(cygwin_conv_path): Revert WIN_A conversion to current locale codeset.
 

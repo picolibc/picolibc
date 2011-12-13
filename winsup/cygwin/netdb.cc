@@ -1,6 +1,6 @@
 /* netdb.cc: network database related routines.
 
-   Copyright 2002, 2003, 2007, 2010 Red Hat, Inc.
+   Copyright 2002, 2003, 2007, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,6 +12,7 @@ details. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <netdb.h>
+#include <shared_info.h>
 
 /* Locate and open a system network database file.  relative_path
  should be one of the following values:
@@ -27,6 +28,7 @@ open_system_file (const char *relative_path)
   /* system dir path is never longer. */
   char win32_name[MAX_PATH];
 
+  user_shared->warned_msdos = true;
   sys_wcstombs (win32_name, MAX_PATH, windows_system_directory);
   strcat (win32_name, "drivers\\etc\\");
   strcat (win32_name, relative_path);
