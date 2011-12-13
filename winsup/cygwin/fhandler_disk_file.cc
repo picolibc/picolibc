@@ -347,9 +347,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
      on the information stored in pc.fnoi.  So we overwrite them here. */
   if (get_io_handle ())
     {
-      PFILE_NETWORK_OPEN_INFORMATION pfnoi = pc.fnoi ();
-      status = NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
-				      FileNetworkOpenInformation);
+      status = file_get_fnoi (h, pc.fs_is_netapp (), pc.fnoi ());
       if (!NT_SUCCESS (status))
        {
 	 debug_printf ("%p = NtQueryInformationFile(%S, "

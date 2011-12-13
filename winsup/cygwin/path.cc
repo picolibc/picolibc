@@ -1180,6 +1180,48 @@ path_conv::is_binary ()
 	 && (bin == SCS_32BIT_BINARY || bin == SCS_64BIT_BINARY);
 }
 
+/* Helper function to fill the fnoi datastructure for a file. */
+NTSTATUS
+file_get_fnoi (HANDLE h, bool skip_network_open_inf,
+	       PFILE_NETWORK_OPEN_INFORMATION pfnoi)
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+
+  /* Some FSes (Netapps) don't implement FileNetworkOpenInformation. */
+  status = skip_network_open_inf ? STATUS_INVALID_PARAMETER
+	   : NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
+				     FileNetworkOpenInformation);
+  if (status == STATUS_INVALID_PARAMETER || status == STATUS_NOT_IMPLEMENTED)
+    {
+      /* Apart from accessing Netapps, this also occurs when accessing SMB
+	 share root dirs hosted on NT4 (STATUS_INVALID_PARAMETER), or when
+	 accessing SMB share root dirs from NT4 (STATUS_NOT_IMPLEMENTED). */
+      FILE_BASIC_INFORMATION fbi;
+      FILE_STANDARD_INFORMATION fsi;
+
+      status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
+				       FileBasicInformation);
+      if (NT_SUCCESS (status))
+	{
+	  memcpy (pfnoi, &fbi, 4 * sizeof (LARGE_INTEGER));
+	  if (NT_SUCCESS (NtQueryInformationFile (h, &io, &fsi,
+					 sizeof fsi,
+					 FileStandardInformation)))
+	    {
+	      pfnoi->EndOfFile.QuadPart = fsi.EndOfFile.QuadPart;
+	      pfnoi->AllocationSize.QuadPart
+		= fsi.AllocationSize.QuadPart;
+	    }
+	  else
+	    pfnoi->EndOfFile.QuadPart
+	      = pfnoi->AllocationSize.QuadPart = 0;
+	  pfnoi->FileAttributes = fbi.FileAttributes;
+	}
+    }
+  return status;
+}
+
 /* Normalize a Win32 path.
    /'s are converted to \'s in the process.
    All duplicate \'s, except for 2 leading \'s, are deleted.
@@ -2422,44 +2464,9 @@ restart:
 	    }
 	  else
 	    {
-	      PFILE_NETWORK_OPEN_INFORMATION pfnoi = conv_hdl.fnoi ();
-
-	      /* Netapps don't implement FileNetworkOpenInformation. */
-	      status = fs.is_netapp ()
-		       ? STATUS_INVALID_PARAMETER
-		       : NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
-						 FileNetworkOpenInformation);
-	      if (status == STATUS_INVALID_PARAMETER
-		  || status == STATUS_NOT_IMPLEMENTED)
-		{
-		  /* Apart from accessing Netapps, this also occurs when
-		     accessing SMB share root dirs hosted on NT4
-		     (STATUS_INVALID_PARAMETER), or when trying to access
-		     SMB share root dirs from NT4 (STATUS_NOT_IMPLEMENTED). */
-		  FILE_BASIC_INFORMATION fbi;
-		  FILE_STANDARD_INFORMATION fsi;
-
-		  status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
-						   FileBasicInformation);
-		  if (NT_SUCCESS (status))
-		    {
-		      memcpy (pfnoi, &fbi, 4 * sizeof (LARGE_INTEGER));
-		      if (NT_SUCCESS (NtQueryInformationFile (h, &io, &fsi,
-						     sizeof fsi,
-						     FileStandardInformation)))
-			{
-			  pfnoi->EndOfFile.QuadPart = fsi.EndOfFile.QuadPart;
-			  pfnoi->AllocationSize.QuadPart
-			    = fsi.AllocationSize.QuadPart;
-			}
-		      else
-			pfnoi->EndOfFile.QuadPart
-			  = pfnoi->AllocationSize.QuadPart = 0;
-		      pfnoi->FileAttributes = fbi.FileAttributes;
-		    }
-		}
+	      status = file_get_fnoi (h, fs.is_netapp (), conv_hdl.fnoi ());
 	      if (NT_SUCCESS (status))
-		fileattr = pfnoi->FileAttributes;
+		fileattr = conv_hdl.fnoi ()->FileAttributes;
 	    }
 	}
       if (!NT_SUCCESS (status))

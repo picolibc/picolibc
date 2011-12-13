@@ -1,3 +1,13 @@
+2011-12-13  Corinna Vinschen  <vinschen@redhat.com>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Call
+	file_get_fnoi instead of NtQueryInformationFile.
+	* path.cc (file_get_fnoi): New helper function to collect a
+	FILE_NETWORK_OPEN_INFORMATION block.
+	(symlink_info::check): Call file_get_fnoi rather than
+	NtQueryInformationFile to collect a FILE_NETWORK_OPEN_INFORMATION block.
+	* path.h (file_get_fnoi): Declare.
+
 2011-12-13  Dave Korn  <dave.korn.cygwin@gmail.com>
 
 	* times.cc (hires_ns::resolution): Don't return less than 1.
