@@ -718,7 +718,7 @@ hires_ns::resolution ()
       return (long long) -1;
     }
 
-  return (LONGLONG) freq;
+  return (freq <= 1.0) ? 1LL : (LONGLONG) freq;
 }
 
 UINT
