@@ -1,3 +1,11 @@
+2011-12-13  Richard Earnshaw  <rearnsha@arm.com>
+	    Thomas Klein  <th.r.klein@web.de>
+
+	* libc/sys/arm/crt0.S: Manually set the target architecture
+	when compiling for Thumb1 on EABI targets.
+	Don't use SWI on M-profile cores.
+	Avoid v6-only Thumb-1 MOV instruction.
+
 2011-12-12  Akio Idehara  <zbe64533@gmail.com>
 
 	* libc/time/strftime.c (get_era_info): Fix off-by-one error in month
