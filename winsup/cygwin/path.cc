@@ -1368,7 +1368,7 @@ conv_path_list (const char *src, char *dst, size_t size,
       what = CCP_WIN_A_TO_POSIX | CCP_RELATIVE;
       env_cvt = true;
     }
-  if (what & CCP_WIN_A_TO_POSIX)
+  if ((what & CCP_CONVTYPE_MASK) == CCP_WIN_A_TO_POSIX)
     {
       src_delim = ';';
       dst_delim = ':';
@@ -2946,7 +2946,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
   PWCHAR path = NULL;
   int error = 0;
   bool relative = !!(what & CCP_RELATIVE);
-  what &= ~CCP_RELATIVE;
+  what &= CCP_CONVTYPE_MASK;
 
   switch (what)
     {
@@ -2959,11 +2959,8 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	  return_with_errno (p.error);
 	PUNICODE_STRING up = p.get_nt_native_path ();
 	buf = tp.c_get ();
-	UINT cp = AreFileApisANSI () ? CP_ACP : CP_OEMCP;
-	int len = WideCharToMultiByte (cp, WC_NO_BEST_FIT_CHARS,
-				       up->Buffer, up->Length / sizeof (WCHAR),
-				       buf, NT_MAX_PATH, NULL, NULL);
-	buf[len] = '\0';
+	sys_wcstombs (buf, NT_MAX_PATH,
+		      up->Buffer, up->Length / sizeof (WCHAR));
 	/* Convert native path to standard DOS path. */
 	if (!strncmp (buf, "\\??\\", 4))
 	  {
@@ -2975,14 +2972,12 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	  {
 	    /* Device name points to somewhere else in the NT namespace.
 	       Use GLOBALROOT prefix to convert to Win32 path. */
-	    char *p = buf + WideCharToMultiByte (cp, WC_NO_BEST_FIT_CHARS,
-				       ro_u_globalroot.Buffer,
-				       ro_u_globalroot.Length / sizeof (WCHAR),
-				       buf, NT_MAX_PATH, NULL, NULL);
-	    len = WideCharToMultiByte (cp, WC_NO_BEST_FIT_CHARS,
-				       up->Buffer, up->Length / sizeof (WCHAR),
-				       p, NT_MAX_PATH - (p - buf), NULL, NULL);
-	    p[len] = '\0';
+	    char *p = buf + sys_wcstombs (buf, NT_MAX_PATH,
+					  ro_u_globalroot.Buffer,
+					  ro_u_globalroot.Length
+					  / sizeof (WCHAR));
+	    sys_wcstombs (p, NT_MAX_PATH - (p - buf),
+			  up->Buffer, up->Length / sizeof (WCHAR));
 	  }
 	lsiz = strlen (buf) + 1;
 	/* TODO: Incoming "." is a special case which leads to a trailing
@@ -3054,16 +3049,12 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
       lsiz *= sizeof (WCHAR);
       break;
     case CCP_WIN_A_TO_POSIX:
-      {
-	UINT cp = AreFileApisANSI () ? CP_ACP : CP_OEMCP;
-	PWCHAR wbuf = tp.w_get ();
-	MultiByteToWideChar (cp, 0, (const char *) from, -1, wbuf, NT_MAX_PATH);
-	buf = tp.c_get ();
-	error = mount_table->conv_to_posix_path (wbuf, buf, relative);
-	if (error)
-	  return_with_errno (error);
-	lsiz = strlen (buf) + 1;
-      }
+      buf = tp.c_get ();
+      error = mount_table->conv_to_posix_path ((const char *) from, buf,
+					       relative);
+      if (error)
+	return_with_errno (error);
+      lsiz = strlen (buf) + 1;
       break;
     case CCP_WIN_W_TO_POSIX:
       buf = tp.c_get ();

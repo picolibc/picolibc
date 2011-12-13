@@ -1,5 +1,10 @@
 2011-12-13  Corinna Vinschen  <vinschen@redhat.com>
 
+	* path.cc (conv_path_list): Fix a condition.
+	(cygwin_conv_path): Revert WIN_A conversion to current locale codeset.
+
+2011-12-13  Corinna Vinschen  <vinschen@redhat.com>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Call
 	file_get_fnoi instead of NtQueryInformationFile.
 	* path.cc (file_get_fnoi): New helper function to collect a
