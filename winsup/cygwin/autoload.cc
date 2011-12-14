@@ -392,6 +392,8 @@ LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 LoadDLLfuncEx (AttachConsole, 4, kernel32, 1)
 LoadDLLfuncEx (GetModuleHandleExW, 12, kernel32, 1)
 LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
+LoadDLLfuncEx (GetSystemWow64DirectoryW, 8, kernel32, 1)
+LoadDLLfuncEx (GetVolumePathNamesForVolumeNameW, 16, kernel32, 1)
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
 
 LoadDLLfunc (WNetCloseEnum, 4, mpr)

@@ -544,6 +544,41 @@ format_process_winexename (void *data, char *&destbuf)
   return len + 1;
 }
 
+static bool
+get_volume_path_names_for_volume_name (LPCWSTR vol, LPWSTR mounts)
+{
+  DWORD len;
+  if (GetVolumePathNamesForVolumeNameW (vol, mounts, NT_MAX_PATH, &len))
+    return true;
+
+  /* Windows 2000 doesn't have GetVolumePathNamesForVolumeNameW.
+     Just assume that mount points are not longer than MAX_PATH. */
+  WCHAR drives[MAX_PATH], dvol[MAX_PATH], mp[MAX_PATH + 3];
+  if (!GetLogicalDriveStringsW (MAX_PATH, drives))
+    return false;
+  for (PWCHAR drive = drives; *drive; drive = wcschr (drive, '\0') + 1)
+    {
+      if (!GetVolumeNameForVolumeMountPointW (drive, dvol, MAX_PATH))
+	continue;
+      if (!wcscasecmp (vol, dvol))
+	mounts = wcpcpy (mounts, drive) + 1;
+      wcscpy (mp, drive);
+      HANDLE h = FindFirstVolumeMountPointW (dvol, mp + 3, MAX_PATH);
+      if (h == INVALID_HANDLE_VALUE)
+	continue;
+      do
+	{
+	  if (GetVolumeNameForVolumeMountPointW (mp, dvol, MAX_PATH))
+	    if (!wcscasecmp (vol, dvol))
+	      mounts = wcpcpy (mounts, drive) + 1;
+	}
+      while (FindNextVolumeMountPointW (h, mp, MAX_PATH));
+      FindVolumeMountPointClose (h);
+    }
+  *mounts = L'\0';
+  return true;
+}
+
 struct dos_drive_mappings
 {
   struct mapping
@@ -573,9 +608,8 @@ struct dos_drive_mappings
     else
       do
 	{
-	  DWORD len;
 	  /* Skip drives which are not mounted. */
-	  if (!GetVolumePathNamesForVolumeNameW (vol, mounts, NT_MAX_PATH, &len)
+	  if (!get_volume_path_names_for_volume_name (vol, mounts)
 	      || mounts[0] == L'\0')
 	    continue;
 	  *wcsrchr (vol, L'\\') = L'\0';
