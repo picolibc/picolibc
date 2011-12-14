@@ -1,3 +1,8 @@
+2011-12-14  Iain Sandoe  <iains@gcc.gnu.org>
+
+	* mach-o/loader.h (bfd_mach_o_section_type): define
+	BFD_MACH_O_S_ATTR_NONE to 0.
+
 2011-11-07  Richard Henderson  <rth@redhat.com>
 
 	Merged from transactional-memory.
