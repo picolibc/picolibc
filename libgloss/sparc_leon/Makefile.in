@@ -1,0 +1,161 @@
+# Makefile for libgloss/sparc_leon. This is the board support
+# code for the various sparc leon targets.
+
+DESTDIR =
+VPATH = @srcdir@
+srcdir = @srcdir@
+objdir = .
+srcroot = $(srcdir)/../..
+objroot = $(objdir)/../..
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+host_alias = @host_alias@
+target_alias = @target_alias@
+
+bindir = @bindir@
+libdir = @libdir@
+tooldir = $(exec_prefix)/$(target_alias)
+mkinstalldirs = $(SHELL) $(srcroot)/mkinstalldirs
+
+# Multilib support variables.
+# TOP is used instead of MULTI{BUILD,SRC}TOP.
+MULTIDIRS =
+MULTISUBDIR =
+MULTIDO = true
+MULTICLEAN = true
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+SHELL = /bin/sh
+
+CC = @CC@
+
+AS = @AS@
+AR = @AR@
+LD = @LD@
+RANLIB = @RANLIB@
+AR_FLAGS = qrv
+
+OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
+	then echo ${objroot}/../binutils/objdump ; \
+	else t='$(program_transform_name)'; echo objdump | sed -e $$t ; fi`
+OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
+	then echo ${objroot}/../binutils/objcopy ; \
+	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
+
+LEON_BSP  = libleonbare.a
+LEON_OBJS = etrap.o rtrap.o etrap_fast.o rtrap_fast.o irqinstall.o regwin.o \
+	    regwinflush.o fpu.o bdinit.o contextswitch.o \
+            busscan.o irqtrap_fast.o catch_interrupt.o catch_interrupt_svt.o \
+	    catch_interrupt_mvt.o catch_interrupt_pending.o gettimeofday.o \
+	    times.o rtc.o lcpuinit.o console_init.o console.o console_dbg.o \
+	    contextswitch.o contextswitch_asm.o _exit.o amba.o amba_dbg.o \
+	    amba_scan.o amba_driver.o timer.o mutex.o locore.o locore_clean.o \
+	    locore_var.o locore_var_svt.o jiffies.o \
+            mmu_asm.o locore_svtdisp.o locore_mvt_reset.o locore_svt_reset.o stop.o initcalls.o \
+	    regwin_patch.o cacheA.o nocache.o  
+
+LEONBARE_THREADS = liblbthread.a
+LEONBARE_THREADS_OBJS = kernel.o kernel_debug.o kernel_debug_var.o kernel_context.o \
+			kernel_mutex.o kernel_thread.o kernel_sched.o kernel_queue.o \
+			kernel_mm.o
+
+LOCOREATEXIT = locore_atexit.o
+LEON_SMALLC = libsmall.a
+
+PNP=pnpinit.o
+PNP_S=pnpinit_simple.o
+LEON_ALL = $(LEON_BSP) $(LEON_SMALLC) $(LEONBARE_THREADS) $(PNP) $(PNP_S) crti.o crtn.o 
+
+LOCORESVT = locore_svt.o 
+LOCOREMVT = locore_mvt.o
+CRT0 = crt0.o
+OBJS = close.o fstat.o getpid.o isatty.o kill.o \
+	lseek.o open.o print.o putnum.o read.o sbrk.o stat.o \
+	unlink.o write.o io.o kernel.o kernel_debug.o kernel_debug_var.o kernel_context.o
+#link.o 
+
+#### Host specific Makefile fragment comes in here.
+@host_makefile_frag@
+
+all: stmp-targ-include $(CRT0) $(LOCOREMVT) $(LOCORESVT) $(LEON_ALL)
+
+$(CRT0): $(srcdir)/crt0.S 
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -o $@ -c $(srcdir)/crt0.S
+
+$(LEON_BSP): $(OBJS) $(LEON_OBJS)
+	@rm -f $@
+	${AR} ${AR_FLAGS} $@ $(OBJS) $(LEON_OBJS) 
+	${RANLIB} $@
+
+$(LEON_SMALLC): $(LOCOREATEXIT)
+	@rm -f $@
+	${AR} ${AR_FLAGS} $@ $(LOCOREATEXIT)
+	${RANLIB} $@
+
+$(LEONBARE_THREADS): $(LEONBARE_THREADS_OBJS)
+	@rm -f $@
+	${AR} ${AR_FLAGS} $@ $(LEONBARE_THREADS_OBJS)
+	${RANLIB} $@
+
+install: 
+	$(INSTALL_DATA) $(CRT0)     $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
+	$(INSTALL_DATA) $(LOCORESVT)  $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(LOCORESVT)
+	$(INSTALL_DATA) $(LOCOREMVT)  $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(LOCOREMVT)
+	$(INSTALL_DATA) $(PNP)  $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(PNP)
+	$(INSTALL_DATA) $(PNP_S)  $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(PNP_S)
+	$(INSTALL_DATA) $(LEON_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(LEON_BSP)
+	$(INSTALL_DATA) $(LEON_SMALLC) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(LEON_SMALLC)
+	$(INSTALL_DATA) $(LEONBARE_THREADS) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(LEONBARE_THREADS)
+	if [ -z "$(MULTISUBDIR)" ]; then \
+	 $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/asm-leon; \
+	 for i in $(srcdir)/asm-leon/*.h; do \
+	  if [ -f $$i ]; then \
+	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/asm-leon/`basename $$i` || exit $$?; \
+	  else true; fi ; \
+	 done; \
+	else true; fi
+
+stmp-targ-include: $(srcdir)/asm-leon/*
+	if [ -d ${objroot}/newlib/targ-include/asm-leon ]; then \
+		rm -rf ${objroot}/newlib/targ-include/asm-leon; \
+	else true; fi ; \
+	if [ -d ${objroot}/newlib/targ-include ]; then \
+		cp -r $(srcdir)/asm-leon ${objroot}/newlib/targ-include/asm-leon; \
+	else true; fi ; \
+	touch $@
+
+all-recursive: stmp-targ-include
+
+# Make a simple test case to test the linker script, startup code, and
+# I/O code
+#
+test: 
+	@echo Done...
+
+# target specific makefile fragment comes in here.
+# @target_makefile_frag@
+
+clean mostlyclean:
+	rm -f *.o *.a *.map *.x
+
+distclean maintainer-clean realclean: clean
+	rm -f Makefile config.cache config.log config.status
+
+.PHONY: info dvi doc install-info clean-info
+info doc dvi:
+install-info:
+clean-info:
+
+# target specific makefile fragment comes in here.
+@target_makefile_frag@
+
+Makefile: Makefile.in config.status @host_makefile_frag_path@ @target_makefile_frag_path@
+	$(SHELL) config.status
+
+config.status: configure
+	$(SHELL) config.status --recheck

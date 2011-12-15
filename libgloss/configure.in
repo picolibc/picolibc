@@ -52,6 +52,9 @@ case "${target}" in
   i960-*-coff)
 	AC_CONFIG_SUBDIRS([i960])
 	;;
+  sparc-*leon*-elf* | sparc-*leon*-none*)
+	AC_CONFIG_SUBDIRS([sparc_leon])
+	;; 
   sparclet-*-aout* | sparc-*-elf* | sparc64-*-elf* | sparc86x-*-* | sparclite-*-*)
 	AC_CONFIG_SUBDIRS([sparc])
 	;;

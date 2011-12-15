@@ -1,3 +1,60 @@
+2011-12-15  Konrad Eisele <konrad@gaisler.com>
+
+	* configure.in: Add SPARC LEON support.
+	* configure: Regenerated.
+	* sparc_leon/asm-leon/amba.h, sparc_leon/asm-leon/asmmacro.h,
+	sparc_leon/asm-leon/clock.h, sparc_leon/asm-leon/contextswitch.h,
+	sparc_leon/asm-leon/elfmacro.h, sparc_leon/asm-leon/head.h,
+	sparc_leon/asm-leon/irq.h, sparc_leon/asm-leon/jiffies.h,
+	sparc_leon/asm-leon/lambapp.h, sparc_leon/asm-leon/lambapp_devs.h,
+	sparc_leon/asm-leon/leon.h, sparc_leon/asm-leon/leon3.h,
+	sparc_leon/asm-leon/leonbare_debug.h, sparc_leon/asm-leon/leonbare_kernel.h,
+	sparc_leon/asm-leon/leonbare_kernel_queue.h, sparc_leon/asm-leon/leoncompat.h,
+	sparc_leon/asm-leon/leondbg.h, sparc_leon/asm-leon/leonstack.h,
+	sparc_leon/asm-leon/liblocks.h, sparc_leon/asm-leon/linkage.h,
+	sparc_leon/asm-leon/param.h, sparc_leon/asm-leon/queue.h,
+	sparc_leon/asm-leon/spinlock.h, sparc_leon/asm-leon/stack.h,
+	sparc_leon/asm-leon/time.h, sparc_leon/asm-leon/timer.h,
+	sparc_leon/asm-leon/types.h, sparc_leon/asm-leon/winmacros.h:
+	New file.
+	* sparc_leon/Makefile.in, sparc_leon/_exit.c,
+	sparc_leon/amba.c, sparc_leon/amba_dbg.c,
+	sparc_leon/amba_driver.c, sparc_leon/amba_scan.c,
+	sparc_leon/asm-leon, sparc_leon/bdinit.S,
+	sparc_leon/busscan.S, sparc_leon/cacheA.S,
+	sparc_leon/catch_interrupt.c, sparc_leon/catch_interrupt_mvt.c,
+	sparc_leon/catch_interrupt_pending.c, sparc_leon/catch_interrupt_svt.c,
+	sparc_leon/configure.in,
+	sparc_leon/console.c, sparc_leon/console_dbg.c,
+	sparc_leon/console_init.c, sparc_leon/contextswitch.c,
+	sparc_leon/contextswitch_asm.S, sparc_leon/crt0.S,
+	sparc_leon/crti.S, sparc_leon/crtn.S,
+	sparc_leon/etrap.S, sparc_leon/etrap_fast.S,
+	sparc_leon/fpu.S, sparc_leon/gettimeofday.c,
+	sparc_leon/initcalls.c, sparc_leon/io.c,
+	sparc_leon/irqinstall.S, sparc_leon/irqtrap.S,
+	sparc_leon/irqtrap_fast.S, sparc_leon/jiffies.c,
+	sparc_leon/kernel.c, sparc_leon/kernel_context.S,
+	sparc_leon/kernel_debug.c, sparc_leon/kernel_debug_var.c,
+	sparc_leon/kernel_mm.c, sparc_leon/kernel_mutex.c,
+	sparc_leon/kernel_queue.c, sparc_leon/kernel_sched.c,
+	sparc_leon/kernel_thread.c, sparc_leon/lcpuinit.S,
+	sparc_leon/locore.S, sparc_leon/locore_atexit.c,
+	sparc_leon/locore_clean.S, sparc_leon/locore_mvt.S,
+	sparc_leon/locore_mvt_reset.S, sparc_leon/locore_svt.S,
+	sparc_leon/locore_svt_reset.S, sparc_leon/locore_svtdisp.S,
+	sparc_leon/locore_var.S, sparc_leon/locore_var_svt.S,
+	sparc_leon/mmu_asm.S, sparc_leon/mutex.c,
+	sparc_leon/nocache.S, sparc_leon/pnpinit.c,
+	sparc_leon/pnpinit_malloc.c, sparc_leon/pnpinit_simple.c,
+	sparc_leon/regwin.S, sparc_leon/regwin_patch.c,
+	sparc_leon/regwin_slow.S, sparc_leon/regwinflush.S,
+	sparc_leon/rtc.c, sparc_leon/rtrap.S,
+	sparc_leon/rtrap_fast.S, sparc_leon/stop.S,
+	sparc_leon/timer.c, sparc_leon/times.c:
+	New file
+	* sparc_leon/configure: Regenerate
+
 2011-12-13  Richard Earnshaw  <rearnsha@arm.com>
             Thomas Klein  <th.r.klein@web.de>
 
