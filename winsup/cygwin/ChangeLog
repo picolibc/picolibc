@@ -1,3 +1,14 @@
+2011-12-16  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* exceptions.cc (_cygtls::call_signal_handler): Fix debugging to not go
+	to console.
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Add temporary
+	kludge to work around problem of make closing a handler while it is
+	being read.
+	* gendef (sigdelayed): Don't call a function if sig has been cleared.
+
+	* sigproc.h (cygwait): Simplify slightly.
+
 2011-12-14  Corinna Vinschen  <vinschen@redhat.com>
 
 	* autoload.cc (GetSystemWow64DirectoryW): Define.

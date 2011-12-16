@@ -87,14 +87,11 @@ cygwait (HANDLE h, DWORD howlong = INFINITE)
   HANDLE w4[3];
   DWORD n = 0;
   DWORD wait_signal;
-  if ((w4[n] = h) == NULL)
+  if ((w4[n] = h) != NULL)
+    wait_signal = WAIT_OBJECT_0 + ++n;
+  else
     wait_signal = WAIT_OBJECT_0 + 15;	/* Arbitrary.  Don't call signal
 					   handler if only waiting for signal */
-  else
-    {
-      n++;
-      wait_signal = n;
-    }
   w4[n++] = signal_arrived;
   if ((w4[n] = pthread::get_cancel_event ()) != NULL)
     n++;

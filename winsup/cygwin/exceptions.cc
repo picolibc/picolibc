@@ -1330,7 +1330,7 @@ _cygtls::call_signal_handler ()
 	  _main_tls->lock ();
 	  if (_main_tls->sig && _main_tls->incyg)
 	    {
-	      small_printf ("Redirecting to main_tls signal %d", _main_tls->sig);
+	      paranoid_printf ("Redirecting to main_tls signal %d", _main_tls->sig);
 	      sig = _main_tls->sig;
 	      sa_flags = _main_tls->sa_flags;
 	      func = _main_tls->func;

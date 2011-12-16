@@ -1925,25 +1925,31 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
     }
   if (res == overlapped_unknown)
     {
-      HANDLE h = writing ? get_output_handle () : get_handle ();
       DWORD wfres = cygwait (get_overlapped ()->hEvent);
-      /* Cancelling here to prevent races.  It's possible that the I/O has
-	 completed already, in which case this is a no-op.  Otherwise,
-	 WFMO returned because 1) This is a non-blocking call, 2) a signal
-	 arrived, or 3) the operation was cancelled.  These cases may be
-	 overridden by the return of GetOverlappedResult which could detect
-	 that I/O completion occurred.  */
-      CancelIo (h);
-      BOOL wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
-      err = GetLastError ();
-      ResetEvent (get_overlapped ()->hEvent);	/* Probably not needed but CYA */
-      debug_printf ("wfres %d, wores %d, bytes %u", wfres, wores, *bytes);
+      HANDLE h = writing ? get_output_handle () : get_handle ();
+      BOOL wores;
+      if (wfres == WAIT_OBJECT_0 + 1 && !get_overlapped ())
+	wores = 0;
+      else
+	{
+	  /* Cancelling here to prevent races.  It's possible that the I/O has
+	     completed already, in which case this is a no-op.  Otherwise,
+	     WFMO returned because 1) This is a non-blocking call, 2) a signal
+	     arrived, or 3) the operation was cancelled.  These cases may be
+	     overridden by the return of GetOverlappedResult which could detect
+	     that I/O completion occurred.  */
+	  CancelIo (h);
+	  BOOL wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
+	  err = GetLastError ();
+	  ResetEvent (get_overlapped ()->hEvent);	/* Probably not needed but CYA */
+	  debug_printf ("wfres %d, wores %d, bytes %u", wfres, wores, *bytes);
+	}
       if (wores)
 	res = overlapped_success;	/* operation succeeded */
       else if (wfres == WAIT_OBJECT_0 + 1)
 	{
 	  err = ERROR_INVALID_AT_INTERRUPT_TIME; /* forces an EINTR below */
-	  debug_printf ("unhandled signal");
+	  debug_printf ("signal");
 	  res = overlapped_error;
 	}
       else if (nonblocking)

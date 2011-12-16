@@ -221,6 +221,10 @@ _sigdelayed:
 	call	_yield
 	jmp	1b
 2:	incl	$tls::incyg(%ebx)
+	movl	$tls::sig(%ebx),%eax
+	testl	%eax,%eax
+	jz	4f			# call_signal_handler may have beat us
+					# to it
 	pushl	$tls::saved_errno(%ebx)	# saved errno
 	call	_set_process_mask_delta
 	pushl	%eax
