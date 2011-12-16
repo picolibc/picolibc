@@ -1939,7 +1939,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	     overridden by the return of GetOverlappedResult which could detect
 	     that I/O completion occurred.  */
 	  CancelIo (h);
-	  BOOL wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
+	  wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
 	  err = GetLastError ();
 	  ResetEvent (get_overlapped ()->hEvent);	/* Probably not needed but CYA */
 	  debug_printf ("wfres %d, wores %d, bytes %u", wfres, wores, *bytes);

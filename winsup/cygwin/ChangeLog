@@ -1,3 +1,8 @@
+2011-12-16  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Fix
+	unresolved access of wores in successful situations.
+
 2011-12-16  Corinna Vinschen  <vinschen@redhat.com>
 
 	* Makefile.in (DLL_OFILES): Add wow64.o.
