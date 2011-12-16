@@ -157,7 +157,7 @@ DLL_OFILES:=advapi32.o assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o \
 	smallprint.o spawn.o strace.o strfmon.o strfuncs.o strptime.o strsep.o \
 	strsig.o sync.o syscalls.o sysconf.o syslog.o termios.o thread.o \
 	timer.o times.o tls_pbuf.o tty.o uinfo.o uname.o wait.o wincap.o \
-	window.o winf.o xsique.o \
+	window.o winf.o wow64.o xsique.o \
 	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
 
 EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\

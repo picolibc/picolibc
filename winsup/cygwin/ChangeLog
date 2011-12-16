@@ -1,3 +1,28 @@
+2011-12-16  Corinna Vinschen  <vinschen@redhat.com>
+
+	* Makefile.in (DLL_OFILES): Add wow64.o.
+	* dcrt0.cc (CYGWIN_GUARD): Drop execute permission for stack, it's
+	not used for stacks by the OS either.
+	(child_info_fork::alloc_stack_hard_way): Ditto.
+	(child_info_fork::alloc_stack): Don't alloc_stack_hard_way under WOW64
+	if forked from a 64 bit parent.  Set child's StackBase to parent's
+	StackBase.  Add comments to explain why.
+	(wow64_respawn): Move to wow64.cc.
+	(wow64_started_from_native64): Move to wow64.cc.
+	(respawn_wow64_process): Move to wow64.cc.
+	(dll_crt0_0): Drop wow64_test_stack_marker and move stack test into
+	wow64_test_for_64bit_parent function.  Don't return early if WOW64
+	process has been started from native 64 bit process.
+	(_dll_crt0): Implement moving stack for WOW64 processes started from
+	native 64 bit process.
+	* wow64.cc: New file.
+	(wow64_has_64bit_parent): Rename from wow64_respawn.
+	(wow64_test_for_64bit_parent): Rename from wow64_started_from_native64.
+	Change comment.
+	(wow64_revert_to_original_stack): New function.
+	(wow64_respawn_process): Rename from respawn_wow64_process for symmetry.
+	* wow64.h: New file.
+
 2011-12-16  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* exceptions.cc (_cygtls::call_signal_handler): Fix debugging to not go

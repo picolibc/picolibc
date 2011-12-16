@@ -37,6 +37,7 @@ details. */
 #include "cygxdr.h"
 #include "fenv.h"
 #include "ntdll.h"
+#include "wow64.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
@@ -385,7 +386,7 @@ check_sanity_and_sync (per_process *p)
 
 child_info NO_COPY *child_proc_info = NULL;
 
-#define CYGWIN_GUARD (PAGE_EXECUTE_READWRITE | PAGE_GUARD)
+#define CYGWIN_GUARD (PAGE_READWRITE | PAGE_GUARD)
 
 void
 child_info_fork::alloc_stack_hard_way (volatile char *b)
@@ -408,8 +409,7 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
     api_fatal ("fork: can't reserve memory for stack %p - %p, %E",
 	       stackaddr, stackbottom);
   stacksize = (char *) stackbottom - (char *) stacktop;
-  stack_ptr = VirtualAlloc (stacktop, stacksize, MEM_COMMIT,
-			    PAGE_EXECUTE_READWRITE);
+  stack_ptr = VirtualAlloc (stacktop, stacksize, MEM_COMMIT, PAGE_READWRITE);
   if (!stack_ptr)
     abort ("can't commit memory for stack %p(%d), %E", stacktop, stacksize);
   if (guardsize != (size_t) -1)
@@ -447,7 +447,15 @@ child_info_fork::alloc_stack ()
 {
   volatile char * volatile esp;
   __asm__ volatile ("movl %%esp,%0": "=r" (esp));
-  if (_tlsbase != stackbottom)
+  /* Make sure not to try a hard allocation if we have been forked off from
+     the main thread of a Cygwin process which has been started from a 64 bit
+     parent.  In that case the _tlsbase of the forked child is not the same
+     as the _tlsbase of the parent (== stackbottom), but only because the
+     stack of the parent has been slightly rearranged.  See comment in
+     wow64_revert_to_original_stack for details. We just check here if the
+     stack is in the usual range for the main thread stack. */
+  if (_tlsbase != stackbottom
+      && (!wincap.is_wow64 () || stackbottom > (char *) 0x400000))
     alloc_stack_hard_way (esp);
   else
     {
@@ -455,6 +463,11 @@ child_info_fork::alloc_stack ()
       while (_tlstop >= st)
 	esp = getstack (esp);
       stackaddr = 0;
+      /* This only affects forked children of a process started from a native
+         64 bit process, but it doesn't hurt to do it unconditionally.  Fix
+	 StackBase in the child to be the same as in the parent, so that the
+	 computation of _my_tls is correct. */
+      _tlsbase = (char *) stackbottom;
     }
 }
 
@@ -657,75 +670,6 @@ init_windows_system_directory ()
     }
 }
 
-static bool NO_COPY wow64_respawn = false;
-
-inline static bool
-wow64_started_from_native64 ()
-{
-  /* On Windows XP 64 and 2003 64 there's a problem with processes running
-     under WOW64.  The first process started from a 64 bit process has an
-     unusual stack address for the main thread.  That is, an address which
-     is in the usual space occupied by the process image, but below the auto
-     load address of DLLs.  If we encounter this situation, check if we
-     really have been started from a 64 bit process here.  If so, we exit
-     early from dll_crt0_0 and respawn first thing in dll_crt0_1.  This
-     ping-pong game is necessary to workaround a problem observed on
-     Windows 2003 R2 64.  Starting with Cygwin 1.7.10 we don't link against
-     advapi32.dll anymore.  However, *any* process linked against advapi32,
-     directly or indirectly, now fails to respawn if respawn_wow_64_process
-     is called during DLL_PROCESS_ATTACH initialization.  In that case
-     CreateProcessW returns with ERROR_ACCESS_DENIED for some reason.
-     Calling CreateProcessW later, inside dll_crt0_1 and so outside of
-     dll initialization works as before, though. */
-  NTSTATUS ret;
-  PROCESS_BASIC_INFORMATION pbi;
-  HANDLE parent;
-
-  ULONG wow64 = TRUE;   /* Opt on the safe side. */
-
-  /* Unfortunately there's no simpler way to retrieve the
-     parent process in NT, as far as I know.  Hints welcome. */
-  ret = NtQueryInformationProcess (NtCurrentProcess (),
-                                   ProcessBasicInformation,
-                                   &pbi, sizeof pbi, NULL);
-  if (NT_SUCCESS (ret)
-      && (parent = OpenProcess (PROCESS_QUERY_INFORMATION,
-                                FALSE,
-                                pbi.InheritedFromUniqueProcessId)))
-    {
-      NtQueryInformationProcess (parent, ProcessWow64Information,
-                                 &wow64, sizeof wow64, NULL);
-      CloseHandle (parent);
-    }
-  return !wow64;
-}
-
-inline static void
-respawn_wow64_process ()
-{
-  /* The parent is a real 64 bit process.  Respawn. */
-  WCHAR path[PATH_MAX];
-  PROCESS_INFORMATION pi;
-  STARTUPINFOW si;
-  DWORD ret = 0;
-
-  GetModuleFileNameW (NULL, path, PATH_MAX);
-  GetStartupInfoW (&si);
-  if (!CreateProcessW (path, GetCommandLineW (), NULL, NULL, TRUE,
-		       CREATE_DEFAULT_ERROR_MODE
-		       | GetPriorityClass (GetCurrentProcess ()),
-		       NULL, NULL, &si, &pi))
-    api_fatal ("Failed to create process <%W> <%W>, %E",
-	       path, GetCommandLineW ());
-  CloseHandle (pi.hThread);
-  if (WaitForSingleObject (pi.hProcess, INFINITE) == WAIT_FAILED)
-    api_fatal ("Waiting for process %d failed, %E", pi.dwProcessId);
-  GetExitCodeProcess (pi.hProcess, &ret);
-  CloseHandle (pi.hProcess);
-  TerminateProcess (GetCurrentProcess (), ret);
-  ExitProcess (ret);
-}
-
 void
 dll_crt0_0 ()
 {
@@ -759,15 +703,11 @@ dll_crt0_0 ()
   if (!child_proc_info)
     {
       memory_init (true);
-      /* WOW64 bit process with stack at unusual address?  Check if we
-	 have been started from 64 bit process ans set wow64_respawn.
-	 Full description in wow64_started_from_native64 above. */
-      BOOL wow64_test_stack_marker;
-      if (wincap.is_wow64 ()
-	  && &wow64_test_stack_marker >= (PBOOL) 0x400000
-	  && &wow64_test_stack_marker <= (PBOOL) 0x10000000
-	  && (wow64_respawn = wow64_started_from_native64 ()))
-	return;
+      /* WOW64 process?  Check if we have been started from 64 bit process
+         and if our stack is at an unusual address.  Set wow64_has_64bit_parent
+	 if so.  Problem description in wow64_test_for_64bit_parent. */
+      if (wincap.is_wow64 ())
+	wow64_has_64bit_parent = wow64_test_for_64bit_parent ();
     }
   else
     {
@@ -1003,10 +943,36 @@ __cygwin_exit_return:			\n\
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  /* Respawn WOW64 process started from native 64 bit process.  See comment
-     in wow64_started_from_native64 above for a full description. */
-  if (wow64_respawn)
-    respawn_wow64_process ();
+  /* Handle WOW64 process started from native 64 bit process.  See comment
+     in wow64_test_for_64bit_parent for a full problem description. */
+  if (wow64_has_64bit_parent && !dynamically_loaded)
+    {
+      /* Must be static since it's referenced after the stack pointers have
+	 been moved. */
+      static PVOID allocationbase = 0;
+
+      /* Check if we just move the stack.  See comment in
+	 wow64_revert_to_original_stack for the gory details. */
+      PVOID stackaddr = wow64_revert_to_original_stack (allocationbase);
+      if (stackaddr)
+      	{
+	  /* 2nd half of the stack move.  First set stack pointers to
+	     our new address. */
+	  __asm__ ("\n\
+		   movl  %[ADDR], %%esp \n\
+		   movl  %%esp, %%ebp   \n"
+		   : : [ADDR] "r" (stackaddr));
+	  /* Now we're back on the original stack.  Free up space taken by the
+	     former main thread stack and... */
+	  VirtualFree (NtCurrentTeb ()->DeallocationStack,
+		       0, MEM_RELEASE);
+	  /* ...set DeallocationStack correctly. */
+	  NtCurrentTeb ()->DeallocationStack = allocationbase;
+	}
+      else
+	/* Fall back to respawn if wow64_revert_to_original_stack fails. */
+	wow64_respawn_process ();
+    }
 #ifdef __i386__
   _feinitialise ();
 #endif
