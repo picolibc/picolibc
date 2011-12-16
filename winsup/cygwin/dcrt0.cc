@@ -452,10 +452,12 @@ child_info_fork::alloc_stack ()
      parent.  In that case the _tlsbase of the forked child is not the same
      as the _tlsbase of the parent (== stackbottom), but only because the
      stack of the parent has been slightly rearranged.  See comment in
-     wow64_revert_to_original_stack for details. We just check here if the
-     stack is in the usual range for the main thread stack. */
+     wow64_revert_to_original_stack for details. We check here if the
+     parent stack fits into the child stack. */
   if (_tlsbase != stackbottom
-      && (!wincap.is_wow64 () || stackbottom > (char *) 0x400000))
+      && (!wincap.is_wow64 ()
+      	  || stacktop < (char *) NtCurrentTeb ()->DeallocationStack
+	  || stackbottom > _tlsbase))
     alloc_stack_hard_way (esp);
   else
     {

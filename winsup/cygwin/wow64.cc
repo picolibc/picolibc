@@ -11,37 +11,73 @@ details. */
 #include "winsup.h"
 #include "cygtls.h"
 #include "ntdll.h"
+#include <sys/param.h>
 
 #define PTR_ADD(p,o)	((PVOID)((PBYTE)(p)+(o)))
 
 bool NO_COPY wow64_has_64bit_parent = false;
 
+static void
+wow64_eval_expected_main_stack (PVOID &allocbase, PVOID &stackbase)
+{
+  PIMAGE_DOS_HEADER dosheader;
+  PIMAGE_NT_HEADERS32 ntheader;
+  DWORD size;
+
+  dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
+  ntheader = (PIMAGE_NT_HEADERS32) ((PBYTE) dosheader + dosheader->e_lfanew);
+  /* The main thread stack is expected to be located at 0x30000, which is the
+     case for all observed NT systems to date, unless the stacksize requested
+     by the StackReserve field in the PE/COFF header is so big that the stack
+     doesn't fit in the area between 0x30000 and the start of the image.  In
+     case of a conflict, the OS allocates the stack right after the image. */
+  allocbase = (PVOID) 0x30000;
+  /* Stack size.  The OS always rounds the size up to allocation granularity
+     and it never allocates less than 256K. */
+  size = roundup2 (ntheader->OptionalHeader.SizeOfStackReserve,
+		   wincap.allocation_granularity ());
+  if (size < 256 * 1024)
+    size = 256 * 1024;
+  /* If the stack doesn't fit in the area before the image, it's allocated
+     right after the image, rounded up to allocation granularity boundary. */
+  if (PTR_ADD (allocbase, size) > (PVOID) ntheader->OptionalHeader.ImageBase)
+    allocbase = PTR_ADD (ntheader->OptionalHeader.ImageBase,
+			 ntheader->OptionalHeader.SizeOfImage);
+  allocbase = (PVOID) roundup2 ((uintptr_t) allocbase,
+				wincap.allocation_granularity ());
+  stackbase = PTR_ADD (allocbase, size);
+  debug_printf ("expected allocbase: %p, stackbase: %p", allocbase, stackbase);
+}
+
 bool
 wow64_test_for_64bit_parent ()
 {
   /* On Windows XP 64 and 2003 64 there's a problem with processes running
-     under WOW64.  The first process started from a 64 bit process has an
-     unusual stack address for the main thread.  That is, an address which
-     is in the usual space occupied by the process image, but below the auto
-     load address of DLLs.  If this process forks, the child has its stack
-     in the usual memory slot again, thus we have to "alloc_stack_hard_way".
-     However, this fails in almost all cases because the stack slot of the
-     parent process is taken by something else in the child process.
-
-     If we encounter this situation, check if we really have been started
-     from a 64 bit process here.  If so, we note this fact in
-     wow64_has_64bit_parent so we can workaround the stack problem in
-     _dll_crt0.  See there for how we go along. */
+     under WOW64.  The first process started from a 64 bit process has its
+     main thread stack not where it should be.  Rather, it uses another
+     stack while the original stack is used for other purposes.
+     The problem is, the child has its stack in the usual spot again, thus
+     we have to "alloc_stack_hard_way".  However, this fails in almost all
+     cases because the stack slot of the parent process is taken by something
+     else in the child process.
+     What we do here is to check if the current stack is the excpected main
+     thread stack and if not, if we really have been started from a 64 bit
+     process here.  If so, we note this fact in wow64_has_64bit_parent so we
+     can workaround the stack problem in _dll_crt0.  See there for how we go
+     along. */
   NTSTATUS ret;
   PROCESS_BASIC_INFORMATION pbi;
   HANDLE parent;
+  PVOID allocbase, stackbase;
 
   ULONG wow64 = TRUE;   /* Opt on the safe side. */
 
-  /* First check if the stack is where it belongs.  If so, we don't have to
-     do anything special.  This is the case on Vista and later. */
-  if (&wow64 < (PULONG) 0x400000)
+  /* First check if the current stack is where it belongs.  If so, we don't
+     have to do anything special.  This is the case on Vista and later. */
+  wow64_eval_expected_main_stack (allocbase, stackbase);
+  if (&wow64 >= (PULONG) allocbase && &wow64 < (PULONG) stackbase)
     return false;
+
   /* Check if the parent is a native 64 bit process.  Unfortunately there's
      no simpler way to retrieve the parent process in NT, as far as I know.
      Hints welcome. */
@@ -67,39 +103,40 @@ wow64_revert_to_original_stack (PVOID &allocationbase)
      though the stack of the WOW64 process is at an unusual address, it appears
      that the "normal" stack has been created as usual.  It's partially in use
      by the 32->64 bit transition layer of the OS to help along the WOW64
-     process, but it's otherwise mostly unused.
-     The original stack is expected to be located at 0x30000, up to 0x230000.
-     The assumption here is that the default main thread stack size is 2 Megs,
-     but we expect lower stacksizes up to 1 Megs.  What we do here is to start
-     about in the middle, but below the 1 Megs stack size.  The stack is
-     allocated in a single call, so the entire stack has the same
-     AllocationBase. */
+     process, but it's otherwise mostly unused. */
   MEMORY_BASIC_INFORMATION mbi;
-  PVOID addr = (PVOID) 0x100000;
+  PVOID stackbase;
 
-  /* First fetch the AllocationBase. */
-  VirtualQuery (addr, &mbi, sizeof mbi);
-  allocationbase = mbi.AllocationBase;
-  /* At the start we expect a reserved region big enough still to host as
-     the main stack. 512K should be ok (knock on wood). */
+  wow64_eval_expected_main_stack (allocationbase, stackbase);
+
+  /* The stack is allocated in a single call, so the entire stack has the
+     same AllocationBase.  At the start we expect a reserved region big
+     enough still to host as the main stack. The OS apparently reserves
+     always at least 256K for the main thread stack.  We err on the side
+     of caution so we test here for a reserved region of at least 256K.
+     That should be enough (knock on wood). */
   VirtualQuery (allocationbase, &mbi, sizeof mbi);
-  if (mbi.State != MEM_RESERVE || mbi.RegionSize < 512 * 1024)
+  if (mbi.State != MEM_RESERVE || mbi.RegionSize < 256 * 1024)
     return NULL;
 
-  addr = PTR_ADD (mbi.BaseAddress, mbi.RegionSize);
-  /* Next we expect a guard page. */
+  /* Next we expect a guard page.  We fetch the size of the guard area since
+     to see how the OS is handling that.  Apparently the guard area on 64 bit
+     systems spans 2 pages. */
+  PVOID addr = PTR_ADD (mbi.BaseAddress, mbi.RegionSize);
   VirtualQuery (addr, &mbi, sizeof mbi);
   if (mbi.AllocationBase != allocationbase
       || mbi.State != MEM_COMMIT
       || !(mbi.Protect & PAGE_GUARD))
     return NULL;
-
   PVOID guardaddr = mbi.BaseAddress;
   SIZE_T guardsize = mbi.RegionSize;
+
+  /* Next we expect a committed R/W region, the in-use area of that stack.
+     This is just a sanity check. */
   addr = PTR_ADD (mbi.BaseAddress, mbi.RegionSize);
-  /* Next we expect a committed R/W region, the in-use area of that stack. */
   VirtualQuery (addr, &mbi, sizeof mbi);
   if (mbi.AllocationBase != allocationbase
+      || PTR_ADD (mbi.BaseAddress, mbi.RegionSize) != stackbase
       || mbi.State != MEM_COMMIT
       || mbi.Protect != PAGE_READWRITE)
     return NULL;

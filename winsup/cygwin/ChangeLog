@@ -1,3 +1,16 @@
+2011-12-16  Corinna Vinschen  <vinschen@redhat.com>
+
+	* dcrt0.cc (child_info_fork::alloc_stack): Correctly check if the
+	parent stack fits into the child stack.  Align comment.
+	* wow64.cc (wow64_eval_expected_main_stack): New function to fetch
+	expected addresses of main thread stack from PE/COFF image header
+	values.
+	(wow64_test_for_64bit_parent): Fix comment.  Check current stack
+	against real expected main thread stack addresses.
+	(wow64_revert_to_original_stack): Fix and add comments. Check memory
+	against real expected main thread stack addresses.  Use orignal stack
+	if reserved area is >= 256K.
+
 2011-12-16  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* gendef (sigdelayed): Remember to pop all of the saved registers.
