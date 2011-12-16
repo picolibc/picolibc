@@ -160,42 +160,6 @@ __sigbe:						# return here after cygwin syscall
 	popl	%ebx
 	ret
 
-	.global	_sigreturn
-_sigreturn:
-	movl	%fs:4,%ebx
-	incl	$tls::incyg(%ebx)
-	addl	\$12,%esp				# remove arguments
-	call	_set_process_mask\@4
-
-1:	movl	\$1,%eax				# potential lock value
-	xchgl	%eax,$tls::stacklock(%ebx)		# see if we can grab it
-	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
-	testl	%eax,%eax				# it will be zero
-	jz	2f					#  if so
-	call	_yield					# sleep
-	jmp	1b					#  and loop
-2:	popl	%edx					# saved errno
-	testl	%edx,%edx				# Is it < 0
-	jl	3f					# yup.  ignore it
-	movl	$tls::errno_addr(%ebx),%eax
-	movl	%edx,(%eax)
-3:	movl	\$-4,%eax				# now decrement aux stack
-	xadd	%eax,$tls::stackptr(%ebx)		#  and get pointer
-	xorl	%ebp,%ebp
-	xchgl	%ebp,-4(%eax)				# get return address from signal stack
-	xchgl	%ebp,28(%esp)				# store real return address
-	decl	$tls::incyg(%ebx)
-	decl	$tls::stacklock(%ebx)			# unlock
-
-	popl	%eax
-	popl	%ebx
-	popl	%ecx
-	popl	%edx
-	popl	%edi
-	popl	%esi
-	popf
-	ret
-
 	.global	_sigdelayed
 _sigdelayed:
 	pushl	%ebp
@@ -223,7 +187,7 @@ _sigdelayed:
 2:	incl	$tls::incyg(%ebx)
 	movl	$tls::sig(%ebx),%eax
 	testl	%eax,%eax
-	jz	4f			# call_signal_handler may have beat us
+	jz	leave			# call_signal_handler may have beat us
 					# to it
 	pushl	$tls::saved_errno(%ebx)	# saved errno
 	call	_set_process_mask_delta
@@ -246,6 +210,42 @@ _sigdelayed:
 4:	decl	$tls::incyg(%ebx)
 	decl	$tls::stacklock(%ebx)
 	ret				# return via signal handler
+
+	.global	_sigreturn
+_sigreturn:
+	movl	%fs:4,%ebx
+	incl	$tls::incyg(%ebx)
+	addl	\$12,%esp				# remove arguments
+	call	_set_process_mask\@4
+
+1:	movl	\$1,%eax				# potential lock value
+	xchgl	%eax,$tls::stacklock(%ebx)		# see if we can grab it
+	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
+	testl	%eax,%eax				# it will be zero
+	jz	2f					#  if so
+	call	_yield					# sleep
+	jmp	1b					#  and loop
+2:	popl	%edx					# saved errno
+	testl	%edx,%edx				# Is it < 0
+	jl	3f					# yup.  ignore it
+	movl	$tls::errno_addr(%ebx),%eax
+	movl	%edx,(%eax)
+3:	movl	\$-4,%eax				# now decrement aux stack
+	xadd	%eax,$tls::stackptr(%ebx)		#  and get pointer
+	xorl	%ebp,%ebp
+	xchgl	%ebp,-4(%eax)				# get return address from signal stack
+	xchgl	%ebp,28(%esp)				# store real return address
+leave:	decl	$tls::incyg(%ebx)
+	decl	$tls::stacklock(%ebx)			# unlock
+
+	popl	%eax
+	popl	%ebx
+	popl	%ecx
+	popl	%edx
+	popl	%edi
+	popl	%esi
+	popf
+	ret
 
 	.global __ZN7_cygtls3popEv
 __ZN7_cygtls3popEv:

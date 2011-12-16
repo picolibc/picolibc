@@ -1,5 +1,10 @@
 2011-12-16  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
+	* gendef (sigdelayed): Remember to pop all of the saved registers.
+	(sigreturn): Add "leave" label.
+
+2011-12-16  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
 	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Fix
 	unresolved access of wores in successful situations.
 
