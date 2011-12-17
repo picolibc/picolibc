@@ -78,7 +78,7 @@ fhandler_termios::tcsetpgrp (const pid_t pgid)
 	{
 	case bg_ok:
 	  tc ()->setpgid (pgid);
-	  if (tc ()->is_console)
+	  if (tc ()->is_console && (strace.active () || !being_debugged ()))
 	    tc ()->kill_pgrp (__SIGSETPGRP);
 	  res = 0;
 	  break;

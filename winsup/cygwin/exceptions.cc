@@ -1344,6 +1344,7 @@ _cygtls::call_signal_handler ()
       if (!sig)
 	break;
 
+      debug_only_printf ("dealing with signal %d", sig);
       this_sa_flags = sa_flags;
       int thissig = sig;
       void (*thisfunc) (int) = func;

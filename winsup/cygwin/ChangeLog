@@ -1,3 +1,51 @@
+2011-12-16  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	Implement fhandler reference counting.
+	* cygheap.h
+	(cygheap_fdmanip::release): Make virtual.
+	(cygheap_fdnew::~cygheap_fdnew): New destructor increments reference
+	count when fd has been allocated.
+	(cygheap_fdget::fh): New (old?) field.
+	(cygheap_fdget::cygheap_fdget): Increment reference count when we've
+	found an active fd.  Set fh appropriately.
+	(cygheap_fdget::~cygheap_fdget): Decrement reference count when
+	appropriate.  Delete fh if reference count goes to zero.
+	(cygheap_fdget::release): New function.  Do more bookkeping on release.
+	* dtable.cc (dtable::release): Change from void to boolean return.
+	Only delete the fhandler when its reference count is <= 0 (this should
+	be a fairly unusual case).  Return true if fhandler has been deleted.
+	(cygwin_attach_handle_to_fd): Increment reference count when fh is
+	assigned.
+	(dtable::init_std_file_from_handle): Ditto.
+	* dtable.h (dtable::release): Change return to boolean.
+	* fhandler.cc (fhandler_base::fhandler_base): Set new isclosed flag to
+	false.  Set _refcnt to zero.
+	(fhandler_base::close): Simplify paranoid debugging output.  Set new
+	isclosed() flag.
+	(fhandler_base_overlapped::wait_overlapped): Use isclosed() flag to
+	avoid querying the exception handle.
+	* fhandler.h (fhandler_base::_refcnt): New field.
+	(fhandler_base::refcnt): New function.
+	(fhandler_base::isclosed): Implement.
+	(fhandler_base::fhandler_base): Set isclosed to false.
+
+	* syscalls.cc: Remove space after function before parentheses for
+	several strace printfs.
+	(dup): Add standard strace "leaver" code.
+	(dup2): Ditto.
+	(dup3): Ditto.
+	(remove): Ditto.
+	(getpid): Ditto.
+	(getppid): Ditto.
+	(lseek64): Fix strace debugging to correctly use %R.
+
+	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Avoid sending
+	signals to other processes if we're debugging since it can cause a
+	deadlock with the calling debugger.
+
+	* exceptions.cc (_cygtls::call_signal_handler): Add debugging-only
+	strace output.
+
 2011-12-16  Corinna Vinschen  <vinschen@redhat.com>
 
 	* dcrt0.cc (child_info_fork::alloc_stack): Correctly check if the

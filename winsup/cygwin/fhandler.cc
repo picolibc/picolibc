@@ -1148,11 +1148,10 @@ fhandler_base::close ()
     res = 0;
   else
     {
-      paranoid_printf ("CloseHandle (%d <%s>) failed", get_handle (),
-		       get_name ());
-
+      paranoid_printf ("CloseHandle failed, %E");
       __seterrno ();
     }
+  isclosed (true);
   return res;
 }
 
@@ -1485,6 +1484,7 @@ fhandler_base::fhandler_base () :
   access (0),
   io_handle (NULL),
   ino (0),
+  _refcnt (0),
   openflags (0),
   rabuf (NULL),
   ralen (0),
@@ -1495,6 +1495,7 @@ fhandler_base::fhandler_base () :
   archetype (NULL),
   usecount (0)
 {
+  isclosed (false);
 }
 
 /* Normal I/O destructor */
@@ -1928,8 +1929,8 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       DWORD wfres = cygwait (get_overlapped ()->hEvent);
       HANDLE h = writing ? get_output_handle () : get_handle ();
       BOOL wores;
-      if (wfres == WAIT_OBJECT_0 + 1 && !get_overlapped ())
-	wores = 0;
+      if (isclosed ())
+	wores = 0;	/* closed in another thread or via signal handler */
       else
 	{
 	  /* Cancelling here to prevent races.  It's possible that the I/O has

@@ -328,10 +328,7 @@ class cygheap_fdmanip
     if (locked)
       cygheap->fdtab.unlock ();
   }
-  void release ()
-  {
-    cygheap->fdtab.release (fd);
-  }
+  virtual void release () { cygheap->fdtab.release (fd); }
   operator int &() {return fd;}
   operator fhandler_base* &() {return cygheap->fdtab[fd];}
   operator fhandler_socket* () const {return reinterpret_cast<fhandler_socket *> (cygheap->fdtab[fd]);}
@@ -368,12 +365,18 @@ class cygheap_fdnew : public cygheap_fdmanip
 	locked = false;
       }
   }
+  ~cygheap_fdnew ()
+  {
+    if (cygheap->fdtab[fd])
+      cygheap->fdtab[fd]->refcnt (1);
+  }
   void operator = (fhandler_base *fh) {cygheap->fdtab[fd] = fh;}
 };
 
 class cygheap_fdget : public cygheap_fdmanip
 {
- public:
+  fhandler_base *fh;
+public:
   cygheap_fdget (int fd, bool lockit = false, bool do_set_errno = true)
   {
     if (lockit)
@@ -382,6 +385,8 @@ class cygheap_fdget : public cygheap_fdmanip
       {
 	this->fd = fd;
 	locked = lockit;
+	fh = cygheap->fdtab[fd];
+	fh->refcnt (1);
       }
     else
       {
@@ -391,7 +396,26 @@ class cygheap_fdget : public cygheap_fdmanip
 	if (lockit)
 	  cygheap->fdtab.unlock ();
 	locked = false;
+	fh = NULL;
       }
+  }
+  ~cygheap_fdget ()
+  {
+    if (!fh)
+      /* nothing to do */;
+    else if (fh->refcnt (-1) > 0)
+      debug_only_printf ("fh %p, %s, refcnt %ld", fh, fh->get_name (), fh->refcnt ());
+    else
+      {
+	debug_only_printf ("deleting fh %p, %s, refcnt %ld", fh, fh->get_name (), fh->refcnt ());
+	delete fh;
+      }
+  }
+  void release ()
+  {
+    fh = cygheap->fdtab[fd];
+    if (cygheap->fdtab.release (fd))
+      fh = NULL;
   }
 };
 

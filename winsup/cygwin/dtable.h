@@ -63,7 +63,7 @@ public:
   }
   int find_unused_handle (int start);
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
-  void release (int fd);
+  bool release (int fd) __attribute__ ((regparm (2)));
   void init_std_file_from_handle (int fd, HANDLE handle);
   int dup3 (int oldfd, int newfd, int flags);
   void fixup_after_exec ();

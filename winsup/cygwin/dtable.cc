@@ -241,16 +241,26 @@ dtable::find_unused_handle (int start)
   return -1;
 }
 
-void
+bool
 dtable::release (int fd)
 {
-  if (!not_open (fd))
+  bool deleted;
+  if (not_open (fd))
+    deleted = false;
+  else
     {
       if (fds[fd]->need_fixup_before ())
 	dec_need_fixup_before ();
-      delete fds[fd];
+      if (fds[fd]->refcnt (-1) > 0)
+	deleted = false;
+      else
+	{
+	  deleted = true;
+	  delete fds[fd];
+	}
       fds[fd] = NULL;
     }
+  return deleted;
 }
 
 extern "C" int
@@ -261,6 +271,7 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
     fd = cygheap->fdtab.find_unused_handle ();
   fhandler_base *fh = build_fh_name (name);
   cygheap->fdtab[fd] = fh;
+  cygheap->fdtab[fd]->refcnt (1);
   fh->init (handle, myaccess, bin ?: fh->pc_binmode ());
   return fd;
 }
@@ -395,6 +406,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       fh->open_setup (openflags);
       fh->usecount = 0;
       cygheap->fdtab[fd] = fh;
+      cygheap->fdtab[fd]->refcnt (1);
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }

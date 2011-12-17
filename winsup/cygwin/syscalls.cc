@@ -120,51 +120,51 @@ close_all_files (bool norelease)
 extern "C" int
 dup (int fd)
 {
-  return cygheap->fdtab.dup3 (fd, cygheap_fdnew (), 0);
+  int res = cygheap->fdtab.dup3 (fd, cygheap_fdnew (), 0);
+  syscall_printf ("%R = dup(%d)", res, fd);
+  return res;
 }
 
 extern "C" int
 dup2 (int oldfd, int newfd)
 {
+  int res;
   if (newfd >= OPEN_MAX_MAX)
     {
-      syscall_printf ("-1 = dup2 (%d, %d) (%d too large)", oldfd, newfd, newfd);
       set_errno (EBADF);
-      return -1;
+      res = -1;
     }
-  if (newfd == oldfd)
+  else if (newfd == oldfd)
     {
       cygheap_fdget cfd (oldfd);
-      if (cfd < 0)
-	{
-	  syscall_printf ("%R = dup2(%d,%d) (oldfd not open)", -1, oldfd, newfd);
-	  return -1;
-	}
-      syscall_printf ("%R = dup2(%d, %d) (newfd==oldfd)", oldfd, oldfd, newfd);
-      return oldfd;
+      res = (cfd >= 0) ? oldfd : -1;
     }
-  return cygheap->fdtab.dup3 (oldfd, newfd, 0);
+  else
+    res = cygheap->fdtab.dup3 (oldfd, newfd, 0); 
+
+  syscall_printf ("%R = dup2(%d, %d)", res, oldfd, newfd);
+  return res;
 }
 
 extern "C" int
 dup3 (int oldfd, int newfd, int flags)
 {
+  int res;
   if (newfd >= OPEN_MAX_MAX)
     {
-      syscall_printf ("-1 = dup3 (%d, %d, %p) (%d too large)",
-		      oldfd, newfd, flags, newfd);
       set_errno (EBADF);
-      return -1;
+      res = -1;
     }
-  if (newfd == oldfd)
+  else if (newfd == oldfd)
     {
       cygheap_fdget cfd (oldfd, false, false);
       set_errno (cfd < 0 ? EBADF : EINVAL);
-      syscall_printf ("-1 = dup3 (%d, %d, %p) (newfd==oldfd)",
-		      oldfd, newfd, flags);
-      return -1;
+      res = -1;
     }
-  return cygheap->fdtab.dup3 (oldfd, newfd, flags);
+  else
+    res = cygheap->fdtab.dup3 (oldfd, newfd, flags);
+  syscall_printf ("%R = dup2(%d, %d, %p)", res, oldfd, newfd, flags);
+  return res;
 }
 
 static inline void
@@ -965,12 +965,15 @@ remove (const char *ourname)
       return -1;
     }
 
-  return win32_name.isdir () ? rmdir (ourname) : unlink (ourname);
+  int res = win32_name.isdir () ? rmdir (ourname) : unlink (ourname);
+  syscall_printf ("%R = remove(%s)", res, ourname);
+  return res;
 }
 
 extern "C" pid_t
 getpid ()
 {
+  syscall_printf ("%d = getpid()", myself->pid);
   return myself->pid;
 }
 
@@ -984,6 +987,7 @@ _getpid_r (struct _reent *)
 extern "C" pid_t
 getppid ()
 {
+  syscall_printf ("%d = getppid()", myself->ppid);
   return myself->ppid;
 }
 
@@ -1041,6 +1045,7 @@ getsid (pid_t pid)
 	  res = -1;
 	}
     }
+  syscall_printf ("%R = getsid(%d)", pid);
   return res;
 }
 
@@ -1066,7 +1071,7 @@ read (int fd, void *ptr, size_t len)
     }
 
   /* Could block, so let user know we at least got here.  */
-  syscall_printf ("read (%d, %p, %d) %sblocking",
+  syscall_printf ("read(%d, %p, %d) %sblocking",
 		  fd, ptr, len, cfd->is_nonblocking () ? "non" : "");
 
   cfd->read (ptr, res = len);
@@ -1108,7 +1113,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
     }
 
   /* Could block, so let user know we at least got here.  */
-  syscall_printf ("readv (%d, %p, %d) %sblocking",
+  syscall_printf ("readv(%d, %p, %d) %sblocking",
 		  fd, iov, iovcnt, cfd->is_nonblocking () ? "non" : "");
 
   res = cfd->readv (iov, iovcnt, tot);
@@ -1158,9 +1163,9 @@ write (int fd, const void *ptr, size_t len)
 
   /* Could block, so let user know we at least got here.  */
   if (fd == 1 || fd == 2)
-    paranoid_printf ("write (%d, %p, %d)", fd, ptr, len);
+    paranoid_printf ("write(%d, %p, %d)", fd, ptr, len);
   else
-    syscall_printf  ("write (%d, %p, %d)", fd, ptr, len);
+    syscall_printf  ("write(%d, %p, %d)", fd, ptr, len);
 
   res = cfd->write (ptr, len);
 
@@ -1206,9 +1211,9 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
 
   /* Could block, so let user know we at least got here.  */
   if (fd == 1 || fd == 2)
-    paranoid_printf ("writev (%d, %p, %d)", fd, iov, iovcnt);
+    paranoid_printf ("writev(%d, %p, %d)", fd, iov, iovcnt);
   else
-    syscall_printf  ("writev (%d, %p, %d)", fd, iov, iovcnt);
+    syscall_printf  ("writev(%d, %p, %d)", fd, iov, iovcnt);
 
   res = cfd->writev (iov, iovcnt, tot);
 
@@ -1248,7 +1253,7 @@ open (const char *unix_path, int flags, ...)
   va_list ap;
   mode_t mode = 0;
 
-  syscall_printf ("open (%s, %p)", unix_path, flags);
+  syscall_printf ("open(%s, %p)", unix_path, flags);
   pthread_testcancel ();
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -1341,7 +1346,7 @@ lseek64 (int fd, _off64_t pos, int dir)
       else
 	res = -1;
     }
-  syscall_printf ("%D = lseek (%d, %D, %d)", res, fd, pos, dir);
+  syscall_printf ("%R = lseek(%d, %D, %d)", res, fd, pos, dir);
 
   return res;
 }
@@ -1361,7 +1366,7 @@ close (int fd)
 {
   int res;
 
-  syscall_printf ("close (%d)", fd);
+  syscall_printf ("close(%d)", fd);
 
   pthread_testcancel ();
 
