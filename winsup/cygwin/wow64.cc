@@ -119,9 +119,9 @@ wow64_revert_to_original_stack (PVOID &allocationbase)
   if (mbi.State != MEM_RESERVE || mbi.RegionSize < 256 * 1024)
     return NULL;
 
-  /* Next we expect a guard page.  We fetch the size of the guard area since
-     to see how the OS is handling that.  Apparently the guard area on 64 bit
-     systems spans 2 pages. */
+  /* Next we expect a guard page.  We fetch the size of the guard area to
+     see how big it is.  Apparently the guard area on 64 bit systems spans
+     2 pages. */
   PVOID addr = PTR_ADD (mbi.BaseAddress, mbi.RegionSize);
   VirtualQuery (addr, &mbi, sizeof mbi);
   if (mbi.AllocationBase != allocationbase
