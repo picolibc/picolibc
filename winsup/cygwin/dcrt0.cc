@@ -466,7 +466,7 @@ child_info_fork::alloc_stack ()
 	esp = getstack (esp);
       stackaddr = 0;
       /* This only affects forked children of a process started from a native
-         64 bit process, but it doesn't hurt to do it unconditionally.  Fix
+	 64 bit process, but it doesn't hurt to do it unconditionally.  Fix
 	 StackBase in the child to be the same as in the parent, so that the
 	 computation of _my_tls is correct. */
       _tlsbase = (char *) stackbottom;
@@ -706,7 +706,7 @@ dll_crt0_0 ()
     {
       memory_init (true);
       /* WOW64 process?  Check if we have been started from 64 bit process
-         and if our stack is at an unusual address.  Set wow64_has_64bit_parent
+	 and if our stack is at an unusual address.  Set wow64_has_64bit_parent
 	 if so.  Problem description in wow64_test_for_64bit_parent. */
       if (wincap.is_wow64 ())
 	wow64_has_64bit_parent = wow64_test_for_64bit_parent ();

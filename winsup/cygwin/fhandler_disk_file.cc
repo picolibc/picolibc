@@ -1457,7 +1457,7 @@ out:
    first call to either pread or pwrite.  This is used for any subsequent
    pread/pwrite.  Thus the current file position of the "normal" file
    handle is not touched.
-   
+
    FIXME:
 
    Note that this is just a hack.  The problem with this approach is that

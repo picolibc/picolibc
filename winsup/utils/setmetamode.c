@@ -48,14 +48,14 @@ void
 print_version ()
 {
   printf ("setmetamode (cygwin) %d.%d.%d\n"
-          "Get or set keyboard meta mode\n"
-          "Copyright (C) 2006 - %s Red Hat, Inc.\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "Get or set keyboard meta mode\n"
+	  "Copyright (C) 2006 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 struct option longopts[] = {
@@ -89,7 +89,7 @@ main (int ac, char *av[])
     switch (opt)
       {
       case 'h':
-      	usage ();
+	usage ();
 	return 0;
       case 'V':
 	print_version ();

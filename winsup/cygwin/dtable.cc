@@ -505,7 +505,7 @@ fh_alloc (path_conv& pc)
 	  if (pc.isopen ())
 	    fh = cnew (fhandler_pty_master, -1);
 	  else
-	    fhraw = cnew_no_ctor (fhandler_pty_master, -1); 
+	    fhraw = cnew_no_ctor (fhandler_pty_master, -1);
 	  break;
 	case FH_WINDOWS:
 	  fh = cnew (fhandler_windows);
@@ -575,7 +575,7 @@ fh_alloc (path_conv& pc)
 	case FH_TTY:
 	  if (!pc.isopen ())
 	    {
-	      fhraw = cnew_no_ctor (fhandler_console, -1); 
+	      fhraw = cnew_no_ctor (fhandler_console, -1);
 	      debug_printf ("not called from open for /dev/tty");
 	    }
 	  else if (myself->ctty <= 0 && last_tty_dev

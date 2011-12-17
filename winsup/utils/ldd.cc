@@ -93,14 +93,14 @@ static void
 print_version ()
 {
   printf ("ldd (cygwin) %d.%d.%d\n"
-          "Print shared library dependencies\n"
-          "Copyright (C) 2009 - %s Chris Faylor\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "Print shared library dependencies\n"
+	  "Copyright (C) 2009 - %s Chris Faylor\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 #define print_errno_error_and_return(__fn) \
@@ -439,7 +439,7 @@ dump_import_directory (const void *const section_base,
 
       int len = mbstowcs (NULL, fn, 0);
       if (len <= 0)
-      	continue;
+	continue;
       wchar_t fnw[len + 1];
       mbstowcs (fnw, fn, len + 1);
       /* output DLL's name */
@@ -492,7 +492,7 @@ map_file (const wchar_t *filename)
       CloseHandle (hFile);
       return 0;
     }
-  
+
   CloseHandle (hMapping);
   CloseHandle (hFile);
 
@@ -658,7 +658,7 @@ process_file (const wchar_t *filename)
       UnmapViewOfFile (basepointer);
       return 8;
     }
-  
+
   UnmapViewOfFile (basepointer);
   return 0;
 }

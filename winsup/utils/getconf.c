@@ -424,20 +424,20 @@ printvar (const struct conf_variable *cp, const char *pathname)
       errno = 0;
       slen = confstr ((int) cp->value, NULL, 0);
       if (slen == 0)
-        {
-          if (errno == 0)
-            print_strvar (cp->name, "undefined");
-          return;
-        }
+	{
+	  if (errno == 0)
+	    print_strvar (cp->name, "undefined");
+	  return;
+	}
 
       if ((sval = malloc (slen)) == NULL)
-        error (EXIT_FAILURE, 0, "Can't allocate %zu bytes", slen);
+	error (EXIT_FAILURE, 0, "Can't allocate %zu bytes", slen);
 
       errno = 0;
       if (confstr ((int) cp->value, sval, slen) == 0)
-        print_strvar (cp->name, "undefined");
+	print_strvar (cp->name, "undefined");
       else
-        print_strvar (cp->name, sval);
+	print_strvar (cp->name, sval);
 
       free (sval);
       break;
@@ -445,25 +445,25 @@ printvar (const struct conf_variable *cp, const char *pathname)
     case SYSCONF:
       errno = 0;
       if ((val = sysconf ((int) cp->value)) == -1)
-        {
-          if (a_flag && errno != 0)
-            return; /* Just skip invalid variables */
-          print_strvar (cp->name, "undefined");
-        }
+	{
+	  if (a_flag && errno != 0)
+	    return; /* Just skip invalid variables */
+	  print_strvar (cp->name, "undefined");
+	}
       else
-        print_longvar (cp->name, val);
+	print_longvar (cp->name, val);
       break;
 
     case PATHCONF:
       errno = 0;
       if ((val = pathconf (pathname, (int) cp->value)) == -1)
-        {
-          if (a_flag && errno != 0)
-            return; /* Just skip invalid variables */
-          print_strvar (cp->name, "undefined");
-        }
+	{
+	  if (a_flag && errno != 0)
+	    return; /* Just skip invalid variables */
+	  print_strvar (cp->name, "undefined");
+	}
       else
-        print_longvar (cp->name, val);
+	print_longvar (cp->name, val);
       break;
     }
 }
@@ -471,7 +471,7 @@ printvar (const struct conf_variable *cp, const char *pathname)
 static void
 usage (int ret)
 {
-  fprintf (ret ? stderr : stdout, 
+  fprintf (ret ? stderr : stdout,
 "Usage: %1$s [-v specification] variable_name [pathname]\n"
 "       %1$s -a [pathname]\n"
 "\n"
@@ -493,14 +493,14 @@ static void
 print_version ()
 {
   printf ("getconf (cygwin) %d.%d.%d\n"
-          "Get configuration values\n"
-          "Copyright (C) 2011 - %s Red Hat, Inc.\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "Get configuration values\n"
+	  "Copyright (C) 2011 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 struct option longopts[] = {
@@ -525,23 +525,23 @@ main (int argc, char **argv)
   while ((ch = getopt_long (argc, argv, opts, longopts, NULL)) != -1)
     {
       switch (ch)
-        {
-        case 'a':
-          a_flag = 1;
-          break;
-        case 'v':
-          v_flag = 1;
-          break;
-        case 'h':
-          usage (0);
+	{
+	case 'a':
+	  a_flag = 1;
+	  break;
+	case 'v':
+	  v_flag = 1;
+	  break;
+	case 'h':
+	  usage (0);
 	case 'V':
 	  print_version ();
 	  return 0;
-        default:
+	default:
 	  fprintf (stderr, "Try `%s --help' for more information.\n",
 		   program_invocation_short_name);
 	  return 1;
-        }
+	}
     }
   argc -= optind;
   argv += optind;
@@ -549,18 +549,18 @@ main (int argc, char **argv)
   if (v_flag)
     {
       if (a_flag || argc < 2)
-        usage (1);
+	usage (1);
       for (sp = spec_table; sp->name != NULL; sp++)
-        {
-          if (strcmp (argv[0], sp->name) == 0)
-            {
-              if (sp->valid != 1)
-                error (EXIT_FAILURE, 0, "unsupported specification \"%s\"", argv[0]);
-              break;
-            }
-        }
+	{
+	  if (strcmp (argv[0], sp->name) == 0)
+	    {
+	      if (sp->valid != 1)
+		error (EXIT_FAILURE, 0, "unsupported specification \"%s\"", argv[0]);
+	      break;
+	    }
+	}
       if (sp->name == NULL)
-        error (EXIT_FAILURE, 0, "unknown specification \"%s\"", argv[0]);
+	error (EXIT_FAILURE, 0, "unknown specification \"%s\"", argv[0]);
       argc--;
       argv++;
     }
@@ -568,7 +568,7 @@ main (int argc, char **argv)
   if (!a_flag)
     {
       if (argc == 0)
-        usage (1);
+	usage (1);
       varname = argv[0];
       argc--;
       argv++;
@@ -584,16 +584,16 @@ main (int argc, char **argv)
   for (cp = conf_table; cp->name != NULL; cp++)
     {
       if (a_flag || strcmp (varname, cp->name) == 0)
-        {
-          /* LINTED weird expression */
-          if ((cp->type == PATHCONF) == (pathname != NULL))
-            {
-              printvar (cp, pathname);
-              found = 1;
-            }
-          else if (!a_flag)
-            usage (1);
-        }
+	{
+	  /* LINTED weird expression */
+	  if ((cp->type == PATHCONF) == (pathname != NULL))
+	    {
+	      printvar (cp, pathname);
+	      found = 1;
+	    }
+	  else if (!a_flag)
+	    usage (1);
+	}
     }
 
   if (!a_flag && !found)

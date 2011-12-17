@@ -57,14 +57,14 @@ static void
 print_version ()
 {
   printf ("umount (cygwin) %d.%d.%d\n"
-          "Unmount filesystem utility\n"
-          "Copyright (C) 1996 - %s Red Hat, Inc.\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "Unmount filesystem utility\n"
+	  "Copyright (C) 1996 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 int

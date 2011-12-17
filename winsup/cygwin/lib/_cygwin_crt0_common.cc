@@ -12,7 +12,7 @@ details. */
 #include "crt0.h"
 #include "cygwin-cxx.h"
 
-/* Weaken these declarations so the references don't pull in C++ dependencies 
+/* Weaken these declarations so the references don't pull in C++ dependencies
    unnecessarily.  */
 #define WEAK __attribute__ ((weak))
 
@@ -55,7 +55,7 @@ extern char __RUNTIME_PSEUDO_RELOC_LIST__;
 extern char __RUNTIME_PSEUDO_RELOC_LIST_END__;
 extern char _image_base__;
 
-struct per_process_cxx_malloc __cygwin_cxx_malloc = 
+struct per_process_cxx_malloc __cygwin_cxx_malloc =
 {
   &(operator new), &(operator new[]),
   &(operator delete), &(operator delete[]),

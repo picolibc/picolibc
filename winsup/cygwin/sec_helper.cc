@@ -336,7 +336,7 @@ security_descriptor::free ()
 /* Index must match the corresponding foo_PRIVILEGE value, see security.h. */
 static const struct {
   const wchar_t *name;
-  bool		 high_integrity; /* UAC: High Mandatory Label required to 
+  bool		 high_integrity; /* UAC: High Mandatory Label required to
 				    be allowed to enable this privilege in
 				    the user token. */
 } cygpriv[] =

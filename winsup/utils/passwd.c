@@ -83,9 +83,9 @@ EvalRet (int ret, const char *user)
 
     case ERROR_ACCESS_DENIED:
       if (! user)
-        eprint (0, "You may not change password expiry information.");
+	eprint (0, "You may not change password expiry information.");
       else
-        eprint (0, "You may not change the password for %s.", user);
+	eprint (0, "You may not change the password for %s.", user);
       break;
 
       eprint (0, "Bad password: Invalid.");
@@ -121,7 +121,7 @@ GetPW (char *user, int print_win_name, LPCWSTR server)
   PUSER_INFO_3 ui;
   struct passwd *pw;
   char *domain = (char *) alloca (INTERNET_MAX_HOST_NAME_LENGTH + 1);
-     
+
   /* Try getting a Win32 username in case the user edited /etc/passwd */
   if ((pw = getpwnam (user)))
     {
@@ -180,13 +180,13 @@ PrintPW (PUSER_INFO_3 ui, LPCWSTR server)
   PUSER_MODALS_INFO_0 mi;
 
   printf ("Account disabled           : %s",
-  	(ui->usri3_flags & UF_ACCOUNTDISABLE) ? "yes\n" : "no\n");
+	(ui->usri3_flags & UF_ACCOUNTDISABLE) ? "yes\n" : "no\n");
   printf ("Password not required      : %s",
-  	(ui->usri3_flags & UF_PASSWD_NOTREQD) ? "yes\n" : "no\n");
+	(ui->usri3_flags & UF_PASSWD_NOTREQD) ? "yes\n" : "no\n");
   printf ("User can't change password : %s",
-  	(ui->usri3_flags & UF_PASSWD_CANT_CHANGE) ? "yes\n" : "no\n");
+	(ui->usri3_flags & UF_PASSWD_CANT_CHANGE) ? "yes\n" : "no\n");
   printf ("Password never expires     : %s",
-  	(ui->usri3_flags & UF_DONT_EXPIRE_PASSWD) ? "yes\n" : "no\n");
+	(ui->usri3_flags & UF_DONT_EXPIRE_PASSWD) ? "yes\n" : "no\n");
   printf ("Password expired           : %s",
 	(ui->usri3_password_expired) ? "yes\n" : "no\n");
   printf ("Latest password change     : %s", ctime(&t));
@@ -194,22 +194,22 @@ PrintPW (PUSER_INFO_3 ui, LPCWSTR server)
   if (! ret)
     {
       if (mi->usrmod0_max_passwd_age == TIMEQ_FOREVER)
-        mi->usrmod0_max_passwd_age = 0;
+	mi->usrmod0_max_passwd_age = 0;
       if (mi->usrmod0_min_passwd_age == TIMEQ_FOREVER)
-        mi->usrmod0_min_passwd_age = 0;
+	mi->usrmod0_min_passwd_age = 0;
       if (mi->usrmod0_force_logoff == TIMEQ_FOREVER)
-        mi->usrmod0_force_logoff = 0;
+	mi->usrmod0_force_logoff = 0;
       if (ui->usri3_priv == USER_PRIV_ADMIN)
-        mi->usrmod0_min_passwd_len = 0;
+	mi->usrmod0_min_passwd_len = 0;
       printf ("\nSystem password settings:\n");
       printf ("Max. password age %ld days\n",
-              mi->usrmod0_max_passwd_age / ONE_DAY);
+	      mi->usrmod0_max_passwd_age / ONE_DAY);
       printf ("Min. password age %ld days\n",
-              mi->usrmod0_min_passwd_age / ONE_DAY);
+	      mi->usrmod0_min_passwd_age / ONE_DAY);
       printf ("Force logout after %ld days\n",
-              mi->usrmod0_force_logoff / ONE_DAY);
+	      mi->usrmod0_force_logoff / ONE_DAY);
       printf ("Min. password length: %ld\n",
-              mi->usrmod0_min_passwd_len);
+	      mi->usrmod0_min_passwd_len);
     }
 }
 
@@ -312,7 +312,7 @@ caller_is_admin ()
   DWORD size;
   PTOKEN_GROUPS grps;
   SID_IDENTIFIER_AUTHORITY nt_auth = {SECURITY_NT_AUTHORITY};
-  PSID admin_grp; 
+  PSID admin_grp;
   DWORD i;
 
   if (is_admin == -1)
@@ -351,14 +351,14 @@ static void
 print_version ()
 {
   printf ("passwd (cygwin) %d.%d.%d\n"
-          "Password Utility\n"
-          "Copyright (C) 1999 - %s Red Hat, Inc.\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "Password Utility\n"
+	  "Copyright (C) 1999 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 int
@@ -398,20 +398,20 @@ main (int argc, char **argv)
       {
       case 'h':
 	usage (stdout, 0);
-        break;
+	break;
 
       case 'i':
 	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt || Ropt)
 	  usage (stderr, 1);
 	if ((iarg = atoi (optarg)) < 0 || iarg > 999)
 	  return eprint (1, "Force logout time must be between 0 and 999.");
-        break;
+	break;
 
       case 'l':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || uopt || Sopt || Ropt)
 	  usage (stderr, 1);
 	lopt = 1;
-        break;
+	break;
 
       case 'n':
 	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt || Ropt)
@@ -420,29 +420,29 @@ main (int argc, char **argv)
 	  return eprint (1, "Minimum password age must be between 0 and 999.");
 	if (xarg >= 0 && narg > xarg)
 	  return eprint (1, "Minimum password age must be less than "
-	                    "maximum password age.");
-        break;
+			    "maximum password age.");
+	break;
 
       case 'u':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || Sopt || Ropt)
 	  usage (stderr, 1);
 	uopt = 1;
-        break;
+	break;
 
       case 'c':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	copt = 1;
-        break;
+	break;
 
       case 'C':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	Copt = 1;
-        break;
+	break;
 
       case 'd':
-        {
+	{
 	  if (Ropt)
 	    usage (stderr, 1);
 	  char *tmpbuf = alloca (strlen (optarg) + 3);
@@ -461,30 +461,30 @@ main (int argc, char **argv)
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	eopt = 1;
-        break;
+	break;
 
       case 'E':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	Eopt = 1;
-        break;
+	break;
 
       case 'p':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	popt = 1;
-        break;
+	break;
 
       case 'P':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt || Ropt)
 	  usage (stderr, 1);
 	Popt = 1;
-        break;
+	break;
 
       case 'V':
 	print_version ();
-        exit (0);
-        break;
+	exit (0);
+	break;
 
       case 'x':
 	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt || Ropt)
@@ -493,23 +493,23 @@ main (int argc, char **argv)
 	  return eprint (1, "Maximum password age must be between 0 and 999.");
 	if (narg >= 0 && xarg < narg)
 	  return eprint (1, "Maximum password age must be greater than "
-	                    "minimum password age.");
-        break;
+			    "minimum password age.");
+	break;
 
       case 'L':
 	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt || Ropt)
 	  usage (stderr, 1);
 	if ((Larg = atoi (optarg)) < 0 || Larg > LM20_PWLEN)
 	  return eprint (1, "Minimum password length must be between "
-	                    "0 and %d.", LM20_PWLEN);
-        break;
+			    "0 and %d.", LM20_PWLEN);
+	break;
 
       case 'S':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || uopt
 	    || copt || Copt || eopt || Eopt || popt || Popt || Ropt)
 	  usage (stderr, 1);
 	Sopt = 1;
-        break;
+	break;
 
       case 'R':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || uopt
@@ -517,10 +517,10 @@ main (int argc, char **argv)
 	    || server)
 	  usage (stderr, 1);
 	Ropt = 1;
-      	break;
+	break;
 
       default:
-        fprintf (stderr, "Try `%s --help' for more information.\n", prog_name);
+	fprintf (stderr, "Try `%s --help' for more information.\n", prog_name);
 	return 1;
       }
 
@@ -559,7 +559,7 @@ main (int argc, char **argv)
 "You can delete the stored password by specifying an empty password.\n\n");
       strcpy (newpwd, getpass (text1));
       if (strcmp (newpwd, getpass (text2)))
-        eprint (0, "Password is not identical.");
+	eprint (0, "Password is not identical.");
       else if (cygwin_internal (CW_SET_PRIV_KEY, newpwd, username))
 	return eprint (0, "Storing password failed: %s", strerror (errno));
       return 0;
@@ -568,7 +568,7 @@ main (int argc, char **argv)
   if (Larg >= 0 || xarg >= 0 || narg >= 0 || iarg >= 0)
     {
       if (optind < argc)
-        usage (stderr, 1);
+	usage (stderr, 1);
       return SetModals (xarg, narg, iarg, Larg, server);
     }
 
@@ -597,31 +597,31 @@ main (int argc, char **argv)
 
       uif.usri1008_flags = ui->usri3_flags;
       if (lopt)
-        {
+	{
 	  if (ui->usri3_priv == USER_PRIV_ADMIN)
 	    return eprint (0, "Locking an admin account is disallowed.");
-          uif.usri1008_flags |= UF_ACCOUNTDISABLE;
-        }
+	  uif.usri1008_flags |= UF_ACCOUNTDISABLE;
+	}
       if (uopt)
-        uif.usri1008_flags &= ~UF_ACCOUNTDISABLE;
+	uif.usri1008_flags &= ~UF_ACCOUNTDISABLE;
       if (copt)
-        uif.usri1008_flags |= UF_PASSWD_CANT_CHANGE;
+	uif.usri1008_flags |= UF_PASSWD_CANT_CHANGE;
       if (Copt)
-        uif.usri1008_flags &= ~UF_PASSWD_CANT_CHANGE;
+	uif.usri1008_flags &= ~UF_PASSWD_CANT_CHANGE;
       if (eopt)
-        uif.usri1008_flags |= UF_DONT_EXPIRE_PASSWD;
+	uif.usri1008_flags |= UF_DONT_EXPIRE_PASSWD;
       if (Eopt)
-        uif.usri1008_flags &= ~UF_DONT_EXPIRE_PASSWD;
+	uif.usri1008_flags &= ~UF_DONT_EXPIRE_PASSWD;
       if (popt)
-        uif.usri1008_flags |= UF_PASSWD_NOTREQD;
+	uif.usri1008_flags |= UF_PASSWD_NOTREQD;
       if (Popt)
-        uif.usri1008_flags &= ~UF_PASSWD_NOTREQD;
+	uif.usri1008_flags &= ~UF_PASSWD_NOTREQD;
 
       if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt)
 	{
-          ret = NetUserSetInfo (server, ui->usri3_name, 1008, (LPBYTE) &uif,
-	  			NULL);
-          return EvalRet (ret, NULL);
+	  ret = NetUserSetInfo (server, ui->usri3_name, 1008, (LPBYTE) &uif,
+				NULL);
+	  return EvalRet (ret, NULL);
 	}
       // Sopt
       PrintPW (ui, server);
@@ -639,18 +639,18 @@ main (int argc, char **argv)
     {
       strcpy (oldpwd, getpass ("Old password: "));
       if (ChangePW (user, oldpwd, oldpwd, 1, server))
-        return 1;
+	return 1;
     }
 
   do
     {
       strcpy (newpwd, getpass ("New password: "));
       if (strcmp (newpwd, getpass ("Re-enter new password: ")))
-        eprint (0, "Password is not identical.");
+	eprint (0, "Password is not identical.");
       else if (! ChangePW (user, *oldpwd ? oldpwd : NULL, newpwd, 0, server))
-        ret = 1;
+	ret = 1;
       if (! ret && cnt < 2)
-        eprint (0, "Try again.");
+	eprint (0, "Try again.");
     }
   while (! ret && ++cnt < 3);
   return ! ret;

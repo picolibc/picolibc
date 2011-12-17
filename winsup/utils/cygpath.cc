@@ -286,7 +286,7 @@ get_device_name (char *path)
 		    {
 		      /* If there's a trailing path, it's a perfectly valid
 			 DOS pathname without the \\.\ prefix.  Unless it's
-			 longer than MAX_PATH - 1 in which case it needs 
+			 longer than MAX_PATH - 1 in which case it needs
 			 the \\?\ prefix. */
 		      if ((len = strlen (ret + 4)) >= MAX_PATH)
 			ret[2] = '?';

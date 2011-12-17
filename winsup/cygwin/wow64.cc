@@ -82,15 +82,15 @@ wow64_test_for_64bit_parent ()
      no simpler way to retrieve the parent process in NT, as far as I know.
      Hints welcome. */
   ret = NtQueryInformationProcess (NtCurrentProcess (),
-                                   ProcessBasicInformation,
-                                   &pbi, sizeof pbi, NULL);
+				   ProcessBasicInformation,
+				   &pbi, sizeof pbi, NULL);
   if (NT_SUCCESS (ret)
       && (parent = OpenProcess (PROCESS_QUERY_INFORMATION,
-                                FALSE,
-                                pbi.InheritedFromUniqueProcessId)))
+				FALSE,
+				pbi.InheritedFromUniqueProcessId)))
     {
       NtQueryInformationProcess (parent, ProcessWow64Information,
-                                 &wow64, sizeof wow64, NULL);
+				 &wow64, sizeof wow64, NULL);
       CloseHandle (parent);
     }
   return !wow64;

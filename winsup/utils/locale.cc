@@ -251,17 +251,17 @@ add_locale_alias_locales ()
       alias_buf[LOCALE_ALIAS_LINE_LEN] = '\0';
       c = strrchr (alias_buf, '\n');
       if (c)
-        *c = '\0';
+	*c = '\0';
       c = alias_buf;
       c += strspn (c, " \t");
       if (!*c || *c == '#')
-        continue;
+	continue;
       alias = c;
       c += strcspn (c, " \t");
       *c++ = '\0';
       c += strspn (c, " \t");
       if (*c == '#')
-        continue;
+	continue;
       replace = c;
       c += strcspn (c, " \t");
       *c++ = '\0';
@@ -524,7 +524,7 @@ print_lc_sepstrings (int key, const char *name, const char *value)
       if (key)
 	fputc ('"', stdout);
       if (value && *value)
-      	fputc (';', stdout);
+	fputc (';', stdout);
     }
   fputc ('\n', stdout);
 }
@@ -693,7 +693,7 @@ print_lc (int cat, int key, const char *category, const char *name,
   for (lc_names_t *lc = lc_name; lc->type != is_end; ++lc)
     if (!name || !strcmp (name, lc->name))
       switch (lc->type)
-      	{
+	{
 	case is_string_fake:
 	  print_lc_svalue (key, lc->name, fake_string[lc->fromval + key]);
 	  break;
@@ -746,14 +746,14 @@ print_names (int cat, int key, const char *name)
   for (c = categories; c->category; ++c)
     if (!strcmp (name, c->category))
       {
-      	print_lc (cat, key, c->category, NULL, c->lc_names);
+	print_lc (cat, key, c->category, NULL, c->lc_names);
 	return;
       }
   for (c = categories; c->category; ++c)
     for (lc = c->lc_names; lc->type != is_end; ++lc)
       if (!strcmp (name, lc->name))
       {
-      	print_lc (cat, key, c->category, lc->name, lc);
+	print_lc (cat, key, c->category, lc->name, lc);
 	return;
       }
 }
@@ -789,31 +789,31 @@ main (int argc, char **argv)
     switch (opt)
       {
       case 'a':
-        all = 1;
+	all = 1;
 	break;
       case 'c':
-        cat = 1;
+	cat = 1;
 	break;
       case 'k':
-        key = 1;
+	key = 1;
 	break;
       case 'm':
 	maps = 1;
 	break;
       case 's':
-      	lcid = GetSystemDefaultUILanguage ();
+	lcid = GetSystemDefaultUILanguage ();
 	break;
       case 'u':
-      	lcid = GetUserDefaultUILanguage ();
+	lcid = GetUserDefaultUILanguage ();
 	break;
       case 'f':
-      	lcid = GetUserDefaultLCID ();
+	lcid = GetUserDefaultLCID ();
 	break;
       case 'n':
-      	lcid = GetSystemDefaultLCID ();
+	lcid = GetSystemDefaultLCID ();
 	break;
       case 'U':
-      	utf = ".UTF-8";
+	utf = ".UTF-8";
 	break;
       case 'v':
 	verbose = 1;

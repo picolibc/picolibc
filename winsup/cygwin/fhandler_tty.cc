@@ -1201,7 +1201,7 @@ fhandler_pty_master::fhandler_pty_master (int unit)
   else if (!setup ())
     {
       dev ().parse (FH_ERROR);
-      return; 
+      return;
     }
   set_name ("/dev/ptmx");
 }
@@ -1302,8 +1302,8 @@ fhandler_pty_master::close ()
   return 0;
 }
 
-/* This is just to catch error conditions.  Since the constructor 
-   ctually opens some handles, and stat() does not open an fd, they need
+/* This is just to catch error conditions.  Since the constructor
+   actually opens some handles, and stat() does not open an fd, they need
    to be closed when the fhandler goes away. */
 fhandler_pty_master::~fhandler_pty_master ()
 {

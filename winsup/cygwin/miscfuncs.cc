@@ -347,10 +347,10 @@ CreatePipeOverlapped (PHANDLE hr, PHANDLE hw, LPSECURITY_ATTRIBUTES sa)
 BOOL WINAPI
 ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len, LPDWORD ret_len,
 		    DWORD timeout)
-{             
+{
   OVERLAPPED ov;
-  BOOL ret;   
-            
+  BOOL ret;
+
   memset (&ov, 0, sizeof ov);
   ov.hEvent = CreateEvent (NULL, TRUE, FALSE, NULL);
   ret = ReadFile (h, buf, len, NULL, &ov);
@@ -359,17 +359,17 @@ ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len, LPDWORD ret_len,
       if (!ret && WaitForSingleObject (ov.hEvent, timeout) != WAIT_OBJECT_0)
 	CancelIo (h);
       ret = GetOverlappedResult (h, &ov, ret_len, FALSE);
-    }     
+    }
   CloseHandle (ov.hEvent);
-  return ret; 
-}             
-            
+  return ret;
+}
+
 BOOL WINAPI
 WritePipeOverlapped (HANDLE h, PCVOID buf, DWORD len, LPDWORD ret_len,
 		     DWORD timeout)
 {
-  OVERLAPPED ov; 
-  BOOL ret; 
+  OVERLAPPED ov;
+  BOOL ret;
 
   memset (&ov, 0, sizeof ov);
   ov.hEvent = CreateEvent (NULL, TRUE, FALSE, NULL);
@@ -379,7 +379,7 @@ WritePipeOverlapped (HANDLE h, PCVOID buf, DWORD len, LPDWORD ret_len,
       if (!ret && WaitForSingleObject (ov.hEvent, timeout) != WAIT_OBJECT_0)
 	CancelIo (h);
       ret = GetOverlappedResult (h, &ov, ret_len, FALSE);
-    }     
+    }
   CloseHandle (ov.hEvent);
   return ret;
 }

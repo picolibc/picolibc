@@ -275,21 +275,21 @@ find_alt_digits (const unsigned char *bp, alt_digits_t *adi, uint *pval)
   return NULL;
 }
 
-static int              
+static int
 is_leap_year (int year)
-{               
+{
   return (year % 4) == 0 && ((year % 100) != 0 || (year % 400) == 0);
-}       
+}
 
-static int      
+static int
 first_day (int year)
-{       
+{
   int ret = 4;
-      
+
   while (--year >= 1970)
     ret = (ret + 365 + is_leap_year (year)) % 7;
-  return ret; 
-}           
+  return ret;
+}
 
 /* This simplifies the calls to conv_num enormously. */
 #define ALT_DIGITS	((alt_format & ALT_O) ? *alt_digits : NULL)

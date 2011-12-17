@@ -44,7 +44,7 @@
 #define _MCOUNT_DECL static __inline__  void _MCOUNT_CALL _mcount
 
 /* FIXME: This works, but it would be cleaner to convert mcount into an
-   assembler stub that calls an extern  _mcount. 
+   assembler stub that calls an extern  _mcount.
    Older versions of GCC (pre-4.1) will still fail with regparm since the
    compiler used %edx to store an unneeded counter variable.  */
 

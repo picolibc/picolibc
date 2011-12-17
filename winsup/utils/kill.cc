@@ -56,14 +56,14 @@ static void
 print_version ()
 {
   printf ("kill (cygwin) %d.%d.%d\n"
-          "Process Signaller\n"
-          "Copyright (C) 1996 - %s Red Hat, Inc.\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "Process Signaller\n"
+	  "Copyright (C) 1996 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 static const char *
@@ -135,7 +135,7 @@ get_debug_priv (void)
   TOKEN_PRIVILEGES tkp;
 
   if (!OpenProcessToken (GetCurrentProcess (),
-  			 TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &tok))
+			 TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &tok))
     return;
 
   if (!LookupPrivilegeValue (NULL, SE_DEBUG_NAME, &luid))
@@ -167,15 +167,15 @@ forcekill (int pid, int sig, int wait)
   HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) dwpid);
   if (!h)
     {
-      if (!wait || GetLastError () != ERROR_INVALID_PARAMETER) 
-        fprintf (stderr, "%s: couldn't open pid %u\n", 
-	         prog_name, (unsigned) dwpid);
+      if (!wait || GetLastError () != ERROR_INVALID_PARAMETER)
+	fprintf (stderr, "%s: couldn't open pid %u\n",
+		 prog_name, (unsigned) dwpid);
       return;
     }
   if (!wait || WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
     if (sig && !TerminateProcess (h, sig << 8)
 	&& WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
-      fprintf (stderr, "%s: couldn't kill pid %u, %lu\n", 
+      fprintf (stderr, "%s: couldn't kill pid %u, %lu\n",
 	       prog_name, (unsigned) dwpid, GetLastError ());
   CloseHandle (h);
 }
@@ -259,8 +259,8 @@ out:
       if (!pid)
 	pid = strtoll (*argv, &p, 10);
       if (*p != '\0'
-          || (!force && (pid < LONG_MIN || pid > LONG_MAX))
-          || (force && (pid <= 0 || pid > ULONG_MAX))) 
+	  || (!force && (pid < LONG_MIN || pid > LONG_MAX))
+	  || (force && (pid <= 0 || pid > ULONG_MAX)))
 	{
 	  fprintf (stderr, "%s: illegal pid: %s\n", prog_name, *argv);
 	  ret = 1;

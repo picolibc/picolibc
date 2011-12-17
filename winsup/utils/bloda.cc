@@ -39,7 +39,7 @@
     Kerio, Agnitum or ZoneAlarm Personal Firewall
     Iolo System Mechanic/AntiVirus/Firewall
     LanDesk
-    Windows Defender 
+    Windows Defender
     Embassy Trust Suite fingerprint reader software containing wxvault.dll
     ByteMobile laptop optimization client
 
@@ -85,7 +85,7 @@ static const struct bad_app_det dodgy_app_detects[] =
   { PROCESSNAME, "LVPrcSrv.exe",                                                 LOGITECH   },
   { FILENAME,    "%programfiles%\\common files\\logitech\\lvmvfm\\LVPrcSrv.exe", LOGITECH   },
   { FILENAME,    "%windir%\\System32\\bmnet.dll",                                BYTEMOBILE },
-}; 
+};
 
 static const size_t num_of_detects = sizeof (dodgy_app_detects) / sizeof (dodgy_app_detects[0]);
 
@@ -146,13 +146,13 @@ find_process_in_list (PSYSTEM_PROCESSES pslist, PUNICODE_STRING psname)
   while (1)
     {
       if (pslist->ProcessName.Length && pslist->ProcessName.Buffer)
-        {
-          dbg_printf (("%S\n", pslist->ProcessName.Buffer));
-          if (!_wcsicmp (pslist->ProcessName.Buffer, psname->Buffer))
-            return true;
-        }
+	{
+	  dbg_printf (("%S\n", pslist->ProcessName.Buffer));
+	  if (!_wcsicmp (pslist->ProcessName.Buffer, psname->Buffer))
+	    return true;
+	}
       if (!pslist->NextEntryDelta)
-        break;
+	break;
       pslist = (PSYSTEM_PROCESSES)(pslist->NextEntryDelta + (char *)pslist);
     };
   return false;
@@ -168,7 +168,7 @@ find_module_in_list (PSYSTEM_MODULE_INFORMATION modlist, const char * const modn
       dbg_printf (("name '%s' offset %d ", &modptr->ImageName[0], modptr->PathLength));
       dbg_printf (("= '%s'\n", &modptr->ImageName[modptr->PathLength]));
       if (!_stricmp (&modptr->ImageName[modptr->PathLength], modname))
-        return true;
+	return true;
       modptr++;
     }
   return false;
@@ -185,45 +185,45 @@ expand_path (const char *path, char *outbuf)
   while ((dst - outbuf) < MAX_PATH)
     {
       if (*path != '%')
-        {
-          if ((*dst++ = *path++) != 0)
-            continue;
-          break;
-        }
+	{
+	  if ((*dst++ = *path++) != 0)
+	    continue;
+	  break;
+	}
       /* Expand an environ var.  */
       end = path + 1;
       while (*end != '%')
-        {
-          /* Watch out for unterminated %  */
-          if (*end++ == 0)
-            {
-              end = NULL;
-              break;
-            }
-        }
+	{
+	  /* Watch out for unterminated %  */
+	  if (*end++ == 0)
+	    {
+	      end = NULL;
+	      break;
+	    }
+	}
       /* If we didn't find the end, can't expand it.  */
       if ((end == NULL) || (end == (path + 1)))
-        {
-          /* Unterminated % so copy verbatim.  */
-          *dst++ = *path++;
-          continue;
-        }
+	{
+	  /* Unterminated % so copy verbatim.  */
+	  *dst++ = *path++;
+	  continue;
+	}
       /* Expand the environment var into the new path.  */
       if ((end - (path + 1)) >= MAX_PATH)
-        return -1;
+	return -1;
       memcpy (envvar, path + 1, end - (path + 1));
       envvar[end - (path + 1)] = 0;
       envval = getenv (envvar);
       /* If not found, copy env var name verbatim.  */
       if (envval == NULL)
-        {
-          *dst++ = *path++;
-          continue;
-        }
+	{
+	  *dst++ = *path++;
+	  continue;
+	}
       /* Check enough room before copying.  */
       len = strlen (envval);
       if ((dst + len - outbuf) >= MAX_PATH)
-        return false;
+	return false;
       memcpy (dst, envval, len);
       dst += len;
       /* And carry on past the end of env var name.  */
@@ -232,7 +232,7 @@ expand_path (const char *path, char *outbuf)
   return (dst - outbuf) < MAX_PATH;
 }
 
-static bool 
+static bool
 detect_dodgy_app (const struct bad_app_det *det, PSYSTEM_PROCESSES pslist, PSYSTEM_MODULE_INFORMATION modlist)
 {
   HANDLE fh;
@@ -248,39 +248,39 @@ detect_dodgy_app (const struct bad_app_det *det, PSYSTEM_PROCESSES pslist, PSYST
     case HKLMKEY:
       dbg_printf (("Detect reg key hklm '%s'... ", det->param));
       if (RegOpenKeyEx (HKEY_LOCAL_MACHINE, det->param, 0, STANDARD_RIGHTS_READ, &hk) == ERROR_SUCCESS)
-        {
-          RegCloseKey (hk);
-          dbg_printf (("found!\n"));
-          return true;
-        }
+	{
+	  RegCloseKey (hk);
+	  dbg_printf (("found!\n"));
+	  return true;
+	}
       break;
 
     case HKCUKEY:
       dbg_printf (("Detect reg key hkcu '%s'... ", det->param));
       if (RegOpenKeyEx (HKEY_CURRENT_USER, det->param, 0, STANDARD_RIGHTS_READ, &hk) == ERROR_SUCCESS)
-        {
-          RegCloseKey (hk);
-          dbg_printf (("found!\n"));
-          return true;
-        }
+	{
+	  RegCloseKey (hk);
+	  dbg_printf (("found!\n"));
+	  return true;
+	}
       break;
 
     case FILENAME:
       dbg_printf (("Detect filename '%s'... ", det->param));
       if (!expand_path (det->param, expandedname))
-        {
-          printf ("Expansion failure!\n");
-          break;
-        }
+	{
+	  printf ("Expansion failure!\n");
+	  break;
+	}
       dbg_printf (("('%s' after expansion)... ", expandedname));
       fh = CreateFile (expandedname, 0, FILE_SHARE_READ | FILE_SHARE_WRITE
-        | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
+	| FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
       if (fh != INVALID_HANDLE_VALUE)
-        {
-          CloseHandle (fh);
-          dbg_printf (("found!\n"));
-          return true;
-        }
+	{
+	  CloseHandle (fh);
+	  dbg_printf (("found!\n"));
+	  return true;
+	}
       break;
 
     case PROCESSNAME:
@@ -290,26 +290,26 @@ detect_dodgy_app (const struct bad_app_det *det, PSYSTEM_PROCESSES pslist, PSYST
       ansiname.Buffer = (CHAR *) det->param;
       rv = RtlAnsiStringToUnicodeString (&unicodename, &ansiname, TRUE);
       if (rv != STATUS_SUCCESS)
-        {
-          printf ("Ansi to unicode conversion failure $%08x\n", (unsigned int) rv);
-          break;
-        }
+	{
+	  printf ("Ansi to unicode conversion failure $%08x\n", (unsigned int) rv);
+	  break;
+	}
       found = find_process_in_list (pslist, &unicodename);
       RtlFreeUnicodeString (&unicodename);
       if (found)
-        {
-          dbg_printf (("found!\n"));
-          return true;
-        }
+	{
+	  dbg_printf (("found!\n"));
+	  return true;
+	}
       break;
 
     case HOOKDLLNAME:
       dbg_printf (("Detect hookdll '%s'... ", det->param));
       if (find_module_in_list (modlist, det->param))
-        {
-          dbg_printf (("found!\n"));
-          return true;
-        }
+	{
+	  dbg_printf (("found!\n"));
+	  return true;
+	}
       break;
 
     }
@@ -324,7 +324,7 @@ find_dodgy_app_info (enum bad_app which_app)
   for (i = 0; i < num_of_dodgy_apps; i++)
     {
       if (big_list_of_dodgy_apps[i].app_id == which_app)
-        return &big_list_of_dodgy_apps[i];
+	return &big_list_of_dodgy_apps[i];
     }
   return NULL;
 }
@@ -357,50 +357,50 @@ dump_dodgy_apps (int verbose)
       /* Not found would mean we coded the lists bad. */
       assert (found);
       if (detected)
-        {
-          ++n_det;
-          found->found_it |= (1 << det->type);
-        }
+	{
+	  ++n_det;
+	  found->found_it |= (1 << det->type);
+	}
     }
   if (n_det)
     {
       printf ("\nPotential app conflicts:\n\n");
       for (i = 0; i < num_of_dodgy_apps; i++)
-        {
-          if (big_list_of_dodgy_apps[i].found_it)
-            {
-              printf ("%s%s", big_list_of_dodgy_apps[i].details, 
-                verbose ? "\nDetected: " : ".\n");
-              if (!verbose)
-                continue;
-              const char *sep = "";
-              if (big_list_of_dodgy_apps[i].found_it & (1 << HKLMKEY))
-                {
-                  printf ("HKLM Registry Key");
-                  sep = ", ";
-                }
-              if (big_list_of_dodgy_apps[i].found_it & (1 << HKCUKEY))
-                {
-                  printf ("%sHKCU Registry Key", sep);
-                  sep = ", ";
-                }
-              if (big_list_of_dodgy_apps[i].found_it & (1 << FILENAME))
-                {
-                  printf ("%sNamed file", sep);
-                  sep = ", ";
-                }
-              if (big_list_of_dodgy_apps[i].found_it & (1 << PROCESSNAME))
-                {
-                  printf ("%sNamed process", sep);
-                  sep = ", ";
-                }
-              if (big_list_of_dodgy_apps[i].found_it & (1 << HOOKDLLNAME))
-                {
-                  printf ("%sLoaded hook DLL", sep);
-                }
-              printf (".\n\n");
-            }
-        }
+	{
+	  if (big_list_of_dodgy_apps[i].found_it)
+	    {
+	      printf ("%s%s", big_list_of_dodgy_apps[i].details,
+		verbose ? "\nDetected: " : ".\n");
+	      if (!verbose)
+		continue;
+	      const char *sep = "";
+	      if (big_list_of_dodgy_apps[i].found_it & (1 << HKLMKEY))
+		{
+		  printf ("HKLM Registry Key");
+		  sep = ", ";
+		}
+	      if (big_list_of_dodgy_apps[i].found_it & (1 << HKCUKEY))
+		{
+		  printf ("%sHKCU Registry Key", sep);
+		  sep = ", ";
+		}
+	      if (big_list_of_dodgy_apps[i].found_it & (1 << FILENAME))
+		{
+		  printf ("%sNamed file", sep);
+		  sep = ", ";
+		}
+	      if (big_list_of_dodgy_apps[i].found_it & (1 << PROCESSNAME))
+		{
+		  printf ("%sNamed process", sep);
+		  sep = ", ";
+		}
+	      if (big_list_of_dodgy_apps[i].found_it & (1 << HOOKDLLNAME))
+		{
+		  printf ("%sLoaded hook DLL", sep);
+		}
+	      printf (".\n\n");
+	    }
+	}
     }
   /* Tidy up allocations.  */
   free (pslist);

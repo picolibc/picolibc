@@ -140,7 +140,7 @@ dup2 (int oldfd, int newfd)
       res = (cfd >= 0) ? oldfd : -1;
     }
   else
-    res = cygheap->fdtab.dup3 (oldfd, newfd, 0); 
+    res = cygheap->fdtab.dup3 (oldfd, newfd, 0);
 
   syscall_printf ("%R = dup2(%d, %d)", res, oldfd, newfd);
   return res;
@@ -645,7 +645,7 @@ unlink_nt (path_conv &pc)
      bin so that it actually disappears from its directory even though its
      in use.  Otherwise, if opening doesn't fail, the file is not in use and
      we can go straight to setting the delete disposition flag.
-     
+
      NOTE: The missing sharing modes FILE_SHARE_READ and FILE_SHARE_WRITE do
 	   NOT result in a STATUS_SHARING_VIOLATION, if another handle is
 	   opened for reading/writing metadata only.  In other words, if
@@ -760,7 +760,7 @@ try_again:
 	  if (NT_SUCCESS (status2) && reopened < 20)
 	    {
 	      /* Workaround rm -r problem:
-	      
+
 		 Sometimes a deleted directory lingers in its parent dir
 		 after the deleting handle has already been closed.  This
 		 can break deleting the parent dir.  See the comment in
@@ -770,7 +770,7 @@ try_again:
 		 STATUS_SUCCESS, the dir is either empty, or only inhabited
 		 by already deleted entries.  If so, we try to move the dir
 		 into the bin.  This usually works.
-		 
+
 		 However, if we're on a filesystem which doesn't support
 		 the try_to_bin method, or if moving to the bin doesn't work
 		 for some reason, just try to delete the directory again,

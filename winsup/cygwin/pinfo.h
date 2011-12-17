@@ -159,7 +159,7 @@ public:
 		     waiter_ready (false), wait_thread (NULL) {}
   pinfo (pid_t n, DWORD flag = 0): pinfo_minimal (), destroy (false),
 				   procinfo (NULL), waiter_ready (false),
-				   wait_thread (NULL) 
+				   wait_thread (NULL)
   {
     init (n, flag, NULL);
   }

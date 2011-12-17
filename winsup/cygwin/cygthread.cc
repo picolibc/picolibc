@@ -140,7 +140,6 @@ cygthread::simplestub (VOID *arg)
   info->callfunc (true);
   if (notify)
      SetEvent (notify);
-    
   return 0;
 }
 

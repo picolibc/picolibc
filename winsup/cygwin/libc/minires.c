@@ -451,11 +451,11 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
       return ((os_query_t *) statp->os_query)(statp, DomName, Class, Type, AnsPtr, AnsLength);
     }
     else {
-      /* dn_expand sets errno */ 
+      /* dn_expand sets errno */
       statp->res_h_errno = NETDB_INTERNAL;
       return -1;
     }
-  }	  
+  }
 
   /* Close the socket if it had been opened before a fork.
      Reuse of pid's cannot hurt */
@@ -488,7 +488,7 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
        This routine runs through the retry loop for each incorrect answer.
        It is thus extremely likely that such attacks will cause a TRY_AGAIN return,
        probably causing the calling program to retry after a delay.
-       
+
        Note that valid late or duplicate answers to a previous questions also cause
        a retry, although this is minimized by flushing the socket before sending the
        new question.
@@ -498,8 +498,8 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
     while ((rslt = cygwin_recvfrom( statp->sockfd, AnsPtr, AnsLength, 0, NULL, NULL)) >= 0) {
       DPRINTF(debug, "Flushed %d bytes\n", rslt);
     }
-    DPRINTF(debug && (errno != EWOULDBLOCK), 
-	    "Unexpected errno for flushing recvfrom: %s", strerror(errno)); 
+    DPRINTF(debug && (errno != EWOULDBLOCK),
+	    "Unexpected errno for flushing recvfrom: %s", strerror(errno));
 
     /* Send the message */
     rslt = cygwin_sendto(statp->sockfd, MsgPtr, MsgLength, 0,
@@ -540,8 +540,8 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
       return -1;
     }
     DPRINTF(debug, "recvfrom: %d bytes from %08x\n", rslt, dnsSockAddr.sin_addr.s_addr);
-    /* 
-       Prepare to retry with tcp 
+    /*
+       Prepare to retry with tcp
     */
     for (tcp = 0; tcp < 2; tcp++) {
       /* Check if this is the expected message from the expected server */
@@ -561,11 +561,11 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
 		  && (rslt >= MsgLength)
 		  && (memcmp(MsgPtr + HFIXEDSZ, AnsPtr + HFIXEDSZ, MsgLength - HFIXEDSZ) == 0)))) {
 	if ((AnsPtr[3] & ERR_MASK) == NOERROR) {
-	  if ((AnsPtr[2] & TC) && (tcp == 0) && !(statp->options & RES_IGNTC)) { 
+	  if ((AnsPtr[2] & TC) && (tcp == 0) && !(statp->options & RES_IGNTC)) {
 	    /* Truncated. Try TCP */
 	    rslt = get_tcp(&statp->nsaddr_list[wServ], MsgPtr, MsgLength,
 			   AnsPtr, AnsLength, statp->options & RES_DEBUG);
-	    continue /* Tcp loop */; 
+	    continue /* Tcp loop */;
 	  }
 	  else if ((AnsPtr[6] | AnsPtr[7])!= 0)
 	    return rslt;
@@ -588,7 +588,7 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
 	  case FORMERR:
 	    statp->res_h_errno = HOST_NOT_FOUND;
 	    break;
-	  case SERVFAIL: 
+	  case SERVFAIL:
 	    statp->res_h_errno = TRY_AGAIN;
 	    break;
 	  default:
@@ -644,7 +644,7 @@ int res_nmkquery (res_state statp,
 
     /* Fill the header */
     PUTSHORT(statp->id, buf);
-    PUTSHORT(RD, buf); 
+    PUTSHORT(RD, buf);
     PUTSHORT(1, buf); /* Number of questions */
     for (i = 0; i < 3; i++)
       PUTSHORT(0, buf); /* Number of answers */
@@ -655,14 +655,14 @@ int res_nmkquery (res_state statp,
     PUTSHORT(qclass, buf);
 
     /* Update id. The current query adds entropy to the next query id */
-    for (id4 = qtype, i = 0, ptr = dnameptr; *ptr; ptr++, i += 3) 
+    for (id4 = qtype, i = 0, ptr = dnameptr; *ptr; ptr++, i += 3)
       id4 ^= *ptr << (i & 0xF);
     i = 1 + statp->id % 15; /* Between 1 and 16 */
     /* id dependent rotation, also brings MSW to LSW */
     id4 = (id4 << i) ^ (id4 >> (16 - i)) ^ (id4 >> (32 - i));
     if ((short) id4)
       statp->id ^= (short) id4;
-    else 
+    else
       statp->id++; /* Force change */
 
     return len + (HFIXEDSZ + QFIXEDSZ); /* packet size */

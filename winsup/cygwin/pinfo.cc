@@ -386,7 +386,7 @@ pinfo::set_acl()
 
 pinfo::pinfo (HANDLE parent, pinfo_minimal& from, pid_t pid):
   pinfo_minimal (), destroy (false), procinfo (NULL), waiter_ready (false),
-  wait_thread (NULL) 
+  wait_thread (NULL)
 {
   HANDLE herr;
   const char *duperr = NULL;

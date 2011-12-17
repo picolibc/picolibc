@@ -1,5 +1,5 @@
 /* wide_path.h  -- Define class wide_path to convert multibyte win32 path
-                   to wchar_t Win32 path including long path prefix if
+		   to wchar_t Win32 path including long path prefix if
 		   necessary.
 
    Copyright 2009 Red Hat, Inc.

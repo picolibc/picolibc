@@ -66,24 +66,24 @@ main (int argc, char **argv)
     {
       char *result = cygpath (t.posix, NULL);
       bool pass = (strcmp (result, t.win32) == 0);
-      
+
       if (pass)
-        {
-          numpass++;
-          printf ("test %03d: PASS cwd=%-18s input=%-22s expected+actual=%s\n",
-                  curtest, t.cwd, t.posix, result);
-        }
+	{
+	  numpass++;
+	  printf ("test %03d: PASS cwd=%-18s input=%-22s expected+actual=%s\n",
+		  curtest, t.cwd, t.posix, result);
+	}
       else
-        {
-          printf ("test %03d: FAIL cwd=%-18s input=%-29s expected=%-25s actual=%s\n",
-                  curtest, t.cwd, t.posix, t.win32, result);
-        }
+	{
+	  printf ("test %03d: FAIL cwd=%-18s input=%-29s expected=%-25s actual=%s\n",
+		  curtest, t.cwd, t.posix, t.win32, result);
+	}
     }
   printf ("\n"
-          "total tests: %d\n"
-          "pass       : %d (%.1f%%)\n"
-          "fail       : %d (%.1f%%)\n",
-          curtest, numpass, ((float)numpass)/curtest * 100.0F, curtest - numpass,
-          ((float)curtest - numpass)/curtest * 100.0F);
+	  "total tests: %d\n"
+	  "pass       : %d (%.1f%%)\n"
+	  "fail       : %d (%.1f%%)\n",
+	  curtest, numpass, ((float)numpass)/curtest * 100.0F, curtest - numpass,
+	  ((float)curtest - numpass)/curtest * 100.0F);
   return (numpass < curtest ? 1 : 0);
 }

@@ -179,14 +179,14 @@ static void
 print_version ()
 {
   printf ("regtool (cygwin) %d.%d.%d\n"
-          "Registry tool\n"
-          "Copyright (C) 2000 - %s Red Hat, Inc.\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "Registry tool\n"
+	  "Copyright (C) 2000 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 void
@@ -420,18 +420,18 @@ find_key (int howmanyparts, REGSAM access, int option = 0)
 	      if (RegCreateKeyExW (base, name, 0, NULL, option, access | wow64,
 				  NULL, &key2, NULL)
 		  == ERROR_SUCCESS)
-	        {
+		{
 		  if (rv == ERROR_SUCCESS)
 		    RegCloseKey (key);
 		  key = key2;
 		  rv = ERROR_SUCCESS;
-	        }
+		}
 	    }
 	  if (rv != ERROR_SUCCESS)
 	    Fail (rv);
 	}
       else if (argv[1])
-	{ 
+	{
 	  ssize_t len = cygwin_conv_path (CCP_POSIX_TO_WIN_W, argv[1], NULL, 0);
 	  wchar_t win32_path[len];
 	  cygwin_conv_path (CCP_POSIX_TO_WIN_W, argv[1], win32_path, len);
@@ -442,7 +442,7 @@ find_key (int howmanyparts, REGSAM access, int option = 0)
 	    printf ("key %ls loaded from file %ls\n", name, win32_path);
 	}
       else
-	{ 
+	{
 	  rv = RegUnLoadKeyW (base, name);
 	  if (rv != ERROR_SUCCESS)
 	    Fail (rv);
@@ -587,7 +587,7 @@ cmd_remove ()
     {
       HMODULE mod = LoadLibrary ("advapi32.dll");
       if (mod)
-        regDeleteKeyEx = (WINADVAPI LONG WINAPI (*)(HKEY, LPCWSTR, REGSAM, DWORD)) GetProcAddress (mod, "RegDeleteKeyExW");
+	regDeleteKeyEx = (WINADVAPI LONG WINAPI (*)(HKEY, LPCWSTR, REGSAM, DWORD)) GetProcAddress (mod, "RegDeleteKeyExW");
     }
   if (regDeleteKeyEx)
     rv = (*regDeleteKeyEx) (key, value, wow64, 0);
@@ -639,7 +639,7 @@ cmd_set ()
     case REG_NONE:
     case REG_BINARY:
       for (n = 0; argv[n+1]; n++)
-        ;
+	;
       if (n == 1 && strcmp (argv[1], "-") == 0)
 	{ /* read from stdin */
 	  i = n = 0;
@@ -720,7 +720,7 @@ cmd_set ()
       rv = ERROR_INVALID_CATEGORY;
       break;
     }
- 
+
   if (data)
     free(data);
 

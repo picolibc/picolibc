@@ -199,24 +199,24 @@ readlink (HANDLE fh, char *path, int maxlen)
       || !ReadFile (fh, buf, fi.nFileSizeLow, &rv, NULL)
       || rv != fi.nFileSizeLow)
     return false;
-  
+
   if (fi.nFileSizeLow > sizeof (file_header)
       && cmp_shortcut_header (file_header))
     {
       cp = buf + sizeof (win_shortcut_hdr);
       if (file_header->flags & WSH_FLAG_IDLIST) /* Skip ITEMIDLIST */
-        cp += *(unsigned short *) cp + 2;
+	cp += *(unsigned short *) cp + 2;
       if (!(len = *(unsigned short *) cp))
-        return false;
+	return false;
       cp += 2;
       /* Has appended full path?  If so, use it instead of description. */
       unsigned short relpath_len = *(unsigned short *) (cp + len);
       if (cp + len + 2 + relpath_len < buf + fi.nFileSizeLow)
-        {
-          cp += len + 2 + relpath_len;
-          len = *(unsigned short *) cp;
-          cp += 2;
-        }
+	{
+	  cp += len + 2 + relpath_len;
+	  len = *(unsigned short *) cp;
+	  cp += 2;
+	}
       if (*(PWCHAR) cp == 0xfeff)	/* BOM */
 	{
 	  len = wcstombs (NULL, (wchar_t *) (cp + 2), 0);
@@ -225,14 +225,14 @@ readlink (HANDLE fh, char *path, int maxlen)
 	  wcstombs (path, (wchar_t *) (cp + 2), len + 1);
 	}
       else if (len + 1 > maxlen)
-        return false;
+	return false;
       else
 	memcpy (path, cp, len);
       path[len] = '\0';
       return true;
     }
   else if (strncmp (buf, SYMLINK_COOKIE, strlen (SYMLINK_COOKIE)) == 0
-           && buf[fi.nFileSizeLow - 1] == '\0')
+	   && buf[fi.nFileSizeLow - 1] == '\0')
     {
       cp = buf + strlen (SYMLINK_COOKIE);
       if (*(PWCHAR) cp == 0xfeff)	/* BOM */
@@ -247,7 +247,7 @@ readlink (HANDLE fh, char *path, int maxlen)
       else
 	strcpy (path, cp);
       return true;
-    }      
+    }
   else
     return false;
 }
@@ -333,21 +333,21 @@ read_flags (char *options, unsigned &flags)
     {
       char *p = strchr (options, ',');
       if (p)
-        *p++ = '\0';
+	*p++ = '\0';
       else
-        p = strchr (options, '\0');
+	p = strchr (options, '\0');
 
       for (opt *o = oopts;
-           o < (oopts + (sizeof (oopts) / sizeof (oopts[0])));
-           o++)
-        if (strcmp (options, o->name) == 0)
-          {
-            if (o->clear)
-              flags &= ~o->val;
-            else
-              flags |= o->val;
-            goto gotit;
-          }
+	   o < (oopts + (sizeof (oopts) / sizeof (oopts[0])));
+	   o++)
+	if (strcmp (options, o->name) == 0)
+	  {
+	    if (o->clear)
+	      flags &= ~o->val;
+	    else
+	      flags |= o->val;
+	    goto gotit;
+	  }
       return false;
 
     gotit:
@@ -405,7 +405,7 @@ from_fstab_line (mnt_t *m, char *line, bool user)
 	  {
 	    if ((mount_flags & MOUNT_SYSTEM) || !(sm->flags & MOUNT_SYSTEM))
 	      {
-	      	if (sm->posix)
+		if (sm->posix)
 		  free (sm->posix);
 		sm->posix = strdup (posix_path);
 		sm->flags = mount_flags | MOUNT_CYGDRIVE;
@@ -428,7 +428,7 @@ from_fstab_line (mnt_t *m, char *line, bool user)
 	      continue;
 	    /* Changing immutable mount points require the override flag. */
 	    if ((sm->flags & MOUNT_IMMUTABLE)
-	    	&& !(mount_flags & MOUNT_OVERRIDE))
+		&& !(mount_flags & MOUNT_OVERRIDE))
 	      return false;
 	    if (mount_flags & MOUNT_OVERRIDE)
 	      mount_flags |= MOUNT_IMMUTABLE;
@@ -475,9 +475,9 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
       unconvert_slashes (buf);
       char *native_path = buf;
       if (!strncmp (native_path, "\\\\?\\", 4))
-        native_path += 4;
+	native_path += 4;
       if (!strncmp (native_path, "UNC\\", 4))
-        *(native_path += 2) = '\\';
+	*(native_path += 2) = '\\';
       m->posix = strdup ("/");
       m->native = strdup (native_path);
       m->flags = MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_IMMUTABLE
@@ -496,8 +496,8 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
       m->flags = MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC;
       ++m;
       /* Create a default cygdrive entry.  Note that this is a user entry.
-         This allows to override it with mount, unless the sysadmin created
-         a cygdrive entry in /etc/fstab. */
+	 This allows to override it with mount, unless the sysadmin created
+	 a cygdrive entry in /etc/fstab. */
       m->posix = strdup (CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX);
       m->native = strdup ("cygdrive prefix");
       m->flags = MOUNT_BINARY | MOUNT_CYGDRIVE;
@@ -509,14 +509,14 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
   if (user)
     mbstowcs (wcscpy (u, L".d\\") + 3, get_user (), BUFSIZE - (u - path));
   HANDLE h = CreateFileW (path, GENERIC_READ, FILE_SHARE_READ, NULL,
-                          OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+			  OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
   if (h == INVALID_HANDLE_VALUE)
     return;
   char *got = buf;
   DWORD len = 0;
   /* Using BUFSIZE-1 leaves space to append two \0. */
   while (ReadFile (h, got, BUFSIZE - 1 - (got - buf),
-                   &len, NULL))
+		   &len, NULL))
     {
       char *end;
 
@@ -527,17 +527,17 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
       /* Reset got to start reading at the start of the buffer again. */
       got = buf;
       while (got < buf + len && (end = strchr (got, '\n')))
-        {
-          end[end[-1] == '\r' ? -1 : 0] = '\0';
-          if (from_fstab_line (m, got, user))
-            ++m;
-          got = end + 1;
-        }
+	{
+	  end[end[-1] == '\r' ? -1 : 0] = '\0';
+	  if (from_fstab_line (m, got, user))
+	    ++m;
+	  got = end + 1;
+	}
       if (len < BUFSIZE - 1)
-        break;
+	break;
       /* We have to read once more.  Move remaining bytes to the start of
-         the buffer and reposition got so that it points to the end of
-         the remaining bytes. */
+	 the buffer and reposition got so that it points to the end of
+	 the remaining bytes. */
       len = buf + len - got;
       memmove (buf, got, len);
       got = buf + len;
@@ -559,7 +559,7 @@ mnt_sort (const void *a, const void *b)
   const mnt_t *ma = (const mnt_t *) a;
   const mnt_t *mb = (const mnt_t *) b;
   int ret;
-  
+
   ret = (ma->flags & MOUNT_CYGDRIVE) - (mb->flags & MOUNT_CYGDRIVE);
   if (ret)
     return ret;
@@ -768,7 +768,7 @@ rel_vconcat (const char *cwd, const char *s, va_list v)
   if (!cwd || *cwd == '\0')
     {
       if (!GetCurrentDirectory (MAX_PATH, pathbuf))
-        return NULL;
+	return NULL;
       cwd = pathbuf;
     }
 
@@ -878,9 +878,9 @@ char *
 cygpath (const char *s, ...)
 {
   va_list v;
-  
+
   va_start (v, s);
-  
+
   return vcygpath (NULL, s, v);
 }
 

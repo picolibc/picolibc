@@ -302,7 +302,7 @@ static const unsigned char conv_start_chars[256] =
     WC,       0,        0,        0,        WC,       0,        0,        0,
     /* 112 */
 /*  p         q         r         s         t         u         v         w */
-    WC,       0,        0,        0,        WC,       0,        0,        0, 
+    WC,       0,        0,        0,        WC,       0,        0,        0,
   };
 
 static inline char

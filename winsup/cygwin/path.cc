@@ -3489,7 +3489,7 @@ copy_cwd_str (PUNICODE_STRING tgt, PUNICODE_STRING src)
    an afterthought now.  The actual CWD storage is a FAST_CWD structure
    which is allocated on the process heap.  The new method only requires
    minimal locking and it's much more multi-thread friendly.  Presumably
-   it minimizes contention when accessing the CWD. 
+   it minimizes contention when accessing the CWD.
    The class fcwd_access_t is supposed to encapsulate the gory implementation
    details depending on OS version from the calling functions. */
 class fcwd_access_t {
@@ -3640,13 +3640,13 @@ public:
 	{
 	case FCWD_OLD:
 	default:
-	  f_cwd = (fcwd_access_t *) 
+	  f_cwd = (fcwd_access_t *)
 	    ((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_OLD, Buffer));
 	case FCWD_W7:
-	  f_cwd = (fcwd_access_t *) 
+	  f_cwd = (fcwd_access_t *)
 	    ((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_7, Buffer));
 	case FCWD_W8:
-	  f_cwd = (fcwd_access_t *) 
+	  f_cwd = (fcwd_access_t *)
 	    ((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_8, Buffer));
 	}
       f_cwd->DirectoryHandle () = dir;
@@ -3654,7 +3654,7 @@ public:
   static void SetVersionFromPointer (PBYTE buf_p, bool is_buffer)
     {
       /* Given a pointer to the FAST_CWD structure (is_buffer == false) or a
-         pointer to the Buffer within (is_buffer == true), this function
+	 pointer to the Buffer within (is_buffer == true), this function
 	 computes the FAST_CWD version by checking that Path.MaximumLength
 	 equals MAX_PATH, and that Path.Buffer == Buffer. */
       if (is_buffer)
@@ -3769,7 +3769,7 @@ find_fast_cwd ()
       /* If we couldn't fetch fast_cwd_ptr, or if fast_cwd_ptr is NULL(*)
 	 we have to figure out the version from the Buffer pointer in the
 	 ProcessParameters.
-	 
+
 	 (*) This is very unlikely to happen when starting the first
 	 Cygwin process, since it only happens when starting the
 	 process in a directory which can't be used as CWD by Win32, or

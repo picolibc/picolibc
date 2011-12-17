@@ -1406,7 +1406,7 @@ __set_charset_from_locale (const char *locale, char *charset)
    which is part of the gettext package, and if it finds the locale alias
    in that file, it replaces the locale with the correct locale string from
    that file.
- 
+
    If successful, it returns a pointer to new_locale, NULL otherwise.*/
 extern "C" char *
 __set_locale_from_locale_alias (const char *locale, char *new_locale)

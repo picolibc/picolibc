@@ -511,7 +511,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
      we only do this on affected systems.  If we recognize a non-inheritable
      socket we switch to inheritance/dup via WSADuplicateSocket/WSASocket for
      that socket.
- 
+
      Starting with Vista there's another neat way to workaround these annoying
      LSP sockets.  WSAIoctl allows to fetch the underlying base socket, which
      is a normal, inheritable IFS handle.  So we fetch the base socket,

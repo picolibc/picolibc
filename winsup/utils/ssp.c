@@ -662,7 +662,7 @@ usage (FILE * stream)
   " -h, --help           output usage information and exit\n"
   " -l, --dll            enable dll profiling.  A chart of relative DLL usage\n"
   "                      is produced after the run.\n"
-  " -s, --sub-threads    trace sub-threads too.  Dangerous if you have\n" 
+  " -s, --sub-threads    trace sub-threads too.  Dangerous if you have\n"
   "                      race conditions.\n"
   " -t, --trace-eip      trace every EIP value to a file TRACE.SSP.  This\n"
   "                      gets big *fast*.\n"
@@ -813,14 +813,14 @@ static void
 print_version ()
 {
   printf ("ssp (cygwin) %d.%d.%d\n"
-          "Single-Step Profiler\n"
-          "Copyright (C) 2000 - %s Red Hat, Inc.\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "Single-Step Profiler\n"
+	  "Copyright (C) 2000 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 int
@@ -838,48 +838,48 @@ main (int argc, char **argv)
     switch (c)
     {
       case 'c':
-        printf ("tracing *all* $eip to the console\n");
-        trace_console = 1;
-        break;
+	printf ("tracing *all* $eip to the console\n");
+	trace_console = 1;
+	break;
       case 'd':
-        printf ("stepping disabled; enable via OutputDebugString (\"ssp on\")\n");
-        stepping_enabled = 0;
-        break;
+	printf ("stepping disabled; enable via OutputDebugString (\"ssp on\")\n");
+	stepping_enabled = 0;
+	break;
       case 'e':
-        printf ("stepping enabled; disable via OutputDebugString (\"ssp off\")\n");
-        stepping_enabled = 1;
-        break;
+	printf ("stepping enabled; disable via OutputDebugString (\"ssp off\")\n");
+	stepping_enabled = 1;
+	break;
       case 'h':
-        usage (stdout);
-        break;
+	usage (stdout);
+	break;
       case 'l':
-        printf ("profiling dll usage\n");
-        dll_counts = 1;
-        break;
+	printf ("profiling dll usage\n");
+	dll_counts = 1;
+	break;
       case 's':
-        printf ("tracing all sub-threads too, not just the main one\n");
-        trace_all_threads = 1;
-        break;
+	printf ("tracing all sub-threads too, not just the main one\n");
+	trace_all_threads = 1;
+	break;
       case 't':
-        printf ("tracing all $eip to trace.ssp\n");
-        tracing_enabled = 1;
-        break;
+	printf ("tracing all $eip to trace.ssp\n");
+	tracing_enabled = 1;
+	break;
       case 'v':
-        printf ("verbose messages enabled\n");
-        verbose = 1;
-        break;
+	printf ("verbose messages enabled\n");
+	verbose = 1;
+	break;
       case 'V':
-        print_version ();
-        exit (0);
-      default:  
-        fprintf (stderr, "Try `%s --help' for more information.\n", prog_name);
+	print_version ();
+	exit (0);
+      default:
+	fprintf (stderr, "Try `%s --help' for more information.\n", prog_name);
 	exit (1);
     }
 
   if ( (argc - optind) < 3 )
     usage (stderr);
-  sscanf (argv[optind++], "%i", &low_pc); 
-  sscanf (argv[optind++], "%i", &high_pc); 
+  sscanf (argv[optind++], "%i", &low_pc);
+  sscanf (argv[optind++], "%i", &high_pc);
 
   if (low_pc > high_pc-8)
     {

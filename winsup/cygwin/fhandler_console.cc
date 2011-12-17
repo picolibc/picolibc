@@ -136,7 +136,7 @@ fhandler_console::set_unit ()
   if (shared_console_info)
     {
       fh_devices this_unit = dev ();
-      fh_devices shared_unit = 
+      fh_devices shared_unit =
 	(fh_devices) shared_console_info->tty_min_state.getntty ();
       created = false;
       devset = (shared_unit == this_unit || this_unit == FH_CONSOLE

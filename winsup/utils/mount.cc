@@ -240,14 +240,14 @@ static void
 print_version ()
 {
   printf ("mount (cygwin) %d.%d.%d\n"
-          "Mount filesystem utility\n"
-          "Copyright (C) 1996 - %s Red Hat, Inc.\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "Mount filesystem utility\n"
+	  "Copyright (C) 1996 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 static char *
@@ -366,7 +366,7 @@ main (int argc, char **argv)
       break;
     case saw_mount_all:
       if (optind <= argc)
-      	usage ();
+	usage ();
       do_mount_from_fstab (NULL);
       break;
     default:
@@ -436,7 +436,7 @@ mount_entries (void)
     {
       char *noumount;
       if ((noumount = strstr (p->mnt_opts, ",noumount")))
-      	{
+	{
 	  char dirname[NT_MAX_PATH];
 	  char opts[strlen (p->mnt_opts) + 1];
 
@@ -456,7 +456,7 @@ mount_entries (void)
 	}
     }
   endmntent (m);
-      
+
   exit(0);
 }
 

@@ -49,7 +49,7 @@ _load_sys_library (const wchar_t *dll)
 
   if (wcscmp (dll, L"cygwin1.dll") == 0)
     return LoadLibraryExW (L"cygwin1.dll", NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-    
+
   wcscpy (dllpath, sysdir);
   wcscpy (dllpath + sysdir_len, dll);
   return LoadLibraryExW (dllpath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);

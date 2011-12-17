@@ -1028,7 +1028,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	}
 
       /* Wait for the blocking object and, for POSIX locks, its holding process.
-         Unfortunately, since BSD flock locks are not attached to a specific
+	 Unfortunately, since BSD flock locks are not attached to a specific
 	 process, we can't recognize an abandoned lock by sync'ing with the
 	 creator process.  We have to make sure the event object is in a
 	 signalled state, or that it has gone away.  The latter we can only

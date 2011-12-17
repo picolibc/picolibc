@@ -102,7 +102,7 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
       clock_gettime (clk_id, &tp);
       /* Check for immediate timeout */
       if (tp.tv_sec > rqtp->tv_sec
-          || (tp.tv_sec == rqtp->tv_sec && tp.tv_nsec > rqtp->tv_nsec))
+	  || (tp.tv_sec == rqtp->tv_sec && tp.tv_nsec > rqtp->tv_nsec))
 	return 0;
 
       if (clk_id == CLOCK_REALTIME)

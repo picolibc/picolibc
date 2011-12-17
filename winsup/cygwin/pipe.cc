@@ -404,7 +404,7 @@ pipe_worker (int filedes[2], unsigned int psize, int mode)
       fdout = fhs[1];
       filedes[0] = fdin;
       filedes[1] = fdout;
-    } 
+    }
   return res;
 }
 

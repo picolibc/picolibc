@@ -128,7 +128,7 @@ typedef struct _fexcept_t
 extern const fenv_t *_fe_dfl_env;
 #define FE_DFL_ENV (_fe_dfl_env)
 
-/*  Additional implementation-defined environments, with macro 
+/*  Additional implementation-defined environments, with macro
    definitions beginning with FE_ and an uppercase letter,and having
    type "pointer to const-qualified fenv_t",may also be specified by
    the implementation.  */

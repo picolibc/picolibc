@@ -310,16 +310,16 @@ attach_process (pid_t pid)
       HANDLE h = OpenProcess(PROCESS_ALL_ACCESS, FALSE, child_pid);
 
       if (h)
-        {
-          /* Try to turn off DEBUG_ONLY_THIS_PROCESS so we can follow forks */
-          /* This is only supported on XP and later */
-          ULONG DebugFlags = DEBUG_PROCESS_DETACH_ON_EXIT;
-          NTSTATUS status = NtSetInformationProcess (h, ProcessDebugFlags, &DebugFlags, sizeof (DebugFlags));
-          if (!NT_SUCCESS (status))
-            warn (0, "Could not clear DEBUG_ONLY_THIS_PROCESS (%x), will not trace child processes", status);
+	{
+	  /* Try to turn off DEBUG_ONLY_THIS_PROCESS so we can follow forks */
+	  /* This is only supported on XP and later */
+	  ULONG DebugFlags = DEBUG_PROCESS_DETACH_ON_EXIT;
+	  NTSTATUS status = NtSetInformationProcess (h, ProcessDebugFlags, &DebugFlags, sizeof (DebugFlags));
+	  if (!NT_SUCCESS (status))
+	    warn (0, "Could not clear DEBUG_ONLY_THIS_PROCESS (%x), will not trace child processes", status);
 
-          CloseHandle(h);
-        }
+	  CloseHandle(h);
+	}
     }
 
   return;
@@ -866,15 +866,15 @@ Trace system calls and signals\n\
   -h, --help                   output usage information and exit\n\
   -m, --mask=MASK              set message filter mask\n\
   -n, --crack-error-numbers    output descriptive text instead of error\n\
-                               numbers for Windows errors\n\
+			       numbers for Windows errors\n\
   -o, --output=FILENAME        set output file to FILENAME\n\
   -p, --pid=n                  attach to executing program with cygwin pid n\n\
   -q, --quiet                  suppress messages about attaching, detaching, etc.\n\
   -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs\n\
   -t, --timestamp              use an absolute hh:mm:ss timestamp insted of \n\
-                               the default microsecond timestamp.  Implies -d\n\
+			       the default microsecond timestamp.  Implies -d\n\
   -T, --toggle                 toggle tracing in a process already being\n\
-                               traced. Requires -p <pid>\n\
+			       traced. Requires -p <pid>\n\
   -u, --usecs                  toggle printing of microseconds timestamp\n\
   -V, --version                output version information and exit\n\
   -w, --new-window             spawn program under test in a new window\n\
@@ -884,7 +884,7 @@ Trace system calls and signals\n\
     MASK can be any combination of the following mnemonics and/or hex values\n\
     (0x is optional).  Combine masks with '+' or ',' like so:\n\
 \n\
-                      --mask=wm+system,malloc+0x00800\n\
+		      --mask=wm+system,malloc+0x00800\n\
 \n\
     Mnemonic Hex     Corresponding Def  Description\n\
     =========================================================================\n\
@@ -908,7 +908,7 @@ Trace system calls and signals\n\
     malloc   0x020000 (_STRACE_MALLOC)   Trace malloc calls.\n\
     thread   0x040000 (_STRACE_THREAD)   Thread-locking calls.\n\
     special  0x100000 (_STRACE_SPECIAL)  Special debugging printfs for\n\
-                                         non-checked-in code\n\
+					 non-checked-in code\n\
 ");
   if (where == stderr)
     fprintf (stderr, "Try `%s --help' for more information.\n", pgm);
@@ -941,14 +941,14 @@ static void
 print_version ()
 {
   printf ("strace (cygwin) %d.%d.%d\n"
-          "System Trace\n"
-          "Copyright (C) 2000 - %s Red Hat, Inc.\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "System Trace\n"
+	  "Copyright (C) 2000 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 int

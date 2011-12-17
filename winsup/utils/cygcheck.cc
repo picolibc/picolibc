@@ -869,7 +869,7 @@ find_app_on_path (const char *app, bool showall = false)
       static char tmp[SYMLINK_MAX + 1];
       if (!readlink (fh, tmp, SYMLINK_MAX))
 	display_error("readlink failed");
-      
+
       /* Resolve the linkname relative to the directory of the link.  */
       char *ptr = cygpath_rel (dirname (papp), tmp, NULL);
       printf (" -> %s\n", ptr);
@@ -884,7 +884,7 @@ find_app_on_path (const char *app, bool showall = false)
       if (!CloseHandle (fh))
 	display_error ("find_app_on_path: CloseHandle()");
       /* FIXME: We leak the ptr returned by cygpath() here which is a
-         malloc()d string.  */
+	 malloc()d string.  */
       return find_app_on_path (ptr, showall);
     }
 
@@ -1250,7 +1250,7 @@ handle_reg_installation (handle_reg_t what)
 	    {
 	      char *path = data + 4;
 	      if (path[1] != ':')
-	      	*(path += 2) = '\\';
+		*(path += 2) = '\\';
 	      if (what == PRINT_KEY)
 		printf ("  %s Key: %s Path: %s", i ? "User:  " : "System:",
 			name, path);
@@ -1286,20 +1286,20 @@ del_orphaned_reg_installations ()
 /* Unfortunately neither mingw nor Windows know this function. */
 char *
 memmem (char *haystack, size_t haystacklen,
-        const char *needle, size_t needlelen)
+	const char *needle, size_t needlelen)
 {
   if (needlelen == 0)
     return haystack;
   while (needlelen <= haystacklen)
     {
       if (!memcmp (haystack, needle, needlelen))
-        return haystack;
+	return haystack;
       haystack++;
       haystacklen--;
     }
   return NULL;
 }
- 
+
 int
 handle_unique_object_name (int opt, char *path)
 {
@@ -1358,7 +1358,7 @@ handle_unique_object_name (int opt, char *path)
   else
     {
       size_t haystacklen = GetFileSize (fh, NULL);
-      cygwin_props_t *cygwin_props = (cygwin_props_t *) 
+      cygwin_props_t *cygwin_props = (cygwin_props_t *)
 	       memmem ((char *) haystack, haystacklen,
 		       CYGWIN_PROPS_MAGIC, sizeof (CYGWIN_PROPS_MAGIC));
       if (!cygwin_props)
@@ -1449,7 +1449,7 @@ dump_sysinfo ()
 #define       PRODUCT_UNLICENSED 0xabcdabcd
 #define       PRODUCT_ULTIMATE_E 0x00000047
 	      const char *products[] =
-	        {
+		{
  /* 0x00000000 */ "",
  /* 0x00000001 */ " Ultimate",
  /* 0x00000002 */ " Home Basic",
@@ -1524,11 +1524,11 @@ dump_sysinfo ()
  /* 0x00000047 */ " Ultimate E"
 		};
 	      if (prod == PRODUCT_UNLICENSED)
-	        strcat (osname, "Unlicensed");
+		strcat (osname, "Unlicensed");
 	      else if (prod > PRODUCT_ULTIMATE_E)
-	        strcat (osname, "");
+		strcat (osname, "");
 	      else
-	        strcat (osname, products[prod]);
+		strcat (osname, products[prod]);
 	    }
 	  else
 	    {
@@ -1540,7 +1540,7 @@ dump_sysinfo ()
 	    {
 	      strcpy (osname, "2000");
 	      if (osversion.wProductType == VER_NT_WORKSTATION)
-	        strcat (osname, " Professional");
+		strcat (osname, " Professional");
 	      else if (osversion.wSuiteMask & VER_SUITE_DATACENTER)
 		strcat (osname, " Datacenter Server");
 	      else if (osversion.wSuiteMask & VER_SUITE_ENTERPRISE)
@@ -1566,7 +1566,7 @@ dump_sysinfo ()
 	    {
 	      strcpy (osname, "2003 Server");
 	      if (GetSystemMetrics (SM_SERVERR2))
-	        strcat (osname, " R2");
+		strcat (osname, " R2");
 	      if (osversion.wSuiteMask & VER_SUITE_BLADE)
 		strcat (osname, " Web Edition");
 	      else if (osversion.wSuiteMask & VER_SUITE_DATACENTER)
@@ -1574,18 +1574,18 @@ dump_sysinfo ()
 	      else if (osversion.wSuiteMask & VER_SUITE_ENTERPRISE)
 		strcat (osname, " Enterprise Edition");
 	      else if (osversion.wSuiteMask & VER_SUITE_COMPUTE_SERVER)
-	        strcat (osname, " Compute Cluster Edition");
+		strcat (osname, " Compute Cluster Edition");
 	    }
 	}
       else if (osversion.dwMajorVersion == 4)
-        {
+	{
 	  strcpy (osname, "NT 4");
 	  if (more_info)
 	    {
 	      if (osversion.wProductType == VER_NT_WORKSTATION)
-	        strcat (osname, " Workstation");
+		strcat (osname, " Workstation");
 	      else
-	      	{
+		{
 		  strcat (osname, " Server");
 		  if (osversion.wSuiteMask & VER_SUITE_ENTERPRISE)
 		    strcat (osname, " Enterprise Edition");
@@ -1733,12 +1733,12 @@ dump_sysinfo ()
     printf ("Use '-r' to scan registry\n\n");
 
   if (RegOpenKeyEx (HKEY_LOCAL_MACHINE,
-                  "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel",
-                  0, KEY_READ, &key) == ERROR_SUCCESS)
+		  "SYSTEM\\CurrentControlSet\\Control\\Session Manager\\kernel",
+		  0, KEY_READ, &key) == ERROR_SUCCESS)
     {
       DWORD size;
       RegQueryValueEx (key, "obcaseinsensitive", NULL, NULL,
-                       (LPBYTE) &obcaseinsensitive, &size);
+		       (LPBYTE) &obcaseinsensitive, &size);
       RegCloseKey (key);
     }
   printf ("obcaseinsensitive set to %lu\n\n", obcaseinsensitive);
@@ -1930,7 +1930,7 @@ dump_sysinfo ()
 		  if (strcasecmp (f, "cygwin1.dll") == 0)
 		    {
 		      if (!cygwin_dll_count)
-		        strcpy (cygdll_path, pth->dir);
+			strcpy (cygdll_path, pth->dir);
 		      if (!cygwin_dll_count
 			  || strcasecmp (cygdll_path, pth->dir) != 0)
 			cygwin_dll_count++;
@@ -2184,32 +2184,32 @@ At least one command option or a PROGRAM is required, as shown above.\n\
 \n\
   PROGRAM              list library (DLL) dependencies of PROGRAM\n\
   -c, --check-setup    show installed version of PACKAGE and verify integrity\n\
-                       (or for all installed packages if none specified)\n\
+		       (or for all installed packages if none specified)\n\
   -d, --dump-only      just list packages, do not verify (with -c)\n\
   -s, --sysinfo        produce diagnostic system information (implies -c)\n\
   -r, --registry       also scan registry for Cygwin settings (with -s)\n\
   -k, --keycheck       perform a keyboard check session (must be run from a\n\
-                       plain console only, not from a pty/rxvt/xterm)\n\
+		       plain console only, not from a pty/rxvt/xterm)\n\
   -f, --find-package   find the package to which FILE belongs\n\
   -l, --list-package   list contents of PACKAGE (or all packages if none given)\n\
   -p, --package-query  search for REGEXP in the entire cygwin.com package\n\
-                       repository (requires internet connectivity)\n\
+		       repository (requires internet connectivity)\n\
   --delete-orphaned-installation-keys\n\
-                       Delete installation keys of old, now unused\n\
-                       installations from the registry.  Requires the right\n\
-                       to change the registry.\n\
+		       Delete installation keys of old, now unused\n\
+		       installations from the registry.  Requires the right\n\
+		       to change the registry.\n\
   --enable-unique-object-names Cygwin-DLL\n\
   --disable-unique-object-names Cygwin-DLL\n\
   --show-unique-object-names Cygwin-DLL\n\
-                       Enable, disable, or show the setting of the\n\
-                       \"unique object names\" setting in the Cygwin DLL\n\
-                       given as argument to this option.  The DLL path must\n\
-                       be given as valid Windows(!) path.\n\
-                       See the users guide for more information.\n\
-                       If you don't know what this means, don't change it.\n\
+		       Enable, disable, or show the setting of the\n\
+		       \"unique object names\" setting in the Cygwin DLL\n\
+		       given as argument to this option.  The DLL path must\n\
+		       be given as valid Windows(!) path.\n\
+		       See the users guide for more information.\n\
+		       If you don't know what this means, don't change it.\n\
   -v, --verbose        produce more verbose output\n\
   -h, --help           annotate output with explanatory comments when given\n\
-                       with another command, otherwise print this help\n\
+		       with another command, otherwise print this help\n\
   -V, --version        print the version of cygcheck and exit\n\
 \n\
 Note: -c, -f, and -l only report on packages that are currently installed. To\n\
@@ -2362,12 +2362,12 @@ main (int argc, char **argv)
 	givehelp = 1;
 	break;
       case CO_DELETE_KEYS:
-      	del_orphaned_reg = 1;
+	del_orphaned_reg = 1;
 	break;
       case CO_ENABLE_UON:
       case CO_DISABLE_UON:
       case CO_SHOW_UON:
-      	unique_object_name_opt = i;
+	unique_object_name_opt = i;
 	break;
       case 'V':
 	print_version ();

@@ -26,7 +26,7 @@
 #ifdef STATUS_INVALID_HANDLE     /* Defined as unsigned value in winbase.h */
 #undef STATUS_INVALID_HANDLE
 #endif
-#define STATUS_INVALID_HANDLE         ((NTSTATUS) 0xc0000008)  
+#define STATUS_INVALID_HANDLE         ((NTSTATUS) 0xc0000008)
 #define STATUS_INVALID_PARAMETER      ((NTSTATUS) 0xc000000d)
 #define STATUS_NO_SUCH_FILE           ((NTSTATUS) 0xc000000f)
 #define STATUS_INVALID_DEVICE_REQUEST ((NTSTATUS) 0xc0000010)

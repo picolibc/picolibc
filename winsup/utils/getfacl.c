@@ -66,47 +66,47 @@ static void
 usage (FILE * stream)
 {
   fprintf (stream, "Usage: %s [-adn] FILE [FILE2...]\n"
-            "\n"
-            "Display file and directory access control lists (ACLs).\n"
-            "\n"
-            "  -a, --all      display the filename, the owner, the group, and\n"
-            "                 the ACL of the file\n"
-            "  -d, --dir      display the filename, the owner, the group, and\n"
-            "                 the default ACL of the directory, if it exists\n"
-            "  -h, --help     output usage information and exit\n"
-            "  -n, --noname   display user and group IDs instead of names\n"
-            "  -V, --version  output version information and exit\n"
-            "\n"
-            "When multiple files are specified on the command line, a blank\n"
-            "line separates the ACLs for each file.\n", prog_name);
-  if (stream == stdout) 
+	    "\n"
+	    "Display file and directory access control lists (ACLs).\n"
+	    "\n"
+	    "  -a, --all      display the filename, the owner, the group, and\n"
+	    "                 the ACL of the file\n"
+	    "  -d, --dir      display the filename, the owner, the group, and\n"
+	    "                 the default ACL of the directory, if it exists\n"
+	    "  -h, --help     output usage information and exit\n"
+	    "  -n, --noname   display user and group IDs instead of names\n"
+	    "  -V, --version  output version information and exit\n"
+	    "\n"
+	    "When multiple files are specified on the command line, a blank\n"
+	    "line separates the ACLs for each file.\n", prog_name);
+  if (stream == stdout)
     {
       fprintf (stream, ""
-            "For each argument that is a regular file, special file or\n"
-            "directory, getfacl displays the owner, the group, and the ACL.\n"
-            "For directories getfacl displays additionally the default ACL.\n"
-            "\n"
-            "With no options specified, getfacl displays the filename, the\n"
-            "owner, the group, and both the ACL and the default ACL, if it\n"
-            "exists.\n"
-            "\n"
-            "The format for ACL output is as follows:\n"
-            "     # file: filename\n"
-            "     # owner: name or uid\n"
-            "     # group: name or uid\n"
-            "     user::perm\n"
-            "     user:name or uid:perm\n"
-            "     group::perm\n"
-            "     group:name or gid:perm\n"
-            "     mask:perm\n"
-            "     other:perm\n"
-            "     default:user::perm\n"
-            "     default:user:name or uid:perm\n"
-            "     default:group::perm\n"
-            "     default:group:name or gid:perm\n"
-            "     default:mask:perm\n"
-            "     default:other:perm\n"
-            "\n");
+	    "For each argument that is a regular file, special file or\n"
+	    "directory, getfacl displays the owner, the group, and the ACL.\n"
+	    "For directories getfacl displays additionally the default ACL.\n"
+	    "\n"
+	    "With no options specified, getfacl displays the filename, the\n"
+	    "owner, the group, and both the ACL and the default ACL, if it\n"
+	    "exists.\n"
+	    "\n"
+	    "The format for ACL output is as follows:\n"
+	    "     # file: filename\n"
+	    "     # owner: name or uid\n"
+	    "     # group: name or uid\n"
+	    "     user::perm\n"
+	    "     user:name or uid:perm\n"
+	    "     group::perm\n"
+	    "     group:name or gid:perm\n"
+	    "     mask:perm\n"
+	    "     other:perm\n"
+	    "     default:user::perm\n"
+	    "     default:user:name or uid:perm\n"
+	    "     default:group::perm\n"
+	    "     default:group:name or gid:perm\n"
+	    "     default:mask:perm\n"
+	    "     default:other:perm\n"
+	    "\n");
     }
 }
 
@@ -124,14 +124,14 @@ static void
 print_version ()
 {
   printf ("getfacl (cygwin) %d.%d.%d\n"
-          "Get POSIX ACL information\n"
-          "Copyright (C) 2000 - %s Red Hat, Inc.\n"
-          "This is free software; see the source for copying conditions.  There is NO\n"
+	  "Get POSIX ACL information\n"
+	  "Copyright (C) 2000 - %s Red Hat, Inc.\n"
+	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
-          CYGWIN_VERSION_DLL_MAJOR / 1000,
-          CYGWIN_VERSION_DLL_MAJOR % 1000,
-          CYGWIN_VERSION_DLL_MINOR,
-          strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MAJOR / 1000,
+	  CYGWIN_VERSION_DLL_MAJOR % 1000,
+	  CYGWIN_VERSION_DLL_MINOR,
+	  strrchr (__DATE__, ' ') + 1);
 }
 
 int
@@ -187,12 +187,12 @@ main (int argc, char **argv)
 	}
       printf ("# file: %s\n", argv[optind]);
       if (nopt)
-        {
+	{
 	  printf ("# owner: %lu\n", (unsigned long)st.st_uid);
 	  printf ("# group: %lu\n", (unsigned long)st.st_gid);
 	}
       else
-        {
+	{
 	  printf ("# owner: %s\n", username (st.st_uid));
 	  printf ("# group: %s\n", groupname (st.st_gid));
 	}
