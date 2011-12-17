@@ -958,17 +958,14 @@ _dll_crt0 ()
       PVOID stackaddr = wow64_revert_to_original_stack (allocationbase);
       if (stackaddr)
       	{
-	  /* 2nd half of the stack move.  First set stack pointers to
-	     our new address. */
+	  /* 2nd half of the stack move.  Set stack pointers to new address. */
 	  __asm__ ("\n\
 		   movl  %[ADDR], %%esp \n\
 		   movl  %%esp, %%ebp   \n"
 		   : : [ADDR] "r" (stackaddr));
 	  /* Now we're back on the original stack.  Free up space taken by the
-	     former main thread stack and... */
-	  VirtualFree (NtCurrentTeb ()->DeallocationStack,
-		       0, MEM_RELEASE);
-	  /* ...set DeallocationStack correctly. */
+	     former main thread stack and set DeallocationStack correctly. */
+	  VirtualFree (NtCurrentTeb ()->DeallocationStack, 0, MEM_RELEASE);
 	  NtCurrentTeb ()->DeallocationStack = allocationbase;
 	}
       else

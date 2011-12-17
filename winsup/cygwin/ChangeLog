@@ -1,5 +1,9 @@
 2011-12-17  Corinna Vinschen  <vinschen@redhat.com>
 
+	* dcrt0.cc (_dll_crt0): Fix formatting.
+
+2011-12-17  Corinna Vinschen  <vinschen@redhat.com>
+
 	* wow64.cc (wow64_revert_to_original_stack): Fix comment.
 	* wow64.h (wow64_respawn_process): Declare noreturn.
 
