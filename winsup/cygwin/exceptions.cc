@@ -1144,8 +1144,6 @@ set_signal_mask (sigset_t newmask, sigset_t& oldmask)
   oldmask = newmask;
   if (mask_bits)
     sig_dispatch_pending (true);
-  else
-    sigproc_printf ("not calling sig_dispatch_pending");
   mask_sync.release ();
 }
 

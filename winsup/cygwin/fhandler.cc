@@ -839,16 +839,13 @@ fhandler_base::write (const void *ptr, size_t len)
 	  NTSTATUS status;
 	  status = NtFsControlFile (get_output_handle (), NULL, NULL, NULL,
 				    &io, FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
-	  syscall_printf ("%p = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
-			  status, pc.get_nt_native_path ());
+	  debug_printf ("%p = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
+			status, pc.get_nt_native_path ());
 	}
     }
 
   if (wbinary ())
-    {
-      debug_printf ("binary write");
-      res = raw_write (ptr, len);
-    }
+    res = raw_write (ptr, len);
   else
     {
       debug_printf ("text write");
@@ -1222,6 +1219,10 @@ fhandler_base_overlapped::close ()
     }
   else
     {
+      /* Cancelling seems to be necessary for cases where a reader is
+	 still executing either in another thread or when a signal handler
+	 performs a close.  */
+      CancelIo (get_io_handle ());
       destroy_overlapped ();
       res = fhandler_base::close ();
     }

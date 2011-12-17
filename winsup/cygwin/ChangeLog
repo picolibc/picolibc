@@ -1,3 +1,15 @@
+2011-12-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* exceptions.cc (set_signal_mask): Remove useless debugging output.
+
+	* fhandler.cc (fhandler_base::write): Ditto.
+	(fhandler_base_overlapped::close): Cancel any ongoing I/O before
+	closing.
+	* syscalls.cc (write): Default to always reporting all writes in strace
+	output via syscall_printf.
+	* wait.cc (wait4): Fix debugging output.  Use standard syscall leaver
+	output.
+
 2011-12-16  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	Implement fhandler reference counting.

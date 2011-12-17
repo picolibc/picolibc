@@ -81,7 +81,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 
       res = cancelable_wait (waitfor);
 
-      sigproc_printf ("%d = WaitForSingleObject (...)", res);
+      sigproc_printf ("%d = cancelable_wait (...)", res);
 
       if (w->ev == NULL)
 	{
@@ -109,10 +109,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       break;
     }
 
-  sigproc_printf ("intpid %d, status %p, w->status %d, options %d, res %d",
-		  intpid, status, w->status, options, res);
+  syscall_printf ("%R = wait4(%d, %p, %d, %p)", res, intpid, w->status, options, r);
   w->status = -1;
-  if (res < 0)
-    sigproc_printf ("*** errno %d", get_errno ());
   return res;
 }

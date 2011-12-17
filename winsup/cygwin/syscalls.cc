@@ -1170,10 +1170,7 @@ write (int fd, const void *ptr, size_t len)
   res = cfd->write (ptr, len);
 
 done:
-  if (fd == 1 || fd == 2)
-    paranoid_printf ("%R = write(%d, %p, %d)", res, fd, ptr, len);
-  else
-    syscall_printf ("%R = write(%d, %p, %d)", res, fd, ptr, len);
+  syscall_printf ("%R = write(%d, %p, %d)", res, fd, ptr, len);
 
   MALLOC_CHECK;
   return res;
