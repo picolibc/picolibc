@@ -1,8 +1,7 @@
 2011-12-16  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	Implement fhandler reference counting.
-	* cygheap.h
-	(cygheap_fdmanip::release): Make virtual.
+	* cygheap.h (cygheap_fdmanip::release): Make virtual.
 	(cygheap_fdnew::~cygheap_fdnew): New destructor increments reference
 	count when fd has been allocated.
 	(cygheap_fdget::fh): New (old?) field.
@@ -99,7 +98,7 @@
 	* exceptions.cc (_cygtls::call_signal_handler): Fix debugging to not go
 	to console.
 	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Add temporary
-	kludge to work around problem of make closing a handler while it is
+	kludge to work around problem of make closing an fhandle while it is
 	being read.
 	* gendef (sigdelayed): Don't call a function if sig has been cleared.
 
