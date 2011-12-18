@@ -55,7 +55,7 @@ SIM_SCRIPTS	=
 SIM_LDFLAGS	=
 SIM_BSP		= libsim.a
 SIM_CRT0	= crt0.o
-SIM_OBJS	= syscalls.o
+SIM_OBJS	= syscalls.o clear_cache_range.o
 SIM_TEST	= sim-test
 SIM_INSTALL	= install-sim
 
@@ -71,10 +71,10 @@ BOARD_SCRIPTS	= bfin-common-sc.ld  bfin-common-mc.ld \
 	bf561.ld bf561a.ld bf561b.ld bf561m.ld \
 	bf592.ld
 BOARD_LDFLAGS	=
-BOARD_BSP	= # We actually use libnosys.a
+BOARD_BSP	= libbfinbsp.a
 BOARD_CRT0S	= basiccrt.o basiccrts.o
 BOARD_CRT0S	+= basiccrt561.o basiccrt561s.o basiccrt561b.o
-BOARD_OBJS	=
+BOARD_OBJS	= clear_cache_range.o
 BOARD_TEST	=
 BOARD_INSTALL	= install-board
 
@@ -91,6 +91,10 @@ all: ${SIM_CRT0} ${SIM_BSP} ${BOARD_CRT0S} ${BOARD_BSP}
 #
 # here's where we build the board support packages for each target
 #
+${BOARD_BSP}: ${OBJS} ${BOARD_OBJS}
+	${AR} ${ARFLAGS} $@ $^
+	${RANLIB} $@
+
 ${SIM_BSP}: ${OBJS} ${SIM_OBJS}
 	${AR} ${ARFLAGS} ${SIM_BSP} ${SIM_OBJS} ${OBJS}
 	${RANLIB} ${SIM_BSP}
