@@ -1,3 +1,16 @@
+2011-12-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.cc (fhandler_base::close): Move setting isclosed() from here
+	to closed().
+	(fhandler_base_overlapped::close): Correct comment.
+	(fhandler_base_overlapped::destroy_overlapped): Signal overlapped event
+	before closing it to potentially wake up a waiting thread.
+	(fhandler_base_overlapped::wait_overlapped): Expand setting of err when
+	closed to encompass non-signal event.  Test for a cancel event before
+	making nonblocking decisions.
+	* syscalls.cc (close): Set closed flag here so that any concurrently
+	executing functions will be notified ASAP.
+
 2011-12-17  Corinna Vinschen  <vinschen@redhat.com>
 
 	* dcrt0.cc (_dll_crt0): Fix formatting.

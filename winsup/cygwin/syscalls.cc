@@ -1373,6 +1373,7 @@ close (int fd)
     res = -1;
   else
     {
+      cfd->isclosed (true);
       res = cfd->close_with_arch ();
       cfd.release ();
     }

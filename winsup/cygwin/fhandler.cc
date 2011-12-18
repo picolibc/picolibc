@@ -1148,7 +1148,6 @@ fhandler_base::close ()
       paranoid_printf ("CloseHandle failed, %E");
       __seterrno ();
     }
-  isclosed (true);
   return res;
 }
 
@@ -1219,9 +1218,8 @@ fhandler_base_overlapped::close ()
     }
   else
     {
-      /* Cancelling seems to be necessary for cases where a reader is
-	 still executing either in another thread or when a signal handler
-	 performs a close.  */
+     /* Cancelling seems to be necessary for cases where a reader is
+         still executing when a signal handler performs a close.  */
       CancelIo (get_io_handle ());
       destroy_overlapped ();
       res = fhandler_base::close ();
@@ -1882,6 +1880,7 @@ fhandler_base_overlapped::destroy_overlapped ()
   OVERLAPPED *ov = get_overlapped ();
   if (ov && ov->hEvent)
     {
+      SetEvent (ov->hEvent);
       CloseHandle (ov->hEvent);
       ov->hEvent = NULL;
     }
@@ -1931,7 +1930,21 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       HANDLE h = writing ? get_output_handle () : get_handle ();
       BOOL wores;
       if (isclosed ())
-	wores = 0;	/* closed in another thread or via signal handler */
+	{
+	  switch (err)
+	    {
+	    case WAIT_OBJECT_0:
+	      err = ERROR_INVALID_HANDLE;
+	      break;
+	    case WAIT_OBJECT_0 + 1:
+	      err = ERROR_INVALID_AT_INTERRUPT_TIME;
+	      break;
+	    default:
+	      err = GetLastError ();
+	      break;
+	    }
+	  res = overlapped_error;
+	}
       else
 	{
 	  /* Cancelling here to prevent races.  It's possible that the I/O has
@@ -1945,23 +1958,23 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	  err = GetLastError ();
 	  ResetEvent (get_overlapped ()->hEvent);	/* Probably not needed but CYA */
 	  debug_printf ("wfres %d, wores %d, bytes %u", wfres, wores, *bytes);
-	}
-      if (wores)
-	res = overlapped_success;	/* operation succeeded */
-      else if (wfres == WAIT_OBJECT_0 + 1)
-	{
-	  err = ERROR_INVALID_AT_INTERRUPT_TIME; /* forces an EINTR below */
-	  debug_printf ("signal");
-	  res = overlapped_error;
-	}
-      else if (nonblocking)
-	res = overlapped_nonblocking_no_data;	/* more handling below */
-      else if (wfres == WAIT_OBJECT_0 + 2)
-	pthread::static_cancel_self ();		/* never returns */
-      else
-	{
-	  debug_printf ("GetOverLappedResult failed, h %p, bytes %u, %E", h, *bytes);
-	  res = overlapped_error;
+	  if (wores)
+	    res = overlapped_success;	/* operation succeeded */
+	  else if (wfres == WAIT_OBJECT_0 + 1)
+	    {
+	      err = ERROR_INVALID_AT_INTERRUPT_TIME; /* forces an EINTR below */
+	      debug_printf ("signal");
+	      res = overlapped_error;
+	    }
+	  else if (wfres == WAIT_OBJECT_0 + 2)
+	    pthread::static_cancel_self ();		/* never returns */
+	  else if (nonblocking)
+	    res = overlapped_nonblocking_no_data;	/* more handling below */
+	  else
+	    {
+	      debug_printf ("GetOverLappedResult failed, h %p, bytes %u, %E", h, *bytes);
+	      res = overlapped_error;
+	    }
 	}
     }
 
