@@ -1,3 +1,7 @@
+2011-12-18  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* configure: Regenerate.
+
 2011-12-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.LIBGLOSS: Add GPL with exception license.
