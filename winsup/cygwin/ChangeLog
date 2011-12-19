@@ -1,5 +1,12 @@
 2011-12-19  Corinna Vinschen  <vinschen@redhat.com>
 
+	* syscalls.cc (rename): Fix typo in comment.  Fix condition to handle
+	the case oldpath is no .lnk symlink and newpath points to an existing
+	.lnk symlink or .exe file and no explicit .lnk suffix has been given
+	in oldpath.  Add a comment to explain.
+
+2011-12-19  Corinna Vinschen  <vinschen@redhat.com>
+
 	* dcrt0.cc (dll_crt0_0): Check for wincap.wow64_has_secondary_stack
 	rather than for wincap.is_wow64.  Accommodate name change from
 	wow64_has_64bit_parent to wow64_needs_stack_adjustment.  Align comment.

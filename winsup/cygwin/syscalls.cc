@@ -2162,7 +2162,7 @@ rename (const char *oldpath, const char *newpath)
 	{
 	  /* Never append .exe suffix if oldpath had .exe suffix given
 	     explicitely, or if newfile is a binary (in which case the given
-	     name probably makes sesne as it is), or if the destination
+	     name probably makes sense as it is), or if the destination
 	     filename has one of the blessed executable suffixes. */
 	  if (!old_explicit_suffix && oldpc.known_suffix
 	      && !newpc.is_binary ()
@@ -2174,8 +2174,12 @@ rename (const char *oldpath, const char *newpath)
 	}
       else
 	{
-	  if ((RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
-					  &ro_u_lnk, TRUE)
+	  /* If the new path is an existing .lnk symlink or a .exe file,
+	     but the new path has not been specified with explicit suffix,
+	     rename to the new name without suffix, as expected, but also
+	     remove the clashing symlink or executable.  Did I ever mention
+	     how I hate the file suffix idea? */
+	  if ((newpc.is_lnk_special ()
 	       || RtlEqualUnicodePathSuffix (newpc.get_nt_native_path (),
 					     &ro_u_exe, TRUE))
 	      && !new_explicit_suffix)
