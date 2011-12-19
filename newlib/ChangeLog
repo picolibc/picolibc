@@ -1,3 +1,21 @@
+2011-12-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* NEWS: Update with 1.20.0 info.
+	* README: Ditto.
+	* acinclude.m4: Change version number to 1.20.0.
+	* aclocal.m4: Regenerated.
+	* configure: Ditto.
+	* Makefile.in: Regenerated.
+	* doc/aclocal.m4: Ditto.
+	* doc/configure: Ditto.
+	* libc/*/aclocal.m4: Ditto.
+	* libc/*/configure: Ditto.
+	* libc/libc.texinfo: Ditto.
+	* libm/*/aclocal.m4: Ditto.
+	* libm/*/configure: Ditto.
+	* libm/libm.texinfo: Ditto.
+	* libc/sys/linux/shared.ld: Add VERS_1.20
+
 2011-12-13  Richard Earnshaw  <rearnsha@arm.com>
 	    Thomas Klein  <th.r.klein@web.de>
 

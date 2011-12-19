@@ -13,7 +13,7 @@ END-INFO-DIR-ENTRY
 @ifinfo
 This file documents the ANSI C library.
 
-Copyright (C) 1992, 1993, 1994-2010 Red Hat, Inc.
+Copyright (C) 1992, 1993, 1994-2011 Red Hat, Inc.
 
 @file{libc} includes software developed by the
 University of California, Berkeley and its contributors.
@@ -69,7 +69,7 @@ into another language, under the above conditions for modified versions.
 @title The Red Hat newlib C Library
 @subtitle Full Configuration
 @sp 1
-@subtitle @code{libc} 1.19.0
+@subtitle @code{libc} 1.20.0
 @subtitle December 2010
 @author {Steve Chamberlain}
 @author {Roland Pesch}

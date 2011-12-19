@@ -37,3 +37,7 @@ VERS_1.18 {
 VERS_1.19 {
 	global: *;
 };
+
+VERS_1.20 {
+	global: *;
+};

@@ -1,3 +1,14 @@
+*** Major changes in newlib version 1.20.0:
+
+* I/O lock clean-up
+* fixes to strftime/strptime
+* fixes to arm support
+* new NO_INCLUDE_LIST configuration support
+* rl78 platform support contributed
+* sparc-leon platform support contributed
+* cvs-to-git mirroring of newlib
+* various bug fixes
+
 *** Major changes in newlib version 1.19.0:
 
 * complex math functions
