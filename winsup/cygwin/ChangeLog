@@ -1,3 +1,19 @@
+2011-12-19  Corinna Vinschen  <vinschen@redhat.com>
+
+	* dcrt0.cc (dll_crt0_0): Check for wincap.wow64_has_secondary_stack
+	rather than for wincap.is_wow64.  Accommodate name change from
+	wow64_has_64bit_parent to wow64_needs_stack_adjustment.  Align comment.
+	(_dll_crt0): Ditto.
+	* wincap.h (wincaps::wow64_has_secondary_stack): New element.
+	* wincap.cc: Implement above element throughout.
+	(wincapc::init): Set wow64_has_secondary_stack to false on non-64 bit
+	systems.
+	* wow64.cc (wow64_needs_stack_adjustment): Rename (hopefully the last
+	time) from wow64_has_64bit_parent.
+	(wow64_eval_expected_main_stack): Fix comment to reflect real life.
+	(wow64_test_for_64bit_parent): Fix comment.
+	* wow64.h (wow64_needs_stack_adjustment): Accommodate new name.
+
 2011-12-17  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.cc (fhandler_base::close): Move setting isclosed() from here

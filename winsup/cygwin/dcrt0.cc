@@ -705,11 +705,12 @@ dll_crt0_0 ()
   if (!child_proc_info)
     {
       memory_init (true);
-      /* WOW64 process?  Check if we have been started from 64 bit process
-	 and if our stack is at an unusual address.  Set wow64_has_64bit_parent
-	 if so.  Problem description in wow64_test_for_64bit_parent. */
-      if (wincap.is_wow64 ())
-	wow64_has_64bit_parent = wow64_test_for_64bit_parent ();
+      /* WOW64 process on XP/64 or Server 2003/64?  Check if we have been
+	 started from 64 bit process and if our stack is at an unusual
+	 address.  Set wow64_needs_stack_adjustment if so.  Problem
+	 description in wow64_test_for_64bit_parent. */
+      if (wincap.wow64_has_secondary_stack ())
+	wow64_needs_stack_adjustment = wow64_test_for_64bit_parent ();
     }
   else
     {
@@ -945,9 +946,10 @@ __cygwin_exit_return:			\n\
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  /* Handle WOW64 process started from native 64 bit process.  See comment
-     in wow64_test_for_64bit_parent for a full problem description. */
-  if (wow64_has_64bit_parent && !dynamically_loaded)
+  /* Handle WOW64 process on XP/2K3 which has been started from native 64 bit
+     process.  See comment in wow64_test_for_64bit_parent for a full problem
+     description. */
+  if (wow64_needs_stack_adjustment && !dynamically_loaded)
     {
       /* Must be static since it's referenced after the stack pointers have
 	 been moved. */

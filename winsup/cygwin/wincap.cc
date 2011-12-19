@@ -52,6 +52,7 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   use_dont_resolve_hack:false,
   has_stack_size_param_is_a_reservation:false,
   has_console_logon_sid:false,
+  wow64_has_secondary_stack:false,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -83,6 +84,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   use_dont_resolve_hack:false,
   has_stack_size_param_is_a_reservation:false,
   has_console_logon_sid:false,
+  wow64_has_secondary_stack:false,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -114,6 +116,7 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   use_dont_resolve_hack:true,
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:false,
+  wow64_has_secondary_stack:false,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -145,6 +148,7 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   use_dont_resolve_hack:true,
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:false,
+  wow64_has_secondary_stack:false,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -176,6 +180,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   use_dont_resolve_hack:true,
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:false,
+  wow64_has_secondary_stack:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -207,6 +212,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   use_dont_resolve_hack:true,
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:false,
+  wow64_has_secondary_stack:true,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -238,6 +244,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   use_dont_resolve_hack:false,
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:false,
+  wow64_has_secondary_stack:false,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -269,6 +276,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   use_dont_resolve_hack:false,
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:true,
+  wow64_has_secondary_stack:false,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
@@ -356,6 +364,7 @@ wincapc::init ()
     {
       ((wincaps *)caps)->needs_count_in_si_lpres2 = false;
       ((wincaps *)caps)->has_restricted_stack_args = false;
+      ((wincaps *)caps)->wow64_has_secondary_stack = false;
     }
 
   __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,

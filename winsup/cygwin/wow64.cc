@@ -15,7 +15,7 @@ details. */
 
 #define PTR_ADD(p,o)	((PVOID)((PBYTE)(p)+(o)))
 
-bool NO_COPY wow64_has_64bit_parent = false;
+bool NO_COPY wow64_needs_stack_adjustment = false;
 
 static void
 wow64_eval_expected_main_stack (PVOID &allocbase, PVOID &stackbase)
@@ -27,10 +27,17 @@ wow64_eval_expected_main_stack (PVOID &allocbase, PVOID &stackbase)
   dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
   ntheader = (PIMAGE_NT_HEADERS32) ((PBYTE) dosheader + dosheader->e_lfanew);
   /* The main thread stack is expected to be located at 0x30000, which is the
-     case for all observed NT systems to date, unless the stacksize requested
-     by the StackReserve field in the PE/COFF header is so big that the stack
-     doesn't fit in the area between 0x30000 and the start of the image.  In
-     case of a conflict, the OS allocates the stack right after the image. */
+     case for all observed NT systems up to Server 2003 R2, unless the
+     stacksize requested by the StackReserve field in the PE/COFF header is
+     so big that the stack doesn't fit in the area between 0x30000 and the
+     start of the image.  In case of a conflict, the OS allocates the stack
+     right after the image.
+     Sidenote: While post-2K3 32 bit systems continue to have the default
+     main thread stack address located at 0x30000, the default main thread
+     stack address on Vista/2008 64 bit is 0x80000 and on W7/2K8R2 64 bit
+     it is 0x90000.  However, this is no problem because the system sticks
+     to that address for all WOW64 processes, not only for the first one
+     started from a 64 bit parent. */
   allocbase = (PVOID) 0x30000;
   /* Stack size.  The OS always rounds the size up to allocation granularity
      and it never allocates less than 256K. */
@@ -62,9 +69,9 @@ wow64_test_for_64bit_parent ()
      else in the child process.
      What we do here is to check if the current stack is the excpected main
      thread stack and if not, if we really have been started from a 64 bit
-     process here.  If so, we note this fact in wow64_has_64bit_parent so we
-     can workaround the stack problem in _dll_crt0.  See there for how we go
-     along. */
+     process here.  If so, we note this fact in wow64_needs_stack_adjustment
+     so we can workaround the stack problem in _dll_crt0.  See there for how
+     we go along. */
   NTSTATUS ret;
   PROCESS_BASIC_INFORMATION pbi;
   HANDLE parent;

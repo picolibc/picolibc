@@ -42,6 +42,7 @@ struct wincaps
   unsigned use_dont_resolve_hack			: 1;
   unsigned has_stack_size_param_is_a_reservation	: 1;
   unsigned has_console_logon_sid			: 1;
+  unsigned wow64_has_secondary_stack			: 1;
 };
 
 class wincapc
@@ -92,6 +93,7 @@ public:
   bool	IMPLEMENT (use_dont_resolve_hack)
   bool	IMPLEMENT (has_stack_size_param_is_a_reservation)
   bool	IMPLEMENT (has_console_logon_sid)
+  bool	IMPLEMENT (wow64_has_secondary_stack)
 
 #undef IMPLEMENT
 };
