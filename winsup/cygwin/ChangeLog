@@ -56,7 +56,7 @@
 	(fhandler_base::close): Simplify paranoid debugging output.  Set new
 	isclosed() flag.
 	(fhandler_base_overlapped::wait_overlapped): Use isclosed() flag to
-	avoid querying the exception handle.
+	avoid querying the overlapped structure.
 	* fhandler.h (fhandler_base::_refcnt): New field.
 	(fhandler_base::refcnt): New function.
 	(fhandler_base::isclosed): Implement.
