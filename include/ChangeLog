@@ -1,3 +1,7 @@
+2011-12-19  Chung-Lin Tang  <cltang@codesourcery.com>
+
+	* elf/mips.h (elf_mips_reloc_type): Add R_MIPS16_TLS_* entries.
+
 2011-12-14  Iain Sandoe  <iains@gcc.gnu.org>
 
 	* mach-o/loader.h (bfd_mach_o_section_type): define
