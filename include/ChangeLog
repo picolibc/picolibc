@@ -1,3 +1,11 @@
+2011-12-19  Chung-Lin Tang  <cltang@codesourcery.com>
+
+	Backport from mainline:
+
+	2011-12-19  Chung-Lin Tang  <cltang@codesourcery.com>
+
+	* elf/mips.h (elf_mips_reloc_type): Add R_MIPS16_TLS_* entries.
+
 2011-10-25  Alan Modra  <amodra@gmail.com>
 
 	Apply mainline patches.
