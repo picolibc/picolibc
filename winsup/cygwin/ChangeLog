@@ -1,3 +1,10 @@
+2011-12-11  Corinna Vinschen  <vinschen@redhat.com>
+
+	* dcrt0.cc (_dll_crt0): Rephrase comments.  Set $ebp to NULL, as in
+	the pthread stack setup.
+	* wow64.cc (wow64_revert_to_original_stack): Rephrase some comments.
+	Return _tlsbase-16 rather than _main_tls-4 so as not to waste stack.
+
 2011-12-19  Corinna Vinschen  <vinschen@redhat.com>
 
 	* syscalls.cc (rename): Fix typo in comment.  Fix condition to handle

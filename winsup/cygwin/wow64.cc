@@ -128,7 +128,8 @@ wow64_revert_to_original_stack (PVOID &allocationbase)
 
   /* Next we expect a guard page.  We fetch the size of the guard area to
      see how big it is.  Apparently the guard area on 64 bit systems spans
-     2 pages. */
+     2 pages, only for the main thread for some reason.  We better keep it
+     that way. */
   PVOID addr = PTR_ADD (mbi.BaseAddress, mbi.RegionSize);
   VirtualQuery (addr, &mbi, sizeof mbi);
   if (mbi.AllocationBase != allocationbase
@@ -163,12 +164,13 @@ wow64_revert_to_original_stack (PVOID &allocationbase)
 
   /* We're going to reuse the original stack.  Yay, no more respawn!
      Set the StackBase and StackLimit values in the TEB, set _main_tls
-     accordingly, and return the new address for the stack pointer.
-     The second half of the stack move is done by the caller _dll_crt0. */
+     accordingly, and return the new, 16 byte aligned address for the
+     stack pointer.  The second half of the stack move is done by the
+     caller _dll_crt0. */
   _tlsbase = (char *) newbase;
   _tlstop = (char *) newtop;
   _main_tls = &_my_tls;
-  return PTR_ADD (_main_tls, -4);
+  return PTR_ADD (_tlsbase, -16);
 }
 
 /* Respawn WOW64 process. This is only called if we can't reuse the original

@@ -951,19 +951,21 @@ _dll_crt0 ()
      description. */
   if (wow64_needs_stack_adjustment && !dynamically_loaded)
     {
-      /* Must be static since it's referenced after the stack pointers have
-	 been moved. */
+      /* Must be static since it's referenced after the stack and frame
+	 pointer registers have been changed. */
       static PVOID allocationbase = 0;
 
-      /* Check if we just move the stack.  See comment in
+      /* Check if we just move the stack.  If so, wow64_revert_to_original_stack
+	 returns a non-NULL, 16 byte aligned address.  See comments in
 	 wow64_revert_to_original_stack for the gory details. */
       PVOID stackaddr = wow64_revert_to_original_stack (allocationbase);
       if (stackaddr)
       	{
-	  /* 2nd half of the stack move.  Set stack pointers to new address. */
+	  /* 2nd half of the stack move.  Set stack pointer to new address.
+	     Set frame pointer to 0. */
 	  __asm__ ("\n\
 		   movl  %[ADDR], %%esp \n\
-		   movl  %%esp, %%ebp   \n"
+		   xorl  %%ebp, %%ebp   \n"
 		   : : [ADDR] "r" (stackaddr));
 	  /* Now we're back on the original stack.  Free up space taken by the
 	     former main thread stack and set DeallocationStack correctly. */
