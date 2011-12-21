@@ -1931,7 +1931,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
       BOOL wores;
       if (isclosed ())
 	{
-	  switch (err)
+	  switch (wfres)
 	    {
 	    case WAIT_OBJECT_0:
 	      err = ERROR_INVALID_HANDLE;

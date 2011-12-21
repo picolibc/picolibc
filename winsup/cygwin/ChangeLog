@@ -1,3 +1,8 @@
+2011-12-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Use correct
+	value in switch statement.
+
 2011-12-11  Corinna Vinschen  <vinschen@redhat.com>
 
 	* dcrt0.cc (_dll_crt0): Rephrase comments.  Set $ebp to NULL, as in
