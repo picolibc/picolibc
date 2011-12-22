@@ -137,7 +137,10 @@ typedef enum
     CW_CVT_MNT_OPTS,
     CW_LST_MNT_OPTS,
     CW_STRERROR,
-    CW_CVT_ENV_TO_WINENV
+    CW_CVT_ENV_TO_WINENV,
+    CW_ALLOC_DRIVE_MAP,
+    CW_MAP_DRIVE_MAP,
+    CW_FREE_DRIVE_MAP
   } cygwin_getinfo_types;
 
 #define CW_LOCK_PINFO CW_LOCK_PINFO

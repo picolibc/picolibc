@@ -1873,3 +1873,154 @@ endmntent (FILE *)
 {
   return 1;
 }
+
+static bool
+get_volume_path_names_for_volume_name (LPCWSTR vol, LPWSTR mounts)
+{
+  DWORD len;
+  if (GetVolumePathNamesForVolumeNameW (vol, mounts, NT_MAX_PATH, &len))
+    return true;
+
+  /* Windows 2000 doesn't have GetVolumePathNamesForVolumeNameW.
+     Just assume that mount points are not longer than MAX_PATH. */
+  WCHAR drives[MAX_PATH], dvol[MAX_PATH], mp[MAX_PATH + 3];
+  if (!GetLogicalDriveStringsW (MAX_PATH, drives))
+    return false;
+  for (PWCHAR drive = drives; *drive; drive = wcschr (drive, '\0') + 1)
+    {
+      if (!GetVolumeNameForVolumeMountPointW (drive, dvol, MAX_PATH))
+	continue;
+      if (!wcscasecmp (vol, dvol))
+	mounts = wcpcpy (mounts, drive) + 1;
+      wcscpy (mp, drive);
+      HANDLE h = FindFirstVolumeMountPointW (dvol, mp + 3, MAX_PATH);
+      if (h == INVALID_HANDLE_VALUE)
+	continue;
+      do
+	{
+	  if (GetVolumeNameForVolumeMountPointW (mp, dvol, MAX_PATH))
+	    if (!wcscasecmp (vol, dvol))
+	      mounts = wcpcpy (mounts, drive) + 1;
+	}
+      while (FindNextVolumeMountPointW (h, mp, MAX_PATH));
+      FindVolumeMountPointClose (h);
+    }
+  *mounts = L'\0';
+  return true;
+}
+
+dos_drive_mappings::dos_drive_mappings ()
+: mappings(0)
+{
+  tmp_pathbuf tp;
+  wchar_t vol[64]; /* Long enough for Volume GUID string */
+  wchar_t *devpath = tp.w_get ();
+  wchar_t *mounts = tp.w_get ();
+
+  /* Iterate over all volumes, fetch the first path from the list of
+     DOS paths the volume is mounted to, or use the GUID volume path
+     otherwise. */
+  HANDLE sh = FindFirstVolumeW (vol, 64);
+  if (sh == INVALID_HANDLE_VALUE)
+    debug_printf ("FindFirstVolumeW, %E");
+  else
+    do
+      {
+	/* Skip drives which are not mounted. */
+	if (!get_volume_path_names_for_volume_name (vol, mounts)
+	    || mounts[0] == L'\0')
+	  continue;
+	*wcsrchr (vol, L'\\') = L'\0';
+	if (QueryDosDeviceW (vol + 4, devpath, NT_MAX_PATH))
+	  {
+	    /* The DOS drive mapping can be another symbolic link.  If so,
+	       the mapping won't work since the section name is the name
+	       after resolving all symlinks.  Resolve symlinks here, too. */
+	    for (int syml_cnt = 0; syml_cnt < SYMLOOP_MAX; ++syml_cnt)
+	      {
+		UNICODE_STRING upath;
+		OBJECT_ATTRIBUTES attr;
+		NTSTATUS status;
+		HANDLE h;
+
+		RtlInitUnicodeString (&upath, devpath);
+		InitializeObjectAttributes (&attr, &upath,
+					    OBJ_CASE_INSENSITIVE, NULL, NULL);
+		status = NtOpenSymbolicLinkObject (&h, SYMBOLIC_LINK_QUERY,
+						   &attr);
+		if (!NT_SUCCESS (status))
+		  break;
+		RtlInitEmptyUnicodeString (&upath, devpath, (NT_MAX_PATH - 1)
+							    * sizeof (WCHAR));
+		status = NtQuerySymbolicLinkObject (h, &upath, NULL);
+		NtClose (h);
+		if (!NT_SUCCESS (status))
+		  break;
+		devpath[upath.Length / sizeof (WCHAR)] = L'\0';
+	      }
+	    mapping *m = new mapping ();
+	    if (m)
+	      {
+		m->dospath = wcsdup (mounts);
+		m->ntdevpath = wcsdup (devpath);
+		if (!m->dospath || !m->ntdevpath)
+		  {
+		    free (m->dospath);
+		    free (m->ntdevpath);
+		    delete m;
+		    continue;
+		  }
+		m->doslen = wcslen (m->dospath);
+		m->dospath[--m->doslen] = L'\0'; /* Drop trailing backslash */
+		m->ntlen = wcslen (m->ntdevpath);
+		m->next = mappings;
+		mappings = m;
+	      }
+	  }
+	else
+	  debug_printf ("Unable to determine the native mapping for %ls "
+			"(error %lu)", vol, GetLastError ());
+      }
+    while (FindNextVolumeW (sh, vol, 64));
+    FindVolumeClose (sh);
+}
+
+wchar_t *
+dos_drive_mappings::fixup_if_match (wchar_t *path)
+{
+  /* Check for network drive first. */
+  if (!wcsncmp (path, L"\\Device\\Mup\\", 12))
+    {
+      path += 10;
+      path[0] = L'\\';
+      return path;
+    }
+  /* Then test local drives. */
+  for (mapping *m = mappings; m; m = m->next)
+    if (!wcsncmp (m->ntdevpath, path, m->ntlen))
+      {
+	wchar_t *tmppath;
+
+	if (m->ntlen > m->doslen)
+	  wcsncpy (path += m->ntlen - m->doslen, m->dospath, m->doslen);
+	else if ((tmppath = wcsdup (path + m->ntlen)) != NULL)
+	  {
+	    wcpcpy (wcpcpy (path, m->dospath), tmppath);
+	    free (tmppath);
+	  }
+	break;
+      }
+  return path;
+}
+
+dos_drive_mappings::~dos_drive_mappings ()
+{
+  mapping *n = 0;
+  for (mapping *m = mappings; m; m = n)
+    {
+      n = m->next;
+      free (m->dospath);
+      free (m->ntdevpath);
+      delete m;
+    }
+}

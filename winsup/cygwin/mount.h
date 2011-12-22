@@ -197,4 +197,22 @@ class mount_info
 
   int cygdrive_win32_path (const char *src, char *dst, int& unit);
 };
+
+class dos_drive_mappings
+{
+  struct mapping
+  {
+    mapping *next;
+    size_t doslen;
+    size_t ntlen;
+    wchar_t *dospath;
+    wchar_t *ntdevpath;
+  };
+  mapping *mappings;
+
+public:
+  dos_drive_mappings ();
+  ~dos_drive_mappings ();
+  wchar_t *fixup_if_match (wchar_t *path);
+};
 #endif

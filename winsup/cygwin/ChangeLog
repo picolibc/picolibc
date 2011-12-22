@@ -1,5 +1,21 @@
 2011-12-22  Corinna Vinschen  <vinschen@redhat.com>
 
+	* external.cc (cygwin_internal): Implement CW_ALLOC_DRIVE_MAP,
+	CW_MAP_DRIVE_MAP, CW_FREE_DRIVE_MAP.
+	* fhandler_process.cc: Include mount.h.
+	(get_volume_path_names_for_volume_name): Move to mount.cc.
+	(struct dos_drive_mappings): Ditto.
+	* mount.cc (get_volume_path_names_for_volume_name): Move here.
+	(dos_drive_mappings::dos_drive_mappings): Ditto.
+	(dos_drive_mappings::fixup_if_match): Ditto.
+	(dos_drive_mappings::~dos_drive_mappings): Ditto.
+	* mount.h (class dos_drive_mappings): Declare her.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_ALLOC_DRIVE_MAP,
+	CW_MAP_DRIVE_MAP, CW_FREE_DRIVE_MAP.
+	* include/cygwin/version.h: Bump API minor number.
+
+2011-12-22  Corinna Vinschen  <vinschen@redhat.com>
+
 	* fhandler_process.cc: Drop unneeded includes.
 
 2011-12-22  Corinna Vinschen  <vinschen@redhat.com>

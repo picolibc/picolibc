@@ -528,6 +528,31 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
 	break;
 
+      case CW_ALLOC_DRIVE_MAP:
+      	{
+	  dos_drive_mappings *ddm = new dos_drive_mappings ();
+	  res = (uintptr_t) ddm;
+	}
+	break;
+
+      case CW_MAP_DRIVE_MAP:
+	{
+	  dos_drive_mappings *ddm = va_arg (arg, dos_drive_mappings *);
+	  wchar_t *pathbuf = va_arg (arg, wchar_t *);
+	  if (ddm && pathbuf)
+	    res = (uintptr_t) ddm->fixup_if_match (pathbuf);
+	}
+	break;
+
+      case CW_FREE_DRIVE_MAP:
+	{
+	  dos_drive_mappings *ddm = va_arg (arg, dos_drive_mappings *);
+	  if (ddm)
+	    delete ddm;
+	  res = 0;
+	}
+	break;
+
       default:
 	set_errno (ENOSYS);
     }
