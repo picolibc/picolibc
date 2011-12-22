@@ -592,7 +592,6 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
   PLSA_UNICODE_STRING privstrs;
   ULONG cnt;
   PTOKEN_PRIVILEGES privs = NULL;
-  NTSTATUS ret;
 
   if (usersid == well_known_system_sid)
     {
@@ -608,13 +607,12 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
     {
       if (grp == -1)
 	{
-	  if ((ret = LsaEnumerateAccountRights (lsa, usersid, &privstrs,
-						&cnt)) != STATUS_SUCCESS)
+	  if (LsaEnumerateAccountRights (lsa, usersid, &privstrs, &cnt)
+	      != STATUS_SUCCESS)
 	    continue;
 	}
-      else if ((ret = LsaEnumerateAccountRights (lsa, grp_list.sids[grp],
-						 &privstrs, &cnt))
-	       != STATUS_SUCCESS)
+      else if (LsaEnumerateAccountRights (lsa, grp_list.sids[grp],
+					  &privstrs, &cnt) != STATUS_SUCCESS)
 	continue;
       for (ULONG i = 0; i < cnt; ++i)
 	{

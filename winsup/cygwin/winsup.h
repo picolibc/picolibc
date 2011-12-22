@@ -257,9 +257,6 @@ int __stdcall stat_worker (path_conv &pc, struct __stat64 *buf) __attribute__ ((
 
 __ino64_t __stdcall readdir_get_ino (const char *path, bool dot_dot) __attribute__ ((regparm (2)));
 
-/* Returns the real page size, not the allocation size. */
-size_t getsystempagesize ();
-
 /* mmap functions. */
 enum mmap_region_status
   {

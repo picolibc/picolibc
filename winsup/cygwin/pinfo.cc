@@ -1323,29 +1323,51 @@ winpids::enum_processes (bool winpid)
   if (winpid)
     {
       static DWORD szprocs;
-      static SYSTEM_PROCESSES *procs;
+      static PSYSTEM_PROCESSES procs;
 
       if (!szprocs)
-	procs = (SYSTEM_PROCESSES *) malloc (sizeof (*procs) + (szprocs = 200 * sizeof (*procs)));
-
-      NTSTATUS res;
-      for (;;)
 	{
-	  res = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
-					  procs, szprocs, NULL);
-	  if (res == 0)
-	    break;
-
-	  if (res == STATUS_INFO_LENGTH_MISMATCH)
-	    procs =  (SYSTEM_PROCESSES *) realloc (procs, szprocs += 200 * sizeof (*procs));
-	  else
+	  procs = (PSYSTEM_PROCESSES)
+		  malloc (sizeof (*procs) + (szprocs = 200 * sizeof (*procs)));
+	  if (!procs)
 	    {
-	      system_printf ("error %p reading system process information", res);
+	      system_printf ("out of memory reading system process "
+			     "information");
 	      return 0;
 	    }
 	}
 
-      SYSTEM_PROCESSES *px = procs;
+      for (;;)
+	{
+	  status =
+		NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+					  procs, szprocs, NULL);
+	  if (NT_SUCCESS (status))
+	    break;
+
+	  if (status == STATUS_INFO_LENGTH_MISMATCH)
+	    {
+	      PSYSTEM_PROCESSES new_p;
+
+	      new_p = (PSYSTEM_PROCESSES)
+		      realloc (procs, szprocs += 200 * sizeof (*procs));
+	      if (!new_p)
+		{
+		  system_printf ("out of memory reading system process "
+				 "information");
+		  return 0;
+		}
+	      procs = new_p;
+	    }
+	  else
+	    {
+	      system_printf ("error %p reading system process information",
+			     status);
+	      return 0;
+	    }
+	}
+
+      PSYSTEM_PROCESSES px = procs;
       for (;;)
 	{
 	  if (px->ProcessId)
@@ -1362,7 +1384,7 @@ winpids::enum_processes (bool winpid)
 	    }
 	  if (!px->NextEntryDelta)
 	    break;
-	  px = (SYSTEM_PROCESSES *) ((char *) px + px->NextEntryDelta);
+	  px = (PSYSTEM_PROCESSES) ((char *) px + px->NextEntryDelta);
 	}
     }
 

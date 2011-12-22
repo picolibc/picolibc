@@ -1,9 +1,34 @@
+2011-12-22  Corinna Vinschen  <vinschen@redhat.com>
+
+	Throughout use wincap.allocation_granularity instead of getpagesize.
+	Throughout use wincap.page_size instead of getsystempagesize.
+	Throughout use "status" as variable name to hold NTSTATUS values.
+	* fhandler_mem.cc: Check for NT_SUCCESS rather than for STATUS_SUCCESS.
+	Fix debug_printf output.  Rectify long statements.  Fix comment
+	formatting.
+	* fhandler_proc.cc: Ditto.
+	(format_proc_swaps): Drop useless test for ERROR_PROC_NOT_FOUND.
+	* fhandler_process.cc: Ditto as in fhandler_mem.cc.
+	(get_process_state): Rearrange allocation loop.  Use malloc/realloc.
+	(get_mem_values): Fix potential NULL pointer usage.  Drop unused
+	variable.
+	* pinfo.cc (winpids::enum_processes): Handle low memory gracefully.
+	* sec_auth.cc (get_priv_list): Drop local variable ret.
+	* shared.cc (memory_init): Drop outdated call to getpagesize.
+	* syscalls.cc (getsystempagesize): Remove.
+	* sysconf.cc: Check for NT_SUCCESS rather than for STATUS_SUCCESS.
+	(sysinfo): Constify sizeof_stodi.  Drop useless test for
+	ERROR_PROC_NOT_FOUND.
+	* thread.cc (pthread_getattr_np): Cast pointers to uintptr_t rather
+	than to int for pointer arithmetic.
+	* winsup.h (getsystempagesize): Drop declaration.
+
 2011-12-21  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Use correct
 	value in switch statement.
 
-2011-12-11  Corinna Vinschen  <vinschen@redhat.com>
+2011-12-21  Corinna Vinschen  <vinschen@redhat.com>
 
 	* dcrt0.cc (_dll_crt0): Rephrase comments.  Set $ebp to NULL, as in
 	the pthread stack setup.

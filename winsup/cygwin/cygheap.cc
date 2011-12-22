@@ -126,7 +126,7 @@ static void *__stdcall
 _csbrk (int sbs)
 {
   void *prebrk = cygheap_max;
-  size_t granmask = getpagesize () - 1;
+  size_t granmask = wincap.allocation_granularity () - 1;
   char *newbase = nextpage (prebrk);
   cygheap_max = (char *) cygheap_max + sbs;
   if (!sbs || (newbase >= cygheap_max) || (cygheap_max <= _cygheap_end))

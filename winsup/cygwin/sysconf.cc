@@ -32,20 +32,21 @@ get_open_max (int in)
 static long
 get_page_size (int in)
 {
-  return getpagesize ();
+  return wincap.allocation_granularity ();
 }
 
 static long
 get_nproc_values (int in)
 {
-  NTSTATUS ret;
+  NTSTATUS status;
   SYSTEM_BASIC_INFORMATION sbi;
-  if ((ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
-				       sizeof sbi, NULL)) != STATUS_SUCCESS)
+
+  status = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
+				     sizeof sbi, NULL);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_nt_status (ret);
-      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E",
-		    ret);
+      __seterrno_from_nt_status (status);
+      debug_printf ("NtQuerySystemInformation: status %p, %E", status);
       return -1;
     }
   switch (in)
@@ -63,7 +64,7 @@ get_nproc_values (int in)
       }
     case _SC_PHYS_PAGES:
       return sbi.NumberOfPhysicalPages
-	     / (getpagesize () / getsystempagesize ());
+	     / (wincap.allocation_granularity () / wincap.page_size ());
     }
   return -1;
 }
@@ -71,18 +72,19 @@ get_nproc_values (int in)
 static long
 get_avphys (int in)
 {
-  NTSTATUS ret;
+  NTSTATUS status;
   SYSTEM_PERFORMANCE_INFORMATION spi;
-  if ((ret = NtQuerySystemInformation (SystemPerformanceInformation,
-				       (PVOID) &spi, sizeof spi, NULL))
-      != STATUS_SUCCESS)
+
+  status = NtQuerySystemInformation (SystemPerformanceInformation,
+				     (PVOID) &spi, sizeof spi, NULL);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_nt_status (ret);
-      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %E",
-		    ret);
+      __seterrno_from_nt_status (status);
+      debug_printf ("NtQuerySystemInformation: status %d, %E", status);
       return -1;
     }
-  return spi.AvailablePages / (getpagesize () / getsystempagesize ());
+  return spi.AvailablePages
+	 / (wincap.allocation_granularity () / wincap.page_size ());
 }
 
 enum sc_type { nsup, cons, func };
@@ -334,8 +336,8 @@ sysinfo (struct sysinfo *info)
   PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
   ULONG sizeof_spi = 512;
   PSYSTEM_TIME_OF_DAY_INFORMATION stodi = NULL;
-  ULONG sizeof_stodi = sizeof (SYSTEM_TIME_OF_DAY_INFORMATION);
-  NTSTATUS ret = STATUS_SUCCESS;
+  const ULONG sizeof_stodi = sizeof (SYSTEM_TIME_OF_DAY_INFORMATION);
+  NTSTATUS status = STATUS_SUCCESS;
   winpids pids ((DWORD) 0);
 
   if (!info)
@@ -345,46 +347,46 @@ sysinfo (struct sysinfo *info)
     }
 
   stodi = (PSYSTEM_TIME_OF_DAY_INFORMATION) malloc (sizeof_stodi);
-  ret = NtQuerySystemInformation (SystemTimeOfDayInformation, (PVOID) stodi,
-				  sizeof_stodi, NULL);
-  if (NT_SUCCESS (ret))
-    uptime = (stodi->CurrentTime.QuadPart - stodi->BootTime.QuadPart) / 10000000ULL;
+  status = NtQuerySystemInformation (SystemTimeOfDayInformation, (PVOID) stodi,
+				     sizeof_stodi, NULL);
+  if (NT_SUCCESS (status))
+    uptime = (stodi->CurrentTime.QuadPart - stodi->BootTime.QuadPart)
+	     / 10000000ULL;
   else
-    {
-      debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
-		  "status %p", ret);
-    }
+    debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
+		  "status %p", status);
 
   if (stodi)
     free (stodi);
 
   memory_status.dwLength = sizeof (MEMORYSTATUSEX);
   GlobalMemoryStatusEx (&memory_status);
-  totalram = memory_status.ullTotalPhys / getsystempagesize ();
-  freeram = memory_status.ullAvailPhys / getsystempagesize ();
+  totalram = memory_status.ullTotalPhys / wincap.page_size ();
+  freeram = memory_status.ullAvailPhys / wincap.page_size ();
 
   spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (sizeof_spi);
   if (spi)
     {
-      ret = NtQuerySystemInformation (SystemPagefileInformation, (PVOID) spi,
-				      sizeof_spi, &sizeof_spi);
-      if (ret == STATUS_INFO_LENGTH_MISMATCH)
+      status = NtQuerySystemInformation (SystemPagefileInformation, (PVOID) spi,
+					 sizeof_spi, &sizeof_spi);
+      if (status == STATUS_INFO_LENGTH_MISMATCH)
 	{
 	  free (spi);
 	  spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (sizeof_spi);
 	  if (spi)
-	    ret = NtQuerySystemInformation (SystemPagefileInformation,
-					    (PVOID) spi, sizeof_spi, &sizeof_spi);
+	    status = NtQuerySystemInformation (SystemPagefileInformation,
+					       (PVOID) spi, sizeof_spi,
+					       &sizeof_spi);
 	}
     }
-  if (!spi || ret || (!ret && GetLastError () == ERROR_PROC_NOT_FOUND))
+  if (!spi || !NT_SUCCESS (status))
     {
       debug_printf ("NtQuerySystemInformation(SystemPagefileInformation), "
-		  "status %p", ret);
+		    "status %p", status);
       totalswap = (memory_status.ullTotalPageFile - memory_status.ullTotalPhys)
-			/ getsystempagesize ();
+		  / wincap.page_size ();
       freeswap = (memory_status.ullAvailPageFile - memory_status.ullTotalPhys)
-			/ getsystempagesize ();
+		 / wincap.page_size ();
     }
   else
     {
@@ -407,7 +409,7 @@ sysinfo (struct sysinfo *info)
   info->totalswap = (unsigned long) totalswap;
   info->freeswap = (unsigned long) freeswap;
   info->procs = (unsigned short) pids.npids;
-  info->mem_unit = (unsigned int) getsystempagesize ();
+  info->mem_unit = (unsigned int) wincap.page_size ();
 
   /* FIXME: unsupported */
   info->loads[0] = 0UL;

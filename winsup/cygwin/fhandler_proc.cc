@@ -460,7 +460,7 @@ static _off64_t
 format_proc_uptime (void *, char *&destbuf)
 {
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
-  NTSTATUS ret;
+  NTSTATUS status;
   SYSTEM_TIME_OF_DAY_INFORMATION stodi;
   /* Sizeof SYSTEM_PERFORMANCE_INFORMATION on 64 bit systems.  It
      appears to contain some trailing additional information from
@@ -470,13 +470,13 @@ format_proc_uptime (void *, char *&destbuf)
   PSYSTEM_PERFORMANCE_INFORMATION spi = (PSYSTEM_PERFORMANCE_INFORMATION)
 					alloca (sizeof_spi);
 
-  ret = NtQuerySystemInformation (SystemTimeOfDayInformation, &stodi,
-				  sizeof stodi, NULL);
-  if (NT_SUCCESS (ret))
+  status = NtQuerySystemInformation (SystemTimeOfDayInformation, &stodi,
+				     sizeof stodi, NULL);
+  if (NT_SUCCESS (status))
     uptime = (stodi.CurrentTime.QuadPart - stodi.BootTime.QuadPart) / 100000ULL;
   else
     debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
-		  "status %p", ret);
+		  "status %p", status);
 
   if (NT_SUCCESS (NtQuerySystemInformation (SystemPerformanceInformation,
 						 spi, sizeof_spi, NULL)))
@@ -495,7 +495,7 @@ format_proc_stat (void *, char *&destbuf)
   unsigned long pages_in = 0UL, pages_out = 0UL, interrupt_count = 0UL,
 		context_switches = 0UL, swap_in = 0UL, swap_out = 0UL;
   time_t boot_time = 0;
-  NTSTATUS ret;
+  NTSTATUS status;
   /* Sizeof SYSTEM_PERFORMANCE_INFORMATION on 64 bit systems.  It
      appears to contain some trailing additional information from
      what I can tell after examining the content.
@@ -510,11 +510,11 @@ format_proc_stat (void *, char *&destbuf)
   char *eobuf = buf;
 
   SYSTEM_PROCESSOR_TIMES spt[wincap.cpu_count ()];
-  ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
-				  sizeof spt[0] * wincap.cpu_count (), NULL);
-  if (!NT_SUCCESS (ret))
+  status = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
+				     sizeof spt[0] * wincap.cpu_count (), NULL);
+  if (!NT_SUCCESS (status))
     debug_printf ("NtQuerySystemInformation(SystemProcessorTimes), "
-		  "status %p", ret);
+		  "status %p", status);
   else
     {
       unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
@@ -539,36 +539,32 @@ format_proc_stat (void *, char *&destbuf)
 				    user_time, 0ULL, kernel_time, idle_time);
 	}
 
-      ret = NtQuerySystemInformation (SystemPerformanceInformation,
-				      (PVOID) spi, sizeof_spi, NULL);
-      if (!NT_SUCCESS (ret))
+      status = NtQuerySystemInformation (SystemPerformanceInformation,
+					 (PVOID) spi, sizeof_spi, NULL);
+      if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("NtQuerySystemInformation(SystemPerformanceInformation)"
-			", status %p", ret);
+			", status %p", status);
 	  memset (spi, 0, sizeof_spi);
 	}
-      ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
-				      (PVOID) &stodi,
-				      sizeof stodi, NULL);
-      if (!NT_SUCCESS (ret))
+      status = NtQuerySystemInformation (SystemTimeOfDayInformation,
+					 (PVOID) &stodi, sizeof stodi, NULL);
+      if (!NT_SUCCESS (status))
 	debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
-		      "status %p", ret);
+		      "status %p", status);
     }
-  if (!NT_SUCCESS (ret))
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_nt_status (ret);
+      __seterrno_from_nt_status (status);
       return 0;
     }
 
   pages_in = spi->PagesRead;
   pages_out = spi->PagefilePagesWritten + spi->MappedFilePagesWritten;
-  /*
-   * Note: there is no distinction made in this structure between pages
-   * read from the page file and pages read from mapped files, but there
-   * is such a distinction made when it comes to writing. Goodness knows
-   * why. The value of swap_in, then, will obviously be wrong but its our
-   * best guess.
-   */
+  /* Note: there is no distinction made in this structure between pages read
+     from the page file and pages read from mapped files, but there is such
+     a distinction made when it comes to writing.  Goodness knows why.  The
+     value of swap_in, then, will obviously be wrong but its our best guess. */
   swap_in = spi->PagesRead;
   swap_out = spi->PagefilePagesWritten;
   context_switches = spi->ContextSwitches;
@@ -705,7 +701,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  maxf &= 0xffff;
 	  vendor_id[3] = 0;
 
-	  // vendor identification
+	  /* Vendor identification. */
 	  bool is_amd = false, is_intel = false;
 	  if (!strcmp ((char*)vendor_id, "AuthenticAMD"))
 	    is_amd = true;
@@ -746,18 +742,18 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		}
 	      else
 		{
-		  // could implement a lookup table here if someone needs it
+		  /* Could implement a lookup table here if someone needs it. */
 		  strcpy (in_buf.s, "unknown");
 		}
 	      int cache_size = -1,
 		  tlb_size = -1,
 		  clflush = 64,
 		  cache_alignment = 64;
-	      if (features1 & (1 << 19)) // CLFSH
+	      if (features1 & (1 << 19)) /* CLFSH */
 		clflush = ((extra_info >> 8) & 0xff) << 3;
 	      if (is_intel && family == 15)
 		cache_alignment = clflush * 2;
-	      if (maxe >= 0x80000005) // L1 Cache and TLB Identifiers
+	      if (maxe >= 0x80000005) /* L1 Cache and TLB Identifiers. */
 		{
 		  unsigned data_cache, inst_cache;
 		  cpuid (&unused, &unused, &data_cache, &inst_cache,
@@ -766,7 +762,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		  cache_size = (inst_cache >> 24) + (data_cache >> 24);
 		  tlb_size = 0;
 		}
-	      if (maxe >= 0x80000006) // L2 Cache and L2 TLB Identifiers
+	      if (maxe >= 0x80000006) /* L2 Cache and L2 TLB Identifiers. */
 		{
 		  unsigned tlb, l2;
 		  cpuid (&unused, &tlb, &l2, &unused, 0x80000006);
@@ -788,7 +784,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		bufptr += __small_sprintf (bufptr, "cache size\t: %d KB\n",
 					   cache_size);
 
-	      // Recognize multi-core CPUs
+	      /* Recognize multi-core CPUs. */
 	      if (is_amd && maxe >= 0x80000008)
 		{
 		  unsigned core_info;
@@ -810,7 +806,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 						 apic_id, core_id, max_cores);
 		    }
 		}
-	      // Recognize Intel Hyper-Transport CPUs
+	      /* Recognize Intel Hyper-Transport CPUs. */
 	      else if (is_intel && (features1 & (1 << 28)) && maxf >= 4)
 		{
 		  /* TODO */
@@ -895,7 +891,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 		  if (features & (1 << 11))
 		    print (" syscall");
-		  if (features & (1 << 19)) // Huh?  Not in AMD64 specs.
+		  if (features & (1 << 19)) /* Huh?  Not in AMD64 specs. */
 		    print (" mp");
 		  if (features & (1 << 20))
 		    print (" nx");
@@ -909,9 +905,9 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		    print (" rdtscp");
 		  if (features & (1 << 29))
 		    print (" lm");
-		  if (features & (1 << 30)) // 31th bit is on
+		  if (features & (1 << 30)) /* 31th bit is on. */
 		    print (" 3dnowext");
-		  if (features & (1 << 31)) // 32th bit (highest) is on
+		  if (features & (1 << 31)) /* 32th bit (highest) is on. */
 		    print (" 3dnow");
 		}
 
@@ -1024,7 +1020,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 					 clflush,
 					 cache_alignment);
 
-	      if (maxe >= 0x80000008) // Address size
+	      if (maxe >= 0x80000008) /* Address size. */
 		{
 		  unsigned addr_size, phys, virt;
 		  cpuid (&addr_size, &unused, &unused, &unused, 0x80000008);
@@ -1040,7 +1036,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 					     phys, virt);
 		}
 
-	      if (maxe >= 0x80000007) // advanced power management
+	      if (maxe >= 0x80000007) /* Advanced power management. */
 		{
 		  cpuid (&unused, &unused, &unused, &features2, 0x80000007);
 
@@ -1287,7 +1283,7 @@ format_proc_swaps (void *, char *&destbuf)
   ssize_t filename_len;
   PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
   ULONG size = 512;
-  NTSTATUS ret = STATUS_SUCCESS;
+  NTSTATUS status = STATUS_SUCCESS;
 
   tmp_pathbuf tp;
   char *buf = tp.c_get ();
@@ -1296,39 +1292,41 @@ format_proc_swaps (void *, char *&destbuf)
   spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
   if (spi)
     {
-      ret = NtQuerySystemInformation (SystemPagefileInformation, (PVOID) spi,
-				      size, &size);
-      if (ret == STATUS_INFO_LENGTH_MISMATCH)
+      status = NtQuerySystemInformation (SystemPagefileInformation, (PVOID) spi,
+					 size, &size);
+      if (status == STATUS_INFO_LENGTH_MISMATCH)
 	{
 	  free (spi);
 	  spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
 	  if (spi)
-	    ret = NtQuerySystemInformation (SystemPagefileInformation,
-					    (PVOID) spi, size, &size);
+	    status = NtQuerySystemInformation (SystemPagefileInformation,
+					       (PVOID) spi, size, &size);
 	}
     }
 
   bufptr += __small_sprintf (bufptr,
 			     "Filename\t\t\t\tType\t\tSize\tUsed\tPriority\n");
 
-  if (spi && !ret && GetLastError () != ERROR_PROC_NOT_FOUND)
+  if (spi && NT_SUCCESS (status))
     {
       PSYSTEM_PAGEFILE_INFORMATION spp = spi;
       do
 	{
-	  total = (unsigned long long) spp->CurrentSize * getsystempagesize ();
-	  used = (unsigned long long) spp->TotalUsed * getsystempagesize ();
+	  total = (unsigned long long) spp->CurrentSize * wincap.page_size ();
+	  used = (unsigned long long) spp->TotalUsed * wincap.page_size ();
 
-	  filename_len = cygwin_conv_path (CCP_WIN_W_TO_POSIX, spp->FileName.Buffer, filename, 0);
+	  filename_len = cygwin_conv_path (CCP_WIN_W_TO_POSIX,
+					   spp->FileName.Buffer, filename, 0);
 	  filename = (char *) malloc (filename_len);
-	  cygwin_conv_path (CCP_WIN_W_TO_POSIX, spp->FileName.Buffer, filename, filename_len);
+	  cygwin_conv_path (CCP_WIN_W_TO_POSIX, spp->FileName.Buffer,
+			    filename, filename_len);
 
 	  bufptr += sprintf (bufptr, "%-40s%-16s%-8llu%-8llu%-8d\n",
 			     filename, "file", total >> 10, used >> 10, 0);
 	}
       while (spp->NextEntryOffset
 	     && (spp = (PSYSTEM_PAGEFILE_INFORMATION)
-			   ((char *) spp + spp->NextEntryOffset)));
+		       ((char *) spp + spp->NextEntryOffset)));
     }
 
   if (spi)

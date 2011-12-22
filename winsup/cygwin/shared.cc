@@ -436,8 +436,6 @@ shared_info::initialize ()
 void
 memory_init (bool init_cygheap)
 {
-  getpagesize ();
-
   /* Initialize the Cygwin heap, if necessary */
   if (init_cygheap)
     {

@@ -88,9 +88,8 @@ static bool get_mem_values (DWORD dwProcessId, unsigned long *vmsize,
 			    unsigned long *vmshare);
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
- * -1 if path is a file, -2 if path is a symlink, -3 if path is a pipe,
- * -4 if path is a socket.
- */
+   -1 if path is a file, -2 if path is a symlink, -3 if path is a pipe,
+   -4 if path is a socket. */
 virtual_ftype_t
 fhandler_process::exists ()
 {
@@ -1021,10 +1020,10 @@ format_process_maps (void *data, char *&destbuf)
 	 the same allocation base and effective permissions. */
       bool newbase = (next.abase != cur.abase);
       if (!last_pass && !newbase && next.a.word == cur.a.word)
-	  cur.rend = next.rend; // merge with previous
+	  cur.rend = next.rend; /* merge with previous */
       else
 	{
-	  // output the current region if it's "interesting"
+	  /* output the current region if it's "interesting". */
 	  if (cur.a.word)
 	    {
 	      size_t newlen = strlen (posix_modname) + 62;
@@ -1044,9 +1043,9 @@ format_process_maps (void *data, char *&destbuf)
 	      len += written;
 	      len += __small_sprintf (destbuf + len, "%s\n", posix_modname);
 	    }
-	  // start of a new region (but possibly still the same allocation)
+	  /* start of a new region (but possibly still the same allocation). */
 	  cur = next;
-	  // if a new allocation, figure out what kind it is
+	  /* if a new allocation, figure out what kind it is. */
 	  if (newbase && !last_pass && mb.State != MEM_FREE)
 	    {
 	      /* If the return length pointer is missing, NtQueryVirtualMemory
@@ -1121,10 +1120,8 @@ format_process_stat (void *data, char *&destbuf)
 	    *s = 0;
 	 }
     }
-  /*
-   * Note: under Windows, a _process_ is always running - it's only _threads_
-   * that get suspended. Therefore the default state is R (runnable).
-   */
+  /* Note: under Windows, a process is always running - it's only threads
+     that get suspended.  Therefore the default state is R (runnable). */
   if (p->process_state & PID_EXITED)
     state = 'Z';
   else if (p->process_state & PID_STOPPED)
@@ -1133,7 +1130,7 @@ format_process_stat (void *data, char *&destbuf)
     state = get_process_state (p->dwProcessId);
   start_time = (GetTickCount () / 1000 - time (NULL) + p->start_time) * HZ;
 
-  NTSTATUS ret;
+  NTSTATUS status;
   HANDLE hProcess;
   VM_COUNTERS vmc;
   KERNEL_USER_TIMES put;
@@ -1145,25 +1142,17 @@ format_process_stat (void *data, char *&destbuf)
 			  FALSE, p->dwProcessId);
   if (hProcess != NULL)
     {
-      ret = NtQueryInformationProcess (hProcess,
-				       ProcessVmCounters,
-				       (PVOID) &vmc,
-				       sizeof vmc, NULL);
-      if (ret == STATUS_SUCCESS)
-	ret = NtQueryInformationProcess (hProcess,
-					 ProcessTimes,
-					 (PVOID) &put,
-					 sizeof put, NULL);
-      if (ret == STATUS_SUCCESS)
-	ret = NtQueryInformationProcess (hProcess,
-					 ProcessBasicInformation,
-					 (PVOID) &pbi,
-					 sizeof pbi, NULL);
-      if (ret == STATUS_SUCCESS)
-	ret = NtQueryInformationProcess (hProcess,
-					 ProcessQuotaLimits,
-					 (PVOID) &ql,
-					 sizeof ql, NULL);
+      status = NtQueryInformationProcess (hProcess, ProcessVmCounters,
+					  (PVOID) &vmc, sizeof vmc, NULL);
+      if (NT_SUCCESS (status))
+	status = NtQueryInformationProcess (hProcess, ProcessTimes,
+					    (PVOID) &put, sizeof put, NULL);
+      if (NT_SUCCESS (status))
+	status = NtQueryInformationProcess (hProcess, ProcessBasicInformation,
+					    (PVOID) &pbi, sizeof pbi, NULL);
+      if (NT_SUCCESS (status))
+	status = NtQueryInformationProcess (hProcess, ProcessQuotaLimits,
+					    (PVOID) &ql, sizeof ql, NULL);
       CloseHandle (hProcess);
     }
   else
@@ -1173,18 +1162,16 @@ format_process_stat (void *data, char *&destbuf)
       debug_printf ("OpenProcess: ret %d", error);
       return 0;
     }
-  if (ret == STATUS_SUCCESS)
-    ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
-				    (PVOID) &stodi,
-				    sizeof stodi, NULL);
-  if (ret == STATUS_SUCCESS)
-    ret = NtQuerySystemInformation (SystemProcessorTimes,
-				    (PVOID) &spt,
-				    sizeof spt, NULL);
-  if (ret != STATUS_SUCCESS)
+  if (NT_SUCCESS (status))
+    status = NtQuerySystemInformation (SystemTimeOfDayInformation,
+				       (PVOID) &stodi, sizeof stodi, NULL);
+  if (NT_SUCCESS (status))
+    status = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) &spt,
+				       sizeof spt, NULL);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_nt_status (ret);
-      debug_printf ("NtQueryInformationProcess: ret %d, Dos(ret) %E", ret);
+      __seterrno_from_nt_status (status);
+      debug_printf ("NtQueryInformationProcess: status %p, %E", status);
       return 0;
     }
   fault_count = vmc.PageFaultCount;
@@ -1203,7 +1190,7 @@ format_process_stat (void *data, char *&destbuf)
      start_time = (spt.KernelTme.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
 #endif
   priority = pbi.BasePriority;
-  unsigned page_size = getsystempagesize ();
+  unsigned page_size = wincap.page_size ();
   vmsize = vmc.PagefileUsage;
   vmrss = vmc.WorkingSetSize / page_size;
   vmmaxrss = ql.MaximumWorkingSetSize / page_size;
@@ -1246,10 +1233,8 @@ format_process_status (void *data, char *&destbuf)
       if (ascii_strcasematch (s, ".exe"))
 	*s = 0;
      }
-  /*
-   * Note: under Windows, a _process_ is always running - it's only _threads_
-   * that get suspended. Therefore the default state is R (runnable).
-   */
+  /* Note: under Windows, a process is always running - it's only threads
+     that get suspended.  Therefore the default state is R (runnable). */
   if (p->process_state & PID_EXITED)
     state = 'Z';
   else if (p->process_state & PID_STOPPED)
@@ -1278,12 +1263,12 @@ format_process_status (void *data, char *&destbuf)
   if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
 		       &vmlib, &vmshare))
     return 0;
-  unsigned page_size = getsystempagesize ();
+  unsigned page_size = wincap.page_size ();
   vmsize *= page_size; vmrss *= page_size; vmdata *= page_size;
   vmtext *= page_size; vmlib *= page_size;
-  // The real uid value for *this* process is stored at cygheap->user.real_uid
-  // but we can't get at the real uid value for any other process, so
-  // just fake it as p->uid. Similar for p->gid.
+  /* The real uid value for *this* process is stored at cygheap->user.real_uid
+     but we can't get at the real uid value for any other process, so
+     just fake it as p->uid.  Similar for p->gid. */
   destbuf = (char *) crealloc_abort (destbuf, strlen (cmd) + 320);
   return __small_sprintf (destbuf, "Name:\t%s\n"
 				   "State:\t%c (%s)\n"
@@ -1393,29 +1378,36 @@ format_process_mounts (void *data, char *&destbuf)
 int
 get_process_state (DWORD dwProcessId)
 {
-  /*
-   * This isn't really heavy magic - just go through the processes'
-   * threads one by one and return a value accordingly
-   * Errors are silently ignored.
-   */
-  NTSTATUS ret;
-  SYSTEM_PROCESSES *sp;
-  ULONG n = 0x1000;
-  PULONG p = new ULONG[n];
+  /* This isn't really heavy magic - just go through the processes' threads
+     one by one and return a value accordingly.  Errors are silently ignored. */
+  NTSTATUS status;
+  PSYSTEM_PROCESSES p, sp;
+  ULONG n = 0x4000;
   int state =' ';
-  while (STATUS_INFO_LENGTH_MISMATCH ==
-	 (ret = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
-					 (PVOID) p,
-					 n * sizeof *p, NULL)))
-    delete [] p, p = new ULONG[n *= 2];
-  if (ret != STATUS_SUCCESS)
+
+  p = (PSYSTEM_PROCESSES) malloc (n);
+  if (!p)
+    return state;
+  while (true)
     {
-      debug_printf ("NtQuerySystemInformation: ret %d, Dos(ret) %d",
-		    ret, RtlNtStatusToDosError (ret));
+      status = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+					 (PVOID) p, n, NULL);
+      if (status != STATUS_INFO_LENGTH_MISMATCH)
+	break;
+      n <<= 1;
+      PSYSTEM_PROCESSES new_p = (PSYSTEM_PROCESSES) realloc (p, n);
+      if (!new_p)
+      	goto out;
+      p = new_p;
+    }
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("NtQuerySystemInformation: status %p, %lu",
+		    status, RtlNtStatusToDosError (status));
       goto out;
     }
   state = 'Z';
-  sp = (SYSTEM_PROCESSES *) p;
+  sp = p;
   for (;;)
     {
       if (sp->ProcessId == dwProcessId)
@@ -1438,10 +1430,10 @@ get_process_state (DWORD dwProcessId)
 	}
       if (!sp->NextEntryDelta)
 	 break;
-      sp = (SYSTEM_PROCESSES *) ((char *) sp + sp->NextEntryDelta);
+      sp = (PSYSTEM_PROCESSES) ((char *) sp + sp->NextEntryDelta);
     }
 out:
-  delete [] p;
+  free (p);
   return state;
 }
 
@@ -1451,15 +1443,16 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
 		unsigned long *vmlib, unsigned long *vmshare)
 {
   bool res = false;
-  NTSTATUS ret;
+  NTSTATUS status;
   HANDLE hProcess;
   VM_COUNTERS vmc;
-  MEMORY_WORKING_SET_LIST *mwsl;
+  PMEMORY_WORKING_SET_LIST p;
   ULONG n = 0x4000, length;
-  PMEMORY_WORKING_SET_LIST p = (PMEMORY_WORKING_SET_LIST) malloc (n);
-  unsigned page_size = getsystempagesize ();
-  hProcess = OpenProcess (PROCESS_QUERY_INFORMATION,
-			  FALSE, dwProcessId);
+
+  p = (PMEMORY_WORKING_SET_LIST) malloc (n);
+  if (!p)
+    return false;
+  hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
   if (hProcess == NULL)
     {
       __seterrno ();
@@ -1468,9 +1461,10 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     }
   while (true)
     {
-      ret = NtQueryVirtualMemory (hProcess, 0, MemoryWorkingSetList,
-				  (PVOID) p, n, (length = ULONG_MAX, &length));
-      if (ret != STATUS_INFO_LENGTH_MISMATCH)
+      status = NtQueryVirtualMemory (hProcess, 0, MemoryWorkingSetList,
+				     (PVOID) p, n,
+				     (length = ULONG_MAX, &length));
+      if (status != STATUS_INFO_LENGTH_MISMATCH)
 	break;
       n <<= 1;
       PMEMORY_WORKING_SET_LIST new_p = (PMEMORY_WORKING_SET_LIST)
@@ -1479,23 +1473,22 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
 	goto out;
       p = new_p;
     }
-  if (!NT_SUCCESS (ret))
+  if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryVirtualMemory: ret %p", ret);
-      if (ret == STATUS_PROCESS_IS_TERMINATING)
+      debug_printf ("NtQueryVirtualMemory: status %p", status);
+      if (status == STATUS_PROCESS_IS_TERMINATING)
 	{
 	  *vmsize = *vmrss = *vmtext = *vmdata = *vmlib = *vmshare = 0;
 	  res = true;
 	}
       else
-	__seterrno_from_nt_status (ret);
+	__seterrno_from_nt_status (status);
       goto out;
     }
-  mwsl = (MEMORY_WORKING_SET_LIST *) p;
-  for (unsigned long i = 0; i < mwsl->NumberOfPages; i++)
+  for (unsigned long i = 0; i < p->NumberOfPages; i++)
     {
       ++*vmrss;
-      unsigned flags = mwsl->WorkingSetList[i] & 0x0FFF;
+      unsigned flags = p->WorkingSetList[i] & 0x0FFF;
       if ((flags & (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE))
 	  == (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE))
 	++*vmlib;
@@ -1506,15 +1499,15 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
       else
 	++*vmdata;
     }
-  ret = NtQueryInformationProcess (hProcess, ProcessVmCounters, (PVOID) &vmc,
-				   sizeof vmc, NULL);
-  if (!NT_SUCCESS (ret))
+  status = NtQueryInformationProcess (hProcess, ProcessVmCounters, (PVOID) &vmc,
+				      sizeof vmc, NULL);
+  if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryInformationProcess: ret %p", ret);
-      __seterrno_from_nt_status (ret);
+      debug_printf ("NtQueryInformationProcess: status %p", status);
+      __seterrno_from_nt_status (status);
       goto out;
     }
-  *vmsize = vmc.PagefileUsage / page_size;
+  *vmsize = vmc.PagefileUsage / wincap.page_size ();
   res = true;
 out:
   free (p);

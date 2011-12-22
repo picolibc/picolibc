@@ -2509,7 +2509,7 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
 {
   const size_t sizeof_tbi = sizeof (THREAD_BASIC_INFORMATION);
   PTHREAD_BASIC_INFORMATION tbi;
-  NTSTATUS ret;
+  NTSTATUS status;
 
   if (!pthread::is_good_object (&thread))
     return ESRCH;
@@ -2529,20 +2529,21 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
   (*attr)->guardsize = thread->attr.guardsize;
 
   tbi = (PTHREAD_BASIC_INFORMATION) malloc (sizeof_tbi);
-  ret = NtQueryInformationThread (thread->win32_obj_id, ThreadBasicInformation,
-				  tbi, sizeof_tbi, NULL);
-
-  if (NT_SUCCESS (ret))
+  status = NtQueryInformationThread (thread->win32_obj_id,
+				     ThreadBasicInformation,
+				     tbi, sizeof_tbi, NULL);
+  if (NT_SUCCESS (status))
     {
       PNT_TIB tib = tbi->TebBaseAddress;
       (*attr)->stackaddr = tib->StackBase;
       /* stack grows downwards on x86 systems */
-      (*attr)->stacksize = (int)tib->StackBase - (int)tib->StackLimit;
+      (*attr)->stacksize = (uintptr_t) tib->StackBase
+			   - (uintptr_t) tib->StackLimit;
     }
   else
     {
       debug_printf ("NtQueryInformationThread(ThreadBasicInformation), "
-		    "status %p", ret);
+		    "status %p", status);
       (*attr)->stackaddr = thread->attr.stackaddr;
       (*attr)->stacksize = thread->attr.stacksize;
     }

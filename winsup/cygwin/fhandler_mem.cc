@@ -32,6 +32,8 @@ fhandler_dev_mem::~fhandler_dev_mem ()
 int
 fhandler_dev_mem::open (int flags, mode_t)
 {
+  NTSTATUS status;
+
   if (!wincap.has_physical_mem_access ())
     {
       set_errno (ENOENT);
@@ -41,13 +43,13 @@ fhandler_dev_mem::open (int flags, mode_t)
 
   if (dev () == FH_MEM) /* /dev/mem */
     {
-      NTSTATUS ret;
       SYSTEM_BASIC_INFORMATION sbi;
-      if ((ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
-					   sizeof sbi, NULL)) != STATUS_SUCCESS)
+      status = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
+					 sizeof sbi, NULL);
+      if (NT_SUCCESS (status))
 	{
-	  __seterrno_from_nt_status (ret);
-	  debug_printf("NtQuerySystemInformation: ret %d, Dos(ret) %E", ret);
+	  __seterrno_from_nt_status (status);
+	  debug_printf("NtQuerySystemInformation: status %p, %E", status);
 	  mem_size = 0;
 	}
       else
@@ -67,7 +69,7 @@ fhandler_dev_mem::open (int flags, mode_t)
   else
     {
       mem_size = 0;
-      debug_printf ("Illegal minor number!!!");
+      debug_printf ("Illegal minor number");
     }
 
   /* Check for illegal flags. */
@@ -101,10 +103,10 @@ fhandler_dev_mem::open (int flags, mode_t)
     }
 
   HANDLE mem;
-  NTSTATUS ret = NtOpenSection (&mem, section_access, &attr);
-  if (!NT_SUCCESS (ret))
+  status = NtOpenSection (&mem, section_access, &attr);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_nt_status (ret);
+      __seterrno_from_nt_status (status);
       set_io_handle (NULL);
       return 0;
     }
@@ -130,31 +132,26 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
     ulen = mem_size - pos;
 
   PHYSICAL_ADDRESS phys;
-  NTSTATUS ret;
+  NTSTATUS status;
   void *viewmem = NULL;
-  DWORD len = ulen + getsystempagesize () - 1;
+  DWORD len = ulen + wincap.page_size () - 1;
 
   phys.QuadPart = (ULONGLONG) pos;
-  if ((ret = NtMapViewOfSection (get_handle (),
-				 INVALID_HANDLE_VALUE,
-				 &viewmem,
-				 0L,
-				 len,
-				 &phys,
-				 &len,
-				 ViewShare,
-				 0,
-				 PAGE_READONLY)) != STATUS_SUCCESS)
+  status = NtMapViewOfSection (get_handle (), INVALID_HANDLE_VALUE, &viewmem,
+			       0L, len, &phys, &len, ViewShare, 0,
+			       PAGE_READONLY);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_nt_status (ret);
+      __seterrno_from_nt_status (status);
       return -1;
     }
 
   memcpy ((char *) viewmem + (pos - phys.QuadPart), ptr, ulen);
 
-  if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
+  status = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_nt_status (ret);
+      __seterrno_from_nt_status (status);
       return -1;
     }
 
@@ -182,32 +179,27 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
     ulen = mem_size - pos;
 
   PHYSICAL_ADDRESS phys;
-  NTSTATUS ret;
+  NTSTATUS status;
   void *viewmem = NULL;
-  DWORD len = ulen + getsystempagesize () - 1;
+  DWORD len = ulen + wincap.page_size () - 1;
 
   phys.QuadPart = (ULONGLONG) pos;
-  if ((ret = NtMapViewOfSection (get_handle (),
-				 INVALID_HANDLE_VALUE,
-				 &viewmem,
-				 0L,
-				 len,
-				 &phys,
-				 &len,
-				 ViewShare,
-				 0,
-				 PAGE_READONLY)) != STATUS_SUCCESS)
+  status = NtMapViewOfSection (get_handle (), INVALID_HANDLE_VALUE, &viewmem,
+			       0L, len, &phys, &len, ViewShare, 0,
+			       PAGE_READONLY);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_nt_status (ret);
+      __seterrno_from_nt_status (status);
       ulen = (size_t) -1;
       return;
     }
 
   memcpy (ptr, (char *) viewmem + (pos - phys.QuadPart), ulen);
 
-  if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
+  status = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_nt_status (ret);
+      __seterrno_from_nt_status (status);
       ulen = (size_t) -1;
       return;
     }
@@ -251,7 +243,7 @@ int
 fhandler_dev_mem::fstat (struct __stat64 *buf)
 {
   fhandler_base::fstat (buf);
-  buf->st_blksize = getsystempagesize ();
+  buf->st_blksize = wincap.page_size ();
   if (is_auto_device ())
     {
       buf->st_mode = S_IFCHR;

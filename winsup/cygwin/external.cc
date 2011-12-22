@@ -371,7 +371,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	break;
       case CW_GET_SHMLBA:
 	{
-	  res = getpagesize ();
+	  res = wincap.allocation_granularity ();
 	}
 	break;
       case CW_GET_UID_FROM_SID:

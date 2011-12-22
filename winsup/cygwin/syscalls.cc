@@ -2447,12 +2447,6 @@ getpagesize ()
   return (size_t) wincap.allocation_granularity ();
 }
 
-size_t
-getsystempagesize ()
-{
-  return (size_t) wincap.page_size ();
-}
-
 /* FIXME: not all values are correct... */
 extern "C" long int
 fpathconf (int fd, int v)
