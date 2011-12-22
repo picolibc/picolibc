@@ -28,8 +28,6 @@ details. */
 #include "tls_pbuf.h"
 #include <sys/param.h>
 #include <ctype.h>
-#include <psapi.h>
-#include <tlhelp32.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>

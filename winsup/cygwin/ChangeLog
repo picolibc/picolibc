@@ -1,5 +1,9 @@
 2011-12-22  Corinna Vinschen  <vinschen@redhat.com>
 
+	* fhandler_process.cc: Drop unneeded includes.
+
+2011-12-22  Corinna Vinschen  <vinschen@redhat.com>
+
 	Throughout use wincap.allocation_granularity instead of getpagesize.
 	Throughout use wincap.page_size instead of getsystempagesize.
 	Throughout use "status" as variable name to hold NTSTATUS values.
