@@ -1,5 +1,11 @@
 2011-12-22  Corinna Vinschen  <vinschen@redhat.com>
 
+	* spawn.cc (child_info_spawn::worker): Add CREATE_BREAKAWAY_FROM_JOB
+	to c_flags only if current process is member of a job and breakaway
+	is allowed.
+
+2011-12-22  Corinna Vinschen  <vinschen@redhat.com>
+
 	* external.cc (cygwin_internal): Implement CW_ALLOC_DRIVE_MAP,
 	CW_MAP_DRIVE_MAP, CW_FREE_DRIVE_MAP.
 	* fhandler_process.cc: Include mount.h.

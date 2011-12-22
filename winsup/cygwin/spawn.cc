@@ -452,6 +452,9 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
   c_flags = GetPriorityClass (GetCurrentProcess ());
   sigproc_printf ("priority class %d", c_flags);
+
+  c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT;
+
   /* We're adding the CREATE_BREAKAWAY_FROM_JOB flag here to workaround issues
      with the "Program Compatibility Assistant (PCA) Service" observed on
      Windows 7.  For some reason, when starting long running sessions from
@@ -461,8 +464,15 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
      mintty session, or to stop the PCA service.  However, a process which
      is controlled by PCA is part of a compatibility job, which allows child
      processes to break away from the job.  This helps to avoid this issue. */
-  c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT
-	     | CREATE_BREAKAWAY_FROM_JOB;
+  JOBOBJECT_BASIC_LIMIT_INFORMATION jobinfo;
+  if (QueryInformationJobObject (NULL, JobObjectBasicLimitInformation,
+				 &jobinfo, sizeof jobinfo, NULL)
+      && (jobinfo.LimitFlags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK
+				| JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)))
+    {
+      debug_printf ("Add CREATE_BREAKAWAY_FROM_JOB");
+      c_flags |= CREATE_BREAKAWAY_FROM_JOB;
+    }
 
   if (mode == _P_DETACH)
     c_flags |= DETACHED_PROCESS;
