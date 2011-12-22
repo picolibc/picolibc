@@ -1,5 +1,14 @@
 2011-12-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (ps.exe): Revert previous change.
+	* ps.cc: Include psapi.h again.
+	(main): In CW_GETPINFO_FULL case.  Evaluate minimal process access mask
+	required per OS and use that in OpenProcess call.  Use
+	GetModuleFileNameExW on Windows 2000 or if fetching the drive mapping
+	failed.  Handle empty process name.
+
+2011-12-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (ps.exe): Drop -lpsapi from ALL_LDFLAGS.
 	* ps.cc: Don't include psapi.h.
 	(dosdevs): Drop.

@@ -22,6 +22,7 @@ details. */
 #include <limits.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
+#include <psapi.h>
 #include <ddk/ntapi.h>
 #include <ddk/winddk.h>
 #include "loadlib.h"
@@ -150,6 +151,7 @@ main (int argc, char *argv[])
   external_pinfo *p;
   int aflag, lflag, fflag, sflag, uid, proc_id;
   bool found_proc_id = true;
+  DWORD proc_access = PROCESS_QUERY_LIMITED_INFORMATION;
   cygwin_getinfo_types query = CW_GETPINFO;
   const char *dtitle = "    PID  TTY        STIME COMMAND\n";
   const char *dfmt   = "%7d%4s%10s %s\n";
@@ -250,12 +252,33 @@ main (int argc, char *argv[])
 	      AdjustTokenPrivileges (tok, FALSE, &priv, 0, NULL, NULL);
 	    }
 	}
-      /* Fetch an opaque drive mapping object from the Cygwin DLL.
-	 This is used to map NT device paths to Win32 paths. */
-      drive_map = (void *) cygwin_internal (CW_ALLOC_DRIVE_MAP);
-      /* Check old Cygwin version. */
-      if (drive_map == (void *) -1)
-	drive_map = NULL;
+
+      /* Check process query capabilities. */
+      OSVERSIONINFO version;
+      version.dwOSVersionInfoSize = sizeof version;
+      GetVersionEx (&version);
+      if (version.dwMajorVersion <= 5)	/* pre-Vista */
+	{
+	  proc_access = PROCESS_QUERY_INFORMATION;
+	  if (version.dwMinorVersion < 1)	/* Windows 2000 */
+	    proc_access |= PROCESS_VM_READ;
+	  else
+	    {
+	    }
+	}
+
+      /* Except on Windows 2000, fetch an opaque drive mapping object from the
+	 Cygwin DLL.  This is used to map NT device paths to Win32 paths. */
+      if (!(proc_access & PROCESS_VM_READ))
+	{
+	  drive_map = (void *) cygwin_internal (CW_ALLOC_DRIVE_MAP);
+	  /* Check old Cygwin version. */
+	  if (drive_map == (void *) -1)
+	    drive_map = NULL;
+	  /* Allow fallback to GetModuleFileNameEx for post-W2K. */
+	  if (!drive_map)
+	    proc_access = PROCESS_QUERY_INFORMATION | PROCESS_VM_READ;
+	}
     }
 
   for (int pid = 0;
@@ -298,29 +321,47 @@ main (int argc, char *argv[])
 	  if (p->process_state & PID_EXITED || (p->exitcode & ~0xffff))
 	    strcat (pname, " <defunct>");
 	}
-      else if (query == CW_GETPINFO_FULL && drive_map)
+      else if (query == CW_GETPINFO_FULL)
 	{
 	  HANDLE h;
 	  NTSTATUS status;
 	  wchar_t *win32path = NULL;
 
-	  h = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-			   FALSE, p->dwProcessId);
+	  h = OpenProcess (proc_access, FALSE, p->dwProcessId);
 	  if (!h)
 	    continue;
-	  status = NtQueryInformationProcess (h, ProcessImageFileName, uni,
-					      sizeof unicode_buf, NULL);
-	  if (NT_SUCCESS (status))
+	  /* We use NtQueryInformationProcess in the first place, because
+	     GetModuleFileNameEx does not work on 64 bit systems when trying
+	     to fetch module names of 64 bit processes. */
+	  if (!(proc_access & PROCESS_VM_READ))	/* Windows 2000 */
 	    {
-	      /* NtQueryInformationProcess returns a native NT device path.
-		 Call CW_MAP_DRIVE_MAP to convert the path to an ordinary
-		 Win32 path.  The returned pointer is a pointer into the
-		 incoming buffer given as third argument.  It's expected
-		 to be big enough, which we made sure by defining unicode_buf
-		 to have enough space for a maximum sized UNICODE_STRING. */
-	      uni->Buffer[uni->Length / sizeof (WCHAR)] = L'\0';
-	      win32path = (wchar_t *) cygwin_internal (CW_MAP_DRIVE_MAP,
-						       drive_map, uni->Buffer);
+	      status = NtQueryInformationProcess (h, ProcessImageFileName, uni,
+						  sizeof unicode_buf, NULL);
+	      if (NT_SUCCESS (status))
+		{
+		  /* NtQueryInformationProcess returns a native NT device path.
+		     Call CW_MAP_DRIVE_MAP to convert the path to an ordinary
+		     Win32 path.  The returned pointer is a pointer into the
+		     incoming buffer given as third argument.  It's expected
+		     to be big enough, which we made sure by defining
+		     unicode_buf to have enough space for a maximum sized
+		     UNICODE_STRING. */
+		  if (uni->Length == 0)	/* System process */
+		    win32path = L"System";
+		  else
+		    {
+		      uni->Buffer[uni->Length / sizeof (WCHAR)] = L'\0';
+		      win32path = (wchar_t *) cygwin_internal (CW_MAP_DRIVE_MAP,
+							       drive_map,
+							       uni->Buffer);
+		    }
+		}
+	    }
+	  else
+	    {
+	      if (GetModuleFileNameExW (h, NULL, (PWCHAR) unicode_buf,
+					NT_MAX_PATH))
+		win32path = (wchar_t *) unicode_buf;
 	    }
 	  if (win32path)
 	    wcstombs (pname, win32path, sizeof pname);
