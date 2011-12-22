@@ -77,7 +77,7 @@ mount.exe: path-mount.o
 cygcheck.exe: MINGW_LDFLAGS += -lntdll
 cygpath.exe: ALL_LDFLAGS += -lcygwin -luserenv -lntdll
 cygpath.exe: CXXFLAGS += -fno-threadsafe-statics
-ps.exe: ALL_LDFLAGS += -lcygwin -lpsapi -lntdll
+ps.exe: ALL_LDFLAGS += -lcygwin -lntdll
 strace.exe: MINGW_LDFLAGS += -lntdll
 
 ldd.exe: ALL_LDFLAGS += -lpsapi

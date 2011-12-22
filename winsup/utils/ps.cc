@@ -22,7 +22,6 @@ details. */
 #include <limits.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
-#include <psapi.h>
 #include <ddk/ntapi.h>
 #include <ddk/winddk.h>
 #include "loadlib.h"
@@ -143,7 +142,7 @@ print_version ()
 	  strrchr (__DATE__, ' ') + 1);
 }
 
-char dosdevs[32000];
+char unicode_buf[sizeof (UNICODE_STRING) + NT_MAX_PATH];
 
 int
 main (int argc, char *argv[])
@@ -159,7 +158,8 @@ main (int argc, char *argv[])
   const char *ltitle = "      PID    PPID    PGID     WINPID   TTY     UID    STIME COMMAND\n";
   const char *lfmt   = "%c %7d %7d %7d %10u %4s %4u %8s %s\n";
   char ch;
-  PUNICODE_STRING uni = NULL;
+  PUNICODE_STRING uni = (PUNICODE_STRING) unicode_buf;
+  void *drive_map = NULL;
 
   aflag = lflag = fflag = sflag = 0;
   uid = getuid ();
@@ -250,6 +250,12 @@ main (int argc, char *argv[])
 	      AdjustTokenPrivileges (tok, FALSE, &priv, 0, NULL, NULL);
 	    }
 	}
+      /* Fetch an opaque drive mapping object from the Cygwin DLL.
+	 This is used to map NT device paths to Win32 paths. */
+      drive_map = (void *) cygwin_internal (CW_ALLOC_DRIVE_MAP);
+      /* Check old Cygwin version. */
+      if (drive_map == (void *) -1)
+	drive_map = NULL;
     }
 
   for (int pid = 0;
@@ -292,71 +298,34 @@ main (int argc, char *argv[])
 	  if (p->process_state & PID_EXITED || (p->exitcode & ~0xffff))
 	    strcat (pname, " <defunct>");
 	}
-      else if (query == CW_GETPINFO_FULL)
+      else if (query == CW_GETPINFO_FULL && drive_map)
 	{
-	  HANDLE h = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-				  FALSE, p->dwProcessId);
+	  HANDLE h;
+	  NTSTATUS status;
+	  wchar_t *win32path = NULL;
+
+	  h = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+			   FALSE, p->dwProcessId);
 	  if (!h)
 	    continue;
-	  HMODULE hm[1000];
-	  DWORD n = p->dwProcessId;
-	  if (!EnumProcessModules (h, hm, sizeof (hm), &n))
-	    n = 0;
-	  /* This occurs when trying to enum modules of a 64 bit process.
-	     GetModuleFileNameEx with a NULL module will return the same error.
-	     Only NtQueryInformationProcess allows to fetch the process image
-	     name in that case. */
-	  if (!n && GetLastError () == ERROR_PARTIAL_COPY)
+	  status = NtQueryInformationProcess (h, ProcessImageFileName, uni,
+					      sizeof unicode_buf, NULL);
+	  if (NT_SUCCESS (status))
 	    {
-	      NTSTATUS status;
-	      char pbuf[PATH_MAX];
-	      char dev[256];
-	      size_t len = sizeof (UNICODE_STRING) + PATH_MAX * sizeof (WCHAR);
-
-	      if (!uni)
-		{
-		  uni = (PUNICODE_STRING) alloca (len);
-		  QueryDosDevice (NULL, dosdevs, 32000);
-		}
-	      status = NtQueryInformationProcess (h, ProcessImageFileName, uni,
-						  len, NULL);
-	      if (NT_SUCCESS (status)
-		  && (len = wcsnrtombs (pbuf, (const wchar_t **) &uni->Buffer,
-					uni->Length / sizeof (WCHAR), PATH_MAX,
-					NULL)) > 0)
-		{
-		  pbuf[len] = '\0';
-		  if (!strncmp (pbuf, "\\Device\\Mup\\", 12))
-		    {
-		      strcpy (pname, "\\\\");
-		      strcpy (pname + 2, pbuf + 12);
-		    }
-		  else
-		    {
-		      strcpy (pname, pbuf);
-		      for (char *d = dosdevs; *d; d = strchr (d, '\0') + 1)
-			if (QueryDosDevice (d, dev, 256)
-			    && strlen (d) < 3
-			    && !strncmp (dev, pbuf, strlen (dev)))
-			  {
-			    strcpy (pname, d);
-			    strcat (pname, pbuf + strlen (dev));
-			    break;
-			  }
-		    }
-		}
-	      else
-		strcpy (pname, "*** unknown ***");
+	      /* NtQueryInformationProcess returns a native NT device path.
+		 Call CW_MAP_DRIVE_MAP to convert the path to an ordinary
+		 Win32 path.  The returned pointer is a pointer into the
+		 incoming buffer given as third argument.  It's expected
+		 to be big enough, which we made sure by defining unicode_buf
+		 to have enough space for a maximum sized UNICODE_STRING. */
+	      uni->Buffer[uni->Length / sizeof (WCHAR)] = L'\0';
+	      win32path = (wchar_t *) cygwin_internal (CW_MAP_DRIVE_MAP,
+						       drive_map, uni->Buffer);
 	    }
+	  if (win32path)
+	    wcstombs (pname, win32path, sizeof pname);
 	  else
-	    {
-	      wchar_t pwname[NT_MAX_PATH];
-
-	      if (!n || !GetModuleFileNameExW (h, hm[0], pwname, NT_MAX_PATH))
-		strcpy (pname, "*** unknown ***");
-	      else
-		wcstombs (pname, pwname, NT_MAX_PATH);
-	    }
+	    strcpy (pname, "*** unknown ***");
 	  FILETIME ct, et, kt, ut;
 	  if (GetProcessTimes (h, &ct, &et, &kt, &ut))
 	    p->start_time = to_time_t (&ct);
@@ -390,6 +359,8 @@ main (int argc, char *argv[])
 		start_time (p), pname);
 
     }
+  if (drive_map)
+    cygwin_internal (CW_FREE_DRIVE_MAP, drive_map);
   (void) cygwin_internal (CW_UNLOCK_PINFO);
 
   return found_proc_id ? 0 : 1;

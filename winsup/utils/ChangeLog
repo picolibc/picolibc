@@ -1,3 +1,12 @@
+2011-12-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (ps.exe): Drop -lpsapi from ALL_LDFLAGS.
+	* ps.cc: Don't include psapi.h.
+	(dosdevs): Drop.
+	(unicode_buf): Define.
+	(main): Simplify path evaluation in CW_GETPINFO_FULL case. Fetch drive
+	map from Cygwin DLL.  Use it to convert NT device paths to Win32 paths.
+
 2011-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (cygpath.exe): Add -luserenv to ALL_LDFLAGS.
