@@ -1,5 +1,15 @@
 2011-12-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/winnt.h (JOB_OBJECT_LIMIT_BREAKAWAY_OK): Define.
+	(JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK): Define.
+	(JOB_OBJECT_BREAKAWAY_OK): Define as JOB_OBJECT_LIMIT_BREAKAWAY_OK
+	and mark as kept for backward compatibility only.
+	(JOB_OBJECT_SILENT_BREAKAWAY): Define as
+	JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK and mark as kept for backward
+	compatibility only.
+
+2011-12-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/winnt.h: Add missing PROCESS_QUERY_LIMITED_INFORMATION.
 
 2011-12-13  Keith Marshall  <keithmarshall@users.sf.net>
