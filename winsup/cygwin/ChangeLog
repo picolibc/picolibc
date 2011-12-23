@@ -1,3 +1,9 @@
+2011-12-23  Corinna Vinschen  <vinschen@redhat.com>
+
+	* pinfo.cc (pinfo_basic::pinfo_basic): Fix formatting.  Set uid and gid
+	to default values to accommodate early initialization of shared user
+	info.  Add comment.
+
 2011-12-22  Corinna Vinschen  <vinschen@redhat.com>
 
 	* spawn.cc (child_info_spawn::worker): Add CREATE_BREAKAWAY_FROM_JOB

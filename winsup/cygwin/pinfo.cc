@@ -36,10 +36,13 @@ public:
   pinfo_basic();
 };
 
-pinfo_basic::pinfo_basic()
+pinfo_basic::pinfo_basic ()
 {
   pid = dwProcessId = GetCurrentProcessId ();
   GetModuleFileNameW (NULL, progname, sizeof (progname));
+  /* Default uid/gid are needed very early to initialize shared user info. */
+  uid = ILLEGAL_UID;
+  gid = UNKNOWN_GID;
 }
 
 pinfo_basic myself_initial NO_COPY;
