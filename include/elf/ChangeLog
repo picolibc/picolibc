@@ -1,3 +1,8 @@
+2011-12-22  DJ Delorie  <dj@redhat.com>
+
+	* rl78.h (R_RL78_RH_RELAX, R_RL78_RH_SFR, R_RL78_RH_SADDR): New.
+	(RL78_RELAXA_BRA, RL78_RELAXA_ADDR16: New.
+
 2011-12-06  Ulrich Weigand  <uweigand@de.ibm.com>
 
 	* common.h (NT_S390_LAST_BREAK): Define.

@@ -1,3 +1,7 @@
+2011-12-16  Tristan Gingold  <gingold@adacore.com>
+
+	* codesign.h: New file.
+
 2011-08-08  Tristan Gingold  <gingold@adacore.com>
 
 	* loader.h (bfd_mach_o_load_command_type): Add
