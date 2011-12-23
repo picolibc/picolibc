@@ -55,6 +55,11 @@ START_RELOC_NUMBERS (elf_rl78_reloc_type)
   RELOC_NUMBER (R_RL78_DIR16_REV,    0x11)
   RELOC_NUMBER (R_RL78_DIR3U_PCREL,  0x12)
 
+  /* These are extensions added by Red Hat.  */
+  RELOC_NUMBER (R_RL78_RH_RELAX,     0x2d) /* Marks opcodes suitable for linker relaxation.  */
+  RELOC_NUMBER (R_RL78_RH_SFR,       0x2e) /* SFR addresses - internal use only.  */
+  RELOC_NUMBER (R_RL78_RH_SADDR,     0x2f) /* SADDR addresses - internal use only..  */
+
   /* These are for complex relocs.  */
   RELOC_NUMBER (R_RL78_ABS32,        0x41)
   RELOC_NUMBER (R_RL78_ABS24S,       0x42)
@@ -103,12 +108,8 @@ END_RELOC_NUMBERS (R_RL78_max)
 #define E_FLAG_RL78_DSP			(1 << 1) /* Defined in the RL78 CPU Object file specification, but not explained.  */
 
 /* These define the addend field of R_RL78_RH_RELAX relocations.  */
-#define	RL78_RELAXA_IMM6	0x00000010	/* Imm8/16/24/32 at bit offset 6.  */
-#define	RL78_RELAXA_IMM12	0x00000020	/* Imm8/16/24/32 at bit offset 12.  */
-#define	RL78_RELAXA_DSP4	0x00000040	/* Dsp0/8/16 at bit offset 4.  */
-#define	RL78_RELAXA_DSP6	0x00000080	/* Dsp0/8/16 at bit offset 6.  */
-#define	RL78_RELAXA_DSP14	0x00000100	/* Dsp0/8/16 at bit offset 14.  */
-#define	RL78_RELAXA_BRA	0x00000200	/* Any type of branch (must be decoded).  */
+#define	RL78_RELAXA_BRA		0x00000010	/* Any type of branch (must be decoded).  */
+#define	RL78_RELAXA_ADDR16	0x00000020	/* addr16->sfr/saddr opportunity  */
 #define RL78_RELAXA_RNUM	0x0000000f	/* Number of associated relocations.  */
 /* These mark the place where alignment is requested, and the place where the filler bytes end.  */
 #define	RL78_RELAXA_ALIGN	0x10000000	/* Start alignment; the remaining bits are the alignment value.  */
