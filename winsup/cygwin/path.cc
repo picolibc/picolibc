@@ -102,7 +102,7 @@ struct symlink_info
   bool parse_device (const char *);
   int check_sysfile (HANDLE h);
   int check_shortcut (HANDLE h);
-  int check_reparse_point (HANDLE h);
+  int check_reparse_point (HANDLE h, bool remote);
   int check_nfs_symlink (HANDLE h);
   int posixify (char *srcbuf);
   bool set_error (int);
@@ -1958,7 +1958,7 @@ symlink_info::check_sysfile (HANDLE h)
 }
 
 int
-symlink_info::check_reparse_point (HANDLE h)
+symlink_info::check_reparse_point (HANDLE h, bool remote)
 {
   tmp_pathbuf tp;
   NTSTATUS status;
@@ -1967,9 +1967,20 @@ symlink_info::check_reparse_point (HANDLE h)
   UNICODE_STRING subst;
   char srcbuf[SYMLINK_MAX + 7];
 
-  status = NtFsControlFile (h, NULL, NULL, NULL, &io, FSCTL_GET_REPARSE_POINT,
-			    NULL, 0, (LPVOID) rp,
+  /* On remote drives or under heavy load, NtFsControlFile can return with
+     STATUS_PENDING.  If so, instead of creating an event object, just set
+     io.Status to an invalid value and perform a minimal wait until io.Status
+     changed. */
+  memset (&io, 0xff, sizeof io);
+  status = NtFsControlFile (h, NULL, NULL, NULL, &io,
+			    FSCTL_GET_REPARSE_POINT, NULL, 0, (LPVOID) rp,
 			    MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
+  if (status == STATUS_PENDING)
+    {
+      while (io.Status == (NTSTATUS) 0xffffffff)
+      	Sleep (1L);
+      status = io.Status;
+    }
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtFsControlFile(FSCTL_GET_REPARSE_POINT) failed, %p",
@@ -1978,12 +1989,21 @@ symlink_info::check_reparse_point (HANDLE h)
       return 0;
     }
   if (rp->ReparseTag == IO_REPARSE_TAG_SYMLINK)
+    /* Windows evaluates native symlink literally.  If a remote symlink points
+       to, say, C:\foo, it will be handled as if the target is the local file
+       C:\foo.  That comes in handy since that's how symlinks are treated under
+       POSIX as well. */
     RtlInitCountedUnicodeString (&subst,
 		  (WCHAR *)((char *)rp->SymbolicLinkReparseBuffer.PathBuffer
 			+ rp->SymbolicLinkReparseBuffer.SubstituteNameOffset),
 		  rp->SymbolicLinkReparseBuffer.SubstituteNameLength);
-  else if (rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
+  else if (!remote && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
     {
+      /* Don't handle junctions on remote filesystems as symlinks.  This type
+	 of reparse point is handled transparently by the OS so that the
+	 target of the junction is the remote directory it is supposed to
+	 point to.  If we handle it as symlink, it will be mistreated as
+	 pointing to a dir on the local system. */
       RtlInitCountedUnicodeString (&subst,
 		  (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
 			  + rp->MountPointReparseBuffer.SubstituteNameOffset),
@@ -1998,10 +2018,9 @@ symlink_info::check_reparse_point (HANDLE h)
     }
   else
     {
-      /* Maybe it's a reparse point, but it's certainly not one we
-	 recognize.  Drop the REPARSE file attribute so we don't even
-	 try to use the flag for some special handling.  It's just some
-	 arbitrary file or directory for us. */
+      /* Maybe it's a reparse point, but it's certainly not one we recognize.
+	 Drop REPARSE attribute so we don't try to use the flag accidentally.
+	 It's just some arbitrary file or directory for us. */
       fileattr &= ~FILE_ATTRIBUTE_REPARSE_POINT;
       return 0;
     }
@@ -2597,14 +2616,7 @@ restart:
 	 with SYSTEM and HIDDEN flags set. */
       if ((fileattr & FILE_ATTRIBUTE_REPARSE_POINT))
 	{
-	  /* Don't check reparse points on remote filesystems.  A reparse point
-	     pointing to another file on the remote system will be mistreated
-	     as pointing to a local file on the local system.  This breaks the
-	     way reparse points are transparently handled on remote systems. */
-	  if (fs.is_remote_drive())
-	    res = 0;
-	  else
-	    res = check_reparse_point (h);
+	  res = check_reparse_point (h, fs.is_remote_drive ());
 	  if (res == -1)
 	    {
 	      /* Volume mount point.  The filesystem information for the top

@@ -1,3 +1,14 @@
+2011-12-24  Corinna Vinschen  <vinschen@redhat.com>
+
+	* path.cc (struct symlink_info): Add bool argument to declaration of
+	check_reparse_point.
+	(symlink_info::check_reparse_point): Add bool argument to indicate
+	remote drive.  Handle STATUS_PENDING.  Don't evaluate junctions on
+	remote drives.  Fix comments.
+	(symlink_info::check): Drop check for is_remote_drive and associated
+	comment here.  Add fs.is_remote_drive as second parameter to
+	check_reparse_point call.
+
 2011-12-23  Corinna Vinschen  <vinschen@redhat.com>
 
 	* pinfo.cc (pinfo_basic::pinfo_basic): Fix formatting.  Set uid and gid
