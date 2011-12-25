@@ -994,9 +994,9 @@ waveIn_callback (HWAVEIN hWave, UINT msg, DWORD instance, DWORD param1,
 fhandler_dev_dsp::fhandler_dev_dsp ():
   fhandler_base ()
 {
-  debug_printf ("0x%08x", (int)this);
   audio_in_ = NULL;
   audio_out_ = NULL;
+  dev ().parse (FH_OSS_DSP);
 }
 
 int

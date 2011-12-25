@@ -1275,7 +1275,7 @@ open (const char *unix_path, int flags, ...)
 	     tty for the process.  */
 	  int opt = PC_OPEN | ((flags & (O_NOFOLLOW | O_EXCL))
 			       ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
-	  if (!(flags & O_NOCTTY)&& fd > 2)
+	  if (!(flags & O_NOCTTY) && fd > 2)
 	    {
 	      flags |= O_NOCTTY;
 	      opt |= PC_CTTY;	/* flag that, if opened, this fhandler could
