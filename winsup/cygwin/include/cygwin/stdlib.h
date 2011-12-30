@@ -31,6 +31,7 @@ char *setstate (const char *state);
 void srandom (unsigned);
 char *ptsname (int);
 int ptsname_r(int, char *, size_t);
+int getpt (void);
 int grantpt (int);
 int unlockpt (int);
 #endif /*__STRICT_ANSI__*/

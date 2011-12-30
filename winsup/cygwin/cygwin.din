@@ -759,6 +759,7 @@ getprogname NOSIGFE
 getprotobyname = cygwin_getprotobyname SIGFE
 getprotobynumber = cygwin_getprotobynumber SIGFE
 getprotoent = cygwin_getprotoent SIGFE
+getpt SIGFE
 getpwduid NOSIGFE
 _getpwduid = getpwduid NOSIGFE
 getpwent SIGFE

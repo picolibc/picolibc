@@ -26,6 +26,12 @@ details. */
 HANDLE NO_COPY tty_list::mutex = NULL;
 
 extern "C" int
+getpt (void)
+{
+  return open ("/dev/ptmx", O_RDWR | O_NOCTTY);
+}
+
+extern "C" int
 posix_openpt (int oflags)
 {
   return open ("/dev/ptmx", oflags);

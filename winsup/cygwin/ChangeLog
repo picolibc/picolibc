@@ -1,5 +1,13 @@
 2011-12-30  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
+	* cygwin.din (getpt): Export.
+	* posix.sgml (std-gnu): Add getpt.
+	* tty.cc (getpt): New function.
+	* include/cygwin/stdlib.h [!__STRICT_ANSI__] (getpt): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2011-12-30  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
 	* thread.cc: Mark pthread_rwlock_timedrdlock and
 	pthread_rwlock_timedwrlock as not yet implemented in the list of
 	cancellation points.
