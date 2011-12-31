@@ -80,6 +80,16 @@ What changed:
 
 - Try harder to send SIGHUP to children when process group leader fails.
 
+- Deal with Windows problem where non-blocking pipe I/O was not flushed properly
+  on close.
+
+- Attempt to regularize most syscall-related strace output.
+
+- Improve behavior of Cygwin when started from a 64-bit process, especially under
+  Windows 2003.
+
+- Improve multi-threading safety with syscalls that deal with fds.
+
 - New heap management.  Drop registry setting "heap_chunk_in_mb" in favor of
   a new per-executable setting in the executable file header which can be set
   using the peflags tool.  Drop registry setting "heap_slop_in_mb" entirely.
