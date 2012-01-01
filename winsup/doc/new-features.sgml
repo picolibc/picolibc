@@ -101,8 +101,9 @@ dlopen now supports the Glibc-specific RTLD_NODELETE and RTLD_NOOPEN flags.
 </para></listitem>
 
 <listitem><para>
-Other new API: clock_settime, __fpurge, getgrouplist, getpt, ppoll, psiginfo,
-psignal, ptsname_r, sys_siglist, pthread_setschedprio, sysinfo.
+Other new API: clock_settime, __fpurge, getgrouplist, get_current_dir_name,
+getpt, ppoll, psiginfo, psignal, ptsname_r, sys_siglist, pthread_setschedprio,
+sysinfo.
 </para></listitem>
 
 </itemizedlist>
