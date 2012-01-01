@@ -1,0 +1,6 @@
+2012-01-01  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (get_current_dir_name): Export.
+	* path.cc (get_current_dir_name): New function.
+	* posix.sgml (std-gnu): Add get_current_dir_name.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.

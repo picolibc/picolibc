@@ -672,6 +672,7 @@ _gcvt = gcvt SIGFE
 gcvtf SIGFE
 _gcvtf = gcvtf SIGFE
 get_avphys_pages SIGFE
+get_current_dir_name SIGFE
 get_nprocs SIGFE
 get_nprocs_conf SIGFE
 get_osfhandle SIGFE

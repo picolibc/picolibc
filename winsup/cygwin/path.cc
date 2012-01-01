@@ -2855,6 +2855,27 @@ getwd (char *buf)
   return getcwd (buf, PATH_MAX + 1);  /*Per SuSv3!*/
 }
 
+extern "C" char *
+get_current_dir_name (void)
+{
+  char *pwd = getenv ("PWD");
+  char *cwd = getcwd (NULL, 0);
+
+  if (pwd)
+    {
+      struct __stat64 pwdbuf, cwdbuf;
+      stat64 (pwd, &pwdbuf);
+      stat64 (cwd, &cwdbuf);
+      if ((pwdbuf.st_dev == cwdbuf.st_dev) && (pwdbuf.st_ino == cwdbuf.st_ino))
+        {
+          cwd = (char *) malloc (strlen (pwd) + 1);
+          strcpy (cwd, pwd);
+        }
+    }
+
+  return cwd;
+}
+
 /* chdir: POSIX 5.2.1.1 */
 extern "C" int
 chdir (const char *in_dir)

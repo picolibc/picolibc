@@ -426,12 +426,13 @@ details. */
       255: Export ptsname_r.
       256: Add CW_ALLOC_DRIVE_MAP, CW_MAP_DRIVE_MAP, CW_FREE_DRIVE_MAP.
       257: Export getpt.
+      258: Export get_current_dir_name.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 257
+#define CYGWIN_VERSION_API_MINOR 258
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
