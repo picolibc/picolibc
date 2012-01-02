@@ -1,3 +1,8 @@
+2012-01-02  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* path.cc (get_current_dir_name): Avoid memory leak.  Don't return PWD
+	contents if directory doesn't actually exist.
+
 2012-01-01  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin.din (get_current_dir_name): Export.

@@ -2858,19 +2858,18 @@ getwd (char *buf)
 extern "C" char *
 get_current_dir_name (void)
 {
-  char *pwd = getenv ("PWD");
+  const char *pwd = getenv ("PWD");
   char *cwd = getcwd (NULL, 0);
+  struct __stat64 pwdbuf, cwdbuf;
 
-  if (pwd)
+  if (pwd && strcmp (pwd, cwd) != 0
+      && stat64 (pwd, &pwdbuf) == 0
+      && stat64 (cwd, &cwdbuf) == 0
+      && pwdbuf.st_dev == cwdbuf.st_dev
+      && pwdbuf.st_ino == cwdbuf.st_ino)
     {
-      struct __stat64 pwdbuf, cwdbuf;
-      stat64 (pwd, &pwdbuf);
-      stat64 (cwd, &cwdbuf);
-      if ((pwdbuf.st_dev == cwdbuf.st_dev) && (pwdbuf.st_ino == cwdbuf.st_ino))
-        {
-          cwd = (char *) malloc (strlen (pwd) + 1);
-          strcpy (cwd, pwd);
-        }
+      cwd = (char *) realloc (cwd, strlen (pwd) + 1);
+      strcpy (cwd, pwd);
     }
 
   return cwd;
