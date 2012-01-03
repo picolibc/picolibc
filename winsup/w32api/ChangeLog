@@ -1,3 +1,10 @@
+2012-01-03  Keith Marshall  <keithmarshall@users.sf.net>
+
+	Correct misuse of #ifdef, identified by 'make test'.
+
+	* include/shlwapi.h (enum ASSOCSTR, enum ASSOCDATA): Fix typos;
+	/#ifdef _WIN32_IE >= 0x0600/s/#ifdef/#if/
+
 2011-12-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winnt.h (JOB_OBJECT_LIMIT_BREAKAWAY_OK): Define.
