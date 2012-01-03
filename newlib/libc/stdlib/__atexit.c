@@ -74,7 +74,7 @@ _DEFUN (__register_exitproc,
 	  if (args == NULL)
 	    {
 #ifndef __SINGLE_THREAD__
-	      __lock_release(lock);
+	      __lock_release(__atexit_lock);
 #endif
 	      return -1;
 	    }

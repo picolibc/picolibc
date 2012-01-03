@@ -1,7 +1,11 @@
+2012-01-03  Viachaslau Kulakouski  <Viachaslau.Kulakouski@oracle.com>
+
+	* libc/stdlib/__atexit.c: Refer to __atexit_lock instead of lock.
+
 2011-12-20  Aleksandr Platonov  <pam@oktetlabs.ru>
 
-	* fvwrite.c (__sfvwrite_r): Set __SMBF flag to avoid double free in
-	fclose.  Enhance comment.
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Set __SMBF flag to avoid double 
+	free in fclose.  Enhance comment.
 
 2011-12-19  Jeff Johnston  <jjohnstn@redhat.com>
 
