@@ -1,5 +1,5 @@
 /* Mach-O support for BFD.
-   Copyright 2011
+   Copyright 2011, 2012
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -118,10 +118,10 @@ struct mach_o_reloc_info_external
 
 struct mach_o_symtab_command_external
 {
-  unsigned char symoff[4];
-  unsigned char nsyms[4];
-  unsigned char stroff[4];
-  unsigned char strsize[4];
+  unsigned char symoff[4];	/* File offset of the symbol table.  */
+  unsigned char nsyms[4];	/* Number of symbols.  */
+  unsigned char stroff[4];	/* File offset of the string table.  */
+  unsigned char strsize[4];	/* String table size.  */
 };
 
 struct mach_o_nlist_external
@@ -253,6 +253,13 @@ struct mach_o_version_min_command_external
 {
   unsigned char version[4];
   unsigned char reserved[4];
+};
+
+struct mach_o_encryption_info_command_external
+{
+  unsigned char cryptoff[4];	/* File offset of the encrypted area.  */
+  unsigned char cryptsize[4];	/* Size of the encrypted area.  */
+  unsigned char cryptid[4];	/* Encryption method.  */
 };
 
 struct mach_o_fat_header_external

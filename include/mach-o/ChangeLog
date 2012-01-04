@@ -1,3 +1,9 @@
+2012-01-04  Tristan Gingold  <gingold@adacore.com>
+
+	* external.h: Update copyright year.
+	(mach_o_symtab_command_external): Add comments.
+	(mach_o_encryption_info_command_external): New structure.
+
 2011-12-16  Tristan Gingold  <gingold@adacore.com>
 
 	* codesign.h: New file.
