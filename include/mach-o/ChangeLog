@@ -1,5 +1,9 @@
 2012-01-04  Tristan Gingold  <gingold@adacore.com>
 
+	* external.h (mach_o_fvmlib_command_external): New structure.
+
+2012-01-04  Tristan Gingold  <gingold@adacore.com>
+
 	* loader.h: Update copyright year.
 	(bfd_mach_o_cpu_subtype): Add ARM subtypes.
 

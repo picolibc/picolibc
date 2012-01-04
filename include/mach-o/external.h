@@ -262,6 +262,13 @@ struct mach_o_encryption_info_command_external
   unsigned char cryptid[4];	/* Encryption method.  */
 };
 
+struct mach_o_fvmlib_command_external
+{
+  unsigned char name[4];	/* Offset of the name.  */
+  unsigned char minor_version[4];
+  unsigned char header_addr[4];
+};
+
 struct mach_o_fat_header_external
 {
   unsigned char magic[4];
