@@ -1083,27 +1083,8 @@ typedef struct _CRYPT_KEY_PROV_INFO {
 
 // dwFlags definitions for CryptAcquireContext
 #define CRYPT_VERIFYCONTEXT     0xF0000000
-#define CRYPT_NEWKEYSET         0x00000008
-#define CRYPT_DELETEKEYSET      0x00000010
-#define CRYPT_MACHINE_KEYSET    0x00000020
-#define CRYPT_SILENT            0x00000040
 
 // dwFlag definitions for CryptGenKey
-#define CRYPT_EXPORTABLE        0x00000001
-#define CRYPT_USER_PROTECTED    0x00000002
-#define CRYPT_CREATE_SALT       0x00000004
-#define CRYPT_UPDATE_KEY        0x00000008
-#define CRYPT_NO_SALT           0x00000010
-#define CRYPT_PREGEN            0x00000040
-#define CRYPT_RECIPIENT         0x00000010
-#define CRYPT_INITIATOR         0x00000040
-#define CRYPT_ONLINE            0x00000080
-#define CRYPT_SF                0x00000100
-#define CRYPT_CREATE_IV         0x00000200
-#define CRYPT_KEK               0x00000400
-#define CRYPT_DATA_KEY          0x00000800
-#define CRYPT_VOLATILE          0x00001000
-#define CRYPT_SGCKEY            0x00002000
 #define CRYPT_ARCHIVABLE        0x00004000
 
 #define RSA1024BIT_KEY          0x04000000
