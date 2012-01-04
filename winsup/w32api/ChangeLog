@@ -1,5 +1,12 @@
 2012-01-03  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
+	Return value, identified by 'make test'.
+
+	* include/gdiplus/gdiplustypes.h (Gdiplus::GdiplusAbort::Abort()): Return
+	NO_ERROR in virtual definition.
+
+2012-01-03  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
 	Remove duplicate definitions, identified by 'make test'.
 
 	* include/wincrypt.h (CRYPT_NEWKEYSET, CRYPT_DELETEKEYSET,

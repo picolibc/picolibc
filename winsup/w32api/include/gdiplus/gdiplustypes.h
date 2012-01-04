@@ -404,7 +404,7 @@ typedef struct RectF {
    binary compatible with MSVC++ code (especially GDIPLUS.DLL of course)? */
 #ifdef __cplusplus
 struct GdiplusAbort {
-	virtual HRESULT __stdcall Abort(void) {}
+	virtual HRESULT __stdcall Abort(void) { return NO_ERROR; }
 };
 #else
 typedef struct GdiplusAbort GdiplusAbort;  /* incomplete type */
