@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 #ifndef WINVER
-#define WINVER 0x0400
+#define WINVER 0x0501
 /*
  * If you need Win32 API features newer the Win95 and WinNT then you must
  * define WINVER before including windows.h or any other method of including

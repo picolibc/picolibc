@@ -1,3 +1,7 @@
+2012-01-05  Chris Sutcliffe  <ir0nh34d@users.sf.net>
+
+	* include/windef.h (WINVER): Bump to 0x0501.
+
 2012-01-03  Chris Sutcliffe  <ir0nh34d@users.sf.net>
 
 	Return value, identified by 'make test'.
