@@ -59,8 +59,8 @@ VERSION = 3.17
 CYGRELEASE = 2
 
 DISTFILES = \
-  Makefile.in configure.ac configure config.guess config.sub \
-  install-sh README.w32api ChangeLog TODO CONTRIBUTIONS
+  ChangeLog configure.ac Makefile.in Makefile.comm.in configure \
+  config.guess config.sub install-sh README.w32api TODO CONTRIBUTIONS
 
 all: lib
 
