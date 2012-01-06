@@ -1270,6 +1270,7 @@ pthread_setschedparam SIGFE
 pthread_setschedprio SIGFE
 pthread_setspecific SIGFE
 pthread_sigmask SIGFE
+pthread_sigqueue SIGFE
 pthread_suspend SIGFE
 pthread_spin_destroy SIGFE
 pthread_spin_init SIGFE

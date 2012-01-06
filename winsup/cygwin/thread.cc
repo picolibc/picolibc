@@ -3093,6 +3093,24 @@ pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
   return res;
 }
 
+extern "C" int
+pthread_sigqueue (pthread_t *thread, int sig, const union sigval value)
+{
+  siginfo_t si = {0};
+
+  if (!pthread::is_good_object (thread))
+    return EINVAL;
+  if (!(*thread)->valid)
+    return ESRCH;
+
+  si.si_signo = sig;
+  si.si_code = SI_QUEUE;
+  si.si_value = value;
+  si.si_pid = myself->pid;
+  si.si_uid = myself->uid;
+  return sig_send (NULL, si, (*thread)->cygtls);
+}
+
 /* ID */
 
 extern "C" int

@@ -1133,6 +1133,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pow10f
     ppoll
     pthread_getattr_np
+    pthread_sigqueue
     ptsname_r
     removexattr
     setxattr

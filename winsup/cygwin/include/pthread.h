@@ -202,6 +202,7 @@ void pthread_testcancel (void);
 /* Non posix calls */
 
 int pthread_getattr_np (pthread_t, pthread_attr_t *);
+int pthread_sigqueue (pthread_t *, int, const union sigval);
 int pthread_suspend (pthread_t);
 int pthread_continue (pthread_t);
 int pthread_yield (void);
