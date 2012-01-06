@@ -1,6 +1,6 @@
 /* This file defines the interface between the Blackfin simulator and GDB.
 
-   Copyright (C) 2005-2011 Free Software Foundation, Inc.
+   Copyright (C) 2005-2012 Free Software Foundation, Inc.
    Contributed by Analog Devices.
 
    This file is part of GDB.
