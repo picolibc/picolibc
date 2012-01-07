@@ -1,3 +1,12 @@
+2012-01-06  Jason Merrill  <jason@redhat.com>
+
+	PR c++/6057
+	PR c++/48051
+	PR c++/50855
+	PR c++/51322
+	* demangle.h (enum demangle_component_type): Add
+	DEMANGLE_COMPONENT_INITIALIZER_LIST, DEMANGLE_COMPONENT_NULLARY.
+
 2011-12-19  Chung-Lin Tang  <cltang@codesourcery.com>
 
 	* elf/mips.h (elf_mips_reloc_type): Add R_MIPS16_TLS_* entries.
