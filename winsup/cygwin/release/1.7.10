@@ -34,6 +34,8 @@ What's new:
 
   - Scheduling: pthread_setschedprio.
 
+  - Signalling: pthread_sigqueue.
+
 - Add /proc/devices, /proc/misc, /proc/sysvipc, /proc/swaps.
 
 - Make various system functions thread cancelation points per POSIX.
@@ -50,7 +52,8 @@ What's new:
   error_message_count, error_one_per_line, error_print_progname.
 
 - Other new API: clock_getcpuclockid, clock_nanosleep, clock_settime, __fpurge,
-  getgrouplist, ppoll, psiginfo, psignal, ptsname_r, sys_siglist, sysinfo.
+  get_current_dir_name, getgrouplist, getpt, ppoll, psiginfo, psignal,
+  ptsname_r, sys_siglist, sysinfo.
 
 - cygwin_conv_path_list finally supports CCP_WIN_W_TO_POSIX and
   CCP_POSIX_TO_WIN_W conversions.
