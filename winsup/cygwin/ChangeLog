@@ -1,3 +1,16 @@
+2012-01-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
+
+	* dtable.cc (dtable::stdio_init): Always initialize console when we
+	have one.
+	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Use a better
+	method to print tty name for debugging.
+	(fhandler_termios::bg_check): Ditto.
+	* pinfo.cc (_pinfo::set_ctty): Remove leftover debugging stuff.
+	Simplify behavior when setting tty's sid and pgid to avoid overwriting
+	previously set values.
+
+	* spawn.cc (ch_spawn): Cosmetic change.
+
 2012-01-06  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin.din (pthread_sigqueue): Export.

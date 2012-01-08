@@ -269,7 +269,7 @@ do_cleanup (void *args)
 # undef cleanup
 }
 
-NO_COPY child_info_spawn ch_spawn;
+child_info_spawn NO_COPY ch_spawn;
 
 int
 child_info_spawn::worker (const char *prog_arg, const char *const *argv,

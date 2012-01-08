@@ -149,14 +149,10 @@ dtable::get_debugger_info ()
 void
 dtable::stdio_init ()
 {
-  /* Set these before trying to output anything from strace.
-     Also, always set them even if we're to pick up our parent's fds
-     in case they're missed.  */
-
   if (myself->cygstarted || ISSTATE (myself, PID_CYGPARENT))
     {
       tty_min *t = cygwin_shared->tty.get_cttyp ();
-      if (t && t->getpgid () == myself->pid && t->is_console)
+      if (t && t->is_console)
 	init_console_handler (true);
       return;
     }

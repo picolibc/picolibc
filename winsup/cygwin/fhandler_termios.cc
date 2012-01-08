@@ -62,7 +62,7 @@ fhandler_termios::tcinit (bool is_pty_master)
 int
 fhandler_termios::tcsetpgrp (const pid_t pgid)
 {
-  termios_printf ("tty %d pgid %d, sid %d, tsid %d", tc ()->ntty, pgid,
+  termios_printf ("%s, pgid %d, sid %d, tsid %d", tc ()->ttyname (), pgid,
 		    myself->sid, tc ()->getsid ());
   if (myself->sid != tc ()->getsid ())
     {
@@ -168,8 +168,8 @@ fhandler_termios::bg_check (int sig)
   if (sig < 0)
     sig = -sig;
 
-  termios_printf ("bg I/O pgid %d, tpgid %d, %s, ntty %s", myself->pgid, tc ()->getpgid (),
-		  myctty (), tc ()->ttyname ());
+  termios_printf ("%s, bg I/O pgid %d, tpgid %d, myctty %s", tc ()->ttyname (),
+		  myself->pgid, tc ()->getpgid (), myctty ());
 
   if (tc ()->getsid () == 0)
     {
