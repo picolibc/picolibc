@@ -1,3 +1,8 @@
+2012-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (thread_wrapper): Make sure stack is 16 byte aligned
+	to make gcc-3 compiled pthread applications happy.
+
 2012-01-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
 
 	* dtable.cc (dtable::stdio_init): Always initialize console when we

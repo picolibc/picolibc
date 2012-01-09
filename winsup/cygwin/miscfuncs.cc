@@ -1,7 +1,7 @@
 /* miscfuncs.cc: misc funcs that don't belong anywhere else
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -525,6 +525,10 @@ thread_wrapper (VOID *arg)
 	   subl  $4, %%ebx             # Subtract another 4 bytes    \n\
 	   movl  %%ebx, %%esp          # Set esp                     \n\
 	   xorl  %%ebp, %%ebp          # Set ebp to 0                \n\
+	   # Make gcc 3.x happy and align the stack so that it is    \n\
+	   # 16 byte aligned right before the final call opcode.     \n\
+	   andl  $-16, %%esp           # 16 bit align                \n\
+	   addl  $-12, %%esp           # 12 bytes + 4 byte arg = 16  \n\
 	   # Now we moved to the new stack.  Save thread func address\n\
 	   # and thread arg on new stack                             \n\
 	   pushl %%ecx                 # Push thread arg onto stack  \n\
