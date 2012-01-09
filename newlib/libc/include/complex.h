@@ -77,7 +77,7 @@ float complex clogf(float complex);
 
 /* 7.3.8 Power and absolute-value functions */
 /* 7.3.8.1 The cabs functions */
-/*#ifndef __LIBM0_SOURCE__
+/*#ifndef __LIBM0_SOURCE__ */
 /* avoid conflict with historical cabs(struct complex) */
 /* double cabs(double complex) __RENAME(__c99_cabs);
    float cabsf(float complex) __RENAME(__c99_cabsf);

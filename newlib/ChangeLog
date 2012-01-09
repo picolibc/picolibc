@@ -1,3 +1,7 @@
+2012-01-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/complex.h: Fix "/*" within comment warning.
+
 2012-01-09  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/process.h: Remove Cygwin-only header.
