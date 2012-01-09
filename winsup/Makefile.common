@@ -103,7 +103,7 @@ endif
 MINGW_INCLUDES:=${mingw_include} $(w32api_include)
 MINGW_CFLAGS:=-mno-cygwin $(MINGW_INCLUDES)
 MINGW_CXXFLAGS:=${filter-out $(newlib_source)/%,$(CXXFLAGS)} -mno-cygwin $(MINGW_INCLUDES)
-MINGW_LDFLAGS:=-B${mingw_build} -B${mingw_build}/mingwex
+MINGW_LDFLAGS:=-L${mingw_build} -L${mingw_build}/mingwex
 
 GCC_DEFAULT_OPTIONS:=$(CFLAGS_COMMON) $(CFLAGS_CONFIG) $(INCLUDES)
 

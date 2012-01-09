@@ -1,3 +1,7 @@
+2012-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.common (MINGW_LDFLAGS): Correctly use -L rather than -B here.
+
 2011-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* COPYING: Replace with the GPLv3 definition.
