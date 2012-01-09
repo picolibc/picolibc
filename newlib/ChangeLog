@@ -1,3 +1,7 @@
+2012-01-09  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/process.h: Remove Cygwin-only header.
+
 2012-01-03  Viachaslau Kulakouski  <Viachaslau.Kulakouski@oracle.com>
 
 	* libc/stdlib/__atexit.c: Refer to __atexit_lock instead of lock.
