@@ -1,5 +1,10 @@
 2012-01-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
+	* libc/include/sys/unistd.h [__CYGWIN__] (get_current_dir_name):
+	Declare.
+
+2012-01-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
 	* libc/include/complex.h: Fix "/*" within comment warning.
 
 2012-01-09  Corinna Vinschen  <vinschen@redhat.com>
