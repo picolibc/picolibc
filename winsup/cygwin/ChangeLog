@@ -1,5 +1,13 @@
 2012-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/process.h: Move here from newlib.
+	* exec.cc: Change include of process.h to reflect the fact that it's
+	now in the include/cygwin subfolder.
+	* spawn.cc: Ditto.
+	* syscalls.cc: Ditto.
+
+2012-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* miscfuncs.cc (thread_wrapper): Make sure stack is 16 byte aligned
 	to make gcc-3 compiled pthread applications happy.
 

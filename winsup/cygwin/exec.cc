@@ -1,6 +1,6 @@
 /* exec.cc: exec system call support.
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2009, 2011 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2009, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,7 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <process.h>
+#include <cygwin/process.h>
 #include "cygerrno.h"
 #include "path.h"
 #include "environ.h"
