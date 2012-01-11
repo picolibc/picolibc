@@ -1,5 +1,9 @@
 2012-01-11  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* spawn.cc (child_info_spawn::worker): Delete debugging.
+
+2012-01-11  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	Update copyright on all files checked in so far this year.
 	* fhandler.h: Use #pragma once rather than ifdef guards.
 	(fhandler_console::tc_getpgid): Return our pgid if we have never opened

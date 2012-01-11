@@ -337,7 +337,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   int looped = 0;
   HANDLE orig_wr_proc_pipe = NULL;
 
-#if 0
   myfault efault;
   if (efault.faulted ())
     {
@@ -348,7 +347,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       res = -1;
       goto out;
     }
-#endif
 
   child_info_types chtype;
   if (mode != _P_OVERLAY)
