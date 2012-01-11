@@ -14,11 +14,11 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include "cygerrno.h"
+#include "sigproc.h"
+#include "pinfo.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "sigproc.h"
-#include "pinfo.h"
 #include "cygheap.h"
 #include "child_info.h"
 #include "cygtls.h"

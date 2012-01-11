@@ -1,3 +1,21 @@
+2012-01-11  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	Update copyright on all files checked in so far this year.
+	* fhandler.h: Use #pragma once rather than ifdef guards.
+	(fhandler_console::tc_getpgid): Return our pgid if we have never opened
+	a console.
+	* fork.cc: Rearrange includes to accommodate fhandler.h use of pinfo.h.
+	* sigproc.cc: Ditto.
+	* spawn.cc: Ditto.
+	(child_info_spawn::worker): Query myself->pgid rather than calling
+	expensive function.
+	* thread.h: Use #pragma once rather than ifdef guards.
+	* pinfo.h: Use #pragma once rather than ifdef guards.
+	(pinfo::remember): Don't define if sigproc.h has not been included.
+	(pinfo::reattach): Ditto.
+	* sigproc.h: Use #pragma once rather than ifdef guards.  Use different
+	test to see if pinfo.h has been included.
+
 2012-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/process.h: Move here from newlib.
@@ -11,7 +29,7 @@
 	* miscfuncs.cc (thread_wrapper): Make sure stack is 16 byte aligned
 	to make gcc-3 compiled pthread applications happy.
 
-2012-01-08  Christopher Faylor  <me.cygwin2011@cgf.cx>
+2012-01-08  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* dtable.cc (dtable::stdio_init): Always initialize console when we
 	have one.
@@ -29,10 +47,10 @@
 	* cygwin.din (pthread_sigqueue): Export.
 	* posix.sgml (std-gnu): Add pthread_sigqueue.
 	* thread.cc (pthread_sigqueue): New function.
-	* include/thread.h (pthread_sigqueue): New function.
+	* thread.h (pthread_sigqueue): New function.
 	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
 
-2012-01-02  Christopher Faylor  <me.cygwin2011@cgf.cx>
+2012-01-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* path.cc (get_current_dir_name): Avoid memory leak.  Don't return PWD
 	contents if directory doesn't actually exist.

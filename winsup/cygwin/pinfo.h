@@ -1,7 +1,7 @@
 /* pinfo.h: process table info
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011 Red Hat, Inc.
+   2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,8 +9,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _PINFO_H
-#define _PINFO_H
+#pragma once
+
 #include <sys/resource.h>
 #include "thread.h"
 
@@ -187,9 +187,9 @@ public:
   operator _pinfo * () const {return procinfo;}
   void preserve () { destroy = false; }
   void allow_remove () { destroy = true; }
-#ifndef _SIGPROC_H
-  int reattach () {system_printf ("reattach is not here"); return 0;}
-  int remember () {system_printf ("remember is not here"); return 0;}
+#ifndef SIG_BAD_MASK		// kludge to ensure that sigproc.h included
+  // int reattach () {system_printf ("reattach is not here"); return 0;}
+  // int remember (bool) {system_printf ("remember is not here"); return 0;}
 #else
   int reattach ()
   {
@@ -291,4 +291,3 @@ int __stdcall fixup_shms_after_fork ();
 
 void __stdcall fill_rusage (struct rusage *, HANDLE);
 void __stdcall add_rusage (struct rusage *, struct rusage *);
-#endif /*_PINFO_H*/

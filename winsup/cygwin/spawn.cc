@@ -18,16 +18,16 @@ details. */
 #include <winuser.h>
 #include <wchar.h>
 #include <ctype.h>
-#include "cygerrno.h"
 #include <sys/cygwin.h>
+#include "cygerrno.h"
 #include "security.h"
+#include "sigproc.h"
+#include "pinfo.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "sigproc.h"
 #include "cygheap.h"
 #include "child_info.h"
-#include "pinfo.h"
 #include "environ.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"
@@ -337,6 +337,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   int looped = 0;
   HANDLE orig_wr_proc_pipe = NULL;
 
+#if 0
   myfault efault;
   if (efault.faulted ())
     {
@@ -347,6 +348,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       res = -1;
       goto out;
     }
+#endif
 
   child_info_types chtype;
   if (mode != _P_OVERLAY)
@@ -584,7 +586,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
      because the Ctrl-C event is sent to all processes in the console, unless
      they ignore it explicitely.  CREATE_NEW_PROCESS_GROUP does that for us. */
   if (!iscygwin () && myself->ctty >= 0 && iscons_dev (myself->ctty)
-      && fhandler_console::tc_getpgid () != getpgrp ())
+      && fhandler_console::tc_getpgid () != myself->pgid)
     c_flags |= CREATE_NEW_PROCESS_GROUP;
   refresh_cygheap ();
   /* When ruid != euid we create the new process under the current original

@@ -1,7 +1,7 @@
 /* thread.h: Locking and threading module definitions
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007,
-   2008, 2009, 2010, 2011 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,8 +9,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _THREAD_H
-#define _THREAD_H
+#pragma once
 
 #define LOCK_MMAP_LIST   1
 
@@ -714,4 +713,3 @@ struct MTinterface
 };
 
 #define MT_INTERFACE user_data->threadinterface
-#endif // _THREAD_H

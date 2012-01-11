@@ -1,7 +1,7 @@
 /* fhandler.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,8 +9,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _FHANDLER_H_
-#define _FHANDLER_H_
+#pragma once
+#include "pinfo.h"
 
 #include "tty.h"
 /* fcntl flags used only internaly. */
@@ -1307,7 +1307,10 @@ private:
   static console_state *open_shared_console (HWND, HANDLE&, bool&);
 
  public:
-  static pid_t tc_getpgid () {return shared_console_info->tty_min_state.getpgid ();}
+  static pid_t tc_getpgid ()
+  {
+    return shared_console_info ? shared_console_info->tty_min_state.getpgid () : myself->pgid;
+  }
   fhandler_console (fh_devices);
   static console_state *open_shared_console (HWND hw, HANDLE& h)
   {
@@ -2113,4 +2116,3 @@ typedef union
   char __virtual[sizeof (fhandler_virtual)];
   char __windows[sizeof (fhandler_windows)];
 } fhandler_union;
-#endif /* _FHANDLER_H_ */

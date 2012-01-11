@@ -1,7 +1,7 @@
 /* sigproc.h
 
    Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2011 Red Hat, Inc.
+   2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,8 +9,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _SIGPROC_H
-#define _SIGPROC_H
+#pragma once
 #include <signal.h>
 
 #ifdef NSIG
@@ -62,7 +61,7 @@ extern HANDLE signal_arrived;
 extern HANDLE sigCONT;
 
 void __stdcall sig_dispatch_pending (bool fast = false);
-#ifdef _PINFO_H
+#ifdef EXITCODE_SET
 extern "C" void __stdcall set_signal_mask (sigset_t newmask, sigset_t&);
 #endif
 int __stdcall handle_sigprocmask (int sig, const sigset_t *set,
@@ -123,4 +122,3 @@ extern char myself_nowait_dummy[];
 extern struct sigaction *global_sigs;
 
 #define myself_nowait ((_pinfo *) myself_nowait_dummy)
-#endif /*_SIGPROC_H*/
