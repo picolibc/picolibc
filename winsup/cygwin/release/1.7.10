@@ -51,6 +51,8 @@ What's new:
 - GNU/glibc error.h error reporting functions: error, error_at_line,
   error_message_count, error_one_per_line, error_print_progname.
 
+- C99 <tgmath.h> type-generic macros.
+
 - Other new API: clock_getcpuclockid, clock_nanosleep, clock_settime, __fpurge,
   get_current_dir_name, getgrouplist, getpt, ppoll, psiginfo, psignal,
   ptsname_r, sys_siglist, sysinfo.
