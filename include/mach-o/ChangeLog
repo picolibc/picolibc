@@ -1,3 +1,8 @@
+2012-01-12  Iain Sandoe  <idsandoe@googlemail.com>
+
+	* loader.h (BFD_MACH_O_INDIRECT_SYM_LOCAL): New.
+	(BFD_MACH_O_INDIRECT_SYM_ABS): New
+
 2012-01-04  Tristan Gingold  <gingold@adacore.com>
 
 	* external.h (mach_o_fvmlib_command_external): New structure.

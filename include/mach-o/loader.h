@@ -320,6 +320,9 @@ bfd_mach_o_section_attribute;
 #define BFD_MACH_O_N_NO_DEAD_STRIP				0x20
 #define BFD_MACH_O_N_WEAK_REF					0x40
 #define BFD_MACH_O_N_WEAK_DEF					0x80
+
+#define BFD_MACH_O_INDIRECT_SYM_LOCAL			0x80000000
+#define BFD_MACH_O_INDIRECT_SYM_ABS			0x40000000
 
 /* Thread constants.  */
 
