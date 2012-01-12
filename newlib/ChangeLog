@@ -1,3 +1,7 @@
+2012-01-12  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/tgmath.h: New header.
+
 2012-01-09  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/sys/unistd.h [__CYGWIN__] (get_current_dir_name):
