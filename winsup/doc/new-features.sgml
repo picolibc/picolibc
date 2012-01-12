@@ -72,6 +72,10 @@ Also, perror and strerror_r no longer clobber strerror storage.
 </para></listitem>
 
 <listitem><para>
+C99 &gt;tgmath.h&lt; type-generic macros.
+</para></listitem>
+
+<listitem><para>
 /proc/loadavg now shows the number of currently running processes and the
 total number of processes.
 </para></listitem>
