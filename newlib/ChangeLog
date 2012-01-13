@@ -1,3 +1,11 @@
+2012-01-13  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/stdio/sprintf.c: Document 'm' conversion specifier.
+	* libc/stdio/swprintf.c: Ditto.
+	* libc/stdio/vfprintf.c (_VFPRINTF_R) [_GLIBC_EXTENSION]: Handle 'm'
+	conversion specifier.
+	* libc/stdio/vfwprintf.c (_VFWPRINTF_R) [_GLIBC_EXTENSION]: Ditto.
+
 2012-01-12  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/tgmath.h: New header.

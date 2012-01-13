@@ -1074,6 +1074,15 @@ reswitch:	switch (ch) {
 				sign = L'-';
 			break;
 #endif /* FLOATING_POINT */
+#ifdef _GLIBC_EXTENSION
+		case L'm':  /* GNU extension */
+			{
+				int dummy;
+				cp = (wchar_t *) _strerror_r (data, data->_errno, 1, &dummy);
+			}
+			flags &= ~LONGINT;
+			goto string;
+#endif
 		case L'n':
 #ifndef _NO_LONGLONG
 			if (flags & QUADINT)
@@ -1118,8 +1127,11 @@ reswitch:	switch (ch) {
 #ifdef _WANT_IO_C99_FORMATS
 		case L'S':	/* POSIX extension */
 #endif
-			sign = '\0';
 			cp = GET_ARG (N, ap, wchar_ptr_t);
+#ifdef _GLIBC_EXTENSION
+string:
+#endif
+			sign = '\0';
 #ifndef __OPTIMIZE_SIZE__
 			/* Behavior is undefined if the user passed a
 			   NULL string when precision is not 0.
@@ -1132,7 +1144,7 @@ reswitch:	switch (ch) {
 			else
 #endif /* __OPTIMIZE_SIZE__ */
 #ifdef _MB_CAPABLE
-			if (ch == L's' && !(flags & LONGINT)) {
+			if (ch != L'S' && !(flags & LONGINT)) {
 				char *arg = (char *) cp;
 				size_t insize = 0, nchars = 0, nconv = 0;
 				mbstate_t ps;

@@ -498,6 +498,10 @@ DESCRIPTION
 			implementation is similar to <<%#tx>>), except
 			that <<0x>> appears even for the NULL pointer.
 
+		o m
+			Prints the output of <<strerror(errno)>>; no
+			argument is required.  A GNU extension.
+
 		o-
 	O-
 
