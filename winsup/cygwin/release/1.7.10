@@ -44,6 +44,9 @@ What's new:
 
 - dlopen now supports the Glibc-specific RTLD_NODELETE and RTLD_NOOPEN flags.
 
+- The printf and wprintf families of functions now support the %m conversion
+  flag.
+
 - Execed processes now inherit the children of their predecessor.
 
 - Fifos have been rewritten and should now be more reliable.
