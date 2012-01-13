@@ -1,3 +1,8 @@
+2012-01-13  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* new-features.sgml (ov-new1.7.10): Document support for the %m
+	conversion flag in printf functions.
+
 2012-01-12  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* new-features.sgml (ov-new1.7.10): Document tgmath.h.

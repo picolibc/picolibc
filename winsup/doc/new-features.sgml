@@ -105,6 +105,11 @@ dlopen now supports the Glibc-specific RTLD_NODELETE and RTLD_NOOPEN flags.
 </para></listitem>
 
 <listitem><para>
+The printf(3) and wprintf(3) families of functions now handle the %m
+conversion flag.
+</para></listitem>
+
+<listitem><para>
 Other new API: clock_settime, __fpurge, getgrouplist, get_current_dir_name,
 getpt, ppoll, psiginfo, psignal, ptsname_r, sys_siglist, pthread_setschedprio,
 pthread_sigqueue, sysinfo.
