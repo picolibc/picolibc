@@ -59,17 +59,17 @@ TEST_OPTIONS = $(ALL_CFLAGS) -Wall -pedantic -Wsystem-headers -c $(srcdir)/test.
 .PHONY: test
 test:
 	@echo "Testing ddk..."
-	@for lang in c c++ objective-c ; do \
-		echo "$$lang..."; \
-		$(CC) -x$$lang $(TEST_OPTIONS) ; \
-		echo "$$lang UNICODE..."; \
-		$(CC) -x$$lang -DUNICODE $(TEST_OPTIONS) ; \
+	@for lang in c c++ objective-c; do \
+	  echo "$$lang..."; \
+	  $(CC) -x$$lang $(TEST_OPTIONS); \
+	  echo "$$lang UNICODE..."; \
+	  $(CC) -x$$lang -DUNICODE $(TEST_OPTIONS); \
 	done
 	@echo "windres..."
-	@$(WINDRES) --include-dir $(INCDIR) -i $(srcdir)/res.rc -o test.o
+	$(WINDRES) --include-dir ${INCDIR} -i ${srcdir}/res.rc -o test.o
 	@echo "windres UNICODE..."
-	@$(WINDRES) --define UNICODE --include-dir $(INCDIR) -i $(srcdir)/res.rc -o test.o
-	@rm -f test.o
+	$(WINDRES) --define UNICODE --include-dir ${INCDIR} -i ${srcdir}/res.rc -o test.o
+	rm -f test.o
 
 # Rules
 #
@@ -79,16 +79,16 @@ install: install-libraries install-headers
 
 install-libraries: all $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)$(inst_libdir)
-	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(DESTDIR)$(inst_libdir)/$$i; \
+	for file in $(LIBS); do \
+	  $(INSTALL_DATA) $$file $(DESTDIR)$(inst_libdir)/$$file; \
 	done
 
 ddk_includedir = ${inst_includedir}/ddk
 
 install-headers: $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)${ddk_includedir}
-	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../../include/ddk/$$i $(DESTDIR)${ddk_includedir}; \
+	for file in $(HEADERS); do \
+		$(INSTALL_DATA) $(srcdir)/../../include/ddk/$$file $(DESTDIR)${ddk_includedir}; \
 	done
 
 # Uninstall headers and libraries from a target specified directory
@@ -96,27 +96,27 @@ install-headers: $(need-DESTDIR-compatibility)
 uninstall: uninstall-libraries uninstall-headers
 
 uninstall-libraries: $(need-DESTDIR-compatibility)
-	@for i in $(LIBS); do \
-		rm -f $(DESTDIR)$(inst_libdir)/$$i; \
+	for file in $(LIBS); do \
+	  rm -f $(DESTDIR)$(inst_libdir)/$$file; \
 	done
 	rmdir $(DESTDIR)$(inst_libdir)
 
 uninstall-headers: $(need-DESTDIR-compatibility)
-	@for i in $(HEADERS); do \
-		rm -r $(DESTDIR)${ddk_includedir}/$$i; \
+	for file in $(HEADERS); do \
+	  rm -r $(DESTDIR)${ddk_includedir}/$$file; \
 	done
 	rmdir $(DESTDIR)${ddk_includedir}
 
 dist:
 	mkdir $(distdir)/include/ddk
 	chmod 755 $(distdir)/include/ddk
-	@for i in $(HEADERS); do \
-		cp -p $(srcdir)/../../include/ddk/$$i $(distdir)/include/ddk/$$i; \
+	for file in $(HEADERS); do \
+	  cp -p $(srcdir)/../../include/ddk/$$file $(distdir)/include/ddk/$$file; \
 	done
 	mkdir $(distdir)/lib/ddk
 	chmod 755 $(distdir)/lib/ddk
-	@for i in $(DISTFILES); do \
-		cp -p $(srcdir)/$$i $(distdir)/lib/ddk/$$i; \
+	for file in $(DISTFILES); do \
+	  cp -p $(srcdir)/$$file $(distdir)/lib/ddk/$$file; \
 	done
 
 Makefile: Makefile.in ../../config.status ../../configure

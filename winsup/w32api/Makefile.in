@@ -36,8 +36,8 @@ DISTFILES = \
 all: $(SUBDIRS)
 
 %-subdirs:
-	for i in $(SUBDIRS); do \
-	  $(MAKE) -C $$i $*; \
+	for dir in $(SUBDIRS); do \
+	  $(MAKE) -C $$dir $*; \
 	done
 
 $(SUBDIRS):
@@ -47,8 +47,8 @@ test:
 	$(MAKE) -C lib test
 
 install uninstall:
-	for i in $(SUBDIRS); do \
-		(cd $$i; $(MAKE) $@); \
+	for dir in $(SUBDIRS); do \
+	  (cd $$dir; $(MAKE) $@); \
 	done
 
 ifdef SNAPDATE
@@ -79,11 +79,11 @@ srcdist:
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 755 $(distdir)
-	for i in $(DISTFILES); do \
-		cp -p $(srcdir)/$$i $(distdir)/$$i ; \
+	for file in $(DISTFILES); do \
+		cp -p $(srcdir)/$$file $(distdir)/$$file ; \
 	done
-	for i in $(SUBDIRS); do \
-		(cd $$i; $(MAKE) distdir=../$(distdir) dist); \
+	for dir in $(SUBDIRS); do \
+	  (cd $$dir; $(MAKE) distdir=../$(distdir) dist); \
 	done
 	rm -f $(distdir)-src$(TARFILEEXT)
 	$(TAR) $(TARFLAGS)cf $(distdir)-src$(TARFILEEXT) $(distdir)

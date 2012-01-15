@@ -1,5 +1,14 @@
 2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
 
+	Improve self-documentation of 'for' loop commands.
+
+	* Makefile.in lib/Makefile.in:
+	* lib/ddk/Makefile.in lib/directx/Makefile.in: In 'for' loops invoked
+	by rule commands, prefer use of 'dir' and 'file' appropriately, as the
+	loop control variables, rather than non-descript 'i'.
+
+2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
+
 	Generalise 'all' rule to arbitrary prerequisite sub-directories.
 
 	* Makefile.in: (all): Make it depend on all $(SUBDIRS), not just on...

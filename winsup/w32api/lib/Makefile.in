@@ -82,8 +82,8 @@ DISTFILES = Makefile.in $(DEF_FILES) $(MRI_FILES) $(SOURCES)
 all-default: $(EXTRA_OBJS) $(LIBS) ddk directx
 
 %-subdirs:
-	for i in $(SUBDIRS); do \
-	  $(MAKE) -C $$i $*; \
+	for dir in $(SUBDIRS); do \
+	  $(MAKE) -C $$dir $*; \
 	done
 
 ddk:
@@ -98,16 +98,16 @@ TEST_OPTIONS = $(ALL_CFLAGS) -DWINVER=0x0666  \
 test:
 	@echo "Testing w32api..."
 	@for lang in c c++ objective-c ; do \
-		echo "$$lang..."; \
-		$(CC) -x$$lang $(TEST_OPTIONS) ; \
-		echo "$$lang UNICODE..."; \
-		$(CC) -x$$lang -DUNICODE $(TEST_OPTIONS) ; \
+	  echo "$$lang..."; \
+	  $(CC) -x$$lang $(TEST_OPTIONS); \
+	  echo "$$lang UNICODE..."; \
+	  $(CC) -x$$lang -DUNICODE $(TEST_OPTIONS); \
 	done
 	@echo "windres..."
-	@$(WINDRES) --include-dir $(INCDIR) -i $(srcdir)/res.rc -o test.o
+	$(WINDRES) --include-dir $(INCDIR) -i ${srcdir}/res.rc -o test.o
 	@echo "windres UNICODE..."
-	@$(WINDRES) --define UNICODE --include-dir $(INCDIR) -i $(srcdir)/res.rc -o test.o
-	@rm -f test.o
+	$(WINDRES) --define UNICODE --include-dir $(INCDIR) -i ${srcdir}/res.rc -o test.o
+	rm -f test.o
 
 scrnsavw.o: scrnsave.c
 	$(CC) -c $(ALL_CFLAGS) -DUNICODE -o $@ $<
@@ -136,22 +136,22 @@ install: install-libraries install-headers install-ddk install-directx
 
 install-libraries: all $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)$(inst_libdir)
-	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(DESTDIR)$(inst_libdir)/$$i ; \
+	for file in $(LIBS); do \
+	  $(INSTALL_DATA) $$file $(DESTDIR)$(inst_libdir)/$$file ; \
 	done
 
 install-headers: $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)
-	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/$$i $(DESTDIR)$(inst_includedir)/$$i ; \
+	for file in $(HEADERS); do \
+	  $(INSTALL_DATA) $(srcdir)/../include/$$file $(DESTDIR)$(inst_includedir)/$$file ; \
 	done
 	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)/GL
-	for i in $(GL_HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/GL/$$i $(DESTDIR)$(inst_includedir)/GL/$$i ; \
+	for file in $(GL_HEADERS); do \
+	  $(INSTALL_DATA) $(srcdir)/../include/GL/$$file $(DESTDIR)$(inst_includedir)/GL/$$file ; \
 	done
 	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)/gdiplus
-	for i in $(GDIPLUS_HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/gdiplus/$$i $(DESTDIR)$(inst_includedir)/gdiplus/$$i ; \
+	for file in $(GDIPLUS_HEADERS); do \
+	  $(INSTALL_DATA) $(srcdir)/../include/gdiplus/$$file $(DESTDIR)$(inst_includedir)/gdiplus/$$file ; \
 	done
 
 install-ddk: install-libraries install-headers
@@ -165,14 +165,14 @@ install-directx: install-libraries install-headers
 uninstall: uninstall-ddk uninstall-directx uninstall-libraries uninstall-headers
 
 uninstall-libraries: $(need-DESTDIR-compatibility)
-	@for i in $(LIBS); do \
-		rm -f $(DESTDIR)$(inst_libdir)/$$i ; \
+	for file in $(LIBS); do \
+	  rm -f $(DESTDIR)$(inst_libdir)/$$file ; \
 	done
 	rmdir $(DESTDIR)$(inst_libdir)
 
 uninstall-headers: $(need-DESTDIR-compatibility)
-	@for i in $(HEADERS); do \
-		rm -r $(DESTDIR)$(inst_includedir)/$$i ; \
+	for file in $(HEADERS); do \
+	  rm -r $(DESTDIR)$(inst_includedir)/$$file ; \
 	done
 	rmdir $(DESTDIR)$(inst_includedir)
 
@@ -185,24 +185,24 @@ uninstall-directx:
 dist:
 	mkdir $(distdir)/include
 	chmod 755 $(distdir)/include
-	@for i in $(HEADERS); do \
-		cp -p $(srcdir)/../include/$$i $(distdir)/include/$$i ; \
+	for file in $(HEADERS); do \
+	  cp -p $(srcdir)/../include/$$file $(distdir)/include/$$file ; \
 	done
 	mkdir $(distdir)/include/GL
-	@for i in $(GL_HEADERS); do \
-		cp -p $(srcdir)/../include/GL/$$i $(distdir)/include/GL/$$i ; \
+	for file in $(GL_HEADERS); do \
+	  cp -p $(srcdir)/../include/GL/$$file $(distdir)/include/GL/$$file ; \
 	done
 	mkdir $(distdir)/include/gdiplus
-	@for i in $(GDIPLUS_HEADERS); do \
-		cp -p $(srcdir)/../include/gdiplus/$$i $(distdir)/include/gdiplus/$$i ; \
+	for file in $(GDIPLUS_HEADERS); do \
+	  cp -p $(srcdir)/../include/gdiplus/$$file $(distdir)/include/gdiplus/$$file ; \
 	done
 	mkdir $(distdir)/lib
 	chmod 755 $(distdir)/lib
-	@for i in $(DISTFILES); do \
-		cp -p $(srcdir)/$$i $(distdir)/lib/$$i ; \
+	for file in $(DISTFILES); do \
+	  cp -p $(srcdir)/$$file $(distdir)/lib/$$file ; \
 	done
-	for i in $(SUBDIRS); do \
-		(cd $$i; $(MAKE) distdir=../$(distdir) dist); \
+	for dir in $(SUBDIRS); do \
+	  (cd $$dir; $(MAKE) distdir=../$(distdir) dist); \
 	done
 
 Makefile: Makefile.in ../config.status ../configure
