@@ -1,5 +1,12 @@
 2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
 
+	More formatting adjustments.
+
+	* lib/directx/Makefile.in (LIBS, DINPUT_OBJS): Adjust indentation.
+	(INCLUDES, EXTRA_INCLUDES): Fold definitions; adjust indentation.
+
+2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
+
 	Miscellaneous formatting adjustments.
 
 	* lib/Makefile.in (subdirs): Unreferenced macro; delete it.

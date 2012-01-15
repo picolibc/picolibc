@@ -24,16 +24,19 @@ include ${top_builddir}/Makefile.comm
 BUILDENV = @BUILDENV@
 
 ifeq ($(BUILDENV), cygwin)
-# winsup/include
-# winsup/../newlib/libc/include
-# winsup/../newlib/libc/sys/cygwin
-EXTRA_INCLUDES = -I${srcdir}/../../include -I${srcdir}/../../../newlib/libc/include -I${srcdir}/../../../newlib/libc/sys/cygwin
+  # winsup/include
+  # winsup/../newlib/libc/include
+  # winsup/../newlib/libc/sys/cygwin
+  EXTRA_INCLUDES = -I ${srcdir}/../../include \
+    -I ${srcdir}/../../../newlib/libc/include \
+    -I ${srcdir}/../../../newlib/libc/sys/cygwin
 endif
 ifeq ($(BUILDENV), mingw)
-EXTRA_INCLUDES = -I${srcdir}/../../mingw/include
+  EXTRA_INCLUDES = -I ${srcdir}/../../mingw/include
 endif
 
-INCLUDES = -I${srcdir}/../include -I${srcdir}/../include/directx $(EXTRA_INCLUDES)
+INCLUDES = -I ${srcdir}/../include -I ${srcdir}/../include/directx \
+  $(EXTRA_INCLUDES)
 
 # Headers
 #
@@ -44,13 +47,16 @@ HEADERS = $(notdir $(wildcard ${srcdir}/../../include/directx/*.h))
 DEF_FILES = $(notdir $(wildcard ${srcdir}/*.def))
 DIST_C_FILES = $(notdir $(wildcard ${srcdir}/*.c))
 DIST_H_FILES = $(notdir $(wildcard ${srcdir}/*.h))
-LIBS = libd3d8.a libd3d9.a libd3dim.a libd3drm.a libd3dx8d.a libd3dx9d.a \
-       libd3dxof.a libddraw.a libdinput.a libdinput8.a libdmoguids.a \
-       libdplayx.a libdpnaddr.a libdpnet.a libdpnlobby.a libdpvoice.a \
-       libdsetup.a libdsound.a libdxerr8.a libdxerr9.a libdxguid.a \
-       libksproxy.a libksuser.a libmsdmo.a libstrmiids.a
-DINPUT_OBJS = dinput_joy.o dinput_joy2.o dinput_kbd.o dinput_mouse.o \
-       dinput_mouse2.o
+
+LIBS = \
+  libd3d8.a libd3d9.a libd3dim.a libd3drm.a libd3dx8d.a libd3dx9d.a \
+  libd3dxof.a libddraw.a libdinput.a libdinput8.a libdmoguids.a \
+  libdplayx.a libdpnaddr.a libdpnet.a libdpnlobby.a libdpvoice.a \
+  libdsetup.a libdsound.a libdxerr8.a libdxerr9.a libdxguid.a \
+  libksproxy.a libksuser.a libmsdmo.a libstrmiids.a
+
+DINPUT_OBJS = \
+  dinput_joy.o dinput_joy2.o dinput_kbd.o dinput_mouse.o dinput_mouse2.o
 
 DISTFILES = Makefile.in $(DEF_FILES) $(DIST_C_FILES) $(DIST_H_FILES)
 
