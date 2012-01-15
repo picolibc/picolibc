@@ -36,6 +36,7 @@ LD = @LD@
 CFLAGS = @CFLAGS@
 ALL_CFLAGS = $(CFLAGS) $(INCLUDES)
 EXTRA_INCLUDES = -nostdinc -iwithprefix include @EXTRA_INCLUDES@
+INCLUDES = -I ${top_srcdir}/include $(EXTRA_INCLUDES)
 
 DLLTOOL = @DLLTOOL@
 DLLTOOL_FLAGS = --as=$(AS) -k

@@ -16,8 +16,6 @@ top_builddir = @top_builddir@
 VPATH = @srcdir@
 
 include ${top_builddir}/Makefile.comm
-INCLUDES = -I ${top_srcdir}/include -I ${top_srcdir}/include/directx \
-  $(EXTRA_INCLUDES)
 
 # Headers
 #

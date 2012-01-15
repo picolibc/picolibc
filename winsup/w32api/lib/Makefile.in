@@ -19,8 +19,6 @@ VPATH = @srcdir@
 
 include ${top_builddir}/Makefile.comm
 
-INCLUDES = -I ${top_srcdir}/include $(EXTRA_INCLUDES)
-
 # Headers
 #
 HEADERS = $(notdir $(wildcard ${top_srcdir}/include/*.h))

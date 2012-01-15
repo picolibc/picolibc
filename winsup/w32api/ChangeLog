@@ -1,5 +1,15 @@
 2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
 
+	More makefile code refactoring; remove redundant INCLUDES references.
+
+	* lib/directx/Makefile.in (INCLUDES): Reference to include/directx
+	is redundant; remove it.  This results in identical definitions...
+	* lib/Makefile.in lib/ddk/Makefile.in (INCLUDES): ...here; factor out
+	from all three independent makefile locations; relocate to...
+	* Makefile.comm.in (INCLUDES): ...here.
+
+2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
+
 	Add smart identification of auxiliary header file paths.
 
 	* aclocal.m4: New file; replaces previously removed file of
