@@ -33,14 +33,14 @@ DISTFILES = \
   ChangeLog configure.ac Makefile.in Makefile.comm.in configure \
   config.guess config.sub install-sh README.w32api TODO CONTRIBUTIONS
 
-all: lib
+all: $(SUBDIRS)
 
 %-subdirs:
 	for i in $(SUBDIRS); do \
 	  $(MAKE) -C $$i $*; \
 	done
 
-lib:
+$(SUBDIRS):
 	$(MAKE) -C $@
 
 test:

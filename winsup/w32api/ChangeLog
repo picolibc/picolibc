@@ -1,5 +1,12 @@
 2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
 
+	Generalise 'all' rule to arbitrary prerequisite sub-directories.
+
+	* Makefile.in: (all): Make it depend on all $(SUBDIRS), not just on...
+	(lib): ...this; replace it with a generic $(SUBDIRS) goal.
+
+2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
+
 	Derive package release index from configure time specification.
 
 	* configure.ac (PACKAGE_RELEASE): New variable; define it, such that
