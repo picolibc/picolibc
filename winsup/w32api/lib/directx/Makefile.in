@@ -50,8 +50,9 @@ all-default: $(LIBS)
 TEST_OPTIONS = \
   $(ALL_CFLAGS) -Wall -pedantic -Wsystem-headers \
   -c ${srcdir}/test.c -o test.o
-.PHONY: test
-test:
+
+.PHONY: check test
+check test:
 	@echo "Testing directx..."
 	@for lang in c c++ objective-c; do \
 	  echo "$$lang..."; \

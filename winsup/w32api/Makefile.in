@@ -43,8 +43,8 @@ all: $(SUBDIRS)
 $(SUBDIRS):
 	$(MAKE) -C $@
 
-test:
-	$(MAKE) -C lib test
+check test:
+	$(MAKE) -C lib $@
 
 install uninstall:
 	for dir in $(SUBDIRS); do \
@@ -141,6 +141,6 @@ distclean: clean-top
 
 maintainer-clean: maintainer-clean-subdirs
 
-.PHONY: lib test 
+.PHONY: lib check test 
 
 # Makefile.in: end of file

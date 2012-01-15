@@ -64,7 +64,7 @@ DISTFILES = Makefile.in $(DEF_FILES) $(MRI_FILES) $(SOURCES)
 
 .NOTPARALLEL:
 .PHONY: install install-libraries install-headers install-ddk
-.PHONY: test $(SUBDIRS)
+.PHONY: check test $(SUBDIRS)
 
 # Targets: (note that 'all-default' is a redirection from 'all',
 # which is the primary default target identified in the included
@@ -87,7 +87,7 @@ TEST_OPTIONS = \
   $(ALL_CFLAGS) -DWINVER=0x0666 -Wall -pedantic -Wsystem-headers \
   -c ${srcdir}/test.c -o test.o
 
-test:
+check test:
 	@echo "Testing w32api..."
 	@for lang in c c++ objective-c ; do \
 	  echo "$$lang..."; \

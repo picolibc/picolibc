@@ -1,5 +1,17 @@
 2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
 
+	Add 'check' as GCS conforming alias for make's 'test' goal.
+
+	* Makefile.in (check): New goal; declare as .PHONY; implement it as...
+	(test): ... alternative goal name for this; the original 'test' goal
+	may now be considered as deprecated, but there is no pressing need to
+	withdraw support for it.
+
+	* lib/Makefile.in lib/ddk/Makefile.in lib/directx/Makefile.in:
+	(check, test): Likewise.
+
+2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
+
 	More makefile code refactoring; remove redundant INCLUDES references.
 
 	* lib/directx/Makefile.in (INCLUDES): Reference to include/directx
