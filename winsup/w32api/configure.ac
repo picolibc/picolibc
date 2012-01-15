@@ -27,6 +27,9 @@ AC_DEFUN([MINGW_AC_CONFIG_SRCDIR],
 AC_INIT([MS-Windows API],[__ver__],[http://mingw.org/reporting_bugs],[w32api])
 MINGW_AC_CONFIG_SRCDIR([__W32API_VERSION],[include/w32api.h])
 
+AC_ARG_VAR([RELEASE],[release serial number for current package version])
+AC_SUBST([PACKAGE_RELEASE],[${RELEASE-"1"}])
+
 AC_CANONICAL_SYSTEM
 
 # Identify commands which are to be used for installation.

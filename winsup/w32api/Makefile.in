@@ -4,59 +4,30 @@
 # Makefile.in
 #
 # This file is part of a free library for the Win32 API.
-# 
+
+PACKAGE = @PACKAGE_TARNAME@
+VERSION = @PACKAGE_VERSION@
+RELEASE = @PACKAGE_RELEASE@
+
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-# start config section
 
 SHELL = @SHELL@
 
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-build_alias = @build@
-host_alias = @host@
 target_alias = @target@
-prefix = @prefix@
 conf_prefix = @prefix@
 # FIXME: this needs an appropriate AC_SUBST
 host_os = mingw32
-
-program_transform_name = @program_transform_name@
-exec_prefix = @exec_prefix@
-bindir = @bindir@
-libdir = @libdir@
-tooldir = $(exec_prefix)/$(target_alias)
-datadir = @datadir@
-infodir = @infodir@
-includedir = @includedir@
-
-CC = @CC@
-CC_FOR_TARGET = $(CC)
-CFLAGS = @CFLAGS@
-
-DLLTOOL = @DLLTOOL@
-AS = @AS@
-AS_FOR_TARGET = $(AS_FOR_TARGET)
-WINDRES = @WINDRES@
-
-RANLIB = @RANLIB@
-AR = @AR@
-LD = @LD@
 
 TAR = tar
 TARFLAGS = --lzma -
 TARFILEEXT = .tar.lzma
 
-# end config section
-
 SUBDIRS = lib
-
-PACKAGE = w32api
-VERSION = 3.17
-CYGRELEASE = 2
 
 DISTFILES = \
   ChangeLog configure.ac Makefile.in Makefile.comm.in configure \
@@ -83,6 +54,7 @@ install uninstall:
 ifdef SNAPDATE
     distdir = $(PACKAGE)-$(VERSION)-$(SNAPDATE)-$(host_os)
 else
+   CYGRELEASE = $(RELEASE)
    ifneq (,$(findstring cygwin, $(target_alias)))
       distdir=$(PACKAGE)-$(VERSION)-$(CYGRELEASE)
    else
@@ -142,18 +114,24 @@ Makefile: Makefile.in config.status configure
 
 mostlyclean-top:
 	rm -f *~
+
 clean-top: mostlyclean-top
 	rm -rf $(distdir)
 	rm -f $(distdir)*$(TARFILEEXT)
 maintainer-clean-top:
 
 mostlyclean: mostlyclean-top mostlyclean-subdirs
+
 clean: mostlyclean-top clean-subdirs
+
 distclean: clean-top
 	$(MAKE) -C lib/directx distclean
 	$(MAKE) -C lib/ddk distclean
 	$(MAKE) -C lib distclean
 	rm -f Makefile config.status config.log config.cache TAGS *~
+
 maintainer-clean: maintainer-clean-subdirs
 
 .PHONY: lib test 
+
+# Makefile.in: end of file

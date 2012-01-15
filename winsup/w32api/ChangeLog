@@ -1,3 +1,21 @@
+2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
+
+	Derive package release index from configure time specification.
+
+	* configure.ac (PACKAGE_RELEASE): New variable; define it, such that
+	AC_SUBST will propagate it to generated makefiles; initialise from...
+	(RELEASE): ...this configure time variable; make it precious.
+
+	* Makefile.in (CYGRELEASE): Reassign its value, to match...
+	(RELEASE): ...this; assign AC_SUBST propagated PACKAGE_RELEASE value.
+	(PACKAGE): Assign AC_SUBST propagated PACKAGE_TARNAME value.
+	(VERSION): Assign AC_SUBST propagated PACKAGE_VERSION value.
+	(CC, CFLAGS, AS, LD, AR, RANLIB): Unreferenced macros; delete them.
+	(CC_FOR_TARGET, AS_FOR_TARGET, DLLTOOL, WINDRES): Likewise.
+	(prefix, exec_prefix, datadir, infodir, includedir): Likewise.
+	(bindir, libdir, tooldir, program_transform_name): Likewise.
+	(build_alias, host_alias): Likewise.
+
 2012-01-14  Keith Marshall  <keithmarshall@users.sf.net>
 
 	Discontinue CVS tracking of generated 'configure' script.
@@ -63,6 +81,8 @@
 
 2011-12-13  Keith Marshall  <keithmarshall@users.sf.net>
 
+	Factor common makefile code into single include file.
+
 	* configure.ac (AC_CONFIG_FILES): Add Makefile.comm
 	(AC_PROG_MKDIR_P): Add, to AC_SUBST result for mkinstalldirs.
 
@@ -81,6 +101,8 @@
 	(bindir, program_transform_name, datadir, infodir): Likewise.
 
 2011-12-13  Keith Marshall  <keithmarshall@users.sf.net>
+
+	Prepare for makefile code refactoring.
 
 	* lib/ddk/Makefile.in (ddk_includedir): New macro; define it, then use
 	it in install-headers and uninstall-headers rules, in place of...
