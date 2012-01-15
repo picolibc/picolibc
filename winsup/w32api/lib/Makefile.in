@@ -214,7 +214,4 @@ dist:
 	  (cd $$dir; $(MAKE) distdir=../${distdir} dist); \
 	done
 
-Makefile: Makefile.in ../config.status ../configure
-	cd ..; $(SHELL) config.status
-
 # Makefile.in: end of file

@@ -109,8 +109,17 @@ endif
 snapshot:
 	make dist SNAPDATE=$(shell date '+%Y%m%d')
 
-Makefile: Makefile.in config.status configure
+# Makefile must be rebuilt if Makefile.in is modified,
+# or if config.status is updated.
+#
+Makefile: Makefile.in config.status
 	$(SHELL) config.status
+
+# config.status itself must be updated if configure is modified;
+# this requires a distinct invocation of itself.
+#
+config.status: configure
+	$(SHELL) config.status --recheck
 
 mostlyclean-top:
 	rm -f *~

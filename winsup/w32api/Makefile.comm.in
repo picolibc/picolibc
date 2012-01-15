@@ -124,4 +124,37 @@ distclean: clean
 
 maintainer-clean: distclean
 
+# Rules for rebuilding makefiles in sub-directories:
+#
+# Each of these should be rebuilt when its own Makefile.in is modified,
+# or when ${top_builddir}/config.status is updated.  Rebuilding is achieved
+# by running ${top_builddir}/config.status, with ${top_builddir} as CWD; as
+# a side effect this also rebuilds all other makefiles in the package tree.
+# In particular, it causes ${top_builddir}/Makefile.comm.in to be rebuilt,
+# BEFORE any sub-directory specific Makefile is updated.
+#
+# Since ${top_builddir}/Makefile.comm is also required by each individual
+# sub-directory Makefile, and since all sub-directory makefiles are ALWAYS
+# updated along with ${top_builddir}/Makefile.comm, we may simply declare
+# the dependency...
+#
+Makefile: ${top_builddir}/Makefile.comm
+
+# ...then by adding Makefile.in as an artificial prerequisite of this,
+# together with its own real dependence on ${top_builddir}/config.status
+# and ${top_srcdir}/Makefile.comm.in, we can simply rely on the mutually
+# effective rebuilding side effects to update both the subdirectory's own
+# Makefile, and ${top_builddir}/Makefile.comm, in a single operation.
+#
+${top_builddir}/Makefile.comm: ${top_builddir}/config.status
+${top_builddir}/Makefile.comm: Makefile.in ${top_srcdir}/Makefile.comm.in
+	cd ${top_builddir} && $(SHELL) config.status
+
+# ${top_builddir}/config.status must itself be updated, at any time when
+# ${top_srcdir}/configure has been modified; this is a distinct operation
+# from the rebuilding of makefiles.
+#
+${top_builddir}/config.status: ${top_srcdir}/configure
+	cd ${top_builddir} && $(SHELL) config.status --recheck
+
 # Makefile.comm.in: end of file

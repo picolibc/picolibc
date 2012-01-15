@@ -1,5 +1,24 @@
 2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
 
+	Update and correct makefile rebuilding rules.
+
+	* Makefile.in (Makefile): Remove dependency on configure; it causes
+	incorrect invocation of config.status when configure is regenerated.
+	(config.status): New rule; it invokes the corrected command.
+
+	* lib/Makefile.in lib/ddk/Makefile.in lib/directx/Makefile.in:
+	(Makefile): Factor out rebuilding rules; replace by...
+	* Makefile.comm.in (Makefile): ...corrected implementation here.
+	(top_builddir/Makefile.comm): New rebuilding rule; it establishes the
+	commands to rebuild Makefile.comm and all other makefiles, when its
+	own Makefile.comm.in, or any subdirectory Makefile.in is modified,
+	or when config.status is updated.
+	(top_builddir/config.status): New rule; it corrects the previously
+	inappropriate command implementation to update config.status, when the
+	configure script is regenerated.
+
+2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
+
 	More formatting adjustments.
 
 	* lib/directx/Makefile.in (LIBS, DINPUT_OBJS): Adjust indentation.
