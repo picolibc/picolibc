@@ -9,6 +9,8 @@
 # but WITHOUT ANY WARANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+SUBDIRS = ddk directx
+
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 top_builddir = @top_builddir@
@@ -16,9 +18,6 @@ top_builddir = @top_builddir@
 VPATH = @srcdir@
 
 include ${top_builddir}/Makefile.comm
-
-SUBDIRS := ddk directx
-subdirs := ddk directx
 
 # Depending on if we build as part of winsup or mingw we need to
 # add additional include paths in order to get the correct headers
@@ -30,50 +29,60 @@ ifeq ($(BUILDENV), cygwin)
 # winsup/include
 # winsup/../newlib/libc/include
 # winsup/../newlib/libc/sys/cygwin
-EXTRA_INCLUDES = -I$(srcdir)/../../include -I$(srcdir)/../../../newlib/libc/include -I$(srcdir)/../../../newlib/libc/sys/cygwin
+EXTRA_INCLUDES = -I${srcdir}/../../include -I${srcdir}/../../../newlib/libc/include -I${srcdir}/../../../newlib/libc/sys/cygwin
 endif
 ifeq ($(BUILDENV), mingw)
-EXTRA_INCLUDES = -I$(srcdir)/../../mingw/include
+EXTRA_INCLUDES = -I${srcdir}/../../mingw/include
 endif
 
-INCLUDES = -I$(srcdir)/../include $(EXTRA_INCLUDES)
+INCLUDES = -I${srcdir}/../include $(EXTRA_INCLUDES)
 
 # Headers
 #
-HEADERS = $(notdir $(wildcard $(srcdir)/../include/*.h))
-GL_HEADERS = $(notdir $(wildcard $(srcdir)/../include/GL/*.h))
-GDIPLUS_HEADERS = $(notdir $(wildcard $(srcdir)/../include/gdiplus/*.h))
+HEADERS = $(notdir $(wildcard ${srcdir}/../include/*.h))
+GL_HEADERS = $(notdir $(wildcard ${srcdir}/../include/GL/*.h))
+GDIPLUS_HEADERS = $(notdir $(wildcard ${srcdir}/../include/gdiplus/*.h))
 
 # Libraries
 #
-DEF_FILES = $(notdir $(wildcard $(srcdir)/*.def))
-MRI_FILES = $(notdir $(wildcard $(srcdir)/*.mri))
+DEF_FILES = $(notdir $(wildcard ${srcdir}/*.def))
+MRI_FILES = $(notdir $(wildcard ${srcdir}/*.mri))
 IMPLIBS = $(addprefix lib,$(subst .def,.a,$(DEF_FILES)))
 MIMPLIBS = $(addprefix lib,$(subst .mri,.a,$(MRI_FILES)))
 
 EXTRA_LIBS = libuuid.a libscrnsave.a libscrnsavw.a liblargeint.a
 
 LIBS = $(IMPLIBS) $(MIMPLIBS) $(EXTRA_LIBS)
-UUID_OBJS = mshtml-uuid.o msxml-uuid.o unknwn-uuid.o \
-			servprov-uuid.o oleidl-uuid.o oleacc-uuid.o ocidl-uuid.o \
-			objsafe-uuid.o oaidl-uuid.o docobj-uuid.o comcat-uuid.o \
-			exdisp-uuid.o mlang-uuid.o objidl-uuid.o cguid-uuid.o \
-			olectlid-uuid.o ativscp-uuid.o urlmon-uuid.o hlink-uuid.o \
-			hlguids-uuid.o extras-uuid.o devguid.o power-uuid.o
-EXTRA_OBJS = shell32.o scrnsave.o scrnsavw.o largeint.o gdiplus.o \
-	$(UUID_OBJS) ws2_32.o
-UUID_SOURCES = mshtml-uuid.c msxml-uuid.c unknwn-uuid.c \
-			   servprov-uuid.c oleidl-uuid.c oleacc-uuid.c ocidl-uuid.c \
-			   objsafe-uuid.c oaidl-uuid.c docobj-uuid.c comcat-uuid.c \
-			   exdisp-uuid.c mlang-uuid.c objidl-uuid.c cguid-uuid.c \
-			   olectlid-uuid.c ativscp-uuid.c urlmon-uuid.c hlink-uuid.c \
-			   hlguids-uuid.c extras-uuid.c devguid.c power-uuid.c
-SOURCES = scrnsave.c shell32.c  largeint.c gdiplus.c $(UUID_SOURCES) \
-res.rc test.c ws2_32.c
+
+UUID_OBJS = \
+  mshtml-uuid.o msxml-uuid.o unknwn-uuid.o \
+  servprov-uuid.o oleidl-uuid.o oleacc-uuid.o ocidl-uuid.o \
+  objsafe-uuid.o oaidl-uuid.o docobj-uuid.o comcat-uuid.o \
+  exdisp-uuid.o mlang-uuid.o objidl-uuid.o cguid-uuid.o \
+  olectlid-uuid.o ativscp-uuid.o urlmon-uuid.o hlink-uuid.o \
+  hlguids-uuid.o extras-uuid.o devguid.o power-uuid.o
+
+EXTRA_OBJS = \
+  shell32.o scrnsave.o scrnsavw.o largeint.o gdiplus.o \
+  $(UUID_OBJS) ws2_32.o
+
+UUID_SOURCES = \
+  mshtml-uuid.c msxml-uuid.c unknwn-uuid.c \
+  servprov-uuid.c oleidl-uuid.c oleacc-uuid.c ocidl-uuid.c \
+  objsafe-uuid.c oaidl-uuid.c docobj-uuid.c comcat-uuid.c \
+  exdisp-uuid.c mlang-uuid.c objidl-uuid.c cguid-uuid.c \
+  olectlid-uuid.c ativscp-uuid.c urlmon-uuid.c hlink-uuid.c \
+  hlguids-uuid.c extras-uuid.c devguid.c power-uuid.c
+
+SOURCES = \
+  scrnsave.c shell32.c  largeint.c gdiplus.c $(UUID_SOURCES) \
+  res.rc test.c ws2_32.c
 
 DISTFILES = Makefile.in $(DEF_FILES) $(MRI_FILES) $(SOURCES)
 
 .NOTPARALLEL:
+.PHONY: install install-libraries install-headers install-ddk
+.PHONY: test $(SUBDIRS)
 
 # Targets: (note that 'all-default' is a redirection from 'all',
 # which is the primary default target identified in the included
@@ -92,9 +101,10 @@ ddk:
 directx:
 	$(MAKE) -C $@
 
-TEST_OPTIONS = $(ALL_CFLAGS) -DWINVER=0x0666  \
-	-Wall -pedantic -Wsystem-headers -c $(srcdir)/test.c -o test.o
-.PHONY: test ddk directx
+TEST_OPTIONS = \
+  $(ALL_CFLAGS) -DWINVER=0x0666 -Wall -pedantic -Wsystem-headers \
+  -c ${srcdir}/test.c -o test.o
+
 test:
 	@echo "Testing w32api..."
 	@for lang in c c++ objective-c ; do \
@@ -129,29 +139,28 @@ libvfw32.a: vfw32.mri libmsvfw32.a libavifil32.a libavicap32.a
 	$(AR) -M < ${word 1,$^}
 	$(RANLIB) $@
 
-.PHONY: install install-libraries install-headers install-ddk
 # Install headers and libraries in a target specified directory.
 #
 install: install-libraries install-headers install-ddk install-directx
 
 install-libraries: all $(need-DESTDIR-compatibility)
-	$(mkinstalldirs) $(DESTDIR)$(inst_libdir)
+	$(mkinstalldirs) $(DESTDIR)${inst_libdir}
 	for file in $(LIBS); do \
-	  $(INSTALL_DATA) $$file $(DESTDIR)$(inst_libdir)/$$file ; \
+	  $(INSTALL_DATA) $$file $(DESTDIR)${inst_libdir}; \
 	done
 
 install-headers: $(need-DESTDIR-compatibility)
-	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)
+	$(mkinstalldirs) $(DESTDIR)${inst_includedir}
 	for file in $(HEADERS); do \
-	  $(INSTALL_DATA) $(srcdir)/../include/$$file $(DESTDIR)$(inst_includedir)/$$file ; \
+	  $(INSTALL_DATA) ${srcdir}/../include/$$file $(DESTDIR)${inst_includedir}; \
 	done
-	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)/GL
+	$(mkinstalldirs) $(DESTDIR)${inst_includedir}/GL
 	for file in $(GL_HEADERS); do \
-	  $(INSTALL_DATA) $(srcdir)/../include/GL/$$file $(DESTDIR)$(inst_includedir)/GL/$$file ; \
+	  $(INSTALL_DATA) ${srcdir}/../include/GL/$$file $(DESTDIR)${inst_includedir}/GL; \
 	done
-	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)/gdiplus
+	$(mkinstalldirs) $(DESTDIR)${inst_includedir}/gdiplus
 	for file in $(GDIPLUS_HEADERS); do \
-	  $(INSTALL_DATA) $(srcdir)/../include/gdiplus/$$file $(DESTDIR)$(inst_includedir)/gdiplus/$$file ; \
+	  $(INSTALL_DATA) ${srcdir}/../include/gdiplus/$$file $(DESTDIR)${inst_includedir}/gdiplus; \
 	done
 
 install-ddk: install-libraries install-headers
@@ -166,15 +175,15 @@ uninstall: uninstall-ddk uninstall-directx uninstall-libraries uninstall-headers
 
 uninstall-libraries: $(need-DESTDIR-compatibility)
 	for file in $(LIBS); do \
-	  rm -f $(DESTDIR)$(inst_libdir)/$$file ; \
+	  rm -f $(DESTDIR)${inst_libdir}/$$file; \
 	done
-	rmdir $(DESTDIR)$(inst_libdir)
+	rmdir $(DESTDIR)${inst_libdir}
 
 uninstall-headers: $(need-DESTDIR-compatibility)
 	for file in $(HEADERS); do \
-	  rm -r $(DESTDIR)$(inst_includedir)/$$file ; \
+	  rm -r $(DESTDIR)${inst_includedir}/$$file; \
 	done
-	rmdir $(DESTDIR)$(inst_includedir)
+	rmdir $(DESTDIR)${inst_includedir}
 
 uninstall-ddk:
 	cd ddk && $(MAKE) uninstall
@@ -183,26 +192,26 @@ uninstall-directx:
 	cd directx && $(MAKE) uninstall
 
 dist:
-	mkdir $(distdir)/include
-	chmod 755 $(distdir)/include
+	mkdir ${distdir}/include
+	chmod 755 ${distdir}/include
 	for file in $(HEADERS); do \
-	  cp -p $(srcdir)/../include/$$file $(distdir)/include/$$file ; \
+	  cp -p ${srcdir}/../include/$$file ${distdir}/include; \
 	done
-	mkdir $(distdir)/include/GL
+	mkdir ${distdir}/include/GL
 	for file in $(GL_HEADERS); do \
-	  cp -p $(srcdir)/../include/GL/$$file $(distdir)/include/GL/$$file ; \
+	  cp -p ${srcdir}/../include/GL/$$file ${distdir}/include/GL; \
 	done
-	mkdir $(distdir)/include/gdiplus
+	mkdir ${distdir}/include/gdiplus
 	for file in $(GDIPLUS_HEADERS); do \
-	  cp -p $(srcdir)/../include/gdiplus/$$file $(distdir)/include/gdiplus/$$file ; \
+	  cp -p ${srcdir}/../include/gdiplus/$$file ${distdir}/include/gdiplus; \
 	done
-	mkdir $(distdir)/lib
-	chmod 755 $(distdir)/lib
+	mkdir ${distdir}/lib
+	chmod 755 ${distdir}/lib
 	for file in $(DISTFILES); do \
-	  cp -p $(srcdir)/$$file $(distdir)/lib/$$file ; \
+	  cp -p ${srcdir}/$$file ${distdir}/lib; \
 	done
 	for dir in $(SUBDIRS); do \
-	  (cd $$dir; $(MAKE) distdir=../$(distdir) dist); \
+	  (cd $$dir; $(MAKE) distdir=../${distdir} dist); \
 	done
 
 Makefile: Makefile.in ../config.status ../configure

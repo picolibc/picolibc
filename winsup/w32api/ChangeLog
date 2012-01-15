@@ -1,5 +1,20 @@
 2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
 
+	Miscellaneous formatting adjustments.
+
+	* lib/Makefile.in (subdirs): Unreferenced macro; delete it.
+	(srcdir, inst_includedir, inst_libdir, distdir): Use braces in macro
+	references; don't respecify $file in destination path when installing.
+	(UUID_OBJS, EXTRA_OBJS, UUID_SOURCES, SOURCES): Adjust indentation.
+	(TEST_OPTIONS): Fold definition; adjust indentation.
+
+	* lib/ddk/Makefile.in lib/directx/Makefile.in:
+	(srcdir, inst_includedir, inst_libdir, distdir): Use braces in macro
+	references; don't respecify $file in destination path when installing.
+	(TEST_OPTIONS): Fold definition; adjust indentation.
+
+2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
+
 	Improve self-documentation of 'for' loop commands.
 
 	* Makefile.in lib/Makefile.in:

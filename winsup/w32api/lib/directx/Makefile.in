@@ -27,23 +27,23 @@ ifeq ($(BUILDENV), cygwin)
 # winsup/include
 # winsup/../newlib/libc/include
 # winsup/../newlib/libc/sys/cygwin
-EXTRA_INCLUDES = -I$(srcdir)/../../include -I$(srcdir)/../../../newlib/libc/include -I$(srcdir)/../../../newlib/libc/sys/cygwin
+EXTRA_INCLUDES = -I${srcdir}/../../include -I${srcdir}/../../../newlib/libc/include -I${srcdir}/../../../newlib/libc/sys/cygwin
 endif
 ifeq ($(BUILDENV), mingw)
-EXTRA_INCLUDES = -I$(srcdir)/../../mingw/include
+EXTRA_INCLUDES = -I${srcdir}/../../mingw/include
 endif
 
-INCLUDES = -I$(srcdir)/../include -I$(srcdir)/../include/directx $(EXTRA_INCLUDES)
+INCLUDES = -I${srcdir}/../include -I${srcdir}/../include/directx $(EXTRA_INCLUDES)
 
 # Headers
 #
-HEADERS = $(notdir $(wildcard $(srcdir)/../../include/directx/*.h))
+HEADERS = $(notdir $(wildcard ${srcdir}/../../include/directx/*.h))
 
 # Libraries
 #
-DEF_FILES = $(notdir $(wildcard $(srcdir)/*.def))
-DIST_C_FILES = $(notdir $(wildcard $(srcdir)/*.c))
-DIST_H_FILES = $(notdir $(wildcard $(srcdir)/*.h))
+DEF_FILES = $(notdir $(wildcard ${srcdir}/*.def))
+DIST_C_FILES = $(notdir $(wildcard ${srcdir}/*.c))
+DIST_H_FILES = $(notdir $(wildcard ${srcdir}/*.h))
 LIBS = libd3d8.a libd3d9.a libd3dim.a libd3drm.a libd3dx8d.a libd3dx9d.a \
        libd3dxof.a libddraw.a libdinput.a libdinput8.a libdmoguids.a \
        libdplayx.a libdpnaddr.a libdpnet.a libdpnlobby.a libdpvoice.a \
@@ -62,7 +62,9 @@ DISTFILES = Makefile.in $(DEF_FILES) $(DIST_C_FILES) $(DIST_H_FILES)
 #
 all-default: $(LIBS)
 
-TEST_OPTIONS = $(ALL_CFLAGS) -Wall -pedantic -Wsystem-headers -c $(srcdir)/test.c -o test.o
+TEST_OPTIONS = \
+  $(ALL_CFLAGS) -Wall -pedantic -Wsystem-headers \
+  -c $(srcdir)/test.c -o test.o
 .PHONY: test
 test:
 	@echo "Testing directx..."
@@ -89,12 +91,12 @@ libdxerr9.a: dxerr9.o dxerr9w.o
 	$(RANLIB) $@
 
 libdinput.a: dinput.def $(DINPUT_OBJS)
-	$(DLLTOOL) $(DLLTOOL_FLAGS) --output-lib $@ --def $(srcdir)/dinput.def
+	$(DLLTOOL) $(DLLTOOL_FLAGS) --output-lib $@ --def ${srcdir}/dinput.def
 	$(AR) r $@ $(DINPUT_OBJS)
 	$(RANLIB) $@
 
 libdinput8.a: dinput8.def $(DINPUT_OBJS)
-	$(DLLTOOL) $(DLLTOOL_FLAGS) --output-lib $@ --def $(srcdir)/dinput8.def
+	$(DLLTOOL) $(DLLTOOL_FLAGS) --output-lib $@ --def ${srcdir}/dinput8.def
 	$(AR) r $@ $(DINPUT_OBJS)
 	$(RANLIB) $@
 
@@ -103,15 +105,15 @@ libdinput8.a: dinput8.def $(DINPUT_OBJS)
 install: install-libraries install-headers
 
 install-libraries: all $(need-DESTDIR-compatibility)
-	$(mkinstalldirs) $(DESTDIR)$(inst_libdir)
+	$(mkinstalldirs) $(DESTDIR)${inst_libdir}
 	for file in $(LIBS); do \
-	  $(INSTALL_DATA) $$file $(DESTDIR)$(inst_libdir)/$$file; \
+	  $(INSTALL_DATA) $$file $(DESTDIR)${inst_libdir}; \
 	done
 
 install-headers: $(need-DESTDIR-compatibility)
-	$(mkinstalldirs) $(DESTDIR)$(inst_includedir)
+	$(mkinstalldirs) $(DESTDIR)${inst_includedir}
 	for file in $(HEADERS); do \
-	  $(INSTALL_DATA) $(srcdir)/../../include/directx/$$file $(DESTDIR)$(inst_includedir)/$$file; \
+	  $(INSTALL_DATA) ${srcdir}/../../include/directx/$$file $(DESTDIR)${inst_includedir}; \
 	done
 
 # Uninstall headers and libraries from a target specified directory
@@ -120,26 +122,26 @@ uninstall: uninstall-libraries uninstall-headers
 
 uninstall-libraries: $(need-DESTDIR-compatibility)
 	for file in $(LIBS); do \
-	  rm -f $(DESTDIR)$(inst_libdir)/$$file; \
+	  rm -f $(DESTDIR)${inst_libdir}/$$file; \
 	done
-	rmdir $(DESTDIR)$(inst_libdir)
+	rmdir $(DESTDIR)${inst_libdir}
 
 uninstall-headers: $(need-DESTDIR-compatibility)
 	for file in $(HEADERS); do \
-	  rm -r $(DESTDIR)$(inst_includedir)/$$file; \
+	  rm -r $(DESTDIR)${inst_includedir}/$$file; \
 	done
-	rmdir $(DESTDIR)$(inst_includedir)
+	rmdir $(DESTDIR)${inst_includedir}
 
 dist:
-	mkdir $(distdir)/include/directx
-	chmod 755 $(distdir)/include/directx
+	mkdir ${distdir}/include/directx
+	chmod 755 ${distdir}/include/directx
 	for file in $(HEADERS); do \
-	  cp -p $(srcdir)/../../include/directx/$$file $(distdir)/include/directx/$$file; \
+	  cp -p ${srcdir}/../../include/directx/$$file ${distdir}/include/directx; \
 	done
-	mkdir $(distdir)/lib/directx
-	chmod 755 $(distdir)/lib/directx
+	mkdir ${distdir}/lib/directx
+	chmod 755 ${distdir}/lib/directx
 	for file in $(DISTFILES); do \
-	  cp -p $(srcdir)/$$file $(distdir)/lib/directx/$$file; \
+	  cp -p ${srcdir}/$$file ${distdir}/lib/directx; \
 	done
 
 Makefile: Makefile.in ../../config.status ../../configure

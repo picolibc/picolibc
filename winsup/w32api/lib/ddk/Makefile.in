@@ -27,21 +27,21 @@ ifeq ($(BUILDENV), cygwin)
 # winsup/include
 # winsup/../newlib/libc/include
 # winsup/../newlib/libc/sys/cygwin
-EXTRA_INCLUDES = -I$(srcdir)/../../include -I$(srcdir)/../../../newlib/libc/include -I$(srcdir)/../../../newlib/libc/sys/cygwin
+EXTRA_INCLUDES = -I${srcdir}/../../include -I${srcdir}/../../../newlib/libc/include -I${srcdir}/../../../newlib/libc/sys/cygwin
 endif
 ifeq ($(BUILDENV), mingw)
-EXTRA_INCLUDES = -I$(srcdir)/../../mingw/include
+EXTRA_INCLUDES = -I${srcdir}/../../mingw/include
 endif
 
-INCLUDES = -I$(srcdir)/../include $(EXTRA_INCLUDES)
+INCLUDES = -I${srcdir}/../include $(EXTRA_INCLUDES)
 
 # Headers
 #
-HEADERS = $(notdir $(wildcard $(srcdir)/../../include/ddk/*.h))
+HEADERS = $(notdir $(wildcard ${srcdir}/../../include/ddk/*.h))
 
 # Libraries
 #
-DEF_FILES = $(notdir $(wildcard $(srcdir)/*.def))
+DEF_FILES = $(notdir $(wildcard ${srcdir}/*.def))
 IMPLIBS = $(addprefix lib,$(subst .def,.a,$(DEF_FILES)))
 LIBS = $(IMPLIBS)
 
@@ -55,7 +55,10 @@ DISTFILES = Makefile.in $(DEF_FILES)
 #
 all-default: $(LIBS)
 
-TEST_OPTIONS = $(ALL_CFLAGS) -Wall -pedantic -Wsystem-headers -c $(srcdir)/test.c -o test.o
+TEST_OPTIONS = \
+  $(ALL_CFLAGS) -Wall -pedantic -Wsystem-headers \
+  -c ${srcdir}/test.c -o test.o
+
 .PHONY: test
 test:
 	@echo "Testing ddk..."
@@ -78,9 +81,9 @@ test:
 install: install-libraries install-headers
 
 install-libraries: all $(need-DESTDIR-compatibility)
-	$(mkinstalldirs) $(DESTDIR)$(inst_libdir)
+	$(mkinstalldirs) $(DESTDIR)${inst_libdir}
 	for file in $(LIBS); do \
-	  $(INSTALL_DATA) $$file $(DESTDIR)$(inst_libdir)/$$file; \
+	  $(INSTALL_DATA) $$file $(DESTDIR)${inst_libdir}; \
 	done
 
 ddk_includedir = ${inst_includedir}/ddk
@@ -88,7 +91,7 @@ ddk_includedir = ${inst_includedir}/ddk
 install-headers: $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)${ddk_includedir}
 	for file in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../../include/ddk/$$file $(DESTDIR)${ddk_includedir}; \
+	  $(INSTALL_DATA) ${srcdir}/../../include/ddk/$$file $(DESTDIR)${ddk_includedir}; \
 	done
 
 # Uninstall headers and libraries from a target specified directory
@@ -97,9 +100,9 @@ uninstall: uninstall-libraries uninstall-headers
 
 uninstall-libraries: $(need-DESTDIR-compatibility)
 	for file in $(LIBS); do \
-	  rm -f $(DESTDIR)$(inst_libdir)/$$file; \
+	  rm -f $(DESTDIR)${inst_libdir}/$$file; \
 	done
-	rmdir $(DESTDIR)$(inst_libdir)
+	rmdir $(DESTDIR)${inst_libdir}
 
 uninstall-headers: $(need-DESTDIR-compatibility)
 	for file in $(HEADERS); do \
@@ -108,15 +111,15 @@ uninstall-headers: $(need-DESTDIR-compatibility)
 	rmdir $(DESTDIR)${ddk_includedir}
 
 dist:
-	mkdir $(distdir)/include/ddk
-	chmod 755 $(distdir)/include/ddk
+	mkdir ${distdir}/include/ddk
+	chmod 755 ${distdir}/include/ddk
 	for file in $(HEADERS); do \
-	  cp -p $(srcdir)/../../include/ddk/$$file $(distdir)/include/ddk/$$file; \
+	  cp -p ${srcdir}/../../include/ddk/$$file ${distdir}/include/ddk; \
 	done
-	mkdir $(distdir)/lib/ddk
-	chmod 755 $(distdir)/lib/ddk
+	mkdir ${distdir}/lib/ddk
+	chmod 755 ${distdir}/lib/ddk
 	for file in $(DISTFILES); do \
-	  cp -p $(srcdir)/$$file $(distdir)/lib/ddk/$$file; \
+	  cp -p ${srcdir}/$$file ${distdir}/lib/ddk; \
 	done
 
 Makefile: Makefile.in ../../config.status ../../configure
