@@ -30,7 +30,7 @@ TARFILEEXT = .tar.lzma
 SUBDIRS = lib
 
 DISTFILES = \
-  ChangeLog configure.ac Makefile.in Makefile.comm.in configure \
+  ChangeLog aclocal.m4 configure.ac Makefile.in Makefile.comm.in configure \
   config.guess config.sub install-sh README.w32api TODO CONTRIBUTIONS
 
 all: $(SUBDIRS)

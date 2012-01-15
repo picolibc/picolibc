@@ -35,6 +35,7 @@ LD = @LD@
 
 CFLAGS = @CFLAGS@
 ALL_CFLAGS = $(CFLAGS) $(INCLUDES)
+EXTRA_INCLUDES = -nostdinc -iwithprefix include @EXTRA_INCLUDES@
 
 DLLTOOL = @DLLTOOL@
 DLLTOOL_FLAGS = --as=$(AS) -k
@@ -42,24 +43,6 @@ WINDRES = @WINDRES@
 
 RANLIB = @RANLIB@
 AR = @AR@
-
-# Depending on if we build as part of winsup or mingw we need to
-# add additional include paths in order to get the correct headers
-# from the C library.
-#
-BUILDENV = @BUILDENV@
-
-ifeq ($(BUILDENV), cygwin)
-  # winsup/include
-  # winsup/../newlib/libc/include
-  # winsup/../newlib/libc/sys/cygwin
-  EXTRA_INCLUDES = -I ${top_srcdir}/../include \
-    -I ${top_srcdir}/../../newlib/libc/include \
-    -I ${top_srcdir}/../../newlib/libc/sys/cygwin
-endif
-ifeq ($(BUILDENV), mingw)
-  EXTRA_INCLUDES = -I ${top_srcdir}/../mingw/include
-endif
 
 # In spite of its general unsuitability for use on MS-Windows hosts,
 # Cygwin is able to, and likes to support the $(DESTDIR) capability;

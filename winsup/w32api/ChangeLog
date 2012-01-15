@@ -1,5 +1,24 @@
 2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
 
+	Add smart identification of auxiliary header file paths.
+
+	* aclocal.m4: New file; replaces previously removed file of
+	same name, with entirely new content.
+
+	* Makefile.in (DISTFILES): Reinstate aclocal.m4
+
+	* Makefile.comm.in (EXTRA_INCLUDES): Use AC_SUBST to assign it.
+	(BUILDENV): No longer required; remove all references to it.
+
+	* configure.ac (BUILDENV): Redundant AC_SUBST variable; delete it.
+	(MINGW_AC_CONFIG_SRCDIR): Factor out; relocate it to aclocal.m4
+	(EXTRA_INCLUDES): Define as AC_SUBST variable; assign value using...
+	(MINGW_AC_RUNTIME_SRCDIR): ...this new aclocal.m4 macro.
+
+	* configure: Regenerated.
+
+2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
+
 	More makefile code refactoring; fix top_srcdir references.
 
 	* Makefile.comm.in (EXTRA_INCLUDES): Add definitions from...
