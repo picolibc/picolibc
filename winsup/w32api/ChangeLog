@@ -1,5 +1,19 @@
 2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
 
+	More makefile code refactoring; fix top_srcdir references.
+
+	* Makefile.comm.in (EXTRA_INCLUDES): Add definitions from...
+	* lib/Makefile.in (EXTRA_INCLUDES): ...here; factor out common code.
+	(top_srcdir): Use this throughout, in place of ${srcdir}/../
+
+	* lib/ddk/Makefile.in lib/directx/Makefile.in (EXTRA_INCLUDES):
+	Factor out; use corrected definitions from Makefile.comm.in
+	(top_srcdir): Use throughout, in place of ${srcdir}/../../
+	(INCLUDES): Adjust incorrect references to ${srcdir}/../include;
+	should be ${top_srcdir}/include
+
+2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
+
 	Update and correct makefile rebuilding rules.
 
 	* Makefile.in (Makefile): Remove dependency on configure; it causes

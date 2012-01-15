@@ -16,31 +16,12 @@ top_builddir = @top_builddir@
 VPATH = @srcdir@
 
 include ${top_builddir}/Makefile.comm
-
-# Depending on if we build as part of winsup or mingw we need to
-# add additional include paths in order to get the correct headers
-# from the C library.
-#
-BUILDENV = @BUILDENV@
-
-ifeq ($(BUILDENV), cygwin)
-  # winsup/include
-  # winsup/../newlib/libc/include
-  # winsup/../newlib/libc/sys/cygwin
-  EXTRA_INCLUDES = -I ${srcdir}/../../include \
-    -I ${srcdir}/../../../newlib/libc/include \
-    -I ${srcdir}/../../../newlib/libc/sys/cygwin
-endif
-ifeq ($(BUILDENV), mingw)
-  EXTRA_INCLUDES = -I ${srcdir}/../../mingw/include
-endif
-
-INCLUDES = -I ${srcdir}/../include -I ${srcdir}/../include/directx \
+INCLUDES = -I ${top_srcdir}/include -I ${top_srcdir}/include/directx \
   $(EXTRA_INCLUDES)
 
 # Headers
 #
-HEADERS = $(notdir $(wildcard ${srcdir}/../../include/directx/*.h))
+HEADERS = $(notdir $(wildcard ${top_srcdir}/include/directx/*.h))
 
 # Libraries
 #
@@ -70,7 +51,7 @@ all-default: $(LIBS)
 
 TEST_OPTIONS = \
   $(ALL_CFLAGS) -Wall -pedantic -Wsystem-headers \
-  -c $(srcdir)/test.c -o test.o
+  -c ${srcdir}/test.c -o test.o
 .PHONY: test
 test:
 	@echo "Testing directx..."
@@ -119,7 +100,7 @@ install-libraries: all $(need-DESTDIR-compatibility)
 install-headers: $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)${inst_includedir}
 	for file in $(HEADERS); do \
-	  $(INSTALL_DATA) ${srcdir}/../../include/directx/$$file $(DESTDIR)${inst_includedir}; \
+	  $(INSTALL_DATA) ${top_srcdir}/include/directx/$$file $(DESTDIR)${inst_includedir}; \
 	done
 
 # Uninstall headers and libraries from a target specified directory
@@ -142,7 +123,7 @@ dist:
 	mkdir ${distdir}/include/directx
 	chmod 755 ${distdir}/include/directx
 	for file in $(HEADERS); do \
-	  cp -p ${srcdir}/../../include/directx/$$file ${distdir}/include/directx; \
+	  cp -p ${top_srcdir}/include/directx/$$file ${distdir}/include/directx; \
 	done
 	mkdir ${distdir}/lib/directx
 	chmod 755 ${distdir}/lib/directx

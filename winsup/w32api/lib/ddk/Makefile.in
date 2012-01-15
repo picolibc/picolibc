@@ -16,28 +16,11 @@ top_builddir = @top_builddir@
 VPATH = @srcdir@
 
 include ${top_builddir}/Makefile.comm
-
-# Depending on if we build as part of winsup or mingw we need to
-# add additional include paths in order to get the correct headers
-# from the C library.
-#
-BUILDENV = @BUILDENV@
-
-ifeq ($(BUILDENV), cygwin)
-# winsup/include
-# winsup/../newlib/libc/include
-# winsup/../newlib/libc/sys/cygwin
-EXTRA_INCLUDES = -I${srcdir}/../../include -I${srcdir}/../../../newlib/libc/include -I${srcdir}/../../../newlib/libc/sys/cygwin
-endif
-ifeq ($(BUILDENV), mingw)
-EXTRA_INCLUDES = -I${srcdir}/../../mingw/include
-endif
-
-INCLUDES = -I${srcdir}/../include $(EXTRA_INCLUDES)
+INCLUDES = -I ${top_srcdir}/include $(EXTRA_INCLUDES)
 
 # Headers
 #
-HEADERS = $(notdir $(wildcard ${srcdir}/../../include/ddk/*.h))
+HEADERS = $(notdir $(wildcard ${top_srcdir}/include/ddk/*.h))
 
 # Libraries
 #
@@ -91,7 +74,7 @@ ddk_includedir = ${inst_includedir}/ddk
 install-headers: $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)${ddk_includedir}
 	for file in $(HEADERS); do \
-	  $(INSTALL_DATA) ${srcdir}/../../include/ddk/$$file $(DESTDIR)${ddk_includedir}; \
+	  $(INSTALL_DATA) ${top_srcdir}/include/ddk/$$file $(DESTDIR)${ddk_includedir}; \
 	done
 
 # Uninstall headers and libraries from a target specified directory
@@ -114,7 +97,7 @@ dist:
 	mkdir ${distdir}/include/ddk
 	chmod 755 ${distdir}/include/ddk
 	for file in $(HEADERS); do \
-	  cp -p ${srcdir}/../../include/ddk/$$file ${distdir}/include/ddk; \
+	  cp -p ${top_srcdir}/include/ddk/$$file ${distdir}/include/ddk; \
 	done
 	mkdir ${distdir}/lib/ddk
 	chmod 755 ${distdir}/lib/ddk

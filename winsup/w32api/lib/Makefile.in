@@ -19,29 +19,13 @@ VPATH = @srcdir@
 
 include ${top_builddir}/Makefile.comm
 
-# Depending on if we build as part of winsup or mingw we need to
-# add additional include paths in order to get the correct headers
-# from the C library.
-#
-BUILDENV = @BUILDENV@
-
-ifeq ($(BUILDENV), cygwin)
-# winsup/include
-# winsup/../newlib/libc/include
-# winsup/../newlib/libc/sys/cygwin
-EXTRA_INCLUDES = -I${srcdir}/../../include -I${srcdir}/../../../newlib/libc/include -I${srcdir}/../../../newlib/libc/sys/cygwin
-endif
-ifeq ($(BUILDENV), mingw)
-EXTRA_INCLUDES = -I${srcdir}/../../mingw/include
-endif
-
-INCLUDES = -I${srcdir}/../include $(EXTRA_INCLUDES)
+INCLUDES = -I ${top_srcdir}/include $(EXTRA_INCLUDES)
 
 # Headers
 #
-HEADERS = $(notdir $(wildcard ${srcdir}/../include/*.h))
-GL_HEADERS = $(notdir $(wildcard ${srcdir}/../include/GL/*.h))
-GDIPLUS_HEADERS = $(notdir $(wildcard ${srcdir}/../include/gdiplus/*.h))
+HEADERS = $(notdir $(wildcard ${top_srcdir}/include/*.h))
+GL_HEADERS = $(notdir $(wildcard ${top_srcdir}/include/GL/*.h))
+GDIPLUS_HEADERS = $(notdir $(wildcard ${top_srcdir}/include/gdiplus/*.h))
 
 # Libraries
 #
@@ -152,15 +136,15 @@ install-libraries: all $(need-DESTDIR-compatibility)
 install-headers: $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)${inst_includedir}
 	for file in $(HEADERS); do \
-	  $(INSTALL_DATA) ${srcdir}/../include/$$file $(DESTDIR)${inst_includedir}; \
+	  $(INSTALL_DATA) ${top_srcdir}/include/$$file $(DESTDIR)${inst_includedir}; \
 	done
 	$(mkinstalldirs) $(DESTDIR)${inst_includedir}/GL
 	for file in $(GL_HEADERS); do \
-	  $(INSTALL_DATA) ${srcdir}/../include/GL/$$file $(DESTDIR)${inst_includedir}/GL; \
+	  $(INSTALL_DATA) ${top_srcdir}/include/GL/$$file $(DESTDIR)${inst_includedir}/GL; \
 	done
 	$(mkinstalldirs) $(DESTDIR)${inst_includedir}/gdiplus
 	for file in $(GDIPLUS_HEADERS); do \
-	  $(INSTALL_DATA) ${srcdir}/../include/gdiplus/$$file $(DESTDIR)${inst_includedir}/gdiplus; \
+	  $(INSTALL_DATA) ${top_srcdir}/include/gdiplus/$$file $(DESTDIR)${inst_includedir}/gdiplus; \
 	done
 
 install-ddk: install-libraries install-headers
@@ -195,15 +179,15 @@ dist:
 	mkdir ${distdir}/include
 	chmod 755 ${distdir}/include
 	for file in $(HEADERS); do \
-	  cp -p ${srcdir}/../include/$$file ${distdir}/include; \
+	  cp -p ${top_srcdir}/include/$$file ${distdir}/include; \
 	done
 	mkdir ${distdir}/include/GL
 	for file in $(GL_HEADERS); do \
-	  cp -p ${srcdir}/../include/GL/$$file ${distdir}/include/GL; \
+	  cp -p ${top_srcdir}/include/GL/$$file ${distdir}/include/GL; \
 	done
 	mkdir ${distdir}/include/gdiplus
 	for file in $(GDIPLUS_HEADERS); do \
-	  cp -p ${srcdir}/../include/gdiplus/$$file ${distdir}/include/gdiplus; \
+	  cp -p ${top_srcdir}/include/gdiplus/$$file ${distdir}/include/gdiplus; \
 	done
 	mkdir ${distdir}/lib
 	chmod 755 ${distdir}/lib
