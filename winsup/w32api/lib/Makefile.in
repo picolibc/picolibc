@@ -70,18 +70,15 @@ DISTFILES = Makefile.in $(DEF_FILES) $(MRI_FILES) $(SOURCES)
 # which is the primary default target identified in the included
 # common makefile fragment, ${top_builddir}/Makefile.comm
 #
-all-default: $(EXTRA_OBJS) $(LIBS) ddk directx
+all-default: $(EXTRA_OBJS) $(LIBS) $(SUBDIRS)
 
 %-subdirs:
 	for dir in $(SUBDIRS); do \
 	  $(MAKE) -C $$dir $*; \
 	done
 
-ddk:
-	$(MAKE) -C $@
-
-directx:
-	$(MAKE) -C $@
+$(SUBDIRS):
+	cd $@ && $(MAKE)
 
 TEST_OPTIONS = \
   $(ALL_CFLAGS) -DWINVER=0x0666 -Wall -pedantic -Wsystem-headers \

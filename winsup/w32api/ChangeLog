@@ -1,3 +1,11 @@
+2012-01-16  Keith Marshall  <keithmarshall@users.sf.net>
+
+	Generalise makefile references to subdirectories of lib.
+
+	* lib/Makefile.in (ddk, directx): Replace explicit references using...
+	(SUBDIRS): ...this macro; it already implements the same references in
+	a more generalised and extensible fashion.
+
 2012-01-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure: Regenerate and re-add to repository.
