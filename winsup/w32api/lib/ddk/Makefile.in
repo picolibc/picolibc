@@ -88,7 +88,7 @@ uninstall-libraries: $(need-DESTDIR-compatibility)
 
 uninstall-headers: $(need-DESTDIR-compatibility)
 	for file in $(HEADERS); do \
-	  rm -r $(DESTDIR)${ddk_includedir}/$$file; \
+	  rm -f $(DESTDIR)${ddk_includedir}/$$file; \
 	done
 	rmdir $(DESTDIR)${ddk_includedir}
 

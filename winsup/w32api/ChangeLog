@@ -1,5 +1,13 @@
 2012-01-16  Keith Marshall  <keithmarshall@users.sf.net>
 
+	Correct misused 'rm -r' command in uninstall rules.
+
+	* lib/Makefile.in lib/ddk/Makefile.in lib/directx/Makefile.in:
+	(uninstall-headers): Don't use 'rm -r' when removing individual files;
+	correct this typo, substituting 'rm -f' as appropriate.
+
+2012-01-16  Keith Marshall  <keithmarshall@users.sf.net>
+
 	Generalise makefile references to subdirectories of lib.
 
 	* lib/Makefile.in (ddk, directx): Replace explicit references using...
