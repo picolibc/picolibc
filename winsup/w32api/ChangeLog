@@ -1,3 +1,8 @@
+2012-01-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure: Regenerate and re-add to repository.
+	* .cvsignore: Fix accordingly.
+
 2012-01-15  Keith Marshall  <keithmarshall@users.sf.net>
 
 	Add 'check' as GCS conforming alias for make's 'test' goal.

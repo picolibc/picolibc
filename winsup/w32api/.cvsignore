@@ -1,2 +1,2 @@
 .hg .hgignore .hgtags
-configure autom4te.cache
+autom4te.cache
