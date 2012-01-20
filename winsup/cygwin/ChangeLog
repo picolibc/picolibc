@@ -1,3 +1,8 @@
+2012-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_registry::opendir): Declare.
+	* fhandler_registry.cc (fhandler_registry::opendir): New function.
+
 2012-01-13  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/cygwin/config.h (_GLIBC_EXTENSION): Define.

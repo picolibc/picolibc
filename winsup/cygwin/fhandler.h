@@ -1979,6 +1979,7 @@ class fhandler_registry: public fhandler_proc
   fhandler_registry ();
   void set_name (path_conv &pc);
   virtual_ftype_t exists();
+  DIR *opendir (int fd) __attribute__ ((regparm (2)));
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   long telldir (DIR *);
   void seekdir (DIR *, long);

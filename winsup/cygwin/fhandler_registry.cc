@@ -537,6 +537,14 @@ fhandler_registry::fstat (struct __stat64 *buf)
   return 0;
 }
 
+DIR *
+fhandler_registry::opendir (int fd)
+{
+  /* Skip fhandler_proc::opendir, which allocates dir->_d_handle for its
+     own devilish purposes... */
+  return fhandler_virtual::opendir (fd);
+}
+
 int
 fhandler_registry::readdir (DIR *dir, dirent *de)
 {
