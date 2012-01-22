@@ -1,7 +1,7 @@
 /* cygheap.h: Cygwin heap manager.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011 Red Hat, Inc.
+   2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -401,13 +401,9 @@ public:
   }
   ~cygheap_fdget ()
   {
-    if (!fh)
-      /* nothing to do */;
-    else if (fh->refcnt (-1) > 0)
-      debug_only_printf ("fh %p, %s, refcnt %ld", fh, fh->get_name (), fh->refcnt ());
-    else
+    if (fh && fh->refcnt (-1) <= 0)
       {
-	debug_only_printf ("deleting fh %p, %s, refcnt %ld", fh, fh->get_name (), fh->refcnt ());
+	debug_only_printf ("deleting fh %p", fh);
 	delete fh;
       }
   }

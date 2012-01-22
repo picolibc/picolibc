@@ -1,7 +1,7 @@
 /* select.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -70,6 +70,7 @@ class select_stuff
 {
 public:
   ~select_stuff ();
+  bool return_on_signal;
   bool always_ready, windows_used;
   select_record start;
 
@@ -84,7 +85,8 @@ public:
   int wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds, DWORD ms);
   void cleanup ();
   void destroy ();
-  select_stuff (): always_ready (0), windows_used (0), start (0),
+  select_stuff (): return_on_signal (false), always_ready (false),
+  		   windows_used (false), start (0),
 		   device_specific_pipe (0),
 		   device_specific_socket (0),
 		   device_specific_serial (0),

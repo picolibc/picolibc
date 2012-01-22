@@ -1,7 +1,7 @@
 /* select.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -130,16 +130,17 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   fd_set *e = allocfd_set (maxfds);
 
   int res = 0;
+  sel.return_on_signal = &_my_tls == _main_tls;
   /* Degenerate case.  No fds to wait for.  Just wait. */
   if (sel.start.next == NULL)
     while (!res)
       switch (cygwait (ms))
 	{
 	case WAIT_OBJECT_0:
-	  _my_tls.call_signal_handler ();
-	  if (&_my_tls != _main_tls)
-	    continue;		/* Emulate linux behavior */
 	  select_printf ("signal received");
+	  _my_tls.call_signal_handler ();
+	  if (!sel.return_on_signal)
+	    continue;		/* Emulate linux behavior */
 	  set_sig_errno (EINTR);
 	  res = -1;
 	  break;
@@ -328,8 +329,11 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       switch (wait_ret)
 	{
 	case WAIT_OBJECT_0:
-	  cleanup ();
 	  select_printf ("signal received");
+	  _my_tls.call_signal_handler ();
+	  if (!return_on_signal)
+	    continue;		/* Emulate linux behavior */
+	  cleanup ();
 	  set_sig_errno (EINTR);
 	  return -1;
 	case WAIT_OBJECT_0 + 1:

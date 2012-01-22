@@ -1,3 +1,16 @@
+2012-01-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygheap.h (cygheap_fdget::~cygheap_fdget): Simplify now that refcnt
+	reports reference count changes itself.
+	* fhandler.cc (fhandler_base::reset): Set _refcnt to 0.
+	* fhandler.h (fhandler_base::refcnt): Report refcnt when debugging.
+
+	* select.cc (cygwin_select): Set return_on_signal to indicate when
+	select should be interrupted.
+	(select_stuff::wait): Keep looping unless return_on_signal is set.
+	* select.h (select_stuff::return_on_signal): New variable.
+	(select_stuff::select_stuff): Zero return_on_signal.
+
 2012-01-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_registry::opendir): Declare.

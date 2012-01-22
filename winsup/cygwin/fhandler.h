@@ -178,7 +178,11 @@ class fhandler_base
   HANDLE read_state;
 
  public:
-  long refcnt(long i = 0) {return _refcnt += i;}
+  long refcnt(long i = 0)
+  {
+    debug_only_printf ("%p, %s, i %d, refcnt %ld", this, get_name (), i, _refcnt + i);
+    return _refcnt += i;
+  }
   class fhandler_base *archetype;
   int usecount;
 
