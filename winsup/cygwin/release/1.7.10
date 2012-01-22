@@ -96,7 +96,7 @@ What changed:
 - Improve behavior of Cygwin when started from a 64-bit process, especially under
   Windows 2003.
 
-- Improve multi-threading safety with syscalls that deal with fds.
+- Improve multi-thread/reentrancy safety with syscalls that deal with fds.
 
 - New heap management.  Drop registry setting "heap_chunk_in_mb" in favor of
   a new per-executable setting in the executable file header which can be set
