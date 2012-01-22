@@ -738,6 +738,7 @@ public:
   bool isfifo () const { return true; }
   void set_close_on_exec (bool val);
   void __stdcall raw_read (void *ptr, size_t& ulen) __attribute__ ((regparm (3)));
+  bool arm (HANDLE h);
   void fixup_after_fork (HANDLE);
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   select_record *select_read (select_stuff *);

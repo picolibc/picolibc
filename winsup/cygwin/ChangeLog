@@ -1,5 +1,15 @@
 2012-01-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* fhandler.h (fhandler_fifo::arm): Declare new function.
+	* fhandler_fifo.cc (fhandler_fifo::arm): Define new function.
+	(fhandler_fifo::open): Fix handling of RDWR pipes to avoid opening a
+	second handle.  Use arm() function to set events.  
+	(fhandler_fifo::raw_read): Correctly go into "connect again logic" when
+	we detect another writer is available.  Use arm() function to set event.
+	* pipe.cc (fhandler_pipe::create): Add more detail to debugging output.
+
+2012-01-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* cygheap.h (cygheap_fdmanip::release): Simplify.
 	* dtable.cc (dtable::release): Make void again.  Skip not_open check
 	since it is guaranteed to be open.  Don't bother deleting here since

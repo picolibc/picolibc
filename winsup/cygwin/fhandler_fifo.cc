@@ -1,6 +1,6 @@
 /* fhandler_fifo.cc - See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
    Red Hat, Inc.
 
    This file is part of Cygwin.
@@ -51,6 +51,26 @@ sec_user_cloexec (bool cloexec, PSECURITY_ATTRIBUTES sa, PSID sid)
   return cloexec ? sec_user_nih (sa, sid) : sec_user (sa, sid);
 }
 
+bool inline
+fhandler_fifo::arm (HANDLE h)
+{
+#ifdef DEBUGGING
+  const char *what;
+  if (h == read_ready)
+    what = "reader";
+  else if (h == write_ready)
+    what = "writer";
+  else
+    what = "overlapped event";
+  debug_only_printf ("arming %s", what);
+#endif
+
+  bool res = SetEvent (h);
+  if (!res)
+    debug_printf ("SetEvent for %s failed, %E", res);
+  return res;
+}
+
 int
 fhandler_fifo::open (int flags, mode_t)
 {
@@ -60,7 +80,7 @@ fhandler_fifo::open (int flags, mode_t)
     error_errno_set,
     error_set_errno
   } res;
-  bool reader, writer;
+  bool reader, writer, duplexer;
   DWORD open_mode = FILE_FLAG_OVERLAPPED;
 
   /* Determine what we're doing with this fhandler: reading, writing, both */
@@ -69,15 +89,18 @@ fhandler_fifo::open (int flags, mode_t)
     case O_RDONLY:
       reader = true;
       writer = false;
+      duplexer = false;
       break;
     case O_WRONLY:
       writer = true;
       reader = false;
+      duplexer = false;
       break;
     case O_RDWR:
-      reader = true;
-      writer = true;
       open_mode |= PIPE_ACCESS_DUPLEX;
+      reader = true;
+      writer = false;
+      duplexer = true;
       break;
     default:
       set_errno (EINVAL);
@@ -85,6 +108,7 @@ fhandler_fifo::open (int flags, mode_t)
       goto out;
     }
 
+  debug_only_printf ("reader %d, writer %d, duplexer %d", reader, writer, duplexer);
   set_flags (flags);
   char char_sa_buf[1024];
   LPSECURITY_ATTRIBUTES sa_buf;
@@ -93,13 +117,13 @@ fhandler_fifo::open (int flags, mode_t)
   char npbuf[MAX_PATH];
 
   /* Create control events for this named pipe */
-  if (!(read_ready = CreateEvent (sa_buf, true, false, fnevent ("r"))))
+  if (!(read_ready = CreateEvent (sa_buf, duplexer, false, fnevent ("r"))))
     {
       debug_printf ("CreatEvent for %s failed, %E", npbuf);
       res = error_set_errno;
       goto out;
     }
-  if (!(write_ready = CreateEvent (sa_buf, true, false, fnevent ("w"))))
+  if (!(write_ready = CreateEvent (sa_buf, false, false, fnevent ("w"))))
     {
       debug_printf ("CreatEvent for %s failed, %E", npbuf);
       res = error_set_errno;
@@ -117,15 +141,13 @@ fhandler_fifo::open (int flags, mode_t)
       res = error_set_errno;
       goto out;
     }
-  else if (!SetEvent (read_ready))
+  else if (!arm (read_ready))
     {
-      debug_printf ("SetEvent for read_ready failed, %E");
       res = error_set_errno;
       goto out;
     }
-  else if (!writer && !wait (write_ready))
+  else if (!duplexer && !wait (write_ready))
     {
-      debug_printf ("wait for write_ready failed, %E");
       res = error_errno_set;
       goto out;
     }
@@ -159,9 +181,8 @@ fhandler_fifo::open (int flags, mode_t)
 	    res = error_set_errno;
 	    goto out;
 	  }
-      if (!SetEvent (write_ready))
+      if (!arm (write_ready))
 	{
-	  debug_printf ("SetEvent for write_ready failed, %E");
 	  res = error_set_errno;
 	  goto out;
 	}
@@ -255,7 +276,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
   for (int i = 0; i < 2; i++)
     {
       fhandler_base_overlapped::raw_read (in_ptr, len);
-      if (len || i || WaitForSingleObject (read_ready, 0) == WAIT_OBJECT_0)
+      if (len || i || WaitForSingleObject (read_ready, 0) != WAIT_OBJECT_0)
 	break;
       /* If we got here, then fhandler_base_overlapped::raw_read returned 0,
 	 indicating "EOF" and something has set read_ready to zero.  That means
@@ -273,11 +294,8 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	  debug_printf ("ConnectNamedPipe failed, %E");
 	  goto errno_out;
 	}
-      else if (!SetEvent (read_ready))
-	{
-	  debug_printf ("SetEvent (read_ready) failed, %E");
-	  goto errno_out;
-	}
+      else if (!arm (read_ready))
+	goto errno_out;
       else if (!wait (get_overlapped_buffer ()->hEvent))
 	goto errout;	/* If wait() fails, errno is set so no need to set it */
       len = orig_len;	/* Reset since raw_read above set it to zero. */
