@@ -1,5 +1,14 @@
 2012-01-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* cygheap.h (cygheap_fdmanip::release): Simplify.
+	* dtable.cc (dtable::release): Make void again.  Skip not_open check
+	since it is guaranteed to be open.  Don't bother deleting here since
+	actual deletion will be handled in cygheap_fdget::~cygheap_fdget.
+	* dtable.h (dtable::release): Make void again.
+	* syscalls.cc (dup2): Bump fhandler use count on successful dup.
+
+2012-01-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* cygheap.h (cygheap_fdget::~cygheap_fdget): Simplify now that refcnt
 	reports reference count changes itself.
 	* fhandler.cc (fhandler_base::reset): Set _refcnt to 0.

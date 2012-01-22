@@ -139,8 +139,8 @@ dup2 (int oldfd, int newfd)
       cygheap_fdget cfd (oldfd);
       res = (cfd >= 0) ? oldfd : -1;
     }
-  else
-    res = cygheap->fdtab.dup3 (oldfd, newfd, 0);
+  else if ((res = cygheap->fdtab.dup3 (oldfd, newfd, 0)) == newfd)
+    cygheap->fdtab[newfd]->refcnt (1);
 
   syscall_printf ("%R = dup2(%d, %d)", res, oldfd, newfd);
   return res;

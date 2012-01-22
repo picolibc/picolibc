@@ -407,12 +407,7 @@ public:
 	delete fh;
       }
   }
-  void release ()
-  {
-    fh = cygheap->fdtab[fd];
-    if (cygheap->fdtab.release (fd))
-      fh = NULL;
-  }
+  void release () { cygheap->fdtab.release (fd); }
 };
 
 class cygheap_fdenum : public cygheap_fdmanip

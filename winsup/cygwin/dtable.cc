@@ -237,26 +237,13 @@ dtable::find_unused_handle (int start)
   return -1;
 }
 
-bool
+void
 dtable::release (int fd)
 {
-  bool deleted;
-  if (not_open (fd))
-    deleted = false;
-  else
-    {
-      if (fds[fd]->need_fixup_before ())
-	dec_need_fixup_before ();
-      if (fds[fd]->refcnt (-1) > 0)
-	deleted = false;
-      else
-	{
-	  deleted = true;
-	  delete fds[fd];
-	}
-      fds[fd] = NULL;
-    }
-  return deleted;
+  if (fds[fd]->need_fixup_before ())
+    dec_need_fixup_before ();
+  fds[fd]->refcnt (-1);
+  fds[fd] = NULL;
 }
 
 extern "C" int
