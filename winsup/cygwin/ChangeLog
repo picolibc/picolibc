@@ -1,3 +1,8 @@
+2012-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (gethostid): Simplify.  Just fetch MachineGuid and
+	create hash from there.
+
 2012-01-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fhandler.h (fhandler_fifo::arm): Declare new function.

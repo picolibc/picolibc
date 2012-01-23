@@ -3875,120 +3875,25 @@ updwtmpx (const char *wtmpx_file, const struct utmpx *utmpx)
 extern "C" long
 gethostid (void)
 {
-  unsigned data[13] = {0x92895012,
-		       0x10293412,
-		       0x29602018,
-		       0x81928167,
-		       0x34601329,
-		       0x75630198,
-		       0x89860395,
-		       0x62897564,
-		       0x00194362,
-		       0x20548593,
-		       0x96839102,
-		       0x12219854,
-		       0x00290012};
+  /* Fetch the globally unique MachineGuid value from
+     HKLM/Software/Microsoft/Cryptography and hash it. */
 
-  bool has_cpuid = false;
+  /* Caution: sizeof long might become > 4 when we go 64 bit, but gethostid
+     is supposed to return a 32 bit value, despite the return type long.
+     That's why hostid is *not* long here. */
+  int32_t hostid = 0x40291372; /* Choose a nice start value */
+  WCHAR wguid[38];
 
-  DWORD opmask = SetThreadAffinityMask (GetCurrentThread (), 1);
-  if (!opmask)
-    debug_printf ("SetThreadAffinityMask to 1 failed, %E");
-
-  if (!can_set_flag (0x00040000))
-    debug_printf ("386 processor - no cpuid");
-  else
-    {
-      debug_printf ("486 processor");
-      if (can_set_flag (0x00200000))
-	{
-	  debug_printf ("processor supports CPUID instruction");
-	  has_cpuid = true;
-	}
-      else
-	debug_printf ("processor does not support CPUID instruction");
-    }
-  if (has_cpuid)
-    {
-      unsigned maxf, unused[3];
-      cpuid (&maxf, &unused[0], &unused[1], &unused[2], 0);
-      maxf &= 0xffff;
-      if (maxf >= 1)
-	{
-	  unsigned features;
-	  cpuid (&data[0], &unused[0], &unused[1], &features, 1);
-	  if (features & (1 << 18))
-	    {
-	      debug_printf ("processor has psn");
-	      if (maxf >= 3)
-		{
-		  cpuid (&unused[0], &unused[1], &data[1], &data[2], 3);
-		  debug_printf ("Processor PSN: %04x-%04x-%04x-%04x-%04x-%04x",
-				data[0] >> 16, data[0] & 0xffff, data[2] >> 16, data[2] & 0xffff, data[1] >> 16, data[1] & 0xffff);
-		}
-	    }
-	  else
-	    debug_printf ("processor does not have psn");
-	}
-    }
-
-  LARGE_INTEGER u1;
-  ULONG u2, u3;
-  union {
-    UCHAR mac[6];
-    struct {
-      ULONG m1;
-      USHORT m2;
-    };
-  } u4;
-  NTSTATUS status = NtAllocateUuids (&u1, &u2, &u3, u4.mac);
-  if (NT_SUCCESS (status))
-    {
-      data[4] = u4.m1;
-      data[5] = u4.m2;
-      // Unfortunately Windows will sometimes pick a virtual Ethernet card
-      // e.g. VMWare Virtual Ethernet Adaptor
-      debug_printf ("MAC address of first Ethernet card: "
-		    "%02x:%02x:%02x:%02x:%02x:%02x",
-		    u4.mac[0], u4.mac[1], u4.mac[2],
-		    u4.mac[3], u4.mac[4], u4.mac[5]);
-    }
-  else
-    debug_printf ("no Ethernet card installed");
-
-  WCHAR wdata[24];
-  reg_key key (HKEY_LOCAL_MACHINE, KEY_READ, L"SOFTWARE", L"Microsoft",
-	       L"Windows NT", L"CurrentVersion", NULL);
-  key.get_string (L"ProductId", wdata, 24, L"00000-000-0000000-00000");
-  sys_wcstombs ((char *)&data[6], 24, wdata, 24);
-  debug_printf ("Windows Product ID: %s", (char *)&data[6]);
-
-  GetDiskFreeSpaceEx ("C:\\", NULL, (PULARGE_INTEGER) &data[11], NULL);
-
-  debug_printf ("hostid entropy: %08x %08x %08x %08x "
-				"%08x %08x %08x %08x "
-				"%08x %08x %08x %08x "
-				"%08x",
-				data[0], data[1],
-				data[2], data[3],
-				data[4], data[5],
-				data[6], data[7],
-				data[8], data[9],
-				data[10], data[11],
-				data[12]);
-
-  long hostid = 0x40291372;
-  // a random hashing algorithm
-  // dependancy on md5 is probably too costly
-  for (int i=0;i<13;i++)
-    hostid ^= ((data[i] << (i << 2)) | (data[i] >> (32 - (i << 2))));
-
-  if (opmask && !SetThreadAffinityMask (GetCurrentThread (), opmask))
-    debug_printf ("SetThreadAffinityMask to %p failed, %E", opmask);
-
-  debug_printf ("hostid: %08x", hostid);
-
-  return hostid;
+  reg_key key (HKEY_LOCAL_MACHINE,
+	       KEY_READ | (wincap.is_wow64() ? KEY_WOW64_64KEY : 0),
+	       L"SOFTWARE", L"Microsoft", L"Cryptography", NULL);
+  key.get_string (L"MachineGuid", wguid, 38,
+		  L"00000000-0000-0000-0000-000000000000");
+  /* SDBM hash */
+  for (PWCHAR wp = wguid; *wp; ++wp)
+    hostid = *wp + (hostid << 6) + (hostid << 16) - hostid;
+  debug_printf ("hostid 0x%08x from MachineGuid %W", hostid, wguid);
+  return (int32_t) hostid; /* Avoid sign extension. */
 }
 
 #define ETC_SHELLS "/etc/shells"
