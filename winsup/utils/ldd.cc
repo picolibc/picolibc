@@ -189,7 +189,11 @@ start_process (const wchar_t *fn, bool& isdll)
   PROCESS_INFORMATION pi;
   si.cb = sizeof (si);
   wchar_t *cmd;
-  if (wcslen (fn) < 4 || wcscasecmp (wcschr (fn, L'\0') - 4, L".dll") != 0)
+  /* OCaml natdynlink plugins (.cmxs) cannot be handled by ldd because they
+     can only be loaded by flexdll_dlopen() */
+  if (wcslen (fn) < 4 || (wcscasecmp (wcschr (fn, L'\0') - 4, L".dll") != 0
+       && wcscasecmp (wcschr (fn, L'\0') - 4, L".oct") != 0
+       && wcscasecmp (wcschr (fn, L'\0') - 3, L".so") != 0))
     {
       cmd = wcsdup (fn);
       isdll = false;

@@ -1,3 +1,7 @@
+2012-01-24  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* ldd.cc (start_process): Handle .oct and .so as DLLs.
+
 2011-12-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (ps.exe): Revert previous change.
