@@ -74,7 +74,7 @@ BOARD_LDFLAGS	=
 BOARD_BSP	= libbfinbsp.a
 BOARD_CRT0S	= basiccrt.o basiccrts.o
 BOARD_CRT0S	+= basiccrt561.o basiccrt561s.o basiccrt561b.o
-BOARD_OBJS	= clear_cache_range.o
+BOARD_OBJS	= clear_cache_range.o _exit.o
 BOARD_TEST	=
 BOARD_INSTALL	= install-board
 

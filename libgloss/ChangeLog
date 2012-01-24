@@ -1,9 +1,14 @@
+2012-01-23  Stuart Henderson  <stuart.henderson@analog.com>
+
+	* bfin/_exit.c: New file.
+	* bfin/Makefile.in (BOARD_OBJS): Add _exit.o.
+
 2012-01-17  Bin Cheng  <bin.cheng@arm.com>
 
 	* arm/linux-crt0.c: Use ldr instead of adr to get address of
 	_start_thumb.
 
-2011-12-18  Mike Frysinger  <vapier@gentoo.org>
+2011-12-18  Steve Kilbane  <stephen.kilbane@analog.com>
 
 	* bfin/clear_cache_range.c: New file.
 	* bfin/Makefile.in (SIM_OBJS): Add clear_cache_range.o.
