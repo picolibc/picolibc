@@ -62,10 +62,15 @@ contains spaces these can be escaped as <literal>'\040'</literal>.</para>
 If the name of the mount point contains spaces these can be
 escaped as '\040'.</para>
 
-<para>The third field describes the type of the filesystem.
-Cygwin supports any string here, since the file system type is usually
-not evaluated.  The notable exception is the file system type
-cygdrive.  This type is used to set the cygdrive prefix.</para>
+<para>The third field describes the type of the filesystem.  Cygwin supports
+any string here, since the file system type is usually not evaluated.  So it
+doesn't matter if you write <literal>FAT</literal> into this field even if
+the filesystem is NTFS.  Cygwin figures out the filesystem type and its
+capabilities by itself.</para>
+
+<para>The only exception is the file system type cygdrive.  This type is
+used to set the cygdrive prefix.  For a description of the cygdrive prefix
+see <xref linkend="cygdrive"></xref></para>
 
 <para>The fourth field describes the mount options associated
 with the filesystem.  It is formatted as a comma separated list of
@@ -77,8 +82,8 @@ posix=[0|1].  The meaning of the options is as follows.</para>
 <screen>
   acl       - Cygwin uses the filesystem's access control lists (ACLs) to
               implement real POSIX permissions (default).  This flag only
-	      affects filesystems supporting ACLs (NTFS) and is ignored
-	      otherwise.
+	      affects filesystems supporting ACLs (NTFS, for instance) and
+	      is ignored otherwise.
   auto      - Ignored.
   binary    - Files default to binary mode (default).
   bind      - Allows to remount part of the file hierarchy somewhere else.
@@ -185,7 +190,7 @@ mount the root dir with special options (for instance, as text mount).</para>
   <screen>  C:/Documents\040and\040Settings /docs ext3 binary 0 0</screen>
 </listitem>
 <listitem>
-  <para>A mount point for a remote directory without ACL support:</para>
+  <para>A mount point for a remote directory, don't store POSIX permissions in ACLs:</para>
   <screen>  //server/share/subdir /srv/subdir smbfs binary,noacl 0 0</screen>
 </listitem>
 <listitem>
