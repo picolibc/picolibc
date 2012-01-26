@@ -1,3 +1,7 @@
+2012-01-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* sigproc.cc (child_info::retry_count): Default to 1.
+
 2012-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (gethostid): Simplify.  Just fetch MachineGuid and

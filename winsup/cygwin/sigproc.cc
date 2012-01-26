@@ -821,7 +821,7 @@ out:
   return rc;
 }
 
-int child_info::retry_count = 10;
+int child_info::retry_count = 1;
 
 /* Initialize some of the memory block passed to child processes
    by fork/spawn/exec. */
