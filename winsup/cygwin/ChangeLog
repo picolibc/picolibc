@@ -1,7 +1,8 @@
-2012-01-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+2012-01-27  Corinna Vinschen  <corinna@vinschen.de>
 
-	* sigproc.cc (child_info::retry_count): Actually that should have been
-	0.
+	* dcrt0.cc (is_dos_path): New macro to recognize drive letter and UNC
+	DOS paths.
+	(globify): Call is_dos_path instead of isdrive.
 
 2012-01-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
 

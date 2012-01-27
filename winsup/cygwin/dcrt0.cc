@@ -194,6 +194,14 @@ quoted (char *cmd, int winshell)
 /* Perform a glob on word if it contains wildcard characters.
    Also quote every character between quotes to force glob to
    treat the characters literally. */
+
+/* Either X:[...] or \\server\[...] */
+#define is_dos_path(s) (isdrive(s) \
+			|| ((s)[0] == '\\' \
+			    && (s)[1] == '\\' \
+			    && isalpha ((s)[2]) \
+			    && strchr ((s) + 3, '\\')))
+
 static int __stdcall
 globify (char *word, char **&argv, int &argc, int &argvlen)
 {
@@ -202,9 +210,9 @@ globify (char *word, char **&argv, int &argc, int &argvlen)
 
   int n = 0;
   char *p, *s;
-  int dos_spec = isdrive (word);
+  int dos_spec = is_dos_path (word);
   if (!dos_spec && isquote (*word) && word[1] && word[2])
-    dos_spec = isdrive (word + 1);
+    dos_spec = is_dos_path (word + 1);
 
   /* We'll need more space if there are quoting characters in
      word.  If that is the case, doubling the size of the
