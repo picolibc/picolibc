@@ -13,6 +13,8 @@ _daylight DATA
 error_message_count DATA
 error_one_per_line DATA
 error_print_progname DATA
+_fe_dfl_env DATA
+_fe_nomask_env DATA
 h_errno DATA
 _impure_ptr DATA
 in6addr_any DATA
@@ -24,6 +26,8 @@ optind DATA
 optopt DATA
 optreset DATA
 __progname DATA
+program_invocation_name DATA
+program_invocation_short_name DATA
 __rcmd_errstr DATA
 reent_data DATA
 sys_errlist = _sys_errlist DATA
@@ -504,8 +508,6 @@ fdopen SIGFE
 _fdopen = fdopen SIGFE
 _fdopen64 = fdopen64 SIGFE
 fdopendir SIGFE
-_fe_dfl_env DATA
-_fe_nomask_env DATA
 feclearexcept NOSIGFE
 fedisableexcept NOSIGFE
 feenableexcept SIGFE
@@ -1176,8 +1178,6 @@ _powf = powf NOSIGFE
 ppoll SIGFE
 pread SIGFE
 printf SIGFE
-program_invocation_name DATA
-program_invocation_short_name DATA
 _printf = printf SIGFE
 pselect SIGFE
 psiginfo SIGFE
