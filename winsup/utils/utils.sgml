@@ -2117,6 +2117,34 @@ This program is mainly useful for debugging the Cygwin DLL itself.</para>
 
 </sect2>
 
+<sect2 id="tzset"><title>tzset</title>
+
+<screen>
+Usage: tzset [OPTION]
+
+Print POSIX-compatible timezone ID from current Windows timezone setting
+
+Options:
+  -h, --help               output usage information and exit.
+  -V, --version            output version information and exit.
+
+Use tzset to set your TZ variable. In POSIX-compatible shells like bash,
+dash, mksh, or zsh:
+
+      export TZ=$(tzset)
+
+In csh-compatible shells like tcsh:
+
+      setenv TZ `tzset`
+</screen>
+
+<para>The <command>tzset</command> tool reads the current timezone from Windows
+and generates a POSIX-compatible timezone information for the TZ environment
+variable from that information.  That's all there is to it.  For the way how
+to use it, see the above usage information.</para>
+
+</sect2>
+
 <sect2 id="umount"><title>umount</title>
 
 <screen>

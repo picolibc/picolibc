@@ -4,6 +4,9 @@ What's new:
 - New getconf tool for querying confstr(3), pathconf(3), sysconf(3), and
   limits.h configuration.
 
+- New tzset utility to generate a POSIX-compatible TZ environment
+  variable from the Windows timezone settings.
+
 - The passwd tool now allows an administrator to use the -R command for
   other user accounts:  passwd -R username.
 
