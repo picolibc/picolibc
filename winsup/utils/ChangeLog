@@ -1,5 +1,10 @@
 2012-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* tzset.c: Throughout use wide characters to be locale agnostic.
+	(main): Call setlocale.
+
+2012-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (CYGWIN_BINS): Add tzset.
 	* tzset.c: New tool, new file.
 	* utils.sgml (tzset): New section.
