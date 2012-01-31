@@ -674,8 +674,8 @@ struct bfd_link_order
 	} indirect;
       struct
 	{
-	  /* Size of contents, or zero when contents size == size
-	     within output section.
+	  /* Size of contents, or zero when contents should be filled by 
+	     the architecture-dependent fill function.
 	     A non-zero value allows filling of the output section
 	     with an arbitrary repeated pattern.  */
 	  unsigned int size;

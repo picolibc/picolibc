@@ -1,3 +1,8 @@
+2012-01-31  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/13616
+	* bfdlink.h (bfd_link_order): Update comments on data size.
+
 2012-01-26  Cary Coutant  <ccoutant@google.com>
 
 	* dwarf2.h (enum dwarf_form): Add Fission extensions.
