@@ -3,6 +3,10 @@
 	* rl78.h (R_RL78_RH_RELAX, R_RL78_RH_SFR, R_RL78_RH_SADDR): New.
 	(RL78_RELAXA_BRA, RL78_RELAXA_ADDR16: New.
 
+2011-12-19  Chung-Lin Tang  <cltang@codesourcery.com>
+
+	* mips.h (elf_mips_reloc_type): Add R_MIPS16_TLS_* entries.
+
 2011-12-06  Ulrich Weigand  <uweigand@de.ibm.com>
 
 	* common.h (NT_S390_LAST_BREAK): Define.
@@ -103,6 +107,12 @@
 2011-05-31  Paul Brook  <paul@codesourcery.com>
 
 	* arm.h (arm_st_branch_type): Add ST_BRANCH_UNKNOWN.
+
+2011-05-09  Paul Brook  <paul@codesourcery.com>
+
+	* tic6x.h (ELF_STRING_C6000_unwind,
+	ELF_STRING_C6000_unwind_info, ELF_STRING_C6000_unwind_once,
+	ELF_STRING_C6000_unwind_info_once): Define.
 
 2011-04-15  Sergio Durigan Junior  <sergiodj@redhat.com>
 
@@ -387,6 +397,11 @@
 	* ppc.h (R_PPC_RELAX32, R_PPC_RELAX32PC, R_PPC_RELAX32_PLT,
 	R_PPC_RELAX32PC_PLT): Delete.
 	(R_PPC_RELAX, R_PPC_RELAX_PLT, R_PPC_RELAX_PLTREL24): Define.
+
+2009-12-03  David Daney  <ddaney@caviumnetworks.com>
+	    Adam Nemet  <adambnemet@gmail.com>
+
+	* mips.h (E_MIPS_MACH_OCTEON2): New machine flag.
 
 2009-11-28  Joseph Myers  <joseph@codesourcery.com>
 

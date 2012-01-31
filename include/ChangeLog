@@ -17,10 +17,6 @@
 	* demangle.h (enum demangle_component_type): Add
 	DEMANGLE_COMPONENT_INITIALIZER_LIST, DEMANGLE_COMPONENT_NULLARY.
 
-2011-12-19  Chung-Lin Tang  <cltang@codesourcery.com>
-
-	* elf/mips.h (elf_mips_reloc_type): Add R_MIPS16_TLS_* entries.
-
 2011-12-14  Iain Sandoe  <iains@gcc.gnu.org>
 
 	* mach-o/loader.h (bfd_mach_o_section_type): define
@@ -195,12 +191,6 @@
 2011-05-16  Alan Modra  <amodra@gmail.com>
 
 	* bfdlink.h (struct bfd_link_hash_entry): Remove u.undef.weak field.
-
-2011-05-09  Paul Brook  <paul@codesourcery.com>
-
-	* elf/tic6x.h (ELF_STRING_C6000_unwind,
-	ELF_STRING_C6000_unwind_info, ELF_STRING_C6000_unwind_once,
-	ELF_STRING_C6000_unwind_info_once): Define.
 
 2011-04-30  Jakub Jelinek  <jakub@redhat.com>
 
@@ -496,11 +486,6 @@
 	(disassemble_init_for_target): Ditto.
 	(init_disassemble_info): Ditto.
 
-2009-12-03  David Daney  <ddaney@caviumnetworks.com>
-	    Adam Nemet  <adambnemet@gmail.com>
-
-	* elf/mips.h (E_MIPS_MACH_OCTEON2): New machine flag.
-
 2009-11-18  Alan Modra  <amodra@bigpond.net.au>
 
 	* alloca-conf.h: Clarify comment.
@@ -509,7 +494,7 @@
 
 	Add DWARF attribute value for the "Borland fastcall" calling
 	convention.
-	* elf/dwarf2.h: Add DW_CC_GNU_borland_fastcall_i386 constant.
+	* dwarf2.h: Add DW_CC_GNU_borland_fastcall_i386 constant.
 
 2009-10-23  Kai Tietz  <kai.tietz@onevision.com>
 
