@@ -1156,11 +1156,10 @@ DWORD WINAPI
 flush_async_io (void *arg)
 {
   fhandler_base_overlapped *fh = (fhandler_base_overlapped *) arg;
-  debug_only_printf ("waiting for %s I/O for %s",
-		     (fh->get_access () & GENERIC_WRITE) ? "write" : "read",
-		     fh->get_name ());
-  SetEvent (fh->get_overlapped ()->hEvent); /* force has_ongoing_io to block */
-  bool res = fh->has_ongoing_io ();
+  debug_only_printf ("waiting for write I/O for %s", fh->get_name ());
+  DWORD nbytes;
+  bool res = GetOverlappedResult (fh->get_output_handle (),
+				  fh->get_overlapped (), &nbytes, true);
   debug_printf ("finished waiting for I/O from %s, res %d", fh->get_name (),
 		res);
   fh->close ();
@@ -1210,9 +1209,10 @@ int
 fhandler_base_overlapped::close ()
 {
   int res;
+  int writer = (get_access () & GENERIC_WRITE);
   /* Need to treat non-blocking I/O specially because Windows appears to
      be brain-dead  */
-  if (is_nonblocking () && has_ongoing_io ())
+  if (writer && is_nonblocking () && has_ongoing_io ())
     {
       clone (HEAP_3_FHANDLER)->check_later ();
       res = 0;
@@ -1221,7 +1221,8 @@ fhandler_base_overlapped::close ()
     {
      /* Cancelling seems to be necessary for cases where a reader is
          still executing when a signal handler performs a close.  */
-      CancelIo (get_io_handle ());
+      if (!writer)
+	CancelIo (get_io_handle ());
       destroy_overlapped ();
       res = fhandler_base::close ();
     }

@@ -163,7 +163,7 @@ dup3 (int oldfd, int newfd, int flags)
     }
   else
     res = cygheap->fdtab.dup3 (oldfd, newfd, flags);
-  syscall_printf ("%R = dup2(%d, %d, %p)", res, oldfd, newfd, flags);
+  syscall_printf ("%R = dup3(%d, %d, %p)", res, oldfd, newfd, flags);
   return res;
 }
 
