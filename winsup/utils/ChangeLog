@@ -1,3 +1,9 @@
+2012-01-31  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* strace.cc (proc_child): Don't right-shift exit value.
+	(main): Call ExitProcess() to exit exactly the same way as any straced
+	child.
+
 2012-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* tzset.c: Throughout use wide characters to be locale agnostic.
