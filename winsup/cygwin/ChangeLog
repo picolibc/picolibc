@@ -12,7 +12,7 @@
 	* syscalls.cc (dup3): Fix debug typo.
 
 	* fhandler.cc (flush_async_io): Assume only called for writer.  Call
-	GetOverlappedResult directly rather than kluding call to
+	GetOverlappedResult directly rather than kludging call to
 	has_ongoing_io.
 	(fhandler_base_overlapped::close): Only start flush thread when closing
 	write handle.  Only cancel I/O when reading.
