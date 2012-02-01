@@ -1900,7 +1900,7 @@ fhandler_base_overlapped::has_ongoing_io ()
     return true;
   io_pending = false;
   DWORD nbytes;
-  GetOverlappedResult (get_output_handle (), get_overlapped (), &nbytes, true);
+  GetOverlappedResult (get_output_handle (), get_overlapped (), &nbytes, false);
   return false;
 }
 

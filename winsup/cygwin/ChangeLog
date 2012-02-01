@@ -1,3 +1,12 @@
+2012-02-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler.cc (fhandler_base_overlapped::has_ongoing_io): Don't block
+	GetOverlappedResult since previous IsEventSignalled will have reset the
+	handle.
+	* select.cc (cygwin_select): Remove space before parentheses in syscall
+	debugging output.
+	(pipe_data_available): Streamline if block.
+
 2012-01-31  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* syscalls.cc (dup3): Fix debug typo.
