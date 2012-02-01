@@ -1,7 +1,7 @@
 2012-02-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fcntl.cc (fcntl64): Add introductory debug statement.  Call dup3
-	directory via dtable method to avoid over-incrementing refcnt.
+	directly via dtable method to avoid over-incrementing refcnt.
 
 2012-02-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
