@@ -669,8 +669,12 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
 	}
       else
 	{
+	  /* Don't increment refcnt here since we don't know if this is a
+	     allocated fd.  So we leave this chore to the caller. */
+
 	  newfh->usecount = 0;
 	  newfh->archetype_usecount (1);
+
 	  /* The O_CLOEXEC flag enforces close-on-exec behaviour. */
 	  newfh->set_close_on_exec (!!(flags & O_CLOEXEC));
 	  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
@@ -735,9 +739,9 @@ dtable::dup3 (int oldfd, int newfd, int flags)
 
   if (!not_open (newfd))
     close (newfd);
-  else if ((size_t) newfd < size)
-    /* nothing to do */;
-  else if (find_unused_handle (newfd) < 0)
+  else if ((size_t) newfd > size
+	   && find_unused_handle (newfd) < 0)
+    /* couldn't extend fdtab */
     {
       newfh->close ();
       res = -1;

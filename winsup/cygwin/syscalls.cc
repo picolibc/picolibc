@@ -161,8 +161,9 @@ dup3 (int oldfd, int newfd, int flags)
       set_errno (cfd < 0 ? EBADF : EINVAL);
       res = -1;
     }
-  else
-    res = cygheap->fdtab.dup3 (oldfd, newfd, flags);
+  else if ((res = cygheap->fdtab.dup3 (oldfd, newfd, flags)) == newfd)
+    cygheap->fdtab[newfd]->refcnt (1);
+
   syscall_printf ("%R = dup3(%d, %d, %p)", res, oldfd, newfd, flags);
   return res;
 }

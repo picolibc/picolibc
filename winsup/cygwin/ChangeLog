@@ -1,5 +1,12 @@
 2012-02-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* dtable.cc (dtable::dup_worker): Add comment explaining why refcnt
+	isn't incremented here.
+	(dtable::dup3): Simplify slightly.  Add comment.
+	* syscalls.cc (dup3): Increment refcnt here, similarly to dup2.
+
+2012-02-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* fhandler.cc (fhandler_base_overlapped::has_ongoing_io): Don't block
 	GetOverlappedResult since previous IsEventSignalled will have reset the
 	handle.
