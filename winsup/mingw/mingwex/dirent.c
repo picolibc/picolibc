@@ -2,6 +2,7 @@
  * dirent.c
  *
  * This file has no copyright assigned and is placed in the Public Domain.
+ *
  * This file is a part of the mingw-runtime package.
  * No warranty is given; refer to the file DISCLAIMER within the package.
  *
@@ -12,22 +13,20 @@
  * Updated by Jeremy Bettis <jeremy@hksys.com>
  * Significantly revised and rewinddir, seekdir and telldir added
  * by Colin Peters <colin@fu.is.saga-u.ac.jp>
+ * Further significantly revised for improved memory utilisation,
+ * efficiency in operation, and better POSIX standards compliance
+ * by Keith Marshall <keithmarshall@users.sourceforge.net>
  *	
  */
-
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 #include <io.h>
-#include <direct.h>
 #include <dirent.h>
 
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h> /* for GetFileAttributes */
-
+#include <windows.h>
 #include <tchar.h>
-#define SUFFIX	_T("*")
-#define SLASH	_T("\\")
 
 #define DIRENT_RETURN_NOTHING
 #define DIRENT_REJECT( chk, err, rtn )	\
@@ -127,119 +126,144 @@ union __wdirstream_t
  */
 #define DT_IGNORED	(_A_RDONLY | _A_HIDDEN | _A_SYSTEM | _A_ARCH)
 
-/* Helper for opendir().  */
-static inline unsigned _tGetFileAttributes (const _TCHAR * tPath)
-{
-#ifdef _UNICODE
-  /* GetFileAttributesW does not work on W9x, so convert to ANSI */
-  if (_osver & 0x8000)
-    {
-      char aPath [MAX_PATH];
-      WideCharToMultiByte (CP_ACP, 0, tPath, -1, aPath, MAX_PATH, NULL,
-			   NULL);
-      return GetFileAttributesA (aPath);
-    }
-  return GetFileAttributesW (tPath);
-#else
-  return GetFileAttributesA (tPath);
-#endif
-}
+#define DIRENT_OPEN(D)	\
+    ((D).dd_handle = _tfindfirst((D).dd_name, &((D).dd_dta)))
 
-/*
- * opendir
+#define DIRENT_UPDATE(D)  \
+    _tfindnext( (D).dd_handle, &(D).dd_dta )
+
+
+/*****
  *
- * Returns a pointer to a DIR structure appropriately filled in to begin
- * searching a directory.
+ * opendir()
+ *
+ * Returns a pointer to a DIR structure appropriately filled in
+ * to begin searching a directory.
+ *
  */
 _TDIR * 
-_topendir (const _TCHAR *szPath)
+_topendir( const _TCHAR *path_name )
 {
   _TDIR *nd;
-  unsigned int rc;
-  _TCHAR szFullPath[MAX_PATH];
+  _TCHAR abs_path[MAX_PATH];
 	
   /* Reject any request which passes a NULL or an empty path name;
    * note that POSIX doesn't specify the handling for the NULL case,
    * and some implementations may simply fail with a segmentation
-   * fault.  We will fail more gracefully; however, the choice of
-   * EFAULT is not specified by POSIX, for any opendir failure.
+   * fault.  We will fail more gracefully.  Previous versions used
+   * EFAULT here, but EINVAL seems more appropriate; however, POSIX
+   * specifies neither of these for any opendir() failure.
    */
-  DIRENT_REJECT( (!szPath), EFAULT, (_TDIR *)(0) );
+  DIRENT_REJECT( (path_name == NULL), EINVAL, (_TDIR *)(NULL) );
   /*
    * Conversely, POSIX *does* specify ENOENT for the empty path
    * name case, where we previously had ENOTDIR; here, we correct
    * this previous anomaly.
    */
-  DIRENT_REJECT( (*szPath == _T('\0')), ENOENT, (_TDIR *)(0) );
+  DIRENT_REJECT( (*path_name == _T('\0')), ENOENT, (_TDIR *)(NULL) );
 
-  /* Attempt to determine if the given path really is a directory.
-   * On error, user may call GetLastError() for more error info
+  /* Identify the absolute path name corresponding to the (maybe
+   * relative) path name we are to process; (this ensures that we
+   * may always refer back to this same path name, e.g. to rewind
+   * the "directory stream", even after an intervening change of
+   * current working directory).
    */
-  DIRENT_REJECT( ((rc = _tGetFileAttributes (szPath)) == (unsigned int)(-1)),
-      ENOENT, (_TDIR *)(0)
-    );
+  _tfullpath( abs_path, path_name, MAX_PATH );
 
-  /* Error, entry exists but not a directory.
+  /* Ensure that the generated absolute path name ends with a
+   * directory separator (backslash) character, so that we may
+   * correctly append a wild-card matching pattern which will
+   * cause _findfirst() and _findnext() to return every entry
+   * in the specified directory; (note that, for now we may
+   * simply assume that abs_path refers to a directory;
+   * we will verify that when we call _findfirst() on it).
    */
-  DIRENT_REJECT( (!(rc & FILE_ATTRIBUTE_DIRECTORY)), ENOTDIR, (_TDIR *)(0) );
-
-  /* Make an absolute pathname.  */
-  _tfullpath (szFullPath, szPath, MAX_PATH);
-
-  /* Allocate enough space to store DIR structure and the complete
-   * directory path given. */
-  nd = (_TDIR *)(malloc( sizeof( _TDIR )
-	+ (_tcslen( szFullPath ) + _tcslen( SLASH ) + _tcslen( SUFFIX ) + 1)
-	    * sizeof( _TCHAR )
-       ));
-
-  /* Error, out of memory.
-   */ 
-  DIRENT_REJECT( (!nd), ENOMEM, (_TDIR *)(0) );
-
-  /* Create the search expression. */
-  _tcscpy (nd->dd_private.dd_name, szFullPath);
-
-  /* Add on a slash if the path does not end with one. */
-  if (nd->dd_private.dd_name[0] != _T('\0')
-      && _tcsrchr (nd->dd_private.dd_name, _T('/')) != nd->dd_private.dd_name
-					    + _tcslen (nd->dd_private.dd_name) - 1
-      && _tcsrchr (nd->dd_private.dd_name, _T('\\')) != nd->dd_private.dd_name
-      					     + _tcslen (nd->dd_private.dd_name) - 1)
+  if( *abs_path != _T('\0') )
     {
-      _tcscat (nd->dd_private.dd_name, SLASH);
+      size_t offset = _tcslen( abs_path ) - 1;
+      if( (abs_path[offset] != _T('/')) && (abs_path[offset] != _T('\\')) )
+	_tcscat( abs_path, _T("\\") );
     }
 
-  /* Add on the search pattern */
-  _tcscat (nd->dd_private.dd_name, SUFFIX);
+  /* Now append the "match everything" wild-card pattern.
+   */
+  _tcscat( abs_path, _T("*") );
 
-  /* Initialize handle to -1 so that a premature closedir doesn't try
-   * to call _findclose on it. */
-  nd->dd_private.dd_handle = -1;
+  /* Allocate space to store DIR structure.  The size MUST be
+   * adjusted to accommodate the complete absolute path name for
+   * the specified directory, extended to include the wild-card
+   * matching pattern, as above; (note that we DO NOT need any
+   * special provision for the terminating NUL on the path name,
+   * since the base size of the DIR structure includes it).
+   */
+  nd = (_TDIR *)(malloc(
+	 sizeof( _TDIR ) + (_tcslen( abs_path ) * sizeof( _TCHAR ))
+       ));
 
-  /* Initialize the status. */
+  /* Bail out, if insufficient memory.
+   */ 
+  DIRENT_REJECT( (nd == NULL), ENOMEM, (_TDIR *)(NULL) );
+
+  /* Copy the extended absolute path name string into place
+   * within the allocated space for the DIR structure.
+   */
+  _tcscpy( nd->dd_private.dd_name, abs_path );
+
+  /* Initialize the "directory stream", by calling _findfirst() on it;
+   * this leaves the data for the first directory entry in the internal
+   * dirent buffer, ready to be retrieved by readdir().
+   */
+  if( DIRENT_OPEN( nd->dd_private ) == (intptr_t)(-1) )
+    {
+      /* The _findfirst() call, (implied by DIRENT_OPEN), failed;
+       * _findfirst() sets EINVAL where POSIX mandates ENOTDIR...
+       */
+      if( errno == EINVAL )
+	errno = ENOTDIR;
+
+      /* ...otherwise, while it may not be strictly POSIX conformant,
+       * just accept whatever value _findfirst() assigned to errno.  In
+       * any event, prepare to return the NULL "directory stream"; since
+       * this implies that we will lose our reference pointer to the
+       * block of memory we allocated for the stream, free that
+       * before we bail out.
+       */
+      free( nd );
+      return (_TDIR *)(NULL);
+    }
+
+  /* Initialize the status, (i.e. the location index), so that
+   * readdir() will simply return the first directory entry, which
+   * has already been fetched by _findfirst(), without performing
+   * an intervening _findnext() call.
+   */
   nd->dd_private.dd_stat = 0;
 
-  /* Initialize the dirent structure. ino and reclen are invalid under
-   * Win32, and name simply points at the appropriate part of the
-   * findfirst_t structure. */
+  /* The d_ino and d_reclen fields have no relevance in MS-Windows;
+   * initialize them to zero, as a one-time assignment for this DIR
+   * instance, and henceforth forget them; (users should simply
+   * ignore them).
+   */
   nd->dd_dir.d_ino = 0;
   nd->dd_dir.d_reclen = 0;
-  nd->dd_dir.d_namlen = 0;
-  memset (nd->dd_dir.d_name, 0, FILENAME_MAX);
 
+  /* We've now completely initialized an instance of a DIR structure,
+   * representing the requested "directory stream"; return a pointer
+   * via which the caller may access it.
+   */
   return nd;
 }
 
 
-/*
- * readdir
+/*****
  *
- * Return a pointer to a dirent structure filled with the information on the
- * next entry in the directory.
+ * readdir()
+ *
+ * Return a pointer to a dirent structure filled in with information
+ * on the next available entry, (if any), in the "directory stream".
  */
 struct _tdirent *
-_treaddir (_TDIR *dirp)
+_treaddir( _TDIR *dirp )
 {
   /* Check for a valid DIR stream reference; (we can't really
    * be certain until we try to read from it, except in the case
@@ -247,34 +271,17 @@ _treaddir (_TDIR *dirp)
    * POSIX mandates reporting EBADF; we previously had EFAULT, so
    * this version corrects the former anomaly.
    */ 
-  DIRENT_REJECT( (!dirp), EBADF, (struct _tdirent *)(0) );
+  DIRENT_REJECT( (dirp == NULL), EBADF, (struct _tdirent *)(NULL) );
 
-  if (dirp->dd_private.dd_stat < 0)
+  /* Okay to proceed.  If this is the first readdir() request
+   * following an opendir(), or a rewinddir(), then we already
+   * have the requisite return information...
+   */
+  if( dirp->dd_private.dd_stat++ > 0 )
     {
-      /* We have already returned all files in the directory
-       * (or the structure has an invalid dd_stat). */
-      return (struct _tdirent *) 0;
-    }
-  else if (dirp->dd_private.dd_stat == 0)
-    {
-      /* We haven't started the search yet. */
-      /* Start the search */
-      dirp->dd_private.dd_handle = _tfindfirst (dirp->dd_private.dd_name, &(dirp->dd_private.dd_dta));
-
-      if (dirp->dd_private.dd_handle == -1)
-	{
-	  /* Oops! Seems there are no files in that
-	   * directory. */
-	  dirp->dd_private.dd_stat = -1;
-	}
-      else
-	{
-	  dirp->dd_private.dd_stat = 1;
-	}
-    }
-  else
-    {
-      /* Get the next search entry.  POSIX mandates that this must
+      /* Otherwise...
+       *
+       * Get the next search entry.  POSIX mandates that this must
        * return NULL after the last entry has been read, but that it
        * MUST NOT change errno in this case.  MS-Windows _findnext()
        * DOES change errno (to ENOENT) after the last entry has been
@@ -282,7 +289,7 @@ _treaddir (_TDIR *dirp)
        * value, when no actual error has occurred.
        */
       int prev_errno = errno;
-      if (_tfindnext (dirp->dd_private.dd_handle, &(dirp->dd_private.dd_dta)))
+      if( DIRENT_UPDATE( dirp->dd_private ) != 0 )
 	{
 	  /* May be an error, or just the case described above...
 	   */
@@ -292,164 +299,170 @@ _treaddir (_TDIR *dirp)
 	     */
 	    errno = prev_errno;	
 
-	  /* FIXME: this is just wrong: we should NOT close the DIR
-	   * handle here; it is the responsibility of closedir().
+	  /* In either case, there is no valid data to return.
 	   */
-	  _findclose (dirp->dd_private.dd_handle);
-	  dirp->dd_private.dd_handle = -1;
-	  dirp->dd_private.dd_stat = -1;
-	}
-      else
-	{
-	  /* Update the status to indicate the correct
-	   * number. */
-	  dirp->dd_private.dd_stat++;
+	  return (struct _tdirent *)(NULL);
 	}
     }
 
-  if (dirp->dd_private.dd_stat > 0)
+  /* Successfully got an entry.  Everything about the file is
+   * already appropriately filled in, except for the length of
+   * the file name in the d_namlen field...
+   */
+  dirp->dd_dir.d_namlen = _tcslen( dirp->dd_dir.d_name );
+  /*
+   * ...and the attributes returned in the dd_dta.attrib field;
+   * these require adjustment to their BSD equivalents, which are
+   * returned via the union with the dd_dir.d_type field:
+   */
+  switch( dirp->dd_dir.d_type &= ~DT_IGNORED )
     {
-      /* Successfully got an entry. Everything about the file is
-       * already appropriately filled in except the length of the
-       * file name...
-       */
-      dirp->dd_dir.d_namlen = _tcslen (dirp->dd_dir.d_name);
-      /*
-       * ...and the attributes returned in the dd_dta.attrib field;
-       * these require adjustment to their BSD equivalents, which are
-       * returned via the union with the dd_dir.d_type field:
-       */
-      switch( dirp->dd_dir.d_type &= ~DT_IGNORED )
-	{
-	  case DT_REG:
-	  case DT_DIR:
-	    /* After stripping out the modifier bits in DT_IGNORED,
-	     * (which we ALWAYS ignore), this pair require no further
-	     * adjustment...
-	     */
-	    break;
+      case DT_REG:
+      case DT_DIR:
+	/* After stripping out the modifier bits in DT_IGNORED,
+	 * (which we ALWAYS ignore), this pair require no further
+	 * adjustment...
+	 */
+	break;
 
-	  default:
-	    /* ...while nothing else has an appropriate equivalent
-	     * in the BSD d_type identification model.
-	     */
-	    dirp->dd_dir.d_type = DT_UNKNOWN;
-	}
-      return &dirp->dd_dir;
+      default:
+	/* ...while nothing else has an appropriate equivalent
+	 * in the BSD d_type identification model.
+	 */
+	dirp->dd_dir.d_type = DT_UNKNOWN;
     }
-
-  return (struct _tdirent *) 0;
+  return &dirp->dd_dir;
 }
 
 
-/*
- * closedir
+/*****
  *
- * Frees up resources allocated by opendir.
+ * closedir()
+ *
+ * Frees up resources allocated by opendir().
+ *
  */
 int
-_tclosedir (_TDIR * dirp)
+_tclosedir( _TDIR * dirp )
 {
-  int rc = 0;
-
   /* Attempting to reference a directory stream via a NULL pointer
    * would cause a segmentation fault; evade this.  Since NULL can
    * never represent an open directory stream, set the EBADF errno
    * status, as mandated by POSIX, once again correcting previous
    * anomalous use of EFAULT in this context.
    */
-  DIRENT_REJECT( (!dirp), EBADF, -1 );
+  DIRENT_REJECT(
+      ((dirp == NULL) || (_findclose( dirp->dd_private.dd_handle ) != 0)),
+	EBADF, -1
+    );
 
-  if (dirp->dd_private.dd_handle != -1)
-    {
-      rc = _findclose (dirp->dd_private.dd_handle);
-    }
-
-  /* Delete the dir structure. */
-  free (dirp);
-
-  return rc;
+  /* If we didn't bail out above, we have a valid DIR structure
+   * with which we have finished; release the memory allocated
+   * to it, before returning "success".
+   */
+  free( dirp );
+  return 0;
 }
 
-/*
- * rewinddir
+
+/*****
  *
- * Return to the beginning of the directory "stream". We simply call findclose
- * and then reset things like an opendir.
+ * rewinddir()
+ *
+ * Return to the beginning of the directory "stream".  We simply call
+ * _findclose(), to clear prior context, then _findfirst() to restart
+ * the directory search, resetting the location index appropriately,
+ * as it would be left by opendir().
+ *
  */
 void
-_trewinddir (_TDIR * dirp)
+_trewinddir( _TDIR * dirp )
 {
-  /* Once again, evade a potential segmentation fault on passing
-   * a NULL reference pointer, and again correct previous anomalous
-   * use of EFAULT, where POSIX mandates EBADF for errno reporting.
+  /* This is an XSI extension to POSIX, which specifies no formal
+   * error conditions; we will continue to check for and evade the
+   * potential segmentation fault which would result from passing a
+   * NULL reference pointer.  For consistency with the core functions
+   * implemented above, we will again report this as EBADF, rather
+   * than the EFAULT of previous versions.
    */
-  DIRENT_REJECT( (!dirp), EBADF, DIRENT_RETURN_NOTHING );
-
-  if (dirp->dd_private.dd_handle != -1)
-    {
-      _findclose (dirp->dd_private.dd_handle);
-    }
-
-  dirp->dd_private.dd_handle = -1;
-  dirp->dd_private.dd_stat = 0;
+  DIRENT_REJECT(
+      ((dirp == NULL) || (_findclose( dirp->dd_private.dd_handle ) != 0)),
+	EBADF, DIRENT_RETURN_NOTHING
+    );
+  
+  /* We successfully closed the prior search context; reopen...
+   */
+  if( DIRENT_OPEN( dirp->dd_private ) != (intptr_t)(-1) )
+    /*
+     * ...and, on success, reset the location index.
+     */
+    dirp->dd_private.dd_stat = 0;
 }
 
-/*
- * telldir
+
+/*****
  *
- * Returns the "position" in the "directory stream" which can be used with
- * seekdir to go back to an old entry. We simply return the value in stat.
+ * telldir()
+ *
+ * Returns the "position" in the "directory stream" which can then
+ * be passed to seekdir(), to return back to a previous entry.  We
+ * simply return the current location index from the dd_stat field.
+ *
  */
 long
-_ttelldir (_TDIR * dirp)
+_ttelldir( _TDIR * dirp )
 {
-  /* Once again, evade a potential segmentation fault on passing
-   * a NULL reference pointer, and again correct previous anomalous
-   * use of EFAULT, where POSIX mandates EBADF for errno reporting.
+  /* This too is a POSIX-XSI extension, with no mandatory error
+   * conditions.  Once again, evade a potential segmentation fault
+   * on passing a NULL reference pointer, again reporting it as
+   * EBADF in preference to the EFAULT of previous versions.
    */
-  DIRENT_REJECT( (!dirp), EBADF, -1 );
+  DIRENT_REJECT( (dirp == NULL), EBADF, -1 );
+
+  /* We didn't bail out; just assume dirp is valid, and return
+   * the location index from the dd_stat field.
+   */
   return dirp->dd_private.dd_stat;
 }
 
-/*
- * seekdir
+
+/*****
  *
- * Seek to an entry previously returned by telldir. We rewind the directory
- * and call readdir repeatedly until either dd_stat is the position number
- * or -1 (off the end). This is not perfect, in that the directory may
- * have changed while we weren't looking. But that is probably the case with
- * any such system.
+ * seekdir()
+ *
+ * Seek to an entry previously returned by telldir().  We rewind
+ * the "directory stream", then repeatedly call _findnext() while
+ * incrementing its internal location index until it matches the
+ * position requested, or we reach the end of the stream.  This is
+ * not perfect, in that the directory may have changed while we
+ * weren't looking, but it is the best we can achieve, and may
+ * likely reproduce the behaviour of other implementations.
+ *
  */
 void
-_tseekdir (_TDIR * dirp, long lPos)
+_tseekdir( _TDIR * dirp, long loc )
 {
-  /* Once again, evade a potential segmentation fault on passing
-   * a NULL reference pointer, and again correct previous anomalous
-   * use of EFAULT, where POSIX mandates EBADF for errno reporting.
+  /* Another POSIX-XSI extension, with no specified mandatory
+   * error conditions; we require a seek location of zero or
+   * greater, and will reject less than zero as EINVAL...
    */
-  DIRENT_REJECT( (!dirp), EBADF, DIRENT_RETURN_NOTHING );
+  DIRENT_REJECT( (loc < 0L), EINVAL, DIRENT_RETURN_NOTHING );
 
-  /* Seeking to an invalid position.
+  /* Other than this, we simply accept any error condition
+   * which arises as we "rewind" the "directory stream"...
    */
-  DIRENT_REJECT( (lPos < -1), EINVAL, DIRENT_RETURN_NOTHING );
+  _trewinddir( dirp );
 
-  if (lPos == -1)
-    {
-      /* Seek past end. */
-      if (dirp->dd_private.dd_handle != -1)
-	{
-	  _findclose (dirp->dd_private.dd_handle);
-	}
-      dirp->dd_private.dd_handle = -1;
-      dirp->dd_private.dd_stat = -1;
-    }
-  else
-    {
-      /* Rewind and read forward to the appropriate index. */
-      _trewinddir (dirp);
-
-      while ((dirp->dd_private.dd_stat < lPos) && _treaddir (dirp))
-	;
-    }
+  /* ...and, if this is successful...
+   */
+  if( (loc > 0) && (dirp->dd_private.dd_handle != (intptr_t)(-1)) )
+    /*
+     * ...seek forward until the location index within
+     * the DIR structure matches the requested location.
+     */
+    while( (++dirp->dd_private.dd_stat < loc)
+      &&   (DIRENT_UPDATE( dirp->dd_private ) == 0)  )
+      ;
 }
+
+/* $RCSfile$: end of file */

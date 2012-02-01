@@ -1,3 +1,29 @@
+2012-02-01  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	More performance enhancements and POSIX compliance corrections.
+
+	* mingwex/dirent.c: Improve comments; miscellaneous format adjustments.
+	(direct.h): Don't include this header; it isn't, and never was, needed.
+	(SUFFIX, SLASH): Macros no longer required; delete them.
+	(_tGetFileAttributes): Function no longer required; delete it.
+	(DIRENT_OPEN, DIRENT_UPDATE): New macros; define them.
+	(_topendir): Use DIRENT_OPEN; this initialises the requisite _TDIR
+	struct, and populates it by calling _findfirst(), in preparation for
+	retrieval by the first subsequent call to _treaddir().
+	(_treaddir): Use DIRENT_UPDATE on all but the first call following
+	_topendir() or _trewinddir(); in any case, update d_namlen and d_type
+	fields within the associated _TDIR.dirent struct prior to return.  Do
+	NOT automatically call _findclose() at end of "directory stream"; that
+	duty properly belongs exclusively to...
+	(_tclosedir): ...this; simplify, since we no longer need to check for
+	premature closure within _tclosedir().
+	(_trewinddir): Rewrite; it now simply invokes _findclose() in the same
+	manner as _tclosedir(), immediately followed by DIRENT_OPEN, resetting
+	the "directory stream" to the initial state as set by _topendir().
+	(_tseekdir): Simplify; use _trewinddir(), followed by repeated use of
+	DIRENT_UPDATE, as many times as necessary to advance the location
+	counter to the requested offset.
+
 2011-11-30  Ozkan Sezer  <sezero@users.sourceforge.net>
 
 	* include/io.h (_wfindfirst, _wfindnext, _wfindfirst32, _wfindnext32,
