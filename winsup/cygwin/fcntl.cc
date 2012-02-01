@@ -1,7 +1,7 @@
 /* fcntl.cc: fcntl syscall
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2008,
-   2009, 2010, 2011 Red Hat, Inc.
+   2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -28,6 +28,7 @@ fcntl64 (int fd, int cmd, ...)
 
   pthread_testcancel ();
 
+  debug_printf ("fcntl(%d, %d, ...)", fd, cmd);
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
@@ -45,8 +46,10 @@ fcntl64 (int fd, int cmd, ...)
     case F_DUPFD:
     case F_DUPFD_CLOEXEC:
       if ((int) arg >= 0 && (int) arg < OPEN_MAX_MAX)
-	res = dup3 (fd, cygheap_fdnew (((int) arg) - 1),
-		    cmd == F_DUPFD_CLOEXEC ? O_CLOEXEC : 0);
+	{
+	  int flags = cmd == F_DUPFD_CLOEXEC ? O_CLOEXEC : 0;
+	  res = cygheap->fdtab.dup3 (fd, cygheap_fdnew (((int) arg) - 1), flags);
+	}
       else
 	{
 	  set_errno (EINVAL);
@@ -107,3 +110,4 @@ _fcntl (int fd, int cmd, ...)
     }
   return res;
 }
+
