@@ -1,3 +1,36 @@
+2012-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	Fix memory and handle leaks due to fdopendir:
+	* dir.cc (closedir): Call global close instead of just releasing the
+	fhandler.
+	* fhandler_disk_file.cc (fhandler_disk_file::closedir): Don't close
+	fhandler handle here, rely on global closedir doing the right thing.
+	* fhandler_registry.cc (fhandler_registry::readdir): Also delete
+	d_hash when closing registry key.
+	(fhandler_registry::rewinddir): Ditto.
+
+	Avoid infinite recursion in VirtualStore under UAC:
+	* fhandler_registry.cc (VIRT_CLASSES_KEY_PREFIX): Define.
+	(VIRT_CLASSES_KEY_SUFFIX): Ditto.
+	(VIRT_CLASSES_KEY): Ditto.
+	(VIRT_CLASSES_LINKTGT): Ditto.
+	(fhandler_registry::exists): Return virt_symlink as file type if
+	this is a Classes key under the VirtualStore.
+	(fhandler_registry::fstat): Handle virt_symlink.
+	(fhandler_registry::readdir): Return DT_LNK as d_type if this is a
+	Classes key under the VirtualStore.
+	(fhandler_registry::fill_filebuf): Handle Classes symlink.
+
+	Handle user impersonation in /proc/registry access:
+	* autoload.cc (RegOpenUserClassesRoot): Define.
+	(RegOpenCurrentUser): Define.
+	* fhandler_registry.cc (RegOpenUserClassesRoot): Declare function
+	missing in w32api.
+	(RegOpenCurrentUser): Ditto.
+	(fetch_hkey): New function.
+	(fhandler_registry::open): Call fetch_hkey to get root registry key.
+	(open_key): Ditto.
+
 2012-02-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fcntl.cc (fcntl64): Add introductory debug statement.  Call dup3

@@ -1,7 +1,7 @@
 /* fhandler_disk_file.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -2344,21 +2344,8 @@ int
 fhandler_disk_file::closedir (DIR *dir)
 {
   int res = 0;
-  NTSTATUS status;
 
   delete d_mounts (dir);
-  if (!get_handle ())
-    /* ignore */;
-  else if (get_handle () == INVALID_HANDLE_VALUE)
-    {
-      set_errno (EBADF);
-      res = -1;
-    }
-  else if (!NT_SUCCESS (status = NtClose (get_handle ())))
-    {
-      __seterrno_from_nt_status (status);
-      res = -1;
-    }
   syscall_printf ("%d = closedir(%p, %s)", res, dir, get_name ());
   return res;
 }

@@ -32,6 +32,20 @@ details. */
 static const _off_t REG_ENUM_VALUES_MASK = 0x8000000;
 static const _off_t REG_POSITION_MASK = 0xffff;
 
+/* These key paths are used below whenever we return key information.
+   The problem is UAC virtualization when running an admin account with
+   restricted rights.  In that case the subkey "Classes" in the VirtualStore
+   points to the HKEY_CLASSES_ROOT key again.  If "Classes" is handled as a
+   normal subdirectory, applications recursing throught the directory
+   hirarchy will invariably run into an infinite recursion.  What we do here
+   is to handle the "Classes" subkey as a symlink to HKEY_CLASSES_ROOT.  This
+   avoids the infinite recursion, unless the application blindly follows
+   symlinks pointing to directories, in which case it's their own fault. */
+#define VIRT_CLASSES_KEY_PREFIX "/VirtualStore/MACHINE/SOFTWARE"
+#define VIRT_CLASSES_KEY_SUFFIX "Classes"
+#define VIRT_CLASSES_KEY VIRT_CLASSES_KEY_PREFIX "/" VIRT_CLASSES_KEY_SUFFIX
+#define VIRT_CLASSES_LINKTGT "/proc/registry/HKEY_CLASSES_ROOT"
+
 /* List of root keys in /proc/registry.
  * Possibly we should filter out those not relevant to the flavour of Windows
  * Cygwin is running on.
@@ -62,6 +76,33 @@ static const HKEY registry_keys[] =
 };
 
 static const int ROOT_KEY_COUNT = sizeof (registry_keys) / sizeof (HKEY);
+
+extern "C" {
+  LONG WINAPI RegOpenUserClassesRoot (HANDLE, DWORD, REGSAM, PHKEY);
+  LONG WINAPI RegOpenCurrentUser (REGSAM, PHKEY);
+};
+
+/* Make sure to access the correct per-user HKCR and HKCU hives, even if
+   the current user is only impersonated in another user's session. */
+static HKEY
+fetch_hkey (int idx) /* idx *must* be valid */
+{
+  HKEY key;
+
+  if (registry_keys[idx] == HKEY_CLASSES_ROOT)
+    {
+      if (RegOpenUserClassesRoot (cygheap->user.issetuid ()
+				  ? cygheap->user.imp_token () : hProcImpToken,
+				  0, KEY_READ, &key) == ERROR_SUCCESS)
+	return key;
+    }
+  else if (registry_keys[idx] == HKEY_CURRENT_USER)
+    {
+      if (RegOpenCurrentUser (KEY_READ, &key) == ERROR_SUCCESS)
+	return key;
+    }
+  return registry_keys[idx];
+}
 
 /* These get added to each subdirectory in /proc/registry.
  * If we wanted to implement writing, we could maybe add a '.writable' entry or
@@ -319,7 +360,14 @@ fhandler_registry::exists ()
       if (!val_only)
 	hKey = open_key (path, KEY_READ, wow64, false);
       if (hKey != (HKEY) INVALID_HANDLE_VALUE)
-	file_type = virt_directory;
+	{
+	  if (!strcasecmp (path + strlen (path)
+			   - sizeof (VIRT_CLASSES_KEY) + 1,
+			   VIRT_CLASSES_KEY))
+	    file_type = virt_symlink;
+	  else
+	    file_type = virt_directory;
+	}
       else
 	{
 	  /* Key does not exist or open failed with EACCES,
@@ -429,6 +477,9 @@ fhandler_registry::fstat (struct __stat64 *buf)
     case virt_none:
       set_errno (ENOENT);
       return -1;
+    case virt_symlink:
+      buf->st_mode |= S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
+      break;
     case virt_directory:
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
       break;
@@ -550,7 +601,6 @@ fhandler_registry::readdir (DIR *dir, dirent *de)
 {
   DWORD buf_size = NAME_MAX + 1;
   wchar_t buf[buf_size];
-  HANDLE handle;
   const char *path = dir->__d_dirname + proc_len + 1 + prefix_len;
   LONG error;
   int res = ENMFILE;
@@ -568,8 +618,7 @@ fhandler_registry::readdir (DIR *dir, dirent *de)
     {
       if (dir->__d_position != 0)
 	goto out;
-      handle = open_key (path + 1, KEY_READ, wow64, false);
-      dir->__handle = handle;
+      dir->__handle = open_key (path + 1, KEY_READ, wow64, false);
       if (dir->__handle == INVALID_HANDLE_VALUE)
 	goto out;
       dir->__d_internal = (unsigned) new __DIR_hash ();
@@ -615,6 +664,7 @@ retry:
     }
   if (error != ERROR_SUCCESS && error != ERROR_MORE_DATA)
     {
+      delete d_hash (dir);
       RegCloseKey ((HKEY) dir->__handle);
       dir->__handle = INVALID_HANDLE_VALUE;
       if (error != ERROR_NO_MORE_ITEMS)
@@ -646,6 +696,11 @@ retry:
 
   if (dir->__d_position & REG_ENUM_VALUES_MASK)
     de->d_type = DT_REG;
+  else if (!strcasecmp (de->d_name, "Classes")
+	   && !strcasecmp (path + strlen (path)
+			   - sizeof (VIRT_CLASSES_KEY_PREFIX) + 1,
+			   VIRT_CLASSES_KEY_PREFIX))
+    de->d_type = DT_LNK;
   else
     de->d_type = DT_DIR;
 
@@ -678,6 +733,7 @@ fhandler_registry::rewinddir (DIR * dir)
 {
   if (dir->__handle != INVALID_HANDLE_VALUE)
     {
+      delete d_hash (dir);
       RegCloseKey ((HKEY) dir->__handle);
       dir->__handle = INVALID_HANDLE_VALUE;
     }
@@ -766,7 +822,7 @@ fhandler_registry::open (int flags, mode_t mode)
 	      }
 	    else
 	      {
-		set_io_handle (registry_keys[i]);
+		set_io_handle (fetch_hkey (i));
 		/* Marking as nohandle allows to call dup on pseudo registry
 		   handles. */
 		nohandle (true);
@@ -881,6 +937,16 @@ fhandler_registry::fill_filebuf ()
       error = RegQueryValueExW (handle, value_name, NULL, &type, NULL, &size);
       if (error != ERROR_SUCCESS)
 	{
+	  if (error == ERROR_INVALID_HANDLE
+	      && !strcasecmp (get_name () + strlen (get_name ())
+			      - sizeof (VIRT_CLASSES_KEY) + 1,
+			      VIRT_CLASSES_KEY))
+	    {
+	      filesize = sizeof (VIRT_CLASSES_LINKTGT);
+	      filebuf = (char *) cmalloc_abort (HEAP_BUF, filesize);
+	      strcpy (filebuf, VIRT_CLASSES_LINKTGT);
+	      return true;
+	    }
 	  if (error != ERROR_FILE_NOT_FOUND)
 	    {
 	      seterrno_from_win_error (__FILE__, __LINE__, error);
@@ -1025,7 +1091,7 @@ open_key (const char *name, REGSAM access, DWORD wow64, bool isValue)
 	{
 	  for (int i = 0; registry_listing[i]; i++)
 	    if (strncasematch (anchor, registry_listing[i], name - anchor - 1))
-	      hKey = registry_keys[i];
+	      hKey = fetch_hkey (i);
 	  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
 	    return hKey;
 	  hParentKey = hKey;

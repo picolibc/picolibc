@@ -1,7 +1,7 @@
 /* dir.cc: Posix directory-related routines
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2006, 2007,
-   2008, 2009, 2010 Red Hat, Inc.
+   2008, 2009, 2010, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -266,8 +267,7 @@ closedir (DIR *dir)
 
   int res = ((fhandler_base *) dir->__fh)->closedir (dir);
 
-  cygheap->fdtab.release (dir->__d_fd);
-
+  close (dir->__d_fd);
   free (dir->__d_dirname);
   free (dir->__d_dirent);
   free (dir);
