@@ -90,23 +90,23 @@ close_all_files (bool norelease)
 
   semaphore::terminate ();
 
-  fhandler_base *fh;
   HANDLE h = NULL;
 
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
-    if ((fh = cygheap->fdtab[i]) != NULL)
-      {
-#ifdef DEBUGGING
-	debug_printf ("closing fd %d", i);
-#endif
-	if (i == 2)
-	  DuplicateHandle (GetCurrentProcess (), fh->get_output_handle (),
-			   GetCurrentProcess (), &h,
-			   0, false, DUPLICATE_SAME_ACCESS);
-	fh->close_with_arch ();
-	if (!norelease)
-	  cygheap->fdtab.release (i);
-      }
+    {
+      cygheap_fdget cfd (i);
+      if (cfd >= 0)
+	{
+	  debug_only_printf ("closing fd %d", i);
+	  if (i == 2)
+	    DuplicateHandle (GetCurrentProcess (), cfd->get_output_handle (),
+			     GetCurrentProcess (), &h,
+			     0, false, DUPLICATE_SAME_ACCESS);
+	  cfd->close_with_arch ();
+	  if (!norelease)
+	    cfd.release ();
+	}
+    }
 
   if (!have_execed && cygheap->ctty)
     cygheap->close_ctty ();

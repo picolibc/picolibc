@@ -1,3 +1,8 @@
+2012-02-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* syscalls.cc (close_all_files): Use cygheap_fdget to manipulate
+	fhandler.  Use debug_only_printf.
+
 2012-02-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	Fix memory and handle leaks due to fdopendir:
