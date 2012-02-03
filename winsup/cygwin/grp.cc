@@ -1,7 +1,7 @@
 /* grp.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2011 Red Hat, Inc.
+   2007, 2008, 2009, 2011, 2012 Red Hat, Inc.
 
    Original stubs by Jason Molenda of Cygnus Support, crash@cygnus.com
    First implementation by Gunther Ebert, gunther.ebert@ixos-leipzig.de
@@ -32,7 +32,7 @@ static char * NO_COPY null_ptr;
 bool
 pwdgrp::parse_group ()
 {
-# define grp (*group_buf)[curr_lines]
+  __group32 &grp = (*group_buf)[curr_lines];
   grp.gr_name = next_str (':');
   if (!*grp.gr_name)
     return false;
@@ -60,7 +60,6 @@ pwdgrp::parse_group ()
     }
 
   return true;
-# undef grp
 }
 
 /* Cygwin internal */

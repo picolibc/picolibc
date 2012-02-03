@@ -1,3 +1,8 @@
+2012-02-03  Václav Zeman  <vhaisman@gmail.com>
+
+	* grp.cc (pwdgrp::parse_group): Convert grp from macro to reference.
+	* passwd.cc (pwdgrp::parse_passwd): Ditto for res.
+
 2012-02-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* syscalls.cc (close_all_files): Use cygheap_fdget to manipulate

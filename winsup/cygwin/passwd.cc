@@ -1,6 +1,7 @@
 /* passwd.cc: getpwnam () and friends
 
-   Copyright 1996, 1997, 1998, 2001, 2002, 2003, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2001, 2002, 2003, 2007, 2008, 2009,
+   2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -31,7 +32,7 @@ static pwdgrp pr (passwd_buf);
 bool
 pwdgrp::parse_passwd ()
 {
-# define res (*passwd_buf)[curr_lines]
+  passwd &res = (*passwd_buf)[curr_lines];
   res.pw_name = next_str (':');
   res.pw_passwd = next_str (':');
   if (!next_num (res.pw_uid))
@@ -43,7 +44,6 @@ pwdgrp::parse_passwd ()
   res.pw_dir =  next_str (':');
   res.pw_shell = next_str (':');
   return true;
-# undef res
 }
 
 /* Read in /etc/passwd and save contents in the password cache.
