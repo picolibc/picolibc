@@ -1,5 +1,10 @@
 2012-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setup2.sgml: Fix more typos.
+	* setup-net.sgml: Ditto.
+
+2012-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* faq-using.xml: Fix typos.
 	* ntsec.sgml: Ditto.
 	* pathnames.sgml: Ditto.

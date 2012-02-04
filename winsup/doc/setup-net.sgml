@@ -144,7 +144,7 @@ setup.exe homepage</ulink>.
 The chooser is the most complex part of <command>setup.exe</command>. 
 Packages are grouped into categories, and one package may belong to multiple 
 categories (assigned by the volunteer package maintainer). Each package
-can be found under any of those categories in the hirarchial chooser view.
+can be found under any of those categories in the hierarchical chooser view.
 By default, <command>setup.exe</command>
 will install only the packages in the <literal>Base</literal> category
 and their dependencies, resulting in a minimal Cygwin installation.

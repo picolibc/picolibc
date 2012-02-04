@@ -490,7 +490,7 @@ environment, if it's different from the UTF-8 charset.</para>
 
 <note><para>Per POSIX, the name of an environment variable should only
 consist of valid ASCII characters, and only of uppercase letters, digits, and
-the underscore for maximum portabilty.</para></note>
+the underscore for maximum portability.</para></note>
 
 <para>Symbolic links, too, may pose a problem when switching charsets on
 the fly.  A symbolic link contains the filename of the target file the
