@@ -1,3 +1,7 @@
+2012-02-03  Kevin Buettner  <kevinb@redhat.com>
+
+	* sim-rl78.h: New file.
+
 2011-12-03  Mike Frysinger  <vapier@gentoo.org>
 
 	* callback.h (cb_get_string): New prototype.
