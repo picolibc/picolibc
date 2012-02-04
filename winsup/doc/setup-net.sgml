@@ -88,12 +88,6 @@ If you do not have the necessary permissions, but still want to use these
 programs, consult the Cygwin mailing list archives about others' experiences.
 
 </para>
-<para>
-The <literal>Default Text File Type</literal> should be left on
-<literal>Unix</literal> (that is, <literal>\n</literal>) unless you
-have a very good reason to switch it to 
-<literal>DOS</literal> (that is, <literal>\r\n</literal>).
-</para>
 </sect2>
 
 <sect2 id="setup-localdir"><title>Local Package Directory</title>
@@ -150,7 +144,7 @@ setup.exe homepage</ulink>.
 The chooser is the most complex part of <command>setup.exe</command>. 
 Packages are grouped into categories, and one package may belong to multiple 
 categories (assigned by the volunteer package maintainer). Each package
-can be found under any of those categories in the heirarchial chooser view.
+can be found under any of those categories in the hirarchial chooser view.
 By default, <command>setup.exe</command>
 will install only the packages in the <literal>Base</literal> category
 and their dependencies, resulting in a minimal Cygwin installation.

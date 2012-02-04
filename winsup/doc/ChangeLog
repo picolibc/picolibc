@@ -1,3 +1,12 @@
+2012-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-using.xml: Fix typos.
+	* ntsec.sgml: Ditto.
+	* pathnames.sgml: Ditto.
+	* setup2.sgml: Ditto.
+	* setup-net.sgml: Ditto.
+	(setup-dir): Drop paragraph on Unix/DOS file mode.
+
 2012-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.10): Add tzset.

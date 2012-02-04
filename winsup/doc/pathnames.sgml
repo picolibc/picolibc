@@ -22,7 +22,7 @@ appear as subdirectories (for example, you might buy a new disk and
 make it be the <filename>/disk2</filename> directory).</para>
 
 <para>Because many programs written to run on UNIX systems assume
-the existance of a single unified POSIX file system structure, Cygwin
+the existence of a single unified POSIX file system structure, Cygwin
 maintains a special internal POSIX view of the Win32 file system
 that allows these programs to successfully run under Windows.  Cygwin
 uses this mapping to translate from POSIX to Win32 paths as
@@ -223,7 +223,7 @@ filenames bypasses the mount table.
 </para>
 
 <para>If you want to see the current set of mount points valid in your
-session, you can invoking the Cygwin tool <command>mount</command> without
+session, you can invoke the Cygwin tool <command>mount</command> without
 arguments:</para>
 
 <example id="pathnames-mount-ex">
@@ -288,8 +288,8 @@ on a system are subsumed.  The mount options of the cygdrive prefix is
 used for all file access through the cygdrive prefixed drives.  For instance,
 assuming the cygdrive mount options are <literal>binary,posix=0</literal>,
 then any file <literal>/cygdrive/x/file</literal> will be opened in
-binary mode by default (mount option <literal>binary</literal>, and the case
-of the filename doesn't matter (mount option <literal>posix=0</literal>.
+binary mode by default (mount option <literal>binary</literal>), and the case
+of the filename doesn't matter (mount option <literal>posix=0</literal>).
 </para>
 
 <para>The cygdrive prefix flags are also used for all UNC paths starting with
@@ -363,9 +363,9 @@ bypass the information given in the Cygwin mount table.</para>
 
 <para>When accessing files using native Win32 paths as above, Cygwin uses a
 default setting for the mount flags.  All paths using DOS notation will be
-treated as caseinsensitive, and permissions are just faked as if the
+treated as case insensitive, and permissions are just faked as if the
 underlying drive is a FAT drive.  This also applies to NTFS and other
-filesystems which usually are capable of casesensitivity and storing
+filesystems which usually are capable of case sensitivity and storing
 permissions.</para>
 
 </sect2>

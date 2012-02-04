@@ -417,7 +417,7 @@ UTF-16 encoding to store filename information.  Not all characters
 from the Unicode character set are available in a singlebyte or doublebyte
 charset.  While Cygwin has a workaround to access files with unusual
 characters (see <xref linkend="pathnames-unusual"></xref>), a better
-workaround is to use always the UTF-8 character set.i</para>
+workaround is to use always the UTF-8 character set.</para>
 
 <para><emphasis>UTF-8 is the only multibyte character set which can represent
 every Unicode character.</emphasis></para>
@@ -490,7 +490,7 @@ environment, if it's different from the UTF-8 charset.</para>
 
 <note><para>Per POSIX, the name of an environment variable should only
 consist of valid ASCII characters, and only of uppercase letters, digits, and
-the underscore for maximum portablilty.</para></note>
+the underscore for maximum portabilty.</para></note>
 
 <para>Symbolic links, too, may pose a problem when switching charsets on
 the fly.  A symbolic link contains the filename of the target file the

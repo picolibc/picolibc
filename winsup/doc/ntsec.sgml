@@ -14,7 +14,7 @@ default.</para>
 be necessarily short.  If you want to learn more about the Windows security
 model, see the <ulink url="http://msdn.microsoft.com/en-us/library/aa374860(VS.85).aspx">Access Control</ulink> article in MSDN documentation.</para>
 
-<para>POSIX concepts and specificially the POSIX security model are not
+<para>POSIX concepts and in particular the POSIX security model are not
 discussed here, but assumed to be understood by the reader.  If you
 don't know the POSIX security model, search the web for beginner
 documentation.</para>

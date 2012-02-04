@@ -650,7 +650,7 @@ of this is perl's configuration script, which wants
 tell the difference between files with just different case, so the
 configuration fails.
 </para>
-<para>To help with this problem, Cygwin supports casesensitivity
+<para>To help with this problem, Cygwin supports case sensitivity
 starting with Cygwin 1.7.0.  For a detailed description how to use that
 feature see the Cygwin User's Guilde at
 <ulink url="http://cygwin.com/cygwin-ug-net/using-specialnames.html">http://cygwin.com/cygwin-ug-net/using-specialnames.html</ulink>.
