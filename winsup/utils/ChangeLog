@@ -1,3 +1,7 @@
+2012-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* utils.sgml: Fix typos.
+
 2012-01-31  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* strace.cc (proc_child): Don't right-shift exit value.

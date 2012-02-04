@@ -130,7 +130,7 @@ directories on the PATH.  </para>
 
 <para>The <literal>-r</literal> option causes
 <command>cygcheck</command> to search your registry for information
-that is relevent to Cygwin programs.  These registry entries are the
+that is relevant to Cygwin programs.  These registry entries are the
 ones that have "Cygwin" in the name.  If you are paranoid about
 privacy, you may remove information from this report, but please keep
 in mind that doing so makes it harder to diagnose your problems.</para>
@@ -141,7 +141,7 @@ to search the entire official Cygwin package repository.  It takes as argument
 a Perl-compatible regular expression which is used to match package names, 
 package descriptions, and path/filenames of the contents of packages.  This
 feature requires an active internet connection, since it must query the
-<literal>cygwin.com</literal> web site.  In fact, it is equalivant to the
+<literal>cygwin.com</literal> web site.  In fact, it is equivalent to the
 search that is available on the <ulink url="http://cygwin.com/packages/">Cygwin
 package listing</ulink> page.</para>
 
@@ -233,12 +233,12 @@ concurrently will result in error messages like this one:</para>
 
 <screen>
 *** shared version mismatch detected - 0x8A88009C/0x75BE0074.
-This problem is probably due to using incompatible versions of the cygwin DLL.
+This problem is probably due to using incompatible versions of the Cygwin DLL.
 Search for cygwin1.dll using the Windows Start->Find/Search facility
 and delete all but the most recent version.  The most recent version *should*
 reside in x:\\cygwin\\bin, where 'x' is the drive on which you have
 installed the cygwin distribution.  Rebooting is also suggested if you
-are unable to find another cygwin DLL.
+are unable to find another Cygwin DLL.
 </screen>
 
 <para>
@@ -346,7 +346,7 @@ to print DOS and Windows paths created with one of the <literal>-d</literal>,
 use the character set of the current locale defined by one of the
 internationalization environment variables <envar>LC_ALL</envar>,
 <envar>LC_CTYPE</envar>, or <envar>LANG</envar>, see
-<xref linkend="setup-locale"></xref>.  This is sometimes not sufficent for
+<xref linkend="setup-locale"></xref>.  This is sometimes not sufficient for
 interaction with native Windows tools, which might expect native, non-ASCII
 characters in a specific Windows codepage.  Console tools, for instance, might
 expect pathnames in the current OEM codepage, while graphical tools like
@@ -405,7 +405,7 @@ the "All Users" directories instead of the current user for the
 <literal>-D</literal>, <literal>-O</literal> and <literal>-P</literal> 
 options.
 The <literal>-F</literal> outputs other special folders specified by
-their internal numeric code (decimal or 0xhex). For valid codes and
+their internal numeric code (decimal or 0x-prefixed hex). For valid codes and
 symbolic names, see the CSIDL_* definitions in the include file
 /usr/include/w32api/shlobj.h from package w32api. The current valid
 range of codes for folders is 0 (Desktop) to 59 (CDBurn area).
@@ -1885,7 +1885,7 @@ are seconds, they really are instruction counts.  More on that later.
 </para>
 
 <para>
-Because the SSP was originally designed to profile the cygwin DLL, it
+Because the SSP was originally designed to profile the Cygwin DLL, it
 does not automatically select a block of code to report statistics on.
 You must specify the range of memory addresses to keep track of
 manually, but it's not hard to figure out what to specify.  Use the
