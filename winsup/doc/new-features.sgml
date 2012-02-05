@@ -77,7 +77,7 @@ Also, perror and strerror_r no longer clobber strerror storage.
 </para></listitem>
 
 <listitem><para>
-C99 &gt;tgmath.h&lt; type-generic macros.
+C99 &lt;tgmath.h&gt; type-generic macros.
 </para></listitem>
 
 <listitem><para>
