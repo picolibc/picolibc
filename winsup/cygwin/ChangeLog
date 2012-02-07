@@ -1,5 +1,10 @@
 2012-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::create_root_entry): Fix format specifier in
+	api_fatal message.
+
+2012-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/process.h: Move here from include/cygwin subdir.
 	* exec.cc: Change include of process.h to reflect the fact that it's
 	now back in include.

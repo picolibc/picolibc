@@ -1,7 +1,7 @@
 /* mount.cc: mount handling.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -450,7 +450,7 @@ mount_info::create_root_entry (const PWCHAR root)
   if (add_item (native_root, "/",
 		MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_IMMUTABLE | MOUNT_AUTOMATIC)
       < 0)
-    api_fatal ("add_item (\"%W\", \"/\", ...) failed, errno %d", native_root, errno);
+    api_fatal ("add_item (\"%s\", \"/\", ...) failed, errno %d", native_root, errno);
   /* Create a default cygdrive entry.  Note that this is a user entry.
      This allows to override it with mount, unless the sysadmin created
      a cygdrive entry in /etc/fstab. */
