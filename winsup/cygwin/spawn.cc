@@ -12,7 +12,7 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <unistd.h>
-#include <cygwin/process.h>
+#include <process.h>
 #include <sys/wait.h>
 #include <wingdi.h>
 #include <winuser.h>

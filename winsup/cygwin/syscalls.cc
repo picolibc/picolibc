@@ -31,7 +31,7 @@ details. */
 #include <sys/statvfs.h> /* needed for statvfs */
 #include <stdlib.h>
 #include <stdio.h>
-#include <cygwin/process.h>
+#include <process.h>
 #include <utmp.h>
 #include <utmpx.h>
 #include <sys/uio.h>

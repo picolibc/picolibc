@@ -9,7 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <cygwin/process.h>
+#include <process.h>
 #include "cygerrno.h"
 #include "path.h"
 #include "environ.h"

@@ -1,3 +1,11 @@
+2012-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/process.h: Move here from include/cygwin subdir.
+	* exec.cc: Change include of process.h to reflect the fact that it's
+	now back in include.
+	* spawn.cc: Ditto.
+	* syscalls.cc: Ditto.
+
 2012-02-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* cygheap.cc (init_cygheap::manage_console_count): Delete.
