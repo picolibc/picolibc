@@ -1357,7 +1357,7 @@ private:
   void setup ();
   bool set_unit ();
   static bool need_invisible ();
-  static bool has_a () {return !invisible_console;}
+  static void free_console ();
 
   fhandler_console (void *) {}
 

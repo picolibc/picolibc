@@ -1,7 +1,7 @@
 /* fhandler_tty.cc
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -516,9 +516,8 @@ fhandler_pty_slave::open (int flags, mode_t)
   set_io_handle (from_master_local);
   set_output_handle (to_master_local);
 
+  fhandler_console::need_invisible ();
   set_open_status ();
-  if (cygheap->manage_console_count ("fhandler_pty_slave::open", 1) == 1)
-    fhandler_console::need_invisible ();
   return 1;
 
 err:
@@ -540,7 +539,6 @@ fhandler_pty_slave::open_setup (int flags)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   myself->set_ctty (this, flags);
-  cygheap->manage_console_count ("fhandler_pty_slave::open_setup", 1);
   report_tty_counts (this, "opened", "");
 }
 
@@ -552,7 +550,6 @@ fhandler_pty_slave::cleanup ()
      Since close_all_files is not called until after the cygwin process has
      synced or before a non-cygwin process has exited, it should be safe to
      just close this normally.  cgf 2006-05-20 */
-  cygheap->manage_console_count ("fhandler_pty_slave::close", -1);
   report_tty_counts (this, "closed", "");
 }
 
@@ -564,6 +561,8 @@ fhandler_pty_slave::close ()
     termios_printf ("CloseHandle (inuse), %E");
   if (!ForceCloseHandle (input_available_event))
     termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
+  if ((unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_unit ()))
+    fhandler_console::free_console ();	/* assumes that we are the last pty closer */
   return fhandler_pty_common::close ();
 }
 
@@ -900,7 +899,6 @@ int
 fhandler_pty_slave::dup (fhandler_base *child, int flags)
 {
   myself->set_ctty (this, flags);
-  cygheap->manage_console_count ("fhandler_pty_slave::dup", 1);
   report_tty_counts (child, "duped slave", "");
   return 0;
 }

@@ -1,5 +1,27 @@
 2012-02-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* cygheap.cc (init_cygheap::manage_console_count): Delete.
+	* cygheap.h (init_cygheap::manage_console_count): Ditto.
+	(init_cygheap::console_count): Ditto.
+	* fhandler.h (fhandler_console::has_a): Ditto.
+	(fhandler_console::free_console): Declare new function.
+	* fhandler_console.cc (fhandler_console::free_console): Define new
+	function.
+	(fhandler_console::open_setup): Delete call to manage_console_count.
+	(fhandler_console::close): Ditto.  Replace with call to free_console().
+	* fhandler_tty.cc (fhandler_pty_slave::open): Delete call to
+	manage_console_count.
+	(fhandler_pty_slave::cleanup): Ditto.
+	(fhandler_pty_slave::close): Call fhandler_console::free_console() if
+	this is our controlling tty.
+	* pinfo.cc (_pinfo::set_ctty): Skip function if tty in question == our
+	ctty.  Delete call to manage_console_count.
+
+	* syscalls.cc (close_all_files): Avoid locking and avoid setting errno
+	when iterating over fds.
+
+2012-02-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* include/cygwin/version.h: Bump CYGWIN_VERSION_DLL_MINOR to 11.
 
 2012-02-03  Václav Zeman  <vhaisman@gmail.com>

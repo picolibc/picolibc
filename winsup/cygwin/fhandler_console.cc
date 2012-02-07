@@ -1,7 +1,7 @@
 /* fhandler_console.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -827,7 +827,6 @@ fhandler_console::open (int flags, mode_t)
 void
 fhandler_console::open_setup (int flags)
 {
-  cygheap->manage_console_count ("fhandler_console::open", 1);
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   myself->set_ctty (this, flags);
 }
@@ -838,7 +837,7 @@ fhandler_console::close ()
   CloseHandle (get_io_handle ());
   CloseHandle (get_output_handle ());
   if (!have_execed)
-    cygheap->manage_console_count ("fhandler_console::close", -1);
+    free_console ();
   return 0;
 }
 
@@ -2346,6 +2345,14 @@ fhandler_console::create_invisible_console_workaround ()
 	}
     }
   return invisible_console = true;
+}
+
+void
+fhandler_console::free_console ()
+{
+  BOOL res = FreeConsole ();
+  debug_printf ("freed console, res %d", res);
+  init_console_handler (false);
 }
 
 bool

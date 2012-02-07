@@ -94,7 +94,7 @@ close_all_files (bool norelease)
 
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
     {
-      cygheap_fdget cfd (i);
+      cygheap_fdget cfd (i, false, false);
       if (cfd >= 0)
 	{
 	  debug_only_printf ("closing fd %d", i);
@@ -1016,7 +1016,6 @@ setsid (void)
   else
     {
       myself->ctty = -1;
-      cygheap->manage_console_count ("setsid", 0);
       myself->sid = getpid ();
       myself->pgid = getpid ();
       if (cygheap->ctty)

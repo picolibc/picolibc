@@ -303,9 +303,6 @@ struct init_cygheap: public mini_cygheap
   } inode_list;			/* Global inode pointer for adv. locking. */
   hook_chain hooks;
   void close_ctty ();
-  int manage_console_count (const char *, int, bool = false) __attribute__ ((regparm (3)));
-private:
-  int console_count;
 };
 
 

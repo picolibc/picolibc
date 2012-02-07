@@ -435,7 +435,7 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 {
   tty_min& tc = *fh->tc ();
   debug_printf ("old %s, ctty device number %p, tc.ntty device number %p flags & O_NOCTTY %p", __ctty (), ctty, tc.ntty, flags & O_NOCTTY);
-  if (fh && &tc && (ctty <= 0 || ctty == tc.ntty) && !(flags & O_NOCTTY))
+  if (fh && &tc && (ctty <= 0 || ctty != tc.ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc.ntty;
       if (cygheap->ctty != fh->archetype)
@@ -454,7 +454,6 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 	    {
 	      fh->archetype_usecount (1);
 	      /* guard ctty fh */
-	      cygheap->manage_console_count ("_pinfo::set_ctty", 1);
 	      report_tty_counts (cygheap->ctty, "ctty", "");
 	    }
 	}

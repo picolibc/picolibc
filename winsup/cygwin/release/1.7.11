@@ -1,0 +1,9 @@
+What's new:
+-----------
+
+
+What changed:
+-------------
+
+- Fixed problem where background Cygwin processes kept the windows
+console window from exiting.

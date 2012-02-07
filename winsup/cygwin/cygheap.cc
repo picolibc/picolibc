@@ -1,7 +1,7 @@
 /* cygheap.cc: Cygwin heap manager.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011 Red Hat, Inc.
+   2010, 2011, 2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -87,23 +87,6 @@ cygheap_fixup_in_child (bool execed)
       else
 	ce->type += HEAP_1_MAX;	/* Mark for freeing after next exec */
     }
-}
-
-int
-init_cygheap::manage_console_count (const char *something, int amount, bool avoid_freeing_console)
-{
-  if (console_count == 0 && amount > 0)
-    init_console_handler (true);
-  console_count += amount;
-  debug_printf ("%s: console_count %d, amount %d, %s, avoid_freeing_console %d",
-		something, console_count, amount, myctty (), avoid_freeing_console);
-  if (!avoid_freeing_console && amount <= 0 && !console_count && myself->ctty == -1)
-    {
-      BOOL res = FreeConsole ();
-      debug_printf ("freed console, res %d", res);
-      init_console_handler (false);
-    }
-  return console_count;
 }
 
 void
