@@ -1,3 +1,7 @@
+2012-02-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_DLL_MINOR to 11.
+
 2012-02-03  Václav Zeman  <vhaisman@gmail.com>
 
 	* grp.cc (pwdgrp::parse_group): Convert grp from macro to reference.
