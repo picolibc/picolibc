@@ -1,3 +1,7 @@
+2012-02-07  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/inttypes.h: Redefine pointer type macros.
+
 2012-01-13  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/stdio/sprintf.c: Document 'm' conversion specifier.
