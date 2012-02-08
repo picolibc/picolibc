@@ -1,3 +1,13 @@
+2012-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (__pthread_cond_wait_init): New static function replacing
+	__pthread_cond_dowait.  Only check and potentially initialize cond and
+	mutex, drop call to (*cond)->wait.
+	(pthread_cond_timedwait): Replace call to __pthread_cond_dowait with
+	separate calls to __pthread_cond_wait_init and (*cond)->wait to be
+	able to initialize cond before accessing its clock_id member.
+	(pthread_cond_wait): Ditto (more or less).
+
 2012-02-08  Christian Franke  <franke@computer.org>
 
 	* include/sys/wait.h: Remove C++ inline functions for `union wait'.

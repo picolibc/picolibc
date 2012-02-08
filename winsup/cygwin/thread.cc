@@ -2746,8 +2746,7 @@ pthread_cond_signal (pthread_cond_t *cond)
 }
 
 static int
-__pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
-		       PLARGE_INTEGER waitlength)
+__pthread_cond_wait_init (pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
@@ -2759,7 +2758,7 @@ __pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   if (!pthread_cond::is_good_object (cond))
     return EINVAL;
 
-  return (*cond)->wait (*mutex, waitlength);
+  return 0;
 }
 
 extern "C" int
@@ -2774,6 +2773,10 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
     return EINVAL;
 
   pthread_testcancel ();
+
+  int err = __pthread_cond_wait_init (cond, mutex);
+  if (err)
+    return err;
 
   /* According to SUSv3, the abstime value must be checked for validity. */
   if (abstime->tv_sec < 0
@@ -2803,7 +2806,7 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
       timeout.QuadPart *= -1LL;
       break;
     }
-  return __pthread_cond_dowait (cond, mutex, &timeout);
+  return (*cond)->wait (*mutex, &timeout);
 }
 
 extern "C" int
@@ -2811,7 +2814,10 @@ pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
   pthread_testcancel ();
 
-  return __pthread_cond_dowait (cond, mutex, NULL);
+  int err = __pthread_cond_wait_init (cond, mutex);
+  if (err)
+    return err;
+  return (*cond)->wait (*mutex, NULL);
 }
 
 extern "C" int
