@@ -149,17 +149,17 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       else
 	{
 	  if (d->p.data_start != p->data_start)
-	    fabort ("data segment start: parent(%p) != child(%p)",
-		    d->p.data_start, p->data_start);
+	    fabort ("%W: data segment start: parent(%p) != child(%p)",
+		    name, d->p.data_start, p->data_start);
 	  else if (d->p.data_end != p->data_end)
-	    fabort ("data segment end: parent(%p) != child(%p)",
-		    d->p.data_end, p->data_end);
+	    fabort ("%W: data segment end: parent(%p) != child(%p)",
+		    name, d->p.data_end, p->data_end);
 	  else if (d->p.bss_start != p->bss_start)
-	    fabort ("data segment start: parent(%p) != child(%p)",
-		    d->p.bss_start, p->bss_start);
+	    fabort ("%W: bss segment start: parent(%p) != child(%p)",
+		    name, d->p.bss_start, p->bss_start);
 	  else if (d->p.bss_end != p->bss_end)
-	    fabort ("bss segment end: parent(%p) != child(%p)",
-		    d->p.bss_end, p->bss_end);
+	    fabort ("%W: bss segment end: parent(%p) != child(%p)",
+		    name, d->p.bss_end, p->bss_end);
 	}
       d->p = p;
     }

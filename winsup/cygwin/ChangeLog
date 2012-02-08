@@ -1,5 +1,10 @@
 2012-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dll_init.cc (dll_list::alloc): Add DLL name to fabort output.  Fix
+	fabort string in case of bss start.
+
+2012-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/sys/sysmacros.h: Include sys/types.h.
 
 2012-02-07  Corinna Vinschen  <corinna@vinschen.de>
