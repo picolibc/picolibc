@@ -19,11 +19,16 @@ details. */
 extern "C" {
 #endif
 
-#ifdef __cplusplus
+#ifdef __INSIDE_CYGWIN__
 
 typedef int *__wait_status_ptr_t;
 
-#else /* !__cplusplus */
+#elif defined(__cplusplus)
+
+/* Attribute __transparent_union__ is only supported for C.  */
+typedef void *__wait_status_ptr_t;
+
+#else /* !__INSIDE_CYGWIN__ && !__cplusplus */
 
 /* Allow `int' and `union wait' for the status.  */
 typedef union
@@ -32,7 +37,7 @@ typedef union
     union wait *__union_wait_ptr;
   } __wait_status_ptr_t  __attribute__ ((__transparent_union__));
 
-#endif /* __cplusplus */
+#endif /* __INSIDE_CYGWIN__ */
 
 pid_t wait (__wait_status_ptr_t __status);
 pid_t waitpid (pid_t __pid, __wait_status_ptr_t __status, int __options);
@@ -55,8 +60,7 @@ union wait
 	unsigned int __w_stopsig:8; /* Stopping signal.  */
 	unsigned int:16;
       } __wait_stopped;
-  };
-
+  }; 
 #define	w_termsig	__wait_terminated.__w_termsig
 #define	w_coredump	__wait_terminated.__w_coredump
 #define	w_retcode	__wait_terminated.__w_retcode
@@ -77,17 +81,7 @@ inline int __wait_status_to_int (int __status)
   { return __status; }
 inline int __wait_status_to_int (const union wait & __status)
   { return __status.w_status; }
-
-/* C++ wait() variants for `union wait'.  */
-inline pid_t wait (union wait *__status)
-  { return wait ((int *) __status); }
-inline pid_t waitpid (pid_t __pid, union wait *__status, int __options)
-  { return waitpid(__pid, (int *) __status, __options); }
-inline pid_t wait3 (union wait *__status, int __options, struct rusage *__rusage)
-  { return wait3 ((int *) __status, __options, __rusage); }
-inline pid_t wait4 (pid_t __pid, union wait *__status, int __options, struct rusage *__rusage)
-  { return wait4 (__pid, (int *) __status, __options, __rusage); }
-};
+}
 
 #else /* !__cplusplus */
 

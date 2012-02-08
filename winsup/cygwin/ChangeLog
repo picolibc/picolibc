@@ -1,3 +1,9 @@
+2012-02-08  Christian Franke  <franke@computer.org>
+
+	* include/sys/wait.h: Remove C++ inline functions for `union wait'.
+	For C++ use `void *' as __wait_status_ptr_t instead.  This is less type
+	safe but fixes compile error on `wait(NULL)'.  Remove extra `;'.
+
 2012-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sigproc.cc (child_info_fork::abort): Call TerminateProcess rather
