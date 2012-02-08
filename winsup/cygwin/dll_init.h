@@ -54,7 +54,6 @@ struct dll
   dll_type type;
   long ndeps;
   dll** deps;
-  PWCHAR modname;
   DWORD image_size;
   void* preferred_base;
   WCHAR name[1];
@@ -90,7 +89,6 @@ public:
   void load_after_fork (HANDLE);
   void reserve_space ();
   void load_after_fork_impl (HANDLE, dll* which, int retries);
-  dll *find_by_modname (const PWCHAR name);
   void populate_deps (dll* d);
   void topsort ();
   void topsort_visit (dll* d, bool goto_tail);
