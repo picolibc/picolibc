@@ -1,5 +1,10 @@
 2012-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (cygheap_user::env_userprofile): Simplify since network
+	drives are not supported here.
+
+2012-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (cygheap_user::env_userprofile): Convert native
 	userprofile path returned from get_registry_hive_path to Win32 path.
 

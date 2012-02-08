@@ -440,15 +440,7 @@ cygheap_user::env_userprofile (const char *name, size_t namelen)
 
   cfree_and_set (puserprof, almost_null);
   if (get_registry_hive_path (get_windows_id (win_id), userprofile_env_buf))
-    {
-      PWCHAR up = userprofile_env_buf + 4;
-      if (!wcsncasecmp (up, L"UNC\\", 4))
-	{
-	  up += 2;
-	  *up = L'\\';
-	}
-      sys_wcstombs_alloc (&puserprof, HEAP_STR, up);
-    }
+    sys_wcstombs_alloc (&puserprof, HEAP_STR, userprofile_env_buf + 4);
 
   return puserprof;
 }
