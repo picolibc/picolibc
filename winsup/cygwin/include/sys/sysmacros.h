@@ -1,6 +1,6 @@
 /* sys/sysmacros.h
 
-   Copyright 1998, 2001, 2010, 2011 Red Hat, Inc.
+   Copyright 1998, 2001, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -10,6 +10,8 @@ details. */
 
 #ifndef _SYS_SYSMACROS_H
 #define _SYS_SYSMACROS_H
+
+#include <sys/types.h>
 
 _ELIDABLE_INLINE int gnu_dev_major(dev_t);
 _ELIDABLE_INLINE int gnu_dev_minor(dev_t);
