@@ -1,3 +1,8 @@
+2012-02-08  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (XACQUIRE_PREFIX_OPCODE): New.
+	(XRELEASE_PREFIX_OPCODE): Likewise.
+
 2011-12-08  Andrew Pinski  <apinski@cavium.com>
             Adam Nemet  <anemet@caviumnetworks.com>
 
