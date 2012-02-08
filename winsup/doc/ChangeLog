@@ -1,3 +1,9 @@
+2012-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-using.xml (faq.using.sshd-in-domain): Document autoload error
+	1114 when loading user32.dll as potential problem when not using
+	a domain service account.
+
 2012-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.10): Fix typo.

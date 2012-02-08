@@ -986,8 +986,18 @@ environment variable option "winsymlinks"
 <para>
 If you want to be able to logon with domain accounts to a domain member
 machine, you should make sure that the "cyg_server" account under which
-the sshd service is usually running, is a domain account as well.  Here's
-how you set this up.
+the sshd service is usually running, is a domain account.  Otherwise you
+might end up with weird problems.  For instance, sshd might fail to load
+the child process when trying to login with a domain account.  A potential,
+confirmed error message is
+</para>
+
+<screen>
+  *** fatal error - unable to load user32.dll, Win32 error 1114
+</screen>.
+
+<para>
+Here's how you set up a sshd with a domain service account.
 </para>
 
 <para>
