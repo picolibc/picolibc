@@ -1,5 +1,10 @@
 2012-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sigproc.cc (child_info_fork::abort): Call TerminateProcess rather
+	than ExitProcess.
+
+2012-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (cygheap_user::env_userprofile): Simplify since network
 	drives are not supported here.
 
