@@ -1,3 +1,8 @@
+2012-02-08  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Reinstate opening tty
+	handles with O_RDWR permissions.
+
 2012-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (__pthread_cond_wait_init): New static function replacing

@@ -351,7 +351,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       /* Console windows are not kernel objects, so the access mask returned
 	 by NtQueryInformationFile is meaningless.  CMD always hands down
 	 stdin handles as R/O handles, but our tty slave sides are R/W. */
-      if (!iscons_dev (dev) && fh->is_tty ())
+      if (fh->is_tty ())
 	{
 	  openflags |= O_RDWR;
 	  access |= GENERIC_READ | GENERIC_WRITE;
