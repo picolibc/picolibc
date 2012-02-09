@@ -879,7 +879,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	    }
 	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
 	  if (!GetThreadContext (hth, &cx))
-	    system_printf ("couldn't get context of thread, %E");
+	    sigproc_printf ("couldn't get context of thread, %E");
 	  else
 	    interrupted = tls->interrupt_now (&cx, sig, handler, siga);
 

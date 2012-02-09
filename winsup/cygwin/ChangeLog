@@ -1,3 +1,9 @@
+2012-02-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* exceptions.cc (setup_handler): Reduce system_printf to sigproc_printf
+	since it is for a transient situation which will undoubtedly be
+	handled.
+
 2012-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_dsp.cc (fhandler_dev_dsp::Audio_out::write): Set
