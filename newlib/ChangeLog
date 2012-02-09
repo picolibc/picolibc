@@ -1,3 +1,7 @@
+2012-02-09  Eric Blake  <eblake@redhat.com>
+
+	* libc/include/_ansi.h (_ELIDABLE_INLINE): Fix C99 mode.
+
 2012-02-09  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/sys/rtems/sys/utime.h: Include <sys/types.h> to provide a
