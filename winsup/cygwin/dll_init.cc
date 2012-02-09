@@ -106,13 +106,17 @@ dll::init ()
   return ret;
 }
 
-/* Look for a dll based on name */
+/* Look for a dll based on the basename.
+   Only compare basenames for DLLs.  Per MSDN, the Windows loader re-uses
+   the already loaded DLL, if the new DLL has the same basename as the
+   already loaded DLL.  It will not try to load the new DLL at all.  See
+   http://msdn.microsoft.com/en-us/library/ms682586%28v=vs.85%29.aspx */
 dll *
-dll_list::operator[] (const PWCHAR name)
+dll_list::operator[] (const PWCHAR modname)
 {
   dll *d = &start;
   while ((d = d->next) != NULL)
-    if (!wcscasecmp (name, d->name))
+    if (!wcscasecmp (modname, d->modname))
       return d;
 
   return NULL;
@@ -124,27 +128,21 @@ dll_list::operator[] (const PWCHAR name)
 dll *
 dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 {
-  /* Only use and compare basenames for DLLs.  Per MSDN, the Windows loader
-     re-uses the already loaded DLL, if the new DLL has the same basename
-     as the already loaded DLL.  It will not try to load the new DLL at all.
-     See http://msdn.microsoft.com/en-us/library/ms682586%28v=vs.85%29.aspx
-     Use GetModuleFileNameW + wcsrchr rather than GetModuleBaseNameW since
-     it's faster per MSDN, and it doesn't require to link against psapi. */
-  WCHAR buf[NT_MAX_PATH];
-  GetModuleFileNameW (h, buf, sizeof (buf));
-  PWCHAR name = wcsrchr (buf, L'\\') + 1;
+  WCHAR name[NT_MAX_PATH];
+  GetModuleFileNameW (h, name, sizeof (name));
   DWORD namelen = wcslen (name);
+  PWCHAR modname = wcsrchr (name, L'\\') + 1;
 
   guard (true);
   /* Already loaded? */
-  dll *d = dlls[name];
+  dll *d = dlls[modname];
   if (d)
     {
       if (!in_forkee)
 	d->count++;	/* Yes.  Bump the usage count. */
       else if (d->handle != h)
 	fabort ("%W: Loaded to different address: parent(%p) != child(%p)",
-		name, d->handle, h);
+		modname, d->handle, h);
       d->p = p;
     }
   else
@@ -156,6 +154,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 	 supplied info about this DLL. */
       d->count = 1;
       wcscpy (d->name, name);
+      d->modname = d->name + (modname - name);
       d->handle = h;
       d->has_dtors = true;
       d->p = p;
@@ -240,9 +239,9 @@ dll_list::topsort ()
   while ((d = d->next))
     {
 #ifdef DEBUGGING
-      paranoid_printf ("%W", d->name);
+      paranoid_printf ("%W", d->modname);
       for (int i = 1; i < -d->ndeps; i++)
-	paranoid_printf ("-> %W", d->deps[i - 1]->name);
+	paranoid_printf ("-> %W", d->deps[i - 1]->modname);
 #endif
 
       /* It would be really nice to be able to keep this information
@@ -409,7 +408,7 @@ dll_list::reserve_space ()
   for (dll* d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
     if (!VirtualAlloc (d->handle, d->image_size, MEM_RESERVE, PAGE_NOACCESS))
       fabort ("address space needed by '%W' (%p) is already occupied",
-	      d->name, d->handle);
+	      d->modname, d->handle);
 }
 
 /* Reload DLLs after a fork.  Iterates over the list of dynamically loaded
@@ -455,33 +454,32 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	 */
 	if (!retries && !VirtualFree (d->handle, 0, MEM_RELEASE))
 	  fabort ("unable to release protective reservation for %W (%08lx), %E",
-		  d->name, d->handle);
+		  d->modname, d->handle);
 
 	HMODULE h = LoadLibraryExW (d->name, NULL, DONT_RESOLVE_DLL_REFERENCES);
 	if (!h)
-	  fabort ("unable to create interim mapping for %W, %E",
-		  d->name);
+	  fabort ("unable to create interim mapping for %W, %E", d->name);
 	if (h != d->handle)
 	  {
 	    sigproc_printf ("%W loaded in wrong place: %08lx != %08lx",
-			    d->name, h, d->handle);
+			    d->modname, h, d->handle);
 	    FreeLibrary (h);
-	    DWORD reservation = reserve_at (d->name, (DWORD) h,
+	    DWORD reservation = reserve_at (d->modname, (DWORD) h,
 					    (DWORD) d->handle, d->image_size);
 	    if (!reservation)
 	      fabort ("unable to block off %p to prevent %W from loading there",
-		      h, d->name);
+		      h, d->modname);
 
 	    if (retries < DLL_RETRY_MAX)
 	      load_after_fork_impl (parent, d, retries+1);
 	    else
 	       fabort ("unable to remap %W to same address as parent (%08lx) - try running rebaseall",
-		       d->name, d->handle);
+		       d->modname, d->handle);
 
 	    /* once the above returns all the dlls are mapped; release
 	       the reservation and continue unwinding */
 	    sigproc_printf ("releasing blocked space at %08lx", reservation);
-	    release_at (d->name, reservation);
+	    release_at (d->modname, reservation);
 	    return;
 	  }
       }
@@ -497,7 +495,7 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	{
 	  if (!VirtualFree (d->handle, 0, MEM_RELEASE))
 	    fabort ("unable to release protective reservation for %W (%08lx), %E",
-		    d->name, d->handle);
+		    d->modname, d->handle);
 	}
       else
 	{
@@ -505,14 +503,14 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	     to ours or we wouldn't have gotten this far */
 	  if (!FreeLibrary (d->handle))
 	    fabort ("unable to unload interim mapping of %W, %E",
-		    d->name);
+		    d->modname);
 	}
       HMODULE h = LoadLibraryW (d->name);
       if (!h)
 	fabort ("unable to map %W, %E", d->name);
       if (h != d->handle)
 	fabort ("unable to map %W to same address as parent: %p != %p",
-		d->name, d->handle, h);
+		d->modname, d->handle, h);
     }
 }
 

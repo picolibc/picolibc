@@ -56,6 +56,7 @@ struct dll
   dll** deps;
   DWORD image_size;
   void* preferred_base;
+  PWCHAR modname;
   WCHAR name[1];
   void detach ();
   int init ();

@@ -1,3 +1,12 @@
+2012-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dll_init.h (struct dll): Re-add modname.
+	* dll_init.cc: Throughout, use modname where it was used before.
+	(dll_list::operator[]): Use modname.  Move comment from dll_list::alloc
+	here and remove hint about GetModuleBaseNameW.
+	(dll_list::alloc): Store full path in name, pointer to basename in
+	modname.  Search dll using modname.
+
 2012-02-08  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Reinstate opening tty
