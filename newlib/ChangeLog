@@ -1,3 +1,11 @@
+2012-02-08  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* libc/machine/arm/strcmp.S: New File.
+	* libc/machine/arm/strcmp.c: Deleted.
+	* libc/machine/arm/Makefile.am: Replaces strcmp.c with strcmp.S
+	* libc/machine/arm/Makefile.in: Regenerated.
+	* testsuite/newlib.string/strcmp-1.c: New file.
+
 2012-02-07  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/inttypes.h: Redefine pointer type macros.
