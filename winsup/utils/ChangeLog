@@ -1,3 +1,8 @@
+2012-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.cc: Add -v option to print version information as well, since
+	it's used in older csih.
+
 2012-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* utils.sgml: Fix typos.
