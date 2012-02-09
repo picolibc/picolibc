@@ -1,6 +1,6 @@
 /* fhandler_dev_dsp: code to emulate OSS sound model /dev/dsp
 
-   Copyright 2001, 2002, 2003, 2004, 2008, 2011 Red Hat, Inc
+   Copyright 2001, 2002, 2003, 2004, 2008, 2011, 2012 Red Hat, Inc
 
    Written by Andy Younger (andy@snoogie.demon.co.uk)
    Extended by Gerd Spalink (Gerd.Spalink@t-online.de)
@@ -478,6 +478,7 @@ fhandler_dev_dsp::Audio_out::write (const char *pSampleData, int nBytes)
 	{ // all data fits into the current block, with some space left
 	  memcpy (&pHdr_->lpData[bufferIndex_], pSampleData, bytes_to_write);
 	  bufferIndex_ += bytes_to_write;
+	  bytes_to_write = 0;
 	  break;
 	}
       else

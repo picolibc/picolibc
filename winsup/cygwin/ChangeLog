@@ -1,5 +1,11 @@
 2012-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_dsp.cc (fhandler_dev_dsp::Audio_out::write): Set
+	bytes_to_write to 0 in case it fits into the buffer, otherwise suffer
+	early EOF in caller.
+
+2012-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dll_init.h (struct dll): Re-add modname.
 	* dll_init.cc: Throughout, use modname where it was used before.
 	(dll_list::operator[]): Use modname.  Move comment from dll_list::alloc
