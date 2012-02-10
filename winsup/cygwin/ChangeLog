@@ -1,3 +1,8 @@
+2012-02-10  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* syscalls.cc (open): Semi-revert (?) to allowing open of a tty to
+	become controlling tty if there is no controlling tty.
+
 2012-02-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* exceptions.cc (setup_handler): Reduce system_printf to sigproc_printf
