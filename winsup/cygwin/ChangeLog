@@ -1,5 +1,11 @@
 2012-02-10  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* syscalls.cc (setsid): On second thought, in the spirit of keeping
+	things kludgy, set ctty to -2 here as a special flag, and...
+	(open): ...only eschew setting O_NOCTTY when that case is detected.
+
+2012-02-10  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* syscalls.cc (open): Semi-revert (?) to allowing open of a tty to
 	become controlling tty if there is no controlling tty.
 

@@ -1015,7 +1015,7 @@ setsid (void)
     syscall_printf ("hmm.  pgid %d pid %d", myself->pgid, myself->pid);
   else
     {
-      myself->ctty = -1;
+      myself->ctty = -2;
       myself->sid = getpid ();
       myself->pgid = getpid ();
       if (cygheap->ctty)
@@ -1275,7 +1275,7 @@ open (const char *unix_path, int flags, ...)
 	     tty for the process.  */
 	  int opt = PC_OPEN | ((flags & (O_NOFOLLOW | O_EXCL))
 			       ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
-	  if (!(flags & O_NOCTTY) && fd > 2 && myself->ctty > 0)
+	  if (!(flags & O_NOCTTY) && fd > 2 && myself->ctty != -2)
 	    {
 	      flags |= O_NOCTTY;
 	      opt |= PC_CTTY;	/* flag that, if opened, this fhandler could
