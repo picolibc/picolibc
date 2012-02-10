@@ -1,3 +1,16 @@
+2012-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (DEFAULT_STACKSIZE): Set to 1 Megs.  Drop comment about
+	RLIMIT_STACK.
+
+	* registry.cc (get_registry_hive_path): Expect the user hive path to
+	be never longer than MAX_PATH.  Don't prepend native NT path prefix
+	here.  Add comment.
+	(load_registry_hive): Prepend native NT path prefix here.  Additionally
+	try to load user's classes hive.
+	* uinfo.cc (cygheap_user::env_userprofile): Reduce size of
+	userprofile_env_buf to MAX_PATH.  Add comment.
+
 2012-02-10  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* syscalls.cc (setsid): On second thought, in the spirit of keeping

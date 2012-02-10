@@ -435,12 +435,13 @@ cygheap_user::env_userprofile (const char *name, size_t namelen)
   if (test_uid (puserprof, name, namelen))
     return puserprof;
 
-  WCHAR userprofile_env_buf[NT_MAX_PATH];
+  /* User hive path is never longer than MAX_PATH. */
+  WCHAR userprofile_env_buf[MAX_PATH];
   WCHAR win_id[UNLEN + 1]; /* Large enough for SID */
 
   cfree_and_set (puserprof, almost_null);
   if (get_registry_hive_path (get_windows_id (win_id), userprofile_env_buf))
-    sys_wcstombs_alloc (&puserprof, HEAP_STR, userprofile_env_buf + 4);
+    sys_wcstombs_alloc (&puserprof, HEAP_STR, userprofile_env_buf);
 
   return puserprof;
 }

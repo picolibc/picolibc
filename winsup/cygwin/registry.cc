@@ -1,7 +1,7 @@
 /* registry.cc: registry interface
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -214,6 +214,7 @@ reg_key::~reg_key ()
   key_is_invalid = 1;
 }
 
+/* The buffer path points to should be at least MAX_PATH bytes. */
 PWCHAR
 get_registry_hive_path (PCWSTR name, PWCHAR path)
 {
@@ -241,8 +242,7 @@ get_registry_hive_path (PCWSTR name, PWCHAR path)
 		    status);
       return NULL;
     }
-  wcpcpy (path, L"\\??\\");
-  ExpandEnvironmentStringsW (buf.Buffer, path + 4, NT_MAX_PATH - 4);
+  ExpandEnvironmentStringsW (buf.Buffer, path, MAX_PATH);
   debug_printf ("ProfileImagePath for %W: %W", name, path);
   return path;
 }
@@ -253,32 +253,56 @@ load_registry_hive (PCWSTR name)
   if (!name)
     return;
 
-  /* Fetch the path. */
+  /* Fetch the path. Prepend native NT path prefix. */
   tmp_pathbuf tp;
   PWCHAR path = tp.w_get ();
-  if (!get_registry_hive_path (name, path))
+  if (!get_registry_hive_path (name, wcpcpy (path, L"\\??\\")))
     return;
 
   WCHAR key[256];
+  PWCHAR path_comp;
   UNICODE_STRING ukey, upath;
   OBJECT_ATTRIBUTES key_attr, path_attr;
   NTSTATUS status;
 
-  /* Create the object attributes for key and path. */
+  /* Create keyname and path strings and object attributes. */
   wcpcpy (wcpcpy (key, L"\\Registry\\User\\"), name);
   RtlInitUnicodeString (&ukey, key);
   InitializeObjectAttributes (&key_attr, &ukey, OBJ_CASE_INSENSITIVE,
 			      NULL, NULL);
-  wcscat (path, L"\\NTUSER.DAT");
+  /* First try to load the "normal" registry hive, which is what the user
+     is supposed to see under HKEY_CURRENT_USER. */
+  path_comp = wcschr (path, L'\0');
+  wcpcpy (path_comp, L"\\ntuser.dat");
   RtlInitUnicodeString (&upath, path);
   InitializeObjectAttributes (&path_attr, &upath, OBJ_CASE_INSENSITIVE,
 			      NULL, NULL);
-  /* Load file into key. */
   status = NtLoadKey (&key_attr, &path_attr);
   if (!NT_SUCCESS (status))
-    debug_printf ("Loading user registry hive %S into %S failed: %p",
+    {
+      debug_printf ("Loading user registry hive %S into %S failed: %p",
+		    &upath, &ukey, status);
+      return;
+    }
+  debug_printf ("Loading user registry hive %S into %S SUCCEEDED: %p",
+		&upath, &ukey, status);
+  /* If loading the normal hive worked, try to load the classes hive into
+     the sibling *_Classes subkey, which is what the user is supposed to
+     see under HKEY_CLASSES_ROOT, merged with the machine-wide classes. */
+  wcscat (key, L"_Classes");
+  RtlInitUnicodeString (&ukey, key);
+  /* Path to UsrClass.dat changed in Vista to
+     \\AppData\\Local\\Microsoft\\Windows\\UsrClass.dat
+     but old path is still available via symlinks. */
+  wcpcpy (path_comp, L"\\Local Settings\\Application Data\\Microsoft\\"
+		      "Windows\\UsrClass.dat");
+  RtlInitUnicodeString (&upath, path);
+  /* Load UsrClass.dat file into key. */
+  status = NtLoadKey (&key_attr, &path_attr);
+  if (!NT_SUCCESS (status))
+    debug_printf ("Loading user classes hive %S into %S failed: %p",
 		  &upath, &ukey, status);
   else
-    debug_printf ("Loading user registry hive %S into %S SUCCEEDED: %p",
+    debug_printf ("Loading user classes hive %S into %S SUCCEEDED: %p",
 		  &upath, &ukey, status);
 }

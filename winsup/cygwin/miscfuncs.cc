@@ -549,8 +549,7 @@ thread_wrapper (VOID *arg)
   ExitThread (0);
 }
 
-/* FIXME: This should be settable via setrlimit (RLIMIT_STACK). */
-#define DEFAULT_STACKSIZE (512 * 1024)
+#define DEFAULT_STACKSIZE (1024 * 1024)
 
 HANDLE WINAPI
 CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
