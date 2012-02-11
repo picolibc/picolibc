@@ -1,3 +1,16 @@
+2012-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (DEFAULT_STACKSIZE): Remove.
+	(CygwinCreateThread): Simplify code by assuming that now stack-related
+	input values are undefined.  Set stack protection to PAGE_READWRITE,
+	as is default on Windows.  Add lengthy comment to explain POSIX
+	guardpage.
+	* thread.cc (pthread_attr::pthread_attr): Initialize stacksize as
+	PTHREAD_DEFAULT_STACKSIZE.  Initialize guardsize as
+	PTHREAD_DEFAULT_GUARDSIZE.
+	* thread.h (PTHREAD_DEFAULT_STACKSIZE): Define.  Add comment to explain.
+	(PTHREAD_DEFAULT_GUARDSIZE): Define.
+
 2012-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (DEFAULT_STACKSIZE): Set to 1 Megs.  Drop comment about

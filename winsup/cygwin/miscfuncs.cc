@@ -549,8 +549,6 @@ thread_wrapper (VOID *arg)
   ExitThread (0);
 }
 
-#define DEFAULT_STACKSIZE (1024 * 1024)
-
 HANDLE WINAPI
 CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 		    PVOID stackaddr, ULONG stacksize, ULONG guardsize,
@@ -572,30 +570,19 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
   wrapper_arg->func = thread_func;
   wrapper_arg->arg = thread_arg;
 
-  /* Set stacksize. */
-  real_stacksize = stacksize ?: DEFAULT_STACKSIZE;
-  if (real_stacksize < PTHREAD_STACK_MIN)
-    real_stacksize = PTHREAD_STACK_MIN;
   if (stackaddr)
     {
       /* If the application provided the stack, just use it. */
       wrapper_arg->stackaddr = (char *) stackaddr;
-      wrapper_arg->stackbase = (char *) stackaddr + real_stacksize;
+      wrapper_arg->stackbase = (char *) stackaddr + stacksize;
     }
   else
     {
       /* If not, we have to create the stack here. */
-      real_stacksize = roundup2 (real_stacksize, wincap.page_size ());
-      /* If no guardsize has been specified by the application, use the
-	 system pagesize as default. */
-      real_guardsize = (guardsize != (ULONG) -1)
-		       ? guardsize : wincap.page_size ();
-      if (real_guardsize)
-	real_guardsize = roundup2 (real_guardsize, wincap.page_size ());
-      /* Add the guardsize to the stacksize, but only if the stacksize and
-	 the guardsize have been explicitely specified. */
-      if (stacksize || guardsize != (ULONG) -1)
-	real_stacksize += real_guardsize;
+      real_stacksize = roundup2 (stacksize, wincap.page_size ());
+      real_guardsize = roundup2 (guardsize, wincap.page_size ());
+      /* Add the guardsize to the stacksize */
+      real_stacksize += real_guardsize;
       /* Now roundup the result to the next allocation boundary. */
       real_stacksize = roundup2 (real_stacksize,
 				 wincap.allocation_granularity ());
@@ -606,7 +593,7 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 	 the Cygwin DLL comes to mind. */
       real_stackaddr = VirtualAlloc (NULL, real_stacksize,
 				     MEM_RESERVE | MEM_TOP_DOWN,
-				     PAGE_EXECUTE_READWRITE);
+				     PAGE_READWRITE);
       if (!real_stackaddr)
 	return NULL;
       /* Set up committed region.  In contrast to the OS we commit 64K and
@@ -615,13 +602,19 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 				  + real_stacksize
 				  - wincap.allocation_granularity ();
       if (!VirtualAlloc (commitaddr, wincap.page_size (), MEM_COMMIT,
-			 PAGE_EXECUTE_READWRITE | PAGE_GUARD))
+			 PAGE_READWRITE | PAGE_GUARD))
 	goto err;
       commitaddr += wincap.page_size ();
       if (!VirtualAlloc (commitaddr, wincap.allocation_granularity ()
 				     - wincap.page_size (), MEM_COMMIT,
-			 PAGE_EXECUTE_READWRITE))
+			 PAGE_READWRITE))
 	goto err;
+      /* If the guardsize is != 0 (which is the default), set up a POSIX
+      	 guardpage at the end of the stack. This isn't the same as the
+	 Windows guardpage, which is used to convert reserved stack to
+	 commited stack if necessary.  Rather, the POSIX guardpage consists
+	 of one or more memory pages with NOACCESS protection.  It's supposed
+	 to safeguard memory areas beyond the stack against stack overflow. */
       if (real_guardsize)
 	VirtualAlloc (real_stackaddr, real_guardsize, MEM_COMMIT,
 		      PAGE_NOACCESS);
