@@ -1,3 +1,11 @@
+2012-02-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* exception.h (stackdump): Declare.
+	* exceptions.cc (stackdump): Rework to perform all operations needed
+	for a stackdump and to avoid recursion.
+	(exception::handle): Use simplified stackdump interface.
+	* sigproc.cc (signal::exit): Ditto.  Delete now, uneeded declaration.
+
 2012-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (DEFAULT_STACKSIZE): Remove.

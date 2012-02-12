@@ -23,6 +23,7 @@ details. */
 #include "shared_info.h"
 #include "cygtls.h"
 #include "ntdll.h"
+#include "exception.h"
 
 /*
  * Convenience defines
@@ -373,8 +374,6 @@ close_my_readsig ()
 void
 _cygtls::signal_exit (int rc)
 {
-  extern void stackdump (DWORD, int, bool);
-
   HANDLE myss = my_sendsig;
   my_sendsig = NULL;		 /* Make no_signals_allowed return true */
 
@@ -414,7 +413,7 @@ _cygtls::signal_exit (int rc)
     }
 
   if ((rc & 0x80) && !try_to_debug ())
-    stackdump (thread_context.ebp, 1, 1);
+    stackdump (thread_context.ebp, true);
 
   lock_process until_exit (true);
   if (have_execed || exit_state > ES_PROCESS_LOCKED)

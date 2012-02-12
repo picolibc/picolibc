@@ -280,21 +280,21 @@ stack_info::walk ()
 }
 
 void
-stackdump (DWORD ebp, int open_file, bool isexception)
+stackdump (DWORD ebp, PCONTEXT in, EXCEPTION_RECORD *e)
 {
   static bool already_dumped;
 
-  if (cygheap->rlim_core == 0UL || (open_file && already_dumped))
+  if (already_dumped || cygheap->rlim_core == 0Ul)
     return;
-
-  if (open_file)
-    open_stackdumpfile ();
-
   already_dumped = true;
+  open_stackdumpfile ();
+
+  if (e)
+    dump_exception (e, in);
 
   int i;
 
-  thestack.init (ebp, 1, !isexception);	/* Initialize from the input CONTEXT */
+  thestack.init (ebp, 1, !in);	/* Initialize from the input CONTEXT */
   small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
   for (i = 0; i < 16 && thestack++; i++)
     {
@@ -356,7 +356,7 @@ cygwin_stackdump ()
   CONTEXT c;
   c.ContextFlags = CONTEXT_FULL;
   GetThreadContext (GetCurrentThread (), &c);
-  stackdump (c.Ebp, 0, 0);
+  stackdump (c.Ebp);
 }
 
 #define TIME_TO_WAIT_FOR_DEBUGGER 10000
@@ -660,11 +660,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 
 	  rtl_unwind (frame, e);
 	  if (cygheap->rlim_core > 0UL)
-	    {
-	      open_stackdumpfile ();
-	      dump_exception (e, in);
-	      stackdump ((DWORD) ebp, 0, 1);
-	    }
+	    stackdump ((DWORD) ebp, in, e);
 	}
 
       if (e->ExceptionCode == STATUS_ACCESS_VIOLATION)
