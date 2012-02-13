@@ -16,10 +16,12 @@ details. */
 #define WRITE_LOCK 1
 #define READ_LOCK  2
 
-/* Default is a 1 Megs stack with a 4K guardpage.  Since the pthread stacksize
-   does not include the guardpage size, but we don't want to waste another 64K,
-   subtract the default guardpage size from the stacksize. */
-#define PTHREAD_DEFAULT_STACKSIZE (1024 * 1024 - wincap.page_size ())
+/* Default is a 1 Megs stack with a 4K guardpage.  The pthread stacksize
+   does not include the guardpage size, so we subtract the default guardpage
+   size. Additionally, the Windows stack handling disallows to use the last
+   two pages as guard page  (tested on XP and W7).  That results in a zone of
+   three pages which have to be subtract to get the actual stack size. */
+#define PTHREAD_DEFAULT_STACKSIZE (1024 * 1024 - 3 * wincap.page_size ())
 #define PTHREAD_DEFAULT_GUARDSIZE (wincap.page_size ())
 
 #include <pthread.h>

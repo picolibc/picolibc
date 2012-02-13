@@ -1192,6 +1192,15 @@ strcoll (const char *s1, const char *s2)
   return ret - CSTR_EQUAL;
 }
 
+/* BSD.  Used in glob.cc and regcomp.c, for instance. */
+extern "C" int
+__collate_range_cmp (int c1, int c2)
+{
+  char s1[2] = { c1, '\0' };
+  char s2[2] = { c2, '\0' };
+  return strcoll (s1, s2);
+}
+
 extern "C" size_t
 wcsxfrm (wchar_t *ws1, const wchar_t *ws2, size_t wsn)
 {

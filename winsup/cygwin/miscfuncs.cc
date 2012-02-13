@@ -527,7 +527,7 @@ thread_wrapper (VOID *arg)
 	   xorl  %%ebp, %%ebp          # Set ebp to 0                \n\
 	   # Make gcc 3.x happy and align the stack so that it is    \n\
 	   # 16 byte aligned right before the final call opcode.     \n\
-	   andl  $-16, %%esp           # 16 bit align                \n\
+	   andl  $-16, %%esp           # 16 byte align               \n\
 	   addl  $-12, %%esp           # 12 bytes + 4 byte arg = 16  \n\
 	   # Now we moved to the new stack.  Save thread func address\n\
 	   # and thread arg on new stack                             \n\
@@ -578,11 +578,17 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
     }
   else
     {
+      char *commitaddr;
+
       /* If not, we have to create the stack here. */
       real_stacksize = roundup2 (stacksize, wincap.page_size ());
       real_guardsize = roundup2 (guardsize, wincap.page_size ());
       /* Add the guardsize to the stacksize */
       real_stacksize += real_guardsize;
+      /* If we use the default Windows guardpage method, we have to take
+	 the 2 pages dead zone into account. */
+      if (real_guardsize == wincap.page_size ())
+	  real_stacksize += 2 * wincap.page_size ();
       /* Now roundup the result to the next allocation boundary. */
       real_stacksize = roundup2 (real_stacksize,
 				 wincap.allocation_granularity ());
@@ -596,28 +602,43 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 				     PAGE_READWRITE);
       if (!real_stackaddr)
 	return NULL;
-      /* Set up committed region.  In contrast to the OS we commit 64K and
-	 set up just a single guard page at the end. */
-      char *commitaddr = (char *) real_stackaddr
-				  + real_stacksize
-				  - wincap.allocation_granularity ();
-      if (!VirtualAlloc (commitaddr, wincap.page_size (), MEM_COMMIT,
-			 PAGE_READWRITE | PAGE_GUARD))
-	goto err;
-      commitaddr += wincap.page_size ();
-      if (!VirtualAlloc (commitaddr, wincap.allocation_granularity ()
-				     - wincap.page_size (), MEM_COMMIT,
-			 PAGE_READWRITE))
-	goto err;
-      /* If the guardsize is != 0 (which is the default), set up a POSIX
-      	 guardpage at the end of the stack. This isn't the same as the
-	 Windows guardpage, which is used to convert reserved stack to
-	 commited stack if necessary.  Rather, the POSIX guardpage consists
-	 of one or more memory pages with NOACCESS protection.  It's supposed
-	 to safeguard memory areas beyond the stack against stack overflow. */
-      if (real_guardsize)
-	VirtualAlloc (real_stackaddr, real_guardsize, MEM_COMMIT,
-		      PAGE_NOACCESS);
+      /* Set up committed region.  Two cases: */
+      if (real_guardsize != wincap.page_size ())
+	{
+	  /* If guardsize is set to something other than the page size, we
+	     commit the entire stack and, if guardsize is > 0, we set up a
+	     POSIX guardpage.  We don't set up a Windows guardpage. */
+	  if (!VirtualAlloc (real_stackaddr, real_guardsize, MEM_COMMIT,
+			     PAGE_NOACCESS))
+	    goto err;
+	  commitaddr = (char *) real_stackaddr + real_guardsize;
+	  if (!VirtualAlloc (commitaddr, real_stacksize - real_guardsize,
+			     MEM_COMMIT, PAGE_READWRITE))
+	    goto err;
+	}
+      else
+	{
+	  /* If guardsize is exactly the page_size, we can assume that the
+	     application will behave Windows conformant in terms of stack usage.
+	     We can especially assume that it never allocates more than one
+	     page at a time (alloca/_chkstk).  Therefore, this is the default
+	     case which allows a Windows compatible stack setup with a
+	     reserved region, a guard page, and a commited region.  We don't
+	     need to set up a POSIX guardpage since Windows already handles
+	     stack overflow: Trying to extend the stack into the last three
+	     pages of the stack results in a SEGV.
+	     We always commit 64K here, starting with the guardpage. */
+	  commitaddr = (char *) real_stackaddr + real_stacksize
+				- wincap.allocation_granularity ();
+	  if (!VirtualAlloc (commitaddr, wincap.page_size (), MEM_COMMIT,
+			     PAGE_READWRITE | PAGE_GUARD))
+	    goto err;
+	  commitaddr += wincap.page_size ();
+	  if (!VirtualAlloc (commitaddr, wincap.allocation_granularity ()
+					 - wincap.page_size (), MEM_COMMIT,
+			     PAGE_READWRITE))
+	    goto err;
+      	}
       wrapper_arg->stackaddr = (char *) real_stackaddr;
       wrapper_arg->stackbase = (char *) real_stackaddr + real_stacksize;
       wrapper_arg->commitaddr = commitaddr;

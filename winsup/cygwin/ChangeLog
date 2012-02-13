@@ -1,3 +1,22 @@
+2012-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (clean): Remove non-existant regexp dir.
+
+	* collate.h: New header.
+	(__collate_range_cmp): Declare.
+	(__collate_load_error): Define.
+	* glob.cc: Pull in latest version from FreeBSD.  Simplify and reduce
+	Cygwin-specific changes.
+	* regex/regcomp.c: Include collate.h on Cygwin as well.
+	(__collate_range_cmp): Move from here...
+	* nlsfuncs.cc (__collate_range_cmp): ...to here.
+
+	* miscfuncs.cc (thread_wrapper): Fix typo in comment.
+	(CygwinCreateThread): Take dead zone of Windows stack into account.
+	Change the way how the stack is commited and how to handle guardpages.
+	Explain how and why.
+	* thread.h (PTHREAD_DEFAULT_STACKSIZE): Change definition.  Explain why.
+
 2012-02-12  Yaakov Selkowitz  <yselkowitz@users.sourceforg.net>
 
 	* include/pthread.h: Include time.h as required by POSIX.
