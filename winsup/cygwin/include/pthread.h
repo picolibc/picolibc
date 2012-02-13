@@ -1,7 +1,7 @@
 /* pthread.h: POSIX pthread interface
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006,
-   2007, 2011 Red Hat, Inc.
+   2007, 2011, 2012 Red Hat, Inc.
 
    Written by Marco Fuykschot <marco@ddi.nl>
 
@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <sched.h>
+#include <time.h>
 
 #ifndef _PTHREAD_H
 #define _PTHREAD_H

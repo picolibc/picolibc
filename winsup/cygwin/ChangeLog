@@ -1,3 +1,7 @@
+2012-02-12  Yaakov Selkowitz  <yselkowitz@users.sourceforg.net>
+
+	* include/pthread.h: Include time.h as required by POSIX.
+
 2012-02-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* exception.h (stackdump): Declare.
