@@ -2393,15 +2393,7 @@ fhandler_cygdrive::fstat (struct __stat64 *buf)
   fhandler_base::fstat (buf);
   buf->st_ino = 2;
   buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
-  if (!ndrives)
-    set_drives ();
-  char flptst[] = "X:";
-  int n = ndrives;
-  for (const char *p = pdrive; p && *p; p = strchr (p, '\0') + 1)
-    if (is_floppy ((flptst[0] = *p, flptst))
-	|| GetFileAttributes (p) == INVALID_FILE_ATTRIBUTES)
-      n--;
-  buf->st_nlink = n + 2;
+  buf->st_nlink = 1;
   return 0;
 }
 

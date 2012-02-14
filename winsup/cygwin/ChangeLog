@@ -1,5 +1,11 @@
 2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_cygdrive::fstat): Don't bother to
+	set st_nlink correctly, just set it to 1 to avoid potential network
+	timeouts.
+
+2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* flock.cc (lf_setlock): Don't close waited lock object handle before
 	we own the node lock.  Fix comment.
 
