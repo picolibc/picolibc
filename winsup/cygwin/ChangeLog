@@ -9,7 +9,7 @@
 
 	* init.cc (search_for): Calculate for every new process rather than
 	using shared value.
-	(threadfunc_ix): Fill in for ever new process rather than sing shared
+	(threadfunc_ix): Fill in for every new process rather than sing shared
 	value.
 
 2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
