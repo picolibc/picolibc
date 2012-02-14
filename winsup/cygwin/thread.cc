@@ -27,15 +27,11 @@ details. */
 #include "miscfuncs.h"
 #include "path.h"
 #include <stdlib.h>
-#include "pinfo.h"
 #include "sigproc.h"
-#include "perprocess.h"
-#include "cygtls.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
-#include "miscfuncs.h"
 
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();

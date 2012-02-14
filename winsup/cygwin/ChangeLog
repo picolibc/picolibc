@@ -1,3 +1,7 @@
+2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc: Drop including unused headers.
+
 2012-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (struct thread_wrapper_arg): Convert char * to PBYTE.
