@@ -1,6 +1,6 @@
 /* transport_pipes.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2009 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2009, 2012 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -84,17 +84,11 @@ transport_layer_pipes::transport_layer_pipes ()
     _is_accepted_endpoint (false),
     _is_listening_endpoint (false)
 {
-#ifdef __INSIDE_CYGWIN__
-  extern WCHAR installation_key_buf[18];
-  wcpcpy (wcpcpy (wcpcpy (_pipe_name, PIPE_NAME_PREFIX), installation_key_buf),
-	  PIPE_NAME_SUFFIX);
-#else
   wchar_t cyg_instkey[18];
 
   wchar_t *p = wcpcpy (_pipe_name, PIPE_NAME_PREFIX);
   if (!cygwin_internal (CW_GET_INSTKEY, cyg_instkey))
     wcpcpy (wcpcpy (p, cyg_instkey), PIPE_NAME_SUFFIX);
-#endif
 }
 
 transport_layer_pipes::~transport_layer_pipes ()

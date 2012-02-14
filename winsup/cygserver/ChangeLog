@@ -1,3 +1,8 @@
+2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
+	Always use cygwin_internal to fetch installation key.
+
 2011-10-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver.cc (print_usage): Align output to utilities in utils
