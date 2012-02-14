@@ -16,8 +16,8 @@ details. */
 
 static DWORD _my_oldfunc;
 
-static char *search_for  __attribute__((section (".cygwin_dll_common"), shared)) = (char *) cygthread::stub;
-unsigned threadfunc_ix[8] __attribute__((section (".cygwin_dll_common"), shared));
+static char *search_for  = (char *) cygthread::stub;
+unsigned threadfunc_ix[8];
 
 static bool dll_finished_loading;
 #define OLDFUNC_OFFSET -1

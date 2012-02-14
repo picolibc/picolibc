@@ -1,3 +1,17 @@
+2012-02-14  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (_pinfo::set_ctty): Revert 2012-02-07 change to skip
+	function if tty in question == our ctty.
+
+	* syscalls.cc (setsid): Avoid two function calls.
+
+	* dtable.cc (dtable::dup_worker): Remove debugging.
+
+	* init.cc (search_for): Calculate for every new process rather than
+	using shared value.
+	(threadfunc_ix): Fill in for ever new process rather than sing shared
+	value.
+
 2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_cygdrive::fstat): Don't bother to

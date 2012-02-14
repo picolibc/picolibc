@@ -435,7 +435,7 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 {
   tty_min& tc = *fh->tc ();
   debug_printf ("old %s, ctty device number %p, tc.ntty device number %p flags & O_NOCTTY %p", __ctty (), ctty, tc.ntty, flags & O_NOCTTY);
-  if (fh && &tc && (ctty <= 0 || ctty != tc.ntty) && !(flags & O_NOCTTY))
+  if (fh && &tc && (ctty <= 0 || ctty == tc.ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc.ntty;
       if (cygheap->ctty != fh->archetype)
@@ -463,9 +463,7 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 		      __ctty (), sid, pid, pgid, tc.getpgid (), tc.getsid ());
       if (!cygwin_finished_initializing && !myself->cygstarted
 	  && pgid == pid && tc.getpgid () && tc.getsid ())
-	{
-	  pgid = tc.getpgid ();
-	}
+	pgid = tc.getpgid ();
 
       /* May actually need to do this:
 

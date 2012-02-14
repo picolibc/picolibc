@@ -1016,8 +1016,8 @@ setsid (void)
   else
     {
       myself->ctty = -2;
-      myself->sid = getpid ();
-      myself->pgid = getpid ();
+      myself->sid = myself->pid;
+      myself->pgid = myself->pid;
       if (cygheap->ctty)
 	cygheap->close_ctty ();
       syscall_printf ("sid %d, pgid %d, %s", myself->sid, myself->pgid, myctty ());

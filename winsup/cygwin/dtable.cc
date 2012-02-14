@@ -677,16 +677,8 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
 
 	  /* The O_CLOEXEC flag enforces close-on-exec behaviour. */
 	  newfh->set_close_on_exec (!!(flags & O_CLOEXEC));
-	  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
-#ifdef DEBUGGING
-	  debug_printf ("duped output_handles old %p, new %p",
-			oldfh->get_output_handle (),
-			newfh->get_output_handle ());
-	  if (oldfh->archetype)
-	    debug_printf ("duped output_handles archetype old %p, archetype new %p",
-			  oldfh->archetype->get_output_handle (),
-			  newfh->archetype->get_output_handle ());
-#endif /*DEBUGGING*/
+	  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (),
+			oldfh->get_io_handle (), newfh->get_io_handle ());
 	}
     }
   return newfh;
