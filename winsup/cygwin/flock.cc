@@ -1039,11 +1039,11 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
       DWORD ret = WaitForMultipleObjects (wait_count, w4, FALSE,
 					  proc ? INFINITE : 100L);
       SetThreadPriority (GetCurrentThread (), old_prio);
-      /* Always close handles before locking the node. */
-      NtClose (obj);
       if (proc)
 	CloseHandle (proc);
       node->LOCK ();
+      /* Never close lock object handle outside of node lock! */
+      NtClose (obj);
       if (ret == WAIT_SIGNAL_ARRIVED)
 	{
 	  /* A signal came in. */

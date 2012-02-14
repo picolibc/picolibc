@@ -1,5 +1,10 @@
 2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (lf_setlock): Don't close waited lock object handle before
+	we own the node lock.  Fix comment.
+
+2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (init_cygheap::init_installation_root): Convert function
 	init_installation_root into a cygheap method.
 	* cygheap.h (struct init_cygheap): Move installation_root,
