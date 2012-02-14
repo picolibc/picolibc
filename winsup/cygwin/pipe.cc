@@ -1,7 +1,7 @@
 /* pipe.cc: pipe for Cygwin.
 
    Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2011 Hat, Inc.
+   2008, 2009, 2010, 2011, 2012 Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -212,7 +212,7 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 
   char pipename[MAX_PATH];
   const size_t len = __small_sprintf (pipename, PIPE_INTRO "%S-",
-				      &installation_key);
+				      &cygheap->installation_key);
   if (name)
     strcpy (pipename + len, name);
 

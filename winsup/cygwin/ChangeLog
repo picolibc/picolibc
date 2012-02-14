@@ -1,5 +1,36 @@
 2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.cc (init_cygheap::init_installation_root): Convert function
+	init_installation_root into a cygheap method.
+	* cygheap.h (struct init_cygheap): Move installation_root,
+	installation_key, and installation_key_buf from shared
+	.cygwin_dll_common DLL section to cygheap.  Declare new method
+	init_installation_root.
+	* dtable.cc (handle_to_fn): Accommodate the move of installation strings
+	to the cygheap.
+	* external.cc (cygwin_internal): Ditto.
+	* fhandler_console.cc (fhandler_console::open_shared_console): Ditto.
+	* fhandler_mailslot.cc (fhandler_mailslot::get_object_attr): Ditto.
+	* fhandler_tty.cc: Ditto, throughout.
+	* mount.cc (mount_info::init): Ditto.
+	* pipe.cc (fhandler_pipe::create): Ditto.
+	* shared.cc: Ditto, throughout.
+	(installation_root): Remove.
+	(installation_key): Move to cygheap.
+	(installation_key_buf): Ditto.
+	(installation_root_inited): Remove.
+	(SPIN_WAIT): Remove.
+	(init_installation_root): Move to cygheap.
+	(memory_init): Call cygheap->init_installation_root right after
+	cygheap->user.init.  Drop call of init_installation_root function.
+	* shared_info.h (init_installation_root): Drop declaration.
+	(installation_root): Ditto.
+	(installation_key): Ditto.
+	* uinfo.cc (pwdgrp::load): Accommodate the move of installation strings
+	to the cygheap.
+
+2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.cc: Drop including unused headers.
 
 2012-02-13  Corinna Vinschen  <corinna@vinschen.de>

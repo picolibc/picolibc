@@ -1,7 +1,7 @@
 /* external.cc: Interface to Cygwin internals from external programs.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -468,9 +468,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	break;
       case CW_GET_INSTKEY:
 	{
-	  extern WCHAR installation_key_buf[18];
 	  PWCHAR dest = va_arg (arg, PWCHAR);
-	  wcscpy (dest, installation_key_buf);
+	  wcscpy (dest, cygheap->installation_key_buf);
 	  res = 0;
 	}
 	break;

@@ -280,6 +280,9 @@ struct init_cygheap: public mini_cygheap
 {
   _cmalloc_entry *chain;
   char *buckets[32];
+  WCHAR installation_root[PATH_MAX];
+  UNICODE_STRING installation_key;
+  WCHAR installation_key_buf[18];
   cygheap_root root;
   cygheap_user user;
   user_heap_info user_heap;
@@ -303,6 +306,7 @@ struct init_cygheap: public mini_cygheap
   } inode_list;			/* Global inode pointer for adv. locking. */
   hook_chain hooks;
   void close_ctty ();
+  void init_installation_root ();
 };
 
 

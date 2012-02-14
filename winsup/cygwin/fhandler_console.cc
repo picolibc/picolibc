@@ -82,7 +82,7 @@ fhandler_console::console_state *
 fhandler_console::open_shared_console (HWND hw, HANDLE& h, bool& create)
 {
   wchar_t namebuf[(sizeof "XXXXXXXXXXXXXXXXXX-consNNNNNNNNNN")];
-  __small_swprintf (namebuf, L"%S-cons%p", &installation_key, hw);
+  __small_swprintf (namebuf, L"%S-cons%p", &cygheap->installation_key, hw);
 
   shared_locations m = create ? SH_SHARED_CONSOLE : SH_JUSTOPEN;
   console_state *res = (console_state *)

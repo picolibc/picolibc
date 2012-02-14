@@ -23,6 +23,8 @@
 #include "heap.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "registry.h"
+#include "ntdll.h"
 #include <unistd.h>
 #include <wchar.h>
 
@@ -136,6 +138,84 @@ _csbrk (int sbs)
     }
 
   return prebrk;
+}
+
+/* Use absolute path of cygwin1.dll to derive the Win32 dir which
+   is our installation_root.  Note that we can't handle Cygwin installation
+   root dirs of more than 4K path length.  I assume that's ok...
+
+   This function also generates the installation_key value.  It's a 64 bit
+   hash value based on the path of the Cygwin DLL itself.  It's subsequently
+   used when generating shared object names.  Thus, different Cygwin
+   installations generate different object names and so are isolated from
+   each other.
+
+   Having this information, the installation key together with the
+   installation root path is written to the registry.  The idea is that
+   cygcheck can print the paths into which the Cygwin DLL has been
+   installed for debugging purposes.
+
+   Last but not least, the new cygwin properties datastrcuture is checked
+   for the "disabled_key" value, which is used to determine whether the
+   installation key is actually added to all object names or not.  This is
+   used as a last resort for debugging purposes, usually.  However, there
+   could be another good reason to re-enable object name collisions between
+   multiple Cygwin DLLs, which we're just not aware of right now.  Cygcheck
+   can be used to change the value in an existing Cygwin DLL binary. */
+void
+init_cygheap::init_installation_root ()
+{
+  if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
+    api_fatal ("Can't initialize Cygwin installation root dir.\n"
+	       "GetModuleFileNameW(%p, %p, %u), %E",
+	       cygwin_hmodule, installation_root, PATH_MAX);
+  PWCHAR p = installation_root;
+  if (wcsncmp (p, L"\\\\?\\", 4))	/* No long path prefix. */
+    {
+      if (!wcsncasecmp (p, L"\\\\", 2))	/* UNC */
+	{
+	  p = wcpcpy (p, L"\\??\\UN");
+	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 6);
+	  *p = L'C';
+	}
+      else
+	{
+	  p = wcpcpy (p, L"\\??\\");
+	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
+	}
+    }
+  installation_root[1] = L'?';
+
+  RtlInitEmptyUnicodeString (&installation_key, installation_key_buf,
+			     sizeof installation_key_buf);
+  RtlInt64ToHexUnicodeString (hash_path_name (0, installation_root),
+			      &installation_key, FALSE);
+
+  PWCHAR w = wcsrchr (installation_root, L'\\');
+  if (w)
+    {
+      *w = L'\0';
+      w = wcsrchr (installation_root, L'\\');
+    }
+  if (!w)
+    api_fatal ("Can't initialize Cygwin installation root dir.\n"
+	       "Invalid DLL path");
+  *w = L'\0';
+
+  for (int i = 1; i >= 0; --i)
+    {
+      reg_key r (i, KEY_WRITE, _WIDE (CYGWIN_INFO_INSTALLATIONS_NAME),
+		 NULL);
+      if (NT_SUCCESS (r.set_string (installation_key_buf,
+				    installation_root)))
+	break;
+    }
+
+  if (cygwin_props.disable_key)
+    {
+      installation_key.Length = 0;
+      installation_key.Buffer[0] = L'\0';
+    }
 }
 
 void __stdcall

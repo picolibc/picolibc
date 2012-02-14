@@ -1,6 +1,6 @@
 /* fhandler_mailslot.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2005, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   Copyright 2005, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -11,8 +11,11 @@
 #include "winsup.h"
 
 #include "cygerrno.h"
+#include "security.h"
 #include "path.h"
 #include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include "ntdll.h"
 #include "shared_info.h"
 #include "tls_pbuf.h"
@@ -51,7 +54,7 @@ fhandler_mailslot::get_object_attr (OBJECT_ATTRIBUTES &attr,
 {
 
   RtlCopyUnicodeString (path, pc.get_nt_native_path ());
-  RtlAppendUnicodeStringToString (path, &installation_key);
+  RtlAppendUnicodeStringToString (path, &cygheap->installation_key);
   InitializeObjectAttributes (&attr, path,
 			      OBJ_CASE_INSENSITIVE
 			      | (flags & O_CLOEXEC ? 0 : OBJ_INHERIT),
