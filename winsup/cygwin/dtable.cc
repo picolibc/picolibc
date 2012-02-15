@@ -262,6 +262,7 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 void
 dtable::init_std_file_from_handle (int fd, HANDLE handle)
 {
+  tmp_pathbuf tp;
   CONSOLE_SCREEN_BUFFER_INFO buf;
   DCB dcb;
   unsigned bin = O_BINARY;
@@ -275,7 +276,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
   SetLastError (0);
   DWORD access = 0;
   DWORD ft = GetFileType (handle);
-  char name[NT_MAX_PATH];
+  char *name = tp.c_get ();
   name[0] = '\0';
   if (ft == FILE_TYPE_UNKNOWN && GetLastError () == ERROR_INVALID_HANDLE)
     /* can't figure out what this is */;
@@ -889,6 +890,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
   tmp_pathbuf tp;
   ULONG len = 0;
   WCHAR *maxmatchdos = NULL;
+  PWCHAR device = tp.w_get ();
   int maxmatchlen = 0;
   OBJECT_NAME_INFORMATION *ntfn = (OBJECT_NAME_INFORMATION *) tp.w_get ();
 
@@ -949,8 +951,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
       for (WCHAR *s = fnbuf; *s; s = wcschr (s, '\0') + 1)
 	{
-	  WCHAR device[NT_MAX_PATH];
-	  if (!QueryDosDeviceW (s, device, sizeof (device)))
+	  if (!QueryDosDeviceW (s, device, NT_MAX_PATH))
 	    continue;
 	  if (wcschr (s, ':') == NULL)
 	    continue;
