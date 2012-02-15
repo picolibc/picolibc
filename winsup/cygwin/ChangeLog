@@ -1,5 +1,13 @@
 2012-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc: Revert change from 2012-02-13 which used the
+	Windows-provided stack rather than an own stack created in
+	CygwinCreateThread.
+	(struct thread_wrapper_arg): Rename commitsize to stacklimit.
+	(CygwinCreateThread): Rename commitsize to real_stacklimit.
+
+2012-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::init_std_file_from_handle): Use tmp_pathbuf for
 	name.
 	(handle_to_fn): Ditto for device.  Fix size in QueryDosDeviceW call.
