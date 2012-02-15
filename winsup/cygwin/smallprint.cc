@@ -1,6 +1,7 @@
 /* smallprint.cc: small print routines for WIN32
 
-   Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009
+   Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006,
+             2007, 2008, 2009, 2012
    Red Hat, Inc.
 
 This file is part of Cygwin.
@@ -11,6 +12,7 @@ details. */
 
 #include "winsup.h"
 #include "ntdll.h"
+#include "sync.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include <wchar.h>
@@ -22,6 +24,34 @@ details. */
 #define rnargLL(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, unsigned long long), len, pad, LLMASK)
 
 static const char hex_str[] = "0123456789ABCDEF";
+
+class tmpbuf
+{
+  static WCHAR buf[NT_MAX_PATH];
+  static muto lock;
+  bool locked;
+public:
+  operator WCHAR * ()
+  {
+    if (!locked)
+      {
+	lock.init ("smallprint_buf")->acquire ();
+	locked = true;
+      }
+    return buf;
+  }
+  operator char * () {return (char *) ((WCHAR *) *this);}
+
+  tmpbuf (): locked (false) {};
+  ~tmpbuf ()
+  {
+    if (locked)
+      lock.release ();
+  }
+};
+
+WCHAR tmpbuf::buf[NT_MAX_PATH];
+muto tmpbuf::lock;
 
 static char __fastcall *
 __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned long long mask)
@@ -65,7 +95,7 @@ __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned
 int
 __small_vsprintf (char *dst, const char *fmt, va_list ap)
 {
-  char tmp[NT_MAX_PATH];
+  tmpbuf tmp;
   char *orig = dst;
   const char *s;
   PWCHAR w;
@@ -367,7 +397,7 @@ __wrn (PWCHAR dst, int base, int dosign, long long val, int len, int pad, unsign
 int
 __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 {
-  WCHAR tmp[NT_MAX_PATH];
+  tmpbuf tmp;
   PWCHAR orig = dst;
   const char *s;
   PWCHAR w;
