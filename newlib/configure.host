@@ -788,7 +788,7 @@ if [ "x${newlib_atexit_dynamic_alloc}" = "x" ]; then
 fi
 
 # Remove rpc headers if xdr_dir not specified
-if [ "x${xdir_dir}" = "x" ]; then
+if [ "x${xdr_dir}" = "x" ]; then
 	noinclude="${noinclude} rpc/types.h rpc/xdr.h"
 fi
 

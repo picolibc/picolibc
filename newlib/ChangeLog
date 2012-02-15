@@ -1,3 +1,7 @@
+2012-02-15  Christopher Faylor  <me.newlib2012@cgf.cx>
+
+	* configure.host: Fix typo: xdir_dir -> xdr_dir.
+
 2012-02-09  Eric Blake  <eblake@redhat.com>
 
 	* libc/include/_ansi.h (_ELIDABLE_INLINE): Fix C99 mode.
