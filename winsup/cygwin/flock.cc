@@ -1006,16 +1006,22 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
       HANDLE w4[4] = { obj, NULL, NULL, NULL };
       DWORD wait_count = 1;
 
+      DWORD timeout;
       HANDLE proc = NULL;
       if (lock->lf_flags & F_POSIX)
 	{
 	  proc = OpenProcess (SYNCHRONIZE, FALSE, block->lf_wid);
 	  if (!proc)
-	    debug_printf ("Can't sync with process holding a POSIX lock "
-			  "(Win32 pid %lu): %E", block->lf_wid);
+	    timeout = 0L;
 	  else
-	    w4[wait_count++] = proc;
+	    {
+	      w4[wait_count++] = proc;
+	      timeout = INFINITE;
+	    }
 	}
+      else
+	timeout = 100L;
+
       DWORD WAIT_SIGNAL_ARRIVED = WAIT_OBJECT_0 + wait_count;
       w4[wait_count++] = signal_arrived;
 
@@ -1033,11 +1039,10 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	 creator process.  We have to make sure the event object is in a
 	 signalled state, or that it has gone away.  The latter we can only
 	 recognize by retrying to fetch the block list, so we must not wait
-	 infinitely.  Same problem for POSIX locks if the process has already
-	 exited at the time we're trying to open the process. */
+	 infinitely.  For POSIX locks, if the process has already exited,
+	 just check if a signal or a thread cancel request arrived. */
       SetThreadPriority (GetCurrentThread (), priority);
-      DWORD ret = WaitForMultipleObjects (wait_count, w4, FALSE,
-					  proc ? INFINITE : 100L);
+      DWORD ret = WaitForMultipleObjects (wait_count, w4, FALSE, timeout);
       SetThreadPriority (GetCurrentThread (), old_prio);
       if (proc)
 	CloseHandle (proc);
@@ -1320,12 +1325,9 @@ lf_getblock (lockf_t *lock, inode_t *node)
 	  /* Open the event object for synchronization. */
 	  if (overlap->open_lock_obj ())
 	    {
-	      /* If we found a POSIX lock, it will block us. */
-	      if (overlap->lf_flags & F_POSIX)
-		return overlap;
-	      /* In case of BSD flock locks, check if the event object is
-		 signalled.  If so, the overlap doesn't actually exist anymore.
-		 There are just a few open handles left. */
+	      /* Check if the event object is signalled.  If so, the overlap
+		 doesn't actually exist anymore.  There are just a few open
+		 handles left. */
 	      if (!IsEventSignalled (overlap->lf_obj))
 		return overlap;
 	      overlap->close_lock_obj ();

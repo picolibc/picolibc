@@ -1,3 +1,11 @@
+2012-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (lf_setlock): Add timeout variable and set before calling
+	WFMO.  Drop debug output if process is not available.  Set timeout to
+	0 instead.  Document timeout 0 in WFMO comment.
+	(lf_getblock): Drop invalid F_POSIX lock type shortcut.  Only return
+	overlap if event is not signalled.  Fix comment.
+
 2012-02-14  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* pinfo.cc (_pinfo::set_ctty): Revert 2012-02-07 change to skip
