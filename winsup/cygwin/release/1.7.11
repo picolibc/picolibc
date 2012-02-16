@@ -6,4 +6,8 @@ What changed:
 -------------
 
 - Fixed problem where background Cygwin processes kept the windows
-console window from exiting.
+  console window from exiting.
+
+- Change the way remote shares mapped to drive letters are recognized
+  when creating the cygdrive directory.  If Windows claims the drive
+  is unavailable, don't show it in the cygdrive directory listing.
