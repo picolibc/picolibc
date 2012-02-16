@@ -25,6 +25,7 @@ details. */
 #include "tls_pbuf.h"
 #include "pwdgrp.h"
 #include <winioctl.h>
+#include <lm.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -2412,7 +2413,7 @@ fhandler_cygdrive::opendir (int fd)
 int
 fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 {
-  char flptst[] = "X:";
+  WCHAR drive[] = L"X:";
 
   while (true)
     {
@@ -2426,8 +2427,29 @@ fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 	    }
 	  return ENMFILE;
 	}
-      if (!is_floppy ((flptst[0] = *pdrive, flptst))
-	  && GetFileAttributes (pdrive) != INVALID_FILE_ATTRIBUTES)
+      disk_type dt = get_disk_type ((drive[0] = *pdrive, drive));
+      if (dt == DT_SHARE_SMB)
+	{
+	  /* Calling NetUseGetInfo on SMB drives allows to fetch the
+	     current state of the drive without trying to open a file
+	     descriptor on the share (GetFileAttributes).  This avoids
+	     waiting for SMB timeouts.  Of course, there's a downside:
+	     If a drive becomes availabe again, it can take a couple of
+	     minutes to recognize it. As long as this didn't happen,
+	     the drive will not show up in the cygdrive dir. */
+	  PUSE_INFO_1 pui1;
+	  DWORD status;
+
+	  if (NetUseGetInfo (NULL, drive, 1, (PBYTE *) &pui1) == NERR_Success)
+	    {
+	      status = pui1->ui1_status;
+	      NetApiBufferFree (pui1);
+	      if (status == USE_OK)
+		break;
+	    }
+	}
+      else if (dt != DT_FLOPPY
+	       && GetFileAttributes (pdrive) != INVALID_FILE_ATTRIBUTES)
 	break;
       pdrive = strchr (pdrive, '\0') + 1;
     }

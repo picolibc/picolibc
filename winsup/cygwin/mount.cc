@@ -1840,13 +1840,42 @@ cygwin_umount (const char *path, unsigned flags)
   return res;
 }
 
-bool
-is_floppy (const char *dos)
+#define is_dev(d,s)	wcsncmp((d),(s),sizeof(s) - 1)
+
+disk_type
+get_disk_type (LPCWSTR dos)
 {
-  char dev[256];
-  if (!QueryDosDevice (dos, dev, 256))
-    return false;
-  return ascii_strncasematch (dev, "\\Device\\Floppy", 14);
+  WCHAR dev[MAX_PATH], *d = dev;
+  if (!QueryDosDeviceW (dos, dev, MAX_PATH))
+    return DT_NODISK;
+  if (is_dev (dev, L"\\Device\\"))
+    {
+      d += 8;
+      switch (toupper (*d))
+	{
+	case 'C':
+	  if (is_dev (d, L"CdRom"))
+	    return DT_CDROM;
+	  break;
+	case 'F':
+	  if (is_dev (d, L"Floppy"))
+	    return DT_FLOPPY;
+	  break;
+	case 'H':
+	  if (is_dev (d, L"Harddisk"))
+	    return DT_HARDDISK;
+	  break;
+	case 'L':
+	  if (is_dev (d, L"LanmanRedirector\\"))
+	    return DT_SHARE_SMB;
+	  break;
+	case 'M':
+	  if (is_dev (d, L"MRxNfs\\"))
+	    return DT_SHARE_NFS;
+	  break;
+	}
+    }
+  return DT_NODISK;
 }
 
 extern "C" FILE *
@@ -1855,9 +1884,11 @@ setmntent (const char *filep, const char *)
   _my_tls.locals.iteration = 0;
   _my_tls.locals.available_drives = GetLogicalDrives ();
   /* Filter floppy drives on A: and B: */
-  if ((_my_tls.locals.available_drives & 1) && is_floppy ("A:"))
+  if ((_my_tls.locals.available_drives & 1)
+      && get_disk_type (L"A:") == DT_FLOPPY)
     _my_tls.locals.available_drives &= ~1;
-  if ((_my_tls.locals.available_drives & 2) && is_floppy ("B:"))
+  if ((_my_tls.locals.available_drives & 2)
+      && get_disk_type (L"B:") == DT_FLOPPY)
     _my_tls.locals.available_drives &= ~2;
   return (FILE *) filep;
 }

@@ -424,7 +424,6 @@ bool has_dot_last_component (const char *dir, bool test_dot_dot) __attribute__ (
 int path_prefix_p (const char *path1, const char *path2, int len1,
 		   bool caseinsensitive) __attribute__ ((regparm (3)));
 
-bool is_floppy (const char *);
 NTSTATUS file_get_fnoi (HANDLE, bool, struct _FILE_NETWORK_OPEN_INFORMATION *);
 int normalize_win32_path (const char *, char *, char *&);
 int normalize_posix_path (const char *, char *, char *&);

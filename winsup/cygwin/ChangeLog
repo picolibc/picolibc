@@ -1,3 +1,16 @@
+2012-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (NetUseGetInfo): Define.
+	* fhandler_disk_file.cc (fhandler_cygdrive::opendir): Rename flptst
+	to drive.  Call new get_disk_type function rather than is_floppy and
+	check SMB drives with the NetUseGetInfo function.  Explain why.
+	* mount.cc (get_disk_type): New function to evaluate disk type from
+	native NT device name.
+	(is_floppy): Remove.
+	* mount.h (enum disk_type): Define.
+	(get_disk_type): Declare.
+	* path.h (is_floppy): Drop declaration.
+
 2012-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc: Revert change from 2012-02-13 which used the

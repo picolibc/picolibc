@@ -406,6 +406,7 @@ LoadDLLfunc (WNetOpenEnumA, 20, mpr)
 
 LoadDLLfunc (DsGetDcNameW, 24, netapi32)
 LoadDLLfunc (NetApiBufferFree, 4, netapi32)
+LoadDLLfunc (NetUseGetInfo, 16, netapi32)
 LoadDLLfunc (NetUserGetGroups, 28, netapi32)
 LoadDLLfunc (NetUserGetInfo, 16, netapi32)
 LoadDLLfunc (NetUserGetLocalGroups, 32, netapi32)
