@@ -1851,25 +1851,25 @@ get_disk_type (LPCWSTR dos)
   if (is_dev (dev, L"\\Device\\"))
     {
       d += 8;
-      switch (toupper (*d))
+      switch (*d)
 	{
-	case 'C':
+	case L'C':
 	  if (is_dev (d, L"CdRom"))
 	    return DT_CDROM;
 	  break;
-	case 'F':
+	case L'F':
 	  if (is_dev (d, L"Floppy"))
 	    return DT_FLOPPY;
 	  break;
-	case 'H':
+	case L'H':
 	  if (is_dev (d, L"Harddisk"))
 	    return DT_HARDDISK;
 	  break;
-	case 'L':
+	case L'L':
 	  if (is_dev (d, L"LanmanRedirector\\"))
 	    return DT_SHARE_SMB;
 	  break;
-	case 'M':
+	case L'M':
 	  if (is_dev (d, L"MRxNfs\\"))
 	    return DT_SHARE_NFS;
 	  break;
