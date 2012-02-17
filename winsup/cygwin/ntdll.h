@@ -1,7 +1,7 @@
 /* ntdll.h.  Contains ntdll specific stuff not defined elsewhere.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011 Red Hat, Inc.
+   2009, 2010, 2011, 2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -689,7 +689,9 @@ typedef struct _PEB
   BYTE Reserved3[4];
   PVOID ProcessHeap;
   PRTL_CRITICAL_SECTION FastPebLock;
-  BYTE Reserved4[436];
+  BYTE Reserved4[8];
+  ULONG EnvironmentUpdateCount;
+  BYTE Reserved5[424];
   ULONG SessionId;
 } PEB, *PPEB;
 

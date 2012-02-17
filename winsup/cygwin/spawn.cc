@@ -455,23 +455,49 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
   c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT;
 
-  /* We're adding the CREATE_BREAKAWAY_FROM_JOB flag here to workaround issues
-     with the "Program Compatibility Assistant (PCA) Service" observed on
-     Windows 7.  For some reason, when starting long running sessions from
-     mintty, the affected svchost.exe process takes more and more memory and
-     at one point takes over the CPU.  At this point the machine becomes
-     unresponsive.  The only way to get back to normal is to stop the entire
-     mintty session, or to stop the PCA service.  However, a process which
-     is controlled by PCA is part of a compatibility job, which allows child
-     processes to break away from the job.  This helps to avoid this issue. */
-  JOBOBJECT_BASIC_LIMIT_INFORMATION jobinfo;
-  if (QueryInformationJobObject (NULL, JobObjectBasicLimitInformation,
-				 &jobinfo, sizeof jobinfo, NULL)
-      && (jobinfo.LimitFlags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK
-				| JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)))
+  if (wincap.has_program_compatibility_assitant ())
     {
-      debug_printf ("Add CREATE_BREAKAWAY_FROM_JOB");
-      c_flags |= CREATE_BREAKAWAY_FROM_JOB;
+      /* We're adding the CREATE_BREAKAWAY_FROM_JOB flag here to workaround
+	 issues with the "Program Compatibility Assistant (PCA) Service"
+	 starting with Windows Vista.  For some reason, when starting long
+	 running sessions from mintty(*), the affected svchost.exe process
+	 takes more and more memory and at one point takes over the CPU.  At
+	 this point the machine becomes unresponsive.  The only way to get
+	 back to normal is to stop the entire mintty session, or to stop the
+	 PCA service.  However, a process which is controlled by PCA is part
+	 of a compatibility job, which allows child processes to break away
+	 from the job.  This helps to avoid this issue.
+	 
+	 (*) Note that this is not mintty's fault.  It has just been observed
+	 with mintty in the first place.  See the archives for more info:
+	 http://cygwin.com/ml/cygwin-developers/2012-02/msg00018.html */
+
+      JOBOBJECT_BASIC_LIMIT_INFORMATION jobinfo;
+
+      /* Calling QueryInformationJobObject costs time.  Starting with
+	 Windows XP there's a function IsProcessInJob, which fetches the
+	 information whether or not we're part of a job 20 times faster than
+	 the call to QueryInformationJobObject.  But we're still
+	 supporting Windows 2000, so we can't just link to that function.
+	 On the other hand, loading the function pointer at runtime is a
+	 time comsuming operation, too.  So, what we do here is to emulate
+	 the IsProcessInJob function when called for the own process and with
+	 a NULL job handle.  In this case it just returns the value of the
+	 lowest bit from PEB->EnvironmentUpdateCount (observed with WinDbg).
+	 The name of this PEB member is the same in all (inofficial)
+	 documentations of the PEB.  Apparently it's a bit misleading.
+	 As a result, we only call QueryInformationJobObject if we're on
+	 Vista or later *and* if the PEB indicates we're running in a job.
+	 Tested on Vista/32, Vista/64, W7/32, W7/64, W8/64. */
+      if ((NtCurrentTeb ()->Peb->EnvironmentUpdateCount & 1) != 0
+	  && QueryInformationJobObject (NULL, JobObjectBasicLimitInformation,
+				     &jobinfo, sizeof jobinfo, NULL)
+	  && (jobinfo.LimitFlags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK
+				    | JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)))
+	{
+	  debug_printf ("Add CREATE_BREAKAWAY_FROM_JOB");
+	  c_flags |= CREATE_BREAKAWAY_FROM_JOB;
+	}
     }
 
   if (mode == _P_DETACH)

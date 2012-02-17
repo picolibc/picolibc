@@ -1,5 +1,13 @@
 2012-02-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h (struct _PEB): Add EnvironmentUpdateCount member.
+	* spawn.cc (child_info_spawn::worker): Speed up job recognition.  Expand
+	comment to explain every little detail and so we never forget.
+	* wincap.h (wincaps::has_program_compatibility_assitant): New element.
+	* wincap.cc: Implement above element throughout.
+
+2012-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (get_disk_type): Drop unneeded toupper call.  Convert case
 	constants to wide chars.
 

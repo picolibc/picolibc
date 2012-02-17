@@ -2,7 +2,7 @@
 		capability class to the appropriate values.
 
    Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011 Red Hat, Inc.
+   2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -53,6 +53,7 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_stack_size_param_is_a_reservation:false,
   has_console_logon_sid:false,
   wow64_has_secondary_stack:false,
+  has_program_compatibility_assitant:false,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -85,6 +86,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_stack_size_param_is_a_reservation:false,
   has_console_logon_sid:false,
   wow64_has_secondary_stack:false,
+  has_program_compatibility_assitant:false,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -117,6 +119,7 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:false,
   wow64_has_secondary_stack:false,
+  has_program_compatibility_assitant:false,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -149,6 +152,7 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:false,
   wow64_has_secondary_stack:false,
+  has_program_compatibility_assitant:false,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -181,6 +185,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:false,
   wow64_has_secondary_stack:false,
+  has_program_compatibility_assitant:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -213,6 +218,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:false,
   wow64_has_secondary_stack:true,
+  has_program_compatibility_assitant:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -245,6 +251,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:false,
   wow64_has_secondary_stack:false,
+  has_program_compatibility_assitant:true,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -277,6 +284,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_stack_size_param_is_a_reservation:true,
   has_console_logon_sid:true,
   wow64_has_secondary_stack:false,
+  has_program_compatibility_assitant:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
