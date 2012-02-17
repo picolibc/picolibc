@@ -423,10 +423,8 @@ getitimer (int which, struct itimerval *ovalue)
       else
 	{
 	  struct itimerspec spec_ovalue;
-	  int ret = timer_gettime ((timer_t) &ttstart, &spec_ovalue);
-	  if (ret)
-	    ret = -1;
-	  else
+	  ret = timer_gettime ((timer_t) &ttstart, &spec_ovalue);
+	  if (!ret)
 	    {
 	      ovalue->it_interval.tv_sec = spec_ovalue.it_interval.tv_sec;
 	      ovalue->it_interval.tv_usec = spec_ovalue.it_interval.tv_nsec / 1000;

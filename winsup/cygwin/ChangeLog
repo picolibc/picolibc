@@ -1,5 +1,11 @@
 2012-02-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* timer.cc (getitimer): Don't create another local ret variable in
+	timer_gettime calling branch.  Simplify conditional since timer_gettime
+	always returns 0 or -1 anyway.
+
+2012-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h (struct _PEB): Add EnvironmentUpdateCount member.
 	* spawn.cc (child_info_spawn::worker): Speed up job recognition.  Expand
 	comment to explain every little detail and so we never forget.
