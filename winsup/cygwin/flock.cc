@@ -1,6 +1,6 @@
 /* flock.cc.  NT specific implementation of advisory file locking.
 
-   Copyright 2003, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   Copyright 2003, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -347,14 +347,18 @@ inode_t::del_my_locks (long long id, HANDLE fhdl)
 {
   lockf_t *lock, *n_lock;
   lockf_t **prev = &i_lockf;
-  int lc = 0;
   for (lock = *prev; lock && (n_lock = lock->lf_next, 1); lock = n_lock)
     {
       if (lock->lf_flags & F_POSIX)
 	{
 	  /* Delete all POSIX locks. */
 	  *prev = n_lock;
-	  ++lc;
+	  /* When called during fork, the POSIX lock must get deleted but
+	     *not* signalled.  The lock is still active and locked in the
+	     parent.  So in case of fork, we call close_lock_obj explicitely,
+	     since del_lock_obj is called from the destructor. */
+	  if (!id)
+	    lock->close_lock_obj ();
 	  delete lock;
 	}
       else if (id && lock->lf_id == id)

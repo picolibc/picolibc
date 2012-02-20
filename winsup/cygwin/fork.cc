@@ -1,7 +1,7 @@
 /* fork.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -190,7 +190,6 @@ int __stdcall
 frok::child (volatile char * volatile here)
 {
   HANDLE& hParent = ch.parent;
-  extern void fixup_lockf_after_fork ();
   extern void fixup_hooks_after_fork ();
   extern void fixup_timers_after_fork ();
 

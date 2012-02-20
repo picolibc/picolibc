@@ -1,3 +1,10 @@
+2012-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (inode_t::del_my_locks): Drop useless counter lc.  Close
+	lock object handle explicitely in case of called during fork.  Add
+	comment to explain why.
+	* fork.cc (frok::child): Drop declaration of fixup_lockf_after_fork.
+
 2012-02-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* timer.cc (getitimer): Don't create another local ret variable in
