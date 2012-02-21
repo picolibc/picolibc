@@ -31,6 +31,7 @@ if test -n "${machine_dir}"; then
 	crx) AC_CONFIG_SUBDIRS(crx) ;;
 	d10v) AC_CONFIG_SUBDIRS(d10v) ;;
 	d30v) AC_CONFIG_SUBDIRS(d30v) ;;
+	epiphany) AC_CONFIG_SUBDIRS(epiphany) ;;
 	fr30) AC_CONFIG_SUBDIRS(fr30) ;;
 	frv) AC_CONFIG_SUBDIRS(frv) ;;
 	h8300) AC_CONFIG_SUBDIRS(h8300) ;;

@@ -1,3 +1,15 @@
+2012-02-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+            Alan Lehotsky  <apl@alum.mit.edu>
+            Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* configure.host: Add Epiphany support.
+	* libc/include/machine/ieeefp.h: Likewise.
+	* libc/include/machine/setjmp.h: Likewise.
+	* libc/machine/configure.in, libc/sys/configure.in: Likewise.
+	* libc/machine/configure, libc/sys/configure: Regenerate.
+	* libc/machine/epiphany, libc/sys/epiphany: New directories.
+	* NEWS: Mention addition of Epiphany.
+
 2012-02-15  Christopher Faylor  <me.newlib2012@cgf.cx>
 
 	* configure.host: Fix typo: xdir_dir -> xdr_dir.
@@ -9,7 +21,7 @@
 2012-02-09  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/sys/rtems/sys/utime.h: Include <sys/types.h> to provide a
-	definition of time_h.
+	definition of time_t.
 
 2012-02-08  Greta Yorsh  <Greta.Yorsh@arm.com>
 

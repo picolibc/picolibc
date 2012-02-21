@@ -69,6 +69,11 @@
 #endif
 #endif
 
+#ifdef __epiphany__
+#define __IEEE_LITTLE_ENDIAN
+#define Sudden_Underflow 1
+#endif
+
 #ifdef __hppa__
 #define __IEEE_BIG_ENDIAN
 #endif

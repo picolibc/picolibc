@@ -122,6 +122,9 @@ case "${host_cpu}" in
   d30v*)
 	machine_dir=d30v
 	;;
+  epiphany)
+	machine_dir=epiphany
+	;;
   fido)
 	machine_dir=m68k
 	newlib_cflags="${newlib_cflags} -DCOMPACT_CTYPE"
@@ -385,6 +388,11 @@ case "${host}" in
   d30v*)
 	sys_dir=
 	;;
+  epiphany-*-*)
+	sys_dir=epiphany
+	# crt0 is provided by libgloss.
+	have_crt0="no"
+	;;
   frv*)
         sys_dir=
         ;;
@@ -597,6 +605,10 @@ case "${host}" in
   d30v*)
 	newlib_cflags="${newlib_cflags} -DABORT_MESSAGE -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
 	syscall_dir=
+	;;
+  epiphany*)
+	syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DSIGNAL_PROVIDED"
 	;;
   fido-*-elf)
 	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_SYSTEM -DMISSING_SYSCALL_NAMES"
