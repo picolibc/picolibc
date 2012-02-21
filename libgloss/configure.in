@@ -34,6 +34,10 @@ dnl indicates whether to run configure within the libnosys subdirectory
 config_libnosys=true
 
 case "${target}" in
+  epiphany-*-*)
+	AC_CONFIG_SUBDIRS(epiphany)
+	config_testsuite=true
+	;;
   i[[3456]]86-*-elf* | i[[3456]]86-*-coff*)
 	AC_CONFIG_SUBDIRS([i386])
 	;;

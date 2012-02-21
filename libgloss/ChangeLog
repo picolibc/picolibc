@@ -1,3 +1,12 @@
+2012-02-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+            Alan Lehotsky  <apl@alum.mit.edu>
+            Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* configure.in: Add Epiphany support.
+	* configure: Regenerate.
+	* epiphany: New directory.
+	* libgloss/README: Add Epiphany entry.
+
 2012-01-23  Stuart Henderson  <stuart.henderson@analog.com>
 
 	* bfin/_exit.c: New file.
