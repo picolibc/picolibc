@@ -1,3 +1,11 @@
+2012-02-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	Based on an idea from Nick Lowe <nick.lowe@gmail.com>:
+	* shared.cc (shared_info::init_obcaseinsensitive): Check actual state
+	of case sensitivity on post-Windows 2000 systems.
+	* wincap.h (wincaps::kernel_is_always_casesensitive): New element.
+	* wincap.cc: Implement above element throughout.
+
 2012-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (inode_t::del_my_locks): Drop useless counter lc.  Close
