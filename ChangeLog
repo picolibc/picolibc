@@ -1,3 +1,16 @@
+2012-02-21  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* COPYING.NEWLIB: Add Adapteva notice.
+	* COPYING.LIBGLOSS: Add Adapteva notice.
+
+2011-12-18  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* configure: Regenerate.
+
+2011-12-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.LIBGLOSS: Add GPL with exception license.
+
 2011-11-09  Roland McGrath  <mcgrathr@google.com>
 
 	* configure.ac: Add tool checks for READELF and READELF_FOR_TARGET.
