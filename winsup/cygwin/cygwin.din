@@ -1406,6 +1406,7 @@ scalbnf NOSIGFE
 _scalbnf = scalbnf NOSIGFE
 scandir SIGFE
 _scandir = scandir SIGFE
+scandirat SIGFE
 scanf SIGFE
 _scanf = scanf SIGFE
 scanf_r = _scanf_r SIGFE

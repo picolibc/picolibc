@@ -1,6 +1,6 @@
 /* Posix dirent.h for WIN32.
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2010 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2010, 2012 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -68,6 +68,10 @@ int scandir (const char *__dir,
 	     struct dirent ***__namelist,
 	     int (*select) (const struct dirent *),
 	     int (*compar) (const struct dirent **, const struct dirent **));
+
+int scandirat (int __dirfd, const char *__dir, struct dirent ***__namelist,
+	       int (*select) (const struct dirent *),
+	       int (*compar) (const struct dirent **, const struct dirent **));
 
 int alphasort (const struct dirent **__a, const struct dirent **__b);
 #ifdef _DIRENT_HAVE_D_TYPE

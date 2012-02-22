@@ -1136,6 +1136,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_sigqueue
     ptsname_r
     removexattr
+    scandirat
     setxattr
     strchrnul
     sysinfo

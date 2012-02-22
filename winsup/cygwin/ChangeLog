@@ -1,3 +1,11 @@
+2012-02-21  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (scandirat): Export.
+	* posix.sgml (std-gnu): Add scandirat.
+	* syscalls.cc (scandirat): New function.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* include/sys/dirent.h (scandirat): Declare.
+
 2012-02-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	Based on an idea from Nick Lowe <nick.lowe@gmail.com>:
@@ -165,7 +173,7 @@
 	Explain how and why.
 	* thread.h (PTHREAD_DEFAULT_STACKSIZE): Change definition.  Explain why.
 
-2012-02-12  Yaakov Selkowitz  <yselkowitz@users.sourceforg.net>
+2012-02-12  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/pthread.h: Include time.h as required by POSIX.
 

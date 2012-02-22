@@ -39,6 +39,7 @@ details. */
 #include <wctype.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <dirent.h>
 #include "ntdll.h"
 
 #undef fstat
@@ -4434,6 +4435,21 @@ renameat (int olddirfd, const char *oldpathname,
   if (gen_full_path_at (newpath, newdirfd, newpathname))
     return -1;
   return rename (oldpath, newpath);
+}
+
+extern "C" int
+scandirat (int dirfd, const char *pathname, struct dirent ***namelist,
+	   int (*select) (const struct dirent *),
+	   int (*compar) (const struct dirent **, const struct dirent **))
+{
+  tmp_pathbuf tp;
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return -1;
+  char *path = tp.c_get ();
+  if (gen_full_path_at (path, dirfd, pathname))
+    return -1;
+  return scandir (pathname, namelist, select, compar);
 }
 
 extern "C" int
