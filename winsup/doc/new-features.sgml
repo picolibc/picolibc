@@ -1,5 +1,17 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.11"><title>What's new and what changed from 1.7.10 to 1.7.11</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+New API: scandirat.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.10"><title>What's new and what changed from 1.7.9 to 1.7.10</title>
 
 <itemizedlist mark="bullet">
