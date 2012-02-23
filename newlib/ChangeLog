@@ -1,3 +1,7 @@
+2012-02-23  Dan Egnor  <egnor@ofb.net>
+
+	* configure.host: Accept "arm*" host spec instead of just "arm".
+
 2012-02-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
             Alan Lehotsky  <apl@alum.mit.edu>
             Joern Rennecke  <joern.rennecke@embecosm.com>

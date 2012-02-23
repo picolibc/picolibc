@@ -98,7 +98,7 @@ case "${host_cpu}" in
   arc)
 	machine_dir=
 	;;
-  arm)
+  arm*)
 	machine_dir=arm
 	;;
   avr*)
@@ -367,7 +367,7 @@ case "${host}" in
   arc-*-*)
 	sys_dir=arc
 	;;
-  arm-*-*)
+  arm*-*-*)
 	sys_dir=arm
 	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
 	  have_crt0="no"
@@ -560,10 +560,10 @@ case "${host}" in
   arc-*-*)
 	syscall_dir=syscalls
 	;;
-  arm-*-pe)
+  arm*-*-pe)
 	syscall_dir=syscalls
 	;;
-  arm-*-*)
+  arm*-*-*)
 	syscall_dir=syscalls
 # If newlib is supplying syscalls, select which debug protocol is being used.
 # ARM_RDP_MONITOR selects the Demon monitor.
