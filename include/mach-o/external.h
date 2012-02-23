@@ -116,6 +116,45 @@ struct mach_o_reloc_info_external
 };
 #define BFD_MACH_O_RELENT_SIZE 8
 
+/* Relocations are based on 'address' being a section offset and an assumption
+   that sections are never more than 2^24-1 bytes in size.  Relocation data
+   also carry information on type/size/PC-relative/extern and whether scattered
+   or not [stored in the MSB of the r_address].  */
+
+#define BFD_MACH_O_SR_SCATTERED		0x80000000
+
+/* For a non-scattered reloc, the relocation info is found in r_symbolnum.
+   Bytes 1 to 3 contain the symbol number (0xffffff, in a non-scattered PAIR).  
+   Byte 4 contains the relocation info - but with differing bit-positions
+   dependent on target endian-ness - as below.  */
+
+#define BFD_MACH_O_LE_PCREL		0x01
+#define BFD_MACH_O_LE_LENGTH_SHIFT	1
+#define BFD_MACH_O_LE_EXTERN		0x08
+#define BFD_MACH_O_LE_TYPE_SHIFT	4
+
+#define BFD_MACH_O_BE_PCREL		0x80
+#define BFD_MACH_O_BE_LENGTH_SHIFT	5
+#define BFD_MACH_O_BE_EXTERN		0x10
+#define BFD_MACH_O_BE_TYPE_SHIFT	0
+
+/* The field sizes are the same for both BE and LE.  */
+#define BFD_MACH_O_LENGTH_MASK		0x03
+#define BFD_MACH_O_TYPE_MASK		0x0f
+
+/* For a scattered reloc entry the info is contained in r_address.  There
+   is no need to discriminate on target endian-ness, since the design was
+   arranged to produce the same layout on both.  Scattered relocations are
+   only used for local items, therefore there is no 'extern' field.  */
+
+#define BFD_MACH_O_SR_PCREL		0x40000000
+#define BFD_MACH_O_GET_SR_LENGTH(s)	(((s) >> 28) & 0x3)
+#define BFD_MACH_O_GET_SR_TYPE(s)	(((s) >> 24) & 0x0f)
+#define BFD_MACH_O_GET_SR_ADDRESS(s)	((s) & 0x00ffffff)
+#define BFD_MACH_O_SET_SR_LENGTH(l)	(((l) & 0x3) << 28)
+#define BFD_MACH_O_SET_SR_TYPE(t)	(((t) & 0xf) << 24)
+#define BFD_MACH_O_SET_SR_ADDRESS(s)	((s) & 0x00ffffff)
+
 struct mach_o_symtab_command_external
 {
   unsigned char symoff[4];	/* File offset of the symbol table.  */

@@ -1,3 +1,11 @@
+2012-02-23  Iain Sandoe  <idsandoe@googlemail.com>
+
+	* external.h: Add comments about relocations fields.  Add macros
+	for non-scattered relocations.  Move scattered relocation macros to
+	here.
+	* reloc.h: Remove macros related to external representation of reloc
+	fields.
+
 2012-01-12  Iain Sandoe  <idsandoe@googlemail.com>
 
 	* loader.h (BFD_MACH_O_INDIRECT_SYM_LOCAL): New.
