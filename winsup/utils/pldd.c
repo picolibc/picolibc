@@ -34,10 +34,10 @@ static void
 print_help (void)
 {
   printf ("Usage: pldd [OPTION...] PID\n\n"
-          "List dynamic shared objects loaded into a process.\n\n"
-          "  -?, --help                 Give this help list\n"
-          "      --usage                Give a short usage message\n"
-          "  -V, --version              Print program version\n");
+	  "List dynamic shared objects loaded into a process.\n\n"
+	  "  -?, --help                 Give this help list\n"
+	  "      --usage                Give a short usage message\n"
+	  "  -V, --version              Print program version\n");
   exit (EXIT_SUCCESS);
 }
 
@@ -94,7 +94,7 @@ main (int argc, char *argv[])
         print_version ();
         break;
       case 0:
-        if (strcmp( "usage", longopts[optind].name ) == 0)
+        if (strcmp ("usage", longopts[optind].name) == 0)
           print_usage ();
         break;
       default:
@@ -112,7 +112,7 @@ main (int argc, char *argv[])
     error (1, 0, "invalid process ID '%s'", argv[0]);
 
   pidfile = (char *) malloc (32);
-  sprintf(pidfile, "/proc/%d/winpid", pid);
+  sprintf (pidfile, "/proc/%d/winpid", pid);
   fd = fopen (pidfile, "rb");
   if (!fd)
     error (1, ENOENT, "cannot open /proc/%d", pid);
@@ -120,7 +120,7 @@ main (int argc, char *argv[])
 
   exefile = (char *) malloc (32);
   exename = (char *) malloc (MAX_PATH);
-  sprintf(exefile, "/proc/%d/exename", pid);
+  sprintf (exefile, "/proc/%d/exename", pid);
   fd = fopen (exefile, "rb");
   fscanf (fd, "%s", exename);
 
@@ -130,9 +130,9 @@ main (int argc, char *argv[])
 
   printf ("%d:\t%s\n", pid, exename);
 
-  EnumProcessModules (hProcess, hModules, sizeof(hModules), &cbModules);
+  EnumProcessModules (hProcess, hModules, sizeof (hModules), &cbModules);
   /* start at 1 to skip the executable itself */
-  for (i = 1; i < (cbModules / sizeof(HMODULE)); i++)
+  for (i = 1; i < (cbModules / sizeof (HMODULE)); i++)
     {
       TCHAR winname[MAX_PATH];
       char posixname[MAX_PATH];
