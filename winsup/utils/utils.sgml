@@ -1434,6 +1434,23 @@ some systems.</para>
 
 </sect2>
 
+<sect2 id="pldd"><title>pldd</title>
+
+<screen>
+Usage: pldd [OPTION...] PID
+
+List dynamic shared objects loaded into a process.
+
+  -?, --help                 Give this help list
+      --usage                Give a short usage message
+  -V, --version              Print program version
+</screen>
+
+<para><command>pldd</command> prints the shared libraries (DLLs) loaded
+by the process with the given PID.</para>
+
+</sect2>
+
 <sect2 id="ps"><title>ps</title>
 
 <screen>
