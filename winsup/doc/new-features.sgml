@@ -5,6 +5,10 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
+New <command>pldd</command> command for listing DLLs loaded by a process.
+</para></listitem>
+
+<listitem><para>
 New API: scandirat.
 </para></listitem>
 
