@@ -1,3 +1,14 @@
+2012-02-24  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* pldd.c: Fix typo in license header.
+
+2012-02-24  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* Makefile.in (CYGWIN_BINS): Add pldd.
+	(pldd.exe): Add -lpsapi to ALL_LDFLAGS.
+	* pldd.c: New file.
+	* utils.sgml (pldd): New section.
+
 2012-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* passwd.cc: Add -v option to print version information as well, since

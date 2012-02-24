@@ -1,4 +1,4 @@
-/* pldd.cc
+/* pldd.c
 
    Copyright 2012 Red Hat, Inc.
 
