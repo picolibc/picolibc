@@ -1,3 +1,7 @@
+2012-02-25  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 12.
+
 2012-02-21  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin.din (scandirat): Export.
