@@ -12,6 +12,17 @@ New <command>pldd</command> command for listing DLLs loaded by a process.
 New API: scandirat.
 </para></listitem>
 
+<listitem><para>
+Change the way remote shares mapped to drive letters are recognized when
+creating the cygdrive directory.  If Windows claims the drive is
+unavailable, don't show it in the cygdrive directory listing.
+</para></listitem>
+
+<listitem><para>
+Raise default stacksize of pthreads from 512K to 1 Meg.  It can still be
+changed using the pthread_attr_setstacksize call.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
