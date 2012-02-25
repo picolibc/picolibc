@@ -1,3 +1,10 @@
+2012-02-25  Walter Lee  <walt@tilera.com>
+
+	* tilegx.h (tilegx_mnemonic): Add TILEGX_OPC_LD4S_TLS,
+	TILEGX_OPC_LD_TLS.
+	* tilepro.h (tilepro_mnemonic): Add TILEPRO_OPC_LW_TLS,
+	TILEPRO_OPC_LW_TLS_SN.
+
 2012-02-08  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h (XACQUIRE_PREFIX_OPCODE): New.
