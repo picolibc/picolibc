@@ -5,7 +5,7 @@
 	(struct parse_thing): Change all justset to setbool for bool variables.
 	(parse_options): Add a case for setbool setting for bool variables
 	since justset (now setdword) always writes a DWORD value, thus
-	potentially overwriting adjacent memory locations.
+	overwriting adjacent memory locations.
 	* external.cc (cygwin_internal): Drop extern declaration.
 
 2012-02-26  Corinna Vinschen  <corinna@vinschen.de>
