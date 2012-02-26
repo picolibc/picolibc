@@ -124,7 +124,14 @@ static NO_COPY muto lockf_guard;
 #define INODE_LIST_LOCK()	(lockf_guard.init ("lockf_guard")->acquire ())
 #define INODE_LIST_UNLOCK()	(lockf_guard.release ())
 
-#define LOCK_OBJ_NAME_LEN	69
+#define LOCK_DIR_NAME_FMT	L"flock-%08x-%016X"
+#define LOCK_DIR_NAME_LEN	31	/* Length of the resulting name */
+#define LOCK_DIR_NAME_DEV_OFF	 6	/* Offset to device number */
+#define LOCK_DIR_NAME_INO_OFF	15	/* Offset to inode number */
+
+/* Don't change format without also changing lockf_t::from_obj_name! */
+#define LOCK_OBJ_NAME_FMT	L"%02x-%01x-%016X-%016X-%016X-%08x-%04x"
+#define LOCK_OBJ_NAME_LEN	69	/* Length of the resulting name */
 
 #define FLOCK_INODE_DIR_ACCESS	(DIRECTORY_QUERY \
 				 | DIRECTORY_TRAVERSE \
@@ -225,11 +232,11 @@ struct lockfattr_t
 class lockf_t
 {
   public:
-    short	    lf_flags; /* Semantics: F_POSIX, F_FLOCK, F_WAIT */
-    short	    lf_type;  /* Lock type: F_RDLCK, F_WRLCK */
+    uint16_t	    lf_flags; /* Semantics: F_POSIX, F_FLOCK, F_WAIT */
+    uint16_t	    lf_type;  /* Lock type: F_RDLCK, F_WRLCK */
     _off64_t	    lf_start; /* Byte # of the start of the lock */
     _off64_t	    lf_end;   /* Byte # of the end of the lock (-1=EOF) */
-    long long       lf_id;    /* Cygwin PID for POSIX locks, a unique id per
+    int64_t         lf_id;    /* Cygwin PID for POSIX locks, a unique id per
 				 file table entry for BSD flock locks. */
     DWORD	    lf_wid;   /* Win PID of the resource holding the lock */
     uint16_t	    lf_ver;   /* Version number of the lock.  If a released
@@ -254,6 +261,9 @@ class lockf_t
       lf_next (NULL), lf_obj (NULL)
     {}
     ~lockf_t ();
+
+    bool from_obj_name (class inode_t *node, class lockf_t **head,
+			const wchar_t *name);
 
     /* Used to create all locks list in a given TLS buffer. */
     void *operator new (size_t size, void *p)
@@ -292,10 +302,6 @@ class inode_t
     HANDLE		 i_mtx;
     uint32_t		 i_cnt;    /* # of threads referencing this instance. */
 
-    void use () { ++i_cnt; }
-    void unuse () { if (i_cnt > 0) --i_cnt; }
-    bool inuse () { return i_cnt > 0; }
-
   public:
     inode_t (__dev32_t dev, __ino64_t ino);
     ~inode_t ();
@@ -305,11 +311,15 @@ class inode_t
     void operator delete (void *p)
     { cfree (p); }
 
-    static inode_t *get (__dev32_t dev, __ino64_t ino, bool create_if_missing);
+    static inode_t *get (__dev32_t dev, __ino64_t ino,
+			 bool create_if_missing, bool lock);
 
     void LOCK () { WaitForSingleObject (i_mtx, INFINITE); }
     void UNLOCK () { ReleaseMutex (i_mtx); }
 
+    void use () { ++i_cnt; }
+    void unuse () { if (i_cnt > 0) --i_cnt; }
+    bool inuse () { return i_cnt > 0; }
     void notused () { i_cnt = 0; }
 
     void unlock_and_remove_if_unused ();
@@ -390,7 +400,7 @@ inode_t::del_my_locks (long long id, HANDLE fhdl)
 void
 fhandler_base::del_my_locks (del_lock_called_from from)
 {
-  inode_t *node = inode_t::get (get_dev (), get_ino (), false);
+  inode_t *node = inode_t::get (get_dev (), get_ino (), false, true);
   if (node)
     {
       /* When we're called from fixup_after_exec, the fhandler is a
@@ -458,7 +468,7 @@ fixup_lockf_after_exec ()
    file.  The file is specified by the device and inode_t number.  If inode_t
    doesn't exist, create it. */
 inode_t *
-inode_t::get (__dev32_t dev, __ino64_t ino, bool create_if_missing)
+inode_t::get (__dev32_t dev, __ino64_t ino, bool create_if_missing, bool lock)
 {
   inode_t *node;
 
@@ -475,7 +485,7 @@ inode_t::get (__dev32_t dev, __ino64_t ino, bool create_if_missing)
   if (node)
     node->use ();
   INODE_LIST_UNLOCK ();
-  if (node)
+  if (node && lock)
     node->LOCK ();
   return node;
 }
@@ -492,7 +502,7 @@ inode_t::inode_t (__dev32_t dev, __ino64_t ino)
   parent_dir = get_shared_parent_dir ();
   /* Create a subdir which is named after the device and inode_t numbers
      of the given file, in hex notation. */
-  int len = __small_swprintf (name, L"flock-%08x-%016X", dev, ino);
+  int len = __small_swprintf (name, LOCK_DIR_NAME_FMT, dev, ino);
   RtlInitCountedUnicodeString (&uname, name, len * sizeof (WCHAR));
   InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
 			      parent_dir, everyone_sd (FLOCK_INODE_DIR_ACCESS));
@@ -516,6 +526,45 @@ inode_t::inode_t (__dev32_t dev, __ino64_t ino)
 #define MAX_LOCKF_CNT	((intptr_t)((NT_MAX_PATH * sizeof (WCHAR)) \
 				    / sizeof (lockf_t)))
 
+bool
+lockf_t::from_obj_name (inode_t *node, lockf_t **head, const wchar_t *name)
+{
+  wchar_t *endptr;
+
+  /* "%02x-%01x-%016X-%016X-%016X-%08x-%04x",
+     lf_flags, lf_type, lf_start, lf_end, lf_id, lf_wid, lf_ver */
+  lf_flags = wcstol (name, &endptr, 16);
+  if ((lf_flags & ~(F_FLOCK | F_POSIX)) != 0
+      || ((lf_flags & (F_FLOCK | F_POSIX)) == (F_FLOCK | F_POSIX)))
+    return false;
+  lf_type = wcstol (endptr + 1, &endptr, 16);
+  if ((lf_type != F_RDLCK && lf_type != F_WRLCK) || !endptr || *endptr != L'-')
+    return false;
+  lf_start = (_off64_t) wcstoull (endptr + 1, &endptr, 16);
+  if (lf_start < 0 || !endptr || *endptr != L'-')
+    return false;
+  lf_end = (_off64_t) wcstoull (endptr + 1, &endptr, 16);
+  if (lf_end < -1LL
+      || (lf_end > 0 && lf_end < lf_start)
+      || !endptr || *endptr != L'-')
+    return false;
+  lf_id = wcstoll (endptr + 1, &endptr, 16);
+  if (!endptr || *endptr != L'-'
+      || ((lf_flags & F_POSIX) && (lf_id < 1 || lf_id > ULONG_MAX)))
+    return false;
+  lf_wid = wcstoul (endptr + 1, &endptr, 16);
+  if (!endptr || *endptr != L'-')
+    return false;
+  lf_ver = wcstoul (endptr + 1, &endptr, 16);
+  if (endptr && *endptr != L'\0')
+    return false;
+  lf_head = head;
+  lf_inode = node;
+  lf_next = NULL;
+  lf_obj = NULL;
+  return true;
+}
+
 lockf_t *
 inode_t::get_all_locks_list ()
 {
@@ -526,7 +575,7 @@ inode_t::get_all_locks_list ()
   } f;
   ULONG context;
   NTSTATUS status;
-  lockf_t *lock = i_all_lf;
+  lockf_t newlock, *lock = i_all_lf;
 
   for (BOOLEAN restart = TRUE;
        NT_SUCCESS (status = NtQueryDirectoryObject (i_dir, &f, sizeof f, TRUE,
@@ -535,32 +584,8 @@ inode_t::get_all_locks_list ()
     {
       if (f.dbi.ObjectName.Length != LOCK_OBJ_NAME_LEN * sizeof (WCHAR))
 	continue;
-      wchar_t *wc = f.dbi.ObjectName.Buffer, *endptr;
-      /* "%02x-%01x-%016X-%016X-%016X-%08x-%04x",
-	 lf_flags, lf_type, lf_start, lf_end, lf_id, lf_wid, lf_ver */
-      wc[LOCK_OBJ_NAME_LEN] = L'\0';
-      short flags = wcstol (wc, &endptr, 16);
-      if ((flags & ~(F_FLOCK | F_POSIX)) != 0
-	  || ((flags & (F_FLOCK | F_POSIX)) == (F_FLOCK | F_POSIX)))
-	continue;
-      short type = wcstol (endptr + 1, &endptr, 16);
-      if ((type != F_RDLCK && type != F_WRLCK) || !endptr || *endptr != L'-')
-	continue;
-      _off64_t start = (_off64_t) wcstoull (endptr + 1, &endptr, 16);
-      if (start < 0 || !endptr || *endptr != L'-')
-	continue;
-      _off64_t end = (_off64_t) wcstoull (endptr + 1, &endptr, 16);
-      if (end < -1LL || (end > 0 && end < start) || !endptr || *endptr != L'-')
-	continue;
-      long long id = wcstoll (endptr + 1, &endptr, 16);
-      if (!endptr || *endptr != L'-'
-	  || ((flags & F_POSIX) && (id < 1 || id > ULONG_MAX)))
-	continue;
-      DWORD wid = wcstoul (endptr + 1, &endptr, 16);
-      if (!endptr || *endptr != L'-')
-	continue;
-      uint16_t ver = wcstoul (endptr + 1, &endptr, 16);
-      if (endptr && *endptr != L'\0')
+      f.dbi.ObjectName.Buffer[LOCK_OBJ_NAME_LEN] = L'\0';
+      if (!newlock.from_obj_name (this, &i_all_lf, f.dbi.ObjectName.Buffer))
 	continue;
       if (lock - i_all_lf >= MAX_LOCKF_CNT)
 	{
@@ -570,8 +595,7 @@ inode_t::get_all_locks_list ()
 	}
       if (lock > i_all_lf)
 	lock[-1].lf_next = lock;
-      new (lock++) lockf_t (this, &i_all_lf,
-			    flags, type, start, end, id, wid, ver);
+      new (lock++) lockf_t (newlock);
     }
   /* If no lock has been found, return NULL. */
   if (lock == i_all_lf)
@@ -584,7 +608,7 @@ inode_t::get_all_locks_list ()
 POBJECT_ATTRIBUTES
 lockf_t::create_lock_obj_attr (lockfattr_t *attr, ULONG flags)
 {
-  __small_swprintf (attr->name, L"%02x-%01x-%016X-%016X-%016X-%08x-%04x",
+  __small_swprintf (attr->name, LOCK_OBJ_NAME_FMT,
 		    lf_flags & (F_POSIX | F_FLOCK), lf_type, lf_start, lf_end,
 		    lf_id, lf_wid, lf_ver);
   RtlInitCountedUnicodeString (&attr->uname, attr->name,
@@ -592,6 +616,111 @@ lockf_t::create_lock_obj_attr (lockfattr_t *attr, ULONG flags)
   InitializeObjectAttributes (&attr->attr, &attr->uname, flags, lf_inode->i_dir,
 			      everyone_sd (FLOCK_EVENT_ACCESS));
   return &attr->attr;
+}
+
+DWORD WINAPI
+create_lock_in_parent (PVOID param)
+{
+  HANDLE lf_obj;
+  ULONG size;
+  OBJECT_NAME_INFORMATION *ntfn;
+  NTSTATUS status;
+  wchar_t *lockname, *inodename, *endptr;
+  __dev32_t dev;
+  __ino64_t ino;
+  inode_t *node;
+  lockf_t newlock, *lock;
+  int cnt;
+
+  /* param is the handle to the lock object, created by caller. */
+  lf_obj = (HANDLE) param;
+  /* Fetch object path from handle.  Typically the length of the path
+     is 146 characters, starting with
+     "\BaseNamedObject\cygwin-1S5-<16-hex-digits>\..." */
+  size = sizeof (OBJECT_NAME_INFORMATION) + 256 * sizeof (WCHAR);
+  ntfn = (OBJECT_NAME_INFORMATION *) alloca (size);
+  memset (ntfn, 0, size);
+  status = NtQueryObject (lf_obj, ObjectNameInformation, ntfn, size, &size);
+  if (!NT_SUCCESS (status))
+    goto err;
+  ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = L'\0';
+  /* Sanity check so that we don't peek into unchartered territory. */
+  if (ntfn->Name.Length < LOCK_OBJ_NAME_LEN + LOCK_DIR_NAME_LEN + 1)
+    goto err;
+  /* The names have fixed size, so we know where the substrings start. */
+  lockname = ntfn->Name.Buffer + ntfn->Name.Length / sizeof (WCHAR)
+			       - LOCK_OBJ_NAME_LEN;
+  inodename = lockname - LOCK_DIR_NAME_LEN - 1;
+  dev = wcstoul (inodename + LOCK_DIR_NAME_DEV_OFF, &endptr, 16);
+  if (*endptr != L'-')
+    goto err;
+  ino = wcstoull (inodename + LOCK_DIR_NAME_INO_OFF, &endptr, 16);
+  if (*endptr != L'\\')
+    goto err;
+  if (!newlock.from_obj_name (NULL, NULL, lockname))
+    goto err;
+  /* Check if we have an open file handle with the same unique id. */
+  {
+    cnt = 0;
+    cygheap_fdenum cfd (true);
+    while (cfd.next () >= 0)
+      if (cfd->get_unique_id () == newlock.lf_id && ++cnt > 0)
+	break;
+  }
+  /* If not, close handle and return. */
+  if (!cnt)
+    {
+      NtClose (lf_obj);
+      return 0;
+    }
+  /* otherwise generate inode from directory name... */
+  node = inode_t::get (dev, ino, true, false);
+  /* ...and generate lock from object name. */
+  lock = new lockf_t (newlock);
+  lock->lf_inode = node;
+  lock->lf_head = &node->i_lockf;
+  lock->lf_next = node->i_lockf;
+  lock->lf_obj = lf_obj;
+  node->i_lockf = lock;
+  node->unuse ();
+  return 0;
+
+err:
+  system_printf ("Adding <%S> lock failed", &ntfn->Name);
+  NtClose (lf_obj);
+  return 1;
+}
+
+DWORD WINAPI
+delete_lock_in_parent (PVOID param)
+{
+  inode_t *node;
+  lockf_t *lock, **prev;
+
+  /* Scan list of all inodes, and reap stale BSD lock if lf_id matches.
+     Remove inode if empty. */
+  INODE_LIST_LOCK ();
+  LIST_FOREACH (node, &cygheap->inode_list, i_next)
+    if (!node->inuse ())
+      {
+	for (prev = &node->i_lockf, lock = *prev; lock; lock = *prev)
+	  {
+	    if ((lock->lf_flags & F_FLOCK) && IsEventSignalled (lock->lf_obj))
+	      {
+		*prev = lock->lf_next;
+		delete lock;
+	      }
+	    else
+	      prev = &lock->lf_next;
+	  }
+	if (node->i_lockf == NULL)
+	  {
+	    LIST_REMOVE (node, i_next);
+	    delete node;
+	  }
+      }
+  INODE_LIST_UNLOCK ();
+  return 0;
 }
 
 /* Create the lock event object in the file's subdir in the NT global
@@ -629,6 +758,54 @@ lockf_t::create_lock_obj ()
 	}
     }
   while (!NT_SUCCESS (status));
+  /* For BSD locks, notify the parent process. */
+  if (lf_flags & F_FLOCK)
+    {
+      HANDLE parent_proc, parent_thread, parent_lf_obj;
+
+      pinfo p (myself->ppid);
+      if (!p)	/* No access or not a Cygwin parent. */
+      	return;
+
+      parent_proc = OpenProcess (PROCESS_DUP_HANDLE
+				 | PROCESS_CREATE_THREAD
+				 | PROCESS_QUERY_INFORMATION
+				 | PROCESS_VM_OPERATION
+				 | PROCESS_VM_WRITE
+				 | PROCESS_VM_READ,
+				 FALSE, p->dwProcessId);
+      if (!parent_proc)
+	{
+	  debug_printf ("OpenProcess (%u): %E", p->dwProcessId);
+	  return;
+	}
+      if (!DuplicateHandle (GetCurrentProcess (), lf_obj, parent_proc,
+			    &parent_lf_obj, TRUE, 0, DUPLICATE_SAME_ACCESS))
+	debug_printf ("DuplicateHandle (lf_obj): %E");
+      else
+	{
+	  parent_thread = CreateRemoteThread (parent_proc, NULL, 256 * 1024,
+					      create_lock_in_parent,
+					      parent_lf_obj,
+					      STACK_SIZE_PARAM_IS_A_RESERVATION,
+					      NULL);
+	  if (!parent_thread)
+	    {
+	      debug_printf ("CreateRemoteThread: %E");
+	      /* If thread didn't get started, close object handle in parent,
+		 otherwise suffer handle leaks. */
+	      DuplicateHandle (parent_proc, parent_lf_obj, parent_proc,
+			       NULL, 0, FALSE, DUPLICATE_CLOSE_SOURCE);
+	    }
+	  else
+	    {
+	      /* Must wait to avoid race conditions. */
+	      WaitForSingleObject (parent_thread, INFINITE);
+	      CloseHandle (parent_thread);
+	    }
+	}
+      CloseHandle (parent_proc);
+    }
 }
 
 /* Open a lock event object for SYNCHRONIZE access (to wait for it). */
@@ -665,7 +842,36 @@ lockf_t::del_lock_obj (HANDLE fhdl, bool signal)
 	 handle/descriptor to the same FILE_OBJECT/file table entry. */
       if ((lf_flags & F_POSIX) || signal
 	  || (fhdl && get_obj_handle_count (fhdl) <= 1))
-	NtSetEvent (lf_obj, NULL);
+	{
+	  NtSetEvent (lf_obj, NULL);
+	  /* For BSD locks, notify the parent process. */
+	  if (lf_flags & F_FLOCK)
+	    {
+	      HANDLE parent_proc, parent_thread;
+
+	      pinfo p (myself->ppid);
+	      if (p && (parent_proc = OpenProcess (PROCESS_CREATE_THREAD
+					     | PROCESS_QUERY_INFORMATION
+					     | PROCESS_VM_OPERATION
+					     | PROCESS_VM_WRITE
+					     | PROCESS_VM_READ,
+					     FALSE, p->dwProcessId)))
+		{
+		  parent_thread = CreateRemoteThread (parent_proc, NULL,
+					      256 * 1024, delete_lock_in_parent,
+					      NULL,
+					      STACK_SIZE_PARAM_IS_A_RESERVATION,
+					      NULL);
+		  if (parent_thread)
+		    {
+		      /* Must wait to avoid race conditions. */
+		      WaitForSingleObject (parent_thread, INFINITE);
+		      CloseHandle (parent_thread);
+		    }
+		  CloseHandle (parent_proc);
+		}
+	    }
+	}
       close_lock_obj ();
     }
 }
@@ -815,7 +1021,7 @@ fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
 
 restart:	/* Entry point after a restartable signal came in. */
 
-  inode_t *node = inode_t::get (get_dev (), get_ino (), true);
+  inode_t *node = inode_t::get (get_dev (), get_ino (), true, true);
   if (!node)
     {
       set_errno (ENOLCK);

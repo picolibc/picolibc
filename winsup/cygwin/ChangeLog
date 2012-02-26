@@ -1,3 +1,30 @@
+2012-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (LOCK_DIR_NAME_FMT): Define.
+	(LOCK_DIR_NAME_LEN): Define.
+	(LOCK_DIR_NAME_DEV_OFF): Define.
+	(LOCK_DIR_NAME_INO_OFF): Define.
+	(LOCK_OBJ_NAME_FMT): Define.  Add comment.
+	(class lockf_t): Use bitsize-explicit types.  Declare from_obj_name,
+	(class inode_t): Make use, unuse and inuse methods public.  Add a
+	lock argument to get method declaration.
+	(inode_t::get): Add lock argument.  Only lock node if lock arg is true.
+	(inode_t::inode_t): Use LOCK_DIR_NAME_FMT as format string.
+	(lockf_t::from_obj_name): New method to generate lockf_t content from
+	lock event object basename.
+	(inode_t::get_all_locks_list): Just call from_obj_name here and copy
+	result into final lockf_t.
+	(create_lock_obj_attr): Use LOCK_OBJ_NAME_FMT as format string.
+	(create_lock_in_parent): New thread function to create lockf_t
+	structure in parent process.
+	(delete_lock_in_parent): New thread function to reap stale BSD locks in
+	parent process.
+	(lockf_t::create_lock_obj): Try to duplicate lock object handle into
+	parent process and call create_lock_in_parent as parent remote thread.
+	(lockf_t::del_lock_obj): Call delete_lock_in_parent as parent remote
+	thread.
+	(fhandler_disk_file::lock): Add lock arg to inode_t::get call.
+
 2012-02-25  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 12.
