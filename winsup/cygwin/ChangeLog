@@ -1,5 +1,15 @@
 2012-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* environ.cc (enum settings): Add setbool.  Rename justset to setdword
+	to avoid future problems.
+	(struct parse_thing): Change all justset to setbool for bool variables.
+	(parse_options): Add a case for setbool setting for bool variables
+	since justset (now setdword) always writes a DWORD value, thus
+	potentially overwriting adjacent memory locations.
+	* external.cc (cygwin_internal): Drop extern declaration.
+
+2012-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (dos_file_warning): Drop declaration.
 	(ignore_case_with_glob): Ditto.
 	(allow_winsymlinks): Ditto.

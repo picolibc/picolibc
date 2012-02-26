@@ -432,7 +432,6 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	break;
       case CW_SET_DOS_FILE_WARNING:
 	{
-	  extern bool dos_file_warning;
 	  dos_file_warning = va_arg (arg, int);
 	  res = 0;
 	}

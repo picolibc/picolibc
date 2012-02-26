@@ -40,8 +40,9 @@ static NO_COPY bool export_settings = false;
 
 enum settings
   {
-    justset,
     isfunc,
+    setdword,
+    setbool,
     setbit
   };
 
@@ -111,16 +112,16 @@ static struct parse_thing
       } values[2];
   } known[] NO_COPY =
 {
-  {"detect_bloda", {&detect_bloda}, justset, NULL, {{false}, {true}}},
-  {"dosfilewarning", {&dos_file_warning}, justset, NULL, {{false}, {true}}},
+  {"detect_bloda", {&detect_bloda}, setbool, NULL, {{false}, {true}}},
+  {"dosfilewarning", {&dos_file_warning}, setbool, NULL, {{false}, {true}}},
   {"error_start", {func: error_start_init}, isfunc, NULL, {{0}, {0}}},
-  {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
+  {"export", {&export_settings}, setbool, NULL, {{false}, {true}}},
   {"glob", {func: glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
-  {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
+  {"reset_com", {&reset_com}, setbool, NULL, {{false}, {true}}},
   {"tty", {func: tty_is_gone}, isfunc, NULL, {{0}, {0}}},
-  {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
-  {NULL, {0}, justset, 0, {{0}, {0}}}
+  {"winsymlinks", {&allow_winsymlinks}, setbool, NULL, {{false}, {true}}},
+  {NULL, {0}, setdword, 0, {{0}, {0}}}
 };
 
 /* Parse a string of the form "something=stuff somethingelse=more-stuff",
@@ -180,12 +181,19 @@ parse_options (const char *inbuf)
 		  k->values[istrue].s : eq);
 		debug_printf ("%s (called func)", k->name);
 		break;
-	      case justset:
+	      case setdword:
 		if (!istrue || !eq)
 		  *k->setting.x = k->values[istrue].i;
 		else
 		  *k->setting.x = strtol (eq, NULL, 0);
 		debug_printf ("%s %d", k->name, *k->setting.x);
+		break;
+	      case setbool:
+		if (!istrue || !eq)
+		  *k->setting.b = k->values[istrue].i;
+		else
+		  *k->setting.b = !!strtol (eq, NULL, 0);
+		debug_printf ("%s%s", *k->setting.b ? "" : "no", k->name);
 		break;
 	      case setbit:
 		*k->setting.x &= ~k->values[istrue].i;
