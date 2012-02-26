@@ -73,8 +73,6 @@
 #include <wchar.h>
 #include <wctype.h>
 
-bool dos_file_warning = true;
-
 suffix_info stat_suffixes[] =
 {
   suffix_info ("", 1),
@@ -1451,10 +1449,6 @@ conv_path_list (const char *src, char *dst, size_t size,
 /********************** Symbolic Link Support **************************/
 
 /* Create a symlink from FROMPATH to TOPATH. */
-
-/* If TRUE create symlinks as Windows shortcuts, if false create symlinks
-   as normal files with magic number and system bit set. */
-bool allow_winsymlinks = false;
 
 extern "C" int
 symlink (const char *oldpath, const char *newpath)

@@ -1,5 +1,23 @@
 2012-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* environ.cc (dos_file_warning): Drop declaration.
+	(ignore_case_with_glob): Ditto.
+	(allow_winsymlinks): Ditto.
+	(reset_com): Move definition to globals.cc.
+	(struct parse_thing): Add "detect_bloda" option.
+	* fhandler_serial.cc (fhandler_serial::open): Drop (incorrect)
+	declaration of reset_com.
+	* globals.cc (ignore_case_with_glob): Move definition into C++-only
+	block.
+	(dos_file_warning): Define.
+	(allow_winsymlinks): Define.
+	(reset_com): Define.
+	(detect_bloda): Define.
+	* path.cc (dos_file_warning): Drop definition here.
+	(allow_winsymlinks): Drop definition here.
+
+2012-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* flock.cc (LOCK_DIR_NAME_FMT): Define.
 	(LOCK_DIR_NAME_LEN): Define.
 	(LOCK_DIR_NAME_DEV_OFF): Define.

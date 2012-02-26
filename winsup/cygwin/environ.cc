@@ -2,7 +2,7 @@
    process's environment.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -31,11 +31,6 @@ details. */
 #include "child_info.h"
 #include "shared_info.h"
 #include "ntdll.h"
-
-extern bool dos_file_warning;
-extern bool ignore_case_with_glob;
-extern bool allow_winsymlinks;
-bool reset_com = false;
 
 static char **lastenviron;
 
@@ -116,6 +111,7 @@ static struct parse_thing
       } values[2];
   } known[] NO_COPY =
 {
+  {"detect_bloda", {&detect_bloda}, justset, NULL, {{false}, {true}}},
   {"dosfilewarning", {&dos_file_warning}, justset, NULL, {{false}, {true}}},
   {"error_start", {func: error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
