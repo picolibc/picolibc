@@ -1,3 +1,10 @@
+2012-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (dll_cmp): New comparison function for bsearch.
+	(well_known_dlls): New array containing well-known DLLs.
+	(_cygtls::call2): Add code for BLODA detection.
+	* net.cc (fdsock): Ditto.
+
 2012-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (enum settings): Add setbool.  Rename justset to setdword

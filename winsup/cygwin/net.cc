@@ -1,7 +1,7 @@
 /* net.cc: network-related routines.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -532,19 +532,33 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 		      sizeof (base_soc), &bret, NULL, NULL);
       if (ret)
 	debug_printf ("WSAIoctl: %lu", WSAGetLastError ());
-      else if (base_soc != soc
-	       && GetHandleInformation ((HANDLE) base_soc, &flags)
-	       && (flags & HANDLE_FLAG_INHERIT))
+      else if (base_soc != soc)
 	{
-	  if (!DuplicateHandle (GetCurrentProcess (), (HANDLE) base_soc,
-				GetCurrentProcess (), (PHANDLE) &base_soc,
-				0, TRUE, DUPLICATE_SAME_ACCESS))
-	    debug_printf ("DuplicateHandle failed, %E");
-	  else
+	  /* LSPs are often BLODAs as well.  So we print an info about
+	     detecting an LSP if BLODA detection is desired. */
+	  if (detect_bloda)
 	    {
-	      closesocket (soc);
-	      soc = base_soc;
-	      fixup = false;
+	      WSAPROTOCOL_INFO prot;
+
+	      memset (&prot, 0, sizeof prot);
+	      ::getsockopt (soc, SOL_SOCKET, SO_PROTOCOL_INFO, (char *) &prot,
+			    (size = sizeof prot, &size));
+	      small_printf ("\n\nPotential BLODA detected!  Layered Socket "
+			    "Service Provider:\n  %s\n\n", prot.szProtocol);
+	    }
+	  if (GetHandleInformation ((HANDLE) base_soc, &flags)
+	      && (flags & HANDLE_FLAG_INHERIT))
+	    {
+	      if (!DuplicateHandle (GetCurrentProcess (), (HANDLE) base_soc,
+				    GetCurrentProcess (), (PHANDLE) &base_soc,
+				    0, TRUE, DUPLICATE_SAME_ACCESS))
+		debug_printf ("DuplicateHandle failed, %E");
+	      else
+		{
+		  closesocket (soc);
+		  soc = base_soc;
+		  fixup = false;
+		}
 	    }
 	}
     }
