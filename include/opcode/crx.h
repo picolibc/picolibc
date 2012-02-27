@@ -1,5 +1,5 @@
 /* crx.h -- Header file for CRX opcode and register tables.
-   Copyright 2004, 2010 Free Software Foundation, Inc.
+   Copyright 2004, 2010, 2012 Free Software Foundation, Inc.
    Contributed by Tomer Levi, NSC, Israel.
    Originally written for GAS 2.12 by Tomer Levi, NSC, Israel.
    Updates, BFDizing, GNUifying and ELF support by Tomer Levi.
@@ -384,7 +384,7 @@ extern const int crx_num_traps;
 #define NUMTRAPS crx_num_traps
 
 /* cst4 operand mapping.  */
-extern const long cst4_map[];
+extern const int cst4_map[];
 extern const int cst4_maps;
 
 /* Table of instructions with no operands.  */
