@@ -1,8 +1,0 @@
-LIBRARY d3d9.dll
-EXPORTS
-DebugSetLevel
-DebugSetMute
-Direct3DCreate9@4
-_Z30Direct3DShaderValidatorCreate9v=Direct3DShaderValidatorCreate9
-_Z9PSGPErrorP21D3DFE_PROCESSVERTICES11PSGPERRORIDj@12=PSGPError
-_Z17PSGPSampleTextureP21D3DFE_PROCESSVERTICESjPA4_fjS2_@20=PSGPSampleTexture
