@@ -1,3 +1,7 @@
+2012-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (well_known_dlls): Add shlwapi.dll.
+
 2012-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (dll_cmp): New comparison function for bsearch.

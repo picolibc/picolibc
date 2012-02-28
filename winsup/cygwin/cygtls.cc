@@ -80,6 +80,7 @@ const wchar_t *well_known_dlls[] =
   L"kernel32.dll",
   L"mswsock.dll",
   L"ntdll.dll",
+  L"shlwapi.dll",
   L"ws2_32.dll",
 };
 
