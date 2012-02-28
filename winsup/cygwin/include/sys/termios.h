@@ -1,7 +1,7 @@
 /* sys/termios.h
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,6 +13,8 @@ details. */
 
 #ifndef	_SYS_TERMIOS_H
 #define _SYS_TERMIOS_H
+
+#include <sys/types.h>
 
 #define	TIOCMGET	0x5415
 #define	TIOCMBIS	0x5416
@@ -328,7 +330,7 @@ int tcsendbreak (int, int);
 int tcdrain (int);
 int tcflush (int, int);
 int tcflow (int, int);
-int tcgetsid (int);
+pid_t tcgetsid (int);
 void cfmakeraw (struct termios *);
 speed_t cfgetispeed(const struct termios *);
 speed_t cfgetospeed(const struct termios *);

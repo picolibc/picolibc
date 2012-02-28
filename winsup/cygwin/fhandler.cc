@@ -1464,7 +1464,7 @@ fhandler_base::tcgetpgrp ()
   return -1;
 }
 
-int
+pid_t
 fhandler_base::tcgetsid ()
 {
   set_errno (ENOTTY);

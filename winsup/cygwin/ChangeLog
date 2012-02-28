@@ -1,3 +1,11 @@
+2012-02-28  Eric Blake  <eblake@redhat.com>
+
+	* include/sys/termios.h (tcgetsid): Fix return type.
+	* termios.cc (tcgetsid): Likewise.
+	* fhandler_termios.cc (fhandler_termios::tcgetsid): Likewise.
+	* fhandler.h (fhandler_base): Likewise.
+	* fhandler.cc (fhandler_base::tcgetsid): Likewise.
+
 2012-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (well_known_dlls): Add shlwapi.dll.

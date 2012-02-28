@@ -383,7 +383,7 @@ public:
   virtual int tcgetattr (struct termios *t);
   virtual int tcsetpgrp (const pid_t pid);
   virtual int tcgetpgrp ();
-  virtual int tcgetsid ();
+  virtual pid_t tcgetsid ();
   virtual bool is_tty () const { return false; }
   virtual bool ispipe () const { return false; }
   virtual pid_t get_popen_pid () const {return 0;}
@@ -1155,7 +1155,7 @@ class fhandler_termios: public fhandler_base
   virtual void __release_output_mutex (const char *fn, int ln) {}
   void echo_erase (int force = 0);
   virtual _off64_t lseek (_off64_t, int);
-  int tcgetsid ();
+  pid_t tcgetsid ();
 
   fhandler_termios (void *) {}
 
