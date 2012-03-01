@@ -93,18 +93,6 @@ C:/cygwin/bin /bin ntfs binary,cygexec 0 0
 C:/cygwin/bin /usr/bin ntfs binary,cygexec 0 0
 </screen>
 
-<para>Note that if you have Tcl/Tk installed, you must additionally
-exclude <literal>tclsh84</literal> and <literal>wish84</literal>, which
-are linked to the Cygwin DLL but are not actually Cygwin programs:
-</para>
-
-<screen>
-C:/cygwin/bin/tclsh84.exe /bin/tclsh84.exe ntfs binary,notexec 0 0
-C:/cygwin/bin/tclsh84.exe /usr/bin/tclsh84.exe ntfs binary,notexec 0 0
-C:/cygwin/bin/wish84.exe /bin/wish84.exe ntfs binary,notexec 0 0
-C:/cygwin/bin/wish84.exe /usr/bin/wish84.exe ntfs binary,notexec 0 0
-</screen>
-
 <para>If you have added other non-Cygwin programs to a path you want to mount
 cygexec, you can find them with a script like this:
 </para>
@@ -574,8 +562,6 @@ $(LD) EXPFILE --dll -o DLLNAME OBJS LIBS -e ENTRY
 </para>
 <para>LIBS is the list of libraries you want to link the DLL against.  For
 example, you may or may not want -lcygwin.  You may want -lkernel32.
-Tcl links against -lcygwin -ladvapi32 -luser32 -lgdi32 -lcomdlg32
--lkernel32.
 </para>
 <para>DEFFILE is the name of your definitions file.  A simple DEFFILE would
 consist of ``EXPORTS'' followed by a list of all symbols which should
@@ -614,9 +600,8 @@ int entry (HINSTANT hinst, DWORD reason, LPVOID reserved)
 }
 </screen>
 
-<para>You may put an optional `--subsystem windows' on the $(LD) lines.  The
-Tcl build does this, but I admit that I no longer remember whether
-this is important.  Note that if you specify a --subsytem &lt;x&gt; flag to ld,
+<para>You may put an optional `--subsystem windows' on the $(LD) lines.
+Note that if you specify a --subsytem &lt;x&gt; flag to ld,
 the -e entry must come after the subsystem flag, since the subsystem flag
 sets a different default entry point.
 </para>

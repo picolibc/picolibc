@@ -1060,16 +1060,27 @@ usually all set and you can start the sshd service via
 </answer></qandaentry>
 
 <qandaentry id="faq.using.tcl-tk">
-<question><para>Why doesn't Cygwin tcl/tk understand Cygwin paths?</para></question>
+<question><para>Why do my Tk programs not work anymore?</para></question>
 <answer>
 
-<para>The versions of Tcl/Tk distributed with Cygwin (e.g. cygtclsh80.exe,
-cygwish80.exe) are not actually "Cygwin versions" of those tools.
-They are built as native libraries, which means they do not understand
-Cygwin mounts or symbolic links.
-</para>
-<para>See the entry "How do I convert between Windows and UNIX paths?"
-elsewhere in this FAQ.
+<para>Previous versions of Tcl/Tk distributed with Cygwin (e.g. tclsh84.exe,
+wish84.exe) were not actually "Cygwin versions" of those tools.
+They were built as native libraries, which means they did not understand
+Cygwin mounts or symbolic links. This lead to all sorts of problems interacting
+with true Cygwin programs.</para>
+
+<para>As of February 2012, this was replaced with a version of Tcl/Tk which
+uses Cygwin's POSIX APIs and X11 for GUI functionality.  If you get a message
+such as this when trying to start a Tk app:</para>
+
+<screen>
+  Application initialization failed: couldn't connect to display ""
+</screen>
+
+<para>Then you need to start an X server, or if one is already running, set the
+<literal>DISPLAY</literal> variable to the proper value.  The Cygwin distribution
+includes an X server; please see the <ulink url="http://x.cygwin.com/docs/ug/cygwin-x-ug.html">Cygwin/X User Guide</ulink>
+for installation and startup instructions.
 </para></answer></qandaentry>
 
 <qandaentry id="faq.using.ipv6">
