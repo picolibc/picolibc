@@ -1,5 +1,13 @@
 2012-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_console.cc (fhandler_console::input_tcsetattr): Revert
+	prevois patch.
+	(fhandler_console::open_setup): Install Ctrl-C handler here, if this
+	console is the controlling tty and the process hasn't been started by
+	a Cygwin process.
+
+2012-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (fhandler_console::input_tcsetattr): Set the
 	state of the Ctrl-C handler depending on the setting of
 	ENABLE_PROCESSED_INPUT.
