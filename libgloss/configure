@@ -2428,7 +2428,7 @@ case "${target}" in
 	subdirs="$subdirs sparc"
 
 	;;
-  sh*-*-pe | mips*-*-pe | *arm-wince-pe)
+  sh*-*-pe | mips*-*-pe | *arm*-wince-pe)
 	subdirs="$subdirs wince"
 
 	;;
@@ -2524,7 +2524,7 @@ case "${target}" in
 	subdirs="$subdirs rx"
 
 	;;
-  arm*-*-elf | arm*-*-coff | arm-*-*)
+  arm*-*-elf | arm*-*-coff | arm*-*-*)
 	subdirs="$subdirs arm"
 
 	;;

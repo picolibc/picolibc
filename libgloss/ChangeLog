@@ -1,3 +1,11 @@
+2012-03-02  Bin Cheng  <bin.cheng@arm.com>
+
+	* configure.in: Accept "arm*" target spec instead of just "arm".
+	* configure: Regenerated.
+	* libnosys/configure.in: Likewise.
+	(libc_symbol_prefix): Renamed to libc_cv_symbol_prefix.
+	* libnosys/configure: Regenerated (using autoconf v2.68).
+
 2012-02-21  Jeremy Bennett  <jeremy.bennett@embecosm.com>
             Alan Lehotsky  <apl@alum.mit.edu>
             Joern Rennecke  <joern.rennecke@embecosm.com>

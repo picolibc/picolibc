@@ -62,7 +62,7 @@ case "${target}" in
   sparclet-*-aout* | sparc-*-elf* | sparc64-*-elf* | sparc86x-*-* | sparclite-*-*)
 	AC_CONFIG_SUBDIRS([sparc])
 	;;
-  sh*-*-pe | mips*-*-pe | *arm-wince-pe)
+  sh*-*-pe | mips*-*-pe | *arm*-wince-pe)
 	AC_CONFIG_SUBDIRS([wince])
 	;;
   mips*-*-*)
@@ -134,7 +134,7 @@ case "${target}" in
   rx*-*-elf)
 	AC_CONFIG_SUBDIRS([rx])
 	;;
-  arm*-*-elf | arm*-*-coff | arm-*-*)
+  arm*-*-elf | arm*-*-coff | arm*-*-*)
 	AC_CONFIG_SUBDIRS([arm])
 	;;
   spu-*-elf)
