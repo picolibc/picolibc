@@ -176,8 +176,22 @@ allow_others_to_sync ()
   /* Create a valid dacl pointer and set its size to be as big as
      there's room in the temporary buffer.  Note that the descriptor
      is in self-relative format. */
-  dacl = (PACL) ((char *) sd + (uintptr_t) sd->Dacl);
-  dacl->AclSize = NT_MAX_PATH * sizeof (WCHAR) - ((char *) dacl - (char *) sd);
+  BOOLEAN present, defaulted;
+  RtlGetDaclSecurityDescriptor (sd, &present, &dacl, &defaulted);
+  if (dacl == NULL) /* Everyone has all access anyway */
+    {
+      done = true;
+      return;
+    }
+  else if (!present)
+    {
+      dacl = (PACL) (sd + 1);
+      RtlCreateAcl (dacl, MAX_PROCESS_SD_SIZE - sizeof *sd, ACL_REVISION);
+    }
+  else
+    {
+      dacl->AclSize = MAX_PROCESS_SD_SIZE - ((PBYTE) dacl - (PBYTE) sd);
+    }
   /* Allow everyone to SYNCHRONIZE with this process. */
   status = RtlAddAccessAllowedAce (dacl, ACL_REVISION, SYNCHRONIZE,
 				   well_known_world_sid);

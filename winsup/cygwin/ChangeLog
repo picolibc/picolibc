@@ -1,5 +1,11 @@
 2012-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (allow_others_to_sync): Use RtlGetDaclSecurityDescriptor
+	rather than accessing the SECURITY_DESCRIPTOR structure directly.
+	Take no DACL and NULL DACL into account.
+
+2012-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (fhandler_console::input_tcsetattr): Revert
 	previous patch.
 	(fhandler_console::open_setup): Install Ctrl-C handler here, if this
