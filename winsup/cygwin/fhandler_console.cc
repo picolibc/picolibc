@@ -1009,6 +1009,9 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
       res = SetConsoleMode (get_io_handle (), flags) ? 0 : -1;
       if (res < 0)
 	__seterrno ();
+      else
+	/* Set state of ctrl_c handler depending on ENABLE_PROCESSED_INPUT. */
+	init_console_handler (flags & ENABLE_PROCESSED_INPUT);
       syscall_printf ("%d = tcsetattr(,%x) enable flags %p, c_lflag %p iflag %p",
 		      res, t, flags, t->c_lflag, t->c_iflag);
     }

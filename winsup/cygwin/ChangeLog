@@ -1,3 +1,9 @@
+2012-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc (fhandler_console::input_tcsetattr): Set the
+	state of the Ctrl-C handler depending on the setting of
+	ENABLE_PROCESSED_INPUT.
+
 2012-02-28  Eric Blake  <eblake@redhat.com>
 
 	* include/sys/termios.h (tcgetsid): Fix return type.
