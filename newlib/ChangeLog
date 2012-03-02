@@ -1,3 +1,8 @@
+2012-03-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/posix/readdir_r.c: Fix return code when end of
+	directory is reached.
+
 2012-02-23  Dan Egnor  <egnor@ofb.net>
 
 	* configure.host: Accept "arm*" host spec instead of just "arm".

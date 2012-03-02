@@ -76,7 +76,7 @@ struct dirent *tmpdp;
         __lock_release_recursive(dirp->dd_lock);
 #endif
         *dpp = NULL;
-        return errno;
+        return dirp->dd_size == 0 ? 0 : errno;
       }
     }
     if (dirp->dd_loc >= dirp->dd_size) {
