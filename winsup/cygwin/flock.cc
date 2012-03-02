@@ -178,15 +178,15 @@ allow_others_to_sync ()
      is in self-relative format. */
   BOOLEAN present, defaulted;
   RtlGetDaclSecurityDescriptor (sd, &present, &dacl, &defaulted);
-  if (dacl == NULL) /* Everyone has all access anyway */
-    {
-      done = true;
-      return;
-    }
-  else if (!present)
+  if (!present) /* If so, dacl has undefined value. */
     {
       dacl = (PACL) (sd + 1);
       RtlCreateAcl (dacl, MAX_PROCESS_SD_SIZE - sizeof *sd, ACL_REVISION);
+    }
+  else if (dacl == NULL) /* Everyone has all access anyway */
+    {
+      done = true;
+      return;
     }
   else
     {

@@ -1,5 +1,11 @@
 2012-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (allow_others_to_sync): Reorder conditional expression to
+	check for DACL presence first, since otherwise dacl pointer value is
+	undefined.  Add comment.
+
+2012-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* flock.cc (allow_others_to_sync): Use RtlGetDaclSecurityDescriptor
 	rather than accessing the SECURITY_DESCRIPTOR structure directly.
 	Take no DACL and NULL DACL into account.
