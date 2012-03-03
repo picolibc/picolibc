@@ -898,7 +898,16 @@ out:
 int
 fhandler_pty_slave::dup (fhandler_base *child, int flags)
 {
-  myself->set_ctty (this, flags);
+  /* This code was added in Oct 2001 for some undisclosed reason.
+     However, setting the controlling tty on a dup causes rxvt to
+     hang when the parent does a dup since the controlling pgid changes.
+     Specifically testing for -2 (ctty has been setsid'ed) works around
+     this problem.  However, it's difficult to see scenarios in which you
+     have a dup'able fd, no controlling tty, and not having run setsid.
+     So, we might want to consider getting rid of the set_ctty in tty-like dup
+     methods entirely at some point */
+  if (myself->ctty != -2)
+    myself->set_ctty (this, flags);
   report_tty_counts (child, "duped slave", "");
   return 0;
 }

@@ -759,7 +759,9 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
 int
 fhandler_console::dup (fhandler_base *child, int flags)
 {
-  myself->set_ctty (this, flags);
+  /* See comments in fhandler_pty_slave::dup */
+  if (myself->ctty != -2)
+    myself->set_ctty (this, flags);
   return 0;
 }
 

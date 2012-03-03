@@ -1,3 +1,14 @@
+2012-03-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler_console.cc (fhandler_console::dup): Only set ctty when we
+	haven't specifically called setsid.
+	* fhandler_tty.cc (fhandler_pty_slave::dup): Ditto.  Also add comment
+	documenting research into rxvt problem.
+	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Don't check
+	specifically for myself->ctty == -1.  Test for > 0 as that is the
+	correct test.
+	(fhandler_termios::sigflush): Ditto.
+
 2012-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (allow_others_to_sync): Reorder conditional expression to
