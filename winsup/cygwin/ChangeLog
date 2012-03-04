@@ -1,5 +1,13 @@
 2012-03-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dll_init.cc: Revert pathname changes from 2012-02-08.
+	(dll_list::operator[]): Add long comment to explain the misery.
+	(dll_list::alloc): Skip long pathname prefix potentially returned by
+	GetModuleFileNameW.
+	* dll_init.h (dll_list::find_by_modname): Add back declaration.
+
+2012-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* winver.rc: Bump copyright date.
 
 2012-03-03  Christopher Faylor  <me.cygwin2012@cgf.cx>

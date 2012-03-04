@@ -106,13 +106,46 @@ dll::init ()
   return ret;
 }
 
-/* Look for a dll based on the basename.
-   Only compare basenames for DLLs.  Per MSDN, the Windows loader re-uses
-   the already loaded DLL, if the new DLL has the same basename as the
-   already loaded DLL.  It will not try to load the new DLL at all.  See
-   http://msdn.microsoft.com/en-us/library/ms682586%28v=vs.85%29.aspx */
+/* Look for a dll based on the full path.
+
+   CV, 2012-03-04: Per MSDN, If a DLL with the same module name is already
+   loaded in memory, the system uses the loaded DLL, no matter which directory
+   it is in. The system does not search for the DLL.  See
+   http://msdn.microsoft.com/en-us/library/ms682586%28v=vs.85%29.aspx
+
+   On 2012-02-08 I interpreted "module name" as "basename".  So the assumption
+   was that the Windows Loader does not load another DLL with the same basename,
+   if one such DLL is already loaded.  Consequentially I changed the code so
+   that DLLs are only compared by basename.
+
+   This assumption was obviously wrong, as the perl dynaloader proves.  It
+   loads multiple DLLs with the same basename into memory, just from different
+   locations.  This mechanism is broken when only comparing basenames in the
+   below code.
+
+   However, the original problem reported on 2012-02-07 was a result of
+   a subtil difference between the paths returned by different calls to
+   GetModuleFileNameW: Sometimes the path is a plain DOS path, sometimes
+   it's preceeded by the long pathname prefix "\\?\".
+
+   So I reverted the original change from 2012-02-08 and only applied the
+   following fix: Check if the path is preceeded by a long pathname prefix,
+   and, if so, drop it forthwith so that subsequent full path comparisons
+   work as expected. */
 dll *
-dll_list::operator[] (const PWCHAR modname)
+dll_list::operator[] (const PWCHAR name)
+{
+  dll *d = &start;
+  while ((d = d->next) != NULL)
+    if (!wcscasecmp (name, d->name))
+      return d;
+
+  return NULL;
+}
+
+/* Look for a dll based on the basename. */
+dll *
+dll_list::find_by_modname (const PWCHAR modname)
 {
   dll *d = &start;
   while ((d = d->next) != NULL)
@@ -128,21 +161,23 @@ dll_list::operator[] (const PWCHAR modname)
 dll *
 dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 {
-  WCHAR name[NT_MAX_PATH];
-  GetModuleFileNameW (h, name, sizeof (name));
+  WCHAR buf[NT_MAX_PATH];
+  GetModuleFileNameW (h, buf, sizeof (buf));
+  PWCHAR name = buf;
+  if (!wcsncmp (name, L"\\\\?\\", 4))
+    name += 4;
   DWORD namelen = wcslen (name);
-  PWCHAR modname = wcsrchr (name, L'\\') + 1;
 
   guard (true);
   /* Already loaded? */
-  dll *d = dlls[modname];
+  dll *d = dlls[name];
   if (d)
     {
       if (!in_forkee)
 	d->count++;	/* Yes.  Bump the usage count. */
       else if (d->handle != h)
 	fabort ("%W: Loaded to different address: parent(%p) != child(%p)",
-		modname, d->handle, h);
+		name, d->handle, h);
       d->p = p;
     }
   else
@@ -154,7 +189,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 	 supplied info about this DLL. */
       d->count = 1;
       wcscpy (d->name, name);
-      d->modname = d->name + (modname - name);
+      d->modname = wcsrchr (d->name, L'\\') + 1;
       d->handle = h;
       d->has_dtors = true;
       d->p = p;
@@ -200,7 +235,7 @@ void dll_list::populate_deps (dll* d)
     {
       char* modname = pef->rva (id->Name);
       sys_mbstowcs (wmodname, NT_MAX_PATH, modname);
-      if (dll* dep = dlls[wmodname])
+      if (dll* dep = find_by_modname (wmodname))
 	{
 	  if (d->ndeps >= maxdeps)
 	    {
