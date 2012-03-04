@@ -1,3 +1,7 @@
+2012-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winver.rc: Bump copyright date.
+
 2012-03-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fhandler_console.cc (fhandler_console::dup): Only set ctty when we
