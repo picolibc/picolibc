@@ -167,10 +167,13 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   if (!wcsncmp (name, L"\\\\?\\", 4))
     name += 4;
   DWORD namelen = wcslen (name);
+  PWCHAR modname = wcsrchr (name, L'\\') + 1;
 
   guard (true);
-  /* Already loaded? */
-  dll *d = dlls[name];
+  /* Already loaded?  For linked DLLs, only compare the basenames.  Linked
+     DLLs are loaded using just the basename and the default DLL search path.
+     The Windows loader picks up the first one it finds.  */
+  dll *d = (type == DLL_LINK) ? dlls.find_by_modname (modname) : dlls[name];
   if (d)
     {
       if (!in_forkee)
@@ -178,6 +181,21 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       else if (d->handle != h)
 	fabort ("%W: Loaded to different address: parent(%p) != child(%p)",
 		name, d->handle, h);
+      /* If this DLL has been linked against, and the full path differs, try
+	 to sanity check if this is the same DLL, just in another path. */
+      else if (type == DLL_LINK && wcscasecmp (name, d->name)
+	       && (d->p.data_start != p->data_start
+		   || d->p.data_start != p->data_start
+		   || d->p.bss_start != p->bss_start
+		   || d->p.bss_end != p->bss_end
+		   || d->p.ctors != p->ctors
+		   || d->p.dtors != p->dtors))
+      	fabort ("\nLoaded different DLL with same basename in forked child,\n"
+		"parent loaded: %W\n"
+		" child loaded: %W\n"
+		"The DLLs differ, so it's not safe to run the forked child.\n"
+		"Make sure to remove the offending DLL before trying again.",
+		d->name, name);
       d->p = p;
     }
   else
@@ -189,7 +207,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 	 supplied info about this DLL. */
       d->count = 1;
       wcscpy (d->name, name);
-      d->modname = wcsrchr (d->name, L'\\') + 1;
+      d->modname = d->name + (modname - name);
       d->handle = h;
       d->has_dtors = true;
       d->p = p;
@@ -446,6 +464,12 @@ dll_list::reserve_space ()
 	      d->modname, d->handle);
 }
 
+/* We need the in_load_after_fork flag so dll_dllcrt0_1 can decide at fork
+   time if this is a linked DLL or a dynamically loaded DLL.  In either case,
+   both, cygwin_finished_initializing and in_forkee are true, so they are not
+   sufficient to discern the situation. */
+static bool NO_COPY in_load_after_fork;
+
 /* Reload DLLs after a fork.  Iterates over the list of dynamically loaded
    DLLs and attempts to load them in the same place as they were loaded in the
    parent. */
@@ -455,7 +479,9 @@ dll_list::load_after_fork (HANDLE parent)
   // moved to frok::child for performance reasons:
   // dll_list::reserve_space();
 
+  in_load_after_fork = true;
   load_after_fork_impl (parent, dlls.istart (DLL_LOAD), 0);
+  in_load_after_fork = false;
 }
 
 static int const DLL_RETRY_MAX = 6;
@@ -582,7 +608,7 @@ dll_dllcrt0_1 (VOID *x)
       _pei386_runtime_relocator (p);
     }
 
-  bool linked = !in_forkee && !cygwin_finished_initializing;
+  bool linked = !cygwin_finished_initializing && !in_load_after_fork;
 
   /* Broken DLLs built against Cygwin versions 1.7.0-49 up to 1.7.0-57
      override the cxx_malloc pointer in their DLL initialization code,

@@ -1,5 +1,16 @@
 2012-03-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dll_init.cc (dll_list::alloc): Compare linked DLLs by basename only.
+	Explain why.  Add code to check if a DLL with the same basename but
+	different path is the same DLL.  Bail out if not.
+	(in_load_after_fork): New static NO_COPY bool to allow to differ
+	between linked and loaded DLL at fork.
+	(dll_list::load_after_fork): Set in_load_after_fork accordingly.
+	(dll_dllcrt0_1): Don't treat DLL as linked if in_load_after_fork is set.
+	Drop test for in_forkee.
+
+2012-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dll_init.cc: Revert pathname changes from 2012-02-08.
 	(dll_list::operator[]): Add long comment to explain the misery.
 	(dll_list::alloc): Skip long pathname prefix potentially returned by
