@@ -1,7 +1,7 @@
 /* dcrt0.cc -- essentially the main() for the Cygwin dll
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -683,6 +683,7 @@ init_windows_system_directory ()
 void
 dll_crt0_0 ()
 {
+  wincap.init ();
   child_proc_info = get_cygwin_startup_info ();
   init_windows_system_directory ();
   init_global_security ();

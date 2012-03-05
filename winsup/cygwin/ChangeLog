@@ -1,5 +1,10 @@
 2012-03-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* init.cc (dll_entry): Move wincap.init call back from here...
+	* dcrt0.cc (dll_crt0_0): ...to here.
+
+2012-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.h (enum fcwd_version_t): Move here from path.cc.
 	(class fcwd_access_t): Ditto.  Only declare methods.
 	(class cwdstuff): Move fast_cwd_ptr and fast_cwd_version from shared
