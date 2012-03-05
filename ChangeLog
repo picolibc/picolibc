@@ -1,3 +1,8 @@
+2012-03-05  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.ac: Enable gdb and readline for ia64*-*-*vms*.
+	* configure: Regenerate.
+
 2012-02-21  Joern Rennecke  <joern.rennecke@embecosm.com>
 
 	* COPYING.NEWLIB: Add Adapteva notice.
