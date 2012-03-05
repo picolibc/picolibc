@@ -131,7 +131,22 @@ dll::init ()
    So I reverted the original change from 2012-02-08 and only applied the
    following fix: Check if the path is preceeded by a long pathname prefix,
    and, if so, drop it forthwith so that subsequent full path comparisons
-   work as expected. */
+   work as expected.
+   
+   At least that was the original idea.  In fact there are two case, linked
+   and runtime loaded DLLs, which have to be distinguished:
+   
+   - Linked DLLs are loaded by only specifying the basename of the DLL and
+     searching it using the system DLL search order as given in the
+     aforementioned MSDN URL.
+
+   - Runtime loaded DLLs are specified with the full path since that's how
+     dlopen works.
+
+   In effect, we have to be careful not to mix linked and loaded DLLs.
+   For more info how this gets accomplished, see the comments at the start
+   of dll_list::alloc, as well as the comment preceeding the definition of
+   the in_load_after_fork bool later in the file. */
 dll *
 dll_list::operator[] (const PWCHAR name)
 {
