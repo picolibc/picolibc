@@ -1,3 +1,8 @@
+2012-03-05  Denis Excoffier  <cygwin@Denis-Excoffier.org>
+
+	* pinfo.cc (_pinfo::dup_proc_pipe): Fix order of arguments in debug
+	output.
+
 2012-03-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* init.cc (dll_entry): Move wincap.init call back from here...

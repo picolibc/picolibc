@@ -1001,7 +1001,7 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
     {
       wr_proc_pipe = orig_wr_proc_pipe;
       warn_printf ("something failed for pid %d: res %d, hProcess %p, wr_proc_pipe %p vs. %p, %E",
-		   res, pid, hProcess, wr_proc_pipe, orig_wr_proc_pipe);
+		   pid, res, hProcess, wr_proc_pipe, orig_wr_proc_pipe);
     }
   else
     {
