@@ -1,3 +1,10 @@
+2012-03-07  Nick Clifton  <nickc@redhat.com>
+
+	* mn10300.h (elf_mn10300_reloc_type): Add R_MN10300_TLS_GD,
+	R_MN10300_TLS_LD, R_MN10300_TLS_LDO, R_MN10300_TLS_GOTIE,
+	R_MN10300_TLS_IE, R_MN10300_TLS_LE, R_MN10300_TLS_DPTMOD,
+	R_MN10300_TLS_DTPOFF and R_MN10300_TLS_TPOFF.
+
 2012-02-25  Walter Lee  <walt@tilera.com>
 
 	* tilegx.h (R_TILEGX_IMM16_X0_HW1_GOT): Delete.
