@@ -1,3 +1,7 @@
+2012-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* glob.cc (MAXPATHLEN): Reinstantiate with a value of 8192.
+
 2012-03-05  Denis Excoffier  <cygwin@Denis-Excoffier.org>
 
 	* pinfo.cc (_pinfo::dup_proc_pipe): Fix order of arguments in debug

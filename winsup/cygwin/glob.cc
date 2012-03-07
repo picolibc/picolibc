@@ -111,6 +111,9 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
 #define Cchar(c)	(ignore_case_with_glob ? towlower (c) : (c))
 #endif
 
+#undef MAXPATHLEN
+#define MAXPATHLEN 8192
+
 #define	DOLLAR		'$'
 #define	DOT		'.'
 #define	EOS		'\0'
