@@ -785,7 +785,7 @@ loop:
 	    myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
 					   just in case we've been previously
 					   execed. */
-	  orig_wr_proc_pipe = myself->dup_proc_pipe (pi.hProcess);
+	  orig_wr_proc_pipe = myself->dup_proc_pipe (pi.hProcess, "child_info_spawn::worker");
 	}
       pid = myself->pid;
       if (!iscygwin ())

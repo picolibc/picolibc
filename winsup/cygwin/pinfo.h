@@ -111,7 +111,7 @@ public:
   char *cwd (size_t &);
   char *cmdline (size_t &);
   bool set_ctty (class fhandler_termios *, int);
-  HANDLE dup_proc_pipe (HANDLE) __attribute__ ((regparm(2)));
+  HANDLE dup_proc_pipe (HANDLE, const char *) __attribute__ ((regparm(3)));
   void sync_proc_pipe ();
   bool alert_parent (char);
   int __stdcall kill (siginfo_t&) __attribute__ ((regparm (2)));

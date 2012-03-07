@@ -1,3 +1,13 @@
+2012-03-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (_pinfo::dup_proc_pipe): Reorganize to provide more
+	information for failing condition.
+	(pinfo::wait): Pass name of function to dup_proc_pipe.  Eliminate error
+	check for dup_proc_pipe since it never actually returned an error.
+	* pinfo.h (_pinfo::dup_proc_pipe): Add an argument.
+	* spawn.cc (child_info_spawn::worker): Pass name of function to
+	dup_proc_pipe.
+
 2012-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* glob.cc (MAXPATHLEN): Reinstantiate with a value of 8192.

@@ -986,7 +986,7 @@ proc_waiter (void *arg)
 #define warn_printf system_printf
 #endif
 HANDLE
-_pinfo::dup_proc_pipe (HANDLE hProcess)
+_pinfo::dup_proc_pipe (HANDLE hProcess, const char *func)
 {
   DWORD flags = DUPLICATE_SAME_ACCESS;
   HANDLE orig_wr_proc_pipe = wr_proc_pipe;
@@ -997,17 +997,25 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
     flags |= DUPLICATE_CLOSE_SOURCE;
   bool res = DuplicateHandle (GetCurrentProcess (), wr_proc_pipe,
 			      hProcess, &wr_proc_pipe, 0, FALSE, flags);
-  if (!res && WaitForSingleObject (hProcess, 0) != WAIT_OBJECT_0)
+  if (res)
     {
-      wr_proc_pipe = orig_wr_proc_pipe;
-      warn_printf ("something failed for pid %d: res %d, hProcess %p, wr_proc_pipe %p vs. %p, %E",
-		   pid, res, hProcess, wr_proc_pipe, orig_wr_proc_pipe);
+      wr_proc_pipe_owner = dwProcessId;
+      sigproc_printf ("(%s) duped wr_proc_pipe %p for pid %d(%u)", func,
+		      wr_proc_pipe, pid, dwProcessId);
     }
   else
     {
-      wr_proc_pipe_owner = dwProcessId;
-      sigproc_printf ("duped wr_proc_pipe %p for pid %d(%u)", wr_proc_pipe,
-		      pid, dwProcessId);
+      DWORD duperr = GetLastError ();
+      DWORD wfsores = WaitForSingleObject (hProcess, 0);
+      if (wfsores != WAIT_OBJECT_0)
+	{
+	  warn_printf ("(%s) process synchronization failed for pid %u/%p, "
+		       "wr_proc_pipe %p vs. %p: DuplicateHandle winerr %d, "
+		       "WFSO returned %u, %E",
+		       func, pid, hProcess, wr_proc_pipe, orig_wr_proc_pipe, duperr,
+		       wfsores);
+	}
+      wr_proc_pipe = orig_wr_proc_pipe;
     }
   return orig_wr_proc_pipe;
 }
@@ -1030,11 +1038,7 @@ pinfo::wait ()
 	  return false;
 	}
 
-      if (!(*this)->dup_proc_pipe (hProcess))
-	{
-	  system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid, hProcess);
-	  return false;
-	}
+      (*this)->dup_proc_pipe (hProcess, "pinfo::wait");
     }
 
   preserve ();		/* Preserve the shared memory associated with the pinfo */
