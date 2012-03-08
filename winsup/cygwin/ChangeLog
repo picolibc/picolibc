@@ -1,3 +1,7 @@
+2012-03-08  Václav Zeman  <vhaisman@gmail.com>
+
+	* path.cc (readlink): Avoid calling strlen() twice.
+
 2012-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Throughout, replace usage of w32api's min with MIN from sys/param.h.

@@ -2783,7 +2783,8 @@ readlink (const char *path, char *buf, size_t buflen)
       return -1;
     }
 
-  ssize_t len = MIN (buflen, strlen (pathbuf.get_win32 ()));
+  size_t pathbuf_len = strlen (pathbuf.get_win32 ());
+  ssize_t len = MIN (buflen, pathbuf_len);
   memcpy (buf, pathbuf.get_win32 (), len);
 
   /* errno set by symlink.check if error */
