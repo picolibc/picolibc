@@ -1650,36 +1650,71 @@ ip_addr_prefix (PIP_ADAPTER_UNICAST_ADDRESS pua, PIP_ADAPTER_PREFIX pap)
 #define GAA_FLAG_INCLUDE_ALL_INTERFACES 0x0100
 #endif
 
-bool
-get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
+struct gaa_wa {
+  ULONG family;
+  PIP_ADAPTER_ADDRESSES *pa_ret;
+};
+
+DWORD WINAPI
+call_gaa (LPVOID param)
 {
   DWORD ret, size = 0;
+  gaa_wa *p = (gaa_wa *) param;
   PIP_ADAPTER_ADDRESSES pa0 = NULL;
 
-  if (!pa_ret)
-    return ERROR_BUFFER_OVERFLOW
-	   == GetAdaptersAddresses (family, GAA_FLAG_INCLUDE_PREFIX
+  if (!p->pa_ret)
+    return GetAdaptersAddresses (p->family, GAA_FLAG_INCLUDE_PREFIX
 					    | GAA_FLAG_INCLUDE_ALL_INTERFACES,
-				    NULL, NULL, &size);
+				 NULL, NULL, &size);
   do
     {
-      ret = GetAdaptersAddresses (family, GAA_FLAG_INCLUDE_PREFIX
-					  | GAA_FLAG_INCLUDE_ALL_INTERFACES,
+      ret = GetAdaptersAddresses (p->family, GAA_FLAG_INCLUDE_PREFIX
+					     | GAA_FLAG_INCLUDE_ALL_INTERFACES,
 				  NULL, pa0, &size);
       if (ret == ERROR_BUFFER_OVERFLOW
 	  && !(pa0 = (PIP_ADAPTER_ADDRESSES) realloc (pa0, size)))
 	break;
     }
   while (ret == ERROR_BUFFER_OVERFLOW);
-  if (ret != ERROR_SUCCESS)
+  if (pa0)
     {
-      if (pa0)
-	free (pa0);
-      *pa_ret = NULL;
-      return false;
+      if (ret != ERROR_SUCCESS)
+	{
+	  free (pa0);
+	  *p->pa_ret = pa0;
+	}
+      else
+	*p->pa_ret = pa0;
     }
-  *pa_ret = pa0;
-  return true;
+  return ret;
+}
+
+bool
+get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
+{
+  DWORD ret;
+  gaa_wa param = { family, pa_ret ?: NULL };
+
+  if ((uintptr_t) &param >= (uintptr_t) 0x80000000L)
+    {
+      /* Starting with Windows Vista, GetAdaptersAddresses fails with error 998,
+	 if it's running in a thread with a stack located in the large address
+	 area.  So, if we're running in a pthread with such a stack, we call
+	 GetAdaptersAddresses in a child thread with an OS-allocated stack,
+	 which is guaranteed to be located in the lower address area. */
+      HANDLE thr = CreateThread (NULL, 0, call_gaa, &param, 0, NULL);
+      if (!thr)
+	{
+	  debug_printf ("CreateThread: %E");
+	  return false;
+	}
+      WaitForSingleObject (thr, INFINITE);
+      GetExitCodeThread (thr, &ret);
+      CloseHandle (thr);
+    }
+  else
+    ret = call_gaa (&param);
+  return ret == ERROR_SUCCESS || (!pa_ret && ret == ERROR_BUFFER_OVERFLOW);
 }
 
 #define WS_IFF_UP	     1

@@ -1,5 +1,11 @@
 2012-03-08  Václav Zeman  <vhaisman@gmail.com>
 
+	* net.cc (call_gaa): New thread function to call GetAdaptersAddresses.
+	(get_adapters_addresses): Call call_gaa.  If necessary, call it as
+	child thread.  Explain why that's necessary.
+
+2012-03-08  Václav Zeman  <vhaisman@gmail.com>
+
 	* path.cc (readlink): Avoid calling strlen() twice.
 
 2012-03-07  Corinna Vinschen  <corinna@vinschen.de>
