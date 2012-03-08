@@ -14,6 +14,7 @@ details. */
 #include <stdlib.h>
 #include <sys/uio.h>
 #include <sys/acl.h>
+#include <sys/param.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
@@ -949,7 +950,7 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
   char *p = buf;
   while (nbytes > 0)
     {
-      const int frag = min (nbytes, (ssize_t) iovptr->iov_len);
+      const int frag = MIN (nbytes, (ssize_t) iovptr->iov_len);
       memcpy (iovptr->iov_base, p, frag);
       p += frag;
       iovptr += 1;
@@ -1001,7 +1002,7 @@ fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
 
   while (nbytes != 0)
     {
-      const int frag = min (nbytes, (ssize_t) iovptr->iov_len);
+      const int frag = MIN (nbytes, (ssize_t) iovptr->iov_len);
       memcpy (bufptr, iovptr->iov_base, frag);
       bufptr += frag;
       iovptr += 1;

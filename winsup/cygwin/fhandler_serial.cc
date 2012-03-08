@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
+#include <sys/param.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -44,7 +45,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
   int tot;
   DWORD n;
 
-  size_t minchars = vmin_ ? min (vmin_, ulen) : ulen;
+  size_t minchars = vmin_ ? MIN (vmin_, ulen) : ulen;
 
   debug_printf ("ulen %d, vmin_ %d, vtime_ %d, hEvent %p", ulen, vmin_, vtime_,
 		io_status.hEvent);

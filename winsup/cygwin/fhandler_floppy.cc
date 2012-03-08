@@ -2,7 +2,7 @@
    fhandler classes.
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2011 Red Hat, Inc.
+   2009, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,6 +13,7 @@ details. */
 #include "winsup.h"
 #include <alloca.h>
 #include <unistd.h>
+#include <sys/param.h>
 #include <winioctl.h>
 #include <cygwin/rdevio.h>
 #include <cygwin/hdreg.h>
@@ -446,7 +447,7 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 	{
 	  if (devbufstart < devbufend)
 	    {
-	      bytes_to_read = min (len, devbufend - devbufstart);
+	      bytes_to_read = MIN (len, devbufend - devbufstart);
 	      debug_printf ("read %d bytes from buffer (rest %d)",
 			    bytes_to_read,
 			    devbufend - devbufstart - bytes_to_read);

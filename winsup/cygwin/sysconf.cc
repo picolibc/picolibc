@@ -1,7 +1,7 @@
 /* sysconf.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2007, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
+#include <sys/param.h>
 #include <sys/sysinfo.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -294,7 +295,7 @@ confstr (int in, char *buf, size_t len)
       if (csa[in].l && len)
 	{
 	  buf[0] = 0;
-	  strncat (buf, csa[in].s, min (len, csa[in].l) - 1);
+	  strncat (buf, csa[in].s, MIN (len, csa[in].l) - 1);
 	}
       return csa[in].l;
     }

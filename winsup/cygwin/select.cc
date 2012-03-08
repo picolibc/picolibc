@@ -1293,7 +1293,7 @@ thread_socket (void *arg)
 	    event = true;
       if (!event)
 	for (int i = 0; i < si->num_w4; i += MAXIMUM_WAIT_OBJECTS)
-	  switch (WaitForMultipleObjects (min (si->num_w4 - i,
+	  switch (WaitForMultipleObjects (MIN (si->num_w4 - i,
 					       MAXIMUM_WAIT_OBJECTS),
 					  si->w4 + i, FALSE, timeout))
 	    {

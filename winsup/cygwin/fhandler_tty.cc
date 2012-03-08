@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <sys/param.h>
 #include <cygwin/kd.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -623,7 +624,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 
   while (len)
     {
-      n = min (OUT_BUFFER_SIZE, len);
+      n = MIN (OUT_BUFFER_SIZE, len);
       char *buf = (char *)ptr;
       ptr = (char *) ptr + n;
       len -= n;
@@ -802,7 +803,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	  return;
 	}
 
-      readlen = min (bytes_in_pipe, min (len, sizeof (buf)));
+      readlen = MIN (bytes_in_pipe, MIN (len, sizeof (buf)));
 
       if (ptr && vmin && readlen > (unsigned) vmin)
 	readlen = vmin;

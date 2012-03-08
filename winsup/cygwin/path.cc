@@ -57,6 +57,7 @@
 #include <winnetwk.h>
 #include <winnls.h>
 #include <shlobj.h>
+#include <sys/param.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -2782,7 +2783,7 @@ readlink (const char *path, char *buf, size_t buflen)
       return -1;
     }
 
-  ssize_t len = min (buflen, strlen (pathbuf.get_win32 ()));
+  ssize_t len = MIN (buflen, strlen (pathbuf.get_win32 ()));
   memcpy (buf, pathbuf.get_win32 (), len);
 
   /* errno set by symlink.check if error */

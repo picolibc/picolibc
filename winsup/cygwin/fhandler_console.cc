@@ -18,6 +18,7 @@ details. */
 #include <winuser.h>
 #include <winnls.h>
 #include <ctype.h>
+#include <sys/param.h>
 #include <sys/cygwin.h>
 #include <cygwin/kd.h>
 #include "cygerrno.h"
@@ -1740,7 +1741,7 @@ fhandler_console::write_normal (const unsigned char *src,
   if (trunc_buf.len)
     {
       const unsigned char *nfound;
-      int cp_len = min (end - src, 4 - trunc_buf.len);
+      int cp_len = MIN (end - src, 4 - trunc_buf.len);
       memcpy (trunc_buf.buf + trunc_buf.len, src, cp_len);
       memset (&ps, 0, sizeof ps);
       switch (ret = f_mbtowc (_REENT, NULL, (const char *) trunc_buf.buf,

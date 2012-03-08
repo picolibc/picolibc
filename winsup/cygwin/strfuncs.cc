@@ -1,7 +1,7 @@
 /* strfuncs.cc: misc funcs that don't belong anywhere else
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <sys/param.h>
 #include <wchar.h>
 #include <winnls.h>
 #include <ntdll.h>
@@ -238,7 +239,7 @@ __db_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n, UINT cp,
 	  *pwc = *(unsigned char *) s;
 	  return *s ? 1 : 0;
 	}
-      size_t cnt = min (n, 2);
+      size_t cnt = MIN (n, 2);
       ret = MultiByteToWideChar (cp, MB_ERR_INVALID_CHARS, s, cnt, pwc, 1);
       if (ret)
 	return cnt;
@@ -312,7 +313,7 @@ __eucjp_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	  ret = 3;
 	  goto jis_x_0212;
 	}
-      size_t cnt = min (n, 2);
+      size_t cnt = MIN (n, 2);
       if (MultiByteToWideChar (20932, MB_ERR_INVALID_CHARS, s, cnt, pwc, 1))
 	return cnt;
       if (n == 1)
