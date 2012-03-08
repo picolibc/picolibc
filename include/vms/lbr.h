@@ -87,7 +87,10 @@ struct vms_lhd
   unsigned char nextvbn[4];
 
   /* Free pre-allocated index block.  */
+  /* Number of free blocks.  */
   unsigned char freidxblk[4];
+  /* VBN of a simply linked list of free blocks.  The list is terminated by a
+     nul VBN.  */
   unsigned char freeidx[4];
 
   /* Highest pre-allocated index block and in use.  */

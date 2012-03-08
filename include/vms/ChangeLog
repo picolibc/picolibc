@@ -1,3 +1,7 @@
+2012-03-08  Tristan Gingold  <gingold@adacore.com>
+
+	* lbr.h (struct vms_lhd): Add comments.
+
 2010-05-27  Tristan Gingold  <gingold@adacore.com>
 
 	* lbr.h: Improve comments.
