@@ -1,3 +1,7 @@
+2012-03-10  Edmar Wienskoski  <edmar@freescale.com>
+
+	* ppc.h: Add PPC_OPCODE_ALTIVEC2, PPC_OPCODE_E6500, PPC_OPCODE_TMR.
+
 2012-02-27  Alan Modra  <amodra@gmail.com>
 
 	* crx.h (cst4_map): Update declaration.

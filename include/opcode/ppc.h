@@ -1,6 +1,6 @@
 /* ppc.h -- Header file for PowerPC opcode table
    Copyright 1994, 1995, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+   2007, 2008, 2009, 2010, 2012 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support
 
    This file is part of GDB, GAS, and the GNU binutils.
@@ -173,6 +173,15 @@ extern const int powerpc_num_opcodes;
 
 /* Opcode which is supported by the e500 family */
 #define PPC_OPCODE_E500	       0x100000000ull
+
+/* Opcode is supported by Extended Altivec Vector Unit */
+#define PPC_OPCODE_ALTIVEC2    0x200000000ull
+
+/* Opcode is supported by Power E6500 */
+#define PPC_OPCODE_E6500       0x400000000ull
+
+/* Opcode is supported by Thread management APU */
+#define PPC_OPCODE_TMR         0x800000000ull
 
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
