@@ -1,5 +1,11 @@
 2012-03-09  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* COPYING.NEWLIB: Modify DJ Delorie license to include
+	modification rights in clause as permitted by DJ Delorie.
+	* COPYING.LIBGLOSS: Ditto.
+
+2012-03-09  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* COPYING.NEWLIB: Remove two unused licenses.
 
 2012-03-05  Tristan Gingold  <gingold@adacore.com>
