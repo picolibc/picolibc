@@ -1,6 +1,6 @@
 /* hookapi.cc
 
-   Copyright 2005, 2006, 2007, 2008, 2011 Red Hat, Inc.
+   Copyright 2005, 2006, 2007, 2008, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -49,14 +49,18 @@ PEHeaderFromHModule (HMODULE hModule)
 }
 
 static long
-rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva)
+rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva, DWORD &max_size)
 {
   PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER) (pnt + 1);
   for (int i = 0; i < pnt->FileHeader.NumberOfSections; i++)
     if (section[i].VirtualAddress <= import_rva
 	&& (section[i].VirtualAddress + section[i].Misc.VirtualSize) > import_rva)
     // if (ascii_strncasematch ((char *) section[i].Name, ".idata", IMAGE_SIZEOF_SHORT_NAME))
-      return section[i].VirtualAddress - section[i].PointerToRawData;
+      {
+	max_size = section[i].Misc.VirtualSize
+		   - (import_rva - section[i].VirtualAddress);
+	return section[i].VirtualAddress - section[i].PointerToRawData;
+      }
   return -1;
 }
 
@@ -172,6 +176,7 @@ find_first_notloaded_dll (path_conv& pc)
   IO_STATUS_BLOCK io;
   HANDLE h;
   NTSTATUS status;
+  LARGE_INTEGER size;
 
   status = NtOpenFile (&h, SYNCHRONIZE | GENERIC_READ,
 		       pc.get_object_attr (attr, sec_none_nih),
@@ -181,13 +186,27 @@ find_first_notloaded_dll (path_conv& pc)
 		       | FILE_NON_DIRECTORY_FILE);
   if (!NT_SUCCESS (status))
     goto out;
-
+  /* Just as in hook_or_detect_cygwin below, we have to take big executables
+     into account.  That means, we must not try to map the entire file, since
+     there's no guarantee that the current process has enough VM in one block
+     left for this mapping.  The offset computation below ignores very big
+     executables for now.  In theory, since the import RVA table appears to
+     be more or less at the end of the data section, independent of the used
+     compiler, that shouldn't matter. */
+  if (!GetFileSizeEx (h, &size))
+    {
+      NtClose (h);
+      goto out;
+    }
+  if (size.QuadPart > wincap.allocation_granularity ())
+    size.LowPart = wincap.allocation_granularity ();
   hc = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY, 0, 0, NULL);
   NtClose (h);
   if (!hc)
     goto out;
-  hm = (HMODULE) MapViewOfFile(hc, FILE_MAP_READ, 0, 0, 0);
-  CloseHandle (hc);
+  hm = (HMODULE) MapViewOfFile(hc, FILE_MAP_READ, 0, 0, size.LowPart);
+  if (!hm)
+    goto out;
 
   PIMAGE_NT_HEADERS pExeNTHdr;
   pExeNTHdr = PEHeaderFromHModule (hm);
@@ -195,19 +214,36 @@ find_first_notloaded_dll (path_conv& pc)
   if (pExeNTHdr)
     {
       DWORD importRVA;
+      DWORD importRVASize;
+      DWORD importRVAMaxSize;
       importRVA = pExeNTHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+      importRVASize = pExeNTHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
       if (importRVA)
 	{
-	  long delta = rvadelta (pExeNTHdr, importRVA);
+	  long delta = rvadelta (pExeNTHdr, importRVA, importRVAMaxSize);
+	  if (delta < 0)
+	    goto out;
+	  importRVA -= delta;
+
+	  DWORD offset = 0;
+	  char *map;
+	  if (importRVA + importRVAMaxSize > wincap.allocation_granularity ())
+	    {
+	      offset = rounddown (importRVA, wincap.allocation_granularity ());
+	      DWORD size = importRVA - offset + importRVAMaxSize;
+	      map = (char *) MapViewOfFile (hc, FILE_MAP_READ, 0, offset, size);
+	      if (!map)
+		goto out;
+	    }
 
 	  // Convert imports RVA to a usable pointer
 	  PIMAGE_IMPORT_DESCRIPTOR pdfirst;
-	  pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA - delta);
+	  pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA - offset);
 
 	  // Iterate through each import descriptor, and redirect if appropriate
 	  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
 	    {
-	      const char *lib = rva (PSTR, hm, pd->Name - delta);
+	      const char *lib = rva (PSTR, hm, pd->Name - delta - offset);
 	      if (!LoadLibraryEx (lib, NULL, DONT_RESOLVE_DLL_REFERENCES
 					     | LOAD_LIBRARY_AS_DATAFILE))
 		{
@@ -215,12 +251,15 @@ find_first_notloaded_dll (path_conv& pc)
 		  res = strcpy (buf, lib);
 		}
 	    }
+	  UnmapViewOfFile (map);
 	}
     }
 
 out:
   if (hm)
     UnmapViewOfFile (hm);
+  if (hc)
+    CloseHandle (hc);
 
   return res;
 }
@@ -233,7 +272,11 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
   PIMAGE_NT_HEADERS pExeNTHdr = PEHeaderFromHModule (hm);
 
   if (!pExeNTHdr)
-    return false;
+    return NULL;
+
+  /* FIXME: This code has to be made 64 bit capable. */
+  if (pExeNTHdr->FileHeader.Machine != IMAGE_FILE_MACHINE_I386)
+    return NULL;
 
   subsys =  pExeNTHdr->OptionalHeader.Subsystem;
 
@@ -242,18 +285,19 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
   DWORD importRVASize = pExeNTHdr->OptionalHeader.DataDirectory
 			[IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
   if (!importRVA)
-    return false;
+    return NULL;
 
-  long delta = fn ? 0 : rvadelta (pExeNTHdr, importRVA);
+  DWORD importRVAMaxSize;
+  long delta = fn ? 0 : rvadelta (pExeNTHdr, importRVA, importRVAMaxSize);
   if (delta < 0)
-    return false;
+    return NULL;
   importRVA -= delta;
 
   // Convert imports RVA to a usable pointer
   PIMAGE_IMPORT_DESCRIPTOR pdfirst;
   char *map = NULL;
   DWORD offset = 0;
-  if (h && importRVA + importRVASize > wincap.allocation_granularity ())
+  if (h && importRVA + importRVAMaxSize > wincap.allocation_granularity ())
     {
       /* If h is not NULL, the calling function only mapped at most the first
 	 64K of the image.  The IAT is usually at the end of the image, so
@@ -261,11 +305,44 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
 	 reside in the first 64K anyway.  The offset must be a multiple of the
 	 allocation granularity, though, so we have to map a bit more. */
       offset = rounddown (importRVA, wincap.allocation_granularity ());
-      DWORD size = importRVA - offset + importRVASize;
+      /* But that's not all, unfortunately.  Apparently there's a difference
+	 between the importRVASize of applications built with gcc and those
+	 built with Visual Studio.  When built with gcc, importRVASize contains
+	 the size of the import RVA table plus the size of the referenced
+	 string table with the DLL names.  When built with VS, it only contains
+	 the size of the naked import RVA table.  importRVAMaxSize contains the
+	 size of the reminder of the section.  If that's less than 64K, we're
+	 good.  Otherwise the executable is potentially *very* big.  In that
+	 case we only map the naked import RVA table and ... */
+      DWORD size = importRVA - offset
+		   + ((importRVA - offset + importRVAMaxSize
+		       <= wincap.allocation_granularity ())
+		      ? importRVAMaxSize : importRVASize);
       map = (char *) MapViewOfFile (h, FILE_MAP_READ, 0, offset, size);
       if (!map)
-	return false;
+	return NULL;
       pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map, importRVA - offset);
+      /* ... carefully check the required size to fit the string table into
+         the map as well.  Allow NAME_MAX bytes for the DLL name.  There's a
+	 slim chance that the allocation will fail, if the string table is
+	 right at the end of the last section in the file, but that's very
+	 unlikely. */
+      if (importRVA - offset + importRVAMaxSize > wincap.allocation_granularity ())
+	{
+	  DWORD newsize = size;
+	  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
+	    if (pd->Name - delta - offset + (NAME_MAX + 1) > newsize)
+	      newsize = pd->Name - delta - offset + (NAME_MAX + 1);
+	  if (newsize > size )
+	    {
+	      UnmapViewOfFile (map);
+	      map = (char *) MapViewOfFile (h, FILE_MAP_READ, 0, offset,
+					    newsize);
+	      if (!map)
+		return NULL;
+	      pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map, importRVA - offset);
+	    }
+	}
     }
   else
     pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA);
@@ -273,7 +350,9 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
   function_hook fh;
   fh.origfn = NULL;
   fh.hookfn = fn;
-  char *buf = (char *) alloca (strlen (name) + sizeof ("_64"));
+  char *buf = NULL;
+  if (fn)
+    buf = (char *) alloca (strlen (name) + sizeof ("_64"));
   int i = 0;
   // Iterate through each import descriptor, and redirect if appropriate
   for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
@@ -296,6 +375,8 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
 
   if (map)
     UnmapViewOfFile (map);
+  if (!fn)
+    return NULL;
 
   while (!fh.origfn && (fh.name = makename (name, buf, i, -1)))
     get_export (fh);

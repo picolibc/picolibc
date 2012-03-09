@@ -1,4 +1,15 @@
-2012-03-08  Václav Zeman  <vhaisman@gmail.com>
+2012-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* hookapi.cc (rvadelta): Add parameter to return maximum available
+	size from start of import RVA table to end of section.
+	(find_first_notloaded_dll): Take big executables into account.  Use
+	offset and size computation as in hook_or_detect_cygwin, just simpler.
+	(hook_or_detect_cygwin): Return NULL rather than false througout.
+	Change computation of required mapping size to take non-gcc compilers
+	into account.  Explain the differences and what we do against them.
+	Don't alloca buf if fn is NULL.  Never use buf if fn is NULL.
+
+2012-03-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (call_gaa): New thread function to call GetAdaptersAddresses.
 	(get_adapters_addresses): Call call_gaa.  If necessary, call it as
