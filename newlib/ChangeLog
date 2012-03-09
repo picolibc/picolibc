@@ -1,3 +1,14 @@
+2012-03-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/machine/setjmp-dj.h: Modify license to include
+	modification in clause as permitted by DJ Delorie.
+	* libc/machine/arm/access.c: Ditto.
+	* libc/machine/i386/setjmp.S: Ditto.
+	* libc/sys/h8300hms/sys/file.h: Ditto.
+	* libc/sys/linux/machine/i386/setjmp.S: Ditto.
+	* libc/sys/sysmec/access.c: Ditto.
+	* libc/sys/sysnecv850/access.c: Ditto.
+
 2012-03-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/posix/readdir_r.c: Fix return code when end of

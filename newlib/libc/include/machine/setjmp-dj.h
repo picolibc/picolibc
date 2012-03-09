@@ -2,7 +2,7 @@
  * Copyright (C) 1991 DJ Delorie
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms is permitted
+ * Redistribution, modification, and use in source and binary forms is permitted
  * provided that the above copyright notice and following paragraph are
  * duplicated in all such forms.
  *
