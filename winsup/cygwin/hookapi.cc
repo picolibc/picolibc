@@ -226,7 +226,7 @@ find_first_notloaded_dll (path_conv& pc)
 	  importRVA -= delta;
 
 	  DWORD offset = 0;
-	  char *map;
+	  char *map = NULL;
 	  if (importRVA + importRVAMaxSize > wincap.allocation_granularity ())
 	    {
 	      offset = rounddown (importRVA, wincap.allocation_granularity ());

@@ -1,5 +1,9 @@
 2012-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* hookapi.cc (find_first_notloaded_dll): Fix a compiler warning.
+
+2012-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* hookapi.cc (rvadelta): Add parameter to return maximum available
 	size from start of import RVA table to end of section.
 	(find_first_notloaded_dll): Take big executables into account.  Use
