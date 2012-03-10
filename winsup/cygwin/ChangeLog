@@ -1,3 +1,9 @@
+2012-03-10  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* dtable.cc (fh_alloc): Treat pc.dev as unsigned.
+	* fhandler_console.cc (fhandler_console::set_unit): Use lock always to
+	avoid races between competing cygwin processes running on the console.
+
 2012-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* hookapi.cc (find_first_notloaded_dll): Fix a compiler warning.

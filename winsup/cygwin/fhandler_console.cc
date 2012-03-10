@@ -134,6 +134,7 @@ fhandler_console::set_unit ()
 {
   bool created;
   fh_devices devset;
+  lock_ttys here;
   if (shared_console_info)
     {
       fh_devices this_unit = dev ();
@@ -152,10 +153,7 @@ fhandler_console::set_unit ()
       shared_console_info = open_shared_console (me, cygheap->console_h, created);
       ProtectHandleINH (cygheap->console_h);
       if (created)
-	{
-	  lock_ttys here;
-	  shared_console_info->tty_min_state.setntty (DEV_CONS_MAJOR, console_unit (me));
-	}
+	shared_console_info->tty_min_state.setntty (DEV_CONS_MAJOR, console_unit (me));
       devset = (fh_devices) shared_console_info->tty_min_state.getntty ();
     }
 

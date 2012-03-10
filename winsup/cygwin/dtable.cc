@@ -478,7 +478,7 @@ fh_alloc (path_conv& pc)
       fh = cnew (fhandler_console, pc.dev);
       break;
     default:
-      switch ((int) pc.dev)
+      switch ((DWORD) pc.dev)
 	{
 	case FH_CONSOLE:
 	case FH_CONIN:
