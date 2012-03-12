@@ -1,3 +1,15 @@
+2012-03-12  Corinna Vinschen  <corinna@vinschen.de>
+	    Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler.h (wait_return): Add overlapped_nullread.
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Detect
+	zero-byte read as a special case.
+	(fhandler_base_overlapped::raw_read): Keep looping when zero-byte read
+	detected without EOF.
+	(fhandler_base_overlapped::raw_write): Quiet gcc warning by adding
+	overlapped_nullread to switch statement even though it will never
+	actually be hit.
+
 2012-03-10  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* dtable.cc (fh_alloc): Treat pc.dev as unsigned.

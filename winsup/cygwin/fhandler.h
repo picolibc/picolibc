@@ -629,6 +629,7 @@ protected:
     overlapped_unknown = 0,
     overlapped_success,
     overlapped_nonblocking_no_data,
+    overlapped_nullread,
     overlapped_error
   };
   bool io_pending;
