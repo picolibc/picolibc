@@ -137,6 +137,9 @@ struct addrinfo {
 extern int h_errno;
 #else
 extern __declspec(dllimport) int h_errno;
+/* Some packages expect h_errno to be a macro, otherwise they redeclare
+   h_errno, which leads to spurious warnings. */
+#define h_errno h_errno
 #endif
 
 #define	NETDB_INTERNAL -1 /* see errno */

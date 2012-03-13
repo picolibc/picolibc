@@ -1,3 +1,7 @@
+2012-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/netdb.h (h_errno): Add self-referencing macro and comment.
+
 2012-03-12  Corinna Vinschen  <corinna@vinschen.de>
 	    Christopher Faylor  <me.cygwin2012@cgf.cx>
 
