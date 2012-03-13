@@ -1,5 +1,12 @@
 2012-03-12  Mike Frysinger  <vapier@gentoo.org>
 
+	* libnosys/Makefile.in (NEWLIB_CFLAGS, NEWLIB_LDFLAGS,
+	INCLUDES, CFLAGS_FOR_TARGET, LDFLAGS_FOR_TARGET,
+	AR_FLAGS, .c.o, .C.o, .s.o, .S.o, .c.s): Delete and replace
+	with @host_makefile_frag@.
+
+2012-03-12  Mike Frysinger  <vapier@gentoo.org>
+
 	* config/default.mh (AR_FLAGS): Set to rc.
 
 2012-03-09  Jeff Johnston  <jjohnstn@redhat.com>
