@@ -1,5 +1,11 @@
 2012-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* hookapi.cc (hook_or_detect_cygwin): Change condition when to use
+	importRVAMaxSize or importRVASize for the mapping size.  Make sure
+	to map never more than the section size.  Change comments accordingly.
+
+2012-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/netdb.h (h_errno): Add self-referencing macro and comment.
 
 2012-03-12  Corinna Vinschen  <corinna@vinschen.de>

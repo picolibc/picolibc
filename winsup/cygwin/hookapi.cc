@@ -310,12 +310,14 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
 	 built with Visual Studio.  When built with gcc, importRVASize contains
 	 the size of the import RVA table plus the size of the referenced
 	 string table with the DLL names.  When built with VS, it only contains
-	 the size of the naked import RVA table.  importRVAMaxSize contains the
-	 size of the reminder of the section.  If that's less than 64K, we're
-	 good.  Otherwise the executable is potentially *very* big.  In that
-	 case we only map the naked import RVA table and ... */
+	 the size of the naked import RVA table.  The following code handles
+	 the situation.  importRVAMaxSize contains the size of the remainder
+	 of the section.  If the difference between importRVAMaxSize and
+	 importRVASize is less than 64K, we just use importRVAMaxSize to
+	 compute the size of the memory map.  Otherwise the executable may be
+	 very big.  In that case we only map the import RVA table and ... */
       DWORD size = importRVA - offset
-		   + ((importRVA - offset + importRVAMaxSize
+		   + ((importRVAMaxSize - importRVASize
 		       <= wincap.allocation_granularity ())
 		      ? importRVAMaxSize : importRVASize);
       map = (char *) MapViewOfFile (h, FILE_MAP_READ, 0, offset, size);
@@ -323,18 +325,18 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
 	return NULL;
       pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map, importRVA - offset);
       /* ... carefully check the required size to fit the string table into
-         the map as well.  Allow NAME_MAX bytes for the DLL name.  There's a
-	 slim chance that the allocation will fail, if the string table is
-	 right at the end of the last section in the file, but that's very
-	 unlikely. */
-      if (importRVA - offset + importRVAMaxSize > wincap.allocation_granularity ())
+         the map as well.  Allow NAME_MAX bytes for the DLL name, but don't
+	 go beyond the remainder of the section. */
+      if (importRVAMaxSize - importRVASize > wincap.allocation_granularity ())
 	{
 	  DWORD newsize = size;
 	  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
 	    if (pd->Name - delta - offset + (NAME_MAX + 1) > newsize)
 	      newsize = pd->Name - delta - offset + (NAME_MAX + 1);
-	  if (newsize > size )
+	  if (newsize > size)
 	    {
+	      if (newsize > importRVA - offset + importRVAMaxSize)
+		newsize = importRVA - offset + importRVAMaxSize;
 	      UnmapViewOfFile (map);
 	      map = (char *) MapViewOfFile (h, FILE_MAP_READ, 0, offset,
 					    newsize);
