@@ -1,3 +1,7 @@
+2012-03-12  Mike Frysinger  <vapier@gentoo.org>
+
+	* config/default.mh (AR_FLAGS): Set to rc.
+
 2012-03-09  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* epiphany/access.c: Add modification rights to clause as
