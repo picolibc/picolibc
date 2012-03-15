@@ -1,3 +1,0 @@
-LIBRARY dpnaddr.dll
-EXPORTS
-DirectPlay8AddressCreate@12
