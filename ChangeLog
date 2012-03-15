@@ -1,3 +1,9 @@
+2012-03-12  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* configure.ac (enable_libgomp): Remove *-*-osf*.
+	(with_stabs): Remove alpha*-*-osf*.
+	* configure: Regenerate.
+
 2012-03-09  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.NEWLIB: Modify DJ Delorie license to include
