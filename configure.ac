@@ -483,7 +483,7 @@ if test x$enable_libgomp = x ; then
 	;;
     *-*-netbsd* | *-*-freebsd* | *-*-openbsd* | *-*-dragonfly*)
 	;;
-    *-*-solaris2* | *-*-irix6* | *-*-osf* | *-*-hpux11*)
+    *-*-solaris2* | *-*-hpux11*)
 	;;
     *-*-darwin* | *-*-aix*)
 	;;
@@ -569,7 +569,7 @@ case "${target}" in
     ;;
   m68k-*-*)
     ;;
-  mips-sgi-irix6.* | mips*-*-rtems*)
+  mips*-*-rtems*)
     ;;
   mips*-*-linux*)
     ;;
@@ -683,13 +683,6 @@ case "${target}" in
     noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   rs6000-*-aix*)
-    noconfigdirs="$noconfigdirs ${libgcj}"
-    ;;
-  mips*-*-irix6*)
-    # Linking libjava exceeds command-line length limits on at least
-    # IRIX 6.2, but not on IRIX 6.5.
-    # Also, boehm-gc won't build on IRIX 6.5, according to Jeffrey Oldham
-    # <oldham@codesourcery.com>
     noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   *-*-lynxos*)
@@ -929,8 +922,8 @@ case "${target}" in
     noconfigdirs="$noconfigdirs libgui itcl ld"
     ;;
   ia64*-*-*vms*)
-    # No gdb or ld support yet.
-    noconfigdirs="$noconfigdirs readline libgui itcl gdb ld"
+    # No ld support yet.
+    noconfigdirs="$noconfigdirs libgui itcl ld"
     ;;
   i[[3456789]]86-w64-mingw*)
     ;;
@@ -2330,18 +2323,6 @@ case "${enable_target_optspace}:${target}" in
     echo "*** bad value \"${enable_target_optspace}\" for --enable-target-optspace flag; ignored" 1>&2
     ;;
 esac
-
-# Default to using --with-stabs for certain targets.
-if test x${with_stabs} = x ; then
-  case "${target}" in
-  mips*-*-irix[[56]]*)
-    ;;
-  mips*-*-* | alpha*-*-osf*)
-    with_stabs=yes;
-    extra_host_args="${extra_host_args} --with-stabs"
-    ;;
-  esac
-fi
 
 # Some systems (e.g., one of the i386-aix systems the gas testers are
 # using) don't handle "\$" correctly, so don't use it here.

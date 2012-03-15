@@ -117,18 +117,9 @@ Mail Stop 573
 Austin, TX 78741
 800-292-9263
 
-(5) C.W. Sandmann
+(5) 
 
-Copyright (C) 1993 C.W. Sandmann
-
-This file may be freely distributed as long as the author's name remains.
-
-(6) Eric Backus
-
-(C) Copyright 1992 Eric Backus
-
-This software may be used freely so long as this copyright notice is
-left intact.  There is no warrantee on this software.
+(6)
 
 (7) Sun Microsystems
 
@@ -416,7 +407,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Copyright (C) 1991 DJ Delorie
 All rights reserved.
 
-Redistribution and use in source and binary forms is permitted
+Redistribution, modification, and use in source and binary forms is permitted
 provided that the above copyright notice and following paragraph are
 duplicated in all such forms.
 
@@ -877,3 +868,29 @@ and need not follow the licensing terms described here, provided that
 the new terms are clearly indicated on the first page of each file where
 they apply. 
 
+(39) - Adapteva, Inc. (epiphany-* targets)
+
+Copyright (c) 2011, Adapteva, Inc.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ * Neither the name of Adapteva nor the names of its contributors may be used
+   to endorse or promote products derived from this software without specific
+   prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
