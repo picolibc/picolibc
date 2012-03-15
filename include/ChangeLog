@@ -1,3 +1,7 @@
+2012-03-15  Alan Modra  <amodra@gmail.com>
+
+	* dis-asm.h (disassemble_init_powerpc): Declare.
+
 2009-11-06  Jonas Maebe  <jonas.maebe@elis.ugent.be>
 
 	Add DWARF attribute value for the "Borland fastcall" calling
