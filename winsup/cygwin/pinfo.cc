@@ -49,6 +49,9 @@ pinfo_basic myself_initial NO_COPY;
 
 pinfo NO_COPY myself (static_cast<_pinfo *> (&myself_initial));	// Avoid myself != NULL checks
 
+HANDLE NO_COPY pinfo::pending_rd_proc_pipe;
+HANDLE NO_COPY pinfo::pending_wr_proc_pipe;
+
 bool is_toplevel_proc;
 
 /* Setup the pinfo structure for this process.  There may already be a
@@ -980,66 +983,16 @@ proc_waiter (void *arg)
   return 0;
 }
 
-#ifdef DEBUGGING
-#define warn_printf api_fatal
-#else
-#define warn_printf system_printf
-#endif
-HANDLE
-_pinfo::dup_proc_pipe (HANDLE hProcess, const char *func)
-{
-  DWORD flags = DUPLICATE_SAME_ACCESS;
-  HANDLE orig_wr_proc_pipe = wr_proc_pipe;
-  /* Can't set DUPLICATE_CLOSE_SOURCE for exec case because we could be
-     execing a non-cygwin process and we need to set the exit value before the
-     parent sees it.  */
-  if (this != myself || is_toplevel_proc)
-    flags |= DUPLICATE_CLOSE_SOURCE;
-  bool res = DuplicateHandle (GetCurrentProcess (), wr_proc_pipe,
-			      hProcess, &wr_proc_pipe, 0, FALSE, flags);
-  if (res)
-    {
-      wr_proc_pipe_owner = dwProcessId;
-      sigproc_printf ("(%s) duped wr_proc_pipe %p for pid %d(%u)", func,
-		      wr_proc_pipe, pid, dwProcessId);
-    }
-  else
-    {
-      DWORD duperr = GetLastError ();
-      DWORD wfsores = WaitForSingleObject (hProcess, 0);
-      if (wfsores != WAIT_OBJECT_0)
-	{
-	  warn_printf ("(%s) process synchronization failed for pid %u/%p, "
-		       "wr_proc_pipe %p vs. %p: DuplicateHandle winerr %d, "
-		       "WFSO returned %u, %E",
-		       func, pid, hProcess, wr_proc_pipe, orig_wr_proc_pipe, duperr,
-		       wfsores);
-	}
-      wr_proc_pipe = orig_wr_proc_pipe;
-    }
-  return orig_wr_proc_pipe;
-}
-
 /* function to set up the process pipe and kick off proc_waiter */
 bool
 pinfo::wait ()
 {
-  /* If rd_proc_pipe != NULL we're in an execed process which already has
-     grabbed the read end of the pipe from the previous cygwin process running
-     with this pid.  */
-  if (!rd_proc_pipe)
-    {
-      /* FIXME: execed processes should be able to wait for pids that were started
-	 by the process which execed them. */
-      if (!CreatePipe (&rd_proc_pipe, &((*this)->wr_proc_pipe), &sec_none_nih, 16))
-	{
-	  system_printf ("Couldn't create pipe tracker for pid %d, %E",
-			 (*this)->pid);
-	  return false;
-	}
+  rd_proc_pipe = pending_rd_proc_pipe;
+  pending_rd_proc_pipe = NULL;
 
-      (*this)->dup_proc_pipe (hProcess, "pinfo::wait");
-    }
+  wr_proc_pipe () = pending_wr_proc_pipe;
+  ForceCloseHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
+  pending_wr_proc_pipe = NULL;
 
   preserve ();		/* Preserve the shared memory associated with the pinfo */
 
@@ -1059,11 +1012,48 @@ pinfo::wait ()
 }
 
 void
-_pinfo::sync_proc_pipe ()
+pinfo::prefork (bool detached)
 {
-  if (wr_proc_pipe && wr_proc_pipe != INVALID_HANDLE_VALUE)
-    while (wr_proc_pipe_owner != GetCurrentProcessId ())
-      yield ();
+  if (wr_proc_pipe () && wr_proc_pipe () != INVALID_HANDLE_VALUE
+      && !SetHandleInformation (wr_proc_pipe (), HANDLE_FLAG_INHERIT, 0))
+    api_fatal ("couldn't set process pipe(%p) inherit state, %E", wr_proc_pipe ());
+  /* If rd_proc_pipe != NULL we're in an execed process which already has
+     grabbed the read end of the pipe from the previous cygwin process running
+     with this pid.  */
+  if (!detached)
+    {
+      if (!CreatePipe (&pending_rd_proc_pipe, &pending_wr_proc_pipe,
+		       &sec_none_nih, 16))
+	api_fatal ("Couldn't create pipe tracker for pid %d, %E", (*this)->pid);
+
+      if (!SetHandleInformation (pending_wr_proc_pipe, HANDLE_FLAG_INHERIT,
+				 HANDLE_FLAG_INHERIT))
+	api_fatal ("prefork: couldn't set process pipe(%p) inherit state, %E",
+		   pending_wr_proc_pipe);
+      ProtectHandle1 (pending_rd_proc_pipe, rd_proc_pipe);
+      ProtectHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
+    }
+}
+
+void
+pinfo::postfork ()
+{
+  if (wr_proc_pipe () && wr_proc_pipe () != INVALID_HANDLE_VALUE
+      && !SetHandleInformation (wr_proc_pipe (), HANDLE_FLAG_INHERIT,
+			       HANDLE_FLAG_INHERIT))
+    api_fatal ("postfork: couldn't set process pipe(%p) inherit state, %E", wr_proc_pipe ());
+  if (pending_rd_proc_pipe)
+    ForceCloseHandle1 (pending_rd_proc_pipe, rd_proc_pipe);
+  if (pending_wr_proc_pipe)
+    ForceCloseHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
+}
+
+void
+pinfo::postexec ()
+{
+  if (wr_proc_pipe () && wr_proc_pipe () != INVALID_HANDLE_VALUE
+      && !ForceCloseHandle (wr_proc_pipe ()))
+    api_fatal ("postexec: couldn't close wr_proc_pipe(%p), %E", wr_proc_pipe ());
 }
 
 /* function to send a "signal" to the parent when something interesting happens
@@ -1078,11 +1068,10 @@ _pinfo::alert_parent (char sig)
 
      FIXME: Is there a race here if we run this while another thread is attempting
      to exec()? */
-  if (wr_proc_pipe == INVALID_HANDLE_VALUE || !myself->wr_proc_pipe || have_execed)
+  if (wr_proc_pipe == INVALID_HANDLE_VALUE || !myself.wr_proc_pipe () || have_execed)
     /* no parent */;
   else
     {
-      sync_proc_pipe ();
       if (WriteFile (wr_proc_pipe, &sig, 1, &nb, NULL))
 	/* all is well */;
       else if (GetLastError () != ERROR_BROKEN_PIPE)

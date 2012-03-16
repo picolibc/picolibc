@@ -47,83 +47,6 @@ class frok
   friend int fork ();
 };
 
-class lock_signals
-{
-  bool worked;
-public:
-  lock_signals ()
-  {
-    worked = sig_send (NULL, __SIGHOLD) == 0;
-  }
-  operator int () const
-  {
-    return worked;
-  }
-  void dont_bother ()
-  {
-    worked = false;
-  }
-  ~lock_signals ()
-  {
-    if (worked)
-      sig_send (NULL, __SIGNOHOLD);
-  }
-};
-
-class lock_pthread
-{
-  bool bother;
-public:
-  lock_pthread (): bother (1)
-  {
-    pthread::atforkprepare ();
-  }
-  void dont_bother ()
-  {
-    bother = false;
-  }
-  ~lock_pthread ()
-  {
-    if (bother)
-      pthread::atforkparent ();
-  }
-};
-
-class hold_everything
-{
-public: /* DELETEME*/
-  bool& ischild;
-  /* Note the order of the locks below.  It is important,
-     to avoid races, that the lock order be preserved.
-
-     pthread is first because it serves as a master lock
-     against other forks being attempted while this one is active.
-
-     signals is next to stop signal processing for the duration
-     of the fork.
-
-     process is last.  If it is put before signals, then a deadlock
-     could be introduced if the process attempts to exit due to a signal. */
-  lock_pthread pthread;
-  lock_signals signals;
-  lock_process process;
-
-public:
-  hold_everything (bool& x): ischild (x) {}
-  operator int () const {return signals;}
-
-  ~hold_everything()
-  {
-    if (ischild)
-      {
-	pthread.dont_bother ();
-	process.dont_bother ();
-	signals.dont_bother ();
-      }
-  }
-
-};
-
 static void
 resume_child (HANDLE forker_finished)
 {
@@ -407,6 +330,7 @@ frok::parent (volatile char * volatile stack_here)
   while (1)
     {
       hchild = NULL;
+      myself.prefork ();
       rc = CreateProcessW (myself->progname, /* image to run */
 			   myself->progname, /* what we send in arg0 */
 			   &sec_none_nih,
@@ -592,6 +516,7 @@ frok::parent (volatile char * volatile stack_here)
 
 /* Common cleanup code for failure cases */
 cleanup:
+  myself.postfork ();
   if (fix_impersonation)
     cygheap->user.reimpersonate ();
   if (locked)

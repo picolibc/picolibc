@@ -1,3 +1,38 @@
+2012-03-16  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fork.cc (lock_signals): Move to sigproc.h.
+	(lock_pthread): Ditto.
+	(hold_everything): Ditto.
+	(frok::parent): Call myself.prefork() just before calling
+	CreateProcess.  Call myself.postfork () on function exit.
+	* pinfo.cc (pinfo::pending_rd_proc_pipe): Define.
+	(pinfo::pending_wr_proc_pipe): Ditto.
+	(_pinfo::dup_proc_pipe): Delete.
+	(pinfo::wait): Move pipe creation into pinfo::prefork.  Set pipe
+	variables from pending_*.
+	(_pinfo::sync_proc_pipe): Delete.
+	(_pinfo::proc_pipe_owner): Ditto.
+	(pinfo::prefork): Define new function.
+	(pinfo::postfork): Ditto.
+	(pinfo::postexec): Ditto.
+	(_pinfo::alert_parent): Remove obsolete call to sync_proc_pipe.
+	(_pinfo::dup_proc_pipe): Delete declaration.
+	(_pinfo::sync_proc_pipe): Ditto.
+	(pinfo::pending_rd_proc_pipe): Declare.
+	(pinfo::pending_wr_proc_pipe): Ditto.
+	(pinfo::prefork): Declare new function.
+	(pinfo::postfork): Ditto.
+	(pinfo::postexec): Ditto.
+	(pinfo::wr_proc_pipe): Define new wrapper function.
+	* sigproc.h: Include "sync.h".  Move locking functions from fork to
+	here.
+	* spawn.cc (child_info_spawn::worker): Delete now-unneeded requirement
+	to record orig_wr_proc_pipe.  Call hold_everything prior to doing
+	anything.  Call myself.prefork() if spawning.  Replace wr_proc_pipe
+	synchronization with call to myself.postexec().  Call myself.postfork()
+	if not execing.
+	* sync.h: Replace #ifdef wrapper with "#pragma once".
+
 2012-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* hookapi.cc (hook_or_detect_cygwin): Change condition when to use

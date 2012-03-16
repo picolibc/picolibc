@@ -308,6 +308,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       return -1;
     }
 
+  hold_everything for_now;
   /* FIXME: There is a small race here and FIXME: not thread safe! */
 
   pthread_cleanup cleanup;
@@ -335,7 +336,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   bool null_app_name = false;
   STARTUPINFOW si = {};
   int looped = 0;
-  HANDLE orig_wr_proc_pipe = NULL;
 
   myfault efault;
   if (efault.faulted ())
@@ -349,10 +349,13 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
     }
 
   child_info_types chtype;
-  if (mode != _P_OVERLAY)
-    chtype = _CH_SPAWN;
-  else
+  if (mode == _P_OVERLAY)
     chtype = _CH_EXEC;
+  else
+    {
+      chtype = _CH_SPAWN;
+      myself.prefork ();
+    }
 
   moreinfo = cygheap_exec_info::alloc ();
 
@@ -770,23 +773,16 @@ loop:
       sigproc_printf ("new process name %W", myself->progname);
       /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
 	 process.  So, we need to wait around until the process we've just "execed"
-	 dies.  Use our own wait facility to wait for our own pid to exit (there
-	 is some minor special case code in proc_waiter and friends to accommodate
-	 this).
+	 dies.  Use our own wait facility below to wait for our own pid to exit
+	 (there is some minor special case code in proc_waiter and friends to
+	 accommodate this).
 
-	 If wr_proc_pipe exists, then it should be duplicated to the child.
+	 If wr_proc_pipe exists, then it will be inherited by the child.
 	 If the child has exited already, that's ok.  The parent will pick up
-	 on this fact when we exit.  dup_proc_pipe will close our end of the pipe.
-	 Note that wr_proc_pipe may also be == INVALID_HANDLE_VALUE.  That will make
-	 dup_proc_pipe essentially a no-op.  */
+	 on this fact when we exit.  myself.postexec () will close our end of
+	 the pipe.  */
       if (!newargv.win16_exe && myself->wr_proc_pipe)
-	{
-	  if (!looped)
-	    myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
-					   just in case we've been previously
-					   execed. */
-	  orig_wr_proc_pipe = myself->dup_proc_pipe (pi.hProcess, "child_info_spawn::worker");
-	}
+	myself.postexec ();
       pid = myself->pid;
       if (!iscygwin ())
 	close_all_files ();
@@ -851,11 +847,6 @@ loop:
       myself.hProcess = pi.hProcess;
       if (!synced)
 	{
-	  if (orig_wr_proc_pipe)
-	    {
-	      myself->wr_proc_pipe_owner = GetCurrentProcessId ();
-	      myself->wr_proc_pipe = orig_wr_proc_pipe;
-	    }
 	  if (!proc_retry (pi.hProcess))
 	    {
 	      looped++;
@@ -896,6 +887,8 @@ loop:
     }
 
 out:
+  if (mode != _P_OVERLAY)
+    myself.postfork ();
   this->cleanup ();
   if (envblock)
     free (envblock);

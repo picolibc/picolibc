@@ -111,8 +111,6 @@ public:
   char *cwd (size_t &);
   char *cmdline (size_t &);
   bool set_ctty (class fhandler_termios *, int);
-  HANDLE dup_proc_pipe (HANDLE, const char *) __attribute__ ((regparm(3)));
-  void sync_proc_pipe ();
   bool alert_parent (char);
   int __stdcall kill (siginfo_t&) __attribute__ ((regparm (2)));
   bool __stdcall exists () __attribute__ ((regparm (1)));
@@ -124,7 +122,6 @@ public:
   DWORD exec_dwProcessId;
 public:
   HANDLE wr_proc_pipe;
-  DWORD wr_proc_pipe_owner;
   friend class pinfo_minimal;
 };
 
@@ -150,6 +147,8 @@ class pinfo: public pinfo_minimal
 {
   bool destroy;
   _pinfo *procinfo;
+  static HANDLE pending_rd_proc_pipe;
+  static HANDLE pending_wr_proc_pipe;
 public:
   bool waiter_ready;
   class cygthread *wait_thread;
@@ -205,10 +204,15 @@ public:
     return res;
   }
 #endif
+  void prefork (bool = false);
+  void postfork ();
+  void postexec ();
   HANDLE shared_handle () {return h;}
   void set_acl ();
   friend class _pinfo;
   friend class winpids;
+private:
+  HANDLE& wr_proc_pipe() {return procinfo->wr_proc_pipe;}
 };
 
 #define ISSTATE(p, f)	(!!((p)->process_state & f))

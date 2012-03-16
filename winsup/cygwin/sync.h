@@ -1,6 +1,7 @@
 /* sync.h: Header file for cygwin synchronization primitives.
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2011, 2012
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,8 +9,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _SYNC_H
-#define _SYNC_H
+#pragma once
+
 /* FIXME: Note that currently this class cannot be allocated via `new' since
    there are issues with malloc and fork. */
 class muto
@@ -62,5 +63,3 @@ public:
   friend class dtable;
   friend class fhandler_fifo;
 };
-
-#endif /*_SYNC_H*/
