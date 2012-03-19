@@ -22,8 +22,6 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 
-#include "sigproc.h"
-
 #include "cygserver_msg.h"
 #include "cygserver_sem.h"
 #include "cygserver_shm.h"

@@ -1,3 +1,7 @@
+2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* client.cc: Remove unneeded #include "sigproc.h".
+
 2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
