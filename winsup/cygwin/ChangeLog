@@ -1,3 +1,13 @@
+2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygprops.h: Use #pragma once.
+	* mkglobals_h: Ditto for generated globals.h file.
+	* globals.cc: Use specific NO_GLOBALS_H flag to control inclusion of
+	globals.h.
+	* winsup.h: Honor NO_GLOBALS_H to control inclusion of globals.h.  Make
+	clear_procimptoken extern inline so that it is only defined when
+	needed.
+
 2012-03-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (cancelable_wait): Don't malloc tbi, just make it a struct

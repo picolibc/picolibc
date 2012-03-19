@@ -9,7 +9,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#define _GLOBALS_H 1
+#define NO_GLOBALS_H
 #include "winsup.h"
 #include "cygtls.h"
 #include "perprocess.h"
@@ -31,20 +31,20 @@ UINT system_wow64_directory_length;
 /* program exit the program */
 
 enum exit_states
-  {
-    ES_NOT_EXITING = 0,
-    ES_EXIT_STARTING,
-    ES_PROCESS_LOCKED,
-    ES_EVENTS_TERMINATE,
-    ES_SIGNAL,
-    ES_CLOSEALL,
-    ES_THREADTERM,
-    ES_HUP_PGRP,
-    ES_HUP_SID,
-    ES_EXEC_EXIT,
-    ES_TTY_TERMINATE,
-    ES_FINAL
-  };
+{
+  ES_NOT_EXITING = 0,
+  ES_EXIT_STARTING,
+  ES_PROCESS_LOCKED,
+  ES_EVENTS_TERMINATE,
+  ES_SIGNAL,
+  ES_CLOSEALL,
+  ES_THREADTERM,
+  ES_HUP_PGRP,
+  ES_HUP_SID,
+  ES_EXEC_EXIT,
+  ES_TTY_TERMINATE,
+  ES_FINAL
+};
 
 exit_states NO_COPY exit_state;
 
