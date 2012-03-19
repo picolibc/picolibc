@@ -1,6 +1,6 @@
 /* cygserver_ipc.h
 
-   Copyright 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -32,6 +32,7 @@ struct proc {
 };
 
 #ifdef __INSIDE_CYGWIN__
+#include "sigproc.h"
 inline void
 ipc_set_proc_info (proc &blk)
 {

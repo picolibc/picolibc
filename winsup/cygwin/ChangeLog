@@ -1,5 +1,9 @@
 2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* cygserver_ipc.h: Include sigproc.h for signal_arrived declaration.
+
+2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* cygprops.h: Use #pragma once.
 	* mkglobals_h: Ditto for generated globals.h file.
 	* globals.cc: Use specific NO_GLOBALS_H flag to control inclusion of
