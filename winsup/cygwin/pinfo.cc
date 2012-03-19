@@ -987,12 +987,15 @@ proc_waiter (void *arg)
 bool
 pinfo::wait ()
 {
-  rd_proc_pipe = pending_rd_proc_pipe;
-  pending_rd_proc_pipe = NULL;
+  if (pending_rd_proc_pipe)
+    {
+      rd_proc_pipe = pending_rd_proc_pipe;
+      pending_rd_proc_pipe = NULL;
 
-  wr_proc_pipe () = pending_wr_proc_pipe;
-  ForceCloseHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
-  pending_wr_proc_pipe = NULL;
+      wr_proc_pipe () = pending_wr_proc_pipe;
+      ForceCloseHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
+      pending_wr_proc_pipe = NULL;
+    }
 
   preserve ();		/* Preserve the shared memory associated with the pinfo */
 

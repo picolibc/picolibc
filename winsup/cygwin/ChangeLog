@@ -1,3 +1,9 @@
+2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (pinfo::wait): Handle case where prefork was not called
+	prior to calling wait().  This is the case when we are reabsorbing
+	processes after being execed.
+
 2012-03-16  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fork.cc (lock_signals): Move to sigproc.h.
