@@ -1,3 +1,8 @@
+2012-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (cancelable_wait): Don't malloc tbi, just make it a struct
+	on the stack to avoid memory leak.
+
 2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* pinfo.cc (pinfo::wait): Handle case where prefork was not called

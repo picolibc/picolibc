@@ -982,15 +982,14 @@ cancelable_wait (HANDLE object, PLARGE_INTEGER timeout,
 
   if (timeout)
     {
-      const size_t sizeof_tbi = sizeof (TIMER_BASIC_INFORMATION);
-      PTIMER_BASIC_INFORMATION tbi = (PTIMER_BASIC_INFORMATION) malloc (sizeof_tbi);
+      TIMER_BASIC_INFORMATION tbi;
 
-      NtQueryTimer (_my_tls.locals.cw_timer, TimerBasicInformation, tbi,
-		    sizeof_tbi, NULL);
+      NtQueryTimer (_my_tls.locals.cw_timer, TimerBasicInformation, &tbi,
+		    sizeof tbi, NULL);
       /* if timer expired, TimeRemaining is negative and represents the
 	  system uptime when signalled */
       if (timeout->QuadPart < 0LL)
-	timeout->QuadPart = tbi->SignalState ? 0LL : tbi->TimeRemaining.QuadPart;
+	timeout->QuadPart = tbi.SignalState ? 0LL : tbi.TimeRemaining.QuadPart;
       NtCancelTimer (_my_tls.locals.cw_timer, NULL);
     }
 
