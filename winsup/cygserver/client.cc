@@ -22,6 +22,10 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 
+#ifdef __INSIDE_CYGWIN__
+#include "sigproc.h"
+#endif
+
 #include "cygserver_msg.h"
 #include "cygserver_sem.h"
 #include "cygserver_shm.h"
