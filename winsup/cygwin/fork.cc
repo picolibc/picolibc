@@ -354,14 +354,14 @@ frok::parent (volatile char * volatile stack_here)
   while (1)
     {
       hchild = NULL;
-      rc = CreateProcessW (myself->progname, /* image to run */
-			   myself->progname, /* what we send in arg0 */
+      rc = CreateProcessW (myself->progname,	/* image to run */
+			   myself->progname,	/* what we send in arg0 */
 			   &sec_none_nih,
 			   &sec_none_nih,
-			   TRUE,	  /* inherit handles from parent */
+			   TRUE,		/* inherit handles from parent */
 			   c_flags,
-			   NULL,	  /* environment filled in later */
-			   0,	  /* use current drive/directory */
+			   NULL,		/* environment filled in later */
+			   0,	  		/* use current drive/directory */
 			   &si,
 			   &pi);
 

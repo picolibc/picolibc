@@ -1,3 +1,11 @@
+2012-03-20  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* dtable.cc (set_std_handle): Call SetStdHandle with NULL if fd is
+	closed.
+	(dtable::release): "Close" standard handle if appropriate.
+	* dcrt0.cc (dll_crt0_0): Fix minor switch formatting problem.
+	* fork.cc (frok::parent): Make minor comment indentation change.
+
 2012-03-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (lseek): Fix debug output.

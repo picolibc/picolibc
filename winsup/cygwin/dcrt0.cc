@@ -744,13 +744,13 @@ dll_crt0_0 ()
       cygwin_user_h = child_proc_info->user_h;
       switch (child_proc_info->type)
 	{
-	  case _CH_FORK:
-	    fork_info->handle_fork ();
-	    break;
-	  case _CH_SPAWN:
-	  case _CH_EXEC:
-	    spawn_info->handle_spawn ();
-	    break;
+	case _CH_FORK:
+	  fork_info->handle_fork ();
+	  break;
+	case _CH_SPAWN:
+	case _CH_EXEC:
+	  spawn_info->handle_spawn ();
+	  break;
 	}
     }
 

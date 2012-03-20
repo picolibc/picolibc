@@ -65,10 +65,11 @@ dtable_init ()
 void __stdcall
 set_std_handle (int fd)
 {
+  fhandler_base *fh = cygheap->fdtab[fd];
   if (fd == 0)
-    SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_handle ());
+    SetStdHandle (std_consts[fd], fh ? fh->get_handle () : NULL);
   else if (fd <= 2)
-    SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_output_handle ());
+    SetStdHandle (std_consts[fd], fh ? fh->get_output_handle () : NULL);
 }
 
 int
@@ -244,6 +245,8 @@ dtable::release (int fd)
     dec_need_fixup_before ();
   fds[fd]->refcnt (-1);
   fds[fd] = NULL;
+  if (fd <= 2)
+    set_std_handle (fd);
 }
 
 extern "C" int
