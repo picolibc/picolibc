@@ -1,3 +1,7 @@
+2012-03-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (lseek): Fix debug output.
+
 2012-03-20  Christian Franke  <franke@computer.org>
 
 	* ntdll.h (SharedUserData): Add volatile qualifier. This fixes a

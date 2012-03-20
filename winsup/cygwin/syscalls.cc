@@ -1344,7 +1344,10 @@ lseek64 (int fd, _off64_t pos, int dir)
       else
 	res = -1;
     }
-  syscall_printf ("%R = lseek(%d, %D, %d)", res, fd, pos, dir);
+  /* Can't use %R here since res is 8 bytes */
+  syscall_printf (res == -1 ? "%D = lseek(%d, %D, %d), errno %d"
+			    : "%D = lseek(%d, %D, %d)",
+		  res, fd, pos, dir, get_errno ());
 
   return res;
 }
