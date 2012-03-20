@@ -1,6 +1,6 @@
 /* cygwin/socket.h
 
-   Copyright 1999, 2000, 2001, 2005, 2006, 2007, 2009, 2010 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2005, 2006, 2007, 2009, 2010, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -269,8 +269,8 @@ struct OLD_msghdr
 #define MCAST_JOIN_SOURCE_GROUP         45
 #define MCAST_LEAVE_SOURCE_GROUP        46
 
-#define MCAST_EXCLUDE                    0
-#define MCAST_INCLUDE                    1
+#define MCAST_INCLUDE                    0
+#define MCAST_EXCLUDE                    1
 
 /* Old WinSock1 values, needed internally */
 #ifdef __INSIDE_CYGWIN__

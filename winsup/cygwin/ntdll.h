@@ -1106,9 +1106,10 @@ typedef VOID (APIENTRY *PTIMER_APC_ROUTINE)(PVOID, ULONG, ULONG);
 
 #ifdef __cplusplus
 /* This is the mapping of the KUSER_SHARED_DATA structure into the 32 bit
-   user address space.  We need it here to access the current DismountCount. */
-static KUSER_SHARED_DATA &SharedUserData
-			 = *(volatile PKUSER_SHARED_DATA) 0x7ffe0000;
+   user address space.  We need it here to access the current DismountCount
+   and InterruptTime.  */
+static volatile KUSER_SHARED_DATA &SharedUserData
+	= *(volatile KUSER_SHARED_DATA *) 0x7ffe0000;
 
 extern "C"
 {

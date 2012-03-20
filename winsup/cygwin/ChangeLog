@@ -1,3 +1,13 @@
+2012-03-20  Christian Franke  <franke@computer.org>
+
+	* ntdll.h (SharedUserData): Add volatile qualifier. This fixes a
+	possible infinite loop in hires_ms::timeGetTime_ns.
+
+2012-03-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/socket.h: Fix definitions of MCAST_INCLUDE and
+	MCAST_EXCLUDE.
+
 2012-03-20  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
