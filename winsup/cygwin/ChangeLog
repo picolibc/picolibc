@@ -1,5 +1,15 @@
 2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* pinfo.cc (pinfo_init): Cosmetic change: unset "destroy" for myself.
+	(pinfo::wait): Change some comments.
+	(pinfo::prefork): Move a comment.
+	(pinfo::postfork): Set pending_*_pipe variables to NULL if closed.
+	(pinfo::postexec): Use right name when closing handle.
+	(_pinfo::alert_parent): Ditto.
+	* sigproc.h (hold_everything): Remove debugging label.
+
+2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* cygserver_ipc.h: Include sigproc.h for signal_arrived declaration.
 
 2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>

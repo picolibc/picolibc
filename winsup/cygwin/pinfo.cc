@@ -117,6 +117,7 @@ pinfo_init (char **envp, int envc)
 
   myself->process_state |= PID_ACTIVE;
   myself->process_state &= ~(PID_INITIALIZING | PID_EXITED | PID_REAPED);
+  myself.preserve ();
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
 }
 
@@ -933,6 +934,7 @@ proc_waiter (void *arg)
 	case __ALERT_ALIVE:
 	  continue;
 	case 0:
+debug_printf ("%d exited buf %d\n", vchild->pid, buf);
 	  /* Child exited.  Do some cleanup and signal myself.  */
 	  vchild.maybe_set_exit_code_from_windows ();
 	  if (WIFEXITED (vchild->exitcode))
@@ -987,11 +989,17 @@ proc_waiter (void *arg)
 bool
 pinfo::wait ()
 {
+  /* If pending_rd_proc_pipe == NULL we're in an execed process which has
+     already grabbed the read end of the pipe from the previous cygwin process
+     running with this pid.  */
   if (pending_rd_proc_pipe)
     {
+      /* Our end of the pipe, previously set in prefork() . */
       rd_proc_pipe = pending_rd_proc_pipe;
       pending_rd_proc_pipe = NULL;
 
+      /* This sets wr_proc_pipe in the child which, after the following
+	 ForceCloseHandle1, will be only process with the handle open.  */
       wr_proc_pipe () = pending_wr_proc_pipe;
       ForceCloseHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
       pending_wr_proc_pipe = NULL;
@@ -1020,9 +1028,6 @@ pinfo::prefork (bool detached)
   if (wr_proc_pipe () && wr_proc_pipe () != INVALID_HANDLE_VALUE
       && !SetHandleInformation (wr_proc_pipe (), HANDLE_FLAG_INHERIT, 0))
     api_fatal ("couldn't set process pipe(%p) inherit state, %E", wr_proc_pipe ());
-  /* If rd_proc_pipe != NULL we're in an execed process which already has
-     grabbed the read end of the pipe from the previous cygwin process running
-     with this pid.  */
   if (!detached)
     {
       if (!CreatePipe (&pending_rd_proc_pipe, &pending_wr_proc_pipe,
@@ -1046,16 +1051,22 @@ pinfo::postfork ()
 			       HANDLE_FLAG_INHERIT))
     api_fatal ("postfork: couldn't set process pipe(%p) inherit state, %E", wr_proc_pipe ());
   if (pending_rd_proc_pipe)
-    ForceCloseHandle1 (pending_rd_proc_pipe, rd_proc_pipe);
+    {
+      ForceCloseHandle1 (pending_rd_proc_pipe, rd_proc_pipe);
+      pending_rd_proc_pipe = NULL;
+    }
   if (pending_wr_proc_pipe)
-    ForceCloseHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
+    {
+      ForceCloseHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
+      pending_wr_proc_pipe = NULL;
+    }
 }
 
 void
 pinfo::postexec ()
 {
   if (wr_proc_pipe () && wr_proc_pipe () != INVALID_HANDLE_VALUE
-      && !ForceCloseHandle (wr_proc_pipe ()))
+      && !ForceCloseHandle1 (wr_proc_pipe (), wr_proc_pipe))
     api_fatal ("postexec: couldn't close wr_proc_pipe(%p), %E", wr_proc_pipe ());
 }
 
@@ -1084,7 +1095,7 @@ _pinfo::alert_parent (char sig)
 	  ppid = 1;
 	  HANDLE closeit = wr_proc_pipe;
 	  wr_proc_pipe = INVALID_HANDLE_VALUE;
-	  CloseHandle (closeit);
+	  ForceCloseHandle1 (closeit, wr_proc_pipe);
 	}
     }
   return (bool) nb;

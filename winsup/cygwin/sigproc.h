@@ -166,7 +166,6 @@ public:
 
 class hold_everything
 {
-public: /* DELETEME*/
   bool ischild;
   /* Note the order of the locks below.  It is important,
      to avoid races, that the lock order be preserved.
