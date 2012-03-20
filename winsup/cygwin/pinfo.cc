@@ -49,9 +49,6 @@ pinfo_basic myself_initial NO_COPY;
 
 pinfo NO_COPY myself (static_cast<_pinfo *> (&myself_initial));	// Avoid myself != NULL checks
 
-HANDLE NO_COPY pinfo::pending_rd_proc_pipe;
-HANDLE NO_COPY pinfo::pending_wr_proc_pipe;
-
 bool is_toplevel_proc;
 
 /* Setup the pinfo structure for this process.  There may already be a
@@ -989,22 +986,6 @@ debug_printf ("%d exited buf %d\n", vchild->pid, buf);
 bool
 pinfo::wait ()
 {
-  /* If pending_rd_proc_pipe == NULL we're in an execed process which has
-     already grabbed the read end of the pipe from the previous cygwin process
-     running with this pid.  */
-  if (pending_rd_proc_pipe)
-    {
-      /* Our end of the pipe, previously set in prefork() . */
-      rd_proc_pipe = pending_rd_proc_pipe;
-      pending_rd_proc_pipe = NULL;
-
-      /* This sets wr_proc_pipe in the child which, after the following
-	 ForceCloseHandle1, will be only process with the handle open.  */
-      wr_proc_pipe () = pending_wr_proc_pipe;
-      ForceCloseHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
-      pending_wr_proc_pipe = NULL;
-    }
-
   preserve ();		/* Preserve the shared memory associated with the pinfo */
 
   waiter_ready = false;
@@ -1022,54 +1003,6 @@ pinfo::wait ()
   return true;
 }
 
-void
-pinfo::prefork (bool detached)
-{
-  if (wr_proc_pipe () && wr_proc_pipe () != INVALID_HANDLE_VALUE
-      && !SetHandleInformation (wr_proc_pipe (), HANDLE_FLAG_INHERIT, 0))
-    api_fatal ("couldn't set process pipe(%p) inherit state, %E", wr_proc_pipe ());
-  if (!detached)
-    {
-      if (!CreatePipe (&pending_rd_proc_pipe, &pending_wr_proc_pipe,
-		       &sec_none_nih, 16))
-	api_fatal ("Couldn't create pipe tracker for pid %d, %E", (*this)->pid);
-
-      if (!SetHandleInformation (pending_wr_proc_pipe, HANDLE_FLAG_INHERIT,
-				 HANDLE_FLAG_INHERIT))
-	api_fatal ("prefork: couldn't set process pipe(%p) inherit state, %E",
-		   pending_wr_proc_pipe);
-      ProtectHandle1 (pending_rd_proc_pipe, rd_proc_pipe);
-      ProtectHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
-    }
-}
-
-void
-pinfo::postfork ()
-{
-  if (wr_proc_pipe () && wr_proc_pipe () != INVALID_HANDLE_VALUE
-      && !SetHandleInformation (wr_proc_pipe (), HANDLE_FLAG_INHERIT,
-			       HANDLE_FLAG_INHERIT))
-    api_fatal ("postfork: couldn't set process pipe(%p) inherit state, %E", wr_proc_pipe ());
-  if (pending_rd_proc_pipe)
-    {
-      ForceCloseHandle1 (pending_rd_proc_pipe, rd_proc_pipe);
-      pending_rd_proc_pipe = NULL;
-    }
-  if (pending_wr_proc_pipe)
-    {
-      ForceCloseHandle1 (pending_wr_proc_pipe, wr_proc_pipe);
-      pending_wr_proc_pipe = NULL;
-    }
-}
-
-void
-pinfo::postexec ()
-{
-  if (wr_proc_pipe () && wr_proc_pipe () != INVALID_HANDLE_VALUE
-      && !ForceCloseHandle1 (wr_proc_pipe (), wr_proc_pipe))
-    api_fatal ("postexec: couldn't close wr_proc_pipe(%p), %E", wr_proc_pipe ());
-}
-
 /* function to send a "signal" to the parent when something interesting happens
    in the child. */
 bool
@@ -1082,19 +1015,17 @@ _pinfo::alert_parent (char sig)
 
      FIXME: Is there a race here if we run this while another thread is attempting
      to exec()? */
-  if (wr_proc_pipe == INVALID_HANDLE_VALUE || !myself.wr_proc_pipe () || have_execed)
-    /* no parent */;
-  else
+  if (my_wr_proc_pipe)
     {
-      if (WriteFile (wr_proc_pipe, &sig, 1, &nb, NULL))
+      if (WriteFile (my_wr_proc_pipe, &sig, 1, &nb, NULL))
 	/* all is well */;
       else if (GetLastError () != ERROR_BROKEN_PIPE)
 	debug_printf ("sending %d notification to parent failed, %E", sig);
       else
 	{
 	  ppid = 1;
-	  HANDLE closeit = wr_proc_pipe;
-	  wr_proc_pipe = INVALID_HANDLE_VALUE;
+	  HANDLE closeit = my_wr_proc_pipe;
+	  my_wr_proc_pipe = NULL;
 	  ForceCloseHandle1 (closeit, wr_proc_pipe);
 	}
     }

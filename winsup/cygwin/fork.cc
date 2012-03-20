@@ -109,6 +109,25 @@ frok::error (const char *fmt, ...)
   return true;
 }
 
+/* Set up a pipe which will track the life of a "pid" through
+   even after we've exec'ed.  */
+void
+child_info::prefork (bool detached)
+{
+  if (!detached)
+    {
+      if (!CreatePipe (&rd_proc_pipe, &wr_proc_pipe, &sec_none_nih, 16))
+	api_fatal ("prefork: couldn't create pipe process tracker%E");
+
+      if (!SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT,
+				 HANDLE_FLAG_INHERIT))
+	api_fatal ("prefork: couldn't set process pipe(%p) inherit state, %E",
+		   wr_proc_pipe);
+      ProtectHandle1 (rd_proc_pipe, rd_proc_pipe);
+      ProtectHandle1 (wr_proc_pipe, wr_proc_pipe);
+    }
+}
+
 int __stdcall
 frok::child (volatile char * volatile here)
 {
@@ -194,6 +213,10 @@ frok::child (volatile char * volatile here)
   ld_preload ();
   fixup_hooks_after_fork ();
   _my_tls.fixup_after_fork ();
+  /* Clear this or the destructor will close them.  In the case of
+     rd_proc_pipe that would be an invalid handle.  In the case of
+     wr_proc_pipe it would be == my_wr_proc_pipe.  Both would be bad. */
+  ch.rd_proc_pipe = ch.wr_proc_pipe = NULL;
   cygwin_finished_initializing = true;
   return 0;
 }
@@ -326,11 +349,11 @@ frok::parent (volatile char * volatile stack_here)
   cygheap->user.deimpersonate ();
   fix_impersonation = true;
   ch.refresh_cygheap ();
+  ch.prefork ();	/* set up process tracking pipes. */
 
   while (1)
     {
       hchild = NULL;
-      myself.prefork ();
       rc = CreateProcessW (myself->progname, /* image to run */
 			   myself->progname, /* what we send in arg0 */
 			   &sec_none_nih,
@@ -403,6 +426,7 @@ frok::parent (volatile char * volatile stack_here)
   /* Fill in fields in the child's process table entry.  */
   child->dwProcessId = pi.dwProcessId;
   child.hProcess = hchild;
+  child.set_rd_proc_pipe (ch.rd_proc_pipe);
 
   /* Hopefully, this will succeed.  The alternative to doing things this
      way is to reserve space prior to calling CreateProcess and then fill
@@ -516,7 +540,6 @@ frok::parent (volatile char * volatile stack_here)
 
 /* Common cleanup code for failure cases */
 cleanup:
-  myself.postfork ();
   if (fix_impersonation)
     cygheap->user.reimpersonate ();
   if (locked)

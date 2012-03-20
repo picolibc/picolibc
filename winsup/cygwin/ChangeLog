@@ -1,3 +1,53 @@
+2012-03-20  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
+	(child_info::rd_proc_pipe): Declare new field.
+	(child_info::wr_proc_pipe): Ditto.
+	(child_info::prefork): Declare new function, derived from previous
+	pinfo version.
+	* dcrt0.cc (child_info_fork::handle_fork): Close previous wr_proc_pipe
+	when appropriate and assign new one from passed-in child_info block.
+	(child_info_spawn::handle_spawn): Assign our wr_proc_pipe handle from
+	passed-in child_info block.
+	* fork.cc (child_info::prefork): Define new function.
+	(frok::child): Clear rd_proc_pipe and wr_proc_pipe so they will not be
+	closed by the child_info destructor.
+	(frok::parent): Use child_info prefork handling, outside of retry loop.
+	Set rd_proc_pipe in child's pinfo after successful CreateProcess.
+	Eliminate postfork call.
+	* globals.cc (my_wr_proc_pipe): Define/declare new variable.
+	* pinfo.cc (pinfo::pending_rd_proc_pipe): Delete.
+	(pinfo::pending_wr_proc_pipe): Ditto.
+	(pinfo::prefork): Ditto.
+	(pinfo::postfork): Ditto.
+	(pinfo::postexec): Ditto.
+	(pinfo::wait): Assume that rd_proc_pipe is set up correctly prior to
+	call.
+	(_pinfo::alert_parent): Replace "wr_proc_pipe" with "my_wr_proc_pipe".
+	* pinfo.h (_pinfo::_wr_proc_pipe): Delete declaration.
+	(_pinfo::set_rd_proc_pipe): Define new function.
+	(pinfo::pending_rd_proc_pipe): Delete declaration.
+	(pinfo::pending_wr_proc_pipe): Ditto.
+	(pinfo::prefork): Ditto.
+	(pinfo::postfork): Ditto.
+	(pinfo::postexec): Ditto.
+	(pinfo::wr_proc_pipe): Ditto.
+	* sigproc.cc (child_info::child_info): Clear rd_proc_pipe and
+	wr_proc_pipe.
+	(child_info::cleanup): Close rd_proc_pipe and
+	wr_proc_pipe if necessary.
+	(child_info_fork::child_info_fork): Set forker_finished to NULL by
+	default.
+	(child_info_spawn::child_info_spawn): Use my_wr_proc_pipe rather than
+	myself->wr_proc_pipe.
+	(child_info::sync): Ditto.
+	(child_info_spawn::cleanup): Call child_info::cleanup.
+	* spawn.cc (child_info_spawn::worker): Remove call to myself.prefork().
+	Set wr_proc_pipe when execing or set up new rd_proc_pipe/wr_proc_pipe
+	via child_info::prefork when spawning.  Remove call to pinfo::postexec.
+	Set rd_proc_pipe in child pinfo when spawning.  Use my_wr_proc_pipe
+	rather than myself->wr_proc_pipe.  Remove call to postfork.
+
 2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* pinfo.cc (pinfo_init): Cosmetic change: unset "destroy" for myself.

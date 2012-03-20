@@ -121,7 +121,6 @@ public:
   HANDLE exec_sendsig;
   DWORD exec_dwProcessId;
 public:
-  HANDLE wr_proc_pipe;
   friend class pinfo_minimal;
 };
 
@@ -140,6 +139,7 @@ public:
   HANDLE hProcess;
   HANDLE rd_proc_pipe;
   pinfo_minimal (): h (NULL), hProcess (NULL), rd_proc_pipe (NULL) {}
+  void set_rd_proc_pipe (HANDLE& h) {rd_proc_pipe = h; h = NULL;}
   friend class pinfo;
 };
 
@@ -147,8 +147,6 @@ class pinfo: public pinfo_minimal
 {
   bool destroy;
   _pinfo *procinfo;
-  static HANDLE pending_rd_proc_pipe;
-  static HANDLE pending_wr_proc_pipe;
 public:
   bool waiter_ready;
   class cygthread *wait_thread;
@@ -204,15 +202,10 @@ public:
     return res;
   }
 #endif
-  void prefork (bool = false);
-  void postfork ();
-  void postexec ();
   HANDLE shared_handle () {return h;}
   void set_acl ();
   friend class _pinfo;
   friend class winpids;
-private:
-  HANDLE& wr_proc_pipe() {return procinfo->wr_proc_pipe;}
 };
 
 #define ISSTATE(p, f)	(!!((p)->process_state & f))

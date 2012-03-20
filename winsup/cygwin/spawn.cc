@@ -352,10 +352,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   if (mode == _P_OVERLAY)
     chtype = _CH_EXEC;
   else
-    {
-      chtype = _CH_SPAWN;
-      myself.prefork ();
-    }
+    chtype = _CH_SPAWN;
 
   moreinfo = cygheap_exec_info::alloc ();
 
@@ -616,6 +613,12 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       && fhandler_console::tc_getpgid () != myself->pgid)
     c_flags |= CREATE_NEW_PROCESS_GROUP;
   refresh_cygheap ();
+
+  if (chtype == _CH_EXEC)
+    wr_proc_pipe = my_wr_proc_pipe;
+  else
+    prefork ();
+
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
      effective vs. real ids.
@@ -737,6 +740,8 @@ loop:
 	  myself->exec_sendsig = NULL;
 	}
       myself->process_state &= ~PID_NOTCYGWIN;
+      if (wr_proc_pipe == my_wr_proc_pipe)
+	wr_proc_pipe = NULL;	/* We still own it: don't nuke in destructor */
       res = -1;
       goto out;
     }
@@ -771,18 +776,6 @@ loop:
       myself.hProcess = hExeced = pi.hProcess;
       real_path.get_wide_win32_path (myself->progname); // FIXME: race?
       sigproc_printf ("new process name %W", myself->progname);
-      /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
-	 process.  So, we need to wait around until the process we've just "execed"
-	 dies.  Use our own wait facility below to wait for our own pid to exit
-	 (there is some minor special case code in proc_waiter and friends to
-	 accommodate this).
-
-	 If wr_proc_pipe exists, then it will be inherited by the child.
-	 If the child has exited already, that's ok.  The parent will pick up
-	 on this fact when we exit.  myself.postexec () will close our end of
-	 the pipe.  */
-      if (!newargv.win16_exe && myself->wr_proc_pipe)
-	myself.postexec ();
       pid = myself->pid;
       if (!iscygwin ())
 	close_all_files ();
@@ -801,6 +794,7 @@ loop:
 	  res = -1;
 	  goto out;
 	}
+      child.set_rd_proc_pipe (rd_proc_pipe);
       child->dwProcessId = pi.dwProcessId;
       child.hProcess = pi.hProcess;
 
@@ -857,7 +851,7 @@ loop:
       else
 	{
 	  close_all_files (true);
-	  if (!myself->wr_proc_pipe
+	  if (!my_wr_proc_pipe
 	      && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
 	    {
 	      extern bool is_toplevel_proc;
@@ -887,8 +881,6 @@ loop:
     }
 
 out:
-  if (mode != _P_OVERLAY)
-    myself.postfork ();
   this->cleanup ();
   if (envblock)
     free (envblock);

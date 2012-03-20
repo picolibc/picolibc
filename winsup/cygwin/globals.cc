@@ -21,6 +21,7 @@ details. */
 HANDLE NO_COPY hMainThread;
 HANDLE NO_COPY hProcToken;
 HANDLE NO_COPY hProcImpToken;
+HANDLE my_wr_proc_pipe;
 HMODULE NO_COPY cygwin_hmodule;
 int NO_COPY sigExeced;
 WCHAR windows_system_directory[MAX_PATH];

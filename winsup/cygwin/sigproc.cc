@@ -828,7 +828,8 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
 			bool need_subproc_ready):
   cb (in_cb), intro (PROC_MAGIC_GENERIC), magic (CHILD_INFO_MAGIC),
   type (chtype), cygheap (::cygheap), cygheap_max (::cygheap_max),
-  flag (0), retry (child_info::retry_count)
+  flag (0), retry (child_info::retry_count), rd_proc_pipe (NULL),
+  wr_proc_pipe (NULL)
 {
   /* It appears that when running under WOW64 on Vista 64, the first DWORD
      value in the datastructure lpReserved2 is pointing to (msv_count in
@@ -876,14 +877,12 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
 
 child_info::~child_info ()
 {
-  if (subproc_ready)
-    CloseHandle (subproc_ready);
-  if (parent)
-    CloseHandle (parent);
+  cleanup ();
 }
 
 child_info_fork::child_info_fork () :
-  child_info (sizeof *this, _CH_FORK, true)
+  child_info (sizeof *this, _CH_FORK, true),
+  forker_finished (NULL)
 {
 }
 
@@ -893,7 +892,7 @@ child_info_spawn::child_info_spawn (child_info_types chtype, bool need_subproc_r
   if (type == _CH_EXEC)
     {
       hExeced = NULL;
-      if (myself->wr_proc_pipe)
+      if (my_wr_proc_pipe)
 	ev = NULL;
       else if (!(ev = CreateEvent (&sec_none_nih, false, false, NULL)))
 	api_fatal ("couldn't create signalling event for exec, %E");
@@ -910,6 +909,31 @@ cygheap_exec_info::alloc ()
  return (cygheap_exec_info *) ccalloc_abort (HEAP_1_EXEC, 1,
 					     sizeof (cygheap_exec_info)
 					     + (nprocs * sizeof (children[0])));
+}
+
+void
+child_info::cleanup ()
+{
+  if (subproc_ready)
+    {
+      CloseHandle (subproc_ready);
+      subproc_ready = NULL;
+    }
+  if (parent)
+    {
+      CloseHandle (parent);
+      parent = NULL;
+    }
+  if (rd_proc_pipe)
+    {
+      ForceCloseHandle (rd_proc_pipe);
+      rd_proc_pipe = NULL;
+    }
+  if (wr_proc_pipe)
+    {
+      ForceCloseHandle (wr_proc_pipe);
+      wr_proc_pipe = NULL;
+    }
 }
 
 void
@@ -940,6 +964,7 @@ child_info_spawn::cleanup ()
       sync_proc_subproc.release ();
     }
   type = _CH_NADA;
+  child_info::cleanup ();
 }
 
 /* Record any non-reaped subprocesses to be passed to about-to-be-execed
@@ -1047,7 +1072,7 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
 	{
 	  res = true;
 	  exit_code = STILL_ACTIVE;
-	  if (type == _CH_EXEC && myself->wr_proc_pipe)
+	  if (type == _CH_EXEC && my_wr_proc_pipe)
 	    {
 	      ForceCloseHandle1 (hProcess, childhProc);
 	      hProcess = NULL;

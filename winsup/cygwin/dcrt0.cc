@@ -598,6 +598,17 @@ child_info_fork::handle_fork ()
 	      "user heap", cygheap->user_heap.base, cygheap->user_heap.ptr,
 	      NULL);
 
+  /* If my_wr_proc_pipe != NULL then it's a leftover handle from a previously
+     forked process.  Close it now or suffer confusion with the parent of our
+     parent.  */
+  if (my_wr_proc_pipe)
+    ForceCloseHandle1 (my_wr_proc_pipe, wr_proc_pipe);
+
+  /* Setup our write end of the process pipe.  Clear the one in the structure.
+     The destructor should never be called for this but, it can't hurt to be
+     safe. */
+  my_wr_proc_pipe = wr_proc_pipe;
+  rd_proc_pipe = wr_proc_pipe = NULL;
   /* Do the relocations here.  These will actually likely be overwritten by the
      below child_copy but we do them here in case there is a read-only section
      which does not get copied by fork. */
@@ -626,6 +637,13 @@ child_info_spawn::handle_spawn ()
 			GetCurrentProcess (), &h, 0,
 			FALSE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     h = NULL;
+
+  /* Setup our write end of the process pipe.  Clear the one in the structure.
+     The destructor should never be called for this but, it can't hurt to be
+     safe. */
+  my_wr_proc_pipe = wr_proc_pipe;
+  rd_proc_pipe = wr_proc_pipe = NULL;
+
   myself.thisproc (h);
   __argc = moreinfo->argc;
   __argv = moreinfo->argv;
