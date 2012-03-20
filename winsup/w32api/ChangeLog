@@ -1,3 +1,8 @@
+2012-03-19	Ben Greear  <greear@users.sf.net>
+
+	* include/routprot.h (IP_LOCAL_BINDING): Move above IP_ADAPTER_BINDING_INFO
+	to correct warning about IP_LOCAL_BINDING being undefined.
+
 2012-01-16  Keith Marshall  <keithmarshall@users.sf.net>
 
 	Correct misused 'rm -r' command in uninstall rules.

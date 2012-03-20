@@ -43,6 +43,10 @@ extern "C" {
 #define IPX_PROTOCOL_NLSP 0x00020002
 /*--- Router Management Reference - Router Management Structures */
 #if (_WIN32_WINNT >= 0x0500)
+typedef struct IP_LOCAL_BINDING {
+	DWORD Address;
+	DWORD Mask;
+} IP_LOCAL_BINDING,*PIP_LOCAL_BINDING;
 typedef struct IP_ADAPTER_BINDING_INFO {
 	ULONG AddressCount;
 	DWORD RemoteAddress;
@@ -50,10 +54,6 @@ typedef struct IP_ADAPTER_BINDING_INFO {
 	ULONGLONG Speed;
 	IP_LOCAL_BINDING Address[];
 } IP_ADAPTER_BINDING_INFO,*PIP_ADAPTER_BINDING_INFO;
-typedef struct IP_LOCAL_BINDING {
-	DWORD Address;
-	DWORD Mask;
-} IP_LOCAL_BINDING,*PIP_LOCAL_BINDING;
 typedef struct IPX_ADAPTER_BINDING_INFO {
 	ULONG AdapterIndex;
 	UCHAR Network[4];
