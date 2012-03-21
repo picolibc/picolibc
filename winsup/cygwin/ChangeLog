@@ -1,5 +1,18 @@
 2012-03-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* child_info.h: Reset magic number.
+	(child_info_spawn::wait_for_myself): Move function to sigproc.cc.
+	* pinfo.cc (is_toplevel_proc): Delete unneeded variable.
+	* sigproc.cc (child_info_spawn::wait_for_myself): Move function from
+	header to here.  Do all setup required to properly wait for top-level
+	execed process to exit.
+	* spawn.cc (child_info_spawn::worker): Attempt to properly handle
+	_P_DETACH.  Set wr_proc_pipe if top-level process even when execing.
+	Just call wait_for_myself() to...  wait for myself.  Don't call cleanup
+	twice.
+
+2012-03-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* pinfo.cc (proc_waiter): Remove debugging.
 
 2012-03-20  Christopher Faylor  <me.cygwin2012@cgf.cx>

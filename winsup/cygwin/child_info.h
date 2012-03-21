@@ -35,7 +35,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xa49e665eU
+#define CURR_CHILD_INFO_MAGIC 0x4a52da7eU
 
 #define NPROCS	256
 
@@ -158,7 +158,7 @@ public:
 	return true;
       }
   }
-  void wait_for_myself () { WaitForSingleObject (ev, INFINITE); }
+  void wait_for_myself ();
   bool has_execed () const
   {
     if (hExeced)

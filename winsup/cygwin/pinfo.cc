@@ -49,8 +49,6 @@ pinfo_basic myself_initial NO_COPY;
 
 pinfo NO_COPY myself (static_cast<_pinfo *> (&myself_initial));	// Avoid myself != NULL checks
 
-bool is_toplevel_proc;
-
 /* Setup the pinfo structure for this process.  There may already be a
    _pinfo for this "pid" if h != NULL. */
 

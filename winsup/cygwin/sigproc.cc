@@ -912,6 +912,16 @@ cygheap_exec_info::alloc ()
 }
 
 void
+child_info_spawn::wait_for_myself ()
+{
+  myself.set_rd_proc_pipe (rd_proc_pipe);
+  ForceCloseHandle (wr_proc_pipe);
+  wr_proc_pipe = NULL;
+  myself.remember (false);
+  WaitForSingleObject (ev, INFINITE);
+}
+
+void
 child_info::cleanup ()
 {
   if (subproc_ready)

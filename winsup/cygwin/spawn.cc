@@ -614,10 +614,12 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
     c_flags |= CREATE_NEW_PROCESS_GROUP;
   refresh_cygheap ();
 
-  if (chtype == _CH_EXEC)
-    wr_proc_pipe = my_wr_proc_pipe;
-  else
+  if (mode == _P_DETACH)
+    /* all set */;
+  else if (chtype != _CH_EXEC || !my_wr_proc_pipe)
     prefork ();
+  else
+    wr_proc_pipe = my_wr_proc_pipe;
 
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
@@ -853,14 +855,8 @@ loop:
 	  close_all_files (true);
 	  if (!my_wr_proc_pipe
 	      && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
-	    {
-	      extern bool is_toplevel_proc;
-	      is_toplevel_proc = true;
-	      myself.remember (false);
-	      wait_for_myself ();
-	    }
+	    wait_for_myself ();
 	}
-      this->cleanup ();
       myself.exit (EXITCODE_NOSET);
       break;
     case _P_WAIT:
