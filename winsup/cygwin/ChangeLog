@@ -1,3 +1,7 @@
+2012-03-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (well_known_dlls): Add advapi32.dll.
+
 2012-03-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* child_info.h: Reset magic number.

@@ -77,6 +77,7 @@ dll_cmp (const void *a, const void *b)
    BLODAs. */
 const wchar_t *well_known_dlls[] =
 {
+  L"advapi32.dll",
   L"kernel32.dll",
   L"mswsock.dll",
   L"ntdll.dll",
