@@ -1,3 +1,7 @@
+2012-03-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (proc_waiter): Remove debugging.
+
 2012-03-20  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* dtable.cc (set_std_handle): Call SetStdHandle with NULL if fd is

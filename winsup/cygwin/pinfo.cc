@@ -931,7 +931,6 @@ proc_waiter (void *arg)
 	case __ALERT_ALIVE:
 	  continue;
 	case 0:
-debug_printf ("%d exited buf %d\n", vchild->pid, buf);
 	  /* Child exited.  Do some cleanup and signal myself.  */
 	  vchild.maybe_set_exit_code_from_windows ();
 	  if (WIFEXITED (vchild->exitcode))
