@@ -1,5 +1,9 @@
 2012-03-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* child_info.h: Reset magic number.
+
+2012-03-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* child_info.h (child_info::postfork): Define new function.
 	* fork.cc (frok::parent): Call postfork to do all of the manipulation
 	required prior to calling pinfo::remember.
