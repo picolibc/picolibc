@@ -426,7 +426,7 @@ frok::parent (volatile char * volatile stack_here)
   /* Fill in fields in the child's process table entry.  */
   child->dwProcessId = pi.dwProcessId;
   child.hProcess = hchild;
-  child.set_rd_proc_pipe (ch.rd_proc_pipe);
+  ch.postfork (child);
 
   /* Hopefully, this will succeed.  The alternative to doing things this
      way is to reserve space prior to calling CreateProcess and then fill

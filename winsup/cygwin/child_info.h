@@ -35,7 +35,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0x4a52da7eU
+#define CURR_CHILD_INFO_MAGIC 0x10f103a4U
 
 #define NPROCS	256
 
@@ -82,10 +82,16 @@ public:
   bool saw_ctrl_c () const {return !!(flag & _CI_SAW_CTRL_C);}
   void prefork (bool = false);
   void cleanup ();
+  void postfork (pinfo& child)
+  {
+    ForceCloseHandle (wr_proc_pipe);
+    wr_proc_pipe = NULL;
+    child.set_rd_proc_pipe (rd_proc_pipe);
+    rd_proc_pipe = NULL;
+  }
 };
 
 class mount_info;
-class _pinfo;
 
 class child_info_fork: public child_info
 {

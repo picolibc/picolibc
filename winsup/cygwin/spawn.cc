@@ -308,9 +308,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       return -1;
     }
 
-  hold_everything for_now;
   /* FIXME: There is a small race here and FIXME: not thread safe! */
-
   pthread_cleanup cleanup;
   if (mode == _P_SYSTEM)
     {
@@ -616,7 +614,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
   if (mode == _P_DETACH)
     /* all set */;
-  else if (chtype != _CH_EXEC || !my_wr_proc_pipe)
+  else if (mode != _P_OVERLAY || !my_wr_proc_pipe)
     prefork ();
   else
     wr_proc_pipe = my_wr_proc_pipe;
@@ -769,7 +767,6 @@ loop:
   /* Name the handle similarly to proc_subproc. */
   ProtectHandle1 (pi.hProcess, childhProc);
 
-  bool synced;
   pid_t pid;
   if (mode == _P_OVERLAY)
     {
@@ -796,7 +793,6 @@ loop:
 	  res = -1;
 	  goto out;
 	}
-      child.set_rd_proc_pipe (rd_proc_pipe);
       child->dwProcessId = pi.dwProcessId;
       child.hProcess = pi.hProcess;
 
@@ -810,6 +806,7 @@ loop:
 		       pi.hProcess, NULL, 0, 0, DUPLICATE_SAME_ACCESS);
       child->start_time = time (NULL); /* Register child's starting time. */
       child->nice = myself->nice;
+      postfork (child);
       if (!child.remember (mode == _P_DETACH))
 	{
 	  /* FIXME: Child in strange state now */
@@ -832,6 +829,7 @@ loop:
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
+  bool synced;
   if ((mode == _P_DETACH || mode == _P_NOWAIT) && !iscygwin ())
     synced = false;
   else

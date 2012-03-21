@@ -1,3 +1,17 @@
+2012-03-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* child_info.h (child_info::postfork): Define new function.
+	* fork.cc (frok::parent): Call postfork to do all of the manipulation
+	required prior to calling pinfo::remember.
+	* pinfo.h (pinfo::set_rd_proc_pipe): Just set pinfo's rd_proc_pipe.
+	Don't bother setting it to NULL.
+	* sigproc.cc (child_info_spawn::wait_for_myself): Call postfork to set
+	up myself for waiting.
+	* spawn.cc (child_info_spawn::worker): Avoid now-unnecessary global
+	lock.  Consistently test mode rather than chtype when making
+	wr_proc_pipe decisions.  Call postfork() to set up stuff prior to
+	pinfo::remember.
+
 2012-03-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (well_known_dlls): Add advapi32.dll.
