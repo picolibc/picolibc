@@ -1,3 +1,7 @@
+2012-03-23  Mike Frysinger  <vapier@gentoo.org>
+
+	* cris/Makefile.in (install-lin): Add $(DESTDIR) before ${tooldir}.
+
 2012-03-12  Mike Frysinger  <vapier@gentoo.org>
 
 	* libnosys/Makefile.in (NEWLIB_CFLAGS, NEWLIB_LDFLAGS,
