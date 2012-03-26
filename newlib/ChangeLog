@@ -1,3 +1,7 @@
+2012-03-26  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/findfp.c (__sinit): Set __sdidinit last.
+
 2012-03-09  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/machine/setjmp-dj.h: Modify license to include
