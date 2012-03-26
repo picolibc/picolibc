@@ -1,5 +1,15 @@
 2012-03-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_dev_clipboard): Add fstat method.
+	* fhandler_clipboard.cc (cygcb_t): New type for Cygwin-specific
+	clipboard format.
+	(set_clipboard): Use new clipboard format to allow setting a timestamp.
+	(fhandler_dev_clipboard::fstat): New method.  Read modification and
+	access timestamp as well as length from clipboard data.
+	(fhandler_dev_clipboard::read): Use new clipboard format.
+
+2012-03-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* hires.h (hires_ms::dmsecs): Drop unused method.
 	* times.cc (JITTER): Remove.
 	(gtod): Revert to process-local variable.

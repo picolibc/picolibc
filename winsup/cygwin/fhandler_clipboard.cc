@@ -1,6 +1,7 @@
 /* fhandler_dev_clipboard: code to access /dev/clipboard
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2011 Red Hat, Inc
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2011,
+   2012 Red Hat, Inc
 
    Written by Charles Wilson (cwilson@ece.gatech.edu)
 
@@ -31,6 +32,13 @@ details. */
 static const NO_COPY WCHAR *CYGWIN_NATIVE = L"CYGWIN_NATIVE_CLIPBOARD";
 /* this is MT safe because windows format id's are atomic */
 static int cygnativeformat;
+
+typedef struct
+{
+  timestruc_t	timestamp;
+  size_t	len;
+  char		data[1];
+} cygcb_t;
 
 fhandler_dev_clipboard::fhandler_dev_clipboard ()
   : fhandler_base (), pos (0), membuffer (NULL), msize (0),
@@ -77,20 +85,24 @@ static int
 set_clipboard (const void *buf, size_t len)
 {
   HGLOBAL hmem;
-  void *clipbuf;
   /* Native CYGWIN format */
   if (OpenClipboard (NULL))
     {
-      hmem = GlobalAlloc (GMEM_MOVEABLE, len + sizeof (size_t));
+      cygcb_t *clipbuf;
+
+      hmem = GlobalAlloc (GMEM_MOVEABLE, sizeof (cygcb_t) + len);
       if (!hmem)
 	{
 	  __seterrno ();
 	  CloseClipboard ();
 	  return -1;
 	}
-      clipbuf = GlobalLock (hmem);
-      memcpy ((unsigned char *) clipbuf + sizeof (size_t), buf, len);
-      *(size_t *) (clipbuf) = len;
+      clipbuf = (cygcb_t *) GlobalLock (hmem);
+
+      clock_gettime (CLOCK_REALTIME, &clipbuf->timestamp);
+      clipbuf->len = len;
+      memcpy (clipbuf->data, buf, len);
+
       GlobalUnlock (hmem);
       EmptyClipboard ();
       if (!cygnativeformat)
@@ -116,6 +128,8 @@ set_clipboard (const void *buf, size_t len)
     }
   if (OpenClipboard (NULL))
     {
+      PWCHAR clipbuf;
+
       hmem = GlobalAlloc (GMEM_MOVEABLE, (len + 1) * sizeof (WCHAR));
       if (!hmem)
 	{
@@ -123,8 +137,8 @@ set_clipboard (const void *buf, size_t len)
 	  CloseClipboard ();
 	  return -1;
 	}
-      clipbuf = GlobalLock (hmem);
-      sys_mbstowcs ((PWCHAR) clipbuf, len + 1, (const char *) buf);
+      clipbuf = (PWCHAR) GlobalLock (hmem);
+      sys_mbstowcs (clipbuf, len + 1, (const char *) buf);
       GlobalUnlock (hmem);
       HANDLE ret = SetClipboardData (CF_UNICODETEXT, hmem);
       CloseClipboard ();
@@ -178,6 +192,40 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
     }
 }
 
+int __stdcall
+fhandler_dev_clipboard::fstat (struct __stat64 *buf)
+{
+  buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
+  buf->st_uid = geteuid32 ();
+  buf->st_gid = getegid32 ();
+  buf->st_nlink = 1;
+  buf->st_blksize = PREFERRED_IO_BLKSIZE;
+
+  buf->st_ctim.tv_sec = 1164931200L;	/* Arbitrary value: 2006-12-01 */
+  buf->st_ctim.tv_nsec = 0L;
+  buf->st_birthtim = buf->st_atim = buf->st_mtim = buf->st_ctim;
+
+  if (OpenClipboard (NULL))
+    {
+      UINT formatlist[1] = { cygnativeformat };
+      int format;
+      HGLOBAL hglb;
+      cygcb_t *clipbuf;
+
+      if ((format = GetPriorityClipboardFormat (formatlist, 1)) > 0
+	  && (hglb = GetClipboardData (format))
+	  && (clipbuf = (cygcb_t *) GlobalLock (hglb)))
+	{
+	  buf->st_atim = buf->st_mtim = clipbuf->timestamp;
+	  buf->st_size = clipbuf->len;
+	  GlobalUnlock (hglb);
+	}
+      CloseClipboard ();
+    }
+
+  return 0;
+}
+
 void __stdcall
 fhandler_dev_clipboard::read (void *ptr, size_t& len)
 {
@@ -206,18 +254,17 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
     }
   if (format == cygnativeformat)
     {
-      unsigned char *buf;
+      cygcb_t *clipbuf;
 
-      if (!(buf = (unsigned char *) GlobalLock (hglb)))
+      if (!(clipbuf = (cygcb_t *) GlobalLock (hglb)))
 	{
 	  CloseClipboard ();
 	  return;
 	}
-      size_t buflen = (*(size_t *) buf);
-      ret = ((plen > (buflen - pos)) ? (buflen - pos) : plen);
-      memcpy (ptr, buf + sizeof (size_t)+ pos , ret);
+      ret = ((plen > (clipbuf->len - pos)) ? (clipbuf->len - pos) : plen);
+      memcpy (ptr, clipbuf->data + pos , ret);
       pos += ret;
-      if (pos + plen - ret >= buflen)
+      if (pos + plen - ret >= clipbuf->len)
 	eof = true;
     }
   else

@@ -1685,6 +1685,7 @@ class fhandler_dev_clipboard: public fhandler_base
   fhandler_dev_clipboard ();
   int is_windows () { return 1; }
   int open (int flags, mode_t mode = 0);
+  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
