@@ -1,6 +1,6 @@
 /* hires.h: Definitions for hires clock calculations
 
-   Copyright 2002, 2003, 2004, 2005, 2009, 2010, 2011 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -62,7 +62,6 @@ class hires_ms : public hires_base
   LONGLONG nsecs ();
   LONGLONG usecs () {return nsecs () / 10LL;}
   LONGLONG msecs () {return nsecs () / 10000LL;}
-  UINT dmsecs () { return timeGetTime_ns () / 10000LL; }
   UINT resolution ();
   LONGLONG uptime () {return (nsecs () - initime_ns) / 10000LL;}
 };

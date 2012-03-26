@@ -1,3 +1,14 @@
+2012-03-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* hires.h (hires_ms::dmsecs): Drop unused method.
+	* times.cc (JITTER): Remove.
+	(gtod): Revert to process-local variable.
+	(hires_ms::nsecs): Just return system time to disallow discrepancy with
+	the OS.
+	(hires_ms::resolution): Return coarsest timer value from OS.  Add
+	comment to explain why.
+	(clock_setres): Ditto.
+
 2012-03-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* child_info.h: Reset magic number.
