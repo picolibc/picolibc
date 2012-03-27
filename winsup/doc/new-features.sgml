@@ -19,6 +19,10 @@ unavailable, don't show it in the cygdrive directory listing.
 </para></listitem>
 
 <listitem><para>
+Add virtual /proc/PID/mountinfo file.
+</para></listitem>
+
+<listitem><para>
 Raise default stacksize of pthreads from 512K to 1 Meg.  It can still be
 changed using the pthread_attr_setstacksize call.
 </para></listitem>

@@ -27,6 +27,7 @@ details. */
 #include "pwdgrp.h"
 #include "mount.h"
 #include "tls_pbuf.h"
+#include <sys/sysmacros.h>
 #include <sys/param.h>
 #include <ctype.h>
 
@@ -51,6 +52,7 @@ static _off64_t format_process_gid (void *, char *&);
 static _off64_t format_process_ctty (void *, char *&);
 static _off64_t format_process_fd (void *, char *&);
 static _off64_t format_process_mounts (void *, char *&);
+static _off64_t format_process_mountinfo (void *, char *&);
 
 static const virt_tab_t process_tab[] =
 {
@@ -64,6 +66,7 @@ static const virt_tab_t process_tab[] =
   { _VN ("fd"),         FH_PROCESSFD, virt_directory, format_process_fd },
   { _VN ("gid"),        FH_PROCESS,   virt_file,      format_process_gid },
   { _VN ("maps"),       FH_PROCESS,   virt_file,      format_process_maps },
+  { _VN ("mountinfo"),  FH_PROCESS,   virt_file,      format_process_mountinfo },
   { _VN ("mounts"),     FH_PROCESS,   virt_file,      format_process_mounts },
   { _VN ("pgid"),       FH_PROCESS,   virt_file,      format_process_pgid },
   { _VN ("ppid"),       FH_PROCESS,   virt_file,      format_process_ppid },
@@ -1156,7 +1159,7 @@ extern "C" {
 };
 
 static _off64_t
-format_process_mounts (void *data, char *&destbuf)
+format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
 {
   _pinfo *p = (_pinfo *) data;
   user_info *u_shared = NULL;
@@ -1164,7 +1167,7 @@ format_process_mounts (void *data, char *&destbuf)
   _off64_t len = 0;
   struct mntent *mnt;
 
-  if (p->pid != myself->pid)
+  if (p->uid != myself->uid)
     {
       WCHAR sid_string[UNLEN + 1] = L""; /* Large enough for SID */
 
@@ -1181,26 +1184,58 @@ format_process_mounts (void *data, char *&destbuf)
     }
   else
     u_shared = user_shared;
+  mount_info *mtab = &u_shared->mountinfo;
 
   /* Store old value of _my_tls.locals here. */
   int iteration = _my_tls.locals.iteration;
   unsigned available_drives = _my_tls.locals.available_drives;
   /* This reinitializes the above values in _my_tls. */
   setmntent (NULL, NULL);
-  while ((mnt = getmntent (NULL)))
+  /* Restore iteration immediately since it's not used below.  We use the
+     local iteration variable instead*/
+  _my_tls.locals.iteration = iteration;
+
+  for (iteration = 0; (mnt = mtab->getmntent (iteration)); ++iteration)
     {
+      /* We have no access to the drives mapped into another user session and
+	 _my_tls.locals.available_drives contains the mappings of the current
+	 user.  So, when printing the mount table of another user, we check
+	 each cygdrive entry if it's a remote drive.  If so, ignore it. */
+      if (iteration >= mtab->nmounts && u_hdl)
+	{
+	  WCHAR drive[3] = { mnt->mnt_fsname[0], L':', L'\0' };
+	  disk_type dt = get_disk_type (drive);
+	  
+	  if (dt == DT_SHARE_SMB || dt == DT_SHARE_NFS)
+	    continue;
+	}
       destbuf = (char *) crealloc_abort (destbuf, len
 						  + strlen (mnt->mnt_fsname)
 						  + strlen (mnt->mnt_dir)
 						  + strlen (mnt->mnt_type)
 						  + strlen (mnt->mnt_opts)
-						  + 28);
-      len += __small_sprintf (destbuf + len, "%s %s %s %s %d %d\n",
-			      mnt->mnt_fsname, mnt->mnt_dir, mnt->mnt_type,
-			      mnt->mnt_opts, mnt->mnt_freq, mnt->mnt_passno);
+						  + 30);
+      if (mountinfo)
+	{
+	  path_conv pc (mnt->mnt_dir, PC_SYM_NOFOLLOW | PC_POSIX);
+	  dev_t dev = pc.exists () ? pc.fs_serial_number () : -1;
+
+	  len += __small_sprintf (destbuf + len,
+				  "%d %d %d:%d / %s %s - %s %s %s\n",
+				  iteration, iteration,
+				  major (dev), minor (dev),
+				  mnt->mnt_dir, mnt->mnt_opts,
+				  mnt->mnt_type, mnt->mnt_fsname,
+				  (pc.fs_flags () & FILE_READ_ONLY_VOLUME)
+				  ? "ro" : "rw");
+	}
+      else
+	len += __small_sprintf (destbuf + len, "%s %s %s %s %d %d\n",
+				mnt->mnt_fsname, mnt->mnt_dir, mnt->mnt_type,
+				mnt->mnt_opts, mnt->mnt_freq, mnt->mnt_passno);
     }
-  /* Restore old value of _my_tls.locals here. */
-  _my_tls.locals.iteration = iteration;
+
+  /* Restore available_drives */
   _my_tls.locals.available_drives = available_drives;
 
   if (u_hdl) /* Only not-NULL if open_shared has been called. */
@@ -1209,6 +1244,18 @@ format_process_mounts (void *data, char *&destbuf)
       CloseHandle (u_hdl);
     }
   return len;
+}
+
+static _off64_t
+format_process_mounts (void *data, char *&destbuf)
+{
+  return format_process_mountstuff (data, destbuf, false);
+}
+
+static _off64_t
+format_process_mountinfo (void *data, char *&destbuf)
+{
+  return format_process_mountstuff (data, destbuf, true);
 }
 
 int

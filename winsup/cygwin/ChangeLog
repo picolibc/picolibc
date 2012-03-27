@@ -1,5 +1,18 @@
 2012-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_process.cc (process_tab): Add entry for mountinfo.
+	(format_process_mountstuff): New function, derived from
+	format_process_mounts.  Only open another user's user_info shared
+	memory area if the process is owned by another user.  Actually
+	access the opened shared user_info to get the right mount table.
+	For other users, don't print remote cygdrive mount points.  Print
+	mountinfo or mounts output depending on the bool mountinfo argument.
+	(format_process_mounts): Just call format_process_mountstuff with
+	mountinfo set to false.
+	(format_process_mountinfo): Ditto with mountinfo set to true.
+
+2012-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* times.cc (clock_setres): Revert previous change.
 
 2012-03-26  Corinna Vinschen  <corinna@vinschen.de>
