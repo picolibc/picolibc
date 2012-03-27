@@ -1,3 +1,7 @@
+2012-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* times.cc (clock_setres): Revert previous change.
+
 2012-03-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_dev_clipboard): Add fstat method.

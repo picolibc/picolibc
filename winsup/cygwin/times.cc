@@ -823,10 +823,7 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  /* The actual resolution of the OS timer is a system-wide setting which
-     can be changed any time, by any process.  The only fixed value we can
-     rely on is the coarsest value. */
-  minperiod = coarsest;
+  minperiod = actual;
   period_set = true;
   return 0;
 }
