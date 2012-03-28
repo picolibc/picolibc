@@ -448,7 +448,8 @@ proc_terminate ()
 	  procs[i]->ppid = 1;
 	  if (procs[i].wait_thread)
 	    procs[i].wait_thread->terminate_thread ();
-	  procs[i].release ();
+	  if (procs[i] != myself)
+	    procs[i].release ();
 	}
       nprocs = 0;
       sync_proc_subproc.release ();

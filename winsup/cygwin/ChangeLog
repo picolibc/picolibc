@@ -1,3 +1,7 @@
+2012-03-28  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* sigproc.cc (proc_terminate): Avoid releasing myself.
+
 2012-03-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* times.cc (clock_setres): Set minperiod to period.
