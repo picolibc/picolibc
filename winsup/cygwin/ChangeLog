@@ -1,3 +1,7 @@
+2012-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* times.cc (clock_setres): Set minperiod to period.
+
 2012-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc (process_tab): Add entry for mountinfo.

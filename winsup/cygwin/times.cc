@@ -823,7 +823,7 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  minperiod = actual;
+  minperiod = period;
   period_set = true;
   return 0;
 }
