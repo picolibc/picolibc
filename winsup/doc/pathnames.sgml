@@ -689,18 +689,24 @@ Read on for more information.</para>
 </sect2>
 
 <sect2 id="pathnames-posixdevices"> <title>POSIX devices</title>
-<para>There is no need to create a POSIX <filename>/dev</filename> 
-directory as Cygwin automatically simulates it internally. 
-These devices cannot be seen with the command <command>ls /dev/</command>
-although commands such as <command>ls /dev/tty</command> work fine.
-If you want to be able to see all well-known devices in
-<filename>/dev/</filename>, you can use Igor Pechtchanski's
-<ulink
-url="http://cygwin.com/ml/cygwin/2004-03/txt00028.txt">create_devices.sh</ulink>
-script.  This script does not add the raw disk devices, though.  Again,
-it's not necessary to see an existing device in /dev to access it.  The script
-is just for the fun of it.
+<para>While there is no need to create a POSIX <filename>/dev</filename> 
+directory, the directory is automatically created as part of a Cygwin
+installation.  It's existence is often a prerequisit to run certain
+applications which create symbolic links, fifos, or UNIX sockets in
+<filename>/dev</filename>.  Also, the directories <filename>/dev/shm</filename>
+and <filename>/dev/mqueue</filename> are required to exist to use named POSIX
+semaphores, shared memory, and message queues, so a system without a real
+<filename>/dev</filename> directory is functionally crippled.
 </para>
+
+<para>Apart from that, Cygwin automatically simulates POSIX devices
+internally.  Up to Cygwin 1.7.11, these devices couldn't be seen with the
+command <command>ls /dev/</command> although commands such as
+<command>ls /dev/tty</command> worked fine.  Starting with Cygwin 1.7.12,
+the <filename>/dev</filename> directory is automagically populated with
+existing POSIX devices by Cygwin in a way comparable with a
+<ulink url="http://en.wikipedia.org/wiki/Udev">udev</ulink> based virtual
+<filename>/dev</filename> directory under Linux.</para>
 
 <para>
 Cygwin supports the following character devices commonly found on POSIX systems:

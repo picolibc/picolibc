@@ -1,5 +1,22 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.12"><title>What's new and what changed from 1.7.11 to 1.7.12</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Cygwin now automatically populates the /dev directory with all existing
+POSIX devices.
+</para></listitem>
+
+<listitem><para>
+Add virtual /proc/PID/mountinfo file.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.11"><title>What's new and what changed from 1.7.10 to 1.7.11</title>
 
 <itemizedlist mark="bullet">
@@ -16,10 +33,6 @@ New API: scandirat.
 Change the way remote shares mapped to drive letters are recognized when
 creating the cygdrive directory.  If Windows claims the drive is
 unavailable, don't show it in the cygdrive directory listing.
-</para></listitem>
-
-<listitem><para>
-Add virtual /proc/PID/mountinfo file.
 </para></listitem>
 
 <listitem><para>
