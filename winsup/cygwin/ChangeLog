@@ -1,3 +1,9 @@
+2012-03-29  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* exceptions.cc (ctrl_c_handler): Don't generate a SIGINT if we've
+	execed a non-cygwin process.  Let the Windows process deal with it
+	itself.
+
 2012-03-28  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* sigproc.cc (proc_terminate): Avoid releasing myself.

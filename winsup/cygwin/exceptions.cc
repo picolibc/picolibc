@@ -996,8 +996,9 @@ ctrl_c_handler (DWORD type)
   tty_min *t = cygwin_shared->tty.get_cttyp ();
   /* Ignore this if we're not the process group leader since it should be handled
      *by* the process group leader. */
-  if (t && t->getpgid () == myself->pid &&
-       (GetTickCount () - t->last_ctrl_c) >= MIN_CTRL_C_SLOP)
+  if (t && (!have_execed || have_execed_cygwin)
+      && t->getpgid () == myself->pid &&
+      (GetTickCount () - t->last_ctrl_c) >= MIN_CTRL_C_SLOP)
     /* Otherwise we just send a SIGINT to the process group and return TRUE (to indicate
        that we have handled the signal).  At this point, type should be
        a CTRL_C_EVENT or CTRL_BREAK_EVENT. */
