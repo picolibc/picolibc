@@ -1,7 +1,7 @@
 /* sec_acl.cc: Sun compatible ACL functions.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011 Red Hat, Inc.
+   2009, 2010, 2011, 2012 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -451,13 +451,13 @@ acl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
 
   fhandler_base *fh = build_fh_name (path, PC_SYM_FOLLOW | PC_KEEP_HANDLE,
 				     stat_suffixes);
-  if (fh->error ())
+  if (!fh || !fh->exists ())
+    set_errno (ENOENT);
+  else if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());
       set_errno (fh->error ());
     }
-  else if (!fh->exists ())
-    set_errno (ENOENT);
   else
     res = fh->facl (cmd, nentries, aclbufp);
 
