@@ -1,3 +1,8 @@
+2012-03-29  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/locale/locale.c (__mb_cur_max): On Cygwin, align default value
+	with default UTF-8 charset.
+
 2012-03-26  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/findfp.c (__sinit): Set __sdidinit last.

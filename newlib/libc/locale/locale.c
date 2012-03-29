@@ -188,7 +188,11 @@ No supporting OS subroutines are required.
 #define _LC_LAST      7
 #define ENCODING_LEN 31
 
+#ifdef __CYGWIN__ /* Cygwin starts with LC_CTYPE set to "C.UTF-8". */
+int __EXPORT __mb_cur_max = 6;
+#else
 int __EXPORT __mb_cur_max = 1;
+#endif
 
 int __nlocale_changed = 0;
 int __mlocale_changed = 0;
