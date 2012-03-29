@@ -135,6 +135,7 @@ fhandler_console::set_unit ()
   bool created;
   fh_devices devset;
   lock_ttys here;
+  HWND me;
   if (shared_console_info)
     {
       fh_devices this_unit = dev ();
@@ -146,9 +147,14 @@ fhandler_console::set_unit ()
 		|| this_unit == FH_TTY) ?
 		shared_unit : FH_ERROR;
     }
+  else if ((myself->ctty != -1 && !iscons_dev (myself->ctty))
+	   || !(me = GetConsoleWindow ()))
+    {
+      created = false;
+      devset = FH_ERROR;
+    }
   else
     {
-      HWND me = GetConsoleWindow ();
       created = true;
       shared_console_info = open_shared_console (me, cygheap->console_h, created);
       ProtectHandleINH (cygheap->console_h);

@@ -1,6 +1,11 @@
+2012-03-29  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler_console.cc (fhandler_console::set_unit): Don't succeed
+	unless we are opening a console actually associated with this process.
+
 2012-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
-	* sec_acl.cc (acl32): Fix potnetial crash if build_fh_name returns NULL.
+	* sec_acl.cc (acl32): Fix potential crash if build_fh_name returns NULL.
 
 2012-03-29  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
