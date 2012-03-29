@@ -1,0 +1,7 @@
+What's new:
+-----------
+
+- Cygwin now automatically populates the /dev directory with all
+  existing POSIX devices.
+
+- Add virtual /proc/PID/mountinfo file.
