@@ -1016,6 +1016,34 @@ class fhandler_disk_file: public fhandler_base
   }
 };
 
+class fhandler_dev: public fhandler_disk_file
+{
+  int lastrealpos;
+  bool dir_exists;
+public:
+  fhandler_dev ();
+  DIR *opendir (int fd) __attribute__ ((regparm (2)));
+  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
+  void rewinddir (DIR *);
+
+  fhandler_dev (void *) {}
+
+  void copyto (fhandler_base *x)
+  {
+    x->pc.free_strings ();
+    *reinterpret_cast<fhandler_dev *> (x) = *this;
+    x->reset (this);
+  }
+
+  fhandler_dev *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev));
+    fhandler_dev *fh = new (ptr) fhandler_dev (ptr);
+    copyto (fh);
+    return fh;
+  }
+};
+
 class fhandler_cygdrive: public fhandler_disk_file
 {
   enum
@@ -2093,6 +2121,7 @@ typedef union
 {
   char __base[sizeof (fhandler_base)];
   char __console[sizeof (fhandler_console)];
+  char __dev[sizeof (fhandler_dev)];
   char __cygdrive[sizeof (fhandler_cygdrive)];
   char __dev_clipboard[sizeof (fhandler_dev_clipboard)];
   char __dev_dsp[sizeof (fhandler_dev_dsp)];

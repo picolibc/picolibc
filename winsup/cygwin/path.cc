@@ -730,17 +730,9 @@ path_conv::check (const char *src, unsigned opt,
 		}
 	      goto out;
 	    }
-	  else if (dev == FH_DEV)
+	  else if (isdev_dev (dev))
 	    {
-	      dev = FH_FS;
-#if 0
-	      fileattr = getfileattr (THIS_path, sym.pflags & MOUNT_NOPOSIX);
-	      if (!component && fileattr == INVALID_FILE_ATTRIBUTES)
-		{
-		  fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
-		  goto out;
-		}
-#endif
+	      /* Just make sure that the path handling goes on as with FH_FS. */
 	    }
 	  else if (isvirtual_dev (dev))
 	    {
@@ -879,7 +871,9 @@ is_virtual_symlink:
 
 	  if (!component)
 	    {
-	      fileattr = sym.fileattr;
+	      /* Make sure that /dev always exists. */
+	      fileattr = isdev_dev (dev) ? FILE_ATTRIBUTE_DIRECTORY
+					 : sym.fileattr;
 	      path_flags = sym.pflags;
 	    }
 

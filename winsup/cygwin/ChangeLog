@@ -1,3 +1,27 @@
+2012-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add fhandler_dev.o.
+	* devices.h (DEV_DEV_MAJOR): Define.
+	(FH_DEV): Redefine in terms of DEV_DEV_MAJOR.
+	(ext_dev_storage): Declare.
+	(dev_storage_size): Declare.
+	(dev_dev_storage): Declare.
+	(dev_dev): Define.
+	(isdev_dev): Define.
+	* devices.in (dev_dev_storage): Activate.
+	(ext_dev_storage): Define as externally available pointer to
+	dev_storage.
+	(dev_storage_size): Define to contain number of dev_storage elements.
+	* dir.cc (rmdir): Handle /dev as always not empty.
+	* dtable.cc (fh_alloc): Handle DEV_DEV_MAJOR.
+	* fhandler.h (fhandler_dev): New class, derived from fhandler_disk_file.
+	(fhandler_union): Add fhandler_dev member.
+	* fhandler_disk_file.cc (class __DIR_mounts): Handle /dev directory
+	to make sure it always exists.
+	* fhandler_dev.cc: New file implementing /dev.
+	* globals.cc (ro_u_dev): New R/O unicode string.
+	* path.cc (path_conv::check): Handle FH_DEV device.
+
 2012-03-29  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fhandler_console.cc (fhandler_console::set_unit): Don't succeed

@@ -96,6 +96,7 @@ UNICODE_STRING _RDATA ro_u_com = _ROU (L".com");
 UNICODE_STRING _RDATA ro_u_scr = _ROU (L".scr");
 UNICODE_STRING _RDATA ro_u_sys = _ROU (L".sys");
 UNICODE_STRING _RDATA ro_u_proc = _ROU (L"proc");
+UNICODE_STRING _RDATA ro_u_dev = _ROU (L"dev");
 UNICODE_STRING _RDATA ro_u_pmem = _ROU (L"\\Device\\PhysicalMemory");
 UNICODE_STRING _RDATA ro_u_natp = _ROU (L"\\??\\");
 UNICODE_STRING _RDATA ro_u_uncp = _ROU (L"\\??\\UNC\\");

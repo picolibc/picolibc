@@ -26,6 +26,7 @@ details. */
 #include "pwdgrp.h"
 #include <winioctl.h>
 #include <lm.h>
+#include "devices.h"
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -36,11 +37,12 @@ class __DIR_mounts
   const char	*parent_dir;
   int		 parent_dir_len;
   UNICODE_STRING mounts[MAX_MOUNTS];
-  bool		 found[MAX_MOUNTS + 2];
+  bool		 found[MAX_MOUNTS + 3];
   UNICODE_STRING cygdrive;
 
 #define __DIR_PROC	(MAX_MOUNTS)
 #define __DIR_CYGDRIVE	(MAX_MOUNTS+1)
+#define __DIR_DEV	(MAX_MOUNTS+2)
 
   __ino64_t eval_ino (int idx)
     {
@@ -84,6 +86,11 @@ public:
 	      found[__DIR_PROC] = true;
 	      return 2;
 	    }
+	  if (RtlEqualUnicodeString (fname, &ro_u_dev, FALSE))
+	    {
+	      found[__DIR_DEV] = true;
+	      return 2;
+	    }
 	  if (fname->Length / sizeof (WCHAR) == mount_table->cygdrive_len - 2
 	      && RtlEqualUnicodeString (fname, &cygdrive, FALSE))
 	    {
@@ -119,6 +126,13 @@ public:
 	      found[__DIR_PROC] = true;
 	      if (retname)
 		*retname = ro_u_proc;
+	      return 2;
+	    }
+	  if (!found[__DIR_DEV])
+	    {
+	      found[__DIR_DEV] = true;
+	      if (retname)
+		*retname = ro_u_dev;
 	      return 2;
 	    }
 	  if (!found[__DIR_CYGDRIVE])
@@ -2348,6 +2362,66 @@ fhandler_disk_file::closedir (DIR *dir)
 
   delete d_mounts (dir);
   syscall_printf ("%d = closedir(%p, %s)", res, dir, get_name ());
+  return res;
+}
+
+fhandler_dev::fhandler_dev () :
+  fhandler_disk_file (), lastrealpos (0), dir_exists (true)
+{
+}
+
+DIR *
+fhandler_dev::opendir (int fd)
+{
+  DIR *dir;
+  DIR *res = NULL;
+
+  dir = fhandler_disk_file::opendir (fd);
+  if (dir)
+    return dir;
+  if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
+    set_errno (ENOMEM);
+  else if ((dir->__d_dirent =
+	    (struct dirent *) malloc (sizeof (struct dirent))) == NULL)
+    {
+      set_errno (ENOMEM);
+      goto free_dir;
+    }
+  else
+    {
+      cygheap_fdnew cfd;
+      if (cfd < 0 && fd < 0)
+	goto free_dirent;
+
+      dir->__d_dirname = NULL;
+      dir->__d_dirent->__d_version = __DIRENT_VERSION;
+      dir->__d_cookie = __DIRENT_COOKIE;
+      dir->__handle = INVALID_HANDLE_VALUE;
+      dir->__d_position = 0;
+      dir->__flags = 0;
+      dir->__d_internal = 0;
+
+      if (fd >= 0)
+	dir->__d_fd = fd;
+      else
+	{
+	  cfd = this;
+	  dir->__d_fd = cfd;
+	  cfd->nohandle (true);
+	}
+      set_close_on_exec (true);
+      dir->__fh = this;
+      dir_exists = false;
+      res = dir;
+    }
+
+  syscall_printf ("%p = opendir (%s)", res, get_name ());
+  return res;
+
+free_dirent:
+  free (dir->__d_dirent);
+free_dir:
+  free (dir);
   return res;
 }
 

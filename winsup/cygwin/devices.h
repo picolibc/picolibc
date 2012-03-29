@@ -1,6 +1,6 @@
 /* devices.h
 
-   Copyright 2002, 2003, 2004, 2005, 2007, 2009, 2010, 2011 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2007, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -68,7 +68,6 @@ enum fh_devices
   FH_FIFO    = FHDEV (0, 196),
   FH_FS      = FHDEV (0, 195),  /* filesystem based device */
   FH_NETDRIVE= FHDEV (0, 194),
-  FH_DEV     = FHDEV (0, 193),
 
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),
@@ -243,6 +242,9 @@ enum fh_devices
   DEV_CYGDRIVE_MAJOR = 98,
   FH_CYGDRIVE= FHDEV (DEV_CYGDRIVE_MAJOR, 0),
 
+  DEV_DEV_MAJOR = 99,
+  FH_DEV= FHDEV (DEV_DEV_MAJOR, 0),
+
   DEV_TCP_MAJOR = 30,
   FH_TCP = FHDEV (DEV_TCP_MAJOR, 36),
   FH_UDP = FHDEV (DEV_TCP_MAJOR, 39),
@@ -316,6 +318,9 @@ struct device
   inline bool is_fs_special () const {return dev_on_fs && d.devn != FH_FS;}
 };
 
+extern const device *ext_dev_storage;
+extern const size_t dev_storage_size;
+
 extern const device *console_dev;
 extern const device *ptmx_dev;
 extern const device *ptys_dev;
@@ -336,6 +341,8 @@ extern const device dev_pipew_storage;
 #define pipew_dev (&dev_pipew_storage)
 extern const device dev_proc_storage;
 #define proc_dev (&dev_proc_storage)
+extern const device dev_dev_storage;
+#define dev_dev (&dev_dev_storage)
 extern const device dev_netdrive_storage;
 #define netdrive_dev (&dev_netdrive_storage)
 extern const device dev_cygdrive_storage;
@@ -347,6 +354,8 @@ extern const device dev_fs_storage;
 
 #define isproc_dev(devn) \
   (devn >= FH_PROC_MIN_MINOR && devn <= FH_PROC_MAX_MINOR)
+
+#define isdev_dev(devn) (devn == FH_DEV)
 
 #define isprocsys_dev(devn) (devn == FH_PROCSYS)
 

@@ -33,10 +33,8 @@ const device dev_procsysvipc_storage =
 const device dev_netdrive_storage =
   {"", {FH_NETDRIVE}, ""};
 
-#if 0
 const device dev_dev_storage =
   {"/dev", {FH_DEV}, "/dev"};
-#endif
 
 const device dev_registry_storage =
   {"", {FH_REGISTRY}, ""};
@@ -46531,6 +46529,10 @@ return	NULL;
 
 
 #undef BRACK
+
+const device *ext_dev_storage = dev_storage;
+const size_t dev_storage_size = sizeof dev_storage / sizeof dev_storage[0];
+
 void
 device::parse (const char *s)
 {
