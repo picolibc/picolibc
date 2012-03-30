@@ -6,7 +6,7 @@ What's new:
 
 - Add virtual /proc/PID/mountinfo file.
 
-- flock now additionaly supports the following scenario, which requires
+- flock now additionally supports the following scenario, which requires
   to propagate locks to the parent process:
 
     (
