@@ -387,8 +387,10 @@ BLODA</ulink>. Badly-behaved applications which
 inject dlls into other processes often manage to clobber important
 sections of the child's address space, leading to base address
 collisions which rebasing cannot fix. The only way to resolve this
-problem is to remove (usually uninstall) the offending
-app.</listitem></itemizedlist></para>
+problem is to remove (usually uninstall) the offending app.  See
+<xref linkend="cygwinenv-implemented-options"></xref> for the
+<literal>detect_bloda</literal> option, which may be able to identify the
+BLODA.</listitem></itemizedlist></para>
 
 <para>In summary, current Windows implementations make it
 impossible to implement a perfectly reliable fork, and occasional

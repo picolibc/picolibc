@@ -1,3 +1,11 @@
+2012-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml (cygwinenv-implemented-options): Add detect_bloda.
+	* new-features.sgml (ov-new1.7.12): Add list items for the change to
+	flock and the detect_bloda CYGWIN option.
+	* overview2.sgml (ov-hi-process-problems): Add a reference to the
+	detect_bloda CYGWIN option.
+
 2012-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.12): Create.  Move mountinfo here.

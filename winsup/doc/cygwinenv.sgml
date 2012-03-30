@@ -12,6 +12,16 @@ by prefixing with <literal>no</literal>.</para>
 <itemizedlist mark="bullet">
 
 <listitem>
+<para><envar>(no)detect_bloda</envar> - If set, Cygwin will try to detect
+foreign applications which try to inject threads into a Cygwin process,
+or which redirect system sockets by providing an enforced so-called
+<literal>Layered Service Provider</literal>.  This may or may not help to
+detect <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda">
+BLODAs</ulink>.  Don't use this option for day-to-day usage, it will slow
+down every thread and socket creation!</para>
+</listitem>
+
+<listitem>
 <para><envar>(no)dosfilewarning</envar> - If set, Cygwin will warn the
 first time a user uses an "MS-DOS" style path name rather than a POSIX-style
 path name.  Defaults to set.</para>
