@@ -1,3 +1,11 @@
+2012-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.h (DEV_TTY_MAJOR): Define, use throughout where appropriate.
+	(DEV_VIRTFS_MAJOR): Ditto.
+	* fhandler_dev.cc (fhandler_dev::readdir): Add comments.  Tweak tests
+	for invisible devices.  Don't print comX devices, only ttySX.  Drop
+	requirement to call stat64.
+
 2012-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add fhandler_dev.o.

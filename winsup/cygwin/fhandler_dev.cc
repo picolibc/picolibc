@@ -32,6 +32,7 @@ int
 fhandler_dev::readdir (DIR *dir, dirent *de)
 {
   int ret;
+  device dev;
 
   if (dir_exists && !lastrealpos)
     {
@@ -40,7 +41,6 @@ fhandler_dev::readdir (DIR *dir, dirent *de)
 	  /* Avoid to print devices for which users have created files under
 	     /dev already, for instance by using the old script from Igor
 	     Peshansky. */
-	  device dev;
 	  dev.name = de->d_name;
 	  if (!bsearch (&dev, ext_dev_storage, dev_storage_size, sizeof dev,
 		       device_cmp))
@@ -56,36 +56,57 @@ fhandler_dev::readdir (DIR *dir, dirent *de)
 	   idx < dev_storage_size;
 	   ++idx)
 	{
-	  struct __stat64 st;
-
 	  ++dir->__d_position;
 	  /* Exclude devices which are only available for internal purposes
 	     and devices which are not really existing at this time. */
 	  switch (ext_dev_storage[idx].d.major)
 	    {
-	    case 0:
-	      if (ext_dev_storage[idx].d.minor == FH_FIFO
-		  || ext_dev_storage[idx].d.minor == FH_PIPE)
-		continue;
+	    case DEV_VIRTFS_MAJOR:
+	      /* Drop /dev/fifo and /dev/pipe since they are internal only. */
+	      switch (ext_dev_storage[idx].d.devn)
+		{
+		case FH_FIFO:
+		case FH_PIPE:
+		  continue;
+		}
+	      break;
 	    case DEV_PTYM_MAJOR:
-	      if (ext_dev_storage[idx].d.minor
-		  || !strcmp (ext_dev_storage[idx].name, "/dev/ptm0"))
+	      /* Only /dev/ptmx is user-visible. */
+	      if (strcmp (ext_dev_storage[idx].name + dev_prefix_len, "ptmx"))
 		continue;
 	      break;
 	    case DEV_PTYS_MAJOR:
+	      /* Show only existing slave ptys. */
 	      if (cygwin_shared->tty.connect (ext_dev_storage[idx].d.minor)
 		  == -1)
 		continue;
 	      break;
 	    case DEV_CONS_MAJOR:
+	      /* Show only the one console which is our controlling tty
+		 right now. */
 	      if (!iscons_dev (myself->ctty)
 		  || myself->ctty != ext_dev_storage[idx].d.devn_int)
 		continue;
 	      break;
+	    case DEV_TTY_MAJOR:
+	      /* Show con{in,out,sole} only if we're running in a console. */
+	      switch (ext_dev_storage[idx].d.devn)
+		{
+		case FH_CONIN:
+		case FH_CONOUT:
+		case FH_CONSOLE:
+		  if (!iscons_dev (myself->ctty))
+		    continue;
+		}
+	      break;
+	    case DEV_SERIAL_MAJOR:
+	      /* Ignore comX devices, only print ttySx. */
+	      if (ext_dev_storage[idx].name[dev_prefix_len] == 'c')
+		continue;
+	      /*FALLTHRU*/
 	    case DEV_FLOPPY_MAJOR:
 	    case DEV_TAPE_MAJOR:
 	    case DEV_CDROM_MAJOR:
-	    case DEV_SERIAL_MAJOR:
 	    case DEV_SD_MAJOR:
 	    case DEV_SD1_MAJOR:
 	    case DEV_SD2_MAJOR:
@@ -94,6 +115,7 @@ fhandler_dev::readdir (DIR *dir, dirent *de)
 	    case DEV_SD5_MAJOR:
 	    case DEV_SD6_MAJOR:
 	    case DEV_SD7_MAJOR:
+	      /* Check existence of POSIX devices backed by real NT devices. */
 	      {
 		WCHAR wpath[MAX_PATH];
 		UNICODE_STRING upath;
@@ -105,8 +127,9 @@ fhandler_dev::readdir (DIR *dir, dirent *de)
 		RtlInitUnicodeString (&upath, wpath);
 		InitializeObjectAttributes (&attr, &upath,
 					    OBJ_CASE_INSENSITIVE, NULL, NULL);
-		/* The native paths are devices, not symlinks, so we expect
-		   a matching error message. */
+		/* Except for the serial IO devices, the native paths are
+		   direct device paths, not symlinks, so every status code
+		   except for "NOT_FOUND" means the device exists. */
 		status = NtOpenSymbolicLinkObject (&h, SYMBOLIC_LINK_QUERY,
 						   &attr);
 		switch (status)
@@ -123,14 +146,40 @@ fhandler_dev::readdir (DIR *dir, dirent *de)
 	      }
 	      break;
 	    }
-	  if (!lstat64 (ext_dev_storage[idx].name, &st))
+	  strcpy (de->d_name, ext_dev_storage[idx].name + dev_prefix_len);
+	  de->d_ino = hash_path_name (0, ext_dev_storage[idx].native);
+	  switch (ext_dev_storage[idx].d.major)
 	    {
-	      strcpy (de->d_name, ext_dev_storage[idx].name + dev_prefix_len);
-	      de->d_ino = st.st_ino;
-	      de->d_type = S_ISBLK (st.st_mode) ? DT_BLK : DT_CHR;
-	      ret = 0;
+	    case DEV_FLOPPY_MAJOR:
+	    case DEV_TAPE_MAJOR:
+	    case DEV_CDROM_MAJOR:
+	    case DEV_SD_MAJOR:
+	    case DEV_SD1_MAJOR:
+	    case DEV_SD2_MAJOR:
+	    case DEV_SD3_MAJOR:
+	    case DEV_SD4_MAJOR:
+	    case DEV_SD5_MAJOR:
+	    case DEV_SD6_MAJOR:
+	    case DEV_SD7_MAJOR:
+	      de->d_type = DT_BLK;
+	      break;
+	    case DEV_TTY_MAJOR:
+	      switch (ext_dev_storage[idx].d.devn)
+		{
+		  case FH_CONIN:
+		  case FH_CONOUT:
+		  case FH_CONSOLE:
+		    dev.parse (myself->ctty);
+		    de->d_ino = hash_path_name (0, dev.native);
+		    break;
+		}
+	      /*FALLTHRU*/
+	    default:
+	      de->d_type = DT_CHR;
 	      break;
 	    }
+	  ret = 0;
+	      break;
 	}
     }
   return ret;
