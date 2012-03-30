@@ -1457,10 +1457,11 @@ CLOCK_REALTIME and CLOCK_MONOTONIC.  <function>clock_setres</function>,
 <function>clock_settime</function>, and <function>timer_create</function>
 currently support only CLOCK_REALTIME.</para>
 
-<para>BSD file locks created via <function>flock</function> are not
-propagated to the parent process and sibling processes.  The locks are
-only valid in the creating process and subsequently started child processes
-sharing the same file descriptor.</para>
+<para>BSD file locks created via <function>flock</function> are only
+propagated to the direct parent process, not to grand parents or sibling
+processes.  The locks are only valid in the creating process, its parent,
+and subsequently started child processes sharing the same file descriptor.
+</para>
 
 <para><function>fpclassify</function>, <function>isfinite</function>,
 <function>isgreater</function>, <function>isgreaterequal</function>,

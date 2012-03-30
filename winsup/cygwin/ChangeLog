@@ -1,5 +1,9 @@
 2012-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix.sgml (std-notes): Change description of flock restrictions.
+
+2012-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.h (DEV_TTY_MAJOR): Define, use throughout where appropriate.
 	(DEV_VIRTFS_MAJOR): Ditto.
 	* fhandler_dev.cc (fhandler_dev::readdir): Add comments.  Tweak tests
