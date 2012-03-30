@@ -1,5 +1,9 @@
 2012-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* new-features.sgml (ov-new1.7.12): Fix typo.
+
+2012-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwinenv.sgml (cygwinenv-implemented-options): Add detect_bloda.
 	* new-features.sgml (ov-new1.7.12): Add list items for the change to
 	flock and the detect_bloda CYGWIN option.
