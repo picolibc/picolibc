@@ -718,6 +718,12 @@ path_conv::check (const char *src, unsigned opt,
 
 	  sym.pflags |= pflags_or;
 
+	  if (!dev.expose ())
+	    {
+	      error = ENXIO;
+	      return;
+	    }
+
 	  if (dev.get_major () == DEV_CYGDRIVE_MAJOR)
 	    {
 	      if (!component)

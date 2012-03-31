@@ -1018,7 +1018,7 @@ class fhandler_disk_file: public fhandler_base
 
 class fhandler_dev: public fhandler_disk_file
 {
-  int lastrealpos;
+  const struct device *devidx;
   bool dir_exists;
 public:
   fhandler_dev ();

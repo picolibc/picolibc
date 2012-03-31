@@ -1,3 +1,39 @@
+2012-03-30  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* devices.cc: Regenerate.
+	* devices.h (device::noexpose): New field.
+	(device::dev_on_fs): Make a bit field.
+	(get_major): Use proper type for declaration.
+	(expose): New field.
+	(ext_dev_storage): Delete declaration.
+	(dev_storage_size): Ditto.
+	(dev_storage): New declaration.
+	(dev_storage_end): Ditto.
+	* devices.in: Mark /dev/ptym*, /dev/com*, /dev/pipe, /dev/fifo, and
+	"/dev" as "no expose".
+	* fhandler.h (fhandler_dev::lastrealpos): Delete declaration.
+	(fhandler_dev::devidx): Declare new field.
+	* fhandler_disk_file.cc: Move fhandler_dev functions into
+	fhandler_dev.cc.
+	* fhandler_dev.cc: Add includes needed for functions moved from
+	fhandler_disk_file.cc.
+	(dev_storage_scan_start): Define place to start listing devices.
+	(dev_storage_size): Define size of array to scan.
+	(fhandler_dev::fhandler_dev): Move here from fhandler_disk_file.cc.
+	(fhandler_dev::opendir): Ditto.
+	(fhandler_dev::readdir): Just check devidx for non-NULL to determine
+	when to go to disk for /dev content.  Use dev_storage rather than
+	ext_dev_storage.  Iterate over dev_storage using devidx pointer.  Use
+	accessor functions rather than raw references to the device struct.
+	Only increment dir->__d_position when we are actually going to be
+	returning something.  Add debug_printf for exit.
+	(fhandler_dev::rewinddir): Set devidx as appropriate depending on
+	whether there's a /dev on disk or not.
+	* gendevices: Don't mark dev_storage static but do put it in the _RDATA
+	section.
+	* path.cc (path_conv::check): Use new "device::expose()" function to
+	decide to forbid programs from referencing internal device types.
+
 2012-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.sgml (std-notes): Change description of flock restrictions.

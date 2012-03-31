@@ -65,7 +65,7 @@ const device dev_error_storage =
 %%
 "/dev/tty", BRACK(FH_TTY), "/dev/tty"
 "/dev/pty%(0-63)d", BRACK(FHDEV(DEV_PTYS_MAJOR, {$1})), "/dev/pty{$1}", ptys_dev
-"/dev/ptym%(0-63)d", BRACK(FHDEV(DEV_PTYM_MAJOR, {$1})), "/dev/ptym{$1}", ptym_dev
+"/dev/ptym%(0-63)d", BRACK(FHDEV(DEV_PTYM_MAJOR, {$1})), "/dev/ptym{$1}", true, ptym_dev
 "/dev/cons%(0-63)d", BRACK(FHDEV(DEV_CONS_MAJOR, {$1})), "/dev/cons{$1}", cons_dev
 "/dev/console", BRACK(FH_CONSOLE), "/dev/console", console_dev
 "/dev/ptmx", BRACK(FH_PTMX), "/dev/ptmx"
@@ -82,10 +82,10 @@ const device dev_error_storage =
 "/dev/kmem", BRACK(FH_KMEM), "/dev/mem"
 "/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard"
 "/dev/port", BRACK(FH_PORT), "/dev/port"
-"/dev/com%(1-16)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1 - 1})), "\\??\\COM{$1}"
+"/dev/com%(1-16)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1 - 1})), "\\??\\COM{$1}", true
 "/dev/ttyS%(0-63)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1})), "\\??\\COM{$1 + 1}"
-"/dev/pipe", BRACK(FH_PIPE), "/dev/pipe"
-"/dev/fifo", BRACK(FH_FIFO), "/dev/fifo"
+"/dev/pipe", BRACK(FH_PIPE), "/dev/pipe", true
+"/dev/fifo", BRACK(FH_FIFO), "/dev/fifo", true
 "/dev/st%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1})), "\\Device\\Tape{$1}"
 "/dev/nst%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1 + 128})), "\\Device\\Tape{$1}"
 "/dev/fd%(0-15)d", BRACK(FHDEV(DEV_FLOPPY_MAJOR, {$1})), "\\Device\\Floppy{$1}"
@@ -107,8 +107,7 @@ const device dev_error_storage =
 %%
 #undef BRACK
 
-const device *ext_dev_storage = dev_storage;
-const size_t dev_storage_size = sizeof dev_storage / sizeof dev_storage[0];
+const device *dev_storage_end = dev_storage + (sizeof dev_storage / sizeof dev_storage[0]);
 
 void
 device::parse (const char *s)

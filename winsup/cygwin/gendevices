@@ -54,7 +54,7 @@ chop $storage[$#storage];
 chop $storage[$#storage];
 $storage[$#storage] .= "\n";
 splice(@lines, $storage_ix, 1,
-       "static const device dev_storage[] =\n", "{\n",
+       "const _RDATA device dev_storage[] =\n", "{\n",
        @storage, "};\n\n",
        sort {$a cmp $b} values %pointers);
 open(SHILKA, '>', $shilka);

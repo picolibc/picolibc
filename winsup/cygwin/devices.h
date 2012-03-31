@@ -275,8 +275,9 @@ struct device
     };
   } d;
   const char *native;
+  bool noexpose:1;
+  bool dev_on_fs:1;
   _mode_t mode;
-  bool dev_on_fs;
   static const device *lookup (const char *, unsigned int = UINT32_MAX);
   void parse (const char *);
   void parse (_major_t major, _minor_t minor);
@@ -308,8 +309,9 @@ struct device
   bool not_device (_dev_t n) const {return d.devn && n != d.devn; }
 
   _minor_t get_minor () const {return d.minor;}
-  _minor_t get_major () const {return d.major;}
+  _major_t get_major () const {return d.major;}
 
+  inline bool expose () const {return !noexpose;}
   inline operator int& () {return d.devn_int;}
   inline operator fh_devices () {return d.devn_fh_devices;}
   inline operator bool () {return !!d.devn_int;}
@@ -320,8 +322,8 @@ struct device
   inline bool is_fs_special () const {return dev_on_fs && d.devn != FH_FS;}
 };
 
-extern const device *ext_dev_storage;
-extern const size_t dev_storage_size;
+extern const device dev_storage[];
+extern const device *dev_storage_end;
 
 extern const device *console_dev;
 extern const device *ptmx_dev;

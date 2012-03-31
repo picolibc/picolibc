@@ -2365,66 +2365,6 @@ fhandler_disk_file::closedir (DIR *dir)
   return res;
 }
 
-fhandler_dev::fhandler_dev () :
-  fhandler_disk_file (), lastrealpos (0), dir_exists (true)
-{
-}
-
-DIR *
-fhandler_dev::opendir (int fd)
-{
-  DIR *dir;
-  DIR *res = NULL;
-
-  dir = fhandler_disk_file::opendir (fd);
-  if (dir)
-    return dir;
-  if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
-    set_errno (ENOMEM);
-  else if ((dir->__d_dirent =
-	    (struct dirent *) malloc (sizeof (struct dirent))) == NULL)
-    {
-      set_errno (ENOMEM);
-      goto free_dir;
-    }
-  else
-    {
-      cygheap_fdnew cfd;
-      if (cfd < 0 && fd < 0)
-	goto free_dirent;
-
-      dir->__d_dirname = NULL;
-      dir->__d_dirent->__d_version = __DIRENT_VERSION;
-      dir->__d_cookie = __DIRENT_COOKIE;
-      dir->__handle = INVALID_HANDLE_VALUE;
-      dir->__d_position = 0;
-      dir->__flags = 0;
-      dir->__d_internal = 0;
-
-      if (fd >= 0)
-	dir->__d_fd = fd;
-      else
-	{
-	  cfd = this;
-	  dir->__d_fd = cfd;
-	  cfd->nohandle (true);
-	}
-      set_close_on_exec (true);
-      dir->__fh = this;
-      dir_exists = false;
-      res = dir;
-    }
-
-  syscall_printf ("%p = opendir (%s)", res, get_name ());
-  return res;
-
-free_dirent:
-  free (dir->__d_dirent);
-free_dir:
-  free (dir);
-  return res;
-}
-
 fhandler_cygdrive::fhandler_cygdrive () :
   fhandler_disk_file (), ndrives (0), pdrive (NULL)
 {
