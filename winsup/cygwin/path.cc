@@ -718,7 +718,7 @@ path_conv::check (const char *src, unsigned opt,
 
 	  sym.pflags |= pflags_or;
 
-	  if (!dev.expose ())
+	  if (!dev.exists ())
 	    {
 	      error = ENXIO;
 	      return;

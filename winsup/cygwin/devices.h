@@ -275,7 +275,7 @@ struct device
     };
   } d;
   const char *native;
-  bool noexpose:1;
+  bool (device::*exists_func)() const;
   bool dev_on_fs:1;
   _mode_t mode;
   static const device *lookup (const char *, unsigned int = UINT32_MAX);
@@ -311,7 +311,6 @@ struct device
   _minor_t get_minor () const {return d.minor;}
   _major_t get_major () const {return d.major;}
 
-  inline bool expose () const {return !noexpose;}
   inline operator int& () {return d.devn_int;}
   inline operator fh_devices () {return d.devn_fh_devices;}
   inline operator bool () {return !!d.devn_int;}
@@ -320,6 +319,13 @@ struct device
   inline void setfs (bool x) {dev_on_fs = x;}
   inline bool isfs () const {return dev_on_fs || d.devn == FH_FS;}
   inline bool is_fs_special () const {return dev_on_fs && d.devn != FH_FS;}
+
+  bool exists_never () const;
+  bool exists_ptys () const;
+  bool exists_cons () const;
+  bool exists_console () const;
+  bool exists_nt_dev () const;
+  bool exists () const;
 };
 
 extern const device dev_storage[];

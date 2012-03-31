@@ -1,3 +1,29 @@
+2012-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.cc: Regenerate.
+	* devices.h (device::exists_func): New member function pointer,
+	replacing noexpose.
+	(device::expose): Remove.
+	(device::exists_never): Declare.
+	(device::exists_ptys): Declare.
+	(device::exists_cons): Declare.
+	(device::exists_console): Declare.
+	(device::exists_nt_dev): Declare.
+	(device::exists): Declare.
+	* devices.in (dev_storage): Replace former noexpose values with
+	pointers to matching exists_XXX method.
+	(device::exists_never): New method.
+	(device::exists_ptys): New method.
+	(device::exists_cons): New method.
+	(device::exists_console): New method.
+	(device::exists_nt_dev): New method.
+	(device::exists): New method.
+	* fhandler_dev.cc (fhandler_dev::readdir): Replace call to
+	device::expose with call to device::exists and drop all further
+	existence filtering since it's done in device::exists now.
+	* path.cc (path_conv::check): Replace call to device::expose with call
+	to device::exists.
+
 2012-03-30  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* devices.cc: Regenerate.
