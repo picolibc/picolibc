@@ -94,6 +94,7 @@ int
 fhandler_dev::readdir (DIR *dir, dirent *de)
 {
   int ret;
+  const device *curdev;
   device dev;
 
   if (!devidx)
@@ -104,62 +105,39 @@ fhandler_dev::readdir (DIR *dir, dirent *de)
 	     /dev already, for instance by using the old script from Igor
 	     Peshansky. */
 	  dev.name = de->d_name;
-	  if (!bsearch (&dev, dev_storage_scan_start, dev_storage_size, sizeof dev,
-			device_cmp))
+	  if (!bsearch (&dev, dev_storage_scan_start, dev_storage_size,
+			sizeof dev, device_cmp))
 	    break;
 	}
-      if (ret == ENMFILE)
-	devidx = dev_storage_scan_start;
-      else
+      if (ret != ENMFILE)
 	goto out;
+      devidx = dev_storage_scan_start;
     }
 
   /* Now start processing our internal dev table. */
   ret = ENMFILE;
-  while (devidx < dev_storage_end)
+  while ((curdev = devidx++) < dev_storage_end)
     {
-      const device& thisdev = *devidx++;
       /* If exists returns < 0 it means that the device can be used by a
 	 program but its use is deprecated and, so, it is not returned
 	 by readdir(().  */
-      if (thisdev.exists () <= 0)
+      if (curdev->exists () <= 0)
 	continue;
       ++dir->__d_position;
-      strcpy (de->d_name, thisdev.name + dev_prefix_len);
-      de->d_ino = hash_path_name (0, thisdev.native);
-      switch (thisdev.get_major ())
+      strcpy (de->d_name, curdev->name + dev_prefix_len);
+      if (curdev->get_major () == DEV_TTY_MAJOR
+	  && (curdev->is_device (FH_CONIN)
+	      || curdev->is_device (FH_CONOUT)
+	      || curdev->is_device (FH_CONSOLE)))
 	{
-	case DEV_FLOPPY_MAJOR:
-	case DEV_TAPE_MAJOR:
-	case DEV_CDROM_MAJOR:
-	case DEV_SD_MAJOR:
-	case DEV_SD1_MAJOR:
-	case DEV_SD2_MAJOR:
-	case DEV_SD3_MAJOR:
-	case DEV_SD4_MAJOR:
-	case DEV_SD5_MAJOR:
-	case DEV_SD6_MAJOR:
-	case DEV_SD7_MAJOR:
-	  de->d_type = DT_BLK;
-	  break;
-	case DEV_TTY_MAJOR:
-	  {
-	    int devn = *const_cast<device *> (&thisdev);
-	    switch (devn)
-	      {
-	      case FH_CONIN:
-	      case FH_CONOUT:
-	      case FH_CONSOLE:
-		dev.parse (myself->ctty);
-		de->d_ino = hash_path_name (0, dev.native);
-		break;
-	      }
-	  }
-	  /*FALLTHRU*/
-	default:
-	  de->d_type = DT_CHR;
-	  break;
+	  /* Make sure conin, conout, and console have the same inode number
+	     as the current consX. */
+	  dev.parse (myself->ctty);
+	  de->d_ino = hash_path_name (0, dev.native);
 	}
+      else
+	de->d_ino = hash_path_name (0, curdev->native);
+      de->d_type = curdev->type ();
       ret = 0;
       break;
     }
