@@ -10,101 +10,179 @@ typedef const device *KR_device_t;
 }
 %type KR_device_t
 %local {
+
+static int
+exists_internal (const device&)
+{
+  return false;
+}
+
+static int
+exists (const device&)
+{
+  return true;
+}
+
+/* Check existence of POSIX devices backed by real NT devices. */
+static int
+exists_ntdev (const device& dev)
+{
+  WCHAR wpath[MAX_PATH];
+  UNICODE_STRING upath;
+  OBJECT_ATTRIBUTES attr;
+  HANDLE h;
+  NTSTATUS status;
+
+  sys_mbstowcs (wpath, MAX_PATH, dev.native);
+  RtlInitUnicodeString (&upath, wpath);
+  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
+  /* Except for the serial IO devices, the native paths are
+     direct device paths, not symlinks, so every status code
+     except for "NOT_FOUND" means the device exists. */
+  status = NtOpenSymbolicLinkObject (&h, SYMBOLIC_LINK_QUERY, &attr);
+  switch (status)
+    {
+    case STATUS_OBJECT_NAME_NOT_FOUND:
+    case STATUS_OBJECT_PATH_NOT_FOUND:
+      return false;
+    case STATUS_SUCCESS:
+      NtClose (h);
+    default:
+      break;
+    }
+  return true;
+}
+
+/* Don't list via readdir but allow as a direct reference. */
+static int
+exists_ntdevs (const device& dev)
+{
+  return exists_ntdev (dev) ? -1 : false;
+}
+
+static int
+exists_console (const device& dev)
+{
+  if (!iscons_dev (myself->ctty))
+    return false;
+  int devn = *const_cast<device *> (&dev);
+  switch (devn)
+    {
+    case FH_CONSOLE:
+    case FH_CONIN:
+    case FH_CONOUT:
+      return iscons_dev (myself->ctty);
+    default:
+      return myself->ctty == devn;
+    }
+}
+
+static int
+exists_pty (const device& dev)
+{
+  /* Only existing slave ptys. */
+  return cygwin_shared->tty.connect (dev.get_minor ()) != -1;
+}
+
 const device dev_cygdrive_storage =
-  {"/cygdrive", {FH_CYGDRIVE}, "/cygdrive"};
+  {"/cygdrive", {FH_CYGDRIVE}, "/cygdrive", exists};
 
 const device dev_fs_storage =
-  {"", {FH_FS}, ""};
+  {"", {FH_FS}, "", exists};
 
 const device dev_proc_storage =
-  {"", {FH_PROC}, ""};
+  {"", {FH_PROC}, "", exists};
 
 const device dev_procnet_storage =
-  {"", {FH_PROCNET}, ""};
+  {"", {FH_PROCNET}, "", exists};
 
 const device dev_procsys_storage =
-  {"", {FH_PROCSYS}, ""};
+  {"", {FH_PROCSYS}, "", exists};
 
 const device dev_procsysvipc_storage =
-  {"", {FH_PROCSYSVIPC}, ""};
+  {"", {FH_PROCSYSVIPC}, "", exists};
 
 const device dev_netdrive_storage =
-  {"", {FH_NETDRIVE}, ""};
+  {"", {FH_NETDRIVE}, "", exists};
 
 const device dev_dev_storage =
-  {"/dev", {FH_DEV}, "/dev"};
+  {"/dev", {FH_DEV}, "/dev", exists};
 
 const device dev_registry_storage =
-  {"", {FH_REGISTRY}, ""};
+  {"", {FH_REGISTRY}, "", exists_internal};
 
 const device dev_piper_storage =
-  {"", {FH_PIPER}, ""};
+  {"", {FH_PIPER}, "", exists_internal};
 
 const device dev_pipew_storage =
-  {"", {FH_PIPEW}, ""};
+  {"", {FH_PIPEW}, "", exists_internal};
 
 const device dev_tcp_storage =
-  {"", {FH_TCP}, ""};
+  {"", {FH_TCP}, "", exists_internal};
 
 const device dev_udp_storage =
-  {"", {FH_UDP}, ""};
+  {"", {FH_UDP}, "", exists_internal};
 
 const device dev_stream_storage =
-  {"", {FH_STREAM}, ""};
+  {"", {FH_STREAM}, "", exists_internal};
 
 const device dev_dgram_storage =
-  {"", {FH_DGRAM}, ""};
+  {"", {FH_DGRAM}, "", exists_internal};
 
 const device dev_bad_storage =
-  {"", {FH_NADA}, ""};
+  {"", {FH_NADA}, "", exists_internal};
 
 const device dev_error_storage =
-  {"", {FH_ERROR}, ""};
-#define BRACK(x) {devn_int: x}
+  {"", {FH_ERROR}, "", exists_internal};
 
+#define BRACK(x) {devn_int: x}
 %storage_here
 }
+/* Internal devices below are marked with a //.  gendevices will
+   eventually translate that to a : .  This is done because shilka
+   does not support a colon here since it is designed to only handle
+   C keywords with special handling for "/".  */
 %%
-"/dev/tty", BRACK(FH_TTY), "/dev/tty"
-"/dev/pty%(0-63)d", BRACK(FHDEV(DEV_PTYS_MAJOR, {$1})), "/dev/pty{$1}", &device::exists_ptys, ptys_dev
-"/dev/ptym%(0-63)d", BRACK(FHDEV(DEV_PTYM_MAJOR, {$1})), "/dev/ptym{$1}", &device::exists_never, ptym_dev
-"/dev/cons%(0-63)d", BRACK(FHDEV(DEV_CONS_MAJOR, {$1})), "/dev/cons{$1}", &device::exists_cons, cons_dev
-"/dev/console", BRACK(FH_CONSOLE), "/dev/console", &device::exists_console, console_dev
-"/dev/ptmx", BRACK(FH_PTMX), "/dev/ptmx"
-"/dev/windows", BRACK(FH_WINDOWS), "/dev/windows"
-"/dev/dsp", BRACK(FH_OSS_DSP), "/dev/dsp"
-"/dev/conin", BRACK(FH_CONIN), "/dev/conin", &device::exists_console
-"/dev/conout", BRACK(FH_CONOUT), "/dev/conout", &device::exists_console
-"/dev/null", BRACK(FH_NULL), "\\Device\\Null"
-"/dev/zero", BRACK(FH_ZERO), "/dev/zero"
-"/dev/full", BRACK(FH_FULL), "/dev/full"
-"/dev/random", BRACK(FH_RANDOM), "/dev/random"
-"/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", urandom_dev
-"/dev/mem", BRACK(FH_MEM), "/dev/mem"
-"/dev/kmem", BRACK(FH_KMEM), "/dev/mem"
-"/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard"
-"/dev/port", BRACK(FH_PORT), "/dev/port"
-"/dev/com%(1-16)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1 - 1})), "\\??\\COM{$1}", &device::exists_never
-"/dev/ttyS%(0-63)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1})), "\\??\\COM{$1 + 1}", &device::exists_nt_dev
-"/dev/pipe", BRACK(FH_PIPE), "/dev/pipe", &device::exists_never
-"/dev/fifo", BRACK(FH_FIFO), "/dev/fifo", &device::exists_never
-"/dev/st%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1})), "\\Device\\Tape{$1}", &device::exists_nt_dev
-"/dev/nst%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1 + 128})), "\\Device\\Tape{$1}", &device::exists_nt_dev
-"/dev/fd%(0-15)d", BRACK(FHDEV(DEV_FLOPPY_MAJOR, {$1})), "\\Device\\Floppy{$1}", &device::exists_nt_dev
-"/dev/scd%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}", &device::exists_nt_dev
-"/dev/sr%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}", &device::exists_nt_dev
-"/dev/sd%{a-z}s", BRACK(FH_SD{uc $1}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition0", &device::exists_nt_dev
-"/dev/sda%{a-z}s", BRACK(FH_SDA{uc $1}), "\\Device\\Harddisk{26 + ord($1) - ord('a')}\\Partition0", &device::exists_nt_dev
-"/dev/sdb%{a-z}s", BRACK(FH_SDB{uc $1}), "\\Device\\Harddisk{52 + ord($1) - ord('a')}\\Partition0", &device::exists_nt_dev
-"/dev/sdc%{a-z}s", BRACK(FH_SDC{uc $1}), "\\Device\\Harddisk{78 + ord($1) - ord('a')}\\Partition0", &device::exists_nt_dev
-"/dev/sdd%{a-x}s", BRACK(FH_SDD{uc $1}), "\\Device\\Harddisk{104 + ord($1) - ord('a')}\\Partition0", &device::exists_nt_dev
-"/dev/sd%{a-z}s%(1-15)d", BRACK(FH_SD{uc $1} | {$2}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition{$2 % 16}", &device::exists_nt_dev
-"/dev/sda%{a-z}s%(1-15)d", BRACK(FH_SDA{uc $1} | {$2}), "\\Device\\Harddisk{26 + ord($1) - ord('a')}\\Partition{$2 % 16}", &device::exists_nt_dev
-"/dev/sdb%{a-z}s%(1-15)d", BRACK(FH_SDB{uc $1} | {$2}), "\\Device\\Harddisk{52 + ord($1) - ord('a')}\\Partition{$2 % 16}", &device::exists_nt_dev
-"/dev/sdc%{a-z}s%(1-15)d", BRACK(FH_SDC{uc $1} | {$2}), "\\Device\\Harddisk{78 + ord($1) - ord('a')}\\Partition{$2 % 16}", &device::exists_nt_dev
-"/dev/sdd%{a-x}s%(1-15)d", BRACK(FH_SDD{uc $1} | {$2}), "\\Device\\Harddisk{104 + ord($1) - ord('a')}\\Partition{$2 % 16}", &device::exists_nt_dev
-"/dev/kmsg", BRACK(FH_KMSG), "\\Device\\MailSlot\\cygwin\\dev\\kmsg"
-"/dev", BRACK(FH_DEV), "/dev"
+"/dev", BRACK(FH_DEV), "/dev", exists, S_IFDIR
+"/dev/tty", BRACK(FH_TTY), "/dev/tty", exists, S_IFCHR
+"/dev/pty%(0-63)d", BRACK(FHDEV(DEV_PTYS_MAJOR, {$1})), "/dev/pty{$1}", exists_pty, S_IFCHR, ptys_dev
+"//ptym%(0-63)d", BRACK(FHDEV(DEV_PTYM_MAJOR, {$1})), "/dev/ptym{$1}", exists_internal, S_IFCHR, ptym_dev
+"/dev/cons%(0-63)d", BRACK(FHDEV(DEV_CONS_MAJOR, {$1})), "/dev/cons{$1}", exists_console, S_IFCHR, cons_dev
+"/dev/console", BRACK(FH_CONSOLE), "/dev/console", exists_console, S_IFCHR, console_dev
+"/dev/ptmx", BRACK(FH_PTMX), "/dev/ptmx", exists, S_IFCHR
+"/dev/windows", BRACK(FH_WINDOWS), "/dev/windows", exists, S_IFCHR
+"/dev/dsp", BRACK(FH_OSS_DSP), "/dev/dsp", exists, S_IFCHR
+"/dev/conin", BRACK(FH_CONIN), "/dev/conin", exists_console, S_IFCHR
+"/dev/conout", BRACK(FH_CONOUT), "/dev/conout", exists_console, S_IFCHR
+"/dev/null", BRACK(FH_NULL), "\\Device\\Null", exists_ntdev, S_IFCHR
+"/dev/zero", BRACK(FH_ZERO), "/dev/zero", exists, S_IFCHR
+"/dev/full", BRACK(FH_FULL), "/dev/full", exists, S_IFCHR
+"/dev/random", BRACK(FH_RANDOM), "/dev/random", exists, S_IFCHR
+"/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", exists, S_IFCHR, urandom_dev
+"/dev/mem", BRACK(FH_MEM), "/dev/mem", exists, S_IFCHR
+"/dev/kmem", BRACK(FH_KMEM), "/dev/mem", exists, S_IFCHR
+"/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard", exists, S_IFCHR
+"/dev/port", BRACK(FH_PORT), "/dev/port", exists, S_IFCHR
+"/dev/com%(1-16)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1 - 1})), "\\??\\COM{$1}", exists_ntdevs, S_IFCHR
+"/dev/ttyS%(0-63)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1})), "\\??\\COM{$1 + 1}", exists_ntdev, S_IFCHR
+"//pipe", BRACK(FH_PIPE), "/dev/pipe", exists_internal, S_IFCHR
+"//fifo", BRACK(FH_FIFO), "/dev/fifo", exists_internal, S_IFCHR
+"/dev/st%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1})), "\\Device\\Tape{$1}", exists_ntdev, S_IFBLK
+"/dev/nst%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1 + 128})), "\\Device\\Tape{$1}", exists_ntdev, S_IFBLK
+"/dev/fd%(0-15)d", BRACK(FHDEV(DEV_FLOPPY_MAJOR, {$1})), "\\Device\\Floppy{$1}", exists_ntdev, S_IFBLK
+"/dev/scd%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}", exists_ntdev, S_IFBLK
+"/dev/sr%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}", exists_ntdev, S_IFBLK
+"/dev/sd%{a-z}s", BRACK(FH_SD{uc $1}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition0", exists_ntdev, S_IFBLK
+"/dev/sda%{a-z}s", BRACK(FH_SDA{uc $1}), "\\Device\\Harddisk{26 + ord($1) - ord('a')}\\Partition0", exists_ntdev, S_IFBLK
+"/dev/sdb%{a-z}s", BRACK(FH_SDB{uc $1}), "\\Device\\Harddisk{52 + ord($1) - ord('a')}\\Partition0", exists_ntdev, S_IFBLK
+"/dev/sdc%{a-z}s", BRACK(FH_SDC{uc $1}), "\\Device\\Harddisk{78 + ord($1) - ord('a')}\\Partition0", exists_ntdev, S_IFBLK
+"/dev/sdd%{a-x}s", BRACK(FH_SDD{uc $1}), "\\Device\\Harddisk{104 + ord($1) - ord('a')}\\Partition0", exists_ntdev, S_IFBLK
+"/dev/sd%{a-z}s%(1-15)d", BRACK(FH_SD{uc $1} | {$2}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition{$2 % 16}", exists_ntdev, S_IFBLK
+"/dev/sda%{a-z}s%(1-15)d", BRACK(FH_SDA{uc $1} | {$2}), "\\Device\\Harddisk{26 + ord($1) - ord('a')}\\Partition{$2 % 16}", exists_ntdev, S_IFBLK
+"/dev/sdb%{a-z}s%(1-15)d", BRACK(FH_SDB{uc $1} | {$2}), "\\Device\\Harddisk{52 + ord($1) - ord('a')}\\Partition{$2 % 16}", exists_ntdev, S_IFBLK
+"/dev/sdc%{a-z}s%(1-15)d", BRACK(FH_SDC{uc $1} | {$2}), "\\Device\\Harddisk{78 + ord($1) - ord('a')}\\Partition{$2 % 16}", exists_ntdev, S_IFBLK
+"/dev/sdd%{a-x}s%(1-15)d", BRACK(FH_SDD{uc $1} | {$2}), "\\Device\\Harddisk{104 + ord($1) - ord('a')}\\Partition{$2 % 16}", exists_ntdev, S_IFBLK
+"/dev/kmsg", BRACK(FH_KMSG), "\\Device\\MailSlot\\cygwin\\dev\\kmsg", exists_ntdev, S_IFCHR
 %other	{return	NULL;}
 %%
 #undef BRACK
@@ -132,14 +210,14 @@ device::init ()
 void
 device::parse (_major_t major, _minor_t minor)
 {
-  _dev_t dev = FHDEV (major, minor);
+  _dev_t devn = FHDEV (major, minor);
 
   d.devn = 0;
 
-  for (unsigned i = 0; i < (sizeof (dev_storage) / sizeof (dev_storage[0])); i++)
-    if (dev_storage[i].d.devn == dev)
+  for (const device *devidx = dev_storage; devidx < dev_storage_end; devidx++)
+    if (devidx->d.devn == devn)
       {
-	*this = dev_storage[i];
+	*this = *devidx;
 	break;
       }
 
@@ -197,72 +275,4 @@ device::parsedisk (int drive, int part)
       drive -= 112;
     }
   parse (base, part + (drive * 16));
-}
-
-bool
-device::exists_never () const
-{
-  return false;
-}
-
-bool
-device::exists_ptys () const
-{
-  /* Only in-use ptys exist. */
-  return cygwin_shared->tty.connect (get_minor ()) != -1;
-}
-
-bool
-device::exists_cons () const
-{
-  /* /dev/consX only exists, if it's the current controlling tty. */
-  return iscons_dev (myself->ctty) && myself->ctty == d.devn_int;
-}
-
-bool
-device::exists_console () const
-{
-  /* console, conin, conout only exist if a console is our controlling tty. */
-  return iscons_dev (myself->ctty);
-}
-
-bool
-device::exists_nt_dev () const
-{
-  /* POSIX devices backed by real NT devices only exist if their NT device
-     exists. */
-  WCHAR wpath[MAX_PATH];
-  UNICODE_STRING upath;
-  OBJECT_ATTRIBUTES attr;
-  HANDLE h;
-  NTSTATUS status;
-
-  sys_mbstowcs (wpath, MAX_PATH, native);
-  RtlInitUnicodeString (&upath, wpath);
-  InitializeObjectAttributes (&attr, &upath,
-			      OBJ_CASE_INSENSITIVE, NULL, NULL);
-  /* Except for the serial IO devices, the native paths are direct device
-     paths, not symlinks, so every status code except for "NOT_FOUND" means
-     the device exists. */
-  status = NtOpenSymbolicLinkObject (&h, SYMBOLIC_LINK_QUERY, &attr);
-  switch (status)
-    {
-    case STATUS_OBJECT_NAME_NOT_FOUND:
-    case STATUS_OBJECT_PATH_NOT_FOUND:
-      return false;
-    case STATUS_SUCCESS:
-      NtClose (h);
-      break;
-    default:
-      break;
-    }
-  return true;
-}
-
-bool  
-device::exists () const
-{
-  if (!exists_func)
-    return true;
-  return (this->*exists_func)();
 }

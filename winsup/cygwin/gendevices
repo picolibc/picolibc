@@ -70,7 +70,7 @@ if ($? == -1) {
 }
 chdir $cwd;
 unlink $shilka;
-open(C, $c) or die "$0: couldn't open $c - $!\n";
+open(C, '<', $c) or die "$0: couldn't open $c - $!\n";
 @lines = <C>;
 close C;
 unlink $c;
@@ -84,6 +84,7 @@ for (my $i = 0; $i < @lines; $i++) {
 	splice(@lines, $i, 1);
 	redo;
     };
+    $lines[$i] =~ s%"//%":%go;
 }
 open(OUTPUT, '>', $output) or do {{
     if (chmod(0664, $output)) {
@@ -155,5 +156,7 @@ sub devsort {
     my $b0 = $b->[0];
     $a0 =~ s/(\D)(\d+)/"$1" . sprintf "%05d", $2/e;
     $b0 =~ s/(\D)(\d+)/"$1" . sprintf "%05d", $2/e;
+    $a0 =~ s%^//%:%o;
+    $b0 =~ s%^//%:%o;
     return $a0 cmp $b0;
 }

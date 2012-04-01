@@ -119,7 +119,10 @@ fhandler_dev::readdir (DIR *dir, dirent *de)
   while (devidx < dev_storage_end)
     {
       const device& thisdev = *devidx++;
-      if (!thisdev.exists ())
+      /* If exists returns < 0 it means that the device can be used by a
+	 program but its use is deprecated and, so, it is not returned
+	 by readdir(().  */
+      if (thisdev.exists () <= 0)
 	continue;
       ++dir->__d_position;
       strcpy (de->d_name, thisdev.name + dev_prefix_len);

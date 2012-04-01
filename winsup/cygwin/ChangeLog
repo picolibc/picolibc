@@ -1,3 +1,17 @@
+2012-03-31  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* devices.h (device::exists_func): Redefine field.
+	(device::dev_on_fs): Remove unneeded bit field.  Just make a normal
+	boolean.
+	(device::exists): Redefine function.
+	* devices.in: Move previous functions earlier since they are now only
+	defined static.  Rename some functions due to an as-yet unresolved bug
+	in gendevices.  Rename posix part of internal-only devices with a
+	double-slash.  gendevices will eventuall translate that to a ":".
+	(device::parse): Rework to use dev pointer and dev_storage_end.
+	* devices.cc: Regenerate.
+	* gendevices: Translate "// to ": after shilka processing.
+
 2012-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* devices.cc: Regenerate.

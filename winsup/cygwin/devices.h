@@ -8,8 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef _DEVICES_H
-#define _DEVICES_H
+#pragma once
 
 typedef unsigned short _major_t;
 typedef unsigned short _minor_t;
@@ -19,6 +18,9 @@ typedef __dev32_t _dev_t;
 #define FHDEV(maj, min) ((((unsigned) (maj)) << (sizeof (_major_t) * 8)) | (unsigned) (min))
 #define _minor(dev) ((dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
 #define _major(dev) ((dev) >> (sizeof (_major_t) * 8))
+
+#include <sys/stat.h>
+#include <dirent.h>
 
 #define MAX_CONSOLES 63
 enum fh_devices
@@ -275,9 +277,9 @@ struct device
     };
   } d;
   const char *native;
-  bool (device::*exists_func)() const;
-  bool dev_on_fs:1;
+  int (*exists_func) (const device&);
   _mode_t mode;
+  bool dev_on_fs;
   static const device *lookup (const char *, unsigned int = UINT32_MAX);
   void parse (const char *);
   void parse (_major_t major, _minor_t minor);
@@ -319,13 +321,13 @@ struct device
   inline void setfs (bool x) {dev_on_fs = x;}
   inline bool isfs () const {return dev_on_fs || d.devn == FH_FS;}
   inline bool is_fs_special () const {return dev_on_fs && d.devn != FH_FS;}
-
-  bool exists_never () const;
-  bool exists_ptys () const;
-  bool exists_cons () const;
-  bool exists_console () const;
-  bool exists_nt_dev () const;
-  bool exists () const;
+  inline int exists () const {return exists_func (*this);}
+  unsigned char type () const
+  {
+    if (S_ISBLK (mode))
+      return DT_BLK;
+    return mode >> 12;
+  }
 };
 
 extern const device dev_storage[];
@@ -379,4 +381,3 @@ extern const device dev_fs_storage;
    || (((int) n) == FH_CONOUT))
 
 #define istty_slave_dev(n) (device::major (n) == DEV_PTYS_MAJOR)
-#endif /*_DEVICES_H*/
