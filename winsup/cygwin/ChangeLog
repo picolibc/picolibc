@@ -1,3 +1,15 @@
+2012-04-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* dtable.cc (dtable::fixup_close): Define new function.
+	(dtable::fixup_after_exec): Use fixup_close() and detect when it was
+	not possible to open an inherited file handle.
+	(dtable::fixup_after_fork): Defensively close any file handles which
+	were not, for some reason, inheritable.
+	* dtable.h: Make #pragma once.
+	(dtable::fixup_close): Declare new function.
+	* fhandler_console.cc (fhandler_console::set_unit): Set I/O handles to
+	NULL when this function fails.
+
 2012-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_dev.cc (fhandler_dev::readdir): Fix formatting.  Simplify

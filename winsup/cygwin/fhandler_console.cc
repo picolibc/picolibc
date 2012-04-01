@@ -141,18 +141,15 @@ fhandler_console::set_unit ()
       fh_devices this_unit = dev ();
       fh_devices shared_unit =
 	(fh_devices) shared_console_info->tty_min_state.getntty ();
-      created = false;
       devset = (shared_unit == this_unit || this_unit == FH_CONSOLE
 		|| this_unit == FH_CONIN || this_unit == FH_CONOUT
 		|| this_unit == FH_TTY) ?
 		shared_unit : FH_ERROR;
+      created = false;
     }
   else if ((myself->ctty != -1 && !iscons_dev (myself->ctty))
 	   || !(me = GetConsoleWindow ()))
-    {
-      created = false;
-      devset = FH_ERROR;
-    }
+    devset = FH_ERROR;
   else
     {
       created = true;
@@ -166,6 +163,12 @@ fhandler_console::set_unit ()
   dev ().parse (devset);
   if (devset != FH_ERROR)
     pc.file_attributes (FILE_ATTRIBUTE_NORMAL);
+  else
+    {
+      set_io_handle (NULL);
+      set_output_handle (NULL);
+      created = false;
+    }
   return created;
 }
 

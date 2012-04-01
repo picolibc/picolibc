@@ -835,6 +835,17 @@ dtable::set_file_pointers_for_exec ()
 }
 
 void
+dtable::fixup_close (size_t i, fhandler_base *fh)
+{
+  if (fh->archetype)
+    {
+      debug_printf ("closing fd %d since it is an archetype", i);
+      fh->close_with_arch ();
+    }
+  release (i);
+}
+
+void
 dtable::fixup_after_exec ()
 {
   first_fd_for_open = 0;
@@ -844,15 +855,11 @@ dtable::fixup_after_exec ()
       {
 	fh->clear_readahead ();
 	fh->fixup_after_exec ();
-	if (fh->close_on_exec ())
-	  {
-	    if (fh->archetype)
-	      {
-		debug_printf ("closing fd %d since it is an archetype", i);
-		fh->close_with_arch ();
-	      }
-	    release (i);
-	  }
+	/* Close the handle if it's close-on-exec or if an error was detected
+	   (typically with opening a console in a gui app) by fixup_after_exec.
+	 */
+	if (fh->close_on_exec () || !fh->get_io_handle ())
+	  fixup_close (i, fh);
 	else if (fh->get_popen_pid ())
 	  close (i);
 	else if (i == 0)
@@ -873,6 +880,13 @@ dtable::fixup_after_fork (HANDLE parent)
 	  {
 	    debug_printf ("fd %d (%s)", i, fh->get_name ());
 	    fh->fixup_after_fork (parent);
+	    if (!fh->get_io_handle ())
+	      {
+		/* This should actually never happen but it's here to make sure
+		   we don't crash due to access of an unopened file handle.  */
+		fixup_close (i, fh);
+		continue;
+	      }
 	  }
 	if (i == 0)
 	  SetStdHandle (std_consts[i], fh->get_io_handle ());
