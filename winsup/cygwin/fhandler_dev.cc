@@ -10,6 +10,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <sys/statvfs.h>
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -33,6 +34,81 @@ device_cmp (const void *a, const void *b)
 fhandler_dev::fhandler_dev () :
   fhandler_disk_file (), devidx (NULL), dir_exists (true)
 {
+}
+
+int
+fhandler_dev::open (int flags, mode_t mode)
+{
+  if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+    {
+      set_errno (EEXIST);
+      return 0;
+    }
+  if (flags & O_WRONLY)
+    {
+      set_errno (EISDIR);
+      return 0;
+    }
+  int ret = fhandler_disk_file::open (flags, mode);
+  if (!ret)
+    {
+      flags |= O_DIROPEN;
+      set_flags (flags);
+      nohandle (true);
+    }
+  return 1;
+}
+
+int
+fhandler_dev::close ()
+{
+  if (nohandle ())
+    return 0;
+  return fhandler_disk_file::close ();
+}
+
+int
+fhandler_dev::fstat (struct __stat64 *st)
+{
+  /* If /dev really exists on disk, return correct disk information. */
+  if (pc.fs_got_fs ())
+    return fhandler_disk_file::fstat (st);
+  /* Otherwise fake virtual filesystem. */
+  fhandler_base::fstat (st);
+  st->st_ino = 2;
+  st->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
+  st->st_nlink = 1;
+  return 0;
+}
+
+int __stdcall
+fhandler_dev::fstatvfs (struct statvfs *sfs)
+{
+  int ret = -1, opened = 0;
+  HANDLE fh = get_handle ();
+
+  if (!fh && !nohandle ())
+    {
+      if (!open (O_RDONLY, 0))
+	return -1;
+      opened = 1;
+    }
+  if (!nohandle ())
+    {
+      ret = fhandler_disk_file::fstatvfs (sfs);
+      goto out;
+    }
+  /* Virtual file system.  Just return an empty buffer with a few values
+     set to something useful.  Just as on Linux. */
+  memset (sfs, 0, sizeof (*sfs));
+  sfs->f_bsize = sfs->f_frsize = 4096;
+  sfs->f_namemax = NAME_MAX;
+  ret = 0;
+
+out:
+  if (opened)
+    close ();
+  return ret;
 }
 
 DIR *

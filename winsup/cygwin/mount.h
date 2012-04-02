@@ -74,7 +74,6 @@ class fs_info
   } status;
   ULONG sernum;			/* Volume Serial Number */
   char fsn[80];			/* Windows filesystem name */
-  unsigned long got_fs () const { return status.fs_type != none; }
 
  public:
   void clear ()
@@ -112,6 +111,7 @@ class fs_info
   IMPLEMENT_FS_FLAG (nwfs)
   IMPLEMENT_FS_FLAG (ncfsd)
   fs_info_type what_fs () const { return status.fs_type; }
+  bool got_fs () const { return status.fs_type != none; }
 
   ULONG serial_number () const { return sernum; }
 

@@ -1,5 +1,22 @@
 2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_dev::open): Declare.
+	(fhandler_dev::close): Declare.
+	(fhandler_dev::fstat): Declare.
+	(fhandler_dev::fstatvfs): Declare.
+	(fhandler_cygdrive::fstatvfs): Declare.
+	* fhandler_dev.cc (fhandler_dev::open): New method.
+	(fhandler_dev::close): Ditto.
+	(fhandler_dev::fstat): Ditto.
+	(fhandler_dev::fstatvfs): Ditto.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Don't fill
+	st_rdev.
+	(fhandler_cygdrive::fstatvfs): New method.
+	* path.h (path_conv::fs_got_fs): New method.
+	* mount.h (fs_info::got_fs): Change type to bool, make public.
+
+2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (fillout_mntent): Use "none" rather than 0 when checking
 	FS type.
 

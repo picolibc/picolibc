@@ -508,7 +508,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 					    : (PFILETIME) &pfnoi->LastWriteTime,
 		  &buf->st_ctim);
   to_timestruc_t ((PFILETIME) &pfnoi->CreationTime, &buf->st_birthtim);
-  buf->st_rdev = buf->st_dev = get_dev ();
+  buf->st_dev = get_dev ();
   /* CV 2011-01-13: Observations on the Cygwin mailing list point to an
      interesting behaviour in some Windows versions.  Apparently the size of
      a directory is computed at the time the directory is first scanned.  This
@@ -2409,6 +2409,17 @@ fhandler_cygdrive::fstat (struct __stat64 *buf)
   buf->st_ino = 2;
   buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
   buf->st_nlink = 1;
+  return 0;
+}
+
+int __stdcall
+fhandler_cygdrive::fstatvfs (struct statvfs *sfs)
+{
+  /* Virtual file system.  Just return an empty buffer with a few values
+     set to something useful.  Just as on Linux. */
+  memset (sfs, 0, sizeof (*sfs));
+  sfs->f_bsize = sfs->f_frsize = 4096;
+  sfs->f_namemax = NAME_MAX;
   return 0;
 }
 

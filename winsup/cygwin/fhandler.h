@@ -1022,6 +1022,10 @@ class fhandler_dev: public fhandler_disk_file
   bool dir_exists;
 public:
   fhandler_dev ();
+  int open (int flags, mode_t mode);
+  int close ();
+  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   DIR *opendir (int fd) __attribute__ ((regparm (2)));
   int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
   void rewinddir (DIR *);
@@ -1063,6 +1067,7 @@ class fhandler_cygdrive: public fhandler_disk_file
   void rewinddir (DIR *);
   int closedir (DIR *);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
 
   fhandler_cygdrive (void *) {}
 
