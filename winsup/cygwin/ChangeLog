@@ -1,3 +1,8 @@
+2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (fillout_mntent): Use "none" rather than 0 when checking
+	FS type.
+
 2012-04-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* dtable.cc (dtable::fixup_close): Define new function.

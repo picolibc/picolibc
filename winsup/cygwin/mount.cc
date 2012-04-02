@@ -1628,7 +1628,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     RtlAppendUnicodeToString (&unat, L"\\");
   mntinfo.update (&unat, NULL);
 
-  if (mntinfo.what_fs () > 0 && mntinfo.what_fs () < max_fs_type)
+  if (mntinfo.what_fs () > none && mntinfo.what_fs () < max_fs_type)
     strcpy (_my_tls.locals.mnt_type, fs_names[mntinfo.what_fs ()].name);
   else
     strcpy (_my_tls.locals.mnt_type, mntinfo.fsname ());
