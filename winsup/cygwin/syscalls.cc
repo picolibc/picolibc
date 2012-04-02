@@ -1612,8 +1612,7 @@ fhandler_base::set_ino_and_dev (struct __stat64 *buf)
 	buf->st_dev = get_device ();
     }
   /* Only set st_rdev if it's a device. */
-  if (!buf->st_rdev && get_major () != DEV_VIRTFS_MAJOR
-      && get_major () != DEV_CYGDRIVE_MAJOR)
+  if (!buf->st_rdev && get_major () != DEV_VIRTFS_MAJOR)
     buf->st_rdev = get_device ();
 }
 

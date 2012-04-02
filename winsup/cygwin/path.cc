@@ -724,7 +724,7 @@ path_conv::check (const char *src, unsigned opt,
 	      return;
 	    }
 
-	  if (dev.get_major () == DEV_CYGDRIVE_MAJOR)
+	  if (iscygdrive_dev (dev))
 	    {
 	      if (!component)
 		fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;

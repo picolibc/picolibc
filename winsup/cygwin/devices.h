@@ -73,6 +73,7 @@ enum fh_devices
   FH_FS      = FHDEV (DEV_VIRTFS_MAJOR, 195),  /* filesystem based device */
   FH_NETDRIVE= FHDEV (DEV_VIRTFS_MAJOR, 194),
   FH_DEV     = FHDEV (DEV_VIRTFS_MAJOR, 193),
+  FH_CYGDRIVE= FHDEV (DEV_VIRTFS_MAJOR, 192),
 
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),
@@ -244,9 +245,6 @@ enum fh_devices
   DEV_SOUND_MAJOR = 14,
   FH_OSS_DSP = FHDEV (DEV_SOUND_MAJOR, 3),
 
-  DEV_CYGDRIVE_MAJOR = 98,
-  FH_CYGDRIVE= FHDEV (DEV_CYGDRIVE_MAJOR, 0),
-
   DEV_TCP_MAJOR = 30,
   FH_TCP = FHDEV (DEV_TCP_MAJOR, 36),
   FH_UDP = FHDEV (DEV_TCP_MAJOR, 39),
@@ -364,6 +362,8 @@ extern const device dev_fs_storage;
 
 #define isproc_dev(devn) \
   (devn >= FH_PROC_MIN_MINOR && devn <= FH_PROC_MAX_MINOR)
+
+#define iscygdrive_dev(devn) (devn == FH_CYGDRIVE)
 
 #define isdev_dev(devn) (devn == FH_DEV)
 
