@@ -1585,6 +1585,38 @@ stat64_to_stat32 (struct __stat64 *src, struct __stat32 *dst)
   dst->st_blocks = src->st_blocks;
 }
 
+static struct __stat64 dev_st;
+static bool dev_st_inited;
+
+void
+fhandler_base::set_ino_and_dev (struct __stat64 *buf)
+{
+  if (!buf->st_ino)
+    buf->st_ino = get_ino ();
+  /* For /dev-based devices, st_dev must be set to the device number of /dev,
+     not it's own device major/minor numbers.  What we do here to speed up
+     the process is to fetch the device number of /dev only once, liberally
+     assuming that /dev doesn't change over the lifetime of a process. */
+  if (!buf->st_dev)
+    {
+      if (!strncmp (dev ().name, "/dev/", 5))
+	{
+	  if (!dev_st_inited)
+	    {
+	      stat64 ("/dev", &dev_st);
+	      dev_st_inited = true;
+	    }
+	  buf->st_dev = dev_st.st_dev;
+	}
+      else
+	buf->st_dev = get_device ();
+    }
+  /* Only set st_rdev if it's a device. */
+  if (!buf->st_rdev && get_major () != DEV_VIRTFS_MAJOR
+      && get_major () != DEV_CYGDRIVE_MAJOR && get_major () != DEV_DEV_MAJOR)
+    buf->st_rdev = get_device ();
+}
+
 extern "C" int
 fstat64 (int fd, struct __stat64 *buf)
 {
@@ -1598,14 +1630,7 @@ fstat64 (int fd, struct __stat64 *buf)
       memset (buf, 0, sizeof (struct __stat64));
       res = cfd->fstat (buf);
       if (!res)
-	{
-	  if (!buf->st_ino)
-	    buf->st_ino = cfd->get_ino ();
-	  if (!buf->st_dev)
-	    buf->st_dev = cfd->get_device ();
-	  if (!buf->st_rdev)
-	    buf->st_rdev = buf->st_dev;
-	}
+	cfd->set_ino_and_dev (buf);
     }
 
   syscall_printf ("%R = fstat(%d, %p)", res, fd, buf);
@@ -1744,14 +1769,7 @@ stat_worker (path_conv &pc, struct __stat64 *buf)
       memset (buf, 0, sizeof (*buf));
       res = fh->fstat (buf);
       if (!res)
-	{
-	  if (!buf->st_ino)
-	    buf->st_ino = fh->get_ino ();
-	  if (!buf->st_dev)
-	    buf->st_dev = fh->get_device ();
-	  if (!buf->st_rdev)
-	    buf->st_rdev = buf->st_dev;
-	}
+	fh->set_ino_and_dev (buf);
       delete fh;
     }
   else

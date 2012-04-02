@@ -328,6 +328,7 @@ class fhandler_base
 # define archetype_usecount(n) _archetype_usecount (__PRETTY_FUNCTION__, __LINE__, (n))
   int close_fs () { return fhandler_base::close (); }
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  void set_ino_and_dev (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_fs (struct __stat64 *buf) __attribute__ ((regparm (2)));
 private:
   int __stdcall fstat_helper (struct __stat64 *buf,

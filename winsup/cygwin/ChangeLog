@@ -1,5 +1,14 @@
 2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_base::set_ino_and_dev): Declare.
+	* syscalls.cc (fhandler_base::set_ino_and_dev): New method to set
+	st_ino, st_dev, and st_rdev for devices in a single spot.
+	(fstat64): Call fhandler_base::set_ino_and_dev instead of setting
+	st_ino, st_dev, and st_rdev here.
+	(stat_worker): Ditto.
+
+2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_dev::open): Declare.
 	(fhandler_dev::close): Declare.
 	(fhandler_dev::fstat): Declare.
