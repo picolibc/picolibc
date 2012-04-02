@@ -459,9 +459,6 @@ fh_alloc (path_conv& pc)
     case DEV_CYGDRIVE_MAJOR:
       fh = cnew (fhandler_cygdrive);
       break;
-    case DEV_DEV_MAJOR:
-      fh = cnew (fhandler_dev);
-      break;
     case DEV_FLOPPY_MAJOR:
     case DEV_CDROM_MAJOR:
     case DEV_SD_MAJOR:
@@ -561,6 +558,9 @@ fh_alloc (path_conv& pc)
 	  break;
 	case FH_NETDRIVE:
 	  fh = cnew (fhandler_netdrive);
+	  break;
+	case FH_DEV:
+	  fh = cnew (fhandler_dev);
 	  break;
 	case FH_TTY:
 	  if (!pc.isopen ())

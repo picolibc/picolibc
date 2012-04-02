@@ -1,5 +1,13 @@
 2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* devices.h (FH_DEV): Define as DEV_VIRTFS_MAJOR class device.
+	(DEV_DEV_MAJOR): Remove.
+	* dtable.cc (fh_alloc): Accommodate above change.
+	* syscalls.cc (set_ino_and_dev): Drop check for DEV_DEV_MAJOR from
+	conditional.
+
+2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_base::set_ino_and_dev): Declare.
 	* syscalls.cc (fhandler_base::set_ino_and_dev): New method to set
 	st_ino, st_dev, and st_rdev for devices in a single spot.
