@@ -1591,8 +1591,10 @@ static bool dev_st_inited;
 void
 fhandler_base::stat_fixup (struct __stat64 *buf)
 {
+  /* Set inode number to device number.  This gives us a valid, unique
+     inode number and we especially don't have to call hash_path_name. */
   if (!buf->st_ino)
-    buf->st_ino = get_ino ();
+    buf->st_ino = get_device ();
   /* For /dev-based devices, st_dev must be set to the device number of /dev,
      not it's own device major/minor numbers.  What we do here to speed up
      the process is to fetch the device number of /dev only once, liberally
@@ -1616,9 +1618,12 @@ fhandler_base::stat_fixup (struct __stat64 *buf)
     {
       buf->st_rdev = get_device ();
       /* consX, console, conin, and conout point to the same device.
-	 make sure the link count is correct. */
+	 Make sure the link count is correct. */
       if (buf->st_rdev == (dev_t) myself->ctty && iscons_dev (myself->ctty))
 	buf->st_nlink = 4;
+      /* CD-ROM drives have two links, /dev/srX and /dev/scdX. */
+      else if (gnu_dev_major (buf->st_rdev) == DEV_CDROM_MAJOR)
+	buf->st_nlink = 2;
     }
 }
 

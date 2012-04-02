@@ -1,5 +1,12 @@
 2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* devices.h (device::get_device): New method.
+	* fhandler_dev.cc (fhandler_dev::readdir): Set st_ino to device number.
+	* syscalls.cc (fhandler_base::stat_fixup): Ditto.  Fix link count for
+	CD-ROM devices.  Fix typo in comment.
+
+2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_base::stat_fixup): Rename from
 	fhandler_base::set_ino_and_dev.
 	* syscalls.cc (fhandler_base::stat_fixup): Ditto. Accommodate name

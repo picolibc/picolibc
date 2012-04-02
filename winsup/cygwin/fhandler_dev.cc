@@ -208,11 +208,10 @@ fhandler_dev::readdir (DIR *dir, dirent *de)
 	{
 	  /* Make sure conin, conout, and console have the same inode number
 	     as the current consX. */
-	  dev.parse (myself->ctty);
-	  de->d_ino = hash_path_name (0, dev.native);
+	  de->d_ino = myself->ctty;
 	}
       else
-	de->d_ino = hash_path_name (0, curdev->native);
+	de->d_ino = curdev->get_device ();
       de->d_type = curdev->type ();
       ret = 0;
       break;

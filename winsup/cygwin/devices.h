@@ -308,6 +308,7 @@ struct device
 
   _minor_t get_minor () const {return d.minor;}
   _major_t get_major () const {return d.major;}
+  _dev_t   get_device () const {return d.devn;}
 
   inline operator int& () {return d.devn_int;}
   inline operator fh_devices () {return d.devn_fh_devices;}
