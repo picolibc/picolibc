@@ -1589,7 +1589,7 @@ static struct __stat64 dev_st;
 static bool dev_st_inited;
 
 void
-fhandler_base::set_ino_and_dev (struct __stat64 *buf)
+fhandler_base::stat_fixup (struct __stat64 *buf)
 {
   if (!buf->st_ino)
     buf->st_ino = get_ino ();
@@ -1613,7 +1613,13 @@ fhandler_base::set_ino_and_dev (struct __stat64 *buf)
     }
   /* Only set st_rdev if it's a device. */
   if (!buf->st_rdev && get_major () != DEV_VIRTFS_MAJOR)
-    buf->st_rdev = get_device ();
+    {
+      buf->st_rdev = get_device ();
+      /* consX, console, conin, and conout point to the same device.
+	 make sure the link count is correct. */
+      if (buf->st_rdev == (dev_t) myself->ctty && iscons_dev (myself->ctty))
+	buf->st_nlink = 4;
+    }
 }
 
 extern "C" int
@@ -1629,7 +1635,7 @@ fstat64 (int fd, struct __stat64 *buf)
       memset (buf, 0, sizeof (struct __stat64));
       res = cfd->fstat (buf);
       if (!res)
-	cfd->set_ino_and_dev (buf);
+	cfd->stat_fixup (buf);
     }
 
   syscall_printf ("%R = fstat(%d, %p)", res, fd, buf);
@@ -1768,7 +1774,7 @@ stat_worker (path_conv &pc, struct __stat64 *buf)
       memset (buf, 0, sizeof (*buf));
       res = fh->fstat (buf);
       if (!res)
-	fh->set_ino_and_dev (buf);
+	fh->stat_fixup (buf);
       delete fh;
     }
   else

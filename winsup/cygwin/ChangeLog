@@ -1,5 +1,12 @@
 2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_base::stat_fixup): Rename from
+	fhandler_base::set_ino_and_dev.
+	* syscalls.cc (fhandler_base::stat_fixup): Ditto. Accommodate name
+	change throughout.  Fixup link count of console devices.
+
+2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.h (FH_CYGDRIVE): Define as DEV_VIRTFS_MAJOR class device.
 	(DEV_CYGDRIVE_MAJOR): Remove.
 	(iscygdrive_dev): Define.
