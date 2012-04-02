@@ -59,7 +59,7 @@ exists_ntdev (const device& dev)
 
 /* Don't list via readdir but allow as a direct reference. */
 static int
-exists_ntdevs (const device& dev)
+exists_ntdev_silent (const device& dev)
 {
   return exists_ntdev (dev) ? -1 : false;
 }
@@ -75,8 +75,9 @@ exists_console (const device& dev)
     case FH_CONSOLE:
     case FH_CONIN:
     case FH_CONOUT:
-      return iscons_dev (myself->ctty);
+      return true;
     default:
+      /* Only show my own console device (for now?) */
       return myself->ctty == devn;
     }
 }
@@ -109,9 +110,6 @@ const device dev_procsysvipc_storage =
 const device dev_netdrive_storage =
   {"", {FH_NETDRIVE}, "", exists};
 
-const device dev_dev_storage =
-  {"/dev", {FH_DEV}, "/dev", exists};
-
 const device dev_registry_storage =
   {"", {FH_REGISTRY}, "", exists_internal};
 
@@ -142,2650 +140,2650 @@ const device dev_error_storage =
 #define BRACK(x) {devn_int: x}
 const _RDATA device dev_storage[] =
 {
-  {"/dev", BRACK(FH_DEV), "/dev", exists, S_IFDIR},
-  {"/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard", exists, S_IFCHR},
-  {"/dev/com1", BRACK(FHDEV(DEV_SERIAL_MAJOR, 0)), "\\??\\COM1", exists_ntdevs, S_IFCHR},
-  {"/dev/com2", BRACK(FHDEV(DEV_SERIAL_MAJOR, 1)), "\\??\\COM2", exists_ntdevs, S_IFCHR},
-  {"/dev/com3", BRACK(FHDEV(DEV_SERIAL_MAJOR, 2)), "\\??\\COM3", exists_ntdevs, S_IFCHR},
-  {"/dev/com4", BRACK(FHDEV(DEV_SERIAL_MAJOR, 3)), "\\??\\COM4", exists_ntdevs, S_IFCHR},
-  {"/dev/com5", BRACK(FHDEV(DEV_SERIAL_MAJOR, 4)), "\\??\\COM5", exists_ntdevs, S_IFCHR},
-  {"/dev/com6", BRACK(FHDEV(DEV_SERIAL_MAJOR, 5)), "\\??\\COM6", exists_ntdevs, S_IFCHR},
-  {"/dev/com7", BRACK(FHDEV(DEV_SERIAL_MAJOR, 6)), "\\??\\COM7", exists_ntdevs, S_IFCHR},
-  {"/dev/com8", BRACK(FHDEV(DEV_SERIAL_MAJOR, 7)), "\\??\\COM8", exists_ntdevs, S_IFCHR},
-  {"/dev/com9", BRACK(FHDEV(DEV_SERIAL_MAJOR, 8)), "\\??\\COM9", exists_ntdevs, S_IFCHR},
-  {"/dev/com10", BRACK(FHDEV(DEV_SERIAL_MAJOR, 9)), "\\??\\COM10", exists_ntdevs, S_IFCHR},
-  {"/dev/com11", BRACK(FHDEV(DEV_SERIAL_MAJOR, 10)), "\\??\\COM11", exists_ntdevs, S_IFCHR},
-  {"/dev/com12", BRACK(FHDEV(DEV_SERIAL_MAJOR, 11)), "\\??\\COM12", exists_ntdevs, S_IFCHR},
-  {"/dev/com13", BRACK(FHDEV(DEV_SERIAL_MAJOR, 12)), "\\??\\COM13", exists_ntdevs, S_IFCHR},
-  {"/dev/com14", BRACK(FHDEV(DEV_SERIAL_MAJOR, 13)), "\\??\\COM14", exists_ntdevs, S_IFCHR},
-  {"/dev/com15", BRACK(FHDEV(DEV_SERIAL_MAJOR, 14)), "\\??\\COM15", exists_ntdevs, S_IFCHR},
-  {"/dev/com16", BRACK(FHDEV(DEV_SERIAL_MAJOR, 15)), "\\??\\COM16", exists_ntdevs, S_IFCHR},
-  {"/dev/conin", BRACK(FH_CONIN), "/dev/conin", exists_console, S_IFCHR},
-  {"/dev/conout", BRACK(FH_CONOUT), "/dev/conout", exists_console, S_IFCHR},
-  {"/dev/cons0", BRACK(FHDEV(DEV_CONS_MAJOR, 0)), "/dev/cons0", exists_console, S_IFCHR},
-  {"/dev/cons1", BRACK(FHDEV(DEV_CONS_MAJOR, 1)), "/dev/cons1", exists_console, S_IFCHR},
-  {"/dev/cons2", BRACK(FHDEV(DEV_CONS_MAJOR, 2)), "/dev/cons2", exists_console, S_IFCHR},
-  {"/dev/cons3", BRACK(FHDEV(DEV_CONS_MAJOR, 3)), "/dev/cons3", exists_console, S_IFCHR},
-  {"/dev/cons4", BRACK(FHDEV(DEV_CONS_MAJOR, 4)), "/dev/cons4", exists_console, S_IFCHR},
-  {"/dev/cons5", BRACK(FHDEV(DEV_CONS_MAJOR, 5)), "/dev/cons5", exists_console, S_IFCHR},
-  {"/dev/cons6", BRACK(FHDEV(DEV_CONS_MAJOR, 6)), "/dev/cons6", exists_console, S_IFCHR},
-  {"/dev/cons7", BRACK(FHDEV(DEV_CONS_MAJOR, 7)), "/dev/cons7", exists_console, S_IFCHR},
-  {"/dev/cons8", BRACK(FHDEV(DEV_CONS_MAJOR, 8)), "/dev/cons8", exists_console, S_IFCHR},
-  {"/dev/cons9", BRACK(FHDEV(DEV_CONS_MAJOR, 9)), "/dev/cons9", exists_console, S_IFCHR},
-  {"/dev/cons10", BRACK(FHDEV(DEV_CONS_MAJOR, 10)), "/dev/cons10", exists_console, S_IFCHR},
-  {"/dev/cons11", BRACK(FHDEV(DEV_CONS_MAJOR, 11)), "/dev/cons11", exists_console, S_IFCHR},
-  {"/dev/cons12", BRACK(FHDEV(DEV_CONS_MAJOR, 12)), "/dev/cons12", exists_console, S_IFCHR},
-  {"/dev/cons13", BRACK(FHDEV(DEV_CONS_MAJOR, 13)), "/dev/cons13", exists_console, S_IFCHR},
-  {"/dev/cons14", BRACK(FHDEV(DEV_CONS_MAJOR, 14)), "/dev/cons14", exists_console, S_IFCHR},
-  {"/dev/cons15", BRACK(FHDEV(DEV_CONS_MAJOR, 15)), "/dev/cons15", exists_console, S_IFCHR},
-  {"/dev/cons16", BRACK(FHDEV(DEV_CONS_MAJOR, 16)), "/dev/cons16", exists_console, S_IFCHR},
-  {"/dev/cons17", BRACK(FHDEV(DEV_CONS_MAJOR, 17)), "/dev/cons17", exists_console, S_IFCHR},
-  {"/dev/cons18", BRACK(FHDEV(DEV_CONS_MAJOR, 18)), "/dev/cons18", exists_console, S_IFCHR},
-  {"/dev/cons19", BRACK(FHDEV(DEV_CONS_MAJOR, 19)), "/dev/cons19", exists_console, S_IFCHR},
-  {"/dev/cons20", BRACK(FHDEV(DEV_CONS_MAJOR, 20)), "/dev/cons20", exists_console, S_IFCHR},
-  {"/dev/cons21", BRACK(FHDEV(DEV_CONS_MAJOR, 21)), "/dev/cons21", exists_console, S_IFCHR},
-  {"/dev/cons22", BRACK(FHDEV(DEV_CONS_MAJOR, 22)), "/dev/cons22", exists_console, S_IFCHR},
-  {"/dev/cons23", BRACK(FHDEV(DEV_CONS_MAJOR, 23)), "/dev/cons23", exists_console, S_IFCHR},
-  {"/dev/cons24", BRACK(FHDEV(DEV_CONS_MAJOR, 24)), "/dev/cons24", exists_console, S_IFCHR},
-  {"/dev/cons25", BRACK(FHDEV(DEV_CONS_MAJOR, 25)), "/dev/cons25", exists_console, S_IFCHR},
-  {"/dev/cons26", BRACK(FHDEV(DEV_CONS_MAJOR, 26)), "/dev/cons26", exists_console, S_IFCHR},
-  {"/dev/cons27", BRACK(FHDEV(DEV_CONS_MAJOR, 27)), "/dev/cons27", exists_console, S_IFCHR},
-  {"/dev/cons28", BRACK(FHDEV(DEV_CONS_MAJOR, 28)), "/dev/cons28", exists_console, S_IFCHR},
-  {"/dev/cons29", BRACK(FHDEV(DEV_CONS_MAJOR, 29)), "/dev/cons29", exists_console, S_IFCHR},
-  {"/dev/cons30", BRACK(FHDEV(DEV_CONS_MAJOR, 30)), "/dev/cons30", exists_console, S_IFCHR},
-  {"/dev/cons31", BRACK(FHDEV(DEV_CONS_MAJOR, 31)), "/dev/cons31", exists_console, S_IFCHR},
-  {"/dev/cons32", BRACK(FHDEV(DEV_CONS_MAJOR, 32)), "/dev/cons32", exists_console, S_IFCHR},
-  {"/dev/cons33", BRACK(FHDEV(DEV_CONS_MAJOR, 33)), "/dev/cons33", exists_console, S_IFCHR},
-  {"/dev/cons34", BRACK(FHDEV(DEV_CONS_MAJOR, 34)), "/dev/cons34", exists_console, S_IFCHR},
-  {"/dev/cons35", BRACK(FHDEV(DEV_CONS_MAJOR, 35)), "/dev/cons35", exists_console, S_IFCHR},
-  {"/dev/cons36", BRACK(FHDEV(DEV_CONS_MAJOR, 36)), "/dev/cons36", exists_console, S_IFCHR},
-  {"/dev/cons37", BRACK(FHDEV(DEV_CONS_MAJOR, 37)), "/dev/cons37", exists_console, S_IFCHR},
-  {"/dev/cons38", BRACK(FHDEV(DEV_CONS_MAJOR, 38)), "/dev/cons38", exists_console, S_IFCHR},
-  {"/dev/cons39", BRACK(FHDEV(DEV_CONS_MAJOR, 39)), "/dev/cons39", exists_console, S_IFCHR},
-  {"/dev/cons40", BRACK(FHDEV(DEV_CONS_MAJOR, 40)), "/dev/cons40", exists_console, S_IFCHR},
-  {"/dev/cons41", BRACK(FHDEV(DEV_CONS_MAJOR, 41)), "/dev/cons41", exists_console, S_IFCHR},
-  {"/dev/cons42", BRACK(FHDEV(DEV_CONS_MAJOR, 42)), "/dev/cons42", exists_console, S_IFCHR},
-  {"/dev/cons43", BRACK(FHDEV(DEV_CONS_MAJOR, 43)), "/dev/cons43", exists_console, S_IFCHR},
-  {"/dev/cons44", BRACK(FHDEV(DEV_CONS_MAJOR, 44)), "/dev/cons44", exists_console, S_IFCHR},
-  {"/dev/cons45", BRACK(FHDEV(DEV_CONS_MAJOR, 45)), "/dev/cons45", exists_console, S_IFCHR},
-  {"/dev/cons46", BRACK(FHDEV(DEV_CONS_MAJOR, 46)), "/dev/cons46", exists_console, S_IFCHR},
-  {"/dev/cons47", BRACK(FHDEV(DEV_CONS_MAJOR, 47)), "/dev/cons47", exists_console, S_IFCHR},
-  {"/dev/cons48", BRACK(FHDEV(DEV_CONS_MAJOR, 48)), "/dev/cons48", exists_console, S_IFCHR},
-  {"/dev/cons49", BRACK(FHDEV(DEV_CONS_MAJOR, 49)), "/dev/cons49", exists_console, S_IFCHR},
-  {"/dev/cons50", BRACK(FHDEV(DEV_CONS_MAJOR, 50)), "/dev/cons50", exists_console, S_IFCHR},
-  {"/dev/cons51", BRACK(FHDEV(DEV_CONS_MAJOR, 51)), "/dev/cons51", exists_console, S_IFCHR},
-  {"/dev/cons52", BRACK(FHDEV(DEV_CONS_MAJOR, 52)), "/dev/cons52", exists_console, S_IFCHR},
-  {"/dev/cons53", BRACK(FHDEV(DEV_CONS_MAJOR, 53)), "/dev/cons53", exists_console, S_IFCHR},
-  {"/dev/cons54", BRACK(FHDEV(DEV_CONS_MAJOR, 54)), "/dev/cons54", exists_console, S_IFCHR},
-  {"/dev/cons55", BRACK(FHDEV(DEV_CONS_MAJOR, 55)), "/dev/cons55", exists_console, S_IFCHR},
-  {"/dev/cons56", BRACK(FHDEV(DEV_CONS_MAJOR, 56)), "/dev/cons56", exists_console, S_IFCHR},
-  {"/dev/cons57", BRACK(FHDEV(DEV_CONS_MAJOR, 57)), "/dev/cons57", exists_console, S_IFCHR},
-  {"/dev/cons58", BRACK(FHDEV(DEV_CONS_MAJOR, 58)), "/dev/cons58", exists_console, S_IFCHR},
-  {"/dev/cons59", BRACK(FHDEV(DEV_CONS_MAJOR, 59)), "/dev/cons59", exists_console, S_IFCHR},
-  {"/dev/cons60", BRACK(FHDEV(DEV_CONS_MAJOR, 60)), "/dev/cons60", exists_console, S_IFCHR},
-  {"/dev/cons61", BRACK(FHDEV(DEV_CONS_MAJOR, 61)), "/dev/cons61", exists_console, S_IFCHR},
-  {"/dev/cons62", BRACK(FHDEV(DEV_CONS_MAJOR, 62)), "/dev/cons62", exists_console, S_IFCHR},
-  {"/dev/cons63", BRACK(FHDEV(DEV_CONS_MAJOR, 63)), "/dev/cons63", exists_console, S_IFCHR},
-  {"/dev/console", BRACK(FH_CONSOLE), "/dev/console", exists_console, S_IFCHR},
-  {"/dev/dsp", BRACK(FH_OSS_DSP), "/dev/dsp", exists, S_IFCHR},
-  {"/dev/fd0", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 0)), "\\Device\\Floppy0", exists_ntdev, S_IFBLK},
-  {"/dev/fd1", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 1)), "\\Device\\Floppy1", exists_ntdev, S_IFBLK},
-  {"/dev/fd2", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 2)), "\\Device\\Floppy2", exists_ntdev, S_IFBLK},
-  {"/dev/fd3", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 3)), "\\Device\\Floppy3", exists_ntdev, S_IFBLK},
-  {"/dev/fd4", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 4)), "\\Device\\Floppy4", exists_ntdev, S_IFBLK},
-  {"/dev/fd5", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 5)), "\\Device\\Floppy5", exists_ntdev, S_IFBLK},
-  {"/dev/fd6", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 6)), "\\Device\\Floppy6", exists_ntdev, S_IFBLK},
-  {"/dev/fd7", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 7)), "\\Device\\Floppy7", exists_ntdev, S_IFBLK},
-  {"/dev/fd8", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 8)), "\\Device\\Floppy8", exists_ntdev, S_IFBLK},
-  {"/dev/fd9", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 9)), "\\Device\\Floppy9", exists_ntdev, S_IFBLK},
-  {"/dev/fd10", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 10)), "\\Device\\Floppy10", exists_ntdev, S_IFBLK},
-  {"/dev/fd11", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 11)), "\\Device\\Floppy11", exists_ntdev, S_IFBLK},
-  {"/dev/fd12", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 12)), "\\Device\\Floppy12", exists_ntdev, S_IFBLK},
-  {"/dev/fd13", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 13)), "\\Device\\Floppy13", exists_ntdev, S_IFBLK},
-  {"/dev/fd14", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 14)), "\\Device\\Floppy14", exists_ntdev, S_IFBLK},
-  {"/dev/fd15", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 15)), "\\Device\\Floppy15", exists_ntdev, S_IFBLK},
-  {"/dev/full", BRACK(FH_FULL), "/dev/full", exists, S_IFCHR},
-  {"/dev/kmem", BRACK(FH_KMEM), "/dev/mem", exists, S_IFCHR},
-  {"/dev/kmsg", BRACK(FH_KMSG), "\\Device\\MailSlot\\cygwin\\dev\\kmsg", exists_ntdev, S_IFCHR},
-  {"/dev/mem", BRACK(FH_MEM), "/dev/mem", exists, S_IFCHR},
-  {"/dev/nst0", BRACK(FHDEV(DEV_TAPE_MAJOR, 128)), "\\Device\\Tape0", exists_ntdev, S_IFBLK},
-  {"/dev/nst1", BRACK(FHDEV(DEV_TAPE_MAJOR, 129)), "\\Device\\Tape1", exists_ntdev, S_IFBLK},
-  {"/dev/nst2", BRACK(FHDEV(DEV_TAPE_MAJOR, 130)), "\\Device\\Tape2", exists_ntdev, S_IFBLK},
-  {"/dev/nst3", BRACK(FHDEV(DEV_TAPE_MAJOR, 131)), "\\Device\\Tape3", exists_ntdev, S_IFBLK},
-  {"/dev/nst4", BRACK(FHDEV(DEV_TAPE_MAJOR, 132)), "\\Device\\Tape4", exists_ntdev, S_IFBLK},
-  {"/dev/nst5", BRACK(FHDEV(DEV_TAPE_MAJOR, 133)), "\\Device\\Tape5", exists_ntdev, S_IFBLK},
-  {"/dev/nst6", BRACK(FHDEV(DEV_TAPE_MAJOR, 134)), "\\Device\\Tape6", exists_ntdev, S_IFBLK},
-  {"/dev/nst7", BRACK(FHDEV(DEV_TAPE_MAJOR, 135)), "\\Device\\Tape7", exists_ntdev, S_IFBLK},
-  {"/dev/nst8", BRACK(FHDEV(DEV_TAPE_MAJOR, 136)), "\\Device\\Tape8", exists_ntdev, S_IFBLK},
-  {"/dev/nst9", BRACK(FHDEV(DEV_TAPE_MAJOR, 137)), "\\Device\\Tape9", exists_ntdev, S_IFBLK},
-  {"/dev/nst10", BRACK(FHDEV(DEV_TAPE_MAJOR, 138)), "\\Device\\Tape10", exists_ntdev, S_IFBLK},
-  {"/dev/nst11", BRACK(FHDEV(DEV_TAPE_MAJOR, 139)), "\\Device\\Tape11", exists_ntdev, S_IFBLK},
-  {"/dev/nst12", BRACK(FHDEV(DEV_TAPE_MAJOR, 140)), "\\Device\\Tape12", exists_ntdev, S_IFBLK},
-  {"/dev/nst13", BRACK(FHDEV(DEV_TAPE_MAJOR, 141)), "\\Device\\Tape13", exists_ntdev, S_IFBLK},
-  {"/dev/nst14", BRACK(FHDEV(DEV_TAPE_MAJOR, 142)), "\\Device\\Tape14", exists_ntdev, S_IFBLK},
-  {"/dev/nst15", BRACK(FHDEV(DEV_TAPE_MAJOR, 143)), "\\Device\\Tape15", exists_ntdev, S_IFBLK},
-  {"/dev/nst16", BRACK(FHDEV(DEV_TAPE_MAJOR, 144)), "\\Device\\Tape16", exists_ntdev, S_IFBLK},
-  {"/dev/nst17", BRACK(FHDEV(DEV_TAPE_MAJOR, 145)), "\\Device\\Tape17", exists_ntdev, S_IFBLK},
-  {"/dev/nst18", BRACK(FHDEV(DEV_TAPE_MAJOR, 146)), "\\Device\\Tape18", exists_ntdev, S_IFBLK},
-  {"/dev/nst19", BRACK(FHDEV(DEV_TAPE_MAJOR, 147)), "\\Device\\Tape19", exists_ntdev, S_IFBLK},
-  {"/dev/nst20", BRACK(FHDEV(DEV_TAPE_MAJOR, 148)), "\\Device\\Tape20", exists_ntdev, S_IFBLK},
-  {"/dev/nst21", BRACK(FHDEV(DEV_TAPE_MAJOR, 149)), "\\Device\\Tape21", exists_ntdev, S_IFBLK},
-  {"/dev/nst22", BRACK(FHDEV(DEV_TAPE_MAJOR, 150)), "\\Device\\Tape22", exists_ntdev, S_IFBLK},
-  {"/dev/nst23", BRACK(FHDEV(DEV_TAPE_MAJOR, 151)), "\\Device\\Tape23", exists_ntdev, S_IFBLK},
-  {"/dev/nst24", BRACK(FHDEV(DEV_TAPE_MAJOR, 152)), "\\Device\\Tape24", exists_ntdev, S_IFBLK},
-  {"/dev/nst25", BRACK(FHDEV(DEV_TAPE_MAJOR, 153)), "\\Device\\Tape25", exists_ntdev, S_IFBLK},
-  {"/dev/nst26", BRACK(FHDEV(DEV_TAPE_MAJOR, 154)), "\\Device\\Tape26", exists_ntdev, S_IFBLK},
-  {"/dev/nst27", BRACK(FHDEV(DEV_TAPE_MAJOR, 155)), "\\Device\\Tape27", exists_ntdev, S_IFBLK},
-  {"/dev/nst28", BRACK(FHDEV(DEV_TAPE_MAJOR, 156)), "\\Device\\Tape28", exists_ntdev, S_IFBLK},
-  {"/dev/nst29", BRACK(FHDEV(DEV_TAPE_MAJOR, 157)), "\\Device\\Tape29", exists_ntdev, S_IFBLK},
-  {"/dev/nst30", BRACK(FHDEV(DEV_TAPE_MAJOR, 158)), "\\Device\\Tape30", exists_ntdev, S_IFBLK},
-  {"/dev/nst31", BRACK(FHDEV(DEV_TAPE_MAJOR, 159)), "\\Device\\Tape31", exists_ntdev, S_IFBLK},
-  {"/dev/nst32", BRACK(FHDEV(DEV_TAPE_MAJOR, 160)), "\\Device\\Tape32", exists_ntdev, S_IFBLK},
-  {"/dev/nst33", BRACK(FHDEV(DEV_TAPE_MAJOR, 161)), "\\Device\\Tape33", exists_ntdev, S_IFBLK},
-  {"/dev/nst34", BRACK(FHDEV(DEV_TAPE_MAJOR, 162)), "\\Device\\Tape34", exists_ntdev, S_IFBLK},
-  {"/dev/nst35", BRACK(FHDEV(DEV_TAPE_MAJOR, 163)), "\\Device\\Tape35", exists_ntdev, S_IFBLK},
-  {"/dev/nst36", BRACK(FHDEV(DEV_TAPE_MAJOR, 164)), "\\Device\\Tape36", exists_ntdev, S_IFBLK},
-  {"/dev/nst37", BRACK(FHDEV(DEV_TAPE_MAJOR, 165)), "\\Device\\Tape37", exists_ntdev, S_IFBLK},
-  {"/dev/nst38", BRACK(FHDEV(DEV_TAPE_MAJOR, 166)), "\\Device\\Tape38", exists_ntdev, S_IFBLK},
-  {"/dev/nst39", BRACK(FHDEV(DEV_TAPE_MAJOR, 167)), "\\Device\\Tape39", exists_ntdev, S_IFBLK},
-  {"/dev/nst40", BRACK(FHDEV(DEV_TAPE_MAJOR, 168)), "\\Device\\Tape40", exists_ntdev, S_IFBLK},
-  {"/dev/nst41", BRACK(FHDEV(DEV_TAPE_MAJOR, 169)), "\\Device\\Tape41", exists_ntdev, S_IFBLK},
-  {"/dev/nst42", BRACK(FHDEV(DEV_TAPE_MAJOR, 170)), "\\Device\\Tape42", exists_ntdev, S_IFBLK},
-  {"/dev/nst43", BRACK(FHDEV(DEV_TAPE_MAJOR, 171)), "\\Device\\Tape43", exists_ntdev, S_IFBLK},
-  {"/dev/nst44", BRACK(FHDEV(DEV_TAPE_MAJOR, 172)), "\\Device\\Tape44", exists_ntdev, S_IFBLK},
-  {"/dev/nst45", BRACK(FHDEV(DEV_TAPE_MAJOR, 173)), "\\Device\\Tape45", exists_ntdev, S_IFBLK},
-  {"/dev/nst46", BRACK(FHDEV(DEV_TAPE_MAJOR, 174)), "\\Device\\Tape46", exists_ntdev, S_IFBLK},
-  {"/dev/nst47", BRACK(FHDEV(DEV_TAPE_MAJOR, 175)), "\\Device\\Tape47", exists_ntdev, S_IFBLK},
-  {"/dev/nst48", BRACK(FHDEV(DEV_TAPE_MAJOR, 176)), "\\Device\\Tape48", exists_ntdev, S_IFBLK},
-  {"/dev/nst49", BRACK(FHDEV(DEV_TAPE_MAJOR, 177)), "\\Device\\Tape49", exists_ntdev, S_IFBLK},
-  {"/dev/nst50", BRACK(FHDEV(DEV_TAPE_MAJOR, 178)), "\\Device\\Tape50", exists_ntdev, S_IFBLK},
-  {"/dev/nst51", BRACK(FHDEV(DEV_TAPE_MAJOR, 179)), "\\Device\\Tape51", exists_ntdev, S_IFBLK},
-  {"/dev/nst52", BRACK(FHDEV(DEV_TAPE_MAJOR, 180)), "\\Device\\Tape52", exists_ntdev, S_IFBLK},
-  {"/dev/nst53", BRACK(FHDEV(DEV_TAPE_MAJOR, 181)), "\\Device\\Tape53", exists_ntdev, S_IFBLK},
-  {"/dev/nst54", BRACK(FHDEV(DEV_TAPE_MAJOR, 182)), "\\Device\\Tape54", exists_ntdev, S_IFBLK},
-  {"/dev/nst55", BRACK(FHDEV(DEV_TAPE_MAJOR, 183)), "\\Device\\Tape55", exists_ntdev, S_IFBLK},
-  {"/dev/nst56", BRACK(FHDEV(DEV_TAPE_MAJOR, 184)), "\\Device\\Tape56", exists_ntdev, S_IFBLK},
-  {"/dev/nst57", BRACK(FHDEV(DEV_TAPE_MAJOR, 185)), "\\Device\\Tape57", exists_ntdev, S_IFBLK},
-  {"/dev/nst58", BRACK(FHDEV(DEV_TAPE_MAJOR, 186)), "\\Device\\Tape58", exists_ntdev, S_IFBLK},
-  {"/dev/nst59", BRACK(FHDEV(DEV_TAPE_MAJOR, 187)), "\\Device\\Tape59", exists_ntdev, S_IFBLK},
-  {"/dev/nst60", BRACK(FHDEV(DEV_TAPE_MAJOR, 188)), "\\Device\\Tape60", exists_ntdev, S_IFBLK},
-  {"/dev/nst61", BRACK(FHDEV(DEV_TAPE_MAJOR, 189)), "\\Device\\Tape61", exists_ntdev, S_IFBLK},
-  {"/dev/nst62", BRACK(FHDEV(DEV_TAPE_MAJOR, 190)), "\\Device\\Tape62", exists_ntdev, S_IFBLK},
-  {"/dev/nst63", BRACK(FHDEV(DEV_TAPE_MAJOR, 191)), "\\Device\\Tape63", exists_ntdev, S_IFBLK},
-  {"/dev/nst64", BRACK(FHDEV(DEV_TAPE_MAJOR, 192)), "\\Device\\Tape64", exists_ntdev, S_IFBLK},
-  {"/dev/nst65", BRACK(FHDEV(DEV_TAPE_MAJOR, 193)), "\\Device\\Tape65", exists_ntdev, S_IFBLK},
-  {"/dev/nst66", BRACK(FHDEV(DEV_TAPE_MAJOR, 194)), "\\Device\\Tape66", exists_ntdev, S_IFBLK},
-  {"/dev/nst67", BRACK(FHDEV(DEV_TAPE_MAJOR, 195)), "\\Device\\Tape67", exists_ntdev, S_IFBLK},
-  {"/dev/nst68", BRACK(FHDEV(DEV_TAPE_MAJOR, 196)), "\\Device\\Tape68", exists_ntdev, S_IFBLK},
-  {"/dev/nst69", BRACK(FHDEV(DEV_TAPE_MAJOR, 197)), "\\Device\\Tape69", exists_ntdev, S_IFBLK},
-  {"/dev/nst70", BRACK(FHDEV(DEV_TAPE_MAJOR, 198)), "\\Device\\Tape70", exists_ntdev, S_IFBLK},
-  {"/dev/nst71", BRACK(FHDEV(DEV_TAPE_MAJOR, 199)), "\\Device\\Tape71", exists_ntdev, S_IFBLK},
-  {"/dev/nst72", BRACK(FHDEV(DEV_TAPE_MAJOR, 200)), "\\Device\\Tape72", exists_ntdev, S_IFBLK},
-  {"/dev/nst73", BRACK(FHDEV(DEV_TAPE_MAJOR, 201)), "\\Device\\Tape73", exists_ntdev, S_IFBLK},
-  {"/dev/nst74", BRACK(FHDEV(DEV_TAPE_MAJOR, 202)), "\\Device\\Tape74", exists_ntdev, S_IFBLK},
-  {"/dev/nst75", BRACK(FHDEV(DEV_TAPE_MAJOR, 203)), "\\Device\\Tape75", exists_ntdev, S_IFBLK},
-  {"/dev/nst76", BRACK(FHDEV(DEV_TAPE_MAJOR, 204)), "\\Device\\Tape76", exists_ntdev, S_IFBLK},
-  {"/dev/nst77", BRACK(FHDEV(DEV_TAPE_MAJOR, 205)), "\\Device\\Tape77", exists_ntdev, S_IFBLK},
-  {"/dev/nst78", BRACK(FHDEV(DEV_TAPE_MAJOR, 206)), "\\Device\\Tape78", exists_ntdev, S_IFBLK},
-  {"/dev/nst79", BRACK(FHDEV(DEV_TAPE_MAJOR, 207)), "\\Device\\Tape79", exists_ntdev, S_IFBLK},
-  {"/dev/nst80", BRACK(FHDEV(DEV_TAPE_MAJOR, 208)), "\\Device\\Tape80", exists_ntdev, S_IFBLK},
-  {"/dev/nst81", BRACK(FHDEV(DEV_TAPE_MAJOR, 209)), "\\Device\\Tape81", exists_ntdev, S_IFBLK},
-  {"/dev/nst82", BRACK(FHDEV(DEV_TAPE_MAJOR, 210)), "\\Device\\Tape82", exists_ntdev, S_IFBLK},
-  {"/dev/nst83", BRACK(FHDEV(DEV_TAPE_MAJOR, 211)), "\\Device\\Tape83", exists_ntdev, S_IFBLK},
-  {"/dev/nst84", BRACK(FHDEV(DEV_TAPE_MAJOR, 212)), "\\Device\\Tape84", exists_ntdev, S_IFBLK},
-  {"/dev/nst85", BRACK(FHDEV(DEV_TAPE_MAJOR, 213)), "\\Device\\Tape85", exists_ntdev, S_IFBLK},
-  {"/dev/nst86", BRACK(FHDEV(DEV_TAPE_MAJOR, 214)), "\\Device\\Tape86", exists_ntdev, S_IFBLK},
-  {"/dev/nst87", BRACK(FHDEV(DEV_TAPE_MAJOR, 215)), "\\Device\\Tape87", exists_ntdev, S_IFBLK},
-  {"/dev/nst88", BRACK(FHDEV(DEV_TAPE_MAJOR, 216)), "\\Device\\Tape88", exists_ntdev, S_IFBLK},
-  {"/dev/nst89", BRACK(FHDEV(DEV_TAPE_MAJOR, 217)), "\\Device\\Tape89", exists_ntdev, S_IFBLK},
-  {"/dev/nst90", BRACK(FHDEV(DEV_TAPE_MAJOR, 218)), "\\Device\\Tape90", exists_ntdev, S_IFBLK},
-  {"/dev/nst91", BRACK(FHDEV(DEV_TAPE_MAJOR, 219)), "\\Device\\Tape91", exists_ntdev, S_IFBLK},
-  {"/dev/nst92", BRACK(FHDEV(DEV_TAPE_MAJOR, 220)), "\\Device\\Tape92", exists_ntdev, S_IFBLK},
-  {"/dev/nst93", BRACK(FHDEV(DEV_TAPE_MAJOR, 221)), "\\Device\\Tape93", exists_ntdev, S_IFBLK},
-  {"/dev/nst94", BRACK(FHDEV(DEV_TAPE_MAJOR, 222)), "\\Device\\Tape94", exists_ntdev, S_IFBLK},
-  {"/dev/nst95", BRACK(FHDEV(DEV_TAPE_MAJOR, 223)), "\\Device\\Tape95", exists_ntdev, S_IFBLK},
-  {"/dev/nst96", BRACK(FHDEV(DEV_TAPE_MAJOR, 224)), "\\Device\\Tape96", exists_ntdev, S_IFBLK},
-  {"/dev/nst97", BRACK(FHDEV(DEV_TAPE_MAJOR, 225)), "\\Device\\Tape97", exists_ntdev, S_IFBLK},
-  {"/dev/nst98", BRACK(FHDEV(DEV_TAPE_MAJOR, 226)), "\\Device\\Tape98", exists_ntdev, S_IFBLK},
-  {"/dev/nst99", BRACK(FHDEV(DEV_TAPE_MAJOR, 227)), "\\Device\\Tape99", exists_ntdev, S_IFBLK},
-  {"/dev/nst100", BRACK(FHDEV(DEV_TAPE_MAJOR, 228)), "\\Device\\Tape100", exists_ntdev, S_IFBLK},
-  {"/dev/nst101", BRACK(FHDEV(DEV_TAPE_MAJOR, 229)), "\\Device\\Tape101", exists_ntdev, S_IFBLK},
-  {"/dev/nst102", BRACK(FHDEV(DEV_TAPE_MAJOR, 230)), "\\Device\\Tape102", exists_ntdev, S_IFBLK},
-  {"/dev/nst103", BRACK(FHDEV(DEV_TAPE_MAJOR, 231)), "\\Device\\Tape103", exists_ntdev, S_IFBLK},
-  {"/dev/nst104", BRACK(FHDEV(DEV_TAPE_MAJOR, 232)), "\\Device\\Tape104", exists_ntdev, S_IFBLK},
-  {"/dev/nst105", BRACK(FHDEV(DEV_TAPE_MAJOR, 233)), "\\Device\\Tape105", exists_ntdev, S_IFBLK},
-  {"/dev/nst106", BRACK(FHDEV(DEV_TAPE_MAJOR, 234)), "\\Device\\Tape106", exists_ntdev, S_IFBLK},
-  {"/dev/nst107", BRACK(FHDEV(DEV_TAPE_MAJOR, 235)), "\\Device\\Tape107", exists_ntdev, S_IFBLK},
-  {"/dev/nst108", BRACK(FHDEV(DEV_TAPE_MAJOR, 236)), "\\Device\\Tape108", exists_ntdev, S_IFBLK},
-  {"/dev/nst109", BRACK(FHDEV(DEV_TAPE_MAJOR, 237)), "\\Device\\Tape109", exists_ntdev, S_IFBLK},
-  {"/dev/nst110", BRACK(FHDEV(DEV_TAPE_MAJOR, 238)), "\\Device\\Tape110", exists_ntdev, S_IFBLK},
-  {"/dev/nst111", BRACK(FHDEV(DEV_TAPE_MAJOR, 239)), "\\Device\\Tape111", exists_ntdev, S_IFBLK},
-  {"/dev/nst112", BRACK(FHDEV(DEV_TAPE_MAJOR, 240)), "\\Device\\Tape112", exists_ntdev, S_IFBLK},
-  {"/dev/nst113", BRACK(FHDEV(DEV_TAPE_MAJOR, 241)), "\\Device\\Tape113", exists_ntdev, S_IFBLK},
-  {"/dev/nst114", BRACK(FHDEV(DEV_TAPE_MAJOR, 242)), "\\Device\\Tape114", exists_ntdev, S_IFBLK},
-  {"/dev/nst115", BRACK(FHDEV(DEV_TAPE_MAJOR, 243)), "\\Device\\Tape115", exists_ntdev, S_IFBLK},
-  {"/dev/nst116", BRACK(FHDEV(DEV_TAPE_MAJOR, 244)), "\\Device\\Tape116", exists_ntdev, S_IFBLK},
-  {"/dev/nst117", BRACK(FHDEV(DEV_TAPE_MAJOR, 245)), "\\Device\\Tape117", exists_ntdev, S_IFBLK},
-  {"/dev/nst118", BRACK(FHDEV(DEV_TAPE_MAJOR, 246)), "\\Device\\Tape118", exists_ntdev, S_IFBLK},
-  {"/dev/nst119", BRACK(FHDEV(DEV_TAPE_MAJOR, 247)), "\\Device\\Tape119", exists_ntdev, S_IFBLK},
-  {"/dev/nst120", BRACK(FHDEV(DEV_TAPE_MAJOR, 248)), "\\Device\\Tape120", exists_ntdev, S_IFBLK},
-  {"/dev/nst121", BRACK(FHDEV(DEV_TAPE_MAJOR, 249)), "\\Device\\Tape121", exists_ntdev, S_IFBLK},
-  {"/dev/nst122", BRACK(FHDEV(DEV_TAPE_MAJOR, 250)), "\\Device\\Tape122", exists_ntdev, S_IFBLK},
-  {"/dev/nst123", BRACK(FHDEV(DEV_TAPE_MAJOR, 251)), "\\Device\\Tape123", exists_ntdev, S_IFBLK},
-  {"/dev/nst124", BRACK(FHDEV(DEV_TAPE_MAJOR, 252)), "\\Device\\Tape124", exists_ntdev, S_IFBLK},
-  {"/dev/nst125", BRACK(FHDEV(DEV_TAPE_MAJOR, 253)), "\\Device\\Tape125", exists_ntdev, S_IFBLK},
-  {"/dev/nst126", BRACK(FHDEV(DEV_TAPE_MAJOR, 254)), "\\Device\\Tape126", exists_ntdev, S_IFBLK},
-  {"/dev/nst127", BRACK(FHDEV(DEV_TAPE_MAJOR, 255)), "\\Device\\Tape127", exists_ntdev, S_IFBLK},
-  {"/dev/null", BRACK(FH_NULL), "\\Device\\Null", exists_ntdev, S_IFCHR},
-  {"/dev/port", BRACK(FH_PORT), "/dev/port", exists, S_IFCHR},
-  {"/dev/ptmx", BRACK(FH_PTMX), "/dev/ptmx", exists, S_IFCHR},
-  {"/dev/pty0", BRACK(FHDEV(DEV_PTYS_MAJOR, 0)), "/dev/pty0", exists_pty, S_IFCHR},
-  {"/dev/pty1", BRACK(FHDEV(DEV_PTYS_MAJOR, 1)), "/dev/pty1", exists_pty, S_IFCHR},
-  {"/dev/pty2", BRACK(FHDEV(DEV_PTYS_MAJOR, 2)), "/dev/pty2", exists_pty, S_IFCHR},
-  {"/dev/pty3", BRACK(FHDEV(DEV_PTYS_MAJOR, 3)), "/dev/pty3", exists_pty, S_IFCHR},
-  {"/dev/pty4", BRACK(FHDEV(DEV_PTYS_MAJOR, 4)), "/dev/pty4", exists_pty, S_IFCHR},
-  {"/dev/pty5", BRACK(FHDEV(DEV_PTYS_MAJOR, 5)), "/dev/pty5", exists_pty, S_IFCHR},
-  {"/dev/pty6", BRACK(FHDEV(DEV_PTYS_MAJOR, 6)), "/dev/pty6", exists_pty, S_IFCHR},
-  {"/dev/pty7", BRACK(FHDEV(DEV_PTYS_MAJOR, 7)), "/dev/pty7", exists_pty, S_IFCHR},
-  {"/dev/pty8", BRACK(FHDEV(DEV_PTYS_MAJOR, 8)), "/dev/pty8", exists_pty, S_IFCHR},
-  {"/dev/pty9", BRACK(FHDEV(DEV_PTYS_MAJOR, 9)), "/dev/pty9", exists_pty, S_IFCHR},
-  {"/dev/pty10", BRACK(FHDEV(DEV_PTYS_MAJOR, 10)), "/dev/pty10", exists_pty, S_IFCHR},
-  {"/dev/pty11", BRACK(FHDEV(DEV_PTYS_MAJOR, 11)), "/dev/pty11", exists_pty, S_IFCHR},
-  {"/dev/pty12", BRACK(FHDEV(DEV_PTYS_MAJOR, 12)), "/dev/pty12", exists_pty, S_IFCHR},
-  {"/dev/pty13", BRACK(FHDEV(DEV_PTYS_MAJOR, 13)), "/dev/pty13", exists_pty, S_IFCHR},
-  {"/dev/pty14", BRACK(FHDEV(DEV_PTYS_MAJOR, 14)), "/dev/pty14", exists_pty, S_IFCHR},
-  {"/dev/pty15", BRACK(FHDEV(DEV_PTYS_MAJOR, 15)), "/dev/pty15", exists_pty, S_IFCHR},
-  {"/dev/pty16", BRACK(FHDEV(DEV_PTYS_MAJOR, 16)), "/dev/pty16", exists_pty, S_IFCHR},
-  {"/dev/pty17", BRACK(FHDEV(DEV_PTYS_MAJOR, 17)), "/dev/pty17", exists_pty, S_IFCHR},
-  {"/dev/pty18", BRACK(FHDEV(DEV_PTYS_MAJOR, 18)), "/dev/pty18", exists_pty, S_IFCHR},
-  {"/dev/pty19", BRACK(FHDEV(DEV_PTYS_MAJOR, 19)), "/dev/pty19", exists_pty, S_IFCHR},
-  {"/dev/pty20", BRACK(FHDEV(DEV_PTYS_MAJOR, 20)), "/dev/pty20", exists_pty, S_IFCHR},
-  {"/dev/pty21", BRACK(FHDEV(DEV_PTYS_MAJOR, 21)), "/dev/pty21", exists_pty, S_IFCHR},
-  {"/dev/pty22", BRACK(FHDEV(DEV_PTYS_MAJOR, 22)), "/dev/pty22", exists_pty, S_IFCHR},
-  {"/dev/pty23", BRACK(FHDEV(DEV_PTYS_MAJOR, 23)), "/dev/pty23", exists_pty, S_IFCHR},
-  {"/dev/pty24", BRACK(FHDEV(DEV_PTYS_MAJOR, 24)), "/dev/pty24", exists_pty, S_IFCHR},
-  {"/dev/pty25", BRACK(FHDEV(DEV_PTYS_MAJOR, 25)), "/dev/pty25", exists_pty, S_IFCHR},
-  {"/dev/pty26", BRACK(FHDEV(DEV_PTYS_MAJOR, 26)), "/dev/pty26", exists_pty, S_IFCHR},
-  {"/dev/pty27", BRACK(FHDEV(DEV_PTYS_MAJOR, 27)), "/dev/pty27", exists_pty, S_IFCHR},
-  {"/dev/pty28", BRACK(FHDEV(DEV_PTYS_MAJOR, 28)), "/dev/pty28", exists_pty, S_IFCHR},
-  {"/dev/pty29", BRACK(FHDEV(DEV_PTYS_MAJOR, 29)), "/dev/pty29", exists_pty, S_IFCHR},
-  {"/dev/pty30", BRACK(FHDEV(DEV_PTYS_MAJOR, 30)), "/dev/pty30", exists_pty, S_IFCHR},
-  {"/dev/pty31", BRACK(FHDEV(DEV_PTYS_MAJOR, 31)), "/dev/pty31", exists_pty, S_IFCHR},
-  {"/dev/pty32", BRACK(FHDEV(DEV_PTYS_MAJOR, 32)), "/dev/pty32", exists_pty, S_IFCHR},
-  {"/dev/pty33", BRACK(FHDEV(DEV_PTYS_MAJOR, 33)), "/dev/pty33", exists_pty, S_IFCHR},
-  {"/dev/pty34", BRACK(FHDEV(DEV_PTYS_MAJOR, 34)), "/dev/pty34", exists_pty, S_IFCHR},
-  {"/dev/pty35", BRACK(FHDEV(DEV_PTYS_MAJOR, 35)), "/dev/pty35", exists_pty, S_IFCHR},
-  {"/dev/pty36", BRACK(FHDEV(DEV_PTYS_MAJOR, 36)), "/dev/pty36", exists_pty, S_IFCHR},
-  {"/dev/pty37", BRACK(FHDEV(DEV_PTYS_MAJOR, 37)), "/dev/pty37", exists_pty, S_IFCHR},
-  {"/dev/pty38", BRACK(FHDEV(DEV_PTYS_MAJOR, 38)), "/dev/pty38", exists_pty, S_IFCHR},
-  {"/dev/pty39", BRACK(FHDEV(DEV_PTYS_MAJOR, 39)), "/dev/pty39", exists_pty, S_IFCHR},
-  {"/dev/pty40", BRACK(FHDEV(DEV_PTYS_MAJOR, 40)), "/dev/pty40", exists_pty, S_IFCHR},
-  {"/dev/pty41", BRACK(FHDEV(DEV_PTYS_MAJOR, 41)), "/dev/pty41", exists_pty, S_IFCHR},
-  {"/dev/pty42", BRACK(FHDEV(DEV_PTYS_MAJOR, 42)), "/dev/pty42", exists_pty, S_IFCHR},
-  {"/dev/pty43", BRACK(FHDEV(DEV_PTYS_MAJOR, 43)), "/dev/pty43", exists_pty, S_IFCHR},
-  {"/dev/pty44", BRACK(FHDEV(DEV_PTYS_MAJOR, 44)), "/dev/pty44", exists_pty, S_IFCHR},
-  {"/dev/pty45", BRACK(FHDEV(DEV_PTYS_MAJOR, 45)), "/dev/pty45", exists_pty, S_IFCHR},
-  {"/dev/pty46", BRACK(FHDEV(DEV_PTYS_MAJOR, 46)), "/dev/pty46", exists_pty, S_IFCHR},
-  {"/dev/pty47", BRACK(FHDEV(DEV_PTYS_MAJOR, 47)), "/dev/pty47", exists_pty, S_IFCHR},
-  {"/dev/pty48", BRACK(FHDEV(DEV_PTYS_MAJOR, 48)), "/dev/pty48", exists_pty, S_IFCHR},
-  {"/dev/pty49", BRACK(FHDEV(DEV_PTYS_MAJOR, 49)), "/dev/pty49", exists_pty, S_IFCHR},
-  {"/dev/pty50", BRACK(FHDEV(DEV_PTYS_MAJOR, 50)), "/dev/pty50", exists_pty, S_IFCHR},
-  {"/dev/pty51", BRACK(FHDEV(DEV_PTYS_MAJOR, 51)), "/dev/pty51", exists_pty, S_IFCHR},
-  {"/dev/pty52", BRACK(FHDEV(DEV_PTYS_MAJOR, 52)), "/dev/pty52", exists_pty, S_IFCHR},
-  {"/dev/pty53", BRACK(FHDEV(DEV_PTYS_MAJOR, 53)), "/dev/pty53", exists_pty, S_IFCHR},
-  {"/dev/pty54", BRACK(FHDEV(DEV_PTYS_MAJOR, 54)), "/dev/pty54", exists_pty, S_IFCHR},
-  {"/dev/pty55", BRACK(FHDEV(DEV_PTYS_MAJOR, 55)), "/dev/pty55", exists_pty, S_IFCHR},
-  {"/dev/pty56", BRACK(FHDEV(DEV_PTYS_MAJOR, 56)), "/dev/pty56", exists_pty, S_IFCHR},
-  {"/dev/pty57", BRACK(FHDEV(DEV_PTYS_MAJOR, 57)), "/dev/pty57", exists_pty, S_IFCHR},
-  {"/dev/pty58", BRACK(FHDEV(DEV_PTYS_MAJOR, 58)), "/dev/pty58", exists_pty, S_IFCHR},
-  {"/dev/pty59", BRACK(FHDEV(DEV_PTYS_MAJOR, 59)), "/dev/pty59", exists_pty, S_IFCHR},
-  {"/dev/pty60", BRACK(FHDEV(DEV_PTYS_MAJOR, 60)), "/dev/pty60", exists_pty, S_IFCHR},
-  {"/dev/pty61", BRACK(FHDEV(DEV_PTYS_MAJOR, 61)), "/dev/pty61", exists_pty, S_IFCHR},
-  {"/dev/pty62", BRACK(FHDEV(DEV_PTYS_MAJOR, 62)), "/dev/pty62", exists_pty, S_IFCHR},
-  {"/dev/pty63", BRACK(FHDEV(DEV_PTYS_MAJOR, 63)), "/dev/pty63", exists_pty, S_IFCHR},
-  {"/dev/random", BRACK(FH_RANDOM), "/dev/random", exists, S_IFCHR},
-  {"/dev/scd0", BRACK(FHDEV(DEV_CDROM_MAJOR, 0)), "\\Device\\CdRom0", exists_ntdev, S_IFBLK},
-  {"/dev/scd1", BRACK(FHDEV(DEV_CDROM_MAJOR, 1)), "\\Device\\CdRom1", exists_ntdev, S_IFBLK},
-  {"/dev/scd2", BRACK(FHDEV(DEV_CDROM_MAJOR, 2)), "\\Device\\CdRom2", exists_ntdev, S_IFBLK},
-  {"/dev/scd3", BRACK(FHDEV(DEV_CDROM_MAJOR, 3)), "\\Device\\CdRom3", exists_ntdev, S_IFBLK},
-  {"/dev/scd4", BRACK(FHDEV(DEV_CDROM_MAJOR, 4)), "\\Device\\CdRom4", exists_ntdev, S_IFBLK},
-  {"/dev/scd5", BRACK(FHDEV(DEV_CDROM_MAJOR, 5)), "\\Device\\CdRom5", exists_ntdev, S_IFBLK},
-  {"/dev/scd6", BRACK(FHDEV(DEV_CDROM_MAJOR, 6)), "\\Device\\CdRom6", exists_ntdev, S_IFBLK},
-  {"/dev/scd7", BRACK(FHDEV(DEV_CDROM_MAJOR, 7)), "\\Device\\CdRom7", exists_ntdev, S_IFBLK},
-  {"/dev/scd8", BRACK(FHDEV(DEV_CDROM_MAJOR, 8)), "\\Device\\CdRom8", exists_ntdev, S_IFBLK},
-  {"/dev/scd9", BRACK(FHDEV(DEV_CDROM_MAJOR, 9)), "\\Device\\CdRom9", exists_ntdev, S_IFBLK},
-  {"/dev/scd10", BRACK(FHDEV(DEV_CDROM_MAJOR, 10)), "\\Device\\CdRom10", exists_ntdev, S_IFBLK},
-  {"/dev/scd11", BRACK(FHDEV(DEV_CDROM_MAJOR, 11)), "\\Device\\CdRom11", exists_ntdev, S_IFBLK},
-  {"/dev/scd12", BRACK(FHDEV(DEV_CDROM_MAJOR, 12)), "\\Device\\CdRom12", exists_ntdev, S_IFBLK},
-  {"/dev/scd13", BRACK(FHDEV(DEV_CDROM_MAJOR, 13)), "\\Device\\CdRom13", exists_ntdev, S_IFBLK},
-  {"/dev/scd14", BRACK(FHDEV(DEV_CDROM_MAJOR, 14)), "\\Device\\CdRom14", exists_ntdev, S_IFBLK},
-  {"/dev/scd15", BRACK(FHDEV(DEV_CDROM_MAJOR, 15)), "\\Device\\CdRom15", exists_ntdev, S_IFBLK},
-  {"/dev/sda", BRACK(FH_SDA), "\\Device\\Harddisk0\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdb", BRACK(FH_SDB), "\\Device\\Harddisk1\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdc", BRACK(FH_SDC), "\\Device\\Harddisk2\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdd", BRACK(FH_SDD), "\\Device\\Harddisk3\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sde", BRACK(FH_SDE), "\\Device\\Harddisk4\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdf", BRACK(FH_SDF), "\\Device\\Harddisk5\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdg", BRACK(FH_SDG), "\\Device\\Harddisk6\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdh", BRACK(FH_SDH), "\\Device\\Harddisk7\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdi", BRACK(FH_SDI), "\\Device\\Harddisk8\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdj", BRACK(FH_SDJ), "\\Device\\Harddisk9\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdk", BRACK(FH_SDK), "\\Device\\Harddisk10\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdl", BRACK(FH_SDL), "\\Device\\Harddisk11\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdm", BRACK(FH_SDM), "\\Device\\Harddisk12\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdn", BRACK(FH_SDN), "\\Device\\Harddisk13\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdo", BRACK(FH_SDO), "\\Device\\Harddisk14\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdp", BRACK(FH_SDP), "\\Device\\Harddisk15\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdq", BRACK(FH_SDQ), "\\Device\\Harddisk16\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdr", BRACK(FH_SDR), "\\Device\\Harddisk17\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sds", BRACK(FH_SDS), "\\Device\\Harddisk18\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdt", BRACK(FH_SDT), "\\Device\\Harddisk19\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdu", BRACK(FH_SDU), "\\Device\\Harddisk20\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdv", BRACK(FH_SDV), "\\Device\\Harddisk21\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdw", BRACK(FH_SDW), "\\Device\\Harddisk22\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdx", BRACK(FH_SDX), "\\Device\\Harddisk23\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdy", BRACK(FH_SDY), "\\Device\\Harddisk24\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdz", BRACK(FH_SDZ), "\\Device\\Harddisk25\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sda1", BRACK(FH_SDA | 1), "\\Device\\Harddisk0\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sda2", BRACK(FH_SDA | 2), "\\Device\\Harddisk0\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sda3", BRACK(FH_SDA | 3), "\\Device\\Harddisk0\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sda4", BRACK(FH_SDA | 4), "\\Device\\Harddisk0\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sda5", BRACK(FH_SDA | 5), "\\Device\\Harddisk0\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sda6", BRACK(FH_SDA | 6), "\\Device\\Harddisk0\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sda7", BRACK(FH_SDA | 7), "\\Device\\Harddisk0\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sda8", BRACK(FH_SDA | 8), "\\Device\\Harddisk0\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sda9", BRACK(FH_SDA | 9), "\\Device\\Harddisk0\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sda10", BRACK(FH_SDA | 10), "\\Device\\Harddisk0\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sda11", BRACK(FH_SDA | 11), "\\Device\\Harddisk0\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sda12", BRACK(FH_SDA | 12), "\\Device\\Harddisk0\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sda13", BRACK(FH_SDA | 13), "\\Device\\Harddisk0\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sda14", BRACK(FH_SDA | 14), "\\Device\\Harddisk0\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sda15", BRACK(FH_SDA | 15), "\\Device\\Harddisk0\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdb1", BRACK(FH_SDB | 1), "\\Device\\Harddisk1\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdb2", BRACK(FH_SDB | 2), "\\Device\\Harddisk1\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdb3", BRACK(FH_SDB | 3), "\\Device\\Harddisk1\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdb4", BRACK(FH_SDB | 4), "\\Device\\Harddisk1\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdb5", BRACK(FH_SDB | 5), "\\Device\\Harddisk1\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdb6", BRACK(FH_SDB | 6), "\\Device\\Harddisk1\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdb7", BRACK(FH_SDB | 7), "\\Device\\Harddisk1\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdb8", BRACK(FH_SDB | 8), "\\Device\\Harddisk1\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdb9", BRACK(FH_SDB | 9), "\\Device\\Harddisk1\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdb10", BRACK(FH_SDB | 10), "\\Device\\Harddisk1\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdb11", BRACK(FH_SDB | 11), "\\Device\\Harddisk1\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdb12", BRACK(FH_SDB | 12), "\\Device\\Harddisk1\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdb13", BRACK(FH_SDB | 13), "\\Device\\Harddisk1\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdb14", BRACK(FH_SDB | 14), "\\Device\\Harddisk1\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdb15", BRACK(FH_SDB | 15), "\\Device\\Harddisk1\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdc1", BRACK(FH_SDC | 1), "\\Device\\Harddisk2\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdc2", BRACK(FH_SDC | 2), "\\Device\\Harddisk2\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdc3", BRACK(FH_SDC | 3), "\\Device\\Harddisk2\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdc4", BRACK(FH_SDC | 4), "\\Device\\Harddisk2\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdc5", BRACK(FH_SDC | 5), "\\Device\\Harddisk2\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdc6", BRACK(FH_SDC | 6), "\\Device\\Harddisk2\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdc7", BRACK(FH_SDC | 7), "\\Device\\Harddisk2\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdc8", BRACK(FH_SDC | 8), "\\Device\\Harddisk2\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdc9", BRACK(FH_SDC | 9), "\\Device\\Harddisk2\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdc10", BRACK(FH_SDC | 10), "\\Device\\Harddisk2\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdc11", BRACK(FH_SDC | 11), "\\Device\\Harddisk2\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdc12", BRACK(FH_SDC | 12), "\\Device\\Harddisk2\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdc13", BRACK(FH_SDC | 13), "\\Device\\Harddisk2\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdc14", BRACK(FH_SDC | 14), "\\Device\\Harddisk2\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdc15", BRACK(FH_SDC | 15), "\\Device\\Harddisk2\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdd1", BRACK(FH_SDD | 1), "\\Device\\Harddisk3\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdd2", BRACK(FH_SDD | 2), "\\Device\\Harddisk3\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdd3", BRACK(FH_SDD | 3), "\\Device\\Harddisk3\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdd4", BRACK(FH_SDD | 4), "\\Device\\Harddisk3\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdd5", BRACK(FH_SDD | 5), "\\Device\\Harddisk3\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdd6", BRACK(FH_SDD | 6), "\\Device\\Harddisk3\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdd7", BRACK(FH_SDD | 7), "\\Device\\Harddisk3\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdd8", BRACK(FH_SDD | 8), "\\Device\\Harddisk3\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdd9", BRACK(FH_SDD | 9), "\\Device\\Harddisk3\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdd10", BRACK(FH_SDD | 10), "\\Device\\Harddisk3\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdd11", BRACK(FH_SDD | 11), "\\Device\\Harddisk3\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdd12", BRACK(FH_SDD | 12), "\\Device\\Harddisk3\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdd13", BRACK(FH_SDD | 13), "\\Device\\Harddisk3\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdd14", BRACK(FH_SDD | 14), "\\Device\\Harddisk3\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdd15", BRACK(FH_SDD | 15), "\\Device\\Harddisk3\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sde1", BRACK(FH_SDE | 1), "\\Device\\Harddisk4\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sde2", BRACK(FH_SDE | 2), "\\Device\\Harddisk4\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sde3", BRACK(FH_SDE | 3), "\\Device\\Harddisk4\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sde4", BRACK(FH_SDE | 4), "\\Device\\Harddisk4\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sde5", BRACK(FH_SDE | 5), "\\Device\\Harddisk4\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sde6", BRACK(FH_SDE | 6), "\\Device\\Harddisk4\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sde7", BRACK(FH_SDE | 7), "\\Device\\Harddisk4\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sde8", BRACK(FH_SDE | 8), "\\Device\\Harddisk4\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sde9", BRACK(FH_SDE | 9), "\\Device\\Harddisk4\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sde10", BRACK(FH_SDE | 10), "\\Device\\Harddisk4\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sde11", BRACK(FH_SDE | 11), "\\Device\\Harddisk4\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sde12", BRACK(FH_SDE | 12), "\\Device\\Harddisk4\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sde13", BRACK(FH_SDE | 13), "\\Device\\Harddisk4\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sde14", BRACK(FH_SDE | 14), "\\Device\\Harddisk4\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sde15", BRACK(FH_SDE | 15), "\\Device\\Harddisk4\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdf1", BRACK(FH_SDF | 1), "\\Device\\Harddisk5\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdf2", BRACK(FH_SDF | 2), "\\Device\\Harddisk5\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdf3", BRACK(FH_SDF | 3), "\\Device\\Harddisk5\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdf4", BRACK(FH_SDF | 4), "\\Device\\Harddisk5\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdf5", BRACK(FH_SDF | 5), "\\Device\\Harddisk5\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdf6", BRACK(FH_SDF | 6), "\\Device\\Harddisk5\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdf7", BRACK(FH_SDF | 7), "\\Device\\Harddisk5\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdf8", BRACK(FH_SDF | 8), "\\Device\\Harddisk5\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdf9", BRACK(FH_SDF | 9), "\\Device\\Harddisk5\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdf10", BRACK(FH_SDF | 10), "\\Device\\Harddisk5\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdf11", BRACK(FH_SDF | 11), "\\Device\\Harddisk5\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdf12", BRACK(FH_SDF | 12), "\\Device\\Harddisk5\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdf13", BRACK(FH_SDF | 13), "\\Device\\Harddisk5\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdf14", BRACK(FH_SDF | 14), "\\Device\\Harddisk5\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdf15", BRACK(FH_SDF | 15), "\\Device\\Harddisk5\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdg1", BRACK(FH_SDG | 1), "\\Device\\Harddisk6\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdg2", BRACK(FH_SDG | 2), "\\Device\\Harddisk6\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdg3", BRACK(FH_SDG | 3), "\\Device\\Harddisk6\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdg4", BRACK(FH_SDG | 4), "\\Device\\Harddisk6\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdg5", BRACK(FH_SDG | 5), "\\Device\\Harddisk6\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdg6", BRACK(FH_SDG | 6), "\\Device\\Harddisk6\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdg7", BRACK(FH_SDG | 7), "\\Device\\Harddisk6\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdg8", BRACK(FH_SDG | 8), "\\Device\\Harddisk6\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdg9", BRACK(FH_SDG | 9), "\\Device\\Harddisk6\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdg10", BRACK(FH_SDG | 10), "\\Device\\Harddisk6\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdg11", BRACK(FH_SDG | 11), "\\Device\\Harddisk6\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdg12", BRACK(FH_SDG | 12), "\\Device\\Harddisk6\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdg13", BRACK(FH_SDG | 13), "\\Device\\Harddisk6\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdg14", BRACK(FH_SDG | 14), "\\Device\\Harddisk6\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdg15", BRACK(FH_SDG | 15), "\\Device\\Harddisk6\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdh1", BRACK(FH_SDH | 1), "\\Device\\Harddisk7\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdh2", BRACK(FH_SDH | 2), "\\Device\\Harddisk7\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdh3", BRACK(FH_SDH | 3), "\\Device\\Harddisk7\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdh4", BRACK(FH_SDH | 4), "\\Device\\Harddisk7\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdh5", BRACK(FH_SDH | 5), "\\Device\\Harddisk7\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdh6", BRACK(FH_SDH | 6), "\\Device\\Harddisk7\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdh7", BRACK(FH_SDH | 7), "\\Device\\Harddisk7\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdh8", BRACK(FH_SDH | 8), "\\Device\\Harddisk7\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdh9", BRACK(FH_SDH | 9), "\\Device\\Harddisk7\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdh10", BRACK(FH_SDH | 10), "\\Device\\Harddisk7\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdh11", BRACK(FH_SDH | 11), "\\Device\\Harddisk7\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdh12", BRACK(FH_SDH | 12), "\\Device\\Harddisk7\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdh13", BRACK(FH_SDH | 13), "\\Device\\Harddisk7\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdh14", BRACK(FH_SDH | 14), "\\Device\\Harddisk7\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdh15", BRACK(FH_SDH | 15), "\\Device\\Harddisk7\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdi1", BRACK(FH_SDI | 1), "\\Device\\Harddisk8\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdi2", BRACK(FH_SDI | 2), "\\Device\\Harddisk8\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdi3", BRACK(FH_SDI | 3), "\\Device\\Harddisk8\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdi4", BRACK(FH_SDI | 4), "\\Device\\Harddisk8\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdi5", BRACK(FH_SDI | 5), "\\Device\\Harddisk8\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdi6", BRACK(FH_SDI | 6), "\\Device\\Harddisk8\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdi7", BRACK(FH_SDI | 7), "\\Device\\Harddisk8\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdi8", BRACK(FH_SDI | 8), "\\Device\\Harddisk8\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdi9", BRACK(FH_SDI | 9), "\\Device\\Harddisk8\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdi10", BRACK(FH_SDI | 10), "\\Device\\Harddisk8\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdi11", BRACK(FH_SDI | 11), "\\Device\\Harddisk8\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdi12", BRACK(FH_SDI | 12), "\\Device\\Harddisk8\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdi13", BRACK(FH_SDI | 13), "\\Device\\Harddisk8\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdi14", BRACK(FH_SDI | 14), "\\Device\\Harddisk8\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdi15", BRACK(FH_SDI | 15), "\\Device\\Harddisk8\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdj1", BRACK(FH_SDJ | 1), "\\Device\\Harddisk9\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdj2", BRACK(FH_SDJ | 2), "\\Device\\Harddisk9\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdj3", BRACK(FH_SDJ | 3), "\\Device\\Harddisk9\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdj4", BRACK(FH_SDJ | 4), "\\Device\\Harddisk9\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdj5", BRACK(FH_SDJ | 5), "\\Device\\Harddisk9\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdj6", BRACK(FH_SDJ | 6), "\\Device\\Harddisk9\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdj7", BRACK(FH_SDJ | 7), "\\Device\\Harddisk9\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdj8", BRACK(FH_SDJ | 8), "\\Device\\Harddisk9\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdj9", BRACK(FH_SDJ | 9), "\\Device\\Harddisk9\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdj10", BRACK(FH_SDJ | 10), "\\Device\\Harddisk9\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdj11", BRACK(FH_SDJ | 11), "\\Device\\Harddisk9\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdj12", BRACK(FH_SDJ | 12), "\\Device\\Harddisk9\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdj13", BRACK(FH_SDJ | 13), "\\Device\\Harddisk9\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdj14", BRACK(FH_SDJ | 14), "\\Device\\Harddisk9\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdj15", BRACK(FH_SDJ | 15), "\\Device\\Harddisk9\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdk1", BRACK(FH_SDK | 1), "\\Device\\Harddisk10\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdk2", BRACK(FH_SDK | 2), "\\Device\\Harddisk10\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdk3", BRACK(FH_SDK | 3), "\\Device\\Harddisk10\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdk4", BRACK(FH_SDK | 4), "\\Device\\Harddisk10\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdk5", BRACK(FH_SDK | 5), "\\Device\\Harddisk10\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdk6", BRACK(FH_SDK | 6), "\\Device\\Harddisk10\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdk7", BRACK(FH_SDK | 7), "\\Device\\Harddisk10\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdk8", BRACK(FH_SDK | 8), "\\Device\\Harddisk10\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdk9", BRACK(FH_SDK | 9), "\\Device\\Harddisk10\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdk10", BRACK(FH_SDK | 10), "\\Device\\Harddisk10\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdk11", BRACK(FH_SDK | 11), "\\Device\\Harddisk10\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdk12", BRACK(FH_SDK | 12), "\\Device\\Harddisk10\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdk13", BRACK(FH_SDK | 13), "\\Device\\Harddisk10\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdk14", BRACK(FH_SDK | 14), "\\Device\\Harddisk10\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdk15", BRACK(FH_SDK | 15), "\\Device\\Harddisk10\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdl1", BRACK(FH_SDL | 1), "\\Device\\Harddisk11\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdl2", BRACK(FH_SDL | 2), "\\Device\\Harddisk11\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdl3", BRACK(FH_SDL | 3), "\\Device\\Harddisk11\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdl4", BRACK(FH_SDL | 4), "\\Device\\Harddisk11\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdl5", BRACK(FH_SDL | 5), "\\Device\\Harddisk11\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdl6", BRACK(FH_SDL | 6), "\\Device\\Harddisk11\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdl7", BRACK(FH_SDL | 7), "\\Device\\Harddisk11\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdl8", BRACK(FH_SDL | 8), "\\Device\\Harddisk11\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdl9", BRACK(FH_SDL | 9), "\\Device\\Harddisk11\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdl10", BRACK(FH_SDL | 10), "\\Device\\Harddisk11\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdl11", BRACK(FH_SDL | 11), "\\Device\\Harddisk11\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdl12", BRACK(FH_SDL | 12), "\\Device\\Harddisk11\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdl13", BRACK(FH_SDL | 13), "\\Device\\Harddisk11\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdl14", BRACK(FH_SDL | 14), "\\Device\\Harddisk11\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdl15", BRACK(FH_SDL | 15), "\\Device\\Harddisk11\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdm1", BRACK(FH_SDM | 1), "\\Device\\Harddisk12\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdm2", BRACK(FH_SDM | 2), "\\Device\\Harddisk12\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdm3", BRACK(FH_SDM | 3), "\\Device\\Harddisk12\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdm4", BRACK(FH_SDM | 4), "\\Device\\Harddisk12\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdm5", BRACK(FH_SDM | 5), "\\Device\\Harddisk12\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdm6", BRACK(FH_SDM | 6), "\\Device\\Harddisk12\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdm7", BRACK(FH_SDM | 7), "\\Device\\Harddisk12\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdm8", BRACK(FH_SDM | 8), "\\Device\\Harddisk12\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdm9", BRACK(FH_SDM | 9), "\\Device\\Harddisk12\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdm10", BRACK(FH_SDM | 10), "\\Device\\Harddisk12\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdm11", BRACK(FH_SDM | 11), "\\Device\\Harddisk12\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdm12", BRACK(FH_SDM | 12), "\\Device\\Harddisk12\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdm13", BRACK(FH_SDM | 13), "\\Device\\Harddisk12\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdm14", BRACK(FH_SDM | 14), "\\Device\\Harddisk12\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdm15", BRACK(FH_SDM | 15), "\\Device\\Harddisk12\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdn1", BRACK(FH_SDN | 1), "\\Device\\Harddisk13\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdn2", BRACK(FH_SDN | 2), "\\Device\\Harddisk13\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdn3", BRACK(FH_SDN | 3), "\\Device\\Harddisk13\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdn4", BRACK(FH_SDN | 4), "\\Device\\Harddisk13\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdn5", BRACK(FH_SDN | 5), "\\Device\\Harddisk13\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdn6", BRACK(FH_SDN | 6), "\\Device\\Harddisk13\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdn7", BRACK(FH_SDN | 7), "\\Device\\Harddisk13\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdn8", BRACK(FH_SDN | 8), "\\Device\\Harddisk13\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdn9", BRACK(FH_SDN | 9), "\\Device\\Harddisk13\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdn10", BRACK(FH_SDN | 10), "\\Device\\Harddisk13\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdn11", BRACK(FH_SDN | 11), "\\Device\\Harddisk13\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdn12", BRACK(FH_SDN | 12), "\\Device\\Harddisk13\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdn13", BRACK(FH_SDN | 13), "\\Device\\Harddisk13\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdn14", BRACK(FH_SDN | 14), "\\Device\\Harddisk13\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdn15", BRACK(FH_SDN | 15), "\\Device\\Harddisk13\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdo1", BRACK(FH_SDO | 1), "\\Device\\Harddisk14\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdo2", BRACK(FH_SDO | 2), "\\Device\\Harddisk14\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdo3", BRACK(FH_SDO | 3), "\\Device\\Harddisk14\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdo4", BRACK(FH_SDO | 4), "\\Device\\Harddisk14\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdo5", BRACK(FH_SDO | 5), "\\Device\\Harddisk14\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdo6", BRACK(FH_SDO | 6), "\\Device\\Harddisk14\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdo7", BRACK(FH_SDO | 7), "\\Device\\Harddisk14\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdo8", BRACK(FH_SDO | 8), "\\Device\\Harddisk14\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdo9", BRACK(FH_SDO | 9), "\\Device\\Harddisk14\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdo10", BRACK(FH_SDO | 10), "\\Device\\Harddisk14\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdo11", BRACK(FH_SDO | 11), "\\Device\\Harddisk14\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdo12", BRACK(FH_SDO | 12), "\\Device\\Harddisk14\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdo13", BRACK(FH_SDO | 13), "\\Device\\Harddisk14\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdo14", BRACK(FH_SDO | 14), "\\Device\\Harddisk14\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdo15", BRACK(FH_SDO | 15), "\\Device\\Harddisk14\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdp1", BRACK(FH_SDP | 1), "\\Device\\Harddisk15\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdp2", BRACK(FH_SDP | 2), "\\Device\\Harddisk15\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdp3", BRACK(FH_SDP | 3), "\\Device\\Harddisk15\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdp4", BRACK(FH_SDP | 4), "\\Device\\Harddisk15\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdp5", BRACK(FH_SDP | 5), "\\Device\\Harddisk15\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdp6", BRACK(FH_SDP | 6), "\\Device\\Harddisk15\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdp7", BRACK(FH_SDP | 7), "\\Device\\Harddisk15\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdp8", BRACK(FH_SDP | 8), "\\Device\\Harddisk15\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdp9", BRACK(FH_SDP | 9), "\\Device\\Harddisk15\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdp10", BRACK(FH_SDP | 10), "\\Device\\Harddisk15\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdp11", BRACK(FH_SDP | 11), "\\Device\\Harddisk15\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdp12", BRACK(FH_SDP | 12), "\\Device\\Harddisk15\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdp13", BRACK(FH_SDP | 13), "\\Device\\Harddisk15\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdp14", BRACK(FH_SDP | 14), "\\Device\\Harddisk15\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdp15", BRACK(FH_SDP | 15), "\\Device\\Harddisk15\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdq1", BRACK(FH_SDQ | 1), "\\Device\\Harddisk16\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdq2", BRACK(FH_SDQ | 2), "\\Device\\Harddisk16\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdq3", BRACK(FH_SDQ | 3), "\\Device\\Harddisk16\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdq4", BRACK(FH_SDQ | 4), "\\Device\\Harddisk16\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdq5", BRACK(FH_SDQ | 5), "\\Device\\Harddisk16\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdq6", BRACK(FH_SDQ | 6), "\\Device\\Harddisk16\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdq7", BRACK(FH_SDQ | 7), "\\Device\\Harddisk16\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdq8", BRACK(FH_SDQ | 8), "\\Device\\Harddisk16\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdq9", BRACK(FH_SDQ | 9), "\\Device\\Harddisk16\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdq10", BRACK(FH_SDQ | 10), "\\Device\\Harddisk16\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdq11", BRACK(FH_SDQ | 11), "\\Device\\Harddisk16\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdq12", BRACK(FH_SDQ | 12), "\\Device\\Harddisk16\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdq13", BRACK(FH_SDQ | 13), "\\Device\\Harddisk16\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdq14", BRACK(FH_SDQ | 14), "\\Device\\Harddisk16\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdq15", BRACK(FH_SDQ | 15), "\\Device\\Harddisk16\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdr1", BRACK(FH_SDR | 1), "\\Device\\Harddisk17\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdr2", BRACK(FH_SDR | 2), "\\Device\\Harddisk17\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdr3", BRACK(FH_SDR | 3), "\\Device\\Harddisk17\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdr4", BRACK(FH_SDR | 4), "\\Device\\Harddisk17\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdr5", BRACK(FH_SDR | 5), "\\Device\\Harddisk17\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdr6", BRACK(FH_SDR | 6), "\\Device\\Harddisk17\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdr7", BRACK(FH_SDR | 7), "\\Device\\Harddisk17\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdr8", BRACK(FH_SDR | 8), "\\Device\\Harddisk17\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdr9", BRACK(FH_SDR | 9), "\\Device\\Harddisk17\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdr10", BRACK(FH_SDR | 10), "\\Device\\Harddisk17\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdr11", BRACK(FH_SDR | 11), "\\Device\\Harddisk17\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdr12", BRACK(FH_SDR | 12), "\\Device\\Harddisk17\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdr13", BRACK(FH_SDR | 13), "\\Device\\Harddisk17\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdr14", BRACK(FH_SDR | 14), "\\Device\\Harddisk17\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdr15", BRACK(FH_SDR | 15), "\\Device\\Harddisk17\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sds1", BRACK(FH_SDS | 1), "\\Device\\Harddisk18\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sds2", BRACK(FH_SDS | 2), "\\Device\\Harddisk18\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sds3", BRACK(FH_SDS | 3), "\\Device\\Harddisk18\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sds4", BRACK(FH_SDS | 4), "\\Device\\Harddisk18\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sds5", BRACK(FH_SDS | 5), "\\Device\\Harddisk18\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sds6", BRACK(FH_SDS | 6), "\\Device\\Harddisk18\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sds7", BRACK(FH_SDS | 7), "\\Device\\Harddisk18\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sds8", BRACK(FH_SDS | 8), "\\Device\\Harddisk18\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sds9", BRACK(FH_SDS | 9), "\\Device\\Harddisk18\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sds10", BRACK(FH_SDS | 10), "\\Device\\Harddisk18\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sds11", BRACK(FH_SDS | 11), "\\Device\\Harddisk18\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sds12", BRACK(FH_SDS | 12), "\\Device\\Harddisk18\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sds13", BRACK(FH_SDS | 13), "\\Device\\Harddisk18\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sds14", BRACK(FH_SDS | 14), "\\Device\\Harddisk18\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sds15", BRACK(FH_SDS | 15), "\\Device\\Harddisk18\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdt1", BRACK(FH_SDT | 1), "\\Device\\Harddisk19\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdt2", BRACK(FH_SDT | 2), "\\Device\\Harddisk19\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdt3", BRACK(FH_SDT | 3), "\\Device\\Harddisk19\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdt4", BRACK(FH_SDT | 4), "\\Device\\Harddisk19\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdt5", BRACK(FH_SDT | 5), "\\Device\\Harddisk19\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdt6", BRACK(FH_SDT | 6), "\\Device\\Harddisk19\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdt7", BRACK(FH_SDT | 7), "\\Device\\Harddisk19\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdt8", BRACK(FH_SDT | 8), "\\Device\\Harddisk19\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdt9", BRACK(FH_SDT | 9), "\\Device\\Harddisk19\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdt10", BRACK(FH_SDT | 10), "\\Device\\Harddisk19\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdt11", BRACK(FH_SDT | 11), "\\Device\\Harddisk19\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdt12", BRACK(FH_SDT | 12), "\\Device\\Harddisk19\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdt13", BRACK(FH_SDT | 13), "\\Device\\Harddisk19\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdt14", BRACK(FH_SDT | 14), "\\Device\\Harddisk19\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdt15", BRACK(FH_SDT | 15), "\\Device\\Harddisk19\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdu1", BRACK(FH_SDU | 1), "\\Device\\Harddisk20\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdu2", BRACK(FH_SDU | 2), "\\Device\\Harddisk20\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdu3", BRACK(FH_SDU | 3), "\\Device\\Harddisk20\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdu4", BRACK(FH_SDU | 4), "\\Device\\Harddisk20\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdu5", BRACK(FH_SDU | 5), "\\Device\\Harddisk20\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdu6", BRACK(FH_SDU | 6), "\\Device\\Harddisk20\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdu7", BRACK(FH_SDU | 7), "\\Device\\Harddisk20\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdu8", BRACK(FH_SDU | 8), "\\Device\\Harddisk20\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdu9", BRACK(FH_SDU | 9), "\\Device\\Harddisk20\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdu10", BRACK(FH_SDU | 10), "\\Device\\Harddisk20\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdu11", BRACK(FH_SDU | 11), "\\Device\\Harddisk20\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdu12", BRACK(FH_SDU | 12), "\\Device\\Harddisk20\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdu13", BRACK(FH_SDU | 13), "\\Device\\Harddisk20\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdu14", BRACK(FH_SDU | 14), "\\Device\\Harddisk20\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdu15", BRACK(FH_SDU | 15), "\\Device\\Harddisk20\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdv1", BRACK(FH_SDV | 1), "\\Device\\Harddisk21\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdv2", BRACK(FH_SDV | 2), "\\Device\\Harddisk21\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdv3", BRACK(FH_SDV | 3), "\\Device\\Harddisk21\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdv4", BRACK(FH_SDV | 4), "\\Device\\Harddisk21\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdv5", BRACK(FH_SDV | 5), "\\Device\\Harddisk21\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdv6", BRACK(FH_SDV | 6), "\\Device\\Harddisk21\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdv7", BRACK(FH_SDV | 7), "\\Device\\Harddisk21\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdv8", BRACK(FH_SDV | 8), "\\Device\\Harddisk21\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdv9", BRACK(FH_SDV | 9), "\\Device\\Harddisk21\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdv10", BRACK(FH_SDV | 10), "\\Device\\Harddisk21\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdv11", BRACK(FH_SDV | 11), "\\Device\\Harddisk21\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdv12", BRACK(FH_SDV | 12), "\\Device\\Harddisk21\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdv13", BRACK(FH_SDV | 13), "\\Device\\Harddisk21\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdv14", BRACK(FH_SDV | 14), "\\Device\\Harddisk21\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdv15", BRACK(FH_SDV | 15), "\\Device\\Harddisk21\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdw1", BRACK(FH_SDW | 1), "\\Device\\Harddisk22\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdw2", BRACK(FH_SDW | 2), "\\Device\\Harddisk22\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdw3", BRACK(FH_SDW | 3), "\\Device\\Harddisk22\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdw4", BRACK(FH_SDW | 4), "\\Device\\Harddisk22\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdw5", BRACK(FH_SDW | 5), "\\Device\\Harddisk22\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdw6", BRACK(FH_SDW | 6), "\\Device\\Harddisk22\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdw7", BRACK(FH_SDW | 7), "\\Device\\Harddisk22\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdw8", BRACK(FH_SDW | 8), "\\Device\\Harddisk22\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdw9", BRACK(FH_SDW | 9), "\\Device\\Harddisk22\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdw10", BRACK(FH_SDW | 10), "\\Device\\Harddisk22\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdw11", BRACK(FH_SDW | 11), "\\Device\\Harddisk22\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdw12", BRACK(FH_SDW | 12), "\\Device\\Harddisk22\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdw13", BRACK(FH_SDW | 13), "\\Device\\Harddisk22\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdw14", BRACK(FH_SDW | 14), "\\Device\\Harddisk22\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdw15", BRACK(FH_SDW | 15), "\\Device\\Harddisk22\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdx1", BRACK(FH_SDX | 1), "\\Device\\Harddisk23\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdx2", BRACK(FH_SDX | 2), "\\Device\\Harddisk23\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdx3", BRACK(FH_SDX | 3), "\\Device\\Harddisk23\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdx4", BRACK(FH_SDX | 4), "\\Device\\Harddisk23\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdx5", BRACK(FH_SDX | 5), "\\Device\\Harddisk23\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdx6", BRACK(FH_SDX | 6), "\\Device\\Harddisk23\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdx7", BRACK(FH_SDX | 7), "\\Device\\Harddisk23\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdx8", BRACK(FH_SDX | 8), "\\Device\\Harddisk23\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdx9", BRACK(FH_SDX | 9), "\\Device\\Harddisk23\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdx10", BRACK(FH_SDX | 10), "\\Device\\Harddisk23\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdx11", BRACK(FH_SDX | 11), "\\Device\\Harddisk23\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdx12", BRACK(FH_SDX | 12), "\\Device\\Harddisk23\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdx13", BRACK(FH_SDX | 13), "\\Device\\Harddisk23\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdx14", BRACK(FH_SDX | 14), "\\Device\\Harddisk23\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdx15", BRACK(FH_SDX | 15), "\\Device\\Harddisk23\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdy1", BRACK(FH_SDY | 1), "\\Device\\Harddisk24\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdy2", BRACK(FH_SDY | 2), "\\Device\\Harddisk24\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdy3", BRACK(FH_SDY | 3), "\\Device\\Harddisk24\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdy4", BRACK(FH_SDY | 4), "\\Device\\Harddisk24\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdy5", BRACK(FH_SDY | 5), "\\Device\\Harddisk24\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdy6", BRACK(FH_SDY | 6), "\\Device\\Harddisk24\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdy7", BRACK(FH_SDY | 7), "\\Device\\Harddisk24\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdy8", BRACK(FH_SDY | 8), "\\Device\\Harddisk24\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdy9", BRACK(FH_SDY | 9), "\\Device\\Harddisk24\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdy10", BRACK(FH_SDY | 10), "\\Device\\Harddisk24\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdy11", BRACK(FH_SDY | 11), "\\Device\\Harddisk24\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdy12", BRACK(FH_SDY | 12), "\\Device\\Harddisk24\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdy13", BRACK(FH_SDY | 13), "\\Device\\Harddisk24\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdy14", BRACK(FH_SDY | 14), "\\Device\\Harddisk24\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdy15", BRACK(FH_SDY | 15), "\\Device\\Harddisk24\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdz1", BRACK(FH_SDZ | 1), "\\Device\\Harddisk25\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdz2", BRACK(FH_SDZ | 2), "\\Device\\Harddisk25\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdz3", BRACK(FH_SDZ | 3), "\\Device\\Harddisk25\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdz4", BRACK(FH_SDZ | 4), "\\Device\\Harddisk25\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdz5", BRACK(FH_SDZ | 5), "\\Device\\Harddisk25\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdz6", BRACK(FH_SDZ | 6), "\\Device\\Harddisk25\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdz7", BRACK(FH_SDZ | 7), "\\Device\\Harddisk25\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdz8", BRACK(FH_SDZ | 8), "\\Device\\Harddisk25\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdz9", BRACK(FH_SDZ | 9), "\\Device\\Harddisk25\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdz10", BRACK(FH_SDZ | 10), "\\Device\\Harddisk25\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdz11", BRACK(FH_SDZ | 11), "\\Device\\Harddisk25\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdz12", BRACK(FH_SDZ | 12), "\\Device\\Harddisk25\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdz13", BRACK(FH_SDZ | 13), "\\Device\\Harddisk25\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdz14", BRACK(FH_SDZ | 14), "\\Device\\Harddisk25\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdz15", BRACK(FH_SDZ | 15), "\\Device\\Harddisk25\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa", BRACK(FH_SDAA), "\\Device\\Harddisk26\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdab", BRACK(FH_SDAB), "\\Device\\Harddisk27\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdac", BRACK(FH_SDAC), "\\Device\\Harddisk28\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdad", BRACK(FH_SDAD), "\\Device\\Harddisk29\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdae", BRACK(FH_SDAE), "\\Device\\Harddisk30\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf", BRACK(FH_SDAF), "\\Device\\Harddisk31\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdag", BRACK(FH_SDAG), "\\Device\\Harddisk32\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdah", BRACK(FH_SDAH), "\\Device\\Harddisk33\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdai", BRACK(FH_SDAI), "\\Device\\Harddisk34\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj", BRACK(FH_SDAJ), "\\Device\\Harddisk35\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdak", BRACK(FH_SDAK), "\\Device\\Harddisk36\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdal", BRACK(FH_SDAL), "\\Device\\Harddisk37\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdam", BRACK(FH_SDAM), "\\Device\\Harddisk38\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdan", BRACK(FH_SDAN), "\\Device\\Harddisk39\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdao", BRACK(FH_SDAO), "\\Device\\Harddisk40\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdap", BRACK(FH_SDAP), "\\Device\\Harddisk41\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq", BRACK(FH_SDAQ), "\\Device\\Harddisk42\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdar", BRACK(FH_SDAR), "\\Device\\Harddisk43\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdas", BRACK(FH_SDAS), "\\Device\\Harddisk44\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdat", BRACK(FH_SDAT), "\\Device\\Harddisk45\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdau", BRACK(FH_SDAU), "\\Device\\Harddisk46\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdav", BRACK(FH_SDAV), "\\Device\\Harddisk47\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw", BRACK(FH_SDAW), "\\Device\\Harddisk48\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdax", BRACK(FH_SDAX), "\\Device\\Harddisk49\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sday", BRACK(FH_SDAY), "\\Device\\Harddisk50\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz", BRACK(FH_SDAZ), "\\Device\\Harddisk51\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa1", BRACK(FH_SDAA | 1), "\\Device\\Harddisk26\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa2", BRACK(FH_SDAA | 2), "\\Device\\Harddisk26\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa3", BRACK(FH_SDAA | 3), "\\Device\\Harddisk26\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa4", BRACK(FH_SDAA | 4), "\\Device\\Harddisk26\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa5", BRACK(FH_SDAA | 5), "\\Device\\Harddisk26\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa6", BRACK(FH_SDAA | 6), "\\Device\\Harddisk26\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa7", BRACK(FH_SDAA | 7), "\\Device\\Harddisk26\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa8", BRACK(FH_SDAA | 8), "\\Device\\Harddisk26\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa9", BRACK(FH_SDAA | 9), "\\Device\\Harddisk26\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa10", BRACK(FH_SDAA | 10), "\\Device\\Harddisk26\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa11", BRACK(FH_SDAA | 11), "\\Device\\Harddisk26\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa12", BRACK(FH_SDAA | 12), "\\Device\\Harddisk26\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa13", BRACK(FH_SDAA | 13), "\\Device\\Harddisk26\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa14", BRACK(FH_SDAA | 14), "\\Device\\Harddisk26\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdaa15", BRACK(FH_SDAA | 15), "\\Device\\Harddisk26\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdab1", BRACK(FH_SDAB | 1), "\\Device\\Harddisk27\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdab2", BRACK(FH_SDAB | 2), "\\Device\\Harddisk27\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdab3", BRACK(FH_SDAB | 3), "\\Device\\Harddisk27\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdab4", BRACK(FH_SDAB | 4), "\\Device\\Harddisk27\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdab5", BRACK(FH_SDAB | 5), "\\Device\\Harddisk27\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdab6", BRACK(FH_SDAB | 6), "\\Device\\Harddisk27\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdab7", BRACK(FH_SDAB | 7), "\\Device\\Harddisk27\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdab8", BRACK(FH_SDAB | 8), "\\Device\\Harddisk27\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdab9", BRACK(FH_SDAB | 9), "\\Device\\Harddisk27\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdab10", BRACK(FH_SDAB | 10), "\\Device\\Harddisk27\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdab11", BRACK(FH_SDAB | 11), "\\Device\\Harddisk27\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdab12", BRACK(FH_SDAB | 12), "\\Device\\Harddisk27\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdab13", BRACK(FH_SDAB | 13), "\\Device\\Harddisk27\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdab14", BRACK(FH_SDAB | 14), "\\Device\\Harddisk27\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdab15", BRACK(FH_SDAB | 15), "\\Device\\Harddisk27\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdac1", BRACK(FH_SDAC | 1), "\\Device\\Harddisk28\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdac2", BRACK(FH_SDAC | 2), "\\Device\\Harddisk28\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdac3", BRACK(FH_SDAC | 3), "\\Device\\Harddisk28\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdac4", BRACK(FH_SDAC | 4), "\\Device\\Harddisk28\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdac5", BRACK(FH_SDAC | 5), "\\Device\\Harddisk28\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdac6", BRACK(FH_SDAC | 6), "\\Device\\Harddisk28\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdac7", BRACK(FH_SDAC | 7), "\\Device\\Harddisk28\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdac8", BRACK(FH_SDAC | 8), "\\Device\\Harddisk28\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdac9", BRACK(FH_SDAC | 9), "\\Device\\Harddisk28\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdac10", BRACK(FH_SDAC | 10), "\\Device\\Harddisk28\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdac11", BRACK(FH_SDAC | 11), "\\Device\\Harddisk28\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdac12", BRACK(FH_SDAC | 12), "\\Device\\Harddisk28\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdac13", BRACK(FH_SDAC | 13), "\\Device\\Harddisk28\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdac14", BRACK(FH_SDAC | 14), "\\Device\\Harddisk28\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdac15", BRACK(FH_SDAC | 15), "\\Device\\Harddisk28\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdad1", BRACK(FH_SDAD | 1), "\\Device\\Harddisk29\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdad2", BRACK(FH_SDAD | 2), "\\Device\\Harddisk29\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdad3", BRACK(FH_SDAD | 3), "\\Device\\Harddisk29\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdad4", BRACK(FH_SDAD | 4), "\\Device\\Harddisk29\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdad5", BRACK(FH_SDAD | 5), "\\Device\\Harddisk29\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdad6", BRACK(FH_SDAD | 6), "\\Device\\Harddisk29\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdad7", BRACK(FH_SDAD | 7), "\\Device\\Harddisk29\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdad8", BRACK(FH_SDAD | 8), "\\Device\\Harddisk29\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdad9", BRACK(FH_SDAD | 9), "\\Device\\Harddisk29\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdad10", BRACK(FH_SDAD | 10), "\\Device\\Harddisk29\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdad11", BRACK(FH_SDAD | 11), "\\Device\\Harddisk29\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdad12", BRACK(FH_SDAD | 12), "\\Device\\Harddisk29\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdad13", BRACK(FH_SDAD | 13), "\\Device\\Harddisk29\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdad14", BRACK(FH_SDAD | 14), "\\Device\\Harddisk29\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdad15", BRACK(FH_SDAD | 15), "\\Device\\Harddisk29\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdae1", BRACK(FH_SDAE | 1), "\\Device\\Harddisk30\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdae2", BRACK(FH_SDAE | 2), "\\Device\\Harddisk30\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdae3", BRACK(FH_SDAE | 3), "\\Device\\Harddisk30\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdae4", BRACK(FH_SDAE | 4), "\\Device\\Harddisk30\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdae5", BRACK(FH_SDAE | 5), "\\Device\\Harddisk30\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdae6", BRACK(FH_SDAE | 6), "\\Device\\Harddisk30\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdae7", BRACK(FH_SDAE | 7), "\\Device\\Harddisk30\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdae8", BRACK(FH_SDAE | 8), "\\Device\\Harddisk30\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdae9", BRACK(FH_SDAE | 9), "\\Device\\Harddisk30\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdae10", BRACK(FH_SDAE | 10), "\\Device\\Harddisk30\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdae11", BRACK(FH_SDAE | 11), "\\Device\\Harddisk30\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdae12", BRACK(FH_SDAE | 12), "\\Device\\Harddisk30\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdae13", BRACK(FH_SDAE | 13), "\\Device\\Harddisk30\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdae14", BRACK(FH_SDAE | 14), "\\Device\\Harddisk30\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdae15", BRACK(FH_SDAE | 15), "\\Device\\Harddisk30\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf1", BRACK(FH_SDAF | 1), "\\Device\\Harddisk31\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf2", BRACK(FH_SDAF | 2), "\\Device\\Harddisk31\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf3", BRACK(FH_SDAF | 3), "\\Device\\Harddisk31\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf4", BRACK(FH_SDAF | 4), "\\Device\\Harddisk31\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf5", BRACK(FH_SDAF | 5), "\\Device\\Harddisk31\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf6", BRACK(FH_SDAF | 6), "\\Device\\Harddisk31\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf7", BRACK(FH_SDAF | 7), "\\Device\\Harddisk31\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf8", BRACK(FH_SDAF | 8), "\\Device\\Harddisk31\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf9", BRACK(FH_SDAF | 9), "\\Device\\Harddisk31\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf10", BRACK(FH_SDAF | 10), "\\Device\\Harddisk31\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf11", BRACK(FH_SDAF | 11), "\\Device\\Harddisk31\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf12", BRACK(FH_SDAF | 12), "\\Device\\Harddisk31\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf13", BRACK(FH_SDAF | 13), "\\Device\\Harddisk31\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf14", BRACK(FH_SDAF | 14), "\\Device\\Harddisk31\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdaf15", BRACK(FH_SDAF | 15), "\\Device\\Harddisk31\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdag1", BRACK(FH_SDAG | 1), "\\Device\\Harddisk32\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdag2", BRACK(FH_SDAG | 2), "\\Device\\Harddisk32\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdag3", BRACK(FH_SDAG | 3), "\\Device\\Harddisk32\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdag4", BRACK(FH_SDAG | 4), "\\Device\\Harddisk32\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdag5", BRACK(FH_SDAG | 5), "\\Device\\Harddisk32\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdag6", BRACK(FH_SDAG | 6), "\\Device\\Harddisk32\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdag7", BRACK(FH_SDAG | 7), "\\Device\\Harddisk32\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdag8", BRACK(FH_SDAG | 8), "\\Device\\Harddisk32\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdag9", BRACK(FH_SDAG | 9), "\\Device\\Harddisk32\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdag10", BRACK(FH_SDAG | 10), "\\Device\\Harddisk32\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdag11", BRACK(FH_SDAG | 11), "\\Device\\Harddisk32\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdag12", BRACK(FH_SDAG | 12), "\\Device\\Harddisk32\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdag13", BRACK(FH_SDAG | 13), "\\Device\\Harddisk32\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdag14", BRACK(FH_SDAG | 14), "\\Device\\Harddisk32\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdag15", BRACK(FH_SDAG | 15), "\\Device\\Harddisk32\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdah1", BRACK(FH_SDAH | 1), "\\Device\\Harddisk33\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdah2", BRACK(FH_SDAH | 2), "\\Device\\Harddisk33\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdah3", BRACK(FH_SDAH | 3), "\\Device\\Harddisk33\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdah4", BRACK(FH_SDAH | 4), "\\Device\\Harddisk33\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdah5", BRACK(FH_SDAH | 5), "\\Device\\Harddisk33\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdah6", BRACK(FH_SDAH | 6), "\\Device\\Harddisk33\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdah7", BRACK(FH_SDAH | 7), "\\Device\\Harddisk33\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdah8", BRACK(FH_SDAH | 8), "\\Device\\Harddisk33\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdah9", BRACK(FH_SDAH | 9), "\\Device\\Harddisk33\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdah10", BRACK(FH_SDAH | 10), "\\Device\\Harddisk33\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdah11", BRACK(FH_SDAH | 11), "\\Device\\Harddisk33\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdah12", BRACK(FH_SDAH | 12), "\\Device\\Harddisk33\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdah13", BRACK(FH_SDAH | 13), "\\Device\\Harddisk33\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdah14", BRACK(FH_SDAH | 14), "\\Device\\Harddisk33\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdah15", BRACK(FH_SDAH | 15), "\\Device\\Harddisk33\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdai1", BRACK(FH_SDAI | 1), "\\Device\\Harddisk34\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdai2", BRACK(FH_SDAI | 2), "\\Device\\Harddisk34\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdai3", BRACK(FH_SDAI | 3), "\\Device\\Harddisk34\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdai4", BRACK(FH_SDAI | 4), "\\Device\\Harddisk34\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdai5", BRACK(FH_SDAI | 5), "\\Device\\Harddisk34\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdai6", BRACK(FH_SDAI | 6), "\\Device\\Harddisk34\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdai7", BRACK(FH_SDAI | 7), "\\Device\\Harddisk34\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdai8", BRACK(FH_SDAI | 8), "\\Device\\Harddisk34\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdai9", BRACK(FH_SDAI | 9), "\\Device\\Harddisk34\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdai10", BRACK(FH_SDAI | 10), "\\Device\\Harddisk34\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdai11", BRACK(FH_SDAI | 11), "\\Device\\Harddisk34\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdai12", BRACK(FH_SDAI | 12), "\\Device\\Harddisk34\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdai13", BRACK(FH_SDAI | 13), "\\Device\\Harddisk34\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdai14", BRACK(FH_SDAI | 14), "\\Device\\Harddisk34\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdai15", BRACK(FH_SDAI | 15), "\\Device\\Harddisk34\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj1", BRACK(FH_SDAJ | 1), "\\Device\\Harddisk35\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj2", BRACK(FH_SDAJ | 2), "\\Device\\Harddisk35\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj3", BRACK(FH_SDAJ | 3), "\\Device\\Harddisk35\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj4", BRACK(FH_SDAJ | 4), "\\Device\\Harddisk35\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj5", BRACK(FH_SDAJ | 5), "\\Device\\Harddisk35\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj6", BRACK(FH_SDAJ | 6), "\\Device\\Harddisk35\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj7", BRACK(FH_SDAJ | 7), "\\Device\\Harddisk35\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj8", BRACK(FH_SDAJ | 8), "\\Device\\Harddisk35\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj9", BRACK(FH_SDAJ | 9), "\\Device\\Harddisk35\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj10", BRACK(FH_SDAJ | 10), "\\Device\\Harddisk35\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj11", BRACK(FH_SDAJ | 11), "\\Device\\Harddisk35\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj12", BRACK(FH_SDAJ | 12), "\\Device\\Harddisk35\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj13", BRACK(FH_SDAJ | 13), "\\Device\\Harddisk35\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj14", BRACK(FH_SDAJ | 14), "\\Device\\Harddisk35\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdaj15", BRACK(FH_SDAJ | 15), "\\Device\\Harddisk35\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdak1", BRACK(FH_SDAK | 1), "\\Device\\Harddisk36\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdak2", BRACK(FH_SDAK | 2), "\\Device\\Harddisk36\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdak3", BRACK(FH_SDAK | 3), "\\Device\\Harddisk36\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdak4", BRACK(FH_SDAK | 4), "\\Device\\Harddisk36\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdak5", BRACK(FH_SDAK | 5), "\\Device\\Harddisk36\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdak6", BRACK(FH_SDAK | 6), "\\Device\\Harddisk36\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdak7", BRACK(FH_SDAK | 7), "\\Device\\Harddisk36\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdak8", BRACK(FH_SDAK | 8), "\\Device\\Harddisk36\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdak9", BRACK(FH_SDAK | 9), "\\Device\\Harddisk36\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdak10", BRACK(FH_SDAK | 10), "\\Device\\Harddisk36\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdak11", BRACK(FH_SDAK | 11), "\\Device\\Harddisk36\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdak12", BRACK(FH_SDAK | 12), "\\Device\\Harddisk36\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdak13", BRACK(FH_SDAK | 13), "\\Device\\Harddisk36\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdak14", BRACK(FH_SDAK | 14), "\\Device\\Harddisk36\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdak15", BRACK(FH_SDAK | 15), "\\Device\\Harddisk36\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdal1", BRACK(FH_SDAL | 1), "\\Device\\Harddisk37\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdal2", BRACK(FH_SDAL | 2), "\\Device\\Harddisk37\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdal3", BRACK(FH_SDAL | 3), "\\Device\\Harddisk37\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdal4", BRACK(FH_SDAL | 4), "\\Device\\Harddisk37\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdal5", BRACK(FH_SDAL | 5), "\\Device\\Harddisk37\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdal6", BRACK(FH_SDAL | 6), "\\Device\\Harddisk37\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdal7", BRACK(FH_SDAL | 7), "\\Device\\Harddisk37\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdal8", BRACK(FH_SDAL | 8), "\\Device\\Harddisk37\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdal9", BRACK(FH_SDAL | 9), "\\Device\\Harddisk37\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdal10", BRACK(FH_SDAL | 10), "\\Device\\Harddisk37\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdal11", BRACK(FH_SDAL | 11), "\\Device\\Harddisk37\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdal12", BRACK(FH_SDAL | 12), "\\Device\\Harddisk37\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdal13", BRACK(FH_SDAL | 13), "\\Device\\Harddisk37\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdal14", BRACK(FH_SDAL | 14), "\\Device\\Harddisk37\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdal15", BRACK(FH_SDAL | 15), "\\Device\\Harddisk37\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdam1", BRACK(FH_SDAM | 1), "\\Device\\Harddisk38\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdam2", BRACK(FH_SDAM | 2), "\\Device\\Harddisk38\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdam3", BRACK(FH_SDAM | 3), "\\Device\\Harddisk38\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdam4", BRACK(FH_SDAM | 4), "\\Device\\Harddisk38\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdam5", BRACK(FH_SDAM | 5), "\\Device\\Harddisk38\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdam6", BRACK(FH_SDAM | 6), "\\Device\\Harddisk38\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdam7", BRACK(FH_SDAM | 7), "\\Device\\Harddisk38\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdam8", BRACK(FH_SDAM | 8), "\\Device\\Harddisk38\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdam9", BRACK(FH_SDAM | 9), "\\Device\\Harddisk38\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdam10", BRACK(FH_SDAM | 10), "\\Device\\Harddisk38\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdam11", BRACK(FH_SDAM | 11), "\\Device\\Harddisk38\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdam12", BRACK(FH_SDAM | 12), "\\Device\\Harddisk38\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdam13", BRACK(FH_SDAM | 13), "\\Device\\Harddisk38\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdam14", BRACK(FH_SDAM | 14), "\\Device\\Harddisk38\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdam15", BRACK(FH_SDAM | 15), "\\Device\\Harddisk38\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdan1", BRACK(FH_SDAN | 1), "\\Device\\Harddisk39\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdan2", BRACK(FH_SDAN | 2), "\\Device\\Harddisk39\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdan3", BRACK(FH_SDAN | 3), "\\Device\\Harddisk39\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdan4", BRACK(FH_SDAN | 4), "\\Device\\Harddisk39\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdan5", BRACK(FH_SDAN | 5), "\\Device\\Harddisk39\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdan6", BRACK(FH_SDAN | 6), "\\Device\\Harddisk39\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdan7", BRACK(FH_SDAN | 7), "\\Device\\Harddisk39\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdan8", BRACK(FH_SDAN | 8), "\\Device\\Harddisk39\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdan9", BRACK(FH_SDAN | 9), "\\Device\\Harddisk39\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdan10", BRACK(FH_SDAN | 10), "\\Device\\Harddisk39\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdan11", BRACK(FH_SDAN | 11), "\\Device\\Harddisk39\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdan12", BRACK(FH_SDAN | 12), "\\Device\\Harddisk39\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdan13", BRACK(FH_SDAN | 13), "\\Device\\Harddisk39\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdan14", BRACK(FH_SDAN | 14), "\\Device\\Harddisk39\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdan15", BRACK(FH_SDAN | 15), "\\Device\\Harddisk39\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdao1", BRACK(FH_SDAO | 1), "\\Device\\Harddisk40\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdao2", BRACK(FH_SDAO | 2), "\\Device\\Harddisk40\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdao3", BRACK(FH_SDAO | 3), "\\Device\\Harddisk40\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdao4", BRACK(FH_SDAO | 4), "\\Device\\Harddisk40\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdao5", BRACK(FH_SDAO | 5), "\\Device\\Harddisk40\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdao6", BRACK(FH_SDAO | 6), "\\Device\\Harddisk40\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdao7", BRACK(FH_SDAO | 7), "\\Device\\Harddisk40\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdao8", BRACK(FH_SDAO | 8), "\\Device\\Harddisk40\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdao9", BRACK(FH_SDAO | 9), "\\Device\\Harddisk40\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdao10", BRACK(FH_SDAO | 10), "\\Device\\Harddisk40\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdao11", BRACK(FH_SDAO | 11), "\\Device\\Harddisk40\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdao12", BRACK(FH_SDAO | 12), "\\Device\\Harddisk40\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdao13", BRACK(FH_SDAO | 13), "\\Device\\Harddisk40\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdao14", BRACK(FH_SDAO | 14), "\\Device\\Harddisk40\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdao15", BRACK(FH_SDAO | 15), "\\Device\\Harddisk40\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdap1", BRACK(FH_SDAP | 1), "\\Device\\Harddisk41\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdap2", BRACK(FH_SDAP | 2), "\\Device\\Harddisk41\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdap3", BRACK(FH_SDAP | 3), "\\Device\\Harddisk41\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdap4", BRACK(FH_SDAP | 4), "\\Device\\Harddisk41\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdap5", BRACK(FH_SDAP | 5), "\\Device\\Harddisk41\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdap6", BRACK(FH_SDAP | 6), "\\Device\\Harddisk41\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdap7", BRACK(FH_SDAP | 7), "\\Device\\Harddisk41\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdap8", BRACK(FH_SDAP | 8), "\\Device\\Harddisk41\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdap9", BRACK(FH_SDAP | 9), "\\Device\\Harddisk41\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdap10", BRACK(FH_SDAP | 10), "\\Device\\Harddisk41\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdap11", BRACK(FH_SDAP | 11), "\\Device\\Harddisk41\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdap12", BRACK(FH_SDAP | 12), "\\Device\\Harddisk41\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdap13", BRACK(FH_SDAP | 13), "\\Device\\Harddisk41\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdap14", BRACK(FH_SDAP | 14), "\\Device\\Harddisk41\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdap15", BRACK(FH_SDAP | 15), "\\Device\\Harddisk41\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq1", BRACK(FH_SDAQ | 1), "\\Device\\Harddisk42\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq2", BRACK(FH_SDAQ | 2), "\\Device\\Harddisk42\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq3", BRACK(FH_SDAQ | 3), "\\Device\\Harddisk42\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq4", BRACK(FH_SDAQ | 4), "\\Device\\Harddisk42\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq5", BRACK(FH_SDAQ | 5), "\\Device\\Harddisk42\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq6", BRACK(FH_SDAQ | 6), "\\Device\\Harddisk42\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq7", BRACK(FH_SDAQ | 7), "\\Device\\Harddisk42\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq8", BRACK(FH_SDAQ | 8), "\\Device\\Harddisk42\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq9", BRACK(FH_SDAQ | 9), "\\Device\\Harddisk42\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq10", BRACK(FH_SDAQ | 10), "\\Device\\Harddisk42\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq11", BRACK(FH_SDAQ | 11), "\\Device\\Harddisk42\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq12", BRACK(FH_SDAQ | 12), "\\Device\\Harddisk42\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq13", BRACK(FH_SDAQ | 13), "\\Device\\Harddisk42\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq14", BRACK(FH_SDAQ | 14), "\\Device\\Harddisk42\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdaq15", BRACK(FH_SDAQ | 15), "\\Device\\Harddisk42\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdar1", BRACK(FH_SDAR | 1), "\\Device\\Harddisk43\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdar2", BRACK(FH_SDAR | 2), "\\Device\\Harddisk43\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdar3", BRACK(FH_SDAR | 3), "\\Device\\Harddisk43\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdar4", BRACK(FH_SDAR | 4), "\\Device\\Harddisk43\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdar5", BRACK(FH_SDAR | 5), "\\Device\\Harddisk43\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdar6", BRACK(FH_SDAR | 6), "\\Device\\Harddisk43\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdar7", BRACK(FH_SDAR | 7), "\\Device\\Harddisk43\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdar8", BRACK(FH_SDAR | 8), "\\Device\\Harddisk43\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdar9", BRACK(FH_SDAR | 9), "\\Device\\Harddisk43\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdar10", BRACK(FH_SDAR | 10), "\\Device\\Harddisk43\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdar11", BRACK(FH_SDAR | 11), "\\Device\\Harddisk43\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdar12", BRACK(FH_SDAR | 12), "\\Device\\Harddisk43\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdar13", BRACK(FH_SDAR | 13), "\\Device\\Harddisk43\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdar14", BRACK(FH_SDAR | 14), "\\Device\\Harddisk43\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdar15", BRACK(FH_SDAR | 15), "\\Device\\Harddisk43\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdas1", BRACK(FH_SDAS | 1), "\\Device\\Harddisk44\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdas2", BRACK(FH_SDAS | 2), "\\Device\\Harddisk44\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdas3", BRACK(FH_SDAS | 3), "\\Device\\Harddisk44\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdas4", BRACK(FH_SDAS | 4), "\\Device\\Harddisk44\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdas5", BRACK(FH_SDAS | 5), "\\Device\\Harddisk44\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdas6", BRACK(FH_SDAS | 6), "\\Device\\Harddisk44\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdas7", BRACK(FH_SDAS | 7), "\\Device\\Harddisk44\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdas8", BRACK(FH_SDAS | 8), "\\Device\\Harddisk44\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdas9", BRACK(FH_SDAS | 9), "\\Device\\Harddisk44\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdas10", BRACK(FH_SDAS | 10), "\\Device\\Harddisk44\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdas11", BRACK(FH_SDAS | 11), "\\Device\\Harddisk44\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdas12", BRACK(FH_SDAS | 12), "\\Device\\Harddisk44\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdas13", BRACK(FH_SDAS | 13), "\\Device\\Harddisk44\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdas14", BRACK(FH_SDAS | 14), "\\Device\\Harddisk44\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdas15", BRACK(FH_SDAS | 15), "\\Device\\Harddisk44\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdat1", BRACK(FH_SDAT | 1), "\\Device\\Harddisk45\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdat2", BRACK(FH_SDAT | 2), "\\Device\\Harddisk45\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdat3", BRACK(FH_SDAT | 3), "\\Device\\Harddisk45\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdat4", BRACK(FH_SDAT | 4), "\\Device\\Harddisk45\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdat5", BRACK(FH_SDAT | 5), "\\Device\\Harddisk45\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdat6", BRACK(FH_SDAT | 6), "\\Device\\Harddisk45\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdat7", BRACK(FH_SDAT | 7), "\\Device\\Harddisk45\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdat8", BRACK(FH_SDAT | 8), "\\Device\\Harddisk45\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdat9", BRACK(FH_SDAT | 9), "\\Device\\Harddisk45\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdat10", BRACK(FH_SDAT | 10), "\\Device\\Harddisk45\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdat11", BRACK(FH_SDAT | 11), "\\Device\\Harddisk45\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdat12", BRACK(FH_SDAT | 12), "\\Device\\Harddisk45\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdat13", BRACK(FH_SDAT | 13), "\\Device\\Harddisk45\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdat14", BRACK(FH_SDAT | 14), "\\Device\\Harddisk45\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdat15", BRACK(FH_SDAT | 15), "\\Device\\Harddisk45\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdau1", BRACK(FH_SDAU | 1), "\\Device\\Harddisk46\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdau2", BRACK(FH_SDAU | 2), "\\Device\\Harddisk46\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdau3", BRACK(FH_SDAU | 3), "\\Device\\Harddisk46\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdau4", BRACK(FH_SDAU | 4), "\\Device\\Harddisk46\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdau5", BRACK(FH_SDAU | 5), "\\Device\\Harddisk46\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdau6", BRACK(FH_SDAU | 6), "\\Device\\Harddisk46\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdau7", BRACK(FH_SDAU | 7), "\\Device\\Harddisk46\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdau8", BRACK(FH_SDAU | 8), "\\Device\\Harddisk46\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdau9", BRACK(FH_SDAU | 9), "\\Device\\Harddisk46\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdau10", BRACK(FH_SDAU | 10), "\\Device\\Harddisk46\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdau11", BRACK(FH_SDAU | 11), "\\Device\\Harddisk46\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdau12", BRACK(FH_SDAU | 12), "\\Device\\Harddisk46\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdau13", BRACK(FH_SDAU | 13), "\\Device\\Harddisk46\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdau14", BRACK(FH_SDAU | 14), "\\Device\\Harddisk46\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdau15", BRACK(FH_SDAU | 15), "\\Device\\Harddisk46\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdav1", BRACK(FH_SDAV | 1), "\\Device\\Harddisk47\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdav2", BRACK(FH_SDAV | 2), "\\Device\\Harddisk47\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdav3", BRACK(FH_SDAV | 3), "\\Device\\Harddisk47\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdav4", BRACK(FH_SDAV | 4), "\\Device\\Harddisk47\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdav5", BRACK(FH_SDAV | 5), "\\Device\\Harddisk47\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdav6", BRACK(FH_SDAV | 6), "\\Device\\Harddisk47\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdav7", BRACK(FH_SDAV | 7), "\\Device\\Harddisk47\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdav8", BRACK(FH_SDAV | 8), "\\Device\\Harddisk47\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdav9", BRACK(FH_SDAV | 9), "\\Device\\Harddisk47\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdav10", BRACK(FH_SDAV | 10), "\\Device\\Harddisk47\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdav11", BRACK(FH_SDAV | 11), "\\Device\\Harddisk47\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdav12", BRACK(FH_SDAV | 12), "\\Device\\Harddisk47\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdav13", BRACK(FH_SDAV | 13), "\\Device\\Harddisk47\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdav14", BRACK(FH_SDAV | 14), "\\Device\\Harddisk47\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdav15", BRACK(FH_SDAV | 15), "\\Device\\Harddisk47\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw1", BRACK(FH_SDAW | 1), "\\Device\\Harddisk48\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw2", BRACK(FH_SDAW | 2), "\\Device\\Harddisk48\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw3", BRACK(FH_SDAW | 3), "\\Device\\Harddisk48\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw4", BRACK(FH_SDAW | 4), "\\Device\\Harddisk48\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw5", BRACK(FH_SDAW | 5), "\\Device\\Harddisk48\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw6", BRACK(FH_SDAW | 6), "\\Device\\Harddisk48\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw7", BRACK(FH_SDAW | 7), "\\Device\\Harddisk48\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw8", BRACK(FH_SDAW | 8), "\\Device\\Harddisk48\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw9", BRACK(FH_SDAW | 9), "\\Device\\Harddisk48\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw10", BRACK(FH_SDAW | 10), "\\Device\\Harddisk48\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw11", BRACK(FH_SDAW | 11), "\\Device\\Harddisk48\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw12", BRACK(FH_SDAW | 12), "\\Device\\Harddisk48\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw13", BRACK(FH_SDAW | 13), "\\Device\\Harddisk48\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw14", BRACK(FH_SDAW | 14), "\\Device\\Harddisk48\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdaw15", BRACK(FH_SDAW | 15), "\\Device\\Harddisk48\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdax1", BRACK(FH_SDAX | 1), "\\Device\\Harddisk49\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdax2", BRACK(FH_SDAX | 2), "\\Device\\Harddisk49\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdax3", BRACK(FH_SDAX | 3), "\\Device\\Harddisk49\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdax4", BRACK(FH_SDAX | 4), "\\Device\\Harddisk49\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdax5", BRACK(FH_SDAX | 5), "\\Device\\Harddisk49\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdax6", BRACK(FH_SDAX | 6), "\\Device\\Harddisk49\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdax7", BRACK(FH_SDAX | 7), "\\Device\\Harddisk49\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdax8", BRACK(FH_SDAX | 8), "\\Device\\Harddisk49\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdax9", BRACK(FH_SDAX | 9), "\\Device\\Harddisk49\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdax10", BRACK(FH_SDAX | 10), "\\Device\\Harddisk49\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdax11", BRACK(FH_SDAX | 11), "\\Device\\Harddisk49\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdax12", BRACK(FH_SDAX | 12), "\\Device\\Harddisk49\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdax13", BRACK(FH_SDAX | 13), "\\Device\\Harddisk49\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdax14", BRACK(FH_SDAX | 14), "\\Device\\Harddisk49\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdax15", BRACK(FH_SDAX | 15), "\\Device\\Harddisk49\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sday1", BRACK(FH_SDAY | 1), "\\Device\\Harddisk50\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sday2", BRACK(FH_SDAY | 2), "\\Device\\Harddisk50\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sday3", BRACK(FH_SDAY | 3), "\\Device\\Harddisk50\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sday4", BRACK(FH_SDAY | 4), "\\Device\\Harddisk50\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sday5", BRACK(FH_SDAY | 5), "\\Device\\Harddisk50\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sday6", BRACK(FH_SDAY | 6), "\\Device\\Harddisk50\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sday7", BRACK(FH_SDAY | 7), "\\Device\\Harddisk50\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sday8", BRACK(FH_SDAY | 8), "\\Device\\Harddisk50\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sday9", BRACK(FH_SDAY | 9), "\\Device\\Harddisk50\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sday10", BRACK(FH_SDAY | 10), "\\Device\\Harddisk50\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sday11", BRACK(FH_SDAY | 11), "\\Device\\Harddisk50\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sday12", BRACK(FH_SDAY | 12), "\\Device\\Harddisk50\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sday13", BRACK(FH_SDAY | 13), "\\Device\\Harddisk50\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sday14", BRACK(FH_SDAY | 14), "\\Device\\Harddisk50\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sday15", BRACK(FH_SDAY | 15), "\\Device\\Harddisk50\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz1", BRACK(FH_SDAZ | 1), "\\Device\\Harddisk51\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz2", BRACK(FH_SDAZ | 2), "\\Device\\Harddisk51\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz3", BRACK(FH_SDAZ | 3), "\\Device\\Harddisk51\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz4", BRACK(FH_SDAZ | 4), "\\Device\\Harddisk51\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz5", BRACK(FH_SDAZ | 5), "\\Device\\Harddisk51\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz6", BRACK(FH_SDAZ | 6), "\\Device\\Harddisk51\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz7", BRACK(FH_SDAZ | 7), "\\Device\\Harddisk51\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz8", BRACK(FH_SDAZ | 8), "\\Device\\Harddisk51\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz9", BRACK(FH_SDAZ | 9), "\\Device\\Harddisk51\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz10", BRACK(FH_SDAZ | 10), "\\Device\\Harddisk51\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz11", BRACK(FH_SDAZ | 11), "\\Device\\Harddisk51\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz12", BRACK(FH_SDAZ | 12), "\\Device\\Harddisk51\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz13", BRACK(FH_SDAZ | 13), "\\Device\\Harddisk51\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz14", BRACK(FH_SDAZ | 14), "\\Device\\Harddisk51\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdaz15", BRACK(FH_SDAZ | 15), "\\Device\\Harddisk51\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdba", BRACK(FH_SDBA), "\\Device\\Harddisk52\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb", BRACK(FH_SDBB), "\\Device\\Harddisk53\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc", BRACK(FH_SDBC), "\\Device\\Harddisk54\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd", BRACK(FH_SDBD), "\\Device\\Harddisk55\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe", BRACK(FH_SDBE), "\\Device\\Harddisk56\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf", BRACK(FH_SDBF), "\\Device\\Harddisk57\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg", BRACK(FH_SDBG), "\\Device\\Harddisk58\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh", BRACK(FH_SDBH), "\\Device\\Harddisk59\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi", BRACK(FH_SDBI), "\\Device\\Harddisk60\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj", BRACK(FH_SDBJ), "\\Device\\Harddisk61\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk", BRACK(FH_SDBK), "\\Device\\Harddisk62\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl", BRACK(FH_SDBL), "\\Device\\Harddisk63\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm", BRACK(FH_SDBM), "\\Device\\Harddisk64\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn", BRACK(FH_SDBN), "\\Device\\Harddisk65\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo", BRACK(FH_SDBO), "\\Device\\Harddisk66\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp", BRACK(FH_SDBP), "\\Device\\Harddisk67\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq", BRACK(FH_SDBQ), "\\Device\\Harddisk68\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr", BRACK(FH_SDBR), "\\Device\\Harddisk69\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs", BRACK(FH_SDBS), "\\Device\\Harddisk70\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt", BRACK(FH_SDBT), "\\Device\\Harddisk71\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu", BRACK(FH_SDBU), "\\Device\\Harddisk72\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv", BRACK(FH_SDBV), "\\Device\\Harddisk73\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw", BRACK(FH_SDBW), "\\Device\\Harddisk74\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx", BRACK(FH_SDBX), "\\Device\\Harddisk75\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdby", BRACK(FH_SDBY), "\\Device\\Harddisk76\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz", BRACK(FH_SDBZ), "\\Device\\Harddisk77\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdba1", BRACK(FH_SDBA | 1), "\\Device\\Harddisk52\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdba2", BRACK(FH_SDBA | 2), "\\Device\\Harddisk52\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdba3", BRACK(FH_SDBA | 3), "\\Device\\Harddisk52\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdba4", BRACK(FH_SDBA | 4), "\\Device\\Harddisk52\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdba5", BRACK(FH_SDBA | 5), "\\Device\\Harddisk52\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdba6", BRACK(FH_SDBA | 6), "\\Device\\Harddisk52\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdba7", BRACK(FH_SDBA | 7), "\\Device\\Harddisk52\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdba8", BRACK(FH_SDBA | 8), "\\Device\\Harddisk52\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdba9", BRACK(FH_SDBA | 9), "\\Device\\Harddisk52\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdba10", BRACK(FH_SDBA | 10), "\\Device\\Harddisk52\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdba11", BRACK(FH_SDBA | 11), "\\Device\\Harddisk52\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdba12", BRACK(FH_SDBA | 12), "\\Device\\Harddisk52\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdba13", BRACK(FH_SDBA | 13), "\\Device\\Harddisk52\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdba14", BRACK(FH_SDBA | 14), "\\Device\\Harddisk52\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdba15", BRACK(FH_SDBA | 15), "\\Device\\Harddisk52\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb1", BRACK(FH_SDBB | 1), "\\Device\\Harddisk53\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb2", BRACK(FH_SDBB | 2), "\\Device\\Harddisk53\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb3", BRACK(FH_SDBB | 3), "\\Device\\Harddisk53\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb4", BRACK(FH_SDBB | 4), "\\Device\\Harddisk53\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb5", BRACK(FH_SDBB | 5), "\\Device\\Harddisk53\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb6", BRACK(FH_SDBB | 6), "\\Device\\Harddisk53\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb7", BRACK(FH_SDBB | 7), "\\Device\\Harddisk53\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb8", BRACK(FH_SDBB | 8), "\\Device\\Harddisk53\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb9", BRACK(FH_SDBB | 9), "\\Device\\Harddisk53\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb10", BRACK(FH_SDBB | 10), "\\Device\\Harddisk53\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb11", BRACK(FH_SDBB | 11), "\\Device\\Harddisk53\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb12", BRACK(FH_SDBB | 12), "\\Device\\Harddisk53\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb13", BRACK(FH_SDBB | 13), "\\Device\\Harddisk53\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb14", BRACK(FH_SDBB | 14), "\\Device\\Harddisk53\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbb15", BRACK(FH_SDBB | 15), "\\Device\\Harddisk53\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc1", BRACK(FH_SDBC | 1), "\\Device\\Harddisk54\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc2", BRACK(FH_SDBC | 2), "\\Device\\Harddisk54\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc3", BRACK(FH_SDBC | 3), "\\Device\\Harddisk54\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc4", BRACK(FH_SDBC | 4), "\\Device\\Harddisk54\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc5", BRACK(FH_SDBC | 5), "\\Device\\Harddisk54\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc6", BRACK(FH_SDBC | 6), "\\Device\\Harddisk54\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc7", BRACK(FH_SDBC | 7), "\\Device\\Harddisk54\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc8", BRACK(FH_SDBC | 8), "\\Device\\Harddisk54\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc9", BRACK(FH_SDBC | 9), "\\Device\\Harddisk54\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc10", BRACK(FH_SDBC | 10), "\\Device\\Harddisk54\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc11", BRACK(FH_SDBC | 11), "\\Device\\Harddisk54\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc12", BRACK(FH_SDBC | 12), "\\Device\\Harddisk54\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc13", BRACK(FH_SDBC | 13), "\\Device\\Harddisk54\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc14", BRACK(FH_SDBC | 14), "\\Device\\Harddisk54\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbc15", BRACK(FH_SDBC | 15), "\\Device\\Harddisk54\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd1", BRACK(FH_SDBD | 1), "\\Device\\Harddisk55\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd2", BRACK(FH_SDBD | 2), "\\Device\\Harddisk55\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd3", BRACK(FH_SDBD | 3), "\\Device\\Harddisk55\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd4", BRACK(FH_SDBD | 4), "\\Device\\Harddisk55\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd5", BRACK(FH_SDBD | 5), "\\Device\\Harddisk55\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd6", BRACK(FH_SDBD | 6), "\\Device\\Harddisk55\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd7", BRACK(FH_SDBD | 7), "\\Device\\Harddisk55\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd8", BRACK(FH_SDBD | 8), "\\Device\\Harddisk55\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd9", BRACK(FH_SDBD | 9), "\\Device\\Harddisk55\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd10", BRACK(FH_SDBD | 10), "\\Device\\Harddisk55\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd11", BRACK(FH_SDBD | 11), "\\Device\\Harddisk55\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd12", BRACK(FH_SDBD | 12), "\\Device\\Harddisk55\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd13", BRACK(FH_SDBD | 13), "\\Device\\Harddisk55\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd14", BRACK(FH_SDBD | 14), "\\Device\\Harddisk55\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbd15", BRACK(FH_SDBD | 15), "\\Device\\Harddisk55\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe1", BRACK(FH_SDBE | 1), "\\Device\\Harddisk56\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe2", BRACK(FH_SDBE | 2), "\\Device\\Harddisk56\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe3", BRACK(FH_SDBE | 3), "\\Device\\Harddisk56\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe4", BRACK(FH_SDBE | 4), "\\Device\\Harddisk56\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe5", BRACK(FH_SDBE | 5), "\\Device\\Harddisk56\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe6", BRACK(FH_SDBE | 6), "\\Device\\Harddisk56\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe7", BRACK(FH_SDBE | 7), "\\Device\\Harddisk56\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe8", BRACK(FH_SDBE | 8), "\\Device\\Harddisk56\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe9", BRACK(FH_SDBE | 9), "\\Device\\Harddisk56\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe10", BRACK(FH_SDBE | 10), "\\Device\\Harddisk56\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe11", BRACK(FH_SDBE | 11), "\\Device\\Harddisk56\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe12", BRACK(FH_SDBE | 12), "\\Device\\Harddisk56\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe13", BRACK(FH_SDBE | 13), "\\Device\\Harddisk56\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe14", BRACK(FH_SDBE | 14), "\\Device\\Harddisk56\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbe15", BRACK(FH_SDBE | 15), "\\Device\\Harddisk56\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf1", BRACK(FH_SDBF | 1), "\\Device\\Harddisk57\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf2", BRACK(FH_SDBF | 2), "\\Device\\Harddisk57\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf3", BRACK(FH_SDBF | 3), "\\Device\\Harddisk57\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf4", BRACK(FH_SDBF | 4), "\\Device\\Harddisk57\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf5", BRACK(FH_SDBF | 5), "\\Device\\Harddisk57\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf6", BRACK(FH_SDBF | 6), "\\Device\\Harddisk57\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf7", BRACK(FH_SDBF | 7), "\\Device\\Harddisk57\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf8", BRACK(FH_SDBF | 8), "\\Device\\Harddisk57\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf9", BRACK(FH_SDBF | 9), "\\Device\\Harddisk57\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf10", BRACK(FH_SDBF | 10), "\\Device\\Harddisk57\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf11", BRACK(FH_SDBF | 11), "\\Device\\Harddisk57\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf12", BRACK(FH_SDBF | 12), "\\Device\\Harddisk57\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf13", BRACK(FH_SDBF | 13), "\\Device\\Harddisk57\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf14", BRACK(FH_SDBF | 14), "\\Device\\Harddisk57\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbf15", BRACK(FH_SDBF | 15), "\\Device\\Harddisk57\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg1", BRACK(FH_SDBG | 1), "\\Device\\Harddisk58\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg2", BRACK(FH_SDBG | 2), "\\Device\\Harddisk58\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg3", BRACK(FH_SDBG | 3), "\\Device\\Harddisk58\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg4", BRACK(FH_SDBG | 4), "\\Device\\Harddisk58\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg5", BRACK(FH_SDBG | 5), "\\Device\\Harddisk58\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg6", BRACK(FH_SDBG | 6), "\\Device\\Harddisk58\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg7", BRACK(FH_SDBG | 7), "\\Device\\Harddisk58\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg8", BRACK(FH_SDBG | 8), "\\Device\\Harddisk58\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg9", BRACK(FH_SDBG | 9), "\\Device\\Harddisk58\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg10", BRACK(FH_SDBG | 10), "\\Device\\Harddisk58\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg11", BRACK(FH_SDBG | 11), "\\Device\\Harddisk58\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg12", BRACK(FH_SDBG | 12), "\\Device\\Harddisk58\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg13", BRACK(FH_SDBG | 13), "\\Device\\Harddisk58\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg14", BRACK(FH_SDBG | 14), "\\Device\\Harddisk58\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbg15", BRACK(FH_SDBG | 15), "\\Device\\Harddisk58\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh1", BRACK(FH_SDBH | 1), "\\Device\\Harddisk59\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh2", BRACK(FH_SDBH | 2), "\\Device\\Harddisk59\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh3", BRACK(FH_SDBH | 3), "\\Device\\Harddisk59\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh4", BRACK(FH_SDBH | 4), "\\Device\\Harddisk59\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh5", BRACK(FH_SDBH | 5), "\\Device\\Harddisk59\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh6", BRACK(FH_SDBH | 6), "\\Device\\Harddisk59\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh7", BRACK(FH_SDBH | 7), "\\Device\\Harddisk59\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh8", BRACK(FH_SDBH | 8), "\\Device\\Harddisk59\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh9", BRACK(FH_SDBH | 9), "\\Device\\Harddisk59\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh10", BRACK(FH_SDBH | 10), "\\Device\\Harddisk59\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh11", BRACK(FH_SDBH | 11), "\\Device\\Harddisk59\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh12", BRACK(FH_SDBH | 12), "\\Device\\Harddisk59\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh13", BRACK(FH_SDBH | 13), "\\Device\\Harddisk59\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh14", BRACK(FH_SDBH | 14), "\\Device\\Harddisk59\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbh15", BRACK(FH_SDBH | 15), "\\Device\\Harddisk59\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi1", BRACK(FH_SDBI | 1), "\\Device\\Harddisk60\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi2", BRACK(FH_SDBI | 2), "\\Device\\Harddisk60\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi3", BRACK(FH_SDBI | 3), "\\Device\\Harddisk60\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi4", BRACK(FH_SDBI | 4), "\\Device\\Harddisk60\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi5", BRACK(FH_SDBI | 5), "\\Device\\Harddisk60\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi6", BRACK(FH_SDBI | 6), "\\Device\\Harddisk60\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi7", BRACK(FH_SDBI | 7), "\\Device\\Harddisk60\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi8", BRACK(FH_SDBI | 8), "\\Device\\Harddisk60\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi9", BRACK(FH_SDBI | 9), "\\Device\\Harddisk60\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi10", BRACK(FH_SDBI | 10), "\\Device\\Harddisk60\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi11", BRACK(FH_SDBI | 11), "\\Device\\Harddisk60\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi12", BRACK(FH_SDBI | 12), "\\Device\\Harddisk60\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi13", BRACK(FH_SDBI | 13), "\\Device\\Harddisk60\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi14", BRACK(FH_SDBI | 14), "\\Device\\Harddisk60\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbi15", BRACK(FH_SDBI | 15), "\\Device\\Harddisk60\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj1", BRACK(FH_SDBJ | 1), "\\Device\\Harddisk61\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj2", BRACK(FH_SDBJ | 2), "\\Device\\Harddisk61\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj3", BRACK(FH_SDBJ | 3), "\\Device\\Harddisk61\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj4", BRACK(FH_SDBJ | 4), "\\Device\\Harddisk61\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj5", BRACK(FH_SDBJ | 5), "\\Device\\Harddisk61\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj6", BRACK(FH_SDBJ | 6), "\\Device\\Harddisk61\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj7", BRACK(FH_SDBJ | 7), "\\Device\\Harddisk61\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj8", BRACK(FH_SDBJ | 8), "\\Device\\Harddisk61\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj9", BRACK(FH_SDBJ | 9), "\\Device\\Harddisk61\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj10", BRACK(FH_SDBJ | 10), "\\Device\\Harddisk61\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj11", BRACK(FH_SDBJ | 11), "\\Device\\Harddisk61\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj12", BRACK(FH_SDBJ | 12), "\\Device\\Harddisk61\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj13", BRACK(FH_SDBJ | 13), "\\Device\\Harddisk61\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj14", BRACK(FH_SDBJ | 14), "\\Device\\Harddisk61\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbj15", BRACK(FH_SDBJ | 15), "\\Device\\Harddisk61\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk1", BRACK(FH_SDBK | 1), "\\Device\\Harddisk62\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk2", BRACK(FH_SDBK | 2), "\\Device\\Harddisk62\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk3", BRACK(FH_SDBK | 3), "\\Device\\Harddisk62\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk4", BRACK(FH_SDBK | 4), "\\Device\\Harddisk62\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk5", BRACK(FH_SDBK | 5), "\\Device\\Harddisk62\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk6", BRACK(FH_SDBK | 6), "\\Device\\Harddisk62\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk7", BRACK(FH_SDBK | 7), "\\Device\\Harddisk62\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk8", BRACK(FH_SDBK | 8), "\\Device\\Harddisk62\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk9", BRACK(FH_SDBK | 9), "\\Device\\Harddisk62\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk10", BRACK(FH_SDBK | 10), "\\Device\\Harddisk62\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk11", BRACK(FH_SDBK | 11), "\\Device\\Harddisk62\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk12", BRACK(FH_SDBK | 12), "\\Device\\Harddisk62\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk13", BRACK(FH_SDBK | 13), "\\Device\\Harddisk62\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk14", BRACK(FH_SDBK | 14), "\\Device\\Harddisk62\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbk15", BRACK(FH_SDBK | 15), "\\Device\\Harddisk62\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl1", BRACK(FH_SDBL | 1), "\\Device\\Harddisk63\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl2", BRACK(FH_SDBL | 2), "\\Device\\Harddisk63\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl3", BRACK(FH_SDBL | 3), "\\Device\\Harddisk63\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl4", BRACK(FH_SDBL | 4), "\\Device\\Harddisk63\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl5", BRACK(FH_SDBL | 5), "\\Device\\Harddisk63\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl6", BRACK(FH_SDBL | 6), "\\Device\\Harddisk63\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl7", BRACK(FH_SDBL | 7), "\\Device\\Harddisk63\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl8", BRACK(FH_SDBL | 8), "\\Device\\Harddisk63\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl9", BRACK(FH_SDBL | 9), "\\Device\\Harddisk63\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl10", BRACK(FH_SDBL | 10), "\\Device\\Harddisk63\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl11", BRACK(FH_SDBL | 11), "\\Device\\Harddisk63\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl12", BRACK(FH_SDBL | 12), "\\Device\\Harddisk63\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl13", BRACK(FH_SDBL | 13), "\\Device\\Harddisk63\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl14", BRACK(FH_SDBL | 14), "\\Device\\Harddisk63\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbl15", BRACK(FH_SDBL | 15), "\\Device\\Harddisk63\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm1", BRACK(FH_SDBM | 1), "\\Device\\Harddisk64\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm2", BRACK(FH_SDBM | 2), "\\Device\\Harddisk64\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm3", BRACK(FH_SDBM | 3), "\\Device\\Harddisk64\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm4", BRACK(FH_SDBM | 4), "\\Device\\Harddisk64\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm5", BRACK(FH_SDBM | 5), "\\Device\\Harddisk64\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm6", BRACK(FH_SDBM | 6), "\\Device\\Harddisk64\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm7", BRACK(FH_SDBM | 7), "\\Device\\Harddisk64\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm8", BRACK(FH_SDBM | 8), "\\Device\\Harddisk64\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm9", BRACK(FH_SDBM | 9), "\\Device\\Harddisk64\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm10", BRACK(FH_SDBM | 10), "\\Device\\Harddisk64\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm11", BRACK(FH_SDBM | 11), "\\Device\\Harddisk64\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm12", BRACK(FH_SDBM | 12), "\\Device\\Harddisk64\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm13", BRACK(FH_SDBM | 13), "\\Device\\Harddisk64\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm14", BRACK(FH_SDBM | 14), "\\Device\\Harddisk64\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbm15", BRACK(FH_SDBM | 15), "\\Device\\Harddisk64\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn1", BRACK(FH_SDBN | 1), "\\Device\\Harddisk65\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn2", BRACK(FH_SDBN | 2), "\\Device\\Harddisk65\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn3", BRACK(FH_SDBN | 3), "\\Device\\Harddisk65\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn4", BRACK(FH_SDBN | 4), "\\Device\\Harddisk65\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn5", BRACK(FH_SDBN | 5), "\\Device\\Harddisk65\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn6", BRACK(FH_SDBN | 6), "\\Device\\Harddisk65\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn7", BRACK(FH_SDBN | 7), "\\Device\\Harddisk65\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn8", BRACK(FH_SDBN | 8), "\\Device\\Harddisk65\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn9", BRACK(FH_SDBN | 9), "\\Device\\Harddisk65\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn10", BRACK(FH_SDBN | 10), "\\Device\\Harddisk65\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn11", BRACK(FH_SDBN | 11), "\\Device\\Harddisk65\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn12", BRACK(FH_SDBN | 12), "\\Device\\Harddisk65\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn13", BRACK(FH_SDBN | 13), "\\Device\\Harddisk65\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn14", BRACK(FH_SDBN | 14), "\\Device\\Harddisk65\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbn15", BRACK(FH_SDBN | 15), "\\Device\\Harddisk65\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo1", BRACK(FH_SDBO | 1), "\\Device\\Harddisk66\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo2", BRACK(FH_SDBO | 2), "\\Device\\Harddisk66\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo3", BRACK(FH_SDBO | 3), "\\Device\\Harddisk66\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo4", BRACK(FH_SDBO | 4), "\\Device\\Harddisk66\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo5", BRACK(FH_SDBO | 5), "\\Device\\Harddisk66\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo6", BRACK(FH_SDBO | 6), "\\Device\\Harddisk66\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo7", BRACK(FH_SDBO | 7), "\\Device\\Harddisk66\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo8", BRACK(FH_SDBO | 8), "\\Device\\Harddisk66\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo9", BRACK(FH_SDBO | 9), "\\Device\\Harddisk66\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo10", BRACK(FH_SDBO | 10), "\\Device\\Harddisk66\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo11", BRACK(FH_SDBO | 11), "\\Device\\Harddisk66\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo12", BRACK(FH_SDBO | 12), "\\Device\\Harddisk66\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo13", BRACK(FH_SDBO | 13), "\\Device\\Harddisk66\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo14", BRACK(FH_SDBO | 14), "\\Device\\Harddisk66\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbo15", BRACK(FH_SDBO | 15), "\\Device\\Harddisk66\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp1", BRACK(FH_SDBP | 1), "\\Device\\Harddisk67\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp2", BRACK(FH_SDBP | 2), "\\Device\\Harddisk67\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp3", BRACK(FH_SDBP | 3), "\\Device\\Harddisk67\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp4", BRACK(FH_SDBP | 4), "\\Device\\Harddisk67\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp5", BRACK(FH_SDBP | 5), "\\Device\\Harddisk67\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp6", BRACK(FH_SDBP | 6), "\\Device\\Harddisk67\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp7", BRACK(FH_SDBP | 7), "\\Device\\Harddisk67\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp8", BRACK(FH_SDBP | 8), "\\Device\\Harddisk67\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp9", BRACK(FH_SDBP | 9), "\\Device\\Harddisk67\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp10", BRACK(FH_SDBP | 10), "\\Device\\Harddisk67\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp11", BRACK(FH_SDBP | 11), "\\Device\\Harddisk67\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp12", BRACK(FH_SDBP | 12), "\\Device\\Harddisk67\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp13", BRACK(FH_SDBP | 13), "\\Device\\Harddisk67\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp14", BRACK(FH_SDBP | 14), "\\Device\\Harddisk67\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbp15", BRACK(FH_SDBP | 15), "\\Device\\Harddisk67\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq1", BRACK(FH_SDBQ | 1), "\\Device\\Harddisk68\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq2", BRACK(FH_SDBQ | 2), "\\Device\\Harddisk68\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq3", BRACK(FH_SDBQ | 3), "\\Device\\Harddisk68\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq4", BRACK(FH_SDBQ | 4), "\\Device\\Harddisk68\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq5", BRACK(FH_SDBQ | 5), "\\Device\\Harddisk68\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq6", BRACK(FH_SDBQ | 6), "\\Device\\Harddisk68\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq7", BRACK(FH_SDBQ | 7), "\\Device\\Harddisk68\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq8", BRACK(FH_SDBQ | 8), "\\Device\\Harddisk68\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq9", BRACK(FH_SDBQ | 9), "\\Device\\Harddisk68\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq10", BRACK(FH_SDBQ | 10), "\\Device\\Harddisk68\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq11", BRACK(FH_SDBQ | 11), "\\Device\\Harddisk68\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq12", BRACK(FH_SDBQ | 12), "\\Device\\Harddisk68\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq13", BRACK(FH_SDBQ | 13), "\\Device\\Harddisk68\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq14", BRACK(FH_SDBQ | 14), "\\Device\\Harddisk68\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbq15", BRACK(FH_SDBQ | 15), "\\Device\\Harddisk68\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr1", BRACK(FH_SDBR | 1), "\\Device\\Harddisk69\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr2", BRACK(FH_SDBR | 2), "\\Device\\Harddisk69\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr3", BRACK(FH_SDBR | 3), "\\Device\\Harddisk69\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr4", BRACK(FH_SDBR | 4), "\\Device\\Harddisk69\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr5", BRACK(FH_SDBR | 5), "\\Device\\Harddisk69\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr6", BRACK(FH_SDBR | 6), "\\Device\\Harddisk69\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr7", BRACK(FH_SDBR | 7), "\\Device\\Harddisk69\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr8", BRACK(FH_SDBR | 8), "\\Device\\Harddisk69\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr9", BRACK(FH_SDBR | 9), "\\Device\\Harddisk69\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr10", BRACK(FH_SDBR | 10), "\\Device\\Harddisk69\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr11", BRACK(FH_SDBR | 11), "\\Device\\Harddisk69\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr12", BRACK(FH_SDBR | 12), "\\Device\\Harddisk69\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr13", BRACK(FH_SDBR | 13), "\\Device\\Harddisk69\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr14", BRACK(FH_SDBR | 14), "\\Device\\Harddisk69\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbr15", BRACK(FH_SDBR | 15), "\\Device\\Harddisk69\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs1", BRACK(FH_SDBS | 1), "\\Device\\Harddisk70\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs2", BRACK(FH_SDBS | 2), "\\Device\\Harddisk70\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs3", BRACK(FH_SDBS | 3), "\\Device\\Harddisk70\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs4", BRACK(FH_SDBS | 4), "\\Device\\Harddisk70\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs5", BRACK(FH_SDBS | 5), "\\Device\\Harddisk70\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs6", BRACK(FH_SDBS | 6), "\\Device\\Harddisk70\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs7", BRACK(FH_SDBS | 7), "\\Device\\Harddisk70\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs8", BRACK(FH_SDBS | 8), "\\Device\\Harddisk70\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs9", BRACK(FH_SDBS | 9), "\\Device\\Harddisk70\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs10", BRACK(FH_SDBS | 10), "\\Device\\Harddisk70\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs11", BRACK(FH_SDBS | 11), "\\Device\\Harddisk70\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs12", BRACK(FH_SDBS | 12), "\\Device\\Harddisk70\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs13", BRACK(FH_SDBS | 13), "\\Device\\Harddisk70\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs14", BRACK(FH_SDBS | 14), "\\Device\\Harddisk70\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbs15", BRACK(FH_SDBS | 15), "\\Device\\Harddisk70\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt1", BRACK(FH_SDBT | 1), "\\Device\\Harddisk71\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt2", BRACK(FH_SDBT | 2), "\\Device\\Harddisk71\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt3", BRACK(FH_SDBT | 3), "\\Device\\Harddisk71\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt4", BRACK(FH_SDBT | 4), "\\Device\\Harddisk71\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt5", BRACK(FH_SDBT | 5), "\\Device\\Harddisk71\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt6", BRACK(FH_SDBT | 6), "\\Device\\Harddisk71\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt7", BRACK(FH_SDBT | 7), "\\Device\\Harddisk71\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt8", BRACK(FH_SDBT | 8), "\\Device\\Harddisk71\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt9", BRACK(FH_SDBT | 9), "\\Device\\Harddisk71\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt10", BRACK(FH_SDBT | 10), "\\Device\\Harddisk71\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt11", BRACK(FH_SDBT | 11), "\\Device\\Harddisk71\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt12", BRACK(FH_SDBT | 12), "\\Device\\Harddisk71\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt13", BRACK(FH_SDBT | 13), "\\Device\\Harddisk71\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt14", BRACK(FH_SDBT | 14), "\\Device\\Harddisk71\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbt15", BRACK(FH_SDBT | 15), "\\Device\\Harddisk71\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu1", BRACK(FH_SDBU | 1), "\\Device\\Harddisk72\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu2", BRACK(FH_SDBU | 2), "\\Device\\Harddisk72\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu3", BRACK(FH_SDBU | 3), "\\Device\\Harddisk72\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu4", BRACK(FH_SDBU | 4), "\\Device\\Harddisk72\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu5", BRACK(FH_SDBU | 5), "\\Device\\Harddisk72\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu6", BRACK(FH_SDBU | 6), "\\Device\\Harddisk72\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu7", BRACK(FH_SDBU | 7), "\\Device\\Harddisk72\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu8", BRACK(FH_SDBU | 8), "\\Device\\Harddisk72\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu9", BRACK(FH_SDBU | 9), "\\Device\\Harddisk72\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu10", BRACK(FH_SDBU | 10), "\\Device\\Harddisk72\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu11", BRACK(FH_SDBU | 11), "\\Device\\Harddisk72\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu12", BRACK(FH_SDBU | 12), "\\Device\\Harddisk72\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu13", BRACK(FH_SDBU | 13), "\\Device\\Harddisk72\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu14", BRACK(FH_SDBU | 14), "\\Device\\Harddisk72\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbu15", BRACK(FH_SDBU | 15), "\\Device\\Harddisk72\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv1", BRACK(FH_SDBV | 1), "\\Device\\Harddisk73\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv2", BRACK(FH_SDBV | 2), "\\Device\\Harddisk73\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv3", BRACK(FH_SDBV | 3), "\\Device\\Harddisk73\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv4", BRACK(FH_SDBV | 4), "\\Device\\Harddisk73\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv5", BRACK(FH_SDBV | 5), "\\Device\\Harddisk73\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv6", BRACK(FH_SDBV | 6), "\\Device\\Harddisk73\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv7", BRACK(FH_SDBV | 7), "\\Device\\Harddisk73\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv8", BRACK(FH_SDBV | 8), "\\Device\\Harddisk73\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv9", BRACK(FH_SDBV | 9), "\\Device\\Harddisk73\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv10", BRACK(FH_SDBV | 10), "\\Device\\Harddisk73\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv11", BRACK(FH_SDBV | 11), "\\Device\\Harddisk73\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv12", BRACK(FH_SDBV | 12), "\\Device\\Harddisk73\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv13", BRACK(FH_SDBV | 13), "\\Device\\Harddisk73\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv14", BRACK(FH_SDBV | 14), "\\Device\\Harddisk73\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbv15", BRACK(FH_SDBV | 15), "\\Device\\Harddisk73\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw1", BRACK(FH_SDBW | 1), "\\Device\\Harddisk74\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw2", BRACK(FH_SDBW | 2), "\\Device\\Harddisk74\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw3", BRACK(FH_SDBW | 3), "\\Device\\Harddisk74\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw4", BRACK(FH_SDBW | 4), "\\Device\\Harddisk74\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw5", BRACK(FH_SDBW | 5), "\\Device\\Harddisk74\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw6", BRACK(FH_SDBW | 6), "\\Device\\Harddisk74\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw7", BRACK(FH_SDBW | 7), "\\Device\\Harddisk74\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw8", BRACK(FH_SDBW | 8), "\\Device\\Harddisk74\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw9", BRACK(FH_SDBW | 9), "\\Device\\Harddisk74\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw10", BRACK(FH_SDBW | 10), "\\Device\\Harddisk74\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw11", BRACK(FH_SDBW | 11), "\\Device\\Harddisk74\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw12", BRACK(FH_SDBW | 12), "\\Device\\Harddisk74\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw13", BRACK(FH_SDBW | 13), "\\Device\\Harddisk74\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw14", BRACK(FH_SDBW | 14), "\\Device\\Harddisk74\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbw15", BRACK(FH_SDBW | 15), "\\Device\\Harddisk74\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx1", BRACK(FH_SDBX | 1), "\\Device\\Harddisk75\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx2", BRACK(FH_SDBX | 2), "\\Device\\Harddisk75\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx3", BRACK(FH_SDBX | 3), "\\Device\\Harddisk75\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx4", BRACK(FH_SDBX | 4), "\\Device\\Harddisk75\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx5", BRACK(FH_SDBX | 5), "\\Device\\Harddisk75\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx6", BRACK(FH_SDBX | 6), "\\Device\\Harddisk75\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx7", BRACK(FH_SDBX | 7), "\\Device\\Harddisk75\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx8", BRACK(FH_SDBX | 8), "\\Device\\Harddisk75\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx9", BRACK(FH_SDBX | 9), "\\Device\\Harddisk75\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx10", BRACK(FH_SDBX | 10), "\\Device\\Harddisk75\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx11", BRACK(FH_SDBX | 11), "\\Device\\Harddisk75\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx12", BRACK(FH_SDBX | 12), "\\Device\\Harddisk75\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx13", BRACK(FH_SDBX | 13), "\\Device\\Harddisk75\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx14", BRACK(FH_SDBX | 14), "\\Device\\Harddisk75\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbx15", BRACK(FH_SDBX | 15), "\\Device\\Harddisk75\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdby1", BRACK(FH_SDBY | 1), "\\Device\\Harddisk76\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdby2", BRACK(FH_SDBY | 2), "\\Device\\Harddisk76\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdby3", BRACK(FH_SDBY | 3), "\\Device\\Harddisk76\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdby4", BRACK(FH_SDBY | 4), "\\Device\\Harddisk76\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdby5", BRACK(FH_SDBY | 5), "\\Device\\Harddisk76\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdby6", BRACK(FH_SDBY | 6), "\\Device\\Harddisk76\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdby7", BRACK(FH_SDBY | 7), "\\Device\\Harddisk76\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdby8", BRACK(FH_SDBY | 8), "\\Device\\Harddisk76\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdby9", BRACK(FH_SDBY | 9), "\\Device\\Harddisk76\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdby10", BRACK(FH_SDBY | 10), "\\Device\\Harddisk76\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdby11", BRACK(FH_SDBY | 11), "\\Device\\Harddisk76\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdby12", BRACK(FH_SDBY | 12), "\\Device\\Harddisk76\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdby13", BRACK(FH_SDBY | 13), "\\Device\\Harddisk76\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdby14", BRACK(FH_SDBY | 14), "\\Device\\Harddisk76\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdby15", BRACK(FH_SDBY | 15), "\\Device\\Harddisk76\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz1", BRACK(FH_SDBZ | 1), "\\Device\\Harddisk77\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz2", BRACK(FH_SDBZ | 2), "\\Device\\Harddisk77\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz3", BRACK(FH_SDBZ | 3), "\\Device\\Harddisk77\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz4", BRACK(FH_SDBZ | 4), "\\Device\\Harddisk77\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz5", BRACK(FH_SDBZ | 5), "\\Device\\Harddisk77\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz6", BRACK(FH_SDBZ | 6), "\\Device\\Harddisk77\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz7", BRACK(FH_SDBZ | 7), "\\Device\\Harddisk77\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz8", BRACK(FH_SDBZ | 8), "\\Device\\Harddisk77\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz9", BRACK(FH_SDBZ | 9), "\\Device\\Harddisk77\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz10", BRACK(FH_SDBZ | 10), "\\Device\\Harddisk77\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz11", BRACK(FH_SDBZ | 11), "\\Device\\Harddisk77\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz12", BRACK(FH_SDBZ | 12), "\\Device\\Harddisk77\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz13", BRACK(FH_SDBZ | 13), "\\Device\\Harddisk77\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz14", BRACK(FH_SDBZ | 14), "\\Device\\Harddisk77\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdbz15", BRACK(FH_SDBZ | 15), "\\Device\\Harddisk77\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdca", BRACK(FH_SDCA), "\\Device\\Harddisk78\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb", BRACK(FH_SDCB), "\\Device\\Harddisk79\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc", BRACK(FH_SDCC), "\\Device\\Harddisk80\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd", BRACK(FH_SDCD), "\\Device\\Harddisk81\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdce", BRACK(FH_SDCE), "\\Device\\Harddisk82\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf", BRACK(FH_SDCF), "\\Device\\Harddisk83\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg", BRACK(FH_SDCG), "\\Device\\Harddisk84\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdch", BRACK(FH_SDCH), "\\Device\\Harddisk85\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdci", BRACK(FH_SDCI), "\\Device\\Harddisk86\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj", BRACK(FH_SDCJ), "\\Device\\Harddisk87\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdck", BRACK(FH_SDCK), "\\Device\\Harddisk88\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl", BRACK(FH_SDCL), "\\Device\\Harddisk89\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm", BRACK(FH_SDCM), "\\Device\\Harddisk90\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn", BRACK(FH_SDCN), "\\Device\\Harddisk91\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdco", BRACK(FH_SDCO), "\\Device\\Harddisk92\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp", BRACK(FH_SDCP), "\\Device\\Harddisk93\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq", BRACK(FH_SDCQ), "\\Device\\Harddisk94\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr", BRACK(FH_SDCR), "\\Device\\Harddisk95\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs", BRACK(FH_SDCS), "\\Device\\Harddisk96\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdct", BRACK(FH_SDCT), "\\Device\\Harddisk97\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu", BRACK(FH_SDCU), "\\Device\\Harddisk98\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv", BRACK(FH_SDCV), "\\Device\\Harddisk99\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw", BRACK(FH_SDCW), "\\Device\\Harddisk100\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx", BRACK(FH_SDCX), "\\Device\\Harddisk101\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy", BRACK(FH_SDCY), "\\Device\\Harddisk102\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz", BRACK(FH_SDCZ), "\\Device\\Harddisk103\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdca1", BRACK(FH_SDCA | 1), "\\Device\\Harddisk78\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdca2", BRACK(FH_SDCA | 2), "\\Device\\Harddisk78\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdca3", BRACK(FH_SDCA | 3), "\\Device\\Harddisk78\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdca4", BRACK(FH_SDCA | 4), "\\Device\\Harddisk78\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdca5", BRACK(FH_SDCA | 5), "\\Device\\Harddisk78\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdca6", BRACK(FH_SDCA | 6), "\\Device\\Harddisk78\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdca7", BRACK(FH_SDCA | 7), "\\Device\\Harddisk78\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdca8", BRACK(FH_SDCA | 8), "\\Device\\Harddisk78\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdca9", BRACK(FH_SDCA | 9), "\\Device\\Harddisk78\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdca10", BRACK(FH_SDCA | 10), "\\Device\\Harddisk78\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdca11", BRACK(FH_SDCA | 11), "\\Device\\Harddisk78\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdca12", BRACK(FH_SDCA | 12), "\\Device\\Harddisk78\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdca13", BRACK(FH_SDCA | 13), "\\Device\\Harddisk78\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdca14", BRACK(FH_SDCA | 14), "\\Device\\Harddisk78\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdca15", BRACK(FH_SDCA | 15), "\\Device\\Harddisk78\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb1", BRACK(FH_SDCB | 1), "\\Device\\Harddisk79\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb2", BRACK(FH_SDCB | 2), "\\Device\\Harddisk79\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb3", BRACK(FH_SDCB | 3), "\\Device\\Harddisk79\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb4", BRACK(FH_SDCB | 4), "\\Device\\Harddisk79\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb5", BRACK(FH_SDCB | 5), "\\Device\\Harddisk79\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb6", BRACK(FH_SDCB | 6), "\\Device\\Harddisk79\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb7", BRACK(FH_SDCB | 7), "\\Device\\Harddisk79\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb8", BRACK(FH_SDCB | 8), "\\Device\\Harddisk79\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb9", BRACK(FH_SDCB | 9), "\\Device\\Harddisk79\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb10", BRACK(FH_SDCB | 10), "\\Device\\Harddisk79\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb11", BRACK(FH_SDCB | 11), "\\Device\\Harddisk79\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb12", BRACK(FH_SDCB | 12), "\\Device\\Harddisk79\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb13", BRACK(FH_SDCB | 13), "\\Device\\Harddisk79\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb14", BRACK(FH_SDCB | 14), "\\Device\\Harddisk79\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcb15", BRACK(FH_SDCB | 15), "\\Device\\Harddisk79\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc1", BRACK(FH_SDCC | 1), "\\Device\\Harddisk80\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc2", BRACK(FH_SDCC | 2), "\\Device\\Harddisk80\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc3", BRACK(FH_SDCC | 3), "\\Device\\Harddisk80\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc4", BRACK(FH_SDCC | 4), "\\Device\\Harddisk80\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc5", BRACK(FH_SDCC | 5), "\\Device\\Harddisk80\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc6", BRACK(FH_SDCC | 6), "\\Device\\Harddisk80\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc7", BRACK(FH_SDCC | 7), "\\Device\\Harddisk80\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc8", BRACK(FH_SDCC | 8), "\\Device\\Harddisk80\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc9", BRACK(FH_SDCC | 9), "\\Device\\Harddisk80\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc10", BRACK(FH_SDCC | 10), "\\Device\\Harddisk80\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc11", BRACK(FH_SDCC | 11), "\\Device\\Harddisk80\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc12", BRACK(FH_SDCC | 12), "\\Device\\Harddisk80\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc13", BRACK(FH_SDCC | 13), "\\Device\\Harddisk80\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc14", BRACK(FH_SDCC | 14), "\\Device\\Harddisk80\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcc15", BRACK(FH_SDCC | 15), "\\Device\\Harddisk80\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd1", BRACK(FH_SDCD | 1), "\\Device\\Harddisk81\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd2", BRACK(FH_SDCD | 2), "\\Device\\Harddisk81\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd3", BRACK(FH_SDCD | 3), "\\Device\\Harddisk81\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd4", BRACK(FH_SDCD | 4), "\\Device\\Harddisk81\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd5", BRACK(FH_SDCD | 5), "\\Device\\Harddisk81\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd6", BRACK(FH_SDCD | 6), "\\Device\\Harddisk81\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd7", BRACK(FH_SDCD | 7), "\\Device\\Harddisk81\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd8", BRACK(FH_SDCD | 8), "\\Device\\Harddisk81\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd9", BRACK(FH_SDCD | 9), "\\Device\\Harddisk81\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd10", BRACK(FH_SDCD | 10), "\\Device\\Harddisk81\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd11", BRACK(FH_SDCD | 11), "\\Device\\Harddisk81\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd12", BRACK(FH_SDCD | 12), "\\Device\\Harddisk81\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd13", BRACK(FH_SDCD | 13), "\\Device\\Harddisk81\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd14", BRACK(FH_SDCD | 14), "\\Device\\Harddisk81\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcd15", BRACK(FH_SDCD | 15), "\\Device\\Harddisk81\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdce1", BRACK(FH_SDCE | 1), "\\Device\\Harddisk82\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdce2", BRACK(FH_SDCE | 2), "\\Device\\Harddisk82\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdce3", BRACK(FH_SDCE | 3), "\\Device\\Harddisk82\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdce4", BRACK(FH_SDCE | 4), "\\Device\\Harddisk82\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdce5", BRACK(FH_SDCE | 5), "\\Device\\Harddisk82\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdce6", BRACK(FH_SDCE | 6), "\\Device\\Harddisk82\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdce7", BRACK(FH_SDCE | 7), "\\Device\\Harddisk82\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdce8", BRACK(FH_SDCE | 8), "\\Device\\Harddisk82\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdce9", BRACK(FH_SDCE | 9), "\\Device\\Harddisk82\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdce10", BRACK(FH_SDCE | 10), "\\Device\\Harddisk82\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdce11", BRACK(FH_SDCE | 11), "\\Device\\Harddisk82\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdce12", BRACK(FH_SDCE | 12), "\\Device\\Harddisk82\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdce13", BRACK(FH_SDCE | 13), "\\Device\\Harddisk82\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdce14", BRACK(FH_SDCE | 14), "\\Device\\Harddisk82\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdce15", BRACK(FH_SDCE | 15), "\\Device\\Harddisk82\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf1", BRACK(FH_SDCF | 1), "\\Device\\Harddisk83\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf2", BRACK(FH_SDCF | 2), "\\Device\\Harddisk83\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf3", BRACK(FH_SDCF | 3), "\\Device\\Harddisk83\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf4", BRACK(FH_SDCF | 4), "\\Device\\Harddisk83\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf5", BRACK(FH_SDCF | 5), "\\Device\\Harddisk83\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf6", BRACK(FH_SDCF | 6), "\\Device\\Harddisk83\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf7", BRACK(FH_SDCF | 7), "\\Device\\Harddisk83\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf8", BRACK(FH_SDCF | 8), "\\Device\\Harddisk83\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf9", BRACK(FH_SDCF | 9), "\\Device\\Harddisk83\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf10", BRACK(FH_SDCF | 10), "\\Device\\Harddisk83\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf11", BRACK(FH_SDCF | 11), "\\Device\\Harddisk83\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf12", BRACK(FH_SDCF | 12), "\\Device\\Harddisk83\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf13", BRACK(FH_SDCF | 13), "\\Device\\Harddisk83\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf14", BRACK(FH_SDCF | 14), "\\Device\\Harddisk83\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcf15", BRACK(FH_SDCF | 15), "\\Device\\Harddisk83\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg1", BRACK(FH_SDCG | 1), "\\Device\\Harddisk84\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg2", BRACK(FH_SDCG | 2), "\\Device\\Harddisk84\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg3", BRACK(FH_SDCG | 3), "\\Device\\Harddisk84\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg4", BRACK(FH_SDCG | 4), "\\Device\\Harddisk84\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg5", BRACK(FH_SDCG | 5), "\\Device\\Harddisk84\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg6", BRACK(FH_SDCG | 6), "\\Device\\Harddisk84\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg7", BRACK(FH_SDCG | 7), "\\Device\\Harddisk84\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg8", BRACK(FH_SDCG | 8), "\\Device\\Harddisk84\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg9", BRACK(FH_SDCG | 9), "\\Device\\Harddisk84\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg10", BRACK(FH_SDCG | 10), "\\Device\\Harddisk84\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg11", BRACK(FH_SDCG | 11), "\\Device\\Harddisk84\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg12", BRACK(FH_SDCG | 12), "\\Device\\Harddisk84\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg13", BRACK(FH_SDCG | 13), "\\Device\\Harddisk84\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg14", BRACK(FH_SDCG | 14), "\\Device\\Harddisk84\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcg15", BRACK(FH_SDCG | 15), "\\Device\\Harddisk84\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdch1", BRACK(FH_SDCH | 1), "\\Device\\Harddisk85\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdch2", BRACK(FH_SDCH | 2), "\\Device\\Harddisk85\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdch3", BRACK(FH_SDCH | 3), "\\Device\\Harddisk85\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdch4", BRACK(FH_SDCH | 4), "\\Device\\Harddisk85\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdch5", BRACK(FH_SDCH | 5), "\\Device\\Harddisk85\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdch6", BRACK(FH_SDCH | 6), "\\Device\\Harddisk85\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdch7", BRACK(FH_SDCH | 7), "\\Device\\Harddisk85\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdch8", BRACK(FH_SDCH | 8), "\\Device\\Harddisk85\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdch9", BRACK(FH_SDCH | 9), "\\Device\\Harddisk85\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdch10", BRACK(FH_SDCH | 10), "\\Device\\Harddisk85\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdch11", BRACK(FH_SDCH | 11), "\\Device\\Harddisk85\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdch12", BRACK(FH_SDCH | 12), "\\Device\\Harddisk85\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdch13", BRACK(FH_SDCH | 13), "\\Device\\Harddisk85\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdch14", BRACK(FH_SDCH | 14), "\\Device\\Harddisk85\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdch15", BRACK(FH_SDCH | 15), "\\Device\\Harddisk85\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdci1", BRACK(FH_SDCI | 1), "\\Device\\Harddisk86\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdci2", BRACK(FH_SDCI | 2), "\\Device\\Harddisk86\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdci3", BRACK(FH_SDCI | 3), "\\Device\\Harddisk86\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdci4", BRACK(FH_SDCI | 4), "\\Device\\Harddisk86\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdci5", BRACK(FH_SDCI | 5), "\\Device\\Harddisk86\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdci6", BRACK(FH_SDCI | 6), "\\Device\\Harddisk86\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdci7", BRACK(FH_SDCI | 7), "\\Device\\Harddisk86\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdci8", BRACK(FH_SDCI | 8), "\\Device\\Harddisk86\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdci9", BRACK(FH_SDCI | 9), "\\Device\\Harddisk86\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdci10", BRACK(FH_SDCI | 10), "\\Device\\Harddisk86\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdci11", BRACK(FH_SDCI | 11), "\\Device\\Harddisk86\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdci12", BRACK(FH_SDCI | 12), "\\Device\\Harddisk86\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdci13", BRACK(FH_SDCI | 13), "\\Device\\Harddisk86\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdci14", BRACK(FH_SDCI | 14), "\\Device\\Harddisk86\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdci15", BRACK(FH_SDCI | 15), "\\Device\\Harddisk86\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj1", BRACK(FH_SDCJ | 1), "\\Device\\Harddisk87\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj2", BRACK(FH_SDCJ | 2), "\\Device\\Harddisk87\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj3", BRACK(FH_SDCJ | 3), "\\Device\\Harddisk87\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj4", BRACK(FH_SDCJ | 4), "\\Device\\Harddisk87\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj5", BRACK(FH_SDCJ | 5), "\\Device\\Harddisk87\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj6", BRACK(FH_SDCJ | 6), "\\Device\\Harddisk87\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj7", BRACK(FH_SDCJ | 7), "\\Device\\Harddisk87\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj8", BRACK(FH_SDCJ | 8), "\\Device\\Harddisk87\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj9", BRACK(FH_SDCJ | 9), "\\Device\\Harddisk87\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj10", BRACK(FH_SDCJ | 10), "\\Device\\Harddisk87\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj11", BRACK(FH_SDCJ | 11), "\\Device\\Harddisk87\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj12", BRACK(FH_SDCJ | 12), "\\Device\\Harddisk87\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj13", BRACK(FH_SDCJ | 13), "\\Device\\Harddisk87\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj14", BRACK(FH_SDCJ | 14), "\\Device\\Harddisk87\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcj15", BRACK(FH_SDCJ | 15), "\\Device\\Harddisk87\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdck1", BRACK(FH_SDCK | 1), "\\Device\\Harddisk88\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdck2", BRACK(FH_SDCK | 2), "\\Device\\Harddisk88\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdck3", BRACK(FH_SDCK | 3), "\\Device\\Harddisk88\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdck4", BRACK(FH_SDCK | 4), "\\Device\\Harddisk88\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdck5", BRACK(FH_SDCK | 5), "\\Device\\Harddisk88\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdck6", BRACK(FH_SDCK | 6), "\\Device\\Harddisk88\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdck7", BRACK(FH_SDCK | 7), "\\Device\\Harddisk88\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdck8", BRACK(FH_SDCK | 8), "\\Device\\Harddisk88\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdck9", BRACK(FH_SDCK | 9), "\\Device\\Harddisk88\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdck10", BRACK(FH_SDCK | 10), "\\Device\\Harddisk88\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdck11", BRACK(FH_SDCK | 11), "\\Device\\Harddisk88\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdck12", BRACK(FH_SDCK | 12), "\\Device\\Harddisk88\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdck13", BRACK(FH_SDCK | 13), "\\Device\\Harddisk88\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdck14", BRACK(FH_SDCK | 14), "\\Device\\Harddisk88\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdck15", BRACK(FH_SDCK | 15), "\\Device\\Harddisk88\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl1", BRACK(FH_SDCL | 1), "\\Device\\Harddisk89\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl2", BRACK(FH_SDCL | 2), "\\Device\\Harddisk89\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl3", BRACK(FH_SDCL | 3), "\\Device\\Harddisk89\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl4", BRACK(FH_SDCL | 4), "\\Device\\Harddisk89\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl5", BRACK(FH_SDCL | 5), "\\Device\\Harddisk89\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl6", BRACK(FH_SDCL | 6), "\\Device\\Harddisk89\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl7", BRACK(FH_SDCL | 7), "\\Device\\Harddisk89\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl8", BRACK(FH_SDCL | 8), "\\Device\\Harddisk89\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl9", BRACK(FH_SDCL | 9), "\\Device\\Harddisk89\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl10", BRACK(FH_SDCL | 10), "\\Device\\Harddisk89\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl11", BRACK(FH_SDCL | 11), "\\Device\\Harddisk89\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl12", BRACK(FH_SDCL | 12), "\\Device\\Harddisk89\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl13", BRACK(FH_SDCL | 13), "\\Device\\Harddisk89\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl14", BRACK(FH_SDCL | 14), "\\Device\\Harddisk89\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcl15", BRACK(FH_SDCL | 15), "\\Device\\Harddisk89\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm1", BRACK(FH_SDCM | 1), "\\Device\\Harddisk90\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm2", BRACK(FH_SDCM | 2), "\\Device\\Harddisk90\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm3", BRACK(FH_SDCM | 3), "\\Device\\Harddisk90\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm4", BRACK(FH_SDCM | 4), "\\Device\\Harddisk90\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm5", BRACK(FH_SDCM | 5), "\\Device\\Harddisk90\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm6", BRACK(FH_SDCM | 6), "\\Device\\Harddisk90\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm7", BRACK(FH_SDCM | 7), "\\Device\\Harddisk90\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm8", BRACK(FH_SDCM | 8), "\\Device\\Harddisk90\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm9", BRACK(FH_SDCM | 9), "\\Device\\Harddisk90\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm10", BRACK(FH_SDCM | 10), "\\Device\\Harddisk90\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm11", BRACK(FH_SDCM | 11), "\\Device\\Harddisk90\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm12", BRACK(FH_SDCM | 12), "\\Device\\Harddisk90\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm13", BRACK(FH_SDCM | 13), "\\Device\\Harddisk90\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm14", BRACK(FH_SDCM | 14), "\\Device\\Harddisk90\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcm15", BRACK(FH_SDCM | 15), "\\Device\\Harddisk90\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn1", BRACK(FH_SDCN | 1), "\\Device\\Harddisk91\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn2", BRACK(FH_SDCN | 2), "\\Device\\Harddisk91\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn3", BRACK(FH_SDCN | 3), "\\Device\\Harddisk91\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn4", BRACK(FH_SDCN | 4), "\\Device\\Harddisk91\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn5", BRACK(FH_SDCN | 5), "\\Device\\Harddisk91\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn6", BRACK(FH_SDCN | 6), "\\Device\\Harddisk91\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn7", BRACK(FH_SDCN | 7), "\\Device\\Harddisk91\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn8", BRACK(FH_SDCN | 8), "\\Device\\Harddisk91\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn9", BRACK(FH_SDCN | 9), "\\Device\\Harddisk91\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn10", BRACK(FH_SDCN | 10), "\\Device\\Harddisk91\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn11", BRACK(FH_SDCN | 11), "\\Device\\Harddisk91\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn12", BRACK(FH_SDCN | 12), "\\Device\\Harddisk91\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn13", BRACK(FH_SDCN | 13), "\\Device\\Harddisk91\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn14", BRACK(FH_SDCN | 14), "\\Device\\Harddisk91\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcn15", BRACK(FH_SDCN | 15), "\\Device\\Harddisk91\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdco1", BRACK(FH_SDCO | 1), "\\Device\\Harddisk92\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdco2", BRACK(FH_SDCO | 2), "\\Device\\Harddisk92\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdco3", BRACK(FH_SDCO | 3), "\\Device\\Harddisk92\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdco4", BRACK(FH_SDCO | 4), "\\Device\\Harddisk92\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdco5", BRACK(FH_SDCO | 5), "\\Device\\Harddisk92\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdco6", BRACK(FH_SDCO | 6), "\\Device\\Harddisk92\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdco7", BRACK(FH_SDCO | 7), "\\Device\\Harddisk92\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdco8", BRACK(FH_SDCO | 8), "\\Device\\Harddisk92\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdco9", BRACK(FH_SDCO | 9), "\\Device\\Harddisk92\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdco10", BRACK(FH_SDCO | 10), "\\Device\\Harddisk92\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdco11", BRACK(FH_SDCO | 11), "\\Device\\Harddisk92\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdco12", BRACK(FH_SDCO | 12), "\\Device\\Harddisk92\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdco13", BRACK(FH_SDCO | 13), "\\Device\\Harddisk92\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdco14", BRACK(FH_SDCO | 14), "\\Device\\Harddisk92\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdco15", BRACK(FH_SDCO | 15), "\\Device\\Harddisk92\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp1", BRACK(FH_SDCP | 1), "\\Device\\Harddisk93\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp2", BRACK(FH_SDCP | 2), "\\Device\\Harddisk93\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp3", BRACK(FH_SDCP | 3), "\\Device\\Harddisk93\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp4", BRACK(FH_SDCP | 4), "\\Device\\Harddisk93\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp5", BRACK(FH_SDCP | 5), "\\Device\\Harddisk93\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp6", BRACK(FH_SDCP | 6), "\\Device\\Harddisk93\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp7", BRACK(FH_SDCP | 7), "\\Device\\Harddisk93\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp8", BRACK(FH_SDCP | 8), "\\Device\\Harddisk93\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp9", BRACK(FH_SDCP | 9), "\\Device\\Harddisk93\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp10", BRACK(FH_SDCP | 10), "\\Device\\Harddisk93\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp11", BRACK(FH_SDCP | 11), "\\Device\\Harddisk93\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp12", BRACK(FH_SDCP | 12), "\\Device\\Harddisk93\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp13", BRACK(FH_SDCP | 13), "\\Device\\Harddisk93\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp14", BRACK(FH_SDCP | 14), "\\Device\\Harddisk93\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcp15", BRACK(FH_SDCP | 15), "\\Device\\Harddisk93\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq1", BRACK(FH_SDCQ | 1), "\\Device\\Harddisk94\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq2", BRACK(FH_SDCQ | 2), "\\Device\\Harddisk94\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq3", BRACK(FH_SDCQ | 3), "\\Device\\Harddisk94\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq4", BRACK(FH_SDCQ | 4), "\\Device\\Harddisk94\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq5", BRACK(FH_SDCQ | 5), "\\Device\\Harddisk94\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq6", BRACK(FH_SDCQ | 6), "\\Device\\Harddisk94\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq7", BRACK(FH_SDCQ | 7), "\\Device\\Harddisk94\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq8", BRACK(FH_SDCQ | 8), "\\Device\\Harddisk94\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq9", BRACK(FH_SDCQ | 9), "\\Device\\Harddisk94\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq10", BRACK(FH_SDCQ | 10), "\\Device\\Harddisk94\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq11", BRACK(FH_SDCQ | 11), "\\Device\\Harddisk94\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq12", BRACK(FH_SDCQ | 12), "\\Device\\Harddisk94\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq13", BRACK(FH_SDCQ | 13), "\\Device\\Harddisk94\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq14", BRACK(FH_SDCQ | 14), "\\Device\\Harddisk94\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcq15", BRACK(FH_SDCQ | 15), "\\Device\\Harddisk94\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr1", BRACK(FH_SDCR | 1), "\\Device\\Harddisk95\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr2", BRACK(FH_SDCR | 2), "\\Device\\Harddisk95\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr3", BRACK(FH_SDCR | 3), "\\Device\\Harddisk95\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr4", BRACK(FH_SDCR | 4), "\\Device\\Harddisk95\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr5", BRACK(FH_SDCR | 5), "\\Device\\Harddisk95\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr6", BRACK(FH_SDCR | 6), "\\Device\\Harddisk95\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr7", BRACK(FH_SDCR | 7), "\\Device\\Harddisk95\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr8", BRACK(FH_SDCR | 8), "\\Device\\Harddisk95\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr9", BRACK(FH_SDCR | 9), "\\Device\\Harddisk95\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr10", BRACK(FH_SDCR | 10), "\\Device\\Harddisk95\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr11", BRACK(FH_SDCR | 11), "\\Device\\Harddisk95\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr12", BRACK(FH_SDCR | 12), "\\Device\\Harddisk95\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr13", BRACK(FH_SDCR | 13), "\\Device\\Harddisk95\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr14", BRACK(FH_SDCR | 14), "\\Device\\Harddisk95\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcr15", BRACK(FH_SDCR | 15), "\\Device\\Harddisk95\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs1", BRACK(FH_SDCS | 1), "\\Device\\Harddisk96\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs2", BRACK(FH_SDCS | 2), "\\Device\\Harddisk96\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs3", BRACK(FH_SDCS | 3), "\\Device\\Harddisk96\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs4", BRACK(FH_SDCS | 4), "\\Device\\Harddisk96\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs5", BRACK(FH_SDCS | 5), "\\Device\\Harddisk96\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs6", BRACK(FH_SDCS | 6), "\\Device\\Harddisk96\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs7", BRACK(FH_SDCS | 7), "\\Device\\Harddisk96\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs8", BRACK(FH_SDCS | 8), "\\Device\\Harddisk96\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs9", BRACK(FH_SDCS | 9), "\\Device\\Harddisk96\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs10", BRACK(FH_SDCS | 10), "\\Device\\Harddisk96\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs11", BRACK(FH_SDCS | 11), "\\Device\\Harddisk96\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs12", BRACK(FH_SDCS | 12), "\\Device\\Harddisk96\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs13", BRACK(FH_SDCS | 13), "\\Device\\Harddisk96\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs14", BRACK(FH_SDCS | 14), "\\Device\\Harddisk96\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcs15", BRACK(FH_SDCS | 15), "\\Device\\Harddisk96\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdct1", BRACK(FH_SDCT | 1), "\\Device\\Harddisk97\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdct2", BRACK(FH_SDCT | 2), "\\Device\\Harddisk97\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdct3", BRACK(FH_SDCT | 3), "\\Device\\Harddisk97\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdct4", BRACK(FH_SDCT | 4), "\\Device\\Harddisk97\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdct5", BRACK(FH_SDCT | 5), "\\Device\\Harddisk97\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdct6", BRACK(FH_SDCT | 6), "\\Device\\Harddisk97\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdct7", BRACK(FH_SDCT | 7), "\\Device\\Harddisk97\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdct8", BRACK(FH_SDCT | 8), "\\Device\\Harddisk97\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdct9", BRACK(FH_SDCT | 9), "\\Device\\Harddisk97\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdct10", BRACK(FH_SDCT | 10), "\\Device\\Harddisk97\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdct11", BRACK(FH_SDCT | 11), "\\Device\\Harddisk97\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdct12", BRACK(FH_SDCT | 12), "\\Device\\Harddisk97\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdct13", BRACK(FH_SDCT | 13), "\\Device\\Harddisk97\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdct14", BRACK(FH_SDCT | 14), "\\Device\\Harddisk97\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdct15", BRACK(FH_SDCT | 15), "\\Device\\Harddisk97\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu1", BRACK(FH_SDCU | 1), "\\Device\\Harddisk98\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu2", BRACK(FH_SDCU | 2), "\\Device\\Harddisk98\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu3", BRACK(FH_SDCU | 3), "\\Device\\Harddisk98\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu4", BRACK(FH_SDCU | 4), "\\Device\\Harddisk98\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu5", BRACK(FH_SDCU | 5), "\\Device\\Harddisk98\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu6", BRACK(FH_SDCU | 6), "\\Device\\Harddisk98\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu7", BRACK(FH_SDCU | 7), "\\Device\\Harddisk98\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu8", BRACK(FH_SDCU | 8), "\\Device\\Harddisk98\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu9", BRACK(FH_SDCU | 9), "\\Device\\Harddisk98\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu10", BRACK(FH_SDCU | 10), "\\Device\\Harddisk98\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu11", BRACK(FH_SDCU | 11), "\\Device\\Harddisk98\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu12", BRACK(FH_SDCU | 12), "\\Device\\Harddisk98\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu13", BRACK(FH_SDCU | 13), "\\Device\\Harddisk98\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu14", BRACK(FH_SDCU | 14), "\\Device\\Harddisk98\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcu15", BRACK(FH_SDCU | 15), "\\Device\\Harddisk98\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv1", BRACK(FH_SDCV | 1), "\\Device\\Harddisk99\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv2", BRACK(FH_SDCV | 2), "\\Device\\Harddisk99\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv3", BRACK(FH_SDCV | 3), "\\Device\\Harddisk99\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv4", BRACK(FH_SDCV | 4), "\\Device\\Harddisk99\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv5", BRACK(FH_SDCV | 5), "\\Device\\Harddisk99\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv6", BRACK(FH_SDCV | 6), "\\Device\\Harddisk99\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv7", BRACK(FH_SDCV | 7), "\\Device\\Harddisk99\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv8", BRACK(FH_SDCV | 8), "\\Device\\Harddisk99\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv9", BRACK(FH_SDCV | 9), "\\Device\\Harddisk99\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv10", BRACK(FH_SDCV | 10), "\\Device\\Harddisk99\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv11", BRACK(FH_SDCV | 11), "\\Device\\Harddisk99\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv12", BRACK(FH_SDCV | 12), "\\Device\\Harddisk99\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv13", BRACK(FH_SDCV | 13), "\\Device\\Harddisk99\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv14", BRACK(FH_SDCV | 14), "\\Device\\Harddisk99\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcv15", BRACK(FH_SDCV | 15), "\\Device\\Harddisk99\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw1", BRACK(FH_SDCW | 1), "\\Device\\Harddisk100\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw2", BRACK(FH_SDCW | 2), "\\Device\\Harddisk100\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw3", BRACK(FH_SDCW | 3), "\\Device\\Harddisk100\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw4", BRACK(FH_SDCW | 4), "\\Device\\Harddisk100\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw5", BRACK(FH_SDCW | 5), "\\Device\\Harddisk100\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw6", BRACK(FH_SDCW | 6), "\\Device\\Harddisk100\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw7", BRACK(FH_SDCW | 7), "\\Device\\Harddisk100\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw8", BRACK(FH_SDCW | 8), "\\Device\\Harddisk100\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw9", BRACK(FH_SDCW | 9), "\\Device\\Harddisk100\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw10", BRACK(FH_SDCW | 10), "\\Device\\Harddisk100\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw11", BRACK(FH_SDCW | 11), "\\Device\\Harddisk100\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw12", BRACK(FH_SDCW | 12), "\\Device\\Harddisk100\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw13", BRACK(FH_SDCW | 13), "\\Device\\Harddisk100\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw14", BRACK(FH_SDCW | 14), "\\Device\\Harddisk100\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcw15", BRACK(FH_SDCW | 15), "\\Device\\Harddisk100\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx1", BRACK(FH_SDCX | 1), "\\Device\\Harddisk101\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx2", BRACK(FH_SDCX | 2), "\\Device\\Harddisk101\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx3", BRACK(FH_SDCX | 3), "\\Device\\Harddisk101\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx4", BRACK(FH_SDCX | 4), "\\Device\\Harddisk101\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx5", BRACK(FH_SDCX | 5), "\\Device\\Harddisk101\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx6", BRACK(FH_SDCX | 6), "\\Device\\Harddisk101\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx7", BRACK(FH_SDCX | 7), "\\Device\\Harddisk101\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx8", BRACK(FH_SDCX | 8), "\\Device\\Harddisk101\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx9", BRACK(FH_SDCX | 9), "\\Device\\Harddisk101\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx10", BRACK(FH_SDCX | 10), "\\Device\\Harddisk101\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx11", BRACK(FH_SDCX | 11), "\\Device\\Harddisk101\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx12", BRACK(FH_SDCX | 12), "\\Device\\Harddisk101\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx13", BRACK(FH_SDCX | 13), "\\Device\\Harddisk101\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx14", BRACK(FH_SDCX | 14), "\\Device\\Harddisk101\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcx15", BRACK(FH_SDCX | 15), "\\Device\\Harddisk101\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy1", BRACK(FH_SDCY | 1), "\\Device\\Harddisk102\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy2", BRACK(FH_SDCY | 2), "\\Device\\Harddisk102\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy3", BRACK(FH_SDCY | 3), "\\Device\\Harddisk102\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy4", BRACK(FH_SDCY | 4), "\\Device\\Harddisk102\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy5", BRACK(FH_SDCY | 5), "\\Device\\Harddisk102\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy6", BRACK(FH_SDCY | 6), "\\Device\\Harddisk102\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy7", BRACK(FH_SDCY | 7), "\\Device\\Harddisk102\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy8", BRACK(FH_SDCY | 8), "\\Device\\Harddisk102\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy9", BRACK(FH_SDCY | 9), "\\Device\\Harddisk102\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy10", BRACK(FH_SDCY | 10), "\\Device\\Harddisk102\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy11", BRACK(FH_SDCY | 11), "\\Device\\Harddisk102\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy12", BRACK(FH_SDCY | 12), "\\Device\\Harddisk102\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy13", BRACK(FH_SDCY | 13), "\\Device\\Harddisk102\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy14", BRACK(FH_SDCY | 14), "\\Device\\Harddisk102\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcy15", BRACK(FH_SDCY | 15), "\\Device\\Harddisk102\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz1", BRACK(FH_SDCZ | 1), "\\Device\\Harddisk103\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz2", BRACK(FH_SDCZ | 2), "\\Device\\Harddisk103\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz3", BRACK(FH_SDCZ | 3), "\\Device\\Harddisk103\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz4", BRACK(FH_SDCZ | 4), "\\Device\\Harddisk103\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz5", BRACK(FH_SDCZ | 5), "\\Device\\Harddisk103\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz6", BRACK(FH_SDCZ | 6), "\\Device\\Harddisk103\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz7", BRACK(FH_SDCZ | 7), "\\Device\\Harddisk103\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz8", BRACK(FH_SDCZ | 8), "\\Device\\Harddisk103\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz9", BRACK(FH_SDCZ | 9), "\\Device\\Harddisk103\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz10", BRACK(FH_SDCZ | 10), "\\Device\\Harddisk103\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz11", BRACK(FH_SDCZ | 11), "\\Device\\Harddisk103\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz12", BRACK(FH_SDCZ | 12), "\\Device\\Harddisk103\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz13", BRACK(FH_SDCZ | 13), "\\Device\\Harddisk103\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz14", BRACK(FH_SDCZ | 14), "\\Device\\Harddisk103\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdcz15", BRACK(FH_SDCZ | 15), "\\Device\\Harddisk103\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdda", BRACK(FH_SDDA), "\\Device\\Harddisk104\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddb", BRACK(FH_SDDB), "\\Device\\Harddisk105\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddc", BRACK(FH_SDDC), "\\Device\\Harddisk106\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddd", BRACK(FH_SDDD), "\\Device\\Harddisk107\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdde", BRACK(FH_SDDE), "\\Device\\Harddisk108\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddf", BRACK(FH_SDDF), "\\Device\\Harddisk109\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddg", BRACK(FH_SDDG), "\\Device\\Harddisk110\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddh", BRACK(FH_SDDH), "\\Device\\Harddisk111\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddi", BRACK(FH_SDDI), "\\Device\\Harddisk112\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddj", BRACK(FH_SDDJ), "\\Device\\Harddisk113\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddk", BRACK(FH_SDDK), "\\Device\\Harddisk114\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddl", BRACK(FH_SDDL), "\\Device\\Harddisk115\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddm", BRACK(FH_SDDM), "\\Device\\Harddisk116\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddn", BRACK(FH_SDDN), "\\Device\\Harddisk117\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddo", BRACK(FH_SDDO), "\\Device\\Harddisk118\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddp", BRACK(FH_SDDP), "\\Device\\Harddisk119\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddq", BRACK(FH_SDDQ), "\\Device\\Harddisk120\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddr", BRACK(FH_SDDR), "\\Device\\Harddisk121\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdds", BRACK(FH_SDDS), "\\Device\\Harddisk122\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddt", BRACK(FH_SDDT), "\\Device\\Harddisk123\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddu", BRACK(FH_SDDU), "\\Device\\Harddisk124\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddv", BRACK(FH_SDDV), "\\Device\\Harddisk125\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddw", BRACK(FH_SDDW), "\\Device\\Harddisk126\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sddx", BRACK(FH_SDDX), "\\Device\\Harddisk127\\Partition0", exists_ntdev, S_IFBLK},
-  {"/dev/sdda1", BRACK(FH_SDDA | 1), "\\Device\\Harddisk104\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdda2", BRACK(FH_SDDA | 2), "\\Device\\Harddisk104\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdda3", BRACK(FH_SDDA | 3), "\\Device\\Harddisk104\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdda4", BRACK(FH_SDDA | 4), "\\Device\\Harddisk104\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdda5", BRACK(FH_SDDA | 5), "\\Device\\Harddisk104\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdda6", BRACK(FH_SDDA | 6), "\\Device\\Harddisk104\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdda7", BRACK(FH_SDDA | 7), "\\Device\\Harddisk104\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdda8", BRACK(FH_SDDA | 8), "\\Device\\Harddisk104\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdda9", BRACK(FH_SDDA | 9), "\\Device\\Harddisk104\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdda10", BRACK(FH_SDDA | 10), "\\Device\\Harddisk104\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdda11", BRACK(FH_SDDA | 11), "\\Device\\Harddisk104\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdda12", BRACK(FH_SDDA | 12), "\\Device\\Harddisk104\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdda13", BRACK(FH_SDDA | 13), "\\Device\\Harddisk104\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdda14", BRACK(FH_SDDA | 14), "\\Device\\Harddisk104\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdda15", BRACK(FH_SDDA | 15), "\\Device\\Harddisk104\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddb1", BRACK(FH_SDDB | 1), "\\Device\\Harddisk105\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddb2", BRACK(FH_SDDB | 2), "\\Device\\Harddisk105\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddb3", BRACK(FH_SDDB | 3), "\\Device\\Harddisk105\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddb4", BRACK(FH_SDDB | 4), "\\Device\\Harddisk105\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddb5", BRACK(FH_SDDB | 5), "\\Device\\Harddisk105\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddb6", BRACK(FH_SDDB | 6), "\\Device\\Harddisk105\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddb7", BRACK(FH_SDDB | 7), "\\Device\\Harddisk105\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddb8", BRACK(FH_SDDB | 8), "\\Device\\Harddisk105\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddb9", BRACK(FH_SDDB | 9), "\\Device\\Harddisk105\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddb10", BRACK(FH_SDDB | 10), "\\Device\\Harddisk105\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddb11", BRACK(FH_SDDB | 11), "\\Device\\Harddisk105\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddb12", BRACK(FH_SDDB | 12), "\\Device\\Harddisk105\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddb13", BRACK(FH_SDDB | 13), "\\Device\\Harddisk105\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddb14", BRACK(FH_SDDB | 14), "\\Device\\Harddisk105\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddb15", BRACK(FH_SDDB | 15), "\\Device\\Harddisk105\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddc1", BRACK(FH_SDDC | 1), "\\Device\\Harddisk106\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddc2", BRACK(FH_SDDC | 2), "\\Device\\Harddisk106\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddc3", BRACK(FH_SDDC | 3), "\\Device\\Harddisk106\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddc4", BRACK(FH_SDDC | 4), "\\Device\\Harddisk106\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddc5", BRACK(FH_SDDC | 5), "\\Device\\Harddisk106\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddc6", BRACK(FH_SDDC | 6), "\\Device\\Harddisk106\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddc7", BRACK(FH_SDDC | 7), "\\Device\\Harddisk106\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddc8", BRACK(FH_SDDC | 8), "\\Device\\Harddisk106\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddc9", BRACK(FH_SDDC | 9), "\\Device\\Harddisk106\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddc10", BRACK(FH_SDDC | 10), "\\Device\\Harddisk106\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddc11", BRACK(FH_SDDC | 11), "\\Device\\Harddisk106\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddc12", BRACK(FH_SDDC | 12), "\\Device\\Harddisk106\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddc13", BRACK(FH_SDDC | 13), "\\Device\\Harddisk106\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddc14", BRACK(FH_SDDC | 14), "\\Device\\Harddisk106\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddc15", BRACK(FH_SDDC | 15), "\\Device\\Harddisk106\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddd1", BRACK(FH_SDDD | 1), "\\Device\\Harddisk107\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddd2", BRACK(FH_SDDD | 2), "\\Device\\Harddisk107\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddd3", BRACK(FH_SDDD | 3), "\\Device\\Harddisk107\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddd4", BRACK(FH_SDDD | 4), "\\Device\\Harddisk107\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddd5", BRACK(FH_SDDD | 5), "\\Device\\Harddisk107\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddd6", BRACK(FH_SDDD | 6), "\\Device\\Harddisk107\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddd7", BRACK(FH_SDDD | 7), "\\Device\\Harddisk107\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddd8", BRACK(FH_SDDD | 8), "\\Device\\Harddisk107\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddd9", BRACK(FH_SDDD | 9), "\\Device\\Harddisk107\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddd10", BRACK(FH_SDDD | 10), "\\Device\\Harddisk107\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddd11", BRACK(FH_SDDD | 11), "\\Device\\Harddisk107\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddd12", BRACK(FH_SDDD | 12), "\\Device\\Harddisk107\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddd13", BRACK(FH_SDDD | 13), "\\Device\\Harddisk107\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddd14", BRACK(FH_SDDD | 14), "\\Device\\Harddisk107\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddd15", BRACK(FH_SDDD | 15), "\\Device\\Harddisk107\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdde1", BRACK(FH_SDDE | 1), "\\Device\\Harddisk108\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdde2", BRACK(FH_SDDE | 2), "\\Device\\Harddisk108\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdde3", BRACK(FH_SDDE | 3), "\\Device\\Harddisk108\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdde4", BRACK(FH_SDDE | 4), "\\Device\\Harddisk108\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdde5", BRACK(FH_SDDE | 5), "\\Device\\Harddisk108\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdde6", BRACK(FH_SDDE | 6), "\\Device\\Harddisk108\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdde7", BRACK(FH_SDDE | 7), "\\Device\\Harddisk108\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdde8", BRACK(FH_SDDE | 8), "\\Device\\Harddisk108\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdde9", BRACK(FH_SDDE | 9), "\\Device\\Harddisk108\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdde10", BRACK(FH_SDDE | 10), "\\Device\\Harddisk108\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdde11", BRACK(FH_SDDE | 11), "\\Device\\Harddisk108\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdde12", BRACK(FH_SDDE | 12), "\\Device\\Harddisk108\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdde13", BRACK(FH_SDDE | 13), "\\Device\\Harddisk108\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdde14", BRACK(FH_SDDE | 14), "\\Device\\Harddisk108\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdde15", BRACK(FH_SDDE | 15), "\\Device\\Harddisk108\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddf1", BRACK(FH_SDDF | 1), "\\Device\\Harddisk109\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddf2", BRACK(FH_SDDF | 2), "\\Device\\Harddisk109\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddf3", BRACK(FH_SDDF | 3), "\\Device\\Harddisk109\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddf4", BRACK(FH_SDDF | 4), "\\Device\\Harddisk109\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddf5", BRACK(FH_SDDF | 5), "\\Device\\Harddisk109\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddf6", BRACK(FH_SDDF | 6), "\\Device\\Harddisk109\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddf7", BRACK(FH_SDDF | 7), "\\Device\\Harddisk109\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddf8", BRACK(FH_SDDF | 8), "\\Device\\Harddisk109\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddf9", BRACK(FH_SDDF | 9), "\\Device\\Harddisk109\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddf10", BRACK(FH_SDDF | 10), "\\Device\\Harddisk109\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddf11", BRACK(FH_SDDF | 11), "\\Device\\Harddisk109\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddf12", BRACK(FH_SDDF | 12), "\\Device\\Harddisk109\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddf13", BRACK(FH_SDDF | 13), "\\Device\\Harddisk109\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddf14", BRACK(FH_SDDF | 14), "\\Device\\Harddisk109\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddf15", BRACK(FH_SDDF | 15), "\\Device\\Harddisk109\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddg1", BRACK(FH_SDDG | 1), "\\Device\\Harddisk110\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddg2", BRACK(FH_SDDG | 2), "\\Device\\Harddisk110\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddg3", BRACK(FH_SDDG | 3), "\\Device\\Harddisk110\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddg4", BRACK(FH_SDDG | 4), "\\Device\\Harddisk110\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddg5", BRACK(FH_SDDG | 5), "\\Device\\Harddisk110\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddg6", BRACK(FH_SDDG | 6), "\\Device\\Harddisk110\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddg7", BRACK(FH_SDDG | 7), "\\Device\\Harddisk110\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddg8", BRACK(FH_SDDG | 8), "\\Device\\Harddisk110\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddg9", BRACK(FH_SDDG | 9), "\\Device\\Harddisk110\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddg10", BRACK(FH_SDDG | 10), "\\Device\\Harddisk110\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddg11", BRACK(FH_SDDG | 11), "\\Device\\Harddisk110\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddg12", BRACK(FH_SDDG | 12), "\\Device\\Harddisk110\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddg13", BRACK(FH_SDDG | 13), "\\Device\\Harddisk110\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddg14", BRACK(FH_SDDG | 14), "\\Device\\Harddisk110\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddg15", BRACK(FH_SDDG | 15), "\\Device\\Harddisk110\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddh1", BRACK(FH_SDDH | 1), "\\Device\\Harddisk111\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddh2", BRACK(FH_SDDH | 2), "\\Device\\Harddisk111\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddh3", BRACK(FH_SDDH | 3), "\\Device\\Harddisk111\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddh4", BRACK(FH_SDDH | 4), "\\Device\\Harddisk111\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddh5", BRACK(FH_SDDH | 5), "\\Device\\Harddisk111\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddh6", BRACK(FH_SDDH | 6), "\\Device\\Harddisk111\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddh7", BRACK(FH_SDDH | 7), "\\Device\\Harddisk111\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddh8", BRACK(FH_SDDH | 8), "\\Device\\Harddisk111\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddh9", BRACK(FH_SDDH | 9), "\\Device\\Harddisk111\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddh10", BRACK(FH_SDDH | 10), "\\Device\\Harddisk111\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddh11", BRACK(FH_SDDH | 11), "\\Device\\Harddisk111\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddh12", BRACK(FH_SDDH | 12), "\\Device\\Harddisk111\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddh13", BRACK(FH_SDDH | 13), "\\Device\\Harddisk111\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddh14", BRACK(FH_SDDH | 14), "\\Device\\Harddisk111\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddh15", BRACK(FH_SDDH | 15), "\\Device\\Harddisk111\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddi1", BRACK(FH_SDDI | 1), "\\Device\\Harddisk112\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddi2", BRACK(FH_SDDI | 2), "\\Device\\Harddisk112\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddi3", BRACK(FH_SDDI | 3), "\\Device\\Harddisk112\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddi4", BRACK(FH_SDDI | 4), "\\Device\\Harddisk112\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddi5", BRACK(FH_SDDI | 5), "\\Device\\Harddisk112\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddi6", BRACK(FH_SDDI | 6), "\\Device\\Harddisk112\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddi7", BRACK(FH_SDDI | 7), "\\Device\\Harddisk112\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddi8", BRACK(FH_SDDI | 8), "\\Device\\Harddisk112\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddi9", BRACK(FH_SDDI | 9), "\\Device\\Harddisk112\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddi10", BRACK(FH_SDDI | 10), "\\Device\\Harddisk112\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddi11", BRACK(FH_SDDI | 11), "\\Device\\Harddisk112\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddi12", BRACK(FH_SDDI | 12), "\\Device\\Harddisk112\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddi13", BRACK(FH_SDDI | 13), "\\Device\\Harddisk112\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddi14", BRACK(FH_SDDI | 14), "\\Device\\Harddisk112\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddi15", BRACK(FH_SDDI | 15), "\\Device\\Harddisk112\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddj1", BRACK(FH_SDDJ | 1), "\\Device\\Harddisk113\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddj2", BRACK(FH_SDDJ | 2), "\\Device\\Harddisk113\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddj3", BRACK(FH_SDDJ | 3), "\\Device\\Harddisk113\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddj4", BRACK(FH_SDDJ | 4), "\\Device\\Harddisk113\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddj5", BRACK(FH_SDDJ | 5), "\\Device\\Harddisk113\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddj6", BRACK(FH_SDDJ | 6), "\\Device\\Harddisk113\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddj7", BRACK(FH_SDDJ | 7), "\\Device\\Harddisk113\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddj8", BRACK(FH_SDDJ | 8), "\\Device\\Harddisk113\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddj9", BRACK(FH_SDDJ | 9), "\\Device\\Harddisk113\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddj10", BRACK(FH_SDDJ | 10), "\\Device\\Harddisk113\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddj11", BRACK(FH_SDDJ | 11), "\\Device\\Harddisk113\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddj12", BRACK(FH_SDDJ | 12), "\\Device\\Harddisk113\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddj13", BRACK(FH_SDDJ | 13), "\\Device\\Harddisk113\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddj14", BRACK(FH_SDDJ | 14), "\\Device\\Harddisk113\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddj15", BRACK(FH_SDDJ | 15), "\\Device\\Harddisk113\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddk1", BRACK(FH_SDDK | 1), "\\Device\\Harddisk114\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddk2", BRACK(FH_SDDK | 2), "\\Device\\Harddisk114\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddk3", BRACK(FH_SDDK | 3), "\\Device\\Harddisk114\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddk4", BRACK(FH_SDDK | 4), "\\Device\\Harddisk114\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddk5", BRACK(FH_SDDK | 5), "\\Device\\Harddisk114\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddk6", BRACK(FH_SDDK | 6), "\\Device\\Harddisk114\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddk7", BRACK(FH_SDDK | 7), "\\Device\\Harddisk114\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddk8", BRACK(FH_SDDK | 8), "\\Device\\Harddisk114\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddk9", BRACK(FH_SDDK | 9), "\\Device\\Harddisk114\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddk10", BRACK(FH_SDDK | 10), "\\Device\\Harddisk114\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddk11", BRACK(FH_SDDK | 11), "\\Device\\Harddisk114\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddk12", BRACK(FH_SDDK | 12), "\\Device\\Harddisk114\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddk13", BRACK(FH_SDDK | 13), "\\Device\\Harddisk114\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddk14", BRACK(FH_SDDK | 14), "\\Device\\Harddisk114\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddk15", BRACK(FH_SDDK | 15), "\\Device\\Harddisk114\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddl1", BRACK(FH_SDDL | 1), "\\Device\\Harddisk115\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddl2", BRACK(FH_SDDL | 2), "\\Device\\Harddisk115\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddl3", BRACK(FH_SDDL | 3), "\\Device\\Harddisk115\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddl4", BRACK(FH_SDDL | 4), "\\Device\\Harddisk115\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddl5", BRACK(FH_SDDL | 5), "\\Device\\Harddisk115\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddl6", BRACK(FH_SDDL | 6), "\\Device\\Harddisk115\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddl7", BRACK(FH_SDDL | 7), "\\Device\\Harddisk115\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddl8", BRACK(FH_SDDL | 8), "\\Device\\Harddisk115\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddl9", BRACK(FH_SDDL | 9), "\\Device\\Harddisk115\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddl10", BRACK(FH_SDDL | 10), "\\Device\\Harddisk115\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddl11", BRACK(FH_SDDL | 11), "\\Device\\Harddisk115\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddl12", BRACK(FH_SDDL | 12), "\\Device\\Harddisk115\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddl13", BRACK(FH_SDDL | 13), "\\Device\\Harddisk115\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddl14", BRACK(FH_SDDL | 14), "\\Device\\Harddisk115\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddl15", BRACK(FH_SDDL | 15), "\\Device\\Harddisk115\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddm1", BRACK(FH_SDDM | 1), "\\Device\\Harddisk116\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddm2", BRACK(FH_SDDM | 2), "\\Device\\Harddisk116\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddm3", BRACK(FH_SDDM | 3), "\\Device\\Harddisk116\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddm4", BRACK(FH_SDDM | 4), "\\Device\\Harddisk116\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddm5", BRACK(FH_SDDM | 5), "\\Device\\Harddisk116\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddm6", BRACK(FH_SDDM | 6), "\\Device\\Harddisk116\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddm7", BRACK(FH_SDDM | 7), "\\Device\\Harddisk116\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddm8", BRACK(FH_SDDM | 8), "\\Device\\Harddisk116\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddm9", BRACK(FH_SDDM | 9), "\\Device\\Harddisk116\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddm10", BRACK(FH_SDDM | 10), "\\Device\\Harddisk116\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddm11", BRACK(FH_SDDM | 11), "\\Device\\Harddisk116\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddm12", BRACK(FH_SDDM | 12), "\\Device\\Harddisk116\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddm13", BRACK(FH_SDDM | 13), "\\Device\\Harddisk116\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddm14", BRACK(FH_SDDM | 14), "\\Device\\Harddisk116\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddm15", BRACK(FH_SDDM | 15), "\\Device\\Harddisk116\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddn1", BRACK(FH_SDDN | 1), "\\Device\\Harddisk117\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddn2", BRACK(FH_SDDN | 2), "\\Device\\Harddisk117\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddn3", BRACK(FH_SDDN | 3), "\\Device\\Harddisk117\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddn4", BRACK(FH_SDDN | 4), "\\Device\\Harddisk117\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddn5", BRACK(FH_SDDN | 5), "\\Device\\Harddisk117\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddn6", BRACK(FH_SDDN | 6), "\\Device\\Harddisk117\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddn7", BRACK(FH_SDDN | 7), "\\Device\\Harddisk117\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddn8", BRACK(FH_SDDN | 8), "\\Device\\Harddisk117\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddn9", BRACK(FH_SDDN | 9), "\\Device\\Harddisk117\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddn10", BRACK(FH_SDDN | 10), "\\Device\\Harddisk117\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddn11", BRACK(FH_SDDN | 11), "\\Device\\Harddisk117\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddn12", BRACK(FH_SDDN | 12), "\\Device\\Harddisk117\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddn13", BRACK(FH_SDDN | 13), "\\Device\\Harddisk117\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddn14", BRACK(FH_SDDN | 14), "\\Device\\Harddisk117\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddn15", BRACK(FH_SDDN | 15), "\\Device\\Harddisk117\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddo1", BRACK(FH_SDDO | 1), "\\Device\\Harddisk118\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddo2", BRACK(FH_SDDO | 2), "\\Device\\Harddisk118\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddo3", BRACK(FH_SDDO | 3), "\\Device\\Harddisk118\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddo4", BRACK(FH_SDDO | 4), "\\Device\\Harddisk118\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddo5", BRACK(FH_SDDO | 5), "\\Device\\Harddisk118\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddo6", BRACK(FH_SDDO | 6), "\\Device\\Harddisk118\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddo7", BRACK(FH_SDDO | 7), "\\Device\\Harddisk118\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddo8", BRACK(FH_SDDO | 8), "\\Device\\Harddisk118\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddo9", BRACK(FH_SDDO | 9), "\\Device\\Harddisk118\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddo10", BRACK(FH_SDDO | 10), "\\Device\\Harddisk118\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddo11", BRACK(FH_SDDO | 11), "\\Device\\Harddisk118\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddo12", BRACK(FH_SDDO | 12), "\\Device\\Harddisk118\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddo13", BRACK(FH_SDDO | 13), "\\Device\\Harddisk118\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddo14", BRACK(FH_SDDO | 14), "\\Device\\Harddisk118\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddo15", BRACK(FH_SDDO | 15), "\\Device\\Harddisk118\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddp1", BRACK(FH_SDDP | 1), "\\Device\\Harddisk119\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddp2", BRACK(FH_SDDP | 2), "\\Device\\Harddisk119\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddp3", BRACK(FH_SDDP | 3), "\\Device\\Harddisk119\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddp4", BRACK(FH_SDDP | 4), "\\Device\\Harddisk119\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddp5", BRACK(FH_SDDP | 5), "\\Device\\Harddisk119\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddp6", BRACK(FH_SDDP | 6), "\\Device\\Harddisk119\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddp7", BRACK(FH_SDDP | 7), "\\Device\\Harddisk119\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddp8", BRACK(FH_SDDP | 8), "\\Device\\Harddisk119\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddp9", BRACK(FH_SDDP | 9), "\\Device\\Harddisk119\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddp10", BRACK(FH_SDDP | 10), "\\Device\\Harddisk119\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddp11", BRACK(FH_SDDP | 11), "\\Device\\Harddisk119\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddp12", BRACK(FH_SDDP | 12), "\\Device\\Harddisk119\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddp13", BRACK(FH_SDDP | 13), "\\Device\\Harddisk119\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddp14", BRACK(FH_SDDP | 14), "\\Device\\Harddisk119\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddp15", BRACK(FH_SDDP | 15), "\\Device\\Harddisk119\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddq1", BRACK(FH_SDDQ | 1), "\\Device\\Harddisk120\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddq2", BRACK(FH_SDDQ | 2), "\\Device\\Harddisk120\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddq3", BRACK(FH_SDDQ | 3), "\\Device\\Harddisk120\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddq4", BRACK(FH_SDDQ | 4), "\\Device\\Harddisk120\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddq5", BRACK(FH_SDDQ | 5), "\\Device\\Harddisk120\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddq6", BRACK(FH_SDDQ | 6), "\\Device\\Harddisk120\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddq7", BRACK(FH_SDDQ | 7), "\\Device\\Harddisk120\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddq8", BRACK(FH_SDDQ | 8), "\\Device\\Harddisk120\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddq9", BRACK(FH_SDDQ | 9), "\\Device\\Harddisk120\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddq10", BRACK(FH_SDDQ | 10), "\\Device\\Harddisk120\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddq11", BRACK(FH_SDDQ | 11), "\\Device\\Harddisk120\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddq12", BRACK(FH_SDDQ | 12), "\\Device\\Harddisk120\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddq13", BRACK(FH_SDDQ | 13), "\\Device\\Harddisk120\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddq14", BRACK(FH_SDDQ | 14), "\\Device\\Harddisk120\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddq15", BRACK(FH_SDDQ | 15), "\\Device\\Harddisk120\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddr1", BRACK(FH_SDDR | 1), "\\Device\\Harddisk121\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddr2", BRACK(FH_SDDR | 2), "\\Device\\Harddisk121\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddr3", BRACK(FH_SDDR | 3), "\\Device\\Harddisk121\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddr4", BRACK(FH_SDDR | 4), "\\Device\\Harddisk121\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddr5", BRACK(FH_SDDR | 5), "\\Device\\Harddisk121\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddr6", BRACK(FH_SDDR | 6), "\\Device\\Harddisk121\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddr7", BRACK(FH_SDDR | 7), "\\Device\\Harddisk121\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddr8", BRACK(FH_SDDR | 8), "\\Device\\Harddisk121\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddr9", BRACK(FH_SDDR | 9), "\\Device\\Harddisk121\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddr10", BRACK(FH_SDDR | 10), "\\Device\\Harddisk121\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddr11", BRACK(FH_SDDR | 11), "\\Device\\Harddisk121\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddr12", BRACK(FH_SDDR | 12), "\\Device\\Harddisk121\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddr13", BRACK(FH_SDDR | 13), "\\Device\\Harddisk121\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddr14", BRACK(FH_SDDR | 14), "\\Device\\Harddisk121\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddr15", BRACK(FH_SDDR | 15), "\\Device\\Harddisk121\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sdds1", BRACK(FH_SDDS | 1), "\\Device\\Harddisk122\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sdds2", BRACK(FH_SDDS | 2), "\\Device\\Harddisk122\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sdds3", BRACK(FH_SDDS | 3), "\\Device\\Harddisk122\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sdds4", BRACK(FH_SDDS | 4), "\\Device\\Harddisk122\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sdds5", BRACK(FH_SDDS | 5), "\\Device\\Harddisk122\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sdds6", BRACK(FH_SDDS | 6), "\\Device\\Harddisk122\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sdds7", BRACK(FH_SDDS | 7), "\\Device\\Harddisk122\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sdds8", BRACK(FH_SDDS | 8), "\\Device\\Harddisk122\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sdds9", BRACK(FH_SDDS | 9), "\\Device\\Harddisk122\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sdds10", BRACK(FH_SDDS | 10), "\\Device\\Harddisk122\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sdds11", BRACK(FH_SDDS | 11), "\\Device\\Harddisk122\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sdds12", BRACK(FH_SDDS | 12), "\\Device\\Harddisk122\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sdds13", BRACK(FH_SDDS | 13), "\\Device\\Harddisk122\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sdds14", BRACK(FH_SDDS | 14), "\\Device\\Harddisk122\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sdds15", BRACK(FH_SDDS | 15), "\\Device\\Harddisk122\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddt1", BRACK(FH_SDDT | 1), "\\Device\\Harddisk123\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddt2", BRACK(FH_SDDT | 2), "\\Device\\Harddisk123\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddt3", BRACK(FH_SDDT | 3), "\\Device\\Harddisk123\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddt4", BRACK(FH_SDDT | 4), "\\Device\\Harddisk123\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddt5", BRACK(FH_SDDT | 5), "\\Device\\Harddisk123\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddt6", BRACK(FH_SDDT | 6), "\\Device\\Harddisk123\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddt7", BRACK(FH_SDDT | 7), "\\Device\\Harddisk123\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddt8", BRACK(FH_SDDT | 8), "\\Device\\Harddisk123\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddt9", BRACK(FH_SDDT | 9), "\\Device\\Harddisk123\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddt10", BRACK(FH_SDDT | 10), "\\Device\\Harddisk123\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddt11", BRACK(FH_SDDT | 11), "\\Device\\Harddisk123\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddt12", BRACK(FH_SDDT | 12), "\\Device\\Harddisk123\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddt13", BRACK(FH_SDDT | 13), "\\Device\\Harddisk123\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddt14", BRACK(FH_SDDT | 14), "\\Device\\Harddisk123\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddt15", BRACK(FH_SDDT | 15), "\\Device\\Harddisk123\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddu1", BRACK(FH_SDDU | 1), "\\Device\\Harddisk124\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddu2", BRACK(FH_SDDU | 2), "\\Device\\Harddisk124\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddu3", BRACK(FH_SDDU | 3), "\\Device\\Harddisk124\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddu4", BRACK(FH_SDDU | 4), "\\Device\\Harddisk124\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddu5", BRACK(FH_SDDU | 5), "\\Device\\Harddisk124\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddu6", BRACK(FH_SDDU | 6), "\\Device\\Harddisk124\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddu7", BRACK(FH_SDDU | 7), "\\Device\\Harddisk124\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddu8", BRACK(FH_SDDU | 8), "\\Device\\Harddisk124\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddu9", BRACK(FH_SDDU | 9), "\\Device\\Harddisk124\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddu10", BRACK(FH_SDDU | 10), "\\Device\\Harddisk124\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddu11", BRACK(FH_SDDU | 11), "\\Device\\Harddisk124\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddu12", BRACK(FH_SDDU | 12), "\\Device\\Harddisk124\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddu13", BRACK(FH_SDDU | 13), "\\Device\\Harddisk124\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddu14", BRACK(FH_SDDU | 14), "\\Device\\Harddisk124\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddu15", BRACK(FH_SDDU | 15), "\\Device\\Harddisk124\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddv1", BRACK(FH_SDDV | 1), "\\Device\\Harddisk125\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddv2", BRACK(FH_SDDV | 2), "\\Device\\Harddisk125\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddv3", BRACK(FH_SDDV | 3), "\\Device\\Harddisk125\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddv4", BRACK(FH_SDDV | 4), "\\Device\\Harddisk125\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddv5", BRACK(FH_SDDV | 5), "\\Device\\Harddisk125\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddv6", BRACK(FH_SDDV | 6), "\\Device\\Harddisk125\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddv7", BRACK(FH_SDDV | 7), "\\Device\\Harddisk125\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddv8", BRACK(FH_SDDV | 8), "\\Device\\Harddisk125\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddv9", BRACK(FH_SDDV | 9), "\\Device\\Harddisk125\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddv10", BRACK(FH_SDDV | 10), "\\Device\\Harddisk125\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddv11", BRACK(FH_SDDV | 11), "\\Device\\Harddisk125\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddv12", BRACK(FH_SDDV | 12), "\\Device\\Harddisk125\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddv13", BRACK(FH_SDDV | 13), "\\Device\\Harddisk125\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddv14", BRACK(FH_SDDV | 14), "\\Device\\Harddisk125\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddv15", BRACK(FH_SDDV | 15), "\\Device\\Harddisk125\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddw1", BRACK(FH_SDDW | 1), "\\Device\\Harddisk126\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddw2", BRACK(FH_SDDW | 2), "\\Device\\Harddisk126\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddw3", BRACK(FH_SDDW | 3), "\\Device\\Harddisk126\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddw4", BRACK(FH_SDDW | 4), "\\Device\\Harddisk126\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddw5", BRACK(FH_SDDW | 5), "\\Device\\Harddisk126\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddw6", BRACK(FH_SDDW | 6), "\\Device\\Harddisk126\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddw7", BRACK(FH_SDDW | 7), "\\Device\\Harddisk126\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddw8", BRACK(FH_SDDW | 8), "\\Device\\Harddisk126\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddw9", BRACK(FH_SDDW | 9), "\\Device\\Harddisk126\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddw10", BRACK(FH_SDDW | 10), "\\Device\\Harddisk126\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddw11", BRACK(FH_SDDW | 11), "\\Device\\Harddisk126\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddw12", BRACK(FH_SDDW | 12), "\\Device\\Harddisk126\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddw13", BRACK(FH_SDDW | 13), "\\Device\\Harddisk126\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddw14", BRACK(FH_SDDW | 14), "\\Device\\Harddisk126\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddw15", BRACK(FH_SDDW | 15), "\\Device\\Harddisk126\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sddx1", BRACK(FH_SDDX | 1), "\\Device\\Harddisk127\\Partition1", exists_ntdev, S_IFBLK},
-  {"/dev/sddx2", BRACK(FH_SDDX | 2), "\\Device\\Harddisk127\\Partition2", exists_ntdev, S_IFBLK},
-  {"/dev/sddx3", BRACK(FH_SDDX | 3), "\\Device\\Harddisk127\\Partition3", exists_ntdev, S_IFBLK},
-  {"/dev/sddx4", BRACK(FH_SDDX | 4), "\\Device\\Harddisk127\\Partition4", exists_ntdev, S_IFBLK},
-  {"/dev/sddx5", BRACK(FH_SDDX | 5), "\\Device\\Harddisk127\\Partition5", exists_ntdev, S_IFBLK},
-  {"/dev/sddx6", BRACK(FH_SDDX | 6), "\\Device\\Harddisk127\\Partition6", exists_ntdev, S_IFBLK},
-  {"/dev/sddx7", BRACK(FH_SDDX | 7), "\\Device\\Harddisk127\\Partition7", exists_ntdev, S_IFBLK},
-  {"/dev/sddx8", BRACK(FH_SDDX | 8), "\\Device\\Harddisk127\\Partition8", exists_ntdev, S_IFBLK},
-  {"/dev/sddx9", BRACK(FH_SDDX | 9), "\\Device\\Harddisk127\\Partition9", exists_ntdev, S_IFBLK},
-  {"/dev/sddx10", BRACK(FH_SDDX | 10), "\\Device\\Harddisk127\\Partition10", exists_ntdev, S_IFBLK},
-  {"/dev/sddx11", BRACK(FH_SDDX | 11), "\\Device\\Harddisk127\\Partition11", exists_ntdev, S_IFBLK},
-  {"/dev/sddx12", BRACK(FH_SDDX | 12), "\\Device\\Harddisk127\\Partition12", exists_ntdev, S_IFBLK},
-  {"/dev/sddx13", BRACK(FH_SDDX | 13), "\\Device\\Harddisk127\\Partition13", exists_ntdev, S_IFBLK},
-  {"/dev/sddx14", BRACK(FH_SDDX | 14), "\\Device\\Harddisk127\\Partition14", exists_ntdev, S_IFBLK},
-  {"/dev/sddx15", BRACK(FH_SDDX | 15), "\\Device\\Harddisk127\\Partition15", exists_ntdev, S_IFBLK},
-  {"/dev/sr0", BRACK(FHDEV(DEV_CDROM_MAJOR, 0)), "\\Device\\CdRom0", exists_ntdev, S_IFBLK},
-  {"/dev/sr1", BRACK(FHDEV(DEV_CDROM_MAJOR, 1)), "\\Device\\CdRom1", exists_ntdev, S_IFBLK},
-  {"/dev/sr2", BRACK(FHDEV(DEV_CDROM_MAJOR, 2)), "\\Device\\CdRom2", exists_ntdev, S_IFBLK},
-  {"/dev/sr3", BRACK(FHDEV(DEV_CDROM_MAJOR, 3)), "\\Device\\CdRom3", exists_ntdev, S_IFBLK},
-  {"/dev/sr4", BRACK(FHDEV(DEV_CDROM_MAJOR, 4)), "\\Device\\CdRom4", exists_ntdev, S_IFBLK},
-  {"/dev/sr5", BRACK(FHDEV(DEV_CDROM_MAJOR, 5)), "\\Device\\CdRom5", exists_ntdev, S_IFBLK},
-  {"/dev/sr6", BRACK(FHDEV(DEV_CDROM_MAJOR, 6)), "\\Device\\CdRom6", exists_ntdev, S_IFBLK},
-  {"/dev/sr7", BRACK(FHDEV(DEV_CDROM_MAJOR, 7)), "\\Device\\CdRom7", exists_ntdev, S_IFBLK},
-  {"/dev/sr8", BRACK(FHDEV(DEV_CDROM_MAJOR, 8)), "\\Device\\CdRom8", exists_ntdev, S_IFBLK},
-  {"/dev/sr9", BRACK(FHDEV(DEV_CDROM_MAJOR, 9)), "\\Device\\CdRom9", exists_ntdev, S_IFBLK},
-  {"/dev/sr10", BRACK(FHDEV(DEV_CDROM_MAJOR, 10)), "\\Device\\CdRom10", exists_ntdev, S_IFBLK},
-  {"/dev/sr11", BRACK(FHDEV(DEV_CDROM_MAJOR, 11)), "\\Device\\CdRom11", exists_ntdev, S_IFBLK},
-  {"/dev/sr12", BRACK(FHDEV(DEV_CDROM_MAJOR, 12)), "\\Device\\CdRom12", exists_ntdev, S_IFBLK},
-  {"/dev/sr13", BRACK(FHDEV(DEV_CDROM_MAJOR, 13)), "\\Device\\CdRom13", exists_ntdev, S_IFBLK},
-  {"/dev/sr14", BRACK(FHDEV(DEV_CDROM_MAJOR, 14)), "\\Device\\CdRom14", exists_ntdev, S_IFBLK},
-  {"/dev/sr15", BRACK(FHDEV(DEV_CDROM_MAJOR, 15)), "\\Device\\CdRom15", exists_ntdev, S_IFBLK},
-  {"/dev/st0", BRACK(FHDEV(DEV_TAPE_MAJOR, 0)), "\\Device\\Tape0", exists_ntdev, S_IFBLK},
-  {"/dev/st1", BRACK(FHDEV(DEV_TAPE_MAJOR, 1)), "\\Device\\Tape1", exists_ntdev, S_IFBLK},
-  {"/dev/st2", BRACK(FHDEV(DEV_TAPE_MAJOR, 2)), "\\Device\\Tape2", exists_ntdev, S_IFBLK},
-  {"/dev/st3", BRACK(FHDEV(DEV_TAPE_MAJOR, 3)), "\\Device\\Tape3", exists_ntdev, S_IFBLK},
-  {"/dev/st4", BRACK(FHDEV(DEV_TAPE_MAJOR, 4)), "\\Device\\Tape4", exists_ntdev, S_IFBLK},
-  {"/dev/st5", BRACK(FHDEV(DEV_TAPE_MAJOR, 5)), "\\Device\\Tape5", exists_ntdev, S_IFBLK},
-  {"/dev/st6", BRACK(FHDEV(DEV_TAPE_MAJOR, 6)), "\\Device\\Tape6", exists_ntdev, S_IFBLK},
-  {"/dev/st7", BRACK(FHDEV(DEV_TAPE_MAJOR, 7)), "\\Device\\Tape7", exists_ntdev, S_IFBLK},
-  {"/dev/st8", BRACK(FHDEV(DEV_TAPE_MAJOR, 8)), "\\Device\\Tape8", exists_ntdev, S_IFBLK},
-  {"/dev/st9", BRACK(FHDEV(DEV_TAPE_MAJOR, 9)), "\\Device\\Tape9", exists_ntdev, S_IFBLK},
-  {"/dev/st10", BRACK(FHDEV(DEV_TAPE_MAJOR, 10)), "\\Device\\Tape10", exists_ntdev, S_IFBLK},
-  {"/dev/st11", BRACK(FHDEV(DEV_TAPE_MAJOR, 11)), "\\Device\\Tape11", exists_ntdev, S_IFBLK},
-  {"/dev/st12", BRACK(FHDEV(DEV_TAPE_MAJOR, 12)), "\\Device\\Tape12", exists_ntdev, S_IFBLK},
-  {"/dev/st13", BRACK(FHDEV(DEV_TAPE_MAJOR, 13)), "\\Device\\Tape13", exists_ntdev, S_IFBLK},
-  {"/dev/st14", BRACK(FHDEV(DEV_TAPE_MAJOR, 14)), "\\Device\\Tape14", exists_ntdev, S_IFBLK},
-  {"/dev/st15", BRACK(FHDEV(DEV_TAPE_MAJOR, 15)), "\\Device\\Tape15", exists_ntdev, S_IFBLK},
-  {"/dev/st16", BRACK(FHDEV(DEV_TAPE_MAJOR, 16)), "\\Device\\Tape16", exists_ntdev, S_IFBLK},
-  {"/dev/st17", BRACK(FHDEV(DEV_TAPE_MAJOR, 17)), "\\Device\\Tape17", exists_ntdev, S_IFBLK},
-  {"/dev/st18", BRACK(FHDEV(DEV_TAPE_MAJOR, 18)), "\\Device\\Tape18", exists_ntdev, S_IFBLK},
-  {"/dev/st19", BRACK(FHDEV(DEV_TAPE_MAJOR, 19)), "\\Device\\Tape19", exists_ntdev, S_IFBLK},
-  {"/dev/st20", BRACK(FHDEV(DEV_TAPE_MAJOR, 20)), "\\Device\\Tape20", exists_ntdev, S_IFBLK},
-  {"/dev/st21", BRACK(FHDEV(DEV_TAPE_MAJOR, 21)), "\\Device\\Tape21", exists_ntdev, S_IFBLK},
-  {"/dev/st22", BRACK(FHDEV(DEV_TAPE_MAJOR, 22)), "\\Device\\Tape22", exists_ntdev, S_IFBLK},
-  {"/dev/st23", BRACK(FHDEV(DEV_TAPE_MAJOR, 23)), "\\Device\\Tape23", exists_ntdev, S_IFBLK},
-  {"/dev/st24", BRACK(FHDEV(DEV_TAPE_MAJOR, 24)), "\\Device\\Tape24", exists_ntdev, S_IFBLK},
-  {"/dev/st25", BRACK(FHDEV(DEV_TAPE_MAJOR, 25)), "\\Device\\Tape25", exists_ntdev, S_IFBLK},
-  {"/dev/st26", BRACK(FHDEV(DEV_TAPE_MAJOR, 26)), "\\Device\\Tape26", exists_ntdev, S_IFBLK},
-  {"/dev/st27", BRACK(FHDEV(DEV_TAPE_MAJOR, 27)), "\\Device\\Tape27", exists_ntdev, S_IFBLK},
-  {"/dev/st28", BRACK(FHDEV(DEV_TAPE_MAJOR, 28)), "\\Device\\Tape28", exists_ntdev, S_IFBLK},
-  {"/dev/st29", BRACK(FHDEV(DEV_TAPE_MAJOR, 29)), "\\Device\\Tape29", exists_ntdev, S_IFBLK},
-  {"/dev/st30", BRACK(FHDEV(DEV_TAPE_MAJOR, 30)), "\\Device\\Tape30", exists_ntdev, S_IFBLK},
-  {"/dev/st31", BRACK(FHDEV(DEV_TAPE_MAJOR, 31)), "\\Device\\Tape31", exists_ntdev, S_IFBLK},
-  {"/dev/st32", BRACK(FHDEV(DEV_TAPE_MAJOR, 32)), "\\Device\\Tape32", exists_ntdev, S_IFBLK},
-  {"/dev/st33", BRACK(FHDEV(DEV_TAPE_MAJOR, 33)), "\\Device\\Tape33", exists_ntdev, S_IFBLK},
-  {"/dev/st34", BRACK(FHDEV(DEV_TAPE_MAJOR, 34)), "\\Device\\Tape34", exists_ntdev, S_IFBLK},
-  {"/dev/st35", BRACK(FHDEV(DEV_TAPE_MAJOR, 35)), "\\Device\\Tape35", exists_ntdev, S_IFBLK},
-  {"/dev/st36", BRACK(FHDEV(DEV_TAPE_MAJOR, 36)), "\\Device\\Tape36", exists_ntdev, S_IFBLK},
-  {"/dev/st37", BRACK(FHDEV(DEV_TAPE_MAJOR, 37)), "\\Device\\Tape37", exists_ntdev, S_IFBLK},
-  {"/dev/st38", BRACK(FHDEV(DEV_TAPE_MAJOR, 38)), "\\Device\\Tape38", exists_ntdev, S_IFBLK},
-  {"/dev/st39", BRACK(FHDEV(DEV_TAPE_MAJOR, 39)), "\\Device\\Tape39", exists_ntdev, S_IFBLK},
-  {"/dev/st40", BRACK(FHDEV(DEV_TAPE_MAJOR, 40)), "\\Device\\Tape40", exists_ntdev, S_IFBLK},
-  {"/dev/st41", BRACK(FHDEV(DEV_TAPE_MAJOR, 41)), "\\Device\\Tape41", exists_ntdev, S_IFBLK},
-  {"/dev/st42", BRACK(FHDEV(DEV_TAPE_MAJOR, 42)), "\\Device\\Tape42", exists_ntdev, S_IFBLK},
-  {"/dev/st43", BRACK(FHDEV(DEV_TAPE_MAJOR, 43)), "\\Device\\Tape43", exists_ntdev, S_IFBLK},
-  {"/dev/st44", BRACK(FHDEV(DEV_TAPE_MAJOR, 44)), "\\Device\\Tape44", exists_ntdev, S_IFBLK},
-  {"/dev/st45", BRACK(FHDEV(DEV_TAPE_MAJOR, 45)), "\\Device\\Tape45", exists_ntdev, S_IFBLK},
-  {"/dev/st46", BRACK(FHDEV(DEV_TAPE_MAJOR, 46)), "\\Device\\Tape46", exists_ntdev, S_IFBLK},
-  {"/dev/st47", BRACK(FHDEV(DEV_TAPE_MAJOR, 47)), "\\Device\\Tape47", exists_ntdev, S_IFBLK},
-  {"/dev/st48", BRACK(FHDEV(DEV_TAPE_MAJOR, 48)), "\\Device\\Tape48", exists_ntdev, S_IFBLK},
-  {"/dev/st49", BRACK(FHDEV(DEV_TAPE_MAJOR, 49)), "\\Device\\Tape49", exists_ntdev, S_IFBLK},
-  {"/dev/st50", BRACK(FHDEV(DEV_TAPE_MAJOR, 50)), "\\Device\\Tape50", exists_ntdev, S_IFBLK},
-  {"/dev/st51", BRACK(FHDEV(DEV_TAPE_MAJOR, 51)), "\\Device\\Tape51", exists_ntdev, S_IFBLK},
-  {"/dev/st52", BRACK(FHDEV(DEV_TAPE_MAJOR, 52)), "\\Device\\Tape52", exists_ntdev, S_IFBLK},
-  {"/dev/st53", BRACK(FHDEV(DEV_TAPE_MAJOR, 53)), "\\Device\\Tape53", exists_ntdev, S_IFBLK},
-  {"/dev/st54", BRACK(FHDEV(DEV_TAPE_MAJOR, 54)), "\\Device\\Tape54", exists_ntdev, S_IFBLK},
-  {"/dev/st55", BRACK(FHDEV(DEV_TAPE_MAJOR, 55)), "\\Device\\Tape55", exists_ntdev, S_IFBLK},
-  {"/dev/st56", BRACK(FHDEV(DEV_TAPE_MAJOR, 56)), "\\Device\\Tape56", exists_ntdev, S_IFBLK},
-  {"/dev/st57", BRACK(FHDEV(DEV_TAPE_MAJOR, 57)), "\\Device\\Tape57", exists_ntdev, S_IFBLK},
-  {"/dev/st58", BRACK(FHDEV(DEV_TAPE_MAJOR, 58)), "\\Device\\Tape58", exists_ntdev, S_IFBLK},
-  {"/dev/st59", BRACK(FHDEV(DEV_TAPE_MAJOR, 59)), "\\Device\\Tape59", exists_ntdev, S_IFBLK},
-  {"/dev/st60", BRACK(FHDEV(DEV_TAPE_MAJOR, 60)), "\\Device\\Tape60", exists_ntdev, S_IFBLK},
-  {"/dev/st61", BRACK(FHDEV(DEV_TAPE_MAJOR, 61)), "\\Device\\Tape61", exists_ntdev, S_IFBLK},
-  {"/dev/st62", BRACK(FHDEV(DEV_TAPE_MAJOR, 62)), "\\Device\\Tape62", exists_ntdev, S_IFBLK},
-  {"/dev/st63", BRACK(FHDEV(DEV_TAPE_MAJOR, 63)), "\\Device\\Tape63", exists_ntdev, S_IFBLK},
-  {"/dev/st64", BRACK(FHDEV(DEV_TAPE_MAJOR, 64)), "\\Device\\Tape64", exists_ntdev, S_IFBLK},
-  {"/dev/st65", BRACK(FHDEV(DEV_TAPE_MAJOR, 65)), "\\Device\\Tape65", exists_ntdev, S_IFBLK},
-  {"/dev/st66", BRACK(FHDEV(DEV_TAPE_MAJOR, 66)), "\\Device\\Tape66", exists_ntdev, S_IFBLK},
-  {"/dev/st67", BRACK(FHDEV(DEV_TAPE_MAJOR, 67)), "\\Device\\Tape67", exists_ntdev, S_IFBLK},
-  {"/dev/st68", BRACK(FHDEV(DEV_TAPE_MAJOR, 68)), "\\Device\\Tape68", exists_ntdev, S_IFBLK},
-  {"/dev/st69", BRACK(FHDEV(DEV_TAPE_MAJOR, 69)), "\\Device\\Tape69", exists_ntdev, S_IFBLK},
-  {"/dev/st70", BRACK(FHDEV(DEV_TAPE_MAJOR, 70)), "\\Device\\Tape70", exists_ntdev, S_IFBLK},
-  {"/dev/st71", BRACK(FHDEV(DEV_TAPE_MAJOR, 71)), "\\Device\\Tape71", exists_ntdev, S_IFBLK},
-  {"/dev/st72", BRACK(FHDEV(DEV_TAPE_MAJOR, 72)), "\\Device\\Tape72", exists_ntdev, S_IFBLK},
-  {"/dev/st73", BRACK(FHDEV(DEV_TAPE_MAJOR, 73)), "\\Device\\Tape73", exists_ntdev, S_IFBLK},
-  {"/dev/st74", BRACK(FHDEV(DEV_TAPE_MAJOR, 74)), "\\Device\\Tape74", exists_ntdev, S_IFBLK},
-  {"/dev/st75", BRACK(FHDEV(DEV_TAPE_MAJOR, 75)), "\\Device\\Tape75", exists_ntdev, S_IFBLK},
-  {"/dev/st76", BRACK(FHDEV(DEV_TAPE_MAJOR, 76)), "\\Device\\Tape76", exists_ntdev, S_IFBLK},
-  {"/dev/st77", BRACK(FHDEV(DEV_TAPE_MAJOR, 77)), "\\Device\\Tape77", exists_ntdev, S_IFBLK},
-  {"/dev/st78", BRACK(FHDEV(DEV_TAPE_MAJOR, 78)), "\\Device\\Tape78", exists_ntdev, S_IFBLK},
-  {"/dev/st79", BRACK(FHDEV(DEV_TAPE_MAJOR, 79)), "\\Device\\Tape79", exists_ntdev, S_IFBLK},
-  {"/dev/st80", BRACK(FHDEV(DEV_TAPE_MAJOR, 80)), "\\Device\\Tape80", exists_ntdev, S_IFBLK},
-  {"/dev/st81", BRACK(FHDEV(DEV_TAPE_MAJOR, 81)), "\\Device\\Tape81", exists_ntdev, S_IFBLK},
-  {"/dev/st82", BRACK(FHDEV(DEV_TAPE_MAJOR, 82)), "\\Device\\Tape82", exists_ntdev, S_IFBLK},
-  {"/dev/st83", BRACK(FHDEV(DEV_TAPE_MAJOR, 83)), "\\Device\\Tape83", exists_ntdev, S_IFBLK},
-  {"/dev/st84", BRACK(FHDEV(DEV_TAPE_MAJOR, 84)), "\\Device\\Tape84", exists_ntdev, S_IFBLK},
-  {"/dev/st85", BRACK(FHDEV(DEV_TAPE_MAJOR, 85)), "\\Device\\Tape85", exists_ntdev, S_IFBLK},
-  {"/dev/st86", BRACK(FHDEV(DEV_TAPE_MAJOR, 86)), "\\Device\\Tape86", exists_ntdev, S_IFBLK},
-  {"/dev/st87", BRACK(FHDEV(DEV_TAPE_MAJOR, 87)), "\\Device\\Tape87", exists_ntdev, S_IFBLK},
-  {"/dev/st88", BRACK(FHDEV(DEV_TAPE_MAJOR, 88)), "\\Device\\Tape88", exists_ntdev, S_IFBLK},
-  {"/dev/st89", BRACK(FHDEV(DEV_TAPE_MAJOR, 89)), "\\Device\\Tape89", exists_ntdev, S_IFBLK},
-  {"/dev/st90", BRACK(FHDEV(DEV_TAPE_MAJOR, 90)), "\\Device\\Tape90", exists_ntdev, S_IFBLK},
-  {"/dev/st91", BRACK(FHDEV(DEV_TAPE_MAJOR, 91)), "\\Device\\Tape91", exists_ntdev, S_IFBLK},
-  {"/dev/st92", BRACK(FHDEV(DEV_TAPE_MAJOR, 92)), "\\Device\\Tape92", exists_ntdev, S_IFBLK},
-  {"/dev/st93", BRACK(FHDEV(DEV_TAPE_MAJOR, 93)), "\\Device\\Tape93", exists_ntdev, S_IFBLK},
-  {"/dev/st94", BRACK(FHDEV(DEV_TAPE_MAJOR, 94)), "\\Device\\Tape94", exists_ntdev, S_IFBLK},
-  {"/dev/st95", BRACK(FHDEV(DEV_TAPE_MAJOR, 95)), "\\Device\\Tape95", exists_ntdev, S_IFBLK},
-  {"/dev/st96", BRACK(FHDEV(DEV_TAPE_MAJOR, 96)), "\\Device\\Tape96", exists_ntdev, S_IFBLK},
-  {"/dev/st97", BRACK(FHDEV(DEV_TAPE_MAJOR, 97)), "\\Device\\Tape97", exists_ntdev, S_IFBLK},
-  {"/dev/st98", BRACK(FHDEV(DEV_TAPE_MAJOR, 98)), "\\Device\\Tape98", exists_ntdev, S_IFBLK},
-  {"/dev/st99", BRACK(FHDEV(DEV_TAPE_MAJOR, 99)), "\\Device\\Tape99", exists_ntdev, S_IFBLK},
-  {"/dev/st100", BRACK(FHDEV(DEV_TAPE_MAJOR, 100)), "\\Device\\Tape100", exists_ntdev, S_IFBLK},
-  {"/dev/st101", BRACK(FHDEV(DEV_TAPE_MAJOR, 101)), "\\Device\\Tape101", exists_ntdev, S_IFBLK},
-  {"/dev/st102", BRACK(FHDEV(DEV_TAPE_MAJOR, 102)), "\\Device\\Tape102", exists_ntdev, S_IFBLK},
-  {"/dev/st103", BRACK(FHDEV(DEV_TAPE_MAJOR, 103)), "\\Device\\Tape103", exists_ntdev, S_IFBLK},
-  {"/dev/st104", BRACK(FHDEV(DEV_TAPE_MAJOR, 104)), "\\Device\\Tape104", exists_ntdev, S_IFBLK},
-  {"/dev/st105", BRACK(FHDEV(DEV_TAPE_MAJOR, 105)), "\\Device\\Tape105", exists_ntdev, S_IFBLK},
-  {"/dev/st106", BRACK(FHDEV(DEV_TAPE_MAJOR, 106)), "\\Device\\Tape106", exists_ntdev, S_IFBLK},
-  {"/dev/st107", BRACK(FHDEV(DEV_TAPE_MAJOR, 107)), "\\Device\\Tape107", exists_ntdev, S_IFBLK},
-  {"/dev/st108", BRACK(FHDEV(DEV_TAPE_MAJOR, 108)), "\\Device\\Tape108", exists_ntdev, S_IFBLK},
-  {"/dev/st109", BRACK(FHDEV(DEV_TAPE_MAJOR, 109)), "\\Device\\Tape109", exists_ntdev, S_IFBLK},
-  {"/dev/st110", BRACK(FHDEV(DEV_TAPE_MAJOR, 110)), "\\Device\\Tape110", exists_ntdev, S_IFBLK},
-  {"/dev/st111", BRACK(FHDEV(DEV_TAPE_MAJOR, 111)), "\\Device\\Tape111", exists_ntdev, S_IFBLK},
-  {"/dev/st112", BRACK(FHDEV(DEV_TAPE_MAJOR, 112)), "\\Device\\Tape112", exists_ntdev, S_IFBLK},
-  {"/dev/st113", BRACK(FHDEV(DEV_TAPE_MAJOR, 113)), "\\Device\\Tape113", exists_ntdev, S_IFBLK},
-  {"/dev/st114", BRACK(FHDEV(DEV_TAPE_MAJOR, 114)), "\\Device\\Tape114", exists_ntdev, S_IFBLK},
-  {"/dev/st115", BRACK(FHDEV(DEV_TAPE_MAJOR, 115)), "\\Device\\Tape115", exists_ntdev, S_IFBLK},
-  {"/dev/st116", BRACK(FHDEV(DEV_TAPE_MAJOR, 116)), "\\Device\\Tape116", exists_ntdev, S_IFBLK},
-  {"/dev/st117", BRACK(FHDEV(DEV_TAPE_MAJOR, 117)), "\\Device\\Tape117", exists_ntdev, S_IFBLK},
-  {"/dev/st118", BRACK(FHDEV(DEV_TAPE_MAJOR, 118)), "\\Device\\Tape118", exists_ntdev, S_IFBLK},
-  {"/dev/st119", BRACK(FHDEV(DEV_TAPE_MAJOR, 119)), "\\Device\\Tape119", exists_ntdev, S_IFBLK},
-  {"/dev/st120", BRACK(FHDEV(DEV_TAPE_MAJOR, 120)), "\\Device\\Tape120", exists_ntdev, S_IFBLK},
-  {"/dev/st121", BRACK(FHDEV(DEV_TAPE_MAJOR, 121)), "\\Device\\Tape121", exists_ntdev, S_IFBLK},
-  {"/dev/st122", BRACK(FHDEV(DEV_TAPE_MAJOR, 122)), "\\Device\\Tape122", exists_ntdev, S_IFBLK},
-  {"/dev/st123", BRACK(FHDEV(DEV_TAPE_MAJOR, 123)), "\\Device\\Tape123", exists_ntdev, S_IFBLK},
-  {"/dev/st124", BRACK(FHDEV(DEV_TAPE_MAJOR, 124)), "\\Device\\Tape124", exists_ntdev, S_IFBLK},
-  {"/dev/st125", BRACK(FHDEV(DEV_TAPE_MAJOR, 125)), "\\Device\\Tape125", exists_ntdev, S_IFBLK},
-  {"/dev/st126", BRACK(FHDEV(DEV_TAPE_MAJOR, 126)), "\\Device\\Tape126", exists_ntdev, S_IFBLK},
-  {"/dev/st127", BRACK(FHDEV(DEV_TAPE_MAJOR, 127)), "\\Device\\Tape127", exists_ntdev, S_IFBLK},
-  {"/dev/tty", BRACK(FH_TTY), "/dev/tty", exists, S_IFCHR},
-  {"/dev/ttyS0", BRACK(FHDEV(DEV_SERIAL_MAJOR, 0)), "\\??\\COM1", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS1", BRACK(FHDEV(DEV_SERIAL_MAJOR, 1)), "\\??\\COM2", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS2", BRACK(FHDEV(DEV_SERIAL_MAJOR, 2)), "\\??\\COM3", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS3", BRACK(FHDEV(DEV_SERIAL_MAJOR, 3)), "\\??\\COM4", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS4", BRACK(FHDEV(DEV_SERIAL_MAJOR, 4)), "\\??\\COM5", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS5", BRACK(FHDEV(DEV_SERIAL_MAJOR, 5)), "\\??\\COM6", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS6", BRACK(FHDEV(DEV_SERIAL_MAJOR, 6)), "\\??\\COM7", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS7", BRACK(FHDEV(DEV_SERIAL_MAJOR, 7)), "\\??\\COM8", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS8", BRACK(FHDEV(DEV_SERIAL_MAJOR, 8)), "\\??\\COM9", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS9", BRACK(FHDEV(DEV_SERIAL_MAJOR, 9)), "\\??\\COM10", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS10", BRACK(FHDEV(DEV_SERIAL_MAJOR, 10)), "\\??\\COM11", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS11", BRACK(FHDEV(DEV_SERIAL_MAJOR, 11)), "\\??\\COM12", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS12", BRACK(FHDEV(DEV_SERIAL_MAJOR, 12)), "\\??\\COM13", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS13", BRACK(FHDEV(DEV_SERIAL_MAJOR, 13)), "\\??\\COM14", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS14", BRACK(FHDEV(DEV_SERIAL_MAJOR, 14)), "\\??\\COM15", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS15", BRACK(FHDEV(DEV_SERIAL_MAJOR, 15)), "\\??\\COM16", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS16", BRACK(FHDEV(DEV_SERIAL_MAJOR, 16)), "\\??\\COM17", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS17", BRACK(FHDEV(DEV_SERIAL_MAJOR, 17)), "\\??\\COM18", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS18", BRACK(FHDEV(DEV_SERIAL_MAJOR, 18)), "\\??\\COM19", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS19", BRACK(FHDEV(DEV_SERIAL_MAJOR, 19)), "\\??\\COM20", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS20", BRACK(FHDEV(DEV_SERIAL_MAJOR, 20)), "\\??\\COM21", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS21", BRACK(FHDEV(DEV_SERIAL_MAJOR, 21)), "\\??\\COM22", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS22", BRACK(FHDEV(DEV_SERIAL_MAJOR, 22)), "\\??\\COM23", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS23", BRACK(FHDEV(DEV_SERIAL_MAJOR, 23)), "\\??\\COM24", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS24", BRACK(FHDEV(DEV_SERIAL_MAJOR, 24)), "\\??\\COM25", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS25", BRACK(FHDEV(DEV_SERIAL_MAJOR, 25)), "\\??\\COM26", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS26", BRACK(FHDEV(DEV_SERIAL_MAJOR, 26)), "\\??\\COM27", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS27", BRACK(FHDEV(DEV_SERIAL_MAJOR, 27)), "\\??\\COM28", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS28", BRACK(FHDEV(DEV_SERIAL_MAJOR, 28)), "\\??\\COM29", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS29", BRACK(FHDEV(DEV_SERIAL_MAJOR, 29)), "\\??\\COM30", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS30", BRACK(FHDEV(DEV_SERIAL_MAJOR, 30)), "\\??\\COM31", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS31", BRACK(FHDEV(DEV_SERIAL_MAJOR, 31)), "\\??\\COM32", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS32", BRACK(FHDEV(DEV_SERIAL_MAJOR, 32)), "\\??\\COM33", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS33", BRACK(FHDEV(DEV_SERIAL_MAJOR, 33)), "\\??\\COM34", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS34", BRACK(FHDEV(DEV_SERIAL_MAJOR, 34)), "\\??\\COM35", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS35", BRACK(FHDEV(DEV_SERIAL_MAJOR, 35)), "\\??\\COM36", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS36", BRACK(FHDEV(DEV_SERIAL_MAJOR, 36)), "\\??\\COM37", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS37", BRACK(FHDEV(DEV_SERIAL_MAJOR, 37)), "\\??\\COM38", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS38", BRACK(FHDEV(DEV_SERIAL_MAJOR, 38)), "\\??\\COM39", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS39", BRACK(FHDEV(DEV_SERIAL_MAJOR, 39)), "\\??\\COM40", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS40", BRACK(FHDEV(DEV_SERIAL_MAJOR, 40)), "\\??\\COM41", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS41", BRACK(FHDEV(DEV_SERIAL_MAJOR, 41)), "\\??\\COM42", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS42", BRACK(FHDEV(DEV_SERIAL_MAJOR, 42)), "\\??\\COM43", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS43", BRACK(FHDEV(DEV_SERIAL_MAJOR, 43)), "\\??\\COM44", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS44", BRACK(FHDEV(DEV_SERIAL_MAJOR, 44)), "\\??\\COM45", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS45", BRACK(FHDEV(DEV_SERIAL_MAJOR, 45)), "\\??\\COM46", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS46", BRACK(FHDEV(DEV_SERIAL_MAJOR, 46)), "\\??\\COM47", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS47", BRACK(FHDEV(DEV_SERIAL_MAJOR, 47)), "\\??\\COM48", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS48", BRACK(FHDEV(DEV_SERIAL_MAJOR, 48)), "\\??\\COM49", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS49", BRACK(FHDEV(DEV_SERIAL_MAJOR, 49)), "\\??\\COM50", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS50", BRACK(FHDEV(DEV_SERIAL_MAJOR, 50)), "\\??\\COM51", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS51", BRACK(FHDEV(DEV_SERIAL_MAJOR, 51)), "\\??\\COM52", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS52", BRACK(FHDEV(DEV_SERIAL_MAJOR, 52)), "\\??\\COM53", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS53", BRACK(FHDEV(DEV_SERIAL_MAJOR, 53)), "\\??\\COM54", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS54", BRACK(FHDEV(DEV_SERIAL_MAJOR, 54)), "\\??\\COM55", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS55", BRACK(FHDEV(DEV_SERIAL_MAJOR, 55)), "\\??\\COM56", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS56", BRACK(FHDEV(DEV_SERIAL_MAJOR, 56)), "\\??\\COM57", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS57", BRACK(FHDEV(DEV_SERIAL_MAJOR, 57)), "\\??\\COM58", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS58", BRACK(FHDEV(DEV_SERIAL_MAJOR, 58)), "\\??\\COM59", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS59", BRACK(FHDEV(DEV_SERIAL_MAJOR, 59)), "\\??\\COM60", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS60", BRACK(FHDEV(DEV_SERIAL_MAJOR, 60)), "\\??\\COM61", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS61", BRACK(FHDEV(DEV_SERIAL_MAJOR, 61)), "\\??\\COM62", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS62", BRACK(FHDEV(DEV_SERIAL_MAJOR, 62)), "\\??\\COM63", exists_ntdev, S_IFCHR},
-  {"/dev/ttyS63", BRACK(FHDEV(DEV_SERIAL_MAJOR, 63)), "\\??\\COM64", exists_ntdev, S_IFCHR},
-  {"/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", exists, S_IFCHR},
-  {"/dev/windows", BRACK(FH_WINDOWS), "/dev/windows", exists, S_IFCHR},
-  {"/dev/zero", BRACK(FH_ZERO), "/dev/zero", exists, S_IFCHR},
-  {":fifo", BRACK(FH_FIFO), "/dev/fifo", exists_internal, S_IFCHR},
-  {":pipe", BRACK(FH_PIPE), "/dev/pipe", exists_internal, S_IFCHR},
-  {":ptym0", BRACK(FHDEV(DEV_PTYM_MAJOR, 0)), "/dev/ptym0", exists_internal, S_IFCHR},
-  {":ptym1", BRACK(FHDEV(DEV_PTYM_MAJOR, 1)), "/dev/ptym1", exists_internal, S_IFCHR},
-  {":ptym2", BRACK(FHDEV(DEV_PTYM_MAJOR, 2)), "/dev/ptym2", exists_internal, S_IFCHR},
-  {":ptym3", BRACK(FHDEV(DEV_PTYM_MAJOR, 3)), "/dev/ptym3", exists_internal, S_IFCHR},
-  {":ptym4", BRACK(FHDEV(DEV_PTYM_MAJOR, 4)), "/dev/ptym4", exists_internal, S_IFCHR},
-  {":ptym5", BRACK(FHDEV(DEV_PTYM_MAJOR, 5)), "/dev/ptym5", exists_internal, S_IFCHR},
-  {":ptym6", BRACK(FHDEV(DEV_PTYM_MAJOR, 6)), "/dev/ptym6", exists_internal, S_IFCHR},
-  {":ptym7", BRACK(FHDEV(DEV_PTYM_MAJOR, 7)), "/dev/ptym7", exists_internal, S_IFCHR},
-  {":ptym8", BRACK(FHDEV(DEV_PTYM_MAJOR, 8)), "/dev/ptym8", exists_internal, S_IFCHR},
-  {":ptym9", BRACK(FHDEV(DEV_PTYM_MAJOR, 9)), "/dev/ptym9", exists_internal, S_IFCHR},
-  {":ptym10", BRACK(FHDEV(DEV_PTYM_MAJOR, 10)), "/dev/ptym10", exists_internal, S_IFCHR},
-  {":ptym11", BRACK(FHDEV(DEV_PTYM_MAJOR, 11)), "/dev/ptym11", exists_internal, S_IFCHR},
-  {":ptym12", BRACK(FHDEV(DEV_PTYM_MAJOR, 12)), "/dev/ptym12", exists_internal, S_IFCHR},
-  {":ptym13", BRACK(FHDEV(DEV_PTYM_MAJOR, 13)), "/dev/ptym13", exists_internal, S_IFCHR},
-  {":ptym14", BRACK(FHDEV(DEV_PTYM_MAJOR, 14)), "/dev/ptym14", exists_internal, S_IFCHR},
-  {":ptym15", BRACK(FHDEV(DEV_PTYM_MAJOR, 15)), "/dev/ptym15", exists_internal, S_IFCHR},
-  {":ptym16", BRACK(FHDEV(DEV_PTYM_MAJOR, 16)), "/dev/ptym16", exists_internal, S_IFCHR},
-  {":ptym17", BRACK(FHDEV(DEV_PTYM_MAJOR, 17)), "/dev/ptym17", exists_internal, S_IFCHR},
-  {":ptym18", BRACK(FHDEV(DEV_PTYM_MAJOR, 18)), "/dev/ptym18", exists_internal, S_IFCHR},
-  {":ptym19", BRACK(FHDEV(DEV_PTYM_MAJOR, 19)), "/dev/ptym19", exists_internal, S_IFCHR},
-  {":ptym20", BRACK(FHDEV(DEV_PTYM_MAJOR, 20)), "/dev/ptym20", exists_internal, S_IFCHR},
-  {":ptym21", BRACK(FHDEV(DEV_PTYM_MAJOR, 21)), "/dev/ptym21", exists_internal, S_IFCHR},
-  {":ptym22", BRACK(FHDEV(DEV_PTYM_MAJOR, 22)), "/dev/ptym22", exists_internal, S_IFCHR},
-  {":ptym23", BRACK(FHDEV(DEV_PTYM_MAJOR, 23)), "/dev/ptym23", exists_internal, S_IFCHR},
-  {":ptym24", BRACK(FHDEV(DEV_PTYM_MAJOR, 24)), "/dev/ptym24", exists_internal, S_IFCHR},
-  {":ptym25", BRACK(FHDEV(DEV_PTYM_MAJOR, 25)), "/dev/ptym25", exists_internal, S_IFCHR},
-  {":ptym26", BRACK(FHDEV(DEV_PTYM_MAJOR, 26)), "/dev/ptym26", exists_internal, S_IFCHR},
-  {":ptym27", BRACK(FHDEV(DEV_PTYM_MAJOR, 27)), "/dev/ptym27", exists_internal, S_IFCHR},
-  {":ptym28", BRACK(FHDEV(DEV_PTYM_MAJOR, 28)), "/dev/ptym28", exists_internal, S_IFCHR},
-  {":ptym29", BRACK(FHDEV(DEV_PTYM_MAJOR, 29)), "/dev/ptym29", exists_internal, S_IFCHR},
-  {":ptym30", BRACK(FHDEV(DEV_PTYM_MAJOR, 30)), "/dev/ptym30", exists_internal, S_IFCHR},
-  {":ptym31", BRACK(FHDEV(DEV_PTYM_MAJOR, 31)), "/dev/ptym31", exists_internal, S_IFCHR},
-  {":ptym32", BRACK(FHDEV(DEV_PTYM_MAJOR, 32)), "/dev/ptym32", exists_internal, S_IFCHR},
-  {":ptym33", BRACK(FHDEV(DEV_PTYM_MAJOR, 33)), "/dev/ptym33", exists_internal, S_IFCHR},
-  {":ptym34", BRACK(FHDEV(DEV_PTYM_MAJOR, 34)), "/dev/ptym34", exists_internal, S_IFCHR},
-  {":ptym35", BRACK(FHDEV(DEV_PTYM_MAJOR, 35)), "/dev/ptym35", exists_internal, S_IFCHR},
-  {":ptym36", BRACK(FHDEV(DEV_PTYM_MAJOR, 36)), "/dev/ptym36", exists_internal, S_IFCHR},
-  {":ptym37", BRACK(FHDEV(DEV_PTYM_MAJOR, 37)), "/dev/ptym37", exists_internal, S_IFCHR},
-  {":ptym38", BRACK(FHDEV(DEV_PTYM_MAJOR, 38)), "/dev/ptym38", exists_internal, S_IFCHR},
-  {":ptym39", BRACK(FHDEV(DEV_PTYM_MAJOR, 39)), "/dev/ptym39", exists_internal, S_IFCHR},
-  {":ptym40", BRACK(FHDEV(DEV_PTYM_MAJOR, 40)), "/dev/ptym40", exists_internal, S_IFCHR},
-  {":ptym41", BRACK(FHDEV(DEV_PTYM_MAJOR, 41)), "/dev/ptym41", exists_internal, S_IFCHR},
-  {":ptym42", BRACK(FHDEV(DEV_PTYM_MAJOR, 42)), "/dev/ptym42", exists_internal, S_IFCHR},
-  {":ptym43", BRACK(FHDEV(DEV_PTYM_MAJOR, 43)), "/dev/ptym43", exists_internal, S_IFCHR},
-  {":ptym44", BRACK(FHDEV(DEV_PTYM_MAJOR, 44)), "/dev/ptym44", exists_internal, S_IFCHR},
-  {":ptym45", BRACK(FHDEV(DEV_PTYM_MAJOR, 45)), "/dev/ptym45", exists_internal, S_IFCHR},
-  {":ptym46", BRACK(FHDEV(DEV_PTYM_MAJOR, 46)), "/dev/ptym46", exists_internal, S_IFCHR},
-  {":ptym47", BRACK(FHDEV(DEV_PTYM_MAJOR, 47)), "/dev/ptym47", exists_internal, S_IFCHR},
-  {":ptym48", BRACK(FHDEV(DEV_PTYM_MAJOR, 48)), "/dev/ptym48", exists_internal, S_IFCHR},
-  {":ptym49", BRACK(FHDEV(DEV_PTYM_MAJOR, 49)), "/dev/ptym49", exists_internal, S_IFCHR},
-  {":ptym50", BRACK(FHDEV(DEV_PTYM_MAJOR, 50)), "/dev/ptym50", exists_internal, S_IFCHR},
-  {":ptym51", BRACK(FHDEV(DEV_PTYM_MAJOR, 51)), "/dev/ptym51", exists_internal, S_IFCHR},
-  {":ptym52", BRACK(FHDEV(DEV_PTYM_MAJOR, 52)), "/dev/ptym52", exists_internal, S_IFCHR},
-  {":ptym53", BRACK(FHDEV(DEV_PTYM_MAJOR, 53)), "/dev/ptym53", exists_internal, S_IFCHR},
-  {":ptym54", BRACK(FHDEV(DEV_PTYM_MAJOR, 54)), "/dev/ptym54", exists_internal, S_IFCHR},
-  {":ptym55", BRACK(FHDEV(DEV_PTYM_MAJOR, 55)), "/dev/ptym55", exists_internal, S_IFCHR},
-  {":ptym56", BRACK(FHDEV(DEV_PTYM_MAJOR, 56)), "/dev/ptym56", exists_internal, S_IFCHR},
-  {":ptym57", BRACK(FHDEV(DEV_PTYM_MAJOR, 57)), "/dev/ptym57", exists_internal, S_IFCHR},
-  {":ptym58", BRACK(FHDEV(DEV_PTYM_MAJOR, 58)), "/dev/ptym58", exists_internal, S_IFCHR},
-  {":ptym59", BRACK(FHDEV(DEV_PTYM_MAJOR, 59)), "/dev/ptym59", exists_internal, S_IFCHR},
-  {":ptym60", BRACK(FHDEV(DEV_PTYM_MAJOR, 60)), "/dev/ptym60", exists_internal, S_IFCHR},
-  {":ptym61", BRACK(FHDEV(DEV_PTYM_MAJOR, 61)), "/dev/ptym61", exists_internal, S_IFCHR},
-  {":ptym62", BRACK(FHDEV(DEV_PTYM_MAJOR, 62)), "/dev/ptym62", exists_internal, S_IFCHR},
-  {":ptym63", BRACK(FHDEV(DEV_PTYM_MAJOR, 63)), "/dev/ptym63", exists_internal, S_IFCHR}
+  {"/dev", BRACK(FH_DEV), "/dev", exists, S_IFDIR, false},
+  {"/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard", exists, S_IFCHR, true},
+  {"/dev/com1", BRACK(FHDEV(DEV_SERIAL_MAJOR, 0)), "\\??\\COM1", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com2", BRACK(FHDEV(DEV_SERIAL_MAJOR, 1)), "\\??\\COM2", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com3", BRACK(FHDEV(DEV_SERIAL_MAJOR, 2)), "\\??\\COM3", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com4", BRACK(FHDEV(DEV_SERIAL_MAJOR, 3)), "\\??\\COM4", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com5", BRACK(FHDEV(DEV_SERIAL_MAJOR, 4)), "\\??\\COM5", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com6", BRACK(FHDEV(DEV_SERIAL_MAJOR, 5)), "\\??\\COM6", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com7", BRACK(FHDEV(DEV_SERIAL_MAJOR, 6)), "\\??\\COM7", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com8", BRACK(FHDEV(DEV_SERIAL_MAJOR, 7)), "\\??\\COM8", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com9", BRACK(FHDEV(DEV_SERIAL_MAJOR, 8)), "\\??\\COM9", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com10", BRACK(FHDEV(DEV_SERIAL_MAJOR, 9)), "\\??\\COM10", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com11", BRACK(FHDEV(DEV_SERIAL_MAJOR, 10)), "\\??\\COM11", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com12", BRACK(FHDEV(DEV_SERIAL_MAJOR, 11)), "\\??\\COM12", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com13", BRACK(FHDEV(DEV_SERIAL_MAJOR, 12)), "\\??\\COM13", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com14", BRACK(FHDEV(DEV_SERIAL_MAJOR, 13)), "\\??\\COM14", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com15", BRACK(FHDEV(DEV_SERIAL_MAJOR, 14)), "\\??\\COM15", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/com16", BRACK(FHDEV(DEV_SERIAL_MAJOR, 15)), "\\??\\COM16", exists_ntdev_silent, S_IFCHR, true},
+  {"/dev/conin", BRACK(FH_CONIN), "/dev/conin", exists_console, S_IFCHR, true},
+  {"/dev/conout", BRACK(FH_CONOUT), "/dev/conout", exists_console, S_IFCHR, true},
+  {"/dev/cons0", BRACK(FHDEV(DEV_CONS_MAJOR, 0)), "/dev/cons0", exists_console, S_IFCHR, true},
+  {"/dev/cons1", BRACK(FHDEV(DEV_CONS_MAJOR, 1)), "/dev/cons1", exists_console, S_IFCHR, true},
+  {"/dev/cons2", BRACK(FHDEV(DEV_CONS_MAJOR, 2)), "/dev/cons2", exists_console, S_IFCHR, true},
+  {"/dev/cons3", BRACK(FHDEV(DEV_CONS_MAJOR, 3)), "/dev/cons3", exists_console, S_IFCHR, true},
+  {"/dev/cons4", BRACK(FHDEV(DEV_CONS_MAJOR, 4)), "/dev/cons4", exists_console, S_IFCHR, true},
+  {"/dev/cons5", BRACK(FHDEV(DEV_CONS_MAJOR, 5)), "/dev/cons5", exists_console, S_IFCHR, true},
+  {"/dev/cons6", BRACK(FHDEV(DEV_CONS_MAJOR, 6)), "/dev/cons6", exists_console, S_IFCHR, true},
+  {"/dev/cons7", BRACK(FHDEV(DEV_CONS_MAJOR, 7)), "/dev/cons7", exists_console, S_IFCHR, true},
+  {"/dev/cons8", BRACK(FHDEV(DEV_CONS_MAJOR, 8)), "/dev/cons8", exists_console, S_IFCHR, true},
+  {"/dev/cons9", BRACK(FHDEV(DEV_CONS_MAJOR, 9)), "/dev/cons9", exists_console, S_IFCHR, true},
+  {"/dev/cons10", BRACK(FHDEV(DEV_CONS_MAJOR, 10)), "/dev/cons10", exists_console, S_IFCHR, true},
+  {"/dev/cons11", BRACK(FHDEV(DEV_CONS_MAJOR, 11)), "/dev/cons11", exists_console, S_IFCHR, true},
+  {"/dev/cons12", BRACK(FHDEV(DEV_CONS_MAJOR, 12)), "/dev/cons12", exists_console, S_IFCHR, true},
+  {"/dev/cons13", BRACK(FHDEV(DEV_CONS_MAJOR, 13)), "/dev/cons13", exists_console, S_IFCHR, true},
+  {"/dev/cons14", BRACK(FHDEV(DEV_CONS_MAJOR, 14)), "/dev/cons14", exists_console, S_IFCHR, true},
+  {"/dev/cons15", BRACK(FHDEV(DEV_CONS_MAJOR, 15)), "/dev/cons15", exists_console, S_IFCHR, true},
+  {"/dev/cons16", BRACK(FHDEV(DEV_CONS_MAJOR, 16)), "/dev/cons16", exists_console, S_IFCHR, true},
+  {"/dev/cons17", BRACK(FHDEV(DEV_CONS_MAJOR, 17)), "/dev/cons17", exists_console, S_IFCHR, true},
+  {"/dev/cons18", BRACK(FHDEV(DEV_CONS_MAJOR, 18)), "/dev/cons18", exists_console, S_IFCHR, true},
+  {"/dev/cons19", BRACK(FHDEV(DEV_CONS_MAJOR, 19)), "/dev/cons19", exists_console, S_IFCHR, true},
+  {"/dev/cons20", BRACK(FHDEV(DEV_CONS_MAJOR, 20)), "/dev/cons20", exists_console, S_IFCHR, true},
+  {"/dev/cons21", BRACK(FHDEV(DEV_CONS_MAJOR, 21)), "/dev/cons21", exists_console, S_IFCHR, true},
+  {"/dev/cons22", BRACK(FHDEV(DEV_CONS_MAJOR, 22)), "/dev/cons22", exists_console, S_IFCHR, true},
+  {"/dev/cons23", BRACK(FHDEV(DEV_CONS_MAJOR, 23)), "/dev/cons23", exists_console, S_IFCHR, true},
+  {"/dev/cons24", BRACK(FHDEV(DEV_CONS_MAJOR, 24)), "/dev/cons24", exists_console, S_IFCHR, true},
+  {"/dev/cons25", BRACK(FHDEV(DEV_CONS_MAJOR, 25)), "/dev/cons25", exists_console, S_IFCHR, true},
+  {"/dev/cons26", BRACK(FHDEV(DEV_CONS_MAJOR, 26)), "/dev/cons26", exists_console, S_IFCHR, true},
+  {"/dev/cons27", BRACK(FHDEV(DEV_CONS_MAJOR, 27)), "/dev/cons27", exists_console, S_IFCHR, true},
+  {"/dev/cons28", BRACK(FHDEV(DEV_CONS_MAJOR, 28)), "/dev/cons28", exists_console, S_IFCHR, true},
+  {"/dev/cons29", BRACK(FHDEV(DEV_CONS_MAJOR, 29)), "/dev/cons29", exists_console, S_IFCHR, true},
+  {"/dev/cons30", BRACK(FHDEV(DEV_CONS_MAJOR, 30)), "/dev/cons30", exists_console, S_IFCHR, true},
+  {"/dev/cons31", BRACK(FHDEV(DEV_CONS_MAJOR, 31)), "/dev/cons31", exists_console, S_IFCHR, true},
+  {"/dev/cons32", BRACK(FHDEV(DEV_CONS_MAJOR, 32)), "/dev/cons32", exists_console, S_IFCHR, true},
+  {"/dev/cons33", BRACK(FHDEV(DEV_CONS_MAJOR, 33)), "/dev/cons33", exists_console, S_IFCHR, true},
+  {"/dev/cons34", BRACK(FHDEV(DEV_CONS_MAJOR, 34)), "/dev/cons34", exists_console, S_IFCHR, true},
+  {"/dev/cons35", BRACK(FHDEV(DEV_CONS_MAJOR, 35)), "/dev/cons35", exists_console, S_IFCHR, true},
+  {"/dev/cons36", BRACK(FHDEV(DEV_CONS_MAJOR, 36)), "/dev/cons36", exists_console, S_IFCHR, true},
+  {"/dev/cons37", BRACK(FHDEV(DEV_CONS_MAJOR, 37)), "/dev/cons37", exists_console, S_IFCHR, true},
+  {"/dev/cons38", BRACK(FHDEV(DEV_CONS_MAJOR, 38)), "/dev/cons38", exists_console, S_IFCHR, true},
+  {"/dev/cons39", BRACK(FHDEV(DEV_CONS_MAJOR, 39)), "/dev/cons39", exists_console, S_IFCHR, true},
+  {"/dev/cons40", BRACK(FHDEV(DEV_CONS_MAJOR, 40)), "/dev/cons40", exists_console, S_IFCHR, true},
+  {"/dev/cons41", BRACK(FHDEV(DEV_CONS_MAJOR, 41)), "/dev/cons41", exists_console, S_IFCHR, true},
+  {"/dev/cons42", BRACK(FHDEV(DEV_CONS_MAJOR, 42)), "/dev/cons42", exists_console, S_IFCHR, true},
+  {"/dev/cons43", BRACK(FHDEV(DEV_CONS_MAJOR, 43)), "/dev/cons43", exists_console, S_IFCHR, true},
+  {"/dev/cons44", BRACK(FHDEV(DEV_CONS_MAJOR, 44)), "/dev/cons44", exists_console, S_IFCHR, true},
+  {"/dev/cons45", BRACK(FHDEV(DEV_CONS_MAJOR, 45)), "/dev/cons45", exists_console, S_IFCHR, true},
+  {"/dev/cons46", BRACK(FHDEV(DEV_CONS_MAJOR, 46)), "/dev/cons46", exists_console, S_IFCHR, true},
+  {"/dev/cons47", BRACK(FHDEV(DEV_CONS_MAJOR, 47)), "/dev/cons47", exists_console, S_IFCHR, true},
+  {"/dev/cons48", BRACK(FHDEV(DEV_CONS_MAJOR, 48)), "/dev/cons48", exists_console, S_IFCHR, true},
+  {"/dev/cons49", BRACK(FHDEV(DEV_CONS_MAJOR, 49)), "/dev/cons49", exists_console, S_IFCHR, true},
+  {"/dev/cons50", BRACK(FHDEV(DEV_CONS_MAJOR, 50)), "/dev/cons50", exists_console, S_IFCHR, true},
+  {"/dev/cons51", BRACK(FHDEV(DEV_CONS_MAJOR, 51)), "/dev/cons51", exists_console, S_IFCHR, true},
+  {"/dev/cons52", BRACK(FHDEV(DEV_CONS_MAJOR, 52)), "/dev/cons52", exists_console, S_IFCHR, true},
+  {"/dev/cons53", BRACK(FHDEV(DEV_CONS_MAJOR, 53)), "/dev/cons53", exists_console, S_IFCHR, true},
+  {"/dev/cons54", BRACK(FHDEV(DEV_CONS_MAJOR, 54)), "/dev/cons54", exists_console, S_IFCHR, true},
+  {"/dev/cons55", BRACK(FHDEV(DEV_CONS_MAJOR, 55)), "/dev/cons55", exists_console, S_IFCHR, true},
+  {"/dev/cons56", BRACK(FHDEV(DEV_CONS_MAJOR, 56)), "/dev/cons56", exists_console, S_IFCHR, true},
+  {"/dev/cons57", BRACK(FHDEV(DEV_CONS_MAJOR, 57)), "/dev/cons57", exists_console, S_IFCHR, true},
+  {"/dev/cons58", BRACK(FHDEV(DEV_CONS_MAJOR, 58)), "/dev/cons58", exists_console, S_IFCHR, true},
+  {"/dev/cons59", BRACK(FHDEV(DEV_CONS_MAJOR, 59)), "/dev/cons59", exists_console, S_IFCHR, true},
+  {"/dev/cons60", BRACK(FHDEV(DEV_CONS_MAJOR, 60)), "/dev/cons60", exists_console, S_IFCHR, true},
+  {"/dev/cons61", BRACK(FHDEV(DEV_CONS_MAJOR, 61)), "/dev/cons61", exists_console, S_IFCHR, true},
+  {"/dev/cons62", BRACK(FHDEV(DEV_CONS_MAJOR, 62)), "/dev/cons62", exists_console, S_IFCHR, true},
+  {"/dev/cons63", BRACK(FHDEV(DEV_CONS_MAJOR, 63)), "/dev/cons63", exists_console, S_IFCHR, true},
+  {"/dev/console", BRACK(FH_CONSOLE), "/dev/console", exists_console, S_IFCHR, true},
+  {"/dev/dsp", BRACK(FH_OSS_DSP), "/dev/dsp", exists, S_IFCHR, true},
+  {"/dev/fd0", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 0)), "\\Device\\Floppy0", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd1", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 1)), "\\Device\\Floppy1", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd2", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 2)), "\\Device\\Floppy2", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd3", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 3)), "\\Device\\Floppy3", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd4", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 4)), "\\Device\\Floppy4", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd5", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 5)), "\\Device\\Floppy5", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd6", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 6)), "\\Device\\Floppy6", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd7", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 7)), "\\Device\\Floppy7", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd8", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 8)), "\\Device\\Floppy8", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd9", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 9)), "\\Device\\Floppy9", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd10", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 10)), "\\Device\\Floppy10", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd11", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 11)), "\\Device\\Floppy11", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd12", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 12)), "\\Device\\Floppy12", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd13", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 13)), "\\Device\\Floppy13", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd14", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 14)), "\\Device\\Floppy14", exists_ntdev, S_IFBLK, true},
+  {"/dev/fd15", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 15)), "\\Device\\Floppy15", exists_ntdev, S_IFBLK, true},
+  {"/dev/full", BRACK(FH_FULL), "/dev/full", exists, S_IFCHR, true},
+  {"/dev/kmem", BRACK(FH_KMEM), "/dev/mem", exists, S_IFCHR, true},
+  {"/dev/kmsg", BRACK(FH_KMSG), "\\Device\\MailSlot\\cygwin\\dev\\kmsg", exists_ntdev, S_IFCHR, true},
+  {"/dev/mem", BRACK(FH_MEM), "/dev/mem", exists, S_IFCHR, true},
+  {"/dev/nst0", BRACK(FHDEV(DEV_TAPE_MAJOR, 128)), "\\Device\\Tape0", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst1", BRACK(FHDEV(DEV_TAPE_MAJOR, 129)), "\\Device\\Tape1", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst2", BRACK(FHDEV(DEV_TAPE_MAJOR, 130)), "\\Device\\Tape2", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst3", BRACK(FHDEV(DEV_TAPE_MAJOR, 131)), "\\Device\\Tape3", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst4", BRACK(FHDEV(DEV_TAPE_MAJOR, 132)), "\\Device\\Tape4", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst5", BRACK(FHDEV(DEV_TAPE_MAJOR, 133)), "\\Device\\Tape5", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst6", BRACK(FHDEV(DEV_TAPE_MAJOR, 134)), "\\Device\\Tape6", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst7", BRACK(FHDEV(DEV_TAPE_MAJOR, 135)), "\\Device\\Tape7", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst8", BRACK(FHDEV(DEV_TAPE_MAJOR, 136)), "\\Device\\Tape8", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst9", BRACK(FHDEV(DEV_TAPE_MAJOR, 137)), "\\Device\\Tape9", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst10", BRACK(FHDEV(DEV_TAPE_MAJOR, 138)), "\\Device\\Tape10", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst11", BRACK(FHDEV(DEV_TAPE_MAJOR, 139)), "\\Device\\Tape11", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst12", BRACK(FHDEV(DEV_TAPE_MAJOR, 140)), "\\Device\\Tape12", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst13", BRACK(FHDEV(DEV_TAPE_MAJOR, 141)), "\\Device\\Tape13", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst14", BRACK(FHDEV(DEV_TAPE_MAJOR, 142)), "\\Device\\Tape14", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst15", BRACK(FHDEV(DEV_TAPE_MAJOR, 143)), "\\Device\\Tape15", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst16", BRACK(FHDEV(DEV_TAPE_MAJOR, 144)), "\\Device\\Tape16", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst17", BRACK(FHDEV(DEV_TAPE_MAJOR, 145)), "\\Device\\Tape17", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst18", BRACK(FHDEV(DEV_TAPE_MAJOR, 146)), "\\Device\\Tape18", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst19", BRACK(FHDEV(DEV_TAPE_MAJOR, 147)), "\\Device\\Tape19", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst20", BRACK(FHDEV(DEV_TAPE_MAJOR, 148)), "\\Device\\Tape20", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst21", BRACK(FHDEV(DEV_TAPE_MAJOR, 149)), "\\Device\\Tape21", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst22", BRACK(FHDEV(DEV_TAPE_MAJOR, 150)), "\\Device\\Tape22", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst23", BRACK(FHDEV(DEV_TAPE_MAJOR, 151)), "\\Device\\Tape23", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst24", BRACK(FHDEV(DEV_TAPE_MAJOR, 152)), "\\Device\\Tape24", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst25", BRACK(FHDEV(DEV_TAPE_MAJOR, 153)), "\\Device\\Tape25", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst26", BRACK(FHDEV(DEV_TAPE_MAJOR, 154)), "\\Device\\Tape26", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst27", BRACK(FHDEV(DEV_TAPE_MAJOR, 155)), "\\Device\\Tape27", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst28", BRACK(FHDEV(DEV_TAPE_MAJOR, 156)), "\\Device\\Tape28", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst29", BRACK(FHDEV(DEV_TAPE_MAJOR, 157)), "\\Device\\Tape29", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst30", BRACK(FHDEV(DEV_TAPE_MAJOR, 158)), "\\Device\\Tape30", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst31", BRACK(FHDEV(DEV_TAPE_MAJOR, 159)), "\\Device\\Tape31", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst32", BRACK(FHDEV(DEV_TAPE_MAJOR, 160)), "\\Device\\Tape32", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst33", BRACK(FHDEV(DEV_TAPE_MAJOR, 161)), "\\Device\\Tape33", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst34", BRACK(FHDEV(DEV_TAPE_MAJOR, 162)), "\\Device\\Tape34", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst35", BRACK(FHDEV(DEV_TAPE_MAJOR, 163)), "\\Device\\Tape35", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst36", BRACK(FHDEV(DEV_TAPE_MAJOR, 164)), "\\Device\\Tape36", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst37", BRACK(FHDEV(DEV_TAPE_MAJOR, 165)), "\\Device\\Tape37", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst38", BRACK(FHDEV(DEV_TAPE_MAJOR, 166)), "\\Device\\Tape38", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst39", BRACK(FHDEV(DEV_TAPE_MAJOR, 167)), "\\Device\\Tape39", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst40", BRACK(FHDEV(DEV_TAPE_MAJOR, 168)), "\\Device\\Tape40", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst41", BRACK(FHDEV(DEV_TAPE_MAJOR, 169)), "\\Device\\Tape41", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst42", BRACK(FHDEV(DEV_TAPE_MAJOR, 170)), "\\Device\\Tape42", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst43", BRACK(FHDEV(DEV_TAPE_MAJOR, 171)), "\\Device\\Tape43", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst44", BRACK(FHDEV(DEV_TAPE_MAJOR, 172)), "\\Device\\Tape44", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst45", BRACK(FHDEV(DEV_TAPE_MAJOR, 173)), "\\Device\\Tape45", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst46", BRACK(FHDEV(DEV_TAPE_MAJOR, 174)), "\\Device\\Tape46", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst47", BRACK(FHDEV(DEV_TAPE_MAJOR, 175)), "\\Device\\Tape47", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst48", BRACK(FHDEV(DEV_TAPE_MAJOR, 176)), "\\Device\\Tape48", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst49", BRACK(FHDEV(DEV_TAPE_MAJOR, 177)), "\\Device\\Tape49", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst50", BRACK(FHDEV(DEV_TAPE_MAJOR, 178)), "\\Device\\Tape50", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst51", BRACK(FHDEV(DEV_TAPE_MAJOR, 179)), "\\Device\\Tape51", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst52", BRACK(FHDEV(DEV_TAPE_MAJOR, 180)), "\\Device\\Tape52", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst53", BRACK(FHDEV(DEV_TAPE_MAJOR, 181)), "\\Device\\Tape53", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst54", BRACK(FHDEV(DEV_TAPE_MAJOR, 182)), "\\Device\\Tape54", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst55", BRACK(FHDEV(DEV_TAPE_MAJOR, 183)), "\\Device\\Tape55", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst56", BRACK(FHDEV(DEV_TAPE_MAJOR, 184)), "\\Device\\Tape56", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst57", BRACK(FHDEV(DEV_TAPE_MAJOR, 185)), "\\Device\\Tape57", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst58", BRACK(FHDEV(DEV_TAPE_MAJOR, 186)), "\\Device\\Tape58", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst59", BRACK(FHDEV(DEV_TAPE_MAJOR, 187)), "\\Device\\Tape59", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst60", BRACK(FHDEV(DEV_TAPE_MAJOR, 188)), "\\Device\\Tape60", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst61", BRACK(FHDEV(DEV_TAPE_MAJOR, 189)), "\\Device\\Tape61", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst62", BRACK(FHDEV(DEV_TAPE_MAJOR, 190)), "\\Device\\Tape62", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst63", BRACK(FHDEV(DEV_TAPE_MAJOR, 191)), "\\Device\\Tape63", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst64", BRACK(FHDEV(DEV_TAPE_MAJOR, 192)), "\\Device\\Tape64", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst65", BRACK(FHDEV(DEV_TAPE_MAJOR, 193)), "\\Device\\Tape65", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst66", BRACK(FHDEV(DEV_TAPE_MAJOR, 194)), "\\Device\\Tape66", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst67", BRACK(FHDEV(DEV_TAPE_MAJOR, 195)), "\\Device\\Tape67", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst68", BRACK(FHDEV(DEV_TAPE_MAJOR, 196)), "\\Device\\Tape68", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst69", BRACK(FHDEV(DEV_TAPE_MAJOR, 197)), "\\Device\\Tape69", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst70", BRACK(FHDEV(DEV_TAPE_MAJOR, 198)), "\\Device\\Tape70", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst71", BRACK(FHDEV(DEV_TAPE_MAJOR, 199)), "\\Device\\Tape71", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst72", BRACK(FHDEV(DEV_TAPE_MAJOR, 200)), "\\Device\\Tape72", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst73", BRACK(FHDEV(DEV_TAPE_MAJOR, 201)), "\\Device\\Tape73", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst74", BRACK(FHDEV(DEV_TAPE_MAJOR, 202)), "\\Device\\Tape74", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst75", BRACK(FHDEV(DEV_TAPE_MAJOR, 203)), "\\Device\\Tape75", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst76", BRACK(FHDEV(DEV_TAPE_MAJOR, 204)), "\\Device\\Tape76", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst77", BRACK(FHDEV(DEV_TAPE_MAJOR, 205)), "\\Device\\Tape77", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst78", BRACK(FHDEV(DEV_TAPE_MAJOR, 206)), "\\Device\\Tape78", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst79", BRACK(FHDEV(DEV_TAPE_MAJOR, 207)), "\\Device\\Tape79", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst80", BRACK(FHDEV(DEV_TAPE_MAJOR, 208)), "\\Device\\Tape80", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst81", BRACK(FHDEV(DEV_TAPE_MAJOR, 209)), "\\Device\\Tape81", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst82", BRACK(FHDEV(DEV_TAPE_MAJOR, 210)), "\\Device\\Tape82", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst83", BRACK(FHDEV(DEV_TAPE_MAJOR, 211)), "\\Device\\Tape83", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst84", BRACK(FHDEV(DEV_TAPE_MAJOR, 212)), "\\Device\\Tape84", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst85", BRACK(FHDEV(DEV_TAPE_MAJOR, 213)), "\\Device\\Tape85", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst86", BRACK(FHDEV(DEV_TAPE_MAJOR, 214)), "\\Device\\Tape86", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst87", BRACK(FHDEV(DEV_TAPE_MAJOR, 215)), "\\Device\\Tape87", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst88", BRACK(FHDEV(DEV_TAPE_MAJOR, 216)), "\\Device\\Tape88", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst89", BRACK(FHDEV(DEV_TAPE_MAJOR, 217)), "\\Device\\Tape89", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst90", BRACK(FHDEV(DEV_TAPE_MAJOR, 218)), "\\Device\\Tape90", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst91", BRACK(FHDEV(DEV_TAPE_MAJOR, 219)), "\\Device\\Tape91", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst92", BRACK(FHDEV(DEV_TAPE_MAJOR, 220)), "\\Device\\Tape92", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst93", BRACK(FHDEV(DEV_TAPE_MAJOR, 221)), "\\Device\\Tape93", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst94", BRACK(FHDEV(DEV_TAPE_MAJOR, 222)), "\\Device\\Tape94", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst95", BRACK(FHDEV(DEV_TAPE_MAJOR, 223)), "\\Device\\Tape95", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst96", BRACK(FHDEV(DEV_TAPE_MAJOR, 224)), "\\Device\\Tape96", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst97", BRACK(FHDEV(DEV_TAPE_MAJOR, 225)), "\\Device\\Tape97", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst98", BRACK(FHDEV(DEV_TAPE_MAJOR, 226)), "\\Device\\Tape98", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst99", BRACK(FHDEV(DEV_TAPE_MAJOR, 227)), "\\Device\\Tape99", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst100", BRACK(FHDEV(DEV_TAPE_MAJOR, 228)), "\\Device\\Tape100", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst101", BRACK(FHDEV(DEV_TAPE_MAJOR, 229)), "\\Device\\Tape101", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst102", BRACK(FHDEV(DEV_TAPE_MAJOR, 230)), "\\Device\\Tape102", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst103", BRACK(FHDEV(DEV_TAPE_MAJOR, 231)), "\\Device\\Tape103", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst104", BRACK(FHDEV(DEV_TAPE_MAJOR, 232)), "\\Device\\Tape104", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst105", BRACK(FHDEV(DEV_TAPE_MAJOR, 233)), "\\Device\\Tape105", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst106", BRACK(FHDEV(DEV_TAPE_MAJOR, 234)), "\\Device\\Tape106", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst107", BRACK(FHDEV(DEV_TAPE_MAJOR, 235)), "\\Device\\Tape107", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst108", BRACK(FHDEV(DEV_TAPE_MAJOR, 236)), "\\Device\\Tape108", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst109", BRACK(FHDEV(DEV_TAPE_MAJOR, 237)), "\\Device\\Tape109", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst110", BRACK(FHDEV(DEV_TAPE_MAJOR, 238)), "\\Device\\Tape110", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst111", BRACK(FHDEV(DEV_TAPE_MAJOR, 239)), "\\Device\\Tape111", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst112", BRACK(FHDEV(DEV_TAPE_MAJOR, 240)), "\\Device\\Tape112", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst113", BRACK(FHDEV(DEV_TAPE_MAJOR, 241)), "\\Device\\Tape113", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst114", BRACK(FHDEV(DEV_TAPE_MAJOR, 242)), "\\Device\\Tape114", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst115", BRACK(FHDEV(DEV_TAPE_MAJOR, 243)), "\\Device\\Tape115", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst116", BRACK(FHDEV(DEV_TAPE_MAJOR, 244)), "\\Device\\Tape116", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst117", BRACK(FHDEV(DEV_TAPE_MAJOR, 245)), "\\Device\\Tape117", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst118", BRACK(FHDEV(DEV_TAPE_MAJOR, 246)), "\\Device\\Tape118", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst119", BRACK(FHDEV(DEV_TAPE_MAJOR, 247)), "\\Device\\Tape119", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst120", BRACK(FHDEV(DEV_TAPE_MAJOR, 248)), "\\Device\\Tape120", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst121", BRACK(FHDEV(DEV_TAPE_MAJOR, 249)), "\\Device\\Tape121", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst122", BRACK(FHDEV(DEV_TAPE_MAJOR, 250)), "\\Device\\Tape122", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst123", BRACK(FHDEV(DEV_TAPE_MAJOR, 251)), "\\Device\\Tape123", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst124", BRACK(FHDEV(DEV_TAPE_MAJOR, 252)), "\\Device\\Tape124", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst125", BRACK(FHDEV(DEV_TAPE_MAJOR, 253)), "\\Device\\Tape125", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst126", BRACK(FHDEV(DEV_TAPE_MAJOR, 254)), "\\Device\\Tape126", exists_ntdev, S_IFBLK, true},
+  {"/dev/nst127", BRACK(FHDEV(DEV_TAPE_MAJOR, 255)), "\\Device\\Tape127", exists_ntdev, S_IFBLK, true},
+  {"/dev/null", BRACK(FH_NULL), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
+  {"/dev/port", BRACK(FH_PORT), "/dev/port", exists, S_IFCHR, true},
+  {"/dev/ptmx", BRACK(FH_PTMX), "/dev/ptmx", exists, S_IFCHR, true},
+  {"/dev/pty0", BRACK(FHDEV(DEV_PTYS_MAJOR, 0)), "/dev/pty0", exists_pty, S_IFCHR, true},
+  {"/dev/pty1", BRACK(FHDEV(DEV_PTYS_MAJOR, 1)), "/dev/pty1", exists_pty, S_IFCHR, true},
+  {"/dev/pty2", BRACK(FHDEV(DEV_PTYS_MAJOR, 2)), "/dev/pty2", exists_pty, S_IFCHR, true},
+  {"/dev/pty3", BRACK(FHDEV(DEV_PTYS_MAJOR, 3)), "/dev/pty3", exists_pty, S_IFCHR, true},
+  {"/dev/pty4", BRACK(FHDEV(DEV_PTYS_MAJOR, 4)), "/dev/pty4", exists_pty, S_IFCHR, true},
+  {"/dev/pty5", BRACK(FHDEV(DEV_PTYS_MAJOR, 5)), "/dev/pty5", exists_pty, S_IFCHR, true},
+  {"/dev/pty6", BRACK(FHDEV(DEV_PTYS_MAJOR, 6)), "/dev/pty6", exists_pty, S_IFCHR, true},
+  {"/dev/pty7", BRACK(FHDEV(DEV_PTYS_MAJOR, 7)), "/dev/pty7", exists_pty, S_IFCHR, true},
+  {"/dev/pty8", BRACK(FHDEV(DEV_PTYS_MAJOR, 8)), "/dev/pty8", exists_pty, S_IFCHR, true},
+  {"/dev/pty9", BRACK(FHDEV(DEV_PTYS_MAJOR, 9)), "/dev/pty9", exists_pty, S_IFCHR, true},
+  {"/dev/pty10", BRACK(FHDEV(DEV_PTYS_MAJOR, 10)), "/dev/pty10", exists_pty, S_IFCHR, true},
+  {"/dev/pty11", BRACK(FHDEV(DEV_PTYS_MAJOR, 11)), "/dev/pty11", exists_pty, S_IFCHR, true},
+  {"/dev/pty12", BRACK(FHDEV(DEV_PTYS_MAJOR, 12)), "/dev/pty12", exists_pty, S_IFCHR, true},
+  {"/dev/pty13", BRACK(FHDEV(DEV_PTYS_MAJOR, 13)), "/dev/pty13", exists_pty, S_IFCHR, true},
+  {"/dev/pty14", BRACK(FHDEV(DEV_PTYS_MAJOR, 14)), "/dev/pty14", exists_pty, S_IFCHR, true},
+  {"/dev/pty15", BRACK(FHDEV(DEV_PTYS_MAJOR, 15)), "/dev/pty15", exists_pty, S_IFCHR, true},
+  {"/dev/pty16", BRACK(FHDEV(DEV_PTYS_MAJOR, 16)), "/dev/pty16", exists_pty, S_IFCHR, true},
+  {"/dev/pty17", BRACK(FHDEV(DEV_PTYS_MAJOR, 17)), "/dev/pty17", exists_pty, S_IFCHR, true},
+  {"/dev/pty18", BRACK(FHDEV(DEV_PTYS_MAJOR, 18)), "/dev/pty18", exists_pty, S_IFCHR, true},
+  {"/dev/pty19", BRACK(FHDEV(DEV_PTYS_MAJOR, 19)), "/dev/pty19", exists_pty, S_IFCHR, true},
+  {"/dev/pty20", BRACK(FHDEV(DEV_PTYS_MAJOR, 20)), "/dev/pty20", exists_pty, S_IFCHR, true},
+  {"/dev/pty21", BRACK(FHDEV(DEV_PTYS_MAJOR, 21)), "/dev/pty21", exists_pty, S_IFCHR, true},
+  {"/dev/pty22", BRACK(FHDEV(DEV_PTYS_MAJOR, 22)), "/dev/pty22", exists_pty, S_IFCHR, true},
+  {"/dev/pty23", BRACK(FHDEV(DEV_PTYS_MAJOR, 23)), "/dev/pty23", exists_pty, S_IFCHR, true},
+  {"/dev/pty24", BRACK(FHDEV(DEV_PTYS_MAJOR, 24)), "/dev/pty24", exists_pty, S_IFCHR, true},
+  {"/dev/pty25", BRACK(FHDEV(DEV_PTYS_MAJOR, 25)), "/dev/pty25", exists_pty, S_IFCHR, true},
+  {"/dev/pty26", BRACK(FHDEV(DEV_PTYS_MAJOR, 26)), "/dev/pty26", exists_pty, S_IFCHR, true},
+  {"/dev/pty27", BRACK(FHDEV(DEV_PTYS_MAJOR, 27)), "/dev/pty27", exists_pty, S_IFCHR, true},
+  {"/dev/pty28", BRACK(FHDEV(DEV_PTYS_MAJOR, 28)), "/dev/pty28", exists_pty, S_IFCHR, true},
+  {"/dev/pty29", BRACK(FHDEV(DEV_PTYS_MAJOR, 29)), "/dev/pty29", exists_pty, S_IFCHR, true},
+  {"/dev/pty30", BRACK(FHDEV(DEV_PTYS_MAJOR, 30)), "/dev/pty30", exists_pty, S_IFCHR, true},
+  {"/dev/pty31", BRACK(FHDEV(DEV_PTYS_MAJOR, 31)), "/dev/pty31", exists_pty, S_IFCHR, true},
+  {"/dev/pty32", BRACK(FHDEV(DEV_PTYS_MAJOR, 32)), "/dev/pty32", exists_pty, S_IFCHR, true},
+  {"/dev/pty33", BRACK(FHDEV(DEV_PTYS_MAJOR, 33)), "/dev/pty33", exists_pty, S_IFCHR, true},
+  {"/dev/pty34", BRACK(FHDEV(DEV_PTYS_MAJOR, 34)), "/dev/pty34", exists_pty, S_IFCHR, true},
+  {"/dev/pty35", BRACK(FHDEV(DEV_PTYS_MAJOR, 35)), "/dev/pty35", exists_pty, S_IFCHR, true},
+  {"/dev/pty36", BRACK(FHDEV(DEV_PTYS_MAJOR, 36)), "/dev/pty36", exists_pty, S_IFCHR, true},
+  {"/dev/pty37", BRACK(FHDEV(DEV_PTYS_MAJOR, 37)), "/dev/pty37", exists_pty, S_IFCHR, true},
+  {"/dev/pty38", BRACK(FHDEV(DEV_PTYS_MAJOR, 38)), "/dev/pty38", exists_pty, S_IFCHR, true},
+  {"/dev/pty39", BRACK(FHDEV(DEV_PTYS_MAJOR, 39)), "/dev/pty39", exists_pty, S_IFCHR, true},
+  {"/dev/pty40", BRACK(FHDEV(DEV_PTYS_MAJOR, 40)), "/dev/pty40", exists_pty, S_IFCHR, true},
+  {"/dev/pty41", BRACK(FHDEV(DEV_PTYS_MAJOR, 41)), "/dev/pty41", exists_pty, S_IFCHR, true},
+  {"/dev/pty42", BRACK(FHDEV(DEV_PTYS_MAJOR, 42)), "/dev/pty42", exists_pty, S_IFCHR, true},
+  {"/dev/pty43", BRACK(FHDEV(DEV_PTYS_MAJOR, 43)), "/dev/pty43", exists_pty, S_IFCHR, true},
+  {"/dev/pty44", BRACK(FHDEV(DEV_PTYS_MAJOR, 44)), "/dev/pty44", exists_pty, S_IFCHR, true},
+  {"/dev/pty45", BRACK(FHDEV(DEV_PTYS_MAJOR, 45)), "/dev/pty45", exists_pty, S_IFCHR, true},
+  {"/dev/pty46", BRACK(FHDEV(DEV_PTYS_MAJOR, 46)), "/dev/pty46", exists_pty, S_IFCHR, true},
+  {"/dev/pty47", BRACK(FHDEV(DEV_PTYS_MAJOR, 47)), "/dev/pty47", exists_pty, S_IFCHR, true},
+  {"/dev/pty48", BRACK(FHDEV(DEV_PTYS_MAJOR, 48)), "/dev/pty48", exists_pty, S_IFCHR, true},
+  {"/dev/pty49", BRACK(FHDEV(DEV_PTYS_MAJOR, 49)), "/dev/pty49", exists_pty, S_IFCHR, true},
+  {"/dev/pty50", BRACK(FHDEV(DEV_PTYS_MAJOR, 50)), "/dev/pty50", exists_pty, S_IFCHR, true},
+  {"/dev/pty51", BRACK(FHDEV(DEV_PTYS_MAJOR, 51)), "/dev/pty51", exists_pty, S_IFCHR, true},
+  {"/dev/pty52", BRACK(FHDEV(DEV_PTYS_MAJOR, 52)), "/dev/pty52", exists_pty, S_IFCHR, true},
+  {"/dev/pty53", BRACK(FHDEV(DEV_PTYS_MAJOR, 53)), "/dev/pty53", exists_pty, S_IFCHR, true},
+  {"/dev/pty54", BRACK(FHDEV(DEV_PTYS_MAJOR, 54)), "/dev/pty54", exists_pty, S_IFCHR, true},
+  {"/dev/pty55", BRACK(FHDEV(DEV_PTYS_MAJOR, 55)), "/dev/pty55", exists_pty, S_IFCHR, true},
+  {"/dev/pty56", BRACK(FHDEV(DEV_PTYS_MAJOR, 56)), "/dev/pty56", exists_pty, S_IFCHR, true},
+  {"/dev/pty57", BRACK(FHDEV(DEV_PTYS_MAJOR, 57)), "/dev/pty57", exists_pty, S_IFCHR, true},
+  {"/dev/pty58", BRACK(FHDEV(DEV_PTYS_MAJOR, 58)), "/dev/pty58", exists_pty, S_IFCHR, true},
+  {"/dev/pty59", BRACK(FHDEV(DEV_PTYS_MAJOR, 59)), "/dev/pty59", exists_pty, S_IFCHR, true},
+  {"/dev/pty60", BRACK(FHDEV(DEV_PTYS_MAJOR, 60)), "/dev/pty60", exists_pty, S_IFCHR, true},
+  {"/dev/pty61", BRACK(FHDEV(DEV_PTYS_MAJOR, 61)), "/dev/pty61", exists_pty, S_IFCHR, true},
+  {"/dev/pty62", BRACK(FHDEV(DEV_PTYS_MAJOR, 62)), "/dev/pty62", exists_pty, S_IFCHR, true},
+  {"/dev/pty63", BRACK(FHDEV(DEV_PTYS_MAJOR, 63)), "/dev/pty63", exists_pty, S_IFCHR, true},
+  {"/dev/random", BRACK(FH_RANDOM), "/dev/random", exists, S_IFCHR, true},
+  {"/dev/scd0", BRACK(FHDEV(DEV_CDROM_MAJOR, 0)), "\\Device\\CdRom0", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd1", BRACK(FHDEV(DEV_CDROM_MAJOR, 1)), "\\Device\\CdRom1", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd2", BRACK(FHDEV(DEV_CDROM_MAJOR, 2)), "\\Device\\CdRom2", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd3", BRACK(FHDEV(DEV_CDROM_MAJOR, 3)), "\\Device\\CdRom3", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd4", BRACK(FHDEV(DEV_CDROM_MAJOR, 4)), "\\Device\\CdRom4", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd5", BRACK(FHDEV(DEV_CDROM_MAJOR, 5)), "\\Device\\CdRom5", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd6", BRACK(FHDEV(DEV_CDROM_MAJOR, 6)), "\\Device\\CdRom6", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd7", BRACK(FHDEV(DEV_CDROM_MAJOR, 7)), "\\Device\\CdRom7", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd8", BRACK(FHDEV(DEV_CDROM_MAJOR, 8)), "\\Device\\CdRom8", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd9", BRACK(FHDEV(DEV_CDROM_MAJOR, 9)), "\\Device\\CdRom9", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd10", BRACK(FHDEV(DEV_CDROM_MAJOR, 10)), "\\Device\\CdRom10", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd11", BRACK(FHDEV(DEV_CDROM_MAJOR, 11)), "\\Device\\CdRom11", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd12", BRACK(FHDEV(DEV_CDROM_MAJOR, 12)), "\\Device\\CdRom12", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd13", BRACK(FHDEV(DEV_CDROM_MAJOR, 13)), "\\Device\\CdRom13", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd14", BRACK(FHDEV(DEV_CDROM_MAJOR, 14)), "\\Device\\CdRom14", exists_ntdev, S_IFBLK, true},
+  {"/dev/scd15", BRACK(FHDEV(DEV_CDROM_MAJOR, 15)), "\\Device\\CdRom15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda", BRACK(FH_SDA), "\\Device\\Harddisk0\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb", BRACK(FH_SDB), "\\Device\\Harddisk1\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc", BRACK(FH_SDC), "\\Device\\Harddisk2\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd", BRACK(FH_SDD), "\\Device\\Harddisk3\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde", BRACK(FH_SDE), "\\Device\\Harddisk4\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf", BRACK(FH_SDF), "\\Device\\Harddisk5\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg", BRACK(FH_SDG), "\\Device\\Harddisk6\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh", BRACK(FH_SDH), "\\Device\\Harddisk7\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi", BRACK(FH_SDI), "\\Device\\Harddisk8\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj", BRACK(FH_SDJ), "\\Device\\Harddisk9\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk", BRACK(FH_SDK), "\\Device\\Harddisk10\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl", BRACK(FH_SDL), "\\Device\\Harddisk11\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm", BRACK(FH_SDM), "\\Device\\Harddisk12\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn", BRACK(FH_SDN), "\\Device\\Harddisk13\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo", BRACK(FH_SDO), "\\Device\\Harddisk14\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp", BRACK(FH_SDP), "\\Device\\Harddisk15\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq", BRACK(FH_SDQ), "\\Device\\Harddisk16\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr", BRACK(FH_SDR), "\\Device\\Harddisk17\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds", BRACK(FH_SDS), "\\Device\\Harddisk18\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt", BRACK(FH_SDT), "\\Device\\Harddisk19\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu", BRACK(FH_SDU), "\\Device\\Harddisk20\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv", BRACK(FH_SDV), "\\Device\\Harddisk21\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw", BRACK(FH_SDW), "\\Device\\Harddisk22\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx", BRACK(FH_SDX), "\\Device\\Harddisk23\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy", BRACK(FH_SDY), "\\Device\\Harddisk24\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz", BRACK(FH_SDZ), "\\Device\\Harddisk25\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda1", BRACK(FH_SDA | 1), "\\Device\\Harddisk0\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda2", BRACK(FH_SDA | 2), "\\Device\\Harddisk0\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda3", BRACK(FH_SDA | 3), "\\Device\\Harddisk0\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda4", BRACK(FH_SDA | 4), "\\Device\\Harddisk0\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda5", BRACK(FH_SDA | 5), "\\Device\\Harddisk0\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda6", BRACK(FH_SDA | 6), "\\Device\\Harddisk0\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda7", BRACK(FH_SDA | 7), "\\Device\\Harddisk0\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda8", BRACK(FH_SDA | 8), "\\Device\\Harddisk0\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda9", BRACK(FH_SDA | 9), "\\Device\\Harddisk0\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda10", BRACK(FH_SDA | 10), "\\Device\\Harddisk0\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda11", BRACK(FH_SDA | 11), "\\Device\\Harddisk0\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda12", BRACK(FH_SDA | 12), "\\Device\\Harddisk0\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda13", BRACK(FH_SDA | 13), "\\Device\\Harddisk0\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda14", BRACK(FH_SDA | 14), "\\Device\\Harddisk0\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sda15", BRACK(FH_SDA | 15), "\\Device\\Harddisk0\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb1", BRACK(FH_SDB | 1), "\\Device\\Harddisk1\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb2", BRACK(FH_SDB | 2), "\\Device\\Harddisk1\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb3", BRACK(FH_SDB | 3), "\\Device\\Harddisk1\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb4", BRACK(FH_SDB | 4), "\\Device\\Harddisk1\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb5", BRACK(FH_SDB | 5), "\\Device\\Harddisk1\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb6", BRACK(FH_SDB | 6), "\\Device\\Harddisk1\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb7", BRACK(FH_SDB | 7), "\\Device\\Harddisk1\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb8", BRACK(FH_SDB | 8), "\\Device\\Harddisk1\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb9", BRACK(FH_SDB | 9), "\\Device\\Harddisk1\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb10", BRACK(FH_SDB | 10), "\\Device\\Harddisk1\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb11", BRACK(FH_SDB | 11), "\\Device\\Harddisk1\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb12", BRACK(FH_SDB | 12), "\\Device\\Harddisk1\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb13", BRACK(FH_SDB | 13), "\\Device\\Harddisk1\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb14", BRACK(FH_SDB | 14), "\\Device\\Harddisk1\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdb15", BRACK(FH_SDB | 15), "\\Device\\Harddisk1\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc1", BRACK(FH_SDC | 1), "\\Device\\Harddisk2\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc2", BRACK(FH_SDC | 2), "\\Device\\Harddisk2\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc3", BRACK(FH_SDC | 3), "\\Device\\Harddisk2\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc4", BRACK(FH_SDC | 4), "\\Device\\Harddisk2\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc5", BRACK(FH_SDC | 5), "\\Device\\Harddisk2\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc6", BRACK(FH_SDC | 6), "\\Device\\Harddisk2\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc7", BRACK(FH_SDC | 7), "\\Device\\Harddisk2\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc8", BRACK(FH_SDC | 8), "\\Device\\Harddisk2\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc9", BRACK(FH_SDC | 9), "\\Device\\Harddisk2\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc10", BRACK(FH_SDC | 10), "\\Device\\Harddisk2\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc11", BRACK(FH_SDC | 11), "\\Device\\Harddisk2\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc12", BRACK(FH_SDC | 12), "\\Device\\Harddisk2\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc13", BRACK(FH_SDC | 13), "\\Device\\Harddisk2\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc14", BRACK(FH_SDC | 14), "\\Device\\Harddisk2\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdc15", BRACK(FH_SDC | 15), "\\Device\\Harddisk2\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd1", BRACK(FH_SDD | 1), "\\Device\\Harddisk3\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd2", BRACK(FH_SDD | 2), "\\Device\\Harddisk3\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd3", BRACK(FH_SDD | 3), "\\Device\\Harddisk3\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd4", BRACK(FH_SDD | 4), "\\Device\\Harddisk3\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd5", BRACK(FH_SDD | 5), "\\Device\\Harddisk3\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd6", BRACK(FH_SDD | 6), "\\Device\\Harddisk3\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd7", BRACK(FH_SDD | 7), "\\Device\\Harddisk3\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd8", BRACK(FH_SDD | 8), "\\Device\\Harddisk3\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd9", BRACK(FH_SDD | 9), "\\Device\\Harddisk3\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd10", BRACK(FH_SDD | 10), "\\Device\\Harddisk3\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd11", BRACK(FH_SDD | 11), "\\Device\\Harddisk3\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd12", BRACK(FH_SDD | 12), "\\Device\\Harddisk3\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd13", BRACK(FH_SDD | 13), "\\Device\\Harddisk3\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd14", BRACK(FH_SDD | 14), "\\Device\\Harddisk3\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdd15", BRACK(FH_SDD | 15), "\\Device\\Harddisk3\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde1", BRACK(FH_SDE | 1), "\\Device\\Harddisk4\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde2", BRACK(FH_SDE | 2), "\\Device\\Harddisk4\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde3", BRACK(FH_SDE | 3), "\\Device\\Harddisk4\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde4", BRACK(FH_SDE | 4), "\\Device\\Harddisk4\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde5", BRACK(FH_SDE | 5), "\\Device\\Harddisk4\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde6", BRACK(FH_SDE | 6), "\\Device\\Harddisk4\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde7", BRACK(FH_SDE | 7), "\\Device\\Harddisk4\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde8", BRACK(FH_SDE | 8), "\\Device\\Harddisk4\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde9", BRACK(FH_SDE | 9), "\\Device\\Harddisk4\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde10", BRACK(FH_SDE | 10), "\\Device\\Harddisk4\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde11", BRACK(FH_SDE | 11), "\\Device\\Harddisk4\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde12", BRACK(FH_SDE | 12), "\\Device\\Harddisk4\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde13", BRACK(FH_SDE | 13), "\\Device\\Harddisk4\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde14", BRACK(FH_SDE | 14), "\\Device\\Harddisk4\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sde15", BRACK(FH_SDE | 15), "\\Device\\Harddisk4\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf1", BRACK(FH_SDF | 1), "\\Device\\Harddisk5\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf2", BRACK(FH_SDF | 2), "\\Device\\Harddisk5\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf3", BRACK(FH_SDF | 3), "\\Device\\Harddisk5\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf4", BRACK(FH_SDF | 4), "\\Device\\Harddisk5\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf5", BRACK(FH_SDF | 5), "\\Device\\Harddisk5\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf6", BRACK(FH_SDF | 6), "\\Device\\Harddisk5\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf7", BRACK(FH_SDF | 7), "\\Device\\Harddisk5\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf8", BRACK(FH_SDF | 8), "\\Device\\Harddisk5\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf9", BRACK(FH_SDF | 9), "\\Device\\Harddisk5\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf10", BRACK(FH_SDF | 10), "\\Device\\Harddisk5\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf11", BRACK(FH_SDF | 11), "\\Device\\Harddisk5\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf12", BRACK(FH_SDF | 12), "\\Device\\Harddisk5\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf13", BRACK(FH_SDF | 13), "\\Device\\Harddisk5\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf14", BRACK(FH_SDF | 14), "\\Device\\Harddisk5\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdf15", BRACK(FH_SDF | 15), "\\Device\\Harddisk5\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg1", BRACK(FH_SDG | 1), "\\Device\\Harddisk6\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg2", BRACK(FH_SDG | 2), "\\Device\\Harddisk6\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg3", BRACK(FH_SDG | 3), "\\Device\\Harddisk6\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg4", BRACK(FH_SDG | 4), "\\Device\\Harddisk6\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg5", BRACK(FH_SDG | 5), "\\Device\\Harddisk6\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg6", BRACK(FH_SDG | 6), "\\Device\\Harddisk6\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg7", BRACK(FH_SDG | 7), "\\Device\\Harddisk6\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg8", BRACK(FH_SDG | 8), "\\Device\\Harddisk6\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg9", BRACK(FH_SDG | 9), "\\Device\\Harddisk6\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg10", BRACK(FH_SDG | 10), "\\Device\\Harddisk6\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg11", BRACK(FH_SDG | 11), "\\Device\\Harddisk6\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg12", BRACK(FH_SDG | 12), "\\Device\\Harddisk6\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg13", BRACK(FH_SDG | 13), "\\Device\\Harddisk6\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg14", BRACK(FH_SDG | 14), "\\Device\\Harddisk6\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdg15", BRACK(FH_SDG | 15), "\\Device\\Harddisk6\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh1", BRACK(FH_SDH | 1), "\\Device\\Harddisk7\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh2", BRACK(FH_SDH | 2), "\\Device\\Harddisk7\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh3", BRACK(FH_SDH | 3), "\\Device\\Harddisk7\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh4", BRACK(FH_SDH | 4), "\\Device\\Harddisk7\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh5", BRACK(FH_SDH | 5), "\\Device\\Harddisk7\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh6", BRACK(FH_SDH | 6), "\\Device\\Harddisk7\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh7", BRACK(FH_SDH | 7), "\\Device\\Harddisk7\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh8", BRACK(FH_SDH | 8), "\\Device\\Harddisk7\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh9", BRACK(FH_SDH | 9), "\\Device\\Harddisk7\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh10", BRACK(FH_SDH | 10), "\\Device\\Harddisk7\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh11", BRACK(FH_SDH | 11), "\\Device\\Harddisk7\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh12", BRACK(FH_SDH | 12), "\\Device\\Harddisk7\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh13", BRACK(FH_SDH | 13), "\\Device\\Harddisk7\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh14", BRACK(FH_SDH | 14), "\\Device\\Harddisk7\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdh15", BRACK(FH_SDH | 15), "\\Device\\Harddisk7\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi1", BRACK(FH_SDI | 1), "\\Device\\Harddisk8\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi2", BRACK(FH_SDI | 2), "\\Device\\Harddisk8\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi3", BRACK(FH_SDI | 3), "\\Device\\Harddisk8\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi4", BRACK(FH_SDI | 4), "\\Device\\Harddisk8\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi5", BRACK(FH_SDI | 5), "\\Device\\Harddisk8\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi6", BRACK(FH_SDI | 6), "\\Device\\Harddisk8\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi7", BRACK(FH_SDI | 7), "\\Device\\Harddisk8\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi8", BRACK(FH_SDI | 8), "\\Device\\Harddisk8\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi9", BRACK(FH_SDI | 9), "\\Device\\Harddisk8\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi10", BRACK(FH_SDI | 10), "\\Device\\Harddisk8\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi11", BRACK(FH_SDI | 11), "\\Device\\Harddisk8\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi12", BRACK(FH_SDI | 12), "\\Device\\Harddisk8\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi13", BRACK(FH_SDI | 13), "\\Device\\Harddisk8\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi14", BRACK(FH_SDI | 14), "\\Device\\Harddisk8\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdi15", BRACK(FH_SDI | 15), "\\Device\\Harddisk8\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj1", BRACK(FH_SDJ | 1), "\\Device\\Harddisk9\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj2", BRACK(FH_SDJ | 2), "\\Device\\Harddisk9\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj3", BRACK(FH_SDJ | 3), "\\Device\\Harddisk9\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj4", BRACK(FH_SDJ | 4), "\\Device\\Harddisk9\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj5", BRACK(FH_SDJ | 5), "\\Device\\Harddisk9\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj6", BRACK(FH_SDJ | 6), "\\Device\\Harddisk9\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj7", BRACK(FH_SDJ | 7), "\\Device\\Harddisk9\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj8", BRACK(FH_SDJ | 8), "\\Device\\Harddisk9\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj9", BRACK(FH_SDJ | 9), "\\Device\\Harddisk9\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj10", BRACK(FH_SDJ | 10), "\\Device\\Harddisk9\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj11", BRACK(FH_SDJ | 11), "\\Device\\Harddisk9\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj12", BRACK(FH_SDJ | 12), "\\Device\\Harddisk9\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj13", BRACK(FH_SDJ | 13), "\\Device\\Harddisk9\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj14", BRACK(FH_SDJ | 14), "\\Device\\Harddisk9\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdj15", BRACK(FH_SDJ | 15), "\\Device\\Harddisk9\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk1", BRACK(FH_SDK | 1), "\\Device\\Harddisk10\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk2", BRACK(FH_SDK | 2), "\\Device\\Harddisk10\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk3", BRACK(FH_SDK | 3), "\\Device\\Harddisk10\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk4", BRACK(FH_SDK | 4), "\\Device\\Harddisk10\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk5", BRACK(FH_SDK | 5), "\\Device\\Harddisk10\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk6", BRACK(FH_SDK | 6), "\\Device\\Harddisk10\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk7", BRACK(FH_SDK | 7), "\\Device\\Harddisk10\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk8", BRACK(FH_SDK | 8), "\\Device\\Harddisk10\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk9", BRACK(FH_SDK | 9), "\\Device\\Harddisk10\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk10", BRACK(FH_SDK | 10), "\\Device\\Harddisk10\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk11", BRACK(FH_SDK | 11), "\\Device\\Harddisk10\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk12", BRACK(FH_SDK | 12), "\\Device\\Harddisk10\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk13", BRACK(FH_SDK | 13), "\\Device\\Harddisk10\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk14", BRACK(FH_SDK | 14), "\\Device\\Harddisk10\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdk15", BRACK(FH_SDK | 15), "\\Device\\Harddisk10\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl1", BRACK(FH_SDL | 1), "\\Device\\Harddisk11\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl2", BRACK(FH_SDL | 2), "\\Device\\Harddisk11\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl3", BRACK(FH_SDL | 3), "\\Device\\Harddisk11\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl4", BRACK(FH_SDL | 4), "\\Device\\Harddisk11\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl5", BRACK(FH_SDL | 5), "\\Device\\Harddisk11\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl6", BRACK(FH_SDL | 6), "\\Device\\Harddisk11\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl7", BRACK(FH_SDL | 7), "\\Device\\Harddisk11\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl8", BRACK(FH_SDL | 8), "\\Device\\Harddisk11\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl9", BRACK(FH_SDL | 9), "\\Device\\Harddisk11\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl10", BRACK(FH_SDL | 10), "\\Device\\Harddisk11\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl11", BRACK(FH_SDL | 11), "\\Device\\Harddisk11\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl12", BRACK(FH_SDL | 12), "\\Device\\Harddisk11\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl13", BRACK(FH_SDL | 13), "\\Device\\Harddisk11\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl14", BRACK(FH_SDL | 14), "\\Device\\Harddisk11\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdl15", BRACK(FH_SDL | 15), "\\Device\\Harddisk11\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm1", BRACK(FH_SDM | 1), "\\Device\\Harddisk12\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm2", BRACK(FH_SDM | 2), "\\Device\\Harddisk12\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm3", BRACK(FH_SDM | 3), "\\Device\\Harddisk12\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm4", BRACK(FH_SDM | 4), "\\Device\\Harddisk12\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm5", BRACK(FH_SDM | 5), "\\Device\\Harddisk12\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm6", BRACK(FH_SDM | 6), "\\Device\\Harddisk12\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm7", BRACK(FH_SDM | 7), "\\Device\\Harddisk12\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm8", BRACK(FH_SDM | 8), "\\Device\\Harddisk12\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm9", BRACK(FH_SDM | 9), "\\Device\\Harddisk12\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm10", BRACK(FH_SDM | 10), "\\Device\\Harddisk12\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm11", BRACK(FH_SDM | 11), "\\Device\\Harddisk12\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm12", BRACK(FH_SDM | 12), "\\Device\\Harddisk12\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm13", BRACK(FH_SDM | 13), "\\Device\\Harddisk12\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm14", BRACK(FH_SDM | 14), "\\Device\\Harddisk12\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdm15", BRACK(FH_SDM | 15), "\\Device\\Harddisk12\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn1", BRACK(FH_SDN | 1), "\\Device\\Harddisk13\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn2", BRACK(FH_SDN | 2), "\\Device\\Harddisk13\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn3", BRACK(FH_SDN | 3), "\\Device\\Harddisk13\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn4", BRACK(FH_SDN | 4), "\\Device\\Harddisk13\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn5", BRACK(FH_SDN | 5), "\\Device\\Harddisk13\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn6", BRACK(FH_SDN | 6), "\\Device\\Harddisk13\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn7", BRACK(FH_SDN | 7), "\\Device\\Harddisk13\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn8", BRACK(FH_SDN | 8), "\\Device\\Harddisk13\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn9", BRACK(FH_SDN | 9), "\\Device\\Harddisk13\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn10", BRACK(FH_SDN | 10), "\\Device\\Harddisk13\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn11", BRACK(FH_SDN | 11), "\\Device\\Harddisk13\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn12", BRACK(FH_SDN | 12), "\\Device\\Harddisk13\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn13", BRACK(FH_SDN | 13), "\\Device\\Harddisk13\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn14", BRACK(FH_SDN | 14), "\\Device\\Harddisk13\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdn15", BRACK(FH_SDN | 15), "\\Device\\Harddisk13\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo1", BRACK(FH_SDO | 1), "\\Device\\Harddisk14\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo2", BRACK(FH_SDO | 2), "\\Device\\Harddisk14\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo3", BRACK(FH_SDO | 3), "\\Device\\Harddisk14\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo4", BRACK(FH_SDO | 4), "\\Device\\Harddisk14\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo5", BRACK(FH_SDO | 5), "\\Device\\Harddisk14\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo6", BRACK(FH_SDO | 6), "\\Device\\Harddisk14\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo7", BRACK(FH_SDO | 7), "\\Device\\Harddisk14\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo8", BRACK(FH_SDO | 8), "\\Device\\Harddisk14\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo9", BRACK(FH_SDO | 9), "\\Device\\Harddisk14\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo10", BRACK(FH_SDO | 10), "\\Device\\Harddisk14\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo11", BRACK(FH_SDO | 11), "\\Device\\Harddisk14\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo12", BRACK(FH_SDO | 12), "\\Device\\Harddisk14\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo13", BRACK(FH_SDO | 13), "\\Device\\Harddisk14\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo14", BRACK(FH_SDO | 14), "\\Device\\Harddisk14\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdo15", BRACK(FH_SDO | 15), "\\Device\\Harddisk14\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp1", BRACK(FH_SDP | 1), "\\Device\\Harddisk15\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp2", BRACK(FH_SDP | 2), "\\Device\\Harddisk15\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp3", BRACK(FH_SDP | 3), "\\Device\\Harddisk15\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp4", BRACK(FH_SDP | 4), "\\Device\\Harddisk15\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp5", BRACK(FH_SDP | 5), "\\Device\\Harddisk15\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp6", BRACK(FH_SDP | 6), "\\Device\\Harddisk15\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp7", BRACK(FH_SDP | 7), "\\Device\\Harddisk15\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp8", BRACK(FH_SDP | 8), "\\Device\\Harddisk15\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp9", BRACK(FH_SDP | 9), "\\Device\\Harddisk15\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp10", BRACK(FH_SDP | 10), "\\Device\\Harddisk15\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp11", BRACK(FH_SDP | 11), "\\Device\\Harddisk15\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp12", BRACK(FH_SDP | 12), "\\Device\\Harddisk15\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp13", BRACK(FH_SDP | 13), "\\Device\\Harddisk15\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp14", BRACK(FH_SDP | 14), "\\Device\\Harddisk15\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdp15", BRACK(FH_SDP | 15), "\\Device\\Harddisk15\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq1", BRACK(FH_SDQ | 1), "\\Device\\Harddisk16\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq2", BRACK(FH_SDQ | 2), "\\Device\\Harddisk16\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq3", BRACK(FH_SDQ | 3), "\\Device\\Harddisk16\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq4", BRACK(FH_SDQ | 4), "\\Device\\Harddisk16\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq5", BRACK(FH_SDQ | 5), "\\Device\\Harddisk16\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq6", BRACK(FH_SDQ | 6), "\\Device\\Harddisk16\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq7", BRACK(FH_SDQ | 7), "\\Device\\Harddisk16\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq8", BRACK(FH_SDQ | 8), "\\Device\\Harddisk16\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq9", BRACK(FH_SDQ | 9), "\\Device\\Harddisk16\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq10", BRACK(FH_SDQ | 10), "\\Device\\Harddisk16\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq11", BRACK(FH_SDQ | 11), "\\Device\\Harddisk16\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq12", BRACK(FH_SDQ | 12), "\\Device\\Harddisk16\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq13", BRACK(FH_SDQ | 13), "\\Device\\Harddisk16\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq14", BRACK(FH_SDQ | 14), "\\Device\\Harddisk16\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdq15", BRACK(FH_SDQ | 15), "\\Device\\Harddisk16\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr1", BRACK(FH_SDR | 1), "\\Device\\Harddisk17\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr2", BRACK(FH_SDR | 2), "\\Device\\Harddisk17\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr3", BRACK(FH_SDR | 3), "\\Device\\Harddisk17\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr4", BRACK(FH_SDR | 4), "\\Device\\Harddisk17\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr5", BRACK(FH_SDR | 5), "\\Device\\Harddisk17\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr6", BRACK(FH_SDR | 6), "\\Device\\Harddisk17\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr7", BRACK(FH_SDR | 7), "\\Device\\Harddisk17\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr8", BRACK(FH_SDR | 8), "\\Device\\Harddisk17\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr9", BRACK(FH_SDR | 9), "\\Device\\Harddisk17\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr10", BRACK(FH_SDR | 10), "\\Device\\Harddisk17\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr11", BRACK(FH_SDR | 11), "\\Device\\Harddisk17\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr12", BRACK(FH_SDR | 12), "\\Device\\Harddisk17\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr13", BRACK(FH_SDR | 13), "\\Device\\Harddisk17\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr14", BRACK(FH_SDR | 14), "\\Device\\Harddisk17\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdr15", BRACK(FH_SDR | 15), "\\Device\\Harddisk17\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds1", BRACK(FH_SDS | 1), "\\Device\\Harddisk18\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds2", BRACK(FH_SDS | 2), "\\Device\\Harddisk18\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds3", BRACK(FH_SDS | 3), "\\Device\\Harddisk18\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds4", BRACK(FH_SDS | 4), "\\Device\\Harddisk18\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds5", BRACK(FH_SDS | 5), "\\Device\\Harddisk18\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds6", BRACK(FH_SDS | 6), "\\Device\\Harddisk18\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds7", BRACK(FH_SDS | 7), "\\Device\\Harddisk18\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds8", BRACK(FH_SDS | 8), "\\Device\\Harddisk18\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds9", BRACK(FH_SDS | 9), "\\Device\\Harddisk18\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds10", BRACK(FH_SDS | 10), "\\Device\\Harddisk18\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds11", BRACK(FH_SDS | 11), "\\Device\\Harddisk18\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds12", BRACK(FH_SDS | 12), "\\Device\\Harddisk18\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds13", BRACK(FH_SDS | 13), "\\Device\\Harddisk18\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds14", BRACK(FH_SDS | 14), "\\Device\\Harddisk18\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sds15", BRACK(FH_SDS | 15), "\\Device\\Harddisk18\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt1", BRACK(FH_SDT | 1), "\\Device\\Harddisk19\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt2", BRACK(FH_SDT | 2), "\\Device\\Harddisk19\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt3", BRACK(FH_SDT | 3), "\\Device\\Harddisk19\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt4", BRACK(FH_SDT | 4), "\\Device\\Harddisk19\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt5", BRACK(FH_SDT | 5), "\\Device\\Harddisk19\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt6", BRACK(FH_SDT | 6), "\\Device\\Harddisk19\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt7", BRACK(FH_SDT | 7), "\\Device\\Harddisk19\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt8", BRACK(FH_SDT | 8), "\\Device\\Harddisk19\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt9", BRACK(FH_SDT | 9), "\\Device\\Harddisk19\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt10", BRACK(FH_SDT | 10), "\\Device\\Harddisk19\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt11", BRACK(FH_SDT | 11), "\\Device\\Harddisk19\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt12", BRACK(FH_SDT | 12), "\\Device\\Harddisk19\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt13", BRACK(FH_SDT | 13), "\\Device\\Harddisk19\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt14", BRACK(FH_SDT | 14), "\\Device\\Harddisk19\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdt15", BRACK(FH_SDT | 15), "\\Device\\Harddisk19\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu1", BRACK(FH_SDU | 1), "\\Device\\Harddisk20\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu2", BRACK(FH_SDU | 2), "\\Device\\Harddisk20\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu3", BRACK(FH_SDU | 3), "\\Device\\Harddisk20\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu4", BRACK(FH_SDU | 4), "\\Device\\Harddisk20\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu5", BRACK(FH_SDU | 5), "\\Device\\Harddisk20\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu6", BRACK(FH_SDU | 6), "\\Device\\Harddisk20\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu7", BRACK(FH_SDU | 7), "\\Device\\Harddisk20\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu8", BRACK(FH_SDU | 8), "\\Device\\Harddisk20\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu9", BRACK(FH_SDU | 9), "\\Device\\Harddisk20\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu10", BRACK(FH_SDU | 10), "\\Device\\Harddisk20\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu11", BRACK(FH_SDU | 11), "\\Device\\Harddisk20\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu12", BRACK(FH_SDU | 12), "\\Device\\Harddisk20\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu13", BRACK(FH_SDU | 13), "\\Device\\Harddisk20\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu14", BRACK(FH_SDU | 14), "\\Device\\Harddisk20\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdu15", BRACK(FH_SDU | 15), "\\Device\\Harddisk20\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv1", BRACK(FH_SDV | 1), "\\Device\\Harddisk21\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv2", BRACK(FH_SDV | 2), "\\Device\\Harddisk21\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv3", BRACK(FH_SDV | 3), "\\Device\\Harddisk21\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv4", BRACK(FH_SDV | 4), "\\Device\\Harddisk21\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv5", BRACK(FH_SDV | 5), "\\Device\\Harddisk21\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv6", BRACK(FH_SDV | 6), "\\Device\\Harddisk21\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv7", BRACK(FH_SDV | 7), "\\Device\\Harddisk21\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv8", BRACK(FH_SDV | 8), "\\Device\\Harddisk21\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv9", BRACK(FH_SDV | 9), "\\Device\\Harddisk21\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv10", BRACK(FH_SDV | 10), "\\Device\\Harddisk21\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv11", BRACK(FH_SDV | 11), "\\Device\\Harddisk21\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv12", BRACK(FH_SDV | 12), "\\Device\\Harddisk21\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv13", BRACK(FH_SDV | 13), "\\Device\\Harddisk21\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv14", BRACK(FH_SDV | 14), "\\Device\\Harddisk21\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdv15", BRACK(FH_SDV | 15), "\\Device\\Harddisk21\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw1", BRACK(FH_SDW | 1), "\\Device\\Harddisk22\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw2", BRACK(FH_SDW | 2), "\\Device\\Harddisk22\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw3", BRACK(FH_SDW | 3), "\\Device\\Harddisk22\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw4", BRACK(FH_SDW | 4), "\\Device\\Harddisk22\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw5", BRACK(FH_SDW | 5), "\\Device\\Harddisk22\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw6", BRACK(FH_SDW | 6), "\\Device\\Harddisk22\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw7", BRACK(FH_SDW | 7), "\\Device\\Harddisk22\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw8", BRACK(FH_SDW | 8), "\\Device\\Harddisk22\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw9", BRACK(FH_SDW | 9), "\\Device\\Harddisk22\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw10", BRACK(FH_SDW | 10), "\\Device\\Harddisk22\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw11", BRACK(FH_SDW | 11), "\\Device\\Harddisk22\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw12", BRACK(FH_SDW | 12), "\\Device\\Harddisk22\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw13", BRACK(FH_SDW | 13), "\\Device\\Harddisk22\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw14", BRACK(FH_SDW | 14), "\\Device\\Harddisk22\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdw15", BRACK(FH_SDW | 15), "\\Device\\Harddisk22\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx1", BRACK(FH_SDX | 1), "\\Device\\Harddisk23\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx2", BRACK(FH_SDX | 2), "\\Device\\Harddisk23\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx3", BRACK(FH_SDX | 3), "\\Device\\Harddisk23\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx4", BRACK(FH_SDX | 4), "\\Device\\Harddisk23\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx5", BRACK(FH_SDX | 5), "\\Device\\Harddisk23\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx6", BRACK(FH_SDX | 6), "\\Device\\Harddisk23\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx7", BRACK(FH_SDX | 7), "\\Device\\Harddisk23\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx8", BRACK(FH_SDX | 8), "\\Device\\Harddisk23\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx9", BRACK(FH_SDX | 9), "\\Device\\Harddisk23\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx10", BRACK(FH_SDX | 10), "\\Device\\Harddisk23\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx11", BRACK(FH_SDX | 11), "\\Device\\Harddisk23\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx12", BRACK(FH_SDX | 12), "\\Device\\Harddisk23\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx13", BRACK(FH_SDX | 13), "\\Device\\Harddisk23\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx14", BRACK(FH_SDX | 14), "\\Device\\Harddisk23\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdx15", BRACK(FH_SDX | 15), "\\Device\\Harddisk23\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy1", BRACK(FH_SDY | 1), "\\Device\\Harddisk24\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy2", BRACK(FH_SDY | 2), "\\Device\\Harddisk24\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy3", BRACK(FH_SDY | 3), "\\Device\\Harddisk24\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy4", BRACK(FH_SDY | 4), "\\Device\\Harddisk24\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy5", BRACK(FH_SDY | 5), "\\Device\\Harddisk24\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy6", BRACK(FH_SDY | 6), "\\Device\\Harddisk24\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy7", BRACK(FH_SDY | 7), "\\Device\\Harddisk24\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy8", BRACK(FH_SDY | 8), "\\Device\\Harddisk24\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy9", BRACK(FH_SDY | 9), "\\Device\\Harddisk24\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy10", BRACK(FH_SDY | 10), "\\Device\\Harddisk24\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy11", BRACK(FH_SDY | 11), "\\Device\\Harddisk24\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy12", BRACK(FH_SDY | 12), "\\Device\\Harddisk24\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy13", BRACK(FH_SDY | 13), "\\Device\\Harddisk24\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy14", BRACK(FH_SDY | 14), "\\Device\\Harddisk24\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdy15", BRACK(FH_SDY | 15), "\\Device\\Harddisk24\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz1", BRACK(FH_SDZ | 1), "\\Device\\Harddisk25\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz2", BRACK(FH_SDZ | 2), "\\Device\\Harddisk25\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz3", BRACK(FH_SDZ | 3), "\\Device\\Harddisk25\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz4", BRACK(FH_SDZ | 4), "\\Device\\Harddisk25\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz5", BRACK(FH_SDZ | 5), "\\Device\\Harddisk25\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz6", BRACK(FH_SDZ | 6), "\\Device\\Harddisk25\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz7", BRACK(FH_SDZ | 7), "\\Device\\Harddisk25\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz8", BRACK(FH_SDZ | 8), "\\Device\\Harddisk25\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz9", BRACK(FH_SDZ | 9), "\\Device\\Harddisk25\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz10", BRACK(FH_SDZ | 10), "\\Device\\Harddisk25\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz11", BRACK(FH_SDZ | 11), "\\Device\\Harddisk25\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz12", BRACK(FH_SDZ | 12), "\\Device\\Harddisk25\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz13", BRACK(FH_SDZ | 13), "\\Device\\Harddisk25\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz14", BRACK(FH_SDZ | 14), "\\Device\\Harddisk25\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdz15", BRACK(FH_SDZ | 15), "\\Device\\Harddisk25\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa", BRACK(FH_SDAA), "\\Device\\Harddisk26\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab", BRACK(FH_SDAB), "\\Device\\Harddisk27\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac", BRACK(FH_SDAC), "\\Device\\Harddisk28\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad", BRACK(FH_SDAD), "\\Device\\Harddisk29\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae", BRACK(FH_SDAE), "\\Device\\Harddisk30\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf", BRACK(FH_SDAF), "\\Device\\Harddisk31\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag", BRACK(FH_SDAG), "\\Device\\Harddisk32\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah", BRACK(FH_SDAH), "\\Device\\Harddisk33\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai", BRACK(FH_SDAI), "\\Device\\Harddisk34\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj", BRACK(FH_SDAJ), "\\Device\\Harddisk35\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak", BRACK(FH_SDAK), "\\Device\\Harddisk36\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal", BRACK(FH_SDAL), "\\Device\\Harddisk37\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam", BRACK(FH_SDAM), "\\Device\\Harddisk38\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan", BRACK(FH_SDAN), "\\Device\\Harddisk39\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao", BRACK(FH_SDAO), "\\Device\\Harddisk40\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap", BRACK(FH_SDAP), "\\Device\\Harddisk41\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq", BRACK(FH_SDAQ), "\\Device\\Harddisk42\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar", BRACK(FH_SDAR), "\\Device\\Harddisk43\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas", BRACK(FH_SDAS), "\\Device\\Harddisk44\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat", BRACK(FH_SDAT), "\\Device\\Harddisk45\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau", BRACK(FH_SDAU), "\\Device\\Harddisk46\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav", BRACK(FH_SDAV), "\\Device\\Harddisk47\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw", BRACK(FH_SDAW), "\\Device\\Harddisk48\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax", BRACK(FH_SDAX), "\\Device\\Harddisk49\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday", BRACK(FH_SDAY), "\\Device\\Harddisk50\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz", BRACK(FH_SDAZ), "\\Device\\Harddisk51\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa1", BRACK(FH_SDAA | 1), "\\Device\\Harddisk26\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa2", BRACK(FH_SDAA | 2), "\\Device\\Harddisk26\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa3", BRACK(FH_SDAA | 3), "\\Device\\Harddisk26\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa4", BRACK(FH_SDAA | 4), "\\Device\\Harddisk26\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa5", BRACK(FH_SDAA | 5), "\\Device\\Harddisk26\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa6", BRACK(FH_SDAA | 6), "\\Device\\Harddisk26\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa7", BRACK(FH_SDAA | 7), "\\Device\\Harddisk26\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa8", BRACK(FH_SDAA | 8), "\\Device\\Harddisk26\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa9", BRACK(FH_SDAA | 9), "\\Device\\Harddisk26\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa10", BRACK(FH_SDAA | 10), "\\Device\\Harddisk26\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa11", BRACK(FH_SDAA | 11), "\\Device\\Harddisk26\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa12", BRACK(FH_SDAA | 12), "\\Device\\Harddisk26\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa13", BRACK(FH_SDAA | 13), "\\Device\\Harddisk26\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa14", BRACK(FH_SDAA | 14), "\\Device\\Harddisk26\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaa15", BRACK(FH_SDAA | 15), "\\Device\\Harddisk26\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab1", BRACK(FH_SDAB | 1), "\\Device\\Harddisk27\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab2", BRACK(FH_SDAB | 2), "\\Device\\Harddisk27\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab3", BRACK(FH_SDAB | 3), "\\Device\\Harddisk27\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab4", BRACK(FH_SDAB | 4), "\\Device\\Harddisk27\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab5", BRACK(FH_SDAB | 5), "\\Device\\Harddisk27\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab6", BRACK(FH_SDAB | 6), "\\Device\\Harddisk27\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab7", BRACK(FH_SDAB | 7), "\\Device\\Harddisk27\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab8", BRACK(FH_SDAB | 8), "\\Device\\Harddisk27\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab9", BRACK(FH_SDAB | 9), "\\Device\\Harddisk27\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab10", BRACK(FH_SDAB | 10), "\\Device\\Harddisk27\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab11", BRACK(FH_SDAB | 11), "\\Device\\Harddisk27\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab12", BRACK(FH_SDAB | 12), "\\Device\\Harddisk27\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab13", BRACK(FH_SDAB | 13), "\\Device\\Harddisk27\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab14", BRACK(FH_SDAB | 14), "\\Device\\Harddisk27\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdab15", BRACK(FH_SDAB | 15), "\\Device\\Harddisk27\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac1", BRACK(FH_SDAC | 1), "\\Device\\Harddisk28\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac2", BRACK(FH_SDAC | 2), "\\Device\\Harddisk28\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac3", BRACK(FH_SDAC | 3), "\\Device\\Harddisk28\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac4", BRACK(FH_SDAC | 4), "\\Device\\Harddisk28\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac5", BRACK(FH_SDAC | 5), "\\Device\\Harddisk28\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac6", BRACK(FH_SDAC | 6), "\\Device\\Harddisk28\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac7", BRACK(FH_SDAC | 7), "\\Device\\Harddisk28\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac8", BRACK(FH_SDAC | 8), "\\Device\\Harddisk28\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac9", BRACK(FH_SDAC | 9), "\\Device\\Harddisk28\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac10", BRACK(FH_SDAC | 10), "\\Device\\Harddisk28\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac11", BRACK(FH_SDAC | 11), "\\Device\\Harddisk28\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac12", BRACK(FH_SDAC | 12), "\\Device\\Harddisk28\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac13", BRACK(FH_SDAC | 13), "\\Device\\Harddisk28\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac14", BRACK(FH_SDAC | 14), "\\Device\\Harddisk28\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdac15", BRACK(FH_SDAC | 15), "\\Device\\Harddisk28\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad1", BRACK(FH_SDAD | 1), "\\Device\\Harddisk29\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad2", BRACK(FH_SDAD | 2), "\\Device\\Harddisk29\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad3", BRACK(FH_SDAD | 3), "\\Device\\Harddisk29\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad4", BRACK(FH_SDAD | 4), "\\Device\\Harddisk29\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad5", BRACK(FH_SDAD | 5), "\\Device\\Harddisk29\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad6", BRACK(FH_SDAD | 6), "\\Device\\Harddisk29\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad7", BRACK(FH_SDAD | 7), "\\Device\\Harddisk29\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad8", BRACK(FH_SDAD | 8), "\\Device\\Harddisk29\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad9", BRACK(FH_SDAD | 9), "\\Device\\Harddisk29\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad10", BRACK(FH_SDAD | 10), "\\Device\\Harddisk29\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad11", BRACK(FH_SDAD | 11), "\\Device\\Harddisk29\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad12", BRACK(FH_SDAD | 12), "\\Device\\Harddisk29\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad13", BRACK(FH_SDAD | 13), "\\Device\\Harddisk29\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad14", BRACK(FH_SDAD | 14), "\\Device\\Harddisk29\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdad15", BRACK(FH_SDAD | 15), "\\Device\\Harddisk29\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae1", BRACK(FH_SDAE | 1), "\\Device\\Harddisk30\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae2", BRACK(FH_SDAE | 2), "\\Device\\Harddisk30\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae3", BRACK(FH_SDAE | 3), "\\Device\\Harddisk30\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae4", BRACK(FH_SDAE | 4), "\\Device\\Harddisk30\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae5", BRACK(FH_SDAE | 5), "\\Device\\Harddisk30\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae6", BRACK(FH_SDAE | 6), "\\Device\\Harddisk30\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae7", BRACK(FH_SDAE | 7), "\\Device\\Harddisk30\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae8", BRACK(FH_SDAE | 8), "\\Device\\Harddisk30\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae9", BRACK(FH_SDAE | 9), "\\Device\\Harddisk30\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae10", BRACK(FH_SDAE | 10), "\\Device\\Harddisk30\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae11", BRACK(FH_SDAE | 11), "\\Device\\Harddisk30\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae12", BRACK(FH_SDAE | 12), "\\Device\\Harddisk30\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae13", BRACK(FH_SDAE | 13), "\\Device\\Harddisk30\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae14", BRACK(FH_SDAE | 14), "\\Device\\Harddisk30\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdae15", BRACK(FH_SDAE | 15), "\\Device\\Harddisk30\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf1", BRACK(FH_SDAF | 1), "\\Device\\Harddisk31\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf2", BRACK(FH_SDAF | 2), "\\Device\\Harddisk31\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf3", BRACK(FH_SDAF | 3), "\\Device\\Harddisk31\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf4", BRACK(FH_SDAF | 4), "\\Device\\Harddisk31\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf5", BRACK(FH_SDAF | 5), "\\Device\\Harddisk31\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf6", BRACK(FH_SDAF | 6), "\\Device\\Harddisk31\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf7", BRACK(FH_SDAF | 7), "\\Device\\Harddisk31\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf8", BRACK(FH_SDAF | 8), "\\Device\\Harddisk31\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf9", BRACK(FH_SDAF | 9), "\\Device\\Harddisk31\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf10", BRACK(FH_SDAF | 10), "\\Device\\Harddisk31\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf11", BRACK(FH_SDAF | 11), "\\Device\\Harddisk31\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf12", BRACK(FH_SDAF | 12), "\\Device\\Harddisk31\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf13", BRACK(FH_SDAF | 13), "\\Device\\Harddisk31\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf14", BRACK(FH_SDAF | 14), "\\Device\\Harddisk31\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaf15", BRACK(FH_SDAF | 15), "\\Device\\Harddisk31\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag1", BRACK(FH_SDAG | 1), "\\Device\\Harddisk32\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag2", BRACK(FH_SDAG | 2), "\\Device\\Harddisk32\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag3", BRACK(FH_SDAG | 3), "\\Device\\Harddisk32\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag4", BRACK(FH_SDAG | 4), "\\Device\\Harddisk32\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag5", BRACK(FH_SDAG | 5), "\\Device\\Harddisk32\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag6", BRACK(FH_SDAG | 6), "\\Device\\Harddisk32\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag7", BRACK(FH_SDAG | 7), "\\Device\\Harddisk32\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag8", BRACK(FH_SDAG | 8), "\\Device\\Harddisk32\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag9", BRACK(FH_SDAG | 9), "\\Device\\Harddisk32\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag10", BRACK(FH_SDAG | 10), "\\Device\\Harddisk32\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag11", BRACK(FH_SDAG | 11), "\\Device\\Harddisk32\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag12", BRACK(FH_SDAG | 12), "\\Device\\Harddisk32\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag13", BRACK(FH_SDAG | 13), "\\Device\\Harddisk32\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag14", BRACK(FH_SDAG | 14), "\\Device\\Harddisk32\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdag15", BRACK(FH_SDAG | 15), "\\Device\\Harddisk32\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah1", BRACK(FH_SDAH | 1), "\\Device\\Harddisk33\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah2", BRACK(FH_SDAH | 2), "\\Device\\Harddisk33\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah3", BRACK(FH_SDAH | 3), "\\Device\\Harddisk33\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah4", BRACK(FH_SDAH | 4), "\\Device\\Harddisk33\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah5", BRACK(FH_SDAH | 5), "\\Device\\Harddisk33\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah6", BRACK(FH_SDAH | 6), "\\Device\\Harddisk33\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah7", BRACK(FH_SDAH | 7), "\\Device\\Harddisk33\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah8", BRACK(FH_SDAH | 8), "\\Device\\Harddisk33\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah9", BRACK(FH_SDAH | 9), "\\Device\\Harddisk33\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah10", BRACK(FH_SDAH | 10), "\\Device\\Harddisk33\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah11", BRACK(FH_SDAH | 11), "\\Device\\Harddisk33\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah12", BRACK(FH_SDAH | 12), "\\Device\\Harddisk33\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah13", BRACK(FH_SDAH | 13), "\\Device\\Harddisk33\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah14", BRACK(FH_SDAH | 14), "\\Device\\Harddisk33\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdah15", BRACK(FH_SDAH | 15), "\\Device\\Harddisk33\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai1", BRACK(FH_SDAI | 1), "\\Device\\Harddisk34\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai2", BRACK(FH_SDAI | 2), "\\Device\\Harddisk34\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai3", BRACK(FH_SDAI | 3), "\\Device\\Harddisk34\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai4", BRACK(FH_SDAI | 4), "\\Device\\Harddisk34\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai5", BRACK(FH_SDAI | 5), "\\Device\\Harddisk34\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai6", BRACK(FH_SDAI | 6), "\\Device\\Harddisk34\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai7", BRACK(FH_SDAI | 7), "\\Device\\Harddisk34\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai8", BRACK(FH_SDAI | 8), "\\Device\\Harddisk34\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai9", BRACK(FH_SDAI | 9), "\\Device\\Harddisk34\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai10", BRACK(FH_SDAI | 10), "\\Device\\Harddisk34\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai11", BRACK(FH_SDAI | 11), "\\Device\\Harddisk34\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai12", BRACK(FH_SDAI | 12), "\\Device\\Harddisk34\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai13", BRACK(FH_SDAI | 13), "\\Device\\Harddisk34\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai14", BRACK(FH_SDAI | 14), "\\Device\\Harddisk34\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdai15", BRACK(FH_SDAI | 15), "\\Device\\Harddisk34\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj1", BRACK(FH_SDAJ | 1), "\\Device\\Harddisk35\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj2", BRACK(FH_SDAJ | 2), "\\Device\\Harddisk35\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj3", BRACK(FH_SDAJ | 3), "\\Device\\Harddisk35\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj4", BRACK(FH_SDAJ | 4), "\\Device\\Harddisk35\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj5", BRACK(FH_SDAJ | 5), "\\Device\\Harddisk35\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj6", BRACK(FH_SDAJ | 6), "\\Device\\Harddisk35\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj7", BRACK(FH_SDAJ | 7), "\\Device\\Harddisk35\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj8", BRACK(FH_SDAJ | 8), "\\Device\\Harddisk35\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj9", BRACK(FH_SDAJ | 9), "\\Device\\Harddisk35\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj10", BRACK(FH_SDAJ | 10), "\\Device\\Harddisk35\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj11", BRACK(FH_SDAJ | 11), "\\Device\\Harddisk35\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj12", BRACK(FH_SDAJ | 12), "\\Device\\Harddisk35\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj13", BRACK(FH_SDAJ | 13), "\\Device\\Harddisk35\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj14", BRACK(FH_SDAJ | 14), "\\Device\\Harddisk35\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaj15", BRACK(FH_SDAJ | 15), "\\Device\\Harddisk35\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak1", BRACK(FH_SDAK | 1), "\\Device\\Harddisk36\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak2", BRACK(FH_SDAK | 2), "\\Device\\Harddisk36\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak3", BRACK(FH_SDAK | 3), "\\Device\\Harddisk36\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak4", BRACK(FH_SDAK | 4), "\\Device\\Harddisk36\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak5", BRACK(FH_SDAK | 5), "\\Device\\Harddisk36\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak6", BRACK(FH_SDAK | 6), "\\Device\\Harddisk36\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak7", BRACK(FH_SDAK | 7), "\\Device\\Harddisk36\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak8", BRACK(FH_SDAK | 8), "\\Device\\Harddisk36\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak9", BRACK(FH_SDAK | 9), "\\Device\\Harddisk36\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak10", BRACK(FH_SDAK | 10), "\\Device\\Harddisk36\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak11", BRACK(FH_SDAK | 11), "\\Device\\Harddisk36\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak12", BRACK(FH_SDAK | 12), "\\Device\\Harddisk36\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak13", BRACK(FH_SDAK | 13), "\\Device\\Harddisk36\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak14", BRACK(FH_SDAK | 14), "\\Device\\Harddisk36\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdak15", BRACK(FH_SDAK | 15), "\\Device\\Harddisk36\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal1", BRACK(FH_SDAL | 1), "\\Device\\Harddisk37\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal2", BRACK(FH_SDAL | 2), "\\Device\\Harddisk37\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal3", BRACK(FH_SDAL | 3), "\\Device\\Harddisk37\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal4", BRACK(FH_SDAL | 4), "\\Device\\Harddisk37\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal5", BRACK(FH_SDAL | 5), "\\Device\\Harddisk37\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal6", BRACK(FH_SDAL | 6), "\\Device\\Harddisk37\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal7", BRACK(FH_SDAL | 7), "\\Device\\Harddisk37\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal8", BRACK(FH_SDAL | 8), "\\Device\\Harddisk37\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal9", BRACK(FH_SDAL | 9), "\\Device\\Harddisk37\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal10", BRACK(FH_SDAL | 10), "\\Device\\Harddisk37\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal11", BRACK(FH_SDAL | 11), "\\Device\\Harddisk37\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal12", BRACK(FH_SDAL | 12), "\\Device\\Harddisk37\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal13", BRACK(FH_SDAL | 13), "\\Device\\Harddisk37\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal14", BRACK(FH_SDAL | 14), "\\Device\\Harddisk37\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdal15", BRACK(FH_SDAL | 15), "\\Device\\Harddisk37\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam1", BRACK(FH_SDAM | 1), "\\Device\\Harddisk38\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam2", BRACK(FH_SDAM | 2), "\\Device\\Harddisk38\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam3", BRACK(FH_SDAM | 3), "\\Device\\Harddisk38\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam4", BRACK(FH_SDAM | 4), "\\Device\\Harddisk38\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam5", BRACK(FH_SDAM | 5), "\\Device\\Harddisk38\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam6", BRACK(FH_SDAM | 6), "\\Device\\Harddisk38\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam7", BRACK(FH_SDAM | 7), "\\Device\\Harddisk38\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam8", BRACK(FH_SDAM | 8), "\\Device\\Harddisk38\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam9", BRACK(FH_SDAM | 9), "\\Device\\Harddisk38\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam10", BRACK(FH_SDAM | 10), "\\Device\\Harddisk38\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam11", BRACK(FH_SDAM | 11), "\\Device\\Harddisk38\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam12", BRACK(FH_SDAM | 12), "\\Device\\Harddisk38\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam13", BRACK(FH_SDAM | 13), "\\Device\\Harddisk38\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam14", BRACK(FH_SDAM | 14), "\\Device\\Harddisk38\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdam15", BRACK(FH_SDAM | 15), "\\Device\\Harddisk38\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan1", BRACK(FH_SDAN | 1), "\\Device\\Harddisk39\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan2", BRACK(FH_SDAN | 2), "\\Device\\Harddisk39\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan3", BRACK(FH_SDAN | 3), "\\Device\\Harddisk39\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan4", BRACK(FH_SDAN | 4), "\\Device\\Harddisk39\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan5", BRACK(FH_SDAN | 5), "\\Device\\Harddisk39\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan6", BRACK(FH_SDAN | 6), "\\Device\\Harddisk39\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan7", BRACK(FH_SDAN | 7), "\\Device\\Harddisk39\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan8", BRACK(FH_SDAN | 8), "\\Device\\Harddisk39\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan9", BRACK(FH_SDAN | 9), "\\Device\\Harddisk39\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan10", BRACK(FH_SDAN | 10), "\\Device\\Harddisk39\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan11", BRACK(FH_SDAN | 11), "\\Device\\Harddisk39\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan12", BRACK(FH_SDAN | 12), "\\Device\\Harddisk39\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan13", BRACK(FH_SDAN | 13), "\\Device\\Harddisk39\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan14", BRACK(FH_SDAN | 14), "\\Device\\Harddisk39\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdan15", BRACK(FH_SDAN | 15), "\\Device\\Harddisk39\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao1", BRACK(FH_SDAO | 1), "\\Device\\Harddisk40\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao2", BRACK(FH_SDAO | 2), "\\Device\\Harddisk40\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao3", BRACK(FH_SDAO | 3), "\\Device\\Harddisk40\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao4", BRACK(FH_SDAO | 4), "\\Device\\Harddisk40\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao5", BRACK(FH_SDAO | 5), "\\Device\\Harddisk40\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao6", BRACK(FH_SDAO | 6), "\\Device\\Harddisk40\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao7", BRACK(FH_SDAO | 7), "\\Device\\Harddisk40\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao8", BRACK(FH_SDAO | 8), "\\Device\\Harddisk40\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao9", BRACK(FH_SDAO | 9), "\\Device\\Harddisk40\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao10", BRACK(FH_SDAO | 10), "\\Device\\Harddisk40\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao11", BRACK(FH_SDAO | 11), "\\Device\\Harddisk40\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao12", BRACK(FH_SDAO | 12), "\\Device\\Harddisk40\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao13", BRACK(FH_SDAO | 13), "\\Device\\Harddisk40\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao14", BRACK(FH_SDAO | 14), "\\Device\\Harddisk40\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdao15", BRACK(FH_SDAO | 15), "\\Device\\Harddisk40\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap1", BRACK(FH_SDAP | 1), "\\Device\\Harddisk41\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap2", BRACK(FH_SDAP | 2), "\\Device\\Harddisk41\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap3", BRACK(FH_SDAP | 3), "\\Device\\Harddisk41\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap4", BRACK(FH_SDAP | 4), "\\Device\\Harddisk41\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap5", BRACK(FH_SDAP | 5), "\\Device\\Harddisk41\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap6", BRACK(FH_SDAP | 6), "\\Device\\Harddisk41\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap7", BRACK(FH_SDAP | 7), "\\Device\\Harddisk41\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap8", BRACK(FH_SDAP | 8), "\\Device\\Harddisk41\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap9", BRACK(FH_SDAP | 9), "\\Device\\Harddisk41\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap10", BRACK(FH_SDAP | 10), "\\Device\\Harddisk41\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap11", BRACK(FH_SDAP | 11), "\\Device\\Harddisk41\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap12", BRACK(FH_SDAP | 12), "\\Device\\Harddisk41\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap13", BRACK(FH_SDAP | 13), "\\Device\\Harddisk41\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap14", BRACK(FH_SDAP | 14), "\\Device\\Harddisk41\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdap15", BRACK(FH_SDAP | 15), "\\Device\\Harddisk41\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq1", BRACK(FH_SDAQ | 1), "\\Device\\Harddisk42\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq2", BRACK(FH_SDAQ | 2), "\\Device\\Harddisk42\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq3", BRACK(FH_SDAQ | 3), "\\Device\\Harddisk42\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq4", BRACK(FH_SDAQ | 4), "\\Device\\Harddisk42\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq5", BRACK(FH_SDAQ | 5), "\\Device\\Harddisk42\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq6", BRACK(FH_SDAQ | 6), "\\Device\\Harddisk42\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq7", BRACK(FH_SDAQ | 7), "\\Device\\Harddisk42\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq8", BRACK(FH_SDAQ | 8), "\\Device\\Harddisk42\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq9", BRACK(FH_SDAQ | 9), "\\Device\\Harddisk42\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq10", BRACK(FH_SDAQ | 10), "\\Device\\Harddisk42\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq11", BRACK(FH_SDAQ | 11), "\\Device\\Harddisk42\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq12", BRACK(FH_SDAQ | 12), "\\Device\\Harddisk42\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq13", BRACK(FH_SDAQ | 13), "\\Device\\Harddisk42\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq14", BRACK(FH_SDAQ | 14), "\\Device\\Harddisk42\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaq15", BRACK(FH_SDAQ | 15), "\\Device\\Harddisk42\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar1", BRACK(FH_SDAR | 1), "\\Device\\Harddisk43\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar2", BRACK(FH_SDAR | 2), "\\Device\\Harddisk43\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar3", BRACK(FH_SDAR | 3), "\\Device\\Harddisk43\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar4", BRACK(FH_SDAR | 4), "\\Device\\Harddisk43\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar5", BRACK(FH_SDAR | 5), "\\Device\\Harddisk43\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar6", BRACK(FH_SDAR | 6), "\\Device\\Harddisk43\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar7", BRACK(FH_SDAR | 7), "\\Device\\Harddisk43\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar8", BRACK(FH_SDAR | 8), "\\Device\\Harddisk43\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar9", BRACK(FH_SDAR | 9), "\\Device\\Harddisk43\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar10", BRACK(FH_SDAR | 10), "\\Device\\Harddisk43\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar11", BRACK(FH_SDAR | 11), "\\Device\\Harddisk43\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar12", BRACK(FH_SDAR | 12), "\\Device\\Harddisk43\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar13", BRACK(FH_SDAR | 13), "\\Device\\Harddisk43\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar14", BRACK(FH_SDAR | 14), "\\Device\\Harddisk43\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdar15", BRACK(FH_SDAR | 15), "\\Device\\Harddisk43\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas1", BRACK(FH_SDAS | 1), "\\Device\\Harddisk44\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas2", BRACK(FH_SDAS | 2), "\\Device\\Harddisk44\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas3", BRACK(FH_SDAS | 3), "\\Device\\Harddisk44\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas4", BRACK(FH_SDAS | 4), "\\Device\\Harddisk44\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas5", BRACK(FH_SDAS | 5), "\\Device\\Harddisk44\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas6", BRACK(FH_SDAS | 6), "\\Device\\Harddisk44\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas7", BRACK(FH_SDAS | 7), "\\Device\\Harddisk44\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas8", BRACK(FH_SDAS | 8), "\\Device\\Harddisk44\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas9", BRACK(FH_SDAS | 9), "\\Device\\Harddisk44\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas10", BRACK(FH_SDAS | 10), "\\Device\\Harddisk44\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas11", BRACK(FH_SDAS | 11), "\\Device\\Harddisk44\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas12", BRACK(FH_SDAS | 12), "\\Device\\Harddisk44\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas13", BRACK(FH_SDAS | 13), "\\Device\\Harddisk44\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas14", BRACK(FH_SDAS | 14), "\\Device\\Harddisk44\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdas15", BRACK(FH_SDAS | 15), "\\Device\\Harddisk44\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat1", BRACK(FH_SDAT | 1), "\\Device\\Harddisk45\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat2", BRACK(FH_SDAT | 2), "\\Device\\Harddisk45\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat3", BRACK(FH_SDAT | 3), "\\Device\\Harddisk45\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat4", BRACK(FH_SDAT | 4), "\\Device\\Harddisk45\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat5", BRACK(FH_SDAT | 5), "\\Device\\Harddisk45\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat6", BRACK(FH_SDAT | 6), "\\Device\\Harddisk45\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat7", BRACK(FH_SDAT | 7), "\\Device\\Harddisk45\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat8", BRACK(FH_SDAT | 8), "\\Device\\Harddisk45\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat9", BRACK(FH_SDAT | 9), "\\Device\\Harddisk45\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat10", BRACK(FH_SDAT | 10), "\\Device\\Harddisk45\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat11", BRACK(FH_SDAT | 11), "\\Device\\Harddisk45\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat12", BRACK(FH_SDAT | 12), "\\Device\\Harddisk45\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat13", BRACK(FH_SDAT | 13), "\\Device\\Harddisk45\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat14", BRACK(FH_SDAT | 14), "\\Device\\Harddisk45\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdat15", BRACK(FH_SDAT | 15), "\\Device\\Harddisk45\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau1", BRACK(FH_SDAU | 1), "\\Device\\Harddisk46\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau2", BRACK(FH_SDAU | 2), "\\Device\\Harddisk46\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau3", BRACK(FH_SDAU | 3), "\\Device\\Harddisk46\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau4", BRACK(FH_SDAU | 4), "\\Device\\Harddisk46\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau5", BRACK(FH_SDAU | 5), "\\Device\\Harddisk46\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau6", BRACK(FH_SDAU | 6), "\\Device\\Harddisk46\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau7", BRACK(FH_SDAU | 7), "\\Device\\Harddisk46\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau8", BRACK(FH_SDAU | 8), "\\Device\\Harddisk46\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau9", BRACK(FH_SDAU | 9), "\\Device\\Harddisk46\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau10", BRACK(FH_SDAU | 10), "\\Device\\Harddisk46\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau11", BRACK(FH_SDAU | 11), "\\Device\\Harddisk46\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau12", BRACK(FH_SDAU | 12), "\\Device\\Harddisk46\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau13", BRACK(FH_SDAU | 13), "\\Device\\Harddisk46\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau14", BRACK(FH_SDAU | 14), "\\Device\\Harddisk46\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdau15", BRACK(FH_SDAU | 15), "\\Device\\Harddisk46\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav1", BRACK(FH_SDAV | 1), "\\Device\\Harddisk47\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav2", BRACK(FH_SDAV | 2), "\\Device\\Harddisk47\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav3", BRACK(FH_SDAV | 3), "\\Device\\Harddisk47\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav4", BRACK(FH_SDAV | 4), "\\Device\\Harddisk47\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav5", BRACK(FH_SDAV | 5), "\\Device\\Harddisk47\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav6", BRACK(FH_SDAV | 6), "\\Device\\Harddisk47\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav7", BRACK(FH_SDAV | 7), "\\Device\\Harddisk47\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav8", BRACK(FH_SDAV | 8), "\\Device\\Harddisk47\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav9", BRACK(FH_SDAV | 9), "\\Device\\Harddisk47\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav10", BRACK(FH_SDAV | 10), "\\Device\\Harddisk47\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav11", BRACK(FH_SDAV | 11), "\\Device\\Harddisk47\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav12", BRACK(FH_SDAV | 12), "\\Device\\Harddisk47\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav13", BRACK(FH_SDAV | 13), "\\Device\\Harddisk47\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav14", BRACK(FH_SDAV | 14), "\\Device\\Harddisk47\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdav15", BRACK(FH_SDAV | 15), "\\Device\\Harddisk47\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw1", BRACK(FH_SDAW | 1), "\\Device\\Harddisk48\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw2", BRACK(FH_SDAW | 2), "\\Device\\Harddisk48\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw3", BRACK(FH_SDAW | 3), "\\Device\\Harddisk48\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw4", BRACK(FH_SDAW | 4), "\\Device\\Harddisk48\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw5", BRACK(FH_SDAW | 5), "\\Device\\Harddisk48\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw6", BRACK(FH_SDAW | 6), "\\Device\\Harddisk48\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw7", BRACK(FH_SDAW | 7), "\\Device\\Harddisk48\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw8", BRACK(FH_SDAW | 8), "\\Device\\Harddisk48\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw9", BRACK(FH_SDAW | 9), "\\Device\\Harddisk48\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw10", BRACK(FH_SDAW | 10), "\\Device\\Harddisk48\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw11", BRACK(FH_SDAW | 11), "\\Device\\Harddisk48\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw12", BRACK(FH_SDAW | 12), "\\Device\\Harddisk48\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw13", BRACK(FH_SDAW | 13), "\\Device\\Harddisk48\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw14", BRACK(FH_SDAW | 14), "\\Device\\Harddisk48\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaw15", BRACK(FH_SDAW | 15), "\\Device\\Harddisk48\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax1", BRACK(FH_SDAX | 1), "\\Device\\Harddisk49\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax2", BRACK(FH_SDAX | 2), "\\Device\\Harddisk49\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax3", BRACK(FH_SDAX | 3), "\\Device\\Harddisk49\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax4", BRACK(FH_SDAX | 4), "\\Device\\Harddisk49\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax5", BRACK(FH_SDAX | 5), "\\Device\\Harddisk49\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax6", BRACK(FH_SDAX | 6), "\\Device\\Harddisk49\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax7", BRACK(FH_SDAX | 7), "\\Device\\Harddisk49\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax8", BRACK(FH_SDAX | 8), "\\Device\\Harddisk49\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax9", BRACK(FH_SDAX | 9), "\\Device\\Harddisk49\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax10", BRACK(FH_SDAX | 10), "\\Device\\Harddisk49\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax11", BRACK(FH_SDAX | 11), "\\Device\\Harddisk49\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax12", BRACK(FH_SDAX | 12), "\\Device\\Harddisk49\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax13", BRACK(FH_SDAX | 13), "\\Device\\Harddisk49\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax14", BRACK(FH_SDAX | 14), "\\Device\\Harddisk49\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdax15", BRACK(FH_SDAX | 15), "\\Device\\Harddisk49\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday1", BRACK(FH_SDAY | 1), "\\Device\\Harddisk50\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday2", BRACK(FH_SDAY | 2), "\\Device\\Harddisk50\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday3", BRACK(FH_SDAY | 3), "\\Device\\Harddisk50\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday4", BRACK(FH_SDAY | 4), "\\Device\\Harddisk50\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday5", BRACK(FH_SDAY | 5), "\\Device\\Harddisk50\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday6", BRACK(FH_SDAY | 6), "\\Device\\Harddisk50\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday7", BRACK(FH_SDAY | 7), "\\Device\\Harddisk50\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday8", BRACK(FH_SDAY | 8), "\\Device\\Harddisk50\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday9", BRACK(FH_SDAY | 9), "\\Device\\Harddisk50\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday10", BRACK(FH_SDAY | 10), "\\Device\\Harddisk50\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday11", BRACK(FH_SDAY | 11), "\\Device\\Harddisk50\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday12", BRACK(FH_SDAY | 12), "\\Device\\Harddisk50\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday13", BRACK(FH_SDAY | 13), "\\Device\\Harddisk50\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday14", BRACK(FH_SDAY | 14), "\\Device\\Harddisk50\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sday15", BRACK(FH_SDAY | 15), "\\Device\\Harddisk50\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz1", BRACK(FH_SDAZ | 1), "\\Device\\Harddisk51\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz2", BRACK(FH_SDAZ | 2), "\\Device\\Harddisk51\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz3", BRACK(FH_SDAZ | 3), "\\Device\\Harddisk51\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz4", BRACK(FH_SDAZ | 4), "\\Device\\Harddisk51\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz5", BRACK(FH_SDAZ | 5), "\\Device\\Harddisk51\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz6", BRACK(FH_SDAZ | 6), "\\Device\\Harddisk51\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz7", BRACK(FH_SDAZ | 7), "\\Device\\Harddisk51\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz8", BRACK(FH_SDAZ | 8), "\\Device\\Harddisk51\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz9", BRACK(FH_SDAZ | 9), "\\Device\\Harddisk51\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz10", BRACK(FH_SDAZ | 10), "\\Device\\Harddisk51\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz11", BRACK(FH_SDAZ | 11), "\\Device\\Harddisk51\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz12", BRACK(FH_SDAZ | 12), "\\Device\\Harddisk51\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz13", BRACK(FH_SDAZ | 13), "\\Device\\Harddisk51\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz14", BRACK(FH_SDAZ | 14), "\\Device\\Harddisk51\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdaz15", BRACK(FH_SDAZ | 15), "\\Device\\Harddisk51\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba", BRACK(FH_SDBA), "\\Device\\Harddisk52\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb", BRACK(FH_SDBB), "\\Device\\Harddisk53\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc", BRACK(FH_SDBC), "\\Device\\Harddisk54\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd", BRACK(FH_SDBD), "\\Device\\Harddisk55\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe", BRACK(FH_SDBE), "\\Device\\Harddisk56\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf", BRACK(FH_SDBF), "\\Device\\Harddisk57\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg", BRACK(FH_SDBG), "\\Device\\Harddisk58\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh", BRACK(FH_SDBH), "\\Device\\Harddisk59\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi", BRACK(FH_SDBI), "\\Device\\Harddisk60\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj", BRACK(FH_SDBJ), "\\Device\\Harddisk61\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk", BRACK(FH_SDBK), "\\Device\\Harddisk62\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl", BRACK(FH_SDBL), "\\Device\\Harddisk63\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm", BRACK(FH_SDBM), "\\Device\\Harddisk64\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn", BRACK(FH_SDBN), "\\Device\\Harddisk65\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo", BRACK(FH_SDBO), "\\Device\\Harddisk66\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp", BRACK(FH_SDBP), "\\Device\\Harddisk67\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq", BRACK(FH_SDBQ), "\\Device\\Harddisk68\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr", BRACK(FH_SDBR), "\\Device\\Harddisk69\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs", BRACK(FH_SDBS), "\\Device\\Harddisk70\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt", BRACK(FH_SDBT), "\\Device\\Harddisk71\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu", BRACK(FH_SDBU), "\\Device\\Harddisk72\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv", BRACK(FH_SDBV), "\\Device\\Harddisk73\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw", BRACK(FH_SDBW), "\\Device\\Harddisk74\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx", BRACK(FH_SDBX), "\\Device\\Harddisk75\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby", BRACK(FH_SDBY), "\\Device\\Harddisk76\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz", BRACK(FH_SDBZ), "\\Device\\Harddisk77\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba1", BRACK(FH_SDBA | 1), "\\Device\\Harddisk52\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba2", BRACK(FH_SDBA | 2), "\\Device\\Harddisk52\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba3", BRACK(FH_SDBA | 3), "\\Device\\Harddisk52\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba4", BRACK(FH_SDBA | 4), "\\Device\\Harddisk52\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba5", BRACK(FH_SDBA | 5), "\\Device\\Harddisk52\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba6", BRACK(FH_SDBA | 6), "\\Device\\Harddisk52\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba7", BRACK(FH_SDBA | 7), "\\Device\\Harddisk52\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba8", BRACK(FH_SDBA | 8), "\\Device\\Harddisk52\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba9", BRACK(FH_SDBA | 9), "\\Device\\Harddisk52\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba10", BRACK(FH_SDBA | 10), "\\Device\\Harddisk52\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba11", BRACK(FH_SDBA | 11), "\\Device\\Harddisk52\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba12", BRACK(FH_SDBA | 12), "\\Device\\Harddisk52\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba13", BRACK(FH_SDBA | 13), "\\Device\\Harddisk52\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba14", BRACK(FH_SDBA | 14), "\\Device\\Harddisk52\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdba15", BRACK(FH_SDBA | 15), "\\Device\\Harddisk52\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb1", BRACK(FH_SDBB | 1), "\\Device\\Harddisk53\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb2", BRACK(FH_SDBB | 2), "\\Device\\Harddisk53\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb3", BRACK(FH_SDBB | 3), "\\Device\\Harddisk53\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb4", BRACK(FH_SDBB | 4), "\\Device\\Harddisk53\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb5", BRACK(FH_SDBB | 5), "\\Device\\Harddisk53\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb6", BRACK(FH_SDBB | 6), "\\Device\\Harddisk53\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb7", BRACK(FH_SDBB | 7), "\\Device\\Harddisk53\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb8", BRACK(FH_SDBB | 8), "\\Device\\Harddisk53\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb9", BRACK(FH_SDBB | 9), "\\Device\\Harddisk53\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb10", BRACK(FH_SDBB | 10), "\\Device\\Harddisk53\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb11", BRACK(FH_SDBB | 11), "\\Device\\Harddisk53\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb12", BRACK(FH_SDBB | 12), "\\Device\\Harddisk53\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb13", BRACK(FH_SDBB | 13), "\\Device\\Harddisk53\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb14", BRACK(FH_SDBB | 14), "\\Device\\Harddisk53\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbb15", BRACK(FH_SDBB | 15), "\\Device\\Harddisk53\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc1", BRACK(FH_SDBC | 1), "\\Device\\Harddisk54\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc2", BRACK(FH_SDBC | 2), "\\Device\\Harddisk54\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc3", BRACK(FH_SDBC | 3), "\\Device\\Harddisk54\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc4", BRACK(FH_SDBC | 4), "\\Device\\Harddisk54\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc5", BRACK(FH_SDBC | 5), "\\Device\\Harddisk54\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc6", BRACK(FH_SDBC | 6), "\\Device\\Harddisk54\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc7", BRACK(FH_SDBC | 7), "\\Device\\Harddisk54\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc8", BRACK(FH_SDBC | 8), "\\Device\\Harddisk54\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc9", BRACK(FH_SDBC | 9), "\\Device\\Harddisk54\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc10", BRACK(FH_SDBC | 10), "\\Device\\Harddisk54\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc11", BRACK(FH_SDBC | 11), "\\Device\\Harddisk54\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc12", BRACK(FH_SDBC | 12), "\\Device\\Harddisk54\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc13", BRACK(FH_SDBC | 13), "\\Device\\Harddisk54\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc14", BRACK(FH_SDBC | 14), "\\Device\\Harddisk54\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbc15", BRACK(FH_SDBC | 15), "\\Device\\Harddisk54\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd1", BRACK(FH_SDBD | 1), "\\Device\\Harddisk55\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd2", BRACK(FH_SDBD | 2), "\\Device\\Harddisk55\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd3", BRACK(FH_SDBD | 3), "\\Device\\Harddisk55\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd4", BRACK(FH_SDBD | 4), "\\Device\\Harddisk55\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd5", BRACK(FH_SDBD | 5), "\\Device\\Harddisk55\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd6", BRACK(FH_SDBD | 6), "\\Device\\Harddisk55\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd7", BRACK(FH_SDBD | 7), "\\Device\\Harddisk55\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd8", BRACK(FH_SDBD | 8), "\\Device\\Harddisk55\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd9", BRACK(FH_SDBD | 9), "\\Device\\Harddisk55\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd10", BRACK(FH_SDBD | 10), "\\Device\\Harddisk55\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd11", BRACK(FH_SDBD | 11), "\\Device\\Harddisk55\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd12", BRACK(FH_SDBD | 12), "\\Device\\Harddisk55\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd13", BRACK(FH_SDBD | 13), "\\Device\\Harddisk55\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd14", BRACK(FH_SDBD | 14), "\\Device\\Harddisk55\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbd15", BRACK(FH_SDBD | 15), "\\Device\\Harddisk55\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe1", BRACK(FH_SDBE | 1), "\\Device\\Harddisk56\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe2", BRACK(FH_SDBE | 2), "\\Device\\Harddisk56\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe3", BRACK(FH_SDBE | 3), "\\Device\\Harddisk56\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe4", BRACK(FH_SDBE | 4), "\\Device\\Harddisk56\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe5", BRACK(FH_SDBE | 5), "\\Device\\Harddisk56\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe6", BRACK(FH_SDBE | 6), "\\Device\\Harddisk56\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe7", BRACK(FH_SDBE | 7), "\\Device\\Harddisk56\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe8", BRACK(FH_SDBE | 8), "\\Device\\Harddisk56\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe9", BRACK(FH_SDBE | 9), "\\Device\\Harddisk56\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe10", BRACK(FH_SDBE | 10), "\\Device\\Harddisk56\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe11", BRACK(FH_SDBE | 11), "\\Device\\Harddisk56\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe12", BRACK(FH_SDBE | 12), "\\Device\\Harddisk56\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe13", BRACK(FH_SDBE | 13), "\\Device\\Harddisk56\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe14", BRACK(FH_SDBE | 14), "\\Device\\Harddisk56\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbe15", BRACK(FH_SDBE | 15), "\\Device\\Harddisk56\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf1", BRACK(FH_SDBF | 1), "\\Device\\Harddisk57\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf2", BRACK(FH_SDBF | 2), "\\Device\\Harddisk57\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf3", BRACK(FH_SDBF | 3), "\\Device\\Harddisk57\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf4", BRACK(FH_SDBF | 4), "\\Device\\Harddisk57\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf5", BRACK(FH_SDBF | 5), "\\Device\\Harddisk57\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf6", BRACK(FH_SDBF | 6), "\\Device\\Harddisk57\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf7", BRACK(FH_SDBF | 7), "\\Device\\Harddisk57\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf8", BRACK(FH_SDBF | 8), "\\Device\\Harddisk57\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf9", BRACK(FH_SDBF | 9), "\\Device\\Harddisk57\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf10", BRACK(FH_SDBF | 10), "\\Device\\Harddisk57\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf11", BRACK(FH_SDBF | 11), "\\Device\\Harddisk57\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf12", BRACK(FH_SDBF | 12), "\\Device\\Harddisk57\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf13", BRACK(FH_SDBF | 13), "\\Device\\Harddisk57\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf14", BRACK(FH_SDBF | 14), "\\Device\\Harddisk57\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbf15", BRACK(FH_SDBF | 15), "\\Device\\Harddisk57\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg1", BRACK(FH_SDBG | 1), "\\Device\\Harddisk58\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg2", BRACK(FH_SDBG | 2), "\\Device\\Harddisk58\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg3", BRACK(FH_SDBG | 3), "\\Device\\Harddisk58\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg4", BRACK(FH_SDBG | 4), "\\Device\\Harddisk58\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg5", BRACK(FH_SDBG | 5), "\\Device\\Harddisk58\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg6", BRACK(FH_SDBG | 6), "\\Device\\Harddisk58\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg7", BRACK(FH_SDBG | 7), "\\Device\\Harddisk58\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg8", BRACK(FH_SDBG | 8), "\\Device\\Harddisk58\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg9", BRACK(FH_SDBG | 9), "\\Device\\Harddisk58\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg10", BRACK(FH_SDBG | 10), "\\Device\\Harddisk58\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg11", BRACK(FH_SDBG | 11), "\\Device\\Harddisk58\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg12", BRACK(FH_SDBG | 12), "\\Device\\Harddisk58\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg13", BRACK(FH_SDBG | 13), "\\Device\\Harddisk58\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg14", BRACK(FH_SDBG | 14), "\\Device\\Harddisk58\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbg15", BRACK(FH_SDBG | 15), "\\Device\\Harddisk58\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh1", BRACK(FH_SDBH | 1), "\\Device\\Harddisk59\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh2", BRACK(FH_SDBH | 2), "\\Device\\Harddisk59\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh3", BRACK(FH_SDBH | 3), "\\Device\\Harddisk59\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh4", BRACK(FH_SDBH | 4), "\\Device\\Harddisk59\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh5", BRACK(FH_SDBH | 5), "\\Device\\Harddisk59\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh6", BRACK(FH_SDBH | 6), "\\Device\\Harddisk59\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh7", BRACK(FH_SDBH | 7), "\\Device\\Harddisk59\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh8", BRACK(FH_SDBH | 8), "\\Device\\Harddisk59\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh9", BRACK(FH_SDBH | 9), "\\Device\\Harddisk59\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh10", BRACK(FH_SDBH | 10), "\\Device\\Harddisk59\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh11", BRACK(FH_SDBH | 11), "\\Device\\Harddisk59\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh12", BRACK(FH_SDBH | 12), "\\Device\\Harddisk59\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh13", BRACK(FH_SDBH | 13), "\\Device\\Harddisk59\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh14", BRACK(FH_SDBH | 14), "\\Device\\Harddisk59\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbh15", BRACK(FH_SDBH | 15), "\\Device\\Harddisk59\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi1", BRACK(FH_SDBI | 1), "\\Device\\Harddisk60\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi2", BRACK(FH_SDBI | 2), "\\Device\\Harddisk60\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi3", BRACK(FH_SDBI | 3), "\\Device\\Harddisk60\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi4", BRACK(FH_SDBI | 4), "\\Device\\Harddisk60\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi5", BRACK(FH_SDBI | 5), "\\Device\\Harddisk60\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi6", BRACK(FH_SDBI | 6), "\\Device\\Harddisk60\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi7", BRACK(FH_SDBI | 7), "\\Device\\Harddisk60\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi8", BRACK(FH_SDBI | 8), "\\Device\\Harddisk60\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi9", BRACK(FH_SDBI | 9), "\\Device\\Harddisk60\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi10", BRACK(FH_SDBI | 10), "\\Device\\Harddisk60\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi11", BRACK(FH_SDBI | 11), "\\Device\\Harddisk60\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi12", BRACK(FH_SDBI | 12), "\\Device\\Harddisk60\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi13", BRACK(FH_SDBI | 13), "\\Device\\Harddisk60\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi14", BRACK(FH_SDBI | 14), "\\Device\\Harddisk60\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbi15", BRACK(FH_SDBI | 15), "\\Device\\Harddisk60\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj1", BRACK(FH_SDBJ | 1), "\\Device\\Harddisk61\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj2", BRACK(FH_SDBJ | 2), "\\Device\\Harddisk61\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj3", BRACK(FH_SDBJ | 3), "\\Device\\Harddisk61\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj4", BRACK(FH_SDBJ | 4), "\\Device\\Harddisk61\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj5", BRACK(FH_SDBJ | 5), "\\Device\\Harddisk61\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj6", BRACK(FH_SDBJ | 6), "\\Device\\Harddisk61\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj7", BRACK(FH_SDBJ | 7), "\\Device\\Harddisk61\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj8", BRACK(FH_SDBJ | 8), "\\Device\\Harddisk61\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj9", BRACK(FH_SDBJ | 9), "\\Device\\Harddisk61\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj10", BRACK(FH_SDBJ | 10), "\\Device\\Harddisk61\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj11", BRACK(FH_SDBJ | 11), "\\Device\\Harddisk61\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj12", BRACK(FH_SDBJ | 12), "\\Device\\Harddisk61\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj13", BRACK(FH_SDBJ | 13), "\\Device\\Harddisk61\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj14", BRACK(FH_SDBJ | 14), "\\Device\\Harddisk61\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbj15", BRACK(FH_SDBJ | 15), "\\Device\\Harddisk61\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk1", BRACK(FH_SDBK | 1), "\\Device\\Harddisk62\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk2", BRACK(FH_SDBK | 2), "\\Device\\Harddisk62\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk3", BRACK(FH_SDBK | 3), "\\Device\\Harddisk62\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk4", BRACK(FH_SDBK | 4), "\\Device\\Harddisk62\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk5", BRACK(FH_SDBK | 5), "\\Device\\Harddisk62\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk6", BRACK(FH_SDBK | 6), "\\Device\\Harddisk62\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk7", BRACK(FH_SDBK | 7), "\\Device\\Harddisk62\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk8", BRACK(FH_SDBK | 8), "\\Device\\Harddisk62\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk9", BRACK(FH_SDBK | 9), "\\Device\\Harddisk62\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk10", BRACK(FH_SDBK | 10), "\\Device\\Harddisk62\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk11", BRACK(FH_SDBK | 11), "\\Device\\Harddisk62\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk12", BRACK(FH_SDBK | 12), "\\Device\\Harddisk62\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk13", BRACK(FH_SDBK | 13), "\\Device\\Harddisk62\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk14", BRACK(FH_SDBK | 14), "\\Device\\Harddisk62\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbk15", BRACK(FH_SDBK | 15), "\\Device\\Harddisk62\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl1", BRACK(FH_SDBL | 1), "\\Device\\Harddisk63\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl2", BRACK(FH_SDBL | 2), "\\Device\\Harddisk63\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl3", BRACK(FH_SDBL | 3), "\\Device\\Harddisk63\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl4", BRACK(FH_SDBL | 4), "\\Device\\Harddisk63\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl5", BRACK(FH_SDBL | 5), "\\Device\\Harddisk63\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl6", BRACK(FH_SDBL | 6), "\\Device\\Harddisk63\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl7", BRACK(FH_SDBL | 7), "\\Device\\Harddisk63\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl8", BRACK(FH_SDBL | 8), "\\Device\\Harddisk63\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl9", BRACK(FH_SDBL | 9), "\\Device\\Harddisk63\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl10", BRACK(FH_SDBL | 10), "\\Device\\Harddisk63\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl11", BRACK(FH_SDBL | 11), "\\Device\\Harddisk63\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl12", BRACK(FH_SDBL | 12), "\\Device\\Harddisk63\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl13", BRACK(FH_SDBL | 13), "\\Device\\Harddisk63\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl14", BRACK(FH_SDBL | 14), "\\Device\\Harddisk63\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbl15", BRACK(FH_SDBL | 15), "\\Device\\Harddisk63\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm1", BRACK(FH_SDBM | 1), "\\Device\\Harddisk64\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm2", BRACK(FH_SDBM | 2), "\\Device\\Harddisk64\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm3", BRACK(FH_SDBM | 3), "\\Device\\Harddisk64\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm4", BRACK(FH_SDBM | 4), "\\Device\\Harddisk64\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm5", BRACK(FH_SDBM | 5), "\\Device\\Harddisk64\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm6", BRACK(FH_SDBM | 6), "\\Device\\Harddisk64\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm7", BRACK(FH_SDBM | 7), "\\Device\\Harddisk64\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm8", BRACK(FH_SDBM | 8), "\\Device\\Harddisk64\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm9", BRACK(FH_SDBM | 9), "\\Device\\Harddisk64\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm10", BRACK(FH_SDBM | 10), "\\Device\\Harddisk64\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm11", BRACK(FH_SDBM | 11), "\\Device\\Harddisk64\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm12", BRACK(FH_SDBM | 12), "\\Device\\Harddisk64\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm13", BRACK(FH_SDBM | 13), "\\Device\\Harddisk64\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm14", BRACK(FH_SDBM | 14), "\\Device\\Harddisk64\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbm15", BRACK(FH_SDBM | 15), "\\Device\\Harddisk64\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn1", BRACK(FH_SDBN | 1), "\\Device\\Harddisk65\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn2", BRACK(FH_SDBN | 2), "\\Device\\Harddisk65\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn3", BRACK(FH_SDBN | 3), "\\Device\\Harddisk65\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn4", BRACK(FH_SDBN | 4), "\\Device\\Harddisk65\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn5", BRACK(FH_SDBN | 5), "\\Device\\Harddisk65\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn6", BRACK(FH_SDBN | 6), "\\Device\\Harddisk65\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn7", BRACK(FH_SDBN | 7), "\\Device\\Harddisk65\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn8", BRACK(FH_SDBN | 8), "\\Device\\Harddisk65\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn9", BRACK(FH_SDBN | 9), "\\Device\\Harddisk65\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn10", BRACK(FH_SDBN | 10), "\\Device\\Harddisk65\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn11", BRACK(FH_SDBN | 11), "\\Device\\Harddisk65\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn12", BRACK(FH_SDBN | 12), "\\Device\\Harddisk65\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn13", BRACK(FH_SDBN | 13), "\\Device\\Harddisk65\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn14", BRACK(FH_SDBN | 14), "\\Device\\Harddisk65\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbn15", BRACK(FH_SDBN | 15), "\\Device\\Harddisk65\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo1", BRACK(FH_SDBO | 1), "\\Device\\Harddisk66\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo2", BRACK(FH_SDBO | 2), "\\Device\\Harddisk66\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo3", BRACK(FH_SDBO | 3), "\\Device\\Harddisk66\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo4", BRACK(FH_SDBO | 4), "\\Device\\Harddisk66\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo5", BRACK(FH_SDBO | 5), "\\Device\\Harddisk66\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo6", BRACK(FH_SDBO | 6), "\\Device\\Harddisk66\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo7", BRACK(FH_SDBO | 7), "\\Device\\Harddisk66\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo8", BRACK(FH_SDBO | 8), "\\Device\\Harddisk66\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo9", BRACK(FH_SDBO | 9), "\\Device\\Harddisk66\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo10", BRACK(FH_SDBO | 10), "\\Device\\Harddisk66\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo11", BRACK(FH_SDBO | 11), "\\Device\\Harddisk66\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo12", BRACK(FH_SDBO | 12), "\\Device\\Harddisk66\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo13", BRACK(FH_SDBO | 13), "\\Device\\Harddisk66\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo14", BRACK(FH_SDBO | 14), "\\Device\\Harddisk66\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbo15", BRACK(FH_SDBO | 15), "\\Device\\Harddisk66\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp1", BRACK(FH_SDBP | 1), "\\Device\\Harddisk67\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp2", BRACK(FH_SDBP | 2), "\\Device\\Harddisk67\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp3", BRACK(FH_SDBP | 3), "\\Device\\Harddisk67\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp4", BRACK(FH_SDBP | 4), "\\Device\\Harddisk67\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp5", BRACK(FH_SDBP | 5), "\\Device\\Harddisk67\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp6", BRACK(FH_SDBP | 6), "\\Device\\Harddisk67\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp7", BRACK(FH_SDBP | 7), "\\Device\\Harddisk67\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp8", BRACK(FH_SDBP | 8), "\\Device\\Harddisk67\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp9", BRACK(FH_SDBP | 9), "\\Device\\Harddisk67\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp10", BRACK(FH_SDBP | 10), "\\Device\\Harddisk67\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp11", BRACK(FH_SDBP | 11), "\\Device\\Harddisk67\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp12", BRACK(FH_SDBP | 12), "\\Device\\Harddisk67\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp13", BRACK(FH_SDBP | 13), "\\Device\\Harddisk67\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp14", BRACK(FH_SDBP | 14), "\\Device\\Harddisk67\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbp15", BRACK(FH_SDBP | 15), "\\Device\\Harddisk67\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq1", BRACK(FH_SDBQ | 1), "\\Device\\Harddisk68\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq2", BRACK(FH_SDBQ | 2), "\\Device\\Harddisk68\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq3", BRACK(FH_SDBQ | 3), "\\Device\\Harddisk68\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq4", BRACK(FH_SDBQ | 4), "\\Device\\Harddisk68\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq5", BRACK(FH_SDBQ | 5), "\\Device\\Harddisk68\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq6", BRACK(FH_SDBQ | 6), "\\Device\\Harddisk68\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq7", BRACK(FH_SDBQ | 7), "\\Device\\Harddisk68\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq8", BRACK(FH_SDBQ | 8), "\\Device\\Harddisk68\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq9", BRACK(FH_SDBQ | 9), "\\Device\\Harddisk68\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq10", BRACK(FH_SDBQ | 10), "\\Device\\Harddisk68\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq11", BRACK(FH_SDBQ | 11), "\\Device\\Harddisk68\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq12", BRACK(FH_SDBQ | 12), "\\Device\\Harddisk68\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq13", BRACK(FH_SDBQ | 13), "\\Device\\Harddisk68\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq14", BRACK(FH_SDBQ | 14), "\\Device\\Harddisk68\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbq15", BRACK(FH_SDBQ | 15), "\\Device\\Harddisk68\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr1", BRACK(FH_SDBR | 1), "\\Device\\Harddisk69\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr2", BRACK(FH_SDBR | 2), "\\Device\\Harddisk69\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr3", BRACK(FH_SDBR | 3), "\\Device\\Harddisk69\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr4", BRACK(FH_SDBR | 4), "\\Device\\Harddisk69\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr5", BRACK(FH_SDBR | 5), "\\Device\\Harddisk69\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr6", BRACK(FH_SDBR | 6), "\\Device\\Harddisk69\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr7", BRACK(FH_SDBR | 7), "\\Device\\Harddisk69\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr8", BRACK(FH_SDBR | 8), "\\Device\\Harddisk69\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr9", BRACK(FH_SDBR | 9), "\\Device\\Harddisk69\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr10", BRACK(FH_SDBR | 10), "\\Device\\Harddisk69\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr11", BRACK(FH_SDBR | 11), "\\Device\\Harddisk69\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr12", BRACK(FH_SDBR | 12), "\\Device\\Harddisk69\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr13", BRACK(FH_SDBR | 13), "\\Device\\Harddisk69\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr14", BRACK(FH_SDBR | 14), "\\Device\\Harddisk69\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbr15", BRACK(FH_SDBR | 15), "\\Device\\Harddisk69\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs1", BRACK(FH_SDBS | 1), "\\Device\\Harddisk70\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs2", BRACK(FH_SDBS | 2), "\\Device\\Harddisk70\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs3", BRACK(FH_SDBS | 3), "\\Device\\Harddisk70\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs4", BRACK(FH_SDBS | 4), "\\Device\\Harddisk70\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs5", BRACK(FH_SDBS | 5), "\\Device\\Harddisk70\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs6", BRACK(FH_SDBS | 6), "\\Device\\Harddisk70\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs7", BRACK(FH_SDBS | 7), "\\Device\\Harddisk70\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs8", BRACK(FH_SDBS | 8), "\\Device\\Harddisk70\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs9", BRACK(FH_SDBS | 9), "\\Device\\Harddisk70\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs10", BRACK(FH_SDBS | 10), "\\Device\\Harddisk70\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs11", BRACK(FH_SDBS | 11), "\\Device\\Harddisk70\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs12", BRACK(FH_SDBS | 12), "\\Device\\Harddisk70\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs13", BRACK(FH_SDBS | 13), "\\Device\\Harddisk70\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs14", BRACK(FH_SDBS | 14), "\\Device\\Harddisk70\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbs15", BRACK(FH_SDBS | 15), "\\Device\\Harddisk70\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt1", BRACK(FH_SDBT | 1), "\\Device\\Harddisk71\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt2", BRACK(FH_SDBT | 2), "\\Device\\Harddisk71\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt3", BRACK(FH_SDBT | 3), "\\Device\\Harddisk71\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt4", BRACK(FH_SDBT | 4), "\\Device\\Harddisk71\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt5", BRACK(FH_SDBT | 5), "\\Device\\Harddisk71\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt6", BRACK(FH_SDBT | 6), "\\Device\\Harddisk71\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt7", BRACK(FH_SDBT | 7), "\\Device\\Harddisk71\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt8", BRACK(FH_SDBT | 8), "\\Device\\Harddisk71\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt9", BRACK(FH_SDBT | 9), "\\Device\\Harddisk71\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt10", BRACK(FH_SDBT | 10), "\\Device\\Harddisk71\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt11", BRACK(FH_SDBT | 11), "\\Device\\Harddisk71\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt12", BRACK(FH_SDBT | 12), "\\Device\\Harddisk71\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt13", BRACK(FH_SDBT | 13), "\\Device\\Harddisk71\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt14", BRACK(FH_SDBT | 14), "\\Device\\Harddisk71\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbt15", BRACK(FH_SDBT | 15), "\\Device\\Harddisk71\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu1", BRACK(FH_SDBU | 1), "\\Device\\Harddisk72\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu2", BRACK(FH_SDBU | 2), "\\Device\\Harddisk72\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu3", BRACK(FH_SDBU | 3), "\\Device\\Harddisk72\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu4", BRACK(FH_SDBU | 4), "\\Device\\Harddisk72\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu5", BRACK(FH_SDBU | 5), "\\Device\\Harddisk72\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu6", BRACK(FH_SDBU | 6), "\\Device\\Harddisk72\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu7", BRACK(FH_SDBU | 7), "\\Device\\Harddisk72\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu8", BRACK(FH_SDBU | 8), "\\Device\\Harddisk72\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu9", BRACK(FH_SDBU | 9), "\\Device\\Harddisk72\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu10", BRACK(FH_SDBU | 10), "\\Device\\Harddisk72\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu11", BRACK(FH_SDBU | 11), "\\Device\\Harddisk72\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu12", BRACK(FH_SDBU | 12), "\\Device\\Harddisk72\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu13", BRACK(FH_SDBU | 13), "\\Device\\Harddisk72\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu14", BRACK(FH_SDBU | 14), "\\Device\\Harddisk72\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbu15", BRACK(FH_SDBU | 15), "\\Device\\Harddisk72\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv1", BRACK(FH_SDBV | 1), "\\Device\\Harddisk73\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv2", BRACK(FH_SDBV | 2), "\\Device\\Harddisk73\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv3", BRACK(FH_SDBV | 3), "\\Device\\Harddisk73\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv4", BRACK(FH_SDBV | 4), "\\Device\\Harddisk73\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv5", BRACK(FH_SDBV | 5), "\\Device\\Harddisk73\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv6", BRACK(FH_SDBV | 6), "\\Device\\Harddisk73\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv7", BRACK(FH_SDBV | 7), "\\Device\\Harddisk73\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv8", BRACK(FH_SDBV | 8), "\\Device\\Harddisk73\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv9", BRACK(FH_SDBV | 9), "\\Device\\Harddisk73\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv10", BRACK(FH_SDBV | 10), "\\Device\\Harddisk73\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv11", BRACK(FH_SDBV | 11), "\\Device\\Harddisk73\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv12", BRACK(FH_SDBV | 12), "\\Device\\Harddisk73\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv13", BRACK(FH_SDBV | 13), "\\Device\\Harddisk73\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv14", BRACK(FH_SDBV | 14), "\\Device\\Harddisk73\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbv15", BRACK(FH_SDBV | 15), "\\Device\\Harddisk73\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw1", BRACK(FH_SDBW | 1), "\\Device\\Harddisk74\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw2", BRACK(FH_SDBW | 2), "\\Device\\Harddisk74\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw3", BRACK(FH_SDBW | 3), "\\Device\\Harddisk74\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw4", BRACK(FH_SDBW | 4), "\\Device\\Harddisk74\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw5", BRACK(FH_SDBW | 5), "\\Device\\Harddisk74\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw6", BRACK(FH_SDBW | 6), "\\Device\\Harddisk74\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw7", BRACK(FH_SDBW | 7), "\\Device\\Harddisk74\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw8", BRACK(FH_SDBW | 8), "\\Device\\Harddisk74\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw9", BRACK(FH_SDBW | 9), "\\Device\\Harddisk74\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw10", BRACK(FH_SDBW | 10), "\\Device\\Harddisk74\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw11", BRACK(FH_SDBW | 11), "\\Device\\Harddisk74\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw12", BRACK(FH_SDBW | 12), "\\Device\\Harddisk74\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw13", BRACK(FH_SDBW | 13), "\\Device\\Harddisk74\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw14", BRACK(FH_SDBW | 14), "\\Device\\Harddisk74\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbw15", BRACK(FH_SDBW | 15), "\\Device\\Harddisk74\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx1", BRACK(FH_SDBX | 1), "\\Device\\Harddisk75\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx2", BRACK(FH_SDBX | 2), "\\Device\\Harddisk75\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx3", BRACK(FH_SDBX | 3), "\\Device\\Harddisk75\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx4", BRACK(FH_SDBX | 4), "\\Device\\Harddisk75\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx5", BRACK(FH_SDBX | 5), "\\Device\\Harddisk75\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx6", BRACK(FH_SDBX | 6), "\\Device\\Harddisk75\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx7", BRACK(FH_SDBX | 7), "\\Device\\Harddisk75\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx8", BRACK(FH_SDBX | 8), "\\Device\\Harddisk75\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx9", BRACK(FH_SDBX | 9), "\\Device\\Harddisk75\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx10", BRACK(FH_SDBX | 10), "\\Device\\Harddisk75\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx11", BRACK(FH_SDBX | 11), "\\Device\\Harddisk75\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx12", BRACK(FH_SDBX | 12), "\\Device\\Harddisk75\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx13", BRACK(FH_SDBX | 13), "\\Device\\Harddisk75\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx14", BRACK(FH_SDBX | 14), "\\Device\\Harddisk75\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbx15", BRACK(FH_SDBX | 15), "\\Device\\Harddisk75\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby1", BRACK(FH_SDBY | 1), "\\Device\\Harddisk76\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby2", BRACK(FH_SDBY | 2), "\\Device\\Harddisk76\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby3", BRACK(FH_SDBY | 3), "\\Device\\Harddisk76\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby4", BRACK(FH_SDBY | 4), "\\Device\\Harddisk76\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby5", BRACK(FH_SDBY | 5), "\\Device\\Harddisk76\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby6", BRACK(FH_SDBY | 6), "\\Device\\Harddisk76\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby7", BRACK(FH_SDBY | 7), "\\Device\\Harddisk76\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby8", BRACK(FH_SDBY | 8), "\\Device\\Harddisk76\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby9", BRACK(FH_SDBY | 9), "\\Device\\Harddisk76\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby10", BRACK(FH_SDBY | 10), "\\Device\\Harddisk76\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby11", BRACK(FH_SDBY | 11), "\\Device\\Harddisk76\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby12", BRACK(FH_SDBY | 12), "\\Device\\Harddisk76\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby13", BRACK(FH_SDBY | 13), "\\Device\\Harddisk76\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby14", BRACK(FH_SDBY | 14), "\\Device\\Harddisk76\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdby15", BRACK(FH_SDBY | 15), "\\Device\\Harddisk76\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz1", BRACK(FH_SDBZ | 1), "\\Device\\Harddisk77\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz2", BRACK(FH_SDBZ | 2), "\\Device\\Harddisk77\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz3", BRACK(FH_SDBZ | 3), "\\Device\\Harddisk77\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz4", BRACK(FH_SDBZ | 4), "\\Device\\Harddisk77\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz5", BRACK(FH_SDBZ | 5), "\\Device\\Harddisk77\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz6", BRACK(FH_SDBZ | 6), "\\Device\\Harddisk77\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz7", BRACK(FH_SDBZ | 7), "\\Device\\Harddisk77\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz8", BRACK(FH_SDBZ | 8), "\\Device\\Harddisk77\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz9", BRACK(FH_SDBZ | 9), "\\Device\\Harddisk77\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz10", BRACK(FH_SDBZ | 10), "\\Device\\Harddisk77\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz11", BRACK(FH_SDBZ | 11), "\\Device\\Harddisk77\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz12", BRACK(FH_SDBZ | 12), "\\Device\\Harddisk77\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz13", BRACK(FH_SDBZ | 13), "\\Device\\Harddisk77\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz14", BRACK(FH_SDBZ | 14), "\\Device\\Harddisk77\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdbz15", BRACK(FH_SDBZ | 15), "\\Device\\Harddisk77\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca", BRACK(FH_SDCA), "\\Device\\Harddisk78\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb", BRACK(FH_SDCB), "\\Device\\Harddisk79\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc", BRACK(FH_SDCC), "\\Device\\Harddisk80\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd", BRACK(FH_SDCD), "\\Device\\Harddisk81\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce", BRACK(FH_SDCE), "\\Device\\Harddisk82\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf", BRACK(FH_SDCF), "\\Device\\Harddisk83\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg", BRACK(FH_SDCG), "\\Device\\Harddisk84\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch", BRACK(FH_SDCH), "\\Device\\Harddisk85\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci", BRACK(FH_SDCI), "\\Device\\Harddisk86\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj", BRACK(FH_SDCJ), "\\Device\\Harddisk87\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck", BRACK(FH_SDCK), "\\Device\\Harddisk88\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl", BRACK(FH_SDCL), "\\Device\\Harddisk89\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm", BRACK(FH_SDCM), "\\Device\\Harddisk90\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn", BRACK(FH_SDCN), "\\Device\\Harddisk91\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco", BRACK(FH_SDCO), "\\Device\\Harddisk92\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp", BRACK(FH_SDCP), "\\Device\\Harddisk93\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq", BRACK(FH_SDCQ), "\\Device\\Harddisk94\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr", BRACK(FH_SDCR), "\\Device\\Harddisk95\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs", BRACK(FH_SDCS), "\\Device\\Harddisk96\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct", BRACK(FH_SDCT), "\\Device\\Harddisk97\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu", BRACK(FH_SDCU), "\\Device\\Harddisk98\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv", BRACK(FH_SDCV), "\\Device\\Harddisk99\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw", BRACK(FH_SDCW), "\\Device\\Harddisk100\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx", BRACK(FH_SDCX), "\\Device\\Harddisk101\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy", BRACK(FH_SDCY), "\\Device\\Harddisk102\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz", BRACK(FH_SDCZ), "\\Device\\Harddisk103\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca1", BRACK(FH_SDCA | 1), "\\Device\\Harddisk78\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca2", BRACK(FH_SDCA | 2), "\\Device\\Harddisk78\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca3", BRACK(FH_SDCA | 3), "\\Device\\Harddisk78\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca4", BRACK(FH_SDCA | 4), "\\Device\\Harddisk78\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca5", BRACK(FH_SDCA | 5), "\\Device\\Harddisk78\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca6", BRACK(FH_SDCA | 6), "\\Device\\Harddisk78\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca7", BRACK(FH_SDCA | 7), "\\Device\\Harddisk78\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca8", BRACK(FH_SDCA | 8), "\\Device\\Harddisk78\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca9", BRACK(FH_SDCA | 9), "\\Device\\Harddisk78\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca10", BRACK(FH_SDCA | 10), "\\Device\\Harddisk78\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca11", BRACK(FH_SDCA | 11), "\\Device\\Harddisk78\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca12", BRACK(FH_SDCA | 12), "\\Device\\Harddisk78\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca13", BRACK(FH_SDCA | 13), "\\Device\\Harddisk78\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca14", BRACK(FH_SDCA | 14), "\\Device\\Harddisk78\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdca15", BRACK(FH_SDCA | 15), "\\Device\\Harddisk78\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb1", BRACK(FH_SDCB | 1), "\\Device\\Harddisk79\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb2", BRACK(FH_SDCB | 2), "\\Device\\Harddisk79\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb3", BRACK(FH_SDCB | 3), "\\Device\\Harddisk79\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb4", BRACK(FH_SDCB | 4), "\\Device\\Harddisk79\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb5", BRACK(FH_SDCB | 5), "\\Device\\Harddisk79\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb6", BRACK(FH_SDCB | 6), "\\Device\\Harddisk79\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb7", BRACK(FH_SDCB | 7), "\\Device\\Harddisk79\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb8", BRACK(FH_SDCB | 8), "\\Device\\Harddisk79\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb9", BRACK(FH_SDCB | 9), "\\Device\\Harddisk79\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb10", BRACK(FH_SDCB | 10), "\\Device\\Harddisk79\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb11", BRACK(FH_SDCB | 11), "\\Device\\Harddisk79\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb12", BRACK(FH_SDCB | 12), "\\Device\\Harddisk79\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb13", BRACK(FH_SDCB | 13), "\\Device\\Harddisk79\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb14", BRACK(FH_SDCB | 14), "\\Device\\Harddisk79\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcb15", BRACK(FH_SDCB | 15), "\\Device\\Harddisk79\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc1", BRACK(FH_SDCC | 1), "\\Device\\Harddisk80\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc2", BRACK(FH_SDCC | 2), "\\Device\\Harddisk80\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc3", BRACK(FH_SDCC | 3), "\\Device\\Harddisk80\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc4", BRACK(FH_SDCC | 4), "\\Device\\Harddisk80\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc5", BRACK(FH_SDCC | 5), "\\Device\\Harddisk80\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc6", BRACK(FH_SDCC | 6), "\\Device\\Harddisk80\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc7", BRACK(FH_SDCC | 7), "\\Device\\Harddisk80\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc8", BRACK(FH_SDCC | 8), "\\Device\\Harddisk80\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc9", BRACK(FH_SDCC | 9), "\\Device\\Harddisk80\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc10", BRACK(FH_SDCC | 10), "\\Device\\Harddisk80\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc11", BRACK(FH_SDCC | 11), "\\Device\\Harddisk80\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc12", BRACK(FH_SDCC | 12), "\\Device\\Harddisk80\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc13", BRACK(FH_SDCC | 13), "\\Device\\Harddisk80\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc14", BRACK(FH_SDCC | 14), "\\Device\\Harddisk80\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcc15", BRACK(FH_SDCC | 15), "\\Device\\Harddisk80\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd1", BRACK(FH_SDCD | 1), "\\Device\\Harddisk81\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd2", BRACK(FH_SDCD | 2), "\\Device\\Harddisk81\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd3", BRACK(FH_SDCD | 3), "\\Device\\Harddisk81\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd4", BRACK(FH_SDCD | 4), "\\Device\\Harddisk81\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd5", BRACK(FH_SDCD | 5), "\\Device\\Harddisk81\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd6", BRACK(FH_SDCD | 6), "\\Device\\Harddisk81\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd7", BRACK(FH_SDCD | 7), "\\Device\\Harddisk81\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd8", BRACK(FH_SDCD | 8), "\\Device\\Harddisk81\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd9", BRACK(FH_SDCD | 9), "\\Device\\Harddisk81\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd10", BRACK(FH_SDCD | 10), "\\Device\\Harddisk81\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd11", BRACK(FH_SDCD | 11), "\\Device\\Harddisk81\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd12", BRACK(FH_SDCD | 12), "\\Device\\Harddisk81\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd13", BRACK(FH_SDCD | 13), "\\Device\\Harddisk81\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd14", BRACK(FH_SDCD | 14), "\\Device\\Harddisk81\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcd15", BRACK(FH_SDCD | 15), "\\Device\\Harddisk81\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce1", BRACK(FH_SDCE | 1), "\\Device\\Harddisk82\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce2", BRACK(FH_SDCE | 2), "\\Device\\Harddisk82\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce3", BRACK(FH_SDCE | 3), "\\Device\\Harddisk82\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce4", BRACK(FH_SDCE | 4), "\\Device\\Harddisk82\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce5", BRACK(FH_SDCE | 5), "\\Device\\Harddisk82\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce6", BRACK(FH_SDCE | 6), "\\Device\\Harddisk82\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce7", BRACK(FH_SDCE | 7), "\\Device\\Harddisk82\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce8", BRACK(FH_SDCE | 8), "\\Device\\Harddisk82\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce9", BRACK(FH_SDCE | 9), "\\Device\\Harddisk82\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce10", BRACK(FH_SDCE | 10), "\\Device\\Harddisk82\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce11", BRACK(FH_SDCE | 11), "\\Device\\Harddisk82\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce12", BRACK(FH_SDCE | 12), "\\Device\\Harddisk82\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce13", BRACK(FH_SDCE | 13), "\\Device\\Harddisk82\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce14", BRACK(FH_SDCE | 14), "\\Device\\Harddisk82\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdce15", BRACK(FH_SDCE | 15), "\\Device\\Harddisk82\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf1", BRACK(FH_SDCF | 1), "\\Device\\Harddisk83\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf2", BRACK(FH_SDCF | 2), "\\Device\\Harddisk83\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf3", BRACK(FH_SDCF | 3), "\\Device\\Harddisk83\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf4", BRACK(FH_SDCF | 4), "\\Device\\Harddisk83\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf5", BRACK(FH_SDCF | 5), "\\Device\\Harddisk83\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf6", BRACK(FH_SDCF | 6), "\\Device\\Harddisk83\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf7", BRACK(FH_SDCF | 7), "\\Device\\Harddisk83\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf8", BRACK(FH_SDCF | 8), "\\Device\\Harddisk83\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf9", BRACK(FH_SDCF | 9), "\\Device\\Harddisk83\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf10", BRACK(FH_SDCF | 10), "\\Device\\Harddisk83\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf11", BRACK(FH_SDCF | 11), "\\Device\\Harddisk83\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf12", BRACK(FH_SDCF | 12), "\\Device\\Harddisk83\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf13", BRACK(FH_SDCF | 13), "\\Device\\Harddisk83\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf14", BRACK(FH_SDCF | 14), "\\Device\\Harddisk83\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcf15", BRACK(FH_SDCF | 15), "\\Device\\Harddisk83\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg1", BRACK(FH_SDCG | 1), "\\Device\\Harddisk84\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg2", BRACK(FH_SDCG | 2), "\\Device\\Harddisk84\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg3", BRACK(FH_SDCG | 3), "\\Device\\Harddisk84\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg4", BRACK(FH_SDCG | 4), "\\Device\\Harddisk84\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg5", BRACK(FH_SDCG | 5), "\\Device\\Harddisk84\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg6", BRACK(FH_SDCG | 6), "\\Device\\Harddisk84\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg7", BRACK(FH_SDCG | 7), "\\Device\\Harddisk84\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg8", BRACK(FH_SDCG | 8), "\\Device\\Harddisk84\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg9", BRACK(FH_SDCG | 9), "\\Device\\Harddisk84\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg10", BRACK(FH_SDCG | 10), "\\Device\\Harddisk84\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg11", BRACK(FH_SDCG | 11), "\\Device\\Harddisk84\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg12", BRACK(FH_SDCG | 12), "\\Device\\Harddisk84\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg13", BRACK(FH_SDCG | 13), "\\Device\\Harddisk84\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg14", BRACK(FH_SDCG | 14), "\\Device\\Harddisk84\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcg15", BRACK(FH_SDCG | 15), "\\Device\\Harddisk84\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch1", BRACK(FH_SDCH | 1), "\\Device\\Harddisk85\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch2", BRACK(FH_SDCH | 2), "\\Device\\Harddisk85\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch3", BRACK(FH_SDCH | 3), "\\Device\\Harddisk85\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch4", BRACK(FH_SDCH | 4), "\\Device\\Harddisk85\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch5", BRACK(FH_SDCH | 5), "\\Device\\Harddisk85\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch6", BRACK(FH_SDCH | 6), "\\Device\\Harddisk85\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch7", BRACK(FH_SDCH | 7), "\\Device\\Harddisk85\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch8", BRACK(FH_SDCH | 8), "\\Device\\Harddisk85\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch9", BRACK(FH_SDCH | 9), "\\Device\\Harddisk85\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch10", BRACK(FH_SDCH | 10), "\\Device\\Harddisk85\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch11", BRACK(FH_SDCH | 11), "\\Device\\Harddisk85\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch12", BRACK(FH_SDCH | 12), "\\Device\\Harddisk85\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch13", BRACK(FH_SDCH | 13), "\\Device\\Harddisk85\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch14", BRACK(FH_SDCH | 14), "\\Device\\Harddisk85\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdch15", BRACK(FH_SDCH | 15), "\\Device\\Harddisk85\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci1", BRACK(FH_SDCI | 1), "\\Device\\Harddisk86\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci2", BRACK(FH_SDCI | 2), "\\Device\\Harddisk86\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci3", BRACK(FH_SDCI | 3), "\\Device\\Harddisk86\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci4", BRACK(FH_SDCI | 4), "\\Device\\Harddisk86\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci5", BRACK(FH_SDCI | 5), "\\Device\\Harddisk86\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci6", BRACK(FH_SDCI | 6), "\\Device\\Harddisk86\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci7", BRACK(FH_SDCI | 7), "\\Device\\Harddisk86\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci8", BRACK(FH_SDCI | 8), "\\Device\\Harddisk86\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci9", BRACK(FH_SDCI | 9), "\\Device\\Harddisk86\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci10", BRACK(FH_SDCI | 10), "\\Device\\Harddisk86\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci11", BRACK(FH_SDCI | 11), "\\Device\\Harddisk86\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci12", BRACK(FH_SDCI | 12), "\\Device\\Harddisk86\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci13", BRACK(FH_SDCI | 13), "\\Device\\Harddisk86\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci14", BRACK(FH_SDCI | 14), "\\Device\\Harddisk86\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdci15", BRACK(FH_SDCI | 15), "\\Device\\Harddisk86\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj1", BRACK(FH_SDCJ | 1), "\\Device\\Harddisk87\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj2", BRACK(FH_SDCJ | 2), "\\Device\\Harddisk87\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj3", BRACK(FH_SDCJ | 3), "\\Device\\Harddisk87\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj4", BRACK(FH_SDCJ | 4), "\\Device\\Harddisk87\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj5", BRACK(FH_SDCJ | 5), "\\Device\\Harddisk87\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj6", BRACK(FH_SDCJ | 6), "\\Device\\Harddisk87\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj7", BRACK(FH_SDCJ | 7), "\\Device\\Harddisk87\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj8", BRACK(FH_SDCJ | 8), "\\Device\\Harddisk87\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj9", BRACK(FH_SDCJ | 9), "\\Device\\Harddisk87\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj10", BRACK(FH_SDCJ | 10), "\\Device\\Harddisk87\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj11", BRACK(FH_SDCJ | 11), "\\Device\\Harddisk87\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj12", BRACK(FH_SDCJ | 12), "\\Device\\Harddisk87\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj13", BRACK(FH_SDCJ | 13), "\\Device\\Harddisk87\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj14", BRACK(FH_SDCJ | 14), "\\Device\\Harddisk87\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcj15", BRACK(FH_SDCJ | 15), "\\Device\\Harddisk87\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck1", BRACK(FH_SDCK | 1), "\\Device\\Harddisk88\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck2", BRACK(FH_SDCK | 2), "\\Device\\Harddisk88\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck3", BRACK(FH_SDCK | 3), "\\Device\\Harddisk88\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck4", BRACK(FH_SDCK | 4), "\\Device\\Harddisk88\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck5", BRACK(FH_SDCK | 5), "\\Device\\Harddisk88\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck6", BRACK(FH_SDCK | 6), "\\Device\\Harddisk88\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck7", BRACK(FH_SDCK | 7), "\\Device\\Harddisk88\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck8", BRACK(FH_SDCK | 8), "\\Device\\Harddisk88\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck9", BRACK(FH_SDCK | 9), "\\Device\\Harddisk88\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck10", BRACK(FH_SDCK | 10), "\\Device\\Harddisk88\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck11", BRACK(FH_SDCK | 11), "\\Device\\Harddisk88\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck12", BRACK(FH_SDCK | 12), "\\Device\\Harddisk88\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck13", BRACK(FH_SDCK | 13), "\\Device\\Harddisk88\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck14", BRACK(FH_SDCK | 14), "\\Device\\Harddisk88\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdck15", BRACK(FH_SDCK | 15), "\\Device\\Harddisk88\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl1", BRACK(FH_SDCL | 1), "\\Device\\Harddisk89\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl2", BRACK(FH_SDCL | 2), "\\Device\\Harddisk89\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl3", BRACK(FH_SDCL | 3), "\\Device\\Harddisk89\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl4", BRACK(FH_SDCL | 4), "\\Device\\Harddisk89\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl5", BRACK(FH_SDCL | 5), "\\Device\\Harddisk89\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl6", BRACK(FH_SDCL | 6), "\\Device\\Harddisk89\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl7", BRACK(FH_SDCL | 7), "\\Device\\Harddisk89\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl8", BRACK(FH_SDCL | 8), "\\Device\\Harddisk89\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl9", BRACK(FH_SDCL | 9), "\\Device\\Harddisk89\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl10", BRACK(FH_SDCL | 10), "\\Device\\Harddisk89\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl11", BRACK(FH_SDCL | 11), "\\Device\\Harddisk89\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl12", BRACK(FH_SDCL | 12), "\\Device\\Harddisk89\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl13", BRACK(FH_SDCL | 13), "\\Device\\Harddisk89\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl14", BRACK(FH_SDCL | 14), "\\Device\\Harddisk89\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcl15", BRACK(FH_SDCL | 15), "\\Device\\Harddisk89\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm1", BRACK(FH_SDCM | 1), "\\Device\\Harddisk90\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm2", BRACK(FH_SDCM | 2), "\\Device\\Harddisk90\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm3", BRACK(FH_SDCM | 3), "\\Device\\Harddisk90\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm4", BRACK(FH_SDCM | 4), "\\Device\\Harddisk90\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm5", BRACK(FH_SDCM | 5), "\\Device\\Harddisk90\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm6", BRACK(FH_SDCM | 6), "\\Device\\Harddisk90\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm7", BRACK(FH_SDCM | 7), "\\Device\\Harddisk90\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm8", BRACK(FH_SDCM | 8), "\\Device\\Harddisk90\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm9", BRACK(FH_SDCM | 9), "\\Device\\Harddisk90\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm10", BRACK(FH_SDCM | 10), "\\Device\\Harddisk90\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm11", BRACK(FH_SDCM | 11), "\\Device\\Harddisk90\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm12", BRACK(FH_SDCM | 12), "\\Device\\Harddisk90\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm13", BRACK(FH_SDCM | 13), "\\Device\\Harddisk90\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm14", BRACK(FH_SDCM | 14), "\\Device\\Harddisk90\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcm15", BRACK(FH_SDCM | 15), "\\Device\\Harddisk90\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn1", BRACK(FH_SDCN | 1), "\\Device\\Harddisk91\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn2", BRACK(FH_SDCN | 2), "\\Device\\Harddisk91\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn3", BRACK(FH_SDCN | 3), "\\Device\\Harddisk91\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn4", BRACK(FH_SDCN | 4), "\\Device\\Harddisk91\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn5", BRACK(FH_SDCN | 5), "\\Device\\Harddisk91\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn6", BRACK(FH_SDCN | 6), "\\Device\\Harddisk91\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn7", BRACK(FH_SDCN | 7), "\\Device\\Harddisk91\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn8", BRACK(FH_SDCN | 8), "\\Device\\Harddisk91\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn9", BRACK(FH_SDCN | 9), "\\Device\\Harddisk91\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn10", BRACK(FH_SDCN | 10), "\\Device\\Harddisk91\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn11", BRACK(FH_SDCN | 11), "\\Device\\Harddisk91\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn12", BRACK(FH_SDCN | 12), "\\Device\\Harddisk91\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn13", BRACK(FH_SDCN | 13), "\\Device\\Harddisk91\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn14", BRACK(FH_SDCN | 14), "\\Device\\Harddisk91\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcn15", BRACK(FH_SDCN | 15), "\\Device\\Harddisk91\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco1", BRACK(FH_SDCO | 1), "\\Device\\Harddisk92\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco2", BRACK(FH_SDCO | 2), "\\Device\\Harddisk92\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco3", BRACK(FH_SDCO | 3), "\\Device\\Harddisk92\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco4", BRACK(FH_SDCO | 4), "\\Device\\Harddisk92\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco5", BRACK(FH_SDCO | 5), "\\Device\\Harddisk92\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco6", BRACK(FH_SDCO | 6), "\\Device\\Harddisk92\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco7", BRACK(FH_SDCO | 7), "\\Device\\Harddisk92\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco8", BRACK(FH_SDCO | 8), "\\Device\\Harddisk92\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco9", BRACK(FH_SDCO | 9), "\\Device\\Harddisk92\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco10", BRACK(FH_SDCO | 10), "\\Device\\Harddisk92\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco11", BRACK(FH_SDCO | 11), "\\Device\\Harddisk92\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco12", BRACK(FH_SDCO | 12), "\\Device\\Harddisk92\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco13", BRACK(FH_SDCO | 13), "\\Device\\Harddisk92\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco14", BRACK(FH_SDCO | 14), "\\Device\\Harddisk92\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdco15", BRACK(FH_SDCO | 15), "\\Device\\Harddisk92\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp1", BRACK(FH_SDCP | 1), "\\Device\\Harddisk93\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp2", BRACK(FH_SDCP | 2), "\\Device\\Harddisk93\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp3", BRACK(FH_SDCP | 3), "\\Device\\Harddisk93\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp4", BRACK(FH_SDCP | 4), "\\Device\\Harddisk93\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp5", BRACK(FH_SDCP | 5), "\\Device\\Harddisk93\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp6", BRACK(FH_SDCP | 6), "\\Device\\Harddisk93\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp7", BRACK(FH_SDCP | 7), "\\Device\\Harddisk93\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp8", BRACK(FH_SDCP | 8), "\\Device\\Harddisk93\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp9", BRACK(FH_SDCP | 9), "\\Device\\Harddisk93\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp10", BRACK(FH_SDCP | 10), "\\Device\\Harddisk93\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp11", BRACK(FH_SDCP | 11), "\\Device\\Harddisk93\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp12", BRACK(FH_SDCP | 12), "\\Device\\Harddisk93\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp13", BRACK(FH_SDCP | 13), "\\Device\\Harddisk93\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp14", BRACK(FH_SDCP | 14), "\\Device\\Harddisk93\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcp15", BRACK(FH_SDCP | 15), "\\Device\\Harddisk93\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq1", BRACK(FH_SDCQ | 1), "\\Device\\Harddisk94\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq2", BRACK(FH_SDCQ | 2), "\\Device\\Harddisk94\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq3", BRACK(FH_SDCQ | 3), "\\Device\\Harddisk94\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq4", BRACK(FH_SDCQ | 4), "\\Device\\Harddisk94\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq5", BRACK(FH_SDCQ | 5), "\\Device\\Harddisk94\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq6", BRACK(FH_SDCQ | 6), "\\Device\\Harddisk94\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq7", BRACK(FH_SDCQ | 7), "\\Device\\Harddisk94\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq8", BRACK(FH_SDCQ | 8), "\\Device\\Harddisk94\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq9", BRACK(FH_SDCQ | 9), "\\Device\\Harddisk94\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq10", BRACK(FH_SDCQ | 10), "\\Device\\Harddisk94\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq11", BRACK(FH_SDCQ | 11), "\\Device\\Harddisk94\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq12", BRACK(FH_SDCQ | 12), "\\Device\\Harddisk94\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq13", BRACK(FH_SDCQ | 13), "\\Device\\Harddisk94\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq14", BRACK(FH_SDCQ | 14), "\\Device\\Harddisk94\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcq15", BRACK(FH_SDCQ | 15), "\\Device\\Harddisk94\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr1", BRACK(FH_SDCR | 1), "\\Device\\Harddisk95\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr2", BRACK(FH_SDCR | 2), "\\Device\\Harddisk95\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr3", BRACK(FH_SDCR | 3), "\\Device\\Harddisk95\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr4", BRACK(FH_SDCR | 4), "\\Device\\Harddisk95\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr5", BRACK(FH_SDCR | 5), "\\Device\\Harddisk95\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr6", BRACK(FH_SDCR | 6), "\\Device\\Harddisk95\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr7", BRACK(FH_SDCR | 7), "\\Device\\Harddisk95\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr8", BRACK(FH_SDCR | 8), "\\Device\\Harddisk95\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr9", BRACK(FH_SDCR | 9), "\\Device\\Harddisk95\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr10", BRACK(FH_SDCR | 10), "\\Device\\Harddisk95\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr11", BRACK(FH_SDCR | 11), "\\Device\\Harddisk95\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr12", BRACK(FH_SDCR | 12), "\\Device\\Harddisk95\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr13", BRACK(FH_SDCR | 13), "\\Device\\Harddisk95\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr14", BRACK(FH_SDCR | 14), "\\Device\\Harddisk95\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcr15", BRACK(FH_SDCR | 15), "\\Device\\Harddisk95\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs1", BRACK(FH_SDCS | 1), "\\Device\\Harddisk96\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs2", BRACK(FH_SDCS | 2), "\\Device\\Harddisk96\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs3", BRACK(FH_SDCS | 3), "\\Device\\Harddisk96\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs4", BRACK(FH_SDCS | 4), "\\Device\\Harddisk96\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs5", BRACK(FH_SDCS | 5), "\\Device\\Harddisk96\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs6", BRACK(FH_SDCS | 6), "\\Device\\Harddisk96\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs7", BRACK(FH_SDCS | 7), "\\Device\\Harddisk96\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs8", BRACK(FH_SDCS | 8), "\\Device\\Harddisk96\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs9", BRACK(FH_SDCS | 9), "\\Device\\Harddisk96\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs10", BRACK(FH_SDCS | 10), "\\Device\\Harddisk96\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs11", BRACK(FH_SDCS | 11), "\\Device\\Harddisk96\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs12", BRACK(FH_SDCS | 12), "\\Device\\Harddisk96\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs13", BRACK(FH_SDCS | 13), "\\Device\\Harddisk96\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs14", BRACK(FH_SDCS | 14), "\\Device\\Harddisk96\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcs15", BRACK(FH_SDCS | 15), "\\Device\\Harddisk96\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct1", BRACK(FH_SDCT | 1), "\\Device\\Harddisk97\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct2", BRACK(FH_SDCT | 2), "\\Device\\Harddisk97\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct3", BRACK(FH_SDCT | 3), "\\Device\\Harddisk97\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct4", BRACK(FH_SDCT | 4), "\\Device\\Harddisk97\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct5", BRACK(FH_SDCT | 5), "\\Device\\Harddisk97\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct6", BRACK(FH_SDCT | 6), "\\Device\\Harddisk97\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct7", BRACK(FH_SDCT | 7), "\\Device\\Harddisk97\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct8", BRACK(FH_SDCT | 8), "\\Device\\Harddisk97\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct9", BRACK(FH_SDCT | 9), "\\Device\\Harddisk97\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct10", BRACK(FH_SDCT | 10), "\\Device\\Harddisk97\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct11", BRACK(FH_SDCT | 11), "\\Device\\Harddisk97\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct12", BRACK(FH_SDCT | 12), "\\Device\\Harddisk97\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct13", BRACK(FH_SDCT | 13), "\\Device\\Harddisk97\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct14", BRACK(FH_SDCT | 14), "\\Device\\Harddisk97\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdct15", BRACK(FH_SDCT | 15), "\\Device\\Harddisk97\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu1", BRACK(FH_SDCU | 1), "\\Device\\Harddisk98\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu2", BRACK(FH_SDCU | 2), "\\Device\\Harddisk98\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu3", BRACK(FH_SDCU | 3), "\\Device\\Harddisk98\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu4", BRACK(FH_SDCU | 4), "\\Device\\Harddisk98\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu5", BRACK(FH_SDCU | 5), "\\Device\\Harddisk98\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu6", BRACK(FH_SDCU | 6), "\\Device\\Harddisk98\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu7", BRACK(FH_SDCU | 7), "\\Device\\Harddisk98\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu8", BRACK(FH_SDCU | 8), "\\Device\\Harddisk98\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu9", BRACK(FH_SDCU | 9), "\\Device\\Harddisk98\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu10", BRACK(FH_SDCU | 10), "\\Device\\Harddisk98\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu11", BRACK(FH_SDCU | 11), "\\Device\\Harddisk98\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu12", BRACK(FH_SDCU | 12), "\\Device\\Harddisk98\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu13", BRACK(FH_SDCU | 13), "\\Device\\Harddisk98\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu14", BRACK(FH_SDCU | 14), "\\Device\\Harddisk98\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcu15", BRACK(FH_SDCU | 15), "\\Device\\Harddisk98\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv1", BRACK(FH_SDCV | 1), "\\Device\\Harddisk99\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv2", BRACK(FH_SDCV | 2), "\\Device\\Harddisk99\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv3", BRACK(FH_SDCV | 3), "\\Device\\Harddisk99\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv4", BRACK(FH_SDCV | 4), "\\Device\\Harddisk99\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv5", BRACK(FH_SDCV | 5), "\\Device\\Harddisk99\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv6", BRACK(FH_SDCV | 6), "\\Device\\Harddisk99\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv7", BRACK(FH_SDCV | 7), "\\Device\\Harddisk99\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv8", BRACK(FH_SDCV | 8), "\\Device\\Harddisk99\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv9", BRACK(FH_SDCV | 9), "\\Device\\Harddisk99\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv10", BRACK(FH_SDCV | 10), "\\Device\\Harddisk99\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv11", BRACK(FH_SDCV | 11), "\\Device\\Harddisk99\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv12", BRACK(FH_SDCV | 12), "\\Device\\Harddisk99\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv13", BRACK(FH_SDCV | 13), "\\Device\\Harddisk99\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv14", BRACK(FH_SDCV | 14), "\\Device\\Harddisk99\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcv15", BRACK(FH_SDCV | 15), "\\Device\\Harddisk99\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw1", BRACK(FH_SDCW | 1), "\\Device\\Harddisk100\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw2", BRACK(FH_SDCW | 2), "\\Device\\Harddisk100\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw3", BRACK(FH_SDCW | 3), "\\Device\\Harddisk100\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw4", BRACK(FH_SDCW | 4), "\\Device\\Harddisk100\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw5", BRACK(FH_SDCW | 5), "\\Device\\Harddisk100\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw6", BRACK(FH_SDCW | 6), "\\Device\\Harddisk100\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw7", BRACK(FH_SDCW | 7), "\\Device\\Harddisk100\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw8", BRACK(FH_SDCW | 8), "\\Device\\Harddisk100\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw9", BRACK(FH_SDCW | 9), "\\Device\\Harddisk100\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw10", BRACK(FH_SDCW | 10), "\\Device\\Harddisk100\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw11", BRACK(FH_SDCW | 11), "\\Device\\Harddisk100\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw12", BRACK(FH_SDCW | 12), "\\Device\\Harddisk100\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw13", BRACK(FH_SDCW | 13), "\\Device\\Harddisk100\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw14", BRACK(FH_SDCW | 14), "\\Device\\Harddisk100\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcw15", BRACK(FH_SDCW | 15), "\\Device\\Harddisk100\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx1", BRACK(FH_SDCX | 1), "\\Device\\Harddisk101\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx2", BRACK(FH_SDCX | 2), "\\Device\\Harddisk101\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx3", BRACK(FH_SDCX | 3), "\\Device\\Harddisk101\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx4", BRACK(FH_SDCX | 4), "\\Device\\Harddisk101\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx5", BRACK(FH_SDCX | 5), "\\Device\\Harddisk101\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx6", BRACK(FH_SDCX | 6), "\\Device\\Harddisk101\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx7", BRACK(FH_SDCX | 7), "\\Device\\Harddisk101\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx8", BRACK(FH_SDCX | 8), "\\Device\\Harddisk101\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx9", BRACK(FH_SDCX | 9), "\\Device\\Harddisk101\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx10", BRACK(FH_SDCX | 10), "\\Device\\Harddisk101\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx11", BRACK(FH_SDCX | 11), "\\Device\\Harddisk101\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx12", BRACK(FH_SDCX | 12), "\\Device\\Harddisk101\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx13", BRACK(FH_SDCX | 13), "\\Device\\Harddisk101\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx14", BRACK(FH_SDCX | 14), "\\Device\\Harddisk101\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcx15", BRACK(FH_SDCX | 15), "\\Device\\Harddisk101\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy1", BRACK(FH_SDCY | 1), "\\Device\\Harddisk102\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy2", BRACK(FH_SDCY | 2), "\\Device\\Harddisk102\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy3", BRACK(FH_SDCY | 3), "\\Device\\Harddisk102\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy4", BRACK(FH_SDCY | 4), "\\Device\\Harddisk102\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy5", BRACK(FH_SDCY | 5), "\\Device\\Harddisk102\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy6", BRACK(FH_SDCY | 6), "\\Device\\Harddisk102\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy7", BRACK(FH_SDCY | 7), "\\Device\\Harddisk102\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy8", BRACK(FH_SDCY | 8), "\\Device\\Harddisk102\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy9", BRACK(FH_SDCY | 9), "\\Device\\Harddisk102\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy10", BRACK(FH_SDCY | 10), "\\Device\\Harddisk102\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy11", BRACK(FH_SDCY | 11), "\\Device\\Harddisk102\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy12", BRACK(FH_SDCY | 12), "\\Device\\Harddisk102\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy13", BRACK(FH_SDCY | 13), "\\Device\\Harddisk102\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy14", BRACK(FH_SDCY | 14), "\\Device\\Harddisk102\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcy15", BRACK(FH_SDCY | 15), "\\Device\\Harddisk102\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz1", BRACK(FH_SDCZ | 1), "\\Device\\Harddisk103\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz2", BRACK(FH_SDCZ | 2), "\\Device\\Harddisk103\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz3", BRACK(FH_SDCZ | 3), "\\Device\\Harddisk103\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz4", BRACK(FH_SDCZ | 4), "\\Device\\Harddisk103\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz5", BRACK(FH_SDCZ | 5), "\\Device\\Harddisk103\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz6", BRACK(FH_SDCZ | 6), "\\Device\\Harddisk103\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz7", BRACK(FH_SDCZ | 7), "\\Device\\Harddisk103\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz8", BRACK(FH_SDCZ | 8), "\\Device\\Harddisk103\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz9", BRACK(FH_SDCZ | 9), "\\Device\\Harddisk103\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz10", BRACK(FH_SDCZ | 10), "\\Device\\Harddisk103\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz11", BRACK(FH_SDCZ | 11), "\\Device\\Harddisk103\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz12", BRACK(FH_SDCZ | 12), "\\Device\\Harddisk103\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz13", BRACK(FH_SDCZ | 13), "\\Device\\Harddisk103\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz14", BRACK(FH_SDCZ | 14), "\\Device\\Harddisk103\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdcz15", BRACK(FH_SDCZ | 15), "\\Device\\Harddisk103\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda", BRACK(FH_SDDA), "\\Device\\Harddisk104\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb", BRACK(FH_SDDB), "\\Device\\Harddisk105\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc", BRACK(FH_SDDC), "\\Device\\Harddisk106\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd", BRACK(FH_SDDD), "\\Device\\Harddisk107\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde", BRACK(FH_SDDE), "\\Device\\Harddisk108\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf", BRACK(FH_SDDF), "\\Device\\Harddisk109\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg", BRACK(FH_SDDG), "\\Device\\Harddisk110\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh", BRACK(FH_SDDH), "\\Device\\Harddisk111\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi", BRACK(FH_SDDI), "\\Device\\Harddisk112\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj", BRACK(FH_SDDJ), "\\Device\\Harddisk113\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk", BRACK(FH_SDDK), "\\Device\\Harddisk114\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl", BRACK(FH_SDDL), "\\Device\\Harddisk115\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm", BRACK(FH_SDDM), "\\Device\\Harddisk116\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn", BRACK(FH_SDDN), "\\Device\\Harddisk117\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo", BRACK(FH_SDDO), "\\Device\\Harddisk118\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp", BRACK(FH_SDDP), "\\Device\\Harddisk119\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq", BRACK(FH_SDDQ), "\\Device\\Harddisk120\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr", BRACK(FH_SDDR), "\\Device\\Harddisk121\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds", BRACK(FH_SDDS), "\\Device\\Harddisk122\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt", BRACK(FH_SDDT), "\\Device\\Harddisk123\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu", BRACK(FH_SDDU), "\\Device\\Harddisk124\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv", BRACK(FH_SDDV), "\\Device\\Harddisk125\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw", BRACK(FH_SDDW), "\\Device\\Harddisk126\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx", BRACK(FH_SDDX), "\\Device\\Harddisk127\\Partition0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda1", BRACK(FH_SDDA | 1), "\\Device\\Harddisk104\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda2", BRACK(FH_SDDA | 2), "\\Device\\Harddisk104\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda3", BRACK(FH_SDDA | 3), "\\Device\\Harddisk104\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda4", BRACK(FH_SDDA | 4), "\\Device\\Harddisk104\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda5", BRACK(FH_SDDA | 5), "\\Device\\Harddisk104\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda6", BRACK(FH_SDDA | 6), "\\Device\\Harddisk104\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda7", BRACK(FH_SDDA | 7), "\\Device\\Harddisk104\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda8", BRACK(FH_SDDA | 8), "\\Device\\Harddisk104\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda9", BRACK(FH_SDDA | 9), "\\Device\\Harddisk104\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda10", BRACK(FH_SDDA | 10), "\\Device\\Harddisk104\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda11", BRACK(FH_SDDA | 11), "\\Device\\Harddisk104\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda12", BRACK(FH_SDDA | 12), "\\Device\\Harddisk104\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda13", BRACK(FH_SDDA | 13), "\\Device\\Harddisk104\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda14", BRACK(FH_SDDA | 14), "\\Device\\Harddisk104\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdda15", BRACK(FH_SDDA | 15), "\\Device\\Harddisk104\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb1", BRACK(FH_SDDB | 1), "\\Device\\Harddisk105\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb2", BRACK(FH_SDDB | 2), "\\Device\\Harddisk105\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb3", BRACK(FH_SDDB | 3), "\\Device\\Harddisk105\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb4", BRACK(FH_SDDB | 4), "\\Device\\Harddisk105\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb5", BRACK(FH_SDDB | 5), "\\Device\\Harddisk105\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb6", BRACK(FH_SDDB | 6), "\\Device\\Harddisk105\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb7", BRACK(FH_SDDB | 7), "\\Device\\Harddisk105\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb8", BRACK(FH_SDDB | 8), "\\Device\\Harddisk105\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb9", BRACK(FH_SDDB | 9), "\\Device\\Harddisk105\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb10", BRACK(FH_SDDB | 10), "\\Device\\Harddisk105\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb11", BRACK(FH_SDDB | 11), "\\Device\\Harddisk105\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb12", BRACK(FH_SDDB | 12), "\\Device\\Harddisk105\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb13", BRACK(FH_SDDB | 13), "\\Device\\Harddisk105\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb14", BRACK(FH_SDDB | 14), "\\Device\\Harddisk105\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddb15", BRACK(FH_SDDB | 15), "\\Device\\Harddisk105\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc1", BRACK(FH_SDDC | 1), "\\Device\\Harddisk106\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc2", BRACK(FH_SDDC | 2), "\\Device\\Harddisk106\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc3", BRACK(FH_SDDC | 3), "\\Device\\Harddisk106\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc4", BRACK(FH_SDDC | 4), "\\Device\\Harddisk106\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc5", BRACK(FH_SDDC | 5), "\\Device\\Harddisk106\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc6", BRACK(FH_SDDC | 6), "\\Device\\Harddisk106\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc7", BRACK(FH_SDDC | 7), "\\Device\\Harddisk106\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc8", BRACK(FH_SDDC | 8), "\\Device\\Harddisk106\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc9", BRACK(FH_SDDC | 9), "\\Device\\Harddisk106\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc10", BRACK(FH_SDDC | 10), "\\Device\\Harddisk106\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc11", BRACK(FH_SDDC | 11), "\\Device\\Harddisk106\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc12", BRACK(FH_SDDC | 12), "\\Device\\Harddisk106\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc13", BRACK(FH_SDDC | 13), "\\Device\\Harddisk106\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc14", BRACK(FH_SDDC | 14), "\\Device\\Harddisk106\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddc15", BRACK(FH_SDDC | 15), "\\Device\\Harddisk106\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd1", BRACK(FH_SDDD | 1), "\\Device\\Harddisk107\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd2", BRACK(FH_SDDD | 2), "\\Device\\Harddisk107\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd3", BRACK(FH_SDDD | 3), "\\Device\\Harddisk107\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd4", BRACK(FH_SDDD | 4), "\\Device\\Harddisk107\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd5", BRACK(FH_SDDD | 5), "\\Device\\Harddisk107\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd6", BRACK(FH_SDDD | 6), "\\Device\\Harddisk107\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd7", BRACK(FH_SDDD | 7), "\\Device\\Harddisk107\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd8", BRACK(FH_SDDD | 8), "\\Device\\Harddisk107\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd9", BRACK(FH_SDDD | 9), "\\Device\\Harddisk107\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd10", BRACK(FH_SDDD | 10), "\\Device\\Harddisk107\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd11", BRACK(FH_SDDD | 11), "\\Device\\Harddisk107\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd12", BRACK(FH_SDDD | 12), "\\Device\\Harddisk107\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd13", BRACK(FH_SDDD | 13), "\\Device\\Harddisk107\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd14", BRACK(FH_SDDD | 14), "\\Device\\Harddisk107\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddd15", BRACK(FH_SDDD | 15), "\\Device\\Harddisk107\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde1", BRACK(FH_SDDE | 1), "\\Device\\Harddisk108\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde2", BRACK(FH_SDDE | 2), "\\Device\\Harddisk108\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde3", BRACK(FH_SDDE | 3), "\\Device\\Harddisk108\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde4", BRACK(FH_SDDE | 4), "\\Device\\Harddisk108\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde5", BRACK(FH_SDDE | 5), "\\Device\\Harddisk108\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde6", BRACK(FH_SDDE | 6), "\\Device\\Harddisk108\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde7", BRACK(FH_SDDE | 7), "\\Device\\Harddisk108\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde8", BRACK(FH_SDDE | 8), "\\Device\\Harddisk108\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde9", BRACK(FH_SDDE | 9), "\\Device\\Harddisk108\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde10", BRACK(FH_SDDE | 10), "\\Device\\Harddisk108\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde11", BRACK(FH_SDDE | 11), "\\Device\\Harddisk108\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde12", BRACK(FH_SDDE | 12), "\\Device\\Harddisk108\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde13", BRACK(FH_SDDE | 13), "\\Device\\Harddisk108\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde14", BRACK(FH_SDDE | 14), "\\Device\\Harddisk108\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdde15", BRACK(FH_SDDE | 15), "\\Device\\Harddisk108\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf1", BRACK(FH_SDDF | 1), "\\Device\\Harddisk109\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf2", BRACK(FH_SDDF | 2), "\\Device\\Harddisk109\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf3", BRACK(FH_SDDF | 3), "\\Device\\Harddisk109\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf4", BRACK(FH_SDDF | 4), "\\Device\\Harddisk109\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf5", BRACK(FH_SDDF | 5), "\\Device\\Harddisk109\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf6", BRACK(FH_SDDF | 6), "\\Device\\Harddisk109\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf7", BRACK(FH_SDDF | 7), "\\Device\\Harddisk109\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf8", BRACK(FH_SDDF | 8), "\\Device\\Harddisk109\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf9", BRACK(FH_SDDF | 9), "\\Device\\Harddisk109\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf10", BRACK(FH_SDDF | 10), "\\Device\\Harddisk109\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf11", BRACK(FH_SDDF | 11), "\\Device\\Harddisk109\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf12", BRACK(FH_SDDF | 12), "\\Device\\Harddisk109\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf13", BRACK(FH_SDDF | 13), "\\Device\\Harddisk109\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf14", BRACK(FH_SDDF | 14), "\\Device\\Harddisk109\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddf15", BRACK(FH_SDDF | 15), "\\Device\\Harddisk109\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg1", BRACK(FH_SDDG | 1), "\\Device\\Harddisk110\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg2", BRACK(FH_SDDG | 2), "\\Device\\Harddisk110\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg3", BRACK(FH_SDDG | 3), "\\Device\\Harddisk110\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg4", BRACK(FH_SDDG | 4), "\\Device\\Harddisk110\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg5", BRACK(FH_SDDG | 5), "\\Device\\Harddisk110\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg6", BRACK(FH_SDDG | 6), "\\Device\\Harddisk110\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg7", BRACK(FH_SDDG | 7), "\\Device\\Harddisk110\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg8", BRACK(FH_SDDG | 8), "\\Device\\Harddisk110\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg9", BRACK(FH_SDDG | 9), "\\Device\\Harddisk110\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg10", BRACK(FH_SDDG | 10), "\\Device\\Harddisk110\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg11", BRACK(FH_SDDG | 11), "\\Device\\Harddisk110\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg12", BRACK(FH_SDDG | 12), "\\Device\\Harddisk110\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg13", BRACK(FH_SDDG | 13), "\\Device\\Harddisk110\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg14", BRACK(FH_SDDG | 14), "\\Device\\Harddisk110\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddg15", BRACK(FH_SDDG | 15), "\\Device\\Harddisk110\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh1", BRACK(FH_SDDH | 1), "\\Device\\Harddisk111\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh2", BRACK(FH_SDDH | 2), "\\Device\\Harddisk111\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh3", BRACK(FH_SDDH | 3), "\\Device\\Harddisk111\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh4", BRACK(FH_SDDH | 4), "\\Device\\Harddisk111\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh5", BRACK(FH_SDDH | 5), "\\Device\\Harddisk111\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh6", BRACK(FH_SDDH | 6), "\\Device\\Harddisk111\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh7", BRACK(FH_SDDH | 7), "\\Device\\Harddisk111\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh8", BRACK(FH_SDDH | 8), "\\Device\\Harddisk111\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh9", BRACK(FH_SDDH | 9), "\\Device\\Harddisk111\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh10", BRACK(FH_SDDH | 10), "\\Device\\Harddisk111\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh11", BRACK(FH_SDDH | 11), "\\Device\\Harddisk111\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh12", BRACK(FH_SDDH | 12), "\\Device\\Harddisk111\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh13", BRACK(FH_SDDH | 13), "\\Device\\Harddisk111\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh14", BRACK(FH_SDDH | 14), "\\Device\\Harddisk111\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddh15", BRACK(FH_SDDH | 15), "\\Device\\Harddisk111\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi1", BRACK(FH_SDDI | 1), "\\Device\\Harddisk112\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi2", BRACK(FH_SDDI | 2), "\\Device\\Harddisk112\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi3", BRACK(FH_SDDI | 3), "\\Device\\Harddisk112\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi4", BRACK(FH_SDDI | 4), "\\Device\\Harddisk112\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi5", BRACK(FH_SDDI | 5), "\\Device\\Harddisk112\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi6", BRACK(FH_SDDI | 6), "\\Device\\Harddisk112\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi7", BRACK(FH_SDDI | 7), "\\Device\\Harddisk112\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi8", BRACK(FH_SDDI | 8), "\\Device\\Harddisk112\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi9", BRACK(FH_SDDI | 9), "\\Device\\Harddisk112\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi10", BRACK(FH_SDDI | 10), "\\Device\\Harddisk112\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi11", BRACK(FH_SDDI | 11), "\\Device\\Harddisk112\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi12", BRACK(FH_SDDI | 12), "\\Device\\Harddisk112\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi13", BRACK(FH_SDDI | 13), "\\Device\\Harddisk112\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi14", BRACK(FH_SDDI | 14), "\\Device\\Harddisk112\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddi15", BRACK(FH_SDDI | 15), "\\Device\\Harddisk112\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj1", BRACK(FH_SDDJ | 1), "\\Device\\Harddisk113\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj2", BRACK(FH_SDDJ | 2), "\\Device\\Harddisk113\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj3", BRACK(FH_SDDJ | 3), "\\Device\\Harddisk113\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj4", BRACK(FH_SDDJ | 4), "\\Device\\Harddisk113\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj5", BRACK(FH_SDDJ | 5), "\\Device\\Harddisk113\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj6", BRACK(FH_SDDJ | 6), "\\Device\\Harddisk113\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj7", BRACK(FH_SDDJ | 7), "\\Device\\Harddisk113\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj8", BRACK(FH_SDDJ | 8), "\\Device\\Harddisk113\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj9", BRACK(FH_SDDJ | 9), "\\Device\\Harddisk113\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj10", BRACK(FH_SDDJ | 10), "\\Device\\Harddisk113\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj11", BRACK(FH_SDDJ | 11), "\\Device\\Harddisk113\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj12", BRACK(FH_SDDJ | 12), "\\Device\\Harddisk113\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj13", BRACK(FH_SDDJ | 13), "\\Device\\Harddisk113\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj14", BRACK(FH_SDDJ | 14), "\\Device\\Harddisk113\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddj15", BRACK(FH_SDDJ | 15), "\\Device\\Harddisk113\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk1", BRACK(FH_SDDK | 1), "\\Device\\Harddisk114\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk2", BRACK(FH_SDDK | 2), "\\Device\\Harddisk114\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk3", BRACK(FH_SDDK | 3), "\\Device\\Harddisk114\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk4", BRACK(FH_SDDK | 4), "\\Device\\Harddisk114\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk5", BRACK(FH_SDDK | 5), "\\Device\\Harddisk114\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk6", BRACK(FH_SDDK | 6), "\\Device\\Harddisk114\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk7", BRACK(FH_SDDK | 7), "\\Device\\Harddisk114\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk8", BRACK(FH_SDDK | 8), "\\Device\\Harddisk114\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk9", BRACK(FH_SDDK | 9), "\\Device\\Harddisk114\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk10", BRACK(FH_SDDK | 10), "\\Device\\Harddisk114\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk11", BRACK(FH_SDDK | 11), "\\Device\\Harddisk114\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk12", BRACK(FH_SDDK | 12), "\\Device\\Harddisk114\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk13", BRACK(FH_SDDK | 13), "\\Device\\Harddisk114\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk14", BRACK(FH_SDDK | 14), "\\Device\\Harddisk114\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddk15", BRACK(FH_SDDK | 15), "\\Device\\Harddisk114\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl1", BRACK(FH_SDDL | 1), "\\Device\\Harddisk115\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl2", BRACK(FH_SDDL | 2), "\\Device\\Harddisk115\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl3", BRACK(FH_SDDL | 3), "\\Device\\Harddisk115\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl4", BRACK(FH_SDDL | 4), "\\Device\\Harddisk115\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl5", BRACK(FH_SDDL | 5), "\\Device\\Harddisk115\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl6", BRACK(FH_SDDL | 6), "\\Device\\Harddisk115\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl7", BRACK(FH_SDDL | 7), "\\Device\\Harddisk115\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl8", BRACK(FH_SDDL | 8), "\\Device\\Harddisk115\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl9", BRACK(FH_SDDL | 9), "\\Device\\Harddisk115\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl10", BRACK(FH_SDDL | 10), "\\Device\\Harddisk115\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl11", BRACK(FH_SDDL | 11), "\\Device\\Harddisk115\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl12", BRACK(FH_SDDL | 12), "\\Device\\Harddisk115\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl13", BRACK(FH_SDDL | 13), "\\Device\\Harddisk115\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl14", BRACK(FH_SDDL | 14), "\\Device\\Harddisk115\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddl15", BRACK(FH_SDDL | 15), "\\Device\\Harddisk115\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm1", BRACK(FH_SDDM | 1), "\\Device\\Harddisk116\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm2", BRACK(FH_SDDM | 2), "\\Device\\Harddisk116\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm3", BRACK(FH_SDDM | 3), "\\Device\\Harddisk116\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm4", BRACK(FH_SDDM | 4), "\\Device\\Harddisk116\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm5", BRACK(FH_SDDM | 5), "\\Device\\Harddisk116\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm6", BRACK(FH_SDDM | 6), "\\Device\\Harddisk116\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm7", BRACK(FH_SDDM | 7), "\\Device\\Harddisk116\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm8", BRACK(FH_SDDM | 8), "\\Device\\Harddisk116\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm9", BRACK(FH_SDDM | 9), "\\Device\\Harddisk116\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm10", BRACK(FH_SDDM | 10), "\\Device\\Harddisk116\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm11", BRACK(FH_SDDM | 11), "\\Device\\Harddisk116\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm12", BRACK(FH_SDDM | 12), "\\Device\\Harddisk116\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm13", BRACK(FH_SDDM | 13), "\\Device\\Harddisk116\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm14", BRACK(FH_SDDM | 14), "\\Device\\Harddisk116\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddm15", BRACK(FH_SDDM | 15), "\\Device\\Harddisk116\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn1", BRACK(FH_SDDN | 1), "\\Device\\Harddisk117\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn2", BRACK(FH_SDDN | 2), "\\Device\\Harddisk117\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn3", BRACK(FH_SDDN | 3), "\\Device\\Harddisk117\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn4", BRACK(FH_SDDN | 4), "\\Device\\Harddisk117\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn5", BRACK(FH_SDDN | 5), "\\Device\\Harddisk117\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn6", BRACK(FH_SDDN | 6), "\\Device\\Harddisk117\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn7", BRACK(FH_SDDN | 7), "\\Device\\Harddisk117\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn8", BRACK(FH_SDDN | 8), "\\Device\\Harddisk117\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn9", BRACK(FH_SDDN | 9), "\\Device\\Harddisk117\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn10", BRACK(FH_SDDN | 10), "\\Device\\Harddisk117\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn11", BRACK(FH_SDDN | 11), "\\Device\\Harddisk117\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn12", BRACK(FH_SDDN | 12), "\\Device\\Harddisk117\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn13", BRACK(FH_SDDN | 13), "\\Device\\Harddisk117\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn14", BRACK(FH_SDDN | 14), "\\Device\\Harddisk117\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddn15", BRACK(FH_SDDN | 15), "\\Device\\Harddisk117\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo1", BRACK(FH_SDDO | 1), "\\Device\\Harddisk118\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo2", BRACK(FH_SDDO | 2), "\\Device\\Harddisk118\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo3", BRACK(FH_SDDO | 3), "\\Device\\Harddisk118\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo4", BRACK(FH_SDDO | 4), "\\Device\\Harddisk118\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo5", BRACK(FH_SDDO | 5), "\\Device\\Harddisk118\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo6", BRACK(FH_SDDO | 6), "\\Device\\Harddisk118\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo7", BRACK(FH_SDDO | 7), "\\Device\\Harddisk118\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo8", BRACK(FH_SDDO | 8), "\\Device\\Harddisk118\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo9", BRACK(FH_SDDO | 9), "\\Device\\Harddisk118\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo10", BRACK(FH_SDDO | 10), "\\Device\\Harddisk118\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo11", BRACK(FH_SDDO | 11), "\\Device\\Harddisk118\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo12", BRACK(FH_SDDO | 12), "\\Device\\Harddisk118\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo13", BRACK(FH_SDDO | 13), "\\Device\\Harddisk118\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo14", BRACK(FH_SDDO | 14), "\\Device\\Harddisk118\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddo15", BRACK(FH_SDDO | 15), "\\Device\\Harddisk118\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp1", BRACK(FH_SDDP | 1), "\\Device\\Harddisk119\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp2", BRACK(FH_SDDP | 2), "\\Device\\Harddisk119\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp3", BRACK(FH_SDDP | 3), "\\Device\\Harddisk119\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp4", BRACK(FH_SDDP | 4), "\\Device\\Harddisk119\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp5", BRACK(FH_SDDP | 5), "\\Device\\Harddisk119\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp6", BRACK(FH_SDDP | 6), "\\Device\\Harddisk119\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp7", BRACK(FH_SDDP | 7), "\\Device\\Harddisk119\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp8", BRACK(FH_SDDP | 8), "\\Device\\Harddisk119\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp9", BRACK(FH_SDDP | 9), "\\Device\\Harddisk119\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp10", BRACK(FH_SDDP | 10), "\\Device\\Harddisk119\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp11", BRACK(FH_SDDP | 11), "\\Device\\Harddisk119\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp12", BRACK(FH_SDDP | 12), "\\Device\\Harddisk119\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp13", BRACK(FH_SDDP | 13), "\\Device\\Harddisk119\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp14", BRACK(FH_SDDP | 14), "\\Device\\Harddisk119\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddp15", BRACK(FH_SDDP | 15), "\\Device\\Harddisk119\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq1", BRACK(FH_SDDQ | 1), "\\Device\\Harddisk120\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq2", BRACK(FH_SDDQ | 2), "\\Device\\Harddisk120\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq3", BRACK(FH_SDDQ | 3), "\\Device\\Harddisk120\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq4", BRACK(FH_SDDQ | 4), "\\Device\\Harddisk120\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq5", BRACK(FH_SDDQ | 5), "\\Device\\Harddisk120\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq6", BRACK(FH_SDDQ | 6), "\\Device\\Harddisk120\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq7", BRACK(FH_SDDQ | 7), "\\Device\\Harddisk120\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq8", BRACK(FH_SDDQ | 8), "\\Device\\Harddisk120\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq9", BRACK(FH_SDDQ | 9), "\\Device\\Harddisk120\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq10", BRACK(FH_SDDQ | 10), "\\Device\\Harddisk120\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq11", BRACK(FH_SDDQ | 11), "\\Device\\Harddisk120\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq12", BRACK(FH_SDDQ | 12), "\\Device\\Harddisk120\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq13", BRACK(FH_SDDQ | 13), "\\Device\\Harddisk120\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq14", BRACK(FH_SDDQ | 14), "\\Device\\Harddisk120\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddq15", BRACK(FH_SDDQ | 15), "\\Device\\Harddisk120\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr1", BRACK(FH_SDDR | 1), "\\Device\\Harddisk121\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr2", BRACK(FH_SDDR | 2), "\\Device\\Harddisk121\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr3", BRACK(FH_SDDR | 3), "\\Device\\Harddisk121\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr4", BRACK(FH_SDDR | 4), "\\Device\\Harddisk121\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr5", BRACK(FH_SDDR | 5), "\\Device\\Harddisk121\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr6", BRACK(FH_SDDR | 6), "\\Device\\Harddisk121\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr7", BRACK(FH_SDDR | 7), "\\Device\\Harddisk121\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr8", BRACK(FH_SDDR | 8), "\\Device\\Harddisk121\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr9", BRACK(FH_SDDR | 9), "\\Device\\Harddisk121\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr10", BRACK(FH_SDDR | 10), "\\Device\\Harddisk121\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr11", BRACK(FH_SDDR | 11), "\\Device\\Harddisk121\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr12", BRACK(FH_SDDR | 12), "\\Device\\Harddisk121\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr13", BRACK(FH_SDDR | 13), "\\Device\\Harddisk121\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr14", BRACK(FH_SDDR | 14), "\\Device\\Harddisk121\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddr15", BRACK(FH_SDDR | 15), "\\Device\\Harddisk121\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds1", BRACK(FH_SDDS | 1), "\\Device\\Harddisk122\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds2", BRACK(FH_SDDS | 2), "\\Device\\Harddisk122\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds3", BRACK(FH_SDDS | 3), "\\Device\\Harddisk122\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds4", BRACK(FH_SDDS | 4), "\\Device\\Harddisk122\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds5", BRACK(FH_SDDS | 5), "\\Device\\Harddisk122\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds6", BRACK(FH_SDDS | 6), "\\Device\\Harddisk122\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds7", BRACK(FH_SDDS | 7), "\\Device\\Harddisk122\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds8", BRACK(FH_SDDS | 8), "\\Device\\Harddisk122\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds9", BRACK(FH_SDDS | 9), "\\Device\\Harddisk122\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds10", BRACK(FH_SDDS | 10), "\\Device\\Harddisk122\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds11", BRACK(FH_SDDS | 11), "\\Device\\Harddisk122\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds12", BRACK(FH_SDDS | 12), "\\Device\\Harddisk122\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds13", BRACK(FH_SDDS | 13), "\\Device\\Harddisk122\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds14", BRACK(FH_SDDS | 14), "\\Device\\Harddisk122\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sdds15", BRACK(FH_SDDS | 15), "\\Device\\Harddisk122\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt1", BRACK(FH_SDDT | 1), "\\Device\\Harddisk123\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt2", BRACK(FH_SDDT | 2), "\\Device\\Harddisk123\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt3", BRACK(FH_SDDT | 3), "\\Device\\Harddisk123\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt4", BRACK(FH_SDDT | 4), "\\Device\\Harddisk123\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt5", BRACK(FH_SDDT | 5), "\\Device\\Harddisk123\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt6", BRACK(FH_SDDT | 6), "\\Device\\Harddisk123\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt7", BRACK(FH_SDDT | 7), "\\Device\\Harddisk123\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt8", BRACK(FH_SDDT | 8), "\\Device\\Harddisk123\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt9", BRACK(FH_SDDT | 9), "\\Device\\Harddisk123\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt10", BRACK(FH_SDDT | 10), "\\Device\\Harddisk123\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt11", BRACK(FH_SDDT | 11), "\\Device\\Harddisk123\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt12", BRACK(FH_SDDT | 12), "\\Device\\Harddisk123\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt13", BRACK(FH_SDDT | 13), "\\Device\\Harddisk123\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt14", BRACK(FH_SDDT | 14), "\\Device\\Harddisk123\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddt15", BRACK(FH_SDDT | 15), "\\Device\\Harddisk123\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu1", BRACK(FH_SDDU | 1), "\\Device\\Harddisk124\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu2", BRACK(FH_SDDU | 2), "\\Device\\Harddisk124\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu3", BRACK(FH_SDDU | 3), "\\Device\\Harddisk124\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu4", BRACK(FH_SDDU | 4), "\\Device\\Harddisk124\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu5", BRACK(FH_SDDU | 5), "\\Device\\Harddisk124\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu6", BRACK(FH_SDDU | 6), "\\Device\\Harddisk124\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu7", BRACK(FH_SDDU | 7), "\\Device\\Harddisk124\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu8", BRACK(FH_SDDU | 8), "\\Device\\Harddisk124\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu9", BRACK(FH_SDDU | 9), "\\Device\\Harddisk124\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu10", BRACK(FH_SDDU | 10), "\\Device\\Harddisk124\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu11", BRACK(FH_SDDU | 11), "\\Device\\Harddisk124\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu12", BRACK(FH_SDDU | 12), "\\Device\\Harddisk124\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu13", BRACK(FH_SDDU | 13), "\\Device\\Harddisk124\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu14", BRACK(FH_SDDU | 14), "\\Device\\Harddisk124\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddu15", BRACK(FH_SDDU | 15), "\\Device\\Harddisk124\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv1", BRACK(FH_SDDV | 1), "\\Device\\Harddisk125\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv2", BRACK(FH_SDDV | 2), "\\Device\\Harddisk125\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv3", BRACK(FH_SDDV | 3), "\\Device\\Harddisk125\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv4", BRACK(FH_SDDV | 4), "\\Device\\Harddisk125\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv5", BRACK(FH_SDDV | 5), "\\Device\\Harddisk125\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv6", BRACK(FH_SDDV | 6), "\\Device\\Harddisk125\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv7", BRACK(FH_SDDV | 7), "\\Device\\Harddisk125\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv8", BRACK(FH_SDDV | 8), "\\Device\\Harddisk125\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv9", BRACK(FH_SDDV | 9), "\\Device\\Harddisk125\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv10", BRACK(FH_SDDV | 10), "\\Device\\Harddisk125\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv11", BRACK(FH_SDDV | 11), "\\Device\\Harddisk125\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv12", BRACK(FH_SDDV | 12), "\\Device\\Harddisk125\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv13", BRACK(FH_SDDV | 13), "\\Device\\Harddisk125\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv14", BRACK(FH_SDDV | 14), "\\Device\\Harddisk125\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddv15", BRACK(FH_SDDV | 15), "\\Device\\Harddisk125\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw1", BRACK(FH_SDDW | 1), "\\Device\\Harddisk126\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw2", BRACK(FH_SDDW | 2), "\\Device\\Harddisk126\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw3", BRACK(FH_SDDW | 3), "\\Device\\Harddisk126\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw4", BRACK(FH_SDDW | 4), "\\Device\\Harddisk126\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw5", BRACK(FH_SDDW | 5), "\\Device\\Harddisk126\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw6", BRACK(FH_SDDW | 6), "\\Device\\Harddisk126\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw7", BRACK(FH_SDDW | 7), "\\Device\\Harddisk126\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw8", BRACK(FH_SDDW | 8), "\\Device\\Harddisk126\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw9", BRACK(FH_SDDW | 9), "\\Device\\Harddisk126\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw10", BRACK(FH_SDDW | 10), "\\Device\\Harddisk126\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw11", BRACK(FH_SDDW | 11), "\\Device\\Harddisk126\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw12", BRACK(FH_SDDW | 12), "\\Device\\Harddisk126\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw13", BRACK(FH_SDDW | 13), "\\Device\\Harddisk126\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw14", BRACK(FH_SDDW | 14), "\\Device\\Harddisk126\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddw15", BRACK(FH_SDDW | 15), "\\Device\\Harddisk126\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx1", BRACK(FH_SDDX | 1), "\\Device\\Harddisk127\\Partition1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx2", BRACK(FH_SDDX | 2), "\\Device\\Harddisk127\\Partition2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx3", BRACK(FH_SDDX | 3), "\\Device\\Harddisk127\\Partition3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx4", BRACK(FH_SDDX | 4), "\\Device\\Harddisk127\\Partition4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx5", BRACK(FH_SDDX | 5), "\\Device\\Harddisk127\\Partition5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx6", BRACK(FH_SDDX | 6), "\\Device\\Harddisk127\\Partition6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx7", BRACK(FH_SDDX | 7), "\\Device\\Harddisk127\\Partition7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx8", BRACK(FH_SDDX | 8), "\\Device\\Harddisk127\\Partition8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx9", BRACK(FH_SDDX | 9), "\\Device\\Harddisk127\\Partition9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx10", BRACK(FH_SDDX | 10), "\\Device\\Harddisk127\\Partition10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx11", BRACK(FH_SDDX | 11), "\\Device\\Harddisk127\\Partition11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx12", BRACK(FH_SDDX | 12), "\\Device\\Harddisk127\\Partition12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx13", BRACK(FH_SDDX | 13), "\\Device\\Harddisk127\\Partition13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx14", BRACK(FH_SDDX | 14), "\\Device\\Harddisk127\\Partition14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sddx15", BRACK(FH_SDDX | 15), "\\Device\\Harddisk127\\Partition15", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr0", BRACK(FHDEV(DEV_CDROM_MAJOR, 0)), "\\Device\\CdRom0", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr1", BRACK(FHDEV(DEV_CDROM_MAJOR, 1)), "\\Device\\CdRom1", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr2", BRACK(FHDEV(DEV_CDROM_MAJOR, 2)), "\\Device\\CdRom2", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr3", BRACK(FHDEV(DEV_CDROM_MAJOR, 3)), "\\Device\\CdRom3", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr4", BRACK(FHDEV(DEV_CDROM_MAJOR, 4)), "\\Device\\CdRom4", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr5", BRACK(FHDEV(DEV_CDROM_MAJOR, 5)), "\\Device\\CdRom5", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr6", BRACK(FHDEV(DEV_CDROM_MAJOR, 6)), "\\Device\\CdRom6", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr7", BRACK(FHDEV(DEV_CDROM_MAJOR, 7)), "\\Device\\CdRom7", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr8", BRACK(FHDEV(DEV_CDROM_MAJOR, 8)), "\\Device\\CdRom8", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr9", BRACK(FHDEV(DEV_CDROM_MAJOR, 9)), "\\Device\\CdRom9", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr10", BRACK(FHDEV(DEV_CDROM_MAJOR, 10)), "\\Device\\CdRom10", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr11", BRACK(FHDEV(DEV_CDROM_MAJOR, 11)), "\\Device\\CdRom11", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr12", BRACK(FHDEV(DEV_CDROM_MAJOR, 12)), "\\Device\\CdRom12", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr13", BRACK(FHDEV(DEV_CDROM_MAJOR, 13)), "\\Device\\CdRom13", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr14", BRACK(FHDEV(DEV_CDROM_MAJOR, 14)), "\\Device\\CdRom14", exists_ntdev, S_IFBLK, true},
+  {"/dev/sr15", BRACK(FHDEV(DEV_CDROM_MAJOR, 15)), "\\Device\\CdRom15", exists_ntdev, S_IFBLK, true},
+  {"/dev/st0", BRACK(FHDEV(DEV_TAPE_MAJOR, 0)), "\\Device\\Tape0", exists_ntdev, S_IFBLK, true},
+  {"/dev/st1", BRACK(FHDEV(DEV_TAPE_MAJOR, 1)), "\\Device\\Tape1", exists_ntdev, S_IFBLK, true},
+  {"/dev/st2", BRACK(FHDEV(DEV_TAPE_MAJOR, 2)), "\\Device\\Tape2", exists_ntdev, S_IFBLK, true},
+  {"/dev/st3", BRACK(FHDEV(DEV_TAPE_MAJOR, 3)), "\\Device\\Tape3", exists_ntdev, S_IFBLK, true},
+  {"/dev/st4", BRACK(FHDEV(DEV_TAPE_MAJOR, 4)), "\\Device\\Tape4", exists_ntdev, S_IFBLK, true},
+  {"/dev/st5", BRACK(FHDEV(DEV_TAPE_MAJOR, 5)), "\\Device\\Tape5", exists_ntdev, S_IFBLK, true},
+  {"/dev/st6", BRACK(FHDEV(DEV_TAPE_MAJOR, 6)), "\\Device\\Tape6", exists_ntdev, S_IFBLK, true},
+  {"/dev/st7", BRACK(FHDEV(DEV_TAPE_MAJOR, 7)), "\\Device\\Tape7", exists_ntdev, S_IFBLK, true},
+  {"/dev/st8", BRACK(FHDEV(DEV_TAPE_MAJOR, 8)), "\\Device\\Tape8", exists_ntdev, S_IFBLK, true},
+  {"/dev/st9", BRACK(FHDEV(DEV_TAPE_MAJOR, 9)), "\\Device\\Tape9", exists_ntdev, S_IFBLK, true},
+  {"/dev/st10", BRACK(FHDEV(DEV_TAPE_MAJOR, 10)), "\\Device\\Tape10", exists_ntdev, S_IFBLK, true},
+  {"/dev/st11", BRACK(FHDEV(DEV_TAPE_MAJOR, 11)), "\\Device\\Tape11", exists_ntdev, S_IFBLK, true},
+  {"/dev/st12", BRACK(FHDEV(DEV_TAPE_MAJOR, 12)), "\\Device\\Tape12", exists_ntdev, S_IFBLK, true},
+  {"/dev/st13", BRACK(FHDEV(DEV_TAPE_MAJOR, 13)), "\\Device\\Tape13", exists_ntdev, S_IFBLK, true},
+  {"/dev/st14", BRACK(FHDEV(DEV_TAPE_MAJOR, 14)), "\\Device\\Tape14", exists_ntdev, S_IFBLK, true},
+  {"/dev/st15", BRACK(FHDEV(DEV_TAPE_MAJOR, 15)), "\\Device\\Tape15", exists_ntdev, S_IFBLK, true},
+  {"/dev/st16", BRACK(FHDEV(DEV_TAPE_MAJOR, 16)), "\\Device\\Tape16", exists_ntdev, S_IFBLK, true},
+  {"/dev/st17", BRACK(FHDEV(DEV_TAPE_MAJOR, 17)), "\\Device\\Tape17", exists_ntdev, S_IFBLK, true},
+  {"/dev/st18", BRACK(FHDEV(DEV_TAPE_MAJOR, 18)), "\\Device\\Tape18", exists_ntdev, S_IFBLK, true},
+  {"/dev/st19", BRACK(FHDEV(DEV_TAPE_MAJOR, 19)), "\\Device\\Tape19", exists_ntdev, S_IFBLK, true},
+  {"/dev/st20", BRACK(FHDEV(DEV_TAPE_MAJOR, 20)), "\\Device\\Tape20", exists_ntdev, S_IFBLK, true},
+  {"/dev/st21", BRACK(FHDEV(DEV_TAPE_MAJOR, 21)), "\\Device\\Tape21", exists_ntdev, S_IFBLK, true},
+  {"/dev/st22", BRACK(FHDEV(DEV_TAPE_MAJOR, 22)), "\\Device\\Tape22", exists_ntdev, S_IFBLK, true},
+  {"/dev/st23", BRACK(FHDEV(DEV_TAPE_MAJOR, 23)), "\\Device\\Tape23", exists_ntdev, S_IFBLK, true},
+  {"/dev/st24", BRACK(FHDEV(DEV_TAPE_MAJOR, 24)), "\\Device\\Tape24", exists_ntdev, S_IFBLK, true},
+  {"/dev/st25", BRACK(FHDEV(DEV_TAPE_MAJOR, 25)), "\\Device\\Tape25", exists_ntdev, S_IFBLK, true},
+  {"/dev/st26", BRACK(FHDEV(DEV_TAPE_MAJOR, 26)), "\\Device\\Tape26", exists_ntdev, S_IFBLK, true},
+  {"/dev/st27", BRACK(FHDEV(DEV_TAPE_MAJOR, 27)), "\\Device\\Tape27", exists_ntdev, S_IFBLK, true},
+  {"/dev/st28", BRACK(FHDEV(DEV_TAPE_MAJOR, 28)), "\\Device\\Tape28", exists_ntdev, S_IFBLK, true},
+  {"/dev/st29", BRACK(FHDEV(DEV_TAPE_MAJOR, 29)), "\\Device\\Tape29", exists_ntdev, S_IFBLK, true},
+  {"/dev/st30", BRACK(FHDEV(DEV_TAPE_MAJOR, 30)), "\\Device\\Tape30", exists_ntdev, S_IFBLK, true},
+  {"/dev/st31", BRACK(FHDEV(DEV_TAPE_MAJOR, 31)), "\\Device\\Tape31", exists_ntdev, S_IFBLK, true},
+  {"/dev/st32", BRACK(FHDEV(DEV_TAPE_MAJOR, 32)), "\\Device\\Tape32", exists_ntdev, S_IFBLK, true},
+  {"/dev/st33", BRACK(FHDEV(DEV_TAPE_MAJOR, 33)), "\\Device\\Tape33", exists_ntdev, S_IFBLK, true},
+  {"/dev/st34", BRACK(FHDEV(DEV_TAPE_MAJOR, 34)), "\\Device\\Tape34", exists_ntdev, S_IFBLK, true},
+  {"/dev/st35", BRACK(FHDEV(DEV_TAPE_MAJOR, 35)), "\\Device\\Tape35", exists_ntdev, S_IFBLK, true},
+  {"/dev/st36", BRACK(FHDEV(DEV_TAPE_MAJOR, 36)), "\\Device\\Tape36", exists_ntdev, S_IFBLK, true},
+  {"/dev/st37", BRACK(FHDEV(DEV_TAPE_MAJOR, 37)), "\\Device\\Tape37", exists_ntdev, S_IFBLK, true},
+  {"/dev/st38", BRACK(FHDEV(DEV_TAPE_MAJOR, 38)), "\\Device\\Tape38", exists_ntdev, S_IFBLK, true},
+  {"/dev/st39", BRACK(FHDEV(DEV_TAPE_MAJOR, 39)), "\\Device\\Tape39", exists_ntdev, S_IFBLK, true},
+  {"/dev/st40", BRACK(FHDEV(DEV_TAPE_MAJOR, 40)), "\\Device\\Tape40", exists_ntdev, S_IFBLK, true},
+  {"/dev/st41", BRACK(FHDEV(DEV_TAPE_MAJOR, 41)), "\\Device\\Tape41", exists_ntdev, S_IFBLK, true},
+  {"/dev/st42", BRACK(FHDEV(DEV_TAPE_MAJOR, 42)), "\\Device\\Tape42", exists_ntdev, S_IFBLK, true},
+  {"/dev/st43", BRACK(FHDEV(DEV_TAPE_MAJOR, 43)), "\\Device\\Tape43", exists_ntdev, S_IFBLK, true},
+  {"/dev/st44", BRACK(FHDEV(DEV_TAPE_MAJOR, 44)), "\\Device\\Tape44", exists_ntdev, S_IFBLK, true},
+  {"/dev/st45", BRACK(FHDEV(DEV_TAPE_MAJOR, 45)), "\\Device\\Tape45", exists_ntdev, S_IFBLK, true},
+  {"/dev/st46", BRACK(FHDEV(DEV_TAPE_MAJOR, 46)), "\\Device\\Tape46", exists_ntdev, S_IFBLK, true},
+  {"/dev/st47", BRACK(FHDEV(DEV_TAPE_MAJOR, 47)), "\\Device\\Tape47", exists_ntdev, S_IFBLK, true},
+  {"/dev/st48", BRACK(FHDEV(DEV_TAPE_MAJOR, 48)), "\\Device\\Tape48", exists_ntdev, S_IFBLK, true},
+  {"/dev/st49", BRACK(FHDEV(DEV_TAPE_MAJOR, 49)), "\\Device\\Tape49", exists_ntdev, S_IFBLK, true},
+  {"/dev/st50", BRACK(FHDEV(DEV_TAPE_MAJOR, 50)), "\\Device\\Tape50", exists_ntdev, S_IFBLK, true},
+  {"/dev/st51", BRACK(FHDEV(DEV_TAPE_MAJOR, 51)), "\\Device\\Tape51", exists_ntdev, S_IFBLK, true},
+  {"/dev/st52", BRACK(FHDEV(DEV_TAPE_MAJOR, 52)), "\\Device\\Tape52", exists_ntdev, S_IFBLK, true},
+  {"/dev/st53", BRACK(FHDEV(DEV_TAPE_MAJOR, 53)), "\\Device\\Tape53", exists_ntdev, S_IFBLK, true},
+  {"/dev/st54", BRACK(FHDEV(DEV_TAPE_MAJOR, 54)), "\\Device\\Tape54", exists_ntdev, S_IFBLK, true},
+  {"/dev/st55", BRACK(FHDEV(DEV_TAPE_MAJOR, 55)), "\\Device\\Tape55", exists_ntdev, S_IFBLK, true},
+  {"/dev/st56", BRACK(FHDEV(DEV_TAPE_MAJOR, 56)), "\\Device\\Tape56", exists_ntdev, S_IFBLK, true},
+  {"/dev/st57", BRACK(FHDEV(DEV_TAPE_MAJOR, 57)), "\\Device\\Tape57", exists_ntdev, S_IFBLK, true},
+  {"/dev/st58", BRACK(FHDEV(DEV_TAPE_MAJOR, 58)), "\\Device\\Tape58", exists_ntdev, S_IFBLK, true},
+  {"/dev/st59", BRACK(FHDEV(DEV_TAPE_MAJOR, 59)), "\\Device\\Tape59", exists_ntdev, S_IFBLK, true},
+  {"/dev/st60", BRACK(FHDEV(DEV_TAPE_MAJOR, 60)), "\\Device\\Tape60", exists_ntdev, S_IFBLK, true},
+  {"/dev/st61", BRACK(FHDEV(DEV_TAPE_MAJOR, 61)), "\\Device\\Tape61", exists_ntdev, S_IFBLK, true},
+  {"/dev/st62", BRACK(FHDEV(DEV_TAPE_MAJOR, 62)), "\\Device\\Tape62", exists_ntdev, S_IFBLK, true},
+  {"/dev/st63", BRACK(FHDEV(DEV_TAPE_MAJOR, 63)), "\\Device\\Tape63", exists_ntdev, S_IFBLK, true},
+  {"/dev/st64", BRACK(FHDEV(DEV_TAPE_MAJOR, 64)), "\\Device\\Tape64", exists_ntdev, S_IFBLK, true},
+  {"/dev/st65", BRACK(FHDEV(DEV_TAPE_MAJOR, 65)), "\\Device\\Tape65", exists_ntdev, S_IFBLK, true},
+  {"/dev/st66", BRACK(FHDEV(DEV_TAPE_MAJOR, 66)), "\\Device\\Tape66", exists_ntdev, S_IFBLK, true},
+  {"/dev/st67", BRACK(FHDEV(DEV_TAPE_MAJOR, 67)), "\\Device\\Tape67", exists_ntdev, S_IFBLK, true},
+  {"/dev/st68", BRACK(FHDEV(DEV_TAPE_MAJOR, 68)), "\\Device\\Tape68", exists_ntdev, S_IFBLK, true},
+  {"/dev/st69", BRACK(FHDEV(DEV_TAPE_MAJOR, 69)), "\\Device\\Tape69", exists_ntdev, S_IFBLK, true},
+  {"/dev/st70", BRACK(FHDEV(DEV_TAPE_MAJOR, 70)), "\\Device\\Tape70", exists_ntdev, S_IFBLK, true},
+  {"/dev/st71", BRACK(FHDEV(DEV_TAPE_MAJOR, 71)), "\\Device\\Tape71", exists_ntdev, S_IFBLK, true},
+  {"/dev/st72", BRACK(FHDEV(DEV_TAPE_MAJOR, 72)), "\\Device\\Tape72", exists_ntdev, S_IFBLK, true},
+  {"/dev/st73", BRACK(FHDEV(DEV_TAPE_MAJOR, 73)), "\\Device\\Tape73", exists_ntdev, S_IFBLK, true},
+  {"/dev/st74", BRACK(FHDEV(DEV_TAPE_MAJOR, 74)), "\\Device\\Tape74", exists_ntdev, S_IFBLK, true},
+  {"/dev/st75", BRACK(FHDEV(DEV_TAPE_MAJOR, 75)), "\\Device\\Tape75", exists_ntdev, S_IFBLK, true},
+  {"/dev/st76", BRACK(FHDEV(DEV_TAPE_MAJOR, 76)), "\\Device\\Tape76", exists_ntdev, S_IFBLK, true},
+  {"/dev/st77", BRACK(FHDEV(DEV_TAPE_MAJOR, 77)), "\\Device\\Tape77", exists_ntdev, S_IFBLK, true},
+  {"/dev/st78", BRACK(FHDEV(DEV_TAPE_MAJOR, 78)), "\\Device\\Tape78", exists_ntdev, S_IFBLK, true},
+  {"/dev/st79", BRACK(FHDEV(DEV_TAPE_MAJOR, 79)), "\\Device\\Tape79", exists_ntdev, S_IFBLK, true},
+  {"/dev/st80", BRACK(FHDEV(DEV_TAPE_MAJOR, 80)), "\\Device\\Tape80", exists_ntdev, S_IFBLK, true},
+  {"/dev/st81", BRACK(FHDEV(DEV_TAPE_MAJOR, 81)), "\\Device\\Tape81", exists_ntdev, S_IFBLK, true},
+  {"/dev/st82", BRACK(FHDEV(DEV_TAPE_MAJOR, 82)), "\\Device\\Tape82", exists_ntdev, S_IFBLK, true},
+  {"/dev/st83", BRACK(FHDEV(DEV_TAPE_MAJOR, 83)), "\\Device\\Tape83", exists_ntdev, S_IFBLK, true},
+  {"/dev/st84", BRACK(FHDEV(DEV_TAPE_MAJOR, 84)), "\\Device\\Tape84", exists_ntdev, S_IFBLK, true},
+  {"/dev/st85", BRACK(FHDEV(DEV_TAPE_MAJOR, 85)), "\\Device\\Tape85", exists_ntdev, S_IFBLK, true},
+  {"/dev/st86", BRACK(FHDEV(DEV_TAPE_MAJOR, 86)), "\\Device\\Tape86", exists_ntdev, S_IFBLK, true},
+  {"/dev/st87", BRACK(FHDEV(DEV_TAPE_MAJOR, 87)), "\\Device\\Tape87", exists_ntdev, S_IFBLK, true},
+  {"/dev/st88", BRACK(FHDEV(DEV_TAPE_MAJOR, 88)), "\\Device\\Tape88", exists_ntdev, S_IFBLK, true},
+  {"/dev/st89", BRACK(FHDEV(DEV_TAPE_MAJOR, 89)), "\\Device\\Tape89", exists_ntdev, S_IFBLK, true},
+  {"/dev/st90", BRACK(FHDEV(DEV_TAPE_MAJOR, 90)), "\\Device\\Tape90", exists_ntdev, S_IFBLK, true},
+  {"/dev/st91", BRACK(FHDEV(DEV_TAPE_MAJOR, 91)), "\\Device\\Tape91", exists_ntdev, S_IFBLK, true},
+  {"/dev/st92", BRACK(FHDEV(DEV_TAPE_MAJOR, 92)), "\\Device\\Tape92", exists_ntdev, S_IFBLK, true},
+  {"/dev/st93", BRACK(FHDEV(DEV_TAPE_MAJOR, 93)), "\\Device\\Tape93", exists_ntdev, S_IFBLK, true},
+  {"/dev/st94", BRACK(FHDEV(DEV_TAPE_MAJOR, 94)), "\\Device\\Tape94", exists_ntdev, S_IFBLK, true},
+  {"/dev/st95", BRACK(FHDEV(DEV_TAPE_MAJOR, 95)), "\\Device\\Tape95", exists_ntdev, S_IFBLK, true},
+  {"/dev/st96", BRACK(FHDEV(DEV_TAPE_MAJOR, 96)), "\\Device\\Tape96", exists_ntdev, S_IFBLK, true},
+  {"/dev/st97", BRACK(FHDEV(DEV_TAPE_MAJOR, 97)), "\\Device\\Tape97", exists_ntdev, S_IFBLK, true},
+  {"/dev/st98", BRACK(FHDEV(DEV_TAPE_MAJOR, 98)), "\\Device\\Tape98", exists_ntdev, S_IFBLK, true},
+  {"/dev/st99", BRACK(FHDEV(DEV_TAPE_MAJOR, 99)), "\\Device\\Tape99", exists_ntdev, S_IFBLK, true},
+  {"/dev/st100", BRACK(FHDEV(DEV_TAPE_MAJOR, 100)), "\\Device\\Tape100", exists_ntdev, S_IFBLK, true},
+  {"/dev/st101", BRACK(FHDEV(DEV_TAPE_MAJOR, 101)), "\\Device\\Tape101", exists_ntdev, S_IFBLK, true},
+  {"/dev/st102", BRACK(FHDEV(DEV_TAPE_MAJOR, 102)), "\\Device\\Tape102", exists_ntdev, S_IFBLK, true},
+  {"/dev/st103", BRACK(FHDEV(DEV_TAPE_MAJOR, 103)), "\\Device\\Tape103", exists_ntdev, S_IFBLK, true},
+  {"/dev/st104", BRACK(FHDEV(DEV_TAPE_MAJOR, 104)), "\\Device\\Tape104", exists_ntdev, S_IFBLK, true},
+  {"/dev/st105", BRACK(FHDEV(DEV_TAPE_MAJOR, 105)), "\\Device\\Tape105", exists_ntdev, S_IFBLK, true},
+  {"/dev/st106", BRACK(FHDEV(DEV_TAPE_MAJOR, 106)), "\\Device\\Tape106", exists_ntdev, S_IFBLK, true},
+  {"/dev/st107", BRACK(FHDEV(DEV_TAPE_MAJOR, 107)), "\\Device\\Tape107", exists_ntdev, S_IFBLK, true},
+  {"/dev/st108", BRACK(FHDEV(DEV_TAPE_MAJOR, 108)), "\\Device\\Tape108", exists_ntdev, S_IFBLK, true},
+  {"/dev/st109", BRACK(FHDEV(DEV_TAPE_MAJOR, 109)), "\\Device\\Tape109", exists_ntdev, S_IFBLK, true},
+  {"/dev/st110", BRACK(FHDEV(DEV_TAPE_MAJOR, 110)), "\\Device\\Tape110", exists_ntdev, S_IFBLK, true},
+  {"/dev/st111", BRACK(FHDEV(DEV_TAPE_MAJOR, 111)), "\\Device\\Tape111", exists_ntdev, S_IFBLK, true},
+  {"/dev/st112", BRACK(FHDEV(DEV_TAPE_MAJOR, 112)), "\\Device\\Tape112", exists_ntdev, S_IFBLK, true},
+  {"/dev/st113", BRACK(FHDEV(DEV_TAPE_MAJOR, 113)), "\\Device\\Tape113", exists_ntdev, S_IFBLK, true},
+  {"/dev/st114", BRACK(FHDEV(DEV_TAPE_MAJOR, 114)), "\\Device\\Tape114", exists_ntdev, S_IFBLK, true},
+  {"/dev/st115", BRACK(FHDEV(DEV_TAPE_MAJOR, 115)), "\\Device\\Tape115", exists_ntdev, S_IFBLK, true},
+  {"/dev/st116", BRACK(FHDEV(DEV_TAPE_MAJOR, 116)), "\\Device\\Tape116", exists_ntdev, S_IFBLK, true},
+  {"/dev/st117", BRACK(FHDEV(DEV_TAPE_MAJOR, 117)), "\\Device\\Tape117", exists_ntdev, S_IFBLK, true},
+  {"/dev/st118", BRACK(FHDEV(DEV_TAPE_MAJOR, 118)), "\\Device\\Tape118", exists_ntdev, S_IFBLK, true},
+  {"/dev/st119", BRACK(FHDEV(DEV_TAPE_MAJOR, 119)), "\\Device\\Tape119", exists_ntdev, S_IFBLK, true},
+  {"/dev/st120", BRACK(FHDEV(DEV_TAPE_MAJOR, 120)), "\\Device\\Tape120", exists_ntdev, S_IFBLK, true},
+  {"/dev/st121", BRACK(FHDEV(DEV_TAPE_MAJOR, 121)), "\\Device\\Tape121", exists_ntdev, S_IFBLK, true},
+  {"/dev/st122", BRACK(FHDEV(DEV_TAPE_MAJOR, 122)), "\\Device\\Tape122", exists_ntdev, S_IFBLK, true},
+  {"/dev/st123", BRACK(FHDEV(DEV_TAPE_MAJOR, 123)), "\\Device\\Tape123", exists_ntdev, S_IFBLK, true},
+  {"/dev/st124", BRACK(FHDEV(DEV_TAPE_MAJOR, 124)), "\\Device\\Tape124", exists_ntdev, S_IFBLK, true},
+  {"/dev/st125", BRACK(FHDEV(DEV_TAPE_MAJOR, 125)), "\\Device\\Tape125", exists_ntdev, S_IFBLK, true},
+  {"/dev/st126", BRACK(FHDEV(DEV_TAPE_MAJOR, 126)), "\\Device\\Tape126", exists_ntdev, S_IFBLK, true},
+  {"/dev/st127", BRACK(FHDEV(DEV_TAPE_MAJOR, 127)), "\\Device\\Tape127", exists_ntdev, S_IFBLK, true},
+  {"/dev/tty", BRACK(FH_TTY), "/dev/tty", exists, S_IFCHR, true},
+  {"/dev/ttyS0", BRACK(FHDEV(DEV_SERIAL_MAJOR, 0)), "\\??\\COM1", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS1", BRACK(FHDEV(DEV_SERIAL_MAJOR, 1)), "\\??\\COM2", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS2", BRACK(FHDEV(DEV_SERIAL_MAJOR, 2)), "\\??\\COM3", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS3", BRACK(FHDEV(DEV_SERIAL_MAJOR, 3)), "\\??\\COM4", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS4", BRACK(FHDEV(DEV_SERIAL_MAJOR, 4)), "\\??\\COM5", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS5", BRACK(FHDEV(DEV_SERIAL_MAJOR, 5)), "\\??\\COM6", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS6", BRACK(FHDEV(DEV_SERIAL_MAJOR, 6)), "\\??\\COM7", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS7", BRACK(FHDEV(DEV_SERIAL_MAJOR, 7)), "\\??\\COM8", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS8", BRACK(FHDEV(DEV_SERIAL_MAJOR, 8)), "\\??\\COM9", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS9", BRACK(FHDEV(DEV_SERIAL_MAJOR, 9)), "\\??\\COM10", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS10", BRACK(FHDEV(DEV_SERIAL_MAJOR, 10)), "\\??\\COM11", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS11", BRACK(FHDEV(DEV_SERIAL_MAJOR, 11)), "\\??\\COM12", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS12", BRACK(FHDEV(DEV_SERIAL_MAJOR, 12)), "\\??\\COM13", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS13", BRACK(FHDEV(DEV_SERIAL_MAJOR, 13)), "\\??\\COM14", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS14", BRACK(FHDEV(DEV_SERIAL_MAJOR, 14)), "\\??\\COM15", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS15", BRACK(FHDEV(DEV_SERIAL_MAJOR, 15)), "\\??\\COM16", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS16", BRACK(FHDEV(DEV_SERIAL_MAJOR, 16)), "\\??\\COM17", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS17", BRACK(FHDEV(DEV_SERIAL_MAJOR, 17)), "\\??\\COM18", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS18", BRACK(FHDEV(DEV_SERIAL_MAJOR, 18)), "\\??\\COM19", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS19", BRACK(FHDEV(DEV_SERIAL_MAJOR, 19)), "\\??\\COM20", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS20", BRACK(FHDEV(DEV_SERIAL_MAJOR, 20)), "\\??\\COM21", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS21", BRACK(FHDEV(DEV_SERIAL_MAJOR, 21)), "\\??\\COM22", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS22", BRACK(FHDEV(DEV_SERIAL_MAJOR, 22)), "\\??\\COM23", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS23", BRACK(FHDEV(DEV_SERIAL_MAJOR, 23)), "\\??\\COM24", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS24", BRACK(FHDEV(DEV_SERIAL_MAJOR, 24)), "\\??\\COM25", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS25", BRACK(FHDEV(DEV_SERIAL_MAJOR, 25)), "\\??\\COM26", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS26", BRACK(FHDEV(DEV_SERIAL_MAJOR, 26)), "\\??\\COM27", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS27", BRACK(FHDEV(DEV_SERIAL_MAJOR, 27)), "\\??\\COM28", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS28", BRACK(FHDEV(DEV_SERIAL_MAJOR, 28)), "\\??\\COM29", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS29", BRACK(FHDEV(DEV_SERIAL_MAJOR, 29)), "\\??\\COM30", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS30", BRACK(FHDEV(DEV_SERIAL_MAJOR, 30)), "\\??\\COM31", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS31", BRACK(FHDEV(DEV_SERIAL_MAJOR, 31)), "\\??\\COM32", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS32", BRACK(FHDEV(DEV_SERIAL_MAJOR, 32)), "\\??\\COM33", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS33", BRACK(FHDEV(DEV_SERIAL_MAJOR, 33)), "\\??\\COM34", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS34", BRACK(FHDEV(DEV_SERIAL_MAJOR, 34)), "\\??\\COM35", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS35", BRACK(FHDEV(DEV_SERIAL_MAJOR, 35)), "\\??\\COM36", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS36", BRACK(FHDEV(DEV_SERIAL_MAJOR, 36)), "\\??\\COM37", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS37", BRACK(FHDEV(DEV_SERIAL_MAJOR, 37)), "\\??\\COM38", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS38", BRACK(FHDEV(DEV_SERIAL_MAJOR, 38)), "\\??\\COM39", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS39", BRACK(FHDEV(DEV_SERIAL_MAJOR, 39)), "\\??\\COM40", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS40", BRACK(FHDEV(DEV_SERIAL_MAJOR, 40)), "\\??\\COM41", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS41", BRACK(FHDEV(DEV_SERIAL_MAJOR, 41)), "\\??\\COM42", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS42", BRACK(FHDEV(DEV_SERIAL_MAJOR, 42)), "\\??\\COM43", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS43", BRACK(FHDEV(DEV_SERIAL_MAJOR, 43)), "\\??\\COM44", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS44", BRACK(FHDEV(DEV_SERIAL_MAJOR, 44)), "\\??\\COM45", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS45", BRACK(FHDEV(DEV_SERIAL_MAJOR, 45)), "\\??\\COM46", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS46", BRACK(FHDEV(DEV_SERIAL_MAJOR, 46)), "\\??\\COM47", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS47", BRACK(FHDEV(DEV_SERIAL_MAJOR, 47)), "\\??\\COM48", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS48", BRACK(FHDEV(DEV_SERIAL_MAJOR, 48)), "\\??\\COM49", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS49", BRACK(FHDEV(DEV_SERIAL_MAJOR, 49)), "\\??\\COM50", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS50", BRACK(FHDEV(DEV_SERIAL_MAJOR, 50)), "\\??\\COM51", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS51", BRACK(FHDEV(DEV_SERIAL_MAJOR, 51)), "\\??\\COM52", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS52", BRACK(FHDEV(DEV_SERIAL_MAJOR, 52)), "\\??\\COM53", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS53", BRACK(FHDEV(DEV_SERIAL_MAJOR, 53)), "\\??\\COM54", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS54", BRACK(FHDEV(DEV_SERIAL_MAJOR, 54)), "\\??\\COM55", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS55", BRACK(FHDEV(DEV_SERIAL_MAJOR, 55)), "\\??\\COM56", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS56", BRACK(FHDEV(DEV_SERIAL_MAJOR, 56)), "\\??\\COM57", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS57", BRACK(FHDEV(DEV_SERIAL_MAJOR, 57)), "\\??\\COM58", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS58", BRACK(FHDEV(DEV_SERIAL_MAJOR, 58)), "\\??\\COM59", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS59", BRACK(FHDEV(DEV_SERIAL_MAJOR, 59)), "\\??\\COM60", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS60", BRACK(FHDEV(DEV_SERIAL_MAJOR, 60)), "\\??\\COM61", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS61", BRACK(FHDEV(DEV_SERIAL_MAJOR, 61)), "\\??\\COM62", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS62", BRACK(FHDEV(DEV_SERIAL_MAJOR, 62)), "\\??\\COM63", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS63", BRACK(FHDEV(DEV_SERIAL_MAJOR, 63)), "\\??\\COM64", exists_ntdev, S_IFCHR, true},
+  {"/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", exists, S_IFCHR, true},
+  {"/dev/windows", BRACK(FH_WINDOWS), "/dev/windows", exists, S_IFCHR, true},
+  {"/dev/zero", BRACK(FH_ZERO), "/dev/zero", exists, S_IFCHR, true},
+  {":fifo", BRACK(FH_FIFO), "/dev/fifo", exists_internal, S_IFCHR, false},
+  {":pipe", BRACK(FH_PIPE), "/dev/pipe", exists_internal, S_IFCHR, false},
+  {":ptym0", BRACK(FHDEV(DEV_PTYM_MAJOR, 0)), "/dev/ptym0", exists_internal, S_IFCHR, false},
+  {":ptym1", BRACK(FHDEV(DEV_PTYM_MAJOR, 1)), "/dev/ptym1", exists_internal, S_IFCHR, false},
+  {":ptym2", BRACK(FHDEV(DEV_PTYM_MAJOR, 2)), "/dev/ptym2", exists_internal, S_IFCHR, false},
+  {":ptym3", BRACK(FHDEV(DEV_PTYM_MAJOR, 3)), "/dev/ptym3", exists_internal, S_IFCHR, false},
+  {":ptym4", BRACK(FHDEV(DEV_PTYM_MAJOR, 4)), "/dev/ptym4", exists_internal, S_IFCHR, false},
+  {":ptym5", BRACK(FHDEV(DEV_PTYM_MAJOR, 5)), "/dev/ptym5", exists_internal, S_IFCHR, false},
+  {":ptym6", BRACK(FHDEV(DEV_PTYM_MAJOR, 6)), "/dev/ptym6", exists_internal, S_IFCHR, false},
+  {":ptym7", BRACK(FHDEV(DEV_PTYM_MAJOR, 7)), "/dev/ptym7", exists_internal, S_IFCHR, false},
+  {":ptym8", BRACK(FHDEV(DEV_PTYM_MAJOR, 8)), "/dev/ptym8", exists_internal, S_IFCHR, false},
+  {":ptym9", BRACK(FHDEV(DEV_PTYM_MAJOR, 9)), "/dev/ptym9", exists_internal, S_IFCHR, false},
+  {":ptym10", BRACK(FHDEV(DEV_PTYM_MAJOR, 10)), "/dev/ptym10", exists_internal, S_IFCHR, false},
+  {":ptym11", BRACK(FHDEV(DEV_PTYM_MAJOR, 11)), "/dev/ptym11", exists_internal, S_IFCHR, false},
+  {":ptym12", BRACK(FHDEV(DEV_PTYM_MAJOR, 12)), "/dev/ptym12", exists_internal, S_IFCHR, false},
+  {":ptym13", BRACK(FHDEV(DEV_PTYM_MAJOR, 13)), "/dev/ptym13", exists_internal, S_IFCHR, false},
+  {":ptym14", BRACK(FHDEV(DEV_PTYM_MAJOR, 14)), "/dev/ptym14", exists_internal, S_IFCHR, false},
+  {":ptym15", BRACK(FHDEV(DEV_PTYM_MAJOR, 15)), "/dev/ptym15", exists_internal, S_IFCHR, false},
+  {":ptym16", BRACK(FHDEV(DEV_PTYM_MAJOR, 16)), "/dev/ptym16", exists_internal, S_IFCHR, false},
+  {":ptym17", BRACK(FHDEV(DEV_PTYM_MAJOR, 17)), "/dev/ptym17", exists_internal, S_IFCHR, false},
+  {":ptym18", BRACK(FHDEV(DEV_PTYM_MAJOR, 18)), "/dev/ptym18", exists_internal, S_IFCHR, false},
+  {":ptym19", BRACK(FHDEV(DEV_PTYM_MAJOR, 19)), "/dev/ptym19", exists_internal, S_IFCHR, false},
+  {":ptym20", BRACK(FHDEV(DEV_PTYM_MAJOR, 20)), "/dev/ptym20", exists_internal, S_IFCHR, false},
+  {":ptym21", BRACK(FHDEV(DEV_PTYM_MAJOR, 21)), "/dev/ptym21", exists_internal, S_IFCHR, false},
+  {":ptym22", BRACK(FHDEV(DEV_PTYM_MAJOR, 22)), "/dev/ptym22", exists_internal, S_IFCHR, false},
+  {":ptym23", BRACK(FHDEV(DEV_PTYM_MAJOR, 23)), "/dev/ptym23", exists_internal, S_IFCHR, false},
+  {":ptym24", BRACK(FHDEV(DEV_PTYM_MAJOR, 24)), "/dev/ptym24", exists_internal, S_IFCHR, false},
+  {":ptym25", BRACK(FHDEV(DEV_PTYM_MAJOR, 25)), "/dev/ptym25", exists_internal, S_IFCHR, false},
+  {":ptym26", BRACK(FHDEV(DEV_PTYM_MAJOR, 26)), "/dev/ptym26", exists_internal, S_IFCHR, false},
+  {":ptym27", BRACK(FHDEV(DEV_PTYM_MAJOR, 27)), "/dev/ptym27", exists_internal, S_IFCHR, false},
+  {":ptym28", BRACK(FHDEV(DEV_PTYM_MAJOR, 28)), "/dev/ptym28", exists_internal, S_IFCHR, false},
+  {":ptym29", BRACK(FHDEV(DEV_PTYM_MAJOR, 29)), "/dev/ptym29", exists_internal, S_IFCHR, false},
+  {":ptym30", BRACK(FHDEV(DEV_PTYM_MAJOR, 30)), "/dev/ptym30", exists_internal, S_IFCHR, false},
+  {":ptym31", BRACK(FHDEV(DEV_PTYM_MAJOR, 31)), "/dev/ptym31", exists_internal, S_IFCHR, false},
+  {":ptym32", BRACK(FHDEV(DEV_PTYM_MAJOR, 32)), "/dev/ptym32", exists_internal, S_IFCHR, false},
+  {":ptym33", BRACK(FHDEV(DEV_PTYM_MAJOR, 33)), "/dev/ptym33", exists_internal, S_IFCHR, false},
+  {":ptym34", BRACK(FHDEV(DEV_PTYM_MAJOR, 34)), "/dev/ptym34", exists_internal, S_IFCHR, false},
+  {":ptym35", BRACK(FHDEV(DEV_PTYM_MAJOR, 35)), "/dev/ptym35", exists_internal, S_IFCHR, false},
+  {":ptym36", BRACK(FHDEV(DEV_PTYM_MAJOR, 36)), "/dev/ptym36", exists_internal, S_IFCHR, false},
+  {":ptym37", BRACK(FHDEV(DEV_PTYM_MAJOR, 37)), "/dev/ptym37", exists_internal, S_IFCHR, false},
+  {":ptym38", BRACK(FHDEV(DEV_PTYM_MAJOR, 38)), "/dev/ptym38", exists_internal, S_IFCHR, false},
+  {":ptym39", BRACK(FHDEV(DEV_PTYM_MAJOR, 39)), "/dev/ptym39", exists_internal, S_IFCHR, false},
+  {":ptym40", BRACK(FHDEV(DEV_PTYM_MAJOR, 40)), "/dev/ptym40", exists_internal, S_IFCHR, false},
+  {":ptym41", BRACK(FHDEV(DEV_PTYM_MAJOR, 41)), "/dev/ptym41", exists_internal, S_IFCHR, false},
+  {":ptym42", BRACK(FHDEV(DEV_PTYM_MAJOR, 42)), "/dev/ptym42", exists_internal, S_IFCHR, false},
+  {":ptym43", BRACK(FHDEV(DEV_PTYM_MAJOR, 43)), "/dev/ptym43", exists_internal, S_IFCHR, false},
+  {":ptym44", BRACK(FHDEV(DEV_PTYM_MAJOR, 44)), "/dev/ptym44", exists_internal, S_IFCHR, false},
+  {":ptym45", BRACK(FHDEV(DEV_PTYM_MAJOR, 45)), "/dev/ptym45", exists_internal, S_IFCHR, false},
+  {":ptym46", BRACK(FHDEV(DEV_PTYM_MAJOR, 46)), "/dev/ptym46", exists_internal, S_IFCHR, false},
+  {":ptym47", BRACK(FHDEV(DEV_PTYM_MAJOR, 47)), "/dev/ptym47", exists_internal, S_IFCHR, false},
+  {":ptym48", BRACK(FHDEV(DEV_PTYM_MAJOR, 48)), "/dev/ptym48", exists_internal, S_IFCHR, false},
+  {":ptym49", BRACK(FHDEV(DEV_PTYM_MAJOR, 49)), "/dev/ptym49", exists_internal, S_IFCHR, false},
+  {":ptym50", BRACK(FHDEV(DEV_PTYM_MAJOR, 50)), "/dev/ptym50", exists_internal, S_IFCHR, false},
+  {":ptym51", BRACK(FHDEV(DEV_PTYM_MAJOR, 51)), "/dev/ptym51", exists_internal, S_IFCHR, false},
+  {":ptym52", BRACK(FHDEV(DEV_PTYM_MAJOR, 52)), "/dev/ptym52", exists_internal, S_IFCHR, false},
+  {":ptym53", BRACK(FHDEV(DEV_PTYM_MAJOR, 53)), "/dev/ptym53", exists_internal, S_IFCHR, false},
+  {":ptym54", BRACK(FHDEV(DEV_PTYM_MAJOR, 54)), "/dev/ptym54", exists_internal, S_IFCHR, false},
+  {":ptym55", BRACK(FHDEV(DEV_PTYM_MAJOR, 55)), "/dev/ptym55", exists_internal, S_IFCHR, false},
+  {":ptym56", BRACK(FHDEV(DEV_PTYM_MAJOR, 56)), "/dev/ptym56", exists_internal, S_IFCHR, false},
+  {":ptym57", BRACK(FHDEV(DEV_PTYM_MAJOR, 57)), "/dev/ptym57", exists_internal, S_IFCHR, false},
+  {":ptym58", BRACK(FHDEV(DEV_PTYM_MAJOR, 58)), "/dev/ptym58", exists_internal, S_IFCHR, false},
+  {":ptym59", BRACK(FHDEV(DEV_PTYM_MAJOR, 59)), "/dev/ptym59", exists_internal, S_IFCHR, false},
+  {":ptym60", BRACK(FHDEV(DEV_PTYM_MAJOR, 60)), "/dev/ptym60", exists_internal, S_IFCHR, false},
+  {":ptym61", BRACK(FHDEV(DEV_PTYM_MAJOR, 61)), "/dev/ptym61", exists_internal, S_IFCHR, false},
+  {":ptym62", BRACK(FHDEV(DEV_PTYM_MAJOR, 62)), "/dev/ptym62", exists_internal, S_IFCHR, false},
+  {":ptym63", BRACK(FHDEV(DEV_PTYM_MAJOR, 63)), "/dev/ptym63", exists_internal, S_IFCHR, false}
 };
 
 const device *cons_dev = dev_storage + 20;
@@ -2815,11 +2813,11 @@ return	NULL;
 
 }
             }
-    case 6:
-      switch (KR_keyword [2])
+    case 5:
+      switch (KR_keyword [1])
         {
         case 'p':
-          if (strncmp (KR_keyword, ":pipe", 6) == 0)
+          if (strncmp (KR_keyword, ":pipe", 5) == 0)
             {
 {
 return dev_storage + 2579;
@@ -2834,7 +2832,7 @@ return	NULL;
 }
             }
         case 'f':
-          if (strncmp (KR_keyword, ":fifo", 6) == 0)
+          if (strncmp (KR_keyword, ":fifo", 5) == 0)
             {
 {
 return dev_storage + 2578;
@@ -2854,11 +2852,11 @@ return	NULL;
 
 }
         }
-    case 7:
-      switch (KR_keyword [6])
+    case 6:
+      switch (KR_keyword [5])
         {
         case '9':
-          if (strncmp (KR_keyword, ":ptym9", 7) == 0)
+          if (strncmp (KR_keyword, ":ptym9", 6) == 0)
             {
 {
 return dev_storage + 2589;
@@ -2873,7 +2871,7 @@ return	NULL;
 }
             }
         case '8':
-          if (strncmp (KR_keyword, ":ptym8", 7) == 0)
+          if (strncmp (KR_keyword, ":ptym8", 6) == 0)
             {
 {
 return dev_storage + 2588;
@@ -2888,7 +2886,7 @@ return	NULL;
 }
             }
         case '7':
-          if (strncmp (KR_keyword, ":ptym7", 7) == 0)
+          if (strncmp (KR_keyword, ":ptym7", 6) == 0)
             {
 {
 return dev_storage + 2587;
@@ -2903,7 +2901,7 @@ return	NULL;
 }
             }
         case '6':
-          if (strncmp (KR_keyword, ":ptym6", 7) == 0)
+          if (strncmp (KR_keyword, ":ptym6", 6) == 0)
             {
 {
 return dev_storage + 2586;
@@ -2918,7 +2916,7 @@ return	NULL;
 }
             }
         case '5':
-          if (strncmp (KR_keyword, ":ptym5", 7) == 0)
+          if (strncmp (KR_keyword, ":ptym5", 6) == 0)
             {
 {
 return dev_storage + 2585;
@@ -2933,7 +2931,7 @@ return	NULL;
 }
             }
         case '4':
-          if (strncmp (KR_keyword, ":ptym4", 7) == 0)
+          if (strncmp (KR_keyword, ":ptym4", 6) == 0)
             {
 {
 return dev_storage + 2584;
@@ -2948,7 +2946,7 @@ return	NULL;
 }
             }
         case '3':
-          if (strncmp (KR_keyword, ":ptym3", 7) == 0)
+          if (strncmp (KR_keyword, ":ptym3", 6) == 0)
             {
 {
 return dev_storage + 2583;
@@ -2963,7 +2961,7 @@ return	NULL;
 }
             }
         case '2':
-          if (strncmp (KR_keyword, ":ptym2", 7) == 0)
+          if (strncmp (KR_keyword, ":ptym2", 6) == 0)
             {
 {
 return dev_storage + 2582;
@@ -2978,7 +2976,7 @@ return	NULL;
 }
             }
         case '1':
-          if (strncmp (KR_keyword, ":ptym1", 7) == 0)
+          if (strncmp (KR_keyword, ":ptym1", 6) == 0)
             {
 {
 return dev_storage + 2581;
@@ -2993,7 +2991,7 @@ return	NULL;
 }
             }
         case '0':
-          if (strncmp (KR_keyword, ":ptym0", 7) == 0)
+          if (strncmp (KR_keyword, ":ptym0", 6) == 0)
             {
 {
 return dev_storage + 2580;
@@ -3002,6 +3000,879 @@ return dev_storage + 2580;
             }
           else
             {
+{
+return	NULL;
+
+}
+            }
+        default:
+{
+return	NULL;
+
+}
+        }
+    case 7:
+      switch (KR_keyword [5])
+        {
+        case '6':
+          switch (KR_keyword [6])
+            {
+            case '3':
+              if (strncmp (KR_keyword, ":ptym63", 7) == 0)
+                {
+{
+return dev_storage + 2643;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '2':
+              if (strncmp (KR_keyword, ":ptym62", 7) == 0)
+                {
+{
+return dev_storage + 2642;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '1':
+              if (strncmp (KR_keyword, ":ptym61", 7) == 0)
+                {
+{
+return dev_storage + 2641;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '0':
+              if (strncmp (KR_keyword, ":ptym60", 7) == 0)
+                {
+{
+return dev_storage + 2640;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            default:
+{
+return	NULL;
+
+}
+            }
+        case '5':
+          switch (KR_keyword [6])
+            {
+            case '9':
+              if (strncmp (KR_keyword, ":ptym59", 7) == 0)
+                {
+{
+return dev_storage + 2639;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '8':
+              if (strncmp (KR_keyword, ":ptym58", 7) == 0)
+                {
+{
+return dev_storage + 2638;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '7':
+              if (strncmp (KR_keyword, ":ptym57", 7) == 0)
+                {
+{
+return dev_storage + 2637;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '6':
+              if (strncmp (KR_keyword, ":ptym56", 7) == 0)
+                {
+{
+return dev_storage + 2636;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '5':
+              if (strncmp (KR_keyword, ":ptym55", 7) == 0)
+                {
+{
+return dev_storage + 2635;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '4':
+              if (strncmp (KR_keyword, ":ptym54", 7) == 0)
+                {
+{
+return dev_storage + 2634;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '3':
+              if (strncmp (KR_keyword, ":ptym53", 7) == 0)
+                {
+{
+return dev_storage + 2633;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '2':
+              if (strncmp (KR_keyword, ":ptym52", 7) == 0)
+                {
+{
+return dev_storage + 2632;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '1':
+              if (strncmp (KR_keyword, ":ptym51", 7) == 0)
+                {
+{
+return dev_storage + 2631;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '0':
+              if (strncmp (KR_keyword, ":ptym50", 7) == 0)
+                {
+{
+return dev_storage + 2630;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            default:
+{
+return	NULL;
+
+}
+            }
+        case '4':
+          switch (KR_keyword [6])
+            {
+            case '9':
+              if (strncmp (KR_keyword, ":ptym49", 7) == 0)
+                {
+{
+return dev_storage + 2629;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '8':
+              if (strncmp (KR_keyword, ":ptym48", 7) == 0)
+                {
+{
+return dev_storage + 2628;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '7':
+              if (strncmp (KR_keyword, ":ptym47", 7) == 0)
+                {
+{
+return dev_storage + 2627;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '6':
+              if (strncmp (KR_keyword, ":ptym46", 7) == 0)
+                {
+{
+return dev_storage + 2626;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '5':
+              if (strncmp (KR_keyword, ":ptym45", 7) == 0)
+                {
+{
+return dev_storage + 2625;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '4':
+              if (strncmp (KR_keyword, ":ptym44", 7) == 0)
+                {
+{
+return dev_storage + 2624;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '3':
+              if (strncmp (KR_keyword, ":ptym43", 7) == 0)
+                {
+{
+return dev_storage + 2623;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '2':
+              if (strncmp (KR_keyword, ":ptym42", 7) == 0)
+                {
+{
+return dev_storage + 2622;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '1':
+              if (strncmp (KR_keyword, ":ptym41", 7) == 0)
+                {
+{
+return dev_storage + 2621;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '0':
+              if (strncmp (KR_keyword, ":ptym40", 7) == 0)
+                {
+{
+return dev_storage + 2620;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            default:
+{
+return	NULL;
+
+}
+            }
+        case '3':
+          switch (KR_keyword [6])
+            {
+            case '9':
+              if (strncmp (KR_keyword, ":ptym39", 7) == 0)
+                {
+{
+return dev_storage + 2619;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '8':
+              if (strncmp (KR_keyword, ":ptym38", 7) == 0)
+                {
+{
+return dev_storage + 2618;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '7':
+              if (strncmp (KR_keyword, ":ptym37", 7) == 0)
+                {
+{
+return dev_storage + 2617;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '6':
+              if (strncmp (KR_keyword, ":ptym36", 7) == 0)
+                {
+{
+return dev_storage + 2616;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '5':
+              if (strncmp (KR_keyword, ":ptym35", 7) == 0)
+                {
+{
+return dev_storage + 2615;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '4':
+              if (strncmp (KR_keyword, ":ptym34", 7) == 0)
+                {
+{
+return dev_storage + 2614;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '3':
+              if (strncmp (KR_keyword, ":ptym33", 7) == 0)
+                {
+{
+return dev_storage + 2613;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '2':
+              if (strncmp (KR_keyword, ":ptym32", 7) == 0)
+                {
+{
+return dev_storage + 2612;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '1':
+              if (strncmp (KR_keyword, ":ptym31", 7) == 0)
+                {
+{
+return dev_storage + 2611;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '0':
+              if (strncmp (KR_keyword, ":ptym30", 7) == 0)
+                {
+{
+return dev_storage + 2610;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            default:
+{
+return	NULL;
+
+}
+            }
+        case '2':
+          switch (KR_keyword [6])
+            {
+            case '9':
+              if (strncmp (KR_keyword, ":ptym29", 7) == 0)
+                {
+{
+return dev_storage + 2609;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '8':
+              if (strncmp (KR_keyword, ":ptym28", 7) == 0)
+                {
+{
+return dev_storage + 2608;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '7':
+              if (strncmp (KR_keyword, ":ptym27", 7) == 0)
+                {
+{
+return dev_storage + 2607;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '6':
+              if (strncmp (KR_keyword, ":ptym26", 7) == 0)
+                {
+{
+return dev_storage + 2606;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '5':
+              if (strncmp (KR_keyword, ":ptym25", 7) == 0)
+                {
+{
+return dev_storage + 2605;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '4':
+              if (strncmp (KR_keyword, ":ptym24", 7) == 0)
+                {
+{
+return dev_storage + 2604;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '3':
+              if (strncmp (KR_keyword, ":ptym23", 7) == 0)
+                {
+{
+return dev_storage + 2603;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '2':
+              if (strncmp (KR_keyword, ":ptym22", 7) == 0)
+                {
+{
+return dev_storage + 2602;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '1':
+              if (strncmp (KR_keyword, ":ptym21", 7) == 0)
+                {
+{
+return dev_storage + 2601;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '0':
+              if (strncmp (KR_keyword, ":ptym20", 7) == 0)
+                {
+{
+return dev_storage + 2600;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            default:
+{
+return	NULL;
+
+}
+            }
+        case '1':
+          switch (KR_keyword [6])
+            {
+            case '9':
+              if (strncmp (KR_keyword, ":ptym19", 7) == 0)
+                {
+{
+return dev_storage + 2599;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '8':
+              if (strncmp (KR_keyword, ":ptym18", 7) == 0)
+                {
+{
+return dev_storage + 2598;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '7':
+              if (strncmp (KR_keyword, ":ptym17", 7) == 0)
+                {
+{
+return dev_storage + 2597;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '6':
+              if (strncmp (KR_keyword, ":ptym16", 7) == 0)
+                {
+{
+return dev_storage + 2596;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '5':
+              if (strncmp (KR_keyword, ":ptym15", 7) == 0)
+                {
+{
+return dev_storage + 2595;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '4':
+              if (strncmp (KR_keyword, ":ptym14", 7) == 0)
+                {
+{
+return dev_storage + 2594;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '3':
+              if (strncmp (KR_keyword, ":ptym13", 7) == 0)
+                {
+{
+return dev_storage + 2593;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '2':
+              if (strncmp (KR_keyword, ":ptym12", 7) == 0)
+                {
+{
+return dev_storage + 2592;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '1':
+              if (strncmp (KR_keyword, ":ptym11", 7) == 0)
+                {
+{
+return dev_storage + 2591;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case '0':
+              if (strncmp (KR_keyword, ":ptym10", 7) == 0)
+                {
+{
+return dev_storage + 2590;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            default:
 {
 return	NULL;
 
@@ -3526,81 +4397,6 @@ return	NULL;
 
 }
                 }
-            case '5':
-              if (strncmp (KR_keyword, ":ptym59", 8) == 0)
-                {
-{
-return dev_storage + 2639;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, ":ptym49", 8) == 0)
-                {
-{
-return dev_storage + 2629;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '3':
-              if (strncmp (KR_keyword, ":ptym39", 8) == 0)
-                {
-{
-return dev_storage + 2619;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              if (strncmp (KR_keyword, ":ptym29", 8) == 0)
-                {
-{
-return dev_storage + 2609;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              if (strncmp (KR_keyword, ":ptym19", 8) == 0)
-                {
-{
-return dev_storage + 2599;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
             default:
 {
 return	NULL;
@@ -3645,81 +4441,6 @@ return	NULL;
                 {
 {
 return dev_storage + 94;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '5':
-              if (strncmp (KR_keyword, ":ptym58", 8) == 0)
-                {
-{
-return dev_storage + 2638;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, ":ptym48", 8) == 0)
-                {
-{
-return dev_storage + 2628;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '3':
-              if (strncmp (KR_keyword, ":ptym38", 8) == 0)
-                {
-{
-return dev_storage + 2618;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              if (strncmp (KR_keyword, ":ptym28", 8) == 0)
-                {
-{
-return dev_storage + 2608;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              if (strncmp (KR_keyword, ":ptym18", 8) == 0)
-                {
-{
-return dev_storage + 2598;
 
 }
                 }
@@ -3784,81 +4505,6 @@ return	NULL;
 
 }
                 }
-            case '5':
-              if (strncmp (KR_keyword, ":ptym57", 8) == 0)
-                {
-{
-return dev_storage + 2637;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, ":ptym47", 8) == 0)
-                {
-{
-return dev_storage + 2627;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '3':
-              if (strncmp (KR_keyword, ":ptym37", 8) == 0)
-                {
-{
-return dev_storage + 2617;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              if (strncmp (KR_keyword, ":ptym27", 8) == 0)
-                {
-{
-return dev_storage + 2607;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              if (strncmp (KR_keyword, ":ptym17", 8) == 0)
-                {
-{
-return dev_storage + 2597;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
             default:
 {
 return	NULL;
@@ -3903,81 +4549,6 @@ return	NULL;
                 {
 {
 return dev_storage + 92;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '5':
-              if (strncmp (KR_keyword, ":ptym56", 8) == 0)
-                {
-{
-return dev_storage + 2636;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, ":ptym46", 8) == 0)
-                {
-{
-return dev_storage + 2626;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '3':
-              if (strncmp (KR_keyword, ":ptym36", 8) == 0)
-                {
-{
-return dev_storage + 2616;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              if (strncmp (KR_keyword, ":ptym26", 8) == 0)
-                {
-{
-return dev_storage + 2606;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              if (strncmp (KR_keyword, ":ptym16", 8) == 0)
-                {
-{
-return dev_storage + 2596;
 
 }
                 }
@@ -4042,81 +4613,6 @@ return	NULL;
 
 }
                 }
-            case '5':
-              if (strncmp (KR_keyword, ":ptym55", 8) == 0)
-                {
-{
-return dev_storage + 2635;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, ":ptym45", 8) == 0)
-                {
-{
-return dev_storage + 2625;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '3':
-              if (strncmp (KR_keyword, ":ptym35", 8) == 0)
-                {
-{
-return dev_storage + 2615;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              if (strncmp (KR_keyword, ":ptym25", 8) == 0)
-                {
-{
-return dev_storage + 2605;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              if (strncmp (KR_keyword, ":ptym15", 8) == 0)
-                {
-{
-return dev_storage + 2595;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
             default:
 {
 return	NULL;
@@ -4161,81 +4657,6 @@ return	NULL;
                 {
 {
 return dev_storage + 90;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '5':
-              if (strncmp (KR_keyword, ":ptym54", 8) == 0)
-                {
-{
-return dev_storage + 2634;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, ":ptym44", 8) == 0)
-                {
-{
-return dev_storage + 2624;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '3':
-              if (strncmp (KR_keyword, ":ptym34", 8) == 0)
-                {
-{
-return dev_storage + 2614;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              if (strncmp (KR_keyword, ":ptym24", 8) == 0)
-                {
-{
-return dev_storage + 2604;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              if (strncmp (KR_keyword, ":ptym14", 8) == 0)
-                {
-{
-return dev_storage + 2594;
 
 }
                 }
@@ -4300,96 +4721,6 @@ return	NULL;
 
 }
                 }
-            case '6':
-              if (strncmp (KR_keyword, ":ptym63", 8) == 0)
-                {
-{
-return dev_storage + 2643;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '5':
-              if (strncmp (KR_keyword, ":ptym53", 8) == 0)
-                {
-{
-return dev_storage + 2633;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, ":ptym43", 8) == 0)
-                {
-{
-return dev_storage + 2623;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '3':
-              if (strncmp (KR_keyword, ":ptym33", 8) == 0)
-                {
-{
-return dev_storage + 2613;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              if (strncmp (KR_keyword, ":ptym23", 8) == 0)
-                {
-{
-return dev_storage + 2603;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              if (strncmp (KR_keyword, ":ptym13", 8) == 0)
-                {
-{
-return dev_storage + 2593;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
             default:
 {
 return	NULL;
@@ -4434,96 +4765,6 @@ return	NULL;
                 {
 {
 return dev_storage + 88;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '6':
-              if (strncmp (KR_keyword, ":ptym62", 8) == 0)
-                {
-{
-return dev_storage + 2642;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '5':
-              if (strncmp (KR_keyword, ":ptym52", 8) == 0)
-                {
-{
-return dev_storage + 2632;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, ":ptym42", 8) == 0)
-                {
-{
-return dev_storage + 2622;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '3':
-              if (strncmp (KR_keyword, ":ptym32", 8) == 0)
-                {
-{
-return dev_storage + 2612;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              if (strncmp (KR_keyword, ":ptym22", 8) == 0)
-                {
-{
-return dev_storage + 2602;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              if (strncmp (KR_keyword, ":ptym12", 8) == 0)
-                {
-{
-return dev_storage + 2592;
 
 }
                 }
@@ -4588,96 +4829,6 @@ return	NULL;
 
 }
                 }
-            case '6':
-              if (strncmp (KR_keyword, ":ptym61", 8) == 0)
-                {
-{
-return dev_storage + 2641;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '5':
-              if (strncmp (KR_keyword, ":ptym51", 8) == 0)
-                {
-{
-return dev_storage + 2631;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, ":ptym41", 8) == 0)
-                {
-{
-return dev_storage + 2621;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '3':
-              if (strncmp (KR_keyword, ":ptym31", 8) == 0)
-                {
-{
-return dev_storage + 2611;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              if (strncmp (KR_keyword, ":ptym21", 8) == 0)
-                {
-{
-return dev_storage + 2601;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              if (strncmp (KR_keyword, ":ptym11", 8) == 0)
-                {
-{
-return dev_storage + 2591;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
             default:
 {
 return	NULL;
@@ -4722,96 +4873,6 @@ return	NULL;
                 {
 {
 return dev_storage + 86;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '6':
-              if (strncmp (KR_keyword, ":ptym60", 8) == 0)
-                {
-{
-return dev_storage + 2640;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '5':
-              if (strncmp (KR_keyword, ":ptym50", 8) == 0)
-                {
-{
-return dev_storage + 2630;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, ":ptym40", 8) == 0)
-                {
-{
-return dev_storage + 2620;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '3':
-              if (strncmp (KR_keyword, ":ptym30", 8) == 0)
-                {
-{
-return dev_storage + 2610;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              if (strncmp (KR_keyword, ":ptym20", 8) == 0)
-                {
-{
-return dev_storage + 2600;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              if (strncmp (KR_keyword, ":ptym10", 8) == 0)
-                {
-{
-return dev_storage + 2590;
 
 }
                 }

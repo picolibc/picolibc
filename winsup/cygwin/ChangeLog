@@ -1,3 +1,21 @@
+2012-04-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* devices.h (lives_in_dev): New field.
+	(dev_on_fs): Set bit size.
+	(is_dev_resident): Define new method.
+	* devices.in: Use different method for labelling requested name for dev
+	storage: prefix it with a ='.  Use an actual ':' to denote an internal
+	device.
+	(exists_console): Avoid repeated test.
+	(exists_ntdev_silent): Rename from the less-descriptive exists_ntdevs.
+	(dev_dev_storage): Delete unneeded define.
+	* gendevices: Add a flag to each line denoting whether the device lives
+	in /dev space.
+	(generate): Handle special ":" case here for internal devices.  Parse
+	=something_dev as requiring a storage location.  Tack the rest of the
+	line back onto the reformulated "$rest".
+	* devices.cc: Regenerate.
+
 2012-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* devices.h (device::get_device): New method.

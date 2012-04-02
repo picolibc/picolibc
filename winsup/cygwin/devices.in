@@ -55,7 +55,7 @@ exists_ntdev (const device& dev)
 
 /* Don't list via readdir but allow as a direct reference. */
 static int
-exists_ntdevs (const device& dev)
+exists_ntdev_silent (const device& dev)
 {
   return exists_ntdev (dev) ? -1 : false;
 }
@@ -71,8 +71,9 @@ exists_console (const device& dev)
     case FH_CONSOLE:
     case FH_CONIN:
     case FH_CONOUT:
-      return iscons_dev (myself->ctty);
+      return true;
     default:
+      /* Only show my own console device (for now?) */
       return myself->ctty == devn;
     }
 }
@@ -105,9 +106,6 @@ const device dev_procsysvipc_storage =
 const device dev_netdrive_storage =
   {"", {FH_NETDRIVE}, "", exists};
 
-const device dev_dev_storage =
-  {"/dev", {FH_DEV}, "/dev", exists};
-
 const device dev_registry_storage =
   {"", {FH_REGISTRY}, "", exists_internal};
 
@@ -138,17 +136,15 @@ const device dev_error_storage =
 #define BRACK(x) {devn_int: x}
 %storage_here
 }
-/* Internal devices below are marked with a //.  gendevices will
-   eventually translate that to a : .  This is done because shilka
-   does not support a colon here since it is designed to only handle
-   C keywords with special handling for "/".  */
+/* Internal devices below are prefixed with a ":".  This moves them out of
+   the POSIX namespace.  */
 %%
 "/dev", BRACK(FH_DEV), "/dev", exists, S_IFDIR
 "/dev/tty", BRACK(FH_TTY), "/dev/tty", exists, S_IFCHR
-"/dev/pty%(0-63)d", BRACK(FHDEV(DEV_PTYS_MAJOR, {$1})), "/dev/pty{$1}", exists_pty, S_IFCHR, ptys_dev
-"//ptym%(0-63)d", BRACK(FHDEV(DEV_PTYM_MAJOR, {$1})), "/dev/ptym{$1}", exists_internal, S_IFCHR, ptym_dev
-"/dev/cons%(0-63)d", BRACK(FHDEV(DEV_CONS_MAJOR, {$1})), "/dev/cons{$1}", exists_console, S_IFCHR, cons_dev
-"/dev/console", BRACK(FH_CONSOLE), "/dev/console", exists_console, S_IFCHR, console_dev
+"/dev/pty%(0-63)d", BRACK(FHDEV(DEV_PTYS_MAJOR, {$1})), "/dev/pty{$1}", exists_pty, S_IFCHR, =ptys_dev
+":ptym%(0-63)d", BRACK(FHDEV(DEV_PTYM_MAJOR, {$1})), "/dev/ptym{$1}", exists_internal, S_IFCHR, =ptym_dev
+"/dev/cons%(0-63)d", BRACK(FHDEV(DEV_CONS_MAJOR, {$1})), "/dev/cons{$1}", exists_console, S_IFCHR, =cons_dev
+"/dev/console", BRACK(FH_CONSOLE), "/dev/console", exists_console, S_IFCHR, =console_dev
 "/dev/ptmx", BRACK(FH_PTMX), "/dev/ptmx", exists, S_IFCHR
 "/dev/windows", BRACK(FH_WINDOWS), "/dev/windows", exists, S_IFCHR
 "/dev/dsp", BRACK(FH_OSS_DSP), "/dev/dsp", exists, S_IFCHR
@@ -158,15 +154,15 @@ const device dev_error_storage =
 "/dev/zero", BRACK(FH_ZERO), "/dev/zero", exists, S_IFCHR
 "/dev/full", BRACK(FH_FULL), "/dev/full", exists, S_IFCHR
 "/dev/random", BRACK(FH_RANDOM), "/dev/random", exists, S_IFCHR
-"/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", exists, S_IFCHR, urandom_dev
+"/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", exists, S_IFCHR, =urandom_dev
 "/dev/mem", BRACK(FH_MEM), "/dev/mem", exists, S_IFCHR
 "/dev/kmem", BRACK(FH_KMEM), "/dev/mem", exists, S_IFCHR
 "/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard", exists, S_IFCHR
 "/dev/port", BRACK(FH_PORT), "/dev/port", exists, S_IFCHR
-"/dev/com%(1-16)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1 - 1})), "\\??\\COM{$1}", exists_ntdevs, S_IFCHR
+"/dev/com%(1-16)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1 - 1})), "\\??\\COM{$1}", exists_ntdev_silent, S_IFCHR
 "/dev/ttyS%(0-63)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1})), "\\??\\COM{$1 + 1}", exists_ntdev, S_IFCHR
-"//pipe", BRACK(FH_PIPE), "/dev/pipe", exists_internal, S_IFCHR
-"//fifo", BRACK(FH_FIFO), "/dev/fifo", exists_internal, S_IFCHR
+":pipe", BRACK(FH_PIPE), "/dev/pipe", exists_internal, S_IFCHR
+":fifo", BRACK(FH_FIFO), "/dev/fifo", exists_internal, S_IFCHR
 "/dev/st%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1})), "\\Device\\Tape{$1}", exists_ntdev, S_IFBLK
 "/dev/nst%(0-127)d", BRACK(FHDEV(DEV_TAPE_MAJOR, {$1 + 128})), "\\Device\\Tape{$1}", exists_ntdev, S_IFBLK
 "/dev/fd%(0-15)d", BRACK(FHDEV(DEV_FLOPPY_MAJOR, {$1})), "\\Device\\Floppy{$1}", exists_ntdev, S_IFBLK

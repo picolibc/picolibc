@@ -275,7 +275,8 @@ struct device
   const char *native;
   int (*exists_func) (const device&);
   _mode_t mode;
-  bool dev_on_fs;
+  bool lives_in_dev:4;
+  bool dev_on_fs:4;
   static const device *lookup (const char *, unsigned int = UINT32_MAX);
   void parse (const char *);
   void parse (_major_t major, _minor_t minor);
@@ -318,6 +319,7 @@ struct device
   inline void setfs (bool x) {dev_on_fs = x;}
   inline bool isfs () const {return dev_on_fs || d.devn == FH_FS;}
   inline bool is_fs_special () const {return dev_on_fs && d.devn != FH_FS;}
+  inline bool is_dev_resident () const {return lives_in_dev;}
   inline int exists () const {return exists_func (*this);}
   unsigned char type () const
   {
