@@ -1,3 +1,8 @@
+2012-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (fhandler_base::stat_fixup): Replace string comparison
+	with new device::is_dev_resident() call.
+
 2012-04-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* devices.h (lives_in_dev): New field.

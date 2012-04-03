@@ -1601,7 +1601,7 @@ fhandler_base::stat_fixup (struct __stat64 *buf)
      assuming that /dev doesn't change over the lifetime of a process. */
   if (!buf->st_dev)
     {
-      if (!strncmp (dev ().name, "/dev/", 5))
+      if (dev ().is_dev_resident ())
 	{
 	  if (!dev_st_inited)
 	    {
