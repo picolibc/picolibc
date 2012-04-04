@@ -1,5 +1,11 @@
 2012-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (path_conv::check): Convert device type to FH_FS for
+	non-existant files on /dev, unless /dev itself doesn't exist on disk.
+	Add comment to explain why.
+
+2012-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* hookapi.cc (rvadelta): Compute max_size using SizeOfRawData rather
 	than VirtualSize.
 

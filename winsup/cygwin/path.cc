@@ -882,6 +882,19 @@ is_virtual_symlink:
 					 : sym.fileattr;
 	      path_flags = sym.pflags;
 	    }
+	  else if (isdev_dev (dev))
+	    {
+	      /* If we're looking for a file below /dev, which doesn't exist,
+	         make sure that the device type is converted to FH_FS, so that
+		 subsequent code handles the file correctly.
+		 Unless /dev itself doesn't exist on disk.  In that case /dev
+		 is handled as virtual filesystem, and virtual filesystems are
+		 read-only. */
+	      if (sym.error == ENOENT)
+		sym.error = EROFS;
+	      else
+		dev.d.devn = FH_FS;
+	    }
 
 	  /* If symlink.check found an existing non-symlink file, then
 	     it sets the appropriate flag.  It also sets any suffix found
