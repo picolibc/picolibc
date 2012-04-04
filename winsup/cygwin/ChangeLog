@@ -1,3 +1,10 @@
+2012-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.cc (_getpass_close_fd): New static pthread cleanup handler.
+	(getpass): Rework to use /dev/tty in the first place.  Install
+	_getpass_close_fd as pthread cleanup handler.  Flush prompt explicitely.
+	Lock input and switch off signal input handling when reading password.
+
 2012-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 13.

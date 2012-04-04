@@ -269,29 +269,50 @@ setpassent ()
   return 0;
 }
 
+static void
+_getpass_close_fd (void *arg)
+{
+  if (arg)
+    fclose ((FILE *) arg);
+}
+
 extern "C" char *
 getpass (const char * prompt)
 {
   char *pass = _my_tls.locals.pass;
   struct termios ti, newti;
 
-  cygheap_fdget fhstdin (0);
+  /* Try to use controlling tty in the first place.  Use stdin and stderr
+     only as fallback. */
+  FILE *in = stdin, *err = stderr;
+  FILE *tty = fopen ("/dev/tty", "w+b");
+  pthread_cleanup_push  (_getpass_close_fd, tty);
+  if (tty)
+    {
+      /* Set close-on-exec for obvious reasons. */
+      fcntl (fileno (tty), F_SETFD, fcntl (fileno (tty), F_GETFD) | FD_CLOEXEC);
+      in = err = tty;
+    }
 
-  if (fhstdin < 0)
+  /* Make sure to notice if stdin is closed. */
+  if (tcgetattr (fileno (in), &ti) == -1)
     pass[0] = '\0';
   else
     {
-      fhstdin->tcgetattr (&ti);
+      flockfile (in);
       newti = ti;
-      newti.c_lflag &= ~ECHO;
-      fhstdin->tcsetattr (TCSANOW, &newti);
-      fputs (prompt, stderr);
-      fgets (pass, _PASSWORD_LEN, stdin);
-      fprintf (stderr, "\n");
-      for (int i=0; pass[i]; i++)
-	if (pass[i] == '\r' || pass[i] == '\n')
-	  pass[i] = '\0';
-      fhstdin->tcsetattr (TCSANOW, &ti);
+      newti.c_lflag &= ~(ECHO | ISIG);	/* No echo, no signal handling. */
+      tcsetattr (fileno (in), TCSANOW, &newti);
+      fputs (prompt, err);
+      fflush (err);
+      fgets (pass, _PASSWORD_LEN, in);
+      fprintf (err, "\n");
+      tcsetattr (fileno (in), TCSANOW, &ti);
+      funlockfile (in);
+      char *crlf = strpbrk (pass, "\r\n");
+      if (crlf)
+	*crlf = '\0';
     }
+  pthread_cleanup_pop (1);
   return pass;
 }
