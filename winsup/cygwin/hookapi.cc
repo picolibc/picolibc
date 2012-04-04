@@ -57,7 +57,7 @@ rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva, DWORD &max_size)
 	&& (section[i].VirtualAddress + section[i].Misc.VirtualSize) > import_rva)
     // if (ascii_strncasematch ((char *) section[i].Name, ".idata", IMAGE_SIZEOF_SHORT_NAME))
       {
-	max_size = section[i].Misc.VirtualSize
+	max_size = section[i].SizeOfRawData
 		   - (import_rva - section[i].VirtualAddress);
 	return section[i].VirtualAddress - section[i].PointerToRawData;
       }

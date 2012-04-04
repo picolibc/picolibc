@@ -1,5 +1,10 @@
 2012-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* hookapi.cc (rvadelta): Compute max_size using SizeOfRawData rather
+	than VirtualSize.
+
+2012-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* passwd.cc (_getpass_close_fd): New static pthread cleanup handler.
 	(getpass): Rework to use /dev/tty in the first place.  Install
 	_getpass_close_fd as pthread cleanup handler.  Flush prompt explicitely.
