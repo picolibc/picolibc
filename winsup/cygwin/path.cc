@@ -889,8 +889,11 @@ is_virtual_symlink:
 		 subsequent code handles the file correctly.
 		 Unless /dev itself doesn't exist on disk.  In that case /dev
 		 is handled as virtual filesystem, and virtual filesystems are
-		 read-only. */
-	      if (sym.error == ENOENT)
+		 read-only.  The PC_KEEP_HANDLE check allows to check for
+		 a call from an informational system call.  In that case we
+		 just stick to ENOENT, and the device type doesn't matter
+		 anyway. */
+	      if (sym.error == ENOENT && !(opt & PC_KEEP_HANDLE))
 		sym.error = EROFS;
 	      else
 		dev.d.devn = FH_FS;

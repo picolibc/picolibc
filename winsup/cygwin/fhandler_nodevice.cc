@@ -15,10 +15,14 @@ details. */
 #include "fhandler.h"
 
 int
-fhandler_nodevice::open (int, mode_t)
+fhandler_nodevice::open (int flags, mode_t)
 {
   if (!pc.error)
     set_errno (ENXIO);
+  /* Fixup EROFS error returned from path_conv if /dev is not backed by real
+     directory on disk and the file doesn't exist. */
+  else if (pc.error == EROFS && (flags & O_ACCMODE) == O_RDONLY)
+    set_errno (ENOENT);
   return 0;
 }
 

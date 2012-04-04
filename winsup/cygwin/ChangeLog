@@ -1,5 +1,12 @@
 2012-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_nodevice.cc (fhandler_nodevice::open): Convert EROFS to
+	ENOENT if non-existent file got opened for reading only.  Explain why.
+	* path.cc (path_conv::check): Stick to ENOENT if file has been opened
+	for informational purposes only.  Add to comment.
+
+2012-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (path_conv::check): Convert device type to FH_FS for
 	non-existant files on /dev, unless /dev itself doesn't exist on disk.
 	Add comment to explain why.
