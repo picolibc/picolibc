@@ -1,7 +1,7 @@
 /* mkgroup.c:
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -558,9 +558,9 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 }
 
 static void
-print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
-	       DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
-	       DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
+print_special_by_sid (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
+		      DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
+		      DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
 {
   WCHAR grp[GNLEN + 1], dom[MAX_DOMAIN_NAME_LEN + 1];
   DWORD glen, dlen, rid;
@@ -595,6 +595,23 @@ print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 	}
       FreeSid (psid);
     }
+}
+
+static void
+print_special_by_name (PCWSTR name, gid_t gid)
+{
+  DWORD size = 256, dom_size = 256;
+  PSID sid = (PSID) alloca (size);
+  WCHAR dom[dom_size];
+  SID_NAME_USE use;
+
+  PWCHAR name_only = wcschr (name, L'\\');
+  if (name_only)
+    ++name_only;
+
+  if (LookupAccountNameW (NULL, name, sid, &size, dom, &dom_size, &use))
+    printf ("%ls:%s:%lu:\n",
+	    name_only ?: name, put_sid (sid), (unsigned long) gid);
 }
 
 static int
@@ -730,8 +747,8 @@ main (int argc, char **argv)
 
   if (argc == 1)
     {
-      print_special (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
-		     0, 0, 0, 0, 0, 0, 0);
+      print_special_by_sid (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
+			    0, 0, 0, 0, 0, 0, 0);
       if (in_domain)
 	{
 	  if (!enum_local_groups (TRUE, NULL, sep_char, id_offset,
@@ -857,8 +874,11 @@ skip:
 
   /* Get 'system' group */
   if (!disp_groupname && print_system && print_builtin && print_domlist)
-    print_special (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
-		   0, 0, 0, 0, 0, 0, 0);
+    {
+      print_special_by_sid (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
+			    0, 0, 0, 0, 0, 0, 0);
+      print_special_by_name (L"NT SERVICE\\TrustedInstaller", -2);
+    }
 
   off = id_offset;
   for (i = 0; i < print_domlist; ++i)

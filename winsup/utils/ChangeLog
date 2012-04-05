@@ -1,3 +1,15 @@
+2012-04-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (print_special_by_sid): Rename from print_special.  Change
+	calls throughout.
+	(print_special_by_name): New function.
+	(main): Call print_special_by_name for TrustedInstaller account.
+	* mkpasswd.c (print_special_by_sid): Rename from print_special.  Change
+	calls throughout.
+	(print_special_by_name): New function.
+	(enum_std_accounts): Call print_special_by_name for TrustedInstaller
+	account.
+
 2012-02-24  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* pldd.c: Fix typo in license header.

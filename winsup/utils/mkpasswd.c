@@ -1,7 +1,7 @@
 /* mkpasswd.c:
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006,
-   2008, 2009, 2010, 2011 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -455,9 +455,9 @@ enum_users (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 }
 
 static void
-print_special (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
-	       DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
-	       DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
+print_special_by_sid (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
+		      DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
+		      DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
 {
   WCHAR user[UNLEN + 1], dom[MAX_DOMAIN_NAME_LEN + 1];
   DWORD len, len2, rid;
@@ -581,6 +581,29 @@ print_version ()
 }
 
 static void
+print_special_by_name (PCWSTR name, uid_t uid, gid_t gid)
+{
+  DWORD size = 256, dom_size = 256;
+  PSID sid = (PSID) alloca (size);
+  WCHAR dom[dom_size];
+  SID_NAME_USE use;
+
+  PWCHAR name_only = wcschr (name, L'\\');
+  if (name_only)
+    ++name_only;
+
+  if (LookupAccountNameW (NULL, name, sid, &size, dom, &dom_size, &use))
+    printf ("%ls:*:%lu:%lu:U-%ls%s%ls,%s::\n",
+	    name_only ?: name,
+	    (unsigned long) uid,
+	    (unsigned long) gid,
+	    name_only ? dom : L"",
+	    name_only ? "\\" : "",
+	    name_only ?: name,
+	    put_sid (sid));
+}
+
+static void
 enum_std_accounts ()
 {
   /* Generate service starter account entries. */
@@ -588,8 +611,10 @@ enum_std_accounts ()
   printf ("LocalService:*:19:544:U-NT AUTHORITY\\LocalService,S-1-5-19::\n");
   printf ("NetworkService:*:20:544:U-NT AUTHORITY\\NetworkService,S-1-5-20::\n");
   /* Get 'administrators' group (has localized name). */
-  print_special (&sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID,
-		 DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0);
+  print_special_by_sid (&sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID,
+			DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0);
+  /* Fetch "TrustedInstaller" account starting with Vista. */
+  print_special_by_name (L"NT SERVICE\\TrustedInstaller", -2, -2);
 }
 
 static PPOLICY_PRIMARY_DOMAIN_INFO p_dom;
