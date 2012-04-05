@@ -1,3 +1,22 @@
+2012-04-04  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler.h (fhandler_pty_common::bytes_available): Declare new
+	function.
+	(fhandler_pty_master::flush_to_slave): Ditto.
+	* fhandler_tty.cc (bytes_available): Define new function.
+	(fhandler_pty_common::bytes_available): Ditto.
+	(handler_pty_master::flush_to_slave): Ditto.
+	(fhandler_pty_master::process_slave_output): Call flush_to_slave ()
+	here.  Use bytes_available () rather than PeekNamedPipe.  Cleanup
+	sloppy logic.
+	(fhandler_pty_slave::read): Use bytes_available () rather than
+	PeekNamedPipe.
+	(fhandler_pty_slave::ioctl): Ditto.
+	(fhandler_pty_master::ioctl): Ditto.
+	(fhandler_pty_master::cleanup): Remove ancient #if 0.
+	* select.cc (peek_pipe): Call flush_to_slave whenever we're checking
+	for a pty master.
+
 2012-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_nodevice.cc (fhandler_nodevice::open): Convert EROFS to

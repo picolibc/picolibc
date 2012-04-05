@@ -1433,6 +1433,7 @@ class fhandler_pty_common: public fhandler_termios
 
   int close ();
   _off64_t lseek (_off64_t, int);
+  bool bytes_available (DWORD& n);
   void set_close_on_exec (bool val);
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
@@ -1549,6 +1550,7 @@ public:
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
   int tcgetpgrp ();
+  void flush_to_slave ();
 
   fhandler_pty_master (void *) {}
   ~fhandler_pty_master ();
