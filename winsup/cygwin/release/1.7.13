@@ -1,0 +1,5 @@
+What's new:
+-----------
+
+- mkpasswd and mkgroup now try to print an entry for the TrustedInstaller
+  account existing since Windows Vista/Server 2008.
