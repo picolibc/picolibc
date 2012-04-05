@@ -1,5 +1,9 @@
 2012-04-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 14.
+
+2012-04-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* passwd.cc (pwdgrp::read_passwd): Fix pretty_ls entry tyo contain
 	the required number of colons.
 
