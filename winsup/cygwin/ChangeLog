@@ -1,3 +1,8 @@
+2012-04-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.cc (pwdgrp::read_passwd): Fix pretty_ls entry tyo contain
+	the required number of colons.
+
 2012-04-04  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fhandler.h (fhandler_pty_common::bytes_available): Declare new

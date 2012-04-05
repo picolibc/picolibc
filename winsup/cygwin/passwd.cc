@@ -58,7 +58,7 @@ pwdgrp::read_passwd ()
   bool searchentry = true;
   struct passwd *pw;
   /* must be static */
-  static char NO_COPY pretty_ls[] = "????????:*:-1:-1:";
+  static char NO_COPY pretty_ls[] = "????????:*:-1:-1:::";
 
   add_line (pretty_ls);
   cygsid tu = cygheap->user.sid ();
