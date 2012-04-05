@@ -1,5 +1,18 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.13"><title>What's new and what changed from 1.7.12 to 1.7.13</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+mkpasswd and mkgroup now try to print an entry for the TrustedInstaller
+account existing since Windows Vista/Server 2008.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.12"><title>What's new and what changed from 1.7.11 to 1.7.12</title>
 
 <itemizedlist mark="bullet">
