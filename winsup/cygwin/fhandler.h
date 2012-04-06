@@ -241,12 +241,19 @@ class fhandler_base
 
   IMPLEMENT_STATUS_FLAG (bool, wbinset)
   IMPLEMENT_STATUS_FLAG (bool, rbinset)
-  IMPLEMENT_STATUS_FLAG (bool, nohandle)
   IMPLEMENT_STATUS_FLAG (bool, did_lseek)
   IMPLEMENT_STATUS_FLAG (query_state, query_open)
   IMPLEMENT_STATUS_FLAG (bool, close_on_exec)
   IMPLEMENT_STATUS_FLAG (bool, need_fork_fixup)
   IMPLEMENT_STATUS_FLAG (bool, isclosed)
+
+  bool nohandle () const {return !!status.nohandle;}
+  bool nohandle (bool val)
+  {
+    if ((status.nohandle = val))
+      io_handle = INVALID_HANDLE_VALUE;
+    return val;
+  }
 
   int get_default_fmode (int flags);
 

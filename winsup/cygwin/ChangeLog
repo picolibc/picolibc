@@ -1,5 +1,11 @@
 2012-04-06  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* fhandler.h (fhandler_base::nohandle): Implement "by hand" rather than
+	through macro.  Set io_handle to INVALID_HANDLE_VALUE when setting flag
+	to true.
+
+2012-04-06  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* path.c (path_conv::check): Avoid directly referencing fields of the
 	dev structure when it can be easily avoided.
 
