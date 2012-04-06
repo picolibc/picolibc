@@ -4,7 +4,7 @@
 
 2012-04-05  Corinna Vinschen  <corinna@vinschen.de>
 
-	* passwd.cc (pwdgrp::read_passwd): Fix pretty_ls entry tyo contain
+	* passwd.cc (pwdgrp::read_passwd): Fix pretty_ls entry typo contain
 	the required number of colons.
 
 2012-04-04  Christopher Faylor  <me.cygwin2012@cgf.cx>
@@ -16,7 +16,7 @@
 	(fhandler_pty_common::bytes_available): Ditto.
 	(handler_pty_master::flush_to_slave): Ditto.
 	(fhandler_pty_master::process_slave_output): Call flush_to_slave ()
-	here.  Use bytes_available () rather than PeekNamedPipe.  Cleanup
+	here.  Use bytes_available () rather than PeekNamedPipe.  Clean up
 	sloppy logic.
 	(fhandler_pty_slave::read): Use bytes_available () rather than
 	PeekNamedPipe.
@@ -36,7 +36,7 @@
 2012-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Convert device type to FH_FS for
-	non-existant files on /dev, unless /dev itself doesn't exist on disk.
+	non-existent files on /dev, unless /dev itself doesn't exist on disk.
 	Add comment to explain why.
 
 2012-04-04  Corinna Vinschen  <corinna@vinschen.de>
@@ -906,7 +906,7 @@
 
 2012-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
-	* Makefile.in (clean): Remove non-existant regexp dir.
+	* Makefile.in (clean): Remove non-existent regexp dir.
 
 	* collate.h: New header.
 	(__collate_range_cmp): Declare.
