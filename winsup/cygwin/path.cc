@@ -896,7 +896,7 @@ is_virtual_symlink:
 	      if (sym.error == ENOENT && !(opt & PC_KEEP_HANDLE))
 		sym.error = EROFS;
 	      else
-		dev.d.devn = FH_FS;
+		dev = FH_FS;
 	    }
 
 	  /* If symlink.check found an existing non-symlink file, then

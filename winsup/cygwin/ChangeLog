@@ -1,3 +1,8 @@
+2012-04-06  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* path.c (path_conv::check): Avoid directly referencing fields of the
+	dev structure when it can be easily avoided.
+
 2012-04-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 14.
