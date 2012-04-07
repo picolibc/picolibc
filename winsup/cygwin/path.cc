@@ -744,13 +744,19 @@ path_conv::check (const char *src, unsigned opt,
 	    {
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
 	      fhandler_virtual *fh = (fhandler_virtual *) build_fh_dev (dev, path_copy);
-	      virtual_ftype_t file_type = fh->exists ();
-	      if (file_type == virt_symlink)
+	      virtual_ftype_t file_type;
+	      if (!fh)
+		file_type = virt_none;
+	      else
 		{
-		  fh->fill_filebuf ();
-		  symlen = sym.set (fh->get_filebuf ());
+		  file_type = fh->exists ();
+		  if (file_type == virt_symlink)
+		    {
+		      fh->fill_filebuf ();
+		      symlen = sym.set (fh->get_filebuf ());
+		    }
+		  delete fh;
 		}
-	      delete fh;
 	      switch (file_type)
 		{
 		  case virt_directory:

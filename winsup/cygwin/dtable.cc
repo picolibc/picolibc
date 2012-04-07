@@ -256,6 +256,8 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
   if (fd == -1)
     fd = cygheap->fdtab.find_unused_handle ();
   fhandler_base *fh = build_fh_name (name);
+  if (!fh)
+    return -1;
   cygheap->fdtab[fd] = fh;
   cygheap->fdtab[fd]->refcnt (1);
   fh->init (handle, myaccess, bin ?: fh->pc_binmode ());
@@ -336,6 +338,9 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	fh = build_fh_dev (dev);
       else
 	fh = build_fh_name (name);
+
+      if (!fh)
+	return;
 
       if (name[0])
 	{

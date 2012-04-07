@@ -1,3 +1,11 @@
+2012-04-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* dtable.cc (cygwin_attach_handle_to_fd): Defend against NULL return
+	from build_fh_*.
+	(dtable::init_std_file_from_handle): Ditto.
+	* mmap.cc (mmap_record::alloc_fh): Ditto.
+	* path.cc (path_conv::check): Ditto.
+
 2012-04-06  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fhandler.h (fhandler_base::nohandle): Implement "by hand" rather than

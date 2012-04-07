@@ -526,7 +526,8 @@ mmap_record::alloc_fh ()
   fdev.name = fdev.native = "";
   fdev.parse (get_device ());
   fhandler_base *fh = build_fh_dev (fdev);
-  fh->set_access (get_openflags ());
+  if (fh)
+    fh->set_access (get_openflags ());
   return fh;
 }
 
