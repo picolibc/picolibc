@@ -1,3 +1,7 @@
+2012-04-09  Roland McGrath  <mcgrathr@google.com>
+
+	* bfdlink.h (struct bfd_link_info): Add new member user_phdrs.
+
 2012-03-15  Alan Modra  <amodra@gmail.com>
 
 	* dis-asm.h (disassemble_init_powerpc): Declare.

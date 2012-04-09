@@ -229,7 +229,7 @@ typedef enum {with_flags, without_flags} flag_type;
 /* A section flag list.  */
 struct flag_info_list
 {
-  flag_type with; 
+  flag_type with;
   const char *name;
   bfd_boolean valid;
   struct flag_info_list *next;
@@ -404,6 +404,9 @@ struct bfd_link_info
 
   /* TRUE if we should warn alternate ELF machine code.  */
   unsigned int warn_alternate_em: 1;
+
+  /* TRUE if the linker script contained an explicit PHDRS command.  */
+  unsigned int user_phdrs: 1;
 
   /* Char that may appear as the first char of a symbol, but should be
      skipped (like symbol_leading_char) when looking up symbols in
@@ -674,7 +677,7 @@ struct bfd_link_order
 	} indirect;
       struct
 	{
-	  /* Size of contents, or zero when contents should be filled by 
+	  /* Size of contents, or zero when contents should be filled by
 	     the architecture-dependent fill function.
 	     A non-zero value allows filling of the output section
 	     with an arbitrary repeated pattern.  */
