@@ -1591,10 +1591,11 @@ static bool dev_st_inited;
 void
 fhandler_base::stat_fixup (struct __stat64 *buf)
 {
-  /* Set inode number to device number.  This gives us a valid, unique
-     inode number and we especially don't have to call hash_path_name. */
+  /* For devices, set inode number to device number.  This gives us a valid,
+     unique inode number without having to call hash_path_name. */
   if (!buf->st_ino)
-    buf->st_ino = get_device ();
+    buf->st_ino = (get_major () == DEV_VIRTFS_MAJOR) ? get_ino ()
+						     : get_device ();
   /* For /dev-based devices, st_dev must be set to the device number of /dev,
      not it's own device major/minor numbers.  What we do here to speed up
      the process is to fetch the device number of /dev only once, liberally

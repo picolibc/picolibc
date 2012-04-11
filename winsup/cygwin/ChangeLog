@@ -1,3 +1,8 @@
+2012-04-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (fhandler_base::stat_fixup): Fix inode numbers of
+	non-device files in virtual fileysystems.
+
 2012-04-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* dtable.cc (cygwin_attach_handle_to_fd): Defend against NULL return
