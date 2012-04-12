@@ -1,3 +1,8 @@
+2012-04-12  David S. Miller  <davem@davemloft.net>
+
+	* elf/sparc.h (R_SPARC_WDISP10): New reloc.
+	* opcode/sparc.h: Define '=' as generating R_SPARC_WDISP10.
+
 2012-04-10  Tristan Gingold  <gingold@adacore.com>
 
 	* splay-tree.h: Conditionnaly includes stdint.h and inttypes.h

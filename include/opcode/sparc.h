@@ -208,7 +208,8 @@ typedef struct sparc_opcode
 	0	32/64 bit immediate for set or setx (v9) insns
 	_	Ancillary state register in rd (v9a)
 	/	Ancillary state register in rs1 (v9a)
-	(	entire floating point state register (%efsr).  */
+	(	entire floating point state register (%efsr)
+	=	2+8 bit PC relative immediate. (v9)  */
 
 #define OP2(x)		(((x) & 0x7) << 22)  /* Op2 field of format2 insns.  */
 #define OP3(x)		(((x) & 0x3f) << 19) /* Op3 field of format3 insns.  */
