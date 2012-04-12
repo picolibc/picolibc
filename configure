@@ -3093,7 +3093,9 @@ case "${target}" in
     noconfigdirs="$noconfigdirs target-libssp"
     ;;
   rl78-*-*)
-    # Dereferencing -1 is a compile-time error
+    # libssp uses a misaligned load to trigger a fault, but the RL78
+    # doesn't fault for those - instead, it gives a build-time error
+    # for explicit misaligned loads.
     noconfigdirs="$noconfigdirs target-libssp"
     ;;
 esac
@@ -3496,8 +3498,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs libgui itcl ld"
     ;;
   ia64*-*-*vms*)
-    # No ld support yet.
-    noconfigdirs="$noconfigdirs libgui itcl ld"
+    noconfigdirs="$noconfigdirs libgui itcl"
     ;;
   i[3456789]86-w64-mingw*)
     ;;
