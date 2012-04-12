@@ -1,3 +1,7 @@
+2012-04-12  Mike Frysinger  <vapier@gentoo.org>
+
+	* callback.h (CB_SYS_argc, CB_SYS_argnlen, CB_SYS_argn): Define.
+
 2012-02-03  Kevin Buettner  <kevinb@redhat.com>
 
 	* sim-rl78.h: New file.

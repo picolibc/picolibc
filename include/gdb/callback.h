@@ -231,6 +231,11 @@ extern host_callback default_callback;
 #define CB_SYS_truncate	21
 #define CB_SYS_ftruncate 22
 #define CB_SYS_pipe 	23
+
+/* New ARGV support.  */
+#define CB_SYS_argc	24
+#define CB_SYS_argnlen	25
+#define CB_SYS_argn	26
 
 /* Struct use to pass and return information necessary to perform a
    system call.  */
