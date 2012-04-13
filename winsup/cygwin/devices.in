@@ -63,18 +63,16 @@ exists_ntdev_silent (const device& dev)
 static int
 exists_console (const device& dev)
 {
-  if (!iscons_dev (myself->ctty))
-    return false;
   int devn = *const_cast<device *> (&dev);
   switch (devn)
     {
     case FH_CONSOLE:
     case FH_CONIN:
     case FH_CONOUT:
-      return true;
+      return !!GetConsoleCP ();
     default:
       /* Only show my own console device (for now?) */
-      return myself->ctty == devn;
+      return iscons_dev (myself->ctty) && myself->ctty == devn;
     }
 }
 

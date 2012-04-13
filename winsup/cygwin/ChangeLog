@@ -1,3 +1,10 @@
+2012-04-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* devices.in (exists_console): Allow /dev/con{sole,in,out} to be
+	referenced they exist.
+	* devices.cc: Regenerate.
+	* fhandler_console.cc (fhandler_console::set_unit): Ditto.
+
 2012-04-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (fhandler_base::stat_fixup): Fix inode numbers of

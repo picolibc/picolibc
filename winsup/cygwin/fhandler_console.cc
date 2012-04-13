@@ -136,18 +136,19 @@ fhandler_console::set_unit ()
   fh_devices devset;
   lock_ttys here;
   HWND me;
+  fh_devices this_unit = dev ();
+  bool generic_console = this_unit == FH_CONIN || this_unit == FH_CONOUT;
   if (shared_console_info)
     {
-      fh_devices this_unit = dev ();
       fh_devices shared_unit =
 	(fh_devices) shared_console_info->tty_min_state.getntty ();
       devset = (shared_unit == this_unit || this_unit == FH_CONSOLE
-		|| this_unit == FH_CONIN || this_unit == FH_CONOUT
+		|| generic_console
 		|| this_unit == FH_TTY) ?
 		shared_unit : FH_ERROR;
       created = false;
     }
-  else if ((myself->ctty != -1 && !iscons_dev (myself->ctty))
+  else if ((!generic_console && (myself->ctty != -1 && !iscons_dev (myself->ctty)))
 	   || !(me = GetConsoleWindow ()))
     devset = FH_ERROR;
   else
