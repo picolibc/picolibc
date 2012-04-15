@@ -5,7 +5,10 @@
 #include "tty.h"
 #include "pinfo.h"
 #include "shared_info.h"
+#include "path.h"
+#include "fhandler.h"
 #include "ntdll.h"
+
 typedef const device *KR_device_t;
 }
 %type KR_device_t
@@ -69,7 +72,7 @@ exists_console (const device& dev)
     case FH_CONSOLE:
     case FH_CONIN:
     case FH_CONOUT:
-      return !!GetConsoleCP ();
+      return fhandler_console::exists ();
     default:
       /* Only show my own console device (for now?) */
       return iscons_dev (myself->ctty) && myself->ctty == devn;

@@ -2371,7 +2371,7 @@ bool
 fhandler_console::need_invisible ()
 {
   BOOL b = false;
-  if (GetConsoleCP ())
+  if (exists ())
     invisible_console = false;
   else
     {

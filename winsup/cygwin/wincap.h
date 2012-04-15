@@ -43,7 +43,7 @@ struct wincaps
   unsigned has_stack_size_param_is_a_reservation	: 1;
   unsigned has_console_logon_sid			: 1;
   unsigned wow64_has_secondary_stack			: 1;
-  unsigned has_program_compatibility_assitant		: 1;
+  unsigned has_program_compatibility_assistant		: 1;
   unsigned kernel_is_always_casesensitive		: 1;
 };
 
@@ -96,7 +96,7 @@ public:
   bool	IMPLEMENT (has_stack_size_param_is_a_reservation)
   bool	IMPLEMENT (has_console_logon_sid)
   bool	IMPLEMENT (wow64_has_secondary_stack)
-  bool	IMPLEMENT (has_program_compatibility_assitant)
+  bool	IMPLEMENT (has_program_compatibility_assistant)
   bool	IMPLEMENT (kernel_is_always_casesensitive)
 
 #undef IMPLEMENT

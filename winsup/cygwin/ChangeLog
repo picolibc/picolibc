@@ -1,3 +1,18 @@
+2012-04-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	wincap.h: Rename assitant to assistant throughout.
+	wincap.cc: Ditto.
+	* devices.in (exists_console): Use fhandler_console::exists () rather
+	than raw test.
+	* devices.cc: Regenerate.
+	* fhandler.h (fhandler_console::exists): Define new function.
+	* fhandler_console.cc (fhandler_console::need_invisible): Use
+	fhandler_console::exists () rather than raw test.
+	* spawn.cc: Rename assitant to assistant throughout.
+	(child_info_spawn::worker): Simplify test for when to start a
+	non-Cygwin process in its own process group.  Just do it whenever we
+	start a non-Cygwin process.
+
 2012-04-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* devices.in (exists_console): Allow /dev/con{sole,in,out} to be
