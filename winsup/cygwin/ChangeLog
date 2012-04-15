@@ -1,7 +1,7 @@
 2012-04-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
-	wincap.h: Rename assitant to assistant throughout.
-	wincap.cc: Ditto.
+	* wincap.h: Rename assitant to assistant throughout.
+	* wincap.cc: Ditto.
 	* devices.in (exists_console): Use fhandler_console::exists () rather
 	than raw test.
 	* devices.cc: Regenerate.
