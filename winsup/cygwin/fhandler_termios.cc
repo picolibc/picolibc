@@ -19,6 +19,9 @@ details. */
 #include "pinfo.h"
 #include "tty.h"
 #include "cygtls.h"
+#include "dtable.h"
+#include "cygheap.h"
+#include "child_info.h"
 #include "ntdll.h"
 
 /* Common functions shared by tty/console */
@@ -397,7 +400,8 @@ fhandler_termios::sigflush ()
   /* FIXME: Checking get_ttyp() for NULL is not right since it should not
      be NULL while this is alive.  However, we can conceivably close a
      ctty while exiting and that will zero this. */
-  if (get_ttyp () && !(get_ttyp ()->ti.c_lflag & NOFLSH))
+  if ((!have_execed || have_execed_cygwin) && get_ttyp ()
+      && !(get_ttyp ()->ti.c_lflag & NOFLSH))
     tcflush (TCIFLUSH);
 }
 

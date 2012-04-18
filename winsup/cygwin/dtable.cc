@@ -863,7 +863,7 @@ dtable::fixup_after_exec ()
 	/* Close the handle if it's close-on-exec or if an error was detected
 	   (typically with opening a console in a gui app) by fixup_after_exec.
 	 */
-	if (fh->close_on_exec () || !fh->get_io_handle ())
+	if (fh->close_on_exec () || (!fh->nohandle () && !fh->get_io_handle ()))
 	  fixup_close (i, fh);
 	else if (fh->get_popen_pid ())
 	  close (i);
@@ -885,7 +885,7 @@ dtable::fixup_after_fork (HANDLE parent)
 	  {
 	    debug_printf ("fd %d (%s)", i, fh->get_name ());
 	    fh->fixup_after_fork (parent);
-	    if (!fh->get_io_handle ())
+	    if (!fh->nohandle () && !fh->get_io_handle ())
 	      {
 		/* This should actually never happen but it's here to make sure
 		   we don't crash due to access of an unopened file handle.  */
