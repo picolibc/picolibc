@@ -77,6 +77,7 @@ enum path_types
   PATH_IHASH		= MOUNT_IHASH,
   PATH_ALL_EXEC		= (PATH_CYGWIN_EXEC | PATH_EXEC),
   PATH_NO_ACCESS_CHECK	= PC_NO_ACCESS_CHECK,
+  PATH_KEPT_HANDLE	= 0x00200000,
   PATH_CTTY		= 0x00400000,	/* could later be used as ctty */
   PATH_OPEN		= 0x00800000,	/* use open semantics */
   PATH_LNK		= 0x01000000,
@@ -153,6 +154,7 @@ class path_conv
   bool has_acls () const {return !(path_flags & PATH_NOACL) && fs.has_acls (); }
   bool hasgood_inode () const {return !(path_flags & PATH_IHASH); }
   bool isgood_inode (__ino64_t ino) const;
+  bool kept_handle () const {return !!(path_flags & PATH_KEPT_HANDLE);}
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int has_dos_filenames_only () const {return path_flags & PATH_DOS;}
   int has_buggy_open () const {return fs.has_buggy_open ();}

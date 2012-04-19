@@ -1,3 +1,11 @@
+2012-04-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* dtable.cc (fh_alloc): Keep fh which was flagged as error if it is for
+	an on-disk device and we were stating it.
+	* path.cc (path_conv::check): Set PATH_KEPT_HANDLE.
+	* path.h (path_types): Add PATH_KEPT_HANDLE.
+	(path_conv::kept_handle): Implement.
+
 2012-04-18  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fhandler.h (fhandler_base::nohandle): Revert to standard
