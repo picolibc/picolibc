@@ -1,3 +1,11 @@
+2012-04-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* dtable.cc (fh_alloc): Only disallow opening of nonexistent on-disk
+	device.
+	* path.cc (path_conv::check): Remove PATH_KEPT_HANDLE setting.
+	* path.h (path_types): Remove PATH_KEPT_HANDLE.
+	(path_conv::kept_handle): Delete now-unneeded function.
+
 2012-04-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* dtable.cc (fh_alloc): Keep fh which was flagged as error if it is for

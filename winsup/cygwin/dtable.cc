@@ -607,10 +607,10 @@ fh_alloc (path_conv& pc)
     fh = cnew (fhandler_nodevice);
   else if (fh->dev () == FH_ERROR)
     {
-      if (pc.kept_handle () && pc.dev.isfs ())
+      if (!pc.isopen () && pc.dev.isfs ())
 	fh->dev () = pc.dev;	/* Special case: This file actually exists on
-				   disk and this is a stat() so just return the
-				   info from pc.  */
+				   disk and we're not trying to open it so just
+				   return the info from pc.  */
       else
 	{
 	  delete fh;
