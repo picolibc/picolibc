@@ -62,10 +62,9 @@ would be difficult.
 <question><para>Where is Objective C?</para></question>
 <answer>
 
-<para>Objective C hasn't been distributed with the Cygwin version of gcc
-for a long time.  For several reason Cygwin was stuck with gcc version 3.4.4.
-Fortunately the latest gcc maintainer is quite busy to create a working
-gcc 4.x release which also comes with an Objective C package.
+<para>Support for compiling Objective C is available in the <literal>gcc4-objc</literal>
+package; resulting binaries will depend on the <literal>libobjc2</literal>
+package at runtime.
 </para>
 </answer></qandaentry>
 
@@ -177,7 +176,7 @@ with gdi32 like this:
 <para>The regular setup allows you to use the option -mwindows on the
 command line to include a set of the basic libraries (and also
 make your program a GUI program instead of a console program),
-including user32, gdi32 and, IIRC, comdlg32.
+including user32, gdi32 and comdlg32.
 </para>
 <para>It is a good idea to put import libraries last on your link line,
 or at least after all the object files and static libraries that reference them.
@@ -194,11 +193,10 @@ as well as the User's Guide section
 <question><para>How do I compile a Win32 executable that doesn't use Cygwin?</para></question>
 <answer>
 
-<para><emphasis role='bold'>(Please note: This section has not yet been updated for the latest net release.)</emphasis>
-</para>
-<para>The -mno-cygwin flag to gcc makes gcc link against standard Microsoft
-DLLs instead of Cygwin.  This is desirable for native Windows programs
-that don't need a UNIX emulation layer.
+<para>The compilers provided by the <literal>mingw-gcc</literal>,
+<literal>mingw64-i686-gcc</literal>, and <literal>mingw64-x86_64-gcc</literal>
+packages link against standard Microsoft DLLs instead of Cygwin. This is
+desirable for native Windows programs that don't need a UNIX emulation layer.
 </para>
 <para>This is not to be confused with 'MinGW' (Minimalist GNU for Windows),
 which is a completely separate effort.  That project's home page is

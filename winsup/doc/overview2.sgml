@@ -35,9 +35,10 @@ the <literal>/usr/share/doc/Cygwin/</literal> directory.
 <para>
 Developers coming from a Windows background will be able to write 
 console or GUI executables that rely on the Microsoft Win32 API instead
-of Cygwin using the -mno-cygwin option to GCC.  The <command>-shared</command>
-option allows to write Windows Dynamically Linked Libraries (DLLs).  The
-resource compiler <command>windres</command> is also provided.
+of Cygwin using the mingw32 or mingw64 cross-compiler toolchains.  The
+<command>-shared</command> option to GCC allows to write Windows Dynamically
+Linked Libraries (DLLs).  The resource compiler <command>windres</command>
+is also provided.
 </para>
 </sect1>
 
