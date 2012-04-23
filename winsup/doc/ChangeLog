@@ -1,5 +1,10 @@
 2012-04-23  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
+	* faq-using.xml (faq.using.emacs, faq.using.xemacs): Change links
+	from http://cygwin.com/xfree to http://x.cygwin.com.
+
+2012-04-23  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
 	* faq-programming.xml (faq.programming.objective-c): Update for gcc4.
 	(faq.programming.win32-api): -mwindows does include -lcomdlg32.
 	(faq.programming.win32-no-cygwin): Update for removal of -mno-cygwin.

@@ -782,7 +782,7 @@ interfere with the normal functioning of Cygwin.
 <para>Yes.  Install the emacs package.  This provides everything you
 need in order to run GNU emacs in a terminal window.  If you also want
 to be able to use the X11
-(<ulink url="http://cygwin.com/xfree/">http://cygwin.com/xfree/</ulink>)
+(<ulink url="http://x.cygwin.com/">http://x.cygwin.com/</ulink>)
 GUI, install the emacs-X11 package.  In either case, you run emacs by
 typing 'emacs' or '/usr/bin/emacs'.
 </para>
@@ -794,7 +794,7 @@ typing 'emacs' or '/usr/bin/emacs'.
 
 <para>Yes.  It can be used in three different modes:</para>
 <para><itemizedlist>
-<listitem><para>X11 (<ulink url="http://cygwin.com/xfree/">http://cygwin.com/xfree/</ulink>) GUI</para></listitem>
+<listitem><para>X11 (<ulink url="http://x.cygwin.com/">http://x.cygwin.com/</ulink>) GUI</para></listitem>
 </itemizedlist></para>
 <para>You have to <emphasis>set</emphasis> the DISPLAY environment variable
 before starting xemacs.</para>
