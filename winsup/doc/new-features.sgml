@@ -1,5 +1,17 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.14"><title>What's new and what changed from 1.7.13 to 1.7.14</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Add mouse reporting modes 1006 and 1015 to console window.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.13"><title>What's new and what changed from 1.7.12 to 1.7.13</title>
 
 <itemizedlist mark="bullet">
