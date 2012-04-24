@@ -1288,6 +1288,8 @@ class dev_console
 
   bool insert_mode;
   int use_mouse;
+  bool ext_mouse_mode6;
+  bool ext_mouse_mode15;
   bool use_focus;
   bool raw_win32_keyboard_mode;
 

@@ -453,12 +453,13 @@ fhandler_console::read (void *pv, size_t& buflen)
 	    {
 	      char c = dev_state.backspace_keycode;
 	      nread = 0;
-	      if (control_key_state & ALT_PRESSED) {
-		if (dev_state.metabit)
-		  c |= 0x80;
-		else
-		  tmp[nread++] = '\e';
-	      }
+	      if (control_key_state & ALT_PRESSED)
+		{
+		  if (dev_state.metabit)
+		    c |= 0x80;
+		  else
+		    tmp[nread++] = '\e';
+		}
 	      tmp[nread++] = c;
 	      tmp[nread] = 0;
 	      toadd = tmp;
@@ -551,6 +552,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 		   events at the same time. */
 		int b = 0;
 		char sz[32];
+		char mode6_term = 'M';
 
 		if (mouse_event.dwEventFlags == MOUSE_WHEELED)
 		  {
@@ -574,7 +576,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 		      {
 			b = dev_state.last_button_code;
 		      }
-		    else if (mouse_event.dwButtonState < dev_state.dwLastButtonState)
+		    else if (mouse_event.dwButtonState < dev_state.dwLastButtonState && !dev_state.ext_mouse_mode6)
 		      {
 			b = 3;
 			strcpy (sz, "btn up");
@@ -594,6 +596,10 @@ fhandler_console::read (void *pv, size_t& buflen)
 			b = 1;
 			strcpy (sz, "btn3 down");
 		      }
+
+		    if (dev_state.ext_mouse_mode6 /* distinguish release */
+			&& mouse_event.dwButtonState < dev_state.dwLastButtonState)
+		        mode6_term = 'm';
 
 		    dev_state.last_button_code = b;
 
@@ -626,25 +632,54 @@ fhandler_console::read (void *pv, size_t& buflen)
 		b |= dev_state.nModifiers;
 
 		/* We can now create the code. */
-		sprintf (tmp, "\033[M%c%c%c", b + ' ', dev_state.dwMousePosition.X + ' ' + 1, dev_state.dwMousePosition.Y + ' ' + 1);
-		syscall_printf ("mouse: %s at (%d,%d)", sz, dev_state.dwMousePosition.X, dev_state.dwMousePosition.Y);
+		if (dev_state.ext_mouse_mode6)
+		  {
+		    __small_sprintf (tmp, "\033[<%d;%d;%d%c", b,
+				     dev_state.dwMousePosition.X + 1,
+				     dev_state.dwMousePosition.Y + 1,
+				     mode6_term);
+		    nread = strlen (tmp);
+		  }
+		else if (dev_state.ext_mouse_mode15)
+		  {
+		    __small_sprintf (tmp, "\033[%d;%d;%dM", b + 32,
+				     dev_state.dwMousePosition.X + 1,
+				     dev_state.dwMousePosition.Y + 1);
+		    nread = strlen (tmp);
+		  }
+		/* else if (dev_state.ext_mouse_mode5) not implemented */
+		else
+		  {
+		    unsigned int xcode = dev_state.dwMousePosition.X + ' ' + 1;
+		    unsigned int ycode = dev_state.dwMousePosition.Y + ' ' + 1;
+		    if (xcode >= 256)
+		      xcode = 0;
+		    if (ycode >= 256)
+		      ycode = 0;
+		    __small_sprintf (tmp, "\033[M%c%c%c", b + ' ',
+				     xcode, ycode);
+		    nread = 6;	/* tmp may contain NUL bytes */
+		  }
+		syscall_printf ("mouse: %s at (%d,%d)", sz,
+				dev_state.dwMousePosition.X,
+				dev_state.dwMousePosition.Y);
 
 		toadd = tmp;
-		nread = 6;
 	      }
 	  }
 	  break;
 
 	case FOCUS_EVENT:
-	  if (dev_state.use_focus) {
-	    if (input_rec.Event.FocusEvent.bSetFocus)
-	      sprintf (tmp, "\033[I");
-	    else
-	      sprintf (tmp, "\033[O");
+	  if (dev_state.use_focus)
+	    {
+	      if (input_rec.Event.FocusEvent.bSetFocus)
+	        __small_sprintf (tmp, "\033[I");
+	      else
+	        __small_sprintf (tmp, "\033[O");
 
-	    toadd = tmp;
-	    nread = 3;
-	  }
+	      toadd = tmp;
+	      nread = 3;
+	    }
 	  break;
 
 	case WINDOW_BUFFER_SIZE_EVENT:
@@ -1517,22 +1552,30 @@ fhandler_console::char_command (char c)
 
 	case 1000: /* Mouse tracking */
 	  dev_state.use_mouse = (c == 'h') ? 1 : 0;
-	  syscall_printf ("mouse support set to mode %d", dev_state.use_mouse);
 	  break;
 
 	case 1002: /* Mouse button event tracking */
 	  dev_state.use_mouse = (c == 'h') ? 2 : 0;
-	  syscall_printf ("mouse support set to mode %d", dev_state.use_mouse);
 	  break;
 
 	case 1003: /* Mouse any event tracking */
 	  dev_state.use_mouse = (c == 'h') ? 3 : 0;
-	  syscall_printf ("mouse support set to mode %d", dev_state.use_mouse);
 	  break;
 
 	case 1004: /* Focus in/out event reporting */
 	  dev_state.use_focus = (c == 'h') ? true : false;
-	  syscall_printf ("focus reporting set to %d", dev_state.use_focus);
+	  break;
+
+	case 1005: /* Extended mouse mode */
+	  syscall_printf ("ignored h/l command for extended mouse mode");
+	  break;
+
+	case 1006: /* SGR extended mouse mode */
+	  dev_state.ext_mouse_mode6 = c == 'h';
+	  break;
+
+	case 1015: /* Urxvt extended mouse mode */
+	  dev_state.ext_mouse_mode15 = c == 'h';
 	  break;
 
 	case 2000: /* Raw keyboard mode */

@@ -1,3 +1,14 @@
+2012-04-24  Thomas Wolff  <towo@towo.net>
+
+	* fhandler.h (class dev_console): Add members ext_mouse_mode6 and
+	ext_mouse_mode15.
+	* fhandler_console.cc (fhandler_console::read): Implement extended
+	mouse modes 1015 (urxvt, mintty, xterm) and 1006 (xterm).  Recognize,
+	but don't implement extended mouse mode 1005 (xterm, mintty).
+	Support mouse coordinates greater than 222 (each axis).  Fix formatting.
+	(fhandler_console::char_command): Initialize enhanced mouse reporting
+	modes.
+
 2012-04-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* dtable.cc (fh_alloc): Only disallow opening of nonexistent on-disk
