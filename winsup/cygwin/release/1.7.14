@@ -1,3 +1,8 @@
+What's new:
+-----------
+
+- Add mouse reporting mode 1006 and 1015 to console.
+
 Bug fixes:
 ----------
 
@@ -11,3 +16,6 @@ Bug fixes:
   which do not have actual handles associated with them.
 
 - Fix inode numbers of non-device files in virtual filesystems.
+
+- Fix reporting large mouse coordinates in console window mouse reporting mode.
+
