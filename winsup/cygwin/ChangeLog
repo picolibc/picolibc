@@ -1,5 +1,9 @@
 2012-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 15.
+
+2012-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_console.cc (ALT_PRESSED): Define earlier, never undefine.
 	(CTRL_PRESSED): Ditto.
 	(fhandler_console::read): Simplify expressions testing for pressed ALT
