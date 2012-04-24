@@ -41,6 +41,9 @@ details. */
    is allocated using tmp_pathbuf!!! */
 #define CONVERT_LIMIT NT_MAX_PATH
 
+#define ALT_PRESSED (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)
+#define CTRL_PRESSED (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)
+
 /*
  * Scroll the screen context.
  * x1, y1 - ul corner
@@ -421,8 +424,6 @@ fhandler_console::read (void *pv, size_t& buflen)
 
 #define ich (input_rec.Event.KeyEvent.uChar.AsciiChar)
 #define wch (input_rec.Event.KeyEvent.uChar.UnicodeChar)
-#define ALT_PRESSED (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)
-#define CTRL_PRESSED (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)
 
 	  /* Ignore key up events, except for left alt events with non-zero character
 	   */
@@ -523,8 +524,6 @@ fhandler_console::read (void *pv, size_t& buflen)
 	    }
 #undef ich
 #undef wch
-#undef ALT_PRESSED
-#undef CTRL_PRESSED
 	  break;
 
 	case MOUSE_EVENT:
@@ -623,9 +622,9 @@ fhandler_console::read (void *pv, size_t& buflen)
 		dev_state.nModifiers = 0;
 		if (mouse_event.dwControlKeyState & SHIFT_PRESSED)
 		    dev_state.nModifiers |= 0x4;
-		if (mouse_event.dwControlKeyState & (RIGHT_ALT_PRESSED|LEFT_ALT_PRESSED))
+		if (mouse_event.dwControlKeyState & ALT_PRESSED)
 		    dev_state.nModifiers |= 0x8;
-		if (mouse_event.dwControlKeyState & (RIGHT_CTRL_PRESSED|LEFT_CTRL_PRESSED))
+		if (mouse_event.dwControlKeyState & CTRL_PRESSED)
 		    dev_state.nModifiers |= 0x10;
 
 		/* Indicate the modifiers */
@@ -2205,15 +2204,13 @@ get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
   int modifier_index = NORMAL;
   if (input_rec.Event.KeyEvent.dwControlKeyState & SHIFT_PRESSED)
     modifier_index = SHIFT;
-  if (input_rec.Event.KeyEvent.dwControlKeyState &
-		(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+  if (input_rec.Event.KeyEvent.dwControlKeyState & CTRL_PRESSED)
     modifier_index += CONTROL;
 
   for (int i = 0; keytable[i].vk; i++)
     if (input_rec.Event.KeyEvent.wVirtualKeyCode == keytable[i].vk)
       {
-	if ((input_rec.Event.KeyEvent.dwControlKeyState &
-		(LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
+	if ((input_rec.Event.KeyEvent.dwControlKeyState & ALT_PRESSED)
 	    && keytable[i].val[modifier_index] != NULL)
 	  { /* Generic ESC prefixing if Alt is pressed */
 	    tmp[0] = '\033';
