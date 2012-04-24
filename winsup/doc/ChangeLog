@@ -1,3 +1,7 @@
+2012-04-24  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* configure: Regenerate.
+
 2012-04-23  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* faq-using.xml (faq.using.emacs, faq.using.xemacs): Change links

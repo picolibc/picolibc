@@ -1,3 +1,7 @@
+2012-04-24  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* configure: Regenerate.
+
 2011-03-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libltp/lib/get_high_address.c: Align copyright with upstream.
