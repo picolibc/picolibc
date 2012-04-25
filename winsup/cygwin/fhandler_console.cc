@@ -307,14 +307,6 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
       return 0;
     }
 
-  /* Check whether adjusted mouse position can be reported */
-  if (dev_state.dwMousePosition.X > 0xFF - ' ' - 1
-      || dev_state.dwMousePosition.Y > 0xFF - ' ' - 1)
-    {
-      /* Mouse position out of reporting range */
-      return 0;
-    }
-
   return ((mouse_event.dwEventFlags == 0 || mouse_event.dwEventFlags == DOUBLE_CLICK)
 	  && mouse_event.dwButtonState != dev_state.dwLastButtonState)
 	 || mouse_event.dwEventFlags == MOUSE_WHEELED
@@ -646,7 +638,34 @@ fhandler_console::read (void *pv, size_t& buflen)
 				     dev_state.dwMousePosition.Y + 1);
 		    nread = strlen (tmp);
 		  }
-		/* else if (dev_state.ext_mouse_mode5) not implemented */
+		else if (dev_state.ext_mouse_mode5)
+		  {
+		    unsigned int xcode = dev_state.dwMousePosition.X + ' ' + 1;
+		    unsigned int ycode = dev_state.dwMousePosition.Y + ' ' + 1;
+
+		    __small_sprintf (tmp, "\033[M%c", b + ' ');
+		    nread = 4;
+		    /* the neat nested encoding function of mintty 
+		       does not compile in g++, so let's unfold it: */
+		    if (xcode < 0x80)
+		      tmp [nread++] = xcode;
+		    else if (xcode < 0x800)
+		      {
+			tmp [nread++] = 0xC0 + (xcode >> 6);
+			tmp [nread++] = 0x80 + (xcode & 0x3F);
+		      }
+		    else
+		      tmp [nread++] = 0;
+		    if (ycode < 0x80)
+		      tmp [nread++] = ycode;
+		    else if (ycode < 0x800)
+		      {
+			tmp [nread++] = 0xC0 + (ycode >> 6);
+			tmp [nread++] = 0x80 + (ycode & 0x3F);
+		      }
+		    else
+		      tmp [nread++] = 0;
+		  }
 		else
 		  {
 		    unsigned int xcode = dev_state.dwMousePosition.X + ' ' + 1;
@@ -1566,7 +1585,7 @@ fhandler_console::char_command (char c)
 	  break;
 
 	case 1005: /* Extended mouse mode */
-	  syscall_printf ("ignored h/l command for extended mouse mode");
+	  dev_state.ext_mouse_mode5 = c == 'h';
 	  break;
 
 	case 1006: /* SGR extended mouse mode */
