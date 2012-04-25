@@ -1,3 +1,54 @@
+2012-04-25  Joel Brobecker  <brobecker@adacore.com>
+
+	* config.sub: Update to 2012-04-18 version from official repo.
+
+2012-03-19  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.ac (ia64*-*-*vms*): Add support for ld.
+	* configure: Regenerate.
+
+2012-03-14  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* configure.ac (enable_libgomp): Remove *-*-irix6*.
+	(unsupported_languages): Remove mips-sgi-irix6.*.
+	(noconfigdirs): Don't add ${libgcj} for mips*-*-irix6*.
+	(with_stabs): Remove.
+	* configure: Regenerate.
+
+2012-03-12  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* configure.ac (enable_libgomp): Remove *-*-osf*.
+	(with_stabs): Remove alpha*-*-osf*.
+	* configure: Regenerate.
+
+2012-03-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Modify DJ Delorie license to include
+	modification rights in clause as permitted by DJ Delorie.
+	* COPYING.LIBGLOSS: Ditto.
+
+2012-03-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Remove two unused licenses.
+
+2012-03-05  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.ac: Enable gdb and readline for ia64*-*-*vms*.
+	* configure: Regenerate.
+
+2012-02-21  Joern Rennecke  <joern.rennecke@embecosm.com>
+
+	* COPYING.NEWLIB: Add Adapteva notice.
+	* COPYING.LIBGLOSS: Add Adapteva notice.
+
+2011-12-18  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* configure: Regenerate.
+
+2011-12-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.LIBGLOSS: Add GPL with exception license.
+
 2011-11-09  Roland McGrath  <mcgrathr@google.com>
 
 	* configure.ac: Add tool checks for READELF and READELF_FOR_TARGET.
