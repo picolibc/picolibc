@@ -5,7 +5,7 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
-Add mouse reporting modes 1006 and 1015 to console window.
+Add mouse reporting modes 1005, 1006 and 1015 to console window.
 </para></listitem>
 
 </itemizedlist>
