@@ -1,3 +1,7 @@
+2012-04-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (find_fast_cwd_pointer): Fix for W8 CP 32 bit.
+
 2012-04-25  Thomas Wolff  <towo@towo.net>
 
 	* fhandler.h (class dev_console): Add member ext_mouse_mode5.
