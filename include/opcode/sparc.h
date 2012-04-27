@@ -99,6 +99,7 @@ typedef struct sparc_opcode
   const char *args;
   /* This was called "delayed" in versions before the flags.  */
   unsigned int flags;
+  unsigned int hwcaps;
   short architecture;	/* Bitmask of sparc_opcode_arch_val's.  */
 } sparc_opcode;
 
@@ -110,25 +111,39 @@ typedef struct sparc_opcode
 #define	F_JSR		0x00000010 /* Subroutine call.  */
 #define F_FLOAT		0x00000020 /* Floating point instruction (not a branch).  */
 #define F_FBR		0x00000040 /* Floating point branch.  */
-#define F_MUL32		0x00000100 /* umul/umulcc/smul/smulcc insns */
-#define F_DIV32		0x00000200 /* udiv/udivcc/sdiv/sdivcc insns */
-#define F_FSMULD	0x00000400 /* 'fsmuld' insn */
-#define F_V8PLUS	0x00000800 /* v9 insns available to 32bit */
-#define F_POPC		0x00001000 /* 'popc' insn */
-#define F_VIS		0x00002000 /* VIS insns */
-#define F_VIS2		0x00004000 /* VIS2 insns */
-#define F_ASI_BLK_INIT	0x00008000 /* block init ASIs */
-#define F_FMAF		0x00010000 /* fused multiply-add */
-#define F_VIS3		0x00020000 /* VIS3 insns */
-#define F_HPC		0x00040000 /* HPC insns */
-#define F_RANDOM	0x00080000 /* 'random' insn */
-#define F_TRANS		0x00100000 /* transaction insns */
-#define F_FJFMAU	0x00200000 /* unfused multiply-add */
-#define F_IMA		0x00400000 /* integer multiply-add */
-#define F_ASI_CACHE_SPARING \
-			0x00800000 /* cache sparing ASIs */
 
-#define F_HWCAP_MASK	0x00ffff00
+/* These must match the HWCAP_* values precisely.  */
+#define HWCAP_MUL32	0x00000001 /* umul/umulcc/smul/smulcc insns */
+#define HWCAP_DIV32	0x00000002 /* udiv/udivcc/sdiv/sdivcc insns */
+#define HWCAP_FSMULD	0x00000004 /* 'fsmuld' insn */
+#define HWCAP_V8PLUS	0x00000008 /* v9 insns available to 32bit */
+#define HWCAP_POPC	0x00000010 /* 'popc' insn */
+#define HWCAP_VIS	0x00000020 /* VIS insns */
+#define HWCAP_VIS2	0x00000040 /* VIS2 insns */
+#define HWCAP_ASI_BLK_INIT	\
+			0x00000080 /* block init ASIs */
+#define HWCAP_FMAF	0x00000100 /* fused multiply-add */
+#define HWCAP_VIS3	0x00000400 /* VIS3 insns */
+#define HWCAP_HPC	0x00000800 /* HPC insns */
+#define HWCAP_RANDOM	0x00001000 /* 'random' insn */
+#define HWCAP_TRANS	0x00002000 /* transaction insns */
+#define HWCAP_FJFMAU	0x00004000 /* unfused multiply-add */
+#define HWCAP_IMA	0x00008000 /* integer multiply-add */
+#define HWCAP_ASI_CACHE_SPARING \
+			0x00010000 /* cache sparing ASIs */
+#define HWCAP_AES	0x00020000 /* AES crypto insns */
+#define HWCAP_DES	0x00040000 /* DES crypto insns */
+#define HWCAP_KASUMI	0x00080000 /* KASUMI crypto insns */
+#define HWCAP_CAMELLIA 	0x00100000 /* CAMELLIA crypto insns */
+#define HWCAP_MD5	0x00200000 /* MD5 hashing insns */
+#define HWCAP_SHA1	0x00400000 /* SHA1 hashing insns */
+#define HWCAP_SHA256	0x00800000 /* SHA256 hashing insns */
+#define HWCAP_SHA512	0x01000000 /* SHA512 hashing insns */
+#define HWCAP_MPMUL	0x02000000 /* Multiple Precision Multiply */
+#define HWCAP_MONT	0x04000000 /* Montgomery Mult/Sqrt */
+#define HWCAP_PAUSE	0x08000000 /* Pause insn */
+#define HWCAP_CBCOND	0x10000000 /* Compare and Branch insns */
+#define HWCAP_CRC32C	0x20000000 /* CRC32C insn */
 
 /* All sparc opcodes are 32 bits, except for the `set' instruction (really a
    macro), which is 64 bits. It is handled as a special case.
