@@ -1,3 +1,8 @@
+2012-04-27  David S. Miller  <davem@davemloft.net>
+
+	* sparc.h: Add new ELF_SPARC_HWCAP_* defines for crypto,
+	pause, and compare-and-branch instructions.
+
 2012-03-07  Nick Clifton  <nickc@redhat.com>
 
 	* mn10300.h (elf_mn10300_reloc_type): Add R_MN10300_TLS_GD,

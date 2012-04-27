@@ -213,5 +213,19 @@ enum
 #define ELF_SPARC_HWCAP_IMA	0x00008000 /* integer multiply-add */
 #define ELF_SPARC_HWCAP_ASI_CACHE_SPARING \
 				0x00010000 /* cache sparing ASIs */
+#define ELF_SPARC_HWCAP_AES	0x00020000 /* AES crypto insns */
+#define ELF_SPARC_HWCAP_DES	0x00040000 /* DES crypto insns */
+#define ELF_SPARC_HWCAP_KASUMI	0x00080000 /* KASUMI crypto insns */
+#define ELF_SPARC_HWCAP_CAMELLIA \
+				0x00100000 /* CAMELLIA crypto insns */
+#define ELF_SPARC_HWCAP_MD5	0x00200000 /* MD5 hashing insns */
+#define ELF_SPARC_HWCAP_SHA1	0x00400000 /* SHA1 hashing insns */
+#define ELF_SPARC_HWCAP_SHA256	0x00800000 /* SHA256 hashing insns */
+#define ELF_SPARC_HWCAP_SHA512	0x01000000 /* SHA512 hashing insns */
+#define ELF_SPARC_HWCAP_MPMUL	0x02000000 /* Multiple Precision Multiply */
+#define ELF_SPARC_HWCAP_MONT	0x04000000 /* Montgomery Mult/Sqrt */
+#define ELF_SPARC_HWCAP_PAUSE	0x08000000 /* Pause insn */
+#define ELF_SPARC_HWCAP_CBCOND	0x10000000 /* Compare and Branch insns */
+#define ELF_SPARC_HWCAP_CRC32C	0x20000000 /* CRC32C insn */
 
 #endif /* _ELF_SPARC_H */
