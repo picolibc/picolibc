@@ -1,5 +1,8 @@
 2012-04-27  David S. Miller  <davem@davemloft.net>
 
+	* sparc.h: Document new arg code' )' for crypto RS3
+	immediates.
+
 	* sparc.h (struct sparc_opcode): New field 'hwcaps'.
 	F_MUL32, F_DIV32, F_FDMULD, F_V8PLUS, F_POPC, F_VIS, F_VIS2,
 	F_ASI_BLK_INIT, F_FMAF, F_VIS3, F_HPC, F_RANDOM, F_TRANS,

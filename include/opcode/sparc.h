@@ -224,6 +224,7 @@ typedef struct sparc_opcode
 	_	Ancillary state register in rd (v9a)
 	/	Ancillary state register in rs1 (v9a)
 	(	entire floating point state register (%efsr)
+	)	5 bit immediate placed in RS3 field
 	=	2+8 bit PC relative immediate. (v9)  */
 
 #define OP2(x)		(((x) & 0x7) << 22)  /* Op2 field of format2 insns.  */
