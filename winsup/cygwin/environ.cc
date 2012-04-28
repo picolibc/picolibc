@@ -117,6 +117,7 @@ static struct parse_thing
   {"error_start", {func: error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, setbool, NULL, {{false}, {true}}},
   {"glob", {func: glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
+  {"pipe_byte", {&pipe_byte}, setbool, NULL, {{false}, {true}}},
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, setbool, NULL, {{false}, {true}}},
   {"tty", {func: tty_is_gone}, isfunc, NULL, {{0}, {0}}},

@@ -58,6 +58,7 @@ bool ignore_case_with_glob = false;
 bool dos_file_warning = true;
 bool allow_winsymlinks = false;
 bool reset_com = false; 
+bool pipe_byte = false;
 bool detect_bloda = false;
 
 bool NO_COPY in_forkee;

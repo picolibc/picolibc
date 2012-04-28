@@ -1,3 +1,13 @@
+2012-04-28  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* environ.cc (struct parse_thing): Add temporary (?) "pipe_byte" option.
+	* globals.cc (pipe_byte): Declare.
+	* pipe.cc (fhandler_pipe::create): Use current process id in pipe name
+	rather than pid for simple name collision avoidance.  Do this only once
+	to avoid extra overhead when a busy pipe is found.  Honor pipe_byte to
+	create non-message pipes if set.
+	* sigproc.cc (sigproc_init): Use a specific name for the signal pipe.
+
 2012-04-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (find_fast_cwd_pointer): Fix for W8 CP 32 bit.
@@ -1291,7 +1301,7 @@
 	* fhandler.h (fhandler_fifo::arm): Declare new function.
 	* fhandler_fifo.cc (fhandler_fifo::arm): Define new function.
 	(fhandler_fifo::open): Fix handling of RDWR pipes to avoid opening a
-	second handle.  Use arm() function to set events.  
+	second handle.  Use arm() function to set events.
 	(fhandler_fifo::raw_read): Correctly go into "connect again logic" when
 	we detect another writer is available.  Use arm() function to set event.
 	* pipe.cc (fhandler_pipe::create): Add more detail to debugging output.
