@@ -42,7 +42,7 @@ UUID_OBJS = \
   objsafe-uuid.o oaidl-uuid.o docobj-uuid.o comcat-uuid.o \
   exdisp-uuid.o mlang-uuid.o objidl-uuid.o cguid-uuid.o \
   olectlid-uuid.o ativscp-uuid.o urlmon-uuid.o hlink-uuid.o \
-  hlguids-uuid.o extras-uuid.o devguid.o power-uuid.o
+  hlguids-uuid.o extras-uuid.o devguid.o power-uuid.o shobjidl-uuid.o
 
 EXTRA_OBJS = \
   shell32.o scrnsave.o scrnsavw.o largeint.o gdiplus.o \
@@ -54,7 +54,7 @@ UUID_SOURCES = \
   objsafe-uuid.c oaidl-uuid.c docobj-uuid.c comcat-uuid.c \
   exdisp-uuid.c mlang-uuid.c objidl-uuid.c cguid-uuid.c \
   olectlid-uuid.c ativscp-uuid.c urlmon-uuid.c hlink-uuid.c \
-  hlguids-uuid.c extras-uuid.c devguid.c power-uuid.c
+  hlguids-uuid.c extras-uuid.c devguid.c power-uuid.c shobjidl-uuid.c
 
 SOURCES = \
   scrnsave.c shell32.c  largeint.c gdiplus.c $(UUID_SOURCES) \

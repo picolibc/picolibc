@@ -1,3 +1,9 @@
+2012-04-28  LRN  <l_r_nightmare@users.sf.net>
+
+	* include/shobjidl.h: New file.
+	* lib/shobjidl-uuid.c: New file.
+	* lib/Makefile.in: Reference shobjidl-uuid.c.
+
 2012-03-19	Ben Greear  <greear@users.sf.net>
 
 	* include/routprot.h (IP_LOCAL_BINDING): Move above IP_ADAPTER_BINDING_INFO
