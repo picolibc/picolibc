@@ -529,7 +529,8 @@ sigproc_init ()
   char char_sa_buf[1024];
   PSECURITY_ATTRIBUTES sa = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
   DWORD err = fhandler_pipe::create (sa, &my_readsig, &my_sendsig,
-				     sizeof (sigpacket), "sigwait", 0);
+				     sizeof (sigpacket), "sigwait",
+				     PIPE_ADD_PID);
   if (err)
     {
       SetLastError (err);

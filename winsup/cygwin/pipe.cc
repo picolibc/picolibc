@@ -211,9 +211,8 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
     psize = DEFAULT_PIPEBUFSIZE;
 
   char pipename[MAX_PATH];
-  const size_t len = __small_sprintf (pipename, PIPE_INTRO "%S-%u-",
-				      &cygheap->installation_key,
-				      GetCurrentProcessId ());
+  size_t len = __small_sprintf (pipename, PIPE_INTRO "%S-",
+				      &cygheap->installation_key);
   DWORD pipe_mode = PIPE_READMODE_BYTE;
   if (!name)
     pipe_mode |= pipe_byte ? PIPE_TYPE_BYTE : PIPE_TYPE_MESSAGE;
@@ -221,6 +220,12 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
     {
       strcpy (pipename + len, name);
       pipe_mode |= PIPE_TYPE_MESSAGE;
+    }
+
+  if (!name || (open_mode &= PIPE_ADD_PID))
+    {
+      len += __small_sprintf (pipename + len, "%u-", GetCurrentProcessId ());
+      open_mode &= ~PIPE_ADD_PID;
     }
 
   open_mode |= PIPE_ACCESS_INBOUND;

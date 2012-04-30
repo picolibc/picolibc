@@ -14,8 +14,8 @@ details. */
 
 #include "tty.h"
 /* fcntl flags used only internaly. */
-#define O_NOSYMLINK 0x080000
-#define O_DIROPEN   0x100000
+#define O_NOSYMLINK	0x080000
+#define O_DIROPEN	0x100000
 
 /* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
    properly defines both to be the same.  Unfortunately, we have to
@@ -35,6 +35,10 @@ details. */
    atomic writes to a pipe.  It is a shame that we have to make this
    so small.  http://cygwin.com/ml/cygwin/2011-03/msg00541.html  */
 #define DEFAULT_PIPEBUFSIZE PREFERRED_IO_BLKSIZE
+
+/* Used for fhandler_pipe::create.  Use an available flag which will
+   never be used in Cygwin for this function. */
+#define PIPE_ADD_PID	PIPE_ACCESS_OUTBOUND
 
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;

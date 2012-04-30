@@ -1,6 +1,14 @@
+2012-04-30  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler.h (PIPE_ADD_PID): Define new flag.
+	* pipe.cc (fhandler_pipe::create): Don't indiscriminately add process
+	id to every pipe since some pipe names (fifo, tty) don't need it.
+	* sigproc.cc (sigproc_init): Pass PIPE_ADD_PID to fhandler_pipe::create
+	to ensure that pid is always part of sigwait pipe name.
+
 2012-04-28  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
-	* environ.cc (struct parse_thing): Add temporary (?) "pipe_byte" option.
+	* environ.cc (struct parse_thing): Add "pipe_byte" option.
 	* globals.cc (pipe_byte): Declare.
 	* pipe.cc (fhandler_pipe::create): Use current process id in pipe name
 	rather than pid for simple name collision avoidance.  Do this only once
