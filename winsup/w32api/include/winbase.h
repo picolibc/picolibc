@@ -1648,7 +1648,7 @@ WINBASEAPI DWORD WINAPI GetModuleFileNameA(HINSTANCE,LPSTR,DWORD);
 WINBASEAPI DWORD WINAPI GetModuleFileNameW(HINSTANCE,LPWSTR,DWORD);
 WINBASEAPI HMODULE WINAPI GetModuleHandleA(LPCSTR);
 WINBASEAPI HMODULE WINAPI GetModuleHandleW(LPCWSTR);
-#if (_WIN32_WINNT >= 0x0500)
+#if (_WIN32_WINNT >= 0x0501)
 WINBASEAPI BOOL WINAPI GetModuleHandleExA(DWORD,LPCSTR,HMODULE*);
 WINBASEAPI BOOL WINAPI GetModuleHandleExW(DWORD,LPCWSTR,HMODULE*);
 #endif
@@ -2339,7 +2339,7 @@ typedef PCACTCTXW PCACTCTX;
 #endif
 #define GetModuleFileName GetModuleFileNameW
 #define GetModuleHandle GetModuleHandleW
-#if (_WIN32_WINNT >= 0x0500)
+#if (_WIN32_WINNT >= 0x0501)
 #define GetModuleHandleEx GetModuleHandleExW
 #endif
 #define GetNamedPipeHandleState GetNamedPipeHandleStateW
@@ -2546,7 +2546,7 @@ typedef PCACTCTXA PCACTCTX;
 #endif
 #define GetNamedPipeHandleState GetNamedPipeHandleStateA
 #define GetModuleHandle GetModuleHandleA
-#if (_WIN32_WINNT >= 0x0500)
+#if (_WIN32_WINNT >= 0x0501)
 #define GetModuleHandleEx GetModuleHandleExA
 #endif
 #define GetModuleFileName GetModuleFileNameA

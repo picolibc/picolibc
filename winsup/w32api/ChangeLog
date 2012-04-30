@@ -1,3 +1,7 @@
+2012-04-29  Jan Ringos  <tringi@users.sf.net>
+
+	* include/winbase.h (GetModuleHandleEx[A/W]): Correct version guard.
+
 2012-04-28  LRN  <l_r_nightmare@users.sf.net>
 
 	* include/shobjidl.h: New file.
