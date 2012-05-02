@@ -1,11 +1,13 @@
 2012-05-02  cgf-000001
 
-This fix was due to a bug report on the Cygwin mailing list:
-http://cygwin.com/ml/cygwin/2012-05/msg00009.html
+<1.7.15>
+Fix problem setting parent pid to 1 when process with children execs
+itself.  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00009.html
+</1.7.15>
 
-strace showed that ssh-agent was checking the parent pid and getting a 1
-when it shouldn't have.  Other stuff looked ok so I chose to consider
-this a smoking gun.
+Investigating this problem with strace showed that ssh-agent was
+checking the parent pid and getting a 1 when it shouldn't have.  Other
+stuff looked ok so I chose to consider this a smoking gun.
 
 Going back to the version that the OP said did not have the problem, I
 worked forward until I found where the problem first occurred -
