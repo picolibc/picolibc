@@ -1,3 +1,8 @@
+2012-05-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fenv.cc (fesetround): Fix test for valid input parameter.
+	(fesetprec): Ditto.
+
 2012-04-30  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fhandler.h (PIPE_ADD_PID): Define new flag.

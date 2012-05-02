@@ -1,6 +1,6 @@
 /* fenv.cc
 
-   Copyright 2010, 2011 Red Hat, Inc.
+   Copyright 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -349,7 +349,7 @@ fesetround (int round)
   unsigned int mxcsr = 0;
 
   /* Will succeed for any valid value of the input parameter.  */
-  if (round & ~(FE_CW_ROUND_MASK >> FE_CW_PREC_SHIFT))
+  if (round < FE_TONEAREST || round > FE_TOWARDZERO)
     return EINVAL;
 
   /* Get control words.  */
@@ -395,7 +395,7 @@ fesetprec (int prec)
   unsigned short cw;
 
   /* Will succeed for any valid value of the input parameter.  */
-  if (prec & ~(FE_CW_PREC_MASK >> FE_CW_PREC_SHIFT) || prec == FE_RESERVEDPREC)
+  if (prec < FE_SINGLEPREC || prec > FE_EXTENDEDPREC)
     return EINVAL;
 
   /* Get control word.  */
