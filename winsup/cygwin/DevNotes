@@ -1,0 +1,26 @@
+2012-05-02  cgf-000001
+
+This fix was due to a bug report on the Cygwin mailing list:
+http://cygwin.com/ml/cygwin/2012-05/msg00009.html
+
+strace showed that ssh-agent was checking the parent pid and getting a 1
+when it shouldn't have.  Other stuff looked ok so I chose to consider
+this a smoking gun.
+
+Going back to the version that the OP said did not have the problem, I
+worked forward until I found where the problem first occurred -
+somewhere around 2012-03-19.  And, indeed, the getppid call returned the
+correct value in the working version.  That means that this stopped
+working when I redid the way the process pipe was inherited around
+this time period.
+
+It isn't clear why (and I suspect I may have to debug this further at
+some poit) this hasn't always been a problem but I made the obvious fix.
+We shouldn't have been setting ppid = 1 when we're about to pass off to
+an execed process.
+
+As I was writing this, I realized that it was necessary to add some
+additional checks.  Just checking for "have_execed" isn't enough.  If
+we've execed a non-cygwin process then it won't know how to deal with
+any inherited children.  So, always set ppid = 1 if we've execed a
+non-cygwin process.
