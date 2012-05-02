@@ -97,7 +97,7 @@ __change_mode:
 
 	movs 	a1, #0
 	ldr	a2, .LC3
-	mov	a3, a2
+	movs	a3, a2
 	bl	SYM_NAME(main)
     1:	bl	SYM_NAME(exit)
 	b	1b

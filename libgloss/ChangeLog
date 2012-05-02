@@ -1,3 +1,7 @@
+2012-05-02  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* arm/redboot-crt0.S (__change_mode): Replace mov with movs.
+
 2012-03-23  Mike Frysinger  <vapier@gentoo.org>
 
 	* cris/Makefile.in (install-lin): Add $(DESTDIR) before ${tooldir}.
