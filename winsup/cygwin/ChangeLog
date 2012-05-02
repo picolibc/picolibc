@@ -1,6 +1,6 @@
 2012-05-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
-	* ChangeNotes: New file.  Add entry cgf-000001.
+	* DevNotes: New file.  Add entry cgf-000001.
 	* sigproc.cc (proc_terminate): Don't set parent pid of child to 1 if
 	we've execed since the execed process is still considered the parent.
 
