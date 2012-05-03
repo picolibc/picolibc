@@ -27,6 +27,7 @@ struct wincaps
   unsigned has_recycle_dot_bin				: 1;
   unsigned has_gaa_prefixes				: 1;
   unsigned has_gaa_on_link_prefix			: 1;
+  unsigned has_gaa_largeaddress_bug			: 1;
   unsigned supports_all_posix_ai_flags			: 1;
   unsigned has_restricted_stack_args			: 1;
   unsigned has_transactions				: 1;
@@ -80,6 +81,7 @@ public:
   bool	IMPLEMENT (has_recycle_dot_bin)
   bool	IMPLEMENT (has_gaa_prefixes)
   bool	IMPLEMENT (has_gaa_on_link_prefix)
+  bool	IMPLEMENT (has_gaa_largeaddress_bug)
   bool	IMPLEMENT (supports_all_posix_ai_flags)
   bool	IMPLEMENT (has_restricted_stack_args)
   bool	IMPLEMENT (has_transactions)

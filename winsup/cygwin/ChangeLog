@@ -1,3 +1,13 @@
+2012-05-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (get_adapters_addresses): Only create thread on affected
+	systems.  Change comment acordingly.
+	* wincap.h (wincaps::has_gaa_largeaddress_bug): New element.
+	* wincap.cc: Implement above element throughout.
+	(wincap_8): New globale wincaps to support Windows 8.
+	(wincapc::init): Take Windows 8 into account.  Set new
+	has_gaa_largeaddress_bug member to false on 32 bit systems.
+
 2012-05-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* DevNotes: New file.  Add entry cgf-000001.

@@ -1695,13 +1695,17 @@ get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
   DWORD ret;
   gaa_wa param = { family, pa_ret ?: NULL };
 
-  if ((uintptr_t) &param >= (uintptr_t) 0x80000000L)
+  if ((uintptr_t) &param >= (uintptr_t) 0x80000000L
+      && wincap.has_gaa_largeaddress_bug ())
     {
-      /* Starting with Windows Vista, GetAdaptersAddresses fails with error 998,
+      /* In Windows Vista and Windows 7 under WOW64, GetAdaptersAddresses fails
 	 if it's running in a thread with a stack located in the large address
 	 area.  So, if we're running in a pthread with such a stack, we call
-	 GetAdaptersAddresses in a child thread with an OS-allocated stack,
-	 which is guaranteed to be located in the lower address area. */
+	 GetAdaptersAddresses in a child thread with an OS-allocated stack.
+	 The OS allocates stacks bottom up, so chances are good that the new
+	 stack will be located in the lower address area.
+	 FIXME: The problem is fixed in W8CP, but needs testing before W8 goes
+		gold. */
       HANDLE thr = CreateThread (NULL, 0, call_gaa, &param, 0, NULL);
       if (!thr)
 	{
