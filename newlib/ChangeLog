@@ -1,3 +1,9 @@
+2012-05-03  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* testsuite/newlib.string/strcmp-1.c (LONG_TEST): New macro.
+	(MAX_BLOCK_SIZE): Use small value when LONG_TEST is not set.
+	(MAX_DIFF, MAX_LEN, MAX_ZEROS) Likewise.
+
 2012-03-29  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/locale/locale.c (__mb_cur_max): On Cygwin, align default value
