@@ -1,3 +1,9 @@
+2012-05-03  Sean Keys  <skeys@ipdatasys.com>
+
+	* dis-asm.h (print_insn_xgate): Define.
+	(print_insn_xgate): Ditto.
+	Added new files for XGATE port.
+
 2012-05-02  Cary Coutant  <ccoutant@google.com>
 
 	* dwarf2.def: Remove DW_FORM_GNU_ref_index,

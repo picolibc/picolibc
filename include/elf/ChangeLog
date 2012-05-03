@@ -1,3 +1,7 @@
+2012-05-03  Sean Keys  <skeys@ipdatasys.com>
+
+	* xgate.h: Mininal file to support XGATE relocations.
+
 2012-04-27  David S. Miller  <davem@davemloft.net>
 
 	* sparc.h: Add new ELF_SPARC_HWCAP_* defines for crypto,

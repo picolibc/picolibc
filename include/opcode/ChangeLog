@@ -1,3 +1,7 @@
+2012-05-03  Sean Keys  <skeys@ipdatasys.com>
+
+	* xgate.h: Header file for XGATE assembler.
+
 2012-04-27  David S. Miller  <davem@davemloft.net>
 
 	* sparc.h: Document new arg code' )' for crypto RS3
