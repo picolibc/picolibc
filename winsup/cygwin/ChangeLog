@@ -1,3 +1,11 @@
+2012-05-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* DevNotes: Add entry cgf-000002.
+	* fhandler_tty.cc (bytes_available): Revert to previous Oct-2011
+	behavior where a dummy buffer is used to determine how many bytes will
+	be read.
+	(fhandler_pty_master::ioctl): Correct coercion in assignment.
+
 2012-05-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (get_adapters_addresses): Only create thread on affected

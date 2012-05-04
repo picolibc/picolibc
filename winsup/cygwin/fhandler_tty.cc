@@ -53,7 +53,11 @@ fhandler_pty_slave::get_unit ()
 bool
 bytes_available (DWORD& n, HANDLE h)
 {
-  bool succeeded = PeekNamedPipe (h, NULL, 0, NULL, &n, NULL);
+  char buf[INP_BUFFER_SIZE];
+  /* Apparently need to pass in a dummy buffer to read a real "record" from
+     the pipe.  So buf is used and then discarded just so we can see how many
+     bytes will be read by the next ReadFile().  */
+  bool succeeded = PeekNamedPipe (h, buf, sizeof (buf), &n, NULL, NULL);
   if (!succeeded)
     {
       termios_printf ("PeekNamedPipe(%p) failed, %E", h);
@@ -1429,7 +1433,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	    set_errno (EINVAL);
 	    return -1;
 	  }
-	*(int *) arg = (DWORD) n;
+	*(int *) arg = (int) n;
       }
       break;
     default:

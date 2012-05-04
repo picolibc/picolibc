@@ -1,3 +1,42 @@
+2012-05-03  cgf-000002
+
+<1.7.15>
+Fix problem where too much input was attempted to be read from a
+pty slave.  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00049.html
+</1.7.15>
+
+My change on 2012/04/05 reintroduced the problem first described by:
+http://cygwin.com/ml/cygwin/2011-10/threads.html#00445
+
+The problem then was, IIRC, due to the fact that bytes sent to the pty
+pipe were not written as records.  Changing pipe to PIPE_TYPE_MESSAGE in
+pipe.cc fixed the problem since writing lines to one side of the pipe
+caused exactly that the number of characters to be read on the other
+even if there were more characters in the pipe.
+
+To debug this, I first replaced fhandler_tty.cc with the 1.258,
+2012/04/05 version.  The test case started working when I did that.
+
+So, then, I replaced individual functions, one at a time, in
+fhandler_tty.cc with their previous versions.  I'd expected this to be a
+problem with fhandler_pty_master::process_slave_output since that had
+seen the most changes but was surprised to see that the culprit was
+fhandler_pty_slave::read().
+
+The reason was that I really needed the bytes_available() function to
+return the number of bytes which would be read in the next operation
+rather than the number of bytes available in the pipe.  That's because
+there may be a number of lines available to be read but the number of
+bytes which will be read by ReadFile should reflect the mode of the pty
+and, if there is a line to read, only the number of bytes in the line
+should be seen as available for the next read.
+
+Having bytes_available() return the number of bytes which would be read
+seemed to fix the problem but it could subtly change the behavior of
+other callers of this function.  However, I actually think this is
+probably a good thing since they probably should have been seeing the
+line behavior.
+
 2012-05-02  cgf-000001
 
 <1.7.15>
