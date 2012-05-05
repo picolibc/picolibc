@@ -1,3 +1,8 @@
+2012-05-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkpasswd.c (current_user): Actually *use* $HOME if it's available.
+	Add comment to explain what we're doing here.
+
 2012-04-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (print_special_by_sid): Rename from print_special.  Change
