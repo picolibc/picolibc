@@ -59,6 +59,11 @@ If supplied, wildcard matching is case insensitive.  The default is <literal>noi
 </listitem>
 
 <listitem>
+<para><envar>(no)pipe_byte</envar> - causes Cygwin to open pipes in byte mode rather than
+message mode.</para>
+</listitem>
+
+<listitem>
 <para><envar>proc_retry:n</envar> - causes <function>fork()</function> and
 <function>exec*()</function> to retry n times when a child process fails
 due to certain windows-specific errors.  These errors usually occur when

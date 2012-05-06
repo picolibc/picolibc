@@ -1,5 +1,13 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.14"><title>What's new and what changed from 1.7.14 to 1.7.15</title>
+<itemizedlist mark="bullet">
+
+<listitem><para>
+CYGWIN=pipe_byte option now forces the opening of pipes in byte mode rather than message mode.
+</para></listitem>
+</sect2>
+
 <sect2 id="ov-new1.7.14"><title>What's new and what changed from 1.7.13 to 1.7.14</title>
 
 <itemizedlist mark="bullet">
