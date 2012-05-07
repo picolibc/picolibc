@@ -77,11 +77,6 @@ pinfo::thisproc (HANDLE h)
   else if (!child_proc_info)	/* child_proc_info is only set when this process
 				   was started by another cygwin process */
     procinfo->start_time = time (NULL); /* Register our starting time. */
-  else if (::cygheap->pid_handle)
-    {
-      ForceCloseHandle (::cygheap->pid_handle);
-      ::cygheap->pid_handle = NULL;
-    }
 }
 
 /* Initialize the process table entry for the current task.
@@ -305,8 +300,9 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
       bool created = shloc != SH_JUSTOPEN;
 
-      if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
-	  && cygwin_pid (procinfo->dwProcessId) != procinfo->pid)
+      if ((procinfo->process_state & PID_REAPED)
+	  || ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
+	      && cygwin_pid (procinfo->dwProcessId) != procinfo->pid))
 	{
 	  set_errno (ESRCH);
 	  break;

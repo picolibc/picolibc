@@ -22,3 +22,8 @@ Bug fixes:
 - Avoid "WARNING: Couldn't compute FAST_CWD pointer." message on
   Windows 8 Customer Preview 32 bit. 
   Fixes: http://cygwin.com/ml/cygwin/2012-04/msg00616.html
+
+- Don't make Cygwin wait for all children of a non-cygwin child program.
+  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00063.html,
+	 http://cygwin.com/ml/cygwin/2012-05/msg00075.html
+

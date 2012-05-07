@@ -390,7 +390,6 @@ struct init_cygheap: public mini_cygheap
   struct _cygtls **threadlist;
   size_t sthreads;
   pid_t pid;			/* my pid */
-  HANDLE pid_handle;		/* handle for my pid */
   struct {			/* Equivalent to using LIST_HEAD. */
     struct inode_t *lh_first;
   } inode_list;			/* Global inode pointer for adv. locking. */

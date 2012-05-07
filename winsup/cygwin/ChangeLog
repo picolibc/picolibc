@@ -1,3 +1,17 @@
+2012-05-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* DevNotes: Add entry cgf-000003.
+	* cygheap.h (init_cygheap::pid_handle): Delete.
+	* dcrt0.cc (child_info_spawn::handle_spawn): Keep parent open if we
+	have execed.
+	* pinfo.cc (pinfo::thisproc): Remove pid_handle manipulations.
+	(pinfo::init): Don't consider a reaped process to be available.
+	* spawn.cc (child_info_spawn::worker): Remove pid_handle manipulations.
+	Make wr_proc_pipe and parent noninheritable when starting a program
+	which doesn't use the Cygwin DLL.  Conditionally reset wr_proc_pipe to
+	inheritable if CreateProcess fails.  Inject wr_proc_pipe handle into
+	non-Cygwin process.  Consider a non-cygwin process to be 'synced'.
+
 2012-05-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* DevNotes: Add entry cgf-000002.

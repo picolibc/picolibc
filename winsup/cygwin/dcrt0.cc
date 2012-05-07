@@ -665,10 +665,15 @@ child_info_spawn::handle_spawn ()
 
   ready (true);
 
-  /* Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of
+  /* Keep pointer to parent open if we've execed so that pid will not be reused.
+     Otherwise, we no longer need this handle so close it.
+     Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of
      handles might get confused. */
-  CloseHandle (child_proc_info->parent);
-  child_proc_info->parent = NULL;
+  if (type != _CH_EXEC)
+    {
+      CloseHandle (child_proc_info->parent);
+      child_proc_info->parent = NULL;
+    }
 
   signal_fixup_after_exec ();
   fixup_lockf_after_exec ();

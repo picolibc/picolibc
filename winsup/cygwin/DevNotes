@@ -1,3 +1,54 @@
+2012-05-03  cgf-000003
+
+<1.7.15>
+Don't make Cygwin wait for all children of a non-cygwin child program.
+Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00063.html,
+       http://cygwin.com/ml/cygwin/2012-05/msg00075.html
+</1.7.15>
+
+This problem is due to a recent change which added some robustness and
+speed to Cygwin's exec/spawn handling by not trying to force inheritance
+every time a process is started.  See ChangeLog entries starting on
+2012-03-20, and multiple on 2012-03-21.
+
+Making the handle inheritable meant that, as usual, there were problems
+with non-Cygwin processes.  When Cygwin "execs" a non-Cygwin process N,
+all of its N + 1, N + 2, ...  children will also inherit the handle.
+That means that Cygwin will wait until all subprocesses have exited
+before it returns.
+
+I was willing to make this a restriction of starting non-Cygwin
+processes but the problem with allowing that is that it can cause the
+creation of a "limbo" pid when N exits and N + 1 and friends are still
+around.  In this scenario, Cygwin dutifully notices that process N has
+died and sets the exit code to indicate that but N's parent will wait on
+rd_proc_pipe and will only return when every N + ...  windows process
+has exited.
+
+The removal of cygheap::pid_handle was not related to the initial
+problem that I set out to fix.  The change came from the realization
+that we were duping the current process handle into the child twice and
+only needed to do it once.  The current process handle is used by exec
+to keep the Windows pid "alive" so that it will not be reused.  So, now
+we just close parent in child_info_spawn::handle_spawn iff we're not
+execing.
+
+In debugging this it bothered me that 'ps' identified a nonactive pid as
+active.  Part of the reason for this was the 'parent' handle in
+child_info was opened in non-Cygwin processes, keeping the pid alive.
+That has been kluged around (more changes after 1.7.15) but that didn't
+fix the problem.  On further investigation, this seems to be caused by
+the fact that the shared memory region pid handles were still being
+passed to non-cygwin children, keeping the pid alive in a limbo-like
+fashion.  This was easily fixed by having pinfo::init() consider a
+memory region with PID_REAPED as not available.
+
+This fixed the problem where a pid showed up in the list after a user
+does something like: "bash$ cmd /c start notepad" but, for some reason,
+it does not fix the problem where "bash$ setsid cmd /c start notepad".
+That bears investigation after 1.7.15 is released but it is not a
+regression and so is not a blocker for the release.
+
 2012-05-03  cgf-000002
 
 <1.7.15>
