@@ -41,7 +41,9 @@ fix the problem.  On further investigation, this seems to be caused by
 the fact that the shared memory region pid handles were still being
 passed to non-cygwin children, keeping the pid alive in a limbo-like
 fashion.  This was easily fixed by having pinfo::init() consider a
-memory region with PID_REAPED as not available.
+memory region with PID_REAPED as not available.  A more robust fix
+should be considered for 1.7.15+ where these handles are not passed
+to non-cygwin processes.
 
 This fixed the problem where a pid showed up in the list after a user
 does something like: "bash$ cmd /c start notepad" but, for some reason,
