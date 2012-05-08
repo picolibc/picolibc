@@ -1,6 +1,8 @@
 2012-05-08  cgf-000004
 
-The change associated with cgf-000003 introduced a new problem.
+The change for cgf-000003 introduced a new problem:
+http://cygwin.com/ml/cygwin/2012-05/msg00154.html
+http://cygwin.com/ml/cygwin/2012-05/msg00157.html
 
 Since a handle associated with the parent is no longer being duplicated
 into a non-cygwin "execed child", Windows is free to reuse the pid of
@@ -144,7 +146,7 @@ working when I redid the way the process pipe was inherited around
 this time period.
 
 It isn't clear why (and I suspect I may have to debug this further at
-some poit) this hasn't always been a problem but I made the obvious fix.
+some point) this hasn't always been a problem but I made the obvious fix.
 We shouldn't have been setting ppid = 1 when we're about to pass off to
 an execed process.
 
