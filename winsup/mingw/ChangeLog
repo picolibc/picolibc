@@ -1,3 +1,13 @@
+2012-05-08  Keith Marshall  <keithmarshall@users.sourceforge.net>
+
+	Remove references to nonexistent files.
+
+	* mingwex/Makefile.in (DISTFILES): Delete references to aclocal.m4,
+	configure.in, and configure; these are no longer required, and are no
+	longer available for distribution.
+
+	* profile/Makefile.in (DISTFILES): Likewise.
+
 2012-02-01  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	More performance enhancements and POSIX compliance corrections.

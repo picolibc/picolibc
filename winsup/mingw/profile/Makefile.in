@@ -33,8 +33,8 @@ INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 mkinstalldirs = $(SHELL) $(srcdir)/../mkinstalldirs
-DISTFILES = Makefile.in configure configure.in aclocal.m4 gcrt0.c gmon.c gmon.h \
-mcount.c profil.c profil.h profile.h CYGWIN_LICENSE COPYING
+DISTFILES = Makefile.in gcrt0.c gmon.c gmon.h \
+  mcount.c profil.c profil.h profile.h CYGWIN_LICENSE COPYING
 
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
