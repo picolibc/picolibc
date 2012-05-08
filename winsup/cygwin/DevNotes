@@ -1,4 +1,39 @@
-2012-05-03  cgf-000003
+2012-05-08  cgf-000004
+
+The change associated with cgf-000003 introduced a new problem.
+
+Since a handle associated with the parent is no longer being duplicated
+into a non-cygwin "execed child", Windows is free to reuse the pid of
+the parent when the parent exits.  However, since we *did* duplicate a
+handle pointing to the pid's shared memory area into the "execed child",
+the shared memory for the pid was still active.
+
+Since the shared memory was still available, if a new process reuses the
+previous pid, Cygwin would detect that the shared memory was not created
+and had a "PID_REAPED" flag.  That was considered an error, and, so, it
+would set procinfo to NULL and pinfo::thisproc would die since this
+situation is not supposed to occur.
+
+I fixed this in two ways:
+
+1) If a shared memory region has a PID_REAPED flag then zero it and
+reuse it.  This should be safe since you are not really supposed to be
+querying the shared memory region for anything after PID_REAPED has been
+set.
+
+2) Forego duping a copy of myself_pinfo if we're starting a non-cygwin
+child for exec.
+
+It seems like 2) is a common theme and an audit of all of the handles
+that are being passed to non-cygwin children is in order for 1.7.16.
+
+The other minor modification that was made in this change was to add the
+pid of the failing process to fork error output.  This helps slightly
+when looking at strace output, even though in this case it was easy to
+find what was failing by looking for '^---' when running the "stv"
+strace dumper.  That found the offending exception quickly.
+
+2012-05-07  cgf-000003
 
 <1.7.15>
 Don't make Cygwin wait for all children of a non-cygwin child program.

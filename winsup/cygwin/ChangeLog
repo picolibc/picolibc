@@ -1,3 +1,13 @@
+2012-05-08  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* DevNotes: Add entry cgf-000004.
+	* pinfo.cc (pinfo::init): Reuse shared memory if the state is marked
+	with PID_REAPED.
+	* spawn.cc (child_info_spawn::worker): Don't duplicate myself_pinfo
+	into non-cygwin child.
+
+	* fork.cc (frok::parent): Improve error output.
+
 2012-05-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* DevNotes: Add entry cgf-000003.

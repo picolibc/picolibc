@@ -393,8 +393,8 @@ frok::parent (volatile char * volatile stack_here)
       /* Wait for subproc to initialize itself. */
       if (!ch.sync (pi.dwProcessId, hchild, FORK_WAIT_TIMEOUT))
 	{
-	  if (!error ("forked process died unexpectedly, retry %d, exit code %d",
-		      ch.retry, ch.exit_code))
+	  if (!error ("forked process %u died unexpectedly, retry %d, exit code %d",
+		      pi.dwProcessId, ch.retry, ch.exit_code))
 	    continue;
 	  this_errno = EAGAIN;
 	  goto cleanup;

@@ -300,6 +300,13 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
       bool created = shloc != SH_JUSTOPEN;
 
+      if (!created && createit && (procinfo->process_state & PID_REAPED))
+	{
+	  memset (procinfo, 0, sizeof (*procinfo));
+	  created = true;	/* Lie that we created this - just reuse old
+				   shared memory */
+	} 
+
       if ((procinfo->process_state & PID_REAPED)
 	  || ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
 	      && cygwin_pid (procinfo->dwProcessId) != procinfo->pid))

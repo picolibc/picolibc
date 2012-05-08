@@ -422,10 +422,10 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       moreinfo->argc = newargv.argc;
       moreinfo->argv = newargv;
 
-      if (mode != _P_OVERLAY ||
-	  !DuplicateHandle (GetCurrentProcess (), myself.shared_handle (),
-			    GetCurrentProcess (), &moreinfo->myself_pinfo,
-			    0, TRUE, DUPLICATE_SAME_ACCESS))
+      if (mode != _P_OVERLAY || !real_path.iscygexec ()
+	  || !DuplicateHandle (GetCurrentProcess (), myself.shared_handle (),
+			       GetCurrentProcess (), &moreinfo->myself_pinfo,
+			       0, TRUE, DUPLICATE_SAME_ACCESS))
 	moreinfo->myself_pinfo = NULL;
       else
 	VerifyHandle (moreinfo->myself_pinfo);
@@ -740,7 +740,7 @@ loop:
 	 process fails.  Only need to do this for _P_OVERLAY since the handle will
 	 be closed otherwise.  Don't need to do this for 'parent' since it will
          be closed in every case.  See FIXME above. */
-      if (!real_path.iscygexec () && mode == _P_OVERLAY)
+      if (!iscygwin () && mode == _P_OVERLAY)
 	SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
       if (wr_proc_pipe == my_wr_proc_pipe)
 	wr_proc_pipe = NULL;	/* We still own it: don't nuke in destructor */
