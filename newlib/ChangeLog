@@ -1,3 +1,9 @@
+2012-05-09  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/sys/rtems/crt0.c: Add stubs for access(), ftruncate(),
+	_getpid_r(), geteuid(), getgid, _getgid_r, getpid(), getppid(),
+	and _getpid_r().
+
 2012-05-03  Greta Yorsh  <Greta.Yorsh@arm.com>
 
 	* testsuite/newlib.string/strcmp-1.c (LONG_TEST): New macro.

@@ -50,6 +50,7 @@ int rtems_gxx_recursive_mutex_unlock() { return -1; }
 #endif
 
 /* stubs for functions RTEMS provides */
+RTEMS_STUB(int, access(const char *pathname, int mode), { return -1; })
 RTEMS_STUB(int, clock_gettime(clockid_t clk_id, struct timespec *tp), { return -1; })
 RTEMS_STUB(int, close (int fd), { return -1; })
 RTEMS_STUB(int, dup2(int oldfd, int newfd), { return -1; })
@@ -63,6 +64,7 @@ RTEMS_STUB(struct passwd *, getpwnam(const char *name), { return 0; })
 RTEMS_STUB(struct passwd *, getpwuid(uid_t uid), { return 0; })
 RTEMS_STUB(uid_t, getuid(void), { return 0; })
 RTEMS_STUB(int, nanosleep(const struct timespec *req, struct timespec *rem), { return -1; })
+RTEMS_STUB(int, ftruncate(int fd, off_t length), { return -1; })
 RTEMS_STUB(_off_t, lseek(int fd, _off_t offset, int whence), { return -1; })
 RTEMS_STUB(int, lstat(const char *path, struct stat *buf), { return -1; })
 RTEMS_STUB(int, open(const char *pathname, int flags, int mode), { return -1; })
@@ -93,7 +95,12 @@ RTEMS_STUB(int, _fork_r (struct _reent *r), { return -1; })
 #endif
 #endif
 RTEMS_STUB(int, _fstat_r (struct _reent *r, int fd, struct stat *buf), { return -1; })
-RTEMS_STUB(int, _getpid_r (struct _reent *r), { return -1; })
+RTEMS_STUB(uid_t, geteuid (), { return -1; })
+RTEMS_STUB(gid_t, getgid (), { return -1; })
+RTEMS_STUB(gid_t, _getgid_r (struct _reent *r), { return -1; })
+RTEMS_STUB(pid_t, getpid (), { return -1; })
+RTEMS_STUB(pid_t, getppid (), { return -1; })
+RTEMS_STUB(pid_t, _getpid_r (struct _reent *r), { return -1; })
 RTEMS_STUB(int, _gettimeofday_r(struct _reent *r, struct timeval *tp, void *tzp), { return 0; })
 RTEMS_STUB(int, _isatty_r (struct _reent *r, int fd), { return isatty( fd ); })
 RTEMS_STUB(int, _kill_r (struct _reent *r, int pid, int sig ), { return -1; })
