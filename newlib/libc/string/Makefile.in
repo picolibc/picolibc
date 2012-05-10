@@ -102,6 +102,7 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-wcpncpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-wcsdup.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_3 = lib_a-memmem.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-memrchr.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-wcscasecmp.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-wcsncasecmp.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
@@ -127,6 +128,7 @@ am__objects_4 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 @ELIX_LEVEL_1_FALSE@	strcasestr.lo strchrnul.lo strndup_r.lo \
 @ELIX_LEVEL_1_FALSE@	wcpcpy.lo wcpncpy.lo wcsdup.lo
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = memmem.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	memrchr.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcscasecmp.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcsncasecmp.lo
 @USE_LIBTOOL_TRUE@am_libstring_la_OBJECTS = $(am__objects_4) \
@@ -385,6 +387,7 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_TRUE@ELIX_2_SOURCES = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_4_SOURCES = \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	memmem.c \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	memrchr.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcscasecmp.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcsncasecmp.c
 
@@ -415,7 +418,7 @@ wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
 wcsrchr.def	wcsspn.def	wcsstr.def 	wcstok.def  \
 wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
 wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
-memmem.def
+memmem.def	memrchr.def
 
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
@@ -974,6 +977,12 @@ lib_a-memmem.o: memmem.c
 
 lib_a-memmem.obj: memmem.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmem.obj `if test -f 'memmem.c'; then $(CYGPATH_W) 'memmem.c'; else $(CYGPATH_W) '$(srcdir)/memmem.c'; fi`
+
+lib_a-memrchr.o: memrchr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memrchr.o `test -f 'memrchr.c' || echo '$(srcdir)/'`memrchr.c
+
+lib_a-memrchr.obj: memrchr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memrchr.obj `if test -f 'memrchr.c'; then $(CYGPATH_W) 'memrchr.c'; else $(CYGPATH_W) '$(srcdir)/memrchr.c'; fi`
 
 lib_a-wcscasecmp.o: wcscasecmp.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcscasecmp.o `test -f 'wcscasecmp.c' || echo '$(srcdir)/'`wcscasecmp.c

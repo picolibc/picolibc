@@ -1,3 +1,11 @@
+2012-05-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/string.h (memrchr): Declare.
+	* libc/string/Makefile.am (ELIX_4_SOURCES): Add memrchr.c.
+	(CHEWOUT_FILES): Add memrchr.def.
+	* libc/string/Makefile.in: Regenerate.
+	* libc/string/memrchr.c: New file.
+
 2012-05-10  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/sys/rtems/machine/_types.h: Add Microblaze.
