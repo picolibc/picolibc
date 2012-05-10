@@ -1,3 +1,9 @@
+2012-05-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (memrchr): Export.
+	* posix.sgml (std-gnu): Add memrchr.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2012-05-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 16.
