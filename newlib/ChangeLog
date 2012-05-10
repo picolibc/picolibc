@@ -1,3 +1,7 @@
+2012-05-10  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/sys/rtems/machine/_types.h: Add Microblaze.
+
 2012-05-09  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/sys/rtems/crt0.c: Add stubs for access(), ftruncate(),
