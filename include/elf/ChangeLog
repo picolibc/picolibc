@@ -1,3 +1,9 @@
+2012-05-11  Georg-Johann Lay  <avr@gjlay.de
+
+	PR target/13503
+	* elf/avr.h (RELOC_NUMBERS): Add values for R_AVR_8_LO8,
+	R_AVR_8_HI8, R_AVR_8_HHI8.
+
 2012-05-03  Sean Keys  <skeys@ipdatasys.com>
 
 	* xgate.h: Mininal file to support XGATE relocations.

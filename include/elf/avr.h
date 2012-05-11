@@ -1,5 +1,6 @@
 /* AVR ELF support for BFD.
-   Copyright 1999, 2000, 2004, 2006, 2010  Free Software Foundation, Inc.
+   Copyright 1999, 2000, 2004, 2006, 2010, 2012
+   Free Software Foundation, Inc.
    Contributed by Denis Chertykov <denisc@overta.ru>
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -30,16 +31,16 @@
    as reference for the relocations so that linker relaxation is possible.  */
 #define EF_AVR_LINKRELAX_PREPARED 0x80
 
-#define E_AVR_MACH_AVR1 1
-#define E_AVR_MACH_AVR2 2
-#define E_AVR_MACH_AVR25 25
-#define E_AVR_MACH_AVR3 3
-#define E_AVR_MACH_AVR31 31
-#define E_AVR_MACH_AVR35 35
-#define E_AVR_MACH_AVR4 4
-#define E_AVR_MACH_AVR5 5
-#define E_AVR_MACH_AVR51 51
-#define E_AVR_MACH_AVR6 6 
+#define E_AVR_MACH_AVR1     1
+#define E_AVR_MACH_AVR2     2
+#define E_AVR_MACH_AVR25   25
+#define E_AVR_MACH_AVR3     3
+#define E_AVR_MACH_AVR31   31
+#define E_AVR_MACH_AVR35   35
+#define E_AVR_MACH_AVR4     4
+#define E_AVR_MACH_AVR5     5
+#define E_AVR_MACH_AVR51   51
+#define E_AVR_MACH_AVR6     6 
 #define E_AVR_MACH_XMEGA1 101
 #define E_AVR_MACH_XMEGA2 102
 #define E_AVR_MACH_XMEGA3 103
@@ -77,6 +78,9 @@ START_RELOC_NUMBERS (elf_avr_reloc_type)
      RELOC_NUMBER (R_AVR_LO8_LDI_GS,	       24)
      RELOC_NUMBER (R_AVR_HI8_LDI_GS,	       25)
      RELOC_NUMBER (R_AVR_8, 		       26)
+     RELOC_NUMBER (R_AVR_8_LO8,                27)
+     RELOC_NUMBER (R_AVR_8_HI8,                28)
+     RELOC_NUMBER (R_AVR_8_HHI8,               29)
 END_RELOC_NUMBERS (R_AVR_max)
 
 #endif /* _ELF_AVR_H */
