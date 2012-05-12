@@ -1,5 +1,11 @@
 2012-05-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* DevNotes: Add entry cgf-000006.
+	* thread.cc (pthread::pop_cleanup_handler): Set cancel state to
+	disabled to avoid recursively waiting for cancel.
+
+2012-05-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* DevNotes: Add entry cgf-000005.
 	* fhandler.h (PIPE_ADD_PID): Redefine to something we actually DON'T
 	use.

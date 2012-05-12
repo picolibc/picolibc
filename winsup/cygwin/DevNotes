@@ -1,3 +1,16 @@
+2012-05-12  cgf-000006
+
+<1.7.16>
+- Fix hang when calling pthread_testcancel in a canceled thread.
+  Fixes some of: http://cygwin.com/ml/cygwin/2012-05/msg00186.html
+</1.7.16>
+
+This should fix the first part of the reported problem in the above
+message.  The cancel seemed to actually be working but, the fprintf
+eventually ended up calling pthread_testcancel.  Since we'd gotten here
+via a cancel, it tried to recursively call the cancel handler causing a
+recursive loop.
+
 2012-05-12  cgf-000005
 
 <1.7.16>

@@ -1057,6 +1057,9 @@ pthread::pop_cleanup_handler (int const execute)
 
   mutex.lock ();
 
+  /* We will no honor cancels since the thread is exiting.  */
+  cancelstate = PTHREAD_CANCEL_DISABLE;
+
   if (cleanup_stack != NULL)
     {
       __pthread_cleanup_handler *handler = cleanup_stack;
