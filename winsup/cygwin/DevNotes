@@ -1,3 +1,22 @@
+2012-05-12  cgf-000005
+
+<1.7.16>
+- Fix pipe creation problem which manifested as a problem creating a
+fifo.  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00253.html
+</1.7.16>
+
+My change on 2012-04-28 introduced a problem with fifos.  The passed
+in name was overwritten.  This was because I wasn't properly keeping
+track of the length of the generated pipe name when there was a
+name passed in to fhandler_pipe::create.
+
+There was also another problem in fhandler_pipe::create.  Since fifos
+use PIPE_ACCESS_DUPLEX and PIPE_ACCESS_DUPLEX is an or'ing of
+PIPE_ACCESS_INBOUND and PIPE_ACCESS_OUTBOUND, using PIPE_ACCESS_OUTBOUND
+as a "never-used" option for PIPE_ADD_PID in fhandler.h was wrong.  So,
+fifo creation attempted to add the pid of a pipe to the name which is
+wrong for fifos.
+
 2012-05-08  cgf-000004
 
 The change for cgf-000003 introduced a new problem:

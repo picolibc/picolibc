@@ -217,16 +217,16 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
   if (!name)
     pipe_mode |= pipe_byte ? PIPE_TYPE_BYTE : PIPE_TYPE_MESSAGE;
   else
-    {
-      strcpy (pipename + len, name);
-      pipe_mode |= PIPE_TYPE_MESSAGE;
-    }
+    pipe_mode |= PIPE_TYPE_MESSAGE;
 
-  if (!name || (open_mode &= PIPE_ADD_PID))
+  if (!name || (open_mode & PIPE_ADD_PID))
     {
       len += __small_sprintf (pipename + len, "%u-", GetCurrentProcessId ());
       open_mode &= ~PIPE_ADD_PID;
     }
+
+  if (name)
+    len += __small_sprintf (pipename + len, "%s", name);
 
   open_mode |= PIPE_ACCESS_INBOUND;
 

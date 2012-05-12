@@ -2,3 +2,10 @@ What's new:
 -----------
 
 - New API: memrchr.
+
+Bug fixes:
+----------
+
+- Fix pipe creation problem which manifested as a problem creating a
+fifo.  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00253.html
+

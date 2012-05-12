@@ -1,3 +1,12 @@
+2012-05-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* DevNotes: Add entry cgf-000005.
+	* fhandler.h (PIPE_ADD_PID): Redefine to something we actually DON'T
+	use.
+	* pipe.cc (fhandler_pipe::create): Avoid clearing all open_mode bits
+	when checking for PIPE_ADD_PID.  Properly keep track of len so that
+	passed in name is not overwritten.
+
 2012-05-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin.din (memrchr): Export.

@@ -38,7 +38,7 @@ details. */
 
 /* Used for fhandler_pipe::create.  Use an available flag which will
    never be used in Cygwin for this function. */
-#define PIPE_ADD_PID	PIPE_ACCESS_OUTBOUND
+#define PIPE_ADD_PID	FILE_FLAG_FIRST_PIPE_INSTANCE
 
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
