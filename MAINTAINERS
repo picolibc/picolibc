@@ -49,7 +49,8 @@ gdb/; readline/; sim/; GDB's part of include/
 include/
 	See binutils/, gdb/, sid/, gcc/, libiberty/ etc.
 
-intl/; config.rhost; libiberty/; libiberty's part of include/ 
+intl/; config.rhost; libiberty/; libiberty's part of include/;
+compile; depcomp; install-sh; missing; ylwrap; config/
 	gcc: http://gcc.gnu.org
 	Changes need to be done in tandem with the official GCC
 	sources or submitted to the master file maintainer and brought
@@ -103,13 +104,6 @@ config-ml.in; makefile.vms; mkdep; setup.com;
 etc/; utils/;
 	Any global maintainer can approve changes to these
 	files and directories.
-
-compile; depcomp; install-sh; missing; ylwrap;
-config/
-	Any global maintainer can approve changes to these
-	files and directories, but they should be aware
-	that they need to be kept in sync with their
-	counterparts in the GCC repository.
 
 modules file
 	If you understand the file format (or can cut-and-paste existing
