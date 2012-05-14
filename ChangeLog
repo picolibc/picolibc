@@ -1,3 +1,7 @@
+2012-05-14  Catherine Moore  <clm@codesourcery.com>
+
+	* NEWS:  Mention PowerPC VLE port.
+
 2012-05-11  Mike Frysinger  <vapier@gentoo.org>
 
 	* MAINTAINERS (config/): Move to intl/ section.

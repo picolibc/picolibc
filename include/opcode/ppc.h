@@ -65,6 +65,8 @@ struct powerpc_opcode
    instructions.  */
 extern const struct powerpc_opcode powerpc_opcodes[];
 extern const int powerpc_num_opcodes;
+extern const struct powerpc_opcode vle_opcodes[];
+extern const int vle_num_opcodes;
 
 /* Values defined for the flags field of a struct powerpc_opcode.  */
 
@@ -183,8 +185,20 @@ extern const int powerpc_num_opcodes;
 /* Opcode is supported by Thread management APU */
 #define PPC_OPCODE_TMR         0x800000000ull
 
+/* Opcode which is supported by the VLE extension.  */
+#define PPC_OPCODE_VLE	      0x1000000000ull
+
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
+
+/* A macro to determine if the instruction is a 2-byte VLE insn.  */
+#define PPC_OP_SE_VLE(m) ((m) <= 0xffff)
+
+/* A macro to extract the major opcode from a VLE instruction.  */
+#define VLE_OP(i,m) (((i) >> ((m) <= 0xffff ? 10 : 26)) & 0x3f)
+
+/* A macro to convert a VLE opcode to a VLE opcode segment.  */
+#define VLE_OP_TO_SEG(i) ((i) >> 1)
 
 /* The operands table is an array of struct powerpc_operand.  */
 
@@ -193,16 +207,22 @@ struct powerpc_operand
   /* A bitmask of bits in the operand.  */
   unsigned int bitm;
 
-  /* How far the operand is left shifted in the instruction.
-     -1 to indicate that BITM and SHIFT cannot be used to determine
-     where the operand goes in the insn.  */
+  /* The shift operation to be applied to the operand.  No shift
+     is made if this is zero.  For positive values, the operand
+     is shifted left by SHIFT.  For negative values, the operand
+     is shifted right by -SHIFT.  Use PPC_OPSHIFT_INV to indicate
+     that BITM and SHIFT cannot be used to determine where the
+     operand goes in the insn.  */
   int shift;
 
   /* Insertion function.  This is used by the assembler.  To insert an
      operand value into an instruction, check this field.
 
      If it is NULL, execute
-	 i |= (op & o->bitm) << o->shift;
+	 if (o->shift >= 0)
+	   i |= (op & o->bitm) << o->shift;
+	 else
+	   i |= (op & o->bitm) >> -o->shift;
      (i is the instruction which we are filling in, o is a pointer to
      this structure, and op is the operand value).
 
@@ -220,7 +240,10 @@ struct powerpc_operand
      extract this operand type from an instruction, check this field.
 
      If it is NULL, compute
-	 op = (i >> o->shift) & o->bitm;
+	 if (o->shift >= 0)
+	   op = (i >> o->shift) & o->bitm;
+	 else
+	   op = (i << -o->shift) & o->bitm;
 	 if ((o->flags & PPC_OPERAND_SIGNED) != 0)
 	   sign_extend (op);
      (i is the instruction, o is a pointer to this structure, and op
@@ -243,6 +266,11 @@ struct powerpc_operand
 
 extern const struct powerpc_operand powerpc_operands[];
 extern const unsigned int num_powerpc_operands;
+
+/* Use with the shift field of a struct powerpc_operand to indicate
+     that BITM and SHIFT cannot be used to determine where the operand
+     goes in the insn.  */
+#define PPC_OPSHIFT_INV (-1 << 31)
 
 /* Values defined for the flags field of a struct powerpc_operand.  */
 
@@ -277,7 +305,7 @@ extern const unsigned int num_powerpc_operands;
        cr4 4	cr5 5	cr6 6	cr7 7
    These may be combined arithmetically, as in cr2*4+gt.  These are
    only supported on the PowerPC, not the POWER.  */
-#define PPC_OPERAND_CR (0x10)
+#define PPC_OPERAND_CR_BIT (0x10)
 
 /* This operand names a register.  The disassembler uses this to print
    register names with a leading 'r'.  */
@@ -342,6 +370,9 @@ extern const unsigned int num_powerpc_operands;
 /* This operand names a vector-scalar unit register.  The disassembler
    prints these with a leading 'vs'.  */
 #define PPC_OPERAND_VSR (0x100000)
+
+/* This is a CR FIELD that does not use symbolic names.  */
+#define PPC_OPERAND_CR_REG (0x200000)
 
 /* The POWER and PowerPC assemblers use a few macros.  We keep them
    with the operands table for simplicity.  The macro table is an

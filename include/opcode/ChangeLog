@@ -1,3 +1,18 @@
+2012-05-14  Catherine Moore  <clm@codesourcery.com>
+	    Maciej W. Rozycki  <macro@codesourcery.com>
+	    Rhonda Wittels  <rhonda@codesourcery.com>
+
+	* ppc.h (PPC_OPCODE_VLE): New definition. 
+	(PPC_OP_SA): New macro.
+	(PPC_OP_SE_VLE): New macro.
+	(PPC_OP): Use a variable shift amount.
+	(powerpc_operand): Update comments.
+	(PPC_OPSHIFT_INV): New macro.
+	(PPC_OPERAND_CR): Replace with...
+	(PPC_OPERAND_CR_BIT): ...this and
+	(PPC_OPERAND_CR_REG): ...this.
+
+
 2012-05-03  Sean Keys  <skeys@ipdatasys.com>
 
 	* xgate.h: Header file for XGATE assembler.

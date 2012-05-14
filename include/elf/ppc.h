@@ -131,6 +131,25 @@ START_RELOC_NUMBERS (elf_ppc_reloc_type)
   RELOC_NUMBER (R_PPC_EMB_BIT_FLD,	115)
   RELOC_NUMBER (R_PPC_EMB_RELSDA,	116)
 
+/* PowerPC VLE relocations.  */
+  RELOC_NUMBER (R_PPC_VLE_REL8,		216)
+  RELOC_NUMBER (R_PPC_VLE_REL15,	217)
+  RELOC_NUMBER (R_PPC_VLE_REL24,	218)
+  RELOC_NUMBER (R_PPC_VLE_LO16A,	219)
+  RELOC_NUMBER (R_PPC_VLE_LO16D,	220)
+  RELOC_NUMBER (R_PPC_VLE_HI16A,	221)
+  RELOC_NUMBER (R_PPC_VLE_HI16D,	222)
+  RELOC_NUMBER (R_PPC_VLE_HA16A,	223)
+  RELOC_NUMBER (R_PPC_VLE_HA16D,	224)
+  RELOC_NUMBER (R_PPC_VLE_SDA21,	225)
+  RELOC_NUMBER (R_PPC_VLE_SDA21_LO,	226)
+  RELOC_NUMBER (R_PPC_VLE_SDAREL_LO16A,	227)
+  RELOC_NUMBER (R_PPC_VLE_SDAREL_LO16D,	228)
+  RELOC_NUMBER (R_PPC_VLE_SDAREL_HI16A,	229)
+  RELOC_NUMBER (R_PPC_VLE_SDAREL_HI16D,	230)
+  RELOC_NUMBER (R_PPC_VLE_SDAREL_HA16A,	231)
+  RELOC_NUMBER (R_PPC_VLE_SDAREL_HA16D,	232)
+
 /* Support STT_GNU_IFUNC plt calls.  */
   RELOC_NUMBER (R_PPC_IRELATIVE,	248)
 
@@ -166,9 +185,11 @@ END_RELOC_NUMBERS (R_PPC_max)
 #define	EF_PPC_RELOCATABLE	0x00010000	/* PowerPC -mrelocatable flag.  */
 #define	EF_PPC_RELOCATABLE_LIB	0x00008000	/* PowerPC -mrelocatable-lib flag.  */
 
-/* This bit is reserved by BFD for processor specific stuff.  Name
-   it properly so that we can easily stay consistent elsewhere.  */
-#define SEC_PPC_VLE		SEC_TIC54X_BLOCK
+/* Processor specific program headers, p_flags field.  */
+#define PF_PPC_VLE		0x10000000	/* PowerPC VLE.  */
+
+/* Processor specific section headers, sh_flags field.  */
+#define SHF_PPC_VLE		0x10000000	/* PowerPC VLE text section.  */
 
 /* Processor specific section headers, sh_type field.  */
 

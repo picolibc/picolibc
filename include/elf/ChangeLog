@@ -1,3 +1,33 @@
+2012-05-14  James Lemke  <jwlemke@codesourcery.com>
+	* ppc.h (SEC_PPC_VLE): Remove.
+
+2012-05-14  Catherine Moore  <clm@codesourcery.com>
+	    James Lemke  <jwlemke@codesourcery.com>
+
+	* ppc.h (R_PPC_VLE_REL8): New reloction.
+	(R_PPC_VLE_REL15): Likewise.
+	(R_PPC_VLE_REL24): Likewise.
+	(R_PPC_VLE_LO16A): Likewise.
+	(R_PPC_VLE_LO16D): Likewise.
+	(R_PPC_VLE_HI16A): Likewise.
+	(R_PPC_VLE_HI16D): Likewise.
+	(R_PPC_VLE_HA16A): Likewise.
+	(R_PPC_VLE_HA16D): Likewise.
+	(R_PPC_VLE_SDA21): Likewise.
+	(R_PPC_VLE_SDA21_LO): Likewise.
+	(R_PPC_VLE_SDAREL_LO16A): Likewise.
+	(R_PPC_VLE_SDAREL_LO16D): Likewise.
+	(R_PPC_VLE_SDAREL_HI16A): Likewise.
+	(R_PPC_VLE_SDAREL_HI16D): Likewise.
+	(R_PPC_VLE_SDAREL_HA16A): Likewise.
+	(R_PPC_VLE_SDAREL_HA16D): Likewise.
+	(SEC_PPC_VLE): Remove.
+	(PF_PPC_VLE): New program header flag.
+	(SHF_PPC_VLE): New section header flag.
+	(vle_opcodes, vle_num_opcodes): New.
+	(VLE_OP): New macro.
+	(VLE_OP_TO_SEG): New macro.
+
 2012-05-11  Georg-Johann Lay  <avr@gjlay.de
 
 	PR target/13503
