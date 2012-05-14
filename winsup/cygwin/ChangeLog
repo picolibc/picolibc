@@ -1,5 +1,9 @@
 2012-05-14  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
+
+2012-05-14  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* DevNotes: Add entry cgf-000007.
 	* child_info.h (child_info_spawn::parent_winpid): Declare new field.
 	(child_info_spawn::get_parent_handle): Declare new function.
