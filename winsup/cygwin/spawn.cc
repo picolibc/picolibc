@@ -614,6 +614,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
       SetHandleInformation (parent, HANDLE_FLAG_INHERIT, 0);
     }
+  parent_winpid = GetCurrentProcessId ();
 
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different

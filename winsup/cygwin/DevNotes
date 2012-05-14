@@ -1,3 +1,26 @@
+2012-05-14  cgf-000007
+
+<1.7.16>
+- Fix invocation of strace from a cygwin process.  Fixes:
+  http://cygwin.com/ml/cygwin/2012-05/msg00292.html
+</1.7.16>
+
+The change in cgf-000004 introduced a problem for processes which load
+cygwin1.dll dynamically.  strace.exe is the most prominent example of
+this.
+
+Since the parent handle is now closed for "non-Cygwin" processes, when
+strace.exe tried to dynamically load cygwin1.dll, the handle was invalid
+and child_info_spawn::handle_spawn couldn't use retrieve information
+from the parent.  This eventually led to a strace_printf error due to an
+attempt to dereference an unavailable cygheap.  Probably have to fix
+this someday.  You shouldn't use the cygheap while attempting to print
+an error about the inavailability of said cygheap.
+
+This was fixed by saving the parent pid in child_info_spawn and calling
+OpenProcess for the parent pid and using that handle iff a process is
+dynamically loaded.
+
 2012-05-12  cgf-000006
 
 <1.7.16>

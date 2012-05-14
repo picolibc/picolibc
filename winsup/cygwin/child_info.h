@@ -66,6 +66,7 @@ public:
   HANDLE subproc_ready;	// used for synchronization with parent
   HANDLE user_h;
   HANDLE parent;
+  DWORD parent_winpid;
   DWORD cygheap_reserve_sz;
   unsigned fhandler_union_cb;
   DWORD exit_code;	// process exit code
@@ -175,6 +176,7 @@ public:
     lock->release ();
     return !!hExeced;
   }
+  bool get_parent_handle ();
   bool has_execed_cygwin () const { return iscygwin () && has_execed (); }
   operator HANDLE& () {return hExeced;}
   int worker (const char *, const char *const *, const char *const [], int,

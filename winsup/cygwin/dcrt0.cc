@@ -625,13 +625,24 @@ child_info_fork::handle_fork ()
     api_fatal ("recreate_mmaps_after_fork_failed");
 }
 
+bool
+child_info_spawn::get_parent_handle ()
+{
+  parent = OpenProcess (PROCESS_VM_READ, false, parent_winpid);
+  moreinfo->myself_pinfo = NULL;
+  return !!parent;
+}
+
 void
 child_info_spawn::handle_spawn ()
 {
   extern void fixup_lockf_after_exec ();
   HANDLE h;
-  cygheap_fixup_in_child (true);
-  memory_init (false);
+  if (!dynamically_loaded || get_parent_handle ())
+      {
+	cygheap_fixup_in_child (true);
+	memory_init (false);
+      }
   if (!moreinfo->myself_pinfo ||
       !DuplicateHandle (GetCurrentProcess (), moreinfo->myself_pinfo,
 			GetCurrentProcess (), &h, 0,
@@ -669,7 +680,7 @@ child_info_spawn::handle_spawn ()
      Otherwise, we no longer need this handle so close it.
      Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of
      handles might get confused. */
-  if (type != _CH_EXEC)
+  if (type != _CH_EXEC && child_proc_info->parent)
     {
       CloseHandle (child_proc_info->parent);
       child_proc_info->parent = NULL;

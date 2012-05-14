@@ -1,3 +1,13 @@
+2012-05-14  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* DevNotes: Add entry cgf-000007.
+	* child_info.h (child_info_spawn::parent_winpid): Declare new field.
+	(child_info_spawn::get_parent_handle): Declare new function.
+	* dcrt0.cc (child_info_spawn::get_parent_handle): Define new function.
+	(child_info_spawn::handle_spawn): Recreate parent handle if possible
+	when dynamically loaded.  Don't mess with parent handle if it's NULL.
+	* spawn.cc (child_info_spawn::worker): Set parent_winpid appropriately.
+
 2012-05-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* DevNotes: Add entry cgf-000006.
