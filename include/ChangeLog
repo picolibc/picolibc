@@ -1,3 +1,8 @@
+2012-05-15  James Murray <jsm@jsm-net.demon.co.uk>
+
+	* dis-asm.h (print_insn_m9s12x): Prototype.
+	(print_insn_m9s12xg): Prototype.
+
 2012-05-03  Sean Keys  <skeys@ipdatasys.com>
 
 	* dis-asm.h (print_insn_xgate): Define.

@@ -1,8 +1,13 @@
+2012-05-15  James Murray <jsm@jsm-net.demon.co.uk>
+
+	* m68hc11.h: Add XGate definitions.
+	(struct m68hc11_opcode): Add xg_mask field.
+
 2012-05-14  Catherine Moore  <clm@codesourcery.com>
 	    Maciej W. Rozycki  <macro@codesourcery.com>
 	    Rhonda Wittels  <rhonda@codesourcery.com>
 
-	* ppc.h (PPC_OPCODE_VLE): New definition. 
+	* ppc.h (PPC_OPCODE_VLE): New definition.
 	(PPC_OP_SA): New macro.
 	(PPC_OP_SE_VLE): New macro.
 	(PPC_OP): Use a variable shift amount.

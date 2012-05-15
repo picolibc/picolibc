@@ -1,3 +1,9 @@
+2012-05-15  James Murray <jsm@jsm-net.demon.co.uk>
+
+	* m68hc11.h (R_M68HC12_16B, R_M68HC12_PCREL_9, R_M68HC12_PCREL_10)
+	R_M68HC12_HI8XG, R_M68HC12_LO8XG): New relocations.
+	(E_M68HC11_XGATE_RAMOFFSET): Define.
+
 2012-05-14  James Lemke  <jwlemke@codesourcery.com>
 	* ppc.h (SEC_PPC_VLE): Remove.
 

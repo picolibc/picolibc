@@ -1,5 +1,5 @@
 /* m68hc11 & m68hc12 ELF support for BFD.
-   Copyright 1999, 2000, 2001, 2002, 2010 Free Software Foundation, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2010, 2012 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -42,6 +42,12 @@ START_RELOC_NUMBERS (elf_m68hc11_reloc_type)
   RELOC_NUMBER (R_M68HC11_LO16, 12)
   RELOC_NUMBER (R_M68HC11_PAGE, 13)
 
+  RELOC_NUMBER (R_M68HC12_16B, 15)
+  RELOC_NUMBER (R_M68HC12_PCREL_9, 16)
+  RELOC_NUMBER (R_M68HC12_PCREL_10, 17)
+  RELOC_NUMBER (R_M68HC12_HI8XG, 18)
+  RELOC_NUMBER (R_M68HC12_LO8XG, 19)
+
      /* GNU extension for linker relaxation.
         Mark beginning of a jump instruction (any form).  */
   RELOC_NUMBER (R_M68HC11_RL_JUMP, 20)
@@ -63,6 +69,9 @@ END_RELOC_NUMBERS (R_M68HC11_max)
 
 /* Uses 68HC12 memory banks.  */
 #define E_M68HC12_BANKS 0x000000004
+
+/* XGATE ram offsetting.  */
+#define E_M68HC11_XGATE_RAMOFFSET     0x000000100
 
 #define EF_M68HC11_MACH_MASK 0xF0
 #define EF_M68HC11_GENERIC   0x00 /* Generic 68HC12/backward compatibility.  */
@@ -86,10 +95,10 @@ END_RELOC_NUMBERS (R_M68HC11_max)
 /* Special values for the st_other field in the symbol table.  These
    are used for 68HC12 to identify far functions (must be called with
    'call' and returns with 'rtc').  */
-#define STO_M68HC12_FAR 0x80
+#define STO_M68HC12_FAR          0x80
 
 /* Identify interrupt handlers.  This is used by the debugger to
    correctly compute the stack frame.  */
-#define STO_M68HC12_INTERRUPT 0x40
+#define STO_M68HC12_INTERRUPT    0x40
      
 #endif
