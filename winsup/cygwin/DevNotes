@@ -1,3 +1,35 @@
+2012-05-14  cgf-000008
+
+<1.7.16>
+- Fix hang when zero bytes are written to a pty using
+  Windows WriteFile or equivalent.  Fixes:
+  http://cygwin.com/ml/cygwin/2012-05/msg00323.html
+</1.7.16>
+
+cgf-000002, as usual, fixed one thing while breaking another.  See
+Larry's predicament in: http://goo.gl/oGEr2 .
+
+The problem is that zero byte writes to the pty pipe caused the dread
+end-of-the-world-as-we-know-it problem reported on the mailing list
+where ReadFile reads zero bytes even though there is still more to read
+on the pipe.  This is because that change caused a 'record' to be read
+and a record can be zero bytes.
+
+I was never really keen about using a throwaway buffer just to get a
+count of the number of characters available to be read in the pty pipe.
+On closer reading of the documentation for PeekNamedPipe it seemed like
+the sixth argument to PeekNamedPipe should return what I needed without
+using a buffer.  And, amazingly, it did, except that the problem still
+remained - a zero byte message still screwed things up.
+
+So, we now detect the case where there is zero bytes available as a
+message but there are bytes available in the pipe.  In that scenario,
+return the bytes available in the pipe rather than the message length of
+zero.  This could conceivably cause problems with pty pipe handling in
+this scenario but since the only way this scenario could possibly happen
+is when someone is writing zero bytes using WriteFile to a pty pipe, I'm
+ok with that.
+
 2012-05-14  cgf-000007
 
 <1.7.16>

@@ -7,10 +7,14 @@ Bug fixes:
 ----------
 
 - Fix pipe creation problem which manifested as a problem creating a
-fifo.  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00253.html
+  fifo.  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00253.html
 
 - Fix hang when calling pthread_testcancel in a canceled thread.
   Fixes some of: http://cygwin.com/ml/cygwin/2012-05/msg00186.html
 
 - Fix invocation of strace from a cygwin process.  Fixes:
   http://cygwin.com/ml/cygwin/2012-05/msg00292.html
+
+- Fix hang when zero bytes are written to a pty using
+  Windows WriteFile or equivalent.  Fixes:
+  http://cygwin.com/ml/cygwin/2012-05/msg00323.html

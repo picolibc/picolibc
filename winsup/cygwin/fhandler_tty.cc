@@ -53,17 +53,20 @@ fhandler_pty_slave::get_unit ()
 bool
 bytes_available (DWORD& n, HANDLE h)
 {
-  char buf[INP_BUFFER_SIZE];
-  /* Apparently need to pass in a dummy buffer to read a real "record" from
-     the pipe.  So buf is used and then discarded just so we can see how many
-     bytes will be read by the next ReadFile().  */
-  bool succeeded = PeekNamedPipe (h, buf, sizeof (buf), &n, NULL, NULL);
-  if (!succeeded)
+  DWORD navail, nleft;
+  navail = nleft = 0;
+  bool succeeded = PeekNamedPipe (h, NULL, 0, NULL, &navail, &nleft);
+  if (succeeded)
+    /* nleft should always be the right choice unless something has written 0
+       bytes to the pipe.  In that pathological case we return the actual number
+       of bytes available in the pipe. See cgf-000008 for more details.  */
+    n = nleft ?: navail;
+  else
     {
       termios_printf ("PeekNamedPipe(%p) failed, %E", h);
       n = 0;
     }
-  debug_only_printf ("%u bytes available", n);
+  debug_only_printf ("n %u, nleft %u, navail %u");
   return succeeded;
 }
 
