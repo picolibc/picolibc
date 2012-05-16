@@ -80,7 +80,7 @@ START_RELOC_NUMBERS (elf_avr_reloc_type)
      RELOC_NUMBER (R_AVR_8, 		       26)
      RELOC_NUMBER (R_AVR_8_LO8,                27)
      RELOC_NUMBER (R_AVR_8_HI8,                28)
-     RELOC_NUMBER (R_AVR_8_HHI8,               29)
+     RELOC_NUMBER (R_AVR_8_HLO8,               29)
 END_RELOC_NUMBERS (R_AVR_max)
 
 #endif /* _ELF_AVR_H */

@@ -1,3 +1,8 @@
+2012-05-16  Georg-Johann Lay  <avr@gjlay.de>
+
+	PR target/13503
+	* avr.h (RELOC_NUMBERS): Rename R_AVR_8_HHI8 to R_AVR_8_HLO8.
+
 2012-05-15  James Murray <jsm@jsm-net.demon.co.uk>
 
 	* m68hc11.h (R_M68HC12_16B, R_M68HC12_PCREL_9, R_M68HC12_PCREL_10)
