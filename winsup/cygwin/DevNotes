@@ -1,3 +1,21 @@
+2012-05-16  cgf-000009
+
+<1.7.16>
+- Fix broken console mouse handling.  Reported here:
+  http://cygwin.com/ml/cygwin/2012-05/msg00360.html
+</1.7.16>
+
+I did a cvs annotate on smallprint.cc and see that the code to translate
+%characters > 127 to 0x notation was in the 1.1 revision.  Then I
+checked the smallprint.c predecessor.  It was in the 1.1 version of that
+program too, which means that this odd change has probably been around
+since <= 2000.
+
+Since __small_sprintf is supposed to emulate sprintf, I got rid of the
+special case handling.  This may affect fhandler_socket::bind.  If so, we
+should work around this problem there rather than keeping this strange
+hack in __small_printf.
+
 2012-05-14  cgf-000008
 
 <1.7.16>

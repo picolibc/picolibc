@@ -146,17 +146,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  l_opt = true;
 		  continue;
 		case 'c':
-		  {
-		    int c = va_arg (ap, int);
-		    if (c > ' ' && c <= 127)
-		      *dst++ = c;
-		    else
-		      {
-			*dst++ = '0';
-			*dst++ = 'x';
-			dst = __rn (dst, 16, 0, c, len, pad, LMASK);
-		      }
-		  }
+		  *dst++ = (char) (va_arg (ap, int) & 0xff);
 		  break;
 		case 'C':
 		  {
@@ -164,14 +154,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		    char buf[4], *c;
 		    sys_wcstombs (buf, 4, &wc, 1);
 		    for (c = buf; *c; ++c)
-		      if (isprint (*c))
-			*dst++ = *c;
-		      else
-			{
-			  *dst++ = '0';
-			  *dst++ = 'x';
-			  dst = __rn (dst, 16, 0, *c, len, pad, LMASK);
-			}
+		      *dst++ = *c;
 		  }
 		case 'E':
 		  strcpy (dst, "Win32 error ");
@@ -445,17 +428,7 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 		  continue;
 		case L'c':
 		case L'C':
-		  {
-		    unsigned int c = va_arg (ap, unsigned int);
-		    if (c > L' ' && c <= 127)
-		      *dst++ = c;
-		    else
-		      {
-			*dst++ = L'0';
-			*dst++ = L'x';
-			dst = __wrn (dst, 16, 0, c, len, pad, LMASK);
-		      }
-		  }
+		  *dst++ = va_arg (ap, unsigned);
 		  break;
 		case L'E':
 		  wcscpy (dst, L"Win32 error ");
