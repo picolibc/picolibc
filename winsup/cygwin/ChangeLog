@@ -1,5 +1,12 @@
 2012-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (cygwin_recvfrom): Don't shortcircuit if len == 0.  Add comment
+	to explain why.
+	(cygwin_recv): Ditto.
+	(cygwin_recvmsg): Ditto.
+
+2012-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (path_conv::isgood_inode): Rearrange, take
 	Samba versions >= 3.5.4 into account, add comments.
 

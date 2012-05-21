@@ -712,7 +712,11 @@ cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
   myfault efault;
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
-  else if ((res = len) != 0)
+  else
+    /* Originally we shortcircuited here if res == 0.
+       Allow 0 bytes buffer.  This is valid in POSIX and handled in
+       fhandler_socket::recv_internal.  If we shortcircuit, we fail
+       to deliver valid error conditions and peer address. */
     res = fh->recvfrom (buf, len, flags, from, fromlen);
 
   syscall_printf ("%R = recvfrom(%d, %p, %d, %x, %p, %p)",
@@ -1465,7 +1469,11 @@ cygwin_recv (int fd, void *buf, size_t len, int flags)
   myfault efault;
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
-  else if ((res = len) != 0)
+  else
+    /* Originally we shortcircuited here if res == 0.
+       Allow 0 bytes buffer.  This is valid in POSIX and handled in
+       fhandler_socket::recv_internal.  If we shortcircuit, we fail
+       to deliver valid error conditions. */
     res = fh->recvfrom (buf, len, flags, NULL, NULL);
 
   syscall_printf ("%R = recv(%d, %p, %d, %x)", res, fd, buf, len, flags);
@@ -2865,7 +2873,11 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
   else
     {
       res = check_iovec_for_read (msg->msg_iov, msg->msg_iovlen);
-      if (res > 0)
+      /* Originally we shortcircuited here if res == 0.
+	 Allow 0 bytes buffer.  This is valid in POSIX and handled in
+	 fhandler_socket::recv_internal.  If we shortcircuit, we fail
+	 to deliver valid error conditions and peer address. */
+      if (res >= 0)
 	res = fh->recvmsg (msg, flags);
     }
 
