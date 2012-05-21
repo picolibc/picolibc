@@ -1,3 +1,8 @@
+2012-05-21  Sandeep Kumar Singh  <Sandeep.Singh2@kpitcummins.com>
+
+	* libc/machine/cr16/asm.h: Added some missing instructions
+	and removed few unsupported instructions of cr16 target.
+
 2012-05-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/string.h (memrchr): Declare.
