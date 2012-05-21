@@ -1,7 +1,7 @@
 /* strace.cc: system/windows tracing
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -59,8 +59,6 @@ strace::activate (bool isfork)
 	  prntf (1, NULL, "**********************************************");
 	  prntf (1, NULL, "Program name: %W %s", progname, pidbuf);
 	  prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
-	  if (cygheap && cygheap->user_heap.chunk)
-	    prntf (1, NULL, "Heap size:    %u", cygheap->user_heap.chunk);
 	  prntf (1, NULL, "**********************************************");
 	}
     }

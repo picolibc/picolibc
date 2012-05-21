@@ -1,5 +1,11 @@
 2012-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* strace.cc (strace::activate): Move printing heap size from here...
+	* heap.cc (heap_init_info): ...to here.  Explain why.  Print heap
+	size in hex and decimal.
+
+2012-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (cygwin_recvfrom): Don't shortcircuit if len == 0.  Add comment
 	to explain why.
 	(cygwin_recv): Ditto.
