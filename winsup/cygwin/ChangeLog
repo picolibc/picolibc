@@ -1,3 +1,8 @@
+2012-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (pthread::cancel): Set thread's cancel_event in
+	PTHREAD_CANCEL_ASYNCHRONOUS case, too.  Explain why.
+
 2012-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* strace.cc (strace::activate): Move printing heap size from here...

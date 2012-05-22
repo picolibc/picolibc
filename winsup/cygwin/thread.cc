@@ -566,6 +566,18 @@ pthread::cancel ()
       SetThreadContext (win32_obj_id, &context);
     }
   mutex.unlock ();
+  /* Setting the context to another function does not work if the thread is
+     waiting in WFMO.  For instance, a thread which waits for a semaphore in
+     sem_wait will call cancelable_wait which in turn calls WFMO.  While this
+     WFMO call is cancelable by setting the thread's cancel_event object, the
+     OS apparently refuses to set the thread's context and continues to wait
+     for the WFMO conditions.  This is *not* reflected in the return value of
+     SetThreadContext or ResumeThread, btw.
+     So, what we do here is to set the cancel_event as well.  This allows the
+     WFMO call in cancelable_wait and elsewhere to return and to handle the
+     cancel request by itself. */
+  canceled = true;
+  SetEvent (cancel_event);
   ResumeThread (win32_obj_id);
 
   return 0;
