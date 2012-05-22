@@ -530,6 +530,7 @@ fh_alloc (path_conv& pc)
 	  fh = cnew (fhandler_dev_random);
 	  break;
 	case FH_MEM:
+	case FH_KMEM:
 	case FH_PORT:
 	  fh = cnew (fhandler_dev_mem);
 	  break;

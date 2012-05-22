@@ -157,7 +157,7 @@ const device dev_error_storage =
 "/dev/random", BRACK(FH_RANDOM), "/dev/random", exists, S_IFCHR
 "/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", exists, S_IFCHR, =urandom_dev
 "/dev/mem", BRACK(FH_MEM), "/dev/mem", exists, S_IFCHR
-"/dev/kmem", BRACK(FH_KMEM), "/dev/mem", exists, S_IFCHR
+"/dev/kmem", BRACK(FH_KMEM), "/dev/kmem", exists, S_IFCHR
 "/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard", exists, S_IFCHR
 "/dev/port", BRACK(FH_PORT), "/dev/port", exists, S_IFCHR
 "/dev/com%(1-16)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1 - 1})), "\\??\\COM{$1}", exists_ntdev_silent, S_IFCHR

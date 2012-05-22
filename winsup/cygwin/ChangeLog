@@ -1,5 +1,14 @@
 2012-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* devices.in: Fix native name of /dev/kmem.
+	* devices.cc: Regenerate.
+	* dtable.cc (fh_alloc): Don't forget FH_KMEM.
+	* fhandler_mem.cc (fhandler_dev_mem::open): Set errno to EACCES rather
+	than ENOENT on systems not granting access to physical memory from
+	user space.
+
+2012-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.cc (pthread::cancel): Set thread's cancel_event in
 	PTHREAD_CANCEL_ASYNCHRONOUS case, too.  Explain why.
 

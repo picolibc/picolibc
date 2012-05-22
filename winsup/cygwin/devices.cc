@@ -244,7 +244,7 @@ const _RDATA device dev_storage[] =
   {"/dev/fd14", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 14)), "\\Device\\Floppy14", exists_ntdev, S_IFBLK, true},
   {"/dev/fd15", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 15)), "\\Device\\Floppy15", exists_ntdev, S_IFBLK, true},
   {"/dev/full", BRACK(FH_FULL), "/dev/full", exists, S_IFCHR, true},
-  {"/dev/kmem", BRACK(FH_KMEM), "/dev/mem", exists, S_IFCHR, true},
+  {"/dev/kmem", BRACK(FH_KMEM), "/dev/kmem", exists, S_IFCHR, true},
   {"/dev/kmsg", BRACK(FH_KMSG), "\\Device\\MailSlot\\cygwin\\dev\\kmsg", exists_ntdev, S_IFCHR, true},
   {"/dev/mem", BRACK(FH_MEM), "/dev/mem", exists, S_IFCHR, true},
   {"/dev/nst0", BRACK(FHDEV(DEV_TAPE_MAJOR, 128)), "\\Device\\Tape0", exists_ntdev, S_IFBLK, true},
