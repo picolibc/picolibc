@@ -569,11 +569,30 @@ pthread::cancel ()
   SuspendThread (win32_obj_id);
   if (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT)
     {
+      static uintptr_t cyg_addr;
       CONTEXT context;
       context.ContextFlags = CONTEXT_CONTROL;
       GetThreadContext (win32_obj_id, &context);
-      context.Eip = (DWORD) pthread::static_cancel_self;
-      SetThreadContext (win32_obj_id, &context);
+      /* FIXME:
+      
+         File access (and probably more) in Cygwin is not foolproof in terms of
+         asynchronous thread cancellation.  For instance, the cleanup of the
+         tmp_buf pointers needs to be changed to use pthread_cleanup_push/pop,
+         rather than being hidden in the myfault class.  We have to inspect
+         all Cygwin functions so that none of them is left in a wrong or
+         undefined state on thread cancellation.
+
+         For the time being, just disable asynchronous cancellation if the
+         thread is currently executing Cygwin or Windows code.  Rely on
+         deferred cancellation in this case. */
+      if (!cyg_addr)
+        cyg_addr = (uintptr_t) GetModuleHandle ("cygwin1.dll");
+      if ((context.Eip < cyg_addr || context.Eip >= (uintptr_t) cygheap)
+          && !cygtls->inside_kernel (&context))
+        {
+          context.Eip = (DWORD) pthread::static_cancel_self;
+          SetThreadContext (win32_obj_id, &context);
+        }
     }
   mutex.unlock ();
   /* Setting the context to another function does not work if the thread is
