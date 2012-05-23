@@ -1,6 +1,6 @@
 /* winbase.h
 
-   Copyright 2002, 2003, 2004, 2008 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2008, 2012 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -10,6 +10,21 @@ details. */
 
 #ifndef _WINBASE2_H
 #define _WINBASE2_H
+
+/* For some unknown reason, InterlockedAdd is only supported on Itanium
+   when using the Windows headers.  Fortunately we're not restricted to the
+   Windows headers :) */
+extern __inline__ long
+ilockadd (volatile long *m, long value)
+{
+  register int __res;
+  __asm__ __volatile__ ("\n\
+	movl	%3,%0\n\
+	lock	xadd %0,%1\n\
+	addl	%3,%0\n\
+	": "=&r" (__res), "=m" (*m): "m" (*m), "r" (value): "cc");
+  return __res;
+}
 
 extern __inline__ long
 ilockincr (volatile long *m)
@@ -65,6 +80,8 @@ ilockcmpexch (volatile long *t, long v, long c)
   });
 }
 
+#undef InterlockedAdd
+#define InterlockedAdd ilockadd
 #undef InterlockedIncrement
 #define InterlockedIncrement ilockincr
 #undef InterlockedDecrement

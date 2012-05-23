@@ -185,7 +185,11 @@ class fhandler_base
   long refcnt(long i = 0)
   {
     debug_only_printf ("%p, %s, i %d, refcnt %ld", this, get_name (), i, _refcnt + i);
-    return _refcnt += i;
+    /* This MUST be an interlocked operation.  If multiple threads access the
+       same descriptor in quick succession, a context switch can interrupt
+       the += operation and we wrongly end up with a refcnt of 0 in the
+       cygheap_fdget destructor. */
+    return i ? InterlockedAdd (&_refcnt, i) : _refcnt;
   }
   class fhandler_base *archetype;
   int usecount;

@@ -1,3 +1,9 @@
+2012-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (refcnt): Add i interlocked.  Explain why.
+	* winbase.h (ilockadd): New function.
+	(InterlockedAdd): Define as ilockadd.
+
 2012-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* devices.in: Fix native name of /dev/kmem.
