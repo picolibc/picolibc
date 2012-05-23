@@ -1,5 +1,10 @@
 2012-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc (pthread::cancel): Re-allow asynchronous cancellation from
+	Cygwin code since it looks like the problem is Windows only.
+
+2012-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.cc: Add a temporary workaround to help Cygwin along while
 	newlib doesn't install cleanup handlers.  Explain the problem.
 	(class __cygwin_lock_handler): New class.

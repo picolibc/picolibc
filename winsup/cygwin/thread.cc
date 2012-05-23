@@ -631,42 +631,28 @@ pthread::cancel ()
   SuspendThread (win32_obj_id);
   if (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT)
     {
-      static uintptr_t cyg_addr;
       CONTEXT context;
       context.ContextFlags = CONTEXT_CONTROL;
       GetThreadContext (win32_obj_id, &context);
-      /* FIXME:
-      
-         File access (and probably more) in Cygwin is not foolproof in terms of
-         asynchronous thread cancellation.  For instance, the cleanup of the
-         tmp_buf pointers needs to be changed to use pthread_cleanup_push/pop,
-         rather than being hidden in the myfault class.  We have to inspect
-         all Cygwin functions so that none of them is left in a wrong or
-         undefined state on thread cancellation.
-
-         For the time being, just disable asynchronous cancellation if the
-         thread is currently executing Cygwin or Windows code.  Rely on
-         deferred cancellation in this case. */
-      if (!cyg_addr)
-        cyg_addr = (uintptr_t) GetModuleHandle ("cygwin1.dll");
-      if ((context.Eip < cyg_addr || context.Eip >= (uintptr_t) cygheap)
-          && !cygtls->inside_kernel (&context))
+      /* The OS is not foolproof in terms of asynchronous thread cancellation
+	 and tends to hang infinitely if we change the instruction pointer.
+         So just don't cancel asynchronously if the thread is currently
+	 executing Windows code.  Rely on deferred cancellation in this case. */
+      if (!cygtls->inside_kernel (&context))
         {
           context.Eip = (DWORD) pthread::static_cancel_self;
           SetThreadContext (win32_obj_id, &context);
         }
     }
   mutex.unlock ();
-  /* Setting the context to another function does not work if the thread is
-     waiting in WFMO.  For instance, a thread which waits for a semaphore in
-     sem_wait will call cancelable_wait which in turn calls WFMO.  While this
-     WFMO call is cancelable by setting the thread's cancel_event object, the
-     OS apparently refuses to set the thread's context and continues to wait
-     for the WFMO conditions.  This is *not* reflected in the return value of
+  /* See above.  For instance, a thread which waits for a semaphore in sem_wait
+     will call cancelable_wait which in turn calls WFMO.  While this WFMO call
+     is cancelable by setting the thread's cancel_event object, the OS
+     apparently refuses to set the thread's context and continues to wait for
+     the WFMO conditions.  This is *not* reflected in the return value of
      SetThreadContext or ResumeThread, btw.
-     So, what we do here is to set the cancel_event as well.  This allows the
-     WFMO call in cancelable_wait and elsewhere to return and to handle the
-     cancel request by itself. */
+     So, what we do here is to set the cancel_event as well to allow at least
+     a deferred cancel. */
   canceled = true;
   SetEvent (cancel_event);
   ResumeThread (win32_obj_id);
