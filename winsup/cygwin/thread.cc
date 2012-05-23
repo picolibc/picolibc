@@ -431,8 +431,18 @@ pthread::precreate (pthread_attr *newattr)
       magic = 0;
       return;
     }
-  /* Change the mutex type to NORMAL to speed up mutex operations */
-  mutex.set_type (PTHREAD_MUTEX_NORMAL);
+  /* This mutex MUST be recursive.  Consider the following scenario:
+     - The thread installs a cleanup handler.
+     - The cleanup handler calls a function which itself installs a
+       cleanup handler.
+     - pthread_cancel is called for this thread.
+     - The thread's cleanup handler is called under mutex lock condition.
+     - The cleanup handler calls the subsequent function with cleanup handler.
+     - The function runs to completion, so it calls pthread_cleanup_pop.
+     - pthread_cleanup_pop calls pthread::pop_cleanup_handler which will again
+       try to lock the mutex.
+     - Deadlock. */
+  mutex.set_type (PTHREAD_MUTEX_RECURSIVE);
   if (!create_cancel_event ())
     magic = 0;
 }

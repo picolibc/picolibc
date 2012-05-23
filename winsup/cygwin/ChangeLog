@@ -1,5 +1,10 @@
 2012-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc (pthread::precreate): Make sure mutex is recursive.
+	Explain why.
+
+2012-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.cc (pthread::pop_cleanup_handler): Move setting the cancelstate
 	to PTHREAD_CANCEL_DISABLE from here...
 	(pthread::pop_all_cleanup_handlers): ...to here, otherwise any explicit
