@@ -1,5 +1,12 @@
 2012-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc (__cygwin_lock_lock): Take null thread at process startup
+	into account.
+	(__cygwin_lock_trylock): Ditto.
+	(__cygwin_lock_unlock): Ditto.
+
+2012-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.cc (pthread::cancel): Re-allow asynchronous cancellation from
 	Cygwin code since it looks like the problem is Windows only.
 
