@@ -95,24 +95,86 @@ __cygwin_lock_fini (_LOCK_T *lock)
   pthread_mutex_destroy ((pthread_mutex_t*) lock);
 }
 
+#define WORKAROUND_NEWLIB
+
+#ifdef WORKAROUND_NEWLIB
+/* FIXME:
+
+   This cleanup stuff is necessary to harden Cygwin against thread
+   cancellation.  In theory, installing a cleanup handler is the task of
+   the calling function.
+
+   The problem here is that a lot of calling functions are in newlib's
+   stdio implementation.  So, the right thing to do would be to change
+   newlib's stdio functions to install the required pthread cleanup
+   handlers.
+
+   This is a bigger task than it sounds, so, as a temporary workaround,
+   what we do here is to install a cleanup handler in the lock function
+   itself and to cleanup in the unlock function.  This works around the
+   problem for the time being. */
+class __cygwin_lock_handler : public __pthread_cleanup_handler
+{
+public:
+  pthread_mutex_t *lock;
+
+  __cygwin_lock_handler (__cleanup_routine_type _fn, _LOCK_T *_lock)
+  {
+    function = _fn;
+    arg = this;
+    next = NULL;
+    lock = (pthread_mutex_t *) _lock;
+  }
+  void *operator new (size_t) __attribute__ ((nothrow))
+  {return cmalloc (HEAP_BUF, sizeof (__cygwin_lock_handler));}
+  void operator delete (void *p) { cfree (p); }
+};
+
+static void
+__cygwin_lock_cleanup (void *hdl)
+{
+  __cygwin_lock_handler *cleanup = (__cygwin_lock_handler *) hdl;
+  pthread_mutex_unlock (cleanup->lock);
+  delete cleanup;
+}
+#endif /* WORKAROUND_NEWLIB */
+
 extern "C" void
 __cygwin_lock_lock (_LOCK_T *lock)
 {
   paranoid_printf ("threadcount %d.  locking", MT_INTERFACE->threadcount);
+#ifdef WORKAROUND_NEWLIB
+  __cygwin_lock_handler *cleanup
+    = new __cygwin_lock_handler (__cygwin_lock_cleanup, lock);
+  pthread::self ()->push_cleanup_handler (cleanup);
+#endif /* WORKAROUND_NEWLIB */
   pthread_mutex_lock ((pthread_mutex_t*) lock);
 }
 
 extern "C" int
 __cygwin_lock_trylock (_LOCK_T *lock)
 {
+#ifdef WORKAROUND_NEWLIB
+  __cygwin_lock_handler *cleanup
+    = new __cygwin_lock_handler (__cygwin_lock_cleanup, lock);
+  pthread::self ()->push_cleanup_handler (cleanup);
+  int ret = pthread_mutex_trylock ((pthread_mutex_t*) lock);
+  if (ret)
+    pthread::self ()->pop_cleanup_handler (0);
+  return ret;
+#else
   return pthread_mutex_trylock ((pthread_mutex_t*) lock);
+#endif /* WORKAROUND_NEWLIB */
 }
-
 
 extern "C" void
 __cygwin_lock_unlock (_LOCK_T *lock)
 {
+#ifdef WORKAROUND_NEWLIB
+  pthread::self ()->pop_cleanup_handler (1);
+#else
   pthread_mutex_unlock ((pthread_mutex_t*) lock);
+#endif /* WORKAROUND_NEWLIB */
   paranoid_printf ("threadcount %d.  unlocked", MT_INTERFACE->threadcount);
 }
 
@@ -1101,10 +1163,22 @@ pthread::pop_cleanup_handler (int const execute)
   if (cleanup_stack != NULL)
     {
       __pthread_cleanup_handler *handler = cleanup_stack;
+#ifdef WORKAROUND_NEWLIB
+      /* We split out handler->next so we can set cleanup_stack to handler->next
+	 without relying on handler still existing.  This allows to delete the
+	 handler in the handler function.  For a description why we need that,
+	 at least temporarly, see the comment preceeding the definition of
+	 __cygwin_lock_handler earlier in this file. */
+      __pthread_cleanup_handler *next = handler->next;
 
       if (execute)
 	(*handler->function) (handler->arg);
+      cleanup_stack = next;
+#else
+      if (execute)
+	(*handler->function) (handler->arg);
       cleanup_stack = handler->next;
+#endif /* WORKAROUND_NEWLIB */
     }
 
   mutex.unlock ();

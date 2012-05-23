@@ -1,5 +1,19 @@
 2012-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc: Add a temporary workaround to help Cygwin along while
+	newlib doesn't install cleanup handlers.  Explain the problem.
+	(class __cygwin_lock_handler): New class.
+	(__cygwin_lock_cleanup): New function.
+	(__cygwin_lock_lock): Push __cygwin_lock_cleanup thread cleanup
+	handler.
+	(__cygwin_lock_trylock): Ditto.
+	(__cygwin_lock_unlock): Pop thread cleanup handler.
+	(pthread::pop_cleanup_handler): Temporarily allow cleanup function to
+	destroy cleanup handler so we can pop in another function than we
+	pushed in.
+
+2012-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.cc (pthread::cancel): Only allow asynchronous cancellation
 	if the thread is not executing Cygwin or Windows code.  Explain why.
 
