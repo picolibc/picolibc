@@ -144,7 +144,7 @@ __cygwin_lock_lock (_LOCK_T *lock)
 {
   paranoid_printf ("threadcount %d.  locking", MT_INTERFACE->threadcount);
 #ifdef WORKAROUND_NEWLIB
-  if (pthread::self () != pthread_null::get_null_pthread ())
+  if (cygwin_finished_initializing)
     {
       __cygwin_lock_handler *cleanup
 	= new __cygwin_lock_handler (__cygwin_lock_cleanup, lock);
@@ -158,29 +158,29 @@ extern "C" int
 __cygwin_lock_trylock (_LOCK_T *lock)
 {
 #ifdef WORKAROUND_NEWLIB
-  __cygwin_lock_handler *cleanup = NULL;
-  if (pthread::self () != pthread_null::get_null_pthread ())
+  if (cygwin_finished_initializing)
     {
-      cleanup = new __cygwin_lock_handler (__cygwin_lock_cleanup, lock);
+      __cygwin_lock_handler *cleanup
+      	= new __cygwin_lock_handler (__cygwin_lock_cleanup, lock);
       pthread::self ()->push_cleanup_handler (cleanup);
+      int ret = pthread_mutex_trylock ((pthread_mutex_t*) lock);
+      if (ret)
+	{
+	  pthread::self ()->pop_cleanup_handler (0);
+	  delete cleanup;
+	}
+      return ret;
     }
-  int ret = pthread_mutex_trylock ((pthread_mutex_t*) lock);
-  if (ret && pthread::self () != pthread_null::get_null_pthread ())
-    {
-      pthread::self ()->pop_cleanup_handler (0);
-      delete cleanup;
-    }
-  return ret;
-#else
-  return pthread_mutex_trylock ((pthread_mutex_t*) lock);
+  else
 #endif /* WORKAROUND_NEWLIB */
+  return pthread_mutex_trylock ((pthread_mutex_t*) lock);
 }
 
 extern "C" void
 __cygwin_lock_unlock (_LOCK_T *lock)
 {
 #ifdef WORKAROUND_NEWLIB
-  if (pthread::self () != pthread_null::get_null_pthread ())
+  if (cygwin_finished_initializing)
     pthread::self ()->pop_cleanup_handler (1);
   else
 #endif /* WORKAROUND_NEWLIB */

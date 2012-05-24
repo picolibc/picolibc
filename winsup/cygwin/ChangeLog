@@ -1,3 +1,10 @@
+2012-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (__cygwin_lock_lock): Replace null thread check with test
+	for cygwin_finished_initializing to handle process startup.
+	(__cygwin_lock_trylock): Ditto.
+	(__cygwin_lock_unlock): Ditto.
+
 2012-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (__cygwin_lock_lock): Take null thread at process startup
