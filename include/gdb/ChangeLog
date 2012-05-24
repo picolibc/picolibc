@@ -1,3 +1,9 @@
+2012-05-24  Pedro Alves  <palves@redhat.com>
+
+	PR gdb/7205
+
+	Replace target_signal with gdb_signal throughout.
+
 2012-04-12  Mike Frysinger  <vapier@gentoo.org>
 
 	* callback.h (CB_SYS_argc, CB_SYS_argnlen, CB_SYS_argn): Define.

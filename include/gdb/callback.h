@@ -314,7 +314,7 @@ int cb_target_to_host_open (host_callback *, int);
 int cb_target_to_host_signal (host_callback *, int);
 
 /* Translate host signal number to target.  */
-int cb_host_to_target_signal (host_callback *, int);
+int cb_host_to_gdb_signal (host_callback *, int);
 
 /* Translate host stat struct to target.
    If stat struct ptr is NULL, just compute target stat struct size.
