@@ -310,6 +310,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       continue;
     }
 
+  bool gotone;
   LONGLONG start_time = gtod.msecs ();	/* Record the current time for later use. */
 
   debug_printf ("m %d, ms %u", m, ms);
@@ -330,10 +331,15 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	{
 	case WAIT_OBJECT_0:
 	  select_printf ("signal received");
-	  _my_tls.call_signal_handler ();
+	  /* FIXME?  Partial revert of change from 2012-01-22.  If the signal
+	     handler is called before the threads are stopped via cleanup,
+	     emacs 24.x crashes in thread_pipe.  For now, do not call the
+	     signal handler if we're not in the main thread, but cleanup
+	     before calling the signal handler. */
 	  if (!return_on_signal)
-	    continue;		/* Emulate linux behavior */
+	    goto looping;		/* Emulate linux behavior */
 	  cleanup ();
+	  _my_tls.call_signal_handler ();
 	  set_sig_errno (EINTR);
 	  return -1;
 	case WAIT_OBJECT_0 + 1:
@@ -361,7 +367,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
       select_printf ("woke up.  wait_ret %d.  verifying", wait_ret);
       s = &start;
-      bool gotone = false;
+      gotone = false;
       /* Some types of objects (e.g., consoles) wake up on "inappropriate" events
 	 like mouse movements.  The verify function will detect these situations.
 	 If it returns false, then this wakeup was a false alarm and we should go
@@ -383,7 +389,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  cleanup ();
 	  goto out;
 	}
-
+looping:
       if (ms == INFINITE)
 	{
 	  select_printf ("looping");

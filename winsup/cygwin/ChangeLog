@@ -1,5 +1,11 @@
 2012-05-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* select.cc (select_stuff::wait): When not returning after receiving
+	a signal, recalculate timeout.  Apply temporary fix to avoid crashes
+	after calling the signal handler.  Explain.
+
+2012-05-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_serial.cc (fhandler_serial::raw_read): Check for
 	ERROR_OPERATION_ABORTED rather than ERROR_IO_INCOMPLETE after CancelIo.
 
