@@ -1,3 +1,8 @@
+2012-05-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_serial.cc (fhandler_serial::raw_read): Just call ReadFile
+	directly in case of non-blocking I/O and handle result gracefully.
+
 2012-05-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (__cygwin_lock_lock): Replace null thread check with test
