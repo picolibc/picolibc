@@ -1,5 +1,9 @@
 2012-05-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* registry.cc (reg_key::build_reg): Fix typo in debug output.
+
+2012-05-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* select.cc (select_stuff::wait): When not returning after receiving
 	a signal, recalculate timeout.  Apply temporary fix to avoid crashes
 	after calling the signal handler.  Explain.
