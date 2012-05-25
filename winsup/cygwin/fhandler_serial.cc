@@ -128,7 +128,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	  CancelIo (get_handle ());
 	  if (GetOverlappedResult (get_handle (), &io_status, &n, FALSE))
 	    tot = n;
-	  else if (GetLastError () != ERROR_IO_INCOMPLETE)
+	  else if (GetLastError () != ERROR_OPERATION_ABORTED)
 	    goto err;
 	  if (tot == 0)
 	    {

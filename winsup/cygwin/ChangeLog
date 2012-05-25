@@ -1,5 +1,10 @@
 2012-05-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_serial.cc (fhandler_serial::raw_read): Check for
+	ERROR_OPERATION_ABORTED rather than ERROR_IO_INCOMPLETE after CancelIo.
+
+2012-05-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_serial.cc (fhandler_serial::raw_read): Just call ReadFile
 	directly in case of non-blocking I/O and handle result gracefully.
 
