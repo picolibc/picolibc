@@ -1,5 +1,10 @@
 2012-05-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* select.cc (select_stuff::wait): Temporarily disable restarting
+	entirely.
+
+2012-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.h (cygsidlist::+=): Correctly copy well_known_sid info from
 	source cygsid.
 

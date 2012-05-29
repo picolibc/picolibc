@@ -331,13 +331,17 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	{
 	case WAIT_OBJECT_0:
 	  select_printf ("signal received");
+#if 0
 	  /* FIXME?  Partial revert of change from 2012-01-22.  If the signal
 	     handler is called before the threads are stopped via cleanup,
-	     emacs 24.x crashes in thread_pipe.  For now, do not call the
-	     signal handler if we're not in the main thread, but cleanup
-	     before calling the signal handler. */
+	     emacs 24.x crashes in thread_pipe.  Just restarting without
+	     calling the signal handler makes select entirely uninterruptible
+	     when called from a thread not the main thread, see
+	     http://cygwin.com/ml/cygwin/2012-05/msg00580.html
+	     So, for now, just disable restarting entirely. */
 	  if (!return_on_signal)
 	    goto looping;		/* Emulate linux behavior */
+#endif
 	  cleanup ();
 	  _my_tls.call_signal_handler ();
 	  set_sig_errno (EINTR);
@@ -389,7 +393,9 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  cleanup ();
 	  goto out;
 	}
+#if 0
 looping:
+#endif
       if (ms == INFINITE)
 	{
 	  select_printf ("looping");
