@@ -1,7 +1,7 @@
 /* security.h: security declarations
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011 Red Hat, Inc.
+   2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -223,9 +223,12 @@ public:
 
   /* += adds a "normal" SID, *= adds a well-known SID.  See comment in class
      cygsid above. */
-  BOOL operator+= (cygsid &si) { return add ((PSID) si, false); }
+  BOOL operator+= (cygsid &si) { return add ((PSID) si,
+					     si.is_well_known_sid ()); }
   BOOL operator+= (const char *sidstr) { cygsid nsi (sidstr);
-					 return add ((PSID) nsi, false); }
+					 return add ((PSID) nsi,
+						     nsi.is_well_known_sid ());
+				       }
   BOOL operator+= (const PSID psid) { return add (psid, false); }
   BOOL operator*= (cygsid &si) { return add ((PSID) si, true); }
   BOOL operator*= (const char *sidstr) { cygsid nsi (sidstr);
