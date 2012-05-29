@@ -1,3 +1,11 @@
+2012-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (LIBS): Re-add advapi32.dll.  Explain why.
+	* make-64bit-version-with-mingw-w64.sh (LIBS): Ditto.
+	* cyglsa.c: Drop NTDLL function declarations.  Use equivalent advapi32
+	functions again, throughout.
+	* cyglsa64.dll: Regenerate.
+
 2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Don't override CC.

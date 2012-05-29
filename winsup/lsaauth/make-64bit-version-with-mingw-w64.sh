@@ -20,6 +20,10 @@ set -e
 CC="x86_64-w64-mingw32-gcc"
 CFLAGS="-fno-exceptions -O0 -Wall -Werror"
 LDFLAGS="-s -nostdlib -Wl,--entry,DllMain,--major-os-version,5,--minor-os-version,2"
-LIBS="-lkernel32 -lntdll"
+# Never again try to remove advapi32.  It does not matter if the DLL calls
+# advapi32 functions or the equivalent ntdll functions.
+# But if the LSA authentication DLL is not linked against advapi32, it's
+# not recognized by LSA.
+LIBS="-ladvapi32 -lkernel32 -lntdll"
 
 $CC $CFLAGS $LDFLAGS -shared -o cyglsa64.dll cyglsa.c cyglsa64.def $LIBS
