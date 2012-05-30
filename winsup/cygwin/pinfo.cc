@@ -114,7 +114,6 @@ pinfo_init (char **envp, int envc)
 static DWORD
 status_exit (DWORD x)
 {
-  const char *find_first_notloaded_dll (path_conv &);
   switch (x)
     {
     case STATUS_DLL_NOT_FOUND:

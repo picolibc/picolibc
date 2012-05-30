@@ -1,5 +1,14 @@
 2012-05-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* hookapi.cc (find_first_notloaded_dll): Extend comment.  Fix usage of
+	mapped memory.  Shorten static library name buffer to MAX_PATH.  Use
+	strlcpy to copy library name to buffer.  Only Unmap "map" if it has been
+	Mapped before.
+	* pinfo.cc (status_exit): Drop unneeded declaration of
+	find_first_notloaded_dll in favor of the declaration in winsup.h.
+
+2012-05-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.cc: Remove temporary newlib workaround, now that newlib
 	handles thread cancellation by itself.
 	(class __cygwin_lock_handler): Remove.
