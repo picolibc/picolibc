@@ -110,9 +110,13 @@ _DEFUN(_fgetws_r, (ptr, ws, n, fp),
     {
       src = (char *) fp->_p;
       nl = memchr (fp->_p, '\n', fp->_r);
-      nconv = _mbsrtowcs_r (ptr, wsp, &src,
-			    nl != NULL ? (nl - fp->_p + 1) : fp->_r,
-			    &fp->_mbstate);
+      nconv = _mbsnrtowcs_r (ptr, wsp, &src,
+			     /* Read all bytes up to the next NL, or up to the
+				end of the buffer if there is no NL. */
+			     nl != NULL ? (nl - fp->_p + 1) : fp->_r,
+			     /* But never more than n - 1 wide chars. */
+			     n - 1,
+			     &fp->_mbstate);
       if (nconv == (size_t) -1)
 	/* Conversion error */
 	goto error;

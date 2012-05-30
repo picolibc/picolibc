@@ -1,5 +1,10 @@
 2012-05-30  Corinna Vinschen  <vinschen@redhat.com>
 
+	* libc/stdio/fgetws.c (_fgetws_r): Call _mbsnrtowcs_r rather than
+	_mbsrtowcs_r and restrict number of wide chars to n - 1.
+
+2012-05-30  Corinna Vinschen  <vinschen@redhat.com>
+
 	* libc/stdio/local.h (_newlib_flockfile_start): New macro to
 	secure stream related critical section against thread cancellation.
 	(_newlib_flockfile_exit): Ditto.
