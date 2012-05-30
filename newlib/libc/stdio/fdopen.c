@@ -93,7 +93,7 @@ _DEFUN(_fdopen_r, (ptr, fd, mode),
   if ((fp = __sfp (ptr)) == 0)
     return 0;
 
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
 
   fp->_flags = flags;
   /* POSIX recommends setting the O_APPEND bit on fd to match append
@@ -127,7 +127,7 @@ _DEFUN(_fdopen_r, (ptr, fd, mode),
     fp->_flags |= __SCLE;
 #endif
 
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return fp;
 }
 

@@ -214,16 +214,16 @@ _DEFUN(_funopen_r, (ptr, cookie, readfn, writefn, seekfn, closefn),
     return NULL;
   if ((c = (funcookie *) _malloc_r (ptr, sizeof *c)) == NULL)
     {
-      __sfp_lock_acquire ();
+      _newlib_sfp_lock_start ();
       fp->_flags = 0;		/* release */
 #ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
 #endif
-      __sfp_lock_release ();
+      _newlib_sfp_lock_end ();
       return NULL;
     }
 
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
   fp->_file = -1;
   c->cookie = (void *) cookie; /* cast away const */
   fp->_cookie = c;
@@ -260,7 +260,7 @@ _DEFUN(_funopen_r, (ptr, cookie, readfn, writefn, seekfn, closefn),
 #endif
   c->closefn = closefn;
   fp->_close = funcloser;
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return fp;
 }
 

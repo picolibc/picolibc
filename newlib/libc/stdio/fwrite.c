@@ -119,14 +119,14 @@ _DEFUN(_fwrite_r, (ptr, buf, size, count, fp),
 
   CHECK_INIT(ptr, fp);
 
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
   ORIENT (fp, -1);
   if (__sfvwrite_r (ptr, fp, &uio) == 0)
     {
-      _funlockfile (fp);
+      _newlib_flockfile_exit (fp);
       return count;
     }
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return (n - uio.uio_resid) / size;
 }
 

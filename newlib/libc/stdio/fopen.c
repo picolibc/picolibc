@@ -140,16 +140,16 @@ _DEFUN(_fopen_r, (ptr, file, mode),
 
   if ((f = _open_r (ptr, file, oflags, 0666)) < 0)
     {
-      __sfp_lock_acquire (); 
+      _newlib_sfp_lock_start (); 
       fp->_flags = 0;		/* release */
 #ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
 #endif
-      __sfp_lock_release (); 
+      _newlib_sfp_lock_end (); 
       return NULL;
     }
 
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
 
   fp->_file = f;
   fp->_flags = flags;
@@ -167,7 +167,7 @@ _DEFUN(_fopen_r, (ptr, file, mode),
     fp->_flags |= __SCLE;
 #endif
 
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return fp;
 }
 

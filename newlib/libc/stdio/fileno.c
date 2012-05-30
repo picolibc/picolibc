@@ -55,8 +55,8 @@ _DEFUN(fileno, (f),
 {
   int result;
   CHECK_INIT (_REENT, f);
-  _flockfile (f);
+  _newlib_flockfile_start (f);
   result = __sfileno (f);
-  _funlockfile (f);
+  _newlib_flockfile_end (f);
   return result;
 }

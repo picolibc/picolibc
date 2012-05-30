@@ -93,7 +93,7 @@ _DEFUN(_fgetws_r, (ptr, ws, n, fp),
   const char *src;
   unsigned char *nl;
 
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
   ORIENT (fp, 1);
 
   if (n <= 0)
@@ -142,11 +142,11 @@ _DEFUN(_fgetws_r, (ptr, ws, n, fp),
     /* Incomplete character */
     goto error;
   *wsp++ = L'\0';
-  _funlockfile (fp);
+  _newlib_flockfile_exit (fp);
   return ws;
 
 error:
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return NULL;
 }
 

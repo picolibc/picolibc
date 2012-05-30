@@ -78,9 +78,9 @@ _DEFUN(_fgetc_r, (ptr, fp),
 {
   int result;
   CHECK_INIT(ptr, fp);
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
   result = __sgetc_r (ptr, fp);
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return result;
 }
 
@@ -93,9 +93,9 @@ _DEFUN(fgetc, (fp),
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   int result;
   CHECK_INIT(_REENT, fp);
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
   result = __sgetc_r (_REENT, fp);
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return result;
 #else
   return _fgetc_r (_REENT, fp);

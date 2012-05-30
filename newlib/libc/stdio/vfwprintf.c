@@ -553,20 +553,20 @@ _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
 #ifndef STRING_ONLY
 	/* Initialize std streams if not dealing with sprintf family.  */
 	CHECK_INIT (data, fp);
-	_flockfile (fp);
+	_newlib_flockfile_start (fp);
 
 	ORIENT(fp, 1);
 
 	/* sorry, fwprintf(read_only_file, "") returns EOF, not 0 */
 	if (cantwrite (data, fp)) {
-		_funlockfile (fp);
+		_newlib_flockfile_exit (fp);
 		return (EOF);
 	}
 
 	/* optimise fwprintf(stderr) (and other unbuffered Unix files) */
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0) {
-		_funlockfile (fp);
+		_newlib_flockfile_exit (fp);
 		return (__sbwprintf (data, fp, fmt0, ap));
 	}
 #else /* STRING_ONLY */
@@ -1465,7 +1465,7 @@ error:
 	if (malloc_buf != NULL)
 		_free_r (data, malloc_buf);
 #ifndef STRING_ONLY
-	_funlockfile (fp);
+	_newlib_flockfile_end (fp);
 #endif
 	return (__sferror (fp) ? EOF : ret);
 	/* NOTREACHED */

@@ -106,7 +106,7 @@ _DEFUN(setvbuf, (fp, buf, mode, size),
 
   CHECK_INIT (_REENT, fp);
 
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
 
   /*
    * Verify arguments.  The `int' limit on `size' is due to this
@@ -115,7 +115,7 @@ _DEFUN(setvbuf, (fp, buf, mode, size),
 
   if ((mode != _IOFBF && mode != _IOLBF && mode != _IONBF) || (int)(_POINTER_INT) size < 0)
     {
-      _funlockfile (fp);
+      _newlib_flockfile_exit (fp);
       return (EOF);
     }
 
@@ -158,7 +158,7 @@ nbf:
           fp->_w = 0;
           fp->_bf._base = fp->_p = fp->_nbuf;
           fp->_bf._size = 1;
-          _funlockfile (fp);
+          _newlib_flockfile_exit (fp);
           return (ret);
         }
       fp->_flags |= __SMBF;
@@ -193,6 +193,6 @@ nbf:
   if (fp->_flags & __SWR)
     fp->_w = fp->_flags & (__SLBF | __SNBF) ? 0 : size;
 
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return 0;
 }

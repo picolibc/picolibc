@@ -65,7 +65,7 @@ _DEFUN(clearerr, (fp),
        FILE * fp)
 {
   CHECK_INIT(_REENT, fp);
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
   __sclearerr (fp);
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
 }

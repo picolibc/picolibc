@@ -125,7 +125,7 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
 
   CHECK_INIT (rptr, fp);
 
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
 
   ORIENT (fp, -1);
 
@@ -140,14 +140,14 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
        */
       if ((fp->_flags & __SRW) == 0)
         {
-          _funlockfile (fp);
+          _newlib_flockfile_exit (fp);
           return EOF;
         }
       if (fp->_flags & __SWR)
 	{
 	  if (_fflush_r (rptr, fp))
             {
-              _funlockfile (fp);
+              _newlib_flockfile_exit (fp);
               return EOF;
             }
 	  fp->_flags &= ~__SWR;
@@ -167,12 +167,12 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
     {
       if (fp->_r >= fp->_ub._size && __submore (rptr, fp))
         {
-          _funlockfile (fp);
+          _newlib_flockfile_exit (fp);
           return EOF;
         }
       *--fp->_p = c;
       fp->_r++;
-      _funlockfile (fp);
+      _newlib_flockfile_exit (fp);
       return c;
     }
 
@@ -186,7 +186,7 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
     {
       fp->_p--;
       fp->_r++;
-      _funlockfile (fp);
+      _newlib_flockfile_exit (fp);
       return c;
     }
 
@@ -202,7 +202,7 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
   fp->_ubuf[sizeof (fp->_ubuf) - 1] = c;
   fp->_p = &fp->_ubuf[sizeof (fp->_ubuf) - 1];
   fp->_r = 1;
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return c;
 }
 

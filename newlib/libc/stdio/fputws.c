@@ -87,7 +87,7 @@ _DEFUN(_fputws_r, (ptr, ws, fp),
   struct __suio uio;
   struct __siov iov;
 
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
   ORIENT (fp, 1);
   if (cantwrite (ptr, fp) != 0)
     goto error;
@@ -104,11 +104,11 @@ _DEFUN(_fputws_r, (ptr, ws, fp),
 	goto error;
     }
   while (ws != NULL);
-  _funlockfile (fp);
+  _newlib_flockfile_exit (fp);
   return (0);
 
 error:
-  _funlockfile(fp);
+  _newlib_flockfile_end(fp);
   return (-1);
 }
 

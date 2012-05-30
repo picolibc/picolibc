@@ -68,7 +68,7 @@ _DEFUN(_fwide_r, (ptr, fp, mode),
 
   CHECK_INIT(ptr, fp);
 
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
   if (mode != 0) {
     ORIENT (fp, mode);
   }
@@ -76,7 +76,7 @@ _DEFUN(_fwide_r, (ptr, fp, mode),
     ret = 0;
   else
     ret = (fp->_flags2 & __SWID) ? 1 : -1;
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return ret;
 }
 

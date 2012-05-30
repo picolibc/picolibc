@@ -108,7 +108,7 @@ _DEFUN(__sfp, (d),
   int n;
   struct _glue *g;
 
-  __sfp_lock_acquire ();
+  _newlib_sfp_lock_start ();
 
   if (!_GLOBAL_REENT->__sdidinit)
     __sinit (_GLOBAL_REENT);
@@ -121,7 +121,7 @@ _DEFUN(__sfp, (d),
 	  (g->_next = __sfmoreglue (d, NDYNAMIC)) == NULL)
 	break;
     }
-  __sfp_lock_release ();
+  _newlib_sfp_lock_exit ();
   d->_errno = ENOMEM;
   return NULL;
 
@@ -132,7 +132,7 @@ found:
 #ifndef __SINGLE_THREAD__
   __lock_init_recursive (fp->_lock);
 #endif
-  __sfp_lock_release ();
+  _newlib_sfp_lock_end ();
 
   fp->_p = NULL;		/* no current pointer */
   fp->_w = 0;			/* nothing to read or write */

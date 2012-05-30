@@ -98,7 +98,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 
   CHECK_INIT(ptr, fp);
 
-  _flockfile (fp);
+  _newlib_flockfile_start (fp);
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
     {
@@ -112,11 +112,11 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 	}
       if (c == EOF && s == buf)
         {
-          _funlockfile (fp);
+          _newlib_flockfile_exit (fp);
           return NULL;
         }
       *s = 0;
-      _funlockfile (fp);
+      _newlib_flockfile_exit (fp);
       return buf;
     }
 #endif
@@ -134,7 +134,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 	      /* EOF: stop with partial or no line */
 	      if (s == buf)
                 {
-                  _funlockfile (fp);
+                  _newlib_flockfile_exit (fp);
                   return 0;
                 }
 	      break;
@@ -159,7 +159,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 	  fp->_p = t;
 	  _CAST_VOID memcpy ((_PTR) s, (_PTR) p, len);
 	  s[len] = 0;
-          _funlockfile (fp);
+          _newlib_flockfile_exit (fp);
 	  return (buf);
 	}
       fp->_r -= len;
@@ -169,7 +169,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
     }
   while ((n -= len) != 0);
   *s = 0;
-  _funlockfile (fp);
+  _newlib_flockfile_end (fp);
   return buf;
 }
 

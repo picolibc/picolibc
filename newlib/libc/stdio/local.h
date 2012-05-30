@@ -32,6 +32,83 @@
 # include <io.h>
 #endif
 
+/* The following macros are supposed to replace calls to _flockfile/_funlockfile
+   and __sfp_lock_acquire/__sfp_lock_release.  In case of multi-threaded
+   environments using pthreads, it's not sufficient to lock the stdio functions
+   against concurrent threads accessing the same data, the locking must also be
+   secured against thread cancellation.
+
+   The below macros have to be used in pairs.  The _newlib_XXX_start macro
+   starts with a opening curly brace, the _newlib_XXX_end macro ends with a
+   closing curly brace, so the start macro and the end macro mark the code
+   start and end of a critical section.  In case the code leaves the critical
+   section before reaching the end of the critical section's code end, use
+   the appropriate _newlib_XXX_exit macro. */
+
+#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
+#include <pthread.h>
+
+/* Start a stream oriented critical section: */
+# define _newlib_flockfile_start(_fp) \
+	{ \
+	  int __oldfpcancel; \
+	  pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &__oldfpcancel); \
+	  _flockfile (_fp)
+
+/* Exit from a stream oriented critical section prematurely: */
+# define _newlib_flockfile_exit(_fp) \
+	  _funlockfile (_fp); \
+	  pthread_setcancelstate (__oldfpcancel, &__oldfpcancel);
+
+/* End a stream oriented critical section: */
+# define _newlib_flockfile_end(_fp) \
+	  _funlockfile (_fp); \
+	  pthread_setcancelstate (__oldfpcancel, &__oldfpcancel); \
+	}
+
+/* Start a stream list oriented critical section: */
+# define _newlib_sfp_lock_start() \
+	{ \
+	  int __oldsfpcancel; \
+	  pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &__oldsfpcancel); \
+	  __sfp_lock_acquire ()
+
+/* Exit from a stream list oriented critical section prematurely: */
+# define _newlib_sfp_lock_exit() \
+	  __sfp_lock_release (); \
+	  pthread_setcancelstate (__oldsfpcancel, &__oldsfpcancel);
+
+/* End a stream list oriented critical section: */
+# define _newlib_sfp_lock_end() \
+	  __sfp_lock_release (); \
+	  pthread_setcancelstate (__oldsfpcancel, &__oldsfpcancel); \
+	}
+
+#else /* __SINGLE_THREAD__ || !_POSIX_THREADS */
+
+# define _newlib_flockfile_start(_fp) \
+	{ \
+		_flockfile(_fp)
+
+# define _newlib_flockfile_exit(_fp) \
+		_funlockfile(_fp); \
+
+# define _newlib_flockfile_end(_fp) \
+		_funlockfile(_fp); \
+	}
+
+# define _newlib_sfp_lock_start() \
+	{ \
+		__sfp_lock_acquire ()
+
+# define _newlib_sfp_lock_end() \
+		__sfp_lock_release ();
+
+# define _newlib_sfp_lock_end() \
+		__sfp_lock_release (); \
+	}
+
+#endif /* !__SINGLE_THREAD__ && _POSIX_THREADS */
 
 extern u_char *_EXFUN(__sccl, (char *, u_char *fmt));
 extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));

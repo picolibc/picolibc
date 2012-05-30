@@ -1,3 +1,19 @@
+2012-05-30  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/local.h (_newlib_flockfile_start): New macro to
+	secure stream related critical section against thread cancellation.
+	(_newlib_flockfile_exit): Ditto.
+	(_newlib_sfp_lock_end): Ditto.
+	(_newlib_sfp_lock_start): Ditto for the list of streams.
+	(_newlib_sfp_lock_exit): Ditto.
+	(_newlib_sfp_lock_end): Ditto.
+	Use aforementioned macros in place of _flockfile/_funlockfile
+	and __sfp_lock_acquire/__sfp_lock_release throughout the code.
+	* libc/stdio/fclose.c: Explicitely disable and re-enable thread
+	cancellation.  Explain why.
+	* libc/stdio/freopen.c: Ditto.
+	* libc/stdio64/freopen64.c: Ditto.
+
 2012-05-21  Sandeep Kumar Singh  <Sandeep.Singh2@kpitcummins.com>
 
 	* libc/machine/cr16/asm.h: Added some missing instructions
