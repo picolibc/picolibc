@@ -1,3 +1,14 @@
+2012-05-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc: Remove temporary newlib workaround, now that newlib
+	handles thread cancellation by itself.
+	(class __cygwin_lock_handler): Remove.
+	(__cygwin_lock_cleanup): Remove.
+	(__cygwin_lock_lock): Revert newlib workaround,
+	(__cygwin_lock_trylock): Ditto.
+	(__cygwin_lock_unlock): Ditto.
+	(pthread::pop_cleanup_handler): Ditto.
+
 2012-05-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* select.cc (select_stuff::wait): Temporarily disable restarting
