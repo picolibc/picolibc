@@ -1,3 +1,8 @@
+2012-05-31  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/local.h (_newlib_sfp_lock_exit): Fix typo in non-pthread
+	version.
+
 2012-05-30  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/fgetws.c (_fgetws_r): Call _mbsnrtowcs_r rather than

@@ -101,7 +101,7 @@
 	{ \
 		__sfp_lock_acquire ()
 
-# define _newlib_sfp_lock_end() \
+# define _newlib_sfp_lock_exit() \
 		__sfp_lock_release ();
 
 # define _newlib_sfp_lock_end() \
