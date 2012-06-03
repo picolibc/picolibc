@@ -126,6 +126,18 @@ dup (int fd)
   return res;
 }
 
+inline int
+dup_finish (int oldfd, int newfd, int flags)
+{
+  int res;
+  if ((res = cygheap->fdtab.dup3 (oldfd, newfd, flags)) == newfd)
+    {
+      cygheap_fdget (newfd)->inc_refcnt ();
+      cygheap->fdtab.unlock ();	/* dup3 exits with lock set on success */
+    }
+  return res;
+}
+
 extern "C" int
 dup2 (int oldfd, int newfd)
 {
@@ -140,8 +152,8 @@ dup2 (int oldfd, int newfd)
       cygheap_fdget cfd (oldfd);
       res = (cfd >= 0) ? oldfd : -1;
     }
-  else if ((res = cygheap->fdtab.dup3 (oldfd, newfd, 0)) == newfd)
-    cygheap->fdtab[newfd]->refcnt (1);
+  else
+    res = dup_finish (oldfd, newfd, 0);
 
   syscall_printf ("%R = dup2(%d, %d)", res, oldfd, newfd);
   return res;
@@ -162,8 +174,8 @@ dup3 (int oldfd, int newfd, int flags)
       set_errno (cfd < 0 ? EBADF : EINVAL);
       res = -1;
     }
-  else if ((res = cygheap->fdtab.dup3 (oldfd, newfd, flags)) == newfd)
-    cygheap->fdtab[newfd]->refcnt (1);
+  else
+    res = dup_finish (oldfd, newfd, flags);
 
   syscall_printf ("%R = dup3(%d, %d, %p)", res, oldfd, newfd, flags);
   return res;

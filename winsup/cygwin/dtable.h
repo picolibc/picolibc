@@ -89,6 +89,7 @@ public:
   void fixup_before_fork (DWORD win_proc_id);
   friend void dtable_init ();
   friend void __stdcall close_all_files (bool);
+  friend int dup_finish (int, int, int);
   friend class fhandler_disk_file;
   friend class cygheap_fdmanip;
   friend class cygheap_fdget;

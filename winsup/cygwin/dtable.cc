@@ -243,7 +243,7 @@ dtable::release (int fd)
 {
   if (fds[fd]->need_fixup_before ())
     dec_need_fixup_before ();
-  fds[fd]->refcnt (-1);
+  fds[fd]->dec_refcnt ();
   fds[fd] = NULL;
   if (fd <= 2)
     set_std_handle (fd);
@@ -259,7 +259,7 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
   if (!fh)
     return -1;
   cygheap->fdtab[fd] = fh;
-  cygheap->fdtab[fd]->refcnt (1);
+  cygheap->fdtab[fd]->inc_refcnt ();
   fh->init (handle, myaccess, bin ?: fh->pc_binmode ());
   return fd;
 }
@@ -398,7 +398,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       fh->open_setup (openflags);
       fh->usecount = 0;
       cygheap->fdtab[fd] = fh;
-      cygheap->fdtab[fd]->refcnt (1);
+      cygheap->fdtab[fd]->inc_refcnt ();
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }
@@ -713,6 +713,7 @@ dtable::dup3 (int oldfd, int newfd, int flags)
   MALLOC_CHECK;
   debug_printf ("dup3 (%d, %d, %p)", oldfd, newfd, flags);
   lock ();
+  bool do_unlock = true;
 
   if (not_open (oldfd))
     {
@@ -760,6 +761,7 @@ dtable::dup3 (int oldfd, int newfd, int flags)
       goto done;
     }
 
+  do_unlock = false;
   fds[newfd] = newfh;
 
   if ((res = newfd) <= 2)
@@ -767,7 +769,8 @@ dtable::dup3 (int oldfd, int newfd, int flags)
 
 done:
   MALLOC_CHECK;
-  unlock ();
+  if (do_unlock)
+    unlock ();
   syscall_printf ("%R = dup3(%d, %d, %p)", res, oldfd, newfd, flags);
 
   return res;

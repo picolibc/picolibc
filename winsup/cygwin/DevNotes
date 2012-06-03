@@ -1,3 +1,28 @@
+2012-06-02  cgf-000011
+
+The refcnt handling was tricky to get right but I had convinced myself
+that the refcnt's were always incremented/decremented under a lock.
+Corinna's 2012-05-23 change to refcnt exposed a potential problem with
+dup handling where the fdtab could be updated while not locked.
+
+That should be fixed by this change but, on closer examination, it seems
+ilke there are many places where it is possible for the refcnt to be
+updated while the fdtab is not locked since the default for
+cygheap_fdget is to not lock the fdtab (and that should be the default -
+you can't have read holding a lock).
+
+Since refcnt was only ever called with 1 or -1, I broke it up into two
+functions but kept the Interlocked* operation.  Incrementing a variable
+should not be as racy as adding an arbitrary number to it but we have
+InterlockedIncrement/InterlockedDecrement for a reason so I kept the
+Interlocked operation here.
+
+In the meantime, I'll be mulling over whether the refcnt operations are
+actually safe as they are.  Maybe just ensuring that they are atomically
+updated is enough since they control the destruction of an fh.  If I got
+the ordering right with incrementing and decrementing then that should
+be adequate.
+
 2012-06-02  cgf-000010
 
 <1.7.16>

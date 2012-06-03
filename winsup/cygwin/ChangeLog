@@ -1,3 +1,23 @@
+2012-06-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* DevNotes: Add entry cgf-000011.
+	* fhandler.h (fhandler_base::refcnt): Delete.
+	(fhandler_base::inc_refcnt): New function.
+	(fhandler_base::dec_refcnt): New function.
+	* cygheap.h (cygheap_fdnew::~cygheap_fdnew): Accommodate split of
+	refcnt to inc_refcnt/dec_refcnt.
+	(cygheap_fdget::cygheap_fdget): Ditto.
+	(cygheap_fdget::~cygheap_fdget::cygheap_fdget): Ditto.
+	* dtable.cc (dtable::release): Ditto.
+	(cygwin_attach_handle_to_fd): Ditto.
+	(dtable::init_std_file_from_handle): Ditto.
+	(dtable::dup3): On success, return with fdtab locked.
+	* dtable.h (dtable): Add dup_finish as a friend.
+	* syscalls.cc (dup_finish): Define new function.  Increment refcnt
+	while fdtab is locked.
+	(dup2): Use common dup_finish() to perform dup operation.
+	(dup3): Ditto.
+
 2012-06-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* globals.cc (ro_u_refs): New R/O unicode string.
