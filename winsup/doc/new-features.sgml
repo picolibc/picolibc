@@ -8,6 +8,10 @@
 New API: memrchr.
 </para></listitem>
 
+<listitem><para>
+Recognize ReFS filesystem.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
