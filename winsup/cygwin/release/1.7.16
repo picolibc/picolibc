@@ -3,6 +3,8 @@ What's new:
 
 - New API: memrchr.
 
+- Support ReFS.
+
 Bug fixes:
 ----------
 
