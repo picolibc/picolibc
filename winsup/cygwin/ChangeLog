@@ -1,5 +1,10 @@
 2012-06-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* select.cc (cygwin_select): Add some comments.
+	(select_stuff::wait): Ditto.
+
+2012-06-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* DevNotes: Add entry cgf-000010.
 	* select.cc (set_handle_or_return_if_not_open): Remove unneeded final
 	backslash from definition.
@@ -8,10 +13,11 @@
 	select_stuff::wait_states for loop control.
 	(select_stuff::cleanup): Avoid unneeded initialization.
 	(select_stuff::wait): Modify definition to return
-	select_stuff::wait_states.  Eliminate is_cancelable.  Don't element 1
-	of an array if it is a cancel handle.  Remove loop.  Rely on being
-	called from enclosing loop in cygwin_select.  Remove time recalculation
-	when restarting.  Try harder to always return from the bottom.
+	select_stuff::wait_states.  Eliminate is_cancelable.  Don't inspect
+	element 1 of an array if it is a cancel handle.  Remove loop.  Rely on
+	being called from enclosing loop in cygwin_select.  Remove time
+	recalculation when restarting.  Try harder to always return from the
+	bottom.
 	* select.h (select_stuff::wait_state): New enum.
 	(select_stuff::wait): Modify declaration to return
 	select_stuff::wait_states.

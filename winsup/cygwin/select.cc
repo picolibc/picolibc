@@ -128,6 +128,8 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
   while (res == select_stuff::select_loop)
     {
+      /* Build the select record per fd linked list and set state as
+	 needed. */
       for (int i = 0; i < maxfds; i++)
 	if (!sel.test_and_set (i, readfds, writefds, exceptfds))
 	  {
@@ -161,20 +163,26 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	    break;
 	  }
       else if (sel.always_ready || ms == 0)
-	res = 0;
+	res = 0;					/* Catch any active fds via
+							   sel.poll() below */
       else
-	res = sel.wait (r, w, e, ms);
+	res = sel.wait (r, w, e, ms);			/* wait for an fd to become
+							   become active or time out */
       if (res == select_stuff::select_timeout)
-	res = 0;
+	res = 0;					/* No fd's were active. */
       else if (res >= 0)
 	{
 	  copyfd_set (readfds, r, maxfds);
 	  copyfd_set (writefds, w, maxfds);
 	  copyfd_set (exceptfds, e, maxfds);
+	  /* Actually set the bit mask from sel records */
 	  res = (res == select_stuff::select_set_zero) ? 0 : sel.poll (readfds, writefds, exceptfds);
 	}
+      /* Always clean up everything here.  If we're looping then build it
+	 all up again.  */
       sel.cleanup ();
       sel.destroy ();
+      /* Recalculate the time remaining to wait if we are going to be looping. */
       if (res == select_stuff::select_loop && ms != INFINITE)
 	{
 	  select_printf ("recalculating ms");
@@ -350,6 +358,8 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
     {
     case WAIT_OBJECT_0:
       select_printf ("signal received");
+      /* Need to get rid of everything when a signal occurs since we can't
+	 be assured that a signal handler won't jump out of select entirely. */
       cleanup ();
       destroy ();
       _my_tls.call_signal_handler ();
@@ -358,7 +368,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       else
 	{
 	  set_sig_errno (EINTR);
-	  res = select_signalled;
+	  res = select_signalled;	/* Cause loop exit in cygwin_select */
 	}
       break;
     case WAIT_FAILED:
