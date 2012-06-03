@@ -198,6 +198,8 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	}
     }
 
+  if (res < -1)
+    res = -1;
   syscall_printf ("%R = select(%d, %p, %p, %p, %p)", res, maxfds, readfds,
 		  writefds, exceptfds, to);
   return res;
@@ -315,7 +317,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   if ((w4[m] = pthread::get_cancel_event ()) != NULL)
     m++;
 
-  int startfds = m;
+  DWORD startfds = m;
   /* Loop through the select chain, starting up anything appropriate and
      counting the number of active fds. */
   while ((s = s->next))
@@ -331,11 +333,13 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  return select_error;
 	}
       if (s->h != NULL)
-	for (DWORD i = startfds; i <= m; i++)
-	  if (i == m)
-	    w4[m = i] = s->h;
-	  else if (w4[i] == s->h)
-	    break;
+	{
+	  for (DWORD i = startfds; i < m; i++)
+	    if (w4[i] == s->h)
+	      goto next_while;
+	  w4[m++] = s->h;
+	}
+next_while:;
     }
 
   debug_printf ("m %d, ms %u", m, ms);

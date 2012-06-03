@@ -1,3 +1,10 @@
+2012-06-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* select.cc (cygwin_select): Make sure that we only return -1 as an
+	error return.
+	(select_stuff::wait): Semi-revert to previous method for filling out
+	w4.
+
 2012-06-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* select.cc (cygwin_select): Add some comments.
