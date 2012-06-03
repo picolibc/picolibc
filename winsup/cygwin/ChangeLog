@@ -1,3 +1,31 @@
+2012-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* globals.cc (ro_u_refs): New R/O unicode string.
+	* mount.cc (fs_info::update): Recognize ReFS.
+	* mount.h (enum fs_info_type): Add refs.
+	(class fs_info): Add refs flag and accessor methods.
+	* ntdll.h (RtlAddAccessAllowedAceEx): Declare.
+	(RtlAddAccessDeniedAceEx): Declare.
+	* path.h (path_conv::fs_is_refs): Define.
+	* sec_helper.cc (_recycler_sd): New function to create security
+	descriptors suitable for the recycler bin starting with Vista.
+	* security.cc (add_access_allowed_ace): Use RtlAddAccessAllowedAceEx
+	and drop code to set AceFlags explicitely.
+	(add_access_denied_ace): Use RtlAddAccessDeniedAceEx and drop code to
+	set AceFlags explicitely.
+	* security.h (_recycler_sd): Declare.
+	(recycler_sd): Define.
+	* syscalls.cc (desktop_ini): Change formatting.
+	(desktop_ini_ext): Define third line of recycler desktop.ini file
+	since Vista,
+	(try_to_bin): Handle ReFS just like NTFS.  Write Vista and later
+	Recycler in all uppercase, just like shell32 does when recreating it.
+	Fix comments to include ReFS.  Don't implicitely reuse object
+	attributes from earlier NtOpenFile call, rather recreate it for safety.
+	Use recycler_sd call when creating security descriptor for Recycler
+	dirs and files on Vista and later.  Write third line of desktop.ini
+	when on Vista and later.
+
 2012-06-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* winbase.h: Add missing copyright date.

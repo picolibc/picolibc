@@ -1,7 +1,7 @@
 /* security.cc: NT file access control functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
    Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
@@ -469,15 +469,13 @@ bool
 add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
 			PSID sid, size_t &len_add, DWORD inherit)
 {
-  NTSTATUS status = RtlAddAccessAllowedAce (acl, ACL_REVISION, attributes, sid);
+  NTSTATUS status = RtlAddAccessAllowedAceEx (acl, ACL_REVISION, inherit,
+					      attributes, sid);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
       return false;
     }
-  ACCESS_ALLOWED_ACE *ace;
-  if (inherit && NT_SUCCESS (RtlGetAce (acl, offset, (PVOID *) &ace)))
-    ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + RtlLengthSid (sid);
   return true;
 }
@@ -486,15 +484,13 @@ bool
 add_access_denied_ace (PACL acl, int offset, DWORD attributes,
 		       PSID sid, size_t &len_add, DWORD inherit)
 {
-  NTSTATUS status = RtlAddAccessDeniedAce (acl, ACL_REVISION, attributes, sid);
+  NTSTATUS status = RtlAddAccessDeniedAceEx (acl, ACL_REVISION, inherit,
+					     attributes, sid);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
       return false;
     }
-  ACCESS_DENIED_ACE *ace;
-  if (inherit && NT_SUCCESS (RtlGetAce (acl, offset, (PVOID *) &ace)))
-    ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD) + RtlLengthSid (sid);
   return true;
 }

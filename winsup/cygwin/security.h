@@ -476,6 +476,13 @@ extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
 extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID, PSID, PSID,
 						  DWORD, BOOL)
 		__attribute__ ((regparm (3)));
+
+extern PSECURITY_DESCRIPTOR _recycler_sd (void *buf, bool users, bool dir);
+#define recycler_sd(users,dir) \
+  (_recycler_sd (alloca (sizeof (SECURITY_DESCRIPTOR) + MAX_DACL_LEN (3)), \
+		 (users), \
+		 (dir)))
+
 extern PSECURITY_DESCRIPTOR _everyone_sd (void *buf, ACCESS_MASK access);
 #define everyone_sd(access)	(_everyone_sd (alloca (SD_MIN_SIZE), (access)))
 

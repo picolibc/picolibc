@@ -29,6 +29,7 @@ enum fs_info_type
   none = 0,
   fat,
   ntfs,
+  refs,
   samba,
   nfs,
   netapp,
@@ -98,6 +99,7 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, has_dos_filenames_only)
   IMPLEMENT_FS_FLAG (fat)
   IMPLEMENT_FS_FLAG (ntfs)
+  IMPLEMENT_FS_FLAG (refs)
   IMPLEMENT_FS_FLAG (samba)
   IMPLEMENT_FS_FLAG (nfs)
   IMPLEMENT_FS_FLAG (netapp)

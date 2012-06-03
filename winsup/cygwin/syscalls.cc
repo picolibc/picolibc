@@ -200,7 +200,12 @@ stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE trans)
 }
 
 static char desktop_ini[] =
-  "[.ShellClassInfo]\r\nCLSID={645FF040-5081-101B-9F08-00AA002F954E}\r\n";
+  "[.ShellClassInfo]\r\n"
+  "CLSID={645FF040-5081-101B-9F08-00AA002F954E}\r\n";
+
+static char desktop_ini_ext[] =
+  "LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-8964\r\n";
+
 static BYTE info2[] =
 {
   0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -229,6 +234,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   PFILE_INTERNAL_INFORMATION pfii;
   PFILE_RENAME_INFORMATION pfri;
   FILE_DISPOSITION_INFORMATION disp = { TRUE };
+  bool fs_has_per_user_recycler = pc.fs_is_ntfs () || pc.fs_is_refs ();
 
   tmp_pathbuf tp;
   PBYTE infobuf = (PBYTE) tp.w_get ();
@@ -253,8 +259,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   RtlInitEmptyUnicodeString (&recycler, recyclerbuf, sizeof recyclerbuf);
   if (!pc.isremote ())
     {
-      if (wincap.has_recycle_dot_bin ())	/* NTFS and FAT since Vista */
-	RtlAppendUnicodeToString (&recycler, L"\\$Recycle.Bin\\");
+      if (wincap.has_recycle_dot_bin ()) /* NTFS and FAT since Vista, ReFS */
+	RtlAppendUnicodeToString (&recycler, L"\\$RECYCLE.BIN\\");
       else if (pc.fs_is_ntfs ())	/* NTFS up to 2K3 */
 	RtlAppendUnicodeToString (&recycler, L"\\RECYCLER\\");
       else if (pc.fs_is_fat ())	/* FAT up to 2K3 */
@@ -291,10 +297,10 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
       recycler.Length -= sizeof (WCHAR);
       /* Store length of recycler base dir, if it's necessary to create it. */
       recycler_base_len = recycler.Length;
-      /* On NTFS the recycler dir contains user specific subdirs, which are the
-	 actual recycle bins per user.  The name if this dir is the string
-	 representation of the user SID. */
-      if (pc.fs_is_ntfs ())
+      /* On NTFS or ReFS the recycler dir contains user specific subdirs, which
+	 are the actual recycle bins per user.  The name if this dir is the
+	 string representation of the user SID. */
+      if (fs_has_per_user_recycler)
 	{
 	  UNICODE_STRING sid;
 	  WCHAR sidbuf[128];
@@ -344,6 +350,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
       /* Ok, so the recycler and/or the recycler/SID directory don't exist.
 	 First reopen root dir with permission to create subdirs. */
       NtClose (rootdir);
+      InitializeObjectAttributes (&attr, &root, OBJ_CASE_INSENSITIVE,
+				  NULL, NULL);
       status = NtOpenFile (&rootdir, FILE_ADD_SUBDIRECTORY, &attr, &io,
 			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
       if (!NT_SUCCESS (status))
@@ -354,14 +362,17 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 	}
       /* Then check if recycler exists by opening and potentially creating it.
 	 Yes, we can really do that.  Typically the recycle bin is created
-	 by the first user actually using the bin.  The permissions are the
-	 default permissions propagated from the root directory. */
+	 by the first user actually using the bin.  Pre-Vista, the permissions
+	 are the default permissions propagated from the root directory.
+	 Since Vista the top-level recycle dir has explicit permissions. */
       InitializeObjectAttributes (&attr, &recycler, OBJ_CASE_INSENSITIVE,
-				  rootdir, NULL);
+				  rootdir,
+				  wincap.has_recycle_dot_bin ()
+				  ? recycler_sd (true, true) : NULL);
       recycler.Length = recycler_base_len;
       status = NtCreateFile (&recyclerdir,
 			     READ_CONTROL
-			     | (pc.fs_is_ntfs () ? 0 : FILE_ADD_FILE),
+			     | (fs_has_per_user_recycler ? 0 : FILE_ADD_FILE),
 			     &attr, &io, NULL,
 			     FILE_ATTRIBUTE_DIRECTORY
 			     | FILE_ATTRIBUTE_SYSTEM
@@ -376,10 +387,12 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 	}
       /* Next, if necessary, check if the recycler/SID dir exists and
 	 create it if not. */
-      if (pc.fs_is_ntfs ())
+      if (fs_has_per_user_recycler)
 	{
 	  NtClose (recyclerdir);
 	  recycler.Length = recycler_user_len;
+	  InitializeObjectAttributes (&attr, &recycler, OBJ_CASE_INSENSITIVE,
+				      rootdir, recycler_sd (false, true));
 	  status = NtCreateFile (&recyclerdir, READ_CONTROL | FILE_ADD_FILE,
 				 &attr, &io, NULL, FILE_ATTRIBUTE_DIRECTORY
 						   | FILE_ATTRIBUTE_SYSTEM
@@ -400,7 +413,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 	{
 	  RtlInitUnicodeString (&fname, L"desktop.ini");
 	  InitializeObjectAttributes (&attr, &fname, OBJ_CASE_INSENSITIVE,
-				      recyclerdir, NULL);
+				      recyclerdir, recycler_sd (false, false));
 	  status = NtCreateFile (&tmp_fh, FILE_GENERIC_WRITE, &attr, &io, NULL,
 				 FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_HIDDEN,
 				 FILE_SHARE_VALID_FLAGS, FILE_CREATE,
@@ -416,6 +429,15 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 	      if (!NT_SUCCESS (status))
 		debug_printf ("NtWriteFile (%S) failed, status = %p",
 			      &fname, status);
+	      else if (wincap.has_recycle_dot_bin ())
+	      	{
+		  status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io,
+		  			desktop_ini_ext,
+					sizeof desktop_ini_ext - 1, NULL, NULL);
+		  if (!NT_SUCCESS (status))
+		    debug_printf ("NtWriteFile (%S) failed, status = %p",
+				  &fname, status);
+		}
 	      NtClose (tmp_fh);
 	    }
 	  if (!wincap.has_recycle_dot_bin ()) /* No INFO2 file since Vista */

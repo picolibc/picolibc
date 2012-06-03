@@ -402,6 +402,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   if (!got_fs ()
       && !is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE))
       && !is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE))
+      && !is_refs (RtlEqualUnicodeString (&fsname, &ro_u_refs, FALSE))
       && !is_csc_cache (RtlEqualUnicodeString (&fsname, &ro_u_csc, FALSE))
       && is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM))
     is_udf (RtlEqualUnicodeString (&fsname, &ro_u_udf, FALSE));

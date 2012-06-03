@@ -1,7 +1,7 @@
 /* sec_helper.cc: NT security helper functions
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2006, 2007, 2008, 2009,
-   2010, 2011 Red Hat, Inc.
+   2010, 2011, 2012 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -576,6 +576,64 @@ __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
   psa->lpSecurityDescriptor = psd;
   psa->bInheritHandle = inherit;
   return psa;
+}
+
+/* Helper function to create a file security descriptor which allows
+   full access to admins, system, and the sid given as parameter.  See
+   try_to_bin for how it's used. */
+
+PSECURITY_DESCRIPTOR
+_recycler_sd (void *buf, bool users, bool dir)
+{
+  NTSTATUS status;
+  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) buf;
+  
+  if (!psd)
+    return NULL;
+  RtlCreateSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
+  PACL dacl = (PACL) (psd + 1);
+  /* Pre-Vista, the per-user recycler dir has a rather too complicated
+     ACL by default, which has distinct ACEs for inheritable and non-inheritable
+     permissions.  However, this ACL is practically equivalent to the ACL
+     created since Vista.  Therefore we simplify our job here and create the
+     pre-Vista permissions the same way as on Vista and later. */
+  RtlCreateAcl (dacl, MAX_DACL_LEN (3), ACL_REVISION);
+  RtlAddAccessAllowedAceEx (dacl, ACL_REVISION,
+			    dir ? CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
+				: NO_INHERITANCE,
+			    FILE_ALL_ACCESS, well_known_admins_sid);
+  RtlAddAccessAllowedAceEx (dacl, ACL_REVISION,
+			    dir ? CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
+				: NO_INHERITANCE,
+			    FILE_ALL_ACCESS, well_known_system_sid);
+  if (users)	
+    RtlAddAccessAllowedAceEx (dacl, ACL_REVISION, NO_PROPAGATE_INHERIT_ACE,
+			      FILE_GENERIC_READ | FILE_GENERIC_EXECUTE
+			      | FILE_APPEND_DATA | FILE_WRITE_ATTRIBUTES,
+			      well_known_users_sid);
+  else
+    RtlAddAccessAllowedAceEx (dacl, ACL_REVISION,
+			      dir ? CONTAINER_INHERIT_ACE
+				    | OBJECT_INHERIT_ACE
+				  : NO_INHERITANCE,
+			      FILE_ALL_ACCESS, cygheap->user.sid ());
+  LPVOID ace;
+  status = RtlFirstFreeAce (dacl, &ace);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("RtlFirstFreeAce: %p", status);
+      return NULL;
+    }
+  dacl->AclSize = (char *) ace - (char *) dacl;
+  RtlSetDaclSecurityDescriptor (psd, TRUE, dacl, FALSE);
+  /* If the directory DACL is not marked as protected, shell32 thinks
+     the recycle dir is corrupted.  As soon as Explorer accesses the
+     Recycler, the user will get a GUI dialog "The Recycle Bin on X:\
+     is corrupted. Do you want to empty the Recycle Bin for this drive?"
+     Of course we want to avoid that. */
+  if (dir)
+    psd->Control |= SE_DACL_PROTECTED;
+  return psd;
 }
 
 /* Helper function to create an event security descriptor which only allows
