@@ -1,7 +1,7 @@
 /* cygcheck.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -1436,7 +1436,7 @@ dump_sysinfo ()
 	  else if (osversion.dwMinorVersion == 2)
 	    {
 	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			      ? "8" : "Server 8");
+			      ? "8" : "Server 2012");
 	      strcat (osname, " (not yet supported!)");
 	    }
 	  DWORD prod;
