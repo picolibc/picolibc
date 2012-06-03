@@ -1,3 +1,45 @@
+2012-06-02  cgf-000010
+
+<1.7.16>
+- Fix emacs problem which exposed an issue with Cygwin's select() function.
+  If a signal arrives while select is blocking and the program longjmps
+  out of the signal handler then threads and memory may be left hanging.
+  Fixes: http://cygwin.com/ml/cygwin/2012-05/threads.html#00275
+</1.7.16>
+
+This was try #4 or #5 to get select() signal handling working right.
+It's still not there but it should now at least not leak memory or
+threads.
+
+I mucked with the interface between cygwin_select and select_stuff::wait
+so that the "new" loop in select_stuff::wait() was essentially moved
+into the caller.  cygwin_select now uses various enum states to decide
+what to do.  It builds the select linked list at the beginning of the
+loop, allowing wait() to tear everything down and restart.  This is
+necessary before calling a signal handler because the signal handler may
+longjmp away.
+
+I initially had this all coded up to use a special signal_cleanup
+callback which could be called when a longjmp is called in a signal
+handler.  And cygwin_select() set up and tore down this callback.  Once
+I got everything compiling it, of course, dawned on me that just because
+you call a longjmp in a signal handler it doesn't mean that you are
+jumping *out* of the signal handler.  So, if the signal handler invokes
+the callback and returns it will be very bad for select().  Hence, this
+slower, but hopefully more correct implementation.
+
+(I still wonder if some sort of signal cleanup callback might still
+be useful in the future)
+
+TODO: I need to do an audit of other places where this problem could be
+occurring.
+
+As alluded to above, select's signal handling is still not right.  It
+still acts as if it could call a signal handler from something other
+than the main thread but, AFAICT, from my STC, this doesn't seem to be
+the case.  It might be worthwhile to extend cygwait to just magically
+figure this out and not even bother using w4[0] for scenarios like this.
+
 2012-05-16  cgf-000009
 
 <1.7.16>

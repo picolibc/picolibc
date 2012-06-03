@@ -24,3 +24,8 @@ Bug fixes:
 
 - Handle inode numbers returned by Samba >= 3.5.4. 
   Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00236.html
+
+- Fix emacs problem which exposed an issue with Cygwin's select() function.
+  If a signal arrives while select is blocking and the program longjmps
+  out of the signal handler then threads and memory may be left hanging.
+  Fixes: http://cygwin.com/ml/cygwin/2012-05/threads.html#00275
