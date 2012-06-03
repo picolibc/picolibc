@@ -865,7 +865,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	     If the thread is already suspended (which can occur when a program
 	     has called SuspendThread on itself) then just queue the signal. */
 
-	  sigproc_printf ("suspending thread");
+	  sigproc_printf ("suspending thread, tls %p, _main_tls %p", tls, _main_tls);
 	  res = SuspendThread (hth);
 	  /* Just set pending if thread is already suspended */
 	  if (res)

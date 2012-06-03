@@ -1,5 +1,10 @@
 2012-06-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* exceptions.cc (setup_handler): Make debugging output a little more
+	verbose.
+
+2012-06-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* cygtls.h (_cygtls::protect_linked_list): Delete unused field.
 
 2012-05-30  Corinna Vinschen  <corinna@vinschen.de>
