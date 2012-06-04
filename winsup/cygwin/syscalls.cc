@@ -130,7 +130,7 @@ inline int
 dup_finish (int oldfd, int newfd, int flags)
 {
   int res;
-  if ((res = cygheap->fdtab.dup3 (oldfd, newfd, flags)) == newfd)
+  if ((res = cygheap->fdtab.dup3 (oldfd, newfd, flags | O_EXCL)) == newfd)
     {
       cygheap_fdget (newfd)->inc_refcnt ();
       cygheap->fdtab.unlock ();	/* dup3 exits with lock set on success */

@@ -1,5 +1,11 @@
 2012-06-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* dtable.cc (dtable::dup3): Only return with lock set when O_EXCL flag
+	is passed in.
+	* syscalls.cc (dup_finish): Pass O_EXCL in flags to dtable::dup3.
+
+2012-06-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* DevNotes: Add entry cgf-000011.
 	* fhandler.h (fhandler_base::refcnt): Delete.
 	(fhandler_base::inc_refcnt): New function.

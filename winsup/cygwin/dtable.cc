@@ -714,6 +714,14 @@ dtable::dup3 (int oldfd, int newfd, int flags)
   debug_printf ("dup3 (%d, %d, %p)", oldfd, newfd, flags);
   lock ();
   bool do_unlock = true;
+  bool unlock_on_return;
+  if (!(flags & O_EXCL))
+    unlock_on_return = true;	/* Relinquish lock on return */
+  else
+    {
+      flags &= ~O_EXCL;
+      unlock_on_return = false;	/* Return with lock set on success */
+    }
 
   if (not_open (oldfd))
     {
@@ -761,11 +769,11 @@ dtable::dup3 (int oldfd, int newfd, int flags)
       goto done;
     }
 
-  do_unlock = false;
   fds[newfd] = newfh;
 
   if ((res = newfd) <= 2)
     set_std_handle (res);
+  do_unlock = unlock_on_return;
 
 done:
   MALLOC_CHECK;
