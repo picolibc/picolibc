@@ -1,3 +1,8 @@
+2012-06-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::link ): Translate
+	STATUS_NOT_SUPPORTED to EPERM as well.
+
 2012-06-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* dtable.cc (dtable::dup3): Only return with lock set when O_EXCL flag

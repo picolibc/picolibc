@@ -1283,7 +1283,8 @@ fhandler_disk_file::link (const char *newpath)
   status = NtSetInformationFile (fh, &io, pfli, size, FileLinkInformation);
   if (!NT_SUCCESS (status))
     {
-      if (status == STATUS_INVALID_DEVICE_REQUEST)
+      if (status == STATUS_INVALID_DEVICE_REQUEST
+	  || status == STATUS_NOT_SUPPORTED)
 	{
 	  /* FS doesn't support hard links.  Linux returns EPERM. */
 	  set_errno (EPERM);
