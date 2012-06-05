@@ -200,6 +200,11 @@ _DEFUN(__sinit, (s),
 #else
   s->__sglue._niobs = 0;
   s->__sglue._iobs = NULL;
+  /* Avoid infinite recursion when calling __sfp  for _GLOBAL_REENT.  The
+     problem is that __sfp checks for _GLOBAL_REENT->__sdidinit and calls
+     __sinit if it's 0. */
+  if (s == _GLOBAL_REENT)
+    s->__sdidinit = 1;
   s->_stdin = __sfp(s);
   s->_stdout = __sfp(s);
   s->_stderr = __sfp(s);

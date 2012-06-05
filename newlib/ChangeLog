@@ -1,3 +1,8 @@
+2012-06-05  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/findfp.c (__sinit): Avoid infinite recursion on
+	_REENT_SMALL targets.  Add comment to explain.
+
 2012-05-31  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/local.h (_newlib_sfp_lock_exit): Fix typo in non-pthread
