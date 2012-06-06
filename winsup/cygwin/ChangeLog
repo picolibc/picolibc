@@ -1,3 +1,16 @@
+2012-06-05  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* include/elf.h: Update from FreeBSD.
+	* include/machine/elf.h: New header, from FreeBSD.
+	* include/sys/elf.h: Ditto.
+	* include/sys/elf32.h: Update from FreeBSD.
+	* include/sys/elf64.h: Ditto.
+	* include/sys/elf_common.h: Ditto.
+	(R_IA64_*): Define Linux-style names as aliases to R_IA_64_*.
+	(R_SH_*): Define, based on sh-4 psABI.
+	(R_390_*): Define, based on s390x psABI.
+	* include/sys/elf_generic.h: Ditto.
+
 2012-06-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::link ): Translate

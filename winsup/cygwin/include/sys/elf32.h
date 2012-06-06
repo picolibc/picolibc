@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/sys/elf32.h,v 1.8 2002/05/30 08:32:18 dfr Exp $
+ * $FreeBSD$
  */
 
 #ifndef _SYS_ELF32_H_
@@ -35,13 +35,18 @@
  * ELF definitions common to all 32-bit architectures.
  */
 
-typedef u_int32_t	Elf32_Addr;
-typedef u_int16_t	Elf32_Half;
-typedef u_int32_t	Elf32_Off;
+typedef uint32_t	Elf32_Addr;
+typedef uint16_t	Elf32_Half;
+typedef uint32_t	Elf32_Off;
 typedef int32_t		Elf32_Sword;
-typedef u_int32_t	Elf32_Word;
-typedef u_int32_t	Elf32_Size;
-typedef Elf32_Off	Elf32_Hashelt;
+typedef uint32_t	Elf32_Word;
+typedef uint64_t	Elf32_Lword;
+
+typedef Elf32_Word	Elf32_Hashelt;
+
+/* Non-standard class-dependent datatype used for abstraction. */
+typedef Elf32_Word	Elf32_Size;
+typedef Elf32_Sword	Elf32_Ssize;
 
 /*
  * ELF header.
@@ -75,11 +80,11 @@ typedef struct {
 	Elf32_Word	sh_flags;	/* Section flags. */
 	Elf32_Addr	sh_addr;	/* Address in memory image. */
 	Elf32_Off	sh_offset;	/* Offset in file. */
-	Elf32_Size	sh_size;	/* Size in bytes. */
+	Elf32_Word	sh_size;	/* Size in bytes. */
 	Elf32_Word	sh_link;	/* Index of a related section. */
 	Elf32_Word	sh_info;	/* Depends on section type. */
-	Elf32_Size	sh_addralign;	/* Alignment in bytes. */
-	Elf32_Size	sh_entsize;	/* Size of each entry in section. */
+	Elf32_Word	sh_addralign;	/* Alignment in bytes. */
+	Elf32_Word	sh_entsize;	/* Size of each entry in section. */
 } Elf32_Shdr;
 
 /*
@@ -91,10 +96,10 @@ typedef struct {
 	Elf32_Off	p_offset;	/* File offset of contents. */
 	Elf32_Addr	p_vaddr;	/* Virtual address in memory image. */
 	Elf32_Addr	p_paddr;	/* Physical address (not used). */
-	Elf32_Size	p_filesz;	/* Size of contents in file. */
-	Elf32_Size	p_memsz;	/* Size of contents in memory. */
+	Elf32_Word	p_filesz;	/* Size of contents in file. */
+	Elf32_Word	p_memsz;	/* Size of contents in memory. */
 	Elf32_Word	p_flags;	/* Access permission flags. */
-	Elf32_Size	p_align;	/* Alignment in memory and file. */
+	Elf32_Word	p_align;	/* Alignment in memory and file. */
 } Elf32_Phdr;
 
 /*
@@ -104,7 +109,7 @@ typedef struct {
 typedef struct {
 	Elf32_Sword	d_tag;		/* Entry type. */
 	union {
-		Elf32_Size	d_val;	/* Integer value. */
+		Elf32_Word	d_val;	/* Integer value. */
 		Elf32_Addr	d_ptr;	/* Address value. */
 	} d_un;
 } Elf32_Dyn;
@@ -134,13 +139,51 @@ typedef struct {
 #define ELF32_R_INFO(sym, type)	(((sym) << 8) + (unsigned char)(type))
 
 /*
+ *	Note entry header
+ */
+typedef Elf_Note Elf32_Nhdr;
+
+/*
+ *	Move entry
+ */
+typedef struct {
+	Elf32_Lword	m_value;	/* symbol value */
+	Elf32_Word 	m_info;		/* size + index */
+	Elf32_Word	m_poffset;	/* symbol offset */
+	Elf32_Half	m_repeat;	/* repeat count */
+	Elf32_Half	m_stride;	/* stride info */
+} Elf32_Move;
+
+/*
+ *	The macros compose and decompose values for Move.r_info
+ *
+ *	sym = ELF32_M_SYM(M.m_info)
+ *	size = ELF32_M_SIZE(M.m_info)
+ *	M.m_info = ELF32_M_INFO(sym, size)
+ */
+#define	ELF32_M_SYM(info)	((info)>>8)
+#define	ELF32_M_SIZE(info)	((unsigned char)(info))
+#define	ELF32_M_INFO(sym, size)	(((sym)<<8)+(unsigned char)(size))
+
+/*
+ *	Hardware/Software capabilities entry
+ */
+typedef struct {
+	Elf32_Word	c_tag;		/* how to interpret value */
+	union {
+		Elf32_Word	c_val;
+		Elf32_Addr	c_ptr;
+	} c_un;
+} Elf32_Cap;
+
+/*
  * Symbol table entries.
  */
 
 typedef struct {
 	Elf32_Word	st_name;	/* String table index of name. */
 	Elf32_Addr	st_value;	/* Symbol value. */
-	Elf32_Size	st_size;	/* Size of associated object. */
+	Elf32_Word	st_size;	/* Size of associated object. */
 	unsigned char	st_info;	/* Type and binding information. */
 	unsigned char	st_other;	/* Reserved (not used). */
 	Elf32_Half	st_shndx;	/* Section index of symbol. */
@@ -152,5 +195,51 @@ typedef struct {
 
 /* Macro for constructing st_info from field values. */
 #define ELF32_ST_INFO(bind, type)	(((bind) << 4) + ((type) & 0xf))
+
+/* Macro for accessing the fields of st_other. */
+#define ELF32_ST_VISIBILITY(oth)	((oth) & 0x3)
+
+/* Structures used by Sun & GNU symbol versioning. */
+typedef struct
+{
+	Elf32_Half	vd_version;
+	Elf32_Half	vd_flags;
+	Elf32_Half	vd_ndx;
+	Elf32_Half	vd_cnt;
+	Elf32_Word	vd_hash;
+	Elf32_Word	vd_aux;
+	Elf32_Word	vd_next;
+} Elf32_Verdef;
+
+typedef struct
+{
+	Elf32_Word	vda_name;
+	Elf32_Word	vda_next;
+} Elf32_Verdaux;
+
+typedef struct
+{
+	Elf32_Half	vn_version;
+	Elf32_Half	vn_cnt;
+	Elf32_Word	vn_file;
+	Elf32_Word	vn_aux;
+	Elf32_Word	vn_next;
+} Elf32_Verneed;
+
+typedef struct
+{
+	Elf32_Word	vna_hash;
+	Elf32_Half	vna_flags;
+	Elf32_Half	vna_other;
+	Elf32_Word	vna_name;
+	Elf32_Word	vna_next;
+} Elf32_Vernaux;
+
+typedef Elf32_Half Elf32_Versym;
+
+typedef struct {
+	Elf32_Half	si_boundto;	/* direct bindings - symbol bound to */
+	Elf32_Half	si_flags;	/* per symbol flags */
+} Elf32_Syminfo;
 
 #endif /* !_SYS_ELF32_H_ */

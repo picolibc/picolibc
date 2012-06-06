@@ -23,11 +23,11 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/sys/sys/elf_generic.h,v 1.6 2002/07/20 02:56:11 peter Exp $
+ * $FreeBSD$
  */
 
 #ifndef _SYS_ELF_GENERIC_H_
-#define _SYS_ELF_GENERIC_H_ 1
+#define	_SYS_ELF_GENERIC_H_ 1
 
 #include <sys/cdefs.h>
 
@@ -36,43 +36,30 @@
  * needing to know the word size.
  */
 
-#ifndef __ELF_WORD_SIZE
-# define __ELF_WORD_SIZE 32
-#endif
-
 #if __ELF_WORD_SIZE != 32 && __ELF_WORD_SIZE != 64
 #error "__ELF_WORD_SIZE must be defined as 32 or 64"
 #endif
 
-#define ELF_CLASS	__CONCAT(ELFCLASS,__ELF_WORD_SIZE)
+#define	ELF_CLASS	__CONCAT(ELFCLASS,__ELF_WORD_SIZE)
 
 #if BYTE_ORDER == LITTLE_ENDIAN
-#define ELF_DATA	ELFDATA2LSB
+#define	ELF_DATA	ELFDATA2LSB
 #elif BYTE_ORDER == BIG_ENDIAN
-#define ELF_DATA	ELFDATA2MSB
+#define	ELF_DATA	ELFDATA2MSB
 #else
 #error "Unknown byte order"
 #endif
 
-#if __ELF_WORD_SIZE == 32
-#define __elfN(x)	elf32_##x
-#define __ElfN(x)	Elf32_##x
-#define __ELFN(x)	ELF32_##x
-#else
-#define __elfN(x)	elf364_##x
-#define __ElfN(x)	Elf364_##x
-#define __ELFN(x)	ELF364_##x
-#endif
-#define __ElfType(x)	typedef __ElfN(x) Elf_##x
+#define	__elfN(x)	__CONCAT(__CONCAT(__CONCAT(elf,__ELF_WORD_SIZE),_),x)
+#define	__ElfN(x)	__CONCAT(__CONCAT(__CONCAT(Elf,__ELF_WORD_SIZE),_),x)
+#define	__ELFN(x)	__CONCAT(__CONCAT(__CONCAT(ELF,__ELF_WORD_SIZE),_),x)
+#define	__ElfType(x)	typedef __ElfN(x) __CONCAT(Elf_,x)
 
-#define FOO
 __ElfType(Addr);
 __ElfType(Half);
 __ElfType(Off);
 __ElfType(Sword);
 __ElfType(Word);
-__ElfType(Size);
-__ElfType(Hashelt);
 __ElfType(Ehdr);
 __ElfType(Shdr);
 __ElfType(Phdr);
@@ -80,12 +67,22 @@ __ElfType(Dyn);
 __ElfType(Rel);
 __ElfType(Rela);
 __ElfType(Sym);
+__ElfType(Verdef);
+__ElfType(Verdaux);
+__ElfType(Verneed);
+__ElfType(Vernaux);
+__ElfType(Versym);
 
-#define ELF_R_SYM	__ELFN(R_SYM)
-#define ELF_R_TYPE	__ELFN(R_TYPE)
-#define ELF_R_INFO	__ELFN(R_INFO)
-#define ELF_ST_BIND	__ELFN(ST_BIND)
-#define ELF_ST_TYPE	__ELFN(ST_TYPE)
-#define ELF_ST_INFO	__ELFN(ST_INFO)
+/* Non-standard ELF types. */
+__ElfType(Hashelt);
+__ElfType(Size);
+__ElfType(Ssize);
+
+#define	ELF_R_SYM	__ELFN(R_SYM)
+#define	ELF_R_TYPE	__ELFN(R_TYPE)
+#define	ELF_R_INFO	__ELFN(R_INFO)
+#define	ELF_ST_BIND	__ELFN(ST_BIND)
+#define	ELF_ST_TYPE	__ELFN(ST_TYPE)
+#define	ELF_ST_INFO	__ELFN(ST_INFO)
 
 #endif /* !_SYS_ELF_GENERIC_H_ */
