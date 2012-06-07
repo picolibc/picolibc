@@ -1,6 +1,6 @@
 /* Opcode table for the Atmel AVR micro controllers.
 
-   Copyright 2000, 2001, 2004, 2006, 2008, 2010 Free Software Foundation, Inc.
+   Copyright 2000, 2001, 2004, 2006, 2008, 2010, 2012 Free Software Foundation, Inc.
    Contributed by Denis Chertykov <denisc@overta.ru>
    
    This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,7 @@
 #define AVR_ISA_MOVW  0x1000 /* device has MOVW */
 #define AVR_ISA_SPMX  0x2000 /* device has SPM Z[+] */
 #define AVR_ISA_DES   0x4000 /* device has DES */
+#define AVR_ISA_XCH   0x8000 /* device has XCH, LAC, LAS, LAT */
 
 #define AVR_ISA_TINY1 (AVR_ISA_1200 | AVR_ISA_LPM)
 #define AVR_ISA_2xxx  (AVR_ISA_TINY1 | AVR_ISA_SRAM)
@@ -52,7 +53,7 @@
 #define AVR_ISA_M323  (AVR_ISA_M161 | AVR_ISA_BRK)
 #define AVR_ISA_M128  (AVR_ISA_M323 | AVR_ISA_ELPM | AVR_ISA_ELPMX)
 #define AVR_ISA_M256  (AVR_ISA_M128 | AVR_ISA_EIND)
-#define AVR_ISA_XMEGA (AVR_ISA_M256 | AVR_ISA_SPMX | AVR_ISA_DES)
+#define AVR_ISA_XMEGA (AVR_ISA_M256 | AVR_ISA_SPMX | AVR_ISA_DES | AVR_ISA_XCH)
 
 #define AVR_ISA_AVR1   AVR_ISA_TINY1
 #define AVR_ISA_AVR2   AVR_ISA_2xxx
@@ -124,7 +125,6 @@
     0x0001...0x00ff    (255) (known to be decoded as `nop' by the old core)
    "100100xxxxxxx011"  (128) 0x9[0-3][0-9a-f][3b]
    "100100xxxxxx1000"   (64) 0x9[0-3][0-9a-f]8
-   "1001001xxxxx01xx"  (128) 0x9[23][0-9a-f][4-7]
    "1001010xxxxx0100"   (32) 0x9[45][0-9a-f]4
    "1001010x001x1001"    (4) 0x9[45][23]9
    "1001010x01xx1001"    (8) 0x9[45][4-7]9
@@ -264,6 +264,12 @@ AVR_INSN (pop,  "r",   "1001000rrrrr1111", 1, AVR_ISA_2xxx, 0x900f)
 AVR_INSN (push, "r",   "1001001rrrrr1111", 1, AVR_ISA_2xxx, 0x920f)
 AVR_INSN (ror,  "r",   "1001010rrrrr0111", 1, AVR_ISA_1200, 0x9407)
 AVR_INSN (swap, "r",   "1001010rrrrr0010", 1, AVR_ISA_1200, 0x9402)
+
+   /* Atomic memory operations for XMEGA.  List before `sts'.  */
+AVR_INSN (xch,  "z,r",   "1001001rrrrr0100", 1, AVR_ISA_XCH, 0x9204)
+AVR_INSN (las,  "z,r",   "1001001rrrrr0101", 1, AVR_ISA_XCH, 0x9205)
+AVR_INSN (lac,  "z,r",   "1001001rrrrr0110", 1, AVR_ISA_XCH, 0x9206)
+AVR_INSN (lat,  "z,r",   "1001001rrrrr0111", 1, AVR_ISA_XCH, 0x9207)
 
    /* Known to be decoded as `nop' by the old core.  */
 AVR_INSN (movw, "v,v", "00000001ddddrrrr", 1, AVR_ISA_MOVW, 0x0100)

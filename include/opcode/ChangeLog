@@ -1,3 +1,9 @@
+2012-06-07  Georg-Johann Lay  <avr@gjlay.de>
+
+	* avr.h: (AVR_ISA_XCH): New define.
+	(AVR_ISA_XMEGA): Use it.
+	(XCH, LAS, LAT, LAC): New XMEGA opcodes.
+
 2012-05-15  James Murray <jsm@jsm-net.demon.co.uk>
 
 	* m68hc11.h: Add XGate definitions.
