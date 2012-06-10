@@ -1,3 +1,9 @@
+2012-06-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* select.cc (cygwin_select): Remove select_timeout test.
+	(select_stuff::wait): Return select_set_zero on timeout.
+	(thread_socket): Report timeout when debugging.
+
 2012-06-05  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/elf.h: Update from FreeBSD.

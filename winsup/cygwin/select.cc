@@ -168,9 +168,7 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       else
 	res = sel.wait (r, w, e, ms);			/* wait for an fd to become
 							   become active or time out */
-      if (res == select_stuff::select_timeout)
-	res = 0;					/* No fd's were active. */
-      else if (res >= 0)
+      if (res >= 0)
 	{
 	  copyfd_set (readfds, r, maxfds);
 	  copyfd_set (writefds, w, maxfds);
@@ -383,7 +381,7 @@ next_while:;
       break;
     case WAIT_TIMEOUT:
       select_printf ("timed out");
-      res = select_timeout;
+      res = select_set_zero;
       break;
     case WAIT_OBJECT_0 + 1:
       if (startfds > 1)
@@ -1305,7 +1303,7 @@ thread_socket (void *arg)
 			   / MAXIMUM_WAIT_OBJECTS));
   bool event = false;
 
-  select_printf ("stuff_start %p", si->start);
+  select_printf ("stuff_start %p, timeout %u", si->start, timeout);
   while (!event)
     {
       for (select_record *s = si->start; (s = s->next); )

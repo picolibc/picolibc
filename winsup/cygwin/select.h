@@ -71,7 +71,6 @@ class select_stuff
 public:
   enum wait_states
   {
-    select_timeout = -4,
     select_signalled = -3,
     select_loop = -2,
     select_error = -1,
