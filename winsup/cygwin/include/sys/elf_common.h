@@ -603,6 +603,10 @@ typedef struct {
 #define	R_386_TLS_LE		17	/* Negative offset relative to static TLS */
 #define	R_386_TLS_GD		18	/* 32 bit offset to GOT (index,off) pair */
 #define	R_386_TLS_LDM		19	/* 32 bit offset to GOT (index,zero) pair */
+#define	R_386_16		20
+#define	R_386_PC16		21
+#define	R_386_8			22
+#define	R_386_PC8		23
 #define	R_386_TLS_GD_32		24	/* 32 bit offset to GOT (index,off) pair */
 #define	R_386_TLS_GD_PUSH	25	/* pushl instruction for Sun ABI GD sequence */
 #define	R_386_TLS_GD_CALL	26	/* call instruction for Sun ABI GD sequence */

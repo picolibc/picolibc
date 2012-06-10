@@ -1,3 +1,10 @@
+2012-06-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* include/sys/elf_common.h (R_386_16): Define.
+	(R_386_PC16): Define.
+	(R_386_8): Define.
+	(R_386_PC8): Define.
+
 2012-06-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* select.cc (cygwin_select): Remove select_timeout test.
