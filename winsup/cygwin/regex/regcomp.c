@@ -324,7 +324,10 @@ p_ere(struct parse *p,
 		conc = HERE();
 		while (MORE() && (c = PEEK()) != '|' && c != stop)
 			p_ere_exp(p);
+#ifndef __CYGWIN__
+		/* undefined behaviour according to POSIX; allowed by glibc */
 		(void)REQUIRE(HERE() != conc, REG_EMPTY);	/* require nonempty */
+#endif
 
 		if (!EAT('|'))
 			break;		/* NOTE BREAK OUT */

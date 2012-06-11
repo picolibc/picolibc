@@ -1,3 +1,8 @@
+2012-06-11  Yaakov Selkowitz  <yselkowitz@...>
+
+	* regex/regcomp.c (p_ere): Allow vertical-line following
+	left-parenthesis in ERE, as in glibc.
+
 2012-06-10  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/sys/elf_common.h (R_386_16): Define.
