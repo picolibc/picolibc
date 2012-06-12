@@ -1,4 +1,4 @@
-2012-06-11  Yaakov Selkowitz  <yselkowitz@...>
+2012-06-11  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* regex/regcomp.c (p_ere): Allow vertical-line following
 	left-parenthesis in ERE, as in glibc.
