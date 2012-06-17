@@ -22,6 +22,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "cygwait.h"
 
 #define _SA_NORESTART	0x8000
 

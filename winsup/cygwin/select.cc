@@ -34,6 +34,7 @@ details. */
 #include "pinfo.h"
 #include "sigproc.h"
 #include "cygtls.h"
+#include "cygwait.h"
 
 /*
  * All these defines below should be in sys/types.h
@@ -143,7 +144,7 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       if (sel.start.next == NULL)
 	switch (cygwait (ms))
 	  {
-	  case WAIT_OBJECT_0:
+	  case WAIT_SIGNALED:
 	    select_printf ("signal received");
 	    _my_tls.call_signal_handler ();
 	    if (!sel.return_on_signal)
@@ -154,7 +155,7 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 		res = select_stuff::select_error;
 	      }
 	    break;
-	  case WAIT_OBJECT_0 + 1:
+	  case WAIT_CANCELED:
 	    sel.destroy ();
 	    pthread::static_cancel_self ();
 	    /*NOTREACHED*/

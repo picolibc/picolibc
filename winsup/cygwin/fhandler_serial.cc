@@ -20,6 +20,7 @@ details. */
 #include "pinfo.h"
 #include <asm/socket.h>
 #include <ddk/ntddser.h>
+#include "cygwait.h"
 
 /**********************************************************************/
 /* fhandler_serial */
@@ -94,13 +95,13 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 		    goto err;
 		  debug_printf ("n %d, ev %x", n, ev);
 		  break;
-		case WAIT_OBJECT_0 + 1:
+		case WAIT_SIGNALED:
 		  tot = -1;
 		  PurgeComm (get_handle (), PURGE_RXABORT);
 		  overlapped_armed = 0;
 		  set_sig_errno (EINTR);
 		  goto out;
-		case WAIT_OBJECT_0 + 2:
+		case WAIT_CANCELED:
 		  PurgeComm (get_handle (), PURGE_RXABORT);
 		  overlapped_armed = 0;
 		  pthread::static_cancel_self ();
@@ -201,12 +202,12 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
 	    {
 	    case WAIT_OBJECT_0:
 	      break;
-	    case WAIT_OBJECT_0 + 1:
+	    case WAIT_SIGNALED:
 	      PurgeComm (get_handle (), PURGE_TXABORT);
 	      set_sig_errno (EINTR);
 	      ForceCloseHandle (write_status.hEvent);
 	      return -1;
-	    case WAIT_OBJECT_0 + 2:
+	    case WAIT_CANCELED:
 	      PurgeComm (get_handle (), PURGE_TXABORT);
 	      pthread::static_cancel_self ();
 	      /*NOTREACHED*/

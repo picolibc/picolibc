@@ -26,6 +26,7 @@ details. */
 #include "cygthread.h"
 #include "child_info.h"
 #include <asm/socket.h>
+#include "cygwait.h"
 
 #define close_maybe(h) \
   do { \
@@ -737,14 +738,14 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	      goto out;
 	    }
 	  break;
-	case WAIT_OBJECT_0 + 1:
+	case WAIT_SIGNALED:
 	  if (totalread > 0)
 	    goto out;
 	  termios_printf ("wait catched signal");
 	  set_sig_errno (EINTR);
 	  totalread = -1;
 	  goto out;
-	case WAIT_OBJECT_0 + 2:
+	case WAIT_CANCELED:
 	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
@@ -772,14 +773,14 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	case WAIT_OBJECT_0:
 	case WAIT_ABANDONED_0:
 	  break;
-	case WAIT_OBJECT_0 + 1:
+	case WAIT_SIGNALED:
 	  if (totalread > 0)
 	    goto out;
-	  termios_printf ("wait for mutex catched signal");
+	  termios_printf ("wait for mutex caught signal");
 	  set_sig_errno (EINTR);
 	  totalread = -1;
 	  goto out;
-	case WAIT_OBJECT_0 + 2:
+	case WAIT_CANCELED:
 	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/

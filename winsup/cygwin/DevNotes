@@ -1,3 +1,25 @@
+2012-06-12  cgf-000012
+
+These changes are the preliminary for redoing the way threads wait for
+signals.  The problems are shown by the test case mentioned here:
+
+http://cygwin.com/ml/cygwin/2012-05/msg00434.html
+
+I've known that the signal handling in threads wasn't quite right for
+some time.  I lost all of my thread signal tests in the great "rm -r"
+debacle of a few years ago and have been less than enthusiastic about
+redoing everything (I had PCTS tests and everyting).  But it really is
+time to redo this signal handling to make it more like it is supposed to
+be.
+
+This change should not introduce any new behavior.  Things should
+continue to behave as before.  The major differences are a change in the
+arguments to cancelable_wait and cygwait now uses cancelable_wait and,
+so, the returns from cygwait now mirror cancelable_wait.
+
+The next change will consolidate cygwait and cancelable_wait into one
+cygwait function.
+
 2012-06-02  cgf-000011
 
 The refcnt handling was tricky to get right but I had convinced myself

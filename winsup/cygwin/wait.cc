@@ -1,7 +1,7 @@
 /* wait.cc: Posix wait routines.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2009, 2011 Red Hat, Inc.
+   2005, 2009, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,6 +14,7 @@ details. */
 #include "sigproc.h"
 #include "thread.h"
 #include "cygtls.h"
+#include "cygwait.h"
 
 /* This is called _wait and not wait because the real wait is defined
    in libc/syscalls/syswait.c.  It calls us.  */
@@ -79,7 +80,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       if ((waitfor = w->ev) == NULL)
 	goto nochildren;
 
-      res = cancelable_wait (waitfor);
+      res = cancelable_wait (waitfor, NULL, cw_cancel | cw_cancel_self);
 
       sigproc_printf ("%d = cancelable_wait (...)", res);
 

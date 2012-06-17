@@ -29,25 +29,7 @@ details. */
 #include "security.h"
 #include <errno.h>
 #include "cygerrno.h"
-
-enum cw_sig_wait
-{
-  cw_sig_nosig,
-  cw_sig_eintr,
-  cw_sig_resume
-};
-
-enum cw_cancel_action
-{
-  cw_cancel_self,
-  cw_no_cancel_self,
-  cw_no_cancel
-};
-
-DWORD cancelable_wait (HANDLE, PLARGE_INTEGER timeout = NULL,
-		       const cw_cancel_action = cw_cancel_self,
-		       const enum cw_sig_wait = cw_sig_nosig)
-  __attribute__ ((regparm (3)));
+#include "cygwait.h"
 
 class fast_mutex
 {
@@ -78,7 +60,7 @@ public:
   void lock ()
   {
     if (InterlockedIncrement ((long *) &lock_counter) != 1)
-      cancelable_wait (win32_obj_id, NULL, cw_no_cancel, cw_sig_resume);
+      cancelable_wait (win32_obj_id, NULL, cw_sig);
   }
 
   void unlock ()

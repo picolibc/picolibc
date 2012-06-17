@@ -80,33 +80,6 @@ void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
 #ifdef __INSIDE_CYGWIN__
 void __stdcall sigproc_terminate (enum exit_states);
-
-static inline DWORD __attribute__ ((always_inline))
-cygwait (HANDLE h, DWORD howlong = INFINITE)
-{
-  HANDLE w4[3];
-  DWORD n = 0;
-  DWORD wait_signal;
-  if ((w4[n] = h) != NULL)
-    wait_signal = WAIT_OBJECT_0 + ++n;
-  else
-    wait_signal = WAIT_OBJECT_0 + 15;	/* Arbitrary.  Don't call signal
-					   handler if only waiting for signal */
-  w4[n++] = signal_arrived;
-  if ((w4[n] = pthread::get_cancel_event ()) != NULL)
-    n++;
-  DWORD res;
-  while ((res = WaitForMultipleObjects (n, w4, FALSE, howlong)) == wait_signal
-	 && (_my_tls.call_signal_handler () || &_my_tls != _main_tls))
-    continue;
-  return res;
-}
-
-static inline DWORD __attribute__ ((always_inline))
-cygwait (DWORD wait)
-{
-  return cygwait ((HANDLE) NULL, wait);
-}
 #endif
 bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
 int __stdcall sig_send (_pinfo *, siginfo_t&, class _cygtls *tls = NULL) __attribute__ ((regparm (3)));

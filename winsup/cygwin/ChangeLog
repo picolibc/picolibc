@@ -1,3 +1,35 @@
+2012-06-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	Add '#include "cygwait.h"' throughout, where appropriate.
+	* DevNotes: Add entry cgf-000012.
+	* Makefile.in (DLL_OFILES): Add cygwait.o.
+	* sigproc.h: Remove cygwait definitions.
+	* cygwait.h: New file.  Define/declare Cygwin waitfor functions.
+	* cygwait.cc: Ditto.
+	* exceptions.cc: Include cygwait.h.
+	(handle_sigsuspend): Accommodate change in cancelable_wait arguments.
+	(sigpacket::process): Display thread tls in debugging output.
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Use symbolic
+	names for signal and cancel return.
+	* fhandler_console.cc (fhandler_console::read): Ditto.
+	(fhandler_dev_dsp::Audio_out::waitforspace): Ditto.
+	fhandler_dev_dsp::Audio_in::waitfordata): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo::wait): Ditto.
+	* fhandler_serial.cc (fhandler_serial::raw_read): Ditto.
+	* fhandler_tty.cc (fhandler_pty_slave::read): Ditto.
+	* select.cc (cygwin_select): Ditto.
+	* wait.cc (wait4): Ditto.
+	* thread.cc (cancelable_wait): Move definition to cygwait.h.
+	(pthread_cond::wait): Accommodate change in cancelable_wait arguments.
+	(pthread_mutex::lock): Ditto.
+	(pthread_spinlock::lock): Ditto.
+	(pthread::join): Ditto.
+	(pthread::thread_init_wrapper): Display tls in debugging output.
+	(semaphore::_timedwait): Ditto.
+	* thread.h (cw_sig_wait): Move to cygwait.h.
+	(cw_cancel_action): Delete.
+	(cancelable_wait): Move declaration to cygwait.h.
+
 2012-06-11  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* regex/regcomp.c (p_ere): Allow vertical-line following

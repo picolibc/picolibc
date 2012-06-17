@@ -32,6 +32,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
+#include "cygwait.h"
 
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
@@ -937,92 +938,6 @@ pthread::static_cancel_self ()
   pthread::self ()->cancel_self ();
 }
 
-DWORD
-cancelable_wait (HANDLE object, PLARGE_INTEGER timeout,
-		 const cw_cancel_action cancel_action,
-		 const enum cw_sig_wait sig_wait)
-{
-  DWORD res;
-  DWORD num = 0;
-  HANDLE wait_objects[4];
-  pthread_t thread = pthread::self ();
-
-  /* Do not change the wait order.
-     The object must have higher priority than the cancel event,
-     because WaitForMultipleObjects will return the smallest index
-     if both objects are signaled. */
-  wait_objects[num++] = object;
-  DWORD cancel_n;
-  if (cancel_action == cw_no_cancel || !pthread::is_good_object (&thread) ||
-      thread->cancelstate == PTHREAD_CANCEL_DISABLE)
-    cancel_n = WAIT_TIMEOUT + 1;
-  else
-    {
-      cancel_n = WAIT_OBJECT_0 + num++;
-      wait_objects[cancel_n] = thread->cancel_event;
-    }
-
-  DWORD sig_n;
-  if (sig_wait == cw_sig_nosig)
-    sig_n = WAIT_TIMEOUT + 1;
-  else
-    {
-      sig_n = WAIT_OBJECT_0 + num++;
-      wait_objects[sig_n] = signal_arrived;
-    }
-
-  DWORD timeout_n;
-  if (!timeout)
-    timeout_n = WAIT_TIMEOUT + 1;
-  else
-    {
-      timeout_n = WAIT_OBJECT_0 + num++;
-      if (!_my_tls.locals.cw_timer)
-	NtCreateTimer (&_my_tls.locals.cw_timer, TIMER_ALL_ACCESS, NULL,
-		       NotificationTimer);
-      NtSetTimer (_my_tls.locals.cw_timer, timeout, NULL, NULL, FALSE, 0, NULL);
-      wait_objects[timeout_n] = _my_tls.locals.cw_timer;
-    }
-
-  while (1)
-    {
-      res = WaitForMultipleObjects (num, wait_objects, FALSE, INFINITE);
-      if (res == cancel_n)
-	{
-	  if (cancel_action == cw_cancel_self)
-	    pthread::static_cancel_self ();
-	  res = WAIT_CANCELED;
-	}
-      else if (res == timeout_n)
-	res = WAIT_TIMEOUT;
-      else if (res != sig_n)
-	/* all set */;
-      else if (sig_wait == cw_sig_eintr)
-	res = WAIT_SIGNALED;
-      else
-	{
-	  _my_tls.call_signal_handler ();
-	  continue;
-	}
-      break;
-    }
-
-  if (timeout)
-    {
-      TIMER_BASIC_INFORMATION tbi;
-
-      NtQueryTimer (_my_tls.locals.cw_timer, TimerBasicInformation, &tbi,
-		    sizeof tbi, NULL);
-      /* if timer expired, TimeRemaining is negative and represents the
-	  system uptime when signalled */
-      if (timeout->QuadPart < 0LL)
-	timeout->QuadPart = tbi.SignalState ? 0LL : tbi.TimeRemaining.QuadPart;
-      NtCancelTimer (_my_tls.locals.cw_timer, NULL);
-    }
-
-  return res;
-}
-
 int
 pthread::setcancelstate (int state, int *oldstate)
 {
@@ -1313,7 +1228,7 @@ pthread_cond::wait (pthread_mutex_t mutex, PLARGE_INTEGER timeout)
   ++mutex->condwaits;
   mutex->unlock ();
 
-  rv = cancelable_wait (sem_wait, timeout, cw_no_cancel_self, cw_sig_eintr);
+  rv = cancelable_wait (sem_wait, timeout, cw_cancel | cw_sig_eintr);
 
   mtx_out.lock ();
 
@@ -1828,7 +1743,8 @@ pthread_mutex::lock ()
   else if (type == PTHREAD_MUTEX_NORMAL /* potentially causes deadlock */
 	   || !pthread::equal (owner, self))
     {
-      cancelable_wait (win32_obj_id, NULL, cw_no_cancel, cw_sig_resume);
+      /* FIXME: no cancel? */
+      cancelable_wait (win32_obj_id, NULL, cw_sig);
       set_owner (self);
     }
   else
@@ -1968,7 +1884,8 @@ pthread_spinlock::lock ()
 	  /* Minimal timeout to minimize CPU usage while still spinning. */
 	  LARGE_INTEGER timeout;
 	  timeout.QuadPart = -10000LL;
-	  cancelable_wait (win32_obj_id, &timeout, cw_no_cancel, cw_sig_resume);
+	  /* FIXME: no cancel? */
+	  cancelable_wait (win32_obj_id, &timeout, cw_sig);
 	}
     }
   while (result == -1);
@@ -2013,6 +1930,7 @@ pthread::thread_init_wrapper (void *arg)
   _my_tls.sigmask = thread->parent_sigmask;
   thread->mutex.unlock ();
 
+  debug_printf ("tid %p", &_my_tls);
   thread_printf ("started thread %p %p %p %p %p %p", arg, &_my_tls.local_clib,
 		 _impure_ptr, thread, thread->function, thread->arg);
 
@@ -2446,7 +2364,7 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->mutex.unlock ();
 
-      switch (cancelable_wait ((*thread)->win32_obj_id, NULL, cw_no_cancel_self, cw_sig_resume))
+      switch (cancelable_wait ((*thread)->win32_obj_id, NULL, cw_sig | cw_cancel))
 	{
 	case WAIT_OBJECT_0:
 	  if (return_val)
@@ -3561,7 +3479,7 @@ semaphore::_timedwait (const struct timespec *abstime)
   timeout.QuadPart = abstime->tv_sec * NSPERSEC
 		     + (abstime->tv_nsec + 99) / 100 + FACTOR;
 
-  switch (cancelable_wait (win32_obj_id, &timeout, cw_cancel_self, cw_sig_eintr))
+  switch (cancelable_wait (win32_obj_id, &timeout, cw_cancel | cw_cancel_self | cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
@@ -3583,7 +3501,7 @@ semaphore::_timedwait (const struct timespec *abstime)
 int
 semaphore::_wait ()
 {
-  switch (cancelable_wait (win32_obj_id, NULL, cw_cancel_self, cw_sig_eintr))
+  switch (cancelable_wait (win32_obj_id, NULL, cw_cancel | cw_cancel_self | cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
