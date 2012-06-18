@@ -1,3 +1,9 @@
+2012-06-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (init_cygheap::init_installation_root): Rearrange code
+	creating valid native NT installation_root path.  Only strip last
+	backslash from path if the result is a valid NT path.  Explain why.
+
 2012-06-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	Add '#include "cygwait.h"' throughout, where appropriate.

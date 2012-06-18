@@ -170,18 +170,28 @@ init_cygheap::init_installation_root ()
 	       "GetModuleFileNameW(%p, %p, %u), %E",
 	       cygwin_hmodule, installation_root, PATH_MAX);
   PWCHAR p = installation_root;
-  if (wcsncmp (p, L"\\\\?\\", 4))	/* No long path prefix. */
+  if (wcsncasecmp (p, L"\\\\", 2))	/* Normal drive letter path */
     {
-      if (!wcsncasecmp (p, L"\\\\", 2))	/* UNC */
+      p = wcpcpy (p, L"\\??\\");
+      GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
+    }
+  else
+    {
+      bool unc = false;
+      if (wcsncmp (p + 2, L"?\\", 2))	/* No long path prefix, so UNC path. */
 	{
 	  p = wcpcpy (p, L"\\??\\UN");
 	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 6);
 	  *p = L'C';
+	  unc = true;
 	}
-      else
+      else if (!wcsncmp (p + 4, L"UNC\\", 4)) /* Native NT UNC path. */
+	unc = true;
+      if (unc)
 	{
-	  p = wcpcpy (p, L"\\??\\");
-	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
+	  p = wcschr (p + 2, L'\\');    /* Skip server name */
+	  if (p)
+	    p = wcschr (p + 1, L'\\');  /* Skip share name */
 	}
     }
   installation_root[1] = L'?';
@@ -200,7 +210,13 @@ init_cygheap::init_installation_root ()
   if (!w)
     api_fatal ("Can't initialize Cygwin installation root dir.\n"
 	       "Invalid DLL path");
-  *w = L'\0';
+  /* If w < p, the Cygwin DLL resides in the root dir of a drive or network
+     path.  In that case, if we strip off yet another backslash, the path
+     becomes invalid.  We avoid that here so that the DLL also works in this
+     scenario.  The /usr/bin and /usr/lib default mounts will probably point
+     to something non-existing, but that's life. */
+  if (w > p)
+    *w = L'\0';
 
   for (int i = 1; i >= 0; --i)
     {
