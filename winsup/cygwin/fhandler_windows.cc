@@ -96,8 +96,7 @@ fhandler_windows::read (void *buf, size_t& len)
       return;
     }
 
-  HANDLE w4[3] = { get_handle (), };
-  set_thread_waiting (w4[1]);
+  HANDLE w4[3] = { get_handle (), signal_arrived, NULL };
   DWORD cnt = 2;
   if ((w4[cnt] = pthread::get_cancel_event ()) != NULL)
     ++cnt;

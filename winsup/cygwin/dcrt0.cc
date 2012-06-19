@@ -842,6 +842,8 @@ dll_crt0_1 (void *)
   strace.microseconds ();
 #endif
 
+  create_signal_arrived (); /* FIXME: move into wait_sig? */
+
   /* Initialize debug muto, if DLL is built with --enable-debugging.
      Need to do this before any helper threads start. */
   debug_init ();

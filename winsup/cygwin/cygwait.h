@@ -11,6 +11,9 @@
 
 #pragma once
 
+#define WAIT_CANCELED   (WAIT_OBJECT_0 + 2)
+#define WAIT_SIGNALED  (WAIT_OBJECT_0 + 1)
+
 enum cw_wait_mask
 {
   cw_cancel =		0x0001,
@@ -19,8 +22,6 @@ enum cw_wait_mask
   cw_sig_eintr =	0x0008
 };
 
-extern TIMER_BASIC_INFORMATION cw_nowait;
-
 const unsigned cw_std_mask = cw_cancel | cw_cancel_self | cw_sig;
 
 DWORD cancelable_wait (HANDLE, PLARGE_INTEGER timeout = NULL,
@@ -28,7 +29,7 @@ DWORD cancelable_wait (HANDLE, PLARGE_INTEGER timeout = NULL,
   __attribute__ ((regparm (3)));
 
 static inline DWORD __attribute__ ((always_inline))
-cancelable_wait (HANDLE h, DWORD howlong, unsigned mask)
+cygwait (HANDLE h, DWORD howlong = INFINITE)
 {
   PLARGE_INTEGER pli_howlong;
   LARGE_INTEGER li_howlong;
@@ -39,14 +40,7 @@ cancelable_wait (HANDLE h, DWORD howlong, unsigned mask)
       li_howlong.QuadPart = 10000ULL * howlong;
       pli_howlong = &li_howlong;
     }
-
-  return cancelable_wait (h, pi_howlong, mask);
-}
-
-static inline DWORD __attribute__ ((always_inline))
-cygwait (HANDLE h, DWORD howlong = INFINITE)
-{
-  return cancelable_wait (h, howlong, cw_cancel | cw_sig_eintr);
+  return cancelable_wait (h, pli_howlong, cw_cancel | cw_sig);
 }
 
 static inline DWORD __attribute__ ((always_inline))
@@ -54,29 +48,3 @@ cygwait (DWORD howlong)
 {
   return cygwait ((HANDLE) NULL, howlong);
 }
-
-class set_thread_waiting
-{
-  void doit (bool setit, DWORD& here)
-  {
-    if (setit)
-      {
-	if (_my_tls.signal_arrived == NULL)
-	  _my_tls.signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
-	here = _my_tls.signal_arrived;
-	_my_tls.waiting = true;
-      }
-  }
-public:
-  set_thread_waiting (bool setit, DWORD& here) { doit (setit, here); }
-  set_thread_waiting (DWORD& here) { doit (true, here); }
-
-  ~set_thread_waiting ()
-  {
-    if (_my_tls.waiting)
-      {
-	_my_tls.waiting = false;
-	ResetEvent (_my_tls.signal_arrived);
-      }
-  }
-};

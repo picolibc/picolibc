@@ -120,9 +120,12 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
 
   syscall_printf ("clock_nanosleep (%ld.%09ld)", rqtp->tv_sec, rqtp->tv_nsec);
 
-  int rc = cancelable_wait (NULL, &timeout, cw_sig | cw_cancel | cw_cancel_self);
-  if (rc == WAIT_SIGNALED)
-    res = EINTR;
+  int rc = cancelable_wait (signal_arrived, &timeout);
+  if (rc == WAIT_OBJECT_0)
+    {
+      _my_tls.call_signal_handler ();
+      res = EINTR;
+    }
 
   /* according to POSIX, rmtp is used only if !abstime */
   if (rmtp && !abstime)
@@ -562,14 +565,21 @@ extern "C" int
 sigwaitinfo (const sigset_t *set, siginfo_t *info)
 {
   pthread_testcancel ();
+  HANDLE h;
+  h = _my_tls.event = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+  if (!h)
+    {
+      __seterrno ();
+      return -1;
+    }
 
   _my_tls.sigwait_mask = *set;
   sig_dispatch_pending (true);
 
   int res;
-  switch (cancelable_wait (NULL, NULL, cw_sig | cw_cancel | cw_cancel_self))
+  switch (WaitForSingleObject (h, INFINITE))
     {
-    case WAIT_SIGNALED:
+    case WAIT_OBJECT_0:
       if (!sigismember (set, _my_tls.infodata.si_signo))
 	{
 	  set_errno (EINTR);
@@ -588,6 +598,8 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
       res = -1;
     }
 
+  _my_tls.event = NULL;
+  CloseHandle (h);
   sigproc_printf ("returning signal %d", res);
   return res;
 }

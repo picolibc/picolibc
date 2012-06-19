@@ -21,8 +21,6 @@
 
 #define is_cw_sig_handle	(mask & (is_cw_sig | is_cw_sig_eintr))
 
-TIMER_BASIC_INFORMATION cw_nowait;
-
 DWORD
 cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 {
@@ -85,11 +83,8 @@ cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 	/* all set */;
       else if (is_cw_sig_eintr)
 	res = WAIT_SIGNALED;
-      else
-	{
-	  _my_tls.call_signal_handler ();
-	  continue;
-	}
+      else if (_my_tls.call_signal_handler () || &_my_tls != _main_tls)
+	continue;
       break;
     }
 

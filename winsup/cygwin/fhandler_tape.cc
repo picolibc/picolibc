@@ -1142,14 +1142,26 @@ mtinfo::initialize ()
 inline bool
 fhandler_dev_tape::_lock (bool cancelable)
 {
+  HANDLE w4[3] = { mt_mtx, signal_arrived, NULL };
+  DWORD cnt = 2;
+  if (cancelable && (w4[2] = pthread::get_cancel_event ()) != NULL)
+    cnt = 3;
   /* O_NONBLOCK is only valid in a read or write call.  Only those are
      cancelable. */
   DWORD timeout = cancelable && is_nonblocking () ? 0 : INFINITE;
 restart:
-  switch (cancelable_wait (mt_mtx, timeout, cw_sig | cw_cancel | cw_cancel_self))
+  switch (WaitForMultipleObjects (cnt, w4, FALSE, timeout))
     {
     case WAIT_OBJECT_0:
       return true;
+    case WAIT_OBJECT_0 + 1:
+      if (_my_tls.call_signal_handler ())
+	goto restart;
+      set_errno (EINTR);
+      return false;
+    case WAIT_OBJECT_0 + 2:
+      pthread::static_cancel_self ();
+      /*NOTREACHED*/
     case WAIT_TIMEOUT:
       set_errno (EAGAIN);
       return false;

@@ -344,9 +344,6 @@ public:
   pthread_spinlock (int);
 };
 
-#define WAIT_CANCELED   (WAIT_OBJECT_0 + 1)
-#define WAIT_SIGNALED  (WAIT_OBJECT_0 + 2)
-
 class _cygtls;
 class pthread: public verifyable_object
 {

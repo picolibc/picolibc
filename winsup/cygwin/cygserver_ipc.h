@@ -43,7 +43,7 @@ ipc_set_proc_info (proc &blk)
   blk.gidcnt = 0;
   blk.gidlist = NULL;
   blk.is_admin = false;
-  blk.signal_arrived = _my_tls.signal_arrived;
+  blk.signal_arrived = signal_arrived;
 }
 #endif /* __INSIDE_CYGWIN__ */
 
