@@ -1,5 +1,20 @@
 2012-06-18  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* cygwait.h (LARGE_NULL): Define.
+	(cancelable_wait): Define variant which accepts DWORD time argument.
+	(cygwait): Use cancelable_wait with DWORD argument.
+	(cygwait): Use cancelable_wait with DWORD argument and cw_sig_eintr for
+	timeout-only case.
+	* exceptions.cc (handle_sigsuspend): Use LARGE_NULL as second argument
+	to distinguish between cancelable_wait variants.
+	* thread.cc (pthread_mutex::lock): Ditto.
+	(pthread::join): Ditto.
+	(semaphore::_timedwait): Ditto.
+	* thread.h (fast_mutex::lock): Ditto.
+	* wait.cc (wait4): Ditto.
+
+2012-06-18  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* cygwait.cc (cancelable_wait): Mimic old cygwait behavior more closely
 	wrt handling of call_signal_handler.
 	* cygwait.h (WAIT_CANCELED): Move here and redefine.

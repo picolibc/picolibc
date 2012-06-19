@@ -1744,7 +1744,7 @@ pthread_mutex::lock ()
 	   || !pthread::equal (owner, self))
     {
       /* FIXME: no cancel? */
-      cancelable_wait (win32_obj_id, NULL, cw_sig);
+      cancelable_wait (win32_obj_id, LARGE_NULL, cw_sig);
       set_owner (self);
     }
   else
@@ -2364,7 +2364,7 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->mutex.unlock ();
 
-      switch (cancelable_wait ((*thread)->win32_obj_id, NULL, cw_sig | cw_cancel))
+      switch (cancelable_wait ((*thread)->win32_obj_id, LARGE_NULL, cw_sig | cw_cancel))
 	{
 	case WAIT_OBJECT_0:
 	  if (return_val)
@@ -3501,7 +3501,7 @@ semaphore::_timedwait (const struct timespec *abstime)
 int
 semaphore::_wait ()
 {
-  switch (cancelable_wait (win32_obj_id, NULL, cw_cancel | cw_cancel_self | cw_sig_eintr))
+  switch (cancelable_wait (win32_obj_id, LARGE_NULL, cw_cancel | cw_cancel_self | cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;

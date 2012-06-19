@@ -715,7 +715,7 @@ handle_sigsuspend (sigset_t tempmask)
   sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
-  cancelable_wait (signal_arrived, NULL, cw_cancel | cw_cancel_self);
+  cancelable_wait (signal_arrived, LARGE_NULL, cw_cancel | cw_cancel_self);
 
   set_sig_errno (EINTR);	// Per POSIX
 
