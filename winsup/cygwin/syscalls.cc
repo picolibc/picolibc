@@ -2295,7 +2295,7 @@ retry:
     {
       debug_printf ("status %p", status);
       if (status == STATUS_SHARING_VIOLATION
-	  && WaitForSingleObject (signal_arrived, 10L) != WAIT_OBJECT_0)
+	  && cygwait (10L) != WAIT_SIGNALED)
 	{
 	  /* Typical BLODA problem.  Some virus scanners check newly generated
 	     files and while doing that disallow DELETE access.  That's really

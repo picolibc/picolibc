@@ -373,20 +373,16 @@ cygthread::detach (HANDLE sigwait)
 	  LONG prio = GetThreadPriority (hth);
 	  ::SetThreadPriority (hth, THREAD_PRIORITY_BELOW_NORMAL);
 
-	  HANDLE w4[2];
-	  unsigned n = 2;
 	  DWORD howlong = INFINITE;
-	  w4[0] = sigwait;
-	  w4[1] = signal_arrived;
 	  /* For a description of the below loop see the end of this file */
 	  for (int i = 0; i < 2; i++)
-	    switch (res = WaitForMultipleObjects (n, w4, FALSE, howlong))
+	    switch (res = cygwait (sigwait, howlong))
 	      {
 	      case WAIT_OBJECT_0:
 		if (n == 1)
 		  howlong = 50;
 		break;
-	      case WAIT_OBJECT_0 + 1:
+	      case WAIT_SIGNALED:
 		n = 1;
 		if (i--)
 		  howlong = 50;
@@ -395,20 +391,7 @@ cygthread::detach (HANDLE sigwait)
 		break;
 	      default:
 		if (!exiting)
-		  {
-		    system_printf ("WFMO failed waiting for cygthread '%s', %E", __name);
-		    for (unsigned j = 0; j < n; j++)
-		      switch (WaitForSingleObject (w4[j], 0))
-			{
-			case WAIT_OBJECT_0:
-			case WAIT_TIMEOUT:
-			  break;
-			default:
-			  system_printf ("%s handle %p is bad", (j ? "signal_arrived" : "semaphore"), w4[j]);
-			  break;
-			}
-		    api_fatal ("exiting on fatal error");
-		  }
+		  api_fatal ("WFMO failed waiting for cygthread '%s', %E", __name);
 		break;
 	      }
 	  /* WAIT_OBJECT_0 means that the thread successfully read something,

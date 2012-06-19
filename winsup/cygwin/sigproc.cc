@@ -43,9 +43,6 @@ int __sp_ln;
 
 char NO_COPY myself_nowait_dummy[1] = {'0'};// Flag to sig_send that signal goes to
 					//  current process but no wait is required
-HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
-					//  resulted in a user-specified
-					//  function call
 
 #define Static static NO_COPY
 
@@ -516,17 +513,6 @@ sig_dispatch_pending (bool fast)
      signals. */
   if (sigq.pending ())
     sig_send (myself, fast ? __SIGFLUSHFAST : __SIGFLUSH);
-}
-
-void __stdcall
-create_signal_arrived ()
-{
-  if (signal_arrived)
-    return;
-  /* local event signaled when main thread has been dispatched
-     to a signal handler function. */
-  signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
-  ProtectHandle (signal_arrived);
 }
 
 /* Signal thread initialization.  Called from dll_crt0_1.

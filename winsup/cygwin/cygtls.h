@@ -174,7 +174,8 @@ public:
   int sa_flags;
   sigset_t oldmask;
   sigset_t deltamask;
-  HANDLE event;
+  HANDLE signal_arrived;
+  bool waiting;
   int *errno_addr;
   sigset_t sigmask;
   sigset_t sigwait_mask;

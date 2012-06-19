@@ -1,3 +1,12 @@
+2012-06-18  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygwait.cc (cancelable_wait): Mimic old cygwait behavior more closely
+	wrt handling of call_signal_handler.
+	* cygwait.h (WAIT_CANCELED): Move here and redefine.
+	(WAIT_SIGNALED): Ditto.
+	* thread.h (WAIT_CANCELED): Delete.
+	(WAIT_SIGNALED): Ditto.
+
 2012-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc (init_cygheap::init_installation_root): Rearrange code

@@ -204,7 +204,7 @@ fhandler_termios::bg_check (int sig)
     {
       /* Don't raise a SIGTT* signal if we have already been
 	 interrupted by another signal. */
-      if (WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
+      if (cygwait (0) != WAIT_SIGNALED)
 	{
 	  siginfo_t si = {0};
 	  si.si_signo = sig;

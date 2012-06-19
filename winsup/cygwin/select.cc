@@ -312,7 +312,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   select_record *s = &start;
   DWORD m = 0;
 
-  w4[m++] = signal_arrived;  /* Always wait for the arrival of a signal. */
+  set_thread_waiting (w4[m++]);
   if ((w4[m] = pthread::get_cancel_event ()) != NULL)
     m++;
 

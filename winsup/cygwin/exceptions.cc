@@ -715,7 +715,7 @@ handle_sigsuspend (sigset_t tempmask)
   sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
-  cancelable_wait (signal_arrived, NULL, cw_cancel | cw_cancel_self);
+  cancelable_wait (NULL, NULL, cw_cancel | cw_cancel_self | cw_sig_eintr);
 
   set_sig_errno (EINTR);	// Per POSIX
 
@@ -748,8 +748,7 @@ sig_handle_tty_stop (int sig)
   sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
   HANDLE w4[2];
   w4[0] = sigCONT;
-  w4[1] = signal_arrived;
-  switch (WaitForMultipleObjects (2, w4, TRUE, INFINITE))
+  switch (cancelable_wait (sigCONT, NULL, cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
     case WAIT_OBJECT_0 + 1:
@@ -1248,7 +1247,7 @@ sigpacket::process ()
 	{
 	  sigproc_printf ("default signal %d ignored", si.si_signo);
 	  if (continue_now)
-	    SetEvent (signal_arrived);
+	    SetEvent (use_tls->signal_arrived);
 	  goto done;
 	}
 

@@ -21,6 +21,8 @@
 
 #define is_cw_sig_handle	(mask & (is_cw_sig | is_cw_sig_eintr))
 
+TIMER_BASIC_INFORMATION cw_nowait;
+
 DWORD
 cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 {
