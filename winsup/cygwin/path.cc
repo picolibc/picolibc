@@ -3206,11 +3206,14 @@ realpath (const char *path, char *resolved)
   if (efault.faulted (EFAULT))
     return NULL;
 
+  /* Win32 drive letter paths have to be converted to a POSIX path first,
+     because path_conv lets the incoming path untouched except for converting
+     backslashes to forward slashes. */
   char *tpath;
   if (isdrive (path))
     {
       tpath = tp.c_get ();
-      mount_table->cygdrive_posix_path (path, tpath, 0);
+      mount_table->conv_to_posix_path (path, tpath, 0);
     }
   else
     tpath = (char *) path;
