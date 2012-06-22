@@ -3207,8 +3207,8 @@ realpath (const char *path, char *resolved)
     return NULL;
 
   /* Win32 drive letter paths have to be converted to a POSIX path first,
-     because path_conv lets the incoming path untouched except for converting
-     backslashes to forward slashes. */
+     because path_conv leaves the incoming path untouched except for
+     converting backslashes to forward slashes. */
   char *tpath;
   if (isdrive (path))
     {
