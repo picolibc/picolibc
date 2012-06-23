@@ -1,3 +1,7 @@
+2012-06-23  Doug Evans  <dje@google.com>
+
+	* gdb-index.h: New file.
+
 2012-05-24  Pedro Alves  <palves@redhat.com>
 
 	PR gdb/7205
