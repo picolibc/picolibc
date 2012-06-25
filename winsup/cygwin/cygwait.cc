@@ -72,17 +72,13 @@ cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
     {
       res = WaitForMultipleObjects (num, wait_objects, FALSE, INFINITE);
       if (res == cancel_n)
-	{
-	  if (is_cw_cancel_self)
-	    pthread::static_cancel_self ();
-	  res = WAIT_CANCELED;
-	}
+	res = WAIT_CANCELED;
       else if (res == timeout_n)
 	res = WAIT_TIMEOUT;
       else if (res != sig_n)
 	/* all set */;
       else if (is_cw_sig_eintr)
-	res = WAIT_SIGNALED;
+	res = WAIT_SIGNALED;	/* caller will deal with signals */
       else if (_my_tls.call_signal_handler () || &_my_tls != _main_tls)
 	continue;
       break;
@@ -100,6 +96,9 @@ cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 	timeout->QuadPart = tbi.SignalState ? 0LL : tbi.TimeRemaining.QuadPart;
       NtCancelTimer (_my_tls.locals.cw_timer, NULL);
     }
+
+  if (res == WAIT_CANCELED && is_cw_cancel_self)
+    pthread::static_cancel_self ();
 
   return res;
 }

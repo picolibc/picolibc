@@ -1,5 +1,10 @@
 2012-06-25  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* cygwait.cc (cancelable_wait): Make sure that timer is cancelled
+	before cancelling thread.
+
+2012-06-25  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* cygwait.h (cancelable_wait): Need to force time to negative to
 	indicate relative time.
 
