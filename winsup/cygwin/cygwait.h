@@ -38,7 +38,7 @@ cancelable_wait (HANDLE h, DWORD howlong, unsigned mask)
     pli_howlong = NULL;
   else
     {
-      li_howlong.QuadPart = 10000ULL * howlong;
+      li_howlong.QuadPart = -(10000ULL * howlong);
       pli_howlong = &li_howlong;
     }
   return cancelable_wait (h, pli_howlong, mask);
