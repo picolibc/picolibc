@@ -1,7 +1,7 @@
 /* winsup.h: main Cygwin header file.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -90,9 +90,6 @@ extern const char case_folded_upper[];
 
 #include "winlean.h"
 #include "wincap.h"
-
-/* The one function we use from winuser.h most of the time */
-extern "C" DWORD WINAPI GetLastError (void);
 
 /* Used as type by sys_wcstombs_alloc and sys_mbstowcs_alloc.  For a
    description see there. */
