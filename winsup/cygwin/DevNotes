@@ -8,7 +8,7 @@ http://cygwin.com/ml/cygwin/2012-05/msg00434.html
 I've known that the signal handling in threads wasn't quite right for
 some time.  I lost all of my thread signal tests in the great "rm -r"
 debacle of a few years ago and have been less than enthusiastic about
-redoing everything (I had PCTS tests and everyting).  But it really is
+redoing everything (I had PCTS tests and everything).  But it really is
 time to redo this signal handling to make it more like it is supposed to
 be.
 
