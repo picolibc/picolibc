@@ -109,19 +109,22 @@ typedef _CLOCK_T_ clock_t;
 #ifndef __time_t_defined
 typedef _TIME_T_ time_t;
 #define __time_t_defined
+#endif
 
+#ifndef __timespec_defined
+#define __timespec_defined
 /* Time Value Specification Structures, P1003.1b-1993, p. 261 */
 
 struct timespec {
   time_t  tv_sec;   /* Seconds */
   long    tv_nsec;  /* Nanoseconds */
 };
+#endif
 
 struct itimerspec {
   struct timespec  it_interval;  /* Timer period */
   struct timespec  it_value;     /* Timer expiration */
 };
-#endif
 
 typedef	long	daddr_t;
 typedef	char *	caddr_t;

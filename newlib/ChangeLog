@@ -1,3 +1,9 @@
+2012-06-26  Christopher Faylor  <me.newlib2012@cgf.cx>
+
+	* libc/include/sys/types.h: Don't use the same preprocessor guard for
+	time_t, timespec, and itimerspec.  Add a separate guard specifically
+	for timespec and always unconditionally define itimerspec.
+
 2012-06-05  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/findfp.c (__sinit): Avoid infinite recursion on
