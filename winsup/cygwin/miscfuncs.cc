@@ -365,7 +365,7 @@ ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len, LPDWORD ret_len,
 }
 
 BOOL WINAPI
-WritePipeOverlapped (HANDLE h, PCVOID buf, DWORD len, LPDWORD ret_len,
+WritePipeOverlapped (HANDLE h, LPCVOID buf, DWORD len, LPDWORD ret_len,
 		     DWORD timeout)
 {
   OVERLAPPED ov;

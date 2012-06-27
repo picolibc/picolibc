@@ -1,7 +1,7 @@
 /* miscfuncs.h: main Cygwin header file.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -21,7 +21,7 @@ BOOL WINAPI CreatePipeOverlapped (PHANDLE read_handle, PHANDLE write_handle,
 				  LPSECURITY_ATTRIBUTES sa);
 BOOL WINAPI ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len,
 				LPDWORD ret_len, DWORD timeout);
-BOOL WINAPI WritePipeOverlapped (HANDLE h, PCVOID buf, DWORD len,
+BOOL WINAPI WritePipeOverlapped (HANDLE h, LPCVOID buf, DWORD len,
 				 LPDWORD ret_len, DWORD timeout);
 
 extern "C" void yield ();

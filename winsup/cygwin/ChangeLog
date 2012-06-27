@@ -1,5 +1,11 @@
 2012-06-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc (WritePipeOverlapped): Define second parameter LPCVOID,
+	rather than PCVOID.
+	* miscfuncs.h (WritePipeOverlapped): Ditto.
+
+2012-06-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* advapi32.cc (_ADVAPI32_): Define.  Explain why.
 	(ImpersonateNamedPipeClient): Add missing WINAPI.
 	* ntdll.h (STATUS_INVALID_PARAMETER): Only define if it isn't already.
