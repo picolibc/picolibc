@@ -1,3 +1,17 @@
+2012-06-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* advapi32.cc (_ADVAPI32_): Define.  Explain why.
+	(ImpersonateNamedPipeClient): Add missing WINAPI.
+	* ntdll.h (STATUS_INVALID_PARAMETER): Only define if it isn't already.
+	(STATUS_DLL_NOT_FOUND): Ditto.
+	(STATUS_ENTRYPOINT_NOT_FOUND): Ditto.
+	(enum _EVENT_TYPE): Guard against redefinition since it's already
+	defined in Mingw64's ntdef.h.
+	(enum _TIMER_TYPE): Ditto.
+	(enum _SECTION_INHERIT): Define if using Mingw64 headers since it's
+	missing in Mingw64's ntdef.h.
+	* winlean.h (__STRALIGN_H_): Define before including windows.h.
+
 2012-06-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.h (GetLastError): Drop redundant definition.

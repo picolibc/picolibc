@@ -1,6 +1,6 @@
 /* winlean.h - Standard "lean" windows include
 
-   Copyright 2010, 2011  Red Hat, Inc.
+   Copyright 2010, 2011, 2012  Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -17,6 +17,7 @@ details. */
 #define _WINVER_H
 #define _WINNETWK_H
 #define _WINSVC_H
+#define __STRALIGN_H_
 #include <windows.h>
 #include <wincrypt.h>
 #include <lmcons.h>
@@ -27,6 +28,7 @@ details. */
 #undef _WINVER_H
 #undef _WINNETWK_H
 #undef _WINSVC_H
+#undef __STRALIGN_H_
 /* When Terminal Services are installed, the GetWindowsDirectory function
    does not return the system installation dir, but a user specific directory
    instead.  That's not what we have in mind when calling GetWindowsDirectory
