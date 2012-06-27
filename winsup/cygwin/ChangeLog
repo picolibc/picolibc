@@ -1,5 +1,12 @@
 2012-06-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (exception::handle): Cast exception code to NTSTATUS
+	for comparison.
+	* ntdll.h: Drop defining NT status codes in favor of including
+	ntstatus.h.
+
+2012-06-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* miscfuncs.cc (WritePipeOverlapped): Define second parameter LPCVOID,
 	rather than PCVOID.
 	* miscfuncs.h (WritePipeOverlapped): Ditto.

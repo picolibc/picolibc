@@ -664,7 +664,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	    stackdump ((DWORD) ebp, in, e);
 	}
 
-      if (e->ExceptionCode == STATUS_ACCESS_VIOLATION)
+      if ((NTSTATUS) e->ExceptionCode == STATUS_ACCESS_VIOLATION)
 	{
 	  int error_code = 0;
 	  if (si.si_code == SEGV_ACCERR)	/* Address present */
