@@ -97,9 +97,9 @@ public:
 
   select_stuff (): return_on_signal (false), always_ready (false),
   		   windows_used (false), start (0),
-		   device_specific_pipe (0),
-		   device_specific_socket (0),
-		   device_specific_serial (0),
-		   device_specific_mailslot (0) {}
+		   device_specific_pipe (NULL),
+		   device_specific_socket (NULL),
+		   device_specific_serial (NULL),
+		   device_specific_mailslot (NULL) {}
 };
 #endif /* _SELECT_H_ */

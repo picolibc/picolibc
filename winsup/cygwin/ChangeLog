@@ -1,3 +1,14 @@
+2012-06-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygwait.h (cancelable_wait): Make extern to avoid always including.
+	* select.cc (allocfd_set): Try to make a little more efficient.
+	(cygwin_select): Break into two functions to avoid what seems to be a
+	strange compiler problem with alloca and sel constructor.
+	(select): New function.  Always honor return from call_signal_handler.
+	(select_stuff::wait): Always honor return from call_signal_handler.
+	* select.h (select_stuff::select_stuff): Use NULL to initialize
+	pointers rather than 0.
+
 2012-06-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (exception::handle): Cast exception code to NTSTATUS

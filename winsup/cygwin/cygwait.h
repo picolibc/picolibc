@@ -29,11 +29,11 @@ DWORD cancelable_wait (HANDLE, PLARGE_INTEGER timeout = NULL,
 		       unsigned = cw_std_mask)
   __attribute__ ((regparm (3)));
 
-static inline DWORD __attribute__ ((always_inline))
+extern inline DWORD __attribute__ ((always_inline))
 cancelable_wait (HANDLE h, DWORD howlong, unsigned mask)
 {
-  PLARGE_INTEGER pli_howlong;
   LARGE_INTEGER li_howlong;
+  PLARGE_INTEGER pli_howlong;
   if (howlong == INFINITE)
     pli_howlong = NULL;
   else
