@@ -1,6 +1,6 @@
 /* ELF support for BFD.
    Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
+   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -934,6 +934,18 @@
    nice things.  */
 #define AT_SYSINFO	32
 #define AT_SYSINFO_EHDR	33 /* Pointer to ELF header of system-supplied DSO.  */
+
+/* More complete cache descriptions than AT_[DIU]CACHEBSIZE.  If the
+   value is -1, then the cache doesn't exist.  Otherwise:
+
+   bit 0-3:  Cache set-associativity; 0 means fully associative.
+   bit 4-7:  Log2 of cacheline size.
+   bit 8-31:  Size of the entire cache >> 8.  */
+
+#define AT_L1I_CACHESHAPE 34
+#define AT_L1D_CACHESHAPE 35
+#define AT_L2_CACHESHAPE  36
+#define AT_L3_CACHESHAPE  37
 
 #define AT_SUN_UID      2000    /* Effective user ID.  */
 #define AT_SUN_RUID     2001    /* Real user ID.  */

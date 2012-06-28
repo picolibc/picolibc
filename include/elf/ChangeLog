@@ -1,3 +1,8 @@
+2012-06-28  Iain Sandoe  <iain@codesourcery.com>
+
+	* common.h (AT_L1I_CACHESHAPE, AT_L1D_CACHESHAPE,
+	AT_L2_CACHESHAPE, AT_L3_CACHESHAPE): New defines.
+
 2012-05-16  Georg-Johann Lay  <avr@gjlay.de>
 
 	PR target/13503
