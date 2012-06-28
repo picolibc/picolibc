@@ -449,7 +449,7 @@ try_to_debug (bool waitloop)
   return dbg;
 }
 
-extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);
+extern "C" void WINAPI RtlUnwind (void *, void *, PEXCEPTION_RECORD, void *);
 static void __stdcall rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline, regparm (3)));
 void __stdcall
 rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)

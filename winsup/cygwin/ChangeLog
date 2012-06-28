@@ -1,3 +1,9 @@
+2012-06-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (RtlUnwind): Align declaration with MSDN.
+	* ntdll.h: Define CreateDisposition Flags.  Add comments.
+	* winlean.h: Define FILE_SHARE_VALID_FLAGS if using Mingw64 headers.
+
 2012-06-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* cygwait.h (cancelable_wait): Make extern to avoid always including.

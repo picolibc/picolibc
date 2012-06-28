@@ -37,4 +37,9 @@ details. */
    use this function.  Use GetSystemWindowsDirectoryW. */
 #define GetWindowsDirectoryW dont_use_GetWindowsDirectory
 #define GetWindowsDirectoryA dont_use_GetWindowsDirectory
+/* FILE_SHARE_VALID_FLAGS is a Mingw32 invention not backed by the system
+   headers.  Therefore it's not defined by Mingw64, either. */
+#ifdef __MINGW64_VERSION_MAJOR
+#define FILE_SHARE_VALID_FLAGS (FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE)
+#endif
 #endif /*_WINLEAN_H*/
