@@ -1,5 +1,14 @@
 2012-06-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_serial.cc: Fix includes for IOCTL codes to support Mingw64.
+	* fhandler_tape.cc: Ditto.
+	* flock.cc (allow_others_to_sync): Use PISECURITY_DESCRIPTOR since
+	PSECURITY_DESCRIPTOR is supposed to be the opaque type.
+	* ntdll.h: Remove CreateDisposition flags again, now that they are
+	defined in Mingw64's ntdef.h.  Ditto for Create/Open flags.
+
+2012-06-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (RtlUnwind): Align declaration with MSDN.
 	* ntdll.h: Define CreateDisposition Flags.  Add comments.
 	* winlean.h: Define FILE_SHARE_VALID_FLAGS if using Mingw64 headers.

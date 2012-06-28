@@ -164,7 +164,7 @@ allow_others_to_sync ()
      at this point because this gets called during initialization when the tls
      is not really available.  */
 #define MAX_PROCESS_SD_SIZE	3072
-  PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) alloca (MAX_PROCESS_SD_SIZE);
+  PISECURITY_DESCRIPTOR sd = (PISECURITY_DESCRIPTOR) alloca (MAX_PROCESS_SD_SIZE);
   status = NtQuerySecurityObject (NtCurrentProcess (),
 				  DACL_SECURITY_INFORMATION, sd,
 				  MAX_PROCESS_SD_SIZE, &len);

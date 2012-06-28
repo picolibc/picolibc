@@ -15,7 +15,12 @@ details. */
 #include <stdlib.h>
 #include <sys/mtio.h>
 #include <sys/param.h>
+#ifdef __MINGW64_VERSION_MAJOR
+#include <devioctl.h>
+#include <ntddstor.h>
+#else
 #include <ddk/ntddstor.h>
+#endif
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
