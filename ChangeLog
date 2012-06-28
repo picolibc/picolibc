@@ -1,3 +1,9 @@
+2012-06-28  Christophe Lyon <christophe.lyon@st.com>
+
+	* configure.ac (CFLAGS_FOR_TARGET, CXXFLAGS_FOR_TARGET): Make sure
+	they contain -O2.
+	* configure: Regenerate.
+
 2012-05-14  Catherine Moore  <clm@codesourcery.com>
 
 	* NEWS:  Mention PowerPC VLE port.
