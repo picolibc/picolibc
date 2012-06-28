@@ -1,3 +1,8 @@
+2012-06-28  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	* doc/Makefile.am (makedoc): Use LDFLAGS_FOR_BUILD not LDFLAGS.
+	* doc/Makefile.in: Regenerate.
+
 2012-06-26  Christopher Faylor  <me.newlib2012@cgf.cx>
 
 	* libc/include/sys/types.h: Don't use the same preprocessor guard for
