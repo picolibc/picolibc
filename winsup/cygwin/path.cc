@@ -2372,8 +2372,6 @@ restart:
   bool had_ext = !!*ext_here;
   while (suffix.next ())
     {
-      bool no_ea = false;
-
       error = 0;
       get_nt_native_path (suffix.path, upath, pflags & PATH_DOS);
       if (h)
@@ -2404,7 +2402,6 @@ restart:
 		 root dir which has EAs enabled? */
 	      || status == STATUS_INVALID_PARAMETER))
 	{
-	  no_ea = true;
 	  /* If EAs are not supported, there's no sense to check them again
 	     with suffixes attached.  So we set eabuf/easize to 0 here once. */
 	  if (status == STATUS_EAS_NOT_SUPPORTED
