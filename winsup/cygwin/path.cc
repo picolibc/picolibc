@@ -112,7 +112,8 @@ muto NO_COPY cwdstuff::cwd_lock;
 static const GUID GUID_shortcut
 			= { 0x00021401L, 0, 0, {0xc0, 0, 0, 0, 0, 0, 0, 0x46}};
 
-enum {
+enum
+{
   WSH_FLAG_IDLIST = 0x01,	/* Contains an ITEMIDLIST. */
   WSH_FLAG_FILE = 0x02,		/* Contains a file locator element. */
   WSH_FLAG_DESC = 0x04,		/* Contains a description. */
@@ -123,24 +124,24 @@ enum {
 };
 
 struct win_shortcut_hdr
-  {
-    DWORD size;		/* Header size in bytes.  Must contain 0x4c. */
-    GUID magic;		/* GUID of shortcut files. */
-    DWORD flags;	/* Content flags.  See above. */
+{
+  DWORD size;		/* Header size in bytes.  Must contain 0x4c. */
+  GUID magic;		/* GUID of shortcut files. */
+  DWORD flags;	/* Content flags.  See above. */
 
-    /* The next fields from attr to icon_no are always set to 0 in Cygwin
-       and U/Win shortcuts. */
-    DWORD attr;	/* Target file attributes. */
-    FILETIME ctime;	/* These filetime items are never touched by the */
-    FILETIME mtime;	/* system, apparently. Values don't matter. */
-    FILETIME atime;
-    DWORD filesize;	/* Target filesize. */
-    DWORD icon_no;	/* Icon number. */
+  /* The next fields from attr to icon_no are always set to 0 in Cygwin
+     and U/Win shortcuts. */
+  DWORD attr;	/* Target file attributes. */
+  FILETIME ctime;	/* These filetime items are never touched by the */
+  FILETIME mtime;	/* system, apparently. Values don't matter. */
+  FILETIME atime;
+  DWORD filesize;	/* Target filesize. */
+  DWORD icon_no;	/* Icon number. */
 
-    DWORD run;		/* Values defined in winuser.h. Use SW_NORMAL. */
-    DWORD hotkey;	/* Hotkey value. Set to 0.  */
-    DWORD dummy[2];	/* Future extension probably. Always 0. */
-  };
+  DWORD run;		/* Values defined in winuser.h. Use SW_NORMAL. */
+  DWORD hotkey;	/* Hotkey value. Set to 0.  */
+  DWORD dummy[2];	/* Future extension probably. Always 0. */
+};
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
@@ -1351,8 +1352,8 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
       if ((tail - dst) >= NT_MAX_PATH)
 	return ENAMETOOLONG;
     }
-   if (tail > dst + 1 && tail[-1] == '.' && tail[-2] == '\\')
-     tail--;
+  if (tail > dst + 1 && tail[-1] == '.' && tail[-2] == '\\')
+    tail--;
   *tail = '\0';
   debug_printf ("%s = normalize_win32_path (%s)", dst, src_start);
   return 0;

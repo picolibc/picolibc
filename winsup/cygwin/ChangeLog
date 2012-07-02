@@ -1,3 +1,7 @@
+2012-07-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* path.cc: Perform some whitespace fixups throughout.
+
 2012-06-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* kernel32.cc (_KERNEL32_): Define.  Explain why.
