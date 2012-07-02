@@ -1721,7 +1721,6 @@ class fhandler_dev_clipboard: public fhandler_base
   _off64_t pos;
   void *membuffer;
   size_t msize;
-  bool eof;
  public:
   fhandler_dev_clipboard ();
   int is_windows () { return 1; }

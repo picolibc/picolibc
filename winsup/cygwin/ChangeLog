@@ -1,3 +1,15 @@
+2012-07-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_clipboard): Remove member eof.
+	* fhandler_clipboard.cc: Throughout remove handling of eof member.
+	(fhandler_dev_clipboard::write): Handle EOF condition immediately,
+	rather than pushing it erroneously to the next read call.  Rearrange
+	code.  Fix bug in CF_UNICODETEXT case which potentially dropped single
+	bytes at the end of the buffer.  Add comment.
+	* strfuncs.cc (sys_cp_wcstombs): Allow returning non-NUL-terminated
+	buffer if dst != NULL and len == (size_t) -1.  Extend leading comment
+	to explain what's returned in more detail.
+
 2012-07-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fhandler_virtual.cc (fhandler_virtual::opendir): Eliminate duplicate
