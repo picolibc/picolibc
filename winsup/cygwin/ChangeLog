@@ -1,5 +1,29 @@
 2012-07-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* Makefile.in: Add some more optimization flags for cygwait, malloc and
+	path.  Explain why -fomit-frame-pointer doesn't work right for passwd.o
+	and path.o.  Add -static to link command line for cygwin0.dll.
+
+	* fhandler_disk_file.cc (fhandler_disk_file::facl): Reorganize slightly
+	to silence compiler warning when compiling with -fstack-check.
+	* net.cc (inet_ntop6): Initialize structure members to silence compiler
+	warning when compiling with -fstack-check.
+
+	* pseudo-reloc.cc (_pei386_runtime_relocator): Make this a C function.
+	Detect NULL u.
+	* winsup.h (_pei386_runtime_relocator): Declare this as extern "C".
+	* lib/_cygwin_crt0_common.cc (_pei386_runtime_relocator): Call with
+	NULL argument.
+
+	* signal.cc (sigaction_worker): Eliminate last argument.  Let callers
+	report their own strace info.  Regparmize.
+	(sigaction): Reflect sigaction_worker changes.
+	(siginterrupt): Ditto.
+
+	* exceptions.cc: Update copyright.
+
+2012-07-01  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* path.cc: Perform some whitespace fixups throughout.
 
 2012-06-28  Corinna Vinschen  <corinna@vinschen.de>

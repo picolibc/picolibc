@@ -328,10 +328,10 @@ do_pseudo_reloc (void * start, void * end, void * base)
 }
 
 #ifdef __CYGWIN__
-void
+extern "C" void
 _pei386_runtime_relocator (per_process *u)
 {
-  if (CYGWIN_VERSION_USE_PSEUDO_RELOC_IN_DLL (u))
+  if (u && CYGWIN_VERSION_USE_PSEUDO_RELOC_IN_DLL (u))
     do_pseudo_reloc (u->pseudo_reloc_start, u->pseudo_reloc_end, u->image_base);
 }
 #else

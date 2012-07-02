@@ -26,7 +26,7 @@ details. */
 
 #define _SA_NORESTART	0x8000
 
-static int sigaction_worker (int, const struct sigaction *, struct sigaction *, bool, const char *)
+static int sigaction_worker (int, const struct sigaction *, struct sigaction *, bool)
   __attribute__ ((regparm (3)));
 
 #define sigtrapped(func) ((func) != SIG_IGN && (func) != SIG_DFL)
@@ -390,9 +390,9 @@ abort (void)
   do_exit (SIGABRT);	/* signal handler didn't exit.  Goodbye. */
 }
 
-static int
+static int  __attribute__ ((regparm (3)))
 sigaction_worker (int sig, const struct sigaction *newact,
-		  struct sigaction *oldact, bool isinternal, const char *fnname)
+		  struct sigaction *oldact, bool isinternal)
 {
   int res = -1;
   myfault efault;
@@ -445,14 +445,15 @@ sigaction_worker (int sig, const struct sigaction *newact,
     }
 
 out:
-  syscall_printf ("%R = %s(%d, %p, %p)", res, fnname, sig, newact, oldact);
   return res;
 }
 
 extern "C" int
 sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 {
-  return sigaction_worker (sig, newact, oldact, false, "sigaction");
+  int res = sigaction_worker (sig, newact, oldact, false);
+  syscall_printf ("%R = sigaction(%d, %p, %p)", res, sig, newact, oldact);
+  return res;
 }
 
 extern "C" int
@@ -549,7 +550,9 @@ siginterrupt (int sig, int flag)
       act.sa_flags &= ~_SA_NORESTART;
       act.sa_flags |= SA_RESTART;
     }
-  return sigaction_worker (sig, &act, NULL, true, "siginterrupt");
+  int res = sigaction_worker (sig, &act, NULL, true);
+  syscall_printf ("%R = siginterrupt(%d, %p)", sig, flag);
+  return res;
 }
 
 extern "C" int
