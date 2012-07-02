@@ -1,6 +1,12 @@
 2012-07-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
-	* path.cc (symlink_info::check): Remove unneeded/unused variable.
+	* mount.cc (mount_info::conv_to_win32_path): Eliminate unneeded
+	assignment found by CLANG.
+
+2012-07-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* path.cc (symlink_info::check): Remove unneeded/unused variable found
+	by CLANG.
 
 2012-07-02  Corinna Vinschen  <corinna@vinschen.de>
 

@@ -648,7 +648,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 
       if (!src_path[n])
 	{
-	  unit = 0;
 	  dst[0] = '\0';
 	  if (mount_table->cygdrive_len > 1)
 	    dev = *cygdrive_dev;
