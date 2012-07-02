@@ -848,6 +848,7 @@ fhandler_registry::open (int flags, mode_t mode)
     {
       set_errno (EROFS);
       res = 0;
+      goto out;
     }
   else
     {
