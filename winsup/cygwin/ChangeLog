@@ -1,5 +1,10 @@
 2012-07-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* pinfo.cc (_pinfo::commune_request): Eliminate unneeded assignment
+	found by Clang.
+
+2012-07-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* external.cc (fillout_pinfo): Return NULL rather than 0.
 	(exit_process): Guard against NULL pointer dereference found by Clang.
 
