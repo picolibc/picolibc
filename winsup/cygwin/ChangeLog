@@ -1,3 +1,8 @@
+2012-07-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* exceptions.cc (exception::handle): Use error_code in klog, as
+	intended.  Found by Clang.
+
 2012-07-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_dev_clipboard): Remove member eof.

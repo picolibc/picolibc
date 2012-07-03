@@ -676,8 +676,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	  klog (LOG_INFO, "%s[%d]: segfault at %08x rip %08x rsp %08x error %d",
 			  __progname, myself->pid,
 			  e->ExceptionInformation[1], in->Eip, in->Esp,
-			  ((in->Eip >= 0x61000000 && in->Eip < 0x61200000)
-			   ? 0 : 4) | (e->ExceptionInformation[0] << 1));
+			  error_code);
 	}
 
       /* Flag signal + core dump */
