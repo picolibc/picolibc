@@ -28,7 +28,7 @@ Corinna's 2012-05-23 change to refcnt exposed a potential problem with
 dup handling where the fdtab could be updated while not locked.
 
 That should be fixed by this change but, on closer examination, it seems
-ilke there are many places where it is possible for the refcnt to be
+like there are many places where it is possible for the refcnt to be
 updated while the fdtab is not locked since the default for
 cygheap_fdget is to not lock the fdtab (and that should be the default -
 you can't have read holding a lock).
