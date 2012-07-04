@@ -835,7 +835,6 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	  if (!ReadFile (get_handle (), buf, readlen, &n, NULL))
 	    {
 	      termios_printf ("read failed, %E");
-	      bytes_in_pipe = 0;
 	      raise (SIGHUP);
 	      bytes_in_pipe = 0;
 	      ptr = NULL;
