@@ -215,10 +215,8 @@ find_first_notloaded_dll (path_conv& pc)
   if (pExeNTHdr)
     {
       DWORD importRVA;
-      DWORD importRVASize;
       DWORD importRVAMaxSize;
       importRVA = pExeNTHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-      importRVASize = pExeNTHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
       if (importRVA)
 	{
 	  long delta = rvadelta (pExeNTHdr, importRVA, importRVAMaxSize);

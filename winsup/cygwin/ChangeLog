@@ -1,5 +1,10 @@
 2012-07-04  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* hookapi.cc (find_first_notloaded_dll): Remove unused assignment of
+	importRVASize found by Clang.
+
+2012-07-04  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* fhandler_tty.cc (fhandler_pty_slave::read): Remove duplicate
 	assignment to bytes_in_pipe found by Clang.
 
