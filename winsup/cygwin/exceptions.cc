@@ -880,7 +880,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	    interrupted = tls->interrupt_now (&cx, sig, handler, siga);
 
 	  tls->unlock ();
-	  res = ResumeThread (hth);
+	  ResumeThread (hth);
 	  if (interrupted)
 	    goto out;
 
