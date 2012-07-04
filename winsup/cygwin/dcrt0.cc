@@ -353,7 +353,8 @@ build_argv (char *cmd, char **&argv, int &argc, int winshell)
 	}
     }
 
-  argv[argc] = NULL;
+  if (argv)
+    argv[argc] = NULL;
 
   debug_printf ("argc %d", argc);
 }

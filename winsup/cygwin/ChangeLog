@@ -1,5 +1,10 @@
 2012-07-04  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* dcrt0.cc (build_argv): Guard against NULL pointer dereference found
+	by Clang.
+
+2012-07-04  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* exceptions.cc (setup_handler): Remove unneeded assignment found by
 	Clang.
 
