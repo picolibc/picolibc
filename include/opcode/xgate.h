@@ -77,7 +77,7 @@
 #define XGATE_OP_IDO5	        "r,r,i5"
 #define XGATE_OP_REL9	        "b9"
 #define XGATE_OP_REL10	        "ba"
-#define XGATE_OP_DYA_MON	"=r,r"
+#define XGATE_OP_DYA_MON	"=r"
 /* Macro definitions.  */
 #define XGATE_OP_IMM16mADD    "r,if; addl addh"
 #define XGATE_OP_IMM16mAND    "r,if; andl andh"
