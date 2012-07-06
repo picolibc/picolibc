@@ -10,6 +10,15 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define  __INSIDE_CYGWIN_NET__
+#define USE_SYS_TYPES_FD_SET
+#include <winsup.h>
+#include <ws2tcpip.h>
+#include <iphlpapi.h>
+#include <windns.h>
+#include <ntdef.h>
+#include "ntdll.h"
+#undef h_errno
 #include "minires.h"
 
 #ifdef __CYGWIN__
@@ -23,13 +32,6 @@ details. */
 #undef ERROR
 #undef NOERROR
 #undef DELETE
-
-#include <windows.h>
-#include <iphlpapi.h>
-#include <windns.h>
-#include <ntdef.h>
-#include "ntdll.h"
-#include <wchar.h>
 
 /***********************************************************************
  * write_record: Translates a Windows DNS record into a compressed record
