@@ -1646,7 +1646,7 @@ extern const int bfd_mips16_num_opcodes;
    "y" 5-bit source 3 register for ALNV.PS (MICROMIPSOP_*_RS3)
    "z" must be zero register
    "C" 23-bit coprocessor function code (MICROMIPSOP_*_COPZ)
-   "B" 8-bit syscall/wait function code (MICROMIPSOP_*_CODE10)
+   "B" 10-bit syscall/wait function code (MICROMIPSOP_*_CODE10)
    "K" 5-bit Hardware Register (RDHWR instruction) (MICROMIPSOP_*_RS)
 
    "+A" 5-bit INS/EXT/DINS/DEXT/DINSM/DEXTM position, which becomes
