@@ -113,7 +113,7 @@ LIBC:=$(newlib_build)/libc/libc.a
 LIBM:=$(newlib_build)/libm/libm.a
 CRT0:=$(cygwin_build)/crt0.o
 
-ALL_CFLAGS:=$(DEFS) $(MALLOC_DEBUG) $(CFLAGS) $(GCC_DEFAULT_OPTIONS)
+ALL_CFLAGS=$(DEFS) $(MALLOC_DEBUG) $(CFLAGS) $(GCC_DEFAULT_OPTIONS)
 ALL_CXXFLAGS=$(DEFS) $(MALLOC_DEBUG) $(CXXFLAGS) $(GCC_DEFAULT_OPTIONS)
 
 ifndef PREPROCESS
