@@ -23,7 +23,6 @@ details. */
 #define _WINNLS_
 #define _WINNETWK_
 #define _WINSVC_
-#define __STRALIGN_H_
 #define _ADVAPI32_
 #define _DSGETDCAPI_
 #define _GDI32_
@@ -51,7 +50,6 @@ details. */
 #undef _WINNLS_
 #undef _WINNETWK_
 #undef _WINSVC_
-#undef __STRALIGN_H_
 
 /* When Terminal Services are installed, the GetWindowsDirectory function
    does not return the system installation dir, but a user specific directory

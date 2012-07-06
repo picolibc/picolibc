@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # mkvers.sh - Make version information for cygwin DLL
 #
 #   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2010 Red Hat, Inc.
@@ -149,6 +149,9 @@ if [ -n "$cvs_tag" ]; then
     cygwin_ver="$cygwin_ver-$cvs_tag"
 fi
 
+compiler=$(echo "$windres" | sed -e 's/windres/gcc/')
+cpu=$("$compiler" -dumpmachine | sed -e 's/\([^-]*\).*/\1/')
+
 echo "Version $cygwin_ver"
 set -$- $builddate
-$windres --include-dir $dir/../w32api/include --include-dir $dir/include --define CYGWIN_BUILD_DATE="$1" --define CYGWIN_BUILD_TIME="$2" --define CYGWIN_VERSION='"'"$cygwin_ver"'"' $rcfile winver.o
+$windres --include-dir /usr/$cpu-w64-mingw32/sys-root/mingw/include --include-dir $dir/include --define CYGWIN_BUILD_DATE="$1" --define CYGWIN_BUILD_TIME="$2" --define CYGWIN_VERSION='"'"$cygwin_ver"'"' $rcfile winver.o
