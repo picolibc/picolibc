@@ -1,3 +1,9 @@
+2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc (.rdata):  Include all sections starting with .rdata.
+	(.debug_pubtypes): Make sure section is loaded at the end like all other
+	debug sections.
+
 2012-07-04  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* dcrt0.cc (build_argv): Guard against NULL pointer dereference found

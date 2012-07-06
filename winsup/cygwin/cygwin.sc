@@ -38,7 +38,7 @@ SECTIONS
   }
   .rdata ALIGN(__section_alignment__) :
   {
-    *(.rdata)
+    *(.rdata*)
     *(SORT(.rdata$*))
     *(.eh_frame)
   }
@@ -134,4 +134,5 @@ SECTIONS
   .debug_loc      ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_loc) }
   .debug_macinfo  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_macinfo) }
   .debug_ranges   ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_ranges) }
+  .debug_pubtypes ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_pubtypes) }
 }
