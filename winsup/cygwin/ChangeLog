@@ -1,5 +1,12 @@
 2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_procnet.cc: Fix copyright.
+	* syslog.cc: Ditto.
+	* libc/minires-os-if.c: Ditto.
+	* libc/minires.h: Ditto.
+
+2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	In terms of network related functionality, rely on Winsock definitions
 	as much as possible:
 	* dtable.cc: Drop including sys/socket.h.

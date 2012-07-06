@@ -1,6 +1,6 @@
 /* fhandler_procnet.cc: fhandler for /proc/net virtual filesystem
 
-   Copyright 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   Copyright 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
