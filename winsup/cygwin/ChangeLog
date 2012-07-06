@@ -1,5 +1,31 @@
 2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_registry.cc (RegOpenUserClassesRoot): Only define when
+	building against w32api headers.
+	(RegOpenCurrentUser): Ditto.
+	* fhandler_tty.cc (GetNamedPipeClientProcessId): Ditto.
+	* ntdll.h (enum _PROCESSINFOCLASS): Add ProcessImageFileName.
+	(RtlInitAnsiString): Declare.
+	(RtlUnicodeStringToAnsiSize): Declare.
+	* sched.cc (GetForegroundWindow): Ditto.
+	* sec_helper.cc (SECURITY_NT_NON_UNIQUE): Define as
+	SECURITY_NT_NON_UNIQUE_RID when building against w32api headers.
+	(cygsid::get_sid): Use SECURITY_NT_NON_UNIQUE rather than
+	SECURITY_NT_NON_UNIQUE_RID.
+	(__sec_user): Use PISECURITY_DESCRIPTOR rather than PSECURITY_DESCRIPTOR
+	to allow valid pointer arithmetic.
+	(_recycler_sd): Ditto.
+	(_everyone_sd): Ditto.
+
+2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* advapi32.cc (_ADVAPI32_): Drop definition.
+	* kernel32.cc (_KERNEL32_): Ditto.
+	* winlean.h: Add definitions required to use Mingw64 headers.
+	(FILE_SHARE_VALID_FLAGS): Drop definition.
+
+2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* winsup.h (_WIN32_WINNT): Define.  Explain why.
 
 2012-07-06  Corinna Vinschen  <corinna@vinschen.de>

@@ -491,7 +491,8 @@ typedef enum _PROCESSINFOCLASS
   ProcessVmCounters = 3,
   ProcessTimes = 4,
   ProcessSessionInformation = 24,
-  ProcessWow64Information = 26
+  ProcessWow64Information = 26,
+  ProcessImageFileName = 27
 } PROCESSINFOCLASS;
 
 typedef struct _DEBUG_BUFFER
@@ -1270,6 +1271,7 @@ extern "C"
 						PBOOLEAN);
   PSID_IDENTIFIER_AUTHORITY NTAPI RtlIdentifierAuthoritySid (PSID);
   VOID NTAPI RtlInitEmptyUnicodeString (PUNICODE_STRING, PCWSTR, USHORT);
+  VOID NTAPI RtlInitAnsiString (PANSI_STRING, PCSTR);
   NTSTATUS NTAPI RtlInitializeSid (PSID, PSID_IDENTIFIER_AUTHORITY, UCHAR);
   VOID NTAPI RtlInitUnicodeString (PUNICODE_STRING, PCWSTR);
   NTSTATUS NTAPI RtlIntegerToUnicodeString (ULONG, ULONG, PUNICODE_STRING);
@@ -1301,6 +1303,7 @@ extern "C"
 						BOOLEAN);
   PUCHAR NTAPI RtlSubAuthorityCountSid (PSID);
   PULONG NTAPI RtlSubAuthoritySid (PSID, ULONG);
+  ULONG NTAPI RtlUnicodeStringToAnsiSize (PUNICODE_STRING);
   NTSTATUS NTAPI RtlUnicodeStringToAnsiString (PANSI_STRING, PUNICODE_STRING,
 					       BOOLEAN);
   NTSTATUS NTAPI RtlUnicodeStringToOemString (PANSI_STRING, PUNICODE_STRING,

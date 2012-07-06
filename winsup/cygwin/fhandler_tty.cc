@@ -1482,7 +1482,9 @@ fhandler_pty_slave::fixup_after_exec ()
     fixup_after_fork (NULL);
 }
 
+#ifndef __MINGW64_VERSION_MAJOR
 extern "C" BOOL WINAPI GetNamedPipeClientProcessId (HANDLE, PULONG);
+#endif
 
 /* This thread function handles the master control pipe.  It waits for a
    client to connect.  Then it checks if the client process has permissions
