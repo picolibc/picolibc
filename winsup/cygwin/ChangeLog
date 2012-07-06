@@ -1,5 +1,11 @@
 2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* winbase.h: Throughout use LONG rather than long type to prepare for
+	64 bit.
+	(InterlockedCompareExchangePointer): Define.
+
+2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_registry.cc (RegOpenUserClassesRoot): Only define when
 	building against w32api headers.
 	(RegOpenCurrentUser): Ditto.
