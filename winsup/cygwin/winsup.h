@@ -27,7 +27,11 @@ details. */
 
 #define EXPORT_ALIAS(sym,symalias) extern "C" __typeof (sym) symalias __attribute__ ((alias(#sym)));
 
-#define WINVER 0x0601
+/* Fun, fun, fun.  On Mingw64, WINVER is set according to the value of
+   _WIN32_WINNT, on Mingw32 it's exactly the opposite... */
+#define _WIN32_WINNT 0x0602
+#define WINVER 0x0602
+
 #define _NO_W32_PSEUDO_MODIFIERS
 
 #include <sys/types.h>
