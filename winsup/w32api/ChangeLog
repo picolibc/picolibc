@@ -1,3 +1,10 @@
+2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winsock.h: Keep IP_OPTIONS and SO_xxx definitions when
+	building Cygwin.
+	* include/winsock2.h: Keep sockaddr and sockaddr_storage definitions
+	when building Cygwin.
+
 2012-04-29  Jan Ringos  <tringi@users.sf.net>
 
 	* include/winbase.h (GetModuleHandleEx[A/W]): Correct version guard.

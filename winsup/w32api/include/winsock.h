@@ -240,7 +240,7 @@ typedef struct WSAData {
 } WSADATA;
 typedef WSADATA *LPWSADATA;
 
-#if !(defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
+#ifndef __INSIDE_MSYS__
 #define IP_OPTIONS	1
 #define SO_DEBUG	1
 #define SO_ACCEPTCONN	2
@@ -260,7 +260,7 @@ typedef WSADATA *LPWSADATA;
 #define SO_RCVTIMEO	0x1006
 #define SO_ERROR	0x1007
 #define SO_TYPE	0x1008
-#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
+#endif /* !__INSIDE_MSYS__ */
 /*
  * Note that the next 5 IP defines are specific to WinSock 1.1 (wsock32.dll).
  * They will cause errors or unexpected results if used with the
