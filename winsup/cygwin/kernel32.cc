@@ -8,10 +8,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-/* This define is required to tell the mingw64 headers to omit
-   declspec(dllimport) from all kernel32 function declarations. */
-#define _KERNEL32_
-
 #include "winsup.h"
 #include "shared_info.h"
 #include "ntdll.h"
