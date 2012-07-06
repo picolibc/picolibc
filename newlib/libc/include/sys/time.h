@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#ifndef _WINSOCK_H
+#ifndef _TIMEVAL_DEFINED
 #define _TIMEVAL_DEFINED
 struct timeval {
   time_t      tv_sec;
@@ -28,7 +28,7 @@ struct timezone {
 #include <cygwin/sys_time.h>
 #endif /* __CYGWIN__ */
 
-#endif /* _WINSOCK_H */
+#endif /* !_TIMEVAL_DEFINED */
 
 #define ITIMER_REAL     0
 #define ITIMER_VIRTUAL  1

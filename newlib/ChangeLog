@@ -1,3 +1,12 @@
+2012-07-06  Corinna Vinschen  <vinschen@redhat.com>
+
+	Allow building of Cygwin using Mingw64 SDK headers:
+	* libc/include/sys/time.h: Drop _WINSOCK_H guard.  Just use
+	_TIMEVAL_DEFINED instead.
+	* libc/include/sys/types.h: Check for _WINSOCKAPI_ along with
+	_WINSOCK_H.
+	* libc/include/sys/unistd.h: Ditto.
+
 2012-06-28  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
 
 	* doc/Makefile.am (makedoc): Use LDFLAGS_FOR_BUILD not LDFLAGS.
