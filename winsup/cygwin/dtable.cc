@@ -12,7 +12,6 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 
 #include "winsup.h"
-#include <sys/socket.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>

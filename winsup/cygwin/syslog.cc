@@ -10,15 +10,15 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #define  __INSIDE_CYGWIN_NET__
-
+#define USE_SYS_TYPES_FD_SET
 #include "winsup.h"
+#include <ws2tcpip.h>
+#include <iphlpapi.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <syslog.h>
 #include <unistd.h>
 #include <sys/un.h>
-#include <netinet/in.h>
-#include <iphlpapi.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"

@@ -1,5 +1,41 @@
 2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	In terms of network related functionality, rely on Winsock definitions
+	as much as possible:
+	* dtable.cc: Drop including sys/socket.h.
+	* fhandler_procnet.cc: Change includes accordingly.
+	* fhandler_socket.cc: Ditto.
+	(fhandler_socket::listen): Avoid gcc error message initializing sin6.
+	(LPFN_WSARECVMSG): Only define when building against w32api headers.
+	* net.cc: Change includes accordingly.  Define USE_SYS_TYPES_FD_SET
+	and __WSA_ERR_MACROS_DEFINED.  Define _INC_NETIOAPI temporarily and
+	explain why.
+	(struct _IP_ADAPTER_UNICAST_ADDRESS_LH): Only define when building
+	against w32api headers.
+	(struct _IP_ADAPTER_ADDRESSES_LH): Ditto.
+	(SIO_GET_INTERFACE_LIST): Ditto.
+	(ws_freeaddrinfo): Rename from freeaddrinfo so as not to collide with
+	Winsock declaration.  Change througout.
+	(ws_getaddrinfo): Ditto.
+	(ws_getnameinfo): Ditto.
+	* select.cc: Include netdb.h after defining USE_SYS_TYPES_FD_SET.
+	* syslog.cc: Drop including netinet/in.h.  Define USE_SYS_TYPES_FD_SET
+	and include ws2tcpip.h.
+	* include/netdb.h (struct addrinfo): Don't define when building Cygwin.
+	* include/cygwin/if.h: Don't declare if_xxx functions when building
+	Cygwin.
+	* include/cygwin/in.h: Disable most definitions when building Cygwin.
+	* include/cygwin/socket.h: Disable sockaddr and sockaddr_storage
+	definitions when building Cygwin.  Same for MCAST_INCLUDE/MCAST_EXCLUDE.
+	* libc/inet_addr.c: Don't define __INSIDE_CYGWIN__ nor
+	__INSIDE_CYGWIN_NET__.
+	* libc/inet_network.c: Ditto.
+	* libc/minires.h: Drop redundant inclusion of netdb.h.  Define
+	__INSIDE_CYGWIN_NET__ only before including netdb.h and resolver
+	headers.
+
+2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* winbase.h: Throughout use LONG rather than long type to prepare for
 	64 bit.
 	(InterlockedCompareExchangePointer): Define.

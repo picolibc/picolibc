@@ -117,6 +117,7 @@ struct rpcent {
 	int	r_number;	/* rpc program number */
 };
 
+#ifndef __INSIDE_CYGWIN_NET__
 struct addrinfo {
   int             ai_flags;		/* input flags */
   int             ai_family;		/* address family of socket */
@@ -127,6 +128,7 @@ struct addrinfo {
   struct sockaddr *ai_addr;		/* socket address of socket */
   struct addrinfo *ai_next;		/* pointer to next in list */
 };
+#endif
 
 /*
  * Error return codes from gethostbyname() and gethostbyaddr()

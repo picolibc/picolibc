@@ -26,6 +26,7 @@ typedef int socklen_t;
 
 typedef uint16_t sa_family_t;
 
+#ifndef __INSIDE_CYGWIN_NET__
 struct sockaddr {
   sa_family_t		sa_family;	/* address family, AF_xxx	*/
   char			sa_data[14];	/* 14 bytes of protocol address	*/
@@ -44,6 +45,7 @@ struct sockaddr_storage {
   int64_t		__ss_align;
   char			_ss_pad2[_SS_PAD2SIZE];
 };
+#endif
 
 #include <asm/socket.h>			/* arch-dependent defines	*/
 #include <cygwin/sockios.h>		/* the SIOCxxx I/O controls	*/
@@ -269,8 +271,10 @@ struct OLD_msghdr
 #define MCAST_JOIN_SOURCE_GROUP         45
 #define MCAST_LEAVE_SOURCE_GROUP        46
 
+#ifndef __INSIDE_CYGWIN_NET__
 #define MCAST_INCLUDE                    0
 #define MCAST_EXCLUDE                    1
+#endif
 
 /* Old WinSock1 values, needed internally */
 #ifdef __INSIDE_CYGWIN__

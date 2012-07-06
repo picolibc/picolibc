@@ -12,24 +12,21 @@
 /* #define DEBUG_NEST_ON 1 */
 
 #define  __INSIDE_CYGWIN_NET__
+#define USE_SYS_TYPES_FD_SET
 
 #include "winsup.h"
-#include <sys/un.h>
-#include <asm/byteorder.h>
-
-#include <stdlib.h>
-#define USE_SYS_TYPES_FD_SET
-#include <winsock2.h>
-#include <mswsock.h>
-#include <iphlpapi.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "cygwin/version.h"
-#include "perprocess.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include <ws2tcpip.h>
+#include <mswsock.h>
+#include <iphlpapi.h>
+#include <asm/byteorder.h>
+#include "cygwin/version.h"
+#include "perprocess.h"
 #include "shared_info.h"
 #include "sigproc.h"
 #include "wininfo.h"
@@ -37,7 +34,7 @@
 #include <sys/param.h>
 #include <sys/acl.h>
 #include "cygtls.h"
-#include "cygwin/in6.h"
+#include <sys/un.h>
 #include "ntdll.h"
 #include "miscfuncs.h"
 
@@ -1129,14 +1126,9 @@ fhandler_socket::listen (int backlog)
 	}
       else if (get_addr_family () == AF_INET6)
 	{
-	  struct sockaddr_in6 sin6 =
-	    {
-	      sin6_family: AF_INET6,
-	      sin6_port: 0,
-	      sin6_flowinfo: 0,
-	      sin6_addr: {{IN6ADDR_ANY_INIT}},
-	      sin6_scope_id: 0
-	    };
+	  struct sockaddr_in6 sin6;
+	  memset (&sin6, 0, sizeof sin6);
+	  sin6.sin6_family = AF_INET6;
 	  if (!::bind (get_socket (), (struct sockaddr *) &sin6, sizeof sin6))
 	    res = ::listen (get_socket (), backlog);
 	}
@@ -1359,10 +1351,12 @@ fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
 }
 
 extern "C" {
+#ifndef __MINGW64_VERSION_MAJOR
 #define WSAID_WSARECVMSG \
 	  {0xf689d7c8,0x6f1f,0x436b,{0x8a,0x53,0xe5,0x4f,0xe3,0x51,0xc3,0x22}};
 typedef int (WSAAPI *LPFN_WSARECVMSG)(SOCKET,LPWSAMSG,LPDWORD,LPWSAOVERLAPPED,
 				      LPWSAOVERLAPPED_COMPLETION_ROUTINE);
+#endif
 int WSAAPI WSASendMsg(SOCKET,LPWSAMSG,DWORD,LPDWORD, LPWSAOVERLAPPED,
 		      LPWSAOVERLAPPED_COMPLETION_ROUTINE);
 };
