@@ -131,7 +131,7 @@ EXTRA_OFILES:=
 
 MALLOC_OFILES:=@MALLOC_OFILES@
 
-DLL_IMPORTS:=$(mingw_lib)/libkernel32.a $(mingw_lib)/libntdll.a
+DLL_IMPORTS:=$(w32api_lib)/libkernel32.a $(w32api_lib)/libntdll.a
 
 MT_SAFE_OBJECTS:=
 #
