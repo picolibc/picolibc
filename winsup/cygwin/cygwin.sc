@@ -38,7 +38,7 @@ SECTIONS
   }
   .rdata ALIGN(__section_alignment__) :
   {
-    *(.rdata*)
+    *(.rdata)
     *(SORT(.rdata$*))
     *(.eh_frame)
   }

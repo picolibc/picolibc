@@ -1,5 +1,9 @@
 2012-07-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.sc (.rdata): Revert patch from 2012-07-06.
+
+2012-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* passwd.cc (getpass): Make check for closed stream more reliable.
 	Check if setting tty attributes worked and only revert to old state
 	if so.
