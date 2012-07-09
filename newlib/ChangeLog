@@ -1,3 +1,11 @@
+2012-07-09  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/fileno.c (fileno): Check if f is a valid stream.  If not,
+	return -1 and set errno to EBADF per POSIX.
+
+2012-07-06  Corinna Vinschen  <vinschen@redhat.com>
+
+
 2012-07-06  Corinna Vinschen  <vinschen@redhat.com>
 
 	Allow building of Cygwin using Mingw64 SDK headers:
