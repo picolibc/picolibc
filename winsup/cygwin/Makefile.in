@@ -17,6 +17,7 @@ CC:=@CC@
 CC_FOR_TARGET:=$(CC)
 srcdir:=@srcdir@
 CONFIG_DIR:=$(srcdir)/config/@CONFIG_DIR@
+include ${srcdir}/../Makefile.common
 
 SHELL:=@SHELL@
 objdir:=.
@@ -27,8 +28,6 @@ target_alias:=@target_alias@
 build_alias:=@build_alias@
 host_alias:=@host_alias@
 prefix:=@prefix@
-
-include ${srcdir}/../Makefile.common
 
 program_transform_name:=@program_transform_name@
 exec_prefix:=@exec_prefix@
