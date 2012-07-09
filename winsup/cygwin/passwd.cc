@@ -281,6 +281,7 @@ getpass (const char * prompt)
 {
   char *pass = _my_tls.locals.pass;
   struct termios ti, newti;
+  bool tc_set = false;
 
   /* Try to use controlling tty in the first place.  Use stdin and stderr
      only as fallback. */
@@ -295,19 +296,23 @@ getpass (const char * prompt)
     }
 
   /* Make sure to notice if stdin is closed. */
-  if (tcgetattr (fileno (in), &ti) == -1)
-    pass[0] = '\0';
-  else
+  if (fileno (in) >= 0)
     {
       flockfile (in);
-      newti = ti;
-      newti.c_lflag &= ~(ECHO | ISIG);	/* No echo, no signal handling. */
-      tcsetattr (fileno (in), TCSANOW, &newti);
+      /* Change tty attributes if possible. */
+      if (!tcgetattr (fileno (in), &ti))
+	{
+	  newti = ti;
+	  newti.c_lflag &= ~(ECHO | ISIG); /* No echo, no signal handling. */
+	  if (!tcsetattr (fileno (in), TCSANOW, &newti))
+	    tc_set = true;
+	}
       fputs (prompt, err);
       fflush (err);
       fgets (pass, _PASSWORD_LEN, in);
       fprintf (err, "\n");
-      tcsetattr (fileno (in), TCSANOW, &ti);
+      if (tc_set)
+	tcsetattr (fileno (in), TCSANOW, &ti);
       funlockfile (in);
       char *crlf = strpbrk (pass, "\r\n");
       if (crlf)

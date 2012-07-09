@@ -1,4 +1,10 @@
-2012-07-08  Corinna Vinschen  <corinna@vinschen.de>
+2012-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.cc (getpass): Make check for closed stream more reliable.
+	Check if setting tty attributes worked and only revert to old state
+	if so.
+
+2012-07-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in, configure.in, mkvers.sh: Revert accidental checkin from
 	2012-07-06.
