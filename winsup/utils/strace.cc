@@ -11,6 +11,12 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include <windows.h>
+#ifndef __MINGW64_VERSION_MAJOR
+#include "ddk/ntapi.h"
+#else
+#include <winternl.h>
+#endif
 #define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>
 #include <fcntl.h>
@@ -19,7 +25,6 @@ details. */
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include <windows.h>
 #include <signal.h>
 #include <errno.h>
 #include "cygwin/include/sys/strace.h"
@@ -28,10 +33,11 @@ details. */
 #include "path.h"
 #undef cygwin_internal
 #include "loadlib.h"
-#include "ddk/ntapi.h"
 
 /* we *know* we're being built with GCC */
+#ifndef alloca
 #define alloca __builtin_alloca
+#endif
 
 static const char *pgm;
 static int forkdebug = 1;

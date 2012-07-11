@@ -11,10 +11,23 @@
 #define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>
 #include <assert.h>
+#define WIN32_NO_STATUS	/* Disable status codes in winnt.h since we include
+			   ntstatus.h for extended status codes below. */
 #include <windows.h>
-#include <ntdef.h>
-#include <ddk/ntstatus.h>
-#include <ddk/ntapi.h>
+#undef WIN32_NO_STATUS
+#include <psapi.h>
+#ifndef __MINGW64_VERSION_MAJOR
+# include <ntdef.h>
+# include <ddk/ntstatus.h>
+# include <ddk/ntapi.h>
+# define SystemProcessInformation SystemProcessesAndThreadsInformation
+# define PSYSTEM_PROCESS_INFORMATION PSYSTEM_PROCESSES
+# define ImageName ProcessName
+# define NextEntryOffset NextEntryDelta
+#else
+# include <winternl.h>
+# include <ntstatus.h>
+#endif
 #undef cygwin_internal
 
 #undef DEBUGGING
@@ -108,68 +121,77 @@ static struct bad_app_info big_list_of_dodgy_apps[] =
 
 static const size_t num_of_dodgy_apps = sizeof (big_list_of_dodgy_apps) / sizeof (big_list_of_dodgy_apps[0]);
 
-static PSYSTEM_PROCESSES
+struct system_module_list
+{
+  LONG count;
+  PVOID *pid;
+  PCHAR *name;
+};
+
+static PSYSTEM_PROCESS_INFORMATION
 get_process_list (void)
 {
   int n_procs = 0x100;
-  PSYSTEM_PROCESSES pslist = (PSYSTEM_PROCESSES) malloc (n_procs * sizeof *pslist);
+  PSYSTEM_PROCESS_INFORMATION pslist = (PSYSTEM_PROCESS_INFORMATION) malloc (n_procs * sizeof *pslist);
 
-  while (NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+  while (NtQuerySystemInformation (SystemProcessInformation,
     pslist, n_procs * sizeof *pslist, 0) == STATUS_INFO_LENGTH_MISMATCH)
     {
       n_procs *= 2;
       free (pslist);
-      pslist = (PSYSTEM_PROCESSES) malloc (n_procs * sizeof *pslist);
+      pslist = (PSYSTEM_PROCESS_INFORMATION) malloc (n_procs * sizeof *pslist);
     }
   return pslist;
 }
 
-static PSYSTEM_MODULE_INFORMATION
+static system_module_list *
 get_module_list (void)
 {
-  int modsize = 0x1000;
-  PSYSTEM_MODULE_INFORMATION modlist = (PSYSTEM_MODULE_INFORMATION) malloc (modsize);
-
-  while (NtQuerySystemInformation (SystemModuleInformation,
-    modlist, modsize, NULL) == STATUS_INFO_LENGTH_MISMATCH)
+  DWORD modsize = 0;
+  system_module_list *modlist = (system_module_list *)
+				calloc (1, sizeof (system_module_list));
+  while (!EnumDeviceDrivers (modlist->pid, modsize, &modsize))
     {
-      modsize *= 2;
-      free (modlist);
-      modlist = (PSYSTEM_MODULE_INFORMATION) malloc (modsize);
+      free (modlist->pid);
+      free (modlist->name);
+      modlist->count = modsize / sizeof (PVOID);
+      modlist->pid = (PVOID *) calloc (modlist->count, sizeof (PVOID));
+      modlist->name = (PCHAR *) calloc (modlist->count, sizeof (PCHAR));
+    }
+  for (int i = 0; i < modlist->count; ++i)
+    {
+      modlist->name[0] = (PCHAR) calloc (256, sizeof (CHAR));
+      GetDeviceDriverBaseNameA (modlist->pid[i], modlist->name[i], 256);
     }
   return modlist;
 }
 
 static bool
-find_process_in_list (PSYSTEM_PROCESSES pslist, PUNICODE_STRING psname)
+find_process_in_list (PSYSTEM_PROCESS_INFORMATION pslist, PUNICODE_STRING psname)
 {
   while (1)
     {
-      if (pslist->ProcessName.Length && pslist->ProcessName.Buffer)
+      if (pslist->ImageName.Length && pslist->ImageName.Buffer)
 	{
-	  dbg_printf (("%S\n", pslist->ProcessName.Buffer));
-	  if (!_wcsicmp (pslist->ProcessName.Buffer, psname->Buffer))
+	  dbg_printf (("%S\n", pslist->ImageName.Buffer));
+	  if (!_wcsicmp (pslist->ImageName.Buffer, psname->Buffer))
 	    return true;
 	}
-      if (!pslist->NextEntryDelta)
+      if (!pslist->NextEntryOffset)
 	break;
-      pslist = (PSYSTEM_PROCESSES)(pslist->NextEntryDelta + (char *)pslist);
+      pslist = (PSYSTEM_PROCESS_INFORMATION)(pslist->NextEntryOffset + (char *)pslist);
     };
   return false;
 }
 
 static bool
-find_module_in_list (PSYSTEM_MODULE_INFORMATION modlist, const char * const modname)
+find_module_in_list (system_module_list * modlist, const char * const modname)
 {
-  PSYSTEM_MODULE_INFORMATION_ENTRY modptr = &modlist->Module[0];
-  DWORD count = modlist->Count;
-  while (count--)
+  for (int i = 0; i < modlist->count; ++i)
     {
-      dbg_printf (("name '%s' offset %d ", &modptr->ImageName[0], modptr->PathLength));
-      dbg_printf (("= '%s'\n", &modptr->ImageName[modptr->PathLength]));
-      if (!_stricmp (&modptr->ImageName[modptr->PathLength], modname))
+      dbg_printf (("name '%s' ", modlist->name[i]));
+      if (!_stricmp (modlist->name[i], modname))
 	return true;
-      modptr++;
     }
   return false;
 }
@@ -233,7 +255,7 @@ expand_path (const char *path, char *outbuf)
 }
 
 static bool
-detect_dodgy_app (const struct bad_app_det *det, PSYSTEM_PROCESSES pslist, PSYSTEM_MODULE_INFORMATION modlist)
+detect_dodgy_app (const struct bad_app_det *det, PSYSTEM_PROCESS_INFORMATION pslist, system_module_list * modlist)
 {
   HANDLE fh;
   HKEY hk;
@@ -334,8 +356,8 @@ void
 dump_dodgy_apps (int verbose)
 {
   size_t i, n_det = 0;
-  PSYSTEM_PROCESSES pslist;
-  PSYSTEM_MODULE_INFORMATION modlist;
+  PSYSTEM_PROCESS_INFORMATION pslist;
+  system_module_list * modlist;
 
   /* Read system info for detect testing.  */
   pslist = get_process_list ();
@@ -404,6 +426,9 @@ dump_dodgy_apps (int verbose)
     }
   /* Tidy up allocations.  */
   free (pslist);
-  free (modlist);
+  for (int i = 0; i < modlist->count; ++i)
+    free (modlist->name[i]);
+  free (modlist->name);
+  free (modlist->pid);
 }
 

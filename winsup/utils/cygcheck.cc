@@ -30,7 +30,13 @@
 #undef cygwin_internal
 #include "loadlib.h"
 
+#ifndef max
+#define max __max
+#endif
+
+#ifndef alloca
 #define alloca __builtin_alloca
+#endif
 
 int verbose = 0;
 int registry = 0;
@@ -1314,7 +1320,7 @@ handle_unique_object_name (int opt, char *path)
   if (opt == CO_SHOW_UON)
     {
       access = GENERIC_READ;
-      share = FILE_SHARE_VALID_FLAGS;
+      share = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
       protect = PAGE_READONLY;
       mapping = FILE_MAP_READ;
     }
@@ -1447,7 +1453,9 @@ dump_sysinfo ()
 			      &prod))
 	    {
 #define       PRODUCT_UNLICENSED 0xabcdabcd
+#ifndef PRODUCT_ULTIMATE_E
 #define       PRODUCT_ULTIMATE_E 0x00000047
+#endif
 	      const char *products[] =
 		{
  /* 0x00000000 */ "",
