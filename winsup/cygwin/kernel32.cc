@@ -11,7 +11,6 @@ details. */
 #include "winsup.h"
 #include "shared_info.h"
 #include "ntdll.h"
-#include <wchar.h>
 
 /* Implement CreateEvent/OpenEvent so that named objects are always created in
    Cygwin shared object namespace. */

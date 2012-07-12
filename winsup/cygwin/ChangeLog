@@ -1,3 +1,10 @@
+2012-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pseudo-reloc.cc: Drop including wchar.h.
+	(__report_error): Define module as WCHAR.
+	* advapi.cc: Drop including wchar.h.
+	* kernel32.cc: Ditto.
+
 2012-07-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (well_known_dlls): Add ole32.dll and wbemprox.dll.

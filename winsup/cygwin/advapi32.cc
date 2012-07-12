@@ -12,7 +12,6 @@ details. */
 #include <winioctl.h>
 #include "shared_info.h"
 #include "ntdll.h"
-#include <wchar.h>
 
 #define DEFAULT_NTSTATUS_TO_BOOL_RETURN \
   if (!NT_SUCCESS (status)) \

@@ -20,8 +20,6 @@
 # define NO_COPY
 #else
 # include "winsup.h"
-# include <wchar.h>
-# include <ntdef.h>
 # include <sys/cygwin.h>
 /* custom status code: */
 # define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)
@@ -87,7 +85,7 @@ __report_error (const char *msg, ...)
    * cygwin ptys.
    */
   char buf[128];
-  wchar_t module[MAX_PATH];
+  WCHAR module[MAX_PATH];
   char * posix_module = NULL;
   static const char UNKNOWN_MODULE[] = "<unknown module>: ";
   static const char CYGWIN_FAILURE_MSG[] = "Cygwin runtime failure: ";
