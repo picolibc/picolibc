@@ -35,10 +35,47 @@ details. */
 #define WINIMPM
 #define WINSOCK_API_LINKAGE
 
+/* Windows headers define a couple of annoyingly intrusive macros for the
+   sole purpose of inline documentation.  Since they are defined without
+   respect for the namespace and not undef'ed anymore, they tend to collide
+   with otherwise innocent definitions in the application.  We check if they
+   exist and if not, we undef them again after including the Windows headers. */
+#ifndef IN
+#define __undef_IN
+#endif
+#ifndef OUT
+#define __undef_OUT
+#endif
+#ifndef OPTIONAL
+#define __undef_OPTIONAL
+#endif
+#ifndef NOTHING
+#define __undef_NOTHING
+#endif
+#ifndef CRITICAL
+#define __undef_CRITICAL
+#endif
+
 #include <windows.h>
 #include <wincrypt.h>
 #include <lmcons.h>
 #include <ntdef.h>
+
+#ifdef __undef_IN
+#undef IN
+#endif
+#ifdef __undef_OUT
+#undef OUT
+#endif
+#ifdef __undef_OPTIONAL
+#undef OPTIONAL
+#endif
+#ifdef __undef_NOTHING
+#undef NOTHING
+#endif
+#ifdef __undef_CRITICAL
+#undef CRITICAL
+#endif
 
 #undef _WINGDI_H
 #undef _WINUSER_H

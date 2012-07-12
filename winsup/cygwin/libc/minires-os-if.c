@@ -16,7 +16,6 @@ details. */
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
 #include <windns.h>
-#include <ntdef.h>
 #include "ntdll.h"
 #undef h_errno
 #include "minires.h"

@@ -81,7 +81,11 @@ int fcntl64 (int fd, int cmd, ...);
 #define __WIDE(a) L ## a
 #define _WIDE(a) __WIDE(a)
 
+#include "winlean.h"
+
 #ifdef __cplusplus
+
+#include "wincap.h"
 
 extern const char case_folded_lower[];
 #define cyg_tolower(c) (case_folded_lower[(unsigned char)(c)])
@@ -91,9 +95,6 @@ extern const char case_folded_upper[];
 #ifndef MALLOC_DEBUG
 #define cfree newlib_cfree_dont_use
 #endif
-
-#include "winlean.h"
-#include "wincap.h"
 
 /* Used as type by sys_wcstombs_alloc and sys_mbstowcs_alloc.  For a
    description see there. */

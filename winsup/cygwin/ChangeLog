@@ -1,6 +1,13 @@
 2012-07-12  Corinna Vinschen  <corinna@vinschen.de>
 
-	* pseudo-reloc.cc: Drop including wchar.h.
+	* winlean.h: Make sure certain Windows macros are undefined again.
+	Add comment to explain why.
+	* winsup.h: Include winlean.h from C sources as well.
+	* libc/minires-os-if.c: Drop including ntdef.h.
+
+2012-07-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pseudo-reloc.cc: Drop including wchar.h and ntdef.h.
 	(__report_error): Define module as WCHAR.
 	* advapi.cc: Drop including wchar.h.
 	* kernel32.cc: Ditto.
