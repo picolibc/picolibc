@@ -1,3 +1,8 @@
+2012-07-13  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* libc/sys/rtems/machine/_types.h (_ssize_t): Add __ARM_EABI__,
+	__v850__, __851__.
+
 2012-07-09  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/fileno.c (fileno): Check if f is a valid stream.  If not,
