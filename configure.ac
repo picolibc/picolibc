@@ -2125,11 +2125,11 @@ if test "x$CFLAGS_FOR_TARGET" = x; then
   CFLAGS_FOR_TARGET=$CFLAGS
   case " $CFLAGS " in
     *" -O2 "*) ;;
-    *) CFLAGS_FOR_TARGET="-O2 $CFLAGS_FOR_TARGET" ;;
+    *) CFLAGS_FOR_TARGET="-O2 $CFLAGS" ;;
   esac
   case " $CFLAGS " in
     *" -g "* | *" -g3 "*) ;;
-    *) CFLAGS_FOR_TARGET="-g $CFLAGS_FOR_TARGET" ;;
+    *) CFLAGS_FOR_TARGET="-g $CFLAGS" ;;
   esac
 fi
 AC_SUBST(CFLAGS_FOR_TARGET)
@@ -2138,11 +2138,11 @@ if test "x$CXXFLAGS_FOR_TARGET" = x; then
   CXXFLAGS_FOR_TARGET=$CXXFLAGS
   case " $CXXFLAGS " in
     *" -O2 "*) ;;
-    *) CXXFLAGS_FOR_TARGET="-O2 $CXXFLAGS_FOR_TARGET" ;;
+    *) CXXFLAGS_FOR_TARGET="-O2 $CXXFLAGS" ;;
   esac
   case " $CXXFLAGS " in
     *" -g "* | *" -g3 "*) ;;
-    *) CXXFLAGS_FOR_TARGET="-g $CXXFLAGS_FOR_TARGET" ;;
+    *) CXXFLAGS_FOR_TARGET="-g $CXXFLAGS" ;;
   esac
 fi
 AC_SUBST(CXXFLAGS_FOR_TARGET)
