@@ -1,3 +1,8 @@
+2012-07-13  Doug Evans  <dje@google.com>
+
+	* filenames.h: #include "hashtab.h".
+	(filename_hash, filename_eq): Declare.
+
 2012-07-13  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
 
 	* elf/s390.h (START_RELOC_NUMBERS): Define R_390_IRELATIVE reloc.
