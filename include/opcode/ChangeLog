@@ -1,7 +1,3 @@
-2012-07-06  Maciej W. Rozycki  <macro@codesourcery.com>
-
-	* mips.h: Fix a typo in description.
-
 2012-06-07  Georg-Johann Lay  <avr@gjlay.de>
 
 	* avr.h: (AVR_ISA_XCH): New define.
