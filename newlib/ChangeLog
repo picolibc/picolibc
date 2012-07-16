@@ -1,3 +1,7 @@
+2012-07-16  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* libc/posix/telldir.c: Conditionally build dd_hash_lock.
+
 2012-07-13  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libc/sys/rtems/machine/_types.h (_ssize_t): Add __ARM_EABI__,
