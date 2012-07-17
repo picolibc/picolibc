@@ -123,9 +123,10 @@ hcreate_r(size_t nel, struct hsearch_data *htab)
 void
 hdestroy_r(struct hsearch_data *htab)
 {
+#if 0
 	struct internal_entry *ie;
 	size_t idx;
-
+#endif
 	if (htab->htable == NULL)
 		return;
 

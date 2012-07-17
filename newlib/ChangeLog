@@ -1,3 +1,7 @@
+2012-07-17  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* libc/search/hcreate_r.c (hdestroy_r): #ifdef 0 unused vars ie, idx.
+
 2012-07-16  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libc/posix/telldir.c: Conditionally build dd_hash_lock.
