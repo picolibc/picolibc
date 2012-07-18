@@ -1,3 +1,8 @@
+2012-07-18  Ralf Corsépius  <ralf.corsepius@rtems.org>
+
+	* libc/sys/rtems/machine/_types.h (_ssize_t): Use signed int for
+	__v850__, __851__.
+
 2012-07-17  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libc/search/hcreate_r.c (hdestroy_r): #ifdef 0 unused vars ie, idx.

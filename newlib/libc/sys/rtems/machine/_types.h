@@ -13,8 +13,7 @@
  * could be applied here.
  */
 
-#if defined(__i386__) || defined(__m32r__) || defined(__h8300__) || (defined(__arm__) && !defined(__ARM_EABI__)) || defined(__bfin__) || defined(__m68k__) || defined(__MICROBLAZE__) \
-  || defined(__v850__) || defined(__v851__)
+#if defined(__i386__) || defined(__m32r__) || defined(__h8300__) || (defined(__arm__) && !defined(__ARM_EABI__)) || defined(__bfin__) || defined(__m68k__) || defined(__MICROBLAZE__)
 #if defined(__H8300__)
 typedef signed int _ssize_t;
 #else
@@ -24,7 +23,8 @@ typedef long signed int _ssize_t;
 #elif defined(__sparc__) && defined(__LP64__)
 typedef long signed int _ssize_t;
 #define __ssize_t_defined 1
-#elif defined(__AVR__) || defined(__lm32__) || defined(__m32c__) || defined(__mips__) || defined(__moxie__) || defined(__PPC__) || defined(__sparc__) || defined(__sh__) || defined(__ARM_EABI__)
+#elif defined(__AVR__) || defined(__lm32__) || defined(__m32c__) || defined(__mips__) || defined(__moxie__) || defined(__PPC__) || defined(__sparc__) || defined(__sh__) || defined(__ARM_EABI__) \
+  || defined(__v850__) || defined(__v851__)
 typedef signed int _ssize_t;
 #define __ssize_t_defined 1
 #else
