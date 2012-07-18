@@ -5,7 +5,7 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
-New API: memrchr.
+New API: getmntent_r, memrchr.
 </para></listitem>
 
 <listitem><para>
