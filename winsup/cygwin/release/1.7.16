@@ -1,7 +1,7 @@
 What's new:
 -----------
 
-- New API: memrchr.
+- New API: getmntent_r, memrchr.
 
 - Support ReFS.
 

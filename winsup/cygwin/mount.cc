@@ -1899,6 +1899,35 @@ getmntent (FILE *)
   return mount_table->getmntent (_my_tls.locals.iteration++);
 }
 
+extern "C" struct mntent *
+getmntent_r (FILE *, struct mntent *mntbuf, char *buf, int buflen)
+{
+  struct mntent *mnt = mount_table->getmntent (_my_tls.locals.iteration++);
+  int fsname_len, dir_len, type_len, opts_len, tmplen = buflen;
+
+  if (!mnt)
+    return NULL;
+
+  fsname_len = strlen (mnt->mnt_fsname) + 1;
+  dir_len = strlen (mnt->mnt_dir) + 1;
+  type_len = strlen (mnt->mnt_type) + 1;
+  opts_len = strlen (mnt->mnt_opts) + 1;
+
+  snprintf (buf, buflen, "%s%c%s%c%s%c%s", mnt->mnt_fsname, '\0',
+	    mnt->mnt_dir, '\0', mnt->mnt_type, '\0', mnt->mnt_opts);
+
+  mntbuf->mnt_fsname = buf;
+  tmplen -= fsname_len;
+  mntbuf->mnt_dir = tmplen > 0 ? buf + fsname_len : (char *)"";
+  tmplen -= dir_len;
+  mntbuf->mnt_type = tmplen > 0 ? buf + fsname_len + dir_len : (char *)"";
+  tmplen -= type_len;
+  mntbuf->mnt_opts = tmplen > 0 ? buf + fsname_len + dir_len + type_len : (char *)"";
+  mntbuf->mnt_freq = mnt->mnt_freq;
+  mntbuf->mnt_passno = mnt->mnt_passno;
+  return mntbuf;
+}
+
 extern "C" int
 endmntent (FILE *)
 {

@@ -430,12 +430,13 @@ details. */
       259: Export pthread_sigqueue.
       260: Export scandirat.
       261: Export memrchr.
+      262: Export getmntent_r.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 261
+#define CYGWIN_VERSION_API_MINOR 262
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

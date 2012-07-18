@@ -738,6 +738,7 @@ _getlogin = getlogin NOSIGFE
 getlogin_r NOSIGFE
 getmntent SIGFE
 _getmntent = getmntent SIGFE
+getmntent_r SIGFE
 getmode SIGFE
 _getmode = getmode SIGFE
 getnameinfo = cygwin_getnameinfo SIGFE

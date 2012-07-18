@@ -1,3 +1,11 @@
+2012-07-18  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin.din (getmntent_r): Export.
+	* mount.cc (getmntent_r): New function.
+	* posix.sgml (std-gnu): Add getmntent_r.
+	* include/mntent.h (getmntent_r): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2012-07-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winlean.h: Make sure certain Windows macros are undefined again.
