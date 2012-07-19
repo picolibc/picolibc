@@ -1,3 +1,7 @@
+2012-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* woutsup.h: Just include winlean.h.
+
 2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* client.cc: Revert sigproc.h inclusion since it was fixed elsewhere.
