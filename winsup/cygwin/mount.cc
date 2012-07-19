@@ -1903,7 +1903,7 @@ extern "C" struct mntent *
 getmntent_r (FILE *, struct mntent *mntbuf, char *buf, int buflen)
 {
   struct mntent *mnt = mount_table->getmntent (_my_tls.locals.iteration++);
-  int fsname_len, dir_len, type_len, opts_len, tmplen = buflen;
+  int fsname_len, dir_len, type_len, tmplen = buflen;
 
   if (!mnt)
     return NULL;
@@ -1911,7 +1911,6 @@ getmntent_r (FILE *, struct mntent *mntbuf, char *buf, int buflen)
   fsname_len = strlen (mnt->mnt_fsname) + 1;
   dir_len = strlen (mnt->mnt_dir) + 1;
   type_len = strlen (mnt->mnt_type) + 1;
-  opts_len = strlen (mnt->mnt_opts) + 1;
 
   snprintf (buf, buflen, "%s%c%s%c%s%c%s", mnt->mnt_fsname, '\0',
 	    mnt->mnt_dir, '\0', mnt->mnt_type, '\0', mnt->mnt_opts);

@@ -1,3 +1,7 @@
+2012-07-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* mount.cc (getmntent_r): Remove unused but set variable.
+
 2012-07-18  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin.din (getmntent_r): Export.
