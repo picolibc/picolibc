@@ -31,3 +31,9 @@ Bug fixes:
   If a signal arrives while select is blocking and the program longjmps
   out of the signal handler then threads and memory may be left hanging.
   Fixes: http://cygwin.com/ml/cygwin/2012-05/threads.html#00275
+
+- Fix fileno(3) to return -1/EBADF if stream is closed.
+  Fixes: http://cygwin.com/ml/cygwin/2012-07/msg00083.html
+
+- Fix clipboard handling, at least partially:
+  http://cygwin.com/ml/cygwin/2012-06/msg00521.html
