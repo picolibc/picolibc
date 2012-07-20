@@ -1,3 +1,8 @@
+2012-07-20  Eric Blake  <eblake@redhat.com>
+
+	* libc/posix/readdir.c (readdir): Drop bogus attempt to catch
+	bogus pointers.
+
 2012-07-18  Ralf Corsépius  <ralf.corsepius@rtems.org>
 
 	* libc/sys/rtems/machine/_types.h (_ssize_t): Use signed int for
