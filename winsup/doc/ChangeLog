@@ -1,3 +1,12 @@
+2012-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml (pathnames-intro): Remove paragraph on UNC paths.
+	Try to be clearer on POSIX vs. Win32 paths.
+	(unc-paths): New section.
+	(cygdrive): Fix a few SGML qualifiers.
+	* setup-net.sgml: Move ntsec section from here...
+	* using.sgml: ..to here.
+
 2012-07-18  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* new-features.sgml (ov-new1.7.16): Document getmntent_r.

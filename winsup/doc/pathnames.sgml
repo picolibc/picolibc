@@ -2,12 +2,12 @@
 
 <sect2 id="pathnames-intro"><title>Introduction</title>
 
-<para>Cygwin supports both Win32- and POSIX-style paths.  Directory
+<para>Cygwin supports both POSIX- and Win32-style paths.  Directory
 delimiters may be either forward slashes or backslashes.  Paths using
-backslashes are always handled as Win32 paths.  POSIX paths must only
-use forward slashes as delimiter, otherwise they are treated as Win32
-paths and file access might fail in surprising ways.  UNC pathnames
-(starting with two slashes and a network name) are also supported.</para>
+backslashes or starting with a drive letter are always handled as
+Win32 paths.  POSIX paths must only use forward slashes as delimiter,
+otherwise they are treated as Win32 paths and file access might fail
+in surprising ways.</para>
 
 <note><para>The usage of Win32 paths, though possible, is deprecated,
 since it circumvents important internal path handling mechanisms. 
@@ -269,11 +269,27 @@ old user mount points as before.
 
 </sect2>
 
+<sect2 id="unc-paths"><title>UNC paths</title>
+
+<para>Apart from the unified POSIX tree starting at the <filename>/</filename>
+directory, UNC pathnames starting with two slashes and a server name
+(<filename>//machine/share/...</filename>) are supported as well.
+They are handled as POSIX paths if only containing forward slashes.  There's
+also a virtual directory <filename>//</filename> which allows to enumerate
+the fileservers known to the local machine with <command>ls</command>.
+Same goes for the UNC paths of the type <filename>//machine</filename>,
+which allow to enumerate the shares provided by the server
+<literal>machine</literal>. For often used UNC paths it makes sense to
+add them to the mount table (see <xref linkend="mount-table"></xref> so
+they are included in the unified POSIX path tree.</para>
+
+</sect2>
+
 <sect2 id="cygdrive"><title>The cygdrive path prefix</title>
 
 <para>As already outlined in <xref linkend="ov-hi-files"></xref>, you can
 access arbitary drives on your system by using the cygdrive path prefix.
-The default value for this prefix is <literal>/cygdrive</literal>, and
+The default value for this prefix is <filename>/cygdrive</filename>, and
 a path to any drive can be constructed by using the cygdrive prefix and
 appending the drive letter as subdirectory, like this:</para>
 
@@ -287,7 +303,7 @@ appending the drive letter as subdirectory, like this:</para>
 on a system are subsumed.  The mount options of the cygdrive prefix is
 used for all file access through the cygdrive prefixed drives.  For instance,
 assuming the cygdrive mount options are <literal>binary,posix=0</literal>,
-then any file <literal>/cygdrive/x/file</literal> will be opened in
+then any file <filename>/cygdrive/x/file</filename> will be opened in
 binary mode by default (mount option <literal>binary</literal>), and the case
 of the filename doesn't matter (mount option <literal>posix=0</literal>).
 </para>
