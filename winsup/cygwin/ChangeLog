@@ -1,3 +1,7 @@
+2012-07-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 17.
+
 2012-07-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* mount.cc (getmntent_r): Remove unused but set variable.
