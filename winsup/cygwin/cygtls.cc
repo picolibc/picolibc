@@ -190,6 +190,7 @@ _cygtls::fixup_after_fork ()
       sig = 0;
     }
   stacklock = spinning = 0;
+  signal_arrived = NULL;
   locals.select.sockevt = NULL;
   locals.cw_timer = NULL;
   wq.thread_ev = NULL;
@@ -213,6 +214,13 @@ _cygtls::remove (DWORD wait)
 
   /* FIXME: Need some sort of atthreadexit function to allow things like
      select to control this themselves. */
+
+  if (signal_arrived)
+    {
+      HANDLE h = signal_arrived;
+      signal_arrived = NULL;
+      CloseHandle (h);
+    }
 
   /* Close handle and free memory used by select. */
   if (locals.select.sockevt)
@@ -252,31 +260,6 @@ void
 _cygtls::push (__stack_t addr)
 {
   *stackptr++ = (__stack_t) addr;
-}
-
-
-_cygtls *
-_cygtls::find_tls (int sig)
-{
-  static int NO_COPY threadlist_ix;
-
-  debug_printf ("signal %d\n", sig);
-  sentry here (INFINITE);
-
-  _cygtls *res = NULL;
-  threadlist_ix = -1;
-
-  myfault efault;
-  if (efault.faulted ())
-    cygheap->threadlist[threadlist_ix]->remove (INFINITE);
-
-  while (++threadlist_ix < (int) nthreads)
-    if (sigismember (&(cygheap->threadlist[threadlist_ix]->sigwait_mask), sig))
-      {
-	res = cygheap->threadlist[threadlist_ix];
-	break;
-      }
-  return res;
 }
 
 void

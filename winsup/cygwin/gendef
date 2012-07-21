@@ -202,8 +202,6 @@ _sigdelayed:
 
 	pushl	\$_sigreturn		# where to return
 	pushl	$tls::func(%ebx)	# user-supplied signal func
-	cmpl	\$0,$tls::threadkill(%ebx)#pthread_kill signal?
-	jnz	4f			# yes.  callee clears signal number
 	movl	\$0,$tls::sig(%ebx)	# zero the signal number as a
 					# flag to the signal handler thread
 					# that it is ok to set up sigsave

@@ -58,13 +58,11 @@ struct sigpacket
   int __stdcall process () __attribute__ ((regparm (1)));
 };
 
-extern HANDLE signal_arrived;
 extern HANDLE sigCONT;
 
-void __stdcall sig_dispatch_pending (bool fast = false);
-#ifdef EXITCODE_SET
-extern "C" void __stdcall set_signal_mask (sigset_t newmask, sigset_t&);
-#endif
+void __stdcall sig_dispatch_pending (bool fast = false)
+  __attribute__ ((regparm (1)));
+void set_signal_mask (sigset_t&, sigset_t) __attribute__ ((regparm (2)));
 int __stdcall handle_sigprocmask (int sig, const sigset_t *set,
 				  sigset_t *oldset, sigset_t& opmask)
   __attribute__ ((regparm (3)));
@@ -86,7 +84,6 @@ int __stdcall sig_send (_pinfo *, siginfo_t&, class _cygtls *tls = NULL) __attri
 int __stdcall sig_send (_pinfo *, int) __attribute__ ((regparm (2)));
 void __stdcall signal_fixup_after_exec ();
 void __stdcall sigalloc ();
-void __stdcall create_signal_arrived ();
 
 int kill_pgrp (pid_t, siginfo_t&);
 int killsys (pid_t, int);

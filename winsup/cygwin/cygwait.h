@@ -22,7 +22,10 @@ enum cw_wait_mask
   cw_sig_eintr =	0x0008
 };
 
-#define LARGE_NULL ((PLARGE_INTEGER) NULL)
+extern LARGE_INTEGER cw_nowait_storage;
+#define cw_nowait (&cw_nowait_storage)
+#define cw_infinite ((PLARGE_INTEGER) NULL)
+
 const unsigned cw_std_mask = cw_cancel | cw_cancel_self | cw_sig;
 
 DWORD cancelable_wait (HANDLE, PLARGE_INTEGER timeout = NULL,
@@ -53,5 +56,5 @@ cygwait (HANDLE h, DWORD howlong = INFINITE)
 static inline DWORD __attribute__ ((always_inline))
 cygwait (DWORD howlong)
 {
-  return cancelable_wait (NULL, howlong, cw_cancel | cw_sig_eintr);
+  return cygwait (NULL, howlong);
 }

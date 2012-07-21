@@ -281,7 +281,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	      goto out;
 	    }
 	  pthread_testcancel ();
-	  if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0
+	  if (cancelable_wait (NULL, 10, cw_sig_eintr) == WAIT_SIGNALED
 	      && !_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);

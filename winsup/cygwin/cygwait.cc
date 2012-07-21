@@ -21,6 +21,8 @@
 
 #define is_cw_sig_handle	(mask & (is_cw_sig | is_cw_sig_eintr))
 
+LARGE_INTEGER cw_nowait_storage;
+
 DWORD
 cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 {
@@ -36,14 +38,13 @@ cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
   if (object)
     wait_objects[num++] = object;
 
+  set_thread_waiting thread_waiting (is_cw_sig_handle, wait_objects[num]);
+debug_printf ("thread waiting %d, signal_arrived %p", (int) thread_waiting, _my_tls.signal_arrived);
   DWORD sig_n;
-  if (!is_cw_sig_handle)
+  if (!thread_waiting)
     sig_n = WAIT_TIMEOUT + 1;
   else
-    {
-      sig_n = WAIT_OBJECT_0 + num++;
-      wait_objects[sig_n] = signal_arrived;
-    }
+    sig_n = WAIT_OBJECT_0 + num++;
 
   DWORD cancel_n;
   if (!is_cw_cancel || !pthread::is_good_object (&thread) ||
@@ -79,7 +80,7 @@ cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 	/* all set */;
       else if (is_cw_sig_eintr)
 	res = WAIT_SIGNALED;	/* caller will deal with signals */
-      else if (_my_tls.call_signal_handler () || &_my_tls != _main_tls)
+      else if (_my_tls.call_signal_handler ())
 	continue;
       break;
     }

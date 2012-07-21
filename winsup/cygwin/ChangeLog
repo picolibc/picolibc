@@ -1,5 +1,92 @@
 2012-07-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* DevNotes: Add entry cgf-000013.
+	* cygserver_ipc.h (ipc_set_proc_info): Use _cygtls::ipc_set_proc_info
+	to set per-thread signal arrived value.
+	* cygthread.cc (cygthread::detach): Use per-thread signal_arrived via
+	set_thread_waiting.
+	* fork.cc (_cygtls::fixup_after_fork): Clear signal_arrived.
+	(_cygtls::remove): Close any signal_arrived handle when thread exists.
+	(_cygtls::find_tls): Remove unneeded function.
+	* cygtls.h: Update copyright.
+	(class _cygtls): Reorganize to help avoid rebuilding newlib when
+	structure changes.
+	(_cygtls::event): Delete.
+	(_cygtls::threadkill): Ditto.	
+	(_cygtls::signal_waiting): Declare new bool.
+	(_cygtls::find_tls): Delete declaration.
+	(_cygtls::set_threadkill): Ditto.
+	(_cygtls::reset_threadkill): Ditto.
+	(_cygtls::set_signal_arrived): Declare new function.
+	(class set_thread_waiting): Declare new class.
+	* cygwait.cc (cw_nowait_storage): Define.
+	(cygwait): Set per-thread signal_arrived via set_thread_waiting.  Don't
+	special-case _main_tls.
+	* cygwait.h (cw_nowait): Define.
+	(cw_infinite): Ditto.
+	(cygwait): Redefine pathological wait-only case.
+	* dcrt0.cc (dll_crt0_0): Remove call to now-defunct events_init().
+	(dll_crt0_1): Remove call to now-defunct create_signal_arrived().
+	* exceptions.cc: Reflect set_signal_mask() argument reordering
+	throughout.  Remove signal mask synchronization throughout.
+	(events_init): Delete definition.
+	(mask_sync): Delete now-unneeded mask synchronization.
+	(set_signal_mask): Reverse order of arguments to "standard" to, from
+	layout.  Rename "newmask" argument to "setmask".  Remove debugging.
+	(sig_handle_tty_stop): Use cancelable_wait rather than WFMO.
+	(_cygtls::interrupt_setup): Don't treat "threadkill" events specially.
+	Conditionally set signal_arrived depending on whether the thread has
+	created it or not.
+	(sigpacket::process): Reorganize to reflect thread-specific sending of
+	signals which is more in line with the way it was actually supposed to
+	work.
+	* fhandler_socket.cc (get_inet_addr): Use cancelable_wait rather than
+	IsEventSignalled to avoid potential race.
+	(fhandler_socket::wait_for_events): Set signal_arrived event using
+	set_thread_waiting().
+	(fhandler_socket::close): Use cygwait for the case of just
+	waiting 10 ms for a signal.
+	* fhandler_tape.cc (fhandler_dev_tape::_lock): Use cancelable_wait
+	rather than WFMO.  Redo switch/case tests accordingly.
+	* fhandler_termios.cc (fhandler_termios::bg_check): Use cygwait for
+	case of just waiting 0 ms for a potential signal.
+	* fhandler_tty.cc (fhandler_pty_master::process_slave_output): Use
+	cancelable_wait rather than WFSO.
+	* fhandler_windows.cc (fhandler_windows::read): Set per-thread
+	signal_arrived via set_thread_waiting().
+	* flock.cc (lf_setlock):  Ditto.
+	* select.cc (pselect): Ditto.  Set per-thread signal_arrived using
+	set_thread_waiting().
+	* gendef: Don't special case handling of _cygtls::sig for threads.
+	* gentls_offsets: Use #pragma once in tlsoffsets.h.
+	* ntdll.h: Use #pragma once.
+	* poll.cc: Reflect set_signal_mask() argument reordering.
+	* posix_ipc.cc (ipc_mutex_lock): Use cancelable_wait rather than WFMO.
+	(ipc_cond_timedwait): Set perl-thread signal arrived using
+	set_thread_waiting().
+	* security.h: Use #pragma once.
+	* signal.cc (abort): Reflect set_signal_mask() argument reordering.
+	(clock_nanosleep): Ditto.  Change call to cancelable_wait to properly
+	specify handling of cancel and interrupt.
+	(sigwaitinfo): Remove handling of per-thread event in favor of
+	per-thread signal_arrived.  Use cancelable_wait rather than WFSO.
+	* sigproc.cc (signal_arrived): Delete definition.
+	(create_signal_arrived): Ditto.
+	* sigproc.h (signal_arrived): Delete declaration.
+	(set_signal_mask): Avoid defining as a "C" function.  Don't
+	conditionally declare.
+	(create_signal_arrived): Delete declaration.
+	* syscalls.cc (rename): Use cygwait() rather than WFSO.
+	* thread.h (fast_mutex::lock): Use cw_infinite rather than LARGE_NULL.
+	* wait.cc (wait4): Ditto.
+	* thread.cc (pthread_mutex::lock): Ditto.
+	(pthread::join): Ditto.
+	(semaphore::_wait): Ditto.
+	(pthread_kill): Remove set_threadkill() accommodation.
+	* tlsoffsets.h: Regenerate.
+
+2012-07-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 17.
 
 2012-07-19  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>

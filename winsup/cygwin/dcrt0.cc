@@ -774,9 +774,6 @@ dll_crt0_0 ()
   user_data->threadinterface->Init ();
 
   _cygtls::init ();
-
-  /* Initialize events */
-  events_init ();
   tty_list::init_session ();
 
   _main_tls = &_my_tls;
@@ -842,8 +839,6 @@ dll_crt0_1 (void *)
 #ifdef DEBUGGING
   strace.microseconds ();
 #endif
-
-  create_signal_arrived (); /* FIXME: move into wait_sig? */
 
   /* Initialize debug muto, if DLL is built with --enable-debugging.
      Need to do this before any helper threads start. */

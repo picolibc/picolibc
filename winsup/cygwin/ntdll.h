@@ -9,8 +9,7 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#ifndef _NTDLL_H
-#define _NTDLL_H 1
+#pragma once
 
 #ifndef __MINGW64_VERSION_MAJOR
 # include <ddk/ntstatus.h>
@@ -1425,4 +1424,3 @@ extern "C"
   }
 }
 #endif
-#endif /*_NTDLL_H*/

@@ -125,9 +125,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	     some greedy Win32 application.  Therefore we should never wait
 	     endlessly without checking for signals and thread cancel event. */
 	  pthread_testcancel ();
-	  /* Using IsEventSignalled like this is racy since another thread could
-	     be waiting for signal_arrived. */
-	  if (IsEventSignalled (signal_arrived)
+	  if (cancelable_wait (NULL, cw_nowait, cw_sig_eintr) == WAIT_SIGNALED
 	      && !_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);
@@ -659,7 +657,8 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
 	  return SOCKET_ERROR;
 	}
 
-      WSAEVENT ev[2] = { wsock_evt, signal_arrived };
+      WSAEVENT ev[2] = { wsock_evt };
+      set_thread_waiting here (ev[1]);
       switch (WSAWaitForMultipleEvents (2, ev, FALSE, 50, FALSE))
 	{
 	  case WSA_WAIT_TIMEOUT:
@@ -1778,7 +1777,7 @@ fhandler_socket::close ()
 	  res = -1;
 	  break;
 	}
-      if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0)
+      if (cygwait (10) == WAIT_SIGNALED)
 	{
 	  set_errno (EINTR);
 	  res = -1;

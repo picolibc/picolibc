@@ -120,12 +120,9 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
 
   syscall_printf ("clock_nanosleep (%ld.%09ld)", rqtp->tv_sec, rqtp->tv_nsec);
 
-  int rc = cancelable_wait (signal_arrived, &timeout);
-  if (rc == WAIT_OBJECT_0)
-    {
-      _my_tls.call_signal_handler ();
-      res = EINTR;
-    }
+  int rc = cancelable_wait (NULL, &timeout, cw_sig | cw_cancel | cw_cancel_self);
+  if (rc == WAIT_SIGNALED)
+    res = EINTR;
 
   /* according to POSIX, rmtp is used only if !abstime */
   if (rmtp && !abstime)
@@ -226,7 +223,7 @@ handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& op
 	  newmask = *set;
 	  break;
 	}
-      set_signal_mask (newmask, opmask);
+      set_signal_mask (opmask, newmask);
     }
   return 0;
 }
@@ -379,7 +376,7 @@ abort (void)
   sigset_t sig_mask;
   sigfillset (&sig_mask);
   sigdelset (&sig_mask, SIGABRT);
-  set_signal_mask (sig_mask, _my_tls.sigmask);
+  set_signal_mask (_my_tls.sigmask, sig_mask);
 
   raise (SIGABRT);
   _my_tls.call_signal_handler (); /* Call any signal handler */
@@ -568,21 +565,18 @@ extern "C" int
 sigwaitinfo (const sigset_t *set, siginfo_t *info)
 {
   pthread_testcancel ();
-  HANDLE h;
-  h = _my_tls.event = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-  if (!h)
-    {
-      __seterrno ();
-      return -1;
-    }
 
-  _my_tls.sigwait_mask = *set;
+  myfault efault;
+  if (efault.faulted (EFAULT))
+    return EFAULT;
+
+  set_signal_mask (_my_tls.sigwait_mask, *set);
   sig_dispatch_pending (true);
 
   int res;
-  switch (WaitForSingleObject (h, INFINITE))
+  switch (cancelable_wait (NULL, cw_infinite, cw_sig | cw_cancel | cw_cancel_self))
     {
-    case WAIT_OBJECT_0:
+    case WAIT_SIGNALED:
       if (!sigismember (set, _my_tls.infodata.si_signo))
 	{
 	  set_errno (EINTR);
@@ -593,6 +587,7 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
 	  if (info)
 	    *info = _my_tls.infodata;
 	  res = _my_tls.infodata.si_signo;
+	  /* FIXME: Is this right? */
 	  InterlockedExchange ((LONG *) &_my_tls.sig, (LONG) 0);
 	}
       break;
@@ -601,8 +596,6 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
       res = -1;
     }
 
-  _my_tls.event = NULL;
-  CloseHandle (h);
   sigproc_printf ("returning signal %d", res);
   return res;
 }
