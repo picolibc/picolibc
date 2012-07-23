@@ -1,3 +1,7 @@
+2012-07-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	Change "set_thread_waiting" to "set_signal_arrived" throughout.
+
 2012-07-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* DevNotes: Add entry cgf-000013.

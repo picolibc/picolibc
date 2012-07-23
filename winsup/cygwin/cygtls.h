@@ -315,14 +315,14 @@ public:
   }
 };
 
-class set_thread_waiting
+class set_signal_arrived
 {
 public:
-  set_thread_waiting (bool setit, HANDLE& h) { _my_tls.set_signal_arrived (setit, h); }
-  set_thread_waiting (HANDLE& h) { _my_tls.set_signal_arrived (true, h); }
+  set_signal_arrived (bool setit, HANDLE& h) { _my_tls.set_signal_arrived (setit, h); }
+  set_signal_arrived (HANDLE& h) { _my_tls.set_signal_arrived (true, h); }
 
   operator int () const {return _my_tls.signal_waiting;}
-  ~set_thread_waiting () { _my_tls.signal_waiting = false; }
+  ~set_signal_arrived () { _my_tls.signal_waiting = false; }
 };
 
 #define __getreent() (&_my_tls.local_clib)

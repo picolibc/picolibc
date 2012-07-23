@@ -658,7 +658,7 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
 	}
 
       WSAEVENT ev[2] = { wsock_evt };
-      set_thread_waiting here (ev[1]);
+      set_signal_arrived here (ev[1]);
       switch (WSAWaitForMultipleEvents (2, ev, FALSE, 50, FALSE))
 	{
 	  case WSA_WAIT_TIMEOUT:

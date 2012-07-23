@@ -4,7 +4,7 @@ These changes reflect a revamp of the "wait for signal" functionality
 which has existed in Cygwin through several signal massages.
 
 We now create a signal event only when a thread is waiting for a signal
-and arm it only for that thread.  The "set_thread_waiting" function is
+and arm it only for that thread.  The "set_signal_arrived" function is
 used to establish the event and set it in a location referencable by
 the caller.
 
