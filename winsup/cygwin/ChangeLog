@@ -1,3 +1,9 @@
+2012-07-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* wincap.cc (wincapc::init): Drop memset call since it can result in
+	a race condition.  Drop all considerations for pre-Windows 2000 systems
+	since Cygwin won't start on them anyway.
+
 2012-07-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	Change "set_thread_waiting" to "set_signal_arrived" throughout.
