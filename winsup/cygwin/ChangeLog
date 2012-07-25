@@ -1,3 +1,17 @@
+2012-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (enum bin_status): Add dir_not_empty.
+	(try_to_bin): Call NtQueryInformationFile(FileInternalInformation)
+	with exact buffer size.  Explain why.
+	Ditto for NtSetInformationFile(FileRenameInformation).
+	Handle race-condition which might lead to renaming a non-empty
+	directory.
+	(unlink_nt): Rearrange and partially rephrase comments related to the
+	STATUS_SHARING_VIOLATION case.  Fix condition under which a dir is
+	tested for being non-empty.  Handle dir_not_empty return code from
+	try_to_bin.  Gracefully handle disappearing directory in rm -r
+	workaround.  Fix typo in comment.
+
 2012-07-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* wincap.cc (wincapc::init): Drop memset call since it can result in

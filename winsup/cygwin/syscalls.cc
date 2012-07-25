@@ -228,7 +228,8 @@ enum bin_status
 {
   dont_move,
   move_to_bin,
-  has_been_moved
+  has_been_moved,
+  dir_not_empty
 };
 
 static bin_status
@@ -245,6 +246,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   PFILE_NAME_INFORMATION pfni;
   PFILE_INTERNAL_INFORMATION pfii;
   PFILE_RENAME_INFORMATION pfri;
+  ULONG frisiz;
   FILE_DISPOSITION_INFORMATION disp = { TRUE };
   bool fs_has_per_user_recycler = pc.fs_is_ntfs () || pc.fs_is_refs ();
 
@@ -339,7 +341,10 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 			    pc.fs_flags () & FILE_UNICODE_ON_DISK
 			    ? L".\xdc63\xdc79\xdc67" : L".cyg");
   pfii = (PFILE_INTERNAL_INFORMATION) infobuf;
-  status = NtQueryInformationFile (fh, &io, pfii, 65536,
+  /* Note: Modern Samba versions apparently don't like buffer sizes of more
+     than 65535 in some NtQueryInformationFile/NtSetInformationFile calls.
+     Therefore we better use exact buffer sizes from now on. */
+  status = NtQueryInformationFile (fh, &io, pfii, sizeof *pfii,
 				   FileInternalInformation);
   if (!NT_SUCCESS (status))
     {
@@ -356,7 +361,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   pfri->RootDirectory = pc.isremote () ? NULL : rootdir;
   pfri->FileNameLength = recycler.Length;
   memcpy (pfri->FileName, recycler.Buffer, recycler.Length);
-  status = NtSetInformationFile (fh, &io, pfri, 65536, FileRenameInformation);
+  frisiz = sizeof *pfri + pfri->FileNameLength - sizeof (WCHAR);
+  status = NtSetInformationFile (fh, &io, pfri, frisiz, FileRenameInformation);
   if (status == STATUS_OBJECT_PATH_NOT_FOUND && !pc.isremote ())
     {
       /* Ok, so the recycler and/or the recycler/SID directory don't exist.
@@ -477,7 +483,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 	}
       NtClose (recyclerdir);
       /* Shoot again. */
-      status = NtSetInformationFile (fh, &io, pfri, 65536,
+      status = NtSetInformationFile (fh, &io, pfri, frisiz,
 				     FileRenameInformation);
     }
   if (!NT_SUCCESS (status))
@@ -493,6 +499,26 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
      Otherwise the below code closes the handle to allow replacing the file. */
   status = NtSetInformationFile (fh, &io, &disp, sizeof disp,
 				 FileDispositionInformation);
+  if (status == STATUS_DIRECTORY_NOT_EMPTY)
+    {
+      /* Uh oh!  This was supposed to be avoided by the check_dir_not_empty
+	 test in unlink_nt, but given that the test isn't atomic, this *can*
+	 happen.  Try to move the dir back ASAP. */
+      pfri->RootDirectory = NULL;
+      pfri->FileNameLength = pc.get_nt_native_path ()->Length;
+      memcpy (pfri->FileName, pc.get_nt_native_path ()->Buffer,
+			      pc.get_nt_native_path ()->Length);
+      frisiz = sizeof *pfri + pfri->FileNameLength - sizeof (WCHAR);
+      if (NT_SUCCESS (NtSetInformationFile (fh, &io, pfri, frisiz,
+					    FileRenameInformation)))
+	{
+	  /* Give notice to unlink_nt and leave immediately.  This avoids
+	     closing the handle, which might still be used if called from
+	     the rm -r workaround code. */
+	  bin_stat = dir_not_empty;
+	  goto out;
+	}
+    }
   /* In case of success, restore R/O attribute to accommodate hardlinks.
      That leaves potentially hardlinks around with the R/O bit suddenly
      off if setting the delete disposition failed, but please, keep in
@@ -524,7 +550,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 		    status);
       goto out;
     }
-  status = NtSetInformationFile (tmp_fh, &io, pfri, 65536,
+  status = NtSetInformationFile (tmp_fh, &io, pfri, frisiz,
 				 FileRenameInformation);
   NtClose (tmp_fh);
   if (!NT_SUCCESS (status))
@@ -691,46 +717,45 @@ unlink_nt (path_conv &pc)
 	   if a file is already open elsewhere for other purposes than
 	   reading and writing data.  */
   status = NtOpenFile (&fh, access, &attr, &io, FILE_SHARE_DELETE, flags);
+  /* STATUS_SHARING_VIOLATION is what we expect. STATUS_LOCK_NOT_GRANTED can
+     be generated under not quite clear circumstances when trying to open a
+     file on NFS with FILE_SHARE_DELETE only.  This has been observed with
+     SFU 3.5 if the NFS share has been mounted under a drive letter.  It's
+     not generated for all files, but only for some.  If it's generated once
+     for a file, it will be generated all the time.  It looks as if wrong file
+     state information is stored within the NFS client which never times out.
+     Opening the file with FILE_SHARE_VALID_FLAGS will work, though, and it
+     is then possible to delete the file quite normally. */
   if (status == STATUS_SHARING_VIOLATION || status == STATUS_LOCK_NOT_GRANTED)
     {
-      /* STATUS_LOCK_NOT_GRANTED can be generated under not quite clear
-	 circumstances when trying to open a file on NFS with FILE_SHARE_DELETE
-	 only.  This has been observed with SFU 3.5 if the NFS share has been
-	 mounted under a drive letter.  It's not generated for all files, but
-	 only for some.  If it's generated once for a file, it will be
-	 generated all the time.  It looks like wrong file state information
-	 is stored within the NFS client, for no apparent reason, which never
-	 times out.  Opening the file with FILE_SHARE_VALID_FLAGS will work,
-	 though, and it is then possible to delete the file quite normally.
-
-	 NFS implements its own mechanism to remove in-use files which
-	 looks quite similar to what we do in try_to_bin for remote files.
-	 That's why we don't call try_to_bin on NFS.
+      debug_printf ("Sharing violation when opening %S",
+		    pc.get_nt_native_path ());
+      /* We never call try_to_bin on NFS and NetApp for the follwing reasons:
+      
+         NFS implements its own mechanism to remove in-use files, which looks
+	 quite similar to what we do in try_to_bin for remote files.
 
 	 Netapp filesystems don't understand the "move and delete" method
 	 at all and have all kinds of weird effects.  Just setting the delete
 	 dispositon usually works fine, though. */
-      debug_printf ("Sharing violation when opening %S",
-		    pc.get_nt_native_path ());
       if (!pc.fs_is_nfs () && !pc.fs_is_netapp ())
 	bin_stat = move_to_bin;
-      if (!pc.isdir () || pc.isremote ())
+      /* If the file is not a directory, of if we didn't set the move_to_bin
+	 flag, just proceed with the FILE_SHARE_VALID_FLAGS set. */
+      if (!pc.isdir () || bin_stat == dont_move)
 	status = NtOpenFile (&fh, access, &attr, &io,
 			     FILE_SHARE_VALID_FLAGS, flags);
       else
 	{
-	  /* It's getting tricky.  The directory is opened in some process,
-	     so we're supposed to move it to the recycler and mark it for
-	     deletion.  But what if the directory is not empty?  The move
+	  /* Otherwise it's getting tricky.  The directory is opened in some
+	     process, so we're supposed to move it to the recycler and mark it
+	     for deletion.  But what if the directory is not empty?  The move
 	     will work, but the subsequent delete will fail.  So we would
-	     have to move it back.  That's bad, because the directory would
-	     be moved around which results in a temporary inconsistent state.
-	     So, what we do here is to test if the directory is empty.  If
-	     not, we bail out with STATUS_DIRECTORY_NOT_EMPTY.  The below code
-	     tests for at least three entries in the directory, ".", "..",
-	     and another one.  Three entries means, not empty.  This doesn't
-	     work for the root directory of a drive, but the root dir can
-	     neither be deleted, nor moved anyway. */
+	     have to move it back.  While we do that in try_to_bin, it's bad,
+	     because the move results in a temporary inconsistent state.
+	     So, we test first if the directory is empty.  If not, we bail
+	     out with STATUS_DIRECTORY_NOT_EMPTY.  This avoids most of the
+	     problems. */
 	  status = NtOpenFile (&fh, access | FILE_LIST_DIRECTORY | SYNCHRONIZE,
 			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       flags | FILE_SYNCHRONOUS_IO_NONALERT);
@@ -764,9 +789,15 @@ unlink_nt (path_conv &pc)
   /* Try to move to bin if a sharing violation occured.  If that worked,
      we're done. */
   if (bin_stat == move_to_bin
-      && (bin_stat = try_to_bin (pc, fh, access)) == has_been_moved)
+      && (bin_stat = try_to_bin (pc, fh, access)) >= has_been_moved)
     {
-      status = STATUS_SUCCESS;
+      if (bin_stat == has_been_moved)
+	status = STATUS_SUCCESS;
+      else
+	{
+	  status = STATUS_DIRECTORY_NOT_EMPTY;
+	  NtClose (fh);
+	}
       goto out;
     }
 
@@ -831,6 +862,7 @@ try_again:
 			  bin_stat = try_to_bin (pc, fh, access);
 			}
 		    }
+		  /* Do NOT handle bin_stat == dir_not_empty here! */
 		  if (bin_stat == has_been_moved)
 		    status = STATUS_SUCCESS;
 		  else
@@ -842,12 +874,15 @@ try_again:
 		    }
 		}
 	    }
-	  else
+	  else if (status2 != STATUS_OBJECT_PATH_NOT_FOUND
+		   && status2 !=  STATUS_OBJECT_NAME_NOT_FOUND)
 	    {
 	      fh = NULL;
 	      debug_printf ("Opening dir %S for check_dir_not_empty failed, "
 			    "status = %p", pc.get_nt_native_path (), status2);
 	    }
+	  else /* Directory disappeared between NtClose and NtOpenFile. */
+	    status = STATUS_SUCCESS;
 	}
       /* Trying to delete a hardlink to a file in use by the system in some
 	 way (for instance, font files) by setting the delete disposition fails
@@ -885,8 +920,10 @@ try_again:
 		 unlinking didn't work. */
 	      if (bin_stat == dont_move)
 		bin_stat = try_to_bin (pc, fh, access);
-	      if (bin_stat == has_been_moved)
-		status = STATUS_SUCCESS;
+	      if (bin_stat >= has_been_moved)
+		status = bin_stat == has_been_moved
+				     ? STATUS_SUCCESS
+				     : STATUS_DIRECTORY_NOT_EMPTY;
 	    }
 	  else
 	    NtClose (fh2);
@@ -896,7 +933,7 @@ try_again:
     {
       if (access & FILE_WRITE_ATTRIBUTES)
 	{
-	  /* Restore R/O attribute if setting the delete dispostion failed. */
+	  /* Restore R/O attribute if setting the delete disposition failed. */
 	  if (!NT_SUCCESS (status))
 	    NtSetAttributesFile (fh, pc.file_attributes ());
 	  /* If we succeeded, restore R/O attribute to accommodate hardlinks.
