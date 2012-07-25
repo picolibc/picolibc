@@ -1,3 +1,8 @@
+2012-07-25  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* signal.cc (clock_nanosleep): Force return on signal rather than
+	letting cancelable_wait loop on signal.
+
 2012-07-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (enum bin_status): Add dir_not_empty.

@@ -120,7 +120,7 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
 
   syscall_printf ("clock_nanosleep (%ld.%09ld)", rqtp->tv_sec, rqtp->tv_nsec);
 
-  int rc = cancelable_wait (NULL, &timeout, cw_sig | cw_cancel | cw_cancel_self);
+  int rc = cancelable_wait (NULL, &timeout, cw_sig_eintr | cw_cancel | cw_cancel_self);
   if (rc == WAIT_SIGNALED)
     res = EINTR;
 
