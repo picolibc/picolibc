@@ -1,7 +1,0 @@
-2010-06-10  Tristan Gingold  <gingold@adacore.com>
-
-	* aout.h: New file.
-	* clock.h: Likewise.
-	* lst.h: Likewise.
-	* reloc.h: Likewise.
-	* internal.h: Likewise.
