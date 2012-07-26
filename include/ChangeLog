@@ -1,4 +1,5 @@
-2012-07-24  Dr David Alan Gilbert  <dave@treblig.org>
+2012-07-24  Stephan McCamant  <smcc@cs.berkeley.edu>
+            Dr David Alan Gilbert  <dave@treblig.org>
 
 	PR binutils/13135
 	* dis-asm.h (fprintf_ftype): Add ATTRIBUTE_FPTR_PRINTF_2.
