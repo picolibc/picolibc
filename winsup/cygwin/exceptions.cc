@@ -748,7 +748,7 @@ sig_handle_tty_stop (int sig)
   switch (cancelable_wait (sigCONT, cw_infinite, cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
-    case WAIT_OBJECT_0 + 1:
+    case WAIT_SIGNALED:
       myself->stopsig = SIGCONT;
       myself->alert_parent (SIGCONT);
       break;
@@ -801,7 +801,7 @@ _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
 
   this->sig = sig;			// Should always be last thing set to avoid a race
 
-  if (signal_arrived)
+  if (incyg && signal_arrived)
     SetEvent (signal_arrived);
 
   proc_subproc (PROC_CLEARWAIT, 1);
@@ -1259,10 +1259,14 @@ _cygtls::call_signal_handler ()
   while (1)
     {
       lock ();
-      if (sig)
+      if (!sig)
+	{
+	  unlock ();
+	  break;
+	}
+
+      if (incyg)
 	pop ();
-      else
-	break;
 
       debug_only_printf ("dealing with signal %d", sig);
       this_sa_flags = sa_flags;
@@ -1272,12 +1276,12 @@ _cygtls::call_signal_handler ()
       sigset_t this_oldmask = set_process_mask_delta ();
       int this_errno = saved_errno;
       sig = 0;
+      reset_signal_arrived ();
       unlock ();	// make sure synchronized
       if (!(this_sa_flags & SA_SIGINFO))
 	{
-	  void (*sigfunc) (int) = thisfunc;
 	  incyg = false;
-	  sigfunc (thissig);
+	  thisfunc (thissig);
 	}
       else
 	{
@@ -1293,7 +1297,6 @@ _cygtls::call_signal_handler ()
 	set_errno (this_errno);
     }
 
-  unlock ();
   return this_sa_flags & SA_RESTART || (this != _main_tls);
 }
 

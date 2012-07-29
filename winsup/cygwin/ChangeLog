@@ -1,5 +1,22 @@
 2012-07-29  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* cygtls.cc (_cygtls::reset_signal_arrived): New function.
+	(set_signal_arrived::~set_signal_arrived): Use reset_signal_arrived to
+	reset state.
+	* exceptions.cc (sig_handle_tty_stop): Use WAIT_SIGNALED rather than
+	assume we know the return from cancelable_wait.
+	(_cygtls::interrupt_setup): Modify to allow calling when executing in
+	non-cygwin code via sigdelayed.  Always reset signal_arrived.
+	* gendef: Throughout use start_offset rather than the completely wrong
+	sizeof__cygtls.
+	(_sigdelayed): Rewrite to avoid duplication when calling the signal
+	handler.
+	(sigreturn): Delete.
+	* gentls_offsets: Define start_offset rather than sizeof__cygtls.
+	* tlsoffsets.h: Regenerate.
+
+2012-07-29  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* fhandler_termios.cc (fhandler_termios::line_edit): Use special case
 	'%0c' handling to print non-printable characters using hex notation.
 	* smallprint.cc (__small_vsprintf): Semi-reimplement printing of
