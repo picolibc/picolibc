@@ -1,3 +1,8 @@
+2012-07-29  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/sdkddkver.h: New file.
+	* include/windows.h: Include sdkddkver.h.
+
 2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/winsock.h: Keep IP_OPTIONS and SO_xxx definitions when

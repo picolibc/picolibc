@@ -16,6 +16,8 @@
 #pragma GCC system_header
 #endif
 
+#include <sdkddkver.h>
+
 /* translate GCC target defines to MS equivalents. Keep this synchronized
    with winnt.h. */
 #if defined(__i686__) && !defined(_M_IX86)
