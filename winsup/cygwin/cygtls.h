@@ -248,6 +248,12 @@ public:
 	signal_waiting = true;
       }
   }
+  void reset_signal_arrived ()
+  {
+    if (signal_arrived)
+      ResetEvent (signal_arrived);
+    signal_waiting = false;
+  }
 private:
   void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
   /*gentls_offsets*/
@@ -322,7 +328,7 @@ public:
   set_signal_arrived (HANDLE& h) { _my_tls.set_signal_arrived (true, h); }
 
   operator int () const {return _my_tls.signal_waiting;}
-  ~set_signal_arrived () { _my_tls.signal_waiting = false; }
+  ~set_signal_arrived () { _my_tls.reset_signal_arrived (); }
 };
 
 #define __getreent() (&_my_tls.local_clib)
