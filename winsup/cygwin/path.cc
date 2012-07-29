@@ -1153,7 +1153,7 @@ out:
   if (opt & PC_CTTY)
     path_flags |= PATH_CTTY;
 
-  if ((opt & PC_POSIX))
+  if (opt & PC_POSIX)
     {
       if (tail < path_end && tail > path_copy + 1)
 	*tail = '/';

@@ -237,7 +237,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
     {
       c = *rptr++;
 
-      termios_printf ("char %c", c);
+      paranoid_printf ("char %0c", c);
 
       /* Check for special chars */
 

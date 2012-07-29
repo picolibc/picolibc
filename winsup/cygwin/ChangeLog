@@ -1,3 +1,16 @@
+2012-07-29  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Use special case
+	'%0c' handling to print non-printable characters using hex notation.
+	* smallprint.cc (__small_vsprintf): Semi-reimplement printing of
+	non-printable characters in hex but only when padding is specified.
+
+	* dcrt0.cc (dll_crt0_0): Remove tty_list initialization.
+	* shared.cc (memory_init): Initialize tty_list here.
+
+	* path.cc (path_conv::check): Remove unneeded parentheses from if
+	check.
+
 2012-07-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/inttypes.h: Add x86_64 target considerations throughout.

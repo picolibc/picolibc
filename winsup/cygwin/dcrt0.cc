@@ -774,7 +774,6 @@ dll_crt0_0 ()
   user_data->threadinterface->Init ();
 
   _cygtls::init ();
-  tty_list::init_session ();
 
   _main_tls = &_my_tls;
 
