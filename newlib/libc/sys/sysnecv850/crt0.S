@@ -5,7 +5,7 @@
 
 _start:
 
-#if defined __v850e__
+#if defined(__v850e__) || defined(__v850e2__) || defined(__v850e2v3__)
 	
 	movea   255,		r0,	r20
 	mov     65535,		r21
