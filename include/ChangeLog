@@ -13,6 +13,11 @@
 
 	* elf/s390.h (START_RELOC_NUMBERS): Define R_390_IRELATIVE reloc.
 
+2012-07-05  Sean Keys  <skeys@ipdatasys.com>
+
+        * opcode/xgate.h: Changed the format string for mode
+        XGATE_OP_DYA_MON.
+
 2012-06-18  Doug Evans  <dje@google.com>
 
 	* dwarf2.def (DW_OP): Add DW_OP_GNU_const_index.
