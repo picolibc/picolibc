@@ -517,19 +517,25 @@ sigfillset (sigset_t *set)
 extern "C" int
 sigsuspend (const sigset_t *set)
 {
-  return handle_sigsuspend (*set);
+  int res = handle_sigsuspend (*set);
+  syscall_printf ("%R = sigsuspend(%p)", res, set);
+  return res;
 }
 
 extern "C" int
 sigpause (int signal_mask)
 {
-  return handle_sigsuspend ((sigset_t) signal_mask);
+  int res = handle_sigsuspend ((sigset_t) signal_mask);
+  syscall_printf ("%R = sigpause(%p)", res, signal_mask);
+  return res;
 }
 
 extern "C" int
 pause (void)
 {
-  return handle_sigsuspend (_my_tls.sigmask);
+  int res = handle_sigsuspend (_my_tls.sigmask);
+  syscall_printf ("%R = pause()", res);
+  return res;
 }
 
 extern "C" int

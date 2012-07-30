@@ -58,8 +58,6 @@ struct sigpacket
   int __stdcall process () __attribute__ ((regparm (1)));
 };
 
-extern HANDLE sigCONT;
-
 void __stdcall sig_dispatch_pending (bool fast = false)
   __attribute__ ((regparm (1)));
 void set_signal_mask (sigset_t&, sigset_t) __attribute__ ((regparm (2)));

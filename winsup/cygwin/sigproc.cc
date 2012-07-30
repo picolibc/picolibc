@@ -46,8 +46,7 @@ char NO_COPY myself_nowait_dummy[1] = {'0'};// Flag to sig_send that signal goes
 
 #define Static static NO_COPY
 
-HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
-
+Static HANDLE sig_hold;			// Used to stop signal processing
 Static bool sigheld;			// True if holding signals
 
 Static int nprocs;			// Number of deceased children
@@ -568,7 +567,7 @@ sig_send (_pinfo *p, int sig)
     return 0;
   else if (sig == __SIGNOHOLD || sig == __SIGEXIT)
     {
-      SetEvent (sigCONT);
+      SetEvent (sig_hold);
       sigheld = false;
     }
   else if (&_my_tls == _main_tls)
@@ -1345,7 +1344,7 @@ static void WINAPI
 wait_sig (VOID *)
 {
   _sig_tls = &_my_tls;
-  sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+  sig_hold = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 
   sigproc_printf ("entering ReadFile loop, my_readsig %p, my_sendsig %p",
 		  my_readsig, my_sendsig);
@@ -1355,7 +1354,7 @@ wait_sig (VOID *)
   for (;;)
     {
       if (pack.si.si_signo == __SIGHOLD)
-	WaitForSingleObject (sigCONT, INFINITE);
+	WaitForSingleObject (sig_hold, INFINITE);
       DWORD nb;
       pack.tls = NULL;
       if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))

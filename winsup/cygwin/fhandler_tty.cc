@@ -176,7 +176,7 @@ fhandler_pty_master::accept_input ()
       DWORD rc;
       DWORD written = 0;
 
-      termios_printf ("about to write %d chars to slave", bytes_left);
+      paranoid_printf ("about to write %d chars to slave", bytes_left);
       rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
       if (!rc)
 	{

@@ -735,30 +735,29 @@ sig_handle_tty_stop (int sig)
   /* Silently ignore attempts to suspend if there is no accommodating
      cygwin parent to deal with this behavior. */
   if (!myself->cygstarted)
+    myself->process_state &= ~PID_STOPPED;
+  else
     {
-      myself->process_state &= ~PID_STOPPED;
-      return;
-    }
-
-  myself->stopsig = sig;
-  myself->alert_parent (sig);
-  sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
-  HANDLE w4[2];
-  w4[0] = sigCONT;
-  switch (cancelable_wait (sigCONT, cw_infinite, cw_sig_eintr))
-    {
-    case WAIT_OBJECT_0:
-    case WAIT_SIGNALED:
-      myself->stopsig = SIGCONT;
-      myself->alert_parent (SIGCONT);
-      break;
-    default:
-      api_fatal ("WaitSingleObject failed, %E");
-      break;
+      myself->stopsig = sig;
+      myself->alert_parent (sig);
+      sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
+      /* FIXME! This does nothing to suspend anything other than the main
+	 thread. */
+      DWORD res = cancelable_wait (NULL, cw_infinite, cw_sig_eintr);
+      switch (res)
+	{
+	case WAIT_SIGNALED:
+	  myself->stopsig = SIGCONT;
+	  myself->alert_parent (SIGCONT);
+	  break;
+	default:
+	  api_fatal ("WaitSingleObject returned %d", res);
+	  break;
+	}
     }
   _my_tls.incyg = 0;
 }
-}
+} /* end extern "C" */
 
 bool
 _cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
@@ -1122,14 +1121,14 @@ set_signal_mask (sigset_t& setmask, sigset_t newmask)
 int __stdcall
 sigpacket::process ()
 {
-  DWORD continue_now;
+  bool continue_now;
   struct sigaction dummy = global_sigs[SIGSTOP];
 
   if (si.si_signo != SIGCONT)
     continue_now = false;
   else
     {
-      continue_now = myself->process_state & PID_STOPPED;
+      continue_now = ISSTATE (myself, PID_STOPPED);
       myself->stopsig = 0;
       myself->process_state &= ~PID_STOPPED;
       /* Clear pending stop signals */
@@ -1206,9 +1205,7 @@ sigpacket::process ()
       if (si.si_signo == SIGCHLD || si.si_signo == SIGIO || si.si_signo == SIGCONT || si.si_signo == SIGWINCH
 	  || si.si_signo == SIGURG)
 	{
-	  sigproc_printf ("default signal %d ignored", si.si_signo);
-	  if (continue_now)
-	    SetEvent (tls->signal_arrived);
+	  sigproc_printf ("signal %d default is currently ignore", si.si_signo);
 	  goto done;
 	}
 
@@ -1224,21 +1221,24 @@ sigpacket::process ()
   goto dosig;
 
 stop:
-  /* Eat multiple attempts to STOP */
-  if (ISSTATE (myself, PID_STOPPED))
-    goto done;
   handler = (void *) sig_handle_tty_stop;
   thissig = dummy;
 
 dosig:
-  tls->set_siginfo (this);
-  /* Dispatch to the appropriate function. */
-  sigproc_printf ("signal %d, signal handler %p", si.si_signo, handler);
-  rc = setup_handler (si.si_signo, handler, thissig, tls);
+  if (ISSTATE (myself, PID_STOPPED) && !continue_now)
+      rc = -1;		/* No signals delivered if stopped */
+  else
+    {
+      tls->set_siginfo (this);
+      /* Dispatch to the appropriate function. */
+      sigproc_printf ("signal %d, signal handler %p", si.si_signo, handler);
+      rc = setup_handler (si.si_signo, handler, thissig, tls);
+      continue_now = false;
+    }
 
 done:
   if (continue_now)
-    SetEvent (sigCONT);
+    SetEvent (tls->signal_arrived);
   sigproc_printf ("returning %d", rc);
   return rc;
 

@@ -1,6 +1,30 @@
 2012-07-29  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
-	* cygtls.cc (_cygtls::reset_signal_arrived): New function.
+	* cygwait.cc (cancelable_wait): Add some debugging-only output.
+	* exceptions.cc (sig_handle_tty_stop): Make sure that incyg is cleared
+	when exiting if we have no parent process.  Only wait for signal_arrived.
+	(sigpacket::process): Make continue_now a bool.  Delay sending
+	signal_arrived until the end.  Make code more defensive to avoid
+	calling signal handler when stopped.  Only set signal_arrived when
+	stopped.
+	* sigproc.cc (sig_hold): Rename from sigCONT.  Make static.
+	(sig_send): Accommodate sigCONT -> sig_hold rename.
+	(wait_sig): Ditto.
+	* sigproc.h (sigCONT): Delete declaration.
+
+	* fhandler_console.cc (fhandler_console::write): Use new '%0c' facility
+	to print characters.  Change to paranoid to avoid excessive strace
+	output.
+	* fhandler_tty.cc (fhandler_pty_master::accept_input): Make frequent
+	strace printf "paranoid" to help cut down on strace output size.
+
+	* signal.cc (sigsuspend): Add standard syscall strace output.
+	(sigpause): Ditto.
+	(pause): Ditto.
+
+2012-07-29  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygtls.h (_cygtls::reset_signal_arrived): New function.
 	(set_signal_arrived::~set_signal_arrived): Use reset_signal_arrived to
 	reset state.
 	* exceptions.cc (sig_handle_tty_stop): Use WAIT_SIGNALED rather than

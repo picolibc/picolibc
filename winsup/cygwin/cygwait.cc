@@ -39,7 +39,7 @@ cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
     wait_objects[num++] = object;
 
   set_signal_arrived thread_waiting (is_cw_sig_handle, wait_objects[num]);
-debug_printf ("thread waiting %d, signal_arrived %p", (int) thread_waiting, _my_tls.signal_arrived);
+  debug_only_printf ("object %p, thread waiting %d, signal_arrived %p", object, (int) thread_waiting, _my_tls.signal_arrived);
   DWORD sig_n;
   if (!thread_waiting)
     sig_n = WAIT_TIMEOUT + 1;
@@ -72,6 +72,7 @@ debug_printf ("thread waiting %d, signal_arrived %p", (int) thread_waiting, _my_
   while (1)
     {
       res = WaitForMultipleObjects (num, wait_objects, FALSE, INFINITE);
+      debug_only_printf ("res %d", res);
       if (res == cancel_n)
 	res = WAIT_CANCELED;
       else if (res == timeout_n)
