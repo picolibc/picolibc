@@ -2,6 +2,8 @@
 
 	* include/stdint.h: Include _mingw.h for the definition of __int64 when
 	_WIN64 is defined.
+	* include/inttypes.h: A few items like PRNdPTR and SCNdPTR need 64
+	bitness specified when _WIN64 is defined.
 
 2012-05-08  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
