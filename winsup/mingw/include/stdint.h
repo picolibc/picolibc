@@ -19,6 +19,7 @@
 
 #ifndef _STDINT_H
 #define _STDINT_H
+#include <_mingw.h>
 #define __need_wint_t
 #define __need_wchar_t
 #include <stddef.h>

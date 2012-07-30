@@ -1,3 +1,8 @@
+2012-07-30  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/stdint.h: Include _mingw.h for the definition of __int64 when
+	_WIN64 is defined.
+
 2012-05-08  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
 	Remove references to nonexistent files.
