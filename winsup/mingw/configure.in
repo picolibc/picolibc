@@ -18,7 +18,7 @@ dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 AC_PREREQ([2.59])
 AC_INIT([MinGW Runtime], [v3.x], [http://mingw.org/reporting_bugs], [mingwrt])
-MINGW_AC_CONFIG_SRCDIR([__MINGW32_VERSION], [include/_mingw.h])
+MINGW_AC_CONFIG_SRCDIR([__MINGW_VERSION], [include/_mingw.h])
 
 AC_CANONICAL_SYSTEM
 GCC_NO_EXECUTABLES

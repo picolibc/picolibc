@@ -4,6 +4,11 @@
 	_WIN64 is defined.
 	* include/inttypes.h: A few items like PRNdPTR and SCNdPTR need 64
 	bitness specified when _WIN64 is defined.
+	* include/_mingw.h: Add __MINGW_VERSION, __MINGW_MAJOR_VERSION,
+	__MINGW_MINOR_VERSION and __MINGW_PATCHLEVEL deprecating the __MINGW32_*
+	versions of the macros.
+	* configure.in: Use __MINGW_VERSION instead of __MINGW32_VERSION.
+	* configure: Ditto.
 
 2012-05-08  Keith Marshall  <keithmarshall@users.sourceforge.net>
 
