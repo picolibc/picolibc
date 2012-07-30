@@ -34,7 +34,8 @@ details. */
 #define _WINMM_
 #define WINIMPM
 #define WINSOCK_API_LINKAGE
-#define _SDKDDKVER_H	/* temporary until sdkddkver.h problems are worked out */
+#define NTDDI_VERSION 0x6020000	/* Probably should just be derived from our
+				   _WIN32_WINNT setting in winsup.h */
 
 /* Windows headers define a couple of annoyingly intrusive macros for the
    sole purpose of inline documentation.  Since they are defined without

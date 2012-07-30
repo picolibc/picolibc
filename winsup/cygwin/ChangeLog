@@ -1,5 +1,11 @@
 2012-07-30  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* winlean.h: Define constant which will be needed eventually.  Remove
+	hack in favor of another hack.
+	* lib/crt0.h: Use "winlean.h".
+
+2012-07-30  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* winlean.h: Add temporary define.
 	* winsup.h: Remove ancient debugging defines.
 
