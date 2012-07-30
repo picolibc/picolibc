@@ -34,6 +34,7 @@ details. */
 #define _WINMM_
 #define WINIMPM
 #define WINSOCK_API_LINKAGE
+#define _SDKDDKVER_H	/* temporary until sdkddkver.h problems are worked out */
 
 /* Windows headers define a couple of annoyingly intrusive macros for the
    sole purpose of inline documentation.  Since they are defined without
