@@ -1,3 +1,18 @@
+2012-07-31  Chao-Ying Fu  <fu@mips.com>
+            Catherine Moore  <clm@codesourcery.com>
+            Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h: Document microMIPS DSP ASE usage.
+	(MICROMIPSOP_MASK_DSPACC, MICROMIPSOP_SH_DSPACC): Update for
+	microMIPS DSP ASE support.
+	(MICROMIPSOP_MASK_DSPSFT, MICROMIPSOP_SH_DSPSFT): Likewise.
+	(MICROMIPSOP_MASK_SA3, MICROMIPSOP_SH_SA3): Likewise.
+	(MICROMIPSOP_MASK_SA4, MICROMIPSOP_SH_SA4): Likewise.
+	(MICROMIPSOP_MASK_IMM8, MICROMIPSOP_SH_IMM8): Likewise.
+	(MICROMIPSOP_MASK_IMM10, MICROMIPSOP_SH_IMM10): Likewise.
+	(MICROMIPSOP_MASK_WRDSP, MICROMIPSOP_SH_WRDSP): Likewise.
+	(MICROMIPSOP_MASK_BP, MICROMIPSOP_SH_BP): Likewise.
+
 2012-07-06  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h: Fix a typo in description.
