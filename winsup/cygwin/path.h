@@ -438,7 +438,6 @@ class etc
 {
   friend class dtable;
   static int curr_ix;
-  static HANDLE changed_h;
   static bool change_possible[MAX_ETC_FILES + 1];
   static OBJECT_ATTRIBUTES fn[MAX_ETC_FILES + 1];
   static LARGE_INTEGER last_modified[MAX_ETC_FILES + 1];

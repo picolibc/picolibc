@@ -1,3 +1,10 @@
+2012-07-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (etc::dir_changed): Change `io' to a static NO_COPY
+	variable.  Explain why.  Add a muto to guard overwriting the changed_h
+	handle by multiple concurrent threads.
+	* path.h (class etc): Drop unused changed_h member.
+
 2012-07-30  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* winlean.h: Define constant which will be needed eventually.  Remove

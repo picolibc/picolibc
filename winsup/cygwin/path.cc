@@ -4311,46 +4311,58 @@ etc::test_file_change (int n)
 bool
 etc::dir_changed (int n)
 {
+  static muto lock NO_COPY;
+  static HANDLE changed_h NO_COPY;
+  /* io MUST be static because NtNotifyChangeDirectoryFile works asynchronously.
+     It may write into io after the function has left, which may result in all
+     sorts of stack corruption. */
+  static IO_STATUS_BLOCK io NO_COPY;
+
   if (!change_possible[n])
     {
-      static HANDLE changed_h NO_COPY;
       NTSTATUS status;
-      IO_STATUS_BLOCK io;
 
       if (!changed_h)
 	{
 	  OBJECT_ATTRIBUTES attr;
 
-	  path_conv dir ("/etc");
-	  status = NtOpenFile (&changed_h, SYNCHRONIZE | FILE_LIST_DIRECTORY,
-			       dir.get_object_attr (attr, sec_none_nih), &io,
-			       FILE_SHARE_VALID_FLAGS, FILE_DIRECTORY_FILE);
-	  if (!NT_SUCCESS (status))
+	  lock.init ("etc_dir_changed_lock")->acquire ();
+	  if (!changed_h)
 	    {
+	      path_conv dir ("/etc");
+	      status = NtOpenFile (&changed_h,
+				   SYNCHRONIZE | FILE_LIST_DIRECTORY,
+				   dir.get_object_attr (attr, sec_none_nih),
+				   &io, FILE_SHARE_VALID_FLAGS,
+				   FILE_DIRECTORY_FILE);
+	      if (!NT_SUCCESS (status))
+		{
 #ifdef DEBUGGING
-	      system_printf ("NtOpenFile (%S) failed, %p",
-			     dir.get_nt_native_path (), status);
+		  system_printf ("NtOpenFile (%S) failed, %p",
+				 dir.get_nt_native_path (), status);
 #endif
-	      changed_h = INVALID_HANDLE_VALUE;
-	    }
-	  else
-	    {
-	      status = NtNotifyChangeDirectoryFile (changed_h, NULL, NULL,
+		  changed_h = INVALID_HANDLE_VALUE;
+		}
+	      else
+		{
+		  status = NtNotifyChangeDirectoryFile (changed_h, NULL, NULL,
 						NULL, &io, NULL, 0,
 						FILE_NOTIFY_CHANGE_LAST_WRITE
 						| FILE_NOTIFY_CHANGE_FILE_NAME,
 						FALSE);
-	      if (!NT_SUCCESS (status))
-		{
+		  if (!NT_SUCCESS (status))
+		    {
 #ifdef DEBUGGING
-		  system_printf ("NtNotifyChangeDirectoryFile (1) failed, %p",
-				 status);
+		      system_printf ("NtNotifyChangeDirectoryFile (1) failed, "
+				     "%p", status);
 #endif
-		  NtClose (changed_h);
-		  changed_h = INVALID_HANDLE_VALUE;
+		      NtClose (changed_h);
+		      changed_h = INVALID_HANDLE_VALUE;
+		    }
 		}
+	      memset (change_possible, true, sizeof (change_possible));
 	    }
-	  memset (change_possible, true, sizeof (change_possible));
+	  lock.release ();
 	}
 
       if (changed_h == INVALID_HANDLE_VALUE)
