@@ -1,5 +1,22 @@
 2012-08-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_socket::recv_internal): Add bool parameter.
+	Add regparm attribute.
+	* fhandler_socket.cc (fhandler_socket::read): Call recv_internal with
+	second parameter set to false.
+	(fhandler_socket::readv): Ditto.
+	(fhandler_socket::recvfrom): Ditto.
+	(fhandler_socket::recv_internal): Convert use_recvmsg from local
+	variable to parameter.  Use as request for using WSARecvMsg.  Only
+	fail if WSARecvMsg can't be loaded and wsamsg->Control.len > 0,
+	otherwise use WSARecv{From}.  Restrict dwFlags to MSG_PEEK when using
+	WSARecvMsg.
+	(fhandler_socket::recvmsg): Prefer using WSARecvMsg.  Change priority
+	of tests for not using WSARecvMsg.  Call recv_internal with second
+	parameter set accordingly.
+
+2012-08-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in: Semi-revert patch from 2012-07-01, assuming the previous
 	patch to etc::dir_changed fixes the underlying issue.
 
