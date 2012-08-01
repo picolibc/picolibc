@@ -1,5 +1,10 @@
 2012-08-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/socket.h (MSG_BCAST): Define.
+	(MSG_MCAST): Define.
+
+2012-08-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_socket::recv_internal): Add bool parameter.
 	Add regparm attribute.
 	* fhandler_socket.cc (fhandler_socket::read): Call recv_internal with
