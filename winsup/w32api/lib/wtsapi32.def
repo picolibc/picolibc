@@ -27,6 +27,7 @@ WTSTerminateProcess@12
 WTSUnRegisterSessionNotification@4
 WTSVirtualChannelClose@4
 WTSVirtualChannelOpen@12
+WTSVirtualChannelOpenEx@12
 WTSVirtualChannelPurgeInput@4
 WTSVirtualChannelPurgeOutput@4
 WTSVirtualChannelQuery@16

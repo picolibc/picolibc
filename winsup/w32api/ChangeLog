@@ -2,6 +2,15 @@
 
 	* include/winuser.h (tagMENUITEMINFOA): Correct dwItemData definition.
 	(tagMENUITEMINFOW): Ditto.
+	* include/wtsapi32.h (WTSVirtualChannelClose): Add declaration.
+	(WTSVirtualChannelOpen): Ditto.
+	(WTSVirtualchannelOpenEx): Ditto.
+	(WTSVirtualChannelPurgeInput): Ditto.
+	(WTSVirtualChannelPurgeOutput): Ditto.
+	(WTSVirtualChannelQuery): Ditto.
+	(WTSVirtualChannelRead): Ditto.
+	(WTSVirtualChannelWrite): Ditto.
+	* lib/wtsapi32.def (WTSVirtualChannelOpenEx@12): Add import.
 
 2012-07-29  Earnie Boyd  <earnie@users.sourceforge.net>
 
