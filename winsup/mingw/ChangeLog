@@ -1,3 +1,8 @@
+2012-08-01  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/excpt.h (__try1): Define based on _WIN64 definition.
+	(__except1): Ditto.
+
 2012-07-30  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/stdint.h: Include _mingw.h for the definition of __int64 when
