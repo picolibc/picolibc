@@ -15,6 +15,7 @@
 	LONG WINAPI to LONG __cdecl to match Microsoft documentation.
 	(InterlockedIncrement): Ditto.
 	(InterlockedExchange): Ditto.
+	* include/winnt.h (MemoryBarrier): Add definition.
 
 2012-07-29  Earnie Boyd  <earnie@users.sourceforge.net>
 

@@ -4035,6 +4035,22 @@ struct _TEB * NtCurrentTeb(void);
 #endif /* __GNUC__ */
 #endif /* _X86_ */
 
+#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+# if defined(_AMD64_) || defined(__X86_64)
+#  define MemoryBarrier __faststorefence
+# elif defined(_IA64_)
+#  define MemoryBarrier __mf
+# else
+   FORCEINLINE VOID MemoryBarrier (VOID) {
+       LONG Barrier = 0;
+       __asm__ __volatile__("xchgl %%eax,%0 "
+         :"=r" (Barrier));
+   }
+# endif
+#else
+# define MemoryBarrier
+#endif
+
 #endif /* RC_INVOKED */
 
 #ifdef __cplusplus
