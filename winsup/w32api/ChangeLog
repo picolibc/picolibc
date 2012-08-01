@@ -11,6 +11,10 @@
 	(WTSVirtualChannelRead): Ditto.
 	(WTSVirtualChannelWrite): Ditto.
 	* lib/wtsapi32.def (WTSVirtualChannelOpenEx@12): Add import.
+	* include/winbase.h (InterlockedDecrement): Modify declaration from
+	LONG WINAPI to LONG __cdecl to match Microsoft documentation.
+	(InterlockedIncrement): Ditto.
+	(InterlockedExchange): Ditto.
 
 2012-07-29  Earnie Boyd  <earnie@users.sourceforge.net>
 
