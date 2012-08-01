@@ -1,3 +1,8 @@
+2012-08-01  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/winuser.h (tagMENUITEMINFOA): Correct dwItemData definition.
+	(tagMENUITEMINFOW): Ditto.
+
 2012-07-29  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/sdkddkver.h: New file.
