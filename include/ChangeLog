@@ -1,3 +1,8 @@
+2012-08-02  Sean Keys  <skeys@ipdatasys.com>
+
+	* elf/m68hc11.h: #define E_M68HC11_NO_BANK_WARNING
+        0x000000200
+
 2012-07-24  Stephan McCamant  <smcc@cs.berkeley.edu>
             Dr David Alan Gilbert  <dave@treblig.org>
 
