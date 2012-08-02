@@ -1,3 +1,7 @@
+2012-08-01  Stephan Jorek  <sjorek@users.sourceforge.net>
+
+	* include/setupapi.h: Correct typos and truncations.
+
 2012-08-01  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/winuser.h (tagMENUITEMINFOA): Correct dwItemData definition.
