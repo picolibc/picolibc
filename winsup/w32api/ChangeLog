@@ -20,6 +20,9 @@
 	(InterlockedIncrement): Ditto.
 	(InterlockedExchange): Ditto.
 	* include/winnt.h (MemoryBarrier): Add definition.
+	* lib/Makefile.in (amvideo.h): Dependencies are not met making this file
+	implementation incomplete.  Do not deliver it.
+	(amaudio.h): Ditto.
 
 2012-07-29  Earnie Boyd  <earnie@users.sourceforge.net>
 
