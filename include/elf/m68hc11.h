@@ -73,6 +73,9 @@ END_RELOC_NUMBERS (R_M68HC11_max)
 /* XGATE ram offsetting.  */
 #define E_M68HC11_XGATE_RAMOFFSET     0x000000100
 
+/* Suppress warnings */
+#define E_M68HC11_NO_BANK_WARNING     0x000000200
+
 #define EF_M68HC11_MACH_MASK 0xF0
 #define EF_M68HC11_GENERIC   0x00 /* Generic 68HC12/backward compatibility.  */
 #define EF_M68HC12_MACH      0x10 /* 68HC12 microcontroller.  */
