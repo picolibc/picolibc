@@ -24,6 +24,7 @@
 	* include/sys/param.h (MAXPATHLEN): Make sure PATH_MAX is defined.
 	* include/_mingw.h (threadlocalinfostruct, threadmbinfostruct,
 	*pthreadlocinfo, *pthreadmbcinfo, _locale_tstruct, *_locale_t): Declare.
+	* mingwex/tsearch.c: Correct coding to produce the proper results.
 
 2012-08-01  Earnie Boyd  <earnie@users.sourceforge.net>
 
