@@ -17,6 +17,10 @@
 #define LITTLE_ENDIAN	1234
 #define BYTE_ORDER	LITTLE_ENDIAN
 
+#ifdef PATH_MAX
 #define MAXPATHLEN PATH_MAX
+#else
+#define MAXPATHLEN 260
+#endif
 
 #endif

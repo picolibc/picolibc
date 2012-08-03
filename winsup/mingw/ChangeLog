@@ -20,6 +20,8 @@
 	(_wfdopen, _wfopen, _wfreopen, _wfsopen, _wtmpnam, _wtempnam): Ditto.
 	(_wrename, _wremove, _wperror, _wpopen): Ditto.
 	(_lock_file, _unlock_file): Declare.
+	* include/limits.h (PATH_MAX): Guard with #ifndef __STRICT_ANSI__.
+	* include/sys/param.h (MAXPATHLEN): Make sure PATH_MAX is defined.
 
 2012-08-01  Earnie Boyd  <earnie@users.sourceforge.net>
 
