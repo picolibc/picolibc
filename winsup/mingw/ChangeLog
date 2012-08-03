@@ -15,6 +15,7 @@
 	* include/stdio.h (_getws, _putws): Guard with #ifndef __STRICT_ANSI__.
 	(_wfdopen, _wfopen, _wfreopen, _wfsopen, _wtmpnam, _wtempnam): Ditto.
 	(_wrename, _wremove, _wperror, _wpopen): Ditto.
+	(_lock_file, _unlock_file): Declare.
 
 2012-08-01  Earnie Boyd  <earnie@users.sourceforge.net>
 
