@@ -238,10 +238,12 @@ related messages.
 </answer></qandaentry>
 
 <qandaentry id="faq.using.man">
-<question><para>Why doesn't man -k (or apropos) work?</para></question>
+<question><para>Why doesn't <literal>man -k</literal>,
+<literal>apropos</literal> or <literal>whatis</literal> work?</para></question>
 <answer>
 
-<para>Before you can use <literal>man -k</literal> or <literal>apropos</literal>, you
+<para>Before you can use <literal>man -k</literal>, <literal>apropos</literal>
+or <literal>whatis</literal>, you
 must create the whatis database.  Just run the command
 </para>
 <screen>
