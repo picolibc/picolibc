@@ -588,10 +588,16 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       && (!iscygwin () || mode != _P_OVERLAY
 	  || ::cygheap->fdtab.need_fixup_before ()))
     c_flags |= CREATE_SUSPENDED;
-  /* Give non-Cygwin processes their own process group since they will be
-     dealing with CTRL-C themselves.  Not sure if this is correct for spawn*()
-     or not though.  */
-  if (!iscygwin () && fhandler_console::exists ())
+  /* If a native application should be spawned, we test here if the spawning
+     process is running in a console and, if so, if it's a foreground or
+     background process.  If it's a background process, we start the native
+     process with the CREATE_NEW_PROCESS_GROUP flag set.  This lets the native
+     process ignore Ctrl-C by default.  If we don't do that, pressing Ctrl-C
+     in a console will break native processes running in the background,
+     because the Ctrl-C event is sent to all processes in the console, unless
+     they ignore it explicitely.  CREATE_NEW_PROCESS_GROUP does that for us. */
+  if (!iscygwin () && fhandler_console::exists ()
+      && fhandler_console::tc_getpgid () != myself->pgid)
     c_flags |= CREATE_NEW_PROCESS_GROUP;
   refresh_cygheap ();
 
