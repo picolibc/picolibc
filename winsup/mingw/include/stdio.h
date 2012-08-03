@@ -591,10 +591,11 @@ _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW fgetws (wchar_t*, int, FILE*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	fputws (const wchar_t*, FILE*);
 _CRTIMP wint_t __cdecl __MINGW_NOTHROW	getwc (FILE*);
 _CRTIMP wint_t __cdecl __MINGW_NOTHROW	getwchar (void);
-_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _getws (wchar_t*);
 _CRTIMP wint_t __cdecl __MINGW_NOTHROW	putwc (wint_t, FILE*);
-_CRTIMP int __cdecl __MINGW_NOTHROW	_putws (const wchar_t*);
 _CRTIMP wint_t __cdecl __MINGW_NOTHROW	putwchar (wint_t);
+#ifndef __STRICT_ANSI__
+_CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _getws (wchar_t*);
+_CRTIMP int __cdecl __MINGW_NOTHROW	_putws (const wchar_t*);
 _CRTIMP FILE* __cdecl __MINGW_NOTHROW	_wfdopen(int, const wchar_t *);
 _CRTIMP FILE* __cdecl __MINGW_NOTHROW	_wfopen (const wchar_t*, const wchar_t*);
 _CRTIMP FILE* __cdecl __MINGW_NOTHROW	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
@@ -605,6 +606,7 @@ _CRTIMP int __cdecl __MINGW_NOTHROW	_wrename (const wchar_t*, const wchar_t*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	_wremove (const wchar_t*);
 _CRTIMP void __cdecl __MINGW_NOTHROW	_wperror (const wchar_t*);
 _CRTIMP FILE* __cdecl __MINGW_NOTHROW	_wpopen (const wchar_t*, const wchar_t*);
+#endif  /* __STRING_ANSI__ */
 #endif	/* __MSVCRT__ */
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
