@@ -1,3 +1,14 @@
+2012-08-02  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/stdlib.h (_strtoi64): Declare.
+	(_strtoi64_l): Ditto.
+	(_strtoui64): Ditto.
+	(_strtoui64_l): Ditto.
+	(_wcstrtoi64): Ditto.
+	(_wcstrtoi64_l): Ditto.
+	(_wcstrtoui64): Ditto.
+	(_wcstrtoui64_l): Ditto.
+
 2012-08-01  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/excpt.h (__try1): Define based on _WIN64 definition.
