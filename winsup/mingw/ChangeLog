@@ -8,6 +8,10 @@
 	(_wcstrtoi64_l): Ditto.
 	(_wcstrtoui64): Ditto.
 	(_wcstrtoui64_l): Ditto.
+	* include/wchar.h (_wcstrtoi64): Ditto.
+	(_wcstrtoi64_l): Ditto.
+	(_wcstrtoui64): Ditto.
+	(_wcstrtoui64_l): Ditto.
 
 2012-08-01  Earnie Boyd  <earnie@users.sourceforge.net>
 
