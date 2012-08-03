@@ -23,29 +23,33 @@ tsearch(const void * __restrict__ vkey,		/* key to be located */
 	void ** __restrict__ vrootp,		/* address of tree root */
 	int (*compar) (const void *, const void *))
 {
-	node_t *q;
+	node_t *q, **n;
 	node_t **rootp = (node_t **)vrootp;
 
 	if (rootp == NULL)
 		return NULL;
 
-	while (*rootp != NULL) {	/* Knuth's T1: */
+	n = rootp;
+	while (*n != NULL) {			/* Knuth's T1: */
 		int r;
 
-		if ((r = (*compar)(vkey, (*rootp)->key)) == 0)	/* T2: */
-			return *rootp;		/* we found it! */
+		if ((r = (*compar)(vkey, ((*n)->key))) == 0)	/* T2: */
+			return *n;		/* we found it! */
 
-		rootp = (r < 0) ?
+		n = (r < 0) ?
 		    &(*rootp)->llink :		/* T3: follow left branch */
 		    &(*rootp)->rlink;		/* T4: follow right branch */
+		if (*n == NULL)
+			break;
+		rootp = n;
 	}
 
 	q = malloc(sizeof(node_t));		/* T5: key not found */
-	if (q != 0) {				/* make new node */
-		*rootp = q;			/* link new node to old */
-		/* LINTED const castaway ok */
-		q->key = (void *)vkey;		/* initialize new node */
-		q->llink = q->rlink = NULL;
-	}
+	if (!q)
+		return q;
+	*n = q;					/* make new node */
+	/* LINTED const castaway ok */
+	q->key = (void *)vkey;			/* initialize new node */
+	q->llink = q->rlink = NULL;
 	return q;
 }

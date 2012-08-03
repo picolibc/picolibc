@@ -290,4 +290,14 @@ allow GCC to optimize away some EH unwind code, at least in DW2 case.  */
 # endif
 #endif
 
+struct threadlocalinfostruct;
+struct threadmbinfostruct;
+typedef struct threadlocalinfostruct *pthreadlocinfo;
+typedef struct threadmbcinfostruct *pthreadmbcinfo;
+
+typedef struct localeinfo_struct {
+  pthreadlocinfo locinfo;
+  pthreadmbcinfo mbcinfo;
+} _locale_tstruct, *_locale_t;
+
 #endif /* __MINGW_H */
