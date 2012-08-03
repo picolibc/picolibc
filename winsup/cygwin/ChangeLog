@@ -1,5 +1,11 @@
 2012-08-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* exceptions.cc (sigdelayed): Simplify declaration.
+	(_cygtls::call_signal_handler): Fix test for when to pop signal stack.
+	Only do it exactly when what is on the stack is a no-op.
+
+2012-08-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* spawn.cc (child_info_spawn::worker): Put back a minor variation of
 	Corinna's test for detecting a background process when starting a
 	non-cygwin process.

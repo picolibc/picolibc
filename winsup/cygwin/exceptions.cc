@@ -37,9 +37,7 @@ details. */
 
 char debugger_command[2 * NT_MAX_PATH + 20];
 
-extern "C" {
-extern void sigdelayed ();
-};
+extern "C" void sigdelayed ();
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
 
@@ -1086,7 +1084,7 @@ sigignore (int sig)
 }
 
 /* Update the signal mask for this process and return the old mask.
-   Called from sigdelayed */
+   Called from call_signal_handler */
 extern "C" sigset_t
 set_process_mask_delta ()
 {
@@ -1265,7 +1263,9 @@ _cygtls::call_signal_handler ()
 	  break;
 	}
 
-      if (incyg)
+      /* Pop the stack if the next "return address" is sigdelayed, since
+	 this function is doing what sigdelayed would have done anyway. */
+      if (retaddr () == (__stack_t) sigdelayed)
 	pop ();
 
       debug_only_printf ("dealing with signal %d", sig);
