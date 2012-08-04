@@ -1,3 +1,7 @@
+2012-08-04  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/winver.h (VerQueryValue[AW]): Correct declaration per MSDN.
+
 2012-08-01  Stephan Jorek  <sjorek@users.sourceforge.net>
 
 	* include/setupapi.h: Correct typos and truncations.
