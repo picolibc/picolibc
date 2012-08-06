@@ -11,3 +11,15 @@ Bug fixes:
 
 - Fix mysterious crashes when accessing /etc.
   Fixes: http://cygwin.com/ml/cygwin/2012-07/threads.html#00613 and others.
+
+- Fix a potential race condition starting multiple "first" Cygwin processes
+  concurrently.
+  Should fix: http://cygwin.com/ml/cygwin/2012-07/msg00531.html
+
+- Fix a bug in unlink/rmdir which could result in removing non-empty
+  directories on network drives.  Also fix problems trying to rename files
+  under newer Samba versions.
+  Fixes: http://cygwin.com/ml/cygwin/2012-07/threads.html#00477
+
+- Prefer to call WSARecvMsg from recvmsg if possible.
+  Fixes: http://cygwin.com/ml/cygwin/2012-07/msg00662.html
