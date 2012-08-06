@@ -1,0 +1,13 @@
+Bug fixes:
+----------
+
+- Revamp signals so that signals-to-threads more closely mimic linux
+  operation.
+  First step of fix for: http://cygwin.com/ml/cygwin/2012-05/msg00186.html
+
+- Revert to only creating a new session leader when we know that a
+  console process is started in the background.
+  Should fix: http://cygwin.com/ml/cygwin/2012-08/threads.html#00062
+
+- Fix mysterious crashes when accessing /etc.
+  Fixes: http://cygwin.com/ml/cygwin/2012-07/threads.html#00613 and others.
