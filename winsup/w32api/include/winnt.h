@@ -4041,7 +4041,8 @@ struct _TEB * NtCurrentTeb(void);
 # elif defined(_IA64_)
 #  define MemoryBarrier __mf
 # else
-#  define MemoryBarrier __sync_synchronize
+  void __mingworg_MemoryBarrier(void);
+#  define MemoryBarrier __mingworg_MemoryBarrier
 # endif
 #else
 # define MemoryBarrier

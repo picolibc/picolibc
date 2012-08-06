@@ -1,7 +1,11 @@
 2012-08-06  Earnie Boyd  <earnie@users.sourceforge.net>
 
-	* include/winnt.h (MemoryBarrier): Use __sync_synchronize instead of
+	* include/winnt.h (MemoryBarrier): Define to __mingworg_MemoryBarrier()
+	which is in libmingwex.a.  
+	MODIFIED FROM: Use __sync_synchronize instead of
 	creating a function due to multiple definition.
+	NOTE: Not using __sync_synchronize to allow applications to mix-n-match
+	C libraries from different vendors.
 
 2012-08-04  Earnie Boyd  <earnie@users.sourceforge.net>
 
