@@ -1,3 +1,9 @@
+2012-08-06  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* mingwex/membarrier.c: New file.
+	* mingwex/Makefile.in (DISTFILES): Add membarrier.c.
+	(REPLACE_OBJS): Add membarrier.o.
+
 2012-08-02  Ivan Maidanski  <ivmai@users.sourceforge.net>
 
 	* include/process.h (_wexec*, _wspawn*): Declare.
