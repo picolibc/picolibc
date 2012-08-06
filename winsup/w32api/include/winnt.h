@@ -4041,11 +4041,7 @@ struct _TEB * NtCurrentTeb(void);
 # elif defined(_IA64_)
 #  define MemoryBarrier __mf
 # else
-   FORCEINLINE VOID MemoryBarrier (VOID) {
-       LONG Barrier = 0;
-       __asm__ __volatile__("xchgl %%eax,%0 "
-         :"=r" (Barrier));
-   }
+#  define MemoryBarrier __sync_synchronize
 # endif
 #else
 # define MemoryBarrier
