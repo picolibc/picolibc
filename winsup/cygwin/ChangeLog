@@ -1,3 +1,7 @@
+2012-08-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* signal.cc (sigwaitinfo): Change cw_sig to the correct cw_sig_eintr.
+
 2012-08-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* exceptions.cc (sigdelayed): Simplify declaration.

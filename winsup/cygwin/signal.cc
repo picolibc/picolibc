@@ -580,7 +580,7 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
   sig_dispatch_pending (true);
 
   int res;
-  switch (cancelable_wait (NULL, cw_infinite, cw_sig | cw_cancel | cw_cancel_self))
+  switch (cancelable_wait (NULL, cw_infinite, cw_sig_eintr | cw_cancel | cw_cancel_self))
     {
     case WAIT_SIGNALED:
       if (!sigismember (set, _my_tls.infodata.si_signo))
@@ -593,7 +593,6 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
 	  if (info)
 	    *info = _my_tls.infodata;
 	  res = _my_tls.infodata.si_signo;
-	  /* FIXME: Is this right? */
 	  InterlockedExchange ((LONG *) &_my_tls.sig, (LONG) 0);
 	}
       break;
