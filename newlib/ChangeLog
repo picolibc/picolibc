@@ -1,3 +1,8 @@
+2012-08-07  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdlib/mprec.h (Storeinc): Add parenthesis to avoid compiler
+	warning.
+
 2012-07-30  Kevin Buettner  <kevinb@redhat.com>
 
 	* libc/sys/sysnecv850/crt0.S (_start): Use v850e-specific

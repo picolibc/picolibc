@@ -98,7 +98,7 @@ typedef union { double d; __ULong i[2]; } U;
 #define SI 0
 #endif
 
-#define Storeinc(a,b,c) (*(a)++ = (b) << 16 | (c) & 0xffff)
+#define Storeinc(a,b,c) (*(a)++ = ((b) << 16) | ((c) & 0xffff))
 
 /* #define P DBL_MANT_DIG */
 /* Ten_pmax = floor(P*log(2)/log(5)) */
