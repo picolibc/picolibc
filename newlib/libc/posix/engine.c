@@ -364,9 +364,12 @@ sopno stopst;
 	char *ssp;		/* start of string matched by subsubRE */
 	char *sep;		/* end of string matched by subsubRE */
 	char *oldssp;		/* previous ssp */
+#if defined (__GNUC__) && \
+    ((__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || __GNUC__ > 4)
 /* dp is only used for assertion testing which, for some reason, is not
    recognized as usage. */
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 	char *dp;
 
 	AT("diss", start, stop, startst, stopst);

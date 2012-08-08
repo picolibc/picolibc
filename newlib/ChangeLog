@@ -1,3 +1,9 @@
+2012-08-08  Eric Blake  <eblake@redhat.com>
+
+	* libc/posix/engine.c(dissect): Guard diagnostic pragma for right
+	versions of GCC only.
+	* libc/string/strcasestr.c: Ditto.
+
 2012-08-08  Corinna Vinschen  <vinschen@redhat.com>
 
 	Throughout, run newlib with -Wall -Werror option and fix bugs and
@@ -17,10 +23,10 @@
 	* libc/posix/collate.c: Throughout cast to avoid compiler warning.
 	* libc/posix/engine.c (matcher): Initialize dp to avoid compiler
 	warning.
-	* libc/posix/glob.c: Disable on Cygwin.  Explain why.
-	* libc/posix/regcomp.c: Fix "uninitialized" compiler warnings.
 	(dissect): Deliberately silence gcc compiler warning.  Add comment to
 	explain why.
+	* libc/posix/glob.c: Disable on Cygwin.  Explain why.
+	* libc/posix/regcomp.c: Fix "uninitialized" compiler warnings.
 	* libc/posix/wordexp.c (wordexp): Remove num_bytes variable since result
 	is never used.
 	* libc/posix/popen.c (popen): Ditto for variable last.
