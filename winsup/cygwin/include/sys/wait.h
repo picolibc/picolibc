@@ -1,6 +1,6 @@
 /* sys/wait.h
 
-   Copyright 1997, 1998, 2001, 2002, 2003, 2004, 2006, 2011 Red Hat, Inc.
+   Copyright 1997, 1998, 2001, 2002, 2003, 2004, 2006, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -43,6 +43,10 @@ pid_t wait (__wait_status_ptr_t __status);
 pid_t waitpid (pid_t __pid, __wait_status_ptr_t __status, int __options);
 pid_t wait3 (__wait_status_ptr_t __status, int __options, struct rusage *__rusage);
 pid_t wait4 (pid_t __pid, __wait_status_ptr_t __status, int __options, struct rusage *__rusage);
+
+#ifdef _COMPILING_NEWLIB
+pid_t _wait (__wait_status_ptr_t __status);
+#endif
 
 union wait
   {

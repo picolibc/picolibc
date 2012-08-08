@@ -1,3 +1,7 @@
+2012-08-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/wait.h (_wait): Define when building newlib.
+
 2012-08-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* signal.cc (sigwaitinfo): Change cw_sig to the correct cw_sig_eintr.
