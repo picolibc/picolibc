@@ -78,6 +78,7 @@ typedef enum { COPY_A, COPY_J1, COPY_J2, MAKE_A, NOOP, EMPTY, ERROR } JIS_ACTION
  * is 2 (switch to JIS) + 2 (JIS characters) + 2 (switch back to ASCII) = 6.
  *************************************************************************************/
 
+#ifndef  __CYGWIN__
 static JIS_STATE JIS_state_table[JIS_S_NUM][JIS_C_NUM] = {
 /*              ESCAPE   DOLLAR    BRACKET   AT       B       J        NUL      JIS_CHAR  OTHER */
 /* ASCII */   { A_ESC,   ASCII,    ASCII,    ASCII,   ASCII,  ASCII,   ASCII,   ASCII,    ASCII },
@@ -99,6 +100,7 @@ static JIS_ACTION JIS_action_table[JIS_S_NUM][JIS_C_NUM] = {
 /* J_ESC */   { ERROR,   ERROR,    NOOP,     ERROR,   ERROR,   ERROR,   ERROR,   ERROR,   ERROR },
 /* J_ESC_BR */{ ERROR,   ERROR,    ERROR,    ERROR,   MAKE_A,  MAKE_A,  ERROR,   ERROR,   ERROR },
 };
+#endif /* !__CYGWIN__ */
 
 /* we override the mbstate_t __count field for more complex encodings and use it store a state value */
 #define __state __count

@@ -30,6 +30,10 @@
  * SUCH DAMAGE.
  */
 
+#ifdef __CYGWIN__
+#define _NO_GLOB	/* Cygwin provides its own glob. */
+#endif
+
 #ifndef _NO_GLOB
 
 #if defined(LIBC_SCCS) && !defined(lint)

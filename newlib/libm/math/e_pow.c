@@ -120,9 +120,10 @@ ivln2_l  =  1.92596299112661746887e-08; /* 0x3E54AE0B, 0xF85DDF44 =1/ln2 tail*/
 
     /* x|y==NaN return NaN unless x==1 then return 1 */
 	if(ix > 0x7ff00000 || ((ix==0x7ff00000)&&(lx!=0)) ||
-	   iy > 0x7ff00000 || ((iy==0x7ff00000)&&(ly!=0))) 
+	   iy > 0x7ff00000 || ((iy==0x7ff00000)&&(ly!=0))) {
 	    if(((ix-0x3ff00000)|lx)==0) return one;
 	    else return nan("");	
+	}
 
     /* determine if y is an odd int when x < 0
      * yisint = 0	... y is not an integer

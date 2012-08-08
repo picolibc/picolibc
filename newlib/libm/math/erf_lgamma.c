@@ -151,7 +151,7 @@ static float zero=  0.0000000000e+00;
 	float x; int *signgamp;
 #endif
 {
-	float t,y,z,nadj,p,p1,p2,p3,q,r,w;
+	float t,y,z,nadj = 0.0,p,p1,p2,p3,q,r,w;
 	__int32_t i,hx,ix;
 
 	GET_FLOAT_WORD(hx,x);

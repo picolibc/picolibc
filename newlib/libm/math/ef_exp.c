@@ -47,7 +47,7 @@ P5   =  4.1381369442e-08; /* 0x3331bb4c */
 #endif
 {
 	float y,hi,lo,c,t;
-	__int32_t k,xsb,sx;
+	__int32_t k = 0,xsb,sx;
 	__uint32_t hx;
 
 	GET_FLOAT_WORD(sx,x);
@@ -79,7 +79,6 @@ P5   =  4.1381369442e-08; /* 0x3331bb4c */
 	else if(hx < 0x31800000)  {	/* when |x|<2**-28 */
 	    if(huge+x>one) return one+x;/* trigger inexact */
 	}
-	else k = 0;
 
     /* x is now in primary range */
 	t  = x*x;

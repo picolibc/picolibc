@@ -216,7 +216,7 @@ static double zero=  0.00000000000000000000e+00;
 	double x; int *signgamp;
 #endif
 {
-	double t,y,z,nadj,p,p1,p2,p3,q,r,w;
+	double t,y,z,nadj = 0.0,p,p1,p2,p3,q,r,w;
 	__int32_t i,hx,lx,ix;
 
 	EXTRACT_WORDS(hx,lx,x);

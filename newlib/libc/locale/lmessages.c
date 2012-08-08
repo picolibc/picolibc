@@ -35,7 +35,9 @@
 #define LCMESSAGES_SIZE_MIN \
 		(offsetof(struct lc_messages_T, yesstr) / sizeof(char *))
 
+#ifndef __CYGWIN__
 static char empty[] = "";
+#endif
 
 static const struct lc_messages_T _C_messages_locale = {
 	"^[yY]" ,	/* yesexpr */

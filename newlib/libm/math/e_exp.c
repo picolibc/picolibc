@@ -109,7 +109,7 @@ P5   =  4.13813679705723846039e-08; /* 0x3E663769, 0x72BEA4D0 */
 #endif
 {
 	double y,hi,lo,c,t;
-	__int32_t k,xsb;
+	__int32_t k = 0,xsb;
 	__uint32_t hx;
 
 	GET_HIGH_WORD(hx,x);
@@ -144,7 +144,6 @@ P5   =  4.13813679705723846039e-08; /* 0x3E663769, 0x72BEA4D0 */
 	else if(hx < 0x3e300000)  {	/* when |x|<2**-28 */
 	    if(huge+x>one) return one+x;/* trigger inexact */
 	}
-	else k = 0;
 
     /* x is now in primary range */
 	t  = x*x;

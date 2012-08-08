@@ -667,7 +667,7 @@ static __uint16_t
 overflow_page(hashp)
 	HTAB *hashp;
 {
-	__uint32_t *freep;
+	__uint32_t *freep = NULL;
 	int max_free, offset, splitnum;
 	__uint16_t addr;
 	int bit, first_page, free_bit, free_page, i, in_use_bits, j;

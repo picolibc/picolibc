@@ -182,7 +182,10 @@ char *
 _DEFUN(nl_langinfo, (item), 
        nl_item item) {
 
-   char *ret, *s, *cs;
+   char *ret, *cs;
+#ifndef __CYGWIN__
+   char *s;
+#endif
    static char *csym = NULL;
 #ifdef TRANSITION_PERIOD_HACK
    static char *cset = NULL;

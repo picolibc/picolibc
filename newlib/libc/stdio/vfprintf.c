@@ -567,9 +567,9 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	char sign;		/* sign prefix (' ', '+', '-', or \0) */
 #ifdef _WANT_IO_C99_FORMATS
 				/* locale specific numeric grouping */
-	char *thousands_sep;
-	size_t thsnd_len;
-	const char *grouping;
+	char *thousands_sep = NULL;
+	size_t thsnd_len = 0;
+	const char *grouping = NULL;
 #endif
 #ifdef FLOATING_POINT
 	char *decimal_point = _localeconv_r (data)->decimal_point;
@@ -585,7 +585,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 #if defined (FLOATING_POINT) || defined (_WANT_IO_C99_FORMATS)
 	int ndig = 0;		/* actual number of digits returned by cvt */
 #endif
-#ifdef _WANT_IO_C99_FORMATS
+#if defined (FLOATING_POINT) && defined (_WANT_IO_C99_FORMATS)
 	int nseps;		/* number of group separators with ' */
 	int nrepeats;		/* number of repeats of the last group */
 #endif
@@ -793,9 +793,9 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 		sign = '\0';
 #ifdef FLOATING_POINT
 		lead = 0;
-#endif
 #ifdef _WANT_IO_C99_FORMATS
 		nseps = nrepeats = 0;
+#endif
 #endif
 #ifndef _NO_POS_ARGS
 		N = arg_index;

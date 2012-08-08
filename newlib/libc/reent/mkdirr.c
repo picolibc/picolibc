@@ -44,6 +44,8 @@ DESCRIPTION
 	<<errno>>.
 */
 
+#include <sys/stat.h>
+
 int
 _DEFUN (_mkdir_r, (ptr, path, mode),
      struct _reent *ptr _AND

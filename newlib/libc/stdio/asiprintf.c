@@ -45,7 +45,7 @@ _DEFUN(_asiprintf_r, (ptr, strp, fmt),
   if (ret >= 0)
     {
       *f._p = 0;
-      *strp = f._bf._base;
+      *strp = (char *) f._bf._base;
     }
   return (ret);
 }
@@ -72,7 +72,7 @@ _DEFUN(asiprintf, (strp, fmt),
   if (ret >= 0)
     {
       *f._p = 0;
-      *strp = f._bf._base;
+      *strp = (char *) f._bf._base;
     }
   return (ret);
 }

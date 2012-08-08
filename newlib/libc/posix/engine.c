@@ -145,7 +145,7 @@ int eflags;
 	int i;
 	struct match mv;
 	struct match *m = &mv;
-	char *dp;
+	char *dp = NULL;
 	const sopno gf = g->firststate+1;	/* +1 for OEND */
 	const sopno gl = g->laststate;
 	char *start;
@@ -181,8 +181,8 @@ int eflags;
 			pp = mustlast;
 			for (dp = start+g->mlen-1; dp < stop;) {
 				/* Fast skip non-matches */
-				while (dp < stop && charjump[*dp])
-					dp += charjump[*dp];
+				while (dp < stop && charjump[(unsigned char) *dp])
+					dp += charjump[(unsigned char) *dp];
 
 				if (dp >= stop)
 					break;
@@ -198,7 +198,7 @@ int eflags;
 
 				/* Jump to next possible match */
 				mj = matchjump[pp - mustfirst];
-				cj = charjump[*dp];
+				cj = charjump[(unsigned char) *dp];
 				dp += (cj < mj ? mj : cj);
 				pp = mustlast;
 			}
@@ -364,6 +364,9 @@ sopno stopst;
 	char *ssp;		/* start of string matched by subsubRE */
 	char *sep;		/* end of string matched by subsubRE */
 	char *oldssp;		/* previous ssp */
+/* dp is only used for assertion testing which, for some reason, is not
+   recognized as usage. */
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 	char *dp;
 
 	AT("diss", start, stop, startst, stopst);

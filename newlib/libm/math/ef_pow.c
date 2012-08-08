@@ -77,9 +77,10 @@ ivln2_l  =  7.0526075433e-06; /* 0x36eca570 =1/ln2 tail*/
 
     /* x|y==NaN return NaN unless x==1 then return 1 */
 	if(FLT_UWORD_IS_NAN(ix) ||
-	   FLT_UWORD_IS_NAN(iy))
+	   FLT_UWORD_IS_NAN(iy)) {
 	    if(ix==0x3f800000) return one;
 	    else return nanf("");
+	}
 
     /* determine if y is an odd int when x < 0
      * yisint = 0	... y is not an integer

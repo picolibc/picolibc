@@ -227,6 +227,9 @@ int	_EXFUN(sprintf, (char *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
 int	_EXFUN(remove, (const char *));
 int	_EXFUN(rename, (const char *, const char *));
+#ifdef _COMPILING_NEWLIB
+int	_EXFUN(_rename, (const char *, const char *));
+#endif
 #endif
 #if !defined(__STRICT_ANSI__) || defined(__USE_XOPEN2K)
 #ifdef _COMPILING_NEWLIB

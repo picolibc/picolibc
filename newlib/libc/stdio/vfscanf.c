@@ -243,10 +243,7 @@ static void * get_arg (int, va_list *, int *, void **);
 #define	CT_INT		3	/* integer, i.e., strtol or strtoul */
 #define	CT_FLOAT	4	/* floating, i.e., strtod */
 
-#if 0
 #define u_char unsigned char
-#endif
-#define u_char char
 #define u_long unsigned long
 
 #ifndef _NO_LONGLONG
@@ -513,8 +510,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #ifndef _MB_CAPABLE
       wc = *fmt;
 #else
-      nbytes = __mbtowc (rptr, &wc, fmt, MB_CUR_MAX, __locale_charset (),
-			 &state);
+      nbytes = __mbtowc (rptr, &wc, (char *) fmt, MB_CUR_MAX,
+			 __locale_charset (), &state);
       if (nbytes < 0) {
 	wc = 0xFFFD; /* Unicode replacement character */
 	nbytes = 1;

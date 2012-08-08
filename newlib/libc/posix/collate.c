@@ -117,24 +117,26 @@ __collate_substitute(s)
 	const u_char *s;
 {
 	int dest_len, len, nlen;
-	int delta = strlen(s);
+	int delta = strlen((const char *) s);
 	u_char *dest_str = NULL;
 
 	if(s == NULL || *s == '\0')
-		return __collate_strdup("");
+		return __collate_strdup((u_char *) "");
 	delta += delta / 8;
-	dest_str = malloc(dest_len = delta);
+	dest_str = (u_char *) malloc(dest_len = delta);
 	if(dest_str == NULL)
 		__collate_err(EX_OSERR, __FUNCTION__);
 	len = 0;
 	while(*s) {
-		nlen = len + strlen(__collate_substitute_table[*s]);
+		nlen = len + strlen((const char *)
+				    __collate_substitute_table[*s]);
 		if (dest_len <= nlen) {
 			dest_str = reallocf(dest_str, dest_len = nlen + delta);
 			if(dest_str == NULL)
 				__collate_err(EX_OSERR, __FUNCTION__);
 		}
-		strcpy(dest_str + len, __collate_substitute_table[*s++]);
+		strcpy((char *) dest_str + len,
+		       (const char *) __collate_substitute_table[*s++]);
 		len = nlen;
 	}
 	return dest_str;
@@ -150,8 +152,9 @@ __collate_lookup(t, len, prim, sec)
 	*len = 1;
 	*prim = *sec = 0;
 	for(p2 = __collate_chain_pri_table; p2->str[0]; p2++) {
-		if(strncmp(t, p2->str, strlen(p2->str)) == 0) {
-			*len = strlen(p2->str);
+		if(strncmp((const char *) t, (const char *) p2->str,
+			   strlen((const char *) p2->str)) == 0) {
+			*len = strlen((const char *) p2->str);
 			*prim = p2->prim;
 			*sec = p2->sec;
 			return;
@@ -165,7 +168,7 @@ u_char *
 __collate_strdup(s)
 	u_char *s;
 {
-	u_char *t = strdup(s);
+	u_char *t = (u_char *) strdup((const char *) s);
 
 	if (t == NULL)
 		__collate_err(EX_OSERR, __FUNCTION__);

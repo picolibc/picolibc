@@ -71,6 +71,10 @@ struct  itimerval {
   } while (0)
 #endif /* defined (__rtems__) || defined (__CYGWIN__) */
 
+#ifdef _COMPILING_NEWLIB
+int _EXFUN(_gettimeofday, (struct timeval *__p, void *__tz));
+#endif
+
 int _EXFUN(gettimeofday, (struct timeval *__p, void *__tz));
 int _EXFUN(settimeofday, (const struct timeval *, const struct timezone *));
 int _EXFUN(utimes, (const char *__path, const struct timeval *__tvp));

@@ -37,7 +37,6 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
   char *iter;
   pid_t pid;
   int num_words = 0;
-  int num_bytes = 0;
   int fd[2];
   int fd_err[2];
   int err = 0;
@@ -128,8 +127,6 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
 
       if((iter = strchr(tmp, '\n')))
           *iter = '\0';
-
-      num_bytes = atoi(tmp) + pwordexp->we_wordc;
 
       /* Get each expansion from the shell output, and store each in
          pwordexp's we_wordv vector. */

@@ -59,7 +59,7 @@ _DEFUN(_vasprintf_r, (ptr, strp, fmt, ap),
   if (ret >= 0)
     {
       *f._p = 0;
-      *strp = f._bf._base;
+      *strp = (char *) f._bf._base;
     }
   return ret;
 }

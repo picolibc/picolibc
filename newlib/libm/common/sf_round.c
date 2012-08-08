@@ -18,15 +18,11 @@
 	float x;
 #endif
 {
-  int signbit;
   __uint32_t w;
   /* Most significant word, least significant word. */
   int exponent_less_127;
 
   GET_FLOAT_WORD(w, x);
-
-  /* Extract sign bit. */
-  signbit = w & 0x80000000;
 
   /* Extract exponent field. */
   exponent_less_127 = (int)((w & 0x7f800000) >> 23) - 127;

@@ -21,6 +21,9 @@ struct tms {
 };
 
 clock_t _EXFUN(times,(struct tms *));
+#ifdef _COMPILING_NEWLIB
+clock_t _EXFUN(_times,(struct tms *));
+#endif
 
 #ifdef __cplusplus
 }

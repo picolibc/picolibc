@@ -396,10 +396,11 @@ _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
 	wchar_t sign;		/* sign prefix (' ', '+', '-', or \0) */
 #ifdef _WANT_IO_C99_FORMATS
 				/* locale specific numeric grouping */
-	wchar_t thousands_sep;
-	const char *grouping;
+	wchar_t thousands_sep = L'\0';
+	const char *grouping = NULL;
 #endif
-#ifdef _MB_CAPABLE
+#if defined (FLOATING_POINT) && defined (_MB_CAPABLE) \
+    && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
 	mbstate_t state;        /* mbtowc calls from library must not change state */
 #endif
 #ifdef FLOATING_POINT
@@ -415,7 +416,7 @@ _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
 #if defined (FLOATING_POINT) || defined (_WANT_IO_C99_FORMATS)
 	int ndig = 0;		/* actual number of digits returned by cvt */
 #endif
-#ifdef _WANT_IO_C99_FORMATS
+#if defined (FLOATING_POINT) && defined (_WANT_IO_C99_FORMATS)
 	int nseps;		/* number of group separators with ' */
 	int nrepeats;		/* number of repeats of the last group */
 #endif
@@ -619,9 +620,9 @@ _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
 		sign = L'\0';
 #ifdef FLOATING_POINT
 		lead = 0;
-#endif
 #ifdef _WANT_IO_C99_FORMATS
 		nseps = nrepeats = 0;
+#endif
 #endif
 #ifndef _NO_POS_ARGS
 		N = arg_index;
