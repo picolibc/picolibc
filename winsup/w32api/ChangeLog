@@ -1,3 +1,10 @@
+2012-08-08  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* lib/kernel32.def (InterlockedDecrement): Remove the @BYTE count since
+	we now declare it as __cdecl.
+	(InterlockedIncrement): Ditto.
+	(InterlockedExchange): Ditto.
+
 2012-08-06  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/winnt.h (MemoryBarrier): Define to __mingworg_MemoryBarrier()
