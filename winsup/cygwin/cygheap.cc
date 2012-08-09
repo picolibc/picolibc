@@ -47,6 +47,23 @@ struct cygheap_entry
   char data[0];
 };
 
+class tls_sentry
+{
+public:
+  static muto lock;
+  int destroy;
+  void init ();
+  bool acquired () {return lock.acquired ();}
+  tls_sentry () {destroy = 0;}
+  tls_sentry (DWORD wait) {destroy = lock.acquire (wait);}
+  ~tls_sentry () {if (destroy) lock.release ();}
+};
+
+muto NO_COPY tls_sentry::lock;
+static NO_COPY size_t nthreads;
+
+#define THREADLIST_CHUNK 256
+
 #define NBUCKETS (sizeof (cygheap->buckets) / sizeof (cygheap->buckets[0]))
 #define N0 ((_cmalloc_entry *) NULL)
 #define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (unsigned) (N0->data)))
@@ -256,6 +273,7 @@ cygheap_init ()
     cygheap->fdtab.init ();
   if (!cygheap->sigs)
     sigalloc ();
+  cygheap->init_tls_list ();
 }
 
 /* Copyright (C) 1997, 2000 DJ Delorie */
@@ -544,4 +562,85 @@ cygheap_user::set_name (const char *new_name)
   cfree_and_set (plogsrv);
   cfree_and_set (pdomain);
   cfree_and_set (pwinname);
+}
+
+void
+init_cygheap::init_tls_list ()
+{
+  if (threadlist)
+    memset (cygheap->threadlist, 0, cygheap->sthreads * sizeof (cygheap->threadlist[0]));
+  else
+    {
+      sthreads = THREADLIST_CHUNK;
+      threadlist = (_cygtls **) ccalloc_abort (HEAP_TLS, cygheap->sthreads,
+					       sizeof (cygheap->threadlist[0]));
+    }
+  tls_sentry::lock.init ("thread_tls_sentry");
+}
+
+void
+init_cygheap::add_tls (_cygtls *t)
+{
+  cygheap->user.reimpersonate ();
+  tls_sentry here (INFINITE);
+  if (nthreads >= cygheap->sthreads)
+    {
+      threadlist = (_cygtls **)
+	crealloc_abort (threadlist, (sthreads += THREADLIST_CHUNK)
+			* sizeof (threadlist[0]));
+      // memset (threadlist + nthreads, 0, THREADLIST_CHUNK * sizeof (threadlist[0]));
+    }
+
+  threadlist[nthreads++] = t;
+}
+
+void
+init_cygheap::remove_tls (_cygtls *t, DWORD wait)
+{
+  tls_sentry here (wait);
+  if (here.acquired ())
+    {
+      for (size_t i = 0; i < nthreads; i++)
+	if (t == threadlist[i])
+	  {
+	    if (i < --nthreads)
+	      threadlist[i] = threadlist[nthreads];
+	    debug_only_printf ("removed %p element %d", this, i);
+	    break;
+	  }
+    }
+}
+
+_cygtls *
+init_cygheap::find_tls (int sig)
+{
+  debug_printf ("sig %d\n", sig);
+  tls_sentry here (INFINITE);
+
+  static int NO_COPY threadlist_ix;
+
+  _cygtls *t = _main_tls;
+
+  myfault efault;
+  if (efault.faulted ())
+    threadlist[threadlist_ix]->remove (INFINITE);
+  else
+    {
+      threadlist_ix = -1;
+      while (++threadlist_ix < (int) nthreads)
+	if (sigismember (&(threadlist[threadlist_ix]->sigwait_mask), sig))
+	  {
+	    t = cygheap->threadlist[threadlist_ix];
+	    goto out;
+	  }
+      threadlist_ix = -1;
+      while (++threadlist_ix < (int) nthreads)
+	if (!sigismember (&(threadlist[threadlist_ix]->sigmask), sig))
+	  {
+	    t = cygheap->threadlist[threadlist_ix];
+	    break;
+	  }
+    }
+out:
+  return t;
 }

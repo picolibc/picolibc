@@ -396,6 +396,10 @@ struct init_cygheap: public mini_cygheap
   hook_chain hooks;
   void close_ctty ();
   void init_installation_root ();
+  void init_tls_list () __attribute__ ((regparm (1)));;
+  void add_tls (_cygtls *) __attribute__ ((regparm (2)));
+  void remove_tls (_cygtls *, DWORD) __attribute__ ((regparm (3)));
+  _cygtls *find_tls (int) __attribute__ ((regparm (2)));
 };
 
 

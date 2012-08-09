@@ -1,3 +1,16 @@
+2012-08-09  cgf-000014
+
+So, apparently I got it somewhat right before wrt signal handling.
+Checking on linux, it appears that signals will be sent to a thread
+which can accept the signal.  So resurrecting and extending the
+"find_tls" function is in order.  This function will return the tls
+of any thread which 1) is waiting for a signal with sigwait*() or
+2) has the signal unmasked.
+
+In redoing this it became obvious that I had the class designation wrong
+for the threadlist handling so I moved the manipulation of the global
+threadlist into the cygheap where it logically belongs.
+
 2012-07-21  cgf-000013
 
 These changes reflect a revamp of the "wait for signal" functionality

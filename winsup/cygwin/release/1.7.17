@@ -1,9 +1,10 @@
 Bug fixes:
 ----------
 
-- Revamp signals so that signals-to-threads more closely mimic linux
+- Revamp signals so that signals-to-threads more closely mimic Linux
   operation.
   First step of fix for: http://cygwin.com/ml/cygwin/2012-05/msg00186.html
+  as well as observed Linux behavior.
 
 - Revert to only creating a new session leader when we know that a
   console process is started in the background.

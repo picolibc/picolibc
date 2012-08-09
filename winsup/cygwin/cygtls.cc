@@ -19,39 +19,6 @@ details. */
 #include "sigproc.h"
 #include "exception.h"
 
-class sentry
-{
-  static muto lock;
-  int destroy;
-public:
-  void init ();
-  bool acquired () {return lock.acquired ();}
-  sentry () {destroy = 0;}
-  sentry (DWORD wait) {destroy = lock.acquire (wait);}
-  ~sentry () {if (destroy) lock.release ();}
-  friend void _cygtls::init ();
-};
-
-muto NO_COPY sentry::lock;
-
-static size_t NO_COPY nthreads;
-
-#define THREADLIST_CHUNK 256
-
-void
-_cygtls::init ()
-{
-  if (cygheap->threadlist)
-    memset (cygheap->threadlist, 0, cygheap->sthreads * sizeof (cygheap->threadlist[0]));
-  else
-    {
-      cygheap->sthreads = THREADLIST_CHUNK;
-      cygheap->threadlist = (_cygtls **) ccalloc_abort (HEAP_TLS, cygheap->sthreads,
-							sizeof (cygheap->threadlist[0]));
-    }
-  sentry::lock.init ("sentry_lock");
-}
-
 /* Two calls to get the stack right... */
 void
 _cygtls::call (DWORD (*func) (void *, void *), void *arg)
@@ -167,18 +134,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
       || (void *) func == (void *) cygthread::simplestub)
     return;
 
-  cygheap->user.reimpersonate ();
-
-  sentry here (INFINITE);
-  if (nthreads >= cygheap->sthreads)
-    {
-      cygheap->threadlist = (_cygtls **)
-	crealloc_abort (cygheap->threadlist, (cygheap->sthreads += THREADLIST_CHUNK)
-			* sizeof (cygheap->threadlist[0]));
-      memset (cygheap->threadlist + nthreads, 0, THREADLIST_CHUNK * sizeof (cygheap->threadlist[0]));
-    }
-
-  cygheap->threadlist[nthreads++] = this;
+  cygheap->add_tls (this);
 }
 
 void
@@ -237,22 +193,7 @@ _cygtls::remove (DWORD wait)
   free_local (hostent_buf);
   /* Free temporary TLS path buffers. */
   locals.pathbufs.destroy ();
-
-  do
-    {
-      sentry here (wait);
-      if (here.acquired ())
-	{
-	  for (size_t i = 0; i < nthreads; i++)
-	    if (this == cygheap->threadlist[i])
-	      {
-		if (i < --nthreads)
-		  cygheap->threadlist[i] = cygheap->threadlist[nthreads];
-		debug_printf ("removed %p element %d", this, i);
-		break;
-	      }
-	}
-    } while (0);
+  cygheap->remove_tls (this, wait);
   remove_wq (wait);
 }
 

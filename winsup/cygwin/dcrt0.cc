@@ -773,8 +773,6 @@ dll_crt0_0 ()
 
   user_data->threadinterface->Init ();
 
-  _cygtls::init ();
-
   _main_tls = &_my_tls;
 
   /* Initialize signal processing here, early, in the hopes that the creation

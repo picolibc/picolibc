@@ -204,7 +204,6 @@ public:
   unsigned initialized;
 
   /*gentls_offsets*/
-  static void init ();
   void init_thread (void *, DWORD (*) (void *, void *));
   static void call (DWORD (*) (void *, void *), void *);
   void remove (DWORD);

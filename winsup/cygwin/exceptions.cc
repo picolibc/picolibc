@@ -1170,8 +1170,8 @@ sigpacket::process ()
     sigproc_printf ("using tls %p", tls);
   else
     {
-      tls = _main_tls;
-      sigproc_printf ("using main tls %p", _main_tls);
+      tls = cygheap->find_tls (si.si_signo);
+      sigproc_printf ("using tls %p", tls);
     }
 
   if (si.si_signo == SIGKILL)
