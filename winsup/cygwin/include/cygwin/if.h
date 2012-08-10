@@ -111,12 +111,10 @@ struct ifconf
 #define ifc_buf ifc_ifcu.ifcu_buf               /* buffer address       */
 #define ifc_req ifc_ifcu.ifcu_req               /* array of structures  */
 
-#ifndef __INSIDE_CYGWIN_NET__
 extern unsigned             if_nametoindex (const char *);
 extern char                *if_indextoname (unsigned, char *);
 extern struct if_nameindex *if_nameindex (void);
 extern void                 if_freenameindex (struct if_nameindex *);
-#endif
 
 #ifdef __cplusplus
 };

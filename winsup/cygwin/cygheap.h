@@ -396,10 +396,6 @@ struct init_cygheap: public mini_cygheap
   hook_chain hooks;
   void close_ctty ();
   void init_installation_root ();
-  void init_tls_list () __attribute__ ((regparm (1)));;
-  void add_tls (_cygtls *) __attribute__ ((regparm (2)));
-  void remove_tls (_cygtls *, DWORD) __attribute__ ((regparm (3)));
-  _cygtls *find_tls (int) __attribute__ ((regparm (2)));
 };
 
 
@@ -462,7 +458,7 @@ class cygheap_fdnew : public cygheap_fdmanip
   ~cygheap_fdnew ()
   {
     if (cygheap->fdtab[fd])
-      cygheap->fdtab[fd]->inc_refcnt ();
+      cygheap->fdtab[fd]->refcnt (1);
   }
   void operator = (fhandler_base *fh) {cygheap->fdtab[fd] = fh;}
 };
@@ -480,7 +476,7 @@ public:
 	this->fd = fd;
 	locked = lockit;
 	fh = cygheap->fdtab[fd];
-	fh->inc_refcnt ();
+	fh->refcnt (1);
       }
     else
       {
@@ -495,7 +491,7 @@ public:
   }
   ~cygheap_fdget ()
   {
-    if (fh && fh->dec_refcnt () <= 0)
+    if (fh && fh->refcnt (-1) <= 0)
       {
 	debug_only_printf ("deleting fh %p", fh);
 	delete fh;

@@ -1,0 +1,126 @@
+What's new:
+-----------
+
+- New getconf tool for querying confstr(3), pathconf(3), sysconf(3), and
+  limits.h configuration.
+
+- New tzset utility to generate a POSIX-compatible TZ environment
+  variable from the Windows timezone settings.
+
+- The passwd tool now allows an administrator to use the -R command for
+  other user accounts:  passwd -R username.
+
+- Experimental: Change the way sockets are created so that Cygwin always
+  circumvents so-called "layered service providers" (LSPs) starting with
+  Windows Vista.
+
+- signal handler functions are now dispatched in threads other than the
+  main thread.
+
+- Support NcFsd filesystem.
+
+- clock_gettime(3) and clock_getres(3) accept per-process and per-thread
+  CPU-time clocks, including CLOCK_PROCESS_CPUTIME_ID and
+  CLOCK_THREAD_CPUTIME_ID.
+
+- New pthread functions:
+
+  - Spin Locks: pthread_spin_destroy, pthread_spin_init, pthread_spin_lock,
+    pthread_spin_trylock, pthread_spin_unlock.
+
+  - Stack management: pthread_attr_getstack, pthread_attr_getstackaddr,
+    pthread_attr_getguardsize, pthread_attr_setstack, pthread_attr_setstackaddr,
+    pthread_attr_setguardsize, pthread_getattr_np.
+  
+  - Clock Selection: pthread_getcpuclockid, pthread_condattr_getclock,
+    pthread_condattr_setclock.
+
+  - Scheduling: pthread_setschedprio.
+
+  - Signalling: pthread_sigqueue.
+
+- Add /proc/devices, /proc/misc, /proc/sysvipc, /proc/swaps.
+
+- Make various system functions thread cancelation points per POSIX.
+
+- Add ioctl FIONREAD handling for non-sockets.
+
+- dlopen now supports the Glibc-specific RTLD_NODELETE and RTLD_NOOPEN flags.
+
+- The printf and wprintf families of functions now support the %m conversion
+  flag.
+
+- Execed processes now inherit the children of their predecessor.
+
+- Fifos have been rewritten and should now be more reliable.
+
+- GNU/glibc error.h error reporting functions: error, error_at_line,
+  error_message_count, error_one_per_line, error_print_progname.
+
+- C99 <tgmath.h> type-generic macros.
+
+- Other new API: clock_getcpuclockid, clock_nanosleep, clock_settime, __fpurge,
+  get_current_dir_name, getgrouplist, getpt, ppoll, psiginfo, psignal,
+  ptsname_r, sys_siglist, sysinfo.
+
+- cygwin_conv_path_list finally supports CCP_WIN_W_TO_POSIX and
+  CCP_POSIX_TO_WIN_W conversions.
+
+
+What changed:
+-------------
+
+- Drop support for Windows NT4.
+
+- The CYGWIN=tty mode using pipes to communicate with the console in a pseudo
+  tty-like mode has been removed.  Either just use the normal Windows console
+  as is, or use a terminal application like mintty.
+
+- The CYGWIN environment variable options "envcache", "strip_title", "title",
+  "tty", and "upcaseenv" have been removed.
+
+- New heap management.  Drop registry setting "heap_chunk_in_mb" in favor of
+  a new per-executable setting in the executable file header which can be set
+  using the peflags tool.  Drop registry setting "heap_slop_in_mb" entirely.
+
+- Revamp console and pseudo tty handling.  Rename /dev/ttyX to /dev/consX,
+  /dev/ttyX to /dev/ptyX.
+
+- Improve fork/exec performance on 64 bit systems.
+
+- Improve Ctrl-C handling in console.
+
+- Try harder to let fork not fail if DLLs are moved in memory which should,
+  in some cases, minimize the need for rebaseall.
+
+- Try harder to send SIGHUP to children when process group leader fails.
+
+- Deal with Windows problem where non-blocking pipe I/O was not flushed
+  properly on close.
+
+- Attempt to regularize most syscall-related strace output.
+
+- Improve behavior of Cygwin when started from a 64-bit process, especially
+  under Windows 2003.
+
+- Improve multi-thread/reentrancy safety with syscalls that deal with fds.
+
+- dlopen can now find "cygFOO.dll", even if the caller specified "libFOO.so".
+  This is supposed to support applications which are no aware of Windows DLLs.
+
+- Make accept(2), poll(2) and shutdown(2) behave more like on Linux.
+
+- Raise max number of mount points from 30 to 64.
+
+- Output of /proc/maps is closer to what Linux prints and much more useful to
+  examine process VM layout.
+
+- /proc/loadavg now shows the number of currently running processes and the
+  total number of processes.
+
+- /proc/version now shows the username of whomever compiled the Cygwin DLL
+  as well as the version of GCC used when compiling.
+
+- Various assorted bugfixes and improvements.
+
+- Preliminary, no guarantee, may be broken in subtle ways, Windows 8 support.

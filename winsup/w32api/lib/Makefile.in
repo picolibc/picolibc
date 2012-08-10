@@ -131,14 +131,7 @@ install-libraries: all $(need-DESTDIR-compatibility)
 install-headers: $(need-DESTDIR-compatibility)
 	$(mkinstalldirs) $(DESTDIR)${inst_includedir}
 	for file in $(HEADERS); do \
-	  case $$file in \
-	  amvideo.h | amaudio.h) \
-	    echo Not installing $$file \
-	    ;; \
-	  *) \
-	    $(INSTALL_DATA) ${top_srcdir}/include/$$file $(DESTDIR)${inst_includedir}; \
-	    ;; \
-	  esac \
+	  $(INSTALL_DATA) ${top_srcdir}/include/$$file $(DESTDIR)${inst_includedir}; \
 	done
 	$(mkinstalldirs) $(DESTDIR)${inst_includedir}/GL
 	for file in $(GL_HEADERS); do \

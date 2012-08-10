@@ -109,22 +109,19 @@ typedef _CLOCK_T_ clock_t;
 #ifndef __time_t_defined
 typedef _TIME_T_ time_t;
 #define __time_t_defined
-#endif
 
-#ifndef __timespec_defined
-#define __timespec_defined
 /* Time Value Specification Structures, P1003.1b-1993, p. 261 */
 
 struct timespec {
   time_t  tv_sec;   /* Seconds */
   long    tv_nsec;  /* Nanoseconds */
 };
-#endif
 
 struct itimerspec {
   struct timespec  it_interval;  /* Timer period */
   struct timespec  it_value;     /* Timer expiration */
 };
+#endif
 
 typedef	long	daddr_t;
 typedef	char *	caddr_t;
@@ -210,7 +207,7 @@ typedef unsigned short nlink_t;
    includes the W32api winsock[2].h header must know what it is doing;
    it must not call the cygwin32 select function.
 */
-# if !(defined (_POSIX_SOURCE) || defined (_WINSOCK_H) || defined (_WINSOCKAPI_) || defined (__USE_W32_SOCKETS)) 
+# if !(defined (_POSIX_SOURCE) || defined (_WINSOCK_H) || defined (__USE_W32_SOCKETS)) 
 #  define _SYS_TYPES_FD_SET
 #  define	NBBY	8		/* number of bits in a byte */
 /*
@@ -247,7 +244,7 @@ typedef	struct _types_fd_set {
        *__tmp++ = 0; \
 }))
 
-# endif	/* !(defined (_POSIX_SOURCE) || defined (_WINSOCK_H) || defined (_WINSOCKAPI_) || defined (__USE_W32_SOCKETS)) */
+# endif	/* !(defined (_POSIX_SOURCE) || defined (_WINSOCK_H) || defined (__USE_W32_SOCKETS)) */
 
 #undef __MS_types__
 #undef _ST_INT32

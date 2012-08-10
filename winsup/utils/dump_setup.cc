@@ -8,6 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -16,18 +17,9 @@ details. */
 #include <io.h>
 #include <sys/stat.h>
 #include <errno.h>
-#define WIN32_NO_STATUS	/* Disable status codes in winnt.h since we include
-			   ntstatus.h for extended status codes below. */
-#include <windows.h>
-#undef WIN32_NO_STATUS
-#ifndef __MINGW64_VERSION_MAJOR
-# include <ddk/ntapi.h>
-# include <ddk/winddk.h>
-#else
-# include <winternl.h>
-# include <ntstatus.h>
-#endif
 #include "path.h"
+#include <ddk/ntapi.h>
+#include <ddk/winddk.h>
 #if 0
 #include "zlib.h"
 #endif
@@ -273,8 +265,8 @@ transform_chars (PWCHAR path, PWCHAR path_end)
       *path = tfx_chars[*path];
 }
 
-extern "C" NTAPI NTSTATUS NtQueryAttributesFile (POBJECT_ATTRIBUTES,
-						 PFILE_BASIC_INFORMATION);
+extern "C" NTOSAPI NTAPI NTSTATUS NtQueryAttributesFile(
+			      POBJECT_ATTRIBUTES, PFILE_BASIC_INFORMATION);
 
 /* This function checks for file existance and fills the stat structure
    with only the required mode info.  We're using a native NT function

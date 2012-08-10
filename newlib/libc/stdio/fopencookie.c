@@ -219,16 +219,16 @@ _DEFUN(_fopencookie_r, (ptr, cookie, mode, functions),
     return NULL;
   if ((c = (fccookie *) _malloc_r (ptr, sizeof *c)) == NULL)
     {
-      _newlib_sfp_lock_start ();
+      __sfp_lock_acquire ();
       fp->_flags = 0;		/* release */
 #ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
 #endif
-      _newlib_sfp_lock_end ();
+      __sfp_lock_release ();
       return NULL;
     }
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   fp->_file = -1;
   fp->_flags = flags;
   c->cookie = cookie;
@@ -246,7 +246,7 @@ _DEFUN(_fopencookie_r, (ptr, cookie, mode, functions),
 #endif
   c->closefn = functions.close;
   fp->_close = fccloser;
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return fp;
 }
 

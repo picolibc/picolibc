@@ -180,14 +180,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   GetModuleFileNameW (h, buf, sizeof (buf));
   PWCHAR name = buf;
   if (!wcsncmp (name, L"\\\\?\\", 4))
-    {
-      name += 4;
-      if (!wcsncmp (name, L"UNC\\", 4))
-	{
-	  name += 2;
-	  *name = L'\\';
-	}
-    }
+    name += 4;
   DWORD namelen = wcslen (name);
   PWCHAR modname = wcsrchr (name, L'\\') + 1;
 

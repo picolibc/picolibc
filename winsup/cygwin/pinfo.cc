@@ -114,6 +114,7 @@ pinfo_init (char **envp, int envc)
 static DWORD
 status_exit (DWORD x)
 {
+  const char *find_first_notloaded_dll (path_conv &);
   switch (x)
     {
     case STATUS_DLL_NOT_FOUND:
@@ -655,6 +656,7 @@ _pinfo::commune_request (__uint32_t code, ...)
   HANDLE& hp = si._si_commune._si_process_handle;
   HANDLE& fromthem = si._si_commune._si_read_handle;
   HANDLE request_sync = NULL;
+  bool locked = false;
 
   res.s = NULL;
   res.n = 0;
@@ -681,6 +683,7 @@ _pinfo::commune_request (__uint32_t code, ...)
     }
   va_end (args);
 
+  locked = true;
   char name_buf[MAX_PATH];
   request_sync = CreateSemaphore (&sec_none_nih, 0, LONG_MAX,
 				  shared_name (name_buf, "commune", myself->pid));

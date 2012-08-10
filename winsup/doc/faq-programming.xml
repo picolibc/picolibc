@@ -810,44 +810,20 @@ a Windows environment which Cygwin handles automatically.
 <question><para>How should I port my Unix GUI to Windows?</para></question>
 <answer>
 
-<para>Like other Unix-like platforms, the Cygwin distribtion includes many of
-the common GUI toolkits, including X11, X Athena widgets, Motif, Tk, GTK+,
-and Qt. Many programs which rely on these toolkits will work with little, if
-any, porting work if they are otherwise portable.  However, there are a few
-things to look out for:</para>
-<orderedlist>
-<listitem><para>Some packages written for both Windows and X11 incorrectly
-treat Cygwin as a Windows platform rather than a Unix variant.  Mixing Cygwin's
-Unix APIs with Windows' GDI is best avoided; rather, remove these assumptions
-so that Cygwin is treated like other X11 platforms.</para></listitem>
-<listitem><para>GTK+ programs which use <literal>gtk_builder_connect_signals()</literal>
-or <literal>glade_xml_signal_autoconnect()</literal> need to be able to
-<literal>dlopen()</literal> themselves.  In order for this to work, the program
-must be linked with the <literal>-Wl,--export-all-symbols</literal> linker flag.
-This can be added to LDFLAGS manually, or handled automatically with the
-<literal>-export-dynamic</literal> libtool flag (requires libtool 2.2.8) or
-by adding <literal>gmodule-export-2.0</literal> to the pkg-config modules used
-to build the package.</para></listitem>
-<listitem><para>Programs which include their own loadable modules (plugins)
-often must have its modules linked against the symbols in the program.  The
-most portable solution is for such programs to provide all its symbols (except
-for <literal>main()</literal>) in a shared library, against which the plugins
-can be linked.  Otherwise, the symbols from the executable itself must be
-exported.</para>
-<para>If the package uses the CMake build system, this can be done by adding
-<literal>ENABLE_EXPORTS TRUE</literal> to the executable's <literal>set_target_properties</literal>
-command, then adding the executable's target name to the <literal>target_link_libraries</literal>
-command for the plugins.</para>
-<para>For other build systems, the following steps are required:</para>
-<orderedlist>
-<listitem><para>The executable must be built before its plugins.</para></listitem>
-<listitem><para>Symbols must be exported from the executable with a
-<literal>-Wl,--export-all-symbols,--out-implib,libfoo.exe.a</literal>
-linker flag, where <literal>foo</literal> represents the name of the
-executable.</para></listitem>
-<listitem><para>The plugins must be linked with a <literal>-Wl,/path/to/libfoo.exe.a</literal>
-linker flag.</para></listitem>
-</orderedlist></listitem></orderedlist>
+<para>There are two basic strategies for porting Unix GUIs to Windows.
+</para>
+<para>The first is to use a portable graphics library such as tcl/tk, X11, or
+V (and others?).  Typically, you will end up with a GUI on Windows that
+requires some runtime support.  With tcl/tk, you'll want to include the
+necessary library files and the tcl/tk DLLs.  In the case of X11, you'll
+need everyone using your program to have the X11 server installed.
+</para>
+<para>The second method is to rewrite your GUI using Win32 API calls (or MFC
+with VC++).  If your program is written in a fairly modular fashion, you
+may still want to use Cygwin if your program contains a lot of shared
+(non-GUI-related) code.  That way you still gain some of the portability
+advantages inherent in using Cygwin.
+</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.djgpp">

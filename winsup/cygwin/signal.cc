@@ -22,11 +22,10 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "cygwait.h"
 
 #define _SA_NORESTART	0x8000
 
-static int sigaction_worker (int, const struct sigaction *, struct sigaction *, bool)
+static int sigaction_worker (int, const struct sigaction *, struct sigaction *, bool, const char *)
   __attribute__ ((regparm (3)));
 
 #define sigtrapped(func) ((func) != SIG_IGN && (func) != SIG_DFL)
@@ -120,9 +119,12 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
 
   syscall_printf ("clock_nanosleep (%ld.%09ld)", rqtp->tv_sec, rqtp->tv_nsec);
 
-  int rc = cancelable_wait (NULL, &timeout, cw_sig_eintr | cw_cancel | cw_cancel_self);
-  if (rc == WAIT_SIGNALED)
-    res = EINTR;
+  int rc = cancelable_wait (signal_arrived, &timeout);
+  if (rc == WAIT_OBJECT_0)
+    {
+      _my_tls.call_signal_handler ();
+      res = EINTR;
+    }
 
   /* according to POSIX, rmtp is used only if !abstime */
   if (rmtp && !abstime)
@@ -223,7 +225,7 @@ handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& op
 	  newmask = *set;
 	  break;
 	}
-      set_signal_mask (opmask, newmask);
+      set_signal_mask (newmask, opmask);
     }
   return 0;
 }
@@ -376,7 +378,7 @@ abort (void)
   sigset_t sig_mask;
   sigfillset (&sig_mask);
   sigdelset (&sig_mask, SIGABRT);
-  set_signal_mask (_my_tls.sigmask, sig_mask);
+  set_signal_mask (sig_mask, _my_tls.sigmask);
 
   raise (SIGABRT);
   _my_tls.call_signal_handler (); /* Call any signal handler */
@@ -387,9 +389,9 @@ abort (void)
   do_exit (SIGABRT);	/* signal handler didn't exit.  Goodbye. */
 }
 
-static int  __attribute__ ((regparm (3)))
+static int
 sigaction_worker (int sig, const struct sigaction *newact,
-		  struct sigaction *oldact, bool isinternal)
+		  struct sigaction *oldact, bool isinternal, const char *fnname)
 {
   int res = -1;
   myfault efault;
@@ -442,15 +444,14 @@ sigaction_worker (int sig, const struct sigaction *newact,
     }
 
 out:
+  syscall_printf ("%R = %s(%d, %p, %p)", res, fnname, sig, newact, oldact);
   return res;
 }
 
 extern "C" int
 sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 {
-  int res = sigaction_worker (sig, newact, oldact, false);
-  syscall_printf ("%R = sigaction(%d, %p, %p)", res, sig, newact, oldact);
-  return res;
+  return sigaction_worker (sig, newact, oldact, false, "sigaction");
 }
 
 extern "C" int
@@ -517,25 +518,19 @@ sigfillset (sigset_t *set)
 extern "C" int
 sigsuspend (const sigset_t *set)
 {
-  int res = handle_sigsuspend (*set);
-  syscall_printf ("%R = sigsuspend(%p)", res, set);
-  return res;
+  return handle_sigsuspend (*set);
 }
 
 extern "C" int
 sigpause (int signal_mask)
 {
-  int res = handle_sigsuspend ((sigset_t) signal_mask);
-  syscall_printf ("%R = sigpause(%p)", res, signal_mask);
-  return res;
+  return handle_sigsuspend ((sigset_t) signal_mask);
 }
 
 extern "C" int
 pause (void)
 {
-  int res = handle_sigsuspend (_my_tls.sigmask);
-  syscall_printf ("%R = pause()", res);
-  return res;
+  return handle_sigsuspend (_my_tls.sigmask);
 }
 
 extern "C" int
@@ -553,9 +548,7 @@ siginterrupt (int sig, int flag)
       act.sa_flags &= ~_SA_NORESTART;
       act.sa_flags |= SA_RESTART;
     }
-  int res = sigaction_worker (sig, &act, NULL, true);
-  syscall_printf ("%R = siginterrupt(%d, %p)", sig, flag);
-  return res;
+  return sigaction_worker (sig, &act, NULL, true, "siginterrupt");
 }
 
 extern "C" int
@@ -571,18 +564,21 @@ extern "C" int
 sigwaitinfo (const sigset_t *set, siginfo_t *info)
 {
   pthread_testcancel ();
+  HANDLE h;
+  h = _my_tls.event = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+  if (!h)
+    {
+      __seterrno ();
+      return -1;
+    }
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return EFAULT;
-
-  set_signal_mask (_my_tls.sigwait_mask, *set);
+  _my_tls.sigwait_mask = *set;
   sig_dispatch_pending (true);
 
   int res;
-  switch (cancelable_wait (NULL, cw_infinite, cw_sig_eintr | cw_cancel | cw_cancel_self))
+  switch (WaitForSingleObject (h, INFINITE))
     {
-    case WAIT_SIGNALED:
+    case WAIT_OBJECT_0:
       if (!sigismember (set, _my_tls.infodata.si_signo))
 	{
 	  set_errno (EINTR);
@@ -601,6 +597,8 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
       res = -1;
     }
 
+  _my_tls.event = NULL;
+  CloseHandle (h);
   sigproc_printf ("returning signal %d", res);
   return res;
 }

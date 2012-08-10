@@ -177,10 +177,6 @@ _CRTIMP void __cdecl __MINGW_NOTHROW	_wmakepath(wchar_t*, const wchar_t*, const 
 _CRTIMP void __cdecl __MINGW_NOTHROW	_wsplitpath (const wchar_t*, wchar_t*, wchar_t*, wchar_t*, wchar_t*);
 _CRTIMP wchar_t* __cdecl __MINGW_NOTHROW _wfullpath (wchar_t*, const wchar_t*, size_t);
 #endif
-_CRTIMP __int64 __cdecl _wcstoi64(const wchar_t *, wchar_t **, int);
-_CRTIMP __int64 __cdecl _wcstoi64_l(const wchar_t *, wchar_t **, int, _locale_t);
-_CRTIMP unsigned __int64 __cdecl _wcstoui64(const wchar_t *, wchar_t **, int);
-_CRTIMP unsigned __int64 __cdecl _wcstoui64_l(const wchar_t *, wchar_t **, int, _locale_t);
 #define  _WSTDLIB_DEFINED
 #endif /* _WSTDLIB_DEFINED */
 

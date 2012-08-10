@@ -115,7 +115,7 @@ reg_key::build_reg (HKEY top, REGSAM access, va_list av)
       if (!NT_SUCCESS (status))
 	{
 	  key_is_invalid = status;
-	  debug_printf ("failed to create key %S in the registry", &uname);
+	  debug_printf ("failed to create key %S in the registry", uname);
 	  break;
 	}
     }

@@ -167,7 +167,7 @@ DW_TAG (DW_TAG_GNU_formal_parameter_pack, 0x4108)
    are properly part of DWARF 5.  */
 DW_TAG (DW_TAG_GNU_call_site, 0x4109)
 DW_TAG (DW_TAG_GNU_call_site_parameter, 0x410a)
-/* Extensions for UPC.  See: http://dwarfstd.org/doc/DWARF4.pdf.  */
+/* Extensions for UPC.  See: http://upc.gwu.edu/~upc.  */
 DW_TAG (DW_TAG_upc_shared_type, 0x8765)
 DW_TAG (DW_TAG_upc_strict_type, 0x8766)
 DW_TAG (DW_TAG_upc_relaxed_type, 0x8767)
@@ -205,10 +205,6 @@ DW_FORM (DW_FORM_ref_sig8, 0x20)
 /* Extensions for Fission.  See http://gcc.gnu.org/wiki/DebugFission.  */
 DW_FORM (DW_FORM_GNU_addr_index, 0x1f01)
 DW_FORM (DW_FORM_GNU_str_index, 0x1f02)
-/* Extensions for DWZ multifile.
-   See http://www.dwarfstd.org/ShowIssue.php?issue=120604.1&type=open .  */
-DW_FORM (DW_FORM_GNU_ref_alt, 0x1f20)
-DW_FORM (DW_FORM_GNU_strp_alt, 0x1f21)
 DW_END_FORM
 
 DW_FIRST_AT (DW_AT_sibling, 0x01)
@@ -588,7 +584,6 @@ DW_OP (DW_OP_GNU_reinterpret, 0xf9)
 DW_OP (DW_OP_GNU_parameter_ref, 0xfa)
 /* Extension for Fission.  See http://gcc.gnu.org/wiki/DebugFission.  */
 DW_OP (DW_OP_GNU_addr_index, 0xfb)
-DW_OP (DW_OP_GNU_const_index, 0xfc)
 /* HP extensions.  */
 DW_OP_DUP (DW_OP_HP_unknown, 0xe0) /* Ouch, the same as GNU_push_tls_address.  */
 DW_OP (DW_OP_HP_is_value, 0xe1)

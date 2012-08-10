@@ -29,9 +29,7 @@
  *       are semantically identical, with a limit of 259 characters for the
  *       path name, plus one for a terminating NUL, for a total of 260.
  */
-#ifndef __STRICT_ANSI__
-# define PATH_MAX	260
-#endif
+#define PATH_MAX	260
 
 /*
  * Characteristics of the char data type.

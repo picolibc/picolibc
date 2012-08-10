@@ -1,0 +1,21 @@
+What's new:
+-----------
+
+- Add mouse reporting mode 1005, 1006 and 1015 to console.
+
+Bug fixes:
+----------
+
+- Allow access of /dev/conin, /dev/conout, and /dev/console if a console
+  device is detected.
+
+- Always allow nonexistent on-disk devices to be referenced even if they
+  can't be open.
+
+- Allow inheritance of special types like /dev/clipboard or /dev/urandom
+  which do not have actual handles associated with them.
+
+- Fix inode numbers of non-device files in virtual filesystems.
+
+- Fix reporting large mouse coordinates in console window mouse reporting mode.
+

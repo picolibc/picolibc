@@ -1,13 +1,3 @@
-2012-07-30  Christopher Faylor  <me.cygwin2012@cgf.cx>
-
-	* Makefile.common (CFLAGS_COMMON): Add temporary define to work around
-	w32api problem.
-
-2012-07-06  Corinna Vinschen  <corinna@vinschen.de>
-
-	* Makefile.common (ALL_CFLAGS): Change := to = to allow overriding in
-	dependent Makefiles.
-
 2012-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.common (MINGW_LDFLAGS): Correctly use -L rather than -B here.

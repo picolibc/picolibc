@@ -112,8 +112,7 @@ muto NO_COPY cwdstuff::cwd_lock;
 static const GUID GUID_shortcut
 			= { 0x00021401L, 0, 0, {0xc0, 0, 0, 0, 0, 0, 0, 0x46}};
 
-enum
-{
+enum {
   WSH_FLAG_IDLIST = 0x01,	/* Contains an ITEMIDLIST. */
   WSH_FLAG_FILE = 0x02,		/* Contains a file locator element. */
   WSH_FLAG_DESC = 0x04,		/* Contains a description. */
@@ -124,24 +123,24 @@ enum
 };
 
 struct win_shortcut_hdr
-{
-  DWORD size;		/* Header size in bytes.  Must contain 0x4c. */
-  GUID magic;		/* GUID of shortcut files. */
-  DWORD flags;	/* Content flags.  See above. */
+  {
+    DWORD size;		/* Header size in bytes.  Must contain 0x4c. */
+    GUID magic;		/* GUID of shortcut files. */
+    DWORD flags;	/* Content flags.  See above. */
 
-  /* The next fields from attr to icon_no are always set to 0 in Cygwin
-     and U/Win shortcuts. */
-  DWORD attr;	/* Target file attributes. */
-  FILETIME ctime;	/* These filetime items are never touched by the */
-  FILETIME mtime;	/* system, apparently. Values don't matter. */
-  FILETIME atime;
-  DWORD filesize;	/* Target filesize. */
-  DWORD icon_no;	/* Icon number. */
+    /* The next fields from attr to icon_no are always set to 0 in Cygwin
+       and U/Win shortcuts. */
+    DWORD attr;	/* Target file attributes. */
+    FILETIME ctime;	/* These filetime items are never touched by the */
+    FILETIME mtime;	/* system, apparently. Values don't matter. */
+    FILETIME atime;
+    DWORD filesize;	/* Target filesize. */
+    DWORD icon_no;	/* Icon number. */
 
-  DWORD run;		/* Values defined in winuser.h. Use SW_NORMAL. */
-  DWORD hotkey;	/* Hotkey value. Set to 0.  */
-  DWORD dummy[2];	/* Future extension probably. Always 0. */
-};
+    DWORD run;		/* Values defined in winuser.h. Use SW_NORMAL. */
+    DWORD hotkey;	/* Hotkey value. Set to 0.  */
+    DWORD dummy[2];	/* Future extension probably. Always 0. */
+  };
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
@@ -1153,7 +1152,7 @@ out:
   if (opt & PC_CTTY)
     path_flags |= PATH_CTTY;
 
-  if (opt & PC_POSIX)
+  if ((opt & PC_POSIX))
     {
       if (tail < path_end && tail > path_copy + 1)
 	*tail = '/';
@@ -1352,8 +1351,8 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
       if ((tail - dst) >= NT_MAX_PATH)
 	return ENAMETOOLONG;
     }
-  if (tail > dst + 1 && tail[-1] == '.' && tail[-2] == '\\')
-    tail--;
+   if (tail > dst + 1 && tail[-1] == '.' && tail[-2] == '\\')
+     tail--;
   *tail = '\0';
   debug_printf ("%s = normalize_win32_path (%s)", dst, src_start);
   return 0;
@@ -2372,6 +2371,8 @@ restart:
   bool had_ext = !!*ext_here;
   while (suffix.next ())
     {
+      bool no_ea = false;
+
       error = 0;
       get_nt_native_path (suffix.path, upath, pflags & PATH_DOS);
       if (h)
@@ -2402,6 +2403,7 @@ restart:
 		 root dir which has EAs enabled? */
 	      || status == STATUS_INVALID_PARAMETER))
 	{
+	  no_ea = true;
 	  /* If EAs are not supported, there's no sense to check them again
 	     with suffixes attached.  So we set eabuf/easize to 0 here once. */
 	  if (status == STATUS_EAS_NOT_SUPPORTED
@@ -3204,14 +3206,11 @@ realpath (const char *path, char *resolved)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  /* Win32 drive letter paths have to be converted to a POSIX path first,
-     because path_conv leaves the incoming path untouched except for
-     converting backslashes to forward slashes. */
   char *tpath;
   if (isdrive (path))
     {
       tpath = tp.c_get ();
-      mount_table->conv_to_posix_path (path, tpath, 0);
+      mount_table->cygdrive_posix_path (path, tpath, 0);
     }
   else
     tpath = (char *) path;
@@ -4311,15 +4310,11 @@ etc::test_file_change (int n)
 bool
 etc::dir_changed (int n)
 {
-  /* io MUST be static because NtNotifyChangeDirectoryFile works asynchronously.
-     It may write into io after the function has left, which may result in all
-     sorts of stack corruption. */
-  static IO_STATUS_BLOCK io NO_COPY;
-  static HANDLE changed_h NO_COPY;
-
   if (!change_possible[n])
     {
+      static HANDLE changed_h NO_COPY;
       NTSTATUS status;
+      IO_STATUS_BLOCK io;
 
       if (!changed_h)
 	{

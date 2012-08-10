@@ -109,12 +109,12 @@ _DEFUN(_ftell_r, (ptr, fp),
 
   CHECK_INIT (ptr, fp);
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
 
   if (fp->_seek == NULL)
     {
       ptr->_errno = ESPIPE;
-      _newlib_flockfile_exit (fp);
+      _funlockfile (fp);
       return -1L;
     }
 
@@ -131,7 +131,7 @@ _DEFUN(_ftell_r, (ptr, fp),
       pos = fp->_seek (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
       if (pos == -1L)
         {
-          _newlib_flockfile_exit (fp);
+          _funlockfile (fp);
           return pos;
         }
     }
@@ -156,7 +156,7 @@ _DEFUN(_ftell_r, (ptr, fp),
       pos += fp->_p - fp->_bf._base;
     }
 
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   if ((long)pos != pos)
     {
       pos = -1;

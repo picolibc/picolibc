@@ -1,0 +1,29 @@
+What's new:
+-----------
+
+- Add CYGWIN=pipe_byte option to force opening of pipes in byte mode
+  rather than message mode.
+
+Bug fixes:
+----------
+
+- Fix output of mkpasswd -c option in case $HOME is set at the time.
+  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00094.html
+
+- Fix problem where too much input was attempted to be read from a
+  pty slave.  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00049.html
+
+- Fix problem setting parent pid to 1 when process with children execs
+  itself.  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00009.html
+
+- Fix fesetround and fesetprec to allow all valid input parameters.
+  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00010.html
+
+- Avoid "WARNING: Couldn't compute FAST_CWD pointer." message on
+  Windows 8 Customer Preview 32 bit. 
+  Fixes: http://cygwin.com/ml/cygwin/2012-04/msg00616.html
+
+- Don't make Cygwin wait for all children of a non-cygwin child program.
+  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00063.html,
+	 http://cygwin.com/ml/cygwin/2012-05/msg00075.html
+

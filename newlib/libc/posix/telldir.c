@@ -69,10 +69,7 @@ struct ddloc {
 
 static long	dd_loccnt = 1;	/* Index of entry for sequential readdir's */
 static struct	ddloc *dd_hash[NDIRHASH];   /* Hash list heads for ddlocs */
-
-#ifdef HAVE_DD_LOCK
 __LOCK_INIT(static, dd_hash_lock);
-#endif
 
 /*
  * return a pointer into a directory

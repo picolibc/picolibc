@@ -9,20 +9,70 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#pragma once
+#ifndef _NTDLL_H
+#define _NTDLL_H 1
 
-#ifndef __MINGW64_VERSION_MAJOR
-# include <ddk/ntstatus.h>
-#else
-# include <ntstatus.h>
+/* NTSTATUS values. */
+#define STATUS_NOT_ALL_ASSIGNED       ((NTSTATUS) 0x00000106)
+#define STATUS_OBJECT_NAME_EXISTS     ((NTSTATUS) 0x40000000)
+#define STATUS_BUFFER_OVERFLOW        ((NTSTATUS) 0x80000005)
+#define STATUS_NO_MORE_FILES          ((NTSTATUS) 0x80000006)
+#ifdef STATUS_INVALID_INFO_CLASS /* Defined as unsigned value in subauth.h */
+#undef STATUS_INVALID_INFO_CLASS
 #endif
+#define STATUS_INVALID_INFO_CLASS     ((NTSTATUS) 0xc0000003)
+#define STATUS_NOT_IMPLEMENTED        ((NTSTATUS) 0xc0000002)
+#define STATUS_INFO_LENGTH_MISMATCH   ((NTSTATUS) 0xc0000004)
+#ifdef STATUS_INVALID_HANDLE     /* Defined as unsigned value in winbase.h */
+#undef STATUS_INVALID_HANDLE
+#endif
+#define STATUS_INVALID_HANDLE         ((NTSTATUS) 0xc0000008)
+#define STATUS_INVALID_PARAMETER      ((NTSTATUS) 0xc000000d)
+#define STATUS_NO_SUCH_FILE           ((NTSTATUS) 0xc000000f)
+#define STATUS_INVALID_DEVICE_REQUEST ((NTSTATUS) 0xc0000010)
+#define STATUS_END_OF_FILE            ((NTSTATUS) 0xc0000011)
+#define STATUS_NO_MEDIA_IN_DEVICE     ((NTSTATUS) 0xc0000013)
+#define STATUS_ACCESS_DENIED          ((NTSTATUS) 0xc0000022)
+#define STATUS_BUFFER_TOO_SMALL       ((NTSTATUS) 0xc0000023)
+#define STATUS_OBJECT_TYPE_MISMATCH   ((NTSTATUS) 0xc0000024)
+#define STATUS_OBJECT_NAME_INVALID    ((NTSTATUS) 0xc0000033)
+#define STATUS_OBJECT_NAME_NOT_FOUND  ((NTSTATUS) 0xc0000034)
+#define STATUS_OBJECT_NAME_COLLISION  ((NTSTATUS) 0xc0000035)
+#define STATUS_OBJECT_PATH_NOT_FOUND  ((NTSTATUS) 0xc000003A)
+#define STATUS_SHARING_VIOLATION      ((NTSTATUS) 0xc0000043)
+#define STATUS_EAS_NOT_SUPPORTED      ((NTSTATUS) 0xc000004f)
+#define STATUS_EA_TOO_LARGE           ((NTSTATUS) 0xc0000050)
+#define STATUS_NONEXISTENT_EA_ENTRY   ((NTSTATUS) 0xc0000051)
+#define STATUS_NO_EAS_ON_FILE         ((NTSTATUS) 0xc0000052)
+#define STATUS_LOCK_NOT_GRANTED       ((NTSTATUS) 0xc0000055)
+#define STATUS_DELETE_PENDING         ((NTSTATUS) 0xc0000056)
+#define STATUS_PROCEDURE_NOT_FOUND    ((NTSTATUS) 0xc000007a)
+#define STATUS_DISK_FULL              ((NTSTATUS) 0xc000007f)
+#define STATUS_WORKING_SET_QUOTA      ((NTSTATUS) 0xc00000a1)
+#define STATUS_INSTANCE_NOT_AVAILABLE ((NTSTATUS) 0xc00000ab)
+#define STATUS_PIPE_NOT_AVAILABLE     ((NTSTATUS) 0xc00000ac)
+#define STATUS_INVALID_PIPE_STATE     ((NTSTATUS) 0xc00000ad)
+#define STATUS_PIPE_BUSY              ((NTSTATUS) 0xc00000ae)
+#define STATUS_NOT_SUPPORTED          ((NTSTATUS) 0xc00000bb)
+#define STATUS_BAD_NETWORK_PATH       ((NTSTATUS) 0xc00000be)
+#define STATUS_INVALID_NETWORK_RESPONSE ((NTSTATUS) 0xc00000c3)
+#define STATUS_BAD_NETWORK_NAME       ((NTSTATUS) 0xc00000cc)
+#define STATUS_DIRECTORY_NOT_EMPTY    ((NTSTATUS) 0xc0000101)
+#define STATUS_PROCESS_IS_TERMINATING ((NTSTATUS) 0xc000010a)
+#define STATUS_CANNOT_DELETE          ((NTSTATUS) 0xc0000121)
+#define STATUS_INVALID_LEVEL          ((NTSTATUS) 0xc0000148)
+#define STATUS_DLL_NOT_FOUND          ((NTSTATUS) 0xc0000135)
+#define STATUS_ENTRYPOINT_NOT_FOUND   ((NTSTATUS) 0xc0000139)
+#define STATUS_NOT_FOUND              ((NTSTATUS) 0xc0000225)
+#define STATUS_BAD_DLL_ENTRYPOINT     ((NTSTATUS) 0xc0000251)
+#define STATUS_ILLEGAL_DLL_RELOCATION ((NTSTATUS) 0xc0000269)
 /* custom status code: */
 #define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)
 
 #define NtCurrentProcess() ((HANDLE) 0xffffffff)
 #define NtCurrentThread()  ((HANDLE) 0xfffffffe)
 
-/* Creation information returned in IO_STATUS_BLOCK. */
+/* CreateDisposition in NtCreateFile call. */
 #define FILE_SUPERSEDED     0
 #define FILE_OPENED         1
 #define FILE_CREATED        2
@@ -490,8 +540,7 @@ typedef enum _PROCESSINFOCLASS
   ProcessVmCounters = 3,
   ProcessTimes = 4,
   ProcessSessionInformation = 24,
-  ProcessWow64Information = 26,
-  ProcessImageFileName = 27
+  ProcessWow64Information = 26
 } PROCESSINFOCLASS;
 
 typedef struct _DEBUG_BUFFER
@@ -973,13 +1022,11 @@ typedef struct _FILE_MAILSLOT_SET_INFORMATION
 
 typedef VOID NTAPI (*PIO_APC_ROUTINE)(PVOID, PIO_STATUS_BLOCK, ULONG);
 
-#ifndef __MINGW64_VERSION_MAJOR
 typedef enum _EVENT_TYPE
 {
   NotificationEvent = 0,
   SynchronizationEvent
 } EVENT_TYPE, *PEVENT_TYPE;
-#endif
 
 typedef struct _EVENT_BASIC_INFORMATION
 {
@@ -1046,21 +1093,11 @@ typedef struct _KEY_VALUE_PARTIAL_INFORMATION
   UCHAR Data[1];
 } KEY_VALUE_PARTIAL_INFORMATION, *PKEY_VALUE_PARTIAL_INFORMATION;
 
-#ifndef __MINGW64_VERSION_MAJOR
 typedef enum _TIMER_TYPE
 {
   NotificationTimer,
   SynchronisationTimer
 } TIMER_TYPE, *PTIMER_TYPE;
-#endif
-
-#ifdef __MINGW64_VERSION_MAJOR
-typedef enum _SECTION_INHERIT
-{
-  ViewShare = 1,
-  ViewUnmap = 2
-} SECTION_INHERIT;
-#endif
 
 typedef VOID (APIENTRY *PTIMER_APC_ROUTINE)(PVOID, ULONG, ULONG);
 
@@ -1215,11 +1252,7 @@ extern "C"
 					      PSECURITY_DESCRIPTOR, PULONG);
   VOID NTAPI RtlAcquirePebLock ();
   NTSTATUS NTAPI RtlAddAccessAllowedAce (PACL, ULONG, ACCESS_MASK, PSID);
-  NTSTATUS NTAPI RtlAddAccessAllowedAceEx (PACL, ULONG, ULONG, ACCESS_MASK,
-					   PSID);
   NTSTATUS NTAPI RtlAddAccessDeniedAce (PACL, ULONG, ACCESS_MASK, PSID);
-  NTSTATUS NTAPI RtlAddAccessDeniedAceEx (PACL, ULONG, ULONG, ACCESS_MASK,
-					  PSID);
   NTSTATUS NTAPI RtlAddAce (PACL, ULONG, ULONG, PVOID, ULONG);
   PVOID NTAPI RtlAllocateHeap (PVOID, ULONG, SIZE_T);
   NTSTATUS NTAPI RtlAppendUnicodeToString (PUNICODE_STRING, PCWSTR);
@@ -1270,7 +1303,6 @@ extern "C"
 						PBOOLEAN);
   PSID_IDENTIFIER_AUTHORITY NTAPI RtlIdentifierAuthoritySid (PSID);
   VOID NTAPI RtlInitEmptyUnicodeString (PUNICODE_STRING, PCWSTR, USHORT);
-  VOID NTAPI RtlInitAnsiString (PANSI_STRING, PCSTR);
   NTSTATUS NTAPI RtlInitializeSid (PSID, PSID_IDENTIFIER_AUTHORITY, UCHAR);
   VOID NTAPI RtlInitUnicodeString (PUNICODE_STRING, PCWSTR);
   NTSTATUS NTAPI RtlIntegerToUnicodeString (ULONG, ULONG, PUNICODE_STRING);
@@ -1302,7 +1334,6 @@ extern "C"
 						BOOLEAN);
   PUCHAR NTAPI RtlSubAuthorityCountSid (PSID);
   PULONG NTAPI RtlSubAuthoritySid (PSID, ULONG);
-  ULONG NTAPI RtlUnicodeStringToAnsiSize (PUNICODE_STRING);
   NTSTATUS NTAPI RtlUnicodeStringToAnsiString (PANSI_STRING, PUNICODE_STRING,
 					       BOOLEAN);
   NTSTATUS NTAPI RtlUnicodeStringToOemString (PANSI_STRING, PUNICODE_STRING,
@@ -1424,3 +1455,4 @@ extern "C"
   }
 }
 #endif
+#endif /*_NTDLL_H*/

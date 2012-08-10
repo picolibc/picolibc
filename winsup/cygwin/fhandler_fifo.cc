@@ -22,7 +22,6 @@
 #include "cygtls.h"
 #include "shared_info.h"
 #include "ntdll.h"
-#include "cygwait.h"
 
 fhandler_fifo::fhandler_fifo ():
   fhandler_base_overlapped (),
@@ -243,14 +242,6 @@ fhandler_fifo::wait (HANDLE h)
     case WAIT_OBJECT_0:
       debug_only_printf ("successfully waited for %s", what);
       return true;
-    case WAIT_SIGNALED:
-      debug_only_printf ("interrupted by signal while waiting for %s", what);
-      set_errno (EINTR);
-      return false;
-    case WAIT_CANCELED:
-      debug_only_printf ("cancellable interruption while waiting for %s", what);
-      pthread::static_cancel_self ();	/* never returns */
-      break;
     case WAIT_TIMEOUT:
       if (h == write_ready)
 	{
@@ -262,6 +253,14 @@ fhandler_fifo::wait (HANDLE h)
 	  set_errno (ENXIO);
 	  return false;
 	}
+      break;
+    case WAIT_OBJECT_0 + 1:
+      debug_only_printf ("interrupted by signal while waiting for %s", what);
+      set_errno (EINTR);
+      return false;
+    case WAIT_OBJECT_0 + 2:
+      debug_only_printf ("cancellable interruption while waiting for %s", what);
+      pthread::static_cancel_self ();	/* never returns */
       break;
     default:
       debug_only_printf ("unknown error while waiting for %s", what);

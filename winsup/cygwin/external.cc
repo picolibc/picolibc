@@ -108,7 +108,7 @@ fillout_pinfo (pid_t pid, int winpid)
     {
       i = 0;
       pids.reset ();
-      return NULL;
+      return 0;
     }
   return &ep;
 }
@@ -186,12 +186,10 @@ static void
 exit_process (UINT status, bool useTerminateProcess)
 {
   pid_t pid = getpid ();
-  external_pinfo *ep = fillout_pinfo (pid, 1);
+  external_pinfo * ep = fillout_pinfo (pid, 1);
   DWORD dwpid = ep ? ep->dwProcessId : pid;
   pinfo p (pid, PID_MAP_RW);
-  if (ep)
-    pid = ep->pid;
-  if ((dwpid == GetCurrentProcessId()) && (p->pid == pid))
+  if ((dwpid == GetCurrentProcessId()) && (p->pid == ep->pid))
     p.set_exit_code ((DWORD)status);
   if (useTerminateProcess)
     TerminateProcess (GetCurrentProcess(), status);

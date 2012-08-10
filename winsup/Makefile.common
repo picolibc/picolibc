@@ -1,6 +1,6 @@
 # Makefile.common - common definitions for the winsup directory
 #
-# Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2009, 2012 Red Hat, Inc.
+# Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -10,7 +10,7 @@
 
 # This makefile requires GNU make.
 
-CFLAGS_COMMON:=-Wall -Wstrict-aliasing -Wwrite-strings -fno-common -pipe -fbuiltin -fmessage-length=0 -D_SDKDDKVER_H
+CFLAGS_COMMON:=-Wall -Wstrict-aliasing -Wwrite-strings -fno-common -pipe -fbuiltin -fmessage-length=0# -finline-functions
 MALLOC_DEBUG:=#-DMALLOC_DEBUG -I/cygnus/src/uberbaum/winsup/cygwin/dlmalloc
 MALLOC_OBJ:=#/cygnus/src/uberbaum/winsup/cygwin/dlmalloc/malloc.o
 
@@ -113,7 +113,7 @@ LIBC:=$(newlib_build)/libc/libc.a
 LIBM:=$(newlib_build)/libm/libm.a
 CRT0:=$(cygwin_build)/crt0.o
 
-ALL_CFLAGS=$(DEFS) $(MALLOC_DEBUG) $(CFLAGS) $(GCC_DEFAULT_OPTIONS)
+ALL_CFLAGS:=$(DEFS) $(MALLOC_DEBUG) $(CFLAGS) $(GCC_DEFAULT_OPTIONS)
 ALL_CXXFLAGS=$(DEFS) $(MALLOC_DEBUG) $(CXXFLAGS) $(GCC_DEFAULT_OPTIONS)
 
 ifndef PREPROCESS
