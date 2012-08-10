@@ -1,5 +1,13 @@
 2012-08-10  Corinna Vinschen  <vinschen@redhat.com>
 
+	* libc/stdlib/btowc.c (btowc): Cast to avoid compiler warning.
+	* libc/search/hash_buf.c (__get_buf): Initialize local vars to avoid
+	compiler warning.
+	* libc/stdio/fgets.c (_fgets_r): Ditto.
+	* libc/time/strftime.c (strftime): Ditto.
+
+2012-08-10  Corinna Vinschen  <vinschen@redhat.com>
+
 	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Fix guard around state to
 	allow usage in !FLOATING_POINT && _WANT_IO_C99_FORMATS case.
 
