@@ -211,22 +211,10 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
     psize = DEFAULT_PIPEBUFSIZE;
 
   char pipename[MAX_PATH];
-  size_t len = __small_sprintf (pipename, PIPE_INTRO "%S-",
+  const size_t len = __small_sprintf (pipename, PIPE_INTRO "%S-",
 				      &cygheap->installation_key);
-  DWORD pipe_mode = PIPE_READMODE_BYTE;
-  if (!name)
-    pipe_mode |= pipe_byte ? PIPE_TYPE_BYTE : PIPE_TYPE_MESSAGE;
-  else
-    pipe_mode |= PIPE_TYPE_MESSAGE;
-
-  if (!name || (open_mode & PIPE_ADD_PID))
-    {
-      len += __small_sprintf (pipename + len, "%u-", GetCurrentProcessId ());
-      open_mode &= ~PIPE_ADD_PID;
-    }
-
   if (name)
-    len += __small_sprintf (pipename + len, "%s", name);
+    strcpy (pipename + len, name);
 
   open_mode |= PIPE_ACCESS_INBOUND;
 
@@ -238,12 +226,10 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
     {
       static volatile ULONG pipe_unique_id;
       if (!name)
-	__small_sprintf (pipename + len, "pipe-%p",
-			 InterlockedIncrement ((LONG *) &pipe_unique_id));
+	__small_sprintf (pipename + len, "pipe-%p-%p", myself->pid,
+			InterlockedIncrement ((LONG *) &pipe_unique_id));
 
-      debug_printf ("name %s, size %lu, mode %s", pipename, psize,
-		    (pipe_mode & PIPE_TYPE_MESSAGE)
-		    ? "PIPE_TYPE_MESSAGE" : "PIPE_TYPE_BYTE");
+      debug_printf ("CreateNamedPipe: name %s, size %lu", pipename, psize);
 
       /* Use CreateNamedPipe instead of CreatePipe, because the latter
 	 returns a write handle that does not permit FILE_READ_ATTRIBUTES
@@ -260,7 +246,8 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 	 definitely required for pty handling since fhandler_pty_master
 	 writes to the pipe in chunks, terminated by newline when CANON mode
 	 is specified.  */
-      *r = CreateNamedPipe (pipename, open_mode, pipe_mode, 1, psize,
+      *r = CreateNamedPipe (pipename, open_mode,
+			   PIPE_TYPE_MESSAGE | PIPE_READMODE_BYTE, 1, psize,
 			   psize, NMPWAIT_USE_DEFAULT_WAIT, sa_ptr);
 
       if (*r != INVALID_HANDLE_VALUE)

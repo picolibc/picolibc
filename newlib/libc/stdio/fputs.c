@@ -88,10 +88,10 @@ _DEFUN(_fputs_r, (ptr, s, fp),
 
   CHECK_INIT(ptr, fp);
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   ORIENT (fp, -1);
   result = __sfvwrite_r (ptr, fp, &uio);
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return result;
 }
 

@@ -82,7 +82,7 @@ _DEFUN(_ungetwc_r, (ptr, wc, fp),
   char buf[MB_LEN_MAX];
   size_t len;
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   ORIENT (fp, 1);
   if (wc == WEOF)
     wc = WEOF;
@@ -98,7 +98,7 @@ _DEFUN(_ungetwc_r, (ptr, wc, fp),
 	  wc = WEOF;
 	  break;
 	}
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return wc;
 }
 

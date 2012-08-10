@@ -36,7 +36,6 @@ __FBSDID("$FreeBSD$");
 #else
 #define  __INSIDE_CYGWIN_NET__
 #include "winsup.h"
-#undef  __INSIDE_CYGWIN_NET__
 #endif
 
 #ifndef __CYGWIN__

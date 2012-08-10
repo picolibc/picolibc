@@ -126,7 +126,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
 
   CHECK_INIT (ptr, fp);
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
 
   curoff = fp->_offset;
 
@@ -144,7 +144,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
   if ((seekfn = fp->_seek64) == NULL)
     {
       ptr->_errno = ESPIPE;	/* ??? */
-      _newlib_flockfile_exit(fp);
+      _funlockfile(fp);
       return EOF;
     }
 
@@ -169,7 +169,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
 	  curoff = seekfn (ptr, fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
 	    {
-	      _newlib_flockfile_exit(fp);
+	      _funlockfile(fp);
 	      return EOF;
 	    }
 	}
@@ -194,7 +194,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
 
     default:
       ptr->_errno = EINVAL;
-      _newlib_flockfile_exit(fp);
+      _funlockfile(fp);
       return (EOF);
     }
 
@@ -294,7 +294,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
       if (HASUB (fp))
 	FREEUB (ptr, fp);
       fp->_flags &= ~__SEOF;
-      _newlib_flockfile_exit(fp);
+      _funlockfile(fp);
       return 0;
     }
 
@@ -323,7 +323,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
       fp->_p += n;
       fp->_r -= n;
     }
-  _newlib_flockfile_end(fp);
+  _funlockfile(fp);
   return 0;
 
   /*

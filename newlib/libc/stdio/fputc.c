@@ -83,9 +83,9 @@ _DEFUN(_fputc_r, (ptr, ch, file),
 {
   int result;
   CHECK_INIT(ptr, file);
-   _newlib_flockfile_start (file);
+   _flockfile (file);
   result = _putc_r (ptr, ch, file);
-  _newlib_flockfile_end (file);
+  _funlockfile (file);
   return result;
 }
 
@@ -98,9 +98,9 @@ _DEFUN(fputc, (ch, file),
 #if !defined(__OPTIMIZE_SIZE__) && !defined(PREFER_SIZE_OVER_SPEED)
   int result;
   CHECK_INIT(_REENT, file);
-   _newlib_flockfile_start (file);
+   _flockfile (file);
   result = _putc_r (_REENT, ch, file);
-  _newlib_flockfile_end (file);
+  _funlockfile (file);
   return result;
 #else
   return _fputc_r (_REENT, ch, file);

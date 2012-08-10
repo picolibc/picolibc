@@ -1,13 +1,19 @@
 /* winsup.h: main Cygwin header file.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
+
+#ifdef DEBUGIT
+#define spf(a, b, c) small_printf (a, b, c)
+#else
+#define spf(a, b, c) do {} while (0)
+#endif
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -21,11 +27,7 @@ details. */
 
 #define EXPORT_ALIAS(sym,symalias) extern "C" __typeof (sym) symalias __attribute__ ((alias(#sym)));
 
-/* Fun, fun, fun.  On Mingw64, WINVER is set according to the value of
-   _WIN32_WINNT, on Mingw32 it's exactly the opposite... */
-#define _WIN32_WINNT 0x0602
-#define WINVER 0x0602
-
+#define WINVER 0x0601
 #define _NO_W32_PSEUDO_MODIFIERS
 
 #include <sys/types.h>
@@ -75,11 +77,7 @@ int fcntl64 (int fd, int cmd, ...);
 #define __WIDE(a) L ## a
 #define _WIDE(a) __WIDE(a)
 
-#include "winlean.h"
-
 #ifdef __cplusplus
-
-#include "wincap.h"
 
 extern const char case_folded_lower[];
 #define cyg_tolower(c) (case_folded_lower[(unsigned char)(c)])
@@ -89,6 +87,12 @@ extern const char case_folded_upper[];
 #ifndef MALLOC_DEBUG
 #define cfree newlib_cfree_dont_use
 #endif
+
+#include "winlean.h"
+#include "wincap.h"
+
+/* The one function we use from winuser.h most of the time */
+extern "C" DWORD WINAPI GetLastError (void);
 
 /* Used as type by sys_wcstombs_alloc and sys_mbstowcs_alloc.  For a
    description see there. */
@@ -161,7 +165,7 @@ void dll_dllcrt0_1 (void *);
 /* dynamically loaded dll initialization */
 extern "C" int dll_dllcrt0 (HMODULE, per_process *);
 
-extern "C" void _pei386_runtime_relocator (per_process *);
+void _pei386_runtime_relocator (per_process *);
 
 /* dynamically loaded dll initialization for non-cygwin apps */
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
@@ -294,10 +298,9 @@ extern "C" char _data_start__, _data_end__, _bss_start__, _bss_end__;
 extern "C" void (*__CTOR_LIST__) (void);
 extern "C" void (*__DTOR_LIST__) (void);
 
-#ifndef NO_GLOBALS_H
+#if !defined(_GLOBALS_H)
 #include "globals.h"
-
-extern inline void clear_procimptoken ()
+inline void clear_procimptoken ()
 {
   if (hProcImpToken)
     {
@@ -306,5 +309,6 @@ extern inline void clear_procimptoken ()
       CloseHandle (old_procimp);
     }
 }
-#endif /*NO_GLOBALS_H*/
+#endif
+
 #endif /* defined __cplusplus */

@@ -57,7 +57,6 @@
 #include <winnetwk.h>
 #include <winnls.h>
 #include <shlobj.h>
-#include <sys/param.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -73,6 +72,8 @@
 #include <ntdll.h>
 #include <wchar.h>
 #include <wctype.h>
+
+bool dos_file_warning = true;
 
 suffix_info stat_suffixes[] =
 {
@@ -112,8 +113,7 @@ muto NO_COPY cwdstuff::cwd_lock;
 static const GUID GUID_shortcut
 			= { 0x00021401L, 0, 0, {0xc0, 0, 0, 0, 0, 0, 0, 0x46}};
 
-enum
-{
+enum {
   WSH_FLAG_IDLIST = 0x01,	/* Contains an ITEMIDLIST. */
   WSH_FLAG_FILE = 0x02,		/* Contains a file locator element. */
   WSH_FLAG_DESC = 0x04,		/* Contains a description. */
@@ -124,24 +124,24 @@ enum
 };
 
 struct win_shortcut_hdr
-{
-  DWORD size;		/* Header size in bytes.  Must contain 0x4c. */
-  GUID magic;		/* GUID of shortcut files. */
-  DWORD flags;	/* Content flags.  See above. */
+  {
+    DWORD size;		/* Header size in bytes.  Must contain 0x4c. */
+    GUID magic;		/* GUID of shortcut files. */
+    DWORD flags;	/* Content flags.  See above. */
 
-  /* The next fields from attr to icon_no are always set to 0 in Cygwin
-     and U/Win shortcuts. */
-  DWORD attr;	/* Target file attributes. */
-  FILETIME ctime;	/* These filetime items are never touched by the */
-  FILETIME mtime;	/* system, apparently. Values don't matter. */
-  FILETIME atime;
-  DWORD filesize;	/* Target filesize. */
-  DWORD icon_no;	/* Icon number. */
+    /* The next fields from attr to icon_no are always set to 0 in Cygwin
+       and U/Win shortcuts. */
+    DWORD attr;	/* Target file attributes. */
+    FILETIME ctime;	/* These filetime items are never touched by the */
+    FILETIME mtime;	/* system, apparently. Values don't matter. */
+    FILETIME atime;
+    DWORD filesize;	/* Target filesize. */
+    DWORD icon_no;	/* Icon number. */
 
-  DWORD run;		/* Values defined in winuser.h. Use SW_NORMAL. */
-  DWORD hotkey;	/* Hotkey value. Set to 0.  */
-  DWORD dummy[2];	/* Future extension probably. Always 0. */
-};
+    DWORD run;		/* Values defined in winuser.h. Use SW_NORMAL. */
+    DWORD hotkey;	/* Hotkey value. Set to 0.  */
+    DWORD dummy[2];	/* Future extension probably. Always 0. */
+  };
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
@@ -719,13 +719,7 @@ path_conv::check (const char *src, unsigned opt,
 
 	  sym.pflags |= pflags_or;
 
-	  if (!dev.exists ())
-	    {
-	      error = ENXIO;
-	      return;
-	    }
-
-	  if (iscygdrive_dev (dev))
+	  if (dev.get_major () == DEV_CYGDRIVE_MAJOR)
 	    {
 	      if (!component)
 		fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
@@ -737,27 +731,29 @@ path_conv::check (const char *src, unsigned opt,
 		}
 	      goto out;
 	    }
-	  else if (isdev_dev (dev))
+	  else if (dev == FH_DEV)
 	    {
-	      /* Just make sure that the path handling goes on as with FH_FS. */
+	      dev = FH_FS;
+#if 0
+	      fileattr = getfileattr (THIS_path, sym.pflags & MOUNT_NOPOSIX);
+	      if (!component && fileattr == INVALID_FILE_ATTRIBUTES)
+		{
+		  fileattr = FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_READONLY;
+		  goto out;
+		}
+#endif
 	    }
 	  else if (isvirtual_dev (dev))
 	    {
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
 	      fhandler_virtual *fh = (fhandler_virtual *) build_fh_dev (dev, path_copy);
-	      virtual_ftype_t file_type;
-	      if (!fh)
-		file_type = virt_none;
-	      else
+	      virtual_ftype_t file_type = fh->exists ();
+	      if (file_type == virt_symlink)
 		{
-		  file_type = fh->exists ();
-		  if (file_type == virt_symlink)
-		    {
-		      fh->fill_filebuf ();
-		      symlen = sym.set (fh->get_filebuf ());
-		    }
-		  delete fh;
+		  fh->fill_filebuf ();
+		  symlen = sym.set (fh->get_filebuf ());
 		}
+	      delete fh;
 	      switch (file_type)
 		{
 		  case virt_directory:
@@ -884,26 +880,8 @@ is_virtual_symlink:
 
 	  if (!component)
 	    {
-	      /* Make sure that /dev always exists. */
-	      fileattr = isdev_dev (dev) ? FILE_ATTRIBUTE_DIRECTORY
-					 : sym.fileattr;
+	      fileattr = sym.fileattr;
 	      path_flags = sym.pflags;
-	    }
-	  else if (isdev_dev (dev))
-	    {
-	      /* If we're looking for a file below /dev, which doesn't exist,
-	         make sure that the device type is converted to FH_FS, so that
-		 subsequent code handles the file correctly.
-		 Unless /dev itself doesn't exist on disk.  In that case /dev
-		 is handled as virtual filesystem, and virtual filesystems are
-		 read-only.  The PC_KEEP_HANDLE check allows to check for
-		 a call from an informational system call.  In that case we
-		 just stick to ENOENT, and the device type doesn't matter
-		 anyway. */
-	      if (sym.error == ENOENT && !(opt & PC_KEEP_HANDLE))
-		sym.error = EROFS;
-	      else
-		dev = FH_FS;
 	    }
 
 	  /* If symlink.check found an existing non-symlink file, then
@@ -1153,7 +1131,7 @@ out:
   if (opt & PC_CTTY)
     path_flags |= PATH_CTTY;
 
-  if (opt & PC_POSIX)
+  if ((opt & PC_POSIX))
     {
       if (tail < path_end && tail > path_copy + 1)
 	*tail = '/';
@@ -1352,8 +1330,8 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
       if ((tail - dst) >= NT_MAX_PATH)
 	return ENAMETOOLONG;
     }
-  if (tail > dst + 1 && tail[-1] == '.' && tail[-2] == '\\')
-    tail--;
+   if (tail > dst + 1 && tail[-1] == '.' && tail[-2] == '\\')
+     tail--;
   *tail = '\0';
   debug_printf ("%s = normalize_win32_path (%s)", dst, src_start);
   return 0;
@@ -1473,6 +1451,10 @@ conv_path_list (const char *src, char *dst, size_t size,
 /********************** Symbolic Link Support **************************/
 
 /* Create a symlink from FROMPATH to TOPATH. */
+
+/* If TRUE create symlinks as Windows shortcuts, if false create symlinks
+   as normal files with magic number and system bit set. */
+bool allow_winsymlinks = false;
 
 extern "C" int
 symlink (const char *oldpath, const char *newpath)
@@ -2372,6 +2354,8 @@ restart:
   bool had_ext = !!*ext_here;
   while (suffix.next ())
     {
+      bool no_ea = false;
+
       error = 0;
       get_nt_native_path (suffix.path, upath, pflags & PATH_DOS);
       if (h)
@@ -2402,6 +2386,7 @@ restart:
 		 root dir which has EAs enabled? */
 	      || status == STATUS_INVALID_PARAMETER))
 	{
+	  no_ea = true;
 	  /* If EAs are not supported, there's no sense to check them again
 	     with suffixes attached.  So we set eabuf/easize to 0 here once. */
 	  if (status == STATUS_EAS_NOT_SUPPORTED
@@ -2803,8 +2788,7 @@ readlink (const char *path, char *buf, size_t buflen)
       return -1;
     }
 
-  size_t pathbuf_len = strlen (pathbuf.get_win32 ());
-  ssize_t len = MIN (buflen, pathbuf_len);
+  ssize_t len = min (buflen, strlen (pathbuf.get_win32 ()));
   memcpy (buf, pathbuf.get_win32 (), len);
 
   /* errno set by symlink.check if error */
@@ -3204,14 +3188,11 @@ realpath (const char *path, char *resolved)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  /* Win32 drive letter paths have to be converted to a POSIX path first,
-     because path_conv leaves the incoming path untouched except for
-     converting backslashes to forward slashes. */
   char *tpath;
   if (isdrive (path))
     {
       tpath = tp.c_get ();
-      mount_table->conv_to_posix_path (path, tpath, 0);
+      mount_table->cygdrive_posix_path (path, tpath, 0);
     }
   else
     tpath = (char *) path;
@@ -3535,132 +3516,205 @@ copy_cwd_str (PUNICODE_STRING tgt, PUNICODE_STRING src)
    USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
    DAMAGE. */
 
-void
-fcwd_access_t::SetFSCharacteristics (LONG val)
-{
+/* This class is used to store the CWD starting with Windows Vista.
+   The CWD storage in the RTL_USER_PROCESS_PARAMETERS block is only
+   an afterthought now.  The actual CWD storage is a FAST_CWD structure
+   which is allocated on the process heap.  The new method only requires
+   minimal locking and it's much more multi-thread friendly.  Presumably
+   it minimizes contention when accessing the CWD.
+   The class fcwd_access_t is supposed to encapsulate the gory implementation
+   details depending on OS version from the calling functions. */
+class fcwd_access_t {
+  /* This is the layout used in Windows 8 developer preview. */
+  struct FAST_CWD_8 {
+    LONG           ReferenceCount;	/* Only release when this is 0. */
+    HANDLE         DirectoryHandle;
+    ULONG          OldDismountCount;	/* Reflects the system DismountCount
+					   at the time the CWD has been set. */
+    UNICODE_STRING Path;		/* Path's Buffer member always refers
+					   to the following Buffer array. */
+    LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
+    WCHAR          Buffer[MAX_PATH];
+  };
+  /* This is the layout used in Windows 7 and Vista. */
+  struct FAST_CWD_7 {
+    UNICODE_STRING Path;		/* Path's Buffer member always refers
+					   to the following Buffer array. */
+    HANDLE         DirectoryHandle;
+    LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
+    LONG           ReferenceCount;	/* Only release when this is 0. */
+    ULONG          OldDismountCount;	/* Reflects the system DismountCount
+					   at the time the CWD has been set. */
+    WCHAR          Buffer[MAX_PATH];
+  };
+  /* This is the old FAST_CWD structure up to the patch from KB 2393802,
+     release in February 2011. */
+  struct FAST_CWD_OLD {
+    LONG           ReferenceCount;	/* Only release when this is 0. */
+    HANDLE         DirectoryHandle;
+    ULONG          OldDismountCount;	/* Reflects the system DismountCount
+					   at the time the CWD has been set. */
+    UNICODE_STRING Path;		/* Path's Buffer member always refers
+					   to the following Buffer array. */
+    WCHAR          Buffer[MAX_PATH];
+  };
+  union {
+    FAST_CWD_OLD fold;
+    FAST_CWD_7   f7;
+    FAST_CWD_8   f8;
+  };
+
+  /* Type of FAST_CWD used on this system.  Keeping this information available
+     in shared memory avoids to test for the version every time around.
+     Default to new version. */
+  enum fcwd_version_t {
+    FCWD_OLD,
+    FCWD_W7,
+    FCWD_W8
+  };
+  static fcwd_version_t fast_cwd_version;
+
+#define IMPLEMENT(type, name) \
+  type name () { \
+    switch (fast_cwd_version) { \
+      case FCWD_OLD: \
+      default: \
+	return fold.name; \
+      case FCWD_W7: \
+	return f7.name; \
+      case FCWD_W8: \
+	return f8.name; \
+    } \
+  }
+  IMPLEMENT (LONG &, ReferenceCount)
+  IMPLEMENT (HANDLE &, DirectoryHandle)
+  IMPLEMENT (ULONG &, OldDismountCount)
+  IMPLEMENT (UNICODE_STRING &, Path)
+  IMPLEMENT (WCHAR *, Buffer)
   /* Special case FSCharacteristics.  Didn't exist originally. */
-  switch (fast_cwd_version ())
+  void SetFSCharacteristics (LONG val)
     {
-    case FCWD_OLD:
-      break;
-    case FCWD_W7:
-      f7.FSCharacteristics = val;
-      break;
-    case FCWD_W8:
-      f8.FSCharacteristics = val;
-      break;
-    }
-}
-
-fcwd_version_t &
-fcwd_access_t::fast_cwd_version ()
-{
-  return cygheap->cwd.fast_cwd_version;
-}
-
-void
-fcwd_access_t::CopyPath (UNICODE_STRING &target)
-{
-  /* Copy the Path contents over into the UNICODE_STRING referenced by
-     target.  This is used to set the CurrentDirectoryName in the
-     user parameter block. */
-  target = Path ();
-}
-
-void
-fcwd_access_t::Free (PVOID heap)
-{
-  /* Decrement the reference count.  If it's down to 0, free
-     structure from heap. */
-  if (this && InterlockedDecrement (&ReferenceCount ()) == 0)
-    {
-      /* In contrast to pre-Vista, the handle on init is always a
-	 fresh one and not the handle inherited from the parent
-	 process.  So we always have to close it here.  However, the
-	 handle could be NULL, if we cd'ed into a virtual dir. */
-      HANDLE h = DirectoryHandle ();
-      if (h)
-	NtClose (h);
-      RtlFreeHeap (heap, 0, this);
-    }
-}
-
-void
-fcwd_access_t::FillIn (HANDLE dir, PUNICODE_STRING name,
-			ULONG old_dismount_count)
-{
-  /* Fill in all values into this FAST_CWD structure. */
-  DirectoryHandle () = dir;
-  ReferenceCount () = 1;
-  OldDismountCount () = old_dismount_count;
-  /* The new structure stores the device characteristics of the
-     volume holding the dir.  RtlGetCurrentDirectory_U checks
-     if the FILE_REMOVABLE_MEDIA flag is set and, if so, checks if
-     the volume is still the same as the one used when opening
-     the directory handle.
-     We don't call NtQueryVolumeInformationFile for the \\?\PIPE,
-     though.  It just returns STATUS_INVALID_HANDLE anyway. */
-  if (fast_cwd_version () != FCWD_OLD)
-    {
-      SetFSCharacteristics (0);
-      if (name != &ro_u_pipedir)
+      switch (fast_cwd_version)
 	{
-	  IO_STATUS_BLOCK io;
-	  FILE_FS_DEVICE_INFORMATION ffdi;
-	  if (NT_SUCCESS (NtQueryVolumeInformationFile (dir, &io, &ffdi,
-			  sizeof ffdi, FileFsDeviceInformation)))
-	    SetFSCharacteristics (ffdi.Characteristics);
+	case FCWD_OLD:
+	  break;
+	case FCWD_W7:
+	  f7.FSCharacteristics = val;
+	  break;
+	case FCWD_W8:
+	  f8.FSCharacteristics = val;
+	  break;
 	}
     }
-  RtlInitEmptyUnicodeString (&Path (), Buffer (),
-			     MAX_PATH * sizeof (WCHAR));
-  copy_cwd_str (&Path (), name);
-}
-
-void
-fcwd_access_t::SetDirHandleFromBufferPointer (PWCHAR buf_p, HANDLE dir)
-{
-  /* Input: The buffer pointer as it's stored in the user parameter block
-     and a directory handle.
-     This function computes the address to the FAST_CWD structure based
-     on the version and overwrites the directory handle.  It is only
-     used if we couldn't figure out the address of fast_cwd_ptr. */
-  fcwd_access_t *f_cwd;
-  switch (fast_cwd_version ())
+public:
+  void CopyPath (UNICODE_STRING &target)
     {
-    case FCWD_OLD:
-    default:
-      f_cwd = (fcwd_access_t *)
-	((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_OLD, Buffer));
-    case FCWD_W7:
-      f_cwd = (fcwd_access_t *)
-	((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_7, Buffer));
-    case FCWD_W8:
-      f_cwd = (fcwd_access_t *)
-	((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_8, Buffer));
+      /* Copy the Path contents over into the UNICODE_STRING referenced by
+	 target.  This is used to set the CurrentDirectoryName in the
+	 user parameter block. */
+      target = Path ();
     }
-  f_cwd->DirectoryHandle () = dir;
-}
+  void Free (PVOID heap)
+    {
+      /* Decrement the reference count.  If it's down to 0, free
+	 structure from heap. */
+      if (this && InterlockedDecrement (&ReferenceCount ()) == 0)
+	{
+	  /* In contrast to pre-Vista, the handle on init is always a
+	     fresh one and not the handle inherited from the parent
+	     process.  So we always have to close it here.  However, the
+	     handle could be NULL, if we cd'ed into a virtual dir. */
+	  HANDLE h = DirectoryHandle ();
+	  if (h)
+	    NtClose (h);
+	  RtlFreeHeap (heap, 0, this);
+	}
+    }
+  void FillIn (HANDLE dir, PUNICODE_STRING name, ULONG old_dismount_count)
+    {
+      /* Fill in all values into this FAST_CWD structure. */
+      DirectoryHandle () = dir;
+      ReferenceCount () = 1;
+      OldDismountCount () = old_dismount_count;
+      /* The new structure stores the device characteristics of the
+	 volume holding the dir.  RtlGetCurrentDirectory_U checks
+	 if the FILE_REMOVABLE_MEDIA flag is set and, if so, checks if
+	 the volume is still the same as the one used when opening
+	 the directory handle.
+	 We don't call NtQueryVolumeInformationFile for the \\?\PIPE,
+	 though.  It just returns STATUS_INVALID_HANDLE anyway. */
+      if (fast_cwd_version != FCWD_OLD)
+	{
+	  SetFSCharacteristics (0);
+	  if (name != &ro_u_pipedir)
+	    {
+	      IO_STATUS_BLOCK io;
+	      FILE_FS_DEVICE_INFORMATION ffdi;
+	      if (NT_SUCCESS (NtQueryVolumeInformationFile (dir, &io, &ffdi,
+			      sizeof ffdi, FileFsDeviceInformation)))
+		SetFSCharacteristics (ffdi.Characteristics);
+	    }
+	}
+      RtlInitEmptyUnicodeString (&Path (), Buffer (),
+				 MAX_PATH * sizeof (WCHAR));
+      copy_cwd_str (&Path (), name);
+    }
 
-void
-fcwd_access_t::SetVersionFromPointer (PBYTE buf_p, bool is_buffer)
-{
-  /* Given a pointer to the FAST_CWD structure (is_buffer == false) or a
-     pointer to the Buffer within (is_buffer == true), this function
-     computes the FAST_CWD version by checking that Path.MaximumLength
-     equals MAX_PATH, and that Path.Buffer == Buffer. */
-  if (is_buffer)
-    buf_p -= __builtin_offsetof (FAST_CWD_8, Buffer);
-  fcwd_access_t *f_cwd = (fcwd_access_t *) buf_p;
-  if (f_cwd->f8.Path.MaximumLength == MAX_PATH * sizeof (WCHAR)
-      && f_cwd->f8.Path.Buffer == f_cwd->f8.Buffer)
-    fast_cwd_version () = FCWD_W8;
-  else if (f_cwd->f7.Path.MaximumLength == MAX_PATH * sizeof (WCHAR)
-	   && f_cwd->f7.Path.Buffer == f_cwd->f7.Buffer)
-    fast_cwd_version () = FCWD_W7;
-  else
-    fast_cwd_version () = FCWD_OLD;
-}
+  static void SetDirHandleFromBufferPointer (PWCHAR buf_p, HANDLE dir)
+    {
+      /* Input: The buffer pointer as it's stored in the user parameter block
+	 and a directory handle.
+	 This function computes the address to the FAST_CWD structure based
+	 on the version and overwrites the directory handle.  It is only
+	 used if we couldn't figure out the address of fast_cwd_ptr. */
+      fcwd_access_t *f_cwd;
+      switch (fast_cwd_version)
+	{
+	case FCWD_OLD:
+	default:
+	  f_cwd = (fcwd_access_t *)
+	    ((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_OLD, Buffer));
+	case FCWD_W7:
+	  f_cwd = (fcwd_access_t *)
+	    ((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_7, Buffer));
+	case FCWD_W8:
+	  f_cwd = (fcwd_access_t *)
+	    ((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_8, Buffer));
+	}
+      f_cwd->DirectoryHandle () = dir;
+    }
+  static void SetVersionFromPointer (PBYTE buf_p, bool is_buffer)
+    {
+      /* Given a pointer to the FAST_CWD structure (is_buffer == false) or a
+	 pointer to the Buffer within (is_buffer == true), this function
+	 computes the FAST_CWD version by checking that Path.MaximumLength
+	 equals MAX_PATH, and that Path.Buffer == Buffer. */
+      if (is_buffer)
+	buf_p -= __builtin_offsetof (FAST_CWD_8, Buffer);
+      fcwd_access_t *f_cwd = (fcwd_access_t *) buf_p;
+      if (f_cwd->f8.Path.MaximumLength == MAX_PATH * sizeof (WCHAR)
+	  && f_cwd->f8.Path.Buffer == f_cwd->f8.Buffer)
+	fast_cwd_version = FCWD_W8;
+      else if (f_cwd->f7.Path.MaximumLength == MAX_PATH * sizeof (WCHAR)
+	       && f_cwd->f7.Path.Buffer == f_cwd->f7.Buffer)
+	fast_cwd_version = FCWD_W7;
+      else
+	fast_cwd_version = FCWD_OLD;
+    }
+};
+fcwd_access_t::fcwd_version_t fcwd_access_t::fast_cwd_version
+  __attribute__((section (".cygwin_dll_common"), shared))
+  = fcwd_access_t::FCWD_W7;
+/* fast_cwd_ptr is a pointer to the global RtlpCurDirRef pointer in
+   ntdll.dll pointing to the FAST_CWD structure which constitutes the CWD.
+   Unfortunately RtlpCurDirRef is not exported from ntdll.dll.
+   We put the pointer into the common shared DLL segment.  This allows to
+   restrict the call to find_fast_cwd_pointer() to once per Cygwin session
+   per user session.  This works, because ASLR randomizes the load address
+   of DLLs only once at boot time. */
+static fcwd_access_t **fast_cwd_ptr
+  __attribute__((section (".cygwin_dll_common"), shared))
+  = (fcwd_access_t **) -1;
 
 #define peek32(x)	(*(uint32_t *)(x))
 
@@ -3670,9 +3724,8 @@ fcwd_access_t::SetVersionFromPointer (PBYTE buf_p, bool is_buffer)
    Therefore we have to use some knowledge to figure out the address.
 
    This code has been tested on Vista 32/64 bit, Server 2008 32/64 bit,
-   Windows 7 32/64 bit, Server 2008 R2 (which is only 64 bit anyway),
-   and W8CP 32/64 bit.  There's some hope this will still work for
-   Windows 8 RTM... */
+   Windows 7 32/64 bit, and Server 2008 R2 (which is only 64 bit anyway).
+   There's some hope that this will still work for Windows 8... */
 static fcwd_access_t **
 find_fast_cwd_pointer ()
 {
@@ -3700,64 +3753,31 @@ find_fast_cwd_pointer ()
   /* ...which should be followed by "mov edi, crit-sect-addr" then
      "push edi", or by just a single "push crit-sect-addr". */
   const uint8_t *movedi = pushedi + 1;
-  const uint8_t *mov_pfast_cwd;
-  if (movedi[0] == 0x8b && movedi[1] == 0xff)	/* mov edi,edi -> W8 */
-    {
-      /* Windows 8 CP 32 bit (after a Windows Update?) does not call
-         RtlEnterCriticalSection.  For some reason the function manipulates
-	 the FastPebLock manually, kind of like RtlEnterCriticalSection has
-	 been converted to an inline function.
-
-	 Next we search for a `mov eax, some address'.  This address points
-	 to the LockCount member of the FastPebLock structure, so the address
-	 is equal to FastPebLock + 4. */
-      const uint8_t *moveax = (const uint8_t *) memchr (movedi, 0xb8, 16);
-      if (!moveax)
-	return NULL;
-      offset = (ptrdiff_t) peek32 (moveax + 1) - 4;
-      /* Compare the address with the known PEB lock as stored in the PEB. */
-      if ((PRTL_CRITICAL_SECTION) offset != NtCurrentTeb ()->Peb->FastPebLock)
-	return NULL;
-      /* Now search for the mov instruction fetching the address of the global
-	 PFAST_CWD *. */
-      mov_pfast_cwd = moveax;
-      do
-	{
-	  mov_pfast_cwd = (const uint8_t *) memchr (++mov_pfast_cwd, 0x8b, 48);
-	}
-      while (mov_pfast_cwd && mov_pfast_cwd[1] != 0x1d
-	     && (mov_pfast_cwd - moveax) < 48);
-      if (!mov_pfast_cwd || mov_pfast_cwd[1] != 0x1d)
-	return NULL;
-    }
+  if (movedi[0] == 0xbf && movedi[5] == 0x57)
+    rcall = movedi + 6;
+  else if (movedi[0] == 0x68)
+    rcall = movedi + 5;
   else
-    {
-      if (movedi[0] == 0xbf && movedi[5] == 0x57)
-	rcall = movedi + 6;
-      else if (movedi[0] == 0x68)
-	rcall = movedi + 5;
-      else
-	return NULL;
-      /* Compare the address used for the critical section with the known
-	 PEB lock as stored in the PEB. */
-      if ((PRTL_CRITICAL_SECTION) peek32 (movedi + 1)
-	  != NtCurrentTeb ()->Peb->FastPebLock)
-	return NULL;
-      /* To check we are seeing the right code, we check our expectation that
-	 the next instruction is a relative call into RtlEnterCriticalSection. */
-      if (rcall[0] != 0xe8)
-	return NULL;
-      /* Check that this is a relative call to RtlEnterCriticalSection. */
-      offset = (ptrdiff_t) peek32 (rcall + 1);
-      if (rcall + 5 + offset != ent_crit)
-	return NULL;
-      mov_pfast_cwd = rcall + 5;
-    }
+    return NULL;
+  /* Compare the address used for the critical section with the known
+     PEB lock as stored in the PEB. */
+  if ((PRTL_CRITICAL_SECTION) peek32 (movedi + 1)
+      != NtCurrentTeb ()->Peb->FastPebLock)
+    return NULL;
+  /* To check we are seeing the right code, we check our expectation that
+     the next instruction is a relative call into RtlEnterCriticalSection. */
+  if (rcall[0] != 0xe8)
+    return NULL;
+  /* Check that this is a relative call to RtlEnterCriticalSection. */
+  offset = (ptrdiff_t) peek32 (rcall + 1);
+  if (rcall + 5 + offset != ent_crit)
+    return NULL;
   /* After locking the critical section, the code should read the global
      PFAST_CWD * pointer that is guarded by that critical section. */
-  if (mov_pfast_cwd[0] != 0x8b)
+  const uint8_t *movesi = rcall + 5;
+  if (movesi[0] != 0x8b)
     return NULL;
-  return (fcwd_access_t **) peek32 (mov_pfast_cwd + 2);
+  return (fcwd_access_t **) peek32 (movesi + 2);
 }
 
 static fcwd_access_t **
@@ -3936,13 +3956,8 @@ cwdstuff::init ()
   if (win32.Buffer)
     override_win32_cwd (true, SharedUserData.DismountCount);
   else
-    {
-      /* Initialize fast_cwd stuff. */
-      fast_cwd_ptr = (fcwd_access_t **) -1;
-      fast_cwd_version = FCWD_W7;
-      /* Initially re-open the cwd to allow POSIX semantics. */
-      set (NULL, NULL);
-    }
+    /* Initially re-open the cwd to allow POSIX semantics. */
+    set (NULL, NULL);
 }
 
 /* Chdir and fill out the elements of a cwdstuff struct. */
@@ -4311,15 +4326,11 @@ etc::test_file_change (int n)
 bool
 etc::dir_changed (int n)
 {
-  /* io MUST be static because NtNotifyChangeDirectoryFile works asynchronously.
-     It may write into io after the function has left, which may result in all
-     sorts of stack corruption. */
-  static IO_STATUS_BLOCK io NO_COPY;
-  static HANDLE changed_h NO_COPY;
-
   if (!change_possible[n])
     {
+      static HANDLE changed_h NO_COPY;
       NTSTATUS status;
+      IO_STATUS_BLOCK io;
 
       if (!changed_h)
 	{

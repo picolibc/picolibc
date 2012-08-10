@@ -8,6 +8,10 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define NOCOMATTRIBUTE
+
+#define WINVER 0x0600
+#include <shlobj.h>
 #include <stdio.h>
 #include <string.h>
 #include <wchar.h>
@@ -15,22 +19,17 @@ details. */
 #include <stdlib.h>
 #include <limits.h>
 #include <getopt.h>
+#include <windows.h>
+#include <userenv.h>
 #include <io.h>
 #include <sys/fcntl.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
 #include <ctype.h>
 #include <errno.h>
-
-#define _WIN32_WINNT 0x0602
-#define WINVER 0x0602
-#define NOCOMATTRIBUTE
-#include <windows.h>
-#include <userenv.h>
-#include <shlobj.h>
-#include <ntdef.h>
-#include <ntdll.h>
-
+#include <ddk/ntddk.h>
+#include <ddk/winddk.h>
+#include <ddk/ntifs.h>
 #include "wide_path.h"
 #include "loadlib.h"
 
@@ -149,6 +148,18 @@ RtlAllocateUnicodeString (PUNICODE_STRING uni, ULONG size)
   return uni->Buffer != NULL;
 }
 
+static inline BOOLEAN
+RtlEqualUnicodePathPrefix (PUNICODE_STRING path, PUNICODE_STRING prefix,
+			   BOOLEAN caseinsensitive)
+  {
+    UNICODE_STRING p;
+
+    p.Length = p.MaximumLength = prefix->Length < path->Length
+				 ? prefix->Length : path->Length;
+    p.Buffer = path->Buffer;
+    return RtlEqualUnicodeString (&p, prefix, caseinsensitive);
+  }
+
 static size_t
 my_wcstombs (char *dest, const wchar_t *src, size_t n)
 {
@@ -192,11 +203,11 @@ get_device_name (char *path)
      query it and use the new name as actual device name to search for in the
      DOS device name directory.  If not, just use the incoming device name. */
   InitializeObjectAttributes (&ntobj, &ntdev, OBJ_CASE_INSENSITIVE, NULL, NULL);
-  status = NtOpenSymbolicLinkObject (&lnk, SYMBOLIC_LINK_QUERY, &ntobj);
+  status = ZwOpenSymbolicLinkObject (&lnk, SYMBOLIC_LINK_QUERY, &ntobj);
   if (NT_SUCCESS (status))
     {
-      status = NtQuerySymbolicLinkObject (lnk, &tgtdev, NULL);
-      NtClose (lnk);
+      status = ZwQuerySymbolicLinkObject (lnk, &tgtdev, NULL);
+      ZwClose (lnk);
       if (!NT_SUCCESS (status))
 	goto out;
       RtlCopyUnicodeString (&ntdev, &tgtdev);
@@ -214,28 +225,28 @@ get_device_name (char *path)
       /* Open the directory... */
       InitializeObjectAttributes (&ntobj, &ntdevdir, OBJ_CASE_INSENSITIVE,
 				  NULL, NULL);
-      status = NtOpenDirectoryObject (&dir, DIRECTORY_QUERY, &ntobj);
+      status = ZwOpenDirectoryObject (&dir, DIRECTORY_QUERY, &ntobj);
       if (!NT_SUCCESS (status))
 	break;
 
       /* ...and scan it. */
       for (restart = TRUE, cont = 0;
-	   NT_SUCCESS (NtQueryDirectoryObject (dir, odi, 4096, TRUE,
+	   NT_SUCCESS (ZwQueryDirectoryObject (dir, odi, 4096, TRUE,
 					       restart, &cont, NULL));
 	   restart = FALSE)
 	{
 	  /* For each entry check if it's a symbolic link. */
 	  InitializeObjectAttributes (&ntobj, &odi->ObjectName,
 				      OBJ_CASE_INSENSITIVE, dir, NULL);
-	  status = NtOpenSymbolicLinkObject (&lnk, SYMBOLIC_LINK_QUERY, &ntobj);
+	  status = ZwOpenSymbolicLinkObject (&lnk, SYMBOLIC_LINK_QUERY, &ntobj);
 	  if (!NT_SUCCESS (status))
 	    continue;
 	  tgtdev.Length = 0;
 	  tgtdev.MaximumLength = 512;
 	  /* If so, query it and compare the target of the symlink with the
 	     incoming device name. */
-	  status = NtQuerySymbolicLinkObject (lnk, &tgtdev, NULL);
-	  NtClose (lnk);
+	  status = ZwQuerySymbolicLinkObject (lnk, &tgtdev, NULL);
+	  ZwClose (lnk);
 	  if (!NT_SUCCESS (status))
 	    continue;
 	  if (tgtdev.Length /* There's actually a symlink pointing to an
@@ -282,12 +293,12 @@ get_device_name (char *path)
 		      else
 			memmove (ret, ret + 4, strlen (ret + 4) + 1);
 		    }
-		  NtClose (dir);
+		  ZwClose (dir);
 		  goto out;
 		}
 	    }
 	}
-      NtClose (dir);
+      ZwClose (dir);
     }
 
 out:

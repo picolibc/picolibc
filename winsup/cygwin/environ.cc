@@ -2,7 +2,7 @@
    process's environment.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -32,6 +32,11 @@ details. */
 #include "shared_info.h"
 #include "ntdll.h"
 
+extern bool dos_file_warning;
+extern bool ignore_case_with_glob;
+extern bool allow_winsymlinks;
+bool reset_com = false;
+
 static char **lastenviron;
 
 /* Parse CYGWIN options */
@@ -40,9 +45,8 @@ static NO_COPY bool export_settings = false;
 
 enum settings
   {
+    justset,
     isfunc,
-    setdword,
-    setbool,
     setbit
   };
 
@@ -112,17 +116,15 @@ static struct parse_thing
       } values[2];
   } known[] NO_COPY =
 {
-  {"detect_bloda", {&detect_bloda}, setbool, NULL, {{false}, {true}}},
-  {"dosfilewarning", {&dos_file_warning}, setbool, NULL, {{false}, {true}}},
+  {"dosfilewarning", {&dos_file_warning}, justset, NULL, {{false}, {true}}},
   {"error_start", {func: error_start_init}, isfunc, NULL, {{0}, {0}}},
-  {"export", {&export_settings}, setbool, NULL, {{false}, {true}}},
+  {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
   {"glob", {func: glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
-  {"pipe_byte", {&pipe_byte}, setbool, NULL, {{false}, {true}}},
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
-  {"reset_com", {&reset_com}, setbool, NULL, {{false}, {true}}},
+  {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
   {"tty", {func: tty_is_gone}, isfunc, NULL, {{0}, {0}}},
-  {"winsymlinks", {&allow_winsymlinks}, setbool, NULL, {{false}, {true}}},
-  {NULL, {0}, setdword, 0, {{0}, {0}}}
+  {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
+  {NULL, {0}, justset, 0, {{0}, {0}}}
 };
 
 /* Parse a string of the form "something=stuff somethingelse=more-stuff",
@@ -182,19 +184,12 @@ parse_options (const char *inbuf)
 		  k->values[istrue].s : eq);
 		debug_printf ("%s (called func)", k->name);
 		break;
-	      case setdword:
+	      case justset:
 		if (!istrue || !eq)
 		  *k->setting.x = k->values[istrue].i;
 		else
 		  *k->setting.x = strtol (eq, NULL, 0);
 		debug_printf ("%s %d", k->name, *k->setting.x);
-		break;
-	      case setbool:
-		if (!istrue || !eq)
-		  *k->setting.b = k->values[istrue].i;
-		else
-		  *k->setting.b = !!strtol (eq, NULL, 0);
-		debug_printf ("%s%s", *k->setting.b ? "" : "no", k->name);
 		break;
 	      case setbit:
 		*k->setting.x &= ~k->values[istrue].i;

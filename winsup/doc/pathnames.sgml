@@ -2,12 +2,12 @@
 
 <sect2 id="pathnames-intro"><title>Introduction</title>
 
-<para>Cygwin supports both POSIX- and Win32-style paths.  Directory
+<para>Cygwin supports both Win32- and POSIX-style paths.  Directory
 delimiters may be either forward slashes or backslashes.  Paths using
-backslashes or starting with a drive letter are always handled as
-Win32 paths.  POSIX paths must only use forward slashes as delimiter,
-otherwise they are treated as Win32 paths and file access might fail
-in surprising ways.</para>
+backslashes are always handled as Win32 paths.  POSIX paths must only
+use forward slashes as delimiter, otherwise they are treated as Win32
+paths and file access might fail in surprising ways.  UNC pathnames
+(starting with two slashes and a network name) are also supported.</para>
 
 <note><para>The usage of Win32 paths, though possible, is deprecated,
 since it circumvents important internal path handling mechanisms. 
@@ -269,27 +269,11 @@ old user mount points as before.
 
 </sect2>
 
-<sect2 id="unc-paths"><title>UNC paths</title>
-
-<para>Apart from the unified POSIX tree starting at the <filename>/</filename>
-directory, UNC pathnames starting with two slashes and a server name
-(<filename>//machine/share/...</filename>) are supported as well.
-They are handled as POSIX paths if only containing forward slashes.  There's
-also a virtual directory <filename>//</filename> which allows to enumerate
-the fileservers known to the local machine with <command>ls</command>.
-Same goes for the UNC paths of the type <filename>//machine</filename>,
-which allow to enumerate the shares provided by the server
-<literal>machine</literal>. For often used UNC paths it makes sense to
-add them to the mount table (see <xref linkend="mount-table"></xref> so
-they are included in the unified POSIX path tree.</para>
-
-</sect2>
-
 <sect2 id="cygdrive"><title>The cygdrive path prefix</title>
 
 <para>As already outlined in <xref linkend="ov-hi-files"></xref>, you can
 access arbitary drives on your system by using the cygdrive path prefix.
-The default value for this prefix is <filename>/cygdrive</filename>, and
+The default value for this prefix is <literal>/cygdrive</literal>, and
 a path to any drive can be constructed by using the cygdrive prefix and
 appending the drive letter as subdirectory, like this:</para>
 
@@ -303,7 +287,7 @@ appending the drive letter as subdirectory, like this:</para>
 on a system are subsumed.  The mount options of the cygdrive prefix is
 used for all file access through the cygdrive prefixed drives.  For instance,
 assuming the cygdrive mount options are <literal>binary,posix=0</literal>,
-then any file <filename>/cygdrive/x/file</filename> will be opened in
+then any file <literal>/cygdrive/x/file</literal> will be opened in
 binary mode by default (mount option <literal>binary</literal>), and the case
 of the filename doesn't matter (mount option <literal>posix=0</literal>).
 </para>
@@ -705,24 +689,18 @@ Read on for more information.</para>
 </sect2>
 
 <sect2 id="pathnames-posixdevices"> <title>POSIX devices</title>
-<para>While there is no need to create a POSIX <filename>/dev</filename> 
-directory, the directory is automatically created as part of a Cygwin
-installation.  It's existence is often a prerequisit to run certain
-applications which create symbolic links, fifos, or UNIX sockets in
-<filename>/dev</filename>.  Also, the directories <filename>/dev/shm</filename>
-and <filename>/dev/mqueue</filename> are required to exist to use named POSIX
-semaphores, shared memory, and message queues, so a system without a real
-<filename>/dev</filename> directory is functionally crippled.
+<para>There is no need to create a POSIX <filename>/dev</filename> 
+directory as Cygwin automatically simulates it internally. 
+These devices cannot be seen with the command <command>ls /dev/</command>
+although commands such as <command>ls /dev/tty</command> work fine.
+If you want to be able to see all well-known devices in
+<filename>/dev/</filename>, you can use Igor Pechtchanski's
+<ulink
+url="http://cygwin.com/ml/cygwin/2004-03/txt00028.txt">create_devices.sh</ulink>
+script.  This script does not add the raw disk devices, though.  Again,
+it's not necessary to see an existing device in /dev to access it.  The script
+is just for the fun of it.
 </para>
-
-<para>Apart from that, Cygwin automatically simulates POSIX devices
-internally.  Up to Cygwin 1.7.11, these devices couldn't be seen with the
-command <command>ls /dev/</command> although commands such as
-<command>ls /dev/tty</command> worked fine.  Starting with Cygwin 1.7.12,
-the <filename>/dev</filename> directory is automagically populated with
-existing POSIX devices by Cygwin in a way comparable with a
-<ulink url="http://en.wikipedia.org/wiki/Udev">udev</ulink> based virtual
-<filename>/dev</filename> directory under Linux.</para>
 
 <para>
 Cygwin supports the following character devices commonly found on POSIX systems:

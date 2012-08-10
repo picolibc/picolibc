@@ -331,7 +331,7 @@ typedef WSADATA *LPWSADATA;
 #define AF_12844    25
 #define AF_IRDA     26
 #define AF_NETDES   28
-#ifndef __INSIDE_MSYS__
+#if !(defined (__INSIDE_CYGWIN__) || defined (__INSIDE_MSYS__))
 #define AF_MAX	29
 struct sockaddr {
 	u_short sa_family;
@@ -359,7 +359,7 @@ struct sockaddr_storage {
     __int64 __ss_align;  	   /* force alignment */
     char __ss_pad2[_SS_PAD2SIZE];  /*  pad to 128 */
 };
-#endif /* !__INSIDE_MSYS__ */
+#endif /* ! (__INSIDE_CYGWIN__ || __INSIDE_MSYS__) */
 
 struct sockproto {
 	u_short sp_family;

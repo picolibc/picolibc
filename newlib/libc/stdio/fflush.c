@@ -226,9 +226,9 @@ _DEFUN(_fflush_r, (ptr, fp),
   if (!fp->_flags)
     return 0;
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   ret = __sflush_r (ptr, fp);
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return ret;
 }
 

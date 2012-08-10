@@ -1,7 +1,7 @@
 /* net.cc: network-related routines.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,27 +12,27 @@ details. */
 /* #define DEBUG_NEST_ON 1 */
 
 #define  __INSIDE_CYGWIN_NET__
-#define USE_SYS_TYPES_FD_SET
-#define __WSA_ERR_MACROS_DEFINED
-/* FIXME: Collision with different declarations of if_nametoindex and
-          if_indextoname functions in iphlpapi.h since Vista.
-   TODO:  Convert if_nametoindex to cygwin_if_nametoindex and call
-	  system functions on Vista and later. */
-#define _INC_NETIOAPI
+
 #include "winsup.h"
-#include <ws2tcpip.h>
-#include <mswsock.h>
-#include <iphlpapi.h>
+
+/* unfortunately defined in windows header file but used in
+   cygwin header files too */
+#undef NOERROR
+#undef DELETE
+
 #include "miscfuncs.h"
 #include <ctype.h>
 #include <wchar.h>
+
 #include <stdlib.h>
 #define gethostname cygwin_gethostname
 #include <unistd.h>
 #undef gethostname
 #include <netdb.h>
-#include <cygwin/in.h>
 #include <asm/byteorder.h>
+#define USE_SYS_TYPES_FD_SET
+#include <winsock2.h>
+#include <iphlpapi.h>
 #include <assert.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -46,13 +46,10 @@ details. */
 #include "sigproc.h"
 #include "registry.h"
 #include "cygtls.h"
+#include "cygwin/in6.h"
 #include "ifaddrs.h"
 #include "tls_pbuf.h"
 #include "ntdll.h"
-
-/* Unfortunately defined in Windows header files and arpa/nameser_compat.h. */
-#undef NOERROR
-#undef DELETE
 #define _CYGWIN_IN_H
 #include <resolv.h>
 
@@ -535,33 +532,19 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 		      sizeof (base_soc), &bret, NULL, NULL);
       if (ret)
 	debug_printf ("WSAIoctl: %lu", WSAGetLastError ());
-      else if (base_soc != soc)
+      else if (base_soc != soc
+	       && GetHandleInformation ((HANDLE) base_soc, &flags)
+	       && (flags & HANDLE_FLAG_INHERIT))
 	{
-	  /* LSPs are often BLODAs as well.  So we print an info about
-	     detecting an LSP if BLODA detection is desired. */
-	  if (detect_bloda)
+	  if (!DuplicateHandle (GetCurrentProcess (), (HANDLE) base_soc,
+				GetCurrentProcess (), (PHANDLE) &base_soc,
+				0, TRUE, DUPLICATE_SAME_ACCESS))
+	    debug_printf ("DuplicateHandle failed, %E");
+	  else
 	    {
-	      WSAPROTOCOL_INFO prot;
-
-	      memset (&prot, 0, sizeof prot);
-	      ::getsockopt (soc, SOL_SOCKET, SO_PROTOCOL_INFO, (char *) &prot,
-			    (size = sizeof prot, &size));
-	      small_printf ("\n\nPotential BLODA detected!  Layered Socket "
-			    "Service Provider:\n  %s\n\n", prot.szProtocol);
-	    }
-	  if (GetHandleInformation ((HANDLE) base_soc, &flags)
-	      && (flags & HANDLE_FLAG_INHERIT))
-	    {
-	      if (!DuplicateHandle (GetCurrentProcess (), (HANDLE) base_soc,
-				    GetCurrentProcess (), (PHANDLE) &base_soc,
-				    0, TRUE, DUPLICATE_SAME_ACCESS))
-		debug_printf ("DuplicateHandle failed, %E");
-	      else
-		{
-		  closesocket (soc);
-		  soc = base_soc;
-		  fixup = false;
-		}
+	      closesocket (soc);
+	      soc = base_soc;
+	      fixup = false;
 	    }
 	}
     }
@@ -715,11 +698,7 @@ cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
   myfault efault;
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
-  else
-    /* Originally we shortcircuited here if res == 0.
-       Allow 0 bytes buffer.  This is valid in POSIX and handled in
-       fhandler_socket::recv_internal.  If we shortcircuit, we fail
-       to deliver valid error conditions and peer address. */
+  else if ((res = len) != 0)
     res = fh->recvfrom (buf, len, flags, from, fromlen);
 
   syscall_printf ("%R = recvfrom(%d, %p, %d, %x, %p, %p)",
@@ -1472,11 +1451,7 @@ cygwin_recv (int fd, void *buf, size_t len, int flags)
   myfault efault;
   if (efault.faulted (EFAULT) || !fh)
     res = -1;
-  else
-    /* Originally we shortcircuited here if res == 0.
-       Allow 0 bytes buffer.  This is valid in POSIX and handled in
-       fhandler_socket::recv_internal.  If we shortcircuit, we fail
-       to deliver valid error conditions. */
+  else if ((res = len) != 0)
     res = fh->recvfrom (buf, len, flags, NULL, NULL);
 
   syscall_printf ("%R = recv(%d, %p, %d, %x)", res, fd, buf, len, flags);
@@ -1524,8 +1499,6 @@ getdomainname (char *domain, size_t len)
 }
 
 /* Fill out an ifconf struct. */
-
-#ifndef __MINGW64_VERSION_MAJOR
 
 /* Vista/Longhorn: unicast address has additional OnLinkPrefixLength member. */
 typedef struct _IP_ADAPTER_UNICAST_ADDRESS_LH {
@@ -1584,9 +1557,29 @@ typedef struct _IP_ADAPTER_ADDRESSES_LH {
   ULONG Ipv6Metric;
 } IP_ADAPTER_ADDRESSES_LH,*PIP_ADAPTER_ADDRESSES_LH;
 
+/* We can't include ws2tcpip.h. */
+
 #define SIO_GET_INTERFACE_LIST  _IOR('t', 127, u_long)
 
-#endif /* !__MINGW64_VERSION_MAJOR */
+struct sockaddr_in6_old {
+  short   sin6_family;
+  u_short sin6_port;
+  u_long  sin6_flowinfo;
+  struct in6_addr sin6_addr;
+};
+
+typedef union sockaddr_gen{
+  struct sockaddr	  Address;
+  struct sockaddr_in	  AddressIn;
+  struct sockaddr_in6_old AddressIn6;
+} sockaddr_gen;
+
+typedef struct _INTERFACE_INFO {
+  u_long	  iiFlags;
+  sockaddr_gen	  iiAddress;
+  sockaddr_gen	  iiBroadcastAddress;
+  sockaddr_gen	  iiNetmask;
+} INTERFACE_INFO, *LPINTERFACE_INFO;
 
 #ifndef IN_LOOPBACK
 #define IN_LOOPBACK(a)	((((long int) (a)) & 0xff000000) == 0x7f000000)
@@ -1643,75 +1636,36 @@ ip_addr_prefix (PIP_ADAPTER_UNICAST_ADDRESS pua, PIP_ADAPTER_PREFIX pap)
 #define GAA_FLAG_INCLUDE_ALL_INTERFACES 0x0100
 #endif
 
-struct gaa_wa {
-  ULONG family;
-  PIP_ADAPTER_ADDRESSES *pa_ret;
-};
-
-DWORD WINAPI
-call_gaa (LPVOID param)
+bool
+get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
 {
   DWORD ret, size = 0;
-  gaa_wa *p = (gaa_wa *) param;
   PIP_ADAPTER_ADDRESSES pa0 = NULL;
 
-  if (!p->pa_ret)
-    return GetAdaptersAddresses (p->family, GAA_FLAG_INCLUDE_PREFIX
+  if (!pa_ret)
+    return ERROR_BUFFER_OVERFLOW
+	   == GetAdaptersAddresses (family, GAA_FLAG_INCLUDE_PREFIX
 					    | GAA_FLAG_INCLUDE_ALL_INTERFACES,
-				 NULL, NULL, &size);
+				    NULL, NULL, &size);
   do
     {
-      ret = GetAdaptersAddresses (p->family, GAA_FLAG_INCLUDE_PREFIX
-					     | GAA_FLAG_INCLUDE_ALL_INTERFACES,
+      ret = GetAdaptersAddresses (family, GAA_FLAG_INCLUDE_PREFIX
+					  | GAA_FLAG_INCLUDE_ALL_INTERFACES,
 				  NULL, pa0, &size);
       if (ret == ERROR_BUFFER_OVERFLOW
 	  && !(pa0 = (PIP_ADAPTER_ADDRESSES) realloc (pa0, size)))
 	break;
     }
   while (ret == ERROR_BUFFER_OVERFLOW);
-  if (pa0)
+  if (ret != ERROR_SUCCESS)
     {
-      if (ret != ERROR_SUCCESS)
-	{
-	  free (pa0);
-	  *p->pa_ret = pa0;
-	}
-      else
-	*p->pa_ret = pa0;
+      if (pa0)
+	free (pa0);
+      *pa_ret = NULL;
+      return false;
     }
-  return ret;
-}
-
-bool
-get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
-{
-  DWORD ret;
-  gaa_wa param = { family, pa_ret ?: NULL };
-
-  if ((uintptr_t) &param >= (uintptr_t) 0x80000000L
-      && wincap.has_gaa_largeaddress_bug ())
-    {
-      /* In Windows Vista and Windows 7 under WOW64, GetAdaptersAddresses fails
-	 if it's running in a thread with a stack located in the large address
-	 area.  So, if we're running in a pthread with such a stack, we call
-	 GetAdaptersAddresses in a child thread with an OS-allocated stack.
-	 The OS allocates stacks bottom up, so chances are good that the new
-	 stack will be located in the lower address area.
-	 FIXME: The problem is fixed in W8CP, but needs testing before W8 goes
-		gold. */
-      HANDLE thr = CreateThread (NULL, 0, call_gaa, &param, 0, NULL);
-      if (!thr)
-	{
-	  debug_printf ("CreateThread: %E");
-	  return false;
-	}
-      WaitForSingleObject (thr, INFINITE);
-      GetExitCodeThread (thr, &ret);
-      CloseHandle (thr);
-    }
-  else
-    ret = call_gaa (&param);
-  return ret == ERROR_SUCCESS || (!pa_ret && ret == ERROR_BUFFER_OVERFLOW);
+  *pa_ret = pa0;
+  return true;
 }
 
 #define WS_IFF_UP	     1
@@ -2858,11 +2812,7 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
   else
     {
       res = check_iovec_for_read (msg->msg_iov, msg->msg_iovlen);
-      /* Originally we shortcircuited here if res == 0.
-	 Allow 0 bytes buffer.  This is valid in POSIX and handled in
-	 fhandler_socket::recv_internal.  If we shortcircuit, we fail
-	 to deliver valid error conditions and peer address. */
-      if (res >= 0)
+      if (res > 0)
 	res = fh->recvmsg (msg, flags);
     }
 
@@ -3154,8 +3104,6 @@ inet_ntop6 (const u_char *src, char *dst, size_t size)
     words[i / 2] |= (src[i] << ((1 - (i % 2)) << 3));
   best.base = -1;
   cur.base = -1;
-  best.len = 0;
-  cur.len = 0;
   for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++)
     {
       if (words[i] == 0)
@@ -4215,24 +4163,24 @@ w32_to_gai_err (int w32_err)
    are implemented in ws2_32.dll.  For older systems we use the ipv4-only
    version above. */
 
-static void (WINAPI *ws_freeaddrinfo)(const struct addrinfo *);
-static int (WINAPI *ws_getaddrinfo)(const char *, const char *,
-				    const struct addrinfo *,
-				    struct addrinfo **);
-static int (WINAPI *ws_getnameinfo)(const struct sockaddr *, socklen_t,
-				    char *, size_t, char *, size_t, int);
+static void (WINAPI *freeaddrinfo)(const struct addrinfo *);
+static int (WINAPI *getaddrinfo)(const char *, const char *,
+				  const struct addrinfo *,
+				  struct addrinfo **);
+static int (WINAPI *getnameinfo)(const struct sockaddr *, socklen_t,
+				  char *, size_t, char *, size_t, int);
 static bool
 get_ipv6_funcs (HMODULE lib)
 {
-  return ((ws_freeaddrinfo = (void (WINAPI *)(const struct addrinfo *))
+  return ((freeaddrinfo = (void (WINAPI *)(const struct addrinfo *))
 			  GetProcAddress (lib, "freeaddrinfo"))
-	  && (ws_getaddrinfo = (int (WINAPI *)(const char *, const char *,
-					       const struct addrinfo *,
-					       struct addrinfo **))
+	  && (getaddrinfo = (int (WINAPI *)(const char *, const char *,
+					    const struct addrinfo *,
+					    struct addrinfo **))
 			    GetProcAddress (lib, "getaddrinfo"))
-	  && (ws_getnameinfo = (int (WINAPI *)(const struct sockaddr *,
-					       socklen_t, char *, size_t,
-					       char *, size_t, int))
+	  && (getnameinfo = (int (WINAPI *)(const struct sockaddr *,
+					    socklen_t, char *, size_t,
+					    char *, size_t, int))
 			    GetProcAddress (lib, "getnameinfo")));
 }
 
@@ -4267,9 +4215,9 @@ load_ipv6_funcs ()
 	goto out;
       FreeLibrary (lib);
     }
-  ws_freeaddrinfo = NULL;
-  ws_getaddrinfo = NULL;
-  ws_getnameinfo = NULL;
+  freeaddrinfo = NULL;
+  getaddrinfo = NULL;
+  getnameinfo = NULL;
 
 out:
   ipv6_inited = true;
@@ -4309,7 +4257,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	return EAI_NONAME;
     }
   load_ipv6 ();
-  if (!ws_getaddrinfo)
+  if (!getaddrinfo)
     return ipv4_getaddrinfo (hostname, servname, hints, res);
 
   struct addrinfo nhints, *dupres;
@@ -4326,12 +4274,12 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
       hints = &nhints;
       nhints.ai_flags |= AI_ALL;
     }
-  int ret = w32_to_gai_err (ws_getaddrinfo (hostname, servname, hints, res));
+  int ret = w32_to_gai_err (getaddrinfo (hostname, servname, hints, res));
   /* Always copy over to self-allocated memory. */
   if (!ret)
     {
       dupres = ga_duplist (*res, false);
-      ws_freeaddrinfo (*res);
+      freeaddrinfo (*res);
       *res = dupres;
       if (!dupres)
 	return EAI_MEMORY;
@@ -4351,12 +4299,12 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
       struct addrinfo *v4res;
       nhints = *hints;
       nhints.ai_family = AF_INET;
-      int ret2 = w32_to_gai_err (ws_getaddrinfo (hostname, servname,
-						 &nhints, &v4res));
+      int ret2 = w32_to_gai_err (getaddrinfo (hostname, servname,
+					      &nhints, &v4res));
       if (!ret2)
 	{
 	  dupres = ga_duplist (v4res, true);
-	  ws_freeaddrinfo (v4res);
+	  freeaddrinfo (v4res);
 	  if (!dupres)
 	    {
 	      if (!ret)
@@ -4389,7 +4337,7 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
   if (efault.faulted (EFAULT))
     return EAI_SYSTEM;
   load_ipv6 ();
-  if (!ws_getnameinfo)
+  if (!getnameinfo)
     return ipv4_getnameinfo (sa, salen, host, hostlen, serv, servlen, flags);
 
   /* When the incoming port number does not resolve to a well-known service,
@@ -4414,8 +4362,8 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
       if (!port || !getservbyport (port, flags & NI_DGRAM ? "udp" : "tcp"))
 	flags |= NI_NUMERICSERV;
     }
-  int ret = w32_to_gai_err (ws_getnameinfo (sa, salen, host, hostlen, serv,
-					    servlen, flags));
+  int ret = w32_to_gai_err (getnameinfo (sa, salen, host, hostlen, serv,
+					 servlen, flags));
   if (ret)
     set_winsock_errno ();
   return ret;

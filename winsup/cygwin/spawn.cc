@@ -309,6 +309,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
     }
 
   /* FIXME: There is a small race here and FIXME: not thread safe! */
+
   pthread_cleanup cleanup;
   if (mode == _P_SYSTEM)
     {
@@ -334,6 +335,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   bool null_app_name = false;
   STARTUPINFOW si = {};
   int looped = 0;
+  HANDLE orig_wr_proc_pipe = NULL;
 
   myfault efault;
   if (efault.faulted ())
@@ -347,10 +349,10 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
     }
 
   child_info_types chtype;
-  if (mode == _P_OVERLAY)
-    chtype = _CH_EXEC;
-  else
+  if (mode != _P_OVERLAY)
     chtype = _CH_SPAWN;
+  else
+    chtype = _CH_EXEC;
 
   moreinfo = cygheap_exec_info::alloc ();
 
@@ -422,10 +424,10 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       moreinfo->argc = newargv.argc;
       moreinfo->argv = newargv;
 
-      if (mode != _P_OVERLAY || !real_path.iscygexec ()
-	  || !DuplicateHandle (GetCurrentProcess (), myself.shared_handle (),
-			       GetCurrentProcess (), &moreinfo->myself_pinfo,
-			       0, TRUE, DUPLICATE_SAME_ACCESS))
+      if (mode != _P_OVERLAY ||
+	  !DuplicateHandle (GetCurrentProcess (), myself.shared_handle (),
+			    GetCurrentProcess (), &moreinfo->myself_pinfo,
+			    0, TRUE, DUPLICATE_SAME_ACCESS))
 	moreinfo->myself_pinfo = NULL;
       else
 	VerifyHandle (moreinfo->myself_pinfo);
@@ -453,7 +455,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
   c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT;
 
-  if (wincap.has_program_compatibility_assistant ())
+  if (wincap.has_program_compatibility_assitant ())
     {
       /* We're adding the CREATE_BREAKAWAY_FROM_JOB flag here to workaround
 	 issues with the "Program Compatibility Assistant (PCA) Service"
@@ -517,6 +519,17 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  myself->sendsig = NULL;
 	  reset_sendsig = true;
 	}
+      /* Save a copy of a handle to the current process around the first time we
+	 exec so that the pid will not be reused.  Why did I stop cygwin from
+	 generating its own pids again? */
+      if (::cygheap->pid_handle)
+	/* already done previously */;
+      else if (DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
+				GetCurrentProcess (), &::cygheap->pid_handle,
+				PROCESS_QUERY_INFORMATION, TRUE, 0))
+	ProtectHandleINH (::cygheap->pid_handle);
+      else
+	system_printf ("duplicate to pid_handle failed, %E");
     }
 
   if (null_app_name)
@@ -596,32 +609,10 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
      in a console will break native processes running in the background,
      because the Ctrl-C event is sent to all processes in the console, unless
      they ignore it explicitely.  CREATE_NEW_PROCESS_GROUP does that for us. */
-  if (!iscygwin () && fhandler_console::exists ()
+  if (!iscygwin () && myself->ctty >= 0 && iscons_dev (myself->ctty)
       && fhandler_console::tc_getpgid () != myself->pgid)
     c_flags |= CREATE_NEW_PROCESS_GROUP;
   refresh_cygheap ();
-
-  if (mode == _P_DETACH)
-    /* all set */;
-  else if (mode != _P_OVERLAY || !my_wr_proc_pipe)
-    prefork ();
-  else
-    wr_proc_pipe = my_wr_proc_pipe;
-
-  /* Don't allow child to inherit these handles if it's not a Cygwin program.
-     wr_proc_pipe will be injected later.  parent won't be used by the child
-     so there is no reason for the child to have it open as it can confuse
-     ps into thinking that children of windows processes are all part of
-     the same "execed" process.
-     FIXME: Someday, make it so that parent is never created when starting
-     non-Cygwin processes. */
-  if (!iscygwin ())
-    {
-      SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
-      SetHandleInformation (parent, HANDLE_FLAG_INHERIT, 0);
-    }
-  parent_winpid = GetCurrentProcessId ();
-
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
      effective vs. real ids.
@@ -743,14 +734,6 @@ loop:
 	  myself->exec_sendsig = NULL;
 	}
       myself->process_state &= ~PID_NOTCYGWIN;
-      /* Reset handle inheritance to default when the execution of a non-Cygwin
-	 process fails.  Only need to do this for _P_OVERLAY since the handle will
-	 be closed otherwise.  Don't need to do this for 'parent' since it will
-         be closed in every case.  See FIXME above. */
-      if (!iscygwin () && mode == _P_OVERLAY)
-	SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
-      if (wr_proc_pipe == my_wr_proc_pipe)
-	wr_proc_pipe = NULL;	/* We still own it: don't nuke in destructor */
       res = -1;
       goto out;
     }
@@ -770,12 +753,13 @@ loop:
     cygpid = myself->pid;
 
   /* We print the original program name here so the user can see that too.  */
-  syscall_printf ("pid %d, prog_arg %s, cmd line %.9500s)",
+  syscall_printf ("%d = child_info_spawn::worker(%s, %.9500s)",
 		  rc ? cygpid : (unsigned int) -1, prog_arg, one_line.buf);
 
   /* Name the handle similarly to proc_subproc. */
   ProtectHandle1 (pi.hProcess, childhProc);
 
+  bool synced;
   pid_t pid;
   if (mode == _P_OVERLAY)
     {
@@ -784,6 +768,25 @@ loop:
       myself.hProcess = hExeced = pi.hProcess;
       real_path.get_wide_win32_path (myself->progname); // FIXME: race?
       sigproc_printf ("new process name %W", myself->progname);
+      /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
+	 process.  So, we need to wait around until the process we've just "execed"
+	 dies.  Use our own wait facility to wait for our own pid to exit (there
+	 is some minor special case code in proc_waiter and friends to accommodate
+	 this).
+
+	 If wr_proc_pipe exists, then it should be duplicated to the child.
+	 If the child has exited already, that's ok.  The parent will pick up
+	 on this fact when we exit.  dup_proc_pipe will close our end of the pipe.
+	 Note that wr_proc_pipe may also be == INVALID_HANDLE_VALUE.  That will make
+	 dup_proc_pipe essentially a no-op.  */
+      if (!newargv.win16_exe && myself->wr_proc_pipe)
+	{
+	  if (!looped)
+	    myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
+					   just in case we've been previously
+					   execed. */
+	  orig_wr_proc_pipe = myself->dup_proc_pipe (pi.hProcess);
+	}
       pid = myself->pid;
       if (!iscygwin ())
 	close_all_files ();
@@ -815,7 +818,6 @@ loop:
 		       pi.hProcess, NULL, 0, 0, DUPLICATE_SAME_ACCESS);
       child->start_time = time (NULL); /* Register child's starting time. */
       child->nice = myself->nice;
-      postfork (child);
       if (!child.remember (mode == _P_DETACH))
 	{
 	  /* FIXME: Child in strange state now */
@@ -830,12 +832,6 @@ loop:
   /* Start the child running */
   if (c_flags & CREATE_SUSPENDED)
     {
-      /* Inject a non-inheritable wr_proc_pipe handle into child so that we
-	 can accurately track when the child exits without keeping this
-	 process waiting around for it to exit.  */
-      if (!iscygwin ())
-	DuplicateHandle (GetCurrentProcess (), wr_proc_pipe, pi.hProcess, NULL,
-			 0, false, DUPLICATE_SAME_ACCESS);
       ResumeThread (pi.hThread);
       if (iscygwin ())
 	strace.write_childpid (pi.dwProcessId);
@@ -844,13 +840,10 @@ loop:
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  bool synced;
   if ((mode == _P_DETACH || mode == _P_NOWAIT) && !iscygwin ())
     synced = false;
   else
-    /* Just mark a non-cygwin process as 'synced'.  We will still eventually
-       wait for it to exit in maybe_set_exit_code_from_windows(). */
-    synced = iscygwin () ? sync (pi.dwProcessId, pi.hProcess, INFINITE) : true;
+    synced = sync (pi.dwProcessId, pi.hProcess, INFINITE);
 
   switch (mode)
     {
@@ -858,6 +851,11 @@ loop:
       myself.hProcess = pi.hProcess;
       if (!synced)
 	{
+	  if (orig_wr_proc_pipe)
+	    {
+	      myself->wr_proc_pipe_owner = GetCurrentProcessId ();
+	      myself->wr_proc_pipe = orig_wr_proc_pipe;
+	    }
 	  if (!proc_retry (pi.hProcess))
 	    {
 	      looped++;
@@ -868,10 +866,16 @@ loop:
       else
 	{
 	  close_all_files (true);
-	  if (!my_wr_proc_pipe
+	  if (!myself->wr_proc_pipe
 	      && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
-	    wait_for_myself ();
+	    {
+	      extern bool is_toplevel_proc;
+	      is_toplevel_proc = true;
+	      myself.remember (false);
+	      wait_for_myself ();
+	    }
 	}
+      this->cleanup ();
       myself.exit (EXITCODE_NOSET);
       break;
     case _P_WAIT:

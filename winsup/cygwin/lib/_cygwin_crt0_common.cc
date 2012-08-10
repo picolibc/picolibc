@@ -49,6 +49,7 @@ extern "C"
 {
 char **environ;
 int _fmode;
+void _pei386_runtime_relocator (void);
 
 extern char __RUNTIME_PSEUDO_RELOC_LIST__;
 extern char __RUNTIME_PSEUDO_RELOC_LIST_END__;
@@ -154,7 +155,7 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->image_base = &_image_base__;
   /* This is actually a dummy call to force the linker to load this
      symbol for older apps which need it.  */
-  _pei386_runtime_relocator (NULL);
+  _pei386_runtime_relocator ();
   return 1;
 }
 } /* "C" */

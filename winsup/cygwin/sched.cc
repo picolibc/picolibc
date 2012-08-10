@@ -21,9 +21,7 @@
 #include <unistd.h>
 #include "registry.h"
 
-#ifndef __MINGW64_VERSION_MAJOR
 extern "C" HWND WINAPI GetForegroundWindow();
-#endif
 
 /* Win32 priority to UNIX priority Mapping.
    For now, I'm just following the spec: any range of priorities is ok.

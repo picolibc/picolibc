@@ -567,9 +567,9 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	char sign;		/* sign prefix (' ', '+', '-', or \0) */
 #ifdef _WANT_IO_C99_FORMATS
 				/* locale specific numeric grouping */
-	char *thousands_sep = NULL;
-	size_t thsnd_len = 0;
-	const char *grouping = NULL;
+	char *thousands_sep;
+	size_t thsnd_len;
+	const char *grouping;
 #endif
 #ifdef FLOATING_POINT
 	char *decimal_point = _localeconv_r (data)->decimal_point;
@@ -585,7 +585,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 #if defined (FLOATING_POINT) || defined (_WANT_IO_C99_FORMATS)
 	int ndig = 0;		/* actual number of digits returned by cvt */
 #endif
-#if defined (FLOATING_POINT) && defined (_WANT_IO_C99_FORMATS)
+#ifdef _WANT_IO_C99_FORMATS
 	int nseps;		/* number of group separators with ' */
 	int nrepeats;		/* number of repeats of the last group */
 #endif
@@ -708,20 +708,20 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 #ifndef STRING_ONLY
 	/* Initialize std streams if not dealing with sprintf family.  */
 	CHECK_INIT (data, fp);
-	_newlib_flockfile_start (fp);
+	_flockfile (fp);
 
 	ORIENT(fp, -1);
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
 	if (cantwrite (data, fp)) {
-		_newlib_flockfile_exit (fp);
+		_funlockfile (fp);
 		return (EOF);
 	}
 
 	/* optimise fprintf(stderr) (and other unbuffered Unix files) */
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0) {
-		_newlib_flockfile_exit (fp);
+		_funlockfile (fp);
 		return (__sbprintf (data, fp, fmt0, ap));
 	}
 #else /* STRING_ONLY */
@@ -793,9 +793,9 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 		sign = '\0';
 #ifdef FLOATING_POINT
 		lead = 0;
+#endif
 #ifdef _WANT_IO_C99_FORMATS
 		nseps = nrepeats = 0;
-#endif
 #endif
 #ifndef _NO_POS_ARGS
 		N = arg_index;
@@ -1633,7 +1633,7 @@ error:
 	if (malloc_buf != NULL)
 		_free_r (data, malloc_buf);
 #ifndef STRING_ONLY
-	_newlib_flockfile_end (fp);
+	_funlockfile (fp);
 #endif
 	return (__sferror (fp) ? EOF : ret);
 	/* NOTREACHED */

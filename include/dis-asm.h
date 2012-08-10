@@ -1,7 +1,7 @@
 /* Interface between the opcode library and its callers.
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010,
-   2011, 2012 Free Software Foundation, Inc.
+   2011  Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ extern "C" {
 #include <stdio.h>
 #include "bfd.h"
 
-  typedef int (*fprintf_ftype) (void *, const char*, ...) ATTRIBUTE_FPTR_PRINTF_2;
+  typedef int (*fprintf_ftype) (void *, const char*, ...) /*ATTRIBUTE_FPTR_PRINTF_2*/;
 
 enum dis_insn_type
 {
@@ -260,8 +260,6 @@ extern int print_insn_m32c	        (bfd_vma, disassemble_info *);
 extern int print_insn_m32r		(bfd_vma, disassemble_info *);
 extern int print_insn_m68hc11		(bfd_vma, disassemble_info *);
 extern int print_insn_m68hc12		(bfd_vma, disassemble_info *);
-extern int print_insn_m9s12x		(bfd_vma, disassemble_info *);
-extern int print_insn_m9s12xg		(bfd_vma, disassemble_info *);
 extern int print_insn_m68k		(bfd_vma, disassemble_info *);
 extern int print_insn_m88k		(bfd_vma, disassemble_info *);
 extern int print_insn_mcore		(bfd_vma, disassemble_info *);
@@ -295,7 +293,6 @@ extern int print_insn_v850		(bfd_vma, disassemble_info *);
 extern int print_insn_vax		(bfd_vma, disassemble_info *);
 extern int print_insn_w65		(bfd_vma, disassemble_info *);
 extern int print_insn_xc16x		(bfd_vma, disassemble_info *);
-extern int print_insn_xgate             (bfd_vma, disassemble_info *);
 extern int print_insn_xstormy16		(bfd_vma, disassemble_info *);
 extern int print_insn_xtensa		(bfd_vma, disassemble_info *);
 extern int print_insn_z80		(bfd_vma, disassemble_info *);
@@ -317,7 +314,6 @@ extern int  get_arm_regname_num_options (void);
 extern int  set_arm_regname_option (int);
 extern int  get_arm_regnames (int, const char **, const char **, const char *const **);
 extern bfd_boolean arm_symbol_is_valid (asymbol *, struct disassemble_info *);
-extern void disassemble_init_powerpc (struct disassemble_info *);
 
 /* Fetch the disassembler for a given BFD, if that support is available.  */
 extern disassembler_ftype disassembler (bfd *);

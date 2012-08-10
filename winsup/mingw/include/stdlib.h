@@ -300,11 +300,6 @@ __MINGW_IMPORT  int _fmode_dll;
 
 #endif /* Not __STRICT_ANSI__ */
 
-_CRTIMP __int64 __cdecl _strtoi64(const char*, char **, int);
-_CRTIMP __int64 __cdecl _strtoi64_l(const char *, char **, int, _locale_t);
-_CRTIMP unsigned __int64 __cdecl _strtoui64(const char*, char **, int);
-_CRTIMP unsigned __int64 __cdecl _strtoui64_l(const char *, char **, int, _locale_t);
-
 _CRTIMP double __cdecl __MINGW_NOTHROW	atof	(const char*);
 _CRTIMP int __cdecl __MINGW_NOTHROW	atoi	(const char*);
 _CRTIMP long __cdecl __MINGW_NOTHROW 	atol	(const char*);
@@ -328,10 +323,6 @@ _CRTIMP unsigned long __cdecl __MINGW_NOTHROW	strtoul	(const char*, char**, int)
 
 #ifndef _WSTDLIB_DEFINED
 /*  also declared in wchar.h */
-_CRTIMP __int64 __cdecl _wcstoi64(const wchar_t *, wchar_t **, int);
-_CRTIMP __int64 __cdecl _wcstoi64_l(const wchar_t *, wchar_t **, int, _locale_t);
-_CRTIMP unsigned __int64 __cdecl _wcstoui64(const wchar_t *, wchar_t **, int);
-_CRTIMP unsigned __int64 __cdecl _wcstoui64_l(const wchar_t *, wchar_t **, int, _locale_t);
 _CRTIMP long __cdecl __MINGW_NOTHROW	wcstol	(const wchar_t*, wchar_t**, int);
 _CRTIMP unsigned long __cdecl __MINGW_NOTHROW	wcstoul (const wchar_t*, wchar_t**, int);
 _CRTIMP double __cdecl __MINGW_NOTHROW	wcstod	(const wchar_t*, wchar_t**);

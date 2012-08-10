@@ -1,0 +1,29 @@
+What's new:
+-----------
+
+- New pldd command for listing DLLs loaded by a process.
+
+- New API: scandirat.
+
+
+What changed:
+-------------
+
+- Fixed problem where background Cygwin processes kept the windows
+  console window from exiting.
+
+- Change the way remote shares mapped to drive letters are recognized
+  when creating the cygdrive directory.  If Windows claims the drive
+  is unavailable, don't show it in the cygdrive directory listing.
+
+- Lower the stack pressure in some Cygwin calls by reducing the buffer
+  space allocated on the stack.
+
+- Raise default stacksize of pthreads from 512K to 1 Meg.  It can still
+  be changed using the pthread_attr_setstacksize call.
+
+- process.h header has been moved back from /usr/include/cygwin to
+  /usr/include.
+
+- Make <sys/wait.h> header C++ clean.
+

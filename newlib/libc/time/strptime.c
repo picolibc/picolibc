@@ -165,8 +165,8 @@ _DEFUN (strptime, (buf, format, timeptr),
 	char *s;
 	int ret;
 
-	if (isspace ((unsigned char) c)) {
-	    while (isspace ((unsigned char) *buf))
+	if (isspace (c)) {
+	    while (isspace (*buf))
 		++buf;
 	} else if (c == '%' && format[1] != '\0') {
 	    c = *++format;

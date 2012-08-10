@@ -76,20 +76,11 @@ _DEFUN(_fclose_r, (rptr, fp),
 
   CHECK_INIT (rptr, fp);
 
-  /* We can't use the _newlib_flockfile_XXX macros here due to the
-     interlocked locking with the sfp_lock. */
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
-  int __oldcancel;
-  pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &__oldcancel);
-#endif
   _flockfile (fp);
 
   if (fp->_flags == 0)		/* not open! */
     {
       _funlockfile (fp);
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
-      pthread_setcancelstate (__oldcancel, &__oldcancel);
-#endif
       return (0);
     }
   /* Unconditionally flush to allow special handling for seekable read
@@ -112,9 +103,6 @@ _DEFUN(_fclose_r, (rptr, fp),
 #endif
 
   __sfp_lock_release ();
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
-  pthread_setcancelstate (__oldcancel, &__oldcancel);
-#endif
 
   return (r);
 }

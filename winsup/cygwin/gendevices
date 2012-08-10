@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright 2003, 2004, 2005, 2006, 2012 Red Hat, Inc.
+# Copyright 2003, 2004, 2005 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -41,7 +41,6 @@ while (<INPUT>) {
 	    my $x = $f->[0];
 	    my $rest = $f->[1];
 	    my ($dev, $devrest) = ($x =~ /([^%]+)(%.*)?$/o);
-	    $rest .= ', ' . (($dev =~ m%/dev/%o) ? 'true' : 'false');
 	    push(@lines, generate($dev, $devrest, $rest, []));
 	}
 	@patterns = ();
@@ -55,7 +54,7 @@ chop $storage[$#storage];
 chop $storage[$#storage];
 $storage[$#storage] .= "\n";
 splice(@lines, $storage_ix, 1,
-       "const _RDATA device dev_storage[] =\n", "{\n",
+       "static const device dev_storage[] =\n", "{\n",
        @storage, "};\n\n",
        sort {$a cmp $b} values %pointers);
 open(SHILKA, '>', $shilka);
@@ -71,7 +70,7 @@ if ($? == -1) {
 }
 chdir $cwd;
 unlink $shilka;
-open(C, '<', $c) or die "$0: couldn't open $c - $!\n";
+open(C, $c) or die "$0: couldn't open $c - $!\n";
 @lines = <C>;
 close C;
 unlink $c;
@@ -117,7 +116,6 @@ sub generate {
       } else {
 	my $fh = $dev;
 	$fh =~ s%/%_%og;
-	$fh =~ s%^:%__%o;
 	my $shilka_id = $fh;
 	my $storage_str = $fh . '_storage';
 	$fh =~ s/^_dev_/FH_/o;
@@ -128,9 +126,9 @@ sub generate {
 	@lines = ('"' . $dev . '"' . " = $shilka_id {return $storage_loc;}\n");
 	$rest = "$fh, $rest" if $rest =~ /^"/o;
 	$rest = fixup($rest, $vars);
-	if ($rest =~ /^(.*), =(\S*_dev)\b\s*(.*)$/) {
+	if ($rest =~ /^(.*), ([a-z_]*_dev)/) {
 	    $pointers{$2} ||= "const device *$2 = $storage_loc;\n";
-	    $rest = $1 . $3;
+	    $rest = $1;
 	}
 	push(@storage, "  {\"$dev\", " . $rest . "},\n");
     }
@@ -157,7 +155,5 @@ sub devsort {
     my $b0 = $b->[0];
     $a0 =~ s/(\D)(\d+)/"$1" . sprintf "%05d", $2/e;
     $b0 =~ s/(\D)(\d+)/"$1" . sprintf "%05d", $2/e;
-    $a0 =~ s%^//%:%o;
-    $b0 =~ s%^//%:%o;
     return $a0 cmp $b0;
 }

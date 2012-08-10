@@ -9,8 +9,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#pragma once
-
 /* Initial and increment values for cygwin's fd table */
 #define NOFILE_INCR    32
 /* Maximum size we allow expanding to.  */
@@ -56,8 +54,6 @@ public:
   fhandler_base *dup_worker (fhandler_base *oldfh, int flags);
   int extend (int howmuch);
   void fixup_after_fork (HANDLE);
-  void fixup_close (size_t, fhandler_base *);
-
   inline int not_open (int fd)
   {
     lock ();
@@ -89,7 +85,6 @@ public:
   void fixup_before_fork (DWORD win_proc_id);
   friend void dtable_init ();
   friend void __stdcall close_all_files (bool);
-  friend int dup_finish (int, int, int);
   friend class fhandler_disk_file;
   friend class cygheap_fdmanip;
   friend class cygheap_fdget;

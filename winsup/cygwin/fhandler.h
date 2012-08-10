@@ -14,8 +14,8 @@ details. */
 
 #include "tty.h"
 /* fcntl flags used only internaly. */
-#define O_NOSYMLINK	0x080000
-#define O_DIROPEN	0x100000
+#define O_NOSYMLINK 0x080000
+#define O_DIROPEN   0x100000
 
 /* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
    properly defines both to be the same.  Unfortunately, we have to
@@ -35,10 +35,6 @@ details. */
    atomic writes to a pipe.  It is a shame that we have to make this
    so small.  http://cygwin.com/ml/cygwin/2011-03/msg00541.html  */
 #define DEFAULT_PIPEBUFSIZE PREFERRED_IO_BLKSIZE
-
-/* Used for fhandler_pipe::create.  Use an available flag which will
-   never be used in Cygwin for this function. */
-#define PIPE_ADD_PID	FILE_FLAG_FIRST_PIPE_INSTANCE
 
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
@@ -182,8 +178,11 @@ class fhandler_base
   HANDLE read_state;
 
  public:
-  long inc_refcnt () {return InterlockedIncrement (&_refcnt);}
-  long dec_refcnt () {return InterlockedDecrement (&_refcnt);} 
+  long refcnt(long i = 0)
+  {
+    debug_only_printf ("%p, %s, i %d, refcnt %ld", this, get_name (), i, _refcnt + i);
+    return _refcnt += i;
+  }
   class fhandler_base *archetype;
   int usecount;
 
@@ -329,7 +328,6 @@ class fhandler_base
 # define archetype_usecount(n) _archetype_usecount (__PRETTY_FUNCTION__, __LINE__, (n))
   int close_fs () { return fhandler_base::close (); }
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
-  void stat_fixup (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_fs (struct __stat64 *buf) __attribute__ ((regparm (2)));
 private:
   int __stdcall fstat_helper (struct __stat64 *buf,
@@ -385,7 +383,7 @@ public:
   virtual int tcgetattr (struct termios *t);
   virtual int tcsetpgrp (const pid_t pid);
   virtual int tcgetpgrp ();
-  virtual pid_t tcgetsid ();
+  virtual int tcgetsid ();
   virtual bool is_tty () const { return false; }
   virtual bool ispipe () const { return false; }
   virtual pid_t get_popen_pid () const {return 0;}
@@ -558,7 +556,7 @@ class fhandler_socket: public fhandler_base
   int open (int flags, mode_t mode = 0);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   ssize_t __stdcall readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
-  inline ssize_t recv_internal (struct _WSAMSG *wsamsg, bool use_recvmsg) __attribute__ ((regparm (3)));
+  inline ssize_t recv_internal (struct _WSAMSG *wsamsg);
   ssize_t recvfrom (void *ptr, size_t len, int flags,
 		    struct sockaddr *from, int *fromlen);
   ssize_t recvmsg (struct msghdr *msg, int flags);
@@ -631,7 +629,6 @@ protected:
     overlapped_unknown = 0,
     overlapped_success,
     overlapped_nonblocking_no_data,
-    overlapped_nullread,
     overlapped_error
   };
   bool io_pending;
@@ -1018,38 +1015,6 @@ class fhandler_disk_file: public fhandler_base
   }
 };
 
-class fhandler_dev: public fhandler_disk_file
-{
-  const struct device *devidx;
-  bool dir_exists;
-public:
-  fhandler_dev ();
-  int open (int flags, mode_t mode);
-  int close ();
-  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
-  int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
-  DIR *opendir (int fd) __attribute__ ((regparm (2)));
-  int readdir (DIR *, dirent *) __attribute__ ((regparm (3)));
-  void rewinddir (DIR *);
-
-  fhandler_dev (void *) {}
-
-  void copyto (fhandler_base *x)
-  {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev *> (x) = *this;
-    x->reset (this);
-  }
-
-  fhandler_dev *clone (cygheap_types malloc_type = HEAP_FHANDLER)
-  {
-    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev));
-    fhandler_dev *fh = new (ptr) fhandler_dev (ptr);
-    copyto (fh);
-    return fh;
-  }
-};
-
 class fhandler_cygdrive: public fhandler_disk_file
 {
   enum
@@ -1069,7 +1034,6 @@ class fhandler_cygdrive: public fhandler_disk_file
   void rewinddir (DIR *);
   int closedir (DIR *);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
-  int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
 
   fhandler_cygdrive (void *) {}
 
@@ -1191,7 +1155,7 @@ class fhandler_termios: public fhandler_base
   virtual void __release_output_mutex (const char *fn, int ln) {}
   void echo_erase (int force = 0);
   virtual _off64_t lseek (_off64_t, int);
-  pid_t tcgetsid ();
+  int tcgetsid ();
 
   fhandler_termios (void *) {}
 
@@ -1289,9 +1253,6 @@ class dev_console
 
   bool insert_mode;
   int use_mouse;
-  bool ext_mouse_mode5;
-  bool ext_mouse_mode6;
-  bool ext_mouse_mode15;
   bool use_focus;
   bool raw_win32_keyboard_mode;
 
@@ -1374,7 +1335,6 @@ private:
   ssize_t __stdcall write (const void *ptr, size_t len);
   void doecho (const void *str, DWORD len) { (void) write (str, len); }
   int close ();
-  static bool exists () {return !!GetConsoleCP ();}
 
   int tcflush (int);
   int tcsetattr (int a, const struct termios *t);
@@ -1438,7 +1398,6 @@ class fhandler_pty_common: public fhandler_termios
 
   int close ();
   _off64_t lseek (_off64_t, int);
-  bool bytes_available (DWORD& n);
   void set_close_on_exec (bool val);
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
@@ -1555,7 +1514,6 @@ public:
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
   int tcgetpgrp ();
-  void flush_to_slave ();
 
   fhandler_pty_master (void *) {}
   ~fhandler_pty_master ();
@@ -1721,11 +1679,11 @@ class fhandler_dev_clipboard: public fhandler_base
   _off64_t pos;
   void *membuffer;
   size_t msize;
+  bool eof;
  public:
   fhandler_dev_clipboard ();
   int is_windows () { return 1; }
   int open (int flags, mode_t mode = 0);
-  int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   _off64_t lseek (_off64_t offset, int whence);
@@ -2133,7 +2091,6 @@ typedef union
 {
   char __base[sizeof (fhandler_base)];
   char __console[sizeof (fhandler_console)];
-  char __dev[sizeof (fhandler_dev)];
   char __cygdrive[sizeof (fhandler_cygdrive)];
   char __dev_clipboard[sizeof (fhandler_dev_clipboard)];
   char __dev_dsp[sizeof (fhandler_dev_dsp)];

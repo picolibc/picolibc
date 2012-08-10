@@ -29,7 +29,6 @@ enum fs_info_type
   none = 0,
   fat,
   ntfs,
-  refs,
   samba,
   nfs,
   netapp,
@@ -75,6 +74,7 @@ class fs_info
   } status;
   ULONG sernum;			/* Volume Serial Number */
   char fsn[80];			/* Windows filesystem name */
+  unsigned long got_fs () const { return status.fs_type != none; }
 
  public:
   void clear ()
@@ -99,7 +99,6 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, has_dos_filenames_only)
   IMPLEMENT_FS_FLAG (fat)
   IMPLEMENT_FS_FLAG (ntfs)
-  IMPLEMENT_FS_FLAG (refs)
   IMPLEMENT_FS_FLAG (samba)
   IMPLEMENT_FS_FLAG (nfs)
   IMPLEMENT_FS_FLAG (netapp)
@@ -113,7 +112,6 @@ class fs_info
   IMPLEMENT_FS_FLAG (nwfs)
   IMPLEMENT_FS_FLAG (ncfsd)
   fs_info_type what_fs () const { return status.fs_type; }
-  bool got_fs () const { return status.fs_type != none; }
 
   ULONG serial_number () const { return sernum; }
 

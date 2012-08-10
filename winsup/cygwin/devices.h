@@ -1,6 +1,6 @@
 /* devices.h
 
-   Copyright 2002, 2003, 2004, 2005, 2007, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2007, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,7 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#pragma once
+#ifndef _DEVICES_H
+#define _DEVICES_H
 
 typedef unsigned short _major_t;
 typedef unsigned short _minor_t;
@@ -19,18 +20,14 @@ typedef __dev32_t _dev_t;
 #define _minor(dev) ((dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
 #define _major(dev) ((dev) >> (sizeof (_major_t) * 8))
 
-#include <sys/stat.h>
-#include <dirent.h>
-
 #define MAX_CONSOLES 63
 enum fh_devices
 {
-  DEV_TTY_MAJOR = 5,
-  FH_TTY     = FHDEV (DEV_TTY_MAJOR, 0),
-  FH_CONSOLE = FHDEV (DEV_TTY_MAJOR, 1),
-  FH_PTMX    = FHDEV (DEV_TTY_MAJOR, 2),
-  FH_CONIN   = FHDEV (DEV_TTY_MAJOR, 255),
-  FH_CONOUT  = FHDEV (DEV_TTY_MAJOR, 254),
+  FH_TTY     = FHDEV (5, 0),
+  FH_CONSOLE = FHDEV (5, 1),
+  FH_PTMX    = FHDEV (5, 2),
+  FH_CONIN   = FHDEV (5, 255),
+  FH_CONOUT  = FHDEV (5, 254),
 
   DEV_CONS_MAJOR = 3,
   FH_CONS     = FHDEV (DEV_CONS_MAJOR, 0),
@@ -53,27 +50,25 @@ enum fh_devices
 
   /* begin /proc directories */
 
-  DEV_VIRTFS_MAJOR = 0,
-  FH_PROC_MIN_MINOR = FHDEV (DEV_VIRTFS_MAJOR, 200),
-  FH_PROCSYSVIPC = FHDEV (DEV_VIRTFS_MAJOR, 249),
-  FH_PROCSYS = FHDEV (DEV_VIRTFS_MAJOR, 250),
-  FH_PROCESSFD = FHDEV (DEV_VIRTFS_MAJOR, 251),
-  FH_PROCNET = FHDEV (DEV_VIRTFS_MAJOR, 252),
-  FH_REGISTRY= FHDEV (DEV_VIRTFS_MAJOR, 253),
-  FH_PROCESS = FHDEV (DEV_VIRTFS_MAJOR, 254),
-  FH_PROC    = FHDEV (DEV_VIRTFS_MAJOR, 255),
-  FH_PROC_MAX_MINOR = FHDEV (DEV_VIRTFS_MAJOR, 255),
+  FH_PROC_MIN_MINOR = FHDEV (0, 200),
+  FH_PROCSYSVIPC = FHDEV (0, 249),
+  FH_PROCSYS = FHDEV (0, 250),
+  FH_PROCESSFD = FHDEV (0, 251),
+  FH_PROCNET = FHDEV (0, 252),
+  FH_REGISTRY= FHDEV (0, 253),
+  FH_PROCESS = FHDEV (0, 254),
+  FH_PROC    = FHDEV (0, 255),
+  FH_PROC_MAX_MINOR = FHDEV (0, 255),
 
   /* end /proc directories */
 
-  FH_PIPE    = FHDEV (DEV_VIRTFS_MAJOR, 199),
-  FH_PIPER   = FHDEV (DEV_VIRTFS_MAJOR, 198),
-  FH_PIPEW   = FHDEV (DEV_VIRTFS_MAJOR, 197),
-  FH_FIFO    = FHDEV (DEV_VIRTFS_MAJOR, 196),
-  FH_FS      = FHDEV (DEV_VIRTFS_MAJOR, 195),  /* filesystem based device */
-  FH_NETDRIVE= FHDEV (DEV_VIRTFS_MAJOR, 194),
-  FH_DEV     = FHDEV (DEV_VIRTFS_MAJOR, 193),
-  FH_CYGDRIVE= FHDEV (DEV_VIRTFS_MAJOR, 192),
+  FH_PIPE    = FHDEV (0, 199),
+  FH_PIPER   = FHDEV (0, 198),
+  FH_PIPEW   = FHDEV (0, 197),
+  FH_FIFO    = FHDEV (0, 196),
+  FH_FS      = FHDEV (0, 195),  /* filesystem based device */
+  FH_NETDRIVE= FHDEV (0, 194),
+  FH_DEV     = FHDEV (0, 193),
 
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),
@@ -245,6 +240,9 @@ enum fh_devices
   DEV_SOUND_MAJOR = 14,
   FH_OSS_DSP = FHDEV (DEV_SOUND_MAJOR, 3),
 
+  DEV_CYGDRIVE_MAJOR = 98,
+  FH_CYGDRIVE= FHDEV (DEV_CYGDRIVE_MAJOR, 0),
+
   DEV_TCP_MAJOR = 30,
   FH_TCP = FHDEV (DEV_TCP_MAJOR, 36),
   FH_UDP = FHDEV (DEV_TCP_MAJOR, 39),
@@ -273,10 +271,8 @@ struct device
     };
   } d;
   const char *native;
-  int (*exists_func) (const device&);
   _mode_t mode;
-  bool lives_in_dev:4;
-  bool dev_on_fs:4;
+  bool dev_on_fs;
   static const device *lookup (const char *, unsigned int = UINT32_MAX);
   void parse (const char *);
   void parse (_major_t major, _minor_t minor);
@@ -308,8 +304,7 @@ struct device
   bool not_device (_dev_t n) const {return d.devn && n != d.devn; }
 
   _minor_t get_minor () const {return d.minor;}
-  _major_t get_major () const {return d.major;}
-  _dev_t   get_device () const {return d.devn;}
+  _minor_t get_major () const {return d.major;}
 
   inline operator int& () {return d.devn_int;}
   inline operator fh_devices () {return d.devn_fh_devices;}
@@ -319,18 +314,7 @@ struct device
   inline void setfs (bool x) {dev_on_fs = x;}
   inline bool isfs () const {return dev_on_fs || d.devn == FH_FS;}
   inline bool is_fs_special () const {return dev_on_fs && d.devn != FH_FS;}
-  inline bool is_dev_resident () const {return lives_in_dev;}
-  inline int exists () const {return exists_func (*this);}
-  unsigned char type () const
-  {
-    if (S_ISBLK (mode))
-      return DT_BLK;
-    return mode >> 12;
-  }
 };
-
-extern const device dev_storage[];
-extern const device *dev_storage_end;
 
 extern const device *console_dev;
 extern const device *ptmx_dev;
@@ -352,8 +336,6 @@ extern const device dev_pipew_storage;
 #define pipew_dev (&dev_pipew_storage)
 extern const device dev_proc_storage;
 #define proc_dev (&dev_proc_storage)
-extern const device dev_dev_storage;
-#define dev_dev (&dev_dev_storage)
 extern const device dev_netdrive_storage;
 #define netdrive_dev (&dev_netdrive_storage)
 extern const device dev_cygdrive_storage;
@@ -365,10 +347,6 @@ extern const device dev_fs_storage;
 
 #define isproc_dev(devn) \
   (devn >= FH_PROC_MIN_MINOR && devn <= FH_PROC_MAX_MINOR)
-
-#define iscygdrive_dev(devn) (devn == FH_CYGDRIVE)
-
-#define isdev_dev(devn) (devn == FH_DEV)
 
 #define isprocsys_dev(devn) (devn == FH_PROCSYS)
 
@@ -382,3 +360,4 @@ extern const device dev_fs_storage;
    || (((int) n) == FH_CONOUT))
 
 #define istty_slave_dev(n) (device::major (n) == DEV_PTYS_MAJOR)
+#endif /*_DEVICES_H*/

@@ -238,12 +238,10 @@ related messages.
 </answer></qandaentry>
 
 <qandaentry id="faq.using.man">
-<question><para>Why doesn't <literal>man -k</literal>,
-<literal>apropos</literal> or <literal>whatis</literal> work?</para></question>
+<question><para>Why doesn't man -k (or apropos) work?</para></question>
 <answer>
 
-<para>Before you can use <literal>man -k</literal>, <literal>apropos</literal>
-or <literal>whatis</literal>, you
+<para>Before you can use <literal>man -k</literal> or <literal>apropos</literal>, you
 must create the whatis database.  Just run the command
 </para>
 <screen>
@@ -784,7 +782,7 @@ interfere with the normal functioning of Cygwin.
 <para>Yes.  Install the emacs package.  This provides everything you
 need in order to run GNU emacs in a terminal window.  If you also want
 to be able to use the X11
-(<ulink url="http://x.cygwin.com/">http://x.cygwin.com/</ulink>)
+(<ulink url="http://cygwin.com/xfree/">http://cygwin.com/xfree/</ulink>)
 GUI, install the emacs-X11 package.  In either case, you run emacs by
 typing 'emacs' or '/usr/bin/emacs'.
 </para>
@@ -796,7 +794,7 @@ typing 'emacs' or '/usr/bin/emacs'.
 
 <para>Yes.  It can be used in three different modes:</para>
 <para><itemizedlist>
-<listitem><para>X11 (<ulink url="http://x.cygwin.com/">http://x.cygwin.com/</ulink>) GUI</para></listitem>
+<listitem><para>X11 (<ulink url="http://cygwin.com/xfree/">http://cygwin.com/xfree/</ulink>) GUI</para></listitem>
 </itemizedlist></para>
 <para>You have to <emphasis>set</emphasis> the DISPLAY environment variable
 before starting xemacs.</para>
@@ -1062,27 +1060,16 @@ usually all set and you can start the sshd service via
 </answer></qandaentry>
 
 <qandaentry id="faq.using.tcl-tk">
-<question><para>Why do my Tk programs not work anymore?</para></question>
+<question><para>Why doesn't Cygwin tcl/tk understand Cygwin paths?</para></question>
 <answer>
 
-<para>Previous versions of Tcl/Tk distributed with Cygwin (e.g. tclsh84.exe,
-wish84.exe) were not actually "Cygwin versions" of those tools.
-They were built as native libraries, which means they did not understand
-Cygwin mounts or symbolic links. This lead to all sorts of problems interacting
-with true Cygwin programs.</para>
-
-<para>As of February 2012, this was replaced with a version of Tcl/Tk which
-uses Cygwin's POSIX APIs and X11 for GUI functionality.  If you get a message
-such as this when trying to start a Tk app:</para>
-
-<screen>
-  Application initialization failed: couldn't connect to display ""
-</screen>
-
-<para>Then you need to start an X server, or if one is already running, set the
-<literal>DISPLAY</literal> variable to the proper value.  The Cygwin distribution
-includes an X server; please see the <ulink url="http://x.cygwin.com/docs/ug/cygwin-x-ug.html">Cygwin/X User Guide</ulink>
-for installation and startup instructions.
+<para>The versions of Tcl/Tk distributed with Cygwin (e.g. cygtclsh80.exe,
+cygwish80.exe) are not actually "Cygwin versions" of those tools.
+They are built as native libraries, which means they do not understand
+Cygwin mounts or symbolic links.
+</para>
+<para>See the entry "How do I convert between Windows and UNIX paths?"
+elsewhere in this FAQ.
 </para></answer></qandaentry>
 
 <qandaentry id="faq.using.ipv6">
@@ -1154,7 +1141,7 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>Lenovo IPS Core Service (ipssvc)</para></listitem>
 <listitem><para>Credant Guardian Shield</para></listitem>
 <listitem><para>AVAST (disable FILESYSTEM and BEHAVIOR realtime shields)</para></listitem>
-<listitem><para>Citrix Metaframe Presentation Server/XenApp (see <ulink url="http://support.citrix.com/article/CTX107825">Citrix Support page</ulink>)</para></listitem>
+<listitem><para>Citrix Metaframe Presentation Server/XenApp (see <ulink url="http://support.citrix.com/article/CTX107825">Citrix Support page</ulink></para></listitem>
 </itemizedlist></para>
 <para>Sometimes these problems can be worked around, by temporarily or partially
 disabling the offending software.  For instance, it may be possible to disable

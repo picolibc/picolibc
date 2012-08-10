@@ -1,6 +1,6 @@
 /* cygwin/socket.h
 
-   Copyright 1999, 2000, 2001, 2005, 2006, 2007, 2009, 2010, 2012 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2005, 2006, 2007, 2009, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -26,7 +26,6 @@ typedef int socklen_t;
 
 typedef uint16_t sa_family_t;
 
-#ifndef __INSIDE_CYGWIN_NET__
 struct sockaddr {
   sa_family_t		sa_family;	/* address family, AF_xxx	*/
   char			sa_data[14];	/* 14 bytes of protocol address	*/
@@ -45,7 +44,6 @@ struct sockaddr_storage {
   int64_t		__ss_align;
   char			_ss_pad2[_SS_PAD2SIZE];
 };
-#endif
 
 #include <asm/socket.h>			/* arch-dependent defines	*/
 #include <cygwin/sockios.h>		/* the SIOCxxx I/O controls	*/
@@ -205,9 +203,6 @@ struct OLD_msghdr
 #define MSG_NOSIGNAL    0x20            /* Don't raise SIGPIPE */
 #define MSG_TRUNC       0x0100          /* Normal data truncated */
 #define MSG_CTRUNC      0x0200          /* Control data truncated */
-/* Windows-specific flag values returned by recvmsg. */
-#define MSG_BCAST	0x0400		/* Broadcast datagram */
-#define MSG_MCAST	0x0800		/* Multicast datagram */
 
 /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
 #define SOL_IP		0
@@ -274,10 +269,8 @@ struct OLD_msghdr
 #define MCAST_JOIN_SOURCE_GROUP         45
 #define MCAST_LEAVE_SOURCE_GROUP        46
 
-#ifndef __INSIDE_CYGWIN_NET__
-#define MCAST_INCLUDE                    0
-#define MCAST_EXCLUDE                    1
-#endif
+#define MCAST_EXCLUDE                    0
+#define MCAST_INCLUDE                    1
 
 /* Old WinSock1 values, needed internally */
 #ifdef __INSIDE_CYGWIN__

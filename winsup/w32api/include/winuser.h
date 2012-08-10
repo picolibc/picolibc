@@ -2771,7 +2771,7 @@ typedef struct tagMENUITEMINFOA {
 	HMENU hSubMenu;
 	HBITMAP hbmpChecked;
 	HBITMAP hbmpUnchecked;
-	ULONG_PTR dwItemData;
+	DWORD dwItemData;
 	LPSTR dwTypeData;
 	UINT cch;
 #if (_WIN32_WINNT >= 0x0500)
@@ -2788,7 +2788,7 @@ typedef struct tagMENUITEMINFOW {
 	HMENU hSubMenu;
 	HBITMAP hbmpChecked;
 	HBITMAP hbmpUnchecked;
-	ULONG_PTR dwItemData;
+	DWORD dwItemData;
 	LPWSTR dwTypeData;
 	UINT cch;
 #if (_WIN32_WINNT >= 0x0500)

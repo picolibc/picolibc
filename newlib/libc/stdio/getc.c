@@ -92,9 +92,9 @@ _DEFUN(_getc_r, (ptr, fp),
 {
   int result;
   CHECK_INIT (ptr, fp);
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   result = __sgetc_r (ptr, fp);
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return result;
 }
 
@@ -106,9 +106,9 @@ _DEFUN(getc, (fp),
 {
   int result;
   CHECK_INIT (_REENT, fp);
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   result = __sgetc_r (_REENT, fp);
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return result;
 }
 

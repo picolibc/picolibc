@@ -4035,19 +4035,6 @@ struct _TEB * NtCurrentTeb(void);
 #endif /* __GNUC__ */
 #endif /* _X86_ */
 
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-# if defined(_AMD64_) || defined(__X86_64)
-#  define MemoryBarrier __faststorefence
-# elif defined(_IA64_)
-#  define MemoryBarrier __mf
-# else
-  void __mingworg_MemoryBarrier(void);
-#  define MemoryBarrier __mingworg_MemoryBarrier
-# endif
-#else
-# define MemoryBarrier
-#endif
-
 #endif /* RC_INVOKED */
 
 #ifdef __cplusplus

@@ -1,7 +1,7 @@
 /* fhandler_termios.cc
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009,
-   2010, 2011, 2012 Red Hat, Inc.
+   2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -19,9 +19,6 @@ details. */
 #include "pinfo.h"
 #include "tty.h"
 #include "cygtls.h"
-#include "dtable.h"
-#include "cygheap.h"
-#include "child_info.h"
 #include "ntdll.h"
 
 /* Common functions shared by tty/console */
@@ -102,7 +99,7 @@ fhandler_termios::tcsetpgrp (const pid_t pgid)
 int
 fhandler_termios::tcgetpgrp ()
 {
-  if (myself->ctty > 0 && myself->ctty == tc ()->ntty)
+  if (myself->ctty != -1 && myself->ctty == tc ()->ntty)
     return tc ()->pgid;
   set_errno (ENOTTY);
   return -1;
@@ -204,7 +201,7 @@ fhandler_termios::bg_check (int sig)
     {
       /* Don't raise a SIGTT* signal if we have already been
 	 interrupted by another signal. */
-      if (cygwait ((DWORD) 0) != WAIT_SIGNALED)
+      if (WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
 	{
 	  siginfo_t si = {0};
 	  si.si_signo = sig;
@@ -237,7 +234,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
     {
       c = *rptr++;
 
-      paranoid_printf ("char %0c", c);
+      termios_printf ("char %c", c);
 
       /* Check for special chars */
 
@@ -400,15 +397,14 @@ fhandler_termios::sigflush ()
   /* FIXME: Checking get_ttyp() for NULL is not right since it should not
      be NULL while this is alive.  However, we can conceivably close a
      ctty while exiting and that will zero this. */
-  if ((!have_execed || have_execed_cygwin) && get_ttyp ()
-      && !(get_ttyp ()->ti.c_lflag & NOFLSH))
+  if (get_ttyp () && !(get_ttyp ()->ti.c_lflag & NOFLSH))
     tcflush (TCIFLUSH);
 }
 
-pid_t
+int
 fhandler_termios::tcgetsid ()
 {
-  if (myself->ctty > 0 && myself->ctty == tc ()->ntty)
+  if (myself->ctty != -1 && myself->ctty == tc ()->ntty)
     return tc ()->getsid ();
   set_errno (ENOTTY);
   return -1;

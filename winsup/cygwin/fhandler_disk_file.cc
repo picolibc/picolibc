@@ -26,7 +26,6 @@ details. */
 #include "pwdgrp.h"
 #include <winioctl.h>
 #include <lm.h>
-#include "devices.h"
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -37,12 +36,11 @@ class __DIR_mounts
   const char	*parent_dir;
   int		 parent_dir_len;
   UNICODE_STRING mounts[MAX_MOUNTS];
-  bool		 found[MAX_MOUNTS + 3];
+  bool		 found[MAX_MOUNTS + 2];
   UNICODE_STRING cygdrive;
 
 #define __DIR_PROC	(MAX_MOUNTS)
 #define __DIR_CYGDRIVE	(MAX_MOUNTS+1)
-#define __DIR_DEV	(MAX_MOUNTS+2)
 
   __ino64_t eval_ino (int idx)
     {
@@ -86,11 +84,6 @@ public:
 	      found[__DIR_PROC] = true;
 	      return 2;
 	    }
-	  if (RtlEqualUnicodeString (fname, &ro_u_dev, FALSE))
-	    {
-	      found[__DIR_DEV] = true;
-	      return 2;
-	    }
 	  if (fname->Length / sizeof (WCHAR) == mount_table->cygdrive_len - 2
 	      && RtlEqualUnicodeString (fname, &cygdrive, FALSE))
 	    {
@@ -128,13 +121,6 @@ public:
 		*retname = ro_u_proc;
 	      return 2;
 	    }
-	  if (!found[__DIR_DEV])
-	    {
-	      found[__DIR_DEV] = true;
-	      if (retname)
-		*retname = ro_u_dev;
-	      return 2;
-	    }
 	  if (!found[__DIR_CYGDRIVE])
 	    {
 	      found[__DIR_CYGDRIVE] = true;
@@ -154,26 +140,11 @@ public:
 inline bool
 path_conv::isgood_inode (__ino64_t ino) const
 {
-  /* If the FS doesn't support nonambiguous inode numbers anyway, bail out
-     immediately. */
-  if (!hasgood_inode ())
-    return false;
-  /* If the inode numbers are 64 bit numbers or if it's a local FS, they
-     are to be trusted. */
-  if (ino > UINT32_MAX || !isremote ())
-    return true;
-  /* The inode numbers returned from a remote NT4 NTFS are ephemeral
-     32 bit numbers. */
-  if (fs_is_ntfs ())
-    return false;
-  /* Starting with version 3.5.4, Samba returns the real inode numbers, if
-     the file is on the same device as the root of the share (Samba function
-     get_FileIndex).  32 bit inode numbers returned by older versions (likely
-     < 3.0) are ephemeral. */
-  if (fs_is_samba () && fs.samba_version () < 0x03050400)
-    return false;
-  /* Otherwise, trust the inode numbers unless proved otherwise. */
-  return true;
+  /* We can't trust remote inode numbers of only 32 bit.  That means,
+     remote NT4 NTFS, as well as shares of Samba version < 3.0.
+     The known exception are SFU NFS shares, which return the valid 32 bit
+     inode number from the remote file system unchanged. */
+  return hasgood_inode () && (ino > UINT32_MAX || !isremote () || fs_is_nfs ());
 }
 
 /* Check reparse point for type.  IO_REPARSE_TAG_MOUNT_POINT types are
@@ -523,7 +494,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 					    : (PFILETIME) &pfnoi->LastWriteTime,
 		  &buf->st_ctim);
   to_timestruc_t ((PFILETIME) &pfnoi->CreationTime, &buf->st_birthtim);
-  buf->st_dev = get_dev ();
+  buf->st_rdev = buf->st_dev = get_dev ();
   /* CV 2011-01-13: Observations on the Cygwin mailing list point to an
      interesting behaviour in some Windows versions.  Apparently the size of
      a directory is computed at the time the directory is first scanned.  This
@@ -984,6 +955,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 cant_access_acl:
       switch (cmd)
 	{
+	  struct __stat64 st;
 
 	  case SETACL:
 	    /* Open for writing required to be able to set ctime
@@ -999,7 +971,6 @@ cant_access_acl:
 	      set_errno (ENOSPC);
 	    else
 	      {
-		struct __stat64 st;
 		if (!fstat (&st))
 		  {
 		    aclbufp[0].a_type = USER_OBJ;
@@ -1283,8 +1254,7 @@ fhandler_disk_file::link (const char *newpath)
   status = NtSetInformationFile (fh, &io, pfli, size, FileLinkInformation);
   if (!NT_SUCCESS (status))
     {
-      if (status == STATUS_INVALID_DEVICE_REQUEST
-	  || status == STATUS_NOT_SUPPORTED)
+      if (status == STATUS_INVALID_DEVICE_REQUEST)
 	{
 	  /* FS doesn't support hard links.  Linux returns EPERM. */
 	  set_errno (EPERM);
@@ -2425,17 +2395,6 @@ fhandler_cygdrive::fstat (struct __stat64 *buf)
   buf->st_ino = 2;
   buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
   buf->st_nlink = 1;
-  return 0;
-}
-
-int __stdcall
-fhandler_cygdrive::fstatvfs (struct statvfs *sfs)
-{
-  /* Virtual file system.  Just return an empty buffer with a few values
-     set to something useful.  Just as on Linux. */
-  memset (sfs, 0, sizeof (*sfs));
-  sfs->f_bsize = sfs->f_frsize = 4096;
-  sfs->f_namemax = NAME_MAX;
   return 0;
 }
 

@@ -1,7 +1,7 @@
 /* times.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -27,7 +27,17 @@ details. */
 #include "cygtls.h"
 #include "ntdll.h"
 
-hires_ms NO_COPY gtod;
+/* Max allowed diversion in 100ns of internal timer from system time.  If
+   this difference is exceeded, the internal timer gets re-primed. */
+#define JITTER (40 * 10000LL)
+
+/* TODO: Putting this variable in the shared cygwin region partially solves
+   the problem of cygwin processes not recognizing date changes when other
+   cygwin processes set the date.  There is still an additional problem of
+   long-running cygwin processes becoming confused when a non-cygwin process
+   sets the date.  Unfortunately, it looks like a minor redesign is required
+   to handle that case.  */
+hires_ms gtod __attribute__((section (".cygwin_dll_common"), shared));
 
 hires_ns NO_COPY ntod;
 
@@ -565,7 +575,16 @@ hires_ms::nsecs ()
 {
   if (!inited)
     prime ();
-  return systime_ns ();
+
+  LONGLONG t = systime_ns ();
+  LONGLONG res = initime_ns + timeGetTime_ns ();
+  if (llabs (res - t) > JITTER)
+    {
+      inited = false;
+      prime ();
+      res = initime_ns + timeGetTime_ns ();
+    }
+  return res;
 }
 
 extern "C" int
@@ -712,15 +731,10 @@ hires_ms::resolution ()
 
       status = NtQueryTimerResolution (&coarsest, &finest, &actual);
       if (NT_SUCCESS (status))
-	/* The actual resolution of the OS timer is a system-wide setting which
-	   can be changed any time, by any process.  The only fixed value we
-	   can rely on is the coarsest value. */
-	minperiod = coarsest;
+	minperiod = (DWORD) actual;
       else
 	{
-	  /* There's no good reason that NtQueryTimerResolution should fail
-	     at all, but let's play it safe.  Try to empirically determine
-	     current timer resolution */
+	  /* Try to empirically determine current timer resolution */
 	  int priority = GetThreadPriority (GetCurrentThread ());
 	  SetThreadPriority (GetCurrentThread (),
 			     THREAD_PRIORITY_TIME_CRITICAL);
@@ -823,7 +837,7 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  minperiod = period;
+  minperiod = actual;
   period_set = true;
   return 0;
 }

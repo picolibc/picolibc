@@ -1,7 +1,7 @@
 /* fhandler_socket.cc. See fhandler.h for a description of the fhandler classes.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012 Red Hat, Inc.
+   2009, 2010, 2011 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -12,29 +12,31 @@
 /* #define DEBUG_NEST_ON 1 */
 
 #define  __INSIDE_CYGWIN_NET__
-#define USE_SYS_TYPES_FD_SET
 
 #include "winsup.h"
+#include <sys/un.h>
+#include <asm/byteorder.h>
+
+#include <stdlib.h>
+#define USE_SYS_TYPES_FD_SET
+#include <winsock2.h>
+#include <mswsock.h>
+#include <iphlpapi.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "cygwin/version.h"
+#include "perprocess.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include <ws2tcpip.h>
-#include <mswsock.h>
-#include <iphlpapi.h>
-#include <asm/byteorder.h>
-#include "cygwin/version.h"
-#include "perprocess.h"
 #include "shared_info.h"
 #include "sigproc.h"
 #include "wininfo.h"
 #include <unistd.h>
-#include <sys/param.h>
 #include <sys/acl.h>
 #include "cygtls.h"
-#include <sys/un.h>
+#include "cygwin/in6.h"
 #include "ntdll.h"
 #include "miscfuncs.h"
 
@@ -125,7 +127,9 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	     some greedy Win32 application.  Therefore we should never wait
 	     endlessly without checking for signals and thread cancel event. */
 	  pthread_testcancel ();
-	  if (cancelable_wait (NULL, cw_nowait, cw_sig_eintr) == WAIT_SIGNALED
+	  /* Using IsEventSignalled like this is racy since another thread could
+	     be waiting for signal_arrived. */
+	  if (IsEventSignalled (signal_arrived)
 	      && !_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);
@@ -657,8 +661,7 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
 	  return SOCKET_ERROR;
 	}
 
-      WSAEVENT ev[2] = { wsock_evt };
-      set_signal_arrived here (ev[1]);
+      WSAEVENT ev[2] = { wsock_evt, signal_arrived };
       switch (WSAWaitForMultipleEvents (2, ev, FALSE, 50, FALSE))
 	{
 	  case WSA_WAIT_TIMEOUT:
@@ -1125,9 +1128,14 @@ fhandler_socket::listen (int backlog)
 	}
       else if (get_addr_family () == AF_INET6)
 	{
-	  struct sockaddr_in6 sin6;
-	  memset (&sin6, 0, sizeof sin6);
-	  sin6.sin6_family = AF_INET6;
+	  struct sockaddr_in6 sin6 =
+	    {
+	      sin6_family: AF_INET6,
+	      sin6_port: 0,
+	      sin6_flowinfo: 0,
+	      sin6_addr: {{IN6ADDR_ANY_INIT}},
+	      sin6_scope_id: 0
+	    };
 	  if (!::bind (get_socket (), (struct sockaddr *) &sin6, sizeof sin6))
 	    res = ::listen (get_socket (), backlog);
 	}
@@ -1205,12 +1213,12 @@ fhandler_socket::accept4 (struct sockaddr *peer, int *len, int flags)
 		     bound socket name of the peer's socket.  For now
 		     we just fake an unbound socket on the other side. */
 		  static struct sockaddr_un un = { AF_LOCAL, "" };
-		  memcpy (peer, &un, MIN (*len, (int) sizeof (un.sun_family)));
+		  memcpy (peer, &un, min (*len, (int) sizeof (un.sun_family)));
 		  *len = (int) sizeof (un.sun_family);
 		}
 	      else
 		{
-		  memcpy (peer, &lpeer, MIN (*len, llen));
+		  memcpy (peer, &lpeer, min (*len, llen));
 		  *len = llen;
 		}
 	    }
@@ -1239,7 +1247,7 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
       sun.sun_path[0] = '\0';
       if (get_sun_path ())
 	strncat (sun.sun_path, get_sun_path (), UNIX_PATH_LEN - 1);
-      memcpy (name, &sun, MIN (*namelen, (int) SUN_LEN (&sun) + 1));
+      memcpy (name, &sun, min (*namelen, (int) SUN_LEN (&sun) + 1));
       *namelen = (int) SUN_LEN (&sun) + (get_sun_path () ? 1 : 0);
       res = 0;
     }
@@ -1253,7 +1261,7 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
       res = ::getsockname (get_socket (), (struct sockaddr *) &sock, &len);
       if (!res)
 	{
-	  memcpy (name, &sock, MIN (*namelen, len));
+	  memcpy (name, &sock, min (*namelen, len));
 	  *namelen = len;
 	}
       else
@@ -1282,7 +1290,7 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 		}
 	      if (!res)
 		{
-		  memcpy (name, &sock, MIN (*namelen, len));
+		  memcpy (name, &sock, min (*namelen, len));
 		  *namelen = len;
 		}
 	    }
@@ -1313,12 +1321,12 @@ fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
       sun.sun_path[0] = '\0';
       if (get_peer_sun_path ())
 	strncat (sun.sun_path, get_peer_sun_path (), UNIX_PATH_LEN - 1);
-      memcpy (name, &sun, MIN (*namelen, (int) SUN_LEN (&sun) + 1));
+      memcpy (name, &sun, min (*namelen, (int) SUN_LEN (&sun) + 1));
       *namelen = (int) SUN_LEN (&sun) + (get_peer_sun_path () ? 1 : 0);
     }
   else
     {
-      memcpy (name, &sock, MIN (*namelen, len));
+      memcpy (name, &sock, min (*namelen, len));
       *namelen = len;
     }
 
@@ -1330,7 +1338,7 @@ fhandler_socket::read (void *in_ptr, size_t& len)
 {
   WSABUF wsabuf = { len, (char *) in_ptr };
   WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0,  NULL }, 0 };
-  len = recv_internal (&wsamsg, false);
+  len = recv_internal (&wsamsg);
 }
 
 int
@@ -1346,16 +1354,14 @@ fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
       wsaptr->buf = (char *) iovptr->iov_base;
     }
   WSAMSG wsamsg = { NULL, 0, wsabuf, iovcnt, { 0,  NULL}, 0 };
-  return recv_internal (&wsamsg, false);
+  return recv_internal (&wsamsg);
 }
 
 extern "C" {
-#ifndef __MINGW64_VERSION_MAJOR
 #define WSAID_WSARECVMSG \
 	  {0xf689d7c8,0x6f1f,0x436b,{0x8a,0x53,0xe5,0x4f,0xe3,0x51,0xc3,0x22}};
 typedef int (WSAAPI *LPFN_WSARECVMSG)(SOCKET,LPWSAMSG,LPDWORD,LPWSAOVERLAPPED,
 				      LPWSAOVERLAPPED_COMPLETION_ROUTINE);
-#endif
 int WSAAPI WSASendMsg(SOCKET,LPWSAMSG,DWORD,LPDWORD, LPWSAOVERLAPPED,
 		      LPWSAOVERLAPPED_COMPLETION_ROUTINE);
 };
@@ -1375,32 +1381,28 @@ get_ext_funcptr (SOCKET sock, void *funcptr)
 }
 
 inline ssize_t
-fhandler_socket::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
+fhandler_socket::recv_internal (LPWSAMSG wsamsg)
 {
   ssize_t res = 0;
   DWORD ret = 0, wret;
   int evt_mask = FD_READ | ((wsamsg->dwFlags & MSG_OOB) ? FD_OOB : 0);
   LPWSABUF &wsabuf = wsamsg->lpBuffers;
   ULONG &wsacnt = wsamsg->dwBufferCount;
+  bool use_recvmsg = false;
   static NO_COPY LPFN_WSARECVMSG WSARecvMsg;
 
   DWORD wait_flags = wsamsg->dwFlags;
   bool waitall = !!(wait_flags & MSG_WAITALL);
   wsamsg->dwFlags &= (MSG_OOB | MSG_PEEK | MSG_DONTROUTE);
-  if (use_recvmsg)
+  if (wsamsg->Control.len > 0)
     {
       if (!WSARecvMsg
 	  && get_ext_funcptr (get_socket (), &WSARecvMsg) == SOCKET_ERROR)
 	{
-	  if (wsamsg->Control.len > 0)
-	    {
-	      set_winsock_errno ();
-	      return SOCKET_ERROR;
-	    }
-	  use_recvmsg = false;
+	  set_winsock_errno ();
+	  return SOCKET_ERROR;
 	}
-      else /* Only MSG_PEEK is supported by WSARecvMsg. */
-	wsamsg->dwFlags &= MSG_PEEK;
+      use_recvmsg = true;
     }
   if (waitall)
     {
@@ -1507,7 +1509,7 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 		    &wsabuf, 1,
 		    { 0, NULL},
 		    flags };
-  ssize_t ret = recv_internal (&wsamsg, false);
+  ssize_t ret = recv_internal (&wsamsg);
   if (fromlen)
     *fromlen = wsamsg.namelen;
   return ret;
@@ -1522,12 +1524,12 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 
   /* Disappointing but true:  Even if WSARecvMsg is supported, it's only
      supported for datagram and raw sockets. */
-  bool use_recvmsg = true;
-  if (get_socket_type () == SOCK_STREAM || get_addr_family () == AF_LOCAL
-      || !wincap.has_recvmsg ())
+  if (!wincap.has_recvmsg () || get_socket_type () == SOCK_STREAM
+      || get_addr_family () == AF_LOCAL)
     {
-      use_recvmsg = false;
       msg->msg_controllen = 0;
+      if (!CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR)
+	msg->msg_flags = 0;
     }
 
   WSABUF wsabuf[msg->msg_iovlen];
@@ -1542,7 +1544,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 		    wsabuf, msg->msg_iovlen,
 		    { msg->msg_controllen, (char *) msg->msg_control },
 		    flags };
-  ssize_t ret = recv_internal (&wsamsg, use_recvmsg);
+  ssize_t ret = recv_internal (&wsamsg);
   if (ret >= 0)
     {
       msg->msg_namelen = wsamsg.namelen;
@@ -1781,7 +1783,7 @@ fhandler_socket::close ()
 	  res = -1;
 	  break;
 	}
-      if (cygwait (10) == WAIT_SIGNALED)
+      if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0)
 	{
 	  set_errno (EINTR);
 	  res = -1;

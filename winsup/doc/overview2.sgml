@@ -35,10 +35,9 @@ the <literal>/usr/share/doc/Cygwin/</literal> directory.
 <para>
 Developers coming from a Windows background will be able to write 
 console or GUI executables that rely on the Microsoft Win32 API instead
-of Cygwin using the mingw32 or mingw64 cross-compiler toolchains.  The
-<command>-shared</command> option to GCC allows to write Windows Dynamically
-Linked Libraries (DLLs).  The resource compiler <command>windres</command>
-is also provided.
+of Cygwin using the -mno-cygwin option to GCC.  The <command>-shared</command>
+option allows to write Windows Dynamically Linked Libraries (DLLs).  The
+resource compiler <command>windres</command> is also provided.
 </para>
 </sect1>
 
@@ -388,10 +387,8 @@ BLODA</ulink>. Badly-behaved applications which
 inject dlls into other processes often manage to clobber important
 sections of the child's address space, leading to base address
 collisions which rebasing cannot fix. The only way to resolve this
-problem is to remove (usually uninstall) the offending app.  See
-<xref linkend="cygwinenv-implemented-options"></xref> for the
-<literal>detect_bloda</literal> option, which may be able to identify the
-BLODA.</listitem></itemizedlist></para>
+problem is to remove (usually uninstall) the offending
+app.</listitem></itemizedlist></para>
 
 <para>In summary, current Windows implementations make it
 impossible to implement a perfectly reliable fork, and occasional

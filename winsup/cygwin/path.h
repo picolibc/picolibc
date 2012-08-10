@@ -1,7 +1,7 @@
 /* path.h: path data structures
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -344,10 +344,8 @@ class path_conv
   void file_attributes (DWORD new_attr) {fileattr = new_attr;}
   DWORD fs_flags () {return fs.flags ();}
   DWORD fs_name_len () {return fs.name_len ();}
-  bool fs_got_fs () const { return fs.got_fs (); }
   bool fs_is_fat () const {return fs.is_fat ();}
   bool fs_is_ntfs () const {return fs.is_ntfs ();}
-  bool fs_is_refs () const {return fs.is_refs ();}
   bool fs_is_samba () const {return fs.is_samba ();}
   bool fs_is_nfs () const {return fs.is_nfs ();}
   bool fs_is_netapp () const {return fs.is_netapp ();}
@@ -438,6 +436,7 @@ class etc
 {
   friend class dtable;
   static int curr_ix;
+  static HANDLE changed_h;
   static bool change_possible[MAX_ETC_FILES + 1];
   static OBJECT_ATTRIBUTES fn[MAX_ETC_FILES + 1];
   static LARGE_INTEGER last_modified[MAX_ETC_FILES + 1];

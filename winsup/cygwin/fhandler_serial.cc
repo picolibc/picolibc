@@ -1,7 +1,7 @@
 /* fhandler_serial.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2011, 2012 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,7 +11,6 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
-#include <sys/param.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -19,13 +18,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include <asm/socket.h>
-#ifdef __MINGW64_VERSION_MAJOR
-#include <devioctl.h>
-#include <ntddser.h>
-#else
 #include <ddk/ntddser.h>
-#endif
-#include "cygwait.h"
 
 /**********************************************************************/
 /* fhandler_serial */
@@ -51,7 +44,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
   int tot;
   DWORD n;
 
-  size_t minchars = vmin_ ? MIN (vmin_, ulen) : ulen;
+  size_t minchars = vmin_ ? min (vmin_, ulen) : ulen;
 
   debug_printf ("ulen %d, vmin_ %d, vtime_ %d, hEvent %p", ulen, vmin_, vtime_,
 		io_status.hEvent);
@@ -77,7 +70,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	termios_printf ("error detected %x", ev);
       else if (st.cbInQue && !vtime_)
 	inq = st.cbInQue;
-      else if (!is_nonblocking () && !overlapped_armed)
+      else if (!overlapped_armed)
 	{
 	  if ((size_t) tot >= minchars)
 	    break;
@@ -89,6 +82,16 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	    }
 	  else if (GetLastError () != ERROR_IO_PENDING)
 	    goto err;
+	  else if (is_nonblocking ())
+	    {
+	      PurgeComm (get_handle (), PURGE_RXABORT);
+	      if (tot == 0)
+		{
+		  tot = -1;
+		  set_errno (EAGAIN);
+		}
+	      goto out;
+	    }
 	  else
 	    {
 	      overlapped_armed = 1;
@@ -100,13 +103,13 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 		    goto err;
 		  debug_printf ("n %d, ev %x", n, ev);
 		  break;
-		case WAIT_SIGNALED:
+		case WAIT_OBJECT_0 + 1:
 		  tot = -1;
 		  PurgeComm (get_handle (), PURGE_RXABORT);
 		  overlapped_armed = 0;
 		  set_sig_errno (EINTR);
 		  goto out;
-		case WAIT_CANCELED:
+		case WAIT_OBJECT_0 + 2:
 		  PurgeComm (get_handle (), PURGE_RXABORT);
 		  overlapped_armed = 0;
 		  pthread::static_cancel_self ();
@@ -128,14 +131,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	goto err;
       else if (is_nonblocking ())
 	{
-	  /* Use CancelIo rather than PurgeComm (PURGE_RXABORT) since
-	     PurgeComm apparently discards in-flight bytes while CancelIo
-	     only stops the overlapped IO routine. */
-	  CancelIo (get_handle ());
-	  if (GetOverlappedResult (get_handle (), &io_status, &n, FALSE))
-	    tot = n;
-	  else if (GetLastError () != ERROR_OPERATION_ABORTED)
-	    goto err;
+	  PurgeComm (get_handle (), PURGE_RXABORT);
 	  if (tot == 0)
 	    {
 	      tot = -1;
@@ -207,12 +203,12 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
 	    {
 	    case WAIT_OBJECT_0:
 	      break;
-	    case WAIT_SIGNALED:
+	    case WAIT_OBJECT_0 + 1:
 	      PurgeComm (get_handle (), PURGE_TXABORT);
 	      set_sig_errno (EINTR);
 	      ForceCloseHandle (write_status.hEvent);
 	      return -1;
-	    case WAIT_CANCELED:
+	    case WAIT_OBJECT_0 + 2:
 	      PurgeComm (get_handle (), PURGE_TXABORT);
 	      pthread::static_cancel_self ();
 	      /*NOTREACHED*/
@@ -247,6 +243,7 @@ fhandler_serial::open (int flags, mode_t mode)
 {
   int res;
   COMMTIMEOUTS to;
+  extern BOOL reset_com;
 
   syscall_printf ("fhandler_serial::open (%s, %p, %p)",
 			get_name (), flags, mode);
