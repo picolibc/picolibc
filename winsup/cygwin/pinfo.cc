@@ -77,6 +77,11 @@ pinfo::thisproc (HANDLE h)
   else if (!child_proc_info)	/* child_proc_info is only set when this process
 				   was started by another cygwin process */
     procinfo->start_time = time (NULL); /* Register our starting time. */
+  else if (::cygheap->pid_handle)
+    {
+      ForceCloseHandle (::cygheap->pid_handle);
+      ::cygheap->pid_handle = NULL;
+    }
 }
 
 /* Initialize the process table entry for the current task.
@@ -114,6 +119,7 @@ pinfo_init (char **envp, int envc)
 static DWORD
 status_exit (DWORD x)
 {
+  const char *find_first_notloaded_dll (path_conv &);
   switch (x)
     {
     case STATUS_DLL_NOT_FOUND:
@@ -299,16 +305,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
       bool created = shloc != SH_JUSTOPEN;
 
-      if (!created && createit && (procinfo->process_state & PID_REAPED))
-	{
-	  memset (procinfo, 0, sizeof (*procinfo));
-	  created = true;	/* Lie that we created this - just reuse old
-				   shared memory */
-	} 
-
-      if ((procinfo->process_state & PID_REAPED)
-	  || ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
-	      && cygwin_pid (procinfo->dwProcessId) != procinfo->pid))
+      if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
+	  && cygwin_pid (procinfo->dwProcessId) != procinfo->pid)
 	{
 	  set_errno (ESRCH);
 	  break;
@@ -655,6 +653,7 @@ _pinfo::commune_request (__uint32_t code, ...)
   HANDLE& hp = si._si_commune._si_process_handle;
   HANDLE& fromthem = si._si_commune._si_read_handle;
   HANDLE request_sync = NULL;
+  bool locked = false;
 
   res.s = NULL;
   res.n = 0;
@@ -681,6 +680,7 @@ _pinfo::commune_request (__uint32_t code, ...)
     }
   va_end (args);
 
+  locked = true;
   char name_buf[MAX_PATH];
   request_sync = CreateSemaphore (&sec_none_nih, 0, LONG_MAX,
 				  shared_name (name_buf, "commune", myself->pid));

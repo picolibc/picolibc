@@ -31,7 +31,6 @@ details. */
 #include "sigproc.h"
 #include "shared_info.h"
 #include <asm/socket.h>
-#include "cygwait.h"
 
 #define MAX_OVERLAPPED_WRITE_LEN (64 * 1024 * 1024)
 #define MIN_OVERLAPPED_WRITE_LEN (1 * 1024 * 1024)
@@ -1940,7 +1939,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	    case WAIT_OBJECT_0:
 	      err = ERROR_INVALID_HANDLE;
 	      break;
-	    case WAIT_SIGNALED:
+	    case WAIT_OBJECT_0 + 1:
 	      err = ERROR_INVALID_AT_INTERRUPT_TIME;
 	      break;
 	    default:

@@ -19,6 +19,39 @@ details. */
 #include "sigproc.h"
 #include "exception.h"
 
+class sentry
+{
+  static muto lock;
+  int destroy;
+public:
+  void init ();
+  bool acquired () {return lock.acquired ();}
+  sentry () {destroy = 0;}
+  sentry (DWORD wait) {destroy = lock.acquire (wait);}
+  ~sentry () {if (destroy) lock.release ();}
+  friend void _cygtls::init ();
+};
+
+muto NO_COPY sentry::lock;
+
+static size_t NO_COPY nthreads;
+
+#define THREADLIST_CHUNK 256
+
+void
+_cygtls::init ()
+{
+  if (cygheap->threadlist)
+    memset (cygheap->threadlist, 0, cygheap->sthreads * sizeof (cygheap->threadlist[0]));
+  else
+    {
+      cygheap->sthreads = THREADLIST_CHUNK;
+      cygheap->threadlist = (_cygtls **) ccalloc_abort (HEAP_TLS, cygheap->sthreads,
+							sizeof (cygheap->threadlist[0]));
+    }
+  sentry::lock.init ("sentry_lock");
+}
+
 /* Two calls to get the stack right... */
 void
 _cygtls::call (DWORD (*func) (void *, void *), void *arg)
@@ -48,9 +81,7 @@ const wchar_t *well_known_dlls[] =
   L"kernel32.dll",
   L"mswsock.dll",
   L"ntdll.dll",
-  L"ole32.dll",
   L"shlwapi.dll",
-  L"wbemprox.dll",
   L"ws2_32.dll",
 };
 
@@ -134,7 +165,18 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
       || (void *) func == (void *) cygthread::simplestub)
     return;
 
-  cygheap->add_tls (this);
+  cygheap->user.reimpersonate ();
+
+  sentry here (INFINITE);
+  if (nthreads >= cygheap->sthreads)
+    {
+      cygheap->threadlist = (_cygtls **)
+	crealloc_abort (cygheap->threadlist, (cygheap->sthreads += THREADLIST_CHUNK)
+			* sizeof (cygheap->threadlist[0]));
+      memset (cygheap->threadlist + nthreads, 0, THREADLIST_CHUNK * sizeof (cygheap->threadlist[0]));
+    }
+
+  cygheap->threadlist[nthreads++] = this;
 }
 
 void
@@ -146,7 +188,6 @@ _cygtls::fixup_after_fork ()
       sig = 0;
     }
   stacklock = spinning = 0;
-  signal_arrived = NULL;
   locals.select.sockevt = NULL;
   locals.cw_timer = NULL;
   wq.thread_ev = NULL;
@@ -171,13 +212,6 @@ _cygtls::remove (DWORD wait)
   /* FIXME: Need some sort of atthreadexit function to allow things like
      select to control this themselves. */
 
-  if (signal_arrived)
-    {
-      HANDLE h = signal_arrived;
-      signal_arrived = NULL;
-      CloseHandle (h);
-    }
-
   /* Close handle and free memory used by select. */
   if (locals.select.sockevt)
     {
@@ -193,7 +227,22 @@ _cygtls::remove (DWORD wait)
   free_local (hostent_buf);
   /* Free temporary TLS path buffers. */
   locals.pathbufs.destroy ();
-  cygheap->remove_tls (this, wait);
+
+  do
+    {
+      sentry here (wait);
+      if (here.acquired ())
+	{
+	  for (size_t i = 0; i < nthreads; i++)
+	    if (this == cygheap->threadlist[i])
+	      {
+		if (i < --nthreads)
+		  cygheap->threadlist[i] = cygheap->threadlist[nthreads];
+		debug_printf ("removed %p element %d", this, i);
+		break;
+	      }
+	}
+    } while (0);
   remove_wq (wait);
 }
 
@@ -201,6 +250,31 @@ void
 _cygtls::push (__stack_t addr)
 {
   *stackptr++ = (__stack_t) addr;
+}
+
+
+_cygtls *
+_cygtls::find_tls (int sig)
+{
+  static int NO_COPY threadlist_ix;
+
+  debug_printf ("signal %d\n", sig);
+  sentry here (INFINITE);
+
+  _cygtls *res = NULL;
+  threadlist_ix = -1;
+
+  myfault efault;
+  if (efault.faulted ())
+    cygheap->threadlist[threadlist_ix]->remove (INFINITE);
+
+  while (++threadlist_ix < (int) nthreads)
+    if (sigismember (&(cygheap->threadlist[threadlist_ix]->sigwait_mask), sig))
+      {
+	res = cygheap->threadlist[threadlist_ix];
+	break;
+      }
+  return res;
 }
 
 void

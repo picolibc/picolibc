@@ -36,14 +36,10 @@ details. */
 #include <asm/socket.h>
 #include "sync.h"
 #include "child_info.h"
-#include "cygwait.h"
 
 /* Don't make this bigger than NT_MAX_PATH as long as the temporary buffer
    is allocated using tmp_pathbuf!!! */
 #define CONVERT_LIMIT NT_MAX_PATH
-
-#define ALT_PRESSED (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)
-#define CTRL_PRESSED (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)
 
 /*
  * Scroll the screen context.
@@ -140,19 +136,18 @@ fhandler_console::set_unit ()
   fh_devices devset;
   lock_ttys here;
   HWND me;
-  fh_devices this_unit = dev ();
-  bool generic_console = this_unit == FH_CONIN || this_unit == FH_CONOUT;
   if (shared_console_info)
     {
+      fh_devices this_unit = dev ();
       fh_devices shared_unit =
 	(fh_devices) shared_console_info->tty_min_state.getntty ();
       devset = (shared_unit == this_unit || this_unit == FH_CONSOLE
-		|| generic_console
+		|| this_unit == FH_CONIN || this_unit == FH_CONOUT
 		|| this_unit == FH_TTY) ?
 		shared_unit : FH_ERROR;
       created = false;
     }
-  else if ((!generic_console && (myself->ctty != -1 && !iscons_dev (myself->ctty)))
+  else if ((myself->ctty != -1 && !iscons_dev (myself->ctty))
 	   || !(me = GetConsoleWindow ()))
     devset = FH_ERROR;
   else
@@ -308,6 +303,14 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
       return 0;
     }
 
+  /* Check whether adjusted mouse position can be reported */
+  if (dev_state.dwMousePosition.X > 0xFF - ' ' - 1
+      || dev_state.dwMousePosition.Y > 0xFF - ' ' - 1)
+    {
+      /* Mouse position out of reporting range */
+      return 0;
+    }
+
   return ((mouse_event.dwEventFlags == 0 || mouse_event.dwEventFlags == DOUBLE_CLICK)
 	  && mouse_event.dwButtonState != dev_state.dwLastButtonState)
 	 || mouse_event.dwEventFlags == MOUSE_WHEELED
@@ -356,9 +359,9 @@ fhandler_console::read (void *pv, size_t& buflen)
 	{
 	case WAIT_OBJECT_0:
 	  break;
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0 + 1:
 	  goto sig_exit;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 2:
 	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
@@ -417,6 +420,8 @@ fhandler_console::read (void *pv, size_t& buflen)
 
 #define ich (input_rec.Event.KeyEvent.uChar.AsciiChar)
 #define wch (input_rec.Event.KeyEvent.uChar.UnicodeChar)
+#define ALT_PRESSED (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)
+#define CTRL_PRESSED (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)
 
 	  /* Ignore key up events, except for left alt events with non-zero character
 	   */
@@ -447,13 +452,12 @@ fhandler_console::read (void *pv, size_t& buflen)
 	    {
 	      char c = dev_state.backspace_keycode;
 	      nread = 0;
-	      if (control_key_state & ALT_PRESSED)
-		{
-		  if (dev_state.metabit)
-		    c |= 0x80;
-		  else
-		    tmp[nread++] = '\e';
-		}
+	      if (control_key_state & ALT_PRESSED) {
+		if (dev_state.metabit)
+		  c |= 0x80;
+		else
+		  tmp[nread++] = '\e';
+	      }
 	      tmp[nread++] = c;
 	      tmp[nread] = 0;
 	      toadd = tmp;
@@ -517,6 +521,8 @@ fhandler_console::read (void *pv, size_t& buflen)
 	    }
 #undef ich
 #undef wch
+#undef ALT_PRESSED
+#undef CTRL_PRESSED
 	  break;
 
 	case MOUSE_EVENT:
@@ -544,7 +550,6 @@ fhandler_console::read (void *pv, size_t& buflen)
 		   events at the same time. */
 		int b = 0;
 		char sz[32];
-		char mode6_term = 'M';
 
 		if (mouse_event.dwEventFlags == MOUSE_WHEELED)
 		  {
@@ -568,7 +573,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 		      {
 			b = dev_state.last_button_code;
 		      }
-		    else if (mouse_event.dwButtonState < dev_state.dwLastButtonState && !dev_state.ext_mouse_mode6)
+		    else if (mouse_event.dwButtonState < dev_state.dwLastButtonState)
 		      {
 			b = 3;
 			strcpy (sz, "btn up");
@@ -588,10 +593,6 @@ fhandler_console::read (void *pv, size_t& buflen)
 			b = 1;
 			strcpy (sz, "btn3 down");
 		      }
-
-		    if (dev_state.ext_mouse_mode6 /* distinguish release */
-			&& mouse_event.dwButtonState < dev_state.dwLastButtonState)
-		        mode6_term = 'm';
 
 		    dev_state.last_button_code = b;
 
@@ -615,90 +616,34 @@ fhandler_console::read (void *pv, size_t& buflen)
 		dev_state.nModifiers = 0;
 		if (mouse_event.dwControlKeyState & SHIFT_PRESSED)
 		    dev_state.nModifiers |= 0x4;
-		if (mouse_event.dwControlKeyState & ALT_PRESSED)
+		if (mouse_event.dwControlKeyState & (RIGHT_ALT_PRESSED|LEFT_ALT_PRESSED))
 		    dev_state.nModifiers |= 0x8;
-		if (mouse_event.dwControlKeyState & CTRL_PRESSED)
+		if (mouse_event.dwControlKeyState & (RIGHT_CTRL_PRESSED|LEFT_CTRL_PRESSED))
 		    dev_state.nModifiers |= 0x10;
 
 		/* Indicate the modifiers */
 		b |= dev_state.nModifiers;
 
 		/* We can now create the code. */
-		if (dev_state.ext_mouse_mode6)
-		  {
-		    __small_sprintf (tmp, "\033[<%d;%d;%d%c", b,
-				     dev_state.dwMousePosition.X + 1,
-				     dev_state.dwMousePosition.Y + 1,
-				     mode6_term);
-		    nread = strlen (tmp);
-		  }
-		else if (dev_state.ext_mouse_mode15)
-		  {
-		    __small_sprintf (tmp, "\033[%d;%d;%dM", b + 32,
-				     dev_state.dwMousePosition.X + 1,
-				     dev_state.dwMousePosition.Y + 1);
-		    nread = strlen (tmp);
-		  }
-		else if (dev_state.ext_mouse_mode5)
-		  {
-		    unsigned int xcode = dev_state.dwMousePosition.X + ' ' + 1;
-		    unsigned int ycode = dev_state.dwMousePosition.Y + ' ' + 1;
-
-		    __small_sprintf (tmp, "\033[M%c", b + ' ');
-		    nread = 4;
-		    /* the neat nested encoding function of mintty 
-		       does not compile in g++, so let's unfold it: */
-		    if (xcode < 0x80)
-		      tmp [nread++] = xcode;
-		    else if (xcode < 0x800)
-		      {
-			tmp [nread++] = 0xC0 + (xcode >> 6);
-			tmp [nread++] = 0x80 + (xcode & 0x3F);
-		      }
-		    else
-		      tmp [nread++] = 0;
-		    if (ycode < 0x80)
-		      tmp [nread++] = ycode;
-		    else if (ycode < 0x800)
-		      {
-			tmp [nread++] = 0xC0 + (ycode >> 6);
-			tmp [nread++] = 0x80 + (ycode & 0x3F);
-		      }
-		    else
-		      tmp [nread++] = 0;
-		  }
-		else
-		  {
-		    unsigned int xcode = dev_state.dwMousePosition.X + ' ' + 1;
-		    unsigned int ycode = dev_state.dwMousePosition.Y + ' ' + 1;
-		    if (xcode >= 256)
-		      xcode = 0;
-		    if (ycode >= 256)
-		      ycode = 0;
-		    __small_sprintf (tmp, "\033[M%c%c%c", b + ' ',
-				     xcode, ycode);
-		    nread = 6;	/* tmp may contain NUL bytes */
-		  }
-		syscall_printf ("mouse: %s at (%d,%d)", sz,
-				dev_state.dwMousePosition.X,
-				dev_state.dwMousePosition.Y);
+		sprintf (tmp, "\033[M%c%c%c", b + ' ', dev_state.dwMousePosition.X + ' ' + 1, dev_state.dwMousePosition.Y + ' ' + 1);
+		syscall_printf ("mouse: %s at (%d,%d)", sz, dev_state.dwMousePosition.X, dev_state.dwMousePosition.Y);
 
 		toadd = tmp;
+		nread = 6;
 	      }
 	  }
 	  break;
 
 	case FOCUS_EVENT:
-	  if (dev_state.use_focus)
-	    {
-	      if (input_rec.Event.FocusEvent.bSetFocus)
-	        __small_sprintf (tmp, "\033[I");
-	      else
-	        __small_sprintf (tmp, "\033[O");
+	  if (dev_state.use_focus) {
+	    if (input_rec.Event.FocusEvent.bSetFocus)
+	      sprintf (tmp, "\033[I");
+	    else
+	      sprintf (tmp, "\033[O");
 
-	      toadd = tmp;
-	      nread = 3;
-	    }
+	    toadd = tmp;
+	    nread = 3;
+	  }
 	  break;
 
 	case WINDOW_BUFFER_SIZE_EVENT:
@@ -1571,30 +1516,22 @@ fhandler_console::char_command (char c)
 
 	case 1000: /* Mouse tracking */
 	  dev_state.use_mouse = (c == 'h') ? 1 : 0;
+	  syscall_printf ("mouse support set to mode %d", dev_state.use_mouse);
 	  break;
 
 	case 1002: /* Mouse button event tracking */
 	  dev_state.use_mouse = (c == 'h') ? 2 : 0;
+	  syscall_printf ("mouse support set to mode %d", dev_state.use_mouse);
 	  break;
 
 	case 1003: /* Mouse any event tracking */
 	  dev_state.use_mouse = (c == 'h') ? 3 : 0;
+	  syscall_printf ("mouse support set to mode %d", dev_state.use_mouse);
 	  break;
 
 	case 1004: /* Focus in/out event reporting */
 	  dev_state.use_focus = (c == 'h') ? true : false;
-	  break;
-
-	case 1005: /* Extended mouse mode */
-	  dev_state.ext_mouse_mode5 = c == 'h';
-	  break;
-
-	case 1006: /* SGR extended mouse mode */
-	  dev_state.ext_mouse_mode6 = c == 'h';
-	  break;
-
-	case 1015: /* Urxvt extended mouse mode */
-	  dev_state.ext_mouse_mode15 = c == 'h';
+	  syscall_printf ("focus reporting set to %d", dev_state.use_focus);
 	  break;
 
 	case 2000: /* Raw keyboard mode */
@@ -2012,7 +1949,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 
   while (src < end)
     {
-      paranoid_printf ("char %0c state is %d", *src, dev_state.state_);
+      debug_printf ("at %d(%c) state is %d", *src, isprint (*src) ? *src : ' ',
+		    dev_state.state_);
       switch (dev_state.state_)
 	{
 	case normal:
@@ -2223,13 +2161,15 @@ get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
   int modifier_index = NORMAL;
   if (input_rec.Event.KeyEvent.dwControlKeyState & SHIFT_PRESSED)
     modifier_index = SHIFT;
-  if (input_rec.Event.KeyEvent.dwControlKeyState & CTRL_PRESSED)
+  if (input_rec.Event.KeyEvent.dwControlKeyState &
+		(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
     modifier_index += CONTROL;
 
   for (int i = 0; keytable[i].vk; i++)
     if (input_rec.Event.KeyEvent.wVirtualKeyCode == keytable[i].vk)
       {
-	if ((input_rec.Event.KeyEvent.dwControlKeyState & ALT_PRESSED)
+	if ((input_rec.Event.KeyEvent.dwControlKeyState &
+		(LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
 	    && keytable[i].val[modifier_index] != NULL)
 	  { /* Generic ESC prefixing if Alt is pressed */
 	    tmp[0] = '\033';
@@ -2430,7 +2370,7 @@ bool
 fhandler_console::need_invisible ()
 {
   BOOL b = false;
-  if (exists ())
+  if (GetConsoleCP ())
     invisible_console = false;
   else
     {

@@ -26,7 +26,6 @@ details. */
 #include "cygthread.h"
 #include "child_info.h"
 #include <asm/socket.h>
-#include "cygwait.h"
 
 #define close_maybe(h) \
   do { \
@@ -51,32 +50,6 @@ fhandler_pty_slave::get_unit ()
   return dev ().get_minor ();
 }
 
-bool
-bytes_available (DWORD& n, HANDLE h)
-{
-  DWORD navail, nleft;
-  navail = nleft = 0;
-  bool succeeded = PeekNamedPipe (h, NULL, 0, NULL, &navail, &nleft);
-  if (succeeded)
-    /* nleft should always be the right choice unless something has written 0
-       bytes to the pipe.  In that pathological case we return the actual number
-       of bytes available in the pipe. See cgf-000008 for more details.  */
-    n = nleft ?: navail;
-  else
-    {
-      termios_printf ("PeekNamedPipe(%p) failed, %E", h);
-      n = 0;
-    }
-  debug_only_printf ("n %u, nleft %u, navail %u");
-  return succeeded;
-}
-
-bool
-fhandler_pty_common::bytes_available (DWORD &n)
-{
-  return ::bytes_available (n, get_handle ());
-}
-
 #ifdef DEBUGGING
 static class mutex_stack
 {
@@ -89,16 +62,9 @@ public:
 static int osi;
 #endif /*DEBUGGING*/
 
-void
-fhandler_pty_master::flush_to_slave ()
-{ 
-  if (get_readahead_valid () && !(get_ttyp ()->ti.c_lflag & ICANON))
-    accept_input ();
-}
-
 DWORD
 fhandler_pty_common::__acquire_output_mutex (const char *fn, int ln,
-					     DWORD ms)
+					   DWORD ms)
 {
   if (strace.active ())
     strace.prntf (_STRACE_TERMIOS, fn, "(%d): pty output_mutex (%p): waiting %d ms", ln, output_mutex, ms);
@@ -176,7 +142,7 @@ fhandler_pty_master::accept_input ()
       DWORD rc;
       DWORD written = 0;
 
-      paranoid_printf ("about to write %d chars to slave", bytes_left);
+      termios_printf ("about to write %d chars to slave", bytes_left);
       rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
       if (!rc)
 	{
@@ -228,8 +194,6 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
   int column = 0;
   int rc = 0;
 
-  flush_to_slave ();
-
   if (len == 0)
     goto out;
 
@@ -246,6 +210,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
       goto out;
     }
 
+
   for (;;)
     {
       /* Set RLEN to the number of bytes to read from the pipe.  */
@@ -261,40 +226,50 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
       if (rlen > sizeof outbuf)
 	rlen = sizeof outbuf;
 
-      n = 0;
-      for (;;)
-	{
-	  if (!bytes_available (n))
-	    goto err;
-	  if (n)
-	    break;
-	  if (hit_eof ())
-	    goto out;
-	  /* DISCARD (FLUSHO) and tcflush can finish here. */
-	  if ((get_ttyp ()->ti.c_lflag & FLUSHO || !buf))
-	    goto out;
+      HANDLE handle = get_io_handle ();
 
-	  if (is_nonblocking ())
-	    {
-	      set_errno (EAGAIN);
-	      rc = -1;
-	      goto out;
-	    }
-	  pthread_testcancel ();
-	  if (cancelable_wait (NULL, 10, cw_sig_eintr) == WAIT_SIGNALED
-	      && !_my_tls.call_signal_handler ())
-	    {
-	      set_errno (EINTR);
-	      rc = -1;
-	      goto out;
-	    }
-	  flush_to_slave ();
-	}
-
-      if (!ReadFile (get_handle (), outbuf, rlen, &n, NULL))
+      n = 0; // get_readahead_into_buffer (outbuf, len);
+      if (!n)
 	{
-	  termios_printf ("ReadFile failed, %E");
-	  goto err;
+	  /* Doing a busy wait like this is quite inefficient, but nothing
+	     else seems to work completely.  Windows should provide some sort
+	     of overlapped I/O for pipes, or something, but it doesn't.  */
+	  while (1)
+	    {
+	      if (!PeekNamedPipe (handle, NULL, 0, NULL, &n, NULL))
+		{
+		  termios_printf ("PeekNamedPipe(%p) failed, %E", handle);
+		  goto err;
+		}
+	      if (n > 0)
+		break;
+	      if (hit_eof ())
+		goto out;
+	      /* DISCARD (FLUSHO) and tcflush can finish here. */
+	      if ((get_ttyp ()->ti.c_lflag & FLUSHO || !buf))
+		goto out;
+
+	      if (is_nonblocking ())
+		{
+		  set_errno (EAGAIN);
+		  rc = -1;
+		  goto out;
+		}
+	      pthread_testcancel ();
+	      if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0
+		  && !_my_tls.call_signal_handler ())
+		{
+		  set_errno (EINTR);
+		  rc = -1;
+		  goto out;
+		}
+	    }
+
+	  if (!ReadFile (handle, outbuf, rlen, &n, NULL))
+	    {
+	      termios_printf ("ReadFile failed, %E");
+	      goto err;
+	    }
 	}
 
       termios_printf ("bytes read %u", n);
@@ -693,6 +668,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
   size_t readlen;
   DWORD bytes_in_pipe;
   char buf[INP_BUFFER_SIZE];
+  char peek_buf[INP_BUFFER_SIZE];
   DWORD time_to_wait;
 
   bg_check_types bg = bg_check (SIGTTIN);
@@ -738,14 +714,14 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	      goto out;
 	    }
 	  break;
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0 + 1:
 	  if (totalread > 0)
 	    goto out;
 	  termios_printf ("wait catched signal");
 	  set_sig_errno (EINTR);
 	  totalread = -1;
 	  goto out;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 2:
 	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
@@ -773,14 +749,14 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	case WAIT_OBJECT_0:
 	case WAIT_ABANDONED_0:
 	  break;
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0 + 1:
 	  if (totalread > 0)
 	    goto out;
-	  termios_printf ("wait for mutex caught signal");
+	  termios_printf ("wait for mutex catched signal");
 	  set_sig_errno (EINTR);
 	  totalread = -1;
 	  goto out;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 2:
 	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
@@ -809,8 +785,12 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	    }
 	  goto out;
 	}
-      if (!bytes_available (bytes_in_pipe))
-	raise (SIGHUP);
+      if (!PeekNamedPipe (get_handle (), peek_buf, sizeof (peek_buf), &bytes_in_pipe, NULL, NULL))
+	{
+	  termios_printf ("PeekNamedPipe failed, %E");
+	  raise (SIGHUP);
+	  bytes_in_pipe = 0;
+	}
 
       /* On first peek determine no. of bytes to flush. */
       if (!ptr && len == UINT_MAX)
@@ -835,6 +815,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	  if (!ReadFile (get_handle (), buf, readlen, &n, NULL))
 	    {
 	      termios_printf ("read failed, %E");
+	      bytes_in_pipe = 0;
 	      raise (SIGHUP);
 	      bytes_in_pipe = 0;
 	      ptr = NULL;
@@ -845,8 +826,12 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 		 number of bytes in pipe, but for some reason this number doesn't
 		 change after successful read. So we have to peek into the pipe
 		 again to see if input is still available */
-	      if (!bytes_available (bytes_in_pipe))
-		raise (SIGHUP);
+	      if (!PeekNamedPipe (get_handle (), peek_buf, 1, &bytes_in_pipe, NULL, NULL))
+		{
+		  termios_printf ("PeekNamedPipe failed, %E");
+		  raise (SIGHUP);
+		  bytes_in_pipe = 0;
+		}
 	      if (n)
 		{
 		  len -= n;
@@ -1014,15 +999,15 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
       goto out;
     case FIONREAD:
       {
-	DWORD n;
-	if (!bytes_available (n))
+	int n;
+	if (!PeekNamedPipe (get_handle (), NULL, 0, NULL, (DWORD *) &n, NULL))
 	  {
 	    set_errno (EINVAL);
 	    retval = -1;
 	  }
 	else
 	  {
-	    *(int *) arg = (int) n;
+	    *(int *) arg = n;
 	    retval = 0;
 	  }
       }
@@ -1280,6 +1265,11 @@ fhandler_pty_master::cleanup ()
 int
 fhandler_pty_master::close ()
 {
+#if 0
+  while (accept_input () > 0)
+    continue;
+#endif
+
   termios_printf ("closing from_master(%p)/to_master(%p) since we own them(%d)",
 		  from_master, to_master, dwProcessId);
   if (cygwin_finished_initializing)
@@ -1430,13 +1420,13 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
       return this->tcsetpgrp ((pid_t) arg);
     case FIONREAD:
       {
-	DWORD n;
-	if (!::bytes_available (n, to_master))
+	int n;
+	if (!PeekNamedPipe (to_master, NULL, 0, NULL, (DWORD *) &n, NULL))
 	  {
 	    set_errno (EINVAL);
 	    return -1;
 	  }
-	*(int *) arg = (int) n;
+	*(int *) arg = n;
       }
       break;
     default:
@@ -1482,9 +1472,7 @@ fhandler_pty_slave::fixup_after_exec ()
     fixup_after_fork (NULL);
 }
 
-#ifndef __MINGW64_VERSION_MAJOR
 extern "C" BOOL WINAPI GetNamedPipeClientProcessId (HANDLE, PULONG);
-#endif
 
 /* This thread function handles the master control pipe.  It waits for a
    client to connect.  Then it checks if the client process has permissions

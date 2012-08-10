@@ -69,15 +69,6 @@ struct select_mailslot_info: public select_info
 class select_stuff
 {
 public:
-  enum wait_states
-  {
-    select_signalled = -3,
-    select_loop = -2,
-    select_error = -1,
-    select_ok = 0,
-    select_set_zero = 1
-  };
-
   ~select_stuff ();
   bool return_on_signal;
   bool always_ready, windows_used;
@@ -91,15 +82,14 @@ public:
   bool test_and_set (int i, fd_set *readfds, fd_set *writefds,
 		     fd_set *exceptfds);
   int poll (fd_set *readfds, fd_set *writefds, fd_set *exceptfds);
-  wait_states wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds, DWORD ms);
+  int wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds, DWORD ms);
   void cleanup ();
   void destroy ();
-
   select_stuff (): return_on_signal (false), always_ready (false),
   		   windows_used (false), start (0),
-		   device_specific_pipe (NULL),
-		   device_specific_socket (NULL),
-		   device_specific_serial (NULL),
-		   device_specific_mailslot (NULL) {}
+		   device_specific_pipe (0),
+		   device_specific_socket (0),
+		   device_specific_serial (0),
+		   device_specific_mailslot (0) {}
 };
 #endif /* _SELECT_H_ */

@@ -57,7 +57,7 @@ rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva, DWORD &max_size)
 	&& (section[i].VirtualAddress + section[i].Misc.VirtualSize) > import_rva)
     // if (ascii_strncasematch ((char *) section[i].Name, ".idata", IMAGE_SIZEOF_SHORT_NAME))
       {
-	max_size = section[i].SizeOfRawData
+	max_size = section[i].Misc.VirtualSize
 		   - (import_rva - section[i].VirtualAddress);
 	return section[i].VirtualAddress - section[i].PointerToRawData;
       }
@@ -165,8 +165,7 @@ makename (const char *name, char *&buf, int& i, int inc)
 /* Find first missing dll in a given executable.
    FIXME: This is not foolproof since it doesn't look for dlls in the
    same directory as the given executable, like Windows.  Instead it
-   searches for dlls in the context of the current executable.
-   It also only finds direct dependencies, not indirect ones. */
+   searches for dlls in the context of the current executable.  */
 const char *
 find_first_notloaded_dll (path_conv& pc)
 {
@@ -215,8 +214,10 @@ find_first_notloaded_dll (path_conv& pc)
   if (pExeNTHdr)
     {
       DWORD importRVA;
+      DWORD importRVASize;
       DWORD importRVAMaxSize;
       importRVA = pExeNTHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+      importRVASize = pExeNTHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
       if (importRVA)
 	{
 	  long delta = rvadelta (pExeNTHdr, importRVA, importRVAMaxSize);
@@ -225,37 +226,32 @@ find_first_notloaded_dll (path_conv& pc)
 	  importRVA -= delta;
 
 	  DWORD offset = 0;
-	  HMODULE map = NULL;
+	  char *map = NULL;
 	  if (importRVA + importRVAMaxSize > wincap.allocation_granularity ())
 	    {
 	      offset = rounddown (importRVA, wincap.allocation_granularity ());
 	      DWORD size = importRVA - offset + importRVAMaxSize;
-	      map = (HMODULE) MapViewOfFile (hc, FILE_MAP_READ, 0,
-					     offset, size);
+	      map = (char *) MapViewOfFile (hc, FILE_MAP_READ, 0, offset, size);
 	      if (!map)
 		goto out;
 	    }
 
 	  // Convert imports RVA to a usable pointer
 	  PIMAGE_IMPORT_DESCRIPTOR pdfirst;
-	  pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map ?: hm,
-			 importRVA - offset);
+	  pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA - offset);
 
 	  // Iterate through each import descriptor, and redirect if appropriate
 	  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
 	    {
-	      const char *lib = rva (PSTR, map ?: hm,
-				     pd->Name - delta - offset);
+	      const char *lib = rva (PSTR, hm, pd->Name - delta - offset);
 	      if (!LoadLibraryEx (lib, NULL, DONT_RESOLVE_DLL_REFERENCES
 					     | LOAD_LIBRARY_AS_DATAFILE))
 		{
-		  static char buf[MAX_PATH];
-		  strlcpy (buf, lib, MAX_PATH);
-		  res = buf;
+		  static char buf[NT_MAX_PATH];
+		  res = strcpy (buf, lib);
 		}
 	    }
-	  if (map)
-	    UnmapViewOfFile (map);
+	  UnmapViewOfFile (map);
 	}
     }
 

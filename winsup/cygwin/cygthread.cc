@@ -377,7 +377,7 @@ cygthread::detach (HANDLE sigwait)
 	  unsigned n = 2;
 	  DWORD howlong = INFINITE;
 	  w4[0] = sigwait;
-	  set_signal_arrived here (w4[1]);
+	  w4[1] = signal_arrived;
 	  /* For a description of the below loop see the end of this file */
 	  for (int i = 0; i < 2; i++)
 	    switch (res = WaitForMultipleObjects (n, w4, FALSE, howlong))

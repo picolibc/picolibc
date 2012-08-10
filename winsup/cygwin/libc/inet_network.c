@@ -34,7 +34,8 @@ static const char sccsid[] = "@(#)inet_network.c	8.1 (Berkeley) 6/4/93";
 #ifndef __CYGWIN__
 __FBSDID("$FreeBSD$");
 #else
-#include "winsup.h"
+#define __INSIDE_CYGWIN__
+#define  __INSIDE_CYGWIN_NET__
 #endif
 
 #ifndef __CYGWIN__

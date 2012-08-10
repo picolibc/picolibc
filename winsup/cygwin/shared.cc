@@ -377,8 +377,4 @@ memory_init (bool init_cygheap)
 
   shared_info::create ();	/* Initialize global shared memory */
   user_info::create (false);	/* Initialize per-user shared memory */
-  /* Initialize tty list session stuff.  Doesn't really belong here but
-     this needs to be initialized before any tty or console manipulation
-     happens and it is a common location.  */
-  tty_list::init_session ();
 }

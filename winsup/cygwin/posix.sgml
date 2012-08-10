@@ -1115,7 +1115,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     get_phys_pages
     get_nprocs
     get_nprocs_conf
-    getmntent_r
     getopt_long
     getopt_long_only
     getpt
@@ -1127,7 +1126,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     lsetxattr
     memmem
     mempcpy
-    memrchr
     mkostemp
     mkostemps
     pipe2

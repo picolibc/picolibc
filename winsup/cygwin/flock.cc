@@ -164,7 +164,7 @@ allow_others_to_sync ()
      at this point because this gets called during initialization when the tls
      is not really available.  */
 #define MAX_PROCESS_SD_SIZE	3072
-  PISECURITY_DESCRIPTOR sd = (PISECURITY_DESCRIPTOR) alloca (MAX_PROCESS_SD_SIZE);
+  PSECURITY_DESCRIPTOR sd = (PSECURITY_DESCRIPTOR) alloca (MAX_PROCESS_SD_SIZE);
   status = NtQuerySecurityObject (NtCurrentProcess (),
 				  DACL_SECURITY_INFORMATION, sd,
 				  MAX_PROCESS_SD_SIZE, &len);
@@ -1247,7 +1247,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	timeout = 100L;
 
       DWORD WAIT_SIGNAL_ARRIVED = WAIT_OBJECT_0 + wait_count;
-      set_signal_arrived here (w4[wait_count++]);
+      w4[wait_count++] = signal_arrived;
 
       DWORD WAIT_THREAD_CANCELED = WAIT_TIMEOUT + 1;
       HANDLE cancel_event = pthread::get_cancel_event ();

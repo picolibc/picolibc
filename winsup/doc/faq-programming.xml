@@ -62,9 +62,10 @@ would be difficult.
 <question><para>Where is Objective C?</para></question>
 <answer>
 
-<para>Support for compiling Objective C is available in the <literal>gcc4-objc</literal>
-package; resulting binaries will depend on the <literal>libobjc2</literal>
-package at runtime.
+<para>Objective C hasn't been distributed with the Cygwin version of gcc
+for a long time.  For several reason Cygwin was stuck with gcc version 3.4.4.
+Fortunately the latest gcc maintainer is quite busy to create a working
+gcc 4.x release which also comes with an Objective C package.
 </para>
 </answer></qandaentry>
 
@@ -176,7 +177,7 @@ with gdi32 like this:
 <para>The regular setup allows you to use the option -mwindows on the
 command line to include a set of the basic libraries (and also
 make your program a GUI program instead of a console program),
-including user32, gdi32 and comdlg32.
+including user32, gdi32 and, IIRC, comdlg32.
 </para>
 <para>It is a good idea to put import libraries last on your link line,
 or at least after all the object files and static libraries that reference them.
@@ -193,10 +194,11 @@ as well as the User's Guide section
 <question><para>How do I compile a Win32 executable that doesn't use Cygwin?</para></question>
 <answer>
 
-<para>The compilers provided by the <literal>mingw-gcc</literal>,
-<literal>mingw64-i686-gcc</literal>, and <literal>mingw64-x86_64-gcc</literal>
-packages link against standard Microsoft DLLs instead of Cygwin. This is
-desirable for native Windows programs that don't need a UNIX emulation layer.
+<para><emphasis role='bold'>(Please note: This section has not yet been updated for the latest net release.)</emphasis>
+</para>
+<para>The -mno-cygwin flag to gcc makes gcc link against standard Microsoft
+DLLs instead of Cygwin.  This is desirable for native Windows programs
+that don't need a UNIX emulation layer.
 </para>
 <para>This is not to be confused with 'MinGW' (Minimalist GNU for Windows),
 which is a completely separate effort.  That project's home page is
@@ -810,44 +812,20 @@ a Windows environment which Cygwin handles automatically.
 <question><para>How should I port my Unix GUI to Windows?</para></question>
 <answer>
 
-<para>Like other Unix-like platforms, the Cygwin distribtion includes many of
-the common GUI toolkits, including X11, X Athena widgets, Motif, Tk, GTK+,
-and Qt. Many programs which rely on these toolkits will work with little, if
-any, porting work if they are otherwise portable.  However, there are a few
-things to look out for:</para>
-<orderedlist>
-<listitem><para>Some packages written for both Windows and X11 incorrectly
-treat Cygwin as a Windows platform rather than a Unix variant.  Mixing Cygwin's
-Unix APIs with Windows' GDI is best avoided; rather, remove these assumptions
-so that Cygwin is treated like other X11 platforms.</para></listitem>
-<listitem><para>GTK+ programs which use <literal>gtk_builder_connect_signals()</literal>
-or <literal>glade_xml_signal_autoconnect()</literal> need to be able to
-<literal>dlopen()</literal> themselves.  In order for this to work, the program
-must be linked with the <literal>-Wl,--export-all-symbols</literal> linker flag.
-This can be added to LDFLAGS manually, or handled automatically with the
-<literal>-export-dynamic</literal> libtool flag (requires libtool 2.2.8) or
-by adding <literal>gmodule-export-2.0</literal> to the pkg-config modules used
-to build the package.</para></listitem>
-<listitem><para>Programs which include their own loadable modules (plugins)
-often must have its modules linked against the symbols in the program.  The
-most portable solution is for such programs to provide all its symbols (except
-for <literal>main()</literal>) in a shared library, against which the plugins
-can be linked.  Otherwise, the symbols from the executable itself must be
-exported.</para>
-<para>If the package uses the CMake build system, this can be done by adding
-<literal>ENABLE_EXPORTS TRUE</literal> to the executable's <literal>set_target_properties</literal>
-command, then adding the executable's target name to the <literal>target_link_libraries</literal>
-command for the plugins.</para>
-<para>For other build systems, the following steps are required:</para>
-<orderedlist>
-<listitem><para>The executable must be built before its plugins.</para></listitem>
-<listitem><para>Symbols must be exported from the executable with a
-<literal>-Wl,--export-all-symbols,--out-implib,libfoo.exe.a</literal>
-linker flag, where <literal>foo</literal> represents the name of the
-executable.</para></listitem>
-<listitem><para>The plugins must be linked with a <literal>-Wl,/path/to/libfoo.exe.a</literal>
-linker flag.</para></listitem>
-</orderedlist></listitem></orderedlist>
+<para>There are two basic strategies for porting Unix GUIs to Windows.
+</para>
+<para>The first is to use a portable graphics library such as tcl/tk, X11, or
+V (and others?).  Typically, you will end up with a GUI on Windows that
+requires some runtime support.  With tcl/tk, you'll want to include the
+necessary library files and the tcl/tk DLLs.  In the case of X11, you'll
+need everyone using your program to have the X11 server installed.
+</para>
+<para>The second method is to rewrite your GUI using Win32 API calls (or MFC
+with VC++).  If your program is written in a fairly modular fashion, you
+may still want to use Cygwin if your program contains a lot of shared
+(non-GUI-related) code.  That way you still gain some of the portability
+advantages inherent in using Cygwin.
+</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.djgpp">

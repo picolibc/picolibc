@@ -43,10 +43,14 @@ int __sp_ln;
 
 char NO_COPY myself_nowait_dummy[1] = {'0'};// Flag to sig_send that signal goes to
 					//  current process but no wait is required
+HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
+					//  resulted in a user-specified
+					//  function call
 
 #define Static static NO_COPY
 
-Static HANDLE sig_hold;			// Used to stop signal processing
+HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
+
 Static bool sigheld;			// True if holding signals
 
 Static int nprocs;			// Number of deceased children
@@ -441,17 +445,9 @@ proc_terminate ()
       /* Clean out proc processes from the pid list. */
       for (int i = 0; i < nprocs; i++)
 	{
-	  /* If we've execed then the execed process will handle setting ppid
-	     to 1 iff it is a Cygwin process.  */
-	  if (!have_execed || !have_execed_cygwin)
-	    procs[i]->ppid = 1;
+	  procs[i]->ppid = 1;
 	  if (procs[i].wait_thread)
 	    procs[i].wait_thread->terminate_thread ();
-	  /* Release memory associated with this process unless it is 'myself'.
-	     'myself' is only in the procs table when we've execed.  We reach
-	     here when the next process has finished initializing but we still
-	     can't free the memory used by 'myself' since it is used later on
-	     during cygwin tear down.  */
 	  if (procs[i] != myself)
 	    procs[i].release ();
 	}
@@ -514,6 +510,17 @@ sig_dispatch_pending (bool fast)
     sig_send (myself, fast ? __SIGFLUSHFAST : __SIGFLUSH);
 }
 
+void __stdcall
+create_signal_arrived ()
+{
+  if (signal_arrived)
+    return;
+  /* local event signaled when main thread has been dispatched
+     to a signal handler function. */
+  signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
+  ProtectHandle (signal_arrived);
+}
+
 /* Signal thread initialization.  Called from dll_crt0_1.
    This routine starts the signal handling thread.  */
 void __stdcall
@@ -522,8 +529,7 @@ sigproc_init ()
   char char_sa_buf[1024];
   PSECURITY_ATTRIBUTES sa = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
   DWORD err = fhandler_pipe::create (sa, &my_readsig, &my_sendsig,
-				     sizeof (sigpacket), "sigwait",
-				     PIPE_ADD_PID);
+				     sizeof (sigpacket), NULL, 0);
   if (err)
     {
       SetLastError (err);
@@ -567,7 +573,7 @@ sig_send (_pinfo *p, int sig)
     return 0;
   else if (sig == __SIGNOHOLD || sig == __SIGEXIT)
     {
-      SetEvent (sig_hold);
+      SetEvent (sigCONT);
       sigheld = false;
     }
   else if (&_my_tls == _main_tls)
@@ -1218,7 +1224,7 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
   int might_match;
   waitq *w = parent_w->next;
 
-  sigproc_printf ("considering pid %d, pgid %d, w->pid %d", child->pid, child->pgid, w->pid);
+  sigproc_printf ("considering pid %d", child->pid);
   if (w->pid == -1)
     might_match = 1;
   else if (w->pid == 0)
@@ -1344,7 +1350,7 @@ static void WINAPI
 wait_sig (VOID *)
 {
   _sig_tls = &_my_tls;
-  sig_hold = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+  sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 
   sigproc_printf ("entering ReadFile loop, my_readsig %p, my_sendsig %p",
 		  my_readsig, my_sendsig);
@@ -1354,7 +1360,7 @@ wait_sig (VOID *)
   for (;;)
     {
       if (pack.si.si_signo == __SIGHOLD)
-	WaitForSingleObject (sig_hold, INFINITE);
+	WaitForSingleObject (sigCONT, INFINITE);
       DWORD nb;
       pack.tls = NULL;
       if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))

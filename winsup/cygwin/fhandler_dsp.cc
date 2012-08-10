@@ -21,7 +21,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
-#include "cygwait.h"
 
 /*------------------------------------------------------------------------
   Simple encapsulation of the win32 audio device.
@@ -545,14 +544,14 @@ fhandler_dev_dsp::Audio_out::waitforspace ()
       debug_printf ("100ms");
       switch (cygwait (100))
 	{
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0:
 	  if (!_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);
 	      return false;
 	    }
 	  break;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 1:
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
 	default:
@@ -923,14 +922,14 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
       debug_printf ("100ms");
       switch (cygwait (100))
 	{
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0:
 	  if (!_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);
 	      return false;
 	    }
 	  break;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 1:
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
 	default:

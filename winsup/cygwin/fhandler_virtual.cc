@@ -77,6 +77,7 @@ fhandler_virtual::opendir (int fd)
       if (fd >= 0)
 	{
 	  dir->__d_fd = fd;
+	  res = dir;
 	  dir->__fh = this;
 	  res = dir;
 	}

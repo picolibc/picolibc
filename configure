@@ -2869,7 +2869,7 @@ case "${ENABLE_GOLD}" in
       *-*-elf* | *-*-sysv4* | *-*-unixware* | *-*-eabi* | hppa*64*-*-hpux* \
       | *-*-linux* | frv-*-uclinux* | *-*-irix5* | *-*-irix6* \
       | *-*-netbsd* | *-*-openbsd* | *-*-freebsd* | *-*-dragonfly* \
-      | *-*-solaris2* | *-*-nto* | *-*-nacl*)
+      | *-*-solaris2* | *-*-nto*)
         case "${target}" in
           *-*-linux*aout* | *-*-linux*oldld*)
             ;;
@@ -3093,9 +3093,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs target-libssp"
     ;;
   rl78-*-*)
-    # libssp uses a misaligned load to trigger a fault, but the RL78
-    # doesn't fault for those - instead, it gives a build-time error
-    # for explicit misaligned loads.
+    # Dereferencing -1 is a compile-time error
     noconfigdirs="$noconfigdirs target-libssp"
     ;;
 esac
@@ -3498,7 +3496,8 @@ case "${target}" in
     noconfigdirs="$noconfigdirs libgui itcl ld"
     ;;
   ia64*-*-*vms*)
-    noconfigdirs="$noconfigdirs libgui itcl"
+    # No ld support yet.
+    noconfigdirs="$noconfigdirs libgui itcl ld"
     ;;
   i[3456789]86-w64-mingw*)
     ;;
@@ -5189,16 +5188,9 @@ if test "x$with_mpfr_lib" != x; then
   gmplibs="-L$with_mpfr_lib $gmplibs"
 fi
 if test "x$with_mpfr$with_mpfr_include$with_mpfr_lib" = x && test -d ${srcdir}/mpfr; then
-  # MPFR v3.1.0 moved the sources into a src sub-directory.
-  if test -d ${srcdir}/mpfr/src; then
-    gmplibs='-L$$r/$(HOST_SUBDIR)/mpfr/src/'"$lt_cv_objdir $gmplibs"
-    gmpinc='-I$$r/$(HOST_SUBDIR)/mpfr/src -I$$s/mpfr/src '"$gmpinc"
-    extra_mpc_mpfr_configure_flags='--with-mpfr-include=$$s/mpfr/src --with-mpfr-lib=$$r/$(HOST_SUBDIR)/mpfr/src/'"$lt_cv_objdir"
-  else
-    gmplibs='-L$$r/$(HOST_SUBDIR)/mpfr/'"$lt_cv_objdir $gmplibs"
-    gmpinc='-I$$r/$(HOST_SUBDIR)/mpfr -I$$s/mpfr '"$gmpinc"
-    extra_mpc_mpfr_configure_flags='--with-mpfr-include=$$s/mpfr --with-mpfr-lib=$$r/$(HOST_SUBDIR)/mpfr/'"$lt_cv_objdir"
-  fi
+  gmplibs='-L$$r/$(HOST_SUBDIR)/mpfr/'"$lt_cv_objdir $gmplibs"
+  gmpinc='-I$$r/$(HOST_SUBDIR)/mpfr -I$$s/mpfr '"$gmpinc"
+  extra_mpc_mpfr_configure_flags='--with-mpfr-include=$$s/mpfr --with-mpfr-lib=$$r/$(HOST_SUBDIR)/mpfr/'"$lt_cv_objdir"
   # Do not test the mpfr version.  Assume that it is sufficient, since
   # it is in the source tree, and the library has not been built yet
   # but it would be included on the link line in the version check below
@@ -6667,11 +6659,11 @@ if test "x$CFLAGS_FOR_TARGET" = x; then
   CFLAGS_FOR_TARGET=$CFLAGS
   case " $CFLAGS " in
     *" -O2 "*) ;;
-    *) CFLAGS_FOR_TARGET="-O2 $CFLAGS_FOR_TARGET" ;;
+    *) CFLAGS_FOR_TARGET="-O2 $CFLAGS" ;;
   esac
   case " $CFLAGS " in
     *" -g "* | *" -g3 "*) ;;
-    *) CFLAGS_FOR_TARGET="-g $CFLAGS_FOR_TARGET" ;;
+    *) CFLAGS_FOR_TARGET="-g $CFLAGS" ;;
   esac
 fi
 
@@ -6680,11 +6672,11 @@ if test "x$CXXFLAGS_FOR_TARGET" = x; then
   CXXFLAGS_FOR_TARGET=$CXXFLAGS
   case " $CXXFLAGS " in
     *" -O2 "*) ;;
-    *) CXXFLAGS_FOR_TARGET="-O2 $CXXFLAGS_FOR_TARGET" ;;
+    *) CXXFLAGS_FOR_TARGET="-O2 $CXXFLAGS" ;;
   esac
   case " $CXXFLAGS " in
     *" -g "* | *" -g3 "*) ;;
-    *) CXXFLAGS_FOR_TARGET="-g $CXXFLAGS_FOR_TARGET" ;;
+    *) CXXFLAGS_FOR_TARGET="-g $CXXFLAGS" ;;
   esac
 fi
 

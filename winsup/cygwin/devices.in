@@ -5,10 +5,7 @@
 #include "tty.h"
 #include "pinfo.h"
 #include "shared_info.h"
-#include "path.h"
-#include "fhandler.h"
 #include "ntdll.h"
-
 typedef const device *KR_device_t;
 }
 %type KR_device_t
@@ -66,16 +63,18 @@ exists_ntdev_silent (const device& dev)
 static int
 exists_console (const device& dev)
 {
+  if (!iscons_dev (myself->ctty))
+    return false;
   int devn = *const_cast<device *> (&dev);
   switch (devn)
     {
     case FH_CONSOLE:
     case FH_CONIN:
     case FH_CONOUT:
-      return fhandler_console::exists ();
+      return true;
     default:
       /* Only show my own console device (for now?) */
-      return iscons_dev (myself->ctty) && myself->ctty == devn;
+      return myself->ctty == devn;
     }
 }
 
@@ -157,7 +156,7 @@ const device dev_error_storage =
 "/dev/random", BRACK(FH_RANDOM), "/dev/random", exists, S_IFCHR
 "/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", exists, S_IFCHR, =urandom_dev
 "/dev/mem", BRACK(FH_MEM), "/dev/mem", exists, S_IFCHR
-"/dev/kmem", BRACK(FH_KMEM), "/dev/kmem", exists, S_IFCHR
+"/dev/kmem", BRACK(FH_KMEM), "/dev/mem", exists, S_IFCHR
 "/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard", exists, S_IFCHR
 "/dev/port", BRACK(FH_PORT), "/dev/port", exists, S_IFCHR
 "/dev/com%(1-16)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1 - 1})), "\\??\\COM{$1}", exists_ntdev_silent, S_IFCHR

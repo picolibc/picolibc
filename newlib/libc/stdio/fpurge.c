@@ -68,13 +68,13 @@ _DEFUN(_fpurge_r, (ptr, fp),
 
   CHECK_INIT (ptr, fp);
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
 
   t = fp->_flags;
   if (!t)
     {
       ptr->_errno = EBADF;
-      _newlib_flockfile_exit (fp);
+      _funlockfile (fp);
       return EOF;
     }
   fp->_p = fp->_bf._base;
@@ -86,7 +86,7 @@ _DEFUN(_fpurge_r, (ptr, fp),
     }
   else
     fp->_w = t & (__SLBF | __SNBF) ? 0 : fp->_bf._size;
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return 0;
 }
 

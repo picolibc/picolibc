@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: src/sys/sys/elf64.h,v 1.10 2002/05/30 08:32:18 dfr Exp $
  */
 
 #ifndef _SYS_ELF64_H_
@@ -37,12 +37,14 @@
 
 typedef uint64_t	Elf64_Addr;
 typedef uint16_t	Elf64_Half;
-typedef uint64_t	Elf64_Off;
-typedef int32_t		Elf64_Sword;
-typedef int64_t		Elf64_Sxword;
 typedef uint32_t	Elf64_Word;
-typedef uint64_t	Elf64_Lword;
+typedef int32_t		Elf64_Sword;
 typedef uint64_t	Elf64_Xword;
+typedef int64_t		Elf64_Sxword;
+typedef uint64_t	Elf64_Off;
+typedef uint16_t	Elf64_Section;
+typedef Elf64_Half	Elf64_Versym;
+typedef uint16_t	Elf64_Quarter;
 
 /*
  * Types of dynamic symbol hash table bucket and chain elements.
@@ -51,11 +53,11 @@ typedef uint64_t	Elf64_Xword;
  * typedef is required.
  */
 
-typedef Elf64_Word	Elf64_Hashelt;
-
-/* Non-standard class-dependent datatype used for abstraction. */
-typedef Elf64_Xword	Elf64_Size;
-typedef Elf64_Sxword	Elf64_Ssize;
+#ifdef __alpha__
+typedef Elf64_Off	Elf64_Hashelt;
+#else
+typedef Elf64_Half	Elf64_Hashelt;
+#endif
 
 /*
  * ELF header.
@@ -141,47 +143,11 @@ typedef struct {
 } Elf64_Rela;
 
 /* Macros for accessing the fields of r_info. */
-#define	ELF64_R_SYM(info)	((info) >> 32)
-#define	ELF64_R_TYPE(info)	((info) & 0xffffffffL)
+#define ELF64_R_SYM(info)	((info) >> 32)
+#define ELF64_R_TYPE(info)	((unsigned char)(info))
 
 /* Macro for constructing r_info from field values. */
-#define	ELF64_R_INFO(sym, type)	(((sym) << 32) + ((type) & 0xffffffffL))
-
-#define	ELF64_R_TYPE_DATA(info)	(((Elf64_Xword)(info)<<32)>>40)
-#define	ELF64_R_TYPE_ID(info)	(((Elf64_Xword)(info)<<56)>>56)
-#define	ELF64_R_TYPE_INFO(data, type)	\
-				(((Elf64_Xword)(data)<<8)+(Elf64_Xword)(type))
-
-/*
- *	Note entry header
- */
-typedef Elf_Note Elf64_Nhdr;
-
-/*
- *	Move entry
- */
-typedef struct {
-	Elf64_Lword	m_value;	/* symbol value */
-	Elf64_Xword 	m_info;		/* size + index */
-	Elf64_Xword	m_poffset;	/* symbol offset */
-	Elf64_Half	m_repeat;	/* repeat count */
-	Elf64_Half	m_stride;	/* stride info */
-} Elf64_Move;
-
-#define	ELF64_M_SYM(info)	((info)>>8)
-#define	ELF64_M_SIZE(info)	((unsigned char)(info))
-#define	ELF64_M_INFO(sym, size)	(((sym)<<8)+(unsigned char)(size))
-
-/*
- *	Hardware/Software capabilities entry
- */
-typedef struct {
-	Elf64_Xword	c_tag;		/* how to interpret value */
-	union {
-		Elf64_Xword	c_val;
-		Elf64_Addr	c_ptr;
-	} c_un;
-} Elf64_Cap;
+#define ELF64_R_INFO(sym, type)	(((sym) << 32) + (unsigned char)(type))
 
 /*
  * Symbol table entries.
@@ -191,58 +157,16 @@ typedef struct {
 	Elf64_Word	st_name;	/* String table index of name. */
 	unsigned char	st_info;	/* Type and binding information. */
 	unsigned char	st_other;	/* Reserved (not used). */
-	Elf64_Half	st_shndx;	/* Section index of symbol. */
+	Elf64_Section	st_shndx;	/* Section index of symbol. */
 	Elf64_Addr	st_value;	/* Symbol value. */
 	Elf64_Xword	st_size;	/* Size of associated object. */
 } Elf64_Sym;
 
 /* Macros for accessing the fields of st_info. */
-#define	ELF64_ST_BIND(info)		((info) >> 4)
-#define	ELF64_ST_TYPE(info)		((info) & 0xf)
+#define ELF64_ST_BIND(info)		((info) >> 4)
+#define ELF64_ST_TYPE(info)		((info) & 0xf)
 
 /* Macro for constructing st_info from field values. */
-#define	ELF64_ST_INFO(bind, type)	(((bind) << 4) + ((type) & 0xf))
-
-/* Macro for accessing the fields of st_other. */
-#define	ELF64_ST_VISIBILITY(oth)	((oth) & 0x3)
-
-/* Structures used by Sun & GNU-style symbol versioning. */
-typedef struct {
-	Elf64_Half	vd_version;
-	Elf64_Half	vd_flags;
-	Elf64_Half	vd_ndx;
-	Elf64_Half	vd_cnt;
-	Elf64_Word	vd_hash;
-	Elf64_Word	vd_aux;
-	Elf64_Word	vd_next;
-} Elf64_Verdef;
-
-typedef struct {
-	Elf64_Word	vda_name;
-	Elf64_Word	vda_next;
-} Elf64_Verdaux;
-
-typedef struct {
-	Elf64_Half	vn_version;
-	Elf64_Half	vn_cnt;
-	Elf64_Word	vn_file;
-	Elf64_Word	vn_aux;
-	Elf64_Word	vn_next;
-} Elf64_Verneed;
-
-typedef struct {
-	Elf64_Word	vna_hash;
-	Elf64_Half	vna_flags;
-	Elf64_Half	vna_other;
-	Elf64_Word	vna_name;
-	Elf64_Word	vna_next;
-} Elf64_Vernaux;
-
-typedef Elf64_Half Elf64_Versym;
-
-typedef struct {
-	Elf64_Half	si_boundto;	/* direct bindings - symbol bound to */
-	Elf64_Half	si_flags;	/* per symbol flags */
-} Elf64_Syminfo;
+#define ELF64_ST_INFO(bind, type)	(((bind) << 4) + ((type) & 0xf))
 
 #endif /* !_SYS_ELF64_H_ */

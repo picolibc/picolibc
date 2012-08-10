@@ -75,15 +75,8 @@ typedef PEXCEPTION_REGISTRATION PEXCEPTION_REGISTRATION_RECORD;
  * onto the stack, then put a pointer to the new registration
  * structure (i.e. the current stack pointer) at fs:0.
  */
-#ifdef _WIN64
-# define __try1(pHandler) \
-	__asm__ __volatile__ ("pushq %0;pushq %%gs:0;movq %%rsp,%%gs:0;" : : \
-	"g" (pHandler));
-#else
-# define __try1(pHandler) \
-	__asm__ __volatile__ ("pushl %0;pushl %%fs:0;movl %%esp,%%fs:0;" : : \
-	"g" (pHandler));
-#endif
+#define __try1(pHandler) \
+	__asm__ ("pushl %0;pushl %%fs:0;movl %%esp,%%fs:0;" : : "g" (pHandler));
 
 /*
  * A macro which (despite its name) *removes* an installed
@@ -96,15 +89,9 @@ typedef PEXCEPTION_REGISTRATION PEXCEPTION_REGISTRATION_RECORD;
  * the stack must be in the exact state at this point that it was
  * after we did __try1 or this will smash things.
  */
-#ifdef _WIN64
-# define	__except1	\
-	__asm__ __volatile__ ("movq (%%rsp),%%rax;movq %%rax,%%gs:0;addq \
-	$16,%%rsp;" : : : "%rax");
-#else
-# define __except1	\
-	__asm__ __volatile__ ("movl (%%esp),%%eax;movl %%eax,%%fs:0;addl \
-	$8,%%esp;" : : : "%eax");
-#endif
+#define	__except1	\
+	__asm__ ("movl (%%esp),%%eax;movl %%eax,%%fs:0;addl $8,%%esp;" \
+	 : : : "%eax");
 
 #ifdef	__cplusplus
 }

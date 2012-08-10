@@ -148,12 +148,10 @@ Supporting OS subroutines required:
 #endif
 
 #ifdef STRING_ONLY
-#undef _newlib_flockfile_start
-#undef _newlib_flockfile_exit
-#undef _newlib_flockfile_end
-#define _newlib_flockfile_start(x) {}
-#define _newlib_flockfile_exit(x) {}
-#define _newlib_flockfile_end(x) {}
+#undef _flockfile
+#undef _funlockfile
+#define _flockfile(x) {}
+#define _funlockfile(x) {}
 #define _ungetc_r _sungetc_r
 #define __srefill_r __ssrefill_r
 #define _fread_r _sfread_r
@@ -243,7 +241,10 @@ static void * get_arg (int, va_list *, int *, void **);
 #define	CT_INT		3	/* integer, i.e., strtol or strtoul */
 #define	CT_FLOAT	4	/* floating, i.e., strtod */
 
+#if 0
 #define u_char unsigned char
+#endif
+#define u_char char
 #define u_long unsigned long
 
 #ifndef _NO_LONGLONG
@@ -495,7 +496,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 # define GET_ARG(n, ap, type) (va_arg (ap, type))
 #endif
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
 
   ORIENT (fp, -1);
 
@@ -510,8 +511,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #ifndef _MB_CAPABLE
       wc = *fmt;
 #else
-      nbytes = __mbtowc (rptr, &wc, (char *) fmt, MB_CUR_MAX,
-			 __locale_charset (), &state);
+      nbytes = __mbtowc (rptr, &wc, fmt, MB_CUR_MAX, __locale_charset (),
+			 &state);
       if (nbytes < 0) {
 	wc = 0xFFFD; /* Unicode replacement character */
 	nbytes = 1;
@@ -794,7 +795,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	   * Disgusting backwards compatibility hacks.	XXX
 	   */
 	case '\0':		/* compat */
-	  _newlib_flockfile_exit (fp);
+	  _funlockfile (fp);
 	  return EOF;
 
 	default:		/* compat */
@@ -1594,12 +1595,12 @@ input_failure:
      should have been set prior to here.  On EOF failure (including
      invalid format string), return EOF if no matches yet, else number
      of matches made prior to failure.  */
-  _newlib_flockfile_exit (fp);
+  _funlockfile (fp);
   return nassigned && !(fp->_flags & __SERR) ? nassigned : EOF;
 match_failure:
 all_done:
   /* Return number of matches, which can be 0 on match failure.  */
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return nassigned;
 }
 

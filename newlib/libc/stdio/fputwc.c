@@ -160,10 +160,10 @@ _DEFUN(_fputwc_r, (ptr, wc, fp),
 {
   wint_t r;
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   ORIENT(fp, 1);
   r = __fputwc(ptr, wc, fp);
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return r;
 }
 
