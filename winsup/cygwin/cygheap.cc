@@ -47,23 +47,6 @@ struct cygheap_entry
   char data[0];
 };
 
-class tls_sentry
-{
-public:
-  static muto lock;
-  int destroy;
-  void init ();
-  bool acquired () {return lock.acquired ();}
-  tls_sentry () {destroy = 0;}
-  tls_sentry (DWORD wait) {destroy = lock.acquire (wait);}
-  ~tls_sentry () {if (destroy) lock.release ();}
-};
-
-muto NO_COPY tls_sentry::lock;
-static NO_COPY size_t nthreads;
-
-#define THREADLIST_CHUNK 256
-
 #define NBUCKETS (sizeof (cygheap->buckets) / sizeof (cygheap->buckets[0]))
 #define N0 ((_cmalloc_entry *) NULL)
 #define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (unsigned) (N0->data)))
@@ -187,28 +170,18 @@ init_cygheap::init_installation_root ()
 	       "GetModuleFileNameW(%p, %p, %u), %E",
 	       cygwin_hmodule, installation_root, PATH_MAX);
   PWCHAR p = installation_root;
-  if (wcsncasecmp (p, L"\\\\", 2))	/* Normal drive letter path */
+  if (wcsncmp (p, L"\\\\?\\", 4))	/* No long path prefix. */
     {
-      p = wcpcpy (p, L"\\??\\");
-      GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
-    }
-  else
-    {
-      bool unc = false;
-      if (wcsncmp (p + 2, L"?\\", 2))	/* No long path prefix, so UNC path. */
+      if (!wcsncasecmp (p, L"\\\\", 2))	/* UNC */
 	{
 	  p = wcpcpy (p, L"\\??\\UN");
 	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 6);
 	  *p = L'C';
-	  unc = true;
 	}
-      else if (!wcsncmp (p + 4, L"UNC\\", 4)) /* Native NT UNC path. */
-	unc = true;
-      if (unc)
+      else
 	{
-	  p = wcschr (p + 2, L'\\');    /* Skip server name */
-	  if (p)
-	    p = wcschr (p + 1, L'\\');  /* Skip share name */
+	  p = wcpcpy (p, L"\\??\\");
+	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
 	}
     }
   installation_root[1] = L'?';
@@ -227,13 +200,7 @@ init_cygheap::init_installation_root ()
   if (!w)
     api_fatal ("Can't initialize Cygwin installation root dir.\n"
 	       "Invalid DLL path");
-  /* If w < p, the Cygwin DLL resides in the root dir of a drive or network
-     path.  In that case, if we strip off yet another backslash, the path
-     becomes invalid.  We avoid that here so that the DLL also works in this
-     scenario.  The /usr/bin and /usr/lib default mounts will probably point
-     to something non-existing, but that's life. */
-  if (w > p)
-    *w = L'\0';
+  *w = L'\0';
 
   for (int i = 1; i >= 0; --i)
     {
@@ -273,7 +240,6 @@ cygheap_init ()
     cygheap->fdtab.init ();
   if (!cygheap->sigs)
     sigalloc ();
-  cygheap->init_tls_list ();
 }
 
 /* Copyright (C) 1997, 2000 DJ Delorie */
@@ -562,85 +528,4 @@ cygheap_user::set_name (const char *new_name)
   cfree_and_set (plogsrv);
   cfree_and_set (pdomain);
   cfree_and_set (pwinname);
-}
-
-void
-init_cygheap::init_tls_list ()
-{
-  if (threadlist)
-    memset (cygheap->threadlist, 0, cygheap->sthreads * sizeof (cygheap->threadlist[0]));
-  else
-    {
-      sthreads = THREADLIST_CHUNK;
-      threadlist = (_cygtls **) ccalloc_abort (HEAP_TLS, cygheap->sthreads,
-					       sizeof (cygheap->threadlist[0]));
-    }
-  tls_sentry::lock.init ("thread_tls_sentry");
-}
-
-void
-init_cygheap::add_tls (_cygtls *t)
-{
-  cygheap->user.reimpersonate ();
-  tls_sentry here (INFINITE);
-  if (nthreads >= cygheap->sthreads)
-    {
-      threadlist = (_cygtls **)
-	crealloc_abort (threadlist, (sthreads += THREADLIST_CHUNK)
-			* sizeof (threadlist[0]));
-      // memset (threadlist + nthreads, 0, THREADLIST_CHUNK * sizeof (threadlist[0]));
-    }
-
-  threadlist[nthreads++] = t;
-}
-
-void
-init_cygheap::remove_tls (_cygtls *t, DWORD wait)
-{
-  tls_sentry here (wait);
-  if (here.acquired ())
-    {
-      for (size_t i = 0; i < nthreads; i++)
-	if (t == threadlist[i])
-	  {
-	    if (i < --nthreads)
-	      threadlist[i] = threadlist[nthreads];
-	    debug_only_printf ("removed %p element %d", this, i);
-	    break;
-	  }
-    }
-}
-
-_cygtls *
-init_cygheap::find_tls (int sig)
-{
-  debug_printf ("sig %d\n", sig);
-  tls_sentry here (INFINITE);
-
-  static int NO_COPY threadlist_ix;
-
-  _cygtls *t = _main_tls;
-
-  myfault efault;
-  if (efault.faulted ())
-    threadlist[threadlist_ix]->remove (INFINITE);
-  else
-    {
-      threadlist_ix = -1;
-      while (++threadlist_ix < (int) nthreads)
-	if (sigismember (&(threadlist[threadlist_ix]->sigwait_mask), sig))
-	  {
-	    t = cygheap->threadlist[threadlist_ix];
-	    goto out;
-	  }
-      threadlist_ix = -1;
-      while (++threadlist_ix < (int) nthreads)
-	if (!sigismember (&(threadlist[threadlist_ix]->sigmask), sig))
-	  {
-	    t = cygheap->threadlist[threadlist_ix];
-	    break;
-	  }
-    }
-out:
-  return t;
 }

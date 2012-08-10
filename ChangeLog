@@ -1,36 +1,3 @@
-2012-06-28  Christophe Lyon <christophe.lyon@st.com>
-
-	* configure.ac (CFLAGS_FOR_TARGET, CXXFLAGS_FOR_TARGET): Make sure
-	they contain -O2.
-	* configure: Regenerate.
-
-2012-05-14  Catherine Moore  <clm@codesourcery.com>
-
-	* NEWS:  Mention PowerPC VLE port.
-
-2012-05-11  Mike Frysinger  <vapier@gentoo.org>
-
-	* MAINTAINERS (config/): Move to intl/ section.
-	(compile; depcomp; install-sh; missing; ylwrap): Likewise.
-
-2012-05-09  Nick Clifton  <nickc@redhat.com>
-	    Paul Smith  <psmith@gnu.org>
-
-	PR bootstrap/50461
-	* configure.ac (mpfr-dir): When using in-tree MPFR sources
-	allow for the fact that from release v3.1.0 of MPFR the source
-	files were moved into a src sub-directory.
-	* configure: Regenerate.
-
-2012-05-02  Roland McGrath  <mcgrathr@google.com>
-
-	* configure.ac (ENABLE_GOLD): Consider *-*-nacl* targets ELF.
-	* configure: Regenerate.
-
-2012-04-25  Joel Brobecker  <brobecker@adacore.com>
-
-	* config.sub: Update to 2012-04-18 version from official repo.
-
 2012-03-19  Tristan Gingold  <gingold@adacore.com>
 
 	* configure.ac (ia64*-*-*vms*): Add support for ld.
@@ -126,7 +93,7 @@
 	2011-09-09  Linas Vepstas  <linasvepstas@gmail.com>
 	    Ben Elliston  <bje@gnu.org>
 
-	* config.sub (hexagon, hexagon-*): New.
+        * config.sub (hexagon, hexagon-*): New.
 
 	2011-08-23  Roland McGrath  <mcgrathr@google.com>
 
@@ -615,11 +582,11 @@
 
 	* config.guess: Update to version 2011-02-02
 	* config.sub: Update to version 2011-02-24
-
+	
 2011-03-03  Sebastian Pop  <sebastian.pop@amd.com>
 
-	* configure.ac: Adjust test of with_ppl.
-	* configure: Regenerated.
+        * configure.ac: Adjust test of with_ppl.
+        * configure: Regenerated.
 
 2011-03-02  Sebastian Pop  <sebastian.pop@amd.com>
 
@@ -1226,11 +1193,11 @@
 	* lt~obsolete.m4: Likewise.
 
 2010-01-07  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
-	    Francois-Xavier Coudert  <fxcoudert@gcc.gnu.org>
+            Francois-Xavier Coudert  <fxcoudert@gcc.gnu.org>
 
 	PR bootstrap/42424
 	* configure.ac: Include libtool m4 files.
-	(_LT_CHECK_OBJDIR): Call it.
+        (_LT_CHECK_OBJDIR): Call it.
 	(extra_mpc_mpfr_configure_flags, extra_mpc_gmp_configure_flags,
 	gmplibs, ppllibs, clooglibs): Use $lt_cv_objdir.
 
@@ -1643,8 +1610,8 @@
 2009-06-03  Jerome Guitton  <guitton@adacore.com>
 	    Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
-	* Makefile.tpl (all): Avoid a trailing backslash.
-	* Makefile.in: Regenerate.
+        * Makefile.tpl (all): Avoid a trailing backslash.
+        * Makefile.in: Regenerate.
 
 2009-06-03  Ben Elliston  <bje@au.ibm.com>
 
@@ -3807,7 +3774,7 @@
 	non-ported target libraries in noconfigdirs.
 	<cris-*, crisv32-*> Ditto, except for non-aout, non-elf,
 	non-linux-gnu.  Remove libgcj_ex_libffi.
-	<lang_frag loop>: Set add_this_lang=no if the language is in
+ 	<lang_frag loop>: Set add_this_lang=no if the language is in
 	unsupported_languages.
 	* configure: Regenerate.
 
@@ -5128,8 +5095,8 @@
 
 2003-12-21  Bernardo Innocenti  <bernie@develer.com>
 
-	* configure.in (*-*-uclinux): Exclude newlib, libgloss and rda.
-	* configure: Regenerated.
+ 	* configure.in (*-*-uclinux): Exclude newlib, libgloss and rda.
+ 	* configure: Regenerated.
 
 2003-12-19  Nathanael Nerode  <neroden@gcc.gnu.org>
 
@@ -13218,8 +13185,8 @@ Mon May 10 05:58:35 1993  Ken Raeburn  (raeburn@kr-pc.cygnus.com)
 
 Sun May  9 17:47:57 1993  Rob Savoye  (rob at darkstar.cygnus.com)
 
-	* Makefile.in: Use srcroot to find runtest rather than rootme.
-	Pass RUNTESTFLAGS and EXPECT down in BASE_FLAGS_TO_PASS.
+       * Makefile.in: Use srcroot to find runtest rather than rootme.
+       Pass RUNTESTFLAGS and EXPECT down in BASE_FLAGS_TO_PASS.
 
 Fri May  7 14:55:59 1993  Ian Lance Taylor  (ian@cygnus.com)
 

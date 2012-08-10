@@ -162,23 +162,62 @@ __sigbe:						# return here after cygwin syscall
 
 	.global	_sigdelayed
 _sigdelayed:
-	pushl   %ebp
-	movl    %esp,%ebp
+	pushl	%ebp
+	movl	%esp,%ebp
 	pushf
-	pushl   %esi
-	pushl   %edi
-	pushl   %edx
-	pushl   %ecx
-	pushl   %ebx
-	pushl   %eax
-	movl	%fs:4,%ebx				# get tls
-	pushl   $tls::saved_errno(%ebx) # saved errno
+	pushl	%esi
+	pushl	%edi
+	pushl	%edx
+	pushl	%ecx
+	pushl	%ebx
+	pushl	%eax
+	movl	%fs:4,%ebx
+1:	movl	\$1,%eax
+	xchgl	%eax,$tls::stacklock(%ebx)
+	movl	%eax,$tls::spinning(%ebx) # flag if we are waiting for lock
+					  # If %eax is 1 then someone else has
+					  # the lock but we want to flag that
+					  # we're waiting for it.  If %eax is 0
+					  # then we're not spinning and 0 will
+					  # reflect that.
+	testl	%eax,%eax
+	jz	2f
+	call	_yield
+	jmp	1b
+2:	incl	$tls::incyg(%ebx)
+	movl	$tls::sig(%ebx),%eax
+	testl	%eax,%eax
+	jz	leave			# call_signal_handler may have beat us
+					# to it
+	pushl	$tls::saved_errno(%ebx)	# saved errno
+	call	_set_process_mask_delta
+	pushl	%eax
 
-	movl	\$$tls::start_offset,%eax		# point to beginning
-	addl	%ebx,%eax				#  of tls block
-	call	__ZN7_cygtls19call_signal_handlerEv	# call handler
+	# fill out handler arguments
+	xorl	%eax,%eax		# ucontext_t (currently not set)
+	pushl	%eax
+	leal	$tls::infodata(%ebx),%eax
+	pushl	%eax			# siginfo
+	pushl	$tls::sig(%ebx)		# signal number
 
-	movl	%fs:4,%ebx				# reget tls
+	pushl	\$_sigreturn		# where to return
+	pushl	$tls::func(%ebx)	# user-supplied signal func
+	cmpl	\$0,$tls::threadkill(%ebx)#pthread_kill signal?
+	jnz	4f			# yes.  callee clears signal number
+	movl	\$0,$tls::sig(%ebx)	# zero the signal number as a
+					# flag to the signal handler thread
+					# that it is ok to set up sigsave
+4:	decl	$tls::incyg(%ebx)
+	decl	$tls::stacklock(%ebx)
+	ret				# return via signal handler
+
+	.global	_sigreturn
+_sigreturn:
+	movl	%fs:4,%ebx
+	incl	$tls::incyg(%ebx)
+	addl	\$12,%esp				# remove arguments
+	call	_set_process_mask\@4
+
 1:	movl	\$1,%eax				# potential lock value
 	xchgl	%eax,$tls::stacklock(%ebx)		# see if we can grab it
 	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
@@ -255,7 +294,7 @@ stabilize_sig_stack:
 	cmpl	\$0,$tls::sig(%ebx)
 	jz	3f
 	decl	$tls::stacklock(%ebx)			# unlock
-	movl	\$$tls::start_offset,%eax		# point to beginning
+	movl	\$-$tls::sizeof__cygtls,%eax		# point to beginning
 	addl	%ebx,%eax				#  of tls block
 	call	__ZN7_cygtls19call_signal_handlerEv
 	jmp	1b

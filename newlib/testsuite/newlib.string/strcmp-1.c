@@ -31,9 +31,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-/* The macro LONG_TEST controls whether a short or a more comprehensive test
-   of strcmp should be performed.  */
-#ifdef LONG_TEST
 #ifndef BUFF_SIZE
 #define BUFF_SIZE 1024
 #endif
@@ -57,35 +54,11 @@
 #ifndef MAX_ZEROS
 #define MAX_ZEROS 8
 #endif
-#else /* not defined LONG_TEST */
-#ifndef BUFF_SIZE
-#define BUFF_SIZE 1024
-#endif
-
-#ifndef MAX_BLOCK_SIZE
-#define MAX_BLOCK_SIZE 64
-#endif
-
-#ifndef MAX_OFFSET
-#define MAX_OFFSET 3
-#endif
-
-#ifndef MAX_DIFF
-#define MAX_DIFF 4
-#endif
-
-#ifndef MAX_LEN
-#define MAX_LEN 4
-#endif
-
-#ifndef MAX_ZEROS
-#define MAX_ZEROS 4
-#endif
-#endif /* not defined LONG_TEST */
 
 #if (MAX_OFFSET >= 26)
 #error "MAX_OFFSET >= 26"
 #endif
+
 #if (MAX_OFFSET + MAX_BLOCK_SIZE + MAX_DIFF + MAX_LEN + MAX_ZEROS >= BUFF_SIZE)
 #error "Buffer overrun: MAX_OFFSET + MAX_BLOCK_SIZE + MAX_DIFF + MAX_LEN + MAX_ZEROS >= BUFF_SIZE."
 #endif

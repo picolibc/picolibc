@@ -23,7 +23,22 @@ details. */
 #define _WIN32_WINNT 0x0500
 #endif
 
-#include "winlean.h"
+#define WIN32_LEAN_AND_MEAN 1
+#define _WINGDI_H
+#define _WINUSER_H
+#define _WINNLS_H
+#define _WINVER_H
+#define _WINNETWK_H
+#define _WINSVC_H
+#include <windows.h>
+#include <wincrypt.h>
+#include <lmcons.h>
+#undef _WINGDI_H
+#undef _WINUSER_H
+#undef _WINNLS_H
+#undef _WINVER_H
+#undef _WINNETWK_H
+#undef _WINSVC_H
 
 #include "bsd_helper.h"
 #include "bsd_log.h"

@@ -14,8 +14,8 @@ details. */
 
 #include "tty.h"
 /* fcntl flags used only internaly. */
-#define O_NOSYMLINK	0x080000
-#define O_DIROPEN	0x100000
+#define O_NOSYMLINK 0x080000
+#define O_DIROPEN   0x100000
 
 /* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
    properly defines both to be the same.  Unfortunately, we have to
@@ -35,10 +35,6 @@ details. */
    atomic writes to a pipe.  It is a shame that we have to make this
    so small.  http://cygwin.com/ml/cygwin/2011-03/msg00541.html  */
 #define DEFAULT_PIPEBUFSIZE PREFERRED_IO_BLKSIZE
-
-/* Used for fhandler_pipe::create.  Use an available flag which will
-   never be used in Cygwin for this function. */
-#define PIPE_ADD_PID	FILE_FLAG_FIRST_PIPE_INSTANCE
 
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
@@ -182,8 +178,11 @@ class fhandler_base
   HANDLE read_state;
 
  public:
-  long inc_refcnt () {return InterlockedIncrement (&_refcnt);}
-  long dec_refcnt () {return InterlockedDecrement (&_refcnt);} 
+  long refcnt(long i = 0)
+  {
+    debug_only_printf ("%p, %s, i %d, refcnt %ld", this, get_name (), i, _refcnt + i);
+    return _refcnt += i;
+  }
   class fhandler_base *archetype;
   int usecount;
 
@@ -558,7 +557,7 @@ class fhandler_socket: public fhandler_base
   int open (int flags, mode_t mode = 0);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   ssize_t __stdcall readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
-  inline ssize_t recv_internal (struct _WSAMSG *wsamsg, bool use_recvmsg) __attribute__ ((regparm (3)));
+  inline ssize_t recv_internal (struct _WSAMSG *wsamsg);
   ssize_t recvfrom (void *ptr, size_t len, int flags,
 		    struct sockaddr *from, int *fromlen);
   ssize_t recvmsg (struct msghdr *msg, int flags);
@@ -1289,7 +1288,6 @@ class dev_console
 
   bool insert_mode;
   int use_mouse;
-  bool ext_mouse_mode5;
   bool ext_mouse_mode6;
   bool ext_mouse_mode15;
   bool use_focus;
@@ -1721,6 +1719,7 @@ class fhandler_dev_clipboard: public fhandler_base
   _off64_t pos;
   void *membuffer;
   size_t msize;
+  bool eof;
  public:
   fhandler_dev_clipboard ();
   int is_windows () { return 1; }

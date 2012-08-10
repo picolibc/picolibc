@@ -247,7 +247,7 @@ _DEFUN(_gettemp, (ptr, path, doopen, domkdir, suffixlen, flags),
 	  else
 	    {
 	      /* Safe, since it only encounters 7-bit characters.  */
-	      if (isdigit ((unsigned char) *trv))
+	      if (isdigit (*trv))
 		*trv = 'a';
 	      else
 		++ * trv;

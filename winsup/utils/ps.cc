@@ -23,8 +23,8 @@ details. */
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
 #include <psapi.h>
-#include <ntdef.h>
-#include <ntdll.h>
+#include <ddk/ntapi.h>
+#include <ddk/winddk.h>
 #include "loadlib.h"
 
 /* Maximum possible path length under NT.  There's no official define
@@ -347,7 +347,7 @@ main (int argc, char *argv[])
 		     unicode_buf to have enough space for a maximum sized
 		     UNICODE_STRING. */
 		  if (uni->Length == 0)	/* System process */
-		    win32path = (wchar_t *) L"System";
+		    win32path = L"System";
 		  else
 		    {
 		      uni->Buffer[uni->Length / sizeof (WCHAR)] = L'\0';

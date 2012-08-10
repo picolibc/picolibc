@@ -1,0 +1,21 @@
+What's new:
+-----------
+
+- Cygwin now automatically populates the /dev directory with all
+  existing POSIX devices.
+
+- Add virtual /proc/PID/mountinfo file.
+
+- flock now additionally supports the following scenario, which requires
+  to propagate locks to the parent process:
+
+    (
+      flock -n 9 || exit 1
+      # ... commands executed under lock ...
+    } 9>/var/lock/mylockfile
+
+  Only propagation to the direct parent process is supported so far,
+  not to grand parents or sibling processes.
+
+- Add a "detect_bloda" setting for the CYGWIN environment variable to help
+  finding potential BLODAs.

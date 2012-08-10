@@ -1,6 +1,6 @@
 /* fhandler_procnet.cc: fhandler for /proc/net virtual filesystem
 
-   Copyright 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,7 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #define  __INSIDE_CYGWIN_NET__
-#define USE_SYS_TYPES_FD_SET
+
 #include "winsup.h"
 #include "cygerrno.h"
 #include "security.h"
@@ -18,9 +18,13 @@ details. */
 #include "fhandler_virtual.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include <ws2tcpip.h>
+
+#include <netdb.h>
+#define USE_SYS_TYPES_FD_SET
+#include <winsock2.h>
 #include <iphlpapi.h>
 #include <asm/byteorder.h>
+#include <cygwin/in6.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>

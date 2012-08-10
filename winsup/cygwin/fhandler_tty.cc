@@ -26,7 +26,6 @@ details. */
 #include "cygthread.h"
 #include "child_info.h"
 #include <asm/socket.h>
-#include "cygwait.h"
 
 #define close_maybe(h) \
   do { \
@@ -54,20 +53,13 @@ fhandler_pty_slave::get_unit ()
 bool
 bytes_available (DWORD& n, HANDLE h)
 {
-  DWORD navail, nleft;
-  navail = nleft = 0;
-  bool succeeded = PeekNamedPipe (h, NULL, 0, NULL, &navail, &nleft);
-  if (succeeded)
-    /* nleft should always be the right choice unless something has written 0
-       bytes to the pipe.  In that pathological case we return the actual number
-       of bytes available in the pipe. See cgf-000008 for more details.  */
-    n = nleft ?: navail;
-  else
+  bool succeeded = PeekNamedPipe (h, NULL, 0, NULL, &n, NULL);
+  if (!succeeded)
     {
       termios_printf ("PeekNamedPipe(%p) failed, %E", h);
       n = 0;
     }
-  debug_only_printf ("n %u, nleft %u, navail %u");
+  debug_only_printf ("%u bytes available", n);
   return succeeded;
 }
 
@@ -176,7 +168,7 @@ fhandler_pty_master::accept_input ()
       DWORD rc;
       DWORD written = 0;
 
-      paranoid_printf ("about to write %d chars to slave", bytes_left);
+      termios_printf ("about to write %d chars to slave", bytes_left);
       rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
       if (!rc)
 	{
@@ -281,7 +273,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	      goto out;
 	    }
 	  pthread_testcancel ();
-	  if (cancelable_wait (NULL, 10, cw_sig_eintr) == WAIT_SIGNALED
+	  if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0
 	      && !_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);
@@ -738,14 +730,14 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	      goto out;
 	    }
 	  break;
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0 + 1:
 	  if (totalread > 0)
 	    goto out;
 	  termios_printf ("wait catched signal");
 	  set_sig_errno (EINTR);
 	  totalread = -1;
 	  goto out;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 2:
 	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
@@ -773,14 +765,14 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	case WAIT_OBJECT_0:
 	case WAIT_ABANDONED_0:
 	  break;
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0 + 1:
 	  if (totalread > 0)
 	    goto out;
-	  termios_printf ("wait for mutex caught signal");
+	  termios_printf ("wait for mutex catched signal");
 	  set_sig_errno (EINTR);
 	  totalread = -1;
 	  goto out;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 2:
 	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
@@ -835,6 +827,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	  if (!ReadFile (get_handle (), buf, readlen, &n, NULL))
 	    {
 	      termios_printf ("read failed, %E");
+	      bytes_in_pipe = 0;
 	      raise (SIGHUP);
 	      bytes_in_pipe = 0;
 	      ptr = NULL;
@@ -1436,7 +1429,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	    set_errno (EINVAL);
 	    return -1;
 	  }
-	*(int *) arg = (int) n;
+	*(int *) arg = (DWORD) n;
       }
       break;
     default:
@@ -1482,9 +1475,7 @@ fhandler_pty_slave::fixup_after_exec ()
     fixup_after_fork (NULL);
 }
 
-#ifndef __MINGW64_VERSION_MAJOR
 extern "C" BOOL WINAPI GetNamedPipeClientProcessId (HANDLE, PULONG);
-#endif
 
 /* This thread function handles the master control pipe.  It waits for a
    client to connect.  Then it checks if the client process has permissions

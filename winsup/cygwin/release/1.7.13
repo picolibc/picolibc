@@ -1,0 +1,8 @@
+What's new:
+-----------
+
+- mkpasswd and mkgroup now try to print an entry for the TrustedInstaller
+  account existing since Windows Vista/Server 2008.
+
+- Terminal typeahead when switching from canonical to non-canonical mode
+  is now properly flushed.

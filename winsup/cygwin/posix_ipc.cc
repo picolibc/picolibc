@@ -119,12 +119,14 @@ ipc_mutex_init (HANDLE *pmtx, const char *name)
 static int
 ipc_mutex_lock (HANDLE mtx)
 {
-  switch (cancelable_wait (mtx, cw_infinite, cw_sig_eintr | cw_cancel | cw_cancel_self))
+  HANDLE h[2] = { mtx, signal_arrived };
+
+  switch (WaitForMultipleObjects (2, h, FALSE, INFINITE))
     {
     case WAIT_OBJECT_0:
     case WAIT_ABANDONED_0:
       return 0;
-    case WAIT_SIGNALED:
+    case WAIT_OBJECT_0 + 1:
       set_errno (EINTR);
       return 1;
     default:
@@ -172,12 +174,11 @@ ipc_cond_init (HANDLE *pevt, const char *name, char sr)
 static int
 ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
 {
-  HANDLE w4[4] = { evt, };
+  HANDLE w4[4] = { evt, signal_arrived, NULL, NULL };
   DWORD cnt = 2;
   DWORD timer_idx = 0;
   int ret = 0;
 
-  set_signal_arrived here (w4[1]);
   if ((w4[cnt] = pthread::get_cancel_event ()) != NULL)
     ++cnt;
   if (abstime)

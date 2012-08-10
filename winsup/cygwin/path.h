@@ -347,7 +347,6 @@ class path_conv
   bool fs_got_fs () const { return fs.got_fs (); }
   bool fs_is_fat () const {return fs.is_fat ();}
   bool fs_is_ntfs () const {return fs.is_ntfs ();}
-  bool fs_is_refs () const {return fs.is_refs ();}
   bool fs_is_samba () const {return fs.is_samba ();}
   bool fs_is_nfs () const {return fs.is_nfs ();}
   bool fs_is_netapp () const {return fs.is_netapp ();}
@@ -438,6 +437,7 @@ class etc
 {
   friend class dtable;
   static int curr_ix;
+  static HANDLE changed_h;
   static bool change_possible[MAX_ETC_FILES + 1];
   static OBJECT_ATTRIBUTES fn[MAX_ETC_FILES + 1];
   static LARGE_INTEGER last_modified[MAX_ETC_FILES + 1];

@@ -1788,7 +1788,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
  { $as_echo "$as_me:$LINENO: checking package version" >&5
 $as_echo_n "checking package version... " >&6; }
- PACKAGE_VERSION=`awk '$2 == "'"__MINGW_VERSION"'" { print $3 }' ${srcdir}/include/_mingw.h`
+ PACKAGE_VERSION=`awk '$2 == "'"__MINGW32_VERSION"'" { print $3 }' ${srcdir}/include/_mingw.h`
  { $as_echo "$as_me:$LINENO: result: $PACKAGE_VERSION" >&5
 $as_echo "$PACKAGE_VERSION" >&6; }
 

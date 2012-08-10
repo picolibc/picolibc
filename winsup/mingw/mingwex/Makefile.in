@@ -35,12 +35,12 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 mkinstalldirs = $(SHELL) $(srcdir)/../mkinstalldirs
 
 DISTFILES = \
-	Makefile.in \
+	Makefile.in configure configure.in aclocal.m4 \
 	_Exit.c atoll.c dirent.c feclearexcept.c fegetenv.c \
 	fegetexceptflag.c fegetround.c feholdexcept.c feraiseexcept.c \
 	fesetenv.c fesetexceptflag.c fesetround.c fetestexcept.c \
 	feupdateenv.c ftruncate.c fwide.c  getopt.c imaxabs.c imaxdiv.c \
-	lltoa.c lltow.c mbsinit.c membarrier.c mingw-aligned-malloc.c \
+	lltoa.c lltow.c mbsinit.c mingw-aligned-malloc.c \
 	mingw-fseek.c sitest.c strtoimax.c strtoumax.c \
 	testwmem.c tst-aligned-malloc.c ulltoa.c ulltow.c wcstof.c \
 	wcstoimax.c wcstold.c wcstoumax.c wctrans.c wctype.c \
@@ -201,7 +201,7 @@ POSIX_OBJS = \
 	dirent.o wdirent.o getopt.o ftruncate.o gettimeofday.o usleep.o \
 	basename.o dirname.o tsearch.o twalk.o tdelete.o tfind.o
 REPLACE_OBJS = \
-	membarrier.o mingw-aligned-malloc.o mingw-fseek.o
+	mingw-aligned-malloc.o mingw-fseek.o
 COMPLEX_OBJS = \
 	cabs.o cabsf.o cabsl.o cacos.o cacosf.o cacosl.o cacosh.o \
 	cacoshf.o cacoshl.o carg.o cargf.o cargl.o casin.o casinf.o \

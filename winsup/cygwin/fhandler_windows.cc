@@ -96,47 +96,43 @@ fhandler_windows::read (void *buf, size_t& len)
       return;
     }
 
-  HANDLE w4[3] = { get_handle (), };
-  set_signal_arrived here (w4[1]);
+  HANDLE w4[3] = { get_handle (), signal_arrived, NULL };
   DWORD cnt = 2;
   if ((w4[cnt] = pthread::get_cancel_event ()) != NULL)
     ++cnt;
-  for (;;)
+restart:
+  switch (MsgWaitForMultipleObjectsEx (cnt, w4,
+				       is_nonblocking () ? 0 : INFINITE,
+				       QS_ALLINPUT | QS_ALLPOSTMESSAGE,
+				       MWMO_INPUTAVAILABLE))
     {
-      switch (MsgWaitForMultipleObjectsEx (cnt, w4,
-					   is_nonblocking () ? 0 : INFINITE,
-					   QS_ALLINPUT | QS_ALLPOSTMESSAGE,
-					   MWMO_INPUTAVAILABLE))
+    case WAIT_OBJECT_0:
+      if (!PeekMessageW (ptr, hWnd_, 0, 0, PM_REMOVE))
 	{
-	case WAIT_OBJECT_0:
-	  if (!PeekMessageW (ptr, hWnd_, 0, 0, PM_REMOVE))
-	    {
-	      len = (size_t) -1;
-	      __seterrno ();
-	    }
-	  else if (ptr->message == WM_QUIT)
-	    len = 0;
-	  else
-	    len = sizeof (MSG);
-	  break;
-	case WAIT_OBJECT_0 + 1:
-	  if (_my_tls.call_signal_handler ())
-	    continue;
-	  len = (size_t) -1;
-	  set_errno (EINTR);
-	  break;
-	case WAIT_OBJECT_0 + 2:
-	  pthread::static_cancel_self ();
-	  break;
-	case WAIT_TIMEOUT:
-	  len = (size_t) -1;
-	  set_errno (EAGAIN);
-	  break;
-	default:
 	  len = (size_t) -1;
 	  __seterrno ();
-	  break;
 	}
+      else if (ptr->message == WM_QUIT)
+	len = 0;
+      else
+	len = sizeof (MSG);
+      break;
+    case WAIT_OBJECT_0 + 1:
+      if (_my_tls.call_signal_handler ())
+	goto restart;
+      len = (size_t) -1;
+      set_errno (EINTR);
+      break;
+    case WAIT_OBJECT_0 + 2:
+      pthread::static_cancel_self ();
+      break;
+    case WAIT_TIMEOUT:
+      len = (size_t) -1;
+      set_errno (EAGAIN);
+      break;
+    default:
+      len = (size_t) -1;
+      __seterrno ();
       break;
     }
 }

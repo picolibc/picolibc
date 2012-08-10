@@ -402,7 +402,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   if (!got_fs ()
       && !is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE))
       && !is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE))
-      && !is_refs (RtlEqualUnicodeString (&fsname, &ro_u_refs, FALSE))
       && !is_csc_cache (RtlEqualUnicodeString (&fsname, &ro_u_csc, FALSE))
       && is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM))
     is_udf (RtlEqualUnicodeString (&fsname, &ro_u_udf, FALSE));
@@ -648,6 +647,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 
       if (!src_path[n])
 	{
+	  unit = 0;
 	  dst[0] = '\0';
 	  if (mount_table->cygdrive_len > 1)
 	    dev = *cygdrive_dev;
@@ -1897,34 +1897,6 @@ extern "C" struct mntent *
 getmntent (FILE *)
 {
   return mount_table->getmntent (_my_tls.locals.iteration++);
-}
-
-extern "C" struct mntent *
-getmntent_r (FILE *, struct mntent *mntbuf, char *buf, int buflen)
-{
-  struct mntent *mnt = mount_table->getmntent (_my_tls.locals.iteration++);
-  int fsname_len, dir_len, type_len, tmplen = buflen;
-
-  if (!mnt)
-    return NULL;
-
-  fsname_len = strlen (mnt->mnt_fsname) + 1;
-  dir_len = strlen (mnt->mnt_dir) + 1;
-  type_len = strlen (mnt->mnt_type) + 1;
-
-  snprintf (buf, buflen, "%s%c%s%c%s%c%s", mnt->mnt_fsname, '\0',
-	    mnt->mnt_dir, '\0', mnt->mnt_type, '\0', mnt->mnt_opts);
-
-  mntbuf->mnt_fsname = buf;
-  tmplen -= fsname_len;
-  mntbuf->mnt_dir = tmplen > 0 ? buf + fsname_len : (char *)"";
-  tmplen -= dir_len;
-  mntbuf->mnt_type = tmplen > 0 ? buf + fsname_len + dir_len : (char *)"";
-  tmplen -= type_len;
-  mntbuf->mnt_opts = tmplen > 0 ? buf + fsname_len + dir_len + type_len : (char *)"";
-  mntbuf->mnt_freq = mnt->mnt_freq;
-  mntbuf->mnt_passno = mnt->mnt_passno;
-  return mntbuf;
 }
 
 extern "C" int

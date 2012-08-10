@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#ifndef _TIMEVAL_DEFINED
+#ifndef _WINSOCK_H
 #define _TIMEVAL_DEFINED
 struct timeval {
   time_t      tv_sec;
@@ -28,7 +28,7 @@ struct timezone {
 #include <cygwin/sys_time.h>
 #endif /* __CYGWIN__ */
 
-#endif /* !_TIMEVAL_DEFINED */
+#endif /* _WINSOCK_H */
 
 #define ITIMER_REAL     0
 #define ITIMER_VIRTUAL  1
@@ -70,10 +70,6 @@ struct  itimerval {
     }									      \
   } while (0)
 #endif /* defined (__rtems__) || defined (__CYGWIN__) */
-
-#ifdef _COMPILING_NEWLIB
-int _EXFUN(_gettimeofday, (struct timeval *__p, void *__tz));
-#endif
 
 int _EXFUN(gettimeofday, (struct timeval *__p, void *__tz));
 int _EXFUN(settimeofday, (const struct timeval *, const struct timezone *));

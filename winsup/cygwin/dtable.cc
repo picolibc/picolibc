@@ -12,6 +12,7 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 
 #include "winsup.h"
+#include <sys/socket.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -242,7 +243,7 @@ dtable::release (int fd)
 {
   if (fds[fd]->need_fixup_before ())
     dec_need_fixup_before ();
-  fds[fd]->dec_refcnt ();
+  fds[fd]->refcnt (-1);
   fds[fd] = NULL;
   if (fd <= 2)
     set_std_handle (fd);
@@ -258,7 +259,7 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
   if (!fh)
     return -1;
   cygheap->fdtab[fd] = fh;
-  cygheap->fdtab[fd]->inc_refcnt ();
+  cygheap->fdtab[fd]->refcnt (1);
   fh->init (handle, myaccess, bin ?: fh->pc_binmode ());
   return fd;
 }
@@ -397,7 +398,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       fh->open_setup (openflags);
       fh->usecount = 0;
       cygheap->fdtab[fd] = fh;
-      cygheap->fdtab[fd]->inc_refcnt ();
+      cygheap->fdtab[fd]->refcnt (1);
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }
@@ -529,7 +530,6 @@ fh_alloc (path_conv& pc)
 	  fh = cnew (fhandler_dev_random);
 	  break;
 	case FH_MEM:
-	case FH_KMEM:
 	case FH_PORT:
 	  fh = cnew (fhandler_dev_mem);
 	  break;
@@ -712,15 +712,6 @@ dtable::dup3 (int oldfd, int newfd, int flags)
   MALLOC_CHECK;
   debug_printf ("dup3 (%d, %d, %p)", oldfd, newfd, flags);
   lock ();
-  bool do_unlock = true;
-  bool unlock_on_return;
-  if (!(flags & O_EXCL))
-    unlock_on_return = true;	/* Relinquish lock on return */
-  else
-    {
-      flags &= ~O_EXCL;
-      unlock_on_return = false;	/* Return with lock set on success */
-    }
 
   if (not_open (oldfd))
     {
@@ -772,12 +763,10 @@ dtable::dup3 (int oldfd, int newfd, int flags)
 
   if ((res = newfd) <= 2)
     set_std_handle (res);
-  do_unlock = unlock_on_return;
 
 done:
   MALLOC_CHECK;
-  if (do_unlock)
-    unlock ();
+  unlock ();
   syscall_printf ("%R = dup3(%d, %d, %p)", res, oldfd, newfd, flags);
 
   return res;

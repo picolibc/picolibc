@@ -47,7 +47,6 @@ Supporting OS subroutines required: none.
 
 #include <_ansi.h>
 #include <stdio.h>
-#include <errno.h>
 #include "local.h"
 
 int
@@ -56,14 +55,8 @@ _DEFUN(fileno, (f),
 {
   int result;
   CHECK_INIT (_REENT, f);
-  _newlib_flockfile_start (f);
-  if (f->_flags)
-    result = __sfileno (f);
-  else
-    {
-      result = -1;
-      _REENT->_errno = EBADF;
-    }
-  _newlib_flockfile_end (f);
+  _flockfile (f);
+  result = __sfileno (f);
+  _funlockfile (f);
   return result;
 }

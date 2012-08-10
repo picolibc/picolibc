@@ -36,7 +36,6 @@ details. */
 #include <asm/socket.h>
 #include "sync.h"
 #include "child_info.h"
-#include "cygwait.h"
 
 /* Don't make this bigger than NT_MAX_PATH as long as the temporary buffer
    is allocated using tmp_pathbuf!!! */
@@ -308,6 +307,14 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
       return 0;
     }
 
+  /* Check whether adjusted mouse position can be reported */
+  if (dev_state.dwMousePosition.X > 0xFF - ' ' - 1
+      || dev_state.dwMousePosition.Y > 0xFF - ' ' - 1)
+    {
+      /* Mouse position out of reporting range */
+      return 0;
+    }
+
   return ((mouse_event.dwEventFlags == 0 || mouse_event.dwEventFlags == DOUBLE_CLICK)
 	  && mouse_event.dwButtonState != dev_state.dwLastButtonState)
 	 || mouse_event.dwEventFlags == MOUSE_WHEELED
@@ -356,9 +363,9 @@ fhandler_console::read (void *pv, size_t& buflen)
 	{
 	case WAIT_OBJECT_0:
 	  break;
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0 + 1:
 	  goto sig_exit;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 2:
 	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
@@ -639,34 +646,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 				     dev_state.dwMousePosition.Y + 1);
 		    nread = strlen (tmp);
 		  }
-		else if (dev_state.ext_mouse_mode5)
-		  {
-		    unsigned int xcode = dev_state.dwMousePosition.X + ' ' + 1;
-		    unsigned int ycode = dev_state.dwMousePosition.Y + ' ' + 1;
-
-		    __small_sprintf (tmp, "\033[M%c", b + ' ');
-		    nread = 4;
-		    /* the neat nested encoding function of mintty 
-		       does not compile in g++, so let's unfold it: */
-		    if (xcode < 0x80)
-		      tmp [nread++] = xcode;
-		    else if (xcode < 0x800)
-		      {
-			tmp [nread++] = 0xC0 + (xcode >> 6);
-			tmp [nread++] = 0x80 + (xcode & 0x3F);
-		      }
-		    else
-		      tmp [nread++] = 0;
-		    if (ycode < 0x80)
-		      tmp [nread++] = ycode;
-		    else if (ycode < 0x800)
-		      {
-			tmp [nread++] = 0xC0 + (ycode >> 6);
-			tmp [nread++] = 0x80 + (ycode & 0x3F);
-		      }
-		    else
-		      tmp [nread++] = 0;
-		  }
+		/* else if (dev_state.ext_mouse_mode5) not implemented */
 		else
 		  {
 		    unsigned int xcode = dev_state.dwMousePosition.X + ' ' + 1;
@@ -1586,7 +1566,7 @@ fhandler_console::char_command (char c)
 	  break;
 
 	case 1005: /* Extended mouse mode */
-	  dev_state.ext_mouse_mode5 = c == 'h';
+	  syscall_printf ("ignored h/l command for extended mouse mode");
 	  break;
 
 	case 1006: /* SGR extended mouse mode */
@@ -2012,7 +1992,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 
   while (src < end)
     {
-      paranoid_printf ("char %0c state is %d", *src, dev_state.state_);
+      debug_printf ("at %d(%c) state is %d", *src, isprint (*src) ? *src : ' ',
+		    dev_state.state_);
       switch (dev_state.state_)
 	{
 	case normal:

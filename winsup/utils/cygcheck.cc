@@ -1,7 +1,7 @@
 /* cygcheck.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -30,13 +30,7 @@
 #undef cygwin_internal
 #include "loadlib.h"
 
-#ifndef max
-#define max __max
-#endif
-
-#ifndef alloca
 #define alloca __builtin_alloca
-#endif
 
 int verbose = 0;
 int registry = 0;
@@ -1320,7 +1314,7 @@ handle_unique_object_name (int opt, char *path)
   if (opt == CO_SHOW_UON)
     {
       access = GENERIC_READ;
-      share = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+      share = FILE_SHARE_VALID_FLAGS;
       protect = PAGE_READONLY;
       mapping = FILE_MAP_READ;
     }
@@ -1442,7 +1436,7 @@ dump_sysinfo ()
 	  else if (osversion.dwMinorVersion == 2)
 	    {
 	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			      ? "8" : "Server 2012");
+			      ? "8" : "Server 8");
 	      strcat (osname, " (not yet supported!)");
 	    }
 	  DWORD prod;
@@ -1453,9 +1447,7 @@ dump_sysinfo ()
 			      &prod))
 	    {
 #define       PRODUCT_UNLICENSED 0xabcdabcd
-#ifndef PRODUCT_ULTIMATE_E
 #define       PRODUCT_ULTIMATE_E 0x00000047
-#endif
 	      const char *products[] =
 		{
  /* 0x00000000 */ "",

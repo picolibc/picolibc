@@ -23,8 +23,6 @@
 typedef uint16_t in_port_t;
 typedef uint32_t in_addr_t;
 
-#ifndef __INSIDE_CYGWIN_NET__
-
 /* Standard well-defined IP protocols.  If you ever add one here, don't
    forget to define it below. */
 enum
@@ -262,6 +260,4 @@ struct sockaddr_in
 #ifdef AF_INET6
 #include <cygwin/in6.h>
 #endif
-#endif
-
 #endif	/* _CYGWIN_IN_H */
