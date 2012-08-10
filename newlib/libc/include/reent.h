@@ -164,7 +164,7 @@ extern int _gettimeofday_r _PARAMS ((struct _reent *, struct timeval *__tp, void
 #ifdef __LARGE64_FILES
 
 #if defined(__CYGWIN__) && defined(_COMPILING_NEWLIB)
-#define stat64 __stat64
+#define stat64 stat
 #endif
 
 struct stat64;

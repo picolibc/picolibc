@@ -693,7 +693,7 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 #endif /* !_WANT_C99_TIME_FORMATS */
 {
   size_t count = 0;
-  int i, len;
+  int i, len = 0;
   const CHAR *ctloc;
 #if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
   CHAR ctlocbuf[CTLOCBUFLEN];
