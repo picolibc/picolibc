@@ -347,51 +347,71 @@ wincapc::init ()
     return;		// already initialized
 
   GetSystemInfo (&system_info);
+  memset (&version, 0, sizeof version);
   version.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
-  GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version));
+  if (!GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version)))
+    api_fatal ("Cygwin requires at least Windows 2000.");
 
-  switch (version.dwMajorVersion)
+  switch (version.dwPlatformId)
     {
-      case 5:
-	switch (version.dwMinorVersion)
+      case VER_PLATFORM_WIN32_NT:
+	switch (version.dwMajorVersion)
 	  {
-	    case 0:
-	      if (version.wServicePackMajor < 4)
-		caps = &wincap_2000;
-	      else
-		caps = &wincap_2000sp4;
+	    case 4:
+	      /* I'd be very surprised if this code is ever hit, but it doesn't
+		 hurt to keep it. */
+	      api_fatal ("Cygwin requires at least Windows 2000.");
 	      break;
-
-	    case 1:
-	      caps = &wincap_xp;
-	      switch (version.wServicePackMajor)
+	    case 5:
+	      switch (version.dwMinorVersion)
 		{
-		case 0:
-		  caps = &wincap_xp;
-		case 1:
-		  caps = &wincap_xpsp1;
-		default:
-		  caps = &wincap_xpsp2;
+		  case 0:
+		    if (version.wServicePackMajor < 4)
+		      caps = &wincap_2000;
+		    else
+		      caps = &wincap_2000sp4;
+		    break;
+
+		  case 1:
+		    caps = &wincap_xp;
+		    switch (version.wServicePackMajor)
+		      {
+		      case 0:
+			caps = &wincap_xp;
+		      case 1:
+			caps = &wincap_xpsp1;
+		      default:
+			caps = &wincap_xpsp2;
+		      }
+		    break;
+
+		  default:
+		    caps = &wincap_2003;
 		}
 	      break;
-
+	    case 6:
+	      switch (version.dwMinorVersion)
+		{
+		  case 0:
+		    caps = &wincap_vista;
+		    break;
+		  case 1:
+		    caps = &wincap_7;
+		    break;
+		  default:
+		    caps = &wincap_8;
+		    break;
+		}
+	      break;
 	    default:
-	      caps = &wincap_2003;
+	      caps = &wincap_minimal;
+	      break;
 	  }
 	break;
-      case 6:
-	switch (version.dwMinorVersion)
-	  {
-	    case 0:
-	      caps = &wincap_vista;
-	      break;
-	    case 1:
-	      caps = &wincap_7;
-	      break;
-	    default:
-	      caps = &wincap_8;
-	      break;
-	  }
+      case VER_PLATFORM_WIN32_WINDOWS:
+	/* I'd be very surprised if this code is ever hit, but it doesn't
+	   hurt to keep it. */
+	api_fatal ("Windows 95/98/Me are not supported.");
 	break;
       default:
 	caps = &wincap_minimal;

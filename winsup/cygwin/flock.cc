@@ -1247,7 +1247,7 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	timeout = 100L;
 
       DWORD WAIT_SIGNAL_ARRIVED = WAIT_OBJECT_0 + wait_count;
-      set_signal_arrived here (w4[wait_count++]);
+      w4[wait_count++] = signal_arrived;
 
       DWORD WAIT_THREAD_CANCELED = WAIT_TIMEOUT + 1;
       HANDLE cancel_event = pthread::get_cancel_event ();

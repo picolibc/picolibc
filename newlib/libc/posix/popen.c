@@ -113,7 +113,7 @@ _DEFUN(popen, (program, type),
 	const char *program _AND
 	const char *type)
 {
-	struct pid *cur;
+	struct pid *cur, *last;
 	FILE *iop;
 	int pdes[2], pid;
 
@@ -159,7 +159,8 @@ _DEFUN(popen, (program, type),
 			(void)close(pdes[1]);
 		}
 		/* Close all fd's created by prior popen.  */
-		for (cur = pidlist; cur; cur = cur->next)
+		for (last = NULL, cur = pidlist; cur;
+		     last = cur, cur = cur->next)
 			(void)close (fileno (cur->fp));
 		execl(_PATH_BSHELL, "sh", "-c", program, NULL);
 		_exit(127);

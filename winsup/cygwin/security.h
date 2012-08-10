@@ -9,7 +9,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#pragma once
+#ifndef _SECURITY_H
+#define _SECURITY_H
 
 #include <accctrl.h>
 
@@ -512,3 +513,5 @@ sec_user (SECURITY_ATTRIBUTES *sa_buf, PSID sid1, PSID sid2 = NULL,
 {
   return __sec_user (sa_buf, sid1, sid2, access2, TRUE);
 }
+
+#endif /*_SECURITY_H*/

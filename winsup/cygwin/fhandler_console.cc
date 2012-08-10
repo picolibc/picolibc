@@ -2012,7 +2012,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 
   while (src < end)
     {
-      paranoid_printf ("char %0c state is %d", *src, dev_state.state_);
+      debug_printf ("at %d(%c) state is %d", *src, isprint (*src) ? *src : ' ',
+		    dev_state.state_);
       switch (dev_state.state_)
 	{
 	case normal:

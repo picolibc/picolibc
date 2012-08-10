@@ -146,17 +146,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  l_opt = true;
 		  continue;
 		case 'c':
-		  {
-		    unsigned char c = (va_arg (ap, int) & 0xff); 
-		    if (isprint (c) || pad != '0')
-		      *dst++ = c;
-		    else
-                      {
-                        *dst++ = '0';
-                        *dst++ = 'x';
-                        dst = __rn (dst, 16, 0, c, len, pad, LMASK);
-                      }
-		  }
+		  *dst++ = (char) (va_arg (ap, int) & 0xff);
 		  break;
 		case 'C':
 		  {

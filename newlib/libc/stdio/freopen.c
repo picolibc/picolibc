@@ -208,7 +208,7 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
   if (HASLB (fp))
     FREELB (ptr, fp);
   fp->_lb._size = 0;
-  fp->_flags &= ~__SORD;
+  fp->_flags & ~__SORD;
   fp->_flags2 = 0;
   memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
 

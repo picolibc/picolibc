@@ -100,28 +100,20 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   select_printf ("select(%d, %p, %p, %p, %p)", maxfds, readfds, writefds, exceptfds, to);
 
   pthread_testcancel ();
-  int res;
-  if (maxfds < 0)
-    {
-      set_errno (EINVAL);
-      res = -1;
-    }
+
+  /* Convert to milliseconds or INFINITE if to == NULL */
+  DWORD ms = to ? (to->tv_sec * 1000) + (to->tv_usec / 1000) : INFINITE;
+  if (ms == 0 && to->tv_usec)
+    ms = 1;			/* At least 1 ms granularity */
+
+  if (to)
+    select_printf ("to->tv_sec %d, to->tv_usec %d, ms %d", to->tv_sec, to->tv_usec, ms);
   else
-    {
-      /* Convert to milliseconds or INFINITE if to == NULL */
-      DWORD ms = to ? (to->tv_sec * 1000) + (to->tv_usec / 1000) : INFINITE;
-      if (ms == 0 && to->tv_usec)
-	ms = 1;			/* At least 1 ms granularity */
+    select_printf ("to NULL, ms %x", ms);
 
-      if (to)
-	select_printf ("to->tv_sec %d, to->tv_usec %d, ms %d", to->tv_sec, to->tv_usec, ms);
-      else
-	select_printf ("to NULL, ms %x", ms);
-
-      res = select (maxfds, readfds ?: allocfd_set (maxfds),
+  int res = select (maxfds, readfds ?: allocfd_set (maxfds),
 		    writefds ?: allocfd_set (maxfds),
 		    exceptfds ?: allocfd_set (maxfds), ms);
-    }
   syscall_printf ("%R = select(%d, %p, %p, %p, %p)", res, maxfds, readfds,
 		  writefds, exceptfds, to);
   return res;
@@ -187,7 +179,6 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       else
 	res = sel.wait (r, w, e, ms);			/* wait for an fd to become
 							   become active or time out */
-      select_printf ("res %d", res);
       if (res >= 0)
 	{
 	  copyfd_set (readfds, r, maxfds);
@@ -206,10 +197,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  select_printf ("recalculating ms");
 	  LONGLONG now = gtod.msecs ();
 	  if (now > (start_time + ms))
-	    {
-	      select_printf ("timed out after verification");
-	      res = select_stuff::select_error;
-	    }
+	    select_printf ("timed out after verification");
 	  else
 	    {
 	      ms -= (now - start_time);
@@ -240,11 +228,11 @@ pselect(int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       tv.tv_usec = ts->tv_nsec / 1000;
     }
   if (set)
-    set_signal_mask (_my_tls.sigmask, *set);
+    set_signal_mask (*set, _my_tls.sigmask);
   int ret = cygwin_select (maxfds, readfds, writefds, exceptfds,
 			   ts ? &tv : NULL);
   if (set)
-    set_signal_mask (_my_tls.sigmask, oldset);
+    set_signal_mask (oldset, _my_tls.sigmask);
   return ret;
 }
 
@@ -332,7 +320,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   select_record *s = &start;
   DWORD m = 0;
 
-  set_signal_arrived here (w4[m++]);
+  w4[m++] = signal_arrived;  /* Always wait for the arrival of a signal. */
   if ((w4[m] = pthread::get_cancel_event ()) != NULL)
     m++;
 

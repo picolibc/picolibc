@@ -1,0 +1,39 @@
+What's new:
+-----------
+
+- New API: getmntent_r, memrchr.
+
+- Support ReFS.
+
+Bug fixes:
+----------
+
+- Fix pipe creation problem which manifested as a problem creating a
+  fifo.  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00253.html
+
+- Fix hang when calling pthread_testcancel in a canceled thread.
+  Fixes some of: http://cygwin.com/ml/cygwin/2012-05/msg00186.html
+
+- Fix invocation of strace from a cygwin process.  Fixes:
+  http://cygwin.com/ml/cygwin/2012-05/msg00292.html
+
+- Fix hang when zero bytes are written to a pty using
+  Windows WriteFile or equivalent.  Fixes:
+  http://cygwin.com/ml/cygwin/2012-05/msg00323.html
+
+- Fix recv, recvfrom, recvmsg behaviour if a 0 bytes buffer is given
+  as argument.  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00332.html
+
+- Handle inode numbers returned by Samba >= 3.5.4. 
+  Fixes: http://cygwin.com/ml/cygwin/2012-05/msg00236.html
+
+- Fix emacs problem which exposed an issue with Cygwin's select() function.
+  If a signal arrives while select is blocking and the program longjmps
+  out of the signal handler then threads and memory may be left hanging.
+  Fixes: http://cygwin.com/ml/cygwin/2012-05/threads.html#00275
+
+- Fix fileno(3) to return -1/EBADF if stream is closed.
+  Fixes: http://cygwin.com/ml/cygwin/2012-07/msg00083.html
+
+- Fix clipboard handling, at least partially:
+  http://cygwin.com/ml/cygwin/2012-06/msg00521.html

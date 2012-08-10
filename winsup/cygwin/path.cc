@@ -1153,7 +1153,7 @@ out:
   if (opt & PC_CTTY)
     path_flags |= PATH_CTTY;
 
-  if (opt & PC_POSIX)
+  if ((opt & PC_POSIX))
     {
       if (tail < path_end && tail > path_copy + 1)
 	*tail = '/';
@@ -4311,15 +4311,11 @@ etc::test_file_change (int n)
 bool
 etc::dir_changed (int n)
 {
-  /* io MUST be static because NtNotifyChangeDirectoryFile works asynchronously.
-     It may write into io after the function has left, which may result in all
-     sorts of stack corruption. */
-  static IO_STATUS_BLOCK io NO_COPY;
-  static HANDLE changed_h NO_COPY;
-
   if (!change_possible[n])
     {
+      static HANDLE changed_h NO_COPY;
       NTSTATUS status;
+      IO_STATUS_BLOCK io;
 
       if (!changed_h)
 	{

@@ -275,8 +275,15 @@ malloc_CFLAGS:=-fomit-frame-pointer -O3
 malloc_wrapper_CFLAGS:=-fomit-frame-pointer
 miscfuncs_CFLAGS:=-fomit-frame-pointer
 net_CFLAGS:=-fomit-frame-pointer
-passwd_CFLAGS:=-fomit-frame-pointer
-path_CFLAGS=-fomit-frame-pointer
+#
+# FIXME: Setting either of the below to -fomit-frame-pointer causes an
+# optimized version of Cygwin to sometimes "jump to zero" in long-running
+# shell processes when compiled with gcc 4.5.3.
+#
+# passwd_CFLAGS:=-fomit-frame-pointer
+# path_CFLAGS=-fomit-frame-pointer
+#
+path_CFLAGS=-fgcse-lm -fgcse-sm -fgcse-las -fgcse-after-reload
 regcomp_CFLAGS=-fomit-frame-pointer
 regerror_CFLAGS=-fomit-frame-pointer
 regexec_CFLAGS=-fomit-frame-pointer

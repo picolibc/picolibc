@@ -176,7 +176,7 @@ fhandler_pty_master::accept_input ()
       DWORD rc;
       DWORD written = 0;
 
-      paranoid_printf ("about to write %d chars to slave", bytes_left);
+      termios_printf ("about to write %d chars to slave", bytes_left);
       rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
       if (!rc)
 	{
@@ -281,7 +281,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	      goto out;
 	    }
 	  pthread_testcancel ();
-	  if (cancelable_wait (NULL, 10, cw_sig_eintr) == WAIT_SIGNALED
+	  if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0
 	      && !_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);

@@ -205,9 +205,6 @@ struct OLD_msghdr
 #define MSG_NOSIGNAL    0x20            /* Don't raise SIGPIPE */
 #define MSG_TRUNC       0x0100          /* Normal data truncated */
 #define MSG_CTRUNC      0x0200          /* Control data truncated */
-/* Windows-specific flag values returned by recvmsg. */
-#define MSG_BCAST	0x0400		/* Broadcast datagram */
-#define MSG_MCAST	0x0800		/* Multicast datagram */
 
 /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
 #define SOL_IP		0

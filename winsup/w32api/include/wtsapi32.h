@@ -74,7 +74,7 @@ BOOL WINAPI WTSQueryUserToken(ULONG SessionId, PHANDLE pToken);
 
 #endif /* _WIN32_WINNT >= 0x0501 */
 
-#if (_WIN32_WINNT >= _WIN32_WINNT_WIN2K)
+#if (_WIN32_WINNT >= 0x0500)
 
 typedef struct _WTS_SESSION_INFOW {
   DWORD SessionId;
@@ -167,56 +167,6 @@ BOOL WTSSendMessageW(
 #else
 #define WTSSendMessage WTSSendMessageA
 #endif
-
-BOOL WTSVirtualChannelClose(
-  __in  HANDLE hChannelHandle
-);
-
-HANDLE WTSVirtualChannelOpen(
-  __in  HANDLE hServer,
-  __in  DWORD SessionId,
-  __in  LPSTR pVirtualName
-);
-
-#if _WIN32_WINNT >= _WIN32_WINNT_VISTA
-HANDLE WTSVirtualChannelOpenEx(
-  __in  DWORD SessionId,
-  __in  LPSTR pVirtualName,
-  __in  DWORD flags
-);
-#endif
-
-BOOL WTSVirtualChannelPurgeInput(
-  __in  HANDLE hChannelHandle
-);
-
-BOOL WTSVirtualChannelPurgeOutput(
-  __in  HANDLE hChannelHandle
-);
-
-#if _WIN32_WINNT >= _WIN32_WINNT_WINXP
-BOOL WTSVirtualChannelQuery(
-  __in   HANDLE hChannelHandle,
-  __in   WTS_VIRTUAL_CLASS WtsVirtualClass,
-  __out  PVOID *ppBuffer,
-  __out  DWORD *pBytesReturned
-);
-#endif
-
-BOOL WTSVirtualChannelRead(
-  __in   HANDLE hChannelHandle,
-  __in   ULONG TimeOut,
-  __out  PCHAR Buffer,
-  __in   ULONG BufferSize,
-  __out  PULONG pBytesRead
-);
-
-BOOL WTSVirtualChannelWrite(
-  __in   HANDLE hChannelHandle,
-  __in   PCHAR Buffer,
-  __in   ULONG Length,
-  __out  PULONG pBytesWritten
-);
 
 #endif /* _WIN32_WINNT >= 0x0500 */
 

@@ -1494,24 +1494,6 @@ extern const int bfd_mips16_num_opcodes;
 #define MICROMIPSOP_MASK_IMMY		0x1ff
 #define MICROMIPSOP_SH_IMMY		1
 
-/* MIPS DSP ASE */
-#define MICROMIPSOP_MASK_DSPACC		0x3
-#define MICROMIPSOP_SH_DSPACC		14
-#define MICROMIPSOP_MASK_DSPSFT		0x3f
-#define MICROMIPSOP_SH_DSPSFT		16
-#define MICROMIPSOP_MASK_SA3		0x7
-#define MICROMIPSOP_SH_SA3		13
-#define MICROMIPSOP_MASK_SA4		0xf
-#define MICROMIPSOP_SH_SA4		12
-#define MICROMIPSOP_MASK_IMM8		0xff
-#define MICROMIPSOP_SH_IMM8		13
-#define MICROMIPSOP_MASK_IMM10		0x3ff
-#define MICROMIPSOP_SH_IMM10		16
-#define MICROMIPSOP_MASK_WRDSP		0x3f
-#define MICROMIPSOP_SH_WRDSP		14
-#define MICROMIPSOP_MASK_BP		0x3
-#define MICROMIPSOP_SH_BP		14
-
 /* Placeholders for fields that only exist in the traditional 32-bit
    instruction encoding; see the comment above for details.  */
 #define MICROMIPSOP_MASK_CODE20		0
@@ -1526,12 +1508,28 @@ extern const int bfd_mips16_num_opcodes;
 #define MICROMIPSOP_SH_VECBYTE		0
 #define MICROMIPSOP_MASK_VECALIGN	0
 #define MICROMIPSOP_SH_VECALIGN		0
+#define MICROMIPSOP_MASK_DSPACC	 	0
+#define MICROMIPSOP_SH_DSPACC		0
 #define MICROMIPSOP_MASK_DSPACC_S	0
 #define MICROMIPSOP_SH_DSPACC_S	 	0
+#define MICROMIPSOP_MASK_DSPSFT	 	0
+#define MICROMIPSOP_SH_DSPSFT		0
 #define MICROMIPSOP_MASK_DSPSFT_7	0
 #define MICROMIPSOP_SH_DSPSFT_7	 	0
+#define MICROMIPSOP_MASK_SA3		0
+#define MICROMIPSOP_SH_SA3		0
+#define MICROMIPSOP_MASK_SA4		0
+#define MICROMIPSOP_SH_SA4		0
+#define MICROMIPSOP_MASK_IMM8		0
+#define MICROMIPSOP_SH_IMM8		0
+#define MICROMIPSOP_MASK_IMM10		0
+#define MICROMIPSOP_SH_IMM10		0
+#define MICROMIPSOP_MASK_WRDSP		0
+#define MICROMIPSOP_SH_WRDSP		0
 #define MICROMIPSOP_MASK_RDDSP		0
 #define MICROMIPSOP_SH_RDDSP		0
+#define MICROMIPSOP_MASK_BP		0
+#define MICROMIPSOP_SH_BP		0
 #define MICROMIPSOP_MASK_MT_U		0
 #define MICROMIPSOP_SH_MT_U		0
 #define MICROMIPSOP_MASK_MT_H		0
@@ -1704,18 +1702,6 @@ extern const int bfd_mips16_num_opcodes;
    "f" 32-bit floating point constant
    "l" 32-bit floating point constant in .lit4
 
-   DSP ASE usage:
-   "2" 2-bit unsigned immediate for byte align (MICROMIPSOP_*_BP)
-   "3" 3-bit unsigned immediate (MICROMIPSOP_*_SA3)
-   "4" 4-bit unsigned immediate (MICROMIPSOP_*_SA4)
-   "5" 8-bit unsigned immediate (MICROMIPSOP_*_IMM8)
-   "6" 5-bit unsigned immediate (MICROMIPSOP_*_RS)
-   "7" 2-bit DSP accumulator register (MICROMIPSOP_*_DSPACC)
-   "8" 6-bit unsigned immediate (MICROMIPSOP_*_WRDSP)
-   "0" 6-bit signed immediate (MICROMIPSOP_*_DSPSFT)
-   "@" 10-bit signed immediate (MICROMIPSOP_*_IMM10)
-   "^" 5-bit unsigned immediate (MICROMIPSOP_*_RD)
-
    Other:
    "()" parens surrounding optional value
    ","  separates operands
@@ -1723,8 +1709,8 @@ extern const int bfd_mips16_num_opcodes;
    "m"  start of microMIPS extension sequence
 
    Characters used so far, for quick reference when adding more:
-   "12345678 0"
-   "<>(),+.@\^|~"
+   "1234567890"
+   "<>(),+.\|~"
    "ABCDEFGHI KLMN   RST V    "
    "abcd f hijklmnopqrstuvw yz"
 

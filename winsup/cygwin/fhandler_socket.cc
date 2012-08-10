@@ -125,7 +125,9 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	     some greedy Win32 application.  Therefore we should never wait
 	     endlessly without checking for signals and thread cancel event. */
 	  pthread_testcancel ();
-	  if (cancelable_wait (NULL, cw_nowait, cw_sig_eintr) == WAIT_SIGNALED
+	  /* Using IsEventSignalled like this is racy since another thread could
+	     be waiting for signal_arrived. */
+	  if (IsEventSignalled (signal_arrived)
 	      && !_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);
@@ -657,8 +659,7 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
 	  return SOCKET_ERROR;
 	}
 
-      WSAEVENT ev[2] = { wsock_evt };
-      set_signal_arrived here (ev[1]);
+      WSAEVENT ev[2] = { wsock_evt, signal_arrived };
       switch (WSAWaitForMultipleEvents (2, ev, FALSE, 50, FALSE))
 	{
 	  case WSA_WAIT_TIMEOUT:
@@ -1330,7 +1331,7 @@ fhandler_socket::read (void *in_ptr, size_t& len)
 {
   WSABUF wsabuf = { len, (char *) in_ptr };
   WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0,  NULL }, 0 };
-  len = recv_internal (&wsamsg, false);
+  len = recv_internal (&wsamsg);
 }
 
 int
@@ -1346,7 +1347,7 @@ fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
       wsaptr->buf = (char *) iovptr->iov_base;
     }
   WSAMSG wsamsg = { NULL, 0, wsabuf, iovcnt, { 0,  NULL}, 0 };
-  return recv_internal (&wsamsg, false);
+  return recv_internal (&wsamsg);
 }
 
 extern "C" {
@@ -1375,32 +1376,28 @@ get_ext_funcptr (SOCKET sock, void *funcptr)
 }
 
 inline ssize_t
-fhandler_socket::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
+fhandler_socket::recv_internal (LPWSAMSG wsamsg)
 {
   ssize_t res = 0;
   DWORD ret = 0, wret;
   int evt_mask = FD_READ | ((wsamsg->dwFlags & MSG_OOB) ? FD_OOB : 0);
   LPWSABUF &wsabuf = wsamsg->lpBuffers;
   ULONG &wsacnt = wsamsg->dwBufferCount;
+  bool use_recvmsg = false;
   static NO_COPY LPFN_WSARECVMSG WSARecvMsg;
 
   DWORD wait_flags = wsamsg->dwFlags;
   bool waitall = !!(wait_flags & MSG_WAITALL);
   wsamsg->dwFlags &= (MSG_OOB | MSG_PEEK | MSG_DONTROUTE);
-  if (use_recvmsg)
+  if (wsamsg->Control.len > 0)
     {
       if (!WSARecvMsg
 	  && get_ext_funcptr (get_socket (), &WSARecvMsg) == SOCKET_ERROR)
 	{
-	  if (wsamsg->Control.len > 0)
-	    {
-	      set_winsock_errno ();
-	      return SOCKET_ERROR;
-	    }
-	  use_recvmsg = false;
+	  set_winsock_errno ();
+	  return SOCKET_ERROR;
 	}
-      else /* Only MSG_PEEK is supported by WSARecvMsg. */
-	wsamsg->dwFlags &= MSG_PEEK;
+      use_recvmsg = true;
     }
   if (waitall)
     {
@@ -1507,7 +1504,7 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 		    &wsabuf, 1,
 		    { 0, NULL},
 		    flags };
-  ssize_t ret = recv_internal (&wsamsg, false);
+  ssize_t ret = recv_internal (&wsamsg);
   if (fromlen)
     *fromlen = wsamsg.namelen;
   return ret;
@@ -1522,12 +1519,12 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 
   /* Disappointing but true:  Even if WSARecvMsg is supported, it's only
      supported for datagram and raw sockets. */
-  bool use_recvmsg = true;
-  if (get_socket_type () == SOCK_STREAM || get_addr_family () == AF_LOCAL
-      || !wincap.has_recvmsg ())
+  if (!wincap.has_recvmsg () || get_socket_type () == SOCK_STREAM
+      || get_addr_family () == AF_LOCAL)
     {
-      use_recvmsg = false;
       msg->msg_controllen = 0;
+      if (!CYGWIN_VERSION_CHECK_FOR_USING_ANCIENT_MSGHDR)
+	msg->msg_flags = 0;
     }
 
   WSABUF wsabuf[msg->msg_iovlen];
@@ -1542,7 +1539,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 		    wsabuf, msg->msg_iovlen,
 		    { msg->msg_controllen, (char *) msg->msg_control },
 		    flags };
-  ssize_t ret = recv_internal (&wsamsg, use_recvmsg);
+  ssize_t ret = recv_internal (&wsamsg);
   if (ret >= 0)
     {
       msg->msg_namelen = wsamsg.namelen;
@@ -1781,7 +1778,7 @@ fhandler_socket::close ()
 	  res = -1;
 	  break;
 	}
-      if (cygwait (10) == WAIT_SIGNALED)
+      if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0)
 	{
 	  set_errno (EINTR);
 	  res = -1;

@@ -9,6 +9,12 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifdef DEBUGIT
+#define spf(a, b, c) small_printf (a, b, c)
+#else
+#define spf(a, b, c) do {} while (0)
+#endif
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
