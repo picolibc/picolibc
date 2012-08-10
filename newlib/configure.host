@@ -98,7 +98,7 @@ case "${host_cpu}" in
   arc)
 	machine_dir=
 	;;
-  arm*)
+  arm)
 	machine_dir=arm
 	;;
   avr*)
@@ -121,9 +121,6 @@ case "${host_cpu}" in
 	;;
   d30v*)
 	machine_dir=d30v
-	;;
-  epiphany)
-	machine_dir=epiphany
 	;;
   fido)
 	machine_dir=m68k
@@ -367,7 +364,7 @@ case "${host}" in
   arc-*-*)
 	sys_dir=arc
 	;;
-  arm*-*-*)
+  arm-*-*)
 	sys_dir=arm
 	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
 	  have_crt0="no"
@@ -387,11 +384,6 @@ case "${host}" in
 	;;
   d30v*)
 	sys_dir=
-	;;
-  epiphany-*-*)
-	sys_dir=epiphany
-	# crt0 is provided by libgloss.
-	have_crt0="no"
 	;;
   frv*)
         sys_dir=
@@ -560,10 +552,10 @@ case "${host}" in
   arc-*-*)
 	syscall_dir=syscalls
 	;;
-  arm*-*-pe)
+  arm-*-pe)
 	syscall_dir=syscalls
 	;;
-  arm*-*-*)
+  arm-*-*)
 	syscall_dir=syscalls
 # If newlib is supplying syscalls, select which debug protocol is being used.
 # ARM_RDP_MONITOR selects the Demon monitor.
@@ -605,10 +597,6 @@ case "${host}" in
   d30v*)
 	newlib_cflags="${newlib_cflags} -DABORT_MESSAGE -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
 	syscall_dir=
-	;;
-  epiphany*)
-	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DSIGNAL_PROVIDED"
 	;;
   fido-*-elf)
 	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_SYSTEM -DMISSING_SYSCALL_NAMES"
@@ -800,7 +788,7 @@ if [ "x${newlib_atexit_dynamic_alloc}" = "x" ]; then
 fi
 
 # Remove rpc headers if xdr_dir not specified
-if [ "x${xdr_dir}" = "x" ]; then
+if [ "x${xdir_dir}" = "x" ]; then
 	noinclude="${noinclude} rpc/types.h rpc/xdr.h"
 fi
 

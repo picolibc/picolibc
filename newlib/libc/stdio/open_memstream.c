@@ -313,12 +313,12 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
     return NULL;
   if ((c = (memstream *) _malloc_r (ptr, sizeof *c)) == NULL)
     {
-      _newlib_sfp_lock_start ();
+      __sfp_lock_acquire ();
       fp->_flags = 0;		/* release */
 #ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
 #endif
-      _newlib_sfp_lock_end ();
+      __sfp_lock_release ();
       return NULL;
     }
   /* Use *size as a hint for initial sizing, but bound the initial
@@ -338,12 +338,12 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
   *buf = _malloc_r (ptr, c->max);
   if (!*buf)
     {
-      _newlib_sfp_lock_start ();
+      __sfp_lock_acquire ();
       fp->_flags = 0;		/* release */
 #ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
 #endif
-      _newlib_sfp_lock_end ();
+      __sfp_lock_release ();
       _free_r (ptr, c);
       return NULL;
     }
@@ -359,7 +359,7 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
   c->saved.w = L'\0';
   c->wide = (int8_t) wide;
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   fp->_file = -1;
   fp->_flags = __SWR;
   fp->_cookie = c;
@@ -372,7 +372,7 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
 #endif
   fp->_close = memcloser;
   ORIENT (fp, wide);
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return fp;
 }
 

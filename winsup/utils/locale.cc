@@ -25,7 +25,6 @@
  */
 #include <errno.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <ctype.h>
 #include <getopt.h>
 #include <string.h>
@@ -35,8 +34,7 @@
 #include <limits.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
-#define _WIN32_WINNT 0x0602
-#define WINVER 0x0602
+#define WINVER 0x0601
 #include <windows.h>
 
 #define LOCALE_ALIAS		"/usr/share/locale/locale.alias"

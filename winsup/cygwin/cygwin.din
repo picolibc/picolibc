@@ -738,7 +738,6 @@ _getlogin = getlogin NOSIGFE
 getlogin_r NOSIGFE
 getmntent SIGFE
 _getmntent = getmntent SIGFE
-getmntent_r SIGFE
 getmode SIGFE
 _getmode = getmode SIGFE
 getnameinfo = cygwin_getnameinfo SIGFE
@@ -1063,7 +1062,6 @@ memmove NOSIGFE
 _memmove = memmove NOSIGFE
 mempcpy NOSIGFE
 __mempcpy = mempcpy NOSIGFE
-memrchr NOSIGFE
 memset NOSIGFE
 _memset = memset NOSIGFE
 mkdir SIGFE
@@ -1408,7 +1406,6 @@ scalbnf NOSIGFE
 _scalbnf = scalbnf NOSIGFE
 scandir SIGFE
 _scandir = scandir SIGFE
-scandirat SIGFE
 scanf SIGFE
 _scanf = scanf SIGFE
 scanf_r = _scanf_r SIGFE

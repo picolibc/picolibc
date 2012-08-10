@@ -1,7 +1,7 @@
 /* dll_init.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -106,47 +106,7 @@ dll::init ()
   return ret;
 }
 
-/* Look for a dll based on the full path.
-
-   CV, 2012-03-04: Per MSDN, If a DLL with the same module name is already
-   loaded in memory, the system uses the loaded DLL, no matter which directory
-   it is in. The system does not search for the DLL.  See
-   http://msdn.microsoft.com/en-us/library/ms682586%28v=vs.85%29.aspx
-
-   On 2012-02-08 I interpreted "module name" as "basename".  So the assumption
-   was that the Windows Loader does not load another DLL with the same basename,
-   if one such DLL is already loaded.  Consequentially I changed the code so
-   that DLLs are only compared by basename.
-
-   This assumption was obviously wrong, as the perl dynaloader proves.  It
-   loads multiple DLLs with the same basename into memory, just from different
-   locations.  This mechanism is broken when only comparing basenames in the
-   below code.
-
-   However, the original problem reported on 2012-02-07 was a result of
-   a subtil difference between the paths returned by different calls to
-   GetModuleFileNameW: Sometimes the path is a plain DOS path, sometimes
-   it's preceeded by the long pathname prefix "\\?\".
-
-   So I reverted the original change from 2012-02-08 and only applied the
-   following fix: Check if the path is preceeded by a long pathname prefix,
-   and, if so, drop it forthwith so that subsequent full path comparisons
-   work as expected.
-   
-   At least that was the original idea.  In fact there are two case, linked
-   and runtime loaded DLLs, which have to be distinguished:
-   
-   - Linked DLLs are loaded by only specifying the basename of the DLL and
-     searching it using the system DLL search order as given in the
-     aforementioned MSDN URL.
-
-   - Runtime loaded DLLs are specified with the full path since that's how
-     dlopen works.
-
-   In effect, we have to be careful not to mix linked and loaded DLLs.
-   For more info how this gets accomplished, see the comments at the start
-   of dll_list::alloc, as well as the comment preceeding the definition of
-   the in_load_after_fork bool later in the file. */
+/* Look for a dll based on name */
 dll *
 dll_list::operator[] (const PWCHAR name)
 {
@@ -158,13 +118,13 @@ dll_list::operator[] (const PWCHAR name)
   return NULL;
 }
 
-/* Look for a dll based on the basename. */
+/* Look for a dll based on is short name only (no path) */
 dll *
-dll_list::find_by_modname (const PWCHAR modname)
+dll_list::find_by_modname (const PWCHAR name)
 {
   dll *d = &start;
   while ((d = d->next) != NULL)
-    if (!wcscasecmp (modname, d->modname))
+    if (!wcscasecmp (name, d->modname))
       return d;
 
   return NULL;
@@ -176,48 +136,31 @@ dll_list::find_by_modname (const PWCHAR modname)
 dll *
 dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 {
-  WCHAR buf[NT_MAX_PATH];
-  GetModuleFileNameW (h, buf, sizeof (buf));
-  PWCHAR name = buf;
-  if (!wcsncmp (name, L"\\\\?\\", 4))
-    {
-      name += 4;
-      if (!wcsncmp (name, L"UNC\\", 4))
-	{
-	  name += 2;
-	  *name = L'\\';
-	}
-    }
-  DWORD namelen = wcslen (name);
-  PWCHAR modname = wcsrchr (name, L'\\') + 1;
+  WCHAR name[NT_MAX_PATH];
+  DWORD namelen = GetModuleFileNameW (h, name, sizeof (name));
 
   guard (true);
-  /* Already loaded?  For linked DLLs, only compare the basenames.  Linked
-     DLLs are loaded using just the basename and the default DLL search path.
-     The Windows loader picks up the first one it finds.  */
-  dll *d = (type == DLL_LINK) ? dlls.find_by_modname (modname) : dlls[name];
+  /* Already loaded? */
+  dll *d = dlls[name];
   if (d)
     {
       if (!in_forkee)
 	d->count++;	/* Yes.  Bump the usage count. */
-      else if (d->handle != h)
-	fabort ("%W: Loaded to different address: parent(%p) != child(%p)",
-		name, d->handle, h);
-      /* If this DLL has been linked against, and the full path differs, try
-	 to sanity check if this is the same DLL, just in another path. */
-      else if (type == DLL_LINK && wcscasecmp (name, d->name)
-	       && (d->p.data_start != p->data_start
-		   || d->p.data_start != p->data_start
-		   || d->p.bss_start != p->bss_start
-		   || d->p.bss_end != p->bss_end
-		   || d->p.ctors != p->ctors
-		   || d->p.dtors != p->dtors))
-      	fabort ("\nLoaded different DLL with same basename in forked child,\n"
-		"parent loaded: %W\n"
-		" child loaded: %W\n"
-		"The DLLs differ, so it's not safe to run the forked child.\n"
-		"Make sure to remove the offending DLL before trying again.",
-		d->name, name);
+      else
+	{
+	  if (d->p.data_start != p->data_start)
+	    fabort ("data segment start: parent(%p) != child(%p)",
+		    d->p.data_start, p->data_start);
+	  else if (d->p.data_end != p->data_end)
+	    fabort ("data segment end: parent(%p) != child(%p)",
+		    d->p.data_end, p->data_end);
+	  else if (d->p.bss_start != p->bss_start)
+	    fabort ("data segment start: parent(%p) != child(%p)",
+		    d->p.bss_start, p->bss_start);
+	  else if (d->p.bss_end != p->bss_end)
+	    fabort ("bss segment end: parent(%p) != child(%p)",
+		    d->p.bss_end, p->bss_end);
+	}
       d->p = p;
     }
   else
@@ -225,16 +168,18 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       /* FIXME: Change this to new at some point. */
       d = (dll *) cmalloc (HEAP_2_DLL, sizeof (*d) + (namelen * sizeof (*name)));
 
-      /* Now we've allocated a block of information.  Fill it in with the
-	 supplied info about this DLL. */
+      /* Now we've allocated a block of information.  Fill it in with the supplied
+	 info about this DLL. */
       d->count = 1;
       wcscpy (d->name, name);
-      d->modname = d->name + (modname - name);
       d->handle = h;
       d->has_dtors = true;
       d->p = p;
       d->ndeps = 0;
       d->deps = NULL;
+      d->modname = wcsrchr (d->name, L'\\');
+      if (d->modname)
+       d->modname++;
       d->image_size = ((pefile*)h)->optional_hdr ()->SizeOfImage;
       d->preferred_base = (void*) ((pefile*)h)->optional_hdr()->ImageBase;
       d->type = type;
@@ -486,12 +431,6 @@ dll_list::reserve_space ()
 	      d->modname, d->handle);
 }
 
-/* We need the in_load_after_fork flag so dll_dllcrt0_1 can decide at fork
-   time if this is a linked DLL or a dynamically loaded DLL.  In either case,
-   both, cygwin_finished_initializing and in_forkee are true, so they are not
-   sufficient to discern the situation. */
-static bool NO_COPY in_load_after_fork;
-
 /* Reload DLLs after a fork.  Iterates over the list of dynamically loaded
    DLLs and attempts to load them in the same place as they were loaded in the
    parent. */
@@ -501,9 +440,7 @@ dll_list::load_after_fork (HANDLE parent)
   // moved to frok::child for performance reasons:
   // dll_list::reserve_space();
 
-  in_load_after_fork = true;
   load_after_fork_impl (parent, dlls.istart (DLL_LOAD), 0);
-  in_load_after_fork = false;
 }
 
 static int const DLL_RETRY_MAX = 6;
@@ -541,7 +478,8 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 
 	HMODULE h = LoadLibraryExW (d->name, NULL, DONT_RESOLVE_DLL_REFERENCES);
 	if (!h)
-	  fabort ("unable to create interim mapping for %W, %E", d->name);
+	  fabort ("unable to create interim mapping for %W, %E",
+		  d->name);
 	if (h != d->handle)
 	  {
 	    sigproc_printf ("%W loaded in wrong place: %08lx != %08lx",
@@ -630,7 +568,7 @@ dll_dllcrt0_1 (VOID *x)
       _pei386_runtime_relocator (p);
     }
 
-  bool linked = !cygwin_finished_initializing && !in_load_after_fork;
+  bool linked = !in_forkee && !cygwin_finished_initializing;
 
   /* Broken DLLs built against Cygwin versions 1.7.0-49 up to 1.7.0-57
      override the cxx_malloc pointer in their DLL initialization code,

@@ -45,9 +45,9 @@
    etc. are doing to address these issues.  */
 
 /* For an explanation of what each signal means, see
-   gdb_signal_to_string.  */
+   target_signal_to_string.  */
 
-enum gdb_signal
+enum target_signal
   {
 #define SET(symbol, constant, name, string) \
     symbol = constant,

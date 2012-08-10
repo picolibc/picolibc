@@ -1,6 +1,6 @@
 /* fhandler_dev_dsp: code to emulate OSS sound model /dev/dsp
 
-   Copyright 2001, 2002, 2003, 2004, 2008, 2011, 2012 Red Hat, Inc
+   Copyright 2001, 2002, 2003, 2004, 2008, 2011 Red Hat, Inc
 
    Written by Andy Younger (andy@snoogie.demon.co.uk)
    Extended by Gerd Spalink (Gerd.Spalink@t-online.de)
@@ -21,7 +21,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
-#include "cygwait.h"
 
 /*------------------------------------------------------------------------
   Simple encapsulation of the win32 audio device.
@@ -479,7 +478,6 @@ fhandler_dev_dsp::Audio_out::write (const char *pSampleData, int nBytes)
 	{ // all data fits into the current block, with some space left
 	  memcpy (&pHdr_->lpData[bufferIndex_], pSampleData, bytes_to_write);
 	  bufferIndex_ += bytes_to_write;
-	  bytes_to_write = 0;
 	  break;
 	}
       else
@@ -545,14 +543,14 @@ fhandler_dev_dsp::Audio_out::waitforspace ()
       debug_printf ("100ms");
       switch (cygwait (100))
 	{
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0:
 	  if (!_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);
 	      return false;
 	    }
 	  break;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 1:
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
 	default:
@@ -923,14 +921,14 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
       debug_printf ("100ms");
       switch (cygwait (100))
 	{
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0:
 	  if (!_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);
 	      return false;
 	    }
 	  break;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 1:
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
 	default:

@@ -1,6 +1,6 @@
 /* kernel32.cc: Win32 replacement functions.
 
-   Copyright 2008, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2008, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,6 +11,7 @@ details. */
 #include "winsup.h"
 #include "shared_info.h"
 #include "ntdll.h"
+#include <wchar.h>
 
 /* Implement CreateEvent/OpenEvent so that named objects are always created in
    Cygwin shared object namespace. */
@@ -307,8 +308,8 @@ CreateFileMappingW (HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes,
 			    | PAGE_WRITECOPY | PAGE_EXECUTE
 			    | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE
 			    | PAGE_EXECUTE_WRITECOPY);
-  ULONG attribs = flProtect & (SEC_COMMIT | SEC_IMAGE | SEC_NOCACHE
-			       | SEC_RESERVE);
+  ULONG attribs = flProtect & (SEC_BASED | SEC_NO_CHANGE | SEC_IMAGE | SEC_VLM
+			       | SEC_RESERVE | SEC_COMMIT | SEC_NOCACHE);
   LARGE_INTEGER size = {{ LowPart  : dwMaximumSizeLow,
 			  HighPart : dwMaximumSizeHigh }};
   PLARGE_INTEGER psize = size.QuadPart ? &size : NULL;

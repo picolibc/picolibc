@@ -43,7 +43,7 @@ details. */
 	 changes to the DLL and is mainly informative in nature. */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1007
-#define CYGWIN_VERSION_DLL_MINOR 17
+#define CYGWIN_VERSION_DLL_MINOR 10
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -428,15 +428,12 @@ details. */
       257: Export getpt.
       258: Export get_current_dir_name.
       259: Export pthread_sigqueue.
-      260: Export scandirat.
-      261: Export memrchr.
-      262: Export getmntent_r.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 262
+#define CYGWIN_VERSION_API_MINOR 259
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

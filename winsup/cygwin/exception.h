@@ -1,12 +1,13 @@
 /* exception.h
 
-   Copyright 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2010, 2011 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#pragma once
+#ifndef _EXCEPTION_H
+#define _EXCEPTION_H
 
 #include <exceptions.h>
 
@@ -28,10 +29,5 @@ public:
   ~exception () __attribute__ ((always_inline)) { _except_list = save; }
 };
 
-void stackdump (DWORD, CONTEXT * = NULL, EXCEPTION_RECORD * = NULL);
-extern void inline
-stackdump (DWORD n, bool)
-{
-  stackdump (n, (CONTEXT *) 1);
-}
+#endif /*_EXCEPTION_H*/
 

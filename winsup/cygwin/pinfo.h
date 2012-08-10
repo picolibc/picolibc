@@ -111,6 +111,8 @@ public:
   char *cwd (size_t &);
   char *cmdline (size_t &);
   bool set_ctty (class fhandler_termios *, int);
+  HANDLE dup_proc_pipe (HANDLE) __attribute__ ((regparm(2)));
+  void sync_proc_pipe ();
   bool alert_parent (char);
   int __stdcall kill (siginfo_t&) __attribute__ ((regparm (2)));
   bool __stdcall exists () __attribute__ ((regparm (1)));
@@ -121,6 +123,8 @@ public:
   HANDLE exec_sendsig;
   DWORD exec_dwProcessId;
 public:
+  HANDLE wr_proc_pipe;
+  DWORD wr_proc_pipe_owner;
   friend class pinfo_minimal;
 };
 
@@ -139,7 +143,6 @@ public:
   HANDLE hProcess;
   HANDLE rd_proc_pipe;
   pinfo_minimal (): h (NULL), hProcess (NULL), rd_proc_pipe (NULL) {}
-  void set_rd_proc_pipe (HANDLE& h) {rd_proc_pipe = h;}
   friend class pinfo;
 };
 

@@ -77,12 +77,10 @@ static const HKEY registry_keys[] =
 
 static const int ROOT_KEY_COUNT = sizeof (registry_keys) / sizeof (HKEY);
 
-#ifndef __MINGW64_VERSION_MAJOR
 extern "C" {
   LONG WINAPI RegOpenUserClassesRoot (HANDLE, DWORD, REGSAM, PHKEY);
   LONG WINAPI RegOpenCurrentUser (REGSAM, PHKEY);
 };
-#endif
 
 /* Make sure to access the correct per-user HKCR and HKCU hives, even if
    the current user is only impersonated in another user's session. */
@@ -850,7 +848,6 @@ fhandler_registry::open (int flags, mode_t mode)
     {
       set_errno (EROFS);
       res = 0;
-      goto out;
     }
   else
     {

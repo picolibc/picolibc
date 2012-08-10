@@ -31,7 +31,6 @@ struct mntent
 #include <stdio.h>
 FILE *setmntent (const char *__filep, const char *__type);
 struct mntent *getmntent (FILE *__filep);
-struct mntent *getmntent_r (FILE *, struct mntent *, char *, int);
 int endmntent (FILE *__filep);
 #endif
 

@@ -1,6 +1,6 @@
 /* advapi32.cc: Win32 replacement functions.
 
-   Copyright 2011, 2012 Red Hat, Inc.
+   Copyright 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,6 +12,7 @@ details. */
 #include <winioctl.h>
 #include "shared_info.h"
 #include "ntdll.h"
+#include <wchar.h>
 
 #define DEFAULT_NTSTATUS_TO_BOOL_RETURN \
   if (!NT_SUCCESS (status)) \
@@ -88,7 +89,7 @@ ImpersonateLoggedOnUser (HANDLE tok)
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
 }
 
-BOOL WINAPI
+BOOL
 ImpersonateNamedPipeClient (HANDLE pipe)
 {
   IO_STATUS_BLOCK io;

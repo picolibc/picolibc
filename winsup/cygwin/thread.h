@@ -16,20 +16,30 @@ details. */
 #define WRITE_LOCK 1
 #define READ_LOCK  2
 
-/* Default is a 1 Megs stack with a 4K guardpage.  The pthread stacksize
-   does not include the guardpage size, so we subtract the default guardpage
-   size. Additionally, the Windows stack handling disallows to use the last
-   two pages as guard page  (tested on XP and W7).  That results in a zone of
-   three pages which have to be subtract to get the actual stack size. */
-#define PTHREAD_DEFAULT_STACKSIZE (1024 * 1024 - 3 * wincap.page_size ())
-#define PTHREAD_DEFAULT_GUARDSIZE (wincap.page_size ())
-
 #include <pthread.h>
 #include <limits.h>
 #include "security.h"
 #include <errno.h>
 #include "cygerrno.h"
-#include "cygwait.h"
+
+enum cw_sig_wait
+{
+  cw_sig_nosig,
+  cw_sig_eintr,
+  cw_sig_resume
+};
+
+enum cw_cancel_action
+{
+  cw_cancel_self,
+  cw_no_cancel_self,
+  cw_no_cancel
+};
+
+DWORD cancelable_wait (HANDLE, PLARGE_INTEGER timeout = NULL,
+		       const cw_cancel_action = cw_cancel_self,
+		       const enum cw_sig_wait = cw_sig_nosig)
+  __attribute__ ((regparm (3)));
 
 class fast_mutex
 {
@@ -60,7 +70,7 @@ public:
   void lock ()
   {
     if (InterlockedIncrement ((long *) &lock_counter) != 1)
-      cancelable_wait (win32_obj_id, cw_infinite, cw_sig);
+      cancelable_wait (win32_obj_id, NULL, cw_no_cancel, cw_sig_resume);
   }
 
   void unlock ()
@@ -343,6 +353,9 @@ public:
 
   pthread_spinlock (int);
 };
+
+#define WAIT_CANCELED   (WAIT_OBJECT_0 + 1)
+#define WAIT_SIGNALED  (WAIT_OBJECT_0 + 2)
 
 class _cygtls;
 class pthread: public verifyable_object

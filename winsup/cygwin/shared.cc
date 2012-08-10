@@ -1,7 +1,7 @@
 /* shared.cc: shared data area support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -34,6 +34,96 @@ user_info NO_COPY *user_shared;
 HANDLE NO_COPY cygwin_shared_h;
 HANDLE NO_COPY cygwin_user_h;
 
+WCHAR installation_root[PATH_MAX] __attribute__((section (".cygwin_dll_common"), shared));
+UNICODE_STRING installation_key __attribute__((section (".cygwin_dll_common"), shared));
+WCHAR installation_key_buf[18] __attribute__((section (".cygwin_dll_common"), shared));
+static LONG installation_root_inited __attribute__((section (".cygwin_dll_common"), shared));
+
+#define SPIN_WAIT 10000
+
+/* Use absolute path of cygwin1.dll to derive the Win32 dir which
+   is our installation_root.  Note that we can't handle Cygwin installation
+   root dirs of more than 4K path length.  I assume that's ok...
+
+   This function also generates the installation_key value.  It's a 64 bit
+   hash value based on the path of the Cygwin DLL itself.  It's subsequently
+   used when generating shared object names.  Thus, different Cygwin
+   installations generate different object names and so are isolated from
+   each other.
+
+   Having this information, the installation key together with the
+   installation root path is written to the registry.  The idea is that
+   cygcheck can print the paths into which the Cygwin DLL has been
+   installed for debugging purposes.
+
+   Last but not least, the new cygwin properties datastrcuture is checked
+   for the "disabled_key" value, which is used to determine whether the
+   installation key is actually added to all object names or not.  This is
+   used as a last resort for debugging purposes, usually.  However, there
+   could be another good reason to re-enable object name collisions between
+   multiple Cygwin DLLs, which we're just not aware of right now.  Cygcheck
+   can be used to change the value in an existing Cygwin DLL binary. */
+
+void inline
+init_installation_root ()
+{
+  spinlock iri (installation_root_inited);
+  if (!iri)
+    {
+      if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
+	api_fatal ("Can't initialize Cygwin installation root dir.\n"
+		   "GetModuleFileNameW(%p, %p, %u), %E",
+		   cygwin_hmodule, installation_root, PATH_MAX);
+      PWCHAR p = installation_root;
+      if (wcsncmp (p, L"\\\\?\\", 4))	/* No long path prefix. */
+	{
+	  if (!wcsncasecmp (p, L"\\\\", 2))	/* UNC */
+	    {
+	      p = wcpcpy (p, L"\\??\\UN");
+	      GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 6);
+	      *p = L'C';
+	    }
+	  else
+	    {
+	      p = wcpcpy (p, L"\\??\\");
+	      GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
+	    }
+	}
+      installation_root[1] = L'?';
+
+      RtlInitEmptyUnicodeString (&installation_key, installation_key_buf,
+				 sizeof installation_key_buf);
+      RtlInt64ToHexUnicodeString (hash_path_name (0, installation_root),
+				  &installation_key, FALSE);
+
+      PWCHAR w = wcsrchr (installation_root, L'\\');
+      if (w)
+	{
+	  *w = L'\0';
+	  w = wcsrchr (installation_root, L'\\');
+	}
+      if (!w)
+	api_fatal ("Can't initialize Cygwin installation root dir.\n"
+		   "Invalid DLL path");
+      *w = L'\0';
+
+      for (int i = 1; i >= 0; --i)
+	{
+	  reg_key r (i, KEY_WRITE, _WIDE (CYGWIN_INFO_INSTALLATIONS_NAME),
+		     NULL);
+	  if (NT_SUCCESS (r.set_string (installation_key_buf,
+					installation_root)))
+	    break;
+	}
+
+      if (cygwin_props.disable_key)
+	{
+	  installation_key.Length = 0;
+	  installation_key.Buffer[0] = L'\0';
+	}
+    }
+}
+
 /* This function returns a handle to the top-level directory in the global
    NT namespace used to implement global objects including shared memory. */
 
@@ -52,7 +142,7 @@ get_shared_parent_dir ()
       __small_swprintf (bnoname, L"\\BaseNamedObjects\\%s%s-%S",
 			cygwin_version.shared_id,
 			_cygwin_testing ? cygwin_version.dll_build_date : "",
-			&cygheap->installation_key);
+			&installation_key);
       RtlInitUnicodeString (&uname, bnoname);
       InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF, NULL,
 				  everyone_sd (CYG_SHARED_DIR_ACCESS));
@@ -88,7 +178,7 @@ get_session_parent_dir ()
 			    L"\\Sessions\\BNOLINKS\\%d\\%s%s-%S",
 			    psi.SessionId, cygwin_version.shared_id,
 			    _cygwin_testing ? cygwin_version.dll_build_date : "",
-			    &cygheap->installation_key);
+			    &installation_key);
 	  RtlInitUnicodeString (&uname, bnoname);
 	  InitializeObjectAttributes (&attr, &uname, OBJ_OPENIF, NULL,
 				      everyone_sd(CYG_SHARED_DIR_ACCESS));
@@ -286,44 +376,23 @@ shared_destroy ()
   UnmapViewOfFile (user_shared);
 }
 
-/* Initialize obcaseinsensitive.*/
+/* Initialize obcaseinsensitive.  Default to case insensitive on pre-XP. */
 void
 shared_info::init_obcaseinsensitive ()
 {
-  if (wincap.kernel_is_always_casesensitive ())
-    {
-      /* Only Windows 2000.  Default to case insensitive unless the user
-      	 sets the obcaseinsensitive registry value explicitely to 0. */
-      DWORD def_obcaseinsensitive = 1;
+  NTSTATUS status;
+  DWORD def_obcaseinsensitive = 1;
 
-      obcaseinsensitive = def_obcaseinsensitive;
-      RTL_QUERY_REGISTRY_TABLE tab[2] = {
-	{ NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
-	  L"obcaseinsensitive", &obcaseinsensitive, REG_DWORD,
-	  &def_obcaseinsensitive, sizeof (DWORD) },
-	{ NULL, 0, NULL, NULL, 0, NULL, 0 }
-      };
-      RtlQueryRegistryValues (RTL_REGISTRY_CONTROL,
-			      L"Session Manager\\kernel",
-			      tab, NULL, NULL);
-    }
-  else
-    {
-      /* Instead of reading the obcaseinsensitive registry value, test the
-	 actual state of case sensitivity handling in the kernel. */
-      UNICODE_STRING sysroot;
-      OBJECT_ATTRIBUTES attr;
-      HANDLE h;
-
-      RtlInitUnicodeString (&sysroot, L"\\SYSTEMROOT");
-      InitializeObjectAttributes (&attr, &sysroot, 0, NULL, NULL);
-      /* NtOpenSymbolicLinkObject returns STATUS_ACCESS_DENIED when called
-      	 with a 0 access mask.  However, if the kernel is case sensitive,
-	 it returns STATUS_OBJECT_NAME_NOT_FOUND because we used the incorrect
-	 case for the filename (It's actually "\\SystemRoot"). */
-      obcaseinsensitive = NtOpenSymbolicLinkObject (&h, 0, &attr)
-			  != STATUS_OBJECT_NAME_NOT_FOUND;
-    }
+  obcaseinsensitive = def_obcaseinsensitive;
+  RTL_QUERY_REGISTRY_TABLE tab[2] = {
+    { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+      L"obcaseinsensitive", &obcaseinsensitive, REG_DWORD,
+      &def_obcaseinsensitive, sizeof (DWORD) },
+    { NULL, 0, NULL, NULL, 0, NULL, 0 }
+  };
+  status = RtlQueryRegistryValues (RTL_REGISTRY_CONTROL,
+				   L"Session Manager\\kernel",
+				   tab, NULL, NULL);
 }
 
 void inline
@@ -353,7 +422,7 @@ shared_info::initialize ()
 	 up to this point.  Debug output except for system_printf requires
 	 the global shared memory to exist. */
       debug_printf ("Installation root: <%W> key: <%S>",
-		    cygheap->installation_root, &cygheap->installation_key);
+		    installation_root, &installation_key);
     }
   else if (sversion != (LONG) CURR_SHARED_MAGIC)
     sversion.multiple_cygwin_problem ("system shared memory version",
@@ -372,13 +441,9 @@ memory_init (bool init_cygheap)
     {
       cygheap_init ();
       cygheap->user.init ();
-      cygheap->init_installation_root (); /* Requires user.init! */
     }
 
+  init_installation_root ();	/* Initialize installation root dir */
   shared_info::create ();	/* Initialize global shared memory */
   user_info::create (false);	/* Initialize per-user shared memory */
-  /* Initialize tty list session stuff.  Doesn't really belong here but
-     this needs to be initialized before any tty or console manipulation
-     happens and it is a common location.  */
-  tty_list::init_session ();
 }

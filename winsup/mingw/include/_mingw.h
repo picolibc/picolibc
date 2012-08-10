@@ -22,13 +22,6 @@
  */
 #define __MINGW_H
 
-#define __MINGW_VERSION		    4
-#define __MINGW_MAJOR_VERSION	    0
-#define __MINGW_MINOR_VERSION	    0
-#define __MINGW_PATCHLEVEL	    0
-
-// These four macros are deprecated and will be removed in the next major
-// version release.
 #define __MINGW32_VERSION           3.20
 #define __MINGW32_MAJOR_VERSION     3
 #define __MINGW32_MINOR_VERSION     20
@@ -47,10 +40,10 @@
    __MINGW_IMPORT                  The attribute definition to specify imported
                                    variables/functions.
    _CRTIMP                         As above.  For MS compatibility.
-   __MINGW_VERSION                 Runtime version.
-   __MINGW_MAJOR_VERSION           Runtime major version.
-   __MINGW_MINOR_VERSION           Runtime minor version.
-   __MINGW_BUILD_DATE              Runtime build date.
+   __MINGW32_VERSION               Runtime version.
+   __MINGW32_MAJOR_VERSION         Runtime major version.
+   __MINGW32_MINOR_VERSION         Runtime minor version.
+   __MINGW32_BUILD_DATE            Runtime build date.
 
    Macros to enable MinGW features which deviate from standard MSVC
    compatible behaviour; these may be specified directly in user code,
@@ -289,15 +282,5 @@ allow GCC to optimize away some EH unwind code, at least in DW2 case.  */
 #  define __USE_MINGW_ANSI_STDIO    (__MINGW_FEATURES__ & __MINGW_ANSI_STDIO__)
 # endif
 #endif
-
-struct threadlocalinfostruct;
-struct threadmbinfostruct;
-typedef struct threadlocalinfostruct *pthreadlocinfo;
-typedef struct threadmbcinfostruct *pthreadmbcinfo;
-
-typedef struct localeinfo_struct {
-  pthreadlocinfo locinfo;
-  pthreadmbcinfo mbcinfo;
-} _locale_tstruct, *_locale_t;
 
 #endif /* __MINGW_H */

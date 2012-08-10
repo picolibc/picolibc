@@ -1,7 +1,7 @@
 /* uinfo.cc: user info (uid, gid, etc...)
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -435,8 +435,7 @@ cygheap_user::env_userprofile (const char *name, size_t namelen)
   if (test_uid (puserprof, name, namelen))
     return puserprof;
 
-  /* User hive path is never longer than MAX_PATH. */
-  WCHAR userprofile_env_buf[MAX_PATH];
+  WCHAR userprofile_env_buf[NT_MAX_PATH];
   WCHAR win_id[UNLEN + 1]; /* Large enough for SID */
 
   cfree_and_set (puserprof, almost_null);
@@ -549,13 +548,13 @@ pwdgrp::load (const wchar_t *rel_path)
   curr_lines = 0;
 
   if (!path &&
-      !(path = (PWCHAR) malloc ((wcslen (cygheap->installation_root)
+      !(path = (PWCHAR) malloc ((wcslen (installation_root)
 				 + wcslen (rel_path) + 1) * sizeof (WCHAR))))
     {
       paranoid_printf ("malloc (%W) failed", rel_path);
       goto out;
     }
-  wcpcpy (wcpcpy (path, cygheap->installation_root), rel_path);
+  wcpcpy (wcpcpy (path, installation_root), rel_path);
   RtlInitUnicodeString (&upath, path);
 
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);

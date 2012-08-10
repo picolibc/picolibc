@@ -1,125 +1,5 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
-<sect2 id="ov-new1.7.16"><title>What's new and what changed from 1.7.15 to 1.7.16</title>
-
-<itemizedlist mark="bullet">
-
-<listitem><para>
-New API: getmntent_r, memrchr.
-</para></listitem>
-
-<listitem><para>
-Recognize ReFS filesystem.
-</para></listitem>
-
-</itemizedlist>
-
-</sect2>
-
-<sect2 id="ov-new1.7.15"><title>What's new and what changed from 1.7.14 to 1.7.15</title>
-
-<itemizedlist mark="bullet">
-
-<listitem><para>
-CYGWIN=pipe_byte option now forces the opening of pipes in byte mode rather than message mode.
-</para></listitem>
-
-</itemizedlist>
-
-</sect2>
-
-<sect2 id="ov-new1.7.14"><title>What's new and what changed from 1.7.13 to 1.7.14</title>
-
-<itemizedlist mark="bullet">
-
-<listitem><para>
-Add mouse reporting modes 1005, 1006 and 1015 to console window.
-</para></listitem>
-
-</itemizedlist>
-
-</sect2>
-
-<sect2 id="ov-new1.7.13"><title>What's new and what changed from 1.7.12 to 1.7.13</title>
-
-<itemizedlist mark="bullet">
-
-<listitem><para>
-mkpasswd and mkgroup now try to print an entry for the TrustedInstaller
-account existing since Windows Vista/Server 2008.
-</para></listitem>
-
-<listitem><para>
-Terminal typeahead when switching from canonical to non-canonical mode
-is now properly flushed.
-</para></listitem>
-
-</itemizedlist>
-
-</sect2>
-
-<sect2 id="ov-new1.7.12"><title>What's new and what changed from 1.7.11 to 1.7.12</title>
-
-<itemizedlist mark="bullet">
-
-<listitem><para>
-Cygwin now automatically populates the /dev directory with all existing
-POSIX devices.
-</para></listitem>
-
-<listitem><para>
-Add virtual /proc/PID/mountinfo file.
-</para></listitem>
-
-<listitem><para>
-flock now additionally supports the following scenario, which requires
-  to propagate locks to the parent process:
-   <screen>
-    (
-      flock -n 9 || exit 1
-      # ... commands executed under lock ...
-    } 9>/var/lock/mylockfile
-   </screen>
-  Only propagation to the direct parent process is supported so far,
-  not to grand parents or sibling processes.
-</para></listitem>
-
-<listitem><para>
-Add a "detect_bloda" setting for the CYGWIN environment variable to help
-finding potential BLODAs.
-</para></listitem>
-
-</itemizedlist>
-
-</sect2>
-
-<sect2 id="ov-new1.7.11"><title>What's new and what changed from 1.7.10 to 1.7.11</title>
-
-<itemizedlist mark="bullet">
-
-<listitem><para>
-New <command>pldd</command> command for listing DLLs loaded by a process.
-</para></listitem>
-
-<listitem><para>
-New API: scandirat.
-</para></listitem>
-
-<listitem><para>
-Change the way remote shares mapped to drive letters are recognized when
-creating the cygdrive directory.  If Windows claims the drive is
-unavailable, don't show it in the cygdrive directory listing.
-</para></listitem>
-
-<listitem><para>
-Raise default stacksize of pthreads from 512K to 1 Meg.  It can still be
-changed using the pthread_attr_setstacksize call.
-</para></listitem>
-
-</itemizedlist>
-
-</sect2>
-
 <sect2 id="ov-new1.7.10"><title>What's new and what changed from 1.7.9 to 1.7.10</title>
 
 <itemizedlist mark="bullet">
@@ -197,7 +77,7 @@ Also, perror and strerror_r no longer clobber strerror storage.
 </para></listitem>
 
 <listitem><para>
-C99 &lt;tgmath.h&gt; type-generic macros.
+C99 &gt;tgmath.h&lt; type-generic macros.
 </para></listitem>
 
 <listitem><para>

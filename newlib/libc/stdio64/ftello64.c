@@ -99,12 +99,12 @@ _DEFUN (_ftello64_r, (ptr, fp),
 
   CHECK_INIT (ptr, fp);
 
-  _newlib_flockfile_start(fp);
+  _flockfile(fp);
 
   if (fp->_seek64 == NULL)
     {
       ptr->_errno = ESPIPE;
-      _newlib_flockfile_exit(fp);
+      _funlockfile(fp);
       return -1L;
     }
 
@@ -121,7 +121,7 @@ _DEFUN (_ftello64_r, (ptr, fp),
       pos = fp->_seek64 (ptr, fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
       if (pos == -1L)
         {
-          _newlib_flockfile_exit(fp);
+          _funlockfile(fp);
           return pos;
         }
     }
@@ -146,7 +146,7 @@ _DEFUN (_ftello64_r, (ptr, fp),
       pos += fp->_p - fp->_bf._base;
     }
 
-  _newlib_flockfile_end(fp);
+  _funlockfile(fp);
   return pos;
 }
 

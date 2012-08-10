@@ -1,7 +1,7 @@
 /* fork.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -45,6 +45,83 @@ class frok
   int __stdcall child (volatile char * volatile here);
   bool error (const char *fmt, ...);
   friend int fork ();
+};
+
+class lock_signals
+{
+  bool worked;
+public:
+  lock_signals ()
+  {
+    worked = sig_send (NULL, __SIGHOLD) == 0;
+  }
+  operator int () const
+  {
+    return worked;
+  }
+  void dont_bother ()
+  {
+    worked = false;
+  }
+  ~lock_signals ()
+  {
+    if (worked)
+      sig_send (NULL, __SIGNOHOLD);
+  }
+};
+
+class lock_pthread
+{
+  bool bother;
+public:
+  lock_pthread (): bother (1)
+  {
+    pthread::atforkprepare ();
+  }
+  void dont_bother ()
+  {
+    bother = false;
+  }
+  ~lock_pthread ()
+  {
+    if (bother)
+      pthread::atforkparent ();
+  }
+};
+
+class hold_everything
+{
+public: /* DELETEME*/
+  bool& ischild;
+  /* Note the order of the locks below.  It is important,
+     to avoid races, that the lock order be preserved.
+
+     pthread is first because it serves as a master lock
+     against other forks being attempted while this one is active.
+
+     signals is next to stop signal processing for the duration
+     of the fork.
+
+     process is last.  If it is put before signals, then a deadlock
+     could be introduced if the process attempts to exit due to a signal. */
+  lock_pthread pthread;
+  lock_signals signals;
+  lock_process process;
+
+public:
+  hold_everything (bool& x): ischild (x) {}
+  operator int () const {return signals;}
+
+  ~hold_everything()
+  {
+    if (ischild)
+      {
+	pthread.dont_bother ();
+	process.dont_bother ();
+	signals.dont_bother ();
+      }
+  }
+
 };
 
 static void
@@ -109,29 +186,11 @@ frok::error (const char *fmt, ...)
   return true;
 }
 
-/* Set up a pipe which will track the life of a "pid" through
-   even after we've exec'ed.  */
-void
-child_info::prefork (bool detached)
-{
-  if (!detached)
-    {
-      if (!CreatePipe (&rd_proc_pipe, &wr_proc_pipe, &sec_none_nih, 16))
-	api_fatal ("prefork: couldn't create pipe process tracker%E");
-
-      if (!SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT,
-				 HANDLE_FLAG_INHERIT))
-	api_fatal ("prefork: couldn't set process pipe(%p) inherit state, %E",
-		   wr_proc_pipe);
-      ProtectHandle1 (rd_proc_pipe, rd_proc_pipe);
-      ProtectHandle1 (wr_proc_pipe, wr_proc_pipe);
-    }
-}
-
 int __stdcall
 frok::child (volatile char * volatile here)
 {
   HANDLE& hParent = ch.parent;
+  extern void fixup_lockf_after_fork ();
   extern void fixup_hooks_after_fork ();
   extern void fixup_timers_after_fork ();
 
@@ -213,10 +272,6 @@ frok::child (volatile char * volatile here)
   ld_preload ();
   fixup_hooks_after_fork ();
   _my_tls.fixup_after_fork ();
-  /* Clear this or the destructor will close them.  In the case of
-     rd_proc_pipe that would be an invalid handle.  In the case of
-     wr_proc_pipe it would be == my_wr_proc_pipe.  Both would be bad. */
-  ch.rd_proc_pipe = ch.wr_proc_pipe = NULL;
   cygwin_finished_initializing = true;
   return 0;
 }
@@ -349,19 +404,18 @@ frok::parent (volatile char * volatile stack_here)
   cygheap->user.deimpersonate ();
   fix_impersonation = true;
   ch.refresh_cygheap ();
-  ch.prefork ();	/* set up process tracking pipes. */
 
   while (1)
     {
       hchild = NULL;
-      rc = CreateProcessW (myself->progname,	/* image to run */
-			   myself->progname,	/* what we send in arg0 */
+      rc = CreateProcessW (myself->progname, /* image to run */
+			   myself->progname, /* what we send in arg0 */
 			   &sec_none_nih,
 			   &sec_none_nih,
-			   TRUE,		/* inherit handles from parent */
+			   TRUE,	  /* inherit handles from parent */
 			   c_flags,
-			   NULL,		/* environment filled in later */
-			   0,	  		/* use current drive/directory */
+			   NULL,	  /* environment filled in later */
+			   0,	  /* use current drive/directory */
 			   &si,
 			   &pi);
 
@@ -393,8 +447,8 @@ frok::parent (volatile char * volatile stack_here)
       /* Wait for subproc to initialize itself. */
       if (!ch.sync (pi.dwProcessId, hchild, FORK_WAIT_TIMEOUT))
 	{
-	  if (!error ("forked process %u died unexpectedly, retry %d, exit code %d",
-		      pi.dwProcessId, ch.retry, ch.exit_code))
+	  if (!error ("forked process died unexpectedly, retry %d, exit code %d",
+		      ch.retry, ch.exit_code))
 	    continue;
 	  this_errno = EAGAIN;
 	  goto cleanup;
@@ -426,7 +480,6 @@ frok::parent (volatile char * volatile stack_here)
   /* Fill in fields in the child's process table entry.  */
   child->dwProcessId = pi.dwProcessId;
   child.hProcess = hchild;
-  ch.postfork (child);
 
   /* Hopefully, this will succeed.  The alternative to doing things this
      way is to reserve space prior to calling CreateProcess and then fill

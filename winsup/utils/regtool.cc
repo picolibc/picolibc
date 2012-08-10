@@ -574,7 +574,7 @@ cmd_add ()
 }
 
 extern "C" {
-  LONG WINAPI (*regDeleteKeyEx)(HKEY, LPCWSTR, REGSAM, DWORD);
+WINADVAPI LONG WINAPI (*regDeleteKeyEx)(HKEY, LPCWSTR, REGSAM, DWORD);
 }
 
 int
@@ -587,7 +587,7 @@ cmd_remove ()
     {
       HMODULE mod = LoadLibrary ("advapi32.dll");
       if (mod)
-	regDeleteKeyEx = (LONG WINAPI (*)(HKEY, LPCWSTR, REGSAM, DWORD)) GetProcAddress (mod, "RegDeleteKeyExW");
+	regDeleteKeyEx = (WINADVAPI LONG WINAPI (*)(HKEY, LPCWSTR, REGSAM, DWORD)) GetProcAddress (mod, "RegDeleteKeyExW");
     }
   if (regDeleteKeyEx)
     rv = (*regDeleteKeyEx) (key, value, wow64, 0);

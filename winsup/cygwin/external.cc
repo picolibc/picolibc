@@ -1,7 +1,7 @@
 /* external.cc: Interface to Cygwin internals from external programs.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -108,7 +108,7 @@ fillout_pinfo (pid_t pid, int winpid)
     {
       i = 0;
       pids.reset ();
-      return NULL;
+      return 0;
     }
   return &ep;
 }
@@ -186,12 +186,10 @@ static void
 exit_process (UINT status, bool useTerminateProcess)
 {
   pid_t pid = getpid ();
-  external_pinfo *ep = fillout_pinfo (pid, 1);
+  external_pinfo * ep = fillout_pinfo (pid, 1);
   DWORD dwpid = ep ? ep->dwProcessId : pid;
   pinfo p (pid, PID_MAP_RW);
-  if (ep)
-    pid = ep->pid;
-  if ((dwpid == GetCurrentProcessId()) && (p->pid == pid))
+  if ((dwpid == GetCurrentProcessId()) && (p->pid == ep->pid))
     p.set_exit_code ((DWORD)status);
   if (useTerminateProcess)
     TerminateProcess (GetCurrentProcess(), status);
@@ -434,6 +432,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	break;
       case CW_SET_DOS_FILE_WARNING:
 	{
+	  extern bool dos_file_warning;
 	  dos_file_warning = va_arg (arg, int);
 	  res = 0;
 	}
@@ -469,8 +468,9 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	break;
       case CW_GET_INSTKEY:
 	{
+	  extern WCHAR installation_key_buf[18];
 	  PWCHAR dest = va_arg (arg, PWCHAR);
-	  wcscpy (dest, cygheap->installation_key_buf);
+	  wcscpy (dest, installation_key_buf);
 	  res = 0;
 	}
 	break;

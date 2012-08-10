@@ -33,8 +33,9 @@
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)glob.c	8.3 (Berkeley) 10/13/93";
 #endif /* LIBC_SCCS and not lint */
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Exp $");
+#ifdef __CYGWIN
+__FBSDID("$FreeBSD: /repoman/r/ncvs/src/lib/libc/gen/glob.c,v 1.25 2006/06/05 18:22:13 delphij Exp $");
+#endif
 
 /*
  * glob(3) -- a superset of the one defined in POSIX 1003.2.
@@ -71,48 +72,35 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
  * 3. State-dependent encodings are not currently supported.
  */
 
-#ifdef __CYGWIN__
 #include "winsup.h"
-#endif
 
-#include <sys/param.h>
-#include <sys/stat.h>
 
 #include <ctype.h>
 #include <dirent.h>
-#include <errno.h>
 #include <glob.h>
-#include <limits.h>
 #include <pwd.h>
-#include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <wchar.h>
 
-#include "collate.h"
+//#include "collate.h"
 
-#ifdef __CYGWIN__
-#include <wctype.h>
+#include "cygerrno.h"
+#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
+
 #include "cygheap.h"
+#include "perprocess.h"
 #include "cygwin/version.h"
 
-#define getpwuid(uid)	getpwuid32 (uid)
-#define getuid()	getuid32 ()
-#define issetugid()	(cygheap->user.issetuid ())
-
-#define stat __stat64
-
-#define CCHAR(c)	(ignore_case_with_glob ? towlower (CHAR (c)) : CHAR (c))
-#define Cchar(c)	(ignore_case_with_glob ? towlower (c) : (c))
+#ifndef ARG_MAX
+#define ARG_MAX 32000   /* See CreateProcess */
 #endif
 
 #undef MAXPATHLEN
-#define MAXPATHLEN 8192
+#define MAXPATHLEN 16384
 
 #define	DOLLAR		'$'
 #define	DOT		'.'
@@ -166,19 +154,19 @@ typedef char Char;
 
 static int	 compare(const void *, const void *);
 static int	 g_Ctoc(const Char *, char *, size_t);
-static int	 g_lstat(Char *, struct stat *, glob_t *);
+static int	 g_lstat(Char *, struct __stat64 *, glob_t *);
 static DIR	*g_opendir(Char *, glob_t *);
-static const Char *g_strchr(const Char *, wchar_t);
+static Char	*g_strchr(Char *, wchar_t);
 #ifdef notdef
 static Char	*g_strcat(Char *, const Char *);
 #endif
-static int	 g_stat(Char *, struct stat *, glob_t *);
+static int	 g_stat(Char *, struct __stat64 *, glob_t *);
 static int	 glob0(const Char *, glob_t *, size_t *);
 static int	 glob1(Char *, glob_t *, size_t *);
 static int	 glob2(Char *, Char *, Char *, Char *, glob_t *, size_t *);
 static int	 glob3(Char *, Char *, Char *, Char *, Char *, glob_t *, size_t *);
 static int	 globextend(const Char *, glob_t *, size_t *);
-static const Char *	
+static const Char *
 		 globtilde(const Char *, Char *, size_t, glob_t *);
 static int	 globexp1(const Char *, glob_t *, size_t *);
 static int	 globexp2(const Char *, const Char *, glob_t *, int *, size_t *);
@@ -271,7 +259,7 @@ globexp1(const Char *pattern, glob_t *pglob, size_t *limit)
 	if (pattern[0] == LBRACE && pattern[1] == RBRACE && pattern[2] == EOS)
 		return glob0(pattern, pglob, limit);
 
-	while ((ptr = g_strchr(ptr, LBRACE)) != NULL)
+	while ((ptr = (const Char *) g_strchr((Char *) ptr, LBRACE)) != NULL)
 		if (!globexp2(ptr, pattern, pglob, &rv, limit))
 			return rv;
 
@@ -399,8 +387,8 @@ globtilde(const Char *pattern, Char *patbuf, size_t patbuf_len, glob_t *pglob)
 	if (*pattern != TILDE || !(pglob->gl_flags & GLOB_TILDE))
 		return pattern;
 
-	/* 
-	 * Copy up to the end of the string or / 
+	/*
+	 * Copy up to the end of the string or /
 	 */
 	eb = &patbuf[patbuf_len - 1];
 	for (p = pattern + 1, h = (char *) patbuf;
@@ -415,11 +403,11 @@ globtilde(const Char *pattern, Char *patbuf, size_t patbuf_len, glob_t *pglob)
 		 * we're not running setuid or setgid) and then trying
 		 * the password file
 		 */
-		if (issetugid() != 0 ||
+		if (cygheap->user.issetuid() != 0 ||
 		    (h = getenv("HOME")) == NULL) {
 			if (((h = getlogin()) != NULL &&
 			     (pwd = getpwnam(h)) != NULL) ||
-			    (pwd = getpwuid(getuid())) != NULL)
+			    (pwd = getpwuid32(getuid32())) != NULL)
 				h = pwd->pw_dir;
 			else
 				return pattern;
@@ -460,7 +448,7 @@ glob0(const Char *pattern, glob_t *pglob, size_t *limit)
 	const Char *qpatnext;
 	int err;
 	size_t oldpathc;
-	Char *bufnext, c, patbuf[MAXPATHLEN];
+	Char c, *bufnext, patbuf[MAXPATHLEN];
 
 	qpatnext = globtilde(pattern, patbuf, MAXPATHLEN, pglob);
 	oldpathc = pglob->gl_pathc;
@@ -474,7 +462,7 @@ glob0(const Char *pattern, glob_t *pglob, size_t *limit)
 			if (c == NOT)
 				++qpatnext;
 			if (*qpatnext == EOS ||
-			    g_strchr(qpatnext+1, RBRACKET) == NULL) {
+			    g_strchr((Char *) qpatnext+1, RBRACKET) == NULL) {
 				*bufnext++ = LBRACKET;
 				if (c == NOT)
 					--qpatnext;
@@ -568,7 +556,7 @@ static int
 glob2(Char *pathbuf, Char *pathend, Char *pathend_last, Char *pattern,
       glob_t *pglob, size_t *limit)
 {
-	struct stat sb;
+	struct __stat64 sb;
 	Char *p, *q;
 	int anymeta;
 
@@ -637,8 +625,6 @@ glob3(Char *pathbuf, Char *pathend, Char *pathend_last,
 	 * assigned, below, to two functions which are prototyped in glob.h
 	 * and dirent.h as taking pointers to differently typed opaque
 	 * structures.
-	 * CYGWIN: Needs prototype and subsequently wild casting to avoid
-	 * compiler error.
 	 */
 	struct dirent *(*readdirfunc)(void *);
 
@@ -656,7 +642,7 @@ glob3(Char *pathbuf, Char *pathend, Char *pathend_last,
 			    pglob->gl_flags & GLOB_ERR)
 				return (GLOB_ABORTED);
 		}
-		return(0);
+		return((pglob->gl_flags & GLOB_ERR) ? GLOB_ABORTED : 0);
 	}
 
 	err = 0;
@@ -800,23 +786,41 @@ match(Char *name, Char *pat, Char *patend)
 				return(0);
 			if ((negate_range = ((*pat & M_MASK) == M_NOT)) != EOS)
 				++pat;
-			while (((c = *pat++) & M_MASK) != M_END)
+			if (ignore_case_with_glob)
+			  {
+			    while (((c = *pat++) & M_MASK) != M_END)
 				if ((*pat & M_MASK) == M_RNG) {
-					if (__collate_load_error ?
-					    CCHAR(c) <= CCHAR(k) && CCHAR(k) <= CCHAR(pat[1]) :
-					       __collate_range_cmp(CCHAR(c), CCHAR(k)) <= 0
-					    && __collate_range_cmp(CCHAR(k), CCHAR(pat[1])) <= 0
-					   )
-						ok = 1;
-					pat += 2;
-				} else if (c == k)
+				    if (tolower(c) <= tolower(k) && tolower(k) <= tolower(pat[1]))
 					ok = 1;
+				    pat += 2;
+				} else if (tolower(c) == tolower(k))
+					ok = 1;
+			  }
+			else
+			  {
+			    while (((c = *pat++) & M_MASK) != M_END)
+			    	if ((*pat & M_MASK) == M_RNG) {
+				    if (c <= k && k <= pat[1])
+				    	ok = 1;
+				    pat += 2;
+				} else if (c == k)
+				    ok = 1;
+			  }
 			if (ok == negate_range)
 				return(0);
 			break;
 		default:
-			if (Cchar(*name++) != Cchar(c))
+			if (ignore_case_with_glob)
+			  {
+			    if (tolower(*name) != tolower(c))
+			    	return(0);
+			    ++name;
+			  }
+			else
+			  {
+			    if (*name++ != c)
 				return(0);
+			  }
 			break;
 		}
 	}
@@ -877,18 +881,8 @@ stat32_to_stat64 (struct __stat32 *src, struct __stat64 *dst)
   dst->st_blocks = src->st_blocks;
 }
 
-#define CYGWIN_gl_stat(sfptr) \
-  ({ int ret;								 \
-     struct __stat32 lsb;						 \
-     if (CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES)			 \
-       ret = (*pglob->sfptr) (buf, sb);					 \
-     else  if (!(ret = (*pglob->sfptr) (buf, (struct __stat64 *) &lsb))) \
-       stat32_to_stat64 (&lsb, sb);					 \
-     ret;								 \
-  })
-
 static int
-g_lstat(Char *fn, struct stat *sb, glob_t *pglob)
+g_lstat(Char *fn, struct __stat64 *sb, glob_t *pglob)
 {
 	char buf[MAXPATHLEN];
 
@@ -896,13 +890,22 @@ g_lstat(Char *fn, struct stat *sb, glob_t *pglob)
 		errno = ENAMETOOLONG;
 		return (-1);
 	}
-	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
-		return CYGWIN_gl_stat (gl_lstat);
+	if (pglob->gl_flags & GLOB_ALTDIRFUNC) {
+		struct __stat32 lsb;
+		int ret;
+
+		if (CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES)
+			ret = (*pglob->gl_lstat)(buf, sb);
+		else if (!(ret = (*pglob->gl_lstat)(buf,
+						    (struct __stat64 *)&lsb)))
+			stat32_to_stat64 (&lsb, sb);
+		return ret;
+	}
 	return(lstat64(buf, sb));
 }
 
 static int
-g_stat(Char *fn, struct stat *sb, glob_t *pglob)
+g_stat(Char *fn, struct __stat64 *sb, glob_t *pglob)
 {
 	char buf[MAXPATHLEN];
 
@@ -910,13 +913,22 @@ g_stat(Char *fn, struct stat *sb, glob_t *pglob)
 		errno = ENAMETOOLONG;
 		return (-1);
 	}
-	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
-		return CYGWIN_gl_stat (gl_stat);
+	if (pglob->gl_flags & GLOB_ALTDIRFUNC) {
+		struct __stat32 lsb;
+		int ret;
+
+		if (CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES)
+			ret = (*pglob->gl_stat)(buf, sb);
+		else if (!(ret = (*pglob->gl_stat)(buf,
+						   (struct __stat64 *)&lsb)))
+			stat32_to_stat64 (&lsb, sb);
+		return ret;
+	}
 	return(stat64(buf, sb));
 }
 
-static const Char *
-g_strchr(const Char *str, wchar_t ch)
+static Char *
+g_strchr(Char *str, wchar_t ch)
 {
 
 	do {

@@ -1648,7 +1648,7 @@ WINBASEAPI DWORD WINAPI GetModuleFileNameA(HINSTANCE,LPSTR,DWORD);
 WINBASEAPI DWORD WINAPI GetModuleFileNameW(HINSTANCE,LPWSTR,DWORD);
 WINBASEAPI HMODULE WINAPI GetModuleHandleA(LPCSTR);
 WINBASEAPI HMODULE WINAPI GetModuleHandleW(LPCWSTR);
-#if (_WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0500)
 WINBASEAPI BOOL WINAPI GetModuleHandleExA(DWORD,LPCSTR,HMODULE*);
 WINBASEAPI BOOL WINAPI GetModuleHandleExW(DWORD,LPCWSTR,HMODULE*);
 #endif
@@ -1846,8 +1846,8 @@ LONG WINAPI InterlockedCompareExchange(LONG volatile *,LONG,LONG);
 /* PVOID WINAPI InterlockedCompareExchangePointer(PVOID*,PVOID,PVOID); */
 #define InterlockedCompareExchangePointer(d,e,c) \
     (PVOID)InterlockedCompareExchange((LONG volatile *)(d),(LONG)(e),(LONG)(c))
-LONG __cdecl InterlockedDecrement(LONG volatile *);
-LONG __cdecl InterlockedExchange(LONG volatile *,LONG);
+LONG WINAPI InterlockedDecrement(LONG volatile *);
+LONG WINAPI InterlockedExchange(LONG volatile *,LONG);
 /* PVOID WINAPI InterlockedExchangePointer(PVOID*,PVOID); */
 #define InterlockedExchangePointer(t,v) \
     (PVOID)InterlockedExchange((LONG volatile *)(t),(LONG)(v))
@@ -1855,7 +1855,7 @@ LONG WINAPI InterlockedExchangeAdd(LONG volatile *,LONG);
 #if (_WIN32_WINNT >= 0x0501)
 PSLIST_ENTRY WINAPI InterlockedFlushSList(PSLIST_HEADER);
 #endif
-LONG __cdecl InterlockedIncrement(LONG volatile *);
+LONG WINAPI InterlockedIncrement(LONG volatile *);
 #if (_WIN32_WINNT >= 0x0501)
 PSLIST_ENTRY WINAPI InterlockedPopEntrySList(PSLIST_HEADER);
 PSLIST_ENTRY WINAPI InterlockedPushEntrySList(PSLIST_HEADER,PSLIST_ENTRY);
@@ -2339,7 +2339,7 @@ typedef PCACTCTXW PCACTCTX;
 #endif
 #define GetModuleFileName GetModuleFileNameW
 #define GetModuleHandle GetModuleHandleW
-#if (_WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0500)
 #define GetModuleHandleEx GetModuleHandleExW
 #endif
 #define GetNamedPipeHandleState GetNamedPipeHandleStateW
@@ -2546,7 +2546,7 @@ typedef PCACTCTXA PCACTCTX;
 #endif
 #define GetNamedPipeHandleState GetNamedPipeHandleStateA
 #define GetModuleHandle GetModuleHandleA
-#if (_WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0500)
 #define GetModuleHandleEx GetModuleHandleExA
 #endif
 #define GetModuleFileName GetModuleFileNameA

@@ -1,6 +1,6 @@
 /* minires.h.  Stub synchronous resolver for Cygwin.
 
-   Copyright 2006, 2012 Red Hat, Inc.
+   Copyright 2006 Red Hat, Inc.
 
    Written by Pierre A. Humblet <Pierre.Humblet@ieee.org>
 
@@ -10,10 +10,13 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define  __INSIDE_CYGWIN_NET__
+
 #include "winsup.h"
 #include <string.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <netdb.h>
 #include <ctype.h>
 #include <sys/time.h>
 #include <sys/socket.h>
@@ -24,7 +27,6 @@ details. */
 #include <stdio.h>
 #include <stdarg.h>
 #include <sys/unistd.h>
-#define  __INSIDE_CYGWIN_NET__
 #include <netdb.h>
 #include <arpa/nameser.h>
 #include <resolv.h>

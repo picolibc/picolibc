@@ -37,11 +37,18 @@ extern "C" {
 
 #include "ansidecl.h"
 
-#ifdef HAVE_STDINT_H
-#include <stdint.h>
+#ifndef _WIN64
+  typedef unsigned long int libi_uhostptr_t;
+  typedef long int libi_shostptr_t;
+#else
+#ifdef __GNUC__
+  __extension__
 #endif
-#ifdef HAVE_INTTYPES_H
-#include <inttypes.h>
+  typedef unsigned long long libi_uhostptr_t;
+#ifdef __GNUC__
+  __extension__
+#endif
+  typedef long long libi_shostptr_t;
 #endif
 
 #ifndef GTY
@@ -52,8 +59,8 @@ extern "C" {
    these types, if necessary.  These types should be sufficiently wide
    that any pointer or scalar can be cast to these types, and then
    cast back, without loss of precision.  */
-typedef uintptr_t splay_tree_key;
-typedef uintptr_t splay_tree_value;
+typedef libi_uhostptr_t splay_tree_key;
+typedef libi_uhostptr_t splay_tree_value;
 
 /* Forward declaration for a node in the tree.  */
 typedef struct splay_tree_node_s *splay_tree_node;

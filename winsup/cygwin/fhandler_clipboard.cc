@@ -1,7 +1,6 @@
 /* fhandler_dev_clipboard: code to access /dev/clipboard
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2011,
-   2012 Red Hat, Inc
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2011 Red Hat, Inc
 
    Written by Charles Wilson (cwilson@ece.gatech.edu)
 
@@ -33,15 +32,9 @@ static const NO_COPY WCHAR *CYGWIN_NATIVE = L"CYGWIN_NATIVE_CLIPBOARD";
 /* this is MT safe because windows format id's are atomic */
 static int cygnativeformat;
 
-typedef struct
-{
-  timestruc_t	timestamp;
-  size_t	len;
-  char		data[1];
-} cygcb_t;
-
 fhandler_dev_clipboard::fhandler_dev_clipboard ()
-  : fhandler_base (), pos (0), membuffer (NULL), msize (0)
+  : fhandler_base (), pos (0), membuffer (NULL), msize (0),
+  eof (true)
 {
   /* FIXME: check for errors and loop until we can open the clipboard */
   OpenClipboard (NULL);
@@ -68,6 +61,7 @@ int
 fhandler_dev_clipboard::open (int flags, mode_t)
 {
   set_flags (flags | O_TEXT);
+  eof = false;
   pos = 0;
   if (membuffer)
     free (membuffer);
@@ -83,24 +77,20 @@ static int
 set_clipboard (const void *buf, size_t len)
 {
   HGLOBAL hmem;
+  void *clipbuf;
   /* Native CYGWIN format */
   if (OpenClipboard (NULL))
     {
-      cygcb_t *clipbuf;
-
-      hmem = GlobalAlloc (GMEM_MOVEABLE, sizeof (cygcb_t) + len);
+      hmem = GlobalAlloc (GMEM_MOVEABLE, len + sizeof (size_t));
       if (!hmem)
 	{
 	  __seterrno ();
 	  CloseClipboard ();
 	  return -1;
 	}
-      clipbuf = (cygcb_t *) GlobalLock (hmem);
-
-      clock_gettime (CLOCK_REALTIME, &clipbuf->timestamp);
-      clipbuf->len = len;
-      memcpy (clipbuf->data, buf, len);
-
+      clipbuf = GlobalLock (hmem);
+      memcpy ((unsigned char *) clipbuf + sizeof (size_t), buf, len);
+      *(size_t *) (clipbuf) = len;
       GlobalUnlock (hmem);
       EmptyClipboard ();
       if (!cygnativeformat)
@@ -126,8 +116,6 @@ set_clipboard (const void *buf, size_t len)
     }
   if (OpenClipboard (NULL))
     {
-      PWCHAR clipbuf;
-
       hmem = GlobalAlloc (GMEM_MOVEABLE, (len + 1) * sizeof (WCHAR));
       if (!hmem)
 	{
@@ -135,8 +123,8 @@ set_clipboard (const void *buf, size_t len)
 	  CloseClipboard ();
 	  return -1;
 	}
-      clipbuf = (PWCHAR) GlobalLock (hmem);
-      sys_mbstowcs (clipbuf, len + 1, (const char *) buf);
+      clipbuf = GlobalLock (hmem);
+      sys_mbstowcs ((PWCHAR) clipbuf, len + 1, (const char *) buf);
       GlobalUnlock (hmem);
       HANDLE ret = SetClipboardData (CF_UNICODETEXT, hmem);
       CloseClipboard ();
@@ -156,127 +144,105 @@ set_clipboard (const void *buf, size_t len)
 ssize_t __stdcall
 fhandler_dev_clipboard::write (const void *buf, size_t len)
 {
-  /* write to our membuffer */
-  size_t cursize = msize;
-  void *tempbuffer = realloc (membuffer, cursize + len);
-  if (!tempbuffer)
+  if (!eof)
     {
-      debug_printf ("Couldn't realloc() clipboard buffer for write");
-      return -1;
-    }
-  membuffer = tempbuffer;
-  msize = cursize + len;
-  memcpy ((unsigned char *) membuffer + cursize, buf, len);
-
-  /* now pass to windows */
-  if (set_clipboard (membuffer, msize))
-    {
-      /* FIXME: membuffer is now out of sync with pos, but msize
-		is used above */
-      return -1;
-    }
-
-  pos = msize;
-  return len;
-}
-
-int __stdcall
-fhandler_dev_clipboard::fstat (struct __stat64 *buf)
-{
-  buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
-  buf->st_uid = geteuid32 ();
-  buf->st_gid = getegid32 ();
-  buf->st_nlink = 1;
-  buf->st_blksize = PREFERRED_IO_BLKSIZE;
-
-  buf->st_ctim.tv_sec = 1164931200L;	/* Arbitrary value: 2006-12-01 */
-  buf->st_ctim.tv_nsec = 0L;
-  buf->st_birthtim = buf->st_atim = buf->st_mtim = buf->st_ctim;
-
-  if (OpenClipboard (NULL))
-    {
-      UINT formatlist[1] = { cygnativeformat };
-      int format;
-      HGLOBAL hglb;
-      cygcb_t *clipbuf;
-
-      if ((format = GetPriorityClipboardFormat (formatlist, 1)) > 0
-	  && (hglb = GetClipboardData (format))
-	  && (clipbuf = (cygcb_t *) GlobalLock (hglb)))
+      /* write to our membuffer */
+      size_t cursize = msize;
+      void *tempbuffer = realloc (membuffer, cursize + len);
+      if (!tempbuffer)
 	{
-	  buf->st_atim = buf->st_mtim = clipbuf->timestamp;
-	  buf->st_size = clipbuf->len;
-	  GlobalUnlock (hglb);
+	  debug_printf ("Couldn't realloc() clipboard buffer for write");
+	  return -1;
 	}
-      CloseClipboard ();
-    }
+      membuffer = tempbuffer;
+      msize = cursize + len;
+      memcpy ((unsigned char *) membuffer + cursize, buf, len);
 
-  return 0;
+      /* now pass to windows */
+      if (set_clipboard (membuffer, msize))
+	{
+	  /* FIXME: membuffer is now out of sync with pos, but msize
+		    is used above */
+	  return -1;
+	}
+
+      pos = msize;
+
+      eof = false;
+      return len;
+    }
+  else
+    {
+      /* FIXME: return 0 bytes written, file not open */
+      return 0;
+    }
 }
 
 void __stdcall
 fhandler_dev_clipboard::read (void *ptr, size_t& len)
 {
   HGLOBAL hglb;
-  size_t ret = 0;
+  size_t ret;
   UINT formatlist[2];
   int format;
-  LPVOID cb_data;
+  size_t plen = len;
 
+  len = 0;
+  if (eof)
+    return;
   if (!OpenClipboard (NULL))
-    {
-      len = 0;
-      return;
-    }
+    return;
   formatlist[0] = cygnativeformat;
   formatlist[1] = CF_UNICODETEXT;
-  if ((format = GetPriorityClipboardFormat (formatlist, 2)) <= 0
-      || !(hglb = GetClipboardData (format))
-      || !(cb_data = GlobalLock (hglb)))
+  if ((format = GetPriorityClipboardFormat (formatlist, 2)) <= 0)
     {
       CloseClipboard ();
-      len = 0;
+      return;
+    }
+  if (!(hglb = GetClipboardData (format)))
+    {
+      CloseClipboard ();
       return;
     }
   if (format == cygnativeformat)
     {
-      cygcb_t *clipbuf = (cygcb_t *) cb_data;
+      unsigned char *buf;
 
-      if (pos < clipbuf->len)
-      	{
-	  ret = ((len > (clipbuf->len - pos)) ? (clipbuf->len - pos) : len);
-	  memcpy (ptr, clipbuf->data + pos , ret);
-	  pos += ret;
+      if (!(buf = (unsigned char *) GlobalLock (hglb)))
+	{
+	  CloseClipboard ();
+	  return;
 	}
+      size_t buflen = (*(size_t *) buf);
+      ret = ((plen > (buflen - pos)) ? (buflen - pos) : plen);
+      memcpy (ptr, buf + sizeof (size_t)+ pos , ret);
+      pos += ret;
+      if (pos + plen - ret >= buflen)
+	eof = true;
     }
   else
     {
-      wchar_t *buf = (wchar_t *) cb_data;
+      int wret;
+      PWCHAR buf;
 
-      size_t glen = GlobalSize (hglb) / sizeof (WCHAR) - 1;
-      if (pos < glen)
+      if (!(buf = (PWCHAR) GlobalLock (hglb)))
 	{
-	  /* Comparing apples and oranges here, but the below loop could become
-	     extremly slow otherwise.  We rather return a few bytes less than
-	     possible instead of being even more slow than usual... */
-	  if (glen > pos + len)
-	    glen = pos + len;
-	  /* This loop is necessary because the number of bytes returned by
-	     sys_wcstombs does not indicate the number of wide chars used for
-	     it, so we could potentially drop wide chars. */
-	  while ((ret = sys_wcstombs (NULL, 0, buf + pos, glen - pos))
-		  != (size_t) -1
-		 && ret > len)
-	     --glen;
-	  if (ret == (size_t) -1)
-	    ret = 0;
-	  else
-	    {
-	      ret = sys_wcstombs ((char *) ptr, (size_t) -1,
-				  buf + pos, glen - pos);
-	      pos = glen;
-	    }
+	  CloseClipboard ();
+	  return;
 	}
+      size_t glen = GlobalSize (hglb) / sizeof (WCHAR) - 1;
+      /* This loop is necessary because the number of bytes returned by
+	 sys_wcstombs does not indicate the number of wide chars used for
+	 it, so we could potentially drop wide chars. */
+      if (glen - pos > plen)
+	glen = pos + plen;
+      while ((wret = sys_wcstombs (NULL, 0, buf + pos, glen - pos)) != -1
+	     && (size_t) wret > plen)
+	--glen;
+      ret = sys_wcstombs ((char *) ptr, plen, buf + pos, glen - pos);
+      pos += ret;
+      if (pos + plen - ret >= wcslen (buf))
+	eof = true;
     }
   GlobalUnlock (hglb);
   CloseClipboard ();
@@ -303,6 +269,7 @@ fhandler_dev_clipboard::close ()
 {
   if (!have_execed)
     {
+      eof = true;
       pos = 0;
       if (membuffer)
 	{
@@ -319,6 +286,7 @@ fhandler_dev_clipboard::fixup_after_exec ()
 {
   if (!close_on_exec ())
     {
+      eof = false;
       pos = msize = 0;
       membuffer = NULL;
     }

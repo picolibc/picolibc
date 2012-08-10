@@ -1,7 +1,7 @@
 /* mount.cc: mount handling.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -402,7 +402,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   if (!got_fs ()
       && !is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE))
       && !is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE))
-      && !is_refs (RtlEqualUnicodeString (&fsname, &ro_u_refs, FALSE))
       && !is_csc_cache (RtlEqualUnicodeString (&fsname, &ro_u_csc, FALSE))
       && is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM))
     is_udf (RtlEqualUnicodeString (&fsname, &ro_u_udf, FALSE));
@@ -451,7 +450,7 @@ mount_info::create_root_entry (const PWCHAR root)
   if (add_item (native_root, "/",
 		MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_IMMUTABLE | MOUNT_AUTOMATIC)
       < 0)
-    api_fatal ("add_item (\"%s\", \"/\", ...) failed, errno %d", native_root, errno);
+    api_fatal ("add_item (\"%W\", \"/\", ...) failed, errno %d", native_root, errno);
   /* Create a default cygdrive entry.  Note that this is a user entry.
      This allows to override it with mount, unless the sysadmin created
      a cygdrive entry in /etc/fstab. */
@@ -468,7 +467,7 @@ mount_info::init ()
   PWCHAR pathend;
   WCHAR path[PATH_MAX];
 
-  pathend = wcpcpy (path, cygheap->installation_root);
+  pathend = wcpcpy (path, installation_root);
   create_root_entry (path);
   pathend = wcpcpy (pathend, L"\\etc\\fstab");
 
@@ -648,6 +647,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 
       if (!src_path[n])
 	{
+	  unit = 0;
 	  dst[0] = '\0';
 	  if (mount_table->cygdrive_len > 1)
 	    dev = *cygdrive_dev;
@@ -1628,7 +1628,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     RtlAppendUnicodeToString (&unat, L"\\");
   mntinfo.update (&unat, NULL);
 
-  if (mntinfo.what_fs () > none && mntinfo.what_fs () < max_fs_type)
+  if (mntinfo.what_fs () > 0 && mntinfo.what_fs () < max_fs_type)
     strcpy (_my_tls.locals.mnt_type, fs_names[mntinfo.what_fs ()].name);
   else
     strcpy (_my_tls.locals.mnt_type, mntinfo.fsname ());
@@ -1840,42 +1840,13 @@ cygwin_umount (const char *path, unsigned flags)
   return res;
 }
 
-#define is_dev(d,s)	wcsncmp((d),(s),sizeof(s) - 1)
-
-disk_type
-get_disk_type (LPCWSTR dos)
+bool
+is_floppy (const char *dos)
 {
-  WCHAR dev[MAX_PATH], *d = dev;
-  if (!QueryDosDeviceW (dos, dev, MAX_PATH))
-    return DT_NODISK;
-  if (is_dev (dev, L"\\Device\\"))
-    {
-      d += 8;
-      switch (*d)
-	{
-	case L'C':
-	  if (is_dev (d, L"CdRom"))
-	    return DT_CDROM;
-	  break;
-	case L'F':
-	  if (is_dev (d, L"Floppy"))
-	    return DT_FLOPPY;
-	  break;
-	case L'H':
-	  if (is_dev (d, L"Harddisk"))
-	    return DT_HARDDISK;
-	  break;
-	case L'L':
-	  if (is_dev (d, L"LanmanRedirector\\"))
-	    return DT_SHARE_SMB;
-	  break;
-	case L'M':
-	  if (is_dev (d, L"MRxNfs\\"))
-	    return DT_SHARE_NFS;
-	  break;
-	}
-    }
-  return DT_NODISK;
+  char dev[256];
+  if (!QueryDosDevice (dos, dev, 256))
+    return false;
+  return ascii_strncasematch (dev, "\\Device\\Floppy", 14);
 }
 
 extern "C" FILE *
@@ -1884,11 +1855,9 @@ setmntent (const char *filep, const char *)
   _my_tls.locals.iteration = 0;
   _my_tls.locals.available_drives = GetLogicalDrives ();
   /* Filter floppy drives on A: and B: */
-  if ((_my_tls.locals.available_drives & 1)
-      && get_disk_type (L"A:") == DT_FLOPPY)
+  if ((_my_tls.locals.available_drives & 1) && is_floppy ("A:"))
     _my_tls.locals.available_drives &= ~1;
-  if ((_my_tls.locals.available_drives & 2)
-      && get_disk_type (L"B:") == DT_FLOPPY)
+  if ((_my_tls.locals.available_drives & 2) && is_floppy ("B:"))
     _my_tls.locals.available_drives &= ~2;
   return (FILE *) filep;
 }
@@ -1897,34 +1866,6 @@ extern "C" struct mntent *
 getmntent (FILE *)
 {
   return mount_table->getmntent (_my_tls.locals.iteration++);
-}
-
-extern "C" struct mntent *
-getmntent_r (FILE *, struct mntent *mntbuf, char *buf, int buflen)
-{
-  struct mntent *mnt = mount_table->getmntent (_my_tls.locals.iteration++);
-  int fsname_len, dir_len, type_len, tmplen = buflen;
-
-  if (!mnt)
-    return NULL;
-
-  fsname_len = strlen (mnt->mnt_fsname) + 1;
-  dir_len = strlen (mnt->mnt_dir) + 1;
-  type_len = strlen (mnt->mnt_type) + 1;
-
-  snprintf (buf, buflen, "%s%c%s%c%s%c%s", mnt->mnt_fsname, '\0',
-	    mnt->mnt_dir, '\0', mnt->mnt_type, '\0', mnt->mnt_opts);
-
-  mntbuf->mnt_fsname = buf;
-  tmplen -= fsname_len;
-  mntbuf->mnt_dir = tmplen > 0 ? buf + fsname_len : (char *)"";
-  tmplen -= dir_len;
-  mntbuf->mnt_type = tmplen > 0 ? buf + fsname_len + dir_len : (char *)"";
-  tmplen -= type_len;
-  mntbuf->mnt_opts = tmplen > 0 ? buf + fsname_len + dir_len + type_len : (char *)"";
-  mntbuf->mnt_freq = mnt->mnt_freq;
-  mntbuf->mnt_passno = mnt->mnt_passno;
-  return mntbuf;
 }
 
 extern "C" int

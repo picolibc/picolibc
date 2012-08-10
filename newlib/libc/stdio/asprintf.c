@@ -45,7 +45,7 @@ _DEFUN(_asprintf_r, (ptr, strp, fmt),
   if (ret >= 0)
     {
       *f._p = 0;
-      *strp = (char *) f._bf._base;
+      *strp = f._bf._base;
     }
   return (ret);
 }
@@ -72,7 +72,7 @@ _DEFUN(asprintf, (strp, fmt),
   if (ret >= 0)
     {
       *f._p = 0;
-      *strp = (char *) f._bf._base;
+      *strp = f._bf._base;
     }
   return (ret);
 }

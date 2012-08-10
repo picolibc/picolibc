@@ -12,7 +12,7 @@ details. */
 extern "C" {
 #endif
 
-#include "winlean.h"
+#include <windows.h>
 struct per_process;
 typedef int (*MainFunc) (int argc, char *argv[], char **env);
 int __stdcall _cygwin_crt0_common (MainFunc, struct per_process *);

@@ -55,7 +55,9 @@ __FBSDID("$FreeBSD: src/lib/libc/regex/regcomp.c,v 1.36 2007/06/11 03:05:54 delp
 #include <wchar.h>
 #include <wctype.h>
 
+#ifndef __CYGWIN__
 #include "collate.h"
+#endif
 
 #include "utils.h"
 #include "regex2.h"
@@ -324,10 +326,7 @@ p_ere(struct parse *p,
 		conc = HERE();
 		while (MORE() && (c = PEEK()) != '|' && c != stop)
 			p_ere_exp(p);
-#ifndef __CYGWIN__
-		/* undefined behaviour according to POSIX; allowed by glibc */
 		(void)REQUIRE(HERE() != conc, REG_EMPTY);	/* require nonempty */
-#endif
 
 		if (!EAT('|'))
 			break;		/* NOTE BREAK OUT */
@@ -771,6 +770,17 @@ p_bracket(struct parse *p)
 	} else
 		EMIT(OANYOF, (int)(cs - p->g->sets));
 }
+
+#ifdef __CYGWIN__
+/* This function is usually part of FreeBSD's libc. */
+int
+__collate_range_cmp(int c1, int c2)
+{
+  char s1[2] = { c1, '\0' };
+  char s2[2] = { c2, '\0' };
+  return strcoll (s1, s2);
+}
+#endif
 
 /*
  - p_b_term - parse one term of a bracketed character list

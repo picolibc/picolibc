@@ -117,7 +117,6 @@ struct rpcent {
 	int	r_number;	/* rpc program number */
 };
 
-#ifndef __INSIDE_CYGWIN_NET__
 struct addrinfo {
   int             ai_flags;		/* input flags */
   int             ai_family;		/* address family of socket */
@@ -128,7 +127,6 @@ struct addrinfo {
   struct sockaddr *ai_addr;		/* socket address of socket */
   struct addrinfo *ai_next;		/* pointer to next in list */
 };
-#endif
 
 /*
  * Error return codes from gethostbyname() and gethostbyaddr()
@@ -139,9 +137,6 @@ struct addrinfo {
 extern int h_errno;
 #else
 extern __declspec(dllimport) int h_errno;
-/* Some packages expect h_errno to be a macro, otherwise they redeclare
-   h_errno, which leads to spurious warnings. */
-#define h_errno h_errno
 #endif
 
 #define	NETDB_INTERNAL -1 /* see errno */

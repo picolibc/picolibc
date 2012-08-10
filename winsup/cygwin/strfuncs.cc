@@ -1,7 +1,7 @@
 /* strfuncs.cc: misc funcs that don't belong anywhere else
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,7 +11,6 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
-#include <sys/param.h>
 #include <wchar.h>
 #include <winnls.h>
 #include <ntdll.h>
@@ -239,7 +238,7 @@ __db_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n, UINT cp,
 	  *pwc = *(unsigned char *) s;
 	  return *s ? 1 : 0;
 	}
-      size_t cnt = MIN (n, 2);
+      size_t cnt = min (n, 2);
       ret = MultiByteToWideChar (cp, MB_ERR_INVALID_CHARS, s, cnt, pwc, 1);
       if (ret)
 	return cnt;
@@ -313,7 +312,7 @@ __eucjp_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 	  ret = 3;
 	  goto jis_x_0212;
 	}
-      size_t cnt = MIN (n, 2);
+      size_t cnt = min (n, 2);
       if (MultiByteToWideChar (20932, MB_ERR_INVALID_CHARS, s, cnt, pwc, 1))
 	return cnt;
       if (n == 1)
@@ -393,23 +392,9 @@ __big5_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
      sequence in by treating it as an UTF-8 char.  If that fails, the ASCII
      CAN was probably standalone and it gets just copied over as ASCII CAN.
 
-   - Three cases have to be distinguished for the return value:
-
-     - dst == NULL; len is ignored, the return value is the number of bytes
-       required for the string without the trailing NUL, just like the return
-       value of the wcstombs function.
-
-     - dst != NULL, len == (size_t) -1; the return value is the size in bytes
-       of the destination string without the trailing NUL.  If the incoming
-       wide char string was not NUL-terminated, the target string won't be
-       NUL-terminated either.
-
-     - dst != NULL; len != (size_t) -1; the return value is the size in bytes
-       of the destination string without the trailing NUL.  The target string
-       will be NUL-terminated, no matter what.  If the result is truncated due
-       to buffer size, it's a bug in Cygwin and the buffer in the calling
-       function should be raised.
-*/
+   - The functions always create 0-terminated results, no matter what.
+     If the result is truncated due to buffer size, it's a bug in Cygwin
+     and the buffer in the calling function should be raised. */
 size_t __stdcall
 sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
 		 const wchar_t *src, size_t nwc)
@@ -487,7 +472,7 @@ sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
       else
 	break;
     }
-  if (n && dst && len != (size_t) -1)
+  if (n && dst)
     {
       n = (n < len) ? n : len - 1;
       dst[n] = '\0';

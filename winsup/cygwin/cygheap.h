@@ -204,87 +204,7 @@ public:
 
 /* cwd cache stuff.  */
 
-enum fcwd_version_t {
-  FCWD_OLD,
-  FCWD_W7,
-  FCWD_W8
-};
-
-/* This class is used to store the CWD starting with Windows Vista.
-   The CWD storage in the RTL_USER_PROCESS_PARAMETERS block is only
-   an afterthought now.  The actual CWD storage is a FAST_CWD structure
-   which is allocated on the process heap.  The new method only requires
-   minimal locking and it's much more multi-thread friendly.  Presumably
-   it minimizes contention when accessing the CWD.
-   The class fcwd_access_t is supposed to encapsulate the gory implementation
-   details depending on OS version from the calling functions. */
-class fcwd_access_t {
-  /* This is the layout used in Windows 8 developer preview. */
-  struct FAST_CWD_8 {
-    LONG           ReferenceCount;	/* Only release when this is 0. */
-    HANDLE         DirectoryHandle;
-    ULONG          OldDismountCount;	/* Reflects the system DismountCount
-					   at the time the CWD has been set. */
-    UNICODE_STRING Path;		/* Path's Buffer member always refers
-					   to the following Buffer array. */
-    LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
-    WCHAR          Buffer[MAX_PATH];
-  };
-  /* This is the layout used in Windows 7 and Vista. */
-  struct FAST_CWD_7 {
-    UNICODE_STRING Path;		/* Path's Buffer member always refers
-					   to the following Buffer array. */
-    HANDLE         DirectoryHandle;
-    LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
-    LONG           ReferenceCount;	/* Only release when this is 0. */
-    ULONG          OldDismountCount;	/* Reflects the system DismountCount
-					   at the time the CWD has been set. */
-    WCHAR          Buffer[MAX_PATH];
-  };
-  /* This is the old FAST_CWD structure up to the patch from KB 2393802,
-     release in February 2011. */
-  struct FAST_CWD_OLD {
-    LONG           ReferenceCount;	/* Only release when this is 0. */
-    HANDLE         DirectoryHandle;
-    ULONG          OldDismountCount;	/* Reflects the system DismountCount
-					   at the time the CWD has been set. */
-    UNICODE_STRING Path;		/* Path's Buffer member always refers
-					   to the following Buffer array. */
-    WCHAR          Buffer[MAX_PATH];
-  };
-  union {
-    FAST_CWD_OLD fold;
-    FAST_CWD_7   f7;
-    FAST_CWD_8   f8;
-  };
-
-#define IMPLEMENT(type, name) \
-  type name () { \
-    switch (fast_cwd_version ()) { \
-      case FCWD_OLD: \
-      default: \
-	return fold.name; \
-      case FCWD_W7: \
-	return f7.name; \
-      case FCWD_W8: \
-	return f8.name; \
-    } \
-  }
-  IMPLEMENT (LONG &, ReferenceCount)
-  IMPLEMENT (HANDLE &, DirectoryHandle)
-  IMPLEMENT (ULONG &, OldDismountCount)
-  IMPLEMENT (UNICODE_STRING &, Path)
-  IMPLEMENT (WCHAR *, Buffer)
-  void SetFSCharacteristics (LONG val);
-  static fcwd_version_t &fast_cwd_version (void);
-
-public:
-  void CopyPath (UNICODE_STRING &target);
-  void Free (PVOID heap);
-  void FillIn (HANDLE dir, PUNICODE_STRING name, ULONG old_dismount_count);
-  static void SetDirHandleFromBufferPointer (PWCHAR buf_p, HANDLE dir);
-  static void SetVersionFromPointer (PBYTE buf_p, bool is_buffer);
-};
+class muto;
 
 class cwdstuff
 {
@@ -297,16 +217,6 @@ private:
 			   a native Win32 application.  See cwdstuff::set for
 			   how it gets set.  See child_info_spawn::worker for how
 			   it's evaluated. */
-
-  friend class fcwd_access_t;
-  /* fast_cwd_ptr is a pointer to the global RtlpCurDirRef pointer in
-     ntdll.dll pointing to the FAST_CWD structure which constitutes the CWD.
-     Unfortunately RtlpCurDirRef is not exported from ntdll.dll. */
-  fcwd_access_t **fast_cwd_ptr;
-  /* Type of FAST_CWD used on this system.  Keeping this information
-     available in shared memory avoids to test for the version every time
-     around.  Default to new version. */
-  fcwd_version_t fast_cwd_version;
   void override_win32_cwd (bool, ULONG);
 
 public:
@@ -370,9 +280,6 @@ struct init_cygheap: public mini_cygheap
 {
   _cmalloc_entry *chain;
   char *buckets[32];
-  WCHAR installation_root[PATH_MAX];
-  UNICODE_STRING installation_key;
-  WCHAR installation_key_buf[18];
   cygheap_root root;
   cygheap_user user;
   user_heap_info user_heap;
@@ -390,16 +297,15 @@ struct init_cygheap: public mini_cygheap
   struct _cygtls **threadlist;
   size_t sthreads;
   pid_t pid;			/* my pid */
+  HANDLE pid_handle;		/* handle for my pid */
   struct {			/* Equivalent to using LIST_HEAD. */
     struct inode_t *lh_first;
   } inode_list;			/* Global inode pointer for adv. locking. */
   hook_chain hooks;
   void close_ctty ();
-  void init_installation_root ();
-  void init_tls_list () __attribute__ ((regparm (1)));;
-  void add_tls (_cygtls *) __attribute__ ((regparm (2)));
-  void remove_tls (_cygtls *, DWORD) __attribute__ ((regparm (3)));
-  _cygtls *find_tls (int) __attribute__ ((regparm (2)));
+  int manage_console_count (const char *, int, bool = false) __attribute__ ((regparm (3)));
+private:
+  int console_count;
 };
 
 
@@ -462,7 +368,7 @@ class cygheap_fdnew : public cygheap_fdmanip
   ~cygheap_fdnew ()
   {
     if (cygheap->fdtab[fd])
-      cygheap->fdtab[fd]->inc_refcnt ();
+      cygheap->fdtab[fd]->refcnt (1);
   }
   void operator = (fhandler_base *fh) {cygheap->fdtab[fd] = fh;}
 };
@@ -480,7 +386,7 @@ public:
 	this->fd = fd;
 	locked = lockit;
 	fh = cygheap->fdtab[fd];
-	fh->inc_refcnt ();
+	fh->refcnt (1);
       }
     else
       {
@@ -495,7 +401,7 @@ public:
   }
   ~cygheap_fdget ()
   {
-    if (fh && fh->dec_refcnt () <= 0)
+    if (fh && fh->refcnt (-1) <= 0)
       {
 	debug_only_printf ("deleting fh %p", fh);
 	delete fh;

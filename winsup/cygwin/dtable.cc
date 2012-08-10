@@ -12,6 +12,7 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 
 #include "winsup.h"
+#include <sys/socket.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -64,11 +65,10 @@ dtable_init ()
 void __stdcall
 set_std_handle (int fd)
 {
-  fhandler_base *fh = cygheap->fdtab[fd];
   if (fd == 0)
-    SetStdHandle (std_consts[fd], fh ? fh->get_handle () : NULL);
+    SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_handle ());
   else if (fd <= 2)
-    SetStdHandle (std_consts[fd], fh ? fh->get_output_handle () : NULL);
+    SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_output_handle ());
 }
 
 int
@@ -242,10 +242,8 @@ dtable::release (int fd)
 {
   if (fds[fd]->need_fixup_before ())
     dec_need_fixup_before ();
-  fds[fd]->dec_refcnt ();
+  fds[fd]->refcnt (-1);
   fds[fd] = NULL;
-  if (fd <= 2)
-    set_std_handle (fd);
 }
 
 extern "C" int
@@ -255,10 +253,8 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
   if (fd == -1)
     fd = cygheap->fdtab.find_unused_handle ();
   fhandler_base *fh = build_fh_name (name);
-  if (!fh)
-    return -1;
   cygheap->fdtab[fd] = fh;
-  cygheap->fdtab[fd]->inc_refcnt ();
+  cygheap->fdtab[fd]->refcnt (1);
   fh->init (handle, myaccess, bin ?: fh->pc_binmode ());
   return fd;
 }
@@ -266,7 +262,6 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 void
 dtable::init_std_file_from_handle (int fd, HANDLE handle)
 {
-  tmp_pathbuf tp;
   CONSOLE_SCREEN_BUFFER_INFO buf;
   DCB dcb;
   unsigned bin = O_BINARY;
@@ -280,7 +275,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
   SetLastError (0);
   DWORD access = 0;
   DWORD ft = GetFileType (handle);
-  char *name = tp.c_get ();
+  char name[NT_MAX_PATH];
   name[0] = '\0';
   if (ft == FILE_TYPE_UNKNOWN && GetLastError () == ERROR_INVALID_HANDLE)
     /* can't figure out what this is */;
@@ -338,9 +333,6 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       else
 	fh = build_fh_name (name);
 
-      if (!fh)
-	return;
-
       if (name[0])
 	{
 	  bin = fh->pc_binmode ();
@@ -359,7 +351,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       /* Console windows are not kernel objects, so the access mask returned
 	 by NtQueryInformationFile is meaningless.  CMD always hands down
 	 stdin handles as R/O handles, but our tty slave sides are R/W. */
-      if (fh->is_tty ())
+      if (!iscons_dev (dev) && fh->is_tty ())
 	{
 	  openflags |= O_RDWR;
 	  access |= GENERIC_READ | GENERIC_WRITE;
@@ -397,7 +389,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       fh->open_setup (openflags);
       fh->usecount = 0;
       cygheap->fdtab[fd] = fh;
-      cygheap->fdtab[fd]->inc_refcnt ();
+      cygheap->fdtab[fd]->refcnt (1);
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }
@@ -460,6 +452,9 @@ fh_alloc (path_conv& pc)
     case DEV_PTYM_MAJOR:
       fh = cnew (fhandler_pty_master, pc.dev.get_minor ());
       break;
+    case DEV_CYGDRIVE_MAJOR:
+      fh = cnew (fhandler_cygdrive);
+      break;
     case DEV_FLOPPY_MAJOR:
     case DEV_CDROM_MAJOR:
     case DEV_SD_MAJOR:
@@ -482,7 +477,7 @@ fh_alloc (path_conv& pc)
       fh = cnew (fhandler_console, pc.dev);
       break;
     default:
-      switch ((DWORD) pc.dev)
+      switch ((int) pc.dev)
 	{
 	case FH_CONSOLE:
 	case FH_CONIN:
@@ -529,7 +524,6 @@ fh_alloc (path_conv& pc)
 	  fh = cnew (fhandler_dev_random);
 	  break;
 	case FH_MEM:
-	case FH_KMEM:
 	case FH_PORT:
 	  fh = cnew (fhandler_dev_mem);
 	  break;
@@ -560,12 +554,6 @@ fh_alloc (path_conv& pc)
 	  break;
 	case FH_NETDRIVE:
 	  fh = cnew (fhandler_netdrive);
-	  break;
-	case FH_DEV:
-	  fh = cnew (fhandler_dev);
-	  break;
-	case FH_CYGDRIVE:
-	  fh = cnew (fhandler_cygdrive);
 	  break;
 	case FH_TTY:
 	  if (!pc.isopen ())
@@ -607,15 +595,8 @@ fh_alloc (path_conv& pc)
     fh = cnew (fhandler_nodevice);
   else if (fh->dev () == FH_ERROR)
     {
-      if (!pc.isopen () && pc.dev.isfs ())
-	fh->dev () = pc.dev;	/* Special case: This file actually exists on
-				   disk and we're not trying to open it so just
-				   return the info from pc.  */
-      else
-	{
-	  delete fh;
-	  fh = NULL;
-	}
+      delete fh;
+      fh = NULL;
     }
   return fh;
 }
@@ -696,8 +677,16 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
 
 	  /* The O_CLOEXEC flag enforces close-on-exec behaviour. */
 	  newfh->set_close_on_exec (!!(flags & O_CLOEXEC));
-	  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (),
-			oldfh->get_io_handle (), newfh->get_io_handle ());
+	  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
+#ifdef DEBUGGING
+	  debug_printf ("duped output_handles old %p, new %p",
+			oldfh->get_output_handle (),
+			newfh->get_output_handle ());
+	  if (oldfh->archetype)
+	    debug_printf ("duped output_handles archetype old %p, archetype new %p",
+			  oldfh->archetype->get_output_handle (),
+			  newfh->archetype->get_output_handle ());
+#endif /*DEBUGGING*/
 	}
     }
   return newfh;
@@ -712,15 +701,6 @@ dtable::dup3 (int oldfd, int newfd, int flags)
   MALLOC_CHECK;
   debug_printf ("dup3 (%d, %d, %p)", oldfd, newfd, flags);
   lock ();
-  bool do_unlock = true;
-  bool unlock_on_return;
-  if (!(flags & O_EXCL))
-    unlock_on_return = true;	/* Relinquish lock on return */
-  else
-    {
-      flags &= ~O_EXCL;
-      unlock_on_return = false;	/* Return with lock set on success */
-    }
 
   if (not_open (oldfd))
     {
@@ -772,12 +752,10 @@ dtable::dup3 (int oldfd, int newfd, int flags)
 
   if ((res = newfd) <= 2)
     set_std_handle (res);
-  do_unlock = unlock_on_return;
 
 done:
   MALLOC_CHECK;
-  if (do_unlock)
-    unlock ();
+  unlock ();
   syscall_printf ("%R = dup3(%d, %d, %p)", res, oldfd, newfd, flags);
 
   return res;
@@ -858,17 +836,6 @@ dtable::set_file_pointers_for_exec ()
 }
 
 void
-dtable::fixup_close (size_t i, fhandler_base *fh)
-{
-  if (fh->archetype)
-    {
-      debug_printf ("closing fd %d since it is an archetype", i);
-      fh->close_with_arch ();
-    }
-  release (i);
-}
-
-void
 dtable::fixup_after_exec ()
 {
   first_fd_for_open = 0;
@@ -878,11 +845,15 @@ dtable::fixup_after_exec ()
       {
 	fh->clear_readahead ();
 	fh->fixup_after_exec ();
-	/* Close the handle if it's close-on-exec or if an error was detected
-	   (typically with opening a console in a gui app) by fixup_after_exec.
-	 */
-	if (fh->close_on_exec () || (!fh->nohandle () && !fh->get_io_handle ()))
-	  fixup_close (i, fh);
+	if (fh->close_on_exec ())
+	  {
+	    if (fh->archetype)
+	      {
+		debug_printf ("closing fd %d since it is an archetype", i);
+		fh->close_with_arch ();
+	      }
+	    release (i);
+	  }
 	else if (fh->get_popen_pid ())
 	  close (i);
 	else if (i == 0)
@@ -903,13 +874,6 @@ dtable::fixup_after_fork (HANDLE parent)
 	  {
 	    debug_printf ("fd %d (%s)", i, fh->get_name ());
 	    fh->fixup_after_fork (parent);
-	    if (!fh->nohandle () && !fh->get_io_handle ())
-	      {
-		/* This should actually never happen but it's here to make sure
-		   we don't crash due to access of an unopened file handle.  */
-		fixup_close (i, fh);
-		continue;
-	      }
 	  }
 	if (i == 0)
 	  SetStdHandle (std_consts[i], fh->get_io_handle ());
@@ -933,7 +897,6 @@ handle_to_fn (HANDLE h, char *posix_fn)
   tmp_pathbuf tp;
   ULONG len = 0;
   WCHAR *maxmatchdos = NULL;
-  PWCHAR device = tp.w_get ();
   int maxmatchlen = 0;
   OBJECT_NAME_INFORMATION *ntfn = (OBJECT_NAME_INFORMATION *) tp.w_get ();
 
@@ -968,9 +931,8 @@ handle_to_fn (HANDLE h, char *posix_fn)
 	    return false;
 	  w32 += WCLEN (L"cygwin-");
 	  /* Check for installation key and trailing dash. */
-	  w32len = cygheap->installation_key.Length / sizeof (WCHAR);
-	  if (w32len
-	      && wcsncmp (w32, cygheap->installation_key.Buffer, w32len) != 0)
+	  w32len = installation_key.Length / sizeof (WCHAR);
+	  if (w32len && wcsncmp (w32, installation_key.Buffer, w32len) != 0)
 	    return false;
 	  w32 += w32len;
 	  if (*w32 != L'-')
@@ -994,7 +956,8 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
       for (WCHAR *s = fnbuf; *s; s = wcschr (s, '\0') + 1)
 	{
-	  if (!QueryDosDeviceW (s, device, NT_MAX_PATH))
+	  WCHAR device[NT_MAX_PATH];
+	  if (!QueryDosDeviceW (s, device, sizeof (device)))
 	    continue;
 	  if (wcschr (s, ':') == NULL)
 	    continue;

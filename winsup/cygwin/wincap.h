@@ -1,7 +1,7 @@
 /* wincap.h: Header for OS capability class.
 
    Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012 Red Hat, Inc.
+   2009, 2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -27,7 +27,6 @@ struct wincaps
   unsigned has_recycle_dot_bin				: 1;
   unsigned has_gaa_prefixes				: 1;
   unsigned has_gaa_on_link_prefix			: 1;
-  unsigned has_gaa_largeaddress_bug			: 1;
   unsigned supports_all_posix_ai_flags			: 1;
   unsigned has_restricted_stack_args			: 1;
   unsigned has_transactions				: 1;
@@ -44,8 +43,6 @@ struct wincaps
   unsigned has_stack_size_param_is_a_reservation	: 1;
   unsigned has_console_logon_sid			: 1;
   unsigned wow64_has_secondary_stack			: 1;
-  unsigned has_program_compatibility_assistant		: 1;
-  unsigned kernel_is_always_casesensitive		: 1;
 };
 
 class wincapc
@@ -81,7 +78,6 @@ public:
   bool	IMPLEMENT (has_recycle_dot_bin)
   bool	IMPLEMENT (has_gaa_prefixes)
   bool	IMPLEMENT (has_gaa_on_link_prefix)
-  bool	IMPLEMENT (has_gaa_largeaddress_bug)
   bool	IMPLEMENT (supports_all_posix_ai_flags)
   bool	IMPLEMENT (has_restricted_stack_args)
   bool	IMPLEMENT (has_transactions)
@@ -98,8 +94,6 @@ public:
   bool	IMPLEMENT (has_stack_size_param_is_a_reservation)
   bool	IMPLEMENT (has_console_logon_sid)
   bool	IMPLEMENT (wow64_has_secondary_stack)
-  bool	IMPLEMENT (has_program_compatibility_assistant)
-  bool	IMPLEMENT (kernel_is_always_casesensitive)
 
 #undef IMPLEMENT
 };

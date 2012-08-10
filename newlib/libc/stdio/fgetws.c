@@ -93,7 +93,7 @@ _DEFUN(_fgetws_r, (ptr, ws, n, fp),
   const char *src;
   unsigned char *nl;
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   ORIENT (fp, 1);
 
   if (n <= 0)
@@ -110,13 +110,9 @@ _DEFUN(_fgetws_r, (ptr, ws, n, fp),
     {
       src = (char *) fp->_p;
       nl = memchr (fp->_p, '\n', fp->_r);
-      nconv = _mbsnrtowcs_r (ptr, wsp, &src,
-			     /* Read all bytes up to the next NL, or up to the
-				end of the buffer if there is no NL. */
-			     nl != NULL ? (nl - fp->_p + 1) : fp->_r,
-			     /* But never more than n - 1 wide chars. */
-			     n - 1,
-			     &fp->_mbstate);
+      nconv = _mbsrtowcs_r (ptr, wsp, &src,
+			    nl != NULL ? (nl - fp->_p + 1) : fp->_r,
+			    &fp->_mbstate);
       if (nconv == (size_t) -1)
 	/* Conversion error */
 	goto error;
@@ -146,11 +142,11 @@ _DEFUN(_fgetws_r, (ptr, ws, n, fp),
     /* Incomplete character */
     goto error;
   *wsp++ = L'\0';
-  _newlib_flockfile_exit (fp);
+  _funlockfile (fp);
   return ws;
 
 error:
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return NULL;
 }
 

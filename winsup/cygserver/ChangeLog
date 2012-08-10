@@ -1,24 +1,3 @@
-2012-07-19  Corinna Vinschen  <corinna@vinschen.de>
-
-	* woutsup.h: Just include winlean.h.
-
-2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
-
-	* client.cc: Revert sigproc.h inclusion since it was fixed elsewhere.
-
-2012-03-19  Corinna Vinschen  <corinna@vinschen.de>
-
-	* client.cc: Include sigproc.h if __INSIDE_CYGWIN__ is defined.
-
-2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
-
-	* client.cc: Remove unneeded #include "sigproc.h".
-
-2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
-
-	* transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
-	Always use cygwin_internal to fetch installation key.
-
 2011-10-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver.cc (print_usage): Align output to utilities in utils

@@ -81,7 +81,7 @@ _DEFUN(__getdelim, (bufptr, n, delim, fp),
 
   CHECK_INIT (_REENT, fp);
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
 
   numbytes = *n;
   ptr = buf;
@@ -129,7 +129,7 @@ _DEFUN(__getdelim, (bufptr, n, delim, fp),
         }
     }
 
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
 
   /* if no input data, return failure */
   if (ptr == buf)
