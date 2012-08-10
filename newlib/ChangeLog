@@ -1,3 +1,8 @@
+2012-08-09  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Fix guard around state to
+	allow usage in !FLOATING_POINT && _WANT_IO_C99_FORMATS case.
+
 2012-08-08  Eric Blake  <eblake@redhat.com>
 
 	* libc/posix/engine.c(dissect): Guard diagnostic pragma for right

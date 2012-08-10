@@ -399,8 +399,8 @@ _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
 	wchar_t thousands_sep = L'\0';
 	const char *grouping = NULL;
 #endif
-#if defined (FLOATING_POINT) && defined (_MB_CAPABLE) \
-    && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (_MB_CAPABLE) && !defined (__HAVE_LOCALE_INFO_EXTENDED__) \
+    && (defined (FLOATING_POINT) || defined (_WANT_IO_C99_FORMATS))
 	mbstate_t state;        /* mbtowc calls from library must not change state */
 #endif
 #ifdef FLOATING_POINT
