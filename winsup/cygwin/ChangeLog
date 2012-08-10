@@ -1,3 +1,9 @@
+2012-08-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc: Add default w32api search dirs.
+	* Makefile.in (DLL_IMPORTS); Just use -l syntax.
+	(TEST_DLL_NAME): Drop DLL_IMPORTS dependency.
+
 2012-08-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* DevNotes: Add entry cgf-000014.
