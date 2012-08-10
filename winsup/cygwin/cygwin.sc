@@ -1,4 +1,5 @@
 OUTPUT_FORMAT(pei-i386)
+SEARCH_DIR("/usr/i686-pc-cygwin/lib/w32api"); SEARCH_DIR("=/usr/lib/w32api");
 SECTIONS
 {
   .text  __image_base__ + __section_alignment__  :
