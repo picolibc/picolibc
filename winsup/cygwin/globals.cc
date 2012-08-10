@@ -58,7 +58,6 @@ bool ignore_case_with_glob = false;
 bool dos_file_warning = true;
 bool allow_winsymlinks = false;
 bool reset_com = false; 
-bool pipe_byte = false;
 bool detect_bloda = false;
 
 bool NO_COPY in_forkee;
@@ -107,7 +106,6 @@ UNICODE_STRING _RDATA ro_u_fat = _ROU (L"FAT");
 UNICODE_STRING _RDATA ro_u_mvfs = _ROU (L"MVFS");
 UNICODE_STRING _RDATA ro_u_nfs = _ROU (L"NFS");
 UNICODE_STRING _RDATA ro_u_ntfs = _ROU (L"NTFS");
-UNICODE_STRING _RDATA ro_u_refs = _ROU (L"ReFS");
 UNICODE_STRING _RDATA ro_u_sunwnfs = _ROU (L"SUNWNFS");
 UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
 UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");

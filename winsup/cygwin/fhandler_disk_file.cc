@@ -154,26 +154,11 @@ public:
 inline bool
 path_conv::isgood_inode (__ino64_t ino) const
 {
-  /* If the FS doesn't support nonambiguous inode numbers anyway, bail out
-     immediately. */
-  if (!hasgood_inode ())
-    return false;
-  /* If the inode numbers are 64 bit numbers or if it's a local FS, they
-     are to be trusted. */
-  if (ino > UINT32_MAX || !isremote ())
-    return true;
-  /* The inode numbers returned from a remote NT4 NTFS are ephemeral
-     32 bit numbers. */
-  if (fs_is_ntfs ())
-    return false;
-  /* Starting with version 3.5.4, Samba returns the real inode numbers, if
-     the file is on the same device as the root of the share (Samba function
-     get_FileIndex).  32 bit inode numbers returned by older versions (likely
-     < 3.0) are ephemeral. */
-  if (fs_is_samba () && fs.samba_version () < 0x03050400)
-    return false;
-  /* Otherwise, trust the inode numbers unless proved otherwise. */
-  return true;
+  /* We can't trust remote inode numbers of only 32 bit.  That means,
+     remote NT4 NTFS, as well as shares of Samba version < 3.0.
+     The known exception are SFU NFS shares, which return the valid 32 bit
+     inode number from the remote file system unchanged. */
+  return hasgood_inode () && (ino > UINT32_MAX || !isremote () || fs_is_nfs ());
 }
 
 /* Check reparse point for type.  IO_REPARSE_TAG_MOUNT_POINT types are
@@ -984,6 +969,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 cant_access_acl:
       switch (cmd)
 	{
+	  struct __stat64 st;
 
 	  case SETACL:
 	    /* Open for writing required to be able to set ctime
@@ -999,7 +985,6 @@ cant_access_acl:
 	      set_errno (ENOSPC);
 	    else
 	      {
-		struct __stat64 st;
 		if (!fstat (&st))
 		  {
 		    aclbufp[0].a_type = USER_OBJ;
@@ -1283,8 +1268,7 @@ fhandler_disk_file::link (const char *newpath)
   status = NtSetInformationFile (fh, &io, pfli, size, FileLinkInformation);
   if (!NT_SUCCESS (status))
     {
-      if (status == STATUS_INVALID_DEVICE_REQUEST
-	  || status == STATUS_NOT_SUPPORTED)
+      if (status == STATUS_INVALID_DEVICE_REQUEST)
 	{
 	  /* FS doesn't support hard links.  Linux returns EPERM. */
 	  set_errno (EPERM);

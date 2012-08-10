@@ -36,7 +36,6 @@ details. */
 #include <asm/socket.h>
 #include "sync.h"
 #include "child_info.h"
-#include "cygwait.h"
 
 /* Don't make this bigger than NT_MAX_PATH as long as the temporary buffer
    is allocated using tmp_pathbuf!!! */
@@ -356,9 +355,9 @@ fhandler_console::read (void *pv, size_t& buflen)
 	{
 	case WAIT_OBJECT_0:
 	  break;
-	case WAIT_SIGNALED:
+	case WAIT_OBJECT_0 + 1:
 	  goto sig_exit;
-	case WAIT_CANCELED:
+	case WAIT_OBJECT_0 + 2:
 	  process_state.pop ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
@@ -2012,7 +2011,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 
   while (src < end)
     {
-      paranoid_printf ("char %0c state is %d", *src, dev_state.state_);
+      debug_printf ("at %d(%c) state is %d", *src, isprint (*src) ? *src : ' ',
+		    dev_state.state_);
       switch (dev_state.state_)
 	{
 	case normal:

@@ -44,6 +44,7 @@ typedef struct {
 #define PRIdFAST64 "I64d"
 
 #define PRIdMAX "I64d"
+#define PRIdPTR "d"
 
 #define PRIi8 "i"
 #define PRIi16 "i"
@@ -61,6 +62,7 @@ typedef struct {
 #define PRIiFAST64 "I64i"
 
 #define PRIiMAX "I64i"
+#define PRIiPTR "i"
 
 #define PRIo8 "o"
 #define PRIo16 "o"
@@ -78,6 +80,8 @@ typedef struct {
 #define PRIoFAST64 "I64o"
 
 #define PRIoMAX "I64o"
+
+#define PRIoPTR "o"
 
 /* fprintf macros for unsigned types */
 #define PRIu8 "u"
@@ -97,6 +101,7 @@ typedef struct {
 #define PRIuFAST64 "I64u"
 
 #define PRIuMAX "I64u"
+#define PRIuPTR "u"
 
 #define PRIx8 "x"
 #define PRIx16 "x"
@@ -114,6 +119,7 @@ typedef struct {
 #define PRIxFAST64 "I64x"
 
 #define PRIxMAX "I64x"
+#define PRIxPTR "x"
 
 #define PRIX8 "X"
 #define PRIX16 "X"
@@ -131,22 +137,7 @@ typedef struct {
 #define PRIXFAST64 "I64X"
 
 #define PRIXMAX "I64X"
-
-#ifdef _WIN64
-#define PRIdPTR "I64d"
-#define PRIiPTR "I64i"
-#define PRIoPTR "I64o"
-#define PRIuPTR "I64u"
-#define PRIxPTR "I64x"
-#define PRIXPTR "I64X"
-#else
-#define PRIdPTR "d"
-#define PRIiPTR "i"
-#define PRIoPTR "o"
-#define PRIuPTR "u"
-#define PRIxPTR "x"
 #define PRIXPTR "X"
-#endif
 
 /*
  *   fscanf macros for signed int types
@@ -168,6 +159,7 @@ typedef struct {
 #define SCNdFAST64 "I64d"
 
 #define SCNdMAX "I64d"
+#define SCNdPTR "d"
 
 #define SCNi16 "hi"
 #define SCNi32 "i"
@@ -182,6 +174,7 @@ typedef struct {
 #define SCNiFAST64 "I64i"
 
 #define SCNiMAX "I64i"
+#define SCNiPTR "i"
 
 #define SCNo16 "ho"
 #define SCNo32 "o"
@@ -196,6 +189,7 @@ typedef struct {
 #define SCNoFAST64 "I64o"
 
 #define SCNoMAX "I64o"
+#define SCNoPTR "o"
 
 #define SCNx16 "hx"
 #define SCNx32 "x"
@@ -210,6 +204,8 @@ typedef struct {
 #define SCNxFAST64 "I64x"
 
 #define SCNxMAX "I64x"
+#define SCNxPTR "x"
+
 
 /* fscanf macros for unsigned int types */
 
@@ -226,20 +222,7 @@ typedef struct {
 #define SCNuFAST64 "I64u"
 
 #define SCNuMAX "I64u"
-
-#ifdef _WIN64
-#define SCNdPTR "I64d"
-#define SCNiPTR "I64i"
-#define SCNoPTR "I64o"
-#define SCNxPTR "I64x"
-#define SCNuPTR "I64u"
-#else
-#define SCNdPTR "d"
-#define SCNiPTR "i"
-#define SCNoPTR "o"
-#define SCNxPTR "x"
 #define SCNuPTR "u"
-#endif
 
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 /*

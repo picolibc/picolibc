@@ -112,8 +112,7 @@ muto NO_COPY cwdstuff::cwd_lock;
 static const GUID GUID_shortcut
 			= { 0x00021401L, 0, 0, {0xc0, 0, 0, 0, 0, 0, 0, 0x46}};
 
-enum
-{
+enum {
   WSH_FLAG_IDLIST = 0x01,	/* Contains an ITEMIDLIST. */
   WSH_FLAG_FILE = 0x02,		/* Contains a file locator element. */
   WSH_FLAG_DESC = 0x04,		/* Contains a description. */
@@ -124,24 +123,24 @@ enum
 };
 
 struct win_shortcut_hdr
-{
-  DWORD size;		/* Header size in bytes.  Must contain 0x4c. */
-  GUID magic;		/* GUID of shortcut files. */
-  DWORD flags;	/* Content flags.  See above. */
+  {
+    DWORD size;		/* Header size in bytes.  Must contain 0x4c. */
+    GUID magic;		/* GUID of shortcut files. */
+    DWORD flags;	/* Content flags.  See above. */
 
-  /* The next fields from attr to icon_no are always set to 0 in Cygwin
-     and U/Win shortcuts. */
-  DWORD attr;	/* Target file attributes. */
-  FILETIME ctime;	/* These filetime items are never touched by the */
-  FILETIME mtime;	/* system, apparently. Values don't matter. */
-  FILETIME atime;
-  DWORD filesize;	/* Target filesize. */
-  DWORD icon_no;	/* Icon number. */
+    /* The next fields from attr to icon_no are always set to 0 in Cygwin
+       and U/Win shortcuts. */
+    DWORD attr;	/* Target file attributes. */
+    FILETIME ctime;	/* These filetime items are never touched by the */
+    FILETIME mtime;	/* system, apparently. Values don't matter. */
+    FILETIME atime;
+    DWORD filesize;	/* Target filesize. */
+    DWORD icon_no;	/* Icon number. */
 
-  DWORD run;		/* Values defined in winuser.h. Use SW_NORMAL. */
-  DWORD hotkey;	/* Hotkey value. Set to 0.  */
-  DWORD dummy[2];	/* Future extension probably. Always 0. */
-};
+    DWORD run;		/* Values defined in winuser.h. Use SW_NORMAL. */
+    DWORD hotkey;	/* Hotkey value. Set to 0.  */
+    DWORD dummy[2];	/* Future extension probably. Always 0. */
+  };
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
@@ -1153,7 +1152,7 @@ out:
   if (opt & PC_CTTY)
     path_flags |= PATH_CTTY;
 
-  if (opt & PC_POSIX)
+  if ((opt & PC_POSIX))
     {
       if (tail < path_end && tail > path_copy + 1)
 	*tail = '/';
@@ -1352,8 +1351,8 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
       if ((tail - dst) >= NT_MAX_PATH)
 	return ENAMETOOLONG;
     }
-  if (tail > dst + 1 && tail[-1] == '.' && tail[-2] == '\\')
-    tail--;
+   if (tail > dst + 1 && tail[-1] == '.' && tail[-2] == '\\')
+     tail--;
   *tail = '\0';
   debug_printf ("%s = normalize_win32_path (%s)", dst, src_start);
   return 0;
@@ -2372,6 +2371,8 @@ restart:
   bool had_ext = !!*ext_here;
   while (suffix.next ())
     {
+      bool no_ea = false;
+
       error = 0;
       get_nt_native_path (suffix.path, upath, pflags & PATH_DOS);
       if (h)
@@ -2402,6 +2403,7 @@ restart:
 		 root dir which has EAs enabled? */
 	      || status == STATUS_INVALID_PARAMETER))
 	{
+	  no_ea = true;
 	  /* If EAs are not supported, there's no sense to check them again
 	     with suffixes attached.  So we set eabuf/easize to 0 here once. */
 	  if (status == STATUS_EAS_NOT_SUPPORTED
@@ -3204,14 +3206,11 @@ realpath (const char *path, char *resolved)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  /* Win32 drive letter paths have to be converted to a POSIX path first,
-     because path_conv leaves the incoming path untouched except for
-     converting backslashes to forward slashes. */
   char *tpath;
   if (isdrive (path))
     {
       tpath = tp.c_get ();
-      mount_table->conv_to_posix_path (path, tpath, 0);
+      mount_table->cygdrive_posix_path (path, tpath, 0);
     }
   else
     tpath = (char *) path;
@@ -3700,64 +3699,31 @@ find_fast_cwd_pointer ()
   /* ...which should be followed by "mov edi, crit-sect-addr" then
      "push edi", or by just a single "push crit-sect-addr". */
   const uint8_t *movedi = pushedi + 1;
-  const uint8_t *mov_pfast_cwd;
-  if (movedi[0] == 0x8b && movedi[1] == 0xff)	/* mov edi,edi -> W8 */
-    {
-      /* Windows 8 CP 32 bit (after a Windows Update?) does not call
-         RtlEnterCriticalSection.  For some reason the function manipulates
-	 the FastPebLock manually, kind of like RtlEnterCriticalSection has
-	 been converted to an inline function.
-
-	 Next we search for a `mov eax, some address'.  This address points
-	 to the LockCount member of the FastPebLock structure, so the address
-	 is equal to FastPebLock + 4. */
-      const uint8_t *moveax = (const uint8_t *) memchr (movedi, 0xb8, 16);
-      if (!moveax)
-	return NULL;
-      offset = (ptrdiff_t) peek32 (moveax + 1) - 4;
-      /* Compare the address with the known PEB lock as stored in the PEB. */
-      if ((PRTL_CRITICAL_SECTION) offset != NtCurrentTeb ()->Peb->FastPebLock)
-	return NULL;
-      /* Now search for the mov instruction fetching the address of the global
-	 PFAST_CWD *. */
-      mov_pfast_cwd = moveax;
-      do
-	{
-	  mov_pfast_cwd = (const uint8_t *) memchr (++mov_pfast_cwd, 0x8b, 48);
-	}
-      while (mov_pfast_cwd && mov_pfast_cwd[1] != 0x1d
-	     && (mov_pfast_cwd - moveax) < 48);
-      if (!mov_pfast_cwd || mov_pfast_cwd[1] != 0x1d)
-	return NULL;
-    }
+  if (movedi[0] == 0xbf && movedi[5] == 0x57)
+    rcall = movedi + 6;
+  else if (movedi[0] == 0x68)
+    rcall = movedi + 5;
   else
-    {
-      if (movedi[0] == 0xbf && movedi[5] == 0x57)
-	rcall = movedi + 6;
-      else if (movedi[0] == 0x68)
-	rcall = movedi + 5;
-      else
-	return NULL;
-      /* Compare the address used for the critical section with the known
-	 PEB lock as stored in the PEB. */
-      if ((PRTL_CRITICAL_SECTION) peek32 (movedi + 1)
-	  != NtCurrentTeb ()->Peb->FastPebLock)
-	return NULL;
-      /* To check we are seeing the right code, we check our expectation that
-	 the next instruction is a relative call into RtlEnterCriticalSection. */
-      if (rcall[0] != 0xe8)
-	return NULL;
-      /* Check that this is a relative call to RtlEnterCriticalSection. */
-      offset = (ptrdiff_t) peek32 (rcall + 1);
-      if (rcall + 5 + offset != ent_crit)
-	return NULL;
-      mov_pfast_cwd = rcall + 5;
-    }
+    return NULL;
+  /* Compare the address used for the critical section with the known
+     PEB lock as stored in the PEB. */
+  if ((PRTL_CRITICAL_SECTION) peek32 (movedi + 1)
+      != NtCurrentTeb ()->Peb->FastPebLock)
+    return NULL;
+  /* To check we are seeing the right code, we check our expectation that
+     the next instruction is a relative call into RtlEnterCriticalSection. */
+  if (rcall[0] != 0xe8)
+    return NULL;
+  /* Check that this is a relative call to RtlEnterCriticalSection. */
+  offset = (ptrdiff_t) peek32 (rcall + 1);
+  if (rcall + 5 + offset != ent_crit)
+    return NULL;
   /* After locking the critical section, the code should read the global
      PFAST_CWD * pointer that is guarded by that critical section. */
-  if (mov_pfast_cwd[0] != 0x8b)
+  const uint8_t *movesi = rcall + 5;
+  if (movesi[0] != 0x8b)
     return NULL;
-  return (fcwd_access_t **) peek32 (mov_pfast_cwd + 2);
+  return (fcwd_access_t **) peek32 (movesi + 2);
 }
 
 static fcwd_access_t **
@@ -4311,15 +4277,11 @@ etc::test_file_change (int n)
 bool
 etc::dir_changed (int n)
 {
-  /* io MUST be static because NtNotifyChangeDirectoryFile works asynchronously.
-     It may write into io after the function has left, which may result in all
-     sorts of stack corruption. */
-  static IO_STATUS_BLOCK io NO_COPY;
-  static HANDLE changed_h NO_COPY;
-
   if (!change_possible[n])
     {
+      static HANDLE changed_h NO_COPY;
       NTSTATUS status;
+      IO_STATUS_BLOCK io;
 
       if (!changed_h)
 	{

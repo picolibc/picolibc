@@ -146,7 +146,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 
   CHECK_INIT(ptr, fp);
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   ORIENT (fp, -1);
   if (fp->_r < 0)
     fp->_r = 0;
@@ -195,11 +195,11 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 #ifdef __SCLE
               if (fp->_flags & __SCLE)
 	        {
-	          _newlib_flockfile_exit (fp);
+	          _funlockfile (fp);
 	          return crlf_r (ptr, fp, buf, total-resid, 1) / size;
 	        }
 #endif
-	      _newlib_flockfile_exit (fp);
+	      _funlockfile (fp);
 	      return (total - resid) / size;
 	    }
 	}
@@ -220,11 +220,11 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 #ifdef __SCLE
 	      if (fp->_flags & __SCLE)
 		{
-		  _newlib_flockfile_exit (fp);
+		  _funlockfile (fp);
 		  return crlf_r (ptr, fp, buf, total-resid, 1) / size;
 		}
 #endif
-	      _newlib_flockfile_exit (fp);
+	      _funlockfile (fp);
 	      return (total - resid) / size;
 	    }
 	}
@@ -237,11 +237,11 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
     {
-      _newlib_flockfile_exit (fp);
+      _funlockfile (fp);
       return crlf_r(ptr, fp, buf, total, 0) / size;
     }
 #endif
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return count;
 }
 

@@ -749,11 +749,11 @@ InitializeSListHead@4
 InitializeSRWLock@4
 InterlockedCompareExchange64@20
 InterlockedCompareExchange@12
-InterlockedDecrement
-InterlockedExchange
+InterlockedDecrement@4
+InterlockedExchange@8
 InterlockedExchangeAdd@8
 InterlockedFlushSList@4
-InterlockedIncrement
+InterlockedIncrement@4
 InterlockedPopEntrySList@4
 InterlockedPushEntrySList@8
 InvalidateConsoleDIBits@8

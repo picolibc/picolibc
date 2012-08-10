@@ -1,6 +1,6 @@
 /* minires-os-if.c.  Stub synchronous resolver for Cygwin.
 
-   Copyright 2006, 2007, 2008, 2009, 2011, 2012 Red Hat, Inc.
+   Copyright 2006, 2007, 2008, 2009, 2011 Red Hat, Inc.
 
    Written by Pierre A. Humblet <Pierre.Humblet@ieee.org>
 
@@ -10,14 +10,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#define  __INSIDE_CYGWIN_NET__
-#define USE_SYS_TYPES_FD_SET
-#include <winsup.h>
-#include <ws2tcpip.h>
-#include <iphlpapi.h>
-#include <windns.h>
-#include "ntdll.h"
-#undef h_errno
 #include "minires.h"
 
 #ifdef __CYGWIN__
@@ -31,6 +23,13 @@ details. */
 #undef ERROR
 #undef NOERROR
 #undef DELETE
+
+#include <windows.h>
+#include <iphlpapi.h>
+#include <windns.h>
+#include <ntdef.h>
+#include "ntdll.h"
+#include <wchar.h>
 
 /***********************************************************************
  * write_record: Translates a Windows DNS record into a compressed record

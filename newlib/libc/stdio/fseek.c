@@ -138,7 +138,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 
   CHECK_INIT (ptr, fp);
 
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
 
   /* If we've been doing some writing, and we're in append mode
      then we don't really know where the filepos is.  */
@@ -154,7 +154,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
   if ((seekfn = fp->_seek) == NULL)
     {
       ptr->_errno = ESPIPE;	/* ??? */
-      _newlib_flockfile_exit (fp);
+      _funlockfile (fp);
       return EOF;
     }
 
@@ -179,7 +179,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 	  curoff = seekfn (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
 	    {
-	      _newlib_flockfile_exit (fp);
+	      _funlockfile (fp);
 	      return EOF;
 	    }
 	}
@@ -204,7 +204,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 
     default:
       ptr->_errno = EINVAL;
-      _newlib_flockfile_exit (fp);
+      _funlockfile (fp);
       return (EOF);
     }
 
@@ -263,7 +263,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
   if ((long)target != target)
     {
       ptr->_errno = EOVERFLOW;
-      _newlib_flockfile_exit (fp);
+      _funlockfile (fp);
       return EOF;
     }
 
@@ -319,7 +319,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 	FREEUB (ptr, fp);
       fp->_flags &= ~__SEOF;
       memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
-      _newlib_flockfile_exit (fp);
+      _funlockfile (fp);
       return 0;
     }
 
@@ -349,7 +349,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
       fp->_r -= n;
     }
   memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
-  _newlib_flockfile_exit (fp);
+  _funlockfile (fp);
   return 0;
 
   /*
@@ -361,7 +361,7 @@ dumb:
   if (_fflush_r (ptr, fp)
       || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
-      _newlib_flockfile_exit (fp);
+      _funlockfile (fp);
       return EOF;
     }
   /* success: clear EOF indicator and discard ungetc() data */
@@ -379,7 +379,7 @@ dumb:
      is performed.  */
   fp->_flags &= ~__SNPT;
   memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return 0;
 }
 

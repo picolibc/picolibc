@@ -67,8 +67,8 @@ _DEFUN(ferror, (fp),
 {
   int result;
   CHECK_INIT(_REENT, fp);
-  _newlib_flockfile_start (fp);
+  _flockfile (fp);
   result = __sferror (fp);
-  _newlib_flockfile_end (fp);
+  _funlockfile (fp);
   return result;
 }

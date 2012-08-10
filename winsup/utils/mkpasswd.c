@@ -172,13 +172,9 @@ current_user (const char *sep, const char *passed_home_path, DWORD id_offset,
 			     *GetSidSubAuthorityCount(curr_pgrp.psid) - 1);
   if (passed_home_path[0] == '\0')
     {
-      char *envhome = getenv ("HOME");
+      char *envhome = getenv ("HOME");	/* POSIX! */
 
-      /* If $HOME exists and is non-empty, just copy it over to homedir_psx.
-	 Otherwise, generate a new path of the form "/home/$USER". */
-      if (envhome && envhome[0] != '\0')
-	strncat (homedir_psx, envhome, sizeof (homedir_psx) - 1);
-      else
+      if (!envhome || envhome[0] == '\0')
 	{
 	  wcstombs (stpncpy (homedir_psx, "/home/", sizeof (homedir_psx)),
 		    user, sizeof (homedir_psx) - 6);

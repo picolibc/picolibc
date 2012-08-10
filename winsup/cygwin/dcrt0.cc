@@ -353,8 +353,7 @@ build_argv (char *cmd, char **&argv, int &argc, int winshell)
 	}
     }
 
-  if (argv)
-    argv[argc] = NULL;
+  argv[argc] = NULL;
 
   debug_printf ("argc %d", argc);
 }
@@ -626,24 +625,13 @@ child_info_fork::handle_fork ()
     api_fatal ("recreate_mmaps_after_fork_failed");
 }
 
-bool
-child_info_spawn::get_parent_handle ()
-{
-  parent = OpenProcess (PROCESS_VM_READ, false, parent_winpid);
-  moreinfo->myself_pinfo = NULL;
-  return !!parent;
-}
-
 void
 child_info_spawn::handle_spawn ()
 {
   extern void fixup_lockf_after_exec ();
   HANDLE h;
-  if (!dynamically_loaded || get_parent_handle ())
-      {
-	cygheap_fixup_in_child (true);
-	memory_init (false);
-      }
+  cygheap_fixup_in_child (true);
+  memory_init (false);
   if (!moreinfo->myself_pinfo ||
       !DuplicateHandle (GetCurrentProcess (), moreinfo->myself_pinfo,
 			GetCurrentProcess (), &h, 0,
@@ -677,15 +665,10 @@ child_info_spawn::handle_spawn ()
 
   ready (true);
 
-  /* Keep pointer to parent open if we've execed so that pid will not be reused.
-     Otherwise, we no longer need this handle so close it.
-     Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of
+  /* Need to do this after debug_fixup_after_fork_exec or DEBUGGING handling of
      handles might get confused. */
-  if (type != _CH_EXEC && child_proc_info->parent)
-    {
-      CloseHandle (child_proc_info->parent);
-      child_proc_info->parent = NULL;
-    }
+  CloseHandle (child_proc_info->parent);
+  child_proc_info->parent = NULL;
 
   signal_fixup_after_exec ();
   fixup_lockf_after_exec ();
@@ -773,6 +756,12 @@ dll_crt0_0 ()
 
   user_data->threadinterface->Init ();
 
+  _cygtls::init ();
+
+  /* Initialize events */
+  events_init ();
+  tty_list::init_session ();
+
   _main_tls = &_my_tls;
 
   /* Initialize signal processing here, early, in the hopes that the creation
@@ -836,6 +825,8 @@ dll_crt0_1 (void *)
 #ifdef DEBUGGING
   strace.microseconds ();
 #endif
+
+  create_signal_arrived (); /* FIXME: move into wait_sig? */
 
   /* Initialize debug muto, if DLL is built with --enable-debugging.
      Need to do this before any helper threads start. */

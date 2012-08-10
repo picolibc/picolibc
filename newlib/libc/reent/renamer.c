@@ -1,7 +1,6 @@
 /* Reentrant version of rename system call.  */
 
 #include <reent.h>
-#include <stdio.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <_syslist.h>

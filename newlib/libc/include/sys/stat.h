@@ -170,10 +170,8 @@ int	_EXFUN(futimens, (int, const struct timespec *));
 #ifdef _COMPILING_NEWLIB
 int	_EXFUN(_fstat,( int __fd, struct stat *__sbuf ));
 int	_EXFUN(_stat,( const char *__path, struct stat *__sbuf ));
-int	_EXFUN(_mkdir,( const char *_path, mode_t __mode ));
 #ifdef __LARGE64_FILES
 struct stat64;
-int	_EXFUN(_stat64,( const char *__path, struct stat64 *__sbuf ));
 int	_EXFUN(_fstat64,( int __fd, struct stat64 *__sbuf ));
 #endif
 #endif

@@ -1,7 +1,7 @@
 /* security.h: security declarations
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011, 2012 Red Hat, Inc.
+   2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -9,7 +9,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#pragma once
+#ifndef _SECURITY_H
+#define _SECURITY_H
 
 #include <accctrl.h>
 
@@ -222,12 +223,9 @@ public:
 
   /* += adds a "normal" SID, *= adds a well-known SID.  See comment in class
      cygsid above. */
-  BOOL operator+= (cygsid &si) { return add ((PSID) si,
-					     si.is_well_known_sid ()); }
+  BOOL operator+= (cygsid &si) { return add ((PSID) si, false); }
   BOOL operator+= (const char *sidstr) { cygsid nsi (sidstr);
-					 return add ((PSID) nsi,
-						     nsi.is_well_known_sid ());
-				       }
+					 return add ((PSID) nsi, false); }
   BOOL operator+= (const PSID psid) { return add (psid, false); }
   BOOL operator*= (cygsid &si) { return add ((PSID) si, true); }
   BOOL operator*= (const char *sidstr) { cygsid nsi (sidstr);
@@ -475,13 +473,6 @@ extern SECURITY_ATTRIBUTES sec_none, sec_none_nih, sec_all, sec_all_nih;
 extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID, PSID, PSID,
 						  DWORD, BOOL)
 		__attribute__ ((regparm (3)));
-
-extern PSECURITY_DESCRIPTOR _recycler_sd (void *buf, bool users, bool dir);
-#define recycler_sd(users,dir) \
-  (_recycler_sd (alloca (sizeof (SECURITY_DESCRIPTOR) + MAX_DACL_LEN (3)), \
-		 (users), \
-		 (dir)))
-
 extern PSECURITY_DESCRIPTOR _everyone_sd (void *buf, ACCESS_MASK access);
 #define everyone_sd(access)	(_everyone_sd (alloca (SD_MIN_SIZE), (access)))
 
@@ -512,3 +503,5 @@ sec_user (SECURITY_ATTRIBUTES *sa_buf, PSID sid1, PSID sid2 = NULL,
 {
   return __sec_user (sa_buf, sid1, sid2, access2, TRUE);
 }
+
+#endif /*_SECURITY_H*/

@@ -79,7 +79,6 @@ static struct lc_monetary_T _monetary_locale;
 static int	_monetary_using_locale;
 static char	*_monetary_locale_buf;
 
-#ifndef __CYGWIN__
 static char
 cnv(const char *str) {
 	int i = strtol(str, NULL, 10);
@@ -87,7 +86,6 @@ cnv(const char *str) {
 		i = CHAR_MAX;
 	return (char)i;
 }
-#endif
 
 int
 __monetary_load_locale(const char *name , void *f_wctomb, const char *charset)
