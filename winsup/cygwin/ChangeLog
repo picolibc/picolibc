@@ -1,3 +1,7 @@
+2012-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (TEST_DLL_NAME): Use -nostdlib flag unconditionally.
+
 2012-08-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.sc: Add default w32api search dirs.
