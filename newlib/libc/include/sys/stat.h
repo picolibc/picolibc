@@ -19,7 +19,7 @@ extern "C" {
 #ifdef __CYGWIN__
 #include <cygwin/stat.h>
 #ifdef _COMPILING_NEWLIB
-#define stat64 stat
+#define stat64 __stat64
 #endif
 #else
 struct	stat 
