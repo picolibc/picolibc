@@ -294,7 +294,7 @@ main (int argc, char *argv[])
 	/* nothing to do */;
       else if (p->version >= EXTERNAL_PINFO_VERSION_32_BIT)
 	{
-	  if (p->uid32 != (__uid32_t) uid)
+	  if (p->uid32 != uid)
 	    continue;
 	}
       else if (p->uid != uid)

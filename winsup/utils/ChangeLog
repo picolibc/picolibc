@@ -1,3 +1,7 @@
+2012-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ps.cc (main): Drop unneeded cast.
+
 2012-07-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (cygcheck.exe): Link against psapi.dll.
