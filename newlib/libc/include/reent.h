@@ -163,16 +163,22 @@ extern int _gettimeofday_r _PARAMS ((struct _reent *, struct timeval *__tp, void
 
 #ifdef __LARGE64_FILES
 
-#if defined(__CYGWIN__) && defined(_COMPILING_NEWLIB)
-#define stat64 __stat64
-#endif
 
+#if defined(__CYGWIN__)
+#define stat64 stat
+#endif
 struct stat64;
 
 extern _off64_t _lseek64_r _PARAMS ((struct _reent *, int, _off64_t, int));
 extern int _fstat64_r _PARAMS ((struct _reent *, int, struct stat64 *));
 extern int _open64_r _PARAMS ((struct _reent *, const char *, int, int));
 extern int _stat64_r _PARAMS ((struct _reent *, const char *, struct stat64 *));
+
+/* Don't pollute namespace if not building newlib. */
+#if defined (__CYGWIN__) && !defined (_COMPILING_NEWLIB)
+#undef stat64
+#endif
+
 #endif
 
 #endif
