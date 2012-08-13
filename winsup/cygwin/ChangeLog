@@ -1,3 +1,7 @@
+2012-08-13  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* errno.cc (errmap): Map ERROR_SXS_CANT_GEN_ACTCTX to ELIBBAD.
+
 2012-08-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* DevNotes: Add entry cgf-000014.
