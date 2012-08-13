@@ -13,7 +13,6 @@ details. */
 typedef unsigned short _major_t;
 typedef unsigned short _minor_t;
 typedef mode_t _mode_t;
-typedef __dev32_t _dev_t;
 
 #define FHDEV(maj, min) ((((unsigned) (maj)) << (sizeof (_major_t) * 8)) | (unsigned) (min))
 #define _minor(dev) ((dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
@@ -262,7 +261,7 @@ struct device
   const char *name;
   union __cygwin_dev
   {
-    _dev_t devn;
+    dev_t devn;
     DWORD devn_dword;
     int devn_int;
     fh_devices devn_fh_devices;
@@ -280,7 +279,7 @@ struct device
   static const device *lookup (const char *, unsigned int = UINT32_MAX);
   void parse (const char *);
   void parse (_major_t major, _minor_t minor);
-  void parse (_dev_t dev);
+  void parse (dev_t dev);
   void parsedisk (int, int);
   inline bool setunit (unsigned n)
   {
@@ -289,31 +288,32 @@ struct device
   }
   static void init ();
 
-  static _major_t major (_dev_t n)
+  static _major_t major (dev_t n)
   {
     __cygwin_dev d;
     d.devn = n;
     return d.major;
   }
-  static _minor_t minor (_dev_t n)
+  static _minor_t minor (dev_t n)
   {
     __cygwin_dev d;
     d.devn = n;
     return d.minor;
   }
-  static _major_t major (int n) {return major ((_dev_t) n);}
-  static _minor_t minor (int n) {return minor ((_dev_t) n);}
+  static _major_t major (int n) {return major ((dev_t) n);}
+  static _minor_t minor (int n) {return minor ((dev_t) n);}
 
-  bool is_device (_dev_t n) const {return n == d.devn; }
-  bool not_device (_dev_t n) const {return d.devn && n != d.devn; }
+  bool is_device (dev_t n) const {return n == d.devn; }
+  bool not_device (dev_t n) const {return d.devn && n != d.devn; }
 
   _minor_t get_minor () const {return d.minor;}
   _major_t get_major () const {return d.major;}
-  _dev_t   get_device () const {return d.devn;}
+  dev_t   get_device () const {return d.devn;}
 
   inline operator int& () {return d.devn_int;}
   inline operator fh_devices () {return d.devn_fh_devices;}
   inline operator bool () {return !!d.devn_int;}
+  inline operator dev_t& () {return d.devn;}
   inline operator DWORD& () {return d.devn_dword;}
   fh_devices operator = (fh_devices n) {return d.devn_fh_devices = n;}
   inline void setfs (bool x) {dev_on_fs = x;}

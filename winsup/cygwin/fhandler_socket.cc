@@ -313,7 +313,7 @@ fhandler_socket::af_local_send_secret ()
 bool
 fhandler_socket::af_local_recv_cred ()
 {
-  struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
+  struct ucred out = { (pid_t) 0, (uid_t) -1, (gid_t) -1 };
   int rest = sizeof out;
   char *ptr = (char *) &out;
   while (rest > 0)
@@ -406,8 +406,8 @@ fhandler_socket::af_local_set_cred ()
   sec_uid = geteuid32 ();
   sec_gid = getegid32 ();
   sec_peer_pid = (pid_t) 0;
-  sec_peer_uid = (__uid32_t) -1;
-  sec_peer_gid = (__gid32_t) -1;
+  sec_peer_uid = (uid_t) -1;
+  sec_peer_gid = (gid_t) -1;
 }
 
 void
@@ -803,7 +803,7 @@ fhandler_socket::dup (fhandler_base *child, int flags)
 }
 
 int __stdcall
-fhandler_socket::fstat (struct __stat64 *buf)
+fhandler_socket::fstat (struct stat *buf)
 {
   int res;
   if (get_device () == FH_UNIX)
@@ -821,7 +821,7 @@ fhandler_socket::fstat (struct __stat64 *buf)
       if (!res)
 	{
 	  buf->st_dev = 0;
-	  buf->st_ino = (__ino64_t) ((DWORD) get_handle ());
+	  buf->st_ino = (ino_t) ((DWORD) get_handle ());
 	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
 	  buf->st_size = 0;
 	}
@@ -857,7 +857,7 @@ fhandler_socket::fchmod (mode_t mode)
 }
 
 int
-fhandler_socket::fchown (__uid32_t uid, __gid32_t gid)
+fhandler_socket::fchown (uid_t uid, gid_t gid)
 {
   if (get_device () == FH_UNIX)
     {
@@ -2071,7 +2071,7 @@ fhandler_socket::set_peer_sun_path (const char *path)
 }
 
 int
-fhandler_socket::getpeereid (pid_t *pid, __uid32_t *euid, __gid32_t *egid)
+fhandler_socket::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
 {
   if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
     {

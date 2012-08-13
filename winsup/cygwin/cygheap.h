@@ -97,11 +97,11 @@ class cygheap_user
   cygsid effec_cygsid;  /* buffer for user's SID */
   cygsid saved_cygsid;  /* Remains intact even after impersonation */
 public:
-  __uid32_t saved_uid;     /* Remains intact even after impersonation */
-  __gid32_t saved_gid;     /* Ditto */
-  __uid32_t real_uid;      /* Remains intact on seteuid, replaced by setuid */
-  __gid32_t real_gid;      /* Ditto */
-  user_groups groups;      /* Primary and supp SIDs */
+  uid_t saved_uid;      /* Remains intact even after impersonation */
+  gid_t saved_gid;      /* Ditto */
+  uid_t real_uid;       /* Remains intact on seteuid, replaced by setuid */
+  gid_t real_gid;       /* Ditto */
+  user_groups groups;   /* Primary and supp SIDs */
 
   /* token is needed if set(e)uid should be called. It can be set by a call
      to `set_impersonation_token()'. */

@@ -204,10 +204,10 @@ telldir (DIR *dir)
 /* telldir was never defined using off_t in POSIX, only in early versions
    of glibc.  We have to keep the function in as entry point for backward
    compatibility. */
-extern "C" _off64_t
+extern "C" off_t
 telldir64 (DIR *dir)
 {
-  return (_off64_t) telldir (dir);
+  return (off_t) telldir (dir);
 }
 
 /* seekdir */
@@ -228,7 +228,7 @@ seekdir (DIR *dir, long loc)
    of glibc.  We have to keep the function in as entry point for backward
    compatibility. */
 extern "C" void
-seekdir64 (DIR *dir, _off64_t loc)
+seekdir64 (DIR *dir, off_t loc)
 {
   seekdir (dir, (long) loc);
 }

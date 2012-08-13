@@ -137,7 +137,7 @@ gen_protect (int prot, int flags)
 }
 
 static HANDLE
-CreateMapping (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
+CreateMapping (HANDLE fhdl, size_t len, off_t off, DWORD openflags,
 	       int prot, int flags)
 {
   HANDLE h;
@@ -191,7 +191,7 @@ CreateMapping (HANDLE fhdl, size_t len, _off64_t off, DWORD openflags,
 
 static void *
 MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
-	 int prot, int flags, _off64_t off)
+	 int prot, int flags, off_t off)
 {
   NTSTATUS status;
   LARGE_INTEGER offset = { QuadPart:off };
@@ -258,14 +258,14 @@ class mmap_record
     DWORD openflags;
     int prot;
     int flags;
-    _off64_t offset;
+    off_t offset;
     DWORD len;
     caddr_t base_address;
     int dev;
     DWORD page_map[0];
 
   public:
-    mmap_record (int nfd, HANDLE h, DWORD of, int p, int f, _off64_t o, DWORD l,
+    mmap_record (int nfd, HANDLE h, DWORD of, int p, int f, off_t o, DWORD l,
 		 caddr_t b) :
        fd (nfd),
        mapping_hdl (h),
@@ -296,7 +296,7 @@ class mmap_record
     bool autogrow () const { return ::autogrow (flags); }
     bool attached () const { return ::attached (prot); }
     bool filler () const { return ::filler (prot); }
-    _off64_t get_offset () const { return offset; }
+    off_t get_offset () const { return offset; }
     DWORD get_len () const { return len; }
     caddr_t get_address () const { return base_address; }
 
@@ -304,7 +304,7 @@ class mmap_record
 
     DWORD find_unused_pages (DWORD pages) const;
     bool match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len);
-    _off64_t map_pages (_off64_t off, DWORD len);
+    off_t map_pages (off_t off, DWORD len);
     bool map_pages (caddr_t addr, DWORD len);
     bool unmap_pages (caddr_t addr, DWORD len);
     int access (caddr_t address);
@@ -328,17 +328,17 @@ class mmap_list
 
   private:
     int fd;
-    __ino64_t hash;
+    ino_t hash;
 
   public:
     int get_fd () const { return fd; }
-    __ino64_t get_hash () const { return hash; }
+    ino_t get_hash () const { return hash; }
 
     bool anonymous () const { return fd == -1; }
-    void set (int nfd, struct __stat64 *st);
+    void set (int nfd, struct stat *st);
     mmap_record *add_record (mmap_record &r);
     bool del_record (mmap_record *rec);
-    caddr_t try_map (void *addr, size_t len, int flags, _off64_t off);
+    caddr_t try_map (void *addr, size_t len, int flags, off_t off);
 };
 
 class mmap_areas
@@ -346,8 +346,8 @@ class mmap_areas
   public:
     LIST_HEAD (, mmap_list) lists;
 
-    mmap_list *get_list_by_fd (int fd, struct __stat64 *st);
-    mmap_list *add_list (int fd, struct __stat64 *st);
+    mmap_list *get_list_by_fd (int fd, struct stat *st);
+    mmap_list *add_list (int fd, struct stat *st);
     void del_list (mmap_list *ml);
 };
 
@@ -419,8 +419,8 @@ mmap_record::init_page_map (mmap_record &r)
     MAP_SET (len);
 }
 
-_off64_t
-mmap_record::map_pages (_off64_t off, DWORD len)
+off_t
+mmap_record::map_pages (off_t off, DWORD len)
 {
   /* Used ONLY if this mapping matches into the chunk of another already
      performed mapping in a special case of MAP_ANON|MAP_PRIVATE.
@@ -438,7 +438,7 @@ mmap_record::map_pages (_off64_t off, DWORD len)
 			  &old_prot))
     {
       __seterrno ();
-      return (_off64_t)-1;
+      return (off_t)-1;
     }
 
   while (len-- > 0)
@@ -553,7 +553,7 @@ mmap_list::add_record (mmap_record &r)
 }
 
 void
-mmap_list::set (int nfd, struct __stat64 *st)
+mmap_list::set (int nfd, struct stat *st)
 {
   fd = nfd;
   if (!anonymous ())
@@ -561,7 +561,7 @@ mmap_list::set (int nfd, struct __stat64 *st)
       /* The fd isn't sufficient since it could already be the fd of another
 	 file.  So we use the inode number as evaluated by fstat to identify
 	 the file. */
-      hash = st ? st->st_ino : (__ino64_t) 0;
+      hash = st ? st->st_ino : (ino_t) 0;
     }
   LIST_INIT (&recs);
 }
@@ -577,7 +577,7 @@ mmap_list::del_record (mmap_record *rec)
 }
 
 caddr_t
-mmap_list::try_map (void *addr, size_t len, int flags, _off64_t off)
+mmap_list::try_map (void *addr, size_t len, int flags, off_t off)
 {
   mmap_record *rec;
 
@@ -591,7 +591,7 @@ mmap_list::try_map (void *addr, size_t len, int flags, _off64_t off)
 	  break;
       if (rec && rec->compatible_flags (flags))
 	{
-	  if ((off = rec->map_pages (off, len)) == (_off64_t) -1)
+	  if ((off = rec->map_pages (off, len)) == (off_t) -1)
 	    return (caddr_t) MAP_FAILED;
 	  return (caddr_t) rec->get_address () + off;
 	}
@@ -627,7 +627,7 @@ mmap_list::try_map (void *addr, size_t len, int flags, _off64_t off)
 }
 
 mmap_list *
-mmap_areas::get_list_by_fd (int fd, struct __stat64 *st)
+mmap_areas::get_list_by_fd (int fd, struct stat *st)
 {
   mmap_list *ml;
   LIST_FOREACH (ml, &lists, ml_next)
@@ -644,7 +644,7 @@ mmap_areas::get_list_by_fd (int fd, struct __stat64 *st)
 }
 
 mmap_list *
-mmap_areas::add_list (int fd, struct __stat64 *st)
+mmap_areas::add_list (int fd, struct stat *st)
 {
   mmap_list *ml = (mmap_list *) cmalloc (HEAP_MMAP, sizeof (mmap_list));
   if (!ml)
@@ -768,7 +768,7 @@ out:
 
 static caddr_t
 mmap_worker (mmap_list *map_list, fhandler_base *fh, caddr_t base, size_t len,
-	     int prot, int flags, int fd, _off64_t off, struct __stat64 *st)
+	     int prot, int flags, int fd, off_t off, struct stat *st)
 {
   HANDLE h = fh->mmap (&base, len, prot, flags, off);
   if (h == INVALID_HANDLE_VALUE)
@@ -791,7 +791,7 @@ mmap_worker (mmap_list *map_list, fhandler_base *fh, caddr_t base, size_t len,
 }
 
 extern "C" void *
-mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
+mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
   syscall_printf ("addr %x, len %u, prot %x, flags %x, fd %d, off %D",
 		  addr, len, prot, flags, fd, off);
@@ -803,7 +803,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   mmap_list *map_list = NULL;
   size_t orig_len = 0;
   caddr_t base = NULL;
-  struct __stat64 st;
+  struct stat st;
 
   DWORD pagesize = wincap.allocation_granularity ();
 
@@ -941,7 +941,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  __seterrno ();
 	  goto out;
 	}
-      _off64_t fsiz = st.st_size;
+      off_t fsiz = st.st_size;
 
       /* Don't allow file mappings beginning beyond EOF since Windows can't
 	 handle that POSIX like, unless MAP_AUTOGROW flag is set, which
@@ -1123,11 +1123,15 @@ out:
   return ret;
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (mmap64, mmap)
+#else
 extern "C" void *
 mmap (void *addr, size_t len, int prot, int flags, int fd, _off_t off)
 {
-  return mmap64 (addr, len, prot, flags, fd, (_off64_t)off);
+  return mmap64 (addr, len, prot, flags, fd, (off_t)off);
 }
+#endif
 
 /* munmap () removes all mmapped pages between addr and addr+len. */
 
@@ -1467,7 +1471,7 @@ posix_madvise (void *addr, size_t len, int advice)
 */
 HANDLE
 fhandler_base::mmap (caddr_t *addr, size_t len, int prot,
-		     int flags, _off64_t off)
+		     int flags, off_t off)
 {
   set_errno (ENODEV);
   return INVALID_HANDLE_VALUE;
@@ -1489,7 +1493,7 @@ fhandler_base::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 
 bool
 fhandler_base::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-				      _off64_t offset, DWORD size,
+				      off_t offset, DWORD size,
 				      void *address)
 {
   set_errno (ENODEV);
@@ -1500,7 +1504,7 @@ fhandler_base::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
    quite the natural way. */
 HANDLE
 fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
-			 int flags, _off64_t off)
+			 int flags, off_t off)
 {
   HANDLE h;
   void *base;
@@ -1587,7 +1591,7 @@ fhandler_dev_zero::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 
 bool
 fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-				      _off64_t offset, DWORD size,
+				      off_t offset, DWORD size,
 				      void *address)
 {
   /* Re-create the map */
@@ -1616,7 +1620,7 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 /* Implementation for disk files and anonymous mappings. */
 HANDLE
 fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
-			  int flags, _off64_t off)
+			  int flags, off_t off)
 {
   HANDLE h = CreateMapping (get_handle (), len, off, get_access (),
 			    prot, flags);
@@ -1667,7 +1671,7 @@ fhandler_disk_file::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 
 bool
 fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-					   _off64_t offset, DWORD size,
+					   off_t offset, DWORD size,
 					   void *address)
 {
   /* Re-create the map */
@@ -1685,7 +1689,7 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 
 HANDLE
 fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
-			int flags, _off64_t off)
+			int flags, off_t off)
 {
   if (off >= mem_size
       || (DWORD) len >= mem_size
@@ -1761,7 +1765,7 @@ fhandler_dev_mem::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 
 bool
 fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-					 _off64_t offset, DWORD size,
+					 off_t offset, DWORD size,
 					 void *address)
 {
   void *base = MapView (h, address, size, get_access (), prot,

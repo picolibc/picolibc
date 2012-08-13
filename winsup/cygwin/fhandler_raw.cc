@@ -33,7 +33,7 @@ fhandler_dev_raw::~fhandler_dev_raw ()
 }
 
 int __stdcall
-fhandler_dev_raw::fstat (struct __stat64 *buf)
+fhandler_dev_raw::fstat (struct stat *buf)
 {
   debug_printf ("here");
 

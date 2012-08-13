@@ -35,11 +35,11 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
-__uid32_t getuid32 ();
-__uid32_t geteuid32 ();
-int seteuid32 (__uid32_t);
-__gid32_t getegid32 (void);
-struct passwd *getpwuid32 (__uid32_t);
+uid_t getuid32 ();
+uid_t geteuid32 ();
+int seteuid32 (uid_t);
+gid_t getegid32 (void);
+struct passwd *getpwuid32 (uid_t);
 struct passwd *getpwnam (const char *);
 struct __sFILE64 *fopen64 (const char *, const char *);
 struct hostent *cygwin_gethostbyname (const char *name);
@@ -173,14 +173,16 @@ extern struct per_process_cxx_malloc default_cygwin_cxx_malloc;
 /* UID/GID */
 void uinfo_init ();
 
-#define ILLEGAL_UID16 ((__uid16_t)-1)
-#define ILLEGAL_UID ((__uid32_t)-1)
-#define ILLEGAL_GID16 ((__gid16_t)-1)
-#define ILLEGAL_GID ((__gid32_t)-1)
-#define ILLEGAL_SEEK ((_off64_t)-1)
+#define ILLEGAL_UID ((uid_t)-1)
+#define ILLEGAL_GID ((gid_t)-1)
+#define ILLEGAL_SEEK ((off_t)-1)
 
-#define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(__uid32_t)(u16))
-#define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(__gid32_t)(g16))
+#ifndef __x86_64__
+#define ILLEGAL_UID16 ((__uid16_t)-1)
+#define ILLEGAL_GID16 ((__gid16_t)-1)
+#define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(uid_t)(u16))
+#define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(gid_t)(g16))
+#endif
 
 /* Convert LARGE_INTEGER into long long */
 #define get_ll(pl)  (((long long) (pl).HighPart << 32) | (pl).LowPart)
@@ -203,11 +205,11 @@ extern bool cygwin_finished_initializing;
 /**************************** Miscellaneous ******************************/
 
 void __stdcall set_std_handle (int);
-int __stdcall stat_dev (DWORD, int, unsigned long, struct __stat64 *);
+int __stdcall stat_dev (DWORD, int, unsigned long, struct stat *);
 
-__ino64_t __stdcall hash_path_name (__ino64_t hash, PUNICODE_STRING name) __attribute__ ((regparm(2)));
-__ino64_t __stdcall hash_path_name (__ino64_t hash, PCWSTR name) __attribute__ ((regparm(2)));
-__ino64_t __stdcall hash_path_name (__ino64_t hash, const char *name) __attribute__ ((regparm(2)));
+ino_t __stdcall hash_path_name (ino_t hash, PUNICODE_STRING name) __attribute__ ((regparm(2)));
+ino_t __stdcall hash_path_name (ino_t hash, PCWSTR name) __attribute__ ((regparm(2)));
+ino_t __stdcall hash_path_name (ino_t hash, const char *name) __attribute__ ((regparm(2)));
 void __stdcall nofinalslash (const char *src, char *dst) __attribute__ ((regparm(2)));
 
 void *hook_or_detect_cygwin (const char *, const void *, WORD&, HANDLE h = NULL) __attribute__ ((regparm (3)));
@@ -249,9 +251,9 @@ int symlink_worker (const char *, const char *, bool, bool)
 
 class path_conv;
 
-int __stdcall stat_worker (path_conv &pc, struct __stat64 *buf) __attribute__ ((regparm (2)));
+int __stdcall stat_worker (path_conv &pc, struct stat *buf) __attribute__ ((regparm (2)));
 
-__ino64_t __stdcall readdir_get_ino (const char *path, bool dot_dot) __attribute__ ((regparm (2)));
+ino_t __stdcall readdir_get_ino (const char *path, bool dot_dot) __attribute__ ((regparm (2)));
 
 /* mmap functions. */
 enum mmap_region_status

@@ -181,7 +181,7 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
 }
 
 int __stdcall
-fhandler_dev_clipboard::fstat (struct __stat64 *buf)
+fhandler_dev_clipboard::fstat (struct stat *buf)
 {
   buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
   buf->st_uid = geteuid32 ();
@@ -283,8 +283,8 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
   len = ret;
 }
 
-_off64_t
-fhandler_dev_clipboard::lseek (_off64_t offset, int whence)
+off_t
+fhandler_dev_clipboard::lseek (off_t offset, int whence)
 {
   /* On reads we check this at read time, not seek time.
    * On writes we use this to decide how to write - empty and write, or open, copy, empty

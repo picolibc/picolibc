@@ -1067,7 +1067,7 @@ out:
 }
 
 int __stdcall
-fhandler_pty_slave::fstat (struct __stat64 *st)
+fhandler_pty_slave::fstat (struct stat *st)
 {
   fhandler_base::fstat (st);
 
@@ -1156,8 +1156,8 @@ fhandler_pty_slave::fchmod (mode_t mode)
   int ret = -1;
   bool to_close = false;
   security_descriptor sd;
-  __uid32_t uid;
-  __gid32_t gid;
+  uid_t uid;
+  gid_t gid;
 
   if (!input_available_event)
     {
@@ -1177,13 +1177,13 @@ errout:
 }
 
 int __stdcall
-fhandler_pty_slave::fchown (__uid32_t uid, __gid32_t gid)
+fhandler_pty_slave::fchown (uid_t uid, gid_t gid)
 {
   int ret = -1;
   bool to_close = false;
   mode_t mode = 0;
-  __uid32_t o_uid;
-  __gid32_t o_gid;
+  uid_t o_uid;
+  gid_t o_gid;
   security_descriptor sd;
 
   if (uid == ILLEGAL_UID && gid == ILLEGAL_GID)
@@ -1246,8 +1246,8 @@ fhandler_pty_master::open_setup (int flags)
   report_tty_counts (this, buf, "");
 }
 
-_off64_t
-fhandler_pty_common::lseek (_off64_t, int)
+off_t
+fhandler_pty_common::lseek (off_t, int)
 {
   set_errno (ESPIPE);
   return -1;

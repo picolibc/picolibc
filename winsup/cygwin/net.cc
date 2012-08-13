@@ -903,7 +903,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 }
 
 extern "C" int
-getpeereid (int fd, __uid32_t *euid, __gid32_t *egid)
+getpeereid (int fd, uid_t *euid, gid_t *egid)
 {
   fhandler_socket *fh = get (fd);
   if (fh)

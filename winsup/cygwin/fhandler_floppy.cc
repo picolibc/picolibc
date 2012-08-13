@@ -415,7 +415,7 @@ fhandler_dev_floppy::dup (fhandler_base *child, int flags)
   return ret;
 }
 
-inline _off64_t
+inline off_t
 fhandler_dev_floppy::get_current_position ()
 {
   LARGE_INTEGER off = { QuadPart: 0LL };
@@ -475,7 +475,7 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 		  tgt = devbuf;
 		  bytes_to_read = devbufsiz;
 		}
-	      _off64_t current_position = get_current_position ();
+	      off_t current_position = get_current_position ();
 	      if (current_position + bytes_to_read >= drive_size)
 		bytes_to_read = drive_size - current_position;
 	      if (!bytes_to_read)
@@ -524,7 +524,7 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
     }
   else
     {
-      _off64_t current_position = get_current_position ();
+      off_t current_position = get_current_position ();
       bytes_to_read = len;
       if (current_position + bytes_to_read >= drive_size)
 	bytes_to_read = drive_size - current_position;
@@ -592,12 +592,12 @@ fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
   return bytes_written;
 }
 
-_off64_t
-fhandler_dev_floppy::lseek (_off64_t offset, int whence)
+off_t
+fhandler_dev_floppy::lseek (off_t offset, int whence)
 {
   char buf[bytes_per_sector];
-  _off64_t lloffset = offset;
-  _off64_t current_pos = (_off64_t) -1;
+  off_t lloffset = offset;
+  off_t current_pos = (off_t) -1;
   LARGE_INTEGER sector_aligned_offset;
   size_t bytes_left;
 
@@ -622,7 +622,7 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
   /* If new position is in buffered range, adjust buffer and return */
   if (devbufstart < devbufend)
     {
-      if (current_pos == (_off64_t) -1)
+      if (current_pos == (off_t) -1)
 	current_pos = get_current_position ();
       if (current_pos - devbufend <= lloffset && lloffset <= current_pos)
 	{
@@ -681,7 +681,7 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
 	if (cmd == BLKGETSIZE)
 	  *(long *)buf = drive_size >> 9UL;
 	else
-	  *(_off64_t *)buf = drive_size;
+	  *(off_t *)buf = drive_size;
 	return 0;
       }
     case BLKRRPART:

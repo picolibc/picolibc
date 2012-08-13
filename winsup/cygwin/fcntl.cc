@@ -60,7 +60,7 @@ fcntl64 (int fd, int cmd, ...)
     case F_SETLK:
     case F_SETLKW:
       {
-	struct __flock64 *fl = (struct __flock64 *) arg;
+	struct flock *fl = (struct flock *) arg;
 	fl->l_type &= F_RDLCK | F_WRLCK | F_UNLCK;
 	res = cfd->lock (cmd, fl);
       }
@@ -74,13 +74,16 @@ done:
   return res;
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (fcntl64, _fcntl)
+#else
 extern "C" int
 _fcntl (int fd, int cmd, ...)
 {
   void *arg = NULL;
   va_list args;
   struct __flock32 *src = NULL;
-  struct __flock64 dst;
+  struct flock dst;
 
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -110,4 +113,4 @@ _fcntl (int fd, int cmd, ...)
     }
   return res;
 }
-
+#endif

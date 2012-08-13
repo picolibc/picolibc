@@ -34,25 +34,25 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-static _off64_t format_process_maps (void *, char *&);
-static _off64_t format_process_stat (void *, char *&);
-static _off64_t format_process_status (void *, char *&);
-static _off64_t format_process_statm (void *, char *&);
-static _off64_t format_process_winexename (void *, char *&);
-static _off64_t format_process_winpid (void *, char *&);
-static _off64_t format_process_exename (void *, char *&);
-static _off64_t format_process_root (void *, char *&);
-static _off64_t format_process_cwd (void *, char *&);
-static _off64_t format_process_cmdline (void *, char *&);
-static _off64_t format_process_ppid (void *, char *&);
-static _off64_t format_process_uid (void *, char *&);
-static _off64_t format_process_pgid (void *, char *&);
-static _off64_t format_process_sid (void *, char *&);
-static _off64_t format_process_gid (void *, char *&);
-static _off64_t format_process_ctty (void *, char *&);
-static _off64_t format_process_fd (void *, char *&);
-static _off64_t format_process_mounts (void *, char *&);
-static _off64_t format_process_mountinfo (void *, char *&);
+static off_t format_process_maps (void *, char *&);
+static off_t format_process_stat (void *, char *&);
+static off_t format_process_status (void *, char *&);
+static off_t format_process_statm (void *, char *&);
+static off_t format_process_winexename (void *, char *&);
+static off_t format_process_winpid (void *, char *&);
+static off_t format_process_exename (void *, char *&);
+static off_t format_process_root (void *, char *&);
+static off_t format_process_cwd (void *, char *&);
+static off_t format_process_cmdline (void *, char *&);
+static off_t format_process_ppid (void *, char *&);
+static off_t format_process_uid (void *, char *&);
+static off_t format_process_pgid (void *, char *&);
+static off_t format_process_sid (void *, char *&);
+static off_t format_process_gid (void *, char *&);
+static off_t format_process_ctty (void *, char *&);
+static off_t format_process_fd (void *, char *&);
+static off_t format_process_mounts (void *, char *&);
+static off_t format_process_mountinfo (void *, char *&);
 
 static const virt_tab_t process_tab[] =
 {
@@ -137,7 +137,7 @@ fhandler_process::fhandler_process ():
 }
 
 int
-fhandler_process::fstat (struct __stat64 *buf)
+fhandler_process::fstat (struct stat *buf)
 {
   const char *path = get_name ();
   int file_type = exists ();
@@ -356,7 +356,7 @@ fhandler_process::fill_filebuf ()
   return false;
 }
 
-static _off64_t
+static off_t
 format_process_fd (void *data, char *&destbuf)
 {
   _pinfo *p = ((process_fd_t *) data)->p;
@@ -390,7 +390,7 @@ format_process_fd (void *data, char *&destbuf)
   return fs;
 }
 
-static _off64_t
+static off_t
 format_process_ppid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -398,7 +398,7 @@ format_process_ppid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->ppid);
 }
 
-static _off64_t
+static off_t
 format_process_uid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -406,7 +406,7 @@ format_process_uid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->uid);
 }
 
-static _off64_t
+static off_t
 format_process_pgid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -414,7 +414,7 @@ format_process_pgid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->pgid);
 }
 
-static _off64_t
+static off_t
 format_process_sid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -422,7 +422,7 @@ format_process_sid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->sid);
 }
 
-static _off64_t
+static off_t
 format_process_gid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -430,7 +430,7 @@ format_process_gid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->gid);
 }
 
-static _off64_t
+static off_t
 format_process_ctty (void *data, char *&destbuf)
 {
   device d;
@@ -440,7 +440,7 @@ format_process_ctty (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%s\n", d.name);
 }
 
-static _off64_t
+static off_t
 format_process_root (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -460,7 +460,7 @@ format_process_root (void *data, char *&destbuf)
   return fs;
 }
 
-static _off64_t
+static off_t
 format_process_cwd (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -480,7 +480,7 @@ format_process_cwd (void *data, char *&destbuf)
   return fs;
 }
 
-static _off64_t
+static off_t
 format_process_cmdline (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -500,7 +500,7 @@ format_process_cmdline (void *data, char *&destbuf)
   return fs;
 }
 
-static _off64_t
+static off_t
 format_process_exename (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -526,7 +526,7 @@ format_process_exename (void *data, char *&destbuf)
   return len;
 }
 
-static _off64_t
+static off_t
 format_process_winpid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -534,7 +534,7 @@ format_process_winpid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->dwProcessId);
 }
 
-static _off64_t
+static off_t
 format_process_winexename (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -751,7 +751,7 @@ struct thread_info
   }
 };
 
-static _off64_t
+static off_t
 format_process_maps (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -780,12 +780,12 @@ format_process_maps (void *data, char *&destbuf)
   ReadProcessMemory (proc, &cygheap->user_heap, &user_heap,
 		     sizeof user_heap, NULL);
 
-  _off64_t len = 0;
+  off_t len = 0;
 
   union access
   {
     char flags[8];
-    _off64_t word;
+    off_t word;
   } a;
 
   struct region {
@@ -799,7 +799,7 @@ format_process_maps (void *data, char *&destbuf)
   dos_drive_mappings drive_maps;
   heap_info heaps (p->dwProcessId);
   thread_info threads (p->dwProcessId, proc);
-  struct __stat64 st;
+  struct stat st;
   long last_pass = 0;
 
   tmp_pathbuf tp;
@@ -932,7 +932,7 @@ format_process_maps (void *data, char *&destbuf)
   return len;
 }
 
-static _off64_t
+static off_t
 format_process_stat (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -1052,7 +1052,7 @@ format_process_stat (void *data, char *&destbuf)
 			  );
 }
 
-static _off64_t
+static off_t
 format_process_status (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -1139,7 +1139,7 @@ format_process_status (void *data, char *&destbuf)
 			  );
 }
 
-static _off64_t
+static off_t
 format_process_statm (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -1158,13 +1158,13 @@ extern "C" {
   struct mntent *getmntent (FILE *);
 };
 
-static _off64_t
+static off_t
 format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
 {
   _pinfo *p = (_pinfo *) data;
   user_info *u_shared = NULL;
   HANDLE u_hdl = NULL;
-  _off64_t len = 0;
+  off_t len = 0;
   struct mntent *mnt;
 
   if (p->uid != myself->uid)
@@ -1246,13 +1246,13 @@ format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
   return len;
 }
 
-static _off64_t
+static off_t
 format_process_mounts (void *data, char *&destbuf)
 {
   return format_process_mountstuff (data, destbuf, false);
 }
 
-static _off64_t
+static off_t
 format_process_mountinfo (void *data, char *&destbuf)
 {
   return format_process_mountstuff (data, destbuf, true);

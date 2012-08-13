@@ -175,7 +175,7 @@ fhandler_netdrive::fhandler_netdrive ():
 }
 
 int
-fhandler_netdrive::fstat (struct __stat64 *buf)
+fhandler_netdrive::fstat (struct stat *buf)
 {
   const char *path = get_name ();
   debug_printf ("fstat (%s)", path);

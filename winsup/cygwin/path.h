@@ -152,7 +152,7 @@ class path_conv
   ULONG objcaseinsensitive () const {return caseinsensitive;}
   bool has_acls () const {return !(path_flags & PATH_NOACL) && fs.has_acls (); }
   bool hasgood_inode () const {return !(path_flags & PATH_IHASH); }
-  bool isgood_inode (__ino64_t ino) const;
+  bool isgood_inode (ino_t ino) const;
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int has_dos_filenames_only () const {return path_flags & PATH_DOS;}
   int has_buggy_open () const {return fs.has_buggy_open ();}
@@ -373,7 +373,7 @@ class path_conv
   void reset_conv_handle () { conv_handle.set (NULL); }
   void close_conv_handle () { conv_handle.close (); }
 
-  __ino64_t get_ino_by_handle (HANDLE h);
+  ino_t get_ino_by_handle (HANDLE h);
 #if 0 /* obsolete, method still exists in fhandler_disk_file.cc */
   unsigned __stdcall ndisk_links (DWORD);
 #endif

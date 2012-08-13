@@ -1,5 +1,64 @@
 2012-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/stat.h (struct __stat64): Drop entirely in favor of
+	struct stat.  Accommodate throughout Cygwin.
+	* include/cygwin/types.h: Throughout, drop current, internal types
+	used since Cygwin 1.5 with the base type they have been used for.
+	Throughout, define types based on bitsize-specific types where
+	appropriate.  Accommodate throughout Cygwin.
+	* include/sys/cygwin.h: Drop __uid32_t and __gid32_t in favor of
+	uid_t and gid_t.  Define uid/gid types based on bitsize-specific types.
+	(struct external_pinfo): Accommodate above change.
+	* cygtls.h (struct _local_storage): Drop unused members grp and
+	namearray,
+	* tlsoffsets.h: Regenerate.
+	* devices.h (_dev_t): Drop definition.  Use dev_t throughout instead.
+	* devices.cc: Regenerate.
+
+	Probably temporary patch to drop unneeded functionality on x86_64:
+	* fcntl.cc (_fcntl): Alias to fcntl64 on x86_64.
+	* glob.cc (CYGWIN_gl_stat): Simplify on x86_64.
+	* grp.cc (grp32togrp16): Don't define on x86_64.
+	(getgrgid): Alias to getgrgid32 on x86_64.
+	(getgrnam): Alias to getgrnam32 on x86_64.
+	(getgrent): Alias to getgrent32 on x86_64.
+	(getgroups): Alias to getgroups32 on x86_64.
+	(initgroups): Alias to initgroups32 on x86_64.
+	(setgroups): Alias to setgroups32 on x86_64.
+	* mmap.cc (mmap): Alias to mmap64 on x86_64.
+	* passwd.cc (getpwuid): Alias to getpwuid32 on x86_64.
+	(getpwuid_r): Alias to getpwuid_r32 on x86_64.
+	(getpwduid): Don't define on x86_64.
+	* syscalls.cc (lseek): Alias to lseek64 on x86_64.
+	(_lseek): Alias to lseek64 on x86_64.
+	(chown): Alias to chown32 on x86_64.
+	(lchown): Alias to lchown32 on x86_64.
+	(fchown): Alias to fchown32 on x86_64.
+	(stat64_to_stat32): Don't define on x86_64.
+	(fstat): Alias to fstat64 on x86_64.
+	(_fstat_r): Alias to _fstat64_r on x86_64.
+	(stat): Alias to stat64 on x86_64.
+	(_stat_r): Alias to _stat64_r on x86_64.
+	(lstat): Alias to lstat64 on x86_64.
+	(ftruncate): Alias to ftruncate64 on x86_64.
+	(truncate): Alias to truncate64 on x86_64.
+	(seteuid): Alias to seteuid32 on x86_64.
+	(setuid): Alias to setuid32 on x86_64.
+	(setreuid): Alias to setreuid32 on x86_64.
+	(setegid): Alias to setegid32 on x86_64.
+	(setgid): Alias to setgid32 on x86_64.
+	(setregid): Alias to setregid32 on x86_64.
+	* uinfo.cc (getuid): Alias to getuid32 on x86_64.
+	(getgid): Alias to getgid32 on x86_64.
+	(geteuid): Alias to geteuid32 on x86_64.
+	(getegid): Alias to getegid32 on x86_64.
+	* winsup.h (ILLEGAL_UID16): Don't define on x86_64.
+	(ILLEGAL_GID16): Ditto.
+	(uid16touid32): Don't declare on x86_64.
+	(gid16togid32): Don't declare on x86_64.
+
+2012-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (TEST_DLL_NAME): Use -nostdlib flag unconditionally.
 
 2012-08-10  Corinna Vinschen  <corinna@vinschen.de>

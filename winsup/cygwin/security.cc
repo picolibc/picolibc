@@ -330,7 +330,7 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 
 static void
 get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
-		  __uid32_t *uidret, __gid32_t *gidret)
+		  uid_t *uidret, gid_t *gidret)
 {
   if (!psd)
     {
@@ -357,8 +357,8 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
   if (!NT_SUCCESS (status))
     debug_printf ("RtlGetGroupSecurityDescriptor: %p", status);
 
-  __uid32_t uid;
-  __gid32_t gid;
+  uid_t uid;
+  gid_t gid;
   bool grp_member = get_sids_info (owner_sid, group_sid, &uid, &gid);
   if (uidret)
     *uidret = uid;
@@ -414,8 +414,8 @@ get_reg_sd (HANDLE handle, security_descriptor &sd_ret)
 }
 
 int
-get_reg_attribute (HKEY hkey, mode_t *attribute, __uid32_t *uidret,
-		   __gid32_t *gidret)
+get_reg_attribute (HKEY hkey, mode_t *attribute, uid_t *uidret,
+		   gid_t *gidret)
 {
   security_descriptor sd;
 
@@ -430,7 +430,7 @@ get_reg_attribute (HKEY hkey, mode_t *attribute, __uid32_t *uidret,
 
 int
 get_file_attribute (HANDLE handle, path_conv &pc,
-		    mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
+		    mode_t *attribute, uid_t *uidret, gid_t *gidret)
 {
   if (pc.has_acls ())
     {
@@ -496,7 +496,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
 }
 
 static PSECURITY_DESCRIPTOR
-alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
+alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 	  security_descriptor &sd_ret)
 {
   NTSTATUS status;
@@ -899,7 +899,7 @@ get_object_sd (HANDLE handle, security_descriptor &sd)
 }
 
 int
-get_object_attribute (HANDLE handle, __uid32_t *uidret, __gid32_t *gidret,
+get_object_attribute (HANDLE handle, uid_t *uidret, gid_t *gidret,
 		      mode_t *attribute)
 {
   security_descriptor sd;
@@ -911,7 +911,7 @@ get_object_attribute (HANDLE handle, __uid32_t *uidret, __gid32_t *gidret,
 }
 
 int
-create_object_sd_from_attribute (HANDLE handle, __uid32_t uid, __gid32_t gid,
+create_object_sd_from_attribute (HANDLE handle, uid_t uid, gid_t gid,
 				 mode_t attribute, security_descriptor &sd)
 {
   path_conv pc;
@@ -936,7 +936,7 @@ set_object_sd (HANDLE handle, security_descriptor &sd, bool chown)
 }
 
 int
-set_object_attribute (HANDLE handle, __uid32_t uid, __gid32_t gid,
+set_object_attribute (HANDLE handle, uid_t uid, gid_t gid,
 		      mode_t attribute)
 {
   security_descriptor sd;
@@ -949,7 +949,7 @@ set_object_attribute (HANDLE handle, __uid32_t uid, __gid32_t gid,
 
 int
 set_file_attribute (HANDLE handle, path_conv &pc,
-		    __uid32_t uid, __gid32_t gid, mode_t attribute)
+		    uid_t uid, gid_t gid, mode_t attribute)
 {
   int ret = -1;
 

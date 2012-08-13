@@ -388,7 +388,7 @@ fhandler_base::fhaccess (int flags, bool effective)
       return res;
     }
 
-  struct __stat64 st;
+  struct stat st;
   if (fstat (&st))
     goto done;
 
@@ -1014,8 +1014,8 @@ fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
   return ret;
 }
 
-_off64_t
-fhandler_base::lseek (_off64_t offset, int whence)
+off_t
+fhandler_base::lseek (off_t offset, int whence)
 {
   NTSTATUS status;
   IO_STATUS_BLOCK io;
@@ -1067,7 +1067,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  _off64_t res = fpi.CurrentByteOffset.QuadPart;
+  off_t res = fpi.CurrentByteOffset.QuadPart;
 
   /* When next we write(), we will check to see if *this* seek went beyond
      the end of the file and if so, potentially sparsify the file. */
@@ -1083,14 +1083,14 @@ fhandler_base::lseek (_off64_t offset, int whence)
 }
 
 ssize_t __stdcall
-fhandler_base::pread (void *, size_t, _off64_t)
+fhandler_base::pread (void *, size_t, off_t)
 {
   set_errno (ESPIPE);
   return -1;
 }
 
 ssize_t __stdcall
-fhandler_base::pwrite (void *, size_t, _off64_t)
+fhandler_base::pwrite (void *, size_t, off_t)
 {
   set_errno (ESPIPE);
   return -1;
@@ -1258,14 +1258,14 @@ fhandler_base::ioctl (unsigned int cmd, void *buf)
 }
 
 int
-fhandler_base::lock (int, struct __flock64 *)
+fhandler_base::lock (int, struct flock *)
 {
   set_errno (EINVAL);
   return -1;
 }
 
 int __stdcall
-fhandler_base::fstat (struct __stat64 *buf)
+fhandler_base::fstat (struct stat *buf)
 {
   if (is_fs_special ())
     return fstat_fs (buf);
@@ -1674,7 +1674,7 @@ fhandler_base::fchmod (mode_t mode)
 }
 
 int
-fhandler_base::fchown (__uid32_t uid, __gid32_t gid)
+fhandler_base::fchown (uid_t uid, gid_t gid)
 {
   if (pc.is_fs_special ())
     return ((fhandler_disk_file *) this)->fhandler_disk_file::fchown (uid, gid);
@@ -1740,14 +1740,14 @@ fhandler_base::fsetxattr (const char *name, const void *value, size_t size,
 }
 
 int
-fhandler_base::fadvise (_off64_t offset, _off64_t length, int advice)
+fhandler_base::fadvise (off_t offset, off_t length, int advice)
 {
   set_errno (EINVAL);
   return -1;
 }
 
 int
-fhandler_base::ftruncate (_off64_t length, bool allow_truncate)
+fhandler_base::ftruncate (off_t length, bool allow_truncate)
 {
   set_errno (EINVAL);
   return -1;

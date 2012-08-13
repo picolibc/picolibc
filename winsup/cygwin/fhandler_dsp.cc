@@ -1129,8 +1129,8 @@ fhandler_dev_dsp::read (void *ptr, size_t& len)
   audio_in_->read ((char *)ptr, (int&)len);
 }
 
-_off64_t
-fhandler_dev_dsp::lseek (_off64_t offset, int whence)
+off_t
+fhandler_dev_dsp::lseek (off_t offset, int whence)
 {
   return 0;
 }

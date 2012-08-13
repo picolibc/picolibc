@@ -207,8 +207,8 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
   pos += ulen;
 }
 
-_off64_t
-fhandler_dev_mem::lseek (_off64_t offset, int whence)
+off_t
+fhandler_dev_mem::lseek (off_t offset, int whence)
 {
   switch (whence)
     {
@@ -240,7 +240,7 @@ fhandler_dev_mem::lseek (_off64_t offset, int whence)
 }
 
 int
-fhandler_dev_mem::fstat (struct __stat64 *buf)
+fhandler_dev_mem::fstat (struct stat *buf)
 {
   fhandler_base::fstat (buf);
   buf->st_blksize = wincap.page_size ();

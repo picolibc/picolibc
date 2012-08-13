@@ -68,7 +68,7 @@ fhandler_dev::close ()
 }
 
 int
-fhandler_dev::fstat (struct __stat64 *st)
+fhandler_dev::fstat (struct stat *st)
 {
   /* If /dev really exists on disk, return correct disk information. */
   if (pc.fs_got_fs ())

@@ -114,7 +114,7 @@ public:
   cygpsid (PSID nsid) { psid = nsid; }
   operator PSID () const { return psid; }
   const PSID operator= (PSID nsid) { return psid = nsid;}
-  __uid32_t get_id (BOOL search_grp, int *type = NULL);
+  uid_t get_id (BOOL search_grp, int *type = NULL);
   int get_uid () { return get_id (FALSE); }
   int get_gid () { return get_id (TRUE); }
 
@@ -187,7 +187,7 @@ public:
   inline PSID set () { return psid = (PSID) sbuf; }
 
   BOOL getfrompw (const struct passwd *pw);
-  BOOL getfromgr (const struct __group32 *gr);
+  BOOL getfromgr (const struct group *gr);
 
   void debug_print (const char *prefix = NULL) const
     {
@@ -217,7 +217,7 @@ public:
     }
   ~cygsidlist () { if (type == cygsidlist_auto) delete [] sids; }
 
-  BOOL addfromgr (struct __group32 *gr) /* Only with alloc */
+  BOOL addfromgr (struct group *gr) /* Only with alloc */
     { return sids[cnt].getfromgr (gr) && ++cnt; }
 
   /* += adds a "normal" SID, *= adds a well-known SID.  See comment in class
@@ -370,24 +370,24 @@ legal_sid_type (SID_NAME_USE type)
 class path_conv;
 /* File manipulation */
 int __stdcall get_file_attribute (HANDLE, path_conv &, mode_t *,
-				  __uid32_t *, __gid32_t *)
+				  uid_t *, gid_t *)
 		__attribute__ ((regparm (3)));
 int __stdcall set_file_attribute (HANDLE, path_conv &,
-				  __uid32_t, __gid32_t, mode_t)
+				  uid_t, gid_t, mode_t)
 		__attribute__ ((regparm (3)));
 int __stdcall get_object_sd (HANDLE, security_descriptor &)
 		__attribute__ ((regparm (2)));
-int __stdcall get_object_attribute (HANDLE, __uid32_t *, __gid32_t *, mode_t *)
+int __stdcall get_object_attribute (HANDLE, uid_t *, gid_t *, mode_t *)
 		__attribute__ ((regparm (3)));
-int __stdcall set_object_attribute (HANDLE, __uid32_t, __gid32_t, mode_t)
+int __stdcall set_object_attribute (HANDLE, uid_t, gid_t, mode_t)
 		__attribute__ ((regparm (3)));
-int __stdcall create_object_sd_from_attribute (HANDLE, __uid32_t, __gid32_t,
+int __stdcall create_object_sd_from_attribute (HANDLE, uid_t, gid_t,
 					       mode_t, security_descriptor &)
 		__attribute__ ((regparm (3)));
 int __stdcall set_object_sd (HANDLE, security_descriptor &, bool)
 		__attribute__ ((regparm (3)));
 
-int __stdcall get_reg_attribute (HKEY hkey, mode_t *, __uid32_t *, __gid32_t *)
+int __stdcall get_reg_attribute (HKEY hkey, mode_t *, uid_t *, gid_t *)
 		__attribute__ ((regparm (3)));
 LONG __stdcall get_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool)
 		__attribute__ ((regparm (3)));
@@ -406,7 +406,7 @@ void set_security_attribute (path_conv &pc, int attribute,
 			     PSECURITY_ATTRIBUTES psa,
 			     security_descriptor &sd_buf);
 
-bool get_sids_info (cygpsid, cygpsid, __uid32_t * , __gid32_t *);
+bool get_sids_info (cygpsid, cygpsid, uid_t * , gid_t *);
 
 /* sec_acl.cc */
 struct __acl32;

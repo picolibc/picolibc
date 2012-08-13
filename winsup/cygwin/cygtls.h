@@ -77,8 +77,6 @@ struct _local_storage
   /*
      Needed for the group functions
    */
-  struct __group16 grp;
-  char *namearray[2];
   int grp_pos;
 
   /* dlfcn.cc */

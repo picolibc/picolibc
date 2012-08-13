@@ -2818,8 +2818,8 @@ readlink (const char *path, char *buf, size_t buflen)
    done during the opendir call and the hash or the filename within
    the directory.  FIXME: Not bullet-proof. */
 /* Cygwin internal */
-__ino64_t __stdcall
-hash_path_name (__ino64_t hash, PUNICODE_STRING name)
+ino_t __stdcall
+hash_path_name (ino_t hash, PUNICODE_STRING name)
 {
   if (name->Length == 0)
     return hash;
@@ -2832,20 +2832,20 @@ hash_path_name (__ino64_t hash, PUNICODE_STRING name)
   return hash;
 }
 
-__ino64_t __stdcall
-hash_path_name (__ino64_t hash, PCWSTR name)
+ino_t __stdcall
+hash_path_name (ino_t hash, PCWSTR name)
 {
   UNICODE_STRING uname;
   RtlInitUnicodeString (&uname, name);
   return hash_path_name (hash, &uname);
 }
 
-__ino64_t __stdcall
-hash_path_name (__ino64_t hash, const char *name)
+ino_t __stdcall
+hash_path_name (ino_t hash, const char *name)
 {
   UNICODE_STRING uname;
   RtlCreateUnicodeStringFromAsciiz (&uname, name);
-  __ino64_t ret = hash_path_name (hash, &uname);
+  ino_t ret = hash_path_name (hash, &uname);
   RtlFreeUnicodeString (&uname);
   return ret;
 }
@@ -2876,7 +2876,7 @@ get_current_dir_name (void)
 {
   const char *pwd = getenv ("PWD");
   char *cwd = getcwd (NULL, 0);
-  struct __stat64 pwdbuf, cwdbuf;
+  struct stat pwdbuf, cwdbuf;
 
   if (pwd && strcmp (pwd, cwd) != 0
       && stat64 (pwd, &pwdbuf) == 0

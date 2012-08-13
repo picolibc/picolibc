@@ -1358,13 +1358,13 @@ fhandler_dev_tape::raw_write (const void *ptr, size_t len)
   return unlock (ret ? -1 : (int) len);
 }
 
-_off64_t
-fhandler_dev_tape::lseek (_off64_t offset, int whence)
+off_t
+fhandler_dev_tape::lseek (off_t offset, int whence)
 {
   struct mtop op;
   struct mtpos pos;
   DWORD block_size;
-  _off64_t ret = ILLEGAL_SEEK;
+  off_t ret = ILLEGAL_SEEK;
 
   lock (ILLEGAL_SEEK);
 
@@ -1422,7 +1422,7 @@ out:
 }
 
 int
-fhandler_dev_tape::fstat (struct __stat64 *buf)
+fhandler_dev_tape::fstat (struct stat *buf)
 {
   int ret;
 

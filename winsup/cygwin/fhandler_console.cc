@@ -216,7 +216,7 @@ fhandler_console::setup ()
 tty_min *
 tty_list::get_cttyp ()
 {
-  _dev_t n = myself->ctty;
+  dev_t n = myself->ctty;
   if (iscons_dev (n))
     return fhandler_console::shared_console_info ?
       &fhandler_console::shared_console_info->tty_min_state : NULL;

@@ -387,8 +387,8 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
   return ret;
 }
 
-_off64_t
-fhandler_termios::lseek (_off64_t, int)
+off_t
+fhandler_termios::lseek (off_t, int)
 {
   set_errno (ESPIPE);
   return -1;

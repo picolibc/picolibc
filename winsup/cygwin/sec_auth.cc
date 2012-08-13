@@ -389,12 +389,12 @@ sid_in_token_groups (PTOKEN_GROUPS grps, cygpsid sid)
 static void
 get_unix_group_sidlist (struct passwd *pw, cygsidlist &grp_list)
 {
-  struct __group32 *gr;
+  struct group *gr;
   cygsid gsid;
 
   for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
     {
-      if (gr->gr_gid == (__gid32_t) pw->pw_gid)
+      if (gr->gr_gid == pw->pw_gid)
 	goto found;
       else if (gr->gr_mem)
 	for (int gi = 0; gr->gr_mem[gi]; ++gi)
@@ -748,7 +748,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
   if (groups.issetgroups ()) /* setgroups was called */
     {
       cygsid gsid;
-      struct __group32 *gr;
+      struct group *gr;
       bool saw[groups.sgsids.count ()];
       memset (saw, 0, sizeof(saw));
 

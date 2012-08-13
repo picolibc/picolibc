@@ -128,7 +128,7 @@ psiginfo (const siginfo_t *info, const char *s)
 	    fprintf (stderr, " (%d [%p])", info->si_code, info->si_addr);
 	    break;
 	  case SIGCHLD:
-	    fprintf (stderr, " (%d %d %d %ld)", info->si_code, info->si_pid,
+	    fprintf (stderr, " (%d %d %d %u)", info->si_code, info->si_pid,
 		     info->si_status, info->si_uid);
 	    break;
 /* FIXME: implement si_band
@@ -137,7 +137,7 @@ psiginfo (const siginfo_t *info, const char *s)
 	    break;
 */
 	  default:
-	    fprintf (stderr, " (%d %d %ld)", info->si_code, info->si_pid, info->si_uid);
+	    fprintf (stderr, " (%d %d %u)", info->si_code, info->si_pid, info->si_uid);
 	}
     }
 

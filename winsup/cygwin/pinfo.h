@@ -78,11 +78,11 @@ public:
      if not found.  This data resides in the shared data area (allowing
      tasks to store whatever they want here) so it's for informational
      purposes only. */
-  __uid32_t uid;	/* User ID */
-  __gid32_t gid;	/* Group ID */
-  pid_t pgid;		/* Process group ID */
-  pid_t sid;		/* Session ID */
-  int ctty;		/* Control tty */
+  uid_t uid;	/* User ID */
+  gid_t gid;	/* Group ID */
+  pid_t pgid;	/* Process group ID */
+  pid_t sid;	/* Session ID */
+  int ctty;	/* Control tty */
   bool has_pgid_children;/* True if we've forked or spawned children with our GID. */
 
   /* Resources used by process. */

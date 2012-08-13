@@ -44,11 +44,11 @@ class __DIR_mounts
 #define __DIR_CYGDRIVE	(MAX_MOUNTS+1)
 #define __DIR_DEV	(MAX_MOUNTS+2)
 
-  __ino64_t eval_ino (int idx)
+  ino_t eval_ino (int idx)
     {
-      __ino64_t ino = 0;
+      ino_t ino = 0;
       char fname[parent_dir_len + mounts[idx].Length + 2];
-      struct __stat64 st;
+      struct stat st;
 
       char *c = stpcpy (fname, parent_dir);
       if (c[- 1] != '/')
@@ -76,7 +76,7 @@ public:
 	RtlFreeUnicodeString (&mounts[i]);
       RtlFreeUnicodeString (&cygdrive);
     }
-  __ino64_t check_mount (PUNICODE_STRING fname, __ino64_t ino,
+  ino_t check_mount (PUNICODE_STRING fname, ino_t ino,
 			 bool eval = true)
     {
       if (parent_dir_len == 1)	/* root dir */
@@ -106,7 +106,7 @@ public:
 	  }
       return ino;
     }
-  __ino64_t check_missing_mount (PUNICODE_STRING retname = NULL)
+  ino_t check_missing_mount (PUNICODE_STRING retname = NULL)
     {
       for (int i = 0; i < count; ++i)
 	if (!found[i])
@@ -152,7 +152,7 @@ public:
 };
 
 inline bool
-path_conv::isgood_inode (__ino64_t ino) const
+path_conv::isgood_inode (ino_t ino) const
 {
   /* If the FS doesn't support nonambiguous inode numbers anyway, bail out
      immediately. */
@@ -220,7 +220,7 @@ readdir_check_reparse_point (POBJECT_ATTRIBUTES attr)
   return ret;
 }
 
-inline __ino64_t
+inline ino_t
 path_conv::get_ino_by_handle (HANDLE hdl)
 {
   IO_STATUS_BLOCK io;
@@ -320,7 +320,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
    The content is the NFS equivalent of struct stat. so there's not much
    to do here except for copying. */
 int __stdcall
-fhandler_base::fstat_by_nfs_ea (struct __stat64 *buf)
+fhandler_base::fstat_by_nfs_ea (struct stat *buf)
 {
   fattr3 *nfs_attr = pc.nfsattr ();
 
@@ -360,7 +360,7 @@ fhandler_base::fstat_by_nfs_ea (struct __stat64 *buf)
 }
 
 int __stdcall
-fhandler_base::fstat_by_handle (struct __stat64 *buf)
+fhandler_base::fstat_by_handle (struct stat *buf)
 {
   /* Don't use FileAllInformation info class.  It returns a pathname rather
      than a filename, so it needs a really big buffer for no good reason
@@ -418,7 +418,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf)
 }
 
 int __stdcall
-fhandler_base::fstat_by_name (struct __stat64 *buf)
+fhandler_base::fstat_by_name (struct stat *buf)
 {
   NTSTATUS status;
   OBJECT_ATTRIBUTES attr;
@@ -462,7 +462,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf)
 }
 
 int __stdcall
-fhandler_base::fstat_fs (struct __stat64 *buf)
+fhandler_base::fstat_fs (struct stat *buf)
 {
   int res = -1;
   int oret;
@@ -506,7 +506,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
 }
 
 int __stdcall
-fhandler_base::fstat_helper (struct __stat64 *buf,
+fhandler_base::fstat_helper (struct stat *buf,
 			     DWORD nNumberOfLinks)
 {
   IO_STATUS_BLOCK st;
@@ -531,7 +531,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
      0 in the first call and size > 0 in the second call.  This in turn can
      affect applications like newer tar.
      FIXME: Is the allocation size affected as well? */
-  buf->st_size = pc.isdir () ? 0 : (_off64_t) pfnoi->EndOfFile.QuadPart;
+  buf->st_size = pc.isdir () ? 0 : (off_t) pfnoi->EndOfFile.QuadPart;
   /* The number of links to a directory includes the number of subdirectories
      in the directory, since all those subdirectories point to it.  However,
      this is painfully slow, so we do without it. */
@@ -543,7 +543,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 
   /* Enforce namehash as inode number on untrusted file systems. */
   if (ino && pc.isgood_inode (ino))
-    buf->st_ino = (__ino64_t) ino;
+    buf->st_ino = (ino_t) ino;
   else
     buf->st_ino = get_ino ();
 
@@ -700,7 +700,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 }
 
 int __stdcall
-fhandler_disk_file::fstat (struct __stat64 *buf)
+fhandler_disk_file::fstat (struct stat *buf)
 {
   return fstat_fs (buf);
 }
@@ -755,9 +755,11 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
     {
       sfs->f_bsize = full_fsi.BytesPerSector * full_fsi.SectorsPerAllocationUnit;
       sfs->f_frsize = sfs->f_bsize;
-      sfs->f_blocks = full_fsi.TotalAllocationUnits.LowPart;
-      sfs->f_bfree = full_fsi.ActualAvailableAllocationUnits.LowPart;
-      sfs->f_bavail = full_fsi.CallerAvailableAllocationUnits.LowPart;
+      sfs->f_blocks = (fsblkcnt_t) full_fsi.TotalAllocationUnits.QuadPart;
+      sfs->f_bfree = (fsblkcnt_t)
+		     full_fsi.ActualAvailableAllocationUnits.QuadPart;
+      sfs->f_bavail = (fsblkcnt_t)
+		      full_fsi.CallerAvailableAllocationUnits.QuadPart;
       if (sfs->f_bfree > sfs->f_bavail)
 	{
 	  /* Quotas active.  We can't trust TotalAllocationUnits. */
@@ -770,7 +772,7 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 	    debug_printf ("%p = NtFsControlFile(%S, FSCTL_GET_NTFS_VOLUME_DATA)",
 			  status, pc.get_nt_native_path ());
 	  else
-	    sfs->f_blocks = nvdb.TotalClusters.QuadPart;
+	    sfs->f_blocks = (fsblkcnt_t) nvdb.TotalClusters.QuadPart;
 	}
       ret = 0;
     }
@@ -785,8 +787,8 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 	}
       sfs->f_bsize = fsi.BytesPerSector * fsi.SectorsPerAllocationUnit;
       sfs->f_frsize = sfs->f_bsize;
-      sfs->f_blocks = fsi.TotalAllocationUnits.LowPart;
-      sfs->f_bfree = fsi.AvailableAllocationUnits.LowPart;
+      sfs->f_blocks = (fsblkcnt_t) fsi.TotalAllocationUnits.QuadPart;
+      sfs->f_bfree = (fsblkcnt_t) fsi.AvailableAllocationUnits.QuadPart;
       sfs->f_bavail = sfs->f_bfree;
       ret = 0;
     }
@@ -906,7 +908,7 @@ out:
 }
 
 int __stdcall
-fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
+fhandler_disk_file::fchown (uid_t uid, gid_t gid)
 {
   int oret = 0;
 
@@ -928,7 +930,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
   mode_t attrib = 0;
   if (pc.isdir ())
     attrib |= S_IFDIR;
-  __uid32_t old_uid;
+  uid_t old_uid;
   int res = get_file_attribute (get_handle (), pc, &attrib, &old_uid, NULL);
   if (!res)
     {
@@ -999,7 +1001,7 @@ cant_access_acl:
 	      set_errno (ENOSPC);
 	    else
 	      {
-		struct __stat64 st;
+		struct stat st;
 		if (!fstat (&st))
 		  {
 		    aclbufp[0].a_type = USER_OBJ;
@@ -1113,7 +1115,7 @@ fhandler_disk_file::fsetxattr (const char *name, const void *value, size_t size,
 }
 
 int
-fhandler_disk_file::fadvise (_off64_t offset, _off64_t length, int advice)
+fhandler_disk_file::fadvise (off_t offset, off_t length, int advice)
 {
   if (advice < POSIX_FADV_NORMAL || advice > POSIX_FADV_NOREUSE)
     {
@@ -1156,7 +1158,7 @@ fhandler_disk_file::fadvise (_off64_t offset, _off64_t length, int advice)
 }
 
 int
-fhandler_disk_file::ftruncate (_off64_t length, bool allow_truncate)
+fhandler_disk_file::ftruncate (off_t length, bool allow_truncate)
 {
   int res = -1;
 
@@ -1547,7 +1549,7 @@ fhandler_disk_file::prw_open (bool write)
 }
 
 ssize_t __stdcall
-fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
+fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
 {
   if ((get_flags () & O_ACCMODE) == O_WRONLY)
     {
@@ -1600,7 +1602,7 @@ fhandler_disk_file::pread (void *buf, size_t count, _off64_t offset)
 non_atomic:
   /* Text mode stays slow and non-atomic. */
   ssize_t res;
-  _off64_t curpos = lseek (0, SEEK_CUR);
+  off_t curpos = lseek (0, SEEK_CUR);
   if (curpos < 0 || lseek (offset, SEEK_SET) < 0)
     res = -1;
   else
@@ -1617,7 +1619,7 @@ non_atomic:
 }
 
 ssize_t __stdcall
-fhandler_disk_file::pwrite (void *buf, size_t count, _off64_t offset)
+fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset)
 {
   if ((get_flags () & O_ACCMODE) == O_RDONLY)
     {
@@ -1647,7 +1649,7 @@ fhandler_disk_file::pwrite (void *buf, size_t count, _off64_t offset)
 non_atomic:
   /* Text mode stays slow and non-atomic. */
   int res;
-  _off64_t curpos = lseek (0, SEEK_CUR);
+  off_t curpos = lseek (0, SEEK_CUR);
   if (curpos < 0 || lseek (offset, SEEK_SET) < 0)
     res = curpos;
   else
@@ -1932,15 +1934,15 @@ free_dir:
   return res;
 }
 
-__ino64_t __stdcall
+ino_t __stdcall
 readdir_get_ino (const char *path, bool dot_dot)
 {
   char *fname;
-  struct __stat64 st;
+  struct stat st;
   HANDLE hdl;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
-  __ino64_t ino = 0;
+  ino_t ino = 0;
 
   if (dot_dot)
     {
@@ -2419,7 +2421,7 @@ fhandler_cygdrive::set_drives ()
 }
 
 int
-fhandler_cygdrive::fstat (struct __stat64 *buf)
+fhandler_cygdrive::fstat (struct stat *buf)
 {
   fhandler_base::fstat (buf);
   buf->st_ino = 2;

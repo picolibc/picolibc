@@ -248,8 +248,8 @@ class lockf_t
   public:
     uint16_t	    lf_flags; /* Semantics: F_POSIX, F_FLOCK, F_WAIT */
     uint16_t	    lf_type;  /* Lock type: F_RDLCK, F_WRLCK */
-    _off64_t	    lf_start; /* Byte # of the start of the lock */
-    _off64_t	    lf_end;   /* Byte # of the end of the lock (-1=EOF) */
+    off_t	    lf_start; /* Byte # of the start of the lock */
+    off_t	    lf_end;   /* Byte # of the end of the lock (-1=EOF) */
     int64_t         lf_id;    /* Cygwin PID for POSIX locks, a unique id per
 				 file table entry for BSD flock locks. */
     DWORD	    lf_wid;   /* Win PID of the resource holding the lock */
@@ -268,7 +268,7 @@ class lockf_t
       lf_next (NULL), lf_obj (NULL)
     {}
     lockf_t (class inode_t *node, class lockf_t **head,
-	     short flags, short type, _off64_t start, _off64_t end,
+	     short flags, short type, off_t start, off_t end,
 	     long long id, DWORD wid, uint16_t ver)
     : lf_flags (flags), lf_type (type), lf_start (start), lf_end (end),
       lf_id (id), lf_wid (wid), lf_ver (ver), lf_head (head), lf_inode (node),
@@ -308,8 +308,8 @@ class inode_t
     lockf_t		*i_lockf;  /* List of locks of this process. */
     lockf_t		*i_all_lf; /* Temp list of all locks for this file. */
 
-    __dev32_t		 i_dev;    /* Device ID */
-    __ino64_t		 i_ino;    /* inode number */
+    dev_t		 i_dev;    /* Device ID */
+    ino_t		 i_ino;    /* inode number */
 
   private:
     HANDLE		 i_dir;
@@ -317,7 +317,7 @@ class inode_t
     uint32_t		 i_cnt;    /* # of threads referencing this instance. */
 
   public:
-    inode_t (__dev32_t dev, __ino64_t ino);
+    inode_t (dev_t dev, ino_t ino);
     ~inode_t ();
 
     void *operator new (size_t size)
@@ -325,7 +325,7 @@ class inode_t
     void operator delete (void *p)
     { cfree (p); }
 
-    static inode_t *get (__dev32_t dev, __ino64_t ino,
+    static inode_t *get (dev_t dev, ino_t ino,
 			 bool create_if_missing, bool lock);
 
     void LOCK () { WaitForSingleObject (i_mtx, INFINITE); }
@@ -482,7 +482,7 @@ fixup_lockf_after_exec ()
    file.  The file is specified by the device and inode_t number.  If inode_t
    doesn't exist, create it. */
 inode_t *
-inode_t::get (__dev32_t dev, __ino64_t ino, bool create_if_missing, bool lock)
+inode_t::get (dev_t dev, ino_t ino, bool create_if_missing, bool lock)
 {
   inode_t *node;
 
@@ -504,7 +504,7 @@ inode_t::get (__dev32_t dev, __ino64_t ino, bool create_if_missing, bool lock)
   return node;
 }
 
-inode_t::inode_t (__dev32_t dev, __ino64_t ino)
+inode_t::inode_t (dev_t dev, ino_t ino)
 : i_lockf (NULL), i_all_lf (NULL), i_dev (dev), i_ino (ino), i_cnt (0L)
 {
   HANDLE parent_dir;
@@ -554,10 +554,10 @@ lockf_t::from_obj_name (inode_t *node, lockf_t **head, const wchar_t *name)
   lf_type = wcstol (endptr + 1, &endptr, 16);
   if ((lf_type != F_RDLCK && lf_type != F_WRLCK) || !endptr || *endptr != L'-')
     return false;
-  lf_start = (_off64_t) wcstoull (endptr + 1, &endptr, 16);
+  lf_start = (off_t) wcstoull (endptr + 1, &endptr, 16);
   if (lf_start < 0 || !endptr || *endptr != L'-')
     return false;
-  lf_end = (_off64_t) wcstoull (endptr + 1, &endptr, 16);
+  lf_end = (off_t) wcstoull (endptr + 1, &endptr, 16);
   if (lf_end < -1LL
       || (lf_end > 0 && lf_end < lf_start)
       || !endptr || *endptr != L'-')
@@ -640,8 +640,8 @@ create_lock_in_parent (PVOID param)
   OBJECT_NAME_INFORMATION *ntfn;
   NTSTATUS status;
   wchar_t *lockname, *inodename, *endptr;
-  __dev32_t dev;
-  __ino64_t ino;
+  dev_t dev;
+  ino_t ino;
   inode_t *node;
   lockf_t newlock, *lock;
   int cnt;
@@ -910,15 +910,15 @@ static int maxlockdepth = MAXDEPTH;
 static int      lf_clearlock (lockf_t *, lockf_t **, HANDLE);
 static int      lf_findoverlap (lockf_t *, lockf_t *, int, lockf_t ***, lockf_t **);
 static lockf_t *lf_getblock (lockf_t *, inode_t *node);
-static int      lf_getlock (lockf_t *, inode_t *, struct __flock64 *);
+static int      lf_getlock (lockf_t *, inode_t *, struct flock *);
 static int      lf_setlock (lockf_t *, inode_t *, lockf_t **, HANDLE);
 static void     lf_split (lockf_t *, lockf_t *, lockf_t **);
 static void     lf_wakelock (lockf_t *, HANDLE);
 
 int
-fhandler_disk_file::lock (int a_op, struct __flock64 *fl)
+fhandler_disk_file::lock (int a_op, struct flock *fl)
 {
-  _off64_t start, end, oadd;
+  off_t start, end, oadd;
   int error = 0;
 
   short a_flags = fl->l_type & (F_POSIX | F_FLOCK);
@@ -1499,7 +1499,7 @@ lf_clearlock (lockf_t *unlock, lockf_t **clean, HANDLE fhdl)
  * and if so return its process identifier.
  */
 static int
-lf_getlock (lockf_t *lock, inode_t *node, struct __flock64 *fl)
+lf_getlock (lockf_t *lock, inode_t *node, struct flock *fl)
 {
   lockf_t *block;
   tmp_pathbuf tp;
@@ -1577,7 +1577,7 @@ static int
 lf_findoverlap (lockf_t *lf, lockf_t *lock, int type, lockf_t ***prev,
 		lockf_t **overlap)
 {
-  _off64_t start, end;
+  off_t start, end;
 
   *overlap = lf;
   if (lf == NOLOCKF)
@@ -1716,7 +1716,7 @@ flock (int fd, int operation)
 {
   int res = -1;
   int cmd;
-  struct __flock64 fl = { 0, SEEK_SET, 0, 0, 0 };
+  struct flock fl = { 0, SEEK_SET, 0, 0, 0 };
 
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -1751,11 +1751,11 @@ done:
 }
 
 extern "C" int
-lockf (int filedes, int function, _off64_t size)
+lockf (int filedes, int function, off_t size)
 {
   int res = -1;
   int cmd;
-  struct __flock64 fl;
+  struct flock fl;
 
   pthread_testcancel ();
 

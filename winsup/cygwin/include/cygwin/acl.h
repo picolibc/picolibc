@@ -59,15 +59,17 @@ extern "C" {
 #define OTHER           OTHER_OBJ
 
 #ifdef __INSIDE_CYGWIN__
+#ifndef __x86_64__
 typedef struct __acl16 {
     int          a_type;
     __uid16_t    a_id;
     mode_t       a_perm;
 } __aclent16_t;
+#endif
 
 typedef struct __acl32 {
     int          a_type;
-    __uid32_t    a_id;
+    uid_t        a_id;
     mode_t       a_perm;
 } __aclent32_t;
 #else

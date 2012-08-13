@@ -91,15 +91,15 @@ cygpsid::operator== (const char *nsidstr) const
   return psid == nsid;
 }
 
-__uid32_t
+uid_t
 cygpsid::get_id (BOOL search_grp, int *type)
 {
     /* First try to get SID from group, then passwd */
-  __uid32_t id = ILLEGAL_UID;
+  uid_t id = ILLEGAL_UID;
 
   if (search_grp)
     {
-      struct __group32 *gr;
+      struct group *gr;
       if (cygheap->user.groups.pgsid == psid)
 	id = myself->gid;
       else if ((gr = internal_getgrsid (*this)))
@@ -209,7 +209,7 @@ cygsid::getfrompw (const struct passwd *pw)
 }
 
 BOOL
-cygsid::getfromgr (const struct __group32 *gr)
+cygsid::getfromgr (const struct group *gr)
 {
   char *sp = (gr && gr->gr_passwd) ? gr->gr_passwd : NULL;
   return (*this = sp) != NULL;
@@ -258,10 +258,10 @@ cygsidlist::add (const PSID nsi, bool well_known)
 }
 
 bool
-get_sids_info (cygpsid owner_sid, cygpsid group_sid, __uid32_t * uidret, __gid32_t * gidret)
+get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gidret)
 {
   struct passwd *pw;
-  struct __group32 *gr = NULL;
+  struct group *gr = NULL;
   bool ret = false;
 
   owner_sid.debug_print ("get_sids_info: owner SID =");

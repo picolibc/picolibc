@@ -142,8 +142,8 @@ out:
   return 0;
 }
 
-_off64_t
-fhandler_pipe::lseek (_off64_t offset, int whence)
+off_t
+fhandler_pipe::lseek (off_t offset, int whence)
 {
   debug_printf ("(%d, %d)", offset, whence);
   set_errno (ESPIPE);
@@ -151,14 +151,14 @@ fhandler_pipe::lseek (_off64_t offset, int whence)
 }
 
 int
-fhandler_pipe::fadvise (_off64_t offset, _off64_t length, int advice)
+fhandler_pipe::fadvise (off_t offset, off_t length, int advice)
 {
   set_errno (ESPIPE);
   return -1;
 }
 
 int
-fhandler_pipe::ftruncate (_off64_t length, bool allow_truncate)
+fhandler_pipe::ftruncate (off_t length, bool allow_truncate)
 {
   set_errno (allow_truncate ? EINVAL : ESPIPE);
   return -1;

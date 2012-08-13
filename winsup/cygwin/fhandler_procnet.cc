@@ -31,7 +31,7 @@ extern "C" int ip_addr_prefix (PIP_ADAPTER_UNICAST_ADDRESS pua,
 			       PIP_ADAPTER_PREFIX pap);
 bool get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa0, ULONG family);
 
-static _off64_t format_procnet_ifinet6 (void *, char *&);
+static off_t format_procnet_ifinet6 (void *, char *&);
 
 static const virt_tab_t procnet_tab[] =
 {
@@ -81,7 +81,7 @@ fhandler_procnet::fhandler_procnet ():
 }
 
 int
-fhandler_procnet::fstat (struct __stat64 *buf)
+fhandler_procnet::fstat (struct stat *buf)
 {
   fhandler_base::fstat (buf);
   buf->st_mode &= ~_IFMT & NO_W;
@@ -230,7 +230,7 @@ static unsigned int dad_to_flags[] =
   0x80		/* Preferred -> PERMANENT */
 };
 
-static _off64_t
+static off_t
 format_procnet_ifinet6 (void *, char *&filebuf)
 {
   PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
@@ -239,7 +239,7 @@ format_procnet_ifinet6 (void *, char *&filebuf)
 
   if (!wincap.has_gaa_prefixes ())
     return 0;
-  _off64_t filesize = 0;
+  off_t filesize = 0;
   if (!get_adapters_addresses (&pa0, AF_INET6))
     goto out;
   alloclen = 0;

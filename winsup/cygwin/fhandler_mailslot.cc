@@ -29,7 +29,7 @@ fhandler_mailslot::fhandler_mailslot ()
 }
 
 int __stdcall
-fhandler_mailslot::fstat (struct __stat64 *buf)
+fhandler_mailslot::fstat (struct stat *buf)
 {
   debug_printf ("here");
 

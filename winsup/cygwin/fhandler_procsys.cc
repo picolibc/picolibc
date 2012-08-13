@@ -44,7 +44,7 @@ const size_t procsys_len = sizeof (procsys) - 1;
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
    -1 if path is a file, -2 if it's a symlink.  */
 virtual_ftype_t
-fhandler_procsys::exists (struct __stat64 *buf)
+fhandler_procsys::exists (struct stat *buf)
 {
   UNICODE_STRING path;
   UNICODE_STRING dir;
@@ -261,7 +261,7 @@ unreadable:
 }
 
 int
-fhandler_procsys::fstat (struct __stat64 *buf)
+fhandler_procsys::fstat (struct stat *buf)
 {
   const char *path = get_name ();
   debug_printf ("fstat (%s)", path);

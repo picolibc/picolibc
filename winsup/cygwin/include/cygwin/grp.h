@@ -19,6 +19,7 @@ extern "C" {
 #endif
 
 #ifdef __INSIDE_CYGWIN__
+#ifndef __x86_64__
 struct __group16
 {
   char *gr_name;
@@ -26,19 +27,12 @@ struct __group16
   __gid16_t gr_gid;
   char **gr_mem;
 };
+#endif
 
-struct __group32
-{
-  char *gr_name;
-  char *gr_passwd;
-  __gid32_t gr_gid;
-  char **gr_mem;
-};
-
-struct __group32 * getgrgid32 (__gid32_t gid);
-struct __group32 * getgrnam32 (const char *name);
-__gid32_t getgid32 ();
-__gid32_t getegid32 ();
+struct group * getgrgid32 (gid_t gid);
+struct group * getgrnam32 (const char *name);
+gid_t getgid32 ();
+gid_t getegid32 ();
 #endif
 
 extern int getgrouplist (const char *, gid_t, gid_t *, int *);

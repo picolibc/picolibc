@@ -95,7 +95,7 @@ static int	 fts_ufslinks(FTS *, const FTSENT *);
 struct _fts_private {
 	FTS		ftsp_fts;
 	struct statfs	ftsp_statfs;
-	__dev32_t	ftsp_dev;
+	dev_t		ftsp_dev;
 	int		ftsp_linksreliable;
 };
 
@@ -908,9 +908,9 @@ fts_stat(sp, p, follow)
 	int follow;
 {
 	FTSENT *t;
-	__dev32_t dev;
-	__ino64_t ino;
-	struct __stat64 *sbp, sb;
+	dev_t dev;
+	ino_t ino;
+	struct stat *sbp, sb;
 	int saved_errno;
 
 	/* If user needs stat info, stat buffer already allocated. */
@@ -944,7 +944,7 @@ fts_stat(sp, p, follow)
 		}
 	} else if (lstat64(p->fts_accpath, sbp)) {
 		p->fts_errno = errno;
-err:		memset(sbp, 0, sizeof(struct __stat64));
+err:		memset(sbp, 0, sizeof(struct stat));
 		return (FTS_NS);
 	}
 
@@ -1042,7 +1042,7 @@ fts_alloc(sp, name, namelen)
 
 	struct ftsent_withstat {
 		FTSENT	ent;
-		struct	__stat64 statbuf;
+		struct	stat statbuf;
 	};
 
 	/*
@@ -1178,7 +1178,7 @@ fts_safe_changedir(sp, p, fd, path)
 	const char *path;
 {
 	int ret, oerrno, newfd;
-	struct __stat64 sb;
+	struct stat sb;
 
 	newfd = fd;
 	if (ISSET(FTS_NOCHDIR))
