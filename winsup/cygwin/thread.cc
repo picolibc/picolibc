@@ -3523,7 +3523,7 @@ semaphore::_fixup_after_fork ()
       this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
 					      LONG_MAX, NULL);
       if (!win32_obj_id)
-	api_fatal ("failed to create new win32 semaphore, error %d");
+	api_fatal ("failed to create new win32 semaphore, %E");
     }
 }
 
