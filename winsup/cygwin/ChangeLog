@@ -1,3 +1,7 @@
+2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gmon.c (_mcleanup): Fix scope bug when using gmon_out array.
+
 2012-08-14  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* errno.cc (errmap): Keep sorted.
