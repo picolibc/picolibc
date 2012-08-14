@@ -17,6 +17,7 @@ AC_CONFIG_AUX_DIR(../..)
 INSTALL=`cd $srcdir/../..; echo $(pwd)/install-sh -c`
 
 AC_PROG_INSTALL
+AC_NO_EXECUTABLES
 AC_CANONICAL_SYSTEM
 
 LIB_AC_PROG_CC
