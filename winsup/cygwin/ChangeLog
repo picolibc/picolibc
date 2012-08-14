@@ -1,3 +1,7 @@
+2012-08-14  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* errno.cc (errmap): Keep sorted.
+
 2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (semaphore::_fixup_after_fork): Fix Win32 error output in
