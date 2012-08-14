@@ -1572,11 +1572,13 @@ mount_info::del_item (const char *path, unsigned flags)
 
 /************************* mount_item class ****************************/
 
-/* Order must be identical to mount.h, enum fs_info_type. */
+/* Don't add new fs types without adding them to fs_info_type in mount.h!
+   Don't reorder without reordering fs_info_type in mount.h!*/
 fs_names_t fs_names[] = {
     { "none", false },
     { "vfat", true },
     { "ntfs", true },
+    { "refs", true },
     { "smbfs", false },
     { "nfs", false },
     { "netapp", false },
