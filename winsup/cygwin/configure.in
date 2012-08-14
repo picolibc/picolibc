@@ -16,6 +16,7 @@ AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(../..)
 
 AC_PROG_INSTALL
+AC_NO_EXECUTABLES
 AC_CANONICAL_SYSTEM
 
 LIB_AC_PROG_CC
@@ -80,6 +81,10 @@ case "$target_cpu" in
 		DEF_DLL_ENTRY="dll_entry@12"
 		ALLOCA="_alloca"
 		CONFIG_DIR="i386"  ;;
+   x86_64) DLL_ENTRY="_dll_entry"
+		DEF_DLL_ENTRY="dll_entry"
+		ALLOCA="_alloca"
+		CONFIG_DIR="x86_64"  ;;
    *)		AC_MSG_ERROR(Invalid target processor \"$target_cpu\") ;;
 esac
 
