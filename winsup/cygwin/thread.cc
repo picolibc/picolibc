@@ -1738,7 +1738,7 @@ pthread_mutex::lock ()
   pthread_t self = ::pthread_self ();
   int result = 0;
 
-  if (InterlockedIncrement ((long *) &lock_counter) == 1)
+  if (InterlockedIncrement (&lock_counter) == 1)
     set_owner (self);
   else if (type == PTHREAD_MUTEX_NORMAL /* potentially causes deadlock */
 	   || !pthread::equal (owner, self))
@@ -1749,7 +1749,7 @@ pthread_mutex::lock ()
     }
   else
     {
-      InterlockedDecrement ((long *) &lock_counter);
+      InterlockedDecrement (&lock_counter);
       if (type == PTHREAD_MUTEX_RECURSIVE)
 	result = lock_recursive ();
       else
@@ -1780,7 +1780,7 @@ pthread_mutex::unlock ()
 #ifdef DEBUGGING
       tid = 0;
 #endif
-      if (InterlockedDecrement ((long *) &lock_counter))
+      if (InterlockedDecrement (&lock_counter))
 	::SetEvent (win32_obj_id); // Another thread is waiting
       res = 0;
     }
@@ -1796,7 +1796,7 @@ pthread_mutex::trylock ()
   pthread_t self = ::pthread_self ();
   int result = 0;
 
-  if (InterlockedCompareExchange ((long *) &lock_counter, 1, 0) == 0)
+  if (InterlockedCompareExchange (&lock_counter, 1, 0) == 0)
     set_owner (self);
   else if (type == PTHREAD_MUTEX_RECURSIVE && pthread::equal (owner, self))
     result = lock_recursive ();
@@ -1872,7 +1872,7 @@ pthread_spinlock::lock ()
 
   do
     {
-      if (InterlockedExchange ((long *) &lock_counter, 1) == 0)
+      if (InterlockedExchange (&lock_counter, 1) == 0)
 	{
 	  set_owner (self);
 	  result = 0;
@@ -1907,7 +1907,7 @@ pthread_spinlock::unlock ()
 #ifdef DEBUGGING
       tid = 0;
 #endif
-      InterlockedExchange ((long *) &lock_counter, 0);
+      InterlockedExchange (&lock_counter, 0);
       ::SetEvent (win32_obj_id);
       result = 0;
     }

@@ -59,18 +59,18 @@ public:
 
   void lock ()
   {
-    if (InterlockedIncrement ((long *) &lock_counter) != 1)
+    if (InterlockedIncrement (&lock_counter) != 1)
       cancelable_wait (win32_obj_id, cw_infinite, cw_sig);
   }
 
   void unlock ()
   {
-    if (InterlockedDecrement ((long *) &lock_counter))
+    if (InterlockedDecrement (&lock_counter))
       ::SetEvent (win32_obj_id);
   }
 
 private:
-  unsigned long lock_counter;
+  LONG lock_counter;
   HANDLE win32_obj_id;
 };
 
@@ -297,7 +297,7 @@ public:
   }
 
 protected:
-  unsigned long lock_counter;
+  LONG lock_counter;
   HANDLE win32_obj_id;
   pthread_t owner;
 #ifdef DEBUGGING
@@ -680,7 +680,7 @@ struct MTinterface
 {
   // General
   int concurrency;
-  long int threadcount;
+  LONG threadcount;
 
   callback *pthread_prepare;
   callback *pthread_child;
