@@ -1,5 +1,9 @@
 2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	*  mkvers.sh: Drop reference to w32api includes.
+
+2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (fs_names): Add missing ReFS entry.  Change comment.
 	* mount.h (enum fs_info_type): Add comment.
 
