@@ -1,5 +1,10 @@
 2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* gendef: Delete unneeded read from <IN> which ate an arbitrary line
+	from cygwin.din.
+
+2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* exceptions.cc (sigdelayed): Move declaration to sigproc.h.
 	* sigproc.h (sigdelayed): Make symbol globally available.
 	* gendef (sigdelayed): Specifically zero incyg and stacklock.
