@@ -2,7 +2,7 @@
 
 	Rename cancelable_wait -> cygwait throughout.
 	* DevNotes: Add entry cgf-000015.
-	* cygwait.h (cygwait): Don't allow an optional PLARGE_INTERGER
+	* cygwait.h (cygwait): Don't allow an optional PLARGE_INTEGER
 	argument.
 
 2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
