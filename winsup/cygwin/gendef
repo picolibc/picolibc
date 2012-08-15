@@ -26,7 +26,7 @@ open(IN, $in) or die "$0: couldn't open \"$in\" - $!\n";
 my @top = ();
 while (<IN>) {
     push(@top, cleanup $_);
-    last if /^\s*exports\s*$/i;
+    last if /^\s*exports$/i;
 }
 my @in = cleanup <IN>;
 close(IN);
@@ -37,14 +37,14 @@ my @nosigfuncs = ();
 my @text = ();
 for (@in) {
     chomp;
-    s/\sDATA$//o and do {
+    s/\s+DATA$//o and do {
 	push @data, $_;
 	next;
     };
     if (/=/o) {
 	if (s/\s+NOSIGFE\s*$//) {
 	    # nothing
-	} elsif (s/ SIGFE(_MAYBE)?$//) {
+	} elsif (s/\s+SIGFE(_MAYBE)?$//) {
 	    my $func = (split(' '))[2];
 	    my $maybe = lc $1 . '_';
 	    $sigfe{$func} = '_sigfe' . $maybe . $func;
@@ -67,7 +67,7 @@ for (@in) {
 }
 
 for (@text) {
-    my ($alias, $func) = /^(\S+) = (\S+)\s*$/o;
+    my ($alias, $func) = /^(\S+)\s+=\s+(\S+)\s*$/o;
     $_ = $alias . ' = ' . $sigfe{$func}
       if defined($func) && $sigfe{$func};
 }
