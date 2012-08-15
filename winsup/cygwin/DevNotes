@@ -1,3 +1,7 @@
+2012-08-15  cgf-000015
+
+RIP cancelable_wait.  Yay.
+
 2012-08-09  cgf-000014
 
 So, apparently I got it somewhat right before wrt signal handling.

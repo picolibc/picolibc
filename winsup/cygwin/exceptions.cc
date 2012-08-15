@@ -708,7 +708,7 @@ handle_sigsuspend (sigset_t tempmask)
   sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
-  cancelable_wait (NULL, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr);
+  cygwait (NULL, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr);
 
   set_sig_errno (EINTR);	// Per POSIX
 
@@ -739,7 +739,7 @@ sig_handle_tty_stop (int sig)
       sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
       /* FIXME! This does nothing to suspend anything other than the main
 	 thread. */
-      DWORD res = cancelable_wait (NULL, cw_infinite, cw_sig_eintr);
+      DWORD res = cygwait (NULL, cw_infinite, cw_sig_eintr);
       switch (res)
 	{
 	case WAIT_SIGNALED:

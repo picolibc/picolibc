@@ -24,7 +24,7 @@
 LARGE_INTEGER cw_nowait_storage;
 
 DWORD
-cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
+cygwait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 {
   DWORD res;
   DWORD num = 0;
