@@ -488,7 +488,7 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 bool __stdcall
 _pinfo::exists ()
 {
-  return this && !(process_state & (PID_EXITED | PID_REAPED));
+  return this && !(process_state & (PID_EXITED | PID_REAPED | PID_EXECED));
 }
 
 bool
