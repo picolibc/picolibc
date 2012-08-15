@@ -590,10 +590,14 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
 	}
       else
 	{
+	  _my_tls.lock ();
 	  if (info)
 	    *info = _my_tls.infodata;
 	  res = _my_tls.infodata.si_signo;
-	  InterlockedExchange ((LONG *) &_my_tls.sig, (LONG) 0);
+	  _my_tls.sig = 0;
+	  if (_my_tls.retaddr () == (__stack_t) sigdelayed)
+	    _my_tls.pop ();
+	  _my_tls.unlock ();
 	}
       break;
     default:

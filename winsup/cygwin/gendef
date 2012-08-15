@@ -196,8 +196,9 @@ _sigdelayed:
 	xorl	%ebp,%ebp
 	xchgl	%ebp,-4(%eax)				# get return address from signal stack
 	xchgl	%ebp,28(%esp)				# store real return address
-leave:	decl	$tls::incyg(%ebx)
-	decl	$tls::stacklock(%ebx)			# unlock
+leave:	xorl	%eax,%eax
+	movl	%eax,$tls::incyg(%ebx)
+	movl	%eax,$tls::stacklock(%ebx)		# unlock
 
 	popl	%eax
 	popl	%ebx

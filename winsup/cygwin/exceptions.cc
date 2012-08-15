@@ -37,8 +37,6 @@ details. */
 
 char debugger_command[2 * NT_MAX_PATH + 20];
 
-extern "C" void sigdelayed ();
-
 static BOOL WINAPI ctrl_c_handler (DWORD);
 
 /* This is set to indicate that we have already exited.  */

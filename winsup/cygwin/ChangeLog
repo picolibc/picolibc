@@ -1,5 +1,13 @@
 2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* exceptions.cc (sigdelayed): Move declaration to sigproc.h.
+	* sigproc.h (sigdelayed): Make symbol globally available.
+	* gendef (sigdelayed): Specifically zero incyg and stacklock.
+	* signal.cc (sigwaitinfo): Lock _my_tls and try harder to clean up
+	signal information.
+
+2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* pinfo.cc (_pinfo::exists): Don't consider an execed process to exist.
 
 2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
