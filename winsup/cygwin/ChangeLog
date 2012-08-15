@@ -1,5 +1,14 @@
 2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* cygtls.h (_cygtls::create_signal_arrived): New function.
+	(_cygtls::set_signal_arrived): Lock creation of signal_arrived.
+	* cygwait.cc (cancelable_wait): Ignore signal_arrived event if _my_tls
+	'sig' element does not exist.
+	* exceptions.cc (_cygtls::interrupt_setup): Create signal_arrived if
+	recipient thread has not created it.
+
+2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* gendef: Tighten up whitespace detection.
 
 2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>

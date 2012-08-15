@@ -796,8 +796,12 @@ _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
 
   this->sig = sig;			// Should always be last thing set to avoid a race
 
-  if (incyg && signal_arrived)
-    SetEvent (signal_arrived);
+  if (incyg)
+    {
+      if (!signal_arrived)
+	create_signal_arrived ();
+      SetEvent (signal_arrived);
+    }
 
   proc_subproc (PROC_CLEARWAIT, 1);
   sigproc_printf ("armed signal_arrived %p, signal %d", signal_arrived, sig);

@@ -79,10 +79,18 @@ cancelable_wait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 	res = WAIT_TIMEOUT;
       else if (res != sig_n)
 	/* all set */;
-      else if (is_cw_sig_eintr)
-	res = WAIT_SIGNALED;	/* caller will deal with signals */
-      else if (_my_tls.call_signal_handler ())
-	continue;
+      else
+	{
+	  _my_tls.lock ();
+	  int sig = _my_tls.sig;
+	  _my_tls.unlock ();
+	  if (!sig)
+	    continue;
+	  if (is_cw_sig_eintr)
+	    res = WAIT_SIGNALED;	/* caller will deal with signals */
+	  else if (_my_tls.call_signal_handler ())
+	    continue;
+	}
       break;
     }
 
