@@ -97,11 +97,11 @@ win32_device_name (const char *src_path, char *win32_path, device& dev)
 #define SAMBA_EXTENDED_INFO_VERSION_STRING_LENGTH 28
 #pragma pack(push,4)
 struct smb_extended_info {
-  DWORD         samba_magic;             /* Always SAMBA_EXTENDED_INFO_MAGIC */
-  DWORD         samba_version;           /* Major/Minor/Release/Revision */
-  DWORD         samba_subversion;        /* Prerelease/RC/Vendor patch */
+  DWORD		samba_magic;		/* Always SAMBA_EXTENDED_INFO_MAGIC */
+  DWORD		samba_version;		/* Major/Minor/Release/Revision */
+  DWORD		samba_subversion;	/* Prerelease/RC/Vendor patch */
   LARGE_INTEGER samba_gitcommitdate;
-  char          samba_version_string[SAMBA_EXTENDED_INFO_VERSION_STRING_LENGTH];
+  char		samba_version_string[SAMBA_EXTENDED_INFO_VERSION_STRING_LENGTH];
 };
 #pragma pack(pop)
 

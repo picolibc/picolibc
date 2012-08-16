@@ -91,7 +91,7 @@ static int osi;
 
 void
 fhandler_pty_master::flush_to_slave ()
-{ 
+{
   if (get_readahead_valid () && !(get_ttyp ()->ti.c_lflag & ICANON))
     accept_input ();
 }

@@ -329,7 +329,7 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
 	return NULL;
       pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map, importRVA - offset);
       /* ... carefully check the required size to fit the string table into
-         the map as well.  Allow NAME_MAX bytes for the DLL name, but don't
+	 the map as well.  Allow NAME_MAX bytes for the DLL name, but don't
 	 go beyond the remainder of the section. */
       if (importRVAMaxSize - importRVASize > wincap.allocation_granularity ())
 	{

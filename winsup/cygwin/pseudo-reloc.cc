@@ -188,7 +188,7 @@ do_pseudo_reloc (void * start, void * end, void * base)
    *   1) With a (v2-style) version header. In this case, the
    *      first entry in the list is a 3-DWORD structure, with
    *      value:
-   *         { 0, 0, RP_VERSION_V1 }
+   *	  { 0, 0, RP_VERSION_V1 }
    *      In this case, we skip to the next entry in the list,
    *      knowing that all elements after the head item can
    *      be cast to runtime_pseudo_reloc_item_v1.

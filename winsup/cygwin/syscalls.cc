@@ -731,8 +731,8 @@ unlink_nt (path_conv &pc)
       debug_printf ("Sharing violation when opening %S",
 		    pc.get_nt_native_path ());
       /* We never call try_to_bin on NFS and NetApp for the follwing reasons:
-      
-         NFS implements its own mechanism to remove in-use files, which looks
+
+	 NFS implements its own mechanism to remove in-use files, which looks
 	 quite similar to what we do in try_to_bin for remote files.
 
 	 Netapp filesystems don't understand the "move and delete" method

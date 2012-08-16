@@ -15,7 +15,7 @@ details. */
 #define USE_SYS_TYPES_FD_SET
 #define __WSA_ERR_MACROS_DEFINED
 /* FIXME: Collision with different declarations of if_nametoindex and
-          if_indextoname functions in iphlpapi.h since Vista.
+	  if_indextoname functions in iphlpapi.h since Vista.
    TODO:  Convert if_nametoindex to cygwin_if_nametoindex and call
 	  system functions on Vista and later. */
 #define _INC_NETIOAPI

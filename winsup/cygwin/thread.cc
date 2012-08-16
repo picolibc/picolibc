@@ -575,13 +575,13 @@ pthread::cancel ()
       GetThreadContext (win32_obj_id, &context);
       /* The OS is not foolproof in terms of asynchronous thread cancellation
 	 and tends to hang infinitely if we change the instruction pointer.
-         So just don't cancel asynchronously if the thread is currently
+	 So just don't cancel asynchronously if the thread is currently
 	 executing Windows code.  Rely on deferred cancellation in this case. */
       if (!cygtls->inside_kernel (&context))
-        {
-          context.Eip = (DWORD) pthread::static_cancel_self;
-          SetThreadContext (win32_obj_id, &context);
-        }
+	{
+	  context.Eip = (DWORD) pthread::static_cancel_self;
+	  SetThreadContext (win32_obj_id, &context);
+	}
     }
   mutex.unlock ();
   /* See above.  For instance, a thread which waits for a semaphore in sem_wait

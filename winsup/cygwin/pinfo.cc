@@ -304,7 +304,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	  memset (procinfo, 0, sizeof (*procinfo));
 	  created = true;	/* Lie that we created this - just reuse old
 				   shared memory */
-	} 
+	}
 
       if ((procinfo->process_state & PID_REAPED)
 	  || ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)

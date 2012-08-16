@@ -183,7 +183,7 @@ class fhandler_base
 
  public:
   long inc_refcnt () {return InterlockedIncrement (&_refcnt);}
-  long dec_refcnt () {return InterlockedDecrement (&_refcnt);} 
+  long dec_refcnt () {return InterlockedDecrement (&_refcnt);}
   class fhandler_base *archetype;
   int usecount;
 

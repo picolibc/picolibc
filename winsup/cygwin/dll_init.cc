@@ -132,10 +132,10 @@ dll::init ()
    following fix: Check if the path is preceeded by a long pathname prefix,
    and, if so, drop it forthwith so that subsequent full path comparisons
    work as expected.
-   
+
    At least that was the original idea.  In fact there are two case, linked
    and runtime loaded DLLs, which have to be distinguished:
-   
+
    - Linked DLLs are loaded by only specifying the basename of the DLL and
      searching it using the system DLL search order as given in the
      aforementioned MSDN URL.

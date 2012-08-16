@@ -61,7 +61,7 @@ _cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
 
   /* Optional BLODA detection.  The idea is that the function address is
      supposed to be within Cygwin itself.  This is also true for pthreads,
-     since pthreads are always calling thread_wrapper in miscfuncs.cc. 
+     since pthreads are always calling thread_wrapper in miscfuncs.cc.
      Therefore, every function call to a function outside of the Cygwin DLL
      is potentially a thread injected into the Cygwin process by some BLODA.
 
