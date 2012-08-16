@@ -40,14 +40,14 @@
 
 START_RELOC_NUMBERS (elf_aarch64_reloc_type)
 
-/* Null relocations.  */
+/* Null relocations. */
 RELOC_NUMBER (R_AARCH64_NONE, 0) /* No reloc */
 
 FAKE_RELOC (R_AARCH64_static_min, 256)
 
 RELOC_NUMBER (R_AARCH64_NULL, 256) /* No reloc */
 
-/* Basic data relocations.  */
+/* Basic data relocations. */
 
 /* .xword: (S+A) */
 RELOC_NUMBER (R_AARCH64_ABS64, 257)
@@ -68,7 +68,7 @@ RELOC_NUMBER (R_AARCH64_PREL32, 261)
 RELOC_NUMBER (R_AARCH64_PREL16, 262)
 
 /* Group relocations to create a 16, 32, 48 or 64 bit
-   unsigned data or abs address inline.  */
+   unsigned data or abs address inline. */
 
 /* MOV[ZK]:   ((S+A) >>  0) & 0xffff */
 RELOC_NUMBER (R_AARCH64_MOVW_UABS_G0,		263)
@@ -93,7 +93,7 @@ RELOC_NUMBER (R_AARCH64_MOVW_UABS_G3, 269)
 
 /* Group relocations to create high part of a 16, 32, 48 or 64 bit
    signed data or abs address inline. Will change instruction
-   to MOVN or MOVZ depending on sign of calculated value.  */
+   to MOVN or MOVZ depending on sign of calculated value. */
 
 /* MOV[ZN]:   ((S+A) >>  0) & 0xffff */
 RELOC_NUMBER (R_AARCH64_MOVW_SABS_G0, 270)
@@ -105,7 +105,7 @@ RELOC_NUMBER (R_AARCH64_MOVW_SABS_G1, 271)
 RELOC_NUMBER (R_AARCH64_MOVW_SABS_G2, 272)
 
 /* Relocations to generate 19, 21 and 33 bit PC-relative load/store
-   addresses: PG(x) is (x & ~0xfff).  */
+   addresses: PG(x) is (x & ~0xfff). */
 
 /* LD-lit: ((S+A-P) >> 2) & 0x7ffff */
 RELOC_NUMBER (R_AARCH64_LD_PREL_LO19, 273)
@@ -125,20 +125,20 @@ RELOC_NUMBER (R_AARCH64_ADD_ABS_LO12_NC, 277)
 /* LD/ST8: (S+A) & 0xfff */
 RELOC_NUMBER (R_AARCH64_LDST8_ABS_LO12_NC, 278)
 
-/* Relocations for control-flow instructions.  */
+/* Relocations for control-flow instructions. */
 
-/* TBZ/NZ: ((S+A-P) >> 2) & 0x3fff.  */
+/* TBZ/NZ: ((S+A-P) >> 2) & 0x3fff */
 RELOC_NUMBER (R_AARCH64_TSTBR14, 279)
 
-/* B.cond: ((S+A-P) >> 2) & 0x7ffff.  */
+/* B.cond: ((S+A-P) >> 2) & 0x7ffff */
 RELOC_NUMBER (R_AARCH64_CONDBR19, 280)
 
 /* 281 unused */
 
-/* B:      ((S+A-P) >> 2) & 0x3ffffff.  */
+/* B:      ((S+A-P) >> 2) & 0x3ffffff */
 RELOC_NUMBER (R_AARCH64_JUMP26, 282)
 
-/* BL:     ((S+A-P) >> 2) & 0x3ffffff.  */
+/* BL:     ((S+A-P) >> 2) & 0x3ffffff */
 RELOC_NUMBER (R_AARCH64_CALL26, 283)
 
 /* LD/ST16: (S+A) & 0xffe */

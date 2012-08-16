@@ -34,7 +34,7 @@ typedef uint32_t aarch64_insn;
 
 /* The following bitmasks control CPU features.  */
 #define AARCH64_FEATURE_V8	0x00000001	/* All processors.  */
-#define AARCH64_FEATURE_CRYPTO	0x00010000	/* Crypto instructions.  */
+#define AARCH64_FEATURE_CRYPTO	0x00010000	/* Crypto instructions. */
 #define AARCH64_FEATURE_FP	0x00020000	/* FP instructions.  */
 #define AARCH64_FEATURE_SIMD	0x00040000	/* SIMD instructions.  */
 
@@ -45,25 +45,21 @@ typedef uint32_t aarch64_insn;
 #define AARCH64_ARCH_NONE	AARCH64_FEATURE (0, 0)
 #define AARCH64_ANY		AARCH64_FEATURE (-1, 0)	/* Any basic core.  */
 
-/* CPU-specific features.  */
+/* CPU-specific features */
 typedef unsigned long aarch64_feature_set;
 
 #define AARCH64_CPU_HAS_FEATURE(CPU,FEAT)	\
   (((CPU) & (FEAT)) != 0)
 
 #define AARCH64_MERGE_FEATURE_SETS(TARG,F1,F2)	\
-  do						\
-    {						\
-      (TARG) = (F1) | (F2);			\
-    }						\
-  while (0)
+  do {						\
+    (TARG) = (F1) | (F2);			\
+  } while (0)
 
 #define AARCH64_CLEAR_FEATURE(TARG,F1,F2)	\
-  do						\
-    { 						\
-      (TARG) = (F1) &~ (F2);			\
-    }						\
-  while (0)
+  do {						\
+    (TARG) = (F1) &~ (F2);			\
+  } while (0)
 
 #define AARCH64_FEATURE(core,coproc) ((core) | (coproc))
 
@@ -600,7 +596,7 @@ opcode_has_special_coder (const aarch64_opcode *opcode)
 
 struct aarch64_name_value_pair
 {
-  const char *  name;
+  const char	*name;
   aarch64_insn	value;
 };
 
@@ -691,7 +687,7 @@ struct aarch64_opnd_info
 	  /* Lane index; valid only when has_index is 1.  */
 	  unsigned index : 4;
 	} reglist;
-      /* e.g. immediate or pc relative address offset.  */
+      /* e.g. immediate or pc relative address offset. */
       struct
 	{
 	  int64_t value;
@@ -851,75 +847,54 @@ typedef struct aarch64_operand_error aarch64_operand_error;
 
 /* Encoding entrypoint.  */
 
-extern int
-aarch64_opcode_encode (const aarch64_opcode *, const aarch64_inst *,
-		       aarch64_insn *, aarch64_opnd_qualifier_t *,
-		       aarch64_operand_error *);
+int aarch64_opcode_encode (const aarch64_opcode *, const aarch64_inst *,
+			   aarch64_insn *, aarch64_opnd_qualifier_t *,
+			   aarch64_operand_error *);
 
-extern const aarch64_opcode *
-aarch64_replace_opcode (struct aarch64_inst *,
-			const aarch64_opcode *);
+const aarch64_opcode* aarch64_replace_opcode (struct aarch64_inst *,
+					      const aarch64_opcode *);
 
 /* Given the opcode enumerator OP, return the pointer to the corresponding
    opcode entry.  */
 
-extern const aarch64_opcode *
-aarch64_get_opcode (enum aarch64_op);
+const aarch64_opcode* aarch64_get_opcode (enum aarch64_op);
 
 /* Generate the string representation of an operand.  */
-extern void
-aarch64_print_operand (char *, size_t, bfd_vma, const aarch64_opcode *,
-		       const aarch64_opnd_info *, int, int *, bfd_vma *);
+void aarch64_print_operand (char *, size_t, bfd_vma, const aarch64_opcode *,
+			    const aarch64_opnd_info *, int, int *, bfd_vma *);
 
 /* Miscellaneous interface.  */
 
-extern int
-aarch64_operand_index (const enum aarch64_opnd *, enum aarch64_opnd);
+int aarch64_operand_index (const enum aarch64_opnd *, enum aarch64_opnd);
 
-extern aarch64_opnd_qualifier_t
+aarch64_opnd_qualifier_t
 aarch64_get_expected_qualifier (const aarch64_opnd_qualifier_seq_t *, int,
 				const aarch64_opnd_qualifier_t, int);
 
-extern int
-aarch64_num_of_operands (const aarch64_opcode *);
+int aarch64_num_of_operands (const aarch64_opcode *);
 
-extern int
-aarch64_stack_pointer_p (const aarch64_opnd_info *);
-
-extern
+int aarch64_stack_pointer_p (const aarch64_opnd_info *);
 int aarch64_zero_register_p (const aarch64_opnd_info *);
 
 /* Given an operand qualifier, return the expected data element size
    of a qualified operand.  */
-extern unsigned char
-aarch64_get_qualifier_esize (aarch64_opnd_qualifier_t);
-
-extern enum aarch64_operand_class
-aarch64_get_operand_class (enum aarch64_opnd);
-
-extern const char *
-aarch64_get_operand_name (enum aarch64_opnd);
-
-extern const char *
-aarch64_get_operand_desc (enum aarch64_opnd);
+unsigned char aarch64_get_qualifier_esize (aarch64_opnd_qualifier_t);
+enum aarch64_operand_class aarch64_get_operand_class (enum aarch64_opnd);
+const char* aarch64_get_operand_name (enum aarch64_opnd);
+const char* aarch64_get_operand_desc (enum aarch64_opnd);
 
 #ifdef DEBUG_AARCH64
 extern int debug_dump;
-
-extern void
-aarch64_verbose (const char *, ...) __attribute__ ((format (printf, 1, 2)));
-
-#define DEBUG_TRACE(M, ...)					\
-  {								\
-    if (debug_dump)						\
-      aarch64_verbose ("%s: " M ".", __func__, ##__VA_ARGS__);	\
-  }
-
-#define DEBUG_TRACE_IF(C, M, ...)				\
-  {								\
-    if (debug_dump && (C))					\
-      aarch64_verbose ("%s: " M ".", __func__, ##__VA_ARGS__);	\
-  }
+void aarch64_verbose (const char *str, ...)
+     __attribute__ ((format (printf, 1, 2)));
+#define DEBUG_TRACE(M, ...) {					\
+  if (debug_dump)						\
+    aarch64_verbose ("%s: " M ".", __func__, ##__VA_ARGS__);	\
+}
+#define DEBUG_TRACE_IF(C, M, ...) {				\
+  if (debug_dump && (C))					\
+    aarch64_verbose ("%s: " M ".", __func__, ##__VA_ARGS__);	\
+}
 #else  /* !DEBUG_AARCH64 */
 #define DEBUG_TRACE(M, ...) ;
 #define DEBUG_TRACE_IF(C, M, ...) ;

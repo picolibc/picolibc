@@ -1,3 +1,18 @@
+2012-08-16  Ian Bolton  <ian.bolton@arm.com>
+            Laurent Desnogues  <laurent.desnogues@arm.com>
+            Jim MacArthur  <jim.macarthur@arm.com>
+            Marcus Shawcroft  <marcus.shawcroft@arm.com>
+            Nigel Stephens  <nigel.stephens@arm.com>
+            Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+            Richard Earnshaw  <rearnsha@arm.com>
+            Sofiane Naci  <sofiane.naci@arm.com>
+            Tejas Belagod  <tejas.belagod@arm.com>
+            Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* dis-asm.h (print_insn_aarch64): New declaration.
+	(print_aarch64_disassembler_options): New declaration.
+	(aarch64_symbol_is_valid): New declaration.
+
 2012-07-24  Stephan McCamant  <smcc@cs.berkeley.edu>
             Dr David Alan Gilbert  <dave@treblig.org>
 
