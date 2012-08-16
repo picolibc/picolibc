@@ -226,7 +226,7 @@ public:
   void signal_debugger (int) __attribute__ ((regparm(2)));
 
 #ifdef CYGTLS_HANDLE
-  operator HANDLE () const {return tid->win32_obj_id;}
+  operator HANDLE () const {return tid ? NULL : tid->win32_obj_id;}
 #endif
   void set_siginfo (struct sigpacket *) __attribute__ ((regparm (3)));
   int call_signal_handler () __attribute__ ((regparm (1)));

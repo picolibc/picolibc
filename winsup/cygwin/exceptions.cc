@@ -846,30 +846,34 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 
 	  DWORD res;
 	  HANDLE hth = (HANDLE) *tls;
-
-	  /* Suspend the thread which will receive the signal.
-	     If one of these conditions is not true we loop.
-	     If the thread is already suspended (which can occur when a program
-	     has called SuspendThread on itself) then just queue the signal. */
-
-	  sigproc_printf ("suspending thread, tls %p, _main_tls %p", tls, _main_tls);
-	  res = SuspendThread (hth);
-	  /* Just set pending if thread is already suspended */
-	  if (res)
-	    {
-	      ResumeThread (hth);
-	      goto out;
-	    }
-	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-	  if (!GetThreadContext (hth, &cx))
-	    sigproc_printf ("couldn't get context of thread, %E");
+	  if (!hth)
+	    sigproc_printf ("thread handle NULL, not set up yet?");
 	  else
-	    interrupted = tls->interrupt_now (&cx, sig, handler, siga);
+	    {
+	      /* Suspend the thread which will receive the signal.
+		 If one of these conditions is not true we loop.
+		 If the thread is already suspended (which can occur when a program
+		 has called SuspendThread on itself) then just queue the signal. */
 
-	  tls->unlock ();
-	  ResumeThread (hth);
-	  if (interrupted)
-	    goto out;
+	      sigproc_printf ("suspending thread, tls %p, _main_tls %p", tls, _main_tls);
+	      res = SuspendThread (hth);
+	      /* Just set pending if thread is already suspended */
+	      if (res)
+		{
+		  ResumeThread (hth);
+		  goto out;
+		}
+	      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	      if (!GetThreadContext (hth, &cx))
+		sigproc_printf ("couldn't get context of thread, %E");
+	      else
+		interrupted = tls->interrupt_now (&cx, sig, handler, siga);
+
+	      tls->unlock ();
+	      ResumeThread (hth);
+	      if (interrupted)
+		goto out;
+	    }
 
 	  sigproc_printf ("couldn't interrupt.  trying again.");
 	  yield ();
