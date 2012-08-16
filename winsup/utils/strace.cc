@@ -1,7 +1,7 @@
 /* strace.cc
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011 Red Hat Inc.
+   2009, 2010, 2011, 2012 Red Hat Inc.
 
    Written by Chris Faylor <cgf@redhat.com>
 
@@ -37,6 +37,13 @@ details. */
 /* we *know* we're being built with GCC */
 #ifndef alloca
 #define alloca __builtin_alloca
+#endif
+
+/* Temporary workaround for older Mingw header files on Fedora 17. */
+#ifndef NT_SUCCESS
+#define NT_SUCCESS(status) ((NTSTATUS) (status) >= 0)
+#define ProcessDebugFlags ((PROCESSINFOCLASS) 31)
+extern "C" NTSTATUS NTAPI NtSetInformationProcess(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength);
 #endif
 
 static const char *pgm;

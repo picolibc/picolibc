@@ -25,6 +25,7 @@ details. */
 #include "path.h"
 #include "cygwin/include/cygwin/version.h"
 #include "cygwin/include/sys/mount.h"
+#define _NOMNTENT_MACROS
 #include "cygwin/include/mntent.h"
 #include "testsuite.h"
 #ifdef FSTAB_ONLY

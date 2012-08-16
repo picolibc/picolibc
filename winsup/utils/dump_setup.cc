@@ -32,6 +32,11 @@ details. */
 #include "zlib.h"
 #endif
 
+/* Temporary workaround for older Mingw header files on Fedora 17. */
+#ifndef NT_SUCCESS
+#define NT_SUCCESS(status) ((NTSTATUS) (status) >= 0)
+#endif
+
 #ifndef ZLIB_VERSION
 typedef void * gzFile;
 #define gzgets(fp, buf, size) ({0;})

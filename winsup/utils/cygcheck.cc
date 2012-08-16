@@ -24,9 +24,10 @@
 #include <getopt.h>
 #include "cygwin/include/cygwin/version.h"
 #include "cygwin/include/sys/cygwin.h"
+#define _NOMNTENT_MACROS
 #include "cygwin/include/mntent.h"
 #include "cygwin/cygprops.h"
-#include "cygwin/version.h"
+#include "cygwin/include/cygwin/version.h"
 #undef cygwin_internal
 #include "loadlib.h"
 
