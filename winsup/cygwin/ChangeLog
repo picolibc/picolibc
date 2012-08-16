@@ -1,5 +1,9 @@
 2012-08-16  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* cygtls.cc (_cygtls::operator HANDLE): Reverse '?' test stupidity.
+
+2012-08-16  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* cygheap.cc (init_cygheap::find_tls): Don't consider unitialized
 	threads.
 	* cygtls.cc (_cygtls::operator HANDLE): Return NULL when tid is not
