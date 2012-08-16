@@ -1,5 +1,9 @@
 2012-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ps.cc (main): Define uid correctly as uid_t.
+
+2012-08-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygcheck.cc: Change include path to not depend on installed
 	cygwin/version.h.
 	(_NOMNTENT_MACROS): Define before including mntent.h.
