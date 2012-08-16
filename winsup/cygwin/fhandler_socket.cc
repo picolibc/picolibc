@@ -125,7 +125,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	     some greedy Win32 application.  Therefore we should never wait
 	     endlessly without checking for signals and thread cancel event. */
 	  pthread_testcancel ();
-	  if (cancelable_wait (NULL, cw_nowait, cw_sig_eintr) == WAIT_SIGNALED
+	  if (cygwait (NULL, cw_nowait, cw_sig_eintr) == WAIT_SIGNALED
 	      && !_my_tls.call_signal_handler ())
 	    {
 	      set_errno (EINTR);

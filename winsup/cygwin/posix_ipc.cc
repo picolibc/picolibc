@@ -119,7 +119,7 @@ ipc_mutex_init (HANDLE *pmtx, const char *name)
 static int
 ipc_mutex_lock (HANDLE mtx)
 {
-  switch (cancelable_wait (mtx, cw_infinite, cw_sig_eintr | cw_cancel | cw_cancel_self))
+  switch (cygwait (mtx, cw_infinite, cw_sig_eintr | cw_cancel | cw_cancel_self))
     {
     case WAIT_OBJECT_0:
     case WAIT_ABANDONED_0:

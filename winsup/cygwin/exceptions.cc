@@ -37,8 +37,6 @@ details. */
 
 char debugger_command[2 * NT_MAX_PATH + 20];
 
-extern "C" void sigdelayed ();
-
 static BOOL WINAPI ctrl_c_handler (DWORD);
 
 /* This is set to indicate that we have already exited.  */
@@ -710,7 +708,7 @@ handle_sigsuspend (sigset_t tempmask)
   sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
-  cancelable_wait (NULL, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr);
+  cygwait (NULL, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr);
 
   set_sig_errno (EINTR);	// Per POSIX
 
@@ -741,7 +739,7 @@ sig_handle_tty_stop (int sig)
       sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
       /* FIXME! This does nothing to suspend anything other than the main
 	 thread. */
-      DWORD res = cancelable_wait (NULL, cw_infinite, cw_sig_eintr);
+      DWORD res = cygwait (NULL, cw_infinite, cw_sig_eintr);
       switch (res)
 	{
 	case WAIT_SIGNALED:
@@ -798,8 +796,12 @@ _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
 
   this->sig = sig;			// Should always be last thing set to avoid a race
 
-  if (incyg && signal_arrived)
-    SetEvent (signal_arrived);
+  if (incyg)
+    {
+      if (!signal_arrived)
+	create_signal_arrived ();
+      SetEvent (signal_arrived);
+    }
 
   proc_subproc (PROC_CLEARWAIT, 1);
   sigproc_printf ("armed signal_arrived %p, signal %d", signal_arrived, sig);

@@ -1,3 +1,48 @@
+2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	Rename cancelable_wait -> cygwait throughout.
+	* DevNotes: Add entry cgf-000015.
+	* cygwait.h (cygwait): Don't allow an optional PLARGE_INTEGER
+	argument.
+
+2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygtls.h (_cygtls::create_signal_arrived): New function.
+	(_cygtls::set_signal_arrived): Lock creation of signal_arrived.
+	* cygwait.cc (cancelable_wait): Ignore signal_arrived event if _my_tls
+	'sig' element does not exist.
+	* exceptions.cc (_cygtls::interrupt_setup): Create signal_arrived if
+	recipient thread has not created it.
+
+2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* gendef: Tighten up whitespace detection.
+
+2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* gendef: Delete unneeded read from <IN> which ate an arbitrary line
+	from cygwin.din.
+
+2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* exceptions.cc (sigdelayed): Move declaration to sigproc.h.
+	* sigproc.h (sigdelayed): Make symbol globally available.
+	* gendef (sigdelayed): Specifically zero incyg and stacklock.
+	* signal.cc (sigwaitinfo): Lock _my_tls and try harder to clean up
+	signal information.
+
+2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (_pinfo::exists): Don't consider an execed process to exist.
+
+2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gmon.c (_mcleanup): Fix scope bug when using gmon_out array.
+
+2012-08-14  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* errno.cc (errmap): Keep sorted.
+
 2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* advapi32.cc (DuplicateTokenEx): Make ?: expression type-safe.

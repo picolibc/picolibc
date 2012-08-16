@@ -233,6 +233,10 @@ public:
   void lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));
   bool locked () __attribute__ ((regparm (1)));
+  void create_signal_arrived ()
+  {
+    signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
+  }
   void set_signal_arrived (bool setit, HANDLE& h)
   {
     if (!setit)
@@ -240,7 +244,11 @@ public:
     else
       {
 	if (!signal_arrived)
-	  signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
+	  {
+	    lock ();
+	    create_signal_arrived ();
+	    unlock ();
+	  }
 	h = signal_arrived;
 	signal_waiting = true;
       }

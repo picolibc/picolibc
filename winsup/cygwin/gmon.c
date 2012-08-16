@@ -146,6 +146,9 @@ _mcleanup()
 	struct gmonparam *p = &_gmonparam;
 	struct gmonhdr gmonhdr, *hdr;
 	char *proffile;
+#ifndef nope
+	char gmon_out[] = "gmon.out";
+#endif
 #ifdef DEBUG
 	int log, len;
 	char dbuf[200];
@@ -203,10 +206,7 @@ _mcleanup()
 		proffile = "gmon.out";
 	}
 #else
-	{
-	  char gmon_out[] = "gmon.out";
-	  proffile = gmon_out;
-	}
+	proffile = gmon_out;
 #endif
 
 	fd = open(proffile , O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0666);

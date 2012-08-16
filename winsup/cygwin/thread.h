@@ -60,7 +60,7 @@ public:
   void lock ()
   {
     if (InterlockedIncrement (&lock_counter) != 1)
-      cancelable_wait (win32_obj_id, cw_infinite, cw_sig);
+      cygwait (win32_obj_id, cw_infinite, cw_sig);
   }
 
   void unlock ()

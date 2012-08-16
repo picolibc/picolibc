@@ -80,9 +80,9 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       if ((waitfor = w->ev) == NULL)
 	goto nochildren;
 
-      res = cancelable_wait (waitfor, cw_infinite, cw_cancel | cw_cancel_self);
+      res = cygwait (waitfor, cw_infinite, cw_cancel | cw_cancel_self);
 
-      sigproc_printf ("%d = cancelable_wait (...)", res);
+      sigproc_printf ("%d = cygwait (...)", res);
 
       if (w->ev == NULL)
 	{

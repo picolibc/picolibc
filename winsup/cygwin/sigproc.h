@@ -86,6 +86,8 @@ void __stdcall sigalloc ();
 int kill_pgrp (pid_t, siginfo_t&);
 int killsys (pid_t, int);
 
+extern "C" void sigdelayed ();
+
 extern char myself_nowait_dummy[];
 
 extern struct sigaction *global_sigs;
