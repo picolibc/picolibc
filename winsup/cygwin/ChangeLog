@@ -1,3 +1,9 @@
+2012-08-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* exceptions.cc (sig_handle_tty_stop): Clear tls sig field.
+	(sigpacket::process): When continuing, set tls->sig before arming
+	signal_arrived.
+
 2012-08-17  Thomas Wolff <towo@towo.net>
 
 	* fhandler_clipboard.cc (fhandler_dev_clipboard::read): Use

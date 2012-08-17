@@ -743,6 +743,7 @@ sig_handle_tty_stop (int sig)
       switch (res)
 	{
 	case WAIT_SIGNALED:
+	  _my_tls.sig = 0;
 	  myself->stopsig = SIGCONT;
 	  myself->alert_parent (SIGCONT);
 	  break;
@@ -1242,7 +1243,10 @@ dosig:
 
 done:
   if (continue_now)
-    SetEvent (tls->signal_arrived);
+    {
+      tls->sig = SIGCONT;
+      SetEvent (tls->signal_arrived);
+    }
   sigproc_printf ("returning %d", rc);
   return rc;
 
