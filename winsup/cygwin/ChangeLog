@@ -1,5 +1,26 @@
 2012-08-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* DevNotes: Add entry cgf-000016.
+	* cygtls.h (_cygtls::push): Inline.
+	(_cygtls::interrupt_now): Change signal number argument to siginfo_t
+	argument.
+	(_cygtls::interrupt_setup): Ditto.
+	(_cygtls::set_siginfo): Delete declaration.
+	(_cygtls::reset_signal_arrived): Don't reset signal_arrived signal.
+	Just reset flag.
+	* exceptions.cc (_cygtls::interrupt_now): Reflect argument changes.
+	Pass si to interrupt_setup.
+	(_cygtls::interrupt_setup): Reflect argument changes.  Fill out tls
+	infodata here using passed-in si.  Use si.si_signo instead of sig.
+	(sigpacket::setup_handler): Move this function into sigpacket class.
+	Use si field from the class as appropriate.
+	(sigpacket::process): Don't call tls->set_siginfo here since
+	setup_handler could fail.  Eliminate now-unneeded sig argument.
+	* sigproc.h (sigpacket::setup_handler): Move setup_handler to this
+	class.
+
+2012-08-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* exceptions.cc (sig_handle_tty_stop): Clear tls sig field.
 	(sigpacket::process): When continuing, set tls->sig before arming
 	signal_arrived.

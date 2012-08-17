@@ -196,15 +196,3 @@ _cygtls::remove (DWORD wait)
   cygheap->remove_tls (this, wait);
   remove_wq (wait);
 }
-
-void
-_cygtls::push (__stack_t addr)
-{
-  *stackptr++ = (__stack_t) addr;
-}
-
-void
-_cygtls::set_siginfo (sigpacket *pack)
-{
-  infodata = pack->si;
-}
