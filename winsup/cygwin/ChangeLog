@@ -1,3 +1,10 @@
+2012-08-17  Thomas Wolff <towo@towo.net>
+
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::read): Use
+	read-ahead buffer for reading Windows clipboard if caller's
+	buffer is too small for complete characters.
+	* include/limits.h: Remove outdated TODO comment.
+
 2012-08-16  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* cygtls.cc (_cygtls::operator HANDLE): Reverse '?' test stupidity.
