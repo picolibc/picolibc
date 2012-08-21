@@ -1,3 +1,7 @@
+2012-08-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* net.cc (get_adapters_addresses): Drop FIXME part of comment.
+
 2012-08-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* DevNotes: Add entry cgf-000016.
