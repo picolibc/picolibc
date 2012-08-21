@@ -1,3 +1,9 @@
+2012-08-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* libc/stdio/flags.c (__sflags): Rewrite recognition of extended mode
+	flags to just loop over more allowed flags.  Support glibc 'e' flag on
+	systems defining _GLIBC_EXTENSION.  Support C11 'x' flag.
+
 2012-08-10  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdlib/btowc.c (btowc): Cast to avoid compiler warning.
