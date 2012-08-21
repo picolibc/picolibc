@@ -1,3 +1,7 @@
+2012-08-21  David S. Miller  <davem@davemloft.net>
+
+	* sparc.h (F3F4): New macro.
+
 2012-08-13  Ian Bolton  <ian.bolton@arm.com>
             Laurent Desnogues  <laurent.desnogues@arm.com>
             Jim MacArthur  <jim.macarthur@arm.com>
