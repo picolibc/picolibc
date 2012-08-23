@@ -1,3 +1,8 @@
+2012-08-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* libc/stdio/flags.c (__sflags): Guard against using O_BINARY on
+	systems which do not provide it.
+
 2012-08-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* libc/stdio/flags.c (__sflags): Rewrite recognition of extended mode

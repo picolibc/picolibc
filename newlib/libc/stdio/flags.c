@@ -69,7 +69,9 @@ _DEFUN(__sflags, (ptr, mode, optr),
 	  m = (m & ~O_ACCMODE) | O_RDWR;
 	  break;
 	case 'b':
+#ifdef O_BINARY
 	  m |= O_BINARY;
+#endif
 	  break;
 #ifdef __CYGWIN__
 	case 't':
