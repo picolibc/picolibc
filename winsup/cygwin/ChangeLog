@@ -1,3 +1,8 @@
+2012-08-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (_pinfo::exists): Don't consider a process with no state to
+	exist.
+
 2012-08-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* net.cc (get_adapters_addresses): Drop FIXME part of comment.
