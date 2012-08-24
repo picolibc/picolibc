@@ -1,5 +1,9 @@
 2012-08-24  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
 
+	* opcode/arm.h (ARM_CPU_IS_ANY): New define.
+
+2012-08-24  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
 	* elf/arm.h (TAG_CPU_ARCH_V8): New define.
 	(MAX_TAG_CPU_ARCH): Update.
 	* opcode/arm.h (ARM_EXT_V8): New define.

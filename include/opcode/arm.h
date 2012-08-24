@@ -269,6 +269,9 @@ typedef struct
 #define ARM_CPU_HAS_FEATURE(CPU,FEAT) \
   (((CPU).core & (FEAT).core) != 0 || ((CPU).coproc & (FEAT).coproc) != 0)
 
+#define ARM_CPU_IS_ANY(CPU) \
+  ((CPU).core == ((arm_feature_set)ARM_ANY).core)
+
 #define ARM_MERGE_FEATURE_SETS(TARG,F1,F2)	\
   do {						\
     (TARG).core = (F1).core | (F2).core;	\
