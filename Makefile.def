@@ -61,13 +61,14 @@ host_modules= { module= mpfr; lib_path=.libs; bootstrap=true;
 host_modules= { module= mpc; lib_path=.libs; bootstrap=true;
 		extra_configure_flags='--disable-shared @extra_mpc_gmp_configure_flags@ @extra_mpc_mpfr_configure_flags@';
 		no_install= true; };
-host_modules= { module= ppl; lib_path=src/.libs; bootstrap=true;
-		extra_configure_flags='--disable-shared --with-libgmp-prefix=$$r/$(HOST_SUBDIR)/gmp/ --with-libgmpxx-prefix=$$r/$(HOST_SUBDIR)/gmp/';
+host_modules= { module= isl; lib_path=.libs; bootstrap=true;
+		extra_configure_flags='--disable-shared @extra_isl_gmp_configure_flags@';
+		extra_make_flags='V=1';
 		no_install= true; };
 host_modules= { module= cloog; lib_path=.libs; bootstrap=true;
-		extra_configure_flags='--disable-shared --with-gmp-library=$$r/$(HOST_SUBDIR)/gmp/.libs --with-gmp-include=$$r/$(HOST_SUBDIR)/gmp --with-bits=gmp --with-ppl';
-		extra_exports='CPPFLAGS="${CPPFLAGS} ${HOST_PPLINC}"; export CPPFLAGS; LDFLAGS="$$LDFLAGS ${HOST_PPLLIBS}"; export LDFLAGS; ';
-		extra_make_flags='CPPFLAGS="${CPPFLAGS} ${HOST_PPLINC}" LDFLAGS="$$LDFLAGS"';
+		extra_configure_flags='--disable-shared --with-gmp=system --with-bits=gmp --with-isl=system';
+		extra_exports='CPPFLAGS="$(HOST_GMPINC) $(HOST_ISLINC) $$CPPFLAGS"; export CPPFLAGS; LDFLAGS="-L$$r/$(HOST_SUBDIR)/gmp/.libs -L$$r/$(HOST_SUBDIR)/isl/.libs $$LDFLAGS"; export LDFLAGS; ';
+		extra_make_flags='CPPFLAGS="$$CPPFLAGS" LDFLAGS="$$LDFLAGS" V=1';
 		no_install= true; };
 host_modules= { module= libelf; lib_path=.libs; bootstrap=true;
 		extra_configure_flags='--disable-shared';
@@ -139,6 +140,8 @@ target_modules = { module= boehm-gc; };
 target_modules = { module= rda; };
 target_modules = { module= libada; };
 target_modules = { module= libgomp; bootstrap= true; lib_path=.libs; };
+target_modules = { module= libitm; lib_path=.libs; };
+target_modules = { module= libatomic; lib_path=.libs; };
 
 // These are (some of) the make targets to be done in each subdirectory.
 // Not all; these are the ones which don't have special options.
@@ -293,7 +296,6 @@ dependencies = { module=all-gcc; on=all-gmp; };
 dependencies = { module=all-gcc; on=all-intl; };
 dependencies = { module=all-gcc; on=all-mpfr; };
 dependencies = { module=all-gcc; on=all-mpc; };
-dependencies = { module=all-gcc; on=all-ppl; };
 dependencies = { module=all-gcc; on=all-cloog; };
 dependencies = { module=all-gcc; on=all-build-texinfo; };
 dependencies = { module=all-gcc; on=all-build-bison; };
@@ -313,6 +315,7 @@ dependencies = { module=html-gcc; on=all-build-libiberty; };
 dependencies = { module=install-gcc ; on=install-fixincludes; };
 dependencies = { module=install-gcc ; on=install-lto-plugin; };
 dependencies = { module=install-strip-gcc ; on=install-strip-fixincludes; };
+dependencies = { module=install-strip-gcc ; on=install-strip-lto-plugin; };
 
 dependencies = { module=configure-libcpp; on=configure-libiberty; hard=true; };
 dependencies = { module=configure-libcpp; on=configure-intl; };
@@ -329,9 +332,9 @@ dependencies = { module=all-utils; on=all-libiberty; };
 
 dependencies = { module=configure-mpfr; on=all-gmp; };
 dependencies = { module=configure-mpc; on=all-mpfr; };
-dependencies = { module=configure-ppl; on=all-gmp; };
-dependencies = { module=configure-ppl; on=all-mpfr; };
-dependencies = { module=configure-cloog; on=all-ppl; };
+dependencies = { module=configure-isl; on=all-gmp; };
+dependencies = { module=configure-cloog; on=all-isl; };
+dependencies = { module=configure-cloog; on=all-gmp; };
 
 // Host modules specific to gdb.
 dependencies = { module=configure-gdb; on=all-intl; };
@@ -471,6 +474,7 @@ dependencies = { module=all-m4; on=all-build-texinfo; };
 // environment (e.g. on libstdc++).  By default target modules depend
 // on libgcc and newlib/libgloss.
 lang_env_dependencies = { module=libjava; cxx=true; };
+lang_env_dependencies = { module=libitm; cxx=true; };
 lang_env_dependencies = { module=newlib; no_c=true; };
 lang_env_dependencies = { module=libgloss; no_c=true; };
 lang_env_dependencies = { module=libgcc; no_gcc=true; no_c=true; };
@@ -512,9 +516,11 @@ dependencies = { module=configure-target-newlib; on=all-ld; };
 dependencies = { module=configure-target-libgfortran; on=all-target-libquadmath; };
 
 languages = { language=c;	gcc-check-target=check-gcc; };
-languages = { language=c++;	gcc-check-target="check-c++ check-c++0x";
+languages = { language=c++;	gcc-check-target=check-c++;
 				lib-check-target=check-target-libstdc++-v3;
-				lib-check-target=check-target-libmudflap-c++; };
+				lib-check-target=check-target-libmudflap-c++;
+				lib-check-target=check-target-libitm-c++;
+				lib-check-target=check-target-libgomp-c++; };
 languages = { language=fortran;	gcc-check-target=check-fortran;
 				lib-check-target=check-target-libquadmath;
 				lib-check-target=check-target-libgfortran; };
