@@ -316,7 +316,6 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
       if (procinfo->process_state & PID_EXECED)
 	{
-	  assert (i == 0);
 	  pid_t realpid = procinfo->pid;
 	  debug_printf ("execed process windows pid %d, cygwin pid %d", n, realpid);
 	  if (realpid == n)

@@ -1,3 +1,7 @@
+2012-08-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (pinfo::init): Remove assertion.
+
 2012-08-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* pinfo.cc (_pinfo::exists): Don't consider a process with no state to
