@@ -1,8 +1,42 @@
+2012-08-26  Art Haas <ahaas@impactweather.com>
+
+	* cloog.m4 (CLOOG_INIT_FLAGS): Use = instead of == in test.
+
+2012-07-04  Tristan Gingold  <gingold@adacore.com>
+
+	* isl.m4 (ISL_CHECK_VERSION): Set to yes if cross-compiling.
+	Fix comments.
+
+2012-07-03  Richard Guenther  <rguenther@suse.de>
+
+	* cloog.m4: Remove debugging print.
+
+2012-07-03  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* isl.m4 (ISL_CHECK_VERSION): Add -lisl to LIBS, not LDFLAGS.
+
+2012-07-02  Richard Guenther  <rguenther@suse.de>
+
+	* isl.m4 (_ISL_CHECK_CT_PROG): Omit main function header/footer.
+	Fix version test. 
+
+2012-07-02  Richard Guenther  <rguenther@suse.de>
+	Michael Matz  <matz@suse.de>
+	Tobias Grosser <tobias@grosser.es>
+	Sebastian Pop <sebpop@gmail.com>
+
+	* cloog.m4: Set up to work against ISL only.
+	* isl.m4: New file.
+
 2012-05-29  Joseph Myers  <joseph@codesourcery.com>
 
 	* mt-sde: Fix typos.
 	* stdint.m4: Fix typos.
 	* tcl.m4: Fix typos.
+
+2012-05-03  Olivier Hainque  <hainque@adacore.com>
+
+	* mh-ppc-aix (LDFLAGS): Quote $(CC).
 
 2012-04-03  Tristan Gingold  <gingold@adacore.com>
 
