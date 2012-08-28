@@ -1,3 +1,20 @@
+2012-08-27  Walter Lee  <walt@tilera.com>
+
+	* tilegx.h (R_TILEGX_IMM16_X0_HW0_PLT_PCREL): New relocation.
+	(R_TILEGX_IMM16_X1_HW0_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW1_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X1_HW1_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW2_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X1_HW2_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW3_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X1_HW3_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW0_LAST_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X1_HW0_LAST_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW1_LAST_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X1_HW1_LAST_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW2_LAST_PLT_PCREL	): Ditto.
+	(R_TILEGX_IMM16_X1_HW2_LAST_PLT_PCREL): Ditto.
+	
 2012-08-13  Ian Bolton  <ian.bolton@arm.com>
             Laurent Desnogues  <laurent.desnogues@arm.com>
             Jim MacArthur  <jim.macarthur@arm.com>
