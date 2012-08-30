@@ -1,3 +1,8 @@
+2012-08-30  DJ Delorie  <dj@redhat.com>
+
+	* rx/rx.ld: Add W_* sections to .rodata.
+	* rx/rx-sim.ld: Likewise.
+
 2012-08-30  Kaushik Phatak  <kaushik.phatak@kpitcummins.com>
 
 	* cr16/sys/syscall.h: New file.

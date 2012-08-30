@@ -68,7 +68,7 @@ SECTIONS
   .rodata : {
     . = ALIGN(4);
     *(.plt)
-    *(.rodata C C_2 C_1 .rodata.* .gnu.linkonce.r.*)
+    *(.rodata C C_2 C_1 W W_2 W_1 .rodata.* .gnu.linkonce.r.*)
     *(.rodata1)
     *(.eh_frame_hdr)
     KEEP (*(.eh_frame))
