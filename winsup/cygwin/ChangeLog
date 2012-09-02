@@ -1,3 +1,10 @@
+2012-09-02  Jin-woo Ye <jojelino@gmail.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* pseudo-reloc.cc (auto_protect_for): New function.
+	(__write_memory): Call auto_protect_for to handle page protection.
+	(do_pseudo_reloc): Call auto_protect_for to restore old page protection.
+
 2012-08-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* pinfo.cc (pinfo::init): Remove assertion.
