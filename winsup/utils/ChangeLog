@@ -1,3 +1,8 @@
+2012-09-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Drop "not yet supported" text from
+	Windows 8.  Update products array.
+
 2012-07-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (cygcheck.exe): Link against psapi.dll.
