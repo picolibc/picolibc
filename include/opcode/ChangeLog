@@ -1,3 +1,29 @@
+2012-09-04  Sergey A. Guriev <sergey.a.guriev@intel.com>
+
+	* ia64.h (ia64_opnd): Add new operand types.
+
+	    Laurent Desnogues  <laurent.desnogues@arm.com>
+	    Jim MacArthur  <jim.macarthur@arm.com>
+	    Marcus Shawcroft  <marcus.shawcroft@arm.com>
+	    Nigel Stephens  <nigel.stephens@arm.com>
+	    Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+	    Richard Earnshaw  <rearnsha@arm.com>
+	    Sofiane Naci  <sofiane.naci@arm.com>
+	    Tejas Belagod  <tejas.belagod@arm.com>
+	    Yufeng Zhang  <yufeng.zhang@arm.com>
+	    Maciej W. Rozycki  <macro@codesourcery.com>
+	    Catherine Moore  <clm@codesourcery.com>
+	    Maciej W. Rozycki  <macro@codesourcery.com>
+	    Adam Nemet  <anemet@caviumnetworks.com>
+	    Maciej W. Rozycki  <macro@codesourcery.com>
+	    Maciej W. Rozycki  <macro@codesourcery.com>
+	(OPCODE_IS_MEMBER): Include R14000, R16000 in test.
+	    Joseph Myers  <joseph@codesourcery.com>
+	    Ian Lance Taylor  <ian@wasabisystems.com>
+	    Ben Elliston  <bje@wasabisystems.com>
+	    David Ung  <davidu@mips.com>
+	    Nigel Stephens  <nigel@mips.com>
+	    David Ung  <davidu@mips.com>
 2012-08-16  Ian Bolton  <ian.bolton@arm.com>
             Laurent Desnogues  <laurent.desnogues@arm.com>
             Jim MacArthur  <jim.macarthur@arm.com>
