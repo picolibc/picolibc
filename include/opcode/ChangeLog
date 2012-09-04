@@ -1,22 +1,26 @@
+2012-09-04  Sergey A. Guriev <sergey.a.guriev@intel.com>
+
+	* ia64.h (ia64_opnd): Add new operand types.
+
 2012-08-21  David S. Miller  <davem@davemloft.net>
 
 	* sparc.h (F3F4): New macro.
 
 2012-08-13  Ian Bolton  <ian.bolton@arm.com>
-            Laurent Desnogues  <laurent.desnogues@arm.com>
-            Jim MacArthur  <jim.macarthur@arm.com>
-            Marcus Shawcroft  <marcus.shawcroft@arm.com>
-            Nigel Stephens  <nigel.stephens@arm.com>
-            Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
-            Richard Earnshaw  <rearnsha@arm.com>
-            Sofiane Naci  <sofiane.naci@arm.com>
-            Tejas Belagod  <tejas.belagod@arm.com>
-            Yufeng Zhang  <yufeng.zhang@arm.com>
+	    Laurent Desnogues  <laurent.desnogues@arm.com>
+	    Jim MacArthur  <jim.macarthur@arm.com>
+	    Marcus Shawcroft  <marcus.shawcroft@arm.com>
+	    Nigel Stephens  <nigel.stephens@arm.com>
+	    Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+	    Richard Earnshaw  <rearnsha@arm.com>
+	    Sofiane Naci  <sofiane.naci@arm.com>
+	    Tejas Belagod  <tejas.belagod@arm.com>
+	    Yufeng Zhang  <yufeng.zhang@arm.com>
 
 	* aarch64.h: New file.
 
 2012-08-13  Richard Sandiford  <rdsandiford@googlemail.com>
-            Maciej W. Rozycki  <macro@codesourcery.com>
+	    Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h (mips_opcode): Add the exclusions field.
 	(OPCODE_IS_MEMBER): Remove macro.
@@ -24,8 +28,8 @@
 	(opcode_is_member): Likewise.
 
 2012-07-31  Chao-Ying Fu  <fu@mips.com>
-            Catherine Moore  <clm@codesourcery.com>
-            Maciej W. Rozycki  <macro@codesourcery.com>
+	    Catherine Moore  <clm@codesourcery.com>
+	    Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h: Document microMIPS DSP ASE usage.
 	(MICROMIPSOP_MASK_DSPACC, MICROMIPSOP_SH_DSPACC): Update for
@@ -110,7 +114,7 @@
 	(XRELEASE_PREFIX_OPCODE): Likewise.
 
 2011-12-08  Andrew Pinski  <apinski@cavium.com>
-            Adam Nemet  <anemet@caviumnetworks.com>
+	    Adam Nemet  <anemet@caviumnetworks.com>
 
 	* mips.h (INSN_CHIP_MASK): Update according to INSN_OCTEON2.
 	(INSN_OCTEON2): New macro.
@@ -141,7 +145,7 @@
 	F_FJFMAU, F_IMA, F_ASI_CACHE_SPARING): New flag bits.
 
 2011-08-09  Chao-ying Fu  <fu@mips.com>
-            Maciej W. Rozycki  <macro@codesourcery.com>
+	    Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h (OP_MASK_3BITPOS, OP_SH_3BITPOS): New macros.
 	(OP_MASK_OFFSET12, OP_SH_OFFSET12): Redefine.
@@ -187,7 +191,7 @@
 	(MICROMIPSOP_MASK_MAJOR, MICROMIPSOP_SH_MAJOR): Remove macros.
 
 2011-07-24  Chao-ying Fu  <fu@mips.com>
-            Maciej W. Rozycki  <macro@codesourcery.com>
+	    Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h (OP_MASK_EXTLSB, OP_SH_EXTLSB): New macros.
 	(OP_MASK_STYPE, OP_SH_STYPE): Likewise.
@@ -750,7 +754,7 @@
 2008-11-28  Joshua Kinard  <kumba@gentoo.org>
 
 	* mips.h: Define CPU_R14000, CPU_R16000.
-        (OPCODE_IS_MEMBER): Include R14000, R16000 in test.
+	(OPCODE_IS_MEMBER): Include R14000, R16000 in test.
 
 2008-11-18  Catherine Moore  <clm@codesourcery.com>
 
@@ -989,9 +993,9 @@
 	* i386.h: Replace CpuMNI with CpuSSSE3.
 
 2006-09-26  Mark Shinwell  <shinwell@codesourcery.com>
-            Joseph Myers  <joseph@codesourcery.com>
-            Ian Lance Taylor  <ian@wasabisystems.com>
-            Ben Elliston  <bje@wasabisystems.com>
+	    Joseph Myers  <joseph@codesourcery.com>
+	    Ian Lance Taylor  <ian@wasabisystems.com>
+	    Ben Elliston  <bje@wasabisystems.com>
 
 	* arm.h (ARM_CEXT_IWMMXT2, ARM_ARCH_IWMMXT2): Define.
 
@@ -1034,18 +1038,18 @@
 	* m68k.h (mcf_mask): Define.
 
 2006-05-05  Thiemo Seufer  <ths@mips.com>
-            David Ung  <davidu@mips.com>
+	    David Ung  <davidu@mips.com>
 
 	* mips.h (enum): Add macro M_CACHE_AB.
 
 2006-05-04  Thiemo Seufer  <ths@mips.com>
-            Nigel Stephens  <nigel@mips.com>
+	    Nigel Stephens  <nigel@mips.com>
 	    David Ung  <davidu@mips.com>
 
 	* mips.h: Add INSN_SMARTMIPS define.
 
 2006-04-30  Thiemo Seufer  <ths@mips.com>
-            David Ung  <davidu@mips.com>
+	    David Ung  <davidu@mips.com>
 
 	* mips.h: Defines udi bits and masks.  Add description of
 	characters which may appear in the args field of udi
