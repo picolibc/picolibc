@@ -1,3 +1,13 @@
+2012-09-12  Mike Wrighton  <wrighton@codesourcery.com>
+
+	* gdb/remote.c (remote_insert_hw_breakpoint): Throw exception if
+	there is an error inserting hardware breakpoints and use the
+	error message from the target.
+
+	* gdb/breakpoint.c (insert_bp_location, insert_breakpoint_locations):
+	Catch this exception and print the error message contained within. Do not
+	print the default hardware error breakpoint message in this case.	
+
 2012-08-26  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR binutils/4970
