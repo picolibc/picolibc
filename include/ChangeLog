@@ -1,3 +1,7 @@
+2012-09-12  Chris Schlumberger-Socha  <chris.schlumberger-socha@arm.com>
+
+	* elf/aarch64.h (R_AARCH64_GOT_LD_PREL19): New reloc.
+
 2012-09-06  Cary Coutant  <ccoutant@google.com>
 
 	* dwarf2.def: Edit comment.
