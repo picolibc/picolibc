@@ -2,7 +2,7 @@
  * The common part of the default linker scripts for standalone
  * executables running on a Moxie processor.
  *
- * Copyright (C) 2008 Anthony Green
+ * Copyright (C) 2008, 2012 Anthony Green
  *
  * The authors hereby grant permission to use, copy, modify,
  * distribute, and license this software and its documentation for any
@@ -15,7 +15,8 @@
  * clearly indicated on the first page of each file where they apply.
  */
 
-OUTPUT_FORMAT("elf32-moxie")
+OUTPUT_FORMAT("elf32-bigmoxie", "elf32-bigmoxie",
+              "elf32-littlemoxie")
 OUTPUT_ARCH(moxie)
 ENTRY(_start)
 SECTIONS

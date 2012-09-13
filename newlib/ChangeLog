@@ -1,3 +1,8 @@
+2012-09-13  Anthony Green  <green@moxielogic.com>
+
+	* libc/include/machine/ieeefp.h (__IEEE_BIG_ENDIAN): Add bi-endian
+	support for moxie.
+
 2012-08-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* libc/stdio/flags.c (__sflags): Guard against using O_BINARY on

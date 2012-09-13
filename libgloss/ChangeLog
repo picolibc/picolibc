@@ -1,3 +1,7 @@
+2012-09-13  Anthony Green  <green@moxielogic.com>
+
+	* moxie/moxie-elf-common.ld: Add bi-endian support.
+
 2012-08-30  DJ Delorie  <dj@redhat.com>
 
 	* rx/rx.ld: Add W_* sections to .rodata.
