@@ -867,7 +867,8 @@ loop:
 	}
       else
 	{
-	  close_all_files (true);
+	  if (iscygwin ())
+	    close_all_files (true);
 	  if (!my_wr_proc_pipe
 	      && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
 	    wait_for_myself ();

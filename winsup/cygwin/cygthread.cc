@@ -90,12 +90,6 @@ cygthread::stub (VOID *arg)
 #endif
       else
 	{
-	  if (exiting)
-	    {
-	      info->inuse = false;	// FIXME: Do we need this?
-	      return 0;
-	    }
-
 	  info->callfunc (false);
 
 	  HANDLE notify = info->notify_detached;

@@ -24,3 +24,7 @@ Bug fixes:
 
 - Prefer to call WSARecvMsg from recvmsg if possible.
   Fixes: http://cygwin.com/ml/cygwin/2012-07/msg00662.html
+
+- Correct hang typified by running "procps" after Cygwin has started a
+  Windows process.
+  Fixes: http://cygwin.com/ml/cygwin/2012-05/threads.html#00349

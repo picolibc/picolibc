@@ -1,3 +1,9 @@
+2012-09-13  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygthread.cc (cygthread::stub): Remove old, unnecessary, FIXMEd code.
+	* spawn.cc (child_info_spawn::worker): Avoid calling close_all_files()
+	twice.
+
 2012-09-02  Jin-woo Ye <jojelino@gmail.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
