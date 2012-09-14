@@ -1,3 +1,13 @@
+2012-09-14  David Edelsohn  <dje.gcc@gmail.com>
+
+	PR target/38607
+	Merge upstream change.
+	* libtool.m4 (_LT_COMPILER_PIC): Add -fPIC to GCC and GXX for AIX.
+
+	* configure.ac: Add target-libquadmath to noconfigdirs for AIX.
+	Add libgomp*.o to compare_exclusions for AIX.
+	* configure: Regenerate.
+
 2012-09-12  Mike Wrighton  <wrighton@codesourcery.com>
 
 	* gdb/remote.c (remote_insert_hw_breakpoint): Throw exception if
@@ -6,7 +16,7 @@
 
 	* gdb/breakpoint.c (insert_bp_location, insert_breakpoint_locations):
 	Catch this exception and print the error message contained within. Do not
-	print the default hardware error breakpoint message in this case.	
+	print the default hardware error breakpoint message in this case.
 
 2012-08-26  H.J. Lu  <hongjiu.lu@intel.com>
 
