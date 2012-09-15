@@ -1,3 +1,8 @@
+2012-09-15  Jiong Wang  <jiwang@tilera.com>
+
+	* configure.ac (ENABLE_GOLD): support tilegx*
+	* configure: rebuild
+
 2012-09-14  David Edelsohn  <dje.gcc@gmail.com>
 
 	PR target/38607
