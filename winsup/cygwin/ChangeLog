@@ -1,3 +1,8 @@
+2012-09-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (pinfo::init): Detect potential race where short block has
+	been retrieved but PID_EXECED flag is not set.
+
 2012-09-13  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* cygthread.cc (cygthread::stub): Remove old, unnecessary, FIXMEd code.

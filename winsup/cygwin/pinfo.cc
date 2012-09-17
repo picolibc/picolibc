@@ -299,6 +299,15 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
       bool created = shloc != SH_JUSTOPEN;
 
+      /* Detect situation where a transitional memory block is being retrieved.
+	 If the block has been allocated with PINFO_REDIR_SIZE but not yet
+	 updated with a PID_EXECED state then we'll retry.  */
+      MEMORY_BASIC_INFORMATION mbi;
+      if (!created && procinfo->exists ()
+	  && VirtualQuery (procinfo, &mbi, sizeof (mbi))
+	  && mbi.RegionSize < sizeof (_pinfo))
+	goto loop;
+
       if (!created && createit && (procinfo->process_state & PID_REAPED))
 	{
 	  memset (procinfo, 0, sizeof (*procinfo));
