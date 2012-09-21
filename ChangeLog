@@ -1,3 +1,8 @@
+2012-09-21  Steve Ellcey  <sellcey@mips.com>
+
+	* configure.ac: Add mips*-mti-elf* target.
+	* configure: Regenerate.
+
 2012-09-19  Ian Lance Taylor  <iant@google.com>
 
 	* configure.ac (host_libs): Add libbacktrace.
