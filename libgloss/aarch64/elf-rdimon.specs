@@ -1,0 +1,7 @@
+%rename lib libc
+
+*libgloss:
+-lrdimon
+
+*lib:
+--start-group %(libc) %(libgloss) --end-group

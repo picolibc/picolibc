@@ -1,3 +1,29 @@
+2012-09-26  Ian Bolton  <ian.bolton@arm.com>
+        Jim MacArthur  <jim.macarthur@arm.com>
+        Marcus Shawcroft  <marcus.shawcroft@arm.com>
+        Nigel Stephens  <nigel.stephens@arm.com>
+        Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+        Richard Earnshaw  <rearnsha@arm.com>
+        Sofiane Naci  <sofiane.naci@arm.com>
+        Tejas Belagod  <tejas.belagod@arm.com>
+        Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* aarch64/Makefile.in: New file.
+	* aarch64/_exit.c: New file.
+	* aarch64/_kill.c: New file.
+	* aarch64/aclocal.m4: Generated.
+	* aarch64/configure: Generated.
+	* aarch64/configure.in: New file.
+	* aarch64/cpu-init/Makefile.in: New file.
+	* aarch64/cpu-init/rdimon-aem-el3.S: New file.
+	* aarch64/crt0.S: New file.
+	* aarch64/elf-rdimon.specs: New file.
+	* aarch64/libcfunc.c: New file.
+	* aarch64/svc.h: New file.
+	* aarch64/syscalls.c: New file.
+	* configure.in: Add AArch64.
+	* configure: Re-generated.
+
 2012-09-13  Anthony Green  <green@moxielogic.com>
 
 	* moxie/moxie-elf-common.ld: Add bi-endian support.
