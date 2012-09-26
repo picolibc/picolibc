@@ -4,6 +4,10 @@
 #include <machine/ieeefp.h>  /* floating point macros */
 #include <sys/features.h>	/* POSIX defs */
 
+#ifdef __aarch64__
+#define MALLOC_ALIGNMENT 16
+#endif
+
 /* exceptions first */
 #if defined(__H8500__) || defined(__W65__)
 #define __SMALL_BITFIELDS

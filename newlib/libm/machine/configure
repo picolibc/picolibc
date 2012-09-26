@@ -784,7 +784,8 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP'
-ac_subdirs_all='i386
+ac_subdirs_all='aarch64
+i386
 spu'
 
 # Initialize some variables set by options.
@@ -11413,7 +11414,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11416 "configure"
+#line 11417 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11519,7 +11520,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11522 "configure"
+#line 11523 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11762,9 +11763,11 @@ machlib=
 
 if test -n "${libm_machine_dir}"; then
   case ${libm_machine_dir} in
-	i386)
+	aarch64)
 
-subdirs="$subdirs i386"
+subdirs="$subdirs aarch64"
+ ;;
+	i386) subdirs="$subdirs i386"
  ;;
 	spu) subdirs="$subdirs spu"
  ;;
