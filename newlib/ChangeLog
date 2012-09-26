@@ -1,3 +1,7 @@
+2012-09-26  Michael Hope  <michael.hope@linaro.org>
+
+	* doc/makedoc.c (dup_): Rename to avoid colliding with dup(2). 
+
 2012-09-13  Anthony Green  <green@moxielogic.com>
 
 	* libc/include/machine/ieeefp.h (__IEEE_BIG_ENDIAN): Add bi-endian
