@@ -1,3 +1,7 @@
+2012-09-27  Anthony Green  <green@moxielogic.com>
+
+	* opcode/moxie.h (MOXIE_BAD): New define.
+
 2012-09-12  Chris Schlumberger-Socha  <chris.schlumberger-socha@arm.com>
 
 	* elf/aarch64.h (R_AARCH64_GOT_LD_PREL19): New reloc.
