@@ -1,1 +1,0 @@
-/* ttychars.h */
