@@ -43,7 +43,7 @@ More Documentation
 ==================
 
    Newlib documentation is available on the net via:
-   http://sources.redhat.com/newlib/docs.html
+   http://sourceware.org/newlib/docs.html
 
    All the documentation for NEWLIB comes as part of the machine-readable
 distribution.  The documentation is written in Texinfo format, which is
@@ -379,11 +379,11 @@ Reporting Bugs
 ==============
 
 The correct address for reporting bugs found in NEWLIB is
-"newlib@sources.redhat.com".  Please email all bug reports to that
+"newlib@sourceware.org".  Please email all bug reports to that
 address.  Please include the NEWLIB version number (e.g., newlib-1.20.0),
 and how you configured it (e.g., "sun4 host and m68k-aout target").
 Since NEWLIB supports many different configurations, it is important
 that you be precise about this.
 
 Archives of the newlib mailing list are on-line, see
-	http://sources.redhat.com/ml/newlib/
+	http://sourceware.org/ml/newlib/
