@@ -1,3 +1,8 @@
+2012-10-01  DJ Delorie  <dj@redhat.com>
+
+	* v850/sbrk.c (_sbrk): Change heap_start to be an array of
+	undefined size, to avoid problems when compiled with -msda=4.
+
 2012-09-26  Ian Bolton  <ian.bolton@arm.com>
         Jim MacArthur  <jim.macarthur@arm.com>
         Marcus Shawcroft  <marcus.shawcroft@arm.com>
