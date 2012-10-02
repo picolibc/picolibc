@@ -52,7 +52,7 @@ case "${target}" in
   mips*-tx39*-*|mipstx39*-*-*)
         part_specific_obj=
 	part_specific_defines=
-        script_list="dve idt jmr3904app jmr3904dram jmr3904dram-java jmr3904app-java"
+        script_list="dve idt jmr3904app jmr3904dram jmr3904dram-java jmr3904app-java sde32 sde64 mti32 mti64 mti64_n32 mti64_64"
         bsp_list="libdve.a libidt.a libjmr3904.a"
         ;;
   mipsisa32-*-* | mipsisa32el-*-* | \
@@ -86,7 +86,7 @@ case "${target}" in
 	crt0="crt0_cfe.o crt0.o"
         part_specific_obj="vr4300.o cma101.o"
 	part_specific_defines=
-        script_list="idt pmon ddb ddb-kseg0 lsi cfe idtecoff nullmon"
+        script_list="idt pmon ddb ddb-kseg0 lsi cfe idtecoff nullmon sde32 sde64 mti32 mti64 mti64_n32 mti64_64"
         bsp_list="libidt.a libpmon.a liblsi.a libcfe.a libnullmon.a"
         ;;
 esac
