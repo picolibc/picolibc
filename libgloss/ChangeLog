@@ -1,3 +1,9 @@
+2012-10-03  DJ Delorie  <dj@redhat.com>
+
+	* rl78/crt0.S (_interrupt_vector_table): Convert from CPP macros
+	to GAS macros, to avoid dependence on the line separation
+	character.
+
 2012-10-01  DJ Delorie  <dj@redhat.com>
 
 	* v850/sbrk.c (_sbrk): Change heap_start to be an array of

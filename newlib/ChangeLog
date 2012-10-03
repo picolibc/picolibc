@@ -1,3 +1,8 @@
+2012-10-03  DJ Delorie  <dj@redhat.com>
+
+	* libc/machine/rl78/setjmp.S: Convert from CPP macros to GAS
+	macros, to avoid dependence on the line separation character.
+
 2012-10-01  DJ Delorie  <dj@redhat.com>
 
 	* libc/sys/sysnecv850/sbrk.c (_sbrk): Change heap_start to be an
