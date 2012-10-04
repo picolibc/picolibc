@@ -1,3 +1,7 @@
+2012-10-04  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* s390.h (s390_opcode_cpu_val): Add S390_OPCODE_ZEC12.
+
 2012-09-04  Sergey A. Guriev <sergey.a.guriev@intel.com>
 
 	* ia64.h (ia64_opnd): Add new operand types.
