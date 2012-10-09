@@ -18,8 +18,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/queue.h>
 
 #include <wordexp.h>
+#include "wordexp2.h"
 
 #define MAXLINELEN 500
 
@@ -41,9 +43,9 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
   int fd[2];
   int fd_err[2];
   int err = WRDE_NOSPACE;
-  char **wordv;
-  char *ewords = NULL;
+  ext_wordv_t *wordv = NULL;
   char *eword;
+  struct ewords_entry *entry;
 
   if (pwordexp == NULL)
     {
@@ -63,10 +65,14 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
     {
       offs = pwordexp->we_offs;
 
-      wordv = (char **)realloc(pwordexp->we_wordv, (pwordexp->we_wordc + offs + 1) * sizeof(char *));
+      if (pwordexp->we_wordv)
+        wordv = WE_WORDV_TO_EXT_WORDV(pwordexp->we_wordv);
+      wordv = (ext_wordv_t *)realloc(wordv, sizeof(ext_wordv_t) + (offs + pwordexp->we_wordc) * sizeof(char *));
       if (!wordv)
         return err;
-      pwordexp->we_wordv = wordv;
+      if (!pwordexp->we_wordv)
+        SLIST_INIT(&wordv->list);
+      pwordexp->we_wordv = wordv->we_wordv;
 
       for (i = 0; i < offs; i++)
         pwordexp->we_wordv[i] = NULL;
@@ -142,11 +148,14 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
 
       num_words = atoi(tmp);
 
-      wordv = (char **)realloc(pwordexp->we_wordv,
-                               (pwordexp->we_wordc + num_words + offs + 1) * sizeof(char *));
+      if (pwordexp->we_wordv)
+        wordv = WE_WORDV_TO_EXT_WORDV(pwordexp->we_wordv);
+      wordv = (ext_wordv_t *)realloc(wordv, sizeof(ext_wordv_t) + (offs + pwordexp->we_wordc + num_words) * sizeof(char *));
       if (!wordv)
-        goto cleanup;
-      pwordexp->we_wordv = wordv;
+        return err;
+      if (!pwordexp->we_wordv)
+        SLIST_INIT(&wordv->list);
+      pwordexp->we_wordv = wordv->we_wordv;
 
       /* Get number of bytes required for storage of all num_words words. */
       if (!fgets(tmp, MAXLINELEN, f))
@@ -157,36 +166,32 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
 
       num_bytes = atoi(tmp);
 
+      if (!(entry = (struct ewords_entry *)malloc(sizeof(struct ewords_entry) + num_bytes + num_words)))
+        goto cleanup;
+      SLIST_INSERT_HEAD(&wordv->list, entry, next);
+
       /* Get expansion from the shell output. */
-      if (!(ewords = (char *)malloc(num_bytes + num_words + 1)))
+      if (!fread(entry->ewords, 1, num_bytes + num_words, f))
         goto cleanup;
-      if (!fread(ewords, 1, num_bytes + num_words, f))
-        goto cleanup;
-      ewords[num_bytes + num_words] = 0;
+      entry->ewords[num_bytes + num_words] = 0;
 
       /* Store each entry in pwordexp's we_wordv vector. */
-      eword = ewords;
-      for(i = 0; i < num_words; i++)
+      eword = entry->ewords;
+      for(i = 0; i < num_words; i++, eword = iter)
         {
-          if (eword && (iter = strchr(eword, '\n')))
-            *iter = '\0';
-
-          if (!eword ||
-              !(pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = strdup(eword)))
-            {
-              pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = NULL;
-              pwordexp->we_wordc += i;
-              goto cleanup;
-            }
-          eword = iter ? iter + 1 : iter;
+          if (!eword)
+            break;
+          pwordexp->we_wordv[offs + pwordexp->we_wordc + i] = eword;
+          if ((iter = strchr(eword, '\n')))
+            *iter++ = '\0';
         }
 
-      pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = NULL;
+      pwordexp->we_wordv[offs + pwordexp->we_wordc + i] = NULL;
       pwordexp->we_wordc += num_words;
-      err = WRDE_SUCCESS;
+      if (i == num_words)
+        err = WRDE_SUCCESS;
 
 cleanup:
-      free(ewords);
       if (f)
         fclose(f);
       else
