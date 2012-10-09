@@ -1,5 +1,10 @@
 2012-10-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* child_info.h (child_info_spawn::has_execed): Remove unneeded
+	synchronization.
+
+2012-10-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* pinfo.cc: Remove unneeded assert.h.
 
 2012-09-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
