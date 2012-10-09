@@ -1433,15 +1433,21 @@ dump_sysinfo ()
 	  BOOL (WINAPI *GetProductInfo) (DWORD, DWORD, DWORD, DWORD, PDWORD) =
 		  (BOOL (WINAPI *)(DWORD, DWORD, DWORD, DWORD, PDWORD))
 		  GetProcAddress (k32, "GetProductInfo");
-	  if (osversion.dwMinorVersion == 0)
-	    strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			    ? "Vista" : "2008");
-	  else if (osversion.dwMinorVersion == 1)
-	    strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			    ? "7" : "2008 R2");
-	  else if (osversion.dwMinorVersion == 2)
-	    strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			    ? "8" : "Server 2012 (not yet supported!)");
+	  switch (osversion.dwMinorVersion)
+	    {
+	    case 0:
+	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+			      ? "Vista" : "2008");
+	      break;
+	    case 1:
+	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+			      ? "7" : "2008 R2");
+	      break;
+	    default:
+	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+			      ? "8" : "2012");
+	      break;
+	    }
 	  DWORD prod;
 	  if (GetProductInfo (osversion.dwMajorVersion,
 			      osversion.dwMinorVersion,
