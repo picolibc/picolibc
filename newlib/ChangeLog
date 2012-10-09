@@ -1,3 +1,7 @@
+2012-10-09  Peter Rosin  <peda@lysator.liu.se>
+
+	* libc/posix/wordexp.c (wordexp): Don't leak file streams.
+
 2012-10-03  DJ Delorie  <dj@redhat.com>
 
 	* libc/machine/rl78/setjmp.S: Convert from CPP macros to GAS

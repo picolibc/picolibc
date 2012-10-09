@@ -143,8 +143,8 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
       pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = NULL;
       pwordexp->we_wordc += num_words;
 
-      close(fd[0]);
-      close(fd_err[0]);
+      fclose(f);
+      fclose(f_err);
 
       /* Wait for child to finish. */
       waitpid (pid, NULL, 0);
