@@ -1,3 +1,7 @@
+2012-10-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc: Remove unneeded assert.h.
+
 2012-09-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* pinfo.cc (pinfo::init): Detect potential race where short block has

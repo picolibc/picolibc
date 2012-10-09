@@ -21,7 +21,6 @@ details. */
 #include "pinfo.h"
 #include "perprocess.h"
 #include "environ.h"
-#include <assert.h>
 #include "ntdll.h"
 #include "shared_info.h"
 #include "cygheap.h"
