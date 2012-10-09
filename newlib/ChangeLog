@@ -1,5 +1,10 @@
 2012-10-09  Peter Rosin  <peda@lysator.liu.se>
 
+	* libc/posix/wordexp.c (wordexp): Return WRDE_NOSPACE on resource
+	allocation failure. Cleanup leftover resources when failing.
+
+2012-10-09  Peter Rosin  <peda@lysator.liu.se>
+
 	* libc/posix/wordexp.c (wordexp): Handle expanded words longer
 	than 500 bytes.
 

@@ -29,8 +29,8 @@
 int
 wordexp(const char *words, wordexp_t *pwordexp, int flags)
 {
-  FILE *f;
-  FILE *f_err;
+  FILE *f = NULL;
+  FILE *f_err = NULL;
   char tmp[MAXLINELEN];
   int i = 0;
   int offs = 0;
@@ -40,8 +40,9 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
   int num_bytes = 0;
   int fd[2];
   int fd_err[2];
-  int err = 0;
-  char *ewords;
+  int err = WRDE_NOSPACE;
+  char **wordv;
+  char *ewords = NULL;
   char *eword;
 
   if (pwordexp == NULL)
@@ -62,18 +63,35 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
     {
       offs = pwordexp->we_offs;
 
-      if(!(pwordexp->we_wordv = (char **)realloc(pwordexp->we_wordv, (pwordexp->we_wordc + offs + 1) * sizeof(char *))))
-        return WRDE_NOSPACE;
+      wordv = (char **)realloc(pwordexp->we_wordv, (pwordexp->we_wordc + offs + 1) * sizeof(char *));
+      if (!wordv)
+        return err;
+      pwordexp->we_wordv = wordv;
 
       for (i = 0; i < offs; i++)
         pwordexp->we_wordv[i] = NULL;
     }
 
-  pipe(fd);
-  pipe(fd_err);
+  if (pipe(fd))
+    return err;
+  if (pipe(fd_err))
+    {
+      close(fd[0]);
+      close(fd[1]);
+      return err;
+    }
   pid = fork();
 
-  if (pid > 0)
+  if (pid == -1)
+    {
+      /* In "parent" process, but fork failed */
+      close(fd_err[0]);
+      close(fd_err[1]);
+      close(fd[0]);
+      close(fd[1]);
+      return err;
+    }
+  else if (pid > 0)
     {
       /* In parent process. */
 
@@ -82,7 +100,8 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
       close(fd_err[1]);
 
       /* f_err is the standard error from the shell command. */
-      f_err = fdopen(fd_err[0], "r");
+      if (!(f_err = fdopen(fd_err[0], "r")))
+        goto cleanup;
 
       /* Check for errors. */
       if (fgets(tmp, MAXLINELEN, f_err))
@@ -107,26 +126,31 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
                 fprintf(stderr, tmp);
             }
 
-          return err;
+          goto cleanup;
         }
 
       /* f is the standard output from the shell command. */
-      f = fdopen(fd[0], "r");
+      if (!(f = fdopen(fd[0], "r")))
+        goto cleanup;
 
       /* Get number of words expanded by shell. */
-      fgets(tmp, MAXLINELEN, f);
+      if (!fgets(tmp, MAXLINELEN, f))
+        goto cleanup;
 
       if((iter = strchr(tmp, '\n')))
           *iter = '\0';
 
       num_words = atoi(tmp);
 
-      if(!(pwordexp->we_wordv = (char **)realloc(pwordexp->we_wordv,
-                                                 (pwordexp->we_wordc + num_words + offs + 1) * sizeof(char *))))
-        return WRDE_NOSPACE;
+      wordv = (char **)realloc(pwordexp->we_wordv,
+                               (pwordexp->we_wordc + num_words + offs + 1) * sizeof(char *));
+      if (!wordv)
+        goto cleanup;
+      pwordexp->we_wordv = wordv;
 
       /* Get number of bytes required for storage of all num_words words. */
-      fgets(tmp, MAXLINELEN, f);
+      if (!fgets(tmp, MAXLINELEN, f))
+        goto cleanup;
 
       if((iter = strchr(tmp, '\n')))
           *iter = '\0';
@@ -135,8 +159,9 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
 
       /* Get expansion from the shell output. */
       if (!(ewords = (char *)malloc(num_bytes + num_words + 1)))
-        return WRDE_NOSPACE;
-      fread(ewords, 1, num_bytes + num_words, f);
+        goto cleanup;
+      if (!fread(ewords, 1, num_bytes + num_words, f))
+        goto cleanup;
       ewords[num_bytes + num_words] = 0;
 
       /* Store each entry in pwordexp's we_wordv vector. */
@@ -146,23 +171,35 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
           if (eword && (iter = strchr(eword, '\n')))
             *iter = '\0';
 
-          if (eword)
-            eword = strdup(eword);
-          pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = eword;
+          if (!eword ||
+              !(pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = strdup(eword)))
+            {
+              pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = NULL;
+              pwordexp->we_wordc += i;
+              goto cleanup;
+            }
           eword = iter ? iter + 1 : iter;
         }
 
       pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = NULL;
       pwordexp->we_wordc += num_words;
+      err = WRDE_SUCCESS;
 
+cleanup:
       free(ewords);
-      fclose(f);
-      fclose(f_err);
+      if (f)
+        fclose(f);
+      else
+        close(fd[0]);
+      if (f_err)
+        fclose(f_err);
+      else
+        close(fd_err[0]);
 
       /* Wait for child to finish. */
       waitpid (pid, NULL, 0);
 
-      return WRDE_SUCCESS;
+      return err;
     }
   else
     {
@@ -175,7 +212,8 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
       /* Pipe standard output to parent process via fd. */
       if (fd[1] != STDOUT_FILENO)
         {
-          dup2(fd[1], STDOUT_FILENO);
+          if (dup2(fd[1], STDOUT_FILENO) == -1)
+            _exit(EXIT_FAILURE);
           /* fd[1] no longer required. */
           close(fd[1]);
         }
@@ -183,7 +221,8 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
       /* Pipe standard error to parent process via fd_err. */
       if (fd_err[1] != STDERR_FILENO)
         {
-          dup2(fd_err[1], STDERR_FILENO);
+          if (dup2(fd_err[1], STDERR_FILENO) == -1)
+            _exit(EXIT_FAILURE);
           /* fd_err[1] no longer required. */
           close(fd_err[1]);
         }
@@ -192,6 +231,7 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
         execl("/bin/bash", "bash", "--protected", "--wordexp", words, (char *)0);
       else
         execl("/bin/bash", "bash", "--wordexp", words, (char *)0);
+      _exit(EXIT_FAILURE);
     }
   return WRDE_SUCCESS;
 }
