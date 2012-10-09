@@ -1,5 +1,10 @@
 2012-10-09  Peter Rosin  <peda@lysator.liu.se>
 
+	* libc/posix/wordexp.c (wordexp): Handle expanded words longer
+	than 500 bytes.
+
+2012-10-09  Peter Rosin  <peda@lysator.liu.se>
+
 	* libc/posix/wordexp.c (wordexp): Don't leak file streams.
 
 2012-10-03  DJ Delorie  <dj@redhat.com>

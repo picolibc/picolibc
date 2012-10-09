@@ -37,9 +37,12 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
   char *iter;
   pid_t pid;
   int num_words = 0;
+  int num_bytes = 0;
   int fd[2];
   int fd_err[2];
   int err = 0;
+  char *ewords;
+  char *eword;
 
   if (pwordexp == NULL)
     {
@@ -122,27 +125,37 @@ wordexp(const char *words, wordexp_t *pwordexp, int flags)
                                                  (pwordexp->we_wordc + num_words + offs + 1) * sizeof(char *))))
         return WRDE_NOSPACE;
 
-      /* Get number of bytes required for storage of num_words words. */
+      /* Get number of bytes required for storage of all num_words words. */
       fgets(tmp, MAXLINELEN, f);
 
       if((iter = strchr(tmp, '\n')))
           *iter = '\0';
 
-      /* Get each expansion from the shell output, and store each in
-         pwordexp's we_wordv vector. */
+      num_bytes = atoi(tmp);
+
+      /* Get expansion from the shell output. */
+      if (!(ewords = (char *)malloc(num_bytes + num_words + 1)))
+        return WRDE_NOSPACE;
+      fread(ewords, 1, num_bytes + num_words, f);
+      ewords[num_bytes + num_words] = 0;
+
+      /* Store each entry in pwordexp's we_wordv vector. */
+      eword = ewords;
       for(i = 0; i < num_words; i++)
         {
-          fgets(tmp, MAXLINELEN, f);
-
-          if((iter = strchr(tmp, '\n')))
+          if (eword && (iter = strchr(eword, '\n')))
             *iter = '\0';
 
-          pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = strdup(tmp);
+          if (eword)
+            eword = strdup(eword);
+          pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = eword;
+          eword = iter ? iter + 1 : iter;
         }
 
       pwordexp->we_wordv[pwordexp->we_wordc + offs + i] = NULL;
       pwordexp->we_wordc += num_words;
 
+      free(ewords);
       fclose(f);
       fclose(f_err);
 
