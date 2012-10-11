@@ -1,3 +1,8 @@
+2012-10-10  David Holsgrove  <david.holsgrove@xilinx.com>
+
+	* config.guess, config.sub: Include updated version from
+	config-patches.  Adds microblaze little endian support.
+
 2012-09-28  Ian Lance Taylor  <iant@google.com>
 
 	* Makefile.def: Make all-target-libgo depend on
