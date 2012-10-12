@@ -1,3 +1,13 @@
+2012-10-11  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Don't manipulate
+	output_mutex on CTRL-S/CTRL-Q to avoid a deadlock.
+	* fhandler_tty.cc (fhandler_pty_slave::write): Loop when output_stopped
+	is detected before acquiring output_mutex.  Acquire output_mutex in the
+	loop for each write.
+	* tty.h: Remove some obsolete defines.
+	(tty_min::output_stopped): Make 'bool'.
+
 2012-10-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/in.h (struct in_addr): Guard with s_addr to avoid
