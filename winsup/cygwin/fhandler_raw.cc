@@ -1,7 +1,7 @@
 /* fhandler_raw.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2011
-   Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2011,
+   2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -59,7 +59,7 @@ int
 fhandler_dev_raw::open (int flags, mode_t)
 {
   /* Check for illegal flags. */
-  if (get_major () != DEV_TAPE_MAJOR && (flags & (O_APPEND | O_EXCL)))
+  if (get_major () != DEV_TAPE_MAJOR && (flags & O_APPEND))
     {
       set_errno (EINVAL);
       return 0;
