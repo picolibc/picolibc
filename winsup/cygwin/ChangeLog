@@ -1,3 +1,36 @@
+2012-10-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_raw): Add members devbufalloc and
+	devbufalign.
+	(class fhandler_dev_floppy): Remove member bytes_per_sector;
+	* fhandler_floppy.cc (bytes_per_sector): Define as devbufalign.
+	(fhandler_dev_floppy::open): Set devbufalign to a multiple of the
+	sector size and handle devbuf allocation and alignment in !O_DIRECT
+	case here.  Change comment accordingly.
+	Call FSCTL_ALLOW_EXTENDED_DASD_IO for partitions as well.
+	(fhandler_dev_floppy::raw_write): Fix comment.  Rewrite and fix
+	writing behaviour when application uses read and lseek.
+	(fhandler_dev_floppy::lseek): Use rounddown macro.  Call
+	SetFilePointerEx rather than the old SetFilePointer.
+	(fhandler_dev_floppy::ioctl): Reformat switch.  Call
+	IOCTL_DISK_UPDATE_PROPERTIES rather than IOCTL_DISK_UPDATE_DRIVE_SIZE
+	in BLKRRPART case.  Support BLKIOMIN, BLKIOOPT, BLKPBSZGET and
+	BLKALIGNOFF.
+	* fhandler_raw.cc (fhandler_dev_raw::fhandler_dev_raw): Initialize
+	all devbuf-related members.
+	(fhandler_dev_raw::~fhandler_dev_raw): Delete devbufalloc rather than
+	devbuf.
+	(fhandler_dev_raw::open): Drop allocating devbuf.
+	(fhandler_dev_raw::dup): Allocate devbufalloc and set devbuf to support
+	new sector-aligned devbuf handling.
+	(fhandler_dev_raw::fixup_after_exec): Ditto.
+	* fhandler_tape.cc (fhandler_dev_tape::open): Ditto, set devbufalign
+	to 1.
+	* include/cygwin/fs.h (BLKIOMIN): Define.
+	(BLKIOOPT): Define.
+	(BLKALIGNOFF): Define.
+	(BLKPBSZGET): Define.
+
 2012-10-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_raw.cc (fhandler_dev_raw::open): Allow O_EXCL flag, as on

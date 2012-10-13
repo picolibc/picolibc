@@ -798,7 +798,9 @@ class fhandler_mailslot : public fhandler_base_overlapped
 class fhandler_dev_raw: public fhandler_base
 {
  protected:
+  char *devbufalloc;
   char *devbuf;
+  size_t devbufalign;
   size_t devbufsiz;
   size_t devbufstart;
   size_t devbufend;
@@ -856,7 +858,6 @@ class fhandler_dev_floppy: public fhandler_dev_raw
 {
  private:
   _off64_t drive_size;
-  unsigned long bytes_per_sector;
   part_t *partitions;
   struct status_flags
   {

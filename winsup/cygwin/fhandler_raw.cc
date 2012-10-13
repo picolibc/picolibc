@@ -13,6 +13,7 @@
 
 #include <cygwin/rdevio.h>
 #include <sys/mtio.h>
+#include <sys/param.h>
 #include "cygerrno.h"
 #include "path.h"
 #include "fhandler.h"
@@ -21,7 +22,14 @@
 /* fhandler_dev_raw */
 
 fhandler_dev_raw::fhandler_dev_raw ()
-  : fhandler_base (), status ()
+  : fhandler_base (),
+    devbufalloc (NULL),
+    devbuf (NULL),
+    devbufalign (0),
+    devbufsiz (0),
+    devbufstart (0),
+    devbufend (0),
+    status ()
 {
   need_fork_fixup (true);
 }
@@ -29,7 +37,7 @@ fhandler_dev_raw::fhandler_dev_raw ()
 fhandler_dev_raw::~fhandler_dev_raw ()
 {
   if (devbufsiz > 1L)
-    delete [] devbuf;
+    delete [] devbufalloc;
 }
 
 int __stdcall
@@ -74,8 +82,6 @@ fhandler_dev_raw::open (int flags, mode_t)
     flags = ((flags & ~O_WRONLY) | O_RDWR);
 
   int res = fhandler_base::open (flags, 0);
-  if (res && devbufsiz > 1L)
-    devbuf = new char [devbufsiz];
 
   return res;
 }
@@ -90,7 +96,12 @@ fhandler_dev_raw::dup (fhandler_base *child, int flags)
       fhandler_dev_raw *fhc = (fhandler_dev_raw *) child;
 
       if (devbufsiz > 1L)
-	fhc->devbuf = new char [devbufsiz];
+	{
+	  /* Create sector-aligned buffer */
+	  fhc->devbufalloc = new char [devbufsiz + devbufalign];
+	  fhc->devbuf = (char *) roundup2 ((uintptr_t) fhc->devbufalloc,
+					   devbufalign);
+	}
       fhc->devbufstart = 0;
       fhc->devbufend = 0;
       fhc->lastblk_to_read (false);
@@ -112,7 +123,11 @@ fhandler_dev_raw::fixup_after_exec ()
   if (!close_on_exec ())
     {
       if (devbufsiz > 1L)
-	devbuf = new char [devbufsiz];
+	{
+	  /* Create sector-aligned buffer */
+	  devbufalloc = new char [devbufsiz + devbufalign];
+	  devbuf = (char *) roundup2 ((uintptr_t) devbufalloc, devbufalign);
+	}
       devbufstart = 0;
       devbufend = 0;
       lastblk_to_read (false);
@@ -167,7 +182,7 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 		  devbufend = 0;
 
 		if (devbufsiz > 1L)
-		  delete [] devbuf;
+		  delete [] devbufalloc;
 
 		devbufstart = 0;
 		devbuf = buf;

@@ -1214,9 +1214,9 @@ fhandler_dev_tape::open (int flags, mode_t)
       if (!(flags & O_DIRECT))
 	{
 	  devbufsiz = mt.drive (driveno ())->dp ()->MaximumBlockSize;
-	  devbuf = new char [devbufsiz];
+	  devbufalign = 1;
+	  devbufalloc = devbuf = new char [devbufsiz];
 	}
-      devbufstart = devbufend = 0;
     }
   else
     ReleaseMutex (mt_mtx);
