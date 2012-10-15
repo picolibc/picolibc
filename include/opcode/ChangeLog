@@ -1,3 +1,8 @@
+2012-10-14  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	* hppa.h (pa_opcodes): Use "cX" completer instead of "cx" in fstqx
+	opcodes.  Likewise, use "cM" instead of "cm" in fstqs opcodes.
+
 2012-10-04  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
 
 	* s390.h (s390_opcode_cpu_val): Add S390_OPCODE_ZEC12.
