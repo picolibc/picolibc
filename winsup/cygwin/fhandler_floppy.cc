@@ -380,9 +380,9 @@ fhandler_dev_floppy::open (int flags, mode_t)
 	  devbuf = (char *) roundup2 ((uintptr_t) devbufalloc, devbufalign);
 	}
 
-      /* If we're trying to access a CD/DVD drive, or an entire disk,
-	 make sure we're actually allowed to read *all* of the device.
-	 This is actually documented in the MSDN CreateFile man page. */
+      /* If we're not trying to access a floppy disk, make sure we're actually
+         allowed to read *all* of the device or volume.  This is actually
+	 documented in the MSDN CreateFile man page. */
       if (get_major () != DEV_FLOPPY_MAJOR
 	  && !DeviceIoControl (get_handle (), FSCTL_ALLOW_EXTENDED_DASD_IO,
 			       NULL, 0, NULL, 0, &bytes_read, NULL))
