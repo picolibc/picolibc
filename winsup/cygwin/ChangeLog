@@ -1,3 +1,7 @@
+2012-10-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler_tty.cc (fhandler_pty_slave::write): DWORD -> BOOL.
+
 2012-10-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_dev_raw): Add members devbufalloc and

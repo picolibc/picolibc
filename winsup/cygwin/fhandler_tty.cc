@@ -666,7 +666,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	  break;
 	}
 
-      DWORD res = WriteFile (get_output_handle (), buf, n, &n, NULL);
+      BOOL res = WriteFile (get_output_handle (), buf, n, &n, NULL);
       release_output_mutex ();
       if (!res)
 	{
