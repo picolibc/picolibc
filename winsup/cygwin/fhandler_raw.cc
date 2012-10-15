@@ -23,12 +23,6 @@
 
 fhandler_dev_raw::fhandler_dev_raw ()
   : fhandler_base (),
-    devbufalloc (NULL),
-    devbuf (NULL),
-    devbufalign (0),
-    devbufsiz (0),
-    devbufstart (0),
-    devbufend (0),
     status ()
 {
   need_fork_fixup (true);
