@@ -1,3 +1,9 @@
+2012-10-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler_tty.cc (fhandler_pty_slave::write): Fix potential exit from
+	loop with write mutex held.  Delete redundant mutex release.  Clear tty
+	error once we've grabbed it.
+
 2012-10-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_raw.cc (fhandler_dev_raw::fhandler_dev_raw): Drop gratuitous

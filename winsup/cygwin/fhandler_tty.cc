@@ -663,6 +663,8 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	{
 	  set_errno (get_ttyp ()->write_error);
 	  towrite = (DWORD) -1;
+	  get_ttyp ()->write_error = 0;
+	  release_output_mutex ();
 	  break;
 	}
 
@@ -681,7 +683,6 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	    }
 	  raise (SIGHUP);		/* FIXME: Should this be SIGTTOU? */
 	  towrite = (DWORD) -1;
-	  release_output_mutex ();
 	  break;
 	}
     }
