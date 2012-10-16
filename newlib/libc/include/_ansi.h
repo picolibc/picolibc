@@ -34,9 +34,7 @@
 #define _BEGIN_STD_C extern "C" {
 #define _END_STD_C  }
 #endif
-#if defined(__GNUC__) && \
-  ( (__GNUC__ >= 4) || \
-    ( (__GNUC__ >= 3) && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ >= 3) ) )
+#if __GNUC_PREREQ (3, 3)
 #define _NOTHROW __attribute__ ((nothrow))
 #else
 #define _NOTHROW throw()
@@ -131,6 +129,16 @@
 /* We're using GCC in C99 mode, or an unknown compiler which
   we just have to hope obeys the C99 semantics of inline.  */
 #define _ELIDABLE_INLINE static __inline__
+#endif
+
+#if __GNUC_PREREQ (3, 1)
+#define _NOINLINE		__attribute__ ((__noinline__))
+#define _NOINLINE_STATIC	_NOINLINE static
+#else
+/* On non-GNU compilers and GCC prior to version 3.1 the compiler can't be
+   trusted not to inline if it is static. */
+#define _NOINLINE
+#define _NOINLINE_STATIC
 #endif
 
 #endif /* _ANSIDECL_H_ */

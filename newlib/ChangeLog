@@ -1,3 +1,11 @@
+2012-10-15  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/features.h (__GNUC_PREREQ): Define.  Use
+	throughout in place of explicit GNUC version checks.
+	* libc/include/_ansi.h (_NOINLINE): Define.
+	(_NOINLINE_STATIC): Define.
+	* libc/stdio/vfprintf.c (__sbprintf): Define _NOINLINE_STATIC.
+
 2012-10-09  Peter Rosin  <peda@lysator.liu.se>
 
 	* libc/posix/wordfree.c (wordfree): The wrong words are freed

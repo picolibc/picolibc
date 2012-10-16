@@ -34,10 +34,7 @@ union __ldmath
 /* Natural log of 2 */
 #define _M_LN2        0.693147180559945309417
 
-#if defined(__GNUC__) && \
-  ( (__GNUC__ >= 4) || \
-    ( (__GNUC__ >= 3) && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ >= 3) ) )
-
+#if __GNUC_PREREQ (3, 3)
  /* gcc >= 3.3 implicitly defines builtins for HUGE_VALx values.  */
 
 # ifndef HUGE_VAL

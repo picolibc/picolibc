@@ -9,13 +9,13 @@
 #ifndef _STDINT_H
 #define _STDINT_H
 
+#include <_ansi.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if defined(__GNUC__) && \
-  ( (__GNUC__ >= 4) || \
-    ( (__GNUC__ >= 3) && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ > 2) ) )
+#if __GNUC_PREREQ (3, 2)
 /* gcc > 3.2 implicitly defines the values we are interested */
 #define __STDINT_EXP(x) __##x##__
 #else
