@@ -1,3 +1,14 @@
+2012-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Convert "if/else if" chain to a switch
+	statement.  Drop "not yet supported" and "Server" from Windows 2012
+	output string.
+
+2012-09-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Drop "not yet supported" text from
+	Windows 8.  Update products array.
+
 2012-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ps.cc (main): Define uid correctly as uid_t.
