@@ -95,6 +95,10 @@ case "${host_cpu}" in
   a29k)
 	machine_dir=a29k
 	;;
+  aarch64*)
+	machine_dir=aarch64
+	libm_machine_dir=aarch64
+	;;
   arc)
 	machine_dir=
 	;;
@@ -555,6 +559,10 @@ case "${host}" in
 # UDI doesn't have exec, so system() should fail the right way
   a29k-amd-udi)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC"
+	syscall_dir=syscalls
+	;;
+  aarch64*-*-*)
+	default_newlib_io_long_long="yes"
 	syscall_dir=syscalls
 	;;
   arc-*-*)

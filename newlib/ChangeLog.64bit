@@ -1,0 +1,6 @@
+2012-08-13  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/reent.h (stat64): Define as stat under Cygwin, instead
+	of as __stat64.  Undef stat64 if not building Newlib.
+	* libc/include/sys/stat.h (stat64): Define as stat under Cygwin.
+

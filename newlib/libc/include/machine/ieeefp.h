@@ -69,6 +69,14 @@
 #endif
 #endif
 
+#if defined (__aarch64__)
+#if defined (__AARCH64EL__)
+#define __IEEE_LITTLE_ENDIAN
+#else
+#define __IEEE_BIG_ENDIAN
+#endif
+#endif
+
 #ifdef __epiphany__
 #define __IEEE_LITTLE_ENDIAN
 #define Sudden_Underflow 1
@@ -280,7 +288,11 @@
 #endif
 
 #ifdef __moxie__
+#ifdef __MOXIE_BIG_ENDIAN__
 #define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
 #endif
 
 #ifdef __ia64__

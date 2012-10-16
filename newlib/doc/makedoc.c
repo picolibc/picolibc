@@ -1012,7 +1012,7 @@ WORD(swap)
     
 }
 
-WORD(dup)
+WORD(dup_)
 {
     tos++;
     init_string(tos);
@@ -1410,7 +1410,7 @@ char *av[])
     add_intrinsic("skip_past_newline", skip_past_newline );
     add_intrinsic("catstr", icatstr );
     add_intrinsic("copy_past_newline", icopy_past_newline );
-    add_intrinsic("dup", dup );
+    add_intrinsic("dup", dup_ );
     add_intrinsic("remchar", remchar );
     add_intrinsic("get_stuff_in_command", get_stuff_in_command );
     add_intrinsic("get_stuff_in_angle", get_stuff_in_angle );

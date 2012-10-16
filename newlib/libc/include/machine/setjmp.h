@@ -9,6 +9,11 @@ _BEGIN_STD_C
 #define _JBLEN 23
 #endif
 
+#if defined(__aarch64__)
+#define _JBLEN 22
+#define _JBTYPE long long
+#endif
+
 #if defined(__AVR__)
 #define _JBLEN 24
 #endif
