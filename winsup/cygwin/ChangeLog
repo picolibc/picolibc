@@ -1,7 +1,168 @@
-2012-08-16  Corinna Vinschen  <corinna@vinschen.de>
+2012-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
-	* include/mntent.h: Don't include paths.h and don't define macros if
-	_NOMNTENT_MACROS is set.
+	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Remove lloffset.
+	Use offset directly.  Add shortcut for lseek(fd, 0, SEEK_CUR) case.
+	(fhandler_dev_floppy::ioctl): Drop wrong RDSETBLK case.
+	* fhandler_raw.cc (fhandler_dev_raw::ioctl): Revamp RDSETBLK code.
+
+2012-10-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler_tty.cc (fhandler_pty_slave::write): Fix potential exit from
+	loop with write mutex held.  Delete redundant mutex release.  Clear tty
+	error once we've grabbed it.
+
+2012-10-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_raw.cc (fhandler_dev_raw::fhandler_dev_raw): Drop gratuitous
+	initializing from previous patch.
+
+2012-10-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::open): Fix comment.
+
+2012-10-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler_tty.cc (fhandler_pty_slave::write): DWORD -> BOOL.
+
+2012-10-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_dev_raw): Add members devbufalloc and
+	devbufalign.
+	(class fhandler_dev_floppy): Remove member bytes_per_sector;
+	* fhandler_floppy.cc (bytes_per_sector): Define as devbufalign.
+	(fhandler_dev_floppy::open): Set devbufalign to a multiple of the
+	sector size and handle devbuf allocation and alignment in !O_DIRECT
+	case here.  Change comment accordingly.
+	Call FSCTL_ALLOW_EXTENDED_DASD_IO for partitions as well.
+	(fhandler_dev_floppy::raw_write): Fix comment.  Rewrite and fix
+	writing behaviour when application uses read and lseek.
+	(fhandler_dev_floppy::lseek): Use rounddown macro.  Call
+	SetFilePointerEx rather than the old SetFilePointer.
+	(fhandler_dev_floppy::ioctl): Reformat switch.  Call
+	IOCTL_DISK_UPDATE_PROPERTIES rather than IOCTL_DISK_UPDATE_DRIVE_SIZE
+	in BLKRRPART case.  Support BLKIOMIN, BLKIOOPT, BLKPBSZGET and
+	BLKALIGNOFF.
+	* fhandler_raw.cc (fhandler_dev_raw::fhandler_dev_raw): Initialize
+	all devbuf-related members.
+	(fhandler_dev_raw::~fhandler_dev_raw): Delete devbufalloc rather than
+	devbuf.
+	(fhandler_dev_raw::open): Drop allocating devbuf.
+	(fhandler_dev_raw::dup): Allocate devbufalloc and set devbuf to support
+	new sector-aligned devbuf handling.
+	(fhandler_dev_raw::fixup_after_exec): Ditto.
+	* fhandler_tape.cc (fhandler_dev_tape::open): Ditto, set devbufalign
+	to 1.
+	* include/cygwin/fs.h (BLKIOMIN): Define.
+	(BLKIOOPT): Define.
+	(BLKALIGNOFF): Define.
+	(BLKPBSZGET): Define.
+
+2012-10-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_raw.cc (fhandler_dev_raw::open): Allow O_EXCL flag, as on
+	Linux.
+
+2012-10-11  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Don't manipulate
+	output_mutex on CTRL-S/CTRL-Q to avoid a deadlock.
+	* fhandler_tty.cc (fhandler_pty_slave::write): Loop when output_stopped
+	is detected before acquiring output_mutex.  Acquire output_mutex in the
+	loop for each write.
+	* tty.h: Remove some obsolete defines.
+	(tty_min::output_stopped): Make 'bool'.
+
+2012-10-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/in.h (struct in_addr): Guard with s_addr to avoid
+	potential collision with Win32 headers.
+
+2012-10-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* child_info.h (child_info_spawn::has_execed): Remove unneeded
+	synchronization.
+
+2012-10-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc: Remove unneeded assert.h.
+
+2012-09-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (pinfo::init): Detect potential race where short block has
+	been retrieved but PID_EXECED flag is not set.
+
+2012-09-13  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygthread.cc (cygthread::stub): Remove old, unnecessary, FIXMEd code.
+	* spawn.cc (child_info_spawn::worker): Avoid calling close_all_files()
+	twice.
+
+2012-09-02  Jin-woo Ye <jojelino@gmail.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* pseudo-reloc.cc (auto_protect_for): New function.
+	(__write_memory): Call auto_protect_for to handle page protection.
+	(do_pseudo_reloc): Call auto_protect_for to restore old page protection.
+
+2012-08-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (pinfo::init): Remove assertion.
+
+2012-08-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* pinfo.cc (_pinfo::exists): Don't consider a process with no state to
+	exist.
+
+2012-08-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* net.cc (get_adapters_addresses): Drop FIXME part of comment.
+
+2012-08-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* DevNotes: Add entry cgf-000016.
+	* cygtls.h (_cygtls::push): Inline.
+	(_cygtls::interrupt_now): Change signal number argument to siginfo_t
+	argument.
+	(_cygtls::interrupt_setup): Ditto.
+	(_cygtls::set_siginfo): Delete declaration.
+	(_cygtls::reset_signal_arrived): Don't reset signal_arrived signal.
+	Just reset flag.
+	* exceptions.cc (_cygtls::interrupt_now): Reflect argument changes.
+	Pass si to interrupt_setup.
+	(_cygtls::interrupt_setup): Reflect argument changes.  Fill out tls
+	infodata here using passed-in si.  Use si.si_signo instead of sig.
+	(sigpacket::setup_handler): Move this function into sigpacket class.
+	Use si field from the class as appropriate.
+	(sigpacket::process): Don't call tls->set_siginfo here since
+	setup_handler could fail.  Eliminate now-unneeded sig argument.
+	* sigproc.h (sigpacket::setup_handler): Move setup_handler to this
+	class.
+
+2012-08-17  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* exceptions.cc (sig_handle_tty_stop): Clear tls sig field.
+	(sigpacket::process): When continuing, set tls->sig before arming
+	signal_arrived.
+
+2012-08-17  Thomas Wolff <towo@towo.net>
+
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::read): Use
+	read-ahead buffer for reading Windows clipboard if caller's
+	buffer is too small for complete characters.
+	* include/limits.h: Remove outdated TODO comment.
+
+2012-08-16  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygtls.cc (_cygtls::operator HANDLE): Reverse '?' test stupidity.
+
+2012-08-16  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygheap.cc (init_cygheap::find_tls): Don't consider unitialized
+	threads.
+	* cygtls.cc (_cygtls::operator HANDLE): Return NULL when tid is not
+	set.
+	* exceptions.cc (setup_handler): Don't try to suspend a thread if it
+	has no handle.
 
 2012-08-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
@@ -50,22 +211,6 @@
 
 2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
-	* advapi32.cc (DuplicateTokenEx): Make ?: expression type-safe.
-	* ntdll.h (KAFFINITY): Don't define if building with Mingw64 headers.
-	* thread.cc: Throughout drop casts in calls to Interlocked functions.
-	* thread.h (class fast_mutex): Ditto.  Define lock_counter as LONG.
-	(class pthread_mutex): Define lock_counter as LONG.
-	(struct MTinterface): Define threadcount as LONG.
-
-2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
-
-	* configure.in: Add AC_NO_EXECUTABLES to allow bootstrap.
-	Add x86_64 to allowed cpu types.
-	* configure: Regenerate.
-	* config/x86_64/profile.h: New file.
-
-2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
-
 	* thread.cc (semaphore::_fixup_after_fork): Fix Win32 error output in
 	api_fatal call.
 
@@ -75,85 +220,12 @@
 
 2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
-	* mkvers.sh: Drop reference to w32api includes.
-
-2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
-
 	* mount.cc (fs_names): Add missing ReFS entry.  Change comment.
 	* mount.h (enum fs_info_type): Add comment.
 
 2012-08-13  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* errno.cc (errmap): Map ERROR_SXS_CANT_GEN_ACTCTX to ELIBBAD.
-
-2012-08-13  Corinna Vinschen  <corinna@vinschen.de>
-
-	* include/cygwin/stat.h (struct __stat64): Drop entirely in favor of
-	struct stat.  Accommodate throughout Cygwin.
-	* include/cygwin/types.h: Throughout, drop current, internal types
-	used since Cygwin 1.5 with the base type they have been used for.
-	Throughout, define types based on bitsize-specific types where
-	appropriate.  Accommodate throughout Cygwin.
-	* include/sys/cygwin.h: Drop __uid32_t and __gid32_t in favor of
-	uid_t and gid_t.  Define uid/gid types based on bitsize-specific types.
-	(struct external_pinfo): Accommodate above change.
-	* cygtls.h (struct _local_storage): Drop unused members grp and
-	namearray,
-	* tlsoffsets.h: Regenerate.
-	* devices.h (_dev_t): Drop definition.  Use dev_t throughout instead.
-	* devices.cc: Regenerate.
-
-	Probably temporary patch to drop unneeded functionality on x86_64:
-	* fcntl.cc (_fcntl): Alias to fcntl64 on x86_64.
-	* glob.cc (CYGWIN_gl_stat): Simplify on x86_64.
-	* grp.cc (grp32togrp16): Don't define on x86_64.
-	(getgrgid): Alias to getgrgid32 on x86_64.
-	(getgrnam): Alias to getgrnam32 on x86_64.
-	(getgrent): Alias to getgrent32 on x86_64.
-	(getgroups): Alias to getgroups32 on x86_64.
-	(initgroups): Alias to initgroups32 on x86_64.
-	(setgroups): Alias to setgroups32 on x86_64.
-	* mmap.cc (mmap): Alias to mmap64 on x86_64.
-	* passwd.cc (getpwuid): Alias to getpwuid32 on x86_64.
-	(getpwuid_r): Alias to getpwuid_r32 on x86_64.
-	(getpwduid): Don't define on x86_64.
-	* syscalls.cc (lseek): Alias to lseek64 on x86_64.
-	(_lseek): Alias to lseek64 on x86_64.
-	(chown): Alias to chown32 on x86_64.
-	(lchown): Alias to lchown32 on x86_64.
-	(fchown): Alias to fchown32 on x86_64.
-	(stat64_to_stat32): Don't define on x86_64.
-	(fstat): Alias to fstat64 on x86_64.
-	(_fstat_r): Alias to _fstat64_r on x86_64.
-	(stat): Alias to stat64 on x86_64.
-	(_stat_r): Alias to _stat64_r on x86_64.
-	(lstat): Alias to lstat64 on x86_64.
-	(ftruncate): Alias to ftruncate64 on x86_64.
-	(truncate): Alias to truncate64 on x86_64.
-	(seteuid): Alias to seteuid32 on x86_64.
-	(setuid): Alias to setuid32 on x86_64.
-	(setreuid): Alias to setreuid32 on x86_64.
-	(setegid): Alias to setegid32 on x86_64.
-	(setgid): Alias to setgid32 on x86_64.
-	(setregid): Alias to setregid32 on x86_64.
-	* uinfo.cc (getuid): Alias to getuid32 on x86_64.
-	(getgid): Alias to getgid32 on x86_64.
-	(geteuid): Alias to geteuid32 on x86_64.
-	(getegid): Alias to getegid32 on x86_64.
-	* winsup.h (ILLEGAL_UID16): Don't define on x86_64.
-	(ILLEGAL_GID16): Ditto.
-	(uid16touid32): Don't declare on x86_64.
-	(gid16togid32): Don't declare on x86_64.
-
-2012-08-13  Corinna Vinschen  <corinna@vinschen.de>
-
-	* Makefile.in (TEST_DLL_NAME): Use -nostdlib flag unconditionally.
-
-2012-08-10  Corinna Vinschen  <corinna@vinschen.de>
-
-	* cygwin.sc: Add default w32api search dirs.
-	* Makefile.in (DLL_IMPORTS); Just use -l syntax.
-	(TEST_DLL_NAME): Drop DLL_IMPORTS dependency.
 
 2012-08-09  Christopher Faylor  <me.cygwin2012@cgf.cx>
 

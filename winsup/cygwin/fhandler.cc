@@ -1222,7 +1222,7 @@ fhandler_base_overlapped::close ()
   else
     {
      /* Cancelling seems to be necessary for cases where a reader is
-         still executing when a signal handler performs a close.  */
+	 still executing when a signal handler performs a close.  */
       if (!writer)
 	CancelIo (get_io_handle ());
       destroy_overlapped ();

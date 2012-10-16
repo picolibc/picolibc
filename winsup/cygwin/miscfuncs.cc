@@ -516,33 +516,33 @@ thread_wrapper (VOID *arg)
     }
 
   __asm__ ("\n\
-	   movl  %[WRAPPER_ARG], %%ebx # Load &wrapper_arg into ebx  \n\
-	   movl  (%%ebx), %%eax        # Load thread func into eax   \n\
-	   movl  4(%%ebx), %%ecx       # Load thread arg into ecx    \n\
-	   movl  8(%%ebx), %%edx       # Load stackaddr into edx     \n\
-	   movl  12(%%ebx), %%ebx      # Load stackbase into ebx     \n\
-	   subl  %[CYGTLS], %%ebx      # Subtract CYGTLS_PADSIZE     \n\
-	   subl  $4, %%ebx             # Subtract another 4 bytes    \n\
-	   movl  %%ebx, %%esp          # Set esp                     \n\
-	   xorl  %%ebp, %%ebp          # Set ebp to 0                \n\
-	   # Make gcc 3.x happy and align the stack so that it is    \n\
-	   # 16 byte aligned right before the final call opcode.     \n\
-	   andl  $-16, %%esp           # 16 byte align               \n\
-	   addl  $-12, %%esp           # 12 bytes + 4 byte arg = 16  \n\
-	   # Now we moved to the new stack.  Save thread func address\n\
-	   # and thread arg on new stack                             \n\
-	   pushl %%ecx                 # Push thread arg onto stack  \n\
-	   pushl %%eax                 # Push thread func onto stack \n\
-	   # Now it's safe to release the OS stack.                  \n\
-	   pushl $0x8000               # dwFreeType: MEM_RELEASE     \n\
-	   pushl $0x0                  # dwSize:     0               \n\
-	   pushl %%edx                 # lpAddress:  stackaddr       \n\
-	   call _VirtualFree@12        # Shoot                       \n\
-	   # All set.  We can pop the thread function address from   \n\
-	   # the stack and call it.  The thread arg is still on the  \n\
-	   # stack in the expected spot.                             \n\
-	   popl  %%eax                 # Pop thread_func address     \n\
-	   call  *%%eax                # Call thread func            \n"
+	   movl  %[WRAPPER_ARG], %%ebx # Load &wrapper_arg into ebx	\n\
+	   movl  (%%ebx), %%eax		# Load thread func into eax	\n\
+	   movl  4(%%ebx), %%ecx	# Load thread arg into ecx	\n\
+	   movl  8(%%ebx), %%edx	# Load stackaddr into edx	\n\
+	   movl  12(%%ebx), %%ebx	# Load stackbase into ebx	\n\
+	   subl  %[CYGTLS], %%ebx	# Subtract CYGTLS_PADSIZE	\n\
+	   subl  $4, %%ebx		# Subtract another 4 bytes	\n\
+	   movl  %%ebx, %%esp		# Set esp			\n\
+	   xorl  %%ebp, %%ebp		# Set ebp to 0			\n\
+	   # Make gcc 3.x happy and align the stack so that it is	\n\
+	   # 16 byte aligned right before the final call opcode.	\n\
+	   andl  $-16, %%esp		# 16 byte align			\n\
+	   addl  $-12, %%esp		# 12 bytes + 4 byte arg = 16	\n\
+	   # Now we moved to the new stack.  Save thread func address	\n\
+	   # and thread arg on new stack				\n\
+	   pushl %%ecx			# Push thread arg onto stack	\n\
+	   pushl %%eax			# Push thread func onto stack	\n\
+	   # Now it's safe to release the OS stack.			\n\
+	   pushl $0x8000		# dwFreeType: MEM_RELEASE	\n\
+	   pushl $0x0			# dwSize:     0			\n\
+	   pushl %%edx			# lpAddress:  stackaddr		\n\
+	   call _VirtualFree@12		# Shoot				\n\
+	   # All set.  We can pop the thread function address from	\n\
+	   # the stack and call it.  The thread arg is still on the	\n\
+	   # stack in the expected spot.				\n\
+	   popl  %%eax			# Pop thread_func address	\n\
+	   call  *%%eax			# Call thread func		\n"
 	   : : [WRAPPER_ARG] "r" (&wrapper_arg),
 	       [CYGTLS] "i" (CYGTLS_PADSIZE));
   /* Never return from here. */

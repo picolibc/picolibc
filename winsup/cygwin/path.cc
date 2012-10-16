@@ -892,7 +892,7 @@ is_virtual_symlink:
 	  else if (isdev_dev (dev))
 	    {
 	      /* If we're looking for a file below /dev, which doesn't exist,
-	         make sure that the device type is converted to FH_FS, so that
+		 make sure that the device type is converted to FH_FS, so that
 		 subsequent code handles the file correctly.
 		 Unless /dev itself doesn't exist on disk.  In that case /dev
 		 is handled as virtual filesystem, and virtual filesystems are
@@ -3704,7 +3704,7 @@ find_fast_cwd_pointer ()
   if (movedi[0] == 0x8b && movedi[1] == 0xff)	/* mov edi,edi -> W8 */
     {
       /* Windows 8 CP 32 bit (after a Windows Update?) does not call
-         RtlEnterCriticalSection.  For some reason the function manipulates
+	 RtlEnterCriticalSection.  For some reason the function manipulates
 	 the FastPebLock manually, kind of like RtlEnterCriticalSection has
 	 been converted to an inline function.
 

@@ -21,7 +21,6 @@ details. */
 #include "pinfo.h"
 #include "perprocess.h"
 #include "environ.h"
-#include <assert.h>
 #include "ntdll.h"
 #include "shared_info.h"
 #include "cygheap.h"
@@ -299,12 +298,21 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
       bool created = shloc != SH_JUSTOPEN;
 
+      /* Detect situation where a transitional memory block is being retrieved.
+	 If the block has been allocated with PINFO_REDIR_SIZE but not yet
+	 updated with a PID_EXECED state then we'll retry.  */
+      MEMORY_BASIC_INFORMATION mbi;
+      if (!created && procinfo->exists ()
+	  && VirtualQuery (procinfo, &mbi, sizeof (mbi))
+	  && mbi.RegionSize < sizeof (_pinfo))
+	goto loop;
+
       if (!created && createit && (procinfo->process_state & PID_REAPED))
 	{
 	  memset (procinfo, 0, sizeof (*procinfo));
 	  created = true;	/* Lie that we created this - just reuse old
 				   shared memory */
-	} 
+	}
 
       if ((procinfo->process_state & PID_REAPED)
 	  || ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
@@ -316,7 +324,6 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
       if (procinfo->process_state & PID_EXECED)
 	{
-	  assert (i == 0);
 	  pid_t realpid = procinfo->pid;
 	  debug_printf ("execed process windows pid %d, cygwin pid %d", n, realpid);
 	  if (realpid == n)
@@ -488,7 +495,7 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 bool __stdcall
 _pinfo::exists ()
 {
-  return this && !(process_state & (PID_EXITED | PID_REAPED | PID_EXECED));
+  return this && process_state && !(process_state & (PID_EXITED | PID_REAPED | PID_EXECED));
 }
 
 bool

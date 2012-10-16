@@ -126,6 +126,49 @@ __report_error (const char *msg, ...)
 #endif
 }
 
+/*
+ * This function automatically sets addr as PAGE_EXECUTE_READWRITE
+ * by deciding whether VirtualQuery for the addr is actually needed.
+ * And it assumes that it is called in LdrpCallInitRoutine.
+ * Hence not thread safe.
+ */
+static void
+auto_protect_for (void* addr)
+{
+  static MEMORY_BASIC_INFORMATION mbi;
+  static bool state = false;
+  static DWORD oldprot;
+
+  if (!addr)
+    {
+      /* Restore original protection. */
+      if (!(mbi.Protect & (PAGE_EXECUTE_READWRITE | PAGE_READWRITE)))
+        VirtualProtect (mbi.BaseAddress, mbi.RegionSize, oldprot, &oldprot);
+      state = false;
+      return;
+    }
+  if (state)
+    {
+      /* We have valid region information.  Are we still within this region?
+         If so, just leave. */
+      void *ptr = ((void*) ((ptrdiff_t) mbi.BaseAddress + mbi.RegionSize));
+      if (addr >= mbi.BaseAddress && addr < ptr)
+	return;
+      /* Otherwise, restore original protection and fall through to querying
+         and potentially changing next region. */
+      if (!(mbi.Protect & (PAGE_EXECUTE_READWRITE | PAGE_READWRITE)))
+	VirtualProtect (mbi.BaseAddress, mbi.RegionSize, oldprot, &oldprot);
+    }
+  else
+    state = true;
+  /* Query region and temporarily allow write access to read-only protected
+     memory.  */
+  VirtualQuery (addr, &mbi, sizeof mbi);
+  if (!(mbi.Protect & (PAGE_EXECUTE_READWRITE | PAGE_READWRITE)))
+    VirtualProtect (mbi.BaseAddress, mbi.RegionSize,
+	PAGE_EXECUTE_READWRITE, &oldprot);
+}
+
 /* This function temporarily marks the page containing addr
  * writable, before copying len bytes from *src to *addr, and
  * then restores the original protection settings to the page.
@@ -142,27 +185,12 @@ __report_error (const char *msg, ...)
 static void
 __write_memory (void *addr, const void *src, size_t len)
 {
-  MEMORY_BASIC_INFORMATION b;
-  DWORD oldprot;
-
   if (!len)
     return;
-
-  if (!VirtualQuery (addr, &b, sizeof (b)))
-    {
-      __report_error ("  VirtualQuery failed for %d bytes at address %p",
-		      (int) sizeof (b), addr);
-    }
-
-  /* Temporarily allow write access to read-only protected memory.  */
-  if (b.Protect != PAGE_EXECUTE_READWRITE && b.Protect != PAGE_READWRITE)
-    VirtualProtect (b.BaseAddress, b.RegionSize, PAGE_EXECUTE_READWRITE,
-		  &oldprot);
+  /* Fix page protection for writing. */
+  auto_protect_for (addr);
   /* write the data. */
   memcpy (addr, src, len);
-  /* Restore original protection. */
-  if (b.Protect != PAGE_EXECUTE_READWRITE && b.Protect != PAGE_READWRITE)
-    VirtualProtect (b.BaseAddress, b.RegionSize, oldprot, &oldprot);
 }
 
 #define RP_VERSION_V1 0
@@ -188,7 +216,7 @@ do_pseudo_reloc (void * start, void * end, void * base)
    *   1) With a (v2-style) version header. In this case, the
    *      first entry in the list is a 3-DWORD structure, with
    *      value:
-   *         { 0, 0, RP_VERSION_V1 }
+   *	  { 0, 0, RP_VERSION_V1 }
    *      In this case, we skip to the next entry in the list,
    *      knowing that all elements after the head item can
    *      be cast to runtime_pseudo_reloc_item_v1.
@@ -232,6 +260,8 @@ do_pseudo_reloc (void * start, void * end, void * base)
 	  newval = (*((DWORD*) reloc_target)) + o->addend;
 	  __write_memory ((void *) reloc_target, &newval, sizeof (DWORD));
 	}
+      /* Restore original protection. */
+      auto_protect_for (NULL);
       return;
     }
 
@@ -322,7 +352,9 @@ do_pseudo_reloc (void * start, void * end, void * base)
 	  break;
 #endif
 	}
-     }
+    }
+  /* Restore original protection. */
+  auto_protect_for (NULL);
 }
 
 #ifdef __CYGWIN__

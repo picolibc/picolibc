@@ -595,7 +595,7 @@ _recycler_sd (void *buf, bool users, bool dir)
 {
   NTSTATUS status;
   PISECURITY_DESCRIPTOR psd = (PISECURITY_DESCRIPTOR) buf;
-  
+
   if (!psd)
     return NULL;
   RtlCreateSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
@@ -614,7 +614,7 @@ _recycler_sd (void *buf, bool users, bool dir)
 			    dir ? CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
 				: NO_INHERITANCE,
 			    FILE_ALL_ACCESS, well_known_system_sid);
-  if (users)	
+  if (users)
     RtlAddAccessAllowedAceEx (dacl, ACL_REVISION, NO_PROPAGATE_INHERIT_ACE,
 			      FILE_GENERIC_READ | FILE_GENERIC_EXECUTE
 			      | FILE_APPEND_DATA | FILE_WRITE_ATTRIBUTES,

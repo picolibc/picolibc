@@ -15,7 +15,7 @@ details. */
 #define USE_SYS_TYPES_FD_SET
 #define __WSA_ERR_MACROS_DEFINED
 /* FIXME: Collision with different declarations of if_nametoindex and
-          if_indextoname functions in iphlpapi.h since Vista.
+	  if_indextoname functions in iphlpapi.h since Vista.
    TODO:  Convert if_nametoindex to cygwin_if_nametoindex and call
 	  system functions on Vista and later. */
 #define _INC_NETIOAPI
@@ -1696,9 +1696,7 @@ get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
 	 area.  So, if we're running in a pthread with such a stack, we call
 	 GetAdaptersAddresses in a child thread with an OS-allocated stack.
 	 The OS allocates stacks bottom up, so chances are good that the new
-	 stack will be located in the lower address area.
-	 FIXME: The problem is fixed in W8CP, but needs testing before W8 goes
-		gold. */
+	 stack will be located in the lower address area. */
       HANDLE thr = CreateThread (NULL, 0, call_gaa, &param, 0, NULL);
       if (!thr)
 	{

@@ -172,8 +172,6 @@ public:
       return true;
     if (type != _CH_EXEC)
       return false;
-    lock->acquire ();
-    lock->release ();
     return !!hExeced;
   }
   bool get_parent_handle ();

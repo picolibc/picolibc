@@ -91,7 +91,7 @@ static int osi;
 
 void
 fhandler_pty_master::flush_to_slave ()
-{ 
+{
   if (get_readahead_valid () && !(get_ttyp ()->ti.c_lflag & ICANON))
     accept_input ();
 }
@@ -645,14 +645,16 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 
   push_process_state process_state (PID_TTYOU);
 
-  acquire_output_mutex (INFINITE);
-
   while (len)
     {
       n = MIN (OUT_BUFFER_SIZE, len);
       char *buf = (char *)ptr;
       ptr = (char *) ptr + n;
       len -= n;
+
+      while (tc ()->output_stopped)
+	cygwait (10);
+      acquire_output_mutex (INFINITE);
 
       /* Previous write may have set write_error to != 0.  Check it here.
 	 This is less than optimal, but the alternative slows down pty
@@ -661,10 +663,14 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	{
 	  set_errno (get_ttyp ()->write_error);
 	  towrite = (DWORD) -1;
+	  get_ttyp ()->write_error = 0;
+	  release_output_mutex ();
 	  break;
 	}
 
-      if (WriteFile (get_output_handle (), buf, n, &n, NULL) == FALSE)
+      BOOL res = WriteFile (get_output_handle (), buf, n, &n, NULL);
+      release_output_mutex ();
+      if (!res)
 	{
 	  DWORD err = GetLastError ();
 	  termios_printf ("WriteFile failed, %E");
@@ -680,7 +686,6 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	  break;
 	}
     }
-  release_output_mutex ();
   return towrite;
 }
 

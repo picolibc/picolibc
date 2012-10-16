@@ -222,6 +222,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
   UINT formatlist[2];
   int format;
   LPVOID cb_data;
+  int rach;
 
   if (!OpenClipboard (NULL))
     {
@@ -243,10 +244,22 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
       cygcb_t *clipbuf = (cygcb_t *) cb_data;
 
       if (pos < clipbuf->len)
-      	{
+	{
 	  ret = ((len > (clipbuf->len - pos)) ? (clipbuf->len - pos) : len);
 	  memcpy (ptr, clipbuf->data + pos , ret);
 	  pos += ret;
+	}
+    }
+  else if ((rach = get_readahead ()) >= 0)
+    {
+      /* Deliver from read-ahead buffer. */
+      char * out_ptr = (char *) ptr;
+      * out_ptr++ = rach;
+      ret = 1;
+      while (ret < len && (rach = get_readahead ()) >= 0)
+	{
+	  * out_ptr++ = rach;
+	  ret++;
 	}
     }
   else
@@ -256,25 +269,54 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
       size_t glen = GlobalSize (hglb) / sizeof (WCHAR) - 1;
       if (pos < glen)
 	{
+	  /* If caller's buffer is too small to hold at least one 
+	     max-size character, redirect algorithm to local 
+	     read-ahead buffer, finally fill class read-ahead buffer 
+	     with result and feed caller from there. */
+	  char *conv_ptr = (char *) ptr;
+	  size_t conv_len = len;
+#define cprabuf_len MB_LEN_MAX	/* max MB_CUR_MAX of all encodings */
+	  char cprabuf [cprabuf_len];
+	  if (len < cprabuf_len)
+	    {
+	      conv_ptr = cprabuf;
+	      conv_len = cprabuf_len;
+	    }
+
 	  /* Comparing apples and oranges here, but the below loop could become
 	     extremly slow otherwise.  We rather return a few bytes less than
 	     possible instead of being even more slow than usual... */
-	  if (glen > pos + len)
-	    glen = pos + len;
+	  if (glen > pos + conv_len)
+	    glen = pos + conv_len;
 	  /* This loop is necessary because the number of bytes returned by
 	     sys_wcstombs does not indicate the number of wide chars used for
 	     it, so we could potentially drop wide chars. */
 	  while ((ret = sys_wcstombs (NULL, 0, buf + pos, glen - pos))
 		  != (size_t) -1
-		 && ret > len)
+		 && (ret > conv_len 
+			/* Skip separated high surrogate: */
+		     || ((buf [pos + glen - 1] & 0xFC00) == 0xD800 && glen - pos > 1)))
 	     --glen;
 	  if (ret == (size_t) -1)
 	    ret = 0;
 	  else
 	    {
-	      ret = sys_wcstombs ((char *) ptr, (size_t) -1,
+	      ret = sys_wcstombs ((char *) conv_ptr, (size_t) -1,
 				  buf + pos, glen - pos);
 	      pos = glen;
+	      /* If using read-ahead buffer, copy to class read-ahead buffer
+	         and deliver first byte. */
+	      if (conv_ptr == cprabuf)
+		{
+		  puts_readahead (cprabuf, ret);
+		  char *out_ptr = (char *) ptr;
+		  ret = 0;
+		  while (ret < len && (rach = get_readahead ()) >= 0)
+		    {
+		      * out_ptr++ = rach;
+		      ret++;
+		    }
+		}
 	    }
 	}
     }

@@ -1,3 +1,29 @@
+2012-08-17  cgf-000016
+
+While debugging another problem I finally noticed that
+sigpacket::process was unconditionally calling tls->set_siginfo prior to
+calling setup_handler even though setup_handler could fail.  In the
+event of two successive signals, that would cause the second signal's
+info to overwrite the first even though the signal handler for the first
+would eventually be called.  Doh.
+
+Fixing this required passing the sigpacket si field into setup_handler.
+Making setup_handler part of the sigpacket class seemed to make a lot of
+sense so that's what I did.  Then I passed the si element into
+interrupt_setup so that the infodata structure could be filled out prior
+to arming the signal.
+
+The other changes checked in here eliminate the ResetEvent for
+signal_arrived since previous changes to cygwait should handle the
+case of spurious signal_arrived detection.  Since signal_arrived is
+not a manual-reset event, we really should just let the appropriate
+WFMO handle it.  Otherwise, there is a race where a signal comes in
+a "split second" after WFMO responds to some other event.  Resetting
+the signal_arrived would cause any subsequent WFMO to never be
+triggered.  My current theory is that this is what is causing:
+
+http://cygwin.com/ml/cygwin/2012-08/msg00310.html
+
 2012-08-15  cgf-000015
 
 RIP cancelable_wait.  Yay.

@@ -56,6 +56,8 @@ struct sigpacket
     struct sigpacket *next;
   };
   int __stdcall process () __attribute__ ((regparm (1)));
+  int setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
+    __attribute__ ((regparm (3)));
 };
 
 void __stdcall sig_dispatch_pending (bool fast = false)

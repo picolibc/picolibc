@@ -591,7 +591,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 
 		    if (dev_state.ext_mouse_mode6 /* distinguish release */
 			&& mouse_event.dwButtonState < dev_state.dwLastButtonState)
-		        mode6_term = 'm';
+			mode6_term = 'm';
 
 		    dev_state.last_button_code = b;
 
@@ -646,7 +646,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 
 		    __small_sprintf (tmp, "\033[M%c", b + ' ');
 		    nread = 4;
-		    /* the neat nested encoding function of mintty 
+		    /* the neat nested encoding function of mintty
 		       does not compile in g++, so let's unfold it: */
 		    if (xcode < 0x80)
 		      tmp [nread++] = xcode;
@@ -692,9 +692,9 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  if (dev_state.use_focus)
 	    {
 	      if (input_rec.Event.FocusEvent.bSetFocus)
-	        __small_sprintf (tmp, "\033[I");
+		__small_sprintf (tmp, "\033[I");
 	      else
-	        __small_sprintf (tmp, "\033[O");
+		__small_sprintf (tmp, "\033[O");
 
 	      toadd = tmp;
 	      nread = 3;
