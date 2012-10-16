@@ -23,6 +23,9 @@ AC_ARG_PROGRAM
 AC_CHECK_LIB(iconv, libiconv, libiconv=-liconv)
 AC_SUBST(libiconv)
 
+HOST_CPU="$host_cpu"
+AC_SUBST(HOST_CPU)
+
 INSTALL="/bin/sh "`cd $srcdir/../..; echo $(pwd)/install-sh -c`
 
 AC_PROG_INSTALL

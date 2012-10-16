@@ -9,24 +9,6 @@
 	* cygcheck.cc (dump_sysinfo): Drop "not yet supported" text from
 	Windows 8.  Update products array.
 
-2012-08-16  Corinna Vinschen  <corinna@vinschen.de>
-
-	* ps.cc (main): Define uid correctly as uid_t.
-
-2012-08-16  Corinna Vinschen  <corinna@vinschen.de>
-
-	* cygcheck.cc: Change include path to not depend on installed
-	cygwin/version.h.
-	(_NOMNTENT_MACROS): Define before including mntent.h.
-	* path.cc (_NOMNTENT_MACROS): Ditto.
-	* dump_setup.cc: Add temporary workaround to handle older Mingw header
-	files on Fedora 17.
-	* strace.cc: Ditto.
-
-2012-08-13  Corinna Vinschen  <corinna@vinschen.de>
-
-	* ps.cc (main): Drop unneeded cast.
-
 2012-07-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (cygcheck.exe): Link against psapi.dll.

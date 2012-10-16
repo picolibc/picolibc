@@ -1,8 +1,3 @@
-2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
-
-	* configure.in: Add AC_NO_EXECUTABLES to allow bootstrap.
-	* configure: Regenerate.
-
 2012-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* woutsup.h: Just include winlean.h.

@@ -1,0 +1,5 @@
+2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in: Add AC_NO_EXECUTABLES to allow bootstrap.
+	* configure: Regenerate.
+

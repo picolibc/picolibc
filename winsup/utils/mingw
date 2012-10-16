@@ -5,17 +5,66 @@
 #
 # Find the path to the compiler.
 #
+cpu=$1; shift
 compiler=$1; shift
 dir=$(cd $(dirname $("$compiler" -print-prog-name=ld))/../..; pwd)
+
+case $compiler in
+*-*-*-*) 
+tool=`echo "$compiler" | sed 's/^\([^-]*\)-\([^-]*\)-\([^-]*\)-\(.*\)$/\4/'` ;;
+*) tool=compiler ;;
+esac
 
 #
 # The mingw32 directory should live somewhere close by to the
 # compiler.  Search for it.
 #
-[ "$dir" = '/' ] && dir=''
+[ "$dir" = '/' ] && dir='';
+
+mingw_compiler=''
+for d in "$dir"/bin/"$cpu"-w64-mingw*-"$tool"* \
+        "$dir"/usr/bin/"$cpu"-w64-mingw*-"$tool"* \
+        /bin/"$cpu"-w64-mingw*-"$tool"* /usr/bin/"$cpu"-w64-mingw*-"$tool"* \
+        /usr/local/bin/"$cpu"-w64-mingw*-"$tool"* \
+        "$dir"/"$cpu"-w64-mingw*/sys-root/bin/"$cpu"-w64-mingw*-"$tool"* \
+        "$dir"/usr/"$cpu"-w64-mingw*/sys-root/bin/"$cpu"-w64-mingw*-"$tool"* \
+        /"$cpu"-w64-mingw*/sys-root/bin/"$cpu"-w64-mingw*-"$tool"* \
+        /usr/"$cpu"-w64-mingw*/sys-root/bin/"$cpu"-w64-mingw*-"$tool"*; do
+    case "$d" in
+        *\**) continue ;;
+        *)
+           if test -f "$d"; then
+             mingw_compiler=$d;
+             break;
+           fi
+    esac
+done
+
+if [ -z "$mingw_compiler" ]; then
+  for d in "$dir"/bin/"$cpu"-*-mingw*--"$tool"* \
+        "$dir"/usr/bin/"$cpu"-*-mingw*-"$tool"* \
+        /bin/"$cpu"-w64-mingw*-"$tool"* /usr/bin/"$cpu"-w64-mingw*-"$tool"* \
+        /usr/local/bin/"$cpu"-w64-mingw*-"$tool"* \
+        "$dir"/"$cpu"-w64-mingw*/sys-root/bin/"$cpu"-w64-mingw*-"$tool"* \
+        "$dir"/usr/"$cpu"-w64-mingw*/sys-root/bin/"$cpu"-w64-mingw*-"$tool"* \
+        /"$cpu"-w64-mingw*/sys-root/bin/"$cpu"-w64-mingw*-"$tool"* \
+        /usr/"$cpu"-w64-mingw*/sys-root/bin/"$cpu"-w64-mingw*-"$tool"*; do
+    case "$d" in
+        *\**) continue ;;
+        *)
+           if test -f "$d"; then
+             mingw_compiler=$d;
+             break;
+           fi
+    esac
+  done
+fi
+
 mingw_dir=''
-for d in "$dir"/*-mingw32 "$dir"/usr/*-mingw32 "$dir"/*-mingw* "$dir"/usr/*-mingw* \
-         /*-mingw32 /usr/*-mingw32 /*-mingw* /usr/*-mingw*; do
+for d in "$dir"/"$cpu"-w64-mingw* "$dir"/usr/"$cpu"-w64-mingw* \
+        "$dir"/"$cpu"-w64-mingw* "$dir"/usr/"$cpu"-w64-mingw* \
+        /"$cpu"-w64-mingw* /usr/"$cpu"-w64-mingw* /"$cpu"-w64-mingw* \
+        /usr/"$cpu"-w64-mingw*; do
     case "$d" in
 	*\**)	continue ;;
 	*)	if [ -d "$d"/sys-root/mingw ]; then
@@ -27,7 +76,27 @@ for d in "$dir"/*-mingw32 "$dir"/usr/*-mingw32 "$dir"/*-mingw* "$dir"/usr/*-ming
 done
 
 if [ -z "$mingw_dir" ]; then
-    echo "$0: couldn't find i686-pc-mingw32 directory" 1>&2
+  for d in "$dir"/"$cpu"-*-mingw* "$dir"/usr/"$cpu"-*-mingw* \
+        "$dir"/"$cpu"-*-mingw* "$dir"/usr/"$cpu"-*-mingw* \
+        /"$cpu"-*-mingw* /usr/"$cpu"-*-mingw* /"$cpu"-*-mingw* \
+        /usr/"$cpu"-*-mingw*; do
+    case "$d" in
+        *\**)   continue ;;
+        *)      if [ -d "$d"/sys-root/mingw ]; then
+                    mingw_dir=$d/sys-root/mingw
+                else
+                    mingw_dir=$d;
+                fi; break;
+    esac
+  done
+fi
+
+if [ -z "$mingw_compiler" ]; then
+  mingw_compiler=$compiler
+fi
+
+if [ -z "$mingw_dir" ]; then
+    echo "$0: couldn't find $cpu-*-mingw32 directory" 1>&2
     exit 1
 fi
 
@@ -96,4 +165,5 @@ if sawofile || ! sawcfile || ! sawcomp; then
 fi
 
 # Execute the compiler with new mingw-specific options.
-exec $compiler "$@"
+echo $mingw_compiler "$@"
+exec $mingw_compiler "$@"
