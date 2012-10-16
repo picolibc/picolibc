@@ -334,7 +334,7 @@ int __sprint_r (struct _reent *, FILE *, register struct __suio *);
  * temporary buffer.  We only work on write-only files; this avoids
  * worries about ungetc buffers and so forth.
  *
- * Make sure to avoid inlining when optimizing for size.
+ * Make sure to avoid inlining.
  */
 _NOINLINE_STATIC int
 _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
