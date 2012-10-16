@@ -1,3 +1,10 @@
+2012-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Remove lloffset.
+	Use offset directly.  Add shortcut for lseek(fd, 0, SEEK_CUR) case.
+	(fhandler_dev_floppy::ioctl): Drop wrong RDSETBLK case.
+	* fhandler_raw.cc (fhandler_dev_raw::ioctl): Revamp RDSETBLK code.
+
 2012-10-15  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fhandler_tty.cc (fhandler_pty_slave::write): Fix potential exit from

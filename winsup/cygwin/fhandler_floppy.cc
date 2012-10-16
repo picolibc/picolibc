@@ -668,24 +668,27 @@ _off64_t
 fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 {
   char buf[bytes_per_sector];
-  _off64_t lloffset = offset;
   _off64_t current_pos = (_off64_t) -1;
   LARGE_INTEGER sector_aligned_offset;
   size_t bytes_left;
 
   if (whence == SEEK_END)
     {
-      lloffset += drive_size;
+      offset += drive_size;
       whence = SEEK_SET;
     }
   else if (whence == SEEK_CUR)
     {
       current_pos = get_current_position ();
-      lloffset += current_pos - (devbufend - devbufstart);
+      _off64_t exact_pos = current_pos - (devbufend - devbufstart);
+      /* Shortcut when used to get current position. */
+      if (offset == 0)
+      	return exact_pos;
+      offset += exact_pos;
       whence = SEEK_SET;
     }
 
-  if (whence != SEEK_SET || lloffset < 0 || lloffset > drive_size)
+  if (whence != SEEK_SET || offset < 0 || offset > drive_size)
     {
       set_errno (EINVAL);
       return -1;
@@ -696,15 +699,15 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
     {
       if (current_pos == (_off64_t) -1)
 	current_pos = get_current_position ();
-      if (current_pos - devbufend <= lloffset && lloffset <= current_pos)
+      if (current_pos - devbufend <= offset && offset <= current_pos)
 	{
-	  devbufstart = devbufend - (current_pos - lloffset);
-	  return lloffset;
+	  devbufstart = devbufend - (current_pos - offset);
+	  return offset;
 	}
     }
 
-  sector_aligned_offset.QuadPart = rounddown (lloffset, bytes_per_sector);
-  bytes_left = lloffset - sector_aligned_offset.QuadPart;
+  sector_aligned_offset.QuadPart = rounddown (offset, bytes_per_sector);
+  bytes_left = offset - sector_aligned_offset.QuadPart;
 
   /* Invalidate buffer. */
   devbufstart = devbufend = 0;
@@ -779,17 +782,6 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
       debug_printf ("BLKALIGNOFF");
       *(int *)buf = 0;
       break;
-    case RDSETBLK:
-      /* Just check the restriction that blocksize must be a multiple
-	 of the sector size of the underlying volume sector size,
-	 then fall through to fhandler_dev_raw::ioctl. */
-      debug_printf ("RDSETBLK");
-      if (((struct rdop *) buf)->rd_parm % bytes_per_sector)
-	{
-	  set_errno (EINVAL);
-	  return -1;
-	}
-      /*FALLTHRU*/
     default:
       ret = fhandler_dev_raw::ioctl (cmd, buf);
       break;

@@ -11,6 +11,7 @@
 
 #include "winsup.h"
 
+#include <unistd.h>
 #include <cygwin/rdevio.h>
 #include <sys/mtio.h>
 #include <sys/param.h>
@@ -151,36 +152,32 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 		mop.mt_count = op->rd_parm;
 		ret = ioctl (MTIOCTOP, &mop);
 	      }
-	    else if ((devbuf && ((op->rd_parm <= 1 && (devbufend - devbufstart))
-				 || op->rd_parm < devbufend - devbufstart))
-		     || (op->rd_parm > 1 && (op->rd_parm % 512))
+	    else if ((op->rd_parm <= 1 && get_major () != DEV_TAPE_MAJOR)
+		     || (op->rd_parm > 1 && (op->rd_parm % devbufalign))
 		     || (get_flags () & O_DIRECT))
-	      /* The conditions for a *valid* parameter are these:
-		 - If there's still data in the current buffer, it must
-		   fit in the new buffer.
-		 - The new size is either 0 or 1, both indicating unbufferd
-		   I/O, or the new buffersize must be a multiple of 512.
+	      /* The conditions for a valid parameter are:
+		 - The new size is either 0 or 1, both indicating unbuffered
+		   I/O, and the device is a tape device.
+		 - Or, the new buffersize must be a multiple of the
+		   required buffer alignment.
 		 - In the O_DIRECT case, the whole request is invalid. */
 	      ret = ERROR_INVALID_PARAMETER;
 	    else if (!devbuf || op->rd_parm != devbufsiz)
 	      {
 		char *buf = NULL;
+		_off64_t curpos = lseek (0, SEEK_CUR);
+
 		if (op->rd_parm > 1L)
-		  buf = new char [op->rd_parm];
-		if (buf && devbufsiz > 1L)
-		  {
-		    memcpy (buf, devbuf + devbufstart, devbufend - devbufstart);
-		    devbufend -= devbufstart;
-		  }
-		else
-		  devbufend = 0;
+		  buf = new char [op->rd_parm + devbufalign];
 
 		if (devbufsiz > 1L)
 		  delete [] devbufalloc;
 
-		devbufstart = 0;
-		devbuf = buf;
+		devbufalloc = buf;
+		devbuf = (char *) roundup2 ((uintptr_t) buf, devbufalign);
 		devbufsiz = op->rd_parm ?: 1L;
+		devbufstart = devbufend = 0;
+		lseek (curpos, SEEK_SET);
 	      }
 	    break;
 	  default:
