@@ -4,6 +4,9 @@ What's new:
 - Support the "e" flag to fopen(3).  This is a Glibc extension which
   allows to fopen the file with the O_CLOEXEC flag set.
 
+- Support the "x" flag to fopen(3).  This is a Glibc/C11 extension which
+  allows to open the file with the O_EXCL flag set.
+
 
 Bug fixes:
 ----------
