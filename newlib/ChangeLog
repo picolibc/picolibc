@@ -1,3 +1,7 @@
+2012-10-16  Aurelien Jacobs  <aurel@gnuage.org>
+
+	* libc/include/assert.h (static_assert): Define.
+
 2012-10-15  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/features.h (__GNUC_PREREQ): Define.  Use
