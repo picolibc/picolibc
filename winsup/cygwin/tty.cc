@@ -163,7 +163,7 @@ tty::not_allocated (HANDLE& r, HANDLE& w)
   /* Attempt to open the from-master side of the tty.  If it is accessible
      then it exists although we may not have privileges to actually use it. */
   char pipename[sizeof("ptyNNNN-from-master")];
-  __small_sprintf (pipename, "pty%d-from-master", get_unit ());
+  __small_sprintf (pipename, "pty%d-from-master", get_minor ());
   /* fhandler_pipe::create returns 0 when creation succeeds */
   return fhandler_pipe::create (&sec_none, &r, &w,
 				fhandler_pty_common::pipesize, pipename,
@@ -202,7 +202,7 @@ HANDLE
 tty::open_mutex (const char *mutex, ACCESS_MASK access)
 {
   char buf[MAX_PATH];
-  shared_name (buf, mutex, get_unit ());
+  shared_name (buf, mutex, get_minor ());
   return OpenMutex (access, TRUE, buf);
 }
 
@@ -210,7 +210,7 @@ HANDLE
 tty::open_inuse (ACCESS_MASK access)
 {
   char buf[MAX_PATH];
-  shared_name (buf, TTY_SLAVE_ALIVE, get_unit ());
+  shared_name (buf, TTY_SLAVE_ALIVE, get_minor ());
   return OpenEvent (access, FALSE, buf);
 }
 
@@ -220,7 +220,7 @@ tty::create_inuse (PSECURITY_ATTRIBUTES sa)
   HANDLE h;
   char buf[MAX_PATH];
 
-  shared_name (buf, TTY_SLAVE_ALIVE, get_unit ());
+  shared_name (buf, TTY_SLAVE_ALIVE, get_minor ());
   h = CreateEvent (sa, TRUE, FALSE, buf);
   termios_printf ("%s %p", buf, h);
   if (!h)
@@ -245,7 +245,7 @@ tty::get_event (const char *fmt, PSECURITY_ATTRIBUTES sa, BOOL manual_reset)
   HANDLE hev;
   char buf[MAX_PATH];
 
-  shared_name (buf, fmt, get_unit ());
+  shared_name (buf, fmt, get_minor ());
   if (!sa)
     sa = &sec_all;
   if (!(hev = CreateEvent (sa, manual_reset, FALSE, buf)))

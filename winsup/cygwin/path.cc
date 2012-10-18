@@ -2918,7 +2918,7 @@ chdir (const char *in_dir)
 
   int res = -1;
   const char *posix_cwd = NULL;
-  int devn = path.get_devn ();
+  dev_t devn = path.get_device ();
   if (!path.exists ())
     set_errno (ENOENT);
   else if (!path.isdir ())

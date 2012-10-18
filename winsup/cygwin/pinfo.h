@@ -178,10 +178,10 @@ public:
   int operator == (pinfo &x) const {return x.procinfo == procinfo;}
   int operator == (_pinfo *x) const {return x == procinfo;}
   int operator == (void *x) const {return procinfo == x;}
-  int operator == (int x) const {return (int) procinfo == (int) x;}
   int operator == (char *x) const {return (char *) procinfo == x;}
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
+  int operator !() const {return !procinfo;}
   void preserve () { destroy = false; }
   void allow_remove () { destroy = true; }
 #ifndef SIG_BAD_MASK		// kludge to ensure that sigproc.h included

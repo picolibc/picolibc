@@ -1,3 +1,37 @@
+2012-10-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	Avoid various type ambiguity problems showing up in the 64 bit case:
+	* cygheap.h (cygheap_user::set_sid): Convert to void.
+	(cygheap_user::set_saved_sid): Ditto.
+	* devices.h (struct device): Drop operator int& and DWORD& entirely.
+	Throughout, use dev_t or fh_devices instead.
+	* devices.cc: Regenerate.
+	* fhandler.h (class fhandler_base): Convert _refcnt member to LONG.
+	(fhandler_base::inc_refcnt): Return LONG.
+	(fhandler_base::dec_refcnt): Ditto.
+	(fhandler_base::get_major): Return _major_t.
+	(fhandler_base::get_minor): Return _minor_t.
+	(fhandler_base::get_unit): Delete.  Throughout, use get_minor instead
+	of get_unit.
+	(fhandler_socket::get_socket): Use SOCKET rather than int.  Only define
+	if __INSIDE_CYGWIN_NET__ is defined.
+	(fhandler_pty_slave::get_unit): Drop declaration.
+	* fhandler_procnet.cc: Include Windows headers early.
+	* fhandler_socket.cc: Ditto.
+	* fhandler_tty.cc (fhandler_pty_slave::get_unit): Remove.
+	* path.h (path_conv::get_device): Rename from get_devn and change return
+	type to dev_t.  Accommodate throughout.
+	(path_conv::get_unitn): Remove unused method.
+	* pinfo.h (class pinfo): Drop operator== for int case.
+	(pinfo::operator!): Define.
+	* poll.cc: Don't define __INSIDE_CYGWIN_NET__.
+	* syscalls.cc (getpgid): Replace use of pinfo::operator== with
+	pinfo::operator!.
+	* tty.h (tty_min::setntty): Convert 2nd parameter to _minor_t.
+	* tty.h (tty_min::getntty): Change return type to dev_t.
+	(tty_min::get_minor): Rename from get_unit.  Change return type to
+	_minor_t.
+
 2012-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Remove lloffset.

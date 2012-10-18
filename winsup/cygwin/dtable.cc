@@ -194,7 +194,7 @@ fhandler_base *
 dtable::find_archetype (device& dev)
 {
   for (unsigned i = 0; i < farchetype; i++)
-    if (archetypes[i]->get_device () == (DWORD) dev)
+    if (archetypes[i]->get_device () == (dev_t) dev)
       return archetypes[i];
   return NULL;
 }
@@ -482,7 +482,7 @@ fh_alloc (path_conv& pc)
       fh = cnew (fhandler_console, pc.dev);
       break;
     default:
-      switch ((DWORD) pc.dev)
+      switch ((dev_t) pc.dev)
 	{
 	case FH_CONSOLE:
 	case FH_CONIN:
@@ -661,7 +661,7 @@ build_fh_pc (path_conv& pc)
     last_tty_dev = fh->dev ();
 
 out:
-  debug_printf ("fh %p, dev %p", fh, fh ? (DWORD) fh->dev () : 0);
+  debug_printf ("fh %p, dev %p", fh, fh ? (dev_t) fh->dev () : 0);
   return fh;
 }
 

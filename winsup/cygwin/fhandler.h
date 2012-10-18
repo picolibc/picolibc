@@ -163,7 +163,7 @@ class fhandler_base
   HANDLE io_handle;
 
   ino_t ino;	/* file ID or hashed filename, depends on FS. */
-  long _refcnt;
+  LONG _refcnt;
 
  protected:
   /* File open flags from open () and fcntl () calls */
@@ -182,8 +182,8 @@ class fhandler_base
   HANDLE read_state;
 
  public:
-  long inc_refcnt () {return InterlockedIncrement (&_refcnt);}
-  long dec_refcnt () {return InterlockedDecrement (&_refcnt);}
+  LONG inc_refcnt () {return InterlockedIncrement (&_refcnt);}
+  LONG dec_refcnt () {return InterlockedDecrement (&_refcnt);}
   class fhandler_base *archetype;
   int usecount;
 
@@ -209,10 +209,9 @@ class fhandler_base
   /* Non-virtual simple accessor functions. */
   void set_io_handle (HANDLE x) { io_handle = x; }
 
-  DWORD& get_device () { return dev (); }
-  DWORD get_major () { return dev ().get_major (); }
-  DWORD get_minor () { return dev ().get_minor (); }
-  virtual int get_unit () { return dev ().get_minor (); }
+  dev_t& get_device () { return dev (); }
+  _major_t get_major () { return dev ().get_major (); }
+  _minor_t get_minor () { return dev ().get_minor (); }
 
   ACCESS_MASK get_access () const { return access; }
   void set_access (ACCESS_MASK x) { access = x; }
@@ -537,7 +536,14 @@ class fhandler_socket: public fhandler_base
  public:
   fhandler_socket ();
   ~fhandler_socket ();
-  int get_socket () { return (int) get_handle(); }
+/* Originally get_socket returned an int, which is not a good idea
+   to cast a handle to on 64 bit.  The right type here is very certainly
+   SOCKET instead.  On the other hand, we don't want to have to include
+   winsock.h just to build fhandler.h.  Therefore we define get_socket
+   now only when building network related code. */
+#ifdef __INSIDE_CYGWIN_NET__
+  SOCKET get_socket () { return (SOCKET) get_handle(); }
+#endif
   fhandler_socket *is_socket () { return this; }
 
   IMPLEMENT_STATUS_FLAG (bool, async_io)
@@ -1493,7 +1499,6 @@ class fhandler_pty_slave: public fhandler_pty_common
   void fixup_after_exec ();
 
   select_record *select_read (select_stuff *);
-  int get_unit ();
   virtual char const *ttyname () { return pc.dev.name; }
   int __stdcall fstat (struct stat *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));

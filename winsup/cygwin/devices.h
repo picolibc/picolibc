@@ -310,11 +310,9 @@ struct device
   _major_t get_major () const {return d.major;}
   dev_t   get_device () const {return d.devn;}
 
-  inline operator int& () {return d.devn_int;}
   inline operator fh_devices () {return d.devn_fh_devices;}
   inline operator bool () {return !!d.devn_int;}
   inline operator dev_t& () {return d.devn;}
-  inline operator DWORD& () {return d.devn_dword;}
   fh_devices operator = (fh_devices n) {return d.devn_fh_devices = n;}
   inline void setfs (bool x) {dev_on_fs = x;}
   inline bool isfs () const {return dev_on_fs || d.devn == FH_FS;}
@@ -376,9 +374,9 @@ extern const device dev_fs_storage;
   (isproc_dev (devn) || devn == FH_CYGDRIVE || devn == FH_NETDRIVE)
 
 #define iscons_dev(n) \
-  ((device::major ((int) (n)) == DEV_CONS_MAJOR) \
-   || (((int) n) == FH_CONSOLE) \
-   || (((int) n) == FH_CONIN) \
-   || (((int) n) == FH_CONOUT))
+  ((device::major ((dev_t) (n)) == DEV_CONS_MAJOR) \
+   || (((dev_t) n) == FH_CONSOLE) \
+   || (((dev_t) n) == FH_CONIN) \
+   || (((dev_t) n) == FH_CONOUT))
 
 #define istty_slave_dev(n) (device::major (n) == DEV_PTYS_MAJOR)

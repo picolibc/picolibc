@@ -11,6 +11,8 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 #define USE_SYS_TYPES_FD_SET
 #include "winsup.h"
+#include <ws2tcpip.h>
+#include <iphlpapi.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -18,8 +20,6 @@ details. */
 #include "fhandler_virtual.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include <ws2tcpip.h>
-#include <iphlpapi.h>
 #include <asm/byteorder.h>
 
 #define _COMPILING_NEWLIB

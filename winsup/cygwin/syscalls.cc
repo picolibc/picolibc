@@ -969,7 +969,7 @@ extern "C" int
 unlink (const char *ourname)
 {
   int res = -1;
-  DWORD devn;
+  dev_t devn;
   NTSTATUS status;
 
   path_conv win32_name (ourname, PC_SYM_NOFOLLOW, stat_suffixes);
@@ -980,7 +980,7 @@ unlink (const char *ourname)
       goto done;
     }
 
-  devn = win32_name.get_devn ();
+  devn = win32_name.get_device ();
   if (isproc_dev (devn))
     {
       set_errno (EROFS);
@@ -3020,7 +3020,7 @@ getpgid (pid_t pid)
     pid = getpid ();
 
   pinfo p (pid);
-  if (p == 0)
+  if (!p)
     {
       set_errno (ESRCH);
       return -1;

@@ -112,7 +112,7 @@ openpty (int *amaster, int *aslave, char *name, const struct termios *termp,
     {
       grantpt (master);
       unlockpt (master);
-      __ptsname (pts, cygheap->fdtab[master]->get_unit ());
+      __ptsname (pts, cygheap->fdtab[master]->get_minor ());
       revoke (pts);
       if ((slave = open (pts, O_RDWR | O_NOCTTY)) >= 0)
 	{

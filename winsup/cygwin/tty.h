@@ -68,9 +68,9 @@ public:
   int ioctl_retval;
   int write_error;
 
-  void setntty (_major_t t, int n) {ntty = (fh_devices) FHDEV (t, n);}
-  int getntty () const {return ntty;}
-  int get_unit () const {return device::minor (ntty);}
+  void setntty (_major_t t, _minor_t n) {ntty = (fh_devices) FHDEV (t, n);}
+  dev_t getntty () const {return ntty;}
+  _minor_t get_minor () const {return device::minor (ntty);}
   pid_t getpgid () const {return pgid;}
   void setpgid (int pid) {pgid = pid;}
   int getsid () const {return sid;}

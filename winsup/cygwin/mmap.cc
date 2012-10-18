@@ -261,7 +261,7 @@ class mmap_record
     off_t offset;
     DWORD len;
     caddr_t base_address;
-    int dev;
+    dev_t dev;
     DWORD page_map[0];
 
   public:

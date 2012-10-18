@@ -15,15 +15,15 @@
 #define USE_SYS_TYPES_FD_SET
 
 #include "winsup.h"
+#include <ws2tcpip.h>
+#include <mswsock.h>
+#include <iphlpapi.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include <ws2tcpip.h>
-#include <mswsock.h>
-#include <iphlpapi.h>
 #include <asm/byteorder.h>
 #include "cygwin/version.h"
 #include "perprocess.h"

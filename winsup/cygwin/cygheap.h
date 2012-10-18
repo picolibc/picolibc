@@ -153,8 +153,8 @@ public:
     const char *p = env_domain ("USERDOMAIN=", sizeof ("USERDOMAIN=") - 1);
     return (p == almost_null) ? NULL : p;
   }
-  BOOL set_sid (PSID new_sid) {return (BOOL) (effec_cygsid = new_sid);}
-  BOOL set_saved_sid () { return (BOOL) (saved_cygsid = effec_cygsid); }
+  void set_sid (PSID new_sid) { effec_cygsid = new_sid;}
+  void set_saved_sid () { saved_cygsid = effec_cygsid; }
   PSID sid () { return effec_cygsid; }
   PSID saved_sid () { return saved_cygsid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);

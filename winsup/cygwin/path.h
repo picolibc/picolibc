@@ -338,8 +338,7 @@ class path_conv
   {
     return eq_worker (pc, pc.path, pc.normalized_path);
   }
-  DWORD get_devn () {return (DWORD) dev;}
-  short get_unitn () const {return dev.get_minor ();}
+  dev_t get_device () {return dev.get_device ();}
   DWORD file_attributes () const {return fileattr;}
   void file_attributes (DWORD new_attr) {fileattr = new_attr;}
   DWORD fs_flags () {return fs.flags ();}
