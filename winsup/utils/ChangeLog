@@ -1,3 +1,9 @@
+2012-10-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygcheck.exe): Add temporary (1.7.17-only) hack to
+	allow cygcheck running on pre-Vista despite of the new w32api not
+	matching the locally used w32api.
+
 2012-10-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Convert "if/else if" chain to a switch

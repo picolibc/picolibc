@@ -74,7 +74,7 @@ path-mount.o: path.cc
 mount.exe: path-mount.o
 
 # Provide any necessary per-target variable overrides.
-cygcheck.exe: MINGW_LDFLAGS += -lpsapi -lntdll
+cygcheck.exe: MINGW_LDFLAGS +=  -B{w32api_lib} -lpsapi -lntdll -lmsvcrt
 cygpath.exe: ALL_LDFLAGS += -lcygwin -luserenv -lntdll
 cygpath.exe: CXXFLAGS += -fno-threadsafe-statics
 ps.exe: ALL_LDFLAGS += -lcygwin -lpsapi -lntdll
