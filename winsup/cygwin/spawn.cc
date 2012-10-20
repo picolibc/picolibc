@@ -465,7 +465,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	 PCA service.  However, a process which is controlled by PCA is part
 	 of a compatibility job, which allows child processes to break away
 	 from the job.  This helps to avoid this issue.
-	 
+
 	 (*) Note that this is not mintty's fault.  It has just been observed
 	 with mintty in the first place.  See the archives for more info:
 	 http://cygwin.com/ml/cygwin-developers/2012-02/msg00018.html */
@@ -746,7 +746,7 @@ loop:
       /* Reset handle inheritance to default when the execution of a non-Cygwin
 	 process fails.  Only need to do this for _P_OVERLAY since the handle will
 	 be closed otherwise.  Don't need to do this for 'parent' since it will
-         be closed in every case.  See FIXME above. */
+	 be closed in every case.  See FIXME above. */
       if (!iscygwin () && mode == _P_OVERLAY)
 	SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
       if (wr_proc_pipe == my_wr_proc_pipe)
@@ -867,7 +867,8 @@ loop:
 	}
       else
 	{
-	  close_all_files (true);
+	  if (iscygwin ())
+	    close_all_files (true);
 	  if (!my_wr_proc_pipe
 	      && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
 	    wait_for_myself ();

@@ -41,6 +41,10 @@ void _EXFUN(__assert, (const char *, int, const char *)
 void _EXFUN(__assert_func, (const char *, int, const char *, const char *)
 	    _ATTRIBUTE ((__noreturn__)));
 
+#if __STDC_VERSION__ >= 201112L && !defined __cplusplus
+# define static_assert _Static_assert
+#endif
+
 #ifdef __cplusplus
 }
 #endif

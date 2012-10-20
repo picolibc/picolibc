@@ -628,14 +628,16 @@ init_cygheap::find_tls (int sig)
     {
       threadlist_ix = -1;
       while (++threadlist_ix < (int) nthreads)
-	if (sigismember (&(threadlist[threadlist_ix]->sigwait_mask), sig))
+	if (threadlist[threadlist_ix]->tid
+	    && sigismember (&(threadlist[threadlist_ix]->sigwait_mask), sig))
 	  {
 	    t = cygheap->threadlist[threadlist_ix];
 	    goto out;
 	  }
       threadlist_ix = -1;
       while (++threadlist_ix < (int) nthreads)
-	if (!sigismember (&(threadlist[threadlist_ix]->sigmask), sig))
+	if (threadlist[threadlist_ix]->tid
+	    && !sigismember (&(threadlist[threadlist_ix]->sigmask), sig))
 	  {
 	    t = cygheap->threadlist[threadlist_ix];
 	    break;

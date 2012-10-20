@@ -286,17 +286,13 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
 	  if (CCEQ (ti.c_cc[VSTOP], c))
 	    {
 	      if (!tc ()->output_stopped)
-		{
-		  tc ()->output_stopped = 1;
-		  acquire_output_mutex (INFINITE);
-		}
+		tc ()->output_stopped = true;
 	      continue;
 	    }
 	  else if (CCEQ (ti.c_cc[VSTART], c))
 	    {
     restart_output:
-	      tc ()->output_stopped = 0;
-	      release_output_mutex ();
+	      tc ()->output_stopped = false;
 	      continue;
 	    }
 	  else if ((ti.c_iflag & IXANY) && tc ()->output_stopped)

@@ -207,17 +207,16 @@ public:
   void init_thread (void *, DWORD (*) (void *, void *));
   static void call (DWORD (*) (void *, void *), void *);
   void remove (DWORD);
-  void push (__stack_t) __attribute__ ((regparm (2)));
+  void push (__stack_t addr) {*stackptr++ = (__stack_t) addr;}
   __stack_t pop () __attribute__ ((regparm (1)));
   __stack_t retaddr () {return stackptr[-1];}
   bool isinitialized () const
   {
     return initialized == CYGTLS_INITIALIZED;
   }
-  bool interrupt_now (CONTEXT *, int, void *, struct sigaction&)
+  bool interrupt_now (CONTEXT *, siginfo_t&, void *, struct sigaction&)
     __attribute__((regparm(3)));
-  void __stdcall interrupt_setup (int sig, void *handler,
-				  struct sigaction& siga)
+  void __stdcall interrupt_setup (siginfo_t&, void *, struct sigaction&)
     __attribute__((regparm(3)));
 
   bool inside_kernel (CONTEXT *);
@@ -226,15 +225,18 @@ public:
   void signal_debugger (int) __attribute__ ((regparm(2)));
 
 #ifdef CYGTLS_HANDLE
-  operator HANDLE () const {return tid->win32_obj_id;}
+  operator HANDLE () const {return tid ? tid->win32_obj_id : NULL;}
 #endif
-  void set_siginfo (struct sigpacket *) __attribute__ ((regparm (3)));
   int call_signal_handler () __attribute__ ((regparm (1)));
   void remove_wq (DWORD) __attribute__ ((regparm (1)));
   void fixup_after_fork () __attribute__ ((regparm (1)));
   void lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));
   bool locked () __attribute__ ((regparm (1)));
+  void create_signal_arrived ()
+  {
+    signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
+  }
   void set_signal_arrived (bool setit, HANDLE& h)
   {
     if (!setit)
@@ -242,17 +244,16 @@ public:
     else
       {
 	if (!signal_arrived)
-	  signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
+	  {
+	    lock ();
+	    create_signal_arrived ();
+	    unlock ();
+	  }
 	h = signal_arrived;
 	signal_waiting = true;
       }
   }
-  void reset_signal_arrived ()
-  {
-    if (signal_arrived)
-      ResetEvent (signal_arrived);
-    signal_waiting = false;
-  }
+  void reset_signal_arrived () { signal_waiting = false; }
 private:
   void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
   /*gentls_offsets*/

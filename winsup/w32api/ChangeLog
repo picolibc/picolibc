@@ -1,3 +1,16 @@
+2012-08-10  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	Even though MSDN documents these as __cdecl the kernel32.dll library
+	exports them as __stdcall.  Confirmed with gendef program.
+
+	* lib/kernel32.def (InterlockedDecrement): Revert the 2012-08-08 change.
+	(InterlockedIncrement): Ditto.
+	(InterlockedExchange): Ditto.
+	* include/winbase.h (InterlockedDecrement): Revert the 2012-08-01
+	change.
+	(InterlockedIncrement): Ditto.
+	(InterlockedExchange): Ditto.
+
 2012-08-08  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* lib/kernel32.def (InterlockedDecrement): Remove the @BYTE count since

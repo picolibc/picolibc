@@ -112,11 +112,15 @@ enum
   IPPORT_USERRESERVED = 5000
 };
 
+/* Avoid collision with Mingw64 headers. */
+#ifndef s_addr
 /* Internet address. */
 struct in_addr
 {
   in_addr_t s_addr;
 };
+#define s_addr s_addr
+#endif
 
 /* Request struct for IPv4 multicast socket ops */
 

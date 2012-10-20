@@ -234,6 +234,7 @@ typedef struct sparc_opcode
 #define OPF_LOW5(x)	OPF ((x) & 0x1f)     /* V9.  */
 #define OPF_LOW4(x)	OPF ((x) & 0xf)      /* V9.  */
 #define F3F(x, y, z)	(OP (x) | OP3 (y) | OPF (z)) /* Format3 float insns.  */
+#define F3F4(x, y, z)	(OP (x) | OP3 (y) | OPF_LOW4 (z))
 #define F3I(x)		(((x) & 0x1) << 13)  /* Immediate field of format 3 insns.  */
 #define F2(x, y)	(OP (x) | OP2(y))    /* Format 2 insns.  */
 #define F3(x, y, z)	(OP (x) | OP3(y) | F3I(z)) /* Format3 insns.  */

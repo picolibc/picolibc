@@ -250,7 +250,7 @@ class lockf_t
     uint16_t	    lf_type;  /* Lock type: F_RDLCK, F_WRLCK */
     _off64_t	    lf_start; /* Byte # of the start of the lock */
     _off64_t	    lf_end;   /* Byte # of the end of the lock (-1=EOF) */
-    int64_t         lf_id;    /* Cygwin PID for POSIX locks, a unique id per
+    int64_t	    lf_id;    /* Cygwin PID for POSIX locks, a unique id per
 				 file table entry for BSD flock locks. */
     DWORD	    lf_wid;   /* Win PID of the resource holding the lock */
     uint16_t	    lf_ver;   /* Version number of the lock.  If a released

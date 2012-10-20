@@ -1,3 +1,20 @@
+2012-10-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygcheck.exe): Add temporary (1.7.17-only) hack to
+	allow cygcheck running on pre-Vista despite of the new w32api not
+	matching the locally used w32api.
+
+2012-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Convert "if/else if" chain to a switch
+	statement.  Drop "not yet supported" and "Server" from Windows 2012
+	output string.
+
+2012-09-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Drop "not yet supported" text from
+	Windows 8.  Update products array.
+
 2012-07-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (cygcheck.exe): Link against psapi.dll.

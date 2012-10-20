@@ -23,7 +23,8 @@ btowc (int c)
 
   _REENT_CHECK_MISC(_REENT);
 
-  retval = __mbtowc (_REENT, &pwc, &b, 1, __locale_charset (), &mbs);
+  retval = __mbtowc (_REENT, &pwc, (const char *) &b, 1,
+		     __locale_charset (), &mbs);
 
   if (retval != 0 && retval != 1)
     return WEOF;

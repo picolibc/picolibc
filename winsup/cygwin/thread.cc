@@ -575,17 +575,17 @@ pthread::cancel ()
       GetThreadContext (win32_obj_id, &context);
       /* The OS is not foolproof in terms of asynchronous thread cancellation
 	 and tends to hang infinitely if we change the instruction pointer.
-         So just don't cancel asynchronously if the thread is currently
+	 So just don't cancel asynchronously if the thread is currently
 	 executing Windows code.  Rely on deferred cancellation in this case. */
       if (!cygtls->inside_kernel (&context))
-        {
-          context.Eip = (DWORD) pthread::static_cancel_self;
-          SetThreadContext (win32_obj_id, &context);
-        }
+	{
+	  context.Eip = (DWORD) pthread::static_cancel_self;
+	  SetThreadContext (win32_obj_id, &context);
+	}
     }
   mutex.unlock ();
   /* See above.  For instance, a thread which waits for a semaphore in sem_wait
-     will call cancelable_wait which in turn calls WFMO.  While this WFMO call
+     will call cygwait which in turn calls WFMO.  While this WFMO call
      is cancelable by setting the thread's cancel_event object, the OS
      apparently refuses to set the thread's context and continues to wait for
      the WFMO conditions.  This is *not* reflected in the return value of
@@ -1228,7 +1228,7 @@ pthread_cond::wait (pthread_mutex_t mutex, PLARGE_INTEGER timeout)
   ++mutex->condwaits;
   mutex->unlock ();
 
-  rv = cancelable_wait (sem_wait, timeout, cw_cancel | cw_sig_eintr);
+  rv = cygwait (sem_wait, timeout, cw_cancel | cw_sig_eintr);
 
   mtx_out.lock ();
 
@@ -1744,7 +1744,7 @@ pthread_mutex::lock ()
 	   || !pthread::equal (owner, self))
     {
       /* FIXME: no cancel? */
-      cancelable_wait (win32_obj_id, cw_infinite, cw_sig);
+      cygwait (win32_obj_id, cw_infinite, cw_sig);
       set_owner (self);
     }
   else
@@ -1885,7 +1885,7 @@ pthread_spinlock::lock ()
 	  LARGE_INTEGER timeout;
 	  timeout.QuadPart = -10000LL;
 	  /* FIXME: no cancel? */
-	  cancelable_wait (win32_obj_id, &timeout, cw_sig);
+	  cygwait (win32_obj_id, &timeout, cw_sig);
 	}
     }
   while (result == -1);
@@ -2364,7 +2364,7 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->mutex.unlock ();
 
-      switch (cancelable_wait ((*thread)->win32_obj_id, cw_infinite, cw_sig | cw_cancel))
+      switch (cygwait ((*thread)->win32_obj_id, cw_infinite, cw_sig | cw_cancel))
 	{
 	case WAIT_OBJECT_0:
 	  if (return_val)
@@ -3476,7 +3476,7 @@ semaphore::_timedwait (const struct timespec *abstime)
   timeout.QuadPart = abstime->tv_sec * NSPERSEC
 		     + (abstime->tv_nsec + 99) / 100 + FACTOR;
 
-  switch (cancelable_wait (win32_obj_id, &timeout, cw_cancel | cw_cancel_self | cw_sig_eintr))
+  switch (cygwait (win32_obj_id, &timeout, cw_cancel | cw_cancel_self | cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
@@ -3488,7 +3488,7 @@ semaphore::_timedwait (const struct timespec *abstime)
       set_errno (ETIMEDOUT);
       return -1;
     default:
-      pthread_printf ("cancelable_wait failed. %E");
+      pthread_printf ("cygwait failed. %E");
       __seterrno ();
       return -1;
     }
@@ -3498,7 +3498,7 @@ semaphore::_timedwait (const struct timespec *abstime)
 int
 semaphore::_wait ()
 {
-  switch (cancelable_wait (win32_obj_id, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr))
+  switch (cygwait (win32_obj_id, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       currentvalue--;
@@ -3507,7 +3507,7 @@ semaphore::_wait ()
       set_errno (EINTR);
       return -1;
     default:
-      pthread_printf ("cancelable_wait failed. %E");
+      pthread_printf ("cygwait failed. %E");
       break;
     }
   return 0;
@@ -3523,7 +3523,7 @@ semaphore::_fixup_after_fork ()
       this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
 					      LONG_MAX, NULL);
       if (!win32_obj_id)
-	api_fatal ("failed to create new win32 semaphore, error %d");
+	api_fatal ("failed to create new win32 semaphore, %E");
     }
 }
 

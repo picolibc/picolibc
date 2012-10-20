@@ -25,6 +25,8 @@
 #ifndef _MIPS_H_
 #define _MIPS_H_
 
+#include "bfd.h"
+
 /* These are bit masks and shift counts to use to access the various
    fields of an instruction.  To retrieve the X field of an
    instruction, use the expression
@@ -353,6 +355,9 @@ struct mips_opcode
   /* A collection of bits describing the instruction sets of which this
      instruction or macro is a member. */
   unsigned long membership;
+  /* A collection of bits describing the instruction sets of which this
+     instruction or macro is not a member.  */
+  unsigned long exclusions;
 };
 
 /* These are the characters which may appear in the args field of an
@@ -829,46 +834,102 @@ static const unsigned int mips_isa_table[] =
 #define CPU_OCTEON2	6502
 #define CPU_XLR     	887682   	/* decimal 'XLR'   */
 
+/* Return true if the given CPU is included in INSN_* mask MASK.  */
+
+static inline bfd_boolean
+cpu_is_member (int cpu, unsigned int mask)
+{
+  switch (cpu)
+    {
+    case CPU_R4650:
+    case CPU_RM7000:
+    case CPU_RM9000:
+      return (mask & INSN_4650) != 0;
+
+    case CPU_R4010:
+      return (mask & INSN_4010) != 0;
+
+    case CPU_VR4100:
+      return (mask & INSN_4100) != 0;
+
+    case CPU_R3900:
+      return (mask & INSN_3900) != 0;
+
+    case CPU_R10000:
+    case CPU_R12000:
+    case CPU_R14000:
+    case CPU_R16000:
+      return (mask & INSN_10000) != 0;
+
+    case CPU_SB1:
+      return (mask & INSN_SB1) != 0;
+
+    case CPU_R4111:
+      return (mask & INSN_4111) != 0;
+
+    case CPU_VR4120:
+      return (mask & INSN_4120) != 0;
+
+    case CPU_VR5400:
+      return (mask & INSN_5400) != 0;
+
+    case CPU_VR5500:
+      return (mask & INSN_5500) != 0;
+
+    case CPU_LOONGSON_2E:
+      return (mask & INSN_LOONGSON_2E) != 0;
+
+    case CPU_LOONGSON_2F:
+      return (mask & INSN_LOONGSON_2F) != 0;
+
+    case CPU_LOONGSON_3A:
+      return (mask & INSN_LOONGSON_3A) != 0;
+
+    case CPU_OCTEON:
+      return (mask & INSN_OCTEON) != 0;
+
+    case CPU_OCTEONP:
+      return (mask & INSN_OCTEONP) != 0;
+
+    case CPU_OCTEON2:
+      return (mask & INSN_OCTEON2) != 0;
+
+    case CPU_XLR:
+      return (mask & INSN_XLR) != 0;
+
+    default:
+      return FALSE;
+    }
+}
+
 /* Test for membership in an ISA including chip specific ISAs.  INSN
    is pointer to an element of the opcode table; ISA is the specified
    ISA/ASE bitmask to test against; and CPU is the CPU specific ISA to
-   test, or zero if no CPU specific ISA test is desired.  */
+   test, or zero if no CPU specific ISA test is desired.  Return true
+   if instruction INSN is available to the given ISA and CPU. */
 
-#define OPCODE_IS_MEMBER(insn, isa, cpu)				\
-    (((isa & INSN_ISA_MASK) != 0                                        \
-      && ((insn)->membership & INSN_ISA_MASK) != 0                      \
-      && ((mips_isa_table [(isa & INSN_ISA_MASK) - 1] >>                \
-           (((insn)->membership & INSN_ISA_MASK) - 1)) & 1) != 0)       \
-     || ((isa & ~INSN_ISA_MASK)                                         \
-          & ((insn)->membership & ~INSN_ISA_MASK)) != 0                 \
-     || (cpu == CPU_R4650 && ((insn)->membership & INSN_4650) != 0)	\
-     || (cpu == CPU_RM7000 && ((insn)->membership & INSN_4650) != 0)	\
-     || (cpu == CPU_RM9000 && ((insn)->membership & INSN_4650) != 0)	\
-     || (cpu == CPU_R4010 && ((insn)->membership & INSN_4010) != 0)	\
-     || (cpu == CPU_VR4100 && ((insn)->membership & INSN_4100) != 0)	\
-     || (cpu == CPU_R3900 && ((insn)->membership & INSN_3900) != 0)	\
-     || ((cpu == CPU_R10000 || cpu == CPU_R12000 || cpu == CPU_R14000	\
-	  || cpu == CPU_R16000)						\
-	 && ((insn)->membership & INSN_10000) != 0)			\
-     || (cpu == CPU_SB1 && ((insn)->membership & INSN_SB1) != 0)	\
-     || (cpu == CPU_R4111 && ((insn)->membership & INSN_4111) != 0)	\
-     || (cpu == CPU_VR4120 && ((insn)->membership & INSN_4120) != 0)	\
-     || (cpu == CPU_VR5400 && ((insn)->membership & INSN_5400) != 0)	\
-     || (cpu == CPU_VR5500 && ((insn)->membership & INSN_5500) != 0)	\
-     || (cpu == CPU_LOONGSON_2E                                         \
-         && ((insn)->membership & INSN_LOONGSON_2E) != 0)               \
-     || (cpu == CPU_LOONGSON_2F                                         \
-         && ((insn)->membership & INSN_LOONGSON_2F) != 0)               \
-     || (cpu == CPU_LOONGSON_3A                                         \
-         && ((insn)->membership & INSN_LOONGSON_3A) != 0)               \
-     || (cpu == CPU_OCTEON						\
-	 && ((insn)->membership & INSN_OCTEON) != 0)			\
-     || (cpu == CPU_OCTEONP						\
-	 && ((insn)->membership & INSN_OCTEONP) != 0)			\
-     || (cpu == CPU_OCTEON2						\
-	 && ((insn)->membership & INSN_OCTEON2) != 0)			\
-     || (cpu == CPU_XLR && ((insn)->membership & INSN_XLR) != 0)        \
-     || 0)	/* Please keep this term for easier source merging.  */
+static inline bfd_boolean
+opcode_is_member (const struct mips_opcode *insn, int isa, int cpu)
+{
+  if (!cpu_is_member (cpu, insn->exclusions))
+    {
+      /* Test for ISA level compatibility.  */
+      if ((isa & INSN_ISA_MASK) != 0
+	  && (insn->membership & INSN_ISA_MASK) != 0
+	  && ((mips_isa_table[(isa & INSN_ISA_MASK) - 1]
+	       >> ((insn->membership & INSN_ISA_MASK) - 1)) & 1) != 0)
+	return TRUE;
+
+      /* Test for ASE compatibility.  */
+      if (((isa & ~INSN_ISA_MASK) & (insn->membership & ~INSN_ISA_MASK)) != 0)
+	return TRUE;
+
+      /* Test for processor-specific extensions.  */
+      if (cpu_is_member (cpu, insn->membership))
+	return TRUE;
+    }
+  return FALSE;
+}
 
 /* This is a list of macro expanded instructions.
 

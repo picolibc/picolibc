@@ -61,7 +61,7 @@ _cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
 
   /* Optional BLODA detection.  The idea is that the function address is
      supposed to be within Cygwin itself.  This is also true for pthreads,
-     since pthreads are always calling thread_wrapper in miscfuncs.cc. 
+     since pthreads are always calling thread_wrapper in miscfuncs.cc.
      Therefore, every function call to a function outside of the Cygwin DLL
      is potentially a thread injected into the Cygwin process by some BLODA.
 
@@ -195,16 +195,4 @@ _cygtls::remove (DWORD wait)
   locals.pathbufs.destroy ();
   cygheap->remove_tls (this, wait);
   remove_wq (wait);
-}
-
-void
-_cygtls::push (__stack_t addr)
-{
-  *stackptr++ = (__stack_t) addr;
-}
-
-void
-_cygtls::set_siginfo (sigpacket *pack)
-{
-  infodata = pack->si;
 }

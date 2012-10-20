@@ -37,8 +37,6 @@ details. */
 
 char debugger_command[2 * NT_MAX_PATH + 20];
 
-extern "C" void sigdelayed ();
-
 static BOOL WINAPI ctrl_c_handler (DWORD);
 
 /* This is set to indicate that we have already exited.  */
@@ -710,7 +708,7 @@ handle_sigsuspend (sigset_t tempmask)
   sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
-  cancelable_wait (NULL, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr);
+  cygwait (NULL, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr);
 
   set_sig_errno (EINTR);	// Per POSIX
 
@@ -741,10 +739,11 @@ sig_handle_tty_stop (int sig)
       sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
       /* FIXME! This does nothing to suspend anything other than the main
 	 thread. */
-      DWORD res = cancelable_wait (NULL, cw_infinite, cw_sig_eintr);
+      DWORD res = cygwait (NULL, cw_infinite, cw_sig_eintr);
       switch (res)
 	{
 	case WAIT_SIGNALED:
+	  _my_tls.sig = 0;
 	  myself->stopsig = SIGCONT;
 	  myself->alert_parent (SIGCONT);
 	  break;
@@ -758,7 +757,7 @@ sig_handle_tty_stop (int sig)
 } /* end extern "C" */
 
 bool
-_cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
+_cygtls::interrupt_now (CONTEXT *cx, siginfo_t& si, void *handler,
 			struct sigaction& siga)
 {
   bool interrupted;
@@ -772,7 +771,7 @@ _cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
   else
     {
       push ((__stack_t) cx->Eip);
-      interrupt_setup (sig, handler, siga);
+      interrupt_setup (si, handler, siga);
       cx->Eip = pop ();
       SetThreadContext (*this, cx); /* Restart the thread in a new location */
       interrupted = true;
@@ -781,7 +780,7 @@ _cygtls::interrupt_now (CONTEXT *cx, int sig, void *handler,
 }
 
 void __stdcall
-_cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
+_cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
 {
   push ((__stack_t) sigdelayed);
   deltamask = siga.sa_mask & ~SIG_NONMASKABLE;
@@ -796,13 +795,18 @@ _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
       myself->process_state |= PID_STOPPED;
     }
 
-  this->sig = sig;			// Should always be last thing set to avoid a race
+  infodata = si;
+  this->sig = si.si_signo;		// Should always be last thing set to avoid a race
 
-  if (incyg && signal_arrived)
-    SetEvent (signal_arrived);
+  if (incyg)
+    {
+      if (!signal_arrived)
+	create_signal_arrived ();
+      SetEvent (signal_arrived);
+    }
 
   proc_subproc (PROC_CLEARWAIT, 1);
-  sigproc_printf ("armed signal_arrived %p, signal %d", signal_arrived, sig);
+  sigproc_printf ("armed signal_arrived %p, signal %d", signal_arrived, si.si_signo);
 }
 
 extern "C" void __stdcall
@@ -812,10 +816,8 @@ set_sig_errno (int e)
   _my_tls.saved_errno = e;
 }
 
-static int setup_handler (int, void *, struct sigaction&, _cygtls *tls)
-  __attribute__((regparm(3)));
-static int
-setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
+int
+sigpacket::setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
 {
   CONTEXT cx;
   bool interrupted = false;
@@ -823,7 +825,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
   if (tls->sig)
     {
       sigproc_printf ("trying to send signal %d but signal %d already armed",
-		      sig, tls->sig);
+		      si.si_signo, tls->sig);
       goto out;
     }
 
@@ -836,7 +838,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 	    {
 	      sigproc_printf ("controlled interrupt. stackptr %p, stack %p, stackptr[-1] %p",
 			      tls->stackptr, tls->stack, tls->stackptr[-1]);
-	      tls->interrupt_setup (sig, handler, siga);
+	      tls->interrupt_setup (si, handler, siga);
 	      interrupted = true;
 	      tls->unlock ();
 	      goto out;
@@ -844,30 +846,34 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 
 	  DWORD res;
 	  HANDLE hth = (HANDLE) *tls;
-
-	  /* Suspend the thread which will receive the signal.
-	     If one of these conditions is not true we loop.
-	     If the thread is already suspended (which can occur when a program
-	     has called SuspendThread on itself) then just queue the signal. */
-
-	  sigproc_printf ("suspending thread, tls %p, _main_tls %p", tls, _main_tls);
-	  res = SuspendThread (hth);
-	  /* Just set pending if thread is already suspended */
-	  if (res)
-	    {
-	      ResumeThread (hth);
-	      goto out;
-	    }
-	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-	  if (!GetThreadContext (hth, &cx))
-	    sigproc_printf ("couldn't get context of thread, %E");
+	  if (!hth)
+	    sigproc_printf ("thread handle NULL, not set up yet?");
 	  else
-	    interrupted = tls->interrupt_now (&cx, sig, handler, siga);
+	    {
+	      /* Suspend the thread which will receive the signal.
+		 If one of these conditions is not true we loop.
+		 If the thread is already suspended (which can occur when a program
+		 has called SuspendThread on itself) then just queue the signal. */
 
-	  tls->unlock ();
-	  ResumeThread (hth);
-	  if (interrupted)
-	    goto out;
+	      sigproc_printf ("suspending thread, tls %p, _main_tls %p", tls, _main_tls);
+	      res = SuspendThread (hth);
+	      /* Just set pending if thread is already suspended */
+	      if (res)
+		{
+		  ResumeThread (hth);
+		  goto out;
+		}
+	      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	      if (!GetThreadContext (hth, &cx))
+		sigproc_printf ("couldn't get context of thread, %E");
+	      else
+		interrupted = tls->interrupt_now (&cx, si, handler, siga);
+
+	      tls->unlock ();
+	      ResumeThread (hth);
+	      if (interrupted)
+		goto out;
+	    }
 
 	  sigproc_printf ("couldn't interrupt.  trying again.");
 	  yield ();
@@ -878,7 +884,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
     }
 
 out:
-  sigproc_printf ("signal %d %sdelivered", sig, interrupted ? "" : "not ");
+  sigproc_printf ("signal %d %sdelivered", si.si_signo, interrupted ? "" : "not ");
   return interrupted;
 }
 
@@ -1227,16 +1233,18 @@ dosig:
       rc = -1;		/* No signals delivered if stopped */
   else
     {
-      tls->set_siginfo (this);
       /* Dispatch to the appropriate function. */
       sigproc_printf ("signal %d, signal handler %p", si.si_signo, handler);
-      rc = setup_handler (si.si_signo, handler, thissig, tls);
+      rc = setup_handler (handler, thissig, tls);
       continue_now = false;
     }
 
 done:
   if (continue_now)
-    SetEvent (tls->signal_arrived);
+    {
+      tls->sig = SIGCONT;
+      SetEvent (tls->signal_arrived);
+    }
   sigproc_printf ("returning %d", rc);
   return rc;
 

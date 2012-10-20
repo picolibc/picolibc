@@ -58,8 +58,7 @@
  */
 
 /* requires GCC >= 3.1 */
-#if !defined(__GNUC__) || __GNUC__ < 3 || \
-	(__GNUC__ == 3 && __GNUC_MINOR__ < 1)
+#if !__GNUC_PREREQ (3, 1)
 #error "<tgmath.h> not implemented for this compiler"
 #endif
 

@@ -36,8 +36,7 @@ details. */
 
 /* Maximum length of a multibyte character.  */
 #ifndef MB_LEN_MAX
-/* TODO: This is newlib's max value.  We should probably rather define our
-   own _mbtowc_r and _wctomb_r functions which are only codepage dependent. */
+/* Use value from newlib. */
 #define MB_LEN_MAX 8
 #endif
 

@@ -1,3 +1,35 @@
+2012-08-27  Walter Lee  <walt@tilera.com>
+
+	* tilegx.h (R_TILEGX_IMM16_X0_HW0_PLT_PCREL): New relocation.
+	(R_TILEGX_IMM16_X1_HW0_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW1_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X1_HW1_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW2_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X1_HW2_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW3_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X1_HW3_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW0_LAST_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X1_HW0_LAST_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW1_LAST_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X1_HW1_LAST_PLT_PCREL): Ditto.
+	(R_TILEGX_IMM16_X0_HW2_LAST_PLT_PCREL	): Ditto.
+	(R_TILEGX_IMM16_X1_HW2_LAST_PLT_PCREL): Ditto.
+	
+2012-08-13  Ian Bolton  <ian.bolton@arm.com>
+            Laurent Desnogues  <laurent.desnogues@arm.com>
+            Jim MacArthur  <jim.macarthur@arm.com>
+            Marcus Shawcroft  <marcus.shawcroft@arm.com>
+            Nigel Stephens  <nigel.stephens@arm.com>
+            Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+            Richard Earnshaw  <rearnsha@arm.com>
+            Sofiane Naci  <sofiane.naci@arm.com>
+            Tejas Belagod  <tejas.belagod@arm.com>
+            Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* aarch64.h: New file.
+	* common.h (EM_res183): Rename to EM_AARCH64.
+	(EM_res184): Rename to EM_ARM184.
+
 2012-06-28  Iain Sandoe  <iain@codesourcery.com>
 
 	* common.h (AT_L1I_CACHESHAPE, AT_L1D_CACHESHAPE,

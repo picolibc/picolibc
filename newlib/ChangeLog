@@ -1,4 +1,150 @@
-2012-08-09  Corinna Vinschen  <vinschen@redhat.com>
+2012-10-16  Gregory Pietsch  <gpietsch@comcast.net>
+
+	* libc/stdlib/getopt.c (getopt_internal): Align handling of colon to
+	SUSv4 requirements.
+	(__getopt_long_r): Fix formatting.
+
+2012-10-16  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/vfprintf.c (__sbprintf): Fix comment.
+
+2012-10-16  Aurelien Jacobs  <aurel@gnuage.org>
+
+	* libc/include/assert.h (static_assert): Define.
+
+2012-10-16  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/features.h (__GNUC_PREREQ): Define.  Use
+	throughout in place of explicit GNUC version checks.
+	* libc/include/_ansi.h (_NOINLINE): Define.
+	(_NOINLINE_STATIC): Define.
+	* libc/stdio/vfprintf.c (__sbprintf): Define _NOINLINE_STATIC.
+
+2012-10-09  Peter Rosin  <peda@lysator.liu.se>
+
+	* libc/posix/wordfree.c (wordfree): The wrong words are freed
+	when WRDE_DOOFFS is in use. Restructure the code so that the memory
+	needed to be freed is instead kept in an internal linked list...
+	* libc/posix/wordexp2.h: ...as defined here...
+	* libc/posix/wordexp.c (wordexp): ...and build this internal
+	linked list here, avoiding wasteful strdup calls in the process.
+
+2012-10-09  Peter Rosin  <peda@lysator.liu.se>
+
+	* libc/posix/wordexp.c (wordexp): Return WRDE_NOSPACE on resource
+	allocation failure. Cleanup leftover resources when failing.
+
+2012-10-09  Peter Rosin  <peda@lysator.liu.se>
+
+	* libc/posix/wordexp.c (wordexp): Handle expanded words longer
+	than 500 bytes.
+
+2012-10-09  Peter Rosin  <peda@lysator.liu.se>
+
+	* libc/posix/wordexp.c (wordexp): Don't leak file streams.
+
+2012-10-03  DJ Delorie  <dj@redhat.com>
+
+	* libc/machine/rl78/setjmp.S: Convert from CPP macros to GAS
+	macros, to avoid dependence on the line separation character.
+
+2012-10-01  DJ Delorie  <dj@redhat.com>
+
+	* libc/sys/sysnecv850/sbrk.c (_sbrk): Change heap_start to be an
+	array of undefined size, to avoid problems when compiled with
+	-msda=4.
+
+2012-10-01  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* README: replace sources.redhat.com with sourceware.org.
+	* HOWTO: Ditto.
+
+2012-09-26  Ian Bolton  <ian.bolton@arm.com>
+        Jim MacArthur  <jim.macarthur@arm.com>
+        Marcus Shawcroft  <marcus.shawcroft@arm.com>
+        Nigel Stephens  <nigel.stephens@arm.com>
+        Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+        Richard Earnshaw  <rearnsha@arm.com>
+        Sofiane Naci  <sofiane.naci@arm.com>
+        Tejas Belagod  <tejas.belagod@arm.com>
+        Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* configure.host: Add AArch64.
+	* libc/include/machine/ieeefp.h: Add AArch64.
+	* libc/include/machine/setjmp.h: Add AArch64.
+	* libc/include/machine/time.h: Add AArch64.
+	* libc/include/sys/config.h: Add AArch64.
+	* libc/machine/aarch64/Makefile.am: New file.
+	* libc/machine/aarch64/Makefile.in: Generated.
+	* libc/machine/aarch64/aclocal.m4: Generated.
+	* libc/machine/aarch64/configure: Generated.
+	* libc/machine/aarch64/configure.in: New file.
+	* libc/machine/aarch64/setjmp.S: New file.
+	* libc/machine/configure.in: Add AArch64.
+	* libc/machine/configure: Re-generated.
+	* libm/machine/aarch64/Makefile.am: New file.
+	* libm/machine/aarch64/Makefile.in: Generated.
+	* libm/machine/aarch64/aclocal.m4: Generated.
+	* libm/machine/aarch64/configure: Generated.
+	* libm/machine/aarch64/configure.in: New file.
+	* libm/machine/aarch64/s_ceil.c: New file.
+	* libm/machine/aarch64/s_floor.c: New file.
+	* libm/machine/aarch64/s_fma.c: New file.
+	* libm/machine/aarch64/s_fmax.c: New file.
+	* libm/machine/aarch64/s_fmin.c: New file.
+	* libm/machine/aarch64/s_llrint.c: New file.
+	* libm/machine/aarch64/s_llround.c: New file.
+	* libm/machine/aarch64/s_lrint.c: New file.
+	* libm/machine/aarch64/s_lround.c: New file.
+	* libm/machine/aarch64/s_nearbyint.c: New file.
+	* libm/machine/aarch64/s_rint.c: New file.
+	* libm/machine/aarch64/s_round.c: New file.
+	* libm/machine/aarch64/s_trunc.c: New file.
+	* libm/machine/aarch64/sf_ceil.c: New file.
+	* libm/machine/aarch64/sf_floor.c: New file.
+	* libm/machine/aarch64/sf_fma.c: New file.
+	* libm/machine/aarch64/sf_fmax.c: New file.
+	* libm/machine/aarch64/sf_fmin.c: New file.
+	* libm/machine/aarch64/sf_llrint.c: New file.
+	* libm/machine/aarch64/sf_llround.c: New file.
+	* libm/machine/aarch64/sf_lrint.c: New file.
+	* libm/machine/aarch64/sf_lround.c: New file.
+	* libm/machine/aarch64/sf_nearbyint.c: New file.
+	* libm/machine/aarch64/sf_rint.c: New file.
+	* libm/machine/aarch64/sf_round.c: New file.
+	* libm/machine/aarch64/sf_trunc.c: New file.
+	* libm/machine/configure.in: Add AArch64.
+	* libm/machine/configure: Re-generated.
+
+2012-09-26  Michael Hope  <michael.hope@linaro.org>
+
+	* doc/makedoc.c (dup_): Rename to avoid colliding with dup(2). 
+
+2012-09-13  Anthony Green  <green@moxielogic.com>
+
+	* libc/include/machine/ieeefp.h (__IEEE_BIG_ENDIAN): Add bi-endian
+	support for moxie.
+
+2012-08-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* libc/stdio/flags.c (__sflags): Guard against using O_BINARY on
+	systems which do not provide it.
+
+2012-08-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* libc/stdio/flags.c (__sflags): Rewrite recognition of extended mode
+	flags to just loop over more allowed flags.  Support glibc 'e' flag on
+	systems defining _GLIBC_EXTENSION.  Support C11 'x' flag.
+
+2012-08-10  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdlib/btowc.c (btowc): Cast to avoid compiler warning.
+	* libc/search/hash_buf.c (__get_buf): Initialize local vars to avoid
+	compiler warning.
+	* libc/stdio/fgets.c (_fgets_r): Ditto.
+	* libc/time/strftime.c (strftime): Ditto.
+
+2012-08-10  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Fix guard around state to
 	allow usage in !FLOATING_POINT && _WANT_IO_C99_FORMATS case.

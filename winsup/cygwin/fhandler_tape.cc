@@ -1150,7 +1150,7 @@ fhandler_dev_tape::_lock (bool cancelable)
   /* O_NONBLOCK is only valid in a read or write call.  Only those are
      cancelable. */
   DWORD timeout = cancelable && is_nonblocking () ? 0 : INFINITE;
-  switch (cancelable_wait (mt_mtx, timeout, cw_sig | cw_cancel | cw_cancel_self))
+  switch (cygwait (mt_mtx, timeout, cw_sig | cw_cancel | cw_cancel_self))
     {
     case WAIT_OBJECT_0:
       return true;
@@ -1214,9 +1214,9 @@ fhandler_dev_tape::open (int flags, mode_t)
       if (!(flags & O_DIRECT))
 	{
 	  devbufsiz = mt.drive (driveno ())->dp ()->MaximumBlockSize;
-	  devbuf = new char [devbufsiz];
+	  devbufalign = 1;
+	  devbufalloc = devbuf = new char [devbufsiz];
 	}
-      devbufstart = devbufend = 0;
     }
   else
     ReleaseMutex (mt_mtx);

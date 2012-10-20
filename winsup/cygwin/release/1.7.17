@@ -1,0 +1,43 @@
+What's new:
+-----------
+
+- Support the "e" flag to fopen(3).  This is a Glibc extension which
+  allows to fopen the file with the O_CLOEXEC flag set.
+
+- Support the "x" flag to fopen(3).  This is a Glibc/C11 extension which
+  allows to open the file with the O_EXCL flag set.
+
+
+Bug fixes:
+----------
+
+- Prevent CTRL-S hang.
+  Fixes: http://cygwin.com/ml/cygwin/2012-10/threads.html#00089
+
+- Revamp signals so that signals-to-threads more closely mimic Linux
+  operation.
+  First step of fix for: http://cygwin.com/ml/cygwin/2012-05/msg00186.html
+  as well as observed Linux behavior.
+
+- Revert to only creating a new session leader when we know that a
+  console process is started in the background.
+  Should fix: http://cygwin.com/ml/cygwin/2012-08/threads.html#00062
+
+- Fix mysterious crashes when accessing /etc.
+  Fixes: http://cygwin.com/ml/cygwin/2012-07/threads.html#00613 and others.
+
+- Fix a potential race condition starting multiple "first" Cygwin processes
+  concurrently.
+  Should fix: http://cygwin.com/ml/cygwin/2012-07/msg00531.html
+
+- Fix a bug in unlink/rmdir which could result in removing non-empty
+  directories on network drives.  Also fix problems trying to rename files
+  under newer Samba versions.
+  Fixes: http://cygwin.com/ml/cygwin/2012-07/threads.html#00477
+
+- Prefer to call WSARecvMsg from recvmsg if possible.
+  Fixes: http://cygwin.com/ml/cygwin/2012-07/msg00662.html
+
+- Correct hang typified by running "procps" after Cygwin has started a
+  Windows process.
+  Fixes: http://cygwin.com/ml/cygwin/2012-05/threads.html#00349

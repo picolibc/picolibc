@@ -24,6 +24,8 @@ enum disk_type
 
 disk_type get_disk_type (LPCWSTR);
 
+/* Don't add new fs types without adding them to fs_names in mount.cc!
+   Don't reorder without reordering fs_names in mount.cc! */
 enum fs_info_type
 {
   none = 0,

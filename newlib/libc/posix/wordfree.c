@@ -18,13 +18,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/queue.h>
 
 #include <wordexp.h>
+#include "wordexp2.h"
 
 void
 wordfree(wordexp_t *pwordexp)
 {
-  int i;
+  ext_wordv_t *wordv;
 
   if (pwordexp == NULL)
     return;
@@ -32,10 +34,14 @@ wordfree(wordexp_t *pwordexp)
   if (pwordexp->we_wordv == NULL)
     return;
 
-  for(i = 0; i < pwordexp->we_wordc; i++)
-    free(pwordexp->we_wordv[i]);
+  wordv = WE_WORDV_TO_EXT_WORDV(pwordexp->we_wordv);
+  while (!SLIST_EMPTY(&wordv->list)) {
+    struct ewords_entry *entry = SLIST_FIRST(&wordv->list);
+    SLIST_REMOVE_HEAD(&wordv->list, next);
+    free(entry);
+  }
 
-  free(pwordexp->we_wordv);
+  free(wordv);
   pwordexp->we_wordv = NULL;
 }
 

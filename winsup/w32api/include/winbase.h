@@ -1846,8 +1846,10 @@ LONG WINAPI InterlockedCompareExchange(LONG volatile *,LONG,LONG);
 /* PVOID WINAPI InterlockedCompareExchangePointer(PVOID*,PVOID,PVOID); */
 #define InterlockedCompareExchangePointer(d,e,c) \
     (PVOID)InterlockedCompareExchange((LONG volatile *)(d),(LONG)(e),(LONG)(c))
-LONG __cdecl InterlockedDecrement(LONG volatile *);
-LONG __cdecl InterlockedExchange(LONG volatile *,LONG);
+/* MSDN documents this as __cdecl but it is not. */
+LONG WINAPI InterlockedDecrement(LONG volatile *);
+/* MSDN documents this as __cdecl but it is not. */
+LONG WINAPI InterlockedExchange(LONG volatile *,LONG);
 /* PVOID WINAPI InterlockedExchangePointer(PVOID*,PVOID); */
 #define InterlockedExchangePointer(t,v) \
     (PVOID)InterlockedExchange((LONG volatile *)(t),(LONG)(v))
@@ -1855,7 +1857,8 @@ LONG WINAPI InterlockedExchangeAdd(LONG volatile *,LONG);
 #if (_WIN32_WINNT >= 0x0501)
 PSLIST_ENTRY WINAPI InterlockedFlushSList(PSLIST_HEADER);
 #endif
-LONG __cdecl InterlockedIncrement(LONG volatile *);
+/* MSDN documents this as __cdecl but it is not. */
+LONG WINAPI InterlockedIncrement(LONG volatile *);
 #if (_WIN32_WINNT >= 0x0501)
 PSLIST_ENTRY WINAPI InterlockedPopEntrySList(PSLIST_HEADER);
 PSLIST_ENTRY WINAPI InterlockedPushEntrySList(PSLIST_HEADER,PSLIST_ENTRY);

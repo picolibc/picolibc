@@ -60,27 +60,40 @@ _DEFUN(__sflags, (ptr, mode, optr),
       ptr->_errno = EINVAL;
       return (0);
     }
-  if (mode[1] && (mode[1] == '+' || mode[2] == '+'))
+  while (*++mode)
     {
-      ret = (ret & ~(__SRD | __SWR)) | __SRW;
-      m = O_RDWR;
-    }
-  if (mode[1] && (mode[1] == 'b' || mode[2] == 'b'))
-    {
+      switch (*mode)
+	{
+	case '+':
+	  ret = (ret & ~(__SRD | __SWR)) | __SRW;
+	  m = (m & ~O_ACCMODE) | O_RDWR;
+	  break;
+	case 'b':
 #ifdef O_BINARY
-      m |= O_BINARY;
+	  m |= O_BINARY;
 #endif
-    }
+	  break;
 #ifdef __CYGWIN__
-  else if (mode[1] && (mode[1] == 't' || mode[2] == 't'))
-#else
-  else
+	case 't':
+	  m |= O_TEXT;
+	  break;
 #endif
-    {
-#ifdef O_TEXT
-      m |= O_TEXT;
+#if defined (O_CLOEXEC) && defined (_GLIBC_EXTENSION)
+	case 'e':
+	  m |= O_CLOEXEC;
+	  break;
 #endif
+	case 'x':
+	  m |= O_EXCL;
+	  break;
+	default:
+	  break;
+	}
     }
+#if defined (O_TEXT) && !defined (__CYGWIN__)
+  if (!(m | O_BINARY))
+    m |= O_TEXT;
+#endif
   *optr = m | o;
   return ret;
 }

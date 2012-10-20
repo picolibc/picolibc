@@ -1205,7 +1205,7 @@ format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
 	{
 	  WCHAR drive[3] = { mnt->mnt_fsname[0], L':', L'\0' };
 	  disk_type dt = get_disk_type (drive);
-	  
+
 	  if (dt == DT_SHARE_SMB || dt == DT_SHARE_NFS)
 	    continue;
 	}

@@ -102,7 +102,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
     {
-      int c;
+      int c = 0;
       /* Sorry, have to do it the slow way */
       while (--n > 0 && (c = __sgetc_r (ptr, fp)) != EOF)
 	{

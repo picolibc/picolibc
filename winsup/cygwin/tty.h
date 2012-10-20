@@ -19,12 +19,10 @@ details. */
 
 /* Input/Output/ioctl events */
 
-#define RESTART_OUTPUT_EVENT	"cygtty.output.restart"
 #define INPUT_AVAILABLE_EVENT	"cygtty.input.avail"
 #define OUTPUT_MUTEX		"cygtty.output.mutex"
 #define INPUT_MUTEX		"cygtty.input.mutex"
 #define TTY_SLAVE_ALIVE		"cygtty.slave_alive"
-#define TTY_MASTER_ALIVE	"cygtty.master_alive"
 
 #include <sys/termios.h>
 
@@ -38,15 +36,15 @@ class tty_min
   pid_t sid;	/* Session ID of tty */
   struct status_flags
   {
-    unsigned initialized : 1; /* Set if tty is initialized */
-    unsigned rstcons     : 1; /* Set if console needs to be set to "non-cooked" */
+    unsigned initialized : 1;	/* Set if tty is initialized */
+    unsigned rstcons     : 1;	/* Set if console needs to be set to "non-cooked" */
   } status;
 
 public:
   pid_t pgid;
-  int output_stopped;
+  bool output_stopped;		/* FIXME: Maybe do this with a mutex someday? */
   fh_devices ntty;
-  DWORD last_ctrl_c;	/* tick count of last ctrl-c */
+  DWORD last_ctrl_c;		/* tick count of last ctrl-c */
   bool is_console;
 
   IMPLEMENT_STATUS_FLAG (bool, initialized)

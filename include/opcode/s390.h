@@ -40,6 +40,7 @@ enum s390_opcode_cpu_val
     S390_OPCODE_Z9_EC,
     S390_OPCODE_Z10,
     S390_OPCODE_Z196,
+    S390_OPCODE_ZEC12,
     S390_OPCODE_MAXCPU
   };
 

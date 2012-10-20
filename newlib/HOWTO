@@ -84,12 +84,12 @@ purpose of Linux-based open standards for embedded development.  In brief,
 the intent is to define multiple levels for API functions that allows the
 user to size the library appropriately for their application--at least in
 terms of the predefined lists.  For full details, refer to the EL/IX home
-page at http://sources.redhat.com/elix/.  The likely best way to tell how to
+page at http://sourceware.org/elix/.  The likely best way to tell how to
 classify any new functions in terms of needing an ELIX level qualification
 is to ask Jeff Johnston.  To see how it works and try classification on your
 own, refer to the API specification on the web site,
 
-http://sources.redhat.com/elix/api/current/api.pdf.  
+http://sourceware.org/elix/api/current/api.pdf.  
 
 (Unfortunately, it is not complete with respect to either the C99 or POSIX 
 standards, so particular C and POSIX functions may or may not be found.)

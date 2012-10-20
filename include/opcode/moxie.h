@@ -60,6 +60,8 @@
 #define MOXIE_F3_NARG  0x300
 #define MOXIE_F3_PCREL 0x301
 
+#define MOXIE_BAD     0x400
+
 typedef struct moxie_opc_info_t
 {
   short         opcode;
@@ -67,6 +69,6 @@ typedef struct moxie_opc_info_t
   const char *  name;
 } moxie_opc_info_t;
 
-extern const moxie_opc_info_t moxie_form1_opc_info[64];
+extern const moxie_opc_info_t moxie_form1_opc_info[128];
 extern const moxie_opc_info_t moxie_form2_opc_info[4];
 extern const moxie_opc_info_t moxie_form3_opc_info[16];
