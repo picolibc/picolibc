@@ -1,6 +1,6 @@
 /* sbrk for MMIXware.
 
-   Copyright (C) 2001 Hans-Peter Nilsson
+   Copyright (C) 2001, 2012 Hans-Peter Nilsson
 
    Permission to use, copy, modify, and distribute this software is
    freely granted, provided that the above copyright notice, this notice
@@ -34,10 +34,26 @@ __asm__ (" .global _Sbrk_high\n"
 caddr_t
 _sbrk (size_t incr)
 {
-  extern char end;		/* Defined by the linker */
   char *prev_heap_end;
 
   prev_heap_end = _Sbrk_high;
+
+  /* A simulator that requires explicit memory allocation is expected
+     to hook that to the PRELD data prefetch insn, which is otherwise
+     typically a nop.  */
+  if ((long) incr > 0)
+    {
+      size_t n = incr;
+      char *p = prev_heap_end;
+#define A(N) __asm__ ("preld " #N ",%0,0" : : "r" (p))
+#define PRELDOWNTO(N) while (n >= N + 1) { A(N); n -= N + 1; p += N + 1; }
+
+      PRELDOWNTO (255);
+      PRELDOWNTO (31);
+      PRELDOWNTO (3);
+      PRELDOWNTO (0);
+    }
+
   _Sbrk_high += incr;
   return (caddr_t) prev_heap_end;
 }

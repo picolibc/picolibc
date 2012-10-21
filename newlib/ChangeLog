@@ -1,3 +1,8 @@
+2012-10-21  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* libc/sys/mmixware/sbrk.c (_sbrk): Drop unused extern declaration
+	of "end".  Mark allocated memory by applying PRELD.
+
 2012-10-16  Gregory Pietsch  <gpietsch@comcast.net>
 
 	* libc/stdlib/getopt.c (getopt_internal): Align handling of colon to
