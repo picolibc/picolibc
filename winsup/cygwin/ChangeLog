@@ -1,5 +1,9 @@
 2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* winbase.h: Remove.
+
+2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
 
 2012-10-21  Corinna Vinschen  <corinna@vinschen.de>
