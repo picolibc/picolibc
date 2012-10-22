@@ -1,3 +1,12 @@
+2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (to_cmalloc): Fix pointer cast.
+	(nextpage): Ditto.  Base definition on roundup2.
+	(allocsize): Cast to SIZE_T.
+	(_csbrk): Drop granmask.  Define adjsbs SIZE_T as 2nd parameter to
+	VirtualAlloc.
+	(tocygheap): Fix pointer cast.
+
 2012-10-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	Avoid various type ambiguity problems showing up in the 64 bit case:

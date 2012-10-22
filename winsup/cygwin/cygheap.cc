@@ -27,6 +27,7 @@
 #include "ntdll.h"
 #include <unistd.h>
 #include <wchar.h>
+#include <sys/param.h>
 
 static mini_cygheap NO_COPY cygheap_dummy =
 {
@@ -66,7 +67,7 @@ static NO_COPY size_t nthreads;
 
 #define NBUCKETS (sizeof (cygheap->buckets) / sizeof (cygheap->buckets[0]))
 #define N0 ((_cmalloc_entry *) NULL)
-#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (unsigned) (N0->data)))
+#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (ptrdiff_t) (N0->data)))
 
 #define CFMAP_OPTIONS (SEC_RESERVE | PAGE_READWRITE)
 #define MVMAP_OPTIONS (FILE_MAP_WRITE)
@@ -116,8 +117,9 @@ init_cygheap::close_ctty ()
   cygheap->ctty = NULL;
 }
 
-#define nextpage(x) ((char *) (((DWORD) ((char *) x + granmask)) & ~granmask))
-#define allocsize(x) ((DWORD) nextpage (x))
+#define nextpage(x) ((char *) roundup2 ((uintptr_t) (x), \
+					wincap.allocation_granularity ()))
+#define allocsize(x) ((SIZE_T) nextpage (x))
 #ifdef DEBUGGING
 #define somekinda_printf debug_printf
 #else
@@ -128,7 +130,6 @@ static void *__stdcall
 _csbrk (int sbs)
 {
   void *prebrk = cygheap_max;
-  size_t granmask = wincap.allocation_granularity () - 1;
   char *newbase = nextpage (prebrk);
   cygheap_max = (char *) cygheap_max + sbs;
   if (!sbs || (newbase >= cygheap_max) || (cygheap_max <= _cygheap_end))
@@ -138,7 +139,7 @@ _csbrk (int sbs)
       if (prebrk <= _cygheap_end)
 	newbase = _cygheap_end;
 
-      DWORD adjsbs = allocsize ((char *) cygheap_max - newbase);
+      SIZE_T adjsbs = allocsize ((char *) cygheap_max - newbase);
       if (adjsbs && !VirtualAlloc (newbase, adjsbs, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))
 	{
 	  MEMORY_BASIC_INFORMATION m;
@@ -352,7 +353,7 @@ _crealloc (void *ptr, unsigned size)
 #define sizeof_cygheap(n) ((n) + sizeof (cygheap_entry))
 
 #define N ((cygheap_entry *) NULL)
-#define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - (int) (N->data)))
+#define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - (ptrdiff_t) (N->data)))
 
 inline static void *
 creturn (cygheap_types x, cygheap_entry * c, unsigned len, const char *fn = NULL)
