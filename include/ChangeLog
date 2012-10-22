@@ -1,3 +1,8 @@
+2012-10-22  Jan Beich  <jbeich@tormail.org>
+
+	PR ld/14426
+	* bfdlink.h (bfd_link_info): Add ignore_hash.
+
 2012-10-08  Jason Merrill  <jason@redhat.com>
 
 	* demangle.h (enum demangle_component_type): Add
