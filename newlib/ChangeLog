@@ -1,5 +1,10 @@
 2012-10-22  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
+	* libc/include/string.h (strdup, strndup): Declare if not
+	__STRICT_ANSI__ or _XOPEN_SOURCE is defined appropriately.
+
+2012-10-22  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
 	* libc/include/stdlib.h (strtof, strtoll, strtoull, strtold):Prototype
 	if not __STRICT_ANSI__ or stdc version C99 or greater.
 
