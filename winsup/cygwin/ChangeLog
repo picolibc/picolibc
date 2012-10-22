@@ -1,5 +1,11 @@
 2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.h (_tlsbase): Define for __x86_64__.
+	(_tlstop): Ditto.
+	* exception.h (exception_list): Ditto.
+
+2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	  * winbase.h: Remove.
 
 2012-10-22  Corinna Vinschen  <corinna@vinschen.de>

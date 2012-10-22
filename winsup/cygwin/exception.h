@@ -10,7 +10,11 @@ details. */
 
 #include <exceptions.h>
 
+#ifdef __x86_64__
+extern exception_list *_except_list asm ("%gs:0");
+#else
 extern exception_list *_except_list asm ("%fs:0");
+#endif
 
 class exception
 {

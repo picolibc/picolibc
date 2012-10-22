@@ -262,8 +262,13 @@ const int CYGTLS_PADSIZE = 12700;	/* FIXME: Find some way to autogenerate
 					   this value */
 /*gentls_offsets*/
 
+#ifdef __x86_64__
+extern char *_tlsbase __asm__ ("%gs:8");
+extern char *_tlstop __asm__ ("%gs:16");
+#else
 extern char *_tlsbase __asm__ ("%fs:4");
 extern char *_tlstop __asm__ ("%fs:8");
+#endif
 #define _my_tls (*((_cygtls *) (_tlsbase - CYGTLS_PADSIZE)))
 extern _cygtls *_main_tls;
 extern _cygtls *_sig_tls;
