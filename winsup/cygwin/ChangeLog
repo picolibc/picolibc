@@ -1,11 +1,23 @@
 2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	  * winbase.h: Remove.
+
+2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (to_cmalloc): Fix pointer cast.
 	(nextpage): Ditto.  Base definition on roundup2.
 	(allocsize): Cast to SIZE_T.
 	(_csbrk): Drop granmask.  Define adjsbs SIZE_T as 2nd parameter to
 	VirtualAlloc.
 	(tocygheap): Fix pointer cast.
+
+2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
+
+2012-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 18.
 
 2012-10-18  Corinna Vinschen  <corinna@vinschen.de>
 
