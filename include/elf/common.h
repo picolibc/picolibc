@@ -549,6 +549,8 @@
 					/*   note name must be "LINUX".  */
 #define NT_ARM_VFP	0x400		/* ARM VFP registers */
 					/*   note name must be "LINUX".  */
+#define NT_SIGINFO	0x53494749	/* Fields of siginfo_t.  */
+#define NT_FILE		0x46494c45	/* Description of mapped files.  */
 
 /* Note segments for core files on dir-style procfs systems.  */
 
