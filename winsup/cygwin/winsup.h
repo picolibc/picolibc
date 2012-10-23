@@ -17,7 +17,6 @@ details. */
 
 #define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
 #define NO_COPY_INIT __attribute__((section(".data_cygwin_nocopy")))
-#define _RDATA __attribute__ ((section(".rdata")))
 
 #define EXPORT_ALIAS(sym,symalias) extern "C" __typeof (sym) symalias __attribute__ ((alias(#sym)));
 
@@ -203,8 +202,6 @@ extern "C" int try_to_debug (bool waitloop = 1);
 void ld_preload ();
 const char *find_first_notloaded_dll (class path_conv &);
 
-extern bool cygwin_finished_initializing;
-
 /**************************** Miscellaneous ******************************/
 
 void __stdcall set_std_handle (int);
@@ -300,6 +297,7 @@ extern "C" void (*__CTOR_LIST__) (void);
 extern "C" void (*__DTOR_LIST__) (void);
 
 #ifndef NO_GLOBALS_H
+#define _RDATA	/* See globals.h */
 #include "globals.h"
 
 extern inline void clear_procimptoken ()

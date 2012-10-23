@@ -1,5 +1,14 @@
 2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* globals.cc: Redefine _RDATA as "const", if not already defined.
+	Apply extern "C" linkage to the R/O UNICODE_STRINGs and cygwin_props.
+	Change comments to explain new method.
+	* winsup.h (_RDATA): Define as empty string and only if including
+	globals.h.
+	(cygwin_finished_initializing): Drop redundant declaration.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::get_debugger_info): Raise size of buf to allow
 	64 bit values.  Call sprintf in a type-safe manner.
 
