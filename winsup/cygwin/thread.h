@@ -119,18 +119,20 @@ List_insert (list_node *&head, list_node *node)
     return;
   do
     node->next = head;
-  while (InterlockedCompareExchangePointer (&head, node, node->next) != node->next);
+  while (InterlockedCompareExchangePointer ((PVOID volatile *) &head,
+					    node, node->next) != node->next);
 }
 
 template <class list_node> inline void
-List_remove (fast_mutex &mx, list_node *&head, list_node const *node)
+List_remove (fast_mutex &mx, list_node *&head, list_node *node)
 {
   if (!node)
     return;
   mx.lock ();
   if (head)
     {
-      if (InterlockedCompareExchangePointer (&head, node->next, node) != node)
+      if (InterlockedCompareExchangePointer ((PVOID volatile *) &head,
+					     node->next, node) != node)
 	{
 	  list_node *cur = head;
 
