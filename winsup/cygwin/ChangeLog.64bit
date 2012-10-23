@@ -2,8 +2,8 @@
 
 	* cygheap.cc (N0): Remove.
 	(N): Ditto.
-	(to_cmalloc): Use __builtin_offsetof to compute value.
-	(tocygheap): Use __builtin_offsetof to compute value.
+	(to_cmalloc): Use offsetof to compute value.
+	(tocygheap): Use offsetof to compute value.
 
 2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
