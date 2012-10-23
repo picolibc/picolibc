@@ -59,18 +59,18 @@ public:
 
   void lock ()
   {
-    if (InterlockedIncrement ((long *) &lock_counter) != 1)
+    if (InterlockedIncrement (&lock_counter) != 1)
       cygwait (win32_obj_id, cw_infinite, cw_sig);
   }
 
   void unlock ()
   {
-    if (InterlockedDecrement ((long *) &lock_counter))
+    if (InterlockedDecrement (&lock_counter))
       ::SetEvent (win32_obj_id);
   }
 
 private:
-  unsigned long lock_counter;
+  LONG lock_counter;
   HANDLE win32_obj_id;
 };
 
@@ -119,18 +119,20 @@ List_insert (list_node *&head, list_node *node)
     return;
   do
     node->next = head;
-  while (InterlockedCompareExchangePointer (&head, node, node->next) != node->next);
+  while (InterlockedCompareExchangePointer ((PVOID volatile *) &head,
+					    node, node->next) != node->next);
 }
 
 template <class list_node> inline void
-List_remove (fast_mutex &mx, list_node *&head, list_node const *node)
+List_remove (fast_mutex &mx, list_node *&head, list_node *node)
 {
   if (!node)
     return;
   mx.lock ();
   if (head)
     {
-      if (InterlockedCompareExchangePointer (&head, node->next, node) != node)
+      if (InterlockedCompareExchangePointer ((PVOID volatile *) &head,
+					     node->next, node) != node)
 	{
 	  list_node *cur = head;
 
@@ -297,7 +299,7 @@ public:
   }
 
 protected:
-  unsigned long lock_counter;
+  LONG lock_counter;
   HANDLE win32_obj_id;
   pthread_t owner;
 #ifdef DEBUGGING
@@ -680,7 +682,7 @@ struct MTinterface
 {
   // General
   int concurrency;
-  long int threadcount;
+  LONG threadcount;
 
   callback *pthread_prepare;
   callback *pthread_child;
