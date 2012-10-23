@@ -1,5 +1,18 @@
 2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (init_windows_system_directory): Disable setting
+	system_wow64_directory{_length} on 64 bit.
+	(dll_crt0_0): Disable WOW64-specific code on 64 bit.
+	(_dll_crt0): Ditto.
+	* globals.cc (system_wow64_directory): Don't define on 64 bit.
+	(system_wow64_directory_length): Ditto.
+	* wincap.cc (wincapc::init): On 64 bit, always set wow64 to 0 and
+	related bool values to false.
+	* wow64.cc: Disable entire code on 64 bit.
+	* wow64.h: Ditto.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.h (__stack_t): Define as uintptr_t.
 	* dcrt0.cc (child_info_fork::alloc_stack): Conditionalize assembler
 	code on a per-CPU base.  Rename esp to stackp.
