@@ -190,14 +190,14 @@ public:
 #else
   int reattach ()
   {
-    int res = proc_subproc (PROC_REATTACH_CHILD, (DWORD) this);
+    int res = proc_subproc (PROC_REATTACH_CHILD, (uintptr_t) this);
     destroy = res ? false : true;
     return res;
   }
   int remember (bool detach)
   {
     int res = proc_subproc (detach ? PROC_DETACHED_CHILD : PROC_ADDCHILD,
-			    (DWORD) this);
+			    (uintptr_t) this);
     destroy = res ? false : true;
     return res;
   }

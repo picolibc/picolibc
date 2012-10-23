@@ -177,7 +177,7 @@ mychild (int pid)
 /* Handle all subprocess requests
  */
 int __stdcall
-proc_subproc (DWORD what, DWORD val)
+proc_subproc (DWORD what, uintptr_t val)
 {
   int rc = 1;
   int potential_match;

@@ -71,7 +71,7 @@ void __stdcall sig_clear (int) __attribute__ ((regparm (1)));
 void __stdcall sig_set_pending (int) __attribute__ ((regparm (1)));
 int __stdcall handle_sigsuspend (sigset_t);
 
-int __stdcall proc_subproc (DWORD, DWORD) __attribute__ ((regparm (2)));
+int __stdcall proc_subproc (DWORD, uintptr_t) __attribute__ ((regparm (2)));
 
 class _pinfo;
 void __stdcall proc_terminate ();

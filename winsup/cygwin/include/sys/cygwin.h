@@ -307,7 +307,7 @@ struct per_process
 #endif
   struct _reent *impure_ptr;
 };
-#define per_process_overwrite ((unsigned) &(((struct per_process *) NULL)->threadinterface))
+#define per_process_overwrite offsetof (struct per_process, threadinterface)
 
 #ifdef _PATH_PASSWD
 extern HANDLE cygwin_logon_user (const struct passwd *, const char *);

@@ -454,8 +454,12 @@ getstack (volatile char * volatile p)
 void
 child_info_fork::alloc_stack ()
 {
-  volatile char * volatile esp;
-  __asm__ volatile ("movl %%esp,%0": "=r" (esp));
+  volatile char * volatile stackp;
+#ifdef __x86_64__
+  __asm__ volatile ("movq %%rsp,%0": "=r" (stackp));
+#else
+  __asm__ volatile ("movl %%esp,%0": "=r" (stackp));
+#endif
   /* Make sure not to try a hard allocation if we have been forked off from
      the main thread of a Cygwin process which has been started from a 64 bit
      parent.  In that case the _tlsbase of the forked child is not the same
@@ -467,12 +471,12 @@ child_info_fork::alloc_stack ()
       && (!wincap.is_wow64 ()
       	  || stacktop < (char *) NtCurrentTeb ()->DeallocationStack
 	  || stackbottom > _tlsbase))
-    alloc_stack_hard_way (esp);
+    alloc_stack_hard_way (stackp);
   else
     {
       char *st = (char *) stacktop - 4096;
       while (_tlstop >= st)
-	esp = getstack (esp);
+	stackp = getstack (stackp);
       stackaddr = 0;
       /* This only affects forked children of a process started from a native
 	 64 bit process, but it doesn't hurt to do it unconditionally.  Fix
@@ -542,8 +546,8 @@ get_cygwin_startup_info ()
       if ((res->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
 	multiple_cygwin_problem ("proc intro", res->intro, 0);
       else if (res->cygheap != (void *) &_cygheap_start)
-	multiple_cygwin_problem ("cygheap base", (DWORD) res->cygheap,
-				 (DWORD) &_cygheap_start);
+	multiple_cygwin_problem ("cygheap base", (uintptr_t) res->cygheap,
+				 (uintptr_t) &_cygheap_start);
 
       unsigned should_be_cb = 0;
       switch (res->type)
@@ -559,7 +563,8 @@ get_cygwin_startup_info ()
 	    if (should_be_cb != res->cb)
 	      multiple_cygwin_problem ("proc size", res->cb, should_be_cb);
 	    else if (sizeof (fhandler_union) != res->fhandler_union_cb)
-	      multiple_cygwin_problem ("fhandler size", res->fhandler_union_cb, sizeof (fhandler_union));
+	      multiple_cygwin_problem ("fhandler size", res->fhandler_union_cb,
+				       sizeof (fhandler_union));
 	    if (res->isstraced ())
 	      {
 		while (!being_debugged ())
@@ -999,10 +1004,17 @@ _dll_crt0 ()
       	{
 	  /* 2nd half of the stack move.  Set stack pointer to new address.
 	     Set frame pointer to 0. */
+#ifdef __x86_64__
+	  __asm__ ("\n\
+		   movq  %[ADDR], %%rsp \n\
+		   xorq  %%rbp, %%rbp   \n"
+		   : : [ADDR] "r" (stackaddr));
+#else
 	  __asm__ ("\n\
 		   movl  %[ADDR], %%esp \n\
 		   xorl  %%ebp, %%ebp   \n"
 		   : : [ADDR] "r" (stackaddr));
+#endif
 	  /* Now we're back on the original stack.  Free up space taken by the
 	     former main thread stack and set DeallocationStack correctly. */
 	  VirtualFree (NtCurrentTeb ()->DeallocationStack, 0, MEM_RELEASE);
@@ -1208,7 +1220,7 @@ api_fatal (const char *fmt, ...)
 }
 
 void
-multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned version)
+multiple_cygwin_problem (const char *what, uintptr_t magic_version, uintptr_t version)
 {
   if (_cygwin_testing && (strstr (what, "proc") || strstr (what, "cygheap")))
     {

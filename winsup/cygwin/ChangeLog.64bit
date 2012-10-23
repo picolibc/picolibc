@@ -1,5 +1,24 @@
 2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.h (__stack_t): Define as uintptr_t.
+	* dcrt0.cc (child_info_fork::alloc_stack): Conditionalize assembler
+	code on a per-CPU base.  Rename esp to stackp.
+	(get_cygwin_startup_info): Cast pointers to uintptr_t in
+	multiple_cygwin_problem call.  Minor formatting change.
+	(_dll_crt0): Conditionalize assembler code on a per-CPU base.
+	(multiple_cygwin_problem): Change parameters from unsigned to uintptr_t.
+	* winsup.h (multiple_cygwin_problem): Change declaration accordingly.
+	* pinfo.h (pinfo::reattach): Cast 2nd argument in proc_subproc call
+	to uintptr_t.
+	(pinfo::remember): Ditto.
+	* sigproc.cc (proc_subproc): Change 2nd parameter to uintptr_t to allow
+	pointer values.
+	* sigproc.h (proc_subproc): Change declaration accordingly.
+	* include/sys/cygwin.h (per_process_overwrite): Use offsetof to compute
+	value.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (N0): Remove.
 	(N): Ditto.
 	(to_cmalloc): Use offsetof to compute value.

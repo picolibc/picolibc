@@ -240,7 +240,7 @@ int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__ ((regparm 
 int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
 int __small_swprintf (PWCHAR dst, const WCHAR *fmt, ...) /*__attribute__ ((regparm (2)))*/;
 int __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
-void multiple_cygwin_problem (const char *, unsigned, unsigned);
+void multiple_cygwin_problem (const char *, uintptr_t, uintptr_t);
 
 extern "C" void vklog (int priority, const char *message, va_list ap);
 extern "C" void klog (int priority, const char *message, ...);

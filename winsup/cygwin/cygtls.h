@@ -162,7 +162,7 @@ extern "C" int __ljfault (jmp_buf, int);
 
 /*gentls_offsets*/
 
-typedef __uint32_t __stack_t;
+typedef uintptr_t __stack_t;
 
 class _cygtls
 {
