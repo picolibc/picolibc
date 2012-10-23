@@ -1,5 +1,30 @@
 2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dll_init.cc (reserve_at): Use PVOID rather than DWORD as type for
+	pointer parameters and return type.
+	(release_at): Ditto.
+	(dll_list::load_after_fork_impl): Fix format strings.  Call reserve_at
+	without casts to DWORD.
+	(struct dllcrt0_info): Change type of res to PVOID.
+	(dll_dllcrt0): Return PVOID rather than int.
+	(dll_dllcrt0_1): Accommodate type change of dllcrt0_info::res.
+	(dll_noncygwin_dllcrt0): Disable on 64 bit.  Add a cast for 32 bit.
+	* dll_init.h (struct pefile): Drop 32 bit decoration from Windows
+	types.
+	* ntdll.h (struct _DEBUG_HEAP_INFORMATION): Define Base as UINT_PTR.
+	(struct _DEBUG_MODULE_INFORMATION): Define Reserved and Base as
+	UINT_PTR.
+	* winsup.h (dll_dllcrt0): Declare as PVOID.
+	(dll_noncygwin_dllcrt0): Don't declare on 64 bit.
+	* include/cygwin/cygwin_dll.h (cygwin_attach_dll): Declare as PVOID.
+	(cygwin_detach_dll): Declare with PVOID parameter.
+	(dll_index): Declare as PVOID.
+	(_cygwin_dll_entry): Accommodate type change of dll_index.
+	* lib/crt0.h (dll_dllcrt0): Declare as PVOID.
+	* lib/cygwin_attach_dll.c (cygwin_attach_dll): Define PVOID.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (init_windows_system_directory): Disable setting
 	system_wow64_directory{_length} on 64 bit.
 	(dll_crt0_0): Disable WOW64-specific code on 64 bit.

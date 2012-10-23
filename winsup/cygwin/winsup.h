@@ -159,12 +159,15 @@ void dll_crt0_1 (void *);
 void dll_dllcrt0_1 (void *);
 
 /* dynamically loaded dll initialization */
-extern "C" int dll_dllcrt0 (HMODULE, per_process *);
+extern "C" PVOID dll_dllcrt0 (HMODULE, per_process *);
 
 extern "C" void _pei386_runtime_relocator (per_process *);
 
+#ifndef __x86_64__
 /* dynamically loaded dll initialization for non-cygwin apps */
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
+#endif /* !__x86_64__ */
+
 void __stdcall do_exit (int) __attribute__ ((regparm (1), noreturn));
 
 /* libstdc++ malloc operator wrapper support.  */

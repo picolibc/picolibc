@@ -518,7 +518,7 @@ typedef struct _DEBUG_BUFFER
 
 typedef struct _DEBUG_HEAP_INFORMATION
 {
-  ULONG Base;
+  ULONG_PTR Base;
   ULONG Flags;
   USHORT Granularity;
   USHORT Unknown;
@@ -547,8 +547,8 @@ typedef struct _DEBUG_HEAP_BLOCK
 
 typedef struct _DEBUG_MODULE_INFORMATION
 {
-  ULONG Reserved[2];
-  ULONG Base;
+  ULONG_PTR Reserved[2];
+  ULONG_PTR Base;
   ULONG Size;
   ULONG Flags;
   USHORT Index;

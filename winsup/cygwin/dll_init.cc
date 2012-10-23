@@ -430,30 +430,29 @@ dll_list::init ()
    covering at least _dll_size_ bytes. However, we must take care not
    to clobber the dll's target address range because it often overlaps.
  */
-static DWORD
-reserve_at (const PWCHAR name, DWORD here, DWORD dll_base, DWORD dll_size)
+static PVOID
+reserve_at (const PWCHAR name, PVOID here, PVOID dll_base, DWORD dll_size)
 {
   DWORD size;
   MEMORY_BASIC_INFORMATION mb;
 
-  if (!VirtualQuery ((void *) here, &mb, sizeof (mb)))
-    fabort ("couldn't examine memory at %08lx while mapping %W, %E",
-	    here, name);
+  if (!VirtualQuery (here, &mb, sizeof (mb)))
+    fabort ("couldn't examine memory at %p while mapping %W, %E", here, name);
   if (mb.State != MEM_FREE)
     return 0;
 
   size = mb.RegionSize;
 
   // don't clobber the space where we want the dll to land
-  DWORD end = here + size;
-  DWORD dll_end = dll_base + dll_size;
-  if (dll_base < here && dll_end > here)
-      here = dll_end; // the dll straddles our left edge
-  else if (dll_base >= here && dll_base < end)
-      end = dll_base; // the dll overlaps partly or fully to our right
+  caddr_t end = (caddr_t) here + size;
+  caddr_t dll_end = (caddr_t) dll_base + dll_size;
+  if (dll_base < here && dll_end > (caddr_t) here)
+      here = (PVOID) dll_end; // the dll straddles our left edge
+  else if (dll_base >= here && (caddr_t) dll_base < end)
+      end = (caddr_t) dll_base; // the dll overlaps partly or fully to our right
 
-  size = end - here;
-  if (!VirtualAlloc ((void *) here, size, MEM_RESERVE, PAGE_NOACCESS))
+  size = end - (caddr_t) here;
+  if (!VirtualAlloc (here, size, MEM_RESERVE, PAGE_NOACCESS))
     fabort ("couldn't allocate memory %p(%d) for '%W' alignment, %E\n",
 	    here, size, name);
   return here;
@@ -461,9 +460,9 @@ reserve_at (const PWCHAR name, DWORD here, DWORD dll_base, DWORD dll_size)
 
 /* Release the memory previously allocated by "reserve_at" above. */
 static void
-release_at (const PWCHAR name, DWORD here)
+release_at (const PWCHAR name, PVOID here)
 {
-  if (!VirtualFree ((void *) here, 0, MEM_RELEASE))
+  if (!VirtualFree (here, 0, MEM_RELEASE))
     fabort ("couldn't release memory %p for '%W' alignment, %E\n",
 	    here, name);
 }
@@ -536,7 +535,7 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	   dll's protective reservation from step 1
 	 */
 	if (!retries && !VirtualFree (d->handle, 0, MEM_RELEASE))
-	  fabort ("unable to release protective reservation for %W (%08lx), %E",
+	  fabort ("unable to release protective reservation for %W (%p), %E",
 		  d->modname, d->handle);
 
 	HMODULE h = LoadLibraryExW (d->name, NULL, DONT_RESOLVE_DLL_REFERENCES);
@@ -547,8 +546,8 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	    sigproc_printf ("%W loaded in wrong place: %08lx != %08lx",
 			    d->modname, h, d->handle);
 	    FreeLibrary (h);
-	    DWORD reservation = reserve_at (d->modname, (DWORD) h,
-					    (DWORD) d->handle, d->image_size);
+	    PVOID reservation = reserve_at (d->modname, h,
+					    d->handle, d->image_size);
 	    if (!reservation)
 	      fabort ("unable to block off %p to prevent %W from loading there",
 		      h, d->modname);
@@ -561,7 +560,7 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 
 	    /* once the above returns all the dlls are mapped; release
 	       the reservation and continue unwinding */
-	    sigproc_printf ("releasing blocked space at %08lx", reservation);
+	    sigproc_printf ("releasing blocked space at %p", reservation);
 	    release_at (d->modname, reservation);
 	    return;
 	  }
@@ -601,15 +600,15 @@ struct dllcrt0_info
 {
   HMODULE h;
   per_process *p;
-  int res;
+  PVOID res;
   dllcrt0_info (HMODULE h0, per_process *p0): h (h0), p (p0) {}
 };
 
-extern "C" int
+extern "C" PVOID
 dll_dllcrt0 (HMODULE h, per_process *p)
 {
   if (dynamically_loaded)
-    return 1;
+    return (PVOID) 1;
   dllcrt0_info x (h, p);
   dll_dllcrt0_1 (&x);
   return x.res;
@@ -620,7 +619,7 @@ dll_dllcrt0_1 (VOID *x)
 {
   HMODULE& h = ((dllcrt0_info *) x)->h;
   per_process*& p = ((dllcrt0_info *) x)->p;
-  int& res = ((dllcrt0_info *) x)->res;
+  PVOID& res = ((dllcrt0_info *) x)->res;
 
   if (p == NULL)
     p = &__cygwin_user_data;
@@ -677,20 +676,21 @@ dll_dllcrt0_1 (VOID *x)
      it may not be safe to call the dll's "main" since not
      all of cygwin's internal structures may have been set up. */
   if (!d || (!linked && !d->init ()))
-    res = -1;
+    res = (PVOID) -1;
   else
-    res = (DWORD) d;
+    res = (PVOID) d;
 }
 
+#ifndef __x86_64__
 /* OBSOLETE: This function is obsolete and will go away in the
    future.  Cygwin can now handle being loaded from a noncygwin app
    using the same entry point. */
-
 extern "C" int
 dll_noncygwin_dllcrt0 (HMODULE h, per_process *p)
 {
-  return dll_dllcrt0 (h, p);
+  return (int) dll_dllcrt0 (h, p);
 }
+#endif /* !__x86_64__ */
 
 extern "C" void
 cygwin_detach_dll (dll *)
