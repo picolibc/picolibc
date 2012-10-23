@@ -416,6 +416,10 @@ struct bfd_link_info
   /* Separator between archive and filename in linker script filespecs.  */
   char path_separator;
 
+  /* Default stack size.  Zero means default (often zero itself), -1
+     means explicitly zero-sized.  */
+  bfd_signed_vma stacksize;
+
   /* Function callbacks.  */
   const struct bfd_link_callbacks *callbacks;
 
