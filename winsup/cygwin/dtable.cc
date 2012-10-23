@@ -115,8 +115,8 @@ dtable::get_debugger_info ()
     {
       char std[3][sizeof ("/dev/ptyNNNN")];
       std[0][0] = std[1][0] = std [2][0] = '\0';
-      char buf[sizeof ("cYgstd %x") + 32];
-      sprintf (buf, "cYgstd %x %x %x", (unsigned) &std, sizeof (std[0]), 3);
+      char buf[sizeof ("cYgstd %x") + 64];
+      sprintf (buf, "cYgstd %p %zx %x", &std, sizeof (std[0]), 3);
       OutputDebugString (buf);
       for (int i = 0; i < 3; i++)
 	if (std[i][0])

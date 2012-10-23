@@ -1,5 +1,10 @@
 2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dtable.cc (dtable::get_debugger_info): Raise size of buf to allow
+	64 bit values.  Call sprintf in a type-safe manner.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dll_init.cc (reserve_at): Use PVOID rather than DWORD as type for
 	pointer parameters and return type.
 	(release_at): Ditto.
