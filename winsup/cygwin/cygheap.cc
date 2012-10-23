@@ -66,8 +66,7 @@ static NO_COPY size_t nthreads;
 #define THREADLIST_CHUNK 256
 
 #define NBUCKETS (sizeof (cygheap->buckets) / sizeof (cygheap->buckets[0]))
-#define N0 ((_cmalloc_entry *) NULL)
-#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (ptrdiff_t) (N0->data)))
+#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - offsetof (_cmalloc_entry, data)))
 
 #define CFMAP_OPTIONS (SEC_RESERVE | PAGE_READWRITE)
 #define MVMAP_OPTIONS (FILE_MAP_WRITE)
@@ -352,8 +351,7 @@ _crealloc (void *ptr, unsigned size)
 
 #define sizeof_cygheap(n) ((n) + sizeof (cygheap_entry))
 
-#define N ((cygheap_entry *) NULL)
-#define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - (ptrdiff_t) (N->data)))
+#define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - offsetof (cygheap_entry, data)))
 
 inline static void *
 creturn (cygheap_types x, cygheap_entry * c, unsigned len, const char *fn = NULL)
