@@ -709,7 +709,7 @@ init_windows_system_directory ()
 	api_fatal ("can't find windows system directory");
       windows_system_directory[windows_system_directory_length++] = L'\\';
       windows_system_directory[windows_system_directory_length] = L'\0';
-
+#ifndef __x86_64__
       system_wow64_directory_length =
 	GetSystemWow64DirectoryW (system_wow64_directory, MAX_PATH);
       if (system_wow64_directory_length)
@@ -717,6 +717,7 @@ init_windows_system_directory ()
 	  system_wow64_directory[system_wow64_directory_length++] = L'\\';
 	  system_wow64_directory[system_wow64_directory_length] = L'\0';
 	}
+#endif /* !__x86_64__ */
     }
 }
 
@@ -754,12 +755,14 @@ dll_crt0_0 ()
   if (!child_proc_info)
     {
       memory_init (true);
+#ifndef __x86_64__
       /* WOW64 process on XP/64 or Server 2003/64?  Check if we have been
 	 started from 64 bit process and if our stack is at an unusual
 	 address.  Set wow64_needs_stack_adjustment if so.  Problem
 	 description in wow64_test_for_64bit_parent. */
       if (wincap.wow64_has_secondary_stack ())
 	wow64_needs_stack_adjustment = wow64_test_for_64bit_parent ();
+#endif /* !__x86_64__ */
     }
   else
     {
@@ -981,12 +984,14 @@ dll_crt0_1 (void *)
   __asm__ ("				\n\
 	.global __cygwin_exit_return	\n\
 __cygwin_exit_return:			\n\
+		nop			\n\
 ");
 }
 
 extern "C" void __stdcall
 _dll_crt0 ()
 {
+#ifndef __x86_64__
   /* Handle WOW64 process on XP/2K3 which has been started from native 64 bit
      process.  See comment in wow64_test_for_64bit_parent for a full problem
      description. */
@@ -1004,17 +1009,10 @@ _dll_crt0 ()
       	{
 	  /* 2nd half of the stack move.  Set stack pointer to new address.
 	     Set frame pointer to 0. */
-#ifdef __x86_64__
-	  __asm__ ("\n\
-		   movq  %[ADDR], %%rsp \n\
-		   xorq  %%rbp, %%rbp   \n"
-		   : : [ADDR] "r" (stackaddr));
-#else
 	  __asm__ ("\n\
 		   movl  %[ADDR], %%esp \n\
 		   xorl  %%ebp, %%ebp   \n"
 		   : : [ADDR] "r" (stackaddr));
-#endif
 	  /* Now we're back on the original stack.  Free up space taken by the
 	     former main thread stack and set DeallocationStack correctly. */
 	  VirtualFree (NtCurrentTeb ()->DeallocationStack, 0, MEM_RELEASE);
@@ -1024,9 +1022,8 @@ _dll_crt0 ()
 	/* Fall back to respawn if wow64_revert_to_original_stack fails. */
 	wow64_respawn_process ();
     }
-#ifdef __i386__
+#endif /* !__x86_64__ */
   _feinitialise ();
-#endif
   main_environ = user_data->envptr;
   if (in_forkee)
     {

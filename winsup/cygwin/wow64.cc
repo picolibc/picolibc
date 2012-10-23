@@ -8,6 +8,10 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef __x86_64__
+/* WOW64 only plays a role in the 32 bit version.  Don't use any of this
+   in the 64 bit version. */
+
 #include "winsup.h"
 #include "cygtls.h"
 #include "ntdll.h"
@@ -209,3 +213,5 @@ wow64_respawn_process ()
   TerminateProcess (GetCurrentProcess (), ret);
   ExitProcess (ret);
 }
+
+#endif /* !__x86_64__ */

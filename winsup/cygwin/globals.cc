@@ -26,8 +26,10 @@ HMODULE NO_COPY cygwin_hmodule;
 int NO_COPY sigExeced;
 WCHAR windows_system_directory[MAX_PATH];
 UINT windows_system_directory_length;
+#ifndef __x86_64__
 WCHAR system_wow64_directory[MAX_PATH];
 UINT system_wow64_directory_length;
+#endif /* !__x86_64__ */
 
 /* program exit the program */
 
