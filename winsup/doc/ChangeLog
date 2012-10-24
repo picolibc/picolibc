@@ -1,3 +1,16 @@
+2012-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in: Add AC_NO_EXECUTABLES.
+	* configure: Regenerate.
+
+2012-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.sgml (ov-new1.7.17): Add section.
+
+2012-09-03  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* faq-what.xml: Fix typos, clarify responsibility slightly.
+
 2012-08-03  Adam Dinwoodie  <Adam.Dinwoodie@metaswitch.com>
 
 	 * faq-using.xml (faq.using.man): Make relevance to whatis explicit.
