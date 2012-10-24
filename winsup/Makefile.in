@@ -121,20 +121,20 @@ check: cygwin
 	fi; \
 	$(MAKE) check
 
-utils: cygwin mingw
+utils: cygwin
 
 mingw: w32api
 
-cygwin: w32api
+cygwin:
 
 cygserver: cygwin
 
-install_utils: cygwin mingw
+install_utils: cygwin
 
 install_mingw: w32api
 
-install_cygwin: w32api
+install_cygwin:
 
 install_cygserver: cygwin
 
-lsaauth: mingw cygwin
+lsaauth:
