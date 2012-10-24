@@ -24,21 +24,13 @@ AC_CANONICAL_SYSTEM
 
 LIB_AC_PROG_CC
 
-NO_CYGWIN="$(cd ${srcdir}/../utils; pwd)/mingw"
+AC_CHECK_PROGS(MINGW32_CC, i686-w64-mingw32-gcc)
+AC_CHECK_PROGS(MINGW64_CC, x86_64-w64-mingw32-gcc)
 
-AC_SUBST(NO_CYGWIN)
+test -z "$MINGW32_CC" && AC_MSG_ERROR([no acceptable mingw32 cc found in \$PATH])
+test -z "$MINGW64_CC" && AC_MSG_ERROR([no acceptable mingw64 cc found in \$PATH])
+
 AC_ARG_PROGRAM
-
-if test "x$cross_compiling" = "xyes"; then
-  if test "x$program_transform_name" = "xs,x,x,"; then
-    program_transform_name=""
-  fi
-  if test "x$program_transform_name" = "x"; then
-    program_transform_name="s,^,$host-,"
-  else
-    program_transform_name="$program_transform_name -e s,^,$host-,"
-  fi
-fi
 
 AC_PROG_INSTALL
 

@@ -29,17 +29,16 @@ INSTALL_DATA    := @INSTALL_DATA@
 CC              := @CC@
 CC_FOR_TARGET   := $(CC)
 
+MINGW32_CC	:= @MINGW32_CC@
+MINGW64_CC	:= @MINGW64_CC@
+
 CFLAGS          := @CFLAGS@
 
 include $(srcdir)/../Makefile.common
 
-WIN32_INCLUDES  := -I. -I$(srcdir) $(w32api_include) $(w32api_include)/ddk
-WIN32_CFLAGS    := $(CFLAGS) $(WIN32_COMMON) $(WIN32_INCLUDES)
-WIN32_LDFLAGS	:= $(CFLAGS) $(WIN32_COMMON) -nostdlib -Wl,-shared
-
-ifdef MINGW_CC
-override CC:=${MINGW_CC}
-endif
+WIN32_INCLUDES  := -I. -I$(srcdir)
+WIN32_CFLAGS    := $(CFLAGS) $(WIN32_INCLUDES)
+WIN32_LDFLAGS	:= $(CFLAGS) -nostdlib -Wl,-shared
 
 # Never again try to remove advapi32.  It does not matter if the DLL calls
 # advapi32 functions or the equivalent ntdll functions.
@@ -47,21 +46,33 @@ endif
 # not recognized by LSA.
 LIBS		:= -ladvapi32 -lkernel32 -lntdll
 
-DLL	:=	cyglsa.dll
-DEF_FILE:=	cyglsa.def
+DLL32	:=	cyglsa.dll
+DEF32	:=	cyglsa.def
+OBJ32	:=	cyglsa.o
 
-OBJ	=	cyglsa.o
+DLL64	:=	cyglsa64.dll
+DEF64	:=	cyglsa64.def
+OBJ64	:=	cyglsa64.o
 
 .SUFFIXES:
 .NOEXPORT:
 
-all: Makefile $(DLL)
+all: Makefile $(DLL32) $(DLL64)
 
-$(DEF_FILE): cyglsa.din config.status
+$(DEF32): cyglsa.din config.status
 	$(SHELL) config.status
 
-$(DLL): $(OBJ) $(DEF_FILE)
-	$(CC) -s $(WIN32_LDFLAGS) -o $@ $^ $(LIBS)
+$(DLL32): $(OBJ32) $(DEF32)
+	$(MINGW32_CC) -s $(WIN32_LDFLAGS) -o $@ $^ $(LIBS)
+
+$(OBJ32): cyglsa.c
+	$(MINGW32_CC) $(WIN32_CFLAGS) -c -o $@ $<
+
+$(DLL64): $(OBJ64) $(DEF64)
+	$(MINGW64_CC) -s $(WIN32_LDFLAGS) -o $@ $^ $(LIBS)
+
+$(OBJ64): cyglsa.c
+	$(MINGW64_CC) $(WIN32_CFLAGS) -c -o $@ $<
 
 .PHONY: all install clean realclean
 
@@ -73,9 +84,6 @@ clean:
 
 install: all
 	$(SHELL) $(updir1)/mkinstalldirs $(DESTDIR)$(bindir)
-	$(INSTALL_PROGRAM) $(DLL) $(DESTDIR)$(bindir)/$(DLL)
-	$(INSTALL_PROGRAM) $(srcdir)/cyglsa64.dll $(DESTDIR)$(bindir)/cyglsa64.dll
+	$(INSTALL_PROGRAM) $(DLL32) $(DESTDIR)$(bindir)/$(DLL32)
+	$(INSTALL_PROGRAM) $(DLL64) $(DESTDIR)$(bindir)/$(DLL64)
 	$(INSTALL_PROGRAM) $(srcdir)/cyglsa-config $(DESTDIR)$(bindir)/cyglsa-config
-
-%.o: %.c
-	$(CC) $(WIN32_CFLAGS) -c -o $@ $<
