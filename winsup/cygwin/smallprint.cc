@@ -20,8 +20,8 @@ details. */
 #define LLMASK	(0xffffffffffffffffULL)
 #define LMASK	(0xffffffff)
 
-#define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, long), len, pad, LMASK)
-#define rnargLL(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, unsigned long long), len, pad, LLMASK)
+#define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, uint32_t), len, pad, LMASK)
+#define rnargLL(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, uint64_t), len, pad, LLMASK)
 
 static const char hex_str[] = "0123456789ABCDEF";
 
@@ -91,6 +91,32 @@ __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned
 
   return dst;
 }
+
+/*
+  Meaning of format conversion specifiers.  If 'l' isn't explicitely mentioned,
+  it's ignored!
+
+  c       char
+  C       WCHAR/wchar_t
+  d       signed int, 4 byte
+  D       signed int, 8 byte
+  E       GetLastError
+  o       octal unsigned int, 4 byte
+  O       !!! missing !!!
+  p       address (only 4 byte right now)
+  P       process name
+  R       return value, 4 byte.
+  s       char *
+  ls      char * w/ non-ASCII tweaking
+  S       PUNICODE_STRING
+  lS      PUNICODE_STRING w/ non-ASCII tweaking
+  u       unsigned int, 4 byte
+  U       unsigned int, 8 byte
+  W       PWCHAR/wchar_t *
+  lW      PWCHAR/wchar_t * w/ non-ASCII tweaking
+  x       hex unsigned int, 4 byte
+  X       hex unsigned int, 8 byte
+*/
 
 int
 __small_vsprintf (char *dst, const char *fmt, va_list ap)
@@ -194,7 +220,12 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		case 'p':
 		  *dst++ = '0';
 		  *dst++ = 'x';
-		  /* fall through */
+#ifdef __x86_64__
+		  dst = rnargLL (dst, 16, 0, len, pad);
+#else
+		  dst = rnarg (dst, 16, 0, len, pad);
+#endif
+		  break;
 		case 'x':
 		  dst = rnarg (dst, 16, 0, len, pad);
 		  break;
