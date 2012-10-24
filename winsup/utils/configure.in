@@ -20,12 +20,12 @@ LIB_AC_PROG_CXX
 
 AC_ARG_PROGRAM
 
-AC_CHECK_LIB(iconv, libiconv, libiconv=-liconv)
-AC_SUBST(libiconv)
-
 INSTALL="/bin/sh "`cd $srcdir/../..; echo $(pwd)/install-sh -c`
 
 AC_PROG_INSTALL
+
+AC_CHECK_PROGS(MINGW_CXX, ${target_cpu}-w64-mingw32-g++)
+test -z "$MINGW_CXX" && AC_MSG_ERROR([no acceptable mingw g++ found in \$PATH])
 
 AC_EXEEXT
 AC_OUTPUT(Makefile)

@@ -23,9 +23,9 @@ details. */
 #include <malloc.h>
 #include <wchar.h>
 #include "path.h"
-#include "cygwin/include/cygwin/version.h"
-#include "cygwin/include/sys/mount.h"
-#include "cygwin/include/mntent.h"
+#include "../cygwin/include/cygwin/version.h"
+#include "../cygwin/include/sys/mount.h"
+#include "../cygwin/include/mntent.h"
 #include "testsuite.h"
 #ifdef FSTAB_ONLY
 #include <sys/cygwin.h>

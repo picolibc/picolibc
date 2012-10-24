@@ -27,9 +27,9 @@ details. */
 #include <time.h>
 #include <signal.h>
 #include <errno.h>
-#include "cygwin/include/sys/strace.h"
-#include "cygwin/include/sys/cygwin.h"
-#include "cygwin/include/cygwin/version.h"
+#include "../cygwin/include/sys/strace.h"
+#include "../cygwin/include/sys/cygwin.h"
+#include "../cygwin/include/cygwin/version.h"
 #include "path.h"
 #undef cygwin_internal
 #include "loadlib.h"

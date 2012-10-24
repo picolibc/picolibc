@@ -22,11 +22,10 @@
 #include "path.h"
 #include "wide_path.h"
 #include <getopt.h>
-#include "cygwin/include/cygwin/version.h"
-#include "cygwin/include/sys/cygwin.h"
-#include "cygwin/include/mntent.h"
-#include "cygwin/cygprops.h"
-#include "cygwin/version.h"
+#include "../cygwin/include/cygwin/version.h"
+#include "../cygwin/include/sys/cygwin.h"
+#include "../cygwin/include/mntent.h"
+#include "../cygwin/cygprops.h"
 #undef cygwin_internal
 #include "loadlib.h"
 

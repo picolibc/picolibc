@@ -1,3 +1,17 @@
+2012-10-24  Kai Tietz  <ktietz70@googlemail.com>
+	    Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+	    Corinna Vinschen <corinna@vinschen.de>
+
+	* configure.in: Add check for MINGW_CXX.  Remove libiconv check.
+	* configure: Regenerate.
+	* Makefile.in: Remove references to mingw and w32api directories.
+	Use MINGW_CXX instead of mingw script to build MINGW_BINS.
+	Check for libiconv with $CC --print-file-name.
+	* cygcheck.cc: Use relative include paths for Cygwin headers.
+	* path.cc: Ditto.
+	* strace.cc: Ditto
+	* mingw: Remove.
+
 2012-10-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (cygcheck.exe): Add temporary (1.7.17-only) hack to
