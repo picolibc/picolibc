@@ -1,3 +1,8 @@
+2012-10-24  Corinna Vinschen <corinna@vinschen.de>
+
+	* configure.in: Add AC_NO_EXECUTABLES,
+	* configure: Regenerate.
+
 2012-10-24  Kai Tietz  <ktietz70@googlemail.com>
 	    Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 	    Corinna Vinschen <corinna@vinschen.de>
