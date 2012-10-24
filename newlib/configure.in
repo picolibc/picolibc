@@ -137,13 +137,19 @@ AC_LIBTOOL_WIN32_DLL
 AM_PROG_LIBTOOL
 fi
 
-AC_ARG_ENABLE(newlib_hw_fp,
-[  --enable-newlib-hw-fp    Turn on hardware floating point math],
-[case "${enableval}" in
-   yes) newlib_hw_fp=true ;;
-   no)  newlib_hw_fp=false ;;
-   *) AC_MSG_ERROR(bad value ${enableval} for --enable-newlib-hw-fp) ;;
- esac],[newlib_hw_fp=false])
+dnl The following is being disabled because the mathfp library is
+dnl not up to standard due to inaccuracies caused by some of the
+dnl floating-point algorithms used.  If you wish to work on this,
+dnl comment out the following line and uncomment out the lines
+dnl following it to re-enable the feature.
+newlib_hw_fp=false
+#AC_ARG_ENABLE(newlib_hw_fp,
+#[  --enable-newlib-hw-fp    Turn on hardware floating point math],
+#[case "${enableval}" in
+#   yes) newlib_hw_fp=true ;;
+#   no)  newlib_hw_fp=false ;;
+#   *) AC_MSG_ERROR(bad value ${enableval} for --enable-newlib-hw-fp) ;;
+# esac],[newlib_hw_fp=false])
 AM_CONDITIONAL(NEWLIB_HW_FP, test x$newlib_hw_fp = xtrue)
 
 # These get added in the top-level configure.in, except in the case where

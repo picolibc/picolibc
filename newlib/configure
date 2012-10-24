@@ -804,7 +804,6 @@ with_pic
 enable_fast_install
 with_gnu_ld
 enable_libtool_lock
-enable_newlib_hw_fp
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1469,7 +1468,6 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --enable-newlib-hw-fp    Turn on hardware floating point math
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -11641,7 +11639,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11644 "configure"
+#line 11642 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11747,7 +11745,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11750 "configure"
+#line 11748 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11986,17 +11984,14 @@ CC="$lt_save_CC"
 
 fi
 
-# Check whether --enable-newlib_hw_fp was given.
-if test "${enable_newlib_hw_fp+set}" = set; then :
-  enableval=$enable_newlib_hw_fp; case "${enableval}" in
-   yes) newlib_hw_fp=true ;;
-   no)  newlib_hw_fp=false ;;
-   *) as_fn_error $? "bad value ${enableval} for --enable-newlib-hw-fp" "$LINENO" 5 ;;
- esac
-else
-  newlib_hw_fp=false
-fi
-
+newlib_hw_fp=false
+#AC_ARG_ENABLE(newlib_hw_fp,
+#[  --enable-newlib-hw-fp    Turn on hardware floating point math],
+#[case "${enableval}" in
+#   yes) newlib_hw_fp=true ;;
+#   no)  newlib_hw_fp=false ;;
+#   *) AC_MSG_ERROR(bad value ${enableval} for --enable-newlib-hw-fp) ;;
+# esac],[newlib_hw_fp=false])
  if test x$newlib_hw_fp = xtrue; then
   NEWLIB_HW_FP_TRUE=
   NEWLIB_HW_FP_FALSE='#'

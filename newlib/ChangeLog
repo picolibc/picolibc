@@ -1,3 +1,13 @@
+2012-10-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Comment out the --enable-newlib-fp-hw option
+	as the mathfp library is inaccurate and should not be used.
+	* Makefile.am: Add comment regarding the mathfp directory.
+	* configure: Regenerated.
+	* Makefile.in: Ditto.
+	* libm/mathfp/README: New file that details why the mathfp
+	directory is not used.
+
 2012-10-22  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* libc/include/string.h (strdup, strndup): Declare if not

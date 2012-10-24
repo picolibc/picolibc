@@ -13,6 +13,10 @@ MULTICLEAN = true
 
 LIBTOOL_VERSION_INFO = 0:0:0
 
+# The newlib hardware floating-point routines have been disabled due to
+# inaccuracy.  If you wish to work on them, you will need to edit the
+# configure.in file to re-enable the configuration option.  By default,
+# the NEWLIB_HW_FP variable will always be false.
 if NEWLIB_HW_FP
 MATHDIR = mathfp
 else
