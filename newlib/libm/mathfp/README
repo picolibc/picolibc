@@ -1,0 +1,11 @@
+This directory was an experiment to use floating-point operations to implement
+the math library when a processor had a floating-point instruction set.  The
+experiment was a failure in that some of the algorithms chosen (e.g. recursive
+algorithms for sin/cos, etc..) are too simple and do not provide proper accuracy 
+nor handle very large or very small inputs adequately.
+
+The code is considered moth-balled.  The stable math library routines can be
+found in libm/math and the configuration option to use this has been removed.
+
+If you wish to experiment with the concept, please feel free and report back if
+you have major improvements. 
