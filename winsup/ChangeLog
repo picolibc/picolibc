@@ -1,3 +1,18 @@
+2012-10-24  Kai Tietz  <ktietz70@googlemail.com>
+	    Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in [cygwin*]: Always build cygserver, lsaauth,
+	utils, and doc.  Do not build mingw or w32api.
+	[mingw*]: Build w32api if present.
+	* configure: Regenerate.
+	* Makefile.common: Remove references to mingw and w32api
+	directories.
+	(MINGW_LDFLAGS): Redefine as -static to force static linking
+	with libgcc and libstdc++.
+	* Makefile.in: Remove references to mingw and w32api directories
+	from Cygwin targets.
+
 2012-07-30  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* Makefile.common (CFLAGS_COMMON): Add temporary define to work around

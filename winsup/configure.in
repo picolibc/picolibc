@@ -32,33 +32,17 @@ case "$target" in
     if ! test -d $srcdir/cygwin; then
       AC_MSG_ERROR("No cygwin dir.  Can't build Cygwin.  Exiting...")
     fi
-    AC_CONFIG_SUBDIRS(cygwin)
+    AC_CONFIG_SUBDIRS(cygwin cygserver lsaauth utils doc)
     INSTALL_LICENSE="install-license"
     ;;
   *mingw*)
     if ! test -d $srcdir/mingw; then
       AC_MSG_ERROR("No mingw dir.  Can't build Mingw.  Exiting...")
     fi
-    ;;
-esac
-
-if test -d $srcdir/mingw; then
-  AC_CONFIG_SUBDIRS(mingw)
-fi
-AC_CONFIG_SUBDIRS(w32api cygserver)
-
-case "$with_cross_host" in
-  ""|*cygwin*)
-    # if test -d $srcdir/bz2lib; then
-    #  AC_CONFIG_SUBDIRS(bz2lib)
-    # fi
-    # if test -d $srcdir/zlib; then
-    #   AC_CONFIG_SUBDIRS(zlib)
-    # fi
-    if test -d $srcdir/lsaauth; then
-      AC_CONFIG_SUBDIRS(lsaauth)
+    AC_CONFIG_SUBDIRS(mingw)
+    if test -d $srcdir/w32api; then
+      AC_CONFIG_SUBDIRS(w32api)
     fi
-    AC_CONFIG_SUBDIRS(utils doc)
     ;;
 esac
 
