@@ -1,3 +1,9 @@
+2012-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.ac (FLAGS_FOR_TARGET,target=cygwin): Fix for building
+	against Mingw64 w32api.
+	* configure: Regenerate.
+
 2012-10-23  Eric Botcazou  <ebotcazou@adacore.com>
 
 	PR bootstrap/54820
