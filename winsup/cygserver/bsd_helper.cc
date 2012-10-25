@@ -1,6 +1,6 @@
 /* bsd_helper.cc
 
-   Copyright 2003, 2004, 2005, 2007 Red Hat Inc.
+   Copyright 2003, 2004, 2005, 2007, 2012 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -400,7 +400,7 @@ adjust_identity_info (struct proc *p)
   p->gid = cygwin_internal (CW_GET_GID_FROM_SID, pgrp->PrimaryGroup);
   free (pgrp);
   if (p->gid == (gid_t)-1)
-    log (LOG_WARNING,"WARNING: Group not found in /etc/passwd! Using gid -1!");
+    log (LOG_WARNING,"WARNING: Group not found in /etc/group! Using gid -1!");
 
   /* Generate gid list from token group's SID list.  Also look if the token
      has an enabled admin group SID.  That means, the process has admin
