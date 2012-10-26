@@ -61,7 +61,7 @@ public:
 };
 
 muto NO_COPY tls_sentry::lock;
-static NO_COPY size_t nthreads;
+static NO_COPY uint32_t nthreads;
 
 #define THREADLIST_CHUNK 256
 
@@ -144,9 +144,9 @@ _csbrk (int sbs)
 	  MEMORY_BASIC_INFORMATION m;
 	  if (!VirtualQuery (newbase, &m, sizeof m))
 	    system_printf ("couldn't get memory info, %E");
-	  somekinda_printf ("Couldn't reserve/commit %d bytes of space for cygwin's heap, %E",
+	  somekinda_printf ("Couldn't reserve/commit %ld bytes of space for cygwin's heap, %E",
 			    adjsbs);
-	  somekinda_printf ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
+	  somekinda_printf ("AllocationBase %p, BaseAddress %p, RegionSize %lx, State %x\n",
 			    m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
 	  __seterrno ();
 	  cygheap_max = (char *) cygheap_max - sbs;
@@ -599,12 +599,12 @@ init_cygheap::remove_tls (_cygtls *t, DWORD wait)
   tls_sentry here (wait);
   if (here.acquired ())
     {
-      for (size_t i = 0; i < nthreads; i++)
+      for (uint32_t i = 0; i < nthreads; i++)
 	if (t == threadlist[i])
 	  {
 	    if (i < --nthreads)
 	      threadlist[i] = threadlist[nthreads];
-	    debug_only_printf ("removed %p element %d", this, i);
+	    debug_only_printf ("removed %p element %u", this, i);
 	    break;
 	  }
     }
@@ -616,7 +616,7 @@ init_cygheap::find_tls (int sig)
   debug_printf ("sig %d\n", sig);
   tls_sentry here (INFINITE);
 
-  static int NO_COPY threadlist_ix;
+  static uint32_t NO_COPY threadlist_ix;
 
   _cygtls *t = _main_tls;
 
@@ -626,7 +626,7 @@ init_cygheap::find_tls (int sig)
   else
     {
       threadlist_ix = -1;
-      while (++threadlist_ix < (int) nthreads)
+      while (++threadlist_ix < nthreads)
 	if (threadlist[threadlist_ix]->tid
 	    && sigismember (&(threadlist[threadlist_ix]->sigwait_mask), sig))
 	  {
@@ -634,7 +634,7 @@ init_cygheap::find_tls (int sig)
 	    goto out;
 	  }
       threadlist_ix = -1;
-      while (++threadlist_ix < (int) nthreads)
+      while (++threadlist_ix < nthreads)
 	if (threadlist[threadlist_ix]->tid
 	    && !sigismember (&(threadlist[threadlist_ix]->sigmask), sig))
 	  {
