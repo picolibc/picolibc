@@ -22,20 +22,9 @@ extern "C" {
 static inline __stdcall char *
 strechr (const char *s, int c)
 {
-  register char * res;
-  __asm__ __volatile__ ("\
-	movb	%%al,%%ah\n\
-1:	movb	(%1),%%al\n\
-	cmpb	%%ah,%%al\n\
-	je	2f\n\
-	incl	%1\n\
-	testb	%%al,%%al\n\
-	jne	1b\n\
-	decl	%1\n\
-2:	movl	%1,%0\n\
-	":"=a" (res), "=r" (s)
-	:"0" (c), "1" (s));
-  return res;
+  while (*s != (char) c && *s != 0)
+    ++s;
+  return (char *) s;
 }
 
 #ifdef __INSIDE_CYGWIN__
@@ -45,57 +34,38 @@ extern const char isalpha_array[];
 static inline int
 ascii_strcasematch (const char *cs, const char *ct)
 {
-  register int __res;
-  int d0, d1;
-  __asm__ ("\
-	.global	_isalpha_array			\n\
-	cld					\n\
-	andl	$0xff,%%eax			\n\
-1:	lodsb					\n\
-	scasb					\n\
-	je	2f				\n\
-	xorb	_isalpha_array(%%eax),%%al	\n\
-	cmpb	-1(%%edi),%%al			\n\
-	jne	3f				\n\
-2:	testb	%%al,%%al			\n\
-	jnz	1b				\n\
-	movl	$1,%%eax			\n\
-	jmp	4f				\n\
-3:	xor	%0,%0				\n\
-4:"
-	:"=a" (__res), "=&S" (d0), "=&D" (d1)
-		     : "1" (cs),   "2" (ct));
+  register const unsigned char *us, *ut;
 
-  return __res;
+  us = (const unsigned char *) cs;
+  ut = (const unsigned char *) ct;
+
+  while (us[0] == ut[0] || (us[0] ^ isalpha_array[us[0]]) == ut[0])
+    {
+      if (us[0] == 0)
+	return 1;
+      ++us, ++ut;
+    }
+  return 0;
 }
 
 static inline int
 ascii_strncasematch (const char *cs, const char *ct, size_t n)
 {
-  register int __res;
-  int d0, d1, d2;
-  __asm__ ("\
-	.global	_isalpha_array;			\n\
-	cld					\n\
-	andl	$0xff,%%eax			\n\
-1:	decl	%3				\n\
-	js	3f				\n\
-	lodsb					\n\
-	scasb					\n\
-	je	2f				\n\
-	xorb	_isalpha_array(%%eax),%%al	\n\
-	cmpb	-1(%%edi),%%al			\n\
-	jne	4f				\n\
-2:	testb	%%al,%%al			\n\
-	jnz	1b				\n\
-3:	movl	$1,%%eax			\n\
-	jmp	5f				\n\
-4:	xor	%0,%0				\n\
-5:"
-	:"=a" (__res), "=&S" (d0), "=&D" (d1), "=&c" (d2)
-		       :"1" (cs),  "2" (ct), "3" (n));
+  register const unsigned char *us, *ut;
 
-  return __res;
+  if (!n)
+   return 1;
+  us = (const unsigned char *) cs;
+  ut = (const unsigned char *) ct;
+
+  while (us[0] == ut[0] || (us[0] ^ isalpha_array[us[0]]) == ut[0])
+    {
+      --n;
+      if (!n || us[0] == 0)
+        return 1;
+      ++us, ++ut;
+    }
+  return 0;
 }
 
 #undef strcasecmp
