@@ -271,7 +271,7 @@ closedir (DIR *dir)
   free (dir->__d_dirname);
   free (dir->__d_dirent);
   free (dir);
-  syscall_printf ("%R = closedir(%p)", res);
+  syscall_printf ("%R = closedir(%p)", res, dir);
   return res;
 }
 
