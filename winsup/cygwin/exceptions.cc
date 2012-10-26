@@ -32,6 +32,17 @@ details. */
 #include "ntdll.h"
 #include "exception.h"
 
+/* Definitions for code simplification */
+#ifdef __x86_64__
+# define _GR(reg)	R ## reg
+# define _AFMT		"%016X"
+# define _ADDR		DWORD64
+#else
+# define _GR(reg)	E ## reg
+# define _AFMT		"%08x"
+# define _ADDR		DWORD
+#endif
+
 #define CALL_HANDLER_RETRY_OUTER 10
 #define CALL_HANDLER_RETRY_INNER 10
 
@@ -45,7 +56,7 @@ static NO_COPY int exit_already = 0;
 
 NO_COPY static struct
 {
-  unsigned int code;
+  NTSTATUS code;
   const char *name;
 } status_info[] =
 {
@@ -174,7 +185,7 @@ dump_exception (EXCEPTION_RECORD *e,  CONTEXT *in)
     {
       for (int i = 0; status_info[i].name; i++)
 	{
-	  if (status_info[i].code == e->ExceptionCode)
+	  if (status_info[i].code == (NTSTATUS) e->ExceptionCode)
 	    {
 	      exception_name = status_info[i].name;
 	      break;
@@ -182,6 +193,20 @@ dump_exception (EXCEPTION_RECORD *e,  CONTEXT *in)
 	}
     }
 
+#ifdef __x86_64__
+  if (exception_name)
+    small_printf ("Exception: %s at rip=%016X\r\n", exception_name, in->Rip);
+  else
+    small_printf ("Signal %d at rip=%016X\r\n", e->ExceptionCode, in->Rip);
+  small_printf ("rax=%16X rbx=%16X rcx=%16X\r\n", in->Rax, in->Rbx, in->Rcx);
+  small_printf ("rdx=%16X rsi=%16X rdi=%16X\r\n", in->Rdx, in->Rsi, in->Rdi);
+  small_printf ("r8 =%16X r9 =%16X r10=%16X\r\n", in->R8, in->R9, in->R10);
+  small_printf ("r11=%16X r12=%16X r13=%16X\r\n", in->R11, in->R12, in->R13);
+  small_printf ("r14=%16X r15=%16X\r\n", in->R14, in->R15);
+  small_printf ("rbp=%16X rsp=%16X program=%W, pid %u, thread %s\r\n",
+		in->Rbp, in->Rsp, myself->progname, myself->pid,
+		cygthread::name ());
+#else
   if (exception_name)
     small_printf ("Exception: %s at eip=%08x\r\n", exception_name, in->Eip);
   else
@@ -189,7 +214,9 @@ dump_exception (EXCEPTION_RECORD *e,  CONTEXT *in)
   small_printf ("eax=%08x ebx=%08x ecx=%08x edx=%08x esi=%08x edi=%08x\r\n",
 		in->Eax, in->Ebx, in->Ecx, in->Edx, in->Esi, in->Edi);
   small_printf ("ebp=%08x esp=%08x program=%W, pid %u, thread %s\r\n",
-		in->Ebp, in->Esp, myself->progname, myself->pid, cygthread::name ());
+		in->Ebp, in->Esp, myself->progname, myself->pid,
+		cygthread::name ());
+#endif
   small_printf ("cs=%04x ds=%04x es=%04x fs=%04x gs=%04x ss=%04x\r\n",
 		in->SegCs, in->SegDs, in->SegEs, in->SegFs, in->SegGs, in->SegSs);
 }
@@ -200,10 +227,10 @@ class stack_info
   int walk ();			/* Uses the "old" method */
   char *next_offset () {return *((char **) sf.AddrFrame.Offset);}
   bool needargs;
-  DWORD dummy_frame;
+  PUINT_PTR dummy_frame;
 public:
   STACKFRAME sf;		 /* For storing the stack information */
-  void init (DWORD, bool, bool); /* Called the first time that stack info is needed */
+  void init (PUINT_PTR, bool, bool); /* Called the first time that stack info is needed */
 
   /* Postfix ++ iterates over the stack, returning zero when nothing is left. */
   int operator ++(int) { return walk (); }
@@ -217,21 +244,19 @@ static NO_COPY stack_info thestack;
 
 /* Initialize everything needed to start iterating. */
 void
-stack_info::init (DWORD ebp, bool wantargs, bool goodframe)
+stack_info::init (PUINT_PTR framep, bool wantargs, bool goodframe)
 {
-# define debp ((DWORD *) ebp)
   memset (&sf, 0, sizeof (sf));
   if (!goodframe)
-    sf.AddrFrame.Offset = ebp;
+    sf.AddrFrame.Offset = (UINT_PTR) framep;
   else
     {
-      dummy_frame = ebp;
-      sf.AddrFrame.Offset = (DWORD) &dummy_frame;
+      dummy_frame = framep;
+      sf.AddrFrame.Offset = (UINT_PTR) &dummy_frame;
     }
-  sf.AddrReturn.Offset = debp[1];
+  sf.AddrReturn.Offset = framep[1];
   sf.AddrFrame.Mode = AddrModeFlat;
   needargs = wantargs;
-# undef debp
 }
 
 extern "C" void _cygwin_exit_return ();
@@ -241,41 +266,43 @@ extern "C" void _cygwin_exit_return ();
 int
 stack_info::walk ()
 {
-  char **ebp;
+  char **framep;
 
   if ((void (*) ()) sf.AddrPC.Offset == _cygwin_exit_return)
     return 0;		/* stack frames are exhausted */
 
-  if (((ebp = (char **) next_offset ()) == NULL) || (ebp >= (char **) cygwin_hmodule))
+  if (((framep = (char **) next_offset ()) == NULL)
+      || (framep >= (char **) cygwin_hmodule))
     return 0;
 
-  sf.AddrFrame.Offset = (DWORD) ebp;
+  sf.AddrFrame.Offset = (_ADDR) framep;
   sf.AddrPC.Offset = sf.AddrReturn.Offset;
 
   /* The return address always follows the stack pointer */
-  sf.AddrReturn.Offset = (DWORD) *++ebp;
+  sf.AddrReturn.Offset = (_ADDR) *++framep;
 
   if (needargs)
     {
       unsigned nparams = NPARAMS;
 
       /* The arguments follow the return address */
-      sf.Params[0] = (DWORD) *++ebp;
+      sf.Params[0] = (_ADDR) *++framep;
+#ifndef __x86_64__
       /* Hack for XP/2K3 WOW64.  If the first stack param points to the
 	 application entry point, we can only fetch one additional
 	 parameter.  Accessing anything beyond this address results in
 	 a SEGV.  This is fixed in Vista/2K8 WOW64. */
       if (wincap.has_restricted_stack_args () && sf.Params[0] == 0x401000)
 	nparams = 2;
+#endif
       for (unsigned i = 1; i < nparams; i++)
-	sf.Params[i] = (DWORD) *++ebp;
+	sf.Params[i] = (_ADDR) *++framep;
     }
-
   return 1;
 }
 
 void
-stackdump (DWORD ebp, PCONTEXT in, EXCEPTION_RECORD *e)
+stackdump (PUINT_PTR framep, PCONTEXT in, EXCEPTION_RECORD *e)
 {
   static bool already_dumped;
 
@@ -289,14 +316,14 @@ stackdump (DWORD ebp, PCONTEXT in, EXCEPTION_RECORD *e)
 
   int i;
 
-  thestack.init (ebp, 1, !in);	/* Initialize from the input CONTEXT */
+  thestack.init (framep, 1, !in);	/* Initialize from the input CONTEXT */
   small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
   for (i = 0; i < 16 && thestack++; i++)
     {
-      small_printf ("%08x  %08x ", thestack.sf.AddrFrame.Offset,
+      small_printf (_AFMT "  " _AFMT, thestack.sf.AddrFrame.Offset,
 		    thestack.sf.AddrPC.Offset);
       for (unsigned j = 0; j < NPARAMS; j++)
-	small_printf ("%s%08x", j == 0 ? " (" : ", ", thestack.sf.Params[j]);
+	small_printf ("%s" _AFMT, j == 0 ? " (" : ", ", thestack.sf.Params[j]);
       small_printf (")\r\n");
     }
   small_printf ("End of stack trace%s\n",
@@ -313,8 +340,8 @@ _cygtls::inside_kernel (CONTEXT *cx)
     return true;
 
   memset (&m, 0, sizeof m);
-  if (!VirtualQuery ((LPCVOID) cx->Eip, &m, sizeof m))
-    sigproc_printf ("couldn't get memory info, pc %p, %E", cx->Eip);
+  if (!VirtualQuery ((LPCVOID) cx->_GR(ip), &m, sizeof m))
+    sigproc_printf ("couldn't get memory info, pc %p, %E", cx->_GR(ip));
 
   size_t size = (windows_system_directory_length + 6) * sizeof (WCHAR);
   PWCHAR checkdir = (PWCHAR) alloca (size);
@@ -334,12 +361,14 @@ _cygtls::inside_kernel (CONTEXT *cx)
 	checkdir += 4;
       res = wcsncasecmp (windows_system_directory, checkdir,
 			 windows_system_directory_length) == 0;
+#ifndef __x86_64__
       if (!res && system_wow64_directory_length)
 	res = wcsncasecmp (system_wow64_directory, checkdir,
 			   system_wow64_directory_length) == 0;
 
+#endif
     }
-  sigproc_printf ("pc %p, h %p, inside_kernel %d", cx->Eip, h, res);
+  sigproc_printf ("pc %p, h %p, inside_kernel %d", cx->_GR(ip), h, res);
 # undef h
   return res;
 }
@@ -351,7 +380,7 @@ cygwin_stackdump ()
   CONTEXT c;
   c.ContextFlags = CONTEXT_FULL;
   GetThreadContext (GetCurrentThread (), &c);
-  stackdump (c.Ebp);
+  stackdump ((PUINT_PTR) c._GR(bp));
 }
 
 #define TIME_TO_WAIT_FOR_DEBUGGER 10000
@@ -443,7 +472,14 @@ try_to_debug (bool waitloop)
   return dbg;
 }
 
-extern "C" void WINAPI RtlUnwind (void *, void *, PEXCEPTION_RECORD, void *);
+#ifdef __x86_64__
+static void __stdcall rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline));
+void __stdcall
+rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
+{
+  RtlUnwind (frame, __builtin_return_address (0), e, 0);
+}
+#else
 static void __stdcall rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline, regparm (3)));
 void __stdcall
 rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
@@ -463,10 +499,9 @@ rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
   popl		%%ebx					\n\
 ": : "r" (frame), "r" (e));
 }
+#endif
 
 /* Main exception handler. */
-
-extern exception_list *_except_list asm ("%fs:0");
 
 int
 exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
@@ -596,22 +631,22 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
       return 1;
     }
 
-  debug_printf ("In cygwin_except_handler exception %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
-  debug_printf ("In cygwin_except_handler signal %d at %p", si.si_signo, in->Eip);
+  debug_printf ("In cygwin_except_handler exception 0x%x at %p sp %p", e->ExceptionCode, in->_GR(ip), in->_GR(sp));
+  debug_printf ("In cygwin_except_handler signal %d at %p", si.si_signo, in->_GR(ip));
 
   bool masked = !!(me.sigmask & SIGTOMASK (si.si_signo));
   if (masked)
-    syscall_printf ("signal %d, masked %p", si.si_signo,
+    syscall_printf ("signal %d, masked 0x%lx", si.si_signo,
 		    global_sigs[si.si_signo].sa_mask);
 
   debug_printf ("In cygwin_except_handler calling %p",
 		 global_sigs[si.si_signo].sa_handler);
 
-  DWORD *ebp = (DWORD *) in->Esp;
-  for (DWORD *bpend = (DWORD *) __builtin_frame_address (0); ebp > bpend; ebp--)
-    if (*ebp == in->SegCs && ebp[-1] == in->Eip)
+  PUINT_PTR framep = (PUINT_PTR) in->_GR(sp);
+  for (PUINT_PTR bpend = (PUINT_PTR) __builtin_frame_address (0); framep > bpend; framep--)
+    if (*framep == in->SegCs && framep[-1] == in->_GR(ip))
       {
-	ebp -= 2;
+	framep -= 2;
 	break;
       }
 
@@ -635,7 +670,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
       /* Print the exception to the console */
       if (!myself->cygstarted)
 	for (int i = 0; status_info[i].name; i++)
-	  if (status_info[i].code == e->ExceptionCode)
+	  if (status_info[i].code == (NTSTATUS) e->ExceptionCode)
 	    {
 	      system_printf ("Exception: %s", status_info[i].name);
 	      break;
@@ -655,7 +690,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 
 	  rtl_unwind (frame, e);
 	  if (cygheap->rlim_core > 0UL)
-	    stackdump ((DWORD) ebp, in, e);
+	    stackdump (framep, in, e);
 	}
 
       if ((NTSTATUS) e->ExceptionCode == STATUS_ACCESS_VIOLATION)
@@ -667,9 +702,9 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	    error_code |= 2;
 	  if (!me.inside_kernel (in))		/* User space */
 	    error_code |= 4;
-	  klog (LOG_INFO, "%s[%d]: segfault at %08x rip %08x rsp %08x error %d",
+	  klog (LOG_INFO, "%s[%d]: segfault at " _AFMT " rip " _AFMT " rsp " _AFMT " error %d",
 			  __progname, myself->pid,
-			  e->ExceptionInformation[1], in->Eip, in->Esp,
+			  e->ExceptionInformation[1], in->_GR(ip), in->_GR(sp),
 			  error_code);
 	}
 
@@ -679,7 +714,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 
   si.si_addr =  (si.si_signo == SIGSEGV || si.si_signo == SIGBUS
 		 ? (void *) e->ExceptionInformation[1]
-		 : (void *) in->Eip);
+		 : (void *) in->_GR(ip));
   si.si_errno = si.si_pid = si.si_uid = 0;
   me.incyg++;
   sig_send (NULL, si, &me);	// Signal myself
@@ -705,7 +740,7 @@ handle_sigsuspend (sigset_t tempmask)
   sigset_t oldmask = _my_tls.sigmask;	// Remember for restoration
 
   set_signal_mask (_my_tls.sigmask, tempmask);
-  sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
+  sigproc_printf ("oldmask 0x%lx, newmask 0x%lx", oldmask, tempmask);
 
   pthread_testcancel ();
   cygwait (NULL, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr);
@@ -770,9 +805,10 @@ _cygtls::interrupt_now (CONTEXT *cx, siginfo_t& si, void *handler,
     interrupted = false;
   else
     {
-      push ((__stack_t) cx->Eip);
+      _ADDR &ip = cx->_GR(ip);
+      push (ip);
       interrupt_setup (si, handler, siga);
-      cx->Eip = pop ();
+      ip = pop ();
       SetThreadContext (*this, cx); /* Restart the thread in a new location */
       interrupted = true;
     }
@@ -919,7 +955,7 @@ ctrl_c_handler (DWORD type)
     {
       if (myself->cygstarted)	/* Was this process created by a cygwin process? */
 	return TRUE;		/* Yes.  Let the parent eventually handle CTRL-C issues. */
-      debug_printf ("exiting with status %p", STATUS_CONTROL_C_EXIT);
+      debug_printf ("exiting with status 0x%08x", STATUS_CONTROL_C_EXIT);
       ExitProcess (STATUS_CONTROL_C_EXIT);
     }
 
@@ -1101,7 +1137,7 @@ set_process_mask_delta ()
   else
     oldmask = _my_tls.sigmask;
   newmask = (oldmask | _my_tls.deltamask) & ~SIG_NONMASKABLE;
-  sigproc_printf ("oldmask %p, newmask %p, deltamask %p", oldmask, newmask,
+  sigproc_printf ("oldmask %lx, newmask %lx, deltamask %lx", oldmask, newmask,
 		  _my_tls.deltamask);
   _my_tls.sigmask = newmask;
   return oldmask;
@@ -1115,7 +1151,7 @@ set_signal_mask (sigset_t& setmask, sigset_t newmask)
 {
   newmask &= ~SIG_NONMASKABLE;
   sigset_t mask_bits = setmask & ~newmask;
-  sigproc_printf ("setmask %p, newmask %p, mask_bits %p", setmask, newmask,
+  sigproc_printf ("setmask %lx, newmask %lx, mask_bits %lx", setmask, newmask,
 		  mask_bits);
   setmask = newmask;
   if (mask_bits)
@@ -1311,7 +1347,7 @@ _cygtls::call_signal_handler ()
 void
 _cygtls::copy_context (CONTEXT *c)
 {
-  memcpy (&thread_context, c, (&thread_context._internal - (unsigned char *) &thread_context));
+  memcpy (&thread_context, c, __COPY_CONTEXT_SIZE);
 }
 
 void

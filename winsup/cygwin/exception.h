@@ -32,9 +32,9 @@ public:
   ~exception () __attribute__ ((always_inline)) { _except_list = save; }
 };
 
-void stackdump (DWORD, CONTEXT * = NULL, EXCEPTION_RECORD * = NULL);
+void stackdump (PUINT_PTR, CONTEXT * = NULL, EXCEPTION_RECORD * = NULL);
 extern void inline
-stackdump (DWORD n, bool)
+stackdump (PUINT_PTR n, bool)
 {
   stackdump (n, (CONTEXT *) 1);
 }

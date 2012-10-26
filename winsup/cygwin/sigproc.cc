@@ -409,7 +409,11 @@ _cygtls::signal_exit (int rc)
     }
 
   if ((rc & 0x80) && !try_to_debug ())
-    stackdump (thread_context.ebp, true);
+#ifdef __x86_64__
+    stackdump ((PUINT_PTR) thread_context.rbp, true);
+#else
+    stackdump ((PUINT_PTR) thread_context.ebp, true);
+#endif
 
   lock_process until_exit (true);
   if (have_execed || exit_state > ES_PROCESS_LOCKED)

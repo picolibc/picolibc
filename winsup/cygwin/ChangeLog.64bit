@@ -1,3 +1,40 @@
+2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (stackdump): Change first parameter to PUINT_PTR.
+	* exceptions.cc: Define cpu specific macros _GR, _AFMT and _ADDR.
+	Use throughout to avoid ifdef's.  Fix debug printfs to work in
+	64 bit mode as well, throughout.
+	(status_info): Define member code as NTSTATUS.  Add casts where
+	necessary throughout.
+	(dump_exception): Dump all x86_64 registers if building for it.
+	(class stack_info): Define dummy_frame as PUINT_PTR.
+	(stack_info::init): Change first parameter to PUINT_PTR.  Rename
+	ebp to framep for CPU independent naming.  Drop debp macro.
+	(stack_info::walk): Rename ebp to framep for CPU independent naming.
+	Disable WOW64 hack in 64 bit mode.
+	(stackdump): Change first parameter to PUINT_PTR.  Rename ebp to framep
+	for CPU independent naming.
+	(_cygtls::inside_kernel): Ignore system_wow64_directory on 64 bit.
+	(rtl_unwind): Redefine for x86_64 cpu.
+	(_except_list): Drop redundant definition.
+	(_cygtls::copy_context): Just use __COPY_CONTEXT_SIZE.
+	* sigproc.cc (_cygtls::signal_exit): Conditionalize stackdump call per
+	cpu.
+	* smallprint.cc (__small_vsprintf): Fix up for 64 bit.  Handle 'l' size
+	modifier in 'd', 'o', 'u', 'x' conversion to print "long" values on a
+	per cpu base.  Add 'O' conversion.  Change comment accrdingly.
+	* include/cygwin/signal.h (struct _uc_fpxreg): Define for 64 bit.
+	(struct _uc_xmmreg): Ditto.
+	(struct _fpstate): Ditto.
+	(struct ucontext): Ditto.
+	(struct _uc_fpreg): Define for 32 bit.
+	(struct _fpstate): Use struct _uc_fpreg for _st.  Use explicit sized
+	types.
+	(struct ucontext): Use explicit sized types.
+	(__COPY_CONTEXT_SIZE): Cast safely.
+	(sigset_t): Define as __uint64_t on 64 bit.  Add FIXME comment in 32
+	bit case.
+
 2012-10-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* smallprint.cc (rnarg): Make type-safe.
