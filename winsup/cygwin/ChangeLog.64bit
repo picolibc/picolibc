@@ -1,5 +1,12 @@
 2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.cc (_cygtls::remove): Fix debug printf to be type-safe.
+	* dcrt0.cc: Ditto, throughout.
+	* include/sys/cygwin.h (struct per_process): Define magic_biscuit,
+	dll_major and dll_minor as uint32_t.
+
+2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.h (struct init_cygheap): Define sthreads as uint32_t.
 
 2012-10-26  Corinna Vinschen  <corinna@vinschen.de>

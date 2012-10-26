@@ -1,7 +1,7 @@
 /* sys/cygwin.h
 
    Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,6 +14,7 @@ details. */
 
 #include <sys/types.h>
 #include <limits.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -252,9 +253,9 @@ struct per_process
 
   /* The offset of these 3 values can never change. */
   /* magic_biscuit is the size of this class and should never change. */
-  unsigned long magic_biscuit;
-  unsigned long dll_major;
-  unsigned long dll_minor;
+  uint32_t magic_biscuit;
+  uint32_t dll_major;
+  uint32_t dll_minor;
 
   struct _reent **impure_ptr_ptr;
   char ***envptr;

@@ -166,7 +166,7 @@ _cygtls::remove (DWORD wait)
   if (exit_state >= ES_FINAL)
     return;
 
-  debug_printf ("wait %p", wait);
+  debug_printf ("wait %u", wait);
 
   /* FIXME: Need some sort of atthreadexit function to allow things like
      select to control this themselves. */

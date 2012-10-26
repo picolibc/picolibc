@@ -373,17 +373,17 @@ check_sanity_and_sync (per_process *p)
 
   /* Complain if older than last incompatible change */
   if (p->dll_major < CYGWIN_VERSION_DLL_EPOCH)
-    api_fatal ("cygwin DLL and APP are out of sync -- DLL version mismatch %d < %d",
+    api_fatal ("cygwin DLL and APP are out of sync -- DLL version mismatch %u < %u",
 	       p->dll_major, CYGWIN_VERSION_DLL_EPOCH);
 
   /* magic_biscuit != 0 if using the old style version numbering scheme.  */
   if (p->magic_biscuit != SIZEOF_PER_PROCESS)
-    api_fatal ("Incompatible cygwin .dll -- incompatible per_process info %d != %d",
+    api_fatal ("Incompatible cygwin .dll -- incompatible per_process info %u != %u",
 	       p->magic_biscuit, SIZEOF_PER_PROCESS);
 
   /* Complain if incompatible API changes made */
   if (p->api_major > cygwin_version.api_major)
-    api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %d > %d",
+    api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %u > %u",
 	       p->api_major, cygwin_version.api_major);
 
   /* This is a kludge to work around a version of _cygwin_common_crt0
@@ -573,7 +573,7 @@ get_cygwin_startup_info ()
 	      }
 	    break;
 	  default:
-	    system_printf ("unknown exec type %d", res->type);
+	    system_printf ("unknown exec type %u", res->type);
 	    /* intentionally fall through */
 	  case _CH_WHOOPS:
 	    res = NULL;
@@ -1141,7 +1141,7 @@ do_exit (int status)
 	  siginfo_t si = {0};
 	  si.si_signo = -SIGHUP;
 	  si.si_code = SI_KERNEL;
-	  sigproc_printf ("%d == pgrp %d, send SIG{HUP,CONT} to stopped children",
+	  sigproc_printf ("%u == pgrp %u, send SIG{HUP,CONT} to stopped children",
 			  myself->pid, myself->pgid);
 	  kill_pgrp (myself->pgid, si);
 	}
@@ -1154,7 +1154,7 @@ do_exit (int status)
       if (getpgrp () > 0 && myself->pid == myself->sid && real_tty_attached (myself))
 	{
 	  tty *tp = cygwin_shared->tty[myself->ctty];
-	  sigproc_printf ("%d == sid %d, send SIGHUP to children",
+	  sigproc_printf ("%u == sid %u, send SIGHUP to children",
 			  myself->pid, myself->sid);
 
 	/* CGF FIXME: This can't be right. */
@@ -1246,6 +1246,6 @@ void __stdcall
 cygbench (const char *s)
 {
   if (GetEnvironmentVariableA ("CYGWIN_BENCH", NULL, 0))
-    small_printf ("%05d ***** %s : %10d\n", GetCurrentProcessId (), s, strace.microseconds ());
+    small_printf ("%05u ***** %s : %10d\n", GetCurrentProcessId (), s, strace.microseconds ());
 }
 #endif
