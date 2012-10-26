@@ -190,6 +190,8 @@ enum
 					   perform notification */
 };
 
+typedef __uint32_t sigset_t;
+
 typedef void (*_sig_func_ptr)(int);
 
 struct sigaction
