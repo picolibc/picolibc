@@ -12,7 +12,10 @@ extern "C" {
 
 /* #ifndef __STRICT_ANSI__*/
 
+/* Cygwin defines it's own sigset_t in include/cygwin/signal.h */
+#ifndef __CYGWIN__
 typedef unsigned long sigset_t;
+#endif
 
 #if defined(__rtems__)
 

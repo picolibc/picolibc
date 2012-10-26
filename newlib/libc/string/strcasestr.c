@@ -84,8 +84,7 @@ QUICKREF
   (!memchr ((h) + (h_l), '\0', (j) + (n_l) - (h_l))	\
    && ((h_l) = (j) + (n_l)))
 # define CANON_ELEMENT(c) tolower (c)
-#if defined (__GNUC__) && \
-    ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
+#if __GNUC_PREREQ (4, 2)
 /* strncasecmp uses signed char, CMP_FUNC is expected to use unsigned char. */
 #pragma GCC diagnostic ignored "-Wpointer-sign"
 #endif

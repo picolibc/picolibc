@@ -1,9 +1,54 @@
-2012-10-15  Corinna Vinschen  <vinschen@redhat.com>
+2012-10-26  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/signal.h (sigset_t): Don't define when building
+	for Cygwin.
+
+2012-10-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Comment out the --enable-newlib-fp-hw option
+	as the mathfp library is inaccurate and should not be used.
+	* Makefile.am: Add comment regarding the mathfp directory.
+	* configure: Regenerated.
+	* Makefile.in: Ditto.
+	* libm/mathfp/README: New file that details why the mathfp
+	directory is not used.
+
+2012-10-22  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* libc/include/string.h (strdup, strndup): Declare if not
+	__STRICT_ANSI__ or _XOPEN_SOURCE is defined appropriately.
+
+2012-10-22  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* libc/include/stdlib.h (strtof, strtoll, strtoull, strtold):Prototype
+	if not __STRICT_ANSI__ or stdc version C99 or greater.
+
+2012-10-21  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* libc/sys/mmixware/sbrk.c (_sbrk): Drop unused extern declaration
+	of "end".  Mark allocated memory by applying PRELD.
+
+2012-10-16  Gregory Pietsch  <gpietsch@comcast.net>
+
+	* libc/stdlib/getopt.c (getopt_internal): Align handling of colon to
+	SUSv4 requirements.
+	(__getopt_long_r): Fix formatting.
+
+2012-10-16  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/vfprintf.c (__sbprintf): Fix comment.
+
+2012-10-16  Aurelien Jacobs  <aurel@gnuage.org>
+
+	* libc/include/assert.h (static_assert): Define.
+
+2012-10-16  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/features.h (__GNUC_PREREQ): Define.  Use
 	throughout in place of explicit GNUC version checks.
 	* libc/include/_ansi.h (_NOINLINE): Define.
-	* libc/stdio/vfprintf.c (__sbprintf): Define _NOINLINE.
+	(_NOINLINE_STATIC): Define.
+	* libc/stdio/vfprintf.c (__sbprintf): Define _NOINLINE_STATIC.
 
 2012-10-09  Peter Rosin  <peda@lysator.liu.se>
 

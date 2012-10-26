@@ -125,7 +125,9 @@ _PTR	_EXFUN(reallocf,(_PTR __r, size_t __size));
 _VOID	_EXFUN(srand,(unsigned __seed));
 double	_EXFUN(strtod,(const char *__n, char **__end_PTR));
 double	_EXFUN(_strtod_r,(struct _reent *,const char *__n, char **__end_PTR));
+#if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L)
 float	_EXFUN(strtof,(const char *__n, char **__end_PTR));
+#endif
 #ifndef __STRICT_ANSI__
 /* the following strtodf interface is deprecated...use strtof instead */
 # ifndef strtodf 
@@ -186,9 +188,17 @@ long long _EXFUN(atoll,(const char *__nptr));
 long long _EXFUN(_atoll_r,(struct _reent *, const char *__nptr));
 long long _EXFUN(llabs,(long long));
 lldiv_t	_EXFUN(lldiv,(long long __numer, long long __denom));
+#endif /* ! __STRICT_ANSI__ */
+#if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L)
 long long _EXFUN(strtoll,(const char *__n, char **__end_PTR, int __base));
+#endif
+#ifndef __STRICT_ANSI__
 long long _EXFUN(_strtoll_r,(struct _reent *, const char *__n, char **__end_PTR, int __base));
+#endif /* ! __STRICT_ANSI__ */
+#if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L)
 unsigned long long _EXFUN(strtoull,(const char *__n, char **__end_PTR, int __base));
+#endif
+#ifndef __STRICT_ANSI__
 unsigned long long _EXFUN(_strtoull_r,(struct _reent *, const char *__n, char **__end_PTR, int __base));
 
 #ifndef __CYGWIN__
@@ -217,7 +227,9 @@ _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *))
 
 /* On platforms where long double equals double.  */
 #ifdef _LDBL_EQ_DBL
+#if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L)
 extern long double strtold (const char *, char **);
+#endif
 extern long double wcstold (const wchar_t *, wchar_t **);
 #endif /* _LDBL_EQ_DBL */
 

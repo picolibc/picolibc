@@ -1,3 +1,7 @@
+2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/signal.h (sigset_t): Define here.
+
 2012-10-24  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* Makefile.in (DLL_IMPORTS): Use system import libraries for

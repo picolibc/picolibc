@@ -333,8 +333,10 @@ int __sprint_r (struct _reent *, FILE *, register struct __suio *);
  * Helper function for `fprintf to unbuffered unix file': creates a
  * temporary buffer.  We only work on write-only files; this avoids
  * worries about ungetc buffers and so forth.
+ *
+ * Make sure to avoid inlining.
  */
-static int
+_NOINLINE_STATIC int
 _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
        struct _reent *rptr _AND
        register FILE *fp   _AND
