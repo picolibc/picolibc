@@ -1,3 +1,8 @@
+2012-10-26  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/signal.h (sigset_t): Don't define when building
+	for Cygwin.
+
 2012-10-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.in: Comment out the --enable-newlib-fp-hw option
