@@ -388,7 +388,7 @@ struct init_cygheap: public mini_cygheap
 
   fhandler_termios *ctty;	/* Current tty */
   struct _cygtls **threadlist;
-  size_t sthreads;
+  uint32_t sthreads;
   pid_t pid;			/* my pid */
   struct {			/* Equivalent to using LIST_HEAD. */
     struct inode_t *lh_first;

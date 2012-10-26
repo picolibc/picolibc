@@ -1,5 +1,9 @@
 2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.h (struct init_cygheap): Define sthreads as uint32_t.
+
+2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc: Fix debug printfs to work in 64 bit mode as well,
 	throughout.
 	(nthreads): Define as uint32_t to make always 4 byte.  Accommodate
