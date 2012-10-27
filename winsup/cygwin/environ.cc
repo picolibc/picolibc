@@ -829,7 +829,7 @@ environ_init (char **envp, int envc)
       envp[i] = newp;
       if (*newp == '=')
 	*newp = '!';
-      char *eq = strechr (newp, '=');
+      char *eq = strchrnul (newp, '=');
       ucenv (newp, eq);	/* uppercase env vars which need it */
       if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
 	sawTERM = 1;

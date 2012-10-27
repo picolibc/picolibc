@@ -861,7 +861,7 @@ aclfromtext32 (char *acltextp, int *)
 		      return NULL;
 		    }
 		  lacl[pos].a_id = pw->pw_uid;
-		  c = strechr (c, ':');
+		  c = strchrnul (c, ':');
 		}
 	      else if (isdigit (*c))
 		lacl[pos].a_id = strtol (c, &c, 10);
@@ -889,7 +889,7 @@ aclfromtext32 (char *acltextp, int *)
 		      return NULL;
 		    }
 		  lacl[pos].a_id = gr->gr_gid;
-		  c = strechr (c, ':');
+		  c = strchrnul (c, ':');
 		}
 	      else if (isdigit (*c))
 		lacl[pos].a_id = strtol (c, &c, 10);
