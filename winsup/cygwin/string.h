@@ -17,10 +17,10 @@ details. */
 extern "C" {
 #endif
 
-#undef strechr
-#define strechr cygwin_strechr
+#undef strchrnul
+#define strchrnul cygwin_strchrnul
 static inline __stdcall char *
-strechr (const char *s, int c)
+strchrnul (const char *s, int c)
 {
   while (*s != (char) c && *s != 0)
     ++s;

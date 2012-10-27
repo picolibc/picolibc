@@ -1,3 +1,12 @@
+2012-10-27  Kai Tietz  <ktietz@redhat.com>
+
+	* dcrt0.cc (quoted): Renamed strechr to strchrnul.
+	* environ.cc (environ_init): Likewise.
+	* sec_acl.cc (aclfromtext32): Likewise.
+	* sec_auth.cc (extract_nt_dom_user): Likewise.
+	* uinfo.cc (pwdgrp::next_str): Likewise.
+	* string.h (strechr): Likewise.
+
 2012-10-26  Kai Tietz  <ktietz@redhat.com>
 
 	* string.h (strechr): Replace assembler by

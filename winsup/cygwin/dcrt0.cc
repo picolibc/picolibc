@@ -162,7 +162,7 @@ quoted (char *cmd, int winshell)
     {
       char *p;
       strcpy (cmd, cmd + 1);
-      if (*(p = strechr (cmd, quote)))
+      if (*(p = strchrnul (cmd, quote)))
 	strcpy (p, p + 1);
       return p;
     }

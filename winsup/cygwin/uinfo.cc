@@ -505,7 +505,7 @@ char *
 pwdgrp::next_str (char c)
 {
   char *res = lptr;
-  lptr = strechr (lptr, c);
+  lptr = strchrnul (lptr, c);
   if (*lptr)
     *lptr++ = '\0';
   return res;
