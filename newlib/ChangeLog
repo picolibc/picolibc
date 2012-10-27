@@ -1,3 +1,7 @@
+2012-10-27  Anthony Green  <green@moxielogic.com>
+
+	* libc/machine/moxie/setjmp.S (setjmp): Minor optimization.
+
 2012-10-26  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/signal.h (sigset_t): Don't define when building

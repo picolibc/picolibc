@@ -19,18 +19,15 @@
 	.type	__start,@function
 __start:
 _start:
-	ldi.l	$sp, (_stack-12)/* load up stack pointer with space
-	                           for stack frame. */
+	ldi.l	$sp, _stack	/* set the top of stack */
 	xor	$fp, $fp	/* zero fp to allow unwinders to stop */
 
 	/* zero the bss area */
 	ldi.l	$r0, __bss_start__
-	ldi.l	$r1, __bss_end__
-	sub.l	$r1, $r0
-	sto.l	8($sp), $r1
-	ldi.l	$r1, 0
+	xor	$r1, $r1
+	ldi.l	$r2, __bss_end__
+	sub.l	$r2, $r0
 	jsra	memset
-	inc	$sp, 12
 
 	/* Call _init to invoke static constructors, etc.  */
 	jsra	_init

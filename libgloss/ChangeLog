@@ -1,3 +1,8 @@
+2012-10-27  Anthony Green  <green@moxielogic.com>
+
+	* moxie/crt0.S (_start): Call memset with correct
+	ABI.
+
 2012-10-03  DJ Delorie  <dj@redhat.com>
 
 	* rl78/crt0.S (_interrupt_vector_table): Convert from CPP macros
