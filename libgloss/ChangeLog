@@ -1,5 +1,10 @@
 2012-10-27  Anthony Green  <green@moxielogic.com>
 
+	* moxie/sim-unlink.S (unlink): Loop forever.
+	moxie/sim-time.S (_sim_time): Ditto.
+
+2012-10-27  Anthony Green  <green@moxielogic.com>
+
 	* moxie/crt0.S (_start): Call memset with correct
 	ABI.
 

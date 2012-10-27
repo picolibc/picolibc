@@ -22,7 +22,7 @@
 	.text
 _unlink:
 unlink:
-	bad
+	jmpa unlink
 	ret
 .Lend:
 	.size	_unlink,.Lend-_unlink

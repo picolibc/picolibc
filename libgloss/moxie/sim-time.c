@@ -25,7 +25,7 @@ __asm__ ("\
 	.globl	_sim_time\n\
 	.type	_sim_time,@function\n\
 _sim_time:\n\
-	bad\n			\
+        jmpa _sim_time\n\
 	ret\n\
 .Lsim:\n\
 	.size	_sim_time,.Lsim-_sim_time");
