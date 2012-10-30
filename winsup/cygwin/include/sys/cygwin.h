@@ -201,7 +201,7 @@ CW_TOKEN_RESTRICTED    = 1
 };
 
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */
-unsigned long cygwin_internal (cygwin_getinfo_types, ...);
+uintptr_t cygwin_internal (cygwin_getinfo_types, ...);
 
 /* Flags associated with process_state */
 enum

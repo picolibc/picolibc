@@ -1,5 +1,12 @@
 2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* external.cc (get_cygdrive_info): Return uintptr_t rather than DWORD.
+	(check_ntsec): Return bool.
+	(cygwin_internal): Return uintptr_t.  Accommodate throughout.
+	* include/sys/cygwin.h (cygwin_internal): Align declaration.
+
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/signal.h (NSIG): Define differently for x86_64 and
 	i686.  Change FIXME comment accordingly.
 	(SIGRTMAX): Define in terms of NSIG.
