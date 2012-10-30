@@ -242,9 +242,14 @@ details. */
 /* #define PTHREAD_THREADS_MAX unspecified */
 
 /* Maximum number of realtime signals reserved for application use. */
-/* FIXME: We only support one realtime signal but _POSIX_RTSIG_MAX is 8. */
+/* FIXME: We only support one realtime signal in 32 bit mode, but
+	 _POSIX_RTSIG_MAX is 8. */
 #undef RTSIG_MAX
+#ifdef __x86_64__
+#define RTSIG_MAX 33
+#else
 #define RTSIG_MAX 1
+#endif
 
 /* Maximum number of semaphores that a process may have. */
 /* Windows allows any arbitrary number of semaphores per process. */
