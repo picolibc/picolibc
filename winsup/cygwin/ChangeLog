@@ -1,3 +1,8 @@
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/cygwin.h: Add missing defines for CW_ALLOC_DRIVE_MAP,
+	CW_MAP_DRIVE_MAP and CW_FREE_DRIVE_MAP.
+
 2012-10-27  Kai Tietz  <ktietz@redhat.com>
 
 	* dcrt0.cc (quoted): Renamed strechr to strchrnul.
