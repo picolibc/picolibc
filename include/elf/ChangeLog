@@ -1,3 +1,8 @@
+2012-10-30  Steve McIntyre  <steve.mcintyre@linaro.org>
+
+	* elf/arm.h (EF_ARM_ABI_FLOAT_SOFT): New define.
+	(EF_ARM_ABI_FLOAT_HARD): Likewise.
+
 2012-10-23  Tom Tromey  <tromey@redhat.com>
 
 	* common.h (NT_SIGINFO, NT_FILE): New defines.
@@ -18,7 +23,7 @@
 	(R_TILEGX_IMM16_X1_HW1_LAST_PLT_PCREL): Ditto.
 	(R_TILEGX_IMM16_X0_HW2_LAST_PLT_PCREL	): Ditto.
 	(R_TILEGX_IMM16_X1_HW2_LAST_PLT_PCREL): Ditto.
-	
+
 2012-08-13  Ian Bolton  <ian.bolton@arm.com>
             Laurent Desnogues  <laurent.desnogues@arm.com>
             Jim MacArthur  <jim.macarthur@arm.com>

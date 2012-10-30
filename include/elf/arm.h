@@ -46,6 +46,11 @@
 #define EF_ARM_MAPSYMSFIRST 0x10	/* NB conflicts with EF_APCS_FLOAT.  */
 #define EF_ARM_EABIMASK      0xFF000000
 
+/* New constants defined in the ARM ELF spec. version XXX.
+   Only valid in conjunction with EF_ARM_EABI_VER5. */
+#define EF_ARM_ABI_FLOAT_SOFT 0x200	/* NB conflicts with EF_ARM_SOFT_FLOAT.  */
+#define EF_ARM_ABI_FLOAT_HARD 0x400	/* NB conflicts with EF_ARM_VFP_FLOAT.  */
+
 /* Constants defined in AAELF.  */
 #define EF_ARM_BE8	    0x00800000
 #define EF_ARM_LE8	    0x00400000
