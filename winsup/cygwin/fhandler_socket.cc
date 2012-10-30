@@ -2003,7 +2003,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 }
 
 int
-fhandler_socket::fcntl (int cmd, void *arg)
+fhandler_socket::fcntl (int cmd, intptr_t arg)
 {
   int res = 0;
   int request, current;
@@ -2027,7 +2027,7 @@ fhandler_socket::fcntl (int cmd, void *arg)
 	/* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
 	   Set only the flag that has been passed in.  If both are set, just
 	   record O_NONBLOCK.   */
-	int new_flags = (int) arg & O_NONBLOCK_MASK;
+	int new_flags = arg & O_NONBLOCK_MASK;
 	if ((new_flags & OLD_O_NDELAY) && (new_flags & O_NONBLOCK))
 	  new_flags = O_NONBLOCK;
 	current = get_flags () & O_NONBLOCK_MASK;

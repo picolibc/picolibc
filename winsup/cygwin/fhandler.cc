@@ -1366,7 +1366,7 @@ fhandler_base_overlapped::dup (fhandler_base *child, int flags)
   return res;
 }
 
-int fhandler_base::fcntl (int cmd, void *arg)
+int fhandler_base::fcntl (int cmd, intptr_t arg)
 {
   int res;
 
@@ -1376,7 +1376,7 @@ int fhandler_base::fcntl (int cmd, void *arg)
       res = close_on_exec () ? FD_CLOEXEC : 0;
       break;
     case F_SETFD:
-      set_close_on_exec (((int) arg & FD_CLOEXEC) ? 1 : 0);
+      set_close_on_exec ((arg & FD_CLOEXEC) ? 1 : 0);
       res = 0;
       break;
     case F_GETFL:
@@ -1390,7 +1390,7 @@ int fhandler_base::fcntl (int cmd, void *arg)
 	   Since O_ASYNC isn't defined in fcntl.h it's currently
 	   ignored as well.  */
 	const int allowed_flags = O_APPEND | O_NONBLOCK_MASK;
-	int new_flags = (int) arg & allowed_flags;
+	int new_flags = arg & allowed_flags;
 	/* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
 	   Set only the flag that has been passed in.  If both are set, just
 	   record O_NONBLOCK.   */

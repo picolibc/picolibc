@@ -1,5 +1,14 @@
 2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fcntl.cc (fcntl64): Make arg an intptr_t.  Add comment to explain a
+	potential type problem.  Fix syscall_printf.
+	(_fcntl): Make arg an intptr_t.
+	* fhandler.cc (fhandler_base::fcntl): Ditto.
+	* fhandler_socket.cc (fhandler_socket::fcntl): Ditto.
+	* fhandler.h: Align declarations.
+
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc: Use %y rather than 0x%x.
 	* exceptions.cc: Ditto.
 

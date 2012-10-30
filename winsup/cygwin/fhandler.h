@@ -351,7 +351,7 @@ public:
   virtual int __stdcall utimens (const struct timespec *) __attribute__ ((regparm (2)));
   virtual int __stdcall fsync () __attribute__ ((regparm (1)));
   virtual int ioctl (unsigned int cmd, void *);
-  virtual int fcntl (int cmd, void *);
+  virtual int fcntl (int cmd, intptr_t);
   virtual char const *ttyname () { return get_name (); }
   virtual void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   virtual ssize_t __stdcall write (const void *ptr, size_t len);
@@ -577,7 +577,7 @@ class fhandler_socket: public fhandler_base
   ssize_t sendmsg (const struct msghdr *msg, int flags);
 
   int ioctl (unsigned int cmd, void *);
-  int fcntl (int cmd, void *);
+  int fcntl (int cmd, intptr_t);
   off_t lseek (off_t, int) { return 0; }
   int shutdown (int how);
   int close ();
