@@ -710,7 +710,7 @@ dtable::dup3 (int oldfd, int newfd, int flags)
   fhandler_base *newfh = NULL;	// = NULL to avoid an incorrect warning
 
   MALLOC_CHECK;
-  debug_printf ("dup3 (%d, %d, 0x%x)", oldfd, newfd, flags);
+  debug_printf ("dup3 (%d, %d, %y)", oldfd, newfd, flags);
   lock ();
   bool do_unlock = true;
   bool unlock_on_return;
@@ -736,7 +736,7 @@ dtable::dup3 (int oldfd, int newfd, int flags)
     }
   if ((flags & ~O_CLOEXEC) != 0)
     {
-      syscall_printf ("invalid flags value 0x%x", flags);
+      syscall_printf ("invalid flags value %y", flags);
       set_errno (EINVAL);
       return -1;
     }
@@ -778,7 +778,7 @@ done:
   MALLOC_CHECK;
   if (do_unlock)
     unlock ();
-  syscall_printf ("%R = dup3(%d, %d, 0x%x)", res, oldfd, newfd, flags);
+  syscall_printf ("%R = dup3(%d, %d, %y)", res, oldfd, newfd, flags);
 
   return res;
 }

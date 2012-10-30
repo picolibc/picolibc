@@ -631,7 +631,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
       return 1;
     }
 
-  debug_printf ("In cygwin_except_handler exception 0x%x at %p sp %p", e->ExceptionCode, in->_GR(ip), in->_GR(sp));
+  debug_printf ("In cygwin_except_handler exception %y at %p sp %p", e->ExceptionCode, in->_GR(ip), in->_GR(sp));
   debug_printf ("In cygwin_except_handler signal %d at %p", si.si_signo, in->_GR(ip));
 
   bool masked = !!(me.sigmask & SIGTOMASK (si.si_signo));

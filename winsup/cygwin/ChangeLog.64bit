@@ -1,5 +1,10 @@
 2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dtable.cc: Use %y rather than 0x%x.
+	* exceptions.cc: Ditto.
+
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* smallprint.cc (__small_vsprintf): Add 'y' and 'Y' conversion.
 	Add description to comment.
 	(__small_vswprintf): Align behaviour to __small_vsprintf.
