@@ -543,7 +543,7 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	  fabort ("unable to create interim mapping for %W, %E", d->name);
 	if (h != d->handle)
 	  {
-	    sigproc_printf ("%W loaded in wrong place: %08lx != %08lx",
+	    sigproc_printf ("%W loaded in wrong place: %p != %p",
 			    d->modname, h, d->handle);
 	    FreeLibrary (h);
 	    PVOID reservation = reserve_at (d->modname, h,
@@ -555,7 +555,7 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	    if (retries < DLL_RETRY_MAX)
 	      load_after_fork_impl (parent, d, retries+1);
 	    else
-	       fabort ("unable to remap %W to same address as parent (%08lx) - try running rebaseall",
+	       fabort ("unable to remap %W to same address as parent (%p) - try running rebaseall",
 		       d->modname, d->handle);
 
 	    /* once the above returns all the dlls are mapped; release
@@ -576,7 +576,7 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
       if (d->handle == d->preferred_base)
 	{
 	  if (!VirtualFree (d->handle, 0, MEM_RELEASE))
-	    fabort ("unable to release protective reservation for %W (%08lx), %E",
+	    fabort ("unable to release protective reservation for %W (%p), %E",
 		    d->modname, d->handle);
 	}
       else

@@ -1,3 +1,8 @@
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dll_init.cc: Fix debug printf to be type-safe.
+	* dtable.cc: Ditto.
+
 2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (_cygtls::remove): Fix debug printf to be type-safe.

@@ -661,7 +661,7 @@ build_fh_pc (path_conv& pc)
     last_tty_dev = fh->dev ();
 
 out:
-  debug_printf ("fh %p, dev %p", fh, fh ? (dev_t) fh->dev () : 0);
+  debug_printf ("fh %p, dev %08x", fh, fh ? (dev_t) fh->dev () : 0);
   return fh;
 }
 
@@ -710,7 +710,7 @@ dtable::dup3 (int oldfd, int newfd, int flags)
   fhandler_base *newfh = NULL;	// = NULL to avoid an incorrect warning
 
   MALLOC_CHECK;
-  debug_printf ("dup3 (%d, %d, %p)", oldfd, newfd, flags);
+  debug_printf ("dup3 (%d, %d, 0x%x)", oldfd, newfd, flags);
   lock ();
   bool do_unlock = true;
   bool unlock_on_return;
@@ -736,7 +736,7 @@ dtable::dup3 (int oldfd, int newfd, int flags)
     }
   if ((flags & ~O_CLOEXEC) != 0)
     {
-      syscall_printf ("invalid flags value %x", flags);
+      syscall_printf ("invalid flags value 0x%x", flags);
       set_errno (EINVAL);
       return -1;
     }
@@ -778,7 +778,7 @@ done:
   MALLOC_CHECK;
   if (do_unlock)
     unlock ();
-  syscall_printf ("%R = dup3(%d, %d, %p)", res, oldfd, newfd, flags);
+  syscall_printf ("%R = dup3(%d, %d, 0x%x)", res, oldfd, newfd, flags);
 
   return res;
 }
@@ -939,7 +939,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
   NTSTATUS status = NtQueryObject (h, ObjectNameInformation, ntfn, 65536, &len);
   if (!NT_SUCCESS (status))
-    debug_printf ("NtQueryObject failed, %p", status);
+    debug_printf ("NtQueryObject failed, 0x%08x", status);
   // NT seems to do this on an unopened file
   else if (!ntfn->Name.Buffer)
     debug_printf ("nt->Name.Buffer == NULL");
