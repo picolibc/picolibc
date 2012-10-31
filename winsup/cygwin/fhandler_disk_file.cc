@@ -380,7 +380,7 @@ fhandler_base::fstat_by_handle (struct stat *buf)
       status = file_get_fnoi (h, pc.fs_is_netapp (), pc.fnoi ());
       if (!NT_SUCCESS (status))
        {
-	 debug_printf ("%p = NtQueryInformationFile(%S, "
+	 debug_printf ("%y = NtQueryInformationFile(%S, "
 		       "FileNetworkOpenInformation)",
 		       status, pc.get_nt_native_path ());
 	 return -1;
@@ -394,7 +394,7 @@ fhandler_base::fstat_by_handle (struct stat *buf)
 				       FileStandardInformation);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("%p = NtQueryInformationFile(%S, "
+	  debug_printf ("%y = NtQueryInformationFile(%S, "
 			"FileStandardInformation)",
 			status, pc.get_nt_native_path ());
 	  return -1;
@@ -405,7 +405,7 @@ fhandler_base::fstat_by_handle (struct stat *buf)
 					   FileInternalInformation);
 	  if (!NT_SUCCESS (status))
 	    {
-	      debug_printf ("%p = NtQueryInformationFile(%S, "
+	      debug_printf ("%y = NtQueryInformationFile(%S, "
 			    "FileInternalInformation)",
 			    status, pc.get_nt_native_path ());
 	      return -1;
@@ -442,7 +442,7 @@ fhandler_base::fstat_by_name (struct stat *buf)
 			   | FILE_OPEN_FOR_BACKUP_INTENT
 			   | FILE_DIRECTORY_FILE);
       if (!NT_SUCCESS (status))
-	debug_printf ("%p = NtOpenFile(%S)", status,
+	debug_printf ("%y = NtOpenFile(%S)", status,
 		      pc.get_nt_native_path ());
       else
 	{
@@ -452,7 +452,7 @@ fhandler_base::fstat_by_name (struct stat *buf)
 					 TRUE, &basename, TRUE);
 	  NtClose (dir);
 	  if (!NT_SUCCESS (status))
-	    debug_printf ("%p = NtQueryDirectoryFile(%S)", status,
+	    debug_printf ("%y = NtQueryDirectoryFile(%S)", status,
 			  pc.get_nt_native_path ());
 	  else
 	    ino = fdi_buf.fdi.FileId.QuadPart;
@@ -651,7 +651,7 @@ fhandler_base::fstat_helper (struct stat *buf,
 				   FILE_OPEN_FOR_BACKUP_INTENT
 				   | FILE_SYNCHRONOUS_IO_NONALERT);
 	      if (!NT_SUCCESS (status))
-		debug_printf ("%p = NtOpenFile(%S)", status,
+		debug_printf ("%y = NtOpenFile(%S)", status,
 			      pc.get_nt_native_path ());
 	      else
 		{
@@ -661,7 +661,7 @@ fhandler_base::fstat_helper (struct stat *buf,
 		  status = NtReadFile (h, NULL, NULL, NULL,
 				       &io, magic, 3, &off, NULL);
 		  if (!NT_SUCCESS (status))
-		    debug_printf ("%p = NtReadFile(%S)", status,
+		    debug_printf ("%y = NtReadFile(%S)", status,
 				  pc.get_nt_native_path ());
 		  else if (has_exec_chars (magic, io.Information))
 		    {
@@ -687,7 +687,7 @@ fhandler_base::fstat_helper (struct stat *buf,
     }
 
  done:
-  syscall_printf ("0 = fstat (%S, %p) st_size=%D, st_mode=%p, st_ino=%D"
+  syscall_printf ("0 = fstat (%S, %p) st_size=%D, st_mode=%y, st_ino=%D"
 		  "st_atim=%x.%x st_ctim=%x.%x "
 		  "st_mtim=%x.%x st_birthtim=%x.%x",
 		  pc.get_nt_native_path (), buf,
@@ -769,7 +769,7 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 				    FSCTL_GET_NTFS_VOLUME_DATA,
 				    NULL, 0, &nvdb, sizeof nvdb);
 	  if (!NT_SUCCESS (status))
-	    debug_printf ("%p = NtFsControlFile(%S, FSCTL_GET_NTFS_VOLUME_DATA)",
+	    debug_printf ("%y = NtFsControlFile(%S, FSCTL_GET_NTFS_VOLUME_DATA)",
 			  status, pc.get_nt_native_path ());
 	  else
 	    sfs->f_blocks = (fsblkcnt_t) nvdb.TotalClusters.QuadPart;
@@ -1197,7 +1197,7 @@ fhandler_disk_file::ftruncate (off_t length, bool allow_truncate)
 	{
 	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,
 				    FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
-	  syscall_printf ("%p = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
+	  syscall_printf ("%y = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
 			  status, pc.get_nt_native_path ());
 	}
       status = NtSetInformationFile (get_handle (), &io,
@@ -1476,7 +1476,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
     NtAllocateLocallyUniqueId ((PLUID) &unique_id);
 
 out:
-  syscall_printf ("%d = fhandler_disk_file::open(%S, %p)", res,
+  syscall_printf ("%d = fhandler_disk_file::open(%S, %y)", res,
 		  pc.get_nt_native_path (), flags);
   return res;
 }
@@ -1537,7 +1537,7 @@ fhandler_disk_file::prw_open (bool write)
       status = NtOpenFile (&prw_handle, access, &attr, &io,
 			   FILE_SHARE_VALID_FLAGS, get_options ());
     }
-  debug_printf ("%x = NtOpenFile (%p, %x, %S, io, %x, %x)",
+  debug_printf ("%y = NtOpenFile (%p, %x, %S, io, %x, %x)",
 		status, prw_handle, access, pc.get_nt_native_path (),
 		FILE_SHARE_VALID_FLAGS, get_options ());
   if (!NT_SUCCESS (status))
@@ -1614,7 +1614,7 @@ non_atomic:
       else
 	res = -1;
     }
-  debug_printf ("%d = pread(%p, %d, %d)\n", res, buf, count, offset);
+  debug_printf ("%d = pread(%p, %ld, %D)\n", res, buf, count, offset);
   return res;
 }
 
@@ -1658,7 +1658,7 @@ non_atomic:
       if (lseek (curpos, SEEK_SET) < 0)
 	res = -1;
     }
-  debug_printf ("%d = pwrite(%p, %d, %d)\n", res, buf, count, offset);
+  debug_printf ("%d = pwrite(%p, %ld, %D)\n", res, buf, count, offset);
   return res;
 }
 
@@ -1826,7 +1826,7 @@ fhandler_disk_file::opendir (int fd)
       dir->__d_position = 0;
       dir->__flags = (get_name ()[0] == '/' && get_name ()[1] == '\0')
 		     ? dirent_isroot : 0;
-      dir->__d_internal = (unsigned) new __DIR_mounts (get_name ());
+      dir->__d_internal = (uintptr_t) new __DIR_mounts (get_name ());
       d_cachepos (dir) = 0;
 
       if (!pc.iscygdrive ())
@@ -2192,7 +2192,7 @@ go_ahead:
   if (status == STATUS_NO_MORE_FILES)
     /*nothing*/;
   else if (!NT_SUCCESS (status))
-    debug_printf ("NtQueryDirectoryFile failed, status %p, win32 error %lu",
+    debug_printf ("NtQueryDirectoryFile failed, status %y, win32 error %lu",
 		  status, RtlNtStatusToDosError (status));
   else
     {
@@ -2318,7 +2318,7 @@ go_ahead:
       res = 0;
     }
 
-  syscall_printf ("%d = readdir(%p, %p) (L\"%lS\" > \"%ls\") (attr %p > type %d)",
+  syscall_printf ("%d = readdir(%p, %p) (L\"%lS\" > \"%ls\") (attr %y > type %d)",
 		  res, dir, &de, res ? NULL : &fname, res ? "***" : de->d_name,
 		  FileAttributes, de->d_type);
   return res;
@@ -2360,8 +2360,8 @@ fhandler_disk_file::rewinddir (DIR *dir)
 			   FILE_SYNCHRONOUS_IO_NONALERT
 			   | FILE_OPEN_FOR_BACKUP_INTENT
 			   | FILE_DIRECTORY_FILE);
-      if (!NT_SUCCESS (stat))
-	debug_printf ("Unable to reopen dir %s, NT error: %p",
+      if (!NT_SUCCESS (status))
+	debug_printf ("Unable to reopen dir %s, NT error: %y",
 		      get_name (), status);
       else
 	{

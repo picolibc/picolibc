@@ -1,3 +1,23 @@
+2012-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygthread.cc: Fix usage of %p in debug printfs, throughout.
+	* dcrt0.cc: Ditto.
+	* dtable.cc: Ditto.
+	* errno.cc: Ditto.
+	* exceptions.cc: Ditto.
+	* fhandler.cc: Ditto.
+	* fhandler_console.cc: Ditto.
+	* fhandler_disk_file.cc: Ditto.
+
+	* fhandler_clipboard.cc (cygnativeformat): Define as UINT.
+	(fhandler_dev_clipboard::read): Ditto for local format variable.
+	Use casts to compare off_t with size_t value.
+	* fhandler_console.cc (fhandler_console::ioctl): Avoid compiler
+	warnings.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Fix cast.
+	* include/sys/dirent.h (struct __DIR): Define __d_internal as uintptr_t,
+	rather than unsigned int.
+
 2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fcntl.cc (fcntl64): Make arg an intptr_t.  Add comment to explain a

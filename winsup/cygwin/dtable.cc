@@ -103,7 +103,7 @@ dtable::extend (int howmuch)
 
   size = new_size;
   fds = newfds;
-  debug_printf ("size %d, fds %p", size, fds);
+  debug_printf ("size %ld, fds %p", size, fds);
   return 1;
 }
 

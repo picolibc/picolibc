@@ -350,7 +350,7 @@ seterrno_from_nt_status (const char *file, int line, NTSTATUS status)
 {
   DWORD code = RtlNtStatusToDosError (status);
   SetLastError (code);
-  syscall_printf ("%s:%d status %p -> windows error %d",
+  syscall_printf ("%s:%d status %y -> windows error %d",
 		  file, line, status, code);
   errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
 }

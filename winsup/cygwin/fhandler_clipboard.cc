@@ -31,7 +31,7 @@ details. */
 
 static const NO_COPY WCHAR *CYGWIN_NATIVE = L"CYGWIN_NATIVE_CLIPBOARD";
 /* this is MT safe because windows format id's are atomic */
-static int cygnativeformat;
+static UINT cygnativeformat;
 
 typedef struct
 {
@@ -220,7 +220,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
   HGLOBAL hglb;
   size_t ret = 0;
   UINT formatlist[2];
-  int format;
+  UINT format;
   LPVOID cb_data;
   int rach;
 
@@ -243,7 +243,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
     {
       cygcb_t *clipbuf = (cygcb_t *) cb_data;
 
-      if (pos < clipbuf->len)
+      if (pos < (off_t) clipbuf->len)
 	{
 	  ret = ((len > (clipbuf->len - pos)) ? (clipbuf->len - pos) : len);
 	  memcpy (ptr, clipbuf->data + pos , ret);
@@ -267,7 +267,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
       wchar_t *buf = (wchar_t *) cb_data;
 
       size_t glen = GlobalSize (hglb) / sizeof (WCHAR) - 1;
-      if (pos < glen)
+      if (pos < (off_t) glen)
 	{
 	  /* If caller's buffer is too small to hold at least one 
 	     max-size character, redirect algorithm to local 

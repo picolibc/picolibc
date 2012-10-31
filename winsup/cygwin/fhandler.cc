@@ -190,9 +190,9 @@ fhandler_base::set_flags (int flags, int supplied_bin)
 {
   int bin;
   int fmode;
-  debug_printf ("flags %p, supplied_bin %p", flags, supplied_bin);
+  debug_printf ("flags %y, supplied_bin %y", flags, supplied_bin);
   if ((bin = flags & (O_BINARY | O_TEXT)))
-    debug_printf ("O_TEXT/O_BINARY set in flags %p", bin);
+    debug_printf ("O_TEXT/O_BINARY set in flags %y", bin);
   else if (rbinset () && wbinset ())
     bin = rbinary () ? O_BINARY : O_TEXT;	// FIXME: Not quite right
   else if ((fmode = get_default_fmode (flags)) & O_BINARY)
@@ -516,7 +516,7 @@ fhandler_base::open (int flags, mode_t mode)
   PFILE_FULL_EA_INFORMATION p = NULL;
   ULONG plen = 0;
 
-  syscall_printf ("(%S, %p)", pc.get_nt_native_path (), flags);
+  syscall_printf ("(%S, %y)", pc.get_nt_native_path (), flags);
 
   pc.get_object_attr (attr, *sec_none_cloexec (flags));
 
@@ -705,12 +705,12 @@ fhandler_base::open (int flags, mode_t mode)
   res = 1;
   set_open_status ();
 done:
-  debug_printf ("%x = NtCreateFile "
+  debug_printf ("%y = NtCreateFile "
 		"(%p, %x, %S, io, NULL, %x, %x, %x, %x, NULL, 0)",
 		status, fh, access, pc.get_nt_native_path (), file_attributes,
 		shared, create_disposition, options);
 
-  syscall_printf ("%d = fhandler_base::open(%S, %p)",
+  syscall_printf ("%d = fhandler_base::open(%S, %y)",
 		  res, pc.get_nt_native_path (), flags);
   return res;
 }
@@ -842,7 +842,7 @@ fhandler_base::write (const void *ptr, size_t len)
 	  NTSTATUS status;
 	  status = NtFsControlFile (get_output_handle (), NULL, NULL, NULL,
 				    &io, FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
-	  debug_printf ("%p = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
+	  debug_printf ("%y = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
 			status, pc.get_nt_native_path ());
 	}
     }
@@ -1381,7 +1381,7 @@ int fhandler_base::fcntl (int cmd, intptr_t arg)
       break;
     case F_GETFL:
       res = get_flags ();
-      debug_printf ("GETFL: %p", res);
+      debug_printf ("GETFL: %y", res);
       break;
     case F_SETFL:
       {

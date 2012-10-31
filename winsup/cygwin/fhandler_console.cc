@@ -944,9 +944,9 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
 	*(int *) arg = (dev_state.metabit) ? K_METABIT : K_ESCPREFIX;
 	return 0;
       case KDSKBMETA:
-	if ((int) arg == K_METABIT)
+	if ((intptr_t) arg == K_METABIT)
 	  dev_state.metabit = TRUE;
-	else if ((int) arg == K_ESCPREFIX)
+	else if ((intptr_t) arg == K_ESCPREFIX)
 	  dev_state.metabit = FALSE;
 	else
 	  {
@@ -1075,7 +1075,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
       res = SetConsoleMode (get_io_handle (), flags) ? 0 : -1;
       if (res < 0)
 	__seterrno ();
-      syscall_printf ("%d = tcsetattr(,%x) enable flags %p, c_lflag %p iflag %p",
+      syscall_printf ("%d = tcsetattr(,%x) enable flags %y, c_lflag %y iflag %y",
 		      res, t, flags, t->c_lflag, t->c_iflag);
     }
 
@@ -1126,7 +1126,7 @@ fhandler_console::tcgetattr (struct termios *t)
       /* All the output bits we can ignore */
       res = 0;
     }
-  syscall_printf ("%d = tcgetattr(%p) enable flags %p, t->lflag %p, t->iflag %p",
+  syscall_printf ("%d = tcgetattr(%p) enable flags %y, t->lflag %y, t->iflag %y",
 		 res, t, flags, t->c_lflag, t->c_iflag);
   return res;
 }
