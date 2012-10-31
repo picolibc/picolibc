@@ -2358,7 +2358,7 @@ fhandler_disk_file::rewinddir (DIR *dir)
 			   FILE_SYNCHRONOUS_IO_NONALERT
 			   | FILE_OPEN_FOR_BACKUP_INTENT
 			   | FILE_DIRECTORY_FILE);
-      if (!NT_SUCCESS (stat))
+      if (!NT_SUCCESS (status))
 	debug_printf ("Unable to reopen dir %s, NT error: %p",
 		      get_name (), status);
       else
