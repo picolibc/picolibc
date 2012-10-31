@@ -13,6 +13,9 @@
 /* Linux includes limits.h, but this is not universally done. */
 #include <limits.h>
 
+#define __need_NULL
+#include <stddef.h>
+
 /* Max number of open files.  The Posix version is OPEN_MAX.  */
 /* Number of fds is virtually unlimited in cygwin, but we must provide
    some reasonable value for Posix conformance */
@@ -40,10 +43,6 @@
    It should be in sync with S_BLKSIZE in sys/stat.h.  S_BLKSIZE is the
    BSD variant of this constant. */
 #define DEV_BSIZE	1024
-
-#ifndef NULL
-#define NULL            0L
-#endif
 
 #ifndef NBBY
 #define    NBBY 8

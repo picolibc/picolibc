@@ -1,5 +1,9 @@
 2012-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/sys/param.h: Include stddef.h to define NULL.
+
+2012-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::rewinddir): Fix using
 	wrong value in condition.
 
