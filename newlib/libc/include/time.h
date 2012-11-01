@@ -10,9 +10,9 @@
 #include "_ansi.h"
 #include <sys/reent.h>
 
-#ifndef NULL
-#define	NULL	0
-#endif
+#define __need_size_t
+#define __need_NULL
+#include <stddef.h>
 
 /* Get _CLOCKS_PER_SEC_ */
 #include <machine/time.h>
@@ -23,8 +23,6 @@
 
 #define CLOCKS_PER_SEC _CLOCKS_PER_SEC_
 #define CLK_TCK CLOCKS_PER_SEC
-#define __need_size_t
-#include <stddef.h>
 
 #include <sys/types.h>
 

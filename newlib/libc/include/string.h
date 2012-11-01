@@ -13,11 +13,8 @@
 #include <sys/features.h>
 
 #define __need_size_t
+#define __need_NULL
 #include <stddef.h>
-
-#ifndef NULL
-#define NULL 0
-#endif
 
 _BEGIN_STD_C
 
