@@ -41,6 +41,9 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+#define __need_NULL
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -59,9 +62,6 @@ typedef u_int32_t rpcprot_t;
 typedef u_int32_t rpcport_t;
 typedef   int32_t rpc_inline_t;
 
-#ifndef NULL
-# define NULL 0
-#endif
 #define __dontcare__ -1
 
 #ifndef FALSE

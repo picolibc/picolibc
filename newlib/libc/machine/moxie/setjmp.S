@@ -51,7 +51,7 @@ setjmp:
 	sto.l	0x34($r0), $r13
 	sto.l	0x38($r0), $sp
 	sto.l	0x3c($r0), $fp
-	ldi.l	$r0, 0x00
+	xor	$r0, $r0
 	ret
 .Lend1:
 	.size	setjmp,.Lend1-setjmp

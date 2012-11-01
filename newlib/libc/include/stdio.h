@@ -31,6 +31,7 @@
 #define	_FSTDIO			/* ``function stdio'' */
 
 #define __need_size_t
+#define __need_NULL
 #include <stddef.h>
 
 #define __need___va_list
@@ -95,10 +96,6 @@ typedef _fpos64_t fpos64_t;
 #define	_IOFBF	0		/* setvbuf should set fully buffered */
 #define	_IOLBF	1		/* setvbuf should set line buffered */
 #define	_IONBF	2		/* setvbuf should set unbuffered */
-
-#ifndef NULL
-#define	NULL	0
-#endif
 
 #define	EOF	(-1)
 

@@ -1,3 +1,17 @@
+2012-11-01  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/locale.h (NULL): Fetch definition via stddef.h.
+	* libc/include/stdio.h (NULL): Ditto.
+	* libc/include/stdlib.h (NULL): Ditto.
+	* libc/include/string.h (NULL): Ditto.
+	* libc/include/wchar.h (NULL): Ditto.
+	* libc/include/rpc/types.h (NULL): Ditto.
+	* libc/include/time.h (NULL): Ditto.  Include stddef.h earlier.
+
+2012-10-27  Anthony Green  <green@moxielogic.com>
+
+	* libc/machine/moxie/setjmp.S (setjmp): Minor optimization.
+
 2012-10-26  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/signal.h (sigset_t): Don't define when building

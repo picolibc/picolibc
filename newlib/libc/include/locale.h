@@ -9,9 +9,8 @@
 
 #include "_ansi.h"
 
-#ifndef NULL
-#define NULL    0
-#endif
+#define __need_NULL
+#include <stddef.h>
 
 #define LC_ALL	    0
 #define LC_COLLATE  1
