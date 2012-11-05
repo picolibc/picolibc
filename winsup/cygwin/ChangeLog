@@ -1,3 +1,10 @@
+2012-11-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* include/sys/termios.h (CBRK): Define as alias of CEOL.
+	(CREPRINT): Define as alias of CRPRNT.
+	(CDISCARD): Define as alias of CFLUSH.
+	(TTYDEF_*): Define.
+
 2012-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/param.h: Include stddef.h to define NULL.

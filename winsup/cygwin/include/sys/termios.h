@@ -85,6 +85,7 @@ POSIX commands */
 #define CEOT	CTRL('D')
 #define CEOL	0
 #define CEOL2	0
+#define CBRK	CEOL
 #define CEOF	CTRL('D')
 #define CSTART	CTRL('Q')
 #define CSTOP	CTRL('S')
@@ -93,7 +94,9 @@ POSIX commands */
 #define CSUSP	CTRL('Z')
 #define CDSUSP	CTRL('Y')
 #define CRPRNT	CTRL('R')
+#define CREPRINT	CRPRNT
 #define CFLUSH	CTRL('O')
+#define CDISCARD	CFLUSH
 #define CWERASE	CTRL('W')
 #define CLNEXT	CTRL('V')
 
@@ -240,6 +243,12 @@ POSIX commands */
 /* Compare a character C to a value VAL from the `c_cc' array in a
    `struct termios'.  If VAL is _POSIX_VDISABLE, no character can match it.  */
 #define CCEQ(val, c)	((c) == (val) && (val) != _POSIX_VDISABLE)
+
+#define TTYDEF_IFLAG	(BRKINT	| ICRNL	| IMAXBEL | IXON | IXANY)
+#define TTYDEF_OFLAG	(OPOST | ONLCR)
+#define TTYDEF_LFLAG	(ICANON | ISIG | IEXTEN | ECHO | ECHOE | ECHOKE | ECHOCTL)
+#define TTYDEF_CFLAG	(CREAD | CS8 | HUPCL)
+#define TTYDEF_SPEED	(B9600)
 
 typedef unsigned char cc_t;
 typedef unsigned int  tcflag_t;
