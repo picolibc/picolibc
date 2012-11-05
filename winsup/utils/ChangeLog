@@ -1,3 +1,8 @@
+2012-11-05  Corinna Vinschen <corinna@vinschen.de>
+
+	* Makefile.in (MINGW_CXX): Attach $(CFLAGS) to allow providing
+	build option tweaks to mingw compiler as well.
+
 2012-10-24  Corinna Vinschen <corinna@vinschen.de>
 
 	* configure.in: Add AC_NO_EXECUTABLES,
