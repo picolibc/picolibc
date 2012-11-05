@@ -1,3 +1,20 @@
+2012-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cpuid.h (can_set_flag): Implement for x86_64.
+	* fhandler.h (class fhandler_dev_raw): Define devbuf members taking
+	numerical values as DWORD, rather than size_t.
+	* fhandler_dsp.cc: Fix debug printf calls to be type safe.
+	(waveOut_callback): Align parameter types to latest MSDN description.
+	(waveIn_callback): Ditto.
+	(fhandler_dev_dsp::Audio_out::start): Change casts in call to
+	waveOutOpen according to MSDN.
+	(fhandler_dev_dsp::Audio_out::parsewav): Fix a cast.
+	(fhandler_dev_dsp::Audio_in::start): Change casts in call to
+	waveInOpen according to MSDN.
+	* fhandler_floppy.cc: Fix debug printf calls to be type safe.
+	(fhandler_dev_floppy::ioctl): Add casts to be on the safe side.
+	* fhandler_proc.cc: Fix debug printf calls to be type safe.
+
 2012-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygthread.cc: Fix usage of %p in debug printfs, throughout.

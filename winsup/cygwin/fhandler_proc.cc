@@ -1,6 +1,7 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011,
+   2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -376,7 +377,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_proc::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_proc::open(%y, 0%o)", res, flags, mode);
   return res;
 }
 
@@ -476,7 +477,7 @@ format_proc_uptime (void *, char *&destbuf)
     uptime = (stodi.CurrentTime.QuadPart - stodi.BootTime.QuadPart) / 100000ULL;
   else
     debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
-		  "status %p", status);
+		  "status %y", status);
 
   if (NT_SUCCESS (NtQuerySystemInformation (SystemPerformanceInformation,
 						 spi, sizeof_spi, NULL)))
@@ -514,7 +515,7 @@ format_proc_stat (void *, char *&destbuf)
 				     sizeof spt[0] * wincap.cpu_count (), NULL);
   if (!NT_SUCCESS (status))
     debug_printf ("NtQuerySystemInformation(SystemProcessorTimes), "
-		  "status %p", status);
+		  "status %y", status);
   else
     {
       unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
@@ -544,14 +545,14 @@ format_proc_stat (void *, char *&destbuf)
       if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("NtQuerySystemInformation(SystemPerformanceInformation)"
-			", status %p", status);
+			", status %y", status);
 	  memset (spi, 0, sizeof_spi);
 	}
       status = NtQuerySystemInformation (SystemTimeOfDayInformation,
 					 (PVOID) &stodi, sizeof stodi, NULL);
       if (!NT_SUCCESS (status))
 	debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
-		      "status %p", status);
+		      "status %y", status);
     }
   if (!NT_SUCCESS (status))
     {
@@ -1097,7 +1098,7 @@ format_proc_partitions (void *, char *&destbuf)
   status = NtOpenDirectoryObject (&dirhdl, DIRECTORY_QUERY, &attr);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtOpenDirectoryObject, status %p", status);
+      debug_printf ("NtOpenDirectoryObject, status %y", status);
       __seterrno_from_nt_status (status);
       return 0;
     }
@@ -1144,7 +1145,7 @@ format_proc_partitions (void *, char *&destbuf)
 			   &attr, &io, FILE_SHARE_VALID_FLAGS, 0);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtOpenFile(%S), status %p", &upath, status);
+	  debug_printf ("NtOpenFile(%S), status %y", &upath, status);
 	  __seterrno_from_nt_status (status);
 	  continue;
 	}

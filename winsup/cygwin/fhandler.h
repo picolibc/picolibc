@@ -806,10 +806,10 @@ class fhandler_dev_raw: public fhandler_base
  protected:
   char *devbufalloc;
   char *devbuf;
-  size_t devbufalign;
-  size_t devbufsiz;
-  size_t devbufstart;
-  size_t devbufend;
+  DWORD devbufalign;
+  DWORD devbufsiz;
+  DWORD devbufstart;
+  DWORD devbufend;
   struct status_flags
   {
     unsigned lastblk_to_read : 1;

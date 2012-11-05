@@ -102,8 +102,9 @@ class fhandler_dev_dsp::Audio::queue
   WAVEHDR **storage_;
 };
 
-static void CALLBACK waveOut_callback (HWAVEOUT hWave, UINT msg, DWORD instance,
-				       DWORD param1, DWORD param2);
+static void CALLBACK waveOut_callback (HWAVEOUT hWave, UINT msg,
+				       DWORD_PTR instance, DWORD_PTR param1,
+				       DWORD_PTR param2);
 
 class fhandler_dev_dsp::Audio_out: public Audio
 {
@@ -135,8 +136,9 @@ class fhandler_dev_dsp::Audio_out: public Audio
   int channels_;
 };
 
-static void CALLBACK waveIn_callback (HWAVEIN hWave, UINT msg, DWORD instance,
-				      DWORD param1, DWORD param2);
+static void CALLBACK waveIn_callback (HWAVEIN hWave, UINT msg,
+				      DWORD_PTR instance, DWORD_PTR param1,
+				      DWORD_PTR param2);
 
 class fhandler_dev_dsp::Audio_in: public Audio
 {
@@ -400,8 +402,8 @@ fhandler_dev_dsp::Audio_out::start ()
     return false;
 
   fillFormat (&format, freq_, bits_, channels_);
-  rc = waveOutOpen (&dev_, WAVE_MAPPER, &format, (DWORD) waveOut_callback,
-		     (DWORD) this, CALLBACK_FUNCTION);
+  rc = waveOutOpen (&dev_, WAVE_MAPPER, &format, (DWORD_PTR) waveOut_callback,
+		     (DWORD_PTR) this, CALLBACK_FUNCTION);
   if (rc == MMSYSERR_NOERROR)
     init (bSize);
 
@@ -416,7 +418,7 @@ fhandler_dev_dsp::Audio_out::stop (bool immediately)
   MMRESULT rc;
   WAVEHDR *pHdr;
 
-  debug_printf ("dev_=%08x", (int)dev_);
+  debug_printf ("dev_=%p", dev_);
   if (dev_)
     {
       if (!immediately)
@@ -617,8 +619,8 @@ fhandler_dev_dsp::Audio_out::sendcurrent ()
 //------------------------------------------------------------------------
 // Call back routine
 static void CALLBACK
-waveOut_callback (HWAVEOUT hWave, UINT msg, DWORD instance, DWORD param1,
-		  DWORD param2)
+waveOut_callback (HWAVEOUT hWave, UINT msg, DWORD_PTR instance,
+		  DWORD_PTR param1, DWORD_PTR param2)
 {
   if (msg == WOM_DONE)
     {
@@ -663,7 +665,7 @@ fhandler_dev_dsp::Audio_out::parsewav (const char * &pData, int &nBytes,
   setconvert (bits_ == 8 ? AFMT_U8 : AFMT_S16_LE);
 
   // Check alignment first: A lot of the code below depends on it
-  if (((int)pData & 0x3) != 0)
+  if (((uintptr_t)pData & 0x3) != 0)
     return false;
   if (!(pData[0] == 'R' && pData[1] == 'I'
 	&& pData[2] == 'F' && pData[3] == 'F'))
@@ -774,8 +776,8 @@ fhandler_dev_dsp::Audio_in::start (int rate, int bits, int channels)
     return false;
 
   fillFormat (&format, rate, bits, channels);
-  rc = waveInOpen (&dev_, WAVE_MAPPER, &format, (DWORD) waveIn_callback,
-		   (DWORD) this, CALLBACK_FUNCTION);
+  rc = waveInOpen (&dev_, WAVE_MAPPER, &format, (DWORD_PTR) waveIn_callback,
+		   (DWORD_PTR) this, CALLBACK_FUNCTION);
   debug_printf ("%d = waveInOpen(rate=%d bits=%d channels=%d)", rc, rate, bits, channels);
 
   if (rc == MMSYSERR_NOERROR)
@@ -792,7 +794,7 @@ fhandler_dev_dsp::Audio_in::stop ()
   MMRESULT rc;
   WAVEHDR *pHdr;
 
-  debug_printf ("dev_=%08x", (int)dev_);
+  debug_printf ("dev_=%p", dev_);
   if (dev_)
     {
       /* Note that waveInReset calls our callback for all incomplete buffers.
@@ -978,8 +980,8 @@ fhandler_dev_dsp::Audio_in::callback_blockfull (WAVEHDR *pHdr)
 }
 
 static void CALLBACK
-waveIn_callback (HWAVEIN hWave, UINT msg, DWORD instance, DWORD param1,
-		 DWORD param2)
+waveIn_callback (HWAVEIN hWave, UINT msg, DWORD_PTR instance, DWORD_PTR param1,
+		 DWORD_PTR param2)
 {
   if (msg == WIM_DATA)
     {
@@ -1160,8 +1162,7 @@ fhandler_dev_dsp::close_audio_out (bool immediately)
 int
 fhandler_dev_dsp::close ()
 {
-  debug_printf ("audio_in=%08x audio_out=%08x",
-		(int)audio_in_, (int)audio_out_);
+  debug_printf ("audio_in=%p audio_out=%p", audio_in_, audio_out_);
   close_audio_in ();
   close_audio_out (exit_state != ES_NOT_EXITING);
   return 0;
@@ -1170,8 +1171,7 @@ fhandler_dev_dsp::close ()
 int
 fhandler_dev_dsp::ioctl (unsigned int cmd, void *buf)
 {
-  debug_printf ("audio_in=%08x audio_out=%08x",
-		(int)audio_in_, (int)audio_out_);
+  debug_printf ("audio_in=%p audio_out=%p", audio_in_, audio_out_);
   int *intbuf = (int *) buf;
   switch (cmd)
     {
@@ -1374,8 +1374,8 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *buf)
 void
 fhandler_dev_dsp::fixup_after_fork (HANDLE parent)
 { // called from new child process
-  debug_printf ("audio_in=%08x audio_out=%08x",
-		(int)audio_in_, (int)audio_out_);
+  debug_printf ("audio_in=%p audio_out=%p",
+		audio_in_, audio_out_);
 
   if (audio_in_)
     audio_in_->fork_fixup (parent);
@@ -1386,8 +1386,8 @@ fhandler_dev_dsp::fixup_after_fork (HANDLE parent)
 void
 fhandler_dev_dsp::fixup_after_exec ()
 {
-  debug_printf ("audio_in=%08x audio_out=%08x, close_on_exec %d",
-		(int) audio_in_, (int) audio_out_, close_on_exec ());
+  debug_printf ("audio_in=%p audio_out=%p, close_on_exec %d",
+		audio_in_, audio_out_, close_on_exec ());
   if (!close_on_exec ())
     {
       audio_in_ = NULL;

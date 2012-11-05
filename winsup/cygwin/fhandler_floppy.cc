@@ -180,7 +180,7 @@ fhandler_dev_floppy::read_file (void *buf, DWORD to_read, DWORD *read, int *err)
   *err = 0;
   if (!(ret = ReadFile (get_handle (), buf, to_read, read, 0)))
     *err = GetLastError ();
-  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
+  syscall_printf ("%d (err %d) = ReadFile (%p, %p, to_read %u, read %u, 0)",
 		  ret, *err, get_handle (), buf, to_read, *read);
   return ret;
 }
@@ -234,7 +234,7 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
 				   FilePositionInformation);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryInformationFile(FilePositionInformation): %p",
+      debug_printf ("NtQueryInformationFile(FilePositionInformation): %y",
 		    status);
       return FALSE;
     }
@@ -268,7 +268,7 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
 	  if (part_no >= MAX_PARTITIONS)
 	    return FALSE;
 	  found = TRUE;
-	  debug_printf ("%d %D->%D : %D->%D", part_no,
+	  debug_printf ("%u %D->%D : %D->%D", part_no,
 			ppie->StartingOffset.QuadPart,
 			ppie->StartingOffset.QuadPart
 			+ ppie->PartitionLength.QuadPart,
@@ -305,7 +305,7 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
 			       &io, FILE_SHARE_READ | FILE_SHARE_WRITE, 0);
 	  if (!NT_SUCCESS (status))
 	    {
-	      debug_printf ("NtCreateFile(%W): %p", part, status);
+	      debug_printf ("NtCreateFile(%W): %y", part, status);
 	      return FALSE;
 	    }
 	  if (!DeviceIoControl (partitions->hdl[part_no - 1], FSCTL_LOCK_VOLUME,
@@ -349,7 +349,7 @@ fhandler_dev_floppy::write_file (const void *buf, DWORD to_write,
       if (!(ret = WriteFile (get_handle (), buf, to_write, written, 0)))
 	*err = GetLastError ();
     }
-  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
+  syscall_printf ("%d (err %d) = WriteFile (%p, %p, write %u, written %u, 0)",
 		  ret, *err, get_handle (), buf, to_write, *written);
   return ret;
 }
@@ -451,7 +451,7 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 	  if (devbufstart < devbufend)
 	    {
 	      bytes_to_read = MIN (len, devbufend - devbufstart);
-	      debug_printf ("read %d bytes from buffer (rest %d)",
+	      debug_printf ("read %u bytes from buffer (rest %u)",
 			    bytes_to_read,
 			    devbufend - devbufstart - bytes_to_read);
 	      memcpy (p, devbuf + devbufstart, bytes_to_read);
@@ -484,7 +484,7 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 	      if (!bytes_to_read)
 		break;
 
-	      debug_printf ("read %d bytes from pos %U %s", bytes_to_read,
+	      debug_printf ("read %u bytes from pos %U %s", bytes_to_read,
 			    current_position,
 			    len < devbufsiz ? "into buffer" : "directly");
 	      if (!read_file (tgt, bytes_to_read, &read2, &ret))
@@ -531,7 +531,7 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
       bytes_to_read = len;
       if (current_position + bytes_to_read >= drive_size)
 	bytes_to_read = drive_size - current_position;
-      debug_printf ("read %d bytes from pos %U directly", bytes_to_read,
+      debug_printf ("read %u bytes from pos %U directly", bytes_to_read,
 		    current_position);
       if (bytes_to_read && !read_file (p, bytes_to_read, &bytes_read, &ret))
 	{
@@ -764,19 +764,19 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
       break;
     case BLKSSZGET:
       debug_printf ("BLKSSZGET");
-      *(int *)buf = bytes_per_sector;
+      *(int *)buf = (int) bytes_per_sector;
       break;
     case BLKIOMIN:
       debug_printf ("BLKIOMIN");
-      *(int *)buf = bytes_per_sector;
+      *(int *)buf = (int) bytes_per_sector;
       break;
     case BLKIOOPT:
       debug_printf ("BLKIOOPT");
-      *(int *)buf = bytes_per_sector;
+      *(int *)buf = (int) bytes_per_sector;
       break;
     case BLKPBSZGET:
       debug_printf ("BLKPBSZGET");
-      *(int *)buf = bytes_per_sector;
+      *(int *)buf = (int) bytes_per_sector;
       break;
     case BLKALIGNOFF:
       debug_printf ("BLKALIGNOFF");
