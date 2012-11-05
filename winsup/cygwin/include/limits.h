@@ -1,7 +1,7 @@
 /* limits.h
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008 Red Hat, Inc.
+   2008, 2009, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,6 +12,7 @@ details. */
 #ifndef _LIMITS_H___
 
 #include <features.h>
+#include <bits/wordsize.h>
 
 #ifndef _MACH_MACHLIMITS_H_
 
@@ -24,15 +25,15 @@ details. */
 
 /* Number of bits in a `char'.  */
 #undef CHAR_BIT
-#define CHAR_BIT 8
+#define CHAR_BIT __CHAR_BIT__
 
 /* Number of bits in a `long'.  */
 #undef LONG_BIT
-#define LONG_BIT 32
+#define LONG_BIT (__SIZEOF_LONG__ * __CHAR_BIT__)
 
 /* Number of bits in a `int'.  */
 #undef WORD_BIT
-#define WORD_BIT 32
+#define WORD_BIT (__SIZEOF_INT__ * __CHAR_BIT__)
 
 /* Maximum length of a multibyte character.  */
 #ifndef MB_LEN_MAX
@@ -89,14 +90,14 @@ details. */
 /* Minimum and maximum values a `signed long int' can hold.
    (Same as `int').  */
 #ifndef __LONG_MAX__
-#ifndef __alpha__
-#define __LONG_MAX__ 2147483647L
-#else
+#if __WORDSIZE == 64
 #define __LONG_MAX__ 9223372036854775807L
+#else
+#define __LONG_MAX__ 2147483647L
 # endif /* __alpha__ */
 #endif
 #undef LONG_MIN
-#define LONG_MIN (-LONG_MAX-1)
+#define LONG_MIN (-LONG_MAX-1L)
 #undef LONG_MAX
 #define LONG_MAX __LONG_MAX__
 
@@ -245,7 +246,7 @@ details. */
 /* FIXME: We only support one realtime signal in 32 bit mode, but
 	 _POSIX_RTSIG_MAX is 8. */
 #undef RTSIG_MAX
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define RTSIG_MAX 33
 #else
 #define RTSIG_MAX 1

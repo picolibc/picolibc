@@ -14,13 +14,14 @@ details. */
 #include <stdint.h>
 #define __need_wchar_t
 #include <stddef.h>
+#include <bits/wordsize.h>
 
 /* C99 requires that in C++ the following macros should be defined only
    if requested. */
 #if !defined (__cplusplus) || defined (__STDC_FORMAT_MACROS) \
     || defined (__INSIDE_CYGWIN__)
 
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define __PRI64 "l"
 #define __PRIFAST "l"
 #define __PRIPTR "l"
@@ -144,7 +145,7 @@ details. */
 
 /* fscanf() macros for signed integers */
 
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define __SCN64 "l"
 #define __SCNFAST "l"
 #define __SCNPTR "l"

@@ -11,6 +11,8 @@
 #ifndef _CYGWIN_SIGNAL_H
 #define _CYGWIN_SIGNAL_H
 
+#include <bits/wordsize.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -273,7 +275,7 @@ enum
 					   perform notification */
 };
 
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef __uint64_t sigset_t;
 #else
 /* FIXME: We should probably raise the # of signals for 32 bit as well.
@@ -345,7 +347,7 @@ struct sigaction
 #define	SIGUSR1 30	/* user defined signal 1 */
 #define	SIGUSR2 31	/* user defined signal 2 */
 
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define NSIG	65      /* signal 0 implied */
 #else
 #define NSIG	33      /* signal 0 implied */

@@ -222,7 +222,7 @@ fhandler_process::readdir (DIR *dir, dirent *de)
   int res = ENMFILE;
   if (process_tab[fileid].fhandler == FH_PROCESSFD)
     {
-      if (dir->__d_position >= 2 + filesize / sizeof (int))
+      if ((size_t) dir->__d_position >= 2 + filesize / sizeof (int))
 	goto out;
     }
   else if (dir->__d_position >= PROCESS_LINK_COUNT)
@@ -314,7 +314,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_proc::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_proc::open(%y, %d)", res, flags, mode);
   return res;
 }
 
@@ -664,7 +664,7 @@ struct thread_info
       {
 	if (buf)
 	  free (buf);
-	debug_printf ("NtQuerySystemInformation, %p", status);
+	debug_printf ("NtQuerySystemInformation, %y", status);
 	return;
       }
     proc = (PSYSTEM_PROCESSES) buf;
@@ -687,7 +687,7 @@ struct thread_info
 	HANDLE thread_h;
 
 	if (!(thread_h = OpenThread (THREAD_QUERY_INFORMATION, FALSE,
-				     (ULONG) thread[i].ClientId.UniqueThread)))
+				     (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread)))
 	  continue;
 	status = NtQueryInformationThread (thread_h, ThreadBasicInformation,
 					   &tbi, sizeof tbi, NULL);
@@ -697,7 +697,7 @@ struct thread_info
 	region *r = (region *) malloc (sizeof (region));
 	if (r)
 	  {
-	    *r = (region) { regions, (ULONG) thread[i].ClientId.UniqueThread,
+	    *r = (region) { regions, (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread,
 			    (char *) tbi.TebBaseAddress,
 			    (char *) tbi.TebBaseAddress + wincap.page_size (),
 			    true };
@@ -709,7 +709,7 @@ struct thread_info
 	r = (region *) malloc (sizeof (region));
 	if (r)
 	  {
-	    *r = (region) { regions, (ULONG) thread[i].ClientId.UniqueThread,
+	    *r = (region) { regions, (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread,
 			    (char *) (teb.DeallocationStack
 				      ?: teb.Tib.StackLimit),
 			    (char *) teb.Tib.StackBase,
@@ -1010,7 +1010,7 @@ format_process_stat (void *data, char *&destbuf)
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      debug_printf ("NtQueryInformationProcess: status %p, %E", status);
+      debug_printf ("NtQueryInformationProcess: status %y, %E", status);
       return 0;
     }
   fault_count = vmc.PageFaultCount;
@@ -1203,7 +1203,7 @@ format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
 	 each cygdrive entry if it's a remote drive.  If so, ignore it. */
       if (iteration >= mtab->nmounts && u_hdl)
 	{
-	  WCHAR drive[3] = { mnt->mnt_fsname[0], L':', L'\0' };
+	  WCHAR drive[3] = { (WCHAR) mnt->mnt_fsname[0], L':', L'\0' };
 	  disk_type dt = get_disk_type (drive);
 
 	  if (dt == DT_SHARE_SMB || dt == DT_SHARE_NFS)
@@ -1285,7 +1285,7 @@ get_process_state (DWORD dwProcessId)
     }
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQuerySystemInformation: status %p, %lu",
+      debug_printf ("NtQuerySystemInformation: status %y, %lu",
 		    status, RtlNtStatusToDosError (status));
       goto out;
     }
@@ -1346,7 +1346,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     {
       status = NtQueryVirtualMemory (hProcess, 0, MemoryWorkingSetList,
 				     (PVOID) p, n,
-				     (length = ULONG_MAX, &length));
+				     (length = (ULONG) -1, &length));
       if (status != STATUS_INFO_LENGTH_MISMATCH)
 	break;
       n <<= 1;
@@ -1358,7 +1358,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     }
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryVirtualMemory: status %p", status);
+      debug_printf ("NtQueryVirtualMemory: status %y", status);
       if (status == STATUS_PROCESS_IS_TERMINATING)
 	{
 	  *vmsize = *vmrss = *vmtext = *vmdata = *vmlib = *vmshare = 0;
@@ -1386,7 +1386,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
 				      sizeof vmc, NULL);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryInformationProcess: status %p", status);
+      debug_printf ("NtQueryInformationProcess: status %y", status);
       __seterrno_from_nt_status (status);
       goto out;
     }

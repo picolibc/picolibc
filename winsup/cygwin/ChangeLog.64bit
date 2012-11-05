@@ -1,5 +1,36 @@
 2012-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_process.cc: Fix debug printf calls to be type safe.
+	Add casts to avoid compiler warnings.
+	(get_mem_values): Avoid using ULONG_MAX since it's NOT matching
+	ULONG on 64 bit.
+	* fhandler_procnet.cc (fhandler_procnet::open): Fix syscall_printf call
+	to be type safe.
+	(format_procnet_ifinet6): Add cast to avoid compiler warnings.
+	* ntdll.h (struct _DEBUG_HEAP_BLOCK): Change Address to ULONG_PTR.
+
+	* include/bits/wordsize.h: Fix __WORDSIZE definition for x86_64.
+	Add __WORDSIZE_COMPAT32 as on Linux.
+	* include/inttypes.h: Include bits/wordsize.h.  Use __WORDSIZE check
+	where appropriate.
+	* include/limits.h: Include bits/wordsize.h.
+	(CHAR_BIT): Change definition to rely on default
+	compiler definition.
+	(LONG_BIT): Ditto.
+	(WORD_BIT): Ditto.
+	(__LONG_MAX__): Use __WORDSIZE check.
+	(RTSIG_MAX): Ditto.
+	* include/stdint.h: Include bits/wordsize.h.  Use __WORDSIZE check
+	where appropriate.
+	* include/cygwin/signal.h: Ditto.
+	* include/cygwin/types.h: Ditto.
+
+	* include/asm/byteorder.h (__ntohl): Use bswap instruction, available
+	since i486.
+	(__ntohs): Fix constraint to work on 64 bit CPU as well.
+
+2012-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cpuid.h (can_set_flag): Implement for x86_64.
 	* fhandler.h (class fhandler_dev_raw): Define devbuf members taking
 	numerical values as DWORD, rather than size_t.

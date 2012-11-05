@@ -542,7 +542,7 @@ typedef struct _DEBUG_HEAP_BLOCK
   ULONG Size;
   ULONG Flags;
   ULONG Committed;
-  ULONG Address;
+  ULONG_PTR Address;
 } DEBUG_HEAP_BLOCK, *PDEBUG_HEAP_BLOCK;
 
 typedef struct _DEBUG_MODULE_INFORMATION

@@ -19,6 +19,7 @@ extern "C"
 
 #include <stdint.h>
 #include <endian.h>
+#include <bits/wordsize.h>
 
 #ifndef __timespec_t_defined
 #define __timespec_t_defined
@@ -33,7 +34,7 @@ typedef struct timespec timestruc_t;
 #ifndef __off_t_defined
 #define __off_t_defined
 /* Based on the newlib definitions. */
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef _off_t off_t;
 #else
 typedef _off64_t off_t;

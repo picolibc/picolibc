@@ -190,7 +190,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_proc::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_proc::open(%y, %d)", res, flags, mode);
   return res;
 }
 
@@ -263,7 +263,7 @@ format_procnet_ifinet6 (void *, char *&filebuf)
 	filebuf[filesize++] = ' ';
 	filesize += sprintf (filebuf + filesize,
 			     "%02lx %02x %02x %02x %s\n",
-			     pap->Ipv6IfIndex,
+			     (long) pap->Ipv6IfIndex,
 			     ip_addr_prefix (pua, pap->FirstPrefix),
 			     get_scope (&((struct sockaddr_in6 *)
 					pua->Address.lpSockaddr)->sin6_addr),
