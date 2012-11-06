@@ -1,3 +1,10 @@
+2012-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (PDI_WOW64_MODULES): Define.
+	(struct _DEBUG_BUFFER): Fix definition to work on 32 and 64 bit.
+	(struct _DEBUG_HEAP_INFORMATION): Ditto.
+	(struct _DEBUG_HEAP_BLOCK): Ditto.
+
 2012-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc: Fix debug printf calls to be type safe.

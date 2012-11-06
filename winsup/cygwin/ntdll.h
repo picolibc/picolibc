@@ -114,6 +114,7 @@
 #define PDI_MODULES 0x01
 #define PDI_HEAPS 0x04
 #define PDI_HEAP_BLOCKS 0x10
+#define PDI_WOW64_MODULES 0x40
 
 /* VM working set list protection values.  Returned by NtQueryVirtualMemory. */
 #define WSLE_PAGE_READONLY 0x001
@@ -501,19 +502,19 @@ typedef struct _DEBUG_BUFFER
   HANDLE SectionHandle;
   PVOID SectionBase;
   PVOID RemoteSectionBase;
-  ULONG SectionBaseDelta;
+  ULONG_PTR SectionBaseDelta;
   HANDLE EventPairHandle;
-  ULONG Unknown[2];
+  ULONG_PTR Unknown[2];
   HANDLE RemoteThreadHandle;
   ULONG InfoClassMask;
-  ULONG SizeOfInfo;
-  ULONG AllocatedSize;
-  ULONG SectionSize;
+  ULONG_PTR SizeOfInfo;
+  ULONG_PTR AllocatedSize;
+  ULONG_PTR SectionSize;
   PVOID ModuleInformation;
   PVOID BackTraceInformation;
   PVOID HeapInformation;
   PVOID LockInformation;
-  PVOID Reserved[9];
+  PVOID Reserved[8];
 } DEBUG_BUFFER, *PDEBUG_BUFFER;
 
 typedef struct _DEBUG_HEAP_INFORMATION
@@ -522,8 +523,8 @@ typedef struct _DEBUG_HEAP_INFORMATION
   ULONG Flags;
   USHORT Granularity;
   USHORT Unknown;
-  ULONG Allocated;
-  ULONG Committed;
+  ULONG_PTR Allocated;
+  ULONG_PTR Committed;
   ULONG TagCount;
   ULONG BlockCount;
   ULONG Reserved[7];
@@ -539,9 +540,9 @@ typedef struct _DEBUG_HEAP_ARRAY
 
 typedef struct _DEBUG_HEAP_BLOCK
 {
-  ULONG Size;
+  ULONG_PTR Size;
   ULONG Flags;
-  ULONG Committed;
+  ULONG_PTR Committed;
   ULONG_PTR Address;
 } DEBUG_HEAP_BLOCK, *PDEBUG_HEAP_BLOCK;
 
