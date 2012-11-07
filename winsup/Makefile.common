@@ -50,19 +50,10 @@ else
 endif
 endif
 
-zlib_source:=$(updir)/zlib
-zlib_build:=$(bupdir)/zlib
-bz2lib_source:=$(updir)/bz2lib
-bz2lib_build:=$(bupdir)/bz2lib
-w32api_source:=$(updir)/w32api
-w32api_build:=$(bupdir)/w32api
-w32api_lib:=$(w32api_build)/lib
 newlib_source:=$(updir1)/newlib
 newlib_build:=$(bupdir1)/newlib
 cygwin_build:=$(bupdir)/cygwin
 cygwin_source:=$(updir)/cygwin
-mingw_build:=$(bupdir)/mingw
-mingw_source:=$(updir)/mingw
 utils_build:=$(bupdir)/utils
 utils_source:=$(updir)/utils
 ifeq (,${findstring $(newlib_source)/libc/include,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
@@ -156,15 +147,6 @@ endif
 
 $(bupdir1)/libiberty/%.o: $(updir1)/libiberty/%.c
 	@$(MAKE) -C $(@D) $(@F)
-
-$(w32api_lib)/%.a: $(w32api_lib)/Makefile
-	@$(MAKE) --no-print-dir -C $(@D) $(@F)
-
-$(bz2lib)/%.a: $(bz2lib)/Makefile
-	@$(MAKE) --no-print-dir -C $(@D) $(@F)
-
-$(zlib)/%.a: $(zlib)/Makefile
-	@$(MAKE) --no-print-dir -C $(@D) $(@F)
 
 all:
 
