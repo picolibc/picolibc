@@ -1,3 +1,8 @@
+2012-11-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* mingw: Delete obsolete directory.
+	* w32api: Ditto.
+
 2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.common (zlib_source): Remove.
