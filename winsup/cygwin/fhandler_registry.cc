@@ -623,7 +623,7 @@ fhandler_registry::readdir (DIR *dir, dirent *de)
       dir->__handle = open_key (path + 1, KEY_READ, wow64, false);
       if (dir->__handle == INVALID_HANDLE_VALUE)
 	goto out;
-      dir->__d_internal = (unsigned) new __DIR_hash ();
+      dir->__d_internal = (uintptr_t) new __DIR_hash ();
     }
   if (dir->__d_position < SPECIAL_DOT_FILE_COUNT)
     {

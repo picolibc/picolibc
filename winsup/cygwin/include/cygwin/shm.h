@@ -1,6 +1,6 @@
 /* sys/shm.h
 
-   Copyright 2001, 2002 Red Hat Inc.
+   Copyright 2001, 2002, 2012 Red Hat Inc.
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.
@@ -40,12 +40,12 @@ extern "C"
 
 /* Unsigned integer used for the number of current attaches.
  */
-typedef unsigned int shmatt_t;
+typedef uint32_t shmatt_t;
 
 struct shmid_ds
 {
   struct ipc_perm    shm_perm;	/* Operation permission structure. */
-  size_t             shm_segsz;	/* Size of segment in bytes. */
+  uint32_t           shm_segsz;	/* Size of segment in bytes. */
   pid_t              shm_lpid;	/* Process ID of last operation. */
   pid_t              shm_cpid;	/* Process ID of creator. */
   shmatt_t           shm_nattch;/* Number of current attaches. */
@@ -69,17 +69,17 @@ struct shmid_ds
  */
 struct shminfo
 {
-  long shmmax;		/* Maximum size in bytes of a shared
+  int32_t shmmax;	/* Maximum size in bytes of a shared
 			   memory segment. */
-  long shmmin;		/* Minimum size in bytes of a shared
+  int32_t shmmin;	/* Minimum size in bytes of a shared
 			   memory segment. */
-  long shmmni;		/* Maximum number of shared memory
+  int32_t shmmni;	/* Maximum number of shared memory
 			   segments, system wide. */
-  long shmseg;		/* Maximum number of shared memory
+  int32_t shmseg;	/* Maximum number of shared memory
 			   segments attached per process. */
-  long shmall;		/* Maximum number of bytes of shared
+  int32_t shmall;	/* Maximum number of bytes of shared
 			   memory, system wide. */
-  long shm_spare[4];
+  int32_t shm_spare[4];
 };
 
 /* Buffer type for shmctl (SHM_INFO, ...) as used by ipcs(8).

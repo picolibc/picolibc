@@ -1,5 +1,21 @@
 2012-11-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_procsysvipc.cc (format_procsysvipc_msg): Fix printf format
+	string for 64 bit.
+	* fhandler_registry.cc (fhandler_registry::readdir): Fix cast.
+	* fhandler_serial.cc (ibuf): Avoid compiler warning.
+	* include/cygwin/ipc.h: Include stdint.h.
+	* include/cygwin/msg.h (msgqnum_t): Define as uint32_t.
+	(msglen_t): Ditto.
+	(struct msginfo): Convert all long members to int32_t.
+	(struct msg_info): Ditto.
+	* include/cygwin/sem.h (struct seminfo): Ditto.
+	* include/cygwin/shm.h (shmatt_t): Define as uint32_t.
+	(struct shmid_ds): Define shm_segsz as uint32_t.
+	(struct shminfo): Convert all long members to int32_t.
+
+2012-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h (PDI_WOW64_MODULES): Define.
 	(struct _DEBUG_BUFFER): Fix definition to work on 32 and 64 bit.
 	(struct _DEBUG_HEAP_INFORMATION): Ditto.

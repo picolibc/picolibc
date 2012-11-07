@@ -450,7 +450,7 @@ fhandler_serial::ioctl (unsigned int cmd, void *buf)
 {
   int res = 0;
 
-# define ibuf ((int) buf)
+# define ibuf ((int) (intptr_t) buf)
 # define ipbuf (*(int *) buf)
 
   DWORD ev;
