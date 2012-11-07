@@ -1,5 +1,10 @@
 2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_process.cc (heap_info::heap_info): Add comment to explain a
+	TODO item.
+
+2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_procsysvipc.cc (format_procsysvipc_msg): Fix printf format
 	string for 32 bit as well.
 

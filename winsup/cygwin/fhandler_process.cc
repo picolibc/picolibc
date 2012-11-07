@@ -564,6 +564,22 @@ struct heap_info
     NTSTATUS status;
     PDEBUG_HEAP_ARRAY harray;
 
+    /* FIXME:
+
+       This functionality has two problems on 64 bit machines:
+
+       - 32 bit processes can't call this function for 64 bit processes at all,
+         same as the Win32 toolhelp functions.
+
+       - The heap information fetched from 32 bit processes is broken, if
+	 the caller is a 64 bit process.  Again, the toolhelp functions suffer
+	 the same fate.
+
+       TODO:
+
+       Therefore the only way around this is to call the below Rtl functions
+       within the context of the process for which the information is to be
+       collected. */
     buf = RtlCreateQueryDebugBuffer (0, FALSE);
     if (!buf)
       return;
