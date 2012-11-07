@@ -690,6 +690,8 @@ cygwin_sendto (int fd, const void *buf, size_t len, int flags,
 {
   int res;
 
+  pthread_testcancel ();
+
   fhandler_socket *fh = get (fd);
 
   myfault efault;
@@ -709,6 +711,8 @@ cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
 		 struct sockaddr *from, socklen_t *fromlen)
 {
   int res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -916,6 +920,8 @@ extern "C" int
 cygwin_connect (int fd, const struct sockaddr *name, socklen_t namelen)
 {
   int res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -1293,6 +1299,8 @@ cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
 {
   int res;
 
+  pthread_testcancel ();
+
   fhandler_socket *fh = get (fd);
 
   myfault efault;
@@ -1309,6 +1317,8 @@ extern "C" int
 accept4 (int fd, struct sockaddr *peer, socklen_t *len, int flags)
 {
   int res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -1467,6 +1477,8 @@ cygwin_recv (int fd, void *buf, size_t len, int flags)
 {
   int res;
 
+  pthread_testcancel ();
+
   fhandler_socket *fh = get (fd);
 
   myfault efault;
@@ -1488,6 +1500,8 @@ extern "C" int
 cygwin_send (int fd, const void *buf, size_t len, int flags)
 {
   int res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -2848,6 +2862,8 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 {
   int res;
 
+  pthread_testcancel ();
+
   fhandler_socket *fh = get (fd);
 
   myfault efault;
@@ -2873,6 +2889,8 @@ extern "C" int
 cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 {
   int res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 

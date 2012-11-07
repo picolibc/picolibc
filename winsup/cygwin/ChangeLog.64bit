@@ -1,5 +1,26 @@
 2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc: Throughout, fix casts to work on 64 bit.  Move
+	calls to pthread_testcancel to upper syscall level for consistency.
+	Move read, readv, write, and writev methods to keep together with
+	equivalent recv and send methods.
+	(fhandler_socket::read): Compute WSAMSG buffer on 64 bit to overcome
+	type restriction of WSABUF len member.
+	(fhandler_socket::recvfrom): Ditto.
+	(fhandler_socket::write): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Restructure for readability.
+	* net.cc (cygwin_sendto): Call pthread_testcancel here.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_connect): Ditto.
+	(cygwin_accept): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	(cygwin_recvmsg): Ditto.
+	(cygwin_sendmsg): Ditto.
+
+2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_process.cc (heap_info::heap_info): Add comment to explain a
 	TODO item.
 

@@ -821,7 +821,7 @@ fhandler_socket::fstat (struct stat *buf)
       if (!res)
 	{
 	  buf->st_dev = 0;
-	  buf->st_ino = (ino_t) ((DWORD) get_handle ());
+	  buf->st_ino = (ino_t) ((uintptr_t) get_handle ());
 	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
 	  buf->st_size = 0;
 	}
@@ -1039,8 +1039,6 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   DWORD err;
   int type;
 
-  pthread_testcancel ();
-
   if (get_inet_addr (name, namelen, &sst, &namelen, &type, connect_secret)
       == SOCKET_ERROR)
     return SOCKET_ERROR;
@@ -1150,8 +1148,6 @@ fhandler_socket::accept4 (struct sockaddr *peer, int *len, int flags)
   /* Allows NULL peer and len parameters. */
   struct sockaddr_storage lpeer;
   int llen = sizeof (struct sockaddr_storage);
-
-  pthread_testcancel ();
 
   int res = 0;
   while (!(res = wait_for_events (FD_ACCEPT | FD_CLOSE, 0))
@@ -1325,30 +1321,6 @@ fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
   return res;
 }
 
-void __stdcall
-fhandler_socket::read (void *in_ptr, size_t& len)
-{
-  WSABUF wsabuf = { len, (char *) in_ptr };
-  WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0,  NULL }, 0 };
-  len = recv_internal (&wsamsg, false);
-}
-
-int
-fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
-			ssize_t tot)
-{
-  WSABUF wsabuf[iovcnt];
-  WSABUF *wsaptr = wsabuf + iovcnt;
-  const struct iovec *iovptr = iov + iovcnt;
-  while (--wsaptr >= wsabuf)
-    {
-      wsaptr->len = (--iovptr)->iov_len;
-      wsaptr->buf = (char *) iovptr->iov_base;
-    }
-  WSAMSG wsamsg = { NULL, 0, wsabuf, iovcnt, { 0,  NULL}, 0 };
-  return recv_internal (&wsamsg, false);
-}
-
 extern "C" {
 #ifndef __MINGW64_VERSION_MAJOR
 #define WSAID_WSARECVMSG \
@@ -1496,17 +1468,79 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
   return ret;
 }
 
+void __stdcall
+fhandler_socket::read (void *in_ptr, size_t& len)
+{
+  char *ptr = (char *) in_ptr;
+
+#ifdef __x86_64__
+  /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
+     Split buffer if necessary. */
+  DWORD bufcnt = len / UINT_MAX + ((!len || (len % UINT_MAX)) ? 1 : 0);
+  WSABUF wsabuf[bufcnt];
+  WSAMSG wsamsg = { NULL, 0, wsabuf, bufcnt, { 0,  NULL }, 0 };
+  /* Don't use len as loop condition, it could be 0. */
+  for (WSABUF *wsaptr = wsabuf; bufcnt--; ++wsaptr)
+    {
+      wsaptr->len = MIN (len, UINT_MAX);
+      wsaptr->buf = ptr;
+      len -= wsaptr->len;
+      ptr += wsaptr->len;
+    }
+#else
+  WSABUF wsabuf = { len, ptr };
+  WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0,  NULL }, 0 };
+#endif
+  
+  len = recv_internal (&wsamsg, false);
+}
+
+int
+fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
+			ssize_t tot)
+{
+  WSABUF wsabuf[iovcnt];
+  WSABUF *wsaptr = wsabuf + iovcnt;
+  const struct iovec *iovptr = iov + iovcnt;
+  while (--wsaptr >= wsabuf)
+    {
+      wsaptr->len = (--iovptr)->iov_len;
+      wsaptr->buf = (char *) iovptr->iov_base;
+    }
+  WSAMSG wsamsg = { NULL, 0, wsabuf, (DWORD) iovcnt, { 0,  NULL}, 0 };
+  return recv_internal (&wsamsg, false);
+}
+
 ssize_t
-fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
+fhandler_socket::recvfrom (void *in_ptr, size_t len, int flags,
 			   struct sockaddr *from, int *fromlen)
 {
-  pthread_testcancel ();
+  char *ptr = (char *) in_ptr;
 
-  WSABUF wsabuf = { len, (char *) ptr };
+#ifdef __x86_64__
+  /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
+     Split buffer if necessary. */
+  DWORD bufcnt = len / UINT_MAX + ((!len || (len % UINT_MAX)) ? 1 : 0);
+  WSABUF wsabuf[bufcnt];
+  WSAMSG wsamsg = { from, from && fromlen ? *fromlen : 0,
+		    wsabuf, bufcnt,
+		    { 0,  NULL },
+		    (DWORD) flags };
+  /* Don't use len as loop condition, it could be 0. */
+  for (WSABUF *wsaptr = wsabuf; bufcnt--; ++wsaptr)
+    {
+      wsaptr->len = MIN (len, UINT_MAX);
+      wsaptr->buf = ptr;
+      len -= wsaptr->len;
+      ptr += wsaptr->len;
+    }
+#else
+  WSABUF wsabuf = { len, ptr };
   WSAMSG wsamsg = { from, from && fromlen ? *fromlen : 0,
 		    &wsabuf, 1,
 		    { 0, NULL},
-		    flags };
+		    (DWORD) flags };
+#endif
   ssize_t ret = recv_internal (&wsamsg, false);
   if (fromlen)
     *fromlen = wsamsg.namelen;
@@ -1516,8 +1550,6 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 ssize_t
 fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 {
-  pthread_testcancel ();
-
   /* TODO: Descriptor passing on AF_LOCAL sockets. */
 
   /* Disappointing but true:  Even if WSARecvMsg is supported, it's only
@@ -1539,9 +1571,9 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
       wsaptr->buf = (char *) iovptr->iov_base;
     }
   WSAMSG wsamsg = { (struct sockaddr *) msg->msg_name, msg->msg_namelen,
-		    wsabuf, msg->msg_iovlen,
-		    { msg->msg_controllen, (char *) msg->msg_control },
-		    flags };
+		    wsabuf, (DWORD) msg->msg_iovlen,
+		    { (DWORD) msg->msg_controllen, (char *) msg->msg_control },
+		    (DWORD) flags };
   ssize_t ret = recv_internal (&wsamsg, use_recvmsg);
   if (ret >= 0)
     {
@@ -1551,30 +1583,6 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 	msg->msg_flags = wsamsg.dwFlags;
     }
   return ret;
-}
-
-int
-fhandler_socket::write (const void *ptr, size_t len)
-{
-  WSABUF wsabuf = { len, (char *) ptr };
-  WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0, NULL }, 0 };
-  return send_internal (&wsamsg, 0);
-}
-
-int
-fhandler_socket::writev (const struct iovec *const iov, const int iovcnt,
-			 ssize_t tot)
-{
-  WSABUF wsabuf[iovcnt];
-  WSABUF *wsaptr = wsabuf;
-  const struct iovec *iovptr = iov;
-  for (int i = 0; i < iovcnt; ++i)
-    {
-      wsaptr->len = iovptr->iov_len;
-      (wsaptr++)->buf = (char *) (iovptr++)->iov_base;
-    }
-  WSAMSG wsamsg = { NULL, 0, wsabuf, iovcnt, { 0, NULL}, 0 };
-  return send_internal (&wsamsg, 0);
 }
 
 inline ssize_t
@@ -1660,22 +1668,82 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
   return res;
 }
 
+int
+fhandler_socket::write (const void *in_ptr, size_t len)
+{
+  char *ptr = (char *) in_ptr;
+
+#ifdef __x86_64__
+  /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
+     Split buffer if necessary. */
+  DWORD bufcnt = len / UINT_MAX + ((!len || (len % UINT_MAX)) ? 1 : 0);
+  WSABUF wsabuf[bufcnt];
+  WSAMSG wsamsg = { NULL, 0, wsabuf, bufcnt, { 0,  NULL }, 0 };
+  /* Don't use len as loop condition, it could be 0. */
+  for (WSABUF *wsaptr = wsabuf; bufcnt--; ++wsaptr)
+    {
+      wsaptr->len = MIN (len, UINT_MAX);
+      wsaptr->buf = ptr;
+      len -= wsaptr->len;
+      ptr += wsaptr->len;
+    }
+#else
+  WSABUF wsabuf = { len, ptr };
+  WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0, NULL }, 0 };
+#endif
+  return send_internal (&wsamsg, 0);
+}
+
+int
+fhandler_socket::writev (const struct iovec *const iov, const int iovcnt,
+			 ssize_t tot)
+{
+  WSABUF wsabuf[iovcnt];
+  WSABUF *wsaptr = wsabuf;
+  const struct iovec *iovptr = iov;
+  for (int i = 0; i < iovcnt; ++i)
+    {
+      wsaptr->len = iovptr->iov_len;
+      (wsaptr++)->buf = (char *) (iovptr++)->iov_base;
+    }
+  WSAMSG wsamsg = { NULL, 0, wsabuf, (DWORD) iovcnt, { 0, NULL}, 0 };
+  return send_internal (&wsamsg, 0);
+}
+
 ssize_t
-fhandler_socket::sendto (const void *ptr, size_t len, int flags,
+fhandler_socket::sendto (const void *in_ptr, size_t len, int flags,
 			 const struct sockaddr *to, int tolen)
 {
+  char *ptr = (char *) in_ptr;
   struct sockaddr_storage sst;
-
-  pthread_testcancel ();
 
   if (to && get_inet_addr (to, tolen, &sst, &tolen) == SOCKET_ERROR)
     return SOCKET_ERROR;
 
-  WSABUF wsabuf = { len, (char *) ptr };
+#ifdef __x86_64__
+  /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
+     Split buffer if necessary. */
+  DWORD bufcnt = len / UINT_MAX + ((!len || (len % UINT_MAX)) ? 1 : 0);
+  WSABUF wsabuf[bufcnt];
+  WSAMSG wsamsg = { to ? (struct sockaddr *) &sst : NULL, tolen,
+		    wsabuf, bufcnt,
+		    { 0,  NULL },
+		    0 };
+  /* Don't use len as loop condition, it could be 0. */
+  for (WSABUF *wsaptr = wsabuf; bufcnt--; ++wsaptr)
+    {
+      wsaptr->len = MIN (len, UINT_MAX);
+      wsaptr->buf = ptr;
+      len -= wsaptr->len;
+      ptr += wsaptr->len;
+    }
+#else
+  WSABUF wsabuf = { len, ptr };
   WSAMSG wsamsg = { to ? (struct sockaddr *) &sst : NULL, tolen,
 		    &wsabuf, 1,
 		    { 0, NULL},
 		    0 };
+#endif
   return send_internal (&wsamsg, flags);
 }
 
@@ -1686,8 +1754,6 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
 
   struct sockaddr_storage sst;
   int len = 0;
-
-  pthread_testcancel ();
 
   if (msg->msg_name
       && get_inet_addr ((struct sockaddr *) msg->msg_name, msg->msg_namelen,
@@ -1702,15 +1768,15 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
       wsaptr->len = iovptr->iov_len;
       (wsaptr++)->buf = (char *) (iovptr++)->iov_base;
     }
+  /* Disappointing but true:  Even if WSASendMsg is supported, it's only
+     supported for datagram and raw sockets. */
+  DWORD controllen = (DWORD) (!wincap.has_sendmsg ()
+			      || get_socket_type () == SOCK_STREAM
+			      || get_addr_family () == AF_LOCAL
+			      ? 0 : msg->msg_controllen);
   WSAMSG wsamsg = { msg->msg_name ? (struct sockaddr *) &sst : NULL, len,
-		    wsabuf, msg->msg_iovlen,
-		    /* Disappointing but true:  Even if WSASendMsg is
-		       supported, it's only supported for datagram and
-		       raw sockets. */
-		    { !wincap.has_sendmsg ()
-		      || get_socket_type () == SOCK_STREAM
-		      || get_addr_family () == AF_LOCAL
-		      ? 0 : msg->msg_controllen, (char *) msg->msg_control },
+		    wsabuf, (DWORD) msg->msg_iovlen,
+		    { controllen, (char *) msg->msg_control },
 		    0 };
   return send_internal (&wsamsg, flags);
 }
@@ -1980,7 +2046,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	WSAEventSelect (get_socket (), wsock_evt, EVENT_MASK);
       break;
     case FIONREAD:
-      res = ioctlsocket (get_socket (), FIONREAD, (unsigned long *) p);
+      res = ioctlsocket (get_socket (), FIONREAD, (__ms_u_long *) p);
       if (res == SOCKET_ERROR)
 	set_winsock_errno ();
       break;
@@ -1995,7 +2061,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  res = 0;
 	}
       else
-	res = ioctlsocket (get_socket (), cmd, (unsigned long *) p);
+	res = ioctlsocket (get_socket (), cmd, (__ms_u_long *) p);
       break;
     }
   syscall_printf ("%d = ioctl_socket(%x, %x)", res, cmd, p);
