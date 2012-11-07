@@ -138,10 +138,10 @@ endif
 # how to link a MinGW binary
 $(MINGW_BINS): %.exe: %.o
 ifdef VERBOSE
-	$(MINGW_CXX) $(MINGW_CXXFLAGS) -o $@ ${filter %.o,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+	$(MINGW_CXX) $(MINGW_CXXFLAGS) -o $@ ${filter %.o,$^} $(MINGW_LDFLAGS)
 else
 	@echo $(MINGW_CXX) -o $@ ${filter %.o,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)};\
-	$(MINGW_CXX) $(MINGW_CXXFLAGS) -o $@ ${filter %.o,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+	$(MINGW_CXX) $(MINGW_CXXFLAGS) -o $@ ${filter %.o,$^} $(MINGW_LDFLAGS)
 endif
 
 # how to link a Cygwin binary

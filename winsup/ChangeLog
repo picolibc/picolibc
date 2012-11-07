@@ -1,3 +1,22 @@
+2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.common (zlib_source): Remove.
+	(zlib_build): Remove.
+	(bz2lib_source): Remove.
+	(bz2lib_build): Remove.
+	(w32api_source): Remove.
+	(w32api_build): Remove.
+	(w32api_lib): Remove.
+	(mingw_build): Remove.
+	(mingw_source): Remove.
+	($(w32api_lib)/%.a): Remove rule.
+	* Makefile.in (ZLIB): Remove.
+	($(SUBDIRS)): Drop mingw check.
+	(mingw): Remove rule.
+	(install_mingw): Ditto.
+	* configure.in: Remove support for mingw as build target.
+	* configure: Regenerate.
+
 2012-10-24  Kai Tietz  <ktietz70@googlemail.com>
 	    Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 	    Corinna Vinschen  <corinna@vinschen.de>

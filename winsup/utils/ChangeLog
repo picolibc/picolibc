@@ -1,3 +1,8 @@
+2012-11-07  Corinna Vinschen <corinna@vinschen.de>
+
+	* Makefile.in ($(MINGW_BINS)): Drop -B$(mingw_build)/ from build
+	expression.
+
 2012-11-05  Corinna Vinschen <corinna@vinschen.de>
 
 	* Makefile.in (MINGW_CXX): Attach $(CFLAGS) to allow providing

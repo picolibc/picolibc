@@ -35,15 +35,6 @@ case "$target" in
     AC_CONFIG_SUBDIRS(cygwin cygserver lsaauth utils doc)
     INSTALL_LICENSE="install-license"
     ;;
-  *mingw*)
-    if ! test -d $srcdir/mingw; then
-      AC_MSG_ERROR("No mingw dir.  Can't build Mingw.  Exiting...")
-    fi
-    AC_CONFIG_SUBDIRS(mingw)
-    if test -d $srcdir/w32api; then
-      AC_CONFIG_SUBDIRS(w32api)
-    fi
-    ;;
 esac
 
 AC_SUBST(INSTALL_LICENSE)
