@@ -238,11 +238,7 @@ format_procsysvipc_msg (void *, char *&destbuf)
   for (int i = 0; i < msginfo.msgmni; i++) {
     if (xmsqids[i].msg_qbytes != 0) {
        bufptr += sprintf (bufptr,
-#ifdef __x86_64__
 		 "%10llu %10u %5o %11u %10u %5d %5d %5u %5u %5u %5u %10ld %10ld %10ld\n",
-#else
-		 "%10llu %10u %5o %11lu %10lu %5d %5d %5u %5u %5u %5u %10ld %10ld %10ld\n",
-#endif
 		 xmsqids[i].msg_perm.key,
 		 IXSEQ_TO_IPCID(i, xmsqids[i].msg_perm),
 		 xmsqids[i].msg_perm.mode,
