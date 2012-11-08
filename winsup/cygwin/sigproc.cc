@@ -181,7 +181,6 @@ proc_subproc (DWORD what, DWORD val)
 {
   int rc = 1;
   int potential_match;
-  _pinfo *child;
   int clearing;
   waitq *w;
 

@@ -1,3 +1,7 @@
+2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sigproc.cc (proc_subproc): Delete unused variable child.
+
 2012-11-08  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fhandler_termios.cc (fhandler_termios::line_edit): Don't do special
