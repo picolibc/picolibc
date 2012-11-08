@@ -914,7 +914,7 @@ class fhandler_dev_floppy: public fhandler_dev_raw
 class fhandler_dev_tape: public fhandler_dev_raw
 {
   HANDLE mt_mtx;
-  HANDLE mt_evt;
+  OVERLAPPED ov;
 
   bool is_rewind_device () { return get_minor () < 128; }
   unsigned int driveno () { return (unsigned int) get_minor () & 0x7f; }

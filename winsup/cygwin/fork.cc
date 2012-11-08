@@ -598,14 +598,18 @@ fork ()
 
     ischild = !!setjmp (grouped.ch.jmp);
 
-    volatile char * volatile esp;
-    __asm__ volatile ("movl %%esp,%0": "=r" (esp));
+    volatile char * volatile stackp;
+#ifdef __x86_64__
+    __asm__ volatile ("movq %%rsp,%0": "=r" (stackp));
+#else
+    __asm__ volatile ("movl %%esp,%0": "=r" (stackp));
+#endif
 
     if (!ischild)
-      res = grouped.parent (esp);
+      res = grouped.parent (stackp);
     else
       {
-	res = grouped.child (esp);
+	res = grouped.child (stackp);
 	in_forkee = false;
 	ischild = true;	/* might have been reset by fork mem copy */
       }
@@ -664,12 +668,12 @@ child_copy (HANDLE hp, bool write, ...)
     {
       char *low = va_arg (args, char *);
       char *high = va_arg (args, char *);
-      DWORD todo = high - low;
+      SIZE_T todo = high - low;
       char *here;
 
       for (here = low; here < high; here += todo)
 	{
-	  DWORD done = 0;
+	  SIZE_T done = 0;
 	  if (here + todo > high)
 	    todo = high - here;
 	  int res;

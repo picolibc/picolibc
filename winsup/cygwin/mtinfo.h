@@ -1,6 +1,6 @@
 /* mtinfo.h: Defininitions for the Cygwin tape driver class.
 
-   Copyright 2004, 2005, 2006, 2008 Red Hat, Inc.
+   Copyright 2004, 2005, 2006, 2008, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -46,26 +46,30 @@ enum lock_state
 class mtinfo_part
 {
 public:
-  long block;		/* logical block no */
-  long file;		/* current file no */
-  long fblock;		/* relative block no */
+  int32_t block;		/* logical block no */
+  int32_t file;		/* current file no */
+  int32_t fblock;		/* relative block no */
   bool smark;		/* At setmark? */
   eom_val emark;	/* "end-of"-mark */
 
-  void initialize (long nblock = -1);
+  void initialize (int32_t nblock = -1);
 };
 
 class mtinfo_drive
 {
   int drive;
   int lasterr;
-  long partition;
-  long block;
+  int32_t partition;
+  int32_t block;
   dirty_state dirty;
   lock_state lock;
   TAPE_GET_DRIVE_PARAMETERS _dp;
   TAPE_GET_MEDIA_PARAMETERS _mp;
-  OVERLAPPED ov;
+  /* sizeof(OVERLAPPED) == 20 on 32 bit, 32 on 64 bit.  A drive is always
+     opened exclusively by a single process, though, so instead of the
+     OVERLAPPED structure, we just keep track of the pointer to the
+     OVERLAPPED structure in the application's fhandler. */
+  LPOVERLAPPED ov;
   struct status_flags
   {
     unsigned buffer_writes : 1;
@@ -90,17 +94,17 @@ class mtinfo_drive
 	      ? ((_dp.FeaturesHigh & parm) != 0)
 	      : ((_dp.FeaturesLow & parm) != 0));
     }
-  int get_pos (HANDLE mt, long *ppartition = NULL, long *pblock = NULL);
-  int _set_pos (HANDLE mt, int mode, long count, int partition, BOOL dont_wait);
-  int create_partitions (HANDLE mt, long count);
-  int set_partition (HANDLE mt, long count);
+  int get_pos (HANDLE mt, int32_t *ppartition = NULL, int32_t *pblock = NULL);
+  int _set_pos (HANDLE mt, int mode, int32_t count, int partition, BOOL dont_wait);
+  int create_partitions (HANDLE mt, int32_t count);
+  int set_partition (HANDLE mt, int32_t count);
   int write_marks (HANDLE mt, int marktype, DWORD count);
   int erase (HANDLE mt, int mode);
   int prepare (HANDLE mt, int action, bool is_auto = false);
-  int set_compression (HANDLE mt, long count);
-  int set_blocksize (HANDLE mt, long count);
+  int set_compression (HANDLE mt, int32_t count);
+  int set_blocksize (HANDLE mt, DWORD count);
   int get_status (HANDLE mt, struct mtget *get);
-  int set_options (HANDLE mt, long options);
+  int set_options (HANDLE mt, int32_t options);
   int async_wait (HANDLE mt, DWORD *bytes_written);
 
 public:
@@ -109,10 +113,10 @@ public:
   int get_mp (HANDLE mt);
   int open (HANDLE mt);
   int close (HANDLE mt, bool rewind);
-  int read (HANDLE mt, HANDLE mt_evt, void *ptr, size_t &ulen);
-  int write (HANDLE mt, HANDLE mt_evt, const void *ptr, size_t &len);
+  int read (HANDLE mt, LPOVERLAPPED pov, void *ptr, size_t &ulen);
+  int write (HANDLE mt, LPOVERLAPPED pov, const void *ptr, size_t &len);
   int ioctl (HANDLE mt, unsigned int cmd, void *buf);
-  int set_pos (HANDLE mt, int mode, long count, bool sfm_func);
+  int set_pos (HANDLE mt, int mode, int32_t count, bool sfm_func);
 
   IMPLEMENT_STATUS_FLAG (bool, buffer_writes)
   IMPLEMENT_STATUS_FLAG (bool, async_writes)

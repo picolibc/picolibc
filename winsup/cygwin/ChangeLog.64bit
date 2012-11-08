@@ -1,5 +1,43 @@
 2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.h (struct user_heap_info): Change type of chunk to SIZE_T.
+	Remove unused slop member.
+	* fork.cc (fork): Rename esp to stackp.  Add 64 bit asm expression to
+	fetch stack pointer.
+	(child_copy): Use platform independent types.
+	* heap.cc (eval_start_address): Add comment. Disable 3GB code on 64 bit.
+	(eval_initial_heap_size): Use platform independent types.  Fix debug
+	printf format strings.
+	(sbrk): Add comment.  Change argument type according to newlib
+	definition.  Use platform independent types.  Drop unneeded else and
+	move comment to the right spot.
+	* hookapi.cc (PEHeaderFromHModule): Return PVOID.  Add comment to
+	explain why.  Add bool parameter to return if target executable is
+	64 bit or not.
+	(rvadelta_get): New inline function to fetch section address platform
+	independent.
+	(rvadelta32, rvadelta64): Platform dependent wrappers.
+	(rvadelta): Change to macro calling the platform dependent rvadelta
+	wrappers.
+	(putmem): Define platform dependent THUNK_FUNC_TYPE and use throughout.
+	(RedirectIAT): Add comment.
+	(get_export): Add comment.
+	(find_first_notloaded_dll): Allow to fetch information in a platform
+	and target independent way.
+	(hook_or_detect_cygwin): Ditto.  Recognize the cyg64win1.dll file name
+	as well.
+	* kernel32.cc (CreateFileMappingW): Cast to avoid compiler warning.
+
+	* fhandler.h (class fhandler_dev_tape): Replace mt_evt with an
+	OVERLAPPED structure ov.
+	* mtinfo.h (class mtinfo_part): Define members as int32_t rather than
+	long.  Change member function declarations accordingly.
+	(class mtinfo_drive): Ditto.  Store OVERLAPPED pointer rather than
+	holding the full structure.  Add comment to explain why.
+	* fhandler_tape.cc: Accommodate above changes throughout.
+
+2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::ioctl): Don't use __ms_u_long
 	directly.  Rather only use it on 64 bit.  Add comment to explain the
 	problem.

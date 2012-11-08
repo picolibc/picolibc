@@ -310,7 +310,7 @@ CreateFileMappingW (HANDLE hFile, LPSECURITY_ATTRIBUTES lpAttributes,
   ULONG attribs = flProtect & (SEC_COMMIT | SEC_IMAGE | SEC_NOCACHE
 			       | SEC_RESERVE);
   LARGE_INTEGER size = {{ LowPart  : dwMaximumSizeLow,
-			  HighPart : dwMaximumSizeHigh }};
+			  HighPart : (LONG) dwMaximumSizeHigh }};
   PLARGE_INTEGER psize = size.QuadPart ? &size : NULL;
 
   if (prot & (PAGE_READWRITE | PAGE_WRITECOPY

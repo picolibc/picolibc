@@ -350,8 +350,7 @@ struct user_heap_info
   void *ptr;
   void *top;
   void *max;
-  unsigned chunk;
-  unsigned slop;
+  SIZE_T chunk;
 };
 
 struct hook_chain

@@ -29,13 +29,14 @@ struct function_hook
   void *origfn;		// Stored by HookAPICalls, the address of the original function.
 };
 
-/* Given an HMODULE, returns a pointer to the PE header */
-static PIMAGE_NT_HEADERS
-PEHeaderFromHModule (HMODULE hModule)
+/* Given an HMODULE, returns a pointer to the PE header.
+   Return PVOID to make sure the caller handles 32 and 64 bit executables. */
+static PVOID
+PEHeaderFromHModule (HMODULE hModule, bool &is_64bit)
 {
   PIMAGE_NT_HEADERS pNTHeader;
 
-  if (PIMAGE_DOS_HEADER(hModule) ->e_magic != IMAGE_DOS_SIGNATURE)
+  if (PIMAGE_DOS_HEADER (hModule) ->e_magic != IMAGE_DOS_SIGNATURE)
     pNTHeader = NULL;
   else
     {
@@ -43,19 +44,24 @@ PEHeaderFromHModule (HMODULE hModule)
 				     + PIMAGE_DOS_HEADER (hModule) ->e_lfanew);
       if (pNTHeader->Signature != IMAGE_NT_SIGNATURE)
 	pNTHeader = NULL;
+      else if (pNTHeader->FileHeader.Machine == IMAGE_FILE_MACHINE_AMD64)
+      	is_64bit = true;
+      else if (pNTHeader->FileHeader.Machine == IMAGE_FILE_MACHINE_I386)
+      	is_64bit = false;
+      else
+	pNTHeader = NULL;
     }
 
-  return pNTHeader;
+  return (PVOID) pNTHeader;
 }
 
-static long
-rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva, DWORD &max_size)
+static inline int
+rvadelta_get (WORD NumberOfSections, PIMAGE_SECTION_HEADER section,
+	      DWORD import_rva, DWORD &max_size)
 {
-  PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER) (pnt + 1);
-  for (int i = 0; i < pnt->FileHeader.NumberOfSections; i++)
+  for (int i = 0; i < NumberOfSections; i++)
     if (section[i].VirtualAddress <= import_rva
 	&& (section[i].VirtualAddress + section[i].Misc.VirtualSize) > import_rva)
-    // if (ascii_strncasematch ((char *) section[i].Name, ".idata", IMAGE_SIZEOF_SHORT_NAME))
       {
 	max_size = section[i].SizeOfRawData
 		   - (import_rva - section[i].VirtualAddress);
@@ -64,21 +70,49 @@ rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva, DWORD &max_size)
   return -1;
 }
 
+static int
+rvadelta32 (PIMAGE_NT_HEADERS32 pnt, DWORD import_rva, DWORD &max_size)
+{
+  PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER) (pnt + 1);
+  return rvadelta_get (pnt->FileHeader.NumberOfSections, section,
+		       import_rva, max_size);
+}
+
+static long
+rvadelta64 (PIMAGE_NT_HEADERS64 pnt, DWORD import_rva, DWORD &max_size)
+{
+  PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER) (pnt + 1);
+  return rvadelta_get (pnt->FileHeader.NumberOfSections, section,
+		       import_rva, max_size);
+}
+
+#define rvadelta(p,i,m)	(is_64bit ? rvadelta64 ((PIMAGE_NT_HEADERS64) p, i, m) \
+				  : rvadelta32 ((PIMAGE_NT_HEADERS32) p, i, m))
+
+/* This function is only used for the current architecture.
+   Just the size of the IMAGE_THUNK_DATA Function member differs. */
 static void *
 putmem (PIMAGE_THUNK_DATA pi, const void *hookfn)
 {
+#ifdef __x86_64__
+#define THUNK_FUNC_TYPE ULONGLONG
+#else
+#define THUNK_FUNC_TYPE DWORD
+#endif
+
   DWORD ofl;
-  if (!VirtualProtect (pi, sizeof (PVOID), PAGE_READWRITE, &ofl) )
+  if (!VirtualProtect (pi, sizeof (THUNK_FUNC_TYPE), PAGE_READWRITE, &ofl) )
     return NULL;
 
   void *origfn = (void *) pi->u1.Function;
-  pi->u1.Function = (DWORD) hookfn;
+  pi->u1.Function = (THUNK_FUNC_TYPE) hookfn;
 
-  VirtualProtect (pi, sizeof (PVOID), ofl, &ofl);
+  VirtualProtect (pi, sizeof (THUNK_FUNC_TYPE), ofl, &ofl);
   return origfn;
 }
 
-/* Builds stubs for and redirects the IAT for one DLL (pImportDesc) */
+/* Builds stubs for and redirects the IAT for one DLL (pImportDesc)
+   This function is only used for the current architecture. */
 
 static bool
 RedirectIAT (function_hook& fh, PIMAGE_IMPORT_DESCRIPTOR pImportDesc,
@@ -122,6 +156,7 @@ RedirectIAT (function_hook& fh, PIMAGE_IMPORT_DESCRIPTOR pImportDesc,
   return true;
 }
 
+/* This function is only used for the current architecture. */
 static void
 get_export (function_hook& fh)
 {
@@ -178,6 +213,7 @@ find_first_notloaded_dll (path_conv& pc)
   HANDLE h;
   NTSTATUS status;
   LARGE_INTEGER size;
+  PVOID pExeNTHdr;
 
   status = NtOpenFile (&h, SYNCHRONIZE | GENERIC_READ,
 		       pc.get_object_attr (attr, sec_none_nih),
@@ -209,14 +245,16 @@ find_first_notloaded_dll (path_conv& pc)
   if (!hm)
     goto out;
 
-  PIMAGE_NT_HEADERS pExeNTHdr;
-  pExeNTHdr = PEHeaderFromHModule (hm);
+  bool is_64bit;
+  pExeNTHdr = PEHeaderFromHModule (hm, is_64bit);
 
   if (pExeNTHdr)
     {
       DWORD importRVA;
-      DWORD importRVAMaxSize;
-      importRVA = pExeNTHdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+      DWORD importRVAMaxSize = 0;
+
+      importRVA = is_64bit ? ((PIMAGE_NT_HEADERS64) pExeNTHdr)->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress
+			   : ((PIMAGE_NT_HEADERS32) pExeNTHdr)->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
       if (importRVA)
 	{
 	  long delta = rvadelta (pExeNTHdr, importRVA, importRVAMaxSize);
@@ -273,25 +311,42 @@ void *
 hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
 {
   HMODULE hm = fn ? GetModuleHandle (NULL) : (HMODULE) name;
-  PIMAGE_NT_HEADERS pExeNTHdr = PEHeaderFromHModule (hm);
+  bool is_64bit;
+  PVOID pExeNTHdr = PEHeaderFromHModule (hm, is_64bit);
 
   if (!pExeNTHdr)
     return NULL;
 
   /* FIXME: This code has to be made 64 bit capable. */
-  if (pExeNTHdr->FileHeader.Machine != IMAGE_FILE_MACHINE_I386)
-    return NULL;
+#define nthdr32		((PIMAGE_NT_HEADERS32) pExeNTHdr)
+#define nthdr64		((PIMAGE_NT_HEADERS64) pExeNTHdr)
+#define nthdr(x)	(is_64bit ? nthdr64->x : nthdr32->x)
 
-  subsys =  pExeNTHdr->OptionalHeader.Subsystem;
-
-  DWORD importRVA = pExeNTHdr->OptionalHeader.DataDirectory
-		      [IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-  DWORD importRVASize = pExeNTHdr->OptionalHeader.DataDirectory
-			[IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
+  DWORD importRVA, importRVASize;
+  if (is_64bit)
+    {
+      subsys =  ((PIMAGE_NT_HEADERS64) pExeNTHdr)->OptionalHeader.Subsystem;
+      importRVA =
+      	((PIMAGE_NT_HEADERS64) pExeNTHdr)->OptionalHeader.DataDirectory
+			    [IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+      importRVASize =
+	((PIMAGE_NT_HEADERS64) pExeNTHdr)->OptionalHeader.DataDirectory
+			    [IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
+    }
+  else
+    {
+      subsys =  ((PIMAGE_NT_HEADERS32) pExeNTHdr)->OptionalHeader.Subsystem;
+      importRVA =
+      	((PIMAGE_NT_HEADERS32) pExeNTHdr)->OptionalHeader.DataDirectory
+			    [IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+      importRVASize =
+	((PIMAGE_NT_HEADERS32) pExeNTHdr)->OptionalHeader.DataDirectory
+			    [IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
+    }
   if (!importRVA)
     return NULL;
 
-  DWORD importRVAMaxSize;
+  DWORD importRVAMaxSize = 0;
   long delta = fn ? 0 : rvadelta (pExeNTHdr, importRVA, importRVAMaxSize);
   if (delta < 0)
     return NULL;
@@ -364,7 +419,9 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
   for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
     {
       if (!ascii_strcasematch (rva (PSTR, map ?: (char *) hm,
-				    pd->Name - delta - offset), "cygwin1.dll"))
+				    pd->Name - delta - offset), "cygwin1.dll")
+	  && !ascii_strcasematch (rva (PSTR, map ?: (char *) hm,
+				  pd->Name - delta - offset), "cyg64win1.dll"))
 	continue;
       if (!fn)
 	{
