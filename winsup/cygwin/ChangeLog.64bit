@@ -1,5 +1,20 @@
 2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* tty.h (class tty): Store from_master and to_master HANDLEs in
+	unions to make sure the storage is 64 bit compatible.  Add comment to
+	explain why.
+	(from_master): Convert to read accessor method.
+	(to_master): Ditto.
+	(set_from_master): New method to store HANDLE value 64 bit clean.
+	(set_to_master): Ditto.
+	* fhandler_tty.cc: Fix debug printfs to work in 64 bit mode as well.
+	Change usage of from_master and to_master throughout to accommodate
+	aforementioned change.
+	* fhandler_termios.cc (fhandler_termios::ioctl): Add cast to avoid
+	compiler warning.
+
+2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.h (struct user_heap_info): Change type of chunk to SIZE_T.
 	Remove unused slop member.
 	* fork.cc (fork): Rename esp to stackp.  Add 64 bit asm expression to

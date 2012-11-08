@@ -181,7 +181,6 @@ proc_subproc (DWORD what, uintptr_t val)
 {
   int rc = 1;
   int potential_match;
-  _pinfo *child;
   int clearing;
   waitq *w;
 
@@ -247,9 +246,7 @@ proc_subproc (DWORD what, uintptr_t val)
     case PROC_WAIT:
       wval->ev = NULL;		// Don't know event flag yet
 
-      if (wval->pid == -1 || !wval->pid)
-	child = NULL;		// Not looking for a specific pid
-      else if (!mychild (wval->pid))
+      if (wval->pid != -1 && wval->pid && !mychild (wval->pid))
 	goto out;		// invalid pid.  flag no such child
 
       wval->status = 0;		// Don't know status yet

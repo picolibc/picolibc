@@ -61,7 +61,7 @@ bytes_available (DWORD& n, HANDLE h)
       termios_printf ("PeekNamedPipe(%p) failed, %E", h);
       n = 0;
     }
-  debug_only_printf ("n %u, nleft %u, navail %u");
+  debug_only_printf ("n %u, nleft %u, navail %u", n, nleft, navail);
   return succeeded;
 }
 
@@ -441,7 +441,7 @@ fhandler_pty_slave::open (int flags, mode_t)
     release_output_mutex ();
   }
 
-  if (!get_ttyp ()->from_master || !get_ttyp ()->to_master)
+  if (!get_ttyp ()->from_master () || !get_ttyp ()->to_master ())
     {
       errmsg = "pty handles have been closed";
       set_errno (EACCES);
@@ -482,16 +482,16 @@ fhandler_pty_slave::open (int flags, mode_t)
     }
   if (pty_owner)
     {
-      if (!DuplicateHandle (pty_owner, get_ttyp ()->from_master,
+      if (!DuplicateHandle (pty_owner, get_ttyp ()->from_master (),
 			    GetCurrentProcess (), &from_master_local, 0, TRUE,
 			    DUPLICATE_SAME_ACCESS))
 	{
 	  termios_printf ("can't duplicate input from %u/%p, %E",
-			  get_ttyp ()->master_pid, get_ttyp ()->from_master);
+			  get_ttyp ()->master_pid, get_ttyp ()->from_master ());
 	  __seterrno ();
 	  goto err_no_msg;
 	}
-      if (!DuplicateHandle (pty_owner, get_ttyp ()->to_master,
+      if (!DuplicateHandle (pty_owner, get_ttyp ()->to_master (),
 			  GetCurrentProcess (), &to_master_local, 0, TRUE,
 			  DUPLICATE_SAME_ACCESS))
 	{
@@ -529,9 +529,9 @@ fhandler_pty_slave::open (int flags, mode_t)
   VerifyHandle (to_master_local);
 
   termios_printf ("duplicated from_master %p->%p from pty_owner",
-		  get_ttyp ()->from_master, from_master_local);
+		  get_ttyp ()->from_master (), from_master_local);
   termios_printf ("duplicated to_master %p->%p from pty_owner",
-		  get_ttyp ()->to_master, to_master_local);
+		  get_ttyp ()->to_master (), to_master_local);
 
   set_io_handle (from_master_local);
   set_output_handle (to_master_local);
@@ -1009,7 +1009,7 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
       }
       goto out;
     case TIOCSPGRP:
-      retval = this->tcsetpgrp ((pid_t) arg);
+      retval = this->tcsetpgrp ((pid_t) (intptr_t) arg);
       goto out;
     case FIONREAD:
       {
@@ -1426,7 +1426,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
       *((pid_t *) arg) = this->tcgetpgrp ();
       break;
     case TIOCSPGRP:
-      return this->tcsetpgrp ((pid_t) arg);
+      return this->tcsetpgrp ((pid_t) (intptr_t) arg);
     case FIONREAD:
       {
 	DWORD n;
@@ -1713,8 +1713,8 @@ fhandler_pty_master::setup ()
       goto err;
     }
 
-  t.from_master = from_master;
-  t.to_master = to_master;
+  t.set_from_master (from_master);
+  t.set_to_master (to_master);
   t.winsize.ws_col = 80;
   t.winsize.ws_row = 25;
   t.master_pid = myself->pid;
@@ -1749,8 +1749,8 @@ fhandler_pty_master::fixup_after_fork (HANDLE parent)
       tty& t = *get_ttyp ();
       if (myself->pid == t.master_pid)
 	{
-	  t.from_master = arch->from_master;
-	  t.to_master = arch->to_master;
+	  t.set_from_master (arch->from_master);
+	  t.set_to_master (arch->to_master);
 	}
       arch->dwProcessId = wpid;
     }
