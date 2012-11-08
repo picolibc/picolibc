@@ -239,26 +239,6 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
 
       paranoid_printf ("char %0c", c);
 
-      /* Check for special chars */
-
-      if (c == '\r')
-	{
-	  if (ti.c_iflag & IGNCR)
-	    continue;
-	  if (ti.c_iflag & ICRNL)
-	    {
-	      c = '\n';
-	      set_input_done (iscanon);
-	    }
-	}
-      else if (c == '\n')
-	{
-	  if (ti.c_iflag & INLCR)
-	    c = '\r';
-	  else
-	    set_input_done (iscanon);
-	}
-
       if (ti.c_iflag & ISTRIP)
 	c &= 0x7f;
       if (ti.c_lflag & ISIG)
@@ -298,11 +278,31 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
 	  else if ((ti.c_iflag & IXANY) && tc ()->output_stopped)
 	    goto restart_output;
 	}
+      /* Check for special chars */
+
+      if (c == '\r')
+	{
+	  if (ti.c_iflag & IGNCR)
+	    continue;
+	  if (ti.c_iflag & ICRNL)
+	    {
+	      c = '\n';
+	      set_input_done (iscanon);
+	    }
+	}
+      else if (c == '\n')
+	{
+	  if (ti.c_iflag & INLCR)
+	    c = '\r';
+	  else
+	    set_input_done (iscanon);
+	}
       if (iscanon && ti.c_lflag & IEXTEN && CCEQ (ti.c_cc[VDISCARD], c))
 	{
 	  ti.c_lflag ^= FLUSHO;
 	  continue;
 	}
+
       if (!iscanon)
 	/* nothing */;
       else if (CCEQ (ti.c_cc[VERASE], c))

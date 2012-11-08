@@ -247,9 +247,7 @@ proc_subproc (DWORD what, DWORD val)
     case PROC_WAIT:
       wval->ev = NULL;		// Don't know event flag yet
 
-      if (wval->pid == -1 || !wval->pid)
-	child = NULL;		// Not looking for a specific pid
-      else if (!mychild (wval->pid))
+      if (wval->pid != -1 && wval->pid && !mychild (wval->pid))
 	goto out;		// invalid pid.  flag no such child
 
       wval->status = 0;		// Don't know status yet

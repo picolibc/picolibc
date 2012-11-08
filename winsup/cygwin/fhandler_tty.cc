@@ -67,7 +67,7 @@ bytes_available (DWORD& n, HANDLE h)
       termios_printf ("PeekNamedPipe(%p) failed, %E", h);
       n = 0;
     }
-  debug_only_printf ("n %u, nleft %u, navail %u");
+  debug_only_printf ("n %u, nleft %u, navail %u", n, nleft, navail);
   return succeeded;
 }
 
