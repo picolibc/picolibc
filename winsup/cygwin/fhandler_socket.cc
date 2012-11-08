@@ -14,7 +14,9 @@
 #define  __INSIDE_CYGWIN_NET__
 #define USE_SYS_TYPES_FD_SET
 
+#define _BSDTYPES_DEFINED
 #include "winsup.h"
+#undef _BSDTYPES_DEFINED
 #include <ws2tcpip.h>
 #include <mswsock.h>
 #include <iphlpapi.h>
@@ -2046,7 +2048,17 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	WSAEventSelect (get_socket (), wsock_evt, EVENT_MASK);
       break;
     case FIONREAD:
-      res = ioctlsocket (get_socket (), FIONREAD, (__ms_u_long *) p);
+#ifdef __x86_64__
+/* FIXME: This looks broken in the Mingw64 headers.  If I make sure
+to use the Windows u_long definition, I'd expect that it's defined
+as a 4 byte type on LP64 as well.  But that's not the case right now.
+The *additional* type __ms_u_long is available on LP64, and that's
+used in subsequent function declarations, but that's not available
+on 32 bit or LLP64.  The LP64-ness shouldn't require to use another
+type name in the application code. */
+#define u_long __ms_u_long
+#endif
+      res = ioctlsocket (get_socket (), FIONREAD, (u_long *) p);
       if (res == SOCKET_ERROR)
 	set_winsock_errno ();
       break;
@@ -2061,7 +2073,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  res = 0;
 	}
       else
-	res = ioctlsocket (get_socket (), cmd, (__ms_u_long *) p);
+	res = ioctlsocket (get_socket (), cmd, (u_long *) p);
       break;
     }
   syscall_printf ("%d = ioctl_socket(%x, %x)", res, cmd, p);

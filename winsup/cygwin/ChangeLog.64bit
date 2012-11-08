@@ -1,3 +1,9 @@
+2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::ioctl): Don't use __ms_u_long
+	directly.  Rather only use it on 64 bit.  Add comment to explain the
+	problem.
+
 2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc: Throughout, fix casts to work on 64 bit.  Move
