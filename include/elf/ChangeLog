@@ -1,3 +1,7 @@
+2012-11-08  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h (EF_MIPS_32BITMODE): Move next to lower-order bits.
+
 2012-11-01  Tom Tromey  <tromey@redhat.com>
 
 	* common.h (NT_386_TLS, NT_386_IOPERM): New defines.

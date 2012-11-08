@@ -187,6 +187,10 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 /* Process the .MIPS.options section first by ld */
 #define EF_MIPS_OPTIONS_FIRST	0x00000080
 
+/* Indicates code compiled for a 64-bit machine in 32-bit mode
+   (regs are 32-bits wide).  */
+#define EF_MIPS_32BITMODE	0x00000100
+
 /* Architectural Extensions used by this file */
 #define EF_MIPS_ARCH_ASE	0x0f000000
 
@@ -198,10 +202,6 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
 
 /* Use MICROMIPS ISA extensions.  */
 #define EF_MIPS_ARCH_ASE_MICROMIPS	0x02000000
-
-/* Indicates code compiled for a 64-bit machine in 32-bit mode.
-   (regs are 32-bits wide.) */
-#define EF_MIPS_32BITMODE       0x00000100
 
 /* Four bit MIPS architecture field.  */
 #define EF_MIPS_ARCH		0xf0000000
