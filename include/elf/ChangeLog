@@ -3,6 +3,8 @@
 	* rx.h (EF_RX_CPU_RX): Add comment.
 	(E_FLAG_RX_ABI): Define.
 
+	* v850.h: Add RH850 ABI values.
+
 2012-11-08  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h (EF_MIPS_32BITMODE): Move next to lower-order bits.

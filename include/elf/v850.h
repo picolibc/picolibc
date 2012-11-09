@@ -1,5 +1,5 @@
 /* V850 ELF support for BFD.
-   Copyright 1997, 1998, 2000, 2002, 2003, 2004, 2007, 2008, 2010
+   Copyright 1997, 1998, 2000, 2002, 2003, 2004, 2007, 2008, 2010, 2012
    Free Software Foundation, Inc.
    Created by Michael Meissner, Cygnus Support <meissner@cygnus.com>
 
@@ -147,5 +147,135 @@ END_RELOC_NUMBERS (R_V850_max)
 
 /* This section must be in the zero data area (pointed to by R0).  */
 #define SHF_V850_R0REL		0x40000000
+
+/* Alternative versions of the above definitions, as specified by the RH850 ABI.  */
+
+#define EF_RH850_ABI		0xF0000000
+
+#define EF_V800_850E3		0x00100000
+
+#define EF_RH850_FPU_DOUBLE	0x00000001	/* sizeof(double) == 8.  */
+#define EF_RH850_FPU_SINGLE	0x00000002	/* sizeof(double) == 4.  */
+#define EF_RH850_SIMD		0x00000004
+#define EF_RH850_CACHE		0x00000008
+#define EF_RH850_MMU		0x00000010
+#define EF_RH850_REGMODE22	0x00000020	/* Registers r15-r24 (inclusive) are not used.  */
+#define EF_RH850_REGMODE32	0x00000040
+#define EF_RH850_DATA_ALIGN8	0x00000080	/* 8-byte alignment supported.  */
+#define EF_RH850_GP_FIX		0x00000100	/* r4 is fixed.  */
+#define EF_RH850_GP_NOFIX	0x00000200	/* r4 is callee save.  */
+#define EF_RH850_EP_FIX		0x00000400	/* r30 is fixed.  */
+#define EF_RH850_EP_NOFIX	0x00000800	/* r30 is callee save.  */
+#define EF_RH850_TP_FIX		0x00001000	/* r5 is fixed.  */
+#define EF_RH850_TP_NOFIX	0x00002000	/* r5 is callee save.  */
+#define EF_RH850_REG2_RESERVE	0x00004000	/* r2 is fixed.  */
+#define EF_RH850_REG2_NORESERVE 0x00008000	/* r2 is callee saved.  */
+
+#define SHT_RNESAS_IOP		SHT_LOUSER	/* Used by Renesas linker.  */
+
+#define SHF_RENESAS_ABS		0x80000000	/* Absolute section.  */
+#define SHF_GHS_ABS		0x00000400	/* Use unknown.  */
+
+#define STT_RENESAS_ENTRY	14		/* Set for functions called at reset time.  */
+
+START_RELOC_NUMBERS (v800_reloc_type)
+
+     RELOC_NUMBER (R_V800_NONE,      0x00)
+     RELOC_NUMBER (R_V810_NONE,      0x30)
+     RELOC_NUMBER (R_V810_BYTE,      0x31)
+     RELOC_NUMBER (R_V810_HWORD,     0x32)
+     RELOC_NUMBER (R_V810_WORD,      0x33)
+     RELOC_NUMBER (R_V810_WLO,       0x34)
+     RELOC_NUMBER (R_V810_WHI,       0x35)
+     RELOC_NUMBER (R_V810_WHI1,      0x36)
+     RELOC_NUMBER (R_V810_GPBYTE,    0x37)
+     RELOC_NUMBER (R_V810_GPHWORD,   0x38)
+     RELOC_NUMBER (R_V810_GPWORD,    0x39)
+     RELOC_NUMBER (R_V810_GPWLO,     0x3a)
+     RELOC_NUMBER (R_V810_GPWHI,     0x3b)
+     RELOC_NUMBER (R_V810_GPWHI1,    0x3c)
+     RELOC_NUMBER (R_V850_HWLO,      0x3d)
+     FAKE_RELOC   (R_V810_reserved1, 0x3e)
+     RELOC_NUMBER (R_V850_EP7BIT,    0x3f)
+     RELOC_NUMBER (R_V850_EPHBYTE,   0x40)
+     RELOC_NUMBER (R_V850_EPWBYTE,   0x41)
+     RELOC_NUMBER (R_V850_REGHWLO,   0x42)
+     FAKE_RELOC   (R_V810_reserved2, 0x43)
+     RELOC_NUMBER (R_V850_GPHWLO,    0x44)
+     FAKE_RELOC   (R_V810_reserved3, 0x45)
+     RELOC_NUMBER (R_V850_PCR22,     0x46)
+     RELOC_NUMBER (R_V850_BLO,       0x47)
+     RELOC_NUMBER (R_V850_EP4BIT,    0x48)
+     RELOC_NUMBER (R_V850_EP5BIT,    0x49)
+     RELOC_NUMBER (R_V850_REGBLO,    0x4a)
+     RELOC_NUMBER (R_V850_GPBLO,     0x4b)
+     RELOC_NUMBER (R_V810_WLO_1,     0x4c)
+     RELOC_NUMBER (R_V810_GPWLO_1,   0x4d)
+     RELOC_NUMBER (R_V850_BLO_1,     0x4e)
+     RELOC_NUMBER (R_V850_HWLO_1,    0x4f)
+     FAKE_RELOC   (R_V810_reserved4, 0x50)
+     RELOC_NUMBER (R_V850_GPBLO_1,   0x51)
+     RELOC_NUMBER (R_V850_GPHWLO_1,  0x52)
+     FAKE_RELOC   (R_V810_reserved5, 0x53)
+     RELOC_NUMBER (R_V850_EPBLO,     0x54)
+     RELOC_NUMBER (R_V850_EPHWLO,    0x55)
+     FAKE_RELOC   (R_V810_reserved6, 0x56)
+     RELOC_NUMBER (R_V850_EPWLO_N,   0x57)
+     RELOC_NUMBER (R_V850_PC32,      0x58)
+     RELOC_NUMBER (R_V850_W23BIT,    0x59)
+     RELOC_NUMBER (R_V850_GPW23BIT,  0x5a)
+     RELOC_NUMBER (R_V850_EPW23BIT,  0x5b)
+     RELOC_NUMBER (R_V850_B23BIT,    0x5c)
+     RELOC_NUMBER (R_V850_GPB23BIT,  0x5d)
+     RELOC_NUMBER (R_V850_EPB23BIT,  0x5e)
+     RELOC_NUMBER (R_V850_PC16U,     0x5f)
+     RELOC_NUMBER (R_V850_PC17,      0x60)
+     RELOC_NUMBER (R_V850_DW8,       0x61)
+     RELOC_NUMBER (R_V850_GPDW8,     0x62)
+     RELOC_NUMBER (R_V850_EPDW8,     0x63)
+     RELOC_NUMBER (R_V850_PC9,       0x64)
+     RELOC_NUMBER (R_V810_REGBYTE,   0x65)
+     RELOC_NUMBER (R_V810_REGHWORD,  0x66)
+     RELOC_NUMBER (R_V810_REGWORD,   0x67)
+     RELOC_NUMBER (R_V810_REGWLO,    0x68)
+     RELOC_NUMBER (R_V810_REGWHI,    0x69)
+     RELOC_NUMBER (R_V810_REGWHI1,   0x6a)
+     RELOC_NUMBER (R_V850_REGW23BIT, 0x6b)
+     RELOC_NUMBER (R_V850_REGB23BIT, 0x6c)
+     RELOC_NUMBER (R_V850_REGDW8,    0x6d)
+     RELOC_NUMBER (R_V810_EPBYTE,    0x6e)
+     RELOC_NUMBER (R_V810_EPHWORD,   0x6f)
+     RELOC_NUMBER (R_V810_EPWORD,    0x70)
+     RELOC_NUMBER (R_V850_WLO23,     0x71)
+     RELOC_NUMBER (R_V850_WORD_E,    0x72)
+     RELOC_NUMBER (R_V850_REGWORD_E, 0x73)
+     RELOC_NUMBER (R_V850_WORD,      0x74)
+     RELOC_NUMBER (R_V850_GPWORD,    0x75)
+     RELOC_NUMBER (R_V850_REGWORD,   0x76)
+     RELOC_NUMBER (R_V850_EPWORD,    0x77)
+     RELOC_NUMBER (R_V810_TPBYTE,    0x78)
+     RELOC_NUMBER (R_V810_TPHWORD,   0x79)
+     RELOC_NUMBER (R_V810_TPWORD,    0x7a)
+     RELOC_NUMBER (R_V810_TPWLO,     0x7b)
+     RELOC_NUMBER (R_V810_TPWHI,     0x7c)
+     RELOC_NUMBER (R_V810_TPWHI1,    0x7d)
+     RELOC_NUMBER (R_V850_TPHWLO,    0x7e)
+     RELOC_NUMBER (R_V850_TPBLO,     0x7f)
+     RELOC_NUMBER (R_V810_TPWLO_1,   0x80)
+     RELOC_NUMBER (R_V850_TPBLO_1,   0x81)
+     RELOC_NUMBER (R_V850_TPHWLO_1,  0x82)
+     RELOC_NUMBER (R_V850_TP23BIT,   0x83)
+     RELOC_NUMBER (R_V850_TPW23BIT,  0x84)
+     RELOC_NUMBER (R_V850_TPDW8,     0x85)
+
+/* These are defined by the RH850 ABI, but not used.  */
+     RELOC_NUMBER (R_V810_ABS32,     0xa0)
+     RELOC_NUMBER (R_V850_SYM,       0xe0)
+     RELOC_NUMBER (R_V850_OPadd,     0xe1)
+     RELOC_NUMBER (R_V850_OPsub,     0xe2)
+     RELOC_NUMBER (R_V850_OPsctsize, 0xe3)
+     RELOC_NUMBER (R_V850_OPscttop,  0xe4)
+
+END_RELOC_NUMBERS (R_V800_max)
 
 #endif /* _ELF_V850_H */
