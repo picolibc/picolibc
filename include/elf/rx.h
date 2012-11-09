@@ -110,7 +110,7 @@ START_RELOC_NUMBERS (elf_rx_reloc_type)
 
 END_RELOC_NUMBERS (R_RX_max)
 
-#define EF_RX_CPU_RX	0x00000079      /* FIXME: correct value?  */
+#define EF_RX_CPU_RX	0x00000079      /* FIXME: this collides with the E_FLAG_RX_... values below.  */
 #define EF_RX_CPU_MASK	0x0000007F	/* specific cpu bits.  */
 #define EF_RX_ALL_FLAGS	(EF_RX_CPU_MASK)
 
@@ -118,6 +118,7 @@ END_RELOC_NUMBERS (R_RX_max)
 #define E_FLAG_RX_64BIT_DOUBLES		(1 << 0)
 #define E_FLAG_RX_DSP			(1 << 1) /* Defined in the RX CPU Object file specification, but not explained. */
 #define E_FLAG_RX_PID			(1 << 2) /* Unofficial - DJ */
+#define E_FLAG_RX_ABI			(1 << 3) /* Binary passes stacked arguments using natural alignment.  Unofficial - NC.  */
 
 /* These define the addend field of R_RX_RH_RELAX relocations.  */
 #define	RX_RELAXA_IMM6	0x00000010	/* Imm8/16/24/32 at bit offset 6.  */

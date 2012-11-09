@@ -1,3 +1,8 @@
+2012-11-09  Nick Clifton  <nickc@redhat.com>
+
+	* rx.h (EF_RX_CPU_RX): Add comment.
+	(E_FLAG_RX_ABI): Define.
+
 2012-11-08  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h (EF_MIPS_32BITMODE): Move next to lower-order bits.
