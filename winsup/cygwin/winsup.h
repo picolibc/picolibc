@@ -80,10 +80,10 @@ int fcntl64 (int fd, int cmd, ...);
 
 #include "wincap.h"
 
-extern const char case_folded_lower[];
-#define cyg_tolower(c) (case_folded_lower[(unsigned char)(c)])
-extern const char case_folded_upper[];
-#define cyg_toupper(c) (case_folded_upper[(unsigned char)(c)])
+extern const unsigned char case_folded_lower[];
+#define cyg_tolower(c) ((char) case_folded_lower[(unsigned char)(c)])
+extern const unsigned char case_folded_upper[];
+#define cyg_toupper(c) ((char) case_folded_upper[(unsigned char)(c)])
 
 #ifndef MALLOC_DEBUG
 #define cfree newlib_cfree_dont_use

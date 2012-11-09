@@ -31,7 +31,7 @@ details. */
 
 long tls_ix = -1;
 
-const char case_folded_lower[] NO_COPY = {
+const unsigned char case_folded_lower[] NO_COPY = {
    0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,
   16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,
   32, '!', '"', '#', '$', '%', '&',  39, '(', ')', '*', '+', ',', '-', '.', '/',
@@ -50,7 +50,7 @@ const char case_folded_lower[] NO_COPY = {
  240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
 };
 
-const char case_folded_upper[] NO_COPY = {
+const unsigned char case_folded_upper[] NO_COPY = {
    0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,
   16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,
   32, '!', '"', '#', '$', '%', '&',  39, '(', ')', '*', '+', ',', '-', '.', '/',
@@ -514,9 +514,32 @@ thread_wrapper (VOID *arg)
 	  old_start = old_start->prev;
 	}
     }
-
+#ifdef __x86_64__
   __asm__ ("\n\
-	   movl  %[WRAPPER_ARG], %%ebx # Load &wrapper_arg into ebx	\n\
+	   movq  %[WRAPPER_ARG], %%rbx	# Load &wrapper_arg into rbx	\n\
+	   movq  (%%rbx), %%r12		# Load thread func into r12	\n\
+	   movq  8(%%rbx), %%r13	# Load thread arg into r13	\n\
+	   movq  16(%%rbx), %%rcx	# Load stackaddr into rcx	\n\
+	   movq  24(%%rbx), %%rsp	# Load stackbase into rsp	\n\
+	   subq  %[CYGTLS], %%rsp	# Subtract CYGTLS_PADSIZE	\n\
+	   subq  $40, %%rsp		# Subtract another 40 bytes	\n\
+	   				# (8 bytes + 32 bytes shadow)	\n\
+	   xorq  %%rbp, %%rbp		# Set rbp to 0			\n\
+	   # We moved to the new stack.					\n\
+	   # Now it's safe to release the OS stack.			\n\
+	   movl  $0x8000, %%r8d		# dwFreeType: MEM_RELEASE	\n\
+	   xorl  %%edx, %%edx		# dwSize:     0			\n\
+	   # stackaddr is already in the correct register rcx!		\n\
+	   call  VirtualFree						\n\
+	   # All set.  We can copy the thread function address and the	\n\
+	   # thread arg from the stack and just call the function.	\n\
+	   movq  %%r13, %%rcx		# Move thread arg to 1st arg reg\n\
+	   call  *%%r12			# Call thread func		\n"
+	   : : [WRAPPER_ARG] "r" (&wrapper_arg),
+	       [CYGTLS] "i" (CYGTLS_PADSIZE));
+#else
+  __asm__ ("\n\
+	   movl  %[WRAPPER_ARG], %%ebx	# Load &wrapper_arg into ebx	\n\
 	   movl  (%%ebx), %%eax		# Load thread func into eax	\n\
 	   movl  4(%%ebx), %%ecx	# Load thread arg into ecx	\n\
 	   movl  8(%%ebx), %%edx	# Load stackaddr into edx	\n\
@@ -545,6 +568,7 @@ thread_wrapper (VOID *arg)
 	   call  *%%eax			# Call thread func		\n"
 	   : : [WRAPPER_ARG] "r" (&wrapper_arg),
 	       [CYGTLS] "i" (CYGTLS_PADSIZE));
+#endif
   /* Never return from here. */
   ExitThread (0);
 }

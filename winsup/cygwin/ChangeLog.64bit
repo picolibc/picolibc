@@ -1,3 +1,14 @@
+2012-11-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (case_folded_lower): Change to unsigned char to avoid
+	compiler warnings.
+	(case_folded_upper): Ditto.
+	(thread_wrapper): Add assembler code for x86_64.
+	* winsup.h (case_folded_lower): Change to unsigned char.
+	(case_folded_upper): Ditto.
+	(cyg_tolower): Add cast to avoid compiler warnings.
+	(cyg_toupper): Add cast to avoid compiler warnings.
+
 2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* tty.h (class tty): Store from_master and to_master HANDLEs in
