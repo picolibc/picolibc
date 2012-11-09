@@ -1,3 +1,7 @@
+2012-11-09  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (vcygpath): Handle cygdrive prefix.
+
 2012-11-07  Corinna Vinschen <corinna@vinschen.de>
 
 	* Makefile.in ($(MINGW_BINS)): Drop -B$(mingw_build)/ from build

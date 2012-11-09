@@ -1,7 +1,7 @@
 /* path.cc
 
    Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011 Red Hat, Inc.
+   2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -837,11 +837,14 @@ vcygpath (const char *cwd, const char *s, va_list v)
 
   for (m = mount_table; m->posix; m++)
     {
-      if (m->flags & MOUNT_CYGDRIVE)
-	continue;
-
       int n = strlen (m->posix);
       if (n < max_len || !path_prefix_p (m->posix, path, n))
+	continue;
+      if ((m->flags & MOUNT_CYGDRIVE)
+	  && (strlen (path) < n + 2
+	      || path[n] != '/'
+	      || !isalpha (path[n + 1])
+	      || path[n + 2] != '/'))
 	continue;
       max_len = n;
       match = m;
@@ -852,6 +855,11 @@ vcygpath (const char *cwd, const char *s, va_list v)
     native = strdup (path);
   else if (max_len == (int) strlen (path))
     native = strdup (match->native);
+  else if (match->flags & MOUNT_CYGDRIVE)
+    {
+      char drive[3] = { path[max_len + 1], ':', '\0' };
+      native = concat (drive, path + max_len + 2, NULL);
+    }
   else if (isslash (path[max_len]))
     native = concat (match->native, path + max_len, NULL);
   else
