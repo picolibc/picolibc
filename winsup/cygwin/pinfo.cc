@@ -242,7 +242,6 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
       return;
     }
 
-  void *mapaddr;
   int createit = flag & (PID_IN_USE | PID_EXECED);
   DWORD access = FILE_MAP_READ
 		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW)
@@ -284,13 +283,9 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	  if (exit_state)
 	    return;
 
-	  switch (GetLastError ())
-	    {
-	    case ERROR_INVALID_HANDLE:
-	      api_fatal ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
-	    case ERROR_INVALID_ADDRESS:
-	      mapaddr = NULL;
-	    }
+	  if (GetLastError () == ERROR_INVALID_HANDLE)
+	    api_fatal ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
+
 	  debug_printf ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
 	  yield ();
 	  continue;
