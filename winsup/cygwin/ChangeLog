@@ -1,3 +1,10 @@
+2012-11-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winbase.h: Semi-reinstantiate to workaround lack inline assembler
+	implementation of InterlockedCompareExchange for i686 in Mingw64
+	headers.
+	* pinfo.cc (pinfo::init): Remove unused variable mapaddr.
+
 2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sigproc.cc (proc_subproc): Delete unused variable child.

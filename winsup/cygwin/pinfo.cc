@@ -242,7 +242,6 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
       return;
     }
 
-  void *mapaddr;
   int createit = flag & (PID_IN_USE | PID_EXECED);
   DWORD access = FILE_MAP_READ
 		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW)
@@ -284,13 +283,9 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	  if (exit_state)
 	    return;
 
-	  switch (GetLastError ())
-	    {
-	    case ERROR_INVALID_HANDLE:
-	      api_fatal ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
-	    case ERROR_INVALID_ADDRESS:
-	      mapaddr = NULL;
-	    }
+	  if (GetLastError () == ERROR_INVALID_HANDLE)
+	    api_fatal ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
+
 	  debug_printf ("MapViewOfFileEx h0 %p, i %d failed, %E", h0, i);
 	  yield ();
 	  continue;
@@ -689,7 +684,7 @@ _pinfo::commune_request (__uint32_t code, ...)
   va_end (args);
 
   char name_buf[MAX_PATH];
-  request_sync = CreateSemaphore (&sec_none_nih, 0, LONG_MAX,
+  request_sync = CreateSemaphore (&sec_none_nih, 0, INT_MAX,
 				  shared_name (name_buf, "commune", myself->pid));
   if (!request_sync)
     goto err;
