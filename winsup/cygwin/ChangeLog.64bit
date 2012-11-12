@@ -1,5 +1,17 @@
 2012-11-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.h (class fcwd_access_t): Add alignment attribute to Buffer
+	member of FAST_CWD_* structures to work on 64 bit.
+	* path.cc (symlink_info::check_shortcut): Add cast to avoid compiler
+	warning.
+	(cygwin_conv_path_list): Drop ununsed variable.
+	(peek32): Define with int32_t cast on 64 bit to allow easier fetching
+	of instruction pointer relative addresses.
+	(find_fast_cwd_pointer): Add new implementation for x86_64.
+	Tweak a comment in 32 bit version.
+
+2012-11-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dlfcn.cc (dlopen): Change cast to accommodate type change in ntdll.h
 	* fhandler_process.cc (thread_info::thread_info): Change type of local
 	variable size to ULONG to match NtQuerySystemInformation call.

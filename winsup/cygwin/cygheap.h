@@ -228,7 +228,7 @@ class fcwd_access_t {
     UNICODE_STRING Path;		/* Path's Buffer member always refers
 					   to the following Buffer array. */
     LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
-    WCHAR          Buffer[MAX_PATH];
+    WCHAR          Buffer[MAX_PATH] __attribute ((aligned (8)));
   };
   /* This is the layout used in Windows 7 and Vista. */
   struct FAST_CWD_7 {
@@ -239,7 +239,7 @@ class fcwd_access_t {
     LONG           ReferenceCount;	/* Only release when this is 0. */
     ULONG          OldDismountCount;	/* Reflects the system DismountCount
 					   at the time the CWD has been set. */
-    WCHAR          Buffer[MAX_PATH];
+    WCHAR          Buffer[MAX_PATH] __attribute ((aligned (8)));
   };
   /* This is the old FAST_CWD structure up to the patch from KB 2393802,
      release in February 2011. */
@@ -250,7 +250,7 @@ class fcwd_access_t {
 					   at the time the CWD has been set. */
     UNICODE_STRING Path;		/* Path's Buffer member always refers
 					   to the following Buffer array. */
-    WCHAR          Buffer[MAX_PATH];
+    WCHAR          Buffer[MAX_PATH] __attribute ((aligned (8)));
   };
   union {
     FAST_CWD_OLD fold;
