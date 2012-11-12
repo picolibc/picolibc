@@ -1,3 +1,9 @@
+2012-11-12  Steve Ellcey  <sellcey@mips.com>
+
+	* libc/machine/mips/machine/asm.h: New.
+	* libc/machine/mips/machine/regdef.h: Update register definitions
+	for different ABI's.
+
 2012-11-11  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* libc/include/sys/time.h: Avoid guarding other than timeval
