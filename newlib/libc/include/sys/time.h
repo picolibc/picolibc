@@ -19,26 +19,6 @@ struct timeval {
   suseconds_t tv_usec;
 };
 
-struct timezone {
-  int tz_minuteswest;
-  int tz_dsttime;
-};
-
-#ifdef __CYGWIN__
-#include <cygwin/sys_time.h>
-#endif /* __CYGWIN__ */
-
-#endif /* !_TIMEVAL_DEFINED */
-
-#define ITIMER_REAL     0
-#define ITIMER_VIRTUAL  1
-#define ITIMER_PROF     2
-
-struct  itimerval {
-  struct  timeval it_interval;
-  struct  timeval it_value;
-};
-
 /* BSD time macros used by RTEMS code */
 #if defined (__rtems__) || defined (__CYGWIN__)
 
@@ -70,6 +50,25 @@ struct  itimerval {
     }									      \
   } while (0)
 #endif /* defined (__rtems__) || defined (__CYGWIN__) */
+#endif /* !_TIMEVAL_DEFINED */
+
+struct timezone {
+  int tz_minuteswest;
+  int tz_dsttime;
+};
+
+#ifdef __CYGWIN__
+#include <cygwin/sys_time.h>
+#endif /* __CYGWIN__ */
+
+#define ITIMER_REAL     0
+#define ITIMER_VIRTUAL  1
+#define ITIMER_PROF     2
+
+struct  itimerval {
+  struct  timeval it_interval;
+  struct  timeval it_value;
+};
 
 #ifdef _COMPILING_NEWLIB
 int _EXFUN(_gettimeofday, (struct timeval *__p, void *__tz));

@@ -1,3 +1,9 @@
+2012-11-11  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* libc/include/sys/time.h: Avoid guarding other than timeval
+	declaration with _TIMEVAL_DEFINED.  Move timeval related macros under
+	_TIMEVAL_DEFINED control.
+
 2012-11-01  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/locale.h (NULL): Fetch definition via stddef.h.
