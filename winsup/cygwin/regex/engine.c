@@ -160,7 +160,7 @@ matcher(struct re_guts *g,
 	int i;
 	struct match mv;
 	struct match *m = &mv;
-	const char *dp;
+	const char *dp = NULL;
 	const sopno gf = g->firststate+1;	/* +1 for OEND */
 	const sopno gl = g->laststate;
 	const char *start;
@@ -391,7 +391,7 @@ dissect(struct match *m,
 	const char *ssp;	/* start of string matched by subsubRE */
 	const char *sep;	/* end of string matched by subsubRE */
 	const char *oldssp;	/* previous ssp */
-	const char *dp;
+	const char *dp __attribute__ ((unused));
 
 	AT("diss", start, stop, startst, stopst);
 	sp = start;

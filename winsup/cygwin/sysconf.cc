@@ -336,8 +336,8 @@ sysinfo (struct sysinfo *info)
   MEMORYSTATUSEX memory_status;
   PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
   ULONG sizeof_spi = 512;
-  PSYSTEM_TIME_OF_DAY_INFORMATION stodi = NULL;
-  const ULONG sizeof_stodi = sizeof (SYSTEM_TIME_OF_DAY_INFORMATION);
+  PSYSTEM_TIMEOFDAY_INFORMATION stodi = NULL;
+  const ULONG sizeof_stodi = sizeof (SYSTEM_TIMEOFDAY_INFORMATION);
   NTSTATUS status = STATUS_SUCCESS;
   winpids pids ((DWORD) 0);
 
@@ -347,7 +347,7 @@ sysinfo (struct sysinfo *info)
       return -1;
     }
 
-  stodi = (PSYSTEM_TIME_OF_DAY_INFORMATION) malloc (sizeof_stodi);
+  stodi = (PSYSTEM_TIMEOFDAY_INFORMATION) malloc (sizeof_stodi);
   status = NtQuerySystemInformation (SystemTimeOfDayInformation, (PVOID) stodi,
 				     sizeof_stodi, NULL);
   if (NT_SUCCESS (status))

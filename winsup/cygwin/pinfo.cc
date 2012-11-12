@@ -1250,11 +1250,11 @@ winpids::enum_processes (bool winpid)
   if (winpid)
     {
       static DWORD szprocs;
-      static PSYSTEM_PROCESSES procs;
+      static PSYSTEM_PROCESS_INFORMATION procs;
 
       if (!szprocs)
 	{
-	  procs = (PSYSTEM_PROCESSES)
+	  procs = (PSYSTEM_PROCESS_INFORMATION)
 		  malloc (sizeof (*procs) + (szprocs = 200 * sizeof (*procs)));
 	  if (!procs)
 	    {
@@ -1267,16 +1267,16 @@ winpids::enum_processes (bool winpid)
       for (;;)
 	{
 	  status =
-		NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+		NtQuerySystemInformation (SystemProcessInformation,
 					  procs, szprocs, NULL);
 	  if (NT_SUCCESS (status))
 	    break;
 
 	  if (status == STATUS_INFO_LENGTH_MISMATCH)
 	    {
-	      PSYSTEM_PROCESSES new_p;
+	      PSYSTEM_PROCESS_INFORMATION new_p;
 
-	      new_p = (PSYSTEM_PROCESSES)
+	      new_p = (PSYSTEM_PROCESS_INFORMATION)
 		      realloc (procs, szprocs += 200 * sizeof (*procs));
 	      if (!new_p)
 		{
@@ -1294,24 +1294,24 @@ winpids::enum_processes (bool winpid)
 	    }
 	}
 
-      PSYSTEM_PROCESSES px = procs;
+      PSYSTEM_PROCESS_INFORMATION px = procs;
       for (;;)
 	{
-	  if (px->ProcessId)
+	  if (px->UniqueProcessId)
 	    {
 	      bool do_add = true;
 	      for (unsigned i = 0; i < cygwin_pid_nelem; ++i)
-		if (pidlist[i] == px->ProcessId)
+		if (pidlist[i] == (uintptr_t) px->UniqueProcessId)
 		  {
 		    do_add = false;
 		    break;
 		  }
 	      if (do_add)
-		add (nelem, true, px->ProcessId);
+		add (nelem, true, (DWORD) (uintptr_t) px->UniqueProcessId);
 	    }
-	  if (!px->NextEntryDelta)
+	  if (!px->NextEntryOffset)
 	    break;
-	  px = (PSYSTEM_PROCESSES) ((char *) px + px->NextEntryDelta);
+	  px = (PSYSTEM_PROCESS_INFORMATION) ((char *) px + px->NextEntryOffset);
 	}
     }
 

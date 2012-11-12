@@ -462,7 +462,7 @@ format_proc_uptime (void *, char *&destbuf)
 {
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
   NTSTATUS status;
-  SYSTEM_TIME_OF_DAY_INFORMATION stodi;
+  SYSTEM_TIMEOFDAY_INFORMATION stodi;
   /* Sizeof SYSTEM_PERFORMANCE_INFORMATION on 64 bit systems.  It
      appears to contain some trailing additional information from
      what I can tell after examining the content.
@@ -504,17 +504,18 @@ format_proc_stat (void *, char *&destbuf)
   const size_t sizeof_spi = sizeof (SYSTEM_PERFORMANCE_INFORMATION) + 16;
   PSYSTEM_PERFORMANCE_INFORMATION spi = (PSYSTEM_PERFORMANCE_INFORMATION)
 					alloca (sizeof_spi);
-  SYSTEM_TIME_OF_DAY_INFORMATION stodi;
+  SYSTEM_TIMEOFDAY_INFORMATION stodi;
   tmp_pathbuf tp;
 
   char *buf = tp.c_get ();
   char *eobuf = buf;
 
-  SYSTEM_PROCESSOR_TIMES spt[wincap.cpu_count ()];
-  status = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
+  SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION spt[wincap.cpu_count ()];
+  status = NtQuerySystemInformation (SystemProcessorPerformanceInformation,
+				     (PVOID) spt,
 				     sizeof spt[0] * wincap.cpu_count (), NULL);
   if (!NT_SUCCESS (status))
-    debug_printf ("NtQuerySystemInformation(SystemProcessorTimes), "
+    debug_printf ("NtQuerySystemInformation(SystemProcessorPerformanceInformation), "
 		  "status %y", status);
   else
     {

@@ -177,7 +177,7 @@ dlopen (const char *name, int flags)
 		    {
 		      if (entry->DllBase == ret)
 			{
-			  entry->LoadCount = (WORD) -1;
+			  entry->LoadCount = (USHORT) -1;
 			  break;
 			}
 		    }

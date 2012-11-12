@@ -1,6 +1,6 @@
 /* wow64.cc
 
-   Copyright 2011 Red Hat, Inc.
+   Copyright 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -81,7 +81,7 @@ wow64_test_for_64bit_parent ()
   HANDLE parent;
   PVOID allocbase, stackbase;
 
-  ULONG wow64 = TRUE;   /* Opt on the safe side. */
+  ULONG_PTR wow64 = TRUE;   /* Opt on the safe side. */
 
   /* First check if the current stack is where it belongs.  If so, we don't
      have to do anything special.  This is the case on Vista and later. */
@@ -98,7 +98,7 @@ wow64_test_for_64bit_parent ()
   if (NT_SUCCESS (ret)
       && (parent = OpenProcess (PROCESS_QUERY_INFORMATION,
 				FALSE,
-				pbi.InheritedFromUniqueProcessId)))
+				(DWORD) pbi.InheritedFromUniqueProcessId)))
     {
       NtQueryInformationProcess (parent, ProcessWow64Information,
 				 &wow64, sizeof wow64, NULL);

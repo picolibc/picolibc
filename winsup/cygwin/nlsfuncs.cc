@@ -1196,8 +1196,8 @@ strcoll (const char *s1, const char *s2)
 extern "C" int
 __collate_range_cmp (int c1, int c2)
 {
-  char s1[2] = { c1, '\0' };
-  char s2[2] = { c2, '\0' };
+  char s1[2] = { (char) c1, '\0' };
+  char s2[2] = { (char) c2, '\0' };
   return strcoll (s1, s2);
 }
 

@@ -143,7 +143,7 @@ CreateMapping (HANDLE fhdl, size_t len, off_t off, DWORD openflags,
   HANDLE h;
   NTSTATUS status;
 
-  LARGE_INTEGER sectionsize = { QuadPart: len };
+  LARGE_INTEGER sectionsize = { QuadPart: (LONGLONG) len };
   ULONG protect = gen_create_protect (openflags, flags);
   ULONG attributes = attached (prot) ? SEC_RESERVE : SEC_COMMIT;
 
@@ -967,11 +967,11 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	 WOW64 does not support the AT_ROUND_TO_PAGE flag which is required
 	 to get this right.  Too bad. */
       if (!wincap.is_wow64 ()
-	  && ((len > fsiz && !autogrow (flags))
+	  && (((off_t) len > fsiz && !autogrow (flags))
 	      || roundup2 (len, wincap.page_size ())
 		 < roundup2 (len, pagesize)))
 	orig_len = len;
-      if (len > fsiz)
+      if ((off_t) len > fsiz)
 	{
 	  if (autogrow (flags))
 	    {
@@ -992,7 +992,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 
       /* If the requested offset + len is <= file size, drop MAP_AUTOGROW.
 	 This simplifes fhandler::mmap's job. */
-      if (autogrow (flags) && (off + len) <= fsiz)
+      if (autogrow (flags) && (off + (off_t) len) <= fsiz)
 	flags &= ~MAP_AUTOGROW;
     }
 
@@ -1375,7 +1375,7 @@ mlock (const void *addr, size_t len)
 	     and retry, until either we fail to raise the working set size
 	     further, or until NtLockVirtualMemory returns successfully (or
 	     with another error).  */
-	  ULONG min, max;
+	  SIZE_T min, max;
 	  if (!GetProcessWorkingSetSize (GetCurrentProcess (), &min, &max))
 	    {
 	      set_errno (ENOMEM);

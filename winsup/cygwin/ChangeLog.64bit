@@ -1,3 +1,59 @@
+2012-11-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dlfcn.cc (dlopen): Change cast to accommodate type change in ntdll.h
+	* fhandler_process.cc (thread_info::thread_info): Change type of local
+	variable size to ULONG to match NtQuerySystemInformation call.
+	Add cast to avoid compiler warnings.
+	(get_process_state): Add cast to avoid compiler warnings.  Accommodate
+	name change of NextEntryOffset member of PSYSTEM_PROCESS_INFORMATION
+	structure.
+	* mmap.cc: Add casts to avoid compiler warnings.
+	(mlock): Change type of local variables min and max to match
+	GetProcessWorkingSetSize call.
+	* nlsfuncs.cc (__collate_range_cmp): Add casts to avoid compiler
+	warnings.
+	* ntdll.h: Drop accommodations for Mingw32.  Fix a couple of formatting
+	glitches.  Add a comment to all structures explicitely tested on 64 bit.
+	(SYSTEM_INFORMATION_CLASS): Change SystemProcessesAndThreadsInformation
+	to SystemProcessInformation and SystemProcessorTimes to
+	SystemProcessorPerformanceInformation to match MSDN.
+	(SYSTEM_BASIC_INFORMATION): Fix member types to match 64 bit.
+	(SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION): Rename from
+	SYSTEM_PROCESSOR_TIMES to use official name from MSDN.  Accommodate
+	throughout.  Drop unneeded align attribute.
+	(VM_COUNTERS): Fix member types to match 64 bit.
+	(SYSTEM_PROCESS_INFORMATION): Rename from SYSTEM_PROCESSES to use
+	official name from MSDN.  Fix member types to match 64 bit.  Change
+	member names to match MSDN and Mingw64.  Accommodate throughout.
+	(IO_STATUS_BLOCK): Change to use MSDN definition.
+	(SYSTEM_TIMEOFDAY_INFORMATION): Rename from
+	SYSTEM_TIME_OF_DAY_INFORMATION to use official name from MSDN.
+	Accommodate throughout.  Add Reserved1 area per MSDN.
+	(LDR_DATA_TABLE_ENTRY): Add comment for future reference.  Change
+	type of LoadCount to USHORT.
+	(PEB_LDR_DATA): Change type of Initialized to BOOLEAN.  Add comment for
+	future reference.
+	(PEB): Fix member types to match 64 bit.
+	(GDI_TEB_BATCH): New type.
+	(TEB): Fix member types to match 64 bit.
+	(PROCESS_BASIC_INFORMATION): Ditto.
+	(MEMORY_WORKING_SET_LIST): Ditto.
+	(SharedUserData): Change comment to note the fact that the address
+	is valid on 32 and 64 bit.
+	* pinfo.cc (winpids::enum_processes): Add cast to avoid compiler
+	warnings.
+	* select.cc (pipe_data_available): Add braces in initalization of an
+	IO_STATUS_BLOCK to match new definition.
+	* wincap.h (class wincapc): Change type of wow64 to ULONG_PTR to match
+	MSDN description.
+	(wincapc::is_wow64): Convert return value explicitely to bool.
+	* wow64.cc (wow64_test_for_64bit_parent): Change type of wow64 to
+	ULONG_PTR to match MSDN description.  Add a cast to avoid compiler
+	warning.
+	* regex/engine.c: Avoid compiler warnings about unused and potentially
+	uninitialized variables.
+	* regex/regcomp.c: Ditto.  Drop unnecessary definition of LCID.
+
 2012-11-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pinfo.cc (_pinfo::commune_request): Accommodate the fact that LONG_MAX

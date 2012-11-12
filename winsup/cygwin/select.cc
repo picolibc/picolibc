@@ -522,7 +522,7 @@ no_verify (select_record *, fd_set *, fd_set *, fd_set *)
 static int
 pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 {
-  IO_STATUS_BLOCK iosb = {0};
+  IO_STATUS_BLOCK iosb = {{0}, 0};
   FILE_PIPE_LOCAL_INFORMATION fpli = {0};
 
   bool res;

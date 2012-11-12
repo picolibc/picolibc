@@ -663,15 +663,15 @@ struct thread_info
   {
     NTSTATUS status;
     PVOID buf = NULL;
-    size_t size = 50 * (sizeof (SYSTEM_PROCESSES)
-			+ 16 * sizeof (SYSTEM_THREADS));
-    PSYSTEM_PROCESSES proc;
+    ULONG size = 50 * (sizeof (SYSTEM_PROCESS_INFORMATION)
+		       + 16 * sizeof (SYSTEM_THREADS));
+    PSYSTEM_PROCESS_INFORMATION proc;
     PSYSTEM_THREADS thread;
 
     do
       {
 	buf = realloc (buf, size);
-	status = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+	status = NtQuerySystemInformation (SystemProcessInformation,
 					   buf, size, NULL);
 	size <<= 1;
       }
@@ -683,20 +683,20 @@ struct thread_info
 	debug_printf ("NtQuerySystemInformation, %y", status);
 	return;
       }
-    proc = (PSYSTEM_PROCESSES) buf;
+    proc = (PSYSTEM_PROCESS_INFORMATION) buf;
     while (true)
       {
-	if (proc->ProcessId == pid)
+	if ((DWORD) (uintptr_t) proc->UniqueProcessId == pid)
 	  break;
-	if (!proc->NextEntryDelta)
+	if (!proc->NextEntryOffset)
 	  {
 	    free (buf);
 	    return;
 	  }
-	proc = (PSYSTEM_PROCESSES) ((PBYTE) proc + proc->NextEntryDelta);
+	proc = (PSYSTEM_PROCESS_INFORMATION) ((PBYTE) proc + proc->NextEntryOffset);
       }
     thread = proc->Threads;
-    for (ULONG i = 0; i < proc->ThreadCount; ++i)
+    for (ULONG i = 0; i < proc->NumberOfThreads; ++i)
       {
 	THREAD_BASIC_INFORMATION tbi;
 	TEB teb;
@@ -991,8 +991,8 @@ format_process_stat (void *data, char *&destbuf)
   KERNEL_USER_TIMES put;
   PROCESS_BASIC_INFORMATION pbi;
   QUOTA_LIMITS ql;
-  SYSTEM_TIME_OF_DAY_INFORMATION stodi;
-  SYSTEM_PROCESSOR_TIMES spt;
+  SYSTEM_TIMEOFDAY_INFORMATION stodi;
+  SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION spt;
   hProcess = OpenProcess (PROCESS_VM_READ | PROCESS_QUERY_INFORMATION,
 			  FALSE, p->dwProcessId);
   if (hProcess != NULL)
@@ -1021,8 +1021,8 @@ format_process_stat (void *data, char *&destbuf)
     status = NtQuerySystemInformation (SystemTimeOfDayInformation,
 				       (PVOID) &stodi, sizeof stodi, NULL);
   if (NT_SUCCESS (status))
-    status = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) &spt,
-				       sizeof spt, NULL);
+    status = NtQuerySystemInformation (SystemProcessorPerformanceInformation,
+				       (PVOID) &spt, sizeof spt, NULL);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
@@ -1280,21 +1280,21 @@ get_process_state (DWORD dwProcessId)
   /* This isn't really heavy magic - just go through the processes' threads
      one by one and return a value accordingly.  Errors are silently ignored. */
   NTSTATUS status;
-  PSYSTEM_PROCESSES p, sp;
+  PSYSTEM_PROCESS_INFORMATION p, sp;
   ULONG n = 0x4000;
   int state =' ';
 
-  p = (PSYSTEM_PROCESSES) malloc (n);
+  p = (PSYSTEM_PROCESS_INFORMATION) malloc (n);
   if (!p)
     return state;
   while (true)
     {
-      status = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+      status = NtQuerySystemInformation (SystemProcessInformation,
 					 (PVOID) p, n, NULL);
       if (status != STATUS_INFO_LENGTH_MISMATCH)
 	break;
       n <<= 1;
-      PSYSTEM_PROCESSES new_p = (PSYSTEM_PROCESSES) realloc (p, n);
+      PSYSTEM_PROCESS_INFORMATION new_p = (PSYSTEM_PROCESS_INFORMATION) realloc (p, n);
       if (!new_p)
       	goto out;
       p = new_p;
@@ -1309,12 +1309,12 @@ get_process_state (DWORD dwProcessId)
   sp = p;
   for (;;)
     {
-      if (sp->ProcessId == dwProcessId)
+      if ((DWORD) (uintptr_t) sp->UniqueProcessId == dwProcessId)
 	{
 	  SYSTEM_THREADS *st;
 	  st = &sp->Threads[0];
 	  state = 'S';
-	  for (unsigned i = 0; i < sp->ThreadCount; i++)
+	  for (unsigned i = 0; i < sp->NumberOfThreads; i++)
 	    {
 	      /* FIXME: at some point we should consider generating 'O' */
 	      if (st->State == StateRunning ||
@@ -1327,9 +1327,9 @@ get_process_state (DWORD dwProcessId)
 	    }
 	  break;
 	}
-      if (!sp->NextEntryDelta)
+      if (!sp->NextEntryOffset)
 	 break;
-      sp = (PSYSTEM_PROCESSES) ((char *) sp + sp->NextEntryDelta);
+      sp = (PSYSTEM_PROCESS_INFORMATION) ((char *) sp + sp->NextEntryOffset);
     }
 out:
   free (p);
