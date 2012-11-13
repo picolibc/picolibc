@@ -1,3 +1,10 @@
+2012-11-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (class fcwd_access_t): Remove wrong alignment attribute from
+	Buffer member of FAST_CWD_OLD structure.  Add comment that everything
+	has been tested.
+	* ntdll.h: Mark more native structures as tested on 64 bit.
+
 2012-11-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (class fcwd_access_t): Add alignment attribute to Buffer

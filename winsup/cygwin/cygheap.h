@@ -217,9 +217,10 @@ enum fcwd_version_t {
    minimal locking and it's much more multi-thread friendly.  Presumably
    it minimizes contention when accessing the CWD.
    The class fcwd_access_t is supposed to encapsulate the gory implementation
-   details depending on OS version from the calling functions. */
+   details depending on OS version from the calling functions.
+   The layout of all structures has been tested on 32 and 64 bit. */
 class fcwd_access_t {
-  /* This is the layout used in Windows 8 developer preview. */
+  /* This is the layout used in Windows 8. */
   struct FAST_CWD_8 {
     LONG           ReferenceCount;	/* Only release when this is 0. */
     HANDLE         DirectoryHandle;
@@ -250,7 +251,7 @@ class fcwd_access_t {
 					   at the time the CWD has been set. */
     UNICODE_STRING Path;		/* Path's Buffer member always refers
 					   to the following Buffer array. */
-    WCHAR          Buffer[MAX_PATH] __attribute ((aligned (8)));
+    WCHAR          Buffer[MAX_PATH];
   };
   union {
     FAST_CWD_OLD fold;

@@ -182,6 +182,7 @@ typedef enum _FILE_INFORMATION_CLASS
   FileMaximumInformation
 } FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
 
+/* Checked on 64 bit. */
 typedef struct _FILE_NAMES_INFORMATION
 {
   ULONG  NextEntryOffset;
@@ -190,6 +191,7 @@ typedef struct _FILE_NAMES_INFORMATION
   WCHAR  FileName[1];
 } FILE_NAMES_INFORMATION, *PFILE_NAMES_INFORMATION;
 
+/* Checked on 64 bit. */
 typedef struct _FILE_DIRECTORY_INFORMATION
 {
   ULONG  NextEntryOffset;
@@ -205,6 +207,7 @@ typedef struct _FILE_DIRECTORY_INFORMATION
   WCHAR  FileName[1];
 } FILE_DIRECTORY_INFORMATION, *PFILE_DIRECTORY_INFORMATION;
 
+/* Checked on 64 bit. */
 typedef struct _FILE_BOTH_DIRECTORY_INFORMATION
 {
   ULONG  NextEntryOffset;
@@ -223,6 +226,7 @@ typedef struct _FILE_BOTH_DIRECTORY_INFORMATION
   WCHAR  FileName[1];
 } FILE_BOTH_DIRECTORY_INFORMATION, *PFILE_BOTH_DIRECTORY_INFORMATION;
 
+/* Checked on 64 bit. */
 typedef struct _FILE_ID_BOTH_DIR_INFORMATION
 {
   ULONG  NextEntryOffset;
@@ -782,12 +786,14 @@ typedef enum _MEMORY_INFORMATION_CLASS
   MemoryBasicVlmInformation
 } MEMORY_INFORMATION_CLASS;
 
+/* Checked on 64 bit. */
 typedef struct _MEMORY_WORKING_SET_LIST
 {
   ULONG NumberOfPages;
   ULONG_PTR WorkingSetList[1];
 } MEMORY_WORKING_SET_LIST, *PMEMORY_WORKING_SET_LIST;
 
+/* Checked on 64 bit. */
 typedef struct _MEMORY_SECTION_NAME
 {
   UNICODE_STRING SectionFileName;
