@@ -1,3 +1,7 @@
+2012-11-14  Tristan Gingold  <gingold@adacore.com>
+
+	* arm.h: New file.
+
 2012-02-23  Iain Sandoe  <idsandoe@googlemail.com>
 
 	* external.h: Add comments about relocations fields.  Add macros
