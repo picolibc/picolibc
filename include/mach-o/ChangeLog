@@ -1,5 +1,19 @@
 2012-11-14  Tristan Gingold  <gingold@adacore.com>
 
+	* external.h (mach_o_entry_point_command_external)
+	(mach_o_source_version_command_external)
+	(mach_o_data_in_code_entry_external): New structures.
+
+	* loader.h (bfd_mach_o_load_command_type): Add
+	BFD_MACH_O_LC_MAIN, BFD_MACH_O_LC_DATA_IN_CODE,
+	BFD_MACH_O_LC_SOURCE_VERSION and	BFD_MACH_O_LC_DYLIB_CODE_SIGN_DRS.
+	(BFD_MACH_O_REFERENCE_MASK): Adjust value.
+	(BFD_MACH_O_N_REF_TO_WEAK): New definition.
+	(BFD_MACH_O_N_ARM_THUMB_DEF, BFD_MACH_O_N_SYMBOL_RESOLVER): Likewise.
+	(bfd_mach_o_data_in_code_entry_kind): New enum.
+
+2012-11-14  Tristan Gingold  <gingold@adacore.com>
+
 	* arm.h: New file.
 
 2012-02-23  Iain Sandoe  <idsandoe@googlemail.com>

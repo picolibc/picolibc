@@ -146,9 +146,9 @@ typedef enum bfd_mach_o_load_command_type
   /* Load a dynamically linked shared library that is allowed to be
        missing (weak).  */
   BFD_MACH_O_LC_LOAD_WEAK_DYLIB = 0x18,
-  BFD_MACH_O_LC_SEGMENT_64 = 0x19,	/* 64-bit segment of this file to be 
+  BFD_MACH_O_LC_SEGMENT_64 = 0x19,	/* 64-bit segment of this file to be
                                            mapped.  */
-  BFD_MACH_O_LC_ROUTINES_64 = 0x1a,     /* Address of the dyld init routine 
+  BFD_MACH_O_LC_ROUTINES_64 = 0x1a,     /* Address of the dyld init routine
                                            in a dylib.  */
   BFD_MACH_O_LC_UUID = 0x1b,            /* 128-bit UUID of the executable.  */
   BFD_MACH_O_LC_RPATH = 0x1c,		/* Run path addiions.  */
@@ -162,7 +162,11 @@ typedef enum bfd_mach_o_load_command_type
   BFD_MACH_O_LC_VERSION_MIN_MACOSX = 0x24,   /* Minimal MacOSX version.  */
   BFD_MACH_O_LC_VERSION_MIN_IPHONEOS = 0x25, /* Minimal IOS version.  */
   BFD_MACH_O_LC_FUNCTION_STARTS = 0x26,  /* Compressed table of func start.  */
-  BFD_MACH_O_LC_DYLD_ENVIRONMENT = 0x27  /* Env variable string for dyld.  */
+  BFD_MACH_O_LC_DYLD_ENVIRONMENT = 0x27, /* Env variable string for dyld.  */
+  BFD_MACH_O_LC_MAIN = 0x28,             /* Entry point.  */
+  BFD_MACH_O_LC_DATA_IN_CODE = 0x29,     /* Table of non-instructions.  */
+  BFD_MACH_O_LC_SOURCE_VERSION = 0x2a,   /* Source version.  */
+  BFD_MACH_O_LC_DYLIB_CODE_SIGN_DRS = 0x2b /* DRs from dylibs.  */
 }
 bfd_mach_o_load_command_type;
 
@@ -250,7 +254,7 @@ bfd_mach_o_section_type;
 #define BFD_MACH_O_SECTION_ATTRIBUTES_MASK  0xffffff00
 /* System setable attributes.  */
 #define BFD_MACH_O_SECTION_ATTRIBUTES_SYS   0x00ffff00
-/* User attributes.  */   
+/* User attributes.  */
 #define BFD_MACH_O_SECTION_ATTRIBUTES_USR   0xff000000
 
 typedef enum bfd_mach_o_section_attribute
@@ -261,7 +265,7 @@ typedef enum bfd_mach_o_section_attribute
   /* Section has local relocation entries.  */
   BFD_MACH_O_S_ATTR_LOC_RELOC         = 0x00000100,
 
-  /* Section has external relocation entries.  */  
+  /* Section has external relocation entries.  */
   BFD_MACH_O_S_ATTR_EXT_RELOC         = 0x00000200,
 
   /* Section contains some machine instructions.  */
@@ -272,7 +276,7 @@ typedef enum bfd_mach_o_section_attribute
 
   /* Used with i386 stubs.  */
   BFD_MACH_O_S_SELF_MODIFYING_CODE    = 0x04000000,
-  
+
   /* Blocks are live if they reference live blocks.  */
   BFD_MACH_O_S_ATTR_LIVE_SUPPORT      = 0x08000000,
 
@@ -307,7 +311,7 @@ bfd_mach_o_section_attribute;
 #define BFD_MACH_O_NO_SECT 0	/* Symbol not in any section of the image.  */
 
 /* Symbol n_desc reference flags.  */
-#define BFD_MACH_O_REFERENCE_MASK 				0x0f
+#define BFD_MACH_O_REFERENCE_MASK 				0x07
 #define BFD_MACH_O_REFERENCE_FLAG_UNDEFINED_NON_LAZY		0x00
 #define BFD_MACH_O_REFERENCE_FLAG_UNDEFINED_LAZY		0x01
 #define BFD_MACH_O_REFERENCE_FLAG_DEFINED			0x02
@@ -320,10 +324,24 @@ bfd_mach_o_section_attribute;
 #define BFD_MACH_O_N_NO_DEAD_STRIP				0x20
 #define BFD_MACH_O_N_WEAK_REF					0x40
 #define BFD_MACH_O_N_WEAK_DEF					0x80
+#define BFD_MACH_O_N_REF_TO_WEAK				0x80
+
+#define BFD_MACH_O_N_ARM_THUMB_DEF				0x08
+#define BFD_MACH_O_N_SYMBOL_RESOLVER				0x100
 
 #define BFD_MACH_O_INDIRECT_SYM_LOCAL			0x80000000
 #define BFD_MACH_O_INDIRECT_SYM_ABS			0x40000000
 
+/* Constants for DATA_IN_CODE entries.  */
+typedef enum bfd_mach_o_data_in_code_entry_kind
+{
+  BFD_MACH_O_DICE_KIND_DATA         = 0x0001, /* Data */
+  BFD_MACH_O_DICE_JUMP_TABLES8      = 0x0002, /* 1 byte jump tables.  */
+  BFD_MACH_O_DICE_JUMP_TABLES16     = 0x0003, /* 2 bytes.  */
+  BFD_MACH_O_DICE_JUMP_TABLES32     = 0x0004, /* 4 bytes.  */
+  BFD_MACH_O_DICE_ABS_JUMP_TABLES32 = 0x0005  /* Absolute jump table.  */
+} bfd_mach_o_data_in_code_entry_kind;
+
 /* Thread constants.  */
 
 typedef enum bfd_mach_o_ppc_thread_flavour
