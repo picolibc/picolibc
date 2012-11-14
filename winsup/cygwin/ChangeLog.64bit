@@ -1,3 +1,12 @@
+2012-11-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h: Mark more native structures as tested on 64 bit.
+	(struct _FILE_BOTH_DIR_INFORMATION): Rename from
+	_FILE_BOTH_DIRECTORY_INFORMATION as per WDK documentation.
+	* fhandler_disk_file.cc: Accommodate aforementioned structure name
+	change.
+	* path.cc: Ditto.
+
 2012-11-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (class fcwd_access_t): Remove wrong alignment attribute from

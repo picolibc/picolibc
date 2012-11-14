@@ -256,7 +256,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 
   unsigned count = 0;
   bool first = true;
-  PFILE_BOTH_DIRECTORY_INFORMATION fdibuf = (PFILE_BOTH_DIRECTORY_INFORMATION)
+  PFILE_BOTH_DIR_INFORMATION fdibuf = (PFILE_BOTH_DIR_INFORMATION)
 				       alloca (65536);
   __DIR_mounts *dir = new __DIR_mounts (normalized_path);
   while (NT_SUCCESS (NtQueryDirectoryFile (fh, NULL, NULL, NULL, &io, fdibuf,
@@ -272,9 +272,9 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 	  if (fdibuf->FileNameLength != 2 || fdibuf->FileName[0] != L'.')
 	    count = 2;
 	}
-      for (PFILE_BOTH_DIRECTORY_INFORMATION pfdi = fdibuf;
+      for (PFILE_BOTH_DIR_INFORMATION pfdi = fdibuf;
 	   pfdi;
-	   pfdi = (PFILE_BOTH_DIRECTORY_INFORMATION)
+	   pfdi = (PFILE_BOTH_DIR_INFORMATION)
 		  (pfdi->NextEntryOffset ? (PBYTE) pfdi + pfdi->NextEntryOffset
 					 : NULL))
 	{
@@ -2216,11 +2216,11 @@ go_ahead:
 	}
       else
 	{
-	  FileName = ((PFILE_BOTH_DIRECTORY_INFORMATION) buf)->FileName;
+	  FileName = ((PFILE_BOTH_DIR_INFORMATION) buf)->FileName;
 	  FileNameLength =
-		((PFILE_BOTH_DIRECTORY_INFORMATION) buf)->FileNameLength;
+		((PFILE_BOTH_DIR_INFORMATION) buf)->FileNameLength;
 	  FileAttributes =
-		((PFILE_BOTH_DIRECTORY_INFORMATION) buf)->FileAttributes;
+		((PFILE_BOTH_DIR_INFORMATION) buf)->FileAttributes;
 	}
       RtlInitCountedUnicodeString (&fname, FileName, FileNameLength);
       de->d_ino = d_mounts (dir)->check_mount (&fname, de->d_ino);

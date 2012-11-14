@@ -528,7 +528,7 @@ getfileattr (const char *path, bool caseinsensitive) /* path has to be always ab
 	 directory query. */
       UNICODE_STRING dirname, basename;
       HANDLE dir;
-      FILE_BOTH_DIRECTORY_INFORMATION fdi;
+      FILE_BOTH_DIR_INFORMATION fdi;
 
       RtlSplitUnicodePath (&upath, &dirname, &basename);
       InitializeObjectAttributes (&attr, &dirname,
@@ -2538,7 +2538,7 @@ restart:
 	      OBJECT_ATTRIBUTES dattr;
 	      HANDLE dir;
 	      struct {
-		FILE_BOTH_DIRECTORY_INFORMATION fdi;
+		FILE_BOTH_DIR_INFORMATION fdi;
 		WCHAR dummy_buf[NAME_MAX + 1];
 	      } fdi_buf;
 
