@@ -160,6 +160,7 @@ target_libraries="target-libgcc \
 		target-libitm \
 		target-libstdc++-v3 \
 		target-libmudflap \
+		target-libsanitizer \
 		target-libssp \
 		target-libquadmath \
 		target-libgfortran \
@@ -537,8 +538,27 @@ if test -d ${srcdir}/libitm; then
     fi
 fi
 
+# Disable libsanitizer on unsupported systems.
+if test -d ${srcdir}/libsanitizer; then
+    if test x$enable_libsanitizer = x; then
+	AC_MSG_CHECKING([for libsanitizer support])
+	if (srcdir=${srcdir}/libsanitizer; \
+		. ${srcdir}/configure.tgt; \
+		test -n "$UNSUPPORTED")
+	then
+	    AC_MSG_RESULT([no])
+	    noconfigdirs="$noconfigdirs target-libsanitizer"
+	else
+	    AC_MSG_RESULT([yes])
+	fi
+    fi
+fi
+
 # Disable libquadmath for some systems.
 case "${target}" in
+  avr-*-*)
+    noconfigdirs="$noconfigdirs target-libquadmath"
+    ;;
   # libquadmath is unused on AIX and libquadmath build process use of
   # LD_LIBRARY_PATH can break AIX bootstrap.
   powerpc-*-aix* | rs6000-*-aix*)
@@ -560,13 +580,6 @@ case "${target}" in
     # doesn't fault for those - instead, it gives a build-time error
     # for explicit misaligned loads.
     noconfigdirs="$noconfigdirs target-libssp"
-    ;;
-esac
-
-# Disable libquadmath for some systems.
-case "${target}" in
-  avr-*-*)
-    noconfigdirs="$noconfigdirs target-libquadmath"
     ;;
 esac
 
