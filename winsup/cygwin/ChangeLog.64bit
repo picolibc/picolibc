@@ -1,3 +1,13 @@
+2012-11-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (format_process_stat): Add comment to explain
+	the WOW64 problems concerning the BasePriority value.  Fix format
+	string in __small_sprintf call.
+	* ntdll.h: Mark more native structures as tested on 64 bit.
+	(enum _EVENT_TYPE): Drop definition.
+	(enum _TIMER_TYPE): Ditto.
+	(enum _SECTION_INHERIT): Drop __MINGW64_VERSION_MAJOR guard.
+
 2012-11-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h: Mark more native structures as tested on 64 bit.

@@ -1044,7 +1044,13 @@ format_process_stat (void *data, char *&destbuf)
       */
      start_time = (spt.KernelTme.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
 #endif
-  priority = pbi.BasePriority;
+  /* The BasePriority returned to a 32 bit process under WOW64 is
+     apparently broken, for 32 and 64 bit target processes.  64 bit
+     processes get the correct base priority, even for 32 bit processes. */
+  if (wincap.is_wow64 ())
+    priority = 8; /* Default value. */
+  else
+    priority = pbi.BasePriority;
   unsigned page_size = wincap.page_size ();
   vmsize = vmc.PagefileUsage;
   vmrss = vmc.WorkingSetSize / page_size;
@@ -1053,15 +1059,13 @@ format_process_stat (void *data, char *&destbuf)
   destbuf = (char *) crealloc_abort (destbuf, strlen (cmd) + 320);
   return __small_sprintf (destbuf, "%d (%s) %c "
 				   "%d %d %d %d %d "
-				   "%lu %lu %lu %lu %lu %lu %lu "
-				   "%ld %ld %ld %ld %ld %ld "
+				   "%u %lu %lu %u %u %lu %lu "
+				   "%ld %ld %d %d %d %d "
 				   "%lu %lu "
-				   "%ld "
-				   "%lu",
-			  p->pid, cmd,
-			  state,
-			  p->ppid, p->pgid, p->sid, p->ctty,
-			  -1, 0, fault_count, fault_count, 0, 0, utime, stime,
+				   "%ld %lu",
+			  p->pid, cmd, state,
+			  p->ppid, p->pgid, p->sid, p->ctty, -1,
+			  0, fault_count, fault_count, 0, 0, utime, stime,
 			  utime, stime, priority, 0, 0, 0,
 			  start_time, vmsize,
 			  vmrss, vmmaxrss
