@@ -1,6 +1,6 @@
 /* mntent.h
 
-   Copyright 1996, 1998, 1999, 2000, 2001, 2006, 2009, 2010 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2006, 2009, 2010, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,8 +14,6 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <paths.h>
 
 struct mntent
 {
@@ -35,6 +33,12 @@ struct mntent *getmntent_r (FILE *, struct mntent *, char *, int);
 int endmntent (FILE *__filep);
 #endif
 
+#ifdef __CYGWIN__
+/* Only include paths.h if building for Cygwin.  This avoids including
+   newlib headers when building the native tools in winsup/utils. */
+
+#include <paths.h>
+
 /* The following two defines are deprecated.  Use the equivalent
    names from paths.h instead. */
 #ifndef MNTTAB
@@ -47,6 +51,8 @@ int endmntent (FILE *__filep);
 #ifndef MOUNTED
 #define MOUNTED _PATH_MOUNTED
 #endif
+
+#endif /* __CYGWIN__ */
 
 #ifdef __cplusplus
 };

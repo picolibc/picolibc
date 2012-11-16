@@ -1,3 +1,8 @@
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/mntent.h: Only include paths.h when building for Cygwin.
+	Add comment to explain why.
+
 2012-11-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winbase.h: Semi-reinstantiate to workaround lack inline assembler
