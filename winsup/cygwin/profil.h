@@ -1,12 +1,14 @@
 /* profil.h: gprof profiling header file
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
+
+#include <stdint.h>
 
 /* profiling frequency.  (No larger than 1000) */
 #define PROF_HZ			100
@@ -34,11 +36,11 @@ typedef void *_WINHANDLE;
 struct profinfo {
     _WINHANDLE targthr;			/* thread to profile */
     _WINHANDLE profthr;			/* profiling thread */
-    u_short *counter;			/* profiling counters */
-    u_long lowpc, highpc;		/* range to be profiled */
-    u_int scale;			/* scale value of bins */
+    uint16_t *counter;			/* profiling counters */
+    uintptr_t lowpc, highpc;		/* range to be profiled */
+    unsigned int scale;			/* scale value of bins */
 };
 
-int profile_ctl(struct profinfo *, char *, size_t, u_long, u_int);
-int profil(char *, size_t, u_long, u_int);
+int profile_ctl (struct profinfo *, char *, size_t, size_t, unsigned int);
+int profil (char *, size_t, size_t, unsigned int);
 

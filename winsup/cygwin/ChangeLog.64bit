@@ -1,5 +1,16 @@
 2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.h (CYGTLS_PADSIZE): Define for 64 bit.  Add FIXME comment.
+	* profil.c: Replace usage of network types with types as documented
+	in Linux, throughout.
+	(get_thrpc): Fix access to instruction pointer for x86_64.
+	* profil.h: Include stdin.t.h.  Replace usage of network types with
+	types as documented in Linux, throughout.
+	* config/x86_64/profile.h (mcount): Use unsigned long rather than
+	__uintptr_t.
+
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygmalloc.h (dlmalloc): Change unsigned in declaration to size_t.
 	(dlrealloc): Ditto.
 	* wait.cc (wait4): Cast second parameter in proc_subproc call to

@@ -50,7 +50,7 @@
 void									\
 mcount()								\
 {									\
-	__uintptr_t selfpc, frompcindex;					\
+	unsigned long selfpc, frompcindex;				\
 	/*								\
 	 * Save ABI registers						\
 	 */								\
@@ -65,12 +65,12 @@ mcount()								\
 	 * selfpc = pc pushed by mcount call				\
 	 */								\
 	/* __asm  ("movl 4(%%ebp),%0" : "=r" (selfpc));	*/		\
-	selfpc = (__uintptr_t) __builtin_return_address (0);		\
+	selfpc = (unsigned long) __builtin_return_address (0);		\
 	/*								\
 	 * frompcindex = pc pushed by call into self.			\
 	 */								\
 	/*  __asm ("movl (%%ebp),%0;movl 4(%0),%0" : "=r" (frompcindex)); */  \
-	frompcindex = (__uintptr_t) __builtin_return_address (1);	\
+	frompcindex = (unsigned long) __builtin_return_address (1);	\
 	_mcount(frompcindex, selfpc);					\
 	/*								\
 	 * Restore registers.						\

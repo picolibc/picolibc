@@ -1,6 +1,6 @@
 /* profil.c -- win32 profil.c equivalent
 
-   Copyright 1998, 1999, 2000, 2001, 2003, 2009 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2003, 2009, 2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -21,20 +21,24 @@ static struct profinfo prof;
 
 /* Get the pc for thread THR */
 
-static u_long
+static uintptr_t
 get_thrpc (HANDLE thr)
 {
   CONTEXT ctx;
-  u_long pc;
+  uintptr_t pc;
   int res;
 
   res = SuspendThread (thr);
   if (res == -1)
-    return (u_long) - 1;
+    return (uintptr_t) -1;
   ctx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-  pc = (u_long) - 1;
+  pc = (uintptr_t) -1;
   if (GetThreadContext (thr, &ctx))
+#ifdef __x86_64__
+    pc = ctx.Rip;
+#else
     pc = ctx.Eip;
+#endif
   ResumeThread (thr);
   return pc;
 }
@@ -58,13 +62,14 @@ static DWORD CALLBACK
 profthr_func (LPVOID arg)
 {
   struct profinfo *p = (struct profinfo *) arg;
-  u_long pc, idx;
+  uintptr_t pc;
+  size_t idx;
 
   SetThreadPriority(p->profthr, THREAD_PRIORITY_TIME_CRITICAL);
 
   for (;;)
     {
-      pc = (u_long) get_thrpc (p->targthr);
+      pc = (uintptr_t) get_thrpc (p->targthr);
       if (pc >= p->lowpc && pc < p->highpc)
 	{
 	  idx = PROFIDX (pc, p->lowpc, p->scale);
@@ -134,9 +139,9 @@ profile_on (struct profinfo *p)
  */
 int
 profile_ctl (struct profinfo * p, char *samples, size_t size,
-	     u_long offset, u_int scale)
+	     size_t offset, unsigned int scale)
 {
-  u_long maxbin;
+  size_t maxbin;
 
   if (scale > 65536)
     {
@@ -150,7 +155,7 @@ profile_ctl (struct profinfo * p, char *samples, size_t size,
       memset (samples, 0, size);
       memset (p, 0, sizeof *p);
       maxbin = size >> 1;
-      prof.counter = (u_short *) samples;
+      prof.counter = (uint16_t *) samples;
       prof.lowpc = offset;
       prof.highpc = PROFADDR (maxbin, offset, scale);
       prof.scale = scale;
@@ -166,8 +171,7 @@ profile_ctl (struct profinfo * p, char *samples, size_t size,
    The word pointed to by this address is incremented.  Buf is unused. */
 
 int
-profil (char *samples, size_t size, u_long offset, u_int scale)
+profil (char *samples, size_t size, size_t offset, unsigned int scale)
 {
   return profile_ctl (&prof, samples, size, offset, scale);
 }
-
