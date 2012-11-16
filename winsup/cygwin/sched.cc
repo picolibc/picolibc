@@ -1,6 +1,6 @@
 /* sched.cc: scheduler interface for Cygwin
 
-   Copyright 2001, 2003, 2006, 2008, 2011 Red Hat, Inc.
+   Copyright 2001, 2003, 2006, 2008, 2011, 2012 Red Hat, Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -321,7 +321,6 @@ sched_setparam (pid_t pid, const struct sched_param *param)
   pid_t localpid;
   int winpri;
   DWORD Class;
-  int ThreadPriority;
   HANDLE process;
 
   if (!param || pid < 0)
@@ -347,70 +346,6 @@ sched_setparam (pid_t pid, const struct sched_param *param)
     Class = HIGH_PRIORITY_CLASS;
   else
     Class = NORMAL_PRIORITY_CLASS;
-
-  switch (Class)
-    {
-    case IDLE_PRIORITY_CLASS:
-      switch (winpri)
-	{
-	case 1:
-	  ThreadPriority = THREAD_PRIORITY_IDLE;
-	  break;
-	case 2:
-	  ThreadPriority = THREAD_PRIORITY_LOWEST;
-	  break;
-	case 3:
-	  ThreadPriority = THREAD_PRIORITY_BELOW_NORMAL;
-	  break;
-	case 4:
-	  ThreadPriority = THREAD_PRIORITY_NORMAL;
-	  break;
-	case 5:
-	  ThreadPriority = THREAD_PRIORITY_ABOVE_NORMAL;
-	  break;
-	case 6:
-	  ThreadPriority = THREAD_PRIORITY_HIGHEST;
-	  break;
-	}
-      break;
-    case NORMAL_PRIORITY_CLASS:
-      switch (winpri)
-	{
-	case 7:
-	  ThreadPriority = THREAD_PRIORITY_LOWEST;
-	  break;
-	case 8:
-	  ThreadPriority = THREAD_PRIORITY_BELOW_NORMAL;
-	  break;
-	case 9:
-	  ThreadPriority = THREAD_PRIORITY_NORMAL;
-	  break;
-	case 10:
-	  ThreadPriority = THREAD_PRIORITY_ABOVE_NORMAL;
-	  break;
-	case 11:
-	  ThreadPriority = THREAD_PRIORITY_HIGHEST;
-	  break;
-	}
-      break;
-    case HIGH_PRIORITY_CLASS:
-      switch (winpri)
-	{
-	case 12:
-	  ThreadPriority = THREAD_PRIORITY_BELOW_NORMAL;
-	  break;
-	case 13:
-	  ThreadPriority = THREAD_PRIORITY_NORMAL;
-	  break;
-	case 14:
-	  ThreadPriority = THREAD_PRIORITY_ABOVE_NORMAL;
-	  break;
-	case 15:
-	  ThreadPriority = THREAD_PRIORITY_HIGHEST;
-	  break;
-	}
-      break;
-    }
 
   localpid = pid ? pid : getpid ();
 

@@ -871,7 +871,7 @@ fhandler_socket::fchown (uid_t uid, gid_t gid)
 }
 
 int
-fhandler_socket::facl (int cmd, int nentries, __aclent32_t *aclbufp)
+fhandler_socket::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
   if (get_device () == FH_UNIX)
     {

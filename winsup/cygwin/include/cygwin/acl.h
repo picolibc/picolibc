@@ -66,19 +66,13 @@ typedef struct __acl16 {
     mode_t       a_perm;
 } __aclent16_t;
 #endif
+#endif
 
-typedef struct __acl32 {
-    int          a_type;
-    uid_t        a_id;
-    mode_t       a_perm;
-} __aclent32_t;
-#else
 typedef struct acl {
     int          a_type;    /* entry type */
     uid_t        a_id;      /* UID | GID  */
     mode_t       a_perm;    /* permissions */
 } aclent_t;
-#endif
 
 #ifndef __INSIDE_CYGWIN__
 int _EXFUN(acl,(const char *path, int cmd, int nentries, aclent_t *aclbufp));

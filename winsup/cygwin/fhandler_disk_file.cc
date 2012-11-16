@@ -976,7 +976,7 @@ fhandler_disk_file::fchown (uid_t uid, gid_t gid)
 }
 
 int _stdcall
-fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
+fhandler_disk_file::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
   int res = -1;
   int oret = 0;

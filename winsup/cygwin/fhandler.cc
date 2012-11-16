@@ -1683,7 +1683,7 @@ fhandler_base::fchown (uid_t uid, gid_t gid)
 }
 
 int
-fhandler_base::facl (int cmd, int nentries, __aclent32_t *aclbufp)
+fhandler_base::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
   int res = -1;
   switch (cmd)

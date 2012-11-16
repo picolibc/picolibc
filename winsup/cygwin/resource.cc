@@ -136,9 +136,9 @@ getrlimit (int resource, struct rlimit *rlp)
 	debug_printf ("couldn't get stack info, returning def.values. %E");
       else
 	{
-	  rlp->rlim_cur = (DWORD) &m - (DWORD) m.AllocationBase;
-	  rlp->rlim_max = (DWORD) m.BaseAddress + m.RegionSize
-			  - (DWORD) m.AllocationBase;
+	  rlp->rlim_cur = (rlim_t) &m - (rlim_t) m.AllocationBase;
+	  rlp->rlim_max = (rlim_t) m.BaseAddress + m.RegionSize
+			  - (rlim_t) m.AllocationBase;
 	}
       break;
     case RLIMIT_NOFILE:

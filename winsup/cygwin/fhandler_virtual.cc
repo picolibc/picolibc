@@ -253,7 +253,7 @@ fhandler_virtual::fchown (uid_t uid, gid_t gid)
 }
 
 int
-fhandler_virtual::facl (int cmd, int nentries, __aclent32_t *aclbufp)
+fhandler_virtual::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
   int res = fhandler_base::facl (cmd, nentries, aclbufp);
   if (res >= 0 && cmd == GETACL)

@@ -1,5 +1,25 @@
 2012-11-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/acl.h (struct __acl32): Drop.  Use struct acl or
+	aclent_t throughout instead.
+	* sec_acl.cc (aclcheck32): Mark currently unused variables as unused.
+	(lacl32): Disable on x86_64.
+	(acl): Alias to acl32 on x86_64.
+	(facl): Alias to facl32 on x86_64.
+	(aclcheck): Alias to aclcheck32 on x86_64.
+	(aclsort): Alias to aclsort32 on x86_64.
+	(acltomode): Alias to acltomode32 on x86_64.
+	(aclfrommode): Alias to aclfrommode32 on x86_64.
+	(acltopbits): Alias to acltopbits32 on x86_64.
+	(aclfrompbits): Alias to aclfrompbits32 on x86_64.
+	(acltotext): Alias to acltotext32 on x86_64.
+	(aclfromtext): Alias to aclfromtext32 on x86_64.
+	* resource.cc (getrlimit): Use correct cast to rlim_t rather than DWORD.
+	* sched.cc (sched_setparam): Drop ThreadPriority and all code setting
+	it.
+
+2012-11-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_process.cc (format_process_stat): Add comment to explain
 	the WOW64 problems concerning the BasePriority value.  Fix format
 	string in __small_sprintf call.

@@ -409,11 +409,11 @@ void set_security_attribute (path_conv &pc, int attribute,
 bool get_sids_info (cygpsid, cygpsid, uid_t * , gid_t *);
 
 /* sec_acl.cc */
-struct __acl32;
-extern "C" int aclsort32 (int, int, __acl32 *);
-extern "C" int acl32 (const char *, int, int, __acl32 *);
-int getacl (HANDLE, path_conv &, int, __acl32 *);
-int setacl (HANDLE, path_conv &, int, __acl32 *, bool &);
+struct acl;
+extern "C" int aclsort32 (int, int, struct acl *);
+extern "C" int acl32 (const char *, int, int, struct acl *);
+int getacl (HANDLE, path_conv &, int, struct acl *);
+int setacl (HANDLE, path_conv &, int, struct acl *, bool &);
 
 /* Set impersonation or restricted token.  */
 void set_imp_token (HANDLE token, int type);

@@ -55,7 +55,7 @@ class inode_t;
 typedef struct __DIR DIR;
 struct dirent;
 struct iovec;
-struct __acl32;
+struct acl;
 
 enum dirent_states
 {
@@ -342,7 +342,7 @@ public:
   int utimens_fs (const struct timespec *) __attribute__ ((regparm (2)));
   virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   virtual int __stdcall fchown (uid_t uid, gid_t gid) __attribute__ ((regparm (2)));
-  virtual int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
+  virtual int __stdcall facl (int, int, struct acl *) __attribute__ ((regparm (3)));
   virtual ssize_t __stdcall fgetxattr (const char *, void *, size_t) __attribute__ ((regparm (3)));
   virtual int __stdcall fsetxattr (const char *, const void *, size_t, int) __attribute__ ((regparm (3)));
   virtual int __stdcall fadvise (off_t, off_t, int) __attribute__ ((regparm (3)));
@@ -606,7 +606,7 @@ class fhandler_socket: public fhandler_base
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (uid_t uid, gid_t gid) __attribute__ ((regparm (2)));
-  int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
+  int __stdcall facl (int, int, struct acl *) __attribute__ ((regparm (3)));
   int __stdcall link (const char *) __attribute__ ((regparm (2)));
 
   fhandler_socket (void *) {}
@@ -981,7 +981,7 @@ class fhandler_disk_file: public fhandler_base
   int __stdcall fstat (struct stat *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (uid_t uid, gid_t gid) __attribute__ ((regparm (2)));
-  int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
+  int __stdcall facl (int, int, struct acl *) __attribute__ ((regparm (3)));
   ssize_t __stdcall fgetxattr (const char *, void *, size_t) __attribute__ ((regparm (3)));
   int __stdcall fsetxattr (const char *, const void *, size_t, int) __attribute__ ((regparm (3)));
   int __stdcall fadvise (off_t, off_t, int) __attribute__ ((regparm (3)));
@@ -1871,7 +1871,7 @@ class fhandler_virtual : public fhandler_base
   int __stdcall fstatvfs (struct statvfs *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (uid_t uid, gid_t gid) __attribute__ ((regparm (2)));
-  int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
+  int __stdcall facl (int, int, struct acl *) __attribute__ ((regparm (3)));
   virtual bool fill_filebuf ();
   char *get_filebuf () { return filebuf; }
   void fixup_after_exec ();
