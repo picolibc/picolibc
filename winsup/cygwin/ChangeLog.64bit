@@ -1,5 +1,12 @@
 2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygmalloc.h (dlmalloc): Change unsigned in declaration to size_t.
+	(dlrealloc): Ditto.
+	* wait.cc (wait4): Cast second parameter in proc_subproc call to
+	uintptr_t.
+
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* thread.cc (verifyable_object_isvalid): Temporarily define as
 	non-inline on x86_64 to workaround compiler bug.
 

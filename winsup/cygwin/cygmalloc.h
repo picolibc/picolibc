@@ -12,8 +12,8 @@ details. */
 extern "C" {
 #endif
 void dlfree (void *p) __attribute__ ((regparm (1)));
-void *dlmalloc (unsigned size) __attribute__ ((regparm (1)));
-void *dlrealloc (void *p, unsigned size) __attribute__ ((regparm (2)));
+void *dlmalloc (size_t size) __attribute__ ((regparm (1)));
+void *dlrealloc (void *p, size_t size) __attribute__ ((regparm (2)));
 void *dlcalloc (size_t nmemb, size_t size) __attribute__ ((regparm (2)));
 void *dlmemalign (size_t alignment, size_t bytes) __attribute__ ((regparm (2)));
 void *dlvalloc (size_t bytes) __attribute__ ((regparm (1)));
