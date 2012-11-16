@@ -53,7 +53,6 @@ details. */
  * should be >= NOFILE (param.h).
  */
 
-typedef long fd_mask;
 #define UNIX_NFDBITS (sizeof (fd_mask) * NBBY)       /* bits per mask */
 #ifndef unix_howmany
 #define unix_howmany(x,y) (((x)+((y)-1))/(y))
@@ -63,7 +62,7 @@ typedef long fd_mask;
 
 #define NULL_fd_set ((fd_set *) NULL)
 #define sizeof_fd_set(n) \
-  ((unsigned) (NULL_fd_set->fds_bits + unix_howmany ((n), UNIX_NFDBITS)))
+  ((size_t) (NULL_fd_set->fds_bits + unix_howmany ((n), UNIX_NFDBITS)))
 #define UNIX_FD_SET(n, p) \
   ((p)->fds_bits[(n)/UNIX_NFDBITS] |= (1L << ((n) % UNIX_NFDBITS)))
 #define UNIX_FD_CLR(n, p) \

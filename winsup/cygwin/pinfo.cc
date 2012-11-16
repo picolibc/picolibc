@@ -684,7 +684,7 @@ _pinfo::commune_request (__uint32_t code, ...)
   va_end (args);
 
   char name_buf[MAX_PATH];
-  request_sync = CreateSemaphore (&sec_none_nih, 0, INT_MAX,
+  request_sync = CreateSemaphore (&sec_none_nih, 0, INT32_MAX,
 				  shared_name (name_buf, "commune", myself->pid));
   if (!request_sync)
     goto err;

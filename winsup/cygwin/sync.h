@@ -16,7 +16,7 @@ details. */
 class muto
 {
 public:
-  const char *name;
+  char *name;
 private:
   LONG sync;	/* Used to serialize access to this class. */
   LONG waiters;	/* Number of threads waiting for lock. */

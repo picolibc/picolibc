@@ -249,7 +249,7 @@ connect_syslogd ()
 }
 
 static int
-try_connect_syslogd (int priority, const char *msg, int len)
+try_connect_syslogd (int priority, const char *msg, size_t len)
 {
   ssize_t ret = -1;
 
@@ -402,7 +402,7 @@ vsyslog (int priority, const char *message, va_list ap)
 
     }
   char *total_msg = pass.get_message ();
-  int len = strlen (total_msg);
+  size_t len = strlen (total_msg);
   if (len != 0 && (total_msg[len - 1] == '\n'))
     total_msg[--len] = '\0';
 

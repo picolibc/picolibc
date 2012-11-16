@@ -579,7 +579,11 @@ pthread::cancel ()
 	 executing Windows code.  Rely on deferred cancellation in this case. */
       if (!cygtls->inside_kernel (&context))
 	{
+#ifdef __x86_64__
+	  context.Rip = (ULONG_PTR) pthread::static_cancel_self;
+#else
 	  context.Eip = (DWORD) pthread::static_cancel_self;
+#endif
 	  SetThreadContext (win32_obj_id, &context);
 	}
     }
@@ -1143,7 +1147,7 @@ pthread_cond::pthread_cond (pthread_condattr *attr) :
   /* Change the mutex type to NORMAL to speed up mutex operations */
   mtx_out.set_type (PTHREAD_MUTEX_NORMAL);
 
-  sem_wait = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+  sem_wait = ::CreateSemaphore (&sec_none_nih, 0, INT32_MAX, NULL);
   if (!sem_wait)
     {
       pthread_printf ("CreateSemaphore failed. %E");
@@ -1165,7 +1169,7 @@ pthread_cond::~pthread_cond ()
 void
 pthread_cond::unblock (const bool all)
 {
-  unsigned long releaseable;
+  LONG releaseable;
 
   /*
    * Block outgoing threads (and avoid simultanous unblocks)
@@ -1175,7 +1179,7 @@ pthread_cond::unblock (const bool all)
   releaseable = waiting - pending;
   if (releaseable)
     {
-      unsigned long released;
+      LONG released;
 
       if (!pending)
 	{
@@ -1212,11 +1216,11 @@ pthread_cond::wait (pthread_mutex_t mutex, PLARGE_INTEGER timeout)
   DWORD rv;
 
   mtx_in.lock ();
-  if (InterlockedIncrement ((long *)&waiting) == 1)
+  if (InterlockedIncrement (&waiting) == 1)
     mtx_cond = mutex;
   else if (mtx_cond != mutex)
     {
-      InterlockedDecrement ((long *)&waiting);
+      InterlockedDecrement (&waiting);
       mtx_in.unlock ();
       return EINVAL;
     }
@@ -1247,7 +1251,7 @@ pthread_cond::wait (pthread_mutex_t mutex, PLARGE_INTEGER timeout)
 	rv = WAIT_OBJECT_0;
     }
 
-  InterlockedDecrement ((long *)&waiting);
+  InterlockedDecrement (&waiting);
 
   if (rv == WAIT_OBJECT_0 && --pending == 0)
     /*
@@ -1286,7 +1290,7 @@ pthread_cond::_fixup_after_fork ()
   mtx_in.unlock ();
   mtx_out.unlock ();
 
-  sem_wait = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+  sem_wait = ::CreateSemaphore (&sec_none_nih, 0, INT32_MAX, NULL);
   if (!sem_wait)
     api_fatal ("pthread_cond::_fixup_after_fork () failed to recreate win32 semaphore");
 }
@@ -1384,7 +1388,7 @@ pthread_rwlock::rdlock ()
   reader = lookup_reader (self);
   if (reader)
     {
-      if (reader->n < ULONG_MAX)
+      if (reader->n < UINT32_MAX)
 	++reader->n;
       else
 	errno = EAGAIN;
@@ -1434,7 +1438,7 @@ pthread_rwlock::tryrdlock ()
       struct RWLOCK_READER *reader;
 
       reader = lookup_reader (self);
-      if (reader && reader->n < ULONG_MAX)
+      if (reader && reader->n < UINT32_MAX)
 	++reader->n;
       else if ((reader = new struct RWLOCK_READER))
 	{
@@ -2253,7 +2257,7 @@ pthread_attr_getstack (const pthread_attr_t *attr, void **addr, size_t *size)
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
   /* uses lowest address of stack on all platforms */
-  *addr = (void *)((int)(*attr)->stackaddr - (*attr)->stacksize);
+  *addr = (void *)((ptrdiff_t)(*attr)->stackaddr - (*attr)->stacksize);
   *size = (*attr)->stacksize;
   return 0;
 }
@@ -3373,7 +3377,7 @@ semaphore::semaphore (int pshared, unsigned int value)
 {
   SECURITY_ATTRIBUTES sa = (pshared != PTHREAD_PROCESS_PRIVATE)
 			   ? sec_all : sec_none_nih;
-  this->win32_obj_id = ::CreateSemaphore (&sa, value, LONG_MAX, NULL);
+  this->win32_obj_id = ::CreateSemaphore (&sa, value, INT32_MAX, NULL);
   if (!this->win32_obj_id)
     magic = 0;
 
@@ -3394,7 +3398,7 @@ semaphore::semaphore (unsigned long long shash, LUID sluid, int sfd,
 
   __small_sprintf (name, "semaphore/%016X%08x%08x",
 		   hash, luid.HighPart, luid.LowPart);
-  this->win32_obj_id = ::CreateSemaphore (&sec_all, value, LONG_MAX, name);
+  this->win32_obj_id = ::CreateSemaphore (&sec_all, value, INT32_MAX, name);
   if (!this->win32_obj_id)
     magic = 0;
   if (GetLastError () == ERROR_ALREADY_EXISTS && (oflag & O_EXCL))
@@ -3425,7 +3429,7 @@ semaphore::_post ()
 int
 semaphore::_getvalue (int *sval)
 {
-  long val;
+  LONG val;
 
   switch (WaitForSingleObject (win32_obj_id, 0))
     {
@@ -3521,7 +3525,7 @@ semaphore::_fixup_after_fork ()
       pthread_printf ("sem %x", this);
       /* FIXME: duplicate code here and in the constructor. */
       this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
-					      LONG_MAX, NULL);
+					      INT32_MAX, NULL);
       if (!win32_obj_id)
 	api_fatal ("failed to create new win32 semaphore, %E");
     }

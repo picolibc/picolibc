@@ -1,4 +1,28 @@
-2012-11-15  Corinna Vinschen  <corinna@vinschen.de>
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_netdrive.cc: Use UINT32_MAX rather than UINT_MAX to make
+	absolutely clear that we mean the 32 bit maximum.
+	* fhandler_socket.cc: Ditto.
+	* pinfo.cc: Ditto with INT32_MAX.
+	* select.cc (fd_mask): Drop gratuitious definition.
+	(sizeof_fd_set): Cast to size_t.
+	* shared.cc (pround): Cast to ptrdiff_t.
+	* strace.cc (strace::activate): Fix format string.
+	(strace::write_childpid): Take pid_t as parameter.
+	* include/sys/strace.h (strace::write_childpid): Change declaration
+	accordingly.
+	* sync.cc (muto::init): Cast in call to InterlockedExchangePointer to
+	make compiler happy.
+	* sync.h (class muto): De-const name.
+	* syslog.cc (try_connect_syslogd): Take size_t as third argument.
+	(vsyslog): Convert len to size_t.
+	* thread.cc: Use {U}INT32_MAX rather than {U}LONG_MAX.  Througout change
+	types used in Windows calls to matching Windows types.
+	(pthread::cancel): Fix access to instruction pointer for x86_64.
+	(pthread_attr_getstack): Cast to ptrdiff_t for pointer arithmetic.
+	* thread.h: Throughout convert 'long' types to uint32_t or LONG.
+
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/acl.h (struct __acl32): Drop.  Use struct acl or
 	aclent_t throughout instead.

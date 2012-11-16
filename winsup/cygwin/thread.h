@@ -92,7 +92,7 @@ class pinfo;
 
 #define MUTEX_OWNER_ANONYMOUS ((pthread_t) -1)
 
-typedef unsigned long thread_magic_t;
+typedef uint32_t thread_magic_t;
 
 /* verifyable_object should not be defined here - it's a general purpose class */
 
@@ -496,8 +496,8 @@ public:
   int shared;
   clockid_t clock_id;
 
-  unsigned long waiting;
-  unsigned long pending;
+  LONG waiting;
+  LONG pending;
   HANDLE sem_wait;
 
   pthread_mutex mtx_in;
@@ -547,14 +547,14 @@ public:
 
   int shared;
 
-  unsigned long waiting_readers;
-  unsigned long waiting_writers;
+  uint32_t waiting_readers;
+  uint32_t waiting_writers;
   pthread_t writer;
   struct RWLOCK_READER
   {
     struct RWLOCK_READER *next;
     pthread_t thread;
-    unsigned long n;
+    uint32_t n;
   } *readers;
   fast_mutex readers_mx;
 
@@ -636,7 +636,7 @@ public:
 
   HANDLE win32_obj_id;
   int shared;
-  long currentvalue;
+  LONG currentvalue;
   int fd;
   unsigned long long hash;
   LUID luid;

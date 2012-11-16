@@ -1478,13 +1478,13 @@ fhandler_socket::read (void *in_ptr, size_t& len)
 #ifdef __x86_64__
   /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
      Split buffer if necessary. */
-  DWORD bufcnt = len / UINT_MAX + ((!len || (len % UINT_MAX)) ? 1 : 0);
+  DWORD bufcnt = len / UINT32_MAX + ((!len || (len % UINT32_MAX)) ? 1 : 0);
   WSABUF wsabuf[bufcnt];
   WSAMSG wsamsg = { NULL, 0, wsabuf, bufcnt, { 0,  NULL }, 0 };
   /* Don't use len as loop condition, it could be 0. */
   for (WSABUF *wsaptr = wsabuf; bufcnt--; ++wsaptr)
     {
-      wsaptr->len = MIN (len, UINT_MAX);
+      wsaptr->len = MIN (len, UINT32_MAX);
       wsaptr->buf = ptr;
       len -= wsaptr->len;
       ptr += wsaptr->len;
@@ -1522,7 +1522,7 @@ fhandler_socket::recvfrom (void *in_ptr, size_t len, int flags,
 #ifdef __x86_64__
   /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
      Split buffer if necessary. */
-  DWORD bufcnt = len / UINT_MAX + ((!len || (len % UINT_MAX)) ? 1 : 0);
+  DWORD bufcnt = len / UINT32_MAX + ((!len || (len % UINT32_MAX)) ? 1 : 0);
   WSABUF wsabuf[bufcnt];
   WSAMSG wsamsg = { from, from && fromlen ? *fromlen : 0,
 		    wsabuf, bufcnt,
@@ -1531,7 +1531,7 @@ fhandler_socket::recvfrom (void *in_ptr, size_t len, int flags,
   /* Don't use len as loop condition, it could be 0. */
   for (WSABUF *wsaptr = wsabuf; bufcnt--; ++wsaptr)
     {
-      wsaptr->len = MIN (len, UINT_MAX);
+      wsaptr->len = MIN (len, UINT32_MAX);
       wsaptr->buf = ptr;
       len -= wsaptr->len;
       ptr += wsaptr->len;
@@ -1678,13 +1678,13 @@ fhandler_socket::write (const void *in_ptr, size_t len)
 #ifdef __x86_64__
   /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
      Split buffer if necessary. */
-  DWORD bufcnt = len / UINT_MAX + ((!len || (len % UINT_MAX)) ? 1 : 0);
+  DWORD bufcnt = len / UINT32_MAX + ((!len || (len % UINT32_MAX)) ? 1 : 0);
   WSABUF wsabuf[bufcnt];
   WSAMSG wsamsg = { NULL, 0, wsabuf, bufcnt, { 0,  NULL }, 0 };
   /* Don't use len as loop condition, it could be 0. */
   for (WSABUF *wsaptr = wsabuf; bufcnt--; ++wsaptr)
     {
-      wsaptr->len = MIN (len, UINT_MAX);
+      wsaptr->len = MIN (len, UINT32_MAX);
       wsaptr->buf = ptr;
       len -= wsaptr->len;
       ptr += wsaptr->len;
@@ -1725,7 +1725,7 @@ fhandler_socket::sendto (const void *in_ptr, size_t len, int flags,
 #ifdef __x86_64__
   /* size_t is 64 bit, but the len member in WSABUF is 32 bit.
      Split buffer if necessary. */
-  DWORD bufcnt = len / UINT_MAX + ((!len || (len % UINT_MAX)) ? 1 : 0);
+  DWORD bufcnt = len / UINT32_MAX + ((!len || (len % UINT32_MAX)) ? 1 : 0);
   WSABUF wsabuf[bufcnt];
   WSAMSG wsamsg = { to ? (struct sockaddr *) &sst : NULL, tolen,
 		    wsabuf, bufcnt,
@@ -1734,7 +1734,7 @@ fhandler_socket::sendto (const void *in_ptr, size_t len, int flags,
   /* Don't use len as loop condition, it could be 0. */
   for (WSABUF *wsaptr = wsabuf; bufcnt--; ++wsaptr)
     {
-      wsaptr->len = MIN (len, UINT_MAX);
+      wsaptr->len = MIN (len, UINT32_MAX);
       wsaptr->buf = ptr;
       len -= wsaptr->len;
       ptr += wsaptr->len;
