@@ -1,5 +1,10 @@
 2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc (verifyable_object_isvalid): Temporarily define as
+	non-inline on x86_64 to workaround compiler bug.
+
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_netdrive.cc: Use UINT32_MAX rather than UINT_MAX to make
 	absolutely clear that we mean the 32 bit maximum.
 	* fhandler_socket.cc: Ditto.
