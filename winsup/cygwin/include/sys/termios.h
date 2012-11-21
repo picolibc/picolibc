@@ -345,6 +345,7 @@ speed_t cfgetispeed(const struct termios *);
 speed_t cfgetospeed(const struct termios *);
 int cfsetispeed (struct termios *, speed_t);
 int cfsetospeed (struct termios *, speed_t);
+int cfsetspeed (struct termios *, speed_t);
 
 #ifdef __cplusplus
 }

@@ -208,6 +208,7 @@ cfgetospeed NOSIGFE
 cfmakeraw NOSIGFE
 cfsetispeed SIGFE
 cfsetospeed SIGFE
+cfsetspeed SIGFE
 chdir SIGFE
 _chdir = chdir SIGFE
 chmod SIGFE
