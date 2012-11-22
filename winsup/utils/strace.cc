@@ -39,13 +39,6 @@ details. */
 #define alloca __builtin_alloca
 #endif
 
-/* Temporary workaround for older Mingw header files on Fedora 17. */
-#ifndef NT_SUCCESS
-#define NT_SUCCESS(status) ((NTSTATUS) (status) >= 0)
-#define ProcessDebugFlags ((PROCESSINFOCLASS) 31)
-extern "C" NTSTATUS NTAPI NtSetInformationProcess(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength);
-#endif
-
 static const char *pgm;
 static int forkdebug = 1;
 static int numerror = 1;

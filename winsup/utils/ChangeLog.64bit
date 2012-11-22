@@ -1,3 +1,9 @@
+2012-11-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dump_setup.cc: Drop temporary workaround to handle older Mingw header
+	files on Fedora 17.
+	* strace.cc: Ditto.
+
 2012-08-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ps.cc (main): Define uid correctly as uid_t.
