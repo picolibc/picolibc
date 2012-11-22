@@ -1,3 +1,11 @@
+2012-11-21  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* termios.cc (cfsetspeed): New function.
+	* cygwin.din (cfsetspeed): Export.
+	* posix.sgml (std-bsd): Add cfsetspeed.
+	* include/sys/termios.h (cfsetspeed): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2012-11-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winbase.h: Semi-reinstantiate to workaround lack inline assembler

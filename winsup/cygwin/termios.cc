@@ -328,6 +328,20 @@ cfsetispeed (struct termios *in_tp, speed_t speed)
   return res;
 }
 
+/* cfsetspeed: 4.4BSD */
+extern "C" int
+cfsetspeed (struct termios *in_tp, speed_t speed)
+{
+  struct termios *tp = __tonew_termios (in_tp);
+  int res;
+  /* errors come only from unsupported baud rates, so setspeed() would return
+     identical results in both calls */
+  if ((res = setspeed (tp->c_ospeed, speed)) == 0)
+    setspeed (tp->c_ispeed, speed);
+  __toapp_termios (in_tp, tp);
+  return res;
+}
+
 extern "C" void
 cfmakeraw(struct termios *tp)
 {
