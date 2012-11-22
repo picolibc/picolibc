@@ -4,7 +4,8 @@
    which is intended to operate similarly to a mutex but attempts to
    avoid making expensive calls to the kernel.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2010,
+   2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
