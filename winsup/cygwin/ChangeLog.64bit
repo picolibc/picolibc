@@ -1,3 +1,7 @@
+2012-11-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/strace.h: Include sys/types.h for pid_t.
+
 2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.h (CYGTLS_PADSIZE): Define for 64 bit.  Add FIXME comment.

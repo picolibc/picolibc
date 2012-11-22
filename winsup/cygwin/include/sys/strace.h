@@ -29,6 +29,7 @@ details. */
 #define _SYS_STRACE_H
 
 #include <stdarg.h>
+#include <sys/types.h>
 
 #ifdef __cplusplus
 
