@@ -1,3 +1,8 @@
+2012-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc (semundo_clear): Move condition to break from
+	inner loop to the right spot.
+
 2012-11-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* Makefile.in: Revamp for new configury.
