@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT(crt0.S)
+AC_INIT(Makefile.in)
 
 if test "$srcdir" = "." ; then
   if test "${with_target_subdir}" != "." ; then
@@ -9,7 +9,7 @@ if test "$srcdir" = "." ; then
     libgloss_topdir="${srcdir}/${with_multisrctop}../.."
   fi
 else
-  libgloss_topdir="${srcdir}/../.."
+  libgloss_topdir="${srcdir}/../../.."
 fi
 AC_CONFIG_AUX_DIR($libgloss_topdir)
 
@@ -28,15 +28,7 @@ AC_SUBST(LD)
 AC_PROG_RANLIB
 LIB_AM_PROG_AS
 
-case "${target}" in
-  *-*-elf)
-	objtype=elf-
-	;;
-esac
-
-AC_SUBST(objtype)
-
-host_makefile_frag=${srcdir}/../config/default.mh
+host_makefile_frag=${srcdir}/../../config/default.mh
 
 dnl We have to assign the same value to other variables because autoconf
 dnl doesn't provide a mechanism to substitute a replacement keyword with
@@ -45,13 +37,6 @@ dnl
 host_makefile_frag_path=$host_makefile_frag
 AC_SUBST(host_makefile_frag_path)
 AC_SUBST_FILE(host_makefile_frag)
-
-# Configure cpu init plug-ins
-if test -d "${srcdir}/cpu-init"; then
-  subdirs="${subdirs} cpu-init"
-  AC_CONFIG_SUBDIRS(cpu-init)
-  AC_SUBST(subdirs)
-fi
 
 AC_CONFIG_FILES(Makefile,
 . ${libgloss_topdir}/config-ml.in,

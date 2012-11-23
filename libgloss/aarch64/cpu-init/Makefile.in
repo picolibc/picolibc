@@ -40,8 +40,6 @@ bindir = @bindir@
 libdir = @libdir@
 tooldir = $(exec_prefix)/$(target_alias)
 
-objtype = @objtype@
-
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
@@ -103,8 +101,8 @@ info:
 install-info:
 clean-info:
 
-Makefile: Makefile.in ../config.status @host_makefile_frag_path@
-	$(SHELL) ../config.status --file cpu-init/Makefile
+Makefile: Makefile.in config.status @host_makefile_frag_path@
+	$(SHELL) config.status
 
-../config.status: ../configure
-	$(SHELL) ../config.status --recheck
+config.status: configure
+	$(SHELL) config.status --recheck
