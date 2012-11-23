@@ -1,3 +1,8 @@
+2012-11-23  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* libm/machine/aarch64/configure.in: Change comment to say libm
+	instead of libc.
+
 2012-11-12  Steve Ellcey  <sellcey@mips.com>
 
 	* libc/machine/mips/machine/asm.h: New.
