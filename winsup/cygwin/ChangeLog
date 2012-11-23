@@ -1,5 +1,11 @@
 2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* configure.in: Add previously-missed AC_NO_EXECUTABLES.
+	* configure: Regenerate.
+	* aclocal.m4: Ditto.
+
+2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* Makefile.in: Use explicit path to mkdir.
 
 2012-11-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
