@@ -14,19 +14,26 @@ AC_INIT(mount.cc)
 AC_CONFIG_AUX_DIR(../..)
 
 AC_NO_EXECUTABLES
+
+. ${srcdir}/../configure.cygwin
+
+AC_WINDOWS_HEADERS
+AC_WINDOWS_LIBS
+
 AC_CANONICAL_SYSTEM
 
-LIB_AC_PROG_CC
-LIB_AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_CXX
+
+AC_CYGWIN_INCLUDES
 
 AC_ARG_PROGRAM
-
-INSTALL="/bin/sh "`cd $srcdir/../..; echo $(pwd)/install-sh -c`
 
 AC_PROG_INSTALL
 
 AC_CHECK_PROGS(MINGW_CXX, ${target_cpu}-w64-mingw32-g++)
-test -z "$MINGW_CXX" && AC_MSG_ERROR([no acceptable mingw g++ found in \$PATH])
+test -n "$MINGW_CXX" || AC_MSG_ERROR([no acceptable mingw g++ found in \$PATH])
 
 AC_EXEEXT
+AC_CONFIGURE_ARGS
 AC_OUTPUT(Makefile)

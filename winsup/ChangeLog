@@ -1,3 +1,22 @@
+2012-11-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.common: Revamp for new configury.  Add default compilation
+	targets, include .E processing.  Add magic for allowing "CFLAGS" to
+	control optimization options in "CXXFLAGS".
+	* configure.cygwin: New include for Cygwin configure.in's.
+	* acinclude.m4: Delete old definitions.  Implement AC_WINDOWS_HEADERS,
+	AC_WINDOWS_LIBS, AC_CYGWIN_INCLUDES, target_builddir, winsup_srcdir.
+	* aclocal.m4: Regenerate.
+	* autogen.sh: New file.
+	* ccwrap: New script.
+	* c++wrap: New script.
+	* config.guess: New script.
+	* config.sub: New script.
+	* configure: Regenerate.
+	* configure.in: Eliminate LIB_AC_PROG_* calls in favor of standard.
+	Delete ancient target test.
+	* install-sh: New script.
+
 2012-11-07  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* mingw: Delete obsolete directory.

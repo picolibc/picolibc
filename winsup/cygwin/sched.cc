@@ -10,9 +10,6 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#ifdef HAVE_CONFIG_H
-#endif
-
 #include "winsup.h"
 #include "miscfuncs.h"
 #include "cygerrno.h"

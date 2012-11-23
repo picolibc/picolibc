@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+use strict;
+use File::Basename;
+my $pgm = basename($0);
+(my $wrapper = $pgm) =~ s/\+\+/c/o;
+exec $wrapper, '++', @ARGV;

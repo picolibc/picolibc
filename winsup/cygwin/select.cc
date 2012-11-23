@@ -208,7 +208,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  if (now > (start_time + ms))
 	    {
 	      select_printf ("timed out after verification");
-	      res = select_stuff::select_error;
+	      res = 0;
 	    }
 	  else
 	    {

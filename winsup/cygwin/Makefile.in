@@ -1,28 +1,35 @@
 # Makefile.in for Cygwin.
 # Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-# 2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+# 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
 # This software is a copyrighted work licensed under the terms of the
 # Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 # details.
+# configure_input: @configure_input@
 
 # This makefile requires GNU make.
-#
-# Include common definitions for winsup directory
-# The following assignments are "inputs" to Makefile.common
-#
-CC:=@CC@
-CC_FOR_TARGET:=$(CC)
+
 srcdir:=@srcdir@
-CONFIG_DIR:=$(srcdir)/config/@CONFIG_DIR@
+target_builddir:=@target_builddir@
+winsup_srcdir:=@winsup_srcdir@
+configure_args=@configure_args@
+
+export CC:=@CC@
+export CXX:=@CXX@
+
+CFLAGS?=@CFLAGS@
+CXXFLAGS?=@CXXFLAGS@
+
 include ${srcdir}/../Makefile.common
 
-SHELL:=@SHELL@
-objdir:=.
+# environment variables used by ccwrap
+export CCWRAP_HEADERS:=. ${srcdir}
+export CCWRAP_SYSTEM_HEADERS:=@cygwin_headers@ @newlib_headers@
+export CCWRAP_DIRAFTER_HEADERS:=@windows_headers@
 
-VPATH:=$(srcdir):$(CONFIG_DIR):$(srcdir)/regex:$(srcdir)/lib:$(srcdir)/libc
+VPATH+=$(CONFIG_DIR) $(srcdir)/regex $(srcdir)/lib $(srcdir)/libc
 
 target_alias:=@target_alias@
 build_alias:=@build_alias@
@@ -35,6 +42,7 @@ bindir:=@bindir@
 libdir:=@libdir@
 mandir:=@mandir@
 sysconfdir:=@sysconfdir@
+datarootdir:=@datarootdir@
 ifeq ($(target_alias),$(host_alias))
 ifeq ($(build_alias),$(host_alias))
 tooldir:=$(exec_prefix)
@@ -52,17 +60,24 @@ override INSTALL:=@INSTALL@
 override INSTALL_PROGRAM:=@INSTALL_PROGRAM@
 override INSTALL_DATA:=@INSTALL_DATA@
 
+WINDOWS_LIBDIR:=@windows_libdir@
+
+cygserver_blddir:=${target_builddir}/winsup/cygserver
+LIBSERVER:=${cygserver_blddir}/libcygserver.a
+
+LIBC:=$(newlib_build)/libc/libc.a
+LIBM:=$(newlib_build)/libm/libm.a
+CRT0:=$(cygwin_build)/crt0.o
+
 #
 # --enable options from configure
 #
 MT_SAFE:=@MT_SAFE@
 DEFS:=@DEFS@
-CCEXTRA:=
-CFLAGS?=@CFLAGS@
-override CFLAGS+=-MMD ${$(*F)_CFLAGS} -Werror -fmerge-constants -ftracer \
-  -mno-use-libstdc-wrappers $(CCEXTRA)
-CXX=@CXX@
-override CXXFLAGS=@CXXFLAGS@
+CCEXTRA=
+COMMON_CFLAGS=-MMD ${$(*F)_CFLAGS} -Werror -fmerge-constants -ftracer $(CCEXTRA)
+COMPILE.cc+=${COMMON_CFLAGS} -mno-use-libstdc-wrappers
+COMPILE.c+=${COMMON_CFLAGS}
 
 AR:=@AR@
 AR_FLAGS:=qv
@@ -169,6 +184,13 @@ EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
 	spawn.o \
 )
 
+ifdef PREPROCESS
+override DLL_OFILES:=$(patsubst %.o,%_E,${DLL_OFILES})
+override EXCLUDE_STATIC_OFILES:=$(patsubst %.o,%_E,${EXCLUDE_STATIC_OFILES})
+override EXTRA_OFILES=$(patsubst %.o,%_E,${DLL_OFILES}))
+override MALLOC_OFILES:=$(patsubst %.o,%.E,${MALLOC_OFILES})
+endif #PREPROCESS
+
 GMON_OFILES:=gmon.o mcount.o profil.o
 
 NEW_FUNCTIONS:=$(addprefix --replace=,\
@@ -227,7 +249,6 @@ NEW_FUNCTIONS:=$(addprefix --replace=,\
 API_VER:=$(srcdir)/include/cygwin/version.h
 
 LIB_NAME:=libcygwin.a
-LIBSERVER:=@LIBSERVER@
 SUBLIBS:=libpthread.a libutil.a ${CURDIR}/libm.a ${CURDIR}/libc.a libdl.a libresolv.a librt.a
 EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a libtextreadmode.a
 INSTOBJS:=automode.o binmode.o textmode.o textreadmode.o
@@ -298,9 +319,6 @@ cxx_STDINCFLAGS:=yes
 
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host \
 	install install-libs install-headers
-
-.SUFFIXES:
-.SUFFIXES: .c .cc .def .a .o .d .s
 
 all_host=@all_host@
 install_host=@install_host@
@@ -386,7 +404,7 @@ uninstall-man:
 
 clean:
 	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h $(srcdir)/tlsoffsets.h $(srcdir)/devices.cc
-	-@$(MAKE) -C $(bupdir)/cygserver libclean
+	-@$(MAKE) -C ${cygserver_blddir} libclean
 
 maintainer-clean realclean: clean
 	@echo "This command is intended for maintainers to use;"
@@ -396,7 +414,7 @@ maintainer-clean realclean: clean
 
 # Rule to build cygwin.dll
 $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
-	$(CXX) $(CXXFLAGS) -Wl,--gc-sections $(nostdlib) -Wl,-T$(firstword $^) -static \
+	$(CXX) $(CXXFLAGS) -L${WINDOWS_LIBDIR} -Wl,--gc-sections $(nostdlib) -Wl,-T$(firstword $^) -static \
 	-Wl,--heap=0 -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(MALLOC_OBJ) $(LIBSERVER) $(LIBM) $(LIBC) \
@@ -416,8 +434,12 @@ ${STATIC_LIB_NAME}: mkstatic ${TEST_DLL_NAME}
 $(TEST_LIB_NAME): $(LIB_NAME)
 	perl -p -e 'BEGIN{binmode(STDIN); binmode(STDOUT);}; s/cygwin1/cygwin0/g' < $? > $@
 
-$(LIBSERVER): $(bupdir)/cygserver/Makefile
-	$(MAKE) -C $(bupdir)/cygserver libcygserver.a
+$(LIBSERVER): ${cygserver_blddir}/Makefile
+	$(MAKE) -C ${cygserver_blddir} libcygserver.a
+
+${cygserver_blddir}/Makefile:
+	mkdir -p ${@D}
+	cd ${@D} && exec /bin/sh $(dir ${srcdir})/cygserver/configure ${configure_args}
 
 dll_ofiles: $(DLL_OFILES)
 
@@ -436,10 +458,10 @@ globals.h: mkglobals_h globals.cc
 ${DLL_OFILES} ${LIBCOS}: globals.h
 
 shared_info_magic.h: cygmagic shared_info.h
-	/bin/sh $(word 1,$^) $@ "${COMPILE_CXX} -E -x c++" $(word 2,$^) SHARED_MAGIC 'class shared_info' USER_MAGIC 'class user_info'
+	/bin/sh $(word 1,$^) $@ "${COMPILE.cc} -E -x c++" $(word 2,$^) SHARED_MAGIC 'class shared_info' USER_MAGIC 'class user_info'
 
 child_info_magic.h: cygmagic child_info.h
-	/bin/sh $(word 1,$^) $@ "${COMPILE_CXX} -E -x c++" $(word 2,$^) CHILD_INFO_MAGIC 'class child_info'
+	/bin/sh $(word 1,$^) $@ "${COMPILE.cc} -E -x c++" $(word 2,$^) CHILD_INFO_MAGIC 'class child_info'
 
 dcrt0.o sigproc.o: child_info_magic.h
 
@@ -448,7 +470,7 @@ shared.o: shared_info_magic.h
 $(srcdir)/devices.cc: gendevices devices.in devices.h
 	${wordlist 1,2,$^} $@
 
-${CURDIR}/libc.a: ${LIB_NAME} ./libm.a libpthread.a libutil.a
+${CURDIR}/libc.a: ${LIB_NAME} ${CURDIR}/libm.a libpthread.a libutil.a
 	${speclib} -v ${@F}
 
 ${CURDIR}/libm.a: ${LIB_NAME} $(LIBM)
@@ -474,17 +496,18 @@ ${EXTRALIBS}: lib%.a: %.o
 
 winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	@echo "Making version.o and winver.o";\
-	$(SHELL) ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) && \
-	$(COMPILE_CXX) -c -o version.o version.cc && \
+	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} $(addprefix -I,${CCWRAP_SYSTEM_HEADERS} ${CCWRAP_DIRAFTER_HEADERS}) S&& \
+	$(COMPILE.cc) -c -o version.o version.cc && \
 	touch $@
 
-Makefile: cygwin.din
+Makefile: cygwin.din ${srcdir}/Makefile.in
+	/bin/sh ./config.status
 
 $(DEF_FILE): gendef cygwin.din $(srcdir)/tlsoffsets.h
 	$^ $@ sigfe.s
 
 $(srcdir)/tlsoffsets.h: gentls_offsets cygtls.h
-	$^ $@ $(COMPILE_CXX) -c
+	$^ $@ $(COMPILE.cc) -c
 
 sigfe.s: $(DEF_FILE)
 	@[ -s $@ ] || \
@@ -493,8 +516,6 @@ sigfe.s: $(DEF_FILE)
 
 sigfe.o: sigfe.s
 	$(CC) -c -o $@ $<
-
-winsup.h: config.h
 
 ctags: CTAGS
 tags:  CTAGS

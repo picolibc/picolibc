@@ -1,3 +1,21 @@
+2012-11-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* select.cc (select): Don't return -1 when we've timed out after
+	looping.
+
+2012-11-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Revamp for new configury.
+	(datarootdir): Add variable setting.
+	(winver_stamp): Accommodate changes to mkvers.sh setting.
+	(libc.a): Fix race when libm.a might not have been built yet.
+	* configure.in: Revamp for new configury.
+	* aclocal.m4: Regenerate.
+	* configure: Ditto.
+	* autogen.sh: New script.
+	* mkvers.sh: Find include directives via CFLAGS and friends rather than
+	assuming that w32api lives nearby.
+
 2012-11-21  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* termios.cc (cfsetspeed): New function.

@@ -7,10 +7,22 @@
 # Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 # details.
 
-SHELL:=@SHELL@
-
 srcdir:=@srcdir@
-VPATH:=@srcdir@
+target_builddir:=@target_builddir@
+winsup_srcdir:=@winsup_srcdir@
+configure_args=@configure_args@
+
+export CC:=@CC@
+export CXX:=@CXX@
+
+include ${srcdir}/../Makefile.common
+
+cygwin_build:=${target_builddir}/winsup/cygwin
+
+# environment variables used by ccwrap
+export CCWRAP_HEADERS:=$(dir ${srcdir})/cygwin ${cygwin_build}
+export CCWRAP_SYSTEM_HEADERS:=@cygwin_headers@ @newlib_headers@
+export CCWRAP_DIRAFTER_HEADERS:=@windows_headers@
 
 DESTDIR=
 prefix:=${DESTDIR}@prefix@
@@ -24,19 +36,11 @@ INSTALL:=@INSTALL@
 INSTALL_PROGRAM:=@INSTALL_PROGRAM@
 INSTALL_DATA:=@INSTALL_DATA@
 
-CC:=@CC@
-CC_FOR_TARGET:=$(CC)
-CXX:=@CXX@
-CXX_FOR_TARGET:=$(CXX)
 AR:=@AR@
-
-include $(srcdir)/../Makefile.common
 
 CFLAGS:=@CFLAGS@
 override CXXFLAGS=@CXXFLAGS@
 override CXXFLAGS+=-MMD -DHAVE_DECL_GETOPT=0 -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""
-
-.SUFFIXES: .c .cc .a .o .d
 
 OBJS:=	cygserver.o client.o process.o msg.o sem.o shm.o threaded_queue.o \
 	transport.o transport_pipes.o \
@@ -78,9 +82,10 @@ $(cygwin_build)/%.o: $(cygwin_source)/%.c
 	@$(MAKE) -C $(@D) $(@F)
 
 Makefile: Makefile.in configure
+	./config.status
 
 lib%.o: %.cc
-	${filter-out -D__OUTSIDE_CYGWIN__, $(COMPILE_CXX)} -c -I$(updir)/cygwin -I$(bupdir)/cygwin -o $(@D)/${basename $(@F)}$o $<
+	${filter-out -D__OUTSIDE_CYGWIN__, $(COMPILE.cc)} -c -o $(@D)/${basename $(@F)}.o $<
 
 libcygserver.a: $(LIBOBJS)
 	$(AR) crus $@ $?

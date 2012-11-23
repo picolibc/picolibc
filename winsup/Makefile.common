@@ -8,154 +8,45 @@
 # Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 # details.
 
-# This makefile requires GNU make.
+define justdir
+$(patsubst %/,%,$(dir $1))
+endef
 
-CFLAGS_COMMON:=-Wall -Wstrict-aliasing -Wwrite-strings -fno-common -pipe -fbuiltin -fmessage-length=0 -D_SDKDDKVER_H
-MALLOC_DEBUG:=#-DMALLOC_DEBUG -I/cygnus/src/uberbaum/winsup/cygwin/dlmalloc
-MALLOC_OBJ:=#/cygnus/src/uberbaum/winsup/cygwin/dlmalloc/malloc.o
+define libname
+$(realpath $(shell ${CC} --print-file-name=$1 $2))
+endef
 
-override srcdir:=${shell cd $(srcdir); pwd}
-ifneq (,${filter-out /%,$(srcdir)})
-    updir:=$(srcdir)/..
-    updir1:=$(updir)/..
-else
-    updir:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(srcdir)):::}}
-ifneq (,${findstring /,$(updir)})
-    updir1:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(updir)):::}}
-else
-    updir1:=$(updir)/..
-endif
-endif
+export PATH:=${winsup_srcdir}:${PATH}
 
-pwd:=${shell pwd}
-ifneq "${filter winsup%,${notdir $(pwd)}}" ""
-    here:=${pwd}/cygwin
-else
-    here:=${dir $(pwd)}cygwin
-endif
-bupdir:=${shell cd $(here)/..; pwd}
-ifneq (,${filter-out /%,$(bupdir)})
-    bupdir1:=../..
-    bupdir2:=../../..
-else
-ifneq (,${findstring /,$(bupdir)})
-    bupdir1:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(bupdir)):::}}
-else
-    bupdir1:=$(bupdir)/..
-endif
-ifneq (,${findstring /,$(bupdir1)})
-    bupdir2:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(bupdir1)):::}}
-else
-    bupdir2:=$(bupdir1)/..
-endif
-endif
+# Allow CFLAGS=-O,-g to control CXXFLAGS too
+opt=$(filter -O%,${CFLAGS}) $(filter -g,${CFLAGS})
+override CXXFLAGS:=${filter-out -g,$(filter-out -O%,${CXXFLAGS})} ${opt}
 
-newlib_source:=$(updir1)/newlib
-newlib_build:=$(bupdir1)/newlib
-cygwin_build:=$(bupdir)/cygwin
-cygwin_source:=$(updir)/cygwin
-utils_build:=$(bupdir)/utils
-utils_source:=$(updir)/utils
-ifeq (,${findstring $(newlib_source)/libc/include,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
-newlib_include:=-I$(newlib_source)/libc/include
-endif
-ifeq (,${findstring $(cygwin_source)/include,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
-cygwin_include:=-I$(cygwin_source)/include
-endif
+cflags_common:=-Wall -Wstrict-aliasing -Wwrite-strings -fno-common -pipe -fbuiltin -fmessage-length=0
+COMPILE.cc=c++wrap ${CXXFLAGS} -fno-rtti -fno-exceptions ${cflags_common}
+COMPILE.c=ccwrap ${CFLAGS} ${cflags_common}
 
-nostdincxx:=-nostdinc++
+top_srcdir:=$(call justdir,${winsup_srcdir})
+top_builddir:=$(call justdir,${target_builddir})
+
+cygwin_build:=${target_builddir}/winsup/cygwin
+newlib_build:=${target_builddir}/newlib
 
 nostdlib:=-nostdlib
 
-ifeq (,${nostdlib})
-nostdinc:=
-endif
+VPATH:=${srcdir}
 
-INCLUDES:=-I. $(cygwin_include) -I$(cygwin_source) $(newlib_include)
-ifdef CONFIG_DIR
-INCLUDES+=-I$(CONFIG_DIR)
-endif
-
-MINGW_LDFLAGS:=-static
-MINGW_CFLAGS:=
-MINGW_CXXFLAGS:=
-
-GCC_DEFAULT_OPTIONS:=$(CFLAGS_COMMON) $(CFLAGS_CONFIG) $(INCLUDES)
-
-# Link in libc and libm from newlib
-
-LIBC:=$(newlib_build)/libc/libc.a
-LIBM:=$(newlib_build)/libm/libm.a
-CRT0:=$(cygwin_build)/crt0.o
-
-ALL_CFLAGS=$(DEFS) $(MALLOC_DEBUG) $(CFLAGS) $(GCC_DEFAULT_OPTIONS)
-ALL_CXXFLAGS=$(DEFS) $(MALLOC_DEBUG) $(CXXFLAGS) $(GCC_DEFAULT_OPTIONS)
-
-ifndef PREPROCESS
-c=-c
-o=.o
-else
-c=-E -dD
-o=.E
-endif
-
-libgcc:=${subst \,/,${shell $(CC_FOR_TARGET) -print-libgcc-file-name}}
-gcc_libdir:=${word 1,${dir $(libgcc)}}
-ifeq (,${findstring $(gcc_libdir),$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
-GCC_INCLUDE:=${subst //,/,-I$(gcc_libdir)/include}
-endif
-
-COMPILE_CXX=$(CXX) $c $(if $($(*F)_STDINCFLAGS),,$(nostdincxx) $(nostdinc)) \
-	     $(ALL_CXXFLAGS) $(GCC_INCLUDE) -fno-rtti -fno-exceptions
-COMPILE_CC=$(CC) $c $(if $($(*F)_STDINCFLAGS),,$(nostdinc)) $(ALL_CFLAGS) $(GCC_INCLUDE)
-
-vpath %.a	$(cygwin_build):$(newlib_build)/libc:$(newlib_build)/libm
-
-MAKEOVERRIDES_WORKAROUND=${wordlist 2,1,a b c}
-
-ifneq ($(MAKEOVERRIDES_WORKAROUND),)
-    override MAKE:=$(MAKE) $(MAKEOVERRIDES)
-    MAKEOVERRIDES:=
-    export MAKEOVERRIDES
-endif
-
-ifdef RPATH_ENVVAR
-VERBOSE=1
-endif
-
-ifneq "${findstring -B,$(COMPILE_CXX) $(COMPILE_CC)}" ""
-VERBOSE=1
-endif
-
-.PRECIOUS: %.o
+.SUFFIXES:
+.SUFFIXES: .c .cc .def .a .o .d .s .E
 
 %.o: %.cc
-ifdef VERBOSE
-	$(COMPILE_CXX) -o $(@D)/$(*F)$o $<
-else
-	@echo $(CXX) $c $(CXXFLAGS) ... $(*F).cc
-	@$(COMPILE_CXX) -o $(@D)/$(*F)$o $<
-endif
+	$(strip ${COMPILE.cc} -c -o $@ $<)
 
 %.o: %.c
-ifdef VERBOSE
-	$(COMPILE_CC) -o $(@D)/$(*F)$o $<
-else
-	@echo $(CC) $c $(CFLAGS) ... $(*F).c
-	@$(COMPILE_CC) -o $(@D)/$(*F)$o $<
-endif
+	$(strip ${COMPILE.c} -c -o $@ $<)
 
-$(bupdir1)/libiberty/%.o: $(updir1)/libiberty/%.c
-	@$(MAKE) -C $(@D) $(@F)
+%.E: %.cc
+	$(strip ${COMPILE.cc} -E -dD -o $@ $<)
 
-all:
-
-# For auto-rebuilding the Makefile
-
-.PRECIOUS: Makefile
-
-Makefile: Makefile.in $(srcdir)/configure.in config.status
-	$(SHELL) config.status
-
-config.status: configure
-	$(SHELL) config.status --recheck
+%.E: %.c
+	$(strip ${COMPILE.c} -E -dD -o $@ $<)

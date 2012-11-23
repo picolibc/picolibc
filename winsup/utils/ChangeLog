@@ -1,3 +1,29 @@
+2012-11-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* aclocal.m4: Regenerate.
+	* configure: Ditto.
+	* autogen.sh: New script.
+	* configure.in: Revamp for new configury.
+	* Makefile.in: Revamp for new configury.  Rename ALL_* to just *.
+	Always use "VERBOSE" setting.
+	(MINGW_CXX): Don't include CFLAGS in definition.
+	(all): Define target first, before everything else so that it is the
+	default.
+	(ps.exe): Don't add useless -lcygwin.
+	(ldh.exe): For consistency, add to existing MINGW_LDFLAGS rather than
+	redefining them.
+	(cygcheck.exe): Always include -lz for MINGW_LDFLAGS.  Don't try to
+	figure out where to find it.
+	(dumper.exe): Simplify check.  Assume libraries are installed rather
+	than trying to retrieve from source tree.
+	(install): Just use /bin/mkdir to create directories.
+	(Makefile): Regenerate when standard dependencies change.
+	* dump_setup.cc: Always include zlib.h.  Remove accommodations for it
+	possibly not existing.
+	* parse_pe.cc: Add define which allows building with installed
+	binutils package.
+	* dumper.cc: Ditto.
+
 2012-11-09  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (vcygpath): Handle cygdrive prefix.
