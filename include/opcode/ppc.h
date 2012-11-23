@@ -400,6 +400,6 @@ struct powerpc_macro
 extern const struct powerpc_macro powerpc_macros[];
 extern const int powerpc_num_macros;
 
-extern ppc_cpu_t ppc_parse_cpu (ppc_cpu_t, const char *);
+extern ppc_cpu_t ppc_parse_cpu (ppc_cpu_t, ppc_cpu_t *, const char *);
 
 #endif /* PPC_H */
