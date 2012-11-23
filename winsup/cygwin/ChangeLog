@@ -1,3 +1,7 @@
+2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Use explicit path to mkdir.
+
 2012-11-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* select.cc (select): Don't return -1 when we've timed out after

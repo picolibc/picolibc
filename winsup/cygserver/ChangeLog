@@ -1,3 +1,7 @@
+2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Use /bin/mkdir to make install directories.
+
 2012-11-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sysv_sem.cc (semundo_clear): Move condition to break from

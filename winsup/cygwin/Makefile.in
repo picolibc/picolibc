@@ -438,7 +438,7 @@ $(LIBSERVER): ${cygserver_blddir}/Makefile
 	$(MAKE) -C ${cygserver_blddir} libcygserver.a
 
 ${cygserver_blddir}/Makefile:
-	mkdir -p ${@D}
+	/bin/mkdir -p ${@D}
 	cd ${@D} && exec /bin/sh $(dir ${srcdir})/cygserver/configure ${configure_args}
 
 dll_ofiles: $(DLL_OFILES)
