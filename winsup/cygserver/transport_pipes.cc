@@ -107,7 +107,32 @@ transport_layer_pipes::listen ()
 
   _is_listening_endpoint = true;
 
-  /* no-op */
+  debug ("Try to create named pipe: %ls", _pipe_name);
+
+  HANDLE listen_pipe =
+    CreateNamedPipeW (_pipe_name,
+		      PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE,
+		      PIPE_TYPE_BYTE | PIPE_WAIT, PIPE_UNLIMITED_INSTANCES,
+		      0, 0, 1000, &sec_all_nih);
+  if (listen_pipe != INVALID_HANDLE_VALUE)
+    {
+      HANDLE connect_pipe =
+	CreateFileW (_pipe_name, GENERIC_READ | GENERIC_WRITE, 0, &sec_all_nih,
+		     OPEN_EXISTING, 0, NULL);
+      if (connect_pipe == INVALID_HANDLE_VALUE)
+	{
+	  CloseHandle (listen_pipe);
+	  listen_pipe = INVALID_HANDLE_VALUE;
+	}
+    }
+
+  if (listen_pipe == INVALID_HANDLE_VALUE)
+    {
+      system_printf ("failed to create named pipe: "
+		     "is the daemon already running?");
+      return -1;
+    }
+
   return 0;
 }
 
@@ -125,37 +150,18 @@ transport_layer_pipes::accept (bool *const recoverable)
   // Read: http://www.securityinternals.com/research/papers/namedpipe.php
   // See also the Microsoft security bulletins MS00-053 and MS01-031.
 
-  // FIXME: Remove FILE_CREATE_PIPE_INSTANCE.
-
-  const bool first_instance = (pipe_instance == 0);
-
-  debug ("Try to create named pipe: %ls", _pipe_name);
+  debug ("Try to create named pipe instance %ld: %ls",
+	 pipe_instance + 1, _pipe_name);
 
   const HANDLE accept_pipe =
-    CreateNamedPipeW (_pipe_name,
-		     (PIPE_ACCESS_DUPLEX
-		      | (first_instance ? FILE_FLAG_FIRST_PIPE_INSTANCE : 0)),
-		     (PIPE_TYPE_BYTE | PIPE_WAIT),
-		     PIPE_UNLIMITED_INSTANCES,
-		     0, 0, 1000,
-		     &sec_all_nih);
-
-  const bool duplicate = (accept_pipe == INVALID_HANDLE_VALUE
-			  && pipe_instance == 0
-			  && GetLastError () == ERROR_ACCESS_DENIED);
+    CreateNamedPipeW (_pipe_name, PIPE_ACCESS_DUPLEX,
+		      PIPE_TYPE_BYTE | PIPE_WAIT, PIPE_UNLIMITED_INSTANCES,
+		      0, 0, 1000, &sec_all_nih);
 
   if (accept_pipe != INVALID_HANDLE_VALUE)
     InterlockedIncrement (&pipe_instance);
 
   LeaveCriticalSection (&pipe_instance_lock);
-
-  if (duplicate)
-    {
-      *recoverable = false;
-      system_printf ("failed to create named pipe: "
-		     "is the daemon already running?");
-      return NULL;
-    }
 
   if (accept_pipe == INVALID_HANDLE_VALUE)
     {
@@ -163,8 +169,6 @@ transport_layer_pipes::accept (bool *const recoverable)
       *recoverable = true;	// FIXME: case analysis?
       return NULL;
     }
-
-  assert (accept_pipe);
 
   if (!ConnectNamedPipe (accept_pipe, NULL)
       && GetLastError () != ERROR_PIPE_CONNECTED)

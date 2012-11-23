@@ -1,3 +1,13 @@
+2012-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.cc (main): Call listen right after creating the
+	transport.
+	* transport_pipes.cc (transport_layer_pipes::listen): Create
+	first instance of the named pipe here.  Connect the client side
+	to block it for further use by the system.
+	(transport_layer_pipes::accept): Don't handle first pipe instance
+	here.  Change debug output accordingly.
+
 2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* Makefile.in: Use /bin/mkdir to make install directories.

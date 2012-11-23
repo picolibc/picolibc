@@ -715,14 +715,14 @@ main (const int argc, char *argv[])
   transport_layer_base *const transport = create_server_transport ();
   assert (transport);
 
+  if (transport->listen () == -1)
+    return 1;
+
   process_cache cache (process_cache_size, cleanup_threads);
 
   server_submission_loop submission_loop (&request_queue, transport, &cache);
 
   request_queue.add_submission_loop (&submission_loop);
-
-  if (transport->listen () == -1)
-    return 1;
 
   cache.start ();
 
