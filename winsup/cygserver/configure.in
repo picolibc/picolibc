@@ -11,17 +11,24 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)dnl
 AC_INIT(cygserver.cc)
+AC_CONFIG_AUX_DIR(..)
 
-AC_CONFIG_AUX_DIR(../..)
+. ${srcdir}/../configure.cygwin
 
-INSTALL=`cd $srcdir/../..; echo $(pwd)/install-sh -c`
+AC_WINDOWS_HEADERS
+AC_WINDOWS_LIBS
 
 AC_PROG_INSTALL
 AC_NO_EXECUTABLES
 AC_CANONICAL_SYSTEM
 
-LIB_AC_PROG_CC
-LIB_AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CPP
+AC_LANG(C)
+AC_LANG(C++)
+
+AC_CYGWIN_INCLUDES
 
 case "$with_cross_host" in
   ""|*cygwin*)
@@ -55,4 +62,5 @@ no)	 ;;
 esac
 ])
 
+AC_CONFIGURE_ARGS
 AC_OUTPUT(Makefile)

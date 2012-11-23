@@ -1,26 +1,24 @@
-dnl Autoconf configure script for Cygwin.
-dnl Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-dnl 2008, 2009, 2011 Red Hat, Inc.
-dnl
-dnl This file is part of Cygwin.
-dnl
-dnl This software is a copyrighted work licensed under the terms of the
-dnl Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-dnl details.
-dnl
-dnl Process this file with autoconf to produce a configure script.
-
 AC_PREREQ(2.59)dnl
-AC_INIT(init.cc)
+AC_INIT(Makefile.in)
 AC_CONFIG_HEADER(config.h)
-AC_CONFIG_AUX_DIR(../..)
+AC_CONFIG_AUX_DIR(..)
+
+. ${srcdir}/../configure.cygwin
+
+AC_WINDOWS_HEADERS
+AC_WINDOWS_LIBS
 
 AC_PROG_INSTALL
 AC_NO_EXECUTABLES
 AC_CANONICAL_SYSTEM
 
-LIB_AC_PROG_CC
-LIB_AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CPP
+AC_LANG(C)
+AC_LANG(C++)
+
+AC_CYGWIN_INCLUDES
 
 case "$with_cross_host" in
   ""|*cygwin*)
@@ -32,8 +30,6 @@ case "$with_cross_host" in
     install_host=
     ;;
 esac
-
-LIBSERVER='$(bupdir)/cygserver/libcygserver.a'
 
 AC_SUBST(all_host)
 AC_SUBST(install_host)
@@ -79,15 +75,14 @@ dnl fi
 case "$target_cpu" in
    i?86) DLL_ENTRY="_dll_entry@12"
 		DEF_DLL_ENTRY="dll_entry@12"
-		ALLOCA="_alloca"
 		CONFIG_DIR="i386"  ;;
    x86_64) DLL_ENTRY="_dll_entry"
 		DEF_DLL_ENTRY="dll_entry"
-		ALLOCA="_alloca"
 		CONFIG_DIR="x86_64"  ;;
    *)		AC_MSG_ERROR(Invalid target processor \"$target_cpu\") ;;
 esac
 
+AC_CONFIGURE_ARGS
 AC_SUBST(MALLOC_OFILES)
 AC_SUBST(LIBSERVER)
 AC_SUBST(DLL_ENTRY)

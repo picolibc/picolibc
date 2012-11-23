@@ -1,3 +1,7 @@
+2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Use /bin/mkdir to make directories.
+
 2012-10-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.in: Add AC_NO_EXECUTABLES.

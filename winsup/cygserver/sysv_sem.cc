@@ -529,9 +529,9 @@ semundo_clear(int semid, int semnum, struct thread *td)
 						  suptr->un_ent[suptr->un_cnt];
 						continue;
 					}
+					if (semnum != -1)
+						break;
 				}
-				if (semnum != -1)
-					break;
 			}
 			i++, sunptr++;
 		}

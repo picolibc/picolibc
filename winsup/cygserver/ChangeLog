@@ -1,3 +1,24 @@
+2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Use /bin/mkdir to make install directories.
+
+2012-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc (semundo_clear): Move condition to break from
+	inner loop to the right spot.
+
+2012-11-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Revamp for new configury.
+	* configure.in: Revamp for new configury.
+	* aclocal.m4: Regenerate.
+	* configure: Ditto.
+	* autogen.sh: New script.
+
+2012-10-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (adjust_identity_info): Fix typo in log message.
+
 2012-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* woutsup.h: Just include winlean.h.

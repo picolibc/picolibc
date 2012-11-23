@@ -1,7 +1,7 @@
 #!/bin/sh
 # mkvers.sh - Make version information for cygwin DLL
 #
-#   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2010 Red Hat, Inc.
+#   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2010, 2012 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -14,9 +14,23 @@ exec 9> version.cc
 #
 # Arg 1 is the name of the version include file
 #
-incfile="$1"
-rcfile="$2"
-windres="$3"
+incfile="$1"; shift
+rcfile="$1"; shift
+windres="$1"; shift
+iflags=
+# Find header file locations
+while [ -n "$*" ]; do
+    case "$1" in
+	-I*)
+	    iflags="$iflags $1"
+	    ;;
+	-idirafter)
+	    shift
+	    iflags="$iflags -I$1"
+	    ;;
+    esac
+    shift
+done
 
 [ -r $incfile ] || {
     echo "**** Couldn't open file '$incfile'.  Aborting."
@@ -151,4 +165,4 @@ fi
 
 echo "Version $cygwin_ver"
 set -$- $builddate
-$windres --include-dir $dir/include --define CYGWIN_BUILD_DATE="$1" --define CYGWIN_BUILD_TIME="$2" --define CYGWIN_VERSION='"'"$cygwin_ver"'"' $rcfile winver.o
+$windres $iflags --define CYGWIN_BUILD_DATE="$1" --define CYGWIN_BUILD_TIME="$2" --define CYGWIN_VERSION='"'"$cygwin_ver"'"' $rcfile winver.o

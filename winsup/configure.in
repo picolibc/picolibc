@@ -1,6 +1,6 @@
 dnl Autoconf configure script for Cygwin.
 dnl Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006,
-dnl 2009 Red Hat, Inc.
+dnl 2009, 2010, 2011, 2012 Red Hat, Inc.
 dnl
 dnl This file is part of Cygwin.
 dnl
@@ -12,30 +12,27 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)dnl
 AC_INIT(Makefile.in)
+AC_CONFIG_AUX_DIR(..)
 
-INSTALL=`cd $srcdir/..; echo $(pwd)/install-sh -c`
+. ${srcdir}/configure.cygwin
+
+AC_WINDOWS_HEADERS
+AC_WINDOWS_LIBS
 
 AC_PROG_INSTALL
+AC_NO_EXECUTABLES
 AC_CANONICAL_SYSTEM
 
-GCC_NO_EXECUTABLES
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CPP
+AC_LANG(C)
+AC_LANG(C++)
 
-LIB_AC_PROG_CC
-LIB_AC_PROG_CXX
+AC_CYGWIN_INCLUDES
 
-AC_LANG_C
-
-INSTALL_LICENSE=
-
-case "$target" in
-  *cygwin*)
-    if ! test -d $srcdir/cygwin; then
-      AC_MSG_ERROR("No cygwin dir.  Can't build Cygwin.  Exiting...")
-    fi
-    AC_CONFIG_SUBDIRS(cygwin cygserver lsaauth utils doc)
-    INSTALL_LICENSE="install-license"
-    ;;
-esac
+AC_CONFIG_SUBDIRS(cygwin utils cygserver lsaauth doc)
+INSTALL_LICENSE="install-license"
 
 AC_SUBST(INSTALL_LICENSE)
 

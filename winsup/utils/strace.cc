@@ -13,9 +13,9 @@ details. */
 
 #include <windows.h>
 #ifndef __MINGW64_VERSION_MAJOR
-#include "ddk/ntapi.h"
+# include "ddk/ntapi.h"
 #else
-#include <winternl.h>
+# include <winternl.h>
 #endif
 #define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>

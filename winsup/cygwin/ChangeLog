@@ -1,3 +1,37 @@
+2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* configure.in: Remove unneeded ALLOC substitution.
+	* configure: Regenerate.
+	* aclocal.m4: Ditto.
+
+2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* configure.in: Add previously-missed AC_NO_EXECUTABLES.
+	* configure: Regenerate.
+	* aclocal.m4: Ditto.
+
+2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Use explicit path to mkdir.
+
+2012-11-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* select.cc (select): Don't return -1 when we've timed out after
+	looping.
+
+2012-11-22  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Revamp for new configury.
+	(datarootdir): Add variable setting.
+	(winver_stamp): Accommodate changes to mkvers.sh setting.
+	(libc.a): Fix race when libm.a might not have been built yet.
+	* configure.in: Revamp for new configury.
+	* aclocal.m4: Regenerate.
+	* configure: Ditto.
+	* autogen.sh: New script.
+	* mkvers.sh: Find include directives via CFLAGS and friends rather than
+	assuming that w32api lives nearby.
+
 2012-11-21  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* termios.cc (cfsetspeed): New function.
@@ -5,6 +39,11 @@
 	* posix.sgml (std-bsd): Add cfsetspeed.
 	* include/sys/termios.h (cfsetspeed): Declare.
 	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/mntent.h: Only include paths.h when building for Cygwin.
+	Add comment to explain why.
 
 2012-11-11  Corinna Vinschen  <corinna@vinschen.de>
 

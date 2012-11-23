@@ -28,15 +28,7 @@ details. */
 # include <ntstatus.h>
 #endif
 #include "path.h"
-#if 0
-#include "zlib.h"
-#endif
-
-#ifndef ZLIB_VERSION
-typedef void * gzFile;
-#define gzgets(fp, buf, size) ({0;})
-#define gzclose(fp) ({0;})
-#endif
+#include <zlib.h>
 
 static int package_len = 20;
 static unsigned int version_len = 10;

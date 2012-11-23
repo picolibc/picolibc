@@ -1,5 +1,5 @@
 # Makefile.in for Cygwin's testsuite.
-# Copyright 2000, 2001, 2002, 2003, 2005, 2006, 2009 Red Hat, Inc.
+# Copyright 2000, 2001, 2002, 2003, 2005, 2006, 2009, 2012 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -161,13 +161,7 @@ testsuite/site.exp: site.exp
 # Note: we set the PATH so that we can pick up cygwin0.dll
 
 check: $(TESTSUP_LIB_NAME) $(RUNTIME) cygrun.exe testsuite/site.exp
-	cd testsuite; \
-	export EXPECT=expect ; \
-	if [ -f $(bupdir2)/expect/expect ] ; then  \
-	   TCL_LIBRARY=`cd .. ; cd ${srcdir}/../../tcl/library ; pwd` ; \
-	    export TCL_LIBRARY ; fi ; \
-	PATH=$(bupdir)/cygwin:$${PATH} ;\
-	runtest --tool winsup $(RUNTESTFLAGS) ;\
+	cd testsuite; runtest --tool winsup $(RUNTESTFLAGS)
 
 cygrun.o: cygrun.c
 	${MINGW_FE} $(CC) $(MINGW_CFLAGS) -o $@ -c $<
