@@ -1,3 +1,9 @@
+2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* configure.ac: Rename from configure.in.
+	* configure.in: Delete.
+	* configure: Regenerate.
+
 2012-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_registry.cc: Drop Mingw.org considerations.

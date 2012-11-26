@@ -1,3 +1,9 @@
+2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* configure.ac: Rename from configure.in.
+	* configure.in: Delete.
+	* configure: Regenerate.
+
 2012-10-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.in: Add AC_NO_EXECUTABLES.
