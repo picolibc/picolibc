@@ -19,12 +19,8 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include <asm/socket.h>
-#ifdef __MINGW64_VERSION_MAJOR
 #include <devioctl.h>
 #include <ntddser.h>
-#else
-#include <ddk/ntddser.h>
-#endif
 #include "cygwait.h"
 
 /**********************************************************************/
