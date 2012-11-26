@@ -1,3 +1,9 @@
+2012-11-26  Corinna Vinschen <corinna@vinschen.de>
+
+	* bloda.cc: Drop Mingw.org considerations.
+	* dump_setup.cc: Ditto.
+	* strace.cc: Ditto.
+
 2012-11-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* aclocal.m4: Regenerate.

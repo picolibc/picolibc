@@ -1,6 +1,6 @@
 /* bloda.cc
 
-   Copyright 2007 Red Hat, Inc.
+   Copyright 2007, 2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -16,18 +16,8 @@
 #include <windows.h>
 #undef WIN32_NO_STATUS
 #include <psapi.h>
-#ifndef __MINGW64_VERSION_MAJOR
-# include <ntdef.h>
-# include <ddk/ntstatus.h>
-# include <ddk/ntapi.h>
-# define SystemProcessInformation SystemProcessesAndThreadsInformation
-# define PSYSTEM_PROCESS_INFORMATION PSYSTEM_PROCESSES
-# define ImageName ProcessName
-# define NextEntryOffset NextEntryDelta
-#else
-# include <winternl.h>
-# include <ntstatus.h>
-#endif
+#include <winternl.h>
+#include <ntstatus.h>
 #undef cygwin_internal
 
 #undef DEBUGGING
