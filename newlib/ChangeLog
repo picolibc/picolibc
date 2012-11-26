@@ -1,3 +1,7 @@
+2012-11-26  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/include/inttypes.h: Add and use __INTTYPES_EXP().
+
 2012-11-23  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* libm/machine/aarch64/configure.in: Change comment to say libm
