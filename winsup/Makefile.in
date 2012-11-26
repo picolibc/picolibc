@@ -96,7 +96,7 @@ $(CLEAN_SUBDIRS):
 
 .PRECIOUS: Makefile
 
-Makefile: Makefile.in $(srcdir)/configure.in config.status
+Makefile: Makefile.in $(srcdir)/configure config.status
 	$(SHELL) config.status
 
 config.status: configure

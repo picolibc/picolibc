@@ -1,5 +1,9 @@
 2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* Makefile.in (Makefile): Rely on 'configure' not 'configure.in'.
+
+2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* configure.ac: Rename from configure.in.
 	* configure.in: Delete.
 	* configure: Regenerate.
