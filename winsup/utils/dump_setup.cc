@@ -1,6 +1,6 @@
 /* dump_setup.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2008, 2010 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2008, 2010, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -20,13 +20,8 @@ details. */
 			   ntstatus.h for extended status codes below. */
 #include <windows.h>
 #undef WIN32_NO_STATUS
-#ifndef __MINGW64_VERSION_MAJOR
-# include <ddk/ntapi.h>
-# include <ddk/winddk.h>
-#else
-# include <winternl.h>
-# include <ntstatus.h>
-#endif
+#include <winternl.h>
+#include <ntstatus.h>
 #include "path.h"
 #include <zlib.h>
 

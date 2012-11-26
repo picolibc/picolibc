@@ -12,11 +12,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include <windows.h>
-#ifndef __MINGW64_VERSION_MAJOR
-# include "ddk/ntapi.h"
-#else
-# include <winternl.h>
-#endif
+#include <winternl.h>
 #define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>
 #include <fcntl.h>
