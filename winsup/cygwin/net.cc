@@ -1525,69 +1525,6 @@ getdomainname (char *domain, size_t len)
 
 /* Fill out an ifconf struct. */
 
-#ifndef __MINGW64_VERSION_MAJOR
-
-/* Vista/Longhorn: unicast address has additional OnLinkPrefixLength member. */
-typedef struct _IP_ADAPTER_UNICAST_ADDRESS_LH {
-    _ANONYMOUS_UNION union {
-	ULONGLONG Alignment;
-	_ANONYMOUS_UNION struct {
-	    ULONG Length;
-	    DWORD Flags;
-	} DUMMYSTRUCTNAME;
-    } DUMMYUNIONNAME;
-    struct _IP_ADAPTER_UNICAST_ADDRESS_VISTA *Next;
-    SOCKET_ADDRESS Address;
-    IP_PREFIX_ORIGIN PrefixOrigin;
-    IP_SUFFIX_ORIGIN SuffixOrigin;
-    IP_DAD_STATE DadState;
-    ULONG ValidLifetime;
-    ULONG PreferredLifetime;
-    ULONG LeaseLifetime;
-    unsigned char OnLinkPrefixLength;
-} IP_ADAPTER_UNICAST_ADDRESS_LH, *PIP_ADAPTER_UNICAST_ADDRESS_LH;
-
-/* Vista/Longhorn: IP_ADAPTER_ADDRESSES has a lot more info.  We pick only
-   what we need for now. */
-typedef struct _IP_ADAPTER_ADDRESSES_LH {
-  _ANONYMOUS_UNION union {
-    ULONGLONG Alignment;
-    _ANONYMOUS_STRUCT struct {
-      ULONG Length;
-      DWORD IfIndex;
-    } DUMMYSTRUCTNAME;
-  } DUMMYUNIONNAME;
-  struct _IP_ADAPTER_ADDRESSES* Next;
-  PCHAR AdapterName;
-  PIP_ADAPTER_UNICAST_ADDRESS FirstUnicastAddress;
-  PIP_ADAPTER_ANYCAST_ADDRESS FirstAnycastAddress;
-  PIP_ADAPTER_MULTICAST_ADDRESS FirstMulticastAddress;
-  PIP_ADAPTER_DNS_SERVER_ADDRESS FirstDnsServerAddress;
-  PWCHAR DnsSuffix;
-  PWCHAR Description;
-  PWCHAR FriendlyName;
-  BYTE PhysicalAddress[MAX_ADAPTER_ADDRESS_LENGTH];
-  DWORD PhysicalAddressLength;
-  DWORD Flags;
-  DWORD Mtu;
-  DWORD IfType;
-  IF_OPER_STATUS OperStatus;
-  DWORD Ipv6IfIndex;
-  DWORD ZoneIndices[16];
-  PIP_ADAPTER_PREFIX FirstPrefix;
-
-  ULONG64 TransmitLinkSpeed;
-  ULONG64 ReceiveLinkSpeed;
-  PVOID FirstWinsServerAddress;
-  PVOID FirstGatewayAddress;
-  ULONG Ipv4Metric;
-  ULONG Ipv6Metric;
-} IP_ADAPTER_ADDRESSES_LH,*PIP_ADAPTER_ADDRESSES_LH;
-
-#define SIO_GET_INTERFACE_LIST  _IOR('t', 127, u_long)
-
-#endif /* !__MINGW64_VERSION_MAJOR */
-
 #ifndef IN_LOOPBACK
 #define IN_LOOPBACK(a)	((((long int) (a)) & 0xff000000) == 0x7f000000)
 #endif

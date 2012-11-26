@@ -25,10 +25,6 @@ details. */
 #include "pwdgrp.h"
 #include "ntdll.h"
 
-#ifndef __MINGW64_VERSION_MAJOR
-#define SECURITY_NT_NON_UNIQUE SECURITY_NT_NON_UNIQUE_RID
-#endif
-
 /* General purpose security attribute objects for global use. */
 SECURITY_ATTRIBUTES NO_COPY sec_none;
 SECURITY_ATTRIBUTES NO_COPY sec_none_nih;
@@ -378,11 +374,7 @@ static const struct {
   { SE_CREATE_GLOBAL_NAME,		false },
   { SE_TRUSTED_CREDMAN_ACCESS_NAME,	false },
   { SE_RELABEL_NAME,			true  },
-#ifndef __MINGW64_VERSION_MAJOR
-  { SE_INCREASE_WORKING_SET_NAME,	false },
-#else
   { SE_INC_WORKING_SET_NAME,		false },
-#endif
   { SE_TIME_ZONE_NAME,			true  },
   { SE_CREATE_SYMBOLIC_LINK_NAME,	true  }
 };

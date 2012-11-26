@@ -1349,17 +1349,6 @@ fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
   return recv_internal (&wsamsg, false);
 }
 
-extern "C" {
-#ifndef __MINGW64_VERSION_MAJOR
-#define WSAID_WSARECVMSG \
-	  {0xf689d7c8,0x6f1f,0x436b,{0x8a,0x53,0xe5,0x4f,0xe3,0x51,0xc3,0x22}};
-typedef int (WSAAPI *LPFN_WSARECVMSG)(SOCKET,LPWSAMSG,LPDWORD,LPWSAOVERLAPPED,
-				      LPWSAOVERLAPPED_COMPLETION_ROUTINE);
-#endif
-int WSAAPI WSASendMsg(SOCKET,LPWSAMSG,DWORD,LPDWORD, LPWSAOVERLAPPED,
-		      LPWSAOVERLAPPED_COMPLETION_ROUTINE);
-};
-
 /* There's no DLL which exports the symbol WSARecvMsg.  One has to call
    WSAIoctl as below to fetch the function pointer.  Why on earth did the
    MS developers decide not to export a normal symbol for these extension

@@ -1,3 +1,15 @@
+2012-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_registry.cc: Drop Mingw.org considerations.
+	* fhandler_serial.cc: Ditto.
+	* fhandler_socket.cc: Ditto.
+	* fhandler_tape.cc: Ditto.
+	* fhandler_tty.cc: Ditto.
+	* net.cc: Ditto.
+	* ntdll.h: Ditto.
+	* sched.cc: Ditto.
+	* sec_helper.cc: Ditto.
+
 2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* configure.in: Remove unneeded ALLOC substitution.
