@@ -1,5 +1,10 @@
 2012-11-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* Makefile.in (ZLIBS): Common define to force static load.
+	(MINGW_LDFLAGS): Use static libgcc.
+
+2012-11-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* Makefile.in: Make sure that libz is always loaded staticly.
 
 2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>

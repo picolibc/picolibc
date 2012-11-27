@@ -67,9 +67,10 @@ MINGW_BINS := ${addsuffix .exe,cygcheck cygwin-console-helper ldh strace}
 # list will will be compiled in Cygwin mode implicitly, so there is no
 # need for a CYGWIN_OBJS.
 MINGW_OBJS := bloda.o cygcheck.o dump_setup.o ldh.o path.o strace.o
-MINGW_LDFLAGS:=-L${WINDOWS_LIBDIR}
+MINGW_LDFLAGS:=-L${WINDOWS_LIBDIR} -static-libgcc
 
 CYGCHECK_OBJS:=cygcheck.o bloda.o path.o dump_setup.o
+ZLIB:=-Wl,-dn,-lz,-dy
 
 .PHONY: all
 all:
@@ -85,7 +86,7 @@ mount.exe: path-mount.o
 
 # Provide any necessary per-target variable overrides.
 
-cygcheck.exe: MINGW_LDFLAGS += -lpsapi -lntdll --static -lz
+cygcheck.exe: MINGW_LDFLAGS += ${ZLIB} -lpsapi -lntdll
 cygcheck.exe: ${CYGCHECK_OBJS}
 
 cygpath.o: CXXFLAGS += -fno-threadsafe-statics
@@ -107,7 +108,7 @@ CYGWIN_BINS += dumper.exe
 dumper.o module_info.o parse_pe.o: CXXFLAGS += -I$(top_srcdir)/include
 dumper.o parse_pe.o: dumper.h
 dumper.exe: module_info.o parse_pe.o
-dumper.exe: CYGWIN_LDFLAGS += -lbfd -lintl -liconv -liberty --static -lz
+dumper.exe: CYGWIN_LDFLAGS += -lbfd -lintl -liconv -liberty ${ZLIB}
 else
 all: warn_dumper
 endif
