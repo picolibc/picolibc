@@ -76,6 +76,9 @@ case "$target_cpu" in
    i?86) DLL_ENTRY="_dll_entry@12"
 		DEF_DLL_ENTRY="dll_entry@12"
 		CONFIG_DIR="i386"  ;;
+   x86_64) DLL_ENTRY="_dll_entry"
+		DEF_DLL_ENTRY="dll_entry"
+		CONFIG_DIR="x86_64"  ;;
    *)		AC_MSG_ERROR(Invalid target processor \"$target_cpu\") ;;
 esac
 

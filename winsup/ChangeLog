@@ -1,3 +1,18 @@
+2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in (Makefile): Rely on 'configure' not 'configure.in'.
+
+2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* configure.ac: Rename from configure.in.
+	* configure.in: Delete.
+	* configure: Regenerate.
+
+2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* ccwrap: Don't drop mingw header file paths unless we've specified
+	them with --with-windows-headers.
+
 2012-11-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* Makefile.common: Revamp for new configury.  Add default compilation
