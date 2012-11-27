@@ -1,3 +1,7 @@
+2012-11-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Make sure that libz is always loaded staticly.
+
 2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* configure.ac: Rename from configure.in.
