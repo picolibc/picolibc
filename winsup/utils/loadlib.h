@@ -1,6 +1,6 @@
 /* loadlib.h
 
-   Copyright 2010, 2011 Red Hat, Inc.
+   Copyright 2010, 2011, 2012 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -23,7 +23,7 @@ static HMODULE _load_sys_library (const wchar_t *dll) __attribute__ ((used));
 static HMODULE
 _load_sys_library (const wchar_t *dll)
 {
-  static BOOL (*set_dll_directory)(LPCWSTR);
+  static BOOL WINAPI (*set_dll_directory)(LPCWSTR);
   static WCHAR sysdir[MAX_PATH];
   static UINT sysdir_len;
 
@@ -39,10 +39,10 @@ _load_sys_library (const wchar_t *dll)
     {
       HMODULE k32 = GetModuleHandleW (L"kernel32.dll");
       if (k32)
-      	set_dll_directory = (BOOL (*)(LPCWSTR))
+      	set_dll_directory = (BOOL WINAPI (*)(LPCWSTR))
 		     GetProcAddress (k32, "SetDllDirectoryW");
       if (!set_dll_directory)
-	set_dll_directory = (BOOL (*)(LPCWSTR)) -1;
+	set_dll_directory = (BOOL WINAPI (*)(LPCWSTR)) -1;
       else
       	set_dll_directory (L"");
     }

@@ -1,5 +1,14 @@
 2012-11-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* Makefile.in: Move CFLAGS and CXXFLAGS so that they can be manipulated
+	by Makefile.common.  Add -static-libstdc++ to *LDFLAGS.  Add
+	dependencies for loadlib.h.
+	* loadlib.h: Update copyright.
+	(_load_sys_library): Properly define set_dll_library as WINAPI to avoid
+	stack corruption.
+
+2012-11-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* Makefile.in (ZLIBS): Common define to force static load.
 	(MINGW_LDFLAGS): Use static libgcc.
 
