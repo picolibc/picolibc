@@ -15,6 +15,10 @@ configure_args=@configure_args@
 export CC:=@CC@
 export CXX:=@CXX@
 
+CFLAGS:=@CFLAGS@
+override CXXFLAGS=@CXXFLAGS@
+override CXXFLAGS+=-MMD -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""
+
 include ${srcdir}/../Makefile.common
 
 cygwin_build:=${target_builddir}/winsup/cygwin
@@ -38,9 +42,6 @@ INSTALL_DATA:=@INSTALL_DATA@
 
 AR:=@AR@
 
-CFLAGS:=@CFLAGS@
-override CXXFLAGS=@CXXFLAGS@
-override CXXFLAGS+=-MMD -DHAVE_DECL_GETOPT=0 -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""
 
 OBJS:=	cygserver.o client.o process.o msg.o sem.o shm.o threaded_queue.o \
 	transport.o transport_pipes.o \
