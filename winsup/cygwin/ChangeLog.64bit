@@ -1,3 +1,28 @@
+2012-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Extend leading comment to describe the 64 bit
+	implementation as well.
+	(LoadDLLprime): Define for x86_64.
+	(LoadDLLfuncEx3): Ditto.
+	(dll_func_load): Ditto.
+	(struct dll_info): Use target-agnostic type for load_state.
+	(struct func_info): Add func_addr member on x86_64.
+	(two_addr_t): New type to be twice the size of an address on either
+	target.
+	(union retchain): Use target-agnostic type for low and high,
+	use two_addr_t as type for ll member.
+	(std_dll_init): Define as SYSV ABI function on x86_64.  Explain why.
+	Change return type to two_addr_t.  Add casts as necessary.  Convert
+	assembler code to tweak return address into C code.
+	(wsock_init): Ditto.  Drop leading underscore in LoadDLLprime
+	macro call on x86_64.
+	(GetAdaptersAddresses): Define using LoadDLLfunc since it's not called
+	on pre-XP anyway.
+	(AttachConsole): Don't define on x86_64.
+	(GetModuleHandleExW): Ditto.
+	(GetSystemWow64DirectoryW): Ditto.
+	(GetVolumePathNamesForVolumeNameW): Ditto.
+
 2012-11-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/strace.h: Include sys/types.h for pid_t.
