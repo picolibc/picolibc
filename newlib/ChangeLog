@@ -1,3 +1,14 @@
+2012-11-29  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/reent.h (__sFILE): Change type of _offset
+	from int to _off_t.
+	* libc/stdio/ftell.c: Use _ftello_r().
+	* libc/stdio/ftello.c: Copy implementation from previous
+	_ftell_r().
+	* libc/stdio/fseek.c: Use _fseeko_r().
+	* libc/stdio/fseeko.c: Copy implementation from previous
+	_fseek_r().
+
 2012-11-26  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/include/inttypes.h: Add and use __INTTYPES_EXP().

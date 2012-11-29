@@ -203,7 +203,7 @@ struct __sFILE {
 
   /* Unix stdio files get aligned to block boundaries on fseek() */
   int	_blksize;	/* stat.st_blksize (may be != _bf._size) */
-  int	_offset;	/* current lseek offset */
+  _off_t _offset;	/* current lseek offset */
 
 #ifndef _REENT_SMALL
   struct _reent *_data;	/* Here for binary compatibility? Remove? */

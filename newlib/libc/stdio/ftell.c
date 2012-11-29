@@ -105,64 +105,13 @@ _DEFUN(_ftell_r, (ptr, fp),
 {
   _fpos_t pos;
 
-  /* Ensure stdio is set up.  */
-
-  CHECK_INIT (ptr, fp);
-
-  _newlib_flockfile_start (fp);
-
-  if (fp->_seek == NULL)
-    {
-      ptr->_errno = ESPIPE;
-      _newlib_flockfile_exit (fp);
-      return -1L;
-    }
-
-  /* Find offset of underlying I/O object, then adjust for buffered
-     bytes.  Flush a write stream, since the offset may be altered if
-     the stream is appending.  Do not flush a read stream, since we
-     must not lose the ungetc buffer.  */
-  if (fp->_flags & __SWR)
-    _fflush_r (ptr, fp);
-  if (fp->_flags & __SOFF)
-    pos = fp->_offset;
-  else
-    {
-      pos = fp->_seek (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
-      if (pos == -1L)
-        {
-          _newlib_flockfile_exit (fp);
-          return pos;
-        }
-    }
-  if (fp->_flags & __SRD)
-    {
-      /*
-       * Reading.  Any unread characters (including
-       * those from ungetc) cause the position to be
-       * smaller than that in the underlying object.
-       */
-      pos -= fp->_r;
-      if (HASUB (fp))
-	pos -= fp->_ur;
-    }
-  else if ((fp->_flags & __SWR) && fp->_p != NULL)
-    {
-      /*
-       * Writing.  Any buffered characters cause the
-       * position to be greater than that in the
-       * underlying object.
-       */
-      pos += fp->_p - fp->_bf._base;
-    }
-
-  _newlib_flockfile_end (fp);
+  pos = _ftello_r (ptr, fp);
   if ((long)pos != pos)
     {
       pos = -1;
       ptr->_errno = EOVERFLOW;
     }
-  return pos;
+  return (long)pos;
 }
 
 #ifndef _REENT_ONLY
