@@ -1,3 +1,8 @@
+2012-11-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (thread_wrapper): Use PVOID instead of VOID *.
+	Fix stack alignment before calling VirtualFree.  Fix comments.
+
 2012-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (wsock_init): Drop vendor info debug printout.  It's

@@ -448,7 +448,7 @@ struct thread_wrapper_arg
 };
 
 DWORD WINAPI
-thread_wrapper (VOID *arg)
+thread_wrapper (PVOID arg)
 {
   /* Just plain paranoia. */
   if (!arg)
@@ -522,17 +522,18 @@ thread_wrapper (VOID *arg)
 	   movq  16(%%rbx), %%rcx	# Load stackaddr into rcx	\n\
 	   movq  24(%%rbx), %%rsp	# Load stackbase into rsp	\n\
 	   subq  %[CYGTLS], %%rsp	# Subtract CYGTLS_PADSIZE	\n\
-	   subq  $40, %%rsp		# Subtract another 40 bytes	\n\
-	   				# (8 bytes + 32 bytes shadow)	\n\
+	   				# (here we are 16 bytes aligned)\n\
+	   subq  $32, %%rsp		# Subtract another 32 bytes	\n\
+	   				# (shadow space for arg regs)	\n\
 	   xorq  %%rbp, %%rbp		# Set rbp to 0			\n\
 	   # We moved to the new stack.					\n\
 	   # Now it's safe to release the OS stack.			\n\
 	   movl  $0x8000, %%r8d		# dwFreeType: MEM_RELEASE	\n\
 	   xorl  %%edx, %%edx		# dwSize:     0			\n\
-	   # stackaddr is already in the correct register rcx!		\n\
+	   # dwAddress is already in the correct arg register rcx	\n\
 	   call  VirtualFree						\n\
-	   # All set.  We can copy the thread function address and the	\n\
-	   # thread arg from the stack and just call the function.	\n\
+	   # All set.  We can copy the thread arg from the safe		\n\
+	   # register r13 and then just call the function.		\n\
 	   movq  %%r13, %%rcx		# Move thread arg to 1st arg reg\n\
 	   call  *%%r12			# Call thread func		\n"
 	   : : [WRAPPER_ARG] "r" (&wrapper_arg),
