@@ -16,6 +16,10 @@ configure_args=@configure_args@
 export CC:=@CC@
 export CXX:=@CXX@
 
+CFLAGS:=@CFLAGS@
+CXXFLAGS:=@CXXFLAGS@
+override CXXFLAGS+=-fno-exceptions -fno-rtti
+
 include ${srcdir}/../Makefile.common
 
 cygwin_build:=${target_builddir}/winsup/cygwin
@@ -42,14 +46,10 @@ override INSTALL_DATA:=@INSTALL_DATA@
 EXEEXT:=@EXEEXT@
 EXEEXT_FOR_BUILD:=@EXEEXT_FOR_BUILD@
 
-CFLAGS:=@CFLAGS@
-CXXFLAGS:=@CXXFLAGS@
-override CXXFLAGS+=-fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0
-
 .PHONY: all install clean realclean warn_dumper warn_cygcheck_zlib
 
-LDLIBS     := -lnetapi32 -ladvapi32 -lkernel32 -luser32
-CYGWIN_LDFLAGS    := -static-libgcc -Wl,--enable-auto-import -L${WINDOWS_LIBDIR} $(LDLIBS)
+LDLIBS := -lnetapi32 -ladvapi32 -lkernel32 -luser32
+CYGWIN_LDFLAGS := -static-libgcc -static-libstdc++ -Wl,--enable-auto-import -L${WINDOWS_LIBDIR} $(LDLIBS)
 DEP_LDLIBS := $(cygwin_build)/libcygwin.a
 
 MINGW_CXX      := @MINGW_CXX@
@@ -67,9 +67,10 @@ MINGW_BINS := ${addsuffix .exe,cygcheck cygwin-console-helper ldh strace}
 # list will will be compiled in Cygwin mode implicitly, so there is no
 # need for a CYGWIN_OBJS.
 MINGW_OBJS := bloda.o cygcheck.o dump_setup.o ldh.o path.o strace.o
-MINGW_LDFLAGS:=-L${WINDOWS_LIBDIR}
+MINGW_LDFLAGS:=-L${WINDOWS_LIBDIR} -static-libgcc -static-libstdc++
 
 CYGCHECK_OBJS:=cygcheck.o bloda.o path.o dump_setup.o
+ZLIB:=-Wl,-dn,-lz,-dy
 
 .PHONY: all
 all:
@@ -85,7 +86,7 @@ mount.exe: path-mount.o
 
 # Provide any necessary per-target variable overrides.
 
-cygcheck.exe: MINGW_LDFLAGS += -lpsapi -lntdll -lz
+cygcheck.exe: MINGW_LDFLAGS += ${ZLIB} -lpsapi -lntdll
 cygcheck.exe: ${CYGCHECK_OBJS}
 
 cygpath.o: CXXFLAGS += -fno-threadsafe-statics
@@ -107,7 +108,7 @@ CYGWIN_BINS += dumper.exe
 dumper.o module_info.o parse_pe.o: CXXFLAGS += -I$(top_srcdir)/include
 dumper.o parse_pe.o: dumper.h
 dumper.exe: module_info.o parse_pe.o
-dumper.exe: CYGWIN_LDFLAGS += -lbfd -lintl -liconv -liberty -lz
+dumper.exe: CYGWIN_LDFLAGS += -lbfd -lintl -liconv -liberty ${ZLIB}
 else
 all: warn_dumper
 endif
@@ -150,6 +151,8 @@ $(CYGWIN_BINS): %.exe: %.o
 # these dependencies ensure that the required in-tree libs are built first
 $(MINGW_BINS): $(DEP_LDLIBS)
 $(CYGWIN_BINS): $(DEP_LDLIBS)
+
+cygcheck.o cygpath.o module_info.o path.o ps.o regtool.o strace.o: loadlib.h
 
 .PHONY: clean
 clean:

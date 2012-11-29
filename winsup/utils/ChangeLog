@@ -1,3 +1,27 @@
+2012-11-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Move CFLAGS and CXXFLAGS so that they can be manipulated
+	by Makefile.common.  Add -static-libstdc++ to *LDFLAGS.  Add
+	dependencies for loadlib.h.
+	* loadlib.h: Update copyright.
+	(_load_sys_library): Properly define set_dll_library as WINAPI to avoid
+	stack corruption.
+
+2012-11-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in (ZLIBS): Common define to force static load.
+	(MINGW_LDFLAGS): Use static libgcc.
+
+2012-11-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Make sure that libz is always loaded staticly.
+
+2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* configure.ac: Rename from configure.in.
+	* configure.in: Delete.
+	* configure: Regenerate.
+
 2012-11-26  Corinna Vinschen <corinna@vinschen.de>
 
 	* bloda.cc: Drop Mingw.org considerations.
@@ -11,7 +35,7 @@
 	* autogen.sh: New script.
 	* configure.in: Revamp for new configury.
 	* Makefile.in: Revamp for new configury.  Rename ALL_* to just *.
-	Always use "VERBOSE" setting. 
+	Always use "VERBOSE" setting.
 	(MINGW_CXX): Don't include CFLAGS in definition.
 	(all): Define target first, before everything else so that it is the
 	default.
