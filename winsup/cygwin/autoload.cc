@@ -471,7 +471,6 @@ wsock_init ()
 	  debug_printf ("szSystemStatus %s", wsadata.szSystemStatus);
 	  debug_printf ("iMaxSockets %d", wsadata.iMaxSockets);
 	  debug_printf ("iMaxUdpDg %d", wsadata.iMaxUdpDg);
-	  debug_printf ("lpVendorInfo %d", wsadata.lpVendorInfo);
 
 	  wsock_started = 1;
 	}

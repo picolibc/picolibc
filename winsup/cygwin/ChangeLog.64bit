@@ -1,5 +1,10 @@
 2012-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (wsock_init): Drop vendor info debug printout.  It's
+	undefined since Wsock version 2.
+
+2012-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc: Extend leading comment to describe the 64 bit
 	implementation as well.
 	(LoadDLLprime): Define for x86_64.
