@@ -718,7 +718,6 @@ init_windows_system_directory ()
 void
 dll_crt0_0 ()
 {
-  small_printf ("HERE\n");
   wincap.init ();
   child_proc_info = get_cygwin_startup_info ();
   init_windows_system_directory ();
@@ -783,7 +782,6 @@ dll_crt0_0 ()
     sigproc_init ();
 
   debug_printf ("finished dll_crt0_0 initialization");
-  small_printf ("THERE\n");
 }
 
 /* Take over from libc's crt0.o and start the application. Note the
