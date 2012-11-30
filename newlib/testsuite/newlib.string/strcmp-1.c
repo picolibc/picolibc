@@ -239,6 +239,42 @@ main (void)
 		}
 	    }
 	}
+
+  /* Check some corner cases.  */
+  src[1] = 'A';
+  dest[1] = 'A';
+  src[2] = 'B';
+  dest[2] = 'B';
+  src[3] = 'C';
+  dest[3] = 'C';
+  src[4] = '\0';
+  dest[4] = '\0';
+
+  src[0] = 0xc1;
+  dest[0] = 0x41;
+  ret = strcmp (src, dest);
+  if (ret <= 0)
+    print_error ("\nFailed: expected positive, return %d\n", ret);
+
+  src[0] = 0x01;
+  dest[0] = 0x82;
+  ret = strcmp (src, dest);
+  if (ret >= 0)
+    print_error ("\nFailed: expected negative, return %d\n", ret);
+
+  dest[0] = src[0] = 'D';
+  src[3] = 0xc1;
+  dest[3] = 0x41;
+  ret = strcmp (src, dest);
+  if (ret <= 0)
+    print_error ("\nFailed: expected positive, return %d\n", ret);
+
+  src[3] = 0x01;
+  dest[3] = 0x82;
+  ret = strcmp (src, dest);
+  if (ret >= 0)
+    print_error ("\nFailed: expected negative, return %d\n", ret);
+
   printf ("\n");
   if (errors != 0)
     {

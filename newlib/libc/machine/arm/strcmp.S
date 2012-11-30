@@ -396,7 +396,17 @@ do_return:
         lsr     r2, r2, r0
 
 compute_return_value:
-        subs    r0, r1, r2
+        movs    r0, #1
+        cmp     r1, r2
+        /* The return value is computed as follows.
+        If r1>r2 then (C==1 and Z==0) and LS doesn't hold and r0 is #1 at return.
+        If r1<r2 then (C==0 and Z==0) and we execute SBC with carry_in=0,
+        which means r0:=r0-r0-1 and r0 is #-1 at return.
+        If r1=r2 then (C==1 and Z==1) and we execute SBC with carry_in=1,
+        which means r0:=r0-r0 and r0 is #0 at return.
+        (C==0 and Z==1) cannot happen because the carry bit is "not borrow".  */
+        it      ls
+        sbcls   r0, r0, r0
         bx      lr
 
 

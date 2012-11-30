@@ -1,3 +1,8 @@
+2012-11-30  Greta Yorsh  <Greta.Yorsh@arm.com>
+
+	* libc/machine/arm/strcmp.S (compute_return_value): Fix return value.
+	* testsuite/newlib.string/strcmp-1.c (main): Add new test cases.
+
 2012-11-29  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/reent.h (__sFILE): Change type of _offset
