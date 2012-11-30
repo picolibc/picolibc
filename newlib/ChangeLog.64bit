@@ -1,3 +1,8 @@
+2012-11-30  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/machine/setjmp.h: Change definition of _JBLEN to allow
+	different values for 32 bit and 64 bit Cygwin.
+
 2012-08-13  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/reent.h (stat64): Define as stat under Cygwin, instead

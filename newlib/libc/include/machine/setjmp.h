@@ -68,19 +68,25 @@ _BEGIN_STD_C
 #define	_JBLEN	9
 #endif
 
-#if defined(__CYGWIN__) && !defined (_JBLEN)
-#define _JBLEN (13 * 4)
-#elif defined (__i386__)
-#if defined(__unix__) || defined(__rtems__)
-# define _JBLEN	9
-#else
-#include "setjmp-dj.h"
-#endif
+#ifdef __i386__
+# if defined(__CYGWIN__) && !defined (_JBLEN)
+#  define _JBLEN (13 * 4)
+# elif defined(__unix__) || defined(__rtems__)
+#  define _JBLEN	9
+# else
+#  include "setjmp-dj.h"
+# endif
 #endif
 
 #ifdef __x86_64__
-#define _JBTYPE long long
-#define _JBLEN  8
+# define _JBTYPE long long
+# ifdef __CYGWIN__
+#  define _JBLEN  32	/* FIXME: This matches the size of the native Windows
+				  setjmp buf.  We probably need more for fork
+				  to be on the safe side. */
+# else
+#  define _JBLEN  8
+# endif
 #endif
 
 #ifdef __i960__
