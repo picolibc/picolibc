@@ -1,3 +1,8 @@
+2012-11-30  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* spawn.cc (child_info_spawn::worker): Make detection of '/c' case
+	insensitive when looking for cmd.exe command line.
+
 2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* configure.ac: Rename from configure.in.

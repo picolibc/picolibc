@@ -389,7 +389,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       goto out;
     }
 
-  if (ac == 3 && argv[1][0] == '/' && argv[1][1] == 'c' &&
+  if (ac == 3 && argv[1][0] == '/' && tolower (argv[1][1]) == 'c' &&
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
     {
       real_path.check (prog_arg);
