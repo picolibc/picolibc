@@ -1,11 +1,3 @@
-2012-12-03  Corinna Vinschen  <corinna@vinschen.de>
-
-	* Makefile.in: Add rule to build cygwin.sc dynamically using the
-	target compiler.
-	* cygwin.sc.in: Rename from cygwin.sc.  Make OUTPUT_FORMAT and
-	SEARCH_DIR dependent on target CPU.  Add extra alignment and .xdata
-	section on x86_64.  Keep up with latest dwarf debug section changes.
-
 2012-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_registry.cc: Drop Mingw.org considerations.
