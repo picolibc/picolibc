@@ -411,6 +411,9 @@ maintainer-clean realclean: clean
 	@echo "it deletes files that may require special tools to rebuild."
 	-rm -fr configure
 
+# Rule to build LDSCRIPT
+$(LDSCRIPT): $(LDSCRIPT).in
+	$(CC) -E - -P < $^ -o $@
 
 # Rule to build cygwin.dll
 $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp

@@ -1,5 +1,11 @@
+#ifdef __x86_64__
+OUTPUT_FORMAT(pei-x86_64)
+SEARCH_DIR("/usr/lib64"); SEARCH_DIR("=/usr/lib64/w32api");
+#else
+#undef i386
 OUTPUT_FORMAT(pei-i386)
 SEARCH_DIR("/usr/i686-pc-cygwin/lib/w32api"); SEARCH_DIR("=/usr/lib/w32api");
+#endif
 SECTIONS
 {
   .text  __image_base__ + __section_alignment__  :
@@ -9,6 +15,9 @@ SECTIONS
     *(SORT(.text$*))
     *(.glue_7t)
     *(.glue_7)
+#ifdef __x86_64__
+    . = ALIGN(8);
+#endif
      ___CTOR_LIST__ = .; __CTOR_LIST__ = .;
 			LONG (-1); *(SORT(.ctors.*)); *(.ctors); *(.ctor); LONG (0);
      ___DTOR_LIST__ = .; __DTOR_LIST__ = .;
@@ -26,8 +35,8 @@ SECTIONS
   /* The Cygwin DLL uses a section to avoid copying certain data
      on fork.  This used to be named ".data".  The linker used
      to include this between __data_start__ and __data_end__, but that
-     breaks building the cygwin32 dll.  Instead, we name the section
-     ".data_cygwin_nocopy" and explictly include it after __data_end__. */
+     breaks building the cygwin dll.  Instead, we name the section
+     ".data_cygwin_nocopy" and explicitly include it after __data_end__. */
   .data ALIGN(__section_alignment__) :
   {
     __data_start__ = .;
@@ -47,6 +56,12 @@ SECTIONS
   {
     *(.pdata)
   }
+#ifdef __x86_64__
+  .xdata ALIGN(__section_alignment__) :
+  {
+    *(.xdata)
+  }
+#endif
   .bss ALIGN(__section_alignment__) :
   {
     __bss_start__ = .;
@@ -126,6 +141,7 @@ SECTIONS
   /* DWARF 1.1 and DWARF 2 */
   .debug_aranges  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_aranges) }
   .debug_pubnames ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_pubnames) }
+  .debug_pubtypes ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_pubtypes) }
   /* DWARF 2 */
   .debug_info     ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_info) }
   .debug_abbrev   ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_abbrev) }
@@ -134,6 +150,14 @@ SECTIONS
   .debug_str      ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_str) }
   .debug_loc      ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_loc) }
   .debug_macinfo  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_macinfo) }
+  /* SGI/MIPS DWARF 2 extensions. */
+  .debug_weaknames ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_weaknames) }
+  .debug_funcnames ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_funcnames) }
+  .debug_typenames ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_typenames) }
+  .debug_varnames  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_varnames) }
+  .debug_macro    ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_macro) }
+  /* DWARF 3. */
   .debug_ranges   ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_ranges) }
-  .debug_pubtypes ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_pubtypes) }
+  /* DWARF 4. */
+  .debug_types	  ALIGN(__section_alignment__) (NOLOAD) : { *(.debug_types .gnu.linkonce.wt.*) }
 }
