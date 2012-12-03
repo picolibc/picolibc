@@ -1,5 +1,10 @@
 2012-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.h (CYGTLS_PADSIZE): Change comment noting alignment has to
+	be 16 bytes on x86_64.
+
+2012-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in: Add rule to build cygwin.sc dynamically using the
 	target compiler.
 	* cygwin.sc.in: Rename from cygwin.sc.  Make OUTPUT_FORMAT and

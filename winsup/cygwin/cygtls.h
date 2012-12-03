@@ -261,7 +261,7 @@ private:
 /* FIXME: Find some way to autogenerate this value */
 #ifdef __x86_64__
 /* FIXME: Is that padding sufficent for the 64 bit stack? */
-const int CYGTLS_PADSIZE = 12800;	/* Must be 8-byte aligned */
+const int CYGTLS_PADSIZE = 12800;	/* Must be 16-byte aligned */
 #else
 const int CYGTLS_PADSIZE = 12700;
 #endif
