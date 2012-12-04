@@ -1,6 +1,6 @@
 /* sem.cc: Single unix specification IPC interface for Cygwin.
 
-   Copyright 2003, 2004 Red Hat, Inc.
+   Copyright 2003, 2004, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -43,6 +43,16 @@ client_request_sem::serve (transport_layer_base *const conn,
       msglen (0);
       return;
     }
+#ifndef __x86_64__
+  if (_parameters.in.ipcblk.is_64bit)
+    {
+      syscall_printf ("32 bit cygserver can't serve 64 bit processes.  "
+		      "Use 64 bit cygserver.");
+      error_code (ENOSYS);
+      msglen (0);
+      return;
+    }
+#endif
   if (support_semaphores == TUN_FALSE)
     {
       syscall_printf ("Semaphore support not started");
