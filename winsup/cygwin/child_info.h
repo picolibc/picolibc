@@ -55,7 +55,7 @@ public:
   DWORD msv_count;	// zeroed on < W2K3, set to pseudo-count on Vista
   DWORD cb;		// size of this record
   DWORD intro;		// improbable string
-  unsigned long magic;	// magic number unique to child_info
+  DWORD magic;		// magic number unique to child_info
   unsigned short type;	// type of record, exec, spawn, fork
   init_cygheap *cygheap;
   void *cygheap_max;
