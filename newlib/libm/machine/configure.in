@@ -26,6 +26,7 @@ machlib=
 if test -n "${libm_machine_dir}"; then
   case ${libm_machine_dir} in
 	aarch64) AC_CONFIG_SUBDIRS(aarch64) ;;
+	arm) AC_CONFIG_SUBDIRS(arm) ;;
 	i386) AC_CONFIG_SUBDIRS(i386) ;;
 	spu) AC_CONFIG_SUBDIRS(spu) ;;
   esac;

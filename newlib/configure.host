@@ -104,6 +104,7 @@ case "${host_cpu}" in
 	;;
   arm*)
 	machine_dir=arm
+	libm_machine_dir=arm
 	;;
   avr*)
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mcall-prologues"

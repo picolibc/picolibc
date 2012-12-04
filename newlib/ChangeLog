@@ -1,3 +1,26 @@
+2012-12-04  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* configure.host: Define libm_machine_dir value for arm.
+	* libm/machine/configure.in: Add arm to libm machines list.
+	* libm/machine/configure: Regenerate.
+	* libm/machine/arm/Makefile.am: New file.
+	* libm/machine/arm/Makefile.in: Generated.
+	* libm/machine/arm/aclocal.m4: Generated.
+	* libm/machine/arm/configure: Generated.
+	* libm/machine/arm/configure.in: New file.
+	* libm/machine/arm/s_ceil.c: Likewise.
+	* libm/machine/arm/s_floor.c: Likewise.
+	* libm/machine/arm/s_nearbyint.c: Likewise.
+	* libm/machine/arm/s_rint.c: Likewise.
+	* libm/machine/arm/s_round.c: Likewise.
+	* libm/machine/arm/s_trunc.c: Likewise.
+	* libm/machine/arm/sf_ceil.c: Likewise.
+	* libm/machine/arm/sf_floor.c: Likewise.
+	* libm/machine/arm/sf_nearbyint.c: Likewise.
+	* libm/machine/arm/sf_rint.c: Likewise.
+	* libm/machine/arm/sf_round.c: Likewise.
+	* libm/machine/arm/sf_trunc.c: Likewise.
+
 2012-11-30  Greta Yorsh  <Greta.Yorsh@arm.com>
 
 	* libc/machine/arm/strcmp.S (compute_return_value): Fix return value.
