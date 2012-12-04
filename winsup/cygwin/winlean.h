@@ -90,7 +90,16 @@ details. */
 #undef _WINNETWK_
 #undef _WINSVC_
 
-/* When Terminal Services are installed, the GetWindowsDirectory function
+/* We need a transparent way to define a 64 bit slot for types which have
+   different size on different platforms.  This is a first cut to accomplish
+   this.  We define it here to allow easy access from cygwin and cygserver. */
+#define _TYPE64(type,name) \
+  union { \
+    type name; \
+    UINT64 __ ## name ## _align; \
+  };
+
+/*When Terminal Services are installed, the GetWindowsDirectory function
    does not return the system installation dir, but a user specific directory
    instead.  That's not what we have in mind when calling GetWindowsDirectory
    from within Cygwin.  So we redefine GetWindowsDirectory to something

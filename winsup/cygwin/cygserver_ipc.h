@@ -19,17 +19,21 @@ struct vmspace {
   struct shmmap_state *vm_shm;
 };
 
+#pragma pack (push, 4)
 struct proc {
   pid_t cygpid;
   DWORD winpid;
+  bool is_64bit;
+  bool is_admin;
   uid_t uid;
   gid_t gid;
   int gidcnt;
-  gid_t *gidlist;
-  bool is_admin;
-  struct vmspace *p_vmspace;
-  HANDLE signal_arrived;
+  _TYPE64 (HANDLE, signal_arrived);
+  /* Only used internally. */
+  _TYPE64 (gid_t *, gidlist);
+  _TYPE64 (struct vmspace *, p_vmspace);
 };
+#pragma pack (pop)
 
 #ifdef __INSIDE_CYGWIN__
 #include "sigproc.h"
@@ -38,12 +42,18 @@ ipc_set_proc_info (proc &blk)
 {
   blk.cygpid = getpid ();
   blk.winpid = GetCurrentProcessId ();
+#ifdef __x86_64__
+  blk.is_64bit = true;
+#else
+  blk.is_64bit = false;
+#endif
+  blk.is_admin = false;
   blk.uid = geteuid32 ();
   blk.gid = getegid32 ();
-  blk.gidcnt = 0;
-  blk.gidlist = NULL;
-  blk.is_admin = false;
+  blk.__signal_arrived_align = 0;
   _my_tls.set_signal_arrived (true, blk.signal_arrived);
+  blk.gidcnt = 0;
+  blk.__gidlist_align = 0;
 }
 #endif /* __INSIDE_CYGWIN__ */
 
@@ -52,7 +62,7 @@ class ipc_retval {
 private:
   union {
     int i;
-    unsigned int u;
+    size_t sz;
     vm_offset_t off;
     vm_object_t obj;
   };
@@ -63,8 +73,8 @@ public:
   operator int () const { return i; }
   int operator = (int ni) { return i = ni; }
 
-  operator unsigned int () const { return u; }
-  unsigned int operator = (unsigned int nu) { return u = nu; }
+  operator size_t () const { return sz; }
+  size_t operator = (size_t nsz) { return sz = nsz; }
 
   operator vm_offset_t () const { return off; }
   vm_offset_t operator = (vm_offset_t noff) { return off = noff; }
