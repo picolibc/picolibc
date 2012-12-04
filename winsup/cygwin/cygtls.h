@@ -187,7 +187,7 @@ public:
   sigset_t sigwait_mask;
   siginfo_t *sigwait_info;
   HANDLE signal_arrived;
-  bool signal_waiting;
+  bool will_wait_for_signal;
   struct ucontext thread_context;
   DWORD thread_id;
   siginfo_t infodata;
@@ -233,27 +233,28 @@ public:
   void lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));
   bool locked () __attribute__ ((regparm (1)));
-  void create_signal_arrived ()
+  HANDLE get_signal_arrived ()
   {
-    signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
+    if (!signal_arrived)
+      {
+	lock ();
+	if (!signal_arrived)
+	  signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
+	unlock ();
+      }
+    return signal_arrived;
   }
   void set_signal_arrived (bool setit, HANDLE& h)
   {
     if (!setit)
-      signal_waiting = false;
+      will_wait_for_signal = false;
     else
       {
-	if (!signal_arrived)
-	  {
-	    lock ();
-	    create_signal_arrived ();
-	    unlock ();
-	  }
-	h = signal_arrived;
-	signal_waiting = true;
+	h = get_signal_arrived ();
+	will_wait_for_signal = true;
       }
   }
-  void reset_signal_arrived () { signal_waiting = false; }
+  void reset_signal_arrived () { will_wait_for_signal = false; }
 private:
   void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
   /*gentls_offsets*/
@@ -327,7 +328,7 @@ public:
   set_signal_arrived (bool setit, HANDLE& h) { _my_tls.set_signal_arrived (setit, h); }
   set_signal_arrived (HANDLE& h) { _my_tls.set_signal_arrived (true, h); }
 
-  operator int () const {return _my_tls.signal_waiting;}
+  operator int () const {return _my_tls.will_wait_for_signal;}
   ~set_signal_arrived () { _my_tls.reset_signal_arrived (); }
 };
 

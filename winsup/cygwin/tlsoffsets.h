@@ -27,8 +27,8 @@
 //; $tls::psigwait_info = 2584;
 //; $tls::signal_arrived = -10112;
 //; $tls::psignal_arrived = 2588;
-//; $tls::signal_waiting = -10108;
-//; $tls::psignal_waiting = 2592;
+//; $tls::will_wait_for_signal = -10108;
+//; $tls::pwill_wait_for_signal = 2592;
 //; $tls::thread_context = -10104;
 //; $tls::pthread_context = 2596;
 //; $tls::thread_id = -9892;
@@ -85,8 +85,8 @@
 #define tls_psigwait_info (2584)
 #define tls_signal_arrived (-10112)
 #define tls_psignal_arrived (2588)
-#define tls_signal_waiting (-10108)
-#define tls_psignal_waiting (2592)
+#define tls_will_wait_for_signal (-10108)
+#define tls_pwill_wait_for_signal (2592)
 #define tls_thread_context (-10104)
 #define tls_pthread_context (2596)
 #define tls_thread_id (-9892)
