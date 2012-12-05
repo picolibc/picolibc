@@ -98,6 +98,8 @@ details. */
     type name; \
     UINT64 __ ## name ## _align; \
   };
+#define _TYPE64_CLR(name)	__ ## name ## _align = 0
+#define _TYPE64_SET(name,val)	__ ## name ## _align = (UINT64) (val)
 
 /*When Terminal Services are installed, the GetWindowsDirectory function
    does not return the system installation dir, but a user specific directory

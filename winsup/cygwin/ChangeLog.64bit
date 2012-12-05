@@ -1,5 +1,22 @@
 2012-12-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygserver.h (struct client_request::header_t): Change definition of
+	msglen to use the same structure on 32 and 64 bit.  Add read and write
+	accessors.  Change type of error_code to int.
+	(class client_request): Align accessor methods to above change.
+	* cygserver_ipc.h (ipc_set_proc_info): Use _TYPE64_CLR macros.
+	* winlean.h (_TYPE64_CLR): New macro.
+	(_TYPE64_SET): Ditto.
+	* include/cygwin/msg.h (struct _ts32): Define on 64 bit in _KERNEL mode.
+	(struct _msqid_ds32): Ditto.  Add comment to explain why.
+	* include/cygwin/sysproto.h: Enforce 4 byte alignment on all structs.
+	(struct msgctl_args): Change definition to use the same structure on
+	32 and 64 bit.
+	(struct msgrcv_args): Ditto.
+	(struct msgsnd_args): Ditto.
+
+2012-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* shm.cc (fixup_shms_after_fork): Fix initialization of local variable
 	parent.
 

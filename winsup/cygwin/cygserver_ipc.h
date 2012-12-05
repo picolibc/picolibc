@@ -50,10 +50,10 @@ ipc_set_proc_info (proc &blk)
   blk.is_admin = false;
   blk.uid = geteuid32 ();
   blk.gid = getegid32 ();
-  blk.__signal_arrived_align = 0;
+  blk._TYPE64_CLR (signal_arrived);
   _my_tls.set_signal_arrived (true, blk.signal_arrived);
   blk.gidcnt = 0;
-  blk.__gidlist_align = 0;
+  blk._TYPE64_CLR (gidlist);
 }
 #endif /* __INSIDE_CYGWIN__ */
 

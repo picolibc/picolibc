@@ -57,6 +57,29 @@ struct msqid_ds
 #endif /* _KERNEL */
 };
 
+#if defined (_KERNEL) && defined (__x86_64__)
+/* cygserver has to convert 64 bit timestruc_t (and thus msqid_ds) to 32 bit
+   timestruc_t (msqid_ds) for 32 bit clients. */
+struct _ts32 {
+  int32_t tv_sec;
+  int32_t tv_nsec;
+};
+
+struct _msqid_ds32
+{
+  struct ipc_perm msg_perm;     /* Operation permission structure. */
+  msglen_t        msg_cbytes;   /* Number of bytes currently on queue. */
+  msgqnum_t       msg_qnum;     /* Number of messages currently on queue. */
+  msglen_t        msg_qbytes;   /* Maximum number of bytes allowed on queue. */
+  pid_t           msg_lspid;    /* Process ID of last msgsnd (). */
+  pid_t           msg_lrpid;    /* Process ID of last msgrcv (). */
+  struct _ts32    msg_stim;     /* Time of last msgsnd (). */
+  struct _ts32    msg_rtim;     /* Time of last msgrcv (). */
+  struct _ts32    msg_ctim;     /* Time of last change. */
+  int64_t         msg_spare4;
+};
+#endif /* _KERNEL && __x86_64__ */
+
 #define msg_stime msg_stim.tv_sec
 #define msg_rtime msg_rtim.tv_sec
 #define msg_ctime msg_ctim.tv_sec

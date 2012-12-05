@@ -1,6 +1,6 @@
 /* cygwin/sysproto.h
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2003, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -20,10 +20,11 @@ extern "C" {
 
 #include <sys/types.h>
 
+#pragma pack (push, 4)
 struct msgctl_args {
   int     msqid;
   int     cmd;
-  struct  msqid_ds *buf;
+  _TYPE64 (struct msqid_ds *, buf);
 };
 
 struct msgget_args {
@@ -33,17 +34,17 @@ struct msgget_args {
 
 struct msgrcv_args {
   int     msqid;
-  void    *msgp;
-  size_t  msgsz;
-  long    msgtyp;
   int     msgflg;
+  _TYPE64 (void *, msgp);
+  _TYPE64 (size_t, msgsz);
+  _TYPE64 (long, msgtyp);
 };
 
 struct msgsnd_args {
   int     msqid;
-  const void *msgp;
-  size_t  msgsz;
   int     msgflg;
+  _TYPE64 (const void *, msgp);
+  _TYPE64 (size_t, msgsz);
 };
 
 struct semctl_args {
@@ -86,6 +87,7 @@ struct shmget_args {
   size_t  size;
   int     shmflg;
 };
+#pragma pack (pop)
 
 #ifdef __cplusplus
 }
