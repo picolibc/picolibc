@@ -890,7 +890,6 @@ child_info_spawn::child_info_spawn (child_info_types chtype, bool need_subproc_r
 	api_fatal ("couldn't create signalling event for exec, %E");
 
       get_proc_lock (PROC_EXECING, 0);
-      lock = &sync_proc_subproc;
       /* exit with lock held */
     }
 }
