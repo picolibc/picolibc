@@ -1,3 +1,22 @@
+2012-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* client.cc (client_request::header_t::header_t): Accommodate changes
+	to msglen member.
+	(client_request::handle_request): Ditto.
+	(client_request::client_request): Zero out entire parameter block.
+	Explain why.
+	* sysv_msg.cc (conv_timespec32_to_timespec): New inline function on
+	64 bit Cygwin.
+	(conv_timespec_to_timespec32): Ditto.
+	(conv_msqid_ds32_to_msqid_ds): Ditto.
+	(conv_msqid_ds_to_msqid_ds32): Ditto.
+	(copyin_msqid_ds): New inline function on Cygwin.
+	(copyout_msqid_ds): Ditto.
+	(msgctl): Use copyout_msqid_ds and copyin_msqid_ds to copy msqid_ds
+	structures from cygserver to client and vice versa on Cygwin.
+	(msgsnd): Special case copyin of msg_type on 64 bit Cygwin.
+	(msgrcv): Special case copyout of msg_type on 64 bit Cygwin.
+
 2012-12-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.cc (tunable_int_fetch): Convert 2nd parameter to
