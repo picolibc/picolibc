@@ -1,3 +1,14 @@
+2012-12-04  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* cygtls.h (_cygtls::will_wait_for_signal): Rename from
+	'signal_waiting' to something more expressive.  Reflect rename
+	throughout.
+	(_cygtls::get_signal_arrived): Rename from create_signal_arrived.  Move
+	lock here.
+	(_cygtls::set_signal_arrived): Use get_signal_arrived.
+	* exceptions.cc (_cygtls::interrupt_setup): Use get_signal_arrived.
+	* tlsoffsets.h: Regenerate.
+
 2012-12-04  Kai Tietz  <ktietz@redhat.com>
 
 	* child_info.h (child_info): Re-type magic to DWORD.
