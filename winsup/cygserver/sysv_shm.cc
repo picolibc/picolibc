@@ -512,7 +512,7 @@ done2:
 	return (EINVAL);
 #endif
 }
-#endif /* __CYGWIN__ */
+#endif /* !__CYGWIN__ */
 
 #ifndef _SYS_SYSPROTO_H_
 struct shmctl_args {
@@ -520,6 +520,65 @@ struct shmctl_args {
 	int cmd;
 	struct shmid_ds *buf;
 };
+#endif
+
+#ifdef __CYGWIN__
+    /* The following code implements copyin and copyout for shmid_ds structs
+       on Cygwin.  On 32 bit it's just copyin/copyout.  On 64 bit it depends
+       on the client process.  A 64 bit client gets a direct copy, for a 32
+       bit process cygserver has to convert the datastructure. */
+# ifdef __x86_64__
+    static inline int
+    copyin_shmid_ds (thread *td, shmid_ds *src, shmid_ds *tgt)
+    {
+      if (td->ipcblk->is_64bit)
+	return copyin (src, tgt, sizeof (shmid_ds));
+      _shmid_ds32 buf;
+      int err = copyin (src, &buf, sizeof (_shmid_ds32));
+      if (!err)
+	{
+	  memcpy (tgt, &buf, offsetof (struct shmid_ds, shm_atim));
+	  conv_timespec32_to_timespec (&buf.shm_atim, &tgt->shm_atim);
+	  conv_timespec32_to_timespec (&buf.shm_dtim, &tgt->shm_dtim);
+	  conv_timespec32_to_timespec (&buf.shm_ctim, &tgt->shm_ctim);
+	  tgt->shm_internal = NULL;
+	  tgt->shm_spare4[0] = 0;
+	}
+      return err;
+    }
+
+    static inline int
+    copyout_shmid_ds (thread *td, shmid_ds *src, shmid_ds *tgt, int cnt)
+    {
+      if (td->ipcblk->is_64bit)
+      	return copyout (src, tgt, cnt * sizeof (shmid_ds));
+      _shmid_ds32 buf;
+      _shmid_ds32 *dest = (_shmid_ds32 *) tgt;
+      int err;
+      for (err = 0; !err && cnt-- > 0; ++src, ++dest)
+      	{
+	  memcpy (&buf, src, offsetof (struct shmid_ds, shm_atim));
+	  conv_timespec_to_timespec32 (&src->shm_atim, &buf.shm_atim);
+	  conv_timespec_to_timespec32 (&src->shm_dtim, &buf.shm_dtim);
+	  conv_timespec_to_timespec32 (&src->shm_ctim, &buf.shm_ctim);
+	  buf.shm_spare4 = 0;
+	  err = copyout (&buf, dest, sizeof (_shmid_ds32));
+	}
+      return err;
+    }
+# else
+    static inline int
+    copyin_shmid_ds (thread *td, shmid_ds *src, shmid_ds *tgt)
+    {
+      return copyin (src, tgt, sizeof (shmid_ds));
+    }
+
+    static inline int
+    copyout_shmid_ds (thread *td, shmid_ds *src, shmid_ds *tgt, int cnt)
+    {
+      return copyout (src, tgt, cnt * sizeof (shmid_ds));
+    }
+# endif
 #endif
 
 /*
@@ -629,7 +688,12 @@ shmctl(struct thread *td, struct shmctl_args *uap)
 	
 	/* IPC_SET needs to copyin the buffer before calling kern_shmctl */
 	if (uap->cmd == IPC_SET) {
-		if ((error = copyin(uap->buf, &buf, sizeof(struct shmid_ds))))
+#ifdef __CYGWIN__
+		error = copyin_shmid_ds(td, uap->buf, &buf);
+#else
+		error = copyin(uap->buf, &buf, sizeof(struct shmid_ds));
+#endif
+		if (error)
 			goto done;
 	}
 #ifdef __CYGWIN__
@@ -638,8 +702,7 @@ shmctl(struct thread *td, struct shmctl_args *uap)
 		int shmid = uap->shmid;
 		if (shmid > shminfo.shmmni)
 			shmid = shminfo.shmmni;
-		error = copyout(shmsegs, uap->buf,
-				shmid * sizeof(struct shmid_ds));
+		error = copyout_shmid_ds(td, shmsegs, uap->buf, shmid);
 		td->td_retval[0] = error ? -1 : 0;
 		return (error);
 	}
@@ -651,10 +714,14 @@ shmctl(struct thread *td, struct shmctl_args *uap)
 	
 	/* Cases in which we need to copyout */
 	switch (uap->cmd) {
-	case IPC_INFO:
-	case SHM_INFO:
 	case SHM_STAT:
 	case IPC_STAT:
+#ifdef __CYGWIN__
+		error = copyout_shmid_ds(td, &buf, uap->buf, 1);
+		break;
+#endif
+	case IPC_INFO:
+	case SHM_INFO:
 		error = copyout(&buf, uap->buf, bufsz);
 		break;
 	}

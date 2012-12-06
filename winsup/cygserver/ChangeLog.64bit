@@ -1,3 +1,21 @@
+2012-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_msg.cc (conv_timespec32_to_timespec): Move implementation to
+	cygserver_ipc.h.
+	(conv_timespec_to_timespec32): Ditto.
+	(conv_msqid_ds32_to_msqid_ds): Drop and move code into copyin_msqid_ds.
+	(conv_msqid_ds_to_msqid_ds32): Drop and move code into copyout_msqid_ds.
+	* sysv_sem.cc (copyin_semid_ds): New inline function on Cygwin.
+	(copyout_semid_ds): Ditto.
+	(__semctl): Use a conditional arg_size value rather than a fixed
+	sizeof(real_arg) throughout, to accommodate 64/32 bit conversion.
+	Use copyout_semid_ds and copyin_semid_ds to copy semid_ds
+	structures from cygserver to client and vice versa on Cygwin.
+	* sysv_shm.cc (copyin_shmid_ds): New inline function on Cygwin.
+	(copyout_shmid_ds): Ditto.
+	(shmctl): Use copyout_shmid_ds and copyin_shmid_ds to copy shmid_ds
+	structures from cygserver to client and vice versa on Cygwin.
+
 2012-12-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* client.cc (client_request::header_t::header_t): Accommodate changes

@@ -354,40 +354,6 @@ struct msgctl_args {
        on the client process.  A 64 bit client gets a direct copy, for a 32
        bit process cygserver has to convert the datastructure. */
 # ifdef __x86_64__
-    static inline void
-    conv_timespec32_to_timespec (_ts32 *in, timestruc_t *out)
-    {
-      out->tv_sec = in->tv_sec;
-      out->tv_nsec = in->tv_nsec;
-    }
-
-    static inline void
-    conv_timespec_to_timespec32 (timestruc_t *in, _ts32 *out)
-    {
-      out->tv_sec = (int32_t) in->tv_sec;
-      out->tv_nsec = (int32_t) in->tv_nsec;
-    }
-
-    static inline void
-    conv_msqid_ds32_to_msqid_ds (struct _msqid_ds32 *in, struct msqid_ds *out)
-    {
-      memcpy (out, in, offsetof (struct msqid_ds, msg_stim));
-      conv_timespec32_to_timespec (&in->msg_stim, &out->msg_stim);
-      conv_timespec32_to_timespec (&in->msg_rtim, &out->msg_rtim);
-      conv_timespec32_to_timespec (&in->msg_ctim, &out->msg_ctim);
-      out->msg_first = out->msg_last = NULL;
-    }
-
-    static inline void
-    conv_msqid_ds_to_msqid_ds32 (struct msqid_ds *in, struct _msqid_ds32 *out)
-    {
-      memcpy (out, in, offsetof (struct msqid_ds, msg_stim));
-      conv_timespec_to_timespec32 (&in->msg_stim, &out->msg_stim);
-      conv_timespec_to_timespec32 (&in->msg_rtim, &out->msg_rtim);
-      conv_timespec_to_timespec32 (&in->msg_ctim, &out->msg_ctim);
-      out->msg_spare4 = 0;
-    }
-
     static inline int
     copyin_msqid_ds (thread *td, msqid_ds *src, msqid_ds *tgt)
     {
@@ -396,7 +362,13 @@ struct msgctl_args {
       _msqid_ds32 buf;
       int err = copyin (src, &buf, sizeof (_msqid_ds32));
       if (!err)
-	conv_msqid_ds32_to_msqid_ds (&buf, tgt);
+	{
+	  memcpy (tgt, &buf, offsetof (struct msqid_ds, msg_stim));
+	  conv_timespec32_to_timespec (&buf.msg_stim, &tgt->msg_stim);
+	  conv_timespec32_to_timespec (&buf.msg_rtim, &tgt->msg_rtim);
+	  conv_timespec32_to_timespec (&buf.msg_ctim, &tgt->msg_ctim);
+	  tgt->msg_first = tgt->msg_last = NULL;
+	}
       return err;
     }
 
@@ -410,7 +382,11 @@ struct msgctl_args {
       int err;
       for (err = 0; !err && cnt-- > 0; ++src, ++dest)
       	{
-	  conv_msqid_ds_to_msqid_ds32 (src, &buf);
+	  memcpy (&buf, src, offsetof (struct msqid_ds, msg_stim));
+	  conv_timespec_to_timespec32 (&src->msg_stim, &buf.msg_stim);
+	  conv_timespec_to_timespec32 (&src->msg_rtim, &buf.msg_rtim);
+	  conv_timespec_to_timespec32 (&src->msg_ctim, &buf.msg_ctim);
+	  buf.msg_spare4 = 0;
 	  err = copyout (&buf, dest, sizeof (_msqid_ds32));
 	}
       return err;
