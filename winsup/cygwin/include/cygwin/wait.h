@@ -11,6 +11,9 @@ details. */
 #ifndef _CYGWIN_WAIT_H
 #define _CYGWIN_WAIT_H
 
+#define WAIT_ANY	(pid_t)-1
+#define WAIT_MYPGRP	(pid_t)0
+
 #define WNOHANG 1
 #define WUNTRACED 2
 #define WCONTINUED 8
