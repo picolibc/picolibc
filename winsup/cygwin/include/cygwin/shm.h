@@ -42,6 +42,8 @@ extern "C"
  */
 typedef uint32_t shmatt_t;
 
+#pragma pack (push, 4)
+
 struct shmid_ds
 {
   struct ipc_perm    shm_perm;	/* Operation permission structure. */
@@ -64,6 +66,23 @@ struct shmid_ds
 #define shm_dtime shm_dtim.tv_sec
 #define shm_ctime shm_ctim.tv_sec
 
+#if defined (_KERNEL) && defined (__x86_64__)
+/* Helper struct for conversion from 32 bit shmid_ds to 64 bit shmid_ds
+   and vice versa. */
+struct _shmid_ds32
+{
+  struct ipc_perm    shm_perm;
+  uint32_t           shm_segsz;
+  pid_t              shm_lpid;
+  pid_t              shm_cpid;
+  shmatt_t           shm_nattch;
+  struct _ts32       shm_atim;
+  struct _ts32       shm_dtim;
+  struct _ts32       shm_ctim;
+  uint64_t           shm_spare4;
+};
+#endif /* _KERNEL && __x86_64__ */
+
 #ifdef _KERNEL
 /* Buffer type for shmctl (IPC_INFO, ...) as used by ipcs(8).
  */
@@ -78,7 +97,10 @@ struct shminfo
   int32_t shmseg;	/* Maximum number of shared memory
 			   segments attached per process. */
   int32_t shmall;	/* Maximum number of bytes of shared
-			   memory, system wide. */
+			   memory, system wide.
+			   Note that XSI IPC shared memory allocation is
+			   restricted to a bit less than 2 Gigs, even on
+			   64 bit, so using an int32_t here is sufficient. */
   int32_t shm_spare[4];
 };
 
@@ -87,12 +109,14 @@ struct shminfo
 struct shm_info
 {
 #define shm_ids used_ids
-  long used_ids;	/* Number of allocated segments. */
-  long shm_tot;		/* Size in bytes of allocated segments. */
-  long shm_atts;	/* Number of attached segments, system
+  int32_t used_ids;	/* Number of allocated segments. */
+  int32_t shm_tot;	/* Size in bytes of allocated segments. */
+  int32_t shm_atts;	/* Number of attached segments, system
 			   wide. */
 };
 #endif /* _KERNEL */
+
+#pragma pack (pop)
 
 void *shmat (int shmid, const void *shmaddr, int shmflg);
 int   shmctl (int shmid, int cmd, struct shmid_ds *buf);

@@ -38,6 +38,8 @@ extern "C"
 #define SEM_INFO   0x3011	/* For ipcs(8). */
 #endif /* _KERNEL */
 
+#pragma pack (push, 4)
+
 struct semid_ds
 {
   struct ipc_perm  sem_perm;	/* Operation permission structure. */
@@ -54,6 +56,19 @@ struct semid_ds
 
 #define sem_otime sem_otim.tv_sec
 #define sem_ctime sem_ctim.tv_sec
+
+#if defined (_KERNEL) && defined (__x86_64__)
+/* Helper struct for conversion from 32 bit semid_ds to 64 bit semid_ds
+   and vice versa. */
+struct _semid_ds32
+{
+  struct ipc_perm  sem_perm;
+  unsigned short   sem_nsems;
+  struct _ts32     sem_otim;
+  struct _ts32     sem_ctim;
+  int64_t          sem_spare4;
+};
+#endif /* _KERNEL && __x86_64__ */
 
 struct sembuf
 {
@@ -116,6 +131,8 @@ union semun {
    _KERNEL must not be defined in exernal applications!  Declare union
    semun explicitely as required by SUSv3, please. */
 #endif /* _KERNEL */
+
+#pragma pack (pop)
 
 int semctl (int semid, int semnum, int cmd, ...);
 int semget (key_t key, int nsems, int semflg);

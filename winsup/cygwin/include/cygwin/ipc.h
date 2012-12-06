@@ -54,6 +54,15 @@ struct ipc_perm
 #endif
 
 #ifdef _KERNEL
+#ifdef __x86_64__
+/* Helper struct for conversion from 32 bit timespec to 64 bit timespec
+   and vice versa. */
+struct _ts32 {
+  int32_t tv_sec;
+  int32_t tv_nsec;
+};
+#endif
+
 #define IPCID_TO_IX(id)         ((id) & 0xffff)
 #define IPCID_TO_SEQ(id)        (((id) >> 16) & 0xffff)
 #define IXSEQ_TO_IPCID(ix,perm) (((perm.seq) << 16) | (ix & 0xffff))

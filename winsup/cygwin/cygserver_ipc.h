@@ -92,4 +92,22 @@ struct thread {
 #define p_pid cygpid
 #endif
 
+#if !defined (__INSIDE_CYGWIN__) && defined (__x86_64__) && defined (_CYGWIN_IPC_H)
+/* Inline conversion functions to convert 64 bit timespecs to 32 bit
+   and vice versa.  Used in cygserver only. */
+static inline void
+conv_timespec32_to_timespec (_ts32 *in, timestruc_t *out)
+{
+  out->tv_sec = in->tv_sec;
+  out->tv_nsec = in->tv_nsec;
+}
+
+static inline void
+conv_timespec_to_timespec32 (timestruc_t *in, _ts32 *out)
+{
+  out->tv_sec = (int32_t) in->tv_sec;
+  out->tv_nsec = (int32_t) in->tv_nsec;
+}
+#endif
+
 #endif /* __CYGSERVER_IPC_H__ */

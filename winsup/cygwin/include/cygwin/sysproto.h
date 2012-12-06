@@ -51,7 +51,7 @@ struct semctl_args {
   int     semid;
   int     semnum;
   int     cmd;
-  union   semun *arg;
+  _TYPE64 (union semun *, arg);
 };
 
 struct semget_args {
@@ -62,29 +62,29 @@ struct semget_args {
 
 struct semop_args {
   int     semid;
-  struct  sembuf *sops;
-  size_t  nsops;
+  _TYPE64 (struct sembuf *, sops);
+  _TYPE64 (size_t, nsops);
 };
 
 struct shmat_args {
   int     shmid;
-  const void *shmaddr;
+  _TYPE64 (const void *, shmaddr);
   int     shmflg;
 };
 
 struct shmctl_args {
   int     shmid;
   int     cmd;
-  struct shmid_ds *buf;
+  _TYPE64 (struct shmid_ds *, buf);
 };
 
 struct shmdt_args {
-  const void *shmaddr;
+  _TYPE64 (const void *, shmaddr);
 };
 
 struct shmget_args {
   key_t   key;
-  size_t  size;
+  _TYPE64 (size_t, size);
   int     shmflg;
 };
 #pragma pack (pop)
