@@ -218,6 +218,7 @@ __ZN7_cygtls3popEv:
 	popl	%ebx
 	ret
 
+# _cygtls::lock
 	.global	__ZN7_cygtls4lockEv
 __ZN7_cygtls4lockEv:
 	pushl	%ebx
@@ -231,6 +232,7 @@ __ZN7_cygtls4lockEv:
 2:	popl	%ebx
 	ret
 
+# _cygtls::unlock
 	.global	__ZN7_cygtls6unlockEv
 __ZN7_cygtls6unlockEv:
 	decl	$tls::pstacklock(%eax)

@@ -233,14 +233,16 @@ public:
   void lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));
   bool locked () __attribute__ ((regparm (1)));
-  HANDLE get_signal_arrived ()
+  HANDLE get_signal_arrived (bool wait_for_lock = true)
   {
     if (!signal_arrived)
       {
-	lock ();
+	if (wait_for_lock)
+	  lock ();
 	if (!signal_arrived)
 	  signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
-	unlock ();
+	if (wait_for_lock)
+	  unlock ();
       }
     return signal_arrived;
   }

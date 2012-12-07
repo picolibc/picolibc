@@ -799,7 +799,7 @@ _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
   this->sig = si.si_signo;		// Should always be last thing set to avoid a race
 
   if (incyg)
-    SetEvent (get_signal_arrived ());
+    SetEvent (get_signal_arrived (false));
 
   proc_subproc (PROC_CLEARWAIT, 1);
   sigproc_printf ("armed signal_arrived %p, signal %d", signal_arrived, si.si_signo);
