@@ -68,7 +68,11 @@ fhandler_fifo::arm (HANDLE h)
 
   bool res = SetEvent (h);
   if (!res)
-    debug_printf ("SetEvent for %s failed, %E", res);
+#ifdef DEBUGGING
+    debug_printf ("SetEvent for %s failed, %E", what);
+#else
+    debug_printf ("SetEvent failed, %E");
+#endif
   return res;
 }
 

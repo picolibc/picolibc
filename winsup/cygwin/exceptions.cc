@@ -1123,7 +1123,6 @@ sigpacket::process ()
 {
   bool continue_now;
   struct sigaction dummy = global_sigs[SIGSTOP];
-  _cygtls *tls;
 
   if (si.si_signo != SIGCONT)
     continue_now = false;
@@ -1159,25 +1158,26 @@ sigpacket::process ()
 
   myself->rusage_self.ru_nsignals++;
 
-  void *handler = (void *) thissig.sa_handler;
-  if (handler == SIG_IGN)
-    {
-      sigproc_printf ("signal %d ignored", si.si_signo);
-      goto done;
-    }
-
-  if (have_execed)
-    handler = NULL;
-
+  _cygtls *tls;
   if (sigtls)
     {
       tls = sigtls;
-      sigproc_printf ("using sigtls %p", tls);
+      sigproc_printf ("using sigtls %p", sigtls);
     }
   else
     {
       tls = cygheap->find_tls (si.si_signo);
       sigproc_printf ("using tls %p", tls);
+    }
+
+  void *handler = (void *) thissig.sa_handler;
+  if (have_execed)
+    handler = NULL;
+
+  if (handler == SIG_IGN)
+    {
+      sigproc_printf ("signal %d ignored", si.si_signo);
+      goto done;
     }
 
   if (si.si_signo == SIGKILL)
