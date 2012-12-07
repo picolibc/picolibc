@@ -1123,6 +1123,7 @@ sigpacket::process ()
 {
   bool continue_now;
   struct sigaction dummy = global_sigs[SIGSTOP];
+  _cygtls *tls;
 
   if (si.si_signo != SIGCONT)
     continue_now = false;
@@ -1168,8 +1169,11 @@ sigpacket::process ()
   if (have_execed)
     handler = NULL;
 
-  if (tls)
-    sigproc_printf ("using tls %p", tls);
+  if (sigtls)
+    {
+      tls = sigtls;
+      sigproc_printf ("using sigtls %p", tls);
+    }
   else
     {
       tls = cygheap->find_tls (si.si_signo);

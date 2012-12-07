@@ -47,7 +47,7 @@ struct sigpacket
 {
   siginfo_t si;
   pid_t pid;
-  class _cygtls *tls;
+  class _cygtls *sigtls;
   sigset_t *mask;
   union
   {
@@ -56,7 +56,7 @@ struct sigpacket
     struct sigpacket *next;
   };
   int __stdcall process () __attribute__ ((regparm (1)));
-  int setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
+  int setup_handler (void *, struct sigaction&, _cygtls *)
     __attribute__ ((regparm (3)));
 };
 
@@ -80,7 +80,7 @@ void __stdcall sigproc_init ();
 void __stdcall sigproc_terminate (enum exit_states);
 #endif
 bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
-int __stdcall sig_send (_pinfo *, siginfo_t&, class _cygtls *tls = NULL) __attribute__ ((regparm (3)));
+int __stdcall sig_send (_pinfo *, siginfo_t&, class _cygtls * = NULL) __attribute__ ((regparm (3)));
 int __stdcall sig_send (_pinfo *, int) __attribute__ ((regparm (2)));
 void __stdcall signal_fixup_after_exec ();
 void __stdcall sigalloc ();
