@@ -1,3 +1,7 @@
+2012-12-08  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
+
+	* config.sub: Merge from config repo.
+
 2012-11-30  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
 	* configure.ac: Merge from GCC.
