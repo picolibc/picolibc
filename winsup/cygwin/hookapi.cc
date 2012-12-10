@@ -419,15 +419,16 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
   for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
     {
       if (!ascii_strcasematch (rva (PSTR, map ?: (char *) hm,
-				    pd->Name - delta - offset), "cygwin1.dll")
-	  && !ascii_strcasematch (rva (PSTR, map ?: (char *) hm,
-				  pd->Name - delta - offset), "cyg64win1.dll"))
-	continue;
+				    pd->Name - delta - offset),
+			       is_64bit ? "cyg64win1.dll" : "cygwin1.dll"))
+      	continue;
       if (!fn)
 	{
+	  /* Just checking if executable used cyg{64}win1.dll. */
 	  if (map)
 	    UnmapViewOfFile (map);
-	  return (void *) "found it";	// just checking if executable used cygwin1.dll
+	  /* The return value indicates the target CPU. */
+	  return (void *) (is_64bit ? 64L : 32L);
 	}
       i = -1;
       while (!fh.origfn && (fh.name = makename (name, buf, i, 1)))

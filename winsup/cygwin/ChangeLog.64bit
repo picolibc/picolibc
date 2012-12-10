@@ -1,5 +1,17 @@
 2012-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* hookapi.cc (hook_or_detect_cygwin): Only check for one cygwin DLL
+	file name depending on executable target type.  Return value indicating
+	executable target type.  Change comment accordingly.
+	* path.h (enum path_types): Add FIXME comment to definition of
+	PATH_OPEN.  Add PATH_64BITEXEC.
+	(iscygexec32): New method.
+	(iscygexec64): New method.
+	(set_cygexec): Implement additionally with void * parameter to be able
+	to set PATH_64BITEXEC if required.
+
+2012-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Throughout, fix format string of debug printf and api_fatal calls
 	to work in 32 and 64 bit environment, as well as to honor signedness.
 	Use %y instead of 0x%x.

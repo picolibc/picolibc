@@ -79,11 +79,15 @@ enum path_types
   PATH_NO_ACCESS_CHECK	= PC_NO_ACCESS_CHECK,
   PATH_CTTY		= 0x00400000,	/* could later be used as ctty */
   PATH_OPEN		= 0x00800000,	/* use open semantics */
+  					/* FIXME?  PATH_OPEN collides with
+					   PATH_NO_ACCESS_CHECK, but it looks
+					   like they are never used together. */
   PATH_LNK		= 0x01000000,
   PATH_TEXT		= 0x02000000,
   PATH_REP		= 0x04000000,
   PATH_HAS_SYMLINKS	= 0x10000000,
-  PATH_SOCKET		= 0x40000000
+  PATH_SOCKET		= 0x40000000,
+  PATH_64BITEXEC	= 0x80000000
 };
 
 class symlink_info;
@@ -180,12 +184,29 @@ class path_conv
   int is_lnk_special () const {return is_fs_device () || isfifo () || is_lnk_symlink ();}
   int issocket () const {return dev.is_device (FH_UNIX);}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
+  int iscygexec32 () const
+	{return (path_flags & (PATH_CYGWIN_EXEC | PATH_64BITEXEC))
+		== PATH_CYGWIN_EXEC;}
+  int iscygexec64 () const
+	{return (path_flags & (PATH_CYGWIN_EXEC | PATH_64BITEXEC))
+		== (PATH_CYGWIN_EXEC | PATH_64BITEXEC);}
   int isopen () const {return path_flags & PATH_OPEN;}
   int isctty_capable () const {return path_flags & PATH_CTTY;}
   void set_cygexec (bool isset)
   {
     if (isset)
       path_flags |= PATH_CYGWIN_EXEC;
+    else
+      path_flags &= ~PATH_CYGWIN_EXEC;
+  }
+  void set_cygexec (void *target)
+  {
+    if (target)
+      {
+	path_flags |= PATH_CYGWIN_EXEC;
+	if (target == (void *) 64)
+	  path_flags |= PATH_64BITEXEC;
+      }
     else
       path_flags &= ~PATH_CYGWIN_EXEC;
   }
