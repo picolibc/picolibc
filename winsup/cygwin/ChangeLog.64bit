@@ -1,5 +1,24 @@
 2012-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix_ipc.cc: Enforce 4 byte alignment on all structs used in the
+	message queue file.
+	(struct mq_fattr): Fixed size mq_attr structure as stored in file.
+	(struct mq_hdr): Change to have same size on 32 and 64 bit.  Add
+	mqh_magic to allow check for old message queue file.
+	(struct msg_hdr): Change to have same size on 32 and 64 bit.  Change
+	type of mqh_attr to struct mq_fattr.
+	(struct mq_info): Change to have same size on 32 and 64 bit.
+	(mq_open): Add check for maximum mq_maxmsg and mq_msgsize values which
+	still fit into 32 bit values.  Set mqh_magic in file to MQI_MAGIC.
+	Check mqh_magic value on existing file to detect old message queue file.
+	(mq_getattr): Change type of local attr variable to struct mq_fattr.
+	(mq_setattr): Ditto.
+	(_mq_send): Ditto.
+	(_mq_receive): Ditto.
+	(mq_close): Ditto.
+
+2012-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* hookapi.cc (hook_or_detect_cygwin): Only check for one cygwin DLL
 	file name depending on executable target type.  Return value indicating
 	executable target type.  Change comment accordingly.
