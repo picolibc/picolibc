@@ -708,7 +708,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   if (!pack.si.si_uid)
     pack.si.si_uid = myself->uid;
   pack.pid = myself->pid;
-  pack.tls = tls;
+  pack.sigtls = tls;
   if (wait_for_completion)
     {
       pack.wakeup = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
@@ -1303,7 +1303,7 @@ pending_signals::add (sigpacket& pack)
     return;
   se = sigs + pack.si.si_signo;
   *se = pack;
-  se->mask = &pack.tls->sigmask;
+  se->mask = &pack.sigtls->sigmask;
   se->next = NULL;
   if (end)
     end->next = se;
@@ -1356,7 +1356,7 @@ wait_sig (VOID *)
       if (pack.si.si_signo == __SIGHOLD)
 	WaitForSingleObject (sig_hold, INFINITE);
       DWORD nb;
-      pack.tls = NULL;
+      pack.sigtls = NULL;
       if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))
 	break;
 
@@ -1397,7 +1397,7 @@ wait_sig (VOID *)
 	  unsigned bit;
 	  sigq.reset ();
 	  while ((q = sigq.next ()))
-	    if (pack.tls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
+	    if (pack.sigtls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
 	      *pack.mask |= bit;
 	  break;
 	case __SIGHOLD:
@@ -1432,7 +1432,7 @@ wait_sig (VOID *)
 	      // FIXME: REALLY not right when taking threads into consideration.
 	      // We need a per-thread queue since each thread can have its own
 	      // list of blocked signals.  CGF 2005-08-24
-	      if (sigq.sigs[sig].si.si_signo && sigq.sigs[sig].tls == pack.tls)
+	      if (sigq.sigs[sig].si.si_signo && sigq.sigs[sig].sigtls == pack.sigtls)
 		sigproc_printf ("signal %d already queued", pack.si.si_signo);
 	      else
 		{

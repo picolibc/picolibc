@@ -835,7 +835,7 @@ _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
   this->sig = si.si_signo;		// Should always be last thing set to avoid a race
 
   if (incyg)
-    SetEvent (get_signal_arrived ());
+    SetEvent (get_signal_arrived (false));
 
   proc_subproc (PROC_CLEARWAIT, 1);
   sigproc_printf ("armed signal_arrived %p, signal %d", signal_arrived, si.si_signo);
@@ -1194,22 +1194,26 @@ sigpacket::process ()
 
   myself->rusage_self.ru_nsignals++;
 
-  void *handler = (void *) thissig.sa_handler;
-  if (handler == SIG_IGN)
+  _cygtls *tls;
+  if (sigtls)
     {
-      sigproc_printf ("signal %d ignored", si.si_signo);
-      goto done;
+      tls = sigtls;
+      sigproc_printf ("using sigtls %p", sigtls);
     }
-
-  if (have_execed)
-    handler = NULL;
-
-  if (tls)
-    sigproc_printf ("using tls %p", tls);
   else
     {
       tls = cygheap->find_tls (si.si_signo);
       sigproc_printf ("using tls %p", tls);
+    }
+
+  void *handler = (void *) thissig.sa_handler;
+  if (have_execed)
+    handler = NULL;
+
+  if (handler == SIG_IGN)
+    {
+      sigproc_printf ("signal %d ignored", si.si_signo);
+      goto done;
     }
 
   if (si.si_signo == SIGKILL)
