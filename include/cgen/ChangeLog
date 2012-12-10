@@ -8,3 +8,16 @@
 	* basic-ops.h: New file.  Moved here from opcodes/cgen-ops.h.
 	* bitset.h: New file.  Moved here from ../opcode/cgen-bitset.h.
 	Update license to GPL v3.
+
+Copyright (C) 2009-2012 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

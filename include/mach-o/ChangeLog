@@ -66,4 +66,16 @@
 2011-07-06  Tristan Gingold  <gingold@adacore.com>
 
 	* loader.h: New file.
+
+Copyright (C) 2011-2012 Free Software Foundation, Inc.
 
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

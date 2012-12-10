@@ -72,3 +72,16 @@
 	* dmt.h, dst.h, eeom.h, egps.h, egsd.h, egst.h, egsy.h: New Files.
 	* eiaf.h, eicp.h, eiha.h, eihd.h, eihi.h, eihs.h, eihvn.h: Ditto.
 	* eisd.h, emh.h, eobjrec.h, esdf.h, esrf.h, etir.h, shl.h: Ditto.
+
+Copyright (C) 2010-2012 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

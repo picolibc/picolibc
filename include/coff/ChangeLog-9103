@@ -1172,6 +1172,15 @@ Sat Nov 30 20:38:35 1991  Steve Chamberlain  (sac at rtl.cygnus.com)
 	mips.h, rs6000.h: Move from above coff-<foo>.h.
 
 
+Copyright (C) 1991-2003 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
 Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
 version-control: never
 End:
