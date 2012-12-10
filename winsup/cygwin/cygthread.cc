@@ -1,7 +1,7 @@
 /* cygthread.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008,
-   2009, 2010, 2011 Red Hat, Inc.
+   2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -165,7 +165,7 @@ new (size_t)
 	/* available */
 #ifdef DEBUGGING
 	if (info->__name)
-	  api_fatal ("name not NULL? %s, id %y, i %d", info->__name, info->id, info - threads);
+	  api_fatal ("name not NULL? %s, id %y, i %ld", info->__name, info->id, info - threads);
 #endif
 	goto out;
       }

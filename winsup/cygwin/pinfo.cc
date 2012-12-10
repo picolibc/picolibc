@@ -138,7 +138,7 @@ status_exit (DWORD x)
       x = SIGILL;
       break;
     default:
-      debug_printf ("*** STATUS_%p\n", x);
+      debug_printf ("*** STATUS_%y\n", x);
       x = 127 << 8;
     }
   return EXITCODE_SET | x;
@@ -168,14 +168,14 @@ pinfo::maybe_set_exit_code_from_windows ()
       GetExitCodeProcess (hProcess, &x);
       set_exit_code (x);
     }
-  sigproc_printf ("pid %d, exit value - old %p, windows %p, cygwin %p",
+  sigproc_printf ("pid %d, exit value - old %y, windows %y, cygwin %y",
 		  self->pid, oexitcode, x, self->exitcode);
 }
 
 void
 pinfo::exit (DWORD n)
 {
-  minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
+  minimal_printf ("winpid %u, exit %u", GetCurrentProcessId (), n);
   sigproc_terminate (ES_FINAL);
   lock_process until_exit (true);
   cygthread::terminate ();
@@ -204,7 +204,7 @@ pinfo::exit (DWORD n)
   int exitcode = self->exitcode & 0xffff;
   if (!self->cygstarted)
     exitcode = ((exitcode & 0xff) << 8) | ((exitcode >> 8) & 0xff);
-  sigproc_printf ("Calling ExitProcess n %p, exitcode %p", n, exitcode);
+  sigproc_printf ("Calling ExitProcess n %y, exitcode %y", n, exitcode);
   if (!TerminateProcess (GetCurrentProcess (), exitcode))
     system_printf ("TerminateProcess failed, %E");
   ExitProcess (exitcode);
@@ -320,7 +320,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
       if (procinfo->process_state & PID_EXECED)
 	{
 	  pid_t realpid = procinfo->pid;
-	  debug_printf ("execed process windows pid %d, cygwin pid %d", n, realpid);
+	  debug_printf ("execed process windows pid %u, cygwin pid %d", n, realpid);
 	  if (realpid == n)
 	    api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
 
@@ -385,9 +385,9 @@ pinfo::set_acl()
   RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
   status = RtlSetDaclSecurityDescriptor (&sd, TRUE, acl_buf, FALSE);
   if (!NT_SUCCESS (status))
-    debug_printf ("RtlSetDaclSecurityDescriptor %p", status);
+    debug_printf ("RtlSetDaclSecurityDescriptor %y", status);
   else if ((status = NtSetSecurityObject (h, DACL_SECURITY_INFORMATION, &sd)))
-    debug_printf ("NtSetSecurityObject %p", status);
+    debug_printf ("NtSetSecurityObject %y", status);
 }
 
 pinfo::pinfo (HANDLE parent, pinfo_minimal& from, pid_t pid):
@@ -437,7 +437,7 @@ bool
 _pinfo::set_ctty (fhandler_termios *fh, int flags)
 {
   tty_min& tc = *fh->tc ();
-  debug_printf ("old %s, ctty device number %p, tc.ntty device number %p flags & O_NOCTTY %p", __ctty (), ctty, tc.ntty, flags & O_NOCTTY);
+  debug_printf ("old %s, ctty device number %y, tc.ntty device number %y flags & O_NOCTTY %y", __ctty (), ctty, tc.ntty, flags & O_NOCTTY);
   if (fh && &tc && (ctty <= 0 || ctty == tc.ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc.ntty;
@@ -637,7 +637,7 @@ commune_process (void *arg)
     {
       DWORD res = WaitForSingleObject (process_sync, 5000);
       if (res != WAIT_OBJECT_0)
-	sigproc_printf ("WFSO failed - %d, %E", res);
+	sigproc_printf ("WFSO failed - %u, %E", res);
       else
 	sigproc_printf ("synchronized with pid %d", si.si_pid);
       ForceCloseHandle (process_sync);
@@ -995,7 +995,7 @@ pinfo::wait ()
   else
     {
       wait_thread = h;
-      sigproc_printf ("created tracking thread for pid %d, winpid %p, rd_proc_pipe %p",
+      sigproc_printf ("created tracking thread for pid %d, winpid %y, rd_proc_pipe %p",
 		      (*this)->pid, (*this)->dwProcessId, rd_proc_pipe);
     }
 
@@ -1288,7 +1288,7 @@ winpids::enum_processes (bool winpid)
 	    }
 	  else
 	    {
-	      system_printf ("error %p reading system process information",
+	      system_printf ("error %y reading system process information",
 			     status);
 	      return 0;
 	    }

@@ -636,7 +636,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 
   bool masked = !!(me.sigmask & SIGTOMASK (si.si_signo));
   if (masked)
-    syscall_printf ("signal %d, masked 0x%lx", si.si_signo,
+    syscall_printf ("signal %d, masked %ly", si.si_signo,
 		    global_sigs[si.si_signo].sa_mask);
 
   debug_printf ("In cygwin_except_handler calling %p",
@@ -740,7 +740,7 @@ handle_sigsuspend (sigset_t tempmask)
   sigset_t oldmask = _my_tls.sigmask;	// Remember for restoration
 
   set_signal_mask (_my_tls.sigmask, tempmask);
-  sigproc_printf ("oldmask 0x%lx, newmask 0x%lx", oldmask, tempmask);
+  sigproc_printf ("oldmask %ly, newmask %ly", oldmask, tempmask);
 
   pthread_testcancel ();
   cygwait (NULL, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr);
@@ -951,7 +951,7 @@ ctrl_c_handler (DWORD type)
     {
       if (myself->cygstarted)	/* Was this process created by a cygwin process? */
 	return TRUE;		/* Yes.  Let the parent eventually handle CTRL-C issues. */
-      debug_printf ("exiting with status 0x%08x", STATUS_CONTROL_C_EXIT);
+      debug_printf ("exiting with status %y", STATUS_CONTROL_C_EXIT);
       ExitProcess (STATUS_CONTROL_C_EXIT);
     }
 

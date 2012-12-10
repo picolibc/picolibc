@@ -1784,7 +1784,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       status = NtSetAttributesFile (fh, mk_winsym ? FILE_ATTRIBUTE_READONLY
 						  : FILE_ATTRIBUTE_SYSTEM);
       if (!NT_SUCCESS (status))
-	debug_printf ("Setting attributes failed, status = %p", status);
+	debug_printf ("Setting attributes failed, status = %y", status);
       res = 0;
     }
   else
@@ -1794,7 +1794,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       status = NtSetInformationFile (fh, &io, &fdi, sizeof fdi,
 				     FileDispositionInformation);
       if (!NT_SUCCESS (status))
-	debug_printf ("Setting delete dispostion failed, status = %p", status);
+	debug_printf ("Setting delete dispostion failed, status = %y", status);
     }
   NtClose (fh);
 
@@ -1914,7 +1914,7 @@ symlink_info::check_sysfile (HANDLE h)
 		       sizeof (cookie_buf), &off, NULL);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("ReadFile1 failed %p", status);
+      debug_printf ("ReadFile1 failed %y", status);
       if (status != STATUS_END_OF_FILE)
 	set_error (EIO);
       return 0;
@@ -2001,7 +2001,7 @@ symlink_info::check_reparse_point (HANDLE h, bool remote)
     }
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtFsControlFile(FSCTL_GET_REPARSE_POINT) failed, %p",
+      debug_printf ("NtFsControlFile(FSCTL_GET_REPARSE_POINT) failed, %y",
 		    status);
       set_error (EIO);
       return 0;
@@ -2391,7 +2391,7 @@ restart:
 			     FILE_OPEN_REPARSE_POINT
 			     | FILE_OPEN_FOR_BACKUP_INTENT,
 			     eabuf, easize);
-      debug_printf ("%p = NtCreateFile (%S)", status, &upath);
+      debug_printf ("%y = NtCreateFile (%S)", status, &upath);
       /* No right to access EAs or EAs not supported? */
       if (!NT_SUCCESS (status)
 	  && (status == STATUS_ACCESS_DENIED
@@ -2414,7 +2414,7 @@ restart:
 			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_REPARSE_POINT
 			       | FILE_OPEN_FOR_BACKUP_INTENT);
-	  debug_printf ("%p = NtOpenFile (no-EAs %S)", status, &upath);
+	  debug_printf ("%y = NtOpenFile (no-EAs %S)", status, &upath);
 	}
       if (status == STATUS_OBJECT_NAME_NOT_FOUND)
 	{
@@ -2430,7 +2430,7 @@ restart:
 				   &attr, &io, FILE_SHARE_VALID_FLAGS,
 				   FILE_OPEN_REPARSE_POINT
 				   | FILE_OPEN_FOR_BACKUP_INTENT);
-	      debug_printf ("%p = NtOpenFile (broken-UDF, %S)", status, &upath);
+	      debug_printf ("%y = NtOpenFile (broken-UDF, %S)", status, &upath);
 	      attr.Attributes = 0;
 	      if (NT_SUCCESS (status))
 		{
@@ -2505,7 +2505,7 @@ restart:
 	}
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("%p = NtQueryInformationFile (%S)", status, &upath);
+	  debug_printf ("%y = NtQueryInformationFile (%S)", status, &upath);
 	  fileattr = INVALID_FILE_ATTRIBUTES;
 
 	  /* One of the inner path components is invalid, or the path contains
@@ -2552,7 +2552,7 @@ restart:
 				   | FILE_DIRECTORY_FILE);
 	      if (!NT_SUCCESS (status))
 		{
-		  debug_printf ("%p = NtOpenFile(%S)", status, &dirname);
+		  debug_printf ("%y = NtOpenFile(%S)", status, &dirname);
 		  /* There's a special case if the file is itself the root
 		     of a drive which is not accessible by the current user.
 		     This case is only recognized by the length of the
@@ -2572,7 +2572,7 @@ restart:
 		  NtClose (dir);
 		  if (!NT_SUCCESS (status))
 		    {
-		      debug_printf ("%p = NtQueryDirectoryFile(%S)",
+		      debug_printf ("%y = NtQueryDirectoryFile(%S)",
 				    status, &dirname);
 		      if (status == STATUS_NO_SUCH_FILE)
 			{
@@ -2748,7 +2748,7 @@ restart:
 	NtClose (h);
     }
 
-  syscall_printf ("%d = symlink.check(%s, %p) (%p)",
+  syscall_printf ("%d = symlink.check(%s, %p) (%y)",
 		  res, suffix.path, contents, pflags);
   return res;
 }
@@ -2786,7 +2786,7 @@ readlink (const char *path, char *buf, size_t buflen)
   if (pathbuf.error)
     {
       set_errno (pathbuf.error);
-      syscall_printf ("-1 = readlink (%s, %p, %d)", path, buf, buflen);
+      syscall_printf ("-1 = readlink (%s, %p, %lu)", path, buf, buflen);
       return -1;
     }
 
@@ -3972,7 +3972,7 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 		RtlSetCurrentDirectory_U (error ? &ro_u_pipedir : &win32);
 	      if (!NT_SUCCESS (status))
 		{
-		  debug_printf ("RtlSetCurrentDirectory_U(%S) failed, %p",
+		  debug_printf ("RtlSetCurrentDirectory_U(%S) failed, %y",
 				error ? &ro_u_pipedir : &win32, status);
 		  return;
 		}
@@ -4342,7 +4342,7 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
   cwd_lock.release ();
 
 out:
-  syscall_printf ("(%s) = cwdstuff::get (%p, %d, %d, %d), errno %d",
+  syscall_printf ("(%s) = cwdstuff::get (%p, %u, %d, %d), errno %d",
 		  buf, buf, ulen, need_posix, with_chroot, errno);
   MALLOC_CHECK;
   return buf;
@@ -4383,7 +4383,7 @@ etc::test_file_change (int n)
     {
       res = true;
       memset (last_modified + n, 0, sizeof (last_modified[n]));
-      debug_printf ("NtQueryFullAttributesFile (%S) failed, %p",
+      debug_printf ("NtQueryFullAttributesFile (%S) failed, %y",
 		    fn[n].ObjectName, status);
     }
   else
@@ -4421,7 +4421,7 @@ etc::dir_changed (int n)
 	  if (!NT_SUCCESS (status))
 	    {
 #ifdef DEBUGGING
-	      system_printf ("NtOpenFile (%S) failed, %p",
+	      system_printf ("NtOpenFile (%S) failed, %y",
 			     dir.get_nt_native_path (), status);
 #endif
 	      changed_h = INVALID_HANDLE_VALUE;
@@ -4436,7 +4436,7 @@ etc::dir_changed (int n)
 	      if (!NT_SUCCESS (status))
 		{
 #ifdef DEBUGGING
-		  system_printf ("NtNotifyChangeDirectoryFile (1) failed, %p",
+		  system_printf ("NtNotifyChangeDirectoryFile (1) failed, %y",
 				 status);
 #endif
 		  NtClose (changed_h);
@@ -4458,7 +4458,7 @@ etc::dir_changed (int n)
 	  if (!NT_SUCCESS (status))
 	    {
 #ifdef DEBUGGING
-	      system_printf ("NtNotifyChangeDirectoryFile (2) failed, %p",
+	      system_printf ("NtNotifyChangeDirectoryFile (2) failed, %y",
 			     status);
 #endif
 	      NtClose (changed_h);

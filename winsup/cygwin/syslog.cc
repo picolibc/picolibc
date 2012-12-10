@@ -45,7 +45,7 @@ openlog (const char *ident, int logopt, int facility)
     wchar_t *new_ident = NULL;
 
     debug_printf ("openlog called with (%s, %d, %d)",
-		       ident ? ident : "<NULL>", logopt, facility);
+		  ident ? ident : "<NULL>", logopt, facility);
 
     if (ident)
       {
@@ -296,11 +296,11 @@ try_connect_syslogd (int priority, const char *msg, size_t len)
 extern "C" void
 vsyslog (int priority, const char *message, va_list ap)
 {
-  debug_printf ("%x %s", priority, message);
+  debug_printf ("%y %s", priority, message);
   /* If the priority fails the current mask, reject */
   if ((LOG_MASK (LOG_PRI (priority)) & syslog_globals.process_logmask) == 0)
     {
-      debug_printf ("failing message %x due to priority mask %x",
+      debug_printf ("failing message %y due to priority mask %y",
 		    priority, syslog_globals.process_logmask);
       return;
     }

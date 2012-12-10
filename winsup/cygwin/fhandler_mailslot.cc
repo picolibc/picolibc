@@ -177,7 +177,7 @@ fhandler_mailslot::ioctl (unsigned int cmd, void *buf)
 				       FileMailslotSetInformation);
 	if (!NT_SUCCESS (status))
 	  {
-	    debug_printf ("NtSetInformationFile (%X): %08x",
+	    debug_printf ("NtSetInformationFile (%X): %p",
 			  fmsi.ReadTimeout.QuadPart, status);
 	    __seterrno_from_nt_status (status);
 	    break;

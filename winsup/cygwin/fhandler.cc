@@ -706,7 +706,7 @@ fhandler_base::open (int flags, mode_t mode)
   set_open_status ();
 done:
   debug_printf ("%y = NtCreateFile "
-		"(%p, %x, %S, io, NULL, %x, %x, %x, %x, NULL, 0)",
+		"(%p, %y, %S, io, NULL, %y, %y, %y, %y, NULL, 0)",
 		status, fh, access, pc.get_nt_native_path (), file_attributes,
 		shared, create_disposition, options);
 
@@ -1346,7 +1346,7 @@ fhandler_base::dup (fhandler_base *child, int)
 			    GetCurrentProcess (), &nh,
 			    0, TRUE, DUPLICATE_SAME_ACCESS))
 	{
-	  debug_printf ("dup(%s) failed, handle %x, %E",
+	  debug_printf ("dup(%s) failed, handle %p, %E",
 			get_name (), get_handle ());
 	  __seterrno ();
 	  return -1;
@@ -1961,7 +1961,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	  wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
 	  err = GetLastError ();
 	  ResetEvent (get_overlapped ()->hEvent);	/* Probably not needed but CYA */
-	  debug_printf ("wfres %d, wores %d, bytes %u", wfres, wores, *bytes);
+	  debug_printf ("wfres %u, wores %d, bytes %u", wfres, wores, *bytes);
 	  if (wores)
 	    res = overlapped_success;	/* operation succeeded */
 	  else if (wfres == WAIT_OBJECT_0 + 1)

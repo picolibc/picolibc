@@ -226,7 +226,7 @@ pthread_mutex::can_be_unlocked ()
    * Also check for the ANONYMOUS owner to cover NORMAL mutexes as well. */
   bool res = type == PTHREAD_MUTEX_NORMAL || no_owner ()
 	     || (recursion_counter == 1 && pthread::equal (owner, self));
-  pthread_printf ("recursion_counter %d res %d", recursion_counter, res);
+  pthread_printf ("recursion_counter %u res %d", recursion_counter, res);
   return res;
 }
 
@@ -1770,7 +1770,7 @@ pthread_mutex::lock ()
 	result = EDEADLK;
     }
 
-  pthread_printf ("mutex %p, self %p, owner %p, lock_counter %d, recursion_counter %d",
+  pthread_printf ("mutex %p, self %p, owner %p, lock_counter %d, recursion_counter %u",
 		  this, self, owner, lock_counter, recursion_counter);
   return result;
 }
@@ -1799,7 +1799,7 @@ pthread_mutex::unlock ()
       res = 0;
     }
 
-  pthread_printf ("mutex %p, owner %p, self %p, lock_counter %d, recursion_counter %d, type %d, res %d",
+  pthread_printf ("mutex %p, owner %p, self %p, lock_counter %d, recursion_counter %u, type %d, res %d",
 		  this, owner, self, lock_counter, recursion_counter, type, res);
   return res;
 }
@@ -2500,7 +2500,7 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
   else
     {
       debug_printf ("NtQueryInformationThread(ThreadBasicInformation), "
-		    "status %p", status);
+		    "status %y", status);
       (*attr)->stackaddr = thread->attr.stackaddr;
       (*attr)->stacksize = thread->attr.stacksize;
     }
@@ -3049,7 +3049,8 @@ extern "C" int
 pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 {
   int res = handle_sigprocmask (operation, set, old_set, _my_tls.sigmask);
-  syscall_printf ("%d = pthread_sigmask(%d, %p, %p)", operation, set, old_set);
+  syscall_printf ("%d = pthread_sigmask(%d, %p, %p)",
+		  res, operation, set, old_set);
   return res;
 }
 
@@ -3532,7 +3533,7 @@ semaphore::_fixup_after_fork ()
 {
   if (shared == PTHREAD_PROCESS_PRIVATE)
     {
-      pthread_printf ("sem %x", this);
+      pthread_printf ("sem %p", this);
       /* FIXME: duplicate code here and in the constructor. */
       this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
 					      INT32_MAX, NULL);

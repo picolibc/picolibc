@@ -177,7 +177,7 @@ dup3 (int oldfd, int newfd, int flags)
   else
     res = dup_finish (oldfd, newfd, flags);
 
-  syscall_printf ("%R = dup3(%d, %d, %p)", res, oldfd, newfd, flags);
+  syscall_printf ("%R = dup3(%d, %d, %y)", res, oldfd, newfd, flags);
   return res;
 }
 
@@ -194,7 +194,7 @@ start_transaction (HANDLE &old_trans, HANDLE &trans)
     }
   else
     {
-      debug_printf ("NtCreateTransaction failed, %p", status);
+      debug_printf ("NtCreateTransaction failed, %y", status);
       old_trans = trans = NULL;
     }
 }
@@ -258,7 +258,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtQueryInformationFile (%S, FileNameInformation) "
-		    "failed, status = %p", pc.get_nt_native_path (), status);
+		    "failed, status = %y", pc.get_nt_native_path (), status);
       goto out;
     }
   /* The filename could change, the parent dir not.  So we split both paths
@@ -302,7 +302,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtOpenFile (%S) failed, status = %p", &root, status);
+	  debug_printf ("NtOpenFile (%S) failed, status = %y", &root, status);
 	  goto out;
 	}
 
@@ -349,7 +349,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtQueryInformationFile (%S, FileInternalInformation) "
-		    "failed, status = %p", pc.get_nt_native_path (), status);
+		    "failed, status = %y", pc.get_nt_native_path (), status);
       goto out;
     }
   RtlInt64ToHexUnicodeString (pfii->FileId.QuadPart, &recycler, TRUE);
@@ -374,7 +374,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtOpenFile (%S) failed, status = %p",
+	  debug_printf ("NtOpenFile (%S) failed, status = %y",
 	  		&recycler, status);
 	  goto out;
 	}
@@ -399,7 +399,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 			     FILE_DIRECTORY_FILE, NULL, 0);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtCreateFile (%S) failed, status = %p",
+	  debug_printf ("NtCreateFile (%S) failed, status = %y",
 	  		&recycler, status);
 	  goto out;
 	}
@@ -419,7 +419,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 				 FILE_DIRECTORY_FILE, NULL, 0);
 	  if (!NT_SUCCESS (status))
 	    {
-	      debug_printf ("NtCreateFile (%S) failed, status = %p",
+	      debug_printf ("NtCreateFile (%S) failed, status = %y",
 			    &recycler, status);
 	      goto out;
 	    }
@@ -438,14 +438,14 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 				 FILE_SYNCHRONOUS_IO_NONALERT
 				 | FILE_NON_DIRECTORY_FILE, NULL, 0);
 	  if (!NT_SUCCESS (status))
-	    debug_printf ("NtCreateFile (%S) failed, status = %p",
+	    debug_printf ("NtCreateFile (%S) failed, status = %y",
 			  &recycler, status);
 	  else
 	    {
 	      status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io, desktop_ini,
 				    sizeof desktop_ini - 1, NULL, NULL);
 	      if (!NT_SUCCESS (status))
-		debug_printf ("NtWriteFile (%S) failed, status = %p",
+		debug_printf ("NtWriteFile (%S) failed, status = %y",
 			      &fname, status);
 	      else if (wincap.has_recycle_dot_bin ())
 	      	{
@@ -453,7 +453,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 		  			desktop_ini_ext,
 					sizeof desktop_ini_ext - 1, NULL, NULL);
 		  if (!NT_SUCCESS (status))
-		    debug_printf ("NtWriteFile (%S) failed, status = %p",
+		    debug_printf ("NtWriteFile (%S) failed, status = %y",
 				  &fname, status);
 		}
 	      NtClose (tmp_fh);
@@ -468,14 +468,14 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 				     FILE_SYNCHRONOUS_IO_NONALERT
 				     | FILE_NON_DIRECTORY_FILE, NULL, 0);
 		if (!NT_SUCCESS (status))
-		  debug_printf ("NtCreateFile (%S) failed, status = %p",
+		  debug_printf ("NtCreateFile (%S) failed, status = %y",
 				&recycler, status);
 		else
 		{
 		  status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io, info2,
 					sizeof info2, NULL, NULL);
 		  if (!NT_SUCCESS (status))
-		    debug_printf ("NtWriteFile (%S) failed, status = %p",
+		    debug_printf ("NtWriteFile (%S) failed, status = %y",
 				  &fname, status);
 		  NtClose (tmp_fh);
 		}
@@ -488,7 +488,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
     }
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("Move %S to %S failed, status = %p",
+      debug_printf ("Move %S to %S failed, status = %y",
 		    pc.get_nt_native_path (), &recycler, status);
       goto out;
     }
@@ -546,7 +546,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 			 NULL, 0);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("Creating file for overwriting failed, status = %p",
+      debug_printf ("Creating file for overwriting failed, status = %y",
 		    status);
       goto out;
     }
@@ -554,12 +554,12 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 				 FileRenameInformation);
   NtClose (tmp_fh);
   if (!NT_SUCCESS (status))
-    debug_printf ("Overwriting with another file failed, status = %p", status);
+    debug_printf ("Overwriting with another file failed, status = %y", status);
 
 out:
   if (rootdir)
     NtClose (rootdir);
-  debug_printf ("%S, return status %d", pc.get_nt_native_path (), bin_stat);
+  debug_printf ("%S, return bin_status %d", pc.get_nt_native_path (), bin_stat);
   return bin_stat;
 }
 
@@ -576,7 +576,7 @@ check_dir_not_empty (HANDLE dir, path_conv &pc)
 					  FALSE, NULL, TRUE);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("Checking if directory %S is empty failed, status = %p",
+      debug_printf ("Checking if directory %S is empty failed, status = %y",
 		    pc.get_nt_native_path (), status);
       return status;
     }
@@ -621,7 +621,7 @@ check_dir_not_empty (HANDLE dir, path_conv &pc)
 		  && status != STATUS_OBJECT_PATH_NOT_FOUND)
 		{
 		  debug_printf ("Directory %S not empty, found file <%S>, "
-				 "query status = %p",
+				 "query status = %y",
 				pc.get_nt_native_path (), &fname, status);
 		  return STATUS_DIRECTORY_NOT_EMPTY;
 		}
@@ -685,12 +685,12 @@ unlink_nt (path_conv &pc)
 						  pc.file_attributes ()
 						  & ~FILE_ATTRIBUTE_READONLY);
 	  if (!NT_SUCCESS (status2))
-	    debug_printf ("Removing R/O on %S failed, status = %p",
+	    debug_printf ("Removing R/O on %S failed, status = %y",
 			  pc.get_nt_native_path (), status2);
 	  pc.init_reopen_attr (&attr, fh_ro);
 	}
       else
-	debug_printf ("Opening %S for removing R/O failed, status = %p",
+	debug_printf ("Opening %S for removing R/O failed, status = %y",
 		      pc.get_nt_native_path (), status);
       if (pc.is_lnk_symlink ())
 	{
@@ -782,7 +782,7 @@ unlink_nt (path_conv &pc)
 	  status = STATUS_SUCCESS;
 	  goto out;
 	}
-      debug_printf ("Opening %S for delete failed, status = %p",
+      debug_printf ("Opening %S for delete failed, status = %y",
 		    pc.get_nt_native_path (), status);
       goto out;
     }
@@ -807,7 +807,7 @@ try_again:
 				 FileDispositionInformation);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("Setting delete disposition on %S failed, status = %p",
+      debug_printf ("Setting delete disposition on %S failed, status = %y",
 		    pc.get_nt_native_path (), status);
       if (status == STATUS_DIRECTORY_NOT_EMPTY)
 	{
@@ -879,7 +879,7 @@ try_again:
 	    {
 	      fh = NULL;
 	      debug_printf ("Opening dir %S for check_dir_not_empty failed, "
-			    "status = %p", pc.get_nt_native_path (), status2);
+			    "status = %y", pc.get_nt_native_path (), status2);
 	    }
 	  else /* Directory disappeared between NtClose and NtOpenFile. */
 	    status = STATUS_SUCCESS;
@@ -912,7 +912,7 @@ try_again:
 			       flags | FILE_DELETE_ON_CLOSE);
 	  if (!NT_SUCCESS (status))
 	    {
-	      debug_printf ("Setting delete-on-close on %S failed, status = %p",
+	      debug_printf ("Setting delete-on-close on %S failed, status = %y",
 			    pc.get_nt_native_path (), status);
 	      /* This is really the last chance.  If it hasn't been moved
 		 to the bin already, try it now.  If moving to the bin
@@ -961,7 +961,7 @@ out:
       && (pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
     stop_transaction (status, old_trans, trans);
 
-  syscall_printf ("%S, return status = %p", pc.get_nt_native_path (), status);
+  syscall_printf ("%S, return status = %y", pc.get_nt_native_path (), status);
   return status;
 }
 
@@ -1322,7 +1322,7 @@ open (const char *unix_path, int flags, ...)
   va_list ap;
   mode_t mode = 0;
 
-  syscall_printf ("open(%s, %p)", unix_path, flags);
+  syscall_printf ("open(%s, %y)", unix_path, flags);
   pthread_testcancel ();
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -1390,7 +1390,7 @@ open (const char *unix_path, int flags, ...)
 	}
     }
 
-  syscall_printf ("%R = open(%s, %p)", res, unix_path, flags);
+  syscall_printf ("%R = open(%s, %y)", res, unix_path, flags);
   return res;
 }
 
@@ -1636,7 +1636,7 @@ chmod (const char *path, mode_t mode)
 
   delete fh;
  error:
-  syscall_printf ("%R = chmod(%s, %p)", res, path, mode);
+  syscall_printf ("%R = chmod(%s, 0%o)", res, path, mode);
   return res;
 }
 
@@ -1802,12 +1802,12 @@ sync_worker (HANDLE dir, USHORT len, LPCWSTR vol)
   status = NtOpenFile (&fh, GENERIC_WRITE, &attr, &io,
 		       FILE_SHARE_VALID_FLAGS, 0);
   if (!NT_SUCCESS (status))
-    debug_printf ("NtOpenFile (%S), status %p", &uvol, status);
+    debug_printf ("NtOpenFile (%S), status %y", &uvol, status);
   else
     {
       status = NtFlushBuffersFile (fh, &io);
       if (!NT_SUCCESS (status))
-	debug_printf ("NtFlushBuffersFile (%S), status %p", &uvol, status);
+	debug_printf ("NtFlushBuffersFile (%S), status %y", &uvol, status);
       NtClose (fh);
     }
 }
@@ -1827,7 +1827,7 @@ sync ()
   status = NtOpenDirectoryObject (&devhdl, DIRECTORY_QUERY, &attr);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtOpenDirectoryObject, status %p", status);
+      debug_printf ("NtOpenDirectoryObject, status %y", status);
       return;
     }
   /* Traverse \Device directory ... */
@@ -2363,7 +2363,7 @@ retry:
   }
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("status %p", status);
+      debug_printf ("status %y", status);
       if (status == STATUS_SHARING_VIOLATION
 	  && cygwait (10L) != WAIT_SIGNALED)
 	{
@@ -3240,7 +3240,7 @@ seteuid32 (uid_t uid)
 			    &token_is_internal))
     new_token = cygheap->user.internal_token;
 
-  debug_printf ("Found token %d", new_token);
+  debug_printf ("Found token %p", new_token);
 
   /* If no impersonation token is available, try to authenticate using
      LSA private data stored password, LSA authentication using our own
@@ -3295,14 +3295,14 @@ seteuid32 (uid_t uid)
       status = NtSetInformationToken (new_token, TokenOwner,
 				      &usersid, sizeof usersid);
       if (!NT_SUCCESS (status))
-	debug_printf ("NtSetInformationToken (user.token, TokenOwner), %p",
+	debug_printf ("NtSetInformationToken (user.token, TokenOwner), %y",
 		      status);
       /* Try setting primary group in token to current group */
       status = NtSetInformationToken (new_token, TokenPrimaryGroup,
 				      &groups.pgsid, sizeof (cygsid));
       if (!NT_SUCCESS (status))
 	debug_printf ("NtSetInformationToken (user.token, TokenPrimaryGroup),"
-		      "%p", status);
+		      "%y", status);
       /* Try setting default DACL */
       PACL dacl_buf = (PACL) alloca (MAX_DACL_LEN (5));
       if (sec_acl (dacl_buf, true, true, usersid))
@@ -3311,7 +3311,7 @@ seteuid32 (uid_t uid)
 	  status = NtSetInformationToken (new_token, TokenDefaultDacl,
 					  &tdacl, sizeof (tdacl));
 	  if (!NT_SUCCESS (status))
-	    debug_printf ("NtSetInformationToken (TokenDefaultDacl), %p",
+	    debug_printf ("NtSetInformationToken (TokenDefaultDacl), %y",
 			  status);
 	}
     }
@@ -3456,18 +3456,18 @@ setegid32 (gid_t gid)
 				      TokenPrimaryGroup, &gsid, sizeof gsid);
       if (!NT_SUCCESS (status))
 	debug_printf ("NtSetInformationToken (primary_token, "
-		      "TokenPrimaryGroup), %p", status);
+		      "TokenPrimaryGroup), %y", status);
       status = NtSetInformationToken (cygheap->user.imp_token (),
 				      TokenPrimaryGroup, &gsid, sizeof gsid);
       if (!NT_SUCCESS (status))
-	debug_printf ("NtSetInformationToken (token, TokenPrimaryGroup), %p",
+	debug_printf ("NtSetInformationToken (token, TokenPrimaryGroup), %y",
 		      status);
     }
   cygheap->user.deimpersonate ();
   status = NtSetInformationToken (hProcToken, TokenPrimaryGroup,
 				  &gsid, sizeof gsid);
   if (!NT_SUCCESS (status))
-    debug_printf ("NtSetInformationToken (hProcToken, TokenPrimaryGroup), %p",
+    debug_printf ("NtSetInformationToken (hProcToken, TokenPrimaryGroup), %y",
 		  status);
   clear_procimptoken ();
   cygheap->user.reimpersonate ();
@@ -4061,7 +4061,7 @@ gethostid (void)
   /* SDBM hash */
   for (PWCHAR wp = wguid; *wp; ++wp)
     hostid = *wp + (hostid << 6) + (hostid << 16) - hostid;
-  debug_printf ("hostid 0x%08x from MachineGuid %W", hostid, wguid);
+  debug_printf ("hostid %08y from MachineGuid %W", hostid, wguid);
   return (int32_t) hostid; /* Avoid sign extension. */
 }
 

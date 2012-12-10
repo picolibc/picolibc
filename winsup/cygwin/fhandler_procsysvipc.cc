@@ -1,6 +1,6 @@
 /* fhandler_procsysvipc.cc: fhandler for /proc/sysvipc virtual filesystem
 
-   Copyright 2011 Red Hat, Inc.
+   Copyright 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -202,7 +202,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_proc::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_proc::open(%p, 0%o)", res, flags, mode);
   return res;
 }
 

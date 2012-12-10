@@ -117,7 +117,7 @@ child_info::prefork (bool detached)
   if (!detached)
     {
       if (!CreatePipe (&rd_proc_pipe, &wr_proc_pipe, &sec_none_nih, 16))
-	api_fatal ("prefork: couldn't create pipe process tracker%E");
+	api_fatal ("prefork: couldn't create pipe process tracker %E");
 
       if (!SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT,
 				 HANDLE_FLAG_INHERIT))
@@ -328,7 +328,7 @@ frok::parent (volatile char * volatile stack_here)
 	    ch.guardsize = _my_tls.tid->attr.guardsize;
 	}
     }
-  debug_printf ("stack - bottom %p, top %p, addr %p, guardsize %p",
+  debug_printf ("stack - bottom %p, top %p, addr %p, guardsize %lu",
 		ch.stackbottom, ch.stacktop, ch.stackaddr, ch.guardsize);
 
   PROCESS_INFORMATION pi;
@@ -340,7 +340,7 @@ frok::parent (volatile char * volatile stack_here)
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
-  syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %p, 0, 0, %p, %p)",
+  syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %y, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
   time_t start_time = time (NULL);
@@ -688,7 +688,7 @@ child_copy (HANDLE hp, bool write, ...)
 		__seterrno ();
 	      /* If this happens then there is a bug in our fork
 		 implementation somewhere. */
-	      system_printf ("%s %s copy failed, %p..%p, done %d, windows pid %u, %E",
+	      system_printf ("%s %s copy failed, %p..%p, done %lu, windows pid %u, %E",
 			    what, huh[write], low, high, done, myself->dwProcessId);
 	      goto err;
 	    }

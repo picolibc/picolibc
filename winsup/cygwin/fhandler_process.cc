@@ -314,7 +314,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_proc::open(%y, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_proc::open(%y, 0%o)", res, flags, mode);
   return res;
 }
 
@@ -905,7 +905,7 @@ format_process_maps (void *data, char *&destbuf)
 	    {
 	      /* If the return length pointer is missing, NtQueryVirtualMemory
 		 returns with STATUS_ACCESS_VIOLATION on Windows 2000. */
-	      ULONG ret_len = 0;
+	      SIZE_T ret_len = 0;
 
 	      st.st_dev = 0;
 	      st.st_ino = 0;
@@ -1014,7 +1014,7 @@ format_process_stat (void *data, char *&destbuf)
     {
       DWORD error = GetLastError ();
       __seterrno_from_win_error (error);
-      debug_printf ("OpenProcess: ret %d", error);
+      debug_printf ("OpenProcess: ret %u", error);
       return 0;
     }
   if (NT_SUCCESS (status))
@@ -1305,7 +1305,7 @@ get_process_state (DWORD dwProcessId)
     }
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQuerySystemInformation: status %y, %lu",
+      debug_printf ("NtQuerySystemInformation: status %y, %u",
 		    status, RtlNtStatusToDosError (status));
       goto out;
     }
@@ -1350,7 +1350,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
   HANDLE hProcess;
   VM_COUNTERS vmc;
   PMEMORY_WORKING_SET_LIST p;
-  ULONG n = 0x4000, length;
+  SIZE_T n = 0x4000, length;
 
   p = (PMEMORY_WORKING_SET_LIST) malloc (n);
   if (!p)
@@ -1366,7 +1366,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     {
       status = NtQueryVirtualMemory (hProcess, 0, MemoryWorkingSetList,
 				     (PVOID) p, n,
-				     (length = (ULONG) -1, &length));
+				     (length = (SIZE_T) -1, &length));
       if (status != STATUS_INFO_LENGTH_MISMATCH)
 	break;
       n <<= 1;

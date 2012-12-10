@@ -318,7 +318,7 @@ fhandler_netdrive::open (int flags, mode_t mode)
   set_flags ((flags & ~O_TEXT) | O_BINARY | O_DIROPEN);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_netdrive::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_netdrive::open(%y, 0%o)", res, flags, mode);
   return res;
 }
 

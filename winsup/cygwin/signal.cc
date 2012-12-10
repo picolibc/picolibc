@@ -1,7 +1,7 @@
 /* signal.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
    Written by Steve Chamberlain of Cygnus Support, sac@cygnus.com
    Significant changes by Sergey Okhapkin <sos@prospect.com.ru>
@@ -274,7 +274,7 @@ _pinfo::kill (siginfo_t& si)
       res = -1;
     }
 
-  syscall_printf ("%d = _pinfo::kill (%d), pid %d, process_state %p", res,
+  syscall_printf ("%d = _pinfo::kill (%d), pid %d, process_state %y", res,
 		  si.si_signo, this_pid, this_process_state);
   return res;
 }
@@ -526,7 +526,7 @@ extern "C" int
 sigpause (int signal_mask)
 {
   int res = handle_sigsuspend ((sigset_t) signal_mask);
-  syscall_printf ("%R = sigpause(%p)", res, signal_mask);
+  syscall_printf ("%R = sigpause(%y)", res, signal_mask);
   return res;
 }
 
@@ -554,7 +554,7 @@ siginterrupt (int sig, int flag)
       act.sa_flags |= SA_RESTART;
     }
   int res = sigaction_worker (sig, &act, NULL, true);
-  syscall_printf ("%R = siginterrupt(%d, %p)", sig, flag);
+  syscall_printf ("%R = siginterrupt(%d, %y)", sig, flag);
   return res;
 }
 

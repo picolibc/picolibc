@@ -113,7 +113,7 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	ms = 1;			/* At least 1 ms granularity */
 
       if (to)
-	select_printf ("to->tv_sec %d, to->tv_usec %d, ms %d", to->tv_sec, to->tv_usec, ms);
+	select_printf ("to->tv_sec %ld, to->tv_usec %ld, ms %d", to->tv_sec, to->tv_usec, ms);
       else
 	select_printf ("to NULL, ms %x", ms);
 
@@ -550,7 +550,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
        that.  This means that a pipe could still block since you could
        be trying to write more to the pipe than is available in the
        buffer but that is the hazard of select().  */
-    paranoid_printf ("fd %d, %s, write: size %lu, avail %lu", fd,
+    paranoid_printf ("fd %d, %s, write: size %u, avail %u", fd,
 		     fh->get_name (), fpli.OutboundQuota,
 		     fpli.WriteQuotaAvailable);
   else if ((res = (fpli.OutboundQuota < PIPE_BUF &&
@@ -558,7 +558,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
     /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
        the pipe writable only if it is completely empty, to minimize the
        probability that a subsequent write will block.  */
-    select_printf ("fd, %s, write tiny pipe: size %lu, avail %lu",
+    select_printf ("fd, %s, write tiny pipe: size %u, avail %u",
 		   fd, fh->get_name (), fpli.OutboundQuota,
 		   fpli.WriteQuotaAvailable);
   return res ?: -!!(fpli.NamedPipeState & FILE_PIPE_CLOSING_STATE);

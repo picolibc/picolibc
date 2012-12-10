@@ -1,7 +1,7 @@
 /* mmap.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -197,8 +197,8 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
   LARGE_INTEGER offset = { QuadPart:off };
   DWORD protect = gen_create_protect (openflags, flags);
   void *base = addr;
-  ULONG commitsize = attached (prot) ? 0 : len;
-  ULONG viewsize = len;
+  SIZE_T commitsize = attached (prot) ? 0 : len;
+  SIZE_T viewsize = len;
   ULONG alloc_type = (base && !wincap.is_wow64 () ? AT_ROUND_TO_PAGE : 0)
 		     | MEM_TOP_DOWN;
 
@@ -222,8 +222,8 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
       base = NULL;
       SetLastError (RtlNtStatusToDosError (status));
     }
-  debug_printf ("%p (status %p) = NtMapViewOfSection (h:%x, addr:%x, len:%u,"
-		" off:%X, protect:%x, type:%x)",
+  debug_printf ("%p (status %p) = NtMapViewOfSection (h:%p, addr:%p, len:%lu,"
+		" off:%Y, protect:%y, type:%y)",
 		base, status, h, addr, len, off, protect, 0);
   return base;
 }
@@ -259,7 +259,7 @@ class mmap_record
     int prot;
     int flags;
     off_t offset;
-    DWORD len;
+    SIZE_T len;
     caddr_t base_address;
     dev_t dev;
     DWORD page_map[0];
@@ -297,16 +297,16 @@ class mmap_record
     bool attached () const { return ::attached (prot); }
     bool filler () const { return ::filler (prot); }
     off_t get_offset () const { return offset; }
-    DWORD get_len () const { return len; }
+    SIZE_T get_len () const { return len; }
     caddr_t get_address () const { return base_address; }
 
     void init_page_map (mmap_record &r);
 
     DWORD find_unused_pages (DWORD pages) const;
-    bool match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len);
-    off_t map_pages (off_t off, DWORD len);
-    bool map_pages (caddr_t addr, DWORD len);
-    bool unmap_pages (caddr_t addr, DWORD len);
+    bool match (caddr_t addr, SIZE_T len, caddr_t &m_addr, DWORD &m_len);
+    off_t map_pages (off_t off, SIZE_T len);
+    bool map_pages (caddr_t addr, SIZE_T len);
+    bool unmap_pages (caddr_t addr, SIZE_T len);
     int access (caddr_t address);
 
     fhandler_base *alloc_fh ();
@@ -383,7 +383,7 @@ mmap_record::find_unused_pages (DWORD pages) const
 }
 
 bool
-mmap_record::match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len)
+mmap_record::match (caddr_t addr, SIZE_T len, caddr_t &m_addr, DWORD &m_len)
 {
   caddr_t low = (addr >= get_address ()) ? addr : get_address ();
   caddr_t high = get_address ();
@@ -410,24 +410,24 @@ mmap_record::init_page_map (mmap_record &r)
   if (real_protect != start_protect && !noreserve ()
       && !VirtualProtect (get_address (), get_len (),
 			  real_protect, &start_protect))
-    system_printf ("Warning: VirtualProtect (addr: %p, len: 0x%x, "
-		   "new_prot: 0x%x, old_prot: 0x%x), %E",
+    system_printf ("Warning: VirtualProtect (addr: %p, len: %ly, "
+		   "new_prot: %y, old_prot: %y), %E",
 		   get_address (), get_len (),
 		   real_protect, start_protect);
-  DWORD len = PAGE_CNT (get_len ());
+  SIZE_T len = PAGE_CNT (get_len ());
   while (len-- > 0)
     MAP_SET (len);
 }
 
 off_t
-mmap_record::map_pages (off_t off, DWORD len)
+mmap_record::map_pages (off_t off, SIZE_T len)
 {
   /* Used ONLY if this mapping matches into the chunk of another already
      performed mapping in a special case of MAP_ANON|MAP_PRIVATE.
 
      Otherwise it's job is now done by init_page_map(). */
   DWORD old_prot;
-  debug_printf ("map_pages (fd=%d, off=%D, len=%u)", get_fd (), off, len);
+  debug_printf ("map_pages (fd=%d, off=%Y, len=%lu)", get_fd (), off, len);
   len = PAGE_CNT (len);
 
   if ((off = find_unused_pages (len)) == (DWORD)-1)
@@ -447,9 +447,9 @@ mmap_record::map_pages (off_t off, DWORD len)
 }
 
 bool
-mmap_record::map_pages (caddr_t addr, DWORD len)
+mmap_record::map_pages (caddr_t addr, SIZE_T len)
 {
-  debug_printf ("map_pages (addr=%x, len=%u)", addr, len);
+  debug_printf ("map_pages (addr=%p, len=%lu)", addr, len);
   DWORD old_prot;
   DWORD off = addr - get_address ();
   off /= wincap.page_size ();
@@ -475,7 +475,7 @@ mmap_record::map_pages (caddr_t addr, DWORD len)
 }
 
 bool
-mmap_record::unmap_pages (caddr_t addr, DWORD len)
+mmap_record::unmap_pages (caddr_t addr, SIZE_T len)
 {
   DWORD old_prot;
   DWORD off = addr - get_address ();
@@ -585,7 +585,7 @@ mmap_list::try_map (void *addr, size_t len, int flags, off_t off)
     {
       /* If MAP_FIXED isn't given, check if this mapping matches into the
 	 chunk of another already performed mapping. */
-      DWORD plen = PAGE_CNT (len);
+      SIZE_T plen = PAGE_CNT (len);
       LIST_FOREACH (rec, &recs, mr_next)
 	if (rec->find_unused_pages (plen) != (DWORD) -1)
 	  break;
@@ -793,7 +793,7 @@ mmap_worker (mmap_list *map_list, fhandler_base *fh, caddr_t base, size_t len,
 extern "C" void *
 mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
-  syscall_printf ("addr %x, len %u, prot %x, flags %x, fd %d, off %D",
+  syscall_printf ("addr %p, len %lu, prot %y, flags %y, fd %d, off %Y",
 		  addr, len, prot, flags, fd, off);
 
   caddr_t ret = (caddr_t) MAP_FAILED;
@@ -1138,7 +1138,7 @@ mmap (void *addr, size_t len, int prot, int flags, int fd, _off_t off)
 extern "C" int
 munmap (void *addr, size_t len)
 {
-  syscall_printf ("munmap (addr %x, len %u)", addr, len);
+  syscall_printf ("munmap (addr %p, len %lu)", addr, len);
 
   /* Error conditions according to SUSv3 */
   if (!addr || !len || check_invalid_virtual_addr (addr, len))
@@ -1192,7 +1192,7 @@ munmap (void *addr, size_t len)
     }
 
   LIST_UNLOCK ();
-  syscall_printf ("0 = munmap(): %x", addr);
+  syscall_printf ("0 = munmap(): %p", addr);
   return 0;
 }
 
@@ -1204,7 +1204,7 @@ msync (void *addr, size_t len, int flags)
   int ret = -1;
   mmap_list *map_list;
 
-  syscall_printf ("msync (addr: %p, len %u, flags %x)", addr, len, flags);
+  syscall_printf ("msync (addr: %p, len %lu, flags %y)", addr, len, flags);
 
   pthread_testcancel ();
 
@@ -1266,7 +1266,7 @@ mprotect (void *addr, size_t len, int prot)
   DWORD old_prot;
   DWORD new_prot = 0;
 
-  syscall_printf ("mprotect (addr: %p, len %u, prot %x)", addr, len, prot);
+  syscall_printf ("mprotect (addr: %p, len %lu, prot %y)", addr, len, prot);
 
   /* See comment in mmap64 for a description. */
   size_t pagesize = wincap.allocation_granularity ();
@@ -1357,7 +1357,8 @@ mlock (const void *addr, size_t len)
   /* Align address and length values to page size. */
   size_t pagesize = wincap.allocation_granularity ();
   PVOID base = (PVOID) rounddown((uintptr_t) addr, pagesize);
-  ULONG size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len, pagesize);
+  SIZE_T size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len,
+			  pagesize);
   NTSTATUS status = 0;
   do
     {
@@ -1402,7 +1403,7 @@ mlock (const void *addr, size_t len)
     }
   while (status == STATUS_WORKING_SET_QUOTA);
 
-  syscall_printf ("%R = mlock(%p, %u)", ret, addr, len);
+  syscall_printf ("%R = mlock(%p, %lu)", ret, addr, len);
   return ret;
 }
 
@@ -1414,7 +1415,8 @@ munlock (const void *addr, size_t len)
   /* Align address and length values to page size. */
   size_t pagesize = wincap.allocation_granularity ();
   PVOID base = (PVOID) rounddown((uintptr_t) addr, pagesize);
-  ULONG size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len, pagesize);
+  SIZE_T size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len,
+			  pagesize);
   NTSTATUS status = NtUnlockVirtualMemory (NtCurrentProcess (), &base, &size,
 					   MAP_PROCESS);
   if (!NT_SUCCESS (status))
@@ -1422,7 +1424,7 @@ munlock (const void *addr, size_t len)
   else
     ret = 0;
 
-  syscall_printf ("%R = munlock(%p, %u)", ret, addr, len);
+  syscall_printf ("%R = munlock(%p, %lu)", ret, addr, len);
   return ret;
 }
 
@@ -1452,7 +1454,7 @@ posix_madvise (void *addr, size_t len, int advice)
       ret = 0;
     }
 
-  syscall_printf ("%d = posix_madvise(%p, %u, %d)", ret, addr, len, advice);
+  syscall_printf ("%d = posix_madvise(%p, %lu, %d)", ret, addr, len, advice);
   /* Eventually do nothing. */
   return 0;
 }
@@ -1610,8 +1612,8 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
     {
       MEMORY_BASIC_INFORMATION m;
       VirtualQuery (address, &m, sizeof (m));
-      system_printf ("requested %p != %p mem alloc base %p, state %p, "
-		     "size %d, %E", address, base, m.AllocationBase, m.State,
+      system_printf ("requested %p != %p mem alloc base %p, state %y, "
+		     "size %lu, %E", address, base, m.AllocationBase, m.State,
 		     m.RegionSize);
     }
   return base == address;
@@ -1680,8 +1682,8 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
     {
       MEMORY_BASIC_INFORMATION m;
       VirtualQuery (address, &m, sizeof (m));
-      system_printf ("requested %p != %p mem alloc base %p, state %p, "
-		     "size %d, %E", address, base, m.AllocationBase, m.State,
+      system_printf ("requested %p != %p mem alloc base %p, state %y, "
+		     "size %lu, %E", address, base, m.AllocationBase, m.State,
 		     m.RegionSize);
     }
   return base == address;
@@ -1691,8 +1693,8 @@ HANDLE
 fhandler_dev_mem::mmap (caddr_t *addr, size_t len, int prot,
 			int flags, off_t off)
 {
-  if (off >= mem_size
-      || (DWORD) len >= mem_size
+  if (off >= (off_t) mem_size
+      || len >= mem_size
       || off + len >= mem_size)
     {
       set_errno (EINVAL);
@@ -1774,8 +1776,8 @@ fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
     {
       MEMORY_BASIC_INFORMATION m;
       VirtualQuery (address, &m, sizeof (m));
-      system_printf ("requested %p != %p mem alloc base %p, state %p, "
-		     "size %d, %E", address, base, m.AllocationBase, m.State,
+      system_printf ("requested %p != %p mem alloc base %p, state %y, "
+		     "size %lu, %E", address, base, m.AllocationBase, m.State,
 		     m.RegionSize);
     }
   return base == address;
@@ -1797,8 +1799,8 @@ fixup_mmaps_after_fork (HANDLE parent)
       mmap_record *rec;
       LIST_FOREACH (rec, &map_list->recs, mr_next)
 	{
-	  debug_printf ("fd %d, h 0x%x, address %p, len 0x%x, prot: 0x%x, "
-			"flags: 0x%x, offset %X",
+	  debug_printf ("fd %d, h %p, address %p, len %ly, prot: %y, "
+			"flags: %y, offset %Y",
 			rec->get_fd (), rec->get_handle (), rec->get_address (),
 			rec->get_len (), rec->get_prot (), rec->get_flags (),
 			rec->get_offset ());
@@ -1893,10 +1895,10 @@ fixup_mmaps_after_fork (HANDLE parent)
 		  VirtualQuery (address, &m, sizeof m);
 		  system_printf ("VirtualProtect failed for "
 				 "address %p, "
-				 "parentstate: 0x%x, "
-				 "state: 0x%x, "
-				 "parentprot: 0x%x, "
-				 "prot: 0x%x, %E",
+				 "parentstate: %y, "
+				 "state: %y, "
+				 "parentprot: %y, "
+				 "prot: %y, %E",
 				 address, mbi.State, m.State,
 				 mbi.Protect, m.Protect);
 		  return -1;

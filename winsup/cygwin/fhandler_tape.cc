@@ -1267,7 +1267,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
       if (devbufend > devbufstart)
 	{
 	  bytes_to_read = MIN (len, devbufend - devbufstart);
-	  debug_printf ("read %ld bytes from buffer (rest %ld)",
+	  debug_printf ("read %lu bytes from buffer (rest %lu)",
 			bytes_to_read, devbufend - devbufstart - bytes_to_read);
 	  memcpy (buf, devbuf + devbufstart, bytes_to_read);
 	  len -= bytes_to_read;
@@ -1290,7 +1290,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	  size_t block_fit = !block_size ? len : rounddown(len,  block_size);
 	  if (block_fit)
 	    {
-	      debug_printf ("read %ld bytes from tape (rest %ld)",
+	      debug_printf ("read %lu bytes from tape (rest %lu)",
 			    block_fit, len - block_fit);
 	      ret = mt.drive (driveno ())->read (get_handle (), &ov, buf,
 						 block_fit);
@@ -1313,7 +1313,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	    }
 	  if (!ret && len > 0)
 	    {
-	      debug_printf ("read %ld bytes from tape (one block)", block_size);
+	      debug_printf ("read %lu bytes from tape (one block)", block_size);
 	      ret = mt.drive (driveno ())->read (get_handle (), &ov, devbuf,
 						 block_size);
 	      if (ret)

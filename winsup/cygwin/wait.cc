@@ -110,7 +110,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       break;
     }
 
-  syscall_printf ("%R = wait4(%d, %p, %d, %p)", res, intpid, w->status, options, r);
+  syscall_printf ("%R = wait4(%d, %y, %d, %p)", res, intpid, w->status, options, r);
   w->status = -1;
   return res;
 }

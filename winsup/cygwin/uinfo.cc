@@ -66,14 +66,14 @@ cygheap_user::init ()
   status = NtQueryInformationToken (hProcToken, TokenPrimaryGroup,
 				    &groups.pgsid, sizeof (cygsid), &size);
   if (!NT_SUCCESS (status))
-    system_printf ("NtQueryInformationToken (TokenPrimaryGroup), %p", status);
+    system_printf ("NtQueryInformationToken (TokenPrimaryGroup), %y", status);
 
   /* Get the SID from current process and store it in effec_cygsid */
   status = NtQueryInformationToken (hProcToken, TokenUser, &effec_cygsid,
 				    sizeof (cygsid), &size);
   if (!NT_SUCCESS (status))
     {
-      system_printf ("NtQueryInformationToken (TokenUser), %p", status);
+      system_printf ("NtQueryInformationToken (TokenUser), %y", status);
       return;
     }
 
@@ -81,7 +81,7 @@ cygheap_user::init ()
   status = NtSetInformationToken (hProcToken, TokenOwner, &effec_cygsid,
 				  sizeof (cygsid));
   if (!NT_SUCCESS (status))
-    debug_printf ("NtSetInformationToken(TokenOwner), %p", status);
+    debug_printf ("NtSetInformationToken(TokenOwner), %y", status);
 
   /* Standard way to build a security descriptor with the usual DACL */
   PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
@@ -100,10 +100,10 @@ cygheap_user::init ()
       status = NtSetInformationToken (hProcToken, TokenDefaultDacl, &dacl,
 				      sizeof (dacl));
       if (!NT_SUCCESS (status))
-	system_printf ("NtSetInformationToken (TokenDefaultDacl), %p", status);
+	system_printf ("NtSetInformationToken (TokenDefaultDacl), %y", status);
       if ((status = NtSetSecurityObject (NtCurrentProcess (),
 					 DACL_SECURITY_INFORMATION, psd)))
-	system_printf ("NtSetSecurityObject, %lx", status);
+	system_printf ("NtSetSecurityObject, %y", status);
     }
   else
     system_printf("Cannot get dacl, %E");
@@ -136,7 +136,7 @@ internal_getlogin (cygheap_user &user)
 						       TokenPrimaryGroup,
 						       &gsid, sizeof gsid);
 	      if (!NT_SUCCESS (status))
-		debug_printf ("NtSetInformationToken (TokenPrimaryGroup), %p",
+		debug_printf ("NtSetInformationToken (TokenPrimaryGroup), %y",
 			      status);
 	      else
 		user.groups.pgsid = gsid;
@@ -585,14 +585,14 @@ pwdgrp::load (const wchar_t *rel_path)
 		       | FILE_OPEN_FOR_BACKUP_INTENT);
   if (!NT_SUCCESS (status))
     {
-      paranoid_printf ("NtOpenFile(%S) failed, status %p", &upath, status);
+      paranoid_printf ("NtOpenFile(%S) failed, status %y", &upath, status);
       goto out;
     }
   status = NtQueryInformationFile (fh, &io, &fsi, sizeof fsi,
 				   FileStandardInformation);
   if (!NT_SUCCESS (status))
     {
-      paranoid_printf ("NtQueryInformationFile(%S) failed, status %p",
+      paranoid_printf ("NtQueryInformationFile(%S) failed, status %y",
 		       &upath, status);
       goto out;
     }
@@ -603,14 +603,14 @@ pwdgrp::load (const wchar_t *rel_path)
   buf = (char *) malloc (fsi.EndOfFile.LowPart + 1);
   if (!buf)
     {
-      paranoid_printf ("malloc (%d) failed", fsi.EndOfFile.LowPart);
+      paranoid_printf ("malloc (%u) failed", fsi.EndOfFile.LowPart);
       goto out;
     }
   status = NtReadFile (fh, NULL, NULL, NULL, &io, buf, fsi.EndOfFile.LowPart,
 		       NULL, NULL);
   if (!NT_SUCCESS (status))
     {
-      paranoid_printf ("NtReadFile(%S) failed, status %p", &upath, status);
+      paranoid_printf ("NtReadFile(%S) failed, status %y", &upath, status);
       free (buf);
       goto out;
     }

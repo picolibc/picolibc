@@ -219,7 +219,7 @@ __set_winsock_errno (const char *fn, int ln)
   int err = find_winsock_errno (werr);
 
   set_errno (err);
-  syscall_printf ("%s:%d - winsock error %d -> errno %d", fn, ln, werr, err);
+  syscall_printf ("%s:%d - winsock error %u -> errno %d", fn, ln, werr, err);
 }
 
 /*
@@ -420,7 +420,7 @@ dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
 
       /* Do servent/protoent/hostent specific processing. */
       if (type == unionent::t_protoent)
-	debug_printf ("protoent %s %x %x", dst->name, dst->list, dst->port_proto_addrtype);
+	debug_printf ("protoent %s %p %y", dst->name, dst->list, dst->port_proto_addrtype);
       else if (type == unionent::t_servent)
 	{
 	  if (src->s_proto)
@@ -534,7 +534,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
       ret = WSAIoctl (soc, SIO_BASE_HANDLE, NULL, 0, (void *) &base_soc,
 		      sizeof (base_soc), &bret, NULL, NULL);
       if (ret)
-	debug_printf ("WSAIoctl: %lu", WSAGetLastError ());
+	debug_printf ("WSAIoctl: %u", WSAGetLastError ());
       else if (base_soc != soc)
 	{
 	  /* LSPs are often BLODAs as well.  So we print an info about
@@ -591,20 +591,20 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   if (::setsockopt (soc, SOL_SOCKET, SO_RCVBUF,
 		    (char *) &((fhandler_socket *) fd)->rmem (), sizeof (int)))
     {
-      debug_printf ("setsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());
+      debug_printf ("setsockopt(SO_RCVBUF) failed, %u", WSAGetLastError ());
       if (::getsockopt (soc, SOL_SOCKET, SO_RCVBUF,
 			(char *) &((fhandler_socket *) fd)->rmem (),
 			(size = sizeof (int), &size)))
-	system_printf ("getsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());
+	system_printf ("getsockopt(SO_RCVBUF) failed, %u", WSAGetLastError ());
     }
   if (::setsockopt (soc, SOL_SOCKET, SO_SNDBUF,
 		    (char *) &((fhandler_socket *) fd)->wmem (), sizeof (int)))
     {
-      debug_printf ("setsockopt(SO_SNDBUF) failed, %lu", WSAGetLastError ());
+      debug_printf ("setsockopt(SO_SNDBUF) failed, %u", WSAGetLastError ());
       if (::getsockopt (soc, SOL_SOCKET, SO_SNDBUF,
 			(char *) &((fhandler_socket *) fd)->wmem (),
 			(size = sizeof (int), &size)))
-	system_printf ("getsockopt(SO_SNDBUF) failed, %lu", WSAGetLastError ());
+	system_printf ("getsockopt(SO_SNDBUF) failed, %u", WSAGetLastError ());
     }
 
   return true;
@@ -620,7 +620,7 @@ cygwin_socket (int af, int type, int protocol)
   int flags = type & _SOCK_FLAG_MASK;
   type &= ~_SOCK_FLAG_MASK;
 
-  debug_printf ("socket (%d, %d (flags %p), %d)", af, type, flags, protocol);
+  debug_printf ("socket (%d, %d (flags %y), %d)", af, type, flags, protocol);
 
   if ((flags & ~(SOCK_NONBLOCK | SOCK_CLOEXEC)) != 0)
     {
@@ -670,7 +670,7 @@ cygwin_socket (int af, int type, int protocol)
 	    DWORD blen;
 	    if (WSAIoctl (soc, SIO_UDP_CONNRESET, &cr, sizeof cr, NULL, 0,
 			  &blen, NULL, NULL) == SOCKET_ERROR)
-	      debug_printf ("Reset SIO_UDP_CONNRESET: WinSock error %lu",
+	      debug_printf ("Reset SIO_UDP_CONNRESET: WinSock error %u",
 			    WSAGetLastError ());
 	  }
 	res = fd;
@@ -678,7 +678,7 @@ cygwin_socket (int af, int type, int protocol)
   }
 
 done:
-  syscall_printf ("%R = socket(%d, %d (flags %p), %d)",
+  syscall_printf ("%R = socket(%d, %d (flags %y), %d)",
 		  res, af, type, flags, protocol);
   return res;
 }
@@ -700,7 +700,7 @@ cygwin_sendto (int fd, const void *buf, size_t len, int flags,
   else
     res = fh->sendto (buf, len, flags, to, tolen);
 
-  syscall_printf ("%R = sendto(%d, %p, %d, %x, %p, %d)",
+  syscall_printf ("%R = sendto(%d, %p, %ld, %y, %p, %d)",
 		  res, fd, buf, len, flags, to, tolen);
   return res;
 }
@@ -726,7 +726,7 @@ cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
        to deliver valid error conditions and peer address. */
     res = fh->recvfrom (buf, len, flags, from, fromlen);
 
-  syscall_printf ("%R = recvfrom(%d, %p, %d, %x, %p, %p)",
+  syscall_printf ("%R = recvfrom(%d, %p, %ld, %y, %p, %p)",
 		  res, fd, buf, len, flags, from, fromlen);
   return res;
 }
@@ -791,7 +791,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 			  (const char *) optval, optlen);
 
       if (optlen == 4)
-	syscall_printf ("setsockopt optval=%x", *(long *) optval);
+	syscall_printf ("setsockopt optval=%lx", *(long *) optval);
 
       if (res)
 	{
@@ -841,7 +841,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	  }
     }
 
-  syscall_printf ("%R = setsockopt(%d, %d, %x, %p, %d)",
+  syscall_printf ("%R = setsockopt(%d, %d, %y, %p, %d)",
 		  res, fd, level, optname, optval, optlen);
   return res;
 }
@@ -901,7 +901,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 	}
     }
 
-  syscall_printf ("%R = getsockopt(%d, %d, 0x%x, %p, %p)",
+  syscall_printf ("%R = getsockopt(%d, %d, %y, %p, %p)",
 		  res, fd, level, optname, optval, optlen);
   return res;
 }
@@ -1333,7 +1333,7 @@ accept4 (int fd, struct sockaddr *peer, socklen_t *len, int flags)
   else
     res = fh->accept4 (peer, len, flags);
 
-  syscall_printf ("%R = accept4(%d, %p, %p, %p)", res, fd, peer, len, flags);
+  syscall_printf ("%R = accept4(%d, %p, %p, %y)", res, fd, peer, len, flags);
   return res;
 }
 
@@ -1467,7 +1467,8 @@ cygwin_getpeername (int fd, struct sockaddr *name, socklen_t *len)
   else
     res = fh->getpeername (name, len);
 
-  syscall_printf ("%R = getpeername(%d) %d", res, fd, (fh ? fh->get_socket () : -1));
+  syscall_printf ("%R = getpeername(%d) %p", res, fd,
+  		  (fh ? fh->get_socket () : (SOCKET) -1));
   return res;
 }
 
@@ -1491,7 +1492,7 @@ cygwin_recv (int fd, void *buf, size_t len, int flags)
        to deliver valid error conditions. */
     res = fh->recvfrom (buf, len, flags, NULL, NULL);
 
-  syscall_printf ("%R = recv(%d, %p, %d, %x)", res, fd, buf, len, flags);
+  syscall_printf ("%R = recv(%d, %p, %ld, %y)", res, fd, buf, len, flags);
   return res;
 }
 
@@ -1511,7 +1512,7 @@ cygwin_send (int fd, const void *buf, size_t len, int flags)
   else
     res = fh->sendto (buf, len, flags, NULL, 0);
 
-  syscall_printf ("%R = send(%d, %p, %d, %x)", res, fd, buf, len, flags);
+  syscall_printf ("%R = send(%d, %p, %ld, %y)", res, fd, buf, len, flags);
   return res;
 }
 
@@ -2817,7 +2818,7 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 	res = fh->recvmsg (msg, flags);
     }
 
-  syscall_printf ("%R = recvmsg(%d, %p, %x)", res, fd, msg, flags);
+  syscall_printf ("%R = recvmsg(%d, %p, %y)", res, fd, msg, flags);
   return res;
 }
 
@@ -2841,7 +2842,7 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 	res = fh->sendmsg (msg, flags);
     }
 
-  syscall_printf ("%R = sendmsg(%d, %p, %x)", res, fd, msg, flags);
+  syscall_printf ("%R = sendmsg(%d, %p, %y)", res, fd, msg, flags);
   return res;
 }
 

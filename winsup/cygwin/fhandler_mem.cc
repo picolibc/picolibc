@@ -49,17 +49,18 @@ fhandler_dev_mem::open (int flags, mode_t)
       if (NT_SUCCESS (status))
 	{
 	  __seterrno_from_nt_status (status);
-	  debug_printf("NtQuerySystemInformation: status %p, %E", status);
+	  debug_printf("NtQuerySystemInformation: status %p", status);
 	  mem_size = 0;
 	}
       else
-	mem_size = sbi.PhysicalPageSize * sbi.NumberOfPhysicalPages;
-      debug_printf ("MemSize: %d MB", mem_size >> 20);
+	mem_size = (SIZE_T) sbi.PhysicalPageSize
+		   * (SIZE_T) sbi.NumberOfPhysicalPages;
+      debug_printf ("MemSize: %ld MB", mem_size >> 20);
     }
   else if (dev () == FH_KMEM) /* /dev/kmem - Not yet supported */
     {
       mem_size = 0;
-      debug_printf ("KMemSize: %d MB", mem_size >> 20);
+      debug_printf ("KMemSize: %ld MB", mem_size >> 20);
     }
   else if (dev () == FH_PORT) /* /dev/port == First 64K of /dev/mem */
     {
@@ -119,7 +120,7 @@ fhandler_dev_mem::open (int flags, mode_t)
 ssize_t __stdcall
 fhandler_dev_mem::write (const void *ptr, size_t ulen)
 {
-  if (!ulen || pos >= mem_size)
+  if (!ulen || pos >= (off_t) mem_size)
     return 0;
 
   if (!(get_access () & GENERIC_WRITE))
@@ -129,12 +130,12 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
     }
 
   if (pos + ulen > mem_size)
-    ulen = mem_size - pos;
+    ulen = (off_t) mem_size - pos;
 
   PHYSICAL_ADDRESS phys;
   NTSTATUS status;
   void *viewmem = NULL;
-  DWORD len = ulen + wincap.page_size () - 1;
+  SIZE_T len = ulen + wincap.page_size () - 1;
 
   phys.QuadPart = (ULONGLONG) pos;
   status = NtMapViewOfSection (get_handle (), INVALID_HANDLE_VALUE, &viewmem,
@@ -162,7 +163,7 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
 void __stdcall
 fhandler_dev_mem::read (void *ptr, size_t& ulen)
 {
-  if (!ulen || pos >= mem_size)
+  if (!ulen || pos >= (off_t) mem_size)
     {
       ulen = 0;
       return;
@@ -176,12 +177,12 @@ fhandler_dev_mem::read (void *ptr, size_t& ulen)
     }
 
   if (pos + ulen > mem_size)
-    ulen = mem_size - pos;
+    ulen = (off_t) mem_size - pos;
 
   PHYSICAL_ADDRESS phys;
   NTSTATUS status;
   void *viewmem = NULL;
-  DWORD len = ulen + wincap.page_size () - 1;
+  SIZE_T len = ulen + wincap.page_size () - 1;
 
   phys.QuadPart = (ULONGLONG) pos;
   status = NtMapViewOfSection (get_handle (), INVALID_HANDLE_VALUE, &viewmem,
@@ -221,7 +222,7 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
       break;
 
     case SEEK_END:
-      pos = mem_size;
+      pos = (off_t) mem_size;
       pos += offset;
       break;
 
@@ -230,7 +231,7 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
       return ILLEGAL_SEEK;
     }
 
-  if (pos > mem_size)
+  if (pos > (off_t) mem_size)
     {
       set_errno (EINVAL);
       return ILLEGAL_SEEK;

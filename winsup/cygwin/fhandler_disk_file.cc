@@ -688,8 +688,8 @@ fhandler_base::fstat_helper (struct stat *buf,
 
  done:
   syscall_printf ("0 = fstat (%S, %p) st_size=%D, st_mode=%y, st_ino=%D"
-		  "st_atim=%x.%x st_ctim=%x.%x "
-		  "st_mtim=%x.%x st_birthtim=%x.%x",
+		  "st_atim=%lx.%lx st_ctim=%lx.%lx "
+		  "st_mtim=%lx.%lx st_birthtim=%lx.%lx",
 		  pc.get_nt_native_path (), buf,
 		  buf->st_size, buf->st_mode, buf->st_ino,
 		  buf->st_atim.tv_sec, buf->st_atim.tv_nsec,
@@ -1349,7 +1349,7 @@ fhandler_base::utimens_fs (const struct timespec *tvp)
       tmp[0] = (tvp[0].tv_nsec == UTIME_NOW) ? timeofday : tvp[0];
       tmp[1] = (tvp[1].tv_nsec == UTIME_NOW) ? timeofday : tvp[1];
     }
-  debug_printf ("incoming lastaccess %08x %08x", tmp[0].tv_sec, tmp[0].tv_nsec);
+  debug_printf ("incoming lastaccess %ly %ly", tmp[0].tv_sec, tmp[0].tv_nsec);
 
   IO_STATUS_BLOCK io;
   FILE_BASIC_INFORMATION fbi;
@@ -1537,7 +1537,7 @@ fhandler_disk_file::prw_open (bool write)
       status = NtOpenFile (&prw_handle, access, &attr, &io,
 			   FILE_SHARE_VALID_FLAGS, get_options ());
     }
-  debug_printf ("%y = NtOpenFile (%p, %x, %S, io, %x, %x)",
+  debug_printf ("%y = NtOpenFile (%p, %y, %S, io, %y, %y)",
 		status, prw_handle, access, pc.get_nt_native_path (),
 		FILE_SHARE_VALID_FLAGS, get_options ());
   if (!NT_SUCCESS (status))
@@ -2192,7 +2192,7 @@ go_ahead:
   if (status == STATUS_NO_MORE_FILES)
     /*nothing*/;
   else if (!NT_SUCCESS (status))
-    debug_printf ("NtQueryDirectoryFile failed, status %y, win32 error %lu",
+    debug_printf ("NtQueryDirectoryFile failed, status %y, win32 error %u",
 		  status, RtlNtStatusToDosError (status));
   else
     {

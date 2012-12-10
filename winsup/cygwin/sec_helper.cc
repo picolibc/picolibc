@@ -434,7 +434,7 @@ set_privilege (HANDLE token, DWORD privilege, bool enable)
 
 out:
   if (ret < 0)
-    debug_printf ("%d = set_privilege((token %x) %W, %d)", ret, token,
+    debug_printf ("%d = set_privilege((token %p) %W, %d)", ret, token,
 		  privilege_name (new_priv.Privileges[0].Luid), enable);
   return ret;
 }
@@ -509,44 +509,44 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
   status = RtlCreateAcl (acl, acl_len, ACL_REVISION);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("RtlCreateAcl: %p", status);
+      debug_printf ("RtlCreateAcl: %y", status);
       return false;
     }
   if (sid1)
     {
       status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL, sid1);
       if (!NT_SUCCESS (status))
-	debug_printf ("RtlAddAccessAllowedAce(sid1) %p", status);
+	debug_printf ("RtlAddAccessAllowedAce(sid1) %y", status);
     }
   if (original && (psid = cygheap->user.saved_sid ())
       && psid != sid1 && psid != well_known_system_sid)
     {
       status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL, psid);
       if (!NT_SUCCESS (status))
-	debug_printf ("RtlAddAccessAllowedAce(original) %p", status);
+	debug_printf ("RtlAddAccessAllowedAce(original) %y", status);
     }
   if (sid2)
     {
       status = RtlAddAccessAllowedAce (acl, ACL_REVISION, access2, sid2);
       if (!NT_SUCCESS (status))
-	debug_printf ("RtlAddAccessAllowedAce(sid2) %p", status);
+	debug_printf ("RtlAddAccessAllowedAce(sid2) %y", status);
     }
   if (admins)
     {
       status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL,
 				       well_known_admins_sid);
       if (!NT_SUCCESS (status))
-	debug_printf ("RtlAddAccessAllowedAce(admin) %p", status);
+	debug_printf ("RtlAddAccessAllowedAce(admin) %y", status);
     }
   status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL,
 				   well_known_system_sid);
   if (!NT_SUCCESS (status))
-    debug_printf ("RtlAddAccessAllowedAce(system) %p", status);
+    debug_printf ("RtlAddAccessAllowedAce(system) %y", status);
   status = RtlFirstFreeAce (acl, &pAce);
   if (NT_SUCCESS (status) && pAce)
     acl->AclSize = (char *) pAce - (char *) acl;
   else
-    debug_printf ("RtlFirstFreeAce: %p", status);
+    debug_printf ("RtlFirstFreeAce: %y", status);
 
   return true;
 }
@@ -570,7 +570,7 @@ __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
   RtlCreateSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
   status = RtlSetDaclSecurityDescriptor (psd, TRUE, acl, FALSE);
   if (!NT_SUCCESS (status))
-    debug_printf ("RtlSetDaclSecurityDescriptor %p", status);
+    debug_printf ("RtlSetDaclSecurityDescriptor %y", status);
 
   psa->nLength = sizeof (SECURITY_ATTRIBUTES);
   psa->lpSecurityDescriptor = psd;
@@ -621,7 +621,7 @@ _recycler_sd (void *buf, bool users, bool dir)
   status = RtlFirstFreeAce (dacl, &ace);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("RtlFirstFreeAce: %p", status);
+      debug_printf ("RtlFirstFreeAce: %y", status);
       return NULL;
     }
   dacl->AclSize = (char *) ace - (char *) dacl;
@@ -655,14 +655,14 @@ _everyone_sd (void *buf, ACCESS_MASK access)
 				       well_known_world_sid);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("RtlAddAccessAllowedAce: %p", status);
+	  debug_printf ("RtlAddAccessAllowedAce: %y", status);
 	  return NULL;
 	}
       LPVOID ace;
       status = RtlFirstFreeAce (dacl, &ace);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("RtlFirstFreeAce: %p", status);
+	  debug_printf ("RtlFirstFreeAce: %y", status);
 	  return NULL;
 	}
       dacl->AclSize = (char *) ace - (char *) dacl;

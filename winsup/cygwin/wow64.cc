@@ -207,7 +207,7 @@ wow64_respawn_process ()
 	       path, GetCommandLineW ());
   CloseHandle (pi.hThread);
   if (WaitForSingleObject (pi.hProcess, INFINITE) == WAIT_FAILED)
-    api_fatal ("Waiting for process %d failed, %E", pi.dwProcessId);
+    api_fatal ("Waiting for process %u failed, %E", pi.dwProcessId);
   GetExitCodeProcess (pi.hProcess, &ret);
   CloseHandle (pi.hProcess);
   TerminateProcess (GetCurrentProcess (), ret);

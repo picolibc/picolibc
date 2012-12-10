@@ -1,3 +1,28 @@
+2012-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Throughout, fix format string of debug printf and api_fatal calls
+	to work in 32 and 64 bit environment, as well as to honor signedness.
+	Use %y instead of 0x%x.
+	* fhandler.h (class fhandler_dev_mem): Change type of mem_size from
+	DWORD to SIZE_T.
+	* fhandler_mem.cc: Throughout, cast mem_size in comparisons to make
+	GCC happy.
+	* fhandler_process.cc (format_process_maps): Change type of ret_len
+	to SIZE_T.
+	(get_mem_values): Ditto for n and length.
+	* mmap.cc (MapView): Ditto for commitsize and viewsize.
+	(class mmap_record): Ditto for len.  Use SIZE_T througout for memory
+	size in method args and return types.
+	* ntdll.h (NtLockVirtualMemory): Fix type of memory size parameters
+	to SIZE_T.
+	(NtMapViewOfSection): Ditto.
+	(NtQueryVirtualMemory): Ditto.
+	(NtUnlockVirtualMemory): Ditto.
+	(RtlFreeHeap): Change type of first parameter to HANDLE.
+	* shm.cc (shmat): Change type of viewsize to SIZE_T.
+	* timer.cc (timer_thread): Change type of sleep_ms to LONG.
+	(ualarm): Drop casts to unsigned int in timer value computation.
+
 2012-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver_ipc.h (conv_timespec32_to_timespec): Implement here.

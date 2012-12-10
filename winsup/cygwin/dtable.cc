@@ -939,7 +939,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
   NTSTATUS status = NtQueryObject (h, ObjectNameInformation, ntfn, 65536, &len);
   if (!NT_SUCCESS (status))
-    debug_printf ("NtQueryObject failed, 0x%08x", status);
+    debug_printf ("NtQueryObject failed, %y", status);
   // NT seems to do this on an unopened file
   else if (!ntfn->Name.Buffer)
     debug_printf ("nt->Name.Buffer == NULL");

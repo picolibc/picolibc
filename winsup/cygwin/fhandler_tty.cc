@@ -170,7 +170,7 @@ fhandler_pty_master::accept_input ()
       DWORD rc;
       DWORD written = 0;
 
-      paranoid_printf ("about to write %d chars to slave", bytes_left);
+      paranoid_printf ("about to write %u chars to slave", bytes_left);
       rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
       if (!rc)
 	{
@@ -346,7 +346,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	      if (optr - buf >= (int) len)
 		{
 		  if (*iptr != '\n' || n != 0)
-		    system_printf ("internal error: %d unexpected characters", n);
+		    system_printf ("internal error: %u unexpected characters", n);
 		  need_nl = 1;
 		  break;
 		}
@@ -635,7 +635,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   if (bg <= bg_eof)
     return (ssize_t) bg;
 
-  termios_printf ("pty%d, write(%x, %d)", get_minor (), ptr, len);
+  termios_printf ("pty%d, write(%p, %lu)", get_minor (), ptr, len);
 
   push_process_state process_state (PID_TTYOU);
 
@@ -701,7 +701,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
       return;
     }
 
-  termios_printf ("read(%x, %d) handle %p", ptr, len, get_handle ());
+  termios_printf ("read(%p, %lu) handle %p", ptr, len, get_handle ());
 
   push_process_state process_state (PID_TTYIN);
 
@@ -830,7 +830,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
       DWORD n = 0;
       if (readlen)
 	{
-	  termios_printf ("reading %d bytes (vtime %d)", readlen, vtime);
+	  termios_printf ("reading %lu bytes (vtime %d)", readlen, vtime);
 	  if (!ReadFile (get_handle (), buf, readlen, &n, NULL))
 	    {
 	      termios_printf ("read failed, %E");
@@ -906,7 +906,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	break;
     }
 out:
-  termios_printf ("%d=read(%x, %d)", totalread, ptr, len);
+  termios_printf ("%d=read(%p, %lu)", totalread, ptr, len);
   len = (size_t) totalread;
 }
 
@@ -1279,7 +1279,7 @@ fhandler_pty_master::cleanup ()
 int
 fhandler_pty_master::close ()
 {
-  termios_printf ("closing from_master(%p)/to_master(%p) since we own them(%d)",
+  termios_printf ("closing from_master(%p)/to_master(%p) since we own them(%u)",
 		  from_master, to_master, dwProcessId);
   if (cygwin_finished_initializing)
     {
@@ -1550,7 +1550,7 @@ fhandler_pty_master::pty_master_thread ()
 				  &token);
       if (!NT_SUCCESS (status))
 	{
-	  termios_printf ("NtOpenThreadToken, %p", status);
+	  termios_printf ("NtOpenThreadToken, %y", status);
 	  SetLastError (RtlNtStatusToDosError (status));
 	  goto reply;
 	}
@@ -1560,7 +1560,7 @@ fhandler_pty_master::pty_master_thread ()
       NtClose (token);
       if (!NT_SUCCESS (status))
 	{
-	  termios_printf ("NtAccessCheck, %p", status);
+	  termios_printf ("NtAccessCheck, %y", status);
 	  SetLastError (RtlNtStatusToDosError (status));
 	  goto reply;
 	}
@@ -1608,7 +1608,7 @@ reply:
       if (deimp)
 	cygheap->user.reimpersonate ();
       sd.free ();
-      termios_printf ("Reply: from %p, to %p, error %lu",
+      termios_printf ("Reply: from %p, to %p, error %u",
 		      repl.from_master, repl.to_master, repl.error );
       if (!WriteFile (master_ctl, &repl, sizeof repl, &len, NULL))
 	termios_printf ("WriteFile, %E");

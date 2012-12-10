@@ -1685,7 +1685,7 @@ class fhandler_dev_random: public fhandler_base
 class fhandler_dev_mem: public fhandler_base
 {
  protected:
-  DWORD mem_size;
+  SIZE_T mem_size;
   off_t pos;
 
  public:

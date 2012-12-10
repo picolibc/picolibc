@@ -893,7 +893,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_registry::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_registry::open(%p, 0%o)", res, flags, mode);
   return res;
 }
 

@@ -397,7 +397,7 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cygpsid * srchsid)
 	}
     }
   else
-    debug_printf ("%lu = NtQueryInformationToken(NULL) %p", size, status);
+    debug_printf ("%u = NtQueryInformationToken(NULL) %y", size, status);
   return cnt;
 
 error:
@@ -545,7 +545,7 @@ setgroups32 (int ngroups, const gid_t *grouplist)
       if ((gr = internal_getgrgid (grouplist[gidx]))
 	  && gsids.addfromgr (gr))
 	continue;
-      debug_printf ("No sid found for gid %d", grouplist[gidx]);
+      debug_printf ("No sid found for gid %u", grouplist[gidx]);
       gsids.free_sids ();
       set_errno (EINVAL);
       return -1;

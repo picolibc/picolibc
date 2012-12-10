@@ -1,6 +1,6 @@
 /* posix_ipc.cc: POSIX IPC API for Cygwin.
 
-   Copyright 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   Copyright 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -110,7 +110,7 @@ ipc_mutex_init (HANDLE *pmtx, const char *name)
   status = NtCreateMutant (pmtx, CYG_MUTANT_ACCESS, &attr, FALSE);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtCreateMutant: %p", status);
+      debug_printf ("NtCreateMutant: %y", status);
       return geterrno_from_win_error (RtlNtStatusToDosError (status));
     }
   return 0;
@@ -163,7 +163,7 @@ ipc_cond_init (HANDLE *pevt, const char *name, char sr)
 			  NotificationEvent, FALSE);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtCreateEvent: %p", status);
+      debug_printf ("NtCreateEvent: %y", status);
       return geterrno_from_win_error (RtlNtStatusToDosError (status));
     }
   return 0;

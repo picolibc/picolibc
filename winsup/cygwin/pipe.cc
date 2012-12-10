@@ -145,7 +145,7 @@ out:
 off_t
 fhandler_pipe::lseek (off_t offset, int whence)
 {
-  debug_printf ("(%d, %d)", offset, whence);
+  debug_printf ("(%D, %d)", offset, whence);
   set_errno (ESPIPE);
   return -1;
 }
@@ -241,7 +241,7 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 	__small_sprintf (pipename + len, "pipe-%p",
 			 InterlockedIncrement ((LONG *) &pipe_unique_id));
 
-      debug_printf ("name %s, size %lu, mode %s", pipename, psize,
+      debug_printf ("name %s, size %u, mode %s", pipename, psize,
 		    (pipe_mode & PIPE_TYPE_MESSAGE)
 		    ? "PIPE_TYPE_MESSAGE" : "PIPE_TYPE_BYTE");
 
@@ -361,7 +361,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
       res = 0;
     }
 
-  debug_printf ("%R = pipe([%p, %p], %d, %p)", res, fhs[0], fhs[1], psize, mode);
+  debug_printf ("%R = pipe([%p, %p], %d, %y)", res, fhs[0], fhs[1], psize, mode);
   return res;
 }
 
@@ -433,7 +433,7 @@ _pipe (int filedes[2], unsigned int psize, int mode)
       read = filedes[0];
       write = filedes[1];
     }
-  syscall_printf ("%R = _pipe([%d, %d], %u, %p)", res, read, write, psize, mode);
+  syscall_printf ("%R = _pipe([%d, %d], %u, %y)", res, read, write, psize, mode);
   return res;
 }
 
@@ -465,6 +465,6 @@ pipe2 (int filedes[2], int mode)
       read = filedes[0];
       write = filedes[1];
     }
-  syscall_printf ("%R = pipe2([%d, %d], %p)", res, read, write, mode);
+  syscall_printf ("%R = pipe2([%d, %d], %y)", res, read, write, mode);
   return res;
 }

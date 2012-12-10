@@ -1,6 +1,6 @@
 /* fhandler_procsys.cc: fhandler for native NT namespace.
 
-   Copyright 2010, 2011 Red Hat, Inc.
+   Copyright 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -74,7 +74,7 @@ fhandler_procsys::exists (struct stat *buf)
     dir.Length -= sizeof (WCHAR);
   InitializeObjectAttributes (&attr, &dir, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenDirectoryObject (&h, DIRECTORY_QUERY, &attr);
-  debug_printf ("NtOpenDirectoryObject: %p", status);
+  debug_printf ("NtOpenDirectoryObject: %y", status);
   if (NT_SUCCESS (status))
     {
       internal = true;
@@ -85,7 +85,7 @@ fhandler_procsys::exists (struct stat *buf)
   InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenSymbolicLinkObject (&h, READ_CONTROL | SYMBOLIC_LINK_QUERY,
 				     &attr);
-  debug_printf ("NtOpenSymbolicLinkObject: %p", status);
+  debug_printf ("NtOpenSymbolicLinkObject: %y", status);
   if (NT_SUCCESS (status))
     {
       /* If requested, check permissions. */
@@ -98,7 +98,7 @@ fhandler_procsys::exists (struct stat *buf)
     return virt_symlink;
   /* Then check if it's an object directory. */
   status = NtOpenDirectoryObject (&h, READ_CONTROL | DIRECTORY_QUERY, &attr);
-  debug_printf ("NtOpenDirectoryObject: %p", status);
+  debug_printf ("NtOpenDirectoryObject: %y", status);
   if (NT_SUCCESS (status))
     {
       /* If requested, check permissions. */
@@ -112,7 +112,7 @@ fhandler_procsys::exists (struct stat *buf)
   /* Next try to open as file/device. */
   status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES, &attr, &io,
 		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
-  debug_printf ("NtOpenFile: %p", status);
+  debug_printf ("NtOpenFile: %y", status);
   /* Name is invalid, that's nothing. */
   if (status == STATUS_OBJECT_NAME_INVALID)
     return virt_none;
@@ -135,7 +135,7 @@ fhandler_procsys::exists (struct stat *buf)
 	 since NtQueryAttributesFile might crash the machine if the underlying
 	 driver is badly written. */
       status = NtQueryAttributesFile (&attr, &fbi);
-      debug_printf ("NtQueryAttributesFile: %p", status);
+      debug_printf ("NtQueryAttributesFile: %y", status);
       if (NT_SUCCESS (status))
 	return (fbi.FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	       ? virt_fsdir : virt_fsfile;
@@ -154,7 +154,7 @@ fhandler_procsys::exists (struct stat *buf)
 	  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
 			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_FOR_BACKUP_INTENT);
-	  debug_printf ("NtOpenDirectoryObject: %p", status);
+	  debug_printf ("NtOpenDirectoryObject: %y", status);
 	  if (dir.Length > sizeof (WCHAR))
 	    dir.Length -= sizeof (WCHAR);
 	}
@@ -173,7 +173,7 @@ fhandler_procsys::exists (struct stat *buf)
       /* Check for the device type. */
       status = NtQueryVolumeInformationFile (h, &io, &ffdi, sizeof ffdi,
 					     FileFsDeviceInformation);
-      debug_printf ("NtQueryVolumeInformationFile: %p", status);
+      debug_printf ("NtQueryVolumeInformationFile: %y", status);
       /* Don't call NtQueryInformationFile unless we know it's a safe type.
 	 The call is known to crash machines, if the underlying driver is
 	 badly written. */
@@ -195,7 +195,7 @@ fhandler_procsys::exists (struct stat *buf)
 	     into a real FS through /proc/sys. */
 	  status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
 					   FileBasicInformation);
-	  debug_printf ("NtQueryInformationFile: %p", status);
+	  debug_printf ("NtQueryInformationFile: %y", status);
 	  if (!NT_SUCCESS (status))
 	    file_type = virt_blk;
 	  else
@@ -446,7 +446,7 @@ fhandler_procsys::open (int flags, mode_t mode)
 	  break;
 	}
     }
-  syscall_printf ("%d = fhandler_procsys::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_procsys::open(%p, 0%o)", res, flags, mode);
   return res;
 }
 

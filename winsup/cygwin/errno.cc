@@ -1,7 +1,7 @@
 /* errno.cc: errno-related functions
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -333,7 +333,7 @@ geterrno_from_win_error (DWORD code, int deferrno)
 void __stdcall
 seterrno_from_win_error (const char *file, int line, DWORD code)
 {
-  syscall_printf ("%s:%d windows error %d", file, line, code);
+  syscall_printf ("%s:%d windows error %u", file, line, code);
   errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
 }
 
@@ -350,7 +350,7 @@ seterrno_from_nt_status (const char *file, int line, NTSTATUS status)
 {
   DWORD code = RtlNtStatusToDosError (status);
   SetLastError (code);
-  syscall_printf ("%s:%d status %y -> windows error %d",
+  syscall_printf ("%s:%d status %y -> windows error %u",
 		  file, line, status, code);
   errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
 }

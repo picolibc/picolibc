@@ -170,7 +170,7 @@ allow_others_to_sync ()
 				  MAX_PROCESS_SD_SIZE, &len);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQuerySecurityObject: %p", status);
+      debug_printf ("NtQuerySecurityObject: %y", status);
       return;
     }
   /* Create a valid dacl pointer and set its size to be as big as
@@ -197,14 +197,14 @@ allow_others_to_sync ()
 				   well_known_world_sid);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("RtlAddAccessAllowedAce: %p", status);
+      debug_printf ("RtlAddAccessAllowedAce: %y", status);
       return;
     }
   /* Set the size of the DACL correctly. */
   status = RtlFirstFreeAce (dacl, &ace);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("RtlFirstFreeAce: %p", status);
+      debug_printf ("RtlFirstFreeAce: %y", status);
       return;
     }
   dacl->AclSize = (char *) ace - (char *) dacl;
@@ -212,7 +212,7 @@ allow_others_to_sync ()
   status = NtSetSecurityObject (NtCurrentProcess (), DACL_SECURITY_INFORMATION, sd);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtSetSecurityObject: %p", status);
+      debug_printf ("NtSetSecurityObject: %y", status);
       return;
     }
   done = true;
@@ -228,7 +228,7 @@ get_obj_handle_count (HANDLE h)
 
   status = NtQueryObject (h, ObjectBasicInformation, &obi, sizeof obi, NULL);
   if (!NT_SUCCESS (status))
-    debug_printf ("NtQueryObject: %p\n", status);
+    debug_printf ("NtQueryObject: %y", status);
   else
     hdl_cnt = obi.HandleCount;
   return hdl_cnt;
@@ -522,14 +522,14 @@ inode_t::inode_t (dev_t dev, ino_t ino)
 			      parent_dir, everyone_sd (FLOCK_INODE_DIR_ACCESS));
   status = NtCreateDirectoryObject (&i_dir, FLOCK_INODE_DIR_ACCESS, &attr);
   if (!NT_SUCCESS (status))
-    api_fatal ("NtCreateDirectoryObject(inode): %p", status);
+    api_fatal ("NtCreateDirectoryObject(inode): %y", status);
   /* Create a mutex object in the file specific dir, which is used for
      access synchronization on the dir and its objects. */
   InitializeObjectAttributes (&attr, &ro_u_mtx, OBJ_INHERIT | OBJ_OPENIF, i_dir,
 			      everyone_sd (CYG_MUTANT_ACCESS));
   status = NtCreateMutant (&i_mtx, CYG_MUTANT_ACCESS, &attr, FALSE);
   if (!NT_SUCCESS (status))
-    api_fatal ("NtCreateMutant(inode): %p", status);
+    api_fatal ("NtCreateMutant(inode): %y", status);
 }
 
 /* Enumerate all lock event objects for this file and create a lockf_t
@@ -753,7 +753,7 @@ lockf_t::create_lock_obj ()
       if (!NT_SUCCESS (status))
 	{
 	  if (status != STATUS_OBJECT_NAME_COLLISION)
-	    api_fatal ("NtCreateEvent(lock): %p", status);
+	    api_fatal ("NtCreateEvent(lock): %y", status);
 	  /* If we get a STATUS_OBJECT_NAME_COLLISION, the event still exists
 	     because some other process is waiting for it in lf_setlock.
 	     If so, check the event's signal state.  If we can't open it, it
@@ -764,7 +764,7 @@ lockf_t::create_lock_obj ()
 	  if (open_lock_obj ())
 	    {
 	      if (!IsEventSignalled (lf_obj))
-		api_fatal ("NtCreateEvent(lock): %p", status);
+		api_fatal ("NtCreateEvent(lock): %y", status);
 	      close_lock_obj ();
 	      /* Increment the lf_ver field until we have no collision. */
 	      ++lf_ver;

@@ -201,7 +201,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
     }
   /* Set AclSize to computed value. */
   acl->AclSize = acl_len;
-  debug_printf ("ACL-Size: %d", acl_len);
+  debug_printf ("ACL-Size: %u", acl_len);
   /* Create DACL for local security descriptor. */
   status = RtlSetDaclSecurityDescriptor (&sd, TRUE, acl, FALSE);
   if (!NT_SUCCESS (status))
@@ -228,7 +228,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
       __seterrno_from_nt_status (status);
       return -1;
     }
-  debug_printf ("Created SD-Size: %d", sd_ret.size ());
+  debug_printf ("Created SD-Size: %u", sd_ret.size ());
   return set_file_sd (handle, pc, sd_ret, false);
 }
 

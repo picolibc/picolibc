@@ -1231,7 +1231,7 @@ multiple_cygwin_problem (const char *what, uintptr_t magic_version, uintptr_t ve
   if (CYGWIN_VERSION_MAGIC_VERSION (magic_version) == version)
     system_printf ("%s magic number mismatch detected - %p/%ly", what, magic_version, version);
   else
-    api_fatal ("%s mismatch detected - %p/%ly.\n\
+    api_fatal ("%s mismatch detected - %ly/%ly.\n\
 This problem is probably due to using incompatible versions of the cygwin DLL.\n\
 Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
 and delete all but the most recent version.  The most recent version *should*\n\

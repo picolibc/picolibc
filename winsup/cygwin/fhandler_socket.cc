@@ -491,7 +491,7 @@ search_wsa_event_slot (LONG new_serial_number)
 				  everyone_sd (CYG_MUTANT_ACCESS));
       status = NtCreateMutant (&wsa_slot_mtx, CYG_MUTANT_ACCESS, &attr, FALSE);
       if (!NT_SUCCESS (status))
-	api_fatal ("Couldn't create/open shared socket mutex %S, %p",
+	api_fatal ("Couldn't create/open shared socket mutex %S, %y",
 		   &uname, status);
     }
   switch (WaitForSingleObject (wsa_slot_mtx, INFINITE))
@@ -553,7 +553,7 @@ fhandler_socket::init_events ()
       status = NtCreateMutant (&wsock_mtx, CYG_MUTANT_ACCESS, &attr, FALSE);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtCreateMutant(%S), %p", &uname, status);
+	  debug_printf ("NtCreateMutant(%S), %y", &uname, status);
 	  set_errno (ENOBUFS);
 	  return false;
 	}
@@ -709,7 +709,7 @@ fhandler_socket::fixup_before_fork_exec (DWORD win_pid)
   if (ret)
     set_winsock_errno ();
   else
-    debug_printf ("WSADuplicateSocket succeeded (%lx)", prot_info_ptr->dwProviderReserved);
+    debug_printf ("WSADuplicateSocket succeeded (%x)", prot_info_ptr->dwProviderReserved);
   return (int) ret;
 }
 
@@ -739,7 +739,7 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
 	 socket is potentially inheritable again. */
       SetHandleInformation ((HANDLE) new_sock, HANDLE_FLAG_INHERIT, 0);
       set_io_handle ((HANDLE) new_sock);
-      debug_printf ("WSASocket succeeded (%lx)", new_sock);
+      debug_printf ("WSASocket succeeded (%p)", new_sock);
     }
 }
 
@@ -994,7 +994,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	      status = NtSetInformationFile (fh, &io, &fdi, sizeof fdi,
 					     FileDispositionInformation);
 	      if (!NT_SUCCESS (status))
-		debug_printf ("Setting delete dispostion failed, status = %p",
+		debug_printf ("Setting delete dispostion failed, status = %y",
 			      status);
 	    }
 	  else
@@ -2065,7 +2065,7 @@ type name in the application code. */
 	res = ioctlsocket (get_socket (), cmd, (u_long *) p);
       break;
     }
-  syscall_printf ("%d = ioctl_socket(%x, %x)", res, cmd, p);
+  syscall_printf ("%d = ioctl_socket(%x, %p)", res, cmd, p);
   return res;
 }
 

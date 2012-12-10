@@ -47,7 +47,7 @@ get_nproc_values (int in)
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      debug_printf ("NtQuerySystemInformation: status %p, %E", status);
+      debug_printf ("NtQuerySystemInformation: status %y, %E", status);
       return -1;
     }
   switch (in)
@@ -81,7 +81,7 @@ get_avphys (int in)
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      debug_printf ("NtQuerySystemInformation: status %d, %E", status);
+      debug_printf ("NtQuerySystemInformation: status %y, %E", status);
       return -1;
     }
   return spi.AvailablePages
@@ -355,7 +355,7 @@ sysinfo (struct sysinfo *info)
 	     / 10000000ULL;
   else
     debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
-		  "status %p", status);
+		  "status %y", status);
 
   if (stodi)
     free (stodi);
@@ -383,7 +383,7 @@ sysinfo (struct sysinfo *info)
   if (!spi || !NT_SUCCESS (status))
     {
       debug_printf ("NtQuerySystemInformation(SystemPagefileInformation), "
-		    "status %p", status);
+		    "status %y", status);
       totalswap = (memory_status.ullTotalPageFile - memory_status.ullTotalPhys)
 		  / wincap.page_size ();
       freeswap = (memory_status.ullAvailPageFile - memory_status.ullTotalPhys)

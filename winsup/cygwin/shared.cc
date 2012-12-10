@@ -59,7 +59,7 @@ get_shared_parent_dir ()
       status = NtCreateDirectoryObject (&shared_parent_dir,
 					CYG_SHARED_DIR_ACCESS, &attr);
       if (!NT_SUCCESS (status))
-	api_fatal ("NtCreateDirectoryObject(%S): %p", &uname, status);
+	api_fatal ("NtCreateDirectoryObject(%S): %y", &uname, status);
     }
   return shared_parent_dir;
 }
@@ -95,7 +95,7 @@ get_session_parent_dir ()
 	  status = NtCreateDirectoryObject (&session_parent_dir,
 					    CYG_SHARED_DIR_ACCESS, &attr);
 	  if (!NT_SUCCESS (status))
-	    api_fatal ("NtCreateDirectoryObject(%S): %p", &uname, status);
+	    api_fatal ("NtCreateDirectoryObject(%S): %y", &uname, status);
 	}
     }
   return session_parent_dir;
@@ -359,7 +359,7 @@ shared_info::initialize ()
     sversion.multiple_cygwin_problem ("system shared memory version",
 				      sversion, CURR_SHARED_MAGIC);
   else if (cb != sizeof (*this))
-    system_printf ("size of shared memory region changed from %u to %u",
+    system_printf ("size of shared memory region changed from %lu to %u",
 		   sizeof (*this), cb);
   heap_init ();
 }

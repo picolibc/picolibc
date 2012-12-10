@@ -927,7 +927,7 @@ spawnve (int mode, const char *path, const char *const *argv,
     vf = NULL;
 #endif
 
-  syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
+  syscall_printf ("spawnve (%s, %s, %p)", path, argv[0], envp);
 
   if (!envp)
     envp = empty_env;

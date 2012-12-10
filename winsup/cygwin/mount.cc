@@ -224,7 +224,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	}
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("Cannot access path %S, status %08lx",
+	  debug_printf ("Cannot access path %S, status %y",
 			attr.ObjectName, status);
 	  return false;
 	}
@@ -262,7 +262,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 					   FileFsAttributeInformation);
   if (no_media || !NT_SUCCESS (status))
     {
-      debug_printf ("Cannot get volume attributes (%S), %08lx",
+      debug_printf ("Cannot get volume attributes (%S), %y",
 		    attr.ObjectName, status);
       if (!in_vol)
 	NtClose (vol);
@@ -479,7 +479,7 @@ mount_info::init ()
     {
       char native[PATH_MAX];
       if (root_idx < 0)
-	api_fatal ("root_idx %d, user_shared magic %p, nmounts %d", root_idx, user_shared->version, nmounts);
+	api_fatal ("root_idx %d, user_shared magic %y, nmounts %d", root_idx, user_shared->version, nmounts);
       char *p = stpcpy (native, mount[root_idx].native_path);
       if (!got_usr_bin)
       {
@@ -503,12 +503,12 @@ set_flags (unsigned *flags, unsigned val)
   if (!(*flags & PATH_BINARY))
     {
       *flags |= PATH_TEXT;
-      debug_printf ("flags: text (%p)", *flags & (PATH_TEXT | PATH_BINARY));
+      debug_printf ("flags: text (%y)", *flags & (PATH_TEXT | PATH_BINARY));
     }
   else
     {
       *flags |= PATH_BINARY;
-      debug_printf ("flags: binary (%p)", *flags & (PATH_TEXT | PATH_BINARY));
+      debug_printf ("flags: binary (%y)", *flags & (PATH_TEXT | PATH_BINARY));
     }
 }
 
@@ -717,7 +717,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
     }
 
  out_no_chroot_check:
-  debug_printf ("src_path %s, dst %s, flags %p, rc %d", src_path, dst, *flags, rc);
+  debug_printf ("src_path %s, dst %s, flags %y, rc %d", src_path, dst, *flags, rc);
   return rc;
 }
 
@@ -1194,7 +1194,7 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
 		       | FILE_OPEN_FOR_BACKUP_INTENT);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtOpenFile(%S) failed, %p", &upath, status);
+      debug_printf ("NtOpenFile(%S) failed, %y", &upath, status);
       return false;
     }
 
@@ -1443,7 +1443,7 @@ mount_info::add_item (const char *native, const char *posix,
   else
     posixerr = normalize_posix_path (posix, posixtmp, posixtail);
 
-  debug_printf ("%s[%s], %s[%s], %p",
+  debug_printf ("%s[%s], %s[%s], %y",
 		native, nativeerr ? error : nativetmp,
 		posix, posixerr ? error : posixtmp, mountflags);
 
@@ -1803,7 +1803,7 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
       res = mount_table->add_item (w32_path, posix_path, flags);
     }
 
-  syscall_printf ("%R = mount(%s, %s, %p)", res, win32_path, posix_path, flags);
+  syscall_printf ("%R = mount(%s, %s, %y)", res, win32_path, posix_path, flags);
   return res;
 }
 
@@ -2040,7 +2040,7 @@ dos_drive_mappings::dos_drive_mappings ()
 	  }
 	else
 	  debug_printf ("Unable to determine the native mapping for %ls "
-			"(error %lu)", vol, GetLastError ());
+			"(error %u)", vol, GetLastError ());
       }
     while (FindNextVolumeW (sh, vol, 64));
     FindVolumeClose (sh);
