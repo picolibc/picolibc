@@ -1,3 +1,11 @@
+2012-12-11  Steve Ellcey  <sellcey@mips.com>
+
+	* libc/machine/mips/memcpy.c: Remove.
+	* libc/machine/mips/memcpy.S: New.
+	* libc/machine/mips/Makefile.am (lib_a_CCASFLAGS): Add
+	-D_COMPILING_NEWLIB.
+	(lib_a_CFLAGS): Ditto.
+
 2012-12-04  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* configure.host: Define libm_machine_dir value for arm.
