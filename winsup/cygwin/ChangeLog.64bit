@@ -1,5 +1,17 @@
 2012-12-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (TLSOFFSETS_H): Let configure fill in.  Change all
+	occurence of tlsoffsets.h to $(TLSOFFSETS_H).
+	$(srcdir)/$(TLSOFFSETS_H): Add @CONFIG_DIR@ as parameter to
+	gentls_offsets so the script knows the target CPU.
+	* configure.ac (TLSOFFSETS_H): Set according to target.
+	* configure: Regenerate.
+	* gentls_offsets: Handle x86_64 as target.  Add FIXME comment.  Unlink
+	all temporary files.
+	* tlsoffsets64.h: New file.
+
+2012-12-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_NAME): Let configure fill in.
 	(DIN_FILE): Ditto.  Change all occurence of cygwin.din to $(DIN_FILE).
 	* configure.ac (DLL_NAME): Set according to target.

@@ -116,6 +116,7 @@ TEST_LIB_NAME:=libcygwin0.a
 STATIC_LIB_NAME:=libcygwin_s.a
 DIN_FILE=@DIN_FILE@
 DEF_FILE:=cygwin.def
+TLSOFFSETS_H:=@TLSOFFSETS_H@
 DLL_ENTRY:=@DLL_ENTRY@
 
 LIBGMON_A:=libgmon.a
@@ -404,7 +405,7 @@ uninstall-man:
 	done
 
 clean:
-	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h $(srcdir)/tlsoffsets.h $(srcdir)/devices.cc
+	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h $(srcdir)/$(TLSOFFSETS_H) $(srcdir)/devices.cc
 	-@$(MAKE) -C ${cygserver_blddir} libclean
 
 maintainer-clean realclean: clean
@@ -507,11 +508,11 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 Makefile: $(DIN_FILE) ${srcdir}/Makefile.in
 	/bin/sh ./config.status
 
-$(DEF_FILE): gendef $(DIN_FILE) $(srcdir)/tlsoffsets.h
+$(DEF_FILE): gendef $(DIN_FILE) $(srcdir)/$(TLSOFFSETS_H)
 	$^ $@ sigfe.s
 
-$(srcdir)/tlsoffsets.h: gentls_offsets cygtls.h
-	$^ $@ $(COMPILE.cc) -c
+$(srcdir)/$(TLSOFFSETS_H): gentls_offsets cygtls.h
+	$^ $@ @CONFIG_DIR@ $(COMPILE.cc) -c
 
 sigfe.s: $(DEF_FILE)
 	@[ -s $@ ] || \
