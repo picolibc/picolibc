@@ -81,7 +81,7 @@ void __stdcall sigproc_terminate (enum exit_states);
 #endif
 bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
 int __stdcall sig_send (_pinfo *, siginfo_t&, class _cygtls * = NULL) __attribute__ ((regparm (3)));
-int __stdcall sig_send (_pinfo *, int) __attribute__ ((regparm (2)));
+int __stdcall sig_send (_pinfo *, int, class _cygtls * = NULL) __attribute__ ((regparm (2)));
 void __stdcall signal_fixup_after_exec ();
 void __stdcall sigalloc ();
 

@@ -486,7 +486,7 @@ sig_clear (int target_sig)
 extern "C" int
 sigpending (sigset_t *mask)
 {
-  sigset_t outset = (sigset_t) sig_send (myself, __SIGPENDING);
+  sigset_t outset = (sigset_t) sig_send (myself, __SIGPENDING, &_my_tls);
   if (outset == SIG_BAD_MASK)
     return -1;
   *mask = outset;
@@ -558,7 +558,7 @@ sigproc_terminate (exit_states es)
 }
 
 int __stdcall
-sig_send (_pinfo *p, int sig)
+sig_send (_pinfo *p, int sig, _cygtls *tid)
 {
   if (sig == __SIGHOLD)
     sigheld = true;
@@ -582,7 +582,7 @@ sig_send (_pinfo *p, int sig)
   si.si_signo = sig;
   si.si_code = SI_KERNEL;
   si.si_pid = si.si_uid = si.si_errno = 0;
-  return sig_send (p, si);
+  return sig_send (p, si, tid);
 }
 
 /* Send a signal to another process by raising its signal semaphore.
