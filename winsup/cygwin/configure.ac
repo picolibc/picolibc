@@ -73,11 +73,17 @@ dnl   fi
 dnl fi
 
 case "$target_cpu" in
-   i?86) DLL_ENTRY="_dll_entry@12"
+   i?86)
+		DLL_NAME="cygwin1.dll"
+		DLL_ENTRY="_dll_entry@12"
 		DEF_DLL_ENTRY="dll_entry@12"
+		DIN_FILE="cygwin.din"
 		CONFIG_DIR="i386"  ;;
-   x86_64) DLL_ENTRY="_dll_entry"
+   x86_64)
+		DLL_NAME="cyg64win1.dll"
+		DLL_ENTRY="_dll_entry"
 		DEF_DLL_ENTRY="dll_entry"
+		DIN_FILE="cygwin64.din"
 		CONFIG_DIR="x86_64"  ;;
    *)		AC_MSG_ERROR(Invalid target processor \"$target_cpu\") ;;
 esac
@@ -85,7 +91,9 @@ esac
 AC_CONFIGURE_ARGS
 AC_SUBST(MALLOC_OFILES)
 AC_SUBST(LIBSERVER)
+AC_SUBST(DLL_NAME)
 AC_SUBST(DLL_ENTRY)
 AC_SUBST(DEF_DLL_ENTRY)
+AC_SUBST(DIN_FILE)
 AC_SUBST(CONFIG_DIR)
 AC_OUTPUT(Makefile)

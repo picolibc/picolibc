@@ -1,3 +1,12 @@
+2012-12-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_NAME): Let configure fill in.
+	(DIN_FILE): Ditto.  Change all occurence of cygwin.din to $(DIN_FILE).
+	* configure.ac (DLL_NAME): Set according to target.
+	(DIN_FILE): Ditto.
+	* configure: Regenerate.
+	* cygwin64.din: New file.
+
 2012-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix_ipc.cc: Enforce 4 byte alignment on all structs used in the

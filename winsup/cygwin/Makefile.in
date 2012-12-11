@@ -110,10 +110,11 @@ RUNTESTFLAGS =
 # native rebuilding issues (we don't want the build tools to see a partially
 # built cygwin.dll and attempt to use it instead of the old one).
 
-DLL_NAME:=cygwin1.dll
+DLL_NAME:=@DLL_NAME@
 TEST_DLL_NAME:=cygwin0.dll
 TEST_LIB_NAME:=libcygwin0.a
 STATIC_LIB_NAME:=libcygwin_s.a
+DIN_FILE=@DIN_FILE@
 DEF_FILE:=cygwin.def
 DLL_ENTRY:=@DLL_ENTRY@
 
@@ -449,7 +450,7 @@ dll_ofiles: $(DLL_OFILES)
 $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
 	$(AR) rcv $(LIBGMON_A) $(GMON_OFILES)
 
-$(API_VER): $(srcdir)/cygwin.din
+$(API_VER): $(srcdir)/$(DIN_FILE)
 	@echo Error: Version info is older than DLL API!
 
 version.cc winver.o: winver_stamp
@@ -503,10 +504,10 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	$(COMPILE.cc) -c -o version.o version.cc && \
 	touch $@
 
-Makefile: cygwin.din ${srcdir}/Makefile.in
+Makefile: $(DIN_FILE) ${srcdir}/Makefile.in
 	/bin/sh ./config.status
 
-$(DEF_FILE): gendef cygwin.din $(srcdir)/tlsoffsets.h
+$(DEF_FILE): gendef $(DIN_FILE) $(srcdir)/tlsoffsets.h
 	$^ $@ sigfe.s
 
 $(srcdir)/tlsoffsets.h: gentls_offsets cygtls.h
