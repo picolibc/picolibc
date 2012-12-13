@@ -1,3 +1,9 @@
+2012-12-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc.in (OUTPUT_FORMAT): Fix typo in 64 bit code.
+	* spawn.cc (av::fixup): Drop '!!' to keep argument to set_cygexec a
+	void *.
+
 2012-12-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (TLSOFFSETS_H): Let configure fill in.  Change all

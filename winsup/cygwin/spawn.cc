@@ -1168,8 +1168,8 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	    unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
 	    win16_exe = off < sizeof (IMAGE_DOS_HEADER);
 	    if (!win16_exe)
-	      real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL,
-							      subsys, hm));
+	      real_path.set_cygexec (hook_or_detect_cygwin (buf, NULL,
+							    subsys, hm));
 	    else
 	      real_path.set_cygexec (false);
 	    UnmapViewOfFile (buf);
