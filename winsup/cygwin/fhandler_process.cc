@@ -545,106 +545,107 @@ format_process_winexename (void *data, char *&destbuf)
   return len + 1;
 }
 
-struct heap_info
+win_heap_info::win_heap_info (_pinfo *p)
 {
-  struct heap
-  {
-    heap *next;
-    unsigned heap_id;
-    char *base;
-    char *end;
-    unsigned long flags;
-  };
-  heap *heap_vm_chunks;
+  size_t size;
+  heap_vm_chunks = (heap *) p->win_heap_info (size);
+  heap_vm_chunks_end = (heap *) ((caddr_t) heap_vm_chunks + size);
+}
 
-  heap_info (DWORD pid)
-    : heap_vm_chunks (NULL)
-  {
-    PDEBUG_BUFFER buf;
-    NTSTATUS status;
-    PDEBUG_HEAP_ARRAY harray;
+commune_result
+win_heap_info::gen_heap_info ()
+{
+  commune_result cr;
+  PDEBUG_BUFFER buf;
+  NTSTATUS status;
+  PDEBUG_HEAP_ARRAY harray;
+  PDEBUG_HEAP_BLOCK barray;
+  heap *h = NULL;
 
-    /* FIXME:
-
-       This functionality has two problems on 64 bit machines:
-
-       - 32 bit processes can't call this function for 64 bit processes at all,
-         same as the Win32 toolhelp functions.
-
-       - The heap information fetched from 32 bit processes is broken, if
-	 the caller is a 64 bit process.  Again, the toolhelp functions suffer
-	 the same fate.
-
-       TODO:
-
-       Therefore the only way around this is to call the below Rtl functions
-       within the context of the process for which the information is to be
-       collected. */
-    buf = RtlCreateQueryDebugBuffer (0, FALSE);
-    if (!buf)
-      return;
-    status = RtlQueryProcessDebugInformation (pid, PDI_HEAPS | PDI_HEAP_BLOCKS,
-					      buf);
-    if (NT_SUCCESS (status)
-	&& (harray = (PDEBUG_HEAP_ARRAY) buf->HeapInformation) != NULL)
-      for (ULONG hcnt = 0; hcnt < harray->Count; ++hcnt)
-	{
-	  PDEBUG_HEAP_BLOCK barray = (PDEBUG_HEAP_BLOCK)
-				     harray->Heaps[hcnt].Blocks;
-	  if (!barray)
-	    continue;
-	  for (ULONG bcnt = 0; bcnt < harray->Heaps[hcnt].BlockCount; ++bcnt)
-	    if (barray[bcnt].Flags & 2)
-	      {
-		heap *h = (heap *) malloc (sizeof (heap));
-		if (h)
-		  {
-		    *h = (heap) { heap_vm_chunks,
-				  hcnt, (char *) barray[bcnt].Address,
-				  (char *) barray[bcnt].Address
-					   + barray[bcnt].Size,
-				  harray->Heaps[hcnt].Flags };
-		    heap_vm_chunks = h;
-		  }
-	      }
-	}
+  cr.n = 0;
+  cr.s = NULL;
+  buf = RtlCreateQueryDebugBuffer (0, FALSE);
+  if (!buf)
+    goto err;
+  status = RtlQueryProcessDebugInformation (GetCurrentProcessId (),
+					    PDI_HEAPS | PDI_HEAP_BLOCKS,
+					    buf);
+  if (!NT_SUCCESS (status))
+    goto err;
+  harray = (PDEBUG_HEAP_ARRAY) buf->HeapInformation;
+  if (!harray)
+    goto err;
+  /* Compute size. */
+  for (ULONG hcnt = 0; hcnt < harray->Count; ++hcnt)
+    {
+      barray = (PDEBUG_HEAP_BLOCK) harray->Heaps[hcnt].Blocks;
+      if (!barray)
+	continue;
+      for (ULONG bcnt = 0; bcnt < harray->Heaps[hcnt].BlockCount; ++bcnt)
+	if (barray[bcnt].Flags & 2)
+	  cr.n += sizeof (heap);
+    }
+  if (!cr.n)
+    goto err;
+  /* Allocate. */
+  cr.s = (char *) cmalloc_abort (HEAP_COMMUNE, cr.n);
+  if (!cr.s)
+    {
+      cr.n = 0;
+      goto err;
+    }
+  /* Fill array. */
+  h = (heap *) cr.s;
+  for (ULONG hcnt = 0; hcnt < harray->Count; ++hcnt)
+    {
+      barray = (PDEBUG_HEAP_BLOCK) harray->Heaps[hcnt].Blocks;
+      if (!barray)
+	continue;
+      for (ULONG bcnt = 0; bcnt < harray->Heaps[hcnt].BlockCount; ++bcnt)
+	if (barray[bcnt].Flags & 2)
+	  {
+	    h->heap_id = hcnt;
+	    h->flags = harray->Heaps[hcnt].Flags;
+	    h->_TYPE64_SET (base, barray[bcnt].Address);
+	    h->_TYPE64_SET (end, h->base +  barray[bcnt].Size);
+	    ++h;
+	  }
+    }
+err:
+  if (buf)
     RtlDestroyQueryDebugBuffer (buf);
-  }
+  return cr;
+}
 
-  char *fill_if_match (char *base, ULONG type, char *dest)
-  {
-    for (heap *h = heap_vm_chunks; h; h = h->next)
-      if (base >= h->base && base < h->end)
-	{
-	  char *p = dest + __small_sprintf (dest, "[win heap %ld", h->heap_id);
-	  if (!(h->flags & HEAP_FLAG_NONDEFAULT))
-	    p = stpcpy (p, " default");
-	  if ((h->flags & HEAP_FLAG_SHAREABLE) && (type & MEM_MAPPED))
-	    p = stpcpy (p, " shared");
-	  if (h->flags & HEAP_FLAG_EXECUTABLE)
-	    p = stpcpy (p, " exec");
-	  if (h->flags & HEAP_FLAG_GROWABLE)
-	    p = stpcpy (p, " grow");
-	  if (h->flags & HEAP_FLAG_NOSERIALIZE)
-	    p = stpcpy (p, " noserial");
-	  if (h->flags == HEAP_FLAG_DEBUGGED)
-	    p = stpcpy (p, " debug");
-	  stpcpy (p, "]");
-	  return dest;
-	}
-    return 0;
-  }
-
-  ~heap_info ()
-  {
-    heap *n = 0;
-    for (heap *m = heap_vm_chunks; m; m = n)
+char *
+win_heap_info::fill_if_match (char *base, ULONG type, char *dest)
+{
+  for (heap *h = heap_vm_chunks; h < heap_vm_chunks_end; ++h)
+    if (base >= h->base && base < h->end)
       {
-	n = m->next;
-	free (m);
+	char *p = dest + __small_sprintf (dest, "[win heap %ld", h->heap_id);
+	if (!(h->flags & HEAP_FLAG_NONDEFAULT))
+	  p = stpcpy (p, " default");
+	if ((h->flags & HEAP_FLAG_SHAREABLE) && (type & MEM_MAPPED))
+	  p = stpcpy (p, " shared");
+	if (h->flags & HEAP_FLAG_EXECUTABLE)
+	  p = stpcpy (p, " exec");
+	if (h->flags & HEAP_FLAG_GROWABLE)
+	  p = stpcpy (p, " grow");
+	if (h->flags & HEAP_FLAG_NOSERIALIZE)
+	  p = stpcpy (p, " noserial");
+	if (h->flags == HEAP_FLAG_DEBUGGED)
+	  p = stpcpy (p, " debug");
+	stpcpy (p, "]");
+	return dest;
       }
-  }
-};
+  return 0;
+}
+
+win_heap_info::~win_heap_info ()
+{
+  cfree (heap_vm_chunks);
+}
 
 struct thread_info
 {
@@ -813,7 +814,7 @@ format_process_maps (void *data, char *&destbuf)
 
   MEMORY_BASIC_INFORMATION mb;
   dos_drive_mappings drive_maps;
-  heap_info heaps (p->dwProcessId);
+  win_heap_info heaps (p);
   thread_info threads (p->dwProcessId, proc);
   struct stat st;
   long last_pass = 0;
@@ -831,7 +832,12 @@ format_process_maps (void *data, char *&destbuf)
 
   /* Iterate over each VM region in the address space, coalescing
      memory regions with the same permissions. Once we run out, do one
-     last_pass to trigger output of the last accumulated region. */
+     last_pass to trigger output of the last accumulated region.
+     
+     FIXME:  32 bit processes can't get address information beyond the
+	     32 bit address space from 64 bit processes.  We have to run
+	     this functionality in the target process, if the target
+	     process is 64 bit and our own process is 32 bit. */
   for (char *i = 0;
        VirtualQueryEx (proc, i, &mb, sizeof(mb)) || (1 == ++last_pass);
        i = cur.rend)

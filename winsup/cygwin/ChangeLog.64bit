@@ -1,5 +1,19 @@
 2012-12-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pinfo.h (enum picom): Add PICOM_HEAP_INFO.
+	(_pinfo::win_heap_info): Declare.
+	(struct win_heap_info): Rename from heap_info and define here.  Change
+	to accommodate 64 bit.
+	* fhandler_process.cc (struct win_heap_info): Just implement here.
+	(win_heap_info::gen_heap_info): New method.
+	(format_process_maps): Accommodate above changes.  Add FIXME comment
+	to explain 32->64 bit problem with VirtualQueryEx.
+	* pinfo.cc (commune_process): Handle PICOM_HEAP_INFO.
+	(_pinfo::commune_request): Ditto.
+	(_pinfo::win_heap_info): New method.
+
+2012-12-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.sc.in (OUTPUT_FORMAT): Fix typo in 64 bit code.
 	* spawn.cc (av::fixup): Drop '!!' to keep argument to set_cygexec a
 	void *.

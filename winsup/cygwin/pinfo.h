@@ -29,7 +29,8 @@ enum picom
   PICOM_ROOT = 3,
   PICOM_FDS = 4,
   PICOM_FD = 5,
-  PICOM_PIPE_FHANDLER = 6
+  PICOM_PIPE_FHANDLER = 6,
+  PICOM_HEAP_INFO = 7
 };
 
 #define EXITCODE_SET		0x8000000
@@ -110,6 +111,7 @@ public:
   char *root (size_t &);
   char *cwd (size_t &);
   char *cmdline (size_t &);
+  char *win_heap_info (size_t &);
   bool set_ctty (class fhandler_termios *, int);
   bool alert_parent (char);
   int __stdcall kill (siginfo_t&) __attribute__ ((regparm (2)));
@@ -122,6 +124,26 @@ public:
   DWORD exec_dwProcessId;
 public:
   friend class pinfo_minimal;
+};
+
+/* Commune functionality to fetch Windows heap information.  Implemented
+   in fhandler_process.cc. */
+struct win_heap_info
+{
+  struct heap
+  {
+    ULONG heap_id;
+    ULONG flags;
+    _TYPE64 (char *, base);
+    _TYPE64 (char *, end);
+  };
+  heap *heap_vm_chunks, *heap_vm_chunks_end;
+
+  win_heap_info (_pinfo *p);
+  ~win_heap_info ();
+  char *fill_if_match (char *, ULONG, char *);
+
+  static commune_result gen_heap_info ();
 };
 
 DWORD WINAPI commune_process (void *);
