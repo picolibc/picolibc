@@ -70,6 +70,7 @@ enum path_types
   PATH_EXEC		= MOUNT_EXEC,
   PATH_NOTEXEC		= MOUNT_NOTEXEC,
   PATH_CYGWIN_EXEC	= MOUNT_CYGWIN_EXEC,
+  PATH_SPARSE		= MOUNT_SPARSE,
   PATH_RO		= MOUNT_RO,
   PATH_NOACL		= MOUNT_NOACL,
   PATH_NOPOSIX		= MOUNT_NOPOSIX,
@@ -157,6 +158,11 @@ class path_conv
   bool has_acls () const {return !(path_flags & PATH_NOACL) && fs.has_acls (); }
   bool hasgood_inode () const {return !(path_flags & PATH_IHASH); }
   bool isgood_inode (ino_t ino) const;
+  bool support_sparse () const
+  {
+    return (path_flags & PATH_SPARSE)
+	   && (fs_flags () & FILE_SUPPORTS_SPARSE_FILES);
+  }
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int has_dos_filenames_only () const {return path_flags & PATH_DOS;}
   int has_buggy_open () const {return fs.has_buggy_open ();}
@@ -362,8 +368,8 @@ class path_conv
   dev_t get_device () {return dev.get_device ();}
   DWORD file_attributes () const {return fileattr;}
   void file_attributes (DWORD new_attr) {fileattr = new_attr;}
-  DWORD fs_flags () {return fs.flags ();}
-  DWORD fs_name_len () {return fs.name_len ();}
+  DWORD fs_flags () const {return fs.flags ();}
+  DWORD fs_name_len () const {return fs.name_len ();}
   bool fs_got_fs () const { return fs.got_fs (); }
   bool fs_is_fat () const {return fs.is_fat ();}
   bool fs_is_ntfs () const {return fs.is_ntfs ();}

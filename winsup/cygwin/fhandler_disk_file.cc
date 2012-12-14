@@ -1191,12 +1191,15 @@ fhandler_disk_file::ftruncate (off_t length, bool allow_truncate)
       feofi.EndOfFile.QuadPart = length;
       /* Create sparse files only when called through ftruncate, not when
 	 called through posix_fallocate. */
-      if (allow_truncate
-	  && (pc.fs_flags () & FILE_SUPPORTS_SPARSE_FILES)
+      if (allow_truncate && pc.support_sparse ()
+	  & !has_attribute (FILE_ATTRIBUTE_SPARSE_FILE)
 	  && length >= fsi.EndOfFile.QuadPart + (128 * 1024))
 	{
 	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,
 				    FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
+	  if (NT_SUCCESS (status))
+	    pc.file_attributes (pc.file_attributes ()
+			        | FILE_ATTRIBUTE_SPARSE_FILE);
 	  syscall_printf ("%y = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
 			  status, pc.get_nt_native_path ());
 	}

@@ -1,3 +1,21 @@
+2012-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::write): Don't attempt to sparsify
+	an already sparse file.  Drop check for FILE_SUPPORTS_SPARSE_FILES
+	flag.  Explicitely set FILE_ATTRIBUTE_SPARSE_FILE attribute in
+	cached attributes.
+	(fhandler_base::lseek): Only set did_lseek if sparseness is supported.
+	* fhandler_disk_file.cc (fhandler_disk_file::ftruncate): Don't attempt
+	to sparsify an already sparse file.  Explicitely set
+	FILE_ATTRIBUTE_SPARSE_FILE attribute in cached attributes.
+	* mount.cc (oopt): Add "sparse" flag.
+	(fillout_mntent): Ditto.
+	* path.h (enum path_types): Add PATH_SPARSE.
+	(path_conv::support_sparse): New method.
+	(path_conv::fs_flags): Constify.
+	(path_conv::fs_name_len): Ditto.
+	include/sys/mount.h: Replace unused MOUNT_MIXED flag with MOUNT_SPARSE.
+
 2012-12-10  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* sigproc.h (sig_send): Accept tid as argument #3.  Default to NULL.
