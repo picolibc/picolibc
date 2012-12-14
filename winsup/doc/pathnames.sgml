@@ -117,6 +117,10 @@ posix=[0|1].  The meaning of the options is as follows.</para>
 	      (default for the cygdrive prefix).
   posix=1   - Switch on case sensitivity for paths under this mount point
 	      (default for all other mount points).
+  sparse    - Switch on support for sparse files.  This option only makes
+              sense on NTFS and then only if you really need sparse files.
+	      Cygwin does not try to create sparse files by default for
+	      performance reasons.
   text      - Files default to CRLF text mode line endings.
   user      - Mount is a user mount.
 </screen>

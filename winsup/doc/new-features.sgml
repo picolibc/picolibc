@@ -5,6 +5,11 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
+For performance reasons, Cygwin does not try to create sparse files
+automatically anymore, unless you use the new "sparse" mount option.
+</para></listitem>
+
+<listitem><para>
 New API: cfsetspeed.
 </para></listitem>
 
