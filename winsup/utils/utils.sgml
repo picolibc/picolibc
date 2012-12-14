@@ -1154,6 +1154,8 @@ most of the options are duplicates of other mount flags):</para>
   posix=0    - Switch off case sensitivity for paths under this mount point.
   posix=1    - Switch on case sensitivity for paths under this mount point
                (default).
+  sparse     - Switch on support for sparse files.  This option only makes
+	       sense on NTFS and then only if you really need sparse files.
   text       - Files default to CRLF text mode line endings.
 </screen>
 
