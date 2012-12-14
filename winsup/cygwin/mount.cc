@@ -1028,6 +1028,7 @@ struct opt
   {"override", MOUNT_OVERRIDE, 0},
   {"posix=0", MOUNT_NOPOSIX, 0},
   {"posix=1", MOUNT_NOPOSIX, 1},
+  {"sparse", MOUNT_SPARSE, 0},
   {"text", MOUNT_BINARY, 1},
   {"user", MOUNT_SYSTEM, 1}
 };
@@ -1666,6 +1667,9 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 
   if (flags & MOUNT_NOPOSIX)
     strcat (_my_tls.locals.mnt_opts, (char *) ",posix=0");
+
+  if (flags & MOUNT_SPARSE)
+    strcat (_my_tls.locals.mnt_opts, (char *) ",sparse");
 
   if (!(flags & MOUNT_SYSTEM))		/* user mount */
     strcat (_my_tls.locals.mnt_opts, (char *) ",user");

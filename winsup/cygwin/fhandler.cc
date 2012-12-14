@@ -817,15 +817,17 @@ ssize_t __stdcall
 fhandler_base::write (const void *ptr, size_t len)
 {
   int res;
-  IO_STATUS_BLOCK io;
-  FILE_POSITION_INFORMATION fpi;
-  FILE_STANDARD_INFORMATION fsi;
 
   if (did_lseek ())
     {
+      IO_STATUS_BLOCK io;
+      FILE_POSITION_INFORMATION fpi;
+      FILE_STANDARD_INFORMATION fsi;
+
       did_lseek (false); /* don't do it again */
 
       if (!(get_flags () & O_APPEND)
+	  && !has_attribute (FILE_ATTRIBUTE_SPARSE_FILE)
 	  && NT_SUCCESS (NtQueryInformationFile (get_output_handle (),
 						 &io, &fsi, sizeof fsi,
 						 FileStandardInformation))
@@ -833,8 +835,7 @@ fhandler_base::write (const void *ptr, size_t len)
 						 &io, &fpi, sizeof fpi,
 						 FilePositionInformation))
 	  && fpi.CurrentByteOffset.QuadPart
-	     >= fsi.EndOfFile.QuadPart + (128 * 1024)
-	  && (pc.fs_flags () & FILE_SUPPORTS_SPARSE_FILES))
+	     >= fsi.EndOfFile.QuadPart + (128 * 1024))
 	{
 	  /* If the file system supports sparse files and the application
 	     is writing after a long seek beyond EOF, convert the file to
@@ -842,6 +843,9 @@ fhandler_base::write (const void *ptr, size_t len)
 	  NTSTATUS status;
 	  status = NtFsControlFile (get_output_handle (), NULL, NULL, NULL,
 				    &io, FSCTL_SET_SPARSE, NULL, 0, NULL, 0);
+	  if (NT_SUCCESS (status))
+	    pc.file_attributes (pc.file_attributes ()
+				| FILE_ATTRIBUTE_SPARSE_FILE);
 	  debug_printf ("%p = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
 			status, pc.get_nt_native_path ());
 	}
@@ -1071,7 +1075,8 @@ fhandler_base::lseek (_off64_t offset, int whence)
 
   /* When next we write(), we will check to see if *this* seek went beyond
      the end of the file and if so, potentially sparsify the file. */
-  did_lseek (true);
+  if (pc.support_sparse ())
+    did_lseek (true);
 
   /* If this was a SEEK_CUR with offset 0, we still might have
      readahead that we have to take into account when calculating
