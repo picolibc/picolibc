@@ -1,3 +1,13 @@
+2012-12-17  Nick Clifton  <nickc@redhat.com>
+
+	* MAINTAINERS: Add copyright notice.
+	* alloca-conf.h: Likewise.
+	* fopen-bin.h: Likewise.
+	* fopen-same.h: Likewise.
+	* fopen-vms.h: Likewise.
+	* aout/hppa.h: Likewise.
+	* opcode/tahoe.h: Likewise.
+
 2012-12-11  Edgar E. Iglesias <edgar.iglesias@gmail.com>
 
 	* elf/microblaze.h: Add TLS relocs to START_RELOC_NUMBERS

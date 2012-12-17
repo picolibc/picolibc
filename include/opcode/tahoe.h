@@ -2,6 +2,25 @@
  * Ported by the State University of New York at Buffalo by the Distributed
  * Computer Systems Lab, Department of Computer Science, 1991.
  */
+/* Copyright 2012 Free Software Foundation, Inc.
+
+   This file is part of GDB and BINUTILS.
+
+   GDB and BINUTILS are free software; you can redistribute them and/or
+   modify them under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3, or (at
+   your option) any later version.
+
+   GDB and BINUTILS are distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with GDB or BINUTILS; see the file COPYING3.  If not, write
+   to the Free Software Foundation, 51 Franklin Street - Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
+
 
 #ifndef tahoe_opcodeT
 #define tahoe_opcodeT int
