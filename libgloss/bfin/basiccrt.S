@@ -66,6 +66,12 @@
 	.global __coreb_start;
 	.type __coreb_start, STT_FUNC;
 __coreb_start:
+#elif defined(__ADSPBF60x_CORE1__)
+	.section        .1.text,"ax",@progbits
+	.align 2;
+	.global __core1_start;
+	.type __core1_start, STT_FUNC;
+__core1_start:
 #else
 	.text;
 	.align 2;
@@ -160,6 +166,9 @@ L$ivt:	[P0++] = R1;
 #ifdef __ADSPBF561_COREB__
 	SP.L=__coreb_stack_end - 12;
 	SP.H=__coreb_stack_end - 12;
+#elif defined(__ADSPBF60x_CORE1__)
+	SP.L=__core1_stack_end - 12;
+	SP.H=__core1_stack_end - 12;
 #else
 	SP.L=__stack_end - 12;
 	SP.H=__stack_end - 12;
@@ -187,6 +196,11 @@ L$ivt:	[P0++] = R1;
 	R0.H = __coreb_bss_start;
 	R1.L = __coreb_bss_end;
 	R1.H = __coreb_bss_end;
+#elif defined(__ADSPBF60x_CORE1__)
+	R0.L = __core1_bss_start;
+	R0.H = __core1_bss_start;
+	R1.L = __core1_bss_end;
+	R1.H = __core1_bss_end;
 #else
 	R0.L = __bss_start;
 	R0.H = __bss_start;
@@ -198,6 +212,8 @@ L$ivt:	[P0++] = R1;
 	R1 = 0;
 #ifdef __ADSPBF561_COREB__
 	CALL.X __coreb_memset;
+#elif defined(__ADSPBF60x_CORE1__)
+	CALL.X __core1_memset;
 #else
 	CALL.X _memset;
 #endif
@@ -269,7 +285,8 @@ L$clock_is_set:
 #endif
 #endif /* ADSPLPBLACKFIN */
 
-#if defined(__ADSPBF561__) || defined(__ADSPBF566__)
+#if defined(__ADSPBF561__) || defined(__ADSPBF566__) || defined(__ADSPBF606__) || defined(__ADSPBF607__) || defined(__ADSPBF608__) || defined(__ADSPBF609__)
+
 	// Initialise the multi-core data tables.
 	// A dummy function will be called if we are not linking with
 	// -multicore
@@ -354,7 +371,7 @@ L$supervisor_mode:
 	CALL.X monstartup; // initialise profiling routines
 #endif  /* PROFCRT */
 
-#ifndef __ADSPBF561_COREB__
+#if !defined(__ADSPBF561_COREB__) && !defined(__ADSPBF60x_CORE1__)
 	CALL.X __init;
 
 	R0.L = __fini;
@@ -374,6 +391,9 @@ L$supervisor_mode:
 #ifdef __ADSPBF561_COREB__
 	R1.L=L$argv_coreb;
 	R1.H=L$argv_coreb;
+#elif defined(__ADSPBF60x_CORE1__)
+	R1.L=L$argv_core1;
+	R1.H=L$argv_core1;
 #else
 	R1.L=L$argv;
 	R1.H=L$argv;
@@ -384,18 +404,22 @@ L$supervisor_mode:
 	// At long last, call the application program.
 #ifdef __ADSPBF561_COREB__
 	CALL.X _coreb_main;
+#elif defined(__ADSPBF60x_CORE1__)
+	CALL.X _core1_main;
 #else
 	CALL.X _main;
 #endif
 
 #if !defined(_ADI_THREADS)
-#ifndef __ADSPBF561_COREB__
+#if !defined(__ADSPBF561_COREB__) && !defined(__ADSPBF60x_CORE1__)
 	CALL.X _exit;	// passing in main's return value
 #endif
 #endif
 
 #ifdef __ADSPBF561_COREB__
 	.size	__coreb_start, .-__coreb_start
+#elif defined(__ADSPBF60x_CORE1__)
+	.size	__core1_start, .-__core1_start
 #else
 	.size	__start, .-__start
 #endif
@@ -506,10 +530,16 @@ L$done:
 #endif
 #endif /* ADSPLPBLACKFIN */
 
+#if defined(__ADSPBF561_COREB__) || defined(__ADSPBF60x_CORE1__)
 #ifdef __ADSPBF561_COREB__
 	.section        .b.text,"ax",@progbits
 	.type __coreb_memset, STT_FUNC
 __coreb_memset:
+#else
+	.section        .1.text,"ax",@progbits
+	.type __core1_memset, STT_FUNC
+__core1_memset:
+#endif
 	P0 = R0 ;              /* P0 = address */
 	P2 = R2 ;              /* P2 = count   */
 	R3 = R0 + R2;          /* end          */
@@ -569,7 +599,11 @@ __coreb_memset:
 	B[P0++] = R1;
 	B[P0++] = R1;
 	JUMP .Laligned;
+#ifdef __ADSPBF561_COREB__
 .size __coreb_memset,.-__coreb_memset
+#else
+.size __core1_memset,.-__core1_memset
+#endif
 #endif
 
 #ifdef __ADSPBF561_COREB__
@@ -578,6 +612,13 @@ __coreb_memset:
 	.type	L$argv_coreb, @object
 	.size	L$argv_coreb, 4
 L$argv_coreb:
+	.zero	4
+#elif defined(__ADSPBF60x_CORE1__)
+	.section	.1.bss,"aw",@progbits
+	.align 4
+	.type	L$argv_core1, @object
+	.size	L$argv_core1, 4
+L$argv_core1:
 	.zero	4
 #else
 	.local	L$argv

@@ -60,7 +60,7 @@ SIM_TEST	= sim-test
 SIM_INSTALL	= install-sim
 
 # Here is all of the development board stuff
-BOARD_SCRIPTS	= bfin-common-sc.ld  bfin-common-mc.ld \
+BOARD_SCRIPTS	= bfin-common-sc.ld  bfin-common-mc.ld bfin-common-mc0.ld \
 	bf504.ld bf506.ld \
 	bf512.ld bf514.ld bf516.ld bf518.ld \
 	bf522.ld bf523.ld bf524.ld bf525.ld bf526.ld bf527.ld \
@@ -69,11 +69,16 @@ BOARD_SCRIPTS	= bfin-common-sc.ld  bfin-common-mc.ld \
 	bf538.ld bf539.ld \
 	bf542.ld bf544.ld bf547.ld bf548.ld bf549.ld \
 	bf561.ld bf561a.ld bf561b.ld bf561m.ld \
+	bf606.ld bf606c0.ld bf606c1.ld bf606m.ld \
+	bf607.ld bf607c0.ld bf607c1.ld bf607m.ld \
+	bf608.ld bf608c0.ld bf608c1.ld bf608m.ld \
+	bf609.ld bf609c0.ld bf609c1.ld bf609m.ld \
 	bf592.ld
 BOARD_LDFLAGS	=
 BOARD_BSP	= libbfinbsp.a
 BOARD_CRT0S	= basiccrt.o basiccrts.o
 BOARD_CRT0S	+= basiccrt561.o basiccrt561s.o basiccrt561b.o
+BOARD_CRT0S	+= basiccrt60x.o basiccrt60xs.o basiccrt60xc1.o
 BOARD_OBJS	= clear_cache_range.o _exit.o
 BOARD_TEST	=
 BOARD_INSTALL	= install-board
@@ -137,6 +142,27 @@ ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
 	$(CC) -D__ADSPBF561_COREB__ $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-none -o $@ -c $<
 else
 	$(CC) -D__ADSPBF561_COREB__ $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-any -o $@ -c $<
+endif
+
+basiccrt60x.o: basiccrt.S
+ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf608-none -o $@ -c $<
+else
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf608-any -o $@ -c $<
+endif
+
+basiccrt60xs.o: basiccrt.S
+ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
+	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf608-none -o $@ -c $<
+else
+	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf608-any -o $@ -c $<
+endif
+
+basiccrt60xc1.o: basiccrt.S
+ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
+	$(CC) -D__ADSPBF60x_CORE1__ $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf608-none -o $@ -c $<
+else
+	$(CC) -D__ADSPBF60x_CORE1__ $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf608-any -o $@ -c $<
 endif
 
 clean mostlyclean:

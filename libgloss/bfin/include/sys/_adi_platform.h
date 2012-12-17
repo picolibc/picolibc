@@ -108,6 +108,14 @@
 #include <cdefBF549M.h>
 #elif defined (__ADSPBF592A__)
 #include <cdefBF592-A.h>
+#elif defined (__ADSPBF606__)
+#include <cdefBF606.h>
+#elif defined (__ADSPBF607__)
+#include <cdefBF607.h>
+#elif defined (__ADSPBF608__)
+#include <cdefBF608.h>
+#elif defined (__ADSPBF609__)
+#include <cdefBF609.h>
 #else
 #error Processor Type Not Supported
 #endif
@@ -203,6 +211,14 @@
 #include <defBF549M.h>
 #elif defined (__ADSPBF592A__)
 #include <defBF592-A.h>
+#elif defined (__ADSPBF606__)
+#include <defBF606.h>
+#elif defined (__ADSPBF607__)
+#include <defBF607.h>
+#elif defined (__ADSPBF608__)
+#include <defBF608.h>
+#elif defined (__ADSPBF609__)
+#include <defBF609.h>
 
 #else
 #error Processor Type Not Supported
