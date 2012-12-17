@@ -78,6 +78,7 @@ _DEFUN(_puts_r, (ptr, s),
        struct _reent *ptr _AND
        _CONST char * s)
 {
+  int result;
   size_t c = strlen (s);
   struct __suio uio;
   struct __siov iov[2];
@@ -89,9 +90,14 @@ _DEFUN(_puts_r, (ptr, s),
   uio.uio_resid = c + 1;
   uio.uio_iov = &iov[0];
   uio.uio_iovcnt = 2;
+
   _REENT_SMALL_CHECK_INIT (ptr);
-  ORIENT (stdout, -1);
-  return (__sfvwrite_r (ptr, _stdout_r (ptr), &uio) ? EOF : '\n');
+
+  _newlib_flockfile_start (_stdout_r (ptr));
+  ORIENT (_stdout_r (ptr), -1);
+  result = (__sfvwrite_r (ptr, _stdout_r (ptr), &uio) ? EOF : '\n');
+  _newlib_flockfile_start (_stdout_r (ptr));
+  return result;
 }
 
 #ifndef _REENT_ONLY
