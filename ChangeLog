@@ -1,3 +1,7 @@
+2012-12-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.LIBGLOSS: Add license for bfin libgloss.
+
 2012-12-16  Thomas Schwinge  <thomas@codesourcery.com>
 
 	* configure.ac (ENABLE_GOLD): Consider *-*-gnu* targets ELF.
