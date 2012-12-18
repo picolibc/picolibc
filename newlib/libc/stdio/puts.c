@@ -82,6 +82,7 @@ _DEFUN(_puts_r, (ptr, s),
   size_t c = strlen (s);
   struct __suio uio;
   struct __siov iov[2];
+  FILE *fp;
 
   iov[0].iov_base = s;
   iov[0].iov_len = c;
@@ -92,11 +93,11 @@ _DEFUN(_puts_r, (ptr, s),
   uio.uio_iovcnt = 2;
 
   _REENT_SMALL_CHECK_INIT (ptr);
-
-  _newlib_flockfile_start (_stdout_r (ptr));
-  ORIENT (_stdout_r (ptr), -1);
-  result = (__sfvwrite_r (ptr, _stdout_r (ptr), &uio) ? EOF : '\n');
-  _newlib_flockfile_start (_stdout_r (ptr));
+  fp = _stdout_r (ptr);
+  _newlib_flockfile_start (fp);
+  ORIENT (fp, -1);
+  result = (__sfvwrite_r (ptr, fp, &uio) ? EOF : '\n');
+  _newlib_flockfile_end (fp);
   return result;
 }
 
