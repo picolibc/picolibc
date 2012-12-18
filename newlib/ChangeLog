@@ -1,3 +1,8 @@
+2012-12-18  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/include/math.h: Add recognition of values 1 and 2 for
+	FLT_EVAL_METHOD.
+
 2012-12-18  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/puts.c (_puts_r): Fix typo in previous patch.  Add local

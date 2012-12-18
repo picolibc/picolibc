@@ -140,11 +140,37 @@ extern double fmod _PARAMS((double, double));
 
 /* ISO C99 types and macros. */
 
-#ifndef FLT_EVAL_METHOD
-#define FLT_EVAL_METHOD 0
-typedef float float_t;
-typedef double double_t;
+/* FIXME:  FLT_EVAL_METHOD should somehow be gotten from float.h (which is hard,
+ * considering that the standard says the includes it defines should not
+ * include other includes that it defines) and that value used.  (This can be
+ * solved, but autoconf has a bug which makes the solution more difficult, so
+ * it has been skipped for now.)  */
+#if !defined(FLT_EVAL_METHOD) && defined(__FLT_EVAL_METHOD__)
+  #define FLT_EVAL_METHOD __FLT_EVAL_METHOD__
+  #define __TMP_FLT_EVAL_METHOD
 #endif /* FLT_EVAL_METHOD */
+#if defined FLT_EVAL_METHOD
+  #if FLT_EVAL_METHOD == 0
+    typedef float  float_t;
+    typedef double double_t;
+   #elif FLT_EVAL_METHOD == 1
+    typedef double float_t;
+    typedef double double_t;
+   #elif FLT_EVAL_METHOD == 2
+    typedef long double float_t;
+    typedef long double double_t;
+   #else
+    /* Implementation-defined.  Assume float_t and double_t have been
+     * defined previously for this configuration (e.g. config.h). */
+  #endif
+#else
+    /* Assume basic definitions.  */
+    typedef float  float_t;
+    typedef double double_t;
+#endif
+#if defined(__TMP_FLT_EVAL_METHOD)
+  #undef FLT_EVAL_METHOD
+#endif
 
 #define FP_NAN         0
 #define FP_INFINITE    1
