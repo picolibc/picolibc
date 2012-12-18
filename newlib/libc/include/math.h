@@ -378,9 +378,6 @@ extern float lgammaf _PARAMS((float));
 extern float erff _PARAMS((float));
 extern float erfcf _PARAMS((float));
 extern float log2f _PARAMS((float));
-#if !defined(__cplusplus)
-#define log2f(x) (logf (x) / (float_t) _M_LN2)
-#endif
 extern float hypotf _PARAMS((float, float));
 #endif /* ! defined (_REENT_ONLY) */
 
