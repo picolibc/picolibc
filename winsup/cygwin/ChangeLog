@@ -1,3 +1,8 @@
+2012-12-18  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* select.cc (select_stuff::test_and_set): Work around problem of new()
+	not returning zeroed memory.
+
 2012-12-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::write): Don't attempt to sparsify

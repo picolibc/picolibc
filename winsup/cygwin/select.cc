@@ -295,7 +295,7 @@ select_stuff::test_and_set (int i, fd_set *readfds, fd_set *writefds,
       && ! UNIX_FD_ISSET (i, exceptfds))
     return true;
 
-  select_record *s = new select_record;
+  select_record *s = (select_record *) calloc (1, sizeof (select_record));
   if (!s)
     return false;
 
