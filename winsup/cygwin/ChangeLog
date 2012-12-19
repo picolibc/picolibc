@@ -1,3 +1,7 @@
+2012-12-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* select.cc (select_stuff::wait): Add windows error number to error message.
+
 2012-12-18  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* select.cc (select_stuff::test_and_set): Remove workaround and use

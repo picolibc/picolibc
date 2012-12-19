@@ -394,7 +394,7 @@ next_while:;
 	}
       break;
     case WAIT_FAILED:
-      system_printf ("WaitForMultipleObjects failed");
+      system_printf ("WaitForMultipleObjects failed, %E");
       s = &start;
       s->set_select_errno ();
       res = select_error;
