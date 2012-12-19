@@ -30,8 +30,8 @@ struct select_record
   struct select_record *next;
   void set_select_errno () {__seterrno (); thread_errno = errno;}
   int saw_error () {return thread_errno;}
-  select_record () {}
-  select_record (int): fd (0), h (NULL), fh (NULL), thread_errno (0),
+  select_record (int): next (NULL) {}
+  select_record (): fd (0), h (NULL), fh (NULL), thread_errno (0),
     windows_handle (false), read_ready (false), write_ready (false),
     except_ready (false), read_selected (false), write_selected (false),
     except_selected (false), except_on_write (false),
