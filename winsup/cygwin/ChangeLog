@@ -1,5 +1,12 @@
 2012-12-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* select.h (select_stuff::select_stuff): Make default constructor
+	always zero everything while constructor with int arg just zeroes next.
+	* select.cc (select_stuff::test_and_set): Revert to using default
+	constructor.
+
+2012-12-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* select.cc (select_stuff::wait): Add windows error number to error message.
 
 2012-12-18  Christopher Faylor  <me.cygwin2012@cgf.cx>

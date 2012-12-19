@@ -295,7 +295,7 @@ select_stuff::test_and_set (int i, fd_set *readfds, fd_set *writefds,
       && ! UNIX_FD_ISSET (i, exceptfds))
     return true;
 
-  select_record *s = new select_record (0);
+  select_record *s = new select_record;
   if (!s)
     return false;
 
