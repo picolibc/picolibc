@@ -320,7 +320,11 @@ build_argv (char *cmd, char **&argv, int &argc, int winshell)
 	    /* Skip over characters until the closing quote */
 	    {
 	      sawquote = cmd;
-	      cmd = quoted (cmd, winshell && argc > 0);
+	      /* Handle quoting.  Only strip off quotes if the parent is
+		 a Cygwin process, or if the word starts with a '@'.
+		 In this case, the insert_file function needs an unquoted
+		 DOS filename and globbing isn't performed anyway. */
+	      cmd = quoted (cmd, winshell && argc > 0 && *word != '@');
 	    }
 	  if (issep (*cmd))	// End of argument if space
 	    break;
