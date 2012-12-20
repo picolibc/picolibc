@@ -993,7 +993,6 @@ starting with "@" in a special way.  If a file
 <filename>@pathname</filename> expands recursively to the content of
 <filename>pathname</filename>. Double quotes can be used inside the
 file to delimit strings containing blank space. 
-Embedded double quotes must be repeated.
 In the following example compare the behaviors of the bash built-in
 <command>echo</command> and of the program <command>/bin/echo</command>.</para>
 
