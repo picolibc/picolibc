@@ -1,3 +1,21 @@
+2012-12-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * NEWS: Update with 2.0.0 info.
+        * README: Ditto.
+        * acinclude.m4: Change version number to 2.0.0.
+        * aclocal.m4: Regenerated.
+        * configure: Ditto.
+        * Makefile.in: Regenerated.
+        * doc/aclocal.m4: Ditto.
+        * doc/configure: Ditto.
+        * libc/*/aclocal.m4: Ditto.
+        * libc/*/configure: Ditto.
+        * libc/libc.texinfo: Ditto.
+        * libm/*/aclocal.m4: Ditto.
+        * libm/*/configure: Ditto.
+        * libm/libm.texinfo: Ditto.
+        * libc/sys/linux/shared.ld: Add VERS_2.0
+
 2012-12-19  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdlib/strtod.c (_strtod_r): Revert change from 2011-05-16.

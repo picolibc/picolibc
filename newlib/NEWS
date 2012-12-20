@@ -1,3 +1,16 @@
+*** Major changes in newlib version 2.0.0:
+
+- addition of aarch64 platform support
+- addition of epiphany platform support
+- addition of 'm' printf conversion specifier
+- memrchr function added
+- removal of many compiler warnings
+- removal of enable-newlib-fp-hw option and
+  deprecation of mathfp directory
+- type of offset in file structure changed from int to off_t
+- new optimized arm math routines
+- various bug fixes
+
 *** Major changes in newlib version 1.20.0:
 
 * I/O lock clean-up
