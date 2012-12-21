@@ -13,7 +13,6 @@ details. */
 #include "cygtls.h"
 #include "ntdll.h"
 #include "shared_info.h"
-#include "sync.h"
 
 static DWORD _my_oldfunc;
 
@@ -96,14 +95,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       if (dll_finished_loading
 	  && (PVOID) &_my_tls > (PVOID) &test_stack_marker
 	  && _my_tls.isinitialized ())
-	{
-	  _my_tls.remove (0);
-	  /* Make sure that we don't exit until the process has exited.
-	     Otherwise there is a potential race where the thread exit
-	     code could be considered to be the process exit code.
-	     See cgf-000017 and cgf-000018 in DevNotes.  */
-	  lock_process here;
-	}
+	_my_tls.remove (0);
       /* Windows 2000 has a bug in NtTerminateThread.  Instead of releasing
 	 the stack at teb->DeallocationStack it uses the value of
 	 teb->Tib.StackLimit to evaluate the stack address.  So we just claim

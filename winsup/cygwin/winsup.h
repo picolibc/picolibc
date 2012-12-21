@@ -261,11 +261,14 @@ enum mmap_region_status
 mmap_region_status mmap_is_attached_or_noreserve (void *addr, size_t len);
 bool is_mmapped_region (caddr_t start_addr, caddr_t end_address);
 
-inline bool flush_file_buffers (HANDLE h)
+extern inline bool flush_file_buffers (HANDLE h)
 {
   return (GetFileType (h) != FILE_TYPE_PIPE) ? FlushFileBuffers (h) : true;
 }
 #define FlushFileBuffers flush_file_buffers
+
+/* Make sure that regular ExitThread is never called */
+#define ExitThread exit_thread
 
 /**************************** Exports ******************************/
 

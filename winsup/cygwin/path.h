@@ -18,7 +18,7 @@ details. */
 #include <fcntl.h>
 #include <alloca.h>
 
-inline bool
+extern inline bool
 has_attribute (DWORD attributes, DWORD attribs_to_test)
 {
   return attributes != INVALID_FILE_ATTRIBUTES

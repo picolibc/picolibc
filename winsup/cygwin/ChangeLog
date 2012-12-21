@@ -1,5 +1,30 @@
 2012-12-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	Revert the reversion and go with implementation described in
+	cgf-000017, with some modifications.
+	* init.cc (dll_entry): Revert previous change.
+	* miscfuncs.cc: Include sigproc.h for exit_thread declaration.
+	* winsup.h (ExitThread): Define as 'exit_thread' to ensure no
+	accidental use.
+	* sigproc.cc (exit_thread): New function.
+	(wait_sig): Handle __SIGTHREADEXIT case.  Don't just block rather than
+	returning from this function.
+	* sigproc.h (__SIGTHREADEXIT): New enum.
+	(exit_thread): Declare.
+	* sync.cc (muto::release): Accept a tls command-line argument.
+	* sync.h (muto::release): Accept a tls command-line parameter.  Default
+	to &_my_tls.
+
+	* cygerrno.h (__set_errno): Define as extern so that no function code
+	is ever emitted.
+	* cygserver_ipc.h (cygserver_ipc.h): Ditto.
+	* miscfuncs.h (transform_chars): Ditto.
+	* path.h (has_attribute): Ditto.
+	* security.h (privilege_luid): Ditto.
+	* winsup.h (flush_file_buffers): Ditto.
+
+2012-12-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* DevNotes: Add entry cgf-000018.
 	* init.cc (dll_entry): Grab process lock before exiting to ensure that
 	thread doesn't exit before parent if parent is exiting.

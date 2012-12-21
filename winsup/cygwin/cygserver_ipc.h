@@ -33,7 +33,7 @@ struct proc {
 
 #ifdef __INSIDE_CYGWIN__
 #include "sigproc.h"
-inline void
+extern inline void
 ipc_set_proc_info (proc &blk)
 {
   blk.cygpid = getpid ();
