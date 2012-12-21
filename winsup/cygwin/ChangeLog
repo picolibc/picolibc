@@ -1,5 +1,20 @@
 2012-12-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* DevNotes: Add entry cgf-000018.
+	* init.cc (dll_entry): Grab process lock before exiting to ensure that
+	thread doesn't exit before parent if parent is exiting.
+	* _cygtls.cc (_cygtls::call2): Revert previous 2012-12-21 change.
+	* miscfuncs.cc (thread_wrapper): Ditto.
+	* thread.cc (pthread::exit): Ditto.
+	* sigproc.cc (exit_thread): Ditto.
+	(wait_sig): Ditto.
+	* sync.cc (muto::release): Ditto.
+	* sync.h (muto::release): Ditto.
+	* sigproc.h (__SIGTHREADEXIT): Delete enum.
+	(exit_thread): Delete declaration.
+
+2012-12-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	* DevNotes: Add entry cgf-000017.
 	* _cygtls.cc (_cygtls::call2): Use new exit_thread function in place of
 	ExitThread.

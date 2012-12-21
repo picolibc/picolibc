@@ -102,7 +102,7 @@ _cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
      dynamically loaded.  */
   if ((void *) func != (void *) dll_crt0_1
       && (void *) func != (void *) dll_dllcrt0_1)
-    exit_thread (res);
+    ExitThread (res);
 }
 
 void

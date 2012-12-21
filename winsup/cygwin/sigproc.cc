@@ -553,33 +553,6 @@ sigproc_terminate (exit_states es)
     }
 }
 
-/* Exit the current thread very carefully.
-   See cgf-000017 in DevNotes for more details on why this is
-   necessary.  */
-void
-exit_thread (DWORD res)
-{
-  HANDLE h;
-
-  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
-                        GetCurrentProcess (), &h,
-                        0, FALSE, DUPLICATE_SAME_ACCESS))
-    {
-#ifdef DEBUGGING
-      system_printf ("couldn't duplicate the current thread, %E");
-#endif
-      ExitThread (res);
-    }
-  ProtectHandle1 (h, exit_thread);
-  siginfo_t si = {__SIGTHREADEXIT, SI_KERNEL};
-  si.si_value.sival_ptr = h;
-  /* Tell wait_sig to wait for this thread to exit.  It can then release
-     the lock below and close the above-opened handle. */
-  sig_send (myself_nowait, si, &_my_tls);
-  lock_process for_now;
-  ExitThread (0);	/* Should never hit this */
-}
-
 int __stdcall
 sig_send (_pinfo *p, int sig, _cygtls *tid)
 {
@@ -1446,23 +1419,6 @@ wait_sig (VOID *)
 	case __SIGSETPGRP:
 	  init_console_handler (true);
 	  break;
-	case __SIGTHREADEXIT:
-	  {
-	    /* Serialize thread exit as the thread exit code can be interpreted
-	       as the process exit code in some cases when racing with
-	       ExitProcess/TerminateProcess.
-	       So, wait for the thread which sent this signal to exit, then
-	       release the process lock which it held and close it's handle.
-	       See cgf-000017 in DevNotes for more details.
-	       */
-	    HANDLE h = (HANDLE) pack.si.si_value.sival_ptr;
-	    DWORD res = WaitForSingleObject (h, 5000);
-	    lock_process::force_release (pack.sigtls);
-	    ForceCloseHandle1 (h, exit_thread);
-	    if (res != WAIT_OBJECT_0)
-	      system_printf ("WaitForSingleObject(%p) for thread exit returned %u", h, res);
-	  }
-	  break;
 	default:
 	  if (pack.si.si_signo < 0)
 	    sig_clear (-pack.si.si_signo);
@@ -1505,8 +1461,5 @@ wait_sig (VOID *)
 
   close_my_readsig ();
   sigproc_printf ("signal thread exiting");
-  /* Just wait for the process to go away.  Otherwise, this thread's
-     exit value could be interpreted as the process exit value.
-     See cgf-000017 in DevNotes for more details.  */
-  Sleep (INFINITE);
+  ExitThread (0);
 }

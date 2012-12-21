@@ -25,8 +25,7 @@ enum
   __SIGHOLD	    = -(NSIG + 7),
   __SIGNOHOLD	    = -(NSIG + 8),
   __SIGEXIT	    = -(NSIG + 9),
-  __SIGSETPGRP	    = -(NSIG + 10),
-  __SIGTHREADEXIT   = -(NSIG + 11)
+  __SIGSETPGRP	    = -(NSIG + 10)
 };
 #endif
 
@@ -88,7 +87,6 @@ void __stdcall sigalloc ();
 
 int kill_pgrp (pid_t, siginfo_t&);
 int killsys (pid_t, int);
-void exit_thread (DWORD) __attribute__ ((regparm(1), noreturn));
 
 extern "C" void sigdelayed ();
 

@@ -1,3 +1,14 @@
+2012-12-21  cgf-000018
+
+Re: cgf-000017
+
+It occurred to me that just getting the process lock during
+DLL_THREAD_DETACH in dll_entry() might be adequate to fix this
+problem.  It's certainly much less intrusive.
+
+There are potential deadlock problems with grabbing a lock in
+this code, though, so this check-in will be experimental.
+
 2012-12-21  cgf-000017
 
 The changes in this set are to work around the issue noted here:

@@ -532,7 +532,7 @@ pthread::exit (void *value_ptr)
 	  _main_tls = dummy;
 	  _main_tls->initialized = false;
 	}
-      exit_thread (0);
+      ExitThread (0);
     }
 }
 
