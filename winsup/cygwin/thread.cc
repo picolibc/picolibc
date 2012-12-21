@@ -532,7 +532,7 @@ pthread::exit (void *value_ptr)
 	  _main_tls = dummy;
 	  _main_tls->initialized = false;
 	}
-      ExitThread (0);
+      exit_thread (0);
     }
 }
 
@@ -1778,7 +1778,7 @@ pthread_mutex::unlock ()
     {
       owner = (pthread_t) _unlocked_mutex;
 #ifdef DEBUGGING
-      tid = 0;
+      tid = NULL;
 #endif
       if (InterlockedDecrement ((long *) &lock_counter))
 	::SetEvent (win32_obj_id); // Another thread is waiting
@@ -1905,7 +1905,7 @@ pthread_spinlock::unlock ()
     {
       owner = (pthread_t) _unlocked_mutex;
 #ifdef DEBUGGING
-      tid = 0;
+      tid = NULL;
 #endif
       InterlockedExchange ((long *) &lock_counter, 0);
       ::SetEvent (win32_obj_id);

@@ -515,7 +515,7 @@ commune_process (void *arg)
   if (process_sync)		// FIXME: this test shouldn't be necessary
     ProtectHandle (process_sync);
 
-  lock_process now ();
+  lock_process now;
   if (si._si_commune._si_code & PICOM_EXTRASTR)
     si._si_commune._si_str = (char *) (&si + 1);
 

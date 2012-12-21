@@ -1,3 +1,27 @@
+2012-12-21  cgf-000017
+
+The changes in this set are to work around the issue noted here:
+
+http://cygwin.com/ml/cygwin/2012-12/threads.html#00140
+
+The problem is, apparently, that the return value of an ExitThread()
+will take precedence over the return value of TerminateProcess/ExitProcess
+if the thread is the last one exiting.  That's rather amazing...
+
+For the fix, I replaced all calls to ExitThread with exit_thread().  The
+exit_thread function, creates a handle to the current thread and sends
+it to a packet via sig_send(__SIGTHREADEXIT).  Then it acquires the
+process lock and calls ExitThread.
+
+wait_sig will then wait for the handle, indicating that the thread has
+exited, and, when that has happened, remove the process lock on behalf
+of the now-defunct thread.  wait_sig will now also avoid actually
+exiting since it could trigger the same problem.
+
+Holding process_lock should prevent threads from exiting while a Cygwin
+process is shutting down.  They will just block forever in that case -
+just like wait_sig.
+
 2012-08-17  cgf-000016
 
 While debugging another problem I finally noticed that

@@ -1,3 +1,22 @@
+2012-12-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* DevNotes: Add entry cgf-000017.
+	* _cygtls.cc (_cygtls::call2): Use new exit_thread function in place of
+	ExitThread.
+	* miscfuncs.cc (thread_wrapper): Ditto.
+	* thread.cc (pthread::exit): Ditto.
+	(pthread_mutex::unlock): Set tid to NULL rather than 0.
+	(pthread_spinlock::unlock): Ditto.
+	* pinfo.cc (commune_process): Actually call lock_process constructor.
+	* sigproc.cc (exit_thread): New function.
+	(wait_sig): Handle __SIGTHREADEXIT case.  Don't just block rather than
+	returning from this function.
+	* sigproc.h (__SIGTHREADEXIT): New enum.
+	(exit_thread): Declare.
+	* sync.cc (muto::release): Accept a tls command-line argument.
+	* sync.h (muto::release): Accept a tls command-line parameter.  Default
+	to &_my_tls.
+
 2012-12-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc (build_argv): Allow quoted filenames in @ expression.

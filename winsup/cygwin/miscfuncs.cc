@@ -27,6 +27,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
+#include "sigproc.h"
 #include "exception.h"
 
 long tls_ix = -1;
@@ -546,7 +547,7 @@ thread_wrapper (VOID *arg)
 	   : : [WRAPPER_ARG] "r" (&wrapper_arg),
 	       [CYGTLS] "i" (CYGTLS_PADSIZE));
   /* Never return from here. */
-  ExitThread (0);
+  exit_thread (0);
 }
 
 HANDLE WINAPI
