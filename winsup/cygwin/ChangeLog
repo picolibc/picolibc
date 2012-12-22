@@ -1,5 +1,10 @@
 2012-12-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
+	* sigproc.cc (exit_thread): undef ExitThread or suffer recursion.
+	Attempt to lock process prior to calling sig_send.
+
+2012-12-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
 	Revert the reversion and go with implementation described in
 	cgf-000017, with some modifications.
 	* init.cc (dll_entry): Revert previous change.

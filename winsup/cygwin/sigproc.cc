@@ -561,6 +561,8 @@ exit_thread (DWORD res)
 {
   HANDLE h;
 
+# undef ExitThread
+
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
                         GetCurrentProcess (), &h,
                         0, FALSE, DUPLICATE_SAME_ACCESS))
@@ -573,11 +575,11 @@ exit_thread (DWORD res)
   ProtectHandle1 (h, exit_thread);
   siginfo_t si = {__SIGTHREADEXIT, SI_KERNEL};
   si.si_value.sival_ptr = h;
+  lock_process for_now;		/* May block indefinitely if we're exiting. */
   /* Tell wait_sig to wait for this thread to exit.  It can then release
      the lock below and close the above-opened handle. */
   sig_send (myself_nowait, si, &_my_tls);
-  lock_process for_now;
-  ExitThread (0);	/* Should never hit this */
+  ExitThread (0);		/* Should never hit this */
 }
 
 int __stdcall
