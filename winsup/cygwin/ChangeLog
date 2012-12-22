@@ -14,8 +14,8 @@
 	debugging-only function.
 	(select_stuff::test_and_set): Call dump_select_record when debugging.
 
-	* thread.cc (pthread_mutex::unlock): Revert setting of tid to NULL
-	since, in this context, it is a number, not a pointer.
+	* thread.cc (pthread_mutex::unlock): Revert setting of tid to 0 since,
+	in this context, it is a number, not a pointer.
 	(pthread_spinlock::unlock): Ditto.
 
 2012-12-21  Christopher Faylor  <me.cygwin2012@cgf.cx>
