@@ -48,9 +48,9 @@ class lock_process
 public:
   static void init () {locker.init ("lock_process");}
   void dont_bother () {skip_unlock = true;}
-  lock_process (bool exiting = false, DWORD howlong = INFINITE)
+  lock_process (bool exiting = false)
   {
-    locker.acquire (howlong);
+    locker.acquire ();
     skip_unlock = exiting;
     if (exiting && exit_state < ES_PROCESS_LOCKED)
       exit_state = ES_PROCESS_LOCKED;
