@@ -1778,7 +1778,7 @@ pthread_mutex::unlock ()
     {
       owner = (pthread_t) _unlocked_mutex;
 #ifdef DEBUGGING
-      tid = NULL;
+      tid = 0;		// thread-id
 #endif
       if (InterlockedDecrement ((long *) &lock_counter))
 	::SetEvent (win32_obj_id); // Another thread is waiting
@@ -1905,7 +1905,7 @@ pthread_spinlock::unlock ()
     {
       owner = (pthread_t) _unlocked_mutex;
 #ifdef DEBUGGING
-      tid = NULL;
+      tid = 0;		// thread-id
 #endif
       InterlockedExchange ((long *) &lock_counter, 0);
       ::SetEvent (win32_obj_id);
