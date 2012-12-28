@@ -1,3 +1,26 @@
+2012-12-28  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* DevNotes: Add entry cgf-000019.
+	* dcrt0.cc (do_exit): Just set exit_state to ES_EVENTS_TERMINATE and
+	nuke call to events_terminate which just set a superfluous flag.
+	* sigproc.cc (signal_exit_code): New variable.
+	(setup_signal_exit): Define new function.
+	(_cygtls::signal_exit): Remove accommodations for closing the signal
+	pipe handle.
+	(exit_thread): Just sleep if we're exiting.
+	(wait_sig): If signal_exit_code is set, just handle bookkeeping signals
+	and exit ReadFile loop if there is nothing more to process.  Call
+	signal_exit at end if signal_exit_code is non-zero.
+	* sigproc.h (setup_signal_exit): Declare new function.
+	* exceptions.cc (sigpacket::process): Use setup_signal_exit to control
+	exiting due to a signal.
+	(exception::handle): Ditto.  Query exit_state rather than defunct
+	exit_already to determine if we are exiting.
+	* globals.cc (ES_SIGNAL_EXIT): New enum.
+	* sync.h (lock_process::release): New function for explicitly unlocking
+	muto.
+	(lock_process::~lock_process): Use release method.
+
 2012-12-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* fork.cc (child_info::prefork): Fix error message formatting.

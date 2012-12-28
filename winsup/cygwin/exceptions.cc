@@ -41,8 +41,6 @@ static BOOL WINAPI ctrl_c_handler (DWORD);
 
 /* This is set to indicate that we have already exited.  */
 
-static NO_COPY int exit_already = 0;
-
 NO_COPY static struct
 {
   unsigned int code;
@@ -481,9 +479,9 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
       return 0;
     }
 
-  /* If we've already exited, don't do anything here.  Returning 1
+  /* If we're exiting, don't do anything here.  Returning 1
      tells Windows to keep looking for an exception handler.  */
-  if (exit_already || e->ExceptionFlags)
+  if (exit_state || e->ExceptionFlags)
     return 1;
 
   siginfo_t si = {0};
@@ -673,8 +671,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 			  error_code);
 	}
 
-      /* Flag signal + core dump */
-      me.signal_exit ((cygheap->rlim_core > 0UL ? 0x80 : 0) | si.si_signo);
+      setup_signal_exit ((cygheap->rlim_core > 0UL ? 0x80 : 0) | si.si_signo);
     }
 
   si.si_addr =  (si.si_signo == SIGSEGV || si.si_signo == SIGBUS
@@ -1249,13 +1246,9 @@ done:
   return rc;
 
 exit_sig:
-  tls->signal_exit (si.si_signo);	/* never returns */
-}
-
-void
-events_terminate ()
-{
-  exit_already = 1;
+  sigproc_printf ("setting up for exit with signal %d", si.si_signo);
+  setup_signal_exit (si.si_signo);
+  return rc;
 }
 
 int

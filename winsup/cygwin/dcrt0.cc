@@ -1098,10 +1098,7 @@ do_exit (int status)
   lock_process until_exit (true);
 
   if (exit_state < ES_EVENTS_TERMINATE)
-    {
-      exit_state = ES_EVENTS_TERMINATE;
-      events_terminate ();
-    }
+    exit_state = ES_EVENTS_TERMINATE;
 
   if (exit_state < ES_SIGNAL)
     {

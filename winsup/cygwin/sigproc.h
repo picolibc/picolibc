@@ -89,6 +89,7 @@ void __stdcall sigalloc ();
 int kill_pgrp (pid_t, siginfo_t&);
 int killsys (pid_t, int);
 void exit_thread (DWORD) __attribute__ ((regparm (1), noreturn));
+void setup_signal_exit (int) __attribute__ ((regparm (1)));
 
 extern "C" void sigdelayed ();
 

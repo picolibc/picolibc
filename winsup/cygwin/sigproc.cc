@@ -61,6 +61,7 @@ _cygtls NO_COPY *_sig_tls;
 
 Static HANDLE my_sendsig;
 Static HANDLE my_readsig;
+Static int signal_exit_code;
 
 /* Function declarations */
 static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
@@ -361,32 +362,12 @@ close_my_readsig ()
     ForceCloseHandle1 (h, my_readsig);
 }
 
-/* Cover function to `do_exit' to handle exiting even in presence of more
-   exceptions.  We used to call exit, but a SIGSEGV shouldn't cause atexit
-   routines to run.  */
+/* Exit due to a signal, even in presence of more exceptions.  We used to just
+   call exit, but a SIGSEGV shouldn't cause atexit routines to run.
+   Should only be called from the signal thread.  */
 void
 _cygtls::signal_exit (int rc)
 {
-  HANDLE myss = my_sendsig;
-  my_sendsig = NULL;		 /* Make no_signals_allowed return true */
-
-  /* This code used to try to always close my_readsig but it ended up
-     blocking for reasons that people in google think make sense.
-     It's possible that it was blocking because ReadFile was still active
-     but it isn't clear why this only caused random hangs rather than
-     consistent hangs.  So, for now at least, avoid closing my_readsig
-     unless this is the signal thread.  */
-  if (&_my_tls == _sig_tls)
-    close_my_readsig ();	/* Stop any currently executing sig_sends */
-  else
-    {
-      sigpacket sp = {};
-      sp.si.si_signo = __SIGEXIT;
-      DWORD len;
-      /* Write a packet to the wait_sig thread which tells it to exit and
-	 close my_readsig.  */
-      WriteFile (myss, &sp, sizeof (sp), &len, NULL);
-    }
   signal_debugger (rc & 0x7f);
 
   if (rc == SIGQUIT || rc == SIGABRT)
@@ -553,6 +534,27 @@ sigproc_terminate (exit_states es)
     }
 }
 
+/* Set up stuff so that the signal thread will know that we are
+   exiting due to a signal.  */
+void
+setup_signal_exit (int sig)
+{
+  signal_exit_code = sig;	/* Tell wait_sig() that we are exiting. */
+  exit_state = ES_SIGNAL_EXIT;	/* Tell the rest of the world that we are exiting. */
+
+  if (&_my_tls != _sig_tls)
+    {
+      sigpacket sp = {};
+      sp.si.si_signo = __SIGEXIT;
+      DWORD len;
+      /* Write a packet to the wait_sig thread.  It will eventuall cause
+	 the process to exit too.  So just wait for that to happen after
+	 sending the packet. */
+      WriteFile (my_sendsig, &sp, sizeof (sp), &len, NULL);
+      Sleep (INFINITE);
+    }
+}
+
 /* Exit the current thread very carefully.
    See cgf-000017 in DevNotes for more details on why this is
    necessary.  */
@@ -576,10 +578,16 @@ exit_thread (DWORD res)
   siginfo_t si = {__SIGTHREADEXIT, SI_KERNEL};
   si.si_value.sival_ptr = h;
   lock_process for_now;		/* May block indefinitely if we're exiting. */
+  if (exit_state)
+    {
+      for_now.release ();
+      Sleep (INFINITE);
+    }
+
   /* Tell wait_sig to wait for this thread to exit.  It can then release
      the lock below and close the above-opened handle. */
   sig_send (myself_nowait, si, &_my_tls);
-  ExitThread (0);		/* Should never hit this */
+  ExitThread (0);
 }
 
 int __stdcall
@@ -1368,6 +1376,7 @@ pending_signals::next ()
 static void WINAPI
 wait_sig (VOID *)
 {
+  extern int signal_exit_code;
   _sig_tls = &_my_tls;
   sig_hold = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 
@@ -1380,7 +1389,14 @@ wait_sig (VOID *)
     {
       if (pack.si.si_signo == __SIGHOLD)
 	WaitForSingleObject (sig_hold, INFINITE);
+
       DWORD nb;
+      /* If signal_exit_code is set then we are shutting down due to a signal.
+	 We'll exit this loop iff there is nothing more in the signal queue.  */
+      if (signal_exit_code
+	  && (!PeekNamedPipe (my_readsig, NULL, 0, NULL, &nb, NULL) || !nb))
+	break;
+
       pack.sigtls = NULL;
       if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))
 	break;
@@ -1399,6 +1415,9 @@ wait_sig (VOID *)
 #endif
 	  continue;
 	}
+
+      if (signal_exit_code && pack.si.si_signo > 0)
+	continue;		/* No more real signals allowed */
 
       sigset_t dummy_mask;
       if (!pack.mask)
@@ -1505,8 +1524,14 @@ wait_sig (VOID *)
 	break;
     }
 
-  close_my_readsig ();
   sigproc_printf ("signal thread exiting");
+
+  my_sendsig = NULL;		/* Make no_signals_allowed return true */
+  close_my_readsig ();		/* Cause any sig_send's to stop */
+
+  if (signal_exit_code)
+    _my_tls.signal_exit (signal_exit_code);
+
   /* Just wait for the process to go away.  Otherwise, this thread's
      exit value could be interpreted as the process exit value.
      See cgf-000017 in DevNotes for more details.  */

@@ -55,10 +55,15 @@ public:
     if (exiting && exit_state < ES_PROCESS_LOCKED)
       exit_state = ES_PROCESS_LOCKED;
   }
+  void release ()
+  {
+    locker.release ();
+    skip_unlock = true;
+  }
   ~lock_process ()
   {
     if (!skip_unlock)
-      locker.release ();
+      release ();
   }
   static void force_release (_cygtls *tid) {locker.release (tid);}
   friend class dtable;

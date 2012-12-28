@@ -1,3 +1,32 @@
+2012-12-28  cgf-000019
+
+(I forgot to mention that cgf-000018 was reverted.  Although I never saw
+a hang from this, I couldn't convince myself that one wasn't possible.)
+
+This fix attempts to correct a deadlock where, when a true Windows
+signal arrives, Windows creates a thread which "does stuff" and attempts
+to exit.  In the process of exiting Cygwin grabs the process lock.  If
+the signal thread has seen the signal and wants to exit, it can't
+because the newly-created thread now holds it.  But, since the new
+thread is relying on the signal thread to release its process lock,
+it exits and the process lock is never released.
+
+To fix this, I removed calls to _cygtls::signal_exit in favor of
+flagging that we were exiting by setting signal_exit_code (almost forgot
+to mark that NO_COPY: that would have been fun).  The new function
+setup_signal_exit() now handles setting things up so that ReadFile loop
+in wait_sig will do the right thing when it terminates.  This function
+may just Sleep indefinitely if a signal is being sent from a thread
+other than the signal thread.  wait_sig() was changed so that it will
+essentially drop into asychronous-read-mode when a signal which exits
+has been detected.  The ReadFile loop is exited when we know that the
+process is supposed to be exiting and there is nothing else in the
+signal queue.
+
+Although I never actually saw this happen, exit_thread() was also
+changed to release the process lock and just sleep indefintely if it is
+detected that we are exiting.
+
 2012-12-21  cgf-000018
 
 Re: cgf-000017
