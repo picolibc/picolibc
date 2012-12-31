@@ -185,7 +185,6 @@ void uinfo_init ();
 
 /* various events */
 void events_init ();
-void events_terminate ();
 
 void __stdcall close_all_files (bool = false);
 

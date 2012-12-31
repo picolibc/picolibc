@@ -1,3 +1,9 @@
+2012-12-31  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* dtable.cc (dtable::dup3): Fix bounds checking for valid newfd.
+	* syscalls.cc (dup2): Ditto.
+	* winsup.h (events_terminate): Delete obsolete function declaration.
+
 2012-12-28  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* DevNotes: Add entry cgf-000019.
