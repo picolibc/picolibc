@@ -1376,7 +1376,6 @@ pending_signals::next ()
 static void WINAPI
 wait_sig (VOID *)
 {
-  extern int signal_exit_code;
   _sig_tls = &_my_tls;
   sig_hold = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 
