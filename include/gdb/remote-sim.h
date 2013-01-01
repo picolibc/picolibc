@@ -1,7 +1,6 @@
 /* This file defines the interface between the simulator and gdb.
 
-   Copyright 1993-1994, 1996-1998, 2000, 2002, 2007-2012 Free Software
-   Foundation, Inc.
+   Copyright 1993-2013 Free Software Foundation, Inc.
 
    This file is part of GDB.
 

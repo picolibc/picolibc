@@ -1,6 +1,6 @@
 /* sim-rx.h --- interface between rl78 simulator and GDB.
 
-   Copyright 2011-2012 Free Software Foundation, Inc.
+   Copyright 2011-2013 Free Software Foundation, Inc.
 
    Contributed by Red Hat.
 

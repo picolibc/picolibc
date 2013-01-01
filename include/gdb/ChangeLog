@@ -1,3 +1,7 @@
+2013-01-01  Joel Brobecker  <brobecker@adacore.com>
+
+	Update year range in copyright notice of all files.
+
 2012-06-23  Doug Evans  <dje@google.com>
 
 	* gdb-index.h: New file.
@@ -250,7 +254,7 @@ Wed Jul 17 19:36:38 2002  J"orn Rennecke <joern.rennecke@superh.com>
 	* signals.h: New file, from gdb/defs.h.
 
 
-Copyright (C) 2002-2012 Free Software Foundation, Inc.
+Copyright (C) 2002-2013 Free Software Foundation, Inc.
 
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright

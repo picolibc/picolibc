@@ -1,5 +1,5 @@
 /* Target signal numbers for GDB and the GDB remote protocol.
-   Copyright 1986, 1988-2002, 2007-2012 Free Software Foundation, Inc.
+   Copyright 1986-2013 Free Software Foundation, Inc.
 
    This file is part of GDB.
 

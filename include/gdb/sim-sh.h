@@ -1,6 +1,5 @@
 /* This file defines the interface between the sh simulator and gdb.
-   Copyright (C) 2000, 2002, 2004, 2007-2012 Free Software Foundation,
-   Inc.
+   Copyright (C) 2000-2013 Free Software Foundation, Inc.
 
    This file is part of GDB.
 

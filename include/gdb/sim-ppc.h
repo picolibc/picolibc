@@ -1,6 +1,6 @@
 /* sim-ppc.h --- interface between PowerPC simulator and GDB.
 
-   Copyright 2004, 2007-2012 Free Software Foundation, Inc.
+   Copyright 2004-2013 Free Software Foundation, Inc.
 
    Contributed by Red Hat.
 
