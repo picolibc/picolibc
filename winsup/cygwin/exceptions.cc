@@ -1,7 +1,7 @@
 /* exceptions.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -163,8 +163,8 @@ open_stackdumpfile ()
 
 /* Utilities for dumping the stack, etc.  */
 
-static void
-dump_exception (EXCEPTION_RECORD *e,  CONTEXT *in)
+void
+cygwin_exception::dump_exception ()
 {
   const char *exception_name = NULL;
 
@@ -181,15 +181,15 @@ dump_exception (EXCEPTION_RECORD *e,  CONTEXT *in)
     }
 
   if (exception_name)
-    small_printf ("Exception: %s at eip=%08x\r\n", exception_name, in->Eip);
+    small_printf ("Exception: %s at eip=%08x\r\n", exception_name, ctx->Eip);
   else
-    small_printf ("Signal %d at eip=%08x\r\n", e->ExceptionCode, in->Eip);
+    small_printf ("Signal %d at eip=%08x\r\n", e->ExceptionCode, ctx->Eip);
   small_printf ("eax=%08x ebx=%08x ecx=%08x edx=%08x esi=%08x edi=%08x\r\n",
-		in->Eax, in->Ebx, in->Ecx, in->Edx, in->Esi, in->Edi);
+		ctx->Eax, ctx->Ebx, ctx->Ecx, ctx->Edx, ctx->Esi, ctx->Edi);
   small_printf ("ebp=%08x esp=%08x program=%W, pid %u, thread %s\r\n",
-		in->Ebp, in->Esp, myself->progname, myself->pid, cygthread::name ());
+		ctx->Ebp, ctx->Esp, myself->progname, myself->pid, cygthread::name ());
   small_printf ("cs=%04x ds=%04x es=%04x fs=%04x gs=%04x ss=%04x\r\n",
-		in->SegCs, in->SegDs, in->SegEs, in->SegFs, in->SegGs, in->SegSs);
+		ctx->SegCs, ctx->SegDs, ctx->SegEs, ctx->SegFs, ctx->SegGs, ctx->SegSs);
 }
 
 /* A class for manipulating the stack. */
@@ -273,7 +273,7 @@ stack_info::walk ()
 }
 
 void
-stackdump (DWORD ebp, PCONTEXT in, EXCEPTION_RECORD *e)
+cygwin_exception::dumpstack ()
 {
   static bool already_dumped;
 
@@ -283,11 +283,11 @@ stackdump (DWORD ebp, PCONTEXT in, EXCEPTION_RECORD *e)
   open_stackdumpfile ();
 
   if (e)
-    dump_exception (e, in);
+    dump_exception ();
 
   int i;
 
-  thestack.init (ebp, 1, !in);	/* Initialize from the input CONTEXT */
+  thestack.init (ebp, 1, !ctx);	/* Initialize from the input CONTEXT */
   small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
   for (i = 0; i < 16 && thestack++; i++)
     {
@@ -349,7 +349,8 @@ cygwin_stackdump ()
   CONTEXT c;
   c.ContextFlags = CONTEXT_FULL;
   GetThreadContext (GetCurrentThread (), &c);
-  stackdump (c.Ebp);
+  cygwin_exception exc (c.Ebp);
+  exc.dumpstack ();
 }
 
 #define TIME_TO_WAIT_FOR_DEBUGGER 10000
@@ -484,7 +485,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
   if (exit_state || e->ExceptionFlags)
     return 1;
 
-  siginfo_t si = {0};
+  siginfo_t si = {};
   si.si_code = SI_KERNEL;
   /* Coerce win32 value to posix value.  */
   switch (e->ExceptionCode)
@@ -594,16 +595,11 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
       return 1;
     }
 
+  if (me.andreas)
+    me.andreas->leave ();	/* Return from a "san" caught fault */
+
   debug_printf ("In cygwin_except_handler exception %p at %p sp %p", e->ExceptionCode, in->Eip, in->Esp);
   debug_printf ("In cygwin_except_handler signal %d at %p", si.si_signo, in->Eip);
-
-  bool masked = !!(me.sigmask & SIGTOMASK (si.si_signo));
-  if (masked)
-    syscall_printf ("signal %d, masked %p", si.si_signo,
-		    global_sigs[si.si_signo].sa_mask);
-
-  debug_printf ("In cygwin_except_handler calling %p",
-		 global_sigs[si.si_signo].sa_handler);
 
   DWORD *ebp = (DWORD *) in->Esp;
   for (DWORD *bpend = (DWORD *) __builtin_frame_address (0); ebp > bpend; ebp--)
@@ -613,9 +609,6 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	break;
       }
 
-  if (me.andreas)
-    me.andreas->leave ();	/* Return from a "san" caught fault */
-
   me.copy_context (in);
 
   /* Temporarily replace windows top level SEH with our own handler.
@@ -623,63 +616,38 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
      will be removed automatically after our exception handler returns. */
   _except_list->handler = handle;
 
-  if (masked
-      || &me == _sig_tls
-      || !cygwin_finished_initializing
-      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
-      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
-      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR)
+  /* Another exception could happen while tracing or while exiting.
+     Only do this once.  */
+  if (recursed++)
+    system_printf ("Error while dumping state (probably corrupted stack)");
+  else if (!try_to_debug (0))
+    rtl_unwind (frame, e);
+  else
     {
-      /* Print the exception to the console */
-      if (!myself->cygstarted)
-	for (int i = 0; status_info[i].name; i++)
-	  if (status_info[i].code == e->ExceptionCode)
-	    {
-	      system_printf ("Exception: %s", status_info[i].name);
-	      break;
-	    }
-
-      /* Another exception could happen while tracing or while exiting.
-	 Only do this once.  */
-      if (recursed++)
-	system_printf ("Error while dumping state (probably corrupted stack)");
-      else
-	{
-	  if (try_to_debug (0))
-	    {
-	      debugging = true;
-	      return 0;
-	    }
-
-	  rtl_unwind (frame, e);
-	  if (cygheap->rlim_core > 0UL)
-	    stackdump ((DWORD) ebp, in, e);
-	}
-
-      if ((NTSTATUS) e->ExceptionCode == STATUS_ACCESS_VIOLATION)
-	{
-	  int error_code = 0;
-	  if (si.si_code == SEGV_ACCERR)	/* Address present */
-	    error_code |= 1;
-	  if (e->ExceptionInformation[0])	/* Write access */
-	    error_code |= 2;
-	  if (!me.inside_kernel (in))		/* User space */
-	    error_code |= 4;
-	  klog (LOG_INFO, "%s[%d]: segfault at %08x rip %08x rsp %08x error %d",
-			  __progname, myself->pid,
-			  e->ExceptionInformation[1], in->Eip, in->Esp,
-			  error_code);
-	}
-
-      setup_signal_exit ((cygheap->rlim_core > 0UL ? 0x80 : 0) | si.si_signo);
+      debugging = true;
+      return 0;
     }
 
-  si.si_addr =  (si.si_signo == SIGSEGV || si.si_signo == SIGBUS
-		 ? (void *) e->ExceptionInformation[1]
-		 : (void *) in->Eip);
-  si.si_errno = si.si_pid = si.si_uid = 0;
+  /* FIXME: Probably should be handled in sigpacket::process */
+  if ((NTSTATUS) e->ExceptionCode == STATUS_ACCESS_VIOLATION)
+    {
+      int error_code = 0;
+      if (si.si_code == SEGV_ACCERR)	/* Address present */
+	error_code |= 1;
+      if (e->ExceptionInformation[0])	/* Write access */
+	error_code |= 2;
+      if (!me.inside_kernel (in))	/* User space */
+	error_code |= 4;
+      klog (LOG_INFO, "%s[%d]: segfault at %08x rip %08x rsp %08x error %d",
+		      __progname, myself->pid, e->ExceptionInformation[1],
+		      in->Eip, in->Esp, error_code);
+    }
+
+  cygwin_exception exc ((DWORD) ebp, in, e);
+  si.si_cyg = (void *) &exc;
+  si.si_addr = (void *) in->Eip;
   me.incyg++;
-  sig_send (NULL, si, &me);	// Signal myself
+  sig_send (NULL, si, &me);	/* Signal myself */
   me.incyg--;
   e->ExceptionFlags = 0;
   return 0;
@@ -962,7 +930,7 @@ ctrl_c_handler (DWORD type)
 	     list goad.  */
 	  if (global_sigs[SIGHUP].sa_handler != SIG_DFL)
 	    {
-	      sig_send (myself_nowait, SIGHUP);
+	      sig_send (myself, SIGHUP);
 	      return TRUE;
 	    }
 	  return FALSE;
@@ -1115,6 +1083,59 @@ set_signal_mask (sigset_t& setmask, sigset_t newmask)
     sig_dispatch_pending (true);
 }
 
+/* Exit due to a signal.  Should only be called from the signal thread.  */
+extern "C" {
+static void
+signal_exit (int sig, siginfo_t *si)
+{
+  debug_printf ("exiting due to signal %d", sig);
+  exit_state = ES_SIGNAL_EXIT;
+
+  if (have_execed)
+    {
+      sigproc_printf ("terminating captive process");
+      TerminateProcess (ch_spawn, sigExeced = sig);
+    }
+
+  if (cygheap->rlim_core > 0UL)
+    switch (sig)
+      {
+      case SIGABRT:
+      case SIGBUS:
+      case SIGFPE:
+      case SIGILL:
+      case SIGQUIT:
+      case SIGSEGV:
+      case SIGSYS:
+      case SIGTRAP:
+      case SIGXCPU:
+      case SIGXFSZ:
+	if (try_to_debug ())
+	  break;
+	if (si->si_code != SI_USER && si->si_cyg)
+	  ((cygwin_exception *) si->si_cyg)->dumpstack ();
+	else
+	  {
+	    cygwin_exception exc (_my_tls.thread_context.ebp);
+	    exc.dumpstack ();
+	  }
+	break;
+      }
+
+  lock_process until_exit (true);
+
+  if (have_execed || exit_state > ES_PROCESS_LOCKED)
+    myself.exit (sig);
+
+  /* Starve other threads in a vain attempt to stop them from doing something
+     stupid. */
+  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+
+  sigproc_printf ("about to call do_exit (%x)", sig);
+  do_exit (sig);
+}
+} /* extern "C" */
+
 int __stdcall
 sigpacket::process ()
 {
@@ -1224,17 +1245,38 @@ sigpacket::process ()
 stop:
   handler = (void *) sig_handle_tty_stop;
   thissig = dummy;
+  goto dosig;
+
+exit_sig:
+  handler = (void *) signal_exit;
+  thissig.sa_flags |= SA_SIGINFO;
+  if (si.si_signo == SIGKILL)
+    goto dispatch_sig;
 
 dosig:
   if (ISSTATE (myself, PID_STOPPED) && !continue_now)
-      rc = -1;		/* No signals delivered if stopped */
-  else
     {
-      /* Dispatch to the appropriate function. */
-      sigproc_printf ("signal %d, signal handler %p", si.si_signo, handler);
-      rc = setup_handler (handler, thissig, tls);
-      continue_now = false;
+      rc = -1;		/* No signals delivered if stopped */
+      goto done;
     }
+
+dispatch_sig:
+  /* Do stuff for gdb */
+  if (si.si_code == SI_USER || !si.si_cyg)
+    {
+      CONTEXT c;
+      c.ContextFlags = CONTEXT_FULL;
+      GetThreadContext (hMainThread, &c);
+      _my_tls.copy_context (&c);
+
+      /* Tell gdb that we got a signal. Presumably, gdb already noticed this
+         if we hit an exception.  */
+      _my_tls.signal_debugger (si.si_signo);
+    }
+  /* Dispatch to the appropriate function. */
+  sigproc_printf ("signal %d, signal handler %p", si.si_signo, handler);
+  rc = setup_handler (handler, thissig, tls);
+  continue_now = false;
 
 done:
   if (continue_now)
@@ -1245,10 +1287,6 @@ done:
   sigproc_printf ("returning %d", rc);
   return rc;
 
-exit_sig:
-  sigproc_printf ("setting up for exit with signal %d", si.si_signo);
-  setup_signal_exit (si.si_signo);
-  return rc;
 }
 
 int
