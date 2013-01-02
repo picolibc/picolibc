@@ -1,4 +1,8 @@
-2013-01-02  Christopher Faylor  <me.cygwin2012@cgf.cx>
+2013-01-02  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* DevNotes: Add entry cgf-000020, relating to previous checkin.
+
+2013-01-02  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* cygtls.h (_cygtls::signal_exit): Delete from class.
 	* exception.h (cygwin_exception): New class.

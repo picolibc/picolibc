@@ -1,3 +1,32 @@
+2013-01-02  cgf-000020
+
+(This entry should have been checked in with the changes but... I forgot)
+
+This is a fairly big revamp of the way that windows signals are handled.
+The intent is that all signal decisions should be made by the signal
+thread; not by the exception handler.
+
+This required the ability to pass information from the exception handler
+to the signal thread so, a si_cyg field was added to siginfo_t.  This
+contains information needed to generate a "core dump".  Hmm.  Haven't
+checked to see if this breaks Cygwin's hardly-ever-used real core dump
+facility.
+
+Anyway, I moved signal_exit back into exceptions.cc and removed it from
+the sigpacket class.  This function is now treated like a signal handler
+function - Cygwin will cause it to be dispatched in the context of
+whatever thread caught the signal.  signal_exit also makes the
+determination about when to write a stackdump.
+
+The signal-handler thread will no longer ever attempt to exit.  It will
+just keep processing signals (it will not process real signals after
+Cygwin stops shutting down, however).  This should make it impossible
+for the signal thread to ever block waiting for the process lock since
+it now never grabs the process lock.  The signal-handler thread will
+notify gdb when it gets a signal now but, in theory, gdb should see the
+context of the thread which received the signal, not the signal-handler
+thread.
+
 2012-12-28  cgf-000019
 
 (I forgot to mention that cgf-000018 was reverted.  Although I never saw
