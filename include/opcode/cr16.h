@@ -1,5 +1,5 @@
 /* cr16.h -- Header file for CR16 opcode and register tables.
-   Copyright 2007, 2008, 2010 Free Software Foundation, Inc.
+   Copyright 2007, 2008, 2010, 2013 Free Software Foundation, Inc.
    Contributed by M R Swami Reddy
 
    This file is part of GAS, GDB and the GNU binutils.
@@ -26,21 +26,21 @@
    Therefore, order MUST be preserved.  */
 
 typedef enum
-  {
-    /* 16-bit general purpose registers.  */
-    r0, r1, r2, r3, 
-    r4, r5, r6, r7, 
-    r8, r9, r10, r11, 
-    r12_L = 12, r13_L = 13, ra = 14, sp_L = 15,
+{
+  /* 16-bit general purpose registers.  */
+  r0, r1, r2, r3, 
+  r4, r5, r6, r7, 
+  r8, r9, r10, r11, 
+  r12_L = 12, r13_L = 13, ra = 14, sp_L = 15,
 
-    /* 32-bit general purpose registers.  */
-    r12 = 12, r13 = 13, r14 = 14, r15 = 15, 
-    era = 14, sp = 15, RA,
+  /* 32-bit general purpose registers.  */
+  r12 = 12, r13 = 13, r14 = 14, r15 = 15, 
+  era = 14, sp = 15, RA,
 
-    /* Not a register.  */
-    nullregister,
-    MAX_REG
-  }
+  /* Not a register.  */
+  nullregister,
+  MAX_REG
+}
 reg;
 
 /* CR16 processor registers and special registers :
@@ -48,33 +48,33 @@ reg;
    (cr16_pregtab). Therefore, order MUST be preserved.  */
 
 typedef enum
-  {
-    /* processor registers.  */
-    dbs = MAX_REG, 
-    dsr, dcrl, dcrh, 
-    car0l, car0h, car1l, car1h, 
-    cfg, psr, intbasel, intbaseh, 
-    ispl, isph, uspl, usph,
-    dcr =  dcrl, 
-    car0 = car0l, 
-    car1 = car1l, 
-    intbase = intbasel, 
-    isp =  ispl, 
-    usp =  uspl,
-    /* Not a processor register.  */
-    nullpregister = usph + 1,
-    MAX_PREG
-  }
+{
+  /* processor registers.  */
+  dbs = MAX_REG, 
+  dsr, dcrl, dcrh, 
+  car0l, car0h, car1l, car1h, 
+  cfg, psr, intbasel, intbaseh, 
+  ispl, isph, uspl, usph,
+  dcr =  dcrl, 
+  car0 = car0l, 
+  car1 = car1l, 
+  intbase = intbasel, 
+  isp =  ispl, 
+  usp =  uspl,
+  /* Not a processor register.  */
+  nullpregister = usph + 1,
+  MAX_PREG
+}
 preg;
 
 /* CR16 Register types. */
 
 typedef enum
-  {
-    CR16_R_REGTYPE,    /* r<N>      */
-    CR16_RP_REGTYPE,   /* reg pair  */
-    CR16_P_REGTYPE     /* Processor register  */
-  }
+{
+  CR16_R_REGTYPE,    /* r<N>      */
+  CR16_RP_REGTYPE,   /* reg pair  */
+  CR16_P_REGTYPE     /* Processor register  */
+}
 reg_type;
 
 /* CR16 argument types :
@@ -89,69 +89,69 @@ reg_type;
    idxrp - index with register pair
    rbase - register base
    rpbase - register pair base
-   pr - processor register */
+   pr - processor register.  */
 
 typedef enum
-  {
-    arg_r,
-    arg_c,
-    arg_cr,
-    arg_crp,
-    arg_ic,
-    arg_icr,
-    arg_idxr,
-    arg_idxrp,
-    arg_rbase,
-    arg_rpbase,
-    arg_rp,
-    arg_pr,
-    arg_prp,
-    arg_cc,
-    arg_ra,
-    /* Not an argument.  */
-    nullargs
-  }
+{
+  arg_r,
+  arg_c,
+  arg_cr,
+  arg_crp,
+  arg_ic,
+  arg_icr,
+  arg_idxr,
+  arg_idxrp,
+  arg_rbase,
+  arg_rpbase,
+  arg_rp,
+  arg_pr,
+  arg_prp,
+  arg_cc,
+  arg_ra,
+  /* Not an argument.  */
+  nullargs
+}
 argtype;
 
-/* CR16 operand types:The operand types correspond to instructions operands.*/
+/* CR16 operand types:The operand types correspond to instructions operands.  */
 
 typedef enum
-  {
-    dummy,
-    /* N-bit signed immediate.  */
-    imm3, imm4, imm5, imm6, imm16, imm20, imm32,
-    /* N-bit unsigned immediate.  */
-    uimm3, uimm3_1, uimm4, uimm4_1, uimm5, uimm16, uimm20, uimm32,
-    /* N-bit signed displacement.  */
-    disps5, disps17, disps25,
-    /* N-bit unsigned displacement.  */
-    dispe9,
-    /* N-bit absolute address.  */
-    abs20, abs24,
-    /* Register relative.  */
-    rra, rbase, rbase_disps20, rbase_dispe20,
-    /* Register pair relative.  */
-    rpbase_disps0, rpbase_dispe4, rpbase_disps4, rpbase_disps16,
-    rpbase_disps20, rpbase_dispe20,
-    /* Register index.  */
-    rindex7_abs20, rindex8_abs20,
-    /* Register pair index.  */
-    rpindex_disps0, rpindex_disps14, rpindex_disps20,
-    /* register.  */
-    regr, 
-    /* register pair.  */
-    regp, 
-    /* processor register.  */
-    pregr, 
-    /* processor register 32 bit.  */
-    pregrp, 
-    /* condition code - 4 bit.  */
-    cc, 
-    /* Not an operand.  */
-    nulloperand,
-    /* Maximum supported operand.  */
-    MAX_OPRD
-  }
+{
+  dummy,
+  /* N-bit signed immediate.  */
+  imm3, imm4, imm5, imm6, imm16, imm20, imm32,
+  /* N-bit unsigned immediate.  */
+  uimm3, uimm3_1, uimm4, uimm4_1, uimm5, uimm16, uimm20, uimm32,
+  /* N-bit signed displacement.  */
+  disps5, disps17, disps25,
+  /* N-bit unsigned displacement.  */
+  dispe9,
+  /* N-bit absolute address.  */
+  abs20, abs24,
+  /* Register relative.  */
+  rra, rbase, rbase_disps20, rbase_dispe20,
+  /* Register pair relative.  */
+  rpbase_disps0, rpbase_dispe4, rpbase_disps4, rpbase_disps16,
+  rpbase_disps20, rpbase_dispe20,
+  /* Register index.  */
+  rindex7_abs20, rindex8_abs20,
+  /* Register pair index.  */
+  rpindex_disps0, rpindex_disps14, rpindex_disps20,
+  /* register.  */
+  regr, 
+  /* register pair.  */
+  regp, 
+  /* processor register.  */
+  pregr, 
+  /* processor register 32 bit.  */
+  pregrp, 
+  /* condition code - 4 bit.  */
+  cc, 
+  /* Not an operand.  */
+  nulloperand,
+  /* Maximum supported operand.  */
+  MAX_OPRD
+}
 operand_type;
 
 /* CR16 instruction types.  */
@@ -239,126 +239,126 @@ operand_type;
 /* Single operand description.  */
 
 typedef struct
-  {
-    /* Operand type.  */
-    operand_type op_type;
-    /* Operand location within the opcode.  */
-    unsigned int shift;
-  }
+{
+  /* Operand type.  */
+  operand_type op_type;
+  /* Operand location within the opcode.  */
+  unsigned int shift;
+}
 operand_desc;
 
 /* Instruction data structure used in instruction table.  */
 
 typedef struct
-  {
-    /* Name.  */
-    const char *mnemonic;
-    /* Size (in words).  */
-    unsigned int size;
-    /* Constant prefix (matched by the disassembler).  */
-    unsigned long match;  /* ie opcode */
-    /* Match size (in bits).  */
-    /* MASK: if( (i & match_bits) == match ) then match */
-    int match_bits;
-    /* Attributes.  */
-    unsigned int flags;
-    /* Operands (always last, so unreferenced operands are initialized).  */
-    operand_desc operands[MAX_OPERANDS];
-  }
+{
+  /* Name.  */
+  const char *mnemonic;
+  /* Size (in words).  */
+  unsigned int size;
+  /* Constant prefix (matched by the disassembler).  */
+  unsigned long match;  /* ie opcode */
+  /* Match size (in bits).  */
+  /* MASK: if( (i & match_bits) == match ) then match */
+  int match_bits;
+  /* Attributes.  */
+  unsigned int flags;
+  /* Operands (always last, so unreferenced operands are initialized).  */
+  operand_desc operands[MAX_OPERANDS];
+}
 inst;
 
 /* Data structure for a single instruction's arguments (Operands).  */
 
 typedef struct
-  {
-    /* Register or base register.  */
-    reg r;
-    /* Register pair register.  */
-    reg rp;
-    /* Index register.  */
-    reg i_r;
-    /* Processor register.  */
-    preg pr;
-    /* Processor register. 32 bit  */
-    preg prp;
-    /* Constant/immediate/absolute value.  */
-    long constant;
-    /* CC code.  */
-    unsigned int cc;
-    /* Scaled index mode.  */
-    unsigned int scale;
-    /* Argument type.  */
-    argtype type;
-    /* Size of the argument (in bits) required to represent.  */
-    int size;
+{
+  /* Register or base register.  */
+  reg r;
+  /* Register pair register.  */
+  reg rp;
+  /* Index register.  */
+  reg i_r;
+  /* Processor register.  */
+  preg pr;
+  /* Processor register. 32 bit  */
+  preg prp;
+  /* Constant/immediate/absolute value.  */
+  long constant;
+  /* CC code.  */
+  unsigned int cc;
+  /* Scaled index mode.  */
+  unsigned int scale;
+  /* Argument type.  */
+  argtype type;
+  /* Size of the argument (in bits) required to represent.  */
+  int size;
   /* The type of the expression.  */
-    unsigned char X_op;
-  }
+  unsigned char X_op;
+}
 argument;
 
 /* Internal structure to hold the various entities
    corresponding to the current assembling instruction.  */
 
 typedef struct
-  {
-    /* Number of arguments.  */
-    int nargs;
-    /* The argument data structure for storing args (operands).  */
-    argument arg[MAX_OPERANDS];
+{
+  /* Number of arguments.  */
+  int nargs;
+  /* The argument data structure for storing args (operands).  */
+  argument arg[MAX_OPERANDS];
 /* The following fields are required only by CR16-assembler.  */
 #ifdef TC_CR16
-    /* Expression used for setting the fixups (if any).  */
-    expressionS exp;
-    bfd_reloc_code_real_type rtype;
+  /* Expression used for setting the fixups (if any).  */
+  expressionS exp;
+  bfd_reloc_code_real_type rtype;
 #endif /* TC_CR16 */
-    /* Instruction size (in bytes).  */
-    int size;
-  }
+  /* Instruction size (in bytes).  */
+  int size;
+}
 ins;
 
 /* Structure to hold information about predefined operands.  */
 
 typedef struct
-  {
-    /* Size (in bits).  */
-    unsigned int bit_size;
-    /* Argument type.  */
-    argtype arg_type;
-    /* One bit syntax flags.  */
-    int flags;
-  }
+{
+  /* Size (in bits).  */
+  unsigned int bit_size;
+  /* Argument type.  */
+  argtype arg_type;
+  /* One bit syntax flags.  */
+  int flags;
+}
 operand_entry;
 
 /* Structure to hold trap handler information.  */
 
 typedef struct
-  {
-    /* Trap name.  */
-    char *name;
-    /* Index in dispatch table.  */
-    unsigned int entry;
-  }
+{
+  /* Trap name.  */
+  char *name;
+  /* Index in dispatch table.  */
+  unsigned int entry;
+}
 trap_entry;
 
 /* Structure to hold information about predefined registers.  */
 
 typedef struct
+{
+  /* Name (string representation).  */
+  char *name;
+  /* Value (enum representation).  */
+  union
   {
-    /* Name (string representation).  */
-    char *name;
-    /* Value (enum representation).  */
-    union
-    {
-      /* Register.  */
-      reg reg_val;
-      /* processor register.  */
-      preg preg_val;
-    } value;
-    /* Register image.  */
-    int image;
-    /* Register type.  */
-    reg_type type;
-  }
+    /* Register.  */
+    reg reg_val;
+    /* processor register.  */
+    preg preg_val;
+  } value;
+  /* Register image.  */
+  int image;
+  /* Register type.  */
+  reg_type type;
+}
 reg_entry;
 
 /* CR16 opcode table.  */
@@ -434,5 +434,18 @@ extern const inst *instruction;
 /* Replace all appearances of 'long long int' with LONGLONG.  */
 typedef long long int LONGLONG;
 typedef unsigned long long ULONGLONG;
+
+/* Data types for opcode handling.  */
+typedef unsigned long dwordU;
+typedef unsigned short wordU;
+
+/* Globals to store opcode data and build the instruction.  */
+extern wordU cr16_words[3];
+extern ULONGLONG cr16_allWords;
+extern ins cr16_currInsn;
+
+/* Prototypes for function in cr16-dis.c.  */
+extern void make_instruction (void);
+extern int  match_opcode (void);
 
 #endif /* _CR16_H_ */

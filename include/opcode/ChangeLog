@@ -1,3 +1,9 @@
+2013-01-02  Kaushik Phatak  <kaushik.phatak@kpitcummins.com>
+
+	* cr16.h (dwordU,wordU): Moved typedefs from cr16-dis.c
+	(make_instruction,match_opcode): Added function prototypes.
+	(cr16_words,cr16_allWords,cr16_currInsn): Declare as extern.
+
 2012-11-23  Alan Modra  <amodra@gmail.com>
 
 	* ppc.h (ppc_parse_cpu): Update prototype.
