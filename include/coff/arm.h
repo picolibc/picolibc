@@ -1,5 +1,6 @@
 /* ARM COFF support for BFD.
-   Copyright 1998, 1999, 2000, 2002, 2003, 2010 Free Software Foundation, Inc.
+   Copyright 1998, 1999, 2000, 2002, 2003, 2010, 2013
+   Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -81,9 +82,10 @@
 
 #define	ARMPEMAGIC	0x1c0
 #define	THUMBPEMAGIC	0x1c2
+#define	ARMV7PEMAGIC	0x1c4
 
 #undef  ARMBADMAG
-#define ARMBADMAG(x) (((x).f_magic != ARMMAGIC) && ((x).f_magic != ARMPEMAGIC) && ((x).f_magic != THUMBPEMAGIC))
+#define ARMBADMAG(x) (((x).f_magic != ARMMAGIC) && ((x).f_magic != ARMPEMAGIC) && ((x).f_magic != THUMBPEMAGIC) && ((x).f_magic != ARMV7PEMAGIC))
 
 #define OMAGIC          0404    /* object files, eg as output */
 #define ZMAGIC          0413    /* demand load format, eg normal ld output */

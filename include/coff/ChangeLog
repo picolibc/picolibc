@@ -1,3 +1,8 @@
+2013-01-02  Martin Storsjo <martin@martin.st>
+
+	* arm.h (ARMV7PEMAGIC): Define.
+	(ARMBADMAG): Update.
+
 2011-06-02  Nick Clifton  <nickc@redhat.com>
 
 	* i860.h: Fix spelling mistake in comment.
