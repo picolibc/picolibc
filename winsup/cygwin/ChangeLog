@@ -1,3 +1,8 @@
+2013-01-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* sigproc.cc (exit_thread): Set thread signal mask so that no signals
+	are sent to an exiting thread.
+
 2013-01-02  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* sigproc.cc (no_signals_available): Remove exit_state test since

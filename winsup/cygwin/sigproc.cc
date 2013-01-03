@@ -488,7 +488,8 @@ sigproc_terminate (exit_states es)
 void
 exit_thread (DWORD res)
 {
-  lock_process for_now;		/* May block indefinitely if we're exiting. */
+  sigfillset (&_my_tls.sigmask);	/* No signals wanted */
+  lock_process for_now;			/* May block indefinitely when exiting. */
   if (exit_state)
     {
       for_now.release ();
