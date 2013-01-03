@@ -31,7 +31,7 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define no_signals_available() (exit_state || (myself->exitcode & EXITCODE_SET) || (&_my_tls == _sig_tls))
+#define no_signals_available() ((myself->exitcode & EXITCODE_SET) || (&_my_tls == _sig_tls))
 
 /*
  * Global variables
@@ -426,7 +426,7 @@ sigpending (sigset_t *mask)
 void __stdcall
 sig_dispatch_pending (bool fast)
 {
-  if (exit_state || &_my_tls == _sig_tls)
+  if (&_my_tls == _sig_tls)
     {
 #ifdef DEBUGGING
       sigproc_printf ("exit_state %d, cur thread id %p, _sig_tls %p, sigq.start.next %p",
@@ -488,10 +488,14 @@ sigproc_terminate (exit_states es)
 void
 exit_thread (DWORD res)
 {
+  lock_process for_now;		/* May block indefinitely if we're exiting. */
+  if (exit_state)
+    {
+      for_now.release ();
+      Sleep (INFINITE);
+    }
+
   HANDLE h;
-
-# undef ExitThread
-
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
                         GetCurrentProcess (), &h,
                         0, FALSE, DUPLICATE_SAME_ACCESS))
@@ -502,18 +506,12 @@ exit_thread (DWORD res)
       ExitThread (res);
     }
   ProtectHandle1 (h, exit_thread);
-  siginfo_t si = {__SIGTHREADEXIT, SI_KERNEL};
-  si.si_cyg = h;
-  lock_process for_now;		/* May block indefinitely if we're exiting. */
-  if (exit_state)
-    {
-      for_now.release ();
-      Sleep (INFINITE);
-    }
-
   /* Tell wait_sig to wait for this thread to exit.  It can then release
      the lock below and close the above-opened handle. */
+  siginfo_t si = {__SIGTHREADEXIT, SI_KERNEL};
+  si.si_cyg = h;
   sig_send (myself_nowait, si, &_my_tls);
+# undef ExitThread
   ExitThread (0);
 }
 
@@ -579,7 +577,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  set_errno (EAGAIN);
 	  goto out;		// Either exiting or not yet initializing
 	}
-      wait_for_completion = p != myself_nowait && _my_tls.isinitialized () && !exit_state;
+      wait_for_completion = p != myself_nowait;
       p = myself;
     }
 
@@ -1336,7 +1334,7 @@ wait_sig (VOID *)
 	}
 
       /* Don't process signals when we start exiting */
-      if (exit_state && pack.si.si_signo)
+      if (exit_state && pack.si.si_signo > 0)
 	continue;
 
       sigset_t dummy_mask;

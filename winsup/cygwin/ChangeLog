@@ -1,5 +1,15 @@
 2013-01-02  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* sigproc.cc (no_signals_available): Remove exit_state test since
+	signals are available in a limited fashion when exiting.
+	(sig_dispatch_pending): Ditto.
+	(sig_send): Ditto.
+	(exit_thread): Rearrange to avoid an unnecessary DuplicateProcess when
+	exiting.
+	(wait_sig): Allow special signals when exiting.
+
+2013-01-02  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* DevNotes: Add entry cgf-000020, relating to previous checkin.
 
 2013-01-02  Christopher Faylor  <me.cygwin2013@cgf.cx>
