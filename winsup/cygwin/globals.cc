@@ -34,8 +34,8 @@ UINT system_wow64_directory_length;
 enum exit_states
 {
   ES_NOT_EXITING = 0,
-  ES_SIGNAL_EXIT,
   ES_EXIT_STARTING,
+  ES_SIGNAL_EXIT,
   ES_PROCESS_LOCKED,
   ES_EVENTS_TERMINATE,
   ES_SIGNAL,

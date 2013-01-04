@@ -1,5 +1,12 @@
 2013-01-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* globals.cc (exit_states): Renumber so that ES_EXIT_STARTING is first,
+	as intended.
+	* sigproc.cc (wait_sig): Only stop accepting signals after
+	exit_state > ES_EXIT_STARTING.
+
+2013-01-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* sigproc.cc (exit_thread): Set thread signal mask so that no signals
 	are sent to an exiting thread.
 

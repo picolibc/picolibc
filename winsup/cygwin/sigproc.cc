@@ -1335,7 +1335,7 @@ wait_sig (VOID *)
 	}
 
       /* Don't process signals when we start exiting */
-      if (exit_state && pack.si.si_signo > 0)
+      if (exit_state > ES_EXIT_STARTING && pack.si.si_signo > 0)
 	continue;
 
       sigset_t dummy_mask;
