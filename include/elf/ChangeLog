@@ -1,3 +1,8 @@
+2013-01-04  Juergen Urban <JuergenUrban@gmx.de>
+
+	* mips.h: Add MIPS machine variant number for r5900 which is
+	compatible with old Playstation 2 software.
+
 2012-11-16  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* common.h (DF_1_CONLFAT): Renamed to ...

@@ -1,6 +1,6 @@
 /* mips.h.  Mips opcode list for GDB, the GNU debugger.
    Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005, 2008, 2009, 2010
+   2003, 2004, 2005, 2008, 2009, 2010, 2013
    Free Software Foundation, Inc.
    Contributed by Ralph Campbell and OSF
    Commented and modified by Ian Lance Taylor, Cygnus Support
@@ -732,7 +732,8 @@ static const unsigned int mips_isa_table[] =
 #define INSN_DSP                  0x00001000
 #define INSN_DSP64                0x00002000
 
-/* 0x00004000 is unused.  */
+/* MIPS R5900 instruction */
+#define INSN_5900                 0x00004000
 
 /* MIPS-3D ASE */
 #define INSN_MIPS3D               0x00008000
@@ -811,6 +812,7 @@ static const unsigned int mips_isa_table[] =
 #define CPU_R5000	5000
 #define CPU_VR5400	5400
 #define CPU_VR5500	5500
+#define CPU_R5900	5900
 #define CPU_R6000	6000
 #define CPU_RM7000	7000
 #define CPU_R8000	8000
@@ -875,6 +877,9 @@ cpu_is_member (int cpu, unsigned int mask)
 
     case CPU_VR5500:
       return (mask & INSN_5500) != 0;
+
+    case CPU_R5900:
+      return (mask & INSN_5900) != 0;
 
     case CPU_LOONGSON_2E:
       return (mask & INSN_LOONGSON_2E) != 0;
@@ -1078,6 +1083,7 @@ enum
   M_LL_OB,
   M_LLD_AB,
   M_LLD_OB,
+  M_LQ_AB,
   M_LS_A,
   M_LW_A,
   M_LW_AB,
@@ -1179,6 +1185,7 @@ enum
   M_SB_AB,
   M_SH_A,
   M_SH_AB,
+  M_SQ_AB,
   M_SW_A,
   M_SW_AB,
   M_SWC0_A,
