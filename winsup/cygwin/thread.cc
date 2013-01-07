@@ -1391,8 +1391,9 @@ pthread_rwlock::rdlock ()
       goto DONE;
     }
 
-  reader = new struct RWLOCK_READER;
-  if (!reader)
+  if ((reader = add_reader ()))
+    ++reader->n;
+  else
     {
       result = EAGAIN;
       goto DONE;
@@ -1409,9 +1410,6 @@ pthread_rwlock::rdlock ()
       pthread_cleanup_pop (0);
     }
 
-  reader->thread = self;
-  reader->n = 1;
-  add_reader (reader);
 
  DONE:
   mtx.unlock ();
@@ -1427,21 +1425,15 @@ pthread_rwlock::tryrdlock ()
 
   mtx.lock ();
 
-  if (writer || waiting_writers || lookup_reader (self))
+  if (writer || waiting_writers)
     result = EBUSY;
   else
     {
-      struct RWLOCK_READER *reader;
-
-      reader = lookup_reader (self);
+      RWLOCK_READER *reader = lookup_reader (self);
+      if (!reader)
+	reader = add_reader ();
       if (reader && reader->n < ULONG_MAX)
 	++reader->n;
-      else if ((reader = new struct RWLOCK_READER))
-	{
-	  reader->thread = self;
-	  reader->n = 1;
-	  add_reader (reader);
-	}
       else
 	result = EAGAIN;
     }
@@ -1544,10 +1536,13 @@ pthread_rwlock::unlock ()
   return result;
 }
 
-void
-pthread_rwlock::add_reader (struct RWLOCK_READER *rd)
+pthread_rwlock::RWLOCK_READER *
+pthread_rwlock::add_reader ()
 {
-  List_insert (readers, rd);
+  RWLOCK_READER *rd = new RWLOCK_READER;
+  if (rd)
+    List_insert (readers, rd);
+  return rd;
 }
 
 void

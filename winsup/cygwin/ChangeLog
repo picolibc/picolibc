@@ -1,3 +1,15 @@
+2013-01-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* thread.cc (pthread_rwlock::add_reader): Perform new operation here
+	and return pointer to allocated RWLOCK_READER structure.
+	(pthread_rwlock::rdlock): Reorganize to reflect new add_reader
+	functionality.
+	(pthread_rwlock::tryrdlock): Ditto.  Remove unneeded call to
+	lookup_reader().
+	* thread.h (pthread_rwlock::RWLOCK_READER::RWLOCK_READER): New
+	constructor.
+	(pthread_rwlock::add_reader): Reflect new functionality.
+
 2013-01-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* globals.cc (exit_states): Renumber so that ES_EXIT_STARTING is first,

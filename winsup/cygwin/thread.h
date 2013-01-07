@@ -555,6 +555,7 @@ public:
     struct RWLOCK_READER *next;
     pthread_t thread;
     unsigned long n;
+    RWLOCK_READER (): next (NULL), thread (pthread::self ()), n (0) {}
   } *readers;
   fast_mutex readers_mx;
 
@@ -583,7 +584,7 @@ public:
 private:
   static List<pthread_rwlock> rwlocks;
 
-  void add_reader (struct RWLOCK_READER *rd);
+  RWLOCK_READER *add_reader ();
   void remove_reader (struct RWLOCK_READER *rd);
   struct RWLOCK_READER *lookup_reader (pthread_t thread);
 
