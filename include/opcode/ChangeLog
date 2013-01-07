@@ -1,3 +1,8 @@
+2013-01-07  Kaushik Phatak  <kaushik.phatak@kpitcummins.com>
+
+	* cr16.h (make_instruction): Rename to cr16_make_instruction.
+	(match_opcode): Rename to cr16_match_opcode.
+
 2013-01-04  Juergen Urban <JuergenUrban@gmx.de>
 
 	* mips.h: Add support for r5900 instructions including lq and sq.

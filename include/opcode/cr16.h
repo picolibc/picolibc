@@ -445,7 +445,7 @@ extern ULONGLONG cr16_allWords;
 extern ins cr16_currInsn;
 
 /* Prototypes for function in cr16-dis.c.  */
-extern void make_instruction (void);
-extern int  match_opcode (void);
+extern void cr16_make_instruction (void);
+extern int  cr16_match_opcode (void);
 
 #endif /* _CR16_H_ */
