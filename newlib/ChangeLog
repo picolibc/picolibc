@@ -1,3 +1,7 @@
+2013-01-07  Steve Ellcey  <sellcey@mips.com>
+
+	* libc/machine/mips/memcpy.S (memcpy): Check if _MIPS_SIM is set.
+
 2012-12-20  Jeff Johnston  <jjohnstn@redhat.com>
 
         * NEWS: Update with 2.0.0 info.
