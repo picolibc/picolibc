@@ -1,3 +1,8 @@
+2013-01-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.LIBGLOSS: Remove license for mips/lsi33k-stub.h which no longer
+	exists and replace the new bfin license in its location.
+
 2013-01-07  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR gas/14899
