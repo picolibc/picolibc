@@ -1,5 +1,17 @@
 2013-01-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* thread.cc (pthread_rwlock::lookup_reader): Remove parameter: always
+	assume that we're looking for the current thread.
+	(pthread_rwlock::tryrdlock): Eliminate self variable.  Accommodate
+	change in lookup_reader().
+	(pthread_rwlock::unlock): Ditto.
+	(pthread_rwlock::rdlock): Ditto.  Move add_reader call after writer
+	tests to more closely mimic old behavior.
+	(pthread_rwlock::wrlock): Accommodate change in lookup_reader().
+	* thread.h ((pthread_rwlock::lookup_reader): Eliminate argument.
+
+2013-01-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* thread.cc (pthread_rwlock::add_reader): Perform new operation here
 	and return pointer to allocated RWLOCK_READER structure.
 	(pthread_rwlock::rdlock): Reorganize to reflect new add_reader
