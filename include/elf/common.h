@@ -1,6 +1,7 @@
 /* ELF support for BFD.
    Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
+   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+   2013
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -552,6 +553,13 @@
 #define NT_S390_SYSTEM_CALL     0x307   /* S390 system call restart data */
 					/*   note name must be "LINUX".  */
 #define NT_ARM_VFP	0x400		/* ARM VFP registers */
+/* The following definitions should really use NT_AARCH_..., but defined
+   this way for compatibility with Linux.  */
+#define NT_ARM_TLS	0x401		/* AArch TLS registers */
+					/*   note name must be "LINUX".  */
+#define NT_ARM_HW_BREAK	0x402		/* AArch hardware breakpoint registers */
+					/*   note name must be "LINUX".  */
+#define NT_ARM_HW_WATCH	0x403		/* AArch hardware watchpoint registers */
 					/*   note name must be "LINUX".  */
 #define NT_SIGINFO	0x53494749	/* Fields of siginfo_t.  */
 #define NT_FILE		0x46494c45	/* Description of mapped files.  */
