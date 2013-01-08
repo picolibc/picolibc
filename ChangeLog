@@ -1,3 +1,8 @@
+2013-01-08  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
+
+	* config.guss: Update from config repo.
+	* config.sub: Dito.
+
 2013-01-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.LIBGLOSS: Remove license for mips/lsi33k-stub.h which no longer
