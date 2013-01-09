@@ -117,7 +117,7 @@ child_info::prefork (bool detached)
   if (!detached)
     {
       if (!CreatePipe (&rd_proc_pipe, &wr_proc_pipe, &sec_none_nih, 16))
-	api_fatal ("prefork: couldn't create pipe process tracker %E");
+	api_fatal ("prefork: couldn't create pipe process tracker, %E");
 
       if (!SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT,
 				 HANDLE_FLAG_INHERIT))

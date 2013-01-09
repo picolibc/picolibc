@@ -1,6 +1,6 @@
 /* cygtls.h
 
-   Copyright 2003, 2004, 2005, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -218,7 +218,6 @@ public:
     __attribute__((regparm(3)));
 
   bool inside_kernel (CONTEXT *);
-  void signal_exit (int) __attribute__ ((noreturn, regparm(2)));
   void copy_context (CONTEXT *) __attribute__ ((regparm(2)));
   void signal_debugger (int) __attribute__ ((regparm(2)));
 

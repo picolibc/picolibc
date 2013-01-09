@@ -1,6 +1,6 @@
 /* exception.h
 
-   Copyright 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -32,10 +32,15 @@ public:
   ~exception () __attribute__ ((always_inline)) { _except_list = save; }
 };
 
-void stackdump (PUINT_PTR, CONTEXT * = NULL, EXCEPTION_RECORD * = NULL);
-extern void inline
-stackdump (PUINT_PTR n, bool)
+class cygwin_exception
 {
-  stackdump (n, (CONTEXT *) 1);
-}
-
+  PUINT_PTR framep;
+  PCONTEXT ctx;
+  EXCEPTION_RECORD *e;
+  void dump_exception ();
+public:
+  cygwin_exception (PUINT_PTR in_framep, PCONTEXT in_ctx = NULL, EXCEPTION_RECORD *in_e = NULL):
+    framep (in_framep), ctx (in_ctx), e (in_e) {}
+  void dumpstack ();
+  PCONTEXT context () const {return ctx;}
+};

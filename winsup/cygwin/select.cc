@@ -285,6 +285,22 @@ select_stuff::~select_stuff ()
   destroy ();
 }
 
+#ifdef DEBUGGING
+void
+select_record::dump_select_record ()
+{
+  select_printf ("fd %d, h %p, fh %p, thread_errno %d, windows_handle %p",
+		 fd, h, fh, thread_errno, windows_handle);
+  select_printf ("read_ready %d, write_ready %d, except_ready %d",
+		 read_ready, write_ready, except_ready);
+  select_printf ("read_selected %d, write_selected %d, except_selected %d, except_on_write %d",
+		 read_selected, write_selected, except_selected, except_on_write);
+                    
+  select_printf ("startup %p, peek %p, verify %p cleanup %p, next %p",
+		 startup, peek, verify, cleanup, next);
+}
+#endif /*DEBUGGING*/
+
 /* Add a record to the select chain */
 bool
 select_stuff::test_and_set (int i, fd_set *readfds, fd_set *writefds,
@@ -314,6 +330,9 @@ select_stuff::test_and_set (int i, fd_set *readfds, fd_set *writefds,
   if (s->windows_handle)
     windows_used = true;
 
+#ifdef DEBUGGING
+  s->dump_select_record ();
+#endif
   return true;
 
 err:

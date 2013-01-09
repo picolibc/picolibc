@@ -1,7 +1,7 @@
 /* thread.cc: Locking and threading module functions
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1391,24 +1391,16 @@ pthread_rwlock::rdlock ()
 {
   int result = 0;
   struct RWLOCK_READER *reader;
-  pthread_t self = pthread::self ();
 
   mtx.lock ();
 
-  reader = lookup_reader (self);
+  reader = lookup_reader ();
   if (reader)
     {
       if (reader->n < UINT32_MAX)
 	++reader->n;
       else
 	errno = EAGAIN;
-      goto DONE;
-    }
-
-  reader = new struct RWLOCK_READER;
-  if (!reader)
-    {
-      result = EAGAIN;
       goto DONE;
     }
 
@@ -1423,9 +1415,13 @@ pthread_rwlock::rdlock ()
       pthread_cleanup_pop (0);
     }
 
-  reader->thread = self;
-  reader->n = 1;
-  add_reader (reader);
+  if ((reader = add_reader ()))
+    ++reader->n;
+  else
+    {
+      result = EAGAIN;
+      goto DONE;
+    }
 
  DONE:
   mtx.unlock ();
@@ -1437,25 +1433,18 @@ int
 pthread_rwlock::tryrdlock ()
 {
   int result = 0;
-  pthread_t self = pthread::self ();
 
   mtx.lock ();
 
-  if (writer || waiting_writers || lookup_reader (self))
+  if (writer || waiting_writers)
     result = EBUSY;
   else
     {
-      struct RWLOCK_READER *reader;
-
-      reader = lookup_reader (self);
+      RWLOCK_READER *reader = lookup_reader ();
+      if (!reader)
+	reader = add_reader ();
       if (reader && reader->n < UINT32_MAX)
 	++reader->n;
-      else if ((reader = new struct RWLOCK_READER))
-	{
-	  reader->thread = self;
-	  reader->n = 1;
-	  add_reader (reader);
-	}
       else
 	result = EAGAIN;
     }
@@ -1473,7 +1462,7 @@ pthread_rwlock::wrlock ()
 
   mtx.lock ();
 
-  if (writer == self || lookup_reader (self))
+  if (writer == self || lookup_reader ())
     {
       result = EDEADLK;
       goto DONE;
@@ -1520,13 +1509,12 @@ int
 pthread_rwlock::unlock ()
 {
   int result = 0;
-  pthread_t self = pthread::self ();
 
   mtx.lock ();
 
   if (writer)
     {
-      if (writer != self)
+      if (writer != pthread::self ())
 	{
 	  result = EPERM;
 	  goto DONE;
@@ -1536,7 +1524,7 @@ pthread_rwlock::unlock ()
     }
   else
     {
-      struct RWLOCK_READER *reader = lookup_reader (self);
+      struct RWLOCK_READER *reader = lookup_reader ();
 
       if (!reader)
 	{
@@ -1558,10 +1546,13 @@ pthread_rwlock::unlock ()
   return result;
 }
 
-void
-pthread_rwlock::add_reader (struct RWLOCK_READER *rd)
+pthread_rwlock::RWLOCK_READER *
+pthread_rwlock::add_reader ()
 {
-  List_insert (readers, rd);
+  RWLOCK_READER *rd = new RWLOCK_READER;
+  if (rd)
+    List_insert (readers, rd);
+  return rd;
 }
 
 void
@@ -1571,9 +1562,10 @@ pthread_rwlock::remove_reader (struct RWLOCK_READER *rd)
 }
 
 struct pthread_rwlock::RWLOCK_READER *
-pthread_rwlock::lookup_reader (pthread_t thread)
+pthread_rwlock::lookup_reader ()
 {
   readers_mx.lock ();
+  pthread_t thread = pthread::self ();
 
   struct RWLOCK_READER *cur = readers;
 
@@ -1792,7 +1784,7 @@ pthread_mutex::unlock ()
     {
       owner = (pthread_t) _unlocked_mutex;
 #ifdef DEBUGGING
-      tid = 0;
+      tid = 0;		// thread-id
 #endif
       if (InterlockedDecrement (&lock_counter))
 	::SetEvent (win32_obj_id); // Another thread is waiting
@@ -1919,7 +1911,7 @@ pthread_spinlock::unlock ()
     {
       owner = (pthread_t) _unlocked_mutex;
 #ifdef DEBUGGING
-      tid = 0;
+      tid = 0;		// thread-id
 #endif
       InterlockedExchange (&lock_counter, 0);
       ::SetEvent (win32_obj_id);

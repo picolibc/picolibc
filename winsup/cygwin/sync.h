@@ -33,7 +33,7 @@ public:
   ~muto ()
 #endif
   int acquire (DWORD ms = INFINITE) __attribute__ ((regparm (2))); /* Acquire the lock. */
-  int release () __attribute__ ((regparm (1)));		     /* Release the lock. */
+  int release (_cygtls * = &_my_tls) __attribute__ ((regparm (2))); /* Release the lock. */
 
   bool acquired () __attribute__ ((regparm (1)));
   void upforgrabs () {tls = this;}  // just set to an invalid address
@@ -55,11 +55,17 @@ public:
     if (exiting && exit_state < ES_PROCESS_LOCKED)
       exit_state = ES_PROCESS_LOCKED;
   }
+  void release ()
+  {
+    locker.release ();
+    skip_unlock = true;
+  }
   ~lock_process ()
   {
     if (!skip_unlock)
-      locker.release ();
+      release ();
   }
+  static void force_release (_cygtls *tid) {locker.release (tid);}
   friend class dtable;
   friend class fhandler_fifo;
 };

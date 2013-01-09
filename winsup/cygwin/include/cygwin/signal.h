@@ -1,6 +1,6 @@
 /* signal.h
 
-  Copyright 2004, 2005, 2006, 2011, 2012 Red Hat, Inc.
+  Copyright 2004, 2005, 2006, 2011, 2012, 2013 Red Hat, Inc.
 
   This file is part of Cygwin.
 
@@ -212,8 +212,13 @@ typedef struct
       clock_t si_stime;			/* system time */
     };
 
-    /* core dumping signals */
-    void *si_addr;			/* faulting address */
+    __extension__ struct
+    {
+      /* core dumping signals */
+      void *si_addr;			/* faulting address */
+      void *si_cyg;			/* pointer to block containing
+					   cygwin-special info */
+    };
   };
 } siginfo_t;
 #pragma pack(pop)

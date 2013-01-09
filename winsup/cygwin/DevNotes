@@ -1,3 +1,96 @@
+2013-01-02  cgf-000020
+
+(This entry should have been checked in with the changes but... I forgot)
+
+This is a fairly big revamp of the way that windows signals are handled.
+The intent is that all signal decisions should be made by the signal
+thread; not by the exception handler.
+
+This required the ability to pass information from the exception handler
+to the signal thread so, a si_cyg field was added to siginfo_t.  This
+contains information needed to generate a "core dump".  Hmm.  Haven't
+checked to see if this breaks Cygwin's hardly-ever-used real core dump
+facility.
+
+Anyway, I moved signal_exit back into exceptions.cc and removed it from
+the sigpacket class.  This function is now treated like a signal handler
+function - Cygwin will cause it to be dispatched in the context of
+whatever thread caught the signal.  signal_exit also makes the
+determination about when to write a stackdump.
+
+The signal-handler thread will no longer ever attempt to exit.  It will
+just keep processing signals (it will not process real signals after
+Cygwin stops shutting down, however).  This should make it impossible
+for the signal thread to ever block waiting for the process lock since
+it now never grabs the process lock.  The signal-handler thread will
+notify gdb when it gets a signal now but, in theory, gdb should see the
+context of the thread which received the signal, not the signal-handler
+thread.
+
+2012-12-28  cgf-000019
+
+(I forgot to mention that cgf-000018 was reverted.  Although I never saw
+a hang from this, I couldn't convince myself that one wasn't possible.)
+
+This fix attempts to correct a deadlock where, when a true Windows
+signal arrives, Windows creates a thread which "does stuff" and attempts
+to exit.  In the process of exiting Cygwin grabs the process lock.  If
+the signal thread has seen the signal and wants to exit, it can't
+because the newly-created thread now holds it.  But, since the new
+thread is relying on the signal thread to release its process lock,
+it exits and the process lock is never released.
+
+To fix this, I removed calls to _cygtls::signal_exit in favor of
+flagging that we were exiting by setting signal_exit_code (almost forgot
+to mark that NO_COPY: that would have been fun).  The new function
+setup_signal_exit() now handles setting things up so that ReadFile loop
+in wait_sig will do the right thing when it terminates.  This function
+may just Sleep indefinitely if a signal is being sent from a thread
+other than the signal thread.  wait_sig() was changed so that it will
+essentially drop into asychronous-read-mode when a signal which exits
+has been detected.  The ReadFile loop is exited when we know that the
+process is supposed to be exiting and there is nothing else in the
+signal queue.
+
+Although I never actually saw this happen, exit_thread() was also
+changed to release the process lock and just sleep indefintely if it is
+detected that we are exiting.
+
+2012-12-21  cgf-000018
+
+Re: cgf-000017
+
+It occurred to me that just getting the process lock during
+DLL_THREAD_DETACH in dll_entry() might be adequate to fix this
+problem.  It's certainly much less intrusive.
+
+There are potential deadlock problems with grabbing a lock in
+this code, though, so this check-in will be experimental.
+
+2012-12-21  cgf-000017
+
+The changes in this set are to work around the issue noted here:
+
+http://cygwin.com/ml/cygwin/2012-12/threads.html#00140
+
+The problem is, apparently, that the return value of an ExitThread()
+will take precedence over the return value of TerminateProcess/ExitProcess
+if the thread is the last one exiting.  That's rather amazing...
+
+For the fix, I replaced all calls to ExitThread with exit_thread().  The
+exit_thread function, creates a handle to the current thread and sends
+it to a packet via sig_send(__SIGTHREADEXIT).  Then it acquires the
+process lock and calls ExitThread.
+
+wait_sig will then wait for the handle, indicating that the thread has
+exited, and, when that has happened, remove the process lock on behalf
+of the now-defunct thread.  wait_sig will now also avoid actually
+exiting since it could trigger the same problem.
+
+Holding process_lock should prevent threads from exiting while a Cygwin
+process is shutting down.  They will just block forever in that case -
+just like wait_sig.
+
 2012-08-17  cgf-000016
 
 While debugging another problem I finally noticed that

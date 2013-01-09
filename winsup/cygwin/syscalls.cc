@@ -142,7 +142,7 @@ extern "C" int
 dup2 (int oldfd, int newfd)
 {
   int res;
-  if (newfd >= OPEN_MAX_MAX)
+  if (newfd >= OPEN_MAX_MAX || newfd < 0)
     {
       set_errno (EBADF);
       res = -1;

@@ -1,7 +1,7 @@
 /* sigproc.h
 
    Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2011, 2012 Red Hat, Inc.
+   2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -24,8 +24,8 @@ enum
   __SIGFLUSHFAST    = -(NSIG + 6),
   __SIGHOLD	    = -(NSIG + 7),
   __SIGNOHOLD	    = -(NSIG + 8),
-  __SIGEXIT	    = -(NSIG + 9),
-  __SIGSETPGRP	    = -(NSIG + 10)
+  __SIGSETPGRP	    = -(NSIG + 9),
+  __SIGTHREADEXIT   = -(NSIG + 10)
 };
 #endif
 
@@ -87,6 +87,8 @@ void __stdcall sigalloc ();
 
 int kill_pgrp (pid_t, siginfo_t&);
 int killsys (pid_t, int);
+void exit_thread (DWORD) __attribute__ ((regparm (1), noreturn));
+void setup_signal_exit (int) __attribute__ ((regparm (1)));
 
 extern "C" void sigdelayed ();
 

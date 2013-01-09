@@ -1,6 +1,6 @@
 /* cygerrno.h: main Cygwin header file.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2010, 2011 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -22,7 +22,7 @@ int __stdcall geterrno_from_nt_status (NTSTATUS status, int deferrno = 13 /*EACC
 #define __seterrno_from_win_error(val) seterrno_from_win_error (__FILE__, __LINE__, val)
 #define __seterrno_from_nt_status(status) seterrno_from_nt_status (__FILE__, __LINE__, status)
 
-inline int
+extern inline int
 __set_errno (const char *fn, int ln, int val)
 {
   debug_printf ("%s:%d setting errno %d", fn, ln, val);

@@ -354,13 +354,13 @@ extern cygpsid well_known_samba_unix_user_fake_sid;
 
 bool privilege_luid (const PWCHAR pname, LUID &luid, bool &high_integrity);
 
-inline BOOL
+extern inline BOOL
 well_known_sid_type (SID_NAME_USE type)
 {
   return type == SidTypeAlias || type == SidTypeWellKnownGroup;
 }
 
-inline BOOL
+extern inline BOOL
 legal_sid_type (SID_NAME_USE type)
 {
   return type == SidTypeUser  || type == SidTypeGroup

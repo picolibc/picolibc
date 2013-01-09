@@ -31,7 +31,7 @@ void slashify (const char *, char *, bool);
 #define isslash(c) ((c) == '/')
 
 extern void transform_chars (PWCHAR, PWCHAR);
-inline void
+extern inline void
 transform_chars (PUNICODE_STRING upath, USHORT start_idx)
 {
   transform_chars (upath->Buffer + start_idx,

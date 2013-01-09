@@ -28,6 +28,7 @@ details. */
 #include "cygheap.h"
 #include "pinfo.h"
 #include "exception.h"
+#include "sigproc.h"
 
 long tls_ix = -1;
 
