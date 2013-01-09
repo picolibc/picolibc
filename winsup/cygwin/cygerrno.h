@@ -1,6 +1,6 @@
 /* cygerrno.h: main Cygwin header file.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2010, 2011 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
