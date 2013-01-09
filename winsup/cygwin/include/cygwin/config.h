@@ -4,7 +4,7 @@
    sys/config.h before.  This way we can manaage our configuration
    setting without bothering newlib.
 
-   Copyright 2003, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 2003, 2007, 2008, 2009, 2010, 2012, 2013 Red Hat, Inc.
    Written by C. Vinschen.
 
 This file is part of Cygwin.
@@ -39,7 +39,11 @@ extern "C" {
 
 #ifdef _COMPILING_NEWLIB
 #include "../tlsoffsets.h"
+#ifdef __x86_64__
+extern char *_tlsbase __asm__ ("%gs:8");
+#else
 extern char *_tlsbase __asm__ ("%fs:4");
+#endif
 #define __getreent() (struct _reent *)(_tlsbase + tls_local_clib)
 #endif  /* _COMPILING_NEWLIB */
 
