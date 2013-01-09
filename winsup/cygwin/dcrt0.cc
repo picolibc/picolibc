@@ -1,7 +1,7 @@
 /* dcrt0.cc -- essentially the main() for the Cygwin dll
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -788,6 +788,29 @@ dll_crt0_0 ()
   debug_printf ("finished dll_crt0_0 initialization");
 }
 
+static inline void
+main_thread_sinit ()
+{
+  __sinit (_impure_ptr);
+  /* At this point, _impure_ptr == _global_impure_ptr == _GLOBAL_REENT is
+     initialized, but _REENT == _my_tls.local_clib doesn't know about it.
+     It has been copied over from _GLOBAL_REENT in _cygtls::init_thread
+     *before* the initialization took place.
+
+     As soon as the main thread calls a stdio function, this would be
+     rectified.  But if another thread calls a stdio function on
+     stdin/out/err before the main thread does, all the required
+     initialization of stdin/out/err will be done, but _REENT->__sdidinit
+     is *still* 0.  This in turn will result in a call to __sinit in the
+     wrong spot.  The input or output buffer will be NULLed and nothing is
+     read or written in the first stdio function call in the main thread.
+
+     To fix this issue we have to copy over the relevant part of _GLOBAL_REENT
+     to _REENT here again. */
+  _REENT->__sdidinit = -1;
+  _REENT->__cleanup = _GLOBAL_REENT->__cleanup;
+}
+
 /* Take over from libc's crt0.o and start the application. Note the
    various special cases when Cygwin DLL is being runtime loaded (as
    opposed to being link-time loaded by Cygwin apps) from a non
@@ -869,7 +892,7 @@ dll_crt0_1 (void *)
       longjmp (fork_info->jmp, true);
     }
 
-  __sinit (_impure_ptr);
+  main_thread_sinit ();
 
 #ifdef DEBUGGING
   {
