@@ -279,7 +279,7 @@
 #define EM_MANIK	171	/* M2000 Reconfigurable RISC Microprocessor */
 #define EM_CRAYNV2	172	/* Cray Inc. NV2 vector architecture */
 #define EM_RX		173	/* Renesas RX family */
-#define EM_METAG	174	/* Imagination Technologies META processor architecture */
+#define EM_METAG	174	/* Imagination Technologies Meta processor architecture */
 #define EM_MCST_ELBRUS	175	/* MCST Elbrus general purpose hardware architecture */
 #define EM_ECOG16	176	/* Cyan Technology eCOG16 family */
 #define EM_CR16		177	/* National Semiconductor CompactRISC 16-bit processor */

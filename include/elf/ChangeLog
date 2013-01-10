@@ -1,3 +1,8 @@
+2013-01-10  Will Newton <will.newton@imgtec.com>
+
+	* common.h: Fix case of "Meta".
+	* metag.h: New file.
+
 2013-01-08  Yufeng Zhang  <yufeng.zhang@arm.com>
 
 	* common.h (NT_ARM_TLS, NT_ARM_HW_BREAK, NT_ARM_HW_WATCH): New macro

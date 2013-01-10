@@ -1,3 +1,7 @@
+2013-01-10  Will Newton <will.newton@imgtec.com>
+
+	* dis-asm.h (print_insn_metag): New declaration.
+
 2012-12-18  Aldy Hernandez  <aldyh@redhat.com>
 
 	PR other/54324

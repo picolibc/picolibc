@@ -267,6 +267,7 @@ extern int print_insn_m68k		(bfd_vma, disassemble_info *);
 extern int print_insn_m88k		(bfd_vma, disassemble_info *);
 extern int print_insn_mcore		(bfd_vma, disassemble_info *);
 extern int print_insn_mep		(bfd_vma, disassemble_info *);
+extern int print_insn_metag		(bfd_vma, disassemble_info *);
 extern int print_insn_microblaze	(bfd_vma, disassemble_info *);
 extern int print_insn_mmix		(bfd_vma, disassemble_info *);
 extern int print_insn_mn10200		(bfd_vma, disassemble_info *);

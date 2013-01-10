@@ -1,3 +1,7 @@
+2013-01-10  Will Newton <will.newton@imgtec.com>
+
+	* metag.h: New file.
+
 2013-01-07  Kaushik Phatak  <kaushik.phatak@kpitcummins.com>
 
 	* cr16.h (make_instruction): Rename to cr16_make_instruction.
