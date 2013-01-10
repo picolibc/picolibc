@@ -1,5 +1,13 @@
 2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
 
+        * libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add
+	strnlen-stub.c and strnlen.S
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/strnlen-stub.c: New file.
+	* libc/machine/aarch64/strnlen.S: New file.
+
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
 	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES):
 	Add strlen.S and strlen-stub.c.
 	* libc/machine/aarch64/Makefile.in: Regenerated.
