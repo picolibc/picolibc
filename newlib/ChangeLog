@@ -1,5 +1,13 @@
 2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
 
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add
+	memcmp-stub.c and memcmp.S
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/memcmp-stub.c: New file.
+	* libc/machine/aarch64/memcmp.S: New file.
+
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
         * libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add
 	strnlen-stub.c and strnlen.S
 	* libc/machine/aarch64/Makefile.in: Regenerated.
