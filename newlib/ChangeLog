@@ -1,5 +1,13 @@
 2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
 
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES):
+	Add memmove.S and memmove-stub.c.
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/memmove-stub.c: New file.
+	* libc/machine/aarch64/memmove.S: New file.
+
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
 	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Re-ordered.
 	Add strncmp.S and strncmp-stub.c.
 	* libc/machine/aarch64/Makefile.in: Regenerated.
