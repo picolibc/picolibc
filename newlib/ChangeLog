@@ -1,3 +1,24 @@
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Re-ordered.
+	Add strncmp.S and strncmp-stub.c.
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/strncmp-stub.c: New file.
+	* libc/machine/aarch64/strncmp.S: New file.
+
+2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add
+	memcpy.c memcpy-stub.c memset.S memset-stub.c strcmp.S
+	strcmp-stub.c.
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+	* libc/machine/aarch64/memcpy-stub.c: New file.
+	* libc/machine/aarch64/memcpy.S: New file.
+	* libc/machine/aarch64/memset-stub.c: New file.
+	* libc/machine/aarch64/memset.S: New file.
+	* libc/machine/aarch64/strcmp.S: New file.
+	* libc/machine/aarch64/strcmp-stub.c: New file.
+
 2013-01-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* MAINTAINERS: Add Richard Earnshaw as Arm co-maintainer
