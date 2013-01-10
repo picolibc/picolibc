@@ -2297,6 +2297,15 @@ rename (const char *oldpath, const char *newpath)
     }
   dstpc = (removepc == &newpc) ? &new2pc : &newpc;
 
+  /* Check cross-device before touching anything.  Otherwise we might end
+     up with an unlinked target dir even if the actual rename didn't work. */
+  if (oldpc.fs_type () != dstpc->fs_type ()
+      || oldpc.fs_serial_number () != dstpc->fs_serial_number ())
+    {
+      set_errno (EXDEV);
+      goto out;
+    }
+
   /* Opening the file must be part of the transaction.  It's not sufficient
      to call only NtSetInformationFile under the transaction.  Therefore we
      have to start the transaction here, if necessary. */
@@ -2431,17 +2440,66 @@ retry:
 	}
       NtClose (nfh);
     }
-  size = sizeof (FILE_RENAME_INFORMATION)
-	 + dstpc->get_nt_native_path ()->Length;
-  if (size > NT_MAX_PATH * sizeof (WCHAR)) /* Hopefully very seldom. */
-    pfri = (PFILE_RENAME_INFORMATION) alloca (size);
+  if (oldpc.fs_is_nfs ())
+    {
+      /* Workaround depressing NFS bug.  FILE_RENAME_INFORMATION.FileName
+	 *must* be relative to the parent directory of the original file,
+	 otherwise NtSetInformationFile returns with STATUS_NOT_SAME_DEVICE.
+	 Neither absolute paths, nor directory handle relative paths work
+	 as expected! */
+      PWCHAR oldp, dstp;
+
+      /* Skip equivalent path prefix.  We already know that both paths are
+	 on the same drive anyway. */
+      for (oldp = oldpc.get_nt_native_path ()->Buffer,
+	   dstp = dstpc->get_nt_native_path ()->Buffer;
+	   *oldp == *dstp; ++oldp, ++dstp)
+	;
+      while (oldp[-1] != L'\\')
+      	--oldp, --dstp;
+      /* Now oldp points to the first path component in oldpc different from
+         dstpc, vice versa for dstp and oldpc.  To create a dstpc path relative
+	 to oldpc, we now have to prepend as many ".." components to dstp, as
+	 are still available in oldp.  Example:
+
+	   oldpc = \??\UNC\server\a\b\c\d\e
+	   dstpc = \??\UNC\server\a\b\f\g
+
+           prefix: \??\UNC\server\a\b\
+	   oldp: c\d\e
+	   dstp: f\g
+	   dstp expressed relative to e's parent dir:  ..\..\f\g
+
+	 So what we do here is to count the number of backslashes in oldp and
+	 prepend one "..\" to dstp for each of them. */
+      PWCHAR newdst = tp.w_get ();
+      PWCHAR newp = newdst;
+      while ((oldp = wcschr (++oldp, L'\\')) != NULL)
+      	newp = wcpcpy (newp, L"..\\");
+      newp = wcpcpy (newp, dstp);
+      size = sizeof (FILE_RENAME_INFORMATION)
+	     + (newp - newdst) * sizeof (WCHAR);
+      if (size > NT_MAX_PATH * sizeof (WCHAR)) /* Hopefully very seldom. */
+	pfri = (PFILE_RENAME_INFORMATION) alloca (size);
+      else
+	pfri = (PFILE_RENAME_INFORMATION) tp.w_get ();
+      pfri->FileNameLength = (newp - newdst) * sizeof (WCHAR);
+      memcpy (&pfri->FileName,  newdst, pfri->FileNameLength);
+    }
   else
-    pfri = (PFILE_RENAME_INFORMATION) tp.w_get ();
+    {
+      size = sizeof (FILE_RENAME_INFORMATION)
+	     + dstpc->get_nt_native_path ()->Length;
+      if (size > NT_MAX_PATH * sizeof (WCHAR)) /* Hopefully very seldom. */
+	pfri = (PFILE_RENAME_INFORMATION) alloca (size);
+      else
+	pfri = (PFILE_RENAME_INFORMATION) tp.w_get ();
+      pfri->FileNameLength = dstpc->get_nt_native_path ()->Length;
+      memcpy (&pfri->FileName,  dstpc->get_nt_native_path ()->Buffer,
+	      pfri->FileNameLength);
+    }
   pfri->ReplaceIfExists = TRUE;
   pfri->RootDirectory = NULL;
-  pfri->FileNameLength = dstpc->get_nt_native_path ()->Length;
-  memcpy (&pfri->FileName,  dstpc->get_nt_native_path ()->Buffer,
-	  pfri->FileNameLength);
   status = NtSetInformationFile (fh, &io, pfri, size, FileRenameInformation);
   /* This happens if the access rights don't allow deleting the destination.
      Even if the handle to the original file is opened with BACKUP

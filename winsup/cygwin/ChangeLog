@@ -1,3 +1,10 @@
+2013-01-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.h (path_conv::fs_type): New method.
+	* syscalls.cc (rename): Check for cross-device situation before
+	touching anything.  Explain why.  Workaround NFS bug in call to
+	NtSetInformationFile(FileRenameInformation).
+
 2013-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygerrno.h: Fix copyright.
