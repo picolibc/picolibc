@@ -8,7 +8,14 @@ AM_CCASFLAGS = $(INCLUDES)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = setjmp.S
+lib_a_SOURCES =
+lib_a_SOURCES += memcpy.S
+lib_a_SOURCES += memcpy-stub.c
+lib_a_SOURCES += memset.S
+lib_a_SOURCES += memset-stub.c
+lib_a_SOURCES += setjmp.S
+lib_a_SOURCES += strcmp.S
+lib_a_SOURCES += strcmp-stub.c
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS=$(AM_CFLAGS)
