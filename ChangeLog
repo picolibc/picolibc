@@ -1,3 +1,8 @@
+2013-01-11  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* Makefile.tpl (BOOT_ADAFLAGS): Remove -gnata.
+	* Makefile.in: Regenerate.
+
 2013-01-09  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* Makefile.def (configure-gcc): Depend on all-gmp.
