@@ -1,3 +1,12 @@
+2013-01-11  cgf-000021
+
+Apparently I got the signal handling semantics of select() wrong again
+even though I would have sworn that I tested this on Linux and Windows.
+
+select() is apparently *always* interrupted by a signal and *never*
+restarts.  Hopefully, between the comment added to the code and this
+note, I'll not make this mistake again.
+
 2013-01-02  cgf-000020
 
 (This entry should have been checked in with the changes but... I forgot)

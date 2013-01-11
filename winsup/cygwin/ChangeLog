@@ -1,3 +1,9 @@
+2013-01-11  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* DevNotes: Add entry cgf-000021.
+	* select.cc (select): Unconditionally return when a signal is detected.
+	(select_stuff::wait): Ditto.
+
 2013-01-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (rename): Drop handling paths > 32757 chars, emit EINVAL
