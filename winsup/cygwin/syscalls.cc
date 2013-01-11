@@ -1,7 +1,7 @@
 /* syscalls.cc: syscalls
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -2068,7 +2068,6 @@ rename (const char *oldpath, const char *newpath)
   HANDLE old_trans = NULL, trans = NULL;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
-  ULONG size;
   FILE_STANDARD_INFORMATION ofsi;
   PFILE_RENAME_INFORMATION pfri;
 
@@ -2440,14 +2439,13 @@ retry:
   /* SUSv3: If the old argument and the new argument resolve to the same
      existing file, rename() shall return successfully and perform no
      other action.
-     The test tries to be as quick as possible.  First it tests for identical
-     volume serial numbers because that information is available anyway.
-     Then it tests if oldpath has more than 1 hardlink, then it opens newpath
+     The test tries to be as quick as possible.  Due to the above cross device
+     check we already know both files are on the same device.  So it just
+     tests if oldpath has more than 1 hardlink, then it opens newpath
      and tests for identical file ids.  If so, oldpath and newpath refer to
      the same file. */
   if ((removepc || dstpc->exists ())
       && !oldpc.isdir ()
-      && dstpc->fs_serial_number () == oldpc.fs_serial_number ()
       && NT_SUCCESS (NtQueryInformationFile (fh, &io, &ofsi, sizeof ofsi,
 					     FileStandardInformation))
       && ofsi.NumberOfLinks > 1
@@ -2473,6 +2471,18 @@ retry:
 	}
       NtClose (nfh);
     }
+  /* Create FILE_RENAME_INFORMATION struct.  Using a tmp_pathbuf area allows
+     for paths of up to 32757 chars.  This test is just for paranoia's sake. */
+  if (dstpc->get_nt_native_path ()->Length > NT_MAX_PATH * sizeof (WCHAR)
+					     - sizeof (FILE_RENAME_INFORMATION))
+    {
+      debug_printf ("target filename too long");
+      set_errno (EINVAL);
+      goto out;
+    }
+  pfri = (PFILE_RENAME_INFORMATION) tp.w_get ();
+  pfri->ReplaceIfExists = TRUE;
+  pfri->RootDirectory = NULL;
   if (oldpc.fs_is_nfs ())
     {
       /* Workaround depressing NFS bug.  FILE_RENAME_INFORMATION.FileName
@@ -2510,30 +2520,18 @@ retry:
       while ((oldp = wcschr (++oldp, L'\\')) != NULL)
       	newp = wcpcpy (newp, L"..\\");
       newp = wcpcpy (newp, dstp);
-      size = sizeof (FILE_RENAME_INFORMATION)
-	     + (newp - newdst) * sizeof (WCHAR);
-      if (size > NT_MAX_PATH * sizeof (WCHAR)) /* Hopefully very seldom. */
-	pfri = (PFILE_RENAME_INFORMATION) alloca (size);
-      else
-	pfri = (PFILE_RENAME_INFORMATION) tp.w_get ();
       pfri->FileNameLength = (newp - newdst) * sizeof (WCHAR);
       memcpy (&pfri->FileName,  newdst, pfri->FileNameLength);
     }
   else
     {
-      size = sizeof (FILE_RENAME_INFORMATION)
-	     + dstpc->get_nt_native_path ()->Length;
-      if (size > NT_MAX_PATH * sizeof (WCHAR)) /* Hopefully very seldom. */
-	pfri = (PFILE_RENAME_INFORMATION) alloca (size);
-      else
-	pfri = (PFILE_RENAME_INFORMATION) tp.w_get ();
       pfri->FileNameLength = dstpc->get_nt_native_path ()->Length;
       memcpy (&pfri->FileName,  dstpc->get_nt_native_path ()->Buffer,
 	      pfri->FileNameLength);
     }
-  pfri->ReplaceIfExists = TRUE;
-  pfri->RootDirectory = NULL;
-  status = NtSetInformationFile (fh, &io, pfri, size, FileRenameInformation);
+  status = NtSetInformationFile (fh, &io, pfri,
+  				 sizeof *pfri + pfri->FileNameLength,
+				 FileRenameInformation);
   /* This happens if the access rights don't allow deleting the destination.
      Even if the handle to the original file is opened with BACKUP
      and/or RECOVERY, these flags don't apply to the destination of the
@@ -2570,7 +2568,8 @@ retry:
 	    }
 	}
       if (NT_SUCCESS (status = unlink_nt (*dstpc)))
-	status = NtSetInformationFile (fh, &io, pfri, size,
+	status = NtSetInformationFile (fh, &io, pfri,
+				       sizeof *pfri + pfri->FileNameLength,
 				       FileRenameInformation);
     }
   if (NT_SUCCESS (status))

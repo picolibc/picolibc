@@ -1,3 +1,15 @@
+2013-01-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (rename): Drop handling paths > 32757 chars, emit EINVAL
+	instead, thus simplifying code allocating and filling pfri.  Drop size
+	and use constant expression in NtSetInformationFile call.  Add comments.
+	Drop redundant test for fs_serial_number and change comment accordingly.
+
+2013-01-11  Thomas Wolff  <towo@towo.net>
+
+	* fhandler.h (class dev_console): Flag for expanded control sequence.
+	* fhandler_console.cc (char_command): Supporting cursor style modes.
+
 2013-01-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.h (path_conv::fs_type): New method.

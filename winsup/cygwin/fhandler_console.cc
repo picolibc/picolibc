@@ -1510,6 +1510,31 @@ fhandler_console::char_command (char c)
 	   }
        dev_state.set_color (get_output_handle ());
       break;
+    case 'q': /* Set cursor style (DECSCUSR) */
+      if (dev_state.saw_space)
+	{
+	    CONSOLE_CURSOR_INFO console_cursor_info;
+	    GetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
+	    switch (dev_state.args_[0])
+	      {
+		case 0: /* blinking block */
+		case 1: /* blinking block (default) */
+		case 2: /* steady block */
+		  console_cursor_info.dwSize = 100;
+		  SetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
+		  break;
+		case 3: /* blinking underline */
+		case 4: /* steady underline */
+		  console_cursor_info.dwSize = 10;	/* or Windows default 25? */
+		  SetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
+		  break;
+		default: /* use value as percentage */
+		  console_cursor_info.dwSize = dev_state.args_[0];
+		  SetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
+		  break;
+	      }
+	}
+      break;
     case 'h':
     case 'l':
       if (!dev_state.saw_question_mark)
@@ -1525,6 +1550,17 @@ fhandler_console::char_command (char c)
 	}
       switch (dev_state.args_[0])
 	{
+	case 25: /* Show/Hide Cursor (DECTCEM) */
+	  {
+	    CONSOLE_CURSOR_INFO console_cursor_info;
+	    GetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
+	    if (c == 'h')
+	      console_cursor_info.bVisible = TRUE;
+	    else
+	      console_cursor_info.bVisible = FALSE;
+	    SetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
+	    break;
+	  }
 	case 47:   /* Save/Restore screen */
 	  if (c == 'h') /* save */
 	    {
@@ -1752,7 +1788,7 @@ fhandler_console::char_command (char c)
 	  __small_sprintf (buf, "\033[%d;%dR", y + 1, x + 1);
 	  puts_readahead (buf);
 	  break;
-    default:
+      default:
 	  goto bad_escape;
 	}
       break;
@@ -2026,6 +2062,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      dev_state.state_ = gotsquare;
 	      dev_state.saw_question_mark = false;
 	      dev_state.saw_greater_than_sign = false;
+	      dev_state.saw_space = false;
 	      for (dev_state.nargs_ = 0; dev_state.nargs_ < MAXARGS; dev_state.nargs_++)
 		dev_state.args_[dev_state.nargs_] = 0;
 	      dev_state.nargs_ = 0;
@@ -2091,6 +2128,12 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      dev_state.nargs_++;
 	      if (dev_state.nargs_ >= MAXARGS)
 		dev_state.nargs_--;
+	    }
+	  else if (*src == ' ')
+	    {
+	      src++;
+	      dev_state.saw_space = true;
+	      dev_state.state_ = gotcommand;
 	    }
 	  else
 	    {
