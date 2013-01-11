@@ -1,3 +1,8 @@
+2013-01-11  Thomas Wolff  <towo@towo.net>
+
+	* fhandler.h (class dev_console): Flag for expanded control sequence.
+	* fhandler_console.cc (char_command): Supporting cursor style modes.
+
 2013-01-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.h (path_conv::fs_type): New method.
