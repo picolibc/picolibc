@@ -16,7 +16,7 @@
 2013-01-08  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
 	* config.guss: Update from config repo.
-	* config.sub: Dito.
+	* config.sub: Ditto.
 
 2013-01-07  Jeff Johnston  <jjohnstn@redhat.com>
 
@@ -65,9 +65,9 @@
 2012-11-30  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
 	* configure.ac: Merge from GCC.
-	* Makefile.tpl: Dito.
-	* Makefile.in: Dito.
-	* configure: Dito.
+	* Makefile.tpl: Ditto.
+	* Makefile.in: Ditto.
+	* configure: Ditto.
 
 2012-11-28  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
