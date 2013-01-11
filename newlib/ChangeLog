@@ -1,3 +1,9 @@
+2013-01-11  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Add code to correctly handle
+	's' format specifier on not _MB_CAPABLE targets.  Fix a formatting
+	glitch in _MB_CAPABLE enabled code.  Add a missing 'L' specifier.
+
 2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
 
 	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add
@@ -8,7 +14,7 @@
 
 2013-01-10  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
 
-        * libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add
 	strnlen-stub.c and strnlen.S
 	* libc/machine/aarch64/Makefile.in: Regenerated.
 	* libc/machine/aarch64/strnlen-stub.c: New file.

@@ -1171,11 +1171,11 @@ string:
 					insize = strlen(arg);
 				if (insize >= BUF) {
 				    if ((malloc_buf = (wchar_t *) _malloc_r (data, (insize + 1) * sizeof (wchar_t)))
-								== NULL) {
-							fp->_flags |= __SERR;
-							goto error;
-						}
-						cp = malloc_buf;
+					== NULL) {
+						fp->_flags |= __SERR;
+						goto error;
+					}
+					cp = malloc_buf;
 				} else
 					cp = buf;
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
@@ -1195,9 +1195,31 @@ string:
 				*p = L'\0';
 				size = p - cp;
 			}
-			else
+#else
+			if (ch != L'S' && !(flags & LONGINT)) {
+				char *arg = (char *) cp;
+				size_t insize = 0;
+
+				if (prec >= 0) {
+					char *p = memchr (arg, '\0', prec);
+					insize = p ? p - arg : prec;
+				} else
+					insize = strlen (arg);
+				if (insize >= BUF) {
+				    if ((malloc_buf = (wchar_t *) _malloc_r (data, (insize + 1) * sizeof (wchar_t)))
+					== NULL) {
+						fp->_flags |= __SERR;
+						goto error;
+					}
+					cp = malloc_buf;
+				} else
+					cp = buf;
+				for (size = 0; size < insize; ++size)
+					cp[size] = arg[size];
+				cp[size] = L'\0';
+			}
 #endif /* _MB_CAPABLE */
-			if (prec >= 0) {
+			else if (prec >= 0) {
 				/*
 				 * can't use wcslen; can only look for the
 				 * NUL in the first `prec' characters, and
@@ -1222,7 +1244,7 @@ string:
 		case L'X':
 			xdigs = L"0123456789ABCDEF";
 			goto hex;
-		case 'x':
+		case L'x':
 			xdigs = L"0123456789abcdef";
 hex:			_uquad = UARG ();
 			base = HEX;
