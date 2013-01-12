@@ -23,7 +23,7 @@
 
 2013-01-08  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
-	* config.guss: Update from config repo.
+	* config.guess: Update from config repo.
 	* config.sub: Ditto.
 
 2013-01-07  Jeff Johnston  <jjohnstn@redhat.com>
