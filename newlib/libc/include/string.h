@@ -64,13 +64,13 @@ int	 _EXFUN(strcasecmp,(const char *, const char *));
 char	*_EXFUN(strcasestr,(const char *, const char *));
 char 	*_EXFUN(strchrnul,(const char *, int));
 #endif
-#if !defined(__STRICT_ANSI__) || (_XOPEN_SOURCE >= 500)
+#if !defined(__STRICT_ANSI__) || (_XOPEN_SOURCE - 0) >= 500
 char 	*_EXFUN(strdup,(const char *));
 #endif
 #ifndef __STRICT_ANSI__
 char 	*_EXFUN(_strdup_r,(struct _reent *, const char *));
 #endif
-#if !defined(__STRICT_ANSI__) || (_XOPEN_SOURCE >= 700)
+#if !defined(__STRICT_ANSI__) || (_XOPEN_SOURCE - 0) >= 700
 char 	*_EXFUN(strndup,(const char *, size_t));
 #endif
 #ifndef __STRICT_ANSI__

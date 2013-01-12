@@ -1,3 +1,8 @@
+2013-01-12  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/string.h: Fix preprocessor expressions using
+	_XOPEN_SOURCE.
+
 2013-01-11  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Add code to correctly handle
