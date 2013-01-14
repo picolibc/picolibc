@@ -35,3 +35,24 @@ Bug fixes:
   bug in the NFS driver's implementation of the FileRenameInformation info
   class.
 
+- Fix bug where dup2 segv'ed on negative fd.
+  See: http://cygwin.com/ml/cygwin/2012-12/msg00377.html
+
+- Work around problem of erratic exit codes caused by a thread exiting
+  while process is shutting down.
+  See: http://cygwin.com/ml/cygwin/2012-12/msg00377.html
+
+- Always interrupt select() on a signal.
+  See: http://cygwin.com/ml/cygwin/2013-01/threads.html#00139
+
+- Fix problem where sigwait() ignored non-thread-specific signals.
+  See: http://cygwin.com/ml/cygwin/2012-12/threads.html#00076
+
+- Fix special processing of "cmd /c" so that "/C" is allowed as well.
+  See: http://cygwin.com/ml/cygwin/2012-11/msg00286.html
+
+- Return 0 rather than -1 when select() times out.
+  See: http://cygwin.com/ml/cygwin/2012-11/msg00132.html
+
+- Fix some bugs in CTRL-S/CTRL-Q handling in ptys.
+  See: http://cygwin.com/ml/cygwin/2012-10/msg00089.html
