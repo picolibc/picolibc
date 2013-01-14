@@ -43,7 +43,6 @@ enum exit_states
   ES_THREADTERM,
   ES_HUP_PGRP,
   ES_HUP_SID,
-  ES_EXEC_EXIT,
   ES_TTY_TERMINATE,
   ES_FINAL
 };
