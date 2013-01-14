@@ -1,3 +1,7 @@
+2013-01-14  Antti Kantee  <pooka@iki.fi>
+
+	* include/pthread.h (pthread_exit): Mark as "noreturn".
+
 2013-01-14  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* exceptions.cc (signal_exit): Move captive process termintation...
