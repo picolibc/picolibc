@@ -4,7 +4,34 @@ What's new:
 - For performance reasons, Cygwin does not try to create sparse files
   automatically anymore, unless you use the new "sparse" mount option.
 
+- Added Windows console cursor appearance support:
+
+  - Show/Hide Cursor mode (DECTCEM): "ESC[?25h" / "ESC[?25l"
+
+  - Set cursor style (DECSCUSR): "ESC[n q" (note the space before the q);
+    where n is 0, 1, 2 for block cursor, 3, 4 for underline cursor (all
+    disregarding blinking mode), or > 4 to set the cursor height to a
+    percentage of the cell height.
+
+- New API: cfsetspeed.
 
 Bug fixes:
 ----------
+
+- Fix handle leak in rewinddir(3).  This affected Windows 2000 only.
+
+- Allow quoted filenames in @ argument expression when called from native
+  processes.  Fixes http://cygwin.com/ml/cygwin/2012-12/msg00276.html
+
+- Fix a bug in initializing the stdio settings at process startup, which
+  could result in missing output.
+  Fixes http://cygwin.com/ml/cygwin/2013-01/msg00008.html
+
+- rename("dir1", "dir2") could result in deleting dir2, even if the rename
+  didn't take place, for instance, if dir1 and dir2 were not on the same
+  device.
+
+- rename("file1", "file2") would fail in almost all cases on NFS, due to a
+  bug in the NFS driver's implementation of the FileRenameInformation info
+  class.
 
