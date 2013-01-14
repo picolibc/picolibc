@@ -92,7 +92,7 @@ it to a packet via sig_send(__SIGTHREADEXIT).  Then it acquires the
 process lock and calls ExitThread.
 
 wait_sig will then wait for the handle, indicating that the thread has
-exited, and, when that has happened, remove the process lock on behalf
+exited, and, when that has happened, removes the process lock on behalf
 of the now-defunct thread.  wait_sig will now also avoid actually
 exiting since it could trigger the same problem.
 
