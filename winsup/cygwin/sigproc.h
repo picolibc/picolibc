@@ -76,9 +76,6 @@ int __stdcall proc_subproc (DWORD, uintptr_t) __attribute__ ((regparm (2)));
 class _pinfo;
 void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
-#ifdef __INSIDE_CYGWIN__
-void __stdcall sigproc_terminate (enum exit_states);
-#endif
 bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
 int __stdcall sig_send (_pinfo *, siginfo_t&, class _cygtls * = NULL) __attribute__ ((regparm (3)));
 int __stdcall sig_send (_pinfo *, int, class _cygtls * = NULL) __attribute__ ((regparm (2)));

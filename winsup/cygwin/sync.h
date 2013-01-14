@@ -52,8 +52,6 @@ public:
   {
     locker.acquire ();
     skip_unlock = exiting;
-    if (exiting && exit_state < ES_PROCESS_LOCKED)
-      exit_state = ES_PROCESS_LOCKED;
   }
   void release ()
   {
@@ -65,6 +63,7 @@ public:
     if (!skip_unlock)
       release ();
   }
+  operator LONG () const {return locker.visits; }
   static void force_release (_cygtls *tid) {locker.release (tid);}
   friend class dtable;
   friend class fhandler_fifo;

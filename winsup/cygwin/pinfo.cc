@@ -175,18 +175,16 @@ pinfo::maybe_set_exit_code_from_windows ()
 void
 pinfo::exit (DWORD n)
 {
-  minimal_printf ("winpid %u, exit %u", GetCurrentProcessId (), n);
-  sigproc_terminate (ES_FINAL);
+  debug_only_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
+  proc_terminate ();
   lock_process until_exit (true);
   cygthread::terminate ();
 
   if (n != EXITCODE_NOSET)
     self->exitcode = EXITCODE_SET | n;/* We're really exiting.  Record the UNIX exit code. */
   else
-    {
-      exit_state = ES_EXEC_EXIT;
-      maybe_set_exit_code_from_windows ();
-    }
+    maybe_set_exit_code_from_windows ();	/* may block */
+  exit_state = ES_FINAL;
 
   if (myself->ctty > 0 && !iscons_dev (myself->ctty))
     {

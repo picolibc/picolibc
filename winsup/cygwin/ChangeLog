@@ -1,3 +1,26 @@
+2013-01-14  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* exceptions.cc (signal_exit): Move captive process termintation...
+	(_cygtls::interrupt_setup): ...into here.
+	(sigpacket::process): Simplify setting of handler when have_execed.
+	(_cygtls::interrupt_setup): Don't call proc_subproc when we've execed.
+	* globals.cc (exit_states): Delete unneeded ES_EXEC_EXIT.
+	* pinfo.cc (pinfo::exit): Change debugging output.  Call proc_terminate
+	rather than the now-obsolete sigproc_terminate.  Don't set exit_state
+	to ES_EXEC_EXIT.  Set exit_state to ES_FINAL later.
+	* sigproc.cc (sigproc_terminate): Delete function.
+	(wait_sig): Don't call proc_subproc if have_execed.
+	* sigproc.h (sigproc_terminate): Delete declaration.
+	* sync.h (lock_process::lock_process): Don't set exit_state to
+	ES_PROCESS_LOCKED.
+	(lock_process::operator LONG): Define.
+
+2013-01-11  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* DevNotes: Add entry cgf-000021.
+	* select.cc (select): Unconditionally return when a signal is detected.
+	(select_stuff::wait): Ditto.
+
 2013-01-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (rename): Drop handling paths > 32757 chars, emit EINVAL

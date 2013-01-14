@@ -467,21 +467,6 @@ sigproc_init ()
   new cygthread (wait_sig, cygself, "sig");
 }
 
-/* Called on process termination to terminate signal and process threads.
- */
-void __stdcall
-sigproc_terminate (exit_states es)
-{
-  exit_states prior_exit_state = exit_state;
-  exit_state = es;
-  if (!cygwin_finished_initializing)
-    /* nothing to do */;
-  else if (prior_exit_state >= ES_FINAL)
-    sigproc_printf ("already performed");
-  else
-    proc_terminate ();		// clean up process stuff
-}
-
 /* Exit the current thread very carefully.
    See cgf-000017 in DevNotes for more details on why this is
    necessary.  */
@@ -1427,7 +1412,7 @@ wait_sig (VOID *)
 	    }
 	  break;
 	}
-      if (clearwait)
+      if (clearwait && !have_execed)
 	proc_subproc (PROC_CLEARWAIT, 0);
     loop:
       if (pack.wakeup)

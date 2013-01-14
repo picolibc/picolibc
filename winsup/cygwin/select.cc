@@ -1,7 +1,7 @@
 /* select.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -164,13 +164,12 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  {
 	  case WAIT_SIGNALED:
 	    select_printf ("signal received");
-	    if (_my_tls.call_signal_handler ())
-	      res = select_stuff::select_loop;		/* Emulate linux behavior */
-	    else
-	      {
-		set_sig_errno (EINTR);
-		res = select_stuff::select_error;
-	      }
+	    /* select() is always interrupted by a signal so set EINTR,
+	       unconditionally, ignoring any SA_RESTART detection by
+	       call_signal_handler().  */
+	    _my_tls.call_signal_handler ();
+	    set_sig_errno (EINTR);
+	    res = select_stuff::select_signalled;
 	    break;
 	  case WAIT_CANCELED:
 	    sel.destroy ();
@@ -403,13 +402,12 @@ next_while:;
 	 be assured that a signal handler won't jump out of select entirely. */
       cleanup ();
       destroy ();
-      if (_my_tls.call_signal_handler ())
-	res = select_loop;
-      else
-	{
-	  set_sig_errno (EINTR);
-	  res = select_signalled;	/* Cause loop exit in cygwin_select */
-	}
+      /* select() is always interrupted by a signal so set EINTR,
+	 unconditionally, ignoring any SA_RESTART detection by
+	 call_signal_handler().  */
+      _my_tls.call_signal_handler ();
+      set_sig_errno (EINTR);
+      res = select_signalled;	/* Cause loop exit in cygwin_select */
       break;
     case WAIT_FAILED:
       system_printf ("WaitForMultipleObjects failed, %E");

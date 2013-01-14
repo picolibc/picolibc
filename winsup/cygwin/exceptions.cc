@@ -801,7 +801,8 @@ _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
   if (incyg)
     SetEvent (get_signal_arrived (false));
 
-  proc_subproc (PROC_CLEARWAIT, 1);
+  if (!have_execed)
+    proc_subproc (PROC_CLEARWAIT, 1);
   sigproc_printf ("armed signal_arrived %p, signal %d", signal_arrived, si.si_signo);
 }
 
@@ -1126,12 +1127,6 @@ signal_exit (int sig, siginfo_t *si)
   debug_printf ("exiting due to signal %d", sig);
   exit_state = ES_SIGNAL_EXIT;
 
-  if (have_execed)
-    {
-      sigproc_printf ("terminating captive process");
-      TerminateProcess (ch_spawn, sigExeced = sig);
-    }
-
   if (cygheap->rlim_core > 0UL)
     switch (sig)
       {
@@ -1227,9 +1222,7 @@ sigpacket::process ()
       sigproc_printf ("using tls %p", tls);
     }
 
-  void *handler = (void *) thissig.sa_handler;
-  if (have_execed)
-    handler = NULL;
+  void *handler = have_execed ? NULL : (void *) thissig.sa_handler;
 
   if (handler == SIG_IGN)
     {
@@ -1311,6 +1304,11 @@ dispatch_sig:
       /* Tell gdb that we got a signal. Presumably, gdb already noticed this
 	 if we hit an exception.  */
       _my_tls.signal_debugger (si.si_signo);
+    }
+  if (have_execed)
+    {
+      sigproc_printf ("terminating captive process");
+      TerminateProcess (ch_spawn, sigExeced = si.si_signo);
     }
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, signal handler %p", si.si_signo, handler);
