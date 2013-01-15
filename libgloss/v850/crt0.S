@@ -14,6 +14,16 @@ _start:
 	mov     hilo(__gp),	gp
 	mov     hilo(__ctbp),	r6
 	ldsr    r6,             ctbp
+#if defined(__v850e2v3__)
+	// FPU enable
+	stsr    psw,            r6
+	movhi   1,              r0,      r7
+	or      r7,             r6
+	ldsr    r6,             psw
+	// Initialize the FPSR
+	movhi	2,		r0,	r6
+	ldsr    r6, 	    	fpsr
+#endif
 	mov     hilo(_edata),	r6
 	mov     hilo(_end),	r7
 .L0:

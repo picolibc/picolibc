@@ -1,3 +1,8 @@
+2013-01-15  Nick Clifton  <nickc@redhat.com>
+
+	* libc/sys/sysnecv850/crt0.S (_start): Enable FPU for the
+	V850e2v3.
+
 2013-01-12  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/string.h: Fix preprocessor expressions using

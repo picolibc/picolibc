@@ -1,3 +1,7 @@
+2013-01-15  Nick Clifton  <nickc@redhat.com>
+
+	* v850/crt0.S (_start): Enable FPU for the V850e2v3.
+
 2012-12-17  Stuart Henderson  <shenders@gcc.gnu.org>
 
 	* bfin/Makefile.in: Add BF60x support.
