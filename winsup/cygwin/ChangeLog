@@ -1,3 +1,7 @@
+2013-01-16  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* pthread.cc (pthread_exit): Add kludge to accommodate noreturn attribute.
+
 2013-01-14  Antti Kantee  <pooka@iki.fi>
 
 	* include/pthread.h (pthread_exit): Mark as "noreturn".

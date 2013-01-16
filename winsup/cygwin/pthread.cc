@@ -39,7 +39,8 @@ pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void)
 void
 pthread_exit (void *value_ptr)
 {
-  return pthread::self ()->exit (value_ptr);
+  pthread::self ()->exit (value_ptr);
+  __builtin_unreachable ();	/* FIXME: don't know why this is necessary */
 }
 
 int
