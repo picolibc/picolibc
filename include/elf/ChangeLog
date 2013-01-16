@@ -1,3 +1,9 @@
+2013-01-16  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (R_386_SIZE32): Fill it.
+	* x86-64.h (R_X86_64_SIZE32): Likewise.
+	(R_X86_64_SIZE64): Likewise.
+
 2013-01-10  Will Newton <will.newton@imgtec.com>
 
 	* common.h: Fix case of "Meta".

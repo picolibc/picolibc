@@ -63,7 +63,8 @@ START_RELOC_NUMBERS (elf_x86_64_reloc_type)
      						 that PLT entry is needed */
      RELOC_NUMBER (R_X86_64_PLTOFF64, 31)     /* 64 bit GOT relative offset
      						 to PLT entry */
-     /* 32 .. 33 */
+     RELOC_NUMBER (R_X86_64_SIZE32,   32)     /* 32-bit symbol size */
+     RELOC_NUMBER (R_X86_64_SIZE64,   33)     /* 64-bit symbol size */
      RELOC_NUMBER (R_X86_64_GOTPC32_TLSDESC, 34)
 					      /* 32 bit signed pc relative
 						 offset to TLS descriptor
