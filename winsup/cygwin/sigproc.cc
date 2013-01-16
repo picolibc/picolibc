@@ -31,8 +31,6 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define no_signals_available() ((myself->exitcode & EXITCODE_SET) || (&_my_tls == _sig_tls))
-
 /*
  * Global variables
  */
@@ -489,6 +487,7 @@ exit_thread (DWORD res)
 #ifdef DEBUGGING
       system_printf ("couldn't duplicate the current thread, %E");
 #endif
+      for_now.release ();
       ExitThread (res);
     }
   ProtectHandle1 (h, exit_thread);
@@ -543,7 +542,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 
   pack.wakeup = NULL;
   bool wait_for_completion;
-  if (!(its_me = (!have_execed && (p == NULL || p == myself || p == myself_nowait))))
+  if (!(its_me = p == NULL || p == myself || p == myself_nowait))
     {
       /* It is possible that the process is not yet ready to receive messages
        * or that it has exited.  Detect this.
@@ -558,11 +557,6 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     }
   else
     {
-      if (no_signals_available ())
-	{
-	  set_errno (EAGAIN);
-	  goto out;		// Either exiting or not yet initializing
-	}
       wait_for_completion = p != myself_nowait;
       p = myself;
     }
@@ -688,9 +682,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	}
       else
 	{
-	  if (no_signals_available ())
-	    sigproc_printf ("I'm going away now");
-	  else if (!p->exec_sendsig)
+	  if (!p->exec_sendsig)
 	    system_printf ("error sending signal %d to pid %d, pipe handle %p, %E",
 			   si.si_signo, p->pid, sendsig);
 	}
@@ -728,9 +720,6 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     rc = 0;		// Successful exit
   else
     {
-      if (!no_signals_available ())
-	system_printf ("wait for sig_complete event failed, signal %d, rc %d, %E",
-		       si.si_signo, rc);
       set_errno (ENOSYS);
       rc = -1;
     }

@@ -1,5 +1,12 @@
 2013-01-16  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* sigproc.cc (no_signals_available): Finally remove this macro
+	entirely.
+	(exit_thread): Ensure process lock is released on error exit.
+	(sig_send): Simplify "its_me" test.  Remove no_signals_available tests.
+
+2013-01-16  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* pthread.cc (pthread_exit): Add kludge to accommodate noreturn attribute.
 
 2013-01-14  Antti Kantee  <pooka@iki.fi>
