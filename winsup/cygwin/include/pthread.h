@@ -137,7 +137,7 @@ int pthread_create (pthread_t *, const pthread_attr_t *,
 		    void *(*)(void *), void *);
 int pthread_detach (pthread_t);
 int pthread_equal (pthread_t, pthread_t);
-void pthread_exit (void *);
+void pthread_exit (void *) __attribute__ ((noreturn));
 int pthread_getcpuclockid (pthread_t, clockid_t *);
 int pthread_getschedparam (pthread_t, int *, struct sched_param *);
 void *pthread_getspecific (pthread_key_t);
