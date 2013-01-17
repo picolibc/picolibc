@@ -409,8 +409,6 @@ enum aarch64_op
   OP_UXTH,
   OP_UXTW,
 
-  OP_V_MOVI_B,
-
   OP_CINC,
   OP_CINV,
   OP_CNEG,
