@@ -1,5 +1,11 @@
 2013-01-17  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
 
+	* libc/machine/aarch64/strncmp.S: Correct arithmetic for
+	argument N values close to the maximum representable
+	value in an unsigned 64 bit value.
+
+2013-01-17  Marcus Shawcroft  <marcus.shawcroft@linaro.org>
+
 	* libc/machine/aarch64/strnlen.S: Correct arithmetic for
 	argument N values close to the maximum representable
 	value in an unsigned 64 bit value.

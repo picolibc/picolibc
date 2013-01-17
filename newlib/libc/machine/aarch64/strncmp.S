@@ -81,8 +81,10 @@ def_fn strncmp
 	b.ne	.Lmisaligned8
 	ands	tmp1, src1, #7
 	b.ne	.Lmutual_align
-	add	limit_wd, limit, #7
-	lsr	limit_wd, limit_wd, #3
+	/* Calculate the number of full and partial words -1.  */
+	sub	limit_wd, limit, #1	/* limit != 0, so no underflow.  */
+	lsr	limit_wd, limit_wd, #3	/* Convert to Dwords.  */
+
 	/* NUL detection works on the principle that (X - 1) & (~X) & 0x80
 	   (=> (X - 1) & ~(X | 0x7f)) is non-zero iff a byte is zero, and
 	   can be done in parallel across the entire word.  */
@@ -95,14 +97,14 @@ def_fn strncmp
 	sub	tmp1, data1, zeroones
 	orr	tmp2, data1, #REP8_7f
 	eor	diff, data1, data2	/* Non-zero if differences found.  */
-	csinv	endloop, diff, xzr, ne	/* Last Dword or differences.  */
+	csinv	endloop, diff, xzr, pl	/* Last Dword or differences.  */
 	bics	has_nul, tmp1, tmp2	/* Non-zero if NUL terminator.  */
 	ccmp	endloop, #0, #0, eq
 	b.eq	.Lloop_aligned
 	/* End of performance-critical section  -- one 64B cache line.  */
 
 	/* Not reached the limit, must have found the end or a diff.  */
-	cbnz	limit_wd, .Lnot_limit
+	tbz	limit_wd, #63, .Lnot_limit
 
 	/* Limit % 8 == 0 => all bytes significant.  */
 	ands	limit, limit, #7
@@ -177,26 +179,31 @@ def_fn strncmp
 .Lmutual_align:
 	/* Sources are mutually aligned, but are not currently at an
 	   alignment boundary.  Round down the addresses and then mask off
-	   the bytes that precede the start point.  */
+	   the bytes that precede the start point.
+	   We also need to adjust the limit calculations, but without
+	   overflowing if the limit is near ULONG_MAX.  */
 	bic	src1, src1, #7
 	bic	src2, src2, #7
-	add	limit, limit, tmp1	/* Adjust the limit for the extra.  */
-	lsl	tmp1, tmp1, #3		/* Bytes beyond alignment -> bits.  */
 	ldr	data1, [src1], #8
-	neg	tmp1, tmp1		/* Bits to alignment -64.  */
+	neg	tmp3, tmp1, lsl #3	/* 64 - bits(bytes beyond align). */
 	ldr	data2, [src2], #8
 	mov	tmp2, #~0
+	sub	limit_wd, limit, #1	/* limit != 0, so no underflow.  */
 #ifdef __AARCH64EB__
 	/* Big-endian.  Early bytes are at MSB.  */
-	lsl	tmp2, tmp2, tmp1	/* Shift (tmp1 & 63).  */
+	lsl	tmp2, tmp2, tmp3	/* Shift (tmp1 & 63).  */
 #else
 	/* Little-endian.  Early bytes are at LSB.  */
-	lsr	tmp2, tmp2, tmp1	/* Shift (tmp1 & 63).  */
+	lsr	tmp2, tmp2, tmp3	/* Shift (tmp1 & 63).  */
 #endif
-	add	limit_wd, limit, #7
+	and	tmp3, limit_wd, #7
+	lsr	limit_wd, limit_wd, #3
+	/* Adjust the limit. Only low 3 bits used, so overflow irrelevant.  */
+	add	limit, limit, tmp1
+	add	tmp3, tmp3, tmp1
 	orr	data1, data1, tmp2
 	orr	data2, data2, tmp2
-	lsr	limit_wd, limit_wd, #3
+	add	limit_wd, limit_wd, tmp3, lsr #3
 	b	.Lstart_realigned
 
 .Lret0:
