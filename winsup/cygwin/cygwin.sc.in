@@ -6,6 +6,9 @@ SEARCH_DIR("/usr/lib64"); SEARCH_DIR("=/usr/lib64/w32api");
 OUTPUT_FORMAT(pei-i386)
 SEARCH_DIR("/usr/i686-pc-cygwin/lib/w32api"); SEARCH_DIR("=/usr/lib/w32api");
 #endif
+#define __CONCAT1(a,b)	a##b
+#define __CONCAT(a,b) __CONCAT1(a,b)
+#define _SYM(x)	__CONCAT(__USER_LABEL_PREFIX__, x)
 SECTIONS
 {
   .text  __image_base__ + __section_alignment__  :
@@ -39,11 +42,11 @@ SECTIONS
      ".data_cygwin_nocopy" and explicitly include it after __data_end__. */
   .data ALIGN(__section_alignment__) :
   {
-    __data_start__ = .;
+    _SYM (_data_start__) = .;
     *(.data)
     *(.data2)
     *(SORT(.data$*))
-    __data_end__ = .;
+    _SYM (_data_end__) = .;
     *(.data_cygwin_nocopy)
   }
   .rdata ALIGN(__section_alignment__) :
@@ -64,10 +67,10 @@ SECTIONS
 #endif
   .bss ALIGN(__section_alignment__) :
   {
-    __bss_start__ = .;
+    _SYM (_bss_start__) = .;
     *(.bss)
     *(COMMON)
-    __bss_end__ = .;
+    _SYM (_bss_end__) = .;
   }
   .edata ALIGN(__section_alignment__) :
   {
@@ -119,13 +122,13 @@ SECTIONS
     SORT(*)(.idata$6)
     SORT(*)(.idata$7)
     . = ALIGN(16);
-    __cygheap_start = ABSOLUTE(.);
+    _SYM (_cygheap_start) = ABSOLUTE(.);
   }
   .cygheap ALIGN(__section_alignment__) :
   {
     . = . + (2048 * 1024);
     . = ALIGN(0x10000);
-    __cygheap_end = ABSOLUTE(.);
+    _SYM (_cygheap_end) = ABSOLUTE(.);
   }
   /DISCARD/ :
   {

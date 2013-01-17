@@ -1,3 +1,19 @@
+2013-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h (spawn_info): Define asm symbol without leading
+	underscore for x86_64.
+	(fork_info): Ditto.
+	* cygwin.sc.in (__CONCAT1): Define.
+	(__CONCAT): Define.
+	(_SYM): Define.
+	(_data_start__): Define using _SYM macro to accommodate multiple
+	platforms.
+	(_data_end__): Ditto.
+	(_bss_start__): Ditto.
+	(_bss_end__): Ditto.
+	(_cygheap_start): Ditto.
+	(_cygheap_end): Ditto.
+
 2013-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/config.h (_tlsbase): Define for x86_64.

@@ -189,6 +189,11 @@ void __stdcall init_child_info (DWORD, child_info *, HANDLE);
 
 extern "C" {
 extern child_info *child_proc_info;
+#ifdef __x86_64__
+extern child_info_spawn *spawn_info asm ("child_proc_info");
+extern child_info_fork *fork_info asm ("child_proc_info");
+#else
 extern child_info_spawn *spawn_info asm ("_child_proc_info");
 extern child_info_fork *fork_info asm ("_child_proc_info");
+#endif
 }
