@@ -85,8 +85,10 @@ def_fn strnlen
 	bic	src, srcin, #15
 	ands	tmp1, srcin, #15
 	b.ne	.Lmisaligned
-	add	limit_wd, limit, #15
-	lsr	limit_wd, limit_wd, #4
+	/* Calculate the number of full and partial words -1.  */
+	sub	limit_wd, limit, #1	/* Limit != 0, so no underflow.  */
+	lsr	limit_wd, limit_wd, #4	/* Convert to Qwords.  */
+
 	/* NUL detection works on the principle that (X - 1) & (~X) & 0x80
 	   (=> (X - 1) & ~(X | 0x7f)) is non-zero iff a byte is zero, and
 	   can be done in parallel across the entire word.  */
@@ -107,7 +109,7 @@ def_fn strnlen
 	bic	has_nul2, tmp3, tmp4
 	subs	limit_wd, limit_wd, #1
 	orr	tmp1, has_nul1, has_nul2
-	ccmp	tmp1, #0, #0, ne	/* NZCV = 0000  */
+	ccmp	tmp1, #0, #0, pl	/* NZCV = 0000  */
 	b.eq	.Lloop
 	/* End of critical section -- keep to one 64Byte cache line.  */
 
@@ -145,23 +147,38 @@ def_fn strnlen
 	ret
 
 .Lmisaligned:
-	add	tmp3, limit, tmp1
+	/* Deal with a partial first word.
+	   We're doing two things in parallel here;
+	   1) Calculate the number of words (but avoiding overflow if
+	      limit is near ULONG_MAX) - to do this we need to work out
+	      limit + tmp1 - 1 as a 65-bit value before shifting it;
+	   2) Load and mask the initial data words - we force the bytes
+	      before the ones we are interested in to 0xff - this ensures
+	      early bytes will not hit any zero detection.  */
+	sub	limit_wd, limit, #1
+	neg	tmp4, tmp1
 	cmp	tmp1, #8
-	neg	tmp1, tmp1
-	ldp	data1, data2, [src], #16
-	add	limit_wd, tmp3, #15
-	lsl	tmp1, tmp1, #3		/* Bytes beyond alignment -> bits.  */
-	mov	tmp2, #~0
+
+	and	tmp3, limit_wd, #15
 	lsr	limit_wd, limit_wd, #4
+	mov	tmp2, #~0
+
+	ldp	data1, data2, [src], #16
+	lsl	tmp4, tmp4, #3		/* Bytes beyond alignment -> bits.  */
+	add	tmp3, tmp3, tmp1
+
 #ifdef __AARCH64EB__
 	/* Big-endian.  Early bytes are at MSB.  */
-	lsl	tmp2, tmp2, tmp1	/* Shift (tmp1 & 63).  */
+	lsl	tmp2, tmp2, tmp4	/* Shift (tmp1 & 63).  */
 #else
 	/* Little-endian.  Early bytes are at LSB.  */
-	lsr	tmp2, tmp2, tmp1	/* Shift (tmp1 & 63).  */
+	lsr	tmp2, tmp2, tmp4	/* Shift (tmp1 & 63).  */
 #endif
+	add	limit_wd, limit_wd, tmp3, lsr #4
+
 	orr	data1, data1, tmp2
 	orr	data2a, data2, tmp2
+
 	csinv	data1, data1, xzr, le
 	csel	data2, data2, data2a, le
 	b	.Lrealigned
