@@ -150,7 +150,7 @@ extern int cygserver_running;
 
 class per_process;
 /* cygwin .dll initialization */
-void dll_crt0 (per_process *) __asm__ ("_dll_crt0__FP11per_process");
+void dll_crt0 (per_process *) __asm__ (_SYMSTR (dll_crt0__FP11per_process));
 extern "C" void __stdcall _dll_crt0 ();
 void dll_crt0_1 (void *);
 void dll_dllcrt0_1 (void *);

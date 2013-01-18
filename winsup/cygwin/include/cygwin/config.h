@@ -47,6 +47,13 @@ extern char *_tlsbase __asm__ ("%fs:4");
 #define __getreent() (struct _reent *)(_tlsbase + tls_local_clib)
 #endif  /* _COMPILING_NEWLIB */
 
+#ifdef __x86_64__
+# define __SYMBOL_PREFIX
+#else
+# define __SYMBOL_PREFIX "_"
+#endif
+#define _SYMSTR(x)	__SYMBOL_PREFIX #x
+
 #define __FILENAME_MAX__ 4096	/* Keep in sync with PATH_MAX in limits.h. */
 
 /* The following block of macros is required to build newlib correctly for

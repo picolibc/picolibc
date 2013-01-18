@@ -26,10 +26,10 @@ time_t __cdecl timegm (struct tm *);
 
 #ifndef __STRICT_ANSI__
 
-extern int daylight __asm__ ("__daylight");
+extern int daylight __asm__ (_SYMSTR (_daylight));
 
 #ifndef __timezonefunc__
-extern long timezone __asm__ ("__timezone");
+extern long timezone __asm__ (_SYMSTR (_timezone));
 #endif
 
 #endif /*__STRICT_ANSI__*/

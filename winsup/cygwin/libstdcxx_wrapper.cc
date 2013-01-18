@@ -24,21 +24,21 @@ details.  */
    it think they're just any old function matching 'extern "C" _wrap_*'.  */
 
 extern void *operator new(std::size_t sz) throw (std::bad_alloc)
-			__asm__ ("___wrap__Znwj");
+			__asm__ (_SYMSTR (__wrap__Znwj));
 extern void *operator new[](std::size_t sz) throw (std::bad_alloc)
-			__asm__ ("___wrap__Znaj");
+			__asm__ (_SYMSTR (__wrap__Znaj));
 extern void operator delete(void *p) throw()
-			__asm__ ("___wrap__ZdlPv");
+			__asm__ (_SYMSTR (__wrap__ZdlPv));
 extern void operator delete[](void *p) throw()
-			__asm__ ("___wrap__ZdaPv");
+			__asm__ (_SYMSTR (__wrap__ZdaPv));
 extern void *operator new(std::size_t sz, const std::nothrow_t &nt) throw()
-			__asm__ ("___wrap__ZnwjRKSt9nothrow_t");
+			__asm__ (_SYMSTR (__wrap__ZnwjRKSt9nothrow_t));
 extern void *operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
-			__asm__ ("___wrap__ZnajRKSt9nothrow_t");
+			__asm__ (_SYMSTR (__wrap__ZnajRKSt9nothrow_t));
 extern void operator delete(void *p, const std::nothrow_t &nt) throw()
-			__asm__ ("___wrap__ZdlPvRKSt9nothrow_t");
+			__asm__ (_SYMSTR (__wrap__ZdlPvRKSt9nothrow_t));
 extern void operator delete[](void *p, const std::nothrow_t &nt) throw()
-			__asm__ ("___wrap__ZdaPvRKSt9nothrow_t");
+			__asm__ (_SYMSTR (__wrap__ZdaPvRKSt9nothrow_t));
 
 extern void *
 operator new(std::size_t sz) throw (std::bad_alloc)

@@ -21,21 +21,21 @@ details. */
    way we can record what definitions were visible at final link time but still
    send all calls to the redirectors.  */
 extern WEAK void *operator new(std::size_t sz) throw (std::bad_alloc)
-			__asm__ ("___real__Znwj");
+			__asm__ (_SYMSTR (__real__Znwj));
 extern WEAK void *operator new[](std::size_t sz) throw (std::bad_alloc)
-			__asm__ ("___real__Znaj");
+			__asm__ (_SYMSTR (__real__Znaj));
 extern WEAK void operator delete(void *p) throw()
-			__asm__ ("___real__ZdlPv ");
+			__asm__ (_SYMSTR (__real__ZdlPv ));
 extern WEAK void operator delete[](void *p) throw()
-			__asm__ ("___real__ZdaPv");
+			__asm__ (_SYMSTR (__real__ZdaPv));
 extern WEAK void *operator new(std::size_t sz, const std::nothrow_t &nt) throw()
-			__asm__ ("___real__ZnwjRKSt9nothrow_t");
+			__asm__ (_SYMSTR (__real__ZnwjRKSt9nothrow_t));
 extern WEAK void *operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
-			__asm__ ("___real__ZnajRKSt9nothrow_t");
+			__asm__ (_SYMSTR (__real__ZnajRKSt9nothrow_t));
 extern WEAK void operator delete(void *p, const std::nothrow_t &nt) throw()
-			__asm__ ("___real__ZdlPvRKSt9nothrow_t");
+			__asm__ (_SYMSTR (__real__ZdlPvRKSt9nothrow_t));
 extern WEAK void operator delete[](void *p, const std::nothrow_t &nt) throw()
-			__asm__ ("___real__ZdaPvRKSt9nothrow_t");
+			__asm__ (_SYMSTR (__real__ZdaPvRKSt9nothrow_t));
 
 /* Avoid an info message from linker when linking applications.  */
 extern __declspec(dllimport) struct _reent *_impure_ptr;
