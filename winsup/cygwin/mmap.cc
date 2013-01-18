@@ -1664,7 +1664,14 @@ fhandler_disk_file::msync (HANDLE h, caddr_t addr, size_t len, int flags)
      cygwin list.  So retry 99 times and hope we get lucky.  */
   for (int i = 0; i < retry; i++)
     if (FlushViewOfFile (addr, len))
-      return 0;
+      {
+	/* FlushViewOfFile just triggers the action and returns immediately,
+	   so it's equivalent to MS_ASYNC.  MS_SYNC requires another call to
+	   FlushFileBuffers. */
+	if (flags & MS_SYNC)
+	  FlushFileBuffers (h);
+	return 0;
+      }
     else if (GetLastError () != ERROR_LOCK_VIOLATION)
       break;
     else if (i < (retry - 1))
