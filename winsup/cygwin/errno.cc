@@ -1,7 +1,7 @@
 /* errno.cc: errno-related functions
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -103,7 +103,7 @@ static NO_COPY struct
   X (IO_DEVICE,			EIO),
   X (IO_INCOMPLETE,		EAGAIN),
   X (IO_PENDING,		EAGAIN),
-  X (LOCK_VIOLATION,		EACCES),
+  X (LOCK_VIOLATION,		EBUSY),
   X (MAX_THRDS_REACHED,		EAGAIN),
   X (META_EXPANSION_TOO_LONG,	EINVAL),
   X (MOD_NOT_FOUND,		ENOENT),

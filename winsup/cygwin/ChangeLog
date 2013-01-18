@@ -1,4 +1,8 @@
-2013-01-18  Christopher Faylor  <me.cygwin2013@cgf.cx>
+2013-01-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Map ERROR_LOCK_VIOLATION to EBUSY.
+
+2013-01-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (handler_disk_file::msync): Add call to FlushFileBuffers
 	to implement MS_SYNC.
