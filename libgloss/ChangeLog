@@ -1,3 +1,10 @@
+2013-01-18  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* aarch64/Machine.in (RDIMON_SCRIPTS):
+	Add aem-ve.specs and aem-validation.specs.
+	* aarch64/elf-aem-validation.specs: New file.
+	* aarch64/elf-aem-ve.specs: New file.
+
 2013-01-15  Nick Clifton  <nickc@redhat.com>
 
 	* v850/crt0.S (_start): Enable FPU for the V850e2v3.

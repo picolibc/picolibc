@@ -81,7 +81,7 @@ CRT0_INSTALL	= install-crt0
 RDIMON_CRT0	= rdimon-crt0.o
 RDIMON_BSP	= librdimon.a
 RDIMON_OBJS	= $(patsubst %,rdimon-%,$(OBJS))
-RDIMON_SCRIPTS	= rdimon.specs
+RDIMON_SCRIPTS	= rdimon.specs aem-ve.specs aem-validation.specs
 RDIMON_INSTALL	= install-rdimon
 
 CFLAGS		= -g
