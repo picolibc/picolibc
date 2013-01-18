@@ -1,7 +1,7 @@
 /* mmap.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1657,12 +1657,21 @@ fhandler_disk_file::munmap (HANDLE h, caddr_t addr, size_t len)
 int
 fhandler_disk_file::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 {
-  if (FlushViewOfFile (addr, len) == 0)
-    {
-      __seterrno ();
-      return -1;
-    }
-  return 0;
+  const int retry = 100;
+  /* The wisdom of google tells us that FlushViewOfFile may fail with
+     ERROR_LOCK_VIOLATION if "if the memory system is writing dirty
+     pages to disk".  And, we've seen reports of this happening in the
+     cygwin list.  So retry 99 times and hope we get lucky.  */
+  for (int i = 0; i < retry; i++)
+    if (FlushViewOfFile (addr, len))
+      return 0;
+    else if (GetLastError () != ERROR_LOCK_VIOLATION)
+      break;
+    else if (i < (retry - 1))
+      yield ();
+
+  __seterrno ();
+  return -1;
 }
 
 bool
