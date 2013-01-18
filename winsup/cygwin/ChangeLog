@@ -1,3 +1,17 @@
+2013-01-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Map ERROR_LOCK_VIOLATION to EBUSY.
+
+2013-01-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (handler_disk_file::msync): Add call to FlushFileBuffers
+	to implement MS_SYNC.
+
+2013-01-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* mmap.cc (handler_disk_file::msync): Retry up to 99 times if
+	FlushViewOFile fails with ERROR_LOCK_VIOLATION.
+
 2013-01-16  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* sigproc.cc (no_signals_available): Finally remove this macro
