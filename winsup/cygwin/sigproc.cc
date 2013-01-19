@@ -471,6 +471,7 @@ sigproc_init ()
 void
 exit_thread (DWORD res)
 {
+# undef ExitThread
   sigfillset (&_my_tls.sigmask);	/* No signals wanted */
   lock_process for_now;			/* May block indefinitely when exiting. */
   if (exit_state)
@@ -496,7 +497,6 @@ exit_thread (DWORD res)
   siginfo_t si = {__SIGTHREADEXIT, SI_KERNEL};
   si.si_cyg = h;
   sig_send (myself_nowait, si, &_my_tls);
-# undef ExitThread
   ExitThread (0);
 }
 
