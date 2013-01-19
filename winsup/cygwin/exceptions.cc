@@ -912,14 +912,6 @@ ctrl_c_handler (DWORD type)
 {
   static bool saw_close;
 
-  if (!cygwin_finished_initializing)
-    {
-      if (myself->cygstarted)	/* Was this process created by a cygwin process? */
-	return TRUE;		/* Yes.  Let the parent eventually handle CTRL-C issues. */
-      debug_printf ("exiting with status %y", STATUS_CONTROL_C_EXIT);
-      ExitProcess (STATUS_CONTROL_C_EXIT);
-    }
-
   /* Remove early or we could overthrow the threadlist in cygheap.
      Deleting this line causes ash to SEGV if CTRL-C is hit repeatedly.
      I am not exactly sure why that is.  Maybe it's just because this

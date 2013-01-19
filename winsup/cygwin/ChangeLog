@@ -1,3 +1,15 @@
+2013-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (rename): Remove ill-conceived NFS workaround from
+	2013-01-10 for self-inflicted NFS server problem.
+
+2013-01-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* exceptions.cc (ctrl_c_handler): Remove special-case handler for
+	"cygwin_finished_initializing".
+	* sigproc.cc (exit_thread): Undefine ExitThread earlier to avoid
+	recursion on error return.
+
 2013-01-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (errmap): Map ERROR_LOCK_VIOLATION to EBUSY.
