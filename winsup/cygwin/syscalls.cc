@@ -2450,52 +2450,9 @@ retry:
   pfri = (PFILE_RENAME_INFORMATION) tp.w_get ();
   pfri->ReplaceIfExists = TRUE;
   pfri->RootDirectory = NULL;
-  if (oldpc.fs_is_nfs ())
-    {
-      /* Workaround depressing NFS bug.  FILE_RENAME_INFORMATION.FileName
-	 *must* be relative to the parent directory of the original file,
-	 otherwise NtSetInformationFile returns with STATUS_NOT_SAME_DEVICE.
-	 Neither absolute paths, nor directory handle relative paths work
-	 as expected! */
-      PWCHAR oldp, dstp;
-
-      /* Skip equivalent path prefix.  We already know that both paths are
-	 on the same drive anyway. */
-      for (oldp = oldpc.get_nt_native_path ()->Buffer,
-	   dstp = dstpc->get_nt_native_path ()->Buffer;
-	   *oldp == *dstp; ++oldp, ++dstp)
-	;
-      while (oldp[-1] != L'\\')
-      	--oldp, --dstp;
-      /* Now oldp points to the first path component in oldpc different from
-         dstpc, vice versa for dstp and oldpc.  To create a dstpc path relative
-	 to oldpc, we now have to prepend as many ".." components to dstp, as
-	 are still available in oldp.  Example:
-
-	   oldpc = \??\UNC\server\a\b\c\d\e
-	   dstpc = \??\UNC\server\a\b\f\g
-
-           prefix: \??\UNC\server\a\b\
-	   oldp: c\d\e
-	   dstp: f\g
-	   dstp expressed relative to e's parent dir:  ..\..\f\g
-
-	 So what we do here is to count the number of backslashes in oldp and
-	 prepend one "..\" to dstp for each of them. */
-      PWCHAR newdst = tp.w_get ();
-      PWCHAR newp = newdst;
-      while ((oldp = wcschr (++oldp, L'\\')) != NULL)
-      	newp = wcpcpy (newp, L"..\\");
-      newp = wcpcpy (newp, dstp);
-      pfri->FileNameLength = (newp - newdst) * sizeof (WCHAR);
-      memcpy (&pfri->FileName,  newdst, pfri->FileNameLength);
-    }
-  else
-    {
-      pfri->FileNameLength = dstpc->get_nt_native_path ()->Length;
-      memcpy (&pfri->FileName,  dstpc->get_nt_native_path ()->Buffer,
-	      pfri->FileNameLength);
-    }
+  pfri->FileNameLength = dstpc->get_nt_native_path ()->Length;
+  memcpy (&pfri->FileName,  dstpc->get_nt_native_path ()->Buffer,
+	  pfri->FileNameLength);
   status = NtSetInformationFile (fh, &io, pfri,
   				 sizeof *pfri + pfri->FileNameLength,
 				 FileRenameInformation);

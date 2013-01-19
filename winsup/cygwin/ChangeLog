@@ -1,3 +1,8 @@
+2013-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (rename): Remove ill-conceived NFS workaround from
+	2013-01-10 for self-inflicted NFS server problem.
+
 2013-01-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* exceptions.cc (ctrl_c_handler): Remove special-case handler for
