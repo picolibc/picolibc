@@ -21,7 +21,11 @@ extern struct per_process __cygwin_user_data;
 /* We use the following to test that sizeof hasn't changed.  When adding
    or deleting members, insert fillers or use the reserved entries.
    Do not change this value. */
+#ifdef __x86_64__
+#define SIZEOF_PER_PROCESS (42 * 8)
+#else
 #define SIZEOF_PER_PROCESS (42 * 4)
+#endif
 
 #ifdef __cplusplus
 }

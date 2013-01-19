@@ -285,10 +285,10 @@ struct per_process
   /* For future expansion of values set by the app. */
   void (*premain[4]) (int, char **, struct per_process *);
 
-  /* non-zero of ctors have been run.  Inherited from parent. */
-  int run_ctors_p;
+  /* non-zero if ctors have been run.  Inherited from parent. */
+  int32_t run_ctors_p;
 
-  DWORD unused[7];
+  DWORD_PTR unused[7];
 
   /* Pointers to real operator new/delete functions for forwarding.  */
   struct per_process_cxx_malloc *cxx_malloc;
@@ -299,7 +299,11 @@ struct per_process
   DWORD api_minor;		/*  linked with */
   /* For future expansion, so apps won't have to be relinked if we
      add an item. */
-  DWORD unused2[3];
+#ifdef __x86_64__
+  DWORD_PTR unused2[5];
+#else
+  DWORD_PTR unused2[3];
+#endif
   void *pseudo_reloc_start;
   void *pseudo_reloc_end;
   void *image_base;

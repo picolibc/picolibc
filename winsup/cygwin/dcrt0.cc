@@ -1009,7 +1009,9 @@ dll_crt0_1 (void *)
       cygwin_exit (user_data->main (__argc, newargv, *user_data->envptr));
     }
   __asm__ ("				\n\
+	.global _cygwin_exit_return	\n\
 	.global __cygwin_exit_return	\n\
+_cygwin_exit_return:			\n\
 __cygwin_exit_return:			\n\
 		nop			\n\
 ");
