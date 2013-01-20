@@ -84,7 +84,7 @@ public:
   sigpacket *next ();
   sigpacket *save () const {return curr;}
   void restore (sigpacket *saved) {curr = saved;}
-  friend void __stdcall sig_dispatch_pending (bool);
+  friend void __stdcall sig_dispatch_pending (bool) __attribute__ ((regparm (1)));;
   friend void WINAPI wait_sig (VOID *arg);
 };
 
@@ -156,7 +156,7 @@ proc_can_be_signalled (_pinfo *p)
   return false;
 }
 
-bool __stdcall
+bool __stdcall __attribute__ ((regparm(1)))
 pid_exists (pid_t pid)
 {
   return pinfo (pid)->exists ();
@@ -174,7 +174,7 @@ mychild (int pid)
 
 /* Handle all subprocess requests
  */
-int __stdcall
+int __stdcall __attribute__ ((regparm (2)))
 proc_subproc (DWORD what, DWORD val)
 {
   int rc = 1;
@@ -390,7 +390,7 @@ proc_terminate ()
 }
 
 /* Clear pending signal */
-void __stdcall
+void __stdcall __attribute__ ((regparm (1)))
 sig_clear (int target_sig)
 {
   if (&_my_tls != _sig_tls)
@@ -421,7 +421,7 @@ sigpending (sigset_t *mask)
 }
 
 /* Force the wait_sig thread to wake up and scan for pending signals */
-void __stdcall
+void __stdcall __attribute__ ((regparm (1)))
 sig_dispatch_pending (bool fast)
 {
   if (&_my_tls == _sig_tls)
@@ -500,7 +500,7 @@ exit_thread (DWORD res)
   ExitThread (0);
 }
 
-int __stdcall
+int __stdcall __attribute__ ((regparm (3)))
 sig_send (_pinfo *p, int sig, _cygtls *tid)
 {
   if (sig == __SIGHOLD)
@@ -531,7 +531,7 @@ sig_send (_pinfo *p, int sig, _cygtls *tid)
    If pinfo *p == NULL, send to the current process.
    If sending to this process, wait for notification that a signal has
    completed before returning.  */
-int __stdcall
+int __stdcall __attribute__ ((regparm (3)))
 sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 {
   int rc = 1;
@@ -1081,7 +1081,7 @@ child_info_fork::abort (const char *fmt, ...)
 /* Check the state of all of our children to see if any are stopped or
  * terminated.
  */
-static int __stdcall
+static int __stdcall __attribute__ ((regparm (1)))
 checkstate (waitq *parent_w)
 {
   int potential_match = 0;

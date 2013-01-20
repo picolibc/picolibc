@@ -1,3 +1,13 @@
+2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* sigproc.cc (sig_dispatch_pending): Add correct regparm attributes to
+	match declaration.
+	(pid_exists): Ditto.
+	(proc_subproc): Ditto.
+	(sig_clear): Ditto.
+	(sig_send): Ditto.
+	(checkstate): Ditto.
+
 2013-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (rename): Remove ill-conceived NFS workaround from
