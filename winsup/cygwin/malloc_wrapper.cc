@@ -1,10 +1,7 @@
 /* malloc_wrapper.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007 Red Hat, Inc.
-
-   Originally written by Steve Chamberlain of Cygnus Support
-   sac@cygnus.com
+   2006, 2007, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -19,6 +16,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "perprocess.h"
+#include "miscfuncs.h"
 #include "cygmalloc.h"
 #ifndef MALLOC_DEBUG
 #include <malloc.h>
@@ -31,8 +29,8 @@ extern "C" struct mallinfo dlmallinfo ();
    problems if malloced on our heap and free'd on theirs.
 */
 
-static int export_malloc_called;
-static int use_internal_malloc = 1;
+static bool use_internal = true;
+static bool internal_malloc_determined;
 
 /* These routines are used by the application if it
    doesn't provide its own malloc. */
@@ -41,7 +39,7 @@ extern "C" void
 free (void *p)
 {
   malloc_printf ("(%p), called by %p", p, __builtin_return_address (0));
-  if (!use_internal_malloc)
+  if (!use_internal)
     user_data->free (p);
   else
     {
@@ -55,8 +53,7 @@ extern "C" void *
 malloc (size_t size)
 {
   void *res;
-  export_malloc_called = 1;
-  if (!use_internal_malloc)
+  if (!use_internal)
     res = user_data->malloc (size);
   else
     {
@@ -72,7 +69,7 @@ extern "C" void *
 realloc (void *p, size_t size)
 {
   void *res;
-  if (!use_internal_malloc)
+  if (!use_internal)
     res = user_data->realloc (p, size);
   else
     {
@@ -99,7 +96,7 @@ extern "C" void *
 calloc (size_t nmemb, size_t size)
 {
   void *res;
-  if (!use_internal_malloc)
+  if (!use_internal)
     res = user_data->calloc (nmemb, size);
   else
     {
@@ -117,7 +114,7 @@ posix_memalign (void **memptr, size_t alignment, size_t bytes)
   save_errno save;
 
   void *res;
-  if (!use_internal_malloc)
+  if (!use_internal)
     return ENOSYS;
   if ((alignment & (alignment - 1)) != 0)
     return EINVAL;
@@ -135,7 +132,7 @@ extern "C" void *
 memalign (size_t alignment, size_t bytes)
 {
   void *res;
-  if (!use_internal_malloc)
+  if (!use_internal)
     {
       set_errno (ENOSYS);
       res = NULL;
@@ -154,7 +151,7 @@ extern "C" void *
 valloc (size_t bytes)
 {
   void *res;
-  if (!use_internal_malloc)
+  if (!use_internal)
     {
       set_errno (ENOSYS);
       res = NULL;
@@ -173,7 +170,7 @@ extern "C" size_t
 malloc_usable_size (void *p)
 {
   size_t res;
-  if (!use_internal_malloc)
+  if (!use_internal)
     {
       set_errno (ENOSYS);
       res = 0;
@@ -192,7 +189,7 @@ extern "C" int
 malloc_trim (size_t pad)
 {
   size_t res;
-  if (!use_internal_malloc)
+  if (!use_internal)
     {
       set_errno (ENOSYS);
       res = 0;
@@ -211,7 +208,7 @@ extern "C" int
 mallopt (int p, int v)
 {
   int res;
-  if (!use_internal_malloc)
+  if (!use_internal)
     {
       set_errno (ENOSYS);
       res = 0;
@@ -229,7 +226,7 @@ mallopt (int p, int v)
 extern "C" void
 malloc_stats ()
 {
-  if (!use_internal_malloc)
+  if (!use_internal)
     set_errno (ENOSYS);
   else
     {
@@ -243,7 +240,7 @@ extern "C" struct mallinfo
 mallinfo ()
 {
   struct mallinfo m;
-  if (!use_internal_malloc)
+  if (!use_internal)
     set_errno (ENOSYS);
   else
     {
@@ -284,16 +281,12 @@ malloc_init ()
      calls to malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides
      its own malloc */
-  if (!in_forkee)
+  if (!internal_malloc_determined)
     {
-      user_data->free (user_data->malloc (16));
-      if (export_malloc_called)
-	malloc_printf ("using internal malloc");
-      else
-	{
-	  use_internal_malloc = 0;
-	  malloc_printf ("using external malloc");
-	}
+      extern void *_sigfe_malloc;
+      use_internal = import_address (user_data->malloc) == &_sigfe_malloc;
+      malloc_printf ("using %s malloc", use_internal ? "internal" : "external");
+      internal_malloc_determined = true;
     }
 #endif
 }

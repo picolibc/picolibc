@@ -1,5 +1,19 @@
 2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* malloc_wrapper.cc: Change 'use_internal_malloc' to 'use_internal'
+	throughout.
+	(export_malloc_called): Delete.
+	(internal_malloc_determined): New variable.
+	(malloc_init): Control calculation of internal/external malloc based on
+	'internal_malloc_determined'.  Use import_address() to determine if
+	malloc in user_data is ours or not.
+	* miscfuncs.cc (thread_wrapper): Make static.
+	(__import_address): Define new function.
+	* miscfuncs.h (import_address): New define.
+	(__import_address): Declare new function.
+
+2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* sigproc.cc (sig_dispatch_pending): Add correct regparm attributes to
 	match declaration.
 	(pid_exists): Ditto.
