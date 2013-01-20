@@ -1,5 +1,10 @@
 2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* update-copyright: Update standard copyright information based on cvs
+	log and current sandbox status.
+
+2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* malloc_wrapper.cc: Change 'use_internal_malloc' to 'use_internal'
 	throughout.
 	(export_malloc_called): Delete.
