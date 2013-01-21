@@ -1,7 +1,7 @@
 /* path.h: path data structures
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -215,10 +215,10 @@ class path_conv
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
 
-  void check (const UNICODE_STRING *upath, unsigned opt = PC_SYM_FOLLOW,
-	      const suffix_info *suffixes = NULL) __attribute__ ((regparm(3)));
-  void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
-	      const suffix_info *suffixes = NULL) __attribute__ ((regparm(3)));
+  void __reg3 check (const UNICODE_STRING *upath, unsigned opt = PC_SYM_FOLLOW,
+	      const suffix_info *suffixes = NULL);
+  void __reg3 check (const char *src, unsigned opt = PC_SYM_FOLLOW,
+	      const suffix_info *suffixes = NULL);
 
   path_conv (const device& in_dev)
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
@@ -384,7 +384,7 @@ class path_conv
 #if 0 /* obsolete, method still exists in fhandler_disk_file.cc */
   unsigned __stdcall ndisk_links (DWORD);
 #endif
-  void set_normalized_path (const char *) __attribute__ ((regparm (2)));
+  void __reg2 set_normalized_path (const char *);
   DWORD get_symlink_length () { return symlink_length; };
  private:
   char *modifiable_path () {return (char *) path;}
@@ -407,11 +407,10 @@ enum fe_types
   FE_CWD = 4,		/* Search CWD for program */
   FE_DLL = 8		/* Search for DLLs, not executables. */
 };
-const char *__stdcall find_exec (const char *name, path_conv& buf,
+const char *__reg3 find_exec (const char *name, path_conv& buf,
 				 const char *winenv = "PATH=",
 				 unsigned opt = FE_NADA,
-				 const char **known_suffix = NULL)
-  __attribute__ ((regparm(3)));
+				 const char **known_suffix = NULL);
 
 /* Common macros for checking for invalid path names */
 #define isdrive(s) (isalpha (*(s)) && (s)[1] == ':')
@@ -426,17 +425,17 @@ has_exec_chars (const char *buf, int len)
 	  (buf[0] == 'M' && buf[1] == 'Z'));
 }
 
-int pathmatch (const char *path1, const char *path2, bool caseinsensitive) __attribute__ ((regparm (3)));
-int pathnmatch (const char *path1, const char *path2, int len, bool caseinsensitive) __attribute__ ((regparm (3)));
-bool has_dot_last_component (const char *dir, bool test_dot_dot) __attribute__ ((regparm (2)));
+int __reg3 pathmatch (const char *path1, const char *path2, bool caseinsensitive);
+int __reg3 pathnmatch (const char *path1, const char *path2, int len, bool caseinsensitive);
+bool __reg2 has_dot_last_component (const char *dir, bool test_dot_dot);
 
-int path_prefix_p (const char *path1, const char *path2, int len1,
-		   bool caseinsensitive) __attribute__ ((regparm (3)));
+int __reg3 path_prefix_p (const char *path1, const char *path2, int len1,
+		   bool caseinsensitive);
 
 NTSTATUS file_get_fnoi (HANDLE, bool, struct _FILE_NETWORK_OPEN_INFORMATION *);
 int normalize_win32_path (const char *, char *, char *&);
 int normalize_posix_path (const char *, char *, char *&);
-PUNICODE_STRING get_nt_native_path (const char *, UNICODE_STRING&, bool) __attribute__ ((regparm (3)));
+PUNICODE_STRING __reg3 get_nt_native_path (const char *, UNICODE_STRING&, bool);
 
 /* FIXME: Move to own include file eventually */
 

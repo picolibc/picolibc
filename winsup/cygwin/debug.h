@@ -1,6 +1,7 @@
 /* debug.h
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010
+   Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -66,16 +67,12 @@ details. */
 # define VerifyHandle(h) verify_handle (__PRETTY_FUNCTION__, __LINE__, (h))
 
 void debug_init ();
-void __stdcall add_handle (const char *, int, HANDLE, const char *, bool = false)
-  __attribute__ ((regparm (3)));
-void __stdcall verify_handle (const char *, int, HANDLE)
-  __attribute__ ((regparm (3)));
-bool __stdcall close_handle (const char *, int, HANDLE, const char *, bool)
-  __attribute__ ((regparm (3)));
+void __reg3 add_handle (const char *, int, HANDLE, const char *, bool = false);
+void __reg3 verify_handle (const char *, int, HANDLE);
+bool __reg3 close_handle (const char *, int, HANDLE, const char *, bool);
 extern "C" void console_printf (const char *fmt,...);
-void __stdcall cygbench (const char *s) __attribute__ ((regparm (1)));
-void __stdcall modify_handle (const char *, int, HANDLE, const char *, bool)
-  __attribute__ ((regparm (3)));
+void __reg1 cygbench (const char *s);
+void __reg3 modify_handle (const char *, int, HANDLE, const char *, bool);
 void setclexec (HANDLE, HANDLE, bool);
 void debug_fixup_after_fork_exec ();
 

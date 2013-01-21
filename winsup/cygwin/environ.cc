@@ -1,8 +1,8 @@
 /* environ.cc: Cygwin-adopted functions from newlib to manipulate
    process's environment.
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -375,7 +375,7 @@ win_env::add_cache (const char *in_posix, const char *in_native)
   to the beginning of the environment variable name.  *in_posix is any
   known posix value for the environment variable. Returns a pointer to
   the appropriate conversion structure.  */
-win_env * __stdcall
+win_env * __reg3
 getwinenv (const char *env, const char *in_posix, win_env *temp)
 {
   if (!match_first_char (env, WC))
@@ -872,7 +872,7 @@ env_sort (const void *a, const void *b)
   return strcmp (*p, *q);
 }
 
-char * __stdcall
+char * __reg3
 getwinenveq (const char *name, size_t namelen, int x)
 {
   WCHAR name0[namelen - 1];
@@ -907,8 +907,7 @@ struct spenv
   bool add_if_exists;		/* if true, retrieve value from cache */
   const char * (cygheap_user::*from_cygheap) (const char *, size_t);
 
-  char *retrieve (bool, const char * const = NULL)
-    __attribute__ ((regparm (3)));
+  char __reg3 *retrieve (bool, const char * const = NULL);
 };
 
 #define env_dontadd almost_null
@@ -972,7 +971,7 @@ spenv::retrieve (bool no_envblock, const char *const env)
    filled with null terminated strings, terminated by double null characters.
    Converts environment variables noted in conv_envvars into win32 form
    prior to placing them in the string.  */
-char ** __stdcall
+char ** __reg3
 build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 	   bool no_envblock)
 {

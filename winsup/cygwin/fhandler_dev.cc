@@ -1,6 +1,6 @@
 /* fhandler_dev.cc, Implement /dev.
 
-   Copyright 2012 Red Hat, Inc.
+   Copyright 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -67,7 +67,7 @@ fhandler_dev::close ()
   return fhandler_disk_file::close ();
 }
 
-int
+int __reg2
 fhandler_dev::fstat (struct __stat64 *st)
 {
   /* If /dev really exists on disk, return correct disk information. */

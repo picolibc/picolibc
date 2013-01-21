@@ -1,7 +1,7 @@
 /* fhandler.cc.  See console.cc for fhandler_console functions.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1269,7 +1269,7 @@ fhandler_base::lock (int, struct __flock64 *)
   return -1;
 }
 
-int __stdcall
+int __reg2
 fhandler_base::fstat (struct __stat64 *buf)
 {
   if (is_fs_special ())
@@ -1872,7 +1872,7 @@ fhandler_base::fpathconf (int v)
 
 /* Overlapped I/O */
 
-int __stdcall __attribute__ ((regparm (1)))
+int __reg1
 fhandler_base_overlapped::setup_overlapped ()
 {
   OVERLAPPED *ov = get_overlapped_buffer ();
@@ -1883,7 +1883,7 @@ fhandler_base_overlapped::setup_overlapped ()
   return ov->hEvent ? 0 : -1;
 }
 
-void __stdcall __attribute__ ((regparm (1)))
+void __reg1
 fhandler_base_overlapped::destroy_overlapped ()
 {
   OVERLAPPED *ov = get_overlapped ();
@@ -1897,7 +1897,7 @@ fhandler_base_overlapped::destroy_overlapped ()
   get_overlapped () = NULL;
 }
 
-bool __stdcall __attribute__ ((regparm (1)))
+bool __reg1
 fhandler_base_overlapped::has_ongoing_io ()
 {
   if (!io_pending)
@@ -1911,7 +1911,7 @@ fhandler_base_overlapped::has_ongoing_io ()
   return false;
 }
 
-fhandler_base_overlapped::wait_return __stdcall __attribute__ ((regparm (3)))
+fhandler_base_overlapped::wait_return __reg3
 fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *bytes, bool nonblocking, DWORD len)
 {
   if (!get_overlapped ())
@@ -2019,7 +2019,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
   return res;
 }
 
-void __stdcall __attribute__ ((regparm (3)))
+void __reg3
 fhandler_base_overlapped::raw_read (void *ptr, size_t& len)
 {
   DWORD nbytes;
@@ -2044,7 +2044,7 @@ fhandler_base_overlapped::raw_read (void *ptr, size_t& len)
   len = (size_t) nbytes;
 }
 
-ssize_t __stdcall __attribute__ ((regparm (3)))
+ssize_t __reg3
 fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
 {
   size_t nbytes;

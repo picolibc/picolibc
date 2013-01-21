@@ -1,7 +1,7 @@
 /* signal.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
    Written by Steve Chamberlain of Cygnus Support, sac@cygnus.com
    Significant changes by Sergey Okhapkin <sos@prospect.com.ru>
@@ -26,8 +26,7 @@ details. */
 
 #define _SA_NORESTART	0x8000
 
-static int sigaction_worker (int, const struct sigaction *, struct sigaction *, bool)
-  __attribute__ ((regparm (3)));
+static int __reg3 sigaction_worker (int, const struct sigaction *, struct sigaction *, bool);
 
 #define sigtrapped(func) ((func) != SIG_IGN && (func) != SIG_DFL)
 
@@ -387,7 +386,7 @@ abort (void)
   do_exit (SIGABRT);	/* signal handler didn't exit.  Goodbye. */
 }
 
-static int  __attribute__ ((regparm (3)))
+static int __reg3
 sigaction_worker (int sig, const struct sigaction *newact,
 		  struct sigaction *oldact, bool isinternal)
 {

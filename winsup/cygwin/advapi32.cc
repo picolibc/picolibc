@@ -1,6 +1,6 @@
 /* advapi32.cc: Win32 replacement functions.
 
-   Copyright 2011, 2012 Red Hat, Inc.
+   Copyright 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -42,8 +42,8 @@ DuplicateTokenEx (HANDLE tok, DWORD access, LPSECURITY_ATTRIBUTES sec_attr,
     { sizeof sqos, level, SECURITY_STATIC_TRACKING, FALSE };
   OBJECT_ATTRIBUTES attr =
     { sizeof attr, NULL, NULL,
-      sec_attr && sec_attr->bInheritHandle? OBJ_INHERIT : 0,
-      sec_attr ? sec_attr->lpSecurityDescriptor : NULL, &sqos };
+      (ULONG) ((sec_attr && sec_attr->bInheritHandle) ? OBJ_INHERIT : 0),
+      (sec_attr ? sec_attr->lpSecurityDescriptor : NULL), &sqos };
   NTSTATUS status = NtDuplicateToken (tok, access, &attr, FALSE, type, new_tok);
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
 }

@@ -1,7 +1,7 @@
 /* cygheap.h: Cygwin heap manager.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+   2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -198,8 +198,7 @@ public:
     return effec_cygsid.string (buf);
   }
 
-  const char *test_uid (char *&, const char *, size_t)
-    __attribute__ ((regparm (3)));
+  const char __reg3 *test_uid (char *&, const char *, size_t);
 };
 
 /* cwd cache stuff.  */
@@ -396,10 +395,10 @@ struct init_cygheap: public mini_cygheap
   hook_chain hooks;
   void close_ctty ();
   void init_installation_root ();
-  void init_tls_list () __attribute__ ((regparm (1)));;
-  void add_tls (_cygtls *) __attribute__ ((regparm (2)));
-  void remove_tls (_cygtls *, DWORD) __attribute__ ((regparm (3)));
-  _cygtls *find_tls (int) __attribute__ ((regparm (2)));
+  void __reg1 init_tls_list ();;
+  void __reg2 add_tls (_cygtls *);
+  void __reg3 remove_tls (_cygtls *, DWORD);
+  _cygtls __reg2 *find_tls (int);
 };
 
 

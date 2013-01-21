@@ -1,7 +1,7 @@
 /* cygthread.h
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2010,
-   2011 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2010, 2011 Red
+   Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -31,7 +31,7 @@ class cygthread
   bool is_freerange;
   static bool exiting;
   HANDLE notify_detached;
-  void create () __attribute__ ((regparm (1)));
+  void __reg1 create ();
   static void CALLBACK async_create (ULONG_PTR);
  public:
   bool terminate_thread ();
@@ -39,7 +39,7 @@ class cygthread
   static DWORD WINAPI simplestub (VOID *);
   static DWORD main_thread_id;
   static const char *name (DWORD = 0);
-  void callfunc (bool) __attribute__ ((noinline, regparm (2)));
+  void __reg2 callfunc (bool) __attribute__ ((noinline, ));
   void auto_release () {func = NULL;}
   void release (bool);
   cygthread (LPTHREAD_START_ROUTINE start, unsigned n, LPVOID param, const char *name, HANDLE notify = NULL)

@@ -1,7 +1,7 @@
 /* fhandler_registry.cc: fhandler for /proc/registry virtual filesystem
 
-   Copyright 2002, 2003, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+   2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -461,7 +461,7 @@ fhandler_proc ()
   prefix_len = sizeof ("registry") - 1;
 }
 
-int
+int __reg2
 fhandler_registry::fstat (struct __stat64 *buf)
 {
   fhandler_base::fstat (buf);

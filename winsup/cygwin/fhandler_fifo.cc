@@ -313,7 +313,7 @@ errout:
   len = -1;
 }
 
-int __stdcall
+int __reg2
 fhandler_fifo::fstatvfs (struct statvfs *sfs)
 {
   fhandler_disk_file fh (pc);

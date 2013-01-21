@@ -1,7 +1,7 @@
 /* fhandler_raw.cc.  See fhandler.h for a description of the fhandler classes.
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2011,
-   2012 Red Hat, Inc.
+   2012, 2013 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -35,7 +35,7 @@ fhandler_dev_raw::~fhandler_dev_raw ()
     delete [] devbufalloc;
 }
 
-int __stdcall
+int __reg2
 fhandler_dev_raw::fstat (struct __stat64 *buf)
 {
   debug_printf ("here");

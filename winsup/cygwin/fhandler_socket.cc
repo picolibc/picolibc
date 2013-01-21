@@ -1,7 +1,7 @@
 /* fhandler_socket.cc. See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+   2011, 2012, 2013 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -802,7 +802,7 @@ fhandler_socket::dup (fhandler_base *child, int flags)
   return -1;
 }
 
-int __stdcall
+int __reg2
 fhandler_socket::fstat (struct __stat64 *buf)
 {
   int res;

@@ -1,7 +1,7 @@
 /* fhandler_dev_clipboard: code to access /dev/clipboard
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2011,
-   2012 Red Hat, Inc
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2011, 2012, 2013
+   Red Hat, Inc
 
    Written by Charles Wilson (cwilson@ece.gatech.edu)
 
@@ -31,7 +31,7 @@ details. */
 
 static const NO_COPY WCHAR *CYGWIN_NATIVE = L"CYGWIN_NATIVE_CLIPBOARD";
 /* this is MT safe because windows format id's are atomic */
-static int cygnativeformat;
+static UINT cygnativeformat;
 
 typedef struct
 {
@@ -180,7 +180,7 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
   return len;
 }
 
-int __stdcall
+int __reg2
 fhandler_dev_clipboard::fstat (struct __stat64 *buf)
 {
   buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
@@ -214,13 +214,13 @@ fhandler_dev_clipboard::fstat (struct __stat64 *buf)
   return 0;
 }
 
-void __stdcall
+void __reg3
 fhandler_dev_clipboard::read (void *ptr, size_t& len)
 {
   HGLOBAL hglb;
   size_t ret = 0;
   UINT formatlist[2];
-  int format;
+  UINT format;
   LPVOID cb_data;
   int rach;
 
@@ -269,9 +269,9 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
       size_t glen = GlobalSize (hglb) / sizeof (WCHAR) - 1;
       if (pos < glen)
 	{
-	  /* If caller's buffer is too small to hold at least one 
-	     max-size character, redirect algorithm to local 
-	     read-ahead buffer, finally fill class read-ahead buffer 
+	  /* If caller's buffer is too small to hold at least one
+	     max-size character, redirect algorithm to local
+	     read-ahead buffer, finally fill class read-ahead buffer
 	     with result and feed caller from there. */
 	  char *conv_ptr = (char *) ptr;
 	  size_t conv_len = len;
@@ -293,7 +293,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
 	     it, so we could potentially drop wide chars. */
 	  while ((ret = sys_wcstombs (NULL, 0, buf + pos, glen - pos))
 		  != (size_t) -1
-		 && (ret > conv_len 
+		 && (ret > conv_len
 			/* Skip separated high surrogate: */
 		     || ((buf [pos + glen - 1] & 0xFC00) == 0xD800 && glen - pos > 1)))
 	     --glen;

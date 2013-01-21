@@ -1,5 +1,27 @@
 2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	Throughout, change __attribute__ ((regparm (N))) to just __regN.
+	Throughout, (mainly in fhandler*) start fixing gcc 4.7.2 mismatch
+	between regparm definitions and declarations.
+	* gendef: Define some functions to take @ declaration to accommodate
+	_regN defines which use __stdcall.
+	* gentls_offsets: Define __regN macros as empty.
+	* autoload.cc (wsock_init): Remove unneeded regparm attribute.
+	* winsup.h (__reg1): Define.
+	(__reg2): Define.
+	(__reg3): Define.
+
+	* advapi32.cc (DuplicateTokenEx): Coerce some initializers to avoid
+	warnings from gcc 4.7.2.
+	* exceptions.cc (status_info): Declare struct to use NTSTATUS.
+	(cygwin_exception::dump_exception): Coerce e->ExceptionCode to
+	NTSTATUS.
+	* fhandler_clipboard.cc (cygnativeformat): Redefine as UINT to avoid
+	gcc 4.7.2 warnings.
+	(fhandler_dev_clipboard::read): Ditto.
+
+2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* update-copyright (update_maybe): Accommodate perl-style copyright
 	comments.
 

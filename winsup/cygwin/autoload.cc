@@ -1,7 +1,7 @@
 /* autoload.cc: all dynamic load stuff.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+   2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -299,7 +299,7 @@ std_dll_init ()
 
 /* Initialization function for winsock stuff. */
 WSADATA NO_COPY wsadata;
-__attribute__ ((used, noinline, regparm(1))) static long long
+static long long __attribute__ ((used, noinline)) 
 wsock_init ()
 {
   static LONG NO_COPY here = -1L;

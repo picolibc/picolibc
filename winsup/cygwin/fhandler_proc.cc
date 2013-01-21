@@ -1,6 +1,7 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -183,7 +184,7 @@ fhandler_proc::fhandler_proc ():
 {
 }
 
-int
+int __reg2
 fhandler_proc::fstat (struct __stat64 *buf)
 {
   const char *path = get_name ();

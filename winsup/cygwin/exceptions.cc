@@ -41,7 +41,7 @@ static BOOL WINAPI ctrl_c_handler (DWORD);
 
 NO_COPY static struct
 {
-  unsigned int code;
+  NTSTATUS code;
   const char *name;
 } status_info[] =
 {
@@ -170,7 +170,7 @@ cygwin_exception::dump_exception ()
     {
       for (int i = 0; status_info[i].name; i++)
 	{
-	  if (status_info[i].code == e->ExceptionCode)
+	  if (status_info[i].code == (NTSTATUS) e->ExceptionCode)
 	    {
 	      exception_name = status_info[i].name;
 	      break;
@@ -441,7 +441,7 @@ try_to_debug (bool waitloop)
 }
 
 extern "C" void WINAPI RtlUnwind (void *, void *, PEXCEPTION_RECORD, void *);
-static void __stdcall rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline, regparm (3)));
+static void __reg3 rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline, ));
 void __stdcall
 rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 {

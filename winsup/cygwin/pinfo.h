@@ -1,7 +1,7 @@
 /* pinfo.h: process table info
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012 Red Hat, Inc.
+   2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -112,8 +112,8 @@ public:
   char *cmdline (size_t &);
   bool set_ctty (class fhandler_termios *, int);
   bool alert_parent (char);
-  int __stdcall kill (siginfo_t&) __attribute__ ((regparm (2)));
-  bool __stdcall exists () __attribute__ ((regparm (1)));
+  int __reg2 kill (siginfo_t&);
+  bool __reg1 exists ();
   const char *_ctty (char *);
 
   /* signals */
@@ -151,7 +151,7 @@ public:
   bool waiter_ready;
   class cygthread *wait_thread;
 
-  void init (pid_t, DWORD, HANDLE) __attribute__ ((regparm(3)));
+  void __reg3 init (pid_t, DWORD, HANDLE);
   pinfo (_pinfo *x = NULL): pinfo_minimal (), destroy (false), procinfo (x),
 		     waiter_ready (false), wait_thread (NULL) {}
   pinfo (pid_t n, DWORD flag = 0): pinfo_minimal (), destroy (false),
@@ -161,18 +161,18 @@ public:
     init (n, flag, NULL);
   }
   pinfo (HANDLE, pinfo_minimal&, pid_t);
-  void thisproc (HANDLE) __attribute__ ((regparm (2)));
+  void __reg2 thisproc (HANDLE);
   inline void _pinfo_release ();
   void release ();
-  bool wait () __attribute__ ((regparm (1)));
+  bool __reg1 wait ();
   ~pinfo ()
   {
     if (destroy && procinfo)
       release ();
   }
-  void exit (DWORD n) __attribute__ ((noreturn, regparm(2)));
-  void maybe_set_exit_code_from_windows () __attribute__ ((regparm(1)));
-  void set_exit_code (DWORD n) __attribute__ ((regparm(2)));
+  void __reg2 exit (DWORD n) __attribute__ ((noreturn, ));
+  void __reg1 maybe_set_exit_code_from_windows ();
+  void __reg2 set_exit_code (DWORD n);
   _pinfo *operator -> () const {return procinfo;}
   int operator == (pinfo *x) const {return x->procinfo == procinfo;}
   int operator == (pinfo &x) const {return x.procinfo == procinfo;}
