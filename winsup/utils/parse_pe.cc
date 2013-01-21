@@ -1,6 +1,6 @@
 /* parse_pe.cc
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2012 Red Hat, Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
