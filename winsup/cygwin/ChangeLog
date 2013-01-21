@@ -1,3 +1,7 @@
+2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* cygerrno.h: Conditionally define __regN for cygserver.
+
 2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* malloc_wrapper.cc (malloc_init): Re-add inadvertently dropped comment
