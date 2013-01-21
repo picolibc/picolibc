@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+use strict;
+use File::stat;
+sub update_maybe($%);
+
+my $year =  (split ' ', ~~localtime)[4];
+my %dates = ();
+my %files = ();
+my $cvs;
+open $cvs, '-|', '/usr/bin/cvs', 'update', @ARGV or die "cvs update failed - $!\n";
+while (<$cvs>) {
+    /^M (.*)$/o and $files{$1}{$year} = 1;
+}
+close $cvs;
+
+open $cvs, '-|', '/usr/bin/cvs', 'log', '-N', '-b', @ARGV or die "cvs log failed - $!\n";
+my $file;
+while (<$cvs>) {
+    if (/^Working file: (.*)$/o) {
+	$file = $1;
+    } elsif (/^date: (\d+)/o) {
+	$files{$file}{$1} = 1;
+    } elsif (/^=+$/o) {
+	my $rec = delete $files{$file};
+	update_maybe($file, %{$rec}) if -e $file;
+    }
+}
+close $cvs;
+
+exit 0;
+
+sub addwrap($$) {
+    my $indent = shift;
+    my $copyright = shift;
+    $copyright =~ s/Red Hat\n/Red Hat, Inc.\n/so;
+    return $copyright if length($copyright) <= 80;
+    my @lines;
+    while (length($copyright) > 80) {
+	my $i = index($copyright, ' ', 80 - 6);
+	push @lines, substr($copyright, 0, $i) . "\n";
+	substr($copyright, 0, $i + 1) = $indent;
+    }
+    push @lines, $copyright unless $copyright =~ /^\s*$/o;
+    return join('', @lines);
+}
+
+sub update_maybe($%) {
+    my $f = shift;
+    local @ARGV = $f;
+    my %dates = @_;
+    my @file = ();
+    my $copyright = '';
+    my $modified = 0;
+    while (<>) {
+	if ($copyright) {
+	    push @file, $_;
+	} elsif (/^[#\s]*Copyright/o) {
+	    $copyright = $_;
+	    $copyright .= scalar <> while $copyright =~ /,\s*$/o;
+	    if ($copyright !~ /Red Hat, Inc\.\n/o) {
+		push @file, $copyright;
+		next;
+	    }
+	    for my $date ($copyright =~ /(\d+)/g) {
+		$dates{$date} = 1;
+	    }
+	    my $indent = ($copyright =~ /\A([#\s]*)/o)[0];
+	    my $newcopyright = addwrap $indent,
+				       $indent . 'Copyright ' .
+				       (join ', ', sort {$a <=> $b} sort keys %dates) .
+				       " Red Hat, Inc.\n";
+	    push @file, $newcopyright;
+	    $modified = $newcopyright ne $copyright;
+	} else {
+	    push @file, $_;
+	}
+    }
+    if ($modified) {
+	print "updating $f\n";
+	my $fcopy = "$f.copyright";
+	rename $f, $fcopy or die "$0: couldn't rename $f -> $fcopy - $!\n";
+	my $st = stat($fcopy);
+	open my $fd, '>', $f;
+	chmod $st->mode & 07777, $f;
+	print $fd @file;
+	close $fd;
+    }
+}
+
