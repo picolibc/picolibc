@@ -789,6 +789,10 @@ sigpacket::setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
       goto out;
     }
 
+  while (in_forkee)
+    yield ();		/* Won't be able to send signals until we're finished
+			   processing fork().  */
+
   for (int n = 0; n < CALL_HANDLER_RETRY_OUTER; n++)
     {
       for (int i = 0; i < CALL_HANDLER_RETRY_INNER; i++)

@@ -891,6 +891,8 @@ dll_crt0_1 (void *)
 	  _tlstop = (char *) fork_info->stacktop;
 	}
 
+      /* Not resetting _my_tls.incyg here because presumably fork will overwrite
+	 it with the value of the forker and all will be good.   */
       longjmp (fork_info->jmp, true);
     }
 

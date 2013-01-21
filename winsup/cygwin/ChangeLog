@@ -1,5 +1,11 @@
 2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* dcrt0.cc (dll_crt0_1): Comment assumption.
+	* exceptions.cc (sigpacket::setup_handler): Avoid sending signals
+	during fork processing.
+
+2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* dcrt0.cc (dll_crt0_1): Flag that we are working "incyg".  Handle any
 	signals (presumably exiting signals) which may have come in while we
 	are in the process of setting up.
