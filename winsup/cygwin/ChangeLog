@@ -1,5 +1,10 @@
 2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* cygerrno.h (__reg3): Define.
+	* cygmalloc.h (__reg3): Ditto.
+
+2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* cygerrno.h: Conditionally define __regN for cygserver.
 
 2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>

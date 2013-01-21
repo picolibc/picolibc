@@ -19,8 +19,8 @@ details. */
 #ifndef __reg2
 # define __reg2 __stdcall __attribute__ ((regparm (2)))
 #endif
-#ifndef __reg2
-# define __reg2 __stdcall __attribute__ ((regparm (2)))
+#ifndef __reg3
+# define __reg3 __stdcall __attribute__ ((regparm (3)))
 #endif
 
 void __reg3 seterrno_from_win_error (const char *file, int line, DWORD code);

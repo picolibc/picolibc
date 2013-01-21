@@ -17,8 +17,8 @@ extern "C" {
 #ifndef __reg2
 # define __reg2 __stdcall __attribute__ ((regparm (2)))
 #endif
-#ifndef __reg2
-# define __reg2 __stdcall __attribute__ ((regparm (2)))
+#ifndef __reg3
+# define __reg3 __stdcall __attribute__ ((regparm (3)))
 #endif
 void __reg1 dlfree (void *p);
 void __reg1 *dlmalloc (unsigned size);
