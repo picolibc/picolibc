@@ -1,5 +1,10 @@
 2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* update-copyright (update_maybe): Accommodate perl-style copyright
+	comments.
+
+2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* update-copyright: Silently skip nonexistent files.  Display filename
 	on update.  Don't update non-Red Hat copyrights.
 
