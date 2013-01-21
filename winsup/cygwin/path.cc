@@ -1,7 +1,7 @@
 /* path.cc: path support.
 
      Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-     2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+     2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
   This file is part of Cygwin.
 
@@ -341,8 +341,7 @@ path_conv::add_ext_from_sym (symlink_info &sym)
     }
 }
 
-static void __stdcall mkrelpath (char *dst, bool caseinsensitive)
-  __attribute__ ((regparm (2)));
+static void __reg2 mkrelpath (char *dst, bool caseinsensitive);
 
 static void __stdcall
 mkrelpath (char *path, bool caseinsensitive)

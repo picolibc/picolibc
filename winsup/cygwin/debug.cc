@@ -103,7 +103,7 @@ newh ()
   return NULL;
 }
 
-void __stdcall
+void __reg3
 modify_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
 {
   lock_debug here;
@@ -119,7 +119,7 @@ modify_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
 }
 
 /* Add a handle to the linked list of known handles. */
-void __stdcall
+void __reg3
 add_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
 {
   handle_list *hl;
@@ -213,7 +213,7 @@ mark_closed (const char *func, int ln, HANDLE h, const char *name, bool force)
 
 /* Close a known handle.  Complain if !force and closing a known handle or
    if the name of the handle being closed does not match the registered name. */
-bool __stdcall
+bool __reg3
 close_handle (const char *func, int ln, HANDLE h, const char *name, bool force)
 {
   bool ret;

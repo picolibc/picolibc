@@ -1,6 +1,7 @@
 /* cygerrno.h: main Cygwin header file.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2009, 2010, 2011, 2012, 2013
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,11 +13,21 @@ details. */
 #define _CYGERRNO_H
 #include <errno.h>
 
-void __stdcall seterrno_from_win_error (const char *file, int line, DWORD code) __attribute__ ((regparm(3)));
-void __stdcall seterrno_from_nt_status (const char *file, int line, NTSTATUS status) __attribute__ ((regparm(3)));
-void __stdcall seterrno (const char *, int line) __attribute__ ((regparm(2)));
-int __stdcall geterrno_from_win_error (DWORD code = GetLastError (), int deferrno = 13 /*EACCESS*/) __attribute__ ((regparm(2)));
-int __stdcall geterrno_from_nt_status (NTSTATUS status, int deferrno = 13 /*EACCESS*/) __attribute__ ((regparm(2)));
+#ifndef __reg1
+# define __reg1 __stdcall __attribute__ ((regparm (1)))
+#endif
+#ifndef __reg2
+# define __reg2 __stdcall __attribute__ ((regparm (2)))
+#endif
+#ifndef __reg3
+# define __reg3 __stdcall __attribute__ ((regparm (3)))
+#endif
+
+void __reg3 seterrno_from_win_error (const char *file, int line, DWORD code);
+void __reg3 seterrno_from_nt_status (const char *file, int line, NTSTATUS status);
+void __reg2 seterrno (const char *, int line);
+int __reg2 geterrno_from_win_error (DWORD code = GetLastError (), int deferrno = 13 /*EACCESS*/);
+int __reg2 geterrno_from_nt_status (NTSTATUS status, int deferrno = 13 /*EACCESS*/);
 
 #define __seterrno() seterrno (__FILE__, __LINE__)
 #define __seterrno_from_win_error(val) seterrno_from_win_error (__FILE__, __LINE__, val)

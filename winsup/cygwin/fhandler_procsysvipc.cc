@@ -1,6 +1,6 @@
 /* fhandler_procsysvipc.cc: fhandler for /proc/sysvipc virtual filesystem
 
-   Copyright 2011, 2012 Red Hat, Inc.
+   Copyright 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -92,7 +92,7 @@ fhandler_procsysvipc::fhandler_procsysvipc ():
 {
 }
 
-int
+int __reg2
 fhandler_procsysvipc::fstat (struct stat *buf)
 {
   fhandler_base::fstat (buf);

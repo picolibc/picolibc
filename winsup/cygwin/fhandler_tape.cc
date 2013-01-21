@@ -1,8 +1,8 @@
 /* fhandler_tape.cc.  See fhandler.h for a description of the fhandler
    classes.
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+   2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1418,7 +1418,7 @@ out:
   return unlock (ret);
 }
 
-int
+int __reg2
 fhandler_dev_tape::fstat (struct stat *buf)
 {
   int ret;

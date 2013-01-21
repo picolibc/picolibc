@@ -1,7 +1,7 @@
 /* mount.h: mount definitions.
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -121,7 +121,7 @@ class fs_info
 
   const char *fsname () const { return fsn[0] ? fsn : "unknown"; }
 
-  bool update (PUNICODE_STRING, HANDLE) __attribute__ ((regparm (3)));
+  bool __reg3 update (PUNICODE_STRING, HANDLE);
   bool inited () const { return !!status.flags; }
 };
 

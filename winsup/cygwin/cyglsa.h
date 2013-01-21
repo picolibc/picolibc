@@ -1,6 +1,6 @@
 /* cyglsa.h: Header file for Cygwin LSA authentication
 
-   Copyright 2006 Red Hat, Inc.
+   Copyright 2006, 2008 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 

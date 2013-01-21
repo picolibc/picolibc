@@ -1,6 +1,6 @@
 /* sys/stdio.h
 
-   Copyright 2004, 2005, 2006, 2007, 2010 Red Hat, Inc.
+   Copyright 2004, 2005, 2006, 2007, 2008, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 

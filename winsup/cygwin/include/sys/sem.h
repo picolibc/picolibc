@@ -1,6 +1,6 @@
 /* sys/sem.h
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 

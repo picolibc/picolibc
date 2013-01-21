@@ -1,5 +1,6 @@
 #!/usr/bin/perl
-# Copyright 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+# Copyright 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013
+# Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -175,7 +176,7 @@ _sigdelayed:
 
 	movl	\$$tls::start_offset,%eax		# point to beginning
 	addl	%ebx,%eax				#  of tls block
-	call	__ZN7_cygtls19call_signal_handlerEv	# call handler
+	call	__ZN7_cygtls19call_signal_handlerEv\@4	# call handler
 
 	movl	%fs:4,%ebx				# reget tls
 1:	movl	\$1,%eax				# potential lock value
@@ -208,8 +209,8 @@ leave:	xorl	%eax,%eax
 	popf
 	ret
 
-	.global __ZN7_cygtls3popEv
-__ZN7_cygtls3popEv:
+	.global __ZN7_cygtls3popEv\@4
+__ZN7_cygtls3popEv\@4:
 1:	pushl	%ebx
 	movl	%eax,%ebx			# this
 	movl	\$-4,%eax
@@ -219,8 +220,8 @@ __ZN7_cygtls3popEv:
 	ret
 
 # _cygtls::lock
-	.global	__ZN7_cygtls4lockEv
-__ZN7_cygtls4lockEv:
+	.global	__ZN7_cygtls4lockEv\@4
+__ZN7_cygtls4lockEv\@4:
 	pushl	%ebx
 	movl	%eax,%ebx
 1:	movl	\$1,%eax
@@ -233,8 +234,8 @@ __ZN7_cygtls4lockEv:
 	ret
 
 # _cygtls::unlock
-	.global	__ZN7_cygtls6unlockEv
-__ZN7_cygtls6unlockEv:
+	.global	__ZN7_cygtls6unlockEv\@4
+__ZN7_cygtls6unlockEv\@4:
 	decl	$tls::pstacklock(%eax)
 	ret
 
@@ -243,7 +244,7 @@ __ZN7_cygtls6lockedEv:
 	movl	$tls::pstacklock(%eax),%eax
 	ret
 
-	.extern	__ZN7_cygtls19call_signal_handlerEv
+	.extern	__ZN7_cygtls19call_signal_handlerEv\@4
 stabilize_sig_stack:
 	movl	%fs:4,%ebx
 1:	movl	\$1,%eax
@@ -259,7 +260,7 @@ stabilize_sig_stack:
 	decl	$tls::stacklock(%ebx)			# unlock
 	movl	\$$tls::start_offset,%eax		# point to beginning
 	addl	%ebx,%eax				#  of tls block
-	call	__ZN7_cygtls19call_signal_handlerEv
+	call	__ZN7_cygtls19call_signal_handlerEv\@4
 	jmp	1b
 3:	decl	$tls::incyg(%ebx)
 	ret

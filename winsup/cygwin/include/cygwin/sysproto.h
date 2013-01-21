@@ -1,6 +1,6 @@
 /* cygwin/sysproto.h
 
-   Copyright 2003, 2012 Red Hat, Inc.
+   Copyright 2003, 2005, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 

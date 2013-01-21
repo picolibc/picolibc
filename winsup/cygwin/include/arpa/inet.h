@@ -1,6 +1,6 @@
 /* arpa/inet.h
 
-   Copyright 1997, 1998, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 

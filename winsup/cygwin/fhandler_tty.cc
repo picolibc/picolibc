@@ -1,7 +1,7 @@
 /* fhandler_tty.cc
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1065,7 +1065,7 @@ out:
   return retval;
 }
 
-int __stdcall
+int __reg2
 fhandler_pty_slave::fstat (struct stat *st)
 {
   fhandler_base::fstat (st);

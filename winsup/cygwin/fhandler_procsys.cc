@@ -1,6 +1,6 @@
 /* fhandler_procsys.cc: fhandler for native NT namespace.
 
-   Copyright 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -260,7 +260,7 @@ unreadable:
   return false;
 }
 
-int
+int __reg2
 fhandler_procsys::fstat (struct stat *buf)
 {
   const char *path = get_name ();

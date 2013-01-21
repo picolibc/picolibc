@@ -1,7 +1,7 @@
 /* cygheap.cc: Cygwin heap manager.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+   2011, 2012, 2013 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -72,7 +72,7 @@ static NO_COPY uint32_t nthreads;
 #define MVMAP_OPTIONS (FILE_MAP_WRITE)
 
 extern "C" {
-static void __stdcall _cfree (void *) __attribute__((regparm(1)));
+static void __reg1 _cfree (void *);
 static void *__stdcall _csbrk (int);
 }
 
@@ -278,10 +278,10 @@ cygheap_init ()
 
 /* Copyright (C) 1997, 2000 DJ Delorie */
 
-static void *__stdcall _cmalloc (unsigned size) __attribute__ ((regparm(1)));
-static void *__stdcall _crealloc (void *ptr, unsigned size) __attribute__ ((regparm(2)));
+static void *__reg1 _cmalloc (unsigned size);
+static void *__reg2 _crealloc (void *ptr, unsigned size);
 
-static void *__stdcall __attribute__ ((regparm(1)))
+static void *__reg1
 _cmalloc (unsigned size)
 {
   _cmalloc_entry *rvc;
@@ -315,7 +315,7 @@ _cmalloc (unsigned size)
   return rvc->data;
 }
 
-static void __stdcall __attribute__ ((regparm(1)))
+static void __reg1
 _cfree (void *ptr)
 {
   cygheap_protect.acquire ();
@@ -326,7 +326,7 @@ _cfree (void *ptr)
   cygheap_protect.release ();
 }
 
-static void *__stdcall __attribute__ ((regparm(2)))
+static void *__reg2
 _crealloc (void *ptr, unsigned size)
 {
   void *newptr;
@@ -408,19 +408,19 @@ crealloc (void *s, DWORD n, const char *fn)
   return creturn (t, c, n, fn);
 }
 
-extern "C" void *__stdcall  __attribute__ ((regparm(2)))
+extern "C" void *__reg2
 crealloc (void *s, DWORD n)
 {
   return crealloc (s, n, NULL);
 }
 
-extern "C" void *__stdcall  __attribute__ ((regparm(2)))
+extern "C" void *__reg2
 crealloc_abort (void *s, DWORD n)
 {
   return crealloc (s, n, "crealloc");
 }
 
-extern "C" void __stdcall __attribute__ ((regparm(1)))
+extern "C" void __reg1
 cfree (void *s)
 {
   assert (!inheap (s));
@@ -428,7 +428,7 @@ cfree (void *s)
   MALLOC_CHECK;
 }
 
-extern "C" void __stdcall __attribute__ ((regparm(2)))
+extern "C" void __reg2
 cfree_and_set (char *&s, char *what)
 {
   if (s && s != almost_null)
@@ -448,19 +448,19 @@ ccalloc (cygheap_types x, DWORD n, DWORD size, const char *fn)
   return creturn (x, c, n, fn);
 }
 
-extern "C" void *__stdcall __attribute__ ((regparm(3)))
+extern "C" void *__reg3
 ccalloc (cygheap_types x, DWORD n, DWORD size)
 {
   return ccalloc (x, n, size, NULL);
 }
 
-extern "C" void *__stdcall __attribute__ ((regparm(3)))
+extern "C" void *__reg3
 ccalloc_abort (cygheap_types x, DWORD n, DWORD size)
 {
   return ccalloc (x, n, size, "ccalloc");
 }
 
-extern "C" PWCHAR __stdcall __attribute__ ((regparm(1)))
+extern "C" PWCHAR __reg1
 cwcsdup (const PWCHAR s)
 {
   MALLOC_CHECK;
@@ -472,7 +472,7 @@ cwcsdup (const PWCHAR s)
   return p;
 }
 
-extern "C" PWCHAR __stdcall __attribute__ ((regparm(1)))
+extern "C" PWCHAR __reg1
 cwcsdup1 (const PWCHAR s)
 {
   MALLOC_CHECK;
@@ -484,7 +484,7 @@ cwcsdup1 (const PWCHAR s)
   return p;
 }
 
-extern "C" char *__stdcall __attribute__ ((regparm(1)))
+extern "C" char *__reg1
 cstrdup (const char *s)
 {
   MALLOC_CHECK;
@@ -496,7 +496,7 @@ cstrdup (const char *s)
   return p;
 }
 
-extern "C" char *__stdcall __attribute__ ((regparm(1)))
+extern "C" char *__reg1
 cstrdup1 (const char *s)
 {
   MALLOC_CHECK;

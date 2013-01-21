@@ -470,15 +470,15 @@ try_to_debug (bool waitloop)
 }
 
 #ifdef __x86_64__
-static void __stdcall rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline));
-void __stdcall
+static void rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline));
+void
 rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 {
   RtlUnwind (frame, __builtin_return_address (0), e, 0);
 }
 #else
-static void __stdcall rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline, regparm (3)));
-void __stdcall
+static void __reg3 rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline, regparm (3)));
+void __reg3
 rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 {
   __asm__ ("\n\

@@ -1,6 +1,6 @@
 /* _cygwin_crt0_common.cc: common crt0 function for cygwin crt0's.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2009 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 

@@ -1,7 +1,7 @@
 /* miscfuncs.h: main Cygwin header file.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,11 +11,10 @@ details. */
 
 #ifndef _MISCFUNCS_H
 #define _MISCFUNCS_H
-int winprio_to_nice (DWORD) __attribute__ ((regparm (1)));
-DWORD nice_to_winprio (int &) __attribute__ ((regparm (1)));
+int __reg1 winprio_to_nice (DWORD);
+DWORD __reg1 nice_to_winprio (int &);
 
-bool __stdcall create_pipe (PHANDLE, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD)
-  __attribute__ ((regparm (3)));
+bool __reg3 create_pipe (PHANDLE, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD);
 
 BOOL WINAPI CreatePipeOverlapped (PHANDLE read_handle, PHANDLE write_handle,
 				  LPSECURITY_ATTRIBUTES sa);
@@ -25,6 +24,9 @@ BOOL WINAPI WritePipeOverlapped (HANDLE h, LPCVOID buf, DWORD len,
 				 LPDWORD ret_len, DWORD timeout);
 
 extern "C" void yield ();
+
+#define import_address(x) __import_address ((void *)(x))
+void * __reg1 __import_address (void *);
 
 void backslashify (const char *, char *, bool);
 void slashify (const char *, char *, bool);
@@ -39,9 +41,9 @@ transform_chars (PUNICODE_STRING upath, USHORT start_idx)
 }
 
 /* Memory checking */
-int __stdcall check_invalid_virtual_addr (const void *s, unsigned sz) __attribute__ ((regparm(2)));
+int __reg2 check_invalid_virtual_addr (const void *s, unsigned sz);
 
-ssize_t check_iovec (const struct iovec *, int, bool) __attribute__ ((regparm(3)));
+ssize_t __reg3 check_iovec (const struct iovec *, int, bool);
 #define check_iovec_for_read(a, b) check_iovec ((a), (b), false)
 #define check_iovec_for_write(a, b) check_iovec ((a), (b), true)
 

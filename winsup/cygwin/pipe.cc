@@ -399,7 +399,7 @@ fhandler_pipe::fstatvfs (struct statvfs *sfs)
   return -1;
 }
 
-static int __attribute__ ((regparm (3)))
+static int __reg3
 pipe_worker (int filedes[2], unsigned int psize, int mode)
 {
   fhandler_pipe *fhs[2];

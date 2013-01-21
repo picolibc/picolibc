@@ -1,6 +1,7 @@
 /* cygheap_malloc.h: Cygwin heap manager allocation functions.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -39,18 +40,18 @@ enum cygheap_types
 };
 
 extern "C" {
-void __stdcall cfree (void *) __attribute__ ((regparm(1)));
-void *__stdcall cmalloc (cygheap_types, DWORD) __attribute__ ((regparm(2)));
-void *__stdcall crealloc (void *, DWORD) __attribute__ ((regparm(2)));
-void *__stdcall ccalloc (cygheap_types, DWORD, DWORD) __attribute__ ((regparm(3)));
-void *__stdcall cmalloc_abort (cygheap_types, DWORD) __attribute__ ((regparm(2)));
-void *__stdcall crealloc_abort (void *, DWORD) __attribute__ ((regparm(2)));
-void *__stdcall ccalloc_abort (cygheap_types, DWORD, DWORD) __attribute__ ((regparm(3)));
-PWCHAR __stdcall cwcsdup (const PWCHAR) __attribute__ ((regparm(1)));
-PWCHAR __stdcall cwcsdup1 (const PWCHAR) __attribute__ ((regparm(1)));
-char *__stdcall cstrdup (const char *) __attribute__ ((regparm(1)));
-char *__stdcall cstrdup1 (const char *) __attribute__ ((regparm(1)));
-void __stdcall cfree_and_set (char *&, char * = NULL) __attribute__ ((regparm(2)));
+void __reg1 cfree (void *);
+void *__reg2 cmalloc (cygheap_types, DWORD);
+void *__reg2 crealloc (void *, DWORD);
+void *__reg3 ccalloc (cygheap_types, DWORD, DWORD);
+void *__reg2 cmalloc_abort (cygheap_types, DWORD);
+void *__reg2 crealloc_abort (void *, DWORD);
+void *__reg3 ccalloc_abort (cygheap_types, DWORD, DWORD);
+PWCHAR __reg1 cwcsdup (const PWCHAR);
+PWCHAR __reg1 cwcsdup1 (const PWCHAR);
+char *__reg1 cstrdup (const char *);
+char *__reg1 cstrdup1 (const char *);
+void __reg2 cfree_and_set (char *&, char * = NULL);
 }
 
 #endif /*_CYGHEAP_MALLOC_H*/

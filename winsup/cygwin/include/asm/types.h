@@ -1,6 +1,6 @@
 /* asm/types.h
 
-   Copyright 1998, 2001 Red Hat, Inc.
+   Copyright 1998, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 

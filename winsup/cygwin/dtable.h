@@ -1,7 +1,7 @@
 /* dtable.h: fd table definition.
 
-   Copyright 2000, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+   2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -67,7 +67,7 @@ public:
   }
   int find_unused_handle (int start);
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
-  void release (int fd) __attribute__ ((regparm (2)));
+  void __reg2 release (int fd);
   void init_std_file_from_handle (int fd, HANDLE handle);
   int dup3 (int oldfd, int newfd, int flags);
   void fixup_after_exec ();

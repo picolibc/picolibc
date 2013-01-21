@@ -1,6 +1,6 @@
 /* stdint.h - integer types
 
-   Copyright 2003, 2006, 2007, 2008, 2009, 2010, 2012 Red Hat, Inc.
+   Copyright 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 

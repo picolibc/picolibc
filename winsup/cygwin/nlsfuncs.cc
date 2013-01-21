@@ -1,6 +1,6 @@
 /* nlsfuncs.cc: NLS helper functions
 
-   Copyright 2010 Red Hat, Inc.
+   Copyright 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 

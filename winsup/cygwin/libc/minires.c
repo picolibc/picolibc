@@ -1,6 +1,6 @@
 /* minires.c.  Stub synchronous resolver for Cygwin.
 
-   Copyright 2006, 2008, 2009 Red Hat, Inc.
+   Copyright 2006, 2008, 2009, 2010, 2011 Red Hat, Inc.
 
    Written by Pierre A. Humblet <Pierre.Humblet@ieee.org>
 

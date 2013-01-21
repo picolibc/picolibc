@@ -1,6 +1,6 @@
 /* sys/un.h
 
-   Copyright 1999, 2001, 2005, 2009 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2005, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 

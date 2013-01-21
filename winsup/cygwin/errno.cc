@@ -1,7 +1,7 @@
 /* errno.cc: errno-related functions
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -313,7 +313,7 @@ const char *_sys_errlist[] NO_COPY_INIT =
 int NO_COPY_INIT _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
 };
 
-int __stdcall
+int __reg2
 geterrno_from_win_error (DWORD code, int deferrno)
 {
   for (int i = 0; errmap[i].w != 0; ++i)
@@ -330,14 +330,14 @@ geterrno_from_win_error (DWORD code, int deferrno)
 
 /* seterrno_from_win_error: Given a Windows error code, set errno
    as appropriate. */
-void __stdcall
+void __reg3
 seterrno_from_win_error (const char *file, int line, DWORD code)
 {
   syscall_printf ("%s:%d windows error %u", file, line, code);
   errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
 }
 
-int __stdcall
+int __reg2
 geterrno_from_nt_status (NTSTATUS status, int deferrno)
 {
   return geterrno_from_win_error (RtlNtStatusToDosError (status));
@@ -345,7 +345,7 @@ geterrno_from_nt_status (NTSTATUS status, int deferrno)
 
 /* seterrno_from_nt_status: Given a NT status code, set errno
    as appropriate. */
-void __stdcall
+void __reg3
 seterrno_from_nt_status (const char *file, int line, NTSTATUS status)
 {
   DWORD code = RtlNtStatusToDosError (status);
@@ -356,7 +356,7 @@ seterrno_from_nt_status (const char *file, int line, NTSTATUS status)
 }
 
 /* seterrno: Set `errno' based on GetLastError (). */
-void __stdcall
+void __reg2
 seterrno (const char *file, int line)
 {
   seterrno_from_win_error (file, line, GetLastError ());

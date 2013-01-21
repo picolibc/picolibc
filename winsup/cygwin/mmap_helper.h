@@ -1,6 +1,6 @@
 /* mmap_helper.h
 
-   Copyright 2006 Red Hat, Inc.
+   Copyright 2006, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 

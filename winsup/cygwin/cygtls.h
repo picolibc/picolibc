@@ -1,6 +1,7 @@
 /* cygtls.h
 
-   Copyright 2003, 2004, 2005, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
+   Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -206,30 +207,28 @@ public:
   static void call (DWORD (*) (void *, void *), void *);
   void remove (DWORD);
   void push (__stack_t addr) {*stackptr++ = (__stack_t) addr;}
-  __stack_t pop () __attribute__ ((regparm (1)));
+  __stack_t __reg1 pop ();
   __stack_t retaddr () {return stackptr[-1];}
   bool isinitialized () const
   {
     return initialized == CYGTLS_INITIALIZED;
   }
-  bool interrupt_now (CONTEXT *, siginfo_t&, void *, struct sigaction&)
-    __attribute__((regparm(3)));
-  void __stdcall interrupt_setup (siginfo_t&, void *, struct sigaction&)
-    __attribute__((regparm(3)));
+  bool __reg3 interrupt_now (CONTEXT *, siginfo_t&, void *, struct sigaction&);
+  void __reg3 interrupt_setup (siginfo_t&, void *, struct sigaction&);
 
   bool inside_kernel (CONTEXT *);
-  void copy_context (CONTEXT *) __attribute__ ((regparm(2)));
-  void signal_debugger (int) __attribute__ ((regparm(2)));
+  void __reg2 copy_context (CONTEXT *);
+  void __reg2 signal_debugger (int);
 
 #ifdef CYGTLS_HANDLE
   operator HANDLE () const {return tid ? tid->win32_obj_id : NULL;}
 #endif
-  int call_signal_handler () __attribute__ ((regparm (1)));
-  void remove_wq (DWORD) __attribute__ ((regparm (1)));
-  void fixup_after_fork () __attribute__ ((regparm (1)));
-  void lock () __attribute__ ((regparm (1)));
-  void unlock () __attribute__ ((regparm (1)));
-  bool locked () __attribute__ ((regparm (1)));
+  int __reg1 call_signal_handler ();
+  void __reg1 remove_wq (DWORD);
+  void __reg1 fixup_after_fork ();
+  void __reg1 lock ();
+  void __reg1 unlock ();
+  bool __reg1 locked ();
   HANDLE get_signal_arrived (bool wait_for_lock = true)
   {
     if (!signal_arrived)
@@ -255,7 +254,7 @@ public:
   }
   void reset_signal_arrived () { will_wait_for_signal = false; }
 private:
-  void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
+  void __reg3 call2 (DWORD (*) (void *, void *), void *, void *);
   /*gentls_offsets*/
 };
 #pragma pack(pop)
