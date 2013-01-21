@@ -438,7 +438,12 @@ void * __reg1
 __import_address (void *imp)
 {
   const char *ptr = (const char *) imp;
+#ifdef __x86_64__
+  /* On 64 bit, the jmp address is pc relative. */
+  const uintptr_t *jmpto = (uintptr_t *) (ptr + 6 + *(int32_t *)(ptr + 2));
+#else
   const uintptr_t *jmpto = (uintptr_t *) *((uintptr_t *) (ptr + 2));
+#endif
   return (void *) *jmpto;
 }
 
