@@ -42,7 +42,7 @@ DuplicateTokenEx (HANDLE tok, DWORD access, LPSECURITY_ATTRIBUTES sec_attr,
     { sizeof sqos, level, SECURITY_STATIC_TRACKING, FALSE };
   OBJECT_ATTRIBUTES attr =
     { sizeof attr, NULL, NULL,
-      (ULONG) ((sec_attr && sec_attr->bInheritHandle) ? OBJ_INHERIT : 0),
+      (sec_attr && sec_attr->bInheritHandle) ? OBJ_INHERIT : 0U,
       (sec_attr ? sec_attr->lpSecurityDescriptor : NULL), &sqos };
   NTSTATUS status = NtDuplicateToken (tok, access, &attr, FALSE, type, new_tok);
   DEFAULT_NTSTATUS_TO_BOOL_RETURN
