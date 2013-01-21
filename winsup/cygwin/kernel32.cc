@@ -1,6 +1,6 @@
 /* kernel32.cc: Win32 replacement functions.
 
-   Copyright 2008, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 

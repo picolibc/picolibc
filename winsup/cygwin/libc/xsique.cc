@@ -1,6 +1,6 @@
 /* xsique.cc.  XSI insque and remque functions.
 
-   Copyright 2007 Red Hat, Inc.
+   Copyright 2007, 2008 Red Hat, Inc.
 
 This file is part of Cygwin.
 

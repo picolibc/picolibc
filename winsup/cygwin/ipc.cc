@@ -1,6 +1,6 @@
 /* ipc.cc: Single unix specification IPC interface for Cygwin
 
-   Copyright 2001, 2002, 2003, 2010 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2008, 2010 Red Hat, Inc.
 
    Originally written by Robert Collins <robert.collins@hotmail.com>
    Updated to 64 bit key_t by Charles Wilson <cygwin@cwilson.fastmail.fm>

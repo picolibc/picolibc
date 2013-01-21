@@ -1,5 +1,10 @@
 2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	Throughout, update copyrights to reflect dates which correspond to
+	main-branch checkins.  Regularize copyright format.
+
+2013-01-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	Throughout, change __attribute__ ((regparm (N))) to just __regN.
 	Throughout, (mainly in fhandler*) start fixing gcc 4.7.2 mismatch
 	between regparm definitions and declarations.

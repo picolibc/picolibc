@@ -4,7 +4,7 @@
    sys/config.h before.  This way we can manaage our configuration
    setting without bothering newlib.
 
-   Copyright 2003, 2007, 2008, 2009, 2010 Red Hat, Inc.
+   Copyright 2003, 2007, 2008, 2009, 2010, 2012 Red Hat, Inc.
    Written by C. Vinschen.
 
 This file is part of Cygwin.

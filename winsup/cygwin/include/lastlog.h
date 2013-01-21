@@ -1,6 +1,6 @@
 /* lastlog.h
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 

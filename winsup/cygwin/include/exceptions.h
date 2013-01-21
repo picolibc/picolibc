@@ -1,6 +1,6 @@
 /* exceptions.h
 
-   Copyright 1996, 1997, 1998, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 

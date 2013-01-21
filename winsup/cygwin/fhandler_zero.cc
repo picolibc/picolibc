@@ -1,6 +1,6 @@
 /* fhandler_dev_zero.cc: code to access /dev/zero
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009 Red Hat, Inc.
 
    Written by DJ Delorie (dj@cygnus.com)
 

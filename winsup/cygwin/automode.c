@@ -1,6 +1,6 @@
 /* automode.c
 
-   Copyright 2000 Red Hat, Inc.
+   Copyright 2000, 2001, 2010 Red Hat, Inc.
 
 This file is part of Cygwin.
 

@@ -1,7 +1,7 @@
 /* pthread.h: POSIX pthread interface
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006,
-   2007, 2011, 2012 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
+   2007, 2011, 2012, 2013 Red Hat, Inc.
 
    Written by Marco Fuykschot <marco@ddi.nl>
 

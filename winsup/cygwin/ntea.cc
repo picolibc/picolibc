@@ -1,6 +1,7 @@
 /* ntea.cc: code for manipulating Extended Attributes
 
-   Copyright 1997, 1998, 2000, 2001, 2006, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009,
+   2010, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 

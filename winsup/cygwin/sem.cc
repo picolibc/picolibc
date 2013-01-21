@@ -1,6 +1,6 @@
 /* sem.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2003, 2004, 2009 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2008, 2009 Red Hat, Inc.
 
 This file is part of Cygwin.
 
