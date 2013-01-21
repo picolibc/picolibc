@@ -1,5 +1,9 @@
 2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* update-copyright: Recognize configure.ac scripts too.
+
+2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* cygerrno.h (__reg3): Define.
 	* cygmalloc.h (__reg3): Ditto.
 
