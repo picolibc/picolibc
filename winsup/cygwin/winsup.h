@@ -301,11 +301,13 @@ int cygwin_gethostname (char *__name, size_t __len);
 #define NO_X ~(S_IXUSR | S_IXGRP | S_IXOTH)
 
 
+#ifdef __x86_64__
+extern "C" char __data_start__, __data_end__, __bss_start__, __bss_end__;
+#else
 extern "C" char _data_start__, _data_end__, _bss_start__, _bss_end__;
+#endif
 extern "C" void (*__CTOR_LIST__) (void);
 extern "C" void (*__DTOR_LIST__) (void);
-
-
 
 #ifndef NO_GLOBALS_H
 #define _RDATA	/* See globals.h */

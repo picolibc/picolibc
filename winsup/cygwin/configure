@@ -4427,7 +4427,7 @@ case "$target_cpu" in
 		CONFIG_DIR="i386"  ;;
    x86_64)
 		DLL_NAME="cyg64win1.dll"
-		DLL_ENTRY="_dll_entry"
+		DLL_ENTRY="dll_entry"
 		DEF_DLL_ENTRY="dll_entry"
 		DIN_FILE="cygwin64.din"
 		TLSOFFSETS_H="tlsoffsets64.h"

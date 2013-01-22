@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 # Copyright 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013
 # Red Hat, Inc.
 #
@@ -13,15 +13,19 @@ sub cleanup(@);
 
 my $in = shift;
 my $tls_offsets = shift;
+my $target = shift;
 my $out = shift;
 my $sigfe = shift;
 
 $main::first = 0;
-if (!defined($in) || !defined($out) || !defined($sigfe)) {
-    die "usage: $0 deffile.in cygtls.h deffile.def sigfe.s\n";
+if (!defined($in) || !defined($target) || !defined($out) || !defined($sigfe)) {
+    die "usage: $0 deffile.in cygtls.h target-triplet deffile.def sigfe.s\n";
 }
 
 require $tls_offsets;
+
+my $is64bit = ($target =~ /^x86_64\-/ ? 1 : 0);
+my $sym_prefix = ($is64bit ? '' : '_');
 
 open(IN, $in) or die "$0: couldn't open \"$in\" - $!\n";
 my @top = ();
@@ -86,20 +90,66 @@ for my $k (sort keys %sigfe) {
 close SIGFE;
 
 sub fefunc {
-    my $func = '_' . shift;
-    my $fe = '_' . shift;
-    my $sigfe_func = ($fe =~ /^(.*)$func/)[0];
+    my $func = $sym_prefix . shift;
+    my $fe = $sym_prefix . shift;
+    my $sigfe_func;
+    if ($is64bit) {
+	$sigfe_func = ($fe =~ /^(.*)_${func}$/)[0];
+    } else {
+	$sigfe_func = ($fe =~ /^(.*)${func}$/)[0];
+    }
     my $extra;
     my $res = <<EOF;
 	.extern	$func
 	.global	$fe
 $fe:
-	pushl	\$$func
+	push	\$$func
 	jmp	$sigfe_func
 
 EOF
     if (!$main::first++) {
-	$res = <<EOF . longjmp () . $res;
+	if ($is64bit) {
+	  $res = <<EOF . longjmp () . $res;
+	.text
+
+_sigfe_maybe:
+	ret
+
+_sigfe:
+	ret
+
+_sigbe:
+	ret
+
+	.global	sigdelayed
+sigdelayed:
+	ret
+
+# _cygtls::pop
+	.global _ZN7_cygtls3popEv
+_ZN7_cygtls3popEv:
+	ret
+
+# _cygtls::lock
+	.global _ZN7_cygtls4lockEv
+_ZN7_cygtls4lockEv:
+	ret
+
+# _cygtls::unlock
+	.global _ZN7_cygtls6unlockEv
+_ZN7_cygtls6unlockEv:
+	ret
+
+# _cygtls::locked
+	.global _ZN7_cygtls6lockedEv
+_ZN7_cygtls6lockedEv:
+	ret
+
+stabilize_sig_stack:
+	ret
+EOF
+	} else {
+	  $res = <<EOF . longjmp () . $res;
 	.text
 
 __sigfe_maybe:
@@ -265,12 +315,33 @@ stabilize_sig_stack:
 3:	decl	$tls::incyg(%ebx)
 	ret
 EOF
+	}
     }
     return $res;
 }
 
 sub longjmp {
-    return <<EOF;
+    if ($is64bit) {
+	return <<EOF;
+
+	.globl  setjmp
+setjmp:
+	ret
+
+	.globl  __sjfault
+__sjfault:
+	ret
+
+	.globl  __ljfault
+__ljfault:
+	ret
+
+	.globl  longjmp
+longjmp:
+	ret
+EOF
+    } else {
+	return <<EOF;
 
 	.globl	_setjmp
 _setjmp:
@@ -424,6 +495,7 @@ _longjmp:
 	popfl
 	ret
 EOF
+    }
 }
 
 sub cleanup(@) {

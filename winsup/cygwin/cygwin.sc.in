@@ -42,11 +42,11 @@ SECTIONS
      ".data_cygwin_nocopy" and explicitly include it after __data_end__. */
   .data ALIGN(__section_alignment__) :
   {
-    _SYM (_data_start__) = .;
+    __data_start__ = .;
     *(.data)
     *(.data2)
     *(SORT(.data$*))
-    _SYM (_data_end__) = .;
+    __data_end__ = .;
     *(.data_cygwin_nocopy)
   }
   .rdata ALIGN(__section_alignment__) :
@@ -67,10 +67,10 @@ SECTIONS
 #endif
   .bss ALIGN(__section_alignment__) :
   {
-    _SYM (_bss_start__) = .;
+    __bss_start__ = .;
     *(.bss)
     *(COMMON)
-    _SYM (_bss_end__) = .;
+    __bss_end__ = .;
   }
   .edata ALIGN(__section_alignment__) :
   {

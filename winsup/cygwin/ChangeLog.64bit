@@ -1,3 +1,32 @@
+2013-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (speclib): Exclude main symbol.
+	(NEW_FUNCTIONS): Set to empty for x86_64.
+	($(DEF_FILE)): Call gendef with target_alias as additional parameter.
+	* configure.ac (DLL_ENTRY): Drop leading underscore for x86_64.
+	* configure: Regenerate.
+	* cygwin.sc.in: Drop _SYM usage for __data_start__, __data_end__,
+	__bss_start__, and __bss_end__.
+	* cygwin64.din: Remove all fast-call math function entry points.
+	(_alloca): Define as __alloca.
+	(_dll_crt0): Drop 32 bit stdcall specifier.
+	(dll_entry): Ditto.
+	(dll_noncygwin_dllcrt0): Remove.
+	(getpwduid): Remove.
+	(lacl): Remove.
+	* dcrt0.cc (dll_data_start): Define for x86_64.
+	(dll_data_end): Ditto.
+	(dll_bss_start): Ditto.
+	(dll_bss_end): Ditto.
+	* gendef: Handle new target argument.  Handle 64 bit target.
+	Add preliminiary empty function definitions for 64 bit to allow linking.
+	* winsup.h: Define linker data and bss section symbols with
+	additional underscore for x86_64.
+	* lib/_cygwin_crt0_common.cc (__image_base__): Define for 64 bit and
+	map to _image_base__ via macro.
+	(_cygwin_crt0_common): Fix setting data and bss section borders on
+	x86_64.
+
 2013-01-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (__import_address): Fix address computation for 64 bit.

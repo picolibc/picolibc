@@ -129,6 +129,7 @@ speclib=\
 	--exclude='cygwin' \
 	--exclude='(?i:dll)' \
 	--exclude='reloc' \
+	--exclude='^main$$' \
 	--exclude='^_main$$' \
 	$^
 
@@ -195,6 +196,9 @@ endif #PREPROCESS
 
 GMON_OFILES:=gmon.o mcount.o profil.o
 
+ifeq ($(target_alias),x86_64-pc-cygwin)
+NEW_FUNCTIONS:=
+else
 NEW_FUNCTIONS:=$(addprefix --replace=,\
 	acl=_acl32 \
 	aclcheck=_aclcheck32 \
@@ -247,6 +251,7 @@ NEW_FUNCTIONS:=$(addprefix --replace=,\
 	tmpfile=_tmpfile64 \
 	truncate=_truncate64 \
 )
+endif
 
 API_VER:=$(srcdir)/include/cygwin/version.h
 
@@ -509,7 +514,7 @@ Makefile: $(DIN_FILE) ${srcdir}/Makefile.in
 	/bin/sh ./config.status
 
 $(DEF_FILE): gendef $(DIN_FILE) $(srcdir)/$(TLSOFFSETS_H)
-	$^ $@ sigfe.s
+	$^ $(target_alias) $@ sigfe.s
 
 $(srcdir)/$(TLSOFFSETS_H): gentls_offsets cygtls.h
 	$^ $@ @CONFIG_DIR@ $(COMPILE.cc) -c

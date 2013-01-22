@@ -52,7 +52,12 @@ int _fmode;
 
 extern char __RUNTIME_PSEUDO_RELOC_LIST__;
 extern char __RUNTIME_PSEUDO_RELOC_LIST_END__;
+#ifdef __x86_64__
+extern char __image_base__;
+#define _image_base__ __image_base__
+#else
 extern char _image_base__;
+#endif
 
 struct per_process_cxx_malloc __cygwin_cxx_malloc =
 {
@@ -145,10 +150,17 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->hmodule = GetModuleHandle (0);
 
   /* variables for fork */
+#ifdef __x86_64__
+  u->data_start = &__data_start__;
+  u->data_end = &__data_end__;
+  u->bss_start = &__bss_start__;
+  u->bss_end = &__bss_end__;
+#else
   u->data_start = &_data_start__;
   u->data_end = &_data_end__;
   u->bss_start = &_bss_start__;
   u->bss_end = &_bss_end__;
+#endif
   u->pseudo_reloc_start = &__RUNTIME_PSEUDO_RELOC_LIST__;
   u->pseudo_reloc_end = &__RUNTIME_PSEUDO_RELOC_LIST_END__;
   u->image_base = &_image_base__;

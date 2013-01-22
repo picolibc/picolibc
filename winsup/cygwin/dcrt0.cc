@@ -588,10 +588,17 @@ get_cygwin_startup_info ()
   return res;
 }
 
+#ifdef __x86_64__
+#define dll_data_start &__data_start__
+#define dll_data_end &__data_end__
+#define dll_bss_start &__bss_start__
+#define dll_bss_end &__bss_end__
+#else
 #define dll_data_start &_data_start__
 #define dll_data_end &_data_end__
 #define dll_bss_start &_bss_start__
 #define dll_bss_end &_bss_end__
+#endif
 
 void
 child_info_fork::handle_fork ()
