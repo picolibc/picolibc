@@ -104,7 +104,7 @@ int	_EXFUN(pthread_cond_destroy, (pthread_cond_t *__mutex));
     pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
  */
  
-#define PTHREAD_COND_INITIALIZER  ((pthread_mutex_t) 0xFFFFFFFF)
+#define PTHREAD_COND_INITIALIZER  ((pthread_cond_t) 0xFFFFFFFF)
  
 /* Broadcasting and Signaling a Condition, P1003.1c/Draft 10, p. 101 */
  
@@ -327,6 +327,13 @@ int	_EXFUN(pthread_spin_unlock, (pthread_spinlock_t *__spinlock));
 #endif /* defined(_POSIX_SPIN_LOCKS) */
 
 #if defined(_POSIX_READER_WRITER_LOCKS)
+
+/* This is used to statically initialize a pthread_rwlock_t. Example:
+  
+    pthread_mutex_t mutex = PTHREAD_RWLOCK_INITIALIZER;
+ */
+
+#define PTHREAD_RWLOCK_INITIALIZER  ((pthread_rwlock_t) 0xFFFFFFFF)
 
 int	_EXFUN(pthread_rwlockattr_init, (pthread_rwlockattr_t *__attr));
 int	_EXFUN(pthread_rwlockattr_destroy, (pthread_rwlockattr_t *__attr));
