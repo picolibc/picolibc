@@ -285,8 +285,7 @@ malloc_init ()
     {
       extern void *_sigfe_malloc;
       /* Decide if we are using our own version of malloc by testing the import
-	 address from user_data.  This will likely need to be updated
-	 for 64-bit.  */
+	 address from user_data.  */
       use_internal = import_address (user_data->malloc) == &_sigfe_malloc;
       malloc_printf ("using %s malloc", use_internal ? "internal" : "external");
       internal_malloc_determined = true;
