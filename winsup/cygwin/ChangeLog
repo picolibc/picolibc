@@ -1,5 +1,9 @@
 2013-01-22  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* miscfuncs.cc (__import_address): Avoid NULL explicitly.
+
+2013-01-22  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* miscfuncs.cc (__import_address): Avoid treating random instructions
 	as import jump.
 	* malloc_wrapper.cc (malloc_init): Remove comment about 64-bit.
