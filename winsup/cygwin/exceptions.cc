@@ -617,7 +617,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
   /* Another exception could happen while tracing or while exiting.
      Only do this once.  */
   if (recursed++)
-    system_printf ("Error while dumping state (probably corrupted stack)");
+    api_fatal ("Error while dumping state (probably corrupted stack)");
   else if (!try_to_debug (0))
     rtl_unwind (frame, e);
   else

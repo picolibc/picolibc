@@ -1,3 +1,8 @@
+2013-01-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* exceptions.cc (exception::handle): Make attempt to recursively dump
+	stack fatal.
+
 2013-01-22  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* miscfuncs.cc (__import_address): Avoid NULL explicitly.
