@@ -1,5 +1,10 @@
 2013-01-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* miscfuncs.cc (__import_address): Check if malloc field points
+	directly at 'malloc'.
+
+2013-01-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* miscfuncs.cc (__import_address): On second thought, the chance that
 	this pointer could be NULL is very low so don't bother checking for it.
 
