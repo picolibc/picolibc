@@ -1,5 +1,5 @@
 /* v850.h -- Header file for NEC V850 opcode table
-   Copyright 1996, 1997, 2001, 2003, 2010 Free Software Foundation, Inc.
+   Copyright 1996-2013 Free Software Foundation, Inc.
    Written by J.T. Conklin, Cygnus Support
 
    This file is part of GDB, GAS, and the GNU binutils.
@@ -54,18 +54,42 @@ struct v850_opcode
   unsigned int processors;
 };
 
+/* Values for architecture number.  */
+#define arch_V850      0
+#define arch_V850E     (arch_V850 + 1)
+#define arch_V850E1    (arch_V850E + 1)
+#define arch_V850E2    (arch_V850E1 + 1)
+#define arch_V850E2V3  (arch_V850E2 + 1)
+#define arch_V850E3V5  (arch_V850E2V3 + 1)
+#define arch_separator (arch_V850E3V5 + 1)
+
+#define opt_EXTENSION  (arch_separator)
+#define opt_ALIAS      (opt_EXTENSION + 1)
+
 /* Values for the processors field in the v850_opcode structure.  */
-#define PROCESSOR_MASK		0x1f
-#define PROCESSOR_OPTION_EXTENSION	(1 << 5)	/* Enable extension opcodes.  */
-#define PROCESSOR_OPTION_ALIAS	(1 << 6)		/* Enable alias opcodes.  */
-#define PROCESSOR_V850		(1 << 0)		/* Just the V850.  */
-#define PROCESSOR_ALL		PROCESSOR_MASK		/* Any processor.  */
-#define PROCESSOR_V850E		(1 << 1)		/* Just the V850E.  */
-#define PROCESSOR_NOT_V850	(PROCESSOR_ALL & (~ PROCESSOR_V850))	/* Any processor except the V850.  */
-#define PROCESSOR_V850E1	(1 << 2)		/* Just the V850E1.  */
-#define PROCESSOR_V850E2	(1 << 3)		/* Just the V850E2.  */
-#define PROCESSOR_V850E2V3	(1 << 4)		/* Just the V850E2V3.  */
-#define PROCESSOR_V850E2_ALL	(PROCESSOR_V850E2 | PROCESSOR_V850E2V3)	/* V850E2 & V850E2V3.  */
+#define PROCESSOR_V850       (1 << (arch_V850))     /* Just the V850.  */
+#define PROCESSOR_V850E      (1 << (arch_V850E))    /* Just the V850E.  */
+#define PROCESSOR_V850E1     (1 << (arch_V850E1))   /* Just the V850E1.  */
+#define PROCESSOR_V850E2     (1 << (arch_V850E2))   /* Just the V850E2.  */
+#define PROCESSOR_V850E2V3   (1 << (arch_V850E2V3)) /* Just the V850E2V3.  */
+#define PROCESSOR_V850E3V5   (1 << (arch_V850E3V5)) /* Just the V850E3V5.  */
+
+/* UPPERS */
+#define PROCESSOR_V850E3V5_UP (PROCESSOR_V850E3V5)
+#define PROCESSOR_V850E2V3_UP (PROCESSOR_V850E2V3 | PROCESSOR_V850E3V5_UP)
+#define PROCESSOR_V850E2_UP   (PROCESSOR_V850E2   | PROCESSOR_V850E2V3_UP)
+#define PROCESSOR_V850E_UP    (PROCESSOR_V850E    | PROCESSOR_V850E1 | PROCESSOR_V850E2_UP)
+#define PROCESSOR_ALL         (PROCESSOR_V850     | PROCESSOR_V850E_UP)
+
+#define PROCESSOR_MASK        (PROCESSOR_ALL)
+#define PROCESSOR_NOT_V850    (PROCESSOR_ALL & (~ PROCESSOR_V850))         /* Any processor except the V850.  */
+
+#define PROCESSOR_UNKNOWN    ~(PROCESSOR_MASK)
+
+/* OPTIONS */
+#define PROCESSOR_OPTION_EXTENSION (1 << (opt_EXTENSION))                  /* Enable extension opcodes.  */
+#define PROCESSOR_OPTION_ALIAS     (1 << (opt_ALIAS))                      /* Enable alias opcodes.  */
+
 #define SET_PROCESSOR_MASK(mask,set)	((mask) = ((mask) & ~PROCESSOR_MASK) | (set))
 
 /* The table itself is sorted by major opcode number, and is otherwise
@@ -202,6 +226,12 @@ extern const struct v850_operand v850_operands[];
 /* The operand has '%' prefix.  */
 #define V850_OPERAND_PERCENT	0x200000
 
-extern int v850_msg_is_out_of_range (const char * msg);
+/* This operand is a cache oparation.  */
+#define V850_OPERAND_CACHEOP	0x400000
+
+/* This operand is a prefetch oparation.  */
+#define V850_OPERAND_PREFOP	0x800000
+
+extern int v850_msg_is_out_of_range (const char *);
 
 #endif /* V850_H */
