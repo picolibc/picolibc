@@ -1,3 +1,8 @@
+2013-01-24  Nick Clifton  <nickc@redhat.com>
+
+	* v850.h: Add support for e3v5 architecture.
+	Reorganize processor selection macros.
+
 2013-01-16  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h (R_386_SIZE32): Fill it.

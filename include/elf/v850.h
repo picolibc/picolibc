@@ -1,6 +1,5 @@
 /* V850 ELF support for BFD.
-   Copyright 1997, 1998, 2000, 2002, 2003, 2004, 2007, 2008, 2010, 2012
-   Free Software Foundation, Inc.
+   Copyright 1997-2013 Free Software Foundation, Inc.
    Created by Michael Meissner, Cygnus Support <meissner@cygnus.com>
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -45,6 +44,9 @@
 
 /* v850e2v3 code.  */
 #define E_V850E2V3_ARCH		0x40000000
+
+/* v850e3v5 code.  */
+#define E_V850E3V5_ARCH		0x60000000
 
 /* Flags for the st_other field.  */
 #define V850_OTHER_SDA		0x10	/* Symbol had SDA relocations.  */
