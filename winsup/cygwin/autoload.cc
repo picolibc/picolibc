@@ -125,9 +125,9 @@ bool NO_COPY wsock_started;
   .align	16					\n\
 " #name ":						\n\
 _win32_" #name ":					\n\
-  movq		(3f),%rax				\n\
+  movq		3f(%rip),%rax				\n\
   jmp		*%rax					\n\
-1:movq		(2f),%rax				\n\
+1:movq		2f(%rip),%rax				\n\
   push		%rbp		# Keep 16 byte aligned	\n\
   push		%r9					\n\
   push		%r8					\n\
@@ -206,7 +206,7 @@ noload:									\n\
 	movq	(%rdx),%rax	# Handle value				\n\
 	movq	8(%rax),%r8						\n\
 	lea	20(%rdx),%rdx	# Location of name of function		\n\
-	movq	$msg1,%rcx	# The message				\n\
+	lea	msg1(%rip),%rcx	# The message				\n\
 	call	api_fatal	# Print message. Never returns		\n\
 									\n\
 	.globl	dll_func_load						\n\
