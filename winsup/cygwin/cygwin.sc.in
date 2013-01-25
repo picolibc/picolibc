@@ -15,6 +15,9 @@ SECTIONS
   {
      *(.init)
     *(.text)
+#ifdef __x86_64__
+    *(.text.*)
+#endif
     *(SORT(.text$*))
     *(.glue_7t)
     *(.glue_7)
@@ -57,12 +60,12 @@ SECTIONS
   }
   .pdata ALIGN(__section_alignment__) :
   {
-    *(.pdata)
+    *(.pdata*)
   }
 #ifdef __x86_64__
   .xdata ALIGN(__section_alignment__) :
   {
-    *(.xdata)
+    *(.xdata*)
   }
 #endif
   .bss ALIGN(__section_alignment__) :

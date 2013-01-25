@@ -103,7 +103,8 @@ sub fefunc {
 	.extern	$func
 	.global	$fe
 $fe:
-	push	\$$func
+	leaq	$func(%rip),%r10
+	pushq	%r10
 	jmp	$sigfe_func
 
 EOF
@@ -117,12 +118,13 @@ _sigfe_maybe:
 	movq	%gs:8,%r12			# location of bottom of stack
 	addq	\$$tls::initialized,%r12	# where we will be looking
 	cmpq	%r12,%rsp			# stack loc > than tls
-	jge	0f				# yep.  we don't have a tls.
+	jge	0f				#  yep.  we don't have a tls.
 	subq	\$$tls::initialized,%r12	# where we will be looking
 	movl	$tls::initialized(%r12),%r11d
 	cmpl	\$0xc763173f,%r11d		# initialized?
 	je	1f
 0:
+	popq	%r12
 	ret
 
 _sigfe:
@@ -140,7 +142,7 @@ _sigfe:
 	jmp	1b				# sleep and loop
 2:	movq	\$8,%rax			# have the lock, now increment the
 	xaddq	%rax,$tls::stackptr(%r12)	#  stack pointer and get pointer
-	leaq	_sigbe,%r11			# new place to return to
+	leaq	_sigbe(%rip),%r11		# new place to return to
 	xchgq	%r11,8(%rsp)			# exchange with real return value
 	movq	%r11,(%rax)			# store real return value on alt stack
 	incl	$tls::incyg(%r12)
@@ -176,20 +178,15 @@ _sigbe:						# return here after cygwin syscall
 sigdelayed:
 	pushq	%rbp
 	movq	%rsp,%rbp
-	pushf
 	pushq	%r15
 	pushq	%r14
 	pushq	%r13
 	pushq	%r12
-	pushq	%r9
-	pushq	%r8
 	pushq	%rsi
 	pushq	%rdi
-	pushq	%rdx
-	pushq	%rcx
 	pushq	%rbx
 	pushq	%rax
-	subq	\$40,%rsp
+	subq	\$32,%rsp
 
 	movq	%gs:8,%r12			# get tls
 	movl	$tls::saved_errno(%r12),%r15d	# temorarily save saved_errno
@@ -215,21 +212,16 @@ sigdelayed:
 	xorl	%r11d,%r11d
 	movl	%r11d,$tls::incyg(%r12)
 	movl	%r11d,$tls::stacklock(%r12)	# unlock
-	addq	\$40,%rsp
+	addq	\$32,%rsp
 	popq	%rax
 	popq	%rbx
-	popq	%rcx
-	popq	%rdx
 	popq	%rdi
 	popq	%rsi
-	popq	%r8
-	popq	%r9
 	popq	%r12
 	popq	%r13
 	popq	%r14
 	popq	%r15
-	popf
-	popq	%rbp
+	leave
 	jmp	*%r10
 
 # _cygtls::pop
@@ -259,14 +251,37 @@ _ZN7_cygtls4lockEv:
 # _cygtls::unlock
 	.global _ZN7_cygtls6unlockEv
 _ZN7_cygtls6unlockEv:
+	decl	$tls::pstacklock(%rcx)
 	ret
 
 # _cygtls::locked
 	.global _ZN7_cygtls6lockedEv
 _ZN7_cygtls6lockedEv:
+	movl	$tls::pstacklock(%rcx),%eax
 	ret
 
 stabilize_sig_stack:
+	pushq	%r12
+	subq	\$32,%rsp
+	movq	%gs:8,%r12
+1:	movl	\$1,%r10d
+	xchgl	%r10d,$tls::stacklock(%r12)
+	movl	%r10d,$tls::spinning(%r12)		# flag if we are waiting for lock
+	testl	%r10d,%r10d
+	jz	2f
+	call	yield
+	jmp	1b
+2:	incl	$tls::incyg(%r12)
+	cmpl	\$0,$tls::sig(%r12)
+	jz	3f
+	decl	$tls::stacklock(%r12)			# unlock
+	movq	\$$tls::start_offset,%rcx		# point to beginning
+	addq	%r12,%rcx				#  of tls block
+	call	_ZN7_cygtls19call_signal_handlerEv
+	jmp	1b
+3:	decl	$tls::incyg(%r12)
+	addq	\$32,%rsp
+	popq	%r12
 	ret
 EOF
 	} else {
