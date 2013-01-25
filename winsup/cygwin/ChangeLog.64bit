@@ -1,3 +1,9 @@
+2013-01-25  Kai Tietz  <ktietz@redhat.com>
+
+	* autoload.cc (LoadDLLfuncEx3): Adjust assembler for x64
+	to avoid relocations.
+	(noload): Likewise.
+
 2013-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gendef: First cut 64 bit assembler functionality, untested.
