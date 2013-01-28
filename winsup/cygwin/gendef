@@ -137,7 +137,6 @@ _sigfe:
 	jz	2f				#  if so
 	subq	\$40,%rsp			# Align stack
 	call	yield				# should be a short-time thing, so
-	nop
 	addq	\$40,%rsp			# Revert stack
 	jmp	1b				# sleep and loop
 2:	movq	\$8,%rax			# have the lock, now increment the
@@ -162,7 +161,6 @@ _sigbe:						# return here after cygwin syscall
 	jz	2f				#  if so
 	subq	\$40,%rsp			# Align stack
 	call	yield				# sleep
-	nop
 	addq	\$40,%rsp			# Revert stack
 	jmp	1b				#  and loop
 2:	movq	\$-8,%r11			# now decrement aux stack
@@ -175,18 +173,31 @@ _sigbe:						# return here after cygwin syscall
 	jmp	*%r11				# "return" to caller
 
 	.global	sigdelayed
+	.seh_proc sigdelayed
 sigdelayed:
 	pushq	%rbp
+	.seh_pushreg %rbp
 	movq	%rsp,%rbp
+	.seh_setframe %rbp,0
 	pushq	%r15
+	.seh_pushreg %r15
 	pushq	%r14
+	.seh_pushreg %r14
 	pushq	%r13
+	.seh_pushreg %r13
 	pushq	%r12
+	.seh_pushreg %r12
 	pushq	%rsi
+	.seh_pushreg %rsi
 	pushq	%rdi
+	.seh_pushreg %rdi
 	pushq	%rbx
+	.seh_pushreg %rbx
 	pushq	%rax
+	.seh_pushreg %rax
 	subq	\$32,%rsp
+	.seh_stackalloc 32
+	.seh_endprologue
 
 	movq	%gs:8,%r12			# get tls
 	movl	$tls::saved_errno(%r12),%r15d	# temorarily save saved_errno
@@ -221,22 +232,30 @@ sigdelayed:
 	popq	%r13
 	popq	%r14
 	popq	%r15
-	leave
+	popq	%rbp
 	jmp	*%r10
+	.seh_endproc
 
 # _cygtls::pop
 	.global _ZN7_cygtls3popEv
+	.seh_proc _ZN7_cygtls3popEv
 _ZN7_cygtls3popEv:
+	.seh_endprologue
 	movq	\$-8,%r11
 	xaddq	%r11,$tls::pstackptr(%rcx)
 	movq	-8(%r11),%rax
 	ret
+	.seh_endproc
 
 # _cygtls::lock
 	.global _ZN7_cygtls4lockEv
+	.seh_proc _ZN7_cygtls4lockEv
 _ZN7_cygtls4lockEv:
 	pushq	%r12
+	.seh_pushreg %r12
 	subq	\$32,%rsp
+	.seh_stackalloc 32
+	.seh_endprologue
 	movq	%rcx,%r12
 1:	movl	\$1,%r11d
 	xchgl	%r11d,$tls::pstacklock(%r12)
@@ -247,22 +266,33 @@ _ZN7_cygtls4lockEv:
 2:	subq	\$32,%rsp
 	popq	%r12
 	ret
+	.seh_endproc
 
 # _cygtls::unlock
 	.global _ZN7_cygtls6unlockEv
+	.seh_proc _ZN7_cygtls6unlockEv
 _ZN7_cygtls6unlockEv:
+	.seh_endprologue
 	decl	$tls::pstacklock(%rcx)
 	ret
+	.seh_endproc
 
 # _cygtls::locked
 	.global _ZN7_cygtls6lockedEv
+	.seh_proc _ZN7_cygtls6lockedEv
 _ZN7_cygtls6lockedEv:
+	.seh_endprologue
 	movl	$tls::pstacklock(%rcx),%eax
 	ret
+	.seh_endproc
 
+	.seh_proc stabilize_sig_stack
 stabilize_sig_stack:
 	pushq	%r12
+	.seh_pushreg %r12
 	subq	\$32,%rsp
+	.seh_stackalloc 32
+	.seh_endprologue
 	movq	%gs:8,%r12
 1:	movl	\$1,%r10d
 	xchgl	%r10d,$tls::stacklock(%r12)
@@ -281,8 +311,10 @@ stabilize_sig_stack:
 	jmp	1b
 3:	decl	$tls::incyg(%r12)
 	addq	\$32,%rsp
+	movq	%r12,%r11				# return tls addr in r11
 	popq	%r12
 	ret
+	.seh_endproc
 EOF
 	} else {
 	  $res = <<EOF . longjmp () . $res;
@@ -461,20 +493,153 @@ sub longjmp {
 	return <<EOF;
 
 	.globl  setjmp
+	.seh_proc setjmp
 setjmp:
+	.seh_endprologue
+	# We use the Windows jmp_buf layout.  Store ExceptionList in Frame.
+	# Store alternative stackptr in Spare.
+	movq	%gs:0,%r10
+	movq	%r10,(%rcx)
+	movq	%rbx,8(%rcx)
+	movq	%rsp,16(%rcx)
+	movq	%rbp,24(%rcx)
+	movq	%rsi,32(%rcx)
+	movq	%rdi,40(%rcx)
+	movq	%r12,48(%rcx)
+	movq	%r13,56(%rcx)
+	movq	%r14,64(%rcx)
+	movq	%r15,72(%rcx)
+	movq	(%rsp),%r10
+	movq	%r10,80(%rcx)
+	movaps	%xmm6,96(%rcx)
+	movaps	%xmm7,112(%rcx)
+	movaps	%xmm8,128(%rcx)
+	movaps	%xmm9,144(%rcx)
+	movaps	%xmm10,160(%rcx)
+	movaps	%xmm11,176(%rcx)
+	movaps	%xmm12,192(%rcx)
+	movaps	%xmm13,208(%rcx)
+	movaps	%xmm14,224(%rcx)
+	movaps	%xmm15,240(%rcx)
+	pushq	%rcx
+	.seh_pushreg %rcx
+	call	stabilize_sig_stack		# returns tls in r11
+	popq	%rcx
+	movq	$tls::stackptr(%r11),%r10
+	movq	%r10,88(%ecx)
+	decl	$tls::stacklock(%r11)
+	movl	\$0,%eax
 	ret
+	.seh_endproc
 
 	.globl  __sjfault
+	.seh_proc __sjfault
 __sjfault:
+	.seh_endprologue
+	# Like setjmp, just w/o storing the alternate stackptr.
+	movq	%gs:0,%r10
+	movq	%r10,(%rcx)
+	movq	%rbx,8(%rcx)
+	movq	%rsp,16(%rcx)
+	movq	%rbp,24(%rcx)
+	movq	%rsi,32(%rcx)
+	movq	%rdi,40(%rcx)
+	movq	%r12,48(%rcx)
+	movq	%r13,56(%rcx)
+	movq	%r14,64(%rcx)
+	movq	%r15,72(%rcx)
+	movq	(%rsp),%r10
+	movq	%r10,80(%rcx)
+	movaps	%xmm6,96(%rcx)
+	movaps	%xmm7,112(%rcx)
+	movaps	%xmm8,128(%rcx)
+	movaps	%xmm9,144(%rcx)
+	movaps	%xmm10,160(%rcx)
+	movaps	%xmm11,176(%rcx)
+	movaps	%xmm12,192(%rcx)
+	movaps	%xmm13,208(%rcx)
+	movaps	%xmm14,224(%rcx)
+	movaps	%xmm15,240(%rcx)
+	movl	\$0,%eax
 	ret
+	.seh_endproc
 
 	.globl  __ljfault
+	.seh_proc __ljfault
 __ljfault:
-	ret
+	movq	(%rcx),%r10
+	movq	%r10,%gs:0
+	movq	8(%rcx),%rbx
+	movq	16(%rcx),%rsp
+	movq	24(%rcx),%rbp
+	movq	32(%rcx),%rsi
+	movq	40(%rcx),%rdi
+	movq	48(%rcx),%r12
+	movq	56(%rcx),%r13
+	movq	64(%rcx),%r14
+	movq	72(%rcx),%r15
+	movq	80(%rcx),%r10
+	movq	%r10,(%rsp)
+	movaps	96(%rcx),%xmm6
+	movaps	112(%rcx),%xmm7
+	movaps	128(%rcx),%xmm8
+	movaps	144(%rcx),%xmm9
+	movaps	160(%rcx),%xmm10
+	movaps	176(%rcx),%xmm11
+	movaps	192(%rcx),%xmm12
+	movaps	208(%rcx),%xmm13
+	movaps	224(%rcx),%xmm14
+	movaps	240(%rcx),%xmm15
+	movl	%edx,%eax
+	testl	%eax,%eax
+	jne	0f
+	incl	%eax
+0:	ret
+	.seh_endproc
 
 	.globl  longjmp
+	.seh_proc longjmp
 longjmp:
-	ret
+	pushq	%rcx
+	.seh_pushreg %rcx
+	.seh_endprologue
+	movq	%rdx,%r12			# save return value (r12 is overwritten anyway)
+	call	stabilize_sig_stack		# returns tls in r11
+	popq	%rcx
+	movq	%r12,%rax			# restore return value
+	movq	88(%rcx),%r10			# get old signal stack
+	movq	%r10,$tls::stackptr(%r11)	# restore
+	decl	$tls::stacklock(%r11)		# relinquish lock
+	xorl	%r10d,%r10d
+	movl	%r10d,$tls::incyg(%r11)		# we're definitely not in cygwin anymore
+	movq	(%rcx),%r10
+	movq	%r10,%gs:0
+	movq	8(%rcx),%rbx
+	movq	16(%rcx),%rsp
+	movq	24(%rcx),%rbp
+	movq	32(%rcx),%rsi
+	movq	40(%rcx),%rdi
+	movq	48(%rcx),%r12
+	movq	56(%rcx),%r13
+	movq	64(%rcx),%r14
+	movq	72(%rcx),%r15
+	movq	80(%rcx),%r10
+	movq	%r10,(%rsp)
+	movaps	96(%rcx),%xmm6
+	movaps	112(%rcx),%xmm7
+	movaps	128(%rcx),%xmm8
+	movaps	144(%rcx),%xmm9
+	movaps	160(%rcx),%xmm10
+	movaps	176(%rcx),%xmm11
+	movaps	192(%rcx),%xmm12
+	movaps	208(%rcx),%xmm13
+	movaps	224(%rcx),%xmm14
+	movaps	240(%rcx),%xmm15
+	testl	%eax,%eax
+	jne	0f
+	incl	%eax
+0:	ret
+	.seh_endproc
 EOF
     } else {
 	return <<EOF;

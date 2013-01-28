@@ -1,12 +1,19 @@
+2013-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef: Add missing setjmp/longjmp functionality, still untested.
+
 2013-01-25  Corinna Vinschen  <corinna@vinschen.de>
 
-	* cygwin.sc.in: Accommodate extra .text, .pdata, and .xdata section on 64 bit.
-	* cygwin64.din: Set BASE to 0x200040000 to start shared sections at 0x200000000.
+	* cygwin.sc.in: Accommodate extra .text, .pdata, and .xdata section on
+	64 bit.
+	* cygwin64.din: Set BASE to 0x200040000 to start shared sections at
+	0x200000000.
 	* gendef: Second cut 64 bit assembler functionality, still untested.
 
 2013-01-25  Kai Tietz  <ktietz@redhat.com>
 
-	* autoload.cc (LoadDLLfuncEx3): Adjust assembler for x64 to avoid relocations.
+	* autoload.cc (LoadDLLfuncEx3): Adjust assembler for x64 to avoid
+	relocations.
 	(noload): Likewise.
 
 2013-01-23  Corinna Vinschen  <corinna@vinschen.de>
