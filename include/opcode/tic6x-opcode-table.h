@@ -436,7 +436,7 @@ INSN(bnop, s, branch_nop_cst, branch, C64X,
      TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MCNOP,
      FIX0(),
      OP2(OLCST, OACST),
-     ENC3(ENC(s, fu, 0), ENC(src2, pcrel, 0), ENC(src1, ucst, 1)))
+     ENC3(ENC(s, fu, 0), ENC(src2, pcrel_half, 0), ENC(src1, ucst, 1)))
 INSN(bnop, nfu, s_branch_nop_cst, branch, C64XP,
      TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MACRO|TIC6X_FLAG_MCNOP,
      FIX1(FIX(s, 0)),

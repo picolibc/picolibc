@@ -1,3 +1,8 @@
+2013-01-28  Alexis Deruelle  <alexis.deruelle@gmail.com>
+
+	PR gas/15069
+	* tic6x-opcode-table.h: Fix encoding of BNOP instruction.
+
 2013-01-24  Nick Clifton  <nickc@redhat.com>
 
 	* v850.h: Add e3v5 support.
