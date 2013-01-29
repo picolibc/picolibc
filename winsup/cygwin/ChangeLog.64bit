@@ -1,5 +1,20 @@
 2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.h (_tlsbase): Temporary workaround for GCC bug.
+	(_tlsbase): Ditto.
+	* cygwin64.din: Set BASE temporariliy to address < 32 bit to workaround
+	GDB bug.
+	* dcrt0.cc (child_info_fork::alloc_stack): Temporary workaround for GCC
+	bug.
+	(dll_crt0_1): Ditto.
+	* miscfuncs.cc (memset): Temporary workaround missing MSABI function in
+	newlib.
+	(memcpy): Ditto.
+	* include/cygwin/config.h (__getreent): Drop definition for x86_64 to
+	workaround GCC bug.
+
+2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* winbase.h (ilockcmpexch): Define always.
 	(InterlockedCompareExchange): Ditto.
 	(ilockcmpexch64): Define for x86_64.

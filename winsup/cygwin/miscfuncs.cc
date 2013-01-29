@@ -705,3 +705,25 @@ err:
     }
   return thread;
 }
+
+#ifdef __x86_64__
+// TODO: The equivalent newlib functions only work for SYSV ABI so far.
+extern "C" void *
+memset (void *s, int c, size_t n)
+{
+  char *cs = (char *) s;
+  while (n-- > 0)
+    *cs++ = c;
+  return s;
+}
+
+extern "C" void *
+memcpy(void *dest, const void *src, size_t n)
+{
+  char *dp = (char *) dest;
+  const char *sp = (const char *) src;
+  while (n-- > 0)
+    *dp++ = *sp++;
+  return dest;
+}
+#endif

@@ -157,6 +157,7 @@ typedef struct struct_waitq
 /*gentls_offsets*/
 #include "cygerrno.h"
 #include "security.h"
+#include "ntdll.h"
 
 extern "C" int __sjfault (jmp_buf);
 extern "C" int __ljfault (jmp_buf, int);
@@ -270,8 +271,11 @@ const int CYGTLS_PADSIZE = 12700;
 /*gentls_offsets*/
 
 #ifdef __x86_64__
-extern char *_tlsbase __asm__ ("%gs:8");
-extern char *_tlstop __asm__ ("%gs:16");
+// FIXME: gcc is broken and creates pc-relative instructions here!
+//extern char *_tlsbase __asm__ ("%gs:8");
+//extern char *_tlstop __asm__ ("%gs:16");
+#define _tlsbase ((char*)(NtCurrentTeb()->Tib.StackBase))
+#define _tlstop ((char*)(NtCurrentTeb()->Tib.StackLimit))
 #else
 extern char *_tlsbase __asm__ ("%fs:4");
 extern char *_tlstop __asm__ ("%fs:8");

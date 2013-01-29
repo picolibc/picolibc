@@ -38,13 +38,12 @@ extern "C" {
    we might as well just use it here.  */
 
 #ifdef _COMPILING_NEWLIB
+// FIXME: We would like to use "%gs:8" on 64 bit, but gcc chokes on that so far.
+#ifndef __x86_64__
 #include "../tlsoffsets.h"
-#ifdef __x86_64__
-extern char *_tlsbase __asm__ ("%gs:8");
-#else
 extern char *_tlsbase __asm__ ("%fs:4");
-#endif
 #define __getreent() (struct _reent *)(_tlsbase + tls_local_clib)
+#endif
 #endif  /* _COMPILING_NEWLIB */
 
 #ifdef __x86_64__
