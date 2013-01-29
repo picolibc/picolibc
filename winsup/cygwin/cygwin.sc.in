@@ -23,11 +23,16 @@ SECTIONS
     *(.glue_7)
 #ifdef __x86_64__
     . = ALIGN(8);
-#endif
+     ___CTOR_LIST__ = .; __CTOR_LIST__ = .;
+			LONG (-1); LONG (-1); *(SORT(.ctors.*)); *(.ctors); *(.ctor); LONG (0); LONG (0);
+     ___DTOR_LIST__ = .; __DTOR_LIST__ = .;
+			LONG (-1); LONG (-1); *(SORT(.dtors.*)); *(.dtors); *(.dtor);  LONG (0); LONG (0);
+#else
      ___CTOR_LIST__ = .; __CTOR_LIST__ = .;
 			LONG (-1); *(SORT(.ctors.*)); *(.ctors); *(.ctor); LONG (0);
      ___DTOR_LIST__ = .; __DTOR_LIST__ = .;
 			LONG (-1); *(SORT(.dtors.*)); *(.dtors); *(.dtor);  LONG (0);
+#endif
      *(.fini)
     /* ??? Why is .gcc_exc here?  */
      *(.gcc_exc)
