@@ -1,6 +1,7 @@
 /* passwd.c: Changing passwords and managing account information
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2008, 2009, 2011, 2012 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2011, 2012 Red
+   Hat, Inc.
 
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 

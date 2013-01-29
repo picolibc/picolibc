@@ -1,6 +1,6 @@
 /* umount.cc
 
-   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2008, 2011 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2008, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
