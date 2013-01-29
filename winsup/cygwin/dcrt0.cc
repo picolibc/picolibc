@@ -835,6 +835,8 @@ dll_crt0_1 (void *)
 {
   extern void initial_setlocale ();
 
+  _my_tls.incyg++;
+
   if (dynamically_loaded)
     sigproc_init ();
 
@@ -904,6 +906,8 @@ dll_crt0_1 (void *)
 	  _tlstop = (PVOID) fork_info->stacktop;
 	}
 
+      /* Not resetting _my_tls.incyg here because presumably fork will overwrite
+	 it with the value of the forker and all will be good.   */
       longjmp (fork_info->jmp, true);
     }
 
@@ -1002,7 +1006,13 @@ dll_crt0_1 (void *)
   /* Per POSIX set the default application locale back to "C". */
   _setlocale_r (_REENT, LC_CTYPE, "C");
 
-  if (user_data->main)
+  if (!user_data->main)
+    {
+      /* Handle any signals which may have arrived */
+      _my_tls.call_signal_handler ();
+      _my_tls.incyg--;	/* Not in Cygwin anymore */
+    }
+  else
     {
       /* Create a copy of Cygwin's version of __argv so that, if the user makes
 	 a change to an element of argv[] it does not affect Cygwin's argv.
@@ -1013,6 +1023,9 @@ dll_crt0_1 (void *)
       char **oav = __argv;
       while ((*nav++ = *oav++) != NULL)
 	continue;
+      /* Handle any signals which may have arrived */
+      _my_tls.call_signal_handler ();
+      _my_tls.incyg--;	/* Not in Cygwin anymore */
       cygwin_exit (user_data->main (__argc, newargv, *user_data->envptr));
     }
   __asm__ ("				\n\
