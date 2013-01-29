@@ -29,18 +29,19 @@ static unsigned page_const;
 static uintptr_t
 eval_start_address ()
 {
+#ifdef __x86_64__
+  /* On 64 bit, we choose a nice address outside the 32 bit area.  The
+     Cygwin DLL starts at 0x200000000L, so let's start at 0x400000000L
+     with the heap.  There's enough room for other DLLs in the space
+     in between. */
+  uintptr_t start_address = 0x400000000L;
+#else
   /* Starting with Vista, Windows performs heap ASLR.  This spoils the entire
      region below 0x20000000 for us, because that region is used by Windows
      to randomize heap and stack addresses.  Therefore we put our heap into a
      safe region starting at 0x20000000.  This should work right from the start
      in 99% of the cases. */
-
-  /* FIXME: Is the start_address still valid for 64 bit?  Given that 
-     executables on 64 bit start at the usual address, I think so, but
-     this has to be re-evaluated. */
-
   uintptr_t start_address = 0x20000000L;
-#ifndef __x86_64__
   if ((uintptr_t) NtCurrentTeb () >= 0xbf000000L)
     {
       /* However, if we're running on a /3GB enabled 32 bit system or on
@@ -63,30 +64,37 @@ eval_start_address ()
   return start_address;
 }
 
-static unsigned
+static SIZE_T
 eval_initial_heap_size ()
 {
   PIMAGE_DOS_HEADER dosheader;
   PIMAGE_NT_HEADERS ntheader;
-  unsigned size;
+  SIZE_T size;
 
   dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
   ntheader = (PIMAGE_NT_HEADERS) ((PBYTE) dosheader + dosheader->e_lfanew);
   /* LoaderFlags is an obsolete DWORD member of the PE/COFF file header.
      It's value is ignored by the loader, so we're free to use it for
-     Cygwin.  If it's 0, we default to the usual 384 Megs.  Otherwise,
-     we use it as the default initial heap size in megabyte.  Valid values
-     are between 4 and 2048 Megs. */
-
-  /* FIXME: Different numbers for 64 bit? */
+     Cygwin.  If it's 0, we default to the usual 384 Megs on 32 bit and
+     512 on 64 bit.  Otherwise, we use it as the default initial heap size
+     in megabyte.  Valid values are between 4 and 2048/8388608 Megs. */
 
   size = ntheader->OptionalHeader.LoaderFlags;
+#ifdef __x86_64__
+  if (size == 0)
+    size = 512;
+  else if (size < 4)
+    size = 4;
+  else if (size > 8388608)
+    size = 8388608;
+#else
   if (size == 0)
     size = 384;
   else if (size < 4)
     size = 4;
   else if (size > 2048)
     size = 2048;
+#endif
   return size << 20;
 }
 

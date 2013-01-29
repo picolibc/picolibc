@@ -1,3 +1,9 @@
+2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* heap.cc (eval_start_address): Change address and comment for 64 bit.
+	(eval_initial_heap_size): Change return type to SIZE_T.  Use different
+	values for 64 bit.
+
 2013-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gendef: Add missing setjmp/longjmp functionality, still untested.
