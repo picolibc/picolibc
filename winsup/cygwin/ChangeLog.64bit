@@ -1,5 +1,10 @@
 2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (TEST_DLL_NAME): Fix to use correct name per target.
+	* gendef (fefunc): Resurrect accidentally dropped 32 bit code.
+
+2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* heap.cc (eval_start_address): Change address and comment for 64 bit.
 	(eval_initial_heap_size): Change return type to SIZE_T.  Use different
 	values for 64 bit.

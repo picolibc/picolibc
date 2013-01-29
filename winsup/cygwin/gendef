@@ -99,7 +99,9 @@ sub fefunc {
 	$sigfe_func = ($fe =~ /^(.*)${func}$/)[0];
     }
     my $extra;
-    my $res = <<EOF;
+    my $res;
+    if ($is64bit) {
+	$res = <<EOF;
 	.extern	$func
 	.global	$fe
 $fe:
@@ -108,6 +110,16 @@ $fe:
 	jmp	$sigfe_func
 
 EOF
+    } else {
+	$res = <<EOF;
+        .extern $func
+        .global $fe
+$fe:
+        pushl   \$$func
+        jmp     $sigfe_func
+
+EOF
+    }
     if (!$main::first++) {
 	if ($is64bit) {
 	  $res = <<EOF . longjmp () . $res;
