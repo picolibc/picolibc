@@ -1,3 +1,44 @@
+2013-01-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* miscfuncs.cc (__import_address): Check if malloc field points
+	directly at 'malloc'.
+
+2013-01-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* miscfuncs.cc (__import_address): On second thought, the chance that
+	this pointer could be NULL is very low so don't bother checking for it.
+
+2013-01-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* exceptions.cc (exception::handle): Make attempt to recursively dump
+	stack fatal.
+
+2013-01-22  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* miscfuncs.cc (__import_address): Avoid NULL explicitly.
+
+2013-01-22  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* miscfuncs.cc (__import_address): Avoid treating random instructions
+	as import jump.
+	* malloc_wrapper.cc (malloc_init): Remove comment about 64-bit.
+
+2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_1): Comment assumption.
+	* exceptions.cc (sigpacket::setup_handler): Avoid sending signals
+	during fork processing.
+
+2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_1): Flag that we are working "incyg".  Handle any
+	signals (presumably exiting signals) which may have come in while we
+	are in the process of setting up.
+
+2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* update-copyright: Recognize configure.ac scripts too.
+
 2013-01-21  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* cygerrno.h (__reg3): Define.

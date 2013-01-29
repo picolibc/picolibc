@@ -486,8 +486,7 @@ child_info_fork::alloc_stack ()
 	 64 bit process, but it doesn't hurt to do it unconditionally.  Fix
 	 StackBase in the child to be the same as in the parent, so that the
 	 computation of _my_tls is correct. */
-      // FIXME: Temp. workaround for gcc asm error (see cygtls.h)
-      NtCurrentTeb()->Tib.StackBase = (PVOID) stackbottom;
+      _tlsbase = (PVOID) stackbottom;
     }
 }
 
@@ -901,9 +900,8 @@ dll_crt0_1 (void *)
 	 this step. */
       if (fork_info->stackaddr)
 	{
-	  // FIXME: Temp. workaround for gcc asm error (see cygtls.h)
-	  NtCurrentTeb()->Tib.StackBase = (PVOID) fork_info->stackbottom;
-	  NtCurrentTeb()->Tib.StackLimit = (PVOID) fork_info->stacktop;
+	  _tlsbase = (PVOID) fork_info->stackbottom;
+	  _tlstop = (PVOID) fork_info->stacktop;
 	}
 
       longjmp (fork_info->jmp, true);

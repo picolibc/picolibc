@@ -8,10 +8,14 @@ details. */
 
 #pragma once
 
+#ifdef __x86_64__
+#define _exception_list _EXCEPTION_REGISTRATION_RECORD
+#endif
+
 #include <exceptions.h>
 
 #ifdef __x86_64__
-extern exception_list *_except_list asm ("%gs:0");
+#define _except_list (NtCurrentTeb ()->Tib.ExceptionList)
 #else
 extern exception_list *_except_list asm ("%fs:0");
 #endif

@@ -54,7 +54,7 @@ sub update_maybe($%) {
     while (<>) {
 	if ($copyright) {
 	    push @file, $_;
-	} elsif (/^[#\s]*Copyright/o) {
+	} elsif (/^(?:dnl\s|[#\s]*)Copyright/o) {
 	    $copyright = $_;
 	    $copyright .= scalar <> while $copyright =~ /,\s*$/o;
 	    if ($copyright !~ /Red Hat, Inc\.\n/o) {
@@ -64,7 +64,7 @@ sub update_maybe($%) {
 	    for my $date ($copyright =~ /(\d+)/g) {
 		$dates{$date} = 1;
 	    }
-	    my $indent = ($copyright =~ /\A([#\s]*)/o)[0];
+	    my $indent = ($copyright =~ /\A(dnl\s+|[#\s]*)/o)[0];
 	    my $newcopyright = addwrap $indent,
 				       $indent . 'Copyright ' .
 				       (join ', ', sort {$a <=> $b} sort keys %dates) .

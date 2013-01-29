@@ -271,16 +271,16 @@ const int CYGTLS_PADSIZE = 12700;
 /*gentls_offsets*/
 
 #ifdef __x86_64__
-// FIXME: gcc is broken and creates pc-relative instructions here!
-//extern char *_tlsbase __asm__ ("%gs:8");
-//extern char *_tlstop __asm__ ("%gs:16");
-#define _tlsbase ((char*)(NtCurrentTeb()->Tib.StackBase))
-#define _tlstop ((char*)(NtCurrentTeb()->Tib.StackLimit))
+/* When just using a "gs:X" asm for the x86_64 code, gcc wrongly creates
+   pc-relative instructions.  However, NtCurrentTeb() is inline assembler
+   anyway, so using it here should be fast enough on x86_64. */
+#define _tlsbase (NtCurrentTeb()->Tib.StackBase)
+#define _tlstop (NtCurrentTeb()->Tib.StackLimit)
 #else
-extern char *_tlsbase __asm__ ("%fs:4");
-extern char *_tlstop __asm__ ("%fs:8");
+extern PVOID _tlsbase __asm__ ("%fs:4");
+extern PVOID _tlstop __asm__ ("%fs:8");
 #endif
-#define _my_tls (*((_cygtls *) (_tlsbase - CYGTLS_PADSIZE)))
+#define _my_tls (*((_cygtls *) ((char *)_tlsbase - CYGTLS_PADSIZE)))
 extern _cygtls *_main_tls;
 extern _cygtls *_sig_tls;
 

@@ -1,5 +1,23 @@
 2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.h: Cleanup x86_64 related comment.
+	(_tlsbase): Change return type to PVOID.
+	(_tlstop): Ditto.
+	(_my_tls): Accommodate above change.
+	* dcrt0.cc (child_info_fork::alloc_stack): Revert previous patch, but
+	keep cast to PVOID.
+	(dll_crt0_1): Ditto.
+	* exception.h: Define _exception_list as _EXCEPTION_REGISTRATION_RECORD
+	on x86_64.
+	(_except_list): Define in terms of NtCurrentTeb() on x86_64.
+	* miscfuncs.cc (__import_address): Handle 32 bit absolute addressing
+	in IAT on x86_64.
+	* include/cygwin/config.h (___getreent): New inline function on
+	x86_64.  Define __getreent in terms of ___getreent on x86_64.  Fix
+	comment accordingly.
+
+2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.h (_tlsbase): Temporary workaround for GCC bug.
 	(_tlsbase): Ditto.
 	* cygwin64.din: Set BASE temporariliy to address < 32 bit to workaround
