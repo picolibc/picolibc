@@ -1,3 +1,12 @@
+2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winbase.h (ilockcmpexch): Define always.
+	(InterlockedCompareExchange): Ditto.
+	(ilockcmpexch64): Define for x86_64.
+	(InterlockedCompareExchange64): Ditto.
+	(InterlockedCompareExchangePointer): Define in terms of
+	InterlockedCompareExchange64 on x86_64.
+
 2013-01-29  Kai Tietz  <ktietz@redhat.com>
 
 	* cygwin.sc.in: Fix ctors and dtors filler and zero-terminator for
