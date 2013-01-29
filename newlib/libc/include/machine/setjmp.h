@@ -79,12 +79,13 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __x86_64__
-# define _JBTYPE long long
 # ifdef __CYGWIN__
-#  define _JBLEN  32	/* FIXME: This matches the size of the native Windows
-				  setjmp buf.  We probably need more for fork
-				  to be on the safe side. */
+#  define _JBTYPE __int128
+#  define _JBLEN  16	/* This matches the size of the native Windows setjmp
+			   buf.  We have to enforce 16 byte alignment, because
+			   the buffer contains FP registers. */
 # else
+#  define _JBTYPE long long
 #  define _JBLEN  8
 # endif
 #endif
