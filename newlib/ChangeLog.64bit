@@ -1,3 +1,7 @@
+2013-01-29  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/ctype/ctype_.c (_ctype_): Fix definition for 64 bit Cygwin.
+
 2012-11-30  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/machine/setjmp.h: Change definition of _JBLEN to allow
