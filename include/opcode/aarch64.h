@@ -1,6 +1,6 @@
 /* AArch64 assembler/disassembler support.
 
-   Copyright 2009, 2010, 2011, 2012  Free Software Foundation, Inc.
+   Copyright 2009, 2010, 2011, 2012, 2013  Free Software Foundation, Inc.
    Contributed by ARM Ltd.
 
    This file is part of GNU Binutils.
@@ -423,6 +423,11 @@ enum aarch64_op
   OP_FCVTXN_S,		/* Scalar version.  */
 
   OP_ROR_IMM,
+
+  OP_SXTL,
+  OP_SXTL2,
+  OP_UXTL,
+  OP_UXTL2,
 
   OP_TOTAL_NUM,		/* Pseudo.  */
 };

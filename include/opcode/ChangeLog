@@ -1,3 +1,7 @@
+2013-01-30  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* aarch64.h (aarch64_op): Add OP_SXTL, OP_SXTL2, OP_UXTL and OP_UXTL2.
+
 2013-01-28  Alexis Deruelle  <alexis.deruelle@gmail.com>
 
 	PR gas/15069
