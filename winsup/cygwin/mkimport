@@ -5,8 +5,8 @@ use File::Spec;
 use Getopt::Long;
 my $dir = tempdir(CLEANUP => 1);
 
-my ($ar, $as, $nm, $objcopy, %replace);
-GetOptions('ar=s'=>\$ar, 'as=s'=>\$as,'nm=s'=>\$nm, 'objcopy=s'=>\$objcopy, 'replace=s'=>\%replace);
+my ($target, $ar, $as, $nm, $objcopy, %replace);
+GetOptions('target=s'=>\$target, 'ar=s'=>\$ar, 'as=s'=>\$as,'nm=s'=>\$nm, 'objcopy=s'=>\$objcopy, 'replace=s'=>\%replace);
 
 # Args::
 #   1) import lib to create
@@ -22,6 +22,10 @@ open my $nm_fd, '-|', $nm, '-Apg', '--defined-only', $inpdll;
 my %text = ();
 my %import = ();
 my %symfile = ();
+
+my $is64bit = ($target =~ /^x86_64\-/ ? 1 : 0);
+my $sym_prefix = ($is64bit ? '' : '_');
+
 while (<$nm_fd>) {
     chomp;
     my ($fn, $type, $sym) = /^$inpdll:(.*?):\S+\s+(\S)\s+(\S+)$/o;
@@ -34,7 +38,7 @@ close $nm_fd or exit 1;
 
 for my $sym (keys %replace) {
     my $fn;
-    my $_sym = '_' . $sym;
+    my $_sym = $sym_prefix . $sym;
     if (!defined($fn = $symfile{$_sym})) {
 	$fn = "$sym.o";
 	$text{$fn} = $_sym;
@@ -53,13 +57,23 @@ for my $f (keys %text) {
     } else {
 	$text{$f} = 1;
 	open my $as_fd, '|-', $as, '-o', "$dir/t-$f", "-";
-	print $as_fd <<EOF;
+	if ($is64bit) {
+	    print $as_fd <<EOF;
+	.text
+	.extern	$imp_sym
+	.global	$glob_sym
+$glob_sym:
+	jmp	*$imp_sym(%rip)
+EOF
+	} else {
+	    print $as_fd <<EOF;
 	.text
 	.extern	$imp_sym
 	.global	$glob_sym
 $glob_sym:
 	jmp	*$imp_sym
 EOF
+	}
 	close $as_fd or exit 1;
     }
 }

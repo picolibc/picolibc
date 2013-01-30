@@ -437,30 +437,14 @@ slashify (const char *src, char *dst, bool trailing_slash_p)
 void * __reg1
 __import_address (void *imp)
 {
-#ifdef __x86_64__
-  bool pcrel;
-  /* FIXME in ld?  How's 32 bit absolute addressing supposed to work
-     after rebasing an executable to an address > 32 bit?!? */
-  if ((*((uint32_t *) imp) & 0xffffff) == 0x2524ff)
-    pcrel = false;
-  else if (*((uint16_t *) imp) == 0x25ff)
-    pcrel = true;
-  else
-    return NULL;
-#else
   if (*((uint16_t *) imp) != 0x25ff)
     return NULL;
-#endif
   myfault efault;
   if (efault.faulted ())
     return NULL;
   const char *ptr = (const char *) imp;
 #ifdef __x86_64__
-  const uintptr_t *jmpto;
-  if (pcrel)
-    jmpto = (uintptr_t *) (ptr + 6 + *(int32_t *)(ptr + 2));
-  else
-    jmpto = (uintptr_t *) (uintptr_t) *((uint32_t *)(ptr + 3));
+  const uintptr_t *jmpto = (uintptr_t *) (ptr + 6 + *(int32_t *)(ptr + 2));
 #else
   const uintptr_t *jmpto = (uintptr_t *) *((uintptr_t *) (ptr + 2));
 #endif

@@ -1,3 +1,13 @@
+2013-01-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in ($(LIB_NAME)): Add --target option to mkimport call.
+	* gendef: Drop -w option.  Make callto sigfe function pc-relative
+	on x86_64.
+	* miscfuncs.cc (__import_address): Drop comment and misguide attempt
+	to handle absolute addressing in x86_64 mode.
+	* mkimport: Add --target option.  Handle x86_64 target, especially
+	create pc-relative jmp calls.
+
 2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.h: Cleanup x86_64 related comment.
