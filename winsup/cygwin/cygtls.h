@@ -178,7 +178,7 @@ public:
     char __dontuse[8 * ((sizeof(struct _reent) + 4) / 8)];
   };
   /**/
-  void (*func) /*gentls_offsets*/(int)/*gentls_offsets*/;
+  void (*func) /*gentls_offsets*/(int, siginfo_t *, void *)/*gentls_offsets*/;
   int saved_errno;
   int sa_flags;
   sigset_t oldmask;

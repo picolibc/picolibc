@@ -300,15 +300,6 @@ kill0 (pid_t pid, siginfo_t& si)
 }
 
 int
-killsys (pid_t pid, int sig)
-{
-  siginfo_t si = {0};
-  si.si_signo = sig;
-  si.si_code = SI_KERNEL;
-  return kill0 (pid, si);
-}
-
-int
 kill (pid_t pid, int sig)
 {
   siginfo_t si = {0};

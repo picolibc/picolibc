@@ -1053,7 +1053,7 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
 	{
 	  get_ttyp ()->arg.winsize = *(struct winsize *) arg;
 	  get_ttyp ()->winsize = *(struct winsize *) arg;
-	  killsys (-get_ttyp ()->getpgid (), SIGWINCH);
+	  get_ttyp ()->kill_pgrp (SIGWINCH);
 	}
       break;
     }
@@ -1425,7 +1425,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
 	{
 	  get_ttyp ()->winsize = *(struct winsize *) arg;
-	  killsys (-get_ttyp ()->getpgid (), SIGWINCH);
+	  get_ttyp ()->kill_pgrp (SIGWINCH);
 	}
       break;
     case TIOCGPGRP:

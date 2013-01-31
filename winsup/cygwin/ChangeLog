@@ -1,3 +1,26 @@
+2013-01-31  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* DevNotes: Add entry cgf-000022.
+	* cygtls.h (_cygtls::func): Define as a sa_sigaction style function.
+	* exceptions.cc (sig_handle_tty_stop): Ditto.
+	(_cygtls::interrupt_setup): Fix coercion to accommodate 'func' change.
+	(ctrl_c_handler): Use tty kill_pgrp to send a signal.
+	(sigpacket::process): Don't process sigflush here.
+	(_cygtls::call_signal_handler): Reorganize to avoid a race.  Always
+	call sa_sigaction style function.
+	* fhandler_termios.cc (is_flush_sig): Define new function.
+	(tty_min::kill_pgrp): Handle tty flush when signal detected.
+	(fhandler_termios::bg_check): Be slightly more paranoid about checking
+	for valid tty.
+	(fhandler_termios::sigflush): Don't flush unless tty owner.
+	* fhandler_tty.cc (fhandler_pty_slave::ioctl): Use tty kill_pgrp to
+	send signal.
+	(fhandler_pty_master::ioctl): Ditto.
+	* signal.cc (killsys): Delete definition.
+	* sigproc.h (killsys): Delete declaration.
+	* include/cygwin/signal.h (siginfo_t): Simplify union/struct nesting
+	slightly.  Implement mechanism to allow cygwin data passing.
+
 2013-01-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* miscfuncs.cc (__import_address): Check if malloc field points
