@@ -1,3 +1,8 @@
+2013-02-01  Nick Clifton  <nickc@redhat.com>
+
+	* v850/crt0.S: Add recognition of the e3v5
+	architecture variant.
+
 2013-01-18  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* aarch64/Machine.in (RDIMON_SCRIPTS):

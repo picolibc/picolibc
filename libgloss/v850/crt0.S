@@ -5,7 +5,7 @@
 
 _start:
 
-#if defined(__v850e__) || defined(__v850e2__) || defined(__v850e2v3__)
+#if defined(__v850e__) || defined(__v850e2__) || defined(__v850e2v3__) || defined(__v850e3v5__)
 	
 	movea   255,		r0,	r20
 	mov     65535,		r21
@@ -14,7 +14,7 @@ _start:
 	mov     hilo(__gp),	gp
 	mov     hilo(__ctbp),	r6
 	ldsr    r6,             ctbp
-#if defined(__v850e2v3__)
+#if defined(__v850e2v3__) || defined(__v850e3v5__)
 	// FPU enable
 	stsr    psw,            r6
 	movhi   1,              r0,      r7
