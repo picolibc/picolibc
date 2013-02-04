@@ -906,7 +906,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       if (len <= 1 || len > UNIX_PATH_LEN
 	  || !memchr (un_addr->sun_path, '\0', len))
 	{
-	  set_errno (len < 1 ? EINVAL : ENAMETOOLONG);
+	  set_errno (len <= 1 ? (len == 1 ? ENOENT : EINVAL) : ENAMETOOLONG);
 	  goto out;
 	}
       sin.sin_family = AF_INET;

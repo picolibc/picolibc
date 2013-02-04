@@ -1,5 +1,10 @@
 2013-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::bind): Fix error code for
+	empty filename.
+
+2013-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::bind): Fix length check of
 	AF_LOCAL filename so it never accesses memory beyond namelen.  Also
 	make sure filename is NUL-terminated.
