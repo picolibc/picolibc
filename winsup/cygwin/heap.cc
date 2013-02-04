@@ -22,7 +22,7 @@ details. */
 
 #define assert(x)
 
-static unsigned page_const;
+static ptrdiff_t page_const;
 
 #define MINHEAP_SIZE (4 * 1024 * 1024)
 

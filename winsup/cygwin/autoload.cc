@@ -224,7 +224,7 @@ gotit:									\n\
 	addq	$40,%rsp	# Revert stack				\n\
 	pop 	%r10		# Pointer to 'return address'		\n\
 	movq	%rax,12(%r10)	# Move absolute address to address slot	\n\
-	subq	$27,%r10	# Point to jmp				\n\
+	subq	$25,%r10	# Point to jmp				\n\
 	pop	%rcx		# Restore arg registers			\n\
 	pop	%rdx							\n\
 	pop	%r8							\n\

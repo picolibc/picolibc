@@ -115,7 +115,7 @@ shared_name (WCHAR *ret_buf, const WCHAR *str, int num)
   return ret_buf;
 }
 
-#define page_const (65535)
+#define page_const ((ptrdiff_t) 65535)
 #define pround(n) ((ptrdiff_t)(((n) + page_const) & ~page_const))
 
 /* The order in offsets is so that the constant blocks shared_info

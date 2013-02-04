@@ -39,7 +39,11 @@ details. */
 #include "thread.h"
 #endif
 
+#ifdef __x86_64__
+#pragma pack(push,8)
+#else
 #pragma pack(push,4)
+#endif
 /* Defined here to support auto rebuild of tlsoffsets.h. */
 class tls_pathbuf
 {
@@ -155,9 +159,6 @@ typedef struct struct_waitq
 */
 
 /*gentls_offsets*/
-#include "cygerrno.h"
-#include "security.h"
-#include "ntdll.h"
 
 extern "C" int __sjfault (jmp_buf);
 extern "C" int __ljfault (jmp_buf, int);
@@ -237,7 +238,7 @@ public:
 	if (wait_for_lock)
 	  lock ();
 	if (!signal_arrived)
-	  signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
+	  signal_arrived = CreateEvent (NULL, false, false, NULL);
 	if (wait_for_lock)
 	  unlock ();
       }
@@ -269,6 +270,9 @@ const int CYGTLS_PADSIZE = 12700;
 #endif
 
 /*gentls_offsets*/
+
+#include "cygerrno.h"
+#include "ntdll.h"
 
 #ifdef __x86_64__
 /* When just using a "gs:X" asm for the x86_64 code, gcc wrongly creates

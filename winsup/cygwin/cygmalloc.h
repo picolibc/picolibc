@@ -31,6 +31,10 @@ int __reg1 dlmalloc_trim (size_t);
 int __reg2 dlmallopt (int p, int v);
 void dlmalloc_stats ();
 
+#ifdef __x86_64__
+#define MALLOC_ALIGNMENT ((size_t)16U)
+#endif
+
 #ifndef __INSIDE_CYGWIN__
 extern "C" void __set_ENOMEM ();
 # define MALLOC_FAILURE_ACTION	__set_ENOMEM ()

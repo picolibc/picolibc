@@ -1,3 +1,19 @@
+2013-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (LoadDLLfuncEx3): Adjust address computation required
+	by latest change to the 64 bit code.
+	* cygmalloc.h (MALLOC_ALIGNMENT): Set to 16 on x86_64.
+	* cygtls.h: Set struct alignment to 8 on x86_64.  Move inclusion of
+	other header files outside of alignment-enforced code area.  Drop
+	inclusion of security.h entirely.
+	(_cygtls::get_signal_arrived): Use NULL SECURITY_ATTRIBUTES rather than
+	&sec_none_nih.
+	* gendef (_cygtls::lock): Fix stack alignment.
+	* heap.cc (page_const): Change type to ptrdiff_t, otherwise negation
+	operator in pround creates broken bitmask.
+	* shared.cc (page_const): Add cast to ptrdiff_t.
+	* tlsoffsets64.h: Regenerate.
+
 2013-01-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in ($(LIB_NAME)): Add --target option to mkimport call.

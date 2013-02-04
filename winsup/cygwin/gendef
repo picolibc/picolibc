@@ -275,7 +275,7 @@ _ZN7_cygtls4lockEv:
 	jz	2f
 	call	yield
 	jmp	1b
-2:	subq	\$32,%rsp
+2:	addq	\$32,%rsp
 	popq	%r12
 	ret
 	.seh_endproc
