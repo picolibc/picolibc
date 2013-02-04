@@ -546,6 +546,9 @@ struct external_reloc
 #define RELSZ_V0 10                 /* FIXME -- coffcode.h needs fixing */
 #define RELSZ 12                    /* for COFF1/2 */
 
+#define SWAP_OUT_RELOC_EXTRA(abfd, src, dst) \
+  do memset (dst->r_reserved, 0, sizeof (dst->r_reserved)); while (0)
+
 /* various relocation types.  */
 #define R_ABS     0x0000            /* no relocation */
 #define R_REL13   0x002A            /* 13-bit direct reference (???) */
