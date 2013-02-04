@@ -107,7 +107,7 @@ sub fefunc {
 $fe:
 	leaq	$func(%rip),%r10
 	pushq	%r10
-	jmp	*$sigfe_func(%rip)
+	jmp	$sigfe_func
 
 EOF
     } else {
@@ -139,7 +139,7 @@ _sigfe_maybe:
 	popq	%r12
 	ret
 
-_sigfe:
+_sigfe:						# stack is aligned on entry!
 	pushq	%r12
 	movq	%gs:8,%r12			# location of bottom of stack
 1:	movl	\$1,%r11d			# potential lock value
@@ -147,14 +147,14 @@ _sigfe:
 	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
-	subq	\$40,%rsp			# Align stack
+	subq	\$40,%rsp			# add spill and align stack
 	call	yield				# should be a short-time thing, so
-	addq	\$40,%rsp			# Revert stack
+	addq	\$40,%rsp			# revert stack and
 	jmp	1b				# sleep and loop
 2:	movq	\$8,%rax			# have the lock, now increment the
 	xaddq	%rax,$tls::stackptr(%r12)	#  stack pointer and get pointer
 	leaq	_sigbe(%rip),%r11		# new place to return to
-	xchgq	%r11,8(%rsp)			# exchange with real return value
+	xchgq	%r11,16(%rsp)			# exchange with real return value
 	movq	%r11,(%rax)			# store real return value on alt stack
 	incl	$tls::incyg(%r12)
 	decl	$tls::stacklock(%r12)		# remove lock
@@ -163,6 +163,7 @@ _sigfe:
 	jmp	*%rax				# and jmp to it
 
 _sigbe:						# return here after cygwin syscall
+						# stack is aligned on entry!
 	pushq	%rax				# don't clobber
 	pushq	%r12				# tls pointer
 	movq	%gs:8,%r12			# address of bottom of tls
@@ -171,9 +172,9 @@ _sigbe:						# return here after cygwin syscall
 	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
-	subq	\$40,%rsp			# Align stack
+	subq	\$32,%rsp			# add spill
 	call	yield				# sleep
-	addq	\$40,%rsp			# Revert stack
+	addq	\$32,%rsp			# revert stack
 	jmp	1b				#  and loop
 2:	movq	\$-8,%r11			# now decrement aux stack
 	xaddq	%r11,$tls::stackptr(%r12)	#  and get pointer
@@ -186,7 +187,9 @@ _sigbe:						# return here after cygwin syscall
 
 	.global	sigdelayed
 	.seh_proc sigdelayed
-sigdelayed:
+sigdelayed:					# stack is aligned on entry!
+	pushq	%rbp				# fake to make unaligned
+	.seh_pushreg %rbp
 	pushq	%rbp
 	.seh_pushreg %rbp
 	movq	%rsp,%rbp
@@ -212,7 +215,7 @@ sigdelayed:
 	.seh_endprologue
 
 	movq	%gs:8,%r12			# get tls
-	movl	$tls::saved_errno(%r12),%r15d	# temorarily save saved_errno
+	movl	$tls::saved_errno(%r12),%r15d	# temporarily save saved_errno
 	movq	\$$tls::start_offset,%rcx	# point to beginning of tls block
 	addq	%r12,%rcx			#  and store as first arg to method
 	call	_ZN7_cygtls19call_signal_handlerEv	# call handler
@@ -245,7 +248,8 @@ sigdelayed:
 	popq	%r14
 	popq	%r15
 	popq	%rbp
-	jmp	*%r10
+	movq	%r10,(%rsp)
+	ret
 	.seh_endproc
 
 # _cygtls::pop
@@ -265,18 +269,17 @@ _ZN7_cygtls3popEv:
 _ZN7_cygtls4lockEv:
 	pushq	%r12
 	.seh_pushreg %r12
-	subq	\$32,%rsp
-	.seh_stackalloc 32
 	.seh_endprologue
 	movq	%rcx,%r12
 1:	movl	\$1,%r11d
 	xchgl	%r11d,$tls::pstacklock(%r12)
 	testl   %r11d,%r11d
 	jz	2f
+	subq	\$32,%rsp
 	call	yield
+	addq	\$32,%rsp
 	jmp	1b
-2:	addq	\$32,%rsp
-	popq	%r12
+2:	popq	%r12
 	ret
 	.seh_endproc
 

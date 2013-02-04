@@ -1,5 +1,17 @@
 2013-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* gendef (fefunc): Fix incorrect pc-relative jmp instruction.
+	(_sigfe): Fix offset to return address on stack.  Add and fix comments.
+	(_sigbe): Fix stack alignment when creating spill area for call to
+	yield.  Add and fix comments.
+	(sigdelayed): Add fake push to make sure stack is aligned correctly.
+	Use fake stack alignment on exit to store return address and call ret,
+	rather than jmp.  Fix comments.
+	(_cygtls::lock): Only create and destroy spill area when really calling
+	yield.
+
+2013-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (LoadDLLfuncEx3): Adjust address computation required
 	by latest change to the 64 bit code.
 	* cygmalloc.h (MALLOC_ALIGNMENT): Set to 16 on x86_64.
