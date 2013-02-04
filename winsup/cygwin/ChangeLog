@@ -1,3 +1,9 @@
+2013-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::bind): Fix length check of
+	AF_LOCAL filename so it never accesses memory beyond namelen.  Also
+	make sure filename is NUL-terminated.
+
 2013-01-31  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* DevNotes: Add entry cgf-000022.

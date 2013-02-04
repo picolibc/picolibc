@@ -900,17 +900,19 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
     {
 #define un_addr ((struct sockaddr_un *) name)
       struct sockaddr_in sin;
-      int len = sizeof sin;
+      int len = namelen - offsetof (struct sockaddr_un, sun_path);
 
-      if (strlen (un_addr->sun_path) >= UNIX_PATH_LEN)
+      /* Check that name is within bounds and NUL-terminated. */
+      if (len <= 1 || len > UNIX_PATH_LEN
+	  || !memchr (un_addr->sun_path, '\0', len))
 	{
-	  set_errno (ENAMETOOLONG);
+	  set_errno (len < 1 ? EINVAL : ENAMETOOLONG);
 	  goto out;
 	}
       sin.sin_family = AF_INET;
       sin.sin_port = 0;
       sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-      if (::bind (get_socket (), (sockaddr *) &sin, len))
+      if (::bind (get_socket (), (sockaddr *) &sin, len = sizeof sin))
 	{
 	  syscall_printf ("AF_LOCAL: bind failed");
 	  set_winsock_errno ();
