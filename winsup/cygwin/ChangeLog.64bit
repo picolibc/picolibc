@@ -1,5 +1,10 @@
 2013-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pseudo-reloc.cc (do_pseudo_reloc): Enable 64 bit code for x86_64
+	Cygwin.
+
+2013-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* miscfuncs.cc (RtlFillMemory): Declare.
 	(RtlCopyMemory): Declare.
 	(memset): Just call RtlFillMemory.
