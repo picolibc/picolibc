@@ -1,3 +1,14 @@
+2013-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (RtlFillMemory): Declare.
+	(RtlCopyMemory): Declare.
+	(memset): Just call RtlFillMemory.
+	(memcpy): Just call RtlCopyMemory.
+	* mmap.cc (class mmap_record): Drop enforced packing.  Reorder members
+	to allow tight packing on 32 as well as on 64 bit.
+	* include/sys/dirent.h: Don't enforced structure packing on x86_64.
+	(__DIRENT_COOKIE): Use different value on 64 bit.
+
 2013-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gendef (fefunc): Fix incorrect pc-relative jmp instruction.

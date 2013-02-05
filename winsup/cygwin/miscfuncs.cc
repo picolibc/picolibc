@@ -712,22 +712,22 @@ err:
 
 #ifdef __x86_64__
 // TODO: The equivalent newlib functions only work for SYSV ABI so far.
+#undef RtlFillMemory
+#undef RtlCopyMemory
+extern "C" void NTAPI RtlFillMemory (PVOID, SIZE_T, BYTE);
+extern "C" void NTAPI RtlCopyMemory (PVOID, const VOID *, SIZE_T);
+
 extern "C" void *
 memset (void *s, int c, size_t n)
 {
-  char *cs = (char *) s;
-  while (n-- > 0)
-    *cs++ = c;
+  RtlFillMemory (s, n, c);
   return s;
 }
 
 extern "C" void *
 memcpy(void *dest, const void *src, size_t n)
 {
-  char *dp = (char *) dest;
-  const char *sp = (const char *) src;
-  while (n-- > 0)
-    *dp++ = *sp++;
+  RtlCopyMemory (dest, src, n);
   return dest;
 }
 #endif

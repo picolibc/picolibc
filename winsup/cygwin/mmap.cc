@@ -253,28 +253,31 @@ class mmap_record
     LIST_ENTRY (mmap_record) mr_next;
 
   private:
-    int fd;
+    /* 4 byte on 32 bit, 8 byte on 64 bit */
     HANDLE mapping_hdl;
+    SIZE_T len;
+    caddr_t base_address;
+    /* Always 8 bytes */
+    off_t offset;
+    /* Always 4 bytes */
+    int fd;
     DWORD openflags;
     int prot;
     int flags;
-    off_t offset;
-    SIZE_T len;
-    caddr_t base_address;
     dev_t dev;
     DWORD page_map[0];
 
   public:
     mmap_record (int nfd, HANDLE h, DWORD of, int p, int f, off_t o, DWORD l,
 		 caddr_t b) :
-       fd (nfd),
        mapping_hdl (h),
+       len (l),
+       base_address (b),
+       offset (o),
+       fd (nfd),
        openflags (of),
        prot (p),
-       flags (f),
-       offset (o),
-       len (l),
-       base_address (b)
+       flags (f)
       {
 	dev = 0;
 	if (fd >= 0 && !cygheap->fdtab.not_open (fd))
