@@ -1,3 +1,18 @@
+2013-01-31  cgf-000022
+
+While researching the lftp behavior reported here:
+
+http://cygwin.com/ml/cygwin/2013-01/msg00390.html
+
+after a frenzy of rewriting sigflush handling to avoid blocking in the
+signal thread (which is now and should ever have been illegal), it
+dawned on me that we're not supposed to be flushing the tty input buffer
+every time a signal is received.  We're supposed to do this only when
+the user hits a character (e.g., CTRL-C) which initiates a signal
+action.  So, I removed sigflush from sigpacket::process and moved it to
+tc ()->kill_pgrp ().  This function should only be called to send
+signals related to the tty so this should have the desired effect.
+
 2013-01-11  cgf-000021
 
 Apparently I got the signal handling semantics of select() wrong again

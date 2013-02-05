@@ -1135,7 +1135,7 @@ __main (void)
   sig_dispatch_pending (true);
 }
 
-void __stdcall
+void __reg1
 do_exit (int status)
 {
   syscall_printf ("do_exit (%d), exit_state %d", status, exit_state);

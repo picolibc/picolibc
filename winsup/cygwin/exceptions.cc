@@ -724,7 +724,7 @@ extern DWORD exec_exit;		// Possible exit value for exec
 
 extern "C" {
 static void
-sig_handle_tty_stop (int sig)
+sig_handle_tty_stop (int sig, siginfo_t *, void *)
 {
   _my_tls.incyg = 1;
   /* Silently ignore attempts to suspend if there is no accommodating
@@ -779,13 +779,13 @@ _cygtls::interrupt_now (CONTEXT *cx, siginfo_t& si, void *handler,
   return interrupted;
 }
 
-void __stdcall
+void __reg3
 _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
 {
   push ((__stack_t) sigdelayed);
   deltamask = siga.sa_mask & ~SIG_NONMASKABLE;
   sa_flags = siga.sa_flags;
-  func = (void (*) (int)) handler;
+  func = (void (*) (int, siginfo_t *, void *)) handler;
   if (siga.sa_flags & SA_RESETHAND)
     siga.sa_handler = SIG_DFL;
   saved_errno = -1;		// Flag: no errno to save
@@ -993,7 +993,7 @@ ctrl_c_handler (DWORD type)
 	  && t->ti.c_cc[VINTR] == 3 && t->ti.c_cc[VQUIT] == 3)
 	sig = SIGQUIT;
       t->last_ctrl_c = GetTickCount ();
-      killsys (-myself->pid, sig);
+      t->kill_pgrp (sig);
       t->last_ctrl_c = GetTickCount ();
       return TRUE;
     }
@@ -1166,7 +1166,7 @@ signal_exit (int sig, siginfo_t *si)
 }
 } /* extern "C" */
 
-int __stdcall
+int __reg1
 sigpacket::process ()
 {
   bool continue_now;
@@ -1184,19 +1184,6 @@ sigpacket::process ()
       sig_clear (SIGTSTP);
       sig_clear (SIGTTIN);
       sig_clear (SIGTTOU);
-    }
-
-  switch (si.si_signo)
-    {
-    case SIGINT:
-    case SIGQUIT:
-    case SIGSTOP:
-    case SIGTSTP:
-      if (cygheap->ctty)
-	cygheap->ctty->sigflush ();
-      break;
-    default:
-      break;
     }
 
   int rc = 1;
@@ -1342,28 +1329,23 @@ _cygtls::call_signal_handler ()
 
       debug_only_printf ("dealing with signal %d", sig);
       this_sa_flags = sa_flags;
+
+      /* Save information locally on stack to pass to handler. */
       int thissig = sig;
-      void (*thisfunc) (int) = func;
+      siginfo_t thissi = infodata;
+      void (*thisfunc) (int, siginfo_t *, void *) = func;
 
       sigset_t this_oldmask = set_process_mask_delta ();
       int this_errno = saved_errno;
-      sig = 0;
+      sig = 0;		/* Flag that we can accept another signal */
       reset_signal_arrived ();
-      unlock ();	// make sure synchronized
-      if (!(this_sa_flags & SA_SIGINFO))
-	{
-	  incyg = false;
-	  thisfunc (thissig);
-	}
-      else
-	{
-	  siginfo_t thissi = infodata;
-	  void (*sigact) (int, siginfo_t *, void *) = (void (*) (int, siginfo_t *, void *)) thisfunc;
-	  /* no ucontext_t information provided yet */
-	  incyg = false;
-	  sigact (thissig, &thissi, NULL);
-	}
+      unlock ();	/* unlock signal stack */
+
+      incyg = false;
+      /* no ucontext_t information provided yet, so third arg is NULL */
+      thisfunc (thissig, &thissi, NULL);
       incyg = true;
+
       set_signal_mask (_my_tls.sigmask, this_oldmask);
       if (this_errno >= 0)
 	set_errno (this_errno);

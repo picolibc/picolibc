@@ -114,14 +114,23 @@ fhandler_pty_master::tcgetpgrp ()
   return tc ()->pgid;
 }
 
+static inline bool
+is_flush_sig (int sig)
+{
+  return sig == SIGINT || sig == SIGQUIT || sig == SIGTSTP;
+}
+
 void
 tty_min::kill_pgrp (int sig)
 {
   bool killself = false;
+  if (is_flush_sig (sig) && cygheap->ctty)
+    cygheap->ctty->sigflush ();
   winpids pids ((DWORD) PID_MAP_RW);
   siginfo_t si = {0};
   si.si_signo = sig;
   si.si_code = SI_KERNEL;
+
   for (unsigned i = 0; i < pids.npids; i++)
     {
       _pinfo *p = pids[i];
@@ -163,7 +172,7 @@ tty_min::is_orphaned_process_group (int pgid)
 bg_check_types
 fhandler_termios::bg_check (int sig)
 {
-  if (!myself->pgid || tc ()->getpgid () == myself->pgid ||
+  if (!myself->pgid || !tc () || tc ()->getpgid () == myself->pgid ||
 	myself->ctty != tc ()->ntty ||
 	((sig == SIGTTOU) && !(tc ()->ti.c_lflag & TOSTOP)))
     return bg_ok;
@@ -397,8 +406,9 @@ fhandler_termios::sigflush ()
   /* FIXME: Checking get_ttyp() for NULL is not right since it should not
      be NULL while this is alive.  However, we can conceivably close a
      ctty while exiting and that will zero this. */
-  if ((!have_execed || have_execed_cygwin) && get_ttyp ()
-      && !(get_ttyp ()->ti.c_lflag & NOFLSH))
+  if ((!have_execed || have_execed_cygwin) && tc ()
+      && (tc ()->getpgid () == myself->pgid)
+      && !(tc ()->ti.c_lflag & NOFLSH))
     tcflush (TCIFLUSH);
 }
 

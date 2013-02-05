@@ -80,7 +80,6 @@ void __stdcall signal_fixup_after_exec ();
 void __stdcall sigalloc ();
 
 int kill_pgrp (pid_t, siginfo_t&);
-int killsys (pid_t, int);
 void __reg1 exit_thread (DWORD) __attribute__ ((noreturn));
 void __reg1 setup_signal_exit (int);
 
