@@ -30,8 +30,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
 #include <wchar.h>
 #include <locale.h>
 #include <sys/cygwin.h>
@@ -164,7 +162,7 @@ load_dll (const wchar_t *fn)
   wchar_t *buf = get_module_filename (GetCurrentProcess (), NULL);
   if (!buf)
     {
-      printf ("ldd: GetModuleFileName returned an error %" PRIu32 "\n",
+      printf ("ldd: GetModuleFileName returned an error %u\n",
 	      (unsigned int) GetLastError ());
       exit (1);		/* FIXME */
     }
@@ -489,13 +487,15 @@ map_file (const wchar_t *filename)
     }
   if (!(hMapping = CreateFileMapping (hFile, 0, PAGE_READONLY | SEC_COMMIT, 0, 0, 0)))
     {
-      fprintf (stderr, "CreateFileMapping failed with windows error %" PRIu32 "\n", (unsigned int) GetLastError ());
+      fprintf (stderr, "CreateFileMapping failed with windows error %u\n",
+	       (unsigned int) GetLastError ());
       CloseHandle (hFile);
       return 0;
     }
   if (!(basepointer = MapViewOfFile (hMapping, FILE_MAP_READ, 0, 0, 0)))
     {
-      fprintf (stderr, "MapViewOfFile failed with windows error %" PRIu32 "\n", (unsigned int) GetLastError ());
+      fprintf (stderr, "MapViewOfFile failed with windows error %u\n",
+	       (unsigned int) GetLastError ());
       CloseHandle (hMapping);
       CloseHandle (hFile);
       return 0;

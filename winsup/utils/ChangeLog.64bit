@@ -1,5 +1,11 @@
 2013-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ldd.cc: Drop including inttypes.h.  Use %u rather than PRIu32.
+	* mount.cc: Fix type problem with %* expression.
+	* cygcheck.cc: Ditto.
+
+2013-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	Throughout, fix type problems on 32 and 64 bit.  Except:
 	* ssp.c: Disable entire functionality on x86_64 for now.
 

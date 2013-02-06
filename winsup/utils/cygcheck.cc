@@ -1116,7 +1116,7 @@ pretty_id ()
   sz = -sz;
   for (char **g = groups; g <= ng; g++)
     if ((g != ng) && (++i < n))
-      printf ("%*s", sz, *g);
+      printf ("%*s", (int) sz, *g);
     else
       {
 	puts (*g);
@@ -1692,7 +1692,7 @@ dump_sysinfo ()
 	{
 	  for (e = s; *e && *e != sep; e++);
 	  if (e-s)
-	    printf ("\t%.*s\n", e - s, s);
+	    printf ("\t%.*s\n", (int) (e - s), s);
 	  else
 	    puts ("\t.");
 	  count_path_items++;

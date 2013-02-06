@@ -101,7 +101,7 @@ do_mount (const char *dev, const char *where, int flags)
 	  fprintf (stderr,
       "%s: defaulting to 'notexec' mount option for speed since native path\n"
       "%*creferences a remote share.  Use '-f' option to override.\n",
-		   progname, strlen(progname) + 2, ' ');
+		   progname, (int) strlen(progname) + 2, ' ');
 	  flags |= MOUNT_NOTEXEC;
 	}
     }
