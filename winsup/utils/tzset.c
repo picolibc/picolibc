@@ -1,6 +1,6 @@
 /* tzset.c: Convert current Windows timezone to POSIX timezone information.
 
-   Copyright 2012 Red Hat, Inc.
+   Copyright 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -10,6 +10,7 @@ details. */
 
 #include <errno.h>
 #include <stdio.h>
+#include <inttypes.h>
 #include <wchar.h>
 #include <locale.h>
 #include <getopt.h>
@@ -518,8 +519,8 @@ reg_open (HKEY pkey, PCWSTR path, const char *msg)
   if (ret == ERROR_SUCCESS)
     return hkey;
   if (msg)
-    fprintf (stderr, "%s: cannot open registry %s, error code %ld\n",
-	     program_invocation_short_name, msg, ret);
+    fprintf (stderr, "%s: cannot open registry %s, error code %" PRIu32 "\n",
+	     program_invocation_short_name, msg, (unsigned int) ret);
   return NULL;
 }
 
@@ -536,8 +537,8 @@ reg_query (HKEY hkey, PCWSTR value, PWCHAR buf, DWORD size, const char *msg)
   if (ret == ERROR_SUCCESS)
     return TRUE;
   if (msg)
-    fprintf (stderr, "%s: cannot query registry %s, error code %ld\n",
-	     program_invocation_short_name, msg, ret);
+    fprintf (stderr, "%s: cannot query registry %s, error code %" PRIu32 "\n",
+	     program_invocation_short_name, msg, (unsigned int) ret);
   return FALSE;
 }
 

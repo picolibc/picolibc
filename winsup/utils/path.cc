@@ -1,7 +1,7 @@
 /* path.cc
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-   Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+   2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -842,7 +842,7 @@ vcygpath (const char *cwd, const char *s, va_list v)
       if (n < max_len || !path_prefix_p (m->posix, path, n))
 	continue;
       if ((m->flags & MOUNT_CYGDRIVE)
-	  && (strlen (path) < n + 2
+	  && ((int) strlen (path) < n + 2
 	      || path[n] != '/'
 	      || !isalpha (path[n + 1])
 	      || path[n + 2] != '/'))
@@ -918,7 +918,8 @@ getmntent (FILE *)
   if (!mnt.mnt_opts)
     mnt.mnt_opts = (char *) malloc (64);
 
-  strcpy (mnt.mnt_type, (char *) (m->flags & MOUNT_SYSTEM) ? "system" : "user");
+  strcpy (mnt.mnt_type,
+	  (char *) ((m->flags & MOUNT_SYSTEM) ? "system" : "user"));
 
   if (!(m->flags & MOUNT_BINARY))
     strcpy (mnt.mnt_opts, (char *) "text");

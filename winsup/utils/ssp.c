@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2000, 2001, 2002, 2009, 2011 Red Hat, Inc.
+ * Copyright (c) 2000, 2001, 2002, 2009, 2011, 2013 Red Hat, Inc.
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -12,6 +12,20 @@
  * Written by DJ Delorie <dj@redhat.com>
  *
  */
+
+#ifdef __x86_64__
+
+#include <stdio.h>
+
+int
+main (int argc, char **argv)
+{
+  fprintf (stderr, "%s: This application is unsuported on x86_64 so far.\n",
+	   argv[0]);
+  return 1;
+}
+
+#else
 
 #include <errno.h>
 #include <stdio.h>
@@ -939,3 +953,4 @@ main (int argc, char **argv)
   exit (0);
 }
 
+#endif /* !__x86_64 */
