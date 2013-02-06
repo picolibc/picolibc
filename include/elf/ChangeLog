@@ -1,3 +1,10 @@
+2013-02-06  Sandra Loosemore  <sandra@codesourcery.com>
+            Andrew Jenner <andrew@codesourcery.com>
+
+	Based on patches from Altera Corporation.
+
+	* nios2.h: New file.
+
 2013-01-24  Nick Clifton  <nickc@redhat.com>
 
 	* v850.h: Add support for e3v5 architecture.
