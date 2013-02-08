@@ -6,8 +6,6 @@
 	* winsup.h: Ditto.
 	* cygmagic: Define __CYGMAGIC__ to help generate same result on all
 	platforms.
-	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
-	(class child_info_fork): Drop extraneous semicolon.
 
 2013-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
