@@ -1,3 +1,14 @@
+2013-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin64.din (BASE): Set to 0x180040000.
+	(_fe_dfl_env): Remove useless symbol.
+	(_fe_nomask_env): Remove useless symbol.
+	(exit): Add missing symbol.
+	(setmode): Ditto.
+	* gendef (longjmp): Convert all displacements to hex for readability.
+	Change all movaps instructions to movdqu to accommodate unaligned
+	access to 128 bit values.
+
 2013-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pseudo-reloc.cc (do_pseudo_reloc): Enable 64 bit code for x86_64

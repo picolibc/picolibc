@@ -1,4 +1,4 @@
-LIBRARY "cyg64win1.dll" BASE=0xe0040000
+LIBRARY "cyg64win1.dll" BASE=0x180040000
 
 EXPORTS
 __argc DATA
@@ -13,8 +13,6 @@ _daylight DATA
 error_message_count DATA
 error_one_per_line DATA
 error_print_progname DATA
-_fe_dfl_env DATA
-_fe_nomask_env DATA
 h_errno DATA
 _impure_ptr DATA
 in6addr_any DATA
@@ -265,6 +263,7 @@ execv SIGFE
 execve SIGFE
 execvp SIGFE
 execvpe SIGFE
+exit SIGFE
 _exit SIGFE
 exp NOSIGFE
 exp10 NOSIGFE
@@ -925,6 +924,7 @@ setlinebuf SIGFE
 setlocale NOSIGFE
 setlogmask NOSIGFE
 setmntent SIGFE
+setmode = cygwin_setmode SIGFE
 setpassent NOSIGFE
 setpgid SIGFE
 setpgrp SIGFE
