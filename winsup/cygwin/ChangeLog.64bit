@@ -1,5 +1,16 @@
 2013-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* regparm.h: New file to define platform dependent regparm attributes.
+	Define all of them empty if __CYGMAGIC__ is defined.
+	* cygerrno.h: Include regparm.h instead of defining _reg[123] here.
+	* winsup.h: Ditto.
+	* cygmagic: Define __CYGMAGIC__ to help generate same result on all
+	platforms.
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
+	(class child_info_fork): Drop extraneous semicolon.
+
+2013-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin64.din (BASE): Set to 0x180040000.
 	(_fe_dfl_env): Remove useless symbol.
 	(_fe_nomask_env): Remove useless symbol.

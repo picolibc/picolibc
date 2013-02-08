@@ -1,7 +1,7 @@
 /* child_info.h: shared child info for cygwin
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011, 2012
-   Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011, 2012,
+   2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -35,7 +35,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xac40be03U
+#define CURR_CHILD_INFO_MAGIC 0x93737edaU
 
 #define NPROCS	256
 
@@ -106,7 +106,7 @@ public:
 			// user stack
   char filler[4];
   child_info_fork ();
-  void __reg1 handle_fork ();;
+  void __reg1 handle_fork ();
   bool abort (const char *fmt = NULL, ...);
   void alloc_stack ();
   void alloc_stack_hard_way (volatile char *);

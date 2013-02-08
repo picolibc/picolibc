@@ -77,16 +77,7 @@ int fcntl64 (int fd, int cmd, ...);
 #ifdef __cplusplus
 
 #include "wincap.h"
-
-#ifdef __x86_64__
-# define __reg1
-# define __reg2
-# define __reg3
-#else
-# define __reg1 __stdcall __attribute__ ((regparm (1)))
-# define __reg2 __stdcall __attribute__ ((regparm (2)))
-# define __reg3 __stdcall __attribute__ ((regparm (3)))
-#endif
+#include "regparm.h"
 
 extern const unsigned char case_folded_lower[];
 #define cyg_tolower(c) ((char) case_folded_lower[(unsigned char)(c)])
