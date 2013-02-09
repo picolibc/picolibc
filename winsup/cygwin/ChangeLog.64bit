@@ -1,5 +1,47 @@
 2013-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.sc.in (.rdata): Add .rdata_cygwin_nocopy subsection.
+	(.cygheap): Raise size to 3 Megs on x86_64.
+	* dcrt0.cc (dll_crt0_0): Drop call to init_global_security.
+	* dtable.cc (std_consts): Drop NO_COPY.
+	* errno.cc (errmap): Drop NO_COPY, constify instead.
+	(_sys_errlist): Drop NO_COPY.
+	* fhandler_clipboard.cc (CYGWIN_NATIVE): Ditto.
+	* fhandler_console.cc (keytable): Drop NO_COPY, constify instead.
+	* grp.cc (null_ptr): Make NO_COPY_RO.
+	* heap.cc (eval_start_address): Fix comment.
+	* localtime.cc (wildabbr): Make NO_COPY_RO.
+	(gmt): Ditto.
+	* miscfuncs.cc (case_folded_lower): Drop NO_COPY.
+	(case_folded_upper): Ditto.
+	(isalpha_array): Ditto.
+	(nice_to_winprio): Ditto for priority.
+	(class thread_allocator): New class to allocate thread stack on x86_64.
+	(thr_alloc): Define global NO_COPY instant of thread_allocator.
+	(CygwinCreateThread): Call thr_alloc.alloc on x86_64 to reserve stack.
+	* net.cc (errmap): Drop NO_COPY, constify instead.
+	(host_errmap): Ditto.
+	* netdb.cc (SPACE): Drop NO_COPY.
+	* sec_helper.cc (null_sdp): Static NO_COPY_RO definition of null SD.
+	(sec_none): Define NO_COPY_RO, define content statically.
+	(sec_none_nih): Ditto.
+	(sec_all): Ditto.
+	(sec_all_nih): Ditto.
+	(get_null_sd): Remove.
+	(init_global_security): Remove.
+	* security.cc (file_mapping): Define NO_COPY_RO.
+	(check_registry_access): Ditto for reg_mapping.
+	* spawn.cc (exe_suffixes): Drop NO_COPY, constify instead.
+	(dll_suffixes): Drop unused, disabled definition and comment.
+	* strsig.cc (sys_sigabbrev): Drop NO_COPY_INIT.
+	(sys_siglist): Ditto.
+	* syscalls.cc (def_shells): Drop NO_COPY.
+	* winsup.h (NO_COPY_RO): Define to place variable in
+	.rdata_cygwin_nocopy section.
+	(init_global_security): Drop declaration.
+
+2013-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_process.cc (win_heap_info::~win_heap_info): Only try to free
 	heap_vm_chunks if it's not NULL.
 	* pinfo.h (struct commune_result): Change type of n to DWORD.

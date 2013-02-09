@@ -1,7 +1,7 @@
 /* grp.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2011, 2012 Red Hat, Inc.
+   2008, 2009, 2011, 2012, 2013 Red Hat, Inc.
 
    Original stubs by Jason Molenda of Cygnus Support, crash@cygnus.com
    First implementation by Gunther Ebert, gunther.ebert@ixos-leipzig.de
@@ -27,7 +27,7 @@ details. */
 
 static group *group_buf;
 static pwdgrp gr (group_buf);
-static char * NO_COPY null_ptr;
+static char * NO_COPY_RO null_ptr;
 
 bool
 pwdgrp::parse_group ()

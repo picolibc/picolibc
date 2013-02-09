@@ -1,7 +1,7 @@
 /* net.cc: network-related routines.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -157,7 +157,7 @@ struct tl
   int e;
 };
 
-static NO_COPY struct tl errmap[] = {
+static const struct tl errmap[] = {
   {WSAEINTR, "WSAEINTR", EINTR},
   {WSAEWOULDBLOCK, "WSAEWOULDBLOCK", EWOULDBLOCK},
   {WSAEINPROGRESS, "WSAEINPROGRESS", EINPROGRESS},
@@ -226,7 +226,7 @@ __set_winsock_errno (const char *fn, int ln)
  * Since the member `s' isn't used for debug output we can use it
  * for the error text returned by herror and hstrerror.
  */
-static NO_COPY struct tl host_errmap[] = {
+static const struct tl host_errmap[] = {
   {WSAHOST_NOT_FOUND, "Unknown host", HOST_NOT_FOUND},
   {WSATRY_AGAIN, "Host name lookup failure", TRY_AGAIN},
   {WSANO_RECOVERY, "Unknown server error", NO_RECOVERY},

@@ -4090,7 +4090,7 @@ getusershell ()
      FIXME: SunOS has a far longer list, containing all shells which
      might be shipped with the OS.  Should we do the same for the Cygwin
      distro, adding bash, tcsh, ksh, pdksh and zsh?  */
-  static NO_COPY const char *def_shells[] = {
+  static const char *def_shells[] = {
     "/bin/sh",
     "/bin/csh",
     "/usr/bin/sh",

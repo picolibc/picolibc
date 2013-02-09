@@ -32,7 +32,7 @@ details. */
 
 long tls_ix = -1;
 
-const unsigned char case_folded_lower[] NO_COPY = {
+const unsigned char case_folded_lower[] = {
    0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,
   16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,
   32, '!', '"', '#', '$', '%', '&',  39, '(', ')', '*', '+', ',', '-', '.', '/',
@@ -51,7 +51,7 @@ const unsigned char case_folded_lower[] NO_COPY = {
  240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
 };
 
-const unsigned char case_folded_upper[] NO_COPY = {
+const unsigned char case_folded_upper[] = {
    0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,
   16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,
   32, '!', '"', '#', '$', '%', '&',  39, '(', ')', '*', '+', ',', '-', '.', '/',
@@ -70,7 +70,7 @@ const unsigned char case_folded_upper[] NO_COPY = {
  240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
 };
 
-const char isalpha_array[] NO_COPY = {
+const char isalpha_array[] = {
    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
@@ -282,7 +282,7 @@ winprio_to_nice (DWORD prio)
 DWORD
 nice_to_winprio (int &nice)
 {
-  static const DWORD priority[] NO_COPY =
+  static const DWORD priority[] =
     {
       REALTIME_PRIORITY_CLASS,		/*  0 */
       HIGH_PRIORITY_CLASS,		/*  1 */
@@ -593,6 +593,69 @@ thread_wrapper (PVOID arg)
   ExitThread (0);
 }
 
+#ifdef __x86_64__
+/* The memory region used for thread stacks */
+#define THREAD_STORAGE_LOW	0x080000000L
+#define THREAD_STORAGE_HIGH	0x100000000L
+/* We provide the stacks always in 1 Megabyte slots */
+#define THREAD_STACK_SLOT	0x100000L	/* 1 Meg */
+/* Maximum stack size returned from the pool. */
+#define THREAD_STACK_MAX	0x20000000L	/* 512 Megs */
+
+class thread_allocator
+{
+  UINT_PTR current;
+public:
+  thread_allocator () : current (THREAD_STORAGE_HIGH) {}
+  PVOID alloc (SIZE_T size)
+  {
+    SIZE_T real_size = roundup2 (size, THREAD_STACK_SLOT);
+    BOOL overflow = FALSE;
+    PVOID real_stackaddr = NULL;
+
+    /* If an application requests a monster stack, we fulfill this request
+       from outside of our pool, top down. */
+    if (real_size > THREAD_STACK_MAX)
+      return VirtualAlloc (NULL, real_size, MEM_RESERVE | MEM_TOP_DOWN,
+			   PAGE_READWRITE);
+    /* Simple round-robin.  Keep looping until VirtualAlloc succeeded, or
+       until we overflowed and hit the current address. */
+    for (UINT_PTR addr = current - real_size;
+	 !real_stackaddr && (!overflow || addr >= current);
+	 addr -= THREAD_STACK_SLOT)
+      {
+	if (addr < THREAD_STORAGE_LOW)
+	  {
+	    addr = THREAD_STORAGE_HIGH - real_size;
+	    overflow = TRUE;
+	  }
+	real_stackaddr = VirtualAlloc ((PVOID) addr, real_size,
+				       MEM_RESERVE, PAGE_READWRITE);
+	if (!real_stackaddr)
+	  {
+	    /* So we couldn't grab this space.  Let's check the state.
+	       If this area is free, simply try the next lower 1 Meg slot.
+	       Otherwise, shift the next try down to the AllocationBase
+	       of the current address, minus the requested slot size.
+	       Add THREAD_STACK_SLOT since that's subtracted in the next
+	       run of the loop anyway. */
+	    MEMORY_BASIC_INFORMATION mbi;
+	    VirtualQuery ((PVOID) addr, &mbi, sizeof mbi);
+	    if (mbi.State != MEM_FREE)
+	      addr = (UINT_PTR) mbi.AllocationBase - real_size
+						    + THREAD_STACK_SLOT;
+	  }
+      }
+    /* If we got an address, remember it for the next allocation attempt. */
+    if (real_stackaddr)
+      current = (UINT_PTR) real_stackaddr;
+    return real_stackaddr;
+  }
+};
+
+thread_allocator thr_alloc NO_COPY;
+#endif
+
 HANDLE WINAPI
 CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 		    PVOID stackaddr, ULONG stacksize, ULONG guardsize,
@@ -636,14 +699,18 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
       /* Now roundup the result to the next allocation boundary. */
       real_stacksize = roundup2 (real_stacksize,
 				 wincap.allocation_granularity ());
-      /* Reserve stack.
-	 FIXME? If the TOP_DOWN method tends to collide too much with
+      /* Reserve stack. */
+#ifdef __x86_64__
+      real_stackaddr = thr_alloc.alloc (real_stacksize);
+#else
+      /* FIXME? If the TOP_DOWN method tends to collide too much with
 	 other stuff, we should provide our own mechanism to find a
 	 suitable place for the stack.  Top down from the start of
 	 the Cygwin DLL comes to mind. */
       real_stackaddr = VirtualAlloc (NULL, real_stacksize,
 				     MEM_RESERVE | MEM_TOP_DOWN,
 				     PAGE_READWRITE);
+#endif
       if (!real_stackaddr)
 	return NULL;
       /* Set up committed region.  Two cases: */

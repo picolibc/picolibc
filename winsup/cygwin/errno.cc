@@ -34,7 +34,7 @@ details. */
 
 #define X(w, e) {ERROR_##w, #w, e}
 
-static NO_COPY struct
+static const struct
 {
   DWORD w;		 /* windows version of error */
   const char *s;	 /* text of windows version */
@@ -162,7 +162,7 @@ static NO_COPY struct
 };
 
 extern "C" {
-const char *_sys_errlist[] NO_COPY_INIT =
+const char *_sys_errlist[] =
 {
 /* NOERROR 0 */		  "No error",
 /* EPERM 1 */		  "Operation not permitted",

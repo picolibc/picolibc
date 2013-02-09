@@ -2216,10 +2216,10 @@ fhandler_console::write (const void *vsrc, size_t len)
   return len;
 }
 
-static struct {
+static const struct {
   int vk;
   const char *val[4];
-} keytable[] NO_COPY = {
+} keytable[] = {
 	       /* NORMAL */    /* SHIFT */     /* CTRL */     /* CTRL-SHIFT */
   /* Unmodified and Alt-modified keypad keys comply with linux console
      SHIFT, CTRL, CTRL-SHIFT modifiers comply with xterm modifier usage */

@@ -1,7 +1,7 @@
 /* sec_helper.cc: NT security helper functions
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012 Red Hat, Inc.
+   2011, 2012, 2013 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -26,10 +26,17 @@ details. */
 #include "ntdll.h"
 
 /* General purpose security attribute objects for global use. */
-SECURITY_ATTRIBUTES NO_COPY sec_none;
-SECURITY_ATTRIBUTES NO_COPY sec_none_nih;
-SECURITY_ATTRIBUTES NO_COPY sec_all;
-SECURITY_ATTRIBUTES NO_COPY sec_all_nih;
+static NO_COPY_RO SECURITY_DESCRIPTOR null_sdp =
+	{ SECURITY_DESCRIPTOR_REVISION, 0, SE_DACL_PRESENT,
+	  NULL, NULL, NULL, NULL };
+SECURITY_ATTRIBUTES NO_COPY_RO sec_none =
+	{ sizeof (SECURITY_ATTRIBUTES), NULL, TRUE };
+SECURITY_ATTRIBUTES NO_COPY_RO sec_none_nih =
+	{ sizeof (SECURITY_ATTRIBUTES), NULL, FALSE };
+SECURITY_ATTRIBUTES NO_COPY_RO sec_all =
+	{ sizeof (SECURITY_ATTRIBUTES), &null_sdp, TRUE };
+SECURITY_ATTRIBUTES NO_COPY_RO sec_all_nih =
+	{ sizeof (SECURITY_ATTRIBUTES), &null_sdp, FALSE };
 
 MKSID (well_known_null_sid, "S-1-0-0",
        SECURITY_NULL_SID_AUTHORITY, 1, SECURITY_NULL_RID);
@@ -459,39 +466,6 @@ set_cygwin_privileges (HANDLE token)
   if (wincap.has_create_global_privilege ())
     set_privilege (token, SE_CREATE_GLOBAL_PRIVILEGE, true);
 #endif
-}
-
-/* Function to return a common SECURITY_DESCRIPTOR that
-   allows all access.  */
-
-static inline PSECURITY_DESCRIPTOR
-get_null_sd ()
-{
-  static NO_COPY SECURITY_DESCRIPTOR sd;
-  static NO_COPY PSECURITY_DESCRIPTOR null_sdp;
-
-  if (!null_sdp)
-    {
-      RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-      RtlSetDaclSecurityDescriptor (&sd, TRUE, NULL, FALSE);
-      null_sdp = &sd;
-    }
-  return null_sdp;
-}
-
-/* Initialize global security attributes.
-   Called from dcrt0.cc (_dll_crt0).  */
-
-void
-init_global_security ()
-{
-  sec_none.nLength = sec_none_nih.nLength =
-  sec_all.nLength = sec_all_nih.nLength = sizeof (SECURITY_ATTRIBUTES);
-  sec_none.bInheritHandle = sec_all.bInheritHandle = TRUE;
-  sec_none_nih.bInheritHandle = sec_all_nih.bInheritHandle = FALSE;
-  sec_none.lpSecurityDescriptor = sec_none_nih.lpSecurityDescriptor = NULL;
-  sec_all.lpSecurityDescriptor = sec_all_nih.lpSecurityDescriptor =
-    get_null_sd ();
 }
 
 bool

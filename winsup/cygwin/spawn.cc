@@ -1,7 +1,7 @@
 /* spawn.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -34,27 +34,13 @@ details. */
 #include "winf.h"
 #include "ntdll.h"
 
-static suffix_info NO_COPY exe_suffixes[] =
+static const suffix_info exe_suffixes[] =
 {
   suffix_info ("", 1),
   suffix_info (".exe", 1),
   suffix_info (".com"),
   suffix_info (NULL)
 };
-
-#if 0
-/* CV, 2009-11-05: Used to be used when searching for DLLs in calls to
-   dlopen().  However, dlopen() on other platforms never adds a suffix by
-   its own.  Therefore we use stat_suffixes now, which only adds a .exe
-   suffix for symmetry. */
-static suffix_info dll_suffixes[] =
-{
-  suffix_info (".dll"),
-  suffix_info ("", 1),
-  suffix_info (".exe", 1),
-  suffix_info (NULL)
-};
-#endif
 
 /* Add .exe to PROG if not already present and see if that exists.
    If not, return PROG (converted from posix to win32 rules if necessary).

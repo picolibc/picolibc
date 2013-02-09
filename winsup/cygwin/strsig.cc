@@ -1,6 +1,6 @@
 /* strsig.cc
 
-   Copyright 2004, 2007, 2008, 2010, 2011 Red Hat, Inc.
+   Copyright 2004, 2007, 2008, 2010, 2011, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -101,7 +101,7 @@ struct sigdesc
 
 #define _s(n, s) #n
 #define _s2(n, s, n1, s1) #n
-const char *sys_sigabbrev[] NO_COPY_INIT =
+const char *sys_sigabbrev[] =
 {
   NULL,
   __signals
@@ -111,7 +111,7 @@ const char *sys_sigabbrev[] NO_COPY_INIT =
 #undef _s2
 #define _s(n, s) s
 #define _s2(n, s, n1, s1) s
-const char *sys_siglist[] NO_COPY_INIT =
+const char *sys_siglist[] =
 {
   NULL,
   __signals

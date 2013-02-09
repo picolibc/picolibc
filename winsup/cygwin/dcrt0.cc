@@ -738,7 +738,6 @@ dll_crt0_0 ()
   wincap.init ();
   child_proc_info = get_cygwin_startup_info ();
   init_windows_system_directory ();
-  init_global_security ();
   initial_env ();
 
   SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);

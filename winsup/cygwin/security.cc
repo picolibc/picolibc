@@ -1,7 +1,7 @@
 /* security.cc: NT file access control functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
    Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
@@ -31,10 +31,10 @@ details. */
 				  | GROUP_SECURITY_INFORMATION \
 				  | OWNER_SECURITY_INFORMATION)
 
-static NO_COPY GENERIC_MAPPING file_mapping = { FILE_GENERIC_READ,
-						FILE_GENERIC_WRITE,
-						FILE_GENERIC_EXECUTE,
-						FILE_ALL_ACCESS };
+static GENERIC_MAPPING NO_COPY_RO file_mapping = { FILE_GENERIC_READ,
+						   FILE_GENERIC_WRITE,
+						   FILE_GENERIC_EXECUTE,
+						   FILE_ALL_ACCESS };
 
 LONG
 get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
@@ -1070,10 +1070,10 @@ check_registry_access (HANDLE hdl, int flags, bool effective)
 {
   security_descriptor sd;
   int ret = -1;
-  static GENERIC_MAPPING NO_COPY reg_mapping = { KEY_READ,
-						 KEY_WRITE,
-						 KEY_EXECUTE,
-						 KEY_ALL_ACCESS };
+  static GENERIC_MAPPING NO_COPY_RO reg_mapping = { KEY_READ,
+						    KEY_WRITE,
+						    KEY_EXECUTE,
+						    KEY_ALL_ACCESS };
   ACCESS_MASK desired = 0;
   if (flags & R_OK)
     desired |= KEY_ENUMERATE_SUB_KEYS;

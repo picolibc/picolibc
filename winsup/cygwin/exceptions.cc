@@ -50,7 +50,7 @@ char debugger_command[2 * NT_MAX_PATH + 20];
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
 
-NO_COPY static struct
+static const struct
 {
   NTSTATUS code;
   const char *name;

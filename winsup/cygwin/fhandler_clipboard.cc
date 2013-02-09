@@ -29,7 +29,7 @@ details. */
  * changed? How does /dev/clipboard operate under (say) linux?
  */
 
-static const NO_COPY WCHAR *CYGWIN_NATIVE = L"CYGWIN_NATIVE_CLIPBOARD";
+static const WCHAR *CYGWIN_NATIVE = L"CYGWIN_NATIVE_CLIPBOARD";
 /* this is MT safe because windows format id's are atomic */
 static UINT cygnativeformat;
 

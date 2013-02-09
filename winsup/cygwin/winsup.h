@@ -13,6 +13,7 @@ details. */
 
 #define __INSIDE_CYGWIN__
 
+#define NO_COPY_RO __attribute__((nocommon)) __attribute__((section(".rdata_cygwin_nocopy")))
 #define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
 #define NO_COPY_INIT __attribute__((section(".data_cygwin_nocopy")))
 
@@ -223,8 +224,6 @@ void __stdcall timeval_to_filetime (const struct timeval *, FILETIME *);
 /* Console related */
 void __stdcall set_console_title (char *);
 void init_console_handler (bool);
-
-void init_global_security ();
 
 void __reg2 __set_winsock_errno (const char *fn, int ln);
 #define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)

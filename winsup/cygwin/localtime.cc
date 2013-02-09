@@ -486,9 +486,9 @@ struct tzhead {
 #define WILDABBR	"   "
 #endif /* !defined WILDABBR */
 
-static char wildabbr[] NO_COPY = WILDABBR;
+static char wildabbr[] NO_COPY_RO = WILDABBR;
 
-static char gmt[] NO_COPY = "GMT";
+static char gmt[] NO_COPY_RO = "GMT";
 
 struct ttinfo {				/* time type information */
 	long		tt_gmtoff;	/* UTC offset in seconds */

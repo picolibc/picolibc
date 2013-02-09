@@ -30,10 +30,10 @@ static uintptr_t
 eval_start_address ()
 {
 #ifdef __x86_64__
-  /* On 64 bit, we choose a nice address outside the 32 bit area.  The
-     Cygwin DLL starts at 0x200000000L, so let's start at 0x400000000L
-     with the heap.  There's enough room for other DLLs in the space
-     in between. */
+  /* On 64 bit, we choose a fixed address outside the 32 bit area.  The
+     executable starts at 0x1:00400000L, the Cygwin DLL starts at
+     0x1:80040000L, other DLLs are located in the space from 0x2:00000000L
+     up to 0x4:00000000L, so we let the heap start at 0x4:00000000L. */
   uintptr_t start_address = 0x400000000L;
 #else
   /* Starting with Vista, Windows performs heap ASLR.  This spoils the entire
