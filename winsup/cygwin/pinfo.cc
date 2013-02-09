@@ -708,7 +708,7 @@ _pinfo::commune_request (__uint32_t code, ...)
       goto err;
     }
 
-  size_t n;
+  DWORD n;
   switch (code)
     {
     case PICOM_CMDLINE:
@@ -718,7 +718,7 @@ _pinfo::commune_request (__uint32_t code, ...)
     case PICOM_FD:
     case PICOM_HEAP_INFO:
     case PICOM_PIPE_FHANDLER:
-      if (!ReadPipeOverlapped (fromthem, &n, sizeof n, &nr, 500L)
+      if (!ReadPipeOverlapped (fromthem, &n, sizeof n, &nr, 1000L)
 	  || nr != sizeof n)
 	{
 	  __seterrno ();
@@ -731,7 +731,7 @@ _pinfo::commune_request (__uint32_t code, ...)
 	  res.s = (char *) cmalloc_abort (HEAP_COMMUNE, n);
 	  char *p;
 	  for (p = res.s;
-	       n && ReadPipeOverlapped (fromthem, p, n, &nr, 500L);
+	       n && ReadPipeOverlapped (fromthem, p, n, &nr, 1000L);
 	       p += nr, n -= nr)
 	    continue;
 	  if (n)

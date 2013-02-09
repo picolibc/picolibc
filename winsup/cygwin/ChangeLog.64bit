@@ -1,5 +1,14 @@
 2013-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_process.cc (win_heap_info::~win_heap_info): Only try to free
+	heap_vm_chunks if it's not NULL.
+	* pinfo.h (struct commune_result): Change type of n to DWORD.
+	* pinfo.cc (_pinfo::commune_request): Change type of n to DWORD to
+	fix subsequent sizeof test after reading from commune pipe on x86_64.
+	Raise read timeout to match write timeout.
+
+2013-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygserver_ipc.h (ipc_retval::operator =): Disable size_t variant
 	on x86_64 since type is identical to vm_offset_t.
 

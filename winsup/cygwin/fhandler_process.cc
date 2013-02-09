@@ -644,7 +644,8 @@ win_heap_info::fill_if_match (char *base, ULONG type, char *dest)
 
 win_heap_info::~win_heap_info ()
 {
-  cfree (heap_vm_chunks);
+  if (heap_vm_chunks)
+    cfree (heap_vm_chunks);
 }
 
 struct thread_info

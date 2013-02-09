@@ -17,7 +17,7 @@ details. */
 struct commune_result
 {
   char *s;
-  int n;
+  DWORD n;
   HANDLE handles[2];
 };
 
