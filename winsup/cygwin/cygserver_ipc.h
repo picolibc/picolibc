@@ -1,6 +1,6 @@
 /* cygserver_ipc.h
 
-   Copyright 2002, 2003, 2004, 2012 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -73,8 +73,11 @@ public:
   operator int () const { return i; }
   int operator = (int ni) { return i = ni; }
 
+#ifndef __x86_64__
+  /* On x86_64: size_t == vm_offset_t == unsigned long */
   operator size_t () const { return sz; }
   size_t operator = (size_t nsz) { return sz = nsz; }
+#endif
 
   operator vm_offset_t () const { return off; }
   vm_offset_t operator = (vm_offset_t noff) { return off = noff; }

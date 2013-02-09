@@ -1,3 +1,8 @@
+2013-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver_ipc.h (ipc_retval::operator =): Disable size_t variant
+	on x86_64 since type is identical to vm_offset_t.
+
 2013-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regparm.h: New file to define platform dependent regparm attributes.
