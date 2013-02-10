@@ -1,3 +1,7 @@
+2013-02-04  Greta Yorsh <greta.yorsh@arm.com>
+
+	* arm/elf-rdimon.specs (-lrdimon): Change link to lib.
+
 2013-02-01  Nick Clifton  <nickc@redhat.com>
 
 	* v850/crt0.S: Add recognition of the e3v5
