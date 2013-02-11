@@ -1,4 +1,4 @@
-2013-02-10  Corinna Vinschen  <corinna@vinschen.de>
+2013-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin64.din: Add missing symbols.
 	* mkimport: Make sure to use and test against platform dependent
