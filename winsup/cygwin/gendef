@@ -541,7 +541,7 @@ setjmp:
 	call	stabilize_sig_stack		# returns tls in r11
 	popq	%rcx
 	movq	$tls::stackptr(%r11),%r10
-	movq	%r10,0x58(%ecx)
+	movq	%r10,0x58(%rcx)
 	decl	$tls::stacklock(%r11)
 	movl	\$0,%eax
 	ret

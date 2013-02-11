@@ -1,5 +1,9 @@
 2013-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* gendef (longjmp): Fix indirect addressing in x86_64 setjmp.
+
+2013-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin64.din: Add missing symbols.
 	* mkimport: Make sure to use and test against platform dependent
 	"imp" prefix.
