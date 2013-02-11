@@ -1,4 +1,8 @@
-2013-02-04  Greta Yorsh <greta.yorsh@arm.com>
+2013-02-10  Peter Marheine  <peter@taricorp.net>
+
+	* libgloss/rx/Makefile.in: Respect DESTDIR when installing
+
+2013-02-04  Greta Yorsh  <greta.yorsh@arm.com>
 
 	* arm/elf-rdimon.specs (-lrdimon): Change link to lib.
 
