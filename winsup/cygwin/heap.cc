@@ -32,9 +32,11 @@ eval_start_address ()
 #ifdef __x86_64__
   /* On 64 bit, we choose a fixed address outside the 32 bit area.  The
      executable starts at 0x1:00400000L, the Cygwin DLL starts at
-     0x1:80040000L, other DLLs are located in the space from 0x2:00000000L
-     up to 0x4:00000000L, so we let the heap start at 0x4:00000000L. */
-  uintptr_t start_address = 0x400000000L;
+     0x1:80040000L, other rebased DLLs are located in the region from
+     0x2:00000000L up to 0x4:00000000L, -auto-image-based DLLs are located
+     in the region from 0x4:00000000L up to 0x6:00000000L.
+     So we let the heap start at 0x6:00000000L. */
+  uintptr_t start_address = 0x600000000L;
 #else
   /* Starting with Vista, Windows performs heap ASLR.  This spoils the entire
      region below 0x20000000 for us, because that region is used by Windows

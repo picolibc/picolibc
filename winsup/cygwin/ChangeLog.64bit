@@ -1,5 +1,11 @@
 2013-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* heap.cc (eval_start_address): Move heap to 0x6:00000000.  Change
+	comment to explain why.
+	* mmap.cc (MMAP_STORAGE_LOW): Accommodate above change.
+
+2013-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_floppy.cc (fhandler_dev_floppy::open): Cast second parameter
 	in roundup2 to same size as first parameter to make sure mask size is
 	correct.

@@ -800,7 +800,7 @@ mmap_worker (mmap_list *map_list, fhandler_base *fh, caddr_t base, size_t len,
 #ifdef __x86_64__
 
 /* The memory region used for memory maps */
-#define MMAP_STORAGE_LOW	0x00500000000L
+#define MMAP_STORAGE_LOW	0x00700000000L
 #define MMAP_STORAGE_HIGH	0x70000000000L
 
 /* FIXME?  Unfortunately the OS doesn't support a top down allocation with
