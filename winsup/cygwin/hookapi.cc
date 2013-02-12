@@ -1,6 +1,6 @@
 /* hookapi.cc
 
-   Copyright 2005, 2006, 2007, 2008, 2011, 2012 Red Hat, Inc.
+   Copyright 2005, 2006, 2007, 2008, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -235,7 +235,7 @@ find_first_notloaded_dll (path_conv& pc)
       NtClose (h);
       goto out;
     }
-  if (size.QuadPart > wincap.allocation_granularity ())
+  if (size.QuadPart > (LONGLONG) wincap.allocation_granularity ())
     size.LowPart = wincap.allocation_granularity ();
   hc = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY, 0, 0, NULL);
   NtClose (h);

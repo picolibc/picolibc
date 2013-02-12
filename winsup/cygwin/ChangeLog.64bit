@@ -1,3 +1,22 @@
+2013-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::open): Cast second parameter
+	in roundup2 to same size as first parameter to make sure mask size is
+	correct.
+	* fhandler_process.cc (format_process_maps): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::dup): Ditto.
+	* hookapi.cc (find_first_notloaded_dll): Add cast.
+	* spawn.cc (av::fixup): Ditto.
+	* wincap.h: Add comment to explain the folowing change.
+	(wincapc::page_size): Return size_t.
+	(wincapc::allocation_granularity): Ditto.
+
+	* mmap.cc: Throughout, accommodate the fact that AT_ROUND_TO_PAGE isn't
+	support on 64 bit at all.
+	(class mmap_allocator): New class to allocate mmap slots on x86_64.
+	(mmap_alloc): Define global instant of mmap_allocator.
+	(mmap64): Call mmap_alloc.alloc on x86_64.
+
 2013-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gendef (longjmp): Fix indirect addressing in x86_64 setjmp.

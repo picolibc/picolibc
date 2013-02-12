@@ -890,9 +890,9 @@ format_process_maps (void *data, char *&destbuf)
 	    {
 	      size_t newlen = strlen (posix_modname) + 62;
 	      if (len + newlen >= maxsize)
-		destbuf = (char *) crealloc_abort (destbuf,
-						   maxsize += roundup2 (newlen,
-									2048));
+		destbuf = (char *)
+		  crealloc_abort (destbuf,
+				  maxsize += roundup2 (newlen, 2048UL));
 	      int written = __small_sprintf (destbuf + len,
 					     "%08lx-%08lx %s %08lx %04x:%04x %U   ",
 					     cur.rbase, cur.rend, cur.a.flags,

@@ -1,7 +1,7 @@
 /* wincap.h: Header for OS capability class.
 
    Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-   2012 Red Hat, Inc.
+   2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -60,9 +60,12 @@ public:
   void init ();
 
   const DWORD cpu_count () const { return system_info.dwNumberOfProcessors; }
-  const DWORD page_size () const { return system_info.dwPageSize; }
-  const DWORD allocation_granularity () const
-			      { return system_info.dwAllocationGranularity; }
+  /* The casts to size_t make sure that the returned value has the size of
+     a pointer on any system.  This is important when using them for bit
+     mask operations, like in roundup2. */
+  const size_t page_size () const { return (size_t) system_info.dwPageSize; }
+  const size_t allocation_granularity () const
+		     { return (size_t) system_info.dwAllocationGranularity; }
   const char *osname () const { return osnam; }
   const bool is_wow64 () const { return !!wow64; }
 

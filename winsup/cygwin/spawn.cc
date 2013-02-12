@@ -1113,7 +1113,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	  NtClose (h);
 	  goto err;
 	}
-      if (size.QuadPart > wincap.allocation_granularity ())
+      if (size.QuadPart > (LONGLONG) wincap.allocation_granularity ())
 	size.LowPart = wincap.allocation_granularity ();
 
       HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY,

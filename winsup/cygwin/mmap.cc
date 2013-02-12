@@ -199,8 +199,12 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
   void *base = addr;
   SIZE_T commitsize = attached (prot) ? 0 : len;
   SIZE_T viewsize = len;
+#ifdef __x86_64__ /* AT_ROUND_TO_PAGE isn't supported on 64 bit systems. */
+  ULONG alloc_type = MEM_TOP_DOWN;
+#else
   ULONG alloc_type = (base && !wincap.is_wow64 () ? AT_ROUND_TO_PAGE : 0)
 		     | MEM_TOP_DOWN;
+#endif
 
   /* Try mapping using the given address first, even if it's NULL.
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
@@ -793,6 +797,75 @@ mmap_worker (mmap_list *map_list, fhandler_base *fh, caddr_t base, size_t len,
   return base;
 }
 
+#ifdef __x86_64__
+
+/* The memory region used for memory maps */
+#define MMAP_STORAGE_LOW	0x00500000000L
+#define MMAP_STORAGE_HIGH	0x70000000000L
+
+/* FIXME?  Unfortunately the OS doesn't support a top down allocation with
+	   a ceiling value.  The ZeroBits mechanism only works for
+	   NtMapViewOfSection and it only evaluates the high bit of ZeroBits
+	   on 64 bit, so it's pretty much useless for our purposes.
+
+	   If the below super simple mechanism to perform top-down allocations
+	   turns out to be too slow, we need something else.  One idea is to
+	   dived the space in (3835) 4 Gig chunks and simply store the
+	   available free space per slot.  Then we can go top down from slot
+	   to slot and only try slots which are supposed to have enough space.
+	   Bookkeeping would be very simple and fast. */
+class mmap_allocator
+{
+public:
+  PVOID alloc (PVOID in_addr, SIZE_T in_size, bool fixed)
+  {
+    MEMORY_BASIC_INFORMATION mbi;
+
+    SIZE_T size = roundup2 (in_size, wincap.allocation_granularity ());
+    /* First check for the given address. */
+    if (in_addr)
+      {
+	/* If it points to a free area, big enough to fulfill the request,
+	   return the address. */
+      	if (VirtualQuery (in_addr, &mbi, sizeof mbi)
+	    && mbi.State == MEM_FREE
+	    && mbi.RegionSize >= size)
+	  return in_addr;
+	/* Otherwise, if MAP_FIXED was given, give up. */
+	if (fixed)
+	  return NULL;
+	/* Otherwise, fall through to the usual free space search mechanism. */
+      }
+    caddr_t addr = (caddr_t) MMAP_STORAGE_HIGH - size;
+    do
+      {
+	/* Shouldn't fail, but better test. */
+	if (!VirtualQuery ((PVOID) addr, &mbi, sizeof mbi))
+	  return NULL;
+	/* If the region is free... */
+	if (mbi.State == MEM_FREE)
+	  {
+	    /* ...and the region is big enough to fulfill the request, return
+	       the address. */
+	    if (mbi.RegionSize >= size)
+	      return (PVOID) addr;
+	    /* Otherwise, subtract what's missing in size and try again. */
+	    addr -= size - mbi.RegionSize;
+	  }
+	/* If the region isn't free, skip to address below AllocationBase
+	   and try again. */
+	else
+	  addr = (caddr_t) mbi.AllocationBase - size;
+      }
+    /* Give up when we are lower than the lowest address we search. */
+    while (addr >= (caddr_t) MMAP_STORAGE_LOW);
+    return NULL;
+  }
+};
+
+static mmap_allocator mmap_alloc;	/* Inherited by forked child. */
+#endif
+
 extern "C" void *
 mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
@@ -862,7 +935,11 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	 If all these requirements are given, we just return an anonymous map.
 	 This will help to get over the autoconf test even on 64 bit systems.
 	 The tests are ordered for speed. */
+#ifdef __x86_64__
+      if (1)
+#else
       if (wincap.is_wow64 ())
+#endif
 	{
 	  UNICODE_STRING fname;
 	  IO_STATUS_BLOCK io;
@@ -966,14 +1043,16 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	}
       fsiz -= off;
       /* We're creating the pages beyond EOF as reserved, anonymous pages.
-	 Note that this isn't done in WOW64 environments since apparently
-	 WOW64 does not support the AT_ROUND_TO_PAGE flag which is required
-	 to get this right.  Too bad. */
+	 Note that this isn't done in 64 bit environments since apparently
+	 64 bit systems don't support the AT_ROUND_TO_PAGE flag, which is
+	 required to get this right.  Too bad. */
+#ifndef __x86_64__
       if (!wincap.is_wow64 ()
 	  && (((off_t) len > fsiz && !autogrow (flags))
 	      || roundup2 (len, wincap.page_size ())
 		 < roundup2 (len, pagesize)))
 	orig_len = len;
+#endif
       if ((off_t) len > fsiz)
 	{
 	  if (autogrow (flags))
@@ -1023,6 +1102,9 @@ go_ahead:
 	}
     }
 
+#ifdef __x86_64__
+  addr = mmap_alloc.alloc (addr, orig_len ?: len, fixed (flags));
+#else
   if (orig_len)
     {
       /* If the requested length is bigger than the file size, we try to
@@ -1053,6 +1135,7 @@ go_ahead:
 	}
       addr = newaddr;
     }
+#endif
 
   base = mmap_worker (map_list, fh, (caddr_t) addr, len, prot, flags, fd, off,
 		      &st);
