@@ -1,4 +1,4 @@
-%rename link                old_link
+%rename lib libc
 
 *libgloss:
 -lrdimon
