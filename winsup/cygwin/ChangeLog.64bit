@@ -1,3 +1,11 @@
+2013-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (toollibdir): Define build and target dependent.
+	(install-libs): Use $(toollibdir) rather than $(tooldir)/lib.
+	(uninstall-libs): Ditto.
+	(uninstall-man): Use $(DESTDIR)$(mandir) as in install-man, rather
+	than $(tooldir)/man.
+
 2013-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* heap.cc (eval_start_address): Move heap to 0x6:00000000.  Change
