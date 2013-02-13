@@ -1,3 +1,9 @@
+2013-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* kill.cc (forcekill): Use unsigned int printf format specifier and
+	cast to avoid compiler warnings where DWORD value is used.
+	* regtool.cc: Ditto, throughout.
+
 2013-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ldd.cc: Drop including inttypes.h.  Use %u rather than PRIu32.
