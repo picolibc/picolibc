@@ -987,19 +987,19 @@ If a registry key contains a subkey and a value with the same name
 
 <sect2 id="pathnames-at"><title>The @pathnames</title> 
 <para>To circumvent the limitations on shell line length in the native
-Windows command shells, Cygwin programs expand their arguments
+Windows command shells, Cygwin programs, when invoked by non-Cygwin processes, expand their arguments
 starting with "@" in a special way.  If a file
 <filename>pathname</filename> exists, the argument
 <filename>@pathname</filename> expands recursively to the content of
 <filename>pathname</filename>. Double quotes can be used inside the
 file to delimit strings containing blank space. 
-In the following example compare the behaviors of the bash built-in
-<command>echo</command> and of the program <command>/bin/echo</command>.</para>
+In the following example compare the behaviors
+<command>/bin/echo</command> when run from bash and from the Windows command prompt.</para>
 
 <example id="pathnames-at-ex"><title> Using @pathname</title>
 <screen>
-<prompt>bash$</prompt> <userinput>echo  'This   is   "a     long"  line' > mylist</userinput>
-<prompt>bash$</prompt> <userinput>echo @mylist</userinput>
+<prompt>bash$</prompt> <userinput>@/bin/echo  'This   is   "a     long"  line' > mylist</userinput>
+<prompt>bash$</prompt> <userinput>/bin/echo @mylist</userinput>
 @mylist
 <prompt>bash$</prompt> <userinput>cmd</userinput>
 <prompt>c:\&gt;</prompt> <userinput>c:\cygwin\bin\echo @mylist</userinput>
