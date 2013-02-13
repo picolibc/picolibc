@@ -1,5 +1,9 @@
 2013-02-13  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* pathnames.sgml: Remove stray '@'.
+
+2013-02-13  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* pathnames.sgml: Clarify '@' processing.
 
 2013-01-23  Christopher Faylor  <me.cygwin2012@cgf.cx>

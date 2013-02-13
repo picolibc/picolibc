@@ -998,7 +998,7 @@ In the following example compare the behaviors
 
 <example id="pathnames-at-ex"><title> Using @pathname</title>
 <screen>
-<prompt>bash$</prompt> <userinput>@/bin/echo  'This   is   "a     long"  line' > mylist</userinput>
+<prompt>bash$</prompt> <userinput>/bin/echo  'This   is   "a     long"  line' > mylist</userinput>
 <prompt>bash$</prompt> <userinput>/bin/echo @mylist</userinput>
 @mylist
 <prompt>bash$</prompt> <userinput>cmd</userinput>
