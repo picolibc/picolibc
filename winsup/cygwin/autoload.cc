@@ -322,7 +322,7 @@ struct func_info
 #ifdef __x86_64__
 typedef __uint128_t two_addr_t;
 #else
-typedef unsigned long long two_addr_t;
+typedef __uint64_t two_addr_t;
 #endif
 union retchain
 {
@@ -355,17 +355,61 @@ dll_load (HANDLE& handle, WCHAR *name)
 
 /* The standard DLL initialization routine. */
 #ifdef __x86_64__
+
+/* On x86_64, we need assembler wrappers for std_dll_init and wsock_init
+   for two reasons:
+
+   - The functions are sysv_abi for simpler access to the return value
+     from dll_chain (rax/rdx, rather than xmm0).  However, in sysv_abi,
+     rsi/rdi are volatile argument registers, in ms_abi they are non-
+     volatile, callee saved registers.  Therefore the compiler may overwrite
+     these two registers at will in a sysv_abi function, which may break the
+     calling ms_abi function.  So we have to push these regs on the stack
+     before calling the real std_dll_init/wsock_init.
+
+   - More importantly, in the x86_64 ABI it's no safe bet that frame[1]
+     (aka 8(%rbp)) contains the return address.  Consequentially, if we
+     try to overwrite frame[1] with the address of dll_chain, we end up
+     with a scrambled stack, the result depending on the optimization
+     settings and the current frame of mind of the compiler.  So for
+     x86_64, we disable overwriting the return address in the real
+     std_dll_init/wsock_init function, but rather do this in the wrapper,
+     after return from the function, when we exactly know where the original
+     return address is stored on the stack. */
+
+#define INIT_WRAPPER(func) \
+__asm__ ("								\n\
+	.text								\n\
+" #func ":								\n\
+	pushq	%rbp							\n\
+	movq	%rsp,%rbp						\n\
+	pushq	%rsi							\n\
+	pushq	%rdi							\n\
+	movq	24(%rsp),%rdi						\n\
+	call	_" #func "						\n\
+	leaq	dll_chain(%rip),%rdi					\n\
+	movq	%rdi,24(%rsp)						\n\
+	popq	%rdi							\n\
+	popq	%rsi							\n\
+	popq	%rbp							\n\
+	ret								\n\
+");
+
+INIT_WRAPPER (std_dll_init)
+
 /* sysv_abi uses %rax and %rdx to return 128 bit int values, equivalent to
    the 32 bit ABIs using %eax and %edx to return 64 bit values.  The MS ABI
    returns 128 bit int values in %xmm0, which isn't helpful here. */
-__attribute__ ((used, noinline, sysv_abi))
+__attribute__ ((used, noinline, sysv_abi)) static two_addr_t
+_std_dll_init (struct func_info *func)
 #else
-__attribute__ ((used, noinline))
-#endif
-static two_addr_t
+__attribute__ ((used, noinline)) static two_addr_t
 std_dll_init ()
+#endif
 {
+#ifndef __x86_64__
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
+#endif
   struct dll_info *dll = func->dll;
   retchain ret;
 
@@ -423,9 +467,11 @@ std_dll_init ()
 
   InterlockedDecrement (&dll->here);
 
+#ifndef __x86_64__
   /* Kludge alert.  Redirects the return address to dll_chain. */
   uintptr_t *volatile frame = (uintptr_t *) __builtin_frame_address (0);
   frame[1] = (uintptr_t) dll_chain;
+#endif
 
   return ret.ll;
 }
@@ -433,18 +479,24 @@ std_dll_init ()
 /* Initialization function for winsock stuff. */
 WSADATA NO_COPY wsadata;
 #ifdef __x86_64__
+
+/* See above comment preceeding std_dll_init. */
+INIT_WRAPPER (wsock_init)
+
 /* sysv_abi uses %rax and %rdx to return 128 bit int values, equivalent to
    the 32 bit ABIs using %eax and %edx to return 64 bit values.  The MS ABI
    returns 128 bit int values in %xmm0, which isn't helpful here. */
-__attribute__ ((used, noinline, sysv_abi))
+__attribute__ ((used, noinline, sysv_abi)) static two_addr_t
+_wsock_init (struct func_info *func)
 #else
-__attribute__ ((used, noinline))
-#endif
-static two_addr_t
+__attribute__ ((used, noinline)) static two_addr_t
 wsock_init ()
+#endif
 {
   static LONG NO_COPY here = -1L;
+#ifndef __x86_64__
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
+#endif
   struct dll_info *dll = func->dll;
 
   while (InterlockedIncrement (&here))
@@ -476,9 +528,11 @@ wsock_init ()
 	}
     }
 
+#ifndef __x86_64__
   /* Kludge alert.  Redirects the return address to dll_chain. */
   uintptr_t *volatile frame = (uintptr_t *) __builtin_frame_address (0);
   frame[1] = (uintptr_t) dll_chain;
+#endif
 
   InterlockedDecrement (&here);
 

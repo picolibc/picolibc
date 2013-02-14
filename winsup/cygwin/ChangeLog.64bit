@@ -1,3 +1,15 @@
+2013-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (two_addr_t): Use __uint64_t as type for the i686
+	version, analogue to __uint128_t for x86_64.
+	(INIT_WRAPPER): New x86_64 macro to install a sysv_abi function wrapper
+	for the DLL init functions.  Add long comment to explain why this is
+	necessary.  Create wrapper for std_dll_init and wsock_init.
+	(std_dll_init): Rename with leading underscore on x86_64 and take
+	calling function as argument.  Disable overwriting return address on
+	stack for x86_64.
+	(wsock_init): Ditto.
+
 2013-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (toollibdir): Define build and target dependent.
