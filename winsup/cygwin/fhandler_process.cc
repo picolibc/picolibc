@@ -545,108 +545,90 @@ format_process_winexename (void *data, char *&destbuf)
   return len + 1;
 }
 
-win_heap_info::win_heap_info (_pinfo *p)
+struct heap_info
 {
-  size_t size;
-  heap_vm_chunks = (heap *) p->win_heap_info (size);
-  heap_vm_chunks_end = (heap *) ((caddr_t) heap_vm_chunks + size);
-}
+  struct heap
+  {
+    heap *next;
+    unsigned heap_id;
+    char *base;
+    char *end;
+    unsigned long flags;
+  };
+  heap *heap_vm_chunks;
 
-commune_result
-win_heap_info::gen_heap_info ()
-{
-  commune_result cr;
-  PDEBUG_BUFFER buf;
-  NTSTATUS status;
-  PDEBUG_HEAP_ARRAY harray;
-  PDEBUG_HEAP_BLOCK barray;
-  heap *h = NULL;
+  heap_info (DWORD pid)
+    : heap_vm_chunks (NULL)
+  {
+    PDEBUG_BUFFER buf;
+    NTSTATUS status;
+    PDEBUG_HEAP_ARRAY harray;
 
-  cr.n = 0;
-  cr.s = NULL;
-  buf = RtlCreateQueryDebugBuffer (0, FALSE);
-  if (!buf)
-    goto err;
-  status = RtlQueryProcessDebugInformation (GetCurrentProcessId (),
-					    PDI_HEAPS | PDI_HEAP_BLOCKS,
-					    buf);
-  if (!NT_SUCCESS (status))
-    goto err;
-  harray = (PDEBUG_HEAP_ARRAY) buf->HeapInformation;
-  if (!harray)
-    goto err;
-  /* Compute size. */
-  for (ULONG hcnt = 0; hcnt < harray->Count; ++hcnt)
-    {
-      barray = (PDEBUG_HEAP_BLOCK) harray->Heaps[hcnt].Blocks;
-      if (!barray)
-	continue;
-      for (ULONG bcnt = 0; bcnt < harray->Heaps[hcnt].BlockCount; ++bcnt)
-	if (barray[bcnt].Flags & 2)
-	  cr.n += sizeof (heap);
-    }
-  if (!cr.n)
-    goto err;
-  /* Allocate. */
-  cr.s = (char *) cmalloc_abort (HEAP_COMMUNE, cr.n);
-  if (!cr.s)
-    {
-      cr.n = 0;
-      goto err;
-    }
-  /* Fill array. */
-  h = (heap *) cr.s;
-  for (ULONG hcnt = 0; hcnt < harray->Count; ++hcnt)
-    {
-      barray = (PDEBUG_HEAP_BLOCK) harray->Heaps[hcnt].Blocks;
-      if (!barray)
-	continue;
-      for (ULONG bcnt = 0; bcnt < harray->Heaps[hcnt].BlockCount; ++bcnt)
-	if (barray[bcnt].Flags & 2)
-	  {
-	    h->heap_id = hcnt;
-	    h->flags = harray->Heaps[hcnt].Flags;
-	    h->_TYPE64_SET (base, barray[bcnt].Address);
-	    h->_TYPE64_SET (end, h->base +  barray[bcnt].Size);
-	    ++h;
-	  }
-    }
-err:
-  if (buf)
+    buf = RtlCreateQueryDebugBuffer (0, FALSE);
+    if (!buf)
+      return;
+    status = RtlQueryProcessDebugInformation (pid, PDI_HEAPS | PDI_HEAP_BLOCKS,
+					      buf);
+    if (NT_SUCCESS (status)
+	&& (harray = (PDEBUG_HEAP_ARRAY) buf->HeapInformation) != NULL)
+      for (ULONG hcnt = 0; hcnt < harray->Count; ++hcnt)
+	{
+	  PDEBUG_HEAP_BLOCK barray = (PDEBUG_HEAP_BLOCK)
+				     harray->Heaps[hcnt].Blocks;
+	  if (!barray)
+	    continue;
+	  for (ULONG bcnt = 0; bcnt < harray->Heaps[hcnt].BlockCount; ++bcnt)
+	    if (barray[bcnt].Flags & 2)
+	      {
+		heap *h = (heap *) malloc (sizeof (heap));
+		if (h)
+		  {
+		    *h = (heap) { heap_vm_chunks,
+				  hcnt, (char *) barray[bcnt].Address,
+				  (char *) barray[bcnt].Address
+					   + barray[bcnt].Size,
+				  harray->Heaps[hcnt].Flags };
+		    heap_vm_chunks = h;
+		  }
+	      }
+	}
     RtlDestroyQueryDebugBuffer (buf);
-  return cr;
-}
+  }
 
-char *
-win_heap_info::fill_if_match (char *base, ULONG type, char *dest)
-{
-  for (heap *h = heap_vm_chunks; h < heap_vm_chunks_end; ++h)
-    if (base >= h->base && base < h->end)
+  char *fill_if_match (char *base, ULONG type, char *dest)
+  {
+    for (heap *h = heap_vm_chunks; h; h = h->next)
+      if (base >= h->base && base < h->end)
+	{
+	  char *p = dest + __small_sprintf (dest, "[win heap %ld", h->heap_id);
+	  if (!(h->flags & HEAP_FLAG_NONDEFAULT))
+	    p = stpcpy (p, " default");
+	  if ((h->flags & HEAP_FLAG_SHAREABLE) && (type & MEM_MAPPED))
+	    p = stpcpy (p, " shared");
+	  if (h->flags & HEAP_FLAG_EXECUTABLE)
+	    p = stpcpy (p, " exec");
+	  if (h->flags & HEAP_FLAG_GROWABLE)
+	    p = stpcpy (p, " grow");
+	  if (h->flags & HEAP_FLAG_NOSERIALIZE)
+	    p = stpcpy (p, " noserial");
+	  if (h->flags == HEAP_FLAG_DEBUGGED)
+	    p = stpcpy (p, " debug");
+	  stpcpy (p, "]");
+	  return dest;
+	}
+    return 0;
+  }
+
+  ~heap_info ()
+  {
+    heap *n = 0;
+    for (heap *m = heap_vm_chunks; m; m = n)
       {
-	char *p = dest + __small_sprintf (dest, "[win heap %ld", h->heap_id);
-	if (!(h->flags & HEAP_FLAG_NONDEFAULT))
-	  p = stpcpy (p, " default");
-	if ((h->flags & HEAP_FLAG_SHAREABLE) && (type & MEM_MAPPED))
-	  p = stpcpy (p, " shared");
-	if (h->flags & HEAP_FLAG_EXECUTABLE)
-	  p = stpcpy (p, " exec");
-	if (h->flags & HEAP_FLAG_GROWABLE)
-	  p = stpcpy (p, " grow");
-	if (h->flags & HEAP_FLAG_NOSERIALIZE)
-	  p = stpcpy (p, " noserial");
-	if (h->flags == HEAP_FLAG_DEBUGGED)
-	  p = stpcpy (p, " debug");
-	stpcpy (p, "]");
-	return dest;
+	n = m->next;
+	free (m);
       }
-  return 0;
-}
-
-win_heap_info::~win_heap_info ()
-{
-  if (heap_vm_chunks)
-    cfree (heap_vm_chunks);
-}
+  }
+};
 
 struct thread_info
 {
@@ -815,7 +797,7 @@ format_process_maps (void *data, char *&destbuf)
 
   MEMORY_BASIC_INFORMATION mb;
   dos_drive_mappings drive_maps;
-  win_heap_info heaps (p);
+  heap_info heaps (p->dwProcessId);
   thread_info threads (p->dwProcessId, proc);
   struct stat st;
   long last_pass = 0;

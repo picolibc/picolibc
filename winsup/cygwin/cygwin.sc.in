@@ -1,6 +1,6 @@
 #ifdef __x86_64__
 OUTPUT_FORMAT(pei-x86-64)
-SEARCH_DIR("/usr/lib64"); SEARCH_DIR("=/usr/lib64/w32api");
+SEARCH_DIR("/usr/x86_64-pc-cygwin/lib/w32api"); SEARCH_DIR("=/usr/lib/w32api");
 #else
 #undef i386
 OUTPUT_FORMAT(pei-i386)

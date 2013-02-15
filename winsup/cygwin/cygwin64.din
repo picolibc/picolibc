@@ -1,4 +1,4 @@
-LIBRARY "cyg64win1.dll" BASE=0x180040000
+LIBRARY "cygwin1.dll" BASE=0x180040000
 
 EXPORTS
 __argc DATA

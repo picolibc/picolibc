@@ -346,6 +346,16 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
   if (!importRVA)
     return NULL;
 
+  /* Shortcut.  We don't have to do anything further from here, if the
+     executable's architecture doesn't match, unless we want to support
+     a mix of 32 and 64 bit Cygwin at one point. */
+#ifdef __x86_64__
+  if (!is_64bit)
+#else
+  if (is_64bit)
+#endif
+    return NULL;
+
   DWORD importRVAMaxSize = 0;
   long delta = fn ? 0 : rvadelta (pExeNTHdr, importRVA, importRVAMaxSize);
   if (delta < 0)
@@ -420,7 +430,7 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
     {
       if (!ascii_strcasematch (rva (PSTR, map ?: (char *) hm,
 				    pd->Name - delta - offset),
-			       is_64bit ? "cyg64win1.dll" : "cygwin1.dll"))
+			       "cygwin1.dll"))
       	continue;
       if (!fn)
 	{

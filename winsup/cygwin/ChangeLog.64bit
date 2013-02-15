@@ -1,3 +1,22 @@
+2013-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (toollibdir): Remove.  Revert to using tooldir instead.
+	* configure.ac (DLL_NAME): Set to cygwin1.dll in x86_64 case, too.
+	* configure: Regenerate.
+	* cygwin.sc.in (SEARCH_DIR): Align to 32 bit search dir, use lib, rather
+	than lib64.
+	* cygwin64.din (LIBRARY): Set name to cygwin1.dll.
+	* fhandler_process.cc (struct heap_info): Drop win_heap_info class
+	and revert code to former heap_info implementation.
+	(format_process_maps): Define heaps back to heap_info
+	* hookapi.cc (hook_or_detect_cygwin): Add shortcut so the code does
+	not search executable for being a Cygwin executable, if the architecture
+	is not matching the current Cygwin.  Always use for "cygwin1.dll".
+	* pinfo.cc (commune_process): Drop PICOM_HEAP_INFO code.
+	(_pinfo::commune_request): Ditto.
+	(_pinfo::win_heap_info): Remove.
+	* pinfo.h (enum picom): Remove PICOM_HEAP_INFO.
+
 2013-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (two_addr_t): Use __uint64_t as type for the i686

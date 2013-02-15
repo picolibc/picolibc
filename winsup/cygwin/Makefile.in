@@ -49,14 +49,8 @@ tooldir:=$(exec_prefix)
 else
 tooldir:=$(exec_prefix)/$(target_alias)
 endif
-ifeq ($(target_alias),x86_64-pc-cygwin)
-toollibdir:=$(tooldir)/lib64
-else
-toollibdir:=$(tooldir)/lib
-endif
 else
 tooldir:=$(exec_prefix)/$(target_alias)
-toollibdir:=$(tooldir)/lib
 endif
 datadir:=@datadir@
 infodir:=@infodir@
@@ -353,9 +347,9 @@ install-libs: $(TARGET_LIBS)
 	@$(MKDIRP) $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) $(TEST_DLL_NAME) $(DESTDIR)$(bindir)/$(DLL_NAME); \
 	for i in $^; do \
-	    $(INSTALL_DATA) $$i $(DESTDIR)$(toollibdir)/`basename $$i` ; \
+	    $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/lib/`basename $$i` ; \
 	done
-	cd $(DESTDIR)$(toollibdir) && ln -sf libcygwin.a libg.a
+	cd $(DESTDIR)$(tooldir)/lib && ln -sf libcygwin.a libg.a
 
 install-headers:
 	cd $(srcdir); \
@@ -389,7 +383,7 @@ install_host:
 uninstall-libs: $(TARGET_LIBS)
 	rm -f $(bindir)/$(DLL_NAME); \
 	for i in $^; do \
-	    rm -f $(toollibdir)/$$i ; \
+	    rm -f $(tooldir)/lib/$$i ; \
 	done
 
 uninstall-headers:

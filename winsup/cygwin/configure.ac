@@ -81,7 +81,7 @@ case "$target_cpu" in
 		TLSOFFSETS_H="tlsoffsets.h"
 		CONFIG_DIR="i386"  ;;
    x86_64)
-		DLL_NAME="cyg64win1.dll"
+		DLL_NAME="cygwin1.dll"
 		DLL_ENTRY="dll_entry"
 		DEF_DLL_ENTRY="dll_entry"
 		DIN_FILE="cygwin64.din"

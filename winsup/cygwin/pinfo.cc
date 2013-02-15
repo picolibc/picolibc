@@ -630,18 +630,6 @@ commune_process (void *arg)
 	  sigproc_printf ("WritePipeOverlapped fd failed, %E");
 	break;
       }
-    case PICOM_HEAP_INFO:
-      {
-	sigproc_printf ("processing PICOM_HEAP_INFO");
-      	commune_result cr = win_heap_info::gen_heap_info ();
-	if (!WritePipeOverlapped (tothem, &cr.n, sizeof cr.n, &nr, 1000L))
-	  sigproc_printf ("WritePipeOverlapped sizeof heaps failed, %E");
-	else if (cr.n && !WritePipeOverlapped (tothem, cr.s, cr.n, &nr, 1000L))
-	  sigproc_printf ("WritePipeOverlapped heaps failed, %E");
-	if (cr.s)
-	  cfree (cr.s);
-	break;
-      }
     }
   if (process_sync)
     {
@@ -716,7 +704,6 @@ _pinfo::commune_request (__uint32_t code, ...)
     case PICOM_ROOT:
     case PICOM_FDS:
     case PICOM_FD:
-    case PICOM_HEAP_INFO:
     case PICOM_PIPE_FHANDLER:
       if (!ReadPipeOverlapped (fromthem, &n, sizeof n, &nr, 1000L)
 	  || nr != sizeof n)
@@ -896,21 +883,6 @@ _pinfo::cmdline (size_t& n)
 	}
     }
   return s;
-}
-
-char *
-_pinfo::win_heap_info (size_t& n)
-{
-  commune_result cr;
-
-  if (!this || !pid)
-    return NULL;
-  if (pid != myself->pid)
-    cr = commune_request (PICOM_HEAP_INFO);
-  else
-    cr = win_heap_info::gen_heap_info ();
-  n = cr.n;
-  return cr.s;
 }
 
 /* This is the workhorse which waits for the write end of the pipe
