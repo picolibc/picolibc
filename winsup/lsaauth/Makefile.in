@@ -46,9 +46,11 @@ WIN32_LDFLAGS	:= $(CFLAGS) -nostdlib -Wl,-shared
 # not recognized by LSA.
 LIBS		:= -ladvapi32 -lkernel32 -lntdll
 
+ifneq ($(target_alias),x86_64-pc-cygwin)
 DLL32	:=	cyglsa.dll
 DEF32	:=	cyglsa.def
 OBJ32	:=	cyglsa.o
+endif
 
 DLL64	:=	cyglsa64.dll
 DEF64	:=	cyglsa64.def
@@ -84,6 +86,8 @@ clean:
 
 install: all
 	/bin/mkdir -p $(DESTDIR)$(bindir)
+ifneq ($(target_alias),x86_64-pc-cygwin)
 	$(INSTALL_PROGRAM) $(DLL32) $(DESTDIR)$(bindir)/$(DLL32)
+endif
 	$(INSTALL_PROGRAM) $(DLL64) $(DESTDIR)$(bindir)/$(DLL64)
 	$(INSTALL_PROGRAM) $(srcdir)/cyglsa-config $(DESTDIR)$(bindir)/cyglsa-config

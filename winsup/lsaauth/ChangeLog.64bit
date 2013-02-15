@@ -1,0 +1,3 @@
+2013-02-15  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* Makefile.in: Do not build or install 32bit DLL for 64bit target.
