@@ -1,3 +1,8 @@
+2013-02-15  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* configure.ac: Sync with GCC repo.
+	* configure: Ditto.
+
 2013-02-05  Ian Lance Taylor  <iant@google.com>
 
 	PR go/55969
