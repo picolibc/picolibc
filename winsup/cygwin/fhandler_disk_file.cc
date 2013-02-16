@@ -353,9 +353,12 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
   buf->st_size = nfs_attr->size;
   buf->st_blksize = PREFERRED_IO_BLKSIZE;
   buf->st_blocks = (nfs_attr->used + S_BLKSIZE - 1) / S_BLKSIZE;
-  buf->st_atim = nfs_attr->atime;
-  buf->st_mtim = nfs_attr->mtime;
-  buf->st_ctim = nfs_attr->ctime;
+  buf->st_atim.tv_sec = nfs_attr->atime.tv_sec;
+  buf->st_atim.tv_nsec = nfs_attr->atime.tv_nsec;
+  buf->st_mtim.tv_sec = nfs_attr->mtime.tv_sec;
+  buf->st_mtim.tv_nsec = nfs_attr->mtime.tv_nsec;
+  buf->st_ctim.tv_sec = nfs_attr->ctime.tv_sec;
+  buf->st_ctim.tv_nsec = nfs_attr->ctime.tv_nsec;
   return 0;
 }
 

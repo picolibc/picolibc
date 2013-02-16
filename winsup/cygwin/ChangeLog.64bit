@@ -1,3 +1,11 @@
+2013-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nfs.h: Make sure packing of NFS fattr3 struct is 4 byte.
+	(struct nfs_timestruc_t): Define.
+	(struct fattr3): Define timestamps as type struct nfs_timestruc_t.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Copy
+	each timestruc_t component separately to accommodate different size.
+
 2013-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (toollibdir): Remove.  Revert to using tooldir instead.
