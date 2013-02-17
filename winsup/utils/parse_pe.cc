@@ -1,6 +1,6 @@
 /* parse_pe.cc
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2012 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2012, 2013 Red Hat, Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -28,7 +28,7 @@
 #include "dumper.h"
 
 int
-exclusion::add (LPBYTE mem_base, DWORD mem_size)
+exclusion::add (LPBYTE mem_base, SIZE_T mem_size)
 {
   while (last >= size)
     size += step;
@@ -62,7 +62,7 @@ exclusion::sort_and_check ()
 	continue;
       if (p->base + size > q->base)
 	{
-	  fprintf (stderr, "region error @ (%8p + %d) > %8p\n", p->base, size, q->base);
+	  fprintf (stderr, "region error @ (%p + %zd) > %p\n", p->base, size, q->base);
 	  return 0;
 	}
     }
@@ -77,7 +77,7 @@ select_data_section (bfd * abfd, asection * sect, PTR obj)
   if ((sect->flags & (SEC_CODE | SEC_DEBUGGING)) &&
       sect->vma && bfd_get_section_size (sect))
     {
-      excl_list->add ((LPBYTE) sect->vma, (DWORD) bfd_get_section_size (sect));
+      excl_list->add ((LPBYTE) sect->vma, (SIZE_T) bfd_get_section_size (sect));
       deb_printf ("excluding section: %20s %08lx\n", sect->name,
 		  bfd_get_section_size (sect));
     }

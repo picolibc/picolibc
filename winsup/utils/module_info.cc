@@ -1,6 +1,6 @@
 /* module_info.cc
 
-   Copyright 1999, 2000, 2001, 2010 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2010, 2013 Red Hat, Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -33,7 +33,7 @@ static tf_GetModuleFileNameExA *psapi_GetModuleFileNameExA = NULL;
    Uses psapi.dll. */
 
 char *
-psapi_get_module_name (HANDLE hProcess, DWORD BaseAddress)
+psapi_get_module_name (HANDLE hProcess, LPVOID BaseAddress)
 {
   DWORD len;
   MODULEINFO mi;
@@ -103,7 +103,7 @@ psapi_get_module_name (HANDLE hProcess, DWORD BaseAddress)
 	  goto failed;
 	}
 
-      if ((DWORD) (mi.lpBaseOfDll) == BaseAddress)
+      if (mi.lpBaseOfDll == BaseAddress)
 	{
 	  free (DllHandle);
 	  return strdup (name_buf);

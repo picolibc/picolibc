@@ -1,3 +1,22 @@
+2013-02-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	Fix 64-bit type problems in dumper.exe
+	* dumper.cc: Througout, cast pid to unsigned int, change addresses
+	and sizes from DWORD to SIZE_T, and use %p for pointer addresses.
+	(dumper::add_mem_region): Change size type to SIZE_T.
+	(dumper::split_add_mem_region): Ditto.
+	* dumper.h (struct process_mem_region): Change size type to SIZE_T.
+	(class exclusion): Change last, size, and step types to size_t.
+	(exclusion::exclusion): Change argument type to size_t.
+	(exclusion::add): Change mem_size type to SIZE_T.
+	(dumper::add_mem_region): Change size type to SIZE_T.
+	(dumper::split_add_mem_region): Ditto.
+	(psapi_get_module_name): Change BaseAddress type to LPVOID.
+	* module_info.cc (psapi_get_module_name): Ditto.
+	* parse_pe.cc: Througout, change addresses and sizes from DWORD to
+	SIZE_T, and use %p for pointer addresses.
+	(exclusion::add): Change mem_size type to SIZE_T.
+
 2013-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* kill.cc (forcekill): Use unsigned int printf format specifier and
