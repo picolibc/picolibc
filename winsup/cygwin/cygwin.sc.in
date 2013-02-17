@@ -103,10 +103,6 @@ SECTIONS
     BYTE(0)	/* c */
     BYTE(0)	/* y */
     BYTE(0)	/* g */
-#ifdef __x86_64__
-    BYTE(0)	/* 6 */
-    BYTE(0)	/* 4 */
-#endif
     BYTE(0)	/* w */
     BYTE(0)	/* i */
     BYTE(0)	/* n */

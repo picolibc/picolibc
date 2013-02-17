@@ -1,3 +1,7 @@
+2013-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc.in (.gnu_debuglink_overlay): Drop "64" in dbg file name.
+
 2013-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nfs.h: Make sure packing of NFS fattr3 struct is 4 byte.
