@@ -1,4 +1,11 @@
 /*	$NetBSD: localtime.c,v 1.72 2012/10/28 19:02:29 christos Exp $	*/
+
+/* Don't reformat the code arbitrarily.
+
+   It uses in wide parts the exact formatting as the upstream NetBSD
+   versions.  The purpose is to simplify subsequent diffs to the NetBSD
+   version, should the need arise again at one point. */
+
 /*
 ** This file is in the public domain, so clarified as of
 ** 1996-06-05 by Arthur David Olson (arthur_david_olson@nih.gov).

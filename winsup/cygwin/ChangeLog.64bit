@@ -1,5 +1,9 @@
 2013-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* localtime.cc: Add comment.
+
+2013-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* localtime.cc: Throughout, pull up to latest code from NetBSD.
 
 2013-02-18  Corinna Vinschen  <corinna@vinschen.de>
