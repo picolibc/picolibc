@@ -469,9 +469,6 @@ struct bfd_link_info
   bfd *input_bfds;
   bfd **input_bfds_tail;
 
-  /* Non-NULL if .note.gnu.build-id section should be created.  */
-  char *emit_note_gnu_build_id;
-
   /* If a symbol should be created for each input BFD, this is section
      where those symbols should be placed.  It must be a section in
      the output BFD.  It may be NULL, in which case no such symbols
