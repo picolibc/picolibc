@@ -1,3 +1,9 @@
+2013-02-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* Makefile.in (libcygwin.a): Move --target flag from here...
+	(toolopts): to here, to be used by both mkimport and speclib.
+	* speclib: Omit leading underscore in symbol names on x86_64.
+
 2013-02-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.sc.in (.gnu_debuglink_overlay): Drop "64" in dbg file name.
