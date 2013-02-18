@@ -1,3 +1,12 @@
+2013-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::raw_read): Rearrange code to use
+	NtReadFile and to fix problem using pointer to wrongly sized variable
+	on x86_64.
+	(fhandler_base::read): Drop redundant code.
+	* fhandler_disk_file.cc (fhandler_disk_file::pread): Fix function
+	to not read the information twice.  Handle STATUS_END_OF_FILE.
+
 2013-02-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* Makefile.in (libcygwin.a): Move --target flag from here...

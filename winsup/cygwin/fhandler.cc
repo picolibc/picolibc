@@ -217,34 +217,36 @@ fhandler_base::set_flags (int flags, int supplied_bin)
 /* Cover function to ReadFile to achieve (as much as possible) Posix style
    semantics and use of errno.  */
 void __stdcall
-fhandler_base::raw_read (void *ptr, size_t& ulen)
+fhandler_base::raw_read (void *ptr, size_t& len)
 {
-#define bytes_read ulen
-
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
   int try_noreserve = 1;
-  DWORD len = ulen;
 
 retry:
-  ulen = (size_t) -1;
-  BOOL res = ReadFile (get_handle (), ptr, len, (DWORD *) &ulen, NULL);
-  if (!res)
+  status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, ptr, len,
+		       NULL, NULL);
+  if (NT_SUCCESS (status))
+    len = io.Information;
+  else
     {
       /* Some errors are not really errors.  Detect such cases here.  */
-
-      DWORD  errcode = GetLastError ();
-      switch (errcode)
+      switch (status)
 	{
-	case ERROR_BROKEN_PIPE:
+	case STATUS_END_OF_FILE:
+	case STATUS_PIPE_BROKEN:
 	  /* This is really EOF.  */
-	  bytes_read = 0;
+	  len = 0;
 	  break;
-	case ERROR_MORE_DATA:
-	  /* `bytes_read' is supposedly valid.  */
+	case STATUS_MORE_ENTRIES:
+	case STATUS_BUFFER_OVERFLOW:
+	  /* `io.Information' is supposedly valid.  */
+	  len = io.Information;
 	  break;
-	case ERROR_NOACCESS:
+	case STATUS_ACCESS_VIOLATION:
 	  if (is_at_eof (get_handle ()))
 	    {
-	      bytes_read = 0;
+	      len = 0;
 	      break;
 	    }
 	  if (try_noreserve)
@@ -267,17 +269,15 @@ retry:
 	  if (pc.isdir ())
 	    {
 	      set_errno (EISDIR);
-	      bytes_read = (size_t) -1;
+	      len = (size_t) -1;
 	      break;
 	    }
 	default:
-	  syscall_printf ("ReadFile %s(%p) failed, %E", get_name (), get_handle ());
-	  __seterrno_from_win_error (errcode);
-	  bytes_read = (size_t) -1;
+	  __seterrno_from_nt_status (status);
+	  len = (size_t) -1;
 	  break;
 	}
     }
-#undef bytes_read
 }
 
 /* Cover function to WriteFile to provide Posix interface and semantics
@@ -729,26 +729,13 @@ fhandler_base::read (void *in_ptr, size_t& len)
   char *ptr = (char *) in_ptr;
   ssize_t copied_chars = get_readahead_into_buffer (ptr, len);
 
-  if (copied_chars)
+  if (copied_chars || !len)
     {
       len = (size_t) copied_chars;
       goto out;
     }
 
-  len -= copied_chars;
-  if (!len)
-    {
-      len = (size_t) copied_chars;
-      goto out;
-    }
-
-  raw_read (ptr + copied_chars, len);
-  if (!copied_chars)
-    /* nothing */;
-  else if ((ssize_t) len > 0)
-    len += copied_chars;
-  else
-    len = copied_chars;
+  raw_read (ptr, len);
 
   if (rbinary () || (ssize_t) len <= 0)
     goto out;
@@ -790,24 +777,6 @@ fhandler_base::read (void *in_ptr, size_t& len)
     }
 
   len = dst - (char *) ptr;
-
-#ifndef NOSTRACE
-  if (strace.active ())
-    {
-      char buf[16 * 6 + 1];
-      char *p = buf;
-
-      for (int i = 0; i < copied_chars && i < 16; ++i)
-	{
-	  unsigned char c = ((unsigned char *) ptr)[i];
-	  __small_sprintf (p, " %c", c);
-	  p += strlen (p);
-	}
-      *p = '\0';
-      debug_printf ("read %d bytes (%s%s)", copied_chars, buf,
-		    copied_chars > 16 ? " ..." : "");
-    }
-#endif
 
 out:
   debug_printf ("returning %d, %s mode", len, rbinary () ? "binary" : "text");
