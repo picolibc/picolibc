@@ -49,8 +49,11 @@
 #include <sys/asm.h>
 #endif
 
-#if (_MIPS_ISA == _MIPS_ISA_MIPS4) || (_MIPS_ISA == _MIPS_ISA_MIPS5) || \
-    (_MIPS_ISA == _MIPS_ISA_MIPS32) || (_MIPS_ISA == _MIPS_ISA_MIPS64)
+/* Check to see if the MIPS architecture we are compiling for supports
+ * prefetching.
+ */
+
+#if (__mips == 4) || (__mips == 5) || (__mips == 32) || (__mips == 64)
 #ifndef DISABLE_PREFETCH
 #define USE_PREFETCH
 #endif

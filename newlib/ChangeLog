@@ -1,3 +1,7 @@
+2013-02-19  Steve Ellcey  <sellcey@mips.com>
+
+	* libc/machine/mips/memcpy.S: Fix USE_PREFETCH check.
+
 2013-02-01  Nick Clifton  <nickc@redhat.com>
 
 	* libc/sys/sysnecv850/crt0.S: Add recognition of the e3v5
