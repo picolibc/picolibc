@@ -1,3 +1,9 @@
+2013-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dll_info): Handle x86_64 binaries.  Make sure to print
+	only architecture matching cygcheck build, otherwise suffer path
+	evaluation problems.
+
 2013-02-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	Fix 64-bit type problems in dumper.exe

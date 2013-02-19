@@ -598,6 +598,28 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
   int pe_header_offset = get_dword (fh, 0x3c);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
+  WORD arch = get_word (fh, pe_header_offset + 4);
+  if (GetLastError () != NO_ERROR)
+    display_error ("get_word");
+#ifdef __x86_64__
+  if (arch != IMAGE_FILE_MACHINE_AMD64)
+    {
+      fputc ('\n', stderr);
+      display_error ("Wrong architecture. Only x86_64 executables supported.",
+		     false, false);
+      return;
+    }
+  int base_off = 108;
+#else
+  if (arch != IMAGE_FILE_MACHINE_I386)
+    {
+      fputc ('\n', stderr);
+      display_error ("Wrong architecture. Only ix86 executables supported.",
+		     false, false);
+      return;
+    }
+  int base_off = 92;
+#endif
   int opthdr_ofs = pe_header_offset + 4 + 20;
   unsigned short v[6];
 
@@ -620,19 +642,19 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
   else
     printf ("\n");
 
-  int num_entries = get_dword (fh, opthdr_ofs + 92);
+  int num_entries = get_dword (fh, opthdr_ofs + base_off + 0);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
-  int export_rva = get_dword (fh, opthdr_ofs + 96);
+  int export_rva = get_dword (fh, opthdr_ofs + base_off + 4);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
-  int export_size = get_dword (fh, opthdr_ofs + 100);
+  int export_size = get_dword (fh, opthdr_ofs + base_off + 8);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
-  int import_rva = get_dword (fh, opthdr_ofs + 104);
+  int import_rva = get_dword (fh, opthdr_ofs + base_off + 12);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
-  int import_size = get_dword (fh, opthdr_ofs + 108);
+  int import_size = get_dword (fh, opthdr_ofs + base_off + 16);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
 
