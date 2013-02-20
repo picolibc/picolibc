@@ -559,7 +559,7 @@ err:
   ulen = (size_t) -1;
 }
 
-int __stdcall
+ssize_t __stdcall
 fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written = 0;

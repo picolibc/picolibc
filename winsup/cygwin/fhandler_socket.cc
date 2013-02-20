@@ -1488,7 +1488,7 @@ fhandler_socket::read (void *in_ptr, size_t& len)
   len = recv_internal (&wsamsg, false);
 }
 
-int
+ssize_t
 fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
 			ssize_t tot)
 {
@@ -1661,7 +1661,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
   return res;
 }
 
-int
+ssize_t
 fhandler_socket::write (const void *in_ptr, size_t len)
 {
   char *ptr = (char *) in_ptr;
@@ -1687,7 +1687,7 @@ fhandler_socket::write (const void *in_ptr, size_t len)
   return send_internal (&wsamsg, 0);
 }
 
-int
+ssize_t
 fhandler_socket::writev (const struct iovec *const iov, const int iovcnt,
 			 ssize_t tot)
 {
@@ -1740,7 +1740,7 @@ fhandler_socket::sendto (const void *in_ptr, size_t len, int flags,
   return send_internal (&wsamsg, flags);
 }
 
-int
+ssize_t
 fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
 {
   /* TODO: Descriptor passing on AF_LOCAL sockets. */

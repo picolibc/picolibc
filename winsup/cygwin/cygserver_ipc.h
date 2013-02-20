@@ -62,6 +62,7 @@ class ipc_retval {
 private:
   union {
     int i;
+    ssize_t ssz;
     size_t sz;
     vm_offset_t off;
     vm_object_t obj;
@@ -77,6 +78,10 @@ public:
   /* On x86_64: size_t == vm_offset_t == unsigned long */
   operator size_t () const { return sz; }
   size_t operator = (size_t nsz) { return sz = nsz; }
+#else
+  /* On i686: ssize_t == long == int */
+  operator ssize_t () const { return ssz; }
+  ssize_t operator = (ssize_t nssz) { return ssz = nssz; }
 #endif
 
   operator vm_offset_t () const { return off; }
