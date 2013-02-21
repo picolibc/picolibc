@@ -5,8 +5,8 @@ use File::Spec;
 use Getopt::Long;
 my $dir = tempdir(CLEANUP => 1);
 
-my ($target, $ar, $as, $nm, $objcopy, %replace);
-GetOptions('target=s'=>\$target, 'ar=s'=>\$ar, 'as=s'=>\$as,'nm=s'=>\$nm, 'objcopy=s'=>\$objcopy, 'replace=s'=>\%replace);
+my ($cpu, $ar, $as, $nm, $objcopy, %replace);
+GetOptions('cpu=s'=>\$cpu, 'ar=s'=>\$ar, 'as=s'=>\$as,'nm=s'=>\$nm, 'objcopy=s'=>\$objcopy, 'replace=s'=>\%replace);
 
 # Args::
 #   1) import lib to create
@@ -23,7 +23,7 @@ my %text = ();
 my %import = ();
 my %symfile = ();
 
-my $is64bit = ($target =~ /^x86_64\-/ ? 1 : 0);
+my $is64bit = ($cpu eq 'x86_64' ? 1 : 0);
 my $sym_prefix = ($is64bit ? '' : '_');
 
 while (<$nm_fd>) {

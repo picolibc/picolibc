@@ -11,15 +11,15 @@ my $static;
 my $inverse;
 my @exclude;
 
-my ($target, $ar, $as, $nm, $objcopy);
+my ($cpu, $ar, $as, $nm, $objcopy);
 GetOptions('exclude=s'=>\@exclude, 'static!'=>\$static, 'v!'=>\$inverse,
-	   'target=s'=>\$target, 'ar=s'=>\$ar, 'as=s'=>\$as,'nm=s'=>\$nm, 'objcopy=s'=>\$objcopy);
+	   'cpu=s'=>\$cpu, 'ar=s'=>\$ar, 'as=s'=>\$as,'nm=s'=>\$nm, 'objcopy=s'=>\$objcopy);
 
 $_ = File::Spec->rel2abs($_) for @ARGV;
 
 my $libdll = shift;
 my $lib =  pop;
-my $uscore = ($target =~ /^x86_64\-/ ? undef : '_');
+my $uscore = ($cpu eq 'x86_64' ? undef : '_');
 (my $iname = basename $lib) =~ s/\.a$//o;
 $iname = $uscore . $iname . '_dll_iname';
 

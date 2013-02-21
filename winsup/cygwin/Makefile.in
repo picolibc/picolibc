@@ -31,6 +31,7 @@ export CCWRAP_DIRAFTER_HEADERS:=@windows_headers@
 
 VPATH+=$(CONFIG_DIR) $(srcdir)/regex $(srcdir)/lib $(srcdir)/libc
 
+target_cpu:=@target_cpu@
 target_alias:=@target_alias@
 build_alias:=@build_alias@
 host_alias:=@host_alias@
@@ -123,7 +124,7 @@ LIBGMON_A:=libgmon.a
 CYGWIN_START:=crt0.o
 GMON_START:=gcrt0.o
 
-toolopts:=--target=${target_alias} --ar=${AR} --as=${AS} --nm=${NM} --objcopy=${OBJCOPY}
+toolopts:=--cpu=${target_cpu} --ar=${AR} --as=${AS} --nm=${NM} --objcopy=${OBJCOPY}
 speclib=\
     ${srcdir}/speclib ${toolopts} \
 	--exclude='cygwin' \
@@ -196,7 +197,7 @@ endif #PREPROCESS
 
 GMON_OFILES:=gmon.o mcount.o profil.o
 
-ifeq ($(target_alias),x86_64-pc-cygwin)
+ifeq ($(target_cpu),x86_64)
 NEW_FUNCTIONS:=
 else
 NEW_FUNCTIONS:=$(addprefix --replace=,\
@@ -514,7 +515,7 @@ Makefile: $(DIN_FILE) ${srcdir}/Makefile.in
 	/bin/sh ./config.status
 
 $(DEF_FILE): gendef $(DIN_FILE) $(srcdir)/$(TLSOFFSETS_H)
-	$^ $(target_alias) $@ sigfe.s
+	$^ $(target_cpu) $@ sigfe.s
 
 $(srcdir)/$(TLSOFFSETS_H): gentls_offsets cygtls.h
 	$^ $@ @CONFIG_DIR@ $(COMPILE.cc) -c

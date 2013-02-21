@@ -1,3 +1,15 @@
+2013-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (target_cpu): Define.  Check for target_cpu rather than
+	target_alias for conditional compilation issues.
+	(toolopts): Change --target into --cpu option and use $target_cpu as
+	argument.
+	($(DEF_FILE)): Call gendef with $(target_cpu) as argument, rather than
+	with $(target_alias).
+	* gendef: Accommodate change from --target to --cpu option.
+	* mkimport: Ditto.
+	* speclib: Ditto.
+
 2013-02-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygserver_ipc (class ipc_retval): Add ssize_t member to anonymous
