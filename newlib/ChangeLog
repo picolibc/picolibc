@@ -1,3 +1,9 @@
+2013-02-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+	    Joseph S. Myers <joseph@codesourcery.com>
+
+	* libc/include/sys/_types.h (_ssize_t): Define as signed equivalent of
+	size_t with GCC.
+
 2012-11-29  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/reent.h (__sFILE): Change type of _offset
