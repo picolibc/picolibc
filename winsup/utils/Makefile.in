@@ -49,7 +49,7 @@ EXEEXT_FOR_BUILD:=@EXEEXT_FOR_BUILD@
 .PHONY: all install clean realclean warn_dumper warn_cygcheck_zlib
 
 LDLIBS := -lnetapi32 -ladvapi32 -lkernel32 -luser32
-CYGWIN_LDFLAGS := -static-libgcc -static-libstdc++ -Wl,--enable-auto-import -L${WINDOWS_LIBDIR} $(LDLIBS)
+CYGWIN_LDFLAGS := -static -Wl,--enable-auto-import -L${WINDOWS_LIBDIR} $(LDLIBS)
 DEP_LDLIBS := $(cygwin_build)/libcygwin.a
 
 MINGW_CXX      := @MINGW_CXX@
@@ -67,10 +67,10 @@ MINGW_BINS := ${addsuffix .exe,cygcheck cygwin-console-helper ldh strace}
 # list will will be compiled in Cygwin mode implicitly, so there is no
 # need for a CYGWIN_OBJS.
 MINGW_OBJS := bloda.o cygcheck.o dump_setup.o ldh.o path.o strace.o
-MINGW_LDFLAGS:=-L${WINDOWS_LIBDIR} -static-libgcc -static-libstdc++
+MINGW_LDFLAGS:=-L${WINDOWS_LIBDIR} -static
 
 CYGCHECK_OBJS:=cygcheck.o bloda.o path.o dump_setup.o
-ZLIB:=-Wl,-dn,-lz,-dy
+ZLIB:=-lz
 
 .PHONY: all
 all:

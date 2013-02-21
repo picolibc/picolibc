@@ -19,9 +19,15 @@ extern "C"
 void error (int, int, const char *, ...);
 void error_at_line (int, int, const char *, unsigned int, const char *, ...);
 
+#ifdef  __INSIDE_CYGWIN__
 extern unsigned int error_message_count;
 extern int error_one_per_line;
 extern void (*error_print_progname) (void);
+#else
+extern __declspec(dllimport) unsigned int error_message_count;
+extern __declspec(dllimport) int error_one_per_line;
+extern __declspec(dllimport) void (*error_print_progname) (void);
+#endif
 
 #ifdef __cplusplus
 }
