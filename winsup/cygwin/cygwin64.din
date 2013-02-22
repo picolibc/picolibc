@@ -437,7 +437,7 @@ get_avphys_pages SIGFE
 get_current_dir_name SIGFE
 get_nprocs SIGFE
 get_nprocs_conf SIGFE
-get_osfhandle SIGFE
+_get_osfhandle SIGFE
 get_phys_pages SIGFE
 getaddrinfo = cygwin_getaddrinfo SIGFE
 getc SIGFE
@@ -1014,7 +1014,7 @@ setlinebuf SIGFE
 setlocale NOSIGFE
 setlogmask NOSIGFE
 setmntent SIGFE
-setmode = cygwin_setmode SIGFE
+_setmode = cygwin_setmode SIGFE
 setpassent NOSIGFE
 setpgid SIGFE
 setpgrp SIGFE

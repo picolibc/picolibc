@@ -2754,7 +2754,7 @@ getmode (int fd)
    previous mode.  */
 
 extern "C" int
-setmode (int fd, int mode)
+_setmode (int fd, int mode)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0)
@@ -2792,7 +2792,7 @@ setmode (int fd, int mode)
 extern "C" int
 cygwin_setmode (int fd, int mode)
 {
-  int res = setmode (fd, mode);
+  int res = _setmode (fd, mode);
   if (res != -1)
     {
       _my_tls.locals.setmode_file = fd;
@@ -2892,7 +2892,7 @@ truncate (const char *pathname, _off_t length)
 #endif
 
 extern "C" long
-get_osfhandle (int fd)
+_get_osfhandle (int fd)
 {
   long res;
 

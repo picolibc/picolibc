@@ -1,3 +1,17 @@
+2013-02-22  Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+	    Corinna Vinschen <corinna@vinschen.de>
+
+	* cygwin.din (_get_osfhandle): Make main export.  Define get_osfhandle
+	from here.
+	* cygwin64.din (_get_osfhandle): Rename from get_osfhandle.
+	(_setmode): Rename from setmode.
+	* include/io.h: Ditto. Define unprefixed names with preprocessor
+	macros for backwards source compatibility.
+	(access): Remove.
+	* syscalls.cc (_setmode): Rename from setmode.
+	(cygwin_setmode): Call _setmode.
+	(_get_osfhandle): Rename from get_osfhandle.
+
 2013-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (target_cpu): Define.  Check for target_cpu rather than
