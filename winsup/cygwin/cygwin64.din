@@ -190,41 +190,19 @@ ctime SIGFE
 ctime_r SIGFE
 cuserid NOSIGFE
 cwait SIGFE
-cygwin32_attach_handle_to_fd = cygwin_attach_handle_to_fd SIGFE
-cygwin32_conv_to_full_posix_path = cygwin_conv_to_full_posix_path SIGFE
-cygwin32_conv_to_full_win32_path = cygwin_conv_to_full_win32_path SIGFE
-cygwin32_conv_to_posix_path = cygwin_conv_to_posix_path SIGFE
-cygwin32_conv_to_win32_path = cygwin_conv_to_win32_path SIGFE
-cygwin32_detach_dll = cygwin_detach_dll SIGFE_MAYBE
-cygwin32_internal = cygwin_internal SIGFE
-cygwin32_posix_path_list_p = cygwin_posix_path_list_p NOSIGFE
-cygwin32_posix_to_win32_path_list = cygwin_posix_to_win32_path_list SIGFE
-cygwin32_posix_to_win32_path_list_buf_size = cygwin_posix_to_win32_path_list_buf_size SIGFE
-cygwin32_split_path = cygwin_split_path NOSIGFE
-cygwin32_win32_to_posix_path_list = cygwin_win32_to_posix_path_list SIGFE
-cygwin32_win32_to_posix_path_list_buf_size = cygwin_win32_to_posix_path_list_buf_size SIGFE
-cygwin32_winpid_to_pid = cygwin_winpid_to_pid SIGFE
 cygwin_attach_handle_to_fd SIGFE
 cygwin_conv_path SIGFE
 cygwin_conv_path_list SIGFE
-cygwin_conv_to_full_posix_path SIGFE
-cygwin_conv_to_full_win32_path SIGFE
-cygwin_conv_to_posix_path SIGFE
-cygwin_conv_to_win32_path SIGFE
 cygwin_create_path SIGFE
 cygwin_detach_dll SIGFE_MAYBE
 cygwin_dll_init NOSIGFE
 cygwin_internal NOSIGFE
 cygwin_logon_user SIGFE
 cygwin_posix_path_list_p NOSIGFE
-cygwin_posix_to_win32_path_list SIGFE
-cygwin_posix_to_win32_path_list_buf_size SIGFE
 cygwin_set_impersonation_token SIGFE
 cygwin_split_path NOSIGFE
 cygwin_stackdump SIGFE
 cygwin_umount SIGFE
-cygwin_win32_to_posix_path_list SIGFE
-cygwin_win32_to_posix_path_list_buf_size SIGFE
 cygwin_winpid_to_pid SIGFE
 daemon SIGFE
 difftime NOSIGFE

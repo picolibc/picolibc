@@ -3153,6 +3153,7 @@ cygwin_create_path (cygwin_conv_path_t what, const void *from)
   return to;
 }
 
+#ifndef __x86_64__	/* Disable deprecated functions on x86_64. */
 
 extern "C" int
 cygwin_conv_to_win32_path (const char *path, char *win32_path)
@@ -3183,6 +3184,8 @@ cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
   return cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_ABSOLUTE, path, posix_path,
 			   MAX_PATH);
 }
+
+#endif /* !__x86_64__ */
 
 /* The realpath function is required by POSIX:2008.  */
 
@@ -3320,6 +3323,14 @@ conv_path_list_buf_size (const char *path_list, bool to_posix)
   return size;
 }
 
+extern "C" ssize_t
+env_PATH_to_posix (const void *win32, void *posix, size_t size)
+{
+  return_with_errno (conv_path_list ((const char *) win32, (char *) posix,
+				     size, ENV_CVT));
+}
+
+#ifndef __x86_64__	/* Disable deprecated functions on x86_64. */
 
 extern "C" int
 cygwin_win32_to_posix_path_list_buf_size (const char *path_list)
@@ -3331,13 +3342,6 @@ extern "C" int
 cygwin_posix_to_win32_path_list_buf_size (const char *path_list)
 {
   return conv_path_list_buf_size (path_list, false);
-}
-
-extern "C" ssize_t
-env_PATH_to_posix (const void *win32, void *posix, size_t size)
-{
-  return_with_errno (conv_path_list ((const char *) win32, (char *) posix,
-				     size, ENV_CVT));
 }
 
 extern "C" int
@@ -3353,6 +3357,8 @@ cygwin_posix_to_win32_path_list (const char *posix, char *win32)
   return_with_errno (conv_path_list (posix, win32, MAX_PATH,
 		     CCP_POSIX_TO_WIN_A | CCP_RELATIVE));
 }
+
+#endif /* !__x86_64__ */
 
 extern "C" ssize_t
 cygwin_conv_path_list (cygwin_conv_path_t what, const void *from, void *to,

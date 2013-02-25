@@ -1,5 +1,13 @@
 2013-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin64.din: Remove all deprecated cygwin32_foo and cygwin_foo
+	path conversion functions.
+	* path.cc: Disable aforementioned functions on x86_64.
+	* include/sys/cygwin.h: Don't declare aforementioned functions on
+	x86_64.
+
+2013-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exception.h (class exception): Add handler_installed member.
 	Change parameters to handle method to match high-level exception
 	handler calls.
