@@ -1,3 +1,35 @@
+2013-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (class exception): Add handler_installed member.
+	Change parameters to handle method to match high-level exception
+	handler calls.
+	(exception::exception): On x86_64, install exception handler only
+	once.  Explain what we do.
+	* exceptions.cc (_AFMT): Change to only 11 digits on x86_64.
+	(cygwin_exception::dump_exception): Print Rip with only 11 digits.
+	Print 64 bit registers with 0-padding.
+	(class stack_info): Add members c and hist on x86_64.
+	(stack_info::init): Take PCONTEXT rather than bool as third parameter.
+	Tweak code accordingly.  Initialize c and hist on x86_64.
+	(stack_info::walk): Add implementation for x86_64.  Drop unneeded
+	#ifndef in 32 bit code.
+	(cygwin_exception::dumpstack): Call thestack.init with context as
+	parameter.  Change header output for x86_64.
+	(cygwin_stackdump): Prefer RtlCaptureContext over GetThreadContext.
+	(CYG_EXC_CONTINUE_EXECUTION): Define generic definition matching all
+	platforms.
+	(CYG_EXC_CONTINUE_SEARCH): Ditto.
+	(exception::handler_installed): Define here.
+	(exception::handle): Define according to declaration in exception.h.
+	Create 32 bit parameters as local variable on 64 bit.  Change all
+	return statements to use generic definitions.  Simplify setting framep
+	on x86_64.  Disable setting frame-based exception handler on x86_64.
+	Fix formatting of klog output for x86_64.
+	(signal_exit): Create context for cygwin_exception creation.
+	(sigpacket::process): Prefer RtlCaptureContext over GetThreadContext.
+	* wincap.h (wincaps::has_rtl_capture_context): New element.
+	* wincap.cc: Implement above element throughout.
+
 2013-02-22  Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 	    Corinna Vinschen <corinna@vinschen.de>
 
@@ -125,7 +157,7 @@
 	* fhandler_raw.cc (fhandler_dev_raw::dup): Ditto.
 	* hookapi.cc (find_first_notloaded_dll): Add cast.
 	* spawn.cc (av::fixup): Ditto.
-	* wincap.h: Add comment to explain the folowing change.
+	* wincap.h: Add comment to explain the following change.
 	(wincapc::page_size): Return size_t.
 	(wincapc::allocation_granularity): Ditto.
 

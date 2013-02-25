@@ -35,7 +35,7 @@ details. */
 /* Definitions for code simplification */
 #ifdef __x86_64__
 # define _GR(reg)	R ## reg
-# define _AFMT		"%016X"
+# define _AFMT		"%011X"
 # define _ADDR		DWORD64
 #else
 # define _GR(reg)	E ## reg
@@ -191,17 +191,17 @@ cygwin_exception::dump_exception ()
 
 #ifdef __x86_64__
   if (exception_name)
-    small_printf ("Exception: %s at rip=%016X\r\n", exception_name, ctx->Rip);
+    small_printf ("Exception: %s at rip=%011X\r\n", exception_name, ctx->Rip);
   else
-    small_printf ("Signal %d at rip=%016X\r\n", e->ExceptionCode, ctx->Rip);
-  small_printf ("rax=%16X rbx=%16X rcx=%16X\r\n", ctx->Rax, ctx->Rbx, ctx->Rcx);
-  small_printf ("rdx=%16X rsi=%16X rdi=%16X\r\n", ctx->Rdx, ctx->Rsi, ctx->Rdi);
-  small_printf ("r8 =%16X r9 =%16X r10=%16X\r\n", ctx->R8, ctx->R9, ctx->R10);
-  small_printf ("r11=%16X r12=%16X r13=%16X\r\n", ctx->R11, ctx->R12, ctx->R13);
-  small_printf ("r14=%16X r15=%16X\r\n", ctx->R14, ctx->R15);
-  small_printf ("rbp=%16X rsp=%16X program=%W, pid %u, thread %s\r\n",
-		ctx->Rbp, ctx->Rsp, myself->progname, myself->pid,
-		cygthread::name ());
+    small_printf ("Signal %d at rip=%011X\r\n", e->ExceptionCode, ctx->Rip);
+  small_printf ("rax=%016X rbx=%016X rcx=%016X\r\n", ctx->Rax, ctx->Rbx, ctx->Rcx);
+  small_printf ("rdx=%016X rsi=%016X rdi=%016X\r\n", ctx->Rdx, ctx->Rsi, ctx->Rdi);
+  small_printf ("r8 =%016X r9 =%016X r10=%016X\r\n", ctx->R8, ctx->R9, ctx->R10);
+  small_printf ("r11=%016X r12=%016X r13=%016X\r\n", ctx->R11, ctx->R12, ctx->R13);
+  small_printf ("r14=%016X r15=%016X\r\n", ctx->R14, ctx->R15);
+  small_printf ("rbp=%016X rsp=%016X\r\n", ctx->Rbp, ctx->Rsp);
+  small_printf ("program=%W, pid %u, thread %s\r\n",
+		myself->progname, myself->pid, cygthread::name ());
 #else
   if (exception_name)
     small_printf ("Exception: %s at eip=%08x\r\n", exception_name, ctx->Eip);
@@ -224,9 +224,13 @@ class stack_info
   char *next_offset () {return *((char **) sf.AddrFrame.Offset);}
   bool needargs;
   PUINT_PTR dummy_frame;
+#ifdef __x86_64__
+  CONTEXT c;
+  UNWIND_HISTORY_TABLE hist;
+#endif
 public:
   STACKFRAME sf;		 /* For storing the stack information */
-  void init (PUINT_PTR, bool, bool); /* Called the first time that stack info is needed */
+  void init (PUINT_PTR, bool, PCONTEXT); /* Called the first time that stack info is needed */
 
   /* Postfix ++ iterates over the stack, returning zero when nothing is left. */
   int operator ++(int) { return walk (); }
@@ -240,10 +244,20 @@ static NO_COPY stack_info thestack;
 
 /* Initialize everything needed to start iterating. */
 void
-stack_info::init (PUINT_PTR framep, bool wantargs, bool goodframe)
+stack_info::init (PUINT_PTR framep, bool wantargs, PCONTEXT ctx)
 {
+#ifdef __x86_64__
+  memset (&hist, 0, sizeof hist);
+  if (ctx)
+    memcpy (&c, ctx, sizeof c);
+  else
+    {
+      memset (&c, 0, sizeof c);
+      c.ContextFlags = CONTEXT_ALL;
+    }
+#endif
   memset (&sf, 0, sizeof (sf));
-  if (!goodframe)
+  if (ctx)
     sf.AddrFrame.Offset = (UINT_PTR) framep;
   else
     {
@@ -262,6 +276,35 @@ extern "C" void _cygwin_exit_return ();
 int
 stack_info::walk ()
 {
+#ifdef __x86_64__
+  PRUNTIME_FUNCTION f;
+  ULONG64 imagebase;
+  DWORD64 establisher;
+  PVOID hdl;
+
+  if (!c.Rip)
+    return 0;
+
+  sf.AddrPC.Offset = c.Rip;
+  sf.AddrStack.Offset = c.Rsp;
+  sf.AddrFrame.Offset = c.Rbp;
+
+  f = RtlLookupFunctionEntry (c.Rip, &imagebase, &hist);
+  if (f)
+    RtlVirtualUnwind (0, imagebase, c.Rip, f, &c, &hdl, &establisher, NULL);
+  else
+    {
+      c.Rip = *(ULONG_PTR *) c.Rsp;
+      c.Rsp += 8;
+    }
+  if (needargs && c.Rip)
+    {
+      PULONG_PTR p = (PULONG_PTR) c.Rsp;
+      for (unsigned i = 0; i < NPARAMS; ++i)
+	sf.Params[i] = p[i + 1];
+    }
+  return 1;
+#else
   char **framep;
 
   if ((void (*) ()) sf.AddrPC.Offset == _cygwin_exit_return)
@@ -283,18 +326,17 @@ stack_info::walk ()
 
       /* The arguments follow the return address */
       sf.Params[0] = (_ADDR) *++framep;
-#ifndef __x86_64__
       /* Hack for XP/2K3 WOW64.  If the first stack param points to the
 	 application entry point, we can only fetch one additional
 	 parameter.  Accessing anything beyond this address results in
 	 a SEGV.  This is fixed in Vista/2K8 WOW64. */
       if (wincap.has_restricted_stack_args () && sf.Params[0] == 0x401000)
 	nparams = 2;
-#endif
       for (unsigned i = 1; i < nparams; i++)
 	sf.Params[i] = (_ADDR) *++framep;
     }
   return 1;
+#endif
 }
 
 void
@@ -312,8 +354,12 @@ cygwin_exception::dumpstack ()
 
   int i;
 
-  thestack.init (framep, 1, !ctx);	/* Initialize from the input CONTEXT */
+  thestack.init (framep, 1, ctx);	/* Initialize from the input CONTEXT */
+#ifdef __x86_64__
+  small_printf ("Stack trace:\r\nFrame        Function    Args\r\n");
+#else
   small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
+#endif
   for (i = 0; i < 16 && thestack++; i++)
     {
       small_printf (_AFMT "  " _AFMT, thestack.sf.AddrFrame.Offset,
@@ -375,8 +421,11 @@ cygwin_stackdump ()
 {
   CONTEXT c;
   c.ContextFlags = CONTEXT_FULL;
-  GetThreadContext (GetCurrentThread (), &c);
-  cygwin_exception exc ((PUINT_PTR) c._GR(bp));
+  if (wincap.has_rtl_capture_context ())
+    RtlCaptureContext (&c);
+  else
+    GetThreadContext (GetCurrentThread (), &c);
+  cygwin_exception exc ((PUINT_PTR) c._GR(bp), &c);
   exc.dumpstack ();
 }
 
@@ -500,23 +549,42 @@ rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 
 /* Main exception handler. */
 
+#ifdef __x86_64__
+#define CYG_EXC_CONTINUE_EXECUTION	EXCEPTION_CONTINUE_EXECUTION
+#define CYG_EXC_CONTINUE_SEARCH		EXCEPTION_CONTINUE_SEARCH
+
+bool exception::handler_installed NO_COPY; 
+
+int
+exception::handle (LPEXCEPTION_POINTERS ep)
+#else
+#define CYG_EXC_CONTINUE_EXECUTION	0
+#define CYG_EXC_CONTINUE_SEARCH		1
+
 int
 exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
+#endif
 {
   static bool NO_COPY debugging;
   static int NO_COPY recursed;
   _cygtls& me = _my_tls;
 
+#ifdef __x86_64__
+  EXCEPTION_RECORD *e = ep->ExceptionRecord;
+  CONTEXT *in = ep->ContextRecord;
+  exception_list *frame = (exception_list *) __builtin_frame_address (0);
+#endif
+
   if (debugging && ++debugging < 500000)
     {
       SetThreadPriority (hMainThread, THREAD_PRIORITY_NORMAL);
-      return 0;
+      return CYG_EXC_CONTINUE_EXECUTION;
     }
 
   /* If we're exiting, don't do anything here.  Returning 1
      tells Windows to keep looking for an exception handler.  */
   if (exit_state || e->ExceptionFlags)
-    return 1;
+    return CYG_EXC_CONTINUE_SEARCH;
 
   siginfo_t si = {};
   si.si_code = SI_KERNEL;
@@ -585,7 +653,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 					     1))
 	{
 	case MMAP_NORESERVE_COMMITED:
-	  return 0;
+	  return CYG_EXC_CONTINUE_EXECUTION;
 	case MMAP_RAISE_SIGBUS:	/* MAP_NORESERVE page, commit failed, or
 				   access to mmap page beyond EOF. */
 	  si.si_signo = SIGBUS;
@@ -619,13 +687,13 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	 want CloseHandle to return an error.  This can be revisited
 	 if gcc ever supports Windows style structured exception
 	 handling.  */
-      return 0;
+      return CYG_EXC_CONTINUE_EXECUTION;
 
     default:
       /* If we don't recognize the exception, we have to assume that
 	 we are doing structured exception handling, and we let
 	 something else handle it.  */
-      return 1;
+      return CYG_EXC_CONTINUE_SEARCH;
     }
 
   if (me.andreas)
@@ -634,6 +702,9 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
   debug_printf ("In cygwin_except_handler exception %y at %p sp %p", e->ExceptionCode, in->_GR(ip), in->_GR(sp));
   debug_printf ("In cygwin_except_handler signal %d at %p", si.si_signo, in->_GR(ip));
 
+#ifdef __x86_64__
+  PUINT_PTR framep = (PUINT_PTR) in->Rbp;
+#else
   PUINT_PTR framep = (PUINT_PTR) in->_GR(sp);
   for (PUINT_PTR bpend = (PUINT_PTR) __builtin_frame_address (0); framep > bpend; framep--)
     if (*framep == in->SegCs && framep[-1] == in->_GR(ip))
@@ -641,13 +712,16 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	framep -= 2;
 	break;
       }
+#endif
 
   me.copy_context (in);
 
+#ifndef __x86_64__
   /* Temporarily replace windows top level SEH with our own handler.
      We don't want any Windows magic kicking in.  This top level frame
      will be removed automatically after our exception handler returns. */
   _except_list->handler = handle;
+#endif
 
   /* Another exception could happen while tracing or while exiting.
      Only do this once.  */
@@ -658,7 +732,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
   else
     {
       debugging = true;
-      return 0;
+      return CYG_EXC_CONTINUE_EXECUTION;
     }
 
   /* FIXME: Probably should be handled in sigpacket::process */
@@ -671,7 +745,12 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	error_code |= 2;
       if (!me.inside_kernel (in))	/* User space */
 	error_code |= 4;
-      klog (LOG_INFO, "%s[%d]: segfault at " _AFMT " rip " _AFMT " rsp " _AFMT " error %d",
+      klog (LOG_INFO,
+#ifdef __x86_64__
+	    "%s[%d]: segfault at %011X rip %011X rsp %011X error %d",
+#else
+	    "%s[%d]: segfault at %08x rip %08x rsp %08x error %d",
+#endif
 		      __progname, myself->pid,
 		      e->ExceptionInformation[1], in->_GR(ip), in->_GR(sp),
 		      error_code);
@@ -684,7 +763,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
   sig_send (NULL, si, &me);	/* Signal myself */
   me.incyg--;
   e->ExceptionFlags = 0;
-  return 0;
+  return CYG_EXC_CONTINUE_EXECUTION;
 }
 
 /* Utilities to call a user supplied exception handler.  */
@@ -1142,10 +1221,16 @@ signal_exit (int sig, siginfo_t *si)
 	 ((cygwin_exception *) si->si_cyg)->dumpstack ();
        else
 	 {
+	   CONTEXT c;
+	   c.ContextFlags = CONTEXT_FULL;
+	   if (wincap.has_rtl_capture_context ())
+	     RtlCaptureContext (&c);
+	   else
+	     GetThreadContext (GetCurrentThread (), &c);
 #ifdef __x86_64__
-	   cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.rbp);
+	   cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.rbp, &c);
 #else
-	   cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.ebp);
+	   cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.ebp, &c);
 #endif
 	   exc.dumpstack ();
 	 }
@@ -1281,7 +1366,10 @@ dispatch_sig:
     {
       CONTEXT c;
       c.ContextFlags = CONTEXT_FULL;
-      GetThreadContext (hMainThread, &c);
+      if (_my_tls == _main_tls && wincap.has_rtl_capture_context ())
+	RtlCaptureContext (&c);
+      else
+	GetThreadContext (hMainThread, &c);
       _my_tls.copy_context (&c);
 
       /* Tell gdb that we got a signal. Presumably, gdb already noticed this

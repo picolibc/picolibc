@@ -56,6 +56,7 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:true,
+  has_rtl_capture_context:false,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -91,6 +92,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:true,
+  has_rtl_capture_context:true,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -126,6 +128,7 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:false,
+  has_rtl_capture_context:true,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -161,6 +164,7 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:false,
+  has_rtl_capture_context:true,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -196,6 +200,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:false,
+  has_rtl_capture_context:true,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -231,6 +236,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:true,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:false,
+  has_rtl_capture_context:true,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -266,6 +272,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:true,
   kernel_is_always_casesensitive:false,
+  has_rtl_capture_context:true,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -301,6 +308,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:true,
   kernel_is_always_casesensitive:false,
+  has_rtl_capture_context:true,
 };
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -336,6 +344,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:true,
   kernel_is_always_casesensitive:false,
+  has_rtl_capture_context:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));

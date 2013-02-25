@@ -46,6 +46,7 @@ struct wincaps
   unsigned wow64_has_secondary_stack			: 1;
   unsigned has_program_compatibility_assistant		: 1;
   unsigned kernel_is_always_casesensitive		: 1;
+  unsigned has_rtl_capture_context			: 1;
 };
 
 class wincapc
@@ -103,6 +104,7 @@ public:
   bool	IMPLEMENT (wow64_has_secondary_stack)
   bool	IMPLEMENT (has_program_compatibility_assistant)
   bool	IMPLEMENT (kernel_is_always_casesensitive)
+  bool	IMPLEMENT (has_rtl_capture_context)
 
 #undef IMPLEMENT
 };
