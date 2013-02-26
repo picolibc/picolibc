@@ -63,6 +63,8 @@ extern "C"
 #define PTHREAD_SCOPE_PROCESS 0
 #define PTHREAD_SCOPE_SYSTEM 1
 
+/* Register Fork Handlers */
+int pthread_atfork (void (*)(void), void (*)(void), void (*)(void));
 
 /* Attributes */
 int pthread_attr_destroy (pthread_attr_t *);
