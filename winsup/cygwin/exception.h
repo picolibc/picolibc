@@ -14,20 +14,18 @@ details. */
 
 #include <exceptions.h>
 
-#ifdef __x86_64__
-#define _except_list (NtCurrentTeb ()->Tib.ExceptionList)
-#else
+#ifndef __x86_64__
 extern exception_list *_except_list asm ("%fs:0");
 #endif
 
 class exception
 {
-  exception_list el;
-  exception_list *save;
 #ifdef __x86_64__
   static bool handler_installed; 
   static int handle (LPEXCEPTION_POINTERS);
 #else
+  exception_list el;
+  exception_list *save;
   static int handle (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void *);
 #endif
 public:
@@ -51,7 +49,9 @@ public:
     _except_list = &el;
 #endif
   };
+#ifndef __x86_64__
   ~exception () __attribute__ ((always_inline)) { _except_list = save; }
+#endif
 };
 
 class cygwin_exception

@@ -1366,7 +1366,7 @@ dispatch_sig:
     {
       CONTEXT c;
       c.ContextFlags = CONTEXT_FULL;
-      if (_my_tls == _main_tls && wincap.has_rtl_capture_context ())
+      if (&_my_tls == _main_tls && wincap.has_rtl_capture_context ())
 	RtlCaptureContext (&c);
       else
 	GetThreadContext (hMainThread, &c);

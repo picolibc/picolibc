@@ -1,3 +1,10 @@
+2013-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (_except_list): Don't define on x86_64.
+	(class exception): Don't define members el and save on x86_64.
+	(exception::~exception): Don't define on x86_64.
+	* exceptions.cc (signal_exit): Fix typo in condition.
+
 2013-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin64.din: Remove all deprecated cygwin32_foo and cygwin_foo
