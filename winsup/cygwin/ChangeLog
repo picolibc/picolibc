@@ -1,3 +1,7 @@
+2013-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/pthread.h (pthread_atfork): Add missing declaration.
+
 2013-02-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* include/error.h (error_message_count): Declare as dllimport.
