@@ -1,3 +1,8 @@
+2013-02-26  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/malloc.h (struct mallinfo): Convert type of all members
+	to size_t to match all targets.
+
 2013-02-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 	    Joseph S. Myers <joseph@codesourcery.com>
 
