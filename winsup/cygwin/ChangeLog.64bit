@@ -1,3 +1,8 @@
+2013-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/signal.h (struct ucontext): Add missing fields from
+	Windows CONTEXT definition.  Define oldmask as 64 bit type.
+
 -- post-ptmalloc3 tag
 
 2013-02-27  Corinna Vinschen  <corinna@vinschen.de>

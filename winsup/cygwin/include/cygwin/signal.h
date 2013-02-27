@@ -86,8 +86,14 @@ struct ucontext
   __uint64_t r15;
   __uint64_t rip;
   struct _fpstate fpregs;
+  __uint64_t vcx;
+  __uint64_t dbc;
+  __uint64_t btr;
+  __uint64_t bfr;
+  __uint64_t etr;
+  __uint64_t efr;
   __uint8_t _internal;
-  __uint32_t oldmask;
+  __uint64_t oldmask;
 };
 
 #else /* !x86_64 */
