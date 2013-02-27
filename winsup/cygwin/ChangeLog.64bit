@@ -1,3 +1,31 @@
+-- post-ptmalloc3 tag
+
+2013-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.ac (MALLOC_OFILES): Add ptmalloc3.o.
+	* configure: Regenerate.
+	* cygmalloc.h: Declare pt* functions rather than dl* functions.
+	(mmap64): Declare.
+	(mmap): Define as mmap64.
+	(__malloc_lock): Drop macro.
+	(__malloc_unlock): Ditto.
+	(MSPACES): Define.
+	(ONLY_MSPACES): Define.
+	* debug.h: Include malloc.h rather than otherwise unused dlmalloc.h.
+	* fork.cc (frok::parent): Drop malloc locking since that's performed
+	by malloc_atfork now.
+	* heap.cc (heap_init): Accommodate the fact that there's a chance
+	that no heap space has been allocated at fork time.
+	* malloc-private.h: New file from ptmalloc3, having malloc-machine.h
+	and malloc-2.8.3.h folded in.
+	* malloc.cc: Replaced by new file from ptmalloc3.
+	* malloc_wrapper.cc: Throughout, remove malloc locks and call pt*
+	functions rather than dl* functions.
+	* pinfo.cc (winpids::set): Drop malloc locking.
+	* ptmalloc3.cc: New file from ptmalloc3.
+
+-- pre-ptmalloc3 tag
+
 2013-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exception.h (_except_list): Don't define on x86_64.

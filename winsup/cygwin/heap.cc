@@ -188,6 +188,12 @@ heap_init ()
       /* total size commited in parent */
       SIZE_T allocsize = (char *) cygheap->user_heap.top -
 			 (char *) cygheap->user_heap.base;
+      /* With ptmalloc3 there's a good chance that there has been no memory
+	 allocated on the heap.  If we don't check that, reserve_size will
+	 be 0 and from there, the below loop will end up overallocating due
+	 to integer overflow. */
+      if (!allocsize)
+	allocsize = chunk;
 
       /* Loop until we've managed to reserve an adequate amount of memory. */
       char *p;
