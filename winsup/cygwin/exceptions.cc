@@ -1453,7 +1453,11 @@ _cygtls::signal_debugger (int sig)
 {
   if (isinitialized () && being_debugged ())
     {
+#ifdef __x86_64__
+      char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffffffffffff")];
+#else
       char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffff")];
+#endif
       __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %y %p", sig, thread_id, &thread_context);
       OutputDebugString (sigmsg);
     }
