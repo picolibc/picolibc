@@ -1,5 +1,11 @@
 2013-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pseudo-reloc.cc (do_pseudo_reloc): Add test to check for invalid 32
+	bit relocation in 64 bit code.  Only test when building without
+	optimization.
+
+2013-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (_cygtls::signal_debugger): Raise size of sigmsg buffer
 	on x86_64.
 	* tlsoffsets64.h: Regenerate.

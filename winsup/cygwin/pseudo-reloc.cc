@@ -344,6 +344,12 @@ do_pseudo_reloc (void * start, void * end, void * base)
 	  __write_memory ((void *) reloc_target, &reldata, 2);
 	  break;
 	case 32:
+#if defined (__CYGWIN__) && defined (__x86_64__) && !defined (__OPTIMIZE__)
+	  if (reldata > (ptrdiff_t) __INT32_MAX__
+	      || reldata < -((ptrdiff_t) __INT32_MAX__) - 1)
+	    __report_error ("Invalid relocation.  Offset %p at address %p "
+			    "doesn't fit into 32 bits", reldata, reloc_target);
+#endif
 	  __write_memory ((void *) reloc_target, &reldata, 4);
 	  break;
 #if defined (__x86_64__) || defined (_WIN64)
