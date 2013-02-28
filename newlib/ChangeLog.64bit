@@ -1,5 +1,10 @@
 2013-01-29  Corinna Vinschen  <vinschen@redhat.com>
 
+	* libc/include/machine/setjmp.h: Revert definition of _JBTYPE and _JBLEN
+	for 64 bit Cygwin to use long as base type.  Drop unneeded comment.
+
+2013-01-29  Corinna Vinschen  <vinschen@redhat.com>
+
 	* libc/include/machine/setjmp.h: Fix definition of _JBTYPE and _JBLEN
 	for 64 bit Cygwin to enforce 16 byte alignment.  Change comment to
 	explain.

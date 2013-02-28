@@ -1,3 +1,8 @@
+2013-02-28  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/machine/setjmp.h (sigjmp_buf): Fix definition of
+	sigjmp_buf size if _JBTYPE is defined.
+
 2013-02-26  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/malloc.h (struct mallinfo): Convert type of all members

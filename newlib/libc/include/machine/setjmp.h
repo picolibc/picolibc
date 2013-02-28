@@ -80,10 +80,8 @@ _BEGIN_STD_C
 
 #ifdef __x86_64__
 # ifdef __CYGWIN__
-#  define _JBTYPE __int128
-#  define _JBLEN  16	/* This matches the size of the native Windows setjmp
-			   buf.  We have to enforce 16 byte alignment, because
-			   the buffer contains FP registers. */
+#  define _JBTYPE long
+#  define _JBLEN  32
 # else
 #  define _JBTYPE long long
 #  define _JBLEN  8
@@ -312,7 +310,8 @@ extern "C" {
 
 /* POSIX sigsetjmp/siglongjmp macros */
 #ifdef _JBTYPE
-typedef _JBTYPE sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (_JBTYPE))];
+typedef _JBTYPE sigjmp_buf[_JBLEN+1+((sizeof (_JBTYPE) + sizeof (sigset_t) - 1)
+				     /sizeof (_JBTYPE))];
 #else
 typedef int sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (int))];
 #endif
