@@ -305,7 +305,8 @@ extern "C" {
 
 /* POSIX sigsetjmp/siglongjmp macros */
 #ifdef _JBTYPE
-typedef _JBTYPE sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (_JBTYPE))];
+typedef _JBTYPE sigjmp_buf[_JBLEN+1+((sizeof (_JBTYPE) + sizeof (sigset_t) - 1)
+				     /sizeof (_JBTYPE))];
 #else
 typedef int sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (int))];
 #endif
