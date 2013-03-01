@@ -1,3 +1,8 @@
+2013-03-01  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* exceptions.cc (exception::handle): Eliminate buggy recursed value and
+	just check if we're exiting.
+
 2013-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/pthread.h (pthread_atfork): Add missing declaration.
