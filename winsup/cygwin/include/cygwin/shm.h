@@ -1,6 +1,6 @@
 /* sys/shm.h
 
-   Copyright 2001, 2002, 2012 Red Hat Inc.
+   Copyright 2001, 2002, 2012, 2013 Red Hat Inc.
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.
@@ -42,8 +42,6 @@ extern "C"
  */
 typedef uint32_t shmatt_t;
 
-#pragma pack (push, 4)
-
 struct shmid_ds
 {
   struct ipc_perm    shm_perm;	/* Operation permission structure. */
@@ -65,23 +63,6 @@ struct shmid_ds
 #define shm_atime shm_atim.tv_sec
 #define shm_dtime shm_dtim.tv_sec
 #define shm_ctime shm_ctim.tv_sec
-
-#if defined (_KERNEL) && defined (__x86_64__)
-/* Helper struct for conversion from 32 bit shmid_ds to 64 bit shmid_ds
-   and vice versa. */
-struct _shmid_ds32
-{
-  struct ipc_perm    shm_perm;
-  uint32_t           shm_segsz;
-  pid_t              shm_lpid;
-  pid_t              shm_cpid;
-  shmatt_t           shm_nattch;
-  struct _ts32       shm_atim;
-  struct _ts32       shm_dtim;
-  struct _ts32       shm_ctim;
-  uint64_t           shm_spare4;
-};
-#endif /* _KERNEL && __x86_64__ */
 
 #ifdef _KERNEL
 /* Buffer type for shmctl (IPC_INFO, ...) as used by ipcs(8).
@@ -115,8 +96,6 @@ struct shm_info
 			   wide. */
 };
 #endif /* _KERNEL */
-
-#pragma pack (pop)
 
 void *shmat (int shmid, const void *shmaddr, int shmflg);
 int   shmctl (int shmid, int cmd, struct shmid_ds *buf);

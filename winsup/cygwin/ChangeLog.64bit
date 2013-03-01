@@ -1,3 +1,22 @@
+2013-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.h (struct header_t): Revert msglen to simple member.
+	Drop accessor methods.
+	* cygserver_ipc.h (struct proc): Drop enforced 4 byte struct packing.
+	Remove members for 64<->32 bit IPC.  Revert to original member order.
+	(ipc_set_proc_info): Remove 64<->32 handling.
+	(conv_timespec32_to_timespec): Delete.
+	(conv_timespec_to_timespec32): Delete.
+	* pinfo.h (struct win_heap_info): Remove.
+	* shm.cc (fixup_shms_after_fork): Revert parent initialization.
+	* winlean.h: Remove _TYPE64_CLR and _TYPE64_SET macros.  Remove
+	usage throughout code.
+	* include/cygwin/ipc.h: Drop 64<->32 bit helper structures.
+	* include/cygwin/msg.h: Ditto.  Drop enforced 4 byte struct packing.
+	* include/cygwin/sem.h: Ditto.
+	* include/cygwin/shm.h: Ditto.
+	* include/cygwin/sysproto.h: Drop enforced 4 byte struct packing.
+
 2013-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pseudo-reloc.cc (do_pseudo_reloc): Add test to check for invalid 32

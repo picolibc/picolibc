@@ -1,6 +1,6 @@
 /* sys/msg.h
 
-   Copyright 2002, 2012 Red Hat Inc.
+   Copyright 2002, 2012, 2013 Red Hat Inc.
    Written by Conrad Scott <conrad.scott@dsl.pipex.com>
 
 This file is part of Cygwin.
@@ -38,8 +38,6 @@ typedef uint32_t msgqnum_t;
  */
 typedef uint32_t msglen_t;
 
-#pragma pack (push, 4)
-
 struct msqid_ds
 {
   struct ipc_perm msg_perm;	/* Operation permission structure. */
@@ -62,24 +60,6 @@ struct msqid_ds
 #define msg_stime msg_stim.tv_sec
 #define msg_rtime msg_rtim.tv_sec
 #define msg_ctime msg_ctim.tv_sec
-
-#if defined (_KERNEL) && defined (__x86_64__)
-/* Helper struct for conversion from 32 bit msqid_ds to 64 bit msqid_ds
-   and vice versa. */
-struct _msqid_ds32
-{
-  struct ipc_perm msg_perm;
-  msglen_t        msg_cbytes;
-  msgqnum_t       msg_qnum;
-  msglen_t        msg_qbytes;
-  pid_t           msg_lspid;
-  pid_t           msg_lrpid;
-  struct _ts32    msg_stim;
-  struct _ts32    msg_rtim;
-  struct _ts32    msg_ctim;
-  int64_t         msg_spare4;
-};
-#endif /* _KERNEL && __x86_64__ */
 
 #ifdef _KERNEL
 /* Buffer type for msgctl (IPC_INFO, ...) as used by ipcs(8).
@@ -109,8 +89,6 @@ struct msg_info
   int32_t msg_tot;		/* Size in bytes of messages, system wide. */
 };
 #endif /* _KERNEL */
-
-#pragma pack (pop)
 
 int     msgctl (int msqid, int cmd, struct msqid_ds *buf);
 int     msgget (key_t key, int msgflg);

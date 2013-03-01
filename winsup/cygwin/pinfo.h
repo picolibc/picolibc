@@ -125,26 +125,6 @@ public:
   friend class pinfo_minimal;
 };
 
-/* Commune functionality to fetch Windows heap information.  Implemented
-   in fhandler_process.cc. */
-struct win_heap_info
-{
-  struct heap
-  {
-    ULONG heap_id;
-    ULONG flags;
-    _TYPE64 (char *, base);
-    _TYPE64 (char *, end);
-  };
-  heap *heap_vm_chunks, *heap_vm_chunks_end;
-
-  win_heap_info (_pinfo *p);
-  ~win_heap_info ();
-  char *fill_if_match (char *, ULONG, char *);
-
-  static commune_result gen_heap_info ();
-};
-
 DWORD WINAPI commune_process (void *);
 
 enum parent_alerter

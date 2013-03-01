@@ -1,6 +1,7 @@
 /* shm.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2012 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2012, 2013
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -120,11 +121,7 @@ fixup_shms_after_fork ()
   if (!SLIST_FIRST (&sph_list))
     return 0;
   pinfo p (myself->ppid);
-#ifdef __x86_64__
-  proc parent = { myself->ppid, p->dwProcessId, true, false, p->uid, p->gid };
-#else
-  proc parent = { myself->ppid, p->dwProcessId, false, false, p->uid, p->gid };
-#endif
+  proc parent = { myself->ppid, p->dwProcessId, p->uid, p->gid };
 
   client_request_shm request (&parent);
   if (request.make_request () == -1 || request.retval () == -1)

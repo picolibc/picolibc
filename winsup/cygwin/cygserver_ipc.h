@@ -19,21 +19,17 @@ struct vmspace {
   struct shmmap_state *vm_shm;
 };
 
-#pragma pack (push, 4)
 struct proc {
   pid_t cygpid;
   DWORD winpid;
-  bool is_64bit;
-  bool is_admin;
   uid_t uid;
   gid_t gid;
   int gidcnt;
-  _TYPE64 (HANDLE, signal_arrived);
-  /* Only used internally. */
-  _TYPE64 (gid_t *, gidlist);
-  _TYPE64 (struct vmspace *, p_vmspace);
+  gid_t *gidlist;
+  bool is_admin;
+  struct vmspace *p_vmspace;
+  HANDLE signal_arrived;
 };
-#pragma pack (pop)
 
 #ifdef __INSIDE_CYGWIN__
 #include "sigproc.h"
@@ -42,18 +38,12 @@ ipc_set_proc_info (proc &blk)
 {
   blk.cygpid = getpid ();
   blk.winpid = GetCurrentProcessId ();
-#ifdef __x86_64__
-  blk.is_64bit = true;
-#else
-  blk.is_64bit = false;
-#endif
-  blk.is_admin = false;
   blk.uid = geteuid32 ();
   blk.gid = getegid32 ();
-  blk._TYPE64_CLR (signal_arrived);
-  _my_tls.set_signal_arrived (true, blk.signal_arrived);
   blk.gidcnt = 0;
-  blk._TYPE64_CLR (gidlist);
+  blk.gidlist = NULL;
+  blk.is_admin = false;
+  _my_tls.set_signal_arrived (true, blk.signal_arrived);
 }
 #endif /* __INSIDE_CYGWIN__ */
 
@@ -98,24 +88,6 @@ struct thread {
 };
 #define td_proc ipcblk
 #define p_pid cygpid
-#endif
-
-#if !defined (__INSIDE_CYGWIN__) && defined (__x86_64__) && defined (_CYGWIN_IPC_H)
-/* Inline conversion functions to convert 64 bit timespecs to 32 bit
-   and vice versa.  Used in cygserver only. */
-static inline void
-conv_timespec32_to_timespec (_ts32 *in, timestruc_t *out)
-{
-  out->tv_sec = in->tv_sec;
-  out->tv_nsec = in->tv_nsec;
-}
-
-static inline void
-conv_timespec_to_timespec32 (timestruc_t *in, _ts32 *out)
-{
-  out->tv_sec = (int32_t) in->tv_sec;
-  out->tv_nsec = (int32_t) in->tv_nsec;
-}
 #endif
 
 #endif /* __CYGSERVER_IPC_H__ */
