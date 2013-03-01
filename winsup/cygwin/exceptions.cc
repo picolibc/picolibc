@@ -560,7 +560,6 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 #endif
 {
   static bool NO_COPY debugging;
-  static int NO_COPY recursed;
   _cygtls& me = _my_tls;
 
 #ifdef __x86_64__
@@ -716,10 +715,9 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
   _except_list->handler = handle;
 #endif
 
-  /* Another exception could happen while tracing or while exiting.
-     Only do this once.  */
-  if (recursed++)
-    api_fatal ("Error while dumping state (probably corrupted stack)");
+  if (exit_state >= ES_SIGNAL_EXIT
+      && (NTSTATUS) e->ExceptionCode != STATUS_CONTROL_C_EXIT)
+    api_fatal ("Exception during process exit");
   else if (!try_to_debug (0))
     rtl_unwind (frame, e);
   else
