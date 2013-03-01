@@ -613,8 +613,6 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
      will be removed automatically after our exception handler returns. */
   _except_list->handler = handle;
 
-  /* Another exception could happen while tracing or while exiting.
-     Only do this once.  */
   if (exit_state >= ES_SIGNAL_EXIT
       && (NTSTATUS) e->ExceptionCode != STATUS_CONTROL_C_EXIT)
     api_fatal ("Exception during process exit");
