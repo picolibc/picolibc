@@ -1,3 +1,7 @@
+2013-03-01  Cary Coutant  <ccoutant@google.com>
+
+	* dwarf2.h (enum dwarf_sect): New enum type.
+
 2013-02-19  Alan Modra  <amodra@gmail.com>
 
 	* bfdlink.h (struct bfd_link_info): Delete emit_note_gnu_build_id.
