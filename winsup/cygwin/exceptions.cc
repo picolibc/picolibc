@@ -519,12 +519,9 @@ try_to_debug (bool waitloop)
 }
 
 #ifdef __x86_64__
-static void rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline));
-void
-rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
-{
-  RtlUnwind (frame, __builtin_return_address (0), e, 0);
-}
+/* Don't unwind the stack on x86_64.  It's not necessary to do that from the
+   exception handler. */
+#define rtl_unwind(el,er)
 #else
 static void __reg3 rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline, regparm (3)));
 void __reg3
@@ -572,9 +569,9 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 #ifdef __x86_64__
   EXCEPTION_RECORD *e = ep->ExceptionRecord;
   CONTEXT *in = ep->ContextRecord;
-  exception_list *frame = (exception_list *) __builtin_frame_address (0);
 #endif
 
+  system_printf ("Here");
   if (debugging && ++debugging < 500000)
     {
       SetThreadPriority (hMainThread, THREAD_PRIORITY_NORMAL);

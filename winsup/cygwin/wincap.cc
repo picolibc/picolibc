@@ -92,7 +92,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:true,
-  has_rtl_capture_context:true,
+  has_rtl_capture_context:false,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {

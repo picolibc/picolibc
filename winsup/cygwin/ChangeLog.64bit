@@ -1,5 +1,11 @@
 2013-03-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (rtl_unwind): Convert to macro doing nothing on x86_64.
+	(exception::handle): Drop creating frame variable on x86_64.
+	* wincap.cc (wincap_2000sp4): Set has_rtl_capture_context to false.
+
+2013-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygserver.h (struct header_t): Revert msglen to simple member.
 	Drop accessor methods.
 	* cygserver_ipc.h (struct proc): Drop enforced 4 byte struct packing.
