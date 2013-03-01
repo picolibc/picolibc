@@ -421,10 +421,7 @@ cygwin_stackdump ()
 {
   CONTEXT c;
   c.ContextFlags = CONTEXT_FULL;
-  if (wincap.has_rtl_capture_context ())
-    RtlCaptureContext (&c);
-  else
-    GetThreadContext (GetCurrentThread (), &c);
+  RtlCaptureContext (&c);
   cygwin_exception exc ((PUINT_PTR) c._GR(bp), &c);
   exc.dumpstack ();
 }
@@ -571,7 +568,6 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
   CONTEXT *in = ep->ContextRecord;
 #endif
 
-  system_printf ("Here");
   if (debugging && ++debugging < 500000)
     {
       SetThreadPriority (hMainThread, THREAD_PRIORITY_NORMAL);
@@ -1220,10 +1216,7 @@ signal_exit (int sig, siginfo_t *si)
 	 {
 	   CONTEXT c;
 	   c.ContextFlags = CONTEXT_FULL;
-	   if (wincap.has_rtl_capture_context ())
-	     RtlCaptureContext (&c);
-	   else
-	     GetThreadContext (GetCurrentThread (), &c);
+	   RtlCaptureContext (&c);
 #ifdef __x86_64__
 	   cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.rbp, &c);
 #else
@@ -1363,7 +1356,7 @@ dispatch_sig:
     {
       CONTEXT c;
       c.ContextFlags = CONTEXT_FULL;
-      if (&_my_tls == _main_tls && wincap.has_rtl_capture_context ())
+      if (&_my_tls == _main_tls)
 	RtlCaptureContext (&c);
       else
 	GetThreadContext (hMainThread, &c);

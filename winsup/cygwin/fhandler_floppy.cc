@@ -53,7 +53,7 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
   /* Always try using the new EX ioctls first (>= XP).  If not available,
      fall back to trying the old non-EX ioctls.
      Unfortunately the EX ioctls are not implemented in the floppy driver. */
-  if (wincap.has_disk_ex_ioctls () && get_major () != DEV_FLOPPY_MAJOR)
+  if (get_major () != DEV_FLOPPY_MAJOR)
     {
       if (!DeviceIoControl (get_handle (),
 			    IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0,
@@ -149,7 +149,7 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
 	     looks wrong, but this is a historical necessity.  NT4 didn't
 	     maintain partition information for the whole drive (aka
 	     "partition 0"), but returned ERROR_INVALID_HANDLE instead.  That
-	     got fixed in W2K. */
+	     got fixed in W2K, but we keep it here as fallback. */
 	  drive_size = di->Cylinders.QuadPart * di->TracksPerCylinder
 		       * di->SectorsPerTrack * di->BytesPerSector;
 	}

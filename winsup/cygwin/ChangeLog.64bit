@@ -1,5 +1,55 @@
 2013-03-01  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (AttachConsole): Remove.
+	(GetModuleHandleExW): Remove.
+	(GetSystemWow64DirectoryW): Remove.
+	(GetVolumePathNamesForVolumeNameW): Remove.
+	* exceptions.cc (cygwin_stackdump): Always call RtlCaptureContext.
+	(exception::handle): Drop accidentally left in debugging statement.
+	Always call RtlCaptureContext.
+	(sigpacket::process): Always call RtlCaptureContext for current thread.
+	* fhandler_disk_file.cc (fstatvfs): Drop code using
+	FileFsSizeInformation.
+	(struct __DIR_cache): Remove comment.
+	(fhandler_disk_file::rewinddir): Drop W2K-only code.
+	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Don't
+	check for old OS.  Extend a comment.
+	* fhandler_mem.cc (fhandler_dev_mem::open): Drop NT4 and W2K from
+	debug output.
+	* fhandler_proc.cc (format_proc_partitions): Drop Pre-XP considerations.
+	* fhandler_procnet.cc (fhandler_procnet::exists): Ditto.
+	(fhandler_procnet::readdir): Ditto.
+	(format_procnet_ifinet6): Ditto.
+	* fhandler_socket.cc (fhandler_socket::recvmsg): Ditto.
+	* fhandler_tape.cc (mtinfo_drive::get_status): Ditto.
+	* init.cc (dll_entry): Drop W2K-only code.
+	* net.cc (get_ifs): Rename from get_xp_ifs.
+	(get_2k_ifs): Remove.
+	(getifaddrs): Always call get_ifs.
+	(get_ifconf): Ditto.
+	(if_nametoindex): Drop Pre-XP considerations.
+	(load_ipv6_funcs): Ditto.  Fix preceeding comment.
+	* sec_auth.cc (lsaauth): Drop code handling fake_login_sid.
+	* sec_helper.cc (fake_logon_sid): Remove.
+	(set_cygwin_privileges): Fix uncommented statement to drop pre-XP
+	considerations.
+	* security.h (fake_logon_sid): Drop declaration.
+	* shared.cc (shared_info::init_obcaseinsensitive): Drop W2K-only code.
+	* wincap.cc: Throughout, remove setting all deprecated wincapc members.
+	(wincap_minimal): Set to wincap_xpsp2.
+	(wincap_2000): Remove.
+	(wincap_2000sp4): Remove.
+	(wincap_xp): Remove.
+	(wincap_xpsp1): Remove.
+	(wincapc::init): Drop OS 5.0 and pre-SP2 XP.
+	* wincap.h (struct wincaps): Remove the following members:
+	has_create_global_privilege, has_ioctl_storage_get_media_types_ex,
+	has_disk_ex_ioctls, has_buggy_restart_scan, needs_logon_sid_in_sid_list,
+	has_gaa_prefixes, has_recvmsg, has_stack_size_param_is_a_reservation,
+	kernel_is_always_casesensitive, has_rtl_capture_context.
+
+2013-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (rtl_unwind): Convert to macro doing nothing on x86_64.
 	(exception::handle): Drop creating frame variable on x86_64.
 	* wincap.cc (wincap_2000sp4): Set has_rtl_capture_context to false.

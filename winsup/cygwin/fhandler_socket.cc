@@ -1548,8 +1548,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
   /* Disappointing but true:  Even if WSARecvMsg is supported, it's only
      supported for datagram and raw sockets. */
   bool use_recvmsg = true;
-  if (get_socket_type () == SOCK_STREAM || get_addr_family () == AF_LOCAL
-      || !wincap.has_recvmsg ())
+  if (get_socket_type () == SOCK_STREAM || get_addr_family () == AF_LOCAL)
     {
       use_recvmsg = false;
       msg->msg_controllen = 0;

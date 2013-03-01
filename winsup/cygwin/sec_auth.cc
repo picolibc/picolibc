@@ -1,7 +1,7 @@
 /* sec_auth.cc: NT authentication functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1033,11 +1033,6 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid, pw,
 				    NULL, auth_luid, auth_pos))
     goto out;
-  /* The logon SID entry is not generated automatically on Windows 2000
-     and earlier for some reason.  So add fake logon sid here, which is
-     filled with logon id values in the authentication package. */
-  if (wincap.needs_logon_sid_in_sid_list ())
-    tmp_gsids += fake_logon_sid;
 
   tmp_gsids.debug_print ("tmp_gsids");
 
@@ -1131,10 +1126,6 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
       gsids->Groups[i].Attributes = SE_GROUP_MANDATORY
 				    | SE_GROUP_ENABLED_BY_DEFAULT
 				    | SE_GROUP_ENABLED;
-      /* Mark logon SID as logon SID :) */
-      if (wincap.needs_logon_sid_in_sid_list ()
-	  && tmp_gsids.sids[tmpidx] == fake_logon_sid)
-	gsids->Groups[i].Attributes += SE_GROUP_LOGON_ID;
       RtlCopySid (RtlLengthSid (tmp_gsids.sids[tmpidx]),
 		  (PSID) ((PBYTE) &authinf->inf + sids_offset),
 		  tmp_gsids.sids[tmpidx]);

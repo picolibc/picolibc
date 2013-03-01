@@ -1139,11 +1139,8 @@ format_proc_partitions (void *, char *&destbuf)
       upath.MaximumLength = upath.Length + sizeof (WCHAR);
       InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
 				  dirhdl, NULL);
-      /* Up to W2K the handle needs read access to fetch the partition info. */
-      status = NtOpenFile (&devhdl, wincap.has_disk_ex_ioctls ()
-				    ? READ_CONTROL
-				    : READ_CONTROL | FILE_READ_DATA,
-			   &attr, &io, FILE_SHARE_VALID_FLAGS, 0);
+      status = NtOpenFile (&devhdl, READ_CONTROL, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, 0);
       if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("NtOpenFile(%S), status %y", &upath, status);
@@ -1156,9 +1153,8 @@ format_proc_partitions (void *, char *&destbuf)
 	  got_one = true;
 	}
       /* Fetch partition info for the entire disk to get its size. */
-      if (wincap.has_disk_ex_ioctls ()
-	  && DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
-			      ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+      if (DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
+			   ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
 	{
 	  pix = (PARTITION_INFORMATION_EX *) ioctl_buf;
 	  size = pix->PartitionLength.QuadPart;
@@ -1180,9 +1176,8 @@ format_proc_partitions (void *, char *&destbuf)
 				 dev.get_major (), dev.get_minor (),
 				 size >> 10, dev.name + 5);
       /* Fetch drive layout info to get size of all partitions on the disk. */
-      if (wincap.has_disk_ex_ioctls ()
-	  && DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
-			      NULL, 0, ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+      if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
+			   NULL, 0, ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
 	{
 	  PDRIVE_LAYOUT_INFORMATION_EX pdlix = (PDRIVE_LAYOUT_INFORMATION_EX)
 					       ioctl_buf;
@@ -1214,13 +1209,7 @@ format_proc_partitions (void *, char *&destbuf)
 	    else
 	      {
 		size = pi->PartitionLength.QuadPart;
-		/* Pre-W2K you can't rely on the partition number info for
-		   unused partitions. */
-		if (pi->PartitionType == PARTITION_ENTRY_UNUSED
-		    || pi->PartitionType == PARTITION_EXTENDED)
-		  part_num = 0;
-		else
-		  part_num = pi->PartitionNumber;
+		part_num = pi->PartitionNumber;
 		++pi;
 	      }
 	    /* A partition number of 0 denotes an extended partition or a

@@ -715,7 +715,6 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
   NTSTATUS status;
   IO_STATUS_BLOCK io;
   FILE_FS_FULL_SIZE_INFORMATION full_fsi;
-  FILE_FS_SIZE_INFORMATION fsi;
   /* We must not use the stat handle here, even if it exists.  The handle
      has been opened with FILE_OPEN_REPARSE_POINT, thus, in case of a volume
      mount point, it points to the FS of the mount point, rather than to the
@@ -749,9 +748,7 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
   sfs->f_fsid = pc.fs_serial_number ();
   sfs->f_flag = pc.fs_flags ();
   sfs->f_namemax = pc.fs_name_len ();
-  /* Get allocation related information.  Try to get "full" information
-     first, which is only available since W2K.  If that fails, try to
-     retrieve normal allocation information. */
+  /* Get allocation related information. */
   status = NtQueryVolumeInformationFile (fh, &io, &full_fsi, sizeof full_fsi,
 					 FileFsFullSizeInformation);
   if (NT_SUCCESS (status))
@@ -777,22 +774,6 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 	  else
 	    sfs->f_blocks = (fsblkcnt_t) nvdb.TotalClusters.QuadPart;
 	}
-      ret = 0;
-    }
-  else
-    {
-      status = NtQueryVolumeInformationFile (fh, &io, &fsi, sizeof fsi,
-					     FileFsSizeInformation);
-      if (!NT_SUCCESS (status))
-	{
-	  __seterrno_from_nt_status (status);
-	  goto out;
-	}
-      sfs->f_bsize = fsi.BytesPerSector * fsi.SectorsPerAllocationUnit;
-      sfs->f_frsize = sfs->f_bsize;
-      sfs->f_blocks = (fsblkcnt_t) fsi.TotalAllocationUnits.QuadPart;
-      sfs->f_bfree = (fsblkcnt_t) fsi.AvailableAllocationUnits.QuadPart;
-      sfs->f_bavail = sfs->f_bfree;
       ret = 0;
     }
 out:
@@ -1793,7 +1774,7 @@ fhandler_disk_file::rmdir ()
 
 struct __DIR_cache
 {
-  char  __cache[DIR_BUF_SIZE];	/* W2K needs this buffer 8 byte aligned. */
+  char  __cache[DIR_BUF_SIZE];
   ULONG __pos;
 };
 
@@ -2353,32 +2334,6 @@ void
 fhandler_disk_file::rewinddir (DIR *dir)
 {
   d_cachepos (dir) = 0;
-  if (wincap.has_buggy_restart_scan () && isremote ())
-    {
-      /* This works around a W2K bug.  The RestartScan parameter in calls
-	 to NtQueryDirectoryFile on remote shares is ignored, thus
-	 resulting in not being able to rewind on remote shares.  By
-	 reopening the directory, we get a fresh new directory pointer. */
-      OBJECT_ATTRIBUTES attr;
-      NTSTATUS status;
-      IO_STATUS_BLOCK io;
-      HANDLE new_dir;
-
-      pc.init_reopen_attr (&attr, get_handle ());
-      status = NtOpenFile (&new_dir, SYNCHRONIZE | FILE_LIST_DIRECTORY,
-			   &attr, &io, FILE_SHARE_VALID_FLAGS,
-			   FILE_SYNCHRONOUS_IO_NONALERT
-			   | FILE_OPEN_FOR_BACKUP_INTENT
-			   | FILE_DIRECTORY_FILE);
-      if (!NT_SUCCESS (status))
-	debug_printf ("Unable to reopen dir %s, NT error: %y",
-		      get_name (), status);
-      else
-	{
-	  NtClose (get_handle ());
-	  set_io_handle (new_dir);
-	}
-    }
   dir->__d_position = 0;
   d_mounts (dir)->rewind ();
 }

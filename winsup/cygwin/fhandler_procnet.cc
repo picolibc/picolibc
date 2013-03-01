@@ -63,12 +63,8 @@ fhandler_procnet::exists ()
 				       PROCNET_LINK_COUNT);
   if (entry)
     {
-      if (entry->type == virt_file)
-	{
-	  if (!wincap.has_gaa_prefixes ()
-	      || !get_adapters_addresses (NULL, AF_INET6))
-	    return virt_none;
-	}
+      if (entry->type == virt_file && !get_adapters_addresses (NULL, AF_INET6))
+	return virt_none;
       fileid = entry - procnet_tab;
       return entry->type;
     }
@@ -109,12 +105,9 @@ fhandler_procnet::readdir (DIR *dir, dirent *de)
   int res = ENMFILE;
   if (dir->__d_position >= PROCNET_LINK_COUNT)
     goto out;
-  if (procnet_tab[dir->__d_position].type == virt_file)
-    {
-      if (!wincap.has_gaa_prefixes ()
-	  || !get_adapters_addresses (NULL, AF_INET6))
-	goto out;
-    }
+  if (procnet_tab[dir->__d_position].type == virt_file
+      && !get_adapters_addresses (NULL, AF_INET6))
+    goto out;
   strcpy (de->d_name, procnet_tab[dir->__d_position++].name);
   dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
   res = 0;
@@ -236,10 +229,8 @@ format_procnet_ifinet6 (void *, char *&filebuf)
   PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
   PIP_ADAPTER_UNICAST_ADDRESS pua;
   ULONG alloclen;
-
-  if (!wincap.has_gaa_prefixes ())
-    return 0;
   off_t filesize = 0;
+
   if (!get_adapters_addresses (&pa0, AF_INET6))
     goto out;
   alloclen = 0;

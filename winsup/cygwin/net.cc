@@ -1870,12 +1870,12 @@ get_hwaddr (struct ifall *ifp, PIP_ADAPTER_ADDRESSES pap)
     else
       ifp->ifa_hwaddr.sa_data[i] = pap->PhysicalAddress[i];
 }
+
 /*
- * Get network interfaces XP SP1 and above.
- * Use IP Helper function GetAdaptersAddresses.
+ * Get network interfaces.  Use IP Helper function GetAdaptersAddresses.
  */
 static struct ifall *
-get_xp_ifs (ULONG family)
+get_ifs (ULONG family)
 {
   PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
   PIP_ADAPTER_UNICAST_ADDRESS pua;
@@ -2053,201 +2053,6 @@ done:
   return ifret;
 }
 
-/*
- * Get network interfaces up to XP w/o service packs.
- */
-static struct ifall *
-get_2k_ifs ()
-{
-  int ethId = 0, pppId = 0, slpId = 0, tokId = 0;
-
-  DWORD ip_cnt;
-  DWORD siz_ip_table = 0;
-  PMIB_IPADDRTABLE ipt;
-  PMIB_IFROW ifrow;
-  struct ifall *ifret = NULL, *ifp = NULL;
-  struct sockaddr_in *if_sin;
-
-  struct ifcount_t
-  {
-    DWORD ifIndex;
-    size_t count;
-    unsigned int enumerated;	// for eth0:1
-    unsigned int classId;	// for eth0, tok0 ...
-
-  };
-  ifcount_t *iflist, *ifEntry;
-
-  if (GetIpAddrTable (NULL, &siz_ip_table, TRUE) == ERROR_INSUFFICIENT_BUFFER
-      && (ifrow = (PMIB_IFROW) alloca (sizeof (MIB_IFROW)))
-      && (ipt = (PMIB_IPADDRTABLE) alloca (siz_ip_table))
-      && !GetIpAddrTable (ipt, &siz_ip_table, TRUE))
-    {
-      if (!(ifret = (struct ifall *) calloc (ipt->dwNumEntries, sizeof (struct ifall))))
-	goto done;
-      ifp = ifret;
-
-      iflist =
-	(ifcount_t *) alloca (sizeof (ifcount_t) * (ipt->dwNumEntries + 1));
-      memset (iflist, 0, sizeof (ifcount_t) * (ipt->dwNumEntries + 1));
-      for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt)
-	{
-	  ifEntry = iflist;
-	  /* search for matching entry (and stop at first free entry) */
-	  while (ifEntry->count != 0)
-	    {
-	      if (ifEntry->ifIndex == ipt->table[ip_cnt].dwIndex)
-		break;
-	      ifEntry++;
-	    }
-	  if (ifEntry->count == 0)
-	    {
-	      ifEntry->count = 1;
-	      ifEntry->ifIndex = ipt->table[ip_cnt].dwIndex;
-	    }
-	  else
-	    {
-	      ifEntry->count++;
-	    }
-	}
-      /* reset the last element. This is just the stopper for the loop. */
-      iflist[ipt->dwNumEntries].count = 0;
-
-      /* Iterate over all configured IP-addresses */
-      for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt)
-	{
-	  memset (ifrow, 0, sizeof (MIB_IFROW));
-	  ifrow->dwIndex = ipt->table[ip_cnt].dwIndex;
-	  if (GetIfEntry (ifrow) != NO_ERROR)
-	    continue;
-
-	  ifcount_t *ifEntry = iflist;
-
-	  /* search for matching entry (and stop at first free entry) */
-	  while (ifEntry->count != 0)
-	    {
-	      if (ifEntry->ifIndex == ipt->table[ip_cnt].dwIndex)
-		break;
-	      ifEntry++;
-	    }
-
-	  /* Next in chain */
-	  ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
-	  /* Interface name */
-	  if (ifrow->dwType == IF_TYPE_SOFTWARE_LOOPBACK)
-	    strcpy (ifp->ifa_name, "lo");
-	  else
-	    {
-	      const char *name = "";
-	      switch (ifrow->dwType)
-		{
-		  case IF_TYPE_ISO88025_TOKENRING:
-		    name = "tok";
-		    if (ifEntry->enumerated == 0)
-		      ifEntry->classId = tokId++;
-		    break;
-		  case IF_TYPE_ETHERNET_CSMACD:
-		    name = "eth";
-		    if (ifEntry->enumerated == 0)
-		      ifEntry->classId = ethId++;
-		    break;
-		  case IF_TYPE_PPP:
-		    name = "ppp";
-		    if (ifEntry->enumerated == 0)
-		      ifEntry->classId = pppId++;
-		    break;
-		  case IF_TYPE_SLIP:
-		    name = "slp";
-		    if (ifEntry->enumerated == 0)
-		      ifEntry->classId = slpId++;
-		    break;
-		  default:
-		    continue;
-		}
-	      __small_sprintf (ifp->ifa_name,
-			       ifEntry->enumerated ? "%s%u:%u" : "%s%u",
-			       name, ifEntry->classId, ifEntry->enumerated);
-	      ifEntry->enumerated++;
-	    }
-	  ifp->ifa_ifa.ifa_name = ifp->ifa_name;
-	  /* Flags */
-	  if (ifrow->dwType == IF_TYPE_SOFTWARE_LOOPBACK)
-	    ifp->ifa_ifa.ifa_flags |= IFF_LOOPBACK;
-	  else if (ifrow->dwType == IF_TYPE_PPP
-		   || ifrow->dwType == IF_TYPE_SLIP)
-	    ifp->ifa_ifa.ifa_flags |= IFF_POINTOPOINT | IFF_NOARP;
-	  else
-	    ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
-	  if (ifrow->dwAdminStatus == IF_ADMIN_STATUS_UP)
-	    {
-	      ifp->ifa_ifa.ifa_flags |= IFF_UP | IFF_LOWER_UP;
-	      if (ifrow->dwOperStatus >= IF_OPER_STATUS_CONNECTED)
-		ifp->ifa_ifa.ifa_flags |= IFF_RUNNING;
-	    }
-	  /* Address */
-	  if_sin = (struct sockaddr_in *) &ifp->ifa_addr;
-	  if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr;
-	  if_sin->sin_family = AF_INET;
-	  ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
-	  /* Netmask */
-	  if_sin = (struct sockaddr_in *) &ifp->ifa_netmask;
-	  if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwMask;
-	  if_sin->sin_family = AF_INET;
-	  ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
-	  if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
-	  if (ifrow->dwType == IF_TYPE_PPP
-	      || ifrow->dwType == IF_TYPE_SLIP)
-	    {
-	      /* Destination address */
-	      if_sin->sin_addr.s_addr =
-		get_routedst (ipt->table[ip_cnt].dwIndex);
-	      ifp->ifa_ifa.ifa_dstaddr = (struct sockaddr *)
-					 &ifp->ifa_brddstaddr;
-	    }
-	  else
-	    {
-	      /* Broadcast address */
-#if 0
-	      /* Unfortunately, the field returns only crap. */
-	      if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwBCastAddr;
-#else
-	      uint32_t mask = ipt->table[ip_cnt].dwMask;
-	      if_sin->sin_addr.s_addr = (ipt->table[ip_cnt].dwAddr & mask) | ~mask;
-#endif
-	      ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *)
-					   &ifp->ifa_brddstaddr;
-	    }
-	  if_sin->sin_family = AF_INET;
-	  /* Hardware address */
-	  for (UINT i = 0; i < IFHWADDRLEN; ++i)
-	    if (i >= ifrow->dwPhysAddrLen)
-	      ifp->ifa_hwaddr.sa_data[i] = '\0';
-	    else
-	      ifp->ifa_hwaddr.sa_data[i] = ifrow->bPhysAddr[i];
-	  /* Metric */
-	  ifp->ifa_metric = 1;
-	  /* MTU */
-	  ifp->ifa_mtu = ifrow->dwMtu;
-	  /* Interface index */
-	  ifp->ifa_ifindex = ifrow->dwIndex;
-	  /* Friendly name */
-	  struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
-					 &ifp->ifa_frndlyname;
-	  iff->ifrf_len = sys_wcstombs (iff->ifrf_friendlyname,
-					IFRF_FRIENDLYNAMESIZ,
-					ifrow->wszName);
-	  ++ifp;
-	}
-    }
-  /* Since every entry is set to the next entry, the last entry points to an
-     invalid next entry now.  Fix it retroactively. */
-  if (ifp > ifret)
-    ifp[-1].ifa_ifa.ifa_next = NULL;
-
-done:
-  return ifret;
-}
-
 extern "C" int
 getifaddrs (struct ifaddrs **ifap)
 {
@@ -2257,10 +2062,7 @@ getifaddrs (struct ifaddrs **ifap)
       return -1;
     }
   struct ifall *ifp;
-  if (wincap.has_gaa_prefixes () && !CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-    ifp = get_xp_ifs (AF_UNSPEC);
-  else
-    ifp = get_2k_ifs ();
+  ifp = get_ifs (AF_UNSPEC);
   *ifap = &ifp->ifa_ifa;
   return ifp ? 0 : -1;
 }
@@ -2287,10 +2089,7 @@ get_ifconf (struct ifconf *ifc, int what)
     }
 
   struct ifall *ifret, *ifp;
-  if (wincap.has_gaa_prefixes () && !CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-    ifret = get_xp_ifs (AF_INET);
-  else
-    ifret = get_2k_ifs ();
+  ifret = get_ifs (AF_INET);
   if (!ifret)
     return -1;
 
@@ -2369,8 +2168,7 @@ if_nametoindex (const char *name)
   if (efault.faulted (EFAULT))
     return 0;
 
-  if (wincap.has_gaa_prefixes ()
-      && get_adapters_addresses (&pa0, AF_UNSPEC))
+  if (get_adapters_addresses (&pa0, AF_UNSPEC))
     {
       char lname[IF_NAMESIZE], *c;
 
@@ -2399,8 +2197,7 @@ if_indextoname (unsigned ifindex, char *ifname)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  if (wincap.has_gaa_prefixes ()
-      && get_adapters_addresses (&pa0, AF_UNSPEC))
+  if (get_adapters_addresses (&pa0, AF_UNSPEC))
     {
       for (pap = pa0; pap; pap = pap->Next)
 	if (ifindex == (pap->Ipv6IfIndex ?: pap->IfIndex))
@@ -2439,8 +2236,7 @@ if_nameindex (void)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  if (wincap.has_gaa_prefixes ()
-      && get_adapters_addresses (&pa0, AF_UNSPEC))
+  if (get_adapters_addresses (&pa0, AF_UNSPEC))
     {
       int cnt = 0;
       for (pap = pa0; pap; pap = pap->Next)
@@ -4163,11 +3959,9 @@ w32_to_gai_err (int w32_err)
   return w32_err;
 }
 
-/* We can't use autoload here because we don't know where the functions
-   are loaded from.  On Win2K, the functions are available in the
-   ipv6 technology preview lib called wship6.dll, in XP and above they
-   are implemented in ws2_32.dll.  For older systems we use the ipv4-only
-   version above. */
+/* We can't use autoload here because we don't know if the functions
+   are available (pre-Vista).  For those systems we redirect to the
+   ipv4-only version above. */
 
 static void (WINAPI *ws_freeaddrinfo)(const struct addrinfo *);
 static int (WINAPI *ws_getaddrinfo)(const char *, const char *,
@@ -4208,13 +4002,6 @@ load_ipv6_funcs ()
   WSAGetLastError ();	/* Kludge.  Enforce WSAStartup call. */
   lib_name = wcpcpy (lib_path, windows_system_directory);
   wcpcpy (lib_name, L"ws2_32.dll");
-  if ((lib = LoadLibraryW (lib_path)))
-    {
-      if (get_ipv6_funcs (lib))
-	goto out;
-      FreeLibrary (lib);
-    }
-  wcpcpy (lib_name, L"wship6.dll");
   if ((lib = LoadLibraryW (lib_path)))
     {
       if (get_ipv6_funcs (lib))

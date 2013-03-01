@@ -768,32 +768,29 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
     get->mt_dsreg = (dp ()->DefaultBlockSize << MT_ST_BLKSIZE_SHIFT)
 		    & MT_ST_BLKSIZE_MASK;
 
-  if (wincap.has_ioctl_storage_get_media_types_ex ())
+  DWORD size = sizeof (GET_MEDIA_TYPES) + 10 * sizeof (DEVICE_MEDIA_INFO);
+  void *buf = alloca (size);
+  if (DeviceIoControl (mt, IOCTL_STORAGE_GET_MEDIA_TYPES_EX,
+		       NULL, 0, buf, size, &size, NULL)
+      || GetLastError () == ERROR_MORE_DATA)
     {
-      DWORD size = sizeof (GET_MEDIA_TYPES) + 10 * sizeof (DEVICE_MEDIA_INFO);
-      void *buf = alloca (size);
-      if (DeviceIoControl (mt, IOCTL_STORAGE_GET_MEDIA_TYPES_EX,
-			   NULL, 0, buf, size, &size, NULL)
-	  || GetLastError () == ERROR_MORE_DATA)
+      PGET_MEDIA_TYPES gmt = (PGET_MEDIA_TYPES) buf;
+      for (DWORD i = 0; i < gmt->MediaInfoCount; ++i)
 	{
-	  PGET_MEDIA_TYPES gmt = (PGET_MEDIA_TYPES) buf;
-	  for (DWORD i = 0; i < gmt->MediaInfoCount; ++i)
-	    {
-	      PDEVICE_MEDIA_INFO dmi = &gmt->MediaInfo[i];
-	      get->mt_type = dmi->DeviceSpecific.TapeInfo.MediaType;
+	  PDEVICE_MEDIA_INFO dmi = &gmt->MediaInfo[i];
+	  get->mt_type = dmi->DeviceSpecific.TapeInfo.MediaType;
 #define TINFO DeviceSpecific.TapeInfo
-	      if (dmi->TINFO.MediaCharacteristics & MEDIA_CURRENTLY_MOUNTED)
-		{
-		  get->mt_type = dmi->DeviceSpecific.TapeInfo.MediaType;
-		  if (dmi->TINFO.BusType == BusTypeScsi)
-		    get->mt_dsreg |=
-		      (dmi->TINFO.BusSpecificData.ScsiInformation.DensityCode
-		       << MT_ST_DENSITY_SHIFT)
-		      & MT_ST_DENSITY_MASK;
-		  break;
-		}
-#undef TINFO
+	  if (dmi->TINFO.MediaCharacteristics & MEDIA_CURRENTLY_MOUNTED)
+	    {
+	      get->mt_type = dmi->DeviceSpecific.TapeInfo.MediaType;
+	      if (dmi->TINFO.BusType == BusTypeScsi)
+		get->mt_dsreg |=
+		  (dmi->TINFO.BusSpecificData.ScsiInformation.DensityCode
+		   << MT_ST_DENSITY_SHIFT)
+		  & MT_ST_DENSITY_MASK;
+	      break;
 	    }
+#undef TINFO
 	}
     }
 

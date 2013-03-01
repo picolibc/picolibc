@@ -588,15 +588,7 @@ LoadDLLfunc (GetIpForwardTable, 12, iphlpapi)
 LoadDLLfunc (GetNetworkParams, 8, iphlpapi)
 LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 
-#ifndef __x86_64__
-LoadDLLfuncEx (AttachConsole, 4, kernel32, 1)
-LoadDLLfuncEx (GetModuleHandleExW, 12, kernel32, 1)
-#endif
 LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
-#ifndef __x86_64__
-LoadDLLfuncEx (GetSystemWow64DirectoryW, 8, kernel32, 1)
-LoadDLLfuncEx (GetVolumePathNamesForVolumeNameW, 16, kernel32, 1)
-#endif
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
 
 LoadDLLfunc (WNetCloseEnum, 4, mpr)

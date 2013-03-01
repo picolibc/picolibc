@@ -37,7 +37,7 @@ fhandler_dev_mem::open (int flags, mode_t)
   if (!wincap.has_physical_mem_access ())
     {
       set_errno (EACCES);
-      debug_printf ("%s is accessible under NT4/W2K/XP only", dev ().name);
+      debug_printf ("%s is accessible under XP only", dev ().name);
       return 0;
     }
 

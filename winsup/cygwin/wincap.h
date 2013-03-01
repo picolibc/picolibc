@@ -17,21 +17,14 @@ struct wincaps
   DWORD    max_sys_priv;
   unsigned is_server                                    : 1;
   unsigned has_physical_mem_access                      : 1;
-  unsigned has_create_global_privilege			: 1;
-  unsigned has_ioctl_storage_get_media_types_ex		: 1;
-  unsigned has_disk_ex_ioctls				: 1;
-  unsigned has_buggy_restart_scan			: 1;
   unsigned has_mandatory_integrity_control		: 1;
-  unsigned needs_logon_sid_in_sid_list			: 1;
   unsigned needs_count_in_si_lpres2			: 1;
   unsigned has_recycle_dot_bin				: 1;
-  unsigned has_gaa_prefixes				: 1;
   unsigned has_gaa_on_link_prefix			: 1;
   unsigned has_gaa_largeaddress_bug			: 1;
   unsigned supports_all_posix_ai_flags			: 1;
   unsigned has_restricted_stack_args			: 1;
   unsigned has_transactions				: 1;
-  unsigned has_recvmsg					: 1;
   unsigned has_sendmsg					: 1;
   unsigned has_broken_udf				: 1;
   unsigned has_console_handle_problem			: 1;
@@ -41,12 +34,9 @@ struct wincaps
   unsigned has_fast_cwd					: 1;
   unsigned has_restricted_raw_disk_access		: 1;
   unsigned use_dont_resolve_hack			: 1;
-  unsigned has_stack_size_param_is_a_reservation	: 1;
   unsigned has_console_logon_sid			: 1;
   unsigned wow64_has_secondary_stack			: 1;
   unsigned has_program_compatibility_assistant		: 1;
-  unsigned kernel_is_always_casesensitive		: 1;
-  unsigned has_rtl_capture_context			: 1;
 };
 
 class wincapc
@@ -75,21 +65,14 @@ public:
   DWORD IMPLEMENT (max_sys_priv)
   bool  IMPLEMENT (is_server)
   bool  IMPLEMENT (has_physical_mem_access)
-  bool  IMPLEMENT (has_create_global_privilege)
-  bool	IMPLEMENT (has_ioctl_storage_get_media_types_ex)
-  bool	IMPLEMENT (has_disk_ex_ioctls)
-  bool	IMPLEMENT (has_buggy_restart_scan)
   bool	IMPLEMENT (has_mandatory_integrity_control)
-  bool	IMPLEMENT (needs_logon_sid_in_sid_list)
   bool	IMPLEMENT (needs_count_in_si_lpres2)
   bool	IMPLEMENT (has_recycle_dot_bin)
-  bool	IMPLEMENT (has_gaa_prefixes)
   bool	IMPLEMENT (has_gaa_on_link_prefix)
   bool	IMPLEMENT (has_gaa_largeaddress_bug)
   bool	IMPLEMENT (supports_all_posix_ai_flags)
   bool	IMPLEMENT (has_restricted_stack_args)
   bool	IMPLEMENT (has_transactions)
-  bool	IMPLEMENT (has_recvmsg)
   bool	IMPLEMENT (has_sendmsg)
   bool	IMPLEMENT (has_broken_udf)
   bool	IMPLEMENT (has_console_handle_problem)
@@ -99,12 +82,9 @@ public:
   bool	IMPLEMENT (has_fast_cwd)
   bool	IMPLEMENT (has_restricted_raw_disk_access)
   bool	IMPLEMENT (use_dont_resolve_hack)
-  bool	IMPLEMENT (has_stack_size_param_is_a_reservation)
   bool	IMPLEMENT (has_console_logon_sid)
   bool	IMPLEMENT (wow64_has_secondary_stack)
   bool	IMPLEMENT (has_program_compatibility_assistant)
-  bool	IMPLEMENT (kernel_is_always_casesensitive)
-  bool	IMPLEMENT (has_rtl_capture_context)
 
 #undef IMPLEMENT
 };
