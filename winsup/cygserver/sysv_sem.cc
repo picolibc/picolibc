@@ -558,63 +558,6 @@ struct __semctl_args {
 };
 #endif
 
-#ifdef __CYGWIN__
-    /* The following code implements copyin and copyout for semid_ds structs
-       on Cygwin.  On 32 bit it's just copyin/copyout.  On 64 bit it depends
-       on the client process.  A 64 bit client gets a direct copy, for a 32
-       bit process cygserver has to convert the datastructure. */
-# ifdef __x86_64__
-    static inline int
-    copyin_semid_ds (thread *td, semid_ds *src, semid_ds *tgt)
-    {
-      if (td->ipcblk->is_64bit)
-	return copyin (src, tgt, sizeof (semid_ds));
-      _semid_ds32 buf;
-      int err = copyin (src, &buf, sizeof (_semid_ds32));
-      if (!err)
-	{
-	  memcpy (tgt, &buf, offsetof (struct semid_ds, sem_otim));
-	  conv_timespec32_to_timespec (&buf.sem_otim, &tgt->sem_otim);
-	  conv_timespec32_to_timespec (&buf.sem_ctim, &tgt->sem_ctim);
-	  tgt->sem_base = NULL;
-	  tgt->sem_spare4[0] = 0;
-	}
-      return err;
-    }
-
-    static inline int
-    copyout_semid_ds (thread *td, semid_ds *src, semid_ds *tgt, int cnt)
-    {
-      if (td->ipcblk->is_64bit)
-      	return copyout (src, tgt, cnt * sizeof (semid_ds));
-      _semid_ds32 buf;
-      _semid_ds32 *dest = (_semid_ds32 *) tgt;
-      int err;
-      for (err = 0; !err && cnt-- > 0; ++src, ++dest)
-      	{
-	  memcpy (&buf, src, offsetof (struct semid_ds, sem_otim));
-	  conv_timespec_to_timespec32 (&src->sem_otim, &buf.sem_otim);
-	  conv_timespec_to_timespec32 (&src->sem_ctim, &buf.sem_ctim);
-	  buf.sem_spare4 = 0;
-	  err = copyout (&buf, dest, sizeof (_semid_ds32));
-	}
-      return err;
-    }
-# else
-    static inline int
-    copyin_semid_ds (thread *td, semid_ds *src, semid_ds *tgt)
-    {
-      return copyin (src, tgt, sizeof (semid_ds));
-    }
-
-    static inline int
-    copyout_semid_ds (thread *td, semid_ds *src, semid_ds *tgt, int cnt)
-    {
-      return copyout (src, tgt, cnt * sizeof (semid_ds));
-    }
-# endif
-#endif
-
 /*
  * MPSAFE
  */
@@ -636,15 +579,6 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 	struct mtx *sema_mtxp;
 	u_short usval, count;
 
-	size_t arg_size = sizeof(real_arg);
-#if defined (__CYGWIN__) && defined (__x86_64__)
-	if (!td->ipcblk->is_64bit)
-	  {
-	    arg_size = sizeof (int32_t);
-	    real_arg.buf = NULL;
-	  }
-#endif
-
 	DPRINTF(("call to semctl(%d, %d, %d, 0x%x)\n",
 	    semid, semnum, cmd, arg));
 	if (!jail_sysvipc_allowed && jailed(td->td_ucred))
@@ -655,7 +589,7 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 	switch(cmd) {
 #ifdef __CYGWIN__
 	case IPC_INFO:
-		if ((error = copyin(arg, &real_arg, arg_size)) != 0)
+		if ((error = copyin(arg, &real_arg, sizeof(real_arg))) != 0)
 			return (error);
 		if (!semid) {
 			error = copyout(&seminfo, real_arg.buf,
@@ -665,11 +599,12 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 		}
 		if (semid > seminfo.semmni)
 			semid = seminfo.semmni;
-		error = copyout_semid_ds (td, sema, real_arg.buf, semid);
+		error = copyout(sema, real_arg.buf,
+				semid * sizeof(struct semid_ds));
 		td->td_retval[0] = error ? -1 : 0;
 		return (error);
 	case SEM_INFO:
-		if (!(error = copyin(arg, &real_arg, arg_size))) {
+		if (!(error = copyin(arg, &real_arg, sizeof(real_arg)))) {
 			struct sem_info sem_info;
 			sem_info.sem_ids = semtots;
 			sem_info.sem_num = semtot;
@@ -683,7 +618,7 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 	case SEM_STAT:
 		if (semid < 0 || semid >= seminfo.semmni)
 			return (EINVAL);
-		if ((error = copyin(arg, &real_arg, arg_size)) != 0)
+		if ((error = copyin(arg, &real_arg, sizeof(real_arg))) != 0)
 			return (error);
 		semaptr = &sema[semid];
 		sema_mtxp = &sema_mtx[semid];
@@ -695,11 +630,7 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 		if ((error = ipcperm(td, &semaptr->sem_perm, IPC_R)))
 			goto done2;
 		mtx_unlock(sema_mtxp);
-#ifdef __CYGWIN__
-		error = copyout_semid_ds (td, semaptr, real_arg.buf, 1);
-#else
 		error = copyout(semaptr, real_arg.buf, sizeof(struct semid_ds));
-#endif
 		rval = IXSEQ_TO_IPCID(semid,semaptr->sem_perm);
 		if (error == 0)
 			td->td_retval[0] = rval;
@@ -747,14 +678,9 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 		break;
 
 	case IPC_SET:
-		if ((error = copyin(arg, &real_arg, arg_size)) != 0)
+		if ((error = copyin(arg, &real_arg, sizeof(real_arg))) != 0)
 			goto done2;
-#ifdef __CYGWIN__
-		error = copyin_semid_ds(td, real_arg.buf, &sbuf);
-#else
-		error = copyin(real_arg.buf, &sbuf, sizeof(sbuf));
-#endif
-		if (error != 0)
+		if ((error = copyin(real_arg.buf, &sbuf, sizeof(sbuf))) != 0)
 			goto done2;
 		mtx_lock(sema_mtxp);
 		if ((error = semvalid(uap->semid, semaptr)) != 0)
@@ -769,7 +695,7 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 		break;
 
 	case IPC_STAT:
-		if ((error = copyin(arg, &real_arg, arg_size)) != 0)
+		if ((error = copyin(arg, &real_arg, sizeof(real_arg))) != 0)
 			goto done2;
 		mtx_lock(sema_mtxp);
 		if ((error = semvalid(uap->semid, semaptr)) != 0)
@@ -778,12 +704,8 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 			goto done2;
 		sbuf = *semaptr;
 		mtx_unlock(sema_mtxp);
-#ifdef __CYGWIN__
-		error = copyout_semid_ds (td, semaptr, real_arg.buf, 1);
-#else
 		error = copyout(semaptr, real_arg.buf,
 				sizeof(struct semid_ds));
-#endif
 		break;
 
 	case GETNCNT:
@@ -826,11 +748,10 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 		break;
 
 	case GETALL:
-		if ((error = copyin(arg, &real_arg, arg_size)) != 0)
+		if ((error = copyin(arg, &real_arg, sizeof(real_arg))) != 0)
 			goto done2;
-		array = (u_short *) sys_malloc(sizeof(*array)
-					       * semaptr->sem_nsems,
-					       M_TEMP, M_WAITOK);
+		array = (u_short *) sys_malloc(sizeof(*array) * semaptr->sem_nsems, M_TEMP,
+		    M_WAITOK);
 		mtx_lock(sema_mtxp);
 		if ((error = semvalid(uap->semid, semaptr)) != 0)
 			goto done2;
@@ -857,7 +778,7 @@ __semctl(struct thread *td, struct __semctl_args *uap)
 		break;
 
 	case SETVAL:
-		if ((error = copyin(arg, &real_arg, arg_size)) != 0)
+		if ((error = copyin(arg, &real_arg, sizeof(real_arg))) != 0)
 			goto done2;
 		mtx_lock(sema_mtxp);
 		if ((error = semvalid(uap->semid, semaptr)) != 0)
@@ -886,7 +807,7 @@ raced:
 			goto done2;
 		count = semaptr->sem_nsems;
 		mtx_unlock(sema_mtxp);
-		if ((error = copyin(arg, &real_arg, arg_size)) != 0)
+		if ((error = copyin(arg, &real_arg, sizeof(real_arg))) != 0)
 			goto done2;
 		array = (u_short *) sys_malloc(sizeof(*array) * count, M_TEMP, M_WAITOK);
 		error = copyin(real_arg.array, array, count * sizeof(*array));

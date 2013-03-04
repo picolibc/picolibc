@@ -348,64 +348,6 @@ struct msgctl_args {
 };
 #endif
 
-#ifdef __CYGWIN__
-    /* The following code implements copyin and copyout for msqid_ds structs
-       on Cygwin.  On 32 bit it's just copyin/copyout.  On 64 bit it depends
-       on the client process.  A 64 bit client gets a direct copy, for a 32
-       bit process cygserver has to convert the datastructure. */
-# ifdef __x86_64__
-    static inline int
-    copyin_msqid_ds (thread *td, msqid_ds *src, msqid_ds *tgt)
-    {
-      if (td->ipcblk->is_64bit)
-	return copyin (src, tgt, sizeof (msqid_ds));
-      _msqid_ds32 buf;
-      int err = copyin (src, &buf, sizeof (_msqid_ds32));
-      if (!err)
-	{
-	  memcpy (tgt, &buf, offsetof (struct msqid_ds, msg_stim));
-	  conv_timespec32_to_timespec (&buf.msg_stim, &tgt->msg_stim);
-	  conv_timespec32_to_timespec (&buf.msg_rtim, &tgt->msg_rtim);
-	  conv_timespec32_to_timespec (&buf.msg_ctim, &tgt->msg_ctim);
-	  tgt->msg_first = tgt->msg_last = NULL;
-	}
-      return err;
-    }
-
-    static inline int
-    copyout_msqid_ds (thread *td, msqid_ds *src, msqid_ds *tgt, int cnt)
-    {
-      if (td->ipcblk->is_64bit)
-      	return copyout (src, tgt, cnt * sizeof (msqid_ds));
-      _msqid_ds32 buf;
-      _msqid_ds32 *dest = (_msqid_ds32 *) tgt;
-      int err;
-      for (err = 0; !err && cnt-- > 0; ++src, ++dest)
-      	{
-	  memcpy (&buf, src, offsetof (struct msqid_ds, msg_stim));
-	  conv_timespec_to_timespec32 (&src->msg_stim, &buf.msg_stim);
-	  conv_timespec_to_timespec32 (&src->msg_rtim, &buf.msg_rtim);
-	  conv_timespec_to_timespec32 (&src->msg_ctim, &buf.msg_ctim);
-	  buf.msg_spare4 = 0;
-	  err = copyout (&buf, dest, sizeof (_msqid_ds32));
-	}
-      return err;
-    }
-# else
-    static inline int
-    copyin_msqid_ds (thread *td, msqid_ds *src, msqid_ds *tgt)
-    {
-      return copyin (src, tgt, sizeof (msqid_ds));
-    }
-
-    static inline int
-    copyout_msqid_ds (thread *td, msqid_ds *src, msqid_ds *tgt, int cnt)
-    {
-      return copyout (src, tgt, cnt * sizeof (msqid_ds));
-    }
-# endif
-#endif
-
 /*
  * MPSAFE
  */
@@ -434,7 +376,8 @@ msgctl(struct thread *td, struct msgctl_args *uap)
 		}
 		if (msqid > msginfo.msgmni)
 			msqid = msginfo.msgmni;
-		error = copyout_msqid_ds(td, msqids, user_msqptr, msqid);
+		error = copyout(msqids, user_msqptr,
+				msqid * sizeof(struct msqid_ds));
 		td->td_retval[0] = error ? -1 : 0;
 		return (error);
 	} else if (cmd == MSG_INFO) {
@@ -453,15 +396,9 @@ msgctl(struct thread *td, struct msgctl_args *uap)
 		    msginfo.msgmni));
 		return (EINVAL);
 	}
-#ifdef __CYGWIN__
-	if (cmd == IPC_SET &&
-	    (error = copyin_msqid_ds(td, user_msqptr, &msqbuf)) != 0)
-		return (error);
-#else
 	if (cmd == IPC_SET &&
 	    (error = copyin(user_msqptr, &msqbuf, sizeof(msqbuf))) != 0)
 		return (error);
-#endif
 
 	msqptr = &msqids[msqid];
 
@@ -559,11 +496,7 @@ msgctl(struct thread *td, struct msgctl_args *uap)
 done2:
 	mtx_unlock(&msq_mtx);
 	if (cmd == IPC_STAT && error == 0)
-#ifdef __CYGWIN__
-		error = copyout_msqid_ds(td, msqptr, user_msqptr, 1);
-#else
 		error = copyout(msqptr, user_msqptr, sizeof(struct msqid_ds));
-#endif
 	return(error);
 }
 
@@ -881,17 +814,8 @@ msgsnd(struct thread *td, struct msgsnd_args *uap)
 	 */
 
 	mtx_unlock(&msq_mtx);
-#if defined (__CYGWIN__) && defined (__x86_64__)
-	if (!td->ipcblk->is_64bit)
-	  {
-	    msghdr->msg_type = 0;
-	    error = copyin(user_msgp, &msghdr->msg_type, sizeof (int32_t));
-	  }
-	else
-#endif
-	  error = copyin(user_msgp, &msghdr->msg_type,
-			 sizeof(msghdr->msg_type));
-	if (error != 0) {
+	if ((error = copyin(user_msgp, &msghdr->msg_type,
+	    sizeof(msghdr->msg_type))) != 0) {
 		mtx_lock(&msq_mtx);
 		DPRINTF(("error %d copying the message type\n", error));
 		msg_freehdr(msghdr);
@@ -1210,15 +1134,8 @@ msgrcv(struct thread *td, struct msgrcv_args *uap)
 	 */
 
 	mtx_unlock(&msq_mtx);
-#if defined (__CYGWIN__) && defined (__x86_64__)
-	/* Make sure to strip off the high 4 bytes when copying to a
-	   32 bit process. */
-	if (!td->ipcblk->is_64bit)
-	  error = copyout(&(msghdr->msg_type), user_msgp, sizeof (int));
-	else
-#endif
 	error = copyout(&(msghdr->msg_type), user_msgp,
-			sizeof(msghdr->msg_type));
+	    sizeof(msghdr->msg_type));
 	mtx_lock(&msq_mtx);
 	if (error != 0) {
 		DPRINTF(("error (%d) copying out message type\n", error));

@@ -1,6 +1,6 @@
 /* client.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2008, 2009, 2012 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2008, 2009, 2012, 2013 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -119,7 +119,7 @@ client_request::header_t::header_t (const request_code_t request_code,
   : request_code (request_code)
 {
   assert (request_code >= 0 && request_code < CYGSERVER_REQUEST_LAST);
-  msglen (len);
+  msglen = len;
 }
 
 // FIXME: also check write and read result for -1.
@@ -301,7 +301,7 @@ client_request::handle_request (transport_layer_base *const conn,
 
   assert (req);
 
-  req->msglen (header.msglen ());
+  req->msglen (header.msglen);
   req->handle (conn, cache);
 
   delete req;
@@ -439,13 +439,6 @@ client_request::client_request (request_code_t const id,
     _buflen (buflen)
 {
   assert ((!_buf && !_buflen) || (_buf && _buflen));
-  /* We're using the same structure on 32 and 64 bit.  On 64 bit, some
-     datatypes are taking more space, though.  Since 32 bit clients will
-     only write half of these values, the other half must be zeroed out,
-     so that a 64 bit cygserver doesn't get random values in the higher
-     32 bits of these values.  The easiest way to accomplish this is to
-     zero out the entire parameter block before writing to it. */
-  memset (_buf, 0, _buflen);
 }
 
 client_request::~client_request ()
