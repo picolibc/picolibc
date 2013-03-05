@@ -1,6 +1,7 @@
 /* _cygwin_crt0_common.cc: common crt0 function for cygwin crt0's.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2009, 2010, 2011, 2012, 2013
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -47,7 +48,9 @@ extern int __dynamically_loaded;
 
 extern "C"
 {
+#ifndef __x86_64__
 char **environ;
+#endif
 int _fmode;
 
 extern char __RUNTIME_PSEUDO_RELOC_LIST__;
@@ -98,7 +101,9 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
 
   u->ctors = &__CTOR_LIST__;
   u->dtors = &__DTOR_LIST__;
+#ifndef __x86_64__
   u->envptr = &environ;
+#endif
   if (uwasnull)
     _impure_ptr = u->impure_ptr;	/* Use field initialized in newer DLLs. */
   else

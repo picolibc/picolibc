@@ -145,7 +145,9 @@ extern "C" {
   /* This is an exported copy of environ which can be used by DLLs
      which use cygwin.dll.  */
   char **__cygwin_environ;
+#ifndef __x86_64__
   char ***main_environ = &__cygwin_environ;
+#endif
   /* __progname used in getopt error message */
   char *__progname;
   char *program_invocation_name;
@@ -155,7 +157,10 @@ extern "C" {
   {/* initial_sp */ 0, /* magic_biscuit */ 0,
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
    /* dll_major */ CYGWIN_VERSION_DLL_MINOR,
-   /* impure_ptr_ptr */ NULL, /* envptr */ NULL,
+   /* impure_ptr_ptr */ NULL,
+#ifndef __x86_64__
+   /* envptr */ NULL,
+#endif
    /* malloc */ malloc, /* free */ free,
    /* realloc */ realloc,
    /* fmode_ptr */ NULL, /* main */ NULL, /* ctors */ NULL,

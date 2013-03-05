@@ -1025,7 +1025,11 @@ dll_crt0_1 (void *)
       /* Handle any signals which may have arrived */
       _my_tls.call_signal_handler ();
       _my_tls.incyg--;	/* Not in Cygwin anymore */
+#ifdef __x86_64__
+      cygwin_exit (user_data->main (__argc, newargv, __cygwin_environ));
+#else
       cygwin_exit (user_data->main (__argc, newargv, *user_data->envptr));
+#endif
     }
   __asm__ ("				\n\
 	.global _cygwin_exit_return	\n\
@@ -1072,7 +1076,9 @@ _dll_crt0 ()
     }
 #endif /* !__x86_64__ */
   _feinitialise ();
+#ifndef __x86_64__
   main_environ = user_data->envptr;
+#endif
   if (in_forkee)
     {
       fork_info->alloc_stack ();
@@ -1105,12 +1111,16 @@ dll_crt0 (per_process *uptr)
 extern "C" void
 cygwin_dll_init ()
 {
+#ifndef __x86_64__
   static char **envp;
+#endif
   static int _fmode;
 
   user_data->magic_biscuit = sizeof (per_process);
 
+#ifndef __x86_64__
   user_data->envptr = &envp;
+#endif
   user_data->fmode_ptr = &_fmode;
 
   _dll_crt0 ();

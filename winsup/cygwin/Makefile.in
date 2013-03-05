@@ -77,6 +77,9 @@ MT_SAFE:=@MT_SAFE@
 DEFS:=@DEFS@
 CCEXTRA=
 COMMON_CFLAGS=-MMD ${$(*F)_CFLAGS} -Werror -fmerge-constants -ftracer $(CCEXTRA)
+ifeq ($(target_cpu),x86_64)
+COMMON_CFLAGS+=-mcmodel=small
+endif
 COMPILE.cc+=${COMMON_CFLAGS} -mno-use-libstdc-wrappers
 COMPILE.c+=${COMMON_CFLAGS}
 

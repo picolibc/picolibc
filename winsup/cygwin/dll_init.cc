@@ -1,7 +1,7 @@
 /* dll_init.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -243,7 +243,9 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 	loaded_dlls++;
     }
   guard (false);
+#ifndef __x86_64__
   assert (p->envptr != NULL);
+#endif
   return d;
 }
 
@@ -715,8 +717,10 @@ dlfork (int val)
 void __stdcall
 update_envptrs ()
 {
+#ifndef __x86_64__
   for (dll *d = dlls.istart (DLL_ANY); d; d = dlls.inext ())
     if (*(d->p.envptr) != __cygwin_environ)
       *(d->p.envptr) = __cygwin_environ;
   *main_environ = __cygwin_environ;
+#endif
 }

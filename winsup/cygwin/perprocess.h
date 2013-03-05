@@ -1,6 +1,6 @@
 /* per_process.h: main Cygwin header file.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -22,7 +22,7 @@ extern struct per_process __cygwin_user_data;
    or deleting members, insert fillers or use the reserved entries.
    Do not change this value. */
 #ifdef __x86_64__
-#define SIZEOF_PER_PROCESS (42 * 8)
+#define SIZEOF_PER_PROCESS (41 * 8)
 #else
 #define SIZEOF_PER_PROCESS (42 * 4)
 #endif

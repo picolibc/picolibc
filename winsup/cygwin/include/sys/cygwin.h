@@ -1,7 +1,7 @@
 /* sys/cygwin.h
 
    Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -263,7 +263,9 @@ struct per_process
   uint32_t dll_minor;
 
   struct _reent **impure_ptr_ptr;
+#ifndef __x86_64__
   char ***envptr;
+#endif
 
   /* Used to point to the memory machine we should use.  Usually these
      point back into the dll, but they can be overridden by the user. */

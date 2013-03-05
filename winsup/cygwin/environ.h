@@ -36,8 +36,13 @@ win_env * __reg3 getwinenv (const char *name, const char *posix = NULL, win_env 
 char * __reg3 getwinenveq (const char *name, size_t len, int);
 
 void __stdcall update_envptrs ();
+#ifdef __x86_64__
+extern "C" char **__cygwin_environ;
+#define cur_environ()  __cygwin_environ
+#else
 extern "C" char **__cygwin_environ, ***main_environ;
 extern "C" char __stdcall **cur_environ ();
+#endif
 char ** __reg3 build_env (const char * const *envp, PWCHAR &envblock,
 			     int &envc, bool need_envblock);
 

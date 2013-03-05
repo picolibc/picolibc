@@ -1,3 +1,27 @@
+2013-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	For x86_64 target:
+	* Makefile.in (COMMON_CFLAGS): Add -mcmodel=small to create smaller
+	footprint.
+	* cygwin64.din (__cygwin_environ): Drop export.  Only export environ
+	as alias to __cygwin_environ.
+	* dcrt0.cc (dll_crt0_1): Call main with __cygwin_environ as parameter.
+	(_dll_crt0): Don't set main_environ.
+	(cygwin_dll_init): Don't create local variable envp and don't set
+	user_data->envptr.
+	* dll_init.cc (dll_list::alloc): Don't assert.
+	* dll_init.h (per_module::operator =): Don't set envptr.
+	* environ.cc (cur_environ): Disable.
+	* environ.h (main_environ): Don't define.
+	(cur_environ): Change to macro.
+	* globals.cc (main_environ): Don't initialize.
+	(struct per_process): Drop envptr.
+	* perprocess.h (SIZEOF_PER_PROCESS): Set to 41*8 to accommodate size
+	change of struct per_process.
+	* include/sys/cygwin.h (struct per_process): Drop envptr.
+	* lib/_cygwin_crt0_common.cc (environ): Drop declaration.
+	(_cygwin_crt0_common): Don't set u->envptr.
+
 2013-03-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* cygwin64.din: Fix mangled operator new names for size_t==long.

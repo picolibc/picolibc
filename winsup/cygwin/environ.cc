@@ -1118,6 +1118,7 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
   return newenv;
 }
 
+#ifndef __x86_64__
 /* This idiocy is necessary because the early implementers of cygwin
    did not seem to know about importing data variables from the DLL.
    So, we have to synchronize cygwin's idea of the environment with the
@@ -1133,3 +1134,4 @@ cur_environ ()
 
   return __cygwin_environ;
 }
+#endif
