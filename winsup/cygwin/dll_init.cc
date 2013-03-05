@@ -86,11 +86,13 @@ dll::init ()
 {
   int ret = 1;
 
+#ifndef __x86_64__
   /* This should be a no-op.  Why didn't we just import this variable? */
   if (!p.envptr)
     p.envptr = &__cygwin_environ;
   else if (*(p.envptr) != __cygwin_environ)
     *(p.envptr) = __cygwin_environ;
+#endif
 
   /* Don't run constructors or the "main" if we've forked. */
   if (!in_forkee)
@@ -711,16 +713,16 @@ dlfork (int val)
   dlls.reload_on_fork = val;
 }
 
+#ifndef __x86_64__
 /* Called from various places to update all of the individual
    ideas of the environ block.  Explain to me again why we didn't
    just import __cygwin_environ? */
 void __stdcall
 update_envptrs ()
 {
-#ifndef __x86_64__
   for (dll *d = dlls.istart (DLL_ANY); d; d = dlls.inext ())
     if (*(d->p.envptr) != __cygwin_environ)
       *(d->p.envptr) = __cygwin_environ;
   *main_environ = __cygwin_environ;
-#endif
 }
+#endif

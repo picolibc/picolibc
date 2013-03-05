@@ -1,6 +1,14 @@
 2013-03-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	For x86_64 target:
+	* dll_init.cc (dll::init): Don't set p.envptr.
+	(update_envptrs): Disable entirely.
+	* dll_init.h (struct per_module): Disable envptr.
+	* environ.h (update_envptrs): Change to empty macro.
+
+2013-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	For x86_64 target:
 	* Makefile.in (COMMON_CFLAGS): Add -mcmodel=small to create smaller
 	footprint.
 	* cygwin64.din (__cygwin_environ): Drop export.  Only export environ

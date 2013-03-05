@@ -11,7 +11,9 @@ details. */
 
 struct per_module
 {
+#ifndef __x86_64__
   char ***envptr;
+#endif
   void (**ctors)(void);
   void (**dtors)(void);
   void *data_start;
