@@ -942,7 +942,7 @@ Emacs or XEmacs from Cygwin Setup.
 </answer></qandaentry>
 
 <qandaentry id="faq.using.symlinkstoppedworking">
-<question><para>Why do some of my old symlinks don't work anymore?</para></question>
+<question><para>Why don't some of my old symlinks work anymore?</para></question>
 <answer>
 
 <para>Beginning with Cygwin 1.7, Cygwin supports multiple character sets.
@@ -960,7 +960,7 @@ set you're using in future.</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.symlinks-samba">
-<question><para>Why don't symlinks work on samba-mounted filesystems?</para></question>
+<question><para>Why don't symlinks work on Samba-mounted filesystems?</para></question>
 <answer>
 
 <para>Symlinks are marked with "system" file attribute.  Samba does not

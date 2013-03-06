@@ -1,3 +1,7 @@
+2013-03-06  Anthony Geoghegan <anthony.geoghegan@gmail.com>
+
+	* faq-using.xml: Fix expression and uppercase Samba.
+
 2013-02-13  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* pathnames.sgml: Remove stray '@'.
