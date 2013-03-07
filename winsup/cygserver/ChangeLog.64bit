@@ -1,3 +1,10 @@
+2013-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* msg.cc (client_request_msg::serve): Revert change to refuse 64 bit
+	processes on 32 bit systems.
+	* sem.cc (client_request_sem::serve): Ditto.
+	* shm.cc (client_request_shm::serve): Ditto.
+
 2013-03-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* client.cc: Revert changes to handle 32 bit processes on 64 bit
