@@ -1,3 +1,8 @@
+2013-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* heap.cc (heap_init): Fix setting reserved_size value when using
+	ptmalloc3 to avoid too much pagefile pressure at fork time.
+
 2013-03-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	For x86_64 target:
