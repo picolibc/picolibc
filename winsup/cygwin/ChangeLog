@@ -1,3 +1,12 @@
+2013-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::bind): Fix check for AF_LOCAL
+	filename length to allow non-NUL terminated strings within namelen
+	bytes.  Copy over sun_path to local array sun_path to have a
+	NUL-terminated string for subsequent function calls.  Move path_conv
+	check before OS bind call to not bind the socket before being sure
+	the file doesn't exist.  Add and fix comments.
+
 2013-03-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (fs_names): Add trailing NULL element to avoid potential
