@@ -904,13 +904,37 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       struct sockaddr_in sin;
       int len = namelen - offsetof (struct sockaddr_un, sun_path);
 
-      /* Check that name is within bounds and NUL-terminated. */
-      if (len <= 1 || len > UNIX_PATH_LEN
-	  || !memchr (un_addr->sun_path, '\0', len))
+      /* Check that name is within bounds.  Don't check if the string is
+         NUL-terminated, because there are projects out there which set
+	 namelen to a value which doesn't cover the trailing NUL. */
+      if (len <= 1 || (len = strnlen (un_addr->sun_path, len)) > UNIX_PATH_LEN)
 	{
 	  set_errno (len <= 1 ? (len == 1 ? ENOENT : EINVAL) : ENAMETOOLONG);
 	  goto out;
 	}
+      /* Copy over the sun_path string into a buffer big enough to add a
+	 trailing NUL. */
+      char sun_path[len + 1];
+      strncpy (sun_path, un_addr->sun_path, len);
+      sun_path[len] = '\0';
+
+      /* This isn't entirely foolproof, but we check first if the file exists
+	 so we can return with EADDRINUSE before having bound the socket.
+	 This allows an application to call bind again on the same socket using
+	 another filename.  If we bind first, the application will not be able
+	 to call bind successfully ever again. */
+      path_conv pc (sun_path, PC_SYM_FOLLOW);
+      if (pc.error)
+	{
+	  set_errno (pc.error);
+	  goto out;
+	}
+      if (pc.exists ())
+	{
+	  set_errno (EADDRINUSE);
+	  goto out;
+	}
+
       sin.sin_family = AF_INET;
       sin.sin_port = 0;
       sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
@@ -930,17 +954,6 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       sin.sin_port = ntohs (sin.sin_port);
       debug_printf ("AF_LOCAL: socket bound to port %u", sin.sin_port);
 
-      path_conv pc (un_addr->sun_path, PC_SYM_FOLLOW);
-      if (pc.error)
-	{
-	  set_errno (pc.error);
-	  goto out;
-	}
-      if (pc.exists ())
-	{
-	  set_errno (EADDRINUSE);
-	  goto out;
-	}
       mode_t mode = adjust_socket_file_mode ((S_IRWXU | S_IRWXG | S_IRWXO)
 					     & ~cygheap->umask);
       DWORD fattr = FILE_ATTRIBUTE_SYSTEM;
@@ -1001,7 +1014,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	    }
 	  else
 	    {
-	      set_sun_path (un_addr->sun_path);
+	      set_sun_path (sun_path);
 	      res = 0;
 	    }
 	  NtClose (fh);
