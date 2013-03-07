@@ -907,7 +907,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       /* Check that name is within bounds.  Don't check if the string is
          NUL-terminated, because there are projects out there which set
 	 namelen to a value which doesn't cover the trailing NUL. */
-      if (len <= 1 || (len = strnlen (un_addr->sun_path, len)) > UNIX_PATH_LEN)
+      if (len <= 1 || (len = strnlen (un_addr->sun_path, len)) > UNIX_PATH_MAX)
 	{
 	  set_errno (len <= 1 ? (len == 1 ? ENOENT : EINVAL) : ENAMETOOLONG);
 	  goto out;
@@ -1251,7 +1251,7 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
       sun.sun_family = AF_LOCAL;
       sun.sun_path[0] = '\0';
       if (get_sun_path ())
-	strncat (sun.sun_path, get_sun_path (), UNIX_PATH_LEN - 1);
+	strncat (sun.sun_path, get_sun_path (), UNIX_PATH_MAX - 1);
       memcpy (name, &sun, MIN (*namelen, (int) SUN_LEN (&sun) + 1));
       *namelen = (int) SUN_LEN (&sun) + (get_sun_path () ? 1 : 0);
       res = 0;
@@ -1325,7 +1325,7 @@ fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
       sun.sun_family = AF_LOCAL;
       sun.sun_path[0] = '\0';
       if (get_peer_sun_path ())
-	strncat (sun.sun_path, get_peer_sun_path (), UNIX_PATH_LEN - 1);
+	strncat (sun.sun_path, get_peer_sun_path (), UNIX_PATH_MAX - 1);
       memcpy (name, &sun, MIN (*namelen, (int) SUN_LEN (&sun) + 1));
       *namelen = (int) SUN_LEN (&sun) + (get_peer_sun_path () ? 1 : 0);
     }
@@ -1361,6 +1361,7 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
   LPWSABUF &wsabuf = wsamsg->lpBuffers;
   ULONG &wsacnt = wsamsg->dwBufferCount;
   static NO_COPY LPFN_WSARECVMSG WSARecvMsg;
+  int orig_namelen = wsamsg->namelen;
 
   DWORD wait_flags = wsamsg->dwFlags;
   bool waitall = !!(wait_flags & MSG_WAITALL);
@@ -1457,17 +1458,43 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
       /* According to SUSv3, errno isn't set in that case and no error
 	 condition is returned. */
       if (WSAGetLastError () == WSAEMSGSIZE)
-	return ret + wret;
-
-      if (!ret)
+	ret += wret;
+      else if (!ret)
 	{
 	  /* ESHUTDOWN isn't defined for recv in SUSv3.  Simply EOF is returned
 	     in this case. */
 	  if (WSAGetLastError () == WSAESHUTDOWN)
-	    return 0;
+	    ret = 0;
+	  else
+	    {
+	      set_winsock_errno ();
+	      return SOCKET_ERROR;
+	    }
+	}
+    }
 
-	  set_winsock_errno ();
-	  return SOCKET_ERROR;
+  if (get_addr_family () == AF_LOCAL && wsamsg->name != NULL
+      && orig_namelen >= (int) sizeof (sa_family_t))
+    {
+      /* WSARecvFrom copied the sockaddr_in block to wsamsg->name.
+	 We have to overwrite it with a sockaddr_un block. */
+      sockaddr_un *un = (sockaddr_un *) wsamsg->name;
+      un->sun_family = AF_LOCAL;
+      int len = orig_namelen - offsetof (struct sockaddr_un, sun_path);
+      if (len > 0)
+      	{
+	  if (!get_peer_sun_path ())
+	    wsamsg->namelen = sizeof (sa_family_t);
+	  else
+	    {
+	      memset (un->sun_path, 0, len);
+	      strncpy (un->sun_path, get_peer_sun_path (), len);
+	      if (un->sun_path[len - 1] == '\0')
+		len = strlen (un->sun_path) + 1;
+	      if (len > UNIX_PATH_MAX)
+		len = UNIX_PATH_MAX;
+	      wsamsg->namelen = offsetof (struct sockaddr_un, sun_path) + len;
+	    }
 	}
     }
 

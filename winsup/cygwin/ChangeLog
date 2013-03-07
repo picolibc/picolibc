@@ -1,5 +1,14 @@
 2013-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/sys/un.h (UNIX_PATH_MAX): Rename from UNIX_PATH_LEN to
+	follow Linux.
+	* fhandler_socket.cc: Change UNIX_PATH_LEN to UNIX_PATH_MAX throughout.
+	(fhandler_socket::recv_internal): Don't return prematurely in case of
+	successful return.  For AF_LOCAL sockets, overwrite returned AF_INET
+	name with AF_LOCAL name.
+
+2013-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::bind): Fix check for AF_LOCAL
 	filename length to allow non-NUL terminated strings within namelen
 	bytes.  Copy over sun_path to local array sun_path to have a
