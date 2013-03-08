@@ -1,3 +1,7 @@
+2013-03-08  Andreas Arnez  <arnez@linux.vnet.ibm.com>
+
+	* common.h (NT_S390_TDB): Define.
+
 2013-02-06  Sandra Loosemore  <sandra@codesourcery.com>
             Andrew Jenner <andrew@codesourcery.com>
 

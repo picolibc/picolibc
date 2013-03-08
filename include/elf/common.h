@@ -1,8 +1,5 @@
 /* ELF support for BFD.
-   Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
-   2013
-   Free Software Foundation, Inc.
+   Copyright 1991-2013 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
@@ -551,6 +548,8 @@
 #define NT_S390_LAST_BREAK      0x306   /* S390 breaking event address */
 					/*   note name must be "LINUX".  */
 #define NT_S390_SYSTEM_CALL     0x307   /* S390 system call restart data */
+					/*   note name must be "LINUX".  */
+#define NT_S390_TDB	0x308		/* S390 transaction diagnostic block */
 					/*   note name must be "LINUX".  */
 #define NT_ARM_VFP	0x400		/* ARM VFP registers */
 /* The following definitions should really use NT_AARCH_..., but defined
