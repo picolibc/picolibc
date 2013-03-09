@@ -1,3 +1,9 @@
+2013-03-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* spawn.cc (child_info_spawn::worker): Save and restore my_wr_proc_pipe
+	around non-execing operations to avoid handle leak seen in
+	http://cygwin.com/ml/cygwin/2013-03/msg00152.html .
+
 2013-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/un.h (UNIX_PATH_MAX): Rename from UNIX_PATH_LEN to
