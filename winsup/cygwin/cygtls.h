@@ -219,8 +219,7 @@ public:
   void __reg3 interrupt_setup (siginfo_t&, void *, struct sigaction&);
 
   bool inside_kernel (CONTEXT *);
-  void __reg2 copy_context (CONTEXT *);
-  void __reg2 signal_debugger (int);
+  void __reg2 signal_debugger (siginfo_t&);
 
 #ifdef CYGTLS_HANDLE
   operator HANDLE () const {return tid ? tid->win32_obj_id : NULL;}

@@ -606,8 +606,6 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	break;
       }
 
-  me.copy_context (in);
-
   /* Temporarily replace windows top level SEH with our own handler.
      We don't want any Windows magic kicking in.  This top level frame
      will be removed automatically after our exception handler returns. */
@@ -1162,6 +1160,10 @@ sigpacket::process ()
       sigproc_printf ("using tls %p", tls);
     }
 
+  /* Do stuff for gdb */
+  if ((HANDLE) *tls)
+    tls->signal_debugger (si);
+
   void *handler = have_execed ? NULL : (void *) thissig.sa_handler;
 
   if (handler == SIG_IGN)
@@ -1233,18 +1235,6 @@ dosig:
     }
 
 dispatch_sig:
-  /* Do stuff for gdb */
-  if (si.si_code == SI_USER || !si.si_cyg)
-    {
-      CONTEXT c;
-      c.ContextFlags = CONTEXT_FULL;
-      GetThreadContext (hMainThread, &c);
-      _my_tls.copy_context (&c);
-
-      /* Tell gdb that we got a signal. Presumably, gdb already noticed this
-         if we hit an exception.  */
-      _my_tls.signal_debugger (si.si_signo);
-    }
   if (have_execed)
     {
       sigproc_printf ("terminating captive process");
@@ -1312,18 +1302,37 @@ _cygtls::call_signal_handler ()
 }
 
 void
-_cygtls::copy_context (CONTEXT *c)
+_cygtls::signal_debugger (siginfo_t& si)
 {
-  memcpy (&thread_context, c, (&thread_context._internal - (unsigned char *) &thread_context));
-}
-
-void
-_cygtls::signal_debugger (int sig)
-{
+  HANDLE th = NULL;
   if (isinitialized () && being_debugged ())
     {
+      CONTEXT c;
+      CONTEXT *pc;
+
+      if (si.si_cyg)
+	pc = ((cygwin_exception *) si.si_cyg)->context ();
+      else if (!(th = (HANDLE) *this))
+	return;
+      else
+	{
+	  SuspendThread (th);
+	  c.ContextFlags = CONTEXT_FULL;
+	  if (GetThreadContext (th, &c))
+	    pc = &c;
+	  else
+	    goto out;
+	  if (incyg)
+	    c.Eip = retaddr ();
+	}
+      memcpy (&thread_context, pc, (&thread_context._internal -
+				   (unsigned char *) &thread_context));
       char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffff")];
-      __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %p %p", sig, thread_id, &thread_context);
+      __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %p %p", si.si_signo,
+		       thread_id, &thread_context);
       OutputDebugString (sigmsg);
     }
+out:
+    if (th)
+      ResumeThread (th);
 }

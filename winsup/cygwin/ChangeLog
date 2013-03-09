@@ -1,3 +1,13 @@
+2013-03-09  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* cygtls.h (_cygtls::signal_debugger): Change argument type.
+	(_cygtls::copy_context): Delete declaration.
+	* exceptions.cc (exception::handle): Don't call copy_context() here.
+	Move signal_handler call earlier and always call it.  
+	(_cygtls::copy_context): Delete definition.
+	(_cygtls::signal_debugger): Move copy_context logic here.  Suspend
+	thread receiving signal before gathering context information.
+
 2013-03-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* spawn.cc (child_info_spawn::worker): Save and restore my_wr_proc_pipe
