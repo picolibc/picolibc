@@ -1,5 +1,10 @@
 2013-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::raw_read): Replace accidentally left in
+	Win32 error codes with equivalent status codes.
+
+2013-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygmalloc.h: Include regparm.h rather than defining __reg{1,2,3} here.
 	* ptmalloc3.cc (__malloc_initialized): Define as type LONG on Cygwin
 	and include windows.h.

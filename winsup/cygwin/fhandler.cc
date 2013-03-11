@@ -263,9 +263,9 @@ retry:
 		}
 	    }
 	  /*FALLTHRU*/
-	case ERROR_INVALID_FUNCTION:
-	case ERROR_INVALID_PARAMETER:
-	case ERROR_INVALID_HANDLE:
+	case STATUS_INVALID_DEVICE_REQUEST:
+	case STATUS_INVALID_PARAMETER:
+	case STATUS_INVALID_HANDLE:
 	  if (pc.isdir ())
 	    {
 	      set_errno (EISDIR);
