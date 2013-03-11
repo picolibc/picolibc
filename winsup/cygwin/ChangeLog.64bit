@@ -1,3 +1,8 @@
+2013-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef: Add SEH information to sigfe entry points, as well as to
+	_sigfe and _sigbe.
+
 2013-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* heap.cc (heap_init): Fix setting reserved_size value when using

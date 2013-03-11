@@ -104,10 +104,14 @@ sub fefunc {
 	$res = <<EOF;
 	.extern	$func
 	.global	$fe
+	.seh_proc $fe
 $fe:
 	leaq	$func(%rip),%r10
 	pushq	%r10
+	.seh_pushreg %r10
+	.seh_endprologue
 	jmp	$sigfe_func
+	.seh_endproc
 
 EOF
     } else {
@@ -125,8 +129,11 @@ EOF
 	  $res = <<EOF . longjmp () . $res;
 	.text
 
+	.seh_proc _sigfe_maybe
 _sigfe_maybe:
 	pushq	%r12
+	.seh_pushreg %r12
+	.seh_endprologue
 	movq	%gs:8,%r12			# location of bottom of stack
 	addq	\$$tls::initialized,%r12	# where we will be looking
 	cmpq	%r12,%rsp			# stack loc > than tls
@@ -138,9 +145,13 @@ _sigfe_maybe:
 0:
 	popq	%r12
 	ret
+	.seh_endproc
 
+	.seh_proc _sigfe
 _sigfe:						# stack is aligned on entry!
 	pushq	%r12
+	.seh_pushreg %r12
+	.seh_endprologue
 	movq	%gs:8,%r12			# location of bottom of stack
 1:	movl	\$1,%r11d			# potential lock value
 	xchgl	%r11d,$tls::stacklock(%r12)	# see if we can grab it
@@ -161,11 +172,16 @@ _sigfe:						# stack is aligned on entry!
 	popq	%r12				# restore saved value
 	popq	%rax				# pop real function address from stack
 	jmp	*%rax				# and jmp to it
+	.seh_endproc
 
+	.seh_proc _sigfe
 _sigbe:						# return here after cygwin syscall
 						# stack is aligned on entry!
 	pushq	%rax				# don't clobber
+	.seh_pushreg %rax
 	pushq	%r12				# tls pointer
+	.seh_pushreg %r12
+	.seh_endprologue
 	movq	%gs:8,%r12			# address of bottom of tls
 1:	movl	\$1,%r11d			# potential lock value
 	xchgl	%r11d,$tls::stacklock(%r12)	# see if we can grab it
@@ -184,6 +200,7 @@ _sigbe:						# return here after cygwin syscall
 	popq	%r12
 	popq	%rax				# restore return value
 	jmp	*%r11				# "return" to caller
+	.seh_endproc
 
 	.global	sigdelayed
 	.seh_proc sigdelayed
