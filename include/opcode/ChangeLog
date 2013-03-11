@@ -1,3 +1,8 @@
+2013-03-11  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* arm.h (CRC_EXT_ARMV8): New constant.
+	(ARCH_CRC_ARMV8): New macro.
+
 2013-02-28  Yufeng Zhang  <yufeng.zhang@arm.com>
 
 	* aarch64.h (AARCH64_FEATURE_CRC): New macro.
