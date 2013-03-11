@@ -88,7 +88,12 @@ PERFORMANCE OF THIS SOFTWARE.
 #define my_powerof2(x) ((((x)-1)&(x))==0)
 
 /* Already initialized? */
+#ifdef __CYGWIN__
+#include <windows.h>
+LONG __malloc_initialized = -1;
+#else
 int __malloc_initialized = -1;
+#endif
 
 #ifndef RETURN_ADDRESS
 # define RETURN_ADDRESS(X_) (NULL)
@@ -672,7 +677,15 @@ ptmalloc_init(void)
   void *mspace __attribute__ ((unused));
 
   if(__malloc_initialized >= 0) return;
+#ifdef __CYGWIN__
+  LONG ret;
+  while ((ret = InterlockedCompareExchange (&__malloc_initialized, 0, -1)) == 0)
+    Sleep (10);
+  if (ret != -1)
+    return;
+#else
   __malloc_initialized = 0;
+#endif
 
   /*if (mp_.pagesize == 0)
     ptmalloc_init_minimal();*/

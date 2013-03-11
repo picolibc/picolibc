@@ -11,15 +11,8 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
-#ifndef __reg1
-# define __reg1 __stdcall __attribute__ ((regparm (1)))
-#endif
-#ifndef __reg2
-# define __reg2 __stdcall __attribute__ ((regparm (2)))
-#endif
-#ifndef __reg3
-# define __reg3 __stdcall __attribute__ ((regparm (3)))
-#endif
+#include "regparm.h"
+
 void __reg1 ptfree (void *p);
 void __reg1 *ptmalloc (size_t size);
 void __reg2 *ptrealloc (void *p, size_t size);

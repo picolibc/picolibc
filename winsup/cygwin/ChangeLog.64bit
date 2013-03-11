@@ -1,5 +1,14 @@
 2013-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygmalloc.h: Include regparm.h rather than defining __reg{1,2,3} here.
+	* ptmalloc3.cc (__malloc_initialized): Define as type LONG on Cygwin
+	and include windows.h.
+	(ptmalloc_init): Set __malloc_initialized on Cygwin using
+	InterlockedCompareExchange and carefully check for concurrency
+	situation.
+
+2013-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* gendef: Add SEH information to sigfe entry points, as well as to
 	_sigfe and _sigbe.
 
