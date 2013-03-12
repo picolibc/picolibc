@@ -367,7 +367,7 @@ BUILD_PREFIX_1 = @BUILD_PREFIX_1@
 # here so that they can be overridden by Makefile fragments.
 BOOT_CFLAGS= -g -O2
 BOOT_LDFLAGS=
-BOOT_ADAFLAGS= -gnatpg
+BOOT_ADAFLAGS=-gnatpg -gnata
 
 AWK = @AWK@
 SED = @SED@
