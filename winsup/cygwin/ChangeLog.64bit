@@ -1,3 +1,7 @@
+2013-03-12  Ken Brown  <kbrown@cornell.edu>
+
+	* include/a.out.h: Fix up for x86_64.
+
 2013-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* smallprint.cc (rnarg): Fix cast to print negative values correctly.
