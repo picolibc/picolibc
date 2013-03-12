@@ -289,6 +289,7 @@ struct nios2_reg
 #define OP_OPX 58
 #define OP_ORHI 52
 #define OP_ORI 20
+#define OP_RDPRS 56
 #define OP_STB 5
 #define OP_STBIO 37
 #define OP_STC 29
@@ -386,6 +387,7 @@ struct nios2_reg
 #define OP_MATCH_OPX		OP_OPX
 #define OP_MATCH_ORHI		OP_ORHI
 #define OP_MATCH_ORI		OP_ORI
+#define OP_MATCH_RDPRS		OP_RDPRS
 #define OP_MATCH_STB		OP_STB
 #define OP_MATCH_STBIO		OP_STBIO
 #define OP_MATCH_STC		OP_STC
