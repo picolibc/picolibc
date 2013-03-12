@@ -1,5 +1,10 @@
 2013-03-11  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
+	* opcode/nios2.h (OPX_WRPRS): New define.
+	(OP_MATCH_WRPRS): Likewise.
+
+2013-03-11  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
 	* opcode/nios2.h (OP_RDPRS): New define.
 	(OP_MATCH_RDPRS): Likewise.
 

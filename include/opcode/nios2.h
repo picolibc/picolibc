@@ -344,6 +344,7 @@ struct nios2_reg
 #define OPX_SYNC 54
 #define OPX_TRAP 45
 #define OPX_WRCTL 46
+#define OPX_WRPRS 20
 #define OPX_XOR 30
 
 /* The following macros define the opcode matches for each
@@ -440,6 +441,7 @@ struct nios2_reg
 #define OP_MATCH_TRAP		((0x1d << 17) | OPX_MATCH (OPX_TRAP))
 #define OP_MATCH_ERET		(0xe8000000 | OPX_MATCH (OPX_ERET))
 #define OP_MATCH_WRCTL		OPX_MATCH (OPX_WRCTL)
+#define OP_MATCH_WRPRS		OPX_MATCH (OPX_WRPRS)
 #define OP_MATCH_XOR		OPX_MATCH (OPX_XOR)
 #define OP_MATCH_FLUSHI		OPX_MATCH (OPX_FLUSHI)
 #define OP_MATCH_FLUSHP		OPX_MATCH (OPX_FLUSHP)
