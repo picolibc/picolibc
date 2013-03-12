@@ -48,15 +48,16 @@ enum overflow_type
 
    The args field is a string describing the operands.  The following
    letters can appear in the args:
-     c - a 5-bit control register index or break opcode
+     c - a 5-bit control register index
      d - a 5-bit destination register index
      s - a 5-bit left source register index
      t - a 5-bit right source register index
      i - a 16-bit signed immediate
      u - a 16-bit unsigned immediate
+     o - a 16-bit signed program counter relative offset
      j - a 5-bit unsigned immediate
-     k - a 6-bit unsigned immediate
-     l - an 8-bit unsigned immediate
+     b - a 5-bit break instruction constant
+     l - a 8-bit custom instruction constant
      m - a 26-bit unsigned immediate
    Literal ',', '(', and ')' characters may also appear in the args as
    delimiters.
