@@ -3413,32 +3413,12 @@ case "${target}" in
     ;;
 esac
 
-# Disable libgo for some systems where it is known to not work.
-# For testing, you can easily override this with --enable-libgo.
-if test x$enable_libgo = x; then
-    case "${target}" in
-    *-*-darwin*)
-	# PR 46986
-	noconfigdirs="$noconfigdirs target-libgo"
-	;;
-    *-*-cygwin* | *-*-mingw*)
-	noconfigdirs="$noconfigdirs target-libgo"
-	;;
-    *-*-aix*)
-	noconfigdirs="$noconfigdirs target-libgo"
-	;;
-    esac
-fi
-
 # Default libgloss CPU subdirectory.
 libgloss_dir="$target_cpu"
 
 case "${target}" in
   sh*-*-pe|mips*-*-pe|*arm-wince-pe)
     libgloss_dir=wince
-    ;;
-  aarch64*-*-* )
-    libgloss_dir=aarch64
     ;;
   arm*-*-*)
     libgloss_dir=arm
@@ -5853,6 +5833,7 @@ $as_echo "$as_me: WARNING: using in-tree ISL, disabling version check" >&2;}
     CFLAGS="${_isl_saved_CFLAGS} ${islinc} ${gmpinc}"
     LDFLAGS="${_isl_saved_LDFLAGS} ${isllibs}"
     LIBS="${_isl_saved_LIBS} -lisl"
+    echo $CFLAGS
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for version 0.10 of ISL" >&5
 $as_echo_n "checking for version 0.10 of ISL... " >&6; }
@@ -5901,6 +5882,7 @@ $as_echo "$gcc_cv_isl" >&6; }
     CFLAGS="${_isl_saved_CFLAGS} ${islinc} ${gmpinc}"
     LDFLAGS="${_isl_saved_LDFLAGS} ${isllibs}"
     LIBS="${_isl_saved_LIBS} -lisl"
+    echo $CFLAGS
 
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for version 0.11 of ISL" >&5
 $as_echo_n "checking for version 0.11 of ISL... " >&6; }
