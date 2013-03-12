@@ -1,21 +1,3 @@
-2013-03-12  Sebastian Huber <sebastian.huber@embedded-brains.de>
-
-	* opcode/nios2.h: Edit comment.
-
-2013-03-11  Sebastian Huber <sebastian.huber@embedded-brains.de>
-
-	* opcode/nios2.h (OPX_WRPRS): New define.
-	(OP_MATCH_WRPRS): Likewise.
-
-2013-03-11  Sebastian Huber <sebastian.huber@embedded-brains.de>
-
-	* opcode/nios2.h (OP_RDPRS): New define.
-	(OP_MATCH_RDPRS): Likewise.
-
-2013-03-01  Cary Coutant  <ccoutant@google.com>
-
-	* dwarf2.h (enum dwarf_sect): New enum type.
-
 2013-02-19  Alan Modra  <amodra@gmail.com>
 
 	* bfdlink.h (struct bfd_link_info): Delete emit_note_gnu_build_id.

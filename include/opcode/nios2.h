@@ -48,16 +48,15 @@ enum overflow_type
 
    The args field is a string describing the operands.  The following
    letters can appear in the args:
-     c - a 5-bit control register index
+     c - a 5-bit control register index or break opcode
      d - a 5-bit destination register index
      s - a 5-bit left source register index
      t - a 5-bit right source register index
      i - a 16-bit signed immediate
      u - a 16-bit unsigned immediate
-     o - a 16-bit signed program counter relative offset
      j - a 5-bit unsigned immediate
-     b - a 5-bit break instruction constant
-     l - a 8-bit custom instruction constant
+     k - a 6-bit unsigned immediate
+     l - an 8-bit unsigned immediate
      m - a 26-bit unsigned immediate
    Literal ',', '(', and ')' characters may also appear in the args as
    delimiters.
@@ -290,7 +289,6 @@ struct nios2_reg
 #define OP_OPX 58
 #define OP_ORHI 52
 #define OP_ORI 20
-#define OP_RDPRS 56
 #define OP_STB 5
 #define OP_STBIO 37
 #define OP_STC 29
@@ -345,7 +343,6 @@ struct nios2_reg
 #define OPX_SYNC 54
 #define OPX_TRAP 45
 #define OPX_WRCTL 46
-#define OPX_WRPRS 20
 #define OPX_XOR 30
 
 /* The following macros define the opcode matches for each
@@ -389,7 +386,6 @@ struct nios2_reg
 #define OP_MATCH_OPX		OP_OPX
 #define OP_MATCH_ORHI		OP_ORHI
 #define OP_MATCH_ORI		OP_ORI
-#define OP_MATCH_RDPRS		OP_RDPRS
 #define OP_MATCH_STB		OP_STB
 #define OP_MATCH_STBIO		OP_STBIO
 #define OP_MATCH_STC		OP_STC
@@ -442,7 +438,6 @@ struct nios2_reg
 #define OP_MATCH_TRAP		((0x1d << 17) | OPX_MATCH (OPX_TRAP))
 #define OP_MATCH_ERET		(0xe8000000 | OPX_MATCH (OPX_ERET))
 #define OP_MATCH_WRCTL		OPX_MATCH (OPX_WRCTL)
-#define OP_MATCH_WRPRS		OPX_MATCH (OPX_WRPRS)
 #define OP_MATCH_XOR		OPX_MATCH (OPX_XOR)
 #define OP_MATCH_FLUSHI		OPX_MATCH (OPX_FLUSHI)
 #define OP_MATCH_FLUSHP		OPX_MATCH (OPX_FLUSHP)
