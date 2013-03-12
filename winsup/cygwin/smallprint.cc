@@ -20,7 +20,7 @@ details. */
 #define LLMASK	(0xffffffffffffffffULL)
 #define LMASK	(0xffffffff)
 
-#define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, uint32_t), len, pad, LMASK)
+#define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, int32_t), len, pad, LMASK)
 #define rnargLL(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, uint64_t), len, pad, LLMASK)
 
 static const char hex_str[] = "0123456789ABCDEF";
