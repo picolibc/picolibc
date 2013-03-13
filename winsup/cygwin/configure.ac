@@ -55,7 +55,7 @@ no)	 ;;
 esac
 ])
 
-MALLOC_OFILES="malloc.o ptmalloc3.o"
+MALLOC_OFILES=malloc.o
 
 dnl The only time we might want to transform the install names
 dnl is for unix x cygwin.  Otherwise we don't.  For now we don't

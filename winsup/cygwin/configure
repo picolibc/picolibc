@@ -4413,7 +4413,7 @@ esac
 fi
 
 
-MALLOC_OFILES="malloc.o ptmalloc3.o"
+MALLOC_OFILES=malloc.o
 
 
 

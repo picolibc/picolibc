@@ -1,7 +1,7 @@
 /* fork.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -24,6 +24,7 @@ details. */
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include "dll_init.h"
+#include "cygmalloc.h"
 #include "ntdll.h"
 
 #define NPIDS_HELD 4
@@ -341,6 +342,7 @@ frok::parent (volatile char * volatile stack_here)
 
   syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %y, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
+  bool locked = __malloc_lock ();
   time_t start_time = time (NULL);
 
   /* Remove impersonation */
@@ -471,6 +473,8 @@ frok::parent (volatile char * volatile stack_here)
 		   impure, impure_beg, impure_end,
 		   NULL);
 
+  __malloc_unlock ();
+  locked = false;
   MALLOC_CHECK;
   if (!rc)
     {
@@ -538,6 +542,8 @@ frok::parent (volatile char * volatile stack_here)
 cleanup:
   if (fix_impersonation)
     cygheap->user.reimpersonate ();
+  if (locked)
+    __malloc_unlock ();
 
   /* Remember to de-allocate the fd table. */
   if (hchild && !child.hProcess)

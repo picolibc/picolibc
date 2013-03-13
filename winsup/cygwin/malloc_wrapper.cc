@@ -21,7 +21,7 @@ details. */
 #ifndef MALLOC_DEBUG
 #include <malloc.h>
 #endif
-extern "C" struct mallinfo ptmallinfo ();
+extern "C" struct mallinfo dlmallinfo ();
 
 /* we provide these stubs to call into a user's
    provided malloc if there is one - otherwise
@@ -42,7 +42,11 @@ free (void *p)
   if (!use_internal)
     user_data->free (p);
   else
-    ptfree (p);
+    {
+      __malloc_lock ();
+      dlfree (p);
+      __malloc_unlock ();
+    }
 }
 
 extern "C" void *
@@ -52,7 +56,11 @@ malloc (size_t size)
   if (!use_internal)
     res = user_data->malloc (size);
   else
-    res = ptmalloc (size);
+    {
+      __malloc_lock ();
+      res = dlmalloc (size);
+      __malloc_unlock ();
+    }
   malloc_printf ("(%d) = %x, called by %p", size, res, __builtin_return_address (0));
   return res;
 }
@@ -64,7 +72,11 @@ realloc (void *p, size_t size)
   if (!use_internal)
     res = user_data->realloc (p, size);
   else
-    res = ptrealloc (p, size);
+    {
+      __malloc_lock ();
+      res = dlrealloc (p, size);
+      __malloc_unlock ();
+    }
   malloc_printf ("(%x, %d) = %x, called by %x", p, size, res, __builtin_return_address (0));
   return res;
 }
@@ -87,7 +99,11 @@ calloc (size_t nmemb, size_t size)
   if (!use_internal)
     res = user_data->calloc (nmemb, size);
   else
-    res = ptcalloc (nmemb, size);
+    {
+      __malloc_lock ();
+      res = dlcalloc (nmemb, size);
+      __malloc_unlock ();
+    }
   malloc_printf ("(%d, %d) = %x, called by %x", nmemb, size, res, __builtin_return_address (0));
   return res;
 }
@@ -102,7 +118,9 @@ posix_memalign (void **memptr, size_t alignment, size_t bytes)
     return ENOSYS;
   if ((alignment & (alignment - 1)) != 0)
     return EINVAL;
-  res = ptmemalign (alignment, bytes);
+  __malloc_lock ();
+  res = dlmemalign (alignment, bytes);
+  __malloc_unlock ();
   if (!res)
     return ENOMEM;
   if (memptr)
@@ -120,7 +138,11 @@ memalign (size_t alignment, size_t bytes)
       res = NULL;
     }
   else
-    res = ptmemalign (alignment, bytes);
+    {
+      __malloc_lock ();
+      res = dlmemalign (alignment, bytes);
+      __malloc_unlock ();
+    }
 
   return res;
 }
@@ -135,7 +157,11 @@ valloc (size_t bytes)
       res = NULL;
     }
   else
-    res = ptvalloc (bytes);
+    {
+      __malloc_lock ();
+      res = dlvalloc (bytes);
+      __malloc_unlock ();
+    }
 
   return res;
 }
@@ -150,7 +176,11 @@ malloc_usable_size (void *p)
       res = 0;
     }
   else
-    res = ptmalloc_usable_size (p);
+    {
+      __malloc_lock ();
+      res = dlmalloc_usable_size (p);
+      __malloc_unlock ();
+    }
 
   return res;
 }
@@ -165,7 +195,11 @@ malloc_trim (size_t pad)
       res = 0;
     }
   else
-    res = ptmalloc_trim (pad);
+    {
+      __malloc_lock ();
+      res = dlmalloc_trim (pad);
+      __malloc_unlock ();
+    }
 
   return res;
 }
@@ -180,7 +214,11 @@ mallopt (int p, int v)
       res = 0;
     }
   else
-    res = ptmallopt (p, v);
+    {
+      __malloc_lock ();
+      res = dlmallopt (p, v);
+      __malloc_unlock ();
+    }
 
   return res;
 }
@@ -191,7 +229,11 @@ malloc_stats ()
   if (!use_internal)
     set_errno (ENOSYS);
   else
-    ptmalloc_stats ();
+    {
+      __malloc_lock ();
+      dlmalloc_stats ();
+      __malloc_unlock ();
+    }
 }
 
 extern "C" struct mallinfo
@@ -201,7 +243,11 @@ mallinfo ()
   if (!use_internal)
     set_errno (ENOSYS);
   else
-    m = ptmallinfo ();
+    {
+      __malloc_lock ();
+      m = dlmallinfo ();
+      __malloc_unlock ();
+    }
 
   return m;
 }
@@ -216,9 +262,20 @@ strdup (const char *s)
   return p;
 }
 
+/* We use a critical section to lock access to the malloc data
+   structures.  This permits malloc to be called from different
+   threads.  Note that it does not make malloc reentrant, and it does
+   not permit a signal handler to call malloc.  The malloc code in
+   newlib will call __malloc_lock and __malloc_unlock at appropriate
+   times.  */
+
+muto NO_COPY mallock;
+
 void
 malloc_init ()
 {
+  mallock.init ("mallock");
+
 #ifndef MALLOC_DEBUG
   /* Check if malloc is provided by application. If so, redirect all
      calls to malloc/free/realloc to application provided. This may

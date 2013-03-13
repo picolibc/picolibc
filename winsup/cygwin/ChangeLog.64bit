@@ -1,3 +1,13 @@
+2013-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Revert to old malloc.
+	* mmap.cc (MMAP_STORAGE_LOW): Set higher.  Add comment.
+	(MMAP_STORAGE_HIGH): Add comment.
+	(class mmap_allocator): Change comment.  Add mmap_current_low member.
+	(mmap_allocator::mmap_allocator): Define default constructor.
+	(mmap_allocator::alloc): Change to a round-robin mechanism.  Add or
+	change comments accordingly.
+
 2013-03-13  Kai Tietz  <ktietz@redhat.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

@@ -800,23 +800,27 @@ mmap_worker (mmap_list *map_list, fhandler_base *fh, caddr_t base, size_t len,
 #ifdef __x86_64__
 
 /* The memory region used for memory maps */
-#define MMAP_STORAGE_LOW	0x00700000000L
-#define MMAP_STORAGE_HIGH	0x70000000000L
+#define MMAP_STORAGE_LOW	0x00800000000L	/* Leave 8 Gigs for heap. */
+#define MMAP_STORAGE_HIGH	0x70000000000L	/* Leave enough room for OS. */
 
 /* FIXME?  Unfortunately the OS doesn't support a top down allocation with
 	   a ceiling value.  The ZeroBits mechanism only works for
 	   NtMapViewOfSection and it only evaluates the high bit of ZeroBits
 	   on 64 bit, so it's pretty much useless for our purposes.
 
-	   If the below super simple mechanism to perform top-down allocations
-	   turns out to be too slow, we need something else.  One idea is to
+	   If the below simple mechanism to perform top-down allocations
+	   turns out to be too dumb, we need something else.  One idea is to
 	   dived the space in (3835) 4 Gig chunks and simply store the
 	   available free space per slot.  Then we can go top down from slot
 	   to slot and only try slots which are supposed to have enough space.
 	   Bookkeeping would be very simple and fast. */
 class mmap_allocator
 {
+  caddr_t mmap_current_low;
+
 public:
+  mmap_allocator () : mmap_current_low ((caddr_t) MMAP_STORAGE_HIGH) {}
+
   PVOID alloc (PVOID in_addr, SIZE_T in_size, bool fixed)
   {
     MEMORY_BASIC_INFORMATION mbi;
@@ -836,19 +840,32 @@ public:
 	  return NULL;
 	/* Otherwise, fall through to the usual free space search mechanism. */
       }
-    caddr_t addr = (caddr_t) MMAP_STORAGE_HIGH - size;
+    /* Start with the last allocation start address - requested size. */
+    caddr_t addr = mmap_current_low - size;
+    bool merry_go_round = false;
     do
       {
+	/* Did we hit the lower ceiling?  If so, restart from the upper
+	   ceiling, but note that we did it. */
+	if (addr < (caddr_t) MMAP_STORAGE_LOW)
+	  {
+	    addr = (caddr_t) MMAP_STORAGE_HIGH - size;
+	    merry_go_round = true;
+	  }
 	/* Shouldn't fail, but better test. */
 	if (!VirtualQuery ((PVOID) addr, &mbi, sizeof mbi))
 	  return NULL;
 	/* If the region is free... */
 	if (mbi.State == MEM_FREE)
 	  {
-	    /* ...and the region is big enough to fulfill the request, return
-	       the address. */
+	    /* ...and the region is big enough to fulfill the request... */
 	    if (mbi.RegionSize >= size)
-	      return (PVOID) addr;
+	      {
+		/* ...note the address as next start address for our simple
+		   merry-go-round and return the address. */
+		mmap_current_low = addr;
+		return (PVOID) addr;
+	      }
 	    /* Otherwise, subtract what's missing in size and try again. */
 	    addr -= size - mbi.RegionSize;
 	  }
@@ -857,8 +874,8 @@ public:
 	else
 	  addr = (caddr_t) mbi.AllocationBase - size;
       }
-    /* Give up when we are lower than the lowest address we search. */
-    while (addr >= (caddr_t) MMAP_STORAGE_LOW);
+    /* Repeat until we had a full ride on the merry_go_round. */
+    while (!merry_go_round || addr >= mmap_current_low);
     return NULL;
   }
 };
