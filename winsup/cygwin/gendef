@@ -158,10 +158,18 @@ _sigfe:						# stack is aligned on entry!
 	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
-	subq	\$40,%rsp			# add spill and align stack
-	call	yield				# should be a short-time thing, so
-	addq	\$40,%rsp			# revert stack and
-	jmp	1b				# sleep and loop
+	subq	\$0x48,%rsp			#   call yield but save
+	movq	%rcx,0x40(%rsp)			#   arguments first, otherwise
+	movq	%rdx,0x38(%rsp)			#   we end up with scrambled
+	movq	%r8,0x30(%rsp)			#   arguments when eventually
+	movq	%r9,0x28(%rsp)			#   calling the real function
+	call	yield				# should be a short-time thing
+	movq	0x28(%rsp),%r9			#  revert arguments,
+	movq	0x30(%rsp),%r8
+	movq	0x38(%rsp),%rdx
+	movq	0x40(%rsp),%rcx
+	addq	\$0x48,%rsp			# revert stack and
+	jmp	1b				# loop
 2:	movq	\$8,%rax			# have the lock, now increment the
 	xaddq	%rax,$tls::stackptr(%r12)	#  stack pointer and get pointer
 	leaq	_sigbe(%rip),%r11		# new place to return to
