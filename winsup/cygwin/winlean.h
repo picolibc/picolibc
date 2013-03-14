@@ -54,6 +54,11 @@ details. */
 #include <lmcons.h>
 #include <ntdef.h>
 
+/* Temporary kludge for missing flag in Mingw64's w32api. */
+#ifndef PIPE_REJECT_REMOTE_CLIENTS
+#define PIPE_REJECT_REMOTE_CLIENTS 8
+#endif
+
 #ifdef __undef_IN
 #undef IN
 #endif

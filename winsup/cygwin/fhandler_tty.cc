@@ -1693,10 +1693,13 @@ fhandler_pty_master::setup ()
      the pty pipe handles to processes which deserve it. */
   __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-pty%d-master-ctl",
 		   &cygheap->installation_key, unit);
-  master_ctl = CreateNamedPipe (buf, PIPE_ACCESS_DUPLEX,
+  master_ctl = CreateNamedPipe (buf, PIPE_ACCESS_DUPLEX
+				     | FILE_FLAG_FIRST_PIPE_INSTANCE,
 				PIPE_WAIT | PIPE_TYPE_MESSAGE
-				| PIPE_READMODE_MESSAGE, 1, 4096, 4096,
-				0, &sec_all_nih);
+				| PIPE_READMODE_MESSAGE
+				| (wincap.has_pipe_reject_remote_clients ()
+				   ? PIPE_REJECT_REMOTE_CLIENTS : 0),
+				1, 4096, 4096, 0, &sec_all_nih);
   if (master_ctl == INVALID_HANDLE_VALUE)
     {
       errstr = "pty master control pipe";

@@ -47,6 +47,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:false,
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
+  has_pipe_reject_remote_clients:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -73,6 +74,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:false,
   wow64_has_secondary_stack:true,
   has_program_compatibility_assistant:false,
+  has_pipe_reject_remote_clients:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -99,6 +101,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:false,
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:true,
+  has_pipe_reject_remote_clients:true,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -125,6 +128,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:true,
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:true,
+  has_pipe_reject_remote_clients:true,
 };
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -151,6 +155,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:true,
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:true,
+  has_pipe_reject_remote_clients:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));

@@ -213,7 +213,9 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
   char pipename[MAX_PATH];
   size_t len = __small_sprintf (pipename, PIPE_INTRO "%S-",
 				      &cygheap->installation_key);
-  DWORD pipe_mode = PIPE_READMODE_BYTE;
+  DWORD pipe_mode = PIPE_READMODE_BYTE
+		    | (wincap.has_pipe_reject_remote_clients ()
+		       ? PIPE_REJECT_REMOTE_CLIENTS : 0);
   if (!name)
     pipe_mode |= pipe_byte ? PIPE_TYPE_BYTE : PIPE_TYPE_MESSAGE;
   else
@@ -228,7 +230,7 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
   if (name)
     len += __small_sprintf (pipename + len, "%s", name);
 
-  open_mode |= PIPE_ACCESS_INBOUND;
+  open_mode |= PIPE_ACCESS_INBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE;
 
   /* Retry CreateNamedPipe as long as the pipe name is in use.
      Retrying will probably never be necessary, but we want
@@ -252,8 +254,7 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 	 a waste, since only a single direction is actually used.
 	 It's important to only allow a single instance, to ensure that
 	 the pipe was not created earlier by some other process, even if
-	 the pid has been reused.  We avoid FILE_FLAG_FIRST_PIPE_INSTANCE
-	 because that is only available for Win2k SP2 and WinXP.
+	 the pid has been reused.
 
 	 Note that the write side of the pipe is opened as PIPE_TYPE_MESSAGE.
 	 This *seems* to more closely mimic Linux pipe behavior and is

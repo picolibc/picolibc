@@ -1,5 +1,17 @@
 2013-03-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_tty.cc (fhandler_pty_master::setup): Add
+	PIPE_REJECT_REMOTE_CLIENTS to pipe mode on systems supporting it.  Add
+	FILE_FLAG_FIRST_PIPE_INSTANCE to pipe open mode.
+	* pipe.cc (fhandler_pipe::create): Ditto.  Fix subsequent comment
+	accordingly.
+	* wincap.h (wincaps::has_pipe_reject_remote_clients): New element.
+	* wincap.cc: Implement above element throughout.
+	* winlean.h (PIPE_REJECT_REMOTE_CLIENTS): Temporarily define until
+	Mingw64 headers define it.
+
+2013-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	Remove more old cruft.  Remove Windows NT4 and 2000 from comments
 	throughout, unless it still makes sense.
 	* dlfcn.cc (dlopen): Drop W2K-only code to make loaded DLL persistent.
