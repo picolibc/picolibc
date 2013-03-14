@@ -1028,10 +1028,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	  /* If the application didn't explicitely request SO_REUSEADDR,
 	     enforce POSIX standard socket binding behaviour by setting the
 	     SO_EXCLUSIVEADDRUSE socket option.  See cygwin_setsockopt()
-	     for a more detailed description.
-
-	     KB 870562: Note that a bug in Win2K SP1-3 and XP up to SP1 only
-	     enables this option for users in the local administrators group. */
+	     for a more detailed description. */
 	  int on = 1;
 	  int ret = ::setsockopt (get_socket (), SOL_SOCKET,
 				  ~(SO_REUSEADDR),
@@ -1856,20 +1853,7 @@ int
 fhandler_socket::close ()
 {
   int res = 0;
-  /* TODO: CV - 2008-04-16.  Lingering disabled.  The original problem
-     could be no longer reproduced on NT4, XP, 2K8.  Any return of a
-     spurious "Connection reset by peer" *could* be caused by disabling
-     the linger code here... */
-#if 0
-  /* HACK to allow a graceful shutdown even if shutdown() hasn't been
-     called by the application. Note that this isn't the ultimate
-     solution but it helps in many cases. */
-  struct linger linger;
-  linger.l_onoff = 1;
-  linger.l_linger = 240; /* secs. default 2MSL value according to MSDN. */
-  setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
-	      (const char *)&linger, sizeof linger);
-#endif
+
   release_events ();
   while ((res = closesocket (get_socket ())) != 0)
     {

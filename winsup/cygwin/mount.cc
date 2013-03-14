@@ -306,14 +306,20 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_UNICODE_ON_DISK \
 			     | FILE_NAMED_STREAMS)
-/* These are the minimal flags supported by NTFS since NT4.  Every filesystem
+/* These are the minimal flags supported by NTFS since XP.  Every filesystem
    not supporting these flags is not a native NTFS.  We subsume them under
    the filesystem type "cifs". */
 #define MINIMAL_WIN_NTFS_FLAGS (FILE_CASE_SENSITIVE_SEARCH \
 				| FILE_CASE_PRESERVED_NAMES \
 				| FILE_UNICODE_ON_DISK \
 				| FILE_PERSISTENT_ACLS \
-				| FILE_FILE_COMPRESSION)
+				| FILE_FILE_COMPRESSION \
+				| FILE_VOLUME_QUOTAS \
+				| FILE_SUPPORTS_SPARSE_FILES \
+				| FILE_SUPPORTS_REPARSE_POINTS \
+				| FILE_SUPPORTS_OBJECT_IDS \
+				| FILE_SUPPORTS_ENCRYPTION \
+				| FILE_NAMED_STREAMS)
 #define FS_IS_WINDOWS_NTFS TEST_GVI(flags () & MINIMAL_WIN_NTFS_FLAGS, \
 				    MINIMAL_WIN_NTFS_FLAGS)
 /* These are the exact flags of a real Windows FAT/FAT32 filesystem.
@@ -1940,41 +1946,6 @@ endmntent (FILE *)
   return 1;
 }
 
-static bool
-get_volume_path_names_for_volume_name (LPCWSTR vol, LPWSTR mounts)
-{
-  DWORD len;
-  if (GetVolumePathNamesForVolumeNameW (vol, mounts, NT_MAX_PATH, &len))
-    return true;
-
-  /* Windows 2000 doesn't have GetVolumePathNamesForVolumeNameW.
-     Just assume that mount points are not longer than MAX_PATH. */
-  WCHAR drives[MAX_PATH], dvol[MAX_PATH], mp[MAX_PATH + 3];
-  if (!GetLogicalDriveStringsW (MAX_PATH, drives))
-    return false;
-  for (PWCHAR drive = drives; *drive; drive = wcschr (drive, '\0') + 1)
-    {
-      if (!GetVolumeNameForVolumeMountPointW (drive, dvol, MAX_PATH))
-	continue;
-      if (!wcscasecmp (vol, dvol))
-	mounts = wcpcpy (mounts, drive) + 1;
-      wcscpy (mp, drive);
-      HANDLE h = FindFirstVolumeMountPointW (dvol, mp + 3, MAX_PATH);
-      if (h == INVALID_HANDLE_VALUE)
-	continue;
-      do
-	{
-	  if (GetVolumeNameForVolumeMountPointW (mp, dvol, MAX_PATH))
-	    if (!wcscasecmp (vol, dvol))
-	      mounts = wcpcpy (mounts, drive) + 1;
-	}
-      while (FindNextVolumeMountPointW (h, mp, MAX_PATH));
-      FindVolumeMountPointClose (h);
-    }
-  *mounts = L'\0';
-  return true;
-}
-
 dos_drive_mappings::dos_drive_mappings ()
 : mappings(0)
 {
@@ -1993,7 +1964,8 @@ dos_drive_mappings::dos_drive_mappings ()
     do
       {
 	/* Skip drives which are not mounted. */
-	if (!get_volume_path_names_for_volume_name (vol, mounts)
+	DWORD len;
+	if (!GetVolumePathNamesForVolumeNameW (vol, mounts, NT_MAX_PATH, &len)
 	    || mounts[0] == L'\0')
 	  continue;
 	*wcsrchr (vol, L'\\') = L'\0';

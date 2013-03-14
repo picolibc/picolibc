@@ -755,11 +755,9 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
       wrapper_arg->stacklimit = real_stacklimit;
     }
   /* Use the STACK_SIZE_PARAM_IS_A_RESERVATION parameter so only the
-     minimum size for a thread stack is reserved by the OS.  This doesn't
-     work on Windows 2000, but we deallocate the OS stack in thread_wrapper
-     anyway, so this should be a problem only in a tight memory condition.
-     Note that we reserve a 256K stack, not 64K, otherwise the thread creation
-     might crash the process due to a stack overflow. */
+     minimum size for a thread stack is reserved by the OS.  Note that we
+     reserve a 256K stack, not 64K, otherwise the thread creation might
+     crash the process due to a stack overflow. */
   thread = CreateThread (&sec_none_nih, 4 * PTHREAD_STACK_MIN,
 			 thread_wrapper, wrapper_arg,
 			 creation_flags | STACK_SIZE_PARAM_IS_A_RESERVATION,

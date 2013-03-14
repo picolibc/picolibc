@@ -12,13 +12,6 @@ details. */
 #define _WINLEAN_H 1
 #define WIN32_LEAN_AND_MEAN 1
 
-/* Mingw32 */
-#define _WINGDI_H
-#define _WINUSER_H
-#define _WINNLS_H
-#define _WINVER_H
-#define _WINNETWK_H
-#define _WINSVC_H
 /* Mingw64 */
 #define _WINNLS_
 #define _WINNETWK_
@@ -34,8 +27,6 @@ details. */
 #define _WINMM_
 #define WINIMPM
 #define WINSOCK_API_LINKAGE
-#define NTDDI_VERSION 0x6020000	/* Probably should just be derived from our
-				   _WIN32_WINNT setting in winsup.h */
 
 /* Windows headers define a couple of annoyingly intrusive macros for the
    sole purpose of inline documentation.  Since they are defined without
@@ -79,18 +70,11 @@ details. */
 #undef CRITICAL
 #endif
 
-#undef _WINGDI_H
-#undef _WINUSER_H
-#undef _WINNLS_H
-#undef _WINVER_H
-#undef _WINNETWK_H
-#undef _WINSVC_H
-
 #undef _WINNLS_
 #undef _WINNETWK_
 #undef _WINSVC_
 
-/*When Terminal Services are installed, the GetWindowsDirectory function
+/* When Terminal Services are installed, the GetWindowsDirectory function
    does not return the system installation dir, but a user specific directory
    instead.  That's not what we have in mind when calling GetWindowsDirectory
    from within Cygwin.  So we redefine GetWindowsDirectory to something

@@ -1,3 +1,25 @@
+2013-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	Remove more old cruft.  Remove Windows NT4 and 2000 from comments
+	throughout, unless it still makes sense.
+	* dlfcn.cc (dlopen): Drop W2K-only code to make loaded DLL persistent.
+	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Drop code
+	trying to use information from NtQueryVolumeInformationFile.
+	* fhandler_socket.cc (fhandler_socket::close): Drop code snippet
+	disabled since 2008.
+	* mount.cc (MINIMAL_WIN_NTFS_FLAGS): Add flag values set on all
+	NTFS since Windows XP.
+	(get_volume_path_names_for_volume_name): Remove.
+	(dos_drive_mappings::dos_drive_mappings): Call Win32 function
+	GetVolumePathNamesForVolumeNameW directly.
+	* path.cc (file_get_fnoi): Drop test for NT4-only return code.
+	* sched.cc: Add FIXME to global comment.  Reformat comments throughout.
+	* spawn.cc (child_info_spawn::worker): Just call official IsProcessInJob
+	function rather than to test undocumented TEB member.
+	* winlean.h: Drop Mingw32-related defines.
+	* include/limits.h (PTHREAD_KEYS_MAX): Raise value to reflect minimum
+	value available on XP and later.
+	
 2013-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Revert to old malloc.

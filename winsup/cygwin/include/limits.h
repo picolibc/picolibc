@@ -1,7 +1,7 @@
 /* limits.h
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2011, 2012 Red Hat, Inc.
+   2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -222,9 +222,9 @@ details. */
 #define PTHREAD_DESTRUCTOR_ITERATIONS 1
 
 /* Maximum number of data keys that can be created by a process. */
-/* Tls has 64 items for pre win2000 - and we don't want to use them all :] */
+/* Tls has 1088 items - and we don't want to use them all :] */
 #undef PTHREAD_KEYS_MAX
-#define PTHREAD_KEYS_MAX 32
+#define PTHREAD_KEYS_MAX 1024
 
 /* Minimum size in bytes of thread stack storage. */
 /* Actually the minimum stack size is somewhat of a split personality.

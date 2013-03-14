@@ -1213,11 +1213,10 @@ file_get_fnoi (HANDLE h, bool skip_network_open_inf,
   status = skip_network_open_inf ? STATUS_INVALID_PARAMETER
 	   : NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
 				     FileNetworkOpenInformation);
-  if (status == STATUS_INVALID_PARAMETER || status == STATUS_NOT_IMPLEMENTED)
+  if (status == STATUS_INVALID_PARAMETER)
     {
       /* Apart from accessing Netapps, this also occurs when accessing SMB
-	 share root dirs hosted on NT4 (STATUS_INVALID_PARAMETER), or when
-	 accessing SMB share root dirs from NT4 (STATUS_NOT_IMPLEMENTED). */
+	 share root dirs hosted on NT4. */
       FILE_BASIC_INFORMATION fbi;
       FILE_STANDARD_INFORMATION fsi;
 
@@ -1650,12 +1649,11 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	full_len += sizeof (unsigned short) + pidl_len;
       oldpath_len = strlen (oldpath);
       /* Unfortunately the length of the description is restricted to a
-	 length of MAX_PATH up to NT4, and to a length of 2000 bytes
-	 since W2K.  We don't want to add considerations for the different
-	 lengths and even 2000 bytes is not enough for long path names.
-	 So what we do here is to set the description to the POSIX path
-	 only if the path is not longer than MAX_PATH characters.  We
-	 append the full path name after the regular shortcut data
+	 length of 2000 bytes.  We don't want to add considerations for
+	 the different lengths and even 2000 bytes is not enough for long
+	 path names.  So what we do here is to set the description to the
+	 POSIX path only if the path is not longer than MAX_PATH characters.
+	 We append the full path name after the regular shortcut data
 	 (see below), which works fine with Windows Explorer as well
 	 as older Cygwin versions (as long as the whole file isn't bigger
 	 than 8K).  The description field is only used for backward

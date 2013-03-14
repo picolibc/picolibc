@@ -53,12 +53,10 @@ details. */
 #define SE_SYSTEM_ENVIRONMENT_PRIVILEGE     22UL
 #define SE_CHANGE_NOTIFY_PRIVILEGE          23UL
 #define SE_REMOTE_SHUTDOWN_PRIVILEGE        24UL
-/* Starting with Windows 2000 */
 #define SE_UNDOCK_PRIVILEGE                 25UL
 #define SE_SYNC_AGENT_PRIVILEGE             26UL
 #define SE_ENABLE_DELEGATION_PRIVILEGE      27UL
 #define SE_MANAGE_VOLUME_PRIVILEGE          28UL
-/* Starting with Windows 2000 SP4, XP SP2, 2003 Server */
 #define SE_IMPERSONATE_PRIVILEGE            29UL
 #define SE_CREATE_GLOBAL_PRIVILEGE          30UL
 /* Starting with Vista */

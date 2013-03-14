@@ -59,7 +59,7 @@ static const char *registry_listing[] =
   "HKEY_CURRENT_USER",
   "HKEY_LOCAL_MACHINE",
   "HKEY_USERS",
-  "HKEY_PERFORMANCE_DATA",	// NT/2000/XP
+  "HKEY_PERFORMANCE_DATA",
   NULL
 };
 

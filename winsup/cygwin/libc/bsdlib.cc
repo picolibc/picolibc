@@ -54,7 +54,7 @@ daemon (int nochdir, int noclose)
 	break;
       default:
 	/* This sleep avoids a race condition which kills the
-	   child process if parent is started by a NT/W2K service.
+	   child process if parent is started by a service process.
 	   FIXME: Is that still true? */
 	Sleep (1000L);
 	_exit (0);

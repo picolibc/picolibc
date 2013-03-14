@@ -321,8 +321,6 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
 	  /* Unhide trailing backslash. */
 	  recycler.Length += sizeof (WCHAR);
 	  RtlInitEmptyUnicodeString (&sid, sidbuf, sizeof sidbuf);
-	  /* In contrast to what MSDN claims, this function is already available
-	     since NT4. */
 	  RtlConvertSidToUnicodeString (&sid, cygheap->user.sid (), FALSE);
 	  RtlAppendUnicodeStringToString (&recycler, &sid);
 	  recycler_user_len = recycler.Length;

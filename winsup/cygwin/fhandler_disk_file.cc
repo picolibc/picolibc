@@ -1870,10 +1870,9 @@ fhandler_disk_file::opendir (int fd)
 	     XP when accessing directories on UDF.  When trying to use it
 	     so, NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.
 	     It's not clear if the call isn't also unsupported on other
-	     OS/FS combinations (say, Win2K/CDFS or so).  Instead of
-	     testing in readdir for yet another error code, let's use
-	     FileIdBothDirectoryInformation only on filesystems supporting
-	     persistent ACLs, FileBothDirectoryInformation otherwise.
+	     OS/FS combinations.  Instead of testing for yet another error
+	     code, let's use FileIdBothDirectoryInformation only on FSes
+	     supporting persistent ACLs, FileBothDirectoryInformation otherwise.
 
 	     NFS clients hide dangling symlinks from directory queries,
 	     unless you use the FileNamesInformation info class.
@@ -2108,11 +2107,10 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
 					 FileIdBothDirectoryInformation,
 					 FALSE, NULL, dir->__d_position == 0);
 	  /* FileIdBothDirectoryInformation isn't supported for remote drives
-	     on NT4 and 2K systems, and it's also not supported on 2K at all,
-	     when accessing network drives on any remote OS.  There are also
-	     hacked versions of Samba 3.0.x out there (Debian-based it seems),
-	     which return STATUS_NOT_SUPPORTED rather than handling this info
-	     class.  We just fall back to using a standard directory query in
+	     on NT4 and 2K systems.  There are also hacked versions of
+	     Samba 3.0.x out there (Debian-based it seems), which return
+	     STATUS_NOT_SUPPORTED rather than handling this info class.
+	     We just fall back to using a standard directory query in
 	     this case and note this case using the dirent_get_d_ino flag. */
 	  if (!NT_SUCCESS (status) && status != STATUS_NO_MORE_FILES
 	      && (status == STATUS_INVALID_LEVEL
