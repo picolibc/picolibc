@@ -19,7 +19,7 @@
 	* winlean.h: Drop Mingw32-related defines.
 	* include/limits.h (PTHREAD_KEYS_MAX): Raise value to reflect minimum
 	value available on XP and later.
-	
+
 2013-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Revert to old malloc.
