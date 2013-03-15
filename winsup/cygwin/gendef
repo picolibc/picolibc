@@ -159,23 +159,23 @@ _sigfe:						# stack is aligned on entry!
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
 	subq	\$0x88,%rsp			#   call yield but save
-	movq	%rcx,0x80(%rsp)			#   arguments first, otherwise
-	movq	%rdx,0x78(%rsp)			#   we end up with scrambled
-	movq	%r8,0x70(%rsp)			#   arguments when eventually
-	movq	%r9,0x68(%rsp)			#   calling the real function
-	movdqu	%xmm0,0x58(%rsp)
-	movdqu	%xmm1,0x48(%rsp)
-	movdqu	%xmm2,0x38(%rsp)
-	movdqu	%xmm3,0x28(%rsp)
+	movq	%rcx,0x78(%rsp)			#   arguments first, otherwise
+	movq	%rdx,0x70(%rsp)			#   we end up with scrambled
+	movq	%r8,0x68(%rsp)			#   arguments when eventually
+	movq	%r9,0x60(%rsp)			#   calling the real function
+	movdqa	%xmm0,0x50(%rsp)
+	movdqa	%xmm1,0x40(%rsp)
+	movdqa	%xmm2,0x30(%rsp)
+	movdqa	%xmm3,0x20(%rsp)
 	call	yield				# should be a short-time thing
-	movdqu	0x28(%rsp),%xmm3		#  revert arguments,
-	movdqu	0x38(%rsp),%xmm2
-	movdqu	0x48(%rsp),%xmm1
-	movdqu	0x58(%rsp),%xmm0
-	movq	0x68(%rsp),%r9
-	movq	0x70(%rsp),%r8
-	movq	0x78(%rsp),%rdx
-	movq	0x80(%rsp),%rcx
+	movdqa	0x20(%rsp),%xmm3		#  revert arguments,
+	movdqa	0x30(%rsp),%xmm2
+	movdqa	0x40(%rsp),%xmm1
+	movdqa	0x50(%rsp),%xmm0
+	movq	0x60(%rsp),%r9
+	movq	0x68(%rsp),%r8
+	movq	0x70(%rsp),%rdx
+	movq	0x78(%rsp),%rcx
 	addq	\$0x88,%rsp			# revert stack and
 	jmp	1b				# loop
 2:	movq	\$8,%rax			# have the lock, now increment the
@@ -202,13 +202,13 @@ _sigbe:						# return here after cygwin syscall
 	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
-	subq	\$0x40,%rsp			# add spill and save return regs
-	movq	%rax,0x38(%rsp)
-	movdqu	%xmm0,0x28(%rsp)
+	subq	\$0x38,%rsp			# add spill and save return regs
+	movq	%rax,0x30(%rsp)
+	movdqa	%xmm0,0x20(%rsp)
 	call	yield				# sleep
-	movdqu	0x28(%rsp),%xmm0
-	movq	0x38(%rsp),%rax
-	addq	\$0x40,%rsp			# revert stack and return regs
+	movdqa	0x20(%rsp),%xmm0
+	movq	0x30(%rsp),%rax
+	addq	\$0x38,%rsp			# revert stack and return regs
 	jmp	1b				#  and loop
 2:	movq	\$-8,%r11			# now decrement aux stack
 	xaddq	%r11,$tls::stackptr(%r12)	#  and get pointer
@@ -246,7 +246,7 @@ sigdelayed:					# stack is aligned on entry!
 	.seh_pushreg %rax
 	subq	\$0x30,%rsp
 	.seh_stackalloc 48
-	movdqu	%xmm0,0x20(%rsp)
+	movdqa	%xmm0,0x20(%rsp)
 	.seh_endprologue
 
 	movq	%gs:8,%r12			# get tls
@@ -273,7 +273,7 @@ sigdelayed:					# stack is aligned on entry!
 	xorl	%r11d,%r11d
 	movl	%r11d,$tls::incyg(%r12)
 	movl	%r11d,$tls::stacklock(%r12)	# unlock
-	movdqu	0x20(%rsp),%xmm0
+	movdqa	0x20(%rsp),%xmm0
 	addq	\$0x30,%rsp
 	popq	%rax
 	popq	%rbx
@@ -311,9 +311,9 @@ _ZN7_cygtls4lockEv:
 	xchgl	%r11d,$tls::pstacklock(%r12)
 	testl   %r11d,%r11d
 	jz	2f
-	subq	\$32,%rsp
+	subq	\$0x20,%rsp
 	call	yield
-	addq	\$32,%rsp
+	addq	\$0x20,%rsp
 	jmp	1b
 2:	popq	%r12
 	ret
@@ -341,7 +341,7 @@ _ZN7_cygtls6lockedEv:
 stabilize_sig_stack:
 	pushq	%r12
 	.seh_pushreg %r12
-	subq	\$32,%rsp
+	subq	\$0x20,%rsp
 	.seh_stackalloc 32
 	.seh_endprologue
 	movq	%gs:8,%r12
@@ -361,7 +361,7 @@ stabilize_sig_stack:
 	call	_ZN7_cygtls19call_signal_handlerEv
 	jmp	1b
 3:	decl	$tls::incyg(%r12)
-	addq	\$32,%rsp
+	addq	\$0x20,%rsp
 	movq	%r12,%r11				# return tls addr in r11
 	popq	%r12
 	ret
@@ -562,6 +562,7 @@ setjmp:
 	movq	%r15,0x48(%rcx)
 	movq	(%rsp),%r10
 	movq	%r10,0x50(%rcx)
+	# jmp_buf is potentially unaligned!
 	movdqu	%xmm6,0x60(%rcx)
 	movdqu	%xmm7,0x70(%rcx)
 	movdqu	%xmm8,0x80(%rcx)
@@ -601,6 +602,7 @@ __sjfault:
 	movq	%r15,0x48(%rcx)
 	movq	(%rsp),%r10
 	movq	%r10,0x50(%rcx)
+	# jmp_buf is potentially unaligned!
 	movdqu	%xmm6,0x60(%rcx)
 	movdqu	%xmm7,0x70(%rcx)
 	movdqu	%xmm8,0x80(%rcx)
@@ -631,6 +633,7 @@ __ljfault:
 	movq	0x48(%rcx),%r15
 	movq	0x50(%rcx),%r10
 	movq	%r10,(%rsp)
+	# jmp_buf is potentially unaligned!
 	movdqu	0x60(%rcx),%xmm6
 	movdqu	0x70(%rcx),%xmm7
 	movdqu	0x80(%rcx),%xmm8
@@ -654,10 +657,10 @@ longjmp:
 	pushq	%rcx
 	.seh_pushreg %rcx
 	.seh_endprologue
-	movq	%rdx,%r12			# save return value (r12 is overwritten anyway)
+	movl	%edx,%r12d			# save return value (r12 is overwritten anyway)
 	call	stabilize_sig_stack		# returns tls in r11
 	popq	%rcx
-	movq	%r12,%rax			# restore return value
+	movl	%r12d,%eax			# restore return value
 	movq	0x58(%rcx),%r10			# get old signal stack
 	movq	%r10,$tls::stackptr(%r11)	# restore
 	decl	$tls::stacklock(%r11)		# relinquish lock
@@ -676,6 +679,7 @@ longjmp:
 	movq	0x48(%rcx),%r15
 	movq	0x50(%rcx),%r10
 	movq	%r10,(%rsp)
+	# jmp_buf is potentially unaligned!
 	movdqu	0x60(%rcx),%xmm6
 	movdqu	0x70(%rcx),%xmm7
 	movdqu	0x80(%rcx),%xmm8

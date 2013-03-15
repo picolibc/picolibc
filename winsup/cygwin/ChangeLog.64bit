@@ -1,5 +1,20 @@
 2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* gendef (_sigfe): 16-byte align xmm0 storage and use movdqa.
+	(_sigbe): Fix alignment before calling yield.  Use movdqa to save and
+	restore xmm0.
+	(sigdelayed): Use movdqa to save and restore xmm0.
+	(_ZN7_cygtls4lockEv): Change absolute values to hex.
+	(stabilize_sig_stack): Ditto.
+	(setjmp): Add comment to explain usage of movdqu.
+	(__sjfault): Ditto.
+	(__ljfault): Ditto.
+	(longjmp): Ditto. Access return value using 32 bit opcodes only.
+	* miscfuncs.cc (thread_wrapper): Don't attempt to copy exception
+	handler list on x86_64.
+
+2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (.#dllname_info): Call _std_dll_init on x86_64 bit, too.
 	(INIT_WRAPPER): Change to accommodate the change of the init functions
 	from sysv_abit to ms_abi.  Fix preceeding comment accordingly.  Add
