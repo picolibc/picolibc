@@ -1,3 +1,7 @@
+2013-03-15  Steve Ellcey  <sellcey@mips.com>
+
+	* gdb/remote-sim.h (sim_command_completer): Make char arguments const.
+
 2013-01-01  Joel Brobecker  <brobecker@adacore.com>
 
 	Update year range in copyright notice of all files.
