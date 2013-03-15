@@ -1,5 +1,9 @@
 2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Revert previous patch.  For some reason perl doesn't like it.
+
+2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.h (CYGTLS_PADSIZE): Reduce to 8000 on x86_64.
 	* tlsoffsets64.h: Regenerate.
 
