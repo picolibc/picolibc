@@ -1,5 +1,11 @@
 2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (child_info_fork::handle_fork): Call
+	_pei386_runtime_relocator first thing, before copying parent data and
+	bss segment.  Tweak comment to explain why.
+
+2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* gendef (_sigfe): 16-byte align xmm0 storage and use movdqa.
 	(_sigbe): Fix alignment before calling yield.  Use movdqa to save and
 	restore xmm0.
