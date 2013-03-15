@@ -1,3 +1,8 @@
+2013-03-15  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* newlib/libc/stdio/findfp.c (glue_with_file): New.
+	(__sfmoreglue): Use glue_with_file to avoid alignment problems.
+
 2013-02-28  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/machine/setjmp.h (sigjmp_buf): Fix definition of

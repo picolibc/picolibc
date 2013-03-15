@@ -77,23 +77,27 @@ _DEFUN(std, (ptr, flags, file, data),
 #endif
 }
 
+struct glue_with_file {
+  struct _glue glue;
+  FILE file;
+};
+
 struct _glue *
 _DEFUN(__sfmoreglue, (d, n),
        struct _reent *d _AND
        register int n)
 {
-  struct _glue *g;
-  FILE *p;
+  struct glue_with_file *g;
 
-  g = (struct _glue *) _malloc_r (d, sizeof (*g) + n * sizeof (FILE));
+  g = (struct glue_with_file *)
+    _malloc_r (d, sizeof (*g) + (n - 1) * sizeof (FILE));
   if (g == NULL)
     return NULL;
-  p = (FILE *) (g + 1);
-  g->_next = NULL;
-  g->_niobs = n;
-  g->_iobs = p;
-  memset (p, 0, n * sizeof (FILE));
-  return g;
+  g->glue._next = NULL;
+  g->glue._niobs = n;
+  g->glue._iobs = &g->file;
+  memset (&g->file, 0, n * sizeof (FILE));
+  return &g->glue;
 }
 
 /*
