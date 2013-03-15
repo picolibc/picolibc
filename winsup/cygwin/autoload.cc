@@ -75,7 +75,7 @@ bool NO_COPY wsock_started;
   .section	.data_cygwin_nocopy,\"w\"		\n\
   .align	8					\n\
 ."#dllname "_info:					\n\
-  .quad		std_dll_init				\n\
+  .quad		_std_dll_init				\n\
   .quad		" #no_resolve_on_fork "			\n\
   .long		-1					\n\
   .align	8					\n\
@@ -356,52 +356,46 @@ dll_load (HANDLE& handle, WCHAR *name)
 /* The standard DLL initialization routine. */
 #ifdef __x86_64__
 
-/* On x86_64, we need assembler wrappers for std_dll_init and wsock_init
-   for two reasons:
-
-   - The functions are sysv_abi for simpler access to the return value
-     from dll_chain (rax/rdx, rather than xmm0).  However, in sysv_abi,
-     rsi/rdi are volatile argument registers, in ms_abi they are non-
-     volatile, callee saved registers.  Therefore the compiler may overwrite
-     these two registers at will in a sysv_abi function, which may break the
-     calling ms_abi function.  So we have to push these regs on the stack
-     before calling the real std_dll_init/wsock_init.
-
-   - More importantly, in the x86_64 ABI it's no safe bet that frame[1]
-     (aka 8(%rbp)) contains the return address.  Consequentially, if we
-     try to overwrite frame[1] with the address of dll_chain, we end up
-     with a scrambled stack, the result depending on the optimization
-     settings and the current frame of mind of the compiler.  So for
-     x86_64, we disable overwriting the return address in the real
-     std_dll_init/wsock_init function, but rather do this in the wrapper,
-     after return from the function, when we exactly know where the original
-     return address is stored on the stack. */
+/* On x86_64, we need assembler wrappers for std_dll_init and wsock_init.
+   In the x86_64 ABI it's no safe bet that frame[1] (aka 8(%rbp)) contains
+   the return address.  Consequentially, if we try to overwrite frame[1]
+   with the address of dll_chain, we end up with a scrambled stack, the
+   result depending on the optimization settings and the current frame of
+   mind of the compiler.  So for x86_64, we disable overwriting the return
+   address in the real std_dll_init/wsock_init function, but rather do this
+   in the wrapper, after return from the function, when we exactly know
+   where the original return address is stored on the stack. */
 
 #define INIT_WRAPPER(func) \
 __asm__ ("								\n\
 	.text								\n\
-" #func ":								\n\
+	.p2align 4,,15							\n\
+	.seh_proc _" #func "						\n\
+_" #func ":								\n\
 	pushq	%rbp							\n\
+	.seh_pushreg %rbp						\n\
 	movq	%rsp,%rbp						\n\
-	pushq	%rsi							\n\
-	pushq	%rdi							\n\
-	movq	24(%rsp),%rdi						\n\
-	call	_" #func "						\n\
-	leaq	dll_chain(%rip),%rdi					\n\
-	movq	%rdi,24(%rsp)						\n\
-	popq	%rdi							\n\
-	popq	%rsi							\n\
+	.seh_setframe %rbp,0						\n\
+	subq	$0x20,%rsp						\n\
+	.seh_stackalloc 32						\n\
+	.seh_endprologue						\n\
+	movq	0x28(%rsp),%rcx		# return address as parameter	\n\
+	call	" #func "						\n\
+	movdqa	%xmm0,0x10(%rsp)	# 128 bit return value in xmm0	\n\
+	movq	0x10(%rsp),%rax		# copy over to %rax and %rdx	\n\
+	movq	0x18(%rsp),%rdx						\n\
+	leaq	dll_chain(%rip),%rcx	# load address of dll_chain	\n\
+	movq	%rcx,0x28(%rsp)		# and overwrite return address	\n\
+	addq	$0x20,%rsp						\n\
 	popq	%rbp							\n\
 	ret								\n\
+	.seh_endproc							\n\
 ");
 
 INIT_WRAPPER (std_dll_init)
 
-/* sysv_abi uses %rax and %rdx to return 128 bit int values, equivalent to
-   the 32 bit ABIs using %eax and %edx to return 64 bit values.  The MS ABI
-   returns 128 bit int values in %xmm0, which isn't helpful here. */
-__attribute__ ((used, noinline, sysv_abi)) static two_addr_t
-_std_dll_init (struct func_info *func)
+__attribute__ ((used, noinline)) static two_addr_t
+std_dll_init (struct func_info *func)
 #else
 __attribute__ ((used, noinline)) static two_addr_t
 std_dll_init ()
@@ -478,16 +472,13 @@ std_dll_init ()
 
 /* Initialization function for winsock stuff. */
 WSADATA NO_COPY wsadata;
-#ifdef __x86_64__
 
+#ifdef __x86_64__
 /* See above comment preceeding std_dll_init. */
 INIT_WRAPPER (wsock_init)
 
-/* sysv_abi uses %rax and %rdx to return 128 bit int values, equivalent to
-   the 32 bit ABIs using %eax and %edx to return 64 bit values.  The MS ABI
-   returns 128 bit int values in %xmm0, which isn't helpful here. */
-__attribute__ ((used, noinline, sysv_abi)) static two_addr_t
-_wsock_init (struct func_info *func)
+__attribute__ ((used, noinline)) static two_addr_t
+wsock_init (struct func_info *func)
 #else
 __attribute__ ((used, noinline)) static two_addr_t
 wsock_init ()
@@ -543,11 +534,7 @@ wsock_init ()
   return ret.ll;
 }
 
-#ifdef __x86_64__
-LoadDLLprime (ws2_32, wsock_init, 0)
-#else
 LoadDLLprime (ws2_32, _wsock_init, 0)
-#endif
 
 LoadDLLfunc (CreateProcessAsUserW, 44, advapi32)
 LoadDLLfunc (CryptAcquireContextW, 20, advapi32)
