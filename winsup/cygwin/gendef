@@ -158,17 +158,25 @@ _sigfe:						# stack is aligned on entry!
 	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
-	subq	\$0x48,%rsp			#   call yield but save
-	movq	%rcx,0x40(%rsp)			#   arguments first, otherwise
-	movq	%rdx,0x38(%rsp)			#   we end up with scrambled
-	movq	%r8,0x30(%rsp)			#   arguments when eventually
-	movq	%r9,0x28(%rsp)			#   calling the real function
+	subq	\$0x88,%rsp			#   call yield but save
+	movq	%rcx,0x80(%rsp)			#   arguments first, otherwise
+	movq	%rdx,0x78(%rsp)			#   we end up with scrambled
+	movq	%r8,0x70(%rsp)			#   arguments when eventually
+	movq	%r9,0x68(%rsp)			#   calling the real function
+	movdqu	%xmm0,0x58(%rsp)
+	movdqu	%xmm1,0x48(%rsp)
+	movdqu	%xmm2,0x38(%rsp)
+	movdqu	%xmm3,0x28(%rsp)
 	call	yield				# should be a short-time thing
-	movq	0x28(%rsp),%r9			#  revert arguments,
-	movq	0x30(%rsp),%r8
-	movq	0x38(%rsp),%rdx
-	movq	0x40(%rsp),%rcx
-	addq	\$0x48,%rsp			# revert stack and
+	movdqu	0x28(%rsp),%xmm3		#  revert arguments,
+	movdqu	0x38(%rsp),%xmm2
+	movdqu	0x48(%rsp),%xmm1
+	movdqu	0x58(%rsp),%xmm0
+	movq	0x68(%rsp),%r9
+	movq	0x70(%rsp),%r8
+	movq	0x78(%rsp),%rdx
+	movq	0x80(%rsp),%rcx
+	addq	\$0x88,%rsp			# revert stack and
 	jmp	1b				# loop
 2:	movq	\$8,%rax			# have the lock, now increment the
 	xaddq	%rax,$tls::stackptr(%r12)	#  stack pointer and get pointer
@@ -185,9 +193,7 @@ _sigfe:						# stack is aligned on entry!
 	.seh_proc _sigfe
 _sigbe:						# return here after cygwin syscall
 						# stack is aligned on entry!
-	pushq	%rax				# don't clobber
-	.seh_pushreg %rax
-	pushq	%r12				# tls pointer
+	pushq	%r12
 	.seh_pushreg %r12
 	.seh_endprologue
 	movq	%gs:8,%r12			# address of bottom of tls
@@ -196,9 +202,13 @@ _sigbe:						# return here after cygwin syscall
 	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
-	subq	\$32,%rsp			# add spill
+	subq	\$0x40,%rsp			# add spill and save return regs
+	movq	%rax,0x38(%rsp)
+	movdqu	%xmm0,0x28(%rsp)
 	call	yield				# sleep
-	addq	\$32,%rsp			# revert stack
+	movdqu	0x28(%rsp),%xmm0
+	movq	0x38(%rsp),%rax
+	addq	\$0x40,%rsp			# revert stack and return regs
 	jmp	1b				#  and loop
 2:	movq	\$-8,%r11			# now decrement aux stack
 	xaddq	%r11,$tls::stackptr(%r12)	#  and get pointer
@@ -206,7 +216,6 @@ _sigbe:						# return here after cygwin syscall
 	decl	$tls::incyg(%r12)
 	decl	$tls::stacklock(%r12)		# release lock
 	popq	%r12
-	popq	%rax				# restore return value
 	jmp	*%r11				# "return" to caller
 	.seh_endproc
 
@@ -214,7 +223,7 @@ _sigbe:						# return here after cygwin syscall
 	.seh_proc sigdelayed
 sigdelayed:					# stack is aligned on entry!
 	pushq	%rbp				# fake to make unaligned
-	.seh_pushreg %rbp
+	.seh_pushreg %rbp			# used for return address injection
 	pushq	%rbp
 	.seh_pushreg %rbp
 	movq	%rsp,%rbp
@@ -235,8 +244,9 @@ sigdelayed:					# stack is aligned on entry!
 	.seh_pushreg %rbx
 	pushq	%rax
 	.seh_pushreg %rax
-	subq	\$32,%rsp
-	.seh_stackalloc 32
+	subq	\$0x30,%rsp
+	.seh_stackalloc 48
+	movdqu	%xmm0,0x20(%rsp)
 	.seh_endprologue
 
 	movq	%gs:8,%r12			# get tls
@@ -263,7 +273,8 @@ sigdelayed:					# stack is aligned on entry!
 	xorl	%r11d,%r11d
 	movl	%r11d,$tls::incyg(%r12)
 	movl	%r11d,$tls::stacklock(%r12)	# unlock
-	addq	\$32,%rsp
+	movdqu	0x20(%rsp),%xmm0
+	addq	\$0x30,%rsp
 	popq	%rax
 	popq	%rbx
 	popq	%rdi

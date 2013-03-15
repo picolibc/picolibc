@@ -1,3 +1,11 @@
+2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (_sigfe): Save float arguments as well before calling yield.
+	(_sigbe): Move saving %rax from prologue to just before the yield call.
+	Save %xmm0 register, too.
+	(sigdelayed): Add comment.  Save %xmm0 register, too, before calling
+	yield.
+
 2013-03-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_pty_master::setup): Add
