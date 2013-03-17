@@ -1096,6 +1096,7 @@ strftime SIGFE
 strlcat NOSIGFE
 strlcpy NOSIGFE
 strlen NOSIGFE
+strlwr NOSIGFE
 strncasecmp NOSIGFE
 strncat NOSIGFE
 strncmp NOSIGFE

@@ -1,3 +1,7 @@
+2013-03-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin64.din (strlwr): Export.
+
 2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Revert previous patch.  For some reason perl doesn't like it.
