@@ -609,11 +609,6 @@ child_info_fork::handle_fork ()
   myself->uid = cygheap->user.real_uid;
   myself->gid = cygheap->user.real_gid;
 
-  /* Do the relocations here.  Do them *before* copying data and bss,
-     otherwise we end up relocating the already relocated parent data
-     here in the child again. */
-  _pei386_runtime_relocator (user_data);
-
   child_copy (parent, false,
 	      "dll data", dll_data_start, dll_data_end,
 	      "dll bss", dll_bss_start, dll_bss_end,
@@ -631,6 +626,10 @@ child_info_fork::handle_fork ()
      safe. */
   my_wr_proc_pipe = wr_proc_pipe;
   rd_proc_pipe = wr_proc_pipe = NULL;
+  /* Do the relocations here.  These will actually likely be overwritten by the
+     below child_copy but we do them here in case there is a read-only section
+     which does not get copied by fork. */
+  _pei386_runtime_relocator (user_data);
 
   /* step 2 now that the dll has its heap filled in, we can fill in the
      user's data and bss since user_data is now filled out. */
