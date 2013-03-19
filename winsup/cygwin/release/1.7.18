@@ -17,7 +17,7 @@ What's new:
 
 - Changes in cygwin1.dll and gdb-7.5.50-2 now allow gdb to recognize
   Cygwin-specific signals like "SIGTERM" as well as Windows signals like
-  "SIGSEGV".
+  "SIGSEGV".  This feature is still experimental.
 
 Bug fixes:
 ----------
