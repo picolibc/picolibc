@@ -221,12 +221,17 @@ _sigbe:						# return here after cygwin syscall
 
 	.global	sigdelayed
 	.seh_proc sigdelayed
-sigdelayed:					# stack is aligned on entry!
-	pushq	%rbp				# fake to make unaligned
-	.seh_pushreg %rbp			# used for return address injection
+sigdelayed:
+	pushq	%r10				# used for return address injection
+	.seh_pushreg %rbp
 	pushq	%rbp
 	.seh_pushreg %rbp
 	movq	%rsp,%rbp
+	# stack is aligned or unaligned on entry!
+	# make sure it is aligned from here on
+	# We could be called from an interrupted thread which doesn't know
+	# about his fate, so save and restore everything and the kitchen sink.
+	andq	\$0xfffffffffffffff0,%rsp
 	.seh_setframe %rbp,0
 	pushq	%r15
 	.seh_pushreg %r15
@@ -236,16 +241,42 @@ sigdelayed:					# stack is aligned on entry!
 	.seh_pushreg %r13
 	pushq	%r12
 	.seh_pushreg %r12
+	pushq	%r11
+	.seh_pushreg %r11
+	pushq	%r9
+	.seh_pushreg %r9
+	pushq	%r8
+	.seh_pushreg %r8
 	pushq	%rsi
 	.seh_pushreg %rsi
 	pushq	%rdi
 	.seh_pushreg %rdi
+	pushq	%rdx
+	.seh_pushreg %rdx
+	pushq	%rcx
+	.seh_pushreg %rcx
 	pushq	%rbx
 	.seh_pushreg %rbx
 	pushq	%rax
 	.seh_pushreg %rax
-	subq	\$0x30,%rsp
-	.seh_stackalloc 48
+	pushf
+	subq	\$0x120,%rsp
+	.seh_stackalloc 0x120
+	movdqa	%xmm15,0x110(%rsp)
+	movdqa	%xmm14,0x100(%rsp)
+	movdqa	%xmm13,0xf0(%rsp)
+	movdqa	%xmm12,0xe0(%rsp)
+	movdqa	%xmm11,0xd0(%rsp)
+	movdqa	%xmm10,0xc0(%rsp)
+	movdqa	%xmm9,0xb0(%rsp)
+	movdqa	%xmm8,0xa0(%rsp)
+	movdqa	%xmm7,0x90(%rsp)
+	movdqa	%xmm6,0x80(%rsp)
+	movdqa	%xmm5,0x70(%rsp)
+	movdqa	%xmm4,0x60(%rsp)
+	movdqa	%xmm3,0x50(%rsp)
+	movdqa	%xmm2,0x40(%rsp)
+	movdqa	%xmm1,0x30(%rsp)
 	movdqa	%xmm0,0x20(%rsp)
 	.seh_endprologue
 
@@ -274,17 +305,39 @@ sigdelayed:					# stack is aligned on entry!
 	movl	%r11d,$tls::incyg(%r12)
 	movl	%r11d,$tls::stacklock(%r12)	# unlock
 	movdqa	0x20(%rsp),%xmm0
-	addq	\$0x30,%rsp
+	movdqa	0x30(%rsp),%xmm1
+	movdqa	0x40(%rsp),%xmm2
+	movdqa	0x50(%rsp),%xmm3
+	movdqa	0x60(%rsp),%xmm4
+	movdqa	0x70(%rsp),%xmm5
+	movdqa	0x80(%rsp),%xmm6
+	movdqa	0x90(%rsp),%xmm7
+	movdqa	0xa0(%rsp),%xmm8
+	movdqa	0xb0(%rsp),%xmm9
+	movdqa	0xc0(%rsp),%xmm10
+	movdqa	0xd0(%rsp),%xmm11
+	movdqa	0xe0(%rsp),%xmm12
+	movdqa	0xf0(%rsp),%xmm13
+	movdqa	0x100(%rsp),%xmm14
+	movdqa	0x110(%rsp),%xmm15
+	addq	\$0x120,%rsp
+	popf
 	popq	%rax
 	popq	%rbx
+	popq	%rcx
+	popq	%rdx
 	popq	%rdi
 	popq	%rsi
+	popq	%r8
+	popq	%r9
+	popq	%r11
 	popq	%r12
 	popq	%r13
 	popq	%r14
 	popq	%r15
+	movq	%rbp,%rsp
 	popq	%rbp
-	movq	%r10,(%rsp)
+	xchgq	%r10,(%rsp)
 	ret
 	.seh_endproc
 
