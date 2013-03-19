@@ -1,5 +1,12 @@
 2013-03-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (stack_info::init): Don't attempt to dereference NULL
+	framep.
+	(exception::handle): On x86_64, if Rbp is NULL, use Rsp as frame
+	pointer.
+
+2013-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* gendef (sigdelayed): Make sure to align the stack since sigdelayed
 	can be called with or without aligned stack.  Save and restore all
 	CPU registers.

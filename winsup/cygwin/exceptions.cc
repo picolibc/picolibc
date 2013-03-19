@@ -264,7 +264,8 @@ stack_info::init (PUINT_PTR framep, bool wantargs, PCONTEXT ctx)
       dummy_frame = framep;
       sf.AddrFrame.Offset = (UINT_PTR) &dummy_frame;
     }
-  sf.AddrReturn.Offset = framep[1];
+  if (framep)
+    sf.AddrReturn.Offset = framep[1];
   sf.AddrFrame.Mode = AddrModeFlat;
   needargs = wantargs;
 }
@@ -696,6 +697,11 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 
 #ifdef __x86_64__
   PUINT_PTR framep = (PUINT_PTR) in->Rbp;
+  /* Sometimes, when a stack is screwed up, Rbp tends to be NULL.  In that
+     case, base the stacktrace on Rsp.  In most cases, it allows to generate
+     useful stack trace. */
+  if (!framep)
+    framep = (PUINT_PTR) in->Rsp;
 #else
   PUINT_PTR framep = (PUINT_PTR) in->_GR(sp);
   for (PUINT_PTR bpend = (PUINT_PTR) __builtin_frame_address (0); framep > bpend; framep--)
@@ -742,7 +748,6 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 		      e->ExceptionInformation[1], in->_GR(ip), in->_GR(sp),
 		      error_code);
     }
-
   cygwin_exception exc (framep, in, e);
   si.si_cyg = (void *) &exc;
   si.si_addr = (void *) in->_GR(ip);
