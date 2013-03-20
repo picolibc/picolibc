@@ -1,3 +1,7 @@
+2013-03-20  Ken Brown  <kbrown@cornell.edu>
+
+	* include/sys/resource.h (RLIM_INFINITY): Define wordsize agnostic.
+
 2013-03-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* lib/_cygwin_crt0_common.cc: Fix mangled operator new names for x86_64.

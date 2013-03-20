@@ -34,7 +34,7 @@ extern "C" {
 #define RLIMIT_NLIMITS  7		/* upper bound of RLIMIT_* defines */
 #define RLIM_NLIMITS    RLIMIT_NLIMITS
 
-#define RLIM_INFINITY	(0xffffffffUL)
+#define RLIM_INFINITY	(~0UL)
 #define RLIM_SAVED_MAX	RLIM_INFINITY
 #define RLIM_SAVED_CUR	RLIM_INFINITY
 
