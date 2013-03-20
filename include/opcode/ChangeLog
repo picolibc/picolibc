@@ -1,5 +1,15 @@
 2013-03-20  Alexis Deruelle  <alexis.deruelle@gmail.com>
 
+	PR gas/15082
+	* tic6x-opcode-table.h: Rename mpydp's specific operand type macro
+	from ORREGD1324 to ORXREGD1324 and make it cross-path-able through
+	tic6x_operand_xregpair operand coding type.
+	Make mpydp instruction cross-path-able, ie: remove the FIXed 'x'
+	opcode field, usu ORXREGD1324 for the src2 operand and remove the
+	TIC6X_FLAG_NO_CROSS.
+
+2013-03-20  Alexis Deruelle  <alexis.deruelle@gmail.com>
+
 	PR gas/15095
 	* tic6x.h (enum tic6x_coding_method): Add
 	tic6x_coding_dreg_(msb|lsb) field coding type in order to encode

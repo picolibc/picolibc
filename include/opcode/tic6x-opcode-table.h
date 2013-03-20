@@ -75,7 +75,7 @@
 #define ORREGD12 { tic6x_operand_regpair, 8, tic6x_rw_read, 1, 1, 2, 2 }
 #define ORXREGD12 { tic6x_operand_xregpair, 8, tic6x_rw_read, 1, 1, 2, 2 }
 #define ORREGD1234 { tic6x_operand_regpair, 8, tic6x_rw_read, 1, 2, 3, 4 }
-#define ORREGD1324 { tic6x_operand_regpair, 8, tic6x_rw_read, 1, 3, 2, 4 }
+#define ORXREGD1324 { tic6x_operand_xregpair, 8, tic6x_rw_read, 1, 3, 2, 4 }
 #define OWREGD910 { tic6x_operand_regpair, 8, tic6x_rw_write, 9, 9, 10, 10 }
 #define ORCREG1 { tic6x_operand_ctrl, 4, tic6x_rw_read, 1, 1, 0, 0 }
 #define OWCREG1 { tic6x_operand_ctrl, 4, tic6x_rw_write, 1, 1, 0, 0 }
@@ -1154,11 +1154,11 @@ INSNE(mpy, m_s5_xsl16_si, m, mpy, 1616_m, C62X, 0,
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, scst, 0),
 	   ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
-INSN(mpydp, m, mpy, mpydp, C67X, TIC6X_FLAG_NO_CROSS,
-     FIX2(FIX(op, 0x0e), FIX(x, 0)),
-     OP3(ORREGD1234, ORREGD1324, OWREGD910),
-     ENC4(ENC(s, fu, 0), ENC(src1, reg, 0), ENC(src2, reg, 1),
-	  ENC(dst, reg, 2)))
+INSN(mpydp, m, mpy, mpydp, C67X, 0,
+     FIX1(FIX(op, 0x0e)),
+     OP3(ORREGD1234, ORXREGD1324, OWREGD910),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
 INSN(mpyh, m, mpy, 1616_m, C62X, 0,
      FIX1(FIX(op, 0x01)),
@@ -2520,7 +2520,7 @@ INSNE(zero, d_sub, d, 1_or_2_src, 1cycle, C62X,
 #undef OWDREGD5
 #undef ORREGD12
 #undef ORXREGD12
-#undef ORREGD1234
+#undef ORXREGD1234
 #undef ORREGD1324
 #undef OWREGD910
 #undef ORCREG1
