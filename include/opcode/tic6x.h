@@ -1,6 +1,5 @@
 /* TI C6X opcode information.
-   Copyright 2010, 2011
-   Free Software Foundation, Inc.
+   Copyright 2010-2013 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -380,6 +379,12 @@ typedef enum
        the field.  When applied to a memory reference, encode the base
        register.  */
     tic6x_coding_reg,
+    /* Encode the register-pair's lsb (even register) for instructions
+       that use src1 as port for loading lsb of double-precision
+       operand value (absdp, dpint, dpsp, dptrunc, rcpdp, rsqrdp).  */
+    tic6x_coding_regpair_lsb,
+    /* Encode the register-pair's msb (odd register), see above.  */ 
+    tic6x_coding_regpair_msb,
     /* Store 0 for register B14, 1 for register B15.  When applied to
        a memory reference, encode the base register.  */
     tic6x_coding_areg,

@@ -1,3 +1,13 @@
+2013-03-20  Alexis Deruelle  <alexis.deruelle@gmail.com>
+
+	PR gas/15095
+	* tic6x.h (enum tic6x_coding_method): Add
+	tic6x_coding_dreg_(msb|lsb) field coding type in order to encode
+	separately the msb and lsb of a register pair.  This is needed to
+	encode the opcodes in the same way as TI assembler does.
+	* tic6x-opcode-table.h: Modify absdp, dpint, dpsp, dptrunc, rcpdp
+	and rsqrdp opcodes to use the new field coding types.
+
 2013-03-11  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* arm.h (CRC_EXT_ARMV8): New constant.

@@ -1,6 +1,5 @@
 /* TI C6X opcode table.
-   Copyright 2010, 2011
-   Free Software Foundation, Inc.
+   Copyright 2010-2013 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -129,9 +128,10 @@ INSN(abs2, l, unary, 1cycle, C64X, 0,
 	  ENC(dst, reg, 1)))
 
 INSN(absdp, s, 1_or_2_src, 2cycle_dp, C67X, TIC6X_FLAG_NO_CROSS,
-     FIX3(FIX(op, 0x2c), FIX(x, 0), FIX(src1, 0)),
+     FIX2(FIX(op, 0x2c), FIX(x, 0)),
      OP2(ORREGD1, OWREGD12),
-     ENC3(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(dst, reg, 1)))
+     ENC4(ENC(s, fu, 0), ENC(src2, regpair_msb, 0), ENC(src1, regpair_lsb, 0),
+	  ENC(dst, reg, 1)))
 
 INSN(abssp, s, unary, 1cycle, C67X, 0,
      FIX1(FIX(op, 0)),
@@ -916,19 +916,22 @@ INSN(dpackx2, l, 1_or_2_src_noncond, 1cycle, C64XP, 0,
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
 INSN(dpint, l, 1_or_2_src, 4cycle, C67X, TIC6X_FLAG_NO_CROSS,
-     FIX3(FIX(op, 0x8), FIX(x, 0), FIX(src1, 0)),
+     FIX2(FIX(op, 0x8), FIX(x, 0)),
      OP2(ORREGD1, OWREG4),
-     ENC3(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(dst, reg, 1)))
+     ENC4(ENC(s, fu, 0), ENC(src2, regpair_msb, 0), ENC(src1, regpair_lsb, 0),
+	  ENC(dst, reg, 1)))
 
 INSN(dpsp, l, 1_or_2_src, 4cycle, C67X, TIC6X_FLAG_NO_CROSS,
-     FIX3(FIX(op, 0x9), FIX(x, 0), FIX(src1, 0)),
+     FIX2(FIX(op, 0x9), FIX(x, 0)),
      OP2(ORREGD1, OWREG4),
-     ENC3(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(dst, reg, 1)))
+     ENC4(ENC(s, fu, 0), ENC(src2, regpair_msb, 0), ENC(src1, regpair_lsb, 0),
+	  ENC(dst, reg, 1)))
 
 INSN(dptrunc, l, 1_or_2_src, 4cycle, C67X, TIC6X_FLAG_NO_CROSS,
-     FIX3(FIX(op, 0x1), FIX(x, 0), FIX(src1, 0)),
+     FIX2(FIX(op, 0x1), FIX(x, 0)),
      OP2(ORREGD1, OWREG4),
-     ENC3(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(dst, reg, 1)))
+     ENC4(ENC(s, fu, 0), ENC(src2, regpair_msb, 0), ENC(src1, regpair_lsb, 0),
+	  ENC(dst, reg, 1)))
 
 INSN(ext, s, field, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
      FIX1(FIX(op, 0x1)),
@@ -1617,9 +1620,10 @@ INSN(packl4, l, 1_or_2_src, 1cycle, C64X, 0,
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
 INSN(rcpdp, s, 1_or_2_src, 2cycle_dp, C67X, TIC6X_FLAG_NO_CROSS,
-     FIX3(FIX(op, 0x2d), FIX(x, 0), FIX(src1, 0)),
+     FIX2(FIX(op, 0x2d), FIX(x, 0)),
      OP2(ORREGD1, OWREGD12),
-     ENC3(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(dst, reg, 1)))
+     ENC4(ENC(s, fu, 0), ENC(src2, regpair_msb, 0), ENC(src1, regpair_lsb, 0),
+	  ENC(dst, reg, 1)))
 
 INSN(rcpsp, s, 1_or_2_src, 1cycle, C67X, 0,
      FIX2(FIX(op, 0x3d), FIX(src1, 0)),
@@ -1677,9 +1681,10 @@ INSN(rpack2, s, ext_1_or_2_src_noncond, 1cycle, C64XP, 0,
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
 INSN(rsqrdp, s, 1_or_2_src, 2cycle_dp, C67X, TIC6X_FLAG_NO_CROSS,
-     FIX3(FIX(op, 0x2e), FIX(x, 0), FIX(src1, 0)),
+     FIX2(FIX(op, 0x2e), FIX(x, 0)),
      OP2(ORREGD1, OWREGD12),
-     ENC3(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(dst, reg, 1)))
+     ENC4(ENC(s, fu, 0), ENC(src2, regpair_msb, 0), ENC(src1, regpair_lsb, 0),
+	  ENC(dst, reg, 1)))
 
 INSN(rsqrsp, s, 1_or_2_src, 1cycle, C67X, 0,
      FIX2(FIX(op, 0x3e), FIX(src1, 0)),
