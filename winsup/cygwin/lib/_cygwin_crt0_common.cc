@@ -17,26 +17,42 @@ details. */
    unnecessarily.  */
 #define WEAK __attribute__ ((weak))
 
+#ifdef __x86_64__
+#define REAL_ZNWX		"__real__Znwm"
+#define REAL_ZNAX		"__real__Znam"
+#define REAL_ZNWX_NOTHROW_T	"__real__ZnwmRKSt9nothrow_t"
+#define REAL_ZNAX_NOTHROW_T	"__real__ZnamRKSt9nothrow_t"
+#else
+#define REAL_ZNWX		"___real__Znwj"
+#define REAL_ZNAX		"___real__Znaj"
+#define REAL_ZNWX_NOTHROW_T	"___real__ZnwjRKSt9nothrow_t"
+#define REAL_ZNAX_NOTHROW_T	"___real__ZnajRKSt9nothrow_t"
+#endif
+#define REAL_ZDLPV		_SYMSTR (__real__ZdlPv)
+#define REAL_ZDAPV		_SYMSTR (__real__ZdaPv)
+#define REAL_ZDLPV_NOTHROW_T	_SYMSTR (__real__ZdlPvRKSt9nothrow_t)
+#define REAL_ZDAPV_NOTHROW_T	_SYMSTR (__real__ZdaPvRKSt9nothrow_t)
+
 /* Use asm names to bypass the --wrap that is being applied to redirect all other
    references to these operators toward the redirectors in the Cygwin DLL; this
    way we can record what definitions were visible at final link time but still
    send all calls to the redirectors.  */
 extern WEAK void *operator new(std::size_t sz) throw (std::bad_alloc)
-			__asm__ (_SYMSTR (__real__Znwj));
+			__asm__ (REAL_ZNWX);
 extern WEAK void *operator new[](std::size_t sz) throw (std::bad_alloc)
-			__asm__ (_SYMSTR (__real__Znaj));
+			__asm__ (REAL_ZNAX);
 extern WEAK void operator delete(void *p) throw()
-			__asm__ (_SYMSTR (__real__ZdlPv ));
+			__asm__ (REAL_ZDLPV);
 extern WEAK void operator delete[](void *p) throw()
-			__asm__ (_SYMSTR (__real__ZdaPv));
+			__asm__ (REAL_ZDAPV);
 extern WEAK void *operator new(std::size_t sz, const std::nothrow_t &nt) throw()
-			__asm__ (_SYMSTR (__real__ZnwjRKSt9nothrow_t));
+			__asm__ (REAL_ZNWX_NOTHROW_T);
 extern WEAK void *operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
-			__asm__ (_SYMSTR (__real__ZnajRKSt9nothrow_t));
+			__asm__ (REAL_ZNAX_NOTHROW_T);
 extern WEAK void operator delete(void *p, const std::nothrow_t &nt) throw()
-			__asm__ (_SYMSTR (__real__ZdlPvRKSt9nothrow_t));
+			__asm__ (REAL_ZDLPV_NOTHROW_T);
 extern WEAK void operator delete[](void *p, const std::nothrow_t &nt) throw()
-			__asm__ (_SYMSTR (__real__ZdaPvRKSt9nothrow_t));
+			__asm__ (REAL_ZDAPV_NOTHROW_T);
 
 /* Avoid an info message from linker when linking applications.  */
 extern __declspec(dllimport) struct _reent *_impure_ptr;

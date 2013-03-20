@@ -1,3 +1,7 @@
+2013-03-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* lib/_cygwin_crt0_common.cc: Fix mangled operator new names for x86_64.
+
 2013-03-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (stack_info::init): Don't attempt to dereference NULL
