@@ -1,7 +1,5 @@
 /* Opcode table for the H8/300
-   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000, 2001, 2002,
-   2003, 2004, 2005, 2008, 2009, 2010
-   Free Software Foundation, Inc.
+   Copyright 1991-2013 Free Software Foundation, Inc.
    Written by Steve Chamberlain <sac@cygnus.com>.
    
    This file is part of GDB, the GNU Debugger and GAS, the GNU Assembler.
@@ -553,7 +551,7 @@ struct h8_opcode
   {CODE, AV_H8,   6, NAME, {{SRC, RDPREDEC,  E}}, {{                              6, OP3, B31 | RDPREDEC,   SRC,                E}}}, \
   {CODE, AV_H8SX, 0, NAME, {{SRC, DISP2DST,  E}}, {{PREFIX, B30 | B20 | DISP2DST, 6, OP1, B31 | DSTDISPREG, SRC,                E}}}, \
   {CODE, AV_H8,   6, NAME, {{SRC, DISP16DST, E}}, {{                              6, OP4, B31 | DSTDISPREG, SRC, DSTDISP16LIST, E}}}, \
-  {CODE, AV_H8,   6, NAME, {{SRC, DISP32DST, E}}, {{7, 8, B30 | DSTDISPREG, 0,    6, OP2, 10,               SRC, DSTDISP32LIST, E}}}, \
+  {CODE, AV_H8,   6, NAME, {{SRC, DISP32DST, E}}, {{7, 8, B30 | DSTDISPREG, 0,    6, OP2, 10,               SRC, MEMRELAX | DSTDISP32LIST, E}}}, \
   {CODE, AV_H8SX, 0, NAME, {{SRC, INDEXB16D, E}}, {{PREFIX, 1,                    6, OP4, B31 | DSTDISPREG, SRC, DSTDISP16LIST, E}}}, \
   {CODE, AV_H8SX, 0, NAME, {{SRC, INDEXW16D, E}}, {{PREFIX, 2,                    6, OP4, B31 | DSTDISPREG, SRC, DSTDISP16LIST, E}}}, \
   {CODE, AV_H8SX, 0, NAME, {{SRC, INDEXL16D, E}}, {{PREFIX, 3,                    6, OP4, B31 | DSTDISPREG, SRC, DSTDISP16LIST, E}}}, \
@@ -571,7 +569,7 @@ struct h8_opcode
   {CODE, AV_H8SX, 0, NAME, {{RSPREDEC,  DST, E}}, {{PREFIX, 3,                    6, OP3, B30 | RSPREDEC,  DST,             E}}}, \
   {CODE, AV_H8SX, 0, NAME, {{DISP2SRC,  DST, E}}, {{PREFIX, B30 | B20 | DISP2SRC, 6, OP1, B30 | DISPREG,   DST,             E}}}, \
   {CODE, AV_H8,   6, NAME, {{DISP16SRC, DST, E}}, {{                              6, OP4, B30 | DISPREG,   DST, DISP16LIST, E}}}, \
-  {CODE, AV_H8,   6, NAME, {{DISP32SRC, DST, E}}, {{7, 8, B30 | DISPREG, 0,       6, OP2, 2,               DST, DISP32LIST, E}}}, \
+  {CODE, AV_H8,   6, NAME, {{DISP32SRC, DST, E}}, {{7, 8, B30 | DISPREG, 0,       6, OP2, 2,               DST, MEMRELAX | DISP32LIST, E}}}, \
   {CODE, AV_H8SX, 0, NAME, {{INDEXB16,  DST, E}}, {{PREFIX, 1,                    6, OP4, B30 | DISPREG,   DST, DISP16LIST, E}}}, \
   {CODE, AV_H8SX, 0, NAME, {{INDEXW16,  DST, E}}, {{PREFIX, 2,                    6, OP4, B30 | DISPREG,   DST, DISP16LIST, E}}}, \
   {CODE, AV_H8SX, 0, NAME, {{INDEXL16,  DST, E}}, {{PREFIX, 3,                    6, OP4, B30 | DISPREG,   DST, DISP16LIST, E}}}, \
@@ -1518,8 +1516,8 @@ struct h8_opcode h8_opcodes[] =
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{RS32, DISP2DST,  E}}, {{PREFIX_010,  B30 | B20 | DISP2DST, 0x6, 0x9, B31 | DSTDISPREG,  RS32, E}}}, 
   {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{RS32, DISP16DST, E}}, {{PREFIX_0100,                       0x6, 0xf, B31 | DSTDISPREG,  RS32, DSTDISP16LIST, E}}}, 
   {O (O_MOV, SL), AV_H8SX, 6, "mov.l", {{RS32, DISP32DST, E}}, {{0x7, 0x8, B31 | DSTDISPREG, 0x0,   0x6, 0xb, 0xa,               RS32, DSTDISP32LIST, E}}},
-  {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{RS32, DISP32DST, E}}, {{PREFIX_0100,                       0x7, 0x8, B31 | DSTDISPREG, 0x0,   0x6, 0xb, 0xa,               RS32, DSTDISP32LIST, E}}},
-  {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{RS32, DISP32DST, E}}, {{PREFIX_0100,                       0x7, 0x8, DSTDISPREG, 0x0,   0x6, 0xb, 0xa,               RS32, DSTDISP32LIST, E}}},
+  {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{RS32, DISP32DST, E}}, {{PREFIX_0100,                       0x7, 0x8, B31 | DSTDISPREG, 0x0,   0x6, 0xb, 0xa,               RS32, MEMRELAX | DSTDISP32LIST, E}}},
+  {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{RS32, DISP32DST, E}}, {{PREFIX_0100,                       0x7, 0x8, DSTDISPREG, 0x0,   0x6, 0xb, 0xa,               RS32, MEMRELAX | DSTDISP32LIST, E}}},
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{RS32, INDEXB16D, E}}, {{PREFIX_0101,                       0x6, 0xf, B31 | DSTDISPREG,  RS32, DSTDISP16LIST, E}}}, 
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{RS32, INDEXW16D, E}}, {{PREFIX_0102,                       0x6, 0xf, B31 | DSTDISPREG,  RS32, DSTDISP16LIST, E}}}, 
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{RS32, INDEXL16D, E}}, {{PREFIX_0103,                       0x6, 0xf, B31 | DSTDISPREG,  RS32, DSTDISP16LIST, E}}}, 
@@ -1537,7 +1535,7 @@ struct h8_opcode h8_opcodes[] =
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{DISP2SRC,  RD32, E}}, {{PREFIX_010,  B30 | B20 | DISP2SRC, 0x6, 0x9, B30 | DISPREG,   RD32, E}}}, 
   {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{DISP16SRC, RD32, E}}, {{PREFIX_0100,                       0x6, 0xf, B30 | DISPREG,   RD32, SRC | DISP16LIST, E}}}, 
   {O (O_MOV, SL), AV_H8SX, 6, "mov.l", {{DISP32SRC, RD32, E}}, {{0x7, 0x8, B31 | DISPREG, 0x0,      0x6, 0xb, 0x2,             RD32, SRC | DISP32LIST, E}}},
-  {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{DISP32SRC, RD32, E}}, {{PREFIX_0100,                       0x7, 0x8, B30 | DISPREG, 0x0, 0x6, 0xb, 0x2,             RD32, SRC | DISP32LIST, E}}},
+  {O (O_MOV, SL), AV_H8H,  6, "mov.l", {{DISP32SRC, RD32, E}}, {{PREFIX_0100,                       0x7, 0x8, B30 | DISPREG, 0x0, 0x6, 0xb, 0x2,             RD32, MEMRELAX | SRC | DISP32LIST, E}}},
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{INDEXB16,  RD32, E}}, {{PREFIX_0101,                       0x6, 0xf, B30 | DISPREG,   RD32, SRC | DISP16LIST, E}}}, 
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{INDEXW16,  RD32, E}}, {{PREFIX_0102,                       0x6, 0xf, B30 | DISPREG,   RD32, SRC | DISP16LIST, E}}}, 
   {O (O_MOV, SL), AV_H8SX, 0, "mov.l", {{INDEXL16,  RD32, E}}, {{PREFIX_0103,                       0x6, 0xf, B30 | DISPREG,   RD32, SRC | DISP16LIST, E}}}, 

@@ -1,3 +1,8 @@
+2013-03-21  Michael Schewe  <michael.schewe@gmx.net>
+
+	* h8.h: Add new reloc R_H8_DISP32A16 for relaxation of
+	mov @(disp:32,ERx) to mov @(disp:16,ERx).
+
 2013-03-08  Andreas Arnez  <arnez@linux.vnet.ibm.com>
 
 	* common.h (NT_S390_TDB): Define.

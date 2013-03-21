@@ -1,3 +1,8 @@
+2013-03-21  Michael Schewe  <michael.schewe@gmx.net>
+
+	* h8300.h: Add MEMRELAX flag for mov.b/w/l @(d:32,ERs),Rd
+	and mov.b/w/l Rs,@(d:32,ERd).
+
 2013-03-20  Alexis Deruelle  <alexis.deruelle@gmail.com>
 
 	PR gas/15082
