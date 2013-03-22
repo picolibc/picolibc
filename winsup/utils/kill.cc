@@ -260,13 +260,13 @@ out:
       if (!pid)
 	pid = strtoll (*argv, &p, 10);
       if (*p != '\0'
-	  || (!force && (pid < LONG_MIN || pid > LONG_MAX))
-	  || (force && (pid <= 0 || pid > ULONG_MAX)))
+	  || (!force && (pid < INT_MIN || pid > INT_MAX))
+	  || (force && (pid <= 0 || pid > UINT_MAX)))
 	{
 	  fprintf (stderr, "%s: illegal pid: %s\n", prog_name, *argv);
 	  ret = 1;
 	}
-      else if (pid <= LONG_MAX && kill ((pid_t) pid, sig) == 0)
+      else if (pid <= INT_MAX && kill ((pid_t) pid, sig) == 0)
 	{
 	  if (force)
 	    forcekill ((pid_t) pid, sig, 1);

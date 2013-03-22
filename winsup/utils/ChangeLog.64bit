@@ -1,3 +1,11 @@
+2013-03-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* kill.cc (main): Chack pid against INT_MIN and (U)INT_MAX since pid_t
+	is 4 byte on all platforms.
+	* mkgroup.c (main): Check domlist[i].id_offset against UINT_MAX since
+	DWORD is 4 byte on all platforms.
+	* mkpasswd.c (main): Ditto.
+
 2013-02-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dll_info): Handle x86_64 binaries.  Make sure to print

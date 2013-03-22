@@ -818,7 +818,7 @@ skip:
   for (i = 0; i < print_domlist; ++i)
     {
       DWORD my_off = (domlist[i].domain || domlist[i].str)
-		     ? domlist[i].id_offset != ULONG_MAX
+		     ? domlist[i].id_offset != UINT_MAX
 		       ? domlist[i].id_offset : off : 0;
       if (!domlist[i].domain && domlist[i].str && print_unix)
 	enum_unix_users (domlist + i, sep_char, my_off, print_unix);

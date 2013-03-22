@@ -888,7 +888,7 @@ skip:
   for (i = 0; i < print_domlist; ++i)
     {
       DWORD my_off = (domlist[i].domain || domlist[i].str)
-		     ? domlist[i].id_offset != ULONG_MAX
+		     ? domlist[i].id_offset != UINT_MAX
 		       ? domlist[i].id_offset : off : 0;
       if (!enum_local_groups (domlist[i].domain, domlist + i, sep_char,
 			      my_off, disp_groupname, print_builtin, print_current))
