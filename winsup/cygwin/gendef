@@ -158,25 +158,7 @@ _sigfe:						# stack is aligned on entry!
 	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
-	subq	\$0x88,%rsp			#   call yield but save
-	movq	%rcx,0x78(%rsp)			#   arguments first, otherwise
-	movq	%rdx,0x70(%rsp)			#   we end up with scrambled
-	movq	%r8,0x68(%rsp)			#   arguments when eventually
-	movq	%r9,0x60(%rsp)			#   calling the real function
-	movdqa	%xmm0,0x50(%rsp)
-	movdqa	%xmm1,0x40(%rsp)
-	movdqa	%xmm2,0x30(%rsp)
-	movdqa	%xmm3,0x20(%rsp)
-	call	yield				# should be a short-time thing
-	movdqa	0x20(%rsp),%xmm3		#  revert arguments,
-	movdqa	0x30(%rsp),%xmm2
-	movdqa	0x40(%rsp),%xmm1
-	movdqa	0x50(%rsp),%xmm0
-	movq	0x60(%rsp),%r9
-	movq	0x68(%rsp),%r8
-	movq	0x70(%rsp),%rdx
-	movq	0x78(%rsp),%rcx
-	addq	\$0x88,%rsp			# revert stack and
+	pause
 	jmp	1b				# loop
 2:	movq	\$8,%rax			# have the lock, now increment the
 	xaddq	%rax,$tls::stackptr(%r12)	#  stack pointer and get pointer
@@ -202,13 +184,7 @@ _sigbe:						# return here after cygwin syscall
 	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
-	subq	\$0x38,%rsp			# add spill and save return regs
-	movq	%rax,0x30(%rsp)
-	movdqa	%xmm0,0x20(%rsp)
-	call	yield				# sleep
-	movdqa	0x20(%rsp),%xmm0
-	movq	0x30(%rsp),%rax
-	addq	\$0x38,%rsp			# revert stack and return regs
+	pause
 	jmp	1b				#  and loop
 2:	movq	\$-8,%r11			# now decrement aux stack
 	xaddq	%r11,$tls::stackptr(%r12)	#  and get pointer
@@ -291,7 +267,7 @@ sigdelayed:
 	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
-	call	yield				# sleep
+	pause
 	jmp	1b				#  and loop
 2:	testl	%r15d,%r15d			# was saved_errno < 0
 	jl	3f				# yup.  ignore it
@@ -364,9 +340,7 @@ _ZN7_cygtls4lockEv:
 	xchgl	%r11d,$tls::pstacklock(%r12)
 	testl   %r11d,%r11d
 	jz	2f
-	subq	\$0x20,%rsp
-	call	yield
-	addq	\$0x20,%rsp
+	pause
 	jmp	1b
 2:	popq	%r12
 	ret
@@ -403,7 +377,7 @@ stabilize_sig_stack:
 	movl	%r10d,$tls::spinning(%r12)		# flag if we are waiting for lock
 	testl	%r10d,%r10d
 	jz	2f
-	call	yield
+	pause
 	jmp	1b
 2:	incl	$tls::incyg(%r12)
 	cmpl	\$0,$tls::sig(%r12)

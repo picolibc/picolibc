@@ -1,3 +1,7 @@
+2013-03-22  Kai Tietz  <ktietz@redhat.com>
+
+	* gendef: Use pause instead of calling yield throughout in x86_64 code.
+
 2013-03-20  Ken Brown  <kbrown@cornell.edu>
 
 	* include/sys/resource.h (RLIM_INFINITY): Define wordsize agnostic.
