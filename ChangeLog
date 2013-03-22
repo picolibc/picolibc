@@ -1,3 +1,8 @@
+2013-03-22  Mike Frysinger  <vapier@gentoo.org>
+
+	* src-release (VER): Change bfd/configure.in sed to use the new
+	`bfd/configure --version` output.
+
 2013-02-15  Yufeng Zhang  <yufeng.zhang@arm.com>
 
 	* configure.ac: Sync with GCC repo.
