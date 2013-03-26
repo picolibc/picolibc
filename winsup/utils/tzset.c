@@ -710,10 +710,12 @@ main (int argc, char **argv)
 	}
       idx = gotit;
     }
-  /* Got one.  Print it. */
-  spc = wcschr (tzmap[idx].posix_tzid, ' ');
-  if (spc)
-    *spc = L'\0';
-  printf ("%ls\n", tzmap[idx].posix_tzid);
+  /* Got one.  Print it.
+     Note: The tzmap array is in the R/O data section on x86_64.  Don't
+           try to overwrite the space, as the code did originally. */
+  spc = wcschr (tzmap[idx].posix_tzid, L' ');
+  if (!spc)
+    spc = wcschr (tzmap[idx].posix_tzid, L'\0');
+  printf ("%.*ls\n", (int) (spc - tzmap[idx].posix_tzid), tzmap[idx].posix_tzid);
   return 0;
 }

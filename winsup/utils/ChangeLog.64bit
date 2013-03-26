@@ -1,3 +1,8 @@
+2013-03-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* tzset.c (main): Don't try to overwrite space with NUL.  Explain why.
+	Rather, just print the string with computed precision value.
+
 2013-03-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* kill.cc (main): Chack pid against INT_MIN and (U)INT_MAX since pid_t
