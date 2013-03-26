@@ -45,7 +45,12 @@
    section before reaching the end of the critical section's code end, use
    the appropriate _newlib_XXX_exit macro. */
 
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
+#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS) \
+    && !defined (__rtems__)
+#define _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
+#endif
+
+#ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
 #include <pthread.h>
 
 /* Start a stream oriented critical section: */
@@ -84,7 +89,7 @@
 	  pthread_setcancelstate (__oldsfpcancel, &__oldsfpcancel); \
 	}
 
-#else /* __SINGLE_THREAD__ || !_POSIX_THREADS */
+#else /* !_STDIO_WITH_THREAD_CANCELLATION_SUPPORT */
 
 # define _newlib_flockfile_start(_fp) \
 	{ \
@@ -108,7 +113,7 @@
 		__sfp_lock_release (); \
 	}
 
-#endif /* !__SINGLE_THREAD__ && _POSIX_THREADS */
+#endif /* _STDIO_WITH_THREAD_CANCELLATION_SUPPORT */
 
 extern u_char *_EXFUN(__sccl, (char *, u_char *fmt));
 extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));

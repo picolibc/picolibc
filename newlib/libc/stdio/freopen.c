@@ -102,7 +102,7 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
 
   /* We can't use the _newlib_flockfile_XXX macros here due to the
      interlocked locking with the sfp_lock. */
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
+#ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
   int __oldcancel;
   pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &__oldcancel);
 #endif
@@ -111,7 +111,7 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
       _funlockfile (fp);
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
+#ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
       pthread_setcancelstate (__oldcancel, &__oldcancel);
 #endif
       _fclose_r (ptr, fp);
@@ -222,7 +222,7 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
       __lock_close_recursive (fp->_lock);
 #endif
       __sfp_lock_release ();
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
+#ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
       pthread_setcancelstate (__oldcancel, &__oldcancel);
 #endif
       return NULL;
@@ -242,7 +242,7 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
 #endif
 
   _funlockfile (fp);
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
+#ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
   pthread_setcancelstate (__oldcancel, &__oldcancel);
 #endif
   return fp;
