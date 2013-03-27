@@ -1,3 +1,20 @@
+2013-03-27  Bin Cheng  <bin.cheng@arm.com>
+
+	* acconfig.h (_FVWRITE_IN_STREAMIO): Undefine.
+	* newlib.hin (_FVWRITE_IN_STREAMIO): Undefine.
+	* configure.in (--disable-newlib-fvwrite-in-streamio): New option.
+	* configure: Regenerated.
+	* libc/stdio/fputs.c (_fputs_r): Use _FVWRITE_IN_STREAMIO to
+	control __sfvwrite_r.  Add alternative implementation.
+	* libc/stdio/fputws.c (_fputws_r): Ditto.
+	* libc/stdio/fwrite.c (_fwrite_r): Ditto.
+	* libc/stdio/puts.c (_puts_r): Ditto.
+	* libc/stdio/vfprintf.c (__ssputs_r, __sfputs_r): New function.
+	(_VFPRINTF_R): Use _FVWRITE_IN_STREAMIO to control vector buffer.
+	(__SPRINT): Use _FVWRITE_IN_STREAMIO to control macro definition.
+	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Use _FVWRITE_IN_STREAMIO
+	to control vector buffer.
+
 2013-03-26  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/stdio/local.h (_STDIO_WITH_THREAD_CANCELLATION_SUPPORT):

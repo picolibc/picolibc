@@ -103,6 +103,7 @@ _DEFUN(_fwrite_r, (ptr, buf, size, count, fp),
        FILE * fp)
 {
   size_t n;
+#ifdef _FVWRITE_IN_STREAMIO
   struct __suio uio;
   struct __siov iov;
 
@@ -128,6 +129,30 @@ _DEFUN(_fwrite_r, (ptr, buf, size, count, fp),
     }
   _newlib_flockfile_end (fp);
   return (n - uio.uio_resid) / size;
+#else
+  size_t i = 0;
+  _CONST char *p = buf;
+  n = count * size;
+  CHECK_INIT (ptr, fp);
+
+  _newlib_flockfile_start (fp);
+  ORIENT (fp, -1);
+  /* Make sure we can write.  */
+  if (cantwrite (ptr, fp))
+    goto ret;
+
+  while (i < n)
+    {
+      if (__sputc_r (ptr, p[i], fp) == EOF)
+	break;
+
+      i++;
+    }
+
+ret:
+  _newlib_flockfile_end (fp);
+  return i / size;
+#endif
 }
 
 #ifndef _REENT_ONLY

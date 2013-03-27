@@ -789,6 +789,7 @@ enable_newlib_iconv_to_encodings
 enable_newlib_iconv_external_ccs
 enable_newlib_atexit_dynamic_alloc
 enable_newlib_reent_small
+enable_newlib_fvwrite_in_streamio
 enable_multilib
 enable_target_optspace
 enable_malloc_debugging
@@ -1452,6 +1453,7 @@ Optional Features:
   --enable-newlib-iconv-external-ccs     enable capabilities to load external CCS files for iconv
   --disable-newlib-atexit-alloc    disable dynamic allocation of atexit entries
   --enable-newlib-reent-small   enable small reentrant struct support
+  --disable-newlib-fvwrite-in-streamio    disable iov in streamio
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -2349,6 +2351,19 @@ if test "${enable_newlib_reent_small+set}" = set; then :
  esac
 else
   newlib_reent_small=
+fi
+
+# Check whether --enable-newlib-fvwrite-in-streamio was given.
+if test "${enable_newlib_fvwrite_in_streamio+set}" = set; then :
+  enableval=$enable_newlib_fvwrite_in_streamio; if test "${newlib_fvwrite_in_streamio+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_fvwrite_in_streamio=yes ;;
+    no)  newlib_fvwrite_in_streamio=no  ;;
+    *)   as_fn_error $? "bad value ${enableval} for newlib-fvwrite-in-streamio option" "$LINENO" 5 ;;
+  esac
+ fi
+else
+  newlib_fvwrite_in_streamio=yes
 fi
 
 
@@ -12228,6 +12243,13 @@ fi
 if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
 #define _ATEXIT_DYNAMIC_ALLOC 1
+_ACEOF
+
+fi
+
+if test "${newlib_fvwrite_in_streamio}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _FVWRITE_IN_STREAMIO 1
 _ACEOF
 
 fi

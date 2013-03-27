@@ -54,6 +54,9 @@
 
 /* Define if the platform long double type is equal to double.  */
 #undef  _LDBL_EQ_DBL
+ 
+/* Define if ivo supported in streamio.  */
+#undef _FVWRITE_IN_STREAMIO
 
 @BOTTOM@
 /*

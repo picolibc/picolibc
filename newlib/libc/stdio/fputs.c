@@ -77,6 +77,7 @@ _DEFUN(_fputs_r, (ptr, s, fp),
        char _CONST * s _AND
        FILE * fp)
 {
+#ifdef _FVWRITE_IN_STREAMIO
   int result;
   struct __suio uio;
   struct __siov iov;
@@ -93,6 +94,29 @@ _DEFUN(_fputs_r, (ptr, s, fp),
   result = __sfvwrite_r (ptr, fp, &uio);
   _newlib_flockfile_end (fp);
   return result;
+#else
+  _CONST char *p = s;
+
+  CHECK_INIT(ptr, fp);
+
+  _newlib_flockfile_start (fp);
+  ORIENT (fp, -1);
+  /* Make sure we can write.  */
+  if (cantwrite (ptr, fp))
+    goto error;
+
+  while (*p)
+    {
+      if (__sputc_r (ptr, *p++, fp) == EOF)
+	goto error;
+    }
+  _newlib_flockfile_exit (fp);
+  return 0;
+
+error:
+  _newlib_flockfile_end (fp);
+  return EOF;
+#endif
 }
 
 #ifndef _REENT_ONLY

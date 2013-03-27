@@ -57,6 +57,9 @@
 
 /* True if long double supported and it is equal to double.  */
 #undef  _LDBL_EQ_DBL
+ 
+/* Define if ivo supported in streamio.  */
+#undef _FVWRITE_IN_STREAMIO
 
 /*
  * Iconv encodings enabled ("to" direction)
