@@ -27,7 +27,6 @@ struct wincaps
   unsigned has_transactions				: 1;
   unsigned has_sendmsg					: 1;
   unsigned has_broken_udf				: 1;
-  unsigned has_console_handle_problem			: 1;
   unsigned has_broken_alloc_console			: 1;
   unsigned has_always_all_codepages			: 1;
   unsigned has_localenames				: 1;
@@ -76,7 +75,6 @@ public:
   bool	IMPLEMENT (has_transactions)
   bool	IMPLEMENT (has_sendmsg)
   bool	IMPLEMENT (has_broken_udf)
-  bool	IMPLEMENT (has_console_handle_problem)
   bool	IMPLEMENT (has_broken_alloc_console)
   bool	IMPLEMENT (has_always_all_codepages)
   bool	IMPLEMENT (has_localenames)

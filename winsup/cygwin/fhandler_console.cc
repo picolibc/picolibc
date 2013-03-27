@@ -2366,7 +2366,7 @@ fhandler_console::create_invisible_console (HWINSTA horig)
   return b;
 }
 
-/* Ugly workaround for Windows 7.
+/* Ugly workaround for Windows 7 and later.
 
    First try to just attach to any console which may have started this
    app.  If that works use this as our "invisible console".

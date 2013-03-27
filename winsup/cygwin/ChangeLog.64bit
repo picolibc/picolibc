@@ -1,5 +1,13 @@
 2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_console.cc
+	(fhandler_console::create_invisible_console_workaround): Fix comment.
+	* wincap.cc: Throughout, remove unused has_console_handle_problem
+	wincapc members.
+	* wincap.h (struct wincaps): Remove has_console_handle_problem.
+
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (cygwin_gethostbyname): Revert accidental checkin of change
 	added for debugging.
 
