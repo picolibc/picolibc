@@ -1,3 +1,8 @@
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-what.xml (faq.what.supported): Mention Windows 8 and Server 2012.
+	Change sentence on native 64 bit version.
+
 2012-10-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.in: Add AC_NO_EXECUTABLES.
