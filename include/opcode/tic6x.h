@@ -27,18 +27,25 @@
 typedef enum
   {
     tic6x_field_baseR,
+    tic6x_field_cc,
     tic6x_field_creg,
     tic6x_field_cst,
     tic6x_field_csta,
     tic6x_field_cstb,
     tic6x_field_dst,
+    tic6x_field_dstms,
+    tic6x_field_dw,
     tic6x_field_fstgfcyc,
     tic6x_field_h,
+    tic6x_field_ii,
     tic6x_field_mask,
     tic6x_field_mode,
+    tic6x_field_n,
+    tic6x_field_na,
     tic6x_field_offsetR,
     tic6x_field_op,
     tic6x_field_p,
+    tic6x_field_ptr,
     tic6x_field_r,
     tic6x_field_s,
     tic6x_field_sc,
@@ -46,6 +53,11 @@ typedef enum
     tic6x_field_src1,
     tic6x_field_src2,
     tic6x_field_srcdst,
+    tic6x_field_srcms,
+    tic6x_field_sn,
+    tic6x_field_sz,
+    tic6x_field_unit,
+    tic6x_field_t,
     tic6x_field_x,
     tic6x_field_y,
     tic6x_field_z
@@ -53,14 +65,24 @@ typedef enum
 
 typedef struct
 {
-  /* The name used to reference the field.  */
-  tic6x_insn_field_id field_id;
-
   /* The least-significant bit position in the field.  */
-  unsigned short low_pos;
+  unsigned short low_pos; 
 
   /* The number of bits in the field.  */
   unsigned short width;
+  /* The position of the bitfield in the field. */
+  unsigned short pos;
+} tic6x_bitfield;
+
+/* Maximum number of subfields in composite field.  */
+#define TIC6X_MAX_BITFIELDS 4
+
+typedef struct
+{
+  /* The name used to reference the field.  */
+  tic6x_insn_field_id field_id;
+  unsigned int num_bitfields;
+  tic6x_bitfield bitfields[TIC6X_MAX_BITFIELDS];
 } tic6x_insn_field;
 
 /* Maximum number of variable fields in an instruction format.  */
@@ -118,6 +140,13 @@ typedef struct
   /* The greatest value of the field in this instruction.  */
   unsigned int max_val;
 } tic6x_fixed_field;
+
+/* Pseudo opcode fields position for compact instructions
+   If 16 bits instruction detected, the opcode is enriched
+   [DSZ/3][BR][SAT][opcode] */
+#define TIC6X_COMPACT_SAT_POS 16
+#define TIC6X_COMPACT_BR_POS 17
+#define TIC6X_COMPACT_DSZ_POS 18
 
 /* Bit-masks for defining instructions present on some subset of
    processors; each indicates an instruction present on that processor
@@ -188,6 +217,29 @@ typedef struct
    values here.  */
 #define TIC6X_PREFER_VAL(n)	(((n) & 0x8000) >> 15)
 #define TIC6X_FLAG_PREFER(n)	((n) << 15)
+
+/* 16 bits opcode is predicated by register a0 (s = 0) or b0 (s = 1) */
+#define TIC6X_FLAG_INSN16_SPRED      0x00100000
+/* 16 bits opcode ignores RS bit of fetch packet header */
+#define TIC6X_FLAG_INSN16_NORS       0x00200000
+/* 16 bits opcode only on side B */
+#define TIC6X_FLAG_INSN16_BSIDE      0x00400000
+/* 16 bits opcode ptr reg is b15 */
+#define TIC6X_FLAG_INSN16_B15PTR     0x00800000
+/* 16 bits opcode memory access modes */
+#define TIC6X_INSN16_MEM_MODE(n)           ((n) << 16)
+#define TIC6X_INSN16_MEM_MODE_VAL(n) (((n) & 0x000F0000) >> 16)
+#define TIC6X_MEM_MODE_NEGATIVE      0
+#define TIC6X_MEM_MODE_POSITIVE      1
+#define TIC6X_MEM_MODE_REG_NEGATIVE  4
+#define TIC6X_MEM_MODE_REG_POSITIVE  5
+#define TIC6X_MEM_MODE_PREDECR       8
+#define TIC6X_MEM_MODE_PREINCR       9
+#define TIC6X_MEM_MODE_POSTDECR      10
+#define TIC6X_MEM_MODE_POSTINCR      11
+
+#define TIC6X_FLAG_INSN16_MEM_MODE(mode) TIC6X_INSN16_MEM_MODE(TIC6X_MEM_MODE_##mode)
+
 #define TIC6X_NUM_PREFER	2
 
 /* Maximum number of fixed fields for a particular opcode.  */
@@ -230,6 +282,13 @@ typedef enum
     /* A register, from the same side as the functional unit
        selected.  */
     tic6x_operand_reg,
+    /* A register, from the same side as the functional unit
+       selected that ignore RS header bit */
+    tic6x_operand_reg_nors,
+    /* A register, from the b side */
+    tic6x_operand_reg_bside,
+    /* A register, from the b side and from the low register set */
+    tic6x_operand_reg_bside_nors,
     /* A register, that is from the other side if a cross path is
        used.  */
     tic6x_operand_xreg,
@@ -241,6 +300,14 @@ typedef enum
        path is not used, and the other side if a cross path is
        used.  */
     tic6x_operand_areg,
+    /* The B15 register */
+    tic6x_operand_b15reg,
+    /* A register coded as an offset from either A16 or B16 depending
+       on the value of the t bit. */
+    tic6x_operand_treg,
+    /* A register (A0 or B0), from the same side as the
+       functional unit selected.  */
+    tic6x_operand_zreg,
     /* A return address register (A3 or B3), from the same side as the
        functional unit selected.  */
     tic6x_operand_retreg,
@@ -252,10 +319,15 @@ typedef enum
     tic6x_operand_xregpair,
     /* A register pair, from the side of the data path selected.  */
     tic6x_operand_dregpair,
+    /* A register pair coded as an offset from either A16 or B16 depending
+       on the value of the t bit. */
+    tic6x_operand_tregpair,
     /* The literal string "irp" (case-insensitive).  */
     tic6x_operand_irp,
     /* The literal string "nrp" (case-insensitive).  */
     tic6x_operand_nrp,
+    /* The literal string "ilc" (case-insensitive).  */
+	tic6x_operand_ilc,
     /* A control register.  */
     tic6x_operand_ctrl,
     /* A memory reference (base and offset registers from the side of
@@ -277,7 +349,16 @@ typedef enum
     tic6x_operand_mem_deref,
     /* A functional unit name or a list thereof (for SPMASK and
        SPMASKR).  */
-    tic6x_operand_func_unit
+    tic6x_operand_func_unit,
+    /* Hardwired constant '5' in Sbu8 Scs10 and Sbu8c 16 bits
+       instruction formats - spru732j.pdf Appendix F.4 */
+    tic6x_operand_hw_const_minus_1,
+    tic6x_operand_hw_const_0,
+    tic6x_operand_hw_const_1,
+    tic6x_operand_hw_const_5,
+    tic6x_operand_hw_const_16,
+    tic6x_operand_hw_const_24,
+    tic6x_operand_hw_const_31
   } tic6x_operand_form;
 
 /* Whether something is, or can be, read or written.  */
@@ -375,6 +456,8 @@ typedef enum
     /* Likewise, but counting in half-words if in a header-based fetch
        packet.  */
     tic6x_coding_pcrel_half,
+    /* Store an unsigned PC-relative value used in compact insn */
+    tic6x_coding_pcrel_half_unsigned,
     /* Encode the register number (even number for a register pair) in
        the field.  When applied to a memory reference, encode the base
        register.  */
@@ -388,6 +471,8 @@ typedef enum
     /* Store 0 for register B14, 1 for register B15.  When applied to
        a memory reference, encode the base register.  */
     tic6x_coding_areg,
+    /* Compact instruction offset base register */
+    tic6x_coding_reg_ptr,
     /* Store the low part of a control register address.  */
     tic6x_coding_crlo,
     /* Store the high part of a control register address.  */
@@ -435,7 +520,16 @@ typedef enum
        destination for load) is on side B, 0 for side A.  */
     tic6x_coding_data_fu,
     /* Store 1 if the cross path is being used, 0 otherwise.  */
-    tic6x_coding_xpath
+    tic6x_coding_xpath,
+    /* L3i constant coding */
+    tic6x_coding_scst_l3i,
+    /* S3i constant coding */
+    tic6x_coding_cst_s3i,
+    /* mem offset minus 1 */
+    tic6x_coding_mem_offset_minus_one,
+    /* non aligned mem offset minus 1 */
+    tic6x_coding_mem_offset_minus_one_noscale,
+    tic6x_coding_rside
   } tic6x_coding_method;
 
 /* How to generate the value of a particular field.  */
@@ -530,7 +624,7 @@ typedef struct
   unsigned short isa_variants;
 
   /* Flags for this instruction.  */
-  unsigned short flags;
+  unsigned int flags;
 
   /* Number of fixed fields, or fields with restricted value ranges,
      for this instruction.  */
@@ -570,9 +664,15 @@ typedef enum
     CONCAT6(tic6x_opcode_,name,_,func_unit,_,format),
 #define INSNE(name, e, func_unit, format, type, isa, flags, fixed, ops, var) \
     CONCAT4(tic6x_opcode_,name,_,e),
+#define INSNU(name, func_unit, format, type, isa, flags, fixed, ops, var) \
+    CONCAT6(tic6x_opcode_,name,_,func_unit,_,format),
+#define INSNUE(name, e, func_unit, format, type, isa, flags, fixed, ops, var) \
+    CONCAT6(tic6x_opcode_,name,_,func_unit,_,e),
 #include "tic6x-opcode-table.h"
 #undef INSN
 #undef INSNE
+#undef INSNU
+#undef INSNUE
     tic6x_opcode_max
   } tic6x_opcode_id;
 

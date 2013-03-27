@@ -1,6 +1,5 @@
 /* TI C6X instruction format information.
-   Copyright 2010
-   Free Software Foundation, Inc.
+   Copyright 2010-2013 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,7 +19,19 @@
 /* Define the FMT macro before including this file; it takes a name
    and the fields from tic6x_insn_format (defined in tic6x.h).  */
 
-#define FLD(name, pos, width) { CONCAT2(tic6x_field_,name), (pos), (width) }
+/* Expansion fields values for 16 bits insn.  */
+#define SAT(a) (((a) & 1) << TIC6X_COMPACT_SAT_POS)
+#define BR(a) (((a) & 1) << TIC6X_COMPACT_BR_POS)
+#define DSZ(a) (((a) & 7) << TIC6X_COMPACT_DSZ_POS)
+/* Composite fields for 16 bits insn.  */
+#define BFLD(low_pos, width, pos) { (low_pos), (width), (pos) }
+#define BFLD1(a) 1, { a }
+#define BFLD2(a, b) 2, { a, b }
+#define BFLD3(a, b, c) 3, { a, b, c }
+#define BFLD4(a, b, c, d) 4, { a, b, c, d }
+#define COMPFLD(name, bitfields) { CONCAT2(tic6x_field_,name),  bitfields }
+/**/
+#define FLD(name, pos, width) { CONCAT2(tic6x_field_,name), BFLD1(BFLD(pos, width, 0)) }
 #define CFLDS FLD(p, 0, 1), FLD(creg, 29, 3), FLD(z, 28, 1)
 #define CFLDS2(a, b) 5, { CFLDS, a, b }
 #define CFLDS3(a, b, c) 6, { CFLDS, a, b, c }
@@ -36,6 +47,21 @@
 #define NFLDS5(a, b, c, d, e) 6, { NFLDS, a, b, c, d, e }
 #define NFLDS6(a, b, c, d, e, f) 7, { NFLDS, a, b, c, d, e, f }
 #define NFLDS7(a, b, c, d, e, f, g) 8, { NFLDS, a, b, c, d, e, f, g }
+/* 16 bits insn */
+#define FLDS1(a) 1, { a }
+#define FLDS2(a, b) 2, { a, b }
+#define FLDS3(a, b, c) 3, { a, b, c }
+#define FLDS4(a, b, c, d) 4, { a, b, c, d }
+#define FLDS5(a, b, c, d, e) 5, { a, b, c, d, e }
+#define SFLDS FLD(s, 0, 1)
+#define SFLDS1(a) 2, { SFLDS, a }
+#define SFLDS2(a, b) 3, { SFLDS, a, b }
+#define SFLDS3(a, b, c) 4, { SFLDS, a, b, c }
+#define SFLDS4(a, b, c, d) 5, { SFLDS, a, b, c, d }
+#define SFLDS5(a, b, c, d, e) 6, { SFLDS, a, b, c, d, e }
+#define SFLDS6(a, b, c, d, e, f) 7, { SFLDS, a, b, c, d, e, f }
+#define SFLDS7(a, b, c, d, e, f, g) 8, { SFLDS, a, b, c, d, e, f, g }
+/**/
 
 /* These are in the order from SPRUFE8, appendices C-H.  */
 
@@ -68,6 +94,194 @@ FMT(d_adda_long, 32, 0x1000000c, 0xf000000c,
 
 /* Appendix C 16-bit formats will go here.  */
 
+/* C-8 */
+FMT(d_doff4_dsz_0xx, 16, DSZ(0) | 0x0004, DSZ(0x4) | 0x0406,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3))))) 
+FMT(d_doff4_dsz_100, 16, DSZ(4) | 0x0004, DSZ(0x7) | 0x0406,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3))))) 
+FMT(d_doff4_dsz_000, 16, DSZ(0) | 0x0004, DSZ(0x7) | 0x0406,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3))))) 
+FMT(d_doff4_dsz_x01, 16, DSZ(1) | 0x0004, DSZ(0x3) | 0x0406,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3))))) 
+FMT(d_doff4_dsz_01x, 16, DSZ(2) | 0x0004, DSZ(0x6) | 0x0406,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3))))) 
+FMT(d_doff4_dsz_111, 16, DSZ(7) | 0x0004, DSZ(0x7) | 0x0406,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3))))) 
+FMT(d_doff4_dsz_x11, 16, DSZ(3) | 0x0004, DSZ(0x3) | 0x0406,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3))))) 
+FMT(d_doff4_dsz_010, 16, DSZ(2) | 0x0004, DSZ(0x7) | 0x0406,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3))))) 
+FMT(d_doff4_dsz_110, 16, DSZ(6) | 0x0004, DSZ(0x7) | 0x0406,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3))))) 
+
+/* C-9 */
+FMT(d_doff4dw, 16, DSZ(4) | 0x0004, DSZ(0x4) | 0x0406,
+    SFLDS7(FLD(op, 3, 1), FLD(na, 4, 1), FLD(srcdst, 5, 2), FLD(ptr, 7, 2), FLD(sz, 9, 1), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3))))) 
+
+/* C-10 */
+FMT(d_dind_dsz_0xx, 16, DSZ(0) | 0x0404, DSZ(0x4) | 0x0c06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(src1, 13, 3)))
+
+FMT(d_dind_dsz_x01, 16, DSZ(1) | 0x0404, DSZ(0x3) | 0x0c06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(src1, 13, 3)))
+
+FMT(d_dind_dsz_x11, 16, DSZ(3) | 0x0404, DSZ(0x3) | 0x0c06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(src1, 13, 3)))
+
+FMT(d_dind_dsz_01x, 16, DSZ(2) | 0x0404, DSZ(0x6) | 0x0c06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(src1, 13, 3)))
+
+FMT(d_dind_dsz_000, 16, DSZ(0) | 0x0404, DSZ(0x7) | 0x0c06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(src1, 13, 3)))
+
+FMT(d_dind_dsz_010, 16, DSZ(2) | 0x0404, DSZ(0x7) | 0x0c06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(src1, 13, 3)))
+
+FMT(d_dind_dsz_100, 16, DSZ(4) | 0x0404, DSZ(0x7) | 0x0c06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(src1, 13, 3)))
+
+FMT(d_dind_dsz_110, 16, DSZ(6) | 0x0404, DSZ(0x7) | 0x0c06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(src1, 13, 3)))
+
+FMT(d_dind_dsz_111, 16, DSZ(7) | 0x0404, DSZ(0x7) | 0x0c06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(src1, 13, 3)))
+
+/* C-11 */
+FMT(d_dinddw, 16, DSZ(4) | 0x0404, DSZ(0x4) | 0x0c06,
+    SFLDS7(FLD(op, 3, 1), FLD(na, 4, 1), FLD(srcdst, 5, 2), FLD(ptr, 7, 2),
+           FLD(sz, 9, 1), FLD(t, 12, 1), FLD(src1, 13, 3)))
+
+/* C-12 */
+FMT(d_dinc_dsz_x01, 16, DSZ(1) | 0x0c04, DSZ(0x3) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_dinc_dsz_0xx, 16, DSZ(0) | 0x0c04, DSZ(0x4) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_dinc_dsz_01x, 16, DSZ(2) | 0x0c04, DSZ(0x6) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_dinc_dsz_x11,16, DSZ(3) | 0x0c04, DSZ(0x3) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_dinc_dsz_000, 16, DSZ(0) | 0x0c04, DSZ(0x7) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_dinc_dsz_010, 16, DSZ(2) | 0x0c04, DSZ(0x7) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_dinc_dsz_100, 16, DSZ(4) | 0x0c04, DSZ(0x7) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_dinc_dsz_110, 16, DSZ(6) | 0x0c04, DSZ(0x7) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_dinc_dsz_111, 16, DSZ(7) | 0x0c04, DSZ(0x7) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+/* C-13*/
+FMT(d_dincdw, 16, DSZ(4) | 0x0c04, DSZ(0x4) | 0xcc06,
+    SFLDS7(FLD(op, 3, 1), FLD(na, 4, 1), FLD(srcdst, 5, 2), FLD(ptr, 7, 2),
+           FLD(sz, 9, 1), FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+/* C-14 */
+FMT(d_ddec_dsz_01x, 16, DSZ(2) | 0x4c04, DSZ(0x6) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_ddec_dsz_0xx, 16, DSZ(0) | 0x4c04, DSZ(0x4) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_ddec_dsz_x01, 16, DSZ(1) | 0x4c04, DSZ(0x3) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_ddec_dsz_x11, 16, DSZ(3) | 0x4c04, DSZ(0x3) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_ddec_dsz_000, 16, DSZ(0) | 0x4c04, DSZ(0x7) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_ddec_dsz_010, 16, DSZ(2) | 0x4c04, DSZ(0x7) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_ddec_dsz_100, 16, DSZ(4) | 0x4c04, DSZ(0x7) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_ddec_dsz_110, 16, DSZ(6) | 0x4c04, DSZ(0x7) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+FMT(d_ddec_dsz_111, 16, DSZ(7) | 0x4c04, DSZ(0x7) | 0xcc06,
+    SFLDS6(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(ptr, 7, 2), FLD(sz, 9, 1),
+           FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+/* C-15 */
+FMT(d_ddecdw, 16, DSZ(4) | 0x4c04, DSZ(0x4) | 0xcc06,
+    SFLDS7(FLD(op, 3, 1), FLD(na, 4, 1),  FLD(srcdst, 5, 2), FLD(ptr, 7, 2),
+           FLD(sz, 9, 1), FLD(t, 12, 1), FLD(cst, 13, 1)))
+
+/* C-16 */
+FMT(d_dstk, 16, 0x8c04, 0x8c06,
+    SFLDS4(FLD(op, 3, 1), FLD(srcdst, 4, 3), FLD(t, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(7, 3, 2), BFLD(13, 2, 0)))))
+
+/* C-17 */
+FMT(d_dx2op, 16, 0x0036, 0x047e,
+    SFLDS4(FLD(src2, 7, 3), FLD(op, 11, 1), FLD(x, 12, 1), FLD(srcdst, 13, 3)))
+
+/* C-18 */
+FMT(d_dx5, 16, 0x0436, 0x047e,
+    SFLDS2(FLD(dst, 7, 3), 
+           COMPFLD(cst, BFLD2(BFLD(11, 2, 3), BFLD(13, 3, 0)))))
+
+/* C-19 */
+FMT(d_dx5p, 16, 0x0c76, 0x1c7e,
+    SFLDS2(FLD(op, 7, 1),
+           COMPFLD(cst, BFLD2(BFLD(8, 2, 3), BFLD(13, 3, 0)))))
+
+/* C-20 */
+FMT(d_dx1, 16, 0x1876, 0x1c7e,
+    SFLDS2(FLD(srcdst, 7, 3), FLD(op, 13, 3)))
+
+/* C-21 */
+FMT(d_dpp, 16, 0x0077, 0x087f,
+    SFLDS5(FLD(srcdst, 7, 4), FLD(t, 12, 1), FLD(cst, 13, 1), FLD(op, 14, 1),
+           FLD(dw, 15, 1)))
+
 /* Appendix D 32-bit formats.  */
 
 FMT(l_1_or_2_src, 32, 0x18, 0x1c,
@@ -81,6 +295,44 @@ FMT(l_unary, 32, 0x358, 0xffc,
 	   FLD(dst, 23, 5)))
 
 /* Appendix D 16-bit formats will go here.  */
+
+/* D-4 */
+FMT(l_l3_sat_0, 16, SAT(0) | 0x0000, SAT(1) | 0x040e,
+    SFLDS5(FLD(dst, 4, 3), FLD(src2, 7, 3), FLD(op, 11, 1), FLD(x, 12, 1),
+           FLD(src1, 13, 3)))
+
+FMT(l_l3_sat_1, 16, SAT(1) | 0x0000, SAT(1) | 0x040e,
+    SFLDS5(FLD(dst, 4, 3), FLD(src2, 7, 3), FLD(op, 11, 1), FLD(x, 12, 1),
+           FLD(src1, 13, 3)))
+
+/* D-5 - combine cst3 and n fields into a single field cst */
+FMT(l_l3i, 16, 0x0400, 0x040e,
+    SFLDS5(FLD(dst, 4, 3), FLD(src2, 7, 3), FLD(sn, 11, 1), FLD(x, 12, 1),
+           COMPFLD(cst, BFLD2(BFLD(13, 3, 0), BFLD(11, 1, 3)))))
+
+/* D-6 Mtbd ? */
+
+/* D-7 */
+FMT(l_l2c, 16, 0x0408, 0x040e,
+    SFLDS5(FLD(dst, 4, 1), FLD(src2, 7, 3), FLD(x, 12, 1), FLD(src1, 13, 3),
+           COMPFLD(op, BFLD2(BFLD(5, 2, 0), BFLD(11, 1, 2)))))
+
+/* D-8 */
+FMT(l_lx5, 16, 0x0426, 0x047e,
+    SFLDS2(FLD(dst, 7, 3),
+           COMPFLD(cst, BFLD2(BFLD(11, 2, 3), BFLD(13, 3, 0)))))
+
+/* D-9 */
+FMT(l_lx3c, 16, 0x0026, 0x147e,
+    SFLDS3(FLD(src2, 7, 3), FLD(dst, 11, 1), FLD(cst, 13, 3)))
+
+/* D-10 */
+FMT(l_lx1c, 16, 0x1026, 0x147e,
+    SFLDS4(FLD(src2, 7, 3), FLD(dst, 11, 1), FLD(cst, 13, 1), FLD(op, 14, 2)))
+
+/* D-11 */
+FMT(l_lx1, 16, 0x1866, 0x1c7e,
+    SFLDS2(FLD(srcdst, 7, 3), FLD(op, 13, 3)))
 
 /* Appendix E 32-bit formats.  */
 
@@ -101,6 +353,12 @@ FMT(m_mpy, 32, 0x0, 0x7c,
 	   FLD(src2, 18, 5), FLD(dst, 23, 5)))
 
 /* Appendix E 16-bit formats will go here.  */
+FMT(m_m3_sat_0, 16, SAT(0) | 0x001e, SAT(1) | 0x001e,
+    SFLDS5(FLD(op, 5, 2), FLD(src2, 7, 3), FLD(dst, 10, 2),
+           FLD(x, 12, 1), FLD(src1, 13, 3)))
+FMT(m_m3_sat_1, 16, SAT(1) | 0x001e, SAT(1) | 0x001e,
+    SFLDS5(FLD(op, 5, 2), FLD(src2, 7, 3), FLD(dst, 10, 2),
+           FLD(x, 12, 1), FLD(src1, 13, 3)))
 
 /* Appendix F 32-bit formats.  */
 
@@ -148,7 +406,113 @@ FMT(s_bpos, 32, 0x20, 0x1ffc,
 
 /* Appendix F 16-bit formats will go here.  */
 
+/* F-17 Sbs7 Instruction Format */
+FMT(s_sbs7, 16, BR(1) | 0x000a, BR(1) | 0x003e,
+    SFLDS2(FLD(cst, 6, 7), FLD(n, 13, 3)))
+
+/* F-18 Sbu8 Instruction Format */
+FMT(s_sbu8, 16, BR(1) | 0xc00a, BR(1) | 0xc03e,
+    SFLDS1(FLD(cst, 6, 8)))
+
+/* F-19 Scs10 Instruction Format */
+FMT(s_scs10, 16, BR(1) | 0x001a, BR(1) | 0x003e,
+    SFLDS1(FLD(cst, 6, 10)))
+
+/* F-20 Sbs7c Instruction Format */
+FMT(s_sbs7c, 16, BR(1) | 0x002a, BR(1) | 0x002e,
+    SFLDS3(FLD(z, 4, 1), FLD(cst, 6, 7), FLD(n, 13, 3)))
+
+/* F-21 Sbu8c Instruction Format */
+FMT(s_sbu8c, 16, BR(1) | 0xc02a, BR(1) |  0xc02e,
+    SFLDS2(FLD(z, 4, 1), FLD(cst, 6, 8)))
+
+/* F-22 S3 Instruction Format */
+FMT(s_s3, 16, BR(0) | 0x000a, BR(1) | 0x040e,
+    SFLDS5(FLD(dst, 4, 3), FLD(src2, 7, 3), FLD(op, 11, 1), FLD(x, 12, 1),
+          FLD(src1, 13, 3)))
+
+FMT(s_s3_sat_x, 16, BR(0) | SAT(0) | 0x000a, BR(1) | SAT(0) | 0x040e,
+    SFLDS5(FLD(dst, 4, 3), FLD(src2, 7, 3), FLD(op, 11, 1), FLD(x, 12, 1),
+          FLD(src1, 13, 3)))
+
+FMT(s_s3_sat_0, 16, BR(0) | SAT(0) | 0x000a, BR(1) | SAT(1) | 0x040e,
+    SFLDS5(FLD(dst, 4, 3), FLD(src2, 7, 3), FLD(op, 11, 1), FLD(x, 12, 1),
+          FLD(src1, 13, 3)))
+
+FMT(s_s3_sat_1, 16, BR(0) | SAT(1) | 0x000a, BR(1) | SAT(1) |	 0x040e,
+    SFLDS5(FLD(dst, 4, 3), FLD(src2, 7, 3), FLD(op, 11, 1), FLD(x, 12, 1),
+          FLD(src1, 13, 3)))
+
+/* F-23 S3i Instruction Format */
+FMT(s_s3i, 16, BR(0) | 0x040a, BR(1) | 0x040e,
+    SFLDS5(FLD(dst, 4, 3), FLD(src2, 7, 3), FLD(op, 11, 1), FLD(x, 12, 1),
+           FLD(cst, 13, 3)))
+
+/* F-24 Smvk8 Instruction Format */
+FMT(s_smvk8, 16, 0x0012, 0x001e,
+    SFLDS2(FLD(dst, 7, 3),
+           COMPFLD(cst, BFLD4(BFLD(10, 1, 7), BFLD(5, 2, 5), BFLD(11, 2, 3), BFLD(13, 3, 0)))))
+
+/* F-25 Ssh5 Instruction Format */
+FMT(s_ssh5_sat_x, 16, SAT(0) | 0x0402, SAT(0) | 0x041e,
+    SFLDS3(FLD(op, 5, 2), FLD(srcdst, 7, 3),
+           COMPFLD(cst, BFLD2(BFLD(11, 2, 3), BFLD(13, 3, 0)))))
+FMT(s_ssh5_sat_0, 16, SAT(0) | 0x0402, SAT(1) | 0x041e,
+    SFLDS3(FLD(op, 5, 2), FLD(srcdst, 7, 3),
+           COMPFLD(cst, BFLD2(BFLD(11, 2, 3), BFLD(13, 3, 0)))))
+FMT(s_ssh5_sat_1, 16, SAT(1) | 0x0402, SAT(1) | 0x041e,
+    SFLDS3(FLD(op, 5, 2), FLD(srcdst, 7, 3),
+           COMPFLD(cst, BFLD2(BFLD(11, 2, 3), BFLD(13, 3, 0)))))
+
+/* F-26 S2sh Instruction Format */
+FMT(s_s2sh, 16, 0x0462, 0x047e,
+    SFLDS3(FLD(srcdst, 7, 3), FLD(op, 11, 2), FLD(src1, 13, 3)))
+
+/* F-27 Sc5 Instruction Format */
+FMT(s_sc5, 16, 0x0002, 0x041e,
+    SFLDS3(FLD(op, 5, 2), FLD(srcdst, 7, 3),
+           COMPFLD(cst, BFLD2(BFLD(11, 2, 3), BFLD(13, 3, 0)))))
+
+/* F-28 S2ext Instruction Format */
+FMT(s_s2ext, 16, 0x0062, 0x047e,
+    SFLDS3(FLD(src, 7, 3), FLD(op, 11, 2), FLD(dst, 13, 3)))
+
+/* F-29 Sx2op Instruction Format */
+FMT(s_sx2op, 16, 0x002e, 0x047e,
+    SFLDS4(FLD(src2, 7, 3), FLD(op, 11, 1), FLD(x, 12, 1),
+           FLD(srcdst, 13, 3)))
+
+/* F-30 Sx5 Instruction Format */
+FMT(s_sx5, 16, 0x042e, 0x047e,
+    SFLDS2(FLD(dst, 7, 3),
+           COMPFLD(cst, BFLD2(BFLD(11, 2, 3), BFLD(13, 3, 0)))))
+
+/* F-31 Sx1 Instruction Format */
+FMT(s_sx1, 16, 0x186e, 0x1c7e,
+    SFLDS2(FLD(srcdst, 7, 3), FLD(op, 13, 3)))
+
+/* F-32 Sx1b Instruction Format */
+FMT(s_sx1b, 16, 0x006e, 0x187e,
+    SFLDS2(FLD(src2, 7, 4), FLD(n, 13, 3)))
+
 /* Appendix G 16-bit formats will go here.  */
+FMT(lsdmvto, 16, 0x0006, 0x0066,
+    SFLDS4(FLD(unit, 3, 2), 
+           FLD(x, 12, 1), FLD(dst, 13, 3),
+           COMPFLD(src2, BFLD2(BFLD(10, 2, 3), BFLD(7, 3, 0)))))
+
+FMT(lsdmvfr, 16, 0x0046, 0x0066,
+    SFLDS4(FLD(unit, 3, 2), FLD(src2, 7, 3), FLD(x, 12, 1),
+           COMPFLD(dst, BFLD2(BFLD(10, 2, 3), BFLD(13, 3, 0)))))
+
+/* G-3 */
+FMT(lsdx1c, 16, 0x0866, 0x1c66,
+    SFLDS4(FLD(unit, 3, 2), FLD(dst, 7, 3), FLD(cst, 13, 1),
+           FLD(cc, 14, 2)))
+
+/* G-4 */
+FMT(lsdx1, 16, 0x1866, 0x1c66,
+    SFLDS3(FLD(unit, 3, 2), FLD(srcdst, 7, 3), FLD(op, 13, 3)))
 
 /* Appendix H 32-bit formats.  */
 
@@ -180,6 +544,38 @@ FMT(nfu_spmask, 32, 0x00020000, 0xfc021ffc,
 
 /* Appendix H 16-bit formats will go here.  */
 
+/* H-5 */
+FMT(nfu_uspl, 16, 0x0c66, 0xbc7e,
+   FLDS2(FLD(op, 0, 1), COMPFLD(ii, BFLD2(BFLD(7, 3, 0), BFLD(14, 1, 3)))))
+
+/* H-6 */
+/* make up some fields to pretend to have s and z fields s for this format
+   so as to fit in other predicated compact instruction to avoid special-
+   casing this instruction in tic6x-dis.c 
+   use op field as a predicate adress register selector (s field)
+   use the first zeroed bit as a z value as this insn only supports [a0]
+   and [b0] predicate forms.
+*/
+FMT(nfu_uspldr, 16, 0x8c66, 0xbc7e,
+   FLDS4(FLD(op, 0, 1), FLD(s, 0, 1), FLD(z, 3, 1),
+         COMPFLD(ii, BFLD2(BFLD(7, 3, 0), BFLD(14, 1, 3)))))
+
+/* H-7 */
+FMT(nfu_uspk, 16, 0x1c66, 0x3c7e,
+   FLDS1(COMPFLD(fstgfcyc, BFLD3(BFLD(0, 1, 0), BFLD(7, 3, 1), BFLD(14, 2, 4)))))
+
+/* H-8a */
+FMT(nfu_uspma, 16, 0x2c66, 0x3c7e,
+   FLDS1(COMPFLD(mask, BFLD3(BFLD(0, 1, 0), BFLD(7, 3, 1), BFLD(14, 2, 4)))))
+
+/* H-8b */
+FMT(nfu_uspmb, 16, 0x3c66, 0x3c7e,
+   FLDS1(COMPFLD(mask, BFLD3(BFLD(0, 1, 0), BFLD(7, 3, 1), BFLD(14, 2, 4)))))
+
+/* H-9 */
+FMT(nfu_unop, 16, 0x0c6e, 0x1fff,
+   FLDS1(FLD(n, 13, 3)))
+
 #undef FLD
 #undef CFLDS
 #undef CFLDS2
@@ -196,3 +592,25 @@ FMT(nfu_spmask, 32, 0x00020000, 0xfc021ffc,
 #undef NFLDS5
 #undef NFLDS6
 #undef NFLDS7
+#undef SFLDS
+#undef SFLDS1
+#undef SFLDS2
+#undef SFLDS3
+#undef SFLDS4
+#undef SFLDS5
+#undef SFLDS6
+#undef SFLDS7
+#undef BFLD
+#undef BFLD1
+#undef BFLD2
+#undef BFLD3
+#undef BFLD4
+#undef FLDS1
+#undef FLDS2
+#undef FLDS3
+#undef FLDS4
+#undef FLDS5
+#undef COMPFLD
+#undef DSZ
+#undef BR
+#undef SAT

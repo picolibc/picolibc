@@ -1,3 +1,11 @@
+2013-03-27  Alexis Deruelle  <alexis.deruelle@gmail.com>
+
+	PR binutils/15068
+	* tic6xc-insn-formats.h (FLD): Add use of bitfield array.
+	Add 16-bit opcodes.
+	* tic6xc-opcode-table.h: Add 16-bit insns.
+	* tic6x.h: Add support for 16-bit insns.
+
 2013-03-21  Michael Schewe  <michael.schewe@gmx.net>
 
 	* h8300.h: Add MEMRELAX flag for mov.b/w/l @(d:32,ERs),Rd

@@ -45,14 +45,28 @@
 #define OP4(a, b, c, d) 4, { a, b, c, d }
 #define OACST { tic6x_operand_asm_const, 0, tic6x_rw_none, 0, 0, 0, 0 }
 #define OLCST { tic6x_operand_link_const, 0, tic6x_rw_none, 0, 0, 0, 0 }
+#define OHWCSTM1 { tic6x_operand_hw_const_minus_1, 0, tic6x_rw_none, 0, 0, 0, 0 }
+#define OHWCST0 { tic6x_operand_hw_const_0, 0, tic6x_rw_none, 0, 0, 0, 0 }
+#define OHWCST1 { tic6x_operand_hw_const_1, 0, tic6x_rw_none, 0, 0, 0, 0 }
+#define OHWCST5 { tic6x_operand_hw_const_5, 0, tic6x_rw_none, 0, 0, 0, 0 }
+#define OHWCST16 { tic6x_operand_hw_const_16, 0, tic6x_rw_none, 0, 0, 0, 0 }
+#define OHWCST24 { tic6x_operand_hw_const_24, 0, tic6x_rw_none, 0, 0, 0, 0 }
+#define OHWCST31 { tic6x_operand_hw_const_31, 0, tic6x_rw_none, 0, 0, 0, 0 }
 #define OFULIST { tic6x_operand_func_unit, 0, tic6x_rw_none, 0, 0, 0, 0 }
 #define ORIRP1 { tic6x_operand_irp, 4, tic6x_rw_read, 1, 1, 0, 0 }
 #define ORNRP1 { tic6x_operand_nrp, 4, tic6x_rw_read, 1, 1, 0, 0 }
 #define OWREG1 { tic6x_operand_reg, 4, tic6x_rw_write, 1, 1, 0, 0 }
+#define OWREG1Z { tic6x_operand_zreg, 4, tic6x_rw_write, 1, 1, 0, 0 }
+#define OWREG1NORS { tic6x_operand_reg_nors, 4, tic6x_rw_write, 1, 1, 0, 0 }
+#define ORREG1B { tic6x_operand_reg_bside, 4, tic6x_rw_write, 1, 1, 0, 0 }
+#define ORREG1BNORS { tic6x_operand_reg_bside_nors, 4, tic6x_rw_write, 1, 1, 0, 0 }
 #define OWRETREG1 { tic6x_operand_retreg, 4, tic6x_rw_write, 1, 1, 0, 0 }
 #define ORREG1 { tic6x_operand_reg, 4, tic6x_rw_read, 1, 1, 0, 0 }
 #define ORDREG1 { tic6x_operand_dreg, 4, tic6x_rw_read, 1, 1, 0, 0 }
+#define ORTREG1 { tic6x_operand_treg, 4, tic6x_rw_read, 1, 1, 0, 0 }
 #define ORWREG1 { tic6x_operand_reg, 4, tic6x_rw_read_write, 1, 1, 0, 0 }
+#define ORB15REG1 { tic6x_operand_b15reg, 4, tic6x_rw_read, 1, 1, 0, 0 }
+#define OWB15REG1 { tic6x_operand_b15reg, 4, tic6x_rw_write, 1, 1, 0, 0 }
 #define ORAREG1 { tic6x_operand_areg, 4, tic6x_rw_read, 1, 1, 0, 0 }
 #define ORXREG1 { tic6x_operand_xreg, 4, tic6x_rw_read, 1, 1, 0, 0 }
 #define ORREG12 { tic6x_operand_reg, 4, tic6x_rw_read, 1, 2, 0, 0 }
@@ -62,6 +76,7 @@
 #define OWREG4 { tic6x_operand_reg, 4, tic6x_rw_write, 4, 4, 0, 0 }
 #define OWREG9 { tic6x_operand_reg, 4, tic6x_rw_write, 9, 9, 0, 0 }
 #define OWDREG5 { tic6x_operand_dreg, 4, tic6x_rw_write, 5, 5, 0, 0 }
+#define OWTREG5 { tic6x_operand_treg, 4, tic6x_rw_write, 5, 5, 0, 0 }
 #define OWREGL1 { tic6x_operand_regpair, 5, tic6x_rw_write, 1, 1, 1, 1 }
 #define ORREGL1 { tic6x_operand_regpair, 5, tic6x_rw_read, 1, 1, 1, 1 }
 #define OWREGD1 { tic6x_operand_regpair, 8, tic6x_rw_write, 1, 1, 1, 1 }
@@ -71,7 +86,9 @@
 #define OWREGD45 { tic6x_operand_regpair, 8, tic6x_rw_write, 4, 4, 5, 5 }
 #define OWREGD67 { tic6x_operand_regpair, 8, tic6x_rw_write, 6, 6, 7, 7 }
 #define ORDREGD1 { tic6x_operand_dregpair, 8, tic6x_rw_read, 1, 1, 1, 1 }
+#define ORTREGD1 { tic6x_operand_tregpair, 8, tic6x_rw_read, 1, 1, 1, 1 }
 #define OWDREGD5 { tic6x_operand_dregpair, 8, tic6x_rw_write, 5, 5, 5, 5 }
+#define OWTREGD5 { tic6x_operand_tregpair, 8, tic6x_rw_write, 5, 5, 5, 5 }
 #define ORREGD12 { tic6x_operand_regpair, 8, tic6x_rw_read, 1, 1, 2, 2 }
 #define ORXREGD12 { tic6x_operand_xregpair, 8, tic6x_rw_read, 1, 1, 2, 2 }
 #define ORREGD1234 { tic6x_operand_regpair, 8, tic6x_rw_read, 1, 2, 3, 4 }
@@ -79,6 +96,7 @@
 #define OWREGD910 { tic6x_operand_regpair, 8, tic6x_rw_write, 9, 9, 10, 10 }
 #define ORCREG1 { tic6x_operand_ctrl, 4, tic6x_rw_read, 1, 1, 0, 0 }
 #define OWCREG1 { tic6x_operand_ctrl, 4, tic6x_rw_write, 1, 1, 0, 0 }
+#define OWILC1 { tic6x_operand_ilc, 4, tic6x_rw_write, 1, 1, 0, 0 }
 #define ORMEMDW { tic6x_operand_mem_deref, 4, tic6x_rw_read, 3, 3, 0, 0 }
 #define OWMEMDW { tic6x_operand_mem_deref, 4, tic6x_rw_write, 3, 3, 0, 0 }
 #define ORMEMSB { tic6x_operand_mem_short, 1, tic6x_rw_read, 3, 3, 0, 0 }
@@ -197,6 +215,55 @@ INSNE(add, d_xsi_s5_si, d, ext_1_or_2_src, 1cycle, C64X, TIC6X_FLAG_PREFER(0),
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
 	   ENC(src1, scst, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(add, l, l3_sat_0, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0x0)),
+     OP3(ORREG1, ORXREG1, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+          ENC(src2, reg, 1), ENC(dst, reg, 2)))
+INSN(add, l, l3i, 1cycle, C64XP, 0,
+     FIX0(),
+     OP3(OACST, ORXREG1, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(cst, scst_l3i, 0),
+          ENC(src2, reg, 1), ENC(dst, reg, 2)))
+INSN(add, l, lx1, 1cycle, C64XP,
+     TIC6X_FLAG_NO_CROSS,
+     FIX1(FIX(op, 0x3)),
+     OP3(OHWCSTM1, ORREG1, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 1), ENC(srcdst, reg, 2)))
+INSN(add, s, s3_sat_0, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0x0)),
+     OP3(ORREG1, ORXREG1, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+          ENC(src2, reg, 1), ENC(dst, reg, 2)))
+INSN(add, s, sx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+      FIX1(FIX(op, 0x3)),
+      OP3(OHWCSTM1, ORREG1, OWREG1),
+      ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 1), ENC(srcdst, reg, 2)))
+INSN(add, s, sx2op, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 0x0)),
+      OP3(ORREG1, ORXREG1, OWREG1),
+      ENC5(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(srcdst, reg, 2),
+           ENC(src2, reg, 1), ENC(x, xpath, 1)))
+INSN(add, d, dx2op, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0x0)),
+     OP3(ORREG1, ORXREG1, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 1), ENC(srcdst, reg, 0),
+          ENC(src2, reg, 1), ENC(srcdst, reg, 2)))
+INSNU(add, l, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 0x7), FIX(unit, 0x0)),
+     OP3(ORREG1, OHWCST1, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(srcdst, reg, 2)))
+INSNU(add, s, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 0x7), FIX(unit, 0x1)),
+     OP3(ORREG1, OHWCST1, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(srcdst, reg, 2)))
+INSNU(add, d, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 0x7), FIX(unit, 0x2)),
+     OP3(ORREG1, OHWCST1, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(srcdst, reg, 2)))
+/**/
+
 INSNE(addab, d_si_si_si, d, 1_or_2_src, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
       FIX1(FIX(op, 0x30)),
       OP3(ORREG1, ORREG1, OWREG1),
@@ -261,6 +328,17 @@ INSN(addaw, d, adda_long, 1cycle, C64XP, TIC6X_FLAG_PREFER(0),
      ENC4(ENC(s, fu, 0), ENC(y, areg, 0), ENC(offsetR, ulcst_dpr_word, 1),
 	  ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(addaw, d, dx5, 1cycle, C64XP, TIC6X_FLAG_INSN16_BSIDE,
+     FIX0(),
+     OP3(ORB15REG1, OACST, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(cst, ucst, 1), ENC(dst, reg, 2)))
+INSN(addaw, d, dx5p, 1cycle, C64XP, TIC6X_FLAG_INSN16_BSIDE,
+     FIX1(FIX(op, 0)),
+     OP3(ORB15REG1, OACST, OWB15REG1),
+     ENC2(ENC(s, fu, 0), ENC(cst, ucst, 1)))
+/**/
+
 INSN(adddp, l, 1_or_2_src, addsubdp, C67X, 0,
      FIX1(FIX(op, 0x18)),
      OP3(ORREGD12, ORXREGD12, OWREGD67),
@@ -276,6 +354,13 @@ INSN(addk, s, addk, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
      FIX0(),
      OP2(OLCST, OWREG1),
      ENC3(ENC(s, fu, 0), ENC(cst, scst, 0), ENC(dst, reg, 1)))
+
+/* 16 bits insn */
+INSN(addk, s, sx5, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX0(),
+     OP2(OACST, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(cst, ucst, 0), ENC(dst, reg, 1)))
+/**/
 
 INSN(addkpc, s, addkpc, 1cycle, C64X,
      TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MCNOP|TIC6X_FLAG_SIDE_B_ONLY,
@@ -370,6 +455,14 @@ INSNE(and, d_s5_xui_ui, d, ext_1_or_2_src, 1cycle, C64X, 0,
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, scst, 0),
 	   ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(and, l, l2c, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 0)),
+      OP3(ORREG1, ORXREG1, OWREG1NORS),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg, 2)))
+/**/
+
 INSN(andn, l, 1_or_2_src, 1cycle, C64X, 0,
      FIX1(FIX(op, 0x7c)),
      OP3(ORREG1, ORXREG1, OWREG1),
@@ -448,6 +541,34 @@ INSN(bnop, s, branch_nop_reg, branch, C64X,
      OP2(ORXREG1, OACST),
      ENC3(ENC(x, xpath, 0), ENC(src2, reg, 0), ENC(src1, ucst, 1)))
 
+/* 16 bits insn format */
+INSN(bnop, s, sbu8, branch, C64XP,
+     TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MCNOP,
+     FIX0(),
+     OP2(OLCST, OHWCST5),
+     ENC2(ENC(s, fu, 0), ENC(cst, pcrel_half_unsigned, 0)))
+INSN(bnop, s, sbs7, branch, C64XP,
+     TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MCNOP,
+     FIX0(),
+     OP2(OLCST, OACST),
+     ENC3(ENC(s, fu, 0), ENC(cst, pcrel_half, 0), ENC(n, ucst, 1)))
+INSN(bnop, s, sbu8c, branch, C64XP,
+     TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MCNOP|TIC6X_FLAG_INSN16_SPRED,
+     FIX0(),
+     OP2(OLCST, OHWCST5),
+     ENC2(ENC(s, fu, 0), ENC(cst, pcrel_half_unsigned, 0)))
+INSN(bnop, s, sbs7c, branch, C64XP,
+     TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MCNOP|TIC6X_FLAG_INSN16_SPRED,
+     FIX0(),
+     OP2(OLCST, OACST),
+     ENC3(ENC(s, fu, 0), ENC(cst, pcrel_half, 0), ENC(n, ucst, 1)))
+INSN(bnop, s, sx1b, branch, C64XP,
+     TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MCNOP,
+     FIX0(),
+     OP2(ORREG1BNORS, OACST),
+     ENC3(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(n, ucst, 1)))
+/**/
+
 INSN(bpos, s, bpos, branch, C64X, TIC6X_FLAG_NO_CROSS,
      FIX0(),
      OP2(OLCST, ORREG1),
@@ -490,11 +611,20 @@ INSN(callnop, s, branch_nop_reg, branch, C64X,
      OP2(ORXREG1, OACST),
      ENC3(ENC(x, xpath, 0), ENC(src2, reg, 0), ENC(src1, ucst, 1)))
 
+
 INSN(callp, s, call_imm_nop, branch, C64XP,
      TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MCNOP,
      FIX1(FIX(z, 1)),
      OP2(OLCST, OWRETREG1),
      ENC2(ENC(s, fu, 0), ENC(cst, pcrel, 0)))
+
+/* 16 bits insn format */
+INSN(callp, s, scs10, branch, C64XP,
+     TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MCNOP,
+     FIX0(),
+     OP2(OLCST, OWRETREG1),
+     ENC2(ENC(s, fu, 0), ENC(cst, pcrel, 0)))
+/**/
 
 INSN(callret, s, ext_branch_cond_imm, branch, C62X,
      TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_MACRO|TIC6X_FLAG_CALL|TIC6X_FLAG_RETURN,
@@ -528,6 +658,14 @@ INSN(clr, s, 1_or_2_src, 1cycle, C62X, 0,
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
 	  ENC(src1, reg, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(clr, s, sc5, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 2)),
+     OP4(ORREG1, OACST, OACST, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(cst, ucst, 1),
+          ENC(cst, ucst, 2), ENC(srcdst, reg, 3)))
+/**/
+
 INSNE(cmpeq, l_si_xsi_ui, l, 1_or_2_src, 1cycle, C62X, 0,
       FIX1(FIX(op, 0x53)),
       OP3(ORREG1, ORXREG1, OWREG1),
@@ -548,6 +686,20 @@ INSNE(cmpeq, l_s5_sl_ui, l, 1_or_2_src, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
       OP3(OACST, ORREGL1, OWREG1),
       ENC4(ENC(s, fu, 0), ENC(src1, scst, 0), ENC(src2, reg, 1),
 	   ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(cmpeq, l, lx3c, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+      FIX0(),
+      OP3(OACST, ORXREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(cst, ucst, 0), ENC(src2, reg, 1),
+           ENC(dst, reg, 2)))
+
+INSN(cmpeq, l, l2c, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 3)),
+      OP3(ORREG1, ORXREG1, OWREG1NORS),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg, 2)))
+/**/
 
 INSN(cmpeq2, s, 1_or_2_src, 1cycle, C64X, 0,
      FIX1(FIX(op, 0x1d)),
@@ -616,6 +768,19 @@ INSNE(cmpgt, l_sl_s5_ui, l, 1_or_2_src, 1cycle, C62X,
       ENC4(ENC(s, fu, 0), ENC(src1, scst, 1), ENC(src2, reg, 0),
 	   ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(cmpgt, l, lx1c, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 1)),
+     OP3(OACST, ORREG1, OWREG1),
+     ENC4(ENC(s, fu, 0), ENC(cst, ucst, 0), ENC(src2, reg, 1),
+          ENC(dst, reg, 2)))
+INSN(cmpgt, l, l2c, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 5)),
+      OP3(ORREG1, ORXREG1, OWREG1NORS),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg, 2)))
+/**/
+
 INSN(cmpgt2, s, 1_or_2_src, 1cycle, C64X, 0,
      FIX1(FIX(op, 0x14)),
      OP3(ORREG1, ORXREG1, OWREG1),
@@ -668,6 +833,19 @@ INSNE(cmpgtu, l_u5_ul_ui, l, 1_or_2_src, 1cycle, C64X, TIC6X_FLAG_NO_CROSS,
       ENC4(ENC(s, fu, 0), ENC(src1, ucst, 0), ENC(src2, reg, 1),
 	   ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(cmpgtu, l, lx1c, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 3)),
+     OP3(OACST, ORREG1, OWREG1),
+     ENC4(ENC(s, fu, 0), ENC(cst, ucst, 0), ENC(src2, reg, 1),
+          ENC(dst, reg, 2)))
+INSN(cmpgtu, l, l2c, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 7)),
+      OP3(ORREG1, ORXREG1, OWREG1NORS),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg, 2)))
+/**/
+
 INSN(cmpgtu4, s, 1_or_2_src, 1cycle, C64X, 0,
      FIX1(FIX(op, 0x15)),
      OP3(ORREG1, ORXREG1, OWREG1),
@@ -716,6 +894,19 @@ INSNE(cmplt, l_sl_s5_ui, l, 1_or_2_src, 1cycle, C62X,
       OP3(ORREGL1, OACST, OWREG1),
       ENC4(ENC(s, fu, 0), ENC(src1, scst, 1), ENC(src2, reg, 0),
 	   ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(cmplt, l, lx1c, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0)),
+     OP3(OACST, ORREG1, OWREG1),
+     ENC4(ENC(s, fu, 0), ENC(cst, ucst, 0), ENC(src2, reg, 1),
+          ENC(dst, reg, 2)))
+INSN(cmplt, l, l2c, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 4)),
+      OP3(ORREG1, ORXREG1, OWREG1NORS),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg, 2)))
+/**/
 
 INSN(cmplt2, s, 1_or_2_src, 1cycle, C64X, TIC6X_FLAG_MACRO,
      FIX1(FIX(op, 0x14)),
@@ -766,6 +957,19 @@ INSNE(cmpltu, l_u5_ul_ui, l, 1_or_2_src, 1cycle, C64X, TIC6X_FLAG_NO_CROSS,
       OP3(OACST, ORREGL1, OWREG1),
       ENC4(ENC(s, fu, 0), ENC(src1, ucst, 0), ENC(src2, reg, 1),
 	   ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(cmpltu, l, lx1c, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 2)),
+     OP3(OACST, ORREG1, OWREG1),
+     ENC4(ENC(s, fu, 0), ENC(cst, ucst, 0), ENC(src2, reg, 1),
+          ENC(dst, reg, 2)))
+INSN(cmpltu, l, l2c, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 6)),
+      OP3(ORREG1, ORXREG1, OWREG1NORS),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg, 2)))
+/**/
 
 INSN(cmpltu4, s, 1_or_2_src, 1cycle, C64X, TIC6X_FLAG_MACRO,
      FIX1(FIX(op, 0x15)),
@@ -944,6 +1148,17 @@ INSN(ext, s, 1_or_2_src, 1cycle, C62X, 0,
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
 	  ENC(src1, reg, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSNE(ext, hwcst16, s, s2ext, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0x0)),
+     OP4(ORREG1, OHWCST16, OHWCST16, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(src, reg, 0), ENC(dst, reg, 3)))
+INSNE(ext, hwcst24, s, s2ext, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0x1)),
+     OP4(ORREG1, OHWCST24, OHWCST24, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(src, reg, 0), ENC(dst, reg, 3)))
+/**/
+
 INSN(extu, s, field, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
      FIX1(FIX(op, 0x0)),
      OP4(ORREG1, OACST, OACST, OWREG1),
@@ -954,6 +1169,21 @@ INSN(extu, s, 1_or_2_src, 1cycle, C62X, 0,
      OP3(ORXREG1, ORREG1, OWREG1),
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
 	  ENC(src1, reg, 1), ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSNE(extu, hwcst16, s, s2ext, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0x2)),
+     OP4(ORREG1, OHWCST16, OHWCST16, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(src, reg, 0), ENC(dst, reg, 3)))
+INSNE(extu, hwcst24, s, s2ext, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0x3)),
+     OP4(ORREG1, OHWCST24, OHWCST24, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(src, reg, 0), ENC(dst, reg, 3)))
+INSN(extu, s, sc5, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0)),
+     OP4(ORREG1, OACST, OHWCST31, OWREG1Z),
+     ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(cst, ucst, 1)))
+/**/
 
 INSN(gmpy, m, 1_or_2_src, 4cycle, C64XP, TIC6X_FLAG_NO_CROSS,
      FIX2(FIX(op, 0x1f), FIX(x, 0)),
@@ -1012,6 +1242,33 @@ INSN(ldb, d, load_store_long, load, C62X,
      ENC4(ENC(s, data_fu, 0), ENC(y, areg, 0), ENC(offsetR, ulcst_dpr_byte, 0),
 	  ENC(dst, reg, 1)))
 
+/* 16 bits insn */
+INSN(ldb, d, doff4_dsz_x01, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSB, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset, 0)))
+INSN(ldb, d, dind_dsz_x01, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSB, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(src1, mem_offset, 0)))
+INSN(ldb, d, dinc_dsz_x01, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSB, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0),  ENC(cst, mem_offset_minus_one, 0)))
+INSN(ldb, d, ddec_dsz_x01, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSB, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+/**/
+
 INSN(ldbu, d, load_store, load, C62X,
      TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_PREFER(1),
      FIX2(FIX(op, 1), FIX(r, 0)),
@@ -1026,6 +1283,33 @@ INSN(ldbu, d, load_store_long, load, C62X,
      ENC4(ENC(s, data_fu, 0), ENC(y, areg, 0), ENC(offsetR, ulcst_dpr_byte, 0),
 	  ENC(dst, reg, 1)))
 
+/* 16 bits insn */
+INSN(ldbu, d, dinc_dsz_000, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSB, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(cst, mem_offset_minus_one, 0),
+          ENC(ptr, reg_ptr, 0), ENC(srcdst, reg, 1)))
+INSN(ldbu, d, dind_dsz_000, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSB, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(src1, mem_offset, 0),
+          ENC(ptr, reg_ptr, 0), ENC(srcdst, reg, 1)))
+INSN(ldbu, d, doff4_dsz_000, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSB, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(cst, mem_offset, 0),
+          ENC(ptr, reg_ptr, 0), ENC(srcdst, reg, 1)))
+INSN(ldbu, d, ddec_dsz_000, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSB, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(cst, mem_offset_minus_one, 0),
+          ENC(ptr, reg_ptr, 0), ENC(srcdst, reg, 1)))
+/**/
+
 INSN(lddw, d, load_store, load, C64X_AND_C67X,
      TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS,
      FIX2(FIX(op, 6), FIX(r, 1)),
@@ -1033,6 +1317,39 @@ INSN(lddw, d, load_store, load, C64X_AND_C67X,
      ENC6(ENC(s, data_fu, 0), ENC(y, fu, 0), ENC(mode, mem_mode, 0),
 	  ENC(offsetR, mem_offset, 0), ENC(baseR, reg, 0),
 	  ENC(srcdst, reg, 1)))
+
+/* 16 bits insn */
+INSN(lddw, d, dpp, load, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREINCR)|TIC6X_FLAG_INSN16_B15PTR|TIC6X_FLAG_INSN16_NORS,
+     FIX2(FIX(op, 1), FIX(dw, 1)),
+     OP2(ORMEMSD, OWDREGD5),
+     ENC4(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+	  ENC(cst, mem_offset_minus_one, 0)))
+INSN(lddw, d, ddecdw, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX3(FIX(op, 1), FIX(na, 0), FIX(sz, 0)),
+     OP2(ORMEMSD, OWTREGD5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg_shift, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+INSN(lddw, d, dincdw, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX3(FIX(op, 1), FIX(na, 0), FIX(sz, 0)),
+     OP2(ORMEMSD, OWTREGD5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg_shift, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+INSN(lddw, d, dinddw, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX3(FIX(op, 1), FIX(na, 0), FIX(sz, 0)),
+     OP2(ORMEMSD, OWTREGD5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(src1, mem_offset, 0),
+          ENC(ptr, reg_ptr, 0), ENC(srcdst, reg_shift, 1)))
+INSN(lddw, d, doff4dw, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX3(FIX(op, 1), FIX(na, 0), FIX(sz, 0)),
+     OP2(ORMEMSD, OWTREGD5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(cst, mem_offset, 0),
+          ENC(ptr, reg_ptr, 0), ENC(srcdst, reg_shift, 1)))
+/**/
 
 INSN(ldh, d, load_store, load, C62X,
      TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_PREFER(1),
@@ -1048,6 +1365,33 @@ INSN(ldh, d, load_store_long, load, C62X,
      ENC4(ENC(s, data_fu, 0), ENC(y, areg, 0), ENC(offsetR, ulcst_dpr_half, 0),
 	  ENC(dst, reg, 1)))
 
+/* 16 bits insn */
+INSN(ldh, d, doff4_dsz_x11, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSH, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(cst, mem_offset, 0),
+          ENC(ptr, reg_ptr, 0), ENC(srcdst, reg, 1)))
+INSN(ldh, d, dind_dsz_x11, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSH, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(src1, mem_offset, 0)))
+INSN(ldh, d, dinc_dsz_x11, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSH, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+INSN(ldh, d, ddec_dsz_x11, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSH, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+/**/
+
 INSN(ldhu, d, load_store, load, C62X,
      TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_PREFER(1),
      FIX2(FIX(op, 0), FIX(r, 0)),
@@ -1062,6 +1406,33 @@ INSN(ldhu, d, load_store_long, load, C62X,
      ENC4(ENC(s, data_fu, 0), ENC(y, areg, 0), ENC(offsetR, ulcst_dpr_half, 0),
 	  ENC(dst, reg, 1)))
 
+/* 16 bits insn */
+INSN(ldhu, d, doff4_dsz_010, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSH, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(cst, mem_offset, 0),
+          ENC(ptr, reg_ptr, 0), ENC(srcdst, reg, 1)))
+INSN(ldhu, d, dind_dsz_010, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSH, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(src1, mem_offset, 0)))
+INSN(ldhu, d, dinc_dsz_010, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSH, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+INSN(ldhu, d, ddec_dsz_010, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSH, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+/**/
+
 INSN(ldndw, d, load_nonaligned, load, C64X,
      TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_UNALIGNED,
      FIX0(),
@@ -1070,6 +1441,33 @@ INSN(ldndw, d, load_nonaligned, load, C64X,
 	  ENC(offsetR, mem_offset_noscale, 0), ENC(baseR, reg, 0),
 	  ENC(sc, scaled, 0), ENC(dst, reg_shift, 1)))
 
+/* 16 bits insn */
+INSN(ldndw, d, ddecdw, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX3(FIX(op, 1), FIX(na, 1), FIX(sz, 0)),
+     OP2(ORMEMND, OWTREGD5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg_shift, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one_noscale, 0)))
+INSN(ldndw, d, dincdw, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX3(FIX(op, 1), FIX(na, 1), FIX(sz, 0)),
+     OP2(ORMEMND, OWTREGD5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg_shift, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one_noscale, 0)))
+INSN(ldndw, d, dinddw, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_UNALIGNED|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX3(FIX(op, 1), FIX(na, 1), FIX(sz, 0)),
+     OP2(ORMEMND, OWTREGD5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(src1, mem_offset_noscale, 0),
+          ENC(ptr, reg_ptr, 0), ENC(srcdst, reg_shift, 1)))
+INSN(ldndw, d, doff4dw, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_UNALIGNED|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX3(FIX(op, 1), FIX(na, 1), FIX(sz, 0)),
+     OP2(ORMEMND, OWTREGD5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(cst, mem_offset_noscale, 0),
+          ENC(ptr, reg_ptr, 0), ENC(srcdst, reg_shift, 1)))
+/**/
+
 INSN(ldnw, d, load_store, load, C64X,
      TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_UNALIGNED,
      FIX2(FIX(op, 3), FIX(r, 1)),
@@ -1077,6 +1475,33 @@ INSN(ldnw, d, load_store, load, C64X,
      ENC6(ENC(s, data_fu, 0), ENC(y, fu, 0), ENC(mode, mem_mode, 0),
 	  ENC(offsetR, mem_offset, 0), ENC(baseR, reg, 0),
 	  ENC(srcdst, reg, 1)))
+
+/* 16 bits insn */
+INSN(ldnw, d, doff4_dsz_110, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset, 0)))
+INSN(ldnw, d, dind_dsz_110, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(src1, mem_offset, 0)))
+INSN(ldnw, d, dinc_dsz_110, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+INSN(ldnw, d, ddec_dsz_110, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+/**/
 
 INSN(ldw, d, load_store, load, C62X,
      TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_PREFER(1),
@@ -1091,6 +1516,69 @@ INSN(ldw, d, load_store_long, load, C62X,
      OP2(ORMEMLW, OWDREG5),
      ENC4(ENC(s, data_fu, 0), ENC(y, areg, 0), ENC(offsetR, ulcst_dpr_word, 0),
 	  ENC(dst, reg, 1)))
+
+/* 16 bits insn */
+INSN(ldw, d, doff4_dsz_0xx, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 0)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset, 0)))
+INSN(ldw, d, doff4_dsz_100, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset, 0)))
+INSN(ldw, d, dind_dsz_0xx, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 0)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(src1, mem_offset, 0)))
+INSN(ldw, d, dind_dsz_100, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(src1, mem_offset, 0)))
+INSN(ldw, d, dinc_dsz_0xx, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 1), FIX(sz, 0)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+INSN(ldw, d, dinc_dsz_100, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+INSN(ldw, d, ddec_dsz_0xx, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 1), FIX(sz, 0)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+INSN(ldw, d, ddec_dsz_100, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 1), FIX(sz, 1)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+          ENC(ptr, reg_ptr, 0), ENC(cst, mem_offset_minus_one, 0)))
+INSN(ldw, d, dpp, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREINCR)|TIC6X_FLAG_INSN16_B15PTR|TIC6X_FLAG_INSN16_NORS,
+     FIX2(FIX(op, 1), FIX(dw, 0)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC4(ENC(s, fu, 0), ENC(t, rside, 0),  ENC(srcdst, reg, 1),
+	  ENC(cst, mem_offset_minus_one, 0)))
+INSN(ldw, d, dstk, load, C64XP,
+     TIC6X_FLAG_LOAD|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE)|TIC6X_FLAG_INSN16_B15PTR,
+     FIX2(FIX(op, 0x1), FIX(s, 1)),
+     OP2(ORMEMSW, OWTREG5),
+     ENC4(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 1),
+	  ENC(cst, mem_offset, 0)))
+/**/
 
 INSN(ll, d, 1_or_2_src, load, C64XP,
      TIC6X_FLAG_LOAD|TIC6X_FLAG_SIDE_B_ONLY|TIC6X_FLAG_SIDE_T2_ONLY|TIC6X_FLAG_NO_CROSS,
@@ -1154,6 +1642,13 @@ INSNE(mpy, m_s5_xsl16_si, m, mpy, 1616_m, C62X, 0,
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, scst, 0),
 	   ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
+/* 16-bit insn.  */
+INSN(mpy, m, m3_sat_0, 1616_m, C67X, 0,
+      FIX1(FIX(op, 0x0)),
+      OP3(ORREG1, ORXREG1, OWREG2),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg_shift, 2)))
+
 INSN(mpydp, m, mpy, mpydp, C67X, 0,
      FIX1(FIX(op, 0x0e)),
      OP3(ORREGD1234, ORXREGD1324, OWREGD910),
@@ -1165,6 +1660,14 @@ INSN(mpyh, m, mpy, 1616_m, C62X, 0,
      OP3(ORREG1, ORXREG1, OWREG2),
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(mpyh, m, m3_sat_0, 1616_m, C67X, 0,
+      FIX1(FIX(op, 0x1)),
+      OP3(ORREG1, ORXREG1, OWREG2),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg_shift, 2)))
+/**/ 
 
 INSN(mpyhi, m, compound, 4cycle, C64X, 0,
      FIX1(FIX(op, 0x14)),
@@ -1183,6 +1686,14 @@ INSN(mpyhl, m, mpy, 1616_m, C62X, 0,
      OP3(ORREG1, ORXREG1, OWREG2),
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(mpyhl, m, m3_sat_0, 1616_m, C67X, 0,
+      FIX1(FIX(op, 0x3)),
+      OP3(ORREG1, ORXREG1, OWREG2),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg_shift, 2)))
+/**/ 
 
 INSN(mpyhlu, m, mpy, 1616_m, C62X, 0,
      FIX1(FIX(op, 0x0f)),
@@ -1271,6 +1782,14 @@ INSN(mpylh, m, mpy, 1616_m, C62X, 0,
      OP3(ORREG1, ORXREG1, OWREG2),
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(mpylh, m, m3_sat_0, 1616_m, C67X, 0,
+      FIX1(FIX(op, 0x2)),
+      OP3(ORREG1, ORXREG1, OWREG2),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg_shift, 2)))
+/**/ 
 
 INSN(mpylhu, m, mpy, 1616_m, C62X, 0,
      FIX1(FIX(op, 0x17)),
@@ -1435,6 +1954,38 @@ INSNE(mv, d_xui_ui, d, ext_1_or_2_src, 1cycle, C64X,
       ENC4(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
 	   ENC(dst, reg, 1)))
 
+/* 16 bits insn */
+INSNU(mv, l, lsdmvto, 1cycle, C64X, 0,
+      FIX1(FIX(unit, 0x0)),
+      OP2(ORXREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(x, xpath, 0), ENC(dst, reg, 1)))
+
+INSNU(mv, s, lsdmvto, 1cycle, C64X, 0,
+      FIX1(FIX(unit, 0x1)),
+      OP2(ORXREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(x, xpath, 0), ENC(dst, reg, 1)))
+
+INSNU(mv, d, lsdmvto, 1cycle, C64X, 0,
+      FIX1(FIX(unit, 0x2)),
+      OP2(ORXREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(x, xpath, 0), ENC(dst, reg, 1)))
+
+INSNU(mv, l, lsdmvfr, 1cycle, C64X, 0,
+      FIX1(FIX(unit, 0x0)),
+      OP2(ORXREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(x, xpath, 0), ENC(dst, reg, 1)))
+
+INSNU(mv, s, lsdmvfr, 1cycle, C64X, 0,
+      FIX1(FIX(unit, 0x1)),
+      OP2(ORXREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(x, xpath, 0), ENC(dst, reg, 1)))
+
+INSNU(mv, d, lsdmvfr, 1cycle, C64X, 0,
+      FIX1(FIX(unit, 0x2)),
+      OP2(ORXREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(x, xpath, 0), ENC(dst, reg, 1)))
+/**/
+
 INSNE(mvc, from_cr, s, 1_or_2_src, 1cycle, C62X,
       TIC6X_FLAG_SIDE_B_ONLY|TIC6X_FLAG_NO_CROSS,
       FIX3(FIX(s, 1), FIX(op, 0x0f), FIX(x, 0)),
@@ -1445,6 +1996,14 @@ INSNE(mvc, to_cr, s, 1_or_2_src, 1cycle, C62X, TIC6X_FLAG_SIDE_B_ONLY,
       OP2(ORXREG1, OWCREG1),
       ENC4(ENC(x, xpath, 0), ENC(src2, reg, 0), ENC(src1, crhi, 1),
 	   ENC(dst, crlo, 1)))
+
+/* 16 bits insn */
+INSN(mvc, s, sx1, 1cycle, C64XP,
+      TIC6X_FLAG_NO_CROSS,
+      FIX1(FIX(op, 0x6)),
+      OP2(ORREG1B, OWILC1),
+      ENC2(ENC(s, fu, 0), ENC(srcdst, reg, 0)))
+/**/
 
 INSN(mvd, m, unary, 4cycle, C64X, 0,
      FIX1(FIX(op, 0x1a)),
@@ -1464,6 +2023,53 @@ INSN(mvk, d, 1_or_2_src, 1cycle, C64X, TIC6X_FLAG_NO_CROSS,
      FIX2(FIX(op, 0x00), FIX(src2, 0)),
      OP2(OACST, OWREG1),
      ENC3(ENC(s, fu, 0), ENC(src1, scst, 0), ENC(dst, reg, 1)))
+
+/* 16 bits insn */
+INSN(mvk, l, lx5, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX0(),
+     OP2(OLCST, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(cst, scst, 0), ENC(dst, reg, 1)))
+INSN(mvk, s, smvk8, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX0(),
+     OP2(OLCST, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(cst, ucst, 0), ENC(dst, reg, 1)))
+INSNU(mvk, l, lsdx1c, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_SPRED,
+     FIX1(FIX(unit, 0x0)),
+     OP2(OACST, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(cst, ucst, 0), ENC(dst, reg, 1)))
+INSNU(mvk, s, lsdx1c, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_SPRED,
+     FIX1(FIX(unit, 0x1)),
+     OP2(OACST, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(cst, ucst, 0), ENC(dst, reg, 1)))
+INSNU(mvk, d, lsdx1c, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_SPRED,
+     FIX1(FIX(unit, 0x2)),
+     OP2(OACST, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(cst, ucst, 0), ENC(dst, reg, 1)))
+INSNUE(mvk, zero, l, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 0), FIX(unit, 0x0)),
+     OP2(OHWCST0, OWREG1),
+     ENC2(ENC(s, fu, 0), ENC(srcdst, reg, 1)))
+INSNUE(mvk, zero, s, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 0), FIX(unit, 0x1)),
+     OP2(OHWCST0, OWREG1),
+     ENC2(ENC(s, fu, 0), ENC(srcdst, reg, 1)))
+INSNUE(mvk, zero, d, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 0), FIX(unit, 0x2)),
+     OP2(OHWCST0, OWREG1),
+     ENC2(ENC(s, fu, 0), ENC(srcdst, reg, 1)))
+INSNUE(mvk, one, l, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 1), FIX(unit, 0x0)),
+     OP2(OHWCST1, OWREG1),
+     ENC2(ENC(s, fu, 0), ENC(srcdst, reg, 1)))
+INSNUE(mvk, one, s, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 1), FIX(unit, 0x1)),
+     OP2(OHWCST1, OWREG1),
+     ENC2(ENC(s, fu, 0), ENC(srcdst, reg, 1)))
+INSNUE(mvk, one, d, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 1), FIX(unit, 0x2)),
+     OP2(OHWCST1, OWREG1),
+     ENC2(ENC(s, fu, 0), ENC(srcdst, reg, 1)))
+/**/
 
 INSN(mvkh, s, mvk, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
      FIX1(FIX(h, 1)),
@@ -1505,6 +2111,15 @@ INSNE(nop, 1, nfu, nop_idle, nop, C62X, TIC6X_FLAG_MACRO,
       FIX2(FIX(s, 0), FIX(op, 0)),
       OP0(),
       ENC0())
+
+/* 16 bits insn */
+/* contrary to sprufe8b.pdf p767, and accordingly to
+ * dis6x.exe output, unop3 opcode is decoded as NOP N3 + 1 */
+INSN(nop, nfu, unop, nop, C64XP, 0,
+     FIX0(),
+     OP1(OACST),
+     ENC1(ENC(n, ucst_minus_one, 0)))
+/**/
 
 INSNE(norm, l_xsi_ui, l, 1_or_2_src, 1cycle, C62X, 0,
       FIX2(FIX(op, 0x63), FIX(src1, 0)),
@@ -1562,6 +2177,14 @@ INSNE(or, s_s5_xui_ui, s, 1_or_2_src, 1cycle, C62X, 0,
       OP3(OACST, ORXREG1, OWREG1),
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, scst, 0),
 	   ENC(src2, reg, 1), ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(or, l, l2c, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 1)),
+      OP3(ORREG1, ORXREG1, OWREG1NORS),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg, 2)))
+/**/
 
 INSN(pack2, l, 1_or_2_src, 1cycle, C64X, 0,
      FIX1(FIX(op, 0x0)),
@@ -1718,6 +2341,20 @@ INSNE(sadd, s_si_xsi_si, s, 1_or_2_src, 1cycle, C64X, 0,
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
 	   ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(sadd, l, l3_sat_1, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0)),
+     OP3(ORREG1, ORXREG1, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+          ENC(src2, reg, 1), ENC(dst, reg, 2)))
+
+INSN(sadd, s, s3_sat_1, 1cycle, C64XP,0,
+     FIX1(FIX(op, 0x0)),
+     OP3(ORREG1, ORXREG1, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+          ENC(src2, reg, 1), ENC(dst, reg, 2)))
+/**/
+
 INSN(sadd2, s, ext_1_or_2_src, 1cycle, C64X, 0,
      FIX1(FIX(op, 0x0)),
      OP3(ORREG1, ORXREG1, OWREG1),
@@ -1770,6 +2407,14 @@ INSN(set, s, 1_or_2_src, 1cycle, C62X, 0,
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
 	  ENC(src1, reg, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(set, s, sc5, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 1)),
+     OP4(ORREG1, OACST, OACST, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(cst, ucst, 1),
+          ENC(cst, ucst, 2), ENC(srcdst, reg, 3)))
+/**/
+
 INSN(shfl, m, unary, 1616_m, C64X, 0,
      FIX1(FIX(op, 0x1c)),
      OP2(ORXREG1, OWREG2),
@@ -1813,6 +2458,25 @@ INSNE(shl, s_xui_u5_ul, s, 1_or_2_src, 1cycle, C62X, 0,
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
 	   ENC(src1, ucst, 1), ENC(dst, reg, 2)))
 
+/* 16bit insn */
+INSN(shl, s, s3i, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 0x0)),
+      OP3(ORXREG1, OACST, OWREG1),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
+           ENC(cst, cst_s3i, 1), ENC(dst, reg, 2)))
+INSN(shl, s, ssh5_sat_x, 1cycle, C64XP,
+      TIC6X_FLAG_NO_CROSS,
+      FIX1(FIX(op, 0x0)),
+      OP3(ORREG1, OACST, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(srcdst, reg, 0),
+           ENC(cst, ucst, 1),  ENC(srcdst, reg, 2)))
+INSN(shl, s, s2sh, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 0x0)),
+      OP3(ORREG1, ORREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(src1, reg, 1),
+           ENC(srcdst, reg, 2)))
+/**/
+
 INSN(shlmb, l, 1_or_2_src, 1cycle, C64X, 0,
      FIX1(FIX(op, 0x61)),
      OP3(ORREG1, ORXREG1, OWREG1),
@@ -1844,6 +2508,25 @@ INSNE(shr, s_sl_u5_sl, s, 1_or_2_src, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
       OP3(ORREGL1, OACST, OWREGL1),
       ENC4(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(src1, ucst, 1),
 	   ENC(dst, reg, 2)))
+
+/* 16bit insn */
+INSN(shr, s, s3i, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 0x1)),
+      OP3(ORXREG1, OACST, OWREG1),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
+           ENC(cst, cst_s3i, 1), ENC(dst, reg, 2)))
+INSN(shr, s, ssh5_sat_x, 1cycle, C64XP,
+      TIC6X_FLAG_NO_CROSS,
+      FIX1(FIX(op, 0x1)),
+      OP3(ORREG1, OACST, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(srcdst, reg, 0),
+           ENC(cst, ucst, 1),  ENC(srcdst, reg, 2)))
+INSN(shr, s, s2sh, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 0x1)),
+      OP3(ORREG1, ORREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(src1, reg, 1),
+           ENC(srcdst, reg, 2)))
+/**/
 
 INSNE(shr2, s_xs2_ui_s2, s, ext_1_or_2_src, 1cycle, C64X, 0,
       FIX1(FIX(op, 0x7)),
@@ -1888,6 +2571,20 @@ INSNE(shru, s_ul_u5_ul, s, 1_or_2_src, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
       ENC4(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(src1, ucst, 1),
 	   ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(shru, s, ssh5_sat_0, 1cycle, C64XP,
+      TIC6X_FLAG_NO_CROSS,
+      FIX1(FIX(op, 0x2)),
+      OP3(ORREG1, OACST, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(srcdst, reg, 0),
+           ENC(cst, ucst, 1),  ENC(srcdst, reg, 2)))
+INSN(shru, s, s2sh, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 0x2)),
+      OP3(ORREG1, ORREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(src1, reg, 1),
+           ENC(srcdst, reg, 2)))
+/**/
+
 INSNE(shru2, s_xu2_ui_u2, s, ext_1_or_2_src, 1cycle, C64X, 0,
       FIX1(FIX(op, 0x8)),
       OP3(ORXREG1, ORREG1, OWREG1),
@@ -1911,11 +2608,27 @@ INSN(smpy, m, mpy, 1616_m, C62X, 0,
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(smpy, m, m3_sat_1, 1616_m, C67X, 0,
+      FIX1(FIX(op, 0x0)),
+      OP3(ORREG1, ORXREG1, OWREG2),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg_shift, 2)))
+/**/ 
+
 INSN(smpyh, m, mpy, 1616_m, C62X, 0,
      FIX1(FIX(op, 0x02)),
      OP3(ORREG1, ORXREG1, OWREG2),
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(smpyh, m, m3_sat_1, 1616_m, C67X, 0,
+      FIX1(FIX(op, 0x1)),
+      OP3(ORREG1, ORXREG1, OWREG2),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg_shift, 2)))
+/**/ 
 
 INSN(smpyhl, m, mpy, 1616_m, C62X, 0,
      FIX1(FIX(op, 0x0a)),
@@ -1923,11 +2636,27 @@ INSN(smpyhl, m, mpy, 1616_m, C62X, 0,
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(smpyhl, m, m3_sat_1, 1616_m, C67X, 0,
+      FIX1(FIX(op, 0x3)),
+      OP3(ORREG1, ORXREG1, OWREG2),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg_shift, 2)))
+/**/ 
+
 INSN(smpylh, m, mpy, 1616_m, C62X, 0,
      FIX1(FIX(op, 0x12)),
      OP3(ORREG1, ORXREG1, OWREG2),
      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
 	  ENC(src2, reg, 1), ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(smpylh, m, m3_sat_1, 1616_m, C67X, 0,
+      FIX1(FIX(op, 0x2)),
+      OP3(ORREG1, ORXREG1, OWREG2),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg_shift, 2)))
+/**/ 
 
 INSN(smpy2, m, compound, 4cycle, C64X, 0,
      FIX1(FIX(op, 0x01)),
@@ -1978,6 +2707,14 @@ INSNE(spkernel, nfu_0, nfu, spkernel, 1cycle, C64XP,
       OP0(),
       ENC0())
 
+/* 16 bits insn */
+INSN(spkernel, nfu, uspk, 1cycle, C64XP,
+      TIC6X_FLAG_FIRST|TIC6X_FLAG_NO_MCNOP|TIC6X_FLAG_SPKERNEL,
+      FIX0(),
+      OP2(OACST, OACST),
+      ENC2(ENC(fstgfcyc, fstg, 0), ENC(fstgfcyc, fcyc, 1)))
+/**/
+
 INSN(spkernelr, nfu, spkernelr, 1cycle, C64XP,
      TIC6X_FLAG_FIRST|TIC6X_FLAG_NO_MCNOP|TIC6X_FLAG_SPKERNEL,
      FIX1(FIX(s, 0)),
@@ -2002,6 +2739,27 @@ INSN(sploopw, nfu, loop_buffer, 1cycle, C64XP,
      OP1(OACST),
      ENC1(ENC(cstb, ucst_minus_one, 0)))
 
+/* 16 bits insn */
+INSN(sploop, nfu, uspl, 1cycle, C64XP,
+     TIC6X_FLAG_FIRST|TIC6X_FLAG_NO_MCNOP|TIC6X_FLAG_SPLOOP,
+     FIX1(FIX(op, 0)),
+     OP1(OACST),
+     ENC1(ENC(ii, ucst_minus_one, 0)))
+
+INSN(sploopd, nfu, uspl, 1cycle, C64XP,
+     TIC6X_FLAG_FIRST|TIC6X_FLAG_NO_MCNOP|TIC6X_FLAG_SPLOOP,
+     FIX1(FIX(op, 1)),
+     OP1(OACST),
+     ENC1(ENC(ii, ucst_minus_one, 0)))
+
+INSN(sploopd, nfu, uspldr, 1cycle, C64XP,
+     TIC6X_FLAG_FIRST|TIC6X_FLAG_NO_MCNOP|TIC6X_FLAG_SPLOOP|TIC6X_FLAG_INSN16_SPRED,
+     FIX0(),
+     OP1(OACST),
+     ENC1(ENC(ii, ucst_minus_one, 0)))
+/**/
+
+
 /* Contrary to SPRUFE8, this is the correct encoding for this
    instruction.  */
 INSN(spmask, nfu, spmask, 1cycle, C64XP, TIC6X_FLAG_FIRST|TIC6X_FLAG_SPMASK,
@@ -2009,10 +2767,24 @@ INSN(spmask, nfu, spmask, 1cycle, C64XP, TIC6X_FLAG_FIRST|TIC6X_FLAG_SPMASK,
      OP1(OFULIST),
      ENC1(ENC(mask, spmask, 0)))
 
+/* 16 bits insn */
+INSN(spmask, nfu, uspma, 1cycle, C64XP, TIC6X_FLAG_FIRST|TIC6X_FLAG_SPMASK,
+     FIX0(),
+     OP1(OFULIST),
+     ENC1(ENC(mask, spmask, 0)))
+/**/
+
 INSN(spmaskr, nfu, spmask, 1cycle, C64XP, TIC6X_FLAG_FIRST|TIC6X_FLAG_SPMASK,
      FIX2(FIX(s, 0), FIX(op, 0x9)),
      OP1(OFULIST),
      ENC1(ENC(mask, spmask, 0)))
+
+/* 16 bits insn */
+INSN(spmaskr, nfu, uspmb, 1cycle, C64XP, TIC6X_FLAG_FIRST|TIC6X_FLAG_SPMASK,
+     FIX0(),
+     OP1(OFULIST),
+     ENC1(ENC(mask, spmask, 0)))
+/**/
 
 INSN(sptrunc, l, 1_or_2_src, 4cycle, C67X, 0,
      FIX2(FIX(op, 0x0b), FIX(src1, 0)),
@@ -2030,6 +2802,20 @@ INSNE(sshl, s_xsi_u5_si, s, 1_or_2_src, 1cycle, C62X, 0,
       OP3(ORXREG1, OACST, OWREG1),
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src2, reg, 0),
 	   ENC(src1, ucst, 1), ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(sshl, s, ssh5_sat_1, 1cycle, C64XP,
+      TIC6X_FLAG_NO_CROSS,
+      FIX1(FIX(op, 0x2)),
+      OP3(ORREG1, OACST, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(srcdst, reg, 0),
+           ENC(cst, ucst, 1),  ENC(srcdst, reg, 2)))
+INSN(sshl, s, s2sh, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 0x3)),
+      OP3(ORREG1, ORREG1, OWREG1),
+      ENC4(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(src1, reg, 1),
+           ENC(srcdst, reg, 2)))
+/**/
 
 INSN(sshvl, m, compound, 1616_m, C64X, 0,
      FIX1(FIX(op, 0x1c)),
@@ -2066,6 +2852,14 @@ INSNE(ssub, l_s5_sl_sl, l, 1_or_2_src, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, scst, 0),
 	   ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(ssub, l, l3_sat_1, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 1)),
+     OP3(ORREG1, ORXREG1, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+          ENC(src2, reg, 1), ENC(dst, reg, 2)))
+/**/
+
 INSN(ssub2, l, 1_or_2_src, 1cycle, C64XP, 0,
      FIX1(FIX(op, 0x64)),
      OP3(ORREG1, ORXREG1, OWREG1),
@@ -2086,12 +2880,96 @@ INSN(stb, d, load_store_long, store, C62X,
      ENC4(ENC(s, data_fu, 0), ENC(y, areg, 1), ENC(offsetR, ulcst_dpr_byte, 1),
 	  ENC(dst, reg, 0)))
 
+/* 16 bits insn */
+INSN(stb, d, doff4_dsz_000, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSB),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset, 1)))
+INSN(stb, d, doff4_dsz_x01, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSB),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset, 1)))
+INSN(stb, d, dind_dsz_000, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSB),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(src1, mem_offset, 1),
+          ENC(ptr, reg_ptr, 1), ENC(srcdst, reg, 0)))
+INSN(stb, d, dind_dsz_x01, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSB),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(src1, mem_offset, 1),
+          ENC(ptr, reg_ptr, 1), ENC(srcdst, reg, 0)))
+INSN(stb, d, dinc_dsz_000, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSB),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(stb, d, dinc_dsz_x01, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSB),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(stb, d, ddec_dsz_000, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSB),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(stb, d, ddec_dsz_x01, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSB),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+/**/
+
 INSN(stdw, d, load_store, store, C64X, TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS,
      FIX2(FIX(op, 4), FIX(r, 1)),
      OP2(ORDREGD1, OWMEMSD),
      ENC6(ENC(s, data_fu, 0), ENC(y, fu, 0), ENC(mode, mem_mode, 1),
 	  ENC(offsetR, mem_offset, 1), ENC(baseR, reg, 1),
 	  ENC(srcdst, reg, 0)))
+
+/* 16 bits insn */
+INSN(stdw, d, dpp, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTDECR)|TIC6X_FLAG_INSN16_B15PTR|TIC6X_FLAG_INSN16_NORS,
+     FIX3(FIX(op, 0), FIX(dw, 1), FIX(s, 1)),
+     OP2(ORTREGD1, OWMEMSD),
+     ENC4(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+	  ENC(cst, mem_offset_minus_one, 1)))
+INSN(stdw, d, ddecdw, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX3(FIX(op, 0), FIX(na, 0), FIX(sz, 0)),
+     OP2(ORTREGD1, OWMEMSD),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg_shift, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(stdw, d, dincdw, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX3(FIX(op, 0), FIX(na, 0), FIX(sz, 0)),
+     OP2(ORTREGD1, OWMEMSD),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg_shift, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(stdw, d, dinddw, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX3(FIX(op, 0), FIX(na, 0), FIX(sz, 0)),
+     OP2(ORTREGD1, OWMEMSD),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(src1, mem_offset, 1),
+          ENC(ptr, reg_ptr, 1), ENC(srcdst, reg_shift, 0)))
+INSN(stdw, d, doff4dw, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX3(FIX(op, 0), FIX(na, 0), FIX(sz, 0)),
+     OP2(ORTREGD1, OWMEMSD),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(cst, mem_offset, 1),
+          ENC(ptr, reg_ptr, 1), ENC(srcdst, reg_shift, 0)))
+/**/
 
 INSN(sth, d, load_store, store, C62X,
      TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_PREFER(1),
@@ -2107,6 +2985,57 @@ INSN(sth, d, load_store_long, store, C62X,
      ENC4(ENC(s, data_fu, 0), ENC(y, areg, 1), ENC(offsetR, ulcst_dpr_half, 1),
 	  ENC(dst, reg, 0)))
 
+/* 16 bits insn */
+INSN(sth, d, doff4_dsz_01x, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSH),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset, 1)))
+INSN(sth, d, doff4_dsz_111, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSH),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset, 1)))
+INSN(sth, d, dind_dsz_01x, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSH),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(src1, mem_offset, 1)))
+INSN(sth, d, dind_dsz_111, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSH),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(src1, mem_offset, 1)))
+INSN(sth, d, dinc_dsz_01x, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSH),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(sth, d, dinc_dsz_111, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSH),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(sth, d, ddec_dsz_01x, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSH),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(sth, d, ddec_dsz_111, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSH),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+/**/
+
 INSN(stndw, d, store_nonaligned, store, C64X,
      TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_UNALIGNED,
      FIX0(),
@@ -2115,6 +3044,33 @@ INSN(stndw, d, store_nonaligned, store, C64X,
 	  ENC(offsetR, mem_offset_noscale, 1), ENC(baseR, reg, 1),
 	  ENC(sc, scaled, 1), ENC(src, reg_shift, 0)))
 
+/* 16 bits insn */
+INSN(stndw, d, ddecdw, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_UNALIGNED|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX3(FIX(op, 0), FIX(na, 1), FIX(sz, 0)),
+     OP2(ORTREGD1, OWMEMND),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg_shift, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one_noscale, 1)))
+INSN(stndw, d, dincdw, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_UNALIGNED|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX3(FIX(op, 0), FIX(na, 1), FIX(sz, 0)),
+     OP2(ORTREGD1, OWMEMND),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg_shift, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one_noscale, 1)))
+INSN(stndw, d, dinddw, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_UNALIGNED|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX3(FIX(op, 0), FIX(na, 1), FIX(sz, 0)),
+     OP2(ORTREGD1, OWMEMND),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(src1, mem_offset_noscale, 1),
+          ENC(ptr, reg_ptr, 1), ENC(srcdst, reg_shift, 0)))
+INSN(stndw, d, doff4dw, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_UNALIGNED|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX3(FIX(op, 0), FIX(na, 1), FIX(sz, 0)),
+     OP2(ORTREGD1, OWMEMND),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(cst, mem_offset_noscale, 1),
+          ENC(ptr, reg_ptr, 1), ENC(srcdst, reg_shift, 0)))
+/**/
+
 INSN(stnw, d, load_store, store, C64X,
      TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_UNALIGNED,
      FIX2(FIX(op, 5), FIX(r, 1)),
@@ -2122,6 +3078,33 @@ INSN(stnw, d, load_store, store, C64X,
      ENC6(ENC(s, data_fu, 0), ENC(y, fu, 0), ENC(mode, mem_mode, 1),
 	  ENC(offsetR, mem_offset, 1), ENC(baseR, reg, 1),
 	  ENC(srcdst, reg, 0)))
+
+/* 16 bits insn */
+INSN(stnw, d, doff4_dsz_110, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset, 1)))
+INSN(stnw, d, dind_dsz_110, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(src1, mem_offset, 1)))
+INSN(stnw, d, dinc_dsz_110, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(stnw, d, ddec_dsz_110, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+/**/
 
 INSN(stw, d, load_store, store, C62X,
      TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_PREFER(1),
@@ -2136,6 +3119,69 @@ INSN(stw, d, load_store_long, store, C62X,
      OP2(ORDREG1, OWMEMLW),
      ENC4(ENC(s, data_fu, 0), ENC(y, areg, 1), ENC(offsetR, ulcst_dpr_word, 1),
 	  ENC(dst, reg, 0)))
+
+/* 16 bits insn */
+INSN(stw, d, doff4_dsz_0xx, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 0)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset, 1)))
+INSN(stw, d, doff4_dsz_100, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset, 1)))
+INSN(stw, d, dind_dsz_0xx, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 0)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(src1, mem_offset, 1)))
+INSN(stw, d, dind_dsz_100, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(REG_POSITIVE),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(src1, mem_offset, 1)))
+INSN(stw, d, dinc_dsz_0xx, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 0), FIX(sz, 0)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(stw, d, dinc_dsz_100, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTINCR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(stw, d, ddec_dsz_0xx, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 0), FIX(sz, 0)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(stw, d, ddec_dsz_100, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(PREDECR),
+     FIX2(FIX(op, 0), FIX(sz, 1)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC5(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+          ENC(ptr, reg_ptr, 1), ENC(cst, mem_offset_minus_one, 1)))
+INSN(stw, d, dpp, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSTDECR)|TIC6X_FLAG_INSN16_B15PTR|TIC6X_FLAG_INSN16_NORS,
+     FIX2(FIX(op, 0), FIX(dw, 0)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC4(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+	  ENC(cst, mem_offset_minus_one, 1)))
+INSN(stw, d, dstk, store, C64XP,
+     TIC6X_FLAG_STORE|TIC6X_FLAG_NO_CROSS|TIC6X_FLAG_INSN16_MEM_MODE(POSITIVE)|TIC6X_FLAG_INSN16_B15PTR,
+     FIX2(FIX(op, 0x0), FIX(s, 1)),
+     OP2(ORTREG1, OWMEMSW),
+     ENC4(ENC(s, fu, 0), ENC(t, rside, 0), ENC(srcdst, reg, 0),
+	  ENC(cst, mem_offset, 1)))
+/**/
 
 INSNE(sub, l_si_xsi_si, l, 1_or_2_src, 1cycle, C62X, TIC6X_FLAG_PREFER(1),
       FIX1(FIX(op, 0x07)),
@@ -2217,6 +3263,41 @@ INSNE(sub, d_si_xsi_si, d, ext_1_or_2_src, 1cycle, C64X, TIC6X_FLAG_PREFER(0),
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
 	   ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(sub, l, l3_sat_0, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0x1)),
+     OP3(ORREG1, ORXREG1, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+          ENC(src2, reg, 1), ENC(dst, reg, 2)))
+INSN(sub, l, lx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX1(FIX(op, 0x2)),
+     OP3(OHWCST0, ORREG1, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 1), ENC(srcdst, reg, 2)))
+INSN(sub, s, sx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+      FIX1(FIX(op, 0x2)),
+      OP3(OHWCST0, ORREG1, OWREG1),
+      ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 1), ENC(srcdst, reg, 2)))
+INSN(sub, s, sx2op, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 0x1)),
+      OP3(ORREG1, ORXREG1, OWREG1),
+      ENC5(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(srcdst, reg, 2),
+           ENC(src2, reg, 1), ENC(x, xpath, 1)))
+INSN(sub, s, s3_sat_x, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0x1)),
+     OP3(ORREG1, ORXREG1, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+          ENC(src2, reg, 1), ENC(dst, reg, 2)))
+INSN(sub, d, dx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX1(FIX(op, 0x3)),
+     OP3(ORREG1, OHWCST1, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(srcdst, reg, 2)))
+INSN(sub, d, dx2op, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 0x1)),
+     OP3(ORREG1, ORXREG1, OWREG1),
+     ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(srcdst, reg, 0),
+          ENC(src2, reg, 1), ENC(srcdst, reg, 2)))
+/**/
+
 INSNE(subab, d_si_si_si, d, 1_or_2_src, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
       FIX1(FIX(op, 0x31)),
       OP3(ORREG1, ORREG1, OWREG1),
@@ -2255,6 +3336,13 @@ INSNE(subaw, d_si_u5_si, d, 1_or_2_src, 1cycle, C62X, TIC6X_FLAG_NO_CROSS,
       OP3(ORREG1, OACST, OWREG1),
       ENC4(ENC(s, fu, 0), ENC(src2, reg, 0), ENC(src1, ucst, 1),
 	   ENC(dst, reg, 2)))
+
+/* 16 bits insn */
+INSN(subaw, d, dx5p, 1cycle, C64XP, 0,
+     FIX1(FIX(op, 1)),
+     OP3(ORB15REG1, OACST, OWB15REG1),
+     ENC2(ENC(s, fu, 0), ENC(cst, ucst, 1)))
+/**/
 
 INSN(subc, l, 1_or_2_src, 1cycle, C62X, 0,
      FIX1(FIX(op, 0x4b)),
@@ -2423,6 +3511,26 @@ INSNE(xor, d_s5_xui_ui, d, ext_1_or_2_src, 1cycle, C64X, 0,
       ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, scst, 0),
 	   ENC(src2, reg, 1), ENC(dst, reg, 2)))
 
+/* 16 bits insn */
+INSN(xor, l, l2c, 1cycle, C64XP, 0,
+      FIX1(FIX(op, 0x2)),
+      OP3(ORREG1, ORXREG1, OWREG1NORS),
+      ENC5(ENC(s, fu, 0), ENC(x, xpath, 0), ENC(src1, reg, 0),
+           ENC(src2, reg, 1), ENC(dst, reg, 2)))
+INSNU(xor, l, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 0x7), FIX(unit, 0x0)),
+     OP3(ORREG1, OHWCST0, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(srcdst, reg, 2)))
+INSNU(xor, s, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 0x7), FIX(unit, 0x1)),
+     OP3(ORREG1, OHWCST0, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(srcdst, reg, 2)))
+INSNU(xor, d, lsdx1, 1cycle, C64XP, TIC6X_FLAG_NO_CROSS,
+     FIX2(FIX(op, 0x7), FIX(unit, 0x2)),
+     OP3(ORREG1, OHWCST0, OWREG1),
+     ENC3(ENC(s, fu, 0), ENC(srcdst, reg, 0), ENC(srcdst, reg, 2)))
+/**/
+
 INSN(xormpy, m, 1_or_2_src, 4cycle, C64XP, 0,
      FIX1(FIX(op, 0x1b)),
      OP3(ORREG1, ORXREG1, OWREG4),
@@ -2491,6 +3599,13 @@ INSNE(zero, d_sub, d, 1_or_2_src, 1cycle, C62X,
 #undef OP4
 #undef OACST
 #undef OLCST
+#undef OHWCSTM1
+#undef OHWCST0
+#undef OHWCST1
+#undef OHWCST5
+#undef OHWCST16
+#undef OHWCST24
+#undef OHWCST31
 #undef OFULIST
 #undef ORIRP1
 #undef ORNRP1
@@ -2511,6 +3626,10 @@ INSNE(zero, d_sub, d, 1_or_2_src, 1cycle, C62X,
 #undef OWREGL1
 #undef ORREGL1
 #undef OWREGD1
+#undef ORTREG1
+#undef ORTREGD1
+#undef OWTREG5
+#undef OWTREGD5
 #undef OWREGD12
 #undef OWREGD4
 #undef ORREGD1
@@ -2523,8 +3642,12 @@ INSNE(zero, d_sub, d, 1_or_2_src, 1cycle, C62X,
 #undef ORXREGD1234
 #undef ORREGD1324
 #undef OWREGD910
+#undef OWILC1
 #undef ORCREG1
 #undef OWCREG1
+#undef OWREG1Z
+#undef ORB15REG1
+#undef OWB15REG1
 #undef ORMEMDW
 #undef OWMEMDW
 #undef ORMEMSB
