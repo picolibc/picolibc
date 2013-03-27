@@ -1,5 +1,11 @@
 2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sysconf.cc (sca): Change build environment values according to
+	architecture.
+	(csa): Ditto.
+
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h (STATUS_NETWORK_OPEN_RESTRICTION): Define.
 	(STATUS_SYMLINK_CLASS_DISABLED): Define.
 	* path.cc (symlink_info::check): Handle STATUS_NETWORK_OPEN_RESTRICTION

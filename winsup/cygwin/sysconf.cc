@@ -1,7 +1,7 @@
 /* sysconf.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -192,10 +192,10 @@ static struct
   {nsup, {c:0}},			/*  89, _SC_TRACE_SYS_MAX */
   {nsup, {c:0}},			/*  90, _SC_TRACE_USER_EVENT_MAX */
   {cons, {c:-1L}},			/*  91, _SC_TYPED_MEMORY_OBJECTS */
-  {cons, {c:-1L}},			/*  92, _SC_V6_ILP32_OFF32 */
+  {cons, {c:_POSIX_V6_ILP32_OFF32}},	/*  92, _SC_V6_ILP32_OFF32 */
   {cons, {c:_POSIX_V6_ILP32_OFFBIG}},	/*  93, _SC_V6_ILP32_OFFBIG */
-  {cons, {c:-1L}},			/*  94, _SC_V6_LP64_OFF64 */
-  {cons, {c:-1L}},			/*  95, _SC_V6_LPBIG_OFFBIG */
+  {cons, {c:_POSIX_V6_LP64_OFF64}},	/*  94, _SC_V6_LP64_OFF64 */
+  {cons, {c:_POSIX_V6_LPBIG_OFFBIG}},	/*  95, _SC_V6_LPBIG_OFFBIG */
   {cons, {c:_XOPEN_CRYPT}},		/*  96, _SC_XOPEN_CRYPT */
   {cons, {c:_XOPEN_ENH_I18N}},		/*  97, _SC_XOPEN_ENH_I18N */
   {cons, {c:-1L}},			/*  98, _SC_XOPEN_LEGACY */
@@ -266,6 +266,21 @@ static struct
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LDFLAGS */
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LIBS */
   {0, NULL},				/* _CS_XBS5_ILP32_OFF32_LINTFLAGS */
+#ifdef __x86_64__
+  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFFBIG_LIBS */
+  {0, NULL},				/* _CS_XBS5_ILP32_OFFBIG_LINTFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LP64_OFF64_CFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LP64_OFF64_LDFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LP64_OFF64_LIBS */
+  {ls ("")},				/* _CS_XBS5_LP64_OFF64_LINTFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LIBS */
+  {ls ("")},				/* _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS */
+  {ls ("POSIX_V6_LP64_OFF64")},		/* _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS */
+#else
   {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS */
   {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS */
   {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_LIBS */
@@ -279,6 +294,7 @@ static struct
   {0, NULL},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LIBS */
   {0, NULL},				/* _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS */
   {ls ("POSIX_V6_ILP32_OFFBIG")},	/* _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS */
+#endif
   {ls ("")},				/* _CS_POSIX_V7_THREADS_CFLAGS */
   {ls ("")},				/* _CS_POSIX_V7_THREADS_LDFLAGS */
   {ls ("POSIXLY_CORRECT=1")},		/* _CS_V7_ENV */
