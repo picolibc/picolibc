@@ -1,3 +1,8 @@
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-what.xml (faq.what.supported): Mention Windows 8 and Server 2012.
+	Change sentence on native 64 bit version.
+
 2013-03-06  Anthony Geoghegan <anthony.geoghegan@gmail.com>
 
 	* faq-using.xml: Fix expression and uppercase Samba.
