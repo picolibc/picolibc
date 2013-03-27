@@ -1,3 +1,8 @@
+2013-03-27  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/features.h: Redefine compilation environment
+	definitions for Cygwin to cover 64 bit Cygwin.
+
 2013-01-29  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/machine/setjmp.h: Revert definition of _JBTYPE and _JBLEN
