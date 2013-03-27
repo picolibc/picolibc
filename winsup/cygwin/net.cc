@@ -964,8 +964,7 @@ cygwin_getservbyname (const char *name, const char *proto)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  servent *res = getservbyname (name, proto);
-  res = dup_ent (res);
+  servent *res = dup_ent (getservbyname (name, proto));
   syscall_printf ("%p = getservbyname (%s, %s)", res, name, proto);
   return res;
 }
