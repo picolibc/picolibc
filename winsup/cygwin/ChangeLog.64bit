@@ -1,5 +1,12 @@
 2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (struct win64_servent): Define for x86_64.  Explain why.
+	(WIN_SERVENT): Define for all targets.
+	(dup_ent): Use WIN_SERVENT to access critical servent members
+	throughout.
+
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sysconf.cc (sca): Change build environment values according to
 	architecture.
 	(csa): Ditto.

@@ -305,6 +305,22 @@ realloc_ent (int sz, hostent *)
    The 'unionent' struct is a union of all of the currently used
    *ent structure.  */
 
+#ifdef __x86_64__
+/* For some baffling reason, somebody at Microsoft decided that it would be
+   a good idea to exchange the s_port and s_proto members in the servent
+   structure. */
+struct win64_servent
+{
+  char  *s_name;
+  char **s_aliases;
+  char  *s_proto;
+  short  s_port;
+};
+#define WIN_SERVENT(x)	((win64_servent *)(x))
+#else
+#define WIN_SERVENT(x)	((servent *)(x))
+#endif
+
 #ifdef DEBUGGING
 static void *
 #else
@@ -369,8 +385,8 @@ dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
   int addr_list_len = 0;
   if (type == unionent::t_servent)
     {
-      if (src->s_proto)
-	sz += (protolen = strlen_round (src->s_proto));
+      if (WIN_SERVENT (src)->s_proto)
+	sz += (protolen = strlen_round (WIN_SERVENT (src)->s_proto));
     }
   else if (type == unionent::t_hostent)
     {
@@ -392,8 +408,12 @@ dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
     {
       memset (dst, 0, sz);
       /* This field is common to all *ent structures but named differently
-	 in each, of course.  */
-      dst->port_proto_addrtype = src->port_proto_addrtype;
+	 in each, of course.  Also, take 64 bit Windows servent weirdness
+	 into account. */
+      if (type == unionent::t_servent)
+	dst->port_proto_addrtype = WIN_SERVENT (src)->s_port;
+      else
+	dst->port_proto_addrtype = src->port_proto_addrtype;
 
       char *dp = ((char *) dst) + struct_sz;
       if (namelen)
@@ -423,9 +443,9 @@ dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
 	debug_printf ("protoent %s %p %y", dst->name, dst->list, dst->port_proto_addrtype);
       else if (type == unionent::t_servent)
 	{
-	  if (src->s_proto)
+	  if (WIN_SERVENT (src)->s_proto)
 	    {
-	      strcpy (dst->s_proto = dp, src->s_proto);
+	      strcpy (dst->s_proto = dp, WIN_SERVENT (src)->s_proto);
 	      dp += protolen;
 	    }
 	}
@@ -944,7 +964,8 @@ cygwin_getservbyname (const char *name, const char *proto)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  servent *res = dup_ent (getservbyname (name, proto));
+  servent *res = getservbyname (name, proto);
+  res = dup_ent (res);
   syscall_printf ("%p = getservbyname (%s, %s)", res, name, proto);
   return res;
 }
