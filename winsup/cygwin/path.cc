@@ -2480,6 +2480,22 @@ restart:
 		}
 	    }
 	}
+      else if (status == STATUS_NETWORK_OPEN_RESTRICTION
+	       || status == STATUS_SYMLINK_CLASS_DISABLED)
+	{
+	  /* These status codes are returned if you try to open a native
+	     symlink and the usage of this kind of symlink is forbidden
+	     (see fsutil).  Since we can't open them at all, not even for
+	     stat purposes, we have to return a POSIX error code which is
+	     at least a bit helpful.
+
+	     Additionally Windows 8 introduces a bug in NFS: If you have
+	     a symlink to a directory, with symlinks underneath, resolving
+	     the second level of symlinks fails if remote->remote symlinks
+	     are disabled in fsutil.  Unfortunately that's the default. */
+	  set_error (ELOOP);
+	  break;
+	}
 
       if (NT_SUCCESS (status)
 	  /* Check file system while we're having the file open anyway.

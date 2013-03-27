@@ -1,7 +1,7 @@
 /* ntdll.h.  Contains ntdll specific stuff not defined elsewhere.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012 Red Hat, Inc.
+   2011, 2012, 2013 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -15,6 +15,14 @@
 
 /* custom status code: */
 #define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)
+
+/* As of March 2013, Mingw doesn't define these status codes yet. */
+#ifndef STATUS_NETWORK_OPEN_RESTRICTION
+#define STATUS_NETWORK_OPEN_RESTRICTION ((NTSTATUS)0xC0000201)
+#endif
+#ifndef STATUS_SYMLINK_CLASS_DISABLED
+#define STATUS_SYMLINK_CLASS_DISABLED ((NTSTATUS)0xC0000715)
+#endif
 
 #define NtCurrentProcess() ((HANDLE) (LONG_PTR) -1)
 #define NtCurrentThread()  ((HANDLE) (LONG_PTR) -2)

@@ -1,3 +1,10 @@
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (STATUS_NETWORK_OPEN_RESTRICTION): Define.
+	(STATUS_SYMLINK_CLASS_DISABLED): Define.
+	* path.cc (symlink_info::check): Handle STATUS_NETWORK_OPEN_RESTRICTION
+	and STATUS_SYMLINK_CLASS_DISABLED status codes.  Explain why.
+
 2013-03-22  Kai Tietz  <ktietz@redhat.com>
 
 	* gendef: Use pause instead of calling yield throughout in x86_64 code.
