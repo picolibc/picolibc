@@ -1,3 +1,7 @@
+2013-03-28  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* exceptions.cc (exception::handle): Generalize comment.
+
 2013-03-09  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* cygtls.h (_cygtls::signal_debugger): Change argument type.
