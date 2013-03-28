@@ -1,3 +1,8 @@
+2013-03-28  Kai Tietz  <ktietz@redhat.com>
+
+	* include/cygwin/config.h (___getreent): Harden against aggressive
+	compiler optimization.
+
 2013-03-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin64.din: Reinstantiate definition of __srget and __srget_r.

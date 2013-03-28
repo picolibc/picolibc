@@ -44,12 +44,9 @@ extern "C" {
    addressing and translates "gs:8" into the wrong addressing mode. */
 static inline char *___getreent (void)
 {
-  return
-  ({
-    register char *ret __asm ("%rax");
-    __asm __volatile ("movq %gs:8,%rax");
-    ret + tls_local_clib;
-  });
+  register char *ret;
+  __asm __volatile__ ("movq %%gs:8,%0" : "=r" (ret));
+  return ret + tls_local_clib;
 }
 #define __getreent() ((struct _reent *) ___getreent())
 #else
