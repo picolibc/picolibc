@@ -690,17 +690,20 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 
 	  ExpDirectory *ed = (ExpDirectory *) exp;
 	  int ofs = ed->name_rva - export_rva;
-	  struct tm *tm = localtime ((const time_t *) &(ed->timestamp));
-	  if (tm->tm_year < 60)
+	  time_t ts = ed->timestamp;	/* timestamp is only 4 bytes! */
+	  struct tm *tm = localtime (&ts);
+	  if (tm && tm->tm_year < 60)
 	    tm->tm_year += 2000;
-	  if (tm->tm_year < 200)
+	  if (tm && tm->tm_year < 200)
 	    tm->tm_year += 1900;
 	  printf ("%*c", lvl + 2, ' ');
-	  printf ("\"%s\" v%d.%d ts=", exp + ofs,
+	  printf ("\"%s\" v%d.%d", exp + ofs,
 		  ed->major_ver, ed->minor_ver);
-	  printf ("%d/%d/%d %d:%02d\n",
-		  tm->tm_year, tm->tm_mon + 1, tm->tm_mday,
-		  tm->tm_hour, tm->tm_min);
+	  if (tm)
+	    printf (" ts=%04d-%02d-%02d %02d:%02d",
+		    tm->tm_year, tm->tm_mon + 1, tm->tm_mday,
+		    tm->tm_hour, tm->tm_min);
+	  putchar ('\n');
 	}
     }
 

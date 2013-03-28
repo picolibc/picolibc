@@ -1,3 +1,9 @@
+2013-03-28  Peter Rosin  <peda@lysator.liu.se>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dll_info): Fix crash due to sizeof(time_t) being not
+	equal to sizeof(int).  Output timestamp RFC 3339 compatible.
+
 2013-03-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* tzset.c (main): Don't try to overwrite space with NUL.  Explain why.
