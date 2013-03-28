@@ -1,6 +1,11 @@
 2013-03-27  Alexis Deruelle  <alexis.deruelle@gmail.com>
 
 	PR binutils/15068
+	* tic6x-opcode-table.h: Fix patterns for add, ldnw and xor.
+
+2013-03-27  Alexis Deruelle  <alexis.deruelle@gmail.com>
+
+	PR binutils/15068
 	* tic6xc-insn-formats.h (FLD): Add use of bitfield array.
 	Add 16-bit opcodes.
 	* tic6xc-opcode-table.h: Add 16-bit insns.
