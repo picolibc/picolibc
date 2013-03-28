@@ -1,3 +1,11 @@
+2013-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in ($(LIB_NAME)): Make sure to rebuild when cygwin.def file
+	has been changed.
+	* cygwin64.din: Remove more underscored symbols.
+	(getdelim): Add missing define in favor of unneeded __getline.
+	(getline): Ditto.
+
 2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_console.cc

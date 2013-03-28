@@ -79,7 +79,6 @@ asinh NOSIGFE
 asinhf NOSIGFE
 asnprintf SIGFE
 asprintf SIGFE
-_asprintf_r SIGFE
 __assert NOSIGFE
 __assert_func NOSIGFE
 __assertfail NOSIGFE
@@ -290,7 +289,6 @@ fchown SIGFE
 fchownat SIGFE
 fclose SIGFE
 fcloseall SIGFE
-_fcloseall_r SIGFE
 fcntl SIGFE
 fcvt SIGFE
 fcvtbuf SIGFE
@@ -423,7 +421,7 @@ getc_unlocked SIGFE
 getchar SIGFE
 getchar_unlocked SIGFE
 getcwd SIGFE
-__getdelim SIGFE
+getdelim = __getdelim SIGFE
 getdomainname SIGFE
 getdtablesize NOSIGFE
 getegid NOSIGFE
@@ -442,10 +440,9 @@ gethostbyname = cygwin_gethostbyname SIGFE
 gethostbyname2 SIGFE
 gethostid SIGFE
 gethostname = cygwin_gethostname SIGFE
-_gethostname = cygwin_gethostname SIGFE
 getifaddrs SIGFE
 getitimer SIGFE
-__getline SIGFE
+getline = __getline SIGFE
 getlogin NOSIGFE
 getlogin_r NOSIGFE
 getmntent SIGFE
@@ -948,7 +945,6 @@ scalbnf NOSIGFE
 scandir SIGFE
 scandirat SIGFE
 scanf SIGFE
-_scanf_r SIGFE
 sched_get_priority_max SIGFE
 sched_get_priority_min SIGFE
 sched_getparam SIGFE
@@ -1070,10 +1066,7 @@ sqrtf NOSIGFE
 srand NOSIGFE
 srand48 NOSIGFE
 srandom NOSIGFE
-__srget SIGFE
-__srget_r SIGFE
 sscanf SIGFE
-_sscanf_r SIGFE
 stat SIGFE
 statfs SIGFE
 statvfs SIGFE
@@ -1116,7 +1109,7 @@ strtoimax = strtoll NOSIGFE
 strtok NOSIGFE
 strtok_r NOSIGFE
 strtol NOSIGFE
-_strtold SIGFE
+strtold = _strtold SIGFE
 strtoll NOSIGFE
 strtosigno NOSIGFE
 strtoul NOSIGFE
@@ -1203,7 +1196,6 @@ utmpxname SIGFE
 valloc SIGFE
 vasnprintf SIGFE
 vasprintf SIGFE
-_vasprintf_r SIGFE
 vdprintf SIGFE
 verr SIGFE
 verrx SIGFE
@@ -1211,17 +1203,14 @@ vfiprintf SIGFE
 vfork SIGFE
 vfprintf SIGFE
 vfscanf SIGFE
-_vfscanf_r SIGFE
 vfwprintf SIGFE
 vfwscanf SIGFE
 vhangup SIGFE
 vprintf SIGFE
 vscanf SIGFE
-_vscanf_r SIGFE
 vsnprintf SIGFE
 vsprintf SIGFE
 vsscanf SIGFE
-_vsscanf_r SIGFE
 vswprintf SIGFE
 vswscanf SIGFE
 vsyslog SIGFE
