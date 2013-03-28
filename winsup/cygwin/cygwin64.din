@@ -1066,6 +1066,8 @@ sqrtf NOSIGFE
 srand NOSIGFE
 srand48 NOSIGFE
 srandom NOSIGFE
+__srget SIGFE
+__srget_r SIGFE
 sscanf SIGFE
 stat SIGFE
 statfs SIGFE
