@@ -2,7 +2,7 @@
 		capability class to the appropriate values.
 
    Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-   2012 Red Hat, Inc.
+   2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -56,6 +56,7 @@ wincaps wincap_2000 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:true,
+  terminate_thread_frees_stack:false,
 };
 
 wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -91,6 +92,7 @@ wincaps wincap_2000sp4 __attribute__((section (".cygwin_dll_common"), shared)) =
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:true,
+  terminate_thread_frees_stack:false,
 };
 
 wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -126,6 +128,7 @@ wincaps wincap_xp __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:false,
+  terminate_thread_frees_stack:false,
 };
 
 wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -161,6 +164,7 @@ wincaps wincap_xpsp1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:false,
+  terminate_thread_frees_stack:false,
 };
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -196,6 +200,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:false,
+  terminate_thread_frees_stack:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -231,6 +236,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:true,
   has_program_compatibility_assistant:false,
   kernel_is_always_casesensitive:false,
+  terminate_thread_frees_stack:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -266,6 +272,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:true,
   kernel_is_always_casesensitive:false,
+  terminate_thread_frees_stack:true,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -301,6 +308,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:true,
   kernel_is_always_casesensitive:false,
+  terminate_thread_frees_stack:true,
 };
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -336,6 +344,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   wow64_has_secondary_stack:false,
   has_program_compatibility_assistant:true,
   kernel_is_always_casesensitive:false,
+  terminate_thread_frees_stack:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));

@@ -1,7 +1,7 @@
 /* wincap.h: Header for OS capability class.
 
    Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-   2012 Red Hat, Inc.
+   2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -46,6 +46,7 @@ struct wincaps
   unsigned wow64_has_secondary_stack			: 1;
   unsigned has_program_compatibility_assistant		: 1;
   unsigned kernel_is_always_casesensitive		: 1;
+  unsigned terminate_thread_frees_stack			: 1;
 };
 
 class wincapc
@@ -100,6 +101,7 @@ public:
   bool	IMPLEMENT (wow64_has_secondary_stack)
   bool	IMPLEMENT (has_program_compatibility_assistant)
   bool	IMPLEMENT (kernel_is_always_casesensitive)
+  bool	IMPLEMENT (terminate_thread_frees_stack)
 
 #undef IMPLEMENT
 };
