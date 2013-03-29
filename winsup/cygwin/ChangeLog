@@ -1,5 +1,15 @@
 2013-03-28  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* sigproc.cc (pending_signals::retry): Declare new element.
+	(pending_signals::pending): Force an additional loop through wait_sig
+	by setting retry whenever this function is called.
+	(sig_send): Reorganize to wait for SIGHOLD at bottom.  Always add
+	signal to pending queue and work on whole queue rather than just the
+	one signal.  Loop when sigq.retry is set.  Fix long-broken check for
+	SIGCHLD after queued signals.
+
+2013-03-28  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* exceptions.cc (exception::handle): Generalize comment.
 
 2013-03-09  Christopher Faylor  <me.cygwin2013@cgf.cx>
