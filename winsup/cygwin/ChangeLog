@@ -1,9 +1,14 @@
+2013-03-29  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* sigproc.cc (wait_sig): Avoid uninitialized use of nb when retrying.
+	Consolidate two error messages into one.
+
 2013-03-28  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* sigproc.cc (pending_signals::retry): Declare new element.
 	(pending_signals::pending): Force an additional loop through wait_sig
 	by setting retry whenever this function is called.
-	(sig_send): Reorganize to wait for SIGHOLD at bottom.  Always add
+	(wait_sig): Reorganize to wait for SIGHOLD at bottom.  Always add
 	signal to pending queue and work on whole queue rather than just the
 	one signal.  Loop when sigq.retry is set.  Fix long-broken check for
 	SIGCHLD after queued signals.

@@ -1288,27 +1288,16 @@ wait_sig (VOID *)
       DWORD nb;
       sigpacket pack = {};
       if (sigq.retry)
-	{
-	  sigq.retry = false;
-	  pack.si.si_signo = __SIGFLUSH;
-	}
+	pack.si.si_signo = __SIGFLUSH;
       else if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))
-	Sleep (INFINITE);	/* Never exit this thread */
-      if (nb != sizeof (pack))
+	Sleep (INFINITE);	/* Assume were exiting.  Never exit this thread */
+      else if (nb != sizeof (pack) || !pack.si.si_signo)
 	{
-	  system_printf ("short read from signal pipe: %d != %d", nb,
-			 sizeof (pack));
+	  system_printf ("garbled signal pipe data nb %u, sig %d", nb, pack.si.si_signo);
 	  continue;
 	}
 
-      if (!pack.si.si_signo)
-	{
-#ifdef DEBUGGING
-	  system_printf ("zero signal?");
-#endif
-	  continue;
-	}
-
+      sigq.retry = false;
       /* Don't process signals when we start exiting */
       if (exit_state > ES_EXIT_STARTING && pack.si.si_signo > 0)
 	continue;
