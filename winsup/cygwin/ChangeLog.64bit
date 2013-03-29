@@ -1,3 +1,14 @@
+2013-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Drop old comment.
+	* hookapi.cc (PEHeaderFromHModule): Return PIMAGE_NT_HEADERS.
+	(rvadelta): Convert to function and merge in rvadelta_get.
+	(remap): New function to have code for remapping big executables
+	only once.
+	(find_first_notloaded_dll): Simplify.  Don't handle different
+	architecture at all.  Call remap.
+	(hook_or_detect_cygwin): Ditto.
+
 2013-03-28  Kai Tietz  <ktietz@redhat.com>
 
 	* include/cygwin/config.h (___getreent): Harden against aggressive

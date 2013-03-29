@@ -567,7 +567,6 @@ LoadDLLfunc (ReportEventW, 36, advapi32)
 LoadDLLfunc (DnsQuery_A, 24, dnsapi)
 LoadDLLfunc (DnsRecordListFree, 8, dnsapi)
 
-// 50 = ERROR_NOT_SUPPORTED.  Returned if OS doesn't support iphlpapi funcs
 LoadDLLfunc (GetAdaptersAddresses, 20, iphlpapi)
 LoadDLLfunc (GetIfEntry, 4, iphlpapi)
 LoadDLLfunc (GetIpAddrTable, 12, iphlpapi)

@@ -29,9 +29,8 @@ struct function_hook
   void *origfn;		// Stored by HookAPICalls, the address of the original function.
 };
 
-/* Given an HMODULE, returns a pointer to the PE header.
-   Return PVOID to make sure the caller handles 32 and 64 bit executables. */
-static PVOID
+/* Given an HMODULE, returns a pointer to the PE header. */
+static PIMAGE_NT_HEADERS
 PEHeaderFromHModule (HMODULE hModule, bool &is_64bit)
 {
   PIMAGE_NT_HEADERS pNTHeader;
@@ -52,14 +51,14 @@ PEHeaderFromHModule (HMODULE hModule, bool &is_64bit)
 	pNTHeader = NULL;
     }
 
-  return (PVOID) pNTHeader;
+  return pNTHeader;
 }
 
-static inline int
-rvadelta_get (WORD NumberOfSections, PIMAGE_SECTION_HEADER section,
-	      DWORD import_rva, DWORD &max_size)
+static long
+rvadelta (PIMAGE_NT_HEADERS pnt, DWORD import_rva, DWORD &max_size)
 {
-  for (int i = 0; i < NumberOfSections; i++)
+  PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER) (pnt + 1);
+  for (int i = 0; i < pnt->FileHeader.NumberOfSections; i++)
     if (section[i].VirtualAddress <= import_rva
 	&& (section[i].VirtualAddress + section[i].Misc.VirtualSize) > import_rva)
       {
@@ -69,25 +68,6 @@ rvadelta_get (WORD NumberOfSections, PIMAGE_SECTION_HEADER section,
       }
   return -1;
 }
-
-static int
-rvadelta32 (PIMAGE_NT_HEADERS32 pnt, DWORD import_rva, DWORD &max_size)
-{
-  PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER) (pnt + 1);
-  return rvadelta_get (pnt->FileHeader.NumberOfSections, section,
-		       import_rva, max_size);
-}
-
-static long
-rvadelta64 (PIMAGE_NT_HEADERS64 pnt, DWORD import_rva, DWORD &max_size)
-{
-  PIMAGE_SECTION_HEADER section = (PIMAGE_SECTION_HEADER) (pnt + 1);
-  return rvadelta_get (pnt->FileHeader.NumberOfSections, section,
-		       import_rva, max_size);
-}
-
-#define rvadelta(p,i,m)	(is_64bit ? rvadelta64 ((PIMAGE_NT_HEADERS64) p, i, m) \
-				  : rvadelta32 ((PIMAGE_NT_HEADERS32) p, i, m))
 
 /* This function is only used for the current architecture.
    Just the size of the IMAGE_THUNK_DATA Function member differs. */
@@ -197,6 +177,59 @@ makename (const char *name, char *&buf, int& i, int inc)
   return name;
 }
 
+static HMODULE
+remap (PIMAGE_IMPORT_DESCRIPTOR &pdfirst, long &delta, HANDLE hc,
+       DWORD importRVA, DWORD importRVASize, DWORD importRVAMaxSize)
+{
+  /* If h is not NULL, the calling function only mapped at most the first
+     64K of the image.  The IAT is usually at the end of the image, so
+     what we do here is to map the IAT into our address space if it doesn't
+     reside in the first 64K anyway.  The offset must be a multiple of the
+     allocation granularity, though, so we have to map a bit more. */
+  HMODULE map;
+  DWORD offset = rounddown (importRVA, wincap.allocation_granularity ());
+  /* But that's not all, unfortunately.  Apparently there's a difference
+     between the importRVASize of applications built with gcc and those
+     built with Visual Studio.  When built with gcc, importRVASize contains
+     the size of the import RVA table plus the size of the referenced
+     string table with the DLL names.  When built with VS, it only contains
+     the size of the naked import RVA table.  The following code handles
+     the situation.  importRVAMaxSize contains the size of the remainder
+     of the section.  If the difference between importRVAMaxSize and
+     importRVASize is less than 64K, we just use importRVAMaxSize to
+     compute the size of the memory map.  Otherwise the executable may be
+     very big.  In that case we only map the import RVA table and ... */
+  DWORD size = importRVA - offset + ((importRVAMaxSize - importRVASize
+				      <= wincap.allocation_granularity ())
+				     ? importRVAMaxSize : importRVASize);
+  map = (HMODULE) MapViewOfFile (hc, FILE_MAP_READ, 0, offset, size);
+  if (!map)
+    return NULL;
+  pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map, importRVA - offset);
+  /* ... carefully check the required size to fit the string table into
+     the map as well.  Allow NAME_MAX bytes for the DLL name, but don't
+     go beyond the remainder of the section. */
+  if (importRVAMaxSize - importRVASize > wincap.allocation_granularity ())
+    {
+      DWORD newsize = size;
+      for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
+	if (pd->Name - delta - offset + (NAME_MAX + 1) > newsize)
+	  newsize = pd->Name - delta - offset + (NAME_MAX + 1);
+      if (newsize > size)
+	{
+	  if (newsize > importRVA - offset + importRVAMaxSize)
+	    newsize = importRVA - offset + importRVAMaxSize;
+	  UnmapViewOfFile (map);
+	  map = (HMODULE) MapViewOfFile (hc, FILE_MAP_READ, 0, offset, newsize);
+	  if (!map)
+	    return NULL;
+	  pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map, importRVA - offset);
+	}
+    }
+  delta += offset;
+  return map;
+}
+
 /* Find first missing dll in a given executable.
    FIXME: This is not foolproof since it doesn't look for dlls in the
    same directory as the given executable, like Windows.  Instead it
@@ -213,7 +246,10 @@ find_first_notloaded_dll (path_conv& pc)
   HANDLE h;
   NTSTATUS status;
   LARGE_INTEGER size;
-  PVOID pExeNTHdr;
+  PIMAGE_NT_HEADERS pExeNTHdr;
+  DWORD importRVA, importRVASize, importRVAMaxSize;
+  HMODULE map;
+  long delta;
 
   status = NtOpenFile (&h, SYNCHRONIZE | GENERIC_READ,
 		       pc.get_object_attr (attr, sec_none_nih),
@@ -248,54 +284,55 @@ find_first_notloaded_dll (path_conv& pc)
   bool is_64bit;
   pExeNTHdr = PEHeaderFromHModule (hm, is_64bit);
 
-  if (pExeNTHdr)
+  if (!pExeNTHdr)
+    goto out;
+
+#ifdef __x86_64__
+  if (!is_64bit)
+#else
+  if (is_64bit)
+#endif
+    goto out;
+
+  importRVA = pExeNTHdr->OptionalHeader.DataDirectory
+			[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+  importRVASize = pExeNTHdr->OptionalHeader.DataDirectory
+			[IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
+  if (!importRVA)
+    goto out;
+
+  delta = rvadelta (pExeNTHdr, importRVA, importRVAMaxSize);
+  if (delta < 0)
+    goto out;
+  importRVA -= delta;
+  map = NULL;
+
+  PIMAGE_IMPORT_DESCRIPTOR pdfirst;
+
+  if (importRVA + importRVAMaxSize > wincap.allocation_granularity ())
     {
-      DWORD importRVA;
-      DWORD importRVAMaxSize = 0;
+      map = remap (pdfirst, delta, hc, importRVA, importRVASize,
+		   importRVAMaxSize);
+      if (!map)
+	goto out;
+    }
+  else
+    pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA);
 
-      importRVA = is_64bit ? ((PIMAGE_NT_HEADERS64) pExeNTHdr)->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress
-			   : ((PIMAGE_NT_HEADERS32) pExeNTHdr)->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-      if (importRVA)
+  /* Iterate through each import descriptor, and check if DLL can be loaded. */
+  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
+    {
+      const char *lib = rva (PSTR, map ?: hm, pd->Name - delta);
+      if (!LoadLibraryEx (lib, NULL, DONT_RESOLVE_DLL_REFERENCES
+				     | LOAD_LIBRARY_AS_DATAFILE))
 	{
-	  long delta = rvadelta (pExeNTHdr, importRVA, importRVAMaxSize);
-	  if (delta < 0)
-	    goto out;
-	  importRVA -= delta;
-
-	  DWORD offset = 0;
-	  HMODULE map = NULL;
-	  if (importRVA + importRVAMaxSize > wincap.allocation_granularity ())
-	    {
-	      offset = rounddown (importRVA, wincap.allocation_granularity ());
-	      DWORD size = importRVA - offset + importRVAMaxSize;
-	      map = (HMODULE) MapViewOfFile (hc, FILE_MAP_READ, 0,
-					     offset, size);
-	      if (!map)
-		goto out;
-	    }
-
-	  // Convert imports RVA to a usable pointer
-	  PIMAGE_IMPORT_DESCRIPTOR pdfirst;
-	  pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map ?: hm,
-			 importRVA - offset);
-
-	  // Iterate through each import descriptor, and redirect if appropriate
-	  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
-	    {
-	      const char *lib = rva (PSTR, map ?: hm,
-				     pd->Name - delta - offset);
-	      if (!LoadLibraryEx (lib, NULL, DONT_RESOLVE_DLL_REFERENCES
-					     | LOAD_LIBRARY_AS_DATAFILE))
-		{
-		  static char buf[MAX_PATH];
-		  strlcpy (buf, lib, MAX_PATH);
-		  res = buf;
-		}
-	    }
-	  if (map)
-	    UnmapViewOfFile (map);
+	  static char buf[MAX_PATH];
+	  strlcpy (buf, lib, MAX_PATH);
+	  res = buf;
 	}
     }
+  if (map)
+    UnmapViewOfFile (map);
 
 out:
   if (hm)
@@ -312,38 +349,9 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
 {
   HMODULE hm = fn ? GetModuleHandle (NULL) : (HMODULE) name;
   bool is_64bit;
-  PVOID pExeNTHdr = PEHeaderFromHModule (hm, is_64bit);
+  PIMAGE_NT_HEADERS pExeNTHdr = PEHeaderFromHModule (hm, is_64bit);
 
   if (!pExeNTHdr)
-    return NULL;
-
-  /* FIXME: This code has to be made 64 bit capable. */
-#define nthdr32		((PIMAGE_NT_HEADERS32) pExeNTHdr)
-#define nthdr64		((PIMAGE_NT_HEADERS64) pExeNTHdr)
-#define nthdr(x)	(is_64bit ? nthdr64->x : nthdr32->x)
-
-  DWORD importRVA, importRVASize;
-  if (is_64bit)
-    {
-      subsys =  ((PIMAGE_NT_HEADERS64) pExeNTHdr)->OptionalHeader.Subsystem;
-      importRVA =
-      	((PIMAGE_NT_HEADERS64) pExeNTHdr)->OptionalHeader.DataDirectory
-			    [IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-      importRVASize =
-	((PIMAGE_NT_HEADERS64) pExeNTHdr)->OptionalHeader.DataDirectory
-			    [IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
-    }
-  else
-    {
-      subsys =  ((PIMAGE_NT_HEADERS32) pExeNTHdr)->OptionalHeader.Subsystem;
-      importRVA =
-      	((PIMAGE_NT_HEADERS32) pExeNTHdr)->OptionalHeader.DataDirectory
-			    [IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-      importRVASize =
-	((PIMAGE_NT_HEADERS32) pExeNTHdr)->OptionalHeader.DataDirectory
-			    [IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
-    }
-  if (!importRVA)
     return NULL;
 
   /* Shortcut.  We don't have to do anything further from here, if the
@@ -356,6 +364,15 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
 #endif
     return NULL;
 
+  DWORD importRVA, importRVASize;
+  subsys = pExeNTHdr->OptionalHeader.Subsystem;
+  importRVA = pExeNTHdr->OptionalHeader.DataDirectory
+			[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
+  importRVASize = pExeNTHdr->OptionalHeader.DataDirectory
+			[IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
+  if (!importRVA)
+    return NULL;
+
   DWORD importRVAMaxSize = 0;
   long delta = fn ? 0 : rvadelta (pExeNTHdr, importRVA, importRVAMaxSize);
   if (delta < 0)
@@ -365,55 +382,12 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
   // Convert imports RVA to a usable pointer
   PIMAGE_IMPORT_DESCRIPTOR pdfirst;
   char *map = NULL;
-  DWORD offset = 0;
   if (h && importRVA + importRVAMaxSize > wincap.allocation_granularity ())
     {
-      /* If h is not NULL, the calling function only mapped at most the first
-	 64K of the image.  The IAT is usually at the end of the image, so
-	 what we do here is to map the IAT into our address space if it doesn't
-	 reside in the first 64K anyway.  The offset must be a multiple of the
-	 allocation granularity, though, so we have to map a bit more. */
-      offset = rounddown (importRVA, wincap.allocation_granularity ());
-      /* But that's not all, unfortunately.  Apparently there's a difference
-	 between the importRVASize of applications built with gcc and those
-	 built with Visual Studio.  When built with gcc, importRVASize contains
-	 the size of the import RVA table plus the size of the referenced
-	 string table with the DLL names.  When built with VS, it only contains
-	 the size of the naked import RVA table.  The following code handles
-	 the situation.  importRVAMaxSize contains the size of the remainder
-	 of the section.  If the difference between importRVAMaxSize and
-	 importRVASize is less than 64K, we just use importRVAMaxSize to
-	 compute the size of the memory map.  Otherwise the executable may be
-	 very big.  In that case we only map the import RVA table and ... */
-      DWORD size = importRVA - offset
-		   + ((importRVAMaxSize - importRVASize
-		       <= wincap.allocation_granularity ())
-		      ? importRVAMaxSize : importRVASize);
-      map = (char *) MapViewOfFile (h, FILE_MAP_READ, 0, offset, size);
+      map = (char *) remap (pdfirst, delta, h, importRVA, importRVASize,
+			    importRVAMaxSize);
       if (!map)
 	return NULL;
-      pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map, importRVA - offset);
-      /* ... carefully check the required size to fit the string table into
-	 the map as well.  Allow NAME_MAX bytes for the DLL name, but don't
-	 go beyond the remainder of the section. */
-      if (importRVAMaxSize - importRVASize > wincap.allocation_granularity ())
-	{
-	  DWORD newsize = size;
-	  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
-	    if (pd->Name - delta - offset + (NAME_MAX + 1) > newsize)
-	      newsize = pd->Name - delta - offset + (NAME_MAX + 1);
-	  if (newsize > size)
-	    {
-	      if (newsize > importRVA - offset + importRVAMaxSize)
-		newsize = importRVA - offset + importRVAMaxSize;
-	      UnmapViewOfFile (map);
-	      map = (char *) MapViewOfFile (h, FILE_MAP_READ, 0, offset,
-					    newsize);
-	      if (!map)
-		return NULL;
-	      pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, map, importRVA - offset);
-	    }
-	}
     }
   else
     pdfirst = rva (PIMAGE_IMPORT_DESCRIPTOR, hm, importRVA);
@@ -428,17 +402,15 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
   // Iterate through each import descriptor, and redirect if appropriate
   for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
     {
-      if (!ascii_strcasematch (rva (PSTR, map ?: (char *) hm,
-				    pd->Name - delta - offset),
+      if (!ascii_strcasematch (rva (PSTR, map ?: (char *) hm, pd->Name - delta),
 			       "cygwin1.dll"))
       	continue;
       if (!fn)
 	{
-	  /* Just checking if executable used cyg{64}win1.dll. */
+	  /* Just checking if executable used cygwin1.dll. */
 	  if (map)
 	    UnmapViewOfFile (map);
-	  /* The return value indicates the target CPU. */
-	  return (void *) (is_64bit ? 64L : 32L);
+	  return (void *) "found it";
 	}
       i = -1;
       while (!fh.origfn && (fh.name = makename (name, buf, i, 1)))
