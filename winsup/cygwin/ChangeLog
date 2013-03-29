@@ -1,3 +1,10 @@
+2013-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygthread.cc (cygthread::terminate_thread): Only try to free
+	thread stack on systems not freeing it by themselves.
+	* wincap.h (wincaps::terminate_thread_frees_stack): New element.
+	* wincap.cc: Implement above element throughout.
+
 2013-03-29  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* pinfo.h (pinfo::status_exit): Rename from former static function in
