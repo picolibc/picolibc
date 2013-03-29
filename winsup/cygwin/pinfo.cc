@@ -110,19 +110,26 @@ pinfo_init (char **envp, int envc)
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
 }
 
-static DWORD
-status_exit (DWORD x)
+DWORD
+pinfo::status_exit (DWORD x)
 {
   switch (x)
     {
     case STATUS_DLL_NOT_FOUND:
       {
 	char posix_prog[NT_MAX_PATH];
-	UNICODE_STRING uc;
-	RtlInitUnicodeString(&uc, myself->progname);
-	path_conv pc (&uc, PC_NOWARN);
+	path_conv pc;
+	if (!procinfo)
+	   pc.check ("/dev/null");
+	else
+	  {
+	    UNICODE_STRING uc;
+	    RtlInitUnicodeString(&uc, procinfo->progname);
+	    pc.check (&uc, PC_NOWARN);
+	  }
 	mount_table->conv_to_posix_path (pc.get_win32 (), posix_prog, 1);
-	small_printf ("%s: error while loading shared libraries: %s: cannot open shared object file: No such file or directory\n",
+	small_printf ("%s: error while loading shared libraries: %s: cannot "
+		      "open shared object file: No such file or directory\n",
 		      posix_prog, find_first_notloaded_dll (pc));
 	x = 127 << 8;
       }
