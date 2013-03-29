@@ -728,7 +728,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
       return CYG_EXC_CONTINUE_EXECUTION;
     }
 
-  /* FIXME: Probably should be handled in sigpacket::process */
+  /* FIXME: Probably should be handled in signal processing code */
   if ((NTSTATUS) e->ExceptionCode == STATUS_ACCESS_VIOLATION)
     {
       int error_code = 0;

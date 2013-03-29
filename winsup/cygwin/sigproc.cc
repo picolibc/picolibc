@@ -76,11 +76,12 @@ class pending_signals
   sigpacket *end;
   sigpacket *prev;
   sigpacket *curr;
+  bool retry;
 public:
   void reset () {curr = &start; prev = &start;}
   void add (sigpacket&);
   void del ();
-  bool pending () const {return !!start.next;}
+  bool pending () {retry = true; return !!start.next;}
   sigpacket *next ();
   sigpacket *save () const {return curr;}
   void restore (sigpacket *saved) {curr = saved;}
@@ -627,7 +628,8 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	}
     }
 
-  sigproc_printf ("sendsig %p, pid %d, signal %d, its_me %d", sendsig, p->pid, si.si_signo, its_me);
+  sigproc_printf ("sendsig %p, pid %d, signal %d, its_me %d", sendsig, p->pid,
+		  si.si_signo, its_me);
 
   sigset_t pending;
   if (!its_me)
@@ -1231,9 +1233,9 @@ void
 pending_signals::add (sigpacket& pack)
 {
   sigpacket *se;
-  if (sigs[pack.si.si_signo].si.si_signo)
-    return;
   se = sigs + pack.si.si_signo;
+  if (se->si.si_signo)
+    return;
   *se = pack;
   se->mask = &pack.sigtls->sigmask;
   se->next = NULL;
@@ -1281,18 +1283,17 @@ wait_sig (VOID *)
   sigproc_printf ("entering ReadFile loop, my_readsig %p, my_sendsig %p",
 		  my_readsig, my_sendsig);
 
-  sigpacket pack;
-  pack.si.si_signo = 0;
   for (;;)
     {
-      if (pack.si.si_signo == __SIGHOLD)
-	WaitForSingleObject (sig_hold, INFINITE);
-
       DWORD nb;
-      pack.sigtls = NULL;
-      if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))
-	break;
-
+      sigpacket pack = {};
+      if (sigq.retry)
+	{
+	  sigq.retry = false;
+	  pack.si.si_signo = __SIGFLUSH;
+	}
+      else if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))
+	Sleep (INFINITE);	/* Never exit this thread */
       if (nb != sizeof (pack))
 	{
 	  system_printf ("short read from signal pipe: %u != %lu", nb,
@@ -1340,6 +1341,11 @@ wait_sig (VOID *)
 	case __SIGHOLD:
 	  goto loop;
 	  break;
+	default:
+	  if (pack.si.si_signo < 0)
+	    sig_clear (-pack.si.si_signo);
+	  else
+	    sigq.add (pack);
 	case __SIGNOHOLD:
 	case __SIGFLUSH:
 	case __SIGFLUSHFAST:
@@ -1349,7 +1355,7 @@ wait_sig (VOID *)
 	      int sig = q->si.si_signo;
 	      if (sig == __SIGDELETE || q->process () > 0)
 		sigq.del ();
-	      if (sig == __SIGNOHOLD && q->si.si_signo == SIGCHLD)
+	      if (sig == SIGCHLD)
 		clearwait = true;
 	    }
 	  break;
@@ -1373,33 +1379,6 @@ wait_sig (VOID *)
 	      system_printf ("WaitForSingleObject(%p) for thread exit returned %u", h, res);
 	  }
 	  break;
-	default:
-	  if (pack.si.si_signo < 0)
-	    sig_clear (-pack.si.si_signo);
-	  else
-	    {
-	      int sig = pack.si.si_signo;
-	      // FIXME: REALLY not right when taking threads into consideration.
-	      // We need a per-thread queue since each thread can have its own
-	      // list of blocked signals.  CGF 2005-08-24
-	      if (sigq.sigs[sig].si.si_signo && sigq.sigs[sig].sigtls == pack.sigtls)
-		sigproc_printf ("signal %d already queued", pack.si.si_signo);
-	      else
-		{
-		  int sigres = pack.process ();
-		  if (sigres <= 0)
-		    {
-#ifdef DEBUGGING2
-		      if (!sigres)
-			system_printf ("Failed to arm signal %d from pid %d", pack.si.si_signo, pack.pid);
-#endif
-		      sigq.add (pack);	// FIXME: Shouldn't add this in !sh condition
-		    }
-		}
-	      if (sig == SIGCHLD)
-		clearwait = true;
-	    }
-	  break;
 	}
       if (clearwait && !have_execed)
 	proc_subproc (PROC_CLEARWAIT, 0);
@@ -1409,5 +1388,7 @@ wait_sig (VOID *)
 	  sigproc_printf ("signalling pack.wakeup %p", pack.wakeup);
 	  SetEvent (pack.wakeup);
 	}
+      if (pack.si.si_signo == __SIGHOLD)
+	WaitForSingleObject (sig_hold, INFINITE);
     }
 }
