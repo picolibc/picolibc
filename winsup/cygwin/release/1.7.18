@@ -60,3 +60,6 @@ Bug fixes:
 
 - Fix some bugs in CTRL-S/CTRL-Q handling in ptys.
   See: http://cygwin.com/ml/cygwin/2012-10/msg00089.html
+
+- Fix "error while loading shared libraries:" message to properly
+  display the shared library name in more cases.

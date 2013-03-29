@@ -179,7 +179,6 @@ public:
   int operator == (_pinfo *x) const {return x == procinfo;}
   int operator == (void *x) const {return procinfo == x;}
   int operator == (int x) const {return (int) procinfo == (int) x;}
-  int operator == (char *x) const {return (char *) procinfo == x;}
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
   void preserve () { destroy = false; }
@@ -206,6 +205,8 @@ public:
   void set_acl ();
   friend class _pinfo;
   friend class winpids;
+private:
+  DWORD status_exit (DWORD);
 };
 
 #define ISSTATE(p, f)	(!!((p)->process_state & f))

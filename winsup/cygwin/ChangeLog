@@ -1,5 +1,14 @@
 2013-03-29  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* pinfo.h (pinfo::status_exit): Rename from former static function in
+	pinfo.cc.
+	(pinfo::operator == (char *)): Remove unused operator.
+	* pinfo.cc (pinfo::status_exit): Move this function info pinfo class.
+	Use progname from the pinfo rather than myself.  Be defensive when
+	inspecting procinfo.
+
+2013-03-29  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* sigproc.cc (wait_sig): Avoid uninitialized use of nb when retrying.
 	Consolidate two error messages into one.
 
