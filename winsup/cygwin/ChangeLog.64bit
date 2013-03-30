@@ -1,3 +1,9 @@
+2013-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* lc_msg.h: Regenerate from F18 glibc 2.16-28.  In the first place this
+	fixes fi_FI and adds ta_LK (new in Windows 8).
+	* nlsfuncs.cc (LocaleNameToLCID): Drop unneeded declaration.
+
 2013-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc: Drop old comment.

@@ -1,6 +1,6 @@
 /* nlsfuncs.cc: NLS helper functions
 
-   Copyright 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -40,11 +40,6 @@ details. */
 			     f_wctomb,charset)
 
 #define has_modifier(x)	((x)[0] && !strcmp (modifier, (x)))
-
-/* Vista and later.  Not defined in w32api yet. */
-extern "C" {
-WINBASEAPI LCID WINAPI LocaleNameToLCID (LPCWSTR, DWORD);
-};
 
 static char last_locale[ENCODING_LEN + 1];
 static LCID last_lcid;
