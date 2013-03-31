@@ -1124,12 +1124,19 @@ signal_exit (int sig, siginfo_t *si)
 int __stdcall
 sigpacket::process ()
 {
-  bool continue_now;
-  struct sigaction dummy = global_sigs[SIGSTOP];
+  int rc = 1;
+  bool issig_wait = false;
+  bool continue_now = false;
+  struct sigaction& thissig = global_sigs[si.si_signo];
+  void *handler = have_execed ? NULL : (void *) thissig.sa_handler;
 
-  if (si.si_signo != SIGCONT)
-    continue_now = false;
-  else
+  if (!cygwin_finished_initializing)
+    {
+      rc = -1;
+      goto really_done;
+    }
+
+  if (si.si_signo == SIGCONT)
     {
       continue_now = ISSTATE (myself, PID_STOPPED);
       myself->stopsig = 0;
@@ -1141,30 +1148,43 @@ sigpacket::process ()
       sig_clear (SIGTTOU);
     }
 
-  int rc = 1;
-
   sigproc_printf ("signal %d processing", si.si_signo);
-  struct sigaction& thissig = global_sigs[si.si_signo];
 
   myself->rusage_self.ru_nsignals++;
 
   _cygtls *tls;
-  if (sigtls)
+  if (!sigtls)
     {
-      tls = sigtls;
-      sigproc_printf ("using sigtls %p", sigtls);
+      tls = cygheap->find_tls (si.si_signo, issig_wait);
+      sigproc_printf ("using tls %p", tls);
     }
   else
     {
-      tls = cygheap->find_tls (si.si_signo);
-      sigproc_printf ("using tls %p", tls);
+      tls = sigtls;
+      if (sigismember (&tls->sigwait_mask, si.si_signo))
+	issig_wait = true;
+      else if (!sigismember (&tls->sigmask, si.si_signo))
+	issig_wait = false;
+      else
+	tls = NULL;
+    }
+
+  if (!tls || ISSTATE (myself, PID_STOPPED))
+    {
+      sigproc_printf ("signal %d blocked", si.si_signo);
+      rc = -1;
+      goto done;
     }
 
   /* Do stuff for gdb */
   if ((HANDLE) *tls)
     tls->signal_debugger (si);
 
-  void *handler = have_execed ? NULL : (void *) thissig.sa_handler;
+  if (issig_wait)
+    {
+      tls->sigwait_mask = 0;
+      goto dosig;
+    }
 
   if (handler == SIG_IGN)
     {
@@ -1178,18 +1198,6 @@ sigpacket::process ()
     {
       sig_clear (SIGCONT);
       goto stop;
-    }
-
-  if (sigismember (&tls->sigwait_mask, si.si_signo))
-    {
-      tls->sigwait_mask = 0;
-      goto dosig;
-    }
-  if (sigismember (&tls->sigmask, si.si_signo) || ISSTATE (myself, PID_STOPPED))
-    {
-      sigproc_printf ("signal %d blocked", si.si_signo);
-      rc = -1;
-      goto done;
     }
 
   /* Clear pending SIGCONT on stop signals */
@@ -1218,7 +1226,7 @@ sigpacket::process ()
 
 stop:
   handler = (void *) sig_handle_tty_stop;
-  thissig = dummy;
+  thissig = global_sigs[SIGSTOP];
   goto dosig;
 
 exit_sig:
@@ -1248,9 +1256,10 @@ dispatch_sig:
 done:
   if (continue_now)
     {
-      tls->sig = SIGCONT;
+      (tls ?: _main_tls)->sig = SIGCONT;
       SetEvent (tls->signal_arrived);
     }
+really_done:
   sigproc_printf ("returning %d", rc);
   return rc;
 

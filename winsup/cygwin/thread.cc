@@ -338,7 +338,7 @@ pthread::init_mainthread ()
 	api_fatal ("failed to create mainthread object");
     }
 
-  set_tls_self_pointer (thread);
+  thread->set_tls_self_pointer ();
   thread->thread_id = GetCurrentThreadId ();
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
 			GetCurrentProcess (), &thread->win32_obj_id,
@@ -357,16 +357,16 @@ pthread::self ()
   if (!thread)
     {
       thread = pthread_null::get_null_pthread ();
-      set_tls_self_pointer (thread);
+      thread->set_tls_self_pointer ();
     }
   return thread;
 }
 
 void
-pthread::set_tls_self_pointer (pthread *thread)
+pthread::set_tls_self_pointer ()
 {
-  thread->cygtls = &_my_tls;
-  _my_tls.tid = thread;
+  cygtls = &_my_tls;
+  _my_tls.tid = this;
 }
 
 List<pthread> pthread::threads;
@@ -1912,14 +1912,14 @@ DWORD WINAPI
 pthread::thread_init_wrapper (void *arg)
 {
   pthread *thread = (pthread *) arg;
-  set_tls_self_pointer (thread);
+  _my_tls.sigmask = thread->parent_sigmask;
+  thread->set_tls_self_pointer ();
 
   thread->mutex.lock ();
 
   // if thread is detached force cleanup on exit
   if (thread->attr.joinable == PTHREAD_CREATE_DETACHED && thread->joiner == NULL)
     thread->joiner = thread;
-  _my_tls.sigmask = thread->parent_sigmask;
   thread->mutex.unlock ();
 
   debug_printf ("tid %p", &_my_tls);

@@ -397,7 +397,8 @@ check_sanity_and_sync (per_process *p)
   __cygwin_user_data.cxx_malloc = &default_cygwin_cxx_malloc;
 }
 
-child_info NO_COPY *child_proc_info = NULL;
+child_info NO_COPY *child_proc_info;
+static NO_COPY sigset_t parent_sigmask;
 
 #define CYGWIN_GUARD (PAGE_READWRITE | PAGE_GUARD)
 
@@ -654,6 +655,8 @@ child_info_spawn::handle_spawn ()
 			FALSE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     h = NULL;
 
+  parent_sigmask = moreinfo->sigmask;
+
   /* Setup our write end of the process pipe.  Clear the one in the structure.
      The destructor should never be called for this but, it can't hurt to be
      safe. */
@@ -821,6 +824,9 @@ dll_crt0_1 (void *)
   extern void initial_setlocale ();
 
   _my_tls.incyg++;
+  if (!in_forkee)
+    _my_tls.sigmask = parent_sigmask;	/* always zero if started by non-cygwin
+					   process */
 
   if (dynamically_loaded)
     sigproc_init ();
@@ -1009,6 +1015,7 @@ dll_crt0_1 (void *)
       while ((*nav++ = *oav++) != NULL)
 	continue;
       /* Handle any signals which may have arrived */
+      sig_dispatch_pending (false);
       _my_tls.call_signal_handler ();
       _my_tls.incyg--;	/* Not in Cygwin anymore */
       cygwin_exit (user_data->main (__argc, newargv, *user_data->envptr));

@@ -835,9 +835,12 @@ child_info_spawn::child_info_spawn (child_info_types chtype, bool need_subproc_r
 cygheap_exec_info *
 cygheap_exec_info::alloc ()
 {
- return (cygheap_exec_info *) ccalloc_abort (HEAP_1_EXEC, 1,
-					     sizeof (cygheap_exec_info)
-					     + (nprocs * sizeof (children[0])));
+  cygheap_exec_info *res =
+    (cygheap_exec_info *) ccalloc_abort (HEAP_1_EXEC, 1,
+					 sizeof (cygheap_exec_info)
+					 + (nprocs * sizeof (children[0])));
+  res->sigmask = _my_tls.sigmask;
+  return res;
 }
 
 void
@@ -1237,7 +1240,6 @@ pending_signals::add (sigpacket& pack)
   if (se->si.si_signo)
     return;
   *se = pack;
-  se->mask = &pack.sigtls->sigmask;
   se->next = NULL;
   if (end)
     end->next = se;
@@ -1365,7 +1367,12 @@ wait_sig (VOID *)
 	    lock_process::force_release (pack.sigtls);
 	    ForceCloseHandle1 (h, exit_thread);
 	    if (res != WAIT_OBJECT_0)
-	      system_printf ("WaitForSingleObject(%p) for thread exit returned %u", h, res);
+	      {
+#ifdef DEBUGGING
+		try_to_debug();
+#endif
+		system_printf ("WaitForSingleObject(%p) for thread exit returned %u", h, res);
+	      }
 	  }
 	  break;
 	}

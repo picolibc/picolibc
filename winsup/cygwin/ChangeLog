@@ -1,3 +1,31 @@
+2013-03-31  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* child_info.h (cygheap_exec_info::sigmask): Declare new field.
+	* cygheap.cc (init_cygheap::find_tls): Rename threadlist_ix -> ix.
+	Only take one pass through thread list, looking for eligible threads to
+	signal.  Set a new param indicating that function has found a sigwait*
+	mask.
+	* cygheap.h (init_cygheap::find_tls): Reflect new parameter.
+	* dcrt0.cc (parent_sigmask): New variable.
+	(child_info_spawn::handle_spawn): Save parent's signal mask here.
+	(dll_crt0_1): Restore parent's signal mask to tls sigmask as
+	appropriate.  Call sig_dispatch_pending to flush signal queue when we
+	can finally do something with signals.
+	* exceptions.cc (sigpacket::process): Avoid attempting to handle
+	signals if we haven't finished initializing.  Rely on the fact that
+	find_tls will do mask checking and don't do it again.  Delete ill-named
+	'dummy' variable.
+	* sigproc.cc (cygheap_exec_info::alloc): Save calling thread's signal
+	mask in new sigmask field.
+	(wait_sig): Try to debug when WFSO fails and DEBUGGING is defined.
+	* thread.cc (pthread::set_tls_self_pointer): Make this a true automatic
+	method rather than inexplicably relying on a thread parameter.
+	(pthread::thread_init_wrapper): Accommodate set_tls_self_pointer change
+	to non-static.  Initialize sigmask before setting tid or suffer signal
+	races.
+	* ehread.h (pthread::set_tls_self_pointer): Make non-static, delete
+	parameter.
+
 2013-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygthread.cc (cygthread::terminate_thread): Only try to free

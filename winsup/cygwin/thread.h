@@ -443,7 +443,7 @@ private:
   void precreate (pthread_attr *);
   void postcreate ();
   bool create_cancel_event ();
-  static void set_tls_self_pointer (pthread *);
+  void set_tls_self_pointer ();
   void cancel_self () __attribute__ ((noreturn));
   DWORD get_thread_id ();
 };
