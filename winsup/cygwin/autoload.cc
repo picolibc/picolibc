@@ -299,7 +299,7 @@ std_dll_init ()
 
 /* Initialization function for winsock stuff. */
 WSADATA NO_COPY wsadata;
-static long long __attribute__ ((used, noinline)) 
+static long long __attribute__ ((used, noinline))
 wsock_init ()
 {
   static LONG NO_COPY here = -1L;

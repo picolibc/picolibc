@@ -2,7 +2,7 @@
    fhandler classes.
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2011, 2012 Red Hat, Inc.
+   2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -647,7 +647,7 @@ fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
 	}
       return bytes_written;
     }
-  
+
   /* In O_DIRECT case, just write. */
   if (write_file (p, len, &bytes_written, &ret))
     return bytes_written;

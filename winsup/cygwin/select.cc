@@ -295,7 +295,7 @@ select_record::dump_select_record ()
 		 read_ready, write_ready, except_ready);
   select_printf ("read_selected %d, write_selected %d, except_selected %d, except_on_write %d",
 		 read_selected, write_selected, except_selected, except_on_write);
-		     
+
   select_printf ("startup %p, peek %p, verify %p cleanup %p, next %p",
 		 startup, peek, verify, cleanup, next);
 }
