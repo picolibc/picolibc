@@ -63,3 +63,8 @@ Bug fixes:
 
 - Fix "error while loading shared libraries:" message to properly
   display the shared library name in more cases.
+
+- Fix unreported problem of exec'ed and spawn'ed processes not
+  inheriting the signal mask of their "parents".
+
+- Fix race in signal mask detection with new thread creation.
