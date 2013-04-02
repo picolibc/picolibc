@@ -1176,7 +1176,7 @@ fhandler_disk_file::ftruncate (off_t length, bool allow_truncate)
       /* Create sparse files only when called through ftruncate, not when
 	 called through posix_fallocate. */
       if (allow_truncate && pc.support_sparse ()
-	  & !has_attribute (FILE_ATTRIBUTE_SPARSE_FILE)
+	  && !has_attribute (FILE_ATTRIBUTE_SPARSE_FILE)
 	  && length >= fsi.EndOfFile.QuadPart + (128 * 1024))
 	{
 	  status = NtFsControlFile (get_handle (), NULL, NULL, NULL, &io,

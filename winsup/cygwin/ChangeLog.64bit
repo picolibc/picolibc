@@ -1,3 +1,8 @@
+2013-04-02  Алексей Павлов <alexpux@gmail.com>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::ftruncate): Add missed
+	ampersand.
+
 2013-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lc_msg.h: Regenerate from F18 glibc 2.16-28.  In the first place this
