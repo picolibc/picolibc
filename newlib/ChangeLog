@@ -1,3 +1,8 @@
+2013-04-02  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/posix/scandir.c (DIRSIZ): Use offsetof instead of magic
+	number.
+
 2013-03-27  Bin Cheng  <bin.cheng@arm.com>
 
 	* acconfig.h (_FVWRITE_IN_STREAMIO): Undefine.

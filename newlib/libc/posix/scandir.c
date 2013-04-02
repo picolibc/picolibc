@@ -42,6 +42,7 @@ static char sccsid[] = "@(#)scandir.c	5.10 (Berkeley) 2/23/91";
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stddef.h>
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
@@ -56,10 +57,10 @@ static char sccsid[] = "@(#)scandir.c	5.10 (Berkeley) 2/23/91";
 #undef DIRSIZ
 #ifdef _DIRENT_HAVE_D_NAMLEN
 #define DIRSIZ(dp) \
-    ((sizeof (struct dirent) - (MAXNAMLEN+1)) + (((dp)->d_namlen+1 + 3) &~ 3))
+    (offsetof (struct dirent, d_name) + (((dp)->d_namlen+1 + 3) &~ 3))
 #else
 #define DIRSIZ(dp) \
-    ((sizeof (struct dirent) - (MAXNAMLEN+1)) + ((strlen((dp)->d_name)+1 + 3) &~ 3))
+    (offsetof (struct dirent, d_name) + ((strlen((dp)->d_name)+1 + 3) &~ 3))
 #endif
 
 #ifndef __P
