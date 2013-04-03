@@ -426,7 +426,7 @@ format_proc_loadavg (void *, char *&destbuf)
 	break;
     }
 
-  destbuf = (char *) crealloc_abort (destbuf, 16);
+  destbuf = (char *) crealloc_abort (destbuf, 48);
   return __small_sprintf (destbuf, "%u.%02u %u.%02u %u.%02u %u/%u\n",
 				    0, 0, 0, 0, 0, 0, running, pids.npids);
 }
