@@ -1,5 +1,10 @@
 2013-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (format_proc_loadavg): Raise too small buffer size
+	to avoid overwriting unrelated cygheap memory.
+
+2013-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (class suffix_scan): Add member namelen.
 	(suffix_scan::name_len): New method.
 	(suffix_scan::has): Store namelen since we have it already anyway.

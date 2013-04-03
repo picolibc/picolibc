@@ -1,6 +1,6 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012,
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
    2013 Red Hat, Inc.
 
 This file is part of Cygwin.
@@ -426,7 +426,7 @@ format_proc_loadavg (void *, char *&destbuf)
 	break;
     }
 
-  destbuf = (char *) crealloc_abort (destbuf, 16);
+  destbuf = (char *) crealloc_abort (destbuf, 48);
   return __small_sprintf (destbuf, "%u.%02u %u.%02u %u.%02u %u/%u\n",
 				    0, 0, 0, 0, 0, 0, running, pids.npids);
 }
