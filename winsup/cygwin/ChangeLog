@@ -1,3 +1,14 @@
+2013-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (class suffix_scan): Add member namelen.
+	(suffix_scan::name_len): New method.
+	(suffix_scan::has): Store namelen since we have it already anyway.
+	Add a bit of explanation and a FIXME to comment.
+	(suffix_scan::next): Never attach extra .lnk suffix if resulting
+	filename length exceeds NAME_LEN.
+	(symlink_info::check): Bail out immediately with ENAMETOOLONG if
+	filename length exceeds NAME_LEN.
+
 2013-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygthread.cc (cygthread::terminate_thread): Only try to free
