@@ -1,3 +1,7 @@
+2013-04-03  Nick Clifton  <nickc@redhat.com>
+
+	* v850.h (V850_INVERSE_PCREL): Define.
+
 2013-03-27  Alexis Deruelle  <alexis.deruelle@gmail.com>
 
 	PR binutils/15068

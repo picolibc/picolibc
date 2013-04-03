@@ -232,6 +232,9 @@ extern const struct v850_operand v850_operands[];
 /* This operand is a prefetch oparation.  */
 #define V850_OPERAND_PREFOP	0x800000
 
+/* A PC-relative displacement where a positive value indicates a backwards displacement.  */
+#define V850_INVERSE_PCREL	0x1000000
+
 extern int v850_msg_is_out_of_range (const char *);
 
 #endif /* V850_H */
