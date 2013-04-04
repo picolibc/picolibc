@@ -65,7 +65,6 @@ static NO_COPY uint32_t nthreads;
 
 #define THREADLIST_CHUNK 256
 
-#define NBUCKETS (sizeof (cygheap->buckets) / sizeof (cygheap->buckets[0]))
 #define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - offsetof (_cmalloc_entry, data)))
 
 #define CFMAP_OPTIONS (SEC_RESERVE | PAGE_READWRITE)
@@ -261,6 +260,21 @@ cygheap_init ()
 					 sizeof (*cygheap));
       cygheap_max = cygheap;
       _csbrk (sizeof (*cygheap));
+      /* Initialize bucket_val.  The value is the max size of a block
+         fitting into the bucket.  The values are powers of two and their
+	 medians: 12, 16, 24, 32, 48, 64, ...  On 64 bit, start with 24 to
+	 accommodate bigger size of struct cygheap_entry.
+	 With NBUCKETS == 40, the maximum block size is 6291456/12582912.
+	 The idea is to have better matching bucket sizes (not wasting
+	 space) without trading in performance compared to the old powers
+	 of 2 method. */
+#ifdef __x86_64__
+      unsigned sz[2] = { 16, 24 };	/* sizeof cygheap_entry == 16 */
+#else
+      unsigned sz[2] = { 8, 12 };	/* sizeof cygheap_entry == 8 */
+#endif
+      for (unsigned b = 1; b < NBUCKETS; b++, sz[b & 1] <<= 1)
+	cygheap->bucket_val[b] = sz[b & 1];
       /* Default locale settings. */
       cygheap->locale.mbtowc = __utf8_mbtowc;
       cygheap->locale.wctomb = __utf8_wctomb;
@@ -285,11 +299,13 @@ static void *__reg1
 _cmalloc (unsigned size)
 {
   _cmalloc_entry *rvc;
-  unsigned b, sz;
+  unsigned b;
 
-  /* Calculate "bit bucket" and size as a power of two. */
-  for (b = 3, sz = 8; sz && sz < size; b++, sz <<= 1)
+  /* Calculate "bit bucket". */
+  for (b = 1; b < NBUCKETS && cygheap->bucket_val[b] < size; b++)
     continue;
+  if (b >= NBUCKETS)
+    return NULL;
 
   cygheap_protect.acquire ();
   if (cygheap->buckets[b])
@@ -300,7 +316,8 @@ _cmalloc (unsigned size)
     }
   else
     {
-      rvc = (_cmalloc_entry *) _csbrk (sz + sizeof (_cmalloc_entry));
+      rvc = (_cmalloc_entry *) _csbrk (cygheap->bucket_val[b]
+				       + sizeof (_cmalloc_entry));
       if (!rvc)
 	{
 	  cygheap_protect.release ();
@@ -320,7 +337,7 @@ _cfree (void *ptr)
 {
   cygheap_protect.acquire ();
   _cmalloc_entry *rvc = to_cmalloc (ptr);
-  DWORD b = rvc->b;
+  unsigned b = rvc->b;
   rvc->ptr = cygheap->buckets[b];
   cygheap->buckets[b] = (char *) rvc;
   cygheap_protect.release ();
@@ -334,7 +351,7 @@ _crealloc (void *ptr, unsigned size)
     newptr = _cmalloc (size);
   else
     {
-      unsigned oldsize = 1 << to_cmalloc (ptr)->b;
+      unsigned oldsize = cygheap->bucket_val[to_cmalloc (ptr)->b];
       if (size <= oldsize)
 	return ptr;
       newptr = _cmalloc (size);

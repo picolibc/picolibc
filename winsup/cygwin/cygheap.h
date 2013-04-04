@@ -18,7 +18,7 @@ struct _cmalloc_entry
 {
   union
   {
-    DWORD b;
+    unsigned b;
     char *ptr;
   };
   struct _cmalloc_entry *prev;
@@ -365,10 +365,13 @@ struct mini_cygheap
   cygheap_locale locale;
 };
 
+#define NBUCKETS 40
+
 struct init_cygheap: public mini_cygheap
 {
   _cmalloc_entry *chain;
-  char *buckets[32];
+  unsigned bucket_val[NBUCKETS];
+  char *buckets[NBUCKETS];
   WCHAR installation_root[PATH_MAX];
   UNICODE_STRING installation_key;
   WCHAR installation_key_buf[18];

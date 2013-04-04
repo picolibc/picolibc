@@ -1,3 +1,18 @@
+2013-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (struct _cmalloc_entry): Define b as unsigned rather than
+	DWORD.
+	(NBUCKETS): Define here as constant value.
+	(struct init_cygheap): Add bucket_val member.  Define size of bucket_val
+	and buckets using NBUCKETS.
+	* cygheap.cc (NBUCKETS): Drop definition here.
+	(cygheap_init): Initialize cygheap->bucket_val.  Add comment to explain
+	what we do and why.
+	(_cmalloc): Simplify bit bucket search using cygheap->bucket_val.  Drop
+	local variable sz.  Fetch size of block from cygheap->bucket_val.
+	(_cfree): Define b as unsigned.
+	(_crealloc): Fetch size of block from cygheap->bucket_val.
+
 2013-04-02  Алексей Павлов <alexpux@gmail.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::ftruncate): Add missed
