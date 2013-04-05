@@ -672,7 +672,10 @@ is_mmapped_region (caddr_t start_addr, caddr_t end_address)
   mmap_list *map_list = mmapped_areas.get_list_by_fd (-1, NULL);
 
   if (!map_list)
-    return false;
+    {
+      LIST_UNLOCK ();
+      return false;
+    }
 
   mmap_record *rec;
   caddr_t u_addr;
