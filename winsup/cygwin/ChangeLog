@@ -1,3 +1,7 @@
+2013-04-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (is_mmapped_region): Call LIST_UNLOCK on premature return.
+
 2013-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_loadavg): Raise too small buffer size
