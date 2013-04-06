@@ -1,3 +1,7 @@
+2013-04-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (_csbrk): Move down in file, right in front of _cmalloc.
+
 2013-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (struct _cmalloc_entry): Define b as unsigned rather than

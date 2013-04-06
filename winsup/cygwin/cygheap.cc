@@ -115,47 +115,6 @@ init_cygheap::close_ctty ()
   cygheap->ctty = NULL;
 }
 
-#define nextpage(x) ((char *) roundup2 ((uintptr_t) (x), \
-					wincap.allocation_granularity ()))
-#define allocsize(x) ((SIZE_T) nextpage (x))
-#ifdef DEBUGGING
-#define somekinda_printf debug_printf
-#else
-#define somekinda_printf malloc_printf
-#endif
-
-static void *__stdcall
-_csbrk (int sbs)
-{
-  void *prebrk = cygheap_max;
-  char *newbase = nextpage (prebrk);
-  cygheap_max = (char *) cygheap_max + sbs;
-  if (!sbs || (newbase >= cygheap_max) || (cygheap_max <= _cygheap_end))
-    /* nothing to do */;
-  else
-    {
-      if (prebrk <= _cygheap_end)
-	newbase = _cygheap_end;
-
-      SIZE_T adjsbs = allocsize ((char *) cygheap_max - newbase);
-      if (adjsbs && !VirtualAlloc (newbase, adjsbs, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))
-	{
-	  MEMORY_BASIC_INFORMATION m;
-	  if (!VirtualQuery (newbase, &m, sizeof m))
-	    system_printf ("couldn't get memory info, %E");
-	  somekinda_printf ("Couldn't reserve/commit %ld bytes of space for cygwin's heap, %E",
-			    adjsbs);
-	  somekinda_printf ("AllocationBase %p, BaseAddress %p, RegionSize %lx, State %x\n",
-			    m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
-	  __seterrno ();
-	  cygheap_max = (char *) cygheap_max - sbs;
-	  return NULL;
-	}
-    }
-
-  return prebrk;
-}
-
 /* Use absolute path of cygwin1.dll to derive the Win32 dir which
    is our installation_root.  Note that we can't handle Cygwin installation
    root dirs of more than 4K path length.  I assume that's ok...
@@ -288,6 +247,47 @@ cygheap_init ()
   if (!cygheap->sigs)
     sigalloc ();
   cygheap->init_tls_list ();
+}
+
+#define nextpage(x) ((char *) roundup2 ((uintptr_t) (x), \
+					wincap.allocation_granularity ()))
+#define allocsize(x) ((SIZE_T) nextpage (x))
+#ifdef DEBUGGING
+#define somekinda_printf debug_printf
+#else
+#define somekinda_printf malloc_printf
+#endif
+
+static void *__stdcall
+_csbrk (int sbs)
+{
+  void *prebrk = cygheap_max;
+  char *newbase = nextpage (prebrk);
+  cygheap_max = (char *) cygheap_max + sbs;
+  if (!sbs || (newbase >= cygheap_max) || (cygheap_max <= _cygheap_end))
+    /* nothing to do */;
+  else
+    {
+      if (prebrk <= _cygheap_end)
+	newbase = _cygheap_end;
+
+      SIZE_T adjsbs = allocsize ((char *) cygheap_max - newbase);
+      if (adjsbs && !VirtualAlloc (newbase, adjsbs, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))
+	{
+	  MEMORY_BASIC_INFORMATION m;
+	  if (!VirtualQuery (newbase, &m, sizeof m))
+	    system_printf ("couldn't get memory info, %E");
+	  somekinda_printf ("Couldn't reserve/commit %ld bytes of space for cygwin's heap, %E",
+			    adjsbs);
+	  somekinda_printf ("AllocationBase %p, BaseAddress %p, RegionSize %lx, State %x\n",
+			    m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
+	  __seterrno ();
+	  cygheap_max = (char *) cygheap_max - sbs;
+	  return NULL;
+	}
+    }
+
+  return prebrk;
 }
 
 /* Copyright (C) 1997, 2000 DJ Delorie */
