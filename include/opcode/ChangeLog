@@ -1,3 +1,8 @@
+2013-04-06  David S. Miller  <davem@davemloft.net>
+
+	* sparc.h (F_PREFERRED): Define.
+	(F_PREF_ALIAS): Define.
+
 2013-04-03  Nick Clifton  <nickc@redhat.com>
 
 	* v850.h (V850_INVERSE_PCREL): Define.
