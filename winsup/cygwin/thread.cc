@@ -1912,6 +1912,9 @@ DWORD WINAPI
 pthread::thread_init_wrapper (void *arg)
 {
   pthread *thread = (pthread *) arg;
+  /* This *must* be set prior to calling set_tls_self_pointer or there is
+     a race with the signal processing code which may miss the signal mask
+     settings. */
   _my_tls.sigmask = thread->parent_sigmask;
   thread->set_tls_self_pointer ();
 

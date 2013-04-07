@@ -1,3 +1,12 @@
+2013-04-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* cygheap.cc (init_cygheap::find_tls): Add a comment.
+	* dcrt0.cc (parent_sigmask): Delete.
+	(dll_crt0_1): Use spawn_info->moreinfo->sigmask rather than saved
+	parent signal mask.
+	* thread.cc (pthread::thread_init_wrapper): Add comment stressing the
+	importance of maintaining ordering of statements.
+
 2013-04-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (is_mmapped_region): Call LIST_UNLOCK on premature return.

@@ -628,6 +628,7 @@ init_cygheap::find_tls (int sig, bool& issig_wait)
   else
     {
       ix = -1;
+      /* Scan thread list looking for valid signal-delivery candidates */
       while (++ix < (int) nthreads)
 	if (!threadlist[ix]->tid)
 	  continue;

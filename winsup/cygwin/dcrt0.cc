@@ -398,7 +398,6 @@ check_sanity_and_sync (per_process *p)
 }
 
 child_info NO_COPY *child_proc_info;
-static NO_COPY sigset_t parent_sigmask;
 
 #define CYGWIN_GUARD (PAGE_READWRITE | PAGE_GUARD)
 
@@ -655,8 +654,6 @@ child_info_spawn::handle_spawn ()
 			FALSE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     h = NULL;
 
-  parent_sigmask = moreinfo->sigmask;
-
   /* Setup our write end of the process pipe.  Clear the one in the structure.
      The destructor should never be called for this but, it can't hurt to be
      safe. */
@@ -824,9 +821,9 @@ dll_crt0_1 (void *)
   extern void initial_setlocale ();
 
   _my_tls.incyg++;
-  if (!in_forkee)
-    _my_tls.sigmask = parent_sigmask;	/* always zero if started by non-cygwin
-					   process */
+  /* Inherit "parent" exec'ed process sigmask */
+  if (spawn_info && !in_forkee)
+    _my_tls.sigmask = spawn_info->moreinfo->sigmask;
 
   if (dynamically_loaded)
     sigproc_init ();
