@@ -1,7 +1,7 @@
 /* pipe.cc: pipe for Cygwin.
 
    Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012 Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013 Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -72,7 +72,7 @@ fhandler_pipe::open (int flags, mode_t mode)
   int pid, rwflags = (flags & O_ACCMODE);
   bool inh;
 
-  sscanf (get_name (), "/proc/%d/fd/pipe:[%d]", &pid, (int *) &pipe_hdl);
+  sscanf (get_name (), "/proc/%d/fd/pipe:[%lu]", &pid, (uintptr_t *) &pipe_hdl);
   if (pid == myself->pid)
     {
       cygheap_fdenum cfd (true);
@@ -167,7 +167,7 @@ fhandler_pipe::ftruncate (off_t length, bool allow_truncate)
 char *
 fhandler_pipe::get_proc_fd_name (char *buf)
 {
-  __small_sprintf (buf, "pipe:[%d]", get_handle ());
+  __small_sprintf (buf, "pipe:[%lu]", get_handle ());
   return buf;
 }
 

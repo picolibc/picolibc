@@ -1,3 +1,10 @@
+2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pipe.cc (fhandler_pipe::open): Fix format specifier and type when
+	reading handle value.
+	(fhandler_pipe::get_proc_fd_name): Use same format specifier as in
+	fhandler_pipe::open.
+
 2013-04-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc (_csbrk): Move down in file, right in front of _cmalloc.

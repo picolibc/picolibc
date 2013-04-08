@@ -358,7 +358,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       goto out;
     }
 
-
   wascygexec = real_path.iscygexec ();
   res = newargv.fixup (prog_arg, real_path, ext, p_type_exec);
 
