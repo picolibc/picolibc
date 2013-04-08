@@ -1,3 +1,9 @@
+2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (get_inet_addr): Handle abstract AF_LOCAL socket.
+	(fhandler_socket::recv_internal): Create abstract socket name for
+	AF_LOCAL datagram sockets.  Explain why we do that.
+
 2013-04-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* cygheap.cc (init_cygheap::find_tls): Add a comment.
