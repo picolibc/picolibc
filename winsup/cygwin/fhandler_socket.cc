@@ -74,6 +74,21 @@ get_inet_addr (const struct sockaddr *in, int inlen,
   switch (in->sa_family)
     {
     case AF_LOCAL:
+      /* Check for abstract socket. These are generated for AF_LOCAL datagram
+	 sockets in recv_internal, to allow a datagram server to use sendto
+	 after recvfrom. */
+      if (inlen >= (int) sizeof (in->sa_family) + 7
+	  && in->sa_data[0] == '\0' && in->sa_data[1] == 'd'
+	  && in->sa_data[6] == '\0')
+	{
+	  struct sockaddr_in addr;
+	  addr.sin_family = AF_INET;
+	  sscanf (in->sa_data + 2, "%04hx", &addr.sin_port);
+	  addr.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+	  *outlen = sizeof addr;
+	  memcpy (out, &addr, *outlen);
+	  return 0;
+	}
       break;
     case AF_INET:
     case AF_INET6:
@@ -1473,14 +1488,28 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
   if (get_addr_family () == AF_LOCAL && wsamsg->name != NULL
       && orig_namelen >= (int) sizeof (sa_family_t))
     {
-      /* WSARecvFrom copied the sockaddr_in block to wsamsg->name.
-	 We have to overwrite it with a sockaddr_un block. */
+      /* WSARecvFrom copied the sockaddr_in block to wsamsg->name.  We have to
+	 overwrite it with a sockaddr_un block.  For datagram sockets we
+	 generate a sockaddr_un with a filename analogue to abstract socket
+	 names under Linux.  See `man 7 unix' under Linux for a description. */
       sockaddr_un *un = (sockaddr_un *) wsamsg->name;
       un->sun_family = AF_LOCAL;
       int len = orig_namelen - offsetof (struct sockaddr_un, sun_path);
       if (len > 0)
-      	{
-	  if (!get_peer_sun_path ())
+	{
+	  if (get_socket_type () == SOCK_DGRAM)
+	    {
+	      if (len >= 7)
+		{
+		  __small_sprintf (un->sun_path + 1, "d%04x",
+			       ((struct sockaddr_in *) wsamsg->name)->sin_port);
+		  wsamsg->namelen = offsetof (struct sockaddr_un, sun_path) + 7;
+		}
+	      else
+		wsamsg->namelen = offsetof (struct sockaddr_un, sun_path) + 1;
+	      un->sun_path[0] = '\0';
+	    }
+	  else if (!get_peer_sun_path ())
 	    wsamsg->namelen = sizeof (sa_family_t);
 	  else
 	    {

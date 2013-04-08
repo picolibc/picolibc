@@ -1,3 +1,9 @@
+2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (get_inet_addr): Handle abstract AF_LOCAL socket.
+	(fhandler_socket::recv_internal): Create abstract socket name for
+	AF_LOCAL datagram sockets.  Explain why we do that.
+
 2013-04-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (is_mmapped_region): Call LIST_UNLOCK on premature return.
