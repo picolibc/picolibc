@@ -1,4 +1,20 @@
 2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::send_internal): Change type of
+	local variable res to ssize_t.
+	* net.cc (cygwin_sendto): Fix local variable res, containing return
+	value, to be ssize_t as well.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	(cygwin_recvmsg): Ditto.
+	(cygwin_sendmsg): Ditto.
+	* syscalls.cc (write): Ditto.
+	(writev): Ditto.
+	* pipe.cc (fhandler_pipe::open): Fix type when reading handle value to
+	accommodate 32 bit compiler.
+
+2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
 	
 	* fhandler_socket.cc (fhandler_socket::get_proc_fd_name): Use %lu as
 	format specifier to match HANDLE size.

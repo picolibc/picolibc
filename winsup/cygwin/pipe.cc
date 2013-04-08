@@ -72,7 +72,8 @@ fhandler_pipe::open (int flags, mode_t mode)
   int pid, rwflags = (flags & O_ACCMODE);
   bool inh;
 
-  sscanf (get_name (), "/proc/%d/fd/pipe:[%lu]", &pid, (uintptr_t *) &pipe_hdl);
+  sscanf (get_name (), "/proc/%d/fd/pipe:[%lu]",
+		       &pid, (unsigned long *) &pipe_hdl);
   if (pid == myself->pid)
     {
       cygheap_fdenum cfd (true);

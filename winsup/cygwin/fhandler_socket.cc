@@ -1617,7 +1617,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
 inline ssize_t
 fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 {
-  int res = 0;
+  ssize_t res = 0;
   DWORD ret = 0, err = 0, sum = 0, off = 0;
   WSABUF buf;
   bool use_sendmsg = false;

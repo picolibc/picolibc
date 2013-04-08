@@ -1219,7 +1219,7 @@ write (int fd, const void *ptr, size_t len)
   if (efault.faulted (EFAULT))
     return -1;
 
-  int res = -1;
+  ssize_t res = -1;
 
   cygheap_fdget cfd (fd);
   if (cfd < 0)
@@ -1257,7 +1257,7 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
   if (efault.faulted (EFAULT))
     return -1;
 
-  int res = -1;
+  ssize_t res = -1;
   const ssize_t tot = check_iovec_for_write (iov, iovcnt);
 
   cygheap_fdget cfd (fd);

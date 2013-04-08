@@ -708,7 +708,7 @@ extern "C" ssize_t
 cygwin_sendto (int fd, const void *buf, size_t len, int flags,
 	       const struct sockaddr *to, socklen_t tolen)
 {
-  int res;
+  ssize_t res;
 
   pthread_testcancel ();
 
@@ -730,7 +730,7 @@ extern "C" ssize_t
 cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
 		 struct sockaddr *from, socklen_t *fromlen)
 {
-  int res;
+  ssize_t res;
 
   pthread_testcancel ();
 
@@ -1496,7 +1496,7 @@ cygwin_getpeername (int fd, struct sockaddr *name, socklen_t *len)
 extern "C" ssize_t
 cygwin_recv (int fd, void *buf, size_t len, int flags)
 {
-  int res;
+  ssize_t res;
 
   pthread_testcancel ();
 
@@ -1520,7 +1520,7 @@ cygwin_recv (int fd, void *buf, size_t len, int flags)
 extern "C" ssize_t
 cygwin_send (int fd, const void *buf, size_t len, int flags)
 {
-  int res;
+  ssize_t res;
 
   pthread_testcancel ();
 
@@ -2614,7 +2614,7 @@ endhostent (void)
 extern "C" ssize_t
 cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 {
-  int res;
+  ssize_t res;
 
   pthread_testcancel ();
 
@@ -2642,7 +2642,7 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 extern "C" ssize_t
 cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 {
-  int res;
+  ssize_t res;
 
   pthread_testcancel ();
 
