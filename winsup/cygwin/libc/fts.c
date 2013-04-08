@@ -508,7 +508,7 @@ name:		t = sp->fts_path + NAPPEND(p->fts_parent);
 /* ARGSUSED */
 int
 fts_set(sp, p, instr)
-	FTS *sp;
+	FTS *sp __attribute__ ((unused));
 	FTSENT *p;
 	int instr;
 {
@@ -759,7 +759,7 @@ fts_build(sp, type)
 
 		if ((p = fts_alloc(sp, dp->d_name, (int)dnamlen)) == NULL)
 			goto mem1;
-		if (dnamlen >= maxlen) {	/* include space for NUL */
+		if ((int) dnamlen >= maxlen) {	/* include space for NUL */
 			oldaddr = sp->fts_path;
 			if (fts_palloc(sp, dnamlen + len + 1)) {
 				/*

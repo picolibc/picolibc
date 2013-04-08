@@ -1,5 +1,9 @@
 2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Throughout fix -Wextra warnings.  Ignore regex files and gmon.c.
+
+2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::send_internal): Change type of
 	local variable res to ssize_t.
 	* net.cc (cygwin_sendto): Fix local variable res, containing return
