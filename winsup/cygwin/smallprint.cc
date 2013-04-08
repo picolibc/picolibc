@@ -1,7 +1,7 @@
 /* smallprint.cc: small print routines for WIN32
 
    Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006,
-	     2007, 2008, 2009, 2012
+	     2007, 2008, 2009, 2012, 2013
    Red Hat, Inc.
 
 This file is part of Cygwin.
@@ -108,6 +108,7 @@ __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned
    p       address
    P       process name
    R       return value, 4 byte.
+  lR       return value, 4 byte on 32 bit, 8 byte on 64 bit.
    s       char *
   ls       char * w/ non-ASCII tweaking
    S       PUNICODE_STRING
@@ -137,7 +138,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 
   DWORD err = GetLastError ();
 
-  int32_t Rval = 0;
+  intptr_t Rval = 0;
   while (*fmt)
     {
       int i, n = 0x7fff;
@@ -206,7 +207,12 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  break;
 		case 'R':
 		  {
-		    Rval = va_arg (ap, int32_t);
+#ifdef __x86_64__
+		    if (l_opt)
+		      Rval = va_arg (ap, int64_t);
+		    else
+#endif
+		      Rval = va_arg (ap, int32_t);
 		    dst = __rn (dst, 10, addsign, Rval, len, pad, LMASK);
 		  }
 		  break;
@@ -474,7 +480,7 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 
   DWORD err = GetLastError ();
 
-  int32_t Rval = 0;
+  intptr_t Rval = 0;
   while (*fmt)
     {
       unsigned int n = 0x7fff;
@@ -525,7 +531,12 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 		  break;
 		case 'R':
 		  {
-		    Rval = va_arg (ap, int32_t);
+#ifdef __x86_64__
+		    if (l_opt)
+		      Rval = va_arg (ap, int64_t);
+		    else
+#endif
+		      Rval = va_arg (ap, int32_t);
 		    dst = __wrn (dst, 10, addsign, Rval, len, pad, LMASK);
 		  }
 		  break;

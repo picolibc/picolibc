@@ -1,4 +1,26 @@
 2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
+	
+	* fhandler_socket.cc (fhandler_socket::get_proc_fd_name): Use %lu as
+	format specifier to match HANDLE size.
+	* net.cc (cygwin_sendto): Fix return type to be ssize_t.  Change
+	syscall_printf return type format specifier to %lR.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	(cygwin_recvmsg): Ditto.
+	(cygwin_sendmsg): Ditto.
+	* smallprint.cc (__small_vsprintf): Handle `l' for %R, too.
+	(__small_vswprintf): Ditto.
+	* syscalls.cc (read): Change syscall_printf return type format specifier
+	to %lR.
+	(readv): Ditto.
+	(pread): Ditto.
+	(write): Ditto.
+	(writev): Ditto.
+	(pwrite): Ditto.
+	(lseek64): Enhance comment.
+
+2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pipe.cc (fhandler_pipe::open): Fix format specifier and type when
 	reading handle value.

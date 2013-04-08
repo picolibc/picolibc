@@ -219,7 +219,7 @@ fhandler_socket::~fhandler_socket ()
 char *
 fhandler_socket::get_proc_fd_name (char *buf)
 {
-  __small_sprintf (buf, "socket:[%d]", get_socket ());
+  __small_sprintf (buf, "socket:[%lu]", get_socket ());
   return buf;
 }
 

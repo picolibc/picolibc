@@ -1147,7 +1147,7 @@ read (int fd, void *ptr, size_t len)
   cfd->read (ptr, res = len);
 
 done:
-  syscall_printf ("%R = read(%d, %p, %d)", res, fd, ptr, len);
+  syscall_printf ("%lR = read(%d, %p, %d)", res, fd, ptr, len);
   MALLOC_CHECK;
   return (ssize_t) res;
 }
@@ -1189,7 +1189,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
   res = cfd->readv (iov, iovcnt, tot);
 
 done:
-  syscall_printf ("%R = readv(%d, %p, %d)", res, fd, iov, iovcnt);
+  syscall_printf ("%lR = readv(%d, %p, %d)", res, fd, iov, iovcnt);
   MALLOC_CHECK;
   return res;
 }
@@ -1206,7 +1206,7 @@ pread (int fd, void *ptr, size_t len, off_t off)
   else
     res = cfd->pread (ptr, len, off);
 
-  syscall_printf ("%R = pread(%d, %p, %d, %d)", res, fd, ptr, len, off);
+  syscall_printf ("%lR = pread(%d, %p, %d, %d)", res, fd, ptr, len, off);
   return res;
 }
 
@@ -1240,7 +1240,7 @@ write (int fd, const void *ptr, size_t len)
   res = cfd->write (ptr, len);
 
 done:
-  syscall_printf ("%R = write(%d, %p, %d)", res, fd, ptr, len);
+  syscall_printf ("%lR = write(%d, %p, %d)", res, fd, ptr, len);
 
   MALLOC_CHECK;
   return res;
@@ -1286,9 +1286,9 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
 
 done:
   if (fd == 1 || fd == 2)
-    paranoid_printf ("%R = writev(%d, %p, %d)", res, fd, iov, iovcnt);
+    paranoid_printf ("%lR = writev(%d, %p, %d)", res, fd, iov, iovcnt);
   else
-    syscall_printf ("%R = writev(%d, %p, %d)", res, fd, iov, iovcnt);
+    syscall_printf ("%lR = writev(%d, %p, %d)", res, fd, iov, iovcnt);
 
   MALLOC_CHECK;
   return res;
@@ -1306,7 +1306,7 @@ pwrite (int fd, void *ptr, size_t len, off_t off)
   else
     res = cfd->pwrite (ptr, len, off);
 
-  syscall_printf ("%R = pwrite(%d, %p, %d, %d)", res, fd, ptr, len, off);
+  syscall_printf ("%lR = pwrite(%d, %p, %d, %d)", res, fd, ptr, len, off);
   return res;
 }
 
@@ -1413,7 +1413,7 @@ lseek64 (int fd, off_t pos, int dir)
       else
 	res = -1;
     }
-  /* Can't use %R here since res is 8 bytes */
+  /* Can't use %R/%lR here since res is always 8 bytes */
   syscall_printf (res == -1 ? "%D = lseek(%d, %D, %d), errno %d"
 			    : "%D = lseek(%d, %D, %d)",
 		  res, fd, pos, dir, get_errno ());

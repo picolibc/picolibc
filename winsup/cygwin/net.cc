@@ -704,7 +704,7 @@ done:
 }
 
 /* exported as sendto: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_sendto (int fd, const void *buf, size_t len, int flags,
 	       const struct sockaddr *to, socklen_t tolen)
 {
@@ -720,13 +720,13 @@ cygwin_sendto (int fd, const void *buf, size_t len, int flags,
   else
     res = fh->sendto (buf, len, flags, to, tolen);
 
-  syscall_printf ("%R = sendto(%d, %p, %ld, %y, %p, %d)",
+  syscall_printf ("%lR = sendto(%d, %p, %ld, %y, %p, %d)",
 		  res, fd, buf, len, flags, to, tolen);
   return res;
 }
 
 /* exported as recvfrom: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
 		 struct sockaddr *from, socklen_t *fromlen)
 {
@@ -746,7 +746,7 @@ cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
        to deliver valid error conditions and peer address. */
     res = fh->recvfrom (buf, len, flags, from, fromlen);
 
-  syscall_printf ("%R = recvfrom(%d, %p, %ld, %y, %p, %p)",
+  syscall_printf ("%lR = recvfrom(%d, %p, %ld, %y, %p, %p)",
 		  res, fd, buf, len, flags, from, fromlen);
   return res;
 }
@@ -1493,7 +1493,7 @@ cygwin_getpeername (int fd, struct sockaddr *name, socklen_t *len)
 }
 
 /* exported as recv: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_recv (int fd, void *buf, size_t len, int flags)
 {
   int res;
@@ -1512,12 +1512,12 @@ cygwin_recv (int fd, void *buf, size_t len, int flags)
        to deliver valid error conditions. */
     res = fh->recvfrom (buf, len, flags, NULL, NULL);
 
-  syscall_printf ("%R = recv(%d, %p, %ld, %y)", res, fd, buf, len, flags);
+  syscall_printf ("%lR = recv(%d, %p, %ld, %y)", res, fd, buf, len, flags);
   return res;
 }
 
 /* exported as send: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_send (int fd, const void *buf, size_t len, int flags)
 {
   int res;
@@ -1532,7 +1532,7 @@ cygwin_send (int fd, const void *buf, size_t len, int flags)
   else
     res = fh->sendto (buf, len, flags, NULL, 0);
 
-  syscall_printf ("%R = send(%d, %p, %ld, %y)", res, fd, buf, len, flags);
+  syscall_printf ("%lR = send(%d, %p, %ld, %y)", res, fd, buf, len, flags);
   return res;
 }
 
@@ -2611,7 +2611,7 @@ endhostent (void)
 }
 
 /* exported as recvmsg: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 {
   int res;
@@ -2634,12 +2634,12 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 	res = fh->recvmsg (msg, flags);
     }
 
-  syscall_printf ("%R = recvmsg(%d, %p, %y)", res, fd, msg, flags);
+  syscall_printf ("%lR = recvmsg(%d, %p, %y)", res, fd, msg, flags);
   return res;
 }
 
 /* exported as sendmsg: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 {
   int res;
@@ -2658,7 +2658,7 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 	res = fh->sendmsg (msg, flags);
     }
 
-  syscall_printf ("%R = sendmsg(%d, %p, %y)", res, fd, msg, flags);
+  syscall_printf ("%lR = sendmsg(%d, %p, %y)", res, fd, msg, flags);
   return res;
 }
 
