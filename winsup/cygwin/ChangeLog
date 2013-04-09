@@ -2,7 +2,7 @@
 
 	* cygtls.h (_cygtls::reset_signal_arrived): Actually reset the
 	signal_arrived event.
-	(_cygtls::handle_SIGCONT): Declare ew function.
+	(_cygtls::handle_SIGCONT): Declare new function.
 	* cygwait.cc (is_cw_sig_handle): Delete.
 	(is_cw_sig_cont): New convenience define.
 	(cygwait): Clear signal if is_cw_sig_cont and we got a SIGCONT.
