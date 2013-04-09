@@ -73,20 +73,15 @@ class pending_signals
 {
   sigpacket sigs[NSIG + 1];
   sigpacket start;
-  sigpacket *end;
-  sigpacket *prev;
-  sigpacket *curr;
   bool retry;
+
 public:
-  void reset () {curr = &start; prev = &start;}
   void add (sigpacket&);
-  void del ();
   bool pending () {retry = true; return !!start.next;}
-  sigpacket *next ();
-  sigpacket *save () const {return curr;}
-  void restore (sigpacket *saved) {curr = saved;}
+  void clear (int sig) {sigs[sig].si.si_signo = 0;}
   friend void __reg1 sig_dispatch_pending (bool);;
   friend void WINAPI wait_sig (VOID *arg);
+  friend void sigproc_init ();
 };
 
 Static pending_signals sigq;
@@ -338,18 +333,22 @@ out1:
 void
 _cygtls::remove_wq (DWORD wait)
 {
-  if (exit_state < ES_FINAL && waitq_head.next && sync_proc_subproc
-      && sync_proc_subproc.acquire (wait))
+  if (wq.thread_ev)
     {
-      for (waitq *w = &waitq_head; w->next != NULL; w = w->next)
-	if (w->next == &wq)
-	  {
-	    ForceCloseHandle1 (wq.thread_ev, wq_ev);
-	    w->next = wq.next;
-	    break;
-	  }
-      sync_proc_subproc.release ();
+      if (exit_state < ES_FINAL && waitq_head.next && sync_proc_subproc
+	  && sync_proc_subproc.acquire (wait))
+	{
+	  for (waitq *w = &waitq_head; w->next != NULL; w = w->next)
+	    if (w->next == &wq)
+	      {
+		w->next = wq.next;
+		break;
+	      }
+	  sync_proc_subproc.release ();
+	}
+      ForceCloseHandle1 (wq.thread_ev, wq_ev);
     }
+
 }
 
 /* Terminate the wait_subproc thread.
@@ -392,23 +391,9 @@ proc_terminate ()
 
 /* Clear pending signal */
 void __reg1
-sig_clear (int target_sig)
+sig_clear (int sig)
 {
-  if (&_my_tls != _sig_tls)
-    sig_send (myself, -target_sig);
-  else
-    {
-      sigpacket *q;
-      sigpacket *save = sigq.save ();
-      sigq.reset ();
-      while ((q = sigq.next ()))
-	if (q->si.si_signo == target_sig)
-	  {
-	    q->si.si_signo = __SIGDELETE;
-	    break;
-	  }
-      sigq.restore (save);
-    }
+  sigq.clear (sig);
 }
 
 extern "C" int
@@ -425,21 +410,10 @@ sigpending (sigset_t *mask)
 void __reg1
 sig_dispatch_pending (bool fast)
 {
-  if (&_my_tls == _sig_tls)
-    {
-#ifdef DEBUGGING
-      sigproc_printf ("exit_state %d, cur thread id %p, _sig_tls %p, sigq.start.next %p",
-		      exit_state, GetCurrentThreadId (), _sig_tls, sigq.start.next);
-#endif
-      return;
-    }
-
   /* Non-atomically test for any signals pending and wake up wait_sig if any are
      found.  It's ok if there's a race here since the next call to this function
-     should catch it.
-     FIXME: Eventually, wait_sig should wake up on its own to deal with pending
-     signals. */
-  if (sigq.pending ())
+     should catch it.  */
+  if (sigq.pending () && &_my_tls != _sig_tls)
     sig_send (myself, fast ? __SIGFLUSHFAST : __SIGFLUSH);
 }
 
@@ -728,7 +702,6 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 
   if (wait_for_completion && si.si_signo != __SIGFLUSHFAST)
     _my_tls.call_signal_handler ();
-  goto out;
 
 out:
   if (communing && rc)
@@ -1232,46 +1205,19 @@ talktome (siginfo_t *si)
     new cygthread (commune_process, size, si, "commune");
 }
 
+/* Add a packet to the beginning of the queue.
+   Should only be called from signal thread.  */
 void
 pending_signals::add (sigpacket& pack)
 {
   sigpacket *se;
+
   se = sigs + pack.si.si_signo;
   if (se->si.si_signo)
     return;
   *se = pack;
   se->next = NULL;
-  if (end)
-    end->next = se;
-  end = se;
-  if (!start.next)
-    start.next = se;
-}
-
-void
-pending_signals::del ()
-{
-  sigpacket *next = curr->next;
-  prev->next = next;
-  curr->si.si_signo = 0;
-#ifdef DEBUGGING
-  curr->next = NULL;
-#endif
-  if (end == curr)
-    end = prev;
-  curr = next;
-}
-
-sigpacket *
-pending_signals::next ()
-{
-  sigpacket *res;
-  prev = curr;
-  if (!curr || !(curr = curr->next))
-    res = NULL;
-  else
-    res = curr;
-  return res;
+  start.next = se;
 }
 
 /* Process signals by waiting for signal data to arrive in a pipe.
@@ -1311,7 +1257,7 @@ wait_sig (VOID *)
 	  pack.mask = &dummy_mask;
 	}
 
-      sigpacket *q;
+      sigpacket *q = &sigq.start;
       bool clearwait = false;
       switch (pack.si.si_signo)
 	{
@@ -1324,8 +1270,7 @@ wait_sig (VOID *)
 	case __SIGPENDING:
 	  *pack.mask = 0;
 	  unsigned bit;
-	  sigq.reset ();
-	  while ((q = sigq.next ()))
+	  while ((q = q->next))
 	    if (pack.sigtls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
 	      *pack.mask |= bit;
 	  break;
@@ -1340,15 +1285,23 @@ wait_sig (VOID *)
 	case __SIGNOHOLD:
 	case __SIGFLUSH:
 	case __SIGFLUSHFAST:
-	  sigq.reset ();
-	  while ((q = sigq.next ()))
-	    {
-	      int sig = q->si.si_signo;
-	      if (sig == __SIGDELETE || q->process () > 0)
-		sigq.del ();
-	      if (sig == SIGCHLD)
-		clearwait = true;
-	    }
+	  {
+	    sigpacket *qnext;
+	    /* Check the queue for signals.  There will always be at least one
+	       thing on the queue if this was a valid signal.  */
+	    while ((qnext = q->next))
+	      {
+		if (qnext->si.si_signo && qnext->process () <= 0)
+		  q = q->next;
+		else
+		  {
+		    q->next = qnext->next;
+		    qnext->si.si_signo = 0;
+		  }
+	      }
+	    if (pack.si.si_signo == SIGCHLD)
+	      clearwait = true;
+	  }
 	  break;
 	case __SIGSETPGRP:
 	  init_console_handler (true);

@@ -1,6 +1,6 @@
 /* cygwait.h
 
-   Copyright 2011, 2012 Red Hat, Inc.
+   Copyright 2011, 2012, 2013 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -17,9 +17,9 @@
 #define is_cw_cancel_self	(mask & cw_cancel_self)
 #define is_cw_sig		(mask & cw_sig)
 #define is_cw_sig_eintr		(mask & cw_sig_eintr)
-#define is_cw_sig_return	(mask & cw_sig_return)
+#define is_cw_sig_cont		(mask & cw_sig_cont)
 
-#define is_cw_sig_handle	(mask & (is_cw_sig | is_cw_sig_eintr))
+#define is_cw_sig_handle	(mask & (cw_sig | cw_sig_eintr | cw_sig_cont))
 
 LARGE_INTEGER cw_nowait_storage;
 
@@ -83,10 +83,12 @@ cygwait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 	{
 	  _my_tls.lock ();
 	  int sig = _my_tls.sig;
+	  if (is_cw_sig_cont && sig == SIGCONT)
+	    _my_tls.sig = 0;
 	  _my_tls.unlock ();
 	  if (!sig)
 	    continue;
-	  if (is_cw_sig_eintr)
+	  if (is_cw_sig_eintr || (is_cw_sig_cont && sig == SIGCONT))
 	    res = WAIT_SIGNALED;	/* caller will deal with signals */
 	  else if (_my_tls.call_signal_handler ())
 	    continue;

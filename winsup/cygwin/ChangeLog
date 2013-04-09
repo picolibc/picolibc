@@ -1,3 +1,38 @@
+2013-04-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* cygtls.h (_cygtls::reset_signal_arrived): Actually reset the
+	signal_arrived event.
+	(_cygtls::handle_SIGCONT): Declare ew function.
+	* cygwait.cc (is_cw_sig_handle): Delete.
+	(is_cw_sig_cont): New convenience define.
+	(cygwait): Clear signal if is_cw_sig_cont and we got a SIGCONT.
+	* cygwait.h (cw_wait_mask): Add cw_sig_cont.
+	* exceptions.cc (sig_handle_tty_stop): Tighten "incyg" region.  Use
+	cw_sig_cont param for cygwait.  Don't zero signal here outside of lock.
+	(sigpacket::setup_handler): Don't check for in_forkee since we will now
+	never get here in that state.
+	(_cygtls::handle_SIGCONT): Define new function.
+	(sigpacket::process): Call handle_SIGCONT early to deal with SIGCONT.
+	Nuke continue_now handling.  Allow SIGKILL to kill a suspended process.
+	Delete a couple of now-unneeded labels.
+	(_cygtls::call_signal_handler): Reorganize setting of incyg within
+	lock.
+	* sigproc.cc (pending_signals): Simplify.
+	(pending_signals::clear): New method.
+	(_cygtls::remove_wq): Reorganize to always close wq.thread_ev if it
+	exists to avoid handle leaks.
+	(sig_clear): Simplify by just calling sigq.clear().
+	(sig_dispatch_pending): Always call sigq.pending even in signal thread
+	to force another loop in wait_sig.
+	(sig_send): Remove a "goto out" just before out: label.
+	(pending_signals::add): Simplify.
+	(pending_signals::del): Delete.
+	(pending_signals::next): Delete.
+	(wait_sig): Define variable q to be the start of the signal queue.
+	Just iterate through sigq queue, deleting processed or zeroed signals.
+	Only set clearwait when the current signal is SIGCHLD.
+	* sigproc.h: Add a comment about an unused enum.
+
 2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (get_inet_addr): Handle abstract AF_LOCAL socket.

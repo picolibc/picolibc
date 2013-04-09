@@ -20,7 +20,7 @@ enum
   __SIGSTRACE	    = -(NSIG + 2),
   __SIGCOMMUNE	    = -(NSIG + 3),
   __SIGPENDING	    = -(NSIG + 4),
-  __SIGDELETE	    = -(NSIG + 5),
+  __SIGDELETE	    = -(NSIG + 5),	/* Not currently used */
   __SIGFLUSHFAST    = -(NSIG + 6),
   __SIGHOLD	    = -(NSIG + 7),
   __SIGNOHOLD	    = -(NSIG + 8),
