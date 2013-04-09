@@ -1,3 +1,7 @@
+2013-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (MINIMAL_WIN_NTFS_FLAGS): Fix comment.
+
 2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Throughout fix -Wextra warnings.  Ignore regex files and gmon.c.

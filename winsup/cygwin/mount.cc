@@ -306,9 +306,9 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 			     | FILE_CASE_PRESERVED_NAMES \
 			     | FILE_UNICODE_ON_DISK \
 			     | FILE_NAMED_STREAMS)
-/* These are the minimal flags supported by NTFS since XP.  Every filesystem
-   not supporting these flags is not a native NTFS.  We subsume them under
-   the filesystem type "cifs". */
+/* These are the minimal flags supported by NTFS since Windows 2000.  Every
+   filesystem not supporting these flags is not a native NTFS.  We subsume
+   them under the filesystem type "cifs". */
 #define MINIMAL_WIN_NTFS_FLAGS (FILE_CASE_SENSITIVE_SEARCH \
 				| FILE_CASE_PRESERVED_NAMES \
 				| FILE_UNICODE_ON_DISK \
