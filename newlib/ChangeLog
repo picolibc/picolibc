@@ -1,3 +1,14 @@
+2013-04-10  Bin Cheng  <bin.cheng@arm.com>
+	* acconfig.h (_FSEEK_OPTIMIZATION): Undef
+	* newlib.hin (_FSEEK_OPTIMIZATION): Undef
+	* configure.in (--disable-newlib-fseek-optimization): New option.
+	* configure: Regenerated.
+	* libc/stdio/fflush.c (__sflush_r): Use _FSEEK_OPTIMIZATION to
+	control fseek optimization.
+	* libc/stdio/fseeko.c (_fseeko_r): Ditto.
+	* libc/stdio/makebuf.c (__smakebuf_r): Ditto.
+	* libc/stdio64/fseeko64.c (_fseeko64_r): Ditto.
+
 2013-04-08  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
 
 	* libc/stdio/vfieeefp.h (ldieee): Fix typo.

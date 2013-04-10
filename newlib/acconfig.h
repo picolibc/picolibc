@@ -58,6 +58,9 @@
 /* Define if ivo supported in streamio.  */
 #undef _FVWRITE_IN_STREAMIO
 
+/* Define if fseek functions support seek optimization.  */
+#undef _FSEEK_OPTIMIZATION
+
 @BOTTOM@
 /*
  * Iconv encodings enabled ("to" direction)

@@ -790,6 +790,7 @@ enable_newlib_iconv_external_ccs
 enable_newlib_atexit_dynamic_alloc
 enable_newlib_reent_small
 enable_newlib_fvwrite_in_streamio
+enable_newlib_fseek_optimization
 enable_multilib
 enable_target_optspace
 enable_malloc_debugging
@@ -1454,6 +1455,7 @@ Optional Features:
   --disable-newlib-atexit-alloc    disable dynamic allocation of atexit entries
   --enable-newlib-reent-small   enable small reentrant struct support
   --disable-newlib-fvwrite-in-streamio    disable iov in streamio
+  --disable-newlib-fseek-optimization    disable fseek optimization
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -2364,6 +2366,19 @@ if test "${enable_newlib_fvwrite_in_streamio+set}" = set; then :
  fi
 else
   newlib_fvwrite_in_streamio=yes
+fi
+
+# Check whether --enable-newlib-fseek-optimization was given.
+if test "${enable_newlib_fseek_optimization+set}" = set; then :
+  enableval=$enable_newlib_fseek_optimization; if test "${newlib_fseek_optimization+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_fseek_optimization=yes ;;
+    no)  newlib_fseek_optimization=no  ;;
+    *)   as_fn_error $? "bad value ${enableval} for newlib-fseek-optimization option" "$LINENO" 5 ;;
+  esac
+ fi
+else
+  newlib_fseek_optimization=yes
 fi
 
 
@@ -11666,7 +11681,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11654 "configure"
+#line 11684 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11772,7 +11787,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11760 "configure"
+#line 11790 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12250,6 +12265,13 @@ fi
 if test "${newlib_fvwrite_in_streamio}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
 #define _FVWRITE_IN_STREAMIO 1
+_ACEOF
+
+fi
+
+if test "${newlib_fseek_optimization}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _FSEEK_OPTIMIZATION 1
 _ACEOF
 
 fi

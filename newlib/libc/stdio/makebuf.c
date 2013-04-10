@@ -65,8 +65,10 @@ _DEFUN(__smakebuf_r, (ptr, fp),
         size = _DEFAULT_ASPRINTF_BUFSIZE;
       else
         size = BUFSIZ;
+#ifdef _FSEEK_OPTIMIZATION
       /* do not try to optimise fseek() */
       fp->_flags |= __SNPT;
+#endif
     }
   else
     {
@@ -76,6 +78,7 @@ _DEFUN(__smakebuf_r, (ptr, fp),
 #else
       size = BUFSIZ;
 #endif
+#ifdef _FSEEK_OPTIMIZATION
       /*
        * Optimize fseek() only if it is a regular file.
        * (The test for __sseek is mainly paranoia.)
@@ -91,6 +94,7 @@ _DEFUN(__smakebuf_r, (ptr, fp),
 	}
       else
 	fp->_flags |= __SNPT;
+#endif
     }
   if ((p = _malloc_r (ptr, size)) == NULL)
     {

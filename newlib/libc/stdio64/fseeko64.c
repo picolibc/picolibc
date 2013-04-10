@@ -209,6 +209,8 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
 
   if (fp->_bf._base == NULL)
     __smakebuf_r (ptr, fp);
+
+#if _FSEEK_OPTIMIZATION
   if (fp->_flags & (__SWR | __SRW | __SNBF | __SNPT))
     goto dumb;
   if ((fp->_flags & __SOPT) == 0)
@@ -330,6 +332,7 @@ _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
    * We get here if we cannot optimise the seek ... just
    * do it.  Allow the seek function to change fp->_bf._base.
    */
+#endif
 
 dumb:
   if (_fflush_r (ptr, fp)

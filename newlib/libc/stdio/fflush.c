@@ -80,10 +80,12 @@ _DEFUN(__sflush_r, (ptr, fp),
   t = fp->_flags;
   if ((t & __SWR) == 0)
     {
+#ifdef _FSEEK_OPTIMIZATION
       /* For a read stream, an fflush causes the next seek to be
          unoptimized (i.e. forces a system-level seek).  This conforms
          to the POSIX and SUSv3 standards.  */
       fp->_flags |= __SNPT;
+#endif
 
       /* For a seekable stream with buffered read characters, we will attempt
          a seek to the current position now.  A subsequent read will then get
@@ -152,7 +154,9 @@ _DEFUN(__sflush_r, (ptr, fp),
 	    {
 	      /* Seek successful or ignorable error condition.
 		 We can clear read buffer now.  */
+#ifdef _FSEEK_OPTIMIZATION
 	      fp->_flags &= ~__SNPT;
+#endif
 	      fp->_r = 0;
 	      fp->_p = fp->_bf._base;
 	      if ((fp->_flags & __SOFF) && (curoff != -1 || ptr->_errno == 0))
