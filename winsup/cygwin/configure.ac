@@ -55,8 +55,6 @@ no)	 ;;
 esac
 ])
 
-MALLOC_OFILES=malloc.o
-
 dnl The only time we might want to transform the install names
 dnl is for unix x cygwin.  Otherwise we don't.  For now we don't
 dnl transform names.
@@ -91,7 +89,6 @@ case "$target_cpu" in
 esac
 
 AC_CONFIGURE_ARGS
-AC_SUBST(MALLOC_OFILES)
 AC_SUBST(LIBSERVER)
 AC_SUBST(DLL_NAME)
 AC_SUBST(DLL_ENTRY)

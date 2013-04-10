@@ -1326,11 +1326,9 @@ winpids::enum_processes (bool winpid)
 void
 winpids::set (bool winpid)
 {
-  __malloc_lock ();
   npids = enum_processes (winpid);
   if (pidlist)
     pidlist[npids] = 0;
-  __malloc_unlock ();
 }
 
 DWORD

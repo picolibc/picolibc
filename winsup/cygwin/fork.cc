@@ -342,7 +342,6 @@ frok::parent (volatile char * volatile stack_here)
 
   syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %y, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
-  bool locked = __malloc_lock ();
   time_t start_time = time (NULL);
 
   /* Remove impersonation */
@@ -473,8 +472,6 @@ frok::parent (volatile char * volatile stack_here)
 		   impure, impure_beg, impure_end,
 		   NULL);
 
-  __malloc_unlock ();
-  locked = false;
   MALLOC_CHECK;
   if (!rc)
     {
@@ -542,8 +539,6 @@ frok::parent (volatile char * volatile stack_here)
 cleanup:
   if (fix_impersonation)
     cygheap->user.reimpersonate ();
-  if (locked)
-    __malloc_unlock ();
 
   /* Remember to de-allocate the fd table. */
   if (hchild && !child.hProcess)

@@ -1,3 +1,13 @@
+2013-04-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Reinstantiate ptmalloc3.
+	* configure.ac (MALLOC_OFILES): Drop here.
+	* configure: Regenerate.
+	* Makefile.in (MALLOC_OFILES): Set to fixed value here.
+	* cygmalloc.h (HAVE_MORECORE): Define.
+	* malloc.cc (init_user_mstate): Don't disable MORECORE if building
+	with ONLY_MSPACES.
+
 2013-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (MINIMAL_WIN_NTFS_FLAGS): Fix comment.

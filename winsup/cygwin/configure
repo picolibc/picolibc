@@ -572,7 +572,6 @@ DEF_DLL_ENTRY
 DLL_ENTRY
 DLL_NAME
 LIBSERVER
-MALLOC_OFILES
 configure_args
 SET_MAKE
 WINDRES
@@ -4413,8 +4412,6 @@ esac
 fi
 
 
-MALLOC_OFILES=malloc.o
-
 
 
 case "$target_cpu" in
@@ -4444,7 +4441,6 @@ for f in $ac_configure_args; do
     esac
 done
 configure_args=$(/usr/bin/expr "$configure_args" : 'X \(.*\)')
-
 
 
 
