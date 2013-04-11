@@ -479,7 +479,7 @@ hires_ns::prime ()
 }
 
 LONGLONG
-hires_ns::nsecs ()
+hires_ns::nsecs (bool monotonic)
 {
   if (!inited)
     prime ();
@@ -497,7 +497,8 @@ hires_ns::nsecs ()
     }
 
   // FIXME: Use round() here?
-  now.QuadPart = (LONGLONG) (freq * (double) (now.QuadPart - primed_pc.QuadPart));
+  now.QuadPart = (LONGLONG) (freq * (double)
+		 (now.QuadPart - (monotonic ? 0LL : primed_pc.QuadPart)));
   return now.QuadPart;
 }
 
@@ -644,7 +645,7 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
 
       case CLOCK_MONOTONIC:
 	{
-	  LONGLONG now = ntod.nsecs ();
+	  LONGLONG now = ntod.nsecs (true);
 	  if (now == (LONGLONG) -1)
 	    return -1;
 
