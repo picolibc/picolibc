@@ -1,3 +1,9 @@
+2013-04-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* hires.h (hires_ns::nsecs): Declare with bool parameter.
+	* times.cc (hires_ns::nsecs): Take bool parameter.  If set to true,
+	don't use prime value (== return system wide absolute value).
+
 2013-04-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* cygtls.h (_cygtls::reset_signal_arrived): Actually reset the

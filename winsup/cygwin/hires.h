@@ -48,7 +48,7 @@ class hires_ns : public hires_base
   double freq;
   void prime ();
  public:
-  LONGLONG nsecs ();
+  LONGLONG nsecs (bool monotonic = false);
   LONGLONG usecs () {return nsecs () / 1000LL;}
   LONGLONG resolution();
 };
