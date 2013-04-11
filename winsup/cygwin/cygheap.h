@@ -401,7 +401,7 @@ struct init_cygheap: public mini_cygheap
   void __reg1 init_tls_list ();;
   void __reg2 add_tls (_cygtls *);
   void __reg3 remove_tls (_cygtls *, DWORD);
-  _cygtls __reg2 *find_tls (int);
+  _cygtls __reg3 *find_tls (int, bool&);
 };
 
 

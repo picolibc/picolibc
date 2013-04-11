@@ -397,7 +397,7 @@ check_sanity_and_sync (per_process *p)
   __cygwin_user_data.cxx_malloc = &default_cygwin_cxx_malloc;
 }
 
-child_info NO_COPY *child_proc_info = NULL;
+child_info NO_COPY *child_proc_info;
 
 #define CYGWIN_GUARD (PAGE_READWRITE | PAGE_GUARD)
 
@@ -835,6 +835,9 @@ dll_crt0_1 (void *)
   extern void initial_setlocale ();
 
   _my_tls.incyg++;
+  /* Inherit "parent" exec'ed process sigmask */
+  if (spawn_info && !in_forkee)
+    _my_tls.sigmask = spawn_info->moreinfo->sigmask;
 
   if (dynamically_loaded)
     sigproc_init ();
@@ -1023,6 +1026,7 @@ dll_crt0_1 (void *)
       while ((*nav++ = *oav++) != NULL)
 	continue;
       /* Handle any signals which may have arrived */
+      sig_dispatch_pending (false);
       _my_tls.call_signal_handler ();
       _my_tls.incyg--;	/* Not in Cygwin anymore */
 #ifdef __x86_64__

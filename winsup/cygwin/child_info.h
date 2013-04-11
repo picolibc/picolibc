@@ -122,6 +122,7 @@ public:
   int envc;
   char **envp;
   HANDLE myself_pinfo;
+  sigset_t sigmask;
   int nchildren;
   cchildren children[0];
   static cygheap_exec_info *alloc ();

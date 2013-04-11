@@ -253,7 +253,13 @@ public:
 	will_wait_for_signal = true;
       }
   }
-  void reset_signal_arrived () { will_wait_for_signal = false; }
+  void reset_signal_arrived ()
+  {
+    if (signal_arrived)
+      ResetEvent (signal_arrived);
+    will_wait_for_signal = false;
+  }
+  void handle_SIGCONT ();
 private:
   void __reg3 call2 (DWORD (*) (void *, void *), void *, void *);
   /*gentls_offsets*/

@@ -797,23 +797,24 @@ extern "C" {
 static void
 sig_handle_tty_stop (int sig, siginfo_t *, void *)
 {
-  _my_tls.incyg = 1;
   /* Silently ignore attempts to suspend if there is no accommodating
      cygwin parent to deal with this behavior. */
   if (!myself->cygstarted)
     myself->process_state &= ~PID_STOPPED;
   else
     {
+      _my_tls.incyg = 1;
       myself->stopsig = sig;
       myself->alert_parent (sig);
       sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
       /* FIXME! This does nothing to suspend anything other than the main
 	 thread. */
-      DWORD res = cygwait (NULL, cw_infinite, cw_sig_eintr);
+      /* Use special cygwait parameter to handle SIGCONT.  _main_tls.sig will
+	 be cleared under lock when SIGCONT is detected.  */
+      DWORD res = cygwait (NULL, cw_infinite, cw_sig_cont);
       switch (res)
 	{
 	case WAIT_SIGNALED:
-	  _my_tls.sig = 0;
 	  myself->stopsig = SIGCONT;
 	  myself->alert_parent (SIGCONT);
 	  break;
@@ -821,8 +822,8 @@ sig_handle_tty_stop (int sig, siginfo_t *, void *)
 	  api_fatal ("WaitSingleObject returned %d", res);
 	  break;
 	}
+      _my_tls.incyg = 0;
     }
-  _my_tls.incyg = 0;
 }
 } /* end extern "C" */
 
@@ -896,10 +897,6 @@ sigpacket::setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
 		      si.si_signo, tls->sig);
       goto out;
     }
-
-  while (in_forkee)
-    yield ();		/* Won't be able to send signals until we're finished
-			   processing fork().  */
 
   for (int n = 0; n < CALL_HANDLER_RETRY_OUTER; n++)
     {
@@ -1240,50 +1237,106 @@ signal_exit (int sig, siginfo_t *si)
 }
 } /* extern "C" */
 
+/* Attempt to carefully handle SIGCONT when we are stopped. */
+void
+_cygtls::handle_SIGCONT ()
+{
+  if (ISSTATE (myself, PID_STOPPED))
+    {
+      myself->stopsig = 0;
+      myself->process_state &= ~PID_STOPPED;
+      int state = 0;
+      /* Carefully tell sig_handle_tty_stop to wake up.  */
+      while (state < 2)
+       {
+	 lock ();
+	 if (sig)
+	   yield ();           /* state <= 1 */
+	 else if (state)
+	   state++;            /* state == 2 */
+	 else
+	   {
+	     sig = SIGCONT;
+	     SetEvent (signal_arrived);
+	     state++;          /* state == 1 */
+	   }
+	 unlock ();
+       }
+      /* Tell wait_sig to handle any queued signals now that we're alive
+	again. */
+      sig_dispatch_pending (false);
+    }
+  /* Clear pending stop signals */
+  sig_clear (SIGSTOP);
+  sig_clear (SIGTSTP);
+  sig_clear (SIGTTIN);
+  sig_clear (SIGTTOU);
+}
+
 int __reg1
 sigpacket::process ()
 {
-  bool continue_now;
-  struct sigaction dummy = global_sigs[SIGSTOP];
+  int rc = 1;
+  bool issig_wait = false;
+  struct sigaction& thissig = global_sigs[si.si_signo];
+  void *handler = have_execed ? NULL : (void *) thissig.sa_handler;
 
-  if (si.si_signo != SIGCONT)
-    continue_now = false;
-  else
+  /* Don't try to send signals if we're just starting up since signal masks
+     may not be available.  */
+  if (!cygwin_finished_initializing)
     {
-      continue_now = ISSTATE (myself, PID_STOPPED);
-      myself->stopsig = 0;
-      myself->process_state &= ~PID_STOPPED;
-      /* Clear pending stop signals */
-      sig_clear (SIGSTOP);
-      sig_clear (SIGTSTP);
-      sig_clear (SIGTTIN);
-      sig_clear (SIGTTOU);
+      rc = -1;
+      goto done;
     }
 
-  int rc = 1;
-
   sigproc_printf ("signal %d processing", si.si_signo);
-  struct sigaction& thissig = global_sigs[si.si_signo];
 
   myself->rusage_self.ru_nsignals++;
 
   _cygtls *tls;
-  if (sigtls)
+  if (si.si_signo == SIGCONT)
+    _main_tls->handle_SIGCONT ();
+
+  if (si.si_signo == SIGKILL)
+    tls = _main_tls;	/* SIGKILL is special.  It always goes through.  */
+  else if (ISSTATE (myself, PID_STOPPED))
     {
-      tls = sigtls;
-      sigproc_printf ("using sigtls %p", sigtls);
+      rc = -1;		/* Don't send signals when stopped */
+      goto done;
+    }
+  else if (!sigtls)
+    {
+      tls = cygheap->find_tls (si.si_signo, issig_wait);
+      sigproc_printf ("using tls %p", tls);
     }
   else
     {
-      tls = cygheap->find_tls (si.si_signo);
-      sigproc_printf ("using tls %p", tls);
+      tls = sigtls;
+      if (sigismember (&tls->sigwait_mask, si.si_signo))
+	issig_wait = true;
+      else if (!sigismember (&tls->sigmask, si.si_signo))
+	issig_wait = false;
+      else
+	tls = NULL;
+    }
+      
+  /* !tls means no threads available to catch a signal. */
+  if (!tls)
+    {
+      sigproc_printf ("signal %d blocked", si.si_signo);
+      rc = -1;
+      goto done;
     }
 
   /* Do stuff for gdb */
   if ((HANDLE) *tls)
     tls->signal_debugger (si);
 
-  void *handler = have_execed ? NULL : (void *) thissig.sa_handler;
+  if (issig_wait)
+    {
+      tls->sigwait_mask = 0;
+      goto dosig;
+    }
 
   if (handler == SIG_IGN)
     {
@@ -1297,18 +1350,6 @@ sigpacket::process ()
     {
       sig_clear (SIGCONT);
       goto stop;
-    }
-
-  if (sigismember (&tls->sigwait_mask, si.si_signo))
-    {
-      tls->sigwait_mask = 0;
-      goto dosig;
-    }
-  if (sigismember (&tls->sigmask, si.si_signo) || ISSTATE (myself, PID_STOPPED))
-    {
-      sigproc_printf ("signal %d blocked", si.si_signo);
-      rc = -1;
-      goto done;
     }
 
   /* Clear pending SIGCONT on stop signals */
@@ -1336,24 +1377,16 @@ sigpacket::process ()
   goto dosig;
 
 stop:
+  tls = _main_tls;
   handler = (void *) sig_handle_tty_stop;
-  thissig = dummy;
+  thissig = global_sigs[SIGSTOP];
   goto dosig;
 
 exit_sig:
   handler = (void *) signal_exit;
   thissig.sa_flags |= SA_SIGINFO;
-  if (si.si_signo == SIGKILL)
-    goto dispatch_sig;
 
 dosig:
-  if (ISSTATE (myself, PID_STOPPED) && !continue_now)
-    {
-      rc = -1;		/* No signals delivered if stopped */
-      goto done;
-    }
-
-dispatch_sig:
   if (have_execed)
     {
       sigproc_printf ("terminating captive process");
@@ -1362,14 +1395,8 @@ dispatch_sig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, signal handler %p", si.si_signo, handler);
   rc = setup_handler (handler, thissig, tls);
-  continue_now = false;
 
 done:
-  if (continue_now)
-    {
-      tls->sig = SIGCONT;
-      SetEvent (tls->signal_arrived);
-    }
   sigproc_printf ("returning %d", rc);
   return rc;
 
@@ -1403,11 +1430,11 @@ _cygtls::call_signal_handler ()
 
       sigset_t this_oldmask = set_process_mask_delta ();
       int this_errno = saved_errno;
-      sig = 0;		/* Flag that we can accept another signal */
       reset_signal_arrived ();
+      incyg = false;
+      sig = 0;		/* Flag that we can accept another signal */
       unlock ();	/* unlock signal stack */
 
-      incyg = false;
       /* no ucontext_t information provided yet, so third arg is NULL */
       thisfunc (thissig, &thissi, NULL);
       incyg = true;

@@ -627,37 +627,35 @@ init_cygheap::remove_tls (_cygtls *t, DWORD wait)
     }
 }
 
-_cygtls *
-init_cygheap::find_tls (int sig)
+_cygtls __reg3 *
+init_cygheap::find_tls (int sig, bool& issig_wait)
 {
   debug_printf ("sig %d\n", sig);
   tls_sentry here (INFINITE);
 
-  static uint32_t NO_COPY threadlist_ix;
+  static int NO_COPY ix;
 
-  _cygtls *t = _main_tls;
+  _cygtls *t = NULL;
+  issig_wait = false;
 
   myfault efault;
   if (efault.faulted ())
-    threadlist[threadlist_ix]->remove (INFINITE);
+    threadlist[ix]->remove (INFINITE);
   else
     {
-      threadlist_ix = -1;
-      while (++threadlist_ix < nthreads)
-	if (threadlist[threadlist_ix]->tid
-	    && sigismember (&(threadlist[threadlist_ix]->sigwait_mask), sig))
+      ix = -1;
+      /* Scan thread list looking for valid signal-delivery candidates */
+      while (++ix < (int) nthreads)
+	if (!threadlist[ix]->tid)
+	  continue;
+	else if (sigismember (&(threadlist[ix]->sigwait_mask), sig))
 	  {
-	    t = cygheap->threadlist[threadlist_ix];
+	    t = cygheap->threadlist[ix];
+	    issig_wait = true;
 	    goto out;
 	  }
-      threadlist_ix = -1;
-      while (++threadlist_ix < nthreads)
-	if (threadlist[threadlist_ix]->tid
-	    && !sigismember (&(threadlist[threadlist_ix]->sigmask), sig))
-	  {
-	    t = cygheap->threadlist[threadlist_ix];
-	    break;
-	  }
+	else if (!t && !sigismember (&(threadlist[ix]->sigmask), sig))
+	  t = cygheap->threadlist[ix];
     }
 out:
   return t;
