@@ -1,4 +1,10 @@
+2012-04-11  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* libc/include/stdlib.h (strtof, strtoll, strtoull, strtold): Also
+	prototype if C++11 or later.
+
 2013-04-10  Bin Cheng  <bin.cheng@arm.com>
+
 	* acconfig.h (_FSEEK_OPTIMIZATION): Undef
 	* newlib.hin (_FSEEK_OPTIMIZATION): Undef
 	* configure.in (--disable-newlib-fseek-optimization): New option.
