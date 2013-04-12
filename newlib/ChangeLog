@@ -1,3 +1,18 @@
+2013-04-12  Bin Cheng  <bin.cheng@arm.com>
+
+	* acconfig.h (_WCHAR_ORIENT): Undef
+	* newlib.hin (_WCHAR_ORIENT): Undef
+	* configure.in (--enable-newlib-wchar-orient): New option.
+	* configure: Regenerated.
+	* libc/configure.in (--enable-newlib-wchar-orient): New option.
+	* libc/configure: Regenerated.
+	* libc/stdio/Makefile.am (NEWLIB_WIDE_ORIENT): Use.
+	* libc/stdio/Makefile.in: Regenerated.
+	* libc/stdio/local.h (ORIENT): Use _WCHAR_ORIENT to control
+	the definition. Add alternative definition.
+	* libc/stdio/vfprintf.c (__sfputs_r, __sprint_r): Use _WCHAR_ORIENT
+	to control the wide char output.
+
 2012-04-11  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* libc/include/stdlib.h (strtof, strtoll, strtoull, strtold): Also

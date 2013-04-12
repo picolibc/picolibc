@@ -791,6 +791,7 @@ enable_newlib_atexit_dynamic_alloc
 enable_newlib_reent_small
 enable_newlib_fvwrite_in_streamio
 enable_newlib_fseek_optimization
+enable_newlib_wide_orient
 enable_multilib
 enable_target_optspace
 enable_malloc_debugging
@@ -1456,6 +1457,7 @@ Optional Features:
   --enable-newlib-reent-small   enable small reentrant struct support
   --disable-newlib-fvwrite-in-streamio    disable iov in streamio
   --disable-newlib-fseek-optimization    disable fseek optimization
+  --disable-newlib-wide-orient    Turn off wide orientation in streamio
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -2380,6 +2382,18 @@ if test "${enable_newlib_fseek_optimization+set}" = set; then :
 else
   newlib_fseek_optimization=yes
 fi
+
+# Check whether --enable-newlib_wide_orient was given.
+if test "${enable_newlib_wide_orient+set}" = set; then :
+  enableval=$enable_newlib_wide_orient; case "${enableval}" in
+   yes) newlib_wide_orient=yes ;;
+   no)  newlib_wide_orient=no ;;
+   *) as_fn_error $? "bad value ${enableval} for newlib-wide-orient" "$LINENO" 5 ;;
+ esac
+else
+  newlib_wide_orient=yes
+fi
+
 
 
 # Make sure we can run config.sub.
@@ -12272,6 +12286,13 @@ fi
 if test "${newlib_fseek_optimization}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
 #define _FSEEK_OPTIMIZATION 1
+_ACEOF
+
+fi
+
+if test "${newlib_wide_orient}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _WIDE_ORIENT 1
 _ACEOF
 
 fi

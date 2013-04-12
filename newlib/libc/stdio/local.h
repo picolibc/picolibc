@@ -218,6 +218,7 @@ extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite64,(struct _reent *, void *,
 #define	FREELB(ptr, fp) { _free_r(ptr,(char *)(fp)->_lb._base); \
       (fp)->_lb._base = NULL; }
 
+#ifdef _WIDE_ORIENT
 /*
  * Set the orientation for a stream. If o > 0, the stream has wide-
  * orientation. If o < 0, the stream has byte-orientation.
@@ -235,6 +236,9 @@ extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite64,(struct _reent *, void *,
 	}							\
     }								\
   while (0)
+#else
+#define ORIENT(fp,ori)
+#endif
 
 /* WARNING: _dcvt is defined in the stdlib directory, not here!  */
 

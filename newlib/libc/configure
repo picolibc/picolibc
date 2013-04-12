@@ -749,6 +749,8 @@ build
 newlib_basedir
 MAY_SUPPLY_SYSCALLS_FALSE
 MAY_SUPPLY_SYSCALLS_TRUE
+NEWLIB_WIDE_ORIENT_FALSE
+NEWLIB_WIDE_ORIENT_TRUE
 target_alias
 host_alias
 build_alias
@@ -791,6 +793,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_newlib_io_pos_args
+enable_newlib_wide_orient
 enable_multilib
 enable_target_optspace
 enable_malloc_debugging
@@ -1440,6 +1443,7 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-newlib-io-pos-args enable printf-family positional arg support
+  --disable-newlib-wide-orient    Turn off wide char orient in streamio
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -2211,6 +2215,26 @@ if test "${enable_newlib_io_pos_args+set}" = set; then :
 else
   newlib_io_pos_args=no
 fi
+
+# Check whether --enable-newlib_wide_orient was given.
+if test "${enable_newlib_wide_orient+set}" = set; then :
+  enableval=$enable_newlib_wide_orient; case "${enableval}" in
+   yes) newlib_wide_orient=yes ;;
+   no)  newlib_wide_orient=no ;;
+   *) as_fn_error $? "bad value ${enableval} for newlib-wide-orient" "$LINENO" 5 ;;
+ esac
+else
+  newlib_wide_orient=yes
+fi
+
+ if test x$newlib_wide_orient = xyes; then
+  NEWLIB_WIDE_ORIENT_TRUE=
+  NEWLIB_WIDE_ORIENT_FALSE='#'
+else
+  NEWLIB_WIDE_ORIENT_TRUE='#'
+  NEWLIB_WIDE_ORIENT_FALSE=
+fi
+
 
 
 # Make sure we can run config.sub.

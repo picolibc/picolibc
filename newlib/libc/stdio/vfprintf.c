@@ -377,6 +377,7 @@ _DEFUN(__sfputs_r, (ptr, fp, buf, len),
 {
 	register int i;
 
+#ifdef _WIDE_ORIENT
 	if (fp->_flags2 & __SWID) {
 		wchar_t *p;
 
@@ -386,6 +387,9 @@ _DEFUN(__sfputs_r, (ptr, fp, buf, len),
 				return -1;
 		}
 	} else {
+#else
+	{
+#endif
 		for (i = 0; i < len; i++) {
 			if (_fputc_r (ptr, buf[i], fp) == EOF)
 				return -1;
@@ -410,6 +414,7 @@ _DEFUN(__sprint_r, (ptr, fp, uio),
 		uio->uio_iovcnt = 0;
 		return (0);
 	}
+#ifdef _WIDE_ORIENT
 	if (fp->_flags2 & __SWID) {
 		struct __siov *iov;
 		wchar_t *p;
@@ -428,6 +433,7 @@ _DEFUN(__sprint_r, (ptr, fp, uio),
 			}
 		}
 	} else
+#endif
 		err = __sfvwrite_r(ptr, fp, uio);
 out:
 	uio->uio_resid = 0;

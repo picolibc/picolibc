@@ -61,6 +61,9 @@
 /* Define if fseek functions support seek optimization.  */
 #undef _FSEEK_OPTIMIZATION
 
+/* Define if wide char orientation is supported.  */
+#undef  _WIDE_ORIENT
+
 @BOTTOM@
 /*
  * Iconv encodings enabled ("to" direction)

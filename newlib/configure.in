@@ -145,6 +145,17 @@ AC_ARG_ENABLE(newlib-fseek-optimization,
     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-fseek-optimization option) ;;
   esac
  fi], [newlib_fseek_optimization=yes])dnl
+ 
+dnl Support --enable-newlib-wide-orient
+dnl This option is also read in libc/configure.in.  It is repeated
+dnl here so that it shows up in the help text.
+AC_ARG_ENABLE(newlib_wide_orient,
+[  --disable-newlib-wide-orient    Turn off wide orientation in streamio],
+[case "${enableval}" in
+   yes) newlib_wide_orient=yes ;;
+   no)  newlib_wide_orient=no ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for newlib-wide-orient) ;;
+ esac],[newlib_wide_orient=yes])
 
 NEWLIB_CONFIGURE(.)
 
@@ -341,6 +352,10 @@ fi
  
 if test "${newlib_fseek_optimization}" = "yes"; then
 AC_DEFINE_UNQUOTED(_FSEEK_OPTIMIZATION)
+fi
+ 
+if test "${newlib_wide_orient}" = "yes"; then
+AC_DEFINE_UNQUOTED(_WIDE_ORIENT)
 fi
 
 dnl
