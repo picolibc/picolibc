@@ -1,3 +1,9 @@
+2013-04-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Drop PC_KEEP_HANDLE flag for
+	unrecognized reparse points as well.  Reorganize code and comments
+	handling reparse points for better readability.
+
 2013-04-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* hires.h (hires_ns::nsecs): Declare with bool parameter.
