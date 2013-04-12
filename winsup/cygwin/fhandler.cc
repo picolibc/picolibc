@@ -1949,7 +1949,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	    res = overlapped_nonblocking_no_data;	/* more handling below */
 	  else
 	    {
-	      debug_printf ("GetOverLappedResult failed, h %p, bytes %u, %E", h, *bytes);
+	      debug_printf ("GetOverlappedResult failed, h %p, bytes %u, %E", h, *bytes);
 	      res = overlapped_error;
 	    }
 	}
@@ -2009,7 +2009,7 @@ fhandler_base_overlapped::raw_read (void *ptr, size_t& len)
 	}
     }
   while (keep_looping);
-  len = (size_t) nbytes;
+  len = (nbytes == (DWORD) -1) ? (size_t) -1 : (size_t) nbytes;
 }
 
 ssize_t __reg3
@@ -2019,13 +2019,13 @@ fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
   if (has_ongoing_io ())
     {
       set_errno (EAGAIN);
-      nbytes = (DWORD) -1;
+      nbytes = (size_t) -1;
     }
   else
     {
       size_t chunk;
       if (!max_atomic_write || len < max_atomic_write)
-	chunk = len;
+	chunk = MIN (len, INT_MAX);
       else if (is_nonblocking ())
 	chunk = len = max_atomic_write;
       else
@@ -2033,7 +2033,7 @@ fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
 
       nbytes = 0;
       DWORD nbytes_now = 0;
-      /* Write to fd in smaller chunks, accumlating a total.
+      /* Write to fd in smaller chunks, accumulating a total.
 	 If there's an error, just return the accumulated total
 	 unless the first write fails, in which case return value
 	 from wait_overlapped(). */
@@ -2063,7 +2063,7 @@ fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
 	    }
 	}
       if (!nbytes)
-	nbytes = nbytes_now;
+	nbytes = (nbytes_now == (DWORD) -1) ? (size_t) -1 : nbytes_now;
     }
   return nbytes;
 }

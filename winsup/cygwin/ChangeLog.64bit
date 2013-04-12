@@ -1,3 +1,11 @@
+2013-04-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Fix typo in
+	debug_printf.
+	(fhandler_base_overlapped::raw_read): Handle size difference between
+	DWORD and {s}size_t platform-independently.
+	(fhandler_base_overlapped::raw_write): Ditto.  Fix typo in comment.
+
 2013-04-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Reinstantiate ptmalloc3.
