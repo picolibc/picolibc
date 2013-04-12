@@ -1,3 +1,10 @@
+2013-04-12  Will Newton  <will.newton@linaro.org>
+
+	* libc/machine/arm/memcpy-stub.c: Use generic memcpy if unaligned
+	access is not enabled.
+	* libc/machine/arm/memcpy.S: Faster memcpy implementation for
+	Cortex A15 cores using NEON and VFP if available.
+
 2013-04-12  Bin Cheng  <bin.cheng@arm.com>
 
 	* acconfig.h (_WCHAR_ORIENT): Undef

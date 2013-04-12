@@ -29,7 +29,7 @@
 /* The sole purpose of this file is to include the plain memcpy provided in newlib.  
    An optimized version of memcpy is provided in the assembly file memcpy.S in this directory. */
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
-     (!(defined (__ARM_ARCH_7A__))))
+     (!(defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED))))
 
 #include "../../string/memcpy.c"
 
