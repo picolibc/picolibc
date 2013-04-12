@@ -2653,26 +2653,28 @@ restart:
       if ((fileattr & FILE_ATTRIBUTE_REPARSE_POINT))
 	{
 	  res = check_reparse_point (h, fs.is_remote_drive ());
-	  if (res == -1)
+	  if (res > 0)
 	    {
-	      /* Volume mount point.  The filesystem information for the top
+	      /* A symlink is never a directory. */
+	      conv_hdl.fnoi ()->FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+	      break;
+	    }
+	  else
+	    {
+	      /* Volume moint point or unrecognized reparse point type.
+		 Make sure the open handle is not used in later stat calls.
+		 The handle has been opened with the FILE_OPEN_REPARSE_POINT
+		 flag, so it's a handle to the reparse point, not a handle
+		 to the volumes root dir. */
+	      pflags &= ~PC_KEEP_HANDLE;
+	      /* Volume mount point:  The filesystem information for the top
 		 level directory should be for the volume top level directory,
 		 rather than for the reparse point itself.  So we fetch the
 		 filesystem information again, but with a NULL handle.
 		 This does what we want because fs_info::update opens the
 		 handle without FILE_OPEN_REPARSE_POINT. */
-	      fs.update (&upath, NULL);
-	      /* Make sure the open handle is not used in later stat calls.
-		 The handle has been opened with the FILE_OPEN_REPARSE_POINT
-		 flag, so it's a handle to the reparse point, not a handle
-		 to the volumes root dir. */
-	      pflags &= ~PC_KEEP_HANDLE;
-	    }
-	  else if (res)
-	    {
-	      /* A symlink is never a directory. */
-	      conv_hdl.fnoi ()->FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
-	      break;
+	      if (res == -1)
+		fs.update (&upath, NULL);
 	    }
 	}
 
