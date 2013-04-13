@@ -1,3 +1,9 @@
+2013-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (fdsock): Raise send/recv buffer sizes for x86_64.  Extend
+	comment.
+	(cygwin_setsockopt): Fix condition and syscall_printf.
+
 2013-04-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Fix typo in

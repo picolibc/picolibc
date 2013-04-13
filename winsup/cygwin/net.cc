@@ -605,9 +605,18 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
      handle inheritance.  An explanation for this weird behaviour would
      be nice, though.
 
+     NOTE 2.  Testing on x86_64 (XP, Vista, 2008 R2, W8) indicates that
+     this is no problem on 64 bit.  So we set the default buffer size to
+     the default values in current 3.x Linux versions.
+
      (*) Maximum normal TCP window size.  Coincidence?  */
+#ifdef __x86_64__
+  ((fhandler_socket *) fd)->rmem () = 212992;
+  ((fhandler_socket *) fd)->wmem () = 212992;
+#else
   ((fhandler_socket *) fd)->rmem () = 65535;
   ((fhandler_socket *) fd)->wmem () = 65535;
+#endif
   if (::setsockopt (soc, SOL_SOCKET, SO_RCVBUF,
 		    (char *) &((fhandler_socket *) fd)->rmem (), sizeof (int)))
     {
@@ -810,8 +819,8 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	res = setsockopt (fh->get_socket (), level, optname,
 			  (const char *) optval, optlen);
 
-      if (optlen == 4)
-	syscall_printf ("setsockopt optval=%lx", *(long *) optval);
+      if (optlen == sizeof (int))
+	syscall_printf ("setsockopt optval=%x", *(int *) optval);
 
       if (res)
 	{
