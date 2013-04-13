@@ -1,5 +1,11 @@
 2013-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_tty.cc (fhandler_pty_slave::write): Change type of towrite to
+	ssize_t.
+	(fhandler_pty_slave::read): Ditto for totalread.
+
+2013-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (fdsock): Raise send/recv buffer sizes for x86_64.  Extend
 	comment.
 	(cygwin_setsockopt): Fix condition and syscall_printf.

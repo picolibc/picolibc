@@ -629,7 +629,8 @@ fhandler_pty_slave::init (HANDLE h, DWORD a, mode_t)
 ssize_t __stdcall
 fhandler_pty_slave::write (const void *ptr, size_t len)
 {
-  DWORD n, towrite = len;
+  DWORD n;
+  ssize_t towrite = len;
 
   bg_check_types bg = bg_check (SIGTTOU);
   if (bg <= bg_eof)
@@ -656,7 +657,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
       if (get_ttyp ()->write_error)
 	{
 	  set_errno (get_ttyp ()->write_error);
-	  towrite = (DWORD) -1;
+	  towrite = -1;
 	  get_ttyp ()->write_error = 0;
 	  release_output_mutex ();
 	  break;
@@ -676,7 +677,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	      __seterrno_from_win_error (err);
 	    }
 	  raise (SIGHUP);		/* FIXME: Should this be SIGTTOU? */
-	  towrite = (DWORD) -1;
+	  towrite = -1;
 	  break;
 	}
     }
@@ -686,7 +687,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 void __stdcall
 fhandler_pty_slave::read (void *ptr, size_t& len)
 {
-  int totalread = 0;
+  ssize_t totalread = 0;
   int vmin = 0;
   int vtime = 0;	/* Initialized to prevent -Wuninitialized warning */
   size_t readlen;
