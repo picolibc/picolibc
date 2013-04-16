@@ -30,6 +30,10 @@
  * SUCH DAMAGE.
  */
 
+#ifdef __CYGWIN__
+#include "winsup.h"
+#endif
+
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)glob.c	8.3 (Berkeley) 10/13/93";
 #endif /* LIBC_SCCS and not lint */
@@ -70,10 +74,6 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
  *    cast to wchar_t.
  * 3. State-dependent encodings are not currently supported.
  */
-
-#ifdef __CYGWIN__
-#include "winsup.h"
-#endif
 
 #include <sys/param.h>
 #include <sys/stat.h>

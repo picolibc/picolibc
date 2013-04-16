@@ -1,3 +1,7 @@
+2013-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* glob.cc: Include winsup.h before anything else.
+
 2013-04-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_info::check): Drop PC_KEEP_HANDLE flag for
