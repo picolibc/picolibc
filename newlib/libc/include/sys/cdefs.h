@@ -44,6 +44,10 @@
 #ifndef _SYS_CDEFS_H
 #define _SYS_CDEFS_H
 
+#include <sys/features.h>
+#include <stddef.h>
+#include <stdint.h>
+
 #define __FBSDID(x) /* nothing */
 /*
  * Note: the goal here is not compatibility to K&R C. Since we know that we
@@ -99,6 +103,26 @@
 # define __bounded      /* nothing */
 # define __unbounded    /* nothing */
 # define __ptrvalue     /* nothing */
+#endif
+
+/*
+ * Given the pointer x to the member m of the struct s, return
+ * a pointer to the containing structure.  When using GCC, we first
+ * assign pointer x to a local variable, to check that its type is
+ * compatible with member m.
+ */
+#if __GNUC_PREREQ(3, 1)
+#define	__containerof(x, s, m) ({					\
+	const volatile __typeof__(((s *)0)->m) *__x = (x);		\
+	__DEQUALIFY(s *, (const volatile char *)__x - offsetof(s, m));\
+})
+#else
+#define	__containerof(x, s, m)						\
+	__DEQUALIFY(s *, (const volatile char *)(x) - offsetof(s, m))
+#endif
+
+#ifndef	__DEQUALIFY
+#define	__DEQUALIFY(type, var)	((type)(uintptr_t)(const volatile void *)(var))
 #endif
 
 #ifdef __GNUC__
