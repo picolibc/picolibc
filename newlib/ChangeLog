@@ -19,6 +19,11 @@
 	* libc/include/sys/_types.h (_ssize_t): Define as signed equivalent of
 	size_t with GCC.
 
+2013-01-12  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/string.h: Fix preprocessor expressions using
+	_XOPEN_SOURCE.
+
 2012-11-29  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/reent.h (__sFILE): Change type of _offset
