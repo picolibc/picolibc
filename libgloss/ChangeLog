@@ -1,3 +1,12 @@
+2013-04-19  Steve Ellcey  <sellcey@imgtec.com>
+
+	* mips/cfe_api.h (int64_t): Remove define.
+	(uint64_t): Remove define.
+	(intptr_t): Remove define.
+	(uintptr_t): Remove define.
+	(sys/types.h): Remove include.
+	(_ansi.h): Remove include.
+
 2013-04-19  Yufeng Zhang  <yufeng.zhang@arm.com>
 
 	* aarch64/Makefile.in (rdimon-crt0.o, rdimon-trap.o)

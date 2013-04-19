@@ -59,13 +59,6 @@
  * CFE_API_* can be defined here as desired.
  */
 /* Begin customization. */
-#include <sys/types.h>		/* for __uint64_t and __int64_t. */
-#define int64_t __int64_t
-#define uint64_t __int64_t
-#include <_ansi.h>		/* for _POINTER_INT. */
-typedef _POINTER_INT intptr_t;
-typedef unsigned _POINTER_INT uintptr_t;
-
 #include <string.h>
 #define cfe_strlen(s)	strlen(s)
 
