@@ -1,3 +1,11 @@
+2013-04-19  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* aarch64/Makefile.in (rdimon-crt0.o, rdimon-trap.o)
+	(rdimon-_exit.o, rdimon-_kill.o, rdimon-syscalls.o)
+	(rdimon-libcfunc.o): Add $(CFLAGS) to the compiler command line.
+	* aarch64/cpu-init/Makefile.in (${CPU_INIT_OBJS}): Add $(CFLAGS)
+	to the compiler command line.
+
 2013-02-10  Peter Marheine  <peter@taricorp.net>
 
 	* libgloss/rx/Makefile.in: Respect DESTDIR when installing
