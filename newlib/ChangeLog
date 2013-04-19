@@ -1,3 +1,7 @@
+2013-04-19  Corinna Vinschen  <vinschen@redhat.com>
+
+	* newlib/libc/search/hash.c: Revert patch from 2012-08-08.
+
 2013-04-16  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/sys/rtems/sys/queue.h: Delete file.
