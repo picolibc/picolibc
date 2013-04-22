@@ -1,3 +1,18 @@
+2013-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/queue.h: Delete in favor of more complete newlib file.
+
+2013-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	Adapt to changes in newlib's sys/cdefs.h:
+	* include/sys/sysinfo.h (struct sysinfo): Rename __unused member to __f.
+	* libc/fts.c (__FBSDID): Drop definition.
+	* regex/regexec.c (__unused): Drop definition.
+
+2013-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 19.
+
 2013-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* glob.cc: Include winsup.h before anything else.

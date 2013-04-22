@@ -37,7 +37,6 @@ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
 #ifdef __CYGWIN__
 #include "winsup.h"
 #include <sys/statfs.h>
-#define __FBSDID(x)
 #define _open open
 #define _close close
 #endif
