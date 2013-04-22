@@ -1,3 +1,7 @@
+2013-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 19.
+
 2013-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* glob.cc: Include winsup.h before anything else.
