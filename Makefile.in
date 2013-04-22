@@ -38710,8 +38710,13 @@ maybe-install-target-libffi:
 @if target-libffi
 maybe-install-target-libffi: install-target-libffi
 
-# Dummy target for uninstallable.
-install-target-libffi:
+install-target-libffi: installdirs
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	(cd $(TARGET_SUBDIR)/libffi && \
+	  $(MAKE) $(TARGET_FLAGS_TO_PASS)  install)
 
 @endif target-libffi
 
@@ -38720,8 +38725,13 @@ maybe-install-strip-target-libffi:
 @if target-libffi
 maybe-install-strip-target-libffi: install-strip-target-libffi
 
-# Dummy target for uninstallable.
-install-strip-target-libffi:
+install-strip-target-libffi: installdirs
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(NORMAL_TARGET_EXPORTS) \
+	(cd $(TARGET_SUBDIR)/libffi && \
+	  $(MAKE) $(TARGET_FLAGS_TO_PASS)  install-strip)
 
 @endif target-libffi
 
