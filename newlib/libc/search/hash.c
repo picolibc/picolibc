@@ -143,7 +143,7 @@ _DEFUN(__hash_open, (file, flags, mode, info, dflags),
 #ifdef __USE_INTERNAL_STAT64
 	    (_stat64(file, &statbuf) && (errno == ENOENT))) {
 #else
-	    (stat(file, &statbuf) && (errno == ENOENT))) {
+	    (_stat(file, &statbuf) && (errno == ENOENT))) {
 #endif
 		if (errno == ENOENT)
 			errno = 0; /* Just in case someone looks at errno */
@@ -159,7 +159,7 @@ _DEFUN(__hash_open, (file, flags, mode, info, dflags),
 #ifdef __USE_INTERNAL_STAT64
 		     _fstat64(hashp->fp, &statbuf) == 0 && statbuf.st_size == 0)
 #else
-		     fstat(hashp->fp, &statbuf) == 0 && statbuf.st_size == 0)
+		     _fstat(hashp->fp, &statbuf) == 0 && statbuf.st_size == 0)
 #endif
 			new_table = 1;
 
@@ -341,7 +341,7 @@ init_hash(hashp, file, info)
 #ifdef __USE_INTERNAL_STAT64
 		if (_stat64(file, &statbuf))
 #else
-		if (stat(file, &statbuf))
+		if (_stat(file, &statbuf))
 #endif
 			return (NULL);
 		hashp->BSIZE = statbuf.st_blksize;

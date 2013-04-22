@@ -1,6 +1,6 @@
 /* sys/sysinfo.h
 
-   Copyright 2009, 2011, 2013 Red Hat, Inc.
+   Copyright 2009, 2011 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -30,7 +30,7 @@ struct sysinfo {
   unsigned long totalhigh;    /* Total high memory size */
   unsigned long freehigh;     /* Available high memory size */
   unsigned int mem_unit;      /* Memory unit size in bytes */
-  char __f[10];               /* Pads structure to 64 bytes */
+  char __unused[10];          /* Pads structure to 64 bytes */
 };
 
 extern int sysinfo (struct sysinfo *);

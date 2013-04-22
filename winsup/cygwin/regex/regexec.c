@@ -62,6 +62,10 @@ __FBSDID("$FreeBSD: src/lib/libc/regex/regexec.c,v 1.8 2007/06/11 03:05:54 delph
 #include "utils.h"
 #include "regex2.h"
 
+#ifdef __CYGWIN__
+#define __unused	__attribute__ ((unused))
+#endif
+
 static int nope __unused = 0;	/* for use in asserts; shuts lint up */
 
 static __inline size_t
