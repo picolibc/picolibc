@@ -1,7 +1,12 @@
 2013-04-22  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
+	* Makefile.def: Sync with GCC.
+	* Makefile.in: Regenerate.
+
+2013-04-22  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
+
 	* configure.ac: Sync with GCC.
-	* configure: Regenerated.
+	* configure: Regenerate.
 
 2013-03-22  Mike Frysinger  <vapier@gentoo.org>
 
