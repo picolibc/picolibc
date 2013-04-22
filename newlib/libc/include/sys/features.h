@@ -34,6 +34,8 @@ extern "C" {
 #  define __GNUC_PREREQ(maj, min) 0
 # endif
 #endif /* __GNUC_PREREQ */
+/* Version with trailing underscores for BSD compatibility. */
+#define __GNUC_PREREQ__(ma, mi) __GNUC_PREREQ(ma, mi)
 
 /* RTEMS adheres to POSIX -- 1003.1b with some features from annexes.  */
 

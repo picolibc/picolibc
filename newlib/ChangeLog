@@ -1,3 +1,52 @@
+2013-04-22  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/cdefs.h: Align with latest FreeBSD file header.
+	* libc/include/sys/features.h (__GNUC_PREREQ__): Define.
+
+2013-04-19  Corinna Vinschen  <vinschen@redhat.com>
+
+	* newlib/libc/search/hash.c: Revert patch from 2012-08-08.
+
+2013-04-16  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/sys/rtems/sys/queue.h: Delete file.
+	* libc/include/sys/cdefs.h (__containerof): New define.
+	(__DEQUALIFY): Likewise.
+	* libc/include/sys/queue.h (TRACEBUF_INITIALIZER): Likewise.
+	(TRACEBUF): Likewise.
+	(LIST_FOREACH_SAFE): Likewise.
+	(LIST_PREV): Likewise.
+	(LIST_SWAP): Likewise.
+	(QMD_LIST_CHECK_HEAD): Likewise.
+	(QMD_LIST_CHECK_NEXT): Likewise.
+	(QMD_LIST_CHECK_PREV): Likewise.
+	(QMD_SAVELINK): Likewise.
+	(QMD_TAILQ_CHECK_HEAD): Likewise.
+	(QMD_TAILQ_CHECK_NEXT): Likewise.
+	(QMD_TAILQ_CHECK_PREV): Likewise.
+	(QMD_TAILQ_CHECK_TAIL): Likewise.
+	(QMD_TRACE_ELEM): Likewise.
+	(QMD_TRACE_HEAD): Likewise.
+	(SLIST_FOREACH_PREVPTR): Likewise.
+	(SLIST_FOREACH_SAFE): Likewise.
+	(SLIST_REMOVE_AFTER): Likewise.
+	(SLIST_SWAP): Likewise.
+	(STAILQ_FOREACH_SAFE): Likewise.
+	(STAILQ_REMOVE_AFTER): Likewise.
+	(STAILQ_SWAP): Likewise.
+	(TAILQ_FOREACH_REVERSE_SAFE): Likewise.
+	(TAILQ_FOREACH_SAFE): Likewise.
+	(TAILQ_SWAP): Likewise.
+	(TRASHIT): Likewise.
+	(SLIST_REMOVE): Use SLIST_REMOVE_AFTER().
+	(STAILQ_LAST): Use __containerof().
+	(STAILQ_REMOVE): Use STAILQ_REMOVE_AFTER().
+
+2012-04-11  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* libc/include/stdlib.h (strtof, strtoll, strtoull, strtold): Also
+	prototype if C++11 or later.
+
 2013-03-15  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* newlib/libc/stdio/findfp.c (glue_with_file): New.
