@@ -1,3 +1,15 @@
+2013-04-23  Corinna Vinschen  <vinschen@redhat.com>
+
+	Port newlib to x86_64-pc-cygwin.
+	* libc/include/sys/features.h: Redefine compilation environment
+	definitions for Cygwin to cover 64 bit Cygwin.
+	* libc/ctype/ctype_.c (_ctype_): Fix definition for 64 bit Cygwin.
+	* libc/include/machine/setjmp.h: Change definition of _JBLEN to allow
+	different values for 32 bit and 64 bit Cygwin.
+	* libc/include/reent.h (stat64): Define as stat under Cygwin, instead
+	of as __stat64.  Undef stat64 if not building Newlib.
+	* libc/include/sys/stat.h (stat64): Define as stat under Cygwin.
+
 2013-04-22  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/cdefs.h: Align with latest FreeBSD file header.
