@@ -150,7 +150,7 @@ EXTRA_DLL_OFILES:=${addsuffix .o,${basename ${notdir ${wildcard $(CONFIG_DIR)/*.
 
 EXTRA_OFILES:=
 
-MALLOC_OFILES:=malloc.o ptmalloc3.o
+MALLOC_OFILES:=malloc.o
 
 DLL_IMPORTS:=${shell $(CC) -print-file-name=w32api/libkernel32.a} ${shell $(CC) -print-file-name=w32api/libntdll.a}
 
