@@ -629,6 +629,7 @@ login_tty SIGFE
 logout SIGFE
 logwtmp SIGFE
 longjmp NOSIGFE
+_longjmp = longjmp NOSIGFE
 lrand48 NOSIGFE
 lremovexattr SIGFE
 lrint NOSIGFE
@@ -984,6 +985,7 @@ setgroups SIGFE
 sethostent NOSIGFE
 setitimer SIGFE
 setjmp NOSIGFE
+_setjmp = setjmp NOSIGFE
 setlinebuf SIGFE
 setlocale NOSIGFE
 setlogmask NOSIGFE
