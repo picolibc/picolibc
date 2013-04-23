@@ -1,5 +1,21 @@
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.19"><title>What's new and what changed from 1.7.18 to 1.7.19</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Drop support for Windows 2000 and Windows XP pre-SP3.
+</para></listitem>
+
+<listitem><para>
+Add support for building a 64 bit version of Cygwin on x86_64 natively.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.18"><title>What's new and what changed from 1.7.17 to 1.7.18</title>
 
 <itemizedlist mark="bullet">
