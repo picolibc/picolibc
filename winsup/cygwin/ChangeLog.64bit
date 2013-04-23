@@ -1,5 +1,9 @@
 2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* malloc_wrapper.cc: Throughout fix format specifiers in malloc_printf.
+
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Remove ptmalloc3 once and for all.
 
 2013-04-21  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
