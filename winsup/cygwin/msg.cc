@@ -91,7 +91,7 @@ client_request_msg::client_request_msg (int msqid,
 extern "C" int
 msgctl (int msqid, int cmd, struct msqid_ds *buf)
 {
-  syscall_printf ("msgctl (msqid = %d, cmd = 0x%x, buf = %p)",
+  syscall_printf ("msgctl (msqid = %d, cmd = %y, buf = %p)",
 		  msqid, cmd, buf);
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -128,7 +128,7 @@ msgctl (int msqid, int cmd, struct msqid_ds *buf)
 extern "C" int
 msgget (key_t key, int msgflg)
 {
-  syscall_printf ("msgget (key = %U, msgflg = 0x%x)", key, msgflg);
+  syscall_printf ("msgget (key = %U, msgflg = %y)", key, msgflg);
   client_request_msg request (key, msgflg);
   if (request.make_request () == -1 || request.retval () == -1)
     {
@@ -144,8 +144,8 @@ msgget (key_t key, int msgflg)
 extern "C" ssize_t
 msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
 {
-  syscall_printf ("msgrcv (msqid = %d, msgp = %p, msgsz = %d, "
-		  "msgtyp = %d, msgflg = 0x%x)",
+  syscall_printf ("msgrcv (msqid = %d, msgp = %p, msgsz = %ld, "
+		  "msgtyp = %d, msgflg = %y)",
 		  msqid, msgp, msgsz, msgtyp, msgflg);
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -165,7 +165,7 @@ msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
 extern "C" int
 msgsnd (int msqid, const void *msgp, size_t msgsz, int msgflg)
 {
-  syscall_printf ("msgsnd (msqid = %d, msgp = %p, msgsz = %d, msgflg = 0x%x)",
+  syscall_printf ("msgsnd (msqid = %d, msgp = %p, msgsz = %ld, msgflg = %y)",
 		  msqid, msgp, msgsz, msgflg);
   myfault efault;
   if (efault.faulted (EFAULT))

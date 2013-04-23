@@ -655,7 +655,7 @@ tunable_param_init (const char *config_file, bool force)
 }
 
 void
-tunable_int_fetch (const char *name, long *tunable_target)
+tunable_int_fetch (const char *name, int32_t *tunable_target)
 {
   tun_struct *s;
   for (s = &tunable_params[0]; s->name; ++s)

@@ -13,7 +13,7 @@ struct virt_tab_t {
   size_t name_len;
   fh_devices fhandler;
   virtual_ftype_t type;
-  _off64_t (*format_func)(void *data, char *&);
+  off_t (*format_func)(void *data, char *&);
 };
 
 #define _VN(s)	s, sizeof (s) - 1

@@ -1,12 +1,16 @@
 /* wow64.cc
 
-   Copyright 2011 Red Hat, Inc.
+   Copyright 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
+
+#ifndef __x86_64__
+/* WOW64 only plays a role in the 32 bit version.  Don't use any of this
+   in the 64 bit version. */
 
 #include "winsup.h"
 #include "cygtls.h"
@@ -77,7 +81,7 @@ wow64_test_for_64bit_parent ()
   HANDLE parent;
   PVOID allocbase, stackbase;
 
-  ULONG wow64 = TRUE;   /* Opt on the safe side. */
+  ULONG_PTR wow64 = TRUE;   /* Opt on the safe side. */
 
   /* First check if the current stack is where it belongs.  If so, we don't
      have to do anything special.  This is the case on Vista and later. */
@@ -94,7 +98,7 @@ wow64_test_for_64bit_parent ()
   if (NT_SUCCESS (ret)
       && (parent = OpenProcess (PROCESS_QUERY_INFORMATION,
 				FALSE,
-				pbi.InheritedFromUniqueProcessId)))
+				(DWORD) pbi.InheritedFromUniqueProcessId)))
     {
       NtQueryInformationProcess (parent, ProcessWow64Information,
 				 &wow64, sizeof wow64, NULL);
@@ -203,9 +207,11 @@ wow64_respawn_process ()
 	       path, GetCommandLineW ());
   CloseHandle (pi.hThread);
   if (WaitForSingleObject (pi.hProcess, INFINITE) == WAIT_FAILED)
-    api_fatal ("Waiting for process %d failed, %E", pi.dwProcessId);
+    api_fatal ("Waiting for process %u failed, %E", pi.dwProcessId);
   GetExitCodeProcess (pi.hProcess, &ret);
   CloseHandle (pi.hProcess);
   TerminateProcess (GetCurrentProcess (), ret);
   ExitProcess (ret);
 }
+
+#endif /* !__x86_64__ */

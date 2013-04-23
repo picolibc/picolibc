@@ -69,12 +69,12 @@ pwdgrp::read_passwd ()
       && (!(pw = internal_getpwnam (cygheap->user.name ()))
 	  || !user_shared->cb
 	  || (myself->uid != ILLEGAL_UID
-	      && myself->uid != (__uid32_t) pw->pw_uid
+	      && myself->uid != pw->pw_uid
 	      && !internal_getpwuid (myself->uid))))
     {
       static char linebuf[1024];	// must be static and
 					// should not be NO_COPY
-      snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
+      snprintf (linebuf, sizeof (linebuf), "%s:*:%u:%u:,%s:%s:/bin/sh",
 		cygheap->user.name (),
 		(!user_shared->cb || myself->uid == ILLEGAL_UID)
 		? UNKNOWN_UID : myself->uid,
@@ -111,12 +111,12 @@ internal_getpwsid (cygpsid &sid)
 }
 
 struct passwd *
-internal_getpwuid (__uid32_t uid, bool check)
+internal_getpwuid (uid_t uid, bool check)
 {
   pr.refresh (check);
 
   for (int i = 0; i < pr.curr_lines; i++)
-    if (uid == (__uid32_t) passwd_buf[i].pw_uid)
+    if (uid == passwd_buf[i].pw_uid)
       return passwd_buf + i;
   return NULL;
 }
@@ -135,21 +135,25 @@ internal_getpwnam (const char *name, bool check)
 
 
 extern "C" struct passwd *
-getpwuid32 (__uid32_t uid)
+getpwuid32 (uid_t uid)
 {
   struct passwd *temppw = internal_getpwuid (uid, true);
   pthread_testcancel ();
   return temppw;
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (getpwuid32, getpwuid)
+#else
 extern "C" struct passwd *
 getpwuid (__uid16_t uid)
 {
   return getpwuid32 (uid16touid32 (uid));
 }
+#endif
 
 extern "C" int
-getpwuid_r32 (__uid32_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
+getpwuid_r32 (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
 {
   *result = NULL;
 
@@ -181,11 +185,15 @@ getpwuid_r32 (__uid32_t uid, struct passwd *pwd, char *buffer, size_t bufsize, s
   return 0;
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (getpwuid_r32, getpwuid_r)
+#else
 extern "C" int
 getpwuid_r (__uid16_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
 {
   return getpwuid_r32 (uid16touid32 (uid), pwd, buffer, bufsize, result);
 }
+#endif
 
 extern "C" struct passwd *
 getpwnam (const char *name)
@@ -245,11 +253,13 @@ getpwent (void)
   return NULL;
 }
 
+#ifndef __x86_64__
 extern "C" struct passwd *
 getpwduid (__uid16_t)
 {
   return NULL;
 }
+#endif
 
 extern "C" void
 setpwent (void)

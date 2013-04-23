@@ -1,7 +1,7 @@
 /* strace.cc
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011 Red Hat Inc.
+   2009, 2010, 2011, 2012, 2013 Red Hat Inc.
 
    Written by Chris Faylor <cgf@redhat.com>
 
@@ -265,7 +265,7 @@ ctrl_c (DWORD)
 }
 
 extern "C" {
-unsigned long (*cygwin_internal) (int, ...);
+uintptr_t (*cygwin_internal) (int, ...);
 WCHAR cygwin_dll_path[32768];
 };
 
@@ -286,7 +286,7 @@ load_cygwin ()
       return 0;
     }
   GetModuleFileNameW (h, cygwin_dll_path, 32768);
-  if (!(cygwin_internal = (DWORD (*) (int, ...)) GetProcAddress (h, "cygwin_internal")))
+  if (!(cygwin_internal = (uintptr_t (*) (int, ...)) GetProcAddress (h, "cygwin_internal")))
     {
       errno = ENOSYS;
       return 0;
@@ -437,7 +437,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   int len;
   int special;
   char alen[3 + 8 + 1];
-  DWORD nbytes;
+  SIZE_T nbytes;
   child_list *child = get_child (id);
   if (!child)
     error (0, "no process id %d found", id);
@@ -482,7 +482,11 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   buf[len] = '\0';
   char *s = strtok (buf, " ");
 
+#ifdef __x86_64__
+  unsigned long long n = strtoull (s, NULL, 16);
+#else
   unsigned long n = strtoul (s, NULL, 16);
+#endif
 
   s = strchr (s, '\0') + 1;
 
@@ -619,7 +623,11 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   if (include_hex)
     {
       s -= 8;
-      sprintf (s, "%p", (void *) n);
+#ifdef __x86_64__
+      sprintf (s, "%012I64x", n);
+#else
+      sprintf (s, "%08lx", n);
+#endif
       strchr (s, '\0')[0] = ' ';
     }
   child->last_usecs = usecs;
@@ -691,8 +699,9 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	    {
 	      status = DBG_EXCEPTION_NOT_HANDLED;
 	      if (ev.u.Exception.dwFirstChance)
-		fprintf (ofile, "--- Process %lu, exception %p at %p\n", ev.dwProcessId,
-			 (void *) ev.u.Exception.ExceptionRecord.ExceptionCode,
+		fprintf (ofile, "--- Process %lu, exception %08lx at %p\n",
+			 ev.dwProcessId,
+			 ev.u.Exception.ExceptionRecord.ExceptionCode,
 			 ev.u.Exception.ExceptionRecord.ExceptionAddress);
 	    }
 	  break;
@@ -966,7 +975,7 @@ main (int argc, char **argv)
   if (load_cygwin ())
     {
       char **av = (char **) cygwin_internal (CW_ARGV);
-      if (av && (DWORD) av != (DWORD) -1)
+      if (av && (uintptr_t) av != (uintptr_t) -1)
 	for (argc = 0, argv = av; *av; av++)
 	  argc++;
     }

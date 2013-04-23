@@ -41,8 +41,8 @@ __FBSDID("$FreeBSD: /repoman/r/ncvs/src/lib/libc/gen/ftw.c,v 1.4 2004/08/24 13:0
 #include <limits.h>
 
 int
-ftw(const char *path, int (*fn)(const char *, const struct __stat64 *, int),
-    int nfds)
+ftw(const char *path, int (*fn)(const char *, const struct stat *, int),
+    int nfds __attribute__ ((unused)))
 {
 	char * const paths[2] = { (char *)path, NULL };
 	FTSENT *cur;

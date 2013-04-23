@@ -35,7 +35,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xe399543U
+#define CURR_CHILD_INFO_MAGIC 0x93737edaU
 
 #define NPROCS	256
 
@@ -55,7 +55,7 @@ public:
   DWORD msv_count;	// zeroed on < W2K3, set to pseudo-count on Vista
   DWORD cb;		// size of this record
   DWORD intro;		// improbable string
-  unsigned long magic;	// magic number unique to child_info
+  DWORD magic;		// magic number unique to child_info
   unsigned short type;	// type of record, exec, spawn, fork
   init_cygheap *cygheap;
   void *cygheap_max;
@@ -190,6 +190,6 @@ void __stdcall init_child_info (DWORD, child_info *, HANDLE);
 
 extern "C" {
 extern child_info *child_proc_info;
-extern child_info_spawn *spawn_info asm ("_child_proc_info");
-extern child_info_fork *fork_info asm ("_child_proc_info");
+extern child_info_spawn *spawn_info asm (_SYMSTR (child_proc_info));
+extern child_info_fork *fork_info asm (_SYMSTR (child_proc_info));
 }

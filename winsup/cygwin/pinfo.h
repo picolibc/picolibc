@@ -17,7 +17,7 @@ details. */
 struct commune_result
 {
   char *s;
-  int n;
+  DWORD n;
   HANDLE handles[2];
 };
 
@@ -78,11 +78,11 @@ public:
      if not found.  This data resides in the shared data area (allowing
      tasks to store whatever they want here) so it's for informational
      purposes only. */
-  __uid32_t uid;	/* User ID */
-  __gid32_t gid;	/* Group ID */
-  pid_t pgid;		/* Process group ID */
-  pid_t sid;		/* Session ID */
-  int ctty;		/* Control tty */
+  uid_t uid;	/* User ID */
+  gid_t gid;	/* Group ID */
+  pid_t pgid;	/* Process group ID */
+  pid_t sid;	/* Session ID */
+  int ctty;	/* Control tty */
   bool has_pgid_children;/* True if we've forked or spawned children with our GID. */
 
   /* Resources used by process. */
@@ -110,6 +110,7 @@ public:
   char *root (size_t &);
   char *cwd (size_t &);
   char *cmdline (size_t &);
+  char *win_heap_info (size_t &);
   bool set_ctty (class fhandler_termios *, int);
   bool alert_parent (char);
   int __reg2 kill (siginfo_t&);
@@ -178,9 +179,9 @@ public:
   int operator == (pinfo &x) const {return x.procinfo == procinfo;}
   int operator == (_pinfo *x) const {return x == procinfo;}
   int operator == (void *x) const {return procinfo == x;}
-  int operator == (int x) const {return (int) procinfo == (int) x;}
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
+  int operator !() const {return !procinfo;}
   void preserve () { destroy = false; }
   void allow_remove () { destroy = true; }
 #ifndef SIG_BAD_MASK		// kludge to ensure that sigproc.h included
@@ -189,14 +190,14 @@ public:
 #else
   int reattach ()
   {
-    int res = proc_subproc (PROC_REATTACH_CHILD, (DWORD) this);
+    int res = proc_subproc (PROC_REATTACH_CHILD, (uintptr_t) this);
     destroy = res ? false : true;
     return res;
   }
   int remember (bool detach)
   {
     int res = proc_subproc (detach ? PROC_DETACHED_CHILD : PROC_ADDCHILD,
-			    (DWORD) this);
+			    (uintptr_t) this);
     destroy = res ? false : true;
     return res;
   }

@@ -1,6 +1,6 @@
 /* sem.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2002, 2003, 2004, 2005, 2008, 2009 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2008, 2009, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -83,8 +83,8 @@ semctl (int semid, int semnum, int cmd, ...)
       arg = va_arg (ap, union semun);
       va_end (ap);
     }
-  syscall_printf ("semctl (semid = %d, semnum = %d, cmd = %d, arg.val = 0x%x)",
-		  semid, semnum, cmd, arg.val);
+  syscall_printf ("semctl (semid = %d, semnum = %d, cmd = %d, arg = %p)",
+		  semid, semnum, cmd, arg.buf);
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
@@ -103,7 +103,7 @@ semctl (int semid, int semnum, int cmd, ...)
 extern "C" int
 semget (key_t key, int nsems, int semflg)
 {
-  syscall_printf ("semget (key = %U, nsems = %d, semflg = 0x%x)",
+  syscall_printf ("semget (key = %U, nsems = %d, semflg = %y)",
 		  key, nsems, semflg);
   client_request_sem request (key, nsems, semflg);
   if (request.make_request () == -1 || request.retval () == -1)
@@ -120,7 +120,7 @@ semget (key_t key, int nsems, int semflg)
 extern "C" int
 semop (int semid, struct sembuf *sops, size_t nsops)
 {
-  syscall_printf ("semop (semid = %d, sops = %p, nsops = %d)",
+  syscall_printf ("semop (semid = %d, sops = %p, nsops = %ld)",
 		  semid, sops, nsops);
   myfault efault;
   if (efault.faulted (EFAULT))

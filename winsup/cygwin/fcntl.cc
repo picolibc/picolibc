@@ -23,7 +23,7 @@ extern "C" int
 fcntl64 (int fd, int cmd, ...)
 {
   int res = -1;
-  void *arg = NULL;
+  intptr_t arg = 0;
   va_list args;
 
   pthread_testcancel ();
@@ -37,18 +37,32 @@ fcntl64 (int fd, int cmd, ...)
   if (cfd < 0)
     goto done;
 
+  /* FIXME?  All numerical args to fcntl are defined as long on Linux.
+     This relies on a really dirty trick on x86_64:  A 32 bit mov to
+     a register (e.g. mov $1, %edx) always sets the high 32 bit to 0.
+     We're following the Linux lead here since the third arg to any
+     function is in a register anyway (%r8 in MS ABI).  That's the easy
+     case which is covered here by always reading the arg with
+     sizeof (intptr_t) == sizeof (long) == sizeof (void*) which matches
+     all targets.
+     
+     However, the POSIX standard defines all numerical args as type int.
+     If we take that literally, we had a (small) problem on 64 bit, since
+     sizeof (void*) != sizeof (int).  If we would like to follow POSIX
+     more closely than Linux, we'd have to call va_arg on a per cmd basis. */
+
   va_start (args, cmd);
-  arg = va_arg (args, void *);
+  arg = va_arg (args, intptr_t);
   va_end (args);
 
   switch (cmd)
     {
     case F_DUPFD:
     case F_DUPFD_CLOEXEC:
-      if ((int) arg >= 0 && (int) arg < OPEN_MAX_MAX)
+      if (arg >= 0 && arg < OPEN_MAX_MAX)
 	{
 	  int flags = cmd == F_DUPFD_CLOEXEC ? O_CLOEXEC : 0;
-	  res = cygheap->fdtab.dup3 (fd, cygheap_fdnew (((int) arg) - 1), flags);
+	  res = cygheap->fdtab.dup3 (fd, cygheap_fdnew ((arg) - 1), flags);
 	}
       else
 	{
@@ -60,7 +74,7 @@ fcntl64 (int fd, int cmd, ...)
     case F_SETLK:
     case F_SETLKW:
       {
-	struct __flock64 *fl = (struct __flock64 *) arg;
+	struct flock *fl = (struct flock *) arg;
 	fl->l_type &= F_RDLCK | F_WRLCK | F_UNLCK;
 	res = cfd->lock (cmd, fl);
       }
@@ -70,24 +84,27 @@ fcntl64 (int fd, int cmd, ...)
       break;
     }
 done:
-  syscall_printf ("%R = fcntl(%d, %d, %p)", res, fd, cmd, arg);
+  syscall_printf ("%R = fcntl(%d, %d, %ly)", res, fd, cmd, arg);
   return res;
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (fcntl64, _fcntl)
+#else
 extern "C" int
 _fcntl (int fd, int cmd, ...)
 {
-  void *arg = NULL;
+  intptr_t arg = 0;
   va_list args;
   struct __flock32 *src = NULL;
-  struct __flock64 dst;
+  struct flock dst;
 
   myfault efault;
   if (efault.faulted (EFAULT))
     return -1;
 
   va_start (args, cmd);
-  arg = va_arg (args, void *);
+  arg = va_arg (args, intptr_t);
   va_end (args);
   if (cmd == F_GETLK || cmd == F_SETLK || cmd == F_SETLKW)
     {
@@ -97,7 +114,7 @@ _fcntl (int fd, int cmd, ...)
       dst.l_start = src->l_start;
       dst.l_len = src->l_len;
       dst.l_pid = src->l_pid;
-      arg = &dst;
+      arg = (intptr_t) &dst;
     }
   int res = fcntl64 (fd, cmd, arg);
   if (cmd == F_GETLK)
@@ -110,4 +127,4 @@ _fcntl (int fd, int cmd, ...)
     }
   return res;
 }
-
+#endif

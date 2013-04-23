@@ -328,7 +328,7 @@ frok::parent (volatile char * volatile stack_here)
 	    ch.guardsize = _my_tls.tid->attr.guardsize;
 	}
     }
-  debug_printf ("stack - bottom %p, top %p, addr %p, guardsize %p",
+  debug_printf ("stack - bottom %p, top %p, addr %p, guardsize %lu",
 		ch.stackbottom, ch.stacktop, ch.stackaddr, ch.guardsize);
 
   PROCESS_INFORMATION pi;
@@ -340,7 +340,7 @@ frok::parent (volatile char * volatile stack_here)
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
-  syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %p, 0, 0, %p, %p)",
+  syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %y, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
   time_t start_time = time (NULL);
@@ -598,14 +598,18 @@ fork ()
 
     ischild = !!setjmp (grouped.ch.jmp);
 
-    volatile char * volatile esp;
-    __asm__ volatile ("movl %%esp,%0": "=r" (esp));
+    volatile char * volatile stackp;
+#ifdef __x86_64__
+    __asm__ volatile ("movq %%rsp,%0": "=r" (stackp));
+#else
+    __asm__ volatile ("movl %%esp,%0": "=r" (stackp));
+#endif
 
     if (!ischild)
-      res = grouped.parent (esp);
+      res = grouped.parent (stackp);
     else
       {
-	res = grouped.child (esp);
+	res = grouped.child (stackp);
 	in_forkee = false;
 	ischild = true;	/* might have been reset by fork mem copy */
       }
@@ -664,12 +668,12 @@ child_copy (HANDLE hp, bool write, ...)
     {
       char *low = va_arg (args, char *);
       char *high = va_arg (args, char *);
-      DWORD todo = high - low;
+      SIZE_T todo = high - low;
       char *here;
 
       for (here = low; here < high; here += todo)
 	{
-	  DWORD done = 0;
+	  SIZE_T done = 0;
 	  if (here + todo > high)
 	    todo = high - here;
 	  int res;
@@ -684,7 +688,7 @@ child_copy (HANDLE hp, bool write, ...)
 		__seterrno ();
 	      /* If this happens then there is a bug in our fork
 		 implementation somewhere. */
-	      system_printf ("%s %s copy failed, %p..%p, done %d, windows pid %u, %E",
+	      system_printf ("%s %s copy failed, %p..%p, done %lu, windows pid %u, %E",
 			    what, huh[write], low, high, done, myself->dwProcessId);
 	      goto err;
 	    }

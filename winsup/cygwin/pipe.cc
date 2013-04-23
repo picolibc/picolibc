@@ -1,7 +1,7 @@
 /* pipe.cc: pipe for Cygwin.
 
    Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012 Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013 Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -72,7 +72,8 @@ fhandler_pipe::open (int flags, mode_t mode)
   int pid, rwflags = (flags & O_ACCMODE);
   bool inh;
 
-  sscanf (get_name (), "/proc/%d/fd/pipe:[%d]", &pid, (int *) &pipe_hdl);
+  sscanf (get_name (), "/proc/%d/fd/pipe:[%lu]",
+		       &pid, (unsigned long *) &pipe_hdl);
   if (pid == myself->pid)
     {
       cygheap_fdenum cfd (true);
@@ -142,23 +143,23 @@ out:
   return 0;
 }
 
-_off64_t
-fhandler_pipe::lseek (_off64_t offset, int whence)
+off_t
+fhandler_pipe::lseek (off_t offset, int whence)
 {
-  debug_printf ("(%d, %d)", offset, whence);
+  debug_printf ("(%D, %d)", offset, whence);
   set_errno (ESPIPE);
   return -1;
 }
 
 int
-fhandler_pipe::fadvise (_off64_t offset, _off64_t length, int advice)
+fhandler_pipe::fadvise (off_t offset, off_t length, int advice)
 {
   set_errno (ESPIPE);
   return -1;
 }
 
 int
-fhandler_pipe::ftruncate (_off64_t length, bool allow_truncate)
+fhandler_pipe::ftruncate (off_t length, bool allow_truncate)
 {
   set_errno (allow_truncate ? EINVAL : ESPIPE);
   return -1;
@@ -167,7 +168,7 @@ fhandler_pipe::ftruncate (_off64_t length, bool allow_truncate)
 char *
 fhandler_pipe::get_proc_fd_name (char *buf)
 {
-  __small_sprintf (buf, "pipe:[%d]", get_handle ());
+  __small_sprintf (buf, "pipe:[%lu]", get_handle ());
   return buf;
 }
 
@@ -213,7 +214,9 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
   char pipename[MAX_PATH];
   size_t len = __small_sprintf (pipename, PIPE_INTRO "%S-",
 				      &cygheap->installation_key);
-  DWORD pipe_mode = PIPE_READMODE_BYTE;
+  DWORD pipe_mode = PIPE_READMODE_BYTE
+		    | (wincap.has_pipe_reject_remote_clients ()
+		       ? PIPE_REJECT_REMOTE_CLIENTS : 0);
   if (!name)
     pipe_mode |= pipe_byte ? PIPE_TYPE_BYTE : PIPE_TYPE_MESSAGE;
   else
@@ -228,7 +231,7 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
   if (name)
     len += __small_sprintf (pipename + len, "%s", name);
 
-  open_mode |= PIPE_ACCESS_INBOUND;
+  open_mode |= PIPE_ACCESS_INBOUND | FILE_FLAG_FIRST_PIPE_INSTANCE;
 
   /* Retry CreateNamedPipe as long as the pipe name is in use.
      Retrying will probably never be necessary, but we want
@@ -241,7 +244,7 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 	__small_sprintf (pipename + len, "pipe-%p",
 			 InterlockedIncrement ((LONG *) &pipe_unique_id));
 
-      debug_printf ("name %s, size %lu, mode %s", pipename, psize,
+      debug_printf ("name %s, size %u, mode %s", pipename, psize,
 		    (pipe_mode & PIPE_TYPE_MESSAGE)
 		    ? "PIPE_TYPE_MESSAGE" : "PIPE_TYPE_BYTE");
 
@@ -252,8 +255,7 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
 	 a waste, since only a single direction is actually used.
 	 It's important to only allow a single instance, to ensure that
 	 the pipe was not created earlier by some other process, even if
-	 the pid has been reused.  We avoid FILE_FLAG_FIRST_PIPE_INSTANCE
-	 because that is only available for Win2k SP2 and WinXP.
+	 the pid has been reused.
 
 	 Note that the write side of the pipe is opened as PIPE_TYPE_MESSAGE.
 	 This *seems* to more closely mimic Linux pipe behavior and is
@@ -361,7 +363,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
       res = 0;
     }
 
-  debug_printf ("%R = pipe([%p, %p], %d, %p)", res, fhs[0], fhs[1], psize, mode);
+  debug_printf ("%R = pipe([%p, %p], %d, %y)", res, fhs[0], fhs[1], psize, mode);
   return res;
 }
 
@@ -433,7 +435,7 @@ _pipe (int filedes[2], unsigned int psize, int mode)
       read = filedes[0];
       write = filedes[1];
     }
-  syscall_printf ("%R = _pipe([%d, %d], %u, %p)", res, read, write, psize, mode);
+  syscall_printf ("%R = _pipe([%d, %d], %u, %y)", res, read, write, psize, mode);
   return res;
 }
 
@@ -465,6 +467,6 @@ pipe2 (int filedes[2], int mode)
       read = filedes[0];
       write = filedes[1];
     }
-  syscall_printf ("%R = pipe2([%d, %d], %p)", res, read, write, mode);
+  syscall_printf ("%R = pipe2([%d, %d], %y)", res, read, write, mode);
   return res;
 }

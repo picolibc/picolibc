@@ -126,15 +126,15 @@ fhandler_virtual::closedir (DIR * dir)
   return 0;
 }
 
-_off64_t
-fhandler_virtual::lseek (_off64_t offset, int whence)
+off_t
+fhandler_virtual::lseek (off_t offset, int whence)
 {
   /*
    * On Linux, when you lseek within a /proc file,
    * the contents of the file are updated.
    */
   if (!fill_filebuf ())
-    return (_off64_t) -1;
+    return (off_t) -1;
   switch (whence)
     {
     case SEEK_SET:
@@ -148,7 +148,7 @@ fhandler_virtual::lseek (_off64_t offset, int whence)
       break;
     default:
       set_errno (EINVAL);
-      return (_off64_t) -1;
+      return (off_t) -1;
     }
   return position;
 }
@@ -246,7 +246,7 @@ fhandler_virtual::fchmod (mode_t mode)
 }
 
 int
-fhandler_virtual::fchown (__uid32_t uid, __gid32_t gid)
+fhandler_virtual::fchown (uid_t uid, gid_t gid)
 {
   /* Same as on Linux. */
   set_errno (EPERM);
@@ -254,7 +254,7 @@ fhandler_virtual::fchown (__uid32_t uid, __gid32_t gid)
 }
 
 int
-fhandler_virtual::facl (int cmd, int nentries, __aclent32_t *aclbufp)
+fhandler_virtual::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
   int res = fhandler_base::facl (cmd, nentries, aclbufp);
   if (res >= 0 && cmd == GETACL)

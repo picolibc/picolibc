@@ -1,7 +1,7 @@
 /* resource.cc: getrusage () and friends.
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2010,
-   2011 Red Hat, Inc.
+   2011, 2012 Red Hat, Inc.
 
    Written by Steve Chamberlain (sac@cygnus.com), Doug Evans (dje@cygnus.com),
    Geoffrey Noer (noer@cygnus.com) of Cygnus Support.
@@ -137,9 +137,9 @@ getrlimit (int resource, struct rlimit *rlp)
 	debug_printf ("couldn't get stack info, returning def.values. %E");
       else
 	{
-	  rlp->rlim_cur = (DWORD) &m - (DWORD) m.AllocationBase;
-	  rlp->rlim_max = (DWORD) m.BaseAddress + m.RegionSize
-			  - (DWORD) m.AllocationBase;
+	  rlp->rlim_cur = (rlim_t) &m - (rlim_t) m.AllocationBase;
+	  rlp->rlim_max = (rlim_t) m.BaseAddress + m.RegionSize
+			  - (rlim_t) m.AllocationBase;
 	}
       break;
     case RLIMIT_NOFILE:

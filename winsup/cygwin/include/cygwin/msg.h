@@ -1,6 +1,6 @@
 /* sys/msg.h
 
-   Copyright 2002 Red Hat Inc.
+   Copyright 2002, 2012, 2013 Red Hat Inc.
    Written by Conrad Scott <conrad.scott@dsl.pipex.com>
 
 This file is part of Cygwin.
@@ -32,11 +32,11 @@ extern "C"
 
 /* Used for the number of messages in the message queue.
  */
-typedef unsigned long msgqnum_t;
+typedef uint32_t msgqnum_t;
 
 /* Used for the number of bytes allowed in a message queue.
  */
-typedef unsigned long msglen_t;
+typedef uint32_t msglen_t;
 
 struct msqid_ds
 {
@@ -66,27 +66,27 @@ struct msqid_ds
  */
 struct msginfo
 {
-  long msgmax;		/* Maximum number of bytes per
+  int32_t msgmax;	/* Maximum number of bytes per
 			   message. */
-  long msgmnb;		/* Maximum number of bytes on any one
+  int32_t msgmnb;	/* Maximum number of bytes on any one
 			   message queue. */
-  long msgmni;		/* Maximum number of message queues,
+  int32_t msgmni;	/* Maximum number of message queues,
 			   system wide. */
-  long msgtql;		/* Maximum number of messages, system
+  int32_t msgtql;	/* Maximum number of messages, system
 			   wide. */
-  long msgssz;		/* Size of a message segment, must be
+  int32_t msgssz;	/* Size of a message segment, must be
 			   small power of 2 greater than 4. */
-  long msgseg;		/* Number of message segments */
-  long msg_spare[2];
+  int32_t msgseg;	/* Number of message segments */
+  int32_t msg_spare[2];
 };
 
 /* Buffer type for msgctl (MSG_INFO, ...) as used by ipcs(8).
  */
 struct msg_info
 {
-  long msg_ids;		/* Number of allocated queues. */
-  long msg_num;		/* Number of messages, system wide. */
-  long msg_tot;		/* Size in bytes of messages, system wide. */
+  int32_t msg_ids;		/* Number of allocated queues. */
+  int32_t msg_num;		/* Number of messages, system wide. */
+  int32_t msg_tot;		/* Size in bytes of messages, system wide. */
 };
 #endif /* _KERNEL */
 

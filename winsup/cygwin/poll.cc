@@ -9,8 +9,6 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#define  __INSIDE_CYGWIN_NET__
-
 #define FD_SETSIZE 16384		// lots of fds
 #include "winsup.h"
 #include <sys/poll.h>

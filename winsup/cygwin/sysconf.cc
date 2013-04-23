@@ -1,7 +1,7 @@
 /* sysconf.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -47,7 +47,7 @@ get_nproc_values (int in)
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      debug_printf ("NtQuerySystemInformation: status %p, %E", status);
+      debug_printf ("NtQuerySystemInformation: status %y, %E", status);
       return -1;
     }
   switch (in)
@@ -81,7 +81,7 @@ get_avphys (int in)
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      debug_printf ("NtQuerySystemInformation: status %d, %E", status);
+      debug_printf ("NtQuerySystemInformation: status %y, %E", status);
       return -1;
     }
   return spi.AvailablePages
@@ -192,10 +192,10 @@ static struct
   {nsup, {c:0}},			/*  89, _SC_TRACE_SYS_MAX */
   {nsup, {c:0}},			/*  90, _SC_TRACE_USER_EVENT_MAX */
   {cons, {c:-1L}},			/*  91, _SC_TYPED_MEMORY_OBJECTS */
-  {cons, {c:-1L}},			/*  92, _SC_V6_ILP32_OFF32 */
+  {cons, {c:_POSIX_V6_ILP32_OFF32}},	/*  92, _SC_V6_ILP32_OFF32 */
   {cons, {c:_POSIX_V6_ILP32_OFFBIG}},	/*  93, _SC_V6_ILP32_OFFBIG */
-  {cons, {c:-1L}},			/*  94, _SC_V6_LP64_OFF64 */
-  {cons, {c:-1L}},			/*  95, _SC_V6_LPBIG_OFFBIG */
+  {cons, {c:_POSIX_V6_LP64_OFF64}},	/*  94, _SC_V6_LP64_OFF64 */
+  {cons, {c:_POSIX_V6_LPBIG_OFFBIG}},	/*  95, _SC_V6_LPBIG_OFFBIG */
   {cons, {c:_XOPEN_CRYPT}},		/*  96, _SC_XOPEN_CRYPT */
   {cons, {c:_XOPEN_ENH_I18N}},		/*  97, _SC_XOPEN_ENH_I18N */
   {cons, {c:-1L}},			/*  98, _SC_XOPEN_LEGACY */
@@ -266,6 +266,21 @@ static struct
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LDFLAGS */
   {0, NULL},				/* _CS_POSIX_V6_ILP32_OFF32_LIBS */
   {0, NULL},				/* _CS_XBS5_ILP32_OFF32_LINTFLAGS */
+#ifdef __x86_64__
+  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS */
+  {0, NULL},				/* _CS_POSIX_V6_ILP32_OFFBIG_LIBS */
+  {0, NULL},				/* _CS_XBS5_ILP32_OFFBIG_LINTFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LP64_OFF64_CFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LP64_OFF64_LDFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LP64_OFF64_LIBS */
+  {ls ("")},				/* _CS_XBS5_LP64_OFF64_LINTFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS */
+  {ls ("")},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LIBS */
+  {ls ("")},				/* _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS */
+  {ls ("POSIX_V6_LP64_OFF64")},		/* _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS */
+#else
   {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS */
   {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS */
   {ls ("")},				/* _CS_POSIX_V6_ILP32_OFFBIG_LIBS */
@@ -279,6 +294,7 @@ static struct
   {0, NULL},				/* _CS_POSIX_V6_LPBIG_OFFBIG_LIBS */
   {0, NULL},				/* _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS */
   {ls ("POSIX_V6_ILP32_OFFBIG")},	/* _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS */
+#endif
   {ls ("")},				/* _CS_POSIX_V7_THREADS_CFLAGS */
   {ls ("")},				/* _CS_POSIX_V7_THREADS_LDFLAGS */
   {ls ("POSIXLY_CORRECT=1")},		/* _CS_V7_ENV */
@@ -336,8 +352,8 @@ sysinfo (struct sysinfo *info)
   MEMORYSTATUSEX memory_status;
   PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
   ULONG sizeof_spi = 512;
-  PSYSTEM_TIME_OF_DAY_INFORMATION stodi = NULL;
-  const ULONG sizeof_stodi = sizeof (SYSTEM_TIME_OF_DAY_INFORMATION);
+  PSYSTEM_TIMEOFDAY_INFORMATION stodi = NULL;
+  const ULONG sizeof_stodi = sizeof (SYSTEM_TIMEOFDAY_INFORMATION);
   NTSTATUS status = STATUS_SUCCESS;
   winpids pids ((DWORD) 0);
 
@@ -347,7 +363,7 @@ sysinfo (struct sysinfo *info)
       return -1;
     }
 
-  stodi = (PSYSTEM_TIME_OF_DAY_INFORMATION) malloc (sizeof_stodi);
+  stodi = (PSYSTEM_TIMEOFDAY_INFORMATION) malloc (sizeof_stodi);
   status = NtQuerySystemInformation (SystemTimeOfDayInformation, (PVOID) stodi,
 				     sizeof_stodi, NULL);
   if (NT_SUCCESS (status))
@@ -355,7 +371,7 @@ sysinfo (struct sysinfo *info)
 	     / 10000000ULL;
   else
     debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
-		  "status %p", status);
+		  "status %y", status);
 
   if (stodi)
     free (stodi);
@@ -383,7 +399,7 @@ sysinfo (struct sysinfo *info)
   if (!spi || !NT_SUCCESS (status))
     {
       debug_printf ("NtQuerySystemInformation(SystemPagefileInformation), "
-		    "status %p", status);
+		    "status %y", status);
       totalswap = (memory_status.ullTotalPageFile - memory_status.ullTotalPhys)
 		  / wincap.page_size ();
       freeswap = (memory_status.ullAvailPageFile - memory_status.ullTotalPhys)

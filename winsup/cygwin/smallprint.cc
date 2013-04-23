@@ -1,7 +1,7 @@
 /* smallprint.cc: small print routines for WIN32
 
    Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006,
-	     2007, 2008, 2009, 2012
+	     2007, 2008, 2009, 2012, 2013
    Red Hat, Inc.
 
 This file is part of Cygwin.
@@ -20,8 +20,8 @@ details. */
 #define LLMASK	(0xffffffffffffffffULL)
 #define LMASK	(0xffffffff)
 
-#define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, long), len, pad, LMASK)
-#define rnargLL(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, unsigned long long), len, pad, LLMASK)
+#define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, int32_t), len, pad, LMASK)
+#define rnargLL(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, uint64_t), len, pad, LLMASK)
 
 static const char hex_str[] = "0123456789ABCDEF";
 
@@ -92,6 +92,40 @@ __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned
   return dst;
 }
 
+/*
+  Meaning of format conversion specifiers.  If 'l' isn't explicitely mentioned,
+  it's ignored!
+
+   c       char
+   C       WCHAR/wchar_t
+   d       signed int, 4 byte
+  ld       signed long, 4 byte on 32 bit, 8 byte on 64 bit
+   D       signed long long, 8 byte
+   E       GetLastError
+   o       octal unsigned int, 4 byte
+  lo       octal unsigned long, 4 byte on 32 bit, 8 byte on 64 bit
+   O       octal unsigned long long, 8 byte
+   p       address
+   P       process name
+   R       return value, 4 byte.
+  lR       return value, 4 byte on 32 bit, 8 byte on 64 bit.
+   s       char *
+  ls       char * w/ non-ASCII tweaking
+   S       PUNICODE_STRING
+  lS       PUNICODE_STRING w/ non-ASCII tweaking
+   u       unsigned int, 4 byte
+  lu       unsigned long, 4 byte on 32 bit, 8 byte on 64 bit
+   U       unsigned long long, 8 byte
+   W       PWCHAR/wchar_t *
+  lW       PWCHAR/wchar_t * w/ non-ASCII tweaking
+   x       hex unsigned int, 4 byte
+  lx       hex unsigned long, 4 byte on 32 bit, 8 byte on 64 bit
+   X       hex unsigned long long, 8 byte
+   y       0x hex unsigned int, 4 byte
+  ly       0x hex unsigned long, 4 byte on 32 bit, 8 byte on 64 bit
+   Y       0x hex unsigned long long, 8 byte
+*/
+
 int
 __small_vsprintf (char *dst, const char *fmt, va_list ap)
 {
@@ -100,10 +134,11 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
   const char *s;
   PWCHAR w;
   UNICODE_STRING uw, *us;
+  int base = 0;
 
   DWORD err = GetLastError ();
 
-  long Rval = 0;
+  intptr_t Rval = 0;
   while (*fmt)
     {
       int i, n = 0x7fff;
@@ -171,35 +206,82 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  dst = __rn (dst + sizeof ("Win32 error"), 10, 0, err, len, pad, LMASK);
 		  break;
 		case 'R':
-		case 'd':
 		  {
-		    long val = va_arg (ap, long);
-		    dst = __rn (dst, 10, addsign, val, len, pad, LMASK);
-		    if (c == 'R')
-		      Rval = val;
+#ifdef __x86_64__
+		    if (l_opt)
+		      Rval = va_arg (ap, int64_t);
+		    else
+#endif
+		      Rval = va_arg (ap, int32_t);
+		    dst = __rn (dst, 10, addsign, Rval, len, pad, LMASK);
 		  }
 		  break;
-		case 'D':
-		  dst = rnargLL (dst, 10, addsign, len, pad);
-		  break;
+		case 'd':
+		  base = 10;
+#ifdef __x86_64__
+		  if (l_opt)
+		    goto gen_decimalLL;
+#endif
+		  goto gen_decimal;
 		case 'u':
-		  dst = rnarg (dst, 10, 0, len, pad);
-		  break;
-		case 'U':
-		  dst = rnargLL (dst, 10, 0, len, pad);
-		  break;
+		  base = 10;
+		  addsign = 0;
+#ifdef __x86_64__
+		  if (l_opt)
+		    goto gen_decimalLL;
+#endif
+		  goto gen_decimal;
 		case 'o':
-		  dst = rnarg (dst, 8, 0, len, pad);
+		  base = 8;
+		  addsign = 0;
+#ifdef __x86_64__
+		  if (l_opt)
+		    goto gen_decimalLL;
+#endif
+		  goto gen_decimal;
+		case 'y':
+		  *dst++ = '0';
+		  *dst++ = 'x';
+		  /*FALLTHRU*/
+		case 'x':
+		  base = 16;
+		  addsign = 0;
+#ifdef __x86_64__
+		  if (l_opt)
+		    goto gen_decimalLL;
+#endif
+gen_decimal:
+		  dst = rnarg (dst, base, addsign, len, pad);
+		  break;
+		case 'D':
+		  base = 10;
+		  goto gen_decimalLL;
+		case 'U':
+		  base = 10;
+		  addsign = 0;
+		  goto gen_decimalLL;
+		case 'O':
+		  base = 8;
+		  addsign = 0;
+		  goto gen_decimalLL;
+		case 'Y':
+		  *dst++ = '0';
+		  *dst++ = 'x';
+		  /*FALLTHRU*/
+		case 'X':
+		  base = 16;
+		  addsign = 0;
+gen_decimalLL:
+		  dst = rnargLL (dst, base, addsign, len, pad);
 		  break;
 		case 'p':
 		  *dst++ = '0';
 		  *dst++ = 'x';
-		  /* fall through */
-		case 'x':
-		  dst = rnarg (dst, 16, 0, len, pad);
-		  break;
-		case 'X':
+#ifdef __x86_64__
 		  dst = rnargLL (dst, 16, 0, len, pad);
+#else
+		  dst = rnarg (dst, 16, 0, len, pad);
+#endif
 		  break;
 		case 'P':
 		  if (!GetModuleFileName (NULL, tmp, NT_MAX_PATH))
@@ -273,8 +355,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
     }
   if (Rval < 0)
     {
-      strcpy (dst, ", errno ");
-      dst += strlen (", errno ");
+      dst = stpcpy (dst, ", errno ");
       dst = __rn (dst, 10, false, get_errno (), 0, 0, LMASK);
     }
   *dst = 0;
@@ -395,12 +476,15 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
   const char *s;
   PWCHAR w;
   UNICODE_STRING uw, *us;
+  int base = 0;
 
   DWORD err = GetLastError ();
 
+  intptr_t Rval = 0;
   while (*fmt)
     {
       unsigned int n = 0x7fff;
+      bool l_opt = false;
       if (*fmt != L'%')
 	*dst++ = *fmt++;
       else
@@ -435,6 +519,7 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 		  len = len * 10 + (c - L'0');
 		  continue;
 		case L'l':
+		  l_opt = true;
 		  continue;
 		case L'c':
 		case L'C':
@@ -444,30 +529,83 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 		  wcscpy (dst, L"Win32 error ");
 		  dst = __wrn (dst + sizeof ("Win32 error"), 10, 0, err, len, pad, LMASK);
 		  break;
+		case 'R':
+		  {
+#ifdef __x86_64__
+		    if (l_opt)
+		      Rval = va_arg (ap, int64_t);
+		    else
+#endif
+		      Rval = va_arg (ap, int32_t);
+		    dst = __wrn (dst, 10, addsign, Rval, len, pad, LMASK);
+		  }
+		  break;
 		case L'd':
-		  dst = wrnarg (dst, 10, addsign, len, pad);
+		  base = 10;
+#ifdef __x86_64__
+		  if (l_opt)
+		    goto gen_decimalLL;
+#endif
+		  goto gen_decimal;
+		case 'u':
+		  base = 10;
+		  addsign = 0;
+#ifdef __x86_64__
+		  if (l_opt)
+		    goto gen_decimalLL;
+#endif
+		  goto gen_decimal;
+		case 'o':
+		  base = 8;
+		  addsign = 0;
+#ifdef __x86_64__
+		  if (l_opt)
+		    goto gen_decimalLL;
+#endif
+		  goto gen_decimal;
+		case 'y':
+		  *dst++ = '0';
+		  *dst++ = 'x';
+		  /*FALLTHRU*/
+		case 'x':
+		  base = 16;
+		  addsign = 0;
+#ifdef __x86_64__
+		  if (l_opt)
+		    goto gen_decimalLL;
+#endif
+gen_decimal:
+		  dst = wrnarg (dst, base, addsign, len, pad);
 		  break;
-		case L'D':
-		  dst = wrnargLL (dst, 10, addsign, len, pad);
-		  break;
-		case L'u':
-		  dst = wrnarg (dst, 10, 0, len, pad);
-		  break;
-		case L'U':
-		  dst = wrnargLL (dst, 10, 0, len, pad);
-		  break;
-		case L'o':
-		  dst = wrnarg (dst, 8, 0, len, pad);
+		case 'D':
+		  base = 10;
+		  goto gen_decimalLL;
+		case 'U':
+		  base = 10;
+		  addsign = 0;
+		  goto gen_decimalLL;
+		case 'O':
+		  base = 8;
+		  addsign = 0;
+		  goto gen_decimalLL;
+		case 'Y':
+		  *dst++ = '0';
+		  *dst++ = 'x';
+		  /*FALLTHRU*/
+		case 'X':
+		  base = 16;
+		  addsign = 0;
+gen_decimalLL:
+		  dst = wrnargLL (dst, base, addsign, len, pad);
 		  break;
 		case L'p':
 		  *dst++ = L'0';
 		  *dst++ = L'x';
-		  /* fall through */
-		case L'x':
-		  dst = wrnarg (dst, 16, 0, len, pad);
-		  break;
-		case L'X':
+#ifdef __x86_64__
 		  dst = wrnargLL (dst, 16, 0, len, pad);
+#else
+		  dst = wrnarg (dst, 16, 0, len, pad);
+#endif
 		  break;
 		case L'P':
 		  if (!GetModuleFileNameW (NULL, tmp, NT_MAX_PATH))
@@ -510,6 +648,11 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 	      break;
 	    }
 	}
+    }
+  if (Rval < 0)     
+    {
+      dst = wcpcpy (dst, L", errno ");
+      dst = __wrn (dst, 10, false, get_errno (), 0, 0, LMASK);
     }
   *dst = L'\0';
   SetLastError (err);

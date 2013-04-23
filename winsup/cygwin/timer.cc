@@ -1,7 +1,6 @@
 /* timer.cc
 
-   Copyright 2004, 2005, 2006, 2008, 2010, 2011
-   Red Hat, Inc.
+   Copyright 2004, 2005, 2006, 2008, 2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -125,7 +124,7 @@ timer_thread (VOID *x)
   while (1)
     {
       long long sleep_us;
-      long sleep_ms;
+      LONG sleep_ms;
       /* Account for delays in starting thread
 	and sending the signal */
       now = gtod.usecs ();
@@ -449,7 +448,7 @@ alarm (unsigned int seconds)
  newt.it_value.tv_sec = seconds;
  timer_settime ((timer_t) &ttstart, 0, &newt, &oldt);
  int ret = oldt.it_value.tv_sec + (oldt.it_value.tv_nsec > 0);
- syscall_printf ("%d = alarm(%d)", ret, seconds);
+ syscall_printf ("%d = alarm(%u)", ret, seconds);
  return ret;
 }
 
@@ -461,16 +460,16 @@ ualarm (useconds_t value, useconds_t interval)
     Interpret negative arguments as zero */
  if (value > 0)
    {
-     timer.it_value.tv_sec = (unsigned int) value / 1000000;
-     timer.it_value.tv_nsec = ((unsigned int) value % 1000000) * 1000;
+     timer.it_value.tv_sec = value / 1000000;
+     timer.it_value.tv_nsec = (value % 1000000) * 1000;
    }
  if (interval > 0)
    {
-     timer.it_interval.tv_sec = (unsigned int) interval / 1000000;
-     timer.it_interval.tv_nsec = ((unsigned int) interval % 1000000) * 1000;
+     timer.it_interval.tv_sec = interval / 1000000;
+     timer.it_interval.tv_nsec = (interval % 1000000) * 1000;
    }
  timer_settime ((timer_t) &ttstart, 0, &timer, &otimer);
  useconds_t ret = otimer.it_value.tv_sec * 1000000 + (otimer.it_value.tv_nsec + 999) / 1000;
- syscall_printf ("%d = ualarm(%d , %d)", ret, value, interval);
+ syscall_printf ("%d = ualarm(%ld , %ld)", ret, value, interval);
  return ret;
 }

@@ -1,3 +1,7 @@
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Merge in cygwin-64bit-branch.  See ChangeLog.64bit for details.
+
 2013-04-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/queue.h: Delete in favor of more complete newlib file.

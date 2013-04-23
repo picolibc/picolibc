@@ -69,7 +69,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       w->rusage = r;
       sigproc_printf ("calling proc_subproc, pid %d, options %d",
 		      w->pid, w->options);
-      if (!proc_subproc (PROC_WAIT, (DWORD) w))
+      if (!proc_subproc (PROC_WAIT, (uintptr_t) w))
 	{
 	  set_errno (ENOSYS);
 	  paranoid_printf ("proc_subproc returned 0");
@@ -110,7 +110,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       break;
     }
 
-  syscall_printf ("%R = wait4(%d, %p, %d, %p)", res, intpid, w->status, options, r);
+  syscall_printf ("%R = wait4(%d, %y, %d, %p)", res, intpid, w->status, options, r);
   w->status = -1;
   return res;
 }

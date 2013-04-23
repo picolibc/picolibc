@@ -1,0 +1,1877 @@
+2013-04-21  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* include/stdint.h (INTPTR_MAX): Fix missing parenthesis.
+
+2013-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_pty_slave::write): Change type of towrite to
+	ssize_t.
+	(fhandler_pty_slave::read): Ditto for totalread.
+
+2013-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (fdsock): Raise send/recv buffer sizes for x86_64.  Extend
+	comment.
+	(cygwin_setsockopt): Fix condition and syscall_printf.
+
+2013-04-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base_overlapped::wait_overlapped): Fix typo in
+	debug_printf.
+	(fhandler_base_overlapped::raw_read): Handle size difference between
+	DWORD and {s}size_t platform-independently.
+	(fhandler_base_overlapped::raw_write): Ditto.  Fix typo in comment.
+
+2013-04-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Reinstantiate ptmalloc3.
+	* configure.ac (MALLOC_OFILES): Drop here.
+	* configure: Regenerate.
+	* Makefile.in (MALLOC_OFILES): Set to fixed value here.
+	* cygmalloc.h (HAVE_MORECORE): Define.
+	* malloc.cc (init_user_mstate): Don't disable MORECORE if building
+	with ONLY_MSPACES.
+
+2013-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (MINIMAL_WIN_NTFS_FLAGS): Fix comment.
+
+2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Throughout fix -Wextra warnings.  Ignore regex files and gmon.c.
+
+2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::send_internal): Change type of
+	local variable res to ssize_t.
+	* net.cc (cygwin_sendto): Fix local variable res, containing return
+	value, to be ssize_t as well.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	(cygwin_recvmsg): Ditto.
+	(cygwin_sendmsg): Ditto.
+	* syscalls.cc (write): Ditto.
+	(writev): Ditto.
+	* pipe.cc (fhandler_pipe::open): Fix type when reading handle value to
+	accommodate 32 bit compiler.
+
+2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
+	
+	* fhandler_socket.cc (fhandler_socket::get_proc_fd_name): Use %lu as
+	format specifier to match HANDLE size.
+	* net.cc (cygwin_sendto): Fix return type to be ssize_t.  Change
+	syscall_printf return type format specifier to %lR.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	(cygwin_recvmsg): Ditto.
+	(cygwin_sendmsg): Ditto.
+	* smallprint.cc (__small_vsprintf): Handle `l' for %R, too.
+	(__small_vswprintf): Ditto.
+	* syscalls.cc (read): Change syscall_printf return type format specifier
+	to %lR.
+	(readv): Ditto.
+	(pread): Ditto.
+	(write): Ditto.
+	(writev): Ditto.
+	(pwrite): Ditto.
+	(lseek64): Enhance comment.
+
+2013-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pipe.cc (fhandler_pipe::open): Fix format specifier and type when
+	reading handle value.
+	(fhandler_pipe::get_proc_fd_name): Use same format specifier as in
+	fhandler_pipe::open.
+
+2013-04-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (_csbrk): Move down in file, right in front of _cmalloc.
+
+2013-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (struct _cmalloc_entry): Define b as unsigned rather than
+	DWORD.
+	(NBUCKETS): Define here as constant value.
+	(struct init_cygheap): Add bucket_val member.  Define size of bucket_val
+	and buckets using NBUCKETS.
+	* cygheap.cc (NBUCKETS): Drop definition here.
+	(cygheap_init): Initialize cygheap->bucket_val.  Add comment to explain
+	what we do and why.
+	(_cmalloc): Simplify bit bucket search using cygheap->bucket_val.  Drop
+	local variable sz.  Fetch size of block from cygheap->bucket_val.
+	(_cfree): Define b as unsigned.
+	(_crealloc): Fetch size of block from cygheap->bucket_val.
+
+2013-04-02  Алексей Павлов <alexpux@gmail.com>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::ftruncate): Add missed
+	ampersand.
+
+2013-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* lc_msg.h: Regenerate from F18 glibc 2.16-28.  In the first place this
+	fixes fi_FI and adds ta_LK (new in Windows 8).
+	* nlsfuncs.cc (LocaleNameToLCID): Drop unneeded declaration.
+
+2013-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Drop old comment.
+	* hookapi.cc (PEHeaderFromHModule): Return PIMAGE_NT_HEADERS.
+	(rvadelta): Convert to function and merge in rvadelta_get.
+	(remap): New function to have code for remapping big executables
+	only once.
+	(find_first_notloaded_dll): Simplify.  Don't handle different
+	architecture at all.  Call remap.
+	(hook_or_detect_cygwin): Ditto.
+
+2013-03-28  Kai Tietz  <ktietz@redhat.com>
+
+	* include/cygwin/config.h (___getreent): Harden against aggressive
+	compiler optimization.
+
+2013-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin64.din: Reinstantiate definition of __srget and __srget_r.
+
+2013-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in ($(LIB_NAME)): Make sure to rebuild when cygwin.def file
+	has been changed.
+	* cygwin64.din: Remove more underscored symbols.
+	(getdelim): Add missing define in favor of unneeded __getline.
+	(getline): Ditto.
+
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_console.cc
+	(fhandler_console::create_invisible_console_workaround): Fix comment.
+	* wincap.cc: Throughout, remove unused has_console_handle_problem
+	wincapc members.
+	* wincap.h (struct wincaps): Remove has_console_handle_problem.
+
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_gethostbyname): Revert accidental checkin of change
+	added for debugging.
+
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (struct win64_servent): Define for x86_64.  Explain why.
+	(WIN_SERVENT): Define for all targets.
+	(dup_ent): Use WIN_SERVENT to access critical servent members
+	throughout.
+
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysconf.cc (sca): Change build environment values according to
+	architecture.
+	(csa): Ditto.
+
+2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (STATUS_NETWORK_OPEN_RESTRICTION): Define.
+	(STATUS_SYMLINK_CLASS_DISABLED): Define.
+	* path.cc (symlink_info::check): Handle STATUS_NETWORK_OPEN_RESTRICTION
+	and STATUS_SYMLINK_CLASS_DISABLED status codes.  Explain why.
+
+2013-03-22  Kai Tietz  <ktietz@redhat.com>
+
+	* gendef: Use pause instead of calling yield throughout in x86_64 code.
+
+2013-03-20  Ken Brown  <kbrown@cornell.edu>
+
+	* include/sys/resource.h (RLIM_INFINITY): Define wordsize agnostic.
+
+2013-03-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* lib/_cygwin_crt0_common.cc: Fix mangled operator new names for x86_64.
+
+2013-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (stack_info::init): Don't attempt to dereference NULL
+	framep.
+	(exception::handle): On x86_64, if Rbp is NULL, use Rsp as frame
+	pointer.
+
+2013-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (sigdelayed): Make sure to align the stack since sigdelayed
+	can be called with or without aligned stack.  Save and restore all
+	CPU registers.
+
+2013-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc.in: Fix comment.
+	* dcrt0.cc (child_info_fork::handle_fork): Revert patch from 2013-03-15.
+
+2013-03-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin64.din (strlwr): Export.
+
+2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Revert previous patch.  For some reason perl doesn't like it.
+
+2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (CYGTLS_PADSIZE): Reduce to 8000 on x86_64.
+	* tlsoffsets64.h: Regenerate.
+
+2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (child_info_fork::handle_fork): Call
+	_pei386_runtime_relocator first thing, before copying parent data and
+	bss segment.  Tweak comment to explain why.
+
+2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (_sigfe): 16-byte align xmm0 storage and use movdqa.
+	(_sigbe): Fix alignment before calling yield.  Use movdqa to save and
+	restore xmm0.
+	(sigdelayed): Use movdqa to save and restore xmm0.
+	(_ZN7_cygtls4lockEv): Change absolute values to hex.
+	(stabilize_sig_stack): Ditto.
+	(setjmp): Add comment to explain usage of movdqu.
+	(__sjfault): Ditto.
+	(__ljfault): Ditto.
+	(longjmp): Ditto. Access return value using 32 bit opcodes only.
+	* miscfuncs.cc (thread_wrapper): Don't attempt to copy exception
+	handler list on x86_64.
+
+2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (.#dllname_info): Call _std_dll_init on x86_64 bit, too.
+	(INIT_WRAPPER): Change to accommodate the change of the init functions
+	from sysv_abit to ms_abi.  Fix preceeding comment accordingly.  Add
+	SEH information and comments.
+	(std_dll_init): Drop leading underscore on x86_64.  Drop sysv_abi
+	comment.
+	(wsock_init): Ditto.
+	(LoadDLLprime): Drop surrounding ifdef to accommodate above underscore
+	juggling.
+
+2013-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (_sigfe): Save float arguments as well before calling yield.
+	(_sigbe): Move saving %rax from prologue to just before the yield call.
+	Save %xmm0 register, too.
+	(sigdelayed): Add comment.  Save %xmm0 register, too, before calling
+	yield.
+
+2013-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_pty_master::setup): Add
+	PIPE_REJECT_REMOTE_CLIENTS to pipe mode on systems supporting it.  Add
+	FILE_FLAG_FIRST_PIPE_INSTANCE to pipe open mode.
+	* pipe.cc (fhandler_pipe::create): Ditto.  Fix subsequent comment
+	accordingly.
+	* wincap.h (wincaps::has_pipe_reject_remote_clients): New element.
+	* wincap.cc: Implement above element throughout.
+	* winlean.h (PIPE_REJECT_REMOTE_CLIENTS): Temporarily define until
+	Mingw64 headers define it.
+
+2013-03-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	Remove more old cruft.  Remove Windows NT4 and 2000 from comments
+	throughout, unless it still makes sense.
+	* dlfcn.cc (dlopen): Drop W2K-only code to make loaded DLL persistent.
+	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Drop code
+	trying to use information from NtQueryVolumeInformationFile.
+	* fhandler_socket.cc (fhandler_socket::close): Drop code snippet
+	disabled since 2008.
+	* mount.cc (MINIMAL_WIN_NTFS_FLAGS): Add flag values set on all
+	NTFS since Windows XP.
+	(get_volume_path_names_for_volume_name): Remove.
+	(dos_drive_mappings::dos_drive_mappings): Call Win32 function
+	GetVolumePathNamesForVolumeNameW directly.
+	* path.cc (file_get_fnoi): Drop test for NT4-only return code.
+	* sched.cc: Add FIXME to global comment.  Reformat comments throughout.
+	* spawn.cc (child_info_spawn::worker): Just call official IsProcessInJob
+	function rather than to test undocumented TEB member.
+	* winlean.h: Drop Mingw32-related defines.
+	* include/limits.h (PTHREAD_KEYS_MAX): Raise value to reflect minimum
+	value available on XP and later.
+
+2013-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Revert to old malloc.
+	* mmap.cc (MMAP_STORAGE_LOW): Set higher.  Add comment.
+	(MMAP_STORAGE_HIGH): Add comment.
+	(class mmap_allocator): Change comment.  Add mmap_current_low member.
+	(mmap_allocator::mmap_allocator): Define default constructor.
+	(mmap_allocator::alloc): Change to a round-robin mechanism.  Add or
+	change comments accordingly.
+
+2013-03-13  Kai Tietz  <ktietz@redhat.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (_sigfe): Save arguments before calling yield so they don't
+	get clobbered.  Explain why.
+
+2013-03-12  Ken Brown  <kbrown@cornell.edu>
+
+	* include/a.out.h: Fix up for x86_64.
+
+2013-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprint.cc (rnarg): Fix cast to print negative values correctly.
+
+2013-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::raw_read): Replace accidentally left in
+	Win32 error codes with equivalent status codes.
+
+2013-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygmalloc.h: Include regparm.h rather than defining __reg{1,2,3} here.
+	* ptmalloc3.cc (__malloc_initialized): Define as type LONG on Cygwin
+	and include windows.h.
+	(ptmalloc_init): Set __malloc_initialized on Cygwin using
+	InterlockedCompareExchange and carefully check for concurrency
+	situation.
+
+2013-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef: Add SEH information to sigfe entry points, as well as to
+	_sigfe and _sigbe.
+
+2013-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* heap.cc (heap_init): Fix setting reserved_size value when using
+	ptmalloc3 to avoid too much pagefile pressure at fork time.
+
+2013-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	For x86_64 target:
+	* dll_init.cc (dll::init): Don't set p.envptr.
+	(update_envptrs): Disable entirely.
+	* dll_init.h (struct per_module): Disable envptr.
+	* environ.h (update_envptrs): Change to empty macro.
+
+2013-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	For x86_64 target:
+	* Makefile.in (COMMON_CFLAGS): Add -mcmodel=small to create smaller
+	footprint.
+	* cygwin64.din (__cygwin_environ): Drop export.  Only export environ
+	as alias to __cygwin_environ.
+	* dcrt0.cc (dll_crt0_1): Call main with __cygwin_environ as parameter.
+	(_dll_crt0): Don't set main_environ.
+	(cygwin_dll_init): Don't create local variable envp and don't set
+	user_data->envptr.
+	* dll_init.cc (dll_list::alloc): Don't assert.
+	* dll_init.h (per_module::operator =): Don't set envptr.
+	* environ.cc (cur_environ): Disable.
+	* environ.h (main_environ): Don't define.
+	(cur_environ): Change to macro.
+	* globals.cc (main_environ): Don't initialize.
+	(struct per_process): Drop envptr.
+	* perprocess.h (SIZEOF_PER_PROCESS): Set to 41*8 to accommodate size
+	change of struct per_process.
+	* include/sys/cygwin.h (struct per_process): Drop envptr.
+	* lib/_cygwin_crt0_common.cc (environ): Drop declaration.
+	(_cygwin_crt0_common): Don't set u->envptr.
+
+2013-03-04  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygwin64.din: Fix mangled operator new names for size_t==long.
+	* libstdcxx_wrapper.cc: Ditto for x86_64.
+
+2013-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (AttachConsole): Remove.
+	(GetModuleHandleExW): Remove.
+	(GetSystemWow64DirectoryW): Remove.
+	(GetVolumePathNamesForVolumeNameW): Remove.
+	* exceptions.cc (cygwin_stackdump): Always call RtlCaptureContext.
+	(exception::handle): Drop accidentally left in debugging statement.
+	Always call RtlCaptureContext.
+	(sigpacket::process): Always call RtlCaptureContext for current thread.
+	* fhandler_disk_file.cc (fstatvfs): Drop code using
+	FileFsSizeInformation.
+	(struct __DIR_cache): Remove comment.
+	(fhandler_disk_file::rewinddir): Drop W2K-only code.
+	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Don't
+	check for old OS.  Extend a comment.
+	* fhandler_mem.cc (fhandler_dev_mem::open): Drop NT4 and W2K from
+	debug output.
+	* fhandler_proc.cc (format_proc_partitions): Drop Pre-XP considerations.
+	* fhandler_procnet.cc (fhandler_procnet::exists): Ditto.
+	(fhandler_procnet::readdir): Ditto.
+	(format_procnet_ifinet6): Ditto.
+	* fhandler_socket.cc (fhandler_socket::recvmsg): Ditto.
+	* fhandler_tape.cc (mtinfo_drive::get_status): Ditto.
+	* init.cc (dll_entry): Drop W2K-only code.
+	* net.cc (get_ifs): Rename from get_xp_ifs.
+	(get_2k_ifs): Remove.
+	(getifaddrs): Always call get_ifs.
+	(get_ifconf): Ditto.
+	(if_nametoindex): Drop Pre-XP considerations.
+	(load_ipv6_funcs): Ditto.  Fix preceeding comment.
+	* sec_auth.cc (lsaauth): Drop code handling fake_login_sid.
+	* sec_helper.cc (fake_logon_sid): Remove.
+	(set_cygwin_privileges): Fix uncommented statement to drop pre-XP
+	considerations.
+	* security.h (fake_logon_sid): Drop declaration.
+	* shared.cc (shared_info::init_obcaseinsensitive): Drop W2K-only code.
+	* wincap.cc: Throughout, remove setting all deprecated wincapc members.
+	(wincap_minimal): Set to wincap_xpsp2.
+	(wincap_2000): Remove.
+	(wincap_2000sp4): Remove.
+	(wincap_xp): Remove.
+	(wincap_xpsp1): Remove.
+	(wincapc::init): Drop OS 5.0 and pre-SP2 XP.
+	* wincap.h (struct wincaps): Remove the following members:
+	has_create_global_privilege, has_ioctl_storage_get_media_types_ex,
+	has_disk_ex_ioctls, has_buggy_restart_scan, needs_logon_sid_in_sid_list,
+	has_gaa_prefixes, has_recvmsg, has_stack_size_param_is_a_reservation,
+	kernel_is_always_casesensitive, has_rtl_capture_context.
+
+2013-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (rtl_unwind): Convert to macro doing nothing on x86_64.
+	(exception::handle): Drop creating frame variable on x86_64.
+	* wincap.cc (wincap_2000sp4): Set has_rtl_capture_context to false.
+
+2013-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.h (struct header_t): Revert msglen to simple member.
+	Drop accessor methods.
+	* cygserver_ipc.h (struct proc): Drop enforced 4 byte struct packing.
+	Remove members for 64<->32 bit IPC.  Revert to original member order.
+	(ipc_set_proc_info): Remove 64<->32 handling.
+	(conv_timespec32_to_timespec): Delete.
+	(conv_timespec_to_timespec32): Delete.
+	* pinfo.h (struct win_heap_info): Remove.
+	* shm.cc (fixup_shms_after_fork): Revert parent initialization.
+	* winlean.h: Remove _TYPE64_CLR and _TYPE64_SET macros.  Remove
+	usage throughout code.
+	* include/cygwin/ipc.h: Drop 64<->32 bit helper structures.
+	* include/cygwin/msg.h: Ditto.  Drop enforced 4 byte struct packing.
+	* include/cygwin/sem.h: Ditto.
+	* include/cygwin/shm.h: Ditto.
+	* include/cygwin/sysproto.h: Drop enforced 4 byte struct packing.
+
+2013-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pseudo-reloc.cc (do_pseudo_reloc): Add test to check for invalid 32
+	bit relocation in 64 bit code.  Only test when building without
+	optimization.
+
+2013-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (_cygtls::signal_debugger): Raise size of sigmsg buffer
+	on x86_64.
+	* tlsoffsets64.h: Regenerate.
+
+2013-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/signal.h (struct ucontext): Add missing fields from
+	Windows CONTEXT definition.  Define oldmask as 64 bit type.
+
+-- post-ptmalloc3 tag
+
+2013-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.ac (MALLOC_OFILES): Add ptmalloc3.o.
+	* configure: Regenerate.
+	* cygmalloc.h: Declare pt* functions rather than dl* functions.
+	(mmap64): Declare.
+	(mmap): Define as mmap64.
+	(__malloc_lock): Drop macro.
+	(__malloc_unlock): Ditto.
+	(MSPACES): Define.
+	(ONLY_MSPACES): Define.
+	* debug.h: Include malloc.h rather than otherwise unused dlmalloc.h.
+	* fork.cc (frok::parent): Drop malloc locking since that's performed
+	by malloc_atfork now.
+	* heap.cc (heap_init): Accommodate the fact that there's a chance
+	that no heap space has been allocated at fork time.
+	* malloc-private.h: New file from ptmalloc3, having malloc-machine.h
+	and malloc-2.8.3.h folded in.
+	* malloc.cc: Replaced by new file from ptmalloc3.
+	* malloc_wrapper.cc: Throughout, remove malloc locks and call pt*
+	functions rather than dl* functions.
+	* pinfo.cc (winpids::set): Drop malloc locking.
+	* ptmalloc3.cc: New file from ptmalloc3.
+
+-- pre-ptmalloc3 tag
+
+2013-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (_except_list): Don't define on x86_64.
+	(class exception): Don't define members el and save on x86_64.
+	(exception::~exception): Don't define on x86_64.
+	* exceptions.cc (signal_exit): Fix typo in condition.
+
+2013-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin64.din: Remove all deprecated cygwin32_foo and cygwin_foo
+	path conversion functions.
+	* path.cc: Disable aforementioned functions on x86_64.
+	* include/sys/cygwin.h: Don't declare aforementioned functions on
+	x86_64.
+
+2013-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (class exception): Add handler_installed member.
+	Change parameters to handle method to match high-level exception
+	handler calls.
+	(exception::exception): On x86_64, install exception handler only
+	once.  Explain what we do.
+	* exceptions.cc (_AFMT): Change to only 11 digits on x86_64.
+	(cygwin_exception::dump_exception): Print Rip with only 11 digits.
+	Print 64 bit registers with 0-padding.
+	(class stack_info): Add members c and hist on x86_64.
+	(stack_info::init): Take PCONTEXT rather than bool as third parameter.
+	Tweak code accordingly.  Initialize c and hist on x86_64.
+	(stack_info::walk): Add implementation for x86_64.  Drop unneeded
+	#ifndef in 32 bit code.
+	(cygwin_exception::dumpstack): Call thestack.init with context as
+	parameter.  Change header output for x86_64.
+	(cygwin_stackdump): Prefer RtlCaptureContext over GetThreadContext.
+	(CYG_EXC_CONTINUE_EXECUTION): Define generic definition matching all
+	platforms.
+	(CYG_EXC_CONTINUE_SEARCH): Ditto.
+	(exception::handler_installed): Define here.
+	(exception::handle): Define according to declaration in exception.h.
+	Create 32 bit parameters as local variable on 64 bit.  Change all
+	return statements to use generic definitions.  Simplify setting framep
+	on x86_64.  Disable setting frame-based exception handler on x86_64.
+	Fix formatting of klog output for x86_64.
+	(signal_exit): Create context for cygwin_exception creation.
+	(sigpacket::process): Prefer RtlCaptureContext over GetThreadContext.
+	* wincap.h (wincaps::has_rtl_capture_context): New element.
+	* wincap.cc: Implement above element throughout.
+
+2013-02-22  Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+	    Corinna Vinschen <corinna@vinschen.de>
+
+	* cygwin.din (_get_osfhandle): Make main export.  Define get_osfhandle
+	from here.
+	* cygwin64.din (_get_osfhandle): Rename from get_osfhandle.
+	(_setmode): Rename from setmode.
+	* include/io.h: Ditto. Define unprefixed names with preprocessor
+	macros for backwards source compatibility.
+	(access): Remove.
+	* syscalls.cc (_setmode): Rename from setmode.
+	(cygwin_setmode): Call _setmode.
+	(_get_osfhandle): Rename from get_osfhandle.
+
+2013-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (target_cpu): Define.  Check for target_cpu rather than
+	target_alias for conditional compilation issues.
+	(toolopts): Change --target into --cpu option and use $target_cpu as
+	argument.
+	($(DEF_FILE)): Call gendef with $(target_cpu) as argument, rather than
+	with $(target_alias).
+	* gendef: Accommodate change from --target to --cpu option.
+	* mkimport: Ditto.
+	* speclib: Ditto.
+
+2013-02-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cygserver_ipc (class ipc_retval): Add ssize_t member to anonymous
+	union.
+	(ipc_retval::operator =): Add ssize_t variant for x86_64.
+	* fhandler_floppy.cc (fhandler_dev_floppy::raw_write): Change return
+	type to ssize_t to match fhandler.h.
+	* fhandler_socket.cc (fhandler_socket::readv): Ditto.
+	(fhandler_socket::write): Ditto.
+	(fhandler_socket::writev): Ditto.
+	(fhandler_socket::sendmsg): Ditto.
+
+2013-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc: Add comment.
+
+2013-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc: Throughout, pull up to latest code from NetBSD.
+
+2013-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::raw_read): Rearrange code to use
+	NtReadFile and to fix problem using pointer to wrongly sized variable
+	on x86_64.
+	(fhandler_base::read): Drop redundant code.
+	* fhandler_disk_file.cc (fhandler_disk_file::pread): Fix function
+	to not read the information twice.  Handle STATUS_END_OF_FILE.
+
+2013-02-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* Makefile.in (libcygwin.a): Move --target flag from here...
+	(toolopts): to here, to be used by both mkimport and speclib.
+	* speclib: Omit leading underscore in symbol names on x86_64.
+
+2013-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc.in (.gnu_debuglink_overlay): Drop "64" in dbg file name.
+
+2013-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nfs.h: Make sure packing of NFS fattr3 struct is 4 byte.
+	(struct nfs_timestruc_t): Define.
+	(struct fattr3): Define timestamps as type struct nfs_timestruc_t.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Copy
+	each timestruc_t component separately to accommodate different size.
+
+2013-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (toollibdir): Remove.  Revert to using tooldir instead.
+	* configure.ac (DLL_NAME): Set to cygwin1.dll in x86_64 case, too.
+	* configure: Regenerate.
+	* cygwin.sc.in (SEARCH_DIR): Align to 32 bit search dir, use lib, rather
+	than lib64.
+	* cygwin64.din (LIBRARY): Set name to cygwin1.dll.
+	* fhandler_process.cc (struct heap_info): Drop win_heap_info class
+	and revert code to former heap_info implementation.
+	(format_process_maps): Define heaps back to heap_info
+	* hookapi.cc (hook_or_detect_cygwin): Add shortcut so the code does
+	not search executable for being a Cygwin executable, if the architecture
+	is not matching the current Cygwin.  Always use for "cygwin1.dll".
+	* pinfo.cc (commune_process): Drop PICOM_HEAP_INFO code.
+	(_pinfo::commune_request): Ditto.
+	(_pinfo::win_heap_info): Remove.
+	* pinfo.h (enum picom): Remove PICOM_HEAP_INFO.
+
+2013-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (two_addr_t): Use __uint64_t as type for the i686
+	version, analogue to __uint128_t for x86_64.
+	(INIT_WRAPPER): New x86_64 macro to install a sysv_abi function wrapper
+	for the DLL init functions.  Add long comment to explain why this is
+	necessary.  Create wrapper for std_dll_init and wsock_init.
+	(std_dll_init): Rename with leading underscore on x86_64 and take
+	calling function as argument.  Disable overwriting return address on
+	stack for x86_64.
+	(wsock_init): Ditto.
+
+2013-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (toollibdir): Define build and target dependent.
+	(install-libs): Use $(toollibdir) rather than $(tooldir)/lib.
+	(uninstall-libs): Ditto.
+	(uninstall-man): Use $(DESTDIR)$(mandir) as in install-man, rather
+	than $(tooldir)/man.
+
+2013-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* heap.cc (eval_start_address): Move heap to 0x6:00000000.  Change
+	comment to explain why.
+	* mmap.cc (MMAP_STORAGE_LOW): Accommodate above change.
+
+2013-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::open): Cast second parameter
+	in roundup2 to same size as first parameter to make sure mask size is
+	correct.
+	* fhandler_process.cc (format_process_maps): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::dup): Ditto.
+	* hookapi.cc (find_first_notloaded_dll): Add cast.
+	* spawn.cc (av::fixup): Ditto.
+	* wincap.h: Add comment to explain the following change.
+	(wincapc::page_size): Return size_t.
+	(wincapc::allocation_granularity): Ditto.
+
+	* mmap.cc: Throughout, accommodate the fact that AT_ROUND_TO_PAGE isn't
+	support on 64 bit at all.
+	(class mmap_allocator): New class to allocate mmap slots on x86_64.
+	(mmap_alloc): Define global instant of mmap_allocator.
+	(mmap64): Call mmap_alloc.alloc on x86_64.
+
+2013-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (longjmp): Fix indirect addressing in x86_64 setjmp.
+
+2013-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin64.din: Add missing symbols.
+	* mkimport: Make sure to use and test against platform dependent
+	"imp" prefix.
+
+2013-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc.in (.rdata): Add .rdata_cygwin_nocopy subsection.
+	(.cygheap): Raise size to 3 Megs on x86_64.
+	* dcrt0.cc (dll_crt0_0): Drop call to init_global_security.
+	* dtable.cc (std_consts): Drop NO_COPY.
+	* errno.cc (errmap): Drop NO_COPY, constify instead.
+	(_sys_errlist): Drop NO_COPY.
+	* fhandler_clipboard.cc (CYGWIN_NATIVE): Ditto.
+	* fhandler_console.cc (keytable): Drop NO_COPY, constify instead.
+	* grp.cc (null_ptr): Make NO_COPY_RO.
+	* heap.cc (eval_start_address): Fix comment.
+	* localtime.cc (wildabbr): Make NO_COPY_RO.
+	(gmt): Ditto.
+	* miscfuncs.cc (case_folded_lower): Drop NO_COPY.
+	(case_folded_upper): Ditto.
+	(isalpha_array): Ditto.
+	(nice_to_winprio): Ditto for priority.
+	(class thread_allocator): New class to allocate thread stack on x86_64.
+	(thr_alloc): Define global NO_COPY instant of thread_allocator.
+	(CygwinCreateThread): Call thr_alloc.alloc on x86_64 to reserve stack.
+	* net.cc (errmap): Drop NO_COPY, constify instead.
+	(host_errmap): Ditto.
+	* netdb.cc (SPACE): Drop NO_COPY.
+	* sec_helper.cc (null_sdp): Static NO_COPY_RO definition of null SD.
+	(sec_none): Define NO_COPY_RO, define content statically.
+	(sec_none_nih): Ditto.
+	(sec_all): Ditto.
+	(sec_all_nih): Ditto.
+	(get_null_sd): Remove.
+	(init_global_security): Remove.
+	* security.cc (file_mapping): Define NO_COPY_RO.
+	(check_registry_access): Ditto for reg_mapping.
+	* spawn.cc (exe_suffixes): Drop NO_COPY, constify instead.
+	(dll_suffixes): Drop unused, disabled definition and comment.
+	* strsig.cc (sys_sigabbrev): Drop NO_COPY_INIT.
+	(sys_siglist): Ditto.
+	* syscalls.cc (def_shells): Drop NO_COPY.
+	* winsup.h (NO_COPY_RO): Define to place variable in
+	.rdata_cygwin_nocopy section.
+	(init_global_security): Drop declaration.
+
+2013-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (win_heap_info::~win_heap_info): Only try to free
+	heap_vm_chunks if it's not NULL.
+	* pinfo.h (struct commune_result): Change type of n to DWORD.
+	* pinfo.cc (_pinfo::commune_request): Change type of n to DWORD to
+	fix subsequent sizeof test after reading from commune pipe on x86_64.
+	Raise read timeout to match write timeout.
+
+2013-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver_ipc.h (ipc_retval::operator =): Disable size_t variant
+	on x86_64 since type is identical to vm_offset_t.
+
+2013-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regparm.h: New file to define platform dependent regparm attributes.
+	Define all of them empty if __CYGMAGIC__ is defined.
+	* cygerrno.h: Include regparm.h instead of defining _reg[123] here.
+	* winsup.h: Ditto.
+	* cygmagic: Define __CYGMAGIC__ to help generate same result on all
+	platforms.
+
+2013-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin64.din (BASE): Set to 0x180040000.
+	(_fe_dfl_env): Remove useless symbol.
+	(_fe_nomask_env): Remove useless symbol.
+	(exit): Add missing symbol.
+	(setmode): Ditto.
+	* gendef (longjmp): Convert all displacements to hex for readability.
+	Change all movaps instructions to movdqu to accommodate unaligned
+	access to 128 bit values.
+
+2013-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pseudo-reloc.cc (do_pseudo_reloc): Enable 64 bit code for x86_64
+	Cygwin.
+
+2013-02-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (RtlFillMemory): Declare.
+	(RtlCopyMemory): Declare.
+	(memset): Just call RtlFillMemory.
+	(memcpy): Just call RtlCopyMemory.
+	* mmap.cc (class mmap_record): Drop enforced packing.  Reorder members
+	to allow tight packing on 32 as well as on 64 bit.
+	* include/sys/dirent.h: Don't enforced structure packing on x86_64.
+	(__DIRENT_COOKIE): Use different value on 64 bit.
+
+2013-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (fefunc): Fix incorrect pc-relative jmp instruction.
+	(_sigfe): Fix offset to return address on stack.  Add and fix comments.
+	(_sigbe): Fix stack alignment when creating spill area for call to
+	yield.  Add and fix comments.
+	(sigdelayed): Add fake push to make sure stack is aligned correctly.
+	Use fake stack alignment on exit to store return address and call ret,
+	rather than jmp.  Fix comments.
+	(_cygtls::lock): Only create and destroy spill area when really calling
+	yield.
+
+2013-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (LoadDLLfuncEx3): Adjust address computation required
+	by latest change to the 64 bit code.
+	* cygmalloc.h (MALLOC_ALIGNMENT): Set to 16 on x86_64.
+	* cygtls.h: Set struct alignment to 8 on x86_64.  Move inclusion of
+	other header files outside of alignment-enforced code area.  Drop
+	inclusion of security.h entirely.
+	(_cygtls::get_signal_arrived): Use NULL SECURITY_ATTRIBUTES rather than
+	&sec_none_nih.
+	* gendef (_cygtls::lock): Fix stack alignment.
+	* heap.cc (page_const): Change type to ptrdiff_t, otherwise negation
+	operator in pround creates broken bitmask.
+	* shared.cc (page_const): Add cast to ptrdiff_t.
+	* tlsoffsets64.h: Regenerate.
+
+2013-01-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in ($(LIB_NAME)): Add --target option to mkimport call.
+	* gendef: Drop -w option.  Make callto sigfe function pc-relative
+	on x86_64.
+	* miscfuncs.cc (__import_address): Drop comment and misguide attempt
+	to handle absolute addressing in x86_64 mode.
+	* mkimport: Add --target option.  Handle x86_64 target, especially
+	create pc-relative jmp calls.
+
+2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h: Cleanup x86_64 related comment.
+	(_tlsbase): Change return type to PVOID.
+	(_tlstop): Ditto.
+	(_my_tls): Accommodate above change.
+	* dcrt0.cc (child_info_fork::alloc_stack): Revert previous patch, but
+	keep cast to PVOID.
+	(dll_crt0_1): Ditto.
+	* exception.h: Define _exception_list as _EXCEPTION_REGISTRATION_RECORD
+	on x86_64.
+	(_except_list): Define in terms of NtCurrentTeb() on x86_64.
+	* miscfuncs.cc (__import_address): Handle 32 bit absolute addressing
+	in IAT on x86_64.
+	* include/cygwin/config.h (___getreent): New inline function on
+	x86_64.  Define __getreent in terms of ___getreent on x86_64.  Fix
+	comment accordingly.
+
+2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (_tlsbase): Temporary workaround for GCC bug.
+	(_tlsbase): Ditto.
+	* cygwin64.din: Set BASE temporariliy to address < 32 bit to workaround
+	GDB bug.
+	* dcrt0.cc (child_info_fork::alloc_stack): Temporary workaround for GCC
+	bug.
+	(dll_crt0_1): Ditto.
+	* miscfuncs.cc (memset): Temporary workaround missing MSABI function in
+	newlib.
+	(memcpy): Ditto.
+	* include/cygwin/config.h (__getreent): Drop definition for x86_64 to
+	workaround GCC bug.
+
+2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winbase.h (ilockcmpexch): Define always.
+	(InterlockedCompareExchange): Ditto.
+	(ilockcmpexch64): Define for x86_64.
+	(InterlockedCompareExchange64): Ditto.
+	(InterlockedCompareExchangePointer): Define in terms of
+	InterlockedCompareExchange64 on x86_64.
+
+2013-01-29  Kai Tietz  <ktietz@redhat.com>
+
+	* cygwin.sc.in: Fix ctors and dtors filler and zero-terminator for
+	64 bit.
+
+2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (TEST_DLL_NAME): Fix to use correct name per target.
+	* gendef (fefunc): Resurrect accidentally dropped 32 bit code.
+
+2013-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* heap.cc (eval_start_address): Change address and comment for 64 bit.
+	(eval_initial_heap_size): Change return type to SIZE_T.  Use different
+	values for 64 bit.
+
+2013-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef: Add missing setjmp/longjmp functionality, still untested.
+
+2013-01-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc.in: Accommodate extra .text, .pdata, and .xdata section on
+	64 bit.
+	* cygwin64.din: Set BASE to 0x200040000 to start shared sections at
+	0x200000000.
+	* gendef: Second cut 64 bit assembler functionality, still untested.
+
+2013-01-25  Kai Tietz  <ktietz@redhat.com>
+
+	* autoload.cc (LoadDLLfuncEx3): Adjust assembler for x64 to avoid
+	relocations.
+	(noload): Likewise.
+
+2013-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef: First cut 64 bit assembler functionality, untested.
+
+2013-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (speclib): Exclude main symbol.
+	(NEW_FUNCTIONS): Set to empty for x86_64.
+	($(DEF_FILE)): Call gendef with target_alias as additional parameter.
+	* configure.ac (DLL_ENTRY): Drop leading underscore for x86_64.
+	* configure: Regenerate.
+	* cygwin.sc.in: Drop _SYM usage for __data_start__, __data_end__,
+	__bss_start__, and __bss_end__.
+	* cygwin64.din: Remove all fast-call math function entry points.
+	(_alloca): Define as __alloca.
+	(_dll_crt0): Drop 32 bit stdcall specifier.
+	(dll_entry): Ditto.
+	(dll_noncygwin_dllcrt0): Remove.
+	(getpwduid): Remove.
+	(lacl): Remove.
+	* dcrt0.cc (dll_data_start): Define for x86_64.
+	(dll_data_end): Ditto.
+	(dll_bss_start): Ditto.
+	(dll_bss_end): Ditto.
+	* gendef: Handle new target argument.  Handle 64 bit target.
+	Add preliminiary empty function definitions for 64 bit to allow linking.
+	* winsup.h: Define linker data and bss section symbols with
+	additional underscore for x86_64.
+	* lib/_cygwin_crt0_common.cc (__image_base__): Define for 64 bit and
+	map to _image_base__ via macro.
+	(_cygwin_crt0_common): Fix setting data and bss section borders on
+	x86_64.
+
+2013-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (__import_address): Fix address computation for 64 bit.
+
+2013-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (_cygwin_exit_return): Define to allow usage of same C
+	symbol name independent of target.
+	* perprocess.h (SIZEOF_PER_PROCESS): Define for x86_64.
+	* include/sys/cygwin.h (struct per_process): Tweak definition for
+	x86_64.
+
+2013-01-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/config.h (__SYMBOL_PREFIX): Define.
+	(_SYMSTR): Define.
+	* child_info.h (spawn_info): Use _SYMSTR macro to define assembler
+	symbol.
+	(fork_info): Ditto.
+	* libstdcxx_wrapper.cc: Ditto, throughout.
+	* winsup.h (dll_crt0): Ditto.
+	* include/cygwin/time.h (daylight): Ditto.
+	(timezone): Ditto.
+	* lib/_cygwin_crt0_common.cc: Ditto, throughout.
+
+2013-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h (spawn_info): Define asm symbol without leading
+	underscore for x86_64.
+	(fork_info): Ditto.
+	* cygwin.sc.in (__CONCAT1): Define.
+	(__CONCAT): Define.
+	(_SYM): Define.
+	(_data_start__): Define using _SYM macro to accommodate multiple
+	platforms.
+	(_data_end__): Ditto.
+	(_bss_start__): Ditto.
+	(_bss_end__): Ditto.
+	(_cygheap_start): Ditto.
+	(_cygheap_end): Ditto.
+
+2013-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/config.h (_tlsbase): Define for x86_64.
+
+2012-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc.in (.gnu_debuglink_overlay): Accommodate longer dbg file
+	name on 64 bit.
+
+2012-12-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pinfo.h (enum picom): Add PICOM_HEAP_INFO.
+	(_pinfo::win_heap_info): Declare.
+	(struct win_heap_info): Rename from heap_info and define here.  Change
+	to accommodate 64 bit.
+	* fhandler_process.cc (struct win_heap_info): Just implement here.
+	(win_heap_info::gen_heap_info): New method.
+	(format_process_maps): Accommodate above changes.  Add FIXME comment
+	to explain 32->64 bit problem with VirtualQueryEx.
+	* pinfo.cc (commune_process): Handle PICOM_HEAP_INFO.
+	(_pinfo::commune_request): Ditto.
+	(_pinfo::win_heap_info): New method.
+
+2012-12-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc.in (OUTPUT_FORMAT): Fix typo in 64 bit code.
+	* spawn.cc (av::fixup): Drop '!!' to keep argument to set_cygexec a
+	void *.
+
+2012-12-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (TLSOFFSETS_H): Let configure fill in.  Change all
+	occurence of tlsoffsets.h to $(TLSOFFSETS_H).
+	$(srcdir)/$(TLSOFFSETS_H): Add @CONFIG_DIR@ as parameter to
+	gentls_offsets so the script knows the target CPU.
+	* configure.ac (TLSOFFSETS_H): Set according to target.
+	* configure: Regenerate.
+	* gentls_offsets: Handle x86_64 as target.  Add FIXME comment.  Unlink
+	all temporary files.
+	* tlsoffsets64.h: New file.
+
+2012-12-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_NAME): Let configure fill in.
+	(DIN_FILE): Ditto.  Change all occurence of cygwin.din to $(DIN_FILE).
+	* configure.ac (DLL_NAME): Set according to target.
+	(DIN_FILE): Ditto.
+	* configure: Regenerate.
+	* cygwin64.din: New file.
+
+2012-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix_ipc.cc: Enforce 4 byte alignment on all structs used in the
+	message queue file.
+	(struct mq_fattr): Fixed size mq_attr structure as stored in file.
+	(struct mq_hdr): Change to have same size on 32 and 64 bit.  Add
+	mqh_magic to allow check for old message queue file.
+	(struct msg_hdr): Change to have same size on 32 and 64 bit.  Change
+	type of mqh_attr to struct mq_fattr.
+	(struct mq_info): Change to have same size on 32 and 64 bit.
+	(mq_open): Add check for maximum mq_maxmsg and mq_msgsize values which
+	still fit into 32 bit values.  Set mqh_magic in file to MQI_MAGIC.
+	Check mqh_magic value on existing file to detect old message queue file.
+	(mq_getattr): Change type of local attr variable to struct mq_fattr.
+	(mq_setattr): Ditto.
+	(_mq_send): Ditto.
+	(_mq_receive): Ditto.
+	(mq_close): Ditto.
+
+2012-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* hookapi.cc (hook_or_detect_cygwin): Only check for one cygwin DLL
+	file name depending on executable target type.  Return value indicating
+	executable target type.  Change comment accordingly.
+	* path.h (enum path_types): Add FIXME comment to definition of
+	PATH_OPEN.  Add PATH_64BITEXEC.
+	(iscygexec32): New method.
+	(iscygexec64): New method.
+	(set_cygexec): Implement additionally with void * parameter to be able
+	to set PATH_64BITEXEC if required.
+
+2012-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Throughout, fix format string of debug printf and api_fatal calls
+	to work in 32 and 64 bit environment, as well as to honor signedness.
+	Use %y instead of 0x%x.
+	* fhandler.h (class fhandler_dev_mem): Change type of mem_size from
+	DWORD to SIZE_T.
+	* fhandler_mem.cc: Throughout, cast mem_size in comparisons to make
+	GCC happy.
+	* fhandler_process.cc (format_process_maps): Change type of ret_len
+	to SIZE_T.
+	(get_mem_values): Ditto for n and length.
+	* mmap.cc (MapView): Ditto for commitsize and viewsize.
+	(class mmap_record): Ditto for len.  Use SIZE_T througout for memory
+	size in method args and return types.
+	* ntdll.h (NtLockVirtualMemory): Fix type of memory size parameters
+	to SIZE_T.
+	(NtMapViewOfSection): Ditto.
+	(NtQueryVirtualMemory): Ditto.
+	(NtUnlockVirtualMemory): Ditto.
+	(RtlFreeHeap): Change type of first parameter to HANDLE.
+	* shm.cc (shmat): Change type of viewsize to SIZE_T.
+	* timer.cc (timer_thread): Change type of sleep_ms to LONG.
+	(ualarm): Drop casts to unsigned int in timer value computation.
+
+2012-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver_ipc.h (conv_timespec32_to_timespec): Implement here.
+	(conv_timespec_to_timespec32): Ditto.
+	* include/cygwin/ipc.h (struct _ts32): Define here.
+	* include/cygwin/msg.h: Enforce 4 byte alignment on all structs.
+	(struct _ts32): Move definition to include/cygwin/ipc.h.
+	(struct _msqid_ds32): Drop member comments.
+	* include/cygwin/sem.h: Enforce 4 byte alignment on all structs.
+	(struct _semid_ds32): Define on 64 bit in _KERNEL mode.
+	* include/cygwin/shm.h: Enforce 4 byte alignment on all structs.
+	(struct _shmid_ds32): Define on 64 bit in _KERNEL mode.
+	(struct shminfo): Enhance coment on shmall member.
+	(struct shm_info): Convert type of all members to int32_t.
+	* include/cygwin/sysproto.h (struct semctl_args): Change definition to
+	use the same structure on 32 and 64 bit.
+	(struct semop_args): Ditto.
+	(struct shmat_args): Ditto.
+	(struct shmctl_args): Ditto.
+	(struct shmdt_args): Ditto.
+	(struct shmget_args): Ditto.
+
+2012-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.h (struct client_request::header_t): Change definition of
+	msglen to use the same structure on 32 and 64 bit.  Add read and write
+	accessors.  Change type of error_code to int.
+	(class client_request): Align accessor methods to above change.
+	* cygserver_ipc.h (ipc_set_proc_info): Use _TYPE64_CLR macros.
+	* winlean.h (_TYPE64_CLR): New macro.
+	(_TYPE64_SET): Ditto.
+	* include/cygwin/msg.h (struct _ts32): Define on 64 bit in _KERNEL mode.
+	(struct _msqid_ds32): Ditto.  Add comment to explain why.
+	* include/cygwin/sysproto.h: Enforce 4 byte alignment on all structs.
+	(struct msgctl_args): Change definition to use the same structure on
+	32 and 64 bit.
+	(struct msgrcv_args): Ditto.
+	(struct msgsnd_args): Ditto.
+
+2012-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc (fixup_shms_after_fork): Fix initialization of local variable
+	parent.
+
+2012-12-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winlean.h (_TYPE64): Define.
+	* cygserver_ipc.h (struct proc): Rearrange to use same structure on
+	32 and 64 bit.  Add member is_64bit.
+	(ipc_set_proc_info): Change accordingly.
+
+2012-12-04  Kai Tietz  <ktietz@redhat.com>
+
+	* child_info.h (child_info): Re-type magic to DWORD.
+
+2012-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (CYGTLS_PADSIZE): Change comment noting alignment has to
+	be 16 bytes on x86_64.
+
+2012-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Add rule to build cygwin.sc dynamically using the
+	target compiler.
+	* cygwin.sc.in: Rename from cygwin.sc.  Make OUTPUT_FORMAT and
+	SEARCH_DIR dependent on target CPU.  Add extra alignment and .xdata
+	section on x86_64.  Keep up with latest dwarf debug section changes.
+
+2012-11-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (thread_wrapper): Use PVOID instead of VOID *.
+	Fix stack alignment before calling VirtualFree.  Fix comments.
+
+2012-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (wsock_init): Drop vendor info debug printout.  It's
+	undefined since Wsock version 2.
+
+2012-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Extend leading comment to describe the 64 bit
+	implementation as well.
+	(LoadDLLprime): Define for x86_64.
+	(LoadDLLfuncEx3): Ditto.
+	(dll_func_load): Ditto.
+	(struct dll_info): Use target-agnostic type for load_state.
+	(struct func_info): Add func_addr member on x86_64.
+	(two_addr_t): New type to be twice the size of an address on either
+	target.
+	(union retchain): Use target-agnostic type for low and high,
+	use two_addr_t as type for ll member.
+	(std_dll_init): Define as SYSV ABI function on x86_64.  Explain why.
+	Change return type to two_addr_t.  Add casts as necessary.  Convert
+	assembler code to tweak return address into C code.
+	(wsock_init): Ditto.  Drop leading underscore in LoadDLLprime
+	macro call on x86_64.
+	(GetAdaptersAddresses): Define using LoadDLLfunc since it's not called
+	on pre-XP anyway.
+	(AttachConsole): Don't define on x86_64.
+	(GetModuleHandleExW): Ditto.
+	(GetSystemWow64DirectoryW): Ditto.
+	(GetVolumePathNamesForVolumeNameW): Ditto.
+
+2012-11-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/strace.h: Include sys/types.h for pid_t.
+
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (CYGTLS_PADSIZE): Define for 64 bit.  Add FIXME comment.
+	* profil.c: Replace usage of network types with types as documented
+	in Linux, throughout.
+	(get_thrpc): Fix access to instruction pointer for x86_64.
+	* profil.h: Include stdin.t.h.  Replace usage of network types with
+	types as documented in Linux, throughout.
+	* config/x86_64/profile.h (mcount): Use unsigned long rather than
+	__uintptr_t.
+
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygmalloc.h (dlmalloc): Change unsigned in declaration to size_t.
+	(dlrealloc): Ditto.
+	* wait.cc (wait4): Cast second parameter in proc_subproc call to
+	uintptr_t.
+
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (verifyable_object_isvalid): Temporarily define as
+	non-inline on x86_64 to workaround compiler bug.
+
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_netdrive.cc: Use UINT32_MAX rather than UINT_MAX to make
+	absolutely clear that we mean the 32 bit maximum.
+	* fhandler_socket.cc: Ditto.
+	* pinfo.cc: Ditto with INT32_MAX.
+	* select.cc (fd_mask): Drop gratuitious definition.
+	(sizeof_fd_set): Cast to size_t.
+	* shared.cc (pround): Cast to ptrdiff_t.
+	* strace.cc (strace::activate): Fix format string.
+	(strace::write_childpid): Take pid_t as parameter.
+	* include/sys/strace.h (strace::write_childpid): Change declaration
+	accordingly.
+	* sync.cc (muto::init): Cast in call to InterlockedExchangePointer to
+	make compiler happy.
+	* sync.h (class muto): De-const name.
+	* syslog.cc (try_connect_syslogd): Take size_t as third argument.
+	(vsyslog): Convert len to size_t.
+	* thread.cc: Use {U}INT32_MAX rather than {U}LONG_MAX.  Througout change
+	types used in Windows calls to matching Windows types.
+	(pthread::cancel): Fix access to instruction pointer for x86_64.
+	(pthread_attr_getstack): Cast to ptrdiff_t for pointer arithmetic.
+	* thread.h: Throughout convert 'long' types to uint32_t or LONG.
+
+2012-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/acl.h (struct __acl32): Drop.  Use struct acl or
+	aclent_t throughout instead.
+	* sec_acl.cc (aclcheck32): Mark currently unused variables as unused.
+	(lacl32): Disable on x86_64.
+	(acl): Alias to acl32 on x86_64.
+	(facl): Alias to facl32 on x86_64.
+	(aclcheck): Alias to aclcheck32 on x86_64.
+	(aclsort): Alias to aclsort32 on x86_64.
+	(acltomode): Alias to acltomode32 on x86_64.
+	(aclfrommode): Alias to aclfrommode32 on x86_64.
+	(acltopbits): Alias to acltopbits32 on x86_64.
+	(aclfrompbits): Alias to aclfrompbits32 on x86_64.
+	(acltotext): Alias to acltotext32 on x86_64.
+	(aclfromtext): Alias to aclfromtext32 on x86_64.
+	* resource.cc (getrlimit): Use correct cast to rlim_t rather than DWORD.
+	* sched.cc (sched_setparam): Drop ThreadPriority and all code setting
+	it.
+
+2012-11-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (format_process_stat): Add comment to explain
+	the WOW64 problems concerning the BasePriority value.  Fix format
+	string in __small_sprintf call.
+	* ntdll.h: Mark more native structures as tested on 64 bit.
+	(enum _EVENT_TYPE): Drop definition.
+	(enum _TIMER_TYPE): Ditto.
+	(enum _SECTION_INHERIT): Drop __MINGW64_VERSION_MAJOR guard.
+
+2012-11-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h: Mark more native structures as tested on 64 bit.
+	(struct _FILE_BOTH_DIR_INFORMATION): Rename from
+	_FILE_BOTH_DIRECTORY_INFORMATION as per WDK documentation.
+	* fhandler_disk_file.cc: Accommodate aforementioned structure name
+	change.
+	* path.cc: Ditto.
+
+2012-11-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (class fcwd_access_t): Remove wrong alignment attribute from
+	Buffer member of FAST_CWD_OLD structure.  Add comment that everything
+	has been tested.
+	* ntdll.h: Mark more native structures as tested on 64 bit.
+
+2012-11-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (class fcwd_access_t): Add alignment attribute to Buffer
+	member of FAST_CWD_* structures to work on 64 bit.
+	* path.cc (symlink_info::check_shortcut): Add cast to avoid compiler
+	warning.
+	(cygwin_conv_path_list): Drop ununsed variable.
+	(peek32): Define with int32_t cast on 64 bit to allow easier fetching
+	of instruction pointer relative addresses.
+	(find_fast_cwd_pointer): Add new implementation for x86_64.
+	Tweak a comment in 32 bit version.
+
+2012-11-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dlfcn.cc (dlopen): Change cast to accommodate type change in ntdll.h
+	* fhandler_process.cc (thread_info::thread_info): Change type of local
+	variable size to ULONG to match NtQuerySystemInformation call.
+	Add cast to avoid compiler warnings.
+	(get_process_state): Add cast to avoid compiler warnings.  Accommodate
+	name change of NextEntryOffset member of PSYSTEM_PROCESS_INFORMATION
+	structure.
+	* mmap.cc: Add casts to avoid compiler warnings.
+	(mlock): Change type of local variables min and max to match
+	GetProcessWorkingSetSize call.
+	* nlsfuncs.cc (__collate_range_cmp): Add casts to avoid compiler
+	warnings.
+	* ntdll.h: Drop accommodations for Mingw32.  Fix a couple of formatting
+	glitches.  Add a comment to all structures explicitely tested on 64 bit.
+	(SYSTEM_INFORMATION_CLASS): Change SystemProcessesAndThreadsInformation
+	to SystemProcessInformation and SystemProcessorTimes to
+	SystemProcessorPerformanceInformation to match MSDN.
+	(SYSTEM_BASIC_INFORMATION): Fix member types to match 64 bit.
+	(SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION): Rename from
+	SYSTEM_PROCESSOR_TIMES to use official name from MSDN.  Accommodate
+	throughout.  Drop unneeded align attribute.
+	(VM_COUNTERS): Fix member types to match 64 bit.
+	(SYSTEM_PROCESS_INFORMATION): Rename from SYSTEM_PROCESSES to use
+	official name from MSDN.  Fix member types to match 64 bit.  Change
+	member names to match MSDN and Mingw64.  Accommodate throughout.
+	(IO_STATUS_BLOCK): Change to use MSDN definition.
+	(SYSTEM_TIMEOFDAY_INFORMATION): Rename from
+	SYSTEM_TIME_OF_DAY_INFORMATION to use official name from MSDN.
+	Accommodate throughout.  Add Reserved1 area per MSDN.
+	(LDR_DATA_TABLE_ENTRY): Add comment for future reference.  Change
+	type of LoadCount to USHORT.
+	(PEB_LDR_DATA): Change type of Initialized to BOOLEAN.  Add comment for
+	future reference.
+	(PEB): Fix member types to match 64 bit.
+	(GDI_TEB_BATCH): New type.
+	(TEB): Fix member types to match 64 bit.
+	(PROCESS_BASIC_INFORMATION): Ditto.
+	(MEMORY_WORKING_SET_LIST): Ditto.
+	(SharedUserData): Change comment to note the fact that the address
+	is valid on 32 and 64 bit.
+	* pinfo.cc (winpids::enum_processes): Add cast to avoid compiler
+	warnings.
+	* select.cc (pipe_data_available): Add braces in initalization of an
+	IO_STATUS_BLOCK to match new definition.
+	* wincap.h (class wincapc): Change type of wow64 to ULONG_PTR to match
+	MSDN description.
+	(wincapc::is_wow64): Convert return value explicitely to bool.
+	* wow64.cc (wow64_test_for_64bit_parent): Change type of wow64 to
+	ULONG_PTR to match MSDN description.  Add a cast to avoid compiler
+	warning.
+	* regex/engine.c: Avoid compiler warnings about unused and potentially
+	uninitialized variables.
+	* regex/regcomp.c: Ditto.  Drop unnecessary definition of LCID.
+
+2012-11-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pinfo.cc (_pinfo::commune_request): Accommodate the fact that LONG_MAX
+	does not match sizeof LONG.
+
+2012-11-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (case_folded_lower): Change to unsigned char to avoid
+	compiler warnings.
+	(case_folded_upper): Ditto.
+	(thread_wrapper): Add assembler code for x86_64.
+	* winsup.h (case_folded_lower): Change to unsigned char.
+	(case_folded_upper): Ditto.
+	(cyg_tolower): Add cast to avoid compiler warnings.
+	(cyg_toupper): Add cast to avoid compiler warnings.
+
+2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* tty.h (class tty): Store from_master and to_master HANDLEs in
+	unions to make sure the storage is 64 bit compatible.  Add comment to
+	explain why.
+	(from_master): Convert to read accessor method.
+	(to_master): Ditto.
+	(set_from_master): New method to store HANDLE value 64 bit clean.
+	(set_to_master): Ditto.
+	* fhandler_tty.cc: Fix debug printfs to work in 64 bit mode as well.
+	Change usage of from_master and to_master throughout to accommodate
+	aforementioned change.
+	* fhandler_termios.cc (fhandler_termios::ioctl): Add cast to avoid
+	compiler warning.
+
+2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (struct user_heap_info): Change type of chunk to SIZE_T.
+	Remove unused slop member.
+	* fork.cc (fork): Rename esp to stackp.  Add 64 bit asm expression to
+	fetch stack pointer.
+	(child_copy): Use platform independent types.
+	* heap.cc (eval_start_address): Add comment. Disable 3GB code on 64 bit.
+	(eval_initial_heap_size): Use platform independent types.  Fix debug
+	printf format strings.
+	(sbrk): Add comment.  Change argument type according to newlib
+	definition.  Use platform independent types.  Drop unneeded else and
+	move comment to the right spot.
+	* hookapi.cc (PEHeaderFromHModule): Return PVOID.  Add comment to
+	explain why.  Add bool parameter to return if target executable is
+	64 bit or not.
+	(rvadelta_get): New inline function to fetch section address platform
+	independent.
+	(rvadelta32, rvadelta64): Platform dependent wrappers.
+	(rvadelta): Change to macro calling the platform dependent rvadelta
+	wrappers.
+	(putmem): Define platform dependent THUNK_FUNC_TYPE and use throughout.
+	(RedirectIAT): Add comment.
+	(get_export): Add comment.
+	(find_first_notloaded_dll): Allow to fetch information in a platform
+	and target independent way.
+	(hook_or_detect_cygwin): Ditto.  Recognize the cyg64win1.dll file name
+	as well.
+	* kernel32.cc (CreateFileMappingW): Cast to avoid compiler warning.
+
+	* fhandler.h (class fhandler_dev_tape): Replace mt_evt with an
+	OVERLAPPED structure ov.
+	* mtinfo.h (class mtinfo_part): Define members as int32_t rather than
+	long.  Change member function declarations accordingly.
+	(class mtinfo_drive): Ditto.  Store OVERLAPPED pointer rather than
+	holding the full structure.  Add comment to explain why.
+	* fhandler_tape.cc: Accommodate above changes throughout.
+
+2012-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::ioctl): Don't use __ms_u_long
+	directly.  Rather only use it on 64 bit.  Add comment to explain the
+	problem.
+
+2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc: Throughout, fix casts to work on 64 bit.  Move
+	calls to pthread_testcancel to upper syscall level for consistency.
+	Move read, readv, write, and writev methods to keep together with
+	equivalent recv and send methods.
+	(fhandler_socket::read): Compute WSAMSG buffer on 64 bit to overcome
+	type restriction of WSABUF len member.
+	(fhandler_socket::recvfrom): Ditto.
+	(fhandler_socket::write): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Restructure for readability.
+	* net.cc (cygwin_sendto): Call pthread_testcancel here.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_connect): Ditto.
+	(cygwin_accept): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	(cygwin_recvmsg): Ditto.
+	(cygwin_sendmsg): Ditto.
+
+2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (heap_info::heap_info): Add comment to explain a
+	TODO item.
+
+2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_procsysvipc.cc (format_procsysvipc_msg): Fix printf format
+	string for 32 bit as well.
+
+2012-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_procsysvipc.cc (format_procsysvipc_msg): Fix printf format
+	string for 64 bit.
+	* fhandler_registry.cc (fhandler_registry::readdir): Fix cast.
+	* fhandler_serial.cc (ibuf): Avoid compiler warning.
+	* include/cygwin/ipc.h: Include stdint.h.
+	* include/cygwin/msg.h (msgqnum_t): Define as uint32_t.
+	(msglen_t): Ditto.
+	(struct msginfo): Convert all long members to int32_t.
+	(struct msg_info): Ditto.
+	* include/cygwin/sem.h (struct seminfo): Ditto.
+	* include/cygwin/shm.h (shmatt_t): Define as uint32_t.
+	(struct shmid_ds): Define shm_segsz as uint32_t.
+	(struct shminfo): Convert all long members to int32_t.
+
+2012-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (PDI_WOW64_MODULES): Define.
+	(struct _DEBUG_BUFFER): Fix definition to work on 32 and 64 bit.
+	(struct _DEBUG_HEAP_INFORMATION): Ditto.
+	(struct _DEBUG_HEAP_BLOCK): Ditto.
+
+2012-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc: Fix debug printf calls to be type safe.
+	Add casts to avoid compiler warnings.
+	(get_mem_values): Avoid using ULONG_MAX since it's NOT matching
+	ULONG on 64 bit.
+	* fhandler_procnet.cc (fhandler_procnet::open): Fix syscall_printf call
+	to be type safe.
+	(format_procnet_ifinet6): Add cast to avoid compiler warnings.
+	* ntdll.h (struct _DEBUG_HEAP_BLOCK): Change Address to ULONG_PTR.
+
+	* include/bits/wordsize.h: Fix __WORDSIZE definition for x86_64.
+	Add __WORDSIZE_COMPAT32 as on Linux.
+	* include/inttypes.h: Include bits/wordsize.h.  Use __WORDSIZE check
+	where appropriate.
+	* include/limits.h: Include bits/wordsize.h.
+	(CHAR_BIT): Change definition to rely on default
+	compiler definition.
+	(LONG_BIT): Ditto.
+	(WORD_BIT): Ditto.
+	(__LONG_MAX__): Use __WORDSIZE check.
+	(RTSIG_MAX): Ditto.
+	* include/stdint.h: Include bits/wordsize.h.  Use __WORDSIZE check
+	where appropriate.
+	* include/cygwin/signal.h: Ditto.
+	* include/cygwin/types.h: Ditto.
+
+	* include/asm/byteorder.h (__ntohl): Use bswap instruction, available
+	since i486.
+	(__ntohs): Fix constraint to work on 64 bit CPU as well.
+
+2012-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cpuid.h (can_set_flag): Implement for x86_64.
+	* fhandler.h (class fhandler_dev_raw): Define devbuf members taking
+	numerical values as DWORD, rather than size_t.
+	* fhandler_dsp.cc: Fix debug printf calls to be type safe.
+	(waveOut_callback): Align parameter types to latest MSDN description.
+	(waveIn_callback): Ditto.
+	(fhandler_dev_dsp::Audio_out::start): Change casts in call to
+	waveOutOpen according to MSDN.
+	(fhandler_dev_dsp::Audio_out::parsewav): Fix a cast.
+	(fhandler_dev_dsp::Audio_in::start): Change casts in call to
+	waveInOpen according to MSDN.
+	* fhandler_floppy.cc: Fix debug printf calls to be type safe.
+	(fhandler_dev_floppy::ioctl): Add casts to be on the safe side.
+	* fhandler_proc.cc: Fix debug printf calls to be type safe.
+
+2012-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygthread.cc: Fix usage of %p in debug printfs, throughout.
+	* dcrt0.cc: Ditto.
+	* dtable.cc: Ditto.
+	* errno.cc: Ditto.
+	* exceptions.cc: Ditto.
+	* fhandler.cc: Ditto.
+	* fhandler_console.cc: Ditto.
+	* fhandler_disk_file.cc: Ditto.
+
+	* fhandler_clipboard.cc (cygnativeformat): Define as UINT.
+	(fhandler_dev_clipboard::read): Ditto for local format variable.
+	Use casts to compare off_t with size_t value.
+	* fhandler_console.cc (fhandler_console::ioctl): Avoid compiler
+	warnings.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Fix cast.
+	* include/sys/dirent.h (struct __DIR): Define __d_internal as uintptr_t,
+	rather than unsigned int.
+
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fcntl.cc (fcntl64): Make arg an intptr_t.  Add comment to explain a
+	potential type problem.  Fix syscall_printf.
+	(_fcntl): Make arg an intptr_t.
+	* fhandler.cc (fhandler_base::fcntl): Ditto.
+	* fhandler_socket.cc (fhandler_socket::fcntl): Ditto.
+	* fhandler.h: Align declarations.
+
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc: Use %y rather than 0x%x.
+	* exceptions.cc: Ditto.
+
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprint.cc (__small_vsprintf): Add 'y' and 'Y' conversion.
+	Add description to comment.
+	(__small_vswprintf): Align behaviour to __small_vsprintf.
+
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (get_cygdrive_info): Return uintptr_t rather than DWORD.
+	(check_ntsec): Return bool.
+	(cygwin_internal): Return uintptr_t.  Accommodate throughout.
+	* include/sys/cygwin.h (cygwin_internal): Align declaration.
+
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/signal.h (NSIG): Define differently for x86_64 and
+	i686.  Change FIXME comment accordingly.
+	(SIGRTMAX): Define in terms of NSIG.
+	* include/limits.h (RTSIG_MAX): Define for x86_64.
+	* strsig.cc (__signals_common): Hold all signals available on both
+	platforms.
+	(__signals): Define differently for x86_64 and i686.
+
+2012-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dll_init.cc: Fix debug printf to be type-safe.
+	* dtable.cc: Ditto.
+
+2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (_cygtls::remove): Fix debug printf to be type-safe.
+	* dcrt0.cc: Ditto, throughout.
+	* include/sys/cygwin.h (struct per_process): Define magic_biscuit,
+	dll_major and dll_minor as uint32_t.
+
+2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (struct init_cygheap): Define sthreads as uint32_t.
+
+2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc: Fix debug printfs to work in 64 bit mode as well,
+	throughout.
+	(nthreads): Define as uint32_t to make always 4 byte.  Accommodate
+	throughout.
+	(threadlist_ix): Ditto.
+
+2012-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (stackdump): Change first parameter to PUINT_PTR.
+	* exceptions.cc: Define cpu specific macros _GR, _AFMT and _ADDR.
+	Use throughout to avoid ifdef's.  Fix debug printfs to work in
+	64 bit mode as well, throughout.
+	(status_info): Define member code as NTSTATUS.  Add casts where
+	necessary throughout.
+	(dump_exception): Dump all x86_64 registers if building for it.
+	(class stack_info): Define dummy_frame as PUINT_PTR.
+	(stack_info::init): Change first parameter to PUINT_PTR.  Rename
+	ebp to framep for CPU independent naming.  Drop debp macro.
+	(stack_info::walk): Rename ebp to framep for CPU independent naming.
+	Disable WOW64 hack in 64 bit mode.
+	(stackdump): Change first parameter to PUINT_PTR.  Rename ebp to framep
+	for CPU independent naming.
+	(_cygtls::inside_kernel): Ignore system_wow64_directory on 64 bit.
+	(rtl_unwind): Redefine for x86_64 cpu.
+	(_except_list): Drop redundant definition.
+	(_cygtls::copy_context): Just use __COPY_CONTEXT_SIZE.
+	* sigproc.cc (_cygtls::signal_exit): Conditionalize stackdump call per
+	cpu.
+	* smallprint.cc (__small_vsprintf): Fix up for 64 bit.  Handle 'l' size
+	modifier in 'd', 'o', 'u', 'x' conversion to print "long" values on a
+	per cpu base.  Add 'O' conversion.  Change comment accrdingly.
+	* include/cygwin/signal.h (struct _uc_fpxreg): Define for 64 bit.
+	(struct _uc_xmmreg): Ditto.
+	(struct _fpstate): Ditto.
+	(struct ucontext): Ditto.
+	(struct _uc_fpreg): Define for 32 bit.
+	(struct _fpstate): Use struct _uc_fpreg for _st.  Use explicit sized
+	types.
+	(struct ucontext): Use explicit sized types.
+	(__COPY_CONTEXT_SIZE): Cast safely.
+	(sigset_t): Define as __uint64_t on 64 bit.  Add FIXME comment in 32
+	bit case.
+
+2012-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprint.cc (rnarg): Make type-safe.
+	(rnargLL): Ditto.
+	(__small_vsprintf): Add comment to document meaning of each possible
+	conversion.  Fix 'p' conversion for 64 bit.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* globals.cc: Redefine _RDATA as "const", if not already defined.
+	Apply extern "C" linkage to the R/O UNICODE_STRINGs and cygwin_props.
+	Change comments to explain new method.
+	* winsup.h (_RDATA): Define as empty string and only if including
+	globals.h.
+	(cygwin_finished_initializing): Drop redundant declaration.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::get_debugger_info): Raise size of buf to allow
+	64 bit values.  Call sprintf in a type-safe manner.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dll_init.cc (reserve_at): Use PVOID rather than DWORD as type for
+	pointer parameters and return type.
+	(release_at): Ditto.
+	(dll_list::load_after_fork_impl): Fix format strings.  Call reserve_at
+	without casts to DWORD.
+	(struct dllcrt0_info): Change type of res to PVOID.
+	(dll_dllcrt0): Return PVOID rather than int.
+	(dll_dllcrt0_1): Accommodate type change of dllcrt0_info::res.
+	(dll_noncygwin_dllcrt0): Disable on 64 bit.  Add a cast for 32 bit.
+	* dll_init.h (struct pefile): Drop 32 bit decoration from Windows
+	types.
+	* ntdll.h (struct _DEBUG_HEAP_INFORMATION): Define Base as UINT_PTR.
+	(struct _DEBUG_MODULE_INFORMATION): Define Reserved and Base as
+	UINT_PTR.
+	* winsup.h (dll_dllcrt0): Declare as PVOID.
+	(dll_noncygwin_dllcrt0): Don't declare on 64 bit.
+	* include/cygwin/cygwin_dll.h (cygwin_attach_dll): Declare as PVOID.
+	(cygwin_detach_dll): Declare with PVOID parameter.
+	(dll_index): Declare as PVOID.
+	(_cygwin_dll_entry): Accommodate type change of dll_index.
+	* lib/crt0.h (dll_dllcrt0): Declare as PVOID.
+	* lib/cygwin_attach_dll.c (cygwin_attach_dll): Define PVOID.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (init_windows_system_directory): Disable setting
+	system_wow64_directory{_length} on 64 bit.
+	(dll_crt0_0): Disable WOW64-specific code on 64 bit.
+	(_dll_crt0): Ditto.
+	* globals.cc (system_wow64_directory): Don't define on 64 bit.
+	(system_wow64_directory_length): Ditto.
+	* wincap.cc (wincapc::init): On 64 bit, always set wow64 to 0 and
+	related bool values to false.
+	* wow64.cc: Disable entire code on 64 bit.
+	* wow64.h: Ditto.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (__stack_t): Define as uintptr_t.
+	* dcrt0.cc (child_info_fork::alloc_stack): Conditionalize assembler
+	code on a per-CPU base.  Rename esp to stackp.
+	(get_cygwin_startup_info): Cast pointers to uintptr_t in
+	multiple_cygwin_problem call.  Minor formatting change.
+	(_dll_crt0): Conditionalize assembler code on a per-CPU base.
+	(multiple_cygwin_problem): Change parameters from unsigned to uintptr_t.
+	* winsup.h (multiple_cygwin_problem): Change declaration accordingly.
+	* pinfo.h (pinfo::reattach): Cast 2nd argument in proc_subproc call
+	to uintptr_t.
+	(pinfo::remember): Ditto.
+	* sigproc.cc (proc_subproc): Change 2nd parameter to uintptr_t to allow
+	pointer values.
+	* sigproc.h (proc_subproc): Change declaration accordingly.
+	* include/sys/cygwin.h (per_process_overwrite): Use offsetof to compute
+	value.
+
+2012-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (N0): Remove.
+	(N): Ditto.
+	(to_cmalloc): Use offsetof to compute value.
+	(tocygheap): Use offsetof to compute value.
+
+2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (_tlsbase): Define for __x86_64__.
+	(_tlstop): Ditto.
+	* exception.h (exception_list): Ditto.
+
+2012-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (to_cmalloc): Fix pointer cast.
+	(nextpage): Ditto.  Base definition on roundup2.
+	(allocsize): Cast to SIZE_T.
+	(_csbrk): Drop granmask.  Define adjsbs SIZE_T as 2nd parameter to
+	VirtualAlloc.
+	(tocygheap): Fix pointer cast.
+
+2012-10-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	Avoid various type ambiguity problems showing up in the 64 bit case:
+	* cygheap.h (cygheap_user::set_sid): Convert to void.
+	(cygheap_user::set_saved_sid): Ditto.
+	* devices.h (struct device): Drop operator int& and DWORD& entirely.
+	Throughout, use dev_t or fh_devices instead.
+	* devices.cc: Regenerate.
+	* fhandler.h (class fhandler_base): Convert _refcnt member to LONG.
+	(fhandler_base::inc_refcnt): Return LONG.
+	(fhandler_base::dec_refcnt): Ditto.
+	(fhandler_base::get_major): Return _major_t.
+	(fhandler_base::get_minor): Return _minor_t.
+	(fhandler_base::get_unit): Delete.  Throughout, use get_minor instead
+	of get_unit.
+	(fhandler_socket::get_socket): Use SOCKET rather than int.  Only define
+	if __INSIDE_CYGWIN_NET__ is defined.
+	(fhandler_pty_slave::get_unit): Drop declaration.
+	* fhandler_procnet.cc: Include Windows headers early.
+	* fhandler_socket.cc: Ditto.
+	* fhandler_tty.cc (fhandler_pty_slave::get_unit): Remove.
+	* path.h (path_conv::get_device): Rename from get_devn and change return
+	type to dev_t.  Accommodate throughout.
+	(path_conv::get_unitn): Remove unused method.
+	* pinfo.h (class pinfo): Drop operator== for int case.
+	(pinfo::operator!): Define.
+	* poll.cc: Don't define __INSIDE_CYGWIN_NET__.
+	* syscalls.cc (getpgid): Replace use of pinfo::operator== with
+	pinfo::operator!.
+	* tty.h (tty_min::setntty): Convert 2nd parameter to _minor_t.
+	* tty.h (tty_min::getntty): Change return type to dev_t.
+	(tty_min::get_minor): Rename from get_unit.  Change return type to
+	_minor_t.
+
+2012-08-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/mntent.h: Don't include paths.h and don't define macros if
+	_NOMNTENT_MACROS is set.
+
+2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* advapi32.cc (DuplicateTokenEx): Make ?: expression type-safe.
+	* ntdll.h (KAFFINITY): Don't define if building with Mingw64 headers.
+	* thread.cc: Throughout drop casts in calls to Interlocked functions.
+	* thread.h (class fast_mutex): Ditto.  Define lock_counter as LONG.
+	(class pthread_mutex): Define lock_counter as LONG.
+	(struct MTinterface): Define threadcount as LONG.
+
+2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in: Add AC_NO_EXECUTABLES to allow bootstrap.
+	Add x86_64 to allowed cpu types.
+	* configure: Regenerate.
+	* config/x86_64/profile.h: New file.
+
+2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (semaphore::_fixup_after_fork): Fix Win32 error output in
+	api_fatal call.
+
+2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkvers.sh: Drop reference to w32api includes.
+
+2012-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/stat.h (struct __stat64): Drop entirely in favor of
+	struct stat.  Accommodate throughout Cygwin.
+	* include/cygwin/types.h: Throughout, drop current, internal types
+	used since Cygwin 1.5 with the base type they have been used for.
+	Throughout, define types based on bitsize-specific types where
+	appropriate.  Accommodate throughout Cygwin.
+	* include/sys/cygwin.h: Drop __uid32_t and __gid32_t in favor of
+	uid_t and gid_t.  Define uid/gid types based on bitsize-specific types.
+	(struct external_pinfo): Accommodate above change.
+	* cygtls.h (struct _local_storage): Drop unused members grp and
+	namearray,
+	* tlsoffsets.h: Regenerate.
+	* devices.h (_dev_t): Drop definition.  Use dev_t throughout instead.
+	* devices.cc: Regenerate.
+
+	Probably temporary patch to drop unneeded functionality on x86_64:
+	* fcntl.cc (_fcntl): Alias to fcntl64 on x86_64.
+	* glob.cc (CYGWIN_gl_stat): Simplify on x86_64.
+	* grp.cc (grp32togrp16): Don't define on x86_64.
+	(getgrgid): Alias to getgrgid32 on x86_64.
+	(getgrnam): Alias to getgrnam32 on x86_64.
+	(getgrent): Alias to getgrent32 on x86_64.
+	(getgroups): Alias to getgroups32 on x86_64.
+	(initgroups): Alias to initgroups32 on x86_64.
+	(setgroups): Alias to setgroups32 on x86_64.
+	* mmap.cc (mmap): Alias to mmap64 on x86_64.
+	* passwd.cc (getpwuid): Alias to getpwuid32 on x86_64.
+	(getpwuid_r): Alias to getpwuid_r32 on x86_64.
+	(getpwduid): Don't define on x86_64.
+	* syscalls.cc (lseek): Alias to lseek64 on x86_64.
+	(_lseek): Alias to lseek64 on x86_64.
+	(chown): Alias to chown32 on x86_64.
+	(lchown): Alias to lchown32 on x86_64.
+	(fchown): Alias to fchown32 on x86_64.
+	(stat64_to_stat32): Don't define on x86_64.
+	(fstat): Alias to fstat64 on x86_64.
+	(_fstat_r): Alias to _fstat64_r on x86_64.
+	(stat): Alias to stat64 on x86_64.
+	(_stat_r): Alias to _stat64_r on x86_64.
+	(lstat): Alias to lstat64 on x86_64.
+	(ftruncate): Alias to ftruncate64 on x86_64.
+	(truncate): Alias to truncate64 on x86_64.
+	(seteuid): Alias to seteuid32 on x86_64.
+	(setuid): Alias to setuid32 on x86_64.
+	(setreuid): Alias to setreuid32 on x86_64.
+	(setegid): Alias to setegid32 on x86_64.
+	(setgid): Alias to setgid32 on x86_64.
+	(setregid): Alias to setregid32 on x86_64.
+	* uinfo.cc (getuid): Alias to getuid32 on x86_64.
+	(getgid): Alias to getgid32 on x86_64.
+	(geteuid): Alias to geteuid32 on x86_64.
+	(getegid): Alias to getegid32 on x86_64.
+	* winsup.h (ILLEGAL_UID16): Don't define on x86_64.
+	(ILLEGAL_GID16): Ditto.
+	(uid16touid32): Don't declare on x86_64.
+	(gid16togid32): Don't declare on x86_64.
+
+2012-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (TEST_DLL_NAME): Use -nostdlib flag unconditionally.
+
+2012-08-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc: Add default w32api search dirs.
+	* Makefile.in (DLL_IMPORTS); Just use -l syntax.
+	(TEST_DLL_NAME): Drop DLL_IMPORTS dependency.
+

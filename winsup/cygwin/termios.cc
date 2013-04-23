@@ -159,10 +159,10 @@ tcsetattr (int fd, int a, const struct termios *t)
     }
 
   set_errno (e);
-  termios_printf ("iflag %p, oflag %p, cflag %p, lflag %p, VMIN %d, VTIME %d",
+  termios_printf ("iflag %y, oflag %y, cflag %y, lflag %y, VMIN %d, VTIME %d",
 	t->c_iflag, t->c_oflag, t->c_cflag, t->c_lflag, t->c_cc[VMIN],
 	t->c_cc[VTIME]);
-  termios_printf ("%R = tcsetattr(%d, %d, %x)", res, fd, a, t);
+  termios_printf ("%R = tcsetattr(%d, %d, %p)", res, fd, a, t);
   return res;
 }
 
@@ -184,7 +184,7 @@ tcgetattr (int fd, struct termios *in_t)
   if (res)
     termios_printf ("%R = tcgetattr(%d, %p)", res, fd, in_t);
   else
-    termios_printf ("iflag %x, oflag %x, cflag %x, lflag %x, VMIN %d, VTIME %d",
+    termios_printf ("iflag %y, oflag %y, cflag %y, lflag %y, VMIN %d, VTIME %d",
 	  t->c_iflag, t->c_oflag, t->c_cflag, t->c_lflag, t->c_cc[VMIN],
 	  t->c_cc[VTIME]);
 

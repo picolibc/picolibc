@@ -26,8 +26,10 @@ HMODULE NO_COPY cygwin_hmodule;
 int NO_COPY sigExeced;
 WCHAR windows_system_directory[MAX_PATH];
 UINT windows_system_directory_length;
+#ifndef __x86_64__
 WCHAR system_wow64_directory[MAX_PATH];
 UINT system_wow64_directory_length;
+#endif /* !__x86_64__ */
 
 /* program exit the program */
 
@@ -78,64 +80,74 @@ bool NO_COPY _cygwin_testing;
 
 char NO_COPY almost_null[1];
 
-/* Heavily-used const UNICODE_STRINGs are defined here once.  The idea is a
-   speed improvement by not having to initialize a UNICODE_STRING every time
-   we make a string comparison.  The strings are not defined as const,
-   because the respective NT functions are not taking const arguments
-   and doing so here results in lots of extra casts for no good reason.
-   Rather, the strings are placed in the R/O section .rdata, so we get
-   a SEGV if some code erroneously tries to overwrite these strings. */
+extern "C" {
+
+  /* Heavily-used const UNICODE_STRINGs are defined here once.  The idea is a
+     speed improvement by not having to initialize a UNICODE_STRING every time
+     we make a string comparison.  The _RDATA trick allows defining the strings
+     as const (so we get a SEGV if some code erroneously tries to overwrite
+     them), while declaring them as non-const in the auto-generated globals.h.
+     The strings are usually used in NT functions which don't take const
+     arguments.  We avoid a lot of extra casts here...
+     Note:  The "extern" is required, otherwise either the variables are dropped
+            entirely, or C++ name mangling is applied despite the extern "C"
+	    bracket, depending on the compiler version */
+#ifndef _RDATA
+#  define _RDATA const
+#endif
+
 #define _ROU(_s) \
-	{ Length: sizeof (_s) - sizeof (WCHAR), \
-	  MaximumLength: sizeof (_s), \
-	  Buffer: (PWSTR) (_s) }
-UNICODE_STRING _RDATA ro_u_empty = _ROU (L"");
-UNICODE_STRING _RDATA ro_u_lnk = _ROU (L".lnk");
-UNICODE_STRING _RDATA ro_u_exe = _ROU (L".exe");
-UNICODE_STRING _RDATA ro_u_dll = _ROU (L".dll");
-UNICODE_STRING _RDATA ro_u_com = _ROU (L".com");
-UNICODE_STRING _RDATA ro_u_scr = _ROU (L".scr");
-UNICODE_STRING _RDATA ro_u_sys = _ROU (L".sys");
-UNICODE_STRING _RDATA ro_u_proc = _ROU (L"proc");
-UNICODE_STRING _RDATA ro_u_dev = _ROU (L"dev");
-UNICODE_STRING _RDATA ro_u_pmem = _ROU (L"\\Device\\PhysicalMemory");
-UNICODE_STRING _RDATA ro_u_natp = _ROU (L"\\??\\");
-UNICODE_STRING _RDATA ro_u_uncp = _ROU (L"\\??\\UNC\\");
-UNICODE_STRING _RDATA ro_u_mtx = _ROU (L"mtx");
-UNICODE_STRING _RDATA ro_u_csc = _ROU (L"CSC-CACHE");
-UNICODE_STRING _RDATA ro_u_fat = _ROU (L"FAT");
-UNICODE_STRING _RDATA ro_u_mvfs = _ROU (L"MVFS");
-UNICODE_STRING _RDATA ro_u_nfs = _ROU (L"NFS");
-UNICODE_STRING _RDATA ro_u_ntfs = _ROU (L"NTFS");
-UNICODE_STRING _RDATA ro_u_refs = _ROU (L"ReFS");
-UNICODE_STRING _RDATA ro_u_sunwnfs = _ROU (L"SUNWNFS");
-UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
-UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
-UNICODE_STRING _RDATA ro_u_nwfs = _ROU (L"NWFS");
-UNICODE_STRING _RDATA ro_u_ncfsd = _ROU (L"NcFsd");
-UNICODE_STRING _RDATA ro_u_volume = _ROU (L"\\??\\Volume{");
-UNICODE_STRING _RDATA ro_u_pipedir = _ROU (L"\\\\?\\PIPE\\");
-UNICODE_STRING _RDATA ro_u_globalroot = _ROU (L"\\\\.\\GLOBALROOT");
-#undef _ROU
+	  { Length: sizeof (_s) - sizeof (WCHAR), \
+	    MaximumLength: sizeof (_s), \
+	    Buffer: (PWSTR) (_s) }
+  extern UNICODE_STRING _RDATA ro_u_empty = _ROU (L"");
+  extern UNICODE_STRING _RDATA ro_u_lnk = _ROU (L".lnk");
+  extern UNICODE_STRING _RDATA ro_u_exe = _ROU (L".exe");
+  extern UNICODE_STRING _RDATA ro_u_dll = _ROU (L".dll");
+  extern UNICODE_STRING _RDATA ro_u_com = _ROU (L".com");
+  extern UNICODE_STRING _RDATA ro_u_scr = _ROU (L".scr");
+  extern UNICODE_STRING _RDATA ro_u_sys = _ROU (L".sys");
+  extern UNICODE_STRING _RDATA ro_u_proc = _ROU (L"proc");
+  extern UNICODE_STRING _RDATA ro_u_dev = _ROU (L"dev");
+  extern UNICODE_STRING _RDATA ro_u_pmem = _ROU (L"\\Device\\PhysicalMemory");
+  extern UNICODE_STRING _RDATA ro_u_natp = _ROU (L"\\??\\");
+  extern UNICODE_STRING _RDATA ro_u_uncp = _ROU (L"\\??\\UNC\\");
+  extern UNICODE_STRING _RDATA ro_u_mtx = _ROU (L"mtx");
+  extern UNICODE_STRING _RDATA ro_u_csc = _ROU (L"CSC-CACHE");
+  extern UNICODE_STRING _RDATA ro_u_fat = _ROU (L"FAT");
+  extern UNICODE_STRING _RDATA ro_u_mvfs = _ROU (L"MVFS");
+  extern UNICODE_STRING _RDATA ro_u_nfs = _ROU (L"NFS");
+  extern UNICODE_STRING _RDATA ro_u_ntfs = _ROU (L"NTFS");
+  extern UNICODE_STRING _RDATA ro_u_refs = _ROU (L"ReFS");
+  extern UNICODE_STRING _RDATA ro_u_sunwnfs = _ROU (L"SUNWNFS");
+  extern UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
+  extern UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
+  extern UNICODE_STRING _RDATA ro_u_nwfs = _ROU (L"NWFS");
+  extern UNICODE_STRING _RDATA ro_u_ncfsd = _ROU (L"NcFsd");
+  extern UNICODE_STRING _RDATA ro_u_volume = _ROU (L"\\??\\Volume{");
+  extern UNICODE_STRING _RDATA ro_u_pipedir = _ROU (L"\\\\?\\PIPE\\");
+  extern UNICODE_STRING _RDATA ro_u_globalroot = _ROU (L"\\\\.\\GLOBALROOT");
+  #undef _ROU
 
-/* Cygwin properties are meant to be readonly data placed in the DLL, but
-   which can be changed by external tools to make adjustments to the
-   behaviour of a DLL based on the binary of the DLL itself.  This is
-   different from $CYGWIN since it only affects that very DLL, not all
-   DLLs which have access to the $CYGWIN environment variable. */
-cygwin_props_t _RDATA cygwin_props =
-{
-  CYGWIN_PROPS_MAGIC,
-  sizeof (cygwin_props_t),
-  0
-};
+  /* Cygwin properties are meant to be readonly data placed in the DLL, but
+     which can be changed by external tools to make adjustments to the
+     behaviour of a DLL based on the binary of the DLL itself.  This is
+     different from $CYGWIN since it only affects that very DLL, not all
+     DLLs which have access to the $CYGWIN environment variable.  We use the
+     same _RDATA trick as for the above UNICODE_STRINGs. */
+  extern cygwin_props_t _RDATA cygwin_props =
+  {
+    CYGWIN_PROPS_MAGIC,
+    sizeof (cygwin_props_t),
+    0
+  };
 
-extern "C"
-{
   /* This is an exported copy of environ which can be used by DLLs
      which use cygwin.dll.  */
   char **__cygwin_environ;
+#ifndef __x86_64__
   char ***main_environ = &__cygwin_environ;
+#endif
   /* __progname used in getopt error message */
   char *__progname;
   char *program_invocation_name;
@@ -145,7 +157,10 @@ extern "C"
   {/* initial_sp */ 0, /* magic_biscuit */ 0,
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
    /* dll_major */ CYGWIN_VERSION_DLL_MINOR,
-   /* impure_ptr_ptr */ NULL, /* envptr */ NULL,
+   /* impure_ptr_ptr */ NULL,
+#ifndef __x86_64__
+   /* envptr */ NULL,
+#endif
    /* malloc */ malloc, /* free */ free,
    /* realloc */ realloc,
    /* fmode_ptr */ NULL, /* main */ NULL, /* ctors */ NULL,

@@ -16,7 +16,7 @@ details. */
 #include "crt0.h"
 
 /* for a loaded dll */
-int
+PVOID
 cygwin_attach_dll (HMODULE h, MainFunc f)
 {
   static struct per_process u;

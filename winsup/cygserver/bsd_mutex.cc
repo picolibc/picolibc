@@ -1,6 +1,6 @@
 /* bsd_mutex.cc
 
-   Copyright 2003, 2004, 2005, 2007 Red Hat Inc.
+   Copyright 2003, 2004, 2005, 2007, 2012 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -285,8 +285,8 @@ msleep_init (void)
   msleep_glob_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
   if (!msleep_glob_evt)
     panic ("CreateEvent in msleep_init failed: %lu", GetLastError ());
-  long msgmni = support_msgqueues ? msginfo.msgmni : 0;
-  long semmni = support_semaphores ? seminfo.semmni : 0;
+  int32_t msgmni = support_msgqueues ? msginfo.msgmni : 0;
+  int32_t semmni = support_semaphores ? seminfo.semmni : 0;
   TUNABLE_INT_FETCH ("kern.ipc.msgmni", &msgmni);
   TUNABLE_INT_FETCH ("kern.ipc.semmni", &semmni);
   debug ("Try allocating msgmni (%d) + semmni (%d) msleep records",

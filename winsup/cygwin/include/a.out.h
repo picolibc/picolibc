@@ -1,6 +1,6 @@
 /* a.out.h
 
-   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,22 +14,25 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdint.h>
+
 #define COFF_IMAGE_WITH_PE
 #define COFF_LONG_SECTION_NAMES
 
-/*** coff information for Intel 386/486.  */
+/*** coff information for Intel 386/486 and AMD64.  */
 
 
 /********************** FILE HEADER **********************/
 
 struct external_filehdr {
-  short f_magic;	/* magic number			*/
-  short f_nscns;	/* number of sections		*/
-  unsigned long f_timdat;	/* time & date stamp		*/
-  unsigned long f_symptr;	/* file pointer to symtab	*/
-  unsigned long f_nsyms;	/* number of symtab entries	*/
-  short f_opthdr;	/* sizeof(optional hdr)		*/
-  short f_flags;	/* flags			*/
+  uint16_t f_magic;	/* magic number			*/
+  uint16_t f_nscns;	/* number of sections		*/
+  uint32_t f_timdat;	/* time & date stamp		*/
+  uint32_t f_symptr;	/* file pointer to symtab	*/
+  uint32_t f_nsyms;	/* number of symtab entries	*/
+  uint16_t f_opthdr;	/* sizeof(optional hdr)		*/
+  uint16_t f_flags;	/* flags			*/
 };
 
 /* Bits for f_flags:
@@ -50,6 +53,7 @@ struct external_filehdr {
 #define	I386MAGIC	0x14c
 #define I386PTXMAGIC	0x154
 #define I386AIXMAGIC	0x175
+#define AMD64MAGIC	0x8664
 
 /* This is Lynx's all-platform magic number for executables. */
 
@@ -70,14 +74,14 @@ struct external_filehdr {
 
 typedef struct
 {
-  unsigned short magic;		/* type of file				*/
-  unsigned short vstamp;	/* version stamp			*/
-  unsigned long	tsize;		/* text size in bytes, padded to FW bdry*/
-  unsigned long	dsize;		/* initialized data "  "		*/
-  unsigned long	bsize;		/* uninitialized data "   "		*/
-  unsigned long	entry;		/* entry pt.				*/
-  unsigned long text_start;	/* base of text used for this file */
-  unsigned long data_start;	/* base of data used for this file=
+  uint16_t magic;		/* type of file				*/
+  uint16_t vstamp;		/* version stamp			*/
+  uint32_t tsize;		/* text size in bytes, padded to FW bdry*/
+  uint32_t dsize;		/* initialized data "  "		*/
+  uint32_t bsize;		/* uninitialized data "   "		*/
+  uint32_t entry;		/* entry pt.				*/
+  uint32_t text_start;		/* base of text used for this file */
+  uint32_t data_start;		/* base of data used for this file=
  */
 }
 AOUTHDR;
@@ -103,16 +107,16 @@ AOUTHDR;
 
 struct external_scnhdr {
   char		s_name[8];	/* section name			*/
-  unsigned long	s_paddr;	/* physical address, offset
+  uint32_t	s_paddr;	/* physical address, offset
 				   of last addr in scn */
-  unsigned long	s_vaddr;	/* virtual address		*/
-  unsigned long	s_size;		/* section size			*/
-  unsigned long	s_scnptr;	/* file ptr to raw data for section */
-  unsigned long	s_relptr;	/* file ptr to relocation	*/
-  unsigned long	s_lnnoptr;	/* file ptr to line numbers	*/
-  unsigned short s_nreloc;	/* number of relocation entries	*/
-  unsigned short s_nlnno;	/* number of line number entries*/
-  unsigned long	s_flags;	/* flags			*/
+  uint32_t	s_vaddr;	/* virtual address		*/
+  uint32_t	s_size;		/* section size			*/
+  uint32_t	s_scnptr;	/* file ptr to raw data for section */
+  uint32_t	s_relptr;	/* file ptr to relocation	*/
+  uint32_t	s_lnnoptr;	/* file ptr to line numbers	*/
+  uint16_t	s_nreloc;	/* number of relocation entries	*/
+  uint16_t	s_nlnno;	/* number of line number entries*/
+  uint32_t	s_flags;	/* flags			*/
 };
 
 #define	SCNHDR	struct external_scnhdr
@@ -136,10 +140,10 @@ struct external_scnhdr {
  */
 struct external_lineno {
   union {
-    unsigned long l_symndx; /* function name symbol index, iff l_lnno 0 */
-    unsigned long l_paddr;	/* (physical) address of line number	*/
+    uint32_t l_symndx; 		/* function name symbol index, iff l_lnno 0 */
+    uint32_t l_paddr;		/* (physical) address of line number	*/
   } l_addr;
-  unsigned short l_lnno;	/* line number		*/
+  uint16_t l_lnno;	/* line number		*/
 };
 
 #define	LINENO	struct external_lineno
@@ -156,13 +160,13 @@ struct external_syment
   union {
     char e_name[E_SYMNMLEN];
     struct {
-      unsigned long e_zeroes;
-      unsigned long e_offset;
+      uint32_t e_zeroes;
+      uint32_t e_offset;
     } e;
   } e;
-  unsigned long e_value;
-  unsigned short e_scnum;
-  unsigned short e_type;
+  uint32_t e_value;
+  uint16_t e_scnum;
+  uint16_t e_type;
   char e_sclass[1];
   char e_numaux[1];
 };
@@ -174,46 +178,46 @@ struct external_syment
 
 union external_auxent {
   struct {
-    unsigned long x_tagndx;	/* str, un, or enum tag indx */
+    uint32_t x_tagndx;	/* str, un, or enum tag indx */
     union {
       struct {
-	unsigned short  x_lnno; /* declaration line number */
-	unsigned short  x_size; /* str/union/array size */
+	uint16_t  x_lnno; /* declaration line number */
+	uint16_t  x_size; /* str/union/array size */
       } x_lnsz;
-      unsigned long x_fsize;	/* size of function */
+      uint32_t x_fsize;	/* size of function */
     } x_misc;
     union {
       struct {			/* if ISFCN, tag, or .bb */
-	unsigned long x_lnnoptr;/* ptr to fcn line # */
-	unsigned long x_endndx;	/* entry ndx past block end */
+	uint32_t x_lnnoptr;	/* ptr to fcn line # */
+	uint32_t x_endndx;	/* entry ndx past block end */
       } x_fcn;
       struct {			/* if ISARY, up to 4 dimen. */
 	char x_dimen[E_DIMNUM][2];
       } x_ary;
     } x_fcnary;
-    unsigned short x_tvndx;	/* tv index */
+    uint16_t x_tvndx;	/* tv index */
   } x_sym;
 
   union {
     char x_fname[E_FILNMLEN];
     struct {
-      unsigned long x_zeroes;
-      unsigned long x_offset;
+      uint32_t x_zeroes;
+      uint32_t x_offset;
     } x_n;
   } x_file;
 
   struct {
-    unsigned long x_scnlen;	/* section length */
-    unsigned short x_nreloc;	/* # relocation entries */
-    unsigned short x_nlinno;	/* # line numbers */
-    unsigned long x_checksum;	/* section COMDAT checksum */
-    unsigned short x_associated;/* COMDAT associated section index */
+    uint32_t x_scnlen;		/* section length */
+    uint16_t x_nreloc;		/* # relocation entries */
+    uint16_t x_nlinno;		/* # line numbers */
+    uint32_t x_checksum;	/* section COMDAT checksum */
+    uint16_t x_associated;	/* COMDAT associated section index */
     char x_comdat[1];		/* COMDAT selection number */
   } x_scn;
 
   struct {
-    unsigned long x_tvfill;	/* tv fill value */
-    unsigned short x_tvlen;	/* length of .tv */
+    uint32_t x_tvfill;		/* tv fill value */
+    uint16_t x_tvlen;		/* length of .tv */
     char x_tvran[2][2];		/* tv range */
   } x_tv;	/* info about .tv section (in auxent of symbol .tv)) */
 
@@ -243,6 +247,20 @@ struct external_reloc {
 
 #ifndef _PE_H
 #define _PE_H
+
+#define IMAGE_FILE_MACHINE_I386 0x014c
+#define IMAGE_FILE_MACHINE_AMD64 0x8664
+
+#define IMAGE_NT_OPTIONAL_HDR32_MAGIC 0x10b
+#define IMAGE_NT_OPTIONAL_HDR64_MAGIC 0x20b
+
+#define IMAGE_SIZEOF_STD_OPTIONAL_HEADER 28
+#define IMAGE_SIZEOF_NT_OPTIONAL32_HEADER 224
+#define IMAGE_SIZEOF_NT_OPTIONAL64_HEADER 240
+
+#define IMAGE_SUBSYSTEM_NATIVE 1
+#define IMAGE_SUBSYSTEM_WINDOWS_GUI 2
+#define IMAGE_SUBSYSTEM_WINDOWS_CUI 3
 
 /* NT specific file attributes */
 #define IMAGE_FILE_RELOCS_STRIPPED           0x0001
@@ -320,43 +338,43 @@ struct external_reloc {
 
 
 #ifdef COFF_IMAGE_WITH_PE
-/* The filehdr is only weired in images */
+/* The filehdr is only weird in images */
 
 #undef FILHDR
 struct external_PE_filehdr
 {
   /* DOS header fields */
-  unsigned short e_magic;	/* Magic number, 0x5a4d */
-  unsigned short e_cblp;	/* Bytes on last page of file, 0x90 */
-  unsigned short e_cp;		/* Pages in file, 0x3 */
-  unsigned short e_crlc;	/* Relocations, 0x0 */
-  unsigned short e_cparhdr;	/* Size of header in paragraphs, 0x4 */
-  unsigned short e_minalloc;	/* Minimum extra paragraphs needed, 0x0 */
-  unsigned short e_maxalloc;	/* Maximum extra paragraphs needed, 0xFFFF */
-  unsigned short e_ss;		/* Initial (relative) SS value, 0x0 */
-  unsigned short e_sp;		/* Initial SP value, 0xb8 */
-  unsigned short e_csum;	/* Checksum, 0x0 */
-  unsigned short e_ip;		/* Initial IP value, 0x0 */
-  unsigned short e_cs;		/* Initial (relative) CS value, 0x0 */
-  unsigned short e_lfarlc;	/* File address of relocation table, 0x40 */
-  unsigned short e_ovno;	/* Overlay number, 0x0 */
-  char e_res[4][2];		/* Reserved words, all 0x0 */
-  unsigned short e_oemid;	/* OEM identifier (for e_oeminfo), 0x0 */
-  unsigned short e_oeminfo;	/* OEM information; e_oemid specific, 0x0 */
-  char e_res2[10][2];		/* Reserved words, all 0x0 */
-  unsigned long e_lfanew;	/* File address of new exe header, 0x80 */
+  uint16_t e_magic;	/* Magic number, 0x5a4d */
+  uint16_t e_cblp;	/* Bytes on last page of file, 0x90 */
+  uint16_t e_cp;	/* Pages in file, 0x3 */
+  uint16_t e_crlc;	/* Relocations, 0x0 */
+  uint16_t e_cparhdr;	/* Size of header in paragraphs, 0x4 */
+  uint16_t e_minalloc;	/* Minimum extra paragraphs needed, 0x0 */
+  uint16_t e_maxalloc;	/* Maximum extra paragraphs needed, 0xFFFF */
+  uint16_t e_ss;	/* Initial (relative) SS value, 0x0 */
+  uint16_t e_sp;	/* Initial SP value, 0xb8 */
+  uint16_t e_csum;	/* Checksum, 0x0 */
+  uint16_t e_ip;	/* Initial IP value, 0x0 */
+  uint16_t e_cs;	/* Initial (relative) CS value, 0x0 */
+  uint16_t e_lfarlc;	/* File address of relocation table, 0x40 */
+  uint16_t e_ovno;	/* Overlay number, 0x0 */
+  char e_res[4][2];	/* Reserved words, all 0x0 */
+  uint16_t e_oemid;	/* OEM identifier (for e_oeminfo), 0x0 */
+  uint16_t e_oeminfo;	/* OEM information; e_oemid specific, 0x0 */
+  char e_res2[10][2];	/* Reserved words, all 0x0 */
+  uint32_t e_lfanew;	/* File address of new exe header, 0x80 */
   char dos_message[16][4];	/* other stuff, always follow DOS header */
-  unsigned int nt_signature;	/* required NT signature, 0x4550 */
+  uint32_t nt_signature;	/* required NT signature, 0x4550 */
 
   /* From standard header */
 
-  unsigned short f_magic;	/* magic number			*/
-  unsigned short f_nscns;	/* number of sections		*/
-  unsigned long f_timdat;	/* time & date stamp		*/
-  unsigned long f_symptr;	/* file pointer to symtab	*/
-  unsigned long f_nsyms;	/* number of symtab entries	*/
-  unsigned short f_opthdr;	/* sizeof(optional hdr)		*/
-  unsigned short f_flags;	/* flags			*/
+  uint16_t f_magic;	/* magic number			*/
+  uint16_t f_nscns;	/* number of sections		*/
+  uint32_t f_timdat;	/* time & date stamp		*/
+  uint32_t f_symptr;	/* file pointer to symtab	*/
+  uint32_t f_nsyms;	/* number of symtab entries	*/
+  uint16_t f_opthdr;	/* sizeof(optional hdr)		*/
+  uint16_t f_flags;	/* flags			*/
 };
 
 
@@ -368,37 +386,39 @@ struct external_PE_filehdr
 
 typedef struct
 {
-  unsigned short magic;		/* type of file				*/
-  unsigned short vstamp;	/* version stamp			*/
-  unsigned long	tsize;		/* text size in bytes, padded to FW bdry*/
-  unsigned long	dsize;		/* initialized data "  "		*/
-  unsigned long	bsize;		/* uninitialized data "   "		*/
-  unsigned long	entry;		/* entry pt.				*/
-  unsigned long text_start;	/* base of text used for this file */
-  unsigned long data_start;	/* base of all data used for this file */
+  uint16_t magic;		/* type of file				*/
+  uint16_t vstamp;		/* version stamp			*/
+  uint32_t tsize;		/* text size in bytes, padded to FW bdry*/
+  uint32_t dsize;		/* initialized data "  "		*/
+  uint32_t bsize;		/* uninitialized data "   "		*/
+  uint32_t entry;		/* entry pt.				*/
+  uint32_t text_start;	/* base of text used for this file */
+#ifndef __x86_64__
+  uint32_t data_start;	/* base of all data used for this file */
+#endif
 
   /* NT extra fields; see internal.h for descriptions */
-  unsigned long  ImageBase;
-  unsigned long  SectionAlignment;
-  unsigned long  FileAlignment;
-  unsigned short  MajorOperatingSystemVersion;
-  unsigned short  MinorOperatingSystemVersion;
-  unsigned short  MajorImageVersion;
-  unsigned short  MinorImageVersion;
-  unsigned short  MajorSubsystemVersion;
-  unsigned short  MinorSubsystemVersion;
+  uintptr_t ImageBase;
+  uint32_t  SectionAlignment;
+  uint32_t  FileAlignment;
+  uint16_t  MajorOperatingSystemVersion;
+  uint16_t  MinorOperatingSystemVersion;
+  uint16_t  MajorImageVersion;
+  uint16_t  MinorImageVersion;
+  uint16_t  MajorSubsystemVersion;
+  uint16_t  MinorSubsystemVersion;
   char  Reserved1[4];
-  unsigned long  SizeOfImage;
-  unsigned long  SizeOfHeaders;
-  unsigned long  CheckSum;
-  unsigned short Subsystem;
-  unsigned short DllCharacteristics;
-  unsigned long  SizeOfStackReserve;
-  unsigned long  SizeOfStackCommit;
-  unsigned long  SizeOfHeapReserve;
-  unsigned long  SizeOfHeapCommit;
-  unsigned long  LoaderFlags;
-  unsigned long  NumberOfRvaAndSizes;
+  uint32_t  SizeOfImage;
+  uint32_t  SizeOfHeaders;
+  uint32_t  CheckSum;
+  uint16_t  Subsystem;
+  uint16_t  DllCharacteristics;
+  uintptr_t SizeOfStackReserve;
+  uintptr_t SizeOfStackCommit;
+  uintptr_t SizeOfHeapReserve;
+  uintptr_t SizeOfHeapCommit;
+  uint32_t  LoaderFlags;
+  uint32_t  NumberOfRvaAndSizes;
   /* IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES]; */
   char  DataDirectory[16][2][4]; /* 16 entries, 2 elements/entry, 4 chars */
 
@@ -406,7 +426,11 @@ typedef struct
 
 
 #undef AOUTSZ
+#ifdef __x86_64__
+#define AOUTSZ (AOUTHDRSZ + 212)
+#else
 #define AOUTSZ (AOUTHDRSZ + 196)
+#endif
 
 #undef  E_FILNMLEN
 #define E_FILNMLEN	18	/* # characters in a file name		*/

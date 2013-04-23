@@ -22,6 +22,13 @@ enum ftype3 {
   NF3FIFO   = 7
 };
 
+#pragma pack (push, 4)
+struct nfs_timestruc_t
+{
+  int32_t  tv_sec;
+  uint32_t tv_nsec;
+};
+
 struct fattr3 {
   uint32_t type;
   uint32_t mode;
@@ -38,10 +45,11 @@ struct fattr3 {
     } rdev;
   uint64_t fsid;
   uint64_t fileid;
-  timestruc_t atime;
-  timestruc_t mtime;
-  timestruc_t ctime;
+  struct nfs_timestruc_t atime;
+  struct nfs_timestruc_t mtime;
+  struct nfs_timestruc_t ctime;
 };
+#pragma pack (pop)
 
 struct nfs_aol_ffei_t {
   ULONG NextEntryOffset;
