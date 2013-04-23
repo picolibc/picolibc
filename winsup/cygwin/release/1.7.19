@@ -1,0 +1,10 @@
+What's new:
+-----------
+
+- Drop support for Windows 2000 and Windows XP pre-SP3.
+
+- Add support for building a 64 bit version of Cygwin on x86_64 natively.
+
+Bug fixes:
+----------
+
