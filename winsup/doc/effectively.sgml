@@ -17,12 +17,9 @@ support the <literal>/?</literal> switch to display usage information.
 
 <para>
 Unfortunately, no standard set of tools included with all versions of 
-Windows exists.  If you are unfamiliar with the tools available 
-on your system, here is a general guide.  Windows 2000 has only a basic 
-set of tools, which later versions of Windows expanded.  Microsoft also
-provides free downloads for Windows 2000 (the Resource Kit Tools), and XP
-(the Windows Support Tools).  Generally, the younger the Windows version,
-the more complete are the on-board tools.  Additionally, many independent
+Windows exists.  Generally, the younger the Windows version, the more
+complete are the on-board tools.  Microsoft also provides free downloads
+for Windows XP (the Windows Support Tools).  Additionally, many independent
 sites such as 
 <ulink url="http://download.com">download.com</ulink>, 
 <ulink url="http://simtel.net">simtel.net</ulink>, 
@@ -85,8 +82,8 @@ If your system does not have an always-on network connection, you
 may be interested in <command>rasdial.exe</command> for automating dialup
 connections.  
 Users who frequently change their network 
-configuration can script these changes with <command>netsh.exe</command> 
-(Windows 2000 and later). For proxy users, the open source 
+configuration can script these changes with <command>netsh.exe</command>.
+For proxy users, the open source 
 <ulink url="http://apserver.sourceforge.net">
 NTLM Authorization Proxy Server</ulink> or the no-charge
 <ulink url="http://www.hummingbird.com/products/nc/socks/index.html">

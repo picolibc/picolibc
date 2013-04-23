@@ -8,7 +8,7 @@ Cygwin is a Linux-like environment for Windows. It consists of a DLL
 providing substantial <ulink url="http://www.pasc.org/#POSIX">POSIX</ulink>
 (Portable Operating System Interface) system call functionality, and a
 collection of tools, which provide a Linux look and feel. The Cygwin DLL
-works with all x86 and AMD64 versions of Windows NT since Windows 2000.
+works with all x86 and AMD64 versions of Windows NT since Windows XP SP3.
 The API follows the
 <ulink url="http://www.opengroup.org/onlinepubs/009695399/nfindex.html">Single
 Unix Specification</ulink> as much as possible, and then Linux practice.
@@ -108,11 +108,15 @@ have seen continuous development.
 </para>
 
 <para>
-The latest major improvement in this development is the 1.7 release in
+The biggest major improvement in this development is the 1.7 release in
 2009, which dropped Windows 95/98/Me support in favor of using Windows
 NT features more extensively.  It adds a lot of new features like
 case-sensitive filenames, NFS interoperability, IPv6 support and much
 more.</para>
+
+<para>The latest big improvement is the 64 bit Cygwin DLL which
+allows to run natively on AMD64 Windows machines.  The first release
+available in a 64 bit version is 1.7.19.</para>
 
 </sect1>
 

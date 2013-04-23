@@ -654,12 +654,7 @@ on by setting the registry value</para>
 HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel\obcaseinsensitive
 </screen>
 
-<para>to 0 and reboot the machine.  For least surprise, Cygwin expects
-this registry value also on Windows 2000, which usually doesn't know this
-registry key.  If you want case-sensitivity on Windows 2000, just create
-that registry value and set it to 0.  <emphasis role='bold'>Only</emphasis>
-on Windows 2000 you don't have to reboot to bring it into effect, rather
-stopping all Cygwin processes and then restarting them is sufficient.</para>
+<para>to 0 and reboot the machine.</para>
 
 <note>
 <para>

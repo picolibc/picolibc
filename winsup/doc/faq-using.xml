@@ -1101,10 +1101,6 @@ IPv6-capable and that's why you see the "Address family not supported"
 error message.  Note, however, that the IPv6 stack on these systems
 don't fully support all features of IPv6.</para>
 
-<para>There's also a very experimental IPv6 stack for Windows 2000, and
-Cygwin will try its best to support it, but it's not recommended to install
-it.</para>
-
 <para>For more information about IPv6 on Windows and how to install the
 IPv6 stack, see the <ulink url="http://www.microsoft.com/technet/network/ipv6/ipv6faq.mspx">Microsoft TechNet IPv6 FAQ article</ulink>
 </para></answer></qandaentry>
