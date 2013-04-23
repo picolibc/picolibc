@@ -1,0 +1,87 @@
+2013-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* msg.cc (client_request_msg::serve): Revert change to refuse 64 bit
+	processes on 32 bit systems.
+	* sem.cc (client_request_sem::serve): Ditto.
+	* shm.cc (client_request_shm::serve): Ditto.
+
+2013-03-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* client.cc: Revert changes to handle 32 bit processes on 64 bit
+	systems.
+	* sysv_msg.cc: Ditto.
+	* sysv_sem.cc: Ditto.
+	* sysv_shm.cc: Ditto.
+
+2013-02-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygserver.exe): Make cygwin_build a tooldir (-B instead
+	of -L) to support bootstrapping.
+
+2013-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure: Regenerate to fix wrong ac_unique_file dependency.
+
+2012-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_msg.cc (conv_timespec32_to_timespec): Move implementation to
+	cygserver_ipc.h.
+	(conv_timespec_to_timespec32): Ditto.
+	(conv_msqid_ds32_to_msqid_ds): Drop and move code into copyin_msqid_ds.
+	(conv_msqid_ds_to_msqid_ds32): Drop and move code into copyout_msqid_ds.
+	* sysv_sem.cc (copyin_semid_ds): New inline function on Cygwin.
+	(copyout_semid_ds): Ditto.
+	(__semctl): Use a conditional arg_size value rather than a fixed
+	sizeof(real_arg) throughout, to accommodate 64/32 bit conversion.
+	Use copyout_semid_ds and copyin_semid_ds to copy semid_ds
+	structures from cygserver to client and vice versa on Cygwin.
+	* sysv_shm.cc (copyin_shmid_ds): New inline function on Cygwin.
+	(copyout_shmid_ds): Ditto.
+	(shmctl): Use copyout_shmid_ds and copyin_shmid_ds to copy shmid_ds
+	structures from cygserver to client and vice versa on Cygwin.
+
+2012-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* client.cc (client_request::header_t::header_t): Accommodate changes
+	to msglen member.
+	(client_request::handle_request): Ditto.
+	(client_request::client_request): Zero out entire parameter block.
+	Explain why.
+	* sysv_msg.cc (conv_timespec32_to_timespec): New inline function on
+	64 bit Cygwin.
+	(conv_timespec_to_timespec32): Ditto.
+	(conv_msqid_ds32_to_msqid_ds): Ditto.
+	(conv_msqid_ds_to_msqid_ds32): Ditto.
+	(copyin_msqid_ds): New inline function on Cygwin.
+	(copyout_msqid_ds): Ditto.
+	(msgctl): Use copyout_msqid_ds and copyin_msqid_ds to copy msqid_ds
+	structures from cygserver to client and vice versa on Cygwin.
+	(msgsnd): Special case copyin of msg_type on 64 bit Cygwin.
+	(msgrcv): Special case copyout of msg_type on 64 bit Cygwin.
+
+2012-12-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (tunable_int_fetch): Convert 2nd parameter to
+	int32_t.
+	* bsd_helper.h (tunable_int_fetch): Fix declaration accordingly.
+	* bsd_log.cc (log_level): Change type to int32_t.
+	* bsd_log.h (log_level): Fix declaration accordingly.
+	* bsd_mutex.cc (msgmni): Change type to int32_t.
+	(semmni): Ditto.
+	* cygserver.cc: Fix debug output to be target agnostic.  Use same
+	style throughout.
+	* msg.cc (client_request_msg::serve): Refuse to serve 64 bit processes
+	from 32 bit cygserver.
+	* sem.cc (client_request_sem::serve): Ditto.
+	* shm.cc (client_request_shm::serve): Ditto.
+	* sysv_shm.cc (shm_delete_mapping): Mark size as unused to make gcc
+	happy.
+	(kern_shmat): Ditto with flags.
+	* process.h (class process): Change type of _cleaning_up member to LONG.
+	* threaded_queue.h (class threaded_queue): Ditto for _workers_count.
+
+2012-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in: Add AC_NO_EXECUTABLES to allow bootstrap.
+	* configure: Regenerate.
+

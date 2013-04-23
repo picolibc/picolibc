@@ -34,27 +34,13 @@ details. */
 #include "winf.h"
 #include "ntdll.h"
 
-static suffix_info NO_COPY exe_suffixes[] =
+static const suffix_info exe_suffixes[] =
 {
   suffix_info ("", 1),
   suffix_info (".exe", 1),
   suffix_info (".com"),
   suffix_info (NULL)
 };
-
-#if 0
-/* CV, 2009-11-05: Used to be used when searching for DLLs in calls to
-   dlopen().  However, dlopen() on other platforms never adds a suffix by
-   its own.  Therefore we use stat_suffixes now, which only adds a .exe
-   suffix for symmetry. */
-static suffix_info dll_suffixes[] =
-{
-  suffix_info (".dll"),
-  suffix_info ("", 1),
-  suffix_info (".exe", 1),
-  suffix_info (NULL)
-};
-#endif
 
 /* Add .exe to PROG if not already present and see if that exists.
    If not, return PROG (converted from posix to win32 rules if necessary).
@@ -465,28 +451,18 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	 of a compatibility job, which allows child processes to break away
 	 from the job.  This helps to avoid this issue.
 
+	 First we call IsProcessInJob.  It fetches the information whether or
+	 not we're part of a job 20 times faster than QueryInformationJobObject.
+
 	 (*) Note that this is not mintty's fault.  It has just been observed
 	 with mintty in the first place.  See the archives for more info:
 	 http://cygwin.com/ml/cygwin-developers/2012-02/msg00018.html */
 
       JOBOBJECT_BASIC_LIMIT_INFORMATION jobinfo;
+      BOOL is_in_job;
 
-      /* Calling QueryInformationJobObject costs time.  Starting with
-	 Windows XP there's a function IsProcessInJob, which fetches the
-	 information whether or not we're part of a job 20 times faster than
-	 the call to QueryInformationJobObject.  But we're still
-	 supporting Windows 2000, so we can't just link to that function.
-	 On the other hand, loading the function pointer at runtime is a
-	 time comsuming operation, too.  So, what we do here is to emulate
-	 the IsProcessInJob function when called for the own process and with
-	 a NULL job handle.  In this case it just returns the value of the
-	 lowest bit from PEB->EnvironmentUpdateCount (observed with WinDbg).
-	 The name of this PEB member is the same in all (inofficial)
-	 documentations of the PEB.  Apparently it's a bit misleading.
-	 As a result, we only call QueryInformationJobObject if we're on
-	 Vista or later *and* if the PEB indicates we're running in a job.
-	 Tested on Vista/32, Vista/64, W7/32, W7/64, W8/64. */
-      if ((NtCurrentTeb ()->Peb->EnvironmentUpdateCount & 1) != 0
+      if (IsProcessInJob (GetCurrentProcess (), NULL, &is_in_job)
+	  && is_in_job
 	  && QueryInformationJobObject (NULL, JobObjectBasicLimitInformation,
 				     &jobinfo, sizeof jobinfo, NULL)
 	  && (jobinfo.LimitFlags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK
@@ -935,7 +911,7 @@ spawnve (int mode, const char *path, const char *const *argv,
     vf = NULL;
 #endif
 
-  syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
+  syscall_printf ("spawnve (%s, %s, %p)", path, argv[0], envp);
 
   if (!envp)
     envp = empty_env;
@@ -1135,7 +1111,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	  NtClose (h);
 	  goto err;
 	}
-      if (size.QuadPart > wincap.allocation_granularity ())
+      if (size.QuadPart > (LONGLONG) wincap.allocation_granularity ())
 	size.LowPart = wincap.allocation_granularity ();
 
       HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY,
@@ -1176,8 +1152,8 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	    unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
 	    win16_exe = off < sizeof (IMAGE_DOS_HEADER);
 	    if (!win16_exe)
-	      real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL,
-							      subsys, hm));
+	      real_path.set_cygexec (hook_or_detect_cygwin (buf, NULL,
+							    subsys, hm));
 	    else
 	      real_path.set_cygexec (false);
 	    UnmapViewOfFile (buf);

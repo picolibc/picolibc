@@ -14,12 +14,12 @@ details. */
    the passwd and group lists */
 extern struct passwd *internal_getpwsid (cygpsid &);
 extern struct passwd *internal_getpwnam (const char *, bool = FALSE);
-extern struct passwd *internal_getpwuid (__uid32_t, bool = FALSE);
-extern struct __group32 *internal_getgrsid (cygpsid &);
-extern struct __group32 *internal_getgrgid (__gid32_t gid, bool = FALSE);
-extern struct __group32 *internal_getgrnam (const char *, bool = FALSE);
-extern struct __group32 *internal_getgrent (int);
-int internal_getgroups (int, __gid32_t *, cygpsid * = NULL);
+extern struct passwd *internal_getpwuid (uid_t, bool = FALSE);
+extern struct group *internal_getgrsid (cygpsid &);
+extern struct group *internal_getgrgid (gid_t gid, bool = FALSE);
+extern struct group *internal_getgrnam (const char *, bool = FALSE);
+extern struct group *internal_getgrent (int);
+int internal_getgroups (int, gid_t *, cygpsid * = NULL);
 
 #include "sync.h"
 #include "cygtls.h"
@@ -29,7 +29,7 @@ class pwdgrp
   union
   {
     passwd **passwd_buf;
-    __group32 **group_buf;
+    group **group_buf;
     void **pwdgrp_buf;
   };
   void (pwdgrp::*read) ();
@@ -80,5 +80,5 @@ public:
   }
 
   pwdgrp (passwd *&pbuf);
-  pwdgrp (__group32 *&gbuf);
+  pwdgrp (group *&gbuf);
 };

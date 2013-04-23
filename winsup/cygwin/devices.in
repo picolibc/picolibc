@@ -66,7 +66,7 @@ exists_ntdev_silent (const device& dev)
 static int
 exists_console (const device& dev)
 {
-  int devn = *const_cast<device *> (&dev);
+  fh_devices devn = *const_cast<device *> (&dev);
   switch (devn)
     {
     case FH_CONSOLE:
@@ -207,7 +207,7 @@ device::init ()
 void
 device::parse (_major_t major, _minor_t minor)
 {
-  _dev_t devn = FHDEV (major, minor);
+  dev_t devn = FHDEV (major, minor);
 
   d.devn = 0;
 
@@ -223,7 +223,7 @@ device::parse (_major_t major, _minor_t minor)
 }
 
 void
-device::parse (_dev_t dev)
+device::parse (dev_t dev)
 {
   parse (_major (dev), _minor (dev));
 }

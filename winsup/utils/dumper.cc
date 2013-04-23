@@ -1,6 +1,6 @@
 /* dumper.cc
 
-   Copyright 1999, 2001, 2002, 2004, 2006, 2007, 2011 Red Hat Inc.
+   Copyright 1999, 2001, 2002, 2004, 2006, 2007, 2011, 2013 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -84,7 +84,8 @@ dumper::dumper (DWORD pid, DWORD tid, const char *file_name)
 			  pid);
   if (!hProcess)
     {
-      fprintf (stderr, "Failed to open process #%lu, error %ld\n", pid, GetLastError ());
+      fprintf (stderr, "Failed to open process #%u, error %ld\n",
+	       (unsigned int) pid, (long) GetLastError ());
       return;
     }
 
@@ -192,7 +193,7 @@ dumper::add_thread (DWORD tid, HANDLE hThread)
 }
 
 int
-dumper::add_mem_region (LPBYTE base, DWORD size)
+dumper::add_mem_region (LPBYTE base, SIZE_T size)
 {
   if (!sane ())
     return 0;
@@ -209,14 +210,14 @@ dumper::add_mem_region (LPBYTE base, DWORD size)
   new_entity->u.memory.base = base;
   new_entity->u.memory.size = size;
 
-  deb_printf ("added memory region %08x-%08x\n", (DWORD) base, (DWORD) base + size);
+  deb_printf ("added memory region %p-%p\n", base, base + size);
   return 1;
 }
 
 /* split_add_mem_region scans list of regions to be excluded from dumping process
    (excl_list) and removes all "excluded" parts from given region. */
 int
-dumper::split_add_mem_region (LPBYTE base, DWORD size)
+dumper::split_add_mem_region (LPBYTE base, SIZE_T size)
 {
   if (!sane ())
     return 0;
@@ -255,7 +256,7 @@ dumper::add_module (LPVOID base_address)
   if (!sane ())
     return 0;
 
-  char *module_name = psapi_get_module_name (hProcess, (DWORD) base_address);
+  char *module_name = psapi_get_module_name (hProcess, base_address);
   if (module_name == NULL)
     return 1;
 
@@ -270,7 +271,7 @@ dumper::add_module (LPVOID base_address)
 
   parse_pe (module_name, excl_list);
 
-  deb_printf ("added module %08x %s\n", base_address, module_name);
+  deb_printf ("added module %p %s\n", base_address, module_name);
   return 1;
 }
 
@@ -284,8 +285,8 @@ dumper::collect_memory_sections ()
 
   LPBYTE current_page_address;
   LPBYTE last_base = (LPBYTE) 0xFFFFFFFF;
-  DWORD last_size = 0;
-  DWORD done;
+  SIZE_T last_size = (SIZE_T) 0;
+  SIZE_T done;
 
   char mem_buf[PAGE_BUFFER_SIZE];
 
@@ -329,9 +330,9 @@ dumper::collect_memory_sections ()
 	      for (int i = 0; i < 10; i++)
 		strcat (buf, pt[i]);
 
-	      deb_printf ("warning: failed to read memory at %08x-%08x (protect = %s), error %ld.\n",
-			  (DWORD) current_page_address,
-			  (DWORD) current_page_address + mbi.RegionSize,
+	      deb_printf ("warning: failed to read memory at %p-%p (protect = %s), error %ld.\n",
+			  current_page_address,
+			  current_page_address + mbi.RegionSize,
 			  buf, err);
 	      skip_region_p = 1;
 	    }
@@ -369,9 +370,9 @@ dumper::dump_memory_region (asection * to, process_mem_region * memory)
   if (!sane ())
     return 0;
 
-  DWORD size = memory->size;
-  DWORD todo;
-  DWORD done;
+  SIZE_T size = memory->size;
+  SIZE_T todo;
+  SIZE_T done;
   LPBYTE pos = memory->base;
   DWORD sect_pos = 0;
 
@@ -516,12 +517,13 @@ dumper::collect_process_information ()
 
   if (!DebugActiveProcess (pid))
     {
-      fprintf (stderr, "Cannot attach to process #%lu, error %ld", pid, GetLastError ());
+      fprintf (stderr, "Cannot attach to process #%u, error %ld",
+	       (unsigned int) pid, (long) GetLastError ());
       return 0;
     }
 
   char event_name[sizeof ("cygwin_error_start_event") + 20];
-  sprintf (event_name, "cygwin_error_start_event%16lx", pid);
+  sprintf (event_name, "cygwin_error_start_event%16x", (unsigned int) pid);
   HANDLE sync_with_debugee = OpenEvent (EVENT_MODIFY_STATE, FALSE, event_name);
 
   DEBUG_EVENT current_event;
@@ -660,7 +662,7 @@ dumper::prepare_core_dump ()
   char sect_name[50];
 
   flagword sect_flags;
-  DWORD sect_size;
+  SIZE_T sect_size;
   bfd_vma sect_vma;
 
   asection *new_section;
@@ -812,7 +814,7 @@ dumper::write_core_dump ()
       if (p->section == NULL)
 	continue;
 
-      deb_printf ("writing section type=%u base=%08x size=%08x flags=%08x\n",
+      deb_printf ("writing section type=%u base=%p size=%p flags=%08x\n",
 		  p->type,
 		  p->section->vma,
 		  bfd_get_section_size (p->section),
@@ -936,7 +938,7 @@ main (int argc, char **argv)
   DWORD tid = 0;
 
   if (verbose)
-    printf ("dumping process #%lu to %s\n", pid, core_file);
+    printf ("dumping process #%u to %s\n", (unsigned int) pid, core_file);
 
   dumper d (pid, tid, core_file);
   if (!d.sane ())

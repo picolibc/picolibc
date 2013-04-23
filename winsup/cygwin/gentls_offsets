@@ -1,5 +1,5 @@
 #!/usr/bin/perl -s
-# Copyright 2003, 2004, 2005, 2006, 2008, 2012, 2013 Red Hat, Inc.
+# Copyright 2003, 2004, 2005, 2012, 2013 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -9,6 +9,13 @@
 #
 my $tls = shift;
 my $tls_out = shift;
+my $tgt = shift;
+# FIXME?  This method obviously requires a 64 bit OS to build tlsoffsets64.h
+# Another method which doesn't requires to run an executable would be to
+# generate assembler code accessing the various struct members and analyzing
+# it, but that's arguably a lot more effort.
+my $tgt_opt='-m64';
+$tgt_opt='-m32' unless ($tgt eq 'x86_64');
 open(TLS, $tls) or die "$0: couldn't open tls file \"$tls\" - $!\n";
 my $struct = '';
 my @fields = ();
@@ -44,7 +51,9 @@ close TLS;
 open(TMP, '>', "/tmp/$$.cc") or die "$0: couldn't open temporary index file \"/tmp/$$.c\" - $!\n";
 print TMP <<EOF;
 #define __INSIDE_CYGWIN__
+#ifndef __x86_64__
 #define __attribute__(X)
+#endif
 #define __reg1
 #define __reg2
 #define __reg3
@@ -81,13 +90,13 @@ EOF
 EOF
 close TMP;
 system @ARGV, '-o', "/tmp/$$-1.cc", '-E', "/tmp/$$.cc";
-system 'g++', '-m32', '-o', "/tmp/$$.a.out", "/tmp/$$-1.cc" and
-($? == 127 && system 'c++', '-m32', '-o', "/tmp/$$.a.out", "/tmp/$$-1.cc") and
+system 'g++', "$tgt_opt", '-o', "/tmp/$$.a.out", "/tmp/$$-1.cc" and
+($? == 127 && system 'c++', "$tgt_opt", '-o', "/tmp/$$.a.out", "/tmp/$$-1.cc") and
 die "$0: couldn't generate executable for offset calculation \"/tmp/$$.a.out\" - $!\n";
 open(TLS_OUT, '>', $tls_out) or die "$0: couldn't open tls index file \"$tls_out\" - $!\n";
 open(OFFS, "/tmp/$$.a.out|") or die "$0: couldn't run \"/tmp/$$.a.out\" - $!\n";
 print TLS_OUT <OFFS>;
 close OFFS;
 close TLS_OUT;
-unlink "/tmp/$$.cc", "/tmp/$$.a.out";
+unlink "/tmp/$$.cc", "/tmp/$$-1.cc", "/tmp/$$-1.d", "/tmp/$$.a.out";
 exit(0);

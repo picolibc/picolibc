@@ -1,7 +1,7 @@
 /* grp.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2011, 2012 Red Hat, Inc.
+   2008, 2009, 2011, 2012, 2013 Red Hat, Inc.
 
    Original stubs by Jason Molenda of Cygnus Support, crash@cygnus.com
    First implementation by Gunther Ebert, gunther.ebert@ixos-leipzig.de
@@ -25,14 +25,14 @@ details. */
 #include "ntdll.h"
 #include "pwdgrp.h"
 
-static __group32 *group_buf;
+static group *group_buf;
 static pwdgrp gr (group_buf);
-static char * NO_COPY null_ptr;
+static char * NO_COPY_RO null_ptr;
 
 bool
 pwdgrp::parse_group ()
 {
-  __group32 &grp = (*group_buf)[curr_lines];
+  group &grp = (*group_buf)[curr_lines];
   grp.gr_name = next_str (':');
   if (!*grp.gr_name)
     return false;
@@ -81,15 +81,15 @@ pwdgrp::read_group ()
       static char linebuf [200];
       char group_name [UNLEN + 1] = "mkgroup";
       char strbuf[128] = "";
-      struct __group32 *gr;
+      struct group *gr;
 
       cygheap->user.groups.pgsid.string (strbuf);
       if ((gr = internal_getgrsid (cygheap->user.groups.pgsid)))
 	snprintf (group_name, sizeof (group_name),
-		  "passwd/group_GID_clash(%lu/%lu)", myself->gid, gr->gr_gid);
+		  "passwd/group_GID_clash(%u/%u)", myself->gid, gr->gr_gid);
       if (myself->uid == UNKNOWN_UID)
 	strcpy (group_name, "mkpasswd"); /* Feedback... */
-      snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:%s",
+      snprintf (linebuf, sizeof (linebuf), "%s:%s:%u:%s",
 		group_name, strbuf, myself->gid, cygheap->user.name ());
       debug_printf ("Completing /etc/group: %s", linebuf);
       add_line (linebuf);
@@ -108,7 +108,7 @@ pwdgrp::pwdgrp (passwd *&pbuf) :
   pglock.init ("pglock");
 }
 
-pwdgrp::pwdgrp (__group32 *&gbuf) :
+pwdgrp::pwdgrp (group *&gbuf) :
   pwdgrp_buf_elem_size (sizeof (*gbuf)), group_buf (&gbuf)
 {
   read = &pwdgrp::read_group;
@@ -116,7 +116,7 @@ pwdgrp::pwdgrp (__group32 *&gbuf) :
   pglock.init ("pglock");
 }
 
-struct __group32 *
+struct group *
 internal_getgrsid (cygpsid &sid)
 {
   char sid_string[128];
@@ -130,8 +130,8 @@ internal_getgrsid (cygpsid &sid)
   return NULL;
 }
 
-struct __group32 *
-internal_getgrgid (__gid32_t gid, bool check)
+struct group *
+internal_getgrgid (gid_t gid, bool check)
 {
   gr.refresh (check);
 
@@ -141,7 +141,7 @@ internal_getgrgid (__gid32_t gid, bool check)
   return NULL;
 }
 
-struct __group32 *
+struct group *
 internal_getgrnam (const char *name, bool check)
 {
   gr.refresh (check);
@@ -154,8 +154,9 @@ internal_getgrnam (const char *name, bool check)
   return NULL;
 }
 
+#ifndef __x86_64__
 static struct __group16 *
-grp32togrp16 (struct __group16 *gp16, struct __group32 *gp32)
+grp32togrp16 (struct __group16 *gp16, struct group *gp32)
 {
   if (!gp16 || !gp32)
     return NULL;
@@ -169,17 +170,18 @@ grp32togrp16 (struct __group16 *gp16, struct __group32 *gp32)
 
   return gp16;
 }
+#endif
 
 extern "C" int
-getgrgid_r (__gid32_t gid, struct __group32 *grp, char *buffer, size_t bufsize,
-	    struct __group32 **result)
+getgrgid_r (gid_t gid, struct group *grp, char *buffer, size_t bufsize,
+	    struct group **result)
 {
   *result = NULL;
 
   if (!grp || !buffer)
     return ERANGE;
 
-  struct __group32 *tempgr = internal_getgrgid (gid, true);
+  struct group *tempgr = internal_getgrgid (gid, true);
   pthread_testcancel ();
   if (!tempgr)
     return 0;
@@ -206,12 +208,15 @@ getgrgid_r (__gid32_t gid, struct __group32 *grp, char *buffer, size_t bufsize,
   return 0;
 }
 
-extern "C" struct __group32 *
-getgrgid32 (__gid32_t gid)
+extern "C" struct group *
+getgrgid32 (gid_t gid)
 {
   return internal_getgrgid (gid, true);
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (getgrgid32, getgrgid)
+#else
 extern "C" struct __group16 *
 getgrgid (__gid16_t gid)
 {
@@ -219,17 +224,18 @@ getgrgid (__gid16_t gid)
 
   return grp32togrp16 (&g16, getgrgid32 (gid16togid32 (gid)));
 }
+#endif
 
 extern "C" int
-getgrnam_r (const char *nam, struct __group32 *grp, char *buffer,
-	    size_t bufsize, struct __group32 **result)
+getgrnam_r (const char *nam, struct group *grp, char *buffer,
+	    size_t bufsize, struct group **result)
 {
   *result = NULL;
 
   if (!grp || !buffer)
     return ERANGE;
 
-  struct __group32 *tempgr = internal_getgrnam (nam, true);
+  struct group *tempgr = internal_getgrnam (nam, true);
   pthread_testcancel ();
   if (!tempgr)
     return 0;
@@ -256,12 +262,15 @@ getgrnam_r (const char *nam, struct __group32 *grp, char *buffer,
   return 0;
 }
 
-extern "C" struct __group32 *
+extern "C" struct group *
 getgrnam32 (const char *name)
 {
   return internal_getgrnam (name, true);
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (getgrnam32, getgrnam)
+#else
 extern "C" struct __group16 *
 getgrnam (const char *name)
 {
@@ -269,6 +278,7 @@ getgrnam (const char *name)
 
   return grp32togrp16 (&g16, getgrnam32 (name));
 }
+#endif
 
 extern "C" void
 endgrent ()
@@ -276,7 +286,7 @@ endgrent ()
   _my_tls.locals.grp_pos = 0;
 }
 
-extern "C" struct __group32 *
+extern "C" struct group *
 getgrent32 ()
 {
   if (_my_tls.locals.grp_pos == 0)
@@ -287,6 +297,9 @@ getgrent32 ()
   return NULL;
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (getgrent32, getgrent)
+#else
 extern "C" struct __group16 *
 getgrent ()
 {
@@ -294,6 +307,7 @@ getgrent ()
 
   return grp32togrp16 (&g16, getgrent32 ());
 }
+#endif
 
 extern "C" void
 setgrent ()
@@ -302,7 +316,7 @@ setgrent ()
 }
 
 /* Internal function. ONLY USE THIS INTERNALLY, NEVER `getgrent'!!! */
-struct __group32 *
+struct group *
 internal_getgrent (int pos)
 {
   gr.refresh (false);
@@ -313,13 +327,13 @@ internal_getgrent (int pos)
 }
 
 int
-internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
+internal_getgroups (int gidsetsize, gid_t *grouplist, cygpsid * srchsid)
 {
   NTSTATUS status;
   HANDLE hToken = NULL;
   ULONG size;
   int cnt = 0;
-  struct __group32 *gr;
+  struct group *gr;
 
   if (!srchsid && cygheap->user.groups.issetgroups ())
     {
@@ -383,7 +397,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 	}
     }
   else
-    debug_printf ("%lu = NtQueryInformationToken(NULL) %p", size, status);
+    debug_printf ("%u = NtQueryInformationToken(NULL) %y", size, status);
   return cnt;
 
 error:
@@ -392,15 +406,18 @@ error:
 }
 
 extern "C" int
-getgroups32 (int gidsetsize, __gid32_t *grouplist)
+getgroups32 (int gidsetsize, gid_t *grouplist)
 {
   return internal_getgroups (gidsetsize, grouplist);
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (getgroups32, getgroups)
+#else
 extern "C" int
 getgroups (int gidsetsize, __gid16_t *grouplist)
 {
-  __gid32_t *grouplist32 = NULL;
+  gid_t *grouplist32 = NULL;
 
   if (gidsetsize < 0)
     {
@@ -408,7 +425,7 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
       return -1;
     }
   if (gidsetsize > 0 && grouplist)
-    grouplist32 = (__gid32_t *) alloca (gidsetsize * sizeof (__gid32_t));
+    grouplist32 = (gid_t *) alloca (gidsetsize * sizeof (gid_t));
 
   int ret = internal_getgroups (gidsetsize, grouplist32);
 
@@ -418,6 +435,7 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
 
   return ret;
 }
+#endif
 
 /* Core functionality of initgroups and getgrouplist. */
 static int
@@ -427,7 +445,7 @@ get_groups (const char *user, gid_t gid, cygsidlist &gsids)
 
   cygheap->user.deimpersonate ();
   struct passwd *pw = internal_getpwnam (user);
-  struct __group32 *gr = internal_getgrgid (gid);
+  struct group *gr = internal_getgrgid (gid);
   cygsid usersid, grpsid;
   if (!usersid.getfrompw (pw) || !grpsid.getfromgr (gr))
     set_errno (EINVAL);
@@ -441,7 +459,7 @@ get_groups (const char *user, gid_t gid, cygsidlist &gsids)
 }
 
 extern "C" int
-initgroups32 (const char *user, __gid32_t gid)
+initgroups32 (const char *user, gid_t gid)
 {
   int ret;
 
@@ -459,11 +477,15 @@ initgroups32 (const char *user, __gid32_t gid)
   return ret;
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (initgroups32, initgroups)
+#else
 extern "C" int
 initgroups (const char *user, __gid16_t gid)
 {
   return initgroups32 (user, gid16togid32(gid));
 }
+#endif
 
 extern "C" int
 getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
@@ -484,7 +506,7 @@ getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
       int cnt = 0;
       for (int i = 0; i < tmp_gsids.count (); i++)
 	{
-	  struct __group32 *gr = internal_getgrsid (tmp_gsids.sids[i]);
+	  struct group *gr = internal_getgrsid (tmp_gsids.sids[i]);
 	  if (gr)
 	    {
 	      if (groups && cnt < *ngroups)
@@ -503,7 +525,7 @@ getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
 
 /* setgroups32: standards? */
 extern "C" int
-setgroups32 (int ngroups, const __gid32_t *grouplist)
+setgroups32 (int ngroups, const gid_t *grouplist)
 {
   syscall_printf ("setgroups32 (%d)", ngroups);
   if (ngroups < 0 || (ngroups > 0 && !grouplist))
@@ -513,7 +535,7 @@ setgroups32 (int ngroups, const __gid32_t *grouplist)
     }
 
   cygsidlist gsids (cygsidlist_alloc, ngroups);
-  struct __group32 *gr;
+  struct group *gr;
 
   if (ngroups && !gsids.sids)
     return -1;
@@ -523,7 +545,7 @@ setgroups32 (int ngroups, const __gid32_t *grouplist)
       if ((gr = internal_getgrgid (grouplist[gidx]))
 	  && gsids.addfromgr (gr))
 	continue;
-      debug_printf ("No sid found for gid %d", grouplist[gidx]);
+      debug_printf ("No sid found for gid %u", grouplist[gidx]);
       gsids.free_sids ();
       set_errno (EINVAL);
       return -1;
@@ -532,14 +554,17 @@ setgroups32 (int ngroups, const __gid32_t *grouplist)
   return 0;
 }
 
+#ifdef __x86_64__
+EXPORT_ALIAS (setgroups32, setgroups)
+#else
 extern "C" int
 setgroups (int ngroups, const __gid16_t *grouplist)
 {
-  __gid32_t *grouplist32 = NULL;
+  gid_t *grouplist32 = NULL;
 
   if (ngroups > 0 && grouplist)
     {
-      grouplist32 = (__gid32_t *) alloca (ngroups * sizeof (__gid32_t));
+      grouplist32 = (gid_t *) alloca (ngroups * sizeof (gid_t));
       if (grouplist32 == NULL)
 	return -1;
       for (int i = 0; i < ngroups; i++)
@@ -547,3 +572,4 @@ setgroups (int ngroups, const __gid16_t *grouplist)
     }
   return setgroups32 (ngroups, grouplist32);
 }
+#endif

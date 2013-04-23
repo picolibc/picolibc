@@ -18,7 +18,7 @@ struct _cmalloc_entry
 {
   union
   {
-    DWORD b;
+    unsigned b;
     char *ptr;
   };
   struct _cmalloc_entry *prev;
@@ -97,11 +97,11 @@ class cygheap_user
   cygsid effec_cygsid;  /* buffer for user's SID */
   cygsid saved_cygsid;  /* Remains intact even after impersonation */
 public:
-  __uid32_t saved_uid;     /* Remains intact even after impersonation */
-  __gid32_t saved_gid;     /* Ditto */
-  __uid32_t real_uid;      /* Remains intact on seteuid, replaced by setuid */
-  __gid32_t real_gid;      /* Ditto */
-  user_groups groups;      /* Primary and supp SIDs */
+  uid_t saved_uid;      /* Remains intact even after impersonation */
+  gid_t saved_gid;      /* Ditto */
+  uid_t real_uid;       /* Remains intact on seteuid, replaced by setuid */
+  gid_t real_gid;       /* Ditto */
+  user_groups groups;   /* Primary and supp SIDs */
 
   /* token is needed if set(e)uid should be called. It can be set by a call
      to `set_impersonation_token()'. */
@@ -153,8 +153,8 @@ public:
     const char *p = env_domain ("USERDOMAIN=", sizeof ("USERDOMAIN=") - 1);
     return (p == almost_null) ? NULL : p;
   }
-  BOOL set_sid (PSID new_sid) {return (BOOL) (effec_cygsid = new_sid);}
-  BOOL set_saved_sid () { return (BOOL) (saved_cygsid = effec_cygsid); }
+  void set_sid (PSID new_sid) { effec_cygsid = new_sid;}
+  void set_saved_sid () { saved_cygsid = effec_cygsid; }
   PSID sid () { return effec_cygsid; }
   PSID saved_sid () { return saved_cygsid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);
@@ -216,9 +216,10 @@ enum fcwd_version_t {
    minimal locking and it's much more multi-thread friendly.  Presumably
    it minimizes contention when accessing the CWD.
    The class fcwd_access_t is supposed to encapsulate the gory implementation
-   details depending on OS version from the calling functions. */
+   details depending on OS version from the calling functions.
+   The layout of all structures has been tested on 32 and 64 bit. */
 class fcwd_access_t {
-  /* This is the layout used in Windows 8 developer preview. */
+  /* This is the layout used in Windows 8. */
   struct FAST_CWD_8 {
     LONG           ReferenceCount;	/* Only release when this is 0. */
     HANDLE         DirectoryHandle;
@@ -227,7 +228,7 @@ class fcwd_access_t {
     UNICODE_STRING Path;		/* Path's Buffer member always refers
 					   to the following Buffer array. */
     LONG           FSCharacteristics;	/* Taken from FileFsDeviceInformation */
-    WCHAR          Buffer[MAX_PATH];
+    WCHAR          Buffer[MAX_PATH] __attribute ((aligned (8)));
   };
   /* This is the layout used in Windows 7 and Vista. */
   struct FAST_CWD_7 {
@@ -238,7 +239,7 @@ class fcwd_access_t {
     LONG           ReferenceCount;	/* Only release when this is 0. */
     ULONG          OldDismountCount;	/* Reflects the system DismountCount
 					   at the time the CWD has been set. */
-    WCHAR          Buffer[MAX_PATH];
+    WCHAR          Buffer[MAX_PATH] __attribute ((aligned (8)));
   };
   /* This is the old FAST_CWD structure up to the patch from KB 2393802,
      release in February 2011. */
@@ -349,8 +350,7 @@ struct user_heap_info
   void *ptr;
   void *top;
   void *max;
-  unsigned chunk;
-  unsigned slop;
+  SIZE_T chunk;
 };
 
 struct hook_chain
@@ -365,10 +365,13 @@ struct mini_cygheap
   cygheap_locale locale;
 };
 
+#define NBUCKETS 40
+
 struct init_cygheap: public mini_cygheap
 {
   _cmalloc_entry *chain;
-  char *buckets[32];
+  unsigned bucket_val[NBUCKETS];
+  char *buckets[NBUCKETS];
   WCHAR installation_root[PATH_MAX];
   UNICODE_STRING installation_key;
   WCHAR installation_key_buf[18];
@@ -387,7 +390,7 @@ struct init_cygheap: public mini_cygheap
 
   fhandler_termios *ctty;	/* Current tty */
   struct _cygtls **threadlist;
-  size_t sthreads;
+  uint32_t sthreads;
   pid_t pid;			/* my pid */
   struct {			/* Equivalent to using LIST_HEAD. */
     struct inode_t *lh_first;

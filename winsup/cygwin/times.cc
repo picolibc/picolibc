@@ -74,9 +74,11 @@ times (struct tms *buf)
   GetProcessTimes (GetCurrentProcess (), &creation_time, &exit_time,
 		   &kernel_time, &user_time);
 
-  syscall_printf ("ticks %d, CLOCKS_PER_SEC %d", ticks, CLOCKS_PER_SEC);
-  syscall_printf ("user_time %d, kernel_time %d, creation_time %d, exit_time %d",
-		  user_time, kernel_time, creation_time, exit_time);
+  syscall_printf ("ticks %D, CLOCKS_PER_SEC %d", ticks, CLOCKS_PER_SEC);
+  syscall_printf ("user_time %D, kernel_time %D, "
+		  "creation_time %D, exit_time %D",
+		  user_time, kernel_time,
+		  creation_time, exit_time);
   buf->tms_stime = __to_clock_t (&kernel_time, 0);
   buf->tms_utime = __to_clock_t (&user_time, 0);
   timeval_to_filetime (&myself->rusage_children.ru_stime, &kernel_time);
@@ -123,7 +125,7 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
   if (res)
     set_errno (EPERM);
 
-  syscall_printf ("%R = settimeofday(%x, %x)", res, tv, tz);
+  syscall_printf ("%R = settimeofday(%p, %p)", res, tv, tz);
   return res;
 }
 
@@ -321,7 +323,7 @@ time (time_t * ptr)
   if (ptr)
     *ptr = res;
 
-  syscall_printf ("%d = time(%x)", res, ptr);
+  syscall_printf ("%d = time(%p)", res, ptr);
 
   return res;
 }
@@ -425,7 +427,7 @@ utime (const char *path, const struct utimbuf *buf)
   if (buf == 0)
     return utimes (path, 0);
 
-  debug_printf ("incoming utime act %x", buf->actime);
+  debug_printf ("incoming utime act %lx", buf->actime);
   tmp[0] = time_t_to_timeval (buf->actime);
   tmp[1] = time_t_to_timeval (buf->modtime);
 
@@ -496,7 +498,7 @@ hires_ns::nsecs (bool monotonic)
 
   // FIXME: Use round() here?
   now.QuadPart = (LONGLONG) (freq * (double)
-  		 (now.QuadPart - (monotonic ? 0LL : primed_pc.QuadPart)));
+		 (now.QuadPart - (monotonic ? 0LL : primed_pc.QuadPart)));
   return now.QuadPart;
 }
 

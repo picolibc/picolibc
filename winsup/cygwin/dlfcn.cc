@@ -1,7 +1,7 @@
 /* dlfcn.cc
 
    Copyright 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011 Red Hat, Inc.
+   2010, 2011, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -155,33 +155,9 @@ dlopen (const char *name, int flags)
 	      || (ret = GetModuleHandleW (path)) != NULL)
 	    {
 	      ret = (void *) LoadLibraryW (path);
-	      if (ret && (flags & RTLD_NODELETE)
-		  && !GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_PIN, path,
-					  (HMODULE *) &ret))
-		{
-		  /* Windows 2000 is missing the GetModuleHandleEx call, so we
-		     use a non-documented way to set the DLL to "don't free".
-		     This is how it works:  Fetch the Windows Loader data from
-		     the PEB.  Iterate backwards through the list of loaded
-		     DLLs and compare the DllBase address with the address
-		     returned by LoadLibrary.  If they are equal we found the
-		     right entry.  Now set the LoadCount to -1, which is the
-		     marker for a DLL which should never be free'd. */
-		  PPEB_LDR_DATA ldr = NtCurrentTeb ()->Peb->Ldr;
-
-		  for (PLDR_DATA_TABLE_ENTRY entry = (PLDR_DATA_TABLE_ENTRY)
-					     ldr->InLoadOrderModuleList.Blink;
-		       entry && entry->DllBase;
-		       entry = (PLDR_DATA_TABLE_ENTRY)
-			       entry->InLoadOrderLinks.Blink)
-		    {
-		      if (entry->DllBase == ret)
-			{
-			  entry->LoadCount = (WORD) -1;
-			  break;
-			}
-		    }
-		}
+	      if (ret && (flags & RTLD_NODELETE))
+		GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_PIN, path,
+				    (HMODULE *) &ret);
 	    }
 
 	  /* Restore original cxx_malloc pointer. */

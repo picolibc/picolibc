@@ -149,7 +149,8 @@ int
 main (int argc, char *argv[])
 {
   external_pinfo *p;
-  int aflag, lflag, fflag, sflag, uid, proc_id;
+  int aflag, lflag, fflag, sflag, proc_id;
+  uid_t uid;
   bool found_proc_id = true;
   DWORD proc_access = PROCESS_QUERY_LIMITED_INFORMATION;
   cygwin_getinfo_types query = CW_GETPINFO;
@@ -294,7 +295,7 @@ main (int argc, char *argv[])
 	/* nothing to do */;
       else if (p->version >= EXTERNAL_PINFO_VERSION_32_BIT)
 	{
-	  if (p->uid32 != (__uid32_t) uid)
+	  if (p->uid32 != uid)
 	    continue;
 	}
       else if (p->uid != uid)

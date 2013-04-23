@@ -34,25 +34,25 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-static _off64_t format_process_maps (void *, char *&);
-static _off64_t format_process_stat (void *, char *&);
-static _off64_t format_process_status (void *, char *&);
-static _off64_t format_process_statm (void *, char *&);
-static _off64_t format_process_winexename (void *, char *&);
-static _off64_t format_process_winpid (void *, char *&);
-static _off64_t format_process_exename (void *, char *&);
-static _off64_t format_process_root (void *, char *&);
-static _off64_t format_process_cwd (void *, char *&);
-static _off64_t format_process_cmdline (void *, char *&);
-static _off64_t format_process_ppid (void *, char *&);
-static _off64_t format_process_uid (void *, char *&);
-static _off64_t format_process_pgid (void *, char *&);
-static _off64_t format_process_sid (void *, char *&);
-static _off64_t format_process_gid (void *, char *&);
-static _off64_t format_process_ctty (void *, char *&);
-static _off64_t format_process_fd (void *, char *&);
-static _off64_t format_process_mounts (void *, char *&);
-static _off64_t format_process_mountinfo (void *, char *&);
+static off_t format_process_maps (void *, char *&);
+static off_t format_process_stat (void *, char *&);
+static off_t format_process_status (void *, char *&);
+static off_t format_process_statm (void *, char *&);
+static off_t format_process_winexename (void *, char *&);
+static off_t format_process_winpid (void *, char *&);
+static off_t format_process_exename (void *, char *&);
+static off_t format_process_root (void *, char *&);
+static off_t format_process_cwd (void *, char *&);
+static off_t format_process_cmdline (void *, char *&);
+static off_t format_process_ppid (void *, char *&);
+static off_t format_process_uid (void *, char *&);
+static off_t format_process_pgid (void *, char *&);
+static off_t format_process_sid (void *, char *&);
+static off_t format_process_gid (void *, char *&);
+static off_t format_process_ctty (void *, char *&);
+static off_t format_process_fd (void *, char *&);
+static off_t format_process_mounts (void *, char *&);
+static off_t format_process_mountinfo (void *, char *&);
 
 static const virt_tab_t process_tab[] =
 {
@@ -137,7 +137,7 @@ fhandler_process::fhandler_process ():
 }
 
 int __reg2
-fhandler_process::fstat (struct __stat64 *buf)
+fhandler_process::fstat (struct stat *buf)
 {
   const char *path = get_name ();
   int file_type = exists ();
@@ -222,7 +222,7 @@ fhandler_process::readdir (DIR *dir, dirent *de)
   int res = ENMFILE;
   if (process_tab[fileid].fhandler == FH_PROCESSFD)
     {
-      if (dir->__d_position >= 2 + filesize / sizeof (int))
+      if ((size_t) dir->__d_position >= 2 + filesize / sizeof (int))
 	goto out;
     }
   else if (dir->__d_position >= PROCESS_LINK_COUNT)
@@ -314,7 +314,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_proc::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_proc::open(%y, 0%o)", res, flags, mode);
   return res;
 }
 
@@ -356,7 +356,7 @@ fhandler_process::fill_filebuf ()
   return false;
 }
 
-static _off64_t
+static off_t
 format_process_fd (void *data, char *&destbuf)
 {
   _pinfo *p = ((process_fd_t *) data)->p;
@@ -390,7 +390,7 @@ format_process_fd (void *data, char *&destbuf)
   return fs;
 }
 
-static _off64_t
+static off_t
 format_process_ppid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -398,7 +398,7 @@ format_process_ppid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->ppid);
 }
 
-static _off64_t
+static off_t
 format_process_uid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -406,7 +406,7 @@ format_process_uid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->uid);
 }
 
-static _off64_t
+static off_t
 format_process_pgid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -414,7 +414,7 @@ format_process_pgid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->pgid);
 }
 
-static _off64_t
+static off_t
 format_process_sid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -422,7 +422,7 @@ format_process_sid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->sid);
 }
 
-static _off64_t
+static off_t
 format_process_gid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -430,7 +430,7 @@ format_process_gid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->gid);
 }
 
-static _off64_t
+static off_t
 format_process_ctty (void *data, char *&destbuf)
 {
   device d;
@@ -440,7 +440,7 @@ format_process_ctty (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%s\n", d.name);
 }
 
-static _off64_t
+static off_t
 format_process_root (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -460,7 +460,7 @@ format_process_root (void *data, char *&destbuf)
   return fs;
 }
 
-static _off64_t
+static off_t
 format_process_cwd (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -480,7 +480,7 @@ format_process_cwd (void *data, char *&destbuf)
   return fs;
 }
 
-static _off64_t
+static off_t
 format_process_cmdline (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -500,7 +500,7 @@ format_process_cmdline (void *data, char *&destbuf)
   return fs;
 }
 
-static _off64_t
+static off_t
 format_process_exename (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -526,7 +526,7 @@ format_process_exename (void *data, char *&destbuf)
   return len;
 }
 
-static _off64_t
+static off_t
 format_process_winpid (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -534,7 +534,7 @@ format_process_winpid (void *data, char *&destbuf)
   return __small_sprintf (destbuf, "%d\n", p->dwProcessId);
 }
 
-static _off64_t
+static off_t
 format_process_winexename (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -647,15 +647,15 @@ struct thread_info
   {
     NTSTATUS status;
     PVOID buf = NULL;
-    size_t size = 50 * (sizeof (SYSTEM_PROCESSES)
-			+ 16 * sizeof (SYSTEM_THREADS));
-    PSYSTEM_PROCESSES proc;
+    ULONG size = 50 * (sizeof (SYSTEM_PROCESS_INFORMATION)
+		       + 16 * sizeof (SYSTEM_THREADS));
+    PSYSTEM_PROCESS_INFORMATION proc;
     PSYSTEM_THREADS thread;
 
     do
       {
 	buf = realloc (buf, size);
-	status = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+	status = NtQuerySystemInformation (SystemProcessInformation,
 					   buf, size, NULL);
 	size <<= 1;
       }
@@ -664,30 +664,30 @@ struct thread_info
       {
 	if (buf)
 	  free (buf);
-	debug_printf ("NtQuerySystemInformation, %p", status);
+	debug_printf ("NtQuerySystemInformation, %y", status);
 	return;
       }
-    proc = (PSYSTEM_PROCESSES) buf;
+    proc = (PSYSTEM_PROCESS_INFORMATION) buf;
     while (true)
       {
-	if (proc->ProcessId == pid)
+	if ((DWORD) (uintptr_t) proc->UniqueProcessId == pid)
 	  break;
-	if (!proc->NextEntryDelta)
+	if (!proc->NextEntryOffset)
 	  {
 	    free (buf);
 	    return;
 	  }
-	proc = (PSYSTEM_PROCESSES) ((PBYTE) proc + proc->NextEntryDelta);
+	proc = (PSYSTEM_PROCESS_INFORMATION) ((PBYTE) proc + proc->NextEntryOffset);
       }
     thread = proc->Threads;
-    for (ULONG i = 0; i < proc->ThreadCount; ++i)
+    for (ULONG i = 0; i < proc->NumberOfThreads; ++i)
       {
 	THREAD_BASIC_INFORMATION tbi;
 	TEB teb;
 	HANDLE thread_h;
 
 	if (!(thread_h = OpenThread (THREAD_QUERY_INFORMATION, FALSE,
-				     (ULONG) thread[i].ClientId.UniqueThread)))
+				     (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread)))
 	  continue;
 	status = NtQueryInformationThread (thread_h, ThreadBasicInformation,
 					   &tbi, sizeof tbi, NULL);
@@ -697,7 +697,7 @@ struct thread_info
 	region *r = (region *) malloc (sizeof (region));
 	if (r)
 	  {
-	    *r = (region) { regions, (ULONG) thread[i].ClientId.UniqueThread,
+	    *r = (region) { regions, (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread,
 			    (char *) tbi.TebBaseAddress,
 			    (char *) tbi.TebBaseAddress + wincap.page_size (),
 			    true };
@@ -709,7 +709,7 @@ struct thread_info
 	r = (region *) malloc (sizeof (region));
 	if (r)
 	  {
-	    *r = (region) { regions, (ULONG) thread[i].ClientId.UniqueThread,
+	    *r = (region) { regions, (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread,
 			    (char *) (teb.DeallocationStack
 				      ?: teb.Tib.StackLimit),
 			    (char *) teb.Tib.StackBase,
@@ -751,7 +751,7 @@ struct thread_info
   }
 };
 
-static _off64_t
+static off_t
 format_process_maps (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -780,12 +780,12 @@ format_process_maps (void *data, char *&destbuf)
   ReadProcessMemory (proc, &cygheap->user_heap, &user_heap,
 		     sizeof user_heap, NULL);
 
-  _off64_t len = 0;
+  off_t len = 0;
 
   union access
   {
     char flags[8];
-    _off64_t word;
+    off_t word;
   } a;
 
   struct region {
@@ -799,7 +799,7 @@ format_process_maps (void *data, char *&destbuf)
   dos_drive_mappings drive_maps;
   heap_info heaps (p->dwProcessId);
   thread_info threads (p->dwProcessId, proc);
-  struct __stat64 st;
+  struct stat st;
   long last_pass = 0;
 
   tmp_pathbuf tp;
@@ -815,7 +815,12 @@ format_process_maps (void *data, char *&destbuf)
 
   /* Iterate over each VM region in the address space, coalescing
      memory regions with the same permissions. Once we run out, do one
-     last_pass to trigger output of the last accumulated region. */
+     last_pass to trigger output of the last accumulated region.
+     
+     FIXME:  32 bit processes can't get address information beyond the
+	     32 bit address space from 64 bit processes.  We have to run
+	     this functionality in the target process, if the target
+	     process is 64 bit and our own process is 32 bit. */
   for (char *i = 0;
        VirtualQueryEx (proc, i, &mb, sizeof(mb)) || (1 == ++last_pass);
        i = cur.rend)
@@ -867,9 +872,9 @@ format_process_maps (void *data, char *&destbuf)
 	    {
 	      size_t newlen = strlen (posix_modname) + 62;
 	      if (len + newlen >= maxsize)
-		destbuf = (char *) crealloc_abort (destbuf,
-						   maxsize += roundup2 (newlen,
-									2048));
+		destbuf = (char *)
+		  crealloc_abort (destbuf,
+				  maxsize += roundup2 (newlen, 2048UL));
 	      int written = __small_sprintf (destbuf + len,
 					     "%08lx-%08lx %s %08lx %04x:%04x %U   ",
 					     cur.rbase, cur.rend, cur.a.flags,
@@ -889,7 +894,7 @@ format_process_maps (void *data, char *&destbuf)
 	    {
 	      /* If the return length pointer is missing, NtQueryVirtualMemory
 		 returns with STATUS_ACCESS_VIOLATION on Windows 2000. */
-	      ULONG ret_len = 0;
+	      SIZE_T ret_len = 0;
 
 	      st.st_dev = 0;
 	      st.st_ino = 0;
@@ -932,7 +937,7 @@ format_process_maps (void *data, char *&destbuf)
   return len;
 }
 
-static _off64_t
+static off_t
 format_process_stat (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -975,8 +980,8 @@ format_process_stat (void *data, char *&destbuf)
   KERNEL_USER_TIMES put;
   PROCESS_BASIC_INFORMATION pbi;
   QUOTA_LIMITS ql;
-  SYSTEM_TIME_OF_DAY_INFORMATION stodi;
-  SYSTEM_PROCESSOR_TIMES spt;
+  SYSTEM_TIMEOFDAY_INFORMATION stodi;
+  SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION spt;
   hProcess = OpenProcess (PROCESS_VM_READ | PROCESS_QUERY_INFORMATION,
 			  FALSE, p->dwProcessId);
   if (hProcess != NULL)
@@ -998,19 +1003,19 @@ format_process_stat (void *data, char *&destbuf)
     {
       DWORD error = GetLastError ();
       __seterrno_from_win_error (error);
-      debug_printf ("OpenProcess: ret %d", error);
+      debug_printf ("OpenProcess: ret %u", error);
       return 0;
     }
   if (NT_SUCCESS (status))
     status = NtQuerySystemInformation (SystemTimeOfDayInformation,
 				       (PVOID) &stodi, sizeof stodi, NULL);
   if (NT_SUCCESS (status))
-    status = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) &spt,
-				       sizeof spt, NULL);
+    status = NtQuerySystemInformation (SystemProcessorPerformanceInformation,
+				       (PVOID) &spt, sizeof spt, NULL);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      debug_printf ("NtQueryInformationProcess: status %p, %E", status);
+      debug_printf ("NtQueryInformationProcess: status %y, %E", status);
       return 0;
     }
   fault_count = vmc.PageFaultCount;
@@ -1028,7 +1033,13 @@ format_process_stat (void *data, char *&destbuf)
       */
      start_time = (spt.KernelTme.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
 #endif
-  priority = pbi.BasePriority;
+  /* The BasePriority returned to a 32 bit process under WOW64 is
+     apparently broken, for 32 and 64 bit target processes.  64 bit
+     processes get the correct base priority, even for 32 bit processes. */
+  if (wincap.is_wow64 ())
+    priority = 8; /* Default value. */
+  else
+    priority = pbi.BasePriority;
   unsigned page_size = wincap.page_size ();
   vmsize = vmc.PagefileUsage;
   vmrss = vmc.WorkingSetSize / page_size;
@@ -1037,22 +1048,20 @@ format_process_stat (void *data, char *&destbuf)
   destbuf = (char *) crealloc_abort (destbuf, strlen (cmd) + 320);
   return __small_sprintf (destbuf, "%d (%s) %c "
 				   "%d %d %d %d %d "
-				   "%lu %lu %lu %lu %lu %lu %lu "
-				   "%ld %ld %ld %ld %ld %ld "
+				   "%u %lu %lu %u %u %lu %lu "
+				   "%ld %ld %d %d %d %d "
 				   "%lu %lu "
-				   "%ld "
-				   "%lu",
-			  p->pid, cmd,
-			  state,
-			  p->ppid, p->pgid, p->sid, p->ctty,
-			  -1, 0, fault_count, fault_count, 0, 0, utime, stime,
+				   "%ld %lu",
+			  p->pid, cmd, state,
+			  p->ppid, p->pgid, p->sid, p->ctty, -1,
+			  0, fault_count, fault_count, 0, 0, utime, stime,
 			  utime, stime, priority, 0, 0, 0,
 			  start_time, vmsize,
 			  vmrss, vmmaxrss
 			  );
 }
 
-static _off64_t
+static off_t
 format_process_status (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -1139,7 +1148,7 @@ format_process_status (void *data, char *&destbuf)
 			  );
 }
 
-static _off64_t
+static off_t
 format_process_statm (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
@@ -1158,13 +1167,13 @@ extern "C" {
   struct mntent *getmntent (FILE *);
 };
 
-static _off64_t
+static off_t
 format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
 {
   _pinfo *p = (_pinfo *) data;
   user_info *u_shared = NULL;
   HANDLE u_hdl = NULL;
-  _off64_t len = 0;
+  off_t len = 0;
   struct mntent *mnt;
 
   if (p->uid != myself->uid)
@@ -1203,7 +1212,7 @@ format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
 	 each cygdrive entry if it's a remote drive.  If so, ignore it. */
       if (iteration >= mtab->nmounts && u_hdl)
 	{
-	  WCHAR drive[3] = { mnt->mnt_fsname[0], L':', L'\0' };
+	  WCHAR drive[3] = { (WCHAR) mnt->mnt_fsname[0], L':', L'\0' };
 	  disk_type dt = get_disk_type (drive);
 
 	  if (dt == DT_SHARE_SMB || dt == DT_SHARE_NFS)
@@ -1246,13 +1255,13 @@ format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
   return len;
 }
 
-static _off64_t
+static off_t
 format_process_mounts (void *data, char *&destbuf)
 {
   return format_process_mountstuff (data, destbuf, false);
 }
 
-static _off64_t
+static off_t
 format_process_mountinfo (void *data, char *&destbuf)
 {
   return format_process_mountstuff (data, destbuf, true);
@@ -1264,28 +1273,28 @@ get_process_state (DWORD dwProcessId)
   /* This isn't really heavy magic - just go through the processes' threads
      one by one and return a value accordingly.  Errors are silently ignored. */
   NTSTATUS status;
-  PSYSTEM_PROCESSES p, sp;
+  PSYSTEM_PROCESS_INFORMATION p, sp;
   ULONG n = 0x4000;
   int state =' ';
 
-  p = (PSYSTEM_PROCESSES) malloc (n);
+  p = (PSYSTEM_PROCESS_INFORMATION) malloc (n);
   if (!p)
     return state;
   while (true)
     {
-      status = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
+      status = NtQuerySystemInformation (SystemProcessInformation,
 					 (PVOID) p, n, NULL);
       if (status != STATUS_INFO_LENGTH_MISMATCH)
 	break;
       n <<= 1;
-      PSYSTEM_PROCESSES new_p = (PSYSTEM_PROCESSES) realloc (p, n);
+      PSYSTEM_PROCESS_INFORMATION new_p = (PSYSTEM_PROCESS_INFORMATION) realloc (p, n);
       if (!new_p)
       	goto out;
       p = new_p;
     }
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQuerySystemInformation: status %p, %lu",
+      debug_printf ("NtQuerySystemInformation: status %y, %u",
 		    status, RtlNtStatusToDosError (status));
       goto out;
     }
@@ -1293,12 +1302,12 @@ get_process_state (DWORD dwProcessId)
   sp = p;
   for (;;)
     {
-      if (sp->ProcessId == dwProcessId)
+      if ((DWORD) (uintptr_t) sp->UniqueProcessId == dwProcessId)
 	{
 	  SYSTEM_THREADS *st;
 	  st = &sp->Threads[0];
 	  state = 'S';
-	  for (unsigned i = 0; i < sp->ThreadCount; i++)
+	  for (unsigned i = 0; i < sp->NumberOfThreads; i++)
 	    {
 	      /* FIXME: at some point we should consider generating 'O' */
 	      if (st->State == StateRunning ||
@@ -1311,9 +1320,9 @@ get_process_state (DWORD dwProcessId)
 	    }
 	  break;
 	}
-      if (!sp->NextEntryDelta)
+      if (!sp->NextEntryOffset)
 	 break;
-      sp = (PSYSTEM_PROCESSES) ((char *) sp + sp->NextEntryDelta);
+      sp = (PSYSTEM_PROCESS_INFORMATION) ((char *) sp + sp->NextEntryOffset);
     }
 out:
   free (p);
@@ -1330,7 +1339,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
   HANDLE hProcess;
   VM_COUNTERS vmc;
   PMEMORY_WORKING_SET_LIST p;
-  ULONG n = 0x4000, length;
+  SIZE_T n = 0x4000, length;
 
   p = (PMEMORY_WORKING_SET_LIST) malloc (n);
   if (!p)
@@ -1346,7 +1355,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     {
       status = NtQueryVirtualMemory (hProcess, 0, MemoryWorkingSetList,
 				     (PVOID) p, n,
-				     (length = ULONG_MAX, &length));
+				     (length = (SIZE_T) -1, &length));
       if (status != STATUS_INFO_LENGTH_MISMATCH)
 	break;
       n <<= 1;
@@ -1358,7 +1367,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
     }
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryVirtualMemory: status %p", status);
+      debug_printf ("NtQueryVirtualMemory: status %y", status);
       if (status == STATUS_PROCESS_IS_TERMINATING)
 	{
 	  *vmsize = *vmrss = *vmtext = *vmdata = *vmlib = *vmshare = 0;
@@ -1386,7 +1395,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
 				      sizeof vmc, NULL);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryInformationProcess: status %p", status);
+      debug_printf ("NtQueryInformationProcess: status %y", status);
       __seterrno_from_nt_status (status);
       goto out;
     }

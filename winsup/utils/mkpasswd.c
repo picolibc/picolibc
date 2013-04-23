@@ -1,7 +1,7 @@
 /* mkpasswd.c:
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2009,
-   2010, 2011, 2012 Red Hat, Inc.
+   2010, 2011, 2012, 2013 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -18,6 +18,7 @@
 #include <locale.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <inttypes.h>
 #include <getopt.h>
 #include <io.h>
 #include <sys/fcntl.h>
@@ -62,9 +63,11 @@ _print_win_error(DWORD code, int line)
       code,
       MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
       (LPTSTR) buf, sizeof (buf), NULL))
-    fprintf (stderr, "mkpasswd (%d): [%lu] %s", line, code, buf);
+    fprintf (stderr, "mkpasswd (%d): [%" PRIu32 "] %s",
+	     line, (unsigned int) code, buf);
   else
-    fprintf (stderr, "mkpasswd (%d): error %lu", line, code);
+    fprintf (stderr, "mkpasswd (%d): error %" PRIu32,
+	     line, (unsigned int) code);
 }
 
 static PWCHAR
@@ -104,7 +107,7 @@ put_sid (PSID sid)
   strcat (s, t);
   for (i = 0; i < *GetSidSubAuthorityCount (sid); ++i)
     {
-      sprintf(t, "-%lu", *GetSidSubAuthority (sid, i));
+      sprintf(t, "-%" PRIu32, (unsigned int) *GetSidSubAuthority (sid, i));
       strcat (s, t);
     }
   return s;
@@ -192,12 +195,13 @@ current_user (const char *sep, const char *passed_home_path, DWORD id_offset,
       homedir_psx[PATH_MAX - 1] = '\0';
     }
 
-  printf ("%ls%s%ls:unused:%lu:%lu:U-%ls\\%ls,%s:%s:/bin/bash\n",
+  printf ("%ls%s%ls:unused:%" PRIu32 ":%" PRIu32
+	  ":U-%ls\\%ls,%s:%s:/bin/bash\n",
 	  sep ? dom : L"",
 	  sep ?: "",
 	  user,
-	  id_offset + uid,
-	  id_offset + gid,
+	  (unsigned int) (id_offset + uid),
+	  (unsigned int) (id_offset + gid),
 	  dom,
 	  user,
 	  put_sid (curr_user.psid),
@@ -257,13 +261,13 @@ enum_unix_users (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 				       dom,
 				       (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
 				       &acc_type))
-	    printf ("%s%s%ls:unused:%lu:99999:,%s::\n",
+	    printf ("%s%s%ls:unused:%" PRIu32 ":99999:,%s::\n",
 		    with_dom ? "Unix User" : "",
 		    with_dom ? sep : "",
 		    user + 10,
-		    id_offset +
+		    (unsigned int) (id_offset +
 		    *GetSidSubAuthority (psid,
-					 *GetSidSubAuthorityCount(psid) - 1),
+					 *GetSidSubAuthorityCount(psid) - 1)),
 		    put_sid (psid));
 	}
       else
@@ -294,11 +298,11 @@ enum_unix_users (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 				     (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
 				     &acc_type)
 		  && !iswdigit (user[0]))
-		printf ("%s%s%ls:unused:%lu:99999:,%s::\n",
+		printf ("%s%s%ls:unused:%" PRIu32 ":99999:,%s::\n",
 			with_dom ? "Unix User" : "",
 			with_dom ? sep : "",
 			user,
-			id_offset + start,
+			(unsigned int) (id_offset + start),
 			put_sid (psid));
 	    }
 	}
@@ -435,12 +439,13 @@ enum_users (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	  else if (EqualSid (curr_user.psid, psid))
 	    got_curr_user = TRUE;
 
-	  printf ("%ls%s%ls:unused:%lu:%lu:%ls%sU-%ls\\%ls,%s:%s:/bin/bash\n",
+	  printf ("%ls%s%ls:unused:%" PRIu32 ":%" PRIu32
+		  ":%ls%sU-%ls\\%ls,%s:%s:/bin/bash\n",
 		  with_dom ? domain_name : L"",
 		  with_dom ? sep : "",
 		  buffer[i].usri3_name,
-		  id_offset + uid,
-		  id_offset + gid,
+		  (unsigned int) (id_offset + uid),
+		  (unsigned int) (id_offset + gid),
 		  buffer[i].usri3_full_name ?: L"",
 		  buffer[i].usri3_full_name
 		  && buffer[i].usri3_full_name[0] ? "," : "",
@@ -473,7 +478,7 @@ print_special_by_sid (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
     {
       if (LookupAccountSidW (NULL, sid,
 			     user, (len = UNLEN + 1, &len),
-			     dom, (len2 = MAX_DOMAIN_NAME_LEN + 1, &len),
+			     dom, (len2 = MAX_DOMAIN_NAME_LEN + 1, &len2),
 			     &acc_type))
 	{
 	  if (sub8)
@@ -492,8 +497,9 @@ print_special_by_sid (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 	    rid = sub2;
 	  else
 	    rid = sub1;
-	  printf ("%ls:*:%lu:%lu:,%s::\n",
-		  user, rid, rid == 18 ? 544 : rid, /* SYSTEM hack */
+	  printf ("%ls:*:%" PRIu32 ":%" PRIu32 ":,%s::\n",
+		  user, (unsigned int) rid,
+		  (unsigned int) (rid == 18 ? 544 : rid), /* SYSTEM hack */
 		  put_sid (sid));
 	}
       FreeSid (sid);
@@ -718,7 +724,7 @@ main (int argc, char **argv)
 	      goto skip;
 	    }
 	domlist[print_domlist].str = opt;
-	domlist[print_domlist].id_offset = ULONG_MAX;
+	domlist[print_domlist].id_offset = UINT32_MAX;
 	if (opt && (p = strchr (opt, ',')))
 	  {
 	    if (p == opt
@@ -812,7 +818,7 @@ skip:
   for (i = 0; i < print_domlist; ++i)
     {
       DWORD my_off = (domlist[i].domain || domlist[i].str)
-		     ? domlist[i].id_offset != ULONG_MAX
+		     ? domlist[i].id_offset != UINT_MAX
 		       ? domlist[i].id_offset : off : 0;
       if (!domlist[i].domain && domlist[i].str && print_unix)
 	enum_unix_users (domlist + i, sep_char, my_off, print_unix);

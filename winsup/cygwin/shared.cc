@@ -1,7 +1,7 @@
 /* shared.cc: shared data area support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -59,7 +59,7 @@ get_shared_parent_dir ()
       status = NtCreateDirectoryObject (&shared_parent_dir,
 					CYG_SHARED_DIR_ACCESS, &attr);
       if (!NT_SUCCESS (status))
-	api_fatal ("NtCreateDirectoryObject(%S): %p", &uname, status);
+	api_fatal ("NtCreateDirectoryObject(%S): %y", &uname, status);
     }
   return shared_parent_dir;
 }
@@ -95,7 +95,7 @@ get_session_parent_dir ()
 	  status = NtCreateDirectoryObject (&session_parent_dir,
 					    CYG_SHARED_DIR_ACCESS, &attr);
 	  if (!NT_SUCCESS (status))
-	    api_fatal ("NtCreateDirectoryObject(%S): %p", &uname, status);
+	    api_fatal ("NtCreateDirectoryObject(%S): %y", &uname, status);
 	}
     }
   return session_parent_dir;
@@ -115,8 +115,8 @@ shared_name (WCHAR *ret_buf, const WCHAR *str, int num)
   return ret_buf;
 }
 
-#define page_const (65535)
-#define pround(n) (((size_t) (n) + page_const) & ~page_const)
+#define page_const ((ptrdiff_t) 65535)
+#define pround(n) ((ptrdiff_t)(((n) + page_const) & ~page_const))
 
 /* The order in offsets is so that the constant blocks shared_info
    and user_info are right below the cygwin DLL, then the pinfo block
@@ -290,40 +290,20 @@ shared_destroy ()
 void
 shared_info::init_obcaseinsensitive ()
 {
-  if (wincap.kernel_is_always_casesensitive ())
-    {
-      /* Only Windows 2000.  Default to case insensitive unless the user
-      	 sets the obcaseinsensitive registry value explicitely to 0. */
-      DWORD def_obcaseinsensitive = 1;
+  /* Instead of reading the obcaseinsensitive registry value, test the
+     actual state of case sensitivity handling in the kernel. */
+  UNICODE_STRING sysroot;
+  OBJECT_ATTRIBUTES attr;
+  HANDLE h;
 
-      obcaseinsensitive = def_obcaseinsensitive;
-      RTL_QUERY_REGISTRY_TABLE tab[2] = {
-	{ NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
-	  L"obcaseinsensitive", &obcaseinsensitive, REG_DWORD,
-	  &def_obcaseinsensitive, sizeof (DWORD) },
-	{ NULL, 0, NULL, NULL, 0, NULL, 0 }
-      };
-      RtlQueryRegistryValues (RTL_REGISTRY_CONTROL,
-			      L"Session Manager\\kernel",
-			      tab, NULL, NULL);
-    }
-  else
-    {
-      /* Instead of reading the obcaseinsensitive registry value, test the
-	 actual state of case sensitivity handling in the kernel. */
-      UNICODE_STRING sysroot;
-      OBJECT_ATTRIBUTES attr;
-      HANDLE h;
-
-      RtlInitUnicodeString (&sysroot, L"\\SYSTEMROOT");
-      InitializeObjectAttributes (&attr, &sysroot, 0, NULL, NULL);
-      /* NtOpenSymbolicLinkObject returns STATUS_ACCESS_DENIED when called
-      	 with a 0 access mask.  However, if the kernel is case sensitive,
-	 it returns STATUS_OBJECT_NAME_NOT_FOUND because we used the incorrect
-	 case for the filename (It's actually "\\SystemRoot"). */
-      obcaseinsensitive = NtOpenSymbolicLinkObject (&h, 0, &attr)
-			  != STATUS_OBJECT_NAME_NOT_FOUND;
-    }
+  RtlInitUnicodeString (&sysroot, L"\\SYSTEMROOT");
+  InitializeObjectAttributes (&attr, &sysroot, 0, NULL, NULL);
+  /* NtOpenSymbolicLinkObject returns STATUS_ACCESS_DENIED when called
+     with a 0 access mask.  However, if the kernel is case sensitive,
+     it returns STATUS_OBJECT_NAME_NOT_FOUND because we used the incorrect
+     case for the filename (It's actually "\\SystemRoot"). */
+  obcaseinsensitive = NtOpenSymbolicLinkObject (&h, 0, &attr)
+		      != STATUS_OBJECT_NAME_NOT_FOUND;
 }
 
 void inline
@@ -359,7 +339,7 @@ shared_info::initialize ()
     sversion.multiple_cygwin_problem ("system shared memory version",
 				      sversion, CURR_SHARED_MAGIC);
   else if (cb != sizeof (*this))
-    system_printf ("size of shared memory region changed from %u to %u",
+    system_printf ("size of shared memory region changed from %lu to %u",
 		   sizeof (*this), cb);
   heap_init ();
 }

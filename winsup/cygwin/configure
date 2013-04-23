@@ -566,10 +566,12 @@ ac_no_link=no
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 CONFIG_DIR
+TLSOFFSETS_H
+DIN_FILE
 DEF_DLL_ENTRY
 DLL_ENTRY
+DLL_NAME
 LIBSERVER
-MALLOC_OFILES
 configure_args
 SET_MAKE
 WINDRES
@@ -4410,14 +4412,23 @@ esac
 fi
 
 
-MALLOC_OFILES=malloc.o
-
 
 
 case "$target_cpu" in
-   i?86) DLL_ENTRY="_dll_entry@12"
+   i?86)
+		DLL_NAME="cygwin1.dll"
+		DLL_ENTRY="_dll_entry@12"
 		DEF_DLL_ENTRY="dll_entry@12"
+		DIN_FILE="cygwin.din"
+		TLSOFFSETS_H="tlsoffsets.h"
 		CONFIG_DIR="i386"  ;;
+   x86_64)
+		DLL_NAME="cygwin1.dll"
+		DLL_ENTRY="dll_entry"
+		DEF_DLL_ENTRY="dll_entry"
+		DIN_FILE="cygwin64.din"
+		TLSOFFSETS_H="tlsoffsets64.h"
+		CONFIG_DIR="x86_64"  ;;
    *)		as_fn_error $? "Invalid target processor \"$target_cpu\"" "$LINENO" 5 ;;
 esac
 
@@ -4430,6 +4441,8 @@ for f in $ac_configure_args; do
     esac
 done
 configure_args=$(/usr/bin/expr "$configure_args" : 'X \(.*\)')
+
+
 
 
 

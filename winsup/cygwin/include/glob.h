@@ -61,14 +61,8 @@ typedef struct {
 	void (*gl_closedir)(void *);
 	struct dirent *(*gl_readdir)(void *);
 	void *(*gl_opendir)(const char *);
-#if defined (__INSIDE_CYGWIN__)
-	int (*gl_lstat) __P((const char *, struct __stat64 *));
-	int (*gl_stat) __P((const char *, struct __stat64 *));
-#else
-
 	int (*gl_lstat) __P((const char *, struct stat *));
 	int (*gl_stat) __P((const char *, struct stat *));
-#endif
 } glob_t;
 
 /* Believed to have been introduced in 1003.2-1992 */

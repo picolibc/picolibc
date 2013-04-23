@@ -1,6 +1,6 @@
 /* sys/ipc.h
 
-   Copyright 2001, 2002 Red Hat Inc.
+   Copyright 2001, 2002, 2012, 2013 Red Hat Inc.
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.
@@ -13,6 +13,7 @@ details. */
 #define _CYGWIN_IPC_H
 
 #include <sys/types.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C"

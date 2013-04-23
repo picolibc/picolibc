@@ -1,7 +1,7 @@
 /* init.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -96,13 +96,6 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	  && (PVOID) &_my_tls > (PVOID) &test_stack_marker
 	  && _my_tls.isinitialized ())
 	_my_tls.remove (0);
-      /* Windows 2000 has a bug in NtTerminateThread.  Instead of releasing
-	 the stack at teb->DeallocationStack it uses the value of
-	 teb->Tib.StackLimit to evaluate the stack address.  So we just claim
-	 there is no stack. */
-      if (NtCurrentTeb ()->DeallocationStack == NULL
-	  && !wincap.has_stack_size_param_is_a_reservation ())
-	NtCurrentTeb ()->Tib.StackLimit = NULL;
       break;
     }
 

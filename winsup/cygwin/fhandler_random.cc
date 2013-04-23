@@ -143,13 +143,13 @@ fhandler_dev_random::read (void *ptr, size_t& len)
   len = (size_t) -1;
 }
 
-_off64_t
-fhandler_dev_random::lseek (_off64_t off, int whence)
+off_t
+fhandler_dev_random::lseek (off_t off, int whence)
 {
   /* As on Linux, fake being able to set an offset.  The fact that neither
      reading nor writing changes the dummy offset is also the same as on
      Linux (tested with kernel 2.6.23). */
-  _off64_t new_off;
+  off_t new_off;
 
   switch (whence)
     {
@@ -161,12 +161,12 @@ fhandler_dev_random::lseek (_off64_t off, int whence)
       break;
     default:
       set_errno (EINVAL);
-      return (_off64_t) -1;
+      return (off_t) -1;
     }
   if (new_off < 0)
     {
       set_errno (EINVAL);
-      return (_off64_t) -1;
+      return (off_t) -1;
     }
   return dummy_offset = new_off;
 }

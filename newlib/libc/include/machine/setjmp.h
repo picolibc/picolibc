@@ -68,19 +68,24 @@ _BEGIN_STD_C
 #define	_JBLEN	9
 #endif
 
-#if defined(__CYGWIN__) && !defined (_JBLEN)
-#define _JBLEN (13 * 4)
-#elif defined (__i386__)
-#if defined(__unix__) || defined(__rtems__)
-# define _JBLEN	9
-#else
-#include "setjmp-dj.h"
-#endif
+#ifdef __i386__
+# if defined(__CYGWIN__) && !defined (_JBLEN)
+#  define _JBLEN (13 * 4)
+# elif defined(__unix__) || defined(__rtems__)
+#  define _JBLEN	9
+# else
+#  include "setjmp-dj.h"
+# endif
 #endif
 
 #ifdef __x86_64__
-#define _JBTYPE long long
-#define _JBLEN  8
+# ifdef __CYGWIN__
+#  define _JBTYPE long
+#  define _JBLEN  32
+# else
+#  define _JBTYPE long long
+#  define _JBLEN  8
+# endif
 #endif
 
 #ifdef __i960__

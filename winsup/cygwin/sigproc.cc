@@ -171,7 +171,7 @@ mychild (int pid)
 /* Handle all subprocess requests
  */
 int __reg2
-proc_subproc (DWORD what, DWORD val)
+proc_subproc (DWORD what, uintptr_t val)
 {
   int rc = 1;
   int potential_match;
@@ -991,7 +991,7 @@ child_info::sync (pid_t pid, HANDLE& hProcess, DWORD howlong)
 	      hProcess = NULL;
 	    }
 	}
-      sigproc_printf ("pid %u, WFMO returned %d, exit_code %p, res %d", pid, x,
+      sigproc_printf ("pid %u, WFMO returned %d, exit_code %y, res %d", pid, x,
 		      exit_code, res);
     }
   return res;
@@ -1002,7 +1002,7 @@ child_info::proc_retry (HANDLE h)
 {
   if (!exit_code)
     return EXITCODE_OK;
-  sigproc_printf ("exit_code %p", exit_code);
+  sigproc_printf ("exit_code %y", exit_code);
   switch (exit_code)
     {
     case STILL_ACTIVE:	/* shouldn't happen */

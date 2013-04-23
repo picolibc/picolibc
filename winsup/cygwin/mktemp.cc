@@ -93,7 +93,7 @@ _gettemp(char *path, int *doopen, int domkdir, size_t suffixlen, int flags)
   /*
    * check the target directory.
    */
-  struct __stat64 sbuf;
+  struct stat sbuf;
   if (doopen != NULL || domkdir)
     {
       for (; trv > path; trv--)

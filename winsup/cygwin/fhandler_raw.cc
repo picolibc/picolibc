@@ -36,7 +36,7 @@ fhandler_dev_raw::~fhandler_dev_raw ()
 }
 
 int __reg2
-fhandler_dev_raw::fstat (struct __stat64 *buf)
+fhandler_dev_raw::fstat (struct stat *buf)
 {
   debug_printf ("here");
 
@@ -95,7 +95,7 @@ fhandler_dev_raw::dup (fhandler_base *child, int flags)
 	  /* Create sector-aligned buffer */
 	  fhc->devbufalloc = new char [devbufsiz + devbufalign];
 	  fhc->devbuf = (char *) roundup2 ((uintptr_t) fhc->devbufalloc,
-					   devbufalign);
+					   (uintptr_t) devbufalign);
 	}
       fhc->devbufstart = 0;
       fhc->devbufend = 0;
@@ -121,7 +121,8 @@ fhandler_dev_raw::fixup_after_exec ()
 	{
 	  /* Create sector-aligned buffer */
 	  devbufalloc = new char [devbufsiz + devbufalign];
-	  devbuf = (char *) roundup2 ((uintptr_t) devbufalloc, devbufalign);
+	  devbuf = (char *) roundup2 ((uintptr_t) devbufalloc,
+				      (uintptr_t) devbufalign);
 	}
       devbufstart = 0;
       devbufend = 0;
@@ -165,7 +166,7 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 	    else if (!devbuf || op->rd_parm != devbufsiz)
 	      {
 		char *buf = NULL;
-		_off64_t curpos = lseek (0, SEEK_CUR);
+		off_t curpos = lseek (0, SEEK_CUR);
 
 		if (op->rd_parm > 1L)
 		  buf = new char [op->rd_parm + devbufalign];
@@ -174,7 +175,8 @@ fhandler_dev_raw::ioctl (unsigned int cmd, void *buf)
 		  delete [] devbufalloc;
 
 		devbufalloc = buf;
-		devbuf = (char *) roundup2 ((uintptr_t) buf, devbufalign);
+		devbuf = (char *) roundup2 ((uintptr_t) buf,
+					    (uintptr_t) devbufalign);
 		devbufsiz = op->rd_parm ?: 1L;
 		devbufstart = devbufend = 0;
 		lseek (curpos, SEEK_SET);

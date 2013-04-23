@@ -1,7 +1,7 @@
 /* cygcheck.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -24,6 +24,7 @@
 #include <getopt.h>
 #include "../cygwin/include/cygwin/version.h"
 #include "../cygwin/include/sys/cygwin.h"
+#define _NOMNTENT_MACROS
 #include "../cygwin/include/mntent.h"
 #include "../cygwin/cygprops.h"
 #undef cygwin_internal
@@ -597,6 +598,28 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
   int pe_header_offset = get_dword (fh, 0x3c);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
+  WORD arch = get_word (fh, pe_header_offset + 4);
+  if (GetLastError () != NO_ERROR)
+    display_error ("get_word");
+#ifdef __x86_64__
+  if (arch != IMAGE_FILE_MACHINE_AMD64)
+    {
+      fputc ('\n', stderr);
+      display_error ("Wrong architecture. Only x86_64 executables supported.",
+		     false, false);
+      return;
+    }
+  int base_off = 108;
+#else
+  if (arch != IMAGE_FILE_MACHINE_I386)
+    {
+      fputc ('\n', stderr);
+      display_error ("Wrong architecture. Only ix86 executables supported.",
+		     false, false);
+      return;
+    }
+  int base_off = 92;
+#endif
   int opthdr_ofs = pe_header_offset + 4 + 20;
   unsigned short v[6];
 
@@ -619,19 +642,19 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
   else
     printf ("\n");
 
-  int num_entries = get_dword (fh, opthdr_ofs + 92);
+  int num_entries = get_dword (fh, opthdr_ofs + base_off + 0);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
-  int export_rva = get_dword (fh, opthdr_ofs + 96);
+  int export_rva = get_dword (fh, opthdr_ofs + base_off + 4);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
-  int export_size = get_dword (fh, opthdr_ofs + 100);
+  int export_size = get_dword (fh, opthdr_ofs + base_off + 8);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
-  int import_rva = get_dword (fh, opthdr_ofs + 104);
+  int import_rva = get_dword (fh, opthdr_ofs + base_off + 12);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
-  int import_size = get_dword (fh, opthdr_ofs + 108);
+  int import_size = get_dword (fh, opthdr_ofs + base_off + 16);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
 
@@ -667,17 +690,20 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 
 	  ExpDirectory *ed = (ExpDirectory *) exp;
 	  int ofs = ed->name_rva - export_rva;
-	  struct tm *tm = localtime ((const time_t *) &(ed->timestamp));
-	  if (tm->tm_year < 60)
+	  time_t ts = ed->timestamp;	/* timestamp is only 4 bytes! */
+	  struct tm *tm = localtime (&ts);
+	  if (tm && tm->tm_year < 60)
 	    tm->tm_year += 2000;
-	  if (tm->tm_year < 200)
+	  if (tm && tm->tm_year < 200)
 	    tm->tm_year += 1900;
 	  printf ("%*c", lvl + 2, ' ');
-	  printf ("\"%s\" v%d.%d ts=", exp + ofs,
+	  printf ("\"%s\" v%d.%d", exp + ofs,
 		  ed->major_ver, ed->minor_ver);
-	  printf ("%d/%d/%d %d:%02d\n",
-		  tm->tm_year, tm->tm_mon + 1, tm->tm_mday,
-		  tm->tm_hour, tm->tm_min);
+	  if (tm)
+	    printf (" ts=%04d-%02d-%02d %02d:%02d",
+		    tm->tm_year, tm->tm_mon + 1, tm->tm_mday,
+		    tm->tm_hour, tm->tm_min);
+	  putchar ('\n');
 	}
     }
 
@@ -1115,7 +1141,7 @@ pretty_id ()
   sz = -sz;
   for (char **g = groups; g <= ng; g++)
     if ((g != ng) && (++i < n))
-      printf ("%*s", sz, *g);
+      printf ("%*s", (int) sz, *g);
     else
       {
 	puts (*g);
@@ -1691,7 +1717,7 @@ dump_sysinfo ()
 	{
 	  for (e = s; *e && *e != sep; e++);
 	  if (e-s)
-	    printf ("\t%.*s\n", e - s, s);
+	    printf ("\t%.*s\n", (int) (e - s), s);
 	  else
 	    puts ("\t.");
 	  count_path_items++;
@@ -2307,7 +2333,7 @@ nuke (char *ev)
 }
 
 extern "C" {
-unsigned long (*cygwin_internal) (int, ...);
+uintptr_t (*cygwin_internal) (int, ...);
 WCHAR cygwin_dll_path[32768];
 };
 
@@ -2319,10 +2345,11 @@ load_cygwin (int& argc, char **&argv)
   if (!(h = LoadLibrary ("cygwin1.dll")))
     return;
   GetModuleFileNameW (h, cygwin_dll_path, 32768);
-  if ((cygwin_internal = (DWORD (*) (int, ...)) GetProcAddress (h, "cygwin_internal")))
+  if ((cygwin_internal = (uintptr_t (*) (int, ...))
+  			 GetProcAddress (h, "cygwin_internal")))
     {
       char **av = (char **) cygwin_internal (CW_ARGV);
-      if (av && ((DWORD) av != (DWORD) -1))
+      if (av && ((uintptr_t) av != (uintptr_t) -1))
 	{
 	  /* Copy cygwin's idea of the argument list into this Window application. */
 	  for (argc = 0; av[argc]; argc++)
@@ -2334,7 +2361,7 @@ load_cygwin (int& argc, char **&argv)
 
 
       char **envp = (char **) cygwin_internal (CW_ENVP);
-      if (envp && ((DWORD) envp != (DWORD) -1))
+      if (envp && ((uintptr_t) envp != (uintptr_t) -1))
 	{
 	  /* Store path and revert to this value, otherwise path gets overwritten
 	     by the POSIXy Cygwin variation, which breaks cygcheck.

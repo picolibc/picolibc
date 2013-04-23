@@ -258,7 +258,7 @@ shm_delete_mapping(struct vmspace *vm, struct shmmap_state *shmmap_s)
 {
 	struct shmid_ds *shmseg;
 	int segnum, result;
-	size_t size;
+	size_t size __attribute__ ((unused));
 
 	GIANT_REQUIRED;
 
@@ -335,7 +335,7 @@ int
 kern_shmat(struct thread *td, int shmid, const void *shmaddr, int shmflg)
 {
 	struct proc *p = td->td_proc;
-	int i, flags;
+	int i, flags __attribute__ ((unused));
 	struct shmid_ds *shmseg;
 	struct shmmap_state *shmmap_s = NULL;
 #ifndef __CYGWIN__
@@ -512,7 +512,7 @@ done2:
 	return (EINVAL);
 #endif
 }
-#endif /* __CYGWIN__ */
+#endif /* !__CYGWIN__ */
 
 #ifndef _SYS_SYSPROTO_H_
 struct shmctl_args {

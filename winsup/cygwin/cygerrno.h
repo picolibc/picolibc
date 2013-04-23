@@ -12,16 +12,7 @@ details. */
 #ifndef _CYGERRNO_H
 #define _CYGERRNO_H
 #include <errno.h>
-
-#ifndef __reg1
-# define __reg1 __stdcall __attribute__ ((regparm (1)))
-#endif
-#ifndef __reg2
-# define __reg2 __stdcall __attribute__ ((regparm (2)))
-#endif
-#ifndef __reg3
-# define __reg3 __stdcall __attribute__ ((regparm (3)))
-#endif
+#include "regparm.h"
 
 void __reg3 seterrno_from_win_error (const char *file, int line, DWORD code);
 void __reg3 seterrno_from_nt_status (const char *file, int line, NTSTATUS status);

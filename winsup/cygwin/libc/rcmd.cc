@@ -103,7 +103,7 @@ extern "C" {
   int cygwin_rresvport_af(int *alport, int family);
   int cygwin_select (int, fd_set *, fd_set *, fd_set *, struct timeval *);
   int cygwin_socket (int, int, int);
-  int seteuid32 (__uid32_t);
+  int seteuid32 (uid_t);
 }
 #endif
 
@@ -421,7 +421,7 @@ iruserok_sa(const void *ra, int rlen, int superuser, const char *ruser,
 	    const char *luser)
 {
 	const char *cp;
-	struct __stat64 sbuf;
+	struct stat sbuf;
 	struct passwd *pwd;
 	FILE *hostf;
 	uid_t uid;

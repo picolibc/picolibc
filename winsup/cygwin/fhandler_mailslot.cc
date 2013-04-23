@@ -29,7 +29,7 @@ fhandler_mailslot::fhandler_mailslot ()
 }
 
 int __reg2
-fhandler_mailslot::fstat (struct __stat64 *buf)
+fhandler_mailslot::fstat (struct stat *buf)
 {
   debug_printf ("here");
 
@@ -177,7 +177,7 @@ fhandler_mailslot::ioctl (unsigned int cmd, void *buf)
 				       FileMailslotSetInformation);
 	if (!NT_SUCCESS (status))
 	  {
-	    debug_printf ("NtSetInformationFile (%X): %08x",
+	    debug_printf ("NtSetInformationFile (%X): %p",
 			  fmsi.ReadTimeout.QuadPart, status);
 	    __seterrno_from_nt_status (status);
 	    break;

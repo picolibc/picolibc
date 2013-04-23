@@ -49,8 +49,8 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 
   size_t minchars = vmin_ ? MIN (vmin_, ulen) : ulen;
 
-  debug_printf ("ulen %d, vmin_ %d, vtime_ %d, hEvent %p", ulen, vmin_, vtime_,
-		io_status.hEvent);
+  debug_printf ("ulen %ld, vmin_ %ld, vtime_ %u, hEvent %p",
+		ulen, vmin_, vtime_, io_status.hEvent);
   if (!overlapped_armed)
     {
       SetCommMask (get_handle (), EV_RXCHAR);
@@ -94,7 +94,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 		  if (!GetOverlappedResult (get_handle (), &io_status, &n,
 					    FALSE))
 		    goto err;
-		  debug_printf ("n %d, ev %x", n, ev);
+		  debug_printf ("n %u, ev %x", n, ev);
 		  break;
 		case WAIT_SIGNALED:
 		  tot = -1;
@@ -117,7 +117,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
       ResetEvent (io_status.hEvent);
       if (inq > ulen)
 	inq = ulen;
-      debug_printf ("inq %d", inq);
+      debug_printf ("inq %u", inq);
       if (ReadFile (get_handle (), ptr, inq, &n, &io_status))
 	/* Got something */;
       else if (GetLastError () != ERROR_IO_PENDING)
@@ -143,7 +143,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	goto err;
 
       tot += n;
-      debug_printf ("vtime_ %d, vmin_ %d, n %d, tot %d", vtime_, vmin_, n, tot);
+      debug_printf ("vtime_ %u, vmin_ %lu, n %u, tot %d", vtime_, vmin_, n, tot);
       if (vtime_ || !vmin_ || !n)
 	break;
       continue;
@@ -244,8 +244,8 @@ fhandler_serial::open (int flags, mode_t mode)
   int res;
   COMMTIMEOUTS to;
 
-  syscall_printf ("fhandler_serial::open (%s, %p, %p)",
-			get_name (), flags, mode);
+  syscall_printf ("fhandler_serial::open (%s, %y, 0%o)",
+		  get_name (), flags, mode);
 
   if (!fhandler_base::open (flags, mode))
     return 0;
@@ -301,8 +301,8 @@ fhandler_serial::open (int flags, mode_t mode)
 
   SetCommMask (get_handle (), EV_RXCHAR);
   set_open_status ();
-  syscall_printf ("%p = fhandler_serial::open (%s, %p, %p)",
-			res, get_name (), flags, mode);
+  syscall_printf ("%p = fhandler_serial::open (%s, %y, 0%o)",
+		  res, get_name (), flags, mode);
   return res;
 }
 
@@ -446,7 +446,7 @@ fhandler_serial::ioctl (unsigned int cmd, void *buf)
 {
   int res = 0;
 
-# define ibuf ((int) buf)
+# define ibuf ((int) (intptr_t) buf)
 # define ipbuf (*(int *) buf)
 
   DWORD ev;
@@ -544,7 +544,7 @@ fhandler_serial::ioctl (unsigned int cmd, void *buf)
        break;
      }
 
-  termios_printf ("%d = ioctl(%p, %p)", res, cmd, buf);
+  termios_printf ("%d = ioctl(%x, %p)", res, cmd, buf);
 # undef ibuf
 # undef ipbuf
   return res;
@@ -699,7 +699,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       break;
     default:
       /* Unsupported baud rate! */
-      termios_printf ("Invalid t->c_ospeed %d", t->c_ospeed);
+      termios_printf ("Invalid t->c_ospeed %u", t->c_ospeed);
       set_errno (EINVAL);
       return -1;
     }
@@ -722,7 +722,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       break;
     default:
       /* Unsupported byte size! */
-      termios_printf ("Invalid t->c_cflag byte size %d",
+      termios_printf ("Invalid t->c_cflag byte size %u",
 		      t->c_cflag & CSIZE);
       set_errno (EINVAL);
       return -1;
@@ -902,7 +902,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       vmin_ = t->c_cc[VMIN];
     }
 
-  debug_printf ("vtime %d, vmin %d", vtime_, vmin_);
+  debug_printf ("vtime %d, vmin %ld", vtime_, vmin_);
 
   if (ovmin != vmin_ || ovtime != vtime_)
   {
@@ -935,7 +935,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
 	to.ReadIntervalTimeout = MAXDWORD;
       }
 
-    debug_printf ("ReadTotalTimeoutConstant %d, ReadIntervalTimeout %d, ReadTotalTimeoutMultiplier %d",
+    debug_printf ("ReadTotalTimeoutConstant %u, ReadIntervalTimeout %u, ReadTotalTimeoutMultiplier %u",
 		  to.ReadTotalTimeoutConstant, to.ReadIntervalTimeout, to.ReadTotalTimeoutMultiplier);
 
     if (!SetCommTimeouts(get_handle (), &to))
@@ -1042,7 +1042,7 @@ fhandler_serial::tcgetattr (struct termios *t)
 	break;
     default:
 	/* Unsupported baud rate! */
-	termios_printf ("Invalid baud rate %d", state.BaudRate);
+	termios_printf ("Invalid baud rate %u", state.BaudRate);
 	set_errno (EINVAL);
 	return -1;
     }
@@ -1065,7 +1065,7 @@ fhandler_serial::tcgetattr (struct termios *t)
       break;
     default:
       /* Unsupported byte size! */
-      termios_printf ("Invalid byte size %d", state.ByteSize);
+      termios_printf ("Invalid byte size %u", state.ByteSize);
       set_errno (EINVAL);
       return -1;
     }
@@ -1136,7 +1136,7 @@ fhandler_serial::tcgetattr (struct termios *t)
   t->c_cc[VTIME] = vtime_ / 100;
   t->c_cc[VMIN] = vmin_;
 
-  debug_printf ("vmin_ %d, vtime_ %d", vmin_, vtime_);
+  debug_printf ("vmin_ %lu, vtime_ %u", vmin_, vtime_);
 
   return 0;
 }

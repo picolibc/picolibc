@@ -55,8 +55,8 @@ struct sockaddr_storage {
 
 struct ucred {
   pid_t			pid;
-  __uid32_t		uid;
-  __gid32_t		gid;
+  uid_t			uid;
+  gid_t			gid;
 };
 
 struct linger {

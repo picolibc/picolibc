@@ -1,6 +1,6 @@
 /* bsd_log.cc
 
-   Copyright 2003, 2004 Red Hat Inc.
+   Copyright 2003, 2004, 2012 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -14,7 +14,7 @@ details. */
 #include <stdio.h>
 #include <stdlib.h>
 
-long log_level = 8; /* Illegal value.  Don't change! */
+int32_t log_level = 8; /* Illegal value.  Don't change! */
 tun_bool_t log_debug = TUN_UNDEF;
 tun_bool_t log_syslog = TUN_UNDEF;
 tun_bool_t log_stderr = TUN_UNDEF;
