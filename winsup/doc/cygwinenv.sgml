@@ -78,11 +78,21 @@ time and when handles are inherited.  Defaults to set.</para>
 </listitem>
 
 <listitem>
-<para><envar>(no)winsymlinks</envar> - if set, Cygwin creates
-symlinks as Windows shortcuts with a special header and the R/O attribute
-set. If not set, Cygwin creates symlinks as plain files with a magic number,
-a path and the system attribute set. Defaults to not set since plain
-file symlinks are faster to write and faster to read.</para>
+<para><envar>winsymlinks:{lnk,native}</envar> - if set to just
+<literal>winsymlinks</literal> or <literal>winsymlinks:lnk</literal>,
+Cygwin creates symlinks as Windows shortcuts with a special header and
+the R/O attribute set.  If set to <literal>winsymlinks:native</literal>,
+Cygwin creates symlinks as native Windows symlinks as supported by NTFS
+since Windows Vista/2008.
+
+If not set, Cygwin creates symlinks as plain files with a magic number,
+a path and the DOS SYSTEM attribute set by default, unless this is not
+supported by the underlying filesystem.  For instance, on MVFS symlinks
+are always created as Windows shortcuts, because it doesn't support the
+DOS SYSTEM attribute, on AFS always as native symlink because it doesn't
+support DOS attributes.  On NFS, symlinks are always created as native
+symlinks of the underlying filesystem.
+</para>
 
 <para>Please note that symlinks created under Cygwin 1.7 or later are
 not readable by older Cygwin releases because the new symlinks use UTF-16

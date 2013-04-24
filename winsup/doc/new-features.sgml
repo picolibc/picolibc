@@ -12,6 +12,15 @@ Drop support for Windows 2000 and Windows XP pre-SP3.
 Add support for building a 64 bit version of Cygwin on x86_64 natively.
 </para></listitem>
 
+<listitem><para>
+Add support for creating native NTFS symlinks starting with Windows Vista
+by setting the CYGWIN=winsymlinks:native option.
+</para></listitem>
+
+<listitem><para>
+Add support for AFS filesystem.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

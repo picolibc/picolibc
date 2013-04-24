@@ -1,5 +1,12 @@
 2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwinenv.sgml (cygwinenv-implemented-options): Change description
+	for winsymlink option to explain new implementation.
+	* new-features.sgml (ov-new1.7.19): Add support for native symlinks and
+	AFS.
+
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Throughout, eliminate Windows 2000 from the documentation.
 	* overview.sgml (brief-history): Mention native AMD64 support.
 
