@@ -115,7 +115,11 @@ datatypes when the AMD64 CPU was new.</para>
     printf ("%d %ld\n", l, i);
 </screen>
 
-may not print what you think it should.
+may not print what you think it should.  Enable the gcc options -Wformat or
+-Wall, which warn about type mismatches in printf/scanf functions.
+
+<note>Using -Wall (optionally with -Werror to drive the point home) makes a
+lot of sense in general, not only when porting code to a new platform.</note>
 </para></listitem>
 
 <listitem><para>

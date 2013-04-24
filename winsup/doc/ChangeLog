@@ -1,4 +1,10 @@
 2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
+	    Christian Franke  <Christian.Franke@t-online.de>
+
+	* faq-programming.xml (faq.programming.64bitporting): Mention the
+	-Wformat and -Wall gcc options.
+
+2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-programming.xml (faq.programming.64bitporting): New FAQ entry.
 	(faq.programming.objective-c): Include gcc4.
