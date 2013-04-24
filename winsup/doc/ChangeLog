@@ -1,4 +1,13 @@
-2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-programming.xml (faq.programming.64bitporting): New FAQ entry.
+	(faq.programming.objective-c): Include gcc4.
+	(faq.programming.make-execvp): Drop text discouraging usage of -j.
+	(faq.programming.undeclared-functions): Drop entry.
+	(faq.programming.x86-assembly): Ditto.
+	(faq.programming.djgpp): Ditto.
+
+2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.sgml (cygwinenv-implemented-options): Change description
 	for winsymlink option to explain new implementation.
