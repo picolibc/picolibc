@@ -49,6 +49,16 @@ enum exit_states
   ES_FINAL
 };
 
+/* The type of symlink to create.  The value is set depending on the
+   "winsymlinks" setting of the CYGWIN environment variable. */
+enum winsym_t
+{
+  WSYM_sysfile = 0,
+  WSYM_lnk,
+  WSYM_native,
+  WSYM_nfs
+};
+
 exit_states NO_COPY exit_state;
 
 /* Set in init.cc.  Used to check if Cygwin DLL is dynamically loaded. */
@@ -58,7 +68,7 @@ int NO_COPY dynamically_loaded;
 bool allow_glob = true;
 bool ignore_case_with_glob = false;
 bool dos_file_warning = true;
-bool allow_winsymlinks = false;
+winsym_t allow_winsymlinks = WSYM_sysfile;
 bool reset_com = false;
 bool pipe_byte = false;
 bool detect_bloda = false;
@@ -124,6 +134,7 @@ extern "C" {
   extern UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
   extern UNICODE_STRING _RDATA ro_u_nwfs = _ROU (L"NWFS");
   extern UNICODE_STRING _RDATA ro_u_ncfsd = _ROU (L"NcFsd");
+  extern UNICODE_STRING _RDATA ro_u_afs = _ROU (L"AFSRDRFsd");
   extern UNICODE_STRING _RDATA ro_u_volume = _ROU (L"\\??\\Volume{");
   extern UNICODE_STRING _RDATA ro_u_pipedir = _ROU (L"\\\\?\\PIPE\\");
   extern UNICODE_STRING _RDATA ro_u_globalroot = _ROU (L"\\\\.\\GLOBALROOT");

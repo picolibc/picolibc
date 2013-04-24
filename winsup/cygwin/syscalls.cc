@@ -3081,7 +3081,7 @@ mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
   char buf[sizeof (":\\00000000:00000000:00000000") + PATH_MAX];
   sprintf (buf, ":\\%x:%x:%x", major, minor,
 	   type | (mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
-  return symlink_worker (buf, path, true, true);
+  return symlink_worker (buf, path, true);
 }
 
 extern "C" int

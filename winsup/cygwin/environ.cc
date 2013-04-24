@@ -89,6 +89,19 @@ tty_is_gone (const char *buf)
     }
 }
 
+static void
+set_winsymlinks (const char *buf)
+{
+  if (!buf || !*buf)
+    allow_winsymlinks = WSYM_lnk;
+  else if (ascii_strncasematch (buf, "lnk", 3))
+    allow_winsymlinks = WSYM_lnk;
+  /* Make sure to try native symlinks only on systems supporting them. */
+  else if (ascii_strncasematch (buf, "native", 6)
+	   && wincap.max_sys_priv () >= SE_CREATE_SYMBOLIC_LINK_PRIVILEGE)
+    allow_winsymlinks = WSYM_native;
+}
+
 /* The structure below is used to set up an array which is used to
    parse the CYGWIN environment variable or, if enabled, options from
    the registry.  */
@@ -121,7 +134,7 @@ static struct parse_thing
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, setbool, NULL, {{false}, {true}}},
   {"tty", {func: tty_is_gone}, isfunc, NULL, {{0}, {0}}},
-  {"winsymlinks", {&allow_winsymlinks}, setbool, NULL, {{false}, {true}}},
+  {"winsymlinks", {func: set_winsymlinks}, isfunc, NULL, {{0}, {0}}},
   {NULL, {0}, setdword, 0, {{0}, {0}}}
 };
 

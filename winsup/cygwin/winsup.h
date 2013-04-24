@@ -243,8 +243,6 @@ extern "C" void vklog (int priority, const char *message, va_list ap);
 extern "C" void klog (int priority, const char *message, ...);
 bool child_copy (HANDLE, bool, ...);
 
-int __reg3 symlink_worker (const char *, const char *, bool, bool);
-
 class path_conv;
 
 int __reg2 stat_worker (path_conv &pc, struct stat *buf);

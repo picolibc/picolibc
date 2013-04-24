@@ -1,5 +1,31 @@
 2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (CreateSymbolicLink): Define.
+	* environ.cc (set_winsymlinks): Set allow_winsymlinks.
+	(parse_thing): Change "winsymlinks" to set by function.
+	* globals.cc (enum winsym_t): Define.
+	(allow_winsymlinks): Define as winsym_t.
+	(ro_u_afs): New R/O Unicode string.
+	* mount.cc (fs_info::update): Fix comment.  Handle AFS.
+	(fs_names): Add "afs".
+	* mount.h (enum fs_info_type): Add afs.
+	(class fs_info): Implement afs.
+	* path.cc (symlink): Drop third parameter in call to symlink_worker.
+	(symlink_nfs): New function.
+	(symlink_native): New function.
+	(symlink_worker): Drop third argument.  Handle native symlink type by
+	calling symlink_native.  Move code to handle NFS to symlink_nfs.  Fix
+	formatting.  Slightly restructure code.
+	* path.h (class path_conv): Add fs_is_afs method.
+	(symlink_worker): Declare here.
+	* security.h: Define privilege constants as unsigned int instead of as
+	unsigned long.
+	* syscalls.cc (mknod_worker): Set third parameter in symlink_worker
+	call to WSYM_lnk.
+	* winsup.h (symlink_worker): Drop declaration here.
+
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin64.din (_setjmp): Export.
 	(_longjmp): Export.
 

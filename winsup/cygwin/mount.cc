@@ -275,7 +275,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   if (is_remote_drive ())
     {
 /* Should be reevaluated for each new OS.  Right now this mask is valid up
-   to Vista.  The important point here is to test only flags indicating
+   to Windows 8.  The important point here is to test only flags indicating
    capabilities and to ignore flags indicating a specific state of this
    volume.  At present these flags to ignore are FILE_VOLUME_IS_COMPRESSED,
    FILE_READ_ONLY_VOLUME, and FILE_SEQUENTIAL_WRITE_ONCE.  The additional
@@ -371,7 +371,10 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	  && !is_ncfsd (RtlEqualUnicodeString (&fsname, &ro_u_ncfsd, FALSE))
 	  /* UNIXFS == TotalNet Advanced Server (TAS).  Doesn't support
 	     FileIdBothDirectoryInformation.  See below. */
-	  && !is_unixfs (RtlEqualUnicodeString (&fsname, &ro_u_unixfs, FALSE)))
+	  && !is_unixfs (RtlEqualUnicodeString (&fsname, &ro_u_unixfs, FALSE))
+	  /* AFSRDRFsd == Andrew File System.  Doesn't support DOS attributes.
+	     Only native symlinks are supported. */
+	  && !is_afs (RtlEqualUnicodeString (&fsname, &ro_u_afs, FALSE)))
 	{
 	  /* Known remote file system with buggy open calls.  Further
 	     explanation in fhandler.cc (fhandler_disk_file::open_fs). */
@@ -1598,6 +1601,7 @@ fs_names_t fs_names[] = {
     { "cifs", false },
     { "nwfs", false },
     { "ncfsd", false },
+    { "afs", false },
     { NULL, false }
 };
 

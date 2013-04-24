@@ -574,6 +574,7 @@ LoadDLLfunc (GetIpForwardTable, 12, iphlpapi)
 LoadDLLfunc (GetNetworkParams, 8, iphlpapi)
 LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 
+LoadDLLfunc (CreateSymbolicLink, 12, kernel32)
 LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
 

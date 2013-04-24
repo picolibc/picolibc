@@ -1475,27 +1475,98 @@ conv_path_list (const char *src, char *dst, size_t size,
 extern "C" int
 symlink (const char *oldpath, const char *newpath)
 {
-  return symlink_worker (oldpath, newpath, allow_winsymlinks, false);
+  return symlink_worker (oldpath, newpath, false);
+}
+
+static int
+symlink_nfs (const char *oldpath, path_conv &win32_newpath)
+{
+  /* On NFS, create symlinks by calling NtCreateFile with an EA of type
+     NfsSymlinkTargetName containing ... the symlink target name. */
+  tmp_pathbuf tp;
+  PFILE_FULL_EA_INFORMATION pffei;
+  NTSTATUS status;
+  HANDLE fh;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+
+  pffei = (PFILE_FULL_EA_INFORMATION) tp.w_get ();
+  pffei->NextEntryOffset = 0;
+  pffei->Flags = 0;
+  pffei->EaNameLength = sizeof (NFS_SYML_TARGET) - 1;
+  char *EaValue = stpcpy (pffei->EaName, NFS_SYML_TARGET) + 1;
+  pffei->EaValueLength = sizeof (WCHAR) *
+    (sys_mbstowcs ((PWCHAR) EaValue, NT_MAX_PATH, oldpath) - 1);
+  status = NtCreateFile (&fh, FILE_WRITE_DATA | FILE_WRITE_EA | SYNCHRONIZE,
+			 win32_newpath.get_object_attr (attr, sec_none_nih),
+			 &io, NULL, FILE_ATTRIBUTE_SYSTEM,
+			 FILE_SHARE_VALID_FLAGS, FILE_CREATE,
+			 FILE_SYNCHRONOUS_IO_NONALERT
+			 | FILE_OPEN_FOR_BACKUP_INTENT,
+			 pffei, NT_MAX_PATH * sizeof (WCHAR));
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  NtClose (fh);
+  return 0;
+}
+
+static int
+symlink_native (const char *oldpath, path_conv &win32_newpath)
+{
+  tmp_pathbuf tp;
+  path_conv win32_oldpath;
+  PUNICODE_STRING final_oldpath, final_newpath;
+
+  if (isabspath (oldpath))
+    {
+      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
+      final_oldpath = win32_oldpath.get_nt_native_path ();
+      final_oldpath->Buffer[1] = L'\\';
+    }
+  else
+    {
+      /* The symlink target is relative to the directory in which
+	 the symlink gets created, not relative to the cwd.  Therefore
+	 we have to mangle the path quite a bit before calling path_conv. */
+      ssize_t len = strrchr (win32_newpath.normalized_path, '/')
+		    - win32_newpath.normalized_path + 1;
+      char *absoldpath = tp.t_get ();
+      stpcpy (stpncpy (absoldpath, win32_newpath.normalized_path, len),
+	      oldpath);
+      win32_oldpath.check (absoldpath, PC_SYM_NOFOLLOW, stat_suffixes);
+      UNICODE_STRING dirpath;
+      RtlSplitUnicodePath (win32_newpath.get_nt_native_path (), &dirpath, NULL);
+      final_oldpath = win32_oldpath.get_nt_native_path ();
+      final_oldpath->Buffer += dirpath.Length / sizeof (WCHAR);
+    }
+  final_newpath = win32_newpath.get_nt_native_path ();
+  /* Convert native to DOS UNC path. */
+  final_newpath->Buffer[1] = L'\\';
+  if (!CreateSymbolicLinkW (final_newpath->Buffer, final_oldpath->Buffer,
+			    win32_oldpath.isdir ()
+			    ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0))
+    {
+      /* Repair native path, we still need it. */
+      final_newpath->Buffer[1] = L'?';
+      return -1;
+    }
+  return 0;
 }
 
 int
-symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
-		bool isdevice)
+symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
 {
   int res = -1;
   size_t len;
-  path_conv win32_newpath, win32_oldpath;
+  path_conv win32_newpath;
   char *buf, *cp;
-  SECURITY_ATTRIBUTES sa = sec_none_nih;
-  OBJECT_ATTRIBUTES attr;
-  IO_STATUS_BLOCK io;
-  NTSTATUS status;
-  HANDLE fh;
-  ULONG access = DELETE | FILE_GENERIC_WRITE;
   tmp_pathbuf tp;
   unsigned check_opt;
-  bool mk_winsym = use_winsym;
   bool has_trailing_dirsep = false;
+  winsym_t wsym_type;
 
   /* POSIX says that empty 'newpath' is invalid input while empty
      'oldpath' is valid -- it's symlink resolver job to verify if
@@ -1527,11 +1598,35 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   check_opt = PC_SYM_NOFOLLOW | PC_POSIX | (isdevice ? PC_NOWARN : 0);
   /* We need the normalized full path below. */
   win32_newpath.check (newpath, check_opt, stat_suffixes);
+
+  /* Default symlink type is determined by global allow_winsymlinks variable.
+     Device files are always shortcuts. */
+  wsym_type = isdevice ? WSYM_lnk : allow_winsymlinks;
+  /* NFS has its own, dedicated way to create symlinks. */
+  if (win32_newpath.fs_is_nfs ())
+    wsym_type = WSYM_nfs;
   /* MVFS doesn't handle the SYSTEM DOS attribute, but it handles the R/O
      attribute.  Therefore we create symlinks on MVFS always as shortcuts. */
-  mk_winsym |= win32_newpath.fs_is_mvfs ();
+  else if (win32_newpath.fs_is_mvfs ())
+    wsym_type = WSYM_lnk;
+  /* AFS only supports native symlinks. */
+  else if (win32_newpath.fs_is_afs ())
+    {
+      /* Bail out if OS doesn't support native symlinks. */
+      if (wincap.max_sys_priv () < SE_CREATE_SYMBOLIC_LINK_PRIVILEGE)
+	{
+	  set_errno (EPERM);
+	  goto done;
+	}
+      wsym_type = WSYM_native;
+    }
+  /* Don't try native symlinks on filesystems not supporting reparse points. */
+  else if (wsym_type == WSYM_native
+	   && !(win32_newpath.fs_flags () & FILE_SUPPORTS_REPARSE_POINTS))
+    wsym_type = WSYM_sysfile;
 
-  if (mk_winsym && !win32_newpath.exists ()
+  /* Attach .lnk suffix when shortcut is requested. */
+  if (wsym_type == WSYM_lnk && !win32_newpath.exists ()
       && (isdevice || !win32_newpath.fs_is_nfs ()))
     {
       char *newplnk = tp.c_get ();
@@ -1545,8 +1640,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       goto done;
     }
 
-  syscall_printf ("symlink (%s, %S)", oldpath,
-		  win32_newpath.get_nt_native_path ());
+  syscall_printf ("symlink (%s, %S) wsym_type %d", oldpath,
+		  win32_newpath.get_nt_native_path (), wsym_type);
 
   if ((!isdevice && win32_newpath.exists ())
       || win32_newpath.is_auto_device ())
@@ -1560,36 +1655,29 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       goto done;
     }
 
-  if (!isdevice && win32_newpath.fs_is_nfs ())
+  /* Handle NFS and native symlinks in their own functions. */
+  switch (wsym_type)
     {
-      /* On NFS, create symlinks by calling NtCreateFile with an EA of type
-	 NfsSymlinkTargetName containing ... the symlink target name. */
-      PFILE_FULL_EA_INFORMATION pffei = (PFILE_FULL_EA_INFORMATION) tp.w_get ();
-      pffei->NextEntryOffset = 0;
-      pffei->Flags = 0;
-      pffei->EaNameLength = sizeof (NFS_SYML_TARGET) - 1;
-      char *EaValue = stpcpy (pffei->EaName, NFS_SYML_TARGET) + 1;
-      pffei->EaValueLength = sizeof (WCHAR) *
-	(sys_mbstowcs ((PWCHAR) EaValue, NT_MAX_PATH, oldpath) - 1);
-      status = NtCreateFile (&fh, FILE_WRITE_DATA | FILE_WRITE_EA | SYNCHRONIZE,
-			     win32_newpath.get_object_attr (attr, sa),
-			     &io, NULL, FILE_ATTRIBUTE_SYSTEM,
-			     FILE_SHARE_VALID_FLAGS, FILE_CREATE,
-			     FILE_SYNCHRONOUS_IO_NONALERT
-			     | FILE_OPEN_FOR_BACKUP_INTENT,
-			     pffei, NT_MAX_PATH * sizeof (WCHAR));
-      if (!NT_SUCCESS (status))
+    case WSYM_nfs:
+      res = symlink_nfs (oldpath, win32_newpath);
+      goto done;
+    case WSYM_native:
+      res = symlink_native (oldpath, win32_newpath);
+      /* AFS?  Too bad.  Otherwise, just try the default symlink type. */
+      if (win32_newpath.fs_is_afs ())
 	{
-	  __seterrno_from_nt_status (status);
+	  __seterrno ();
 	  goto done;
 	}
-      NtClose (fh);
-      res = 0;
-      goto done;
+      wsym_type = WSYM_sysfile;
+      break;
+    default:
+      break;
     }
 
-  if (mk_winsym)
+  if (wsym_type == WSYM_lnk)
     {
+      path_conv win32_oldpath;
       ITEMIDLIST *pidl = NULL;
       size_t full_len = 0;
       unsigned short oldpath_len, desc_len, relpath_len, pidl_len = 0;
@@ -1604,11 +1692,11 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
 	  /* The symlink target is relative to the directory in which
 	     the symlink gets created, not relative to the cwd.  Therefore
 	     we have to mangle the path quite a bit before calling path_conv. */
-	if (isabspath (oldpath))
-	  win32_oldpath.check (oldpath,
-			       PC_SYM_NOFOLLOW,
-			       stat_suffixes);
-	else
+	  if (isabspath (oldpath))
+	    win32_oldpath.check (oldpath,
+				 PC_SYM_NOFOLLOW,
+				 stat_suffixes);
+	  else
 	    {
 	      len = strrchr (win32_newpath.normalized_path, '/')
 		    - win32_newpath.normalized_path + 1;
@@ -1677,7 +1765,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       full_len += sizeof (unsigned short) + oldpath_len;
       /* 1 byte more for trailing 0 written by stpcpy. */
       if (full_len < NT_MAX_PATH * sizeof (WCHAR))
-	buf = (char *) tp.w_get ();
+	buf = tp.t_get ();
       else
 	buf = (char *) alloca (full_len + 1);
 
@@ -1721,7 +1809,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   else
     {
       /* Default technique creating a symlink. */
-      buf = (char *) tp.w_get ();
+      buf = tp.t_get ();
       cp = stpcpy (buf, SYMLINK_COOKIE);
       *(PWCHAR) cp = 0xfeff;		/* BOM */
       cp += 2;
@@ -1729,10 +1817,17 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
       cp += sys_mbstowcs ((PWCHAR) cp, NT_MAX_PATH, oldpath) * sizeof (WCHAR);
     }
 
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  NTSTATUS status;
+  ULONG access;
+  HANDLE fh;
+
+  access = DELETE | FILE_GENERIC_WRITE;
   if (isdevice && win32_newpath.exists ())
     {
       status = NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES,
-			   win32_newpath.get_object_attr (attr, sa),
+			   win32_newpath.get_object_attr (attr, sec_none_nih),
 			   &io, 0, FILE_OPEN_FOR_BACKUP_INTENT);
       if (!NT_SUCCESS (status))
 	{
@@ -1758,7 +1853,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
        so for now we don't request WRITE_DAC on remote drives. */
     access |= READ_CONTROL | WRITE_DAC;
 
-  status = NtCreateFile (&fh, access, win32_newpath.get_object_attr (attr, sa),
+  status = NtCreateFile (&fh, access, win32_newpath.get_object_attr (attr, sec_none_nih),
 			 &io, NULL, FILE_ATTRIBUTE_NORMAL,
 			 FILE_SHARE_VALID_FLAGS,
 			 isdevice ? FILE_OVERWRITE_IF : FILE_CREATE,
@@ -1778,8 +1873,9 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   status = NtWriteFile (fh, NULL, NULL, NULL, &io, buf, cp - buf, NULL, NULL);
   if (NT_SUCCESS (status) && io.Information == (ULONG) (cp - buf))
     {
-      status = NtSetAttributesFile (fh, mk_winsym ? FILE_ATTRIBUTE_READONLY
-						  : FILE_ATTRIBUTE_SYSTEM);
+      status = NtSetAttributesFile (fh, wsym_type == WSYM_lnk
+      					? FILE_ATTRIBUTE_READONLY
+					: FILE_ATTRIBUTE_SYSTEM);
       if (!NT_SUCCESS (status))
 	debug_printf ("Setting attributes failed, status = %y", status);
       res = 0;
@@ -1796,8 +1892,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool use_winsym,
   NtClose (fh);
 
 done:
-  syscall_printf ("%d = symlink_worker(%s, %s, %d, %d)", res, oldpath,
-		  newpath, mk_winsym, isdevice);
+  syscall_printf ("%d = symlink_worker(%s, %s, %d)",
+		  res, oldpath, newpath, isdevice);
   if (has_trailing_dirsep)
     free ((void *) newpath);
   return res;
