@@ -1,3 +1,8 @@
+2013-04-24  Corinna Vinschen  <vinschen@redhat.com>
+	    Nick Clifton  <nickc@redhat.com>
+
+	* libc/stdlib/strtod.c: Manual update to latest algorithm from NetBSD.
+
 2013-04-23  Corinna Vinschen  <vinschen@redhat.com>
 
 	Port newlib to x86_64-pc-cygwin.
