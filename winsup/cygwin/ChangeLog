@@ -1,4 +1,4 @@
-2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (CreateSymbolicLink): Define.
 	* environ.cc (set_winsymlinks): Set allow_winsymlinks.
