@@ -1,3 +1,8 @@
+2013-04-25  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/stdio/local.h (_STDIO_CLOSE_PER_REENT_STD_STREAMS): New define.
+	* libc/stdio/findfp.c (_STDIO_CLOSE_PER_REENT_STD_STREAMS): Use define.
+
 2013-04-24  Corinna Vinschen  <vinschen@redhat.com>
 	    Nick Clifton  <nickc@redhat.com>
 
