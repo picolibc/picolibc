@@ -1,5 +1,9 @@
 2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* faq-programming.xml (faq.programming.64bitporting): Fix typo.
+
+2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* faq-programming.xml (faq.programming.64bitporting): Extend entry.
 	(faq.programming.64bitporting-fail): New entry.
 	(faq.programming.64bitporting-cygwin64): New entry.

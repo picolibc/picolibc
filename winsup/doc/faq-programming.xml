@@ -207,7 +207,7 @@ base type helps in this case:
 </para></listitem>
 
 <listitem><para>
-<emphasis>Don't</emphasis> mix Windows dataypes with POSIX type-specific
+<emphasis>Don't</emphasis> mix Windows datatypes with POSIX type-specific
 MIN/MAX values.
 
 <screen>
