@@ -75,8 +75,8 @@ sizeof(void*)       4        8        8
 <para>This difference can result in interesting problems, especially when
 using Win32 functions, especially when using pointers to Windows
 datatypes like LONG, ULONG, DWORD.  Given that Windows is LLP64, all of
-the aforementioned types are 4 byte in size, while `long' on 64 bit Cygwin
-is 8 bytes.</para>
+the aforementioned types are 4 byte in size, on 32 as well as on 64 bit
+Windows, while `long' on 64 bit Cygwin is 8 bytes.</para>
 
 <para>Take the example ReadFile:</para>
 
@@ -142,11 +142,17 @@ which has no immediate connection to the actual bug.
 
 <screen>
     void *ptr;
-    printf ("Pointer value is %x\n", (int) ptr);
+    printf ("Pointer value is %x\n", ptr);
 </screen>
 
-The value printed by printf is missing the upper 4 bytes, so the printed
-value is very likely wrong.
+%x denotes an int argument.  The value printed by printf is a 4 byte value,
+so on x86_64 the printed pointer value is missing its upper 4 bytes; the output
+is very likely wrong.  Use %p instead, which portable across architectures:
+
+<screen>
+    void *ptr;
+    printf ("Pointer value is %p\n", ptr);
+</screen>
 </para></listitem>
 
 <listitem><para>
@@ -155,7 +161,7 @@ pointer arithmetic.  Don't cast pointers to int, don't cast pointer
 differences to int, and don't store pointer differences in an int type.
 Use the types <literal>intptr_t</literal>, <literal>uintptr_t</literal>
 and <literal>ptrdiff_t</literal> instead, they are designed for performing
-pointer arithmetic.
+architecture-independent pointer arithmetic.
 </para></listitem>
 
 <listitem><para>
@@ -181,9 +187,23 @@ string pointer given to printf is missing the upper 4 bytes.
 
 <listitem><para>
 <emphasis>Don't</emphasis> use C base types together with Win32 functions.
-Keep in mind that DWORD, LONG, ULONG are *not* the same as long and unsigned
-long.  Try to use only Win32 datatypes in conjunction with Win32 API function
-calls to avoid type problems.  See the above ReadFile example.
+Keep in mind that DWORD, LONG, ULONG are <emphasis>not</emphasis> the same
+as long and unsigned long.  Try to use only Win32 datatypes in conjunction
+with Win32 API function calls to avoid type problems.  See the above
+ReadFile example.  Windows functions in printf calls should be treated
+carefully as well.  This code is common for 32 bit code, but probably prints
+the wrong value on 64 bit:
+
+<screen>
+    printf ("Error message is: %lu\n", GetLastError ());
+</screen>
+
+Using gcc's -Wformat option would warn about this.  Casting to the requested
+base type helps in this case:
+
+<screen>
+    printf ("Error message is: %lu\n", (unsigned long) GetLastError ());
+</screen>
 </para></listitem>
 
 <listitem><para>
@@ -199,6 +219,111 @@ MIN/MAX values.
 Again, keep in mind that ULONG (or DWORD) is <emphasis>not</emphasis> unsigned
 long but rather unsigned int on 64 bit.
 </para></listitem>
+
+</itemizedlist>
+
+</answer></qandaentry>
+
+<qandaentry id="faq.programming.64bitporting-fail">
+<question><para>My project doesn't build at all on 64 bit Cygwin.  What's up?</para></question>
+<answer>
+
+<para>Typically reasons for that are:</para>
+
+<itemizedlist mark="bullet">
+
+<listitem><para><literal>__CYGWIN32__</literal> is not defined in the
+64 bit toolchain.  This may hit a few projects which are around since before
+Y2K.  Check your project for occurences of <literal>__CYGWIN32__</literal>
+and change them to <literal>__CYGWIN__</literal>, which is defined in the
+Cygwin toolchain since 1998, to get the same Cygwin-specific code changes done.
+</para></listitem>
+
+<listitem><para>The project maintainers took it for granted that Cygwin is
+running only on i686 CPUs and the code is making this assumption blindly.
+You have to check the code for such assumptions and fix them.
+</para></listitem>
+
+<listitem><para>The project is using autotools, the
+<filename>config.sub</filename> and <filename>config.guess</filename> files
+are hopelessly outdated and don't recognize
+<literal>x86_64-{pc,unknown}-cygwin</literal> as valid target.  Update the
+project configury (cygport will do this by default) and try again.
+</para></listitem>
+
+<listitem><para>The project uses Windows functions on Cygwin and it's suffering
+from the problems described in the preceeding FAQ entry.
+</para></listitem>
+
+</itemizedlist>
+
+<para>In all of this cases, please make sure to fix that upstream, or send
+your patches to the upstream maintainers, so the problems get fixed for the
+future.</para>
+
+</answer></qandaentry>
+
+<qandaentry id="faq.programming.64bitporting-cygwin64">
+<question><para>Why is __CYGWIN64__ not defined for 64 bit?</para></question>
+<answer>
+
+<para>There is no <literal>__CYGWIN64__</literal> because we would like to
+have a unified way to handle Cygwin code in portable projects.  Using
+<literal>__CYGWIN32__</literal> and <literal>__CYGWIN64__</literal> only
+complicates the code for no good reason.  Along the same lines you won't
+find predefined macros <literal>__linux32__</literal> and
+<literal>__linux64__</literal> on Linux.</para>
+
+<para>If you really have to differ between 32 and 64 bit in some way, you have
+three choices.</para>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>If your code depends on the CPU architecture, use the
+predefined compiler definition for the architecture, like this:</para>
+
+<screen>
+#ifdef __CYGWIN__
+# ifdef __x86_64__	/* Alternatively __x86_64, __amd64__, __amd64 */
+    /* Code specific for AMD64 CPU */
+# elif __X86__
+    /* Code specific for ix86 CPUs */
+# else
+#   error Unsupported Architecture
+# endif
+#endif
+</screen></listitem>
+
+<listitem><para>If your code depends on differences in the data model, you
+should consider to use the <literal>__LP64__</literal> definition
+instead:</para>
+
+<screen>
+#ifdef __CYGWIN__
+# ifdef __LP64__	/* Alternatively _LP64 */
+    /* Code specific for 64 bit CPUs */
+# else
+    /* Code specific for 32 bit CPUs */
+# endif
+#endif
+</screen></listitem>
+
+<listitem><para>If your code uses Windows functions, and some of the
+functionality is 64 bit Windows-specific, use <literal>_WIN64</literal>,
+which is defined on 64 bit Cygwin, as soon as you include
+<filename>windows.h</filename>.  This should only be used in the most
+desperate of occasions, though, and <emphasis>only</emphasis> if it's
+really about a difference in Windows API functionality!</para>
+
+<screen>
+#ifdef __CYGWIN__
+# ifdef _WIN64
+    /* Code specific for 64 bit Windows */
+# else
+    /* Code specific for 32 bit Windows */
+# endif
+#endif
+</screen></listitem>
 
 </itemizedlist>
 
