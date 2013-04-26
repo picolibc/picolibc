@@ -5,6 +5,10 @@ What's new:
 
 - Add support for building a 64 bit version of Cygwin on x86_64 natively.
 
+- Add support for creating native symlinks (CYGWIN=winsymlinks:native)
+
+- Add support for the AFS filesystem.
+
 Bug fixes:
 ----------
 

@@ -1,3 +1,7 @@
+2013-04-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fcntl.cc (fcntl): Define as export alias for fcntl64 on x86_64.
+
 2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (CreateSymbolicLink): Define.

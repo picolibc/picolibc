@@ -89,6 +89,7 @@ done:
 }
 
 #ifdef __x86_64__
+EXPORT_ALIAS (fcntl64, fcntl)
 EXPORT_ALIAS (fcntl64, _fcntl)
 #else
 extern "C" int
