@@ -1,3 +1,7 @@
+2013-04-29  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/reent.h (_REENT_INIT_PTR): Reduce code size.
+
 2013-04-29  Freddie Chopin  <freddie_chopin@op.pl>
 
 	* libc/libc.texinfo: Fix @ references and change ifinfo to be
