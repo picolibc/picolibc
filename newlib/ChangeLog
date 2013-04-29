@@ -1,3 +1,9 @@
+2013-04-29  Freddie Chopin  <freddie_chopin@op.pl>
+
+	* libc/libc.texinfo: Fix @ references and change ifinfo to be
+	ifnottexinfo.
+	* libm/libm.texinfo: Ditto.
+
 2013-04-25  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/stdio/local.h (_STDIO_CLOSE_PER_REENT_STD_STREAMS): New define.
