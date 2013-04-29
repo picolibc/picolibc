@@ -72,20 +72,24 @@ on two different systems.
 void
 _DEFUN (srand, (seed), unsigned int seed)
 {
-  _REENT_CHECK_RAND48(_REENT);
-  _REENT_RAND_NEXT(_REENT) = seed;
+  struct _reent *reent = _REENT;
+
+  _REENT_CHECK_RAND48(reent);
+  _REENT_RAND_NEXT(reent) = seed;
 }
 
 int
 _DEFUN_VOID (rand)
 {
+  struct _reent *reent = _REENT;
+
   /* This multiplier was obtained from Knuth, D.E., "The Art of
      Computer Programming," Vol 2, Seminumerical Algorithms, Third
      Edition, Addison-Wesley, 1998, p. 106 (line 26) & p. 108 */
-  _REENT_CHECK_RAND48(_REENT);
-  _REENT_RAND_NEXT(_REENT) = 
-     _REENT_RAND_NEXT(_REENT) * __extension__ 6364136223846793005LL + 1;
-  return (int)((_REENT_RAND_NEXT(_REENT) >> 32) & RAND_MAX);
+  _REENT_CHECK_RAND48(reent);
+  _REENT_RAND_NEXT(reent) =
+     _REENT_RAND_NEXT(reent) * __extension__ 6364136223846793005LL + 1;
+  return (int)((_REENT_RAND_NEXT(reent) >> 32) & RAND_MAX);
 }
 
 #endif /* _REENT_ONLY */

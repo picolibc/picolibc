@@ -175,34 +175,37 @@ extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite64,(struct _reent *, void *,
 
 #ifdef _REENT_SMALL
 #define CHECK_INIT(ptr, fp) \
-  do						\
-    {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
-	__sinit (ptr);				\
-      if ((fp) == (FILE *)&__sf_fake_stdin)	\
-	(fp) = _stdin_r(ptr);			\
-      else if ((fp) == (FILE *)&__sf_fake_stdout) \
-	(fp) = _stdout_r(ptr);			\
-      else if ((fp) == (FILE *)&__sf_fake_stderr) \
-	(fp) = _stderr_r(ptr);			\
-    }						\
+  do								\
+    {								\
+      struct _reent *_check_init_ptr = (ptr);			\
+      if ((_check_init_ptr) && !(_check_init_ptr)->__sdidinit)	\
+	__sinit (_check_init_ptr);				\
+      if ((fp) == (FILE *)&__sf_fake_stdin)			\
+	(fp) = _stdin_r(_check_init_ptr);			\
+      else if ((fp) == (FILE *)&__sf_fake_stdout)		\
+	(fp) = _stdout_r(_check_init_ptr);			\
+      else if ((fp) == (FILE *)&__sf_fake_stderr)		\
+	(fp) = _stderr_r(_check_init_ptr);			\
+    }								\
   while (0)
 #else /* !_REENT_SMALL   */
 #define CHECK_INIT(ptr, fp) \
-  do						\
-    {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
-	__sinit (ptr);				\
-    }						\
+  do								\
+    {								\
+      struct _reent *_check_init_ptr = (ptr);			\
+      if ((_check_init_ptr) && !(_check_init_ptr)->__sdidinit)	\
+	__sinit (_check_init_ptr);				\
+    }								\
   while (0)
 #endif /* !_REENT_SMALL  */
 
 #define CHECK_STD_INIT(ptr) \
-  do						\
-    {						\
-      if ((ptr) && !(ptr)->__sdidinit)		\
-	__sinit (ptr);				\
-    }						\
+  do								\
+    {								\
+      struct _reent *_check_init_ptr = (ptr);			\
+      if ((_check_init_ptr) && !(_check_init_ptr)->__sdidinit)	\
+	__sinit (_check_init_ptr);				\
+    }								\
   while (0)
 
 /* Return true and set errno and stream error flag iff the given FILE

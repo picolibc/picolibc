@@ -50,25 +50,26 @@ _DEFUN (wcrtomb, (s, wc, ps),
   return _wcrtomb_r (_REENT, s, wc, ps);
 #else
   int retval = 0;
+  struct _reent *reent = _REENT;
   char buf[10];
 
 #ifdef _MB_CAPABLE
   if (ps == NULL)
     {
-      _REENT_CHECK_MISC(_REENT);
-      ps = &(_REENT_WCRTOMB_STATE(_REENT));
+      _REENT_CHECK_MISC(reent);
+      ps = &(_REENT_WCRTOMB_STATE(reent));
     }
 #endif
 
   if (s == NULL)
-    retval = __wctomb (_REENT, buf, L'\0', __locale_charset (), ps);
+    retval = __wctomb (reent, buf, L'\0', __locale_charset (), ps);
   else
-    retval = __wctomb (_REENT, s, wc, __locale_charset (), ps);
+    retval = __wctomb (reent, s, wc, __locale_charset (), ps);
 
   if (retval == -1)
     {
       ps->__count = 0;
-      _REENT->_errno = EILSEQ;
+      reent->_errno = EILSEQ;
       return (size_t)(-1);
     }
   else

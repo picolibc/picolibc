@@ -175,6 +175,8 @@ wint_t
 _DEFUN(fgetwc, (fp),
 	FILE *fp)
 {
-  CHECK_INIT(_REENT, fp);
-  return _fgetwc_r (_REENT, fp);
+  struct _reent *reent = _REENT;
+
+  CHECK_INIT(reent, fp);
+  return _fgetwc_r (reent, fp);
 }

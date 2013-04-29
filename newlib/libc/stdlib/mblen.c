@@ -55,11 +55,12 @@ _DEFUN (mblen, (s, n),
 {
 #ifdef _MB_CAPABLE
   int retval = 0;
+  struct _reent *reent = _REENT;
   mbstate_t *state;
   
-  _REENT_CHECK_MISC(_REENT);
-  state = &(_REENT_MBLEN_STATE(_REENT));
-  retval = __mbtowc (_REENT, NULL, s, n, __locale_charset (), state);
+  _REENT_CHECK_MISC(reent);
+  state = &(_REENT_MBLEN_STATE(reent));
+  retval = __mbtowc (reent, NULL, s, n, __locale_charset (), state);
   if (retval < 0)
     {
       state->__count = 0;

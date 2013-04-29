@@ -160,6 +160,8 @@ _DEFUN(fgetws, (ws, n, fp),
 	int n _AND
 	FILE *fp)
 {
-  CHECK_INIT (_REENT, fp);
-  return _fgetws_r (_REENT, ws, n, fp);
+  struct _reent *reent = _REENT;
+
+  CHECK_INIT (reent, fp);
+  return _fgetws_r (reent, ws, n, fp);
 }

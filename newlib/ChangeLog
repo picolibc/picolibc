@@ -1,5 +1,49 @@
 2013-04-29  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
+	* libc/stdio/local.h (CHECK_INIT): Evaluate argument only once.
+	(CHECK_STD_INIT): Likewise.
+	* libc/stdio/fgetc.c (fgetc): Use local variable for _REENT.
+	* libc/stdio/fgetwc.c (fwgetc): Likewise.
+	* libc/stdio/fgetws.c (fgetws): Likewise.
+	* libc/stdio/fputc.c (fputc): Likewise.
+	* libc/stdio/fputwc.c (fputwc): Likewise.
+	* libc/stdio/fputws.c (fputws): Likewise.
+	* libc/stdio/getc.c (getc): Likewise.
+	* libc/stdio/getchar.c (_getchar_r): Likewise.
+	* libc/stdio/putc.c (putc): Likewise.
+	* libc/stdio/putchar.c (putchar): Likewise.
+	* libc/stdio/scanf.c (scanf): Likewise.
+	* libc/stdio/setvbuf.c (setvbuf): Likewise.
+	* libc/stdio/ungetwc.c (ungetwc): Likewise.
+	* libc/stdio/vfscanf.c (VFSCANF): Likewise.
+	* libc/stdio/vfwscanf.c (VFWSCANF): Likewise.
+	* libc/stdio/viprintf.c (viprintf): Likewise.
+	* libc/stdio/viscanf.c (viscanf): Likewise.
+	* libc/stdio/vprintf.c (vprintf): Likewise.
+	* libc/stdio/vscanf.c (vscanf): Likewise.
+	* libc/stdio/vwprintf.c (vwprintf): Likewise.
+	* libc/stdio/vwscanf.c (vwscanf): Likewise.
+	* libc/stdio/wscanf.c (wscanf): Likewise.
+	* libc/stdlib/ecvtbuf.c (fcvtbuf): Likewise.
+	(fcvtbuf): Likewise.
+	(ecvtbuf): Likewise.
+	(ecvtbuf): Likewise.
+	* libc/stdlib/mblen.c (mblen): Likewise.
+	* libc/stdlib/mbrlen.c (mbrlen): Likewise.
+	* libc/stdlib/mbrtowc.c (mbrtowc): Likewise.
+	* libc/stdlib/mbtowc.c (mbtowc): Likewise.
+	* libc/stdlib/rand.c (srand): Likewise.
+	(rand): Likewise.
+	* libc/stdlib/wcrtomb.c (wcrtomb): Likewise.
+	* libc/stdlib/wctob.c (wctob): Likewise.
+	* libc/stdlib/wctomb.c (wctomb): Likewise.
+	* libc/string/strtok.c (strtok): Likewise.
+	* libc/time/asctime.c (asctime): Likewise.
+	* libc/time/gmtime.c (gmtime): Likewise.
+	* libc/time/lcltime.c (lcltime): Likewise.
+
+2013-04-29  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
 	* libc/include/sys/reent.h (_REENT_INIT_PTR): Reduce code size.
 
 2013-04-29  Freddie Chopin  <freddie_chopin@op.pl>
