@@ -1,5 +1,18 @@
 2013-04-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* spawn.cc (system_call_cleanup): Rename from pthread_cleanup.  Extend
+	functionality.
+	(system_call_cleanup::system_call_cleanup): Set up signals like
+	system() requires.  Unblock previously-blocked signal handling.
+	(system_call_cleanup::~system_call_cleanup): Restore signal handling
+	after system().
+	(child_info_spawn::worker): Put signals on hold and use
+	system_call_cleanup class to set and restore signals rather than doing
+	it prior to to running the program.  Remove the ill-conceived
+	pthread_cleanup stuff.
+
+2013-04-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* exceptions.cc (cygwin_exception::dumpstack): Guard against wild
 	pointer dereference.
 	(CYG_EXC_CONTINUE_EXECUTION): Define based on standard Windows
