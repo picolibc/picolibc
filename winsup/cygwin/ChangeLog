@@ -7,6 +7,11 @@
 	* cygwin64.din: Delete.
 	* gendef: Rework to take options rather than using positional
 	parameters.  Accept multiple files as input.
+	* Makefile.in: Rework to allow multiple .din files as input to gendef.
+	* configure.in: Change names of .din files to be expressively target
+	specific.
+	* aclocal.m4: Regenerate.
+	* configure: Ditto.
 
 2013-04-29  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
