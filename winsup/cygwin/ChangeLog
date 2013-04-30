@@ -1,5 +1,16 @@
 2013-04-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* exceptions.cc (cygwin_exception::dumpstack): Guard against wild
+	pointer dereference.
+	(CYG_EXC_CONTINUE_EXECUTION): Define based on standard Windows
+	definition.
+	(CYG_EXC_CONTINUE_SEARCH): Ditto.
+	(exception::handle): Move andreas detection earlier.  Make comment
+	clearer.
+	(signal_exit): Set core-dumped flag.
+
+2013-04-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* i686.din: New file.
 	* x86_64.din: New file.
 	* common.din: New file.

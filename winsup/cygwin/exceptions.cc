@@ -344,6 +344,9 @@ void
 cygwin_exception::dumpstack ()
 {
   static bool already_dumped;
+  myfault efault;
+  if (efault.faulted ())
+    return;
 
   if (already_dumped || cygheap->rlim_core == 0Ul)
     return;
@@ -553,8 +556,8 @@ bool exception::handler_installed NO_COPY;
 int
 exception::handle (LPEXCEPTION_POINTERS ep)
 #else
-#define CYG_EXC_CONTINUE_EXECUTION	0
-#define CYG_EXC_CONTINUE_SEARCH		1
+#define CYG_EXC_CONTINUE_EXECUTION	ExceptionContinueExecution
+#define CYG_EXC_CONTINUE_SEARCH		ExceptionContinueSearch
 
 int
 exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
@@ -562,6 +565,9 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 {
   static bool NO_COPY debugging;
   _cygtls& me = _my_tls;
+
+  if (me.andreas)
+    me.andreas->leave ();	/* Return from a "san" caught fault */
 
 #ifdef __x86_64__
   EXCEPTION_RECORD *e = ep->ExceptionRecord;
@@ -574,8 +580,8 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
       return CYG_EXC_CONTINUE_EXECUTION;
     }
 
-  /* If we're exiting, don't do anything here.  Returning 1
-     tells Windows to keep looking for an exception handler.  */
+  /* If we're exiting, tell Windows to keep looking for an
+     exception handler.  */
   if (exit_state || e->ExceptionFlags)
     return CYG_EXC_CONTINUE_SEARCH;
 
@@ -688,9 +694,6 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	 something else handle it.  */
       return CYG_EXC_CONTINUE_SEARCH;
     }
-
-  if (me.andreas)
-    me.andreas->leave ();	/* Return from a "san" caught fault */
 
   debug_printf ("In cygwin_except_handler exception %y at %p sp %p", e->ExceptionCode, in->_GR(ip), in->_GR(sp));
   debug_printf ("In cygwin_except_handler signal %d at %p", si.si_signo, in->_GR(ip));
@@ -1204,29 +1207,33 @@ signal_exit (int sig, siginfo_t *si)
       case SIGTRAP:
       case SIGXCPU:
       case SIGXFSZ:
-       if (try_to_debug ())
-	 break;
-       if (si->si_code != SI_USER && si->si_cyg)
-	 ((cygwin_exception *) si->si_cyg)->dumpstack ();
-       else
-	 {
-	   CONTEXT c;
-	   c.ContextFlags = CONTEXT_FULL;
-	   RtlCaptureContext (&c);
+	sig |= 0x80;		/* Flag that we've "dumped core" */
+	if (try_to_debug ())
+	  break;
+	if (si->si_code != SI_USER && si->si_cyg)
+	  ((cygwin_exception *) si->si_cyg)->dumpstack ();
+	else
+	  {
+	    CONTEXT c;
+	    c.ContextFlags = CONTEXT_FULL;
+	    RtlCaptureContext (&c);
 #ifdef __x86_64__
-	   cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.rbp, &c);
+	    cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.rbp, &c);
 #else
-	   cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.ebp, &c);
+	    cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.ebp, &c);
 #endif
-	   exc.dumpstack ();
-	 }
-       break;
+	    exc.dumpstack ();
+	  }
+	break;
       }
 
   lock_process until_exit (true);
 
   if (have_execed || exit_state > ES_PROCESS_LOCKED)
-    myself.exit (sig);
+    {
+      debug_printf ("recursive exit?");
+      myself.exit (sig);
+    }
 
   /* Starve other threads in a vain attempt to stop them from doing something
      stupid. */
