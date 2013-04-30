@@ -1,3 +1,7 @@
+2013-04-29  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* autoload.cc (CreateSymbolicLinkW): Rename from CreateSymbolicLink.
+
 2013-04-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fcntl.cc (fcntl): Define as export alias for fcntl64 on x86_64.
