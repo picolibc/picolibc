@@ -9,32 +9,32 @@
 # details.
 #
 use strict;
+use integer;
+use Getopt::Long;
+
 sub cleanup(@);
 
-my $in = shift;
-my $tls_offsets = shift;
-my $cpu = shift;
-my $out = shift;
-my $sigfe = shift;
+my $cpu;
+my $output_def;
+my $tls_offsets;
+GetOptions('cpu=s'=>\$cpu, 'output-def=s'=>\$output_def, 'tlsoffsets=s'=>\$tls_offsets);
 
 $main::first = 0;
-if (!defined($in) || !defined($cpu) || !defined($out) || !defined($sigfe)) {
-    die "usage: $0 deffile.in cygtls.h target-cpu deffile.def sigfe.s\n";
+if (!defined($cpu) || !defined($output_def) || !defined($tls_offsets)) {
+    die "$0: missing required option\n";
 }
 
 require $tls_offsets;
 
-my $is64bit = ($cpu eq 'x86_64' ? 1 : 0);
-my $sym_prefix = ($is64bit ? '' : '_');
+my $is64bit = $cpu eq 'x86_64';
+my $sym_prefix = $is64bit ? '' : '_';
 
-open(IN, $in) or die "$0: couldn't open \"$in\" - $!\n";
 my @top = ();
-while (<IN>) {
+while (<>) {
     push(@top, cleanup $_);
-    last if /^\s*exports$/i;
+    last if /^\s*exports$/oi;
 }
-my @in = cleanup <IN>;
-close(IN);
+my @in = cleanup <>;
 
 my %sigfe = ();
 my @data = ();
@@ -77,12 +77,12 @@ for (@text) {
       if defined($func) && $sigfe{$func};
 }
 
-open(OUT, '>', $out) or die "$0: couldn't open \"$out\" - $!\n";
+open OUT, '>', $output_def or die "$0: couldn't open \"$output_def\" - $!\n";
 push @top, (map {$_ . " DATA\n"} @data), (map {$_ . "\n"} @text);
 print OUT @top;
 close OUT;
 
-open(SIGFE, '>', $sigfe) or die "$0: couldn't open sigfe file \"$sigfe\" - $!\n";
+open SIGFE, '>', 'sigfe.h' or die "$0: couldn't open 'sigfe.h' file for writing - $!\n";
 
 for my $k (sort keys %sigfe) {
     print SIGFE fefunc($k, $sigfe{$k});
@@ -882,7 +882,5 @@ EOF
 }
 
 sub cleanup(@) {
-    map {s/\r//g; $_} @_;
-    map {s/#.*//g; $_} @_;
-    map {s/[ \t]+$//g; $_} @_;
+    grep {s/\r//og; s/#.*//og; s/\s+\n//sog; !/^$/o && $_} @_;
 }

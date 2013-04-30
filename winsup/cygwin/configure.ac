@@ -75,14 +75,14 @@ case "$target_cpu" in
 		DLL_NAME="cygwin1.dll"
 		DLL_ENTRY="_dll_entry@12"
 		DEF_DLL_ENTRY="dll_entry@12"
-		DIN_FILE="cygwin.din"
+		DIN_FILE="i686.din"
 		TLSOFFSETS_H="tlsoffsets.h"
 		CONFIG_DIR="i386"  ;;
    x86_64)
 		DLL_NAME="cygwin1.dll"
 		DLL_ENTRY="dll_entry"
 		DEF_DLL_ENTRY="dll_entry"
-		DIN_FILE="cygwin64.din"
+		DIN_FILE="x86_64.din"
 		TLSOFFSETS_H="tlsoffsets64.h"
 		CONFIG_DIR="x86_64"  ;;
    *)		AC_MSG_ERROR(Invalid target processor \"$target_cpu\") ;;

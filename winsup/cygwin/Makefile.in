@@ -118,7 +118,7 @@ DLL_NAME:=@DLL_NAME@
 TEST_DLL_NAME:=${patsubst %1.dll,%0.dll,@DLL_NAME@}
 TEST_LIB_NAME:=libcygwin0.a
 STATIC_LIB_NAME:=libcygwin_s.a
-DIN_FILE=@DIN_FILE@
+DIN_FILE=@DIN_FILE@ common.din
 DEF_FILE:=cygwin.def
 TLSOFFSETS_H:=@TLSOFFSETS_H@
 DLL_ENTRY:=@DLL_ENTRY@
@@ -460,9 +460,6 @@ dll_ofiles: $(DLL_OFILES)
 $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
 	$(AR) rcv $(LIBGMON_A) $(GMON_OFILES)
 
-$(API_VER): $(srcdir)/$(DIN_FILE)
-	@echo Error: Version info is older than DLL API!
-
 version.cc winver.o: winver_stamp
 	@ :
 
@@ -514,11 +511,11 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	$(COMPILE.cc) -c -o version.o version.cc && \
 	touch $@
 
-Makefile: $(DIN_FILE) ${srcdir}/Makefile.in
+Makefile: ${srcdir}/Makefile.in
 	/bin/sh ./config.status
 
-$(DEF_FILE): gendef $(DIN_FILE) $(srcdir)/$(TLSOFFSETS_H)
-	$^ $(target_cpu) $@ sigfe.s
+$(DEF_FILE): gendef $(srcdir)/$(TLSOFFSETS_H) $(DIN_FILE)
+	$(word 1,$^) --cpu=${target_cpu} --output-def=$@  --tlsoffsets=$(word 2,$^) $(wordlist 3,99,$^)
 
 $(srcdir)/$(TLSOFFSETS_H): gentls_offsets cygtls.h
 	$^ $@ @CONFIG_DIR@ $(COMPILE.cc) -c
