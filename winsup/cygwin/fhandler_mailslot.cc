@@ -146,7 +146,7 @@ fhandler_mailslot::open (int flags, mode_t mode)
   return res;
 }
 
-ssize_t __stdcall
+ssize_t __reg3
 fhandler_mailslot::raw_write (const void *ptr, size_t len)
 {
   /* Check for 425/426 byte weirdness */

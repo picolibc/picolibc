@@ -319,7 +319,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
    This returns the content of a struct fattr3 as defined in RFC 1813.
    The content is the NFS equivalent of struct stat. so there's not much
    to do here except for copying. */
-int __stdcall
+int __reg2
 fhandler_base::fstat_by_nfs_ea (struct stat *buf)
 {
   fattr3 *nfs_attr = pc.nfsattr ();
@@ -362,7 +362,7 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
   return 0;
 }
 
-int __stdcall
+int __reg2
 fhandler_base::fstat_by_handle (struct stat *buf)
 {
   /* Don't use FileAllInformation info class.  It returns a pathname rather
@@ -420,7 +420,7 @@ fhandler_base::fstat_by_handle (struct stat *buf)
   return fstat_helper (buf, fsi.NumberOfLinks);
 }
 
-int __stdcall
+int __reg2
 fhandler_base::fstat_by_name (struct stat *buf)
 {
   NTSTATUS status;
@@ -464,7 +464,7 @@ fhandler_base::fstat_by_name (struct stat *buf)
   return fstat_helper (buf, 1);
 }
 
-int __stdcall
+int __reg2
 fhandler_base::fstat_fs (struct stat *buf)
 {
   int res = -1;
@@ -508,7 +508,7 @@ fhandler_base::fstat_fs (struct stat *buf)
   return res;
 }
 
-int __stdcall
+int __reg3
 fhandler_base::fstat_helper (struct stat *buf,
 			     DWORD nNumberOfLinks)
 {
@@ -708,7 +708,7 @@ fhandler_disk_file::fstat (struct stat *buf)
   return fstat_fs (buf);
 }
 
-int __stdcall
+int __reg2
 fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 {
   int ret = -1, opened = 0;
@@ -783,7 +783,7 @@ out:
   return ret;
 }
 
-int __stdcall
+int __reg1
 fhandler_disk_file::fchmod (mode_t mode)
 {
   extern int chmod_device (path_conv& pc, mode_t mode);
@@ -891,7 +891,7 @@ out:
   return res;
 }
 
-int __stdcall
+int __reg2
 fhandler_disk_file::fchown (uid_t uid, gid_t gid)
 {
   int oret = 0;
@@ -959,7 +959,7 @@ fhandler_disk_file::fchown (uid_t uid, gid_t gid)
   return res;
 }
 
-int _stdcall
+int __reg3
 fhandler_disk_file::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
   int res = -1;
@@ -1535,7 +1535,7 @@ fhandler_disk_file::prw_open (bool write)
   return 0;
 }
 
-ssize_t __stdcall
+ssize_t __reg3
 fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
 {
   ssize_t res;
@@ -1609,7 +1609,7 @@ non_atomic:
   return res;
 }
 
-ssize_t __stdcall
+ssize_t __reg3
 fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset)
 {
   if ((get_flags () & O_ACCMODE) == O_RDONLY)
@@ -1924,7 +1924,7 @@ free_dir:
   return res;
 }
 
-ino_t __stdcall
+ino_t __reg2
 readdir_get_ino (const char *path, bool dot_dot)
 {
   char *fname;
@@ -2393,7 +2393,7 @@ fhandler_cygdrive::fstat (struct stat *buf)
   return 0;
 }
 
-int __stdcall
+int __reg2
 fhandler_cygdrive::fstatvfs (struct statvfs *sfs)
 {
   /* Virtual file system.  Just return an empty buffer with a few values

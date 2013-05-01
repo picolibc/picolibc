@@ -187,7 +187,7 @@ sigprocmask (int how, const sigset_t *set, sigset_t *oldset)
   return res;
 }
 
-int __stdcall
+int __reg3
 handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& opmask)
 {
   /* check that how is in right range */
@@ -227,7 +227,7 @@ handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& op
   return 0;
 }
 
-int __stdcall
+int __reg2
 _pinfo::kill (siginfo_t& si)
 {
   int res;

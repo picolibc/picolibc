@@ -1847,7 +1847,7 @@ sync ()
 }
 
 /* Cygwin internal */
-int __stdcall
+int __reg2
 stat_worker (path_conv &pc, struct stat *buf)
 {
   int res = -1;

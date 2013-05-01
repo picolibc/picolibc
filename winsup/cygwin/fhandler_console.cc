@@ -318,7 +318,7 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
 		 || dev_state.use_mouse >= 3));
 }
 
-void __stdcall
+void __reg3
 fhandler_console::read (void *pv, size_t& buflen)
 {
   push_process_state process_state (PID_TTYIN);

@@ -181,7 +181,7 @@ fhandler_virtual::close ()
   return 0;
 }
 
-void __stdcall
+void __reg3
 fhandler_virtual::read (void *ptr, size_t& len)
 {
   if (len == 0)
@@ -266,7 +266,7 @@ fhandler_virtual::facl (int cmd, int nentries, aclent_t *aclbufp)
   return res;
 }
 
-int __stdcall
+int __reg2
 fhandler_virtual::fstatvfs (struct statvfs *sfs)
 {
   /* Virtual file system.  Just return an empty buffer with a few values

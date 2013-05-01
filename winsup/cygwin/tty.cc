@@ -85,7 +85,7 @@ tty::init_session ()
     cygheap->fdtab.get_debugger_info ();
 }
 
-int __stdcall
+int __reg2
 tty_list::attach (int n)
 {
   int res;

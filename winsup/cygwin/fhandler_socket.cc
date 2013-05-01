@@ -846,7 +846,7 @@ fhandler_socket::fstat (struct stat *buf)
   return res;
 }
 
-int __stdcall
+int __reg2
 fhandler_socket::fstatvfs (struct statvfs *sfs)
 {
   if (get_device () == FH_UNIX)
@@ -1527,7 +1527,7 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
   return ret;
 }
 
-void __stdcall
+void __reg3
 fhandler_socket::read (void *in_ptr, size_t& len)
 {
   char *ptr = (char *) in_ptr;

@@ -1095,7 +1095,7 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
   return len - len_s + written;
 }
 
-void __stdcall
+void __reg3
 fhandler_dev_dsp::read (void *ptr, size_t& len)
 {
   debug_printf ("ptr=%p len=%ld", ptr, len);

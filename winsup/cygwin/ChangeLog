@@ -1,3 +1,13 @@
+2013-04-30  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	Throughout, (mainly in fhandler*) fix remaining gcc 4.7 mismatch
+	warnings between regparm definitions and declarations.
+	* smallprint.cc (__small_vswprintf): Conditionalize declaration and
+	setting of l_opt for only x86_64.
+	* spawn.cc (child_info_spawn::worker): Remove unused 'pid' variable.
+	* thread.cc (verifyable_object_isvalid): Temporarily define as
+	non-inline with gcc 4.7+, regardless of target.
+
 2013-04-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* gendef: Fix sigfe.s typo.

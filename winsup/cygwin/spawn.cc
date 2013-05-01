@@ -85,7 +85,7 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
    of name is placed in buf and returned.  Otherwise the contents of buf
    is undefined and NULL is returned.  */
 
-const char * __stdcall
+const char * __reg3
 find_exec (const char *name, path_conv& buf, const char *mywinenv,
 	   unsigned opt, const char **known_suffix)
 {
@@ -764,7 +764,6 @@ loop:
   /* Name the handle similarly to proc_subproc. */
   ProtectHandle1 (pi.hProcess, childhProc);
 
-  pid_t pid;
   if (mode == _P_OVERLAY)
     {
       myself->dwProcessId = pi.dwProcessId;
@@ -772,7 +771,6 @@ loop:
       myself.hProcess = hExeced = pi.hProcess;
       real_path.get_wide_win32_path (myself->progname); // FIXME: race?
       sigproc_printf ("new process name %W", myself->progname);
-      pid = myself->pid;
       if (!iscygwin ())
 	close_all_files ();
     }
@@ -812,7 +810,6 @@ loop:
 	  res = -1;
 	  goto out;
 	}
-      pid = child->pid;
     }
 
   /* Start the child running */

@@ -394,7 +394,7 @@ fhandler_pipe::ioctl (unsigned int cmd, void *p)
   return 0;
 }
 
-int __stdcall
+int __reg2
 fhandler_pipe::fstatvfs (struct statvfs *sfs)
 {
   set_errno (EBADF);

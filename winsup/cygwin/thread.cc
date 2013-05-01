@@ -38,8 +38,8 @@ extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
 extern "C" int valid_sched_parameters(const struct sched_param *);
 extern "C" int sched_set_thread_priority(HANDLE thread, int priority);
-#ifdef __x86_64__
-/* FIXME: Temporarily workaround gcc 4.8 bug. */
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 7
+/* FIXME: Temporarily workaround gcc 4.7+ bug. */
 static verifyable_object_state
 #else
 static inline verifyable_object_state
@@ -122,8 +122,8 @@ __cygwin_lock_unlock (_LOCK_T *lock)
   paranoid_printf ("threadcount %d.  unlocked", MT_INTERFACE->threadcount);
 }
 
-#ifdef __x86_64__
-/* FIXME: Temporarily workaround gcc 4.8 bug. */
+#if __GNUC__ == 4 && __GNUC_MINOR__ >= 7
+/* FIXME: Temporarily workaround gcc 4.7+ bug. */
 static verifyable_object_state
 #else
 static inline verifyable_object_state

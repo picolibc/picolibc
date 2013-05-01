@@ -484,7 +484,9 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
   while (*fmt)
     {
       unsigned int n = 0x7fff;
+#ifdef __x86_64__
       bool l_opt = false;
+#endif
       if (*fmt != L'%')
 	*dst++ = *fmt++;
       else
@@ -519,7 +521,9 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 		  len = len * 10 + (c - L'0');
 		  continue;
 		case L'l':
+#ifdef __x86_64__
 		  l_opt = true;
+#endif
 		  continue;
 		case L'c':
 		case L'C':
