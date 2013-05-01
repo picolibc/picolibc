@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<qandadiv id="faq.setup">
+<title>Setting up Cygwin</title>
+
 <!-- faq-setup.xml -->
 <qandaentry id="faq.setup.setup">
 <question><para>What is the recommended installation procedure?</para></question>
@@ -604,4 +611,5 @@ this up for Cygwin 1.7, we might add this information here.
 except for the installation directory information stored there for the sake
 of setup.exe.  There's nothing left to manipulate anymore.
 </para></answer></qandaentry>
+</qandadiv>
 

@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<qandadiv id="faq.using">
+<title>Using Cygwin</title>
+
 <!-- faq-problems.xml -->
 <qandaentry id="faq.using.missing-dlls">
 <question><para>Why can't my application locate cygncurses-8.dll?  or cygintl-3.dll?  or cygreadline6.dll?  or ...?</para></question>
@@ -1243,3 +1250,4 @@ such as virtual memory paging and file caching.</para>
   difficult to make <literal>fork()</literal> work reliably.</para>
 </answer>
 </qandaentry>
+</qandadiv>

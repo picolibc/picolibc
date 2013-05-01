@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<bookinfo xmlns:xi="http://www.w3.org/2001/XInclude">
+	<date>2001-22-03</date>
+	<title>Cygwin User's Guide</title>
+	<authorgroup>
+		<author>
+			<firstname>Joshua Daniel</firstname>
+			<surname>Franklin</surname>
+		</author>
+		<author>
+			<firstname>Corinna</firstname>
+			<surname>Vinschen</surname>
+		</author>
+		<author>
+			<firstname>Christopher</firstname>
+			<surname>Faylor</surname>
+		</author>
+		<author>
+			<firstname>DJ</firstname>
+			<surname>Delorie</surname>
+		</author>
+		<author>
+			<firstname>Pierre</firstname>
+			<surname>Humblet</surname>
+		</author>
+		<author>
+			<firstname>Geoffrey</firstname>
+			<surname>Noer</surname>
+		</author>
+	</authorgroup>
+
+	<xi:include href="legal.xml"/>
+</bookinfo>

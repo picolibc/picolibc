@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="setup-files"><title>Customizing bash</title>
+
+<para>
+To set up bash so that cut and paste work properly, click on the
+"Properties" button of the window, then on the "Misc" tab.  Make sure
+that "QuickEdit mode" and "Insert mode" are checked.  These settings
+will be remembered next time you run bash from that shortcut. Similarly
+you can set the working directory inside the "Program" tab. The entry
+"%HOME%" is valid, but requires that you set <envar>HOME</envar> in
+the Windows environment.
+</para>
+
+<para>
+Your home directory should contain three initialization files
+that control the behavior of bash.  They are
+<filename>.profile</filename>, <filename>.bashrc</filename> and
+<filename>.inputrc</filename>.  The Cygwin base installation creates
+stub files when you start bash for the first time.</para>
+
+<para>
+<filename>.profile</filename> (other names are also valid, see the bash man
+page) contains bash commands.  It is executed when bash is started as login
+shell, e.g. from the command <command>bash --login</command>.
+This is a useful place to define and
+export environment variables and bash functions that will be used by bash
+and the programs invoked by bash.  It is a good place to redefine
+<envar>PATH</envar> if needed.  We recommend adding a ":." to the end of
+<envar>PATH</envar> to also search the current working directory (contrary
+to DOS, the local directory is not searched by default).  Also to avoid
+delays you should either <command>unset</command> <envar>MAILCHECK</envar> 
+or define <envar>MAILPATH</envar> to point to your existing mail inbox.
+</para>
+
+<para>
+<filename>.bashrc</filename> is similar to
+<filename>.profile</filename> but is executed each time an interactive
+bash shell is launched.  It serves to define elements that are not
+inherited through the environment, such as aliases. If you do not use
+login shells, you may want to put the contents of
+<filename>.profile</filename> as discussed above in this file
+instead.
+</para>
+
+<para>
+<screen>
+shopt -s nocaseglob
+</screen>
+will allow bash to glob filenames in a case-insensitive manner.
+Note that <filename>.bashrc</filename> is not called automatically for login 
+shells. You can source it from <filename>.profile</filename>.
+</para>
+
+<para>
+<filename>.inputrc</filename> controls how programs using the readline
+library (including <command>bash</command>) behave.  It is loaded
+automatically.  For full details see the <literal>Function and Variable
+Index</literal> section of the GNU <systemitem>readline</systemitem> manual.
+Consider the following settings:
+<screen>
+# Ignore case while completing
+set completion-ignore-case on
+# Make Bash 8bit clean
+set meta-flag on
+set convert-meta off
+set output-meta on
+</screen>
+The first command makes filename completion case insensitive, which can
+be convenient in a Windows environment.  The next three commands allow
+<command>bash</command> to display 8-bit characters, useful for
+languages with accented characters.  Note that tools that do not use
+<systemitem>readline</systemitem> for display, such as
+<command>less</command> and <command>ls</command>, require additional
+settings, which could be put in your <filename>.bashrc</filename>:
+<screen>
+alias less='/bin/less -r'
+alias ls='/bin/ls -F --color=tty --show-control-chars'
+</screen>
+</para>
+
+</sect1>
+

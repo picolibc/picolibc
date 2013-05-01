@@ -1,15 +1,13 @@
-<?xml version="1.0"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" []>
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 
-<book id="cygwin-api">
+<book id="cygwin-api" xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <bookinfo>
     <date>1998-08-31</date>
     <title>Cygwin API Reference</title>
-
-    DOCTOOL-INSERT-legal
-
+		<xi:include href="legal.xml"/>
   </bookinfo>
 
   <toc></toc>

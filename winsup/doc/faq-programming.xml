@@ -1,4 +1,10 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 <!-- faq-programming.xml -->
+
+<qandadiv id="faq.programming">
+<title>Programming Questions</title>
 
 <qandaentry id="faq.programming.packages">
 <question><para>How do I contribute a package?</para></question>
@@ -1107,3 +1113,5 @@ executable.</para></listitem>
 linker flag.</para></listitem>
 </orderedlist></listitem></orderedlist>
 </answer></qandaentry>
+
+</qandadiv>

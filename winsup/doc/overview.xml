@@ -1,4 +1,9 @@
-<chapter id="overview"><title>Cygwin Overview</title>
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<chapter id="overview" xmlns:xi="http://www.w3.org/2001/XInclude">
+<title>Cygwin Overview</title>
 
 <sect1 id="what-is-it"><title>What is it?</title>
 
@@ -29,8 +34,8 @@ distribution).
 </para>
 </sect1>
 
-DOCTOOL-INSERT-ov-ex-win
-DOCTOOL-INSERT-ov-ex-unix
+<xi:include href="ov-ex-win.xml"/>
+<xi:include href="ov-ex-unix.xml"/>
 
 <sect1 id="are-free"><title>Are the Cygwin tools free software?</title>
 
@@ -120,7 +125,7 @@ available in a 64 bit version is 1.7.19.</para>
 
 </sect1>
 
-DOCTOOL-INSERT-highlights
-DOCTOOL-INSERT-ov-new1.7
+<xi:include href="highlights.xml"/>
+<xi:include href="new-features.xml"/>
 
 </chapter>

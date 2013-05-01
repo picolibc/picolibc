@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="setup-env"><title>Environment Variables</title>
+
+<sect2 id="setup-env-ov"><title>Overview</title>
+
+<para>
+All Windows environment variables are imported when Cygwin starts.
+Apart from that, you may wish to specify settings of several important
+environment variables that affect Cygwin's operation.</para>
+
+<para>
+The <envar>CYGWIN</envar> variable is used to configure a few global
+settings for the Cygwin runtime system.  Typically you can leave
+<envar>CYGWIN</envar> unset, but if you want to set one ore more
+options, you can set it using a syntax like this, depending on the shell
+in which you're setting it.  Here is an example in CMD syntax:</para>
+
+<screen>
+<prompt>C:\&gt;</prompt> <userinput>set CYGWIN=error_start:C:\cygwin\bin\gdb.exe glob</userinput>
+</screen>
+
+<para>
+This is, of course, just an example.  For the recognized settings of the
+<envar>CYGWIN</envar> environment variable, see
+<xref linkend="using-cygwinenv"></xref>.
+</para>
+
+<para>
+Locale support is controlled by the <envar>LANG</envar> and
+<envar>LC_xxx</envar> environment variables.  Since Cygwin 1.7.2, all of
+them are honored and have a meaning.  For a more detailed description see
+<xref linkend="setup-locale"></xref>.
+</para>
+
+<para>
+The <envar>PATH</envar> environment variable is used by Cygwin
+applications as a list of directories to search for executable files
+to run.  This environment variable is converted from Windows format
+(e.g. <filename>C:\Windows\system32;C:\Windows</filename>) to UNIX format
+(e.g., <filename>/cygdrive/c/Windows/system32:/cygdrive/c/Windows</filename>)
+when a Cygwin process first starts.
+Set it so that it contains at least the <filename>x:\cygwin\bin</filename>
+directory where "<filename>x:\cygwin</filename> is the "root" of your
+cygwin installation if you wish to use cygwin tools outside of bash.
+This is usually done by the batch file you're starting your shell with.
+</para>
+
+<para> 
+The <envar>HOME</envar> environment variable is used by many programs to
+determine the location of your home directory and we recommend that it be
+defined.  This environment variable is also converted from Windows format
+when a Cygwin process first starts.  It's usually set in the shell
+profile scripts in the /etc directory.
+</para>
+
+<para>
+The <envar>TERM</envar> environment variable specifies your terminal
+type.  It is automatically set to <literal>cygwin</literal> if you have
+not set it to something else.
+</para>
+
+<para>The <envar>LD_LIBRARY_PATH</envar> environment variable is used by
+the Cygwin function <function>dlopen ()</function> as a list of
+directories to search for .dll files to load.  This environment variable
+is converted from Windows format to UNIX format when a Cygwin process
+first starts.  Most Cygwin applications do not make use of the
+<function>dlopen ()</function> call and do not need this variable.
+</para>
+
+<para>
+In addition to <envar>PATH</envar>, <envar>HOME</envar>,
+and <envar>LD_LIBRARY_PATH</envar>, there are three other environment
+variables which, if they exist in the Windows environment, are
+converted to UNIX format: <envar>TMPDIR</envar>, <envar>TMP</envar>,
+and <envar>TEMP</envar>.  The first is not set by default in the
+Windows environment but the other two are, and they point to the
+default Windows temporary directory.  If set, these variables will be
+used by some Cygwin applications, possibly with unexpected results.
+You may therefore want to unset them by adding the following two lines
+to your <filename>~/.bashrc</filename> file:
+
+<screen>
+unset TMP
+unset TEMP
+</screen>
+
+This is done in the default <filename>~/.bashrc</filename> file.
+Alternatively, you could set <envar>TMP</envar>
+and <envar>TEMP</envar> to point to <filename>/tmp</filename> or to
+any other temporary directory of your choice.  For example:
+
+<screen>
+export TMP=/tmp
+export TEMP=/tmp
+</screen>
+</para>
+
+</sect2>
+
+<sect2 id="setup-env-win32"><title>Restricted Win32 environment</title>
+
+<para>There is a restriction when calling Win32 API functions which
+require a fully set up application environment.  Cygwin maintains its own
+environment in POSIX style.  The Win32 environment is usually stripped
+to a bare minimum and not at all kept in sync with the Cygwin POSIX
+environment.</para>
+
+<para>If you need the full Win32 environment set up in a Cygwin process,
+you have to call</para>
+
+<screen>
+#include &lt;sys/cygwin.h&gt;
+
+cygwin_internal (CW_SYNC_WINENV);
+</screen>
+
+<para>to synchronize the Win32 environment with the Cygwin environment.
+Note that this only synchronizes the Win32 environment once with the
+Cygwin environment.  Later changes using the <function>setenv</function>
+or <function>putenv</function> calls are not reflected in the Win32
+environment.  In these cases, you have to call the aforementioned
+<function>cygwin_internal</function> call again.</para>
+
+</sect2>
+
+</sect1>

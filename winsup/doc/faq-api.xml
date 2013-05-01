@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<qandadiv id="faq.api">
+<title>Cygwin API Questions</title>
+
 <!-- faq-api.xml --> 
 <qandaentry id="faq.api.everything">
 <question><para>How does everything work?</para></question>
@@ -319,4 +326,4 @@ In a Windows console window you can enable and capture mouse events
 using the xterm escape sequences for mouse events.
 </para>
 </answer></qandaentry>
-
+</qandadiv>

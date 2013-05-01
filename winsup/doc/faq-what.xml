@@ -1,5 +1,12 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<qandadiv id="faq.about">
+<title>About Cygwin</title>
+
 <!-- faq-what.xml -->
-<qandaentry id="faq.what">
+<qandaentry id="faq.what.what">
 <question><para>What is it?</para></question>
 <answer>
 
@@ -152,4 +159,4 @@ function, so some email will have to go unanswered.
 <para>Many thanks to everyone using the tools for their many contributions in
 the form of advice, bug reports, and code fixes.  Keep them coming!
 </para></answer></qandaentry>
-
+</qandadiv>

@@ -1,3 +1,41 @@
+2013-05-01  Warren Young  <warren@etr-usa.com>
+
+	* cygwin-ug.xml: Renamed from cygwin-ug.in.sgml
+	(bookinfo) Extracted <bookinfo> section into new ug-info.xml file
+	* ug-info.xml: Created
+	* cygwin-ug-net.xml: Renamed from cygwin-ug-net.in.sgml
+	(bookinfo) Replaced content with XInclude referencing ug-info.xml
+	* configure.ac: Replaced a *.sgml file reference with *.xml
+	* cygserver.xml cygwinenv.xml dll.xml effectively.xml filemodes.xml
+	gcc.xml gdb.xml legal.xml new-features.xml ntsec.xml overview.xml
+	pathnames.xml programming.xml setup.xml setup-net.xml textbinary.xml
+	using.xml windres.xml: Renamed from *.sgml.
+	Added <?xml> and <!DOCTYPE> tags to the top.
+	* cygserver.sgml cygwinenv.sgml dll.sgml effectively.sgml filemodes.sgml
+	gcc.sgml gdb.sgml legal.sgml new-features.sgml ntsec.sgml overview.sgml
+	pathnames.sgml programming.sgml setup.sgml setup-net.sgml textbinary.sgml
+	using.sgml windres.sgml: Renamed to *.xml
+	* faq.xml: Renamed from faq-sections.sgml.  (Not faq.sgml!)
+	Replaced FAQ section ENTITY declarations with XIncludes.
+	Removed all other ENTITY declarations as they just name entities
+	already defined in the current DocBook stylesheets.
+	* faq.sgml: Removed without translating to DocBook XML.  Obsolete.
+	* faq-*.xml: Added <?xml> and <!DOCTYPE> tags to the top.
+	Moved <qandadiv> tags from faq.xml and faq-sections.xml into
+	individual section files so they individually pass XML validation.
+	* pathnames.xml: Contained two top-level <sect1> elements, which is
+	malformed XML. Moved second to new specialnames.xml file.
+	* specialnames.xml: Created; extracted from pathnames.sgml
+	* overview2.xml: Broke it up into following three files, and
+	removed the original.
+	* ov-ex-win.xml (ov-ex-win): Created; contents extracted from
+	overview2.sgml
+	* ov-ex-unix.xml (ov-ex-unix): Ditto
+	* highlights.xml (highlights): Ditto
+	* setup2.xml: Broke it up into setup-*.xml.
+	* setup-env.xml setup-files.xml setup-locale.xml setup-maxmem.xml:
+	Created; contents extracted from setup2.sgml
+
 2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-programming.xml (faq.programming.64bitporting): Fix typo.
