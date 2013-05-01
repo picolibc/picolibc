@@ -1,3 +1,8 @@
+2013-05-01  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* resource.cc (setrlimit): Use consistent commenting style.  Return
+	EINVAL when rlim_cur > rlim_max.
+
 2013-04-30  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	Throughout, (mainly in fhandler*) fix remaining gcc 4.7 mismatch

@@ -1,7 +1,7 @@
 /* resource.cc: getrusage () and friends.
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2010,
-   2011, 2012 Red Hat, Inc.
+   2011, 2012, 2013 Red Hat, Inc.
 
    Written by Steve Chamberlain (sac@cygnus.com), Doug Evans (dje@cygnus.com),
    Geoffrey Noer (noer@cygnus.com) of Cygnus Support.
@@ -167,16 +167,21 @@ setrlimit (int resource, const struct rlimit *rlp)
 
   struct rlimit oldlimits;
 
-  // Check if the request is to actually change the resource settings.
-  // If it does not result in a change, take no action and do not
-  // fail.
+  /* Check if the request is to actually change the resource settings.
+     If it does not result in a change, take no action and do not fail. */
   if (getrlimit (resource, &oldlimits) < 0)
     return -1;
 
   if (oldlimits.rlim_cur == rlp->rlim_cur &&
       oldlimits.rlim_max == rlp->rlim_max)
-    // No change in resource requirements, succeed immediately
+    /* No change in resource requirements, succeed immediately */
     return 0;
+
+  if (rlp->rlim_cur > rlp->rlim_max)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
   switch (resource)
     {
