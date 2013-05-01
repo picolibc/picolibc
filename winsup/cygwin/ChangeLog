@@ -1,5 +1,9 @@
 2013-04-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* gendef: Fix sigfe.s typo.
+
+2013-04-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* spawn.cc (system_call_cleanup): Rename from pthread_cleanup.  Extend
 	functionality.
 	(system_call_cleanup::system_call_cleanup): Set up signals like

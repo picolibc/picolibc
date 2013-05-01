@@ -82,7 +82,7 @@ push @top, (map {$_ . " DATA\n"} @data), (map {$_ . "\n"} @text);
 print OUT @top;
 close OUT;
 
-open SIGFE, '>', 'sigfe.h' or die "$0: couldn't open 'sigfe.h' file for writing - $!\n";
+open SIGFE, '>', 'sigfe.s' or die "$0: couldn't open 'sigfe.s' file for writing - $!\n";
 
 for my $k (sort keys %sigfe) {
     print SIGFE fefunc($k, $sigfe{$k});
