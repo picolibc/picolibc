@@ -1,3 +1,9 @@
+2013-05-02  Nick Clifton  <nickc@redhat.com>
+
+	* msp430.h: Add MSP430X relocs.
+	Add some more MSP430 machine numbers.
+	Add values used by .MSP430.attributes section.
+
 2013-03-21  Michael Schewe  <michael.schewe@gmx.net>
 
 	* h8.h: Add new reloc R_H8_DISP32A16 for relaxation of

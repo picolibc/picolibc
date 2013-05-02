@@ -1,3 +1,7 @@
+2013-05-02  Nick Clifton  <nickc@redhat.com>
+
+	* msp430.h: Add patterns for MSP430X instructions.
+
 2013-04-06  David S. Miller  <davem@davemloft.net>
 
 	* sparc.h (F_PREFERRED): Define.
