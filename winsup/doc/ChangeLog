@@ -1,5 +1,11 @@
 2013-05-01  Warren Young  <warren@etr-usa.com>
 
+	* bodysnatcher.pl: Created
+	* Makefile.in (faq/faq.body): Added target to create this file from
+	faq/faq.html using new bodysnatcher.pl script.
+
+2013-05-01  Warren Young  <warren@etr-usa.com>
+
 	* cygwin-ug.xml: Renamed from cygwin-ug.in.sgml
 	(bookinfo) Extracted <bookinfo> section into new ug-info.xml file
 	* ug-info.xml: Created

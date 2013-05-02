@@ -24,13 +24,16 @@ include $(srcdir)/../Makefile.common
 
 FAQ_SOURCES:= faq*.xml
 
-.SUFFIXES:
+.SUFFIXES: .html .body
+
+.html.body:
+	$(srcdir)/bodysnatcher.pl $<
 
 all: Makefile \
 	cygwin-ug-net/cygwin-ug-net.html \
 	cygwin-ug-net/cygwin-ug-net-nochunks.html.gz \
 	cygwin-api/cygwin-api.html \
-	faq/faq.html \
+	faq/faq.body faq/faq.html \
 	cygwin-ug-net/cygwin-ug-net.pdf \
 	cygwin-api/cygwin-api.pdf
 
