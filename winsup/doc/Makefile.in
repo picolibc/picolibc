@@ -22,7 +22,7 @@ XMLTO:=xmlto --skip-validation --with-dblatex
 
 include $(srcdir)/../Makefile.common
 
-FAQ_SOURCES:= faq*.xml
+FAQ_SOURCES:= $(wildcard ${srcdir}/faq*.xml)
 
 .SUFFIXES: .html .body
 

@@ -1,3 +1,8 @@
+2013-05-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* Makefile (FAQ_SOURCES): Use wildcard function to find sources in
+	srcdir.
+
 2013-05-01  Warren Young  <warren@etr-usa.com>
 
 	* bodysnatcher.pl: Created
