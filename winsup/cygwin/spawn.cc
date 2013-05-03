@@ -234,16 +234,29 @@ iscmd (const char *argv0, const char *what)
 	 (n == 0 || isdirsep (argv0[n - 1]));
 }
 
-struct system_call_cleanup
+#define ILLEGAL_SIG_FUNC_PTR ((_sig_func_ptr) (-2))
+struct system_call_handle
 {
   _sig_func_ptr oldint;
   _sig_func_ptr oldquit;
   sigset_t oldmask;
-  system_call_cleanup (bool issystem)
+  bool is_system_call ()
+  {
+    return oldint != ILLEGAL_SIG_FUNC_PTR;
+  }
+  system_call_handle (bool issystem)
   {
     if (!issystem)
-      oldint = (_sig_func_ptr) -1;
+      oldint = ILLEGAL_SIG_FUNC_PTR;
     else
+      {
+	sig_send (NULL, __SIGHOLD);
+	oldint = NULL;
+      }
+  }
+  void arm()
+  {
+    if (is_system_call ())
       {
 	sigset_t child_block;
 	oldint = signal (SIGINT,  SIG_IGN);
@@ -254,9 +267,9 @@ struct system_call_cleanup
 	sig_send (NULL, __SIGNOHOLD);
       }
   }
-  ~system_call_cleanup ()
+  ~system_call_handle ()
   {
-    if (oldmask != (sigset_t) -1)
+    if (is_system_call ())
       {
 	signal (SIGINT, oldint);
 	signal (SIGQUIT, oldquit);
@@ -305,9 +318,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       return -1;
     }
 
-  /* FIXME: There is a small race here and FIXME: not thread safe! */
-  if (mode == _P_SYSTEM)
-    sig_send (NULL, __SIGHOLD);
   av newargv;
   linebuf one_line;
   PWCHAR envblock = NULL;
@@ -324,6 +334,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   int looped = 0;
 
   myfault efault;
+  system_call_handle system_call (mode == _P_SYSTEM);
   if (efault.faulted ())
     {
       if (get_errno () == ENOMEM)
@@ -602,12 +613,12 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
     SetHandleInformation (my_wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
   parent_winpid = GetCurrentProcessId ();
 
+loop:
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
      effective vs. real ids.
      FIXME: If ruid != euid and ruid != saved_uid we currently give
      up on ruid. The new process will have ruid == euid. */
-loop:
   ::cygheap->user.deimpersonate ();
 
   if (!real_path.iscygexec () && mode == _P_OVERLAY)
@@ -741,8 +752,6 @@ loop:
       goto out;
     }
 
-  system_call_cleanup (mode == _P_SYSTEM);
-
   /* The CREATE_SUSPENDED case is handled below */
   if (iscygwin () && !(c_flags & CREATE_SUSPENDED))
     strace.write_childpid (pi.dwProcessId);
@@ -862,6 +871,7 @@ loop:
       break;
     case _P_WAIT:
     case _P_SYSTEM:
+      system_call.arm ();
       if (waitpid (cygpid, &res, 0) != cygpid)
 	res = -1;
       break;

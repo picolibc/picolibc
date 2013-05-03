@@ -1,3 +1,17 @@
+2013-05-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* spawn.cc (ILLEGAL_SIG_FUNC_PTR): New define.
+	(system_call_handle): Rename from system_call_cleanup.
+	(is_system_call): New convenience method.
+	(system_call_handle::system_call_handle): Use ILLEGAL_SIG_FUNC_PTR
+	rather than cast.  Call sig_send here rather than in caller.
+	Initialize oldint.
+	(system_call_handle::arm): New function pulled from constructor.
+	(~system_call_handle::system_call_handle): Use is_system_call().
+	(child_info_spawn::worker): Use system_call_handle to set up for system
+	call early.  Use arm call prior to waiting for child to properly set up
+	signal handling.  Move comment closer to code it is commenting on.
+
 2013-05-01  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* resource.cc (setrlimit): Use consistent commenting style.  Return
