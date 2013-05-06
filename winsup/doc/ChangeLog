@@ -12,7 +12,7 @@
 2013-05-01  Warren Young  <warren@etr-usa.com>
 
 	* bodysnatcher.pl: Created
-	* Mak6file.in (faq/faq.body): Added target to create this file from
+	* Makefile.in (faq/faq.body): Added target to create this file from
 	faq/faq.html using new bodysnatcher.pl script.
 
 2013-05-01  Warren Young  <warren@etr-usa.com>
