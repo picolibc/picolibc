@@ -1,3 +1,9 @@
+2013-05-06  Warren Young  <warren@etr-usa.com>
+
+	* cygwin-api.in.xml (bookinfo): Reverted XInclude for legal.xml
+	fragment to a DOCTOOL include.
+
+
 2013-05-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* Makefile (FAQ_SOURCES): Use wildcard function to find sources in
@@ -6,7 +12,7 @@
 2013-05-01  Warren Young  <warren@etr-usa.com>
 
 	* bodysnatcher.pl: Created
-	* Makefile.in (faq/faq.body): Added target to create this file from
+	* Mak6file.in (faq/faq.body): Added target to create this file from
 	faq/faq.html using new bodysnatcher.pl script.
 
 2013-05-01  Warren Young  <warren@etr-usa.com>

@@ -7,7 +7,7 @@
   <bookinfo>
     <date>1998-08-31</date>
     <title>Cygwin API Reference</title>
-		<xi:include href="legal.xml"/>
+DOCTOOL-INSERT-legal
   </bookinfo>
 
   <toc></toc>
