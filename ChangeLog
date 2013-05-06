@@ -1,3 +1,7 @@
+2013-05-06  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* COPYING.NEWLIB: Add Altera Corporation copyright.
+
 2013-04-29  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
 	* config.guess: Update from config repo.
