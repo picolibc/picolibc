@@ -227,6 +227,9 @@ case "${host_cpu}" in
   mt*)
 	machine_dir=mt
 	;;
+  nios2*)
+	machine_dir=nios2
+	;;
   or16)
 	;;
   or32)
@@ -476,6 +479,9 @@ case "${host}" in
   moxie*)
         sys_dir=
         ;;
+  nios2*)
+	sys_dir=
+	;;
   powerpcle-*-pe)
 	posix_dir=posix
 	;;
@@ -703,6 +709,10 @@ case "${host}" in
         syscall_dir=syscalls
 	default_newlib_io_long_long="yes"
         ;;
+  nios2*)
+	syscall_dir=
+	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_SYSTEM -DMISSING_SYSCALL_NAMES"
+	;;
   powerpc*-*-eabialtivec*)
 	default_newlib_io_long_long="yes"
 	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"

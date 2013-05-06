@@ -55,6 +55,7 @@ if test -n "${machine_dir}"; then
 	moxie) AC_CONFIG_SUBDIRS(moxie) ;;
 	mt) AC_CONFIG_SUBDIRS(mt) ;;
 	necv70) AC_CONFIG_SUBDIRS(necv70) ;;
+	nios2) AC_CONFIG_SUBDIRS(nios2) ;;
 	powerpc) AC_CONFIG_SUBDIRS(powerpc) ;;
 	rl78) AC_CONFIG_SUBDIRS(rl78) ;;
 	rx) AC_CONFIG_SUBDIRS(rx) ;;

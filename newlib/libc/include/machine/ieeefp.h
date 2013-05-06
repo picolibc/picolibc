@@ -388,6 +388,14 @@
 #define __SMALL_BITFIELDS	/* 16 Bit INT */
 #endif
 
+#ifdef __NIOS2__
+# ifdef __nios2_big_endian__
+#  define __IEEE_BIG_ENDIAN
+# else
+#  define __IEEE_LITTLE_ENDIAN
+# endif
+#endif
+
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN
 #error Endianess not declared!!

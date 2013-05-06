@@ -816,6 +816,7 @@ mn10300
 moxie
 mt
 necv70
+nios2
 powerpc
 rl78
 rx
@@ -11469,7 +11470,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11472 "configure"
+#line 11473 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11575,7 +11576,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11578 "configure"
+#line 11579 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11881,6 +11882,8 @@ subdirs="$subdirs a29k"
 	mt) subdirs="$subdirs mt"
  ;;
 	necv70) subdirs="$subdirs necv70"
+ ;;
+	nios2) subdirs="$subdirs nios2"
  ;;
 	powerpc) subdirs="$subdirs powerpc"
  ;;

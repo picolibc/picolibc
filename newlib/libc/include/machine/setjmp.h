@@ -287,6 +287,24 @@ _BEGIN_STD_C
 #define _JBTYPE unsigned char
 #endif
 
+/*
+ * There are two versions of setjmp()/longjmp():
+ *   1) Compiler (gcc) built-in versions.
+ *   2) Function-call versions.
+ *
+ * The built-in versions are used most of the time.  When used, gcc replaces
+ * calls to setjmp()/longjmp() with inline assembly code.  The built-in 
+ * versions save/restore a variable number of registers.
+
+ * _JBLEN is set to 40 to be ultra-safe with the built-in versions.
+ * It only needs to be 12 for the function-call versions
+ * but this data structure is used by both versions.
+ */
+#ifdef __NIOS2__
+#define _JBLEN 40
+#define _JBTYPE unsigned long
+#endif
+
 #ifdef __RX__
 #define _JBLEN 0x44
 #endif
