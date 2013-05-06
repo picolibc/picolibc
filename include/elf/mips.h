@@ -152,9 +152,8 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
   FAKE_RELOC (R_MICROMIPS_max, 174)
 
   /* This was a GNU extension used by embedded-PIC.  It was co-opted by
-     mips-linux for exception-handling data.  It is no longer used, but
-     should continue to be supported by the linker for backward
-     compatibility.  (GCC stopped using it in May, 2004.)  */
+     mips-linux for exception-handling data.  GCC stopped using it in
+     May, 2004, then started using it again for compact unwind tables.  */
   RELOC_NUMBER (R_MIPS_PC32, 248)
   /* FIXME: this relocation is used internally by gas.  */
   RELOC_NUMBER (R_MIPS_GNU_REL16_S2, 250)
