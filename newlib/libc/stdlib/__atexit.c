@@ -10,7 +10,10 @@
 
 /* Make this a weak reference to avoid pulling in malloc.  */
 void * malloc(size_t) _ATTRIBUTE((__weak__));
-__LOCK_INIT_RECURSIVE(, __atexit_lock);
+
+#ifndef __SINGLE_THREAD__
+extern _LOCK_RECURSIVE_T __atexit_lock;
+#endif
 
 /*
  * Register a function to be performed at exit or on shared library unload.

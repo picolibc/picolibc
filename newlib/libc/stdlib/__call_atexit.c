@@ -11,9 +11,7 @@
 /* Make this a weak reference to avoid pulling in free.  */
 void free(void *) _ATTRIBUTE((__weak__));
 
-#ifndef __SINGLE_THREAD__
-extern _LOCK_RECURSIVE_T __atexit_lock;
-#endif
+__LOCK_INIT_RECURSIVE(, __atexit_lock);
 
 #ifdef _WANT_REGISTER_FINI
 

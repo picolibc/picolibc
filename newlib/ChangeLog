@@ -1,3 +1,8 @@
+2013-05-07  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/stdlib/__atexit.c (__atexit_lock): Declare.
+	* libc/stdlib/__call_atexit.c (__atexit_lock): Define.
+
 2013-05-06  Sandra Loosemore  <sandra@codesourcery.com>
 
 	* configure.host (machine_dir, sys_dir, syscall_dir, newlib_cflags):
