@@ -1,5 +1,16 @@
 2013-05-07  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
+	* libc/include/sys/reent.h (_ATEXIT_INIT): Define.
+	(_ATEXIT_INIT_PTR): Likewise.
+	(_REENT_INIT_ATEXIT): Likewise.
+	(_REENT_INIT_ATEXIT_PTR): Likewise.
+	(_GLOBAL_ATEXIT): Likewise.
+	* libc/stdlib/__atexit.c (_GLOBAL_ATEXIT0): Define.
+	(__register_exitproc): Use _GLOBAL_ATEXIT and _GLOBAL_ATEXIT0.
+	* libc/stdlib/__call_atexit.c (__call_exitprocs): Likewise.
+
+2013-05-07  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
 	* libc/stdlib/__atexit.c (__atexit_lock): Declare.
 	* libc/stdlib/__call_atexit.c (__atexit_lock): Define.
 

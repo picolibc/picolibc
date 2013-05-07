@@ -85,6 +85,12 @@ struct _atexit {
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
         struct _on_exit_args * _on_exit_args_ptr;
 };
+# define _ATEXIT_INIT {_NULL, 0, {_NULL}, _NULL}
+# define _ATEXIT_INIT_PTR(var) \
+  (var)->_next = _NULL; \
+  (var)->_ind = 0; \
+  (var)->_fns[0] = _NULL; \
+  (var)->_on_exit_args_ptr = _NULL
 #else
 struct _atexit {
 	struct	_atexit *_next;			/* next in list */
@@ -93,7 +99,19 @@ struct _atexit {
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
         struct _on_exit_args _on_exit_args;
 };
+# define _ATEXIT_INIT {_NULL, 0, {_NULL}, {{_NULL}, {_NULL}, 0, 0}}
+# define _ATEXIT_INIT_PTR(var) \
+  (var)->_next = _NULL; \
+  (var)->_ind = 0; \
+  (var)->_fns[0] = _NULL; \
+  (var)->_on_exit_args._fntypes = 0; \
+  (var)->_on_exit_args._fnargs[0] = _NULL
 #endif
+
+#define _REENT_INIT_ATEXIT \
+  _NULL, _ATEXIT_INIT,
+#define _REENT_INIT_ATEXIT_PTR(var, var0) \
+  (var)->_atexit = _NULL; _ATEXIT_INIT_PTR(var0);
 
 /*
  * Stdio buffers.
@@ -425,8 +443,7 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     _NULL, \
     _NULL, \
     _NULL, \
-    _NULL, \
-    {_NULL, 0, {_NULL}, _NULL}, \
+    _REENT_INIT_ATEXIT \
     {_NULL, 0, _NULL}, \
     _NULL, \
     _NULL, \
@@ -452,11 +469,7 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     (var)->_localtime_buf = _NULL; \
     (var)->_asctime_buf = _NULL; \
     (var)->_sig_func = _NULL; \
-    (var)->_atexit = _NULL; \
-    (var)->_atexit0._next = _NULL; \
-    (var)->_atexit0._ind = 0; \
-    (var)->_atexit0._fns[0] = _NULL; \
-    (var)->_atexit0._on_exit_args_ptr = _NULL; \
+    _REENT_INIT_ATEXIT_PTR(var, &(var)->_atexit0) \
     (var)->__sglue._next = _NULL; \
     (var)->__sglue._niobs = 0; \
     (var)->__sglue._iobs = _NULL; \
@@ -698,8 +711,7 @@ struct _reent
         {0, {0}} \
       } \
     }, \
-    _NULL, \
-    {_NULL, 0, {_NULL}, {{_NULL}, {_NULL}, 0, 0}}, \
+    _REENT_INIT_ATEXIT \
     _NULL, \
     {_NULL, 0, _NULL} \
   }
@@ -790,6 +802,8 @@ void _reclaim_reent _PARAMS ((struct _reent *));
 #endif /* !_REENT_ONLY */
 
 #define _GLOBAL_REENT _global_impure_ptr
+
+#define _GLOBAL_ATEXIT (_GLOBAL_REENT->_atexit)
 
 #ifdef __cplusplus
 }

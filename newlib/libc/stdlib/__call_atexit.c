@@ -76,8 +76,8 @@ _DEFUN (__call_exitprocs, (code, d),
 
  restart:
 
-  p = _GLOBAL_REENT->_atexit;
-  lastp = &_GLOBAL_REENT->_atexit;
+  p = _GLOBAL_ATEXIT;
+  lastp = &_GLOBAL_ATEXIT;
   while (p)
     {
 #ifdef _REENT_SMALL

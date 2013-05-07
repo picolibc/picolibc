@@ -15,6 +15,8 @@ void * malloc(size_t) _ATTRIBUTE((__weak__));
 extern _LOCK_RECURSIVE_T __atexit_lock;
 #endif
 
+#define _GLOBAL_ATEXIT0 (&_GLOBAL_REENT->_atexit0)
+
 /*
  * Register a function to be performed at exit or on shared library unload.
  */
@@ -34,9 +36,9 @@ _DEFUN (__register_exitproc,
   __lock_acquire_recursive(__atexit_lock);
 #endif
 
-  p = _GLOBAL_REENT->_atexit;
+  p = _GLOBAL_ATEXIT;
   if (p == NULL)
-    _GLOBAL_REENT->_atexit = p = &_GLOBAL_REENT->_atexit0;
+    _GLOBAL_ATEXIT = p = _GLOBAL_ATEXIT0;
   if (p->_ind >= _ATEXIT_SIZE)
     {
 #ifndef _ATEXIT_DYNAMIC_ALLOC
@@ -56,8 +58,8 @@ _DEFUN (__register_exitproc,
 	  return -1;
 	}
       p->_ind = 0;
-      p->_next = _GLOBAL_REENT->_atexit;
-      _GLOBAL_REENT->_atexit = p;
+      p->_next = _GLOBAL_ATEXIT;
+      _GLOBAL_ATEXIT = p;
 #ifndef _REENT_SMALL
       p->_on_exit_args._fntypes = 0;
       p->_on_exit_args._is_cxa = 0;
