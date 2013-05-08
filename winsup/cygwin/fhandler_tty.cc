@@ -96,6 +96,8 @@ fhandler_pty_common::__acquire_output_mutex (const char *fn, int ln,
 {
   if (strace.active ())
     strace.prntf (_STRACE_TERMIOS, fn, "(%d): pty output_mutex (%p): waiting %d ms", ln, output_mutex, ms);
+  if (ms == INFINITE)
+    ms = 100;
   DWORD res = WaitForSingleObject (output_mutex, ms);
   if (res == WAIT_OBJECT_0)
     {
@@ -435,7 +437,7 @@ fhandler_pty_slave::open (int flags, mode_t)
 					  S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP,
 					  sd))
       sa.lpSecurityDescriptor = (PSECURITY_DESCRIPTOR) sd;
-    acquire_output_mutex (500);
+    acquire_output_mutex (INFINITE);
     inuse = get_ttyp ()->create_inuse (&sa);
     get_ttyp ()->was_opened = true;
     release_output_mutex ();
