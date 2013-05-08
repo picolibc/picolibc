@@ -108,10 +108,15 @@ struct _atexit {
   (var)->_on_exit_args._fnargs[0] = _NULL
 #endif
 
-#define _REENT_INIT_ATEXIT \
+#ifdef _REENT_GLOBAL_ATEXIT
+# define _REENT_INIT_ATEXIT
+# define _REENT_INIT_ATEXIT_PTR(var, var0)
+#else
+# define _REENT_INIT_ATEXIT \
   _NULL, _ATEXIT_INIT,
-#define _REENT_INIT_ATEXIT_PTR(var, var0) \
+# define _REENT_INIT_ATEXIT_PTR(var, var0) \
   (var)->_atexit = _NULL; _ATEXIT_INIT_PTR(var0);
+#endif
 
 /*
  * Stdio buffers.
@@ -410,9 +415,11 @@ struct _reent
   /* signal info */
   void (**(_sig_func))(int);
 
+# ifndef _REENT_GLOBAL_ATEXIT
   /* atexit stuff */
   struct _atexit *_atexit;
   struct _atexit _atexit0;
+# endif
 
   struct _glue __sglue;			/* root of glue chain */
   __FILE *__sf;			        /* file descriptors */
@@ -654,9 +661,11 @@ struct _reent
         } _unused;
     } _new;
 
+# ifndef _REENT_GLOBAL_ATEXIT
   /* atexit stuff */
   struct _atexit *_atexit;	/* points to head of LIFO stack */
   struct _atexit _atexit0;	/* one guaranteed table, required by ANSI */
+# endif
 
   /* signal info */
   void (**(_sig_func))(int);
@@ -803,7 +812,12 @@ void _reclaim_reent _PARAMS ((struct _reent *));
 
 #define _GLOBAL_REENT _global_impure_ptr
 
-#define _GLOBAL_ATEXIT (_GLOBAL_REENT->_atexit)
+#ifdef _REENT_GLOBAL_ATEXIT
+extern struct _atexit *_global_atexit; /* points to head of LIFO stack */
+# define _GLOBAL_ATEXIT _global_atexit
+#else
+# define _GLOBAL_ATEXIT (_GLOBAL_REENT->_atexit)
+#endif
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,10 @@ void free(void *) _ATTRIBUTE((__weak__));
 
 __LOCK_INIT_RECURSIVE(, __atexit_lock);
 
+#ifdef _REENT_GLOBAL_ATEXIT
+struct _atexit *_global_atexit = _NULL;
+#endif
+
 #ifdef _WANT_REGISTER_FINI
 
 /* If "__libc_fini" is defined, finalizers (either

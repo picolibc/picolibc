@@ -1,5 +1,20 @@
 2013-05-07  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
+	* libc/include/sys/config.h (_REENT_GLOBAL_ATEXIT): Define for
+	RTEMS.
+	* libc/include/sys/reent.h (_reent): Use _REENT_GLOBAL_ATEXIT.
+	(_global_atexit): Declare if _REENT_GLOBAL_ATEXIT is defined.
+	* libc/reent/reent.c (_reclaim_reent): Remove atexit cleanup if
+	_REENT_GLOBAL_ATEXIT is defined.
+	(_wrapup_reent): Remove atexit handling if _REENT_GLOBAL_ATEXIT
+	is defined.
+	* libc/stdlib/__atexit.c (_global_atexit0): Define if
+	_REENT_GLOBAL_ATEXIT is defined.
+	* libc/stdlib/__call_atexit.c (_global_atexit): Define if
+	_REENT_GLOBAL_ATEXIT is defined.
+
+2013-05-07  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
 	* libc/include/sys/reent.h (_ATEXIT_INIT): Define.
 	(_ATEXIT_INIT_PTR): Likewise.
 	(_REENT_INIT_ATEXIT): Likewise.

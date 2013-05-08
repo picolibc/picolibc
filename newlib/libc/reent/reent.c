@@ -87,10 +87,14 @@ _DEFUN (_reclaim_reent, (ptr),
 	_free_r (ptr, ptr->_localtime_buf);
       if (ptr->_asctime_buf)
 	_free_r (ptr, ptr->_asctime_buf);
+#endif
+
+#ifndef _REENT_GLOBAL_ATEXIT
+      /* atexit stuff */
+# ifdef _REENT_SMALL
       if (ptr->_atexit && ptr->_atexit->_on_exit_args_ptr)
 	_free_r (ptr, ptr->_atexit->_on_exit_args_ptr);
-#else
-      /* atexit stuff */
+# else
       if ((ptr->_atexit) && (ptr->_atexit != &ptr->_atexit0))
 	{
 	  struct _atexit *p, *q;
@@ -101,6 +105,7 @@ _DEFUN (_reclaim_reent, (ptr),
 	      _free_r (ptr, q);
 	    }
 	}
+# endif
 #endif
 
       if (ptr->_cvtbuf)
@@ -131,19 +136,23 @@ _DEFUN (_reclaim_reent, (ptr),
 void
 _DEFUN (_wrapup_reent, (ptr), struct _reent *ptr)
 {
+#ifndef _REENT_GLOBAL_ATEXIT
   register struct _atexit *p;
+#endif
   register int n;
 
   if (ptr == NULL)
     ptr = _REENT;
 
-#ifdef _REENT_SMALL
+#ifndef _REENT_GLOBAL_ATEXIT
+# ifdef _REENT_SMALL
   for (p = ptr->_atexit, n = p ? p->_ind : 0; --n >= 0;)
     (*p->_fns[n]) ();
-#else
+# else
   for (p = ptr->_atexit; p; p = p->_next)
     for (n = p->_ind; --n >= 0;)
       (*p->_fns[n]) ();
+# endif
 #endif
   if (ptr->__cleanup)
     (*ptr->__cleanup) (ptr);

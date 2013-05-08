@@ -15,7 +15,12 @@ void * malloc(size_t) _ATTRIBUTE((__weak__));
 extern _LOCK_RECURSIVE_T __atexit_lock;
 #endif
 
-#define _GLOBAL_ATEXIT0 (&_GLOBAL_REENT->_atexit0)
+#ifdef _REENT_GLOBAL_ATEXIT
+static struct _atexit _global_atexit0 = _ATEXIT_INIT;
+# define _GLOBAL_ATEXIT0 (&_global_atexit0)
+#else
+# define _GLOBAL_ATEXIT0 (&_GLOBAL_REENT->_atexit0)
+#endif
 
 /*
  * Register a function to be performed at exit or on shared library unload.
