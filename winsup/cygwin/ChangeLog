@@ -3,7 +3,7 @@
 	* fhandler_tty.cc (fhandler_pty_common::__acquire_output_mutex): Never
 	wait an INFINITE amount of time.  Instead default to 1/10 second.
 	(fhandler_pty_slave::open): Just default to INFINITE wait rather than
-	(now) waiting longer than previously.
+	(now) waiting longer than other similar calls.
 
 2013-05-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
