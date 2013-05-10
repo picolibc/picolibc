@@ -1,3 +1,8 @@
+2013-05-10  Freddie Chopin  <freddie_chopin@op.pl>
+
+	* configure.in: Fix help text for disable-newlib-atexit-dynamic-alloc option.
+	* configure: Regenerated.
+
 2013-05-07  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/config.h (_REENT_GLOBAL_ATEXIT): Define for

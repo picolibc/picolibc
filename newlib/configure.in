@@ -106,7 +106,7 @@ AC_ARG_ENABLE(newlib-iconv-external-ccs,
 
 dnl Support --disable-newlib-atexit-dynamic-alloc
 AC_ARG_ENABLE(newlib-atexit-dynamic-alloc,
-[  --disable-newlib-atexit-alloc    disable dynamic allocation of atexit entries],
+[  --disable-newlib-atexit-dynamic-alloc    disable dynamic allocation of atexit entries],
 [if test "${newlib_atexit_dynamic_alloc+set}" != set; then
   case "${enableval}" in
     yes) newlib_atexit_dynamic_alloc=yes ;;

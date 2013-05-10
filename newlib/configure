@@ -1453,7 +1453,7 @@ Optional Features:
   --enable-newlib-iconv-from-encodings   enable specific comma-separated list of \"from\" iconv encodings to be built-in
   --enable-newlib-iconv-to-encodings   enable specific comma-separated list of \"to\" iconv encodings to be built-in
   --enable-newlib-iconv-external-ccs     enable capabilities to load external CCS files for iconv
-  --disable-newlib-atexit-alloc    disable dynamic allocation of atexit entries
+  --disable-newlib-atexit-dynamic-alloc    disable dynamic allocation of atexit entries
   --enable-newlib-reent-small   enable small reentrant struct support
   --disable-newlib-fvwrite-in-streamio    disable iov in streamio
   --disable-newlib-fseek-optimization    disable fseek optimization
@@ -11695,7 +11695,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11684 "configure"
+#line 11698 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11801,7 +11801,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11790 "configure"
+#line 11804 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
