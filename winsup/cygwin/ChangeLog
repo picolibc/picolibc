@@ -1,5 +1,10 @@
 2013-05-13  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* include/cygwin/version.h: Bump api minor number to reflect previous
+	change.
+
+2013-05-13  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* i686.din: Remove _strtold.
 	* x86_64.din: Move strtold definition...
 	* common.din: ...to here.

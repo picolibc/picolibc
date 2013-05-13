@@ -432,12 +432,13 @@ details. */
       261: Export memrchr.
       262: Export getmntent_r.
       263: Export cfsetspeed.
+      264: Consistently export strtold
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 263
+#define CYGWIN_VERSION_API_MINOR 264
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
