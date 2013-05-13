@@ -18,4 +18,3 @@ lrint NOSIGFE
 lrintf NOSIGFE
 rint NOSIGFE
 rintf NOSIGFE
-strtold = _strtold SIGFE

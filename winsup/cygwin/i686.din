@@ -530,7 +530,6 @@ _strtodf = strtof SIGFE
 _strtok = strtok NOSIGFE
 _strtok_r = strtok_r NOSIGFE
 _strtol = strtol NOSIGFE
-_strtold SIGFE
 _strtoll = strtoll NOSIGFE
 _strtoul = strtoul NOSIGFE
 _strtoull = strtoull NOSIGFE

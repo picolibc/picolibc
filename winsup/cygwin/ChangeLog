@@ -1,3 +1,9 @@
+2013-05-13  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* i686.din: Remove _strtold.
+	* x86_64.din: Move strtold definition...
+	* common.din: ...to here.
+
 2013-05-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* fhandler_tty.cc (fhandler_pty_common::__acquire_output_mutex): Never
