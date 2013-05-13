@@ -1,6 +1,8 @@
 2013-05-13  Warren Young  <warren@etr-usa.com>
 
 	* cygwin-ug.xml setup.xml: Removed; unused.
+	* Wishlist: Created, with initial content based on a -patches
+	mailing list post.
 
 2013-05-06  Warren Young  <warren@etr-usa.com>
 
