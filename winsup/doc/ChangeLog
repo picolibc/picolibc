@@ -1,8 +1,11 @@
+2013-05-13  Warren Young  <warren@etr-usa.com>
+
+	* cygwin-ug.xml setup.xml: Removed; unused.
+
 2013-05-06  Warren Young  <warren@etr-usa.com>
 
 	* cygwin-api.in.xml (bookinfo): Reverted XInclude for legal.xml
 	fragment to a DOCTOOL include.
-
 
 2013-05-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
