@@ -1,6 +1,7 @@
 2013-05-13  DJ Delorie  <dj@delorie.com>
 	    Nick Clifton  <nickc@redhat.com>
 
+	* MAINTAINERS (msp430): Add.
 	* configure.host (msp430): Add.
 	* libc/include/machine/ieeefp.h: Add MSP430 support.
 	* libc/include/machine/setjmp.h: Likewise.
