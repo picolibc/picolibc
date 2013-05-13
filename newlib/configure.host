@@ -79,7 +79,7 @@ case "${target_optspace}:${host}" in
   yes:*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
-  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* )
+  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* | :msp430*-* )
     newlib_cflags="${newlib_cflags} -Os"
     ;;
   no:* | :*)
@@ -224,6 +224,12 @@ case "${host_cpu}" in
   moxie)
 	machine_dir=moxie
         ;;
+  msp430*)
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
+	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections "
+	newlib_cflags="${newlib_cflags} -mOs "
+	machine_dir=msp430
+	;;
   mt*)
 	machine_dir=mt
 	;;

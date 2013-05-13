@@ -281,6 +281,16 @@ _BEGIN_STD_C
 #define _JBTYPE unsigned short
 #endif /* __m32c__ */
 
+#ifdef __MSP430__
+#define _JBLEN 9
+
+#ifdef __MSP430X_LARGE__
+#define _JBTYPE unsigned long
+#else
+#define _JBTYPE unsigned short
+#endif
+#endif
+
 #ifdef __RL78__
 /* Three banks of registers, SP, CS, ES, PC */
 #define _JBLEN (8*3+8)

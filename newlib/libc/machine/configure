@@ -814,6 +814,7 @@ mips
 mn10200
 mn10300
 moxie
+msp430
 mt
 necv70
 nios2
@@ -11878,6 +11879,8 @@ subdirs="$subdirs a29k"
 	mn10300) subdirs="$subdirs mn10300"
  ;;
 	moxie) subdirs="$subdirs moxie"
+ ;;
+	msp430) subdirs="$subdirs msp430"
  ;;
 	mt) subdirs="$subdirs mt"
  ;;

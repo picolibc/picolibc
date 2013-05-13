@@ -1,3 +1,14 @@
+2013-05-13  DJ Delorie  <dj@delorie.com>
+	    Nick Clifton  <nickc@redhat.com>
+
+	* configure.host (msp430): Add.
+	* libc/include/machine/ieeefp.h: Add MSP430 support.
+	* libc/include/machine/setjmp.h: Likewise.
+	* libc/include/sys/config.h: Likewise.
+	* libc/machine/configure.in (msp430): Add.
+	* libc/machine/configure: Regenerate.
+	* libc/machine/msp430: New directory.
+
 2013-05-10  Freddie Chopin  <freddie_chopin@op.pl>
 
 	* configure.in: Fix help text for disable-newlib-atexit-dynamic-alloc option.

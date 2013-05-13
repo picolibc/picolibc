@@ -1,0 +1,153 @@
+# Copyright (c) 2008, 2009, 2011, 2013 Red Hat, Inc. All rights reserved.
+#
+# This copyrighted material is made available to anyone wishing to use, modify,
+# copy, or redistribute it subject to the terms and conditions of the BSD
+# License.   This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY expressed or implied, including the implied warranties
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  A copy of this license
+# is available at http://www.opensource.org/licenses. Any Red Hat trademarks that
+# are incorporated in the source code or documentation are not subject to the BSD
+# License and may only be used or replicated with the express permission of
+# Red Hat, Inc.
+
+# Makefile for libgloss/msp430.
+
+VPATH = @srcdir@
+srcdir = @srcdir@
+objdir = .
+srcroot = $(srcdir)/../..
+objroot = $(objdir)/../..
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+host_alias = @host_alias@
+target_alias = @target_alias@
+
+bindir = @bindir@
+libdir = @libdir@
+tooldir = $(exec_prefix)/$(target_alias)
+
+# Multilib support variables.
+# TOP is used instead of MULTI{BUILD,SRC}TOP.
+MULTIDIRS =
+MULTISUBDIR =
+MULTIDO = true
+MULTICLEAN = true
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+SHELL = /bin/sh
+
+CC = @CC@
+
+AS = @AS@
+AR = @AR@
+LD = @LD@
+RANLIB = @RANLIB@
+AR_FLAGS = rc
+
+OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
+	then echo ${objroot}/../binutils/objdump ; \
+	else t='$(program_transform_name)'; echo objdump | sed -e $$t ; fi`
+OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
+	then echo ${objroot}/../binutils/objcopy ; \
+	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
+
+SCRIPTS = $(srcdir)/msp430.ld $(srcdir)/msp430-sim.ld
+SCRIPTS += $(srcdir)/msp430xl-sim.ld
+SCRIPTS += $(srcdir)/msp430F5438A-s.ld
+SCRIPTS += $(srcdir)/msp430F5438A-l.ld
+CRT = gcrt0.o crt0.o crtn.o
+SIM_BSP = libsim.a
+LIBNOSYS = libnosys.a
+
+SIM_OBJS = syscalls.o \
+	cio.o \
+	write.o \
+	sbrk.o
+
+NOSYS_OBJS = nosyscalls.o \
+	cio.o \
+	write.o \
+	sbrk.o
+
+#### Host specific Makefile fragment comes in here.
+@host_makefile_frag@
+
+
+# Override .S.o rule to pass assembler debugging flags
+.S.o:
+	$(CC) -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
+
+all: $(CRT) $(SIM_BSP) $(LIBNOSYS) copy_scripts_to_objdir
+
+$(SIM_BSP): $(SIM_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
+
+$(LIBNOSYS): $(NOSYS_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
+copy_scripts_to_objdir: $(SCRIPTS)
+	cp $(SCRIPTS) $(objdir)
+
+# Dependencies
+
+SDEPS = $(srcdir)/cio.h
+
+abort.o : $(SDEPS)
+argv.o : $(SDEPS)
+argvlen.o : $(SDEPS)
+chdir.o : $(SDEPS)
+chmod.o : $(SDEPS)
+close.o : $(SDEPS)
+exit.o : $(SDEPS)
+fstat.o : $(SDEPS)
+getpid.o : $(SDEPS)
+gettimeofday.o : $(SDEPS)
+gcrt0.o: gcrt0.S crt0.S
+kill.o : $(SDEPS)
+link.o : $(SDEPS)
+lseek.o : $(SDEPS)
+mcount.o : $(SDEPS)
+open.o : $(SDEPS)
+read.o : $(SDEPS)
+sigprocmask.o : $(SDEPS)
+sleep.o : $(SDEPS)
+stat.o : $(SDEPS)
+time.o : $(SDEPS)
+times.o : $(SDEPS)
+unlink.o : $(SDEPS)
+utime.o : $(SDEPS)
+write.o : $(SDEPS)
+
+install: $(CRT) $(SIM_BSP) $(LIBNOSYS) $(SCRIPTS)
+	for c in $(CRT) $(SIM_BSP) $(LIBNOSYS); do \
+	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$c ;\
+	done
+	for c in $(SCRIPTS); do \
+	  b=`basename $$c`; \
+	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$b ;\
+	done
+
+clean mostlyclean:
+	rm -f *.o *.a
+
+distclean maintainer-clean realclean: clean
+	rm -f Makefile config.cache config.log config.status
+
+.PHONY: info dvi doc install-info clean-info
+info doc dvi:
+install-info:
+clean-info:
+
+Makefile: Makefile.in config.status @host_makefile_frag_path@
+	$(SHELL) config.status
+
+config.status: configure
+	$(SHELL) config.status --recheck

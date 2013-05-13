@@ -1,3 +1,10 @@
+2013-05-14  DJ Delorie  <dj@redhat.com>
+	    Nick Clifton  <nickc@redhat.com>
+
+	* configure.in (msp430*-*-elf): Add.
+	* configure: Regenerate.
+	* msp430: New directory.
+
 2013-04-19  Steve Ellcey  <sellcey@imgtec.com>
 
 	* mips/cfe_api.h (int64_t): Remove define.

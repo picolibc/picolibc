@@ -359,6 +359,11 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __MSP430__
+#define __IEEE_LITTLE_ENDIAN
+#define __SMALL_BITFIELDS	/* 16 Bit INT */
+#endif
+
 #ifdef __RL78__
 #define __IEEE_LITTLE_ENDIAN
 #define __SMALL_BITFIELDS	/* 16 Bit INT */
