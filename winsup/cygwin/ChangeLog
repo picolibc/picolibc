@@ -1,5 +1,9 @@
 2013-05-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (devices_CFLAGS): Drop -Os.
+
+2013-05-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (localtime_CFLAGS): Define as -fwrapv since localtime
 	code requires int overflows to be fully defined.
 	* localtime.cc: Align a bit more to upstream code.
