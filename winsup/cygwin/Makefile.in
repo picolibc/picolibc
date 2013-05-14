@@ -303,6 +303,7 @@ fhandler_zero_CFLAGS:=-fomit-frame-pointer
 flock_CFLAGS:=-fomit-frame-pointer
 grp_CFLAGS:=-fomit-frame-pointer
 libstdcxx_wrapper_CFLAGS:=-fomit-frame-pointer
+localtime_CFLAGS:=-fwrapv
 malloc_CFLAGS:=-fomit-frame-pointer -O3
 malloc_wrapper_CFLAGS:=-fomit-frame-pointer
 miscfuncs_CFLAGS:=-fomit-frame-pointer

@@ -8,7 +8,7 @@
 
 /*
 ** This file is in the public domain, so clarified as of
-** 1996-06-05 by Arthur David Olson (arthur_david_olson@nih.gov).
+** 1996-06-05 by Arthur David Olson.
 */
 /* Temporarily merged private.h and tzfile.h for ease of management - DJ */
 
@@ -23,14 +23,13 @@
 
 #ifndef lint
 #ifndef NOID
-static char	elsieid[] = "@(#)localtime.c	7.66";
+static char	elsieid[] = "@(#)localtime.c	8.17";
 #endif /* !defined NOID */
 #endif /* !defined lint */
 
 /*
-** Leap second handling from Bradley White (bww@k.gp.cs.cmu.edu).
-** POSIX-style TZ environment variable handling from Guy Harris
-** (guy@auspex.com).
+** Leap second handling from Bradley White.
+** POSIX-style TZ environment variable handling from Guy Harris.
 */
 
 #define NO_ERROR_IN_DST_GAP
@@ -171,7 +170,7 @@ static char	privatehid[] = "@(#)private.h	7.48";
 
 /*
 ** This file is in the public domain, so clarified as of
-** 1996-06-05 by Arthur David Olson (arthur_david_olson@nih.gov).
+** 1996-06-05 by Arthur David Olson.
 */
 
 /*
@@ -273,7 +272,7 @@ struct tzhead {
 ** 138 years of Pacific Presidential Election time
 ** (where there are three time zone transitions every fourth year).
 */
-#define TZ_MAX_TIMES	370
+#define TZ_MAX_TIMES	1200
 #endif /* !defined TZ_MAX_TIMES */
 
 #ifndef TZ_MAX_TYPES
@@ -283,7 +282,7 @@ struct tzhead {
 #ifdef NOSOLAR
 /*
 ** Must be at least 14 for Europe/Riga as of Jan 12 1995,
-** as noted by Earl Chew <earl@hpato.aus.hp.com>.
+** as noted by Earl Chew.
 */
 #define TZ_MAX_TYPES	20	/* Maximum number of local time types */
 #endif /* !defined NOSOLAR */
@@ -340,28 +339,6 @@ struct tzhead {
 */
 
 #define isleap(y) (((y) % 4) == 0 && (((y) % 100) != 0 || ((y) % 400) == 0))
-
-#ifndef USG
-
-/*
-** Use of the underscored variants may cause problems if you move your code to
-** certain System-V-based systems; for maximum portability, use the
-** underscore-free variants.  The underscored variants are provided for
-** backward compatibility only; they may disappear from future versions of
-** this file.
-*/
-
-#define SECS_PER_MIN	SECSPERMIN
-#define MINS_PER_HOUR	MINSPERHOUR
-#define HOURS_PER_DAY	HOURSPERDAY
-#define DAYS_PER_WEEK	DAYSPERWEEK
-#define DAYS_PER_NYEAR	DAYSPERNYEAR
-#define DAYS_PER_LYEAR	DAYSPERLYEAR
-#define SECS_PER_HOUR	SECSPERHOUR
-#define SECS_PER_DAY	SECSPERDAY
-#define MONS_PER_YEAR	MONSPERYEAR
-
-#endif /* !defined USG */
 
 #endif /* !defined TZFILE_H */
 
@@ -517,7 +494,7 @@ static int		tzload(timezone_t sp, const char * name,
 static int		tzparse(timezone_t sp, const char * name,
 				int lastditch);
 static void		tzset_unlocked(void);
-static long		leapcorr(time_t * timep);
+static long		leapcorr(const timezone_t sp, time_t * timep);
 
 static timezone_t lclptr;
 static timezone_t gmtptr;
@@ -622,11 +599,11 @@ settzname (void)
 #ifdef USG_COMPAT
 		if (ttisp->tt_isdst)
 			daylight = 1;
-		if (i == 0 || !ttisp->tt_isdst)
+		if (!ttisp->tt_isdst)
 			timezone = -(ttisp->tt_gmtoff);
 #endif /* defined USG_COMPAT */
 #ifdef ALTZONE
-		if (i == 0 || ttisp->tt_isdst)
+		if (ttisp->tt_isdst)
 			altzone = -(ttisp->tt_gmtoff);
 #endif /* defined ALTZONE */
 	}
@@ -1523,6 +1500,7 @@ tzsetwall (void)
 	lcl_is_set = lcl_setting;
 
 	if (lclptr == NULL) {
+		save_errno save;
 		lclptr = (timezone_t) calloc(1, sizeof *lclptr);
 		if (lclptr == NULL) {
 			settzname();	/* all we can do */
@@ -1632,11 +1610,11 @@ tzset_unlocked(void)
 		return;
 	}
 
-	if (lcl_is_set > 0 && strncmp(lcl_TZname, name, sizeof(lcl_TZname) - 1) == 0)
+	if (lcl_is_set > 0 && strcmp(lcl_TZname, name) == 0)
 		return;
 	lcl_is_set = (strlen(name) < sizeof (lcl_TZname)) ? lcl_from_environment : lcl_unset;
 	if (lcl_is_set != lcl_unset)
-		strlcpy(lcl_TZname, name, sizeof (lcl_TZname));
+		(void)strlcpy(lcl_TZname, name, sizeof (lcl_TZname));
 
 	if (lclptr == NULL) {
 		save_errno save;
@@ -2490,13 +2468,11 @@ gtime(struct tm *const tmp)
 */
 
 static long
-leapcorr(time_t *timep)
+leapcorr(const timezone_t sp, time_t *timep)
 {
-	timezone_t	sp;
 	struct lsinfo * lp;
 	int		i;
 
-	sp = lclptr;
 	i = sp->leapcnt;
 	while (--i >= 0) {
 		lp = &sp->lsis[i];
@@ -2512,7 +2488,7 @@ time2posix(time_t t)
 	time_t result;
 	tzset_guard.init ("tzset_guard")->acquire ();
 	tzset_unlocked();
-	result = t - leapcorr(&t);
+	result = t - leapcorr(lclptr, &t);
 	tzset_guard.release ();
 	return (result);
 }
@@ -2531,12 +2507,12 @@ posix2time(time_t t)
 	** hit, the corresponding time doesn't exist,
 	** so we return an adjacent second.
 	*/
-	x = (time_t)(t + leapcorr(&t));
-	y = (time_t)(x - leapcorr(&x));
+	x = (time_t)(t + leapcorr(lclptr, &t));
+	y = (time_t)(x - leapcorr(lclptr, &x));
 	if (y < t) {
 		do {
 			x++;
-			y = (time_t)(x - leapcorr(&x));
+			y = (time_t)(x - leapcorr(lclptr, &x));
 		} while (y < t);
 		if (t != y) {
 			return x - 1;
@@ -2544,7 +2520,7 @@ posix2time(time_t t)
 	} else if (y > t) {
 		do {
 			--x;
-			y = (time_t)(x - leapcorr(&x));
+			y = (time_t)(x - leapcorr(lclptr, &x));
 		} while (y > t);
 		if (t != y) {
 			return x + 1;

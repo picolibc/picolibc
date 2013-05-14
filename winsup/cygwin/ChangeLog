@@ -1,5 +1,11 @@
 2013-05-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (localtime_CFLAGS): Define as -fwrapv since localtime
+	code requires int overflows to be fully defined.
+	* localtime.cc: Align a bit more to upstream code.
+
+2013-05-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (get_groups): Convert to void function.
 	(initgroups32): Accommodate the aforementioned change.
 	(getgrouplist): Ditto.
