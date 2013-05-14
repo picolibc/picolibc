@@ -1,5 +1,11 @@
 2013-05-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* grp.cc (get_groups): Convert to void function.
+	(initgroups32): Accommodate the aforementioned change.
+	(getgrouplist): Ditto.
+
+2013-05-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (get_groups): Never return error.  Always create a group list,
 	even if it's empty.
 
