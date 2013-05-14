@@ -441,21 +441,16 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
 static int
 get_groups (const char *user, gid_t gid, cygsidlist &gsids)
 {
-  int ret = -1;
-
   cygheap->user.deimpersonate ();
   struct passwd *pw = internal_getpwnam (user);
   struct group *gr = internal_getgrgid (gid);
   cygsid usersid, grpsid;
-  if (!usersid.getfrompw (pw) || !grpsid.getfromgr (gr))
-    set_errno (EINVAL);
-  else if (get_server_groups (gsids, usersid, pw))
-    {
-      gsids += grpsid;
-      ret = 0;
-    }
+  if (usersid.getfrompw (pw))
+    get_server_groups (gsids, usersid, pw);
+  if (grpsid.getfromgr (gr))
+    gsids += grpsid;
   cygheap->user.reimpersonate ();
-  return ret;
+  return 0;
 }
 
 extern "C" int
