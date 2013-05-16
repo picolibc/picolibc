@@ -125,36 +125,3 @@ _DEFUN (_reclaim_reent, (ptr),
 
     }
 }
-
-/*
- *  Do atexit() processing and cleanup
- *
- *  NOTE:  This is to be executed at task exit.  It does not tear anything
- *         down which is used on a global basis.
- */
-
-void
-_DEFUN (_wrapup_reent, (ptr), struct _reent *ptr)
-{
-#ifndef _REENT_GLOBAL_ATEXIT
-  register struct _atexit *p;
-#endif
-  register int n;
-
-  if (ptr == NULL)
-    ptr = _REENT;
-
-#ifndef _REENT_GLOBAL_ATEXIT
-# ifdef _REENT_SMALL
-  for (p = ptr->_atexit, n = p ? p->_ind : 0; --n >= 0;)
-    (*p->_fns[n]) ();
-# else
-  for (p = ptr->_atexit; p; p = p->_next)
-    for (n = p->_ind; --n >= 0;)
-      (*p->_fns[n]) ();
-# endif
-#endif
-  if (ptr->__cleanup)
-    (*ptr->__cleanup) (ptr);
-}
-
