@@ -473,6 +473,9 @@ thread_wrapper (PVOID arg)
   if (!arg)
     return ERROR_INVALID_PARAMETER;
 
+  /* The process is now threaded.  Note the fact for later usage. */
+  __isthreaded = 1;
+
   /* Fetch thread wrapper info and free from cygheap. */
   thread_wrapper_arg wrapper_arg = *(thread_wrapper_arg *) arg;
   cfree (arg);

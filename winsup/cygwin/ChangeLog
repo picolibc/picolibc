@@ -1,5 +1,11 @@
 2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* globals.cc (__isthreaded): New global variable.  Explain what it's
+	used for.
+	* miscfuncs.cc (thread_wrapper): Set __isthreaded to 1 here.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (class fhandler_dev_random): Change type of pseudo to
 	uint32_t to make sure it's 32 bit on all supported platforms.
 
