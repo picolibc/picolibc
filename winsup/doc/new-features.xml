@@ -25,6 +25,10 @@ by setting the CYGWIN=winsymlinks:native option.
 Add support for AFS filesystem.
 </para></listitem>
 
+<listitem><para>
+New API: __b64_ntop, __b64_pton.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
