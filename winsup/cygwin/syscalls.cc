@@ -1360,7 +1360,7 @@ open (const char *unix_path, int flags, ...)
 	      res = -1;
 	      set_errno (ELOOP);
 	    }
-	  else if ((flags & O_DIRECTORY) && !fh->pc.isdir ())
+	  else if ((flags & O_DIRECTORY) && fh->exists () && !fh->pc.isdir ())
 	    {
 	      delete fh;
 	      res = -1;
