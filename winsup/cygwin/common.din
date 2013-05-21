@@ -39,6 +39,8 @@ _Exit SIGFE
 __assert NOSIGFE
 __assert_func NOSIGFE
 __assertfail NOSIGFE
+__b64_ntop NOSIGFE
+__b64_pton NOSIGFE
 __dn_comp SIGFE
 __dn_expand SIGFE
 __dn_skipname SIGFE

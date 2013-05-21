@@ -954,6 +954,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 <sect1 id="std-bsd"><title>System interfaces compatible with BSD functions:</title>
 
 <screen>
+    __b64_ntop
+    __b64_pton
     bindresvport
     bindresvport_sa
     cfmakeraw

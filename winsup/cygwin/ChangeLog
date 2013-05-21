@@ -1,5 +1,13 @@
 2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/base64.c: New file.
+	* Makefile.in (DLL_OFILES): Add base64.o.
+	* common.din: Export __b64_ntop and __b64_pton.
+	* posix.sgml (std-bsd): Add __b64_ntop and __b64_pton.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (open): Only return ENOTDIR if file exists.
 
 2013-05-16  Christopher Faylor  <me.cygwin2013@cgf.cx>

@@ -156,9 +156,9 @@ DLL_IMPORTS:=${shell $(CC) -print-file-name=w32api/libkernel32.a} ${shell $(CC) 
 
 MT_SAFE_OBJECTS:=
 #
-DLL_OFILES:=advapi32.o assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o \
-	cygthread.o cygtls.o cygwait.o cygxdr.o dcrt0.o debug.o devices.o \
-	dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o exceptions.o \
+DLL_OFILES:=advapi32.o assert.o autoload.o base64.o bsdlib.o ctype.o cxx.o \
+	cygheap.o cygthread.o cygtls.o cygwait.o cygxdr.o dcrt0.o debug.o \
+	devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o exceptions.o \
 	exec.o external.o fcntl.o fenv.o fhandler.o fhandler_clipboard.o \
 	fhandler_console.o fhandler_dev.o fhandler_disk_file.o fhandler_dsp.o \
 	fhandler_fifo.o fhandler_floppy.o fhandler_mailslot.o fhandler_mem.o \
