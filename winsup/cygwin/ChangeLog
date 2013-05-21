@@ -1,5 +1,10 @@
 2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_dev_random): Change type of pseudo to
+	uint32_t to make sure it's 32 bit on all supported platforms.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	x86_64 only:
 	* gendef (_sigfe_maybe): Drop pushing %r12, use %r10 instead since we
 	don't call yield anymore.
