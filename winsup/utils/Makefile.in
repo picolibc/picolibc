@@ -90,8 +90,8 @@ cygcheck.exe: MINGW_LDFLAGS += ${ZLIB} -lpsapi -lntdll
 cygcheck.exe: ${CYGCHECK_OBJS}
 
 cygpath.o: CXXFLAGS += -fno-threadsafe-statics
-cygpath.exe: CYGWIN_LDFLAGS += -luserenv -lntdll
-ps.exe: CYGWIN_LDFLAGS += -lpsapi -lntdll
+cygpath.exe: CYGWIN_LDFLAGS += -lcygwin -luserenv -lntdll
+ps.exe: CYGWIN_LDFLAGS += -lcygwin -lpsapi -lntdll
 strace.exe: MINGW_LDFLAGS += -lntdll
 
 ldd.exe:CYGWIN_LDFLAGS += -lpsapi
