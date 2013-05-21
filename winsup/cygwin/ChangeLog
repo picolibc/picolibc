@@ -1,5 +1,17 @@
 2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_OFILES): Add arc4random.o.
+	* common.din: Export arc4random, arc4random_addrandom, arc4random_buf,
+	arc4random_stir and arc4random_uniform.
+	* mktemp.cc (arc4random): Remove static replacement function.
+	* posix.sgml (std-bsd): Add arc4random functions.
+	* include/cygwin/stdlib.h: Declare arc4random functions.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* libc/arc4random.cc: New file implementing arc4random functions taken
+	from FreeBSD.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* globals.cc (__isthreaded): New global variable.  Explain what it's
 	used for.
 	* miscfuncs.cc (thread_wrapper): Set __isthreaded to 1 here.
