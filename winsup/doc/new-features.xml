@@ -26,7 +26,8 @@ Add support for AFS filesystem.
 </para></listitem>
 
 <listitem><para>
-New API: __b64_ntop, __b64_pton.
+New APIs: __b64_ntop, __b64_pton, arc4random, arc4random_addrandom,
+arc4random_buf, arc4random_stir, arc4random_uniform.
 </para></listitem>
 
 </itemizedlist>
