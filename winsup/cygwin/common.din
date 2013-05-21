@@ -118,6 +118,11 @@ acosh NOSIGFE
 acoshf NOSIGFE
 alarm SIGFE
 alphasort NOSIGFE
+arc4random NOSIGFE
+arc4random_addrandom NOSIGFE
+arc4random_buf NOSIGFE
+arc4random_stir NOSIGFE
+arc4random_uniform NOSIGFE
 argz_add SIGFE
 argz_add_sep SIGFE
 argz_append SIGFE

@@ -956,6 +956,11 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 <screen>
     __b64_ntop
     __b64_pton
+    arc4random
+    arc4random_addrandom
+    arc4random_buf
+    arc4random_stir
+    arc4random_uniform
     bindresvport
     bindresvport_sa
     cfmakeraw
