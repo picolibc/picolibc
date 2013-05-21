@@ -130,44 +130,36 @@ EOF
 	.text
 
 	.seh_proc _sigfe_maybe
-_sigfe_maybe:
-	pushq	%r12
-	.seh_pushreg %r12
+_sigfe_maybe:					# stack is aligned on entry!
 	.seh_endprologue
-	movq	%gs:8,%r12			# location of bottom of stack
-	addq	\$$tls::initialized,%r12	# where we will be looking
-	cmpq	%r12,%rsp			# stack loc > than tls
-	jge	0f				#  yep.  we don't have a tls.
-	subq	\$$tls::initialized,%r12	# where we will be looking
-	movl	$tls::initialized(%r12),%r11d
+	movq	%gs:8,%r10			# location of bottom of stack
+	addq	\$$tls::initialized,%r10	# where we will be looking
+	cmpq	%r10,%rsp			# stack loc > than tls
+	ret					#  yep.  we don't have a tls.
+	subq	\$$tls::initialized,%r10	# where we will be looking
+	movl	$tls::initialized(%r10),%r11d
 	cmpl	\$0xc763173f,%r11d		# initialized?
 	je	1f
-0:
-	popq	%r12
-	ret
 	.seh_endproc
 
 	.seh_proc _sigfe
 _sigfe:						# stack is aligned on entry!
-	pushq	%r12
-	.seh_pushreg %r12
 	.seh_endprologue
-	movq	%gs:8,%r12			# location of bottom of stack
+	movq	%gs:8,%r10			# location of bottom of stack
 1:	movl	\$1,%r11d			# potential lock value
-	xchgl	%r11d,$tls::stacklock(%r12)	# see if we can grab it
-	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
+	xchgl	%r11d,$tls::stacklock(%r10)	# see if we can grab it
+	movl	%r11d,$tls::spinning(%r10)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
 	pause
 	jmp	1b				# loop
 2:	movq	\$8,%rax			# have the lock, now increment the
-	xaddq	%rax,$tls::stackptr(%r12)	#  stack pointer and get pointer
+	xaddq	%rax,$tls::stackptr(%r10)	#  stack pointer and get pointer
 	leaq	_sigbe(%rip),%r11		# new place to return to
-	xchgq	%r11,16(%rsp)			# exchange with real return value
+	xchgq	%r11,8(%rsp)			# exchange with real return value
 	movq	%r11,(%rax)			# store real return value on alt stack
-	incl	$tls::incyg(%r12)
-	decl	$tls::stacklock(%r12)		# remove lock
-	popq	%r12				# restore saved value
+	incl	$tls::incyg(%r10)
+	decl	$tls::stacklock(%r10)		# remove lock
 	popq	%rax				# pop real function address from stack
 	jmp	*%rax				# and jmp to it
 	.seh_endproc
@@ -175,23 +167,20 @@ _sigfe:						# stack is aligned on entry!
 	.seh_proc _sigfe
 _sigbe:						# return here after cygwin syscall
 						# stack is aligned on entry!
-	pushq	%r12
-	.seh_pushreg %r12
 	.seh_endprologue
-	movq	%gs:8,%r12			# address of bottom of tls
+	movq	%gs:8,%r10			# address of bottom of tls
 1:	movl	\$1,%r11d			# potential lock value
-	xchgl	%r11d,$tls::stacklock(%r12)	# see if we can grab it
-	movl	%r11d,$tls::spinning(%r12)	# flag if we are waiting for lock
+	xchgl	%r11d,$tls::stacklock(%r10)	# see if we can grab it
+	movl	%r11d,$tls::spinning(%r10)	# flag if we are waiting for lock
 	testl	%r11d,%r11d			# it will be zero
 	jz	2f				#  if so
 	pause
 	jmp	1b				#  and loop
 2:	movq	\$-8,%r11			# now decrement aux stack
-	xaddq	%r11,$tls::stackptr(%r12)	#  and get pointer
+	xaddq	%r11,$tls::stackptr(%r10)	#  and get pointer
 	movq	-8(%r11),%r11			# get return address from signal stack
-	decl	$tls::incyg(%r12)
-	decl	$tls::stacklock(%r12)		# release lock
-	popq	%r12
+	decl	$tls::incyg(%r10)
+	decl	$tls::stacklock(%r10)		# release lock
 	jmp	*%r11				# "return" to caller
 	.seh_endproc
 

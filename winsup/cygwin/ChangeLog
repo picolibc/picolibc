@@ -1,5 +1,13 @@
 2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	x86_64 only:
+	* gendef (_sigfe_maybe): Drop pushing %r12, use %r10 instead since we
+	don't call yield anymore.
+	(_sigfe): Ditto.
+	(_sigbe): Ditto.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/base64.c: New file.
 	* Makefile.in (DLL_OFILES): Add base64.o.
 	* common.din: Export __b64_ntop and __b64_pton.
