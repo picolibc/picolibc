@@ -267,7 +267,9 @@
 #define	_Alignof(x)		__alignof(x)
 #define	_Noreturn		__dead2
 #define	_Thread_local		__thread
-#ifdef __COUNTER__
+#if __GNUC_PREREQ__(4, 6) && !defined(__cplusplus)
+/*  Do nothing: _Static_assert() works as per C11 */
+#elif defined(__COUNTER__)
 #define	_Static_assert(x, y)	__Static_assert(x, __COUNTER__)
 #define	__Static_assert(x, y)	___Static_assert(x, y)
 #define	___Static_assert(x, y)	typedef char __assert_ ## y[(x) ? 1 : -1]
