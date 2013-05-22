@@ -1,3 +1,10 @@
+2013-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spinlock.h (ULONG): Replace LONG operator with ULONG to accommodate
+	the fact that CURR_SHARED_MAGIC and USER_SHARED_MAGIC are unsigned
+	values.
+	* shared.cc (shared_info::initialize): Drop explicit cast here.
+
 2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add arc4random.o.

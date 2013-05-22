@@ -335,7 +335,7 @@ shared_info::initialize ()
       debug_printf ("Installation root: <%W> key: <%S>",
 		    cygheap->installation_root, &cygheap->installation_key);
     }
-  else if (sversion != (LONG) CURR_SHARED_MAGIC)
+  else if (sversion != CURR_SHARED_MAGIC)
     sversion.multiple_cygwin_problem ("system shared memory version",
 				      sversion, CURR_SHARED_MAGIC);
   else if (cb != sizeof (*this))

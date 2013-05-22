@@ -67,7 +67,7 @@ public:
       }
   }
   ~spinlock () {done (setto);}
-  operator LONG () const {return val;}
+  operator ULONG () const {return (ULONG) val;}
   /* FIXME: This should be handled in a more general fashion, probably by
      establishing a linked list of spinlocks which are freed on process exit. */
   void multiple_cygwin_problem (const char *w, unsigned m, unsigned v)
