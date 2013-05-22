@@ -1,3 +1,11 @@
+2013-05-22  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* common.h (EM_INTEL205): New.
+	(EM_INTEL206): Likewise.
+	(EM_INTEL207): Likewise.
+	(EM_INTEL208): Likewise.
+	(EM_INTEL209): Likewise.
+
 2013-05-02  Nick Clifton  <nickc@redhat.com>
 
 	* msp430.h: Add MSP430X relocs.
