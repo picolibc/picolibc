@@ -1,3 +1,7 @@
+2013-05-22  Jürgen Urban  <JuergenUrban@gmx.de>
+
+	* mips.h (M_LQC2_AB, M_SQC2_AB): New macros.
+
 2013-05-09  Andrew Pinski  <apinski@cavium.com>
 
 	* mips.h (OP_MASK_CODE10): Correct definition.
