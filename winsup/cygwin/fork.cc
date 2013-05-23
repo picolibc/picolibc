@@ -351,7 +351,11 @@ frok::parent (volatile char * volatile stack_here)
     {
       hchild = NULL;
       rc = CreateProcessW (myself->progname,	/* image to run */
-			   myself->progname,	/* what we send in arg0 */
+			   GetCommandLineW (),	/* Take same space for command
+						   line as in parent to make
+						   sure child stack is allocated
+						   in the same memory location
+						   as in parent. */
 			   &sec_none_nih,
 			   &sec_none_nih,
 			   TRUE,		/* inherit handles from parent */

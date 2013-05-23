@@ -15,4 +15,11 @@ What's new:
 Bug fixes:
 ----------
 
-- getgrouplist
+- getgrouplist now always creates a group list, even if it's empty.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00157.html
+
+- In fork, call CreateProcessW with the same command line as the parent
+  process.  This seems to make sure the stack is created in the same
+  memory location as in the parent.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00340.html
+
