@@ -1,5 +1,17 @@
 2013-05-22  Corinna Vinschen  <vinschen@redhat.com>
 
+	* libc/ctype/isalnum.c: Correct domain of definition to SUSv4 wording.
+	* libc/ctype/isalpha.c: Ditto.
+	* libc/ctype/isblank.c: Ditto.
+	* libc/ctype/iscntrl.c: Ditto.
+	* libc/ctype/isdigit.c: Ditto.
+	* libc/ctype/islower.c: Ditto.
+	* libc/ctype/isprint.c: Ditto.
+	* libc/ctype/ispunct.c: Ditto.
+	* libc/ctype/isxdigit.c: Ditto.
+
+2013-05-22  Corinna Vinschen  <vinschen@redhat.com>
+
 	* libc/include/sys/cdefs.h (_Static_assert): Accommodate gcc >= 4.6.
 
 2013-05-16  Sebastian Huber <sebastian.huber@embedded-brains.de>
