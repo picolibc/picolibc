@@ -82,26 +82,27 @@ time and when handles are inherited.  Defaults to set.</para>
 </listitem>
 
 <listitem>
-<para><envar>winsymlinks:{lnk,native}</envar> - if set to just
+<para><envar>winsymlinks:{lnk,native,nativestrict}</envar> - if set to just
 <literal>winsymlinks</literal> or <literal>winsymlinks:lnk</literal>,
 Cygwin creates symlinks as Windows shortcuts with a special header and
-the R/O attribute set.  If set to <literal>winsymlinks:native</literal>,
-Cygwin creates symlinks as native Windows symlinks as supported by NTFS
-since Windows Vista/2008.
+the R/O attribute set.</para>
 
-If not set, Cygwin creates symlinks as plain files with a magic number,
-a path and the DOS SYSTEM attribute set by default, unless this is not
-supported by the underlying filesystem.  For instance, on MVFS symlinks
-are always created as Windows shortcuts, because it doesn't support the
-DOS SYSTEM attribute, on AFS always as native symlink because it doesn't
-support DOS attributes.  On NFS, symlinks are always created as native
-symlinks of the underlying filesystem.
-</para>
+<para>If set to <literal>winsymlinks:native</literal> or
+<literal>winsymlinks:nativestrict</literal>, Cygwin creates symlinks as
+native Windows symlinks on filesystems and OS versions supporting them.
+If the OS is known not to support native symlinks (Windows XP, Windows
+Server 2003), a warning message is produced once per session.</para>
 
-<para>Please note that symlinks created under Cygwin 1.7 or later are
-not readable by older Cygwin releases because the new symlinks use UTF-16
-to encode the target filename, while the old symlinks used the current
-ANSI or OEM charset.</para>
+<para>The difference between <literal>winsymlinks:native</literal> and
+<literal>winsymlinks:nativestrict</literal> is this:  If the filesystem
+supports native symlinks and Cygwin fails to create a native symlink for
+some reason, it will fall back to creating Cygwin default symlinks
+with <literal>winsymlinks:native</literal>, while with
+<literal>winsymlinks:nativestrict</literal> the <literal>symlink(2)</literal>
+system call will immediately fail.</para>
+
+<para>For more information on symbolic links, see
+<xref linkend="pathnames-symlinks"></xref>.</para>
 </listitem>
 
 </itemizedlist>

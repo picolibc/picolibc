@@ -113,30 +113,9 @@ supporting that.  Since Windows XP, the OS only supports case
 sensitivity when a specific registry value is changed.  Therefore, case
 sensitivity is not usually the default.</para>
 
-<para>Symbolic links are not present and supported on Windows up to and
-including Windows Server 2003 R2.  Native symlinks are available starting
-with Windows Vista.  Due to their strange implementation, however,
-they are not useful in a POSIX emulation layer.  Cygwin recognizes
-native symlinks, but does not create them.</para>
-
-<para>Symbolic links are potentially created in two different ways.
-The file style symlinks are files containing a magic cookie followed by
-the path to which the link points.  They are marked with the System DOS
-attribute so that only files with that attribute have to be read to
-determine whether or not the file is a symbolic link.  The shortcut style
-symlinks are Windows shortcut files with a special header and the
-Readonly DOS attribute set.  The advantage of file symlinks is speed,
-the advantage of shortcut symlinks is the fact that they can be utilized
-by non-Cygwin Win32 tools as well.</para>
-
-<para>Starting with Cygwin 1.7, symbolic links are using UTF-16 to encode
-the filename of the target file, to better support internationalization.
-Symlinks created by older Cygwin releases can be read just fine.  However,
-you could run into problems with them if you're now using another character
-set than the one you used when creating these symlinks
-(see <xref linkend="setup-locale-problems"></xref>.  Please note that this
-new UTF-16 style of symlinks is not compatible with older Cygwin release,
-which can't read the target filename correctly.</para>
+<para>Cygwin supports creating and reading symbolic links, even on Windows
+filesystems and OS versions which don't support them.
+See <xref linkend="pathnames-symlinks"></xref> for details.</para>
 
 <para>Hard links are fully supported on NTFS and NFS file systems.  On FAT
 and other file systems which don't support hardlinks, the call returns with

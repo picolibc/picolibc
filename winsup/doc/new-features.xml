@@ -18,7 +18,8 @@ Add support for building a 64 bit version of Cygwin on x86_64 natively.
 
 <listitem><para>
 Add support for creating native NTFS symlinks starting with Windows Vista
-by setting the CYGWIN=winsymlinks:native option.
+by setting the CYGWIN=winsymlinks:native or CYGWIN=winsymlinks:nativestrict
+option.
 </para></listitem>
 
 <listitem><para>

@@ -1,12 +1,23 @@
+2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.xml (cygwinenv-implemented-options): Explain new
+	winsymliks:nativestrict option.  Strip out description of symlink types
+	and refer to new pathnames-symlinks section.
+	* highlights.xml (ov-hi-files): Rip out most of symlink description and
+	refer to new pathnames-symlinks section instead.
+	* new-features.xml (ov-new1.7.19): Add CYGWIN=winsymlinks:nativestrict.
+	* pathnames.xml (pathnames-symlinks): New section describing symbolic
+	link handling.
+
 2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
-	* new-features.sgml (ov-new1.7.19): Add arc4random,
+	* new-features.xml (ov-new1.7.19): Add arc4random,
 	arc4random_addrandom, arc4random_buf, arc4random_stir and
 	arc4random_uniform.
 
 2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
-	* new-features.sgml (ov-new1.7.19): Add __b64_ntop and __b64_pton.
+	* new-features.xml (ov-new1.7.19): Add __b64_ntop and __b64_pton.
 
 2013-05-13  Warren Young  <warren@etr-usa.com>
 
