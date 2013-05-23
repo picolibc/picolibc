@@ -302,17 +302,17 @@ frok::parent (volatile char * volatile stack_here)
 
   ch.forker_finished = forker_finished;
 
+  PTEB teb = NtCurrentTeb ();
   ch.stackbottom = _tlsbase;
   ch.stacktop = (void *) _tlstop;
-  ch.stackaddr = 0;
+  ch.stackaddr = teb->DeallocationStack;
   ch.guardsize = 0;
   if (&_my_tls != _main_tls)
     {
       /* We have not been started from the main thread.  Fetch the
 	 information required to set up the thread stack identically
 	 in the child. */
-      PTEB teb = NtCurrentTeb ();
-      if (!teb->DeallocationStack)
+      if (!ch.stackaddr)
 	{
 	  /* Pthread with application-provided stack.  Don't set up a
 	     PAGE_GUARD page.  guardsize == -1 is used in alloc_stack_hard_way
@@ -320,15 +320,11 @@ frok::parent (volatile char * volatile stack_here)
 	  ch.stackaddr = _my_tls.tid->attr.stackaddr;
 	  ch.guardsize = (size_t) -1;
 	}
-      else
-	{
-	  ch.stackaddr = teb->DeallocationStack;
-	  /* If it's a pthread, fetch guardsize from thread attributes. */
-	  if (_my_tls.tid)
-	    ch.guardsize = _my_tls.tid->attr.guardsize;
-	}
+      else if (_my_tls.tid)
+	/* If it's a pthread, fetch guardsize from thread attributes. */
+	ch.guardsize = _my_tls.tid->attr.guardsize;
     }
-  debug_printf ("stack - bottom %p, top %p, addr %p, guardsize %lu",
+  debug_printf ("stack - bottom %p, top %p, addr %p, guardsize %ly",
 		ch.stackbottom, ch.stacktop, ch.stackaddr, ch.guardsize);
 
   PROCESS_INFORMATION pi;

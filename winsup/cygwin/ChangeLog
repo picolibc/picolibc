@@ -1,5 +1,15 @@
 2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (child_info_fork::alloc_stack_hard_way): Fix datatype of
+	stacksize to SIZE_T.  Cast to SIZE_T in pointer arithmetic.  Slightly
+	enhance output in case of a fatal error.
+	* fork.cc (frok::parent): Always set ch.stackaddr to DeallocationStack
+	value of current thread to help stack reservation in
+	child_info_fork::alloc_stack_hard_way along.  Simplify subsequent code
+	storing stack values in ch.  Print guardsize in hex, too.
+
+2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (set_winsymlinks): Handle "winsymlinks:nativestrict"
 	option.  On pre-Vista warn the user if the "winsymlinks:native*" option
 	is set.

@@ -405,7 +405,7 @@ void
 child_info_fork::alloc_stack_hard_way (volatile char *b)
 {
   void *stack_ptr;
-  DWORD stacksize;
+  SIZE_T stacksize;
 
   /* First check if the requested stack area is part of the user heap
      or part of a mmapped region.  If so, we have been started from a
@@ -415,16 +415,19 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
       && stackbottom <= cygheap->user_heap.max)
       || is_mmapped_region ((caddr_t) stacktop, (caddr_t) stackbottom))
     return;
-
   /* First, try to reserve the entire stack. */
-  stacksize = (char *) stackbottom - (char *) stackaddr;
+  stacksize = (SIZE_T) stackbottom - (SIZE_T) stackaddr;
   if (!VirtualAlloc (stackaddr, stacksize, MEM_RESERVE, PAGE_NOACCESS))
-    api_fatal ("fork: can't reserve memory for stack %p - %p, %E",
-	       stackaddr, stackbottom);
-  stacksize = (char *) stackbottom - (char *) stacktop;
+    {
+      PTEB teb = NtCurrentTeb ();
+      api_fatal ("fork: can't reserve memory for parent stack "
+		 "%p - %p, (child has %p - %p), %E",
+		 stackaddr, stackbottom, teb->DeallocationStack, _tlsbase);
+    }
+  stacksize = (SIZE_T) stackbottom - (SIZE_T) stacktop;
   stack_ptr = VirtualAlloc (stacktop, stacksize, MEM_COMMIT, PAGE_READWRITE);
   if (!stack_ptr)
-    abort ("can't commit memory for stack %p(%d), %E", stacktop, stacksize);
+    abort ("can't commit memory for stack %p(%ly), %E", stacktop, stacksize);
   if (guardsize != (size_t) -1)
     {
       /* Allocate PAGE_GUARD page if it still fits. */
