@@ -1,3 +1,18 @@
+2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (set_winsymlinks): Handle "winsymlinks:nativestrict"
+	option.  On pre-Vista warn the user if the "winsymlinks:native*" option
+	is set.
+	* globals.cc (enum winsym_t): Add WSYM_nativestrict.
+	* path.cc (symlink_native): Don't create native symlink if target
+	does not exist.  Explain why.  Improve comments.
+	(symlink_worker): Change AFS symlink handling to WSYM_nativestrict.
+	Handle WSYM_nativestrict throughout.  Change condition for bail out
+	to wsym_type == WSYM_nativestrict.  Add comment.  Fix formatting.
+	* shared_info.h (CURR_USER_MAGIC): Change to reflect change in
+	class user_info.
+	(class user_info): Add member warned_nonativesyms.
+
 2013-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spinlock.h (ULONG): Replace LONG operator with ULONG to accommodate

@@ -1542,9 +1542,19 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
       final_oldpath = win32_oldpath.get_nt_native_path ();
       final_oldpath->Buffer += dirpath.Length / sizeof (WCHAR);
     }
+  /* If the symlink target doesn't exist, don't create native symlink.
+     Otherwise the directory flag in the symlink is potentially wrong
+     when the target comes into existence, and native tools will fail.
+     This is so screwball. This is no problem on AFS, fortunately. */
+  if (!win32_oldpath.exists () && !win32_oldpath.fs_is_afs ())
+    {
+      SetLastError (ERROR_FILE_NOT_FOUND);
+      return -1;
+    }
+  /* Convert native path to DOS UNC path. */
   final_newpath = win32_newpath.get_nt_native_path ();
-  /* Convert native to DOS UNC path. */
   final_newpath->Buffer[1] = L'\\';
+  /* Try to create native symlink. */
   if (!CreateSymbolicLinkW (final_newpath->Buffer, final_oldpath->Buffer,
 			    win32_oldpath.isdir ()
 			    ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0))
@@ -1618,10 +1628,10 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
 	  set_errno (EPERM);
 	  goto done;
 	}
-      wsym_type = WSYM_native;
+      wsym_type = WSYM_nativestrict;
     }
   /* Don't try native symlinks on filesystems not supporting reparse points. */
-  else if (wsym_type == WSYM_native
+  else if ((wsym_type == WSYM_native || wsym_type == WSYM_nativestrict)
 	   && !(win32_newpath.fs_flags () & FILE_SUPPORTS_REPARSE_POINTS))
     wsym_type = WSYM_sysfile;
 
@@ -1662,13 +1672,17 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
       res = symlink_nfs (oldpath, win32_newpath);
       goto done;
     case WSYM_native:
+    case WSYM_nativestrict:
       res = symlink_native (oldpath, win32_newpath);
-      /* AFS?  Too bad.  Otherwise, just try the default symlink type. */
-      if (win32_newpath.fs_is_afs ())
+      if (!res)
+      	goto done;
+      /* Strictly native?  Too bad. */
+      if (wsym_type == WSYM_nativestrict)
 	{
 	  __seterrno ();
 	  goto done;
 	}
+      /* Otherwise, fall back to default symlink type. */
       wsym_type = WSYM_sysfile;
       break;
     default:
@@ -1853,7 +1867,8 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
        so for now we don't request WRITE_DAC on remote drives. */
     access |= READ_CONTROL | WRITE_DAC;
 
-  status = NtCreateFile (&fh, access, win32_newpath.get_object_attr (attr, sec_none_nih),
+  status = NtCreateFile (&fh, access,
+			 win32_newpath.get_object_attr (attr, sec_none_nih),
 			 &io, NULL, FILE_ATTRIBUTE_NORMAL,
 			 FILE_SHARE_VALID_FLAGS,
 			 isdevice ? FILE_OVERWRITE_IF : FILE_CREATE,

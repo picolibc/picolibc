@@ -97,9 +97,22 @@ set_winsymlinks (const char *buf)
   else if (ascii_strncasematch (buf, "lnk", 3))
     allow_winsymlinks = WSYM_lnk;
   /* Make sure to try native symlinks only on systems supporting them. */
-  else if (ascii_strncasematch (buf, "native", 6)
-	   && wincap.max_sys_priv () >= SE_CREATE_SYMBOLIC_LINK_PRIVILEGE)
-    allow_winsymlinks = WSYM_native;
+  else if (ascii_strncasematch (buf, "native", 6))
+    {
+      if (wincap.max_sys_priv () < SE_CREATE_SYMBOLIC_LINK_PRIVILEGE)
+	{
+	  if (!user_shared->warned_nonativesyms)
+	    {
+	      small_printf ("\"winsymlinks:%s\" option detected in CYGWIN environment variable.\n"
+			    "Native symlinks are not supported on Windows versions prior to\n"
+			    "Windows Vista/Server 2008.  This option will be ignored.\n", buf);
+	      user_shared->warned_nonativesyms = 1;
+	    }
+	}
+      else
+	allow_winsymlinks = ascii_strcasematch (buf + 6, "strict")
+			    ? WSYM_nativestrict : WSYM_native;
+    }
 }
 
 /* The structure below is used to set up an array which is used to

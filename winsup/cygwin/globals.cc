@@ -56,6 +56,7 @@ enum winsym_t
   WSYM_sysfile = 0,
   WSYM_lnk,
   WSYM_native,
+  WSYM_nativestrict,
   WSYM_nfs
 };
 
