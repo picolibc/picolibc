@@ -2,9 +2,6 @@
   to avoid echoing the commands, not keep on trucking past build
   errors.
 
-- Find/build XInclude-aware automatic Makefile dependency generator.  At
-  worst, this shouldn't be much more than a bit of shell and sed.
-
 - Cygwin API docs update:
 
   - Either:
