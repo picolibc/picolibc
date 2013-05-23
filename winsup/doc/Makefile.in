@@ -21,6 +21,7 @@ exeext:=@build_exeext@
 XMLTO:=xmlto --skip-validation --with-dblatex
 
 include $(srcdir)/../Makefile.common
+-include $(srcdir)/Makefile.dep
 
 FAQ_SOURCES:= $(wildcard ${srcdir}/faq*.xml)
 
@@ -29,7 +30,7 @@ FAQ_SOURCES:= $(wildcard ${srcdir}/faq*.xml)
 .html.body:
 	$(srcdir)/bodysnatcher.pl $<
 
-all: Makefile \
+all: Makefile Makefile.dep \
 	cygwin-ug-net/cygwin-ug-net.html \
 	cygwin-ug-net/cygwin-ug-net-nochunks.html.gz \
 	cygwin-api/cygwin-api.html \
@@ -38,6 +39,7 @@ all: Makefile \
 	cygwin-api/cygwin-api.pdf
 
 clean:
+	rm -f Makefile.dep
 	rm -f doctool.exe doctool.o
 	rm -f cygwin-api.xml
 	rm -f *.html *.html.gz
@@ -84,3 +86,6 @@ TBDEPS = cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 tarball : cygwin-docs.tar.bz2
 cygwin-docs.tar.bz2 : $(TBFILES) $(TBDEPS)
 	find $(TBFILES) $(TBDIRS) \! -type d | sort | tar -T - -cf -  | bzip2 > cygwin-docs.tar.bz2
+
+Makefile.dep: cygwin-ug-net.xml faq.xml
+	$(srcdir)/xidepend $^ > $@

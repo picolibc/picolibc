@@ -1,3 +1,11 @@
+2013-05-23  Warren Young  <warren@etr-usa.com>
+
+	* xidepend: New script, generates Makefile.dep from top-level XML
+	* .cvsignore: Ignoring Makefile.dep output
+	* Makefile: Creating Makefile.dep if it doesn't exist, including it
+	if it does, and removing it on 'make clean'
+	* Wishlist: Knocked autodependency generation off the list
+
 2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.xml (cygwinenv-implemented-options): Explain new
