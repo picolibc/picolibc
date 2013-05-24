@@ -1,5 +1,9 @@
 2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pinfo.cc (pinfo::status_exit): Enhance comment.
+
+2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (win_env::add_cache): Set the Windows environment variable
 	using wide chars to make sure native chars don't get scrambled.
 	* environ.h (build_env): Fix formatting in declaration.
