@@ -144,6 +144,19 @@ pinfo::status_exit (DWORD x)
     case STATUS_ILLEGAL_INSTRUCTION:
       x = SIGILL;
       break;
+    case STATUS_NO_MEMORY:
+      /* If the PATH environment variable is longer than about 30K and the full
+	 Windows environment is > 32K, startup of an exec'ed process fails with
+	 STATUS_NO_MEMORY.  This happens with all Cygwin executables, as well
+	 as, for instance, notepad, but it does not happen with CMD for some
+	 reason.  This occurs at a point where there's no return to the exec'ing
+	 parent process, so we have to find some way to inform the user what
+	 happened.
+	 
+	 FIXME: For now, just return with SIGBUS set.  Maybe it's better to add
+	 a lengthy small_printf instead. */
+      x = SIGBUS;
+      break;
     default:
       debug_printf ("*** STATUS_%y\n", x);
       x = 127 << 8;

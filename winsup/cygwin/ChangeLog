@@ -1,5 +1,12 @@
 2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* environ.cc (win_env::add_cache): Set the Windows environment variable
+	using wide chars to make sure native chars don't get scrambled.
+	* environ.h (build_env): Fix formatting in declaration.
+	* pinfo.cc (pinfo::status_exit): Handle STATUS_NO_MEMORY.  Explain why.
+
+2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fork.cc (frok::parent): Always set CREATE_UNICODE_ENVIRONMENT flag.
 	Explain why.
 

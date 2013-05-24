@@ -386,11 +386,11 @@ win_env::add_cache (const char *in_posix, const char *in_native)
   MALLOC_CHECK;
   if (immediate && cygwin_finished_initializing)
     {
-      char s[namelen];
-      size_t n = namelen - 1;
-      memcpy (s, name, n);
-      s[n] = '\0';
-      SetEnvironmentVariable (s, native + namelen);
+      wchar_t s[sys_mbstowcs (NULL, 0, native) + 1];
+      sys_mbstowcs (s, sizeof s, native);
+      /* Hack. Relies on affected variables only having ASCII names. */
+      s[namelen - 1] = L'\0';
+      SetEnvironmentVariableW (s, s + namelen);
     }
   debug_printf ("posix %s", posix);
   debug_printf ("native %s", native);
