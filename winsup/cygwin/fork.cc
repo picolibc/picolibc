@@ -262,6 +262,11 @@ frok::parent (volatile char * volatile stack_here)
 
   int c_flags = GetPriorityClass (GetCurrentProcess ());
   debug_printf ("priority class %d", c_flags);
+  /* Per MSDN, this must be specified even if lpEnvironment is set to NULL,
+     otherwise UNICODE characters in the parent environment are not copied
+     correctly to the child.  Omitting it may scramble %PATH% on non-English
+     systems. */
+  c_flags |= CREATE_UNICODE_ENVIRONMENT;
 
   errmsg = NULL;
   hchild = NULL;

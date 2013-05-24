@@ -1,3 +1,8 @@
+2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fork.cc (frok::parent): Always set CREATE_UNICODE_ENVIRONMENT flag.
+	Explain why.
+
 2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fork.cc (frok::parent): Call CreateProcessW with command line set
