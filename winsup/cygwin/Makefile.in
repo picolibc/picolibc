@@ -74,13 +74,12 @@ CRT0:=$(cygwin_build)/crt0.o
 # --enable options from configure
 #
 MT_SAFE:=@MT_SAFE@
-DEFS:=@DEFS@
 CCEXTRA=
 COMMON_CFLAGS=-MMD ${$(*F)_CFLAGS} -Werror -fmerge-constants -ftracer $(CCEXTRA)
 ifeq ($(target_cpu),x86_64)
 COMMON_CFLAGS+=-mcmodel=small
 endif
-COMPILE.cc+=${COMMON_CFLAGS} -mno-use-libstdc-wrappers
+COMPILE.cc+=${COMMON_CFLAGS}
 COMPILE.c+=${COMMON_CFLAGS}
 
 AR:=@AR@
@@ -429,7 +428,9 @@ $(LDSCRIPT): $(LDSCRIPT).in
 
 # Rule to build cygwin.dll
 $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
-	$(CXX) $(CXXFLAGS) -L${WINDOWS_LIBDIR} -Wl,--gc-sections $(nostdlib) -Wl,-T$(firstword $^) -static \
+	$(CXX) $(CXXFLAGS) \
+	-mno-use-libstdc-wrappers -L${WINDOWS_LIBDIR} \
+	-Wl,--gc-sections $(nostdlib) -Wl,-T$(firstword $^) -static \
 	-Wl,--heap=0 -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(MALLOC_OBJ) $(LIBSERVER) $(LIBM) $(LIBC) \

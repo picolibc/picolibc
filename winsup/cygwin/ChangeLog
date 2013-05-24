@@ -1,5 +1,11 @@
 2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DEFS): Unused, remove.
+	(COMPILE.cc): Move -mno-use-libstdc-wrappers flag from here...
+	($(TEST_DLL_NAME)): ...to here since it's a link time flag.
+
+2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* pinfo.cc (pinfo::status_exit): Enhance comment.
 
 2013-05-24  Corinna Vinschen  <corinna@vinschen.de>
