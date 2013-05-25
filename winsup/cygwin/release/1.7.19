@@ -5,7 +5,8 @@ What's new:
 
 - Add support for building a 64 bit version of Cygwin on x86_64 natively.
 
-- Add support for creating native symlinks (CYGWIN=winsymlinks:native)
+- Add support for creating native symlinks (CYGWIN=winsymlinks:native or
+  CYGWIN=winsymlinks:nativestrict).
 
 - Add support for the AFS filesystem.
 
@@ -23,3 +24,6 @@ Bug fixes:
   memory location as in the parent.
   Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00340.html
 
+- Fix a build problem resulting in Cygwin functions picking up the wrong
+  new/delete.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00331.html
