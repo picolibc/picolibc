@@ -27,3 +27,7 @@ Bug fixes:
 - Fix a build problem resulting in Cygwin functions picking up the wrong
   new/delete.
   Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00331.html
+
+- Fix an incorrect condition which breaks fork after all dlopen'ed DLLs
+  have already been dlclose'd.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00376.html
