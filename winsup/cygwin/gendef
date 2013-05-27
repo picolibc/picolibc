@@ -133,13 +133,13 @@ EOF
 _sigfe_maybe:					# stack is aligned on entry!
 	.seh_endprologue
 	movq	%gs:8,%r10			# location of bottom of stack
-	addq	\$$tls::initialized,%r10	# where we will be looking
-	cmpq	%r10,%rsp			# stack loc > than tls
-	ret					#  yep.  we don't have a tls.
-	subq	\$$tls::initialized,%r10	# where we will be looking
+	leaq	$tls::initialized(%r10),%r11	# where we will be looking
+	cmpq	%r11,%rsp			# stack loc > than tls
+	jge	0f				# yep.  we don't have a tls.
 	movl	$tls::initialized(%r10),%r11d
 	cmpl	\$0xc763173f,%r11d		# initialized?
 	je	1f
+0:	ret
 	.seh_endproc
 
 	.seh_proc _sigfe

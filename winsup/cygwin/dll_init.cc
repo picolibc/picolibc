@@ -299,7 +299,7 @@ void
 dll_list::topsort ()
 {
   /* Anything to do? */
-  if (!end)
+  if (!end || end == &start)
     return;
 
   /* make sure we have all the deps available */
