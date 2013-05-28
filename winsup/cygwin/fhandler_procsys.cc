@@ -394,26 +394,12 @@ fhandler_procsys::closedir (DIR *dir)
 void __reg3
 fhandler_procsys::read (void *ptr, size_t& len)
 {
-  NTSTATUS status;
-  IO_STATUS_BLOCK io;
-  LARGE_INTEGER off = { QuadPart:0LL };
-
-  /* FIXME: Implement nonblocking I/O, interruptibility and cancelability. */
-  status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, ptr, len,
-		       &off, NULL);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      len = -1;
-    }
-  else
-    len = io.Information;
+  fhandler_base::raw_read (ptr, len);
 }
 
 ssize_t __stdcall
 fhandler_procsys::write (const void *ptr, size_t len)
 {
-  /* FIXME: Implement nonblocking I/O, interruptibility and cancelability. */
   return fhandler_base::raw_write (ptr, len);
 }
 

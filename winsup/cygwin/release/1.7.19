@@ -31,3 +31,6 @@ Bug fixes:
 - Fix an incorrect condition which breaks fork after all dlopen'ed DLLs
   have already been dlclose'd.
   Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00376.html
+
+- Fix buggy usage of NtReadFile when reading from device under /proc/sys.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00392.html

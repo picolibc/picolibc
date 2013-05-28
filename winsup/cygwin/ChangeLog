@@ -1,3 +1,9 @@
+2013-05-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_procsys.cc (fhandler_procsys::read): Just call
+	fhandler_base::raw_read from here.  Drop comment.
+	(fhandler_procsys::write): Drop comment.
+
 2013-05-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dll_init.cc (dll_list::topsort): Fix early-return condition to
