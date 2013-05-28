@@ -1,3 +1,10 @@
+2013-05-28  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* aarch64.h (R_AARCH64_TLSDESC_LD64_PREL19): Rename to ...
+	(R_AARCH64_TLSDESC_LD_PREL19): ... this.
+	(R_AARCH64_TLSDESC_ADR_PAGE): Rename to ...
+	(R_AARCH64_TLSDESC_ADR_PAGE21): ... this.
+
 2013-05-22  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* common.h (EM_INTEL205): New.
