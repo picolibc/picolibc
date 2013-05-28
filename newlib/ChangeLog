@@ -1,3 +1,8 @@
+2013-05-28  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/macine/arm/strcpy.S: Explicitly set build attributes when
+	building for thumb1 targets.
+
 2013-05-22  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/ctype/isalnum.c: Correct domain of definition to SUSv4 wording.
