@@ -157,6 +157,19 @@ AC_ARG_ENABLE(newlib_wide_orient,
    *) AC_MSG_ERROR(bad value ${enableval} for newlib-wide-orient) ;;
  esac],[newlib_wide_orient=yes])
 
+dnl Support --enable-newlib-nano-malloc
+dnl This option is also read in libc/configure.in.  It is repeated
+dnl here so that it shows up in the help text.
+AC_ARG_ENABLE(newlib-nano-malloc,
+[  --enable-newlib-nano-malloc    use small-footprint nano-malloc implementation],
+[if test "${newlib_nano_malloc+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_nano_malloc=yes ;;
+    no)  newlib_nano_malloc=no  ;;
+    *)   AC_MSG_ERROR(bad value ${enableval} for newlib-nano-malloc option) ;;
+  esac
+ fi], [newlib_nano_malloc=no])dnl
+
 NEWLIB_CONFIGURE(.)
 
 dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
@@ -345,17 +358,21 @@ fi
 if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
 AC_DEFINE_UNQUOTED(_ATEXIT_DYNAMIC_ALLOC)
 fi
- 
+
 if test "${newlib_fvwrite_in_streamio}" = "yes"; then
 AC_DEFINE_UNQUOTED(_FVWRITE_IN_STREAMIO)
 fi
- 
+
 if test "${newlib_fseek_optimization}" = "yes"; then
 AC_DEFINE_UNQUOTED(_FSEEK_OPTIMIZATION)
 fi
- 
+
 if test "${newlib_wide_orient}" = "yes"; then
 AC_DEFINE_UNQUOTED(_WIDE_ORIENT)
+fi
+
+if test "${newlib_nano_malloc}" = "yes"; then
+AC_DEFINE_UNQUOTED(_NANO_MALLOC)
 fi
 
 dnl

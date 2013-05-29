@@ -1,3 +1,15 @@
+2013-05-13  Joey Ye  <joey.ye@arm.com>
+            Bin Cheng  <bin.cheng@arm.com>
+
+	* configure.in (--enable-newlib-nano-malloc): New option.
+	* configure: Regenerated.
+	* libc/configure.in (--enable-newlib-nano-malloc): New option.
+	* libc/configure: Regenerated.
+	* libc/stdlib/Makefile.am (NEWLIB_NANO_MALLOC): Use.
+	* libc/stdlib/Makefile.in: Regenerated.
+	* libc/stdlib/nano-mallocr.c: New file, implementing nano
+	version malloc family functions.
+
 2013-05-28  Richard Earnshaw  <rearnsha@arm.com>
 
 	* libc/macine/arm/strcpy.S: Explicitly set build attributes when
