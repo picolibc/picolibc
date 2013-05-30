@@ -1,4 +1,10 @@
-2013-05-13  Joey Ye  <joey.ye@arm.com>
+2013-05-30  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/powerpc/times.c: Moved to libgloss/rs6000.
+	* libc/machine/powerpc/Makefile.am: Remove times.c.
+	* libc/machine/powerpc/Makefile.in: Regenerated.
+
+2013-05-29  Joey Ye  <joey.ye@arm.com>
             Bin Cheng  <bin.cheng@arm.com>
 
 	* configure.in (--enable-newlib-nano-malloc): New option.
