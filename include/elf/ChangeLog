@@ -1,3 +1,7 @@
+2013-05-30  Paul Brook  <paul@codesourcery.com>
+
+	* mips.h (R_MIPS_EH): New.
+
 2013-05-28  Yufeng Zhang  <yufeng.zhang@arm.com>
 
 	* aarch64.h (R_AARCH64_TLSDESC_LD64_PREL19): Rename to ...

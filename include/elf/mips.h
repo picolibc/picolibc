@@ -155,6 +155,7 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
      mips-linux for exception-handling data.  GCC stopped using it in
      May, 2004, then started using it again for compact unwind tables.  */
   RELOC_NUMBER (R_MIPS_PC32, 248)
+  RELOC_NUMBER (R_MIPS_EH, 249)
   /* FIXME: this relocation is used internally by gas.  */
   RELOC_NUMBER (R_MIPS_GNU_REL16_S2, 250)
   /* These are GNU extensions to enable C++ vtable garbage collection.  */
