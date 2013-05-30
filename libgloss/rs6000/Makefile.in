@@ -68,7 +68,7 @@ SIM_SCRIPTS	=
 SIM_LDFLAGS	=
 SIM_BSP		= libsim.a
 SIM_CRT0	= sim-crt0.o
-SIM_OBJS	= sim-print.o sim-inbyte.o sim-sbrk.o sim-abort.o sim-errno.o simulator.o sim-getrusage.o
+SIM_OBJS	= sim-print.o sim-inbyte.o sim-sbrk.o sim-abort.o sim-errno.o simulator.o sim-getrusage.o sim-times.o
 SIM_TEST	= sim-test
 SIM_INSTALL	= install-sim
 

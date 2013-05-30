@@ -1,3 +1,9 @@
+2013-05-30  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* rs6000/Makefile.in: Add sim-times support.  This file has been
+	moved from newlib/libc/machine/powerpc and renamed.
+	* rs6000/sim-times.c: New file.
+
 2013-05-14  DJ Delorie  <dj@redhat.com>
 	    Nick Clifton  <nickc@redhat.com>
 
