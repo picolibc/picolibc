@@ -1,3 +1,8 @@
+2013-05-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/if.h: Include cygwin/socket.h rather than sys/socket.h
+	to avoid circular dependency resulting in bogus compile time warnings.
+
 2013-05-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_procsys.cc (fhandler_procsys::read): Just call

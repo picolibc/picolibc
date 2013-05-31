@@ -1,6 +1,6 @@
 /* cygwin/if.h
 
-   Copyright 1996, 2000, 2001, 2007, 2012 Red Hat, Inc.
+   Copyright 1996, 2000, 2001, 2007, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -16,7 +16,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #include <sys/types.h>
-#include <sys/socket.h>
+#include <cygwin/socket.h>
 
 /* Standard interface flags. */
 #define IFF_UP           0x1             /* interface is up               */
