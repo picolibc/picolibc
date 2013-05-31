@@ -1,5 +1,10 @@
 2013-05-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/sys/socket.h: Move SHUT_xx definitoins from here...
+	* include/cygwin/socket.h: ...to here.
+
+2013-05-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/if.h: Include cygwin/socket.h rather than sys/socket.h
 	to avoid circular dependency resulting in bogus compile time warnings.
 
