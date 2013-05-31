@@ -34,3 +34,6 @@ Bug fixes:
 
 - Fix buggy usage of NtReadFile when reading from device under /proc/sys.
   Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00392.html
+
+- Fix an include in <cygwin/if.h> to avoid circular dependency.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00451.html
