@@ -30,7 +30,7 @@
 
 2013-05-31  Corinna Vinschen  <corinna@vinschen.de>
 
-	* include/sys/socket.h: Move SHUT_xx definitoins from here...
+	* include/sys/socket.h: Move SHUT_xx definitions from here...
 	* include/cygwin/socket.h: ...to here.
 
 2013-05-31  Corinna Vinschen  <corinna@vinschen.de>
