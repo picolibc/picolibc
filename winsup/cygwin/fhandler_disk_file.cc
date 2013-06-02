@@ -1379,12 +1379,12 @@ fhandler_base::utimens_fs (const struct timespec *tvp)
 }
 
 fhandler_disk_file::fhandler_disk_file () :
-  fhandler_base (), prw_handle (NULL)
+  fhandler_base (), prw_handle (NULL), mandatory_locking (false)
 {
 }
 
 fhandler_disk_file::fhandler_disk_file (path_conv &pc) :
-  fhandler_base (), prw_handle (NULL)
+  fhandler_base (), prw_handle (NULL), mandatory_locking (false)
 {
   set_name (pc);
 }
@@ -1408,6 +1408,33 @@ fhandler_disk_file::close ()
 }
 
 int
+fhandler_disk_file::fcntl (int cmd, intptr_t arg)
+{
+  int res;
+
+  switch (cmd)
+    {
+    case F_LCK_MANDATORY:
+      mandatory_locking = !!arg;
+      res = 0;
+      break;
+    case F_GETLK:
+    case F_SETLK:
+    case F_SETLKW:
+      {
+	struct flock *fl = (struct flock *) arg;
+	fl->l_type &= F_RDLCK | F_WRLCK | F_UNLCK;
+	res = mandatory_locking ? mand_lock (cmd, fl) : lock (cmd, fl);
+      }
+      break;
+    default:
+      res = fhandler_base::fcntl (cmd, arg);
+      break;
+    }
+  return res;
+}
+
+int
 fhandler_disk_file::dup (fhandler_base *child, int flags)
 {
   fhandler_disk_file *fhc = (fhandler_disk_file *) child;
@@ -1417,7 +1444,8 @@ fhandler_disk_file::dup (fhandler_base *child, int flags)
       && !DuplicateHandle (GetCurrentProcess (), prw_handle,
 			   GetCurrentProcess (), &fhc->prw_handle,
 			   0, TRUE, DUPLICATE_SAME_ACCESS))
-    prw_handle = NULL;
+    fhc->prw_handle = NULL;
+  fhc->mandatory_locking = mandatory_locking;
   return ret;
 }
 
@@ -1425,6 +1453,7 @@ void
 fhandler_disk_file::fixup_after_fork (HANDLE parent)
 {
   prw_handle = NULL;
+  mandatory_locking = false;
   fhandler_base::fixup_after_fork (parent);
 }
 

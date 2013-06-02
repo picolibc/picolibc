@@ -1,6 +1,6 @@
 /* flock.cc.  NT specific implementation of advisory file locking.
 
-   Copyright 2003, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2003, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -915,6 +915,9 @@ static int      lf_setlock (lockf_t *, inode_t *, lockf_t **, HANDLE);
 static void     lf_split (lockf_t *, lockf_t *, lockf_t **);
 static void     lf_wakelock (lockf_t *, HANDLE);
 
+/* This is the fcntl advisory lock implementation.  For the implementation
+   of mandatory locks using the Windows mandatory locking functions, see the
+   fhandler_disk_file::mand_lock method at the end of this file. */
 int
 fhandler_disk_file::lock (int a_op, struct flock *fl)
 {
@@ -1804,4 +1807,200 @@ lockf (int filedes, int function, off_t size)
 done:
   syscall_printf ("%R = lockf(%d, %d, %D)", res, filedes, function, size);
   return res;
+}
+
+/* This is the fcntl lock implementation for mandatory locks using the
+   Windows mandatory locking functions.  For the UNIX-like advisory locking
+   implementation see the fhandler_disk_file::lock method earlier in this
+   file. */
+struct lock_parms {
+  HANDLE	   h;
+  PIO_STATUS_BLOCK pio;
+  PLARGE_INTEGER   poff;
+  PLARGE_INTEGER   plen;
+  BOOL		   type;
+  NTSTATUS	   status;
+};
+
+static DWORD WINAPI
+blocking_lock_thr (LPVOID param)
+{
+  struct lock_parms *lp = (struct lock_parms *) param;
+  lp->status = NtLockFile (lp->h, NULL, NULL, NULL, lp->pio, lp->poff,
+			   lp->plen, 0, FALSE, lp->type);
+  return 0;
+}
+
+int
+fhandler_disk_file::mand_lock (int a_op, struct flock *fl)
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  FILE_POSITION_INFORMATION fpi;
+  FILE_STANDARD_INFORMATION fsi;
+  off_t startpos;
+  LARGE_INTEGER offset;
+  LARGE_INTEGER length;
+
+  /* Calculate where to start from, then adjust this by fl->l_start. */
+  switch (fl->l_whence)
+  {
+    case SEEK_SET:
+      startpos = 0;
+      break;
+    case SEEK_CUR:
+      status = NtQueryInformationFile (get_handle (), &io, &fpi, sizeof fpi,
+				       FilePositionInformation);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  return -1;
+	}
+      startpos = fpi.CurrentByteOffset.QuadPart;
+      break;
+    case SEEK_END:
+      status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
+				       FileStandardInformation);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  return -1;
+	}
+      startpos = fsi.EndOfFile.QuadPart;
+      break;
+    default:
+      set_errno (EINVAL);
+      return -1;
+  }
+  /* Adjust start and length until they make sense. */
+  offset.QuadPart = startpos + fl->l_start;
+  if (fl->l_len < 0)
+    {
+      offset.QuadPart -= fl->l_len;
+      length.QuadPart = -fl->l_len;
+    }
+  else
+    length.QuadPart = fl->l_len;
+  if (offset.QuadPart < 0)
+    {
+      length.QuadPart -= -offset.QuadPart;
+      if (length.QuadPart <= 0)
+        {
+          set_errno (EINVAL);
+          return -1;
+        }
+      offset.QuadPart = 0;
+    }
+  /* Special case if len == 0.  For POSIX this means lock to the end of
+     the entire file, even when file grows later. */
+  if (length.QuadPart == 0)
+    length.QuadPart = UINT64_MAX;
+  /* Action! */
+  if (fl->l_type == F_UNLCK)
+    {
+      status = NtUnlockFile (get_handle (), &io, &offset, &length, 0);
+      if (status == STATUS_RANGE_NOT_LOCKED)	/* Not an error */
+	status = STATUS_SUCCESS;
+    }
+  else if (a_op == F_SETLKW)
+    {
+      /* We open file handles synchronously.  To allow asynchronous operation
+	 the file locking functions require a file handle opened in asynchronous
+	 mode.  Since Windows locks are per-process/per-file object, we can't
+	 open another handle asynchrously and lock/unlock using that handle:
+	 The original file handle would not have placed the lock and would be
+	 restricted by the lock like any other file handle.
+	 So, what we do here is to start a thread which calls the potentially
+	 blocking NtLockFile call.  Then we wait for thread completion in an
+	 interruptible fashion. */
+      OBJECT_ATTRIBUTES attr;
+      HANDLE evt;
+      struct lock_parms lp = { get_handle (), &io, &offset, &length,
+			       fl->l_type == F_WRLCK, 0 };
+      cygthread *thr = NULL;
+
+      InitializeObjectAttributes (&attr, NULL, 0, NULL, NULL);
+      status = NtCreateEvent (&evt, EVENT_ALL_ACCESS, &attr,
+			      NotificationEvent, FALSE);
+      if (evt)
+	thr = new cygthread (blocking_lock_thr, &lp, "blk_lock", evt);
+      if (!thr)
+	{
+	  /* Thread creation failed.  Fall back to blocking lock call. */
+	  if (evt)
+	    NtClose (evt);
+	  status = NtLockFile (get_handle (), NULL, NULL, NULL, &io, &offset,
+			       &length, 0, FALSE, fl->l_type == F_WRLCK);
+	}
+      else
+	{
+	  /* F_SETLKW and lock cannot be established.  Wait until the lock can
+	     be established, or a signal request arrived.  We deliberately
+	     don't handle thread cancel requests here. */
+	  DWORD wait_res = cygwait (evt, INFINITE, cw_sig | cw_sig_eintr);
+	  NtClose (evt);
+	  switch (wait_res)
+	    {
+	    case WAIT_OBJECT_0:
+	      /* Fetch completion status. */
+	      status = lp.status;
+	      thr->detach ();
+	      break;
+	    default:
+	      /* Signal arrived. */
+	      /* Starting with Vista, CancelSynchronousIo works, and we wait
+		 for the thread to exit.  lp.status will be either
+		 STATUS_SUCCESS, or STATUS_CANCELLED.  We only call
+		 NtUnlockFile in the first case.
+		 Prior to Vista, CancelSynchronousIo doesn't exist, so we
+		 terminated the thread and always call NtUnlockFile since
+		 lp.status was 0 to begin with. */
+	      if (CancelSynchronousIo (thr->thread_handle ()))
+		thr->detach ();
+	      else
+	      	thr->terminate_thread ();
+	      if (NT_SUCCESS (lp.status))
+		NtUnlockFile (get_handle (), &io, &offset, &length, 0);
+	      /* Per SUSv4: If a signal is received while fcntl is waiting,
+		 fcntl shall be interrupted.  Upon return from the signal
+		 handler, fcntl shall return -1 with errno set to EINTR,
+		 and the lock operation shall not be done. */
+	      _my_tls.call_signal_handler ();
+	      set_errno (EINTR);
+	      return -1;
+	    }
+	}
+    }
+  else
+    {
+      status = NtLockFile (get_handle (), NULL, NULL, NULL, &io, &offset,
+			   &length, 0, TRUE, fl->l_type == F_WRLCK);
+      if (a_op == F_GETLK)
+	{
+	  /* This is non-atomic, but there's no other way on Windows to detect
+	     if another lock is blocking our lock, other than trying to place
+	     the lock, and then having to unlock it again. */
+	  if (NT_SUCCESS (status))
+	    {
+	      NtUnlockFile (get_handle (), &io, &offset, &length, 0);
+	      fl->l_type = F_UNLCK;
+	    }
+	  else
+	    {
+	      /* FAKE! FAKE! FAKE! */
+	      fl->l_type = F_WRLCK;
+	      fl->l_whence = SEEK_SET;
+	      fl->l_start = offset.QuadPart;
+	      fl->l_len = length.QuadPart;
+	      fl->l_pid = (pid_t) -1;
+	    }
+	  status = STATUS_SUCCESS;
+	}
+    }
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  return 0;
 }

@@ -963,6 +963,7 @@ class fhandler_dev_tape: public fhandler_dev_raw
 class fhandler_disk_file: public fhandler_base
 {
   HANDLE prw_handle;
+  bool mandatory_locking;
   int __reg3 readdir_helper (DIR *, dirent *, DWORD, DWORD, PUNICODE_STRING fname);
 
   int prw_open (bool);
@@ -973,9 +974,11 @@ class fhandler_disk_file: public fhandler_base
 
   int open (int flags, mode_t mode);
   int close ();
+  int fcntl (int cmd, intptr_t);
   int dup (fhandler_base *child, int);
   void fixup_after_fork (HANDLE parent);
   int lock (int, struct flock *);
+  int mand_lock (int, struct flock *);
   bool isdevice () const { return false; }
   int __reg2 fstat (struct stat *buf);
   int __reg1 fchmod (mode_t mode);
