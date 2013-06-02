@@ -753,7 +753,8 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
     }
   cygwin_exception exc (framep, in, e);
   si.si_cyg = (void *) &exc;
-  si.si_addr = (void *) in->_GR(ip);
+  si.si_addr = (si.si_signo == SIGSEGV || si.si_signo == SIGBUS)
+	       ? (void *) e->ExceptionInformation[1] : (void *) in->_GR(ip);
   me.incyg++;
   sig_send (NULL, si, &me);	/* Signal myself */
   me.incyg--;

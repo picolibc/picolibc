@@ -1,3 +1,8 @@
+2013-06-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	*  exceptions.cc (exception::handle): Resurrect accidentally lost
+	patch from 2009-07-22: Set si_addr according to POSIX for SIGSEGV.
+
 2013-05-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/socket.h: Move SHUT_xx definitoins from here...
