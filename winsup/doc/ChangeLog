@@ -1,3 +1,7 @@
+2013-06-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.19): Add mandatory locking.
+
 2013-05-23  Warren Young  <warren@etr-usa.com>
 
 	* xidepend: New script, generates Makefile.dep from top-level XML
