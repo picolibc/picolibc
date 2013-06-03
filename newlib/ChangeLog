@@ -1,3 +1,15 @@
+2013-06-03  Joey Ye  <joey.ye@arm.com>
+
+	* libc/machine/arm/Makefile.am (MEMCPY_DEP): New define.
+	($(lpfx)memcpy.o, $(lpfx)memcpy.obj): Depend on MEMCPY_DEP.
+	* libc/machine/arm/Makefile.in: Regenerated.
+	* newlib/libc/machine/arm/memcpy-stub.c: Exclude armv7-m/armv7e-m.
+	* newlib/libc/machine/arm/memcpy-armv7m.S: New.
+	* newlib/libc/machine/arm/memcpy.S: Replace with wrapper code.  Old
+	code moved to ...
+	* newlib/libc/machine/arm/memcpy-armv7a.S: ... here.  Remove 
+	redundant architecture check.
+
 2013-05-30  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/powerpc/times.c: Moved to libgloss/rs6000.
