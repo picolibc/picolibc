@@ -1,3 +1,8 @@
+2013-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sigproc.cc (exit_thread): Allow to exit the thread while running
+	global dtors.  Explain why.
+
 2013-06-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (CancelSynchronousIo): Define.
