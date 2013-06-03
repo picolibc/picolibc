@@ -40,3 +40,6 @@ Bug fixes:
 
 - Fix an include in <cygwin/if.h> to avoid circular dependency.
   Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00451.html
+
+- Fix a hang on exit when calling pthread_join in global desctructor.
+  Fixes: http://cygwin.com/ml/cygwin/2013-06/msg00017.html
