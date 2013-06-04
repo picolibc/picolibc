@@ -1,3 +1,18 @@
+2013-06-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::lock): Move to flock.cc.
+	(fhandler_base::fixup_after_exec): Reset mandatory_locking.
+	* fhandler.h (class fhandler_base): Add mandatory_locking status flag.
+	Add mandatory_locking accessor methods.  Accommodate change throughout.
+	(fhandler_base::mand_lock): Declare.
+	(class fhandler_disk_file): Drop in favor of new status flag.
+	* (fhandler_disk_file::fcntl): Call need_fork_fixup if mandatory_locking
+	flag gets set.
+	* flock.cc (fhandler_base::lock): Define here.
+	(flock): Handle mandatory_locking.
+	(lockf): Ditto.
+	(fhandler_base::mand_lock): Define.
+
 2013-06-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sigproc.cc (exit_thread): Allow to exit the thread while running

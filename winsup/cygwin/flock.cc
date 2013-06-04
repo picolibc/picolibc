@@ -919,6 +919,13 @@ static void     lf_wakelock (lockf_t *, HANDLE);
    of mandatory locks using the Windows mandatory locking functions, see the
    fhandler_disk_file::mand_lock method at the end of this file. */
 int
+fhandler_base::lock (int, struct flock *)
+{
+  set_errno (EINVAL);
+  return -1;
+}
+
+int
 fhandler_disk_file::lock (int a_op, struct flock *fl)
 {
   off_t start, end, oadd;
@@ -1733,19 +1740,22 @@ flock (int fd, int operation)
   switch (operation & (~LOCK_NB))
     {
     case LOCK_EX:
-      fl.l_type = F_WRLCK | F_FLOCK;
+      fl.l_type = F_WRLCK;
       break;
     case LOCK_SH:
-      fl.l_type = F_RDLCK | F_FLOCK;
+      fl.l_type = F_RDLCK;
       break;
     case LOCK_UN:
-      fl.l_type = F_UNLCK | F_FLOCK;
+      fl.l_type = F_UNLCK;
       break;
     default:
       set_errno (EINVAL);
       goto done;
     }
-  res = cfd->lock (cmd, &fl);
+  if (!cfd->mandatory_locking ())
+    fl.l_type |= F_FLOCK;
+  res = cfd->mandatory_locking () ? cfd->mand_lock (cmd, &fl)
+				  : cfd->lock (cmd, &fl);
   if ((res == -1) && ((get_errno () == EAGAIN) || (get_errno () == EACCES)))
     set_errno (EWOULDBLOCK);
 done:
@@ -1803,7 +1813,8 @@ lockf (int filedes, int function, off_t size)
       goto done;
       /* NOTREACHED */
     }
-  res = cfd->lock (cmd, &fl);
+  res = cfd->mandatory_locking () ? cfd->mand_lock (cmd, &fl)
+				  : cfd->lock (cmd, &fl);
 done:
   syscall_printf ("%R = lockf(%d, %d, %D)", res, filedes, function, size);
   return res;
@@ -1829,6 +1840,13 @@ blocking_lock_thr (LPVOID param)
   lp->status = NtLockFile (lp->h, NULL, NULL, NULL, lp->pio, lp->poff,
 			   lp->plen, 0, FALSE, lp->type);
   return 0;
+}
+
+int
+fhandler_base::mand_lock (int, struct flock *)
+{
+  set_errno (EINVAL);
+  return -1;
 }
 
 int

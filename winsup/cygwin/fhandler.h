@@ -147,12 +147,13 @@ class fhandler_base
     unsigned close_on_exec      : 1; /* close-on-exec */
     unsigned need_fork_fixup    : 1; /* Set if need to fixup after fork. */
     unsigned isclosed		: 1; /* Set when fhandler is closed. */
+    unsigned mandatory_locking	: 1; /* Windows mandatory locking */
 
    public:
     status_flags () :
       rbinary (0), rbinset (0), wbinary (0), wbinset (0), nohandle (0),
       did_lseek (0), query_open (no_query), close_on_exec (0),
-      need_fork_fixup (0), isclosed (0)
+      need_fork_fixup (0), isclosed (0), mandatory_locking (0)
       {}
   } status, open_status;
 
@@ -247,6 +248,7 @@ class fhandler_base
   IMPLEMENT_STATUS_FLAG (bool, close_on_exec)
   IMPLEMENT_STATUS_FLAG (bool, need_fork_fixup)
   IMPLEMENT_STATUS_FLAG (bool, isclosed)
+  IMPLEMENT_STATUS_FLAG (bool, mandatory_locking)
 
   int get_default_fmode (int flags);
 
@@ -360,6 +362,7 @@ public:
   virtual ssize_t __reg3 pwrite (void *, size_t, off_t);
   virtual off_t lseek (off_t offset, int whence);
   virtual int lock (int, struct flock *);
+  virtual int mand_lock (int, struct flock *);
   virtual int dup (fhandler_base *child, int flags);
   virtual int fpathconf (int);
 
@@ -963,7 +966,6 @@ class fhandler_dev_tape: public fhandler_dev_raw
 class fhandler_disk_file: public fhandler_base
 {
   HANDLE prw_handle;
-  bool mandatory_locking;
   int __reg3 readdir_helper (DIR *, dirent *, DWORD, DWORD, PUNICODE_STRING fname);
 
   int prw_open (bool);

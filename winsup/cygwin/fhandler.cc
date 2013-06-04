@@ -1230,13 +1230,6 @@ fhandler_base::ioctl (unsigned int cmd, void *buf)
   return res;
 }
 
-int
-fhandler_base::lock (int, struct flock *)
-{
-  set_errno (EINVAL);
-  return -1;
-}
-
 int __reg2
 fhandler_base::fstat (struct stat *buf)
 {
@@ -1553,6 +1546,7 @@ fhandler_base::fixup_after_exec ()
   debug_printf ("here for '%s'", get_name ());
   if (unique_id && close_on_exec ())
     del_my_locks (after_exec);
+  mandatory_locking (false);
 }
 void
 fhandler_base_overlapped::fixup_after_exec ()
