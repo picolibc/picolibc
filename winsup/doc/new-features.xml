@@ -27,8 +27,8 @@ Add support for AFS filesystem.
 </para></listitem>
 
 <listitem><para>
-Preliminary support for mandatory locking via fcntl, using Windows
-locking semantics.  New F_LCK_MANDATORY fcntl command.
+Support for mandatory locking via fcntl/flock/lockf, using Windows locking
+semantics.  New F_LCK_MANDATORY fcntl command.
 </para></listitem>
 
 <listitem><para>
