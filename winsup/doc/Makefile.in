@@ -21,7 +21,6 @@ exeext:=@build_exeext@
 XMLTO:=xmlto --skip-validation --with-dblatex
 
 include $(srcdir)/../Makefile.common
--include $(srcdir)/Makefile.dep
 
 FAQ_SOURCES:= $(wildcard ${srcdir}/faq*.xml)
 
@@ -37,6 +36,9 @@ all: Makefile Makefile.dep \
 	faq/faq.body faq/faq.html \
 	cygwin-ug-net/cygwin-ug-net.pdf \
 	cygwin-api/cygwin-api.pdf
+
+Makefile: ${srcdir}/Makefile.in
+	/bin/sh ./config.status
 
 clean:
 	rm -f Makefile.dep
@@ -87,5 +89,9 @@ tarball : cygwin-docs.tar.bz2
 cygwin-docs.tar.bz2 : $(TBFILES) $(TBDEPS)
 	find $(TBFILES) $(TBDIRS) \! -type d | sort | tar -T - -cf -  | bzip2 > cygwin-docs.tar.bz2
 
-Makefile.dep: cygwin-ug-net.xml faq.xml
-	$(srcdir)/xidepend $^ > $@
+Makefile.dep: cygwin-ug-net.xml
+	builddir=`pwd` \
+	&& cd $(srcdir) \
+	&& $(srcdir)/xidepend $^ > "$${builddir}/$@"
+
+-include Makefile.dep

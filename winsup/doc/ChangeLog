@@ -1,5 +1,13 @@
 2013-06-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in: Add rule to rebuild Makefile if Makefile.in changes.
+	Include Makefile.dep last.
+	(Makefile.dep): Run xidepend within source dir.  Temporarily drop
+	faq.xml from dependencies.
+	* xidepend: Fix creating base filename to accommodate VPATH.
+
+2013-06-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.xml (ov-new1.7.19): Align mandatory locking text to
 	today's changes.
 

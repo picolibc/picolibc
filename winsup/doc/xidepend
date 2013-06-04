@@ -14,7 +14,7 @@ do
 	if fgrep -q 'xi:include' "$f"
 	then
 		# This file uses XIncludes.  Let's chase its deps recursively.
-		base=`echo $f | sed -e s/\.xml//`
+		base=`basename "$f" .xml`
 		if [ $subproc -eq 0 ] ; then echo -n "$base/$base.html:" ; fi
 
 		deps=`grep 'xi:include.*href' "$f" | cut -f2 -d\" | tr '\n' ' '`
