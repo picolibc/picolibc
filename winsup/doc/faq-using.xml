@@ -628,7 +628,7 @@ of poorly written firewall-type software that causes things to break.
 Note that with many of these products, simply disabling the firewall
 does not remove these changes; it must be completely uninstalled.
 </para>
-<para>See also <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda" />
+<para>See also <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda" />
 for a list of applications that have been known, at one time or another, to 
 interfere with the normal functioning of Cygwin.
 </para>
@@ -778,7 +778,7 @@ contents are exempt from scanning.  In a default installation, this
 would be <literal>C:\cygwin\bin</literal>.  Obviously, this could be
 exploited by a hostile non-Cygwin program, so do this at your own risk.
 </para>
-<para>See also <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda" />
+<para>See also <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda" />
 for a list of applications that have been known, at one time or another, to
 interfere with the normal functioning of Cygwin.
 </para>

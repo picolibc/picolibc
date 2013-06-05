@@ -187,7 +187,7 @@ disk if you are paranoid.
 <para>This should be safe, but only if Cygwin Setup is not substituted by
 something malicious, and no mirror has been compromised.
 </para>
-<para>See also <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda" />
+<para>See also <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda" />
 for a list of applications that have been known, at one time or another, to
 interfere with the normal functioning of Cygwin.
 </para>
@@ -459,7 +459,7 @@ of Cygwin is as follows:
 <orderedlist>
 <listitem><para>If you have any Cygwin services running, remove by repeating 
 the instructions in <ulink
-url="http://cygwin.com/faq/faq.setup.html#faq.setup.uninstall-service" /> for
+url="http://cygwin.com/faq/faq.html#faq.setup.uninstall-service" /> for
 all services that you installed.  Common services that might have been
 installed are <literal>sshd</literal>, <literal>cron</literal>, 
 <literal>cygserver</literal>, <literal>inetd</literal>, <literal>apache</literal>, 

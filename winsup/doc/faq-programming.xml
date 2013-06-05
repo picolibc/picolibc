@@ -360,7 +360,7 @@ package at runtime.
 <answer>
 
 <para>Beware of using non-portable shell features in your Makefiles (see tips
-at <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.shell-scripts" />).
+at <ulink url="http://cygwin.com/faq/faq.html#faq.using.shell-scripts" />).
 </para>
 <para>Errors of <literal>make: execvp: /bin/sh: Illegal Argument</literal> or 
 <literal>make: execvp: /bin/sh: Argument list too long</literal> are often
@@ -746,7 +746,7 @@ recommend trying the latest snapshot from
 <ulink url="http://cygwin.com/snapshots/" /> or building the DLL from CVS.
 </para>
 <para>To build a debugging version of the Cygwin DLL, you will need to follow
-the instructions at <ulink url="http://cygwin.com/faq/faq-nochunks.html#faq.programming.building-cygwin" />. 
+the instructions at <ulink url="http://cygwin.com/faq/faq.html#faq.programming.building-cygwin" />. 
 You can also contact the mailing list for pointers (a simple test case that 
 demonstrates the bug is always welcome).  
 </para>

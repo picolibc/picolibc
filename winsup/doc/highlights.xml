@@ -271,7 +271,7 @@ location, Cygwin can do nothing to compensate (though it will
 retry a few times automatically).</listitem>
 
 <listitem>DLL injection by
-<ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda">
+<ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda">
 BLODA</ulink>. Badly-behaved applications which
 inject dlls into other processes often manage to clobber important
 sections of the child's address space, leading to base address
