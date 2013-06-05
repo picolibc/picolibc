@@ -1,3 +1,7 @@
+2013-06-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 20.
+
 2013-06-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::lock): Move to flock.cc.
