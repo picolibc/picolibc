@@ -39,7 +39,11 @@ details. */
 #include "thread.h"
 #endif
 
+#ifdef __x86_64__
+#pragma pack(push,8)
+#else
 #pragma pack(push,4)
+#endif
 /* Defined here to support auto rebuild of tlsoffsets.h. */
 class tls_pathbuf
 {
@@ -78,8 +82,6 @@ struct _local_storage
   /*
      Needed for the group functions
    */
-  struct __group16 grp;
-  char *namearray[2];
   int grp_pos;
 
   /* dlfcn.cc */
@@ -157,15 +159,13 @@ typedef struct struct_waitq
 */
 
 /*gentls_offsets*/
-#include "cygerrno.h"
-#include "security.h"
 
 extern "C" int __sjfault (jmp_buf);
 extern "C" int __ljfault (jmp_buf, int);
 
 /*gentls_offsets*/
 
-typedef __uint32_t __stack_t;
+typedef uintptr_t __stack_t;
 
 class _cygtls
 {
@@ -237,7 +237,7 @@ public:
 	if (wait_for_lock)
 	  lock ();
 	if (!signal_arrived)
-	  signal_arrived = CreateEvent (&sec_none_nih, false, false, NULL);
+	  signal_arrived = CreateEvent (NULL, false, false, NULL);
 	if (wait_for_lock)
 	  unlock ();
       }
@@ -266,13 +266,29 @@ private:
 };
 #pragma pack(pop)
 
-const int CYGTLS_PADSIZE = 12700;	/* FIXME: Find some way to autogenerate
-					   this value */
+/* FIXME: Find some way to autogenerate this value */
+#ifdef __x86_64__
+const int CYGTLS_PADSIZE = 12800;	/* Must be 16-byte aligned */
+#else
+const int CYGTLS_PADSIZE = 12700;
+#endif
+
 /*gentls_offsets*/
 
-extern char *_tlsbase __asm__ ("%fs:4");
-extern char *_tlstop __asm__ ("%fs:8");
-#define _my_tls (*((_cygtls *) (_tlsbase - CYGTLS_PADSIZE)))
+#include "cygerrno.h"
+#include "ntdll.h"
+
+#ifdef __x86_64__
+/* When just using a "gs:X" asm for the x86_64 code, gcc wrongly creates
+   pc-relative instructions.  However, NtCurrentTeb() is inline assembler
+   anyway, so using it here should be fast enough on x86_64. */
+#define _tlsbase (NtCurrentTeb()->Tib.StackBase)
+#define _tlstop (NtCurrentTeb()->Tib.StackLimit)
+#else
+extern PVOID _tlsbase __asm__ ("%fs:4");
+extern PVOID _tlstop __asm__ ("%fs:8");
+#endif
+#define _my_tls (*((_cygtls *) ((char *)_tlsbase - CYGTLS_PADSIZE)))
 extern _cygtls *_main_tls;
 extern _cygtls *_sig_tls;
 

@@ -421,8 +421,7 @@ _feinitialise (void)
   /* Check for presence of SSE: invoke CPUID #1, check EDX bit 25.  */
   eax = 1;
   __asm__ volatile ("cpuid" : "=d" (edx), "+a" (eax) :: "%ecx", "%ebx");
-  /* If this flag isn't set, or if the OS doesn't support SSE (NT4, at least
-     up to SP4) we'll avoid trying to execute any SSE.  */
+  /* If this flag isn't set we'll avoid trying to execute any SSE.  */
   if ((edx & (1 << 25)) != 0)
     use_sse = true;
 

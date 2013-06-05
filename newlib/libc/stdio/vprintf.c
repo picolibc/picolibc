@@ -33,8 +33,10 @@ _DEFUN(vprintf, (fmt, ap),
        _CONST char *fmt _AND
        va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT (_REENT);
-  return _vfprintf_r (_REENT, _stdout_r (_REENT), fmt, ap);
+  struct _reent *reent = _REENT;
+
+  _REENT_SMALL_CHECK_INIT (reent);
+  return _vfprintf_r (reent, _stdout_r (reent), fmt, ap);
 }
 
 #endif /* !_REENT_ONLY */

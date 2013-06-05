@@ -110,7 +110,7 @@ ipc_mutex_init (HANDLE *pmtx, const char *name)
   status = NtCreateMutant (pmtx, CYG_MUTANT_ACCESS, &attr, FALSE);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtCreateMutant: %p", status);
+      debug_printf ("NtCreateMutant: %y", status);
       return geterrno_from_win_error (RtlNtStatusToDosError (status));
     }
   return 0;
@@ -163,7 +163,7 @@ ipc_cond_init (HANDLE *pevt, const char *name, char sr)
 			  NotificationEvent, FALSE);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtCreateEvent: %p", status);
+      debug_printf ("NtCreateEvent: %y", status);
       return geterrno_from_win_error (RtlNtStatusToDosError (status));
     }
   return 0;
@@ -284,7 +284,7 @@ ipc_cond_close (HANDLE evt)
 
 class ipc_flock
 {
-  struct __flock64 fl;
+  struct flock fl;
 
 public:
   ipc_flock () { memset (&fl, 0, sizeof fl); }
@@ -348,29 +348,52 @@ shm_unlink (const char *name)
    files are created under /dev/mqueue.  mq_timedsend and mq_timedreceive
    are implemented additionally. */
 
+/* The mq_attr structure is defined using long datatypes per POSIX.
+   For interoperability reasons between 32 and 64 bit processes, we have
+   to make sure to use a unified structure layout in the message queue file.
+   That's what the mq_fattr is, the in-file representation of the mq_attr
+   struct. */
+#pragma pack (push, 4)
+struct mq_fattr
+{
+  uint32_t mq_flags;
+  uint32_t mq_maxmsg;
+  uint32_t mq_msgsize;
+  uint32_t mq_curmsgs;
+};
+
 struct mq_hdr
 {
-  struct mq_attr  mqh_attr;	 /* the queue's attributes */
-  long            mqh_head;	 /* index of first message */
-  long            mqh_free;	 /* index of first free message */
-  long            mqh_nwait;	 /* #threads blocked in mq_receive() */
+  struct mq_fattr mqh_attr;	 /* the queue's attributes */
+  int32_t         mqh_head;	 /* index of first message */
+  int32_t         mqh_free;	 /* index of first free message */
+  int32_t         mqh_nwait;	 /* #threads blocked in mq_receive() */
   pid_t           mqh_pid;	 /* nonzero PID if mqh_event set */
   char            mqh_uname[36]; /* unique name used to identify synchronization
 				    objects connected to this queue */
-  struct sigevent mqh_event;	 /* for mq_notify() */
+  union {
+    struct sigevent mqh_event;	 /* for mq_notify() */
+    /* Make sure sigevent takes the same space on 32 and 64 bit systems.
+       Other than that, it doesn't need to be compatible since only
+       one process can be notified at a time. */
+    uint64_t        mqh_placeholder[8];
+  };
+  uint32_t        mqh_magic;	/* Expect MQI_MAGIC here, otherwise it's
+				   an old-style message queue. */
 };
 
 struct msg_hdr
 {
-  long            msg_next;	 /* index of next on linked list */
-  ssize_t         msg_len;	 /* actual length */
+  int32_t         msg_next;	 /* index of next on linked list */
+  int32_t         msg_len;	 /* actual length */
   unsigned int    msg_prio;	 /* priority */
 };
+#pragma pack (pop)
 
 struct mq_info
 {
   struct mq_hdr  *mqi_hdr;	 /* start of mmap'ed region */
-  unsigned long   mqi_magic;	 /* magic number if open */
+  uint32_t        mqi_magic;	 /* magic number if open */
   int             mqi_flags;	 /* flags for this process */
   HANDLE          mqi_lock;	 /* mutex lock */
   HANDLE          mqi_waitsend;	 /* and condition variable for full queue */
@@ -385,19 +408,19 @@ struct mq_info
 
 struct mq_attr defattr = { 0, 10, 8192, 0 };	/* Linux defaults. */
 
-extern "C" _off64_t lseek64 (int, _off64_t, int);
-extern "C" void *mmap64 (void *, size_t, int, int, int, _off64_t);
+extern "C" off_t lseek64 (int, off_t, int);
+extern "C" void *mmap64 (void *, size_t, int, int, int, off_t);
 
 extern "C" mqd_t
 mq_open (const char *name, int oflag, ...)
 {
   int i, fd = -1, nonblock, created;
   long msgsize, index;
-  _off64_t filesize = 0;
+  off_t filesize = 0;
   va_list ap;
   mode_t mode;
   int8_t *mptr;
-  struct __stat64 statbuff;
+  struct stat statbuff;
   struct mq_hdr *mqhdr;
   struct msg_hdr *msghdr;
   struct mq_attr *attr;
@@ -441,7 +464,12 @@ again:
       /* First one to create the file initializes it */
       if (attr == NULL)
 	attr = &defattr;
-      else if (attr->mq_maxmsg <= 0 || attr->mq_msgsize <= 0)
+      /* Check minimum and maximum values.  The max values are pretty much
+         arbitrary, taken from the linux mq_overview man page.  However,
+	 these max values make sure that the internal mq_fattr structure
+	 can use 32 bit types. */
+      else if (attr->mq_maxmsg <= 0 || attr->mq_maxmsg > 32768
+	       || attr->mq_msgsize <= 0 || attr->mq_msgsize > 1048576)
 	{
 	  set_errno (EINVAL);
 	  goto err;
@@ -481,6 +509,7 @@ again:
 		       hash_path_name (0,mqname),
 		       luid.HighPart, luid.LowPart);
       mqhdr->mqh_head = 0;
+      mqhdr->mqh_magic = MQI_MAGIC;
       index = sizeof (struct mq_hdr);
       mqhdr->mqh_free = index;
       for (i = 0; i < attr->mq_maxmsg - 1; i++)
@@ -555,6 +584,15 @@ exists:
   if (!(mqinfo = (struct mq_info *) calloc (1, sizeof (struct mq_info))))
     goto err;
   mqinfo->mqi_hdr = mqhdr = (struct mq_hdr *) mptr;
+  if (mqhdr->mqh_magic != MQI_MAGIC)
+    {
+      system_printf (
+"Old message queue \"%s\" detected!\n"
+"This file is not usable as message queue anymore due to changes in the "
+"internal file layout.  Please remove the file and try again.", mqname);
+      set_errno (EACCES);
+      goto err;
+    }
   mqinfo->mqi_magic = MQI_MAGIC;
   mqinfo->mqi_flags = nonblock;
 
@@ -603,7 +641,7 @@ mq_getattr (mqd_t mqd, struct mq_attr *mqstat)
 {
   int n;
   struct mq_hdr *mqhdr;
-  struct mq_attr *attr;
+  struct mq_fattr *attr;
   struct mq_info *mqinfo;
 
   myfault efault;
@@ -637,7 +675,7 @@ mq_setattr (mqd_t mqd, const struct mq_attr *mqstat, struct mq_attr *omqstat)
 {
   int n;
   struct mq_hdr *mqhdr;
-  struct mq_attr *attr;
+  struct mq_fattr *attr;
   struct mq_info *mqinfo;
 
   myfault efault;
@@ -733,7 +771,7 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
   int8_t *mptr;
   struct sigevent *sigev;
   struct mq_hdr *mqhdr;
-  struct mq_attr *attr;
+  struct mq_fattr *attr;
   struct msg_hdr *msghdr, *nmsghdr, *pmsghdr;
   struct mq_info *mqinfo;
 
@@ -866,7 +904,7 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
   int8_t *mptr;
   ssize_t len;
   struct mq_hdr *mqhdr;
-  struct mq_attr *attr;
+  struct mq_fattr *attr;
   struct msg_hdr *msghdr;
   struct mq_info *mqinfo;
 
@@ -963,7 +1001,7 @@ mq_close (mqd_t mqd)
 {
   long msgsize, filesize;
   struct mq_hdr *mqhdr;
-  struct mq_attr *attr;
+  struct mq_fattr *attr;
   struct mq_info *mqinfo;
 
   myfault efault;
@@ -1028,7 +1066,7 @@ sem_open (const char *name, int oflag, ...)
   va_list ap;
   mode_t mode = 0;
   unsigned int value = 0;
-  struct __stat64 statbuff;
+  struct stat statbuff;
   sem_t *sem = SEM_FAILED;
   sem_finfo sf;
   bool wasopen = false;
@@ -1150,7 +1188,7 @@ _sem_close (sem_t *sem, bool do_close)
   if (semaphore::getinternal (sem, &fd, &sf.hash, &sf.luid, &sf.value) == -1)
     return -1;
   if (!file.lock (fd, sizeof sf)
-      && lseek64 (fd, 0LL, SEEK_SET) != (_off64_t) -1
+      && lseek64 (fd, 0LL, SEEK_SET) != (off_t) -1
       && write (fd, &sf, sizeof sf) == sizeof sf)
     ret = do_close ? semaphore::close (sem) : 0;
 

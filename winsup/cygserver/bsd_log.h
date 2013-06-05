@@ -1,6 +1,6 @@
 /* bsd_log.h: Helps integrating BSD kernel code
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2003, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,7 +13,7 @@ details. */
 #include <sys/types.h>
 #include <sys/syslog.h>
 
-extern long log_level;
+extern int32_t log_level;
 extern tun_bool_t log_debug;
 extern tun_bool_t log_syslog;
 extern tun_bool_t log_stderr;

@@ -1,6 +1,6 @@
 /* automode.c
 
-   Copyright 2000, 2001, 2010 Red Hat, Inc.
+   Copyright 2000, 2001, 2010, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,7 +14,9 @@ details. */
 
 extern int _fmode;
 void
-cygwin_premain0 (int argc, char **argv, struct per_process *myself)
+cygwin_premain0 (int argc __attribute__ ((unused)),
+		 char **argv __attribute__ ((unused)),
+		 struct per_process *myself __attribute__ ((unused)))
 {
   static struct __cygwin_perfile pf[] =
   {

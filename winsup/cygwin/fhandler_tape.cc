@@ -53,7 +53,7 @@ details. */
 /* mtinfo_part */
 
 void
-mtinfo_part::initialize (long nblock)
+mtinfo_part::initialize (int32_t nblock)
 {
   block = nblock;
   if (block == 0)
@@ -182,7 +182,7 @@ mtinfo_drive::close (HANDLE mt, bool rewind)
 }
 
 int
-mtinfo_drive::read (HANDLE mt, HANDLE mt_evt, void *ptr, size_t &ulen)
+mtinfo_drive::read (HANDLE mt, LPOVERLAPPED pov, void *ptr, size_t &ulen)
 {
   BOOL ret;
   DWORD bytes_read = 0;
@@ -231,17 +231,17 @@ mtinfo_drive::read (HANDLE mt, HANDLE mt_evt, void *ptr, size_t &ulen)
   part (partition)->smark = false;
   if (auto_lock () && lock < auto_locked)
     prepare (mt, TAPE_LOCK, true);
-  ov.Offset = ov.OffsetHigh = 0;
-  ov.hEvent = mt_evt;
-  ret = ReadFile (mt, ptr, ulen, &bytes_read, &ov);
+  ov = pov;
+  ov->Offset = ov->OffsetHigh = 0;
+  ret = ReadFile (mt, ptr, ulen, &bytes_read, ov);
   lasterr = ret ? 0 : GetLastError ();
   if (lasterr == ERROR_IO_PENDING)
     lasterr = async_wait (mt, &bytes_read);
   ulen = (size_t) bytes_read;
   if (bytes_read > 0)
     {
-      long blocks_read = mp ()->BlockSize == 0
-			 ? 1 : howmany (bytes_read, mp ()->BlockSize);
+      int32_t blocks_read = mp ()->BlockSize == 0
+			    ? 1 : howmany (bytes_read, mp ()->BlockSize);
       block += blocks_read;
       part (partition)->block += blocks_read;
       if (part (partition)->fblock >= 0)
@@ -287,14 +287,14 @@ mtinfo_drive::async_wait (HANDLE mt, DWORD *bytes_written)
 {
   DWORD written;
 
-  bool ret = GetOverlappedResult (mt, &ov, &written, TRUE);
+  bool ret = GetOverlappedResult (mt, ov, &written, TRUE);
   if (bytes_written)
     *bytes_written = written;
   return ret ? 0 : GetLastError ();
 }
 
 int
-mtinfo_drive::write (HANDLE mt, HANDLE mt_evt, const void *ptr, size_t &len)
+mtinfo_drive::write (HANDLE mt, LPOVERLAPPED pov, const void *ptr, size_t &len)
 {
   BOOL ret;
   DWORD bytes_written = 0;
@@ -313,9 +313,9 @@ mtinfo_drive::write (HANDLE mt, HANDLE mt_evt, const void *ptr, size_t &len)
   part (partition)->smark = false;
   if (auto_lock () && lock < auto_locked)
     prepare (mt, TAPE_LOCK, true);
-  ov.Offset = ov.OffsetHigh = 0;
-  ov.hEvent = mt_evt;
-  ret = WriteFile (mt, ptr, len, &bytes_written, &ov);
+  ov = pov;
+  ov->Offset = ov->OffsetHigh = 0;
+  ret = WriteFile (mt, ptr, len, &bytes_written, ov);
   lasterr = ret ? 0: GetLastError ();
   if (lasterr == ERROR_IO_PENDING)
     {
@@ -328,8 +328,8 @@ mtinfo_drive::write (HANDLE mt, HANDLE mt_evt, const void *ptr, size_t &len)
   len = (size_t) bytes_written;
   if (bytes_written > 0)
     {
-      long blocks_written = mp ()->BlockSize == 0
-			 ? 1 : howmany (bytes_written, mp ()->BlockSize);
+      int32_t blocks_written = mp ()->BlockSize == 0
+			       ? 1 : howmany (bytes_written, mp ()->BlockSize);
       block += blocks_written;
       part (partition)->block += blocks_written;
       if (part (partition)->fblock >= 0)
@@ -353,7 +353,7 @@ mtinfo_drive::write (HANDLE mt, HANDLE mt_evt, const void *ptr, size_t &len)
 }
 
 int
-mtinfo_drive::get_pos (HANDLE mt, long *ppartition, long *pblock)
+mtinfo_drive::get_pos (HANDLE mt, int32_t *ppartition, int32_t *pblock)
 {
   DWORD p, low, high;
 
@@ -363,8 +363,8 @@ mtinfo_drive::get_pos (HANDLE mt, long *ppartition, long *pblock)
   if (!lasterr)
     {
       if (p > 0)
-	partition = (long) p - 1;
-      block = (long) low;
+	partition = (int32_t) p - 1;
+      block = (int32_t) low;
       if (ppartition)
 	*ppartition= partition;
       if (pblock)
@@ -379,7 +379,7 @@ mtinfo_drive::get_pos (HANDLE mt, long *ppartition, long *pblock)
 }
 
 int
-mtinfo_drive::_set_pos (HANDLE mt, int mode, long count, int partition,
+mtinfo_drive::_set_pos (HANDLE mt, int mode, int32_t count, int partition,
 			BOOL dont_wait)
 {
   /* If an async write is still pending, wait for completion. */
@@ -392,11 +392,11 @@ mtinfo_drive::_set_pos (HANDLE mt, int mode, long count, int partition,
 }
 
 int
-mtinfo_drive::set_pos (HANDLE mt, int mode, long count,
+mtinfo_drive::set_pos (HANDLE mt, int mode, int32_t count,
 		       bool sfm_func)
 {
   int err = 0;
-  long undone = count;
+  int32_t undone = count;
   BOOL dont_wait = FALSE;
 
   switch (mode)
@@ -547,7 +547,7 @@ out:
 }
 
 int
-mtinfo_drive::create_partitions (HANDLE mt, long count)
+mtinfo_drive::create_partitions (HANDLE mt, int32_t count)
 {
   if (dp ()->MaximumPartitionCount <= 1)
     return ERROR_INVALID_PARAMETER;
@@ -578,9 +578,9 @@ out:
 }
 
 int
-mtinfo_drive::set_partition (HANDLE mt, long count)
+mtinfo_drive::set_partition (HANDLE mt, int32_t count)
 {
-  if (count < 0 || (unsigned long) count >= MAX_PARTITION_NUM)
+  if (count < 0 || (uint32_t) count >= MAX_PARTITION_NUM)
     lasterr = ERROR_INVALID_PARAMETER;
   else if ((DWORD) count >= dp ()->MaximumPartitionCount)
     lasterr = ERROR_IO_DEVICE;
@@ -715,14 +715,14 @@ mtinfo_drive::prepare (HANDLE mt, int action, bool is_auto)
 }
 
 int
-mtinfo_drive::set_compression (HANDLE mt, long count)
+mtinfo_drive::set_compression (HANDLE mt, int32_t count)
 {
   if (!get_feature (TAPE_DRIVE_SET_COMPRESSION))
     return ERROR_INVALID_PARAMETER;
   TAPE_SET_DRIVE_PARAMETERS sdp =
     {
       dp ()->ECC,
-      count ? TRUE : FALSE,
+      (BOOLEAN) (count ? TRUE : FALSE),
       dp ()->DataPadding,
       dp ()->ReportSetmarks,
       dp ()->EOTWarningZoneSize
@@ -738,7 +738,7 @@ mtinfo_drive::set_compression (HANDLE mt, long count)
 }
 
 int
-mtinfo_drive::set_blocksize (HANDLE mt, long count)
+mtinfo_drive::set_blocksize (HANDLE mt, DWORD count)
 {
   TAPE_SET_MEDIA_PARAMETERS smp = {count};
   TAPE_FUNC (SetTapeParameters (mt, SET_TAPE_MEDIA_INFORMATION, &smp));
@@ -768,32 +768,29 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
     get->mt_dsreg = (dp ()->DefaultBlockSize << MT_ST_BLKSIZE_SHIFT)
 		    & MT_ST_BLKSIZE_MASK;
 
-  if (wincap.has_ioctl_storage_get_media_types_ex ())
+  DWORD size = sizeof (GET_MEDIA_TYPES) + 10 * sizeof (DEVICE_MEDIA_INFO);
+  void *buf = alloca (size);
+  if (DeviceIoControl (mt, IOCTL_STORAGE_GET_MEDIA_TYPES_EX,
+		       NULL, 0, buf, size, &size, NULL)
+      || GetLastError () == ERROR_MORE_DATA)
     {
-      DWORD size = sizeof (GET_MEDIA_TYPES) + 10 * sizeof (DEVICE_MEDIA_INFO);
-      void *buf = alloca (size);
-      if (DeviceIoControl (mt, IOCTL_STORAGE_GET_MEDIA_TYPES_EX,
-			   NULL, 0, buf, size, &size, NULL)
-	  || GetLastError () == ERROR_MORE_DATA)
+      PGET_MEDIA_TYPES gmt = (PGET_MEDIA_TYPES) buf;
+      for (DWORD i = 0; i < gmt->MediaInfoCount; ++i)
 	{
-	  PGET_MEDIA_TYPES gmt = (PGET_MEDIA_TYPES) buf;
-	  for (DWORD i = 0; i < gmt->MediaInfoCount; ++i)
-	    {
-	      PDEVICE_MEDIA_INFO dmi = &gmt->MediaInfo[i];
-	      get->mt_type = dmi->DeviceSpecific.TapeInfo.MediaType;
+	  PDEVICE_MEDIA_INFO dmi = &gmt->MediaInfo[i];
+	  get->mt_type = dmi->DeviceSpecific.TapeInfo.MediaType;
 #define TINFO DeviceSpecific.TapeInfo
-	      if (dmi->TINFO.MediaCharacteristics & MEDIA_CURRENTLY_MOUNTED)
-		{
-		  get->mt_type = dmi->DeviceSpecific.TapeInfo.MediaType;
-		  if (dmi->TINFO.BusType == BusTypeScsi)
-		    get->mt_dsreg |=
-		      (dmi->TINFO.BusSpecificData.ScsiInformation.DensityCode
-		       << MT_ST_DENSITY_SHIFT)
-		      & MT_ST_DENSITY_MASK;
-		  break;
-		}
-#undef TINFO
+	  if (dmi->TINFO.MediaCharacteristics & MEDIA_CURRENTLY_MOUNTED)
+	    {
+	      get->mt_type = dmi->DeviceSpecific.TapeInfo.MediaType;
+	      if (dmi->TINFO.BusType == BusTypeScsi)
+		get->mt_dsreg |=
+		  (dmi->TINFO.BusSpecificData.ScsiInformation.DensityCode
+		   << MT_ST_DENSITY_SHIFT)
+		  & MT_ST_DENSITY_MASK;
+	      break;
 	    }
+#undef TINFO
 	}
     }
 
@@ -870,9 +867,9 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
 }
 
 int
-mtinfo_drive::set_options (HANDLE mt, long options)
+mtinfo_drive::set_options (HANDLE mt, int32_t options)
 {
-  long what = (options & MT_ST_OPTIONS);
+  int32_t what = (options & MT_ST_OPTIONS);
   bool call_setparams = false;
   bool set;
   TAPE_SET_DRIVE_PARAMETERS sdp =
@@ -1234,13 +1231,13 @@ fhandler_dev_tape::close ()
       cret = fhandler_dev_raw::close ();
       unlock (0);
     }
-  if (mt_evt)
-    CloseHandle (mt_evt);
+  if (ov.hEvent)
+    CloseHandle (ov.hEvent);
   CloseHandle (mt_mtx);
   return ret ? -1 : cret;
 }
 
-void __stdcall
+void __reg3
 fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 {
   char *buf = (char *) ptr;
@@ -1267,7 +1264,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
       if (devbufend > devbufstart)
 	{
 	  bytes_to_read = MIN (len, devbufend - devbufstart);
-	  debug_printf ("read %d bytes from buffer (rest %d)",
+	  debug_printf ("read %lu bytes from buffer (rest %lu)",
 			bytes_to_read, devbufend - devbufstart - bytes_to_read);
 	  memcpy (buf, devbuf + devbufstart, bytes_to_read);
 	  len -= bytes_to_read;
@@ -1284,15 +1281,16 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	}
       if (len > 0)
 	{
-	  if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
+	  if (!ov.hEvent
+	      && !(ov.hEvent = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
 	    debug_printf ("Creating event failed, %E");
 	  size_t block_fit = !block_size ? len : rounddown(len,  block_size);
 	  if (block_fit)
 	    {
-	      debug_printf ("read %d bytes from tape (rest %d)",
+	      debug_printf ("read %lu bytes from tape (rest %lu)",
 			    block_fit, len - block_fit);
-	      ret = mt.drive (driveno ())->read (get_handle (), mt_evt, buf,
-						  block_fit);
+	      ret = mt.drive (driveno ())->read (get_handle (), &ov, buf,
+						 block_fit);
 	      if (ret)
 		__seterrno_from_win_error (ret);
 	      else if (block_fit)
@@ -1312,9 +1310,9 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	    }
 	  if (!ret && len > 0)
 	    {
-	      debug_printf ("read %d bytes from tape (one block)", block_size);
-	      ret = mt.drive (driveno ())->read (get_handle (), mt_evt, devbuf,
-						  block_size);
+	      debug_printf ("read %lu bytes from tape (one block)", block_size);
+	      ret = mt.drive (driveno ())->read (get_handle (), &ov, devbuf,
+						 block_size);
 	      if (ret)
 		__seterrno_from_win_error (ret);
 	      else if (block_size)
@@ -1331,40 +1329,40 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
     }
   else
     {
-      if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
+      if (!ov.hEvent
+	  && !(ov.hEvent = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
 	debug_printf ("Creating event failed, %E");
       bytes_read = ulen;
-      ret = mt.drive (driveno ())->read (get_handle (), mt_evt, ptr,
-					  bytes_read);
+      ret = mt.drive (driveno ())->read (get_handle (), &ov, ptr, bytes_read);
     }
   ulen = (ret ? (size_t) -1 : bytes_read);
   unlock ();
 }
 
-ssize_t __stdcall
+ssize_t __reg3
 fhandler_dev_tape::raw_write (const void *ptr, size_t len)
 {
   if (!_lock (true))
     return -1;
-  if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
+  if (!ov.hEvent && !(ov.hEvent = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
     debug_printf ("Creating event failed, %E");
-  int ret = mt.drive (driveno ())->write (get_handle (), mt_evt, ptr, len);
+  int ret = mt.drive (driveno ())->write (get_handle (), &ov, ptr, len);
   if (ret)
     __seterrno_from_win_error (ret);
   return unlock (ret ? -1 : (int) len);
 }
 
-_off64_t
-fhandler_dev_tape::lseek (_off64_t offset, int whence)
+off_t
+fhandler_dev_tape::lseek (off_t offset, int whence)
 {
   struct mtop op;
   struct mtpos pos;
   DWORD block_size;
-  _off64_t ret = ILLEGAL_SEEK;
+  off_t ret = ILLEGAL_SEEK;
 
   lock (ILLEGAL_SEEK);
 
-  debug_printf ("lseek (%s, %d, %d)", get_name (), offset, whence);
+  debug_printf ("lseek (%s, %D, %d)", get_name (), offset, whence);
 
   block_size = mt.drive (driveno ())->mp ()->BlockSize;
   if (block_size == 0)
@@ -1418,7 +1416,7 @@ out:
 }
 
 int __reg2
-fhandler_dev_tape::fstat (struct __stat64 *buf)
+fhandler_dev_tape::fstat (struct stat *buf)
 {
   int ret;
 
@@ -1441,19 +1439,19 @@ fhandler_dev_tape::dup (fhandler_base *child, int flags)
 			GetCurrentProcess (), &fh->mt_mtx,
 			0, TRUE, DUPLICATE_SAME_ACCESS))
     {
-      debug_printf ("dup(%s) failed, mutex handle %x, %E",
+      debug_printf ("dup(%s) failed, mutex handle %p, %E",
 		    get_name (), mt_mtx);
       __seterrno ();
       return unlock (-1);
     }
-  fh->mt_evt = NULL;
-  if (mt_evt &&
-      !DuplicateHandle (GetCurrentProcess (), mt_evt,
-			GetCurrentProcess (), &fh->mt_evt,
+  fh->ov.hEvent = NULL;
+  if (ov.hEvent &&
+      !DuplicateHandle (GetCurrentProcess (), ov.hEvent,
+			GetCurrentProcess (), &fh->ov.hEvent,
 			0, TRUE, DUPLICATE_SAME_ACCESS))
     {
-      debug_printf ("dup(%s) failed, event handle %x, %E",
-		    get_name (), mt_evt);
+      debug_printf ("dup(%s) failed, event handle %p, %E",
+		    get_name (), ov.hEvent);
       __seterrno ();
       return unlock (-1);
     }
@@ -1465,8 +1463,8 @@ fhandler_dev_tape::fixup_after_fork (HANDLE parent)
 {
   fhandler_dev_raw::fixup_after_fork (parent);
   fork_fixup (parent, mt_mtx, "mt_mtx");
-  if (mt_evt)
-    fork_fixup (parent, mt_evt, "mt_evt");
+  if (ov.hEvent)
+    fork_fixup (parent, ov.hEvent, "ov.hEvent");
 }
 
 void
@@ -1474,8 +1472,8 @@ fhandler_dev_tape::set_close_on_exec (bool val)
 {
   fhandler_dev_raw::set_close_on_exec (val);
   set_no_inheritance (mt_mtx, val);
-  if (mt_evt)
-    set_no_inheritance (mt_evt, val);
+  if (ov.hEvent)
+    set_no_inheritance (ov.hEvent, val);
 }
 
 int

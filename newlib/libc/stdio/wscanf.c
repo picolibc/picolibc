@@ -29,10 +29,11 @@ wscanf(_CONST wchar_t *fmt, ...)
 {
   int ret;
   va_list ap;
+  struct _reent *reent = _REENT;
 
-  _REENT_SMALL_CHECK_INIT (_REENT);
+  _REENT_SMALL_CHECK_INIT (reent);
   va_start (ap, fmt);
-  ret = _vfwscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
+  ret = _vfwscanf_r (reent, _stdin_r (reent), fmt, ap);
   va_end (ap);
   return ret;
 }

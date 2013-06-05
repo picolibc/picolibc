@@ -18,9 +18,10 @@ extern "C" {
 /*
  * Function to return a Win32 HANDLE from a fd.
  */
-extern long get_osfhandle(int);
-extern int setmode (int __fd, int __mode);
-int access(const char *__path, int __amode);
+extern long _get_osfhandle(int);
+#define get_osfhandle(i) _get_osfhandle(i)
+extern int _setmode (int __fd, int __mode);
+#define setmode(f,m) _setmode((f),(m))
 
 #ifdef __cplusplus
 };

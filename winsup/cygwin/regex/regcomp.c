@@ -63,8 +63,6 @@ __FBSDID("$FreeBSD: src/lib/libc/regex/regcomp.c,v 1.36 2007/06/11 03:05:54 delp
 #include "cname.h"
 
 #ifdef __CYGWIN__
-/* Don't pull in windows headers just for LCID. */
-typedef unsigned long LCID;
 /* These are defined in nlsfuncs.cc. */
 extern LCID collate_lcid;
 extern char collate_charset[];
@@ -1477,8 +1475,8 @@ static void
 findmust(struct parse *p, struct re_guts *g)
 {
 	sop *scan;
-	sop *start;
-	sop *newstart;
+	sop *start = NULL;
+	sop *newstart = NULL;
 	sopno newlen;
 	sop s;
 	char *cp;

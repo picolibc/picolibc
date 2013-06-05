@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="highlights"><title>Highlights of Cygwin Functionality</title>
+
+<sect2 id="ov-hi-intro"><title>Introduction</title> <para>When a binary linked
+against the library is executed, the Cygwin DLL is loaded into the
+application's text segment.  Because we are trying to emulate a UNIX kernel
+which needs access to all processes running under it, the first Cygwin DLL to
+run creates shared memory areas and global synchronization objects that other
+processes using separate instances of the DLL can access.  This is used to keep track of open file descriptors and to assist fork and exec, among other
+purposes.  Every process also has a per_process structure that contains
+information such as process id, user id, signal masks, and other similar
+process-specific information.</para>
+
+<para>The DLL is implemented as a standard DLL in the Win32 subsystem.  Under
+the hood it's using the Win32 API, as well as the native NT API, where
+appropriate.</para>
+
+<note><para>Some restrictions apply for calls to the Win32 API.
+For details, see <xref linkend="setup-env-win32"></xref>,
+as well as <xref linkend="pathnames-win32-api"></xref>.</para></note>
+
+<para>The native NT API is used mainly for speed, as well as to access
+NT capabilities which are useful to implement certain POSIX features, but
+are hidden to the Win32 API.
+</para>
+
+<para>Due to some restrictions in Windows, it's not always possible
+to strictly adhere to existing UNIX standards like POSIX.1.  Fortunately
+these are mostly corner cases.</para>
+
+<para>Note that many of the things that Cygwin does to provide POSIX
+compatibility do not mesh well with the native Windows API.  If you mix
+POSIX calls with Windows calls in your program it is possible that you
+will see uneven results.  In particular, Cygwin signals will not work
+with Windows functions which block and Windows functions which accept
+filenames may be confused by Cygwin's support for long filenames.</para>
+
+</sect2>
+
+<sect2 id="ov-hi-perm"><title>Permissions and Security</title>
+<para>Windows NT includes a sophisticated security model based on Access
+Control Lists (ACLs).  Cygwin maps Win32 file ownership and permissions to
+ACLs by default, on file systems supporting them (usually NTFS).  Solaris
+style ACLs and accompanying function calls are also supported.
+The chmod call maps UNIX-style permissions back to the Win32 equivalents. 
+Because many programs expect to be able to find the
+<filename>/etc/passwd</filename> and
+<filename>/etc/group</filename> files, we provide <ulink 
+url="http://cygwin.com/cygwin-ug-net/using-utils.html">utilities</ulink>
+that can be used to construct them from the user and group information
+provided by the operating system.</para>
+
+<para>Users with Administrator rights are permitted to chown files.
+With version 1.1.3 Cygwin introduced a mechanism for setting real and
+effective UIDs. This is described in <xref linkend="ntsec"></xref>.  As
+of version 1.5.13, the Cygwin developers are not aware of any feature in
+the Cygwin DLL that would allow users to gain privileges or to access
+objects to which they have no rights under Windows.  However there is no
+guarantee that Cygwin is as secure as the Windows it runs on. Cygwin
+processes share some variables and are thus easier targets of denial of
+service type of attacks.
+</para>
+
+</sect2>
+
+<sect2 id="ov-hi-files"><title>File Access</title> <para>Cygwin supports
+both POSIX- and Win32-style paths, using either forward or back slashes as the
+directory delimiter.  Paths coming into the DLL are translated from POSIX to
+native NT as needed.  From the application perspective, the file system is
+a POSIX-compliant one.  The implementation details are safely hidden in the
+Cygwin DLL.  UNC pathnames (starting with two slashes) are supported for
+network paths.</para>
+
+<para>Since version 1.7.0, the layout of this POSIX view of the Windows file
+system space is stored in the <filename>/etc/fstab</filename> file.  Actually,
+there is a system-wide <filename>/etc/fstab</filename> file as well as a
+user-specific fstab file <filename>/etc/fstab.d/${USER}</filename>.</para>
+
+<para>At startup the DLL has to find out where it can find the
+<filename>/etc/fstab</filename> file.  The mechanism used for this is simple.
+First it retrieves it's own path, for instance
+<filename>C:\Cygwin\bin\cygwin1.dll</filename>.  From there it deduces
+that the root path is <filename>C:\Cygwin</filename>.  So it looks for the
+<filename>fstab</filename> file in <filename>C:\Cygwin\etc\fstab</filename>. 
+The layout of this file is very similar to the layout of the
+<filename>fstab</filename> file on Linux.  Just instead of block devices,
+the mount points point to Win32 paths.  An installation with
+<command>setup.exe</command> installs a <filename>fstab</filename> file by
+default, which can easily be changed using the editor of your choice.</para>
+
+<para>The <filename>fstab</filename> file allows mounting arbitrary Win32
+paths into the POSIX file system space.  A special case is the so-called
+cygdrive prefix.
+It's the path under which every available drive in the system is mounted
+under its drive letter.  The default value is <filename>/cygdrive</filename>,
+so you can access the drives as <filename>/cygdrive/c</filename>,
+<filename>/cygdrive/d</filename>, etc...  The cygdrive prefix can be set to
+some other value (<filename>/mnt</filename> for instance) in the
+<filename>fstab</filename> file(s).</para>
+
+<para>The library exports several Cygwin-specific functions that can be used
+by external programs to convert a path or path list from Win32 to POSIX or vice
+versa.  Shell scripts and Makefiles cannot call these functions directly.
+Instead, they can do the same path translations by executing the
+<command>cygpath</command> utility program that we provide with Cygwin.</para>
+
+<para>Win32 applications handle filenames in a case preserving, but case
+insensitive manner.  Cygwin supports case sensitivity on file systems
+supporting that.  Since Windows XP, the OS only supports case
+sensitivity when a specific registry value is changed.  Therefore, case
+sensitivity is not usually the default.</para>
+
+<para>Cygwin supports creating and reading symbolic links, even on Windows
+filesystems and OS versions which don't support them.
+See <xref linkend="pathnames-symlinks"></xref> for details.</para>
+
+<para>Hard links are fully supported on NTFS and NFS file systems.  On FAT
+and other file systems which don't support hardlinks, the call returns with
+an error, just like on other POSIX systems.</para>
+
+<para>On file systems which don't support unique persistent file IDs (FAT,
+older Samba shares) the inode number for a file is calculated by hashing its
+full Win32 path.  The inode number generated by the stat call always matches
+the one returned in <literal>d_ino</literal> of the <literal>dirent</literal>
+structure.  It is worth noting that the number produced by this method is not
+guaranteed to be unique.  However, we have not found this to be a significant
+problem because of the low probability of generating a duplicate inode number.
+</para>
+
+<para>Cygwin 1.7 and later supports Extended Attributes (EAs) via the
+linux-specific function calls <function>getxattr</function>,
+<function>setxattr</function>, <function>listxattr</function>, and
+<function>removexattr</function>.  All EAs on Samba or NTFS are treated as
+user EAs, so, if the name of an EA is "foo" from the Windows perspective,
+it's transformed into "user.foo" within Cygwin.  This allows Linux-compatible
+EA operations and keeps tools like <command>attr</command>, or
+<command>setfattr</command> happy.
+</para>
+
+<para><function>chroot</function> is supported since Cygwin 1.1.3.
+However, chroot is not a concept known by Windows.  This implies some serious
+restrictions.  First of all, the <function>chroot</function> call isn't a
+privileged call.  Any user may call it.  Second, the chroot environment
+isn't safe against native windows processes.  Given that, chroot in Cygwin
+is only a hack which pretends security where there is none.  For that reason
+the usage of chroot is discouraged.
+</para>
+</sect2>
+
+<sect2 id="ov-hi-textvsbinary"><title>Text Mode vs. Binary Mode</title>
+<para>It is often important that files created by native Windows
+applications be interoperable with Cygwin applications.  For example, a
+file created by a native Windows text editor should be readable by a
+Cygwin application, and vice versa.</para>
+
+<para>Unfortunately, UNIX and Win32 have different end-of-line
+conventions in text files.  A UNIX text file will have a single newline
+character (LF) whereas a Win32 text file will instead use a two
+character sequence (CR+LF).  Consequently, the two character sequence
+must be translated on the fly by Cygwin into a single character newline
+when reading in text mode.</para>
+
+<para>This solution addresses the newline interoperability concern at
+the expense of violating the POSIX requirement that text and binary mode
+be identical.  Consequently, processes that attempt to lseek through
+text files can no longer rely on the number of bytes read to be an
+accurate indicator of position within the file.  For this reason, Cygwin
+allows you to choose the mode in which a file is read in several ways.</para>
+</sect2>
+
+<sect2 id="ov-hi-ansiclib"><title>ANSI C Library</title>
+<para>We chose to include Red Hat's own existing ANSI C library
+"newlib" as part of the library, rather than write all of the lib C
+and math calls from scratch.  Newlib is a BSD-derived ANSI C library,
+previously only used by cross-compilers for embedded systems
+development.  Other functions, which are not supported by newlib have
+been added to the Cygwin sources using BSD implementations as much as
+possible.</para>
+
+<para>The reuse of existing free implementations of such things
+as the glob, regexp, and getopt libraries saved us considerable
+effort.  In addition, Cygwin uses Doug Lea's free malloc
+implementation that successfully balances speed and compactness.  The
+library accesses the malloc calls via an exported function pointer.
+This makes it possible for a Cygwin process to provide its own
+malloc if it so desires.</para>
+</sect2>
+
+<sect2 id="ov-hi-process"><title>Process Creation</title>
+<para>The <function>fork</function> call in Cygwin is particularly interesting
+because it does not map well on top of the Win32 API.  This makes it very
+difficult to implement correctly.  Currently, the Cygwin fork is a
+non-copy-on-write implementation similar to what was present in early
+flavors of UNIX.</para>
+
+<para>The first thing that happens when a parent process
+forks a child process is that the parent initializes a space in the
+Cygwin process table for the child.  It then creates a suspended
+child process using the Win32 CreateProcess call.  Next, the parent
+process calls setjmp to save its own context and sets a pointer to
+this in a Cygwin shared memory area (shared among all Cygwin
+tasks).  It then fills in the child's .data and .bss sections by
+copying from its own address space into the suspended child's address
+space.  After the child's address space is initialized, the child is
+run while the parent waits on a mutex.  The child discovers it has
+been forked and longjumps using the saved jump buffer.  The child then
+sets the mutex the parent is waiting on and blocks on another mutex.
+This is the signal for the parent to copy its stack and heap into the
+child, after which it releases the mutex the child is waiting on and
+returns from the fork call.  Finally, the child wakes from blocking on
+the last mutex, recreates any memory-mapped areas passed to it via the
+shared area, and returns from fork itself.</para>
+
+<para>While we have some
+ideas as to how to speed up our fork implementation by reducing the
+number of context switches between the parent and child process, fork
+will almost certainly always be inefficient under Win32.  Fortunately,
+in most circumstances the spawn family of calls provided by Cygwin
+can be substituted for a fork/exec pair with only a little effort.
+These calls map cleanly on top of the Win32 API.  As a result, they
+are much more efficient.  Changing the compiler's driver program to
+call spawn instead of fork was a trivial change and increased
+compilation speeds by twenty to thirty percent in our
+tests.</para>
+
+<para>However, spawn and exec present their own set of
+difficulties.  Because there is no way to do an actual exec under
+Win32, Cygwin has to invent its own Process IDs (PIDs).  As a
+result, when a process performs multiple exec calls, there will be
+multiple Windows PIDs associated with a single Cygwin PID.  In some
+cases, stubs of each of these Win32 processes may linger, waiting for
+their exec'd Cygwin process to exit.</para>
+</sect2>
+
+<sect3 id='ov-hi-process-problems'>
+<title>Problems with process creation</title>
+
+<para>The semantics of <literal>fork</literal> require that a forked
+child process have <emphasis>exactly</emphasis> the same address
+space layout as its parent. However, Windows provides no native
+support for cloning address space between processes and several
+features actively undermine a reliable <literal>fork</literal>
+implementation. Three issues are especially prevalent:</para>
+
+<para><itemizedlist>
+<listitem>DLL base address collisions. Unlike *nix shared
+libraries, which use "position-independent code", Windows shared
+libraries assume a fixed base address. Whenever the hard-wired
+address ranges of two DLLs collide (which occurs quite often), the
+Windows loader must "rebase" one of them to a different
+address. However, it may not resolve collisions consistently, and
+may rebase a different dll and/or move it to a different address
+every time. Cygwin can usually compensate for this effect when it
+involves libraries opened dynamically, but collisions among
+statically-linked dlls (dependencies known at compile time) are
+resolved before <literal>cygwin1.dll</literal> initializes and
+cannot be fixed afterward. This problem can only be solved by
+removing the base address conflicts which cause the problem,
+usually using the <literal>rebaseall</literal> tool.</listitem>
+
+<listitem>Address space layout randomization (ASLR). Starting with
+Vista, Windows implements ASLR, which means that thread stacks,
+heap, memory-mapped files, and statically-linked dlls are placed
+at different (random) locations in each process. This behaviour
+interferes with a proper <literal>fork</literal>, and if an
+unmovable object (process heap or system dll) ends up at the wrong
+location, Cygwin can do nothing to compensate (though it will
+retry a few times automatically).</listitem>
+
+<listitem>DLL injection by
+<ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda">
+BLODA</ulink>. Badly-behaved applications which
+inject dlls into other processes often manage to clobber important
+sections of the child's address space, leading to base address
+collisions which rebasing cannot fix. The only way to resolve this
+problem is to remove (usually uninstall) the offending app.  See
+<xref linkend="cygwinenv-implemented-options"></xref> for the
+<literal>detect_bloda</literal> option, which may be able to identify the
+BLODA.</listitem></itemizedlist></para>
+
+<para>In summary, current Windows implementations make it
+impossible to implement a perfectly reliable fork, and occasional
+fork failures are inevitable.
+</para>
+
+</sect3>
+
+<sect2 id="ov-hi-signals"><title>Signals</title>
+<para>When
+a Cygwin process starts, the library starts a secondary thread for
+use in signal handling.  This thread waits for Windows events used to
+pass signals to the process.  When a process notices it has a signal,
+it scans its signal bitmask and handles the signal in the appropriate
+fashion.</para>
+
+<para>Several complications in the implementation arise from the
+fact that the signal handler operates in the same address space as the
+executing program.  The immediate consequence is that Cygwin system
+functions are interruptible unless special care is taken to avoid
+this.   We go to some lengths to prevent the sig_send function that
+sends signals from being interrupted.  In the case of a process
+sending a signal to another process, we place a mutex around sig_send
+such that sig_send will not be interrupted until it has completely
+finished sending the signal.</para>
+
+<para>In the case of a process sending
+itself a signal, we use a separate semaphore/event pair instead of the
+mutex.  sig_send starts by resetting the event and incrementing the
+semaphore that flags the signal handler to process the signal.  After
+the signal is processed, the signal handler signals the event that it
+is done.  This process keeps intraprocess signals synchronous, as
+required by POSIX.</para>
+
+<para>Most standard UNIX signals are provided.  Job
+control works as expected in shells that support
+it.</para>
+</sect2>
+
+<sect2 id="ov-hi-sockets"><title>Sockets</title>
+<para>Socket-related calls in Cygwin basically call the functions by the
+same name in Winsock, Microsoft's implementation of Berkeley sockets, but
+with lots of tweaks.  All sockets are non-blocking under the hood to allow
+to interrupt blocking calls by POSIX signals.  Additional bookkeeping is
+necessary to implement correct socket sharing POSIX semantics and especially
+for the select call.  Some socket-related functions are not implemented at
+all in Winsock, as, for example, socketpair.  Starting with Windows Vista,
+Microsoft removed the legacy calls <function>rcmd(3)</function>,
+<function>rexec(3)</function> and <function>rresvport(3)</function>.
+Recent versions of Cygwin now implement all these calls internally.</para>
+
+<para>An especially troublesome feature of Winsock is that it must be
+initialized before the first socket function is called.  As a result, Cygwin
+has to perform this initialization on the fly, as soon as the first
+socket-related function is called by the application.  In order to support
+sockets across fork calls, child processes initialize Winsock if any
+inherited file descriptor is a socket.</para>
+
+<para>AF_UNIX (AF_LOCAL) sockets are not available in Winsock.  They are
+implemented in Cygwin by using local AF_INET sockets instead.  This is
+completely transparent to the application.  Cygwin's implementation also
+supports the getpeereid BSD extension.  However, Cygwin does not yet support
+descriptor passing.</para>
+
+<para>IPv6 is supported beginning with Cygwin release 1.7.0.  This
+support is dependent, however, on the availability of the Windows IPv6
+stack.  The IPv6 stack was "experimental", i.e. not feature complete in
+Windows 2003 and earlier.  Full IPv6 support became available starting
+with Windows Vista and Windows Server 2008.  Cygwin does not depend on
+the underlying OS for the (newly implemented) <function>getaddrinfo</function>
+and <function>getnameinfo</function> functions.  Cygwin 1.7.0 adds
+replacement functions which implement the full functionality for IPv4.</para>
+
+</sect2>
+
+<sect2 id="ov-hi-select"><title>Select</title>
+<para>The UNIX <function>select</function> function is another
+call that does not map cleanly on top of the Win32 API.  Much to our
+dismay, we discovered that the Win32 select in Winsock only worked on
+socket handles.  Our implementation allows select to function normally
+when given different types of file descriptors (sockets, pipes,
+handles, and a custom /dev/windows Windows messages
+pseudo-device).</para>
+
+<para>Upon entry into the select function, the first
+operation is to sort the file descriptors into the different types.
+There are then two cases to consider.  The simple case is when at
+least one file descriptor is a type that is always known to be ready
+(such as a disk file).  In that case, select returns immediately as
+soon as it has polled each of the other types to see if they are
+ready.  The more complex case involves waiting for socket or pipe file
+descriptors to be ready.  This is accomplished by the main thread
+suspending itself, after starting one thread for each type of file
+descriptor present.  Each thread polls the file descriptors of its
+respective type with the appropriate Win32 API call.  As soon as a
+thread identifies a ready descriptor, that thread signals the main
+thread to wake up.  This case is now the same as the first one since
+we know at least one descriptor is ready.  So select returns, after
+polling all of the file descriptors one last time.</para>
+</sect2>
+</sect1>
+

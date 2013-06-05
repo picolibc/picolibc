@@ -1,6 +1,6 @@
 /* Opcode table for the TI MSP430 microcontrollers
 
-   Copyright 2002, 2004, 2010 Free Software Foundation, Inc.
+   Copyright 2002-2013 Free Software Foundation, Inc.
    Contributed by Dmitry Diky <diwil@mail.ru>
    
    This program is free software; you can redistribute it and/or modify
@@ -118,6 +118,74 @@ static struct msp430_opcode_s msp430_opcodes[] =
   MSP_INSN (bgtu,  5, 1, 0, 0xffff),
   MSP_INSN (bleu,  5, 2, 0, 0xffff),
   MSP_INSN (ble,   5, 3, 0, 0xffff),
+
+  /* MSP430X instructions - these ones use an extension word.
+     A negative format indicates an MSP430X instruction.  */
+  MSP_INSN (addcx, -2, 2, 0x6000, 0xf000),
+  MSP_INSN (addx,  -2, 2, 0x5000, 0xf000),
+  MSP_INSN (andx,  -2, 2, 0xf000, 0xf000),
+  MSP_INSN (bicx,  -2, 2, 0xc000, 0xf000),
+  MSP_INSN (bisx,  -2, 2, 0xd000, 0xf000),
+  MSP_INSN (bitx,  -2, 2, 0xb000, 0xf000),
+  MSP_INSN (cmpx,  -2, 2, 0x9000, 0xf000),
+  MSP_INSN (daddx, -2, 2, 0xa000, 0xf000),
+  MSP_INSN (movx,  -2, 2, 0x4000, 0xf000),
+  MSP_INSN (subcx, -2, 2, 0x7000, 0xf000),
+  MSP_INSN (subx,  -2, 2, 0x8000, 0xf000),
+  MSP_INSN (xorx,  -2, 2, 0xe000, 0xf000),
+
+  /* MSP430X Synthetic instructions.  */
+  MSP_INSN (adcx,  -1, 1, 0x6300, 0xff30),
+  MSP_INSN (clra,  -1, 1, 0x4300, 0xff30),
+  MSP_INSN (clrx,  -1, 1, 0x4300, 0xff30),
+  MSP_INSN (dadcx, -1, 1, 0xa300, 0xff30),
+  MSP_INSN (decx,  -1, 1, 0x8310, 0xff30),  
+  MSP_INSN (decda, -1, 1, 0x8320, 0xff30),
+  MSP_INSN (decdx, -1, 1, 0x8320, 0xff30),
+  MSP_INSN (incx,  -1, 1, 0x5310, 0xff30),  
+  MSP_INSN (incda, -1, 1, 0x5320, 0xff30),
+  MSP_INSN (incdx, -1, 1, 0x5320, 0xff30),
+  MSP_INSN (invx,  -1, 1, 0xe330, 0xfff0),
+  MSP_INSN (popx,  -1, 1, 0x4130, 0xff30),
+  MSP_INSN (rlax,  -1, 2, 0x5000, 0xf000),  
+  MSP_INSN (rlcx,  -1, 2, 0x6000, 0xf000),
+  MSP_INSN (sbcx,  -1, 1, 0x7300, 0xff30),
+  MSP_INSN (tsta,  -1, 1, 0x9300, 0xff30),
+  MSP_INSN (tstx,  -1, 1, 0x9300, 0xff30),
+
+  MSP_INSN (pushx, -3, 1, 0x1200, 0xff80),
+  MSP_INSN (rrax,  -3, 1, 0x1100, 0xff80),
+  MSP_INSN (rrcx,  -3, 1, 0x1000, 0xff80),
+  MSP_INSN (swpbx, -3, 1, 0x1080, 0xffc0),
+  MSP_INSN (sxtx,  -3, 1, 0x1180, 0xffc0),
+
+  /* MSP430X Address instructions - no extension word needed.
+     The insn_opnumb field is used to encode the nature of the
+     instruction for assembly and disassembly purposes.  */
+  MSP_INSN (calla, -1, 4, 0x1300, 0xff00),
+
+  MSP_INSN (popm,  -1, 5, 0x1600, 0xfe00),
+  MSP_INSN (pushm, -1, 5, 0x1400, 0xfe00),
+
+  MSP_INSN (rrcm,  -1, 6, 0x0040, 0xf3e0),
+  MSP_INSN (rram,  -1, 6, 0x0140, 0xf3e0),
+  MSP_INSN (rlam,  -1, 6, 0x0240, 0xf3e0),
+  MSP_INSN (rrum,  -1, 6, 0x0340, 0xf3e0),
+
+  MSP_INSN (rrux,  -1, 7, 0x0340, 0xffe0), /* Synthesized in terms of RRUM.  */
+
+  MSP_INSN (adda,  -1, 8, 0x00a0, 0xf0b0),
+  MSP_INSN (cmpa,  -1, 8, 0x0090, 0xf0b0),
+  MSP_INSN (suba,  -1, 8, 0x00b0, 0xf0b0),
+
+  MSP_INSN (reta,  -1, 9, 0x0110, 0xffff),
+  MSP_INSN (bra,   -1, 9, 0x0000, 0xf0cf),
+  MSP_INSN (mova,  -1, 9, 0x0000, 0xf080),
+  MSP_INSN (mova,  -1, 9, 0x0080, 0xf0b0),
+  MSP_INSN (mova,  -1, 9, 0x00c0, 0xf0f0),
+
+  /* Pseudo instruction to set the repeat field in the extension word.  */
+  MSP_INSN (rpt,   -1, 10, 0x0000, 0x0000),
 
   /* End of instruction set.  */
   { NULL, 0, 0, 0, 0 }

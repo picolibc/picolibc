@@ -1,6 +1,6 @@
 /* sys/sem.h
 
-   Copyright 2002 Red Hat Inc.
+   Copyright 2002, 2012, 2013 Red Hat Inc.
    Written by Conrad Scott <conrad.scott@dsl.pipex.com>
 
 This file is part of Cygwin.
@@ -67,23 +67,23 @@ struct sembuf
  */
 struct seminfo
 {
-  long semmni;		/* Maximum number of unique semaphore
+  int32_t semmni;	/* Maximum number of unique semaphore
 			   sets, system wide. */
-  long semmns;		/* Maximum number of semaphores,
+  int32_t semmns;	/* Maximum number of semaphores,
 			   system wide. */
-  long semmsl;		/* Maximum number of semaphores per
+  int32_t semmsl;	/* Maximum number of semaphores per
 			   semaphore set. */
-  long semopm;		/* Maximum number of operations per
+  int32_t semopm;	/* Maximum number of operations per
 			   semop call. */
-  long semmnu;		/* Maximum number of undo structures,
+  int32_t semmnu;	/* Maximum number of undo structures,
 			   system wide. */
-  long semume;		/* Maximum number of undo entries per
+  int32_t semume;	/* Maximum number of undo entries per
 			   undo structure. */
-  long semvmx;		/* Maximum semaphore value. */
-  long semaem;		/* Maximum adjust-on-exit value. */
-  long semmap;		/* # of entries in semaphore map */
-  long semusz;		/* size in bytes of undo structure */
-  long sem_spare[2];
+  int32_t semvmx;	/* Maximum semaphore value. */
+  int32_t semaem;	/* Maximum adjust-on-exit value. */
+  int32_t semmap;	/* # of entries in semaphore map */
+  int32_t semusz;	/* size in bytes of undo structure */
+  int32_t sem_spare[2];
 };
 
 /* Buffer type for semctl (SEM_INFO, ...) as used by ipcs(8).

@@ -190,7 +190,7 @@ print_version ()
 }
 
 void
-Fail (DWORD rv)
+Fail (unsigned int rv)
 {
   char *buf;
   if (!quiet)
@@ -198,7 +198,7 @@ Fail (DWORD rv)
       FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER
 		     | FORMAT_MESSAGE_FROM_SYSTEM,
 		     0, rv, 0, (CHAR *) & buf, 0, 0);
-      fprintf (stderr, "Error (%ld): %s\n", rv, buf);
+      fprintf (stderr, "Error (%d): %s\n", rv, buf);
       LocalFree (buf);
     }
   exit (1);
@@ -512,8 +512,8 @@ cmd_list ()
 		printf ("\n");
 		break;
 	      case REG_DWORD:
-		printf ("0x%08lx (%lu)\n", *(DWORD *) value_data,
-			*(DWORD *) value_data);
+		printf ("0x%08x (%u)\n", *(unsigned int *) value_data,
+			*(unsigned int *) value_data);
 		break;
 	      case REG_DWORD_BIG_ENDIAN:
 		v = ((value_data[0] << 24)
@@ -773,14 +773,14 @@ cmd_get ()
 	fwrite (data, dsize, 1, stdout);
 	break;
       case REG_DWORD:
-	printf (hex ? "0x%08lx\n" : "%lu\n", *(DWORD *) data);
+	printf (hex ? "0x%08x\n" : "%u\n", *(unsigned int *) data);
 	break;
       case REG_DWORD_BIG_ENDIAN:
 	rv = ((data[0] << 24)
 	      | (data[1] << 16)
 	      | (data[2] << 8)
 	      | (data[3]));
-	printf (hex ? "0x%08lx\n" : "%lu\n", rv);
+	printf (hex ? "0x%08x\n" : "%u\n", (unsigned int) rv);
 	break;
       case REG_QWORD:
 	printf (hex ? "0x%016llx\n" : "%llu\n", *(unsigned long long *) data);

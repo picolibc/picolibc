@@ -29,8 +29,8 @@ details. */
  * the bottom 16 bits are the absolute position and the top 15 bits
  * make up the value index if we are enuerating values.
  */
-static const _off_t REG_ENUM_VALUES_MASK = 0x8000000;
-static const _off_t REG_POSITION_MASK = 0xffff;
+static const __int32_t REG_ENUM_VALUES_MASK = 0x8000000;
+static const __int32_t REG_POSITION_MASK = 0xffff;
 
 /* These key paths are used below whenever we return key information.
    The problem is UAC virtualization when running an admin account with
@@ -59,7 +59,7 @@ static const char *registry_listing[] =
   "HKEY_CURRENT_USER",
   "HKEY_LOCAL_MACHINE",
   "HKEY_USERS",
-  "HKEY_PERFORMANCE_DATA",	// NT/2000/XP
+  "HKEY_PERFORMANCE_DATA",
   NULL
 };
 
@@ -462,7 +462,7 @@ fhandler_proc ()
 }
 
 int __reg2
-fhandler_registry::fstat (struct __stat64 *buf)
+fhandler_registry::fstat (struct stat *buf)
 {
   fhandler_base::fstat (buf);
   buf->st_mode &= ~_IFMT & NO_W;
@@ -551,8 +551,8 @@ fhandler_registry::fstat (struct __stat64 *buf)
 		  else
 		    buf->st_size = dwSize;
 		}
-	      __uid32_t uid;
-	      __gid32_t gid;
+	      uid_t uid;
+	      gid_t gid;
 	      if (get_reg_attribute (hKey, &buf->st_mode, &uid, &gid) == 0)
 		{
 		  buf->st_uid = uid;
@@ -616,7 +616,7 @@ fhandler_registry::readdir (DIR *dir, dirent *de)
       dir->__handle = open_key (path + 1, KEY_READ, wow64, false);
       if (dir->__handle == INVALID_HANDLE_VALUE)
 	goto out;
-      dir->__d_internal = (unsigned) new __DIR_hash ();
+      dir->__d_internal = (uintptr_t) new __DIR_hash ();
     }
   if (dir->__d_position < SPECIAL_DOT_FILE_COUNT)
     {
@@ -893,7 +893,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_registry::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_registry::open(%p, 0%o)", res, flags, mode);
   return res;
 }
 

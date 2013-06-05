@@ -1,6 +1,6 @@
 /* process.h
 
-   Copyright 2001, 2002, 2003, 2004, 2005 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2012 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -103,7 +103,7 @@ private:
   const DWORD _winpid;
   HANDLE _hProcess;
   HANDLE _signal_arrived;
-  long _cleaning_up;
+  LONG _cleaning_up;
   DWORD _exit_status;		// Set in the constructor and in exit_code ().
   cleanup_routine *_routines_head;
   /* used to prevent races-on-delete */

@@ -55,6 +55,13 @@
 #if defined (__thumb__)
         .thumb
         .thumb_func
+#if !defined (__thumb2__)
+	/* If we have thumb1 only, we need to explictly mark the
+	   compatibility.  */
+	.arch armv4t
+	.eabi_attribute Tag_also_compatible_with, "\006\013"  /* v6-M.  */
+	.eabi_attribute Tag_ARM_ISA_use, 0
+#endif
 #endif
         .global strcmp
         .type   strcmp, %function

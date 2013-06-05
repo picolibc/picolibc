@@ -1,7 +1,7 @@
 /* sys/cygwin.h
 
    Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,6 +14,7 @@ details. */
 
 #include <sys/types.h>
 #include <limits.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,8 +22,9 @@ extern "C" {
 
 #define _CYGWIN_SIGNAL_STRING "cYgSiGw00f"
 
+#ifndef __x86_64__
 /* DEPRECATED INTERFACES.  These are restricted to MAX_PATH length.
-   Don't use in modern applications. */
+   Don't use in modern applications.  They don't exist on x86_64. */
 extern int cygwin_win32_to_posix_path_list (const char *, char *)
   __attribute__ ((deprecated));
 extern int cygwin_win32_to_posix_path_list_buf_size (const char *)
@@ -39,6 +41,7 @@ extern int cygwin_conv_to_posix_path (const char *, char *)
   __attribute__ ((deprecated));
 extern int cygwin_conv_to_full_posix_path (const char *, char *)
   __attribute__ ((deprecated));
+#endif /* !__x86_64__ */
 
 /* Use these interfaces in favor of the above. */
 
@@ -200,7 +203,7 @@ CW_TOKEN_RESTRICTED    = 1
 };
 
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */
-unsigned long cygwin_internal (cygwin_getinfo_types, ...);
+uintptr_t cygwin_internal (cygwin_getinfo_types, ...);
 
 /* Flags associated with process_state */
 enum
@@ -255,12 +258,14 @@ struct per_process
 
   /* The offset of these 3 values can never change. */
   /* magic_biscuit is the size of this class and should never change. */
-  unsigned long magic_biscuit;
-  unsigned long dll_major;
-  unsigned long dll_minor;
+  uint32_t magic_biscuit;
+  uint32_t dll_major;
+  uint32_t dll_minor;
 
   struct _reent **impure_ptr_ptr;
+#ifndef __x86_64__
   char ***envptr;
+#endif
 
   /* Used to point to the memory machine we should use.  Usually these
      point back into the dll, but they can be overridden by the user. */
@@ -284,10 +289,10 @@ struct per_process
   /* For future expansion of values set by the app. */
   void (*premain[4]) (int, char **, struct per_process *);
 
-  /* non-zero of ctors have been run.  Inherited from parent. */
-  int run_ctors_p;
+  /* non-zero if ctors have been run.  Inherited from parent. */
+  int32_t run_ctors_p;
 
-  DWORD unused[7];
+  DWORD_PTR unused[7];
 
   /* Pointers to real operator new/delete functions for forwarding.  */
   struct per_process_cxx_malloc *cxx_malloc;
@@ -298,7 +303,11 @@ struct per_process
   DWORD api_minor;		/*  linked with */
   /* For future expansion, so apps won't have to be relinked if we
      add an item. */
-  DWORD unused2[3];
+#ifdef __x86_64__
+  DWORD_PTR unused2[5];
+#else
+  DWORD_PTR unused2[3];
+#endif
   void *pseudo_reloc_start;
   void *pseudo_reloc_end;
   void *image_base;
@@ -310,7 +319,7 @@ struct per_process
 #endif
   struct _reent *impure_ptr;
 };
-#define per_process_overwrite ((unsigned) &(((struct per_process *) NULL)->threadinterface))
+#define per_process_overwrite offsetof (struct per_process, threadinterface)
 
 #ifdef _PATH_PASSWD
 extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
@@ -335,11 +344,11 @@ extern void cygwin_premain3 (int, char **, struct per_process *);
 #define EXTERNAL_PINFO_VERSION_32_LP  2
 #define EXTERNAL_PINFO_VERSION EXTERNAL_PINFO_VERSION_32_LP
 
-#ifndef _SYS_TYPES_H
-typedef unsigned short __uid16_t;
-typedef unsigned short __gid16_t;
-typedef unsigned long __uid32_t;
-typedef unsigned long __gid32_t;
+#ifndef __uid_t_defined
+typedef __uint16_t __uid16_t;
+typedef __uint16_t __gid16_t;
+typedef __uint32_t uid_t;
+typedef __uint32_t gid_t;
 #endif
 
 struct external_pinfo
@@ -367,8 +376,8 @@ struct external_pinfo
   DWORD process_state;
 
   /* Only available if version >= EXTERNAL_PINFO_VERSION_32_BIT */
-  __uid32_t uid32;
-  __gid32_t gid32;
+  uid_t uid32;
+  gid_t gid32;
 
   /* Only available if version >= EXTERNAL_PINFO_VERSION_32_LP */
   char *progname_long;

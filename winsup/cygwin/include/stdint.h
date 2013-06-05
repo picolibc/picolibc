@@ -11,6 +11,8 @@ details. */
 #ifndef _STDINT_H
 #define _STDINT_H
 
+#include <bits/wordsize.h>
+
 /* Exact-width integer types */
 
 #ifndef __int8_t_defined
@@ -18,7 +20,7 @@ details. */
 typedef signed char int8_t;
 typedef short int16_t;
 typedef int int32_t;
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef long int64_t;
 #else
 typedef long long int64_t;
@@ -31,7 +33,7 @@ typedef unsigned short uint16_t;
 #define __uint32_t_defined
 typedef unsigned int uint32_t;
 #endif
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef unsigned long uint64_t;
 #else
 typedef unsigned long long uint64_t;
@@ -42,7 +44,7 @@ typedef unsigned long long uint64_t;
 typedef signed char int_least8_t;
 typedef short int_least16_t;
 typedef int int_least32_t;
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef long int_least64_t;
 #else
 typedef long long int_least64_t;
@@ -51,7 +53,7 @@ typedef long long int_least64_t;
 typedef unsigned char uint_least8_t;
 typedef unsigned short uint_least16_t;
 typedef unsigned int uint_least32_t;
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef unsigned long uint_least64_t;
 #else
 typedef unsigned long long uint_least64_t;
@@ -60,7 +62,7 @@ typedef unsigned long long uint_least64_t;
 /* Fastest minimum-width integer types */
 
 typedef signed char int_fast8_t;
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef long int_fast16_t;
 typedef long int_fast32_t;
 typedef long int_fast64_t;
@@ -71,7 +73,7 @@ typedef long long int_fast64_t;
 #endif
 
 typedef unsigned char uint_fast8_t;
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef unsigned long uint_fast16_t;
 typedef unsigned long uint_fast32_t;
 typedef unsigned long uint_fast64_t;
@@ -85,13 +87,13 @@ typedef unsigned long long uint_fast64_t;
 
 #ifndef __intptr_t_defined
 #define __intptr_t_defined
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef long intptr_t;
 #else
 typedef int intptr_t;
 #endif
 #endif
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef unsigned long uintptr_t;
 #else
 typedef unsigned int uintptr_t;
@@ -99,7 +101,7 @@ typedef unsigned int uintptr_t;
 
 /* Greatest-width integer types */
 
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 typedef long intmax_t;
 typedef unsigned long uintmax_t;
 #else
@@ -157,7 +159,7 @@ typedef unsigned long long uintmax_t;
 /* Limits of fastest minimum-width integer types */
 
 #define INT_FAST8_MIN (-128)
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define INT_FAST16_MIN (-__I64(9223372036854775807) - 1)
 #define INT_FAST32_MIN (-__I64(9223372036854775807) - 1)
 #else
@@ -167,7 +169,7 @@ typedef unsigned long long uintmax_t;
 #define INT_FAST64_MIN (-__I64(9223372036854775807) - 1)
 
 #define INT_FAST8_MAX (127)
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define INT_FAST16_MAX (__I64(9223372036854775807))
 #define INT_FAST32_MAX (__I64(9223372036854775807))
 #else
@@ -177,7 +179,7 @@ typedef unsigned long long uintmax_t;
 #define INT_FAST64_MAX (__I64(9223372036854775807))
 
 #define UINT_FAST8_MAX (255)
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define UINT_FAST16_MAX (__U64(18446744073709551615))
 #define UINT_FAST32_MAX (__U64(18446744073709551615))
 #else
@@ -188,9 +190,9 @@ typedef unsigned long long uintmax_t;
 
 /* Limits of integer types capable of holding object pointers */
 
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define INTPTR_MIN (-__I64(9223372036854775807) - 1)
-#define INTPTR_MAX (__I64(9223372036854775807)
+#define INTPTR_MAX (__I64(9223372036854775807))
 #define UINTPTR_MAX (__U64(18446744073709551615))
 #else
 #define INTPTR_MIN (-2147483647 - 1)
@@ -207,7 +209,7 @@ typedef unsigned long long uintmax_t;
 /* Limits of other integer types */
 
 #ifndef PTRDIFF_MIN
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define PTRDIFF_MIN (-9223372036854775807L - 1)
 #define PTRDIFF_MAX (9223372036854775807L)
 #else
@@ -224,7 +226,7 @@ typedef unsigned long long uintmax_t;
 #endif
 
 #ifndef SIZE_MAX
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define SIZE_MAX (18446744073709551615UL)
 #else
 #define SIZE_MAX (4294967295U)
@@ -258,7 +260,7 @@ typedef unsigned long long uintmax_t;
 #define INT8_C(x) x
 #define INT16_C(x) x
 #define INT32_C(x) x
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define INT64_C(x) x ## L
 #else
 #define INT64_C(x) x ## LL
@@ -267,7 +269,7 @@ typedef unsigned long long uintmax_t;
 #define UINT8_C(x) x
 #define UINT16_C(x) x
 #define UINT32_C(x) x ## U
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define UINT64_C(x) x ## UL
 #else
 #define UINT64_C(x) x ## ULL
@@ -275,7 +277,7 @@ typedef unsigned long long uintmax_t;
 
 /* Macros for greatest-width integer constant expressions */
 
-#ifdef __x86_64__
+#if __WORDSIZE == 64
 #define INTMAX_C(x) x ## L
 #define UINTMAX_C(x) x ## UL
 #else

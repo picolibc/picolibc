@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<chapter id="overview" xmlns:xi="http://www.w3.org/2001/XInclude">
+<title>Cygwin Overview</title>
+
+<sect1 id="what-is-it"><title>What is it?</title>
+
+<para>
+Cygwin is a Linux-like environment for Windows. It consists of a DLL
+(<filename>cygwin1.dll</filename>), which acts as an emulation layer
+providing substantial <ulink url="http://www.pasc.org/#POSIX">POSIX</ulink>
+(Portable Operating System Interface) system call functionality, and a
+collection of tools, which provide a Linux look and feel. The Cygwin DLL
+works with all x86 and AMD64 versions of Windows NT since Windows XP SP3.
+The API follows the
+<ulink url="http://www.opengroup.org/onlinepubs/009695399/nfindex.html">Single
+Unix Specification</ulink> as much as possible, and then Linux practice.
+The major differences between Cygwin and Linux is the C library
+(<literal>newlib</literal> instead of <literal>glibc</literal>).
+</para>
+<para>
+With Cygwin installed, users have access to many standard UNIX
+utilities.  They can be used from one of the provided shells such
+as <command>bash</command> or from the Windows Command Prompt.
+Additionally, programmers may write Win32 console or GUI applications
+that make use of the standard Microsoft Win32 API and/or the Cygwin API.
+As a result, it is possible to easily port many significant UNIX
+programs without the need for extensive changes to the source code.
+This includes configuring and building most of the available GNU
+software (including the development tools included with the Cygwin
+distribution). 
+</para>
+</sect1>
+
+<xi:include href="ov-ex-win.xml"/>
+<xi:include href="ov-ex-unix.xml"/>
+
+<sect1 id="are-free"><title>Are the Cygwin tools free software?</title>
+
+<para>Yes. Parts are <ulink url="http://www.gnu.org/">GNU</ulink> software 
+(<command>gcc</command>, <command>gas</command>, <command>ld</command>, etc.),
+parts are covered by the standard 
+<ulink url="http://www.x.org/Downloads_terms.html">X11 license</ulink>, 
+some of it is public domain, some of it was written by Red Hat and placed under
+the <ulink url="http://www.gnu.org/licenses/gpl.html">GNU General Public 
+License</ulink> (GPL). None of it is shareware. You don't have to pay anyone to
+use it but you should be sure to read the copyright section of the FAQ for more
+information on how the GNU GPL may affect your use of these
+tools. If you intend to port a proprietary application using the Cygwin
+library, you may want the Cygwin proprietary-use license.
+For more information about the proprietary-use license, please go to
+<ulink url="http://www.redhat.com/services/custom/cygwin/">http://www.redhat.com/services/custom/cygwin/</ulink>. 
+Customers of the native Win32 GNUPro should feel free to submit bug
+reports and ask questions through Red Hat channels.  All other
+questions should be sent to the project mailing list
+<email>cygwin@cygwin.com</email>.</para>
+
+</sect1>
+
+<sect1 id="brief-history"><title>A brief history of the Cygwin project</title>
+
+<note>
+<para>
+A historical look into the first years of Cygwin development is
+Geoffrey J. Noer's 1998 paper, "Cygwin32: A Free Win32 Porting Layer for
+UNIX&reg; Applications" which can be found at the <ulink
+url="http://www.usenix.org/publications/library/proceedings/usenix-nt98/technical.html">
+2nd USENIX Windows NT Symposium Online Proceedings</ulink>.
+</para>
+</note>
+<para>
+Cygwin began development in 1995 at Cygnus Solutions (now part of Red Hat,
+Inc.).  The first thing done was to enhance the development tools 
+(<command>gcc</command>, <command>gdb</command>, <command>gas</command>, 
+etc.) so that they could generate and interpret Win32 native
+object files.
+The next task was to port the tools to Win NT/9x. We could have
+done this by rewriting large portions of the source to work within the
+context of the Win32 API. But this would have meant spending a huge
+amount of time on each and every tool. Instead, we took a
+substantially different approach by writing a shared library
+(the Cygwin DLL) that adds the necessary UNIX-like functionality
+missing from the Win32 API (<function>fork</function>,
+<function>spawn</function>, <function>signals</function>,
+<function>select</function>, <function>sockets</function>, etc.).  We call this
+new interface the Cygwin API. Once written, it was possible to build working
+Win32 tools using UNIX-hosted cross-compilers, linking against this
+library.</para>
+
+<para>From this point, we pursued the goal of producing Windows-hosted tools
+capable of rebuilding themselves under Windows 9x and NT (this is
+often called self-hosting). Since neither OS ships with standard UNIX
+user tools (fileutils, textutils, bash, etc...), we had to get the GNU
+equivalents working with the Cygwin API. Many of these tools were
+previously only built natively so we had to modify their configure
+scripts to be compatible with cross-compilation. Other than the
+configuration changes, very few source-level changes had to be
+made since Cygwin provided a UNIX-like API. Running bash with the development tools and user tools in place,
+Windows 9x and NT looked like a flavor of UNIX from the perspective of
+the GNU configure mechanism. Self hosting was achieved as of the beta
+17.1 release in October 1996.</para>
+
+<para>
+The entire Cygwin toolset was available as a monolithic install. In
+April 2000, the project announced a
+<ulink url="http://www.cygwin.com/ml/cygwin/2000-04/msg00269.html">
+New Cygwin Net Release</ulink> which provided the native non-Cygwin Win32 program
+<command>setup.exe</command> to install and upgrade each package
+separately. Since then, the Cygwin DLL and <command>setup.exe</command> 
+have seen continuous development.
+</para>
+
+<para>
+The biggest major improvement in this development is the 1.7 release in
+2009, which dropped Windows 95/98/Me support in favor of using Windows
+NT features more extensively.  It adds a lot of new features like
+case-sensitive filenames, NFS interoperability, IPv6 support and much
+more.</para>
+
+<para>The latest big improvement is the 64 bit Cygwin DLL which
+allows to run natively on AMD64 Windows machines.  The first release
+available in a 64 bit version is 1.7.19.</para>
+
+</sect1>
+
+<xi:include href="highlights.xml"/>
+<xi:include href="new-features.xml"/>
+
+</chapter>

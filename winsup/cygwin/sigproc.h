@@ -68,7 +68,7 @@ void __reg1 sig_clear (int);
 void __reg1 sig_set_pending (int);
 int __stdcall handle_sigsuspend (sigset_t);
 
-int __reg2 proc_subproc (DWORD, DWORD);
+int __reg2 proc_subproc (DWORD, uintptr_t);
 
 class _pinfo;
 void __stdcall proc_terminate ();

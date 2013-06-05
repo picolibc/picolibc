@@ -1,6 +1,6 @@
 /* client.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2008, 2009 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2008, 2009, 2012, 2013 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -115,11 +115,11 @@ client_request_attach_tty::send (transport_layer_base * const conn)
 }
 
 client_request::header_t::header_t (const request_code_t request_code,
-				    const size_t msglen)
-  : msglen (msglen),
-    request_code (request_code)
+				    const size_t len)
+  : request_code (request_code)
 {
   assert (request_code >= 0 && request_code < CYGSERVER_REQUEST_LAST);
+  msglen = len;
 }
 
 // FIXME: also check write and read result for -1.

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<chapter id="using" xmlns:xi="http://www.w3.org/2001/XInclude">
+<title>Using Cygwin</title>
+
+<para>This chapter explains some key differences between the Cygwin
+environment and traditional UNIX systems. It assumes a working
+knowledge of standard UNIX commands.</para>
+
+	<xi:include href="pathnames.xml"/>
+	<xi:include href="textbinary.xml"/>
+	<xi:include href="filemodes.xml"/>
+	<xi:include href="specialnames.xml"/>
+	<xi:include href="cygwinenv.xml"/>
+	<xi:include href="ntsec.xml"/>
+	<xi:include href="cygserver.xml"/>
+	<xi:include href="../utils/utils.xml"/>
+	<xi:include href="effectively.xml"/>
+</chapter>

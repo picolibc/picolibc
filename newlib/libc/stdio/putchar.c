@@ -90,8 +90,10 @@ int
 _DEFUN(putchar, (c),
        int c)
 {
-  _REENT_SMALL_CHECK_INIT (_REENT);
-  return _putc_r (_REENT, c, _stdout_r (_REENT));
+  struct _reent *reent = _REENT;
+
+  _REENT_SMALL_CHECK_INIT (reent);
+  return _putc_r (reent, c, _stdout_r (reent));
 }
 
 #endif

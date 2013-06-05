@@ -1,4 +1,4 @@
-/* Copyright (c) 2009, 2010, 2011  Chris Faylor
+/* Copyright (c) 2009, 2010, 2011, 2013  Chris Faylor
 
   All rights reserved.
 
@@ -162,7 +162,8 @@ load_dll (const wchar_t *fn)
   wchar_t *buf = get_module_filename (GetCurrentProcess (), NULL);
   if (!buf)
     {
-      printf ("ldd: GetModuleFileName returned an error %lu\n", GetLastError ());
+      printf ("ldd: GetModuleFileName returned an error %u\n",
+	      (unsigned int) GetLastError ());
       exit (1);		/* FIXME */
     }
 
@@ -219,8 +220,9 @@ static int
 set_entry_point_break ()
 {
   HMODULE hm;
-  DWORD cb;
-  if (!EnumProcessModules (hProcess, &hm, sizeof (hm), &cb) || !cb)
+  DWORD cbe;
+  SIZE_T cbw;
+  if (!EnumProcessModules (hProcess, &hm, sizeof (hm), &cbe) || !cbe)
     set_errno_and_return (1);
 
   MODULEINFO mi = {};
@@ -228,7 +230,7 @@ set_entry_point_break ()
     set_errno_and_return (1);
 
   static const unsigned char int3 = 0xcc;
-  if (!WriteProcessMemory (hProcess, mi.EntryPoint, &int3, 1, &cb) || cb != 1)
+  if (!WriteProcessMemory (hProcess, mi.EntryPoint, &int3, 1, &cbw) || cbw != 1)
     set_errno_and_return (1);
   return 0;
 }
@@ -485,13 +487,15 @@ map_file (const wchar_t *filename)
     }
   if (!(hMapping = CreateFileMapping (hFile, 0, PAGE_READONLY | SEC_COMMIT, 0, 0, 0)))
     {
-      fprintf (stderr, "CreateFileMapping failed with windows error %lu\n", GetLastError ());
+      fprintf (stderr, "CreateFileMapping failed with windows error %u\n",
+	       (unsigned int) GetLastError ());
       CloseHandle (hFile);
       return 0;
     }
   if (!(basepointer = MapViewOfFile (hMapping, FILE_MAP_READ, 0, 0, 0)))
     {
-      fprintf (stderr, "MapViewOfFile failed with windows error %lu\n", GetLastError ());
+      fprintf (stderr, "MapViewOfFile failed with windows error %u\n",
+	       (unsigned int) GetLastError ());
       CloseHandle (hMapping);
       CloseHandle (hFile);
       return 0;

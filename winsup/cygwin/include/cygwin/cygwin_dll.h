@@ -1,6 +1,6 @@
 /* cygwin_dll.h
 
-   Copyright 1998, 1999, 2000, 2001, 2009, 2011 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2009, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -26,8 +26,8 @@ details. */
 CDECL_BEGIN								      \
   int WINAPI Entry (HINSTANCE h, DWORD reason, void *ptr);	              \
   typedef int (*mainfunc) (int, char **, char **);			      \
-  extern int cygwin_attach_dll (HMODULE, mainfunc);			      \
-  extern void cygwin_detach_dll (DWORD);				      \
+  extern PVOID cygwin_attach_dll (HMODULE, mainfunc);			      \
+  extern void cygwin_detach_dll (PVOID);				      \
 CDECL_END								      \
 									      \
 static HINSTANCE storedHandle;						      \
@@ -35,12 +35,14 @@ static DWORD storedReason;						      \
 static void* storedPtr;							      \
 int __dynamically_loaded;						      \
 									      \
-static int __dllMain (int a, char **b, char **c)			      \
+static int __dllMain (int a __attribute__ ((unused)),			      \
+		      char **b __attribute__ ((unused)),		      \
+		      char **c __attribute__ ((unused)))		      \
 {									      \
   return Entry (storedHandle, storedReason, storedPtr);		              \
 }									      \
 									      \
-static DWORD dll_index;							      \
+static PVOID dll_index;							      \
 									      \
 int WINAPI _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
 {									      \
@@ -56,7 +58,7 @@ int WINAPI _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
       storedPtr = ptr;							      \
       __dynamically_loaded = (ptr == NULL);				      \
       dll_index = cygwin_attach_dll (h, &__dllMain);			      \
-      if (dll_index == (DWORD) -1)					      \
+      if (dll_index == (PVOID) -1)					      \
 	ret = 0;							      \
     }									      \
     break;								      \
@@ -67,7 +69,7 @@ int WINAPI _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
       if (ret)								      \
       {									      \
 	cygwin_detach_dll (dll_index);					      \
-	dll_index = (DWORD) -1;						      \
+	dll_index = (PVOID) -1;						      \
       }									      \
     }									      \
     break;								      \

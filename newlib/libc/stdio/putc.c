@@ -111,9 +111,11 @@ _DEFUN(putc, (c, fp),
 {
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   int result;
-  CHECK_INIT (_REENT, fp);
+  struct _reent *reent = _REENT;
+
+  CHECK_INIT (reent, fp);
   _newlib_flockfile_start (fp);
-  result = __sputc_r (_REENT, c, fp);
+  result = __sputc_r (reent, c, fp);
   _newlib_flockfile_end (fp);
   return result;
 #else

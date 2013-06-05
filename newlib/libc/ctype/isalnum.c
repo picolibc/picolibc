@@ -18,7 +18,7 @@ DESCRIPTION
 <<isalnum>> is a macro which classifies ASCII integer values by table
 lookup.  It is a predicate returning non-zero for alphabetic or
 numeric ASCII characters, and <<0>> for other arguments.  It is defined
-for all integer values.
+only if <[c]> is representable as an unsigned char or if <[c]> is EOF.
 
 You can use a compiled subroutine instead of the macro definition by
 undefining the macro using `<<#undef isalnum>>'.

@@ -17,7 +17,8 @@ TRAD_SYNOPSIS
 DESCRIPTION
 <<isblank>> is a function which classifies ASCII integer values by table
 lookup.  It is a predicate returning non-zero for blank characters, and 0
-for other characters.
+for other characters.  It is defined only if <[c]> is representable as an
+unsigned char or if <[c]> is EOF.
 
 RETURNS
 <<isblank>> returns non-zero if <[c]> is a blank character.

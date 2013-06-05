@@ -33,8 +33,10 @@
 int
 vwscanf (_CONST wchar_t *fmt, va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT (_REENT);
-  return __svfwscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
+  struct _reent *reent = _REENT;
+
+  _REENT_SMALL_CHECK_INIT (reent);
+  return __svfwscanf_r (reent, _stdin_r (reent), fmt, ap);
 }
 
 #endif /* !_REENT_ONLY */

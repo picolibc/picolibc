@@ -258,8 +258,10 @@ _DEFUN(VFWSCANF, (fp, fmt, ap),
        _CONST wchar_t *fmt _AND
        va_list ap)
 {
-  CHECK_INIT(_REENT, fp);
-  return __SVFWSCANF_R (_REENT, fp, fmt, ap);
+  struct _reent *reent = _REENT;
+
+  CHECK_INIT(reent, fp);
+  return __SVFWSCANF_R (reent, fp, fmt, ap);
 }
 
 int

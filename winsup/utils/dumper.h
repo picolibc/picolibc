@@ -1,6 +1,6 @@
 /* dumper.h
 
-   Copyright 1999,2001 Red Hat Inc.
+   Copyright 1999, 2001, 2013 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -28,7 +28,7 @@
 typedef struct
 {
   LPBYTE base;
-  DWORD size;
+  SIZE_T size;
 } process_mem_region;
 
 typedef struct
@@ -67,16 +67,16 @@ typedef struct _process_entity
 class exclusion
 {
 public:
-  int last;
-  int size;
-  int step;
+  size_t last;
+  size_t size;
+  size_t step;
   process_mem_region* region;
 
-  exclusion ( int step ) { last = size = 0;
-			   this->step = step;
-			   region = NULL; }
+  exclusion ( size_t step ) { last = size = 0;
+			      this->step = step;
+			      region = NULL; }
   ~exclusion () { free ( region ); }
-  int add ( LPBYTE mem_base, DWORD mem_size );
+  int add ( LPBYTE mem_base, SIZE_T mem_size );
   int sort_and_check ();
 };
 
@@ -105,10 +105,10 @@ class dumper
 
   process_entity* add_process_entity_to_list ( process_entity_type type );
   int add_thread ( DWORD tid, HANDLE hThread );
-  int add_mem_region ( LPBYTE base, DWORD size );
+  int add_mem_region ( LPBYTE base, SIZE_T size );
 
   /* break mem_region by excl_list and add add all subregions */
-  int split_add_mem_region ( LPBYTE base, DWORD size );
+  int split_add_mem_region ( LPBYTE base, SIZE_T size );
 
   int add_module ( LPVOID base_address );
 
@@ -133,7 +133,7 @@ public:
 
 extern int deb_printf ( const char* format, ... );
 
-extern char* psapi_get_module_name ( HANDLE hProcess, DWORD BaseAddress );
+extern char* psapi_get_module_name ( HANDLE hProcess, LPVOID BaseAddress );
 
 extern int parse_pe ( const char* file_name, exclusion* excl_list );
 

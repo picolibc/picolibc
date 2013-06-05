@@ -103,8 +103,9 @@ _DEFUN(setvbuf, (fp, buf, mode, size),
        register size_t size)
 {
   int ret = 0;
+  struct _reent *reent = _REENT;
 
-  CHECK_INIT (_REENT, fp);
+  CHECK_INIT (reent, fp);
 
   _newlib_flockfile_start (fp);
 
@@ -126,11 +127,11 @@ _DEFUN(setvbuf, (fp, buf, mode, size),
    * non buffer flags, and clear malloc flag.
    */
 
-  _fflush_r (_REENT, fp);
+  _fflush_r (reent, fp);
   fp->_r = 0;
   fp->_lbfsize = 0;
   if (fp->_flags & __SMBF)
-    _free_r (_REENT, (_PTR) fp->_bf._base);
+    _free_r (reent, (_PTR) fp->_bf._base);
   fp->_flags &= ~(__SLBF | __SNBF | __SMBF);
 
   if (mode == _IONBF)
@@ -180,7 +181,7 @@ nbf:
 
     case _IOFBF:
       /* no flag */
-      _REENT->__cleanup = _cleanup_r;
+      reent->__cleanup = _cleanup_r;
       fp->_bf._base = fp->_p = (unsigned char *) buf;
       fp->_bf._size = size;
       break;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 ARM Ltd
+ * Copyright (c) 2013 ARM Ltd
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,10 +26,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* The sole purpose of this file is to include the plain memcpy provided in newlib.  
-   An optimized version of memcpy is provided in the assembly file memcpy.S in this directory. */
+/* The sole purpose of this file is to include the plain memcpy provided
+   in newlib.  An optimized version of memcpy is provided in the assembly
+   file memcpy.S in this directory. */
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
-     (!(defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED))))
+     (!((defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED)) \
+        || defined (__ARM_ARCH_7EM__) || defined (__ARM_ARCH_7M__))))
 
 #include "../../string/memcpy.c"
 

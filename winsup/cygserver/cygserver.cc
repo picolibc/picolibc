@@ -1,6 +1,6 @@
 /* cygserver.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2011 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2011, 2012 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -51,13 +51,13 @@ setup_privileges ()
   rc = OpenProcessToken (GetCurrentProcess () , TOKEN_ALL_ACCESS , &hToken) ;
   if (!rc)
     {
-      debug ("error opening process token (%lu)", GetLastError ());
+      debug ("error opening process token (err %u)", GetLastError ());
       return false;
     }
   rc = LookupPrivilegeValue (NULL, SE_DEBUG_NAME, &sPrivileges.Privileges[0].Luid);
   if (!rc)
     {
-      debug ("error getting privilege luid (%lu)", GetLastError ());
+      debug ("error getting privilege luid (err %u)", GetLastError ());
       ret_val = false;
       goto out;
     }
@@ -66,7 +66,7 @@ setup_privileges ()
   rc = AdjustTokenPrivileges (hToken, FALSE, &sPrivileges, 0, NULL, NULL) ;
   if (!rc)
     {
-      debug ("error adjusting privilege level. (%lu)", GetLastError ());
+      debug ("error adjusting privilege level. (err %u)", GetLastError ());
       ret_val = false;
       goto out;
     }
@@ -106,8 +106,8 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 			    0, bInheritHandle,
 			    DUPLICATE_SAME_ACCESS))
 	{
-	  log (LOG_ERR, "error getting handle(%u) to server (%lu)",
-			 (unsigned int)from_handle, GetLastError ());
+	  log (LOG_ERR, "error getting handle(%p) to server (err %u)",
+			 from_handle, GetLastError ());
 	  goto out;
 	}
     } else
@@ -119,7 +119,7 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 				 | DACL_SECURITY_INFORMATION),
 				sd, sizeof (sd_buf), &bytes_needed))
     {
-      log (LOG_ERR, "error getting handle SD (%lu)", GetLastError ());
+      log (LOG_ERR, "error getting handle SD (err %u)", GetLastError ());
       goto out;
     }
 
@@ -128,8 +128,7 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
   if (!AccessCheck (sd, from_process_token, access, &access_mapping,
 		    &ps, &ps_len, &access, &status))
     {
-      log (LOG_ERR, "error checking access rights (%lu)",
-		     GetLastError ());
+      log (LOG_ERR, "error checking access rights (err %u)", GetLastError ());
       goto out;
     }
 
@@ -143,7 +142,7 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 			to_process, to_handle_ptr,
 			access, bInheritHandle, 0))
     {
-      log (LOG_ERR, "error getting handle to client (%lu)", GetLastError ());
+      log (LOG_ERR, "error getting handle to client (err %u)", GetLastError ());
       goto out;
     }
 
@@ -191,8 +190,7 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
 
   if (!from_process_handle)
     {
-      log (LOG_ERR, "error opening `from' process, error = %lu",
-		     GetLastError ());
+      log (LOG_ERR, "error opening `from' process (err %u)", GetLastError ());
       error_code (EACCES);
       return;
     }
@@ -204,8 +202,7 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
 
   if (!to_process_handle)
     {
-      log (LOG_ERR, "error opening `to' process, error = %lu",
-		     GetLastError ());
+      log (LOG_ERR, "error opening `to' process (err %u)", GetLastError ());
       CloseHandle (from_process_handle);
       error_code (EACCES);
       return;
@@ -228,7 +225,7 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
 				    TRUE,
 				    &token_handle);
 
-  debug ("opened thread token, rc=%lu", rc);
+  debug ("opened thread token, rc=%u", rc);
   if (!conn->revert_to_self ())
     {
       CloseHandle (from_process_handle);
@@ -239,8 +236,7 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
 
   if (!rc)
     {
-      log (LOG_ERR, "error opening thread token, error = %lu",
-		     GetLastError ());
+      log (LOG_ERR, "error opening thread token (err %u)", GetLastError ());
       CloseHandle (from_process_handle);
       CloseHandle (to_process_handle);
       error_code (EACCES);
@@ -264,7 +260,7 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
 			      from_master,
 			      &req.from_master, TRUE) != 0)
       {
-	log (LOG_ERR, "error duplicating from_master handle, error = %lu",
+	log (LOG_ERR, "error duplicating from_master handle (err %u)",
 		       GetLastError ());
 	error_code (EACCES);
       }
@@ -276,7 +272,7 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
 			      to_master,
 			      &req.to_master, TRUE) != 0)
       {
-	log (LOG_ERR, "error duplicating to_master handle, error = %lu",
+	log (LOG_ERR, "error duplicating to_master handle (err %u)",
 		       GetLastError ());
 	error_code (EACCES);
       }
@@ -285,9 +281,8 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
   CloseHandle (to_process_handle);
   CloseHandle (token_handle);
 
-  debug ("%lu(%lu, %lu) -> %lu(%lu,%lu)",
-		req.master_pid, from_master, to_master,
-		req.pid, req.from_master, req.to_master);
+  debug ("%u(%p, %p) -> %u(%p,%p)", req.master_pid, from_master, to_master,
+				    req.pid, req.from_master, req.to_master);
 
   return;
 }
@@ -374,7 +369,7 @@ server_submission_loop::request_loop ()
    */
   if (!SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST + 1))
     if (!SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST))
-      debug ("failed to raise accept thread priority, error = %lu",
+      debug ("failed to raise accept thread priority (err %u)",
 	     GetLastError ());
 
   while (_running)
@@ -393,7 +388,7 @@ server_submission_loop::request_loop ()
       if (!conn && errno == EINTR)
 	{
 	  if (!SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_NORMAL))
-	    debug ("failed to reset thread priority, error = %lu",
+	    debug ("failed to reset thread priority (err %u)",
 		   GetLastError ());
 
 	  Sleep (0);
@@ -401,7 +396,7 @@ server_submission_loop::request_loop ()
 				  THREAD_PRIORITY_HIGHEST + 1))
 	    if (!SetThreadPriority (GetCurrentThread (),
 				    THREAD_PRIORITY_HIGHEST))
-	      debug ("failed to raise thread priority, error = %lu",
+	      debug ("failed to raise thread priority (err %u)",
 		     GetLastError ());
 	}
       if (conn)
@@ -534,9 +529,9 @@ main (const int argc, char *argv[])
 
   const char opts[] = "c:deEf:hl:mp:qr:sSVyY";
 
-  long cleanup_threads = 0;
-  long request_threads = 0;
-  long process_cache_size = 0;
+  int32_t cleanup_threads = 0;
+  int32_t request_threads = 0;
+  int32_t process_cache_size = 0;
   bool shutdown = false;
   const char *config_file = DEF_CONFIG_FILE;
   bool force_config_file = false;

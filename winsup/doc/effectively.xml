@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="using-effectively">
+<title>Using Cygwin effectively with Windows</title>
+
+<para>
+Cygwin is not a full operating system, and so must rely on Windows for
+accomplishing some tasks. For example, Cygwin provides a POSIX view
+of the Windows filesystem, but does not provide filesystem drivers of 
+its own. Therefore part of using Cygwin effectively is learning to use
+Windows effectively. 
+Many Windows utilities provide a good way to interact with Cygwin's 
+predominately command-line environment. For example, 
+<command>ipconfig.exe</command> provides information about network 
+configuration, and <command>net.exe</command> views and configures
+network file and printer resources.  Most of these tools
+support the <literal>/?</literal> switch to display usage information. 
+</para>
+
+<para>
+Unfortunately, no standard set of tools included with all versions of 
+Windows exists.  Generally, the younger the Windows version, the more
+complete are the on-board tools.  Microsoft also provides free downloads
+for Windows XP (the Windows Support Tools).  Additionally, many independent
+sites such as 
+<ulink url="http://download.com">download.com</ulink>, 
+<ulink url="http://simtel.net">simtel.net</ulink>, 
+and Microsoft's own
+<ulink url="http://technet.microsoft.com/en-us/sysinternals/default.aspx">Sysinternals</ulink>
+provide quite useful command-line utilities, as far as they are not
+already provided by Cygwin.  A few Windows tools, such as 
+<command>find.exe</command>, <command>link.exe</command> and
+<command>sort.exe</command>, may conflict with the Cygwin versions
+make sure that you use the full path (<command>/usr/bin/find</command>)
+or that your Cygwin <literal>bin</literal> directory comes first in your
+<envar>PATH</envar>.
+</para>
+
+<sect2 id="using-pathnames-effectively"> <title>Pathnames</title>
+
+<para>
+Windows programs do not understand POSIX pathnames, so any arguments 
+that reference the filesystem must be in Windows (or DOS) format or 
+translated.  Cygwin provides the <command>cygpath</command> utility for 
+converting between Windows and POSIX paths. A complete description of its 
+options and examples of its usage are in <xref linkend="cygpath"></xref>, 
+including a shell script for starting Windows Explorer in any directory. 
+The same format works for most Windows programs, for example 
+<screen>
+<literal>notepad.exe "$(cygpath -aw "Desktop/Phone Numbers.txt")"</literal>
+</screen>
+A few programs require a Windows-style, semicolon-delimited path list, 
+which <command>cygpath</command> can translate from a POSIX path with the
+<literal>-p</literal> option. For example, a Java compilation from 
+<command>bash</command> might look like this: 
+<screen>
+<literal>javac -cp "$(cygpath -pw "$CLASSPATH")" hello.java</literal>
+</screen>
+Since using quoting and subshells is somewhat awkward, it is often 
+preferable to use <command>cygpath</command> in shell scripts.
+</para>
+
+</sect2>
+
+<sect2 id="using-net"> <title>Cygwin and Windows Networking</title>
+<para>
+Many popular Cygwin packages, such as <systemitem>ncftp</systemitem>, 
+<systemitem>lynx</systemitem>, and <systemitem>wget</systemitem>, require a 
+network connection.  Since Cygwin relies on Windows for connectivity, 
+if one of these tools is not working as expected you may need to 
+troubleshoot using Windows tools. The first test is to see if you
+can reach the URL's host with <command>ping.exe</command>, one of the 
+few utilities included with every Windows version since Windows 95.
+If you chose to install the <systemitem>inetutils</systemitem> package, 
+you may have both
+Windows and Cygwin versions of utilities such as <command>ftp</command>
+and <command>telnet</command>. If you are having problems using one
+of these programs, see if the alternate one works as expected. 
+</para>
+
+<para>
+There are a variety of other programs available for specific situations.
+If your system does not have an always-on network connection, you 
+may be interested in <command>rasdial.exe</command> for automating dialup
+connections.  
+Users who frequently change their network 
+configuration can script these changes with <command>netsh.exe</command>.
+For proxy users, the open source 
+<ulink url="http://apserver.sourceforge.net">
+NTLM Authorization Proxy Server</ulink> or the no-charge
+<ulink url="http://www.hummingbird.com/products/nc/socks/index.html">
+Hummingbird SOCKS Proxy</ulink> may allow you to use Cygwin network
+programs in your environment.
+</para>
+
+</sect2>
+
+<sect2 id="using-cygutils"><title>The cygutils package</title>
+
+<para>
+The optional <systemitem>cygutils</systemitem> package contains
+miscellaneous tools that are small enough to not require their own package.
+It is not included in a default Cygwin install; select it from the Utils
+category in <command>setup.exe</command>. Several of the
+<systemitem>cygutils</systemitem> tools are useful for interacting with
+Windows.</para>
+
+<para>
+One of the hassles of Unix-Windows interoperability is the different line 
+endings on text files.  As mentioned in <xref linkend="using-textbinary"></xref>, 
+Unix tools such as <command>tr</command> can convert between CRLF and LF 
+endings, but <systemitem>cygutils</systemitem> provides several dedicated programs: 
+<command>conv</command>, <command>d2u</command>, <command>dos2unix</command>, 
+<command>u2d</command>, and <command>unix2dos</command>. Use the
+<literal>--help</literal> switch for usage information. 
+</para>
+</sect2>
+
+<sect2 id="using-shortcuts"><title>Creating shortcuts with cygutils</title>
+<para>
+Another problem area is between Unix-style links, which link one file
+to another, and Microsoft .lnk files, which provide a shortcut to a
+file.  They seem similar at first glance but, in reality, are fairly 
+different.  By default, Cygwin does not create symlinks as .lnk files,
+but there's an option to do that, see <xref linkend="using-cygwinenv"></xref>.
+These symlink .lnk files are compatible with Windows-created .lnk files,
+but they are still different.  They do not include much of the information
+that is available in a standard Microsoft shortcut, such as the working
+directory, an icon, etc.  The <systemitem>cygutils</systemitem>
+package includes a <command>mkshortcut</command> utility for creating
+standard native Microsoft .lnk files.
+</para>
+
+<para>
+But here's the problem.  If Cygwin handled these native shortcuts like any
+other symlink, you could not archive Microsoft .lnk files into
+<command>tar</command> archives and keep all the information in them. 
+After unpacking, these shortcuts would have lost all the extra information
+and would be no different than standard Cygwin symlinks. Therefore these two
+types of links are treated differently.  Unfortunately, this means that the 
+usual Unix way of creating and using symlinks does not work with native
+Windows shortcuts. 
+</para>
+</sect2>
+  
+<sect2 id="using-printing"><title>Printing with cygutils</title>
+<para>
+There are several options for printing from Cygwin, including the 
+<command>lpr</command> found in <systemitem>cygutils</systemitem> (not to be confused with the 
+native Windows <command>lpr.exe</command>). The easiest way to use <systemitem>cygutils</systemitem>' 
+<command>lpr</command> is to specify a default device name in the 
+<envar>PRINTER</envar> environment variable.  You may also specify a device 
+on the command line with the <literal>-d</literal> or <literal>-P</literal> 
+options, which will override the environment variable setting. 
+</para>
+
+<para>
+A device name 
+may be a UNC path (<literal>\\server_name\printer_name</literal>), a reserved 
+DOS device name (<literal>prn</literal>, <literal>lpt1</literal>), or a 
+local port name that is mapped to a printer share. Note that forward slashes 
+may be used in a UNC path (<literal>//server_name/printer_name</literal>),
+which is helpful when using <command>lpr</command> from a shell that uses
+the backslash as an escape character. 
+</para>
+
+<para>
+<command>lpr</command> sends raw data to the printer; no formatting is done.
+Many, but not all, printers accept plain text as input. If your printer 
+supports PostScript, packages such as 
+<systemitem>a2ps</systemitem> and <systemitem>enscript</systemitem> can prepare 
+text files for printing. The <systemitem>ghostscript</systemitem> package also 
+provides some translation
+from PostScript to various native printer languages. Additionally, a native 
+Windows application for printing PostScript, <command>gsprint</command>, is 
+available from the <ulink url="http://www.cs.wisc.edu/~ghost/">Ghostscript
+website</ulink>.
+</para>
+
+</sect2>
+
+</sect1>

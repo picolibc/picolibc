@@ -85,6 +85,12 @@ struct _atexit {
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
         struct _on_exit_args * _on_exit_args_ptr;
 };
+# define _ATEXIT_INIT {_NULL, 0, {_NULL}, _NULL}
+# define _ATEXIT_INIT_PTR(var) \
+  (var)->_next = _NULL; \
+  (var)->_ind = 0; \
+  (var)->_fns[0] = _NULL; \
+  (var)->_on_exit_args_ptr = _NULL
 #else
 struct _atexit {
 	struct	_atexit *_next;			/* next in list */
@@ -93,6 +99,23 @@ struct _atexit {
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
         struct _on_exit_args _on_exit_args;
 };
+# define _ATEXIT_INIT {_NULL, 0, {_NULL}, {{_NULL}, {_NULL}, 0, 0}}
+# define _ATEXIT_INIT_PTR(var) \
+  (var)->_next = _NULL; \
+  (var)->_ind = 0; \
+  (var)->_fns[0] = _NULL; \
+  (var)->_on_exit_args._fntypes = 0; \
+  (var)->_on_exit_args._fnargs[0] = _NULL
+#endif
+
+#ifdef _REENT_GLOBAL_ATEXIT
+# define _REENT_INIT_ATEXIT
+# define _REENT_INIT_ATEXIT_PTR(var, var0)
+#else
+# define _REENT_INIT_ATEXIT \
+  _NULL, _ATEXIT_INIT,
+# define _REENT_INIT_ATEXIT_PTR(var, var0) \
+  (var)->_atexit = _NULL; _ATEXIT_INIT_PTR(var0);
 #endif
 
 /*
@@ -392,9 +415,11 @@ struct _reent
   /* signal info */
   void (**(_sig_func))(int);
 
+# ifndef _REENT_GLOBAL_ATEXIT
   /* atexit stuff */
   struct _atexit *_atexit;
   struct _atexit _atexit0;
+# endif
 
   struct _glue __sglue;			/* root of glue chain */
   __FILE *__sf;			        /* file descriptors */
@@ -425,8 +450,7 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     _NULL, \
     _NULL, \
     _NULL, \
-    _NULL, \
-    {_NULL, 0, {_NULL}, _NULL}, \
+    _REENT_INIT_ATEXIT \
     {_NULL, 0, _NULL}, \
     _NULL, \
     _NULL, \
@@ -452,11 +476,7 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     (var)->_localtime_buf = _NULL; \
     (var)->_asctime_buf = _NULL; \
     (var)->_sig_func = _NULL; \
-    (var)->_atexit = _NULL; \
-    (var)->_atexit0._next = _NULL; \
-    (var)->_atexit0._ind = 0; \
-    (var)->_atexit0._fns[0] = _NULL; \
-    (var)->_atexit0._on_exit_args_ptr = _NULL; \
+    _REENT_INIT_ATEXIT_PTR(var, &(var)->_atexit0) \
     (var)->__sglue._next = _NULL; \
     (var)->__sglue._niobs = 0; \
     (var)->__sglue._iobs = _NULL; \
@@ -641,9 +661,11 @@ struct _reent
         } _unused;
     } _new;
 
+# ifndef _REENT_GLOBAL_ATEXIT
   /* atexit stuff */
   struct _atexit *_atexit;	/* points to head of LIFO stack */
   struct _atexit _atexit0;	/* one guaranteed table, required by ANSI */
+# endif
 
   /* signal info */
   void (**(_sig_func))(int);
@@ -698,34 +720,17 @@ struct _reent
         {0, {0}} \
       } \
     }, \
-    _NULL, \
-    {_NULL, 0, {_NULL}, {{_NULL}, {_NULL}, 0, 0}}, \
+    _REENT_INIT_ATEXIT \
     _NULL, \
     {_NULL, 0, _NULL} \
   }
 
 #define _REENT_INIT_PTR(var) \
-  { (var)->_errno = 0; \
+  { memset((var), 0, sizeof(*(var))); \
     (var)->_stdin = &(var)->__sf[0]; \
     (var)->_stdout = &(var)->__sf[1]; \
     (var)->_stderr = &(var)->__sf[2]; \
-    (var)->_inc = 0; \
-    memset(&(var)->_emergency, 0, sizeof((var)->_emergency)); \
-    (var)->_current_category = 0; \
     (var)->_current_locale = "C"; \
-    (var)->__sdidinit = 0; \
-    (var)->__cleanup = _NULL; \
-    (var)->_result = _NULL; \
-    (var)->_result_k = 0; \
-    (var)->_p5s = _NULL; \
-    (var)->_freelist = _NULL; \
-    (var)->_cvtlen = 0; \
-    (var)->_cvtbuf = _NULL; \
-    (var)->_new._reent._unused_rand = 0; \
-    (var)->_new._reent._strtok_last = _NULL; \
-    (var)->_new._reent._asctime_buf[0] = 0; \
-    memset(&(var)->_new._reent._localtime_buf, 0, sizeof((var)->_new._reent._localtime_buf)); \
-    (var)->_new._reent._gamma_signgam = 0; \
     (var)->_new._reent._rand_next = 1; \
     (var)->_new._reent._r48._seed[0] = _RAND48_SEED_0; \
     (var)->_new._reent._r48._seed[1] = _RAND48_SEED_1; \
@@ -734,36 +739,6 @@ struct _reent
     (var)->_new._reent._r48._mult[1] = _RAND48_MULT_1; \
     (var)->_new._reent._r48._mult[2] = _RAND48_MULT_2; \
     (var)->_new._reent._r48._add = _RAND48_ADD; \
-    (var)->_new._reent._mblen_state.__count = 0; \
-    (var)->_new._reent._mblen_state.__value.__wch = 0; \
-    (var)->_new._reent._mbtowc_state.__count = 0; \
-    (var)->_new._reent._mbtowc_state.__value.__wch = 0; \
-    (var)->_new._reent._wctomb_state.__count = 0; \
-    (var)->_new._reent._wctomb_state.__value.__wch = 0; \
-    (var)->_new._reent._mbrlen_state.__count = 0; \
-    (var)->_new._reent._mbrlen_state.__value.__wch = 0; \
-    (var)->_new._reent._mbrtowc_state.__count = 0; \
-    (var)->_new._reent._mbrtowc_state.__value.__wch = 0; \
-    (var)->_new._reent._mbsrtowcs_state.__count = 0; \
-    (var)->_new._reent._mbsrtowcs_state.__value.__wch = 0; \
-    (var)->_new._reent._wcrtomb_state.__count = 0; \
-    (var)->_new._reent._wcrtomb_state.__value.__wch = 0; \
-    (var)->_new._reent._wcsrtombs_state.__count = 0; \
-    (var)->_new._reent._wcsrtombs_state.__value.__wch = 0; \
-    (var)->_new._reent._l64a_buf[0] = '\0'; \
-    (var)->_new._reent._signal_buf[0] = '\0'; \
-    (var)->_new._reent._getdate_err = 0; \
-    (var)->_atexit = _NULL; \
-    (var)->_atexit0._next = _NULL; \
-    (var)->_atexit0._ind = 0; \
-    (var)->_atexit0._fns[0] = _NULL; \
-    (var)->_atexit0._on_exit_args._fntypes = 0; \
-    (var)->_atexit0._on_exit_args._fnargs[0] = _NULL; \
-    (var)->_sig_func = _NULL; \
-    (var)->__sglue._next = _NULL; \
-    (var)->__sglue._niobs = 0; \
-    (var)->__sglue._iobs = _NULL; \
-    memset(&(var)->__sf, 0, sizeof((var)->__sf)); \
   }
 
 #define _REENT_CHECK_RAND48(ptr)	/* nothing */
@@ -836,6 +811,13 @@ void _reclaim_reent _PARAMS ((struct _reent *));
 #endif /* !_REENT_ONLY */
 
 #define _GLOBAL_REENT _global_impure_ptr
+
+#ifdef _REENT_GLOBAL_ATEXIT
+extern struct _atexit *_global_atexit; /* points to head of LIFO stack */
+# define _GLOBAL_ATEXIT _global_atexit
+#else
+# define _GLOBAL_ATEXIT (_GLOBAL_REENT->_atexit)
+#endif
 
 #ifdef __cplusplus
 }

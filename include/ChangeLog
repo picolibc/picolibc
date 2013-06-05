@@ -1,3 +1,8 @@
+2013-05-06  Paul Brook  <paul@codesourcery.com>
+
+        include/elf/
+        * mips.h (R_MIPS_PC32): Update comment.
+
 2013-04-03  Jason Merrill  <jason@redhat.com>
 
 	Demangle C++11 ref-qualifier.

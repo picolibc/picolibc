@@ -34,7 +34,7 @@ details. */
 
 #define X(w, e) {ERROR_##w, #w, e}
 
-static NO_COPY struct
+static const struct
 {
   DWORD w;		 /* windows version of error */
   const char *s;	 /* text of windows version */
@@ -162,7 +162,7 @@ static NO_COPY struct
 };
 
 extern "C" {
-const char *_sys_errlist[] NO_COPY_INIT =
+const char *_sys_errlist[] =
 {
 /* NOERROR 0 */		  "No error",
 /* EPERM 1 */		  "Operation not permitted",
@@ -333,7 +333,7 @@ geterrno_from_win_error (DWORD code, int deferrno)
 void __reg3
 seterrno_from_win_error (const char *file, int line, DWORD code)
 {
-  syscall_printf ("%s:%d windows error %d", file, line, code);
+  syscall_printf ("%s:%d windows error %u", file, line, code);
   errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
 }
 
@@ -350,7 +350,7 @@ seterrno_from_nt_status (const char *file, int line, NTSTATUS status)
 {
   DWORD code = RtlNtStatusToDosError (status);
   SetLastError (code);
-  syscall_printf ("%s:%d status %p -> windows error %d",
+  syscall_printf ("%s:%d status %y -> windows error %u",
 		  file, line, status, code);
   errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
 }

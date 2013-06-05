@@ -1,0 +1,14 @@
+Makefile
+Makefile.dep
+
+autom4te.cache
+config.log
+config.status
+
+cygwin-api
+cygwin-api.xml
+
+cygwin-ug-net
+cygwin-ug-net.html
+
+faq

@@ -1,0 +1,111 @@
+- Change the '-' prefixes on Makefile.in commands to '@'.  We only want
+  to avoid echoing the commands, not keep on trucking past build
+  errors.
+
+- Cygwin API docs update:
+
+  - Either:
+
+    - Convert existing SGML code embedded in Cygwin source code
+      to Doxygen format, then set up HTML and PDF reference manual
+      generation in doc/Makefile.in.  Then, remove vestiges of doctool.
+
+      The Cygwin User Manual reportedly references pieces of the
+      current SGML that makes up the API Manual, which if true means
+      we have a challenge to make the Doxygen process continue to feed
+      the user manual.
+
+    - Or, move all SGML from winsup/cygwin into winsup/doc/api.
+
+  - Current POSIX documentation is nonexistent.  Either:
+
+    - Fork the current POSIX/Linux manpages.  Downside of this is that
+      it's in nroff format and the license demands that nroff sources
+      continue to be made available.  This is a challenge for PDF
+      manual integration.
+
+    - Switch to Doxygen, which lets us have skeletal POSIX docs almost
+      for free.  Each can point to web docs for more complete info, such
+      that the Cygwin man pages only need to provide parameter lists and
+      document Cygwinisms in the implementation.
+
+    - Write our own man pages in DocBook <refentry> form.  Such files
+      should be XInclude-able in regular API/user manuals, and only have
+      to have the same mininal info as in the Doxygen case above.  It
+      just requires a more verbose markup format.
+
+- Remove autotools outputs from repo.  (configure, Makefile, etc.)
+  Create a bootstrap script to generate them.  Make sure top-level
+  "make" process knows how to call the bootstrap script at need.
+
+- There are absolute HTTP <ulinks> which should be transformed to
+  relative links so that they do the right thing when you move the docs
+  around.  Maybe they'll never live somewhere else on cygwin.com, but if
+  nothing else, they currently do the wrong thing when you open one of the
+  generated .html files from the local filesystem: hyperlinks take you off
+  to cygwin.com instead of to the relevant local file.
+
+- Convert remaining code snippets from HTML entity form (&amp;,
+  &lt;...)  to raw C/C++ code in CDATA sections.  Easier to read and
+  edit in XML form.
+
+- Pretty code snippets.  Search for a DocBook aware automatic code
+  formatter that will take raw example code in and mark it up, as exists
+  for HTML.  If one can't be found or created -- e.g. by lashing an HTML
+  code formatter to a sed script then whipping them until they sing -- do
+  the markup by hand.
+
+- Move to DocBook 5.
+
+- Files are often named with less detail than the ID of the top-level
+  XML element it contains.  For example, specialnames.xml contains
+  <sect1 id="using-specialnames">.  The ID scheme seems hierarchical, so
+  maybe the files should go into subdirectories; e.g.
+  using/specialnames.xml. This would help with the proliferation of files
+  this "patch" created.
+
+- "Tidy" the XML files.
+
+- Remove --skip-validation from XMLTO flags variable in Makefile.in,
+  then fix any errors and warnings that result.
+
+- Replace the hard-coded dates in <bookinfo><date> tags with DocBook
+  time stamps.  (http://www.sagehill.net/docbookxsl/Datetime.html)
+
+- cygwin-ug-net/cygwin-ug-net-nochunks.html.gz build rules can probably
+  be reduced to a one-liner by moving from xmlto wrapper to a raw
+  xsltproc call.
+
+- Is xmlto pulling its own weight for the HTML case?  It *might* have
+  some value for the PDF-via-dblatex case, but an xsltproc call for HTML
+  is also a one-liner.
+
+- Switch from xmlto/dblatex to xsltproc/FOP for PDF?  Might be a
+  prerequisite to the font changes below if dblatex doesn't allow
+  one to specify fonts through the xmlto layer.
+
+- Typography improvements: curl all the quotation marks, replace "--"
+  with em dashes, check proper names for missing accents, etc.
+
+- Adapt top-level cygwin.com CSS to DocBook HTML output so the user
+  guide blends with the rest of the site.  (Something like this has
+  been done to cygwin.com/faq.html already.)
+
+- Improve PDF styling:
+
+  - Wider margins, section indenting, etc.  (i.e. Fix the "wall of text"
+    problem.)
+
+  - Current fonts are Business Blah at best.  Most severe to least:
+
+    - Courier for code is just plain ugly, and is apparently a bitmap
+      font in some people's PDF output besides.  Switch to Deja Vu,
+      Inconsolata, or Adobe Source Code Pro.
+
+    - Times.  Sigh.  There must be something better in the free world,
+      something more in the Palatino or Garamond mold.  Bitstream Vera
+      Serif?  Linux Libertine?
+
+    - Arial/Helvetica/whatever.  Not a serious issue, but we can do
+      better, even if it's just a minor shake-up, like switching to a
+      condensed face.

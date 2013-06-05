@@ -1,6 +1,6 @@
 /* msg.cc: Single unix specification IPC interface for Cygwin.
 
-   Copyright 2003, 2004 Red Hat, Inc.
+   Copyright 2003, 2004, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 

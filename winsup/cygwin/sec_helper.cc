@@ -1,7 +1,7 @@
 /* sec_helper.cc: NT security helper functions
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012 Red Hat, Inc.
+   2011, 2012, 2013 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -26,10 +26,17 @@ details. */
 #include "ntdll.h"
 
 /* General purpose security attribute objects for global use. */
-SECURITY_ATTRIBUTES NO_COPY sec_none;
-SECURITY_ATTRIBUTES NO_COPY sec_none_nih;
-SECURITY_ATTRIBUTES NO_COPY sec_all;
-SECURITY_ATTRIBUTES NO_COPY sec_all_nih;
+static NO_COPY_RO SECURITY_DESCRIPTOR null_sdp =
+	{ SECURITY_DESCRIPTOR_REVISION, 0, SE_DACL_PRESENT,
+	  NULL, NULL, NULL, NULL };
+SECURITY_ATTRIBUTES NO_COPY_RO sec_none =
+	{ sizeof (SECURITY_ATTRIBUTES), NULL, TRUE };
+SECURITY_ATTRIBUTES NO_COPY_RO sec_none_nih =
+	{ sizeof (SECURITY_ATTRIBUTES), NULL, FALSE };
+SECURITY_ATTRIBUTES NO_COPY_RO sec_all =
+	{ sizeof (SECURITY_ATTRIBUTES), &null_sdp, TRUE };
+SECURITY_ATTRIBUTES NO_COPY_RO sec_all_nih =
+	{ sizeof (SECURITY_ATTRIBUTES), &null_sdp, FALSE };
 
 MKSID (well_known_null_sid, "S-1-0-0",
        SECURITY_NULL_SID_AUTHORITY, 1, SECURITY_NULL_RID);
@@ -67,8 +74,6 @@ MKSID (well_known_admins_sid, "S-1-5-32-544",
 MKSID (well_known_users_sid, "S-1-5-32-545",
        SECURITY_NT_AUTHORITY, 2, SECURITY_BUILTIN_DOMAIN_RID,
 				 DOMAIN_ALIAS_RID_USERS);
-MKSID (fake_logon_sid, "S-1-5-5-0-0",
-       SECURITY_NT_AUTHORITY, 3, SECURITY_LOGON_IDS_RID, 0, 0);
 MKSID (mandatory_medium_integrity_sid, "S-1-16-8192",
        SECURITY_MANDATORY_LABEL_AUTHORITY, 1, SECURITY_MANDATORY_MEDIUM_RID);
 MKSID (mandatory_high_integrity_sid, "S-1-16-12288",
@@ -87,15 +92,15 @@ cygpsid::operator== (const char *nsidstr) const
   return psid == nsid;
 }
 
-__uid32_t
+uid_t
 cygpsid::get_id (BOOL search_grp, int *type)
 {
     /* First try to get SID from group, then passwd */
-  __uid32_t id = ILLEGAL_UID;
+  uid_t id = ILLEGAL_UID;
 
   if (search_grp)
     {
-      struct __group32 *gr;
+      struct group *gr;
       if (cygheap->user.groups.pgsid == psid)
 	id = myself->gid;
       else if ((gr = internal_getgrsid (*this)))
@@ -205,7 +210,7 @@ cygsid::getfrompw (const struct passwd *pw)
 }
 
 BOOL
-cygsid::getfromgr (const struct __group32 *gr)
+cygsid::getfromgr (const struct group *gr)
 {
   char *sp = (gr && gr->gr_passwd) ? gr->gr_passwd : NULL;
   return (*this = sp) != NULL;
@@ -254,10 +259,10 @@ cygsidlist::add (const PSID nsi, bool well_known)
 }
 
 bool
-get_sids_info (cygpsid owner_sid, cygpsid group_sid, __uid32_t * uidret, __gid32_t * gidret)
+get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gidret)
 {
   struct passwd *pw;
-  struct __group32 *gr = NULL;
+  struct group *gr = NULL;
   bool ret = false;
 
   owner_sid.debug_print ("get_sids_info: owner SID =");
@@ -434,7 +439,7 @@ set_privilege (HANDLE token, DWORD privilege, bool enable)
 
 out:
   if (ret < 0)
-    debug_printf ("%d = set_privilege((token %x) %W, %d)", ret, token,
+    debug_printf ("%d = set_privilege((token %p) %W, %d)", ret, token,
 		  privilege_name (new_priv.Privileges[0].Luid), enable);
   return ret;
 }
@@ -456,42 +461,8 @@ set_cygwin_privileges (HANDLE token)
   /* Allow to create global shared memory.  This isn't required anymore since
      Cygwin 1.7.  It uses its own subdirectories in the global NT namespace
      which isn't affected by the SE_CREATE_GLOBAL_PRIVILEGE restriction. */
-  if (wincap.has_create_global_privilege ())
-    set_privilege (token, SE_CREATE_GLOBAL_PRIVILEGE, true);
+  set_privilege (token, SE_CREATE_GLOBAL_PRIVILEGE, true);
 #endif
-}
-
-/* Function to return a common SECURITY_DESCRIPTOR that
-   allows all access.  */
-
-static inline PSECURITY_DESCRIPTOR
-get_null_sd ()
-{
-  static NO_COPY SECURITY_DESCRIPTOR sd;
-  static NO_COPY PSECURITY_DESCRIPTOR null_sdp;
-
-  if (!null_sdp)
-    {
-      RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-      RtlSetDaclSecurityDescriptor (&sd, TRUE, NULL, FALSE);
-      null_sdp = &sd;
-    }
-  return null_sdp;
-}
-
-/* Initialize global security attributes.
-   Called from dcrt0.cc (_dll_crt0).  */
-
-void
-init_global_security ()
-{
-  sec_none.nLength = sec_none_nih.nLength =
-  sec_all.nLength = sec_all_nih.nLength = sizeof (SECURITY_ATTRIBUTES);
-  sec_none.bInheritHandle = sec_all.bInheritHandle = TRUE;
-  sec_none_nih.bInheritHandle = sec_all_nih.bInheritHandle = FALSE;
-  sec_none.lpSecurityDescriptor = sec_none_nih.lpSecurityDescriptor = NULL;
-  sec_all.lpSecurityDescriptor = sec_all_nih.lpSecurityDescriptor =
-    get_null_sd ();
 }
 
 bool
@@ -509,49 +480,49 @@ sec_acl (PACL acl, bool original, bool admins, PSID sid1, PSID sid2, DWORD acces
   status = RtlCreateAcl (acl, acl_len, ACL_REVISION);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("RtlCreateAcl: %p", status);
+      debug_printf ("RtlCreateAcl: %y", status);
       return false;
     }
   if (sid1)
     {
       status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL, sid1);
       if (!NT_SUCCESS (status))
-	debug_printf ("RtlAddAccessAllowedAce(sid1) %p", status);
+	debug_printf ("RtlAddAccessAllowedAce(sid1) %y", status);
     }
   if (original && (psid = cygheap->user.saved_sid ())
       && psid != sid1 && psid != well_known_system_sid)
     {
       status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL, psid);
       if (!NT_SUCCESS (status))
-	debug_printf ("RtlAddAccessAllowedAce(original) %p", status);
+	debug_printf ("RtlAddAccessAllowedAce(original) %y", status);
     }
   if (sid2)
     {
       status = RtlAddAccessAllowedAce (acl, ACL_REVISION, access2, sid2);
       if (!NT_SUCCESS (status))
-	debug_printf ("RtlAddAccessAllowedAce(sid2) %p", status);
+	debug_printf ("RtlAddAccessAllowedAce(sid2) %y", status);
     }
   if (admins)
     {
       status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL,
 				       well_known_admins_sid);
       if (!NT_SUCCESS (status))
-	debug_printf ("RtlAddAccessAllowedAce(admin) %p", status);
+	debug_printf ("RtlAddAccessAllowedAce(admin) %y", status);
     }
   status = RtlAddAccessAllowedAce (acl, ACL_REVISION, GENERIC_ALL,
 				   well_known_system_sid);
   if (!NT_SUCCESS (status))
-    debug_printf ("RtlAddAccessAllowedAce(system) %p", status);
+    debug_printf ("RtlAddAccessAllowedAce(system) %y", status);
   status = RtlFirstFreeAce (acl, &pAce);
   if (NT_SUCCESS (status) && pAce)
     acl->AclSize = (char *) pAce - (char *) acl;
   else
-    debug_printf ("RtlFirstFreeAce: %p", status);
+    debug_printf ("RtlFirstFreeAce: %y", status);
 
   return true;
 }
 
-PSECURITY_ATTRIBUTES __stdcall
+PSECURITY_ATTRIBUTES __reg3
 __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
 {
   PSECURITY_ATTRIBUTES psa = (PSECURITY_ATTRIBUTES) sa_buf;
@@ -570,7 +541,7 @@ __sec_user (PVOID sa_buf, PSID sid1, PSID sid2, DWORD access2, BOOL inherit)
   RtlCreateSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
   status = RtlSetDaclSecurityDescriptor (psd, TRUE, acl, FALSE);
   if (!NT_SUCCESS (status))
-    debug_printf ("RtlSetDaclSecurityDescriptor %p", status);
+    debug_printf ("RtlSetDaclSecurityDescriptor %y", status);
 
   psa->nLength = sizeof (SECURITY_ATTRIBUTES);
   psa->lpSecurityDescriptor = psd;
@@ -621,7 +592,7 @@ _recycler_sd (void *buf, bool users, bool dir)
   status = RtlFirstFreeAce (dacl, &ace);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("RtlFirstFreeAce: %p", status);
+      debug_printf ("RtlFirstFreeAce: %y", status);
       return NULL;
     }
   dacl->AclSize = (char *) ace - (char *) dacl;
@@ -655,14 +626,14 @@ _everyone_sd (void *buf, ACCESS_MASK access)
 				       well_known_world_sid);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("RtlAddAccessAllowedAce: %p", status);
+	  debug_printf ("RtlAddAccessAllowedAce: %y", status);
 	  return NULL;
 	}
       LPVOID ace;
       status = RtlFirstFreeAce (dacl, &ace);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("RtlFirstFreeAce: %p", status);
+	  debug_printf ("RtlFirstFreeAce: %y", status);
 	  return NULL;
 	}
       dacl->AclSize = (char *) ace - (char *) dacl;

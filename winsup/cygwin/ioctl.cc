@@ -1,7 +1,7 @@
 /* ioctl.cc: ioctl routines.
 
-   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2011
-   Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2011,
+   2012 Red Hat, Inc.
 
    Written by Doug Evans of Cygnus Support
    dje@cygnus.com
@@ -33,7 +33,7 @@ ioctl (int fd, int cmd, ...)
   char *argp = va_arg (ap, char *);
   va_end (ap);
 
-  debug_printf ("ioctl(fd %d, cmd %p)", fd, cmd);
+  debug_printf ("ioctl(fd %d, cmd %y)", fd, cmd);
   int res;
   /* FIXME: This stinks.  There are collisions between cmd types
      depending on whether fd is associated with a pty master or not.
@@ -58,6 +58,6 @@ ioctl (int fd, int cmd, ...)
   res = cfd->ioctl (cmd, argp);
 
 out:
-  syscall_printf ("%R = ioctl(%d, %p, ...)", res, fd, cmd);
+  syscall_printf ("%R = ioctl(%d, %y, ...)", res, fd, cmd);
   return res;
 }

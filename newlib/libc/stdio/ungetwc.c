@@ -110,6 +110,8 @@ _DEFUN(ungetwc, (wint_t wc, FILE *fp),
 	wint_t wc _AND
 	FILE *fp)
 {
-  CHECK_INIT (_REENT, fp);
-  return _ungetwc_r (_REENT, wc, fp);
+  struct _reent *reent = _REENT;
+
+  CHECK_INIT (reent, fp);
+  return _ungetwc_r (reent, wc, fp);
 }

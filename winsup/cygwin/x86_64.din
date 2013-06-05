@@ -1,0 +1,20 @@
+LIBRARY "cygwin1.dll" BASE=0x180040000
+
+EXPORTS
+#Exported variables
+environ = __cygwin_environ DATA
+
+#Exported functions
+__wrap__Znam NOSIGFE                # void *operator new[](std::size_t sz) throw (std::bad_alloc)
+__wrap__ZnamRKSt9nothrow_t NOSIGFE  # void *operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
+__wrap__Znwm NOSIGFE                # void *operator new(std::size_t sz) throw (std::bad_alloc)
+__wrap__ZnwmRKSt9nothrow_t NOSIGFE  # void *operator new(std::size_t sz, const std::nothrow_t &nt) throw()
+_alloca = __alloca NOSIGFE
+_dll_crt0 NOSIGFE
+dll_entry NOSIGFE
+llrint NOSIGFE
+llrintf NOSIGFE
+lrint NOSIGFE
+lrintf NOSIGFE
+rint NOSIGFE
+rintf NOSIGFE
