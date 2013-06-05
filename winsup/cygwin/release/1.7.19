@@ -10,8 +10,8 @@ What's new:
 
 - Add support for the AFS filesystem.
 
-- Support for mandatory locking via fcntl/flock/lockf, using Windows locking
-  semantics.  New F_LCK_MANDATORY fcntl command.
+- Preliminary support for mandatory locking via fcntl/flock/lockf, using
+  Windows locking semantics.  New F_LCK_MANDATORY fcntl command.
 
 - New APIs: __b64_ntop, __b64_pton, arc4random, arc4random_addrandom,
   arc4random_buf, arc4random_stir, arc4random_uniform.
