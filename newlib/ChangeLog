@@ -1,3 +1,7 @@
+2013-06-05  Joey Ye  <joey.ye@arm.com>
+
+	* libc/machine/arm/strcmp.S: Use local labels.
+
 2013-06-03  Joey Ye  <joey.ye@arm.com>
 
 	* libc/machine/arm/Makefile.am (MEMCPY_DEP): New define.
