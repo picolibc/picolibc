@@ -1,3 +1,8 @@
+2013-06-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.19): Revert mandatory locking support to
+	"preliminary".
+
 2013-06-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Add rule to rebuild Makefile if Makefile.in changes.
