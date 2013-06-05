@@ -439,7 +439,7 @@ Can I bundle Cygwin with my product for free?
 </para></question>
 <answer><para>
 Only if you comply with Cygwin's <ulink
-url="http://cygwin.com/license.html">license</ulink> very carefully.  If you
+url="http://cygwin.com/licensing.html">license</ulink> very carefully.  If you
 choose to distribute cygwin1.dll, you must be willing to distribute the
 exact source code used to build that copy of cygwin1.dll as per the
 terms of the GPL.  If you ship applications that link with cygwin1.dll,

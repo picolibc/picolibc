@@ -43,7 +43,7 @@ Since Cygwin is a community-supported free software project, patches to
 provide support for other versions would be thoughtfully considered.
 Paid support contracts or enhancements are available through Red Hat.  For 
 information about getting a Red Hat support contract, see 
-<ulink url="http://cygwin.com/license.html" />.
+<ulink url="http://cygwin.com/licensing.html" />.
 </para>
 <para>Keep in mind that Cygwin can only do as much as the underlying OS
 supports.  Because of this, Cygwin will behave differently, and
@@ -85,7 +85,7 @@ these tools.
 <para>In particular, if you intend to port a proprietary (non-GPL'd)
 application using Cygwin, you will need the proprietary-use license 
 for the Cygwin library.  This is available for purchase from Red Hat;
-please visit <ulink url="http://cygwin.com/license.html" /> for more
+please visit <ulink url="http://cygwin.com/licensing.html" /> for more
 information.  All other questions should be sent to the public project
 mailing list cygwin@cygwin.com.
 </para>

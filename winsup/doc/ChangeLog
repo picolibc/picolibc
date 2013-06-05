@@ -1,5 +1,11 @@
 2013-06-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* faq-copyright.xml: Fix link to license.
+	* faq-using.xml: Ditto.
+	* faq-what.xml: Ditto.
+
+2013-06-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* faq-programming.xml: Convert url to refer to new flat faq.html file.
 	* faq-setup.xml: Ditto.
 	* faq-using.xml: Ditto.
