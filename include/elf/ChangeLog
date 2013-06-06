@@ -1,3 +1,7 @@
+2013-06-06  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h (ELF_ST_SET_MIPS_PIC): Clear any STO_MIPS16 setting.
+
 2013-05-30  Paul Brook  <paul@codesourcery.com>
 
 	* mips.h (R_MIPS_EH): New.
