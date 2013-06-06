@@ -1253,25 +1253,18 @@ _cygtls::handle_SIGCONT ()
     {
       myself->stopsig = 0;
       myself->process_state &= ~PID_STOPPED;
-      int state = 0;
       /* Carefully tell sig_handle_tty_stop to wake up.  */
-      while (state < 2)
-       {
-	 lock ();
-	 if (sig)
-	   yield ();           /* state <= 1 */
-	 else if (state)
-	   state++;            /* state == 2 */
-	 else
-	   {
-	     sig = SIGCONT;
-	     SetEvent (signal_arrived);
-	     state++;          /* state == 1 */
-	   }
-	 unlock ();
-       }
+      lock ();
+      sig = SIGCONT;
+      SetEvent (signal_arrived);
+      /* Make sure yield doesn't run under lock condition to avoid
+         starvation of sig_handle_tty_stop. */
+      unlock ();
+      /* Wait until sig_handle_tty_stop woke up. */
+      while (sig)
+	yield ();
       /* Tell wait_sig to handle any queued signals now that we're alive
-	again. */
+	 again. */
       sig_dispatch_pending (false);
     }
   /* Clear pending stop signals */

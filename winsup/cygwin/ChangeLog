@@ -1,3 +1,11 @@
+2013-06-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (_cygtls::handle_SIGCONT): Simplify loop waiting for
+	sig_handle_tty_stop to wake up.  Make sure to unlock before calling
+	yield to avoid starvation of sig_handle_tty_stop.  Add comments.
+	* miscfuncs.cc (yield): Explain why yield should never be called under
+	_cygtls::lock conditions.  Call SleepEx with 1ms timeout.  Explain why.
+
 2013-06-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 20.
