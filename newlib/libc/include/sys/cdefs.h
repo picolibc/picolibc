@@ -650,4 +650,17 @@
 #endif
 #endif
 
+#ifndef	__has_extension
+#define	__has_extension  __has_feature
+#endif
+#ifndef	__has_feature
+#define	__has_feature(x) 0
+#endif
+#ifndef	__has_include
+#define	__has_include(x) 0
+#endif
+#ifndef	__has_builtin
+#define	__has_builtin(x) 0
+#endif
+
 #endif /* !_SYS_CDEFS_H_ */

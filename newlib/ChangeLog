@@ -1,3 +1,11 @@
+2013-06-07  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/cdefs.h (__has_extension): New define.
+	(__has_feature): Likewise.
+	(__has_include): Likewise.
+	(__has_builtin): Likewise.
+	* libc/include/stdatomic.h: New.
+
 2013-06-05  Joey Ye  <joey.ye@arm.com>
 
 	* libc/machine/arm/strcmp.S: Use local labels.
