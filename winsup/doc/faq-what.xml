@@ -1,5 +1,12 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<qandadiv id="faq.about">
+<title>About Cygwin</title>
+
 <!-- faq-what.xml -->
-<qandaentry id="faq.what">
+<qandaentry id="faq.what.what">
 <question><para>What is it?</para></question>
 <answer>
 
@@ -26,18 +33,17 @@ sad reason.
 <question><para>What versions of Windows are supported?</para></question>
 <answer>
 
-<para>Cygwin can be expected to run on all modern 32 bit versions of
-Windows  This includes, as of the time of writing this, Windows 2000,
-Windows XP, Windows Server 2003, Windows Vista, Windows Server 2008,
-Windows 7, Windows Server 2012, Windows 8, as well as the WOW64 32 bit
+<para>Cygwin can be expected to run on all modern versions of Windows.
+This includes, as of the time of writing this, Windows XP SP3, Windows
+Server 2003, Windows Vista, Windows Server 2008, Windows 7, Windows
+Server 2012, Windows 8.  The 32 bit version also runs in the WOW64 32 bit
 environment on released 64 bit versions of Windows
 (XP/2003/Vista/2008/7/2008 R2/8/2012).
-A native 64 bit Cygwin version is in the works.
 Since Cygwin is a community-supported free software project, patches to
 provide support for other versions would be thoughtfully considered.
 Paid support contracts or enhancements are available through Red Hat.  For 
 information about getting a Red Hat support contract, see 
-<ulink url="http://cygwin.com/license.html" />.
+<ulink url="http://cygwin.com/licensing.html" />.
 </para>
 <para>Keep in mind that Cygwin can only do as much as the underlying OS
 supports.  Because of this, Cygwin will behave differently, and
@@ -79,7 +85,7 @@ these tools.
 <para>In particular, if you intend to port a proprietary (non-GPL'd)
 application using Cygwin, you will need the proprietary-use license 
 for the Cygwin library.  This is available for purchase from Red Hat;
-please visit <ulink url="http://cygwin.com/license.html" /> for more
+please visit <ulink url="http://cygwin.com/licensing.html" /> for more
 information.  All other questions should be sent to the public project
 mailing list cygwin@cygwin.com.
 </para>
@@ -153,4 +159,4 @@ function, so some email will have to go unanswered.
 <para>Many thanks to everyone using the tools for their many contributions in
 the form of advice, bug reports, and code fixes.  Keep them coming!
 </para></answer></qandaentry>
-
+</qandadiv>

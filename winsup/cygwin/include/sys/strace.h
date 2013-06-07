@@ -1,7 +1,7 @@
 /* sys/strace.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008,
-   2010, 2011 Red Hat, Inc.
+   2010, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -29,6 +29,7 @@ details. */
 #define _SYS_STRACE_H
 
 #include <stdarg.h>
+#include <sys/types.h>
 
 #ifdef __cplusplus
 
@@ -49,7 +50,7 @@ public:
   void prntf (unsigned, const char *func, const char *, ...) /*__attribute__ ((regparm(3)))*/;
   void vprntf (unsigned, const char *func, const char *, va_list ap) /*__attribute__ ((regparm(3)))*/;
   void wm (int message, int word, int lon) __attribute__ ((regparm(3)));
-  void write_childpid (unsigned long) __attribute__ ((regparm (3)));
+  void write_childpid (pid_t) __attribute__ ((regparm (3)));
   bool attached () const {return _active == 3;}
   bool active () const {return _active & 1;}
   unsigned char& active_val () {return _active;}

@@ -105,9 +105,11 @@ _DEFUN(getc, (fp),
        register FILE *fp)
 {
   int result;
-  CHECK_INIT (_REENT, fp);
+  struct _reent *reent = _REENT;
+
+  CHECK_INIT (reent, fp);
   _newlib_flockfile_start (fp);
-  result = __sgetc_r (_REENT, fp);
+  result = __sgetc_r (reent, fp);
   _newlib_flockfile_end (fp);
   return result;
 }

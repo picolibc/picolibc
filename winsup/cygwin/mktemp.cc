@@ -11,7 +11,6 @@ See the copyright at the bottom of this file. */
 #include <unistd.h>
 
 static int _gettemp(char *, int *, int, size_t, int);
-static uint32_t arc4random ();
 
 static const char padchar[] =
 "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -93,7 +92,7 @@ _gettemp(char *path, int *doopen, int domkdir, size_t suffixlen, int flags)
   /*
    * check the target directory.
    */
-  struct __stat64 sbuf;
+  struct stat sbuf;
   if (doopen != NULL || domkdir)
     {
       for (; trv > path; trv--)
@@ -151,20 +150,6 @@ _gettemp(char *path, int *doopen, int domkdir, size_t suffixlen, int flags)
 	}
     }
   /*NOTREACHED*/
-}
-
-static uint32_t
-arc4random ()
-{
-  union
-  {
-    uint32_t rand;
-    char buf[sizeof (int) / 8];
-  } r;
-  int fd = open ("/dev/urandom", O_RDONLY);
-  read (fd, r.buf, 4);
-  close (fd);
-  return r.rand;
 }
 
 /*

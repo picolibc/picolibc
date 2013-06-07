@@ -11,8 +11,10 @@
 /* Make this a weak reference to avoid pulling in free.  */
 void free(void *) _ATTRIBUTE((__weak__));
 
-#ifndef __SINGLE_THREAD__
-extern _LOCK_RECURSIVE_T __atexit_lock;
+__LOCK_INIT_RECURSIVE(, __atexit_lock);
+
+#ifdef _REENT_GLOBAL_ATEXIT
+struct _atexit *_global_atexit = _NULL;
 #endif
 
 #ifdef _WANT_REGISTER_FINI
@@ -78,8 +80,8 @@ _DEFUN (__call_exitprocs, (code, d),
 
  restart:
 
-  p = _GLOBAL_REENT->_atexit;
-  lastp = &_GLOBAL_REENT->_atexit;
+  p = _GLOBAL_ATEXIT;
+  lastp = &_GLOBAL_ATEXIT;
   while (p)
     {
 #ifdef _REENT_SMALL

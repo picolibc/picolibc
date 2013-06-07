@@ -15,7 +15,7 @@ details. */
 #include "limits.h"
 #include "mount.h"
 
-#define CURR_USER_MAGIC 0x6467403bU
+#define CURR_USER_MAGIC 0xab1fcce8U
 
 class user_info
 {
@@ -25,6 +25,7 @@ public:
   DWORD cb;
   bool warned_msdos;
   bool warned_notty;
+  bool warned_nonativesyms;
   mount_info mountinfo;
   friend void dll_crt0_1 (void *);
   static void create (bool);

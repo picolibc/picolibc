@@ -72,7 +72,7 @@ cygthread::stub (VOID *arg)
   else
     {
       info->stack_ptr = &arg;
-      debug_printf ("thread '%s', id %p, stack_ptr %p", info->name (), info->id, info->stack_ptr);
+      debug_printf ("thread '%s', id %y, stack_ptr %p", info->name (), info->id, info->stack_ptr);
       if (!info->ev)
 	{
 	  info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
@@ -165,7 +165,7 @@ new (size_t)
 	/* available */
 #ifdef DEBUGGING
 	if (info->__name)
-	  api_fatal ("name not NULL? %s, id %p, i %d", info->__name, info->id, info - threads);
+	  api_fatal ("name not NULL? %s, id %y, i %ld", info->__name, info->id, info - threads);
 #endif
 	goto out;
       }
@@ -197,7 +197,7 @@ cygthread::async_create (ULONG_PTR arg)
 void
 cygthread::create ()
 {
-  thread_printf ("name %s, id %p, this %p", __name, id, this);
+  thread_printf ("name %s, id %y, this %p", __name, id, this);
   HANDLE htobe;
   if (h)
     {
@@ -206,7 +206,7 @@ cygthread::create ()
       while (!thread_sync)
 	yield ();
       SetEvent (thread_sync);
-      thread_printf ("activated name '%s', thread_sync %p for id %p", __name, thread_sync, id);
+      thread_printf ("activated name '%s', thread_sync %p for id %y", __name, thread_sync, id);
       htobe = h;
     }
   else
@@ -215,8 +215,8 @@ cygthread::create ()
       htobe = CreateThread (&sec_none_nih, 0, is_freerange ? simplestub : stub,
 			    this, 0, &id);
       if (!htobe)
-	api_fatal ("CreateThread failed for %s - %p<%p>, %E", __name, h, id);
-      thread_printf ("created name '%s', thread %p, id %p", __name, h, id);
+	api_fatal ("CreateThread failed for %s - %p<%y>, %E", __name, h, id);
+      thread_printf ("created name '%s', thread %p, id %y", __name, h, id);
 #ifdef DEBUGGING
       terminated = false;
 #endif
@@ -257,7 +257,7 @@ cygthread::name (DWORD tid)
     res = "main";
   else
     {
-      __small_sprintf (_my_tls.locals.unknown_thread_name, "unknown (%p)", tid);
+      __small_sprintf (_my_tls.locals.unknown_thread_name, "unknown (%y)", tid);
       res = _my_tls.locals.unknown_thread_name;
     }
   return res;
@@ -296,7 +296,7 @@ bool
 cygthread::terminate_thread ()
 {
   bool terminated = true;
-  debug_printf ("thread '%s', id %p, inuse %d, stack_ptr %p", __name, id, inuse, stack_ptr);
+  debug_printf ("thread '%s', id %y, inuse %d, stack_ptr %p", __name, id, inuse, stack_ptr);
   while (inuse && !stack_ptr)
     yield ();
 
@@ -354,7 +354,7 @@ cygthread::detach (HANDLE sigwait)
   bool signalled = false;
   bool thread_was_reset = false;
   if (!inuse)
-    system_printf ("called detach but inuse %d, thread %p?", inuse, id);
+    system_printf ("called detach but inuse %d, thread %y?", inuse, id);
   else
     {
       DWORD res;
@@ -429,7 +429,7 @@ cygthread::detach (HANDLE sigwait)
 	  ::SetThreadPriority (hth, prio);
 	}
 
-      thread_printf ("%s returns %d, id %p", sigwait ? "WFMO" : "WFSO",
+      thread_printf ("%s returns %d, id %y", sigwait ? "WFMO" : "WFSO",
 		     res, id);
 
       if (thread_was_reset)

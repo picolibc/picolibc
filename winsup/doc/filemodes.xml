@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="using-filemodes"><title>File permissions</title>
+
+<para>On FAT or FAT32 filesystems, files are always readable, and Cygwin
+uses the DOS read-only attribute to determine if they are writable. Files are
+considered to be executable if the filename ends with .bat, .com or .exe, or
+if its content starts with #!. Consequently <command>chmod</command> can
+only affect the "w" mode, it silently ignores actions involving the other
+modes.  This means that <command>ls -l</command>
+needs to open and read files. It can thus be relatively slow.</para>
+
+<para>On NTFS, file permissions are evaluated using the Access Control
+Lists (ACLs) attached to a file.  This can be switched off by using the
+"noacl" option to the respective mount point in the
+<filename>/etc/fstab</filename> or <filename>/etc/fstab.d/$USER</filename>
+file.  For more information on file permissions, see
+
+<!-- TODO: Put the file permission stuff from ntsec here??? -->
+
+<xref linkend="ntsec"></xref>.
+</para>
+
+<!-- TODO -->
+
+<para>On NFS shares, file permissions are exactly the POSIX permissions
+transmitted from the server using the NFSv3 protocol, if the NFS client
+is the one from Microsoft's "Services For Unix", or the one built into
+Windows Vista or later.
+</para>
+
+<para>Only the user and group ownership is not necessarily correct.</para>
+
+</sect1>
+

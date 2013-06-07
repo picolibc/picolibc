@@ -1,6 +1,6 @@
 /* fhandler_procsys.cc: fhandler for native NT namespace.
 
-   Copyright 2010, 2011, 2013 Red Hat, Inc.
+   Copyright 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -44,7 +44,7 @@ const size_t procsys_len = sizeof (procsys) - 1;
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
    -1 if path is a file, -2 if it's a symlink.  */
 virtual_ftype_t
-fhandler_procsys::exists (struct __stat64 *buf)
+fhandler_procsys::exists (struct stat *buf)
 {
   UNICODE_STRING path;
   UNICODE_STRING dir;
@@ -74,7 +74,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
     dir.Length -= sizeof (WCHAR);
   InitializeObjectAttributes (&attr, &dir, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenDirectoryObject (&h, DIRECTORY_QUERY, &attr);
-  debug_printf ("NtOpenDirectoryObject: %p", status);
+  debug_printf ("NtOpenDirectoryObject: %y", status);
   if (NT_SUCCESS (status))
     {
       internal = true;
@@ -85,7 +85,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
   InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE, NULL, NULL);
   status = NtOpenSymbolicLinkObject (&h, READ_CONTROL | SYMBOLIC_LINK_QUERY,
 				     &attr);
-  debug_printf ("NtOpenSymbolicLinkObject: %p", status);
+  debug_printf ("NtOpenSymbolicLinkObject: %y", status);
   if (NT_SUCCESS (status))
     {
       /* If requested, check permissions. */
@@ -98,7 +98,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
     return virt_symlink;
   /* Then check if it's an object directory. */
   status = NtOpenDirectoryObject (&h, READ_CONTROL | DIRECTORY_QUERY, &attr);
-  debug_printf ("NtOpenDirectoryObject: %p", status);
+  debug_printf ("NtOpenDirectoryObject: %y", status);
   if (NT_SUCCESS (status))
     {
       /* If requested, check permissions. */
@@ -112,7 +112,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
   /* Next try to open as file/device. */
   status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES, &attr, &io,
 		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
-  debug_printf ("NtOpenFile: %p", status);
+  debug_printf ("NtOpenFile: %y", status);
   /* Name is invalid, that's nothing. */
   if (status == STATUS_OBJECT_NAME_INVALID)
     return virt_none;
@@ -135,7 +135,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
 	 since NtQueryAttributesFile might crash the machine if the underlying
 	 driver is badly written. */
       status = NtQueryAttributesFile (&attr, &fbi);
-      debug_printf ("NtQueryAttributesFile: %p", status);
+      debug_printf ("NtQueryAttributesFile: %y", status);
       if (NT_SUCCESS (status))
 	return (fbi.FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	       ? virt_fsdir : virt_fsfile;
@@ -154,7 +154,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
 	  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
 			       &attr, &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_FOR_BACKUP_INTENT);
-	  debug_printf ("NtOpenDirectoryObject: %p", status);
+	  debug_printf ("NtOpenDirectoryObject: %y", status);
 	  if (dir.Length > sizeof (WCHAR))
 	    dir.Length -= sizeof (WCHAR);
 	}
@@ -173,7 +173,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
       /* Check for the device type. */
       status = NtQueryVolumeInformationFile (h, &io, &ffdi, sizeof ffdi,
 					     FileFsDeviceInformation);
-      debug_printf ("NtQueryVolumeInformationFile: %p", status);
+      debug_printf ("NtQueryVolumeInformationFile: %y", status);
       /* Don't call NtQueryInformationFile unless we know it's a safe type.
 	 The call is known to crash machines, if the underlying driver is
 	 badly written. */
@@ -195,7 +195,7 @@ fhandler_procsys::exists (struct __stat64 *buf)
 	     into a real FS through /proc/sys. */
 	  status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
 					   FileBasicInformation);
-	  debug_printf ("NtQueryInformationFile: %p", status);
+	  debug_printf ("NtQueryInformationFile: %y", status);
 	  if (!NT_SUCCESS (status))
 	    file_type = virt_blk;
 	  else
@@ -261,7 +261,7 @@ unreadable:
 }
 
 int __reg2
-fhandler_procsys::fstat (struct __stat64 *buf)
+fhandler_procsys::fstat (struct stat *buf)
 {
   const char *path = get_name ();
   debug_printf ("fstat (%s)", path);
@@ -271,7 +271,7 @@ fhandler_procsys::fstat (struct __stat64 *buf)
   buf->st_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
   buf->st_uid = 544;
   buf->st_gid = 18;
-  buf->st_dev = buf->st_rdev = (int) dev ();
+  buf->st_dev = buf->st_rdev = dev ();
   buf->st_ino = get_ino ();
   switch (exists (buf))
     {
@@ -391,29 +391,15 @@ fhandler_procsys::closedir (DIR *dir)
   return fhandler_virtual::closedir (dir);
 }
 
-void __stdcall
+void __reg3
 fhandler_procsys::read (void *ptr, size_t& len)
 {
-  NTSTATUS status;
-  IO_STATUS_BLOCK io;
-  LARGE_INTEGER off = { QuadPart:0LL };
-
-  /* FIXME: Implement nonblocking I/O, interruptibility and cancelability. */
-  status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, ptr, len,
-		       &off, NULL);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      len = -1;
-    }
-  else
-    len = io.Information;
+  fhandler_base::raw_read (ptr, len);
 }
 
 ssize_t __stdcall
 fhandler_procsys::write (const void *ptr, size_t len)
 {
-  /* FIXME: Implement nonblocking I/O, interruptibility and cancelability. */
   return fhandler_base::raw_write (ptr, len);
 }
 
@@ -446,7 +432,7 @@ fhandler_procsys::open (int flags, mode_t mode)
 	  break;
 	}
     }
-  syscall_printf ("%d = fhandler_procsys::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_procsys::open(%p, 0%o)", res, flags, mode);
   return res;
 }
 

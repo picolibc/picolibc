@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<qandadiv id="faq.using">
+<title>Using Cygwin</title>
+
 <!-- faq-problems.xml -->
 <qandaentry id="faq.using.missing-dlls">
 <question><para>Why can't my application locate cygncurses-8.dll?  or cygintl-3.dll?  or cygreadline6.dll?  or ...?</para></question>
@@ -432,7 +439,7 @@ Can I bundle Cygwin with my product for free?
 </para></question>
 <answer><para>
 Only if you comply with Cygwin's <ulink
-url="http://cygwin.com/license.html">license</ulink> very carefully.  If you
+url="http://cygwin.com/licensing.html">license</ulink> very carefully.  If you
 choose to distribute cygwin1.dll, you must be willing to distribute the
 exact source code used to build that copy of cygwin1.dll as per the
 terms of the GPL.  If you ship applications that link with cygwin1.dll,
@@ -621,7 +628,7 @@ of poorly written firewall-type software that causes things to break.
 Note that with many of these products, simply disabling the firewall
 does not remove these changes; it must be completely uninstalled.
 </para>
-<para>See also <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda" />
+<para>See also <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda" />
 for a list of applications that have been known, at one time or another, to 
 interfere with the normal functioning of Cygwin.
 </para>
@@ -771,7 +778,7 @@ contents are exempt from scanning.  In a default installation, this
 would be <literal>C:\cygwin\bin</literal>.  Obviously, this could be
 exploited by a hostile non-Cygwin program, so do this at your own risk.
 </para>
-<para>See also <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda" />
+<para>See also <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda" />
 for a list of applications that have been known, at one time or another, to
 interfere with the normal functioning of Cygwin.
 </para>
@@ -1101,10 +1108,6 @@ IPv6-capable and that's why you see the "Address family not supported"
 error message.  Note, however, that the IPv6 stack on these systems
 don't fully support all features of IPv6.</para>
 
-<para>There's also a very experimental IPv6 stack for Windows 2000, and
-Cygwin will try its best to support it, but it's not recommended to install
-it.</para>
-
 <para>For more information about IPv6 on Windows and how to install the
 IPv6 stack, see the <ulink url="http://www.microsoft.com/technet/network/ipv6/ipv6faq.mspx">Microsoft TechNet IPv6 FAQ article</ulink>
 </para></answer></qandaentry>
@@ -1247,3 +1250,4 @@ such as virtual memory paging and file caching.</para>
   difficult to make <literal>fork()</literal> work reliably.</para>
 </answer>
 </qandaentry>
+</qandadiv>

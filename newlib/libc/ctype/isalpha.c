@@ -16,8 +16,8 @@ TRAD_SYNOPSIS
 DESCRIPTION
 <<isalpha>> is a macro which classifies ASCII integer values by table
 lookup.  It is a predicate returning non-zero when <[c]> represents an
-alphabetic ASCII character, and 0 otherwise.  It is defined only when
-<<isascii>>(<[c]>) is true or <[c]> is EOF.
+alphabetic ASCII character, and 0 otherwise.  It is defined only if
+<[c]> is representable as an unsigned char or if <[c]> is EOF.
 
 You can use a compiled subroutine instead of the macro definition by
 undefining the macro using `<<#undef isalpha>>'.

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="gdb"><title>Debugging Cygwin Programs</title>
+
+<para>When your program doesn't work right, it usually has a "bug" in
+it, meaning there's something wrong with the program itself that is
+causing unexpected results or crashes.  Diagnosing these bugs and
+fixing them is made easy by special tools called
+<emphasis>debuggers</emphasis>.  In the case of Cygwin, the debugger
+is GDB, which stands for "GNU DeBugger".  This tool lets you run your
+program in a controlled environment where you can investigate the
+state of your program while it is running or after it crashes.
+Crashing programs sometimes create "core" files. In Cygwin these are 
+regular text files that cannot be used directly by GDB.
+</para>
+
+<para>Before you can debug your program, you need to prepare your
+program for debugging.  What you need to do is add
+<literal>-g</literal> to all the other flags you use when compiling
+your sources to objects.</para>
+
+<example id="gdb-g"><title>Compiling with -g</title>
+<screen>
+<prompt>bash$</prompt> gcc -g -O2 -c myapp.c
+<prompt>bash$</prompt> gcc -g myapp.c -o myapp
+</screen>
+</example>
+
+<para>What this does is add extra information to the objects (they get
+much bigger too) that tell the debugger about line numbers, variable
+names, and other useful things.  These extra symbols and debugging
+information give your program enough information about the original
+sources so that the debugger can make debugging much easier for
+you.</para>
+
+<para>To invoke GDB, simply type <command>gdb myapp.exe</command> at the
+command prompt.  It will display some text telling you about itself,
+then <literal>(gdb)</literal> will appear to prompt you to enter
+commands.  Whenever you see this prompt, it means that gdb is waiting
+for you to type in a command, like <command>run</command> or
+<command>help</command>.  Oh <literal>:-)</literal> type
+<command>help</command> to get help on the commands you can type in, or
+read the <citation>GDB User's Manual</citation> for a complete
+description of GDB and how to use it.</para>
+
+<para>If your program crashes and you're trying to figure out why it
+crashed, the best thing to do is type <command>run</command> and let
+your program run.  After it crashes, you can type
+<command>where</command> to find out where it crashed, or
+<command>info locals</command> to see the values of all the local
+variables.  There's also a <command>print</command> that lets you look
+at individual variables or what pointers point to.</para>
+
+<para>If your program is doing something unexpected, you can use the
+<command>break</command> command to tell gdb to stop your program when it
+gets to a specific function or line number:</para>
+
+<example id="gdb-break"><title>"break" in gdb</title>
+<screen>
+<prompt>(gdb)</prompt> break my_function
+<prompt>(gdb)</prompt> break 47
+</screen>
+</example>
+
+<para>Now, when you type <command>run</command> your program will stop
+at that "breakpoint" and you can use the other gdb commands to look at
+the state of your program at that point, modify variables, and
+<command>step</command> through your program's statements one at a
+time.</para>
+
+<para>Note that you may specify additional arguments to the
+<command>run</command> command to provide command-line arguments to
+your program.  These two cases are the same as far as your program is
+concerned:</para>
+
+<example id="gdb-cliargs"><title>Debugging with command line arguments</title>
+<screen>
+<prompt>bash$</prompt> myprog -t foo --queue 47
+
+<prompt>bash$</prompt> gdb myprog
+<prompt>(gdb)</prompt> run -t foo --queue 47
+</screen>
+</example>
+
+
+</sect1>

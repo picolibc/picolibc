@@ -155,7 +155,7 @@ ruserpass(const char *host, char **aname, char **apass, char **aacct)
 	char myname[INTERNET_MAX_HOST_NAME_LENGTH + 1];
 	const char *mydomain;
 	int t, i, c, usedefault = 0;
-	struct __stat64 stb;
+	struct stat stb;
 
 	hdir = getenv("HOME");
 	if (hdir == NULL)

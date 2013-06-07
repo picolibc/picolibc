@@ -1,6 +1,6 @@
 /* stdlib.h
 
-   Copyright 2005, 2006, 2007, 2008, 2009, 2011 Red Hat Inc.
+   Copyright 2005, 2006, 2007, 2008, 2009, 2011, 2013 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -17,6 +17,12 @@ details. */
 extern "C"
 {
 #endif
+
+__uint32_t arc4random(void);
+void arc4random_addrandom(unsigned char *, int);
+void arc4random_buf(void *, size_t);
+void arc4random_stir(void);
+__uint32_t arc4random_uniform(__uint32_t);
 
 const char *getprogname (void);
 void	setprogname (const char *);

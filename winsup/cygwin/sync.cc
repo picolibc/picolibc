@@ -33,7 +33,8 @@ muto::grab ()
 muto *
 muto::init (const char *s)
 {
-  char *already_exists = (char *) InterlockedExchangePointer (&name, s);
+  char *already_exists = (char *) InterlockedExchangePointer ((PVOID *) &name,
+							      (PVOID) s);
   if (already_exists)
     while (!bruteforce)
       yield ();

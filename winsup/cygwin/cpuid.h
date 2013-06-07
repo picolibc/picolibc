@@ -12,10 +12,31 @@ cpuid (unsigned *a, unsigned *b, unsigned *c, unsigned *d, unsigned in)
        : "a" (in));
 }
 
+#ifdef __x86_64__
 extern inline bool
-can_set_flag (unsigned flag)
+can_set_flag (register unsigned long flag)
 {
-  unsigned r1, r2;
+  register unsigned long r1, r2;
+  asm("pushfq\n"
+      "popq %0\n"
+      "movq %0, %1\n"
+      "xorq %2, %0\n"
+      "pushq %0\n"
+      "popfq\n"
+      "pushfq\n"
+      "popq %0\n"
+      "pushq %1\n"
+      "popfq\n"
+      : "=&r" (r1), "=&r" (r2)
+      : "ir" (flag)
+  );
+  return ((r1 ^ r2) & flag) != 0;
+}
+#else
+extern inline bool
+can_set_flag (register unsigned flag)
+{
+  register unsigned r1, r2;
   asm("pushfl\n"
       "popl %0\n"
       "movl %0, %1\n"
@@ -31,5 +52,6 @@ can_set_flag (unsigned flag)
   );
   return ((r1 ^ r2) & flag) != 0;
 }
+#endif
 
 #endif // !CPUID_H

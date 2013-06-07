@@ -45,12 +45,6 @@ struct pipe_reply {
   DWORD error;
 };
 
-int
-fhandler_pty_slave::get_unit ()
-{
-  return dev ().get_minor ();
-}
-
 bool
 bytes_available (DWORD& n, HANDLE h)
 {
@@ -102,6 +96,8 @@ fhandler_pty_common::__acquire_output_mutex (const char *fn, int ln,
 {
   if (strace.active ())
     strace.prntf (_STRACE_TERMIOS, fn, "(%d): pty output_mutex (%p): waiting %d ms", ln, output_mutex, ms);
+  if (ms == INFINITE)
+    ms = 100;
   DWORD res = WaitForSingleObject (output_mutex, ms);
   if (res == WAIT_OBJECT_0)
     {
@@ -176,7 +172,7 @@ fhandler_pty_master::accept_input ()
       DWORD rc;
       DWORD written = 0;
 
-      paranoid_printf ("about to write %d chars to slave", bytes_left);
+      paranoid_printf ("about to write %u chars to slave", bytes_left);
       rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
       if (!rc)
 	{
@@ -352,7 +348,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	      if (optr - buf >= (int) len)
 		{
 		  if (*iptr != '\n' || n != 0)
-		    system_printf ("internal error: %d unexpected characters", n);
+		    system_printf ("internal error: %u unexpected characters", n);
 		  need_nl = 1;
 		  break;
 		}
@@ -402,11 +398,11 @@ fhandler_pty_slave::open (int flags, mode_t)
   for (HANDLE **h = handles; *h; h++)
     **h = NULL;
 
-  _tc = cygwin_shared->tty[get_unit ()];
+  _tc = cygwin_shared->tty[get_minor ()];
 
   tcinit (false);
 
-  cygwin_shared->tty.attach (get_unit ());
+  cygwin_shared->tty.attach (get_minor ());
 
   /* Create synchronisation events */
   char buf[MAX_PATH];
@@ -423,7 +419,7 @@ fhandler_pty_slave::open (int flags, mode_t)
       errmsg = "open input mutex failed, %E";
       goto err;
     }
-  shared_name (buf, INPUT_AVAILABLE_EVENT, get_unit ());
+  shared_name (buf, INPUT_AVAILABLE_EVENT, get_minor ());
   if (!(input_available_event = OpenEvent (MAXIMUM_ALLOWED, TRUE, buf)))
     {
       errmsg = "open input event failed, %E";
@@ -441,13 +437,13 @@ fhandler_pty_slave::open (int flags, mode_t)
 					  S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP,
 					  sd))
       sa.lpSecurityDescriptor = (PSECURITY_DESCRIPTOR) sd;
-    acquire_output_mutex (500);
+    acquire_output_mutex (INFINITE);
     inuse = get_ttyp ()->create_inuse (&sa);
     get_ttyp ()->was_opened = true;
     release_output_mutex ();
   }
 
-  if (!get_ttyp ()->from_master || !get_ttyp ()->to_master)
+  if (!get_ttyp ()->from_master () || !get_ttyp ()->to_master ())
     {
       errmsg = "pty handles have been closed";
       set_errno (EACCES);
@@ -488,16 +484,16 @@ fhandler_pty_slave::open (int flags, mode_t)
     }
   if (pty_owner)
     {
-      if (!DuplicateHandle (pty_owner, get_ttyp ()->from_master,
+      if (!DuplicateHandle (pty_owner, get_ttyp ()->from_master (),
 			    GetCurrentProcess (), &from_master_local, 0, TRUE,
 			    DUPLICATE_SAME_ACCESS))
 	{
 	  termios_printf ("can't duplicate input from %u/%p, %E",
-			  get_ttyp ()->master_pid, get_ttyp ()->from_master);
+			  get_ttyp ()->master_pid, get_ttyp ()->from_master ());
 	  __seterrno ();
 	  goto err_no_msg;
 	}
-      if (!DuplicateHandle (pty_owner, get_ttyp ()->to_master,
+      if (!DuplicateHandle (pty_owner, get_ttyp ()->to_master (),
 			  GetCurrentProcess (), &to_master_local, 0, TRUE,
 			  DUPLICATE_SAME_ACCESS))
 	{
@@ -514,7 +510,7 @@ fhandler_pty_slave::open (int flags, mode_t)
       DWORD len;
 
       __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-pty%d-master-ctl",
-		       &cygheap->installation_key, get_unit ());
+		       &cygheap->installation_key, get_minor ());
       termios_printf ("dup handles via master control pipe %s", buf);
       if (!CallNamedPipe (buf, &req, sizeof req, &repl, sizeof repl,
 			  &len, 500))
@@ -535,9 +531,9 @@ fhandler_pty_slave::open (int flags, mode_t)
   VerifyHandle (to_master_local);
 
   termios_printf ("duplicated from_master %p->%p from pty_owner",
-		  get_ttyp ()->from_master, from_master_local);
+		  get_ttyp ()->from_master (), from_master_local);
   termios_printf ("duplicated to_master %p->%p from pty_owner",
-		  get_ttyp ()->to_master, to_master_local);
+		  get_ttyp ()->to_master (), to_master_local);
 
   set_io_handle (from_master_local);
   set_output_handle (to_master_local);
@@ -587,7 +583,7 @@ fhandler_pty_slave::close ()
     termios_printf ("CloseHandle (inuse), %E");
   if (!ForceCloseHandle (input_available_event))
     termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
-  if ((unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_unit ()))
+  if ((unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_minor ()))
     fhandler_console::free_console ();	/* assumes that we are the last pty closer */
   return fhandler_pty_common::close ();
 }
@@ -635,13 +631,14 @@ fhandler_pty_slave::init (HANDLE h, DWORD a, mode_t)
 ssize_t __stdcall
 fhandler_pty_slave::write (const void *ptr, size_t len)
 {
-  DWORD n, towrite = len;
+  DWORD n;
+  ssize_t towrite = len;
 
   bg_check_types bg = bg_check (SIGTTOU);
   if (bg <= bg_eof)
     return (ssize_t) bg;
 
-  termios_printf ("pty%d, write(%x, %d)", get_unit (), ptr, len);
+  termios_printf ("pty%d, write(%p, %lu)", get_minor (), ptr, len);
 
   push_process_state process_state (PID_TTYOU);
 
@@ -662,7 +659,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
       if (get_ttyp ()->write_error)
 	{
 	  set_errno (get_ttyp ()->write_error);
-	  towrite = (DWORD) -1;
+	  towrite = -1;
 	  get_ttyp ()->write_error = 0;
 	  release_output_mutex ();
 	  break;
@@ -682,17 +679,17 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	      __seterrno_from_win_error (err);
 	    }
 	  raise (SIGHUP);		/* FIXME: Should this be SIGTTOU? */
-	  towrite = (DWORD) -1;
+	  towrite = -1;
 	  break;
 	}
     }
   return towrite;
 }
 
-void __stdcall
+void __reg3
 fhandler_pty_slave::read (void *ptr, size_t& len)
 {
-  int totalread = 0;
+  ssize_t totalread = 0;
   int vmin = 0;
   int vtime = 0;	/* Initialized to prevent -Wuninitialized warning */
   size_t readlen;
@@ -707,7 +704,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
       return;
     }
 
-  termios_printf ("read(%x, %d) handle %p", ptr, len, get_handle ());
+  termios_printf ("read(%p, %lu) handle %p", ptr, len, get_handle ());
 
   push_process_state process_state (PID_TTYIN);
 
@@ -836,7 +833,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
       DWORD n = 0;
       if (readlen)
 	{
-	  termios_printf ("reading %d bytes (vtime %d)", readlen, vtime);
+	  termios_printf ("reading %lu bytes (vtime %d)", readlen, vtime);
 	  if (!ReadFile (get_handle (), buf, readlen, &n, NULL))
 	    {
 	      termios_printf ("read failed, %E");
@@ -912,7 +909,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	break;
     }
 out:
-  termios_printf ("%d=read(%x, %d)", totalread, ptr, len);
+  termios_printf ("%d=read(%p, %lu)", totalread, ptr, len);
   len = (size_t) totalread;
 }
 
@@ -987,7 +984,7 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
     return res;
 
   if (myself->pgid && get_ttyp ()->getpgid () != myself->pgid
-      && (unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_unit ())
+      && (unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_minor ())
       && (get_ttyp ()->ti.c_lflag & TOSTOP))
     {
       /* background process */
@@ -1015,7 +1012,7 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
       }
       goto out;
     case TIOCSPGRP:
-      retval = this->tcsetpgrp ((pid_t) arg);
+      retval = this->tcsetpgrp ((pid_t) (intptr_t) arg);
       goto out;
     case FIONREAD:
       {
@@ -1072,7 +1069,7 @@ out:
 }
 
 int __reg2
-fhandler_pty_slave::fstat (struct __stat64 *st)
+fhandler_pty_slave::fstat (struct stat *st)
 {
   fhandler_base::fstat (st);
 
@@ -1080,7 +1077,7 @@ fhandler_pty_slave::fstat (struct __stat64 *st)
   if (!input_available_event)
     {
       char buf[MAX_PATH];
-      shared_name (buf, INPUT_AVAILABLE_EVENT, get_unit ());
+      shared_name (buf, INPUT_AVAILABLE_EVENT, get_minor ());
       input_available_event = OpenEvent (READ_CONTROL, TRUE, buf);
       if (input_available_event)
 	to_close = true;
@@ -1107,8 +1104,8 @@ fhandler_pty_slave::fch_open_handles ()
 {
   char buf[MAX_PATH];
 
-  _tc = cygwin_shared->tty[get_unit ()];
-  shared_name (buf, INPUT_AVAILABLE_EVENT, get_unit ());
+  _tc = cygwin_shared->tty[get_minor ()];
+  shared_name (buf, INPUT_AVAILABLE_EVENT, get_minor ());
   input_available_event = OpenEvent (READ_CONTROL | WRITE_DAC | WRITE_OWNER,
 				     TRUE, buf);
   output_mutex = get_ttyp ()->open_output_mutex (WRITE_DAC | WRITE_OWNER);
@@ -1155,14 +1152,14 @@ fhandler_pty_slave::fch_close_handles ()
   close_maybe (inuse);
 }
 
-int __stdcall
+int __reg1
 fhandler_pty_slave::fchmod (mode_t mode)
 {
   int ret = -1;
   bool to_close = false;
   security_descriptor sd;
-  __uid32_t uid;
-  __gid32_t gid;
+  uid_t uid;
+  gid_t gid;
 
   if (!input_available_event)
     {
@@ -1181,14 +1178,14 @@ errout:
   return ret;
 }
 
-int __stdcall
-fhandler_pty_slave::fchown (__uid32_t uid, __gid32_t gid)
+int __reg2
+fhandler_pty_slave::fchown (uid_t uid, gid_t gid)
 {
   int ret = -1;
   bool to_close = false;
   mode_t mode = 0;
-  __uid32_t o_uid;
-  __gid32_t o_gid;
+  uid_t o_uid;
+  gid_t o_gid;
   security_descriptor sd;
 
   if (uid == ILLEGAL_UID && gid == ILLEGAL_GID)
@@ -1247,12 +1244,12 @@ fhandler_pty_master::open_setup (int flags)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   char buf[sizeof ("opened pty master for ptyNNNNNNNNNNN")];
-  __small_sprintf (buf, "opened pty master for pty%d", get_unit ());
+  __small_sprintf (buf, "opened pty master for pty%d", get_minor ());
   report_tty_counts (this, buf, "");
 }
 
-_off64_t
-fhandler_pty_common::lseek (_off64_t, int)
+off_t
+fhandler_pty_common::lseek (off_t, int)
 {
   set_errno (ESPIPE);
   return -1;
@@ -1261,7 +1258,7 @@ fhandler_pty_common::lseek (_off64_t, int)
 int
 fhandler_pty_common::close ()
 {
-  termios_printf ("pty%d <%p,%p> closing", get_unit (), get_handle (), get_output_handle ());
+  termios_printf ("pty%d <%p,%p> closing", get_minor (), get_handle (), get_output_handle ());
   if (!ForceCloseHandle (input_mutex))
     termios_printf ("CloseHandle (input_mutex<%p>), %E", input_mutex);
   if (!ForceCloseHandle (output_mutex))
@@ -1285,7 +1282,7 @@ fhandler_pty_master::cleanup ()
 int
 fhandler_pty_master::close ()
 {
-  termios_printf ("closing from_master(%p)/to_master(%p) since we own them(%d)",
+  termios_printf ("closing from_master(%p)/to_master(%p) since we own them(%u)",
 		  from_master, to_master, dwProcessId);
   if (cygwin_finished_initializing)
     {
@@ -1297,7 +1294,7 @@ fhandler_pty_master::close ()
 	  DWORD len;
 
 	  __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-pty%d-master-ctl",
-			   &cygheap->installation_key, get_unit ());
+			   &cygheap->installation_key, get_minor ());
 	  CallNamedPipe (buf, &req, sizeof req, &repl, sizeof repl, &len, 500);
 	  CloseHandle (master_ctl);
 	  master_thread->detach ();
@@ -1360,7 +1357,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
   return i;
 }
 
-void __stdcall
+void __reg3
 fhandler_pty_master::read (void *ptr, size_t& len)
 {
   bg_check_types bg = bg_check (SIGTTIN);
@@ -1376,14 +1373,14 @@ fhandler_pty_master::read (void *ptr, size_t& len)
 int
 fhandler_pty_master::tcgetattr (struct termios *t)
 {
-  *t = cygwin_shared->tty[get_unit ()]->ti;
+  *t = cygwin_shared->tty[get_minor ()]->ti;
   return 0;
 }
 
 int
 fhandler_pty_master::tcsetattr (int, const struct termios *t)
 {
-  cygwin_shared->tty[get_unit ()]->ti = *t;
+  cygwin_shared->tty[get_minor ()]->ti = *t;
   return 0;
 }
 
@@ -1432,7 +1429,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
       *((pid_t *) arg) = this->tcgetpgrp ();
       break;
     case TIOCSPGRP:
-      return this->tcsetpgrp ((pid_t) arg);
+      return this->tcsetpgrp ((pid_t) (intptr_t) arg);
     case FIONREAD:
       {
 	DWORD n;
@@ -1455,7 +1452,7 @@ fhandler_pty_master::ptsname_r (char *buf, size_t buflen)
 {
   char tmpbuf[TTY_NAME_MAX];
 
-  __ptsname (tmpbuf, get_unit ());
+  __ptsname (tmpbuf, get_minor ());
   if (buflen <= strlen (tmpbuf))
     {
       set_errno (ERANGE);
@@ -1556,7 +1553,7 @@ fhandler_pty_master::pty_master_thread ()
 				  &token);
       if (!NT_SUCCESS (status))
 	{
-	  termios_printf ("NtOpenThreadToken, %p", status);
+	  termios_printf ("NtOpenThreadToken, %y", status);
 	  SetLastError (RtlNtStatusToDosError (status));
 	  goto reply;
 	}
@@ -1566,7 +1563,7 @@ fhandler_pty_master::pty_master_thread ()
       NtClose (token);
       if (!NT_SUCCESS (status))
 	{
-	  termios_printf ("NtAccessCheck, %p", status);
+	  termios_printf ("NtAccessCheck, %y", status);
 	  SetLastError (RtlNtStatusToDosError (status));
 	  goto reply;
 	}
@@ -1614,7 +1611,7 @@ reply:
       if (deimp)
 	cygheap->user.reimpersonate ();
       sd.free ();
-      termios_printf ("Reply: from %p, to %p, error %lu",
+      termios_printf ("Reply: from %p, to %p, error %u",
 		      repl.from_master, repl.to_master, repl.error );
       if (!WriteFile (master_ctl, &repl, sizeof repl, &len, NULL))
 	termios_printf ("WriteFile, %E");
@@ -1699,10 +1696,13 @@ fhandler_pty_master::setup ()
      the pty pipe handles to processes which deserve it. */
   __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-pty%d-master-ctl",
 		   &cygheap->installation_key, unit);
-  master_ctl = CreateNamedPipe (buf, PIPE_ACCESS_DUPLEX,
+  master_ctl = CreateNamedPipe (buf, PIPE_ACCESS_DUPLEX
+				     | FILE_FLAG_FIRST_PIPE_INSTANCE,
 				PIPE_WAIT | PIPE_TYPE_MESSAGE
-				| PIPE_READMODE_MESSAGE, 1, 4096, 4096,
-				0, &sec_all_nih);
+				| PIPE_READMODE_MESSAGE
+				| (wincap.has_pipe_reject_remote_clients ()
+				   ? PIPE_REJECT_REMOTE_CLIENTS : 0),
+				1, 4096, 4096, 0, &sec_all_nih);
   if (master_ctl == INVALID_HANDLE_VALUE)
     {
       errstr = "pty master control pipe";
@@ -1715,8 +1715,8 @@ fhandler_pty_master::setup ()
       goto err;
     }
 
-  t.from_master = from_master;
-  t.to_master = to_master;
+  t.set_from_master (from_master);
+  t.set_to_master (to_master);
   t.winsize.ws_col = 80;
   t.winsize.ws_row = 25;
   t.master_pid = myself->pid;
@@ -1751,8 +1751,8 @@ fhandler_pty_master::fixup_after_fork (HANDLE parent)
       tty& t = *get_ttyp ();
       if (myself->pid == t.master_pid)
 	{
-	  t.from_master = arch->from_master;
-	  t.to_master = arch->to_master;
+	  t.set_from_master (arch->from_master);
+	  t.set_to_master (arch->to_master);
 	}
       arch->dwProcessId = wpid;
     }

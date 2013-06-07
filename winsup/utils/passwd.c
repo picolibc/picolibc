@@ -1,7 +1,7 @@
 /* passwd.c: Changing passwords and managing account information
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2011, 2012 Red
-   Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2011, 2012,
+   2013 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 
@@ -22,6 +22,7 @@ details. */
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <inttypes.h>
 #include <getopt.h>
 #include <pwd.h>
 #include <sys/cygwin.h>
@@ -203,14 +204,14 @@ PrintPW (PUSER_INFO_3 ui, LPCWSTR server)
       if (ui->usri3_priv == USER_PRIV_ADMIN)
 	mi->usrmod0_min_passwd_len = 0;
       printf ("\nSystem password settings:\n");
-      printf ("Max. password age %ld days\n",
-	      mi->usrmod0_max_passwd_age / ONE_DAY);
-      printf ("Min. password age %ld days\n",
-	      mi->usrmod0_min_passwd_age / ONE_DAY);
-      printf ("Force logout after %ld days\n",
-	      mi->usrmod0_force_logoff / ONE_DAY);
-      printf ("Min. password length: %ld\n",
-	      mi->usrmod0_min_passwd_len);
+      printf ("Max. password age %" PRIu32 " days\n",
+	      (unsigned int) (mi->usrmod0_max_passwd_age / ONE_DAY));
+      printf ("Min. password age %" PRIu32 " days\n",
+	      (unsigned int) (mi->usrmod0_min_passwd_age / ONE_DAY));
+      printf ("Force logout after %" PRIu32 " days\n",
+	      (unsigned int) (mi->usrmod0_force_logoff / ONE_DAY));
+      printf ("Min. password length: %" PRIu32 "\n",
+	      (unsigned int) mi->usrmod0_min_passwd_len);
     }
 }
 

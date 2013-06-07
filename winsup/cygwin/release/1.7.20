@@ -1,0 +1,9 @@
+What's new:
+-----------
+
+
+Bug fixes:
+----------
+
+- Fix starvation problem when handling SIGCONT.
+  Fixes: http://cygwin.com/ml/cygwin/2013-06/msg00084.html

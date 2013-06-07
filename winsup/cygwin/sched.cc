@@ -1,7 +1,7 @@
 /* sched.cc: scheduler interface for Cygwin
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012
-   Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012,
+   2013 Red Hat, Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -20,30 +20,31 @@
 #include "registry.h"
 
 /* Win32 priority to UNIX priority Mapping.
+
    For now, I'm just following the spec: any range of priorities is ok.
    There are probably many many issues with this...
 
-   We don't want process's going realtime. Well, they probably could, but the issues
-   with avoiding the priority values 17-22 and 27-30 (not supported before win2k)
-   make that inefficient.
-   However to complicate things most unixes use lower is better priorities.
+   FIXME: We don't support pre-Windows 2000 so we should fix the priority
+          computation.  Here's the description for the current code:
 
-   So we map -14 to 15, and 15 to 1 via (16- ((n+16) >> 1))
-   we then map 1 to 15 to various process class and thread priority combinations
+     We don't want process's going realtime. Well, they probably could, but
+     the issues with avoiding the priority values 17-22 and 27-30 (not
+     supported before win2k) make that inefficient.
 
-   Then we need to look at the threads vi process priority. As win95 98 and NT 4
-   Don't support opening threads cross-process (unless a thread HANDLE is passed around)
-   for now, we'll just use the priority class.
+     However to complicate things most unixes use lower is better priorities.
 
-   The code and logic are present to calculate the priority for thread
-   , if a thread handle can be obtained. Alternatively, if the symbols wouldn't be
-   resolved until they are used
-   we could support this on windows 2000 and ME now, and just fall back to the
-   class only on pre win2000 machines.
+     So we map -14 to 15, and 15 to 1 via (16- ((n+16) >> 1)).  We then map 1
+     to 15 to various process class and thread priority combinations.  Then we
+     need to look at the threads process priority.  As win95, 98 and NT 4
+     don't support opening threads cross-process (unless a thread HANDLE is
+     passed around) for now, we'll just use the priority class.
 
-   Lastly, because we can't assume that the pid we're given are Windows pids, we can't
-   alter non-cygwin started programs.
-*/
+     The code and logic are present to calculate the priority for thread, if a
+     thread handle can be obtained.  Alternatively, if the symbols wouldn't be
+     resolved until they are used we could support this.
+
+   Lastly, because we can't assume that the pid we're given are Windows pids,
+   we can't alter non-cygwin started programs.  */
 
 extern "C"
 {
@@ -130,10 +131,7 @@ sched_getparam (pid_t pid, struct sched_param *param)
     }
   ThreadPriority = THREAD_PRIORITY_NORMAL;
 
-  /* calculate the unix priority.
-
-     FIXME: windows 2000 supports ABOVE_NORMAL and BELOW_NORMAL class's
-     So this logic just defaults those class factors to NORMAL in the calculations */
+  /* calculate the unix priority. */
 
   switch (Class)
     {
@@ -241,11 +239,7 @@ sched_getscheduler (pid_t pid)
     return SCHED_FIFO;
 }
 
-/* get the time quantum for pid
-
-   Implemented only for NT systems, it fails and sets errno to ESRCH
-   for non-NT systems.
-*/
+/* get the time quantum for pid */
 int
 sched_rr_get_interval (pid_t pid, struct timespec *interval)
 {
@@ -315,7 +309,6 @@ sched_setparam (pid_t pid, const struct sched_param *param)
   pid_t localpid;
   int winpri;
   DWORD Class;
-  int ThreadPriority;
   HANDLE process;
 
   if (!param || pid < 0)
@@ -342,70 +335,6 @@ sched_setparam (pid_t pid, const struct sched_param *param)
   else
     Class = NORMAL_PRIORITY_CLASS;
 
-  switch (Class)
-    {
-    case IDLE_PRIORITY_CLASS:
-      switch (winpri)
-	{
-	case 1:
-	  ThreadPriority = THREAD_PRIORITY_IDLE;
-	  break;
-	case 2:
-	  ThreadPriority = THREAD_PRIORITY_LOWEST;
-	  break;
-	case 3:
-	  ThreadPriority = THREAD_PRIORITY_BELOW_NORMAL;
-	  break;
-	case 4:
-	  ThreadPriority = THREAD_PRIORITY_NORMAL;
-	  break;
-	case 5:
-	  ThreadPriority = THREAD_PRIORITY_ABOVE_NORMAL;
-	  break;
-	case 6:
-	  ThreadPriority = THREAD_PRIORITY_HIGHEST;
-	  break;
-	}
-      break;
-    case NORMAL_PRIORITY_CLASS:
-      switch (winpri)
-	{
-	case 7:
-	  ThreadPriority = THREAD_PRIORITY_LOWEST;
-	  break;
-	case 8:
-	  ThreadPriority = THREAD_PRIORITY_BELOW_NORMAL;
-	  break;
-	case 9:
-	  ThreadPriority = THREAD_PRIORITY_NORMAL;
-	  break;
-	case 10:
-	  ThreadPriority = THREAD_PRIORITY_ABOVE_NORMAL;
-	  break;
-	case 11:
-	  ThreadPriority = THREAD_PRIORITY_HIGHEST;
-	  break;
-	}
-      break;
-    case HIGH_PRIORITY_CLASS:
-      switch (winpri)
-	{
-	case 12:
-	  ThreadPriority = THREAD_PRIORITY_BELOW_NORMAL;
-	  break;
-	case 13:
-	  ThreadPriority = THREAD_PRIORITY_NORMAL;
-	  break;
-	case 14:
-	  ThreadPriority = THREAD_PRIORITY_ABOVE_NORMAL;
-	  break;
-	case 15:
-	  ThreadPriority = THREAD_PRIORITY_HIGHEST;
-	  break;
-	}
-      break;
-    }
-
   localpid = pid ? pid : getpid ();
 
   pinfo p (localpid);
@@ -414,7 +343,7 @@ sched_setparam (pid_t pid, const struct sched_param *param)
 
   if (!p)
     {
-      set_errno (1);		//ESRCH);
+      set_errno (ESRCH);
       return -1;
     }
   process =
@@ -435,11 +364,11 @@ sched_setparam (pid_t pid, const struct sched_param *param)
   return 0;
 }
 
-/* we map -14 to 15, and 15 to 1 via (16- ((n+16) >> 1)). This lines up with the allowed
- * valueswe return elsewhere in the sched* functions. We then map in groups of three to
- * allowed thread priority's. The reason for dropping accuracy while still returning
- * a wide range of values is to allow more flexible code in the future.
- */
+/* we map -14 to 15, and 15 to 1 via (16- ((n+16) >> 1)). This lines up with
+   the allowed values we return elsewhere in the sched* functions. We then
+   map in groups of three to allowed thread priority's. The reason for dropping
+   accuracy while still returning a wide range of values is to allow more
+   flexible code in the future. */
 int
 sched_set_thread_priority (HANDLE thread, int priority)
 {

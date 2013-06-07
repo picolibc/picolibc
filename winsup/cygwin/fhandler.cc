@@ -190,9 +190,9 @@ fhandler_base::set_flags (int flags, int supplied_bin)
 {
   int bin;
   int fmode;
-  debug_printf ("flags %p, supplied_bin %p", flags, supplied_bin);
+  debug_printf ("flags %y, supplied_bin %y", flags, supplied_bin);
   if ((bin = flags & (O_BINARY | O_TEXT)))
-    debug_printf ("O_TEXT/O_BINARY set in flags %p", bin);
+    debug_printf ("O_TEXT/O_BINARY set in flags %y", bin);
   else if (rbinset () && wbinset ())
     bin = rbinary () ? O_BINARY : O_TEXT;	// FIXME: Not quite right
   else if ((fmode = get_default_fmode (flags)) & O_BINARY)
@@ -216,35 +216,37 @@ fhandler_base::set_flags (int flags, int supplied_bin)
 
 /* Cover function to ReadFile to achieve (as much as possible) Posix style
    semantics and use of errno.  */
-void __stdcall
-fhandler_base::raw_read (void *ptr, size_t& ulen)
+void __reg3
+fhandler_base::raw_read (void *ptr, size_t& len)
 {
-#define bytes_read ulen
-
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
   int try_noreserve = 1;
-  DWORD len = ulen;
 
 retry:
-  ulen = (size_t) -1;
-  BOOL res = ReadFile (get_handle (), ptr, len, (DWORD *) &ulen, NULL);
-  if (!res)
+  status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, ptr, len,
+		       NULL, NULL);
+  if (NT_SUCCESS (status))
+    len = io.Information;
+  else
     {
       /* Some errors are not really errors.  Detect such cases here.  */
-
-      DWORD  errcode = GetLastError ();
-      switch (errcode)
+      switch (status)
 	{
-	case ERROR_BROKEN_PIPE:
+	case STATUS_END_OF_FILE:
+	case STATUS_PIPE_BROKEN:
 	  /* This is really EOF.  */
-	  bytes_read = 0;
+	  len = 0;
 	  break;
-	case ERROR_MORE_DATA:
-	  /* `bytes_read' is supposedly valid.  */
+	case STATUS_MORE_ENTRIES:
+	case STATUS_BUFFER_OVERFLOW:
+	  /* `io.Information' is supposedly valid.  */
+	  len = io.Information;
 	  break;
-	case ERROR_NOACCESS:
+	case STATUS_ACCESS_VIOLATION:
 	  if (is_at_eof (get_handle ()))
 	    {
-	      bytes_read = 0;
+	      len = 0;
 	      break;
 	    }
 	  if (try_noreserve)
@@ -261,28 +263,26 @@ retry:
 		}
 	    }
 	  /*FALLTHRU*/
-	case ERROR_INVALID_FUNCTION:
-	case ERROR_INVALID_PARAMETER:
-	case ERROR_INVALID_HANDLE:
+	case STATUS_INVALID_DEVICE_REQUEST:
+	case STATUS_INVALID_PARAMETER:
+	case STATUS_INVALID_HANDLE:
 	  if (pc.isdir ())
 	    {
 	      set_errno (EISDIR);
-	      bytes_read = (size_t) -1;
+	      len = (size_t) -1;
 	      break;
 	    }
 	default:
-	  syscall_printf ("ReadFile %s(%p) failed, %E", get_name (), get_handle ());
-	  __seterrno_from_win_error (errcode);
-	  bytes_read = (size_t) -1;
+	  __seterrno_from_nt_status (status);
+	  len = (size_t) -1;
 	  break;
 	}
     }
-#undef bytes_read
 }
 
 /* Cover function to WriteFile to provide Posix interface and semantics
    (as much as possible).  */
-ssize_t __stdcall
+ssize_t __reg3
 fhandler_base::raw_write (const void *ptr, size_t len)
 {
   NTSTATUS status;
@@ -388,7 +388,7 @@ fhandler_base::fhaccess (int flags, bool effective)
       return res;
     }
 
-  struct __stat64 st;
+  struct stat st;
   if (fstat (&st))
     goto done;
 
@@ -516,7 +516,7 @@ fhandler_base::open (int flags, mode_t mode)
   PFILE_FULL_EA_INFORMATION p = NULL;
   ULONG plen = 0;
 
-  syscall_printf ("(%S, %p)", pc.get_nt_native_path (), flags);
+  syscall_printf ("(%S, %y)", pc.get_nt_native_path (), flags);
 
   pc.get_object_attr (attr, *sec_none_cloexec (flags));
 
@@ -586,11 +586,10 @@ fhandler_base::open (int flags, mode_t mode)
 	    }
 	}
 
-      /* Starting with Windows 2000, when trying to overwrite an already
-	 existing file with FILE_ATTRIBUTE_HIDDEN and/or FILE_ATTRIBUTE_SYSTEM
-	 attribute set, CreateFile fails with ERROR_ACCESS_DENIED.
-	 Per MSDN you have to create the file with the same attributes as
-	 already specified for the file. */
+      /* Trying to overwrite an already existing file with FILE_ATTRIBUTE_HIDDEN
+	 and/or FILE_ATTRIBUTE_SYSTEM attribute set, NtCreateFile fails with
+	 STATUS_ACCESS_DENIED.  Per MSDN you have to create the file with the
+	 same attributes as already specified for the file. */
       if (((flags & O_CREAT) || create_disposition == FILE_OVERWRITE)
 	  && has_attribute (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
 	file_attributes |= pc.file_attributes ();
@@ -705,12 +704,12 @@ fhandler_base::open (int flags, mode_t mode)
   res = 1;
   set_open_status ();
 done:
-  debug_printf ("%x = NtCreateFile "
-		"(%p, %x, %S, io, NULL, %x, %x, %x, %x, NULL, 0)",
+  debug_printf ("%y = NtCreateFile "
+		"(%p, %y, %S, io, NULL, %y, %y, %y, %y, NULL, 0)",
 		status, fh, access, pc.get_nt_native_path (), file_attributes,
 		shared, create_disposition, options);
 
-  syscall_printf ("%d = fhandler_base::open(%S, %p)",
+  syscall_printf ("%d = fhandler_base::open(%S, %y)",
 		  res, pc.get_nt_native_path (), flags);
   return res;
 }
@@ -723,32 +722,19 @@ done:
    an \n.  If last char is an \r, look ahead one more char, if \n then
    modify \r, if not, remember char.
 */
-void __stdcall
+void __reg3
 fhandler_base::read (void *in_ptr, size_t& len)
 {
   char *ptr = (char *) in_ptr;
   ssize_t copied_chars = get_readahead_into_buffer (ptr, len);
 
-  if (copied_chars)
+  if (copied_chars || !len)
     {
       len = (size_t) copied_chars;
       goto out;
     }
 
-  len -= copied_chars;
-  if (!len)
-    {
-      len = (size_t) copied_chars;
-      goto out;
-    }
-
-  raw_read (ptr + copied_chars, len);
-  if (!copied_chars)
-    /* nothing */;
-  else if ((ssize_t) len > 0)
-    len += copied_chars;
-  else
-    len = copied_chars;
+  raw_read (ptr, len);
 
   if (rbinary () || (ssize_t) len <= 0)
     goto out;
@@ -791,24 +777,6 @@ fhandler_base::read (void *in_ptr, size_t& len)
 
   len = dst - (char *) ptr;
 
-#ifndef NOSTRACE
-  if (strace.active ())
-    {
-      char buf[16 * 6 + 1];
-      char *p = buf;
-
-      for (int i = 0; i < copied_chars && i < 16; ++i)
-	{
-	  unsigned char c = ((unsigned char *) ptr)[i];
-	  __small_sprintf (p, " %c", c);
-	  p += strlen (p);
-	}
-      *p = '\0';
-      debug_printf ("read %d bytes (%s%s)", copied_chars, buf,
-		    copied_chars > 16 ? " ..." : "");
-    }
-#endif
-
 out:
   debug_printf ("returning %d, %s mode", len, rbinary () ? "binary" : "text");
 }
@@ -846,7 +814,7 @@ fhandler_base::write (const void *ptr, size_t len)
 	  if (NT_SUCCESS (status))
 	    pc.file_attributes (pc.file_attributes ()
 				| FILE_ATTRIBUTE_SPARSE_FILE);
-	  debug_printf ("%p = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
+	  debug_printf ("%y = NtFsControlFile(%S, FSCTL_SET_SPARSE)",
 			status, pc.get_nt_native_path ());
 	}
     }
@@ -1018,8 +986,8 @@ fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
   return ret;
 }
 
-_off64_t
-fhandler_base::lseek (_off64_t offset, int whence)
+off_t
+fhandler_base::lseek (off_t offset, int whence)
 {
   NTSTATUS status;
   IO_STATUS_BLOCK io;
@@ -1071,7 +1039,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  _off64_t res = fpi.CurrentByteOffset.QuadPart;
+  off_t res = fpi.CurrentByteOffset.QuadPart;
 
   /* When next we write(), we will check to see if *this* seek went beyond
      the end of the file and if so, potentially sparsify the file. */
@@ -1087,15 +1055,15 @@ fhandler_base::lseek (_off64_t offset, int whence)
   return res;
 }
 
-ssize_t __stdcall
-fhandler_base::pread (void *, size_t, _off64_t)
+ssize_t __reg3
+fhandler_base::pread (void *, size_t, off_t)
 {
   set_errno (ESPIPE);
   return -1;
 }
 
-ssize_t __stdcall
-fhandler_base::pwrite (void *, size_t, _off64_t)
+ssize_t __reg3
+fhandler_base::pwrite (void *, size_t, off_t)
 {
   set_errno (ESPIPE);
   return -1;
@@ -1262,15 +1230,8 @@ fhandler_base::ioctl (unsigned int cmd, void *buf)
   return res;
 }
 
-int
-fhandler_base::lock (int, struct __flock64 *)
-{
-  set_errno (EINVAL);
-  return -1;
-}
-
 int __reg2
-fhandler_base::fstat (struct __stat64 *buf)
+fhandler_base::fstat (struct stat *buf)
 {
   if (is_fs_special ())
     return fstat_fs (buf);
@@ -1310,7 +1271,7 @@ fhandler_base::fstat (struct __stat64 *buf)
   return 0;
 }
 
-int __stdcall
+int __reg2
 fhandler_base::fstatvfs (struct statvfs *sfs)
 {
   /* If we hit this base implementation, it's some device in /dev.
@@ -1351,7 +1312,7 @@ fhandler_base::dup (fhandler_base *child, int)
 			    GetCurrentProcess (), &nh,
 			    0, TRUE, DUPLICATE_SAME_ACCESS))
 	{
-	  debug_printf ("dup(%s) failed, handle %x, %E",
+	  debug_printf ("dup(%s) failed, handle %p, %E",
 			get_name (), get_handle ());
 	  __seterrno ();
 	  return -1;
@@ -1371,7 +1332,7 @@ fhandler_base_overlapped::dup (fhandler_base *child, int flags)
   return res;
 }
 
-int fhandler_base::fcntl (int cmd, void *arg)
+int fhandler_base::fcntl (int cmd, intptr_t arg)
 {
   int res;
 
@@ -1381,12 +1342,12 @@ int fhandler_base::fcntl (int cmd, void *arg)
       res = close_on_exec () ? FD_CLOEXEC : 0;
       break;
     case F_SETFD:
-      set_close_on_exec (((int) arg & FD_CLOEXEC) ? 1 : 0);
+      set_close_on_exec ((arg & FD_CLOEXEC) ? 1 : 0);
       res = 0;
       break;
     case F_GETFL:
       res = get_flags ();
-      debug_printf ("GETFL: %p", res);
+      debug_printf ("GETFL: %y", res);
       break;
     case F_SETFL:
       {
@@ -1395,7 +1356,7 @@ int fhandler_base::fcntl (int cmd, void *arg)
 	   Since O_ASYNC isn't defined in fcntl.h it's currently
 	   ignored as well.  */
 	const int allowed_flags = O_APPEND | O_NONBLOCK_MASK;
-	int new_flags = (int) arg & allowed_flags;
+	int new_flags = arg & allowed_flags;
 	/* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
 	   Set only the flag that has been passed in.  If both are set, just
 	   record O_NONBLOCK.   */
@@ -1585,6 +1546,7 @@ fhandler_base::fixup_after_exec ()
   debug_printf ("here for '%s'", get_name ());
   if (unique_id && close_on_exec ())
     del_my_locks (after_exec);
+  mandatory_locking (false);
 }
 void
 fhandler_base_overlapped::fixup_after_exec ()
@@ -1679,7 +1641,7 @@ fhandler_base::fchmod (mode_t mode)
 }
 
 int
-fhandler_base::fchown (__uid32_t uid, __gid32_t gid)
+fhandler_base::fchown (uid_t uid, gid_t gid)
 {
   if (pc.is_fs_special ())
     return ((fhandler_disk_file *) this)->fhandler_disk_file::fchown (uid, gid);
@@ -1688,7 +1650,7 @@ fhandler_base::fchown (__uid32_t uid, __gid32_t gid)
 }
 
 int
-fhandler_base::facl (int cmd, int nentries, __aclent32_t *aclbufp)
+fhandler_base::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
   int res = -1;
   switch (cmd)
@@ -1745,14 +1707,14 @@ fhandler_base::fsetxattr (const char *name, const void *value, size_t size,
 }
 
 int
-fhandler_base::fadvise (_off64_t offset, _off64_t length, int advice)
+fhandler_base::fadvise (off_t offset, off_t length, int advice)
 {
   set_errno (EINVAL);
   return -1;
 }
 
 int
-fhandler_base::ftruncate (_off64_t length, bool allow_truncate)
+fhandler_base::ftruncate (off_t length, bool allow_truncate)
 {
   set_errno (EINVAL);
   return -1;
@@ -1966,7 +1928,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	  wores = GetOverlappedResult (h, get_overlapped (), bytes, false);
 	  err = GetLastError ();
 	  ResetEvent (get_overlapped ()->hEvent);	/* Probably not needed but CYA */
-	  debug_printf ("wfres %d, wores %d, bytes %u", wfres, wores, *bytes);
+	  debug_printf ("wfres %u, wores %d, bytes %u", wfres, wores, *bytes);
 	  if (wores)
 	    res = overlapped_success;	/* operation succeeded */
 	  else if (wfres == WAIT_OBJECT_0 + 1)
@@ -1981,7 +1943,7 @@ fhandler_base_overlapped::wait_overlapped (bool inres, bool writing, DWORD *byte
 	    res = overlapped_nonblocking_no_data;	/* more handling below */
 	  else
 	    {
-	      debug_printf ("GetOverLappedResult failed, h %p, bytes %u, %E", h, *bytes);
+	      debug_printf ("GetOverlappedResult failed, h %p, bytes %u, %E", h, *bytes);
 	      res = overlapped_error;
 	    }
 	}
@@ -2041,7 +2003,7 @@ fhandler_base_overlapped::raw_read (void *ptr, size_t& len)
 	}
     }
   while (keep_looping);
-  len = (size_t) nbytes;
+  len = (nbytes == (DWORD) -1) ? (size_t) -1 : (size_t) nbytes;
 }
 
 ssize_t __reg3
@@ -2051,13 +2013,13 @@ fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
   if (has_ongoing_io ())
     {
       set_errno (EAGAIN);
-      nbytes = (DWORD) -1;
+      nbytes = (size_t) -1;
     }
   else
     {
       size_t chunk;
       if (!max_atomic_write || len < max_atomic_write)
-	chunk = len;
+	chunk = MIN (len, INT_MAX);
       else if (is_nonblocking ())
 	chunk = len = max_atomic_write;
       else
@@ -2065,7 +2027,7 @@ fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
 
       nbytes = 0;
       DWORD nbytes_now = 0;
-      /* Write to fd in smaller chunks, accumlating a total.
+      /* Write to fd in smaller chunks, accumulating a total.
 	 If there's an error, just return the accumulated total
 	 unless the first write fails, in which case return value
 	 from wait_overlapped(). */
@@ -2095,7 +2057,7 @@ fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
 	    }
 	}
       if (!nbytes)
-	nbytes = nbytes_now;
+	nbytes = (nbytes_now == (DWORD) -1) ? (size_t) -1 : nbytes_now;
     }
   return nbytes;
 }

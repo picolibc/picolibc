@@ -1,6 +1,6 @@
 /* fhandler_procsysvipc.cc: fhandler for /proc/sysvipc virtual filesystem
 
-   Copyright 2011, 2013 Red Hat, Inc.
+   Copyright 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -38,9 +38,9 @@ details. */
 #include <sys/sem.h>
 #include <sys/shm.h>
 
-static _off64_t format_procsysvipc_msg (void *, char *&);
-static _off64_t format_procsysvipc_sem (void *, char *&);
-static _off64_t format_procsysvipc_shm (void *, char *&);
+static off_t format_procsysvipc_msg (void *, char *&);
+static off_t format_procsysvipc_sem (void *, char *&);
+static off_t format_procsysvipc_shm (void *, char *&);
 
 static const virt_tab_t procsysvipc_tab[] =
 {
@@ -93,7 +93,7 @@ fhandler_procsysvipc::fhandler_procsysvipc ():
 }
 
 int __reg2
-fhandler_procsysvipc::fstat (struct __stat64 *buf)
+fhandler_procsysvipc::fstat (struct stat *buf)
 {
   fhandler_base::fstat (buf);
   buf->st_mode &= ~_IFMT & NO_W;
@@ -202,7 +202,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_proc::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_proc::open(%p, 0%o)", res, flags, mode);
   return res;
 }
 
@@ -217,7 +217,7 @@ fhandler_procsysvipc::fill_filebuf ()
   return false;
 }
 
-static _off64_t
+static off_t
 format_procsysvipc_msg (void *, char *&destbuf)
 {
   tmp_pathbuf tp;
@@ -238,7 +238,7 @@ format_procsysvipc_msg (void *, char *&destbuf)
   for (int i = 0; i < msginfo.msgmni; i++) {
     if (xmsqids[i].msg_qbytes != 0) {
        bufptr += sprintf (bufptr,
-		 "%10llu %10u %5o %11lu %10lu %5d %5d %5lu %5lu %5lu %5lu %10ld %10ld %10ld\n",
+		 "%10llu %10u %5o %11u %10u %5d %5d %5u %5u %5u %5u %10ld %10ld %10ld\n",
 		 xmsqids[i].msg_perm.key,
 		 IXSEQ_TO_IPCID(i, xmsqids[i].msg_perm),
 		 xmsqids[i].msg_perm.mode,
@@ -246,10 +246,10 @@ format_procsysvipc_msg (void *, char *&destbuf)
 		 xmsqids[i].msg_qnum,
 		 xmsqids[i].msg_lspid,
 		 xmsqids[i].msg_lrpid,
-		 xmsqids[i].msg_perm.uid,
-		 xmsqids[i].msg_perm.gid,
-		 xmsqids[i].msg_perm.cuid,
-		 xmsqids[i].msg_perm.cgid,
+		 (unsigned) xmsqids[i].msg_perm.uid,
+		 (unsigned) xmsqids[i].msg_perm.gid,
+		 (unsigned) xmsqids[i].msg_perm.cuid,
+		 (unsigned) xmsqids[i].msg_perm.cgid,
 		 xmsqids[i].msg_stime,
 		 xmsqids[i].msg_rtime,
 		 xmsqids[i].msg_ctime);
@@ -261,7 +261,7 @@ format_procsysvipc_msg (void *, char *&destbuf)
   return bufptr - buf;
 }
 
-static _off64_t
+static off_t
 format_procsysvipc_sem (void *, char *&destbuf)
 {
   tmp_pathbuf tp;
@@ -284,15 +284,15 @@ format_procsysvipc_sem (void *, char *&destbuf)
   for (int i = 0; i < seminfo.semmni; i++) {
     if ((xsemids[i].sem_perm.mode & SEM_ALLOC) != 0) {
       bufptr += sprintf (bufptr,
-		"%10llu %10u %5o %10d %5lu %5lu %5lu %5lu %10ld %10ld\n",
+		"%10llu %10u %5o %10d %5u %5u %5u %5u %10ld %10ld\n",
 		xsemids[i].sem_perm.key,
 		IXSEQ_TO_IPCID(i, xsemids[i].sem_perm),
 		xsemids[i].sem_perm.mode,
 		xsemids[i].sem_nsems,
-		xsemids[i].sem_perm.uid,
-		xsemids[i].sem_perm.gid,
-		xsemids[i].sem_perm.cuid,
-		xsemids[i].sem_perm.cgid,
+		(unsigned) xsemids[i].sem_perm.uid,
+		(unsigned) xsemids[i].sem_perm.gid,
+		(unsigned) xsemids[i].sem_perm.cuid,
+		(unsigned) xsemids[i].sem_perm.cgid,
 		xsemids[i].sem_otime,
 		xsemids[i].sem_ctime);
     }
@@ -303,7 +303,7 @@ format_procsysvipc_sem (void *, char *&destbuf)
   return bufptr - buf;
 }
 
-static _off64_t
+static off_t
 format_procsysvipc_shm (void *, char *&destbuf)
 {
   tmp_pathbuf tp;
@@ -323,7 +323,7 @@ format_procsysvipc_shm (void *, char *&destbuf)
   for (int i = 0; i < shminfo.shmmni; i++) {
     if (xshmids[i].shm_perm.mode & 0x0800) {
       bufptr += sprintf (bufptr,
-		"%10llu %10u %5o %10u %5d %5d %6u %5lu %5lu %5lu %5lu %10ld %10ld %10ld\n",
+		"%10llu %10u %5o %10u %5d %5d %6u %5u %5u %5u %5u %10ld %10ld %10ld\n",
 		xshmids[i].shm_perm.key,
 		IXSEQ_TO_IPCID(i, xshmids[i].shm_perm),
 		xshmids[i].shm_perm.mode,
@@ -331,10 +331,10 @@ format_procsysvipc_shm (void *, char *&destbuf)
 		xshmids[i].shm_cpid,
 		xshmids[i].shm_lpid,
 		xshmids[i].shm_nattch,
-		xshmids[i].shm_perm.uid,
-		xshmids[i].shm_perm.gid,
-		xshmids[i].shm_perm.cuid,
-		xshmids[i].shm_perm.cgid,
+		(unsigned) xshmids[i].shm_perm.uid,
+		(unsigned) xshmids[i].shm_perm.gid,
+		(unsigned) xshmids[i].shm_perm.cuid,
+		(unsigned) xshmids[i].shm_perm.cgid,
 		xshmids[i].shm_atime,
 		xshmids[i].shm_dtime,
 		xshmids[i].shm_ctime);

@@ -18,7 +18,7 @@
 extern "C" key_t
 ftok (const char *path, int id)
 {
-  struct __stat64 statbuf;
+  struct stat statbuf;
   key_t tmp;
   if (stat64 (path, &statbuf))
     {

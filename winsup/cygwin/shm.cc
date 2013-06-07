@@ -1,6 +1,7 @@
 /* shm.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2012, 2013
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -135,12 +136,12 @@ fixup_shms_after_fork ()
     {
       NTSTATUS status;
       vm_object_t ptr = sph_entry->ptr;
-      ULONG viewsize = sph_entry->parent->size;
+      SIZE_T viewsize = sph_entry->parent->size;
       status = NtMapViewOfSection (sph_entry->parent->hdl, NtCurrentProcess (),
 				   &ptr, 0, sph_entry->parent->size, NULL,
 				   &viewsize, ViewShare, 0, sph_entry->access);
       if (!NT_SUCCESS (status) || ptr != sph_entry->ptr)
-	api_fatal ("fixup_shms_after_fork: NtMapViewOfSection (%p), status %p.  Terminating.",
+	api_fatal ("fixup_shms_after_fork: NtMapViewOfSection (%p), status %y.  Terminating.",
 		   sph_entry->ptr, status);
     }
   return 0;
@@ -153,7 +154,7 @@ fixup_shms_after_fork ()
 extern "C" void *
 shmat (int shmid, const void *shmaddr, int shmflg)
 {
-  syscall_printf ("shmat (shmid = %d, shmaddr = %p, shmflg = 0x%x)",
+  syscall_printf ("shmat (shmid = %d, shmaddr = %p, shmflg = %y)",
 		  shmid, shmaddr, shmflg);
 
   SLIST_LOCK ();
@@ -219,7 +220,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
     }
   NTSTATUS status;
   vm_object_t ptr = NULL;
-  ULONG viewsize = ssh_entry->size;
+  SIZE_T viewsize = ssh_entry->size;
   ULONG access = (shmflg & SHM_RDONLY) ? PAGE_READONLY : PAGE_READWRITE;
   status = NtMapViewOfSection (ssh_entry->hdl, NtCurrentProcess (), &ptr, 0,
 			       ssh_entry->size, NULL, &viewsize, ViewShare,
@@ -257,7 +258,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
 extern "C" int
 shmctl (int shmid, int cmd, struct shmid_ds *buf)
 {
-  syscall_printf ("shmctl (shmid = %d, cmd = %d, buf = 0x%x)",
+  syscall_printf ("shmctl (shmid = %d, cmd = %d, buf = %p)",
 		  shmid, cmd, buf);
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -339,7 +340,7 @@ shmdt (const void *shmaddr)
 extern "C" int
 shmget (key_t key, size_t size, int shmflg)
 {
-  syscall_printf ("shmget (key = %U, size = %d, shmflg = 0x%x)",
+  syscall_printf ("shmget (key = %U, size = %d, shmflg = %y)",
 		  key, size, shmflg);
   /* Try allocating memory before calling cygserver. */
   shm_shmid_list *ssh_new_entry = new (shm_shmid_list);

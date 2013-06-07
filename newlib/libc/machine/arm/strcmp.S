@@ -55,6 +55,13 @@
 #if defined (__thumb__)
         .thumb
         .thumb_func
+#if !defined (__thumb2__)
+	/* If we have thumb1 only, we need to explictly mark the
+	   compatibility.  */
+	.arch armv4t
+	.eabi_attribute Tag_also_compatible_with, "\006\013"  /* v6-M.  */
+	.eabi_attribute Tag_ARM_ISA_use, 0
+#endif
 #endif
         .global strcmp
         .type   strcmp, %function
@@ -201,12 +208,12 @@ strcmp:
         /* Are both strings double-word aligned?  */
         orr     ip, r0, r1
         tst     ip, #7
-        bne     do_align
+        bne     .Ldo_align
 
         /* Fast path.  */
         init
 
-doubleword_aligned:
+.Ldoubleword_aligned:
 
         /* Get here when the strings to compare are double-word aligned.  */
         /* Compare two words in every iteration.  */
@@ -221,14 +228,14 @@ doubleword_aligned:
         ldrd    r2, r3, [r0], #8
         ldrd    r4, r5, [r1], #8
 
-        magic_compare_and_branch w1=r2, w2=r4, label=return_24
-        magic_compare_and_branch w1=r3, w2=r5, label=return_35
+        magic_compare_and_branch w1=r2, w2=r4, label=.Lreturn_24
+        magic_compare_and_branch w1=r3, w2=r5, label=.Lreturn_35
         b       2b
 
-do_align:
+.Ldo_align:
         /* Is the first string word-aligned?  */
         ands    ip, r0, #3
-        beq     word_aligned_r0
+        beq     .Lword_aligned_r0
 
         /* Fast compare byte by byte until the first string is word-aligned.  */
         /* The offset of r0 from a word boundary is in ip. Thus, the number of bytes
@@ -236,58 +243,58 @@ do_align:
         bic     r0, r0, #3
         ldr     r2, [r0], #4
         lsls    ip, ip, #31
-        beq     byte2
-        bcs     byte3
+        beq     .Lbyte2
+        bcs     .Lbyte3
 
-byte1:
+.Lbyte1:
         ldrb    ip, [r1], #1
         uxtb    r3, r2, ror #BYTE1_OFFSET
         subs    ip, r3, ip
-        bne     fast_return
-        m_cbz   reg=r3, label=fast_return
+        bne     .Lfast_return
+        m_cbz   reg=r3, label=.Lfast_return
 
-byte2:
+.Lbyte2:
         ldrb    ip, [r1], #1
         uxtb    r3, r2, ror #BYTE2_OFFSET
         subs    ip, r3, ip
-        bne     fast_return
-        m_cbz   reg=r3, label=fast_return
+        bne     .Lfast_return
+        m_cbz   reg=r3, label=.Lfast_return
 
-byte3:
+.Lbyte3:
         ldrb    ip, [r1], #1
         uxtb    r3, r2, ror #BYTE3_OFFSET
         subs    ip, r3, ip
-        bne     fast_return
-        m_cbnz  reg=r3, label=word_aligned_r0
+        bne     .Lfast_return
+        m_cbnz  reg=r3, label=.Lword_aligned_r0
 
-fast_return:
+.Lfast_return:
         mov     r0, ip
         bx      lr
 
-word_aligned_r0:
+.Lword_aligned_r0:
         init
         /* The first string is word-aligned.  */
         /* Is the second string word-aligned?  */
         ands    ip, r1, #3
-        bne     strcmp_unaligned
+        bne     .Lstrcmp_unaligned
 
-word_aligned:
+.Lword_aligned:
         /* The strings are word-aligned. */
         /* Is the first string double-word aligned?  */
         tst     r0, #4
-        beq     doubleword_aligned_r0
+        beq     .Ldoubleword_aligned_r0
 
         /* If r0 is not double-word aligned yet, align it by loading
         and comparing the next word from each string.  */
         ldr     r2, [r0], #4
         ldr     r4, [r1], #4
-        magic_compare_and_branch w1=r2 w2=r4 label=return_24
+        magic_compare_and_branch w1=r2 w2=r4 label=.Lreturn_24
 
-doubleword_aligned_r0:
+.Ldoubleword_aligned_r0:
         /* Get here when r0 is double-word aligned.  */
         /* Is r1 doubleword_aligned?  */
         tst     r1, #4
-        beq     doubleword_aligned
+        beq     .Ldoubleword_aligned
 
         /* Get here when the strings to compare are word-aligned,
         r0 is double-word aligned, but r1 is not double-word aligned.  */
@@ -305,9 +312,9 @@ doubleword_aligned_r0:
 
         /* Load the next double-word from each string and compare.  */
         ldrd    r2, r3, [r0], #8
-        magic_compare_and_branch w1=r2 w2=r5 label=return_25
+        magic_compare_and_branch w1=r2 w2=r5 label=.Lreturn_25
         ldrd    r4, r5, [r1], #8
-        magic_compare_and_branch w1=r3 w2=r4 label=return_34
+        magic_compare_and_branch w1=r3 w2=r4 label=.Lreturn_34
         b       3b
 
         .macro miscmp_word offsetlo offsethi
@@ -331,47 +338,47 @@ doubleword_aligned_r0:
         and     r2, r3, r6, S2LOMEM #\offsetlo
         it      eq
         cmpeq   r2, r5
-        bne     return_25
+        bne     .Lreturn_25
         ldr     r5, [r1], #4
         cmp     ip, #0
         eor	r3, r2, r3
         S2HIMEM r2, r5, #\offsethi
         it      eq
         cmpeq   r3, r2
-        bne     return_32
+        bne     .Lreturn_32
         b       7b
         .endm /* miscmp_word */
 
-strcmp_unaligned:
+.Lstrcmp_unaligned:
         /* r0 is word-aligned, r1 is at offset ip from a word.  */
         /* Align r1 to the (previous) word-boundary.  */
         bic     r1, r1, #3
 
         /* Unaligned comparison word by word using LDRs. */
         cmp     ip, #2
-        beq     miscmp_word_16                    /* If ip == 2.  */
-        bge     miscmp_word_24                    /* If ip == 3.  */
+        beq     .Lmiscmp_word_16                    /* If ip == 2.  */
+        bge     .Lmiscmp_word_24                    /* If ip == 3.  */
         miscmp_word offsetlo=8 offsethi=24        /* If ip == 1.  */
-miscmp_word_16:  miscmp_word offsetlo=16 offsethi=16
-miscmp_word_24:  miscmp_word offsetlo=24 offsethi=8
+.Lmiscmp_word_16:  miscmp_word offsetlo=16 offsethi=16
+.Lmiscmp_word_24:  miscmp_word offsetlo=24 offsethi=8
 
 
-return_32:
+.Lreturn_32:
         setup_return w1=r3, w2=r2
-        b       do_return
-return_34:
+        b       .Ldo_return
+.Lreturn_34:
         setup_return w1=r3, w2=r4
-        b       do_return
-return_25:
+        b       .Ldo_return
+.Lreturn_25:
         setup_return w1=r2, w2=r5
-        b       do_return
-return_35:
+        b       .Ldo_return
+.Lreturn_35:
         setup_return w1=r3, w2=r5
-        b       do_return
-return_24:
+        b       .Ldo_return
+.Lreturn_24:
         setup_return w1=r2, w2=r4
 
-do_return:
+.Ldo_return:
 
 #ifdef __ARMEB__
         mov     r0, ip
@@ -387,7 +394,7 @@ do_return:
         /* There is a zero or a different byte between r1 and r2.  */
         /* r0 contains a mask of all-zero bytes in r1.  */
         /* Using r0 and not ip here because cbz requires low register.  */
-        m_cbz   reg=r0, label=compute_return_value
+        m_cbz   reg=r0, label=.Lcompute_return_value
         clz     r0, r0
         /* r0 contains the number of bits on the left of the first all-zero byte in r1.  */
         rsb     r0, r0, #24
@@ -395,7 +402,7 @@ do_return:
         lsr     r1, r1, r0
         lsr     r2, r2, r0
 
-compute_return_value:
+.Lcompute_return_value:
         movs    r0, #1
         cmp     r1, r2
         /* The return value is computed as follows.
@@ -429,7 +436,7 @@ compute_return_value:
         eor     r2, r0, r1
         tst     r2, #3
         /* Strings not at same byte offset from a word boundary.  */
-        bne     strcmp_unaligned
+        bne     .Lstrcmp_unaligned
         ands    r2, r0, #3
         bic     r0, r0, #3
         bic     r1, r1, #3
@@ -506,7 +513,7 @@ compute_return_value:
         RETURN
 
 
-strcmp_unaligned:
+.Lstrcmp_unaligned:
 
 #if 0
         /* The assembly code below is based on the following alogrithm.  */

@@ -187,7 +187,7 @@ sigprocmask (int how, const sigset_t *set, sigset_t *oldset)
   return res;
 }
 
-int __stdcall
+int __reg3
 handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& opmask)
 {
   /* check that how is in right range */
@@ -227,7 +227,7 @@ handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& op
   return 0;
 }
 
-int __stdcall
+int __reg2
 _pinfo::kill (siginfo_t& si)
 {
   int res;
@@ -273,7 +273,7 @@ _pinfo::kill (siginfo_t& si)
       res = -1;
     }
 
-  syscall_printf ("%d = _pinfo::kill (%d), pid %d, process_state %p", res,
+  syscall_printf ("%d = _pinfo::kill (%d), pid %d, process_state %y", res,
 		  si.si_signo, this_pid, this_process_state);
   return res;
 }
@@ -516,7 +516,7 @@ extern "C" int
 sigpause (int signal_mask)
 {
   int res = handle_sigsuspend ((sigset_t) signal_mask);
-  syscall_printf ("%R = sigpause(%p)", res, signal_mask);
+  syscall_printf ("%R = sigpause(%y)", res, signal_mask);
   return res;
 }
 
@@ -544,7 +544,7 @@ siginterrupt (int sig, int flag)
       act.sa_flags |= SA_RESTART;
     }
   int res = sigaction_worker (sig, &act, NULL, true);
-  syscall_printf ("%R = siginterrupt(%d, %p)", sig, flag);
+  syscall_printf ("%R = siginterrupt(%d, %y)", sig, flag);
   return res;
 }
 

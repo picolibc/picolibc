@@ -41,7 +41,7 @@ typedef struct {
 	struct _ftsent *fts_cur;	/* current node */
 	struct _ftsent *fts_child;	/* linked list of children */
 	struct _ftsent **fts_array;	/* sort array */
-	__dev32_t fts_dev;		/* starting device # */
+	dev_t fts_dev;			/* starting device # */
 	char *fts_path;			/* path for this descent */
 	int fts_rfd;			/* fd for root */
 	int fts_pathlen;		/* sizeof(path) */
@@ -88,8 +88,8 @@ typedef struct _ftsent {
 	u_short fts_pathlen;		/* strlen(fts_path) */
 	u_short fts_namelen;		/* strlen(fts_name) */
 
-	__ino64_t fts_ino;		/* inode */
-	__dev32_t fts_dev;		/* device */
+	ino_t fts_ino;			/* inode */
+	dev_t fts_dev;			/* device */
 	nlink_t fts_nlink;		/* link count */
 
 #define	FTS_ROOTPARENTLEVEL	-1
@@ -123,11 +123,7 @@ typedef struct _ftsent {
 #define	FTS_SKIP	 4		/* discard node */
 	u_short fts_instr;		/* fts_set() instructions */
 
-#ifdef __INSIDE_CYGWIN__
-	struct __stat64 *fts_statp;	/* stat(2) information */
-#else
 	struct stat *fts_statp;		/* stat(2) information */
-#endif
 	char *fts_name;			/* file name */
 	FTS *fts_fts;			/* back pointer to main FTS */
 } FTSENT;

@@ -377,17 +377,17 @@ check_sanity_and_sync (per_process *p)
 
   /* Complain if older than last incompatible change */
   if (p->dll_major < CYGWIN_VERSION_DLL_EPOCH)
-    api_fatal ("cygwin DLL and APP are out of sync -- DLL version mismatch %d < %d",
+    api_fatal ("cygwin DLL and APP are out of sync -- DLL version mismatch %u < %u",
 	       p->dll_major, CYGWIN_VERSION_DLL_EPOCH);
 
   /* magic_biscuit != 0 if using the old style version numbering scheme.  */
   if (p->magic_biscuit != SIZEOF_PER_PROCESS)
-    api_fatal ("Incompatible cygwin .dll -- incompatible per_process info %d != %d",
+    api_fatal ("Incompatible cygwin .dll -- incompatible per_process info %u != %u",
 	       p->magic_biscuit, SIZEOF_PER_PROCESS);
 
   /* Complain if incompatible API changes made */
   if (p->api_major > cygwin_version.api_major)
-    api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %d > %d",
+    api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %u > %u",
 	       p->api_major, cygwin_version.api_major);
 
   /* This is a kludge to work around a version of _cygwin_common_crt0
@@ -405,7 +405,7 @@ void
 child_info_fork::alloc_stack_hard_way (volatile char *b)
 {
   void *stack_ptr;
-  DWORD stacksize;
+  SIZE_T stacksize;
 
   /* First check if the requested stack area is part of the user heap
      or part of a mmapped region.  If so, we have been started from a
@@ -415,16 +415,19 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
       && stackbottom <= cygheap->user_heap.max)
       || is_mmapped_region ((caddr_t) stacktop, (caddr_t) stackbottom))
     return;
-
   /* First, try to reserve the entire stack. */
-  stacksize = (char *) stackbottom - (char *) stackaddr;
+  stacksize = (SIZE_T) stackbottom - (SIZE_T) stackaddr;
   if (!VirtualAlloc (stackaddr, stacksize, MEM_RESERVE, PAGE_NOACCESS))
-    api_fatal ("fork: can't reserve memory for stack %p - %p, %E",
-	       stackaddr, stackbottom);
-  stacksize = (char *) stackbottom - (char *) stacktop;
+    {
+      PTEB teb = NtCurrentTeb ();
+      api_fatal ("fork: can't reserve memory for parent stack "
+		 "%p - %p, (child has %p - %p), %E",
+		 stackaddr, stackbottom, teb->DeallocationStack, _tlsbase);
+    }
+  stacksize = (SIZE_T) stackbottom - (SIZE_T) stacktop;
   stack_ptr = VirtualAlloc (stacktop, stacksize, MEM_COMMIT, PAGE_READWRITE);
   if (!stack_ptr)
-    abort ("can't commit memory for stack %p(%d), %E", stacktop, stacksize);
+    abort ("can't commit memory for stack %p(%ly), %E", stacktop, stacksize);
   if (guardsize != (size_t) -1)
     {
       /* Allocate PAGE_GUARD page if it still fits. */
@@ -458,8 +461,12 @@ getstack (volatile char * volatile p)
 void
 child_info_fork::alloc_stack ()
 {
-  volatile char * volatile esp;
-  __asm__ volatile ("movl %%esp,%0": "=r" (esp));
+  volatile char * volatile stackp;
+#ifdef __x86_64__
+  __asm__ volatile ("movq %%rsp,%0": "=r" (stackp));
+#else
+  __asm__ volatile ("movl %%esp,%0": "=r" (stackp));
+#endif
   /* Make sure not to try a hard allocation if we have been forked off from
      the main thread of a Cygwin process which has been started from a 64 bit
      parent.  In that case the _tlsbase of the forked child is not the same
@@ -471,18 +478,18 @@ child_info_fork::alloc_stack ()
       && (!wincap.is_wow64 ()
       	  || stacktop < (char *) NtCurrentTeb ()->DeallocationStack
 	  || stackbottom > _tlsbase))
-    alloc_stack_hard_way (esp);
+    alloc_stack_hard_way (stackp);
   else
     {
       char *st = (char *) stacktop - 4096;
       while (_tlstop >= st)
-	esp = getstack (esp);
+	stackp = getstack (stackp);
       stackaddr = 0;
       /* This only affects forked children of a process started from a native
 	 64 bit process, but it doesn't hurt to do it unconditionally.  Fix
 	 StackBase in the child to be the same as in the parent, so that the
 	 computation of _my_tls is correct. */
-      _tlsbase = (char *) stackbottom;
+      _tlsbase = (PVOID) stackbottom;
     }
 }
 
@@ -546,8 +553,8 @@ get_cygwin_startup_info ()
       if ((res->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
 	multiple_cygwin_problem ("proc intro", res->intro, 0);
       else if (res->cygheap != (void *) &_cygheap_start)
-	multiple_cygwin_problem ("cygheap base", (DWORD) res->cygheap,
-				 (DWORD) &_cygheap_start);
+	multiple_cygwin_problem ("cygheap base", (uintptr_t) res->cygheap,
+				 (uintptr_t) &_cygheap_start);
 
       unsigned should_be_cb = 0;
       switch (res->type)
@@ -563,7 +570,8 @@ get_cygwin_startup_info ()
 	    if (should_be_cb != res->cb)
 	      multiple_cygwin_problem ("proc size", res->cb, should_be_cb);
 	    else if (sizeof (fhandler_union) != res->fhandler_union_cb)
-	      multiple_cygwin_problem ("fhandler size", res->fhandler_union_cb, sizeof (fhandler_union));
+	      multiple_cygwin_problem ("fhandler size", res->fhandler_union_cb,
+				       sizeof (fhandler_union));
 	    if (res->isstraced ())
 	      {
 		while (!being_debugged ())
@@ -572,7 +580,7 @@ get_cygwin_startup_info ()
 	      }
 	    break;
 	  default:
-	    system_printf ("unknown exec type %d", res->type);
+	    system_printf ("unknown exec type %u", res->type);
 	    /* intentionally fall through */
 	  case _CH_WHOOPS:
 	    res = NULL;
@@ -583,10 +591,17 @@ get_cygwin_startup_info ()
   return res;
 }
 
+#ifdef __x86_64__
+#define dll_data_start &__data_start__
+#define dll_data_end &__data_end__
+#define dll_bss_start &__bss_start__
+#define dll_bss_end &__bss_end__
+#else
 #define dll_data_start &_data_start__
 #define dll_data_end &_data_end__
 #define dll_bss_start &_bss_start__
 #define dll_bss_end &_bss_end__
+#endif
 
 void
 child_info_fork::handle_fork ()
@@ -708,7 +723,7 @@ init_windows_system_directory ()
 	api_fatal ("can't find windows system directory");
       windows_system_directory[windows_system_directory_length++] = L'\\';
       windows_system_directory[windows_system_directory_length] = L'\0';
-
+#ifndef __x86_64__
       system_wow64_directory_length =
 	GetSystemWow64DirectoryW (system_wow64_directory, MAX_PATH);
       if (system_wow64_directory_length)
@@ -716,6 +731,7 @@ init_windows_system_directory ()
 	  system_wow64_directory[system_wow64_directory_length++] = L'\\';
 	  system_wow64_directory[system_wow64_directory_length] = L'\0';
 	}
+#endif /* !__x86_64__ */
     }
 }
 
@@ -725,7 +741,6 @@ dll_crt0_0 ()
   wincap.init ();
   child_proc_info = get_cygwin_startup_info ();
   init_windows_system_directory ();
-  init_global_security ();
   initial_env ();
 
   SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
@@ -753,12 +768,14 @@ dll_crt0_0 ()
   if (!child_proc_info)
     {
       memory_init (true);
+#ifndef __x86_64__
       /* WOW64 process on XP/64 or Server 2003/64?  Check if we have been
 	 started from 64 bit process and if our stack is at an unusual
 	 address.  Set wow64_needs_stack_adjustment if so.  Problem
 	 description in wow64_test_for_64bit_parent. */
       if (wincap.wow64_has_secondary_stack ())
 	wow64_needs_stack_adjustment = wow64_test_for_64bit_parent ();
+#endif /* !__x86_64__ */
     }
   else
     {
@@ -847,7 +864,7 @@ dll_crt0_1 (void *)
 	small_printf ("cmalloc returns %p\n", cmalloc (HEAP_STR, n));
       else
 	{
-	  small_printf ("total allocated %p\n", (i - 1) * n);
+	  small_printf ("total allocated %y\n", (i - 1) * n);
 	  break;
 	}
     }
@@ -890,8 +907,8 @@ dll_crt0_1 (void *)
 	 this step. */
       if (fork_info->stackaddr)
 	{
-	  _tlsbase = (char *) fork_info->stackbottom;
-	  _tlstop = (char *) fork_info->stacktop;
+	  _tlsbase = (PVOID) fork_info->stackbottom;
+	  _tlstop = (PVOID) fork_info->stacktop;
 	}
 
       /* Not resetting _my_tls.incyg here because presumably fork will overwrite
@@ -1015,17 +1032,25 @@ dll_crt0_1 (void *)
       sig_dispatch_pending (false);
       _my_tls.call_signal_handler ();
       _my_tls.incyg--;	/* Not in Cygwin anymore */
+#ifdef __x86_64__
+      cygwin_exit (user_data->main (__argc, newargv, __cygwin_environ));
+#else
       cygwin_exit (user_data->main (__argc, newargv, *user_data->envptr));
+#endif
     }
   __asm__ ("				\n\
+	.global _cygwin_exit_return	\n\
 	.global __cygwin_exit_return	\n\
+_cygwin_exit_return:			\n\
 __cygwin_exit_return:			\n\
+		nop			\n\
 ");
 }
 
 extern "C" void __stdcall
 _dll_crt0 ()
 {
+#ifndef __x86_64__
   /* Handle WOW64 process on XP/2K3 which has been started from native 64 bit
      process.  See comment in wow64_test_for_64bit_parent for a full problem
      description. */
@@ -1056,10 +1081,11 @@ _dll_crt0 ()
 	/* Fall back to respawn if wow64_revert_to_original_stack fails. */
 	wow64_respawn_process ();
     }
-#ifdef __i386__
+#endif /* !__x86_64__ */
   _feinitialise ();
-#endif
+#ifndef __x86_64__
   main_environ = user_data->envptr;
+#endif
   if (in_forkee)
     {
       fork_info->alloc_stack ();
@@ -1092,12 +1118,16 @@ dll_crt0 (per_process *uptr)
 extern "C" void
 cygwin_dll_init ()
 {
+#ifndef __x86_64__
   static char **envp;
+#endif
   static int _fmode;
 
   user_data->magic_biscuit = sizeof (per_process);
 
+#ifndef __x86_64__
   user_data->envptr = &envp;
+#endif
   user_data->fmode_ptr = &_fmode;
 
   _dll_crt0 ();
@@ -1121,7 +1151,7 @@ __main (void)
   sig_dispatch_pending (true);
 }
 
-void __stdcall
+void __reg1
 do_exit (int status)
 {
   syscall_printf ("do_exit (%d), exit_state %d", status, exit_state);
@@ -1173,7 +1203,7 @@ do_exit (int status)
 	  siginfo_t si = {0};
 	  si.si_signo = -SIGHUP;
 	  si.si_code = SI_KERNEL;
-	  sigproc_printf ("%d == pgrp %d, send SIG{HUP,CONT} to stopped children",
+	  sigproc_printf ("%u == pgrp %u, send SIG{HUP,CONT} to stopped children",
 			  myself->pid, myself->pgid);
 	  kill_pgrp (myself->pgid, si);
 	}
@@ -1186,7 +1216,7 @@ do_exit (int status)
       if (getpgrp () > 0 && myself->pid == myself->sid && real_tty_attached (myself))
 	{
 	  tty *tp = cygwin_shared->tty[myself->ctty];
-	  sigproc_printf ("%d == sid %d, send SIGHUP to children",
+	  sigproc_printf ("%u == sid %u, send SIGHUP to children",
 			  myself->pid, myself->sid);
 
 	/* CGF FIXME: This can't be right. */
@@ -1249,7 +1279,7 @@ api_fatal (const char *fmt, ...)
 }
 
 void
-multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned version)
+multiple_cygwin_problem (const char *what, uintptr_t magic_version, uintptr_t version)
 {
   if (_cygwin_testing && (strstr (what, "proc") || strstr (what, "cygheap")))
     {
@@ -1261,9 +1291,9 @@ multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned vers
     return;
 
   if (CYGWIN_VERSION_MAGIC_VERSION (magic_version) == version)
-    system_printf ("%s magic number mismatch detected - %p/%p", what, magic_version, version);
+    system_printf ("%s magic number mismatch detected - %p/%ly", what, magic_version, version);
   else
-    api_fatal ("%s mismatch detected - %p/%p.\n\
+    api_fatal ("%s mismatch detected - %ly/%ly.\n\
 This problem is probably due to using incompatible versions of the cygwin DLL.\n\
 Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
 and delete all but the most recent version.  The most recent version *should*\n\
@@ -1278,6 +1308,6 @@ void __stdcall
 cygbench (const char *s)
 {
   if (GetEnvironmentVariableA ("CYGWIN_BENCH", NULL, 0))
-    small_printf ("%05d ***** %s : %10d\n", GetCurrentProcessId (), s, strace.microseconds ());
+    small_printf ("%05u ***** %s : %10d\n", GetCurrentProcessId (), s, strace.microseconds ());
 }
 #endif

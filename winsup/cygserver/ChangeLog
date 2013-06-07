@@ -1,3 +1,7 @@
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Merge in cygwin-64bit-branch.  See ChangeLog.64bit for details.
+
 2012-11-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* Makefile.in: Remove old from CFLAGS and move C*FLAGS so that they can

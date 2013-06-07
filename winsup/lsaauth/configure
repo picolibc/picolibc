@@ -2838,7 +2838,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 test -z "$CC" && as_fn_error $? "no acceptable cc found in \$PATH" "$LINENO" 5
 
 
-for ac_prog in i686-w64-mingw32-gcc
+case "$target_cpu" in
+i?86)
+  for ac_prog in i686-w64-mingw32-gcc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -2879,6 +2881,10 @@ fi
 
   test -n "$MINGW32_CC" && break
 done
+
+  test -z "$MINGW32_CC" && as_fn_error $? "no acceptable mingw32 cc found in \$PATH" "$LINENO" 5
+  ;;
+esac
 
 for ac_prog in x86_64-w64-mingw32-gcc
 do
@@ -2922,8 +2928,6 @@ fi
   test -n "$MINGW64_CC" && break
 done
 
-
-test -z "$MINGW32_CC" && as_fn_error $? "no acceptable mingw32 cc found in \$PATH" "$LINENO" 5
 test -z "$MINGW64_CC" && as_fn_error $? "no acceptable mingw64 cc found in \$PATH" "$LINENO" 5
 
 test "$program_prefix" != NONE &&

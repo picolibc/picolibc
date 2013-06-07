@@ -57,8 +57,10 @@ char *
 _DEFUN (asctime, (tim_p),
 	_CONST struct tm *tim_p)
 {
-  _REENT_CHECK_ASCTIME_BUF(_REENT);
-  return asctime_r (tim_p, _REENT_ASCTIME_BUF(_REENT));
+  struct _reent *reent = _REENT;
+
+  _REENT_CHECK_ASCTIME_BUF(reent);
+  return asctime_r (tim_p, _REENT_ASCTIME_BUF(reent));
 }
 
 #endif

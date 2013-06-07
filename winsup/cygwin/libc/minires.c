@@ -177,9 +177,9 @@ static void get_resolv(res_state statp)
       if (!have_address
 	  && !strncasecmp("nameserver", words[0], sizes[0])) {
 	for ( j = 1; j < i ; j++) {
-	  unsigned int address;
+	  in_addr_t address;
 	  address = cygwin_inet_addr(words[j]);
-	  if (address == -1) {
+	  if (address == INADDR_NONE) {
 	    DPRINTF(debug, "invalid server \"%s\"\n", words[j]);
 	  }
 	  else if (ns >= MAXNS) {
@@ -295,7 +295,7 @@ int res_ninit(res_state statp)
      Mix the upper and lower bits as they are not used equally */
   i = getpid();
   statp->id = (ushort) (getppid() ^ (i << 8) ^ (i >> 8));
-  for (i = 0; i < DIM(statp->dnsrch); i++)  statp->dnsrch[i] = 0;
+  for (i = 0; i < (int) DIM(statp->dnsrch); i++)  statp->dnsrch[i] = 0;
 
   /* resolv.conf (dns servers & search list)*/
   get_resolv(statp);
@@ -424,7 +424,7 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
 	       int MsgLength, unsigned char * AnsPtr, int AnsLength)
 {
   /* Current server, shared by all tasks */
-  volatile static unsigned int SServ = 0XFFFFFFFF;
+  static volatile unsigned int SServ = 0XFFFFFFFF;
   int tcp;
   const int debug = statp->options & RES_DEBUG;
 
@@ -459,7 +459,7 @@ int res_nsend( res_state statp, const unsigned char * MsgPtr,
 
   /* Close the socket if it had been opened before a fork.
      Reuse of pid's cannot hurt */
-  if ((statp->sockfd != -1) && (statp->mypid != getpid())) {
+  if ((statp->sockfd != -1) && ((pid_t) statp->mypid != getpid())) {
     res_nclose(statp);
   }
 
@@ -625,8 +625,10 @@ int res_send( const unsigned char * MsgPtr, int MsgLength,
 *****************************************************************/
 int res_nmkquery (res_state statp,
 		  int op, const char * dnameptr, int qclass, int qtype,
-		  const unsigned char * dataptr, int datalen,
-		  const unsigned char * newrr, unsigned char * buf, int buflen)
+		  const unsigned char * dataptr __attribute__ ((unused)),
+		  int datalen __attribute__ ((unused)),
+		  const unsigned char * newrr __attribute__ ((unused)),
+		  unsigned char * buf, int buflen)
 {
   int i, len;
   const char * ptr;
@@ -722,7 +724,7 @@ int res_nquerydomain( res_state statp, const char * Name, const char * DomName,
 		      int Class, int Type, unsigned char * AnsPtr, int AnsLength)
 {
   char fqdn[MAXDNAME], *ptr;
-  int nlen;
+  size_t nlen;
 
   if (!DomName)
     ptr = (char *) Name;

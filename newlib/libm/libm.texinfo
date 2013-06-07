@@ -86,10 +86,10 @@ into another language, under the above conditions for modified versions.
 @end titlepage
 @end iftex
 
-@ifinfo
+@ifnottex
 @node Top
 @top LIBM
-@end ifinfo
+@end ifnottex
 
 @menu
 * Math::           The mathematical functions (`math.h').
@@ -135,7 +135,7 @@ For such platforms, the long double math functions are implemented as calls to t
 @printindex cp
 
 @tex
-% I think something like @colophon should be in texinfo.  In the
+% I think something like @@colophon should be in texinfo.  In the
 % meantime:
 \long\def\colophon{\hbox to0pt{}\vfill
 \centerline{The body of this manual is set in}
@@ -146,7 +146,7 @@ For such platforms, the long double math functions are implemented as calls to t
 \centerline{{\sl\fontname\tensl\/}}
 \centerline{are used for emphasis.}\vfill}
 \page\colophon
-% Blame: pesch@cygnus.com, 28mar91.
+% Blame: pesch@@cygnus.com, 28mar91.
 @end tex
 
 @contents

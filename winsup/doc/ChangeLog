@@ -1,3 +1,176 @@
+2013-06-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-copyright.xml: Fix link to license.
+	* faq-using.xml: Ditto.
+	* faq-what.xml: Ditto.
+
+2013-06-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-programming.xml: Convert url to refer to new flat faq.html file.
+	* faq-setup.xml: Ditto.
+	* faq-using.xml: Ditto.
+	* highlights.xml: Ditto.
+
+2013-06-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.19): Revert mandatory locking support to
+	"preliminary".
+
+2013-06-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Add rule to rebuild Makefile if Makefile.in changes.
+	Include Makefile.dep last.
+	(Makefile.dep): Run xidepend within source dir.  Temporarily drop
+	faq.xml from dependencies.
+	* xidepend: Fix creating base filename to accommodate VPATH.
+
+2013-06-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.19): Align mandatory locking text to
+	today's changes.
+
+2013-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.19): Add mandatory locking.
+
+2013-05-23  Warren Young  <warren@etr-usa.com>
+
+	* xidepend: New script, generates Makefile.dep from top-level XML
+	* .cvsignore: Ignoring Makefile.dep output
+	* Makefile: Creating Makefile.dep if it doesn't exist, including it
+	if it does, and removing it on 'make clean'
+	* Wishlist: Knocked autodependency generation off the list
+
+2013-05-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.xml (cygwinenv-implemented-options): Explain new
+	winsymliks:nativestrict option.  Strip out description of symlink types
+	and refer to new pathnames-symlinks section.
+	* highlights.xml (ov-hi-files): Rip out most of symlink description and
+	refer to new pathnames-symlinks section instead.
+	* new-features.xml (ov-new1.7.19): Add CYGWIN=winsymlinks:nativestrict.
+	* pathnames.xml (pathnames-symlinks): New section describing symbolic
+	link handling.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.19): Add arc4random,
+	arc4random_addrandom, arc4random_buf, arc4random_stir and
+	arc4random_uniform.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.19): Add __b64_ntop and __b64_pton.
+
+2013-05-13  Warren Young  <warren@etr-usa.com>
+
+	* cygwin-ug.xml setup.xml: Removed; unused.
+	* Wishlist: Created, with initial content based on a -patches
+	mailing list post.
+
+2013-05-06  Warren Young  <warren@etr-usa.com>
+
+	* cygwin-api.in.xml (bookinfo): Reverted XInclude for legal.xml
+	fragment to a DOCTOOL include.
+
+2013-05-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* Makefile (FAQ_SOURCES): Use wildcard function to find sources in
+	srcdir.
+
+2013-05-01  Warren Young  <warren@etr-usa.com>
+
+	* bodysnatcher.pl: Created
+	* Makefile.in (faq/faq.body): Added target to create this file from
+	faq/faq.html using new bodysnatcher.pl script.
+
+2013-05-01  Warren Young  <warren@etr-usa.com>
+
+	* cygwin-ug.xml: Renamed from cygwin-ug.in.sgml
+	(bookinfo) Extracted <bookinfo> section into new ug-info.xml file
+	* ug-info.xml: Created
+	* cygwin-ug-net.xml: Renamed from cygwin-ug-net.in.sgml
+	(bookinfo) Replaced content with XInclude referencing ug-info.xml
+	* configure.ac: Replaced a *.sgml file reference with *.xml
+	* cygserver.xml cygwinenv.xml dll.xml effectively.xml filemodes.xml
+	gcc.xml gdb.xml legal.xml new-features.xml ntsec.xml overview.xml
+	pathnames.xml programming.xml setup.xml setup-net.xml textbinary.xml
+	using.xml windres.xml: Renamed from *.sgml.
+	Added <?xml> and <!DOCTYPE> tags to the top.
+	* cygserver.sgml cygwinenv.sgml dll.sgml effectively.sgml filemodes.sgml
+	gcc.sgml gdb.sgml legal.sgml new-features.sgml ntsec.sgml overview.sgml
+	pathnames.sgml programming.sgml setup.sgml setup-net.sgml textbinary.sgml
+	using.sgml windres.sgml: Renamed to *.xml
+	* faq.xml: Renamed from faq-sections.sgml.  (Not faq.sgml!)
+	Replaced FAQ section ENTITY declarations with XIncludes.
+	Removed all other ENTITY declarations as they just name entities
+	already defined in the current DocBook stylesheets.
+	* faq.sgml: Removed without translating to DocBook XML.  Obsolete.
+	* faq-*.xml: Added <?xml> and <!DOCTYPE> tags to the top.
+	Moved <qandadiv> tags from faq.xml and faq-sections.xml into
+	individual section files so they individually pass XML validation.
+	* pathnames.xml: Contained two top-level <sect1> elements, which is
+	malformed XML. Moved second to new specialnames.xml file.
+	* specialnames.xml: Created; extracted from pathnames.sgml
+	* overview2.xml: Broke it up into following three files, and
+	removed the original.
+	* ov-ex-win.xml (ov-ex-win): Created; contents extracted from
+	overview2.sgml
+	* ov-ex-unix.xml (ov-ex-unix): Ditto
+	* highlights.xml (highlights): Ditto
+	* setup2.xml: Broke it up into setup-*.xml.
+	* setup-env.xml setup-files.xml setup-locale.xml setup-maxmem.xml:
+	Created; contents extracted from setup2.sgml
+
+2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-programming.xml (faq.programming.64bitporting): Fix typo.
+
+2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-programming.xml (faq.programming.64bitporting): Extend entry.
+	(faq.programming.64bitporting-fail): New entry.
+	(faq.programming.64bitporting-cygwin64): New entry.
+
+2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
+	    Christian Franke  <Christian.Franke@t-online.de>
+
+	* faq-programming.xml (faq.programming.64bitporting): Mention the
+	-Wformat and -Wall gcc options.
+
+2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-programming.xml (faq.programming.64bitporting): New FAQ entry.
+	(faq.programming.objective-c): Include gcc4.
+	(faq.programming.make-execvp): Drop text discouraging usage of -j.
+	(faq.programming.undeclared-functions): Drop entry.
+	(faq.programming.x86-assembly): Ditto.
+	(faq.programming.djgpp): Ditto.
+
+2013-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml (cygwinenv-implemented-options): Change description
+	for winsymlink option to explain new implementation.
+	* new-features.sgml (ov-new1.7.19): Add support for native symlinks and
+	AFS.
+
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Throughout, eliminate Windows 2000 from the documentation.
+	* overview.sgml (brief-history): Mention native AMD64 support.
+
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (SGMLDIRS): Accommodate dropping utils_source and
+	cygwin_source from ../Makefile.common.
+	* new-features.sgml (ov-new1.7.19): New section.  Document dropped
+	support for pre-XP SP3 and added support for 64 bit Cygwin.
+
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-what.xml (faq.what.supported): Change to accommodate existence
+	of 64 bit version.
+
 2013-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-what.xml (faq.what.supported): Mention Windows 8 and Server 2012.

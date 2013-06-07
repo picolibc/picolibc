@@ -38,14 +38,15 @@ scanf(fmt, va_alist)
 {
   int ret;
   va_list ap;
+  struct _reent *reent = _REENT;
 
-  _REENT_SMALL_CHECK_INIT (_REENT);
+  _REENT_SMALL_CHECK_INIT (reent);
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
   va_start (ap);
 #endif
-  ret = _vfscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
+  ret = _vfscanf_r (reent, _stdin_r (reent), fmt, ap);
   va_end (ap);
   return ret;
 }

@@ -34,27 +34,13 @@ details. */
 #include "winf.h"
 #include "ntdll.h"
 
-static suffix_info NO_COPY exe_suffixes[] =
+static const suffix_info exe_suffixes[] =
 {
   suffix_info ("", 1),
   suffix_info (".exe", 1),
   suffix_info (".com"),
   suffix_info (NULL)
 };
-
-#if 0
-/* CV, 2009-11-05: Used to be used when searching for DLLs in calls to
-   dlopen().  However, dlopen() on other platforms never adds a suffix by
-   its own.  Therefore we use stat_suffixes now, which only adds a .exe
-   suffix for symmetry. */
-static suffix_info dll_suffixes[] =
-{
-  suffix_info (".dll"),
-  suffix_info ("", 1),
-  suffix_info (".exe", 1),
-  suffix_info (NULL)
-};
-#endif
 
 /* Add .exe to PROG if not already present and see if that exists.
    If not, return PROG (converted from posix to win32 rules if necessary).
@@ -99,7 +85,7 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
    of name is placed in buf and returned.  Otherwise the contents of buf
    is undefined and NULL is returned.  */
 
-const char * __stdcall
+const char * __reg3
 find_exec (const char *name, path_conv& buf, const char *mywinenv,
 	   unsigned opt, const char **known_suffix)
 {
@@ -248,26 +234,50 @@ iscmd (const char *argv0, const char *what)
 	 (n == 0 || isdirsep (argv0[n - 1]));
 }
 
-struct pthread_cleanup
+#define ILLEGAL_SIG_FUNC_PTR ((_sig_func_ptr) (-2))
+struct system_call_handle
 {
   _sig_func_ptr oldint;
   _sig_func_ptr oldquit;
   sigset_t oldmask;
-  pthread_cleanup (): oldint (NULL), oldquit (NULL), oldmask ((sigset_t) -1) {}
-};
-
-static void
-do_cleanup (void *args)
-{
-# define cleanup ((pthread_cleanup *) args)
-  if (cleanup->oldmask != (sigset_t) -1)
-    {
-      signal (SIGINT, cleanup->oldint);
-      signal (SIGQUIT, cleanup->oldquit);
-      sigprocmask (SIG_SETMASK, &(cleanup->oldmask), NULL);
-    }
+  bool is_system_call ()
+  {
+    return oldint != ILLEGAL_SIG_FUNC_PTR;
+  }
+  system_call_handle (bool issystem)
+  {
+    if (!issystem)
+      oldint = ILLEGAL_SIG_FUNC_PTR;
+    else
+      {
+	sig_send (NULL, __SIGHOLD);
+	oldint = NULL;
+      }
+  }
+  void arm()
+  {
+    if (is_system_call ())
+      {
+	sigset_t child_block;
+	oldint = signal (SIGINT,  SIG_IGN);
+	oldquit = signal (SIGQUIT, SIG_IGN);
+	sigemptyset (&child_block);
+	sigaddset (&child_block, SIGCHLD);
+	sigprocmask (SIG_BLOCK, &child_block, &oldmask);
+	sig_send (NULL, __SIGNOHOLD);
+      }
+  }
+  ~system_call_handle ()
+  {
+    if (is_system_call ())
+      {
+	signal (SIGINT, oldint);
+	signal (SIGQUIT, oldquit);
+	sigprocmask (SIG_SETMASK, &oldmask, NULL);
+      }
+  }
 # undef cleanup
-}
+};
 
 child_info_spawn NO_COPY ch_spawn;
 
@@ -308,18 +318,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       return -1;
     }
 
-  /* FIXME: There is a small race here and FIXME: not thread safe! */
-  pthread_cleanup cleanup;
-  if (mode == _P_SYSTEM)
-    {
-      sigset_t child_block;
-      cleanup.oldint = signal (SIGINT, SIG_IGN);
-      cleanup.oldquit = signal (SIGQUIT, SIG_IGN);
-      sigemptyset (&child_block);
-      sigaddset (&child_block, SIGCHLD);
-      sigprocmask (SIG_BLOCK, &child_block, &cleanup.oldmask);
-    }
-  pthread_cleanup_push (do_cleanup, (void *) &cleanup);
   av newargv;
   linebuf one_line;
   PWCHAR envblock = NULL;
@@ -336,6 +334,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   int looped = 0;
 
   myfault efault;
+  system_call_handle system_call (mode == _P_SYSTEM);
   if (efault.faulted ())
     {
       if (get_errno () == ENOMEM)
@@ -465,28 +464,18 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	 of a compatibility job, which allows child processes to break away
 	 from the job.  This helps to avoid this issue.
 
+	 First we call IsProcessInJob.  It fetches the information whether or
+	 not we're part of a job 20 times faster than QueryInformationJobObject.
+
 	 (*) Note that this is not mintty's fault.  It has just been observed
 	 with mintty in the first place.  See the archives for more info:
 	 http://cygwin.com/ml/cygwin-developers/2012-02/msg00018.html */
 
       JOBOBJECT_BASIC_LIMIT_INFORMATION jobinfo;
+      BOOL is_in_job;
 
-      /* Calling QueryInformationJobObject costs time.  Starting with
-	 Windows XP there's a function IsProcessInJob, which fetches the
-	 information whether or not we're part of a job 20 times faster than
-	 the call to QueryInformationJobObject.  But we're still
-	 supporting Windows 2000, so we can't just link to that function.
-	 On the other hand, loading the function pointer at runtime is a
-	 time comsuming operation, too.  So, what we do here is to emulate
-	 the IsProcessInJob function when called for the own process and with
-	 a NULL job handle.  In this case it just returns the value of the
-	 lowest bit from PEB->EnvironmentUpdateCount (observed with WinDbg).
-	 The name of this PEB member is the same in all (inofficial)
-	 documentations of the PEB.  Apparently it's a bit misleading.
-	 As a result, we only call QueryInformationJobObject if we're on
-	 Vista or later *and* if the PEB indicates we're running in a job.
-	 Tested on Vista/32, Vista/64, W7/32, W7/64, W8/64. */
-      if ((NtCurrentTeb ()->Peb->EnvironmentUpdateCount & 1) != 0
+      if (IsProcessInJob (GetCurrentProcess (), NULL, &is_in_job)
+	  && is_in_job
 	  && QueryInformationJobObject (NULL, JobObjectBasicLimitInformation,
 				     &jobinfo, sizeof jobinfo, NULL)
 	  && (jobinfo.LimitFlags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK
@@ -624,12 +613,12 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
     SetHandleInformation (my_wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
   parent_winpid = GetCurrentProcessId ();
 
+loop:
   /* When ruid != euid we create the new process under the current original
      account and impersonate in child, this way maintaining the different
      effective vs. real ids.
      FIXME: If ruid != euid and ruid != saved_uid we currently give
      up on ruid. The new process will have ruid == euid. */
-loop:
   ::cygheap->user.deimpersonate ();
 
   if (!real_path.iscygexec () && mode == _P_OVERLAY)
@@ -784,7 +773,6 @@ loop:
   /* Name the handle similarly to proc_subproc. */
   ProtectHandle1 (pi.hProcess, childhProc);
 
-  pid_t pid;
   if (mode == _P_OVERLAY)
     {
       myself->dwProcessId = pi.dwProcessId;
@@ -792,7 +780,6 @@ loop:
       myself.hProcess = hExeced = pi.hProcess;
       real_path.get_wide_win32_path (myself->progname); // FIXME: race?
       sigproc_printf ("new process name %W", myself->progname);
-      pid = myself->pid;
       if (!iscygwin ())
 	close_all_files ();
     }
@@ -832,7 +819,6 @@ loop:
 	  res = -1;
 	  goto out;
 	}
-      pid = child->pid;
     }
 
   /* Start the child running */
@@ -885,6 +871,7 @@ loop:
       break;
     case _P_WAIT:
     case _P_SYSTEM:
+      system_call.arm ();
       if (waitpid (cygpid, &res, 0) != cygpid)
 	res = -1;
       break;
@@ -904,7 +891,6 @@ out:
   this->cleanup ();
   if (envblock)
     free (envblock);
-  pthread_cleanup_pop (1);
   return (int) res;
 }
 
@@ -935,7 +921,7 @@ spawnve (int mode, const char *path, const char *const *argv,
     vf = NULL;
 #endif
 
-  syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
+  syscall_printf ("spawnve (%s, %s, %p)", path, argv[0], envp);
 
   if (!envp)
     envp = empty_env;
@@ -1135,7 +1121,7 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	  NtClose (h);
 	  goto err;
 	}
-      if (size.QuadPart > wincap.allocation_granularity ())
+      if (size.QuadPart > (LONGLONG) wincap.allocation_granularity ())
 	size.LowPart = wincap.allocation_granularity ();
 
       HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY,
@@ -1176,8 +1162,8 @@ av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
 	    unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
 	    win16_exe = off < sizeof (IMAGE_DOS_HEADER);
 	    if (!win16_exe)
-	      real_path.set_cygexec (!!hook_or_detect_cygwin (buf, NULL,
-							      subsys, hm));
+	      real_path.set_cygexec (hook_or_detect_cygwin (buf, NULL,
+							    subsys, hm));
 	    else
 	      real_path.set_cygexec (false);
 	    UnmapViewOfFile (buf);

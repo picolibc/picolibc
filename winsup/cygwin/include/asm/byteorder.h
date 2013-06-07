@@ -1,6 +1,6 @@
 /* asm/byteorder.h
 
-   Copyright 1996, 1998, 2000, 2001, 2006, 2009, 2011 Red Hat, Inc.
+   Copyright 1996, 1998, 2001, 2006, 2009, 2011, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -34,11 +34,7 @@ _ELIDABLE_INLINE uint16_t __ntohs(uint16_t);
 _ELIDABLE_INLINE uint32_t
 __ntohl(uint32_t x)
 {
-	__asm__("xchgb %b0,%h0\n\t"	/* swap lower bytes	*/
-		"rorl $16,%0\n\t"	/* swap words		*/
-		"xchgb %b0,%h0"		/* swap higher bytes	*/
-		:"=q" (x)
-		: "0" (x));
+	__asm__("bswap %0" : "=r" (x) : "0" (x));
 	return x;
 }
 
@@ -52,7 +48,7 @@ _ELIDABLE_INLINE uint16_t
 __ntohs(uint16_t x)
 {
 	__asm__("xchgb %b0,%h0"		/* swap bytes		*/
-		: "=q" (x)
+		: "=Q" (x)
 		:  "0" (x));
 	return x;
 }

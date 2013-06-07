@@ -53,7 +53,7 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
   /* Always try using the new EX ioctls first (>= XP).  If not available,
      fall back to trying the old non-EX ioctls.
      Unfortunately the EX ioctls are not implemented in the floppy driver. */
-  if (wincap.has_disk_ex_ioctls () && get_major () != DEV_FLOPPY_MAJOR)
+  if (get_major () != DEV_FLOPPY_MAJOR)
     {
       if (!DeviceIoControl (get_handle (),
 			    IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0,
@@ -76,95 +76,49 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
       if (!DeviceIoControl (get_handle (),
 			    IOCTL_DISK_GET_DRIVE_GEOMETRY, NULL, 0,
 			    dbuf, 256, &bytes_read, NULL))
-	__seterrno ();
-      else
 	{
-	  di = (DISK_GEOMETRY *) dbuf;
-	  if (!DeviceIoControl (get_handle (),
-				IOCTL_DISK_GET_PARTITION_INFO, NULL, 0,
-				pbuf, 256, &bytes_read, NULL))
-	    __seterrno ();
-	  else
-	    pi = (PARTITION_INFORMATION *) pbuf;
-	}
-    }
-  if (!di)
-    {
-      /* Up to Win2K, even IOCTL_DISK_GET_DRIVE_GEOMETRY fails when trying
-	 it on CD or DVD drives.  In that case fall back to requesting
-	 simple file system information. */
-      NTSTATUS status;
-      IO_STATUS_BLOCK io;
-      FILE_FS_SIZE_INFORMATION ffsi;
-
-      status = NtQueryVolumeInformationFile (get_handle (), &io, &ffsi,
-					     sizeof ffsi,
-					     FileFsSizeInformation);
-      if (!NT_SUCCESS (status))
-	{
-	  __seterrno_from_nt_status (status);
+	  __seterrno ();
 	  return -1;
 	}
-      debug_printf ("fsys geometry: (%D units)*(%u sec)*(%u bps)",
-		    ffsi.TotalAllocationUnits.QuadPart,
-		    ffsi.SectorsPerAllocationUnit,
-		    ffsi.BytesPerSector);
-      bytes_per_sector = ffsi.BytesPerSector;
-      drive_size = ffsi.TotalAllocationUnits.QuadPart
-		   * ffsi.SectorsPerAllocationUnit
-		   * ffsi.BytesPerSector;
-      if (geo)
-	{
-	  geo->heads = 1;
-	  geo->sectors = ffsi.SectorsPerAllocationUnit;
-	  geo->cylinders = ffsi.TotalAllocationUnits.LowPart;
-	  geo->start = 0;
-	}
+      di = (DISK_GEOMETRY *) dbuf;
+      if (!DeviceIoControl (get_handle (),
+			    IOCTL_DISK_GET_PARTITION_INFO, NULL, 0,
+			    pbuf, 256, &bytes_read, NULL))
+	__seterrno ();
+      else
+	pi = (PARTITION_INFORMATION *) pbuf;
+    }
+  debug_printf ("disk geometry: (%D cyl)*(%u trk)*(%u sec)*(%u bps)",
+		 di->Cylinders.QuadPart,
+		 di->TracksPerCylinder,
+		 di->SectorsPerTrack,
+		 di->BytesPerSector);
+  bytes_per_sector = di->BytesPerSector;
+  if (pix)
+    {
+      debug_printf ("partition info: offset %D  length %D",
+		    pix->StartingOffset.QuadPart,
+		    pix->PartitionLength.QuadPart);
+      drive_size = pix->PartitionLength.QuadPart;
     }
   else
     {
-      debug_printf ("disk geometry: (%D cyl)*(%u trk)*(%u sec)*(%u bps)",
-		     di->Cylinders.QuadPart,
-		     di->TracksPerCylinder,
-		     di->SectorsPerTrack,
-		     di->BytesPerSector);
-      bytes_per_sector = di->BytesPerSector;
+      debug_printf ("partition info: offset %D  length %D",
+		    pi->StartingOffset.QuadPart,
+		    pi->PartitionLength.QuadPart);
+      drive_size = pi->PartitionLength.QuadPart;
+    }
+  if (geo)
+    {
+      geo->heads = di->TracksPerCylinder;
+      geo->sectors = di->SectorsPerTrack;
+      geo->cylinders = di->Cylinders.LowPart;
       if (pix)
-	{
-	  debug_printf ("partition info: offset %D  length %D",
-			pix->StartingOffset.QuadPart,
-			pix->PartitionLength.QuadPart);
-	  drive_size = pix->PartitionLength.QuadPart;
-	}
+	geo->start = pix->StartingOffset.QuadPart >> 9ULL;
       else if (pi)
-	{
-	  debug_printf ("partition info: offset %D  length %D",
-			pi->StartingOffset.QuadPart,
-			pi->PartitionLength.QuadPart);
-	  drive_size = pi->PartitionLength.QuadPart;
-	}
+	geo->start = pi->StartingOffset.QuadPart >> 9ULL;
       else
-	{
-	  /* Getting the partition size by using the drive geometry information
-	     looks wrong, but this is a historical necessity.  NT4 didn't
-	     maintain partition information for the whole drive (aka
-	     "partition 0"), but returned ERROR_INVALID_HANDLE instead.  That
-	     got fixed in W2K. */
-	  drive_size = di->Cylinders.QuadPart * di->TracksPerCylinder
-		       * di->SectorsPerTrack * di->BytesPerSector;
-	}
-      if (geo)
-	{
-	  geo->heads = di->TracksPerCylinder;
-	  geo->sectors = di->SectorsPerTrack;
-	  geo->cylinders = di->Cylinders.LowPart;
-	  if (pix)
-	    geo->start = pix->StartingOffset.QuadPart >> 9ULL;
-	  else if (pi)
-	    geo->start = pi->StartingOffset.QuadPart >> 9ULL;
-	  else
-	    geo->start = 0;
-	}
+	geo->start = 0;
     }
   debug_printf ("drive size: %D", drive_size);
 
@@ -180,7 +134,7 @@ fhandler_dev_floppy::read_file (void *buf, DWORD to_read, DWORD *read, int *err)
   *err = 0;
   if (!(ret = ReadFile (get_handle (), buf, to_read, read, 0)))
     *err = GetLastError ();
-  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
+  syscall_printf ("%d (err %d) = ReadFile (%p, %p, to_read %u, read %u, 0)",
 		  ret, *err, get_handle (), buf, to_read, *read);
   return ret;
 }
@@ -234,7 +188,7 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
 				   FilePositionInformation);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryInformationFile(FilePositionInformation): %p",
+      debug_printf ("NtQueryInformationFile(FilePositionInformation): %y",
 		    status);
       return FALSE;
     }
@@ -268,7 +222,7 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
 	  if (part_no >= MAX_PARTITIONS)
 	    return FALSE;
 	  found = TRUE;
-	  debug_printf ("%d %D->%D : %D->%D", part_no,
+	  debug_printf ("%u %D->%D : %D->%D", part_no,
 			ppie->StartingOffset.QuadPart,
 			ppie->StartingOffset.QuadPart
 			+ ppie->PartitionLength.QuadPart,
@@ -305,7 +259,7 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
 			       &io, FILE_SHARE_READ | FILE_SHARE_WRITE, 0);
 	  if (!NT_SUCCESS (status))
 	    {
-	      debug_printf ("NtCreateFile(%W): %p", part, status);
+	      debug_printf ("NtCreateFile(%W): %y", part, status);
 	      return FALSE;
 	    }
 	  if (!DeviceIoControl (partitions->hdl[part_no - 1], FSCTL_LOCK_VOLUME,
@@ -349,7 +303,7 @@ fhandler_dev_floppy::write_file (const void *buf, DWORD to_write,
       if (!(ret = WriteFile (get_handle (), buf, to_write, written, 0)))
 	*err = GetLastError ();
     }
-  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
+  syscall_printf ("%d (err %d) = WriteFile (%p, %p, write %u, written %u, 0)",
 		  ret, *err, get_handle (), buf, to_write, *written);
   return ret;
 }
@@ -377,7 +331,8 @@ fhandler_dev_floppy::open (int flags, mode_t)
 	     Whoever uses O_DIRECT has my condolences. */
 	  devbufsiz = MAX (16 * bytes_per_sector, 65536);
 	  devbufalloc = new char [devbufsiz + devbufalign];
-	  devbuf = (char *) roundup2 ((uintptr_t) devbufalloc, devbufalign);
+	  devbuf = (char *) roundup2 ((uintptr_t) devbufalloc,
+				      (uintptr_t) devbufalign);
 	}
 
       /* If we're not trying to access a floppy disk, make sure we're actually
@@ -418,7 +373,7 @@ fhandler_dev_floppy::dup (fhandler_base *child, int flags)
   return ret;
 }
 
-inline _off64_t
+inline off_t
 fhandler_dev_floppy::get_current_position ()
 {
   LARGE_INTEGER off = { QuadPart: 0LL };
@@ -426,7 +381,7 @@ fhandler_dev_floppy::get_current_position ()
   return off.QuadPart;
 }
 
-void __stdcall
+void __reg3
 fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 {
   DWORD bytes_read = 0;
@@ -451,7 +406,7 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 	  if (devbufstart < devbufend)
 	    {
 	      bytes_to_read = MIN (len, devbufend - devbufstart);
-	      debug_printf ("read %d bytes from buffer (rest %d)",
+	      debug_printf ("read %u bytes from buffer (rest %u)",
 			    bytes_to_read,
 			    devbufend - devbufstart - bytes_to_read);
 	      memcpy (p, devbuf + devbufstart, bytes_to_read);
@@ -478,13 +433,13 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
 		  tgt = devbuf;
 		  bytes_to_read = devbufsiz;
 		}
-	      _off64_t current_position = get_current_position ();
+	      off_t current_position = get_current_position ();
 	      if (current_position + bytes_to_read >= drive_size)
 		bytes_to_read = drive_size - current_position;
 	      if (!bytes_to_read)
 		break;
 
-	      debug_printf ("read %d bytes from pos %U %s", bytes_to_read,
+	      debug_printf ("read %u bytes from pos %U %s", bytes_to_read,
 			    current_position,
 			    len < devbufsiz ? "into buffer" : "directly");
 	      if (!read_file (tgt, bytes_to_read, &read2, &ret))
@@ -527,11 +482,11 @@ fhandler_dev_floppy::raw_read (void *ptr, size_t& ulen)
     }
   else
     {
-      _off64_t current_position = get_current_position ();
+      off_t current_position = get_current_position ();
       bytes_to_read = len;
       if (current_position + bytes_to_read >= drive_size)
 	bytes_to_read = drive_size - current_position;
-      debug_printf ("read %d bytes from pos %U directly", bytes_to_read,
+      debug_printf ("read %u bytes from pos %U directly", bytes_to_read,
 		    current_position);
       if (bytes_to_read && !read_file (p, bytes_to_read, &bytes_read, &ret))
 	{
@@ -558,7 +513,7 @@ err:
   ulen = (size_t) -1;
 }
 
-int __stdcall
+ssize_t __reg3
 fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written = 0;
@@ -585,7 +540,7 @@ fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
 	 buffer in case we seek to an address which is not sector aligned. */
       if (devbufend && devbufstart < devbufend)
       	{
-	  _off64_t current_pos = get_current_position ();
+	  off_t current_pos = get_current_position ();
 	  cplen = MIN (len, devbufend - devbufstart);
 	  memcpy (devbuf + devbufstart, p, cplen);
 	  LARGE_INTEGER off = { QuadPart:current_pos - devbufend };
@@ -647,7 +602,7 @@ fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
 	}
       return bytes_written;
     }
-
+  
   /* In O_DIRECT case, just write. */
   if (write_file (p, len, &bytes_written, &ret))
     return bytes_written;
@@ -664,11 +619,11 @@ err:
   return bytes_written ?: -1;
 }
 
-_off64_t
-fhandler_dev_floppy::lseek (_off64_t offset, int whence)
+off_t
+fhandler_dev_floppy::lseek (off_t offset, int whence)
 {
   char buf[bytes_per_sector];
-  _off64_t current_pos = (_off64_t) -1;
+  off_t current_pos = (off_t) -1;
   LARGE_INTEGER sector_aligned_offset;
   size_t bytes_left;
 
@@ -680,7 +635,7 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
   else if (whence == SEEK_CUR)
     {
       current_pos = get_current_position ();
-      _off64_t exact_pos = current_pos - (devbufend - devbufstart);
+      off_t exact_pos = current_pos - (devbufend - devbufstart);
       /* Shortcut when used to get current position. */
       if (offset == 0)
       	return exact_pos;
@@ -697,7 +652,7 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
   /* If new position is in buffered range, adjust buffer and return */
   if (devbufstart < devbufend)
     {
-      if (current_pos == (_off64_t) -1)
+      if (current_pos == (off_t) -1)
 	current_pos = get_current_position ();
       if (current_pos - devbufend <= offset && offset <= current_pos)
 	{
@@ -749,7 +704,7 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
       if (cmd == BLKGETSIZE)
 	*(long *)buf = drive_size >> 9UL;
       else
-	*(_off64_t *)buf = drive_size;
+	*(off_t *)buf = drive_size;
       break;
     case BLKRRPART:
       debug_printf ("BLKRRPART");
@@ -764,19 +719,19 @@ fhandler_dev_floppy::ioctl (unsigned int cmd, void *buf)
       break;
     case BLKSSZGET:
       debug_printf ("BLKSSZGET");
-      *(int *)buf = bytes_per_sector;
+      *(int *)buf = (int) bytes_per_sector;
       break;
     case BLKIOMIN:
       debug_printf ("BLKIOMIN");
-      *(int *)buf = bytes_per_sector;
+      *(int *)buf = (int) bytes_per_sector;
       break;
     case BLKIOOPT:
       debug_printf ("BLKIOOPT");
-      *(int *)buf = bytes_per_sector;
+      *(int *)buf = (int) bytes_per_sector;
       break;
     case BLKPBSZGET:
       debug_printf ("BLKPBSZGET");
-      *(int *)buf = bytes_per_sector;
+      *(int *)buf = (int) bytes_per_sector;
       break;
     case BLKALIGNOFF:
       debug_printf ("BLKALIGNOFF");

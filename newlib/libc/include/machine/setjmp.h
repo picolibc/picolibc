@@ -68,19 +68,24 @@ _BEGIN_STD_C
 #define	_JBLEN	9
 #endif
 
-#if defined(__CYGWIN__) && !defined (_JBLEN)
-#define _JBLEN (13 * 4)
-#elif defined (__i386__)
-#if defined(__unix__) || defined(__rtems__)
-# define _JBLEN	9
-#else
-#include "setjmp-dj.h"
-#endif
+#ifdef __i386__
+# if defined(__CYGWIN__) && !defined (_JBLEN)
+#  define _JBLEN (13 * 4)
+# elif defined(__unix__) || defined(__rtems__)
+#  define _JBLEN	9
+# else
+#  include "setjmp-dj.h"
+# endif
 #endif
 
 #ifdef __x86_64__
-#define _JBTYPE long long
-#define _JBLEN  8
+# ifdef __CYGWIN__
+#  define _JBTYPE long
+#  define _JBLEN  32
+# else
+#  define _JBTYPE long long
+#  define _JBLEN  8
+# endif
 #endif
 
 #ifdef __i960__
@@ -276,10 +281,38 @@ _BEGIN_STD_C
 #define _JBTYPE unsigned short
 #endif /* __m32c__ */
 
+#ifdef __MSP430__
+#define _JBLEN 9
+
+#ifdef __MSP430X_LARGE__
+#define _JBTYPE unsigned long
+#else
+#define _JBTYPE unsigned short
+#endif
+#endif
+
 #ifdef __RL78__
 /* Three banks of registers, SP, CS, ES, PC */
 #define _JBLEN (8*3+8)
 #define _JBTYPE unsigned char
+#endif
+
+/*
+ * There are two versions of setjmp()/longjmp():
+ *   1) Compiler (gcc) built-in versions.
+ *   2) Function-call versions.
+ *
+ * The built-in versions are used most of the time.  When used, gcc replaces
+ * calls to setjmp()/longjmp() with inline assembly code.  The built-in 
+ * versions save/restore a variable number of registers.
+
+ * _JBLEN is set to 40 to be ultra-safe with the built-in versions.
+ * It only needs to be 12 for the function-call versions
+ * but this data structure is used by both versions.
+ */
+#ifdef __NIOS2__
+#define _JBLEN 40
+#define _JBTYPE unsigned long
 #endif
 
 #ifdef __RX__

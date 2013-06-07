@@ -1,6 +1,6 @@
 /* cygserver_ipc.h
 
-   Copyright 2002, 2003, 2004, 2012 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -22,10 +22,10 @@ struct vmspace {
 struct proc {
   pid_t cygpid;
   DWORD winpid;
-  __uid32_t uid;
-  __gid32_t gid;
+  uid_t uid;
+  gid_t gid;
   int gidcnt;
-  __gid32_t *gidlist;
+  gid_t *gidlist;
   bool is_admin;
   struct vmspace *p_vmspace;
   HANDLE signal_arrived;
@@ -52,7 +52,8 @@ class ipc_retval {
 private:
   union {
     int i;
-    unsigned int u;
+    ssize_t ssz;
+    size_t sz;
     vm_offset_t off;
     vm_object_t obj;
   };
@@ -63,8 +64,15 @@ public:
   operator int () const { return i; }
   int operator = (int ni) { return i = ni; }
 
-  operator unsigned int () const { return u; }
-  unsigned int operator = (unsigned int nu) { return u = nu; }
+#ifndef __x86_64__
+  /* On x86_64: size_t == vm_offset_t == unsigned long */
+  operator size_t () const { return sz; }
+  size_t operator = (size_t nsz) { return sz = nsz; }
+#else
+  /* On i686: ssize_t == long == int */
+  operator ssize_t () const { return ssz; }
+  ssize_t operator = (ssize_t nssz) { return ssz = nssz; }
+#endif
 
   operator vm_offset_t () const { return off; }
   vm_offset_t operator = (vm_offset_t noff) { return off = noff; }

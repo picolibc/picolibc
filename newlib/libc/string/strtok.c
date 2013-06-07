@@ -95,7 +95,9 @@ _DEFUN (strtok, (s, delim),
 	register char *s _AND
 	register const char *delim)
 {
-	_REENT_CHECK_MISC(_REENT);
-	return __strtok_r (s, delim, &(_REENT_STRTOK_LAST(_REENT)), 1);
+	struct _reent *reent = _REENT;
+
+	_REENT_CHECK_MISC(reent);
+	return __strtok_r (s, delim, &(_REENT_STRTOK_LAST(reent)), 1);
 }
 #endif

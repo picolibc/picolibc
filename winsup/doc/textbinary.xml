@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="using-textbinary"><title>Text and Binary modes</title>
+
+<sect2 id="textbin-issue"> <title>The Issue</title>
+
+<para>On a UNIX system, when an application reads from a file it gets
+exactly what's in the file on disk and the converse is true for writing.
+The situation is different in the DOS/Windows world where a file can
+be opened in one of two modes, binary or text.  In the binary mode the
+system behaves exactly as in UNIX.  However on writing in text mode, a
+NL (\n, ^J) is transformed into the sequence CR (\r, ^M) NL.
+</para>
+
+<para>This can wreak havoc with the seek/fseek calls since the number
+of bytes actually in the file may differ from that seen by the
+application.</para>
+
+<para>The mode can be specified explicitly as explained in the Programming
+section below.  In an ideal DOS/Windows world, all programs using lines as
+records (such as <command>bash</command>, <command>make</command>,
+<command>sed</command> ...) would open files (and change the mode of their
+standard input and output) as text.  All other programs (such as
+<command>cat</command>, <command>cmp</command>, <command>tr</command> ...)
+would use binary mode.  In practice with Cygwin, programs that deal
+explicitly with object files specify binary mode (this is the case of
+<command>od</command>, which is helpful to diagnose CR problems).  Most
+other programs (such as <command>sed</command>, <command>cmp</command>,
+<command>tr</command>) use the default mode.</para>
+
+</sect2>
+
+<sect2 id="textbin-default"><title>The default Cygwin behavior</title>
+
+<para>The Cygwin system gives us some flexibility in deciding how files 
+are to be opened when the mode is not specified explicitly. 
+The rules are evolving, this section gives the design goals.</para>
+
+<orderedlist numeration="loweralpha">
+<listitem>
+<para>If the filename is specified as a POSIX path and it appears to
+reside on a file system that is mounted (i.e.  if its pathname starts
+with a directory displayed by <command>mount</command>), then the
+default is specified by the mount flag.  If the file is a symbolic link,
+the mode of the target file system applies.</para>
+</listitem>
+
+<listitem>
+<para>If the file is specified via a MS-DOS pathname (i.e., it contains a
+backslash or a colon), the default is binary.
+</para>
+</listitem>
+
+<listitem>
+<para>Pipes, sockets and non-file devices are opened in binary mode.
+For pipes opened through the pipe() system call you can use the setmode()
+function (see <xref linkend="textbin-devel"></xref> to switch to textmode.
+For pipes opened through popen(), you can simply specify text or binary
+mode just like in calls to fopen().</para>
+</listitem>
+
+<listitem>
+<para>Sockets and other non-file devices are always opened in binary mode.
+</para>
+</listitem>
+
+<listitem>
+<para> When redirecting, the Cygwin shells uses rules (a-d).
+Non-Cygwin shells always pipe and redirect with binary mode. With
+non-Cygwin shells the commands <command> cat filename | program </command>
+and <command> program &lt; filename </command> are not equivalent when
+<filename>filename</filename> is on a text-mounted partition. </para>
+<para>The programs <command>u2d</command> and <command>d2u</command> can
+be used to add or remove CR's from a file.  <command>u2d</command> add's CR's before a NL.
+<command>d2u</command> removes CR's.  Use the --help option to these commands
+for more information.
+</para>
+</listitem>
+</orderedlist>
+</sect2>
+
+<sect2 id="textbin-question"><title>Binary or text?</title>
+
+<para>UNIX programs that have been written for maximum portability
+will know the difference between text and binary files and act
+appropriately under Cygwin.  Most programs included in the official
+Cygwin distributions should work well in the default mode. </para>
+
+<para>Binmode is the best choice usually since it's faster and
+easier to handle, unless you want to exchange files with native Win32
+applications.  It makes most sense to keep the Cygwin distribution
+and your Cygwin home directory in binmode and generate text files in
+binmode (with UNIX LF lineendings).  Most Windows applications can
+handle binmode files just fine.  A notable exception is the mini-editor
+<command>Notepad</command>, which handles UNIX lineendings incorrectly
+and only produces output files with DOS CRLF lineendings.</para>
+
+<para>You can convert files between CRLF and LF lineendings by using
+certain tools in the Cygwin distribution like <command>d2u</command> and
+<command>u2d</command> from the cygutils package.  You can also specify
+a directory in the mount table to be mounted in textmode so you can use
+that directory for exchange purposes.</para>
+
+<para>As application programmer you can decide on a file by file base,
+or you can specify default open modes depending on the purpose for which
+the application open files.  See the next section for a description of
+your choices.</para>
+
+</sect2>
+
+<sect2 id="textbin-devel"><title>Programming</title>
+
+<para>In the <function>open()</function> function call, binary mode can be
+specified with the flag <literal>O_BINARY</literal> and text mode with
+<literal>O_TEXT</literal>. These symbols are defined in
+<filename>fcntl.h</filename>.</para>
+
+<para>The <function>mkstemp()</function> and <function>mkstemps()</function>
+calls force binary mode.  Use <function>mkostemp()</function> or
+<function>mkostemps()</function> with the same flags
+as <function>open()</function> for more control on temporary files.</para>
+
+<para>In the <function>fopen()</function> and <function>popen()</function>
+function calls, binary mode can be specified by adding a <literal>b</literal>
+to the mode string. Text mode is specified by adding a <literal>t</literal>
+to the mode string.</para>
+
+<para>The mode of a file can be changed by the call
+<function>setmode(fd,mode)</function> where <literal>fd</literal> is a file
+descriptor (an integer) and <literal>mode</literal> is
+<literal>O_BINARY</literal> or <literal>O_TEXT</literal>. The function
+returns <literal>O_BINARY</literal> or <literal>O_TEXT</literal> depending
+on the mode before the call, and <literal>EOF</literal> on error.</para>
+
+<para>There's also a convenient way to set the default open modes used
+in an application by just linking against various object files provided
+by Cygwin.  For instance, if you want to make sure that all files are
+always opened in binary mode by an application, regardless of the mode
+of the underlying mount point, just add the file
+<filename>/lib/binmode.o</filename> to the link stage of the application
+in your project, like this:</para>
+
+<screen>
+  $ gcc my_tiny_app.c /lib/binmode.o -o my_tiny_app
+</screen>
+
+<para>Starting with Cygwin 1.7.7, you can use the even simpler:</para>
+
+<screen>
+  $ gcc my_tiny_app.c -lbinmode -o my_tiny_app
+</screen>
+
+<para>This adds code which sets the default open mode for all files
+opened by <command>my_tiny_app</command> to binary for reading and
+writing.</para>
+
+<para>Cygwin provides the following libraries and object files to set the
+default open mode just by linking an application against them:</para>
+
+<itemizedlist mark="bullet">
+
+<listitem>
+<screen>
+/lib/libautomode.a      -  Open files for reading in textmode,
+/lib/automode.o            open files for writing in binary mode
+</screen>
+</listitem>
+
+<listitem>
+<screen>
+/lib/libbinmode.a       -  Open files for reading and writing in binary mode
+/lib/binmode.o
+</screen>
+</listitem>
+
+<listitem>
+<screen>
+/lib/libtextmode.a      -  Open files for reading and writing in textmode
+/lib/textmode.o
+</screen>
+</listitem>
+
+<listitem>
+<screen>
+/lib/libtextreadmode.a  -  Open files for reading in textmode,
+/lib/textreadmode.o        keep default behaviour for writing.
+</screen>
+</listitem>
+
+</itemizedlist>
+
+</sect2>
+
+</sect1>

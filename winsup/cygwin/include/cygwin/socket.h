@@ -1,7 +1,7 @@
 /* cygwin/socket.h
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009, 2010, 2012
-   Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009, 2010, 2012,
+   2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -55,8 +55,8 @@ struct sockaddr_storage {
 
 struct ucred {
   pid_t			pid;
-  __uid32_t		uid;
-  __gid32_t		gid;
+  uid_t			uid;
+  gid_t			gid;
 };
 
 struct linger {
@@ -301,6 +301,11 @@ struct OLD_msghdr
 #define TCP_NODELAY     0x0001
 #define TCP_MAXSEG	2
 #endif
+
+/* SUS symbolic values for the second parm to shutdown(2) */
+#define SHUT_RD   0		/* == Win32 SD_RECEIVE */
+#define SHUT_WR   1		/* == Win32 SD_SEND    */
+#define SHUT_RDWR 2		/* == Win32 SD_BOTH    */
 
 /* The various priorities. */
 #define SOPRI_INTERACTIVE	0

@@ -266,8 +266,10 @@ _DEFUN(VFSCANF, (fp, fmt, ap),
        _CONST char *fmt _AND
        va_list ap)
 {
-  CHECK_INIT(_REENT, fp);
-  return __SVFSCANF_R (_REENT, fp, fmt, ap);
+  struct _reent *reent = _REENT;
+
+  CHECK_INIT(reent, fp);
+  return __SVFSCANF_R (reent, fp, fmt, ap);
 }
 
 int

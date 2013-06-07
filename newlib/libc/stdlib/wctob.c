@@ -8,6 +8,7 @@
 int
 wctob (wint_t wc)
 {
+  struct _reent *reent;
   mbstate_t mbs;
   unsigned char pmb[MB_LEN_MAX];
 
@@ -17,8 +18,9 @@ wctob (wint_t wc)
   /* Put mbs in initial state. */
   memset (&mbs, '\0', sizeof (mbs));
 
-  _REENT_CHECK_MISC(_REENT);
+  reent = _REENT;
+  _REENT_CHECK_MISC(reent);
 
-  return __wctomb (_REENT, (char *) pmb, wc, __locale_charset (), &mbs) == 1
+  return __wctomb (reent, (char *) pmb, wc, __locale_charset (), &mbs) == 1
 	  ? (int) pmb[0] : EOF;
 }

@@ -41,14 +41,14 @@ fhandler_dev_zero::write (const void *, size_t len)
   return len;
 }
 
-void __stdcall
+void __reg3
 fhandler_dev_zero::read (void *ptr, size_t& len)
 {
   memset (ptr, 0, len);
 }
 
-_off64_t
-fhandler_dev_zero::lseek (_off64_t, int)
+off_t
+fhandler_dev_zero::lseek (off_t, int)
 {
   return 0;
 }

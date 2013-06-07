@@ -37,7 +37,7 @@ details. */
  ***********************************************************************/
 
 #define PUTDOMAIN(d,p)\
- {int res = dn_comp(d, p, EndPtr - p, dnptrs, lastdnptr); p += res < 0 ? strlen(d) : res; }
+ {int res = dn_comp(d, p, EndPtr - p, dnptrs, lastdnptr); p += res < 0 ? (int) strlen(d) : res; }
 
 static u_char * write_record(unsigned char * ptr, PDNS_RECORD rr, unsigned char * EndPtr,
 			   unsigned char ** dnptrs, unsigned char ** lastdnptr, int debug)
@@ -187,7 +187,8 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
 {
   DNS_STATUS res;
   PDNS_RECORD pQueryResultsSet, rr;
-  int section, len, counts[4] = {0, 0, 0, 0}, debug = statp->options & RES_DEBUG;
+  DWORD section;
+  int len, counts[4] = {0, 0, 0, 0}, debug = statp->options & RES_DEBUG;
   unsigned char * dnptrs[256], * ptr;
 
   dnptrs[0] = AnsPtr;
@@ -309,7 +310,7 @@ static void get_registry_dns_items(PUNICODE_STRING in, res_state statp,
     size_t size = wcstombs (list, in->Buffer, in->Length);
     if (what == 0) { /* Get the addresses */
       char *ap, *srch;
-      int numAddresses = 0;
+      size_t numAddresses = 0;
       for (ap = list; ap < list + size && *ap; ap = srch) {
 	/* The separation character can be 0, ' ', or ','. */
 	for (srch = ap; *srch && (isdigit((unsigned) *srch) || *srch == '.' );
@@ -418,7 +419,7 @@ void get_dns_info(res_state statp)
   DWORD dwRetVal;
   IP_ADDR_STRING * pIPAddr;
   FIXED_INFO * pFixedInfo;
-  int numAddresses = 0;
+  size_t numAddresses = 0;
 
   if (statp->use_os)
   {

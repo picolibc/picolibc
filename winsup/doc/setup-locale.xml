@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="setup-locale"><title>Internationalization</title>
+
+<sect2 id="setup-locale-ov"><title>Overview</title>
+
+<para>
+Internationalization support is controlled by the <envar>LANG</envar> and
+<envar>LC_xxx</envar> environment variables.  You can set all of them
+but Cygwin itself only honors the variables <envar>LC_ALL</envar>,
+<envar>LC_CTYPE</envar>, and <envar>LANG</envar>, in this order, according
+to the POSIX standard.  The content of these variables should follow the
+POSIX standard for a locale specifier.  The correct form of a locale
+specifier is</para>
+
+<screen>
+  language[[_TERRITORY][.charset][@modifier]]
+</screen>
+
+<para>"language" is a lowercase two character string per ISO 639-1, or,
+if there is no ISO 639-1 code for the language (for instance, "Lower Sorbian"),
+a three character string per ISO 639-3.</para>
+
+<para>"TERRITORY" is an uppercase two character string per ISO 3166, charset is
+one of a list of supported character sets.  The modifier doesn't matter
+here (though some are recognized, see below).  If you're interested in the
+exact description, you can find it in the online publication of the POSIX
+manual pages on the homepage of the
+<ulink url="http://www.opengroup.org/">Open Group</ulink>.</para>
+
+<para>Typical locale specifiers are</para>
+
+<screen>
+  "de_CH"	   language = German, territory = Switzerland, default charset
+  "fr_FR.UTF-8"    language = french, territory = France, charset = UTF-8
+  "ko_KR.eucKR"    language = korean, territory = South Korea, charset = eucKR
+  "syr_SY"         language = Syriac, territory = Syria, default charset
+</screen>
+
+<para>
+If the locale specifier does not follow the above form, Cygwin checks
+if the locale is one of the locale aliases defined in the file
+<filename>/usr/share/locale/locale.alias</filename>.  If so, and if
+the replacement localename is supported by the underlying Windows,
+the locale is accepted, too.  So, given the default content of the
+<filename>/usr/share/locale/locale.alias</filename> file, the below
+examples would be valid locale specifiers as well.
+</para>
+
+<screen>
+  "catalan"        defined as "ca_ES.ISO-8859-1" in locale.alias
+  "japanese"       defined as "ja_JP.eucJP"      in locale.alias
+  "turkish"        defined as "tr_TR.ISO-8859-9" in locale.alias
+</screen>
+
+<para>The file <filename>/usr/share/locale/locale.alias</filename> is
+provided by the gettext package under Cygwin.</para>
+
+<para>
+At application startup, the application's locale is set to the default
+"C" or "POSIX" locale.  Under Cygwin 1.7.2 and later, this locale defaults
+to the ASCII character set on the application level.  If you want to stick
+to the "C" locale and only change to another charset, you can define this
+by setting one of the locale environment variables to "C.charset".  For
+instance</para>
+
+<screen>
+  "C.ISO-8859-1"
+</screen>
+
+<note><para>The default locale in the absence of the aforementioned locale
+environment variables is "C.UTF-8".</para></note>
+
+<para>Windows uses the UTF-16 charset exclusively to store the names
+of any object used by the Operating System.  This is especially important
+with filenames.  Cygwin uses the setting of the locale environment variables
+<envar>LC_ALL</envar>, <envar>LC_CTYPE</envar>, and <envar>LANG</envar>, to
+determine how to convert Windows filenames from their UTF-16 representation
+to the singlebyte or multibyte character set used by Cygwin.</para>
+
+<para>
+The setting of the locale environment variables at process startup
+is effective for Cygwin's internal conversions to and from the Windows UTF-16
+object names for the entire lifetime of the current process.  Changing
+the environment variables to another value changes the way filenames are
+converted in subsequently started child processes, but not within the same
+process.</para>
+
+<para>
+However, even if one of the locale environment variables is set to
+some other value than "C", this does <emphasis>only</emphasis> affect
+how Cygwin itself converts filenames.  As the POSIX standard requires,
+it's the application's responsibility to activate that locale for its
+own purposes, typically by using the call</para>
+
+<screen>
+  setlocale (LC_ALL, "");
+</screen>
+
+<para>early in the application code.  Again, so that this doesn't get
+lost:  If the application calls setlocale as above, and there is none
+of the important locale variables set in the environment, the locale
+is set to the default locale, which is "C.UTF-8".</para>
+
+<para>But what about applications which are not locale-aware?  Per POSIX,
+they are running in the "C" or "POSIX" locale, which implies the ASCII
+charset.  The Cygwin DLL itself, however, will nevertheless use the locale
+set in the environment (or the "C.UTF-8" default locale) for converting
+filenames etc.</para>
+
+<para>When the locale in the environment specifies an ASCII charset,
+for example "C" or "en_US.ASCII", Cygwin will still use UTF-8
+under the hood to translate filenames.  This allows for easier
+interoperability with applications running in the default "C.UTF-8" locale.
+</para>
+
+<para>
+Starting with Cygwin 1.7.2, the language and territory are used to
+fetch locale-dependent information from Windows.  If the language and
+territory are not known to Windows, the <function>setlocale</function>
+function fails.</para>
+
+<para>The following modifiers are recognized.  Any other modifier is simply
+ignored for now.</para>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+For locales which use the Euro (EUR) as currency, the modifier "@euro"
+can be added to enforce usage of the ISO-8859-15 character set, which
+includes a character for the "Euro" currency sign.
+</para></listitem>
+
+<listitem><para>
+The default script used for all Serbian language locales (sr_BA, sr_ME, sr_RS,
+and the deprecated sr_CS and sr_SP) is cyrillic.  With the "@latin" modifier
+it gets switched to the latin script with the respective collation behaviour.
+</para></listitem>
+
+<listitem><para>
+The default charset of the "be_BY" locale (Belarusian/Belarus) is CP1251.
+With the "@latin" modifier it's UTF-8.
+</para></listitem>
+
+<listitem><para>
+The default charset of the "tt_RU" locale (Tatar/Russia) is ISO-8859-5.
+With the "@iqtelif" modifier it's UTF-8.
+</para></listitem>
+
+<listitem><para>
+The default charset of the "uz_UZ" locale (Uzbek/Uzbekistan) is ISO-8859-1.
+With the "@cyrillic" modifier it's UTF-8.
+</para></listitem>
+
+<listitem><para>
+There's a class of characters in the Unicode character set, called the
+"CJK Ambiguous Width" characters.  For these characters, the width
+returned by the wcwidth/wcswidth functions is usually 1.  This can be a
+problem with East-Asian languages, which historically use character sets
+where these characters have a width of 2.  Therefore, wcwidth/wcswidth
+return 2 as the width of these characters when an East-Asian charset such
+as GBK or SJIS is selected, or when UTF-8 is selected and the language is
+specified as "zh" (Chinese), "ja" (Japanese), or "ko" (Korean).  This is
+not correct in all circumstances, hence the locale modifier "@cjknarrow"
+can be used to force wcwidth/wcswidth to return 1 for the ambiguous width
+characters.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
+<sect2 id="setup-locale-how"><title>How to set the locale</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Assume that you've set one of the aforementioned environment variables to some
+valid POSIX locale value, other than "C" and "POSIX".  Assume further that
+you're living in Japan.  You might want to use the language code "ja" and the
+territory "JP", thus setting, say, <envar>LANG</envar> to "ja_JP".  You didn't
+set a character set, so what will Cygwin use now?  Starting with Cygwin 1.7.2,
+the default character set is determined by the default Windows ANSI codepage
+for this language and territory.  Cygwin uses a character set which is the
+typical Unix-equivalent to the Windows ANSI codepage.  For instance:</para>
+
+<screen>
+  "en_US"		ISO-8859-1
+  "el_GR"		ISO-8859-7
+  "pl_PL"		ISO-8859-2
+  "pl_PL@euro"		ISO-8859-15
+  "ja_JP"		EUCJP
+  "ko_KR"		EUCKR
+  "te_IN"		UTF-8
+</screen>
+</listitem>
+
+<listitem><para>
+You don't want to use the default character set?  In that case you have to
+specify the charset explicitly.  For instance, assume you're from Japan and
+don't want to use the japanese default charset EUC-JP, but the Windows
+default charset SJIS.  What you can do, for instance, is to set the
+<envar>LANG</envar> variable in the <command>mintty</command> Cygwin Terminal
+in the "Text" section of its "Options" dialog.  If you're starting your
+Cygwin session via a batch file or a shortcut to a batch file, you can also
+just set LANG there:</para>
+
+<screen>
+  @echo off
+
+  C:
+  chdir C:\cygwin\bin
+  set LANG=ja_JP.SJIS
+  bash --login -i
+</screen>
+
+<note><para>For a list of locales supported by your Windows machine, use the new
+<command>locale -a</command> command, which is part of the Cygwin package.
+For a description see <xref linkend="locale"></xref></para></note>
+
+<note><para>For a list of supported character sets, see
+<xref linkend="setup-locale-charsetlist"></xref>
+</para></note>
+</listitem>
+
+<listitem><para>
+Last, but not least, most singlebyte or doublebyte charsets have a big
+disadvantage.  Windows filesystems use the Unicode character set in the
+UTF-16 encoding to store filename information.  Not all characters
+from the Unicode character set are available in a singlebyte or doublebyte
+charset.  While Cygwin has a workaround to access files with unusual
+characters (see <xref linkend="pathnames-unusual"></xref>), a better
+workaround is to use always the UTF-8 character set.</para>
+
+<para><emphasis>UTF-8 is the only multibyte character set which can represent
+every Unicode character.</emphasis></para>
+
+<screen>
+  set LANG=es_MX.UTF-8
+</screen>
+
+<para>For a description of the Unicode standard, see the homepage of the
+<ulink url="http://www.unicode.org/">Unicode Consortium</ulink>.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
+<sect2 id="setup-locale-console"><title>The Windows Console character set</title>
+
+<para>Sometimes the Windows console is used to run Cygwin applications.
+While terminal emulations like the Cygwin Terminal <command>mintty</command>
+or <command>xterm</command> have a distinct way to set the character set
+used for in- and output, the Windows console hasn't such a way, since it's
+not an application in its own right.</para>
+
+<para>This problem is solved in Cygwin as follows.  When a Cygwin
+process is started in a Windows console (either explicitly from cmd.exe,
+or implicitly by, for instance, running the
+<filename>C:\cygwin\Cygwin.bat</filename> batch file), the Console character
+set is determined by the setting of the aforementioned
+internationalization environment variables, the same way as described in
+<xref linkend="setup-locale-how"></xref>.  </para>
+
+<para>What is that good for?  Why not switch the console character set with
+the applications requirements?  After all, the application knows if it uses
+localization or not.  However, what if a non-localized application calls
+a remote application which itself is localized?  This can happen with
+<command>ssh</command> or <command>rlogin</command>.  Both commands don't
+have and don't need localization and they never call
+<function>setlocale</function>.  Setting one of the internationalization
+environment variable to the same charset as the remote machine before
+starting <command>ssh</command> or <command>rlogin</command> fixes that
+problem.</para>
+
+</sect2>
+
+<sect2 id="setup-locale-problems"><title>Potential Problems when using Locales</title>
+
+<para>
+You can set the above internationalization variables not only when
+starting the first Cygwin process, but also in your Cygwin shell on the
+fly, even switch to yet another character set, and yet another.  In bash
+for instance:</para>
+
+<screen>
+  <prompt>bash$</prompt> export LC_CTYPE="nl_BE.UTF-8"
+</screen>
+
+<para>However, here's a problem.  At the start of the first Cygwin process
+in a session, the Windows environment is converted from UTF-16 to UTF-8.
+The environment is another of the system objects stored in UTF-16 in
+Windows.</para>
+
+<para>As long as the environment only contains ASCII characters, this is
+no problem at all.  But if it contains native characters, and you're planning
+to use, say, GBK, the environment will result in invalid characters in
+the GBK charset.  This would be especially a problem in variables like
+<envar>PATH</envar>.  To circumvent the worst problems, Cygwin converts
+the <envar>PATH</envar> environment variable to the charset set in the
+environment, if it's different from the UTF-8 charset.</para>
+
+<note><para>Per POSIX, the name of an environment variable should only
+consist of valid ASCII characters, and only of uppercase letters, digits, and
+the underscore for maximum portability.</para></note>
+
+<para>Symbolic links, too, may pose a problem when switching charsets on
+the fly.  A symbolic link contains the filename of the target file the
+symlink points to.  When a symlink had been created with older versions
+of Cygwin, the current ANSI or OEM character set had been used to store
+the target filename, dependent on the old <envar>CYGWIN</envar>
+environment variable setting <envar>codepage</envar> (see <xref
+linkend="cygwinenv-removed-options"></xref>.  If the target filename
+contains non-ASCII characters and you use another character set than
+your default ANSI/OEM charset, the target filename of the symlink is now
+potentially an invalid character sequence in the new character set.
+This behaviour is not different from the behaviour in other Operating
+Systems.  So, if you suddenly can't access a symlink anymore which
+worked all these years before, maybe it's because you switched to
+another character set.  This doesn't occur with symlinks created with
+Cygwin 1.7 or later.  </para>
+
+<para>Another problem you might encounter is that older versions of
+Windows did not install all charsets by default.  If you are running
+Windows XP or older, you can open the "Regional and Language Options"
+portion of the Control Panel, select the "Advanced" tab, and select
+entries from the "Code page conversion tables" list.  The following
+entries are useful to cygwin: 932/SJIS, 936/GBK, 949/EUC-KR, 950/Big5,
+20932/EUC-JP.</para>
+
+</sect2>
+
+<sect2 id="setup-locale-charsetlist"><title>List of supported character sets</title>
+
+<para>Last but not least, here's the list of currently supported character
+sets.  The left-hand expression is the name of the charset, as you would use
+it in the internationalization environment variables as outlined above.
+Note that charset specifiers are case-insensitive.  <literal>EUCJP</literal>
+is equivalent to <literal>eucJP</literal> or <literal>eUcJp</literal>.
+Writing the charset in the exact case as given in the list below is a
+good convention, though.
+</para>
+
+<para>The right-hand side is the number of the equivalent Windows
+codepage as well as the Windows name of the codepage.  They are only
+noted here for reference.  Don't try to use the bare codepage number or
+the Windows name of the codepage as charset in locale specifiers, unless
+they happen to be identical with the left-hand side.  Especially in case
+of the "CPxxx" style charsets, always use them with the trailing "CP".</para>
+
+<para>This works:</para>
+
+<screen>
+  set LC_ALL=en_US.CP437
+</screen>
+
+<para>This does <emphasis>not</emphasis> work:</para>
+
+<screen>
+  set LC_ALL=en_US.437
+</screen>
+
+<para>You can find a full list of Windows codepages on the Microsoft MSDN page
+<ulink url="http://msdn.microsoft.com/en-us/library/dd317756(VS.85).aspx">Code Page Identifiers</ulink>.</para>
+
+<screen>
+    Charset               Codepage
+    -------------------   -------------------------------------------
+    ASCII                 20127 (US_ASCII)
+
+    CP437                   437 (OEM United States)
+    CP720                   720 (DOS Arabic)
+    CP737                   737 (OEM Greek)
+    CP775                   775 (OEM Baltic)
+    CP850                   850 (OEM Latin 1, Western European)
+    CP852                   852 (OEM Latin 2, Central European)
+    CP855                   855 (OEM Cyrillic)
+    CP857                   857 (OEM Turkish)
+    CP858                   858 (OEM Latin 1 + Euro Symbol)
+    CP862                   862 (OEM Hebrew)
+    CP866                   866 (OEM Russian)
+    CP874                   874 (ANSI/OEM Thai)
+    CP932		    932 (Shift_JIS, not exactly identical to SJIS)
+    CP1125                 1125 (OEM Ukraine)
+    CP1250                 1250 (ANSI Central European)
+    CP1251                 1251 (ANSI Cyrillic)
+    CP1252                 1252 (ANSI Latin 1, Western European)
+    CP1253                 1253 (ANSI Greek)
+    CP1254                 1254 (ANSI Turkish)
+    CP1255                 1255 (ANSI Hebrew)
+    CP1256                 1256 (ANSI Arabic)
+    CP1257                 1257 (ANSI Baltic)
+    CP1258                 1258 (ANSI/OEM Vietnamese)
+
+    ISO-8859-1            28591 (ISO-8859-1)
+    ISO-8859-2            28592 (ISO-8859-2)
+    ISO-8859-3            28593 (ISO-8859-3)
+    ISO-8859-4            28594 (ISO-8859-4)
+    ISO-8859-5            28595 (ISO-8859-5)
+    ISO-8859-6            28596 (ISO-8859-6)
+    ISO-8859-7            28597 (ISO-8859-7)
+    ISO-8859-8            28598 (ISO-8859-8)
+    ISO-8859-9            28599 (ISO-8859-9)
+    ISO-8859-10             -   (not available)
+    ISO-8859-11             -   (not available)
+    ISO-8859-13           28603 (ISO-8859-13)
+    ISO-8859-14             -   (not available)
+    ISO-8859-15           28605 (ISO-8859-15)
+    ISO-8859-16             -   (not available)
+
+    Big5                    950 (ANSI/OEM Traditional Chinese)
+    EUCCN or euc-CN         936 (ANSI/OEM Simplified Chinese)
+    EUCJP or euc-JP       20932 (EUC Japanese)
+    EUCKR or euc-KR         949 (EUC Korean)
+    GB2312                  936 (ANSI/OEM Simplified Chinese)
+    GBK                     936 (ANSI/OEM Simplified Chinese)
+    GEORGIAN-PS             -   (not available)
+    KOI8-R                20866 (KOI8-R Russian Cyrillic)
+    KOI8-U                21866 (KOI8-U Ukrainian Cyrillic)
+    PT154                   -   (not available)
+    SJIS                    -   (not available, almost, but not exactly CP932)
+    TIS620 or TIS-620       874 (ANSI/OEM Thai)
+
+    UTF-8 or utf8         65001 (UTF-8)
+</screen>
+
+</sect2>
+
+</sect1>

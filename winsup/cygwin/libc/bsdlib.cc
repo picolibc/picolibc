@@ -54,7 +54,7 @@ daemon (int nochdir, int noclose)
 	break;
       default:
 	/* This sleep avoids a race condition which kills the
-	   child process if parent is started by a NT/W2K service.
+	   child process if parent is started by a service process.
 	   FIXME: Is that still true? */
 	Sleep (1000L);
 	_exit (0);
@@ -112,7 +112,7 @@ openpty (int *amaster, int *aslave, char *name, const struct termios *termp,
     {
       grantpt (master);
       unlockpt (master);
-      __ptsname (pts, cygheap->fdtab[master]->get_unit ());
+      __ptsname (pts, cygheap->fdtab[master]->get_minor ());
       revoke (pts);
       if ((slave = open (pts, O_RDWR | O_NOCTTY)) >= 0)
 	{
