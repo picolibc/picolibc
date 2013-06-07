@@ -1,6 +1,6 @@
 2013-06-07  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
-	* libc/include/cdefs.h (__has_extension): New define.
+	* libc/include/sys/cdefs.h (__has_extension): New define.
 	(__has_feature): Likewise.
 	(__has_include): Likewise.
 	(__has_builtin): Likewise.
@@ -42,7 +42,7 @@
 
 2013-05-28  Richard Earnshaw  <rearnsha@arm.com>
 
-	* libc/macine/arm/strcpy.S: Explicitly set build attributes when
+	* libc/machine/arm/strcpy.S: Explicitly set build attributes when
 	building for thumb1 targets.
 
 2013-05-22  Corinna Vinschen  <vinschen@redhat.com>
