@@ -1,5 +1,10 @@
 2013-06-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* exceptions.cc (_cygtls::handle_SIGCONT): Reinstate previous behavior
+	but make sure that yield() isn't called when signal stack is locked.
+
+2013-06-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* exceptions.cc (exception::handle): Add comment explaining si_addr
 	behavior.
 
