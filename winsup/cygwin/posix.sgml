@@ -1491,7 +1491,7 @@ per-descriptor/per-process basis.  For this purpose, use the call
 After that, all file locks on this descriptor will follow Windows mandatory
 record locking semantics: Locks are per-descriptor/per-process; locks are not
 propagated to child processes, not even via <function>execve</function>;
-no atmoic replacement of read locks with write locks and vice versa on the
+no atomic replacement of read locks with write locks and vice versa on the
 same descriptor; locks have to be unlocked exactly as they have been locked.
 </para>
 
