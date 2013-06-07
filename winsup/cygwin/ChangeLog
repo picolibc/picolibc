@@ -1,3 +1,7 @@
+2013-06-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winver.rc (LegalCopyright): Belatedly bump to 2013.
+
 2013-06-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* exceptions.cc (_cygtls::handle_SIGCONT): Reinstate previous behavior
@@ -13,7 +17,7 @@
 	* DevNotes: Add entry cgf-000023.
 	* sigproc.cc (exit_thread): Remove now-unneeded sleep code.
 
-2013-06-05  Corinna Vinschen  <corinna@vinschen.de>
+2013-06-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 21.
 
