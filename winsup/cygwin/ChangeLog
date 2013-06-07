@@ -1,3 +1,10 @@
+2013-06-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::pread): Skip to non-atomic
+	code if mandatory locking is used on this descriptor.  Explain why.
+	(fhandler_disk_file::pwrite): Ditto.
+	* posix.sgml (std-notes): Extend description of file locking.
+
 2013-06-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (_cygtls::handle_SIGCONT): Simplify loop waiting for

@@ -1575,8 +1575,9 @@ fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
       return -1;
     }
 
-  /* In binary mode, we can use an atomic NtReadFile call. */
-  if (rbinary ())
+  /* In binary mode, we can use an atomic NtReadFile call.
+     Windows mandatory locking semantics disallow to use another HANDLE. */
+  if (rbinary () && !mandatory_locking ())
     {
       extern int __stdcall is_at_eof (HANDLE h);
       NTSTATUS status;
@@ -1647,8 +1648,9 @@ fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset)
       return -1;
     }
 
-  /* In binary mode, we can use an atomic NtWriteFile call. */
-  if (wbinary ())
+  /* In binary mode, we can use an atomic NtWriteFile call.
+     Windows mandatory locking semantics disallow to use another HANDLE. */
+  if (wbinary () && !mandatory_locking ())
     {
       NTSTATUS status;
       IO_STATUS_BLOCK io;
