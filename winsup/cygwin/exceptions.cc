@@ -753,6 +753,10 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
     }
   cygwin_exception exc (framep, in, e);
   si.si_cyg = (void *) &exc;
+  /* POSIX requires that for SIGSEGV and SIGBUS, si_addr should be set to the
+     address of faulting memory reference.  For SIGILL and SIGFPE these should
+     be the address of the faulting instruction.  Other signals are apparently
+     undefined so we just set those to the faulting instruction too.  */ 
   si.si_addr = (si.si_signo == SIGSEGV || si.si_signo == SIGBUS)
 	       ? (void *) e->ExceptionInformation[1] : (void *) in->_GR(ip);
   me.incyg++;
@@ -767,12 +771,11 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 #define SIG_NONMASKABLE	(SIGTOMASK (SIGKILL) | SIGTOMASK (SIGSTOP))
 
 /* Non-raceable sigsuspend
- * Note: This implementation is based on the Single UNIX Specification
- * man page.  This indicates that sigsuspend always returns -1 and that
- * attempts to block unblockable signals will be silently ignored.
- * This is counter to what appears to be documented in some UNIX
- * man pages, e.g. Linux.
- */
+   Note: This implementation is based on the Single UNIX Specification
+   man page.  This indicates that sigsuspend always returns -1 and that
+   attempts to block unblockable signals will be silently ignored.
+   This is counter to what appears to be documented in some UNIX
+   man pages, e.g. Linux.  */
 int __stdcall
 handle_sigsuspend (sigset_t tempmask)
 {

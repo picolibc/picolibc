@@ -1,5 +1,10 @@
 2013-06-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* exceptions.cc (exception::handle): Add comment explaining si_addr
+	behavior.
+
+2013-06-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* DevNotes: Add entry cgf-000023.
 	* sigproc.cc (exit_thread): Remove now-unneeded sleep code.
 
