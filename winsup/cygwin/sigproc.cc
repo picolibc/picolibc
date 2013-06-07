@@ -447,21 +447,6 @@ exit_thread (DWORD res)
 # undef ExitThread
   sigfillset (&_my_tls.sigmask);	/* No signals wanted */
   lock_process for_now;			/* May block indefinitely when exiting. */
-  /* ES_EXIT_STARTING indicates that exit is in progress.  After setting
-     exit_state to ES_EXIT_STARTING, the global dtors are running first,
-     then the exit state is set to the next level in do_exit.  We must not
-     block the thread exit while the global dtors are running, because
-     one of them might have called pthread_join, which is perfectly valid
-     for a global C++ destructor.
-     FIXME: Do we need another state between ES_EXIT_STARTING and
-            ES_SIGNAL_EXIT to narrow the gap in which the thread exit
-	    is still valid? */
-  if (exit_state > ES_EXIT_STARTING)
-    {
-      for_now.release ();
-      Sleep (INFINITE);
-    }
-
   HANDLE h;
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
                         GetCurrentProcess (), &h,

@@ -1,3 +1,8 @@
+2013-06-07  cgf-000023
+
+Given the fact that the signal thread never exits there is no need
+for exit_thread to ever block.  So, nuke this code.
+
 2013-01-31  cgf-000022
 
 While researching the lftp behavior reported here:
