@@ -1,3 +1,7 @@
+2013-06-07  Will Newton  <will.newton@linaro.org>
+
+	* aarch64.h: Add R_AARCH64_IRELATIVE reloc.
+
 2013-06-06  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h (ELF_ST_SET_MIPS_PIC): Clear any STO_MIPS16 setting.
