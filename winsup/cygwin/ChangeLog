@@ -7,7 +7,7 @@
 
 2013-06-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
-	* miscfuncs.cc (yield): Revert (after researching) to calling SleepEx
+	* miscfuncs.cc (yield): Revert (after researching) to calling Sleep
 	with 0.  We don't want to actually sleep when calling this function.
 
 2013-06-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
