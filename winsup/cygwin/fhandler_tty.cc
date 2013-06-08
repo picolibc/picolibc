@@ -96,7 +96,7 @@ fhandler_pty_common::__acquire_output_mutex (const char *fn, int ln,
 {
   if (strace.active ())
     strace.prntf (_STRACE_TERMIOS, fn, "(%d): pty output_mutex (%p): waiting %d ms", ln, output_mutex, ms);
-  if (0 && ms == INFINITE)
+  if (ms == INFINITE)
     ms = 100;
   DWORD res = WaitForSingleObject (output_mutex, ms);
   if (res == WAIT_OBJECT_0)
@@ -145,9 +145,6 @@ fhandler_pty_common::__release_output_mutex (const char *fn, int ln)
 void
 fhandler_pty_master::doecho (const void *str, DWORD len)
 {
-  static char buf[128 * 1024];
-  int buflen = process_slave_output (buf, sizeof (buf), false);
-  puts_readahead (buf, buflen);
   acquire_output_mutex (INFINITE);
   if (!WriteFile (to_master, str, len, &len, NULL))
     termios_printf ("Write to %p failed, %E", to_master);

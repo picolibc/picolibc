@@ -251,8 +251,10 @@ yield ()
       /* MSDN implies that SleepEx will force scheduling of other threads.
 	 Unlike SwitchToThread() the documentation does not mention other
 	 cpus so, presumably (hah!), this + using a lower priority will
-	 stall this thread temporarily and cause another to run.  */
-      SleepEx (0L, false);
+	 stall this thread temporarily and cause another to run.
+	 Note: Don't use 0 timeout.  This takes a lot of CPU if something
+	 goes wrong. */
+      SleepEx (1L, false);
     }
   SetThreadPriority (GetCurrentThread (), prio);
 }
