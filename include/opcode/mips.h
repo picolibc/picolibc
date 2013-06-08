@@ -357,6 +357,9 @@ struct mips_opcode
   /* A collection of bits describing the instruction sets of which this
      instruction or macro is a member. */
   unsigned long membership;
+  /* A collection of bits describing the ASE of which this instruction
+     or macro is a member.  */
+  unsigned long ase;
   /* A collection of bits describing the instruction sets of which this
      instruction or macro is not a member.  */
   unsigned long exclusions;
@@ -733,19 +736,8 @@ static const unsigned int mips_isa_table[] =
 /* Masks used for MIPS-defined ASEs.  */
 #define INSN_ASE_MASK		  0x3c00f0d0
 
-/* DSP ASE */ 
-#define INSN_DSP                  0x00001000
-#define INSN_DSP64                0x00002000
-
 /* MIPS R5900 instruction */
 #define INSN_5900                 0x00004000
-
-/* Virtualization ASE */
-#define INSN_VIRT		  0x00000080
-#define INSN_VIRT64		  0x00000040
-
-/* MIPS-3D ASE */
-#define INSN_MIPS3D               0x00008000
 
 /* MIPS R4650 instruction.  */
 #define INSN_4650                 0x00010000
@@ -768,14 +760,6 @@ static const unsigned int mips_isa_table[] =
 /* NEC VR5500 instruction.  */
 #define INSN_5500		  0x02000000
 
-/* MDMX ASE */ 
-#define INSN_MDMX                 0x04000000
-/* MT ASE */
-#define INSN_MT                   0x08000000
-/* SmartMIPS ASE  */
-#define INSN_SMARTMIPS            0x10000000
-/* DSP R2 ASE  */
-#define INSN_DSPR2                0x20000000
 /* ST Microelectronics Loongson 2E.  */
 #define INSN_LOONGSON_2E          0x40000000
 /* ST Microelectronics Loongson 2F.  */
@@ -783,10 +767,26 @@ static const unsigned int mips_isa_table[] =
 /* Loongson 3A.  */
 #define INSN_LOONGSON_3A          0x00000400
 /* RMI Xlr instruction */
-#define INSN_XLR              	  0x00000020
+#define INSN_XLR                 0x00000020
 
+/* DSP ASE */
+#define ASE_DSP			0x00000001
+#define ASE_DSP64		0x00000002
+/* DSP R2 ASE  */
+#define ASE_DSPR2		0x00000004
 /* MCU (MicroController) ASE */
-#define INSN_MCU		  0x00000010
+#define ASE_MCU			0x00000010
+/* MDMX ASE */
+#define ASE_MDMX		0x00000020
+/* MIPS-3D ASE */
+#define ASE_MIPS3D		0x00000040
+/* MT ASE */
+#define ASE_MT			0x00000080
+/* SmartMIPS ASE  */
+#define ASE_SMARTMIPS		0x00000100
+/* Virtualization ASE */
+#define ASE_VIRT		0x00000200
+#define ASE_VIRT64		0x00000400
 
 /* MIPS ISA defines, use instead of hardcoding ISA level.  */
 
@@ -923,7 +923,7 @@ cpu_is_member (int cpu, unsigned int mask)
    if instruction INSN is available to the given ISA and CPU. */
 
 static inline bfd_boolean
-opcode_is_member (const struct mips_opcode *insn, int isa, int cpu)
+opcode_is_member (const struct mips_opcode *insn, int isa, int ase, int cpu)
 {
   if (!cpu_is_member (cpu, insn->exclusions))
     {
@@ -935,7 +935,7 @@ opcode_is_member (const struct mips_opcode *insn, int isa, int cpu)
 	return TRUE;
 
       /* Test for ASE compatibility.  */
-      if (((isa & ~INSN_ISA_MASK) & (insn->membership & ~INSN_ISA_MASK)) != 0)
+      if ((ase & insn->ase) != 0)
 	return TRUE;
 
       /* Test for processor-specific extensions.  */
