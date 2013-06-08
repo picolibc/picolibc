@@ -508,7 +508,7 @@ try_to_debug (bool waitloop)
 	return dbg;
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       while (!being_debugged ())
-	yield ();
+	Sleep (1);
       Sleep (2000);
     }
 
@@ -923,7 +923,10 @@ sigpacket::setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
 	  DWORD res;
 	  HANDLE hth = (HANDLE) *tls;
 	  if (!hth)
-	    sigproc_printf ("thread handle NULL, not set up yet?");
+	    {
+	      tls->unlock ();
+	      sigproc_printf ("thread handle NULL, not set up yet?");
+	    }
 	  else
 	    {
 	      /* Suspend the thread which will receive the signal.
@@ -936,6 +939,7 @@ sigpacket::setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
 	      /* Just set pending if thread is already suspended */
 	      if (res)
 		{
+		  tls->unlock ();
 		  ResumeThread (hth);
 		  goto out;
 		}
