@@ -236,26 +236,22 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
   return (ssize_t) tot;
 }
 
-/* Try hard to schedule another thread.
-
-   Note: Don't call yield under _cygtls::lock conditions.  It results in
-   potential starvation, especially on a single-CPU system, because
-   _cygtls::lock also calls yield when waiting for the lock. */
+/* Try hard to schedule another thread.  
+   Remember not to call this in a lock condition or you'll potentially
+   suffer starvation.  */
 void
 yield ()
 {
   int prio = GetThreadPriority (GetCurrentThread ());
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
-  for (int i = 0; i < 2; i++)
-    {
-      /* MSDN implies that SleepEx will force scheduling of other threads.
-	 Unlike SwitchToThread() the documentation does not mention other
-	 cpus so, presumably (hah!), this + using a lower priority will
-	 stall this thread temporarily and cause another to run.
-	 Note: Don't use 0 timeout.  This takes a lot of CPU if something
-	 goes wrong. */
-      SleepEx (1L, false);
-    }
+  /* MSDN implies that SleepEx will force scheduling of other threads.
+     Unlike SwitchToThread() the documentation does not mention other
+     cpus so, presumably (hah!), this + using a lower priority will
+     stall this thread temporarily and cause another to run.
+     (stackoverflow and others seem to confirm that setting this thread
+     to a lower priority and calling Sleep with a 0 paramenter will
+     have this desired effect)  */
+  Sleep (0L);
   SetThreadPriority (GetCurrentThread (), prio);
 }
 

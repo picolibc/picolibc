@@ -1,5 +1,10 @@
 2013-06-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* miscfuncs.cc (yield): Revert (after researching) to calling SleepEx
+	with 0.  We don't want to actually sleep when calling this function.
+
+2013-06-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* cygwait.cc (cygwait): Remove lock around sig retrieval since this
 	code is essentially guarded by thread-specific signal_arrived.
 	* exceptions.cc (_cygtls::handle_SIGCONT): Simplify.  Eliminate
