@@ -1,3 +1,10 @@
+2013-06-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* cygwait.cc (cygwait): Remove lock around sig retrieval since this
+	code is essentially guarded by thread-specific signal_arrived.
+	* exceptions.cc (_cygtls::handle_SIGCONT): Simplify.  Eliminate
+	lock/unlock since code is guarded by signal_arrived.
+
 2013-06-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winver.rc (LegalCopyright): Belatedly bump to 2013.

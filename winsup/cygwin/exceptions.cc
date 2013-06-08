@@ -1252,38 +1252,28 @@ signal_exit (int sig, siginfo_t *si)
 void
 _cygtls::handle_SIGCONT ()
 {
-  if (ISSTATE (myself, PID_STOPPED))
-    {
-      myself->stopsig = 0;
-      myself->process_state &= ~PID_STOPPED;
-      int state = 0;
-      /* Carefully tell sig_handle_tty_stop to wake up.
-	 Make sure that any pending signal is handled before trying to
-	 send a new one.  Then make sure that SIGCONT has been recognized
-	 before exiting the loop.  */
-      while (state < 2)
-       {
-	 lock ();
-	 bool do_yield = !!sig;
-	 if (do_yield)
-	   /* signal still being processed */;
-	 else if (state)
-	   state++;		/* state == 2: signal no longer being processed */
-	 else
-	   {
-	     sig = SIGCONT;
-	     SetEvent (signal_arrived);
-	     state++;		/* state == 1: alert sig_handle_tty_stop */
-	     do_yield = true;	/* wake up other thread */
-	   }
-	 unlock ();
-	 if (do_yield)
-	   yield ();
-       }
-      /* Tell wait_sig to handle any queued signals now that we're alive
-	 again. */
-      sig_dispatch_pending (false);
-    }
+  if (NOTSTATE (myself, PID_STOPPED))
+    return;
+
+  myself->stopsig = 0;
+  myself->process_state &= ~PID_STOPPED;
+  /* Carefully tell sig_handle_tty_stop to wake up.
+     Make sure that any pending signal is handled before trying to
+     send a new one.  Then make sure that SIGCONT has been recognized
+     before exiting the loop.  */
+  bool sigsent = false;
+  while (1)
+    if (sig)		/* Assume that it's ok to just test sig outside of a
+			   lock since setup_handler does it this way.  */
+      yield ();		/* Attempt to schedule another thread.  */
+    else if (sigsent)
+      break;		/* SIGCONT has been recognized by other thread */
+    else
+      {
+	sig = SIGCONT;
+	SetEvent (signal_arrived); /* alert sig_handle_tty_stop */
+	sigsent = true;
+      }
   /* Clear pending stop signals */
   sig_clear (SIGSTOP);
   sig_clear (SIGTSTP);
