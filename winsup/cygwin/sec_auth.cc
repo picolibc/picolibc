@@ -259,8 +259,14 @@ get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
   if (ret)
     {
       __seterrno_from_win_error (ret);
-      /* It's no error when the user name can't be found. */
-      return ret == NERR_UserNotFound;
+      /* It's no error when the user name can't be found.
+	 It's also no error if access has been denied.  Yes, sounds weird, but
+	 keep in mind that ERROR_ACCESS_DENIED means the current user has no
+	 permission to access the AD user information.  However, if we return
+	 an error, Cygwin will call DsGetDcName with DS_FORCE_REDISCOVERY set
+	 to ask for another server.  This is not only time consuming, it's also
+	 useless; the next server will return access denied again. */
+      return ret == NERR_UserNotFound || ret == ERROR_ACCESS_DENIED;
     }
 
   len = wcslen (domain);

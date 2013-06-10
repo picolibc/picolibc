@@ -1,3 +1,8 @@
+2013-06-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (get_user_groups): Don't handle ERROR_ACCESS_DENIED as
+	error.  Explain why.
+
 2013-06-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* exceptions.cc (try_to_debug): Don't use yield() when waiting for
