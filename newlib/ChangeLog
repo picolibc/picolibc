@@ -1,3 +1,31 @@
+2013-06-10  Terraneo Federico  <fede.tft@hotmail.it>
+
+	* libc/stdlib/gdtoa-gethex.c (__hexdig): Constify.
+	(hexdig_init): Remove.
+	(__hexdig_fun): New function.
+	hexdig_init, added __hexdig_fun
+	(gethex): Call __get_hexdig macro rather than hexdig.
+	* libc/stdlib/gdtoa-hexnan.c (hexnan): Constify fpi argument.
+	Call __get_hexdig macro rather than hexdig.
+	* libc/stdlib/ldtoa.c: Throughout constify functions arguments where
+	required by constifying the following arrays.
+	(ezero): Constify.
+	(eone): Constify.
+	(ermsg): Constify.
+	(etens): Constify.
+	(emtens): Constify.
+	(nan113): Constify.
+	(nan64): Constify.
+	(nan53): Constify.
+	(nan24): Constify.
+	* libc/stdlib/mprec.h (__get_hexdig): Define.
+	(gethex): Constify args in declaration where appropriate.
+	(hexnan): Ditto.
+	(hexdig_init): Remove declaration.
+	(__hexdig_fun): Declare.
+	* libc/stdlib/strtod.c (fpi): Constify.
+	(fpinan): Constify.
+
 2013-06-07  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/cdefs.h (__has_extension): New define.

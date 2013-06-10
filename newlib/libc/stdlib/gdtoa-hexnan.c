@@ -64,15 +64,13 @@ _DEFUN (L_shift, (x, x1, i),
 int
 _DEFUN (hexnan, (sp, fpi, x0),
 	_CONST char **sp _AND
-	FPI *fpi _AND
+	_CONST FPI *fpi _AND
 	__ULong *x0)
 {
 	__ULong c, h, *x, *x1, *xe;
 	_CONST char *s;
 	int havedig, hd0, i, nbits;
 
-	if (!hexdig['0'])
-		hexdig_init();
 	nbits = fpi->nbits;
 	x = x0 + (nbits >> kshift);
 	if (nbits & kmask)
@@ -82,7 +80,7 @@ _DEFUN (hexnan, (sp, fpi, x0),
 	havedig = hd0 = i = 0;
 	s = *sp;
 	while((c = *(_CONST unsigned char*)++s)) {
-		if (!(h = hexdig[c])) {
+		if (!(h = __get_hexdig(c))) {
 			if (c <= ' ') {
 				if (hd0 < havedig) {
 					if (x < x1 && i < 8)
