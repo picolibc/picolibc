@@ -1,3 +1,7 @@
+2013-06-12  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* nios2.h (OP_MATCH_ERET): Correct eret encoding.
+
 2013-05-22  Jürgen Urban  <JuergenUrban@gmx.de>
 
 	* mips.h (M_LQC2_AB, M_SQC2_AB): New macros.
