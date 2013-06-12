@@ -1,3 +1,8 @@
+2013-06-12  Fedin Pavel <p.fedin@samsung.com>
+
+	* path.cc (normalize_posix_path): Fix long-standing problem which
+	allows to access files via ".." using an invalid POSIX path.
+
 2013-06-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winver.rc (FileDescription): Remove (R).
