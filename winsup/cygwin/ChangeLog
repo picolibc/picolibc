@@ -1,5 +1,11 @@
 2013-06-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (gen_old_if_name): New function to generate short interface
+	names for old pre-1.7 applications.
+	(get_ifs): Call gen_old_if_name for said old applications.
+
+2013-06-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix.sgml (fcntl, flock, lockf): Point to implementation notes.
 
 2013-06-12  Fedin Pavel <p.fedin@samsung.com>
