@@ -188,7 +188,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fchown
     fchownat
     fclose
-    fcntl
+    fcntl			(see chapter "Implementation Notes")
     fdatasync
     fdim
     fdimf
@@ -418,7 +418,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     localeconv
     localtime
     localtime_r
-    lockf
+    lockf			(see chapter "Implementation Notes")
     log
     log10
     log10f
@@ -977,7 +977,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     finite
     finitef
     fiprintf
-    flock
+    flock			(see chapter "Implementation Notes")
     forkpty
     fpurge
     freeifaddrs

@@ -1,3 +1,7 @@
+2013-06-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix.sgml (fcntl, flock, lockf): Point to implementation notes.
+
 2013-06-12  Fedin Pavel <p.fedin@samsung.com>
 
 	* path.cc (normalize_posix_path): Fix long-standing problem which
