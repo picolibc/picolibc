@@ -214,12 +214,12 @@ void __reg2 nofinalslash (const char *src, char *dst);
 void __reg3 *hook_or_detect_cygwin (const char *, const void *, WORD&, HANDLE h = NULL);
 
 /* Time related */
-void __stdcall totimeval (struct timeval *, FILETIME *, int, int);
-long __stdcall to_time_t (FILETIME *);
-void __stdcall to_timestruc_t (FILETIME *, timestruc_t *);
+void __stdcall totimeval (struct timeval *, PLARGE_INTEGER, int, int);
+time_t __stdcall to_time_t (PLARGE_INTEGER);
+void __stdcall to_timestruc_t (PLARGE_INTEGER, timestruc_t *);
 void __stdcall time_as_timestruc_t (timestruc_t *);
-void __stdcall timespec_to_filetime (const struct timespec *, FILETIME *);
-void __stdcall timeval_to_filetime (const struct timeval *, FILETIME *);
+void __stdcall timeval_to_filetime (const struct timeval *, PLARGE_INTEGER);
+void __stdcall timespec_to_filetime (const struct timespec *, PLARGE_INTEGER);
 
 /* Console related */
 void __stdcall set_console_title (char *);

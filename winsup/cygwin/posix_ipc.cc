@@ -199,7 +199,7 @@ ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
 			      NotificationTimer);
       if (!NT_SUCCESS (status))
 	return geterrno_from_nt_status (status);
-      timespec_to_filetime (abstime, (FILETIME *) &duetime);
+      timespec_to_filetime (abstime, &duetime);
       status = NtSetTimer (w4[timer_idx], &duetime, NULL, NULL, FALSE, 0, NULL);
       if (!NT_SUCCESS (status))
 	{

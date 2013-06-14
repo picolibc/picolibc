@@ -570,7 +570,7 @@ format_proc_stat (void *, char *&destbuf)
   swap_in = spi->PagesRead;
   swap_out = spi->PagefilePagesWritten;
   context_switches = spi->ContextSwitches;
-  boot_time = to_time_t ((FILETIME *) &stodi.BootTime.QuadPart);
+  boot_time = to_time_t (&stodi.BootTime);
 
   eobuf += __small_sprintf (eobuf, "page %u %u\n"
 				   "swap %u %u\n"

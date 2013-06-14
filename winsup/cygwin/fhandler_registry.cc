@@ -508,7 +508,7 @@ fhandler_registry::fstat (struct stat *buf)
 	      RegQueryInfoKeyW (hKey, NULL, NULL, NULL, &subkey_count, NULL,
 				NULL, NULL, NULL, NULL, NULL, &ftLastWriteTime))
 	    {
-	      to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
+	      to_timestruc_t ((PLARGE_INTEGER) &ftLastWriteTime, &buf->st_mtim);
 	      buf->st_ctim = buf->st_birthtim = buf->st_mtim;
 	      time_as_timestruc_t (&buf->st_atim);
 	      if (file_type > virt_none)

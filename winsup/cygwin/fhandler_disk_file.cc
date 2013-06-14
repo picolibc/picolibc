@@ -518,14 +518,14 @@ fhandler_base::fstat_helper (struct stat *buf,
   PFILE_NETWORK_OPEN_INFORMATION pfnoi = pc.fnoi ();
   ULONG attributes = pc.file_attributes ();
 
-  to_timestruc_t ((PFILETIME) &pfnoi->LastAccessTime, &buf->st_atim);
-  to_timestruc_t ((PFILETIME) &pfnoi->LastWriteTime, &buf->st_mtim);
+  to_timestruc_t (&pfnoi->LastAccessTime, &buf->st_atim);
+  to_timestruc_t (&pfnoi->LastWriteTime, &buf->st_mtim);
   /* If the ChangeTime is 0, the underlying FS doesn't support this timestamp
      (FAT for instance).  If so, it's faked using LastWriteTime. */
-  to_timestruc_t (pfnoi->ChangeTime.QuadPart ? (PFILETIME) &pfnoi->ChangeTime
-					    : (PFILETIME) &pfnoi->LastWriteTime,
+  to_timestruc_t (pfnoi->ChangeTime.QuadPart ? &pfnoi->ChangeTime
+					     : &pfnoi->LastWriteTime,
 		  &buf->st_ctim);
-  to_timestruc_t ((PFILETIME) &pfnoi->CreationTime, &buf->st_birthtim);
+  to_timestruc_t (&pfnoi->CreationTime, &buf->st_birthtim);
   buf->st_dev = get_dev ();
   /* CV 2011-01-13: Observations on the Cygwin mailing list point to an
      interesting behaviour in some Windows versions.  Apparently the size of
@@ -1343,8 +1343,8 @@ fhandler_base::utimens_fs (const struct timespec *tvp)
 
   fbi.CreationTime.QuadPart = 0LL;
   /* UTIME_OMIT is handled in timespec_to_filetime by setting FILETIME to 0. */
-  timespec_to_filetime (&tmp[0], (LPFILETIME) &fbi.LastAccessTime);
-  timespec_to_filetime (&tmp[1], (LPFILETIME) &fbi.LastWriteTime);
+  timespec_to_filetime (&tmp[0], &fbi.LastAccessTime);
+  timespec_to_filetime (&tmp[1], &fbi.LastWriteTime);
   fbi.ChangeTime.QuadPart = 0LL;
   fbi.FileAttributes = 0;
   NTSTATUS status = NtSetInformationFile (get_handle (), &io, &fbi, sizeof fbi,

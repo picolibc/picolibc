@@ -1,5 +1,44 @@
 2013-06-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	Streamline time/times functionality.  Remove last remains of former
+	Windows 9x compatibility.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Drop now unneeded
+	casts in calls to_timestruc_t.
+	(fhandler_base::utimens_fs): Ditto for timespec_to_filetime.
+	* fhandler_proc.cc (format_proc_stat): Ditto for to_time_t.
+	* hires.h (class hires_ms): Remove unused member initime_ns.
+	Remove declarations for timeGetTime_ns and prime.
+	(hires_ms::uptime): Remove.
+	* posix_ipc.cc (ipc_cond_timedwait): Ditto for timespec_to_filetime.
+	* fhandler_registry.cc (fhandler_registry::fstat): Add cast.
+	* resource.cc (fill_rusage): Call NtQueryInformationProcess rather than
+	GetProcessTimes to deal with LARGE_INTEGER rather than FILETIME.
+	* times.cc: Simplify time handling.  Throughout, use LARGE_INTEGER
+	rather than FILETIME to simplify computations.  Throughout use
+	{u}int64_t rather than {unsigned} long long.  Drop unneeded casts since
+	NSPERSEC is 64 bit anyway.
+	(systime_ns): Remove.
+	(times): Call NtQuerySystemInformation to fetch boot time.  Call
+	NtQueryInformationProcess rather than GetProcessTimes to deal with
+	LARGE_INTEGER rather than FILETIME.  Call GetSystemTimeAsFileTime.
+	(totimeval): Use constant 1000000 as in other functions.
+	(time_t_to_filetime): Remove.
+	(to_time_t): Change return type to time_t.
+	(time_as_timestruc_t): Rename filetime to systime.
+	(time): Ditto. Add cast.
+	(hires_ns::nsecs): Fix return type cast.
+	(hires_ms::timeGetTime_ns): Remove.
+	(hires_ns::prime): Remove.
+	(hires_ms::nsecs): Drop call to prime.  Call GetSystemTimeAsFileTime
+	directly.  Subtract FACTOR here since it's the only function needing
+	to do so.
+	(minperiod): Cosmetically change to ULONG.
+	(hires_ns::resolution): Fix return type cast.
+	(hires_ms::resolution): Simplify, rely on NtQueryTimerResolution.
+	* winsup.h: Align time related prototypes to above changes.
+
+2013-06-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (gen_old_if_name): New function to generate short interface
 	names for old pre-1.7 applications.
 	(get_ifs): Call gen_old_if_name for said old applications.

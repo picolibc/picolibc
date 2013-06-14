@@ -65,18 +65,16 @@ add_rusage (struct rusage *r1, struct rusage *r2)
 void __stdcall
 fill_rusage (struct rusage *r, HANDLE h)
 {
-  FILETIME creation_time = {0,0};
-  FILETIME exit_time = {0,0};
-  FILETIME kernel_time = {0,0};
-  FILETIME user_time = {0,0};
+  KERNEL_USER_TIMES kut;
 
   struct timeval tv;
 
-  memset (r, 0, sizeof (*r));
-  GetProcessTimes (h, &creation_time, &exit_time, &kernel_time, &user_time);
-  totimeval (&tv, &kernel_time, 0, 0);
+  memset (&kut, 0, sizeof kut);
+  memset (r, 0, sizeof *r);
+  NtQueryInformationProcess (h, ProcessTimes, &kut, sizeof kut, NULL);
+  totimeval (&tv, &kut.KernelTime, 0, 0);
   add_timeval (&r->ru_stime, &tv);
-  totimeval (&tv, &user_time, 0, 0);
+  totimeval (&tv, &kut.UserTime, 0, 0);
   add_timeval (&r->ru_utime, &tv);
 
   VM_COUNTERS vmc;
