@@ -1,4 +1,15 @@
-2013-06-13  Corinna Vinschen  <corinna@vinschen.de>
+2013-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetSystemTimePreciseAsFileTime): Define.
+	* times.cc (GetSystemTimePreciseAsFileTime): Temporarily declare here
+	to workaround missing definition in 32 bit w32api headers.
+	(get_system_time): New always inline function to call either
+	GetSystemTimePreciseAsFileTime or GetSystemTimeAsFileTime on a per OS
+	basis.  Call throughout instead of GetSystemTimeAsFileTime.
+	* wincap.h (wincaps::has_precise_system_time): New element.
+	* wincap.cc: Implement above element throughout.
+
+2013-06-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	Streamline time/times functionality.  Remove last remains of former
 	Windows 9x compatibility.

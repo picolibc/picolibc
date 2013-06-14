@@ -38,6 +38,7 @@ struct wincaps
   unsigned has_program_compatibility_assistant		: 1;
   unsigned has_pipe_reject_remote_clients		: 1;
   unsigned terminate_thread_frees_stack			: 1;
+  unsigned has_precise_system_time			: 1;
 };
 
 class wincapc
@@ -87,6 +88,7 @@ public:
   bool	IMPLEMENT (has_program_compatibility_assistant)
   bool	IMPLEMENT (has_pipe_reject_remote_clients)
   bool	IMPLEMENT (terminate_thread_frees_stack)
+  bool	IMPLEMENT (has_precise_system_time)
 
 #undef IMPLEMENT
 };

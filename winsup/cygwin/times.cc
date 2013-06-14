@@ -31,6 +31,16 @@ hires_ms NO_COPY gtod;
 
 hires_ns NO_COPY ntod;
 
+extern "C" { void WINAPI GetSystemTimePreciseAsFileTime (LPFILETIME); }
+
+static inline void __attribute__ ((always_inline))
+get_system_time (PLARGE_INTEGER systime)
+{
+  wincap.has_precise_system_time ()
+  	? GetSystemTimePreciseAsFileTime ((LPFILETIME) systime)
+	: GetSystemTimeAsFileTime ((LPFILETIME) systime);
+}
+
 /* Cygwin internal */
 static uint64_t __stdcall
 __to_clock_t (PLARGE_INTEGER src, int flag)
@@ -64,7 +74,7 @@ times (struct tms *buf)
 
   NtQueryInformationProcess (NtCurrentProcess (), ProcessTimes,
 			     &kut, sizeof kut, NULL);
-  GetSystemTimeAsFileTime ((LPFILETIME) &ticks);
+  get_system_time (&ticks);
 
   /* uptime */
   ticks.QuadPart -= stodi.BootTime.QuadPart;
@@ -286,7 +296,7 @@ time_as_timestruc_t (timestruc_t * out)
 {
   LARGE_INTEGER systime;
 
-  GetSystemTimeAsFileTime ((LPFILETIME) &systime);
+  get_system_time (&systime);
   to_timestruc_t (&systime, out);
 }
 
@@ -298,7 +308,7 @@ time (time_t * ptr)
   time_t res;
   LARGE_INTEGER systime;
 
-  GetSystemTimeAsFileTime ((LPFILETIME) &systime);
+  get_system_time (&systime);
   res = to_time_t (&systime);
   if (ptr)
     *ptr = res;
@@ -486,7 +496,7 @@ LONGLONG
 hires_ms::nsecs ()
 {
   LARGE_INTEGER systime;
-  GetSystemTimeAsFileTime ((LPFILETIME) &systime);
+  get_system_time (&systime);
   /* Add conversion factor for UNIX vs. Windows base time */
   return systime.QuadPart - FACTOR;
 }

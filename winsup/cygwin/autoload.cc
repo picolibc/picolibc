@@ -577,6 +577,7 @@ LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 LoadDLLfuncEx (CancelSynchronousIo, 4, kernel32, 1)
 LoadDLLfunc (CreateSymbolicLinkW, 12, kernel32)
 LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
+LoadDLLfunc (GetSystemTimePreciseAsFileTime, 4, kernel32)
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
 
 LoadDLLfunc (WNetCloseEnum, 4, mpr)
