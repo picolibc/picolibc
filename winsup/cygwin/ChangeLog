@@ -1,5 +1,10 @@
 2013-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::read): Fix buffer
+	read access overrun when pos > 0.
+
+2013-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* times.cc (GetSystemTimePreciseAsFileTime): Add comment to declaration.
 	(__to_clock_t): Remove a debug_printf.
 	(times): Align syscall_printf to debug output of other system calls.

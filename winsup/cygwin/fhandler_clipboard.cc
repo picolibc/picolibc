@@ -295,7 +295,8 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
 		  != (size_t) -1
 		 && (ret > conv_len
 			/* Skip separated high surrogate: */
-		     || ((buf [pos + glen - 1] & 0xFC00) == 0xD800 && glen - pos > 1)))
+		     || ((buf [glen - 1] & 0xFC00) == 0xD800
+			 && glen - pos > 1)))
 	     --glen;
 	  if (ret == (size_t) -1)
 	    ret = 0;
