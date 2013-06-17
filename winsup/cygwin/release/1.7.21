@@ -11,3 +11,6 @@ Bug fixes:
 
 - Fix EFAULT when reading large clipboard.
   Fixes: http://cygwin.com/ml/cygwin/2013-06/msg00311.html
+
+- Fix creation of relative native symlinks.
+  Fixes: http://cygwin.com/ml/cygwin/2013-06/msg00340.html

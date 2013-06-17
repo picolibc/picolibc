@@ -1,5 +1,10 @@
 2013-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (cnt_bs): New inline function.
+	(symlink_native): Fix creating relative native symlink.
+
+2013-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_clipboard.cc (fhandler_dev_clipboard::read): Fix buffer
 	read access overrun when pos > 0.
 

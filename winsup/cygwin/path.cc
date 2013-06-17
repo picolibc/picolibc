@@ -1530,12 +1530,25 @@ symlink_nfs (const char *oldpath, path_conv &win32_newpath)
   return 0;
 }
 
+/* Count backslashes between s and e. */
+static inline int
+cnt_bs (PWCHAR s, PWCHAR e)
+{
+  int num = 0;
+
+  while (s < e)
+    if (*s++ == L'\\')
+      ++num;
+  return num;
+}
+
 static int
 symlink_native (const char *oldpath, path_conv &win32_newpath)
 {
   tmp_pathbuf tp;
   path_conv win32_oldpath;
   PUNICODE_STRING final_oldpath, final_newpath;
+  UNICODE_STRING final_oldpath_buf;
 
   if (isabspath (oldpath))
     {
@@ -1554,10 +1567,48 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
       stpcpy (stpncpy (absoldpath, win32_newpath.normalized_path, len),
 	      oldpath);
       win32_oldpath.check (absoldpath, PC_SYM_NOFOLLOW, stat_suffixes);
-      UNICODE_STRING dirpath;
-      RtlSplitUnicodePath (win32_newpath.get_nt_native_path (), &dirpath, NULL);
-      final_oldpath = win32_oldpath.get_nt_native_path ();
-      final_oldpath->Buffer += dirpath.Length / sizeof (WCHAR);
+
+      /* Try hard to keep Windows symlink path relative. */
+
+      /* 1. Find common path prefix. */
+      PWCHAR c_old = win32_oldpath.get_nt_native_path ()->Buffer;
+      PWCHAR c_new = win32_newpath.get_nt_native_path ()->Buffer;
+      /* Windows compatible == always check case insensitive. */
+      while (towupper (*c_old++) == towupper (*c_new++))
+	;
+      /* The last component could share a common prefix, so make sure we end
+         up on the first char after the last common backslash. */
+      while (c_old[-1] != L'\\')
+	--c_old, --c_new;
+
+      /* 2. Check if prefix is long enough.  The prefix must at least points to
+            a complete device:  \\?\X:\ or \\?\UNC\server\share\ are the minimum
+	    prefix strings.  We start counting behind the \\?\ for speed. */
+      int num = cnt_bs (win32_oldpath.get_nt_native_path ()->Buffer + 4, c_old);
+      if (num < 1		/* locale drive. */
+	  || (win32_oldpath.get_nt_native_path ()->Buffer[6] != L':'
+	      && num < 3))	/* UNC path. */
+	{
+	  /* 3a. No valid common path prefix: Create absolute symlink. */
+	  final_oldpath = win32_oldpath.get_nt_native_path ();
+	  final_oldpath->Buffer[1] = L'\\';
+	}
+      else
+	{
+	  /* 3b. Common path prefx.  Count number of additional directories
+		 in symlink's path, and prepend as much ".." path components
+		 to the target path. */
+	  PWCHAR e_new = win32_newpath.get_nt_native_path ()->Buffer
+			 + win32_newpath.get_nt_native_path ()->Length
+			   / sizeof (WCHAR);
+	  num = cnt_bs (c_new, e_new);
+	  final_oldpath = &final_oldpath_buf;
+	  final_oldpath->Buffer = tp.w_get ();
+	  PWCHAR e_old = final_oldpath->Buffer;
+	  while (num-- > 0)
+	    e_old = wcpcpy (e_old, L"..\\");
+	  wcpcpy (e_old, c_old);
+	}
     }
   /* If the symlink target doesn't exist, don't create native symlink.
      Otherwise the directory flag in the symlink is potentially wrong
