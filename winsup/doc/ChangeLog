@@ -1,3 +1,7 @@
+2013-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.xml: Fix link to FAQ.
+
 2013-06-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-copyright.xml: Fix link to license.
