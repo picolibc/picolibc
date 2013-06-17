@@ -31,6 +31,7 @@ hires_ms NO_COPY gtod;
 
 hires_ns NO_COPY ntod;
 
+/* Temporary declare here until 32 bit w32api follows suit. */
 extern "C" { void WINAPI GetSystemTimePreciseAsFileTime (LPFILETIME); }
 
 static inline void __attribute__ ((always_inline))
@@ -51,7 +52,6 @@ __to_clock_t (PLARGE_INTEGER src, int flag)
     total -= FACTOR;
 
   total /= NSPERSEC / CLOCKS_PER_SEC;
-  debug_printf ("total %016X", total);
   return total;
 }
 
@@ -81,9 +81,6 @@ times (struct tms *buf)
   /* ticks is in in 100ns, convert to clock ticks. */
   clock_t tc = (clock_t) (ticks.QuadPart * CLOCKS_PER_SEC / NSPERSEC);
 
-  syscall_printf ("ticks %D, CLOCKS_PER_SEC %d", ticks, CLOCKS_PER_SEC);
-  syscall_printf ("UserTime %D, KernelTime %D, CreationTime %D, ExitTime %D",
-		  kut.UserTime, kut.KernelTime, kut.CreateTime, kut.ExitTime);
   buf->tms_stime = __to_clock_t (&kut.KernelTime, 0);
   buf->tms_utime = __to_clock_t (&kut.UserTime, 0);
   timeval_to_filetime (&myself->rusage_children.ru_stime, &kut.KernelTime);
@@ -91,6 +88,7 @@ times (struct tms *buf)
   timeval_to_filetime (&myself->rusage_children.ru_utime, &kut.UserTime);
   buf->tms_cutime = __to_clock_t (&kut.UserTime, 1);
 
+  syscall_printf ("%D = times(%p)", tc, buf);
   return tc;
 }
 

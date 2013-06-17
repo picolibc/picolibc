@@ -1,3 +1,9 @@
+2013-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* times.cc (GetSystemTimePreciseAsFileTime): Add comment to declaration.
+	(__to_clock_t): Remove a debug_printf.
+	(times): Align syscall_printf to debug output of other system calls.
+
 2013-06-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (GetSystemTimePreciseAsFileTime): Define.
