@@ -37,7 +37,7 @@ nostdlib:=-nostdlib
 VPATH:=${srcdir}
 
 .SUFFIXES:
-.SUFFIXES: .c .cc .def .a .o .d .s .E
+.SUFFIXES: .c .cc .def .S .a .o .d .s .E
 
 %.o: %.cc
 	$(strip ${COMPILE.cc} -c -o $@ $<)
@@ -50,3 +50,6 @@ VPATH:=${srcdir}
 
 %.E: %.c
 	$(strip ${COMPILE.c} -E -dD -o $@ $<)
+
+%.o: %.S
+	$(strip ${COMPILE.S} -c -o $@ $<)

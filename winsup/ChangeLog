@@ -1,3 +1,8 @@
+2013-06-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.common: Add rule to build assembler code.
+	(.SUFFIXES): Add .S.
+
 2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* Makefile.in (Makefile): Rely on 'configure' not 'configure.in'.
