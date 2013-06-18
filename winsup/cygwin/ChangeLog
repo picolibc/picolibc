@@ -1,5 +1,10 @@
 2013-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* gmon.c: Drop gratuitous inclusion of strings.h.  Remove __MINGW32__
+	around definition of bzero.
+
+2013-06-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (VPATH): Drop CONFIG_DIR.
 	(EXTRA_DLL_OFILES): Remove.
 	(DLL_OFILES): Remove EXTRA_DLL_OFILES.
