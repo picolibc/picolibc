@@ -10,10 +10,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -35,19 +31,39 @@
 static char rcsid[] = "$OpenBSD: gmon.c,v 1.8 1997/07/23 21:11:27 kstailey Exp $";
 #endif
 
-#include "winlean.h"
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <gmon.h>
-#include <stdlib.h>
+/*
+ * This file is taken from Cygwin distribution. Please keep it in sync.
+ * The differences should be within __MINGW32__ guard.
+ */
 
-#include <profil.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <strings.h>
+#ifndef __MINGW32__
+#include <unistd.h>
+#include <sys/param.h>
+#endif
+#include <sys/types.h>
+#include "gmon.h"
+#include "profil.h"
 
 /* XXX needed? */
 //extern char *minbrk __asm ("minbrk");
 
-struct gmonparam _gmonparam = { GMON_PROF_OFF };
+#ifdef _WIN64
+#define MINUS_ONE_P (-1LL)
+#else
+#define MINUS_ONE_P (-1)
+#endif
+
+#ifdef __MINGW32__
+#include <string.h>
+#define bzero(ptr,size) memset (ptr, 0, size);
+#endif
+
+struct gmonparam _gmonparam = { GMON_PROF_OFF, NULL, 0, NULL, 0, NULL, 0, 0L,
+  0, 0, 0, 0};
 
 static int	s_scale;
 /* see profil(2) where this is describe (incorrectly) */
@@ -64,15 +80,15 @@ fake_sbrk(int size)
     if (rv)
       return rv;
     else
-      return (void *) -1;
+      return (void *) MINUS_ONE_P;
 }
 
+void monstartup (size_t, size_t);
+
 void
-monstartup(lowpc, highpc)
-	u_long lowpc;
-	u_long highpc;
+monstartup (size_t lowpc, size_t highpc)
 {
-	register int o;
+	register size_t o;
 	char *cp;
 	struct gmonparam *p = &_gmonparam;
 
@@ -94,13 +110,14 @@ monstartup(lowpc, highpc)
 	p->tossize = p->tolimit * sizeof(struct tostruct);
 
 	cp = fake_sbrk(p->kcountsize + p->fromssize + p->tossize);
-	if (cp == (char *)-1) {
+	if (cp == (char *)MINUS_ONE_P) {
 		ERR("monstartup: out of memory\n");
 		return;
 	}
-#ifdef notdef
+
+	/* zero out cp as value will be added there */
 	bzero(cp, p->kcountsize + p->fromssize + p->tossize);
-#endif
+
 	p->tos = (struct tostruct *)cp;
 	cp += p->tossize;
 	p->kcount = (u_short *)cp;
@@ -133,22 +150,21 @@ monstartup(lowpc, highpc)
 	moncontrol(1);
 }
 
+void _mcleanup (void);
 void
-_mcleanup()
+_mcleanup(void)
 {
+	static char gmon_out[] = "gmon.out";
 	int fd;
 	int hz;
 	int fromindex;
 	int endfrom;
-	u_long frompc;
+	size_t frompc;
 	int toindex;
 	struct rawarc rawarc;
 	struct gmonparam *p = &_gmonparam;
 	struct gmonhdr gmonhdr, *hdr;
-	char *proffile;
-#ifndef nope
-	char gmon_out[] = "gmon.out";
-#endif
+	const char *proffile;
 #ifdef DEBUG
 	int log, len;
 	char dbuf[200];
@@ -203,7 +219,7 @@ _mcleanup()
 
 		proffile = buf;
 	} else {
-		proffile = "gmon.out";
+		proffile = gmon_out;
 	}
 #else
 	proffile = gmon_out;
@@ -263,8 +279,7 @@ _mcleanup()
  *	all the data structures are ready.
  */
 void
-moncontrol(mode)
-	int mode;
+moncontrol(int mode)
 {
 	struct gmonparam *p = &_gmonparam;
 

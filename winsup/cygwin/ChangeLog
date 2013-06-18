@@ -1,3 +1,22 @@
+2013-06-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (VPATH): Drop CONFIG_DIR.
+	(EXTRA_DLL_OFILES): Remove.
+	(DLL_OFILES): Remove EXTRA_DLL_OFILES.
+	(ASFLAGS): Define as -D_WIN64 on x86_64.
+	(GMON_OFILES): Add mcountFunc.o.
+	($(srcdir)/$(TLSOFFSETS_H)): Use target_cpu rather than CONFIG_DIR.
+	* configure.ac (CONFIG_DIR): Remove definition.
+	* configure: Regenerate.
+	* gcrt0.c: Use latest version from Mingw-w64 project.
+	* gmon.c: Ditto.
+	* gmon.h: Ditto.
+	* mcount.c: Ditto.
+	* mcountFunc.S: Ditto, new file.
+	* profil.c: Ditto.
+	* profil.h: Ditto.
+	* config: Remove entire directory.
+
 2013-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (cnt_bs): New inline function.

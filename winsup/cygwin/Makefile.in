@@ -29,7 +29,7 @@ export CCWRAP_HEADERS:=. ${srcdir}
 export CCWRAP_SYSTEM_HEADERS:=@cygwin_headers@ @newlib_headers@
 export CCWRAP_DIRAFTER_HEADERS:=@windows_headers@
 
-VPATH+=$(CONFIG_DIR) $(srcdir)/regex $(srcdir)/lib $(srcdir)/libc
+VPATH+=$(srcdir)/regex $(srcdir)/lib $(srcdir)/libc
 
 target_cpu:=@target_cpu@
 target_alias:=@target_alias@
@@ -145,8 +145,6 @@ LIBCOS:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(srcdir)/lib/*.c}}
 
 # Build all source files in the config directory
 
-EXTRA_DLL_OFILES:=${addsuffix .o,${basename ${notdir ${wildcard $(CONFIG_DIR)/*.c}}}}
-
 EXTRA_OFILES:=
 
 MALLOC_OFILES:=malloc.o
@@ -179,7 +177,7 @@ DLL_OFILES:=advapi32.o arc4random.o assert.o autoload.o base64.o bsdlib.o ctype.
 	strfuncs.o strptime.o strsep.o strsig.o sync.o syscalls.o sysconf.o \
 	syslog.o termios.o thread.o timer.o times.o tls_pbuf.o tty.o uinfo.o \
 	uname.o wait.o wincap.o window.o winf.o wow64.o xsique.o \
-	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
+	$(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
 
 EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
 	cygtls.o \
@@ -197,7 +195,12 @@ override EXTRA_OFILES=$(patsubst %.o,%_E,${DLL_OFILES}))
 override MALLOC_OFILES:=$(patsubst %.o,%.E,${MALLOC_OFILES})
 endif #PREPROCESS
 
-GMON_OFILES:=gmon.o mcount.o profil.o
+ifeq ($(target_cpu),x86_64)
+# Needed by mcountFunc.S to choose the right code path and symbol names
+ASFLAGS:=-D_WIN64
+endif
+
+GMON_OFILES:=gmon.o mcount.o profil.o mcountFunc.o
 
 ifeq ($(target_cpu),x86_64)
 NEW_FUNCTIONS:=
@@ -520,7 +523,7 @@ $(DEF_FILE): gendef $(srcdir)/$(TLSOFFSETS_H) $(DIN_FILE)
 	$(word 1,$^) --cpu=${target_cpu} --output-def=$@  --tlsoffsets=$(word 2,$^) $(wordlist 3,99,$^)
 
 $(srcdir)/$(TLSOFFSETS_H): gentls_offsets cygtls.h
-	$^ $@ @CONFIG_DIR@ $(COMPILE.cc) -c
+	$^ $@ $(target_cpu) $(COMPILE.cc) -c
 
 sigfe.s: $(DEF_FILE)
 	@[ -s $@ ] || \

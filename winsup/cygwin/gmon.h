@@ -13,10 +13,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -36,6 +32,11 @@
  *	@(#)gmon.h	8.2 (Berkeley) 1/4/94
  */
 
+/*
+ * This file is taken from Cygwin distribution. Please keep it in sync.
+ * The differences should be within __MINGW32__ guard.
+ */
+
 #ifndef _SYS_GMON_H_
 #define _SYS_GMON_H_
 
@@ -45,12 +46,16 @@
 
 #include <profile.h>
 
+#ifdef __MINGW32__
+#include <_bsd_types.h>
+#endif /* __MINGW32__*/
+
 /*
  * Structure prepended to gmon.out profiling data file.
  */
 struct gmonhdr {
-	u_long	lpc;		/* base pc address of sample buffer */
-	u_long	hpc;		/* max pc address of sampled buffer */
+	size_t	lpc;		/* base pc address of sample buffer */
+	size_t	hpc;		/* max pc address of sampled buffer */
 	int	ncnt;		/* size of sample buffer (plus this header) */
 	int	version;	/* version number */
 	int	profrate;	/* profiling clock rate */
@@ -106,7 +111,7 @@ struct gmonhdr {
 #define MAXARCS		((1 << (8 * sizeof(HISTCOUNTER))) - 2)
 
 struct tostruct {
-	u_long	selfpc;
+	size_t	selfpc;
 	long	count;
 	u_short	link;
 	u_short pad;
@@ -117,8 +122,8 @@ struct tostruct {
  * the called site and a count.
  */
 struct rawarc {
-	u_long	raw_frompc;
-	u_long	raw_selfpc;
+	size_t	raw_frompc;
+	size_t	raw_selfpc;
 	long	raw_count;
 };
 
@@ -134,16 +139,16 @@ struct rawarc {
 struct gmonparam {
 	int		state;
 	u_short		*kcount;
-	u_long		kcountsize;
+	size_t		kcountsize;
 	u_short		*froms;
-	u_long		fromssize;
+	size_t		fromssize;
 	struct tostruct	*tos;
-	u_long		tossize;
+	size_t		tossize;
 	long		tolimit;
-	u_long		lowpc;
-	u_long		highpc;
-	u_long		textsize;
-	u_long		hashfraction;
+	size_t		lowpc;
+	size_t		highpc;
+	size_t		textsize;
+	size_t		hashfraction;
 };
 extern struct gmonparam _gmonparam;
 
