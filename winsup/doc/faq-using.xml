@@ -395,18 +395,33 @@ set is 65001.</para>
 <qandaentry id="faq.using.multiple-copies">
 <question><para>Is it OK to have multiple copies of the DLL?</para></question>
 <answer>
-<para>You should only have one copy of the Cygwin DLL on your system.  If you
-have multiple versions, they will conflict and cause problems.
+<para>Yes, as long as they are used in strictly separated installations.</para>
+<para>The Cygwin DLL has to handle various sharing situations between
+multiple processes.  It has to keep a process table.  It has to maintain
+a mount table which is based on the installation path of the Cygwin DLL.</para>
+<para>For that reason, the Cygwin DLL maintains shared resources based on
+a hash value created from its own installation path.  Each Cygwin DLL
+on the machine constitutes a Cygwin installation, with the directory
+the Cygwin DLL resides in treated as "/bin", the parent directory as "/".
 </para>
+<para>Therefore, you can install two or more separate Cygwin distros on
+a single machine.  Each of these installations use their own Cygwin DLL,
+and they don't share the default POSIX paths, nor process tables, nor
+any other shared resource used to maintain the installation.</para>
+<para>However, a clean separation requires that you don't try to run
+executables of one Cygwin installation from processes running in another
+Cygwin installation.  This may or may not work, but the chances that the
+result is not what you expect are pretty high.</para>
 <para>If you get the error "shared region is corrupted" or "shared region
 version mismatch" it means you have multiple versions of cygwin1.dll
-running at the same time which conflict with each other.  This could happen,
-for example, if you update cygwin1.dll without exiting
-<emphasis>all</emphasis> Cygwin apps (including inetd) beforehand.
-</para>
+running at the same time which conflict with each other.  Apart from
+mixing executables of different Cygwin installations, this could also happen
+if you have one a single Cygwin installation, for example, if you update the
+Cygwin package without exiting <emphasis>all</emphasis> Cygwin apps (including
+services like sshd) beforehand.</para>
 <para>The only DLL that is sanctioned by the Cygwin project is the one that
 you get by running <ulink url="http://cygwin.com/setup.exe">setup.exe</ulink>,
-installed in the directory controlled by this program.  If you have other
+installed in a directory controlled by this program.  If you have other
 versions on your system and desire help from the cygwin project, you should
 delete or rename all DLLs that are not installed by
 <filename>setup.exe</filename>.
@@ -422,15 +437,17 @@ cygwin-mounted filesystems (as Cygwin 'find' would do).
 <qandaentry id="faq.using.third-party.multiple-copies">
 <question><para>
 I read the above but I want to bundle Cygwin with a product, and ship it
-to customer sites.  How can I do this without conflicting with any
-Cygwin installed by the user?
+to customer sites.  How can I do this without conflicting with any Cygwin
+installed by the user?
 </para></question>
 <answer><para>
-Third party developers who wish to use Cygwin should check if
-there is a version of cygwin installed and use the installed
-version if it is newer, or conditionally upgrade if it is not.
-(If you write a tool to make this easy, consider contributing
-it for others to use)
+Usually, if you keep your installation separate, nothing bad should happen.
+However, for the user's convenience, and to avoid potential problems which
+still can occur, consider to integrate your product with an already existing
+Cygwin installation on the user's machine, or, if there is none, consider
+to install the official Cygwin distro on behalf of the user and integrate
+your tools from there.  (If you write a tool to make this easy, consider
+contributing it for others to use)
 </para></answer></qandaentry>
 
 <qandaentry id="faq.using.bundling-cygwin">
