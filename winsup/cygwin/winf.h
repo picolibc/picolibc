@@ -43,7 +43,7 @@ class av
 	cfree (argv);
       }
   }
-  int unshift (const char *what, int conv = 0);
+  int unshift (const char *what, int conv = 0) __reg2;
   operator char **() {return argv;}
   void all_calloced () {calloced = argc;}
   void replace0_maybe (const char *arg0)
@@ -61,7 +61,8 @@ class av
       argv[i] = cstrdup1 (argv[i]);
     calloced = argc;
   }
-  int setup (const char *, path_conv&, const char *, int, const char *const *, bool) __reg3;
+  int setup (const char *, path_conv&, const char *, int, const char *const *,
+	     bool) __reg3;
 };
 
 class linebuf

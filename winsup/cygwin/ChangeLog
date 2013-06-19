@@ -1,5 +1,9 @@
 2013-06-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* winf.h (av::unshift): Make __reg2.
+
+2013-06-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* spawn.cc (child_info_spawn::worker): Eliminate call to newargv.set()
 	in favor of conglomerated newargv.setup().  Let newargv.setup() decide
 	when to call dup_all().  Only set argc and argv for cygwin processes.
