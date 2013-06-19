@@ -1,3 +1,21 @@
+2013-06-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* spawn.cc (child_info_spawn::worker): Eliminate call to newargv.set()
+	in favor of conglomerated newargv.setup().  Let newargv.setup() decide
+	when to call dup_all().  Only set argc and argv for cygwin processes.
+	(av::setup): Rename from av::fixup.  Accept argc and argv parameters.
+	Fill out argv and argc here.  Duplicate whole argv structure when this
+	is a Cygwin executable.
+	* winf.cc (linebuf::fromargv): Don't bother duplicating argv elements
+	since they will never be used.
+	* winf.h (av::set): Delete.
+	(av::setup): Rename from av::fixup.  Add two parameters.
+	(av::replace0_maybe): Assign calloced to 1 rather than 'true' for
+	clarity.
+	(av::dup_maybe): Delete.
+	(av::dup_all): Set calloced to show that we have duplicated all of the
+	arguments in the list.
+
 2013-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nlsfuncs.cc (__collate_range_cmp): Convert input to wchar_t and call

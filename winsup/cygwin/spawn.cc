@@ -359,8 +359,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   for (ac = 0; argv[ac]; ac++)
     /* nothing */;
 
-  newargv.set (ac, argv);
-
   int err;
   const char *ext;
   if ((ext = perhaps_suffix (prog_arg, real_path, err, FE_NADA)) == NULL)
@@ -370,7 +368,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       goto out;
     }
 
-  res = newargv.fixup (prog_arg, real_path, ext, p_type_exec);
+  res = newargv.setup (prog_arg, real_path, ext, ac, argv, p_type_exec);
 
   if (res)
     goto out;
@@ -405,7 +403,10 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   else
     {
       if (real_path.iscygexec ())
-	newargv.dup_all ();
+	{
+	  moreinfo->argc = newargv.argc;
+	  moreinfo->argv = newargv;
+	}
       else if (!one_line.fromargv (newargv, real_path.get_win32 (),
 				   real_path.iscygexec ()))
 	{
@@ -413,10 +414,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  goto out;
 	}
 
-
-      newargv.all_calloced ();
-      moreinfo->argc = newargv.argc;
-      moreinfo->argv = newargv;
 
       if (mode != _P_OVERLAY || !real_path.iscygexec ()
 	  || !DuplicateHandle (GetCurrentProcess (), myself.shared_handle (),
@@ -1073,174 +1070,177 @@ spawnvpe (int mode, const char *file, const char * const *argv,
 }
 
 int
-av::fixup (const char *prog_arg, path_conv& real_path, const char *ext,
-	   bool p_type_exec)
+av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
+	   int argc, const char *const *argv, bool p_type_exec)
 {
   const char *p;
   bool exeext = ascii_strcasematch (ext, ".exe");
-  if ((exeext && real_path.iscygexec ()) || ascii_strcasematch (ext, ".bat"))
-    return 0;
-  if (!*ext && ((p = ext - 4) > real_path.get_win32 ())
-      && (ascii_strcasematch (p, ".bat") || ascii_strcasematch (p, ".cmd")
-	  || ascii_strcasematch (p, ".btm")))
-    return 0;
-  while (1)
-    {
-      char *pgm = NULL;
-      char *arg1 = NULL;
-      char *ptr, *buf;
-      OBJECT_ATTRIBUTES attr;
-      IO_STATUS_BLOCK io;
-      HANDLE h;
-      NTSTATUS status;
-      LARGE_INTEGER size;
+  new (this) av (argc, argv);
+  if ((exeext && real_path.iscygexec ()) || ascii_strcasematch (ext, ".bat")
+      || (!*ext && ((p = ext - 4) > real_path.get_win32 ())
+	  && (ascii_strcasematch (p, ".bat") || ascii_strcasematch (p, ".cmd")
+	      || ascii_strcasematch (p, ".btm"))))
+    /* no extra checks needed */;
+  else
+    while (1)
+      {
+	char *pgm = NULL;
+	char *arg1 = NULL;
+	char *ptr, *buf;
+	OBJECT_ATTRIBUTES attr;
+	IO_STATUS_BLOCK io;
+	HANDLE h;
+	NTSTATUS status;
+	LARGE_INTEGER size;
 
-      status = NtOpenFile (&h, SYNCHRONIZE | GENERIC_READ,
-			   real_path.get_object_attr (attr, sec_none_nih),
-			   &io, FILE_SHARE_VALID_FLAGS,
-			   FILE_SYNCHRONOUS_IO_NONALERT
-			   | FILE_OPEN_FOR_BACKUP_INTENT
-			   | FILE_NON_DIRECTORY_FILE);
-      if (!NT_SUCCESS (status))
+	status = NtOpenFile (&h, SYNCHRONIZE | GENERIC_READ,
+			     real_path.get_object_attr (attr, sec_none_nih),
+			     &io, FILE_SHARE_VALID_FLAGS,
+			     FILE_SYNCHRONOUS_IO_NONALERT
+			     | FILE_OPEN_FOR_BACKUP_INTENT
+			     | FILE_NON_DIRECTORY_FILE);
+	if (!NT_SUCCESS (status))
+	  {
+	    /* File is not readable?  Doesn't mean it's not executable.
+	       Test for executability and if so, just assume the file is
+	       a cygwin executable and go ahead. */
+	    if (status == STATUS_ACCESS_DENIED && real_path.has_acls ()
+		&& check_file_access (real_path, X_OK, true) == 0)
+	      {
+		real_path.set_cygexec (true);
+		break;
+	      }
+	    goto err;
+	  }
+	if (!GetFileSizeEx (h, &size))
+	  {
+	    NtClose (h);
+	    goto err;
+	  }
+	if (size.QuadPart > (LONGLONG) wincap.allocation_granularity ())
+	  size.LowPart = wincap.allocation_granularity ();
+
+	HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY,
+				       0, 0, NULL);
+	NtClose (h);
+	if (!hm)
+	  {
+	    /* ERROR_FILE_INVALID indicates very likely an empty file. */
+	    if (GetLastError () == ERROR_FILE_INVALID)
+	      {
+		debug_printf ("zero length file, treat as script.");
+		goto just_shell;
+	      }
+	    goto err;
+	  }
+	/* Try to map the first 64K of the image.  That's enough for the local
+	   tests, and it's enough for hook_or_detect_cygwin to compute the IAT
+	   address. */
+	buf = (char *) MapViewOfFile (hm, FILE_MAP_READ, 0, 0, size.LowPart);
+	if (!buf)
+	  {
+	    CloseHandle (hm);
+	    goto err;
+	  }
+
 	{
-	  /* File is not readable?  Doesn't mean it's not executable.
-	     Test for executability and if so, just assume the file is
-	     a cygwin executable and go ahead. */
-	  if (status == STATUS_ACCESS_DENIED && real_path.has_acls ()
-	      && check_file_access (real_path, X_OK, true) == 0)
+	  myfault efault;
+	  if (efault.faulted ())
 	    {
-	      real_path.set_cygexec (true);
+	      UnmapViewOfFile (buf);
+	      CloseHandle (hm);
+	      real_path.set_cygexec (false);
 	      break;
 	    }
-	  goto err;
-	}
-      if (!GetFileSizeEx (h, &size))
-	{
-	  NtClose (h);
-	  goto err;
-	}
-      if (size.QuadPart > (LONGLONG) wincap.allocation_granularity ())
-	size.LowPart = wincap.allocation_granularity ();
-
-      HANDLE hm = CreateFileMapping (h, &sec_none_nih, PAGE_READONLY,
-				     0, 0, NULL);
-      NtClose (h);
-      if (!hm)
-	{
-	  /* ERROR_FILE_INVALID indicates very likely an empty file. */
-	  if (GetLastError () == ERROR_FILE_INVALID)
+	  if (buf[0] == 'M' && buf[1] == 'Z')
 	    {
-	      debug_printf ("zero length file, treat as script.");
-	      goto just_shell;
+	      WORD subsys;
+	      unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
+	      win16_exe = off < sizeof (IMAGE_DOS_HEADER);
+	      if (!win16_exe)
+		real_path.set_cygexec (hook_or_detect_cygwin (buf, NULL,
+							      subsys, hm));
+	      else
+		real_path.set_cygexec (false);
+	      UnmapViewOfFile (buf);
+	      CloseHandle (hm);
+	      break;
 	    }
-	  goto err;
 	}
-      /* Try to map the first 64K of the image.  That's enough for the local
-	 tests, and it's enough for hook_or_detect_cygwin to compute the IAT
-	 address. */
-      buf = (char *) MapViewOfFile (hm, FILE_MAP_READ, 0, 0, size.LowPart);
-      if (!buf)
-	{
-	  CloseHandle (hm);
-	  goto err;
-	}
+	CloseHandle (hm);
 
-      {
-	myfault efault;
-	if (efault.faulted ())
+	debug_printf ("%s is possibly a script", real_path.get_win32 ());
+
+	ptr = buf;
+	if (*ptr++ == '#' && *ptr++ == '!')
 	  {
-	    UnmapViewOfFile (buf);
-	    CloseHandle (hm);
-	    real_path.set_cygexec (false);
-	    break;
+	    ptr += strspn (ptr, " \t");
+	    size_t len = strcspn (ptr, "\r\n");
+	    if (len)
+	      {
+		char *namebuf = (char *) alloca (len + 1);
+		memcpy (namebuf, ptr, len);
+		namebuf[len] = '\0';
+		for (ptr = pgm = namebuf; *ptr; ptr++)
+		  if (!arg1 && (*ptr == ' ' || *ptr == '\t'))
+		    {
+		      /* Null terminate the initial command and step over any
+			 additional white space.  If we've hit the end of the
+			 line, exit the loop.  Otherwise, we've found the first
+			 argument. Position the current pointer on the last known
+			 white space. */
+		      *ptr = '\0';
+		      char *newptr = ptr + 1;
+		      newptr += strspn (newptr, " \t");
+		      if (!*newptr)
+			break;
+		      arg1 = newptr;
+		      ptr = newptr - 1;
+		    }
+	      }
 	  }
-	if (buf[0] == 'M' && buf[1] == 'Z')
+	UnmapViewOfFile (buf);
+  just_shell:
+	if (!pgm)
 	  {
-	    WORD subsys;
-	    unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
-	    win16_exe = off < sizeof (IMAGE_DOS_HEADER);
-	    if (!win16_exe)
-	      real_path.set_cygexec (hook_or_detect_cygwin (buf, NULL,
-							    subsys, hm));
-	    else
-	      real_path.set_cygexec (false);
-	    UnmapViewOfFile (buf);
-	    CloseHandle (hm);
-	    break;
+	    if (!p_type_exec)
+	      {
+		/* Not called from exec[lv]p.  Don't try to treat as script. */
+		debug_printf ("%s is not a valid executable",
+			      real_path.get_win32 ());
+		set_errno (ENOEXEC);
+		return -1;
+	      }
+	    if (ascii_strcasematch (ext, ".com"))
+	      break;
+	    pgm = (char *) "/bin/sh";
+	    arg1 = NULL;
 	  }
+
+	/* Check if script is executable.  Otherwise we start non-executable
+	   scripts successfully, which is incorrect behaviour. */
+	if (real_path.has_acls ()
+	    && check_file_access (real_path, X_OK, true) < 0)
+	  return -1;	/* errno is already set. */
+
+	/* Replace argv[0] with the full path to the script if this is the
+	   first time through the loop. */
+	replace0_maybe (prog_arg);
+
+	/* pointers:
+	 * pgm	interpreter name
+	 * arg1	optional string
+	 */
+	if (arg1)
+	  unshift (arg1);
+
+	/* FIXME: This should not be using FE_NATIVE.  It should be putting
+	   the posix path on the argv list. */
+	find_exec (pgm, real_path, "PATH=", FE_NATIVE, &ext);
+	unshift (real_path.get_win32 (), 1);
       }
-      CloseHandle (hm);
-
-      debug_printf ("%s is possibly a script", real_path.get_win32 ());
-
-      ptr = buf;
-      if (*ptr++ == '#' && *ptr++ == '!')
-	{
-	  ptr += strspn (ptr, " \t");
-	  size_t len = strcspn (ptr, "\r\n");
-	  if (len)
-	    {
-	      char *namebuf = (char *) alloca (len + 1);
-	      memcpy (namebuf, ptr, len);
-	      namebuf[len] = '\0';
-	      for (ptr = pgm = namebuf; *ptr; ptr++)
-		if (!arg1 && (*ptr == ' ' || *ptr == '\t'))
-		  {
-		    /* Null terminate the initial command and step over any
-		       additional white space.  If we've hit the end of the
-		       line, exit the loop.  Otherwise, we've found the first
-		       argument. Position the current pointer on the last known
-		       white space. */
-		    *ptr = '\0';
-		    char *newptr = ptr + 1;
-		    newptr += strspn (newptr, " \t");
-		    if (!*newptr)
-		      break;
-		    arg1 = newptr;
-		    ptr = newptr - 1;
-		  }
-	    }
-	}
-      UnmapViewOfFile (buf);
-just_shell:
-      if (!pgm)
-	{
-	  if (!p_type_exec)
-	    {
-	      /* Not called from exec[lv]p.  Don't try to treat as script. */
-	      debug_printf ("%s is not a valid executable",
-			    real_path.get_win32 ());
-	      set_errno (ENOEXEC);
-	      return -1;
-	    }
-	  if (ascii_strcasematch (ext, ".com"))
-	    break;
-	  pgm = (char *) "/bin/sh";
-	  arg1 = NULL;
-	}
-
-      /* Check if script is executable.  Otherwise we start non-executable
-	 scripts successfully, which is incorrect behaviour. */
-      if (real_path.has_acls ()
-	  && check_file_access (real_path, X_OK, true) < 0)
-	return -1;	/* errno is already set. */
-
-      /* Replace argv[0] with the full path to the script if this is the
-	 first time through the loop. */
-      replace0_maybe (prog_arg);
-
-      /* pointers:
-       * pgm	interpreter name
-       * arg1	optional string
-       */
-      if (arg1)
-	unshift (arg1);
-
-      /* FIXME: This should not be using FE_NATIVE.  It should be putting
-	 the posix path on the argv list. */
-      find_exec (pgm, real_path, "PATH=", FE_NATIVE, &ext);
-      unshift (real_path.get_win32 (), 1);
-    }
+  if (real_path.iscygexec ())
+    dup_all ();
   return 0;
 
 err:

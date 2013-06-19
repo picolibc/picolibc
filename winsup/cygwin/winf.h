@@ -34,14 +34,12 @@ class av
     memcpy (argv, av_in, (argc + 1) * sizeof (char *));
   }
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
-  void set (int ac_in, const char * const *av_in) {new (this) av (ac_in, av_in);}
   ~av ()
   {
     if (argv)
       {
 	for (int i = 0; i < calloced; i++)
-	  if (argv[i])
-	    cfree (argv[i]);
+	  cfree (argv[i]);
 	cfree (argv);
       }
   }
@@ -54,20 +52,16 @@ class av
     if (!calloced)
       {
 	argv[0] = cstrdup1 (arg0);
-	calloced = true;
+	calloced = 1;
       }
-  }
-  void dup_maybe (int i)
-  {
-    if (i >= calloced)
-      argv[i] = cstrdup1 (argv[i]);
   }
   void dup_all ()
   {
     for (int i = calloced; i < argc; i++)
       argv[i] = cstrdup1 (argv[i]);
+    calloced = argc;
   }
-  int fixup (const char *, path_conv&, const char *, bool);
+  int setup (const char *, path_conv&, const char *, int, const char *const *, bool) __reg3;
 };
 
 class linebuf
