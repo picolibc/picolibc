@@ -1187,13 +1187,15 @@ strcoll (const char *s1, const char *s2)
   return ret - CSTR_EQUAL;
 }
 
-/* BSD.  Used in glob.cc and regcomp.c, for instance. */
+/* BSD.  Used from glob.cc, fnmatch.c and regcomp.c.  Make sure caller is
+   using wide chars.  Unfortunately the definition of this functions hides
+   the required input type. */
 extern "C" int
 __collate_range_cmp (int c1, int c2)
 {
-  char s1[2] = { (char) c1, '\0' };
-  char s2[2] = { (char) c2, '\0' };
-  return strcoll (s1, s2);
+  wchar_t s1[2] = { (wchar_t) c1, L'\0' };
+  wchar_t s2[2] = { (wchar_t) c2, L'\0' };
+  return wcscoll (s1, s2);
 }
 
 extern "C" size_t

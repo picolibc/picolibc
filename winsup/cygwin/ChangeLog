@@ -1,5 +1,11 @@
 2013-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* nlsfuncs.cc (__collate_range_cmp): Convert input to wchar_t and call
+	wcscoll since all calling functions are using wide chars.  Explain in
+	preceeding comment.
+
+2013-06-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* spawn.cc (child_info_spawn::worker): Eliminate wascygexec.
 
 2013-06-18  Christopher Faylor  <me.cygwin2013@cgf.cx>
