@@ -1,5 +1,9 @@
 2013-06-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* faq-using.xml (faq.using.private-cygwin): Drop.
+
+2013-06-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* faq-using.xml (faq.using.multiple-copies): Modernize to reflect
 	installation separation since Cygwin 1.7.
 	(faq.using.third-party.multiple-copies): Ditto.

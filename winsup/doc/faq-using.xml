@@ -464,27 +464,6 @@ you must either provide those applications' source code under a
 GPL-compatible license, *or* purchase a cygwin license from Red Hat.
 </para></answer></qandaentry>
 
-<qandaentry id="faq.using.private-cygwin">
-<question><para>
-So I can't install a private version of the Cygwin DLL without
-conflicting with the system cygwin?
-</para></question>
-<answer><para>
-Actually, if you are very careful, you can have two different versions
-of the Cygwin DLL installed on your system at the same time but they
-must be run serially.  The only exception from this rule is, if one of
-the DLLs is a pre-1.7 DLL and the other is a 1.7.0 or later DLL.  These
-DLLs can work concurrently without knowing about each other due to
-massive changes using shared resources in Cygwin 1.7.  However,
-processes using different DLLs will not interact with each other
-correctly, so keep them separate except you really really know what
-you're doing.
-</para>
-<para>This usage is not recommeded for novices.  Only limited support will be
-provided in the <ulink url="http://cygwin.com/lists.html">mailing lists</ulink>
-if you run into problems.
-</para></answer></qandaentry>
-
 <qandaentry id="faq.using.older-cygwin-conflict">
 <question><para>
 But doesn't that mean that if some application installs an older Cygwin
