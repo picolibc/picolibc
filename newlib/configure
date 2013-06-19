@@ -793,6 +793,7 @@ enable_newlib_fvwrite_in_streamio
 enable_newlib_fseek_optimization
 enable_newlib_wide_orient
 enable_newlib_nano_malloc
+enable_newlib_unbuf_stream_opt
 enable_multilib
 enable_target_optspace
 enable_malloc_debugging
@@ -1460,6 +1461,7 @@ Optional Features:
   --disable-newlib-fseek-optimization    disable fseek optimization
   --disable-newlib-wide-orient    Turn off wide orientation in streamio
   --enable-newlib-nano-malloc    use small-footprint nano-malloc implementation
+  --disable-newlib-unbuf-stream-opt    disable unbuffered stream optimization in streamio
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -2408,6 +2410,19 @@ if test "${enable_newlib_nano_malloc+set}" = set; then :
  fi
 else
   newlib_nano_malloc=no
+fi
+
+# Check whether --enable-newlib-unbuf-stream-opt was given.
+if test "${enable_newlib_unbuf_stream_opt+set}" = set; then :
+  enableval=$enable_newlib_unbuf_stream_opt; if test "${newlib_unbuf_stream_opt+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_unbuf_stream_opt=yes ;;
+    no)  newlib_unbuf_stream_opt=no  ;;
+    *)   as_fn_error $? "bad value ${enableval} for newlib-unbuf-stream-opt option" "$LINENO" 5 ;;
+  esac
+ fi
+else
+  newlib_unbuf_stream_opt=yes
 fi
 
 
@@ -12314,7 +12329,14 @@ fi
 
 if test "${newlib_nano_malloc}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
-#define NEWLIB_NANO_MALLOC 1
+#define _NANO_MALLOC 1
+_ACEOF
+
+fi
+
+if test "${newlib_unbuf_stream_opt}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _UNBUF_STREAM_OPT 1
 _ACEOF
 
 fi

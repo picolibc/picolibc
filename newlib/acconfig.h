@@ -64,6 +64,9 @@
 /* Define if wide char orientation is supported.  */
 #undef  _WIDE_ORIENT
 
+/* Define if unbuffered stream file optimization is supported.  */
+#undef _UNBUF_STREAM_OPT
+
 @BOTTOM@
 /*
  * Iconv encodings enabled ("to" direction)

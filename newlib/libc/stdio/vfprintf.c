@@ -447,6 +447,7 @@ int __sfputs_r (struct _reent *, FILE *, _CONST char *buf, size_t);
 int __sprint_r (struct _reent *, FILE *, register struct __suio *);
 #endif /* !INTEGER_ONLY */
 
+#ifdef _UNBUF_STREAM_OPT
 /*
  * Helper function for `fprintf to unbuffered unix file': creates a
  * temporary buffer.  We only work on write-only files; this avoids
@@ -492,6 +493,7 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 #endif
 	return (ret);
 }
+#endif /* _UNBUF_STREAM_OPT */
 #endif /* !STRING_ONLY */
 
 
@@ -865,12 +867,14 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 		return (EOF);
 	}
 
+#ifdef _UNBUF_STREAM_OPT
 	/* optimise fprintf(stderr) (and other unbuffered Unix files) */
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0) {
 		_newlib_flockfile_exit (fp);
 		return (__sbprintf (data, fp, fmt0, ap));
 	}
+#endif
 #else /* STRING_ONLY */
         /* Create initial buffer if we are called by asprintf family.  */
         if (fp->_flags & __SMBF && !fp->_bf._base)

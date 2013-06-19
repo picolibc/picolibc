@@ -321,6 +321,13 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      support `--enable-malloc-debugging' any more.
      Disabled by default.
 
+`--disable-newlib-unbuf-stream-opt'
+     NEWLIB does optimization when `fprintf to write only unbuffered unix
+     file'.  It creates a temorary buffer to do the optimization that
+     increases stack consumption by about `BUFSIZ' bytes.  This option
+     disables the optimization and saves size of text and stack.
+     Enabled by default.
+
 `--enable-multilib'
      Build many library versions.
      Enabled by default.
