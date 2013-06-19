@@ -1,3 +1,7 @@
+2013-06-19  Will Newton  <will.newton@linaro.org>
+
+	* aarch64.h: Remove R_AARCH64_IRELATIVE.
+
 2013-06-07  Will Newton  <will.newton@linaro.org>
 
 	* aarch64.h: Add R_AARCH64_IRELATIVE reloc.
