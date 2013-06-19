@@ -17,3 +17,6 @@ Bug fixes:
 
 - Update profiling code to latest from Mingw-w64.  Allows profiling on x86_64
   now and fixes http://cygwin.com/ml/cygwin/2013-06/msg00376.html
+
+- Fix character comparisons in certain scenarios within the functions glob(3),
+  fnmatch(3), and regcomp(3).  All Unicode chars beyond U+0100 are affected.
