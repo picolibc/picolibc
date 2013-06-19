@@ -1,4 +1,8 @@
-2013-06-13  Bin Cheng  <bin.cheng@arm.com>
+2013-06-19  Terraneo Federico  <fede.tft@hotmail.it>
+
+	* libc/posix/readdir_r.c: Fix potential read past dirp->dd_buf.
+
+2013-06-13  Bir Cheng  <bin.cheng@arm.com>
 
 	* README: Add description for NEWLIB's feature customizing
 	configuration options.
