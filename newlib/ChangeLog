@@ -8,13 +8,6 @@
 	unbuffered stream files.
 	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Likewise.
 	* README: Add description about the option.
-	* newlib.hin (_UNBUF_STREAM_OPT): Undefine.
-	* configure.in (--enable-newlib-unbuf-stream-opt): New option.
-	* configure: Regenerate.
-	* libc/stdio/vfprintf.c (_VFPRINTF_R): Don't do optimization on
-	unbuffered stream files.
-	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Likewise.
-	* README: Add description about the option.
 
 2013-06-19  Terraneo Federico  <fede.tft@hotmail.it>
 
