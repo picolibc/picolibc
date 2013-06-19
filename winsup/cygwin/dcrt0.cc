@@ -481,7 +481,7 @@ child_info_fork::alloc_stack ()
     alloc_stack_hard_way (stackp);
   else
     {
-      char *st = (char *) stacktop - 4096;
+      char *st = (char *) stacktop;
       while (_tlstop >= st)
 	stackp = getstack (stackp);
       stackaddr = 0;

@@ -1,3 +1,8 @@
+2013-06-18  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* dcrt0.cc (child_info_fork::alloc_stack): Don't subtract 4096 from
+	stack pointer since getstack() already does that.
+
 2013-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gmon.c: Drop gratuitous inclusion of strings.h.  Remove __MINGW32__
