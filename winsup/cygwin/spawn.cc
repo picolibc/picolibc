@@ -327,7 +327,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   tmp_pathbuf tp;
   PWCHAR runpath = tp.w_get ();
   int c_flags;
-  bool wascygexec;
 
   bool null_app_name = false;
   STARTUPINFOW si = {};
@@ -371,7 +370,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       goto out;
     }
 
-  wascygexec = real_path.iscygexec ();
   res = newargv.fixup (prog_arg, real_path, ext, p_type_exec);
 
   if (res)
@@ -406,7 +404,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
     }
   else
     {
-      if (wascygexec)
+      if (real_path.iscygexec ())
 	newargv.dup_all ();
       else if (!one_line.fromargv (newargv, real_path.get_win32 (),
 				   real_path.iscygexec ()))
