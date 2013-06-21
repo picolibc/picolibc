@@ -3212,6 +3212,12 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
   bool relative = !!(what & CCP_RELATIVE);
   what &= CCP_CONVTYPE_MASK;
 
+  if (!from)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
   switch (what)
     {
     case CCP_POSIX_TO_WIN_A:

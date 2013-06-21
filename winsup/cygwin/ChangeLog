@@ -1,3 +1,9 @@
+2013-06-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (cygwin_conv_path): Handle NULL "from" path gracefully.
+	* path.sgml (func-cygwin-conv-path): Document returning EINVAL if
+	"from" is NULL.
+
 2013-06-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* winf.h (av::unshift): Make __reg2.

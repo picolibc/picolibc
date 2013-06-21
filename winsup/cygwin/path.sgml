@@ -42,7 +42,7 @@ buffer size in bytes.  Otherwise, it returns 0 on success, or -1 on
 error and errno is set to one of the below values.</para>
 
 <programlisting>
-    EINVAL        what has an invalid value.
+    EINVAL        what has an invalid value or from is NULL.
     EFAULT        from or to point into nirvana.
     ENAMETOOLONG  the resulting path is longer than 32K, or, in case
                   of what == CCP_POSIX_TO_WIN_A, longer than MAX_PATH.
