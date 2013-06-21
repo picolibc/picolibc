@@ -1,5 +1,10 @@
 2013-06-21  Will Newton  <will.newton@linaro.org>
 
+	* libc/machine/arm/strlen-armv7.S: Import latest strlen
+	code from Linaro cortex-strings.
+
+2013-06-21  Will Newton  <will.newton@linaro.org>
+
 	* MAINTAINERS: Add Will Newton to Write After Approval.
 
 2013-06-19  Bin Cheng  <bin.cheng@arm.com>
