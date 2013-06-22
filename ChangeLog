@@ -1,3 +1,10 @@
+2013-06-22  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* configure.ac (mips*-*-bsd*, mips*-*-ultrix*, mips*-*-osf*)
+	(mips*-*-ecoff*, mips*-*-pe*, mips*-*-irix* [v4 and earlier])
+	(mips*-*-lnews*, mips*-*-riscos*): Add gas and ld to noconfigdirs.
+	* configure: Regenerate.
+
 2013-06-01  George Thomas <george.thomas@atmel.com>
 
         * include/opcode/avr.h: Rename AVR_ISA_XCH to AVR_ISA_RMW. Remove
