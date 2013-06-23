@@ -1811,7 +1811,7 @@ extern const int bfd_mips16_num_opcodes;
 
    Coprocessor instructions:
    "E" 5-bit target register (MICROMIPSOP_*_RT)
-   "G" 5-bit destination register (MICROMIPSOP_*_RD)
+   "G" 5-bit destination register (MICROMIPSOP_*_RS)
    "H" 3-bit sel field for (D)MTC* and (D)MFC* (MICROMIPSOP_*_SEL)
    "+D" combined destination register ("G") and sel ("H") for CP0 ops,
 	for pretty-printing in disassembly only
