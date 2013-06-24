@@ -4,6 +4,18 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.21"><title>What's new and what changed from 1.7.20 to 1.7.21</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+New API: rawmemchr.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.19"><title>What's new and what changed from 1.7.18 to 1.7.19</title>
 
 <itemizedlist mark="bullet">
