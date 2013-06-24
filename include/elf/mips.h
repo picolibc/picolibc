@@ -803,8 +803,14 @@ extern void bfd_mips_elf32_swap_reginfo_out
    PLT entries and traditional MIPS lazy binding stubs.  We mark the former
    with STO_MIPS_PLT to distinguish them from the latter.  */
 #define STO_MIPS_PLT		0x8
-#define ELF_ST_IS_MIPS_PLT(other) (((other) & STO_MIPS_FLAGS) == STO_MIPS_PLT)
-#define ELF_ST_SET_MIPS_PLT(other) (((other) & ~STO_MIPS_FLAGS) | STO_MIPS_PLT)
+#define ELF_ST_IS_MIPS_PLT(other)					\
+  ((ELF_ST_IS_MIPS16 (other)						\
+    ? ((other) & (~STO_MIPS16 & STO_MIPS_FLAGS))			\
+    : ((other) & STO_MIPS_FLAGS)) == STO_MIPS_PLT)
+#define ELF_ST_SET_MIPS_PLT(other)					\
+  ((ELF_ST_IS_MIPS16 (other)						\
+    ? ((other) & (STO_MIPS16 | ~STO_MIPS_FLAGS))			\
+    : ((other) & ~STO_MIPS_FLAGS)) | STO_MIPS_PLT)
 
 /* This value is used to mark PIC functions in an object that mixes
    PIC and non-PIC.  Note that this bit overlaps with STO_MIPS16,
