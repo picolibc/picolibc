@@ -1,5 +1,10 @@
 2013-06-24  Terraneo Federico  <fede.tft@hotmail.it>
 
+	* libc/reent/reent.c (_reclaim_reent): Free also _misc and
+	_signal_buf.
+
+2013-06-24  Terraneo Federico  <fede.tft@hotmail.it>
+
 	* libc/include/sys/reent.h (_ATEXIT_INIT_PTR): Remove.
 	(_REENT_INIT_ATEXIT_PTR): Remove.
 	(_REENT_INIT_PTR): Reduce code size if _REENT_SMALL.

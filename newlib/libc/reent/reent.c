@@ -87,6 +87,10 @@ _DEFUN (_reclaim_reent, (ptr),
 	_free_r (ptr, ptr->_localtime_buf);
       if (ptr->_asctime_buf)
 	_free_r (ptr, ptr->_asctime_buf);
+	  if (ptr->_signal_buf)
+	_free_r (ptr, ptr->_signal_buf);
+	  if (ptr->_misc)
+	_free_r (ptr, ptr->_misc);
 #endif
 
 #ifndef _REENT_GLOBAL_ATEXIT
@@ -110,6 +114,11 @@ _DEFUN (_reclaim_reent, (ptr),
 
       if (ptr->_cvtbuf)
 	_free_r (ptr, ptr->_cvtbuf);
+    /* We should free _sig_func to avoid a memory leak, but how to
+	   do it safely considering that a signal may be delivered immediately
+	   after the free?
+	  if (ptr->_sig_func)
+	_free_r (ptr, ptr->_sig_func);*/
 
       if (ptr->__sdidinit)
 	{
