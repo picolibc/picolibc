@@ -1,3 +1,9 @@
+2013-06-24  Terraneo Federico  <fede.tft@hotmail.it>
+
+	* libc/include/sys/reent.h (_ATEXIT_INIT_PTR): Remove.
+	(_REENT_INIT_ATEXIT_PTR): Remove.
+	(_REENT_INIT_PTR): Reduce code size if _REENT_SMALL.
+
 2013-06-21  Will Newton  <will.newton@linaro.org>
 
 	* libc/machine/arm/strlen-armv7.S: Import latest strlen

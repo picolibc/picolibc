@@ -86,11 +86,6 @@ struct _atexit {
         struct _on_exit_args * _on_exit_args_ptr;
 };
 # define _ATEXIT_INIT {_NULL, 0, {_NULL}, _NULL}
-# define _ATEXIT_INIT_PTR(var) \
-  (var)->_next = _NULL; \
-  (var)->_ind = 0; \
-  (var)->_fns[0] = _NULL; \
-  (var)->_on_exit_args_ptr = _NULL
 #else
 struct _atexit {
 	struct	_atexit *_next;			/* next in list */
@@ -100,22 +95,13 @@ struct _atexit {
         struct _on_exit_args _on_exit_args;
 };
 # define _ATEXIT_INIT {_NULL, 0, {_NULL}, {{_NULL}, {_NULL}, 0, 0}}
-# define _ATEXIT_INIT_PTR(var) \
-  (var)->_next = _NULL; \
-  (var)->_ind = 0; \
-  (var)->_fns[0] = _NULL; \
-  (var)->_on_exit_args._fntypes = 0; \
-  (var)->_on_exit_args._fnargs[0] = _NULL
 #endif
 
 #ifdef _REENT_GLOBAL_ATEXIT
 # define _REENT_INIT_ATEXIT
-# define _REENT_INIT_ATEXIT_PTR(var, var0)
 #else
 # define _REENT_INIT_ATEXIT \
   _NULL, _ATEXIT_INIT,
-# define _REENT_INIT_ATEXIT_PTR(var, var0) \
-  (var)->_atexit = _NULL; _ATEXIT_INIT_PTR(var0);
 #endif
 
 /*
@@ -458,31 +444,11 @@ extern const struct __sFILE_fake __sf_fake_stderr;
   }
 
 #define _REENT_INIT_PTR(var) \
-  { (var)->_stdin = (__FILE *)&__sf_fake_stdin; \
+  { memset((var), 0, sizeof(*(var))); \
+    (var)->_stdin = (__FILE *)&__sf_fake_stdin; \
     (var)->_stdout = (__FILE *)&__sf_fake_stdout; \
     (var)->_stderr = (__FILE *)&__sf_fake_stderr; \
-    (var)->_errno = 0; \
-    (var)->_inc = 0; \
-    (var)->_emergency = _NULL; \
-    (var)->__sdidinit = 0; \
-    (var)->_current_category = 0; \
     (var)->_current_locale = "C"; \
-    (var)->_mp = _NULL; \
-    (var)->__cleanup = _NULL; \
-    (var)->_gamma_signgam = 0; \
-    (var)->_cvtlen = 0; \
-    (var)->_cvtbuf = _NULL; \
-    (var)->_r48 = _NULL; \
-    (var)->_localtime_buf = _NULL; \
-    (var)->_asctime_buf = _NULL; \
-    (var)->_sig_func = _NULL; \
-    _REENT_INIT_ATEXIT_PTR(var, &(var)->_atexit0) \
-    (var)->__sglue._next = _NULL; \
-    (var)->__sglue._niobs = 0; \
-    (var)->__sglue._iobs = _NULL; \
-    (var)->__sf = 0; \
-    (var)->_misc = _NULL; \
-    (var)->_signal_buf = _NULL; \
   }
 
 /* Only built the assert() calls if we are built with debugging.  */
