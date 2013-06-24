@@ -436,12 +436,13 @@ details. */
       265: Export __b64_ntop, __b64_pton.
       266: Export arc4random, arc4random_addrandom, arc4random_buf,
 	   arc4random_stir, arc4random_uniform.
+      267: Export rawmemchr.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 266
+#define CYGWIN_VERSION_API_MINOR 267
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

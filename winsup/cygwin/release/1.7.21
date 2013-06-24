@@ -1,6 +1,7 @@
 What's new:
 -----------
 
+- New API: rawmemchr.
 
 Bug fixes:
 ----------

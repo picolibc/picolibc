@@ -897,6 +897,7 @@ raise SIGFE
 rand NOSIGFE
 rand_r NOSIGFE
 random NOSIGFE
+rawmemchr NOSIGFE
 rcmd = cygwin_rcmd SIGFE
 rcmd_af = cygwin_rcmd_af SIGFE
 read SIGFE
