@@ -1,3 +1,20 @@
+2013-06-25  Yufeng Zhang  <Yufeng.Zhang@arm.com>
+
+	* aarch64/crt0.S (GEN_DWORD): New macro definition.
+	(PTR_REG): Ditto.
+	(PTR_SIZE): Ditto.
+	(PTR_LOG_SIZE): Ditto.
+	(start): Use GEN_DWORD to replace the .dword of HeapBase,
+	__bss_start__, __bss_end__, FUNCTION(_fini), env and
+	CommandLine; when __ILP32__ is defined, set the stack base to
+	the top end of the 32-bit address space if the returned value
+	from the Angel API call is larger than or equal to 4 GiB.
+	Also carry out sanity check on the heap base; abort if the
+	base is larger than or equal to 4 GiB.  Use other new
+	macros in the instructions that processes the argv arrays.
+	(StackBase): New lable; replace __stack_base__.
+	(__stack_base__): Set with StackBase or StackBase + 4.
+
 2013-05-30  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* rs6000/Makefile.in: Add sim-times support.  This file has been

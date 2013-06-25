@@ -41,6 +41,36 @@
 #define _fini	__libc_fini_array
 #endif
 
+/* In ELF64, the large addressing model is used and R_AARCH64_ABS64
+   reloc is generated to relocate a 64-bit address.  Since 64-bit
+   relocation is not available in ELF32, in order to have
+   a single code path for both ELF64 and ELF32 classes, we synthesize
+   a 64-bit relocation by using R_AARCH64_P32_ABS32 on one of the two
+   .word directives, depending on the endianness.  */
+
+.macro GEN_DWORD name
+#if defined(__ILP32__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	.word \name
+	.word 0
+#elif defined(__ILP32__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	.word 0
+	.word \name
+#else
+	.dword \name
+#endif
+.endm
+
+/* Help tackle the pointer size difference between ELF64 and ELF32.  */
+#ifdef __ILP32__
+#define PTR_REG(n)	w##n
+#define PTR_SIZE	4
+#define PTR_LOG_SIZE	2
+#else
+#define PTR_REG(n)	x##n
+#define PTR_SIZE	8
+#define PTR_LOG_SIZE	3
+#endif
+
 	.text
 .macro FUNC_START name
 	.global \name
@@ -71,10 +101,33 @@
 	   command line options to the AEM in order to define the values
 	   exposed here in the HeapInfo Angel call.  */
 	ldr	x0, .LC0		/* point at returned values */
-	ldr	x0, [x0, #8]		/* get heap_limit */
+	ldr	x1, [x0, #8]		/* get heap_limit */
+#ifdef __ILP32__
+	/* Sanity check on the heap base.  */
+	ldr	x0, [x0]		/* get heap_base */
+	tst	x0, #0xffffffff00000000
+	beq	1f
+	/* Exit with 1 if the heap base is not within the 32-bit address
+	   space.  */
+	mov	x0, ADP_Stopped_ApplicationExit & 0xff
+	movk	x0, ADP_Stopped_ApplicationExit >> 16, lsl #16
+	adrp	x1, HeapBase	/* Reuse to construct the parameter block.  */
+	add	x1, x1, #:lo12:HeapBase
+	str	x0, [x1]
+	mov	x0, 1
+	str	x0, [x1, #8]
+	mov	w0, #AngelSVC_Reason_ReportException
+	AngelSVCAsm AngelSVC
+1:
+	/* For the sake of safety, set the stack base to the top end of
+	   the 32-bit address space if the returned value from the
+	   Angel API call is larger than or equal to 4 GiB.  */
+	tst	x1, #0xffffffff00000000
+	csinv	w1, w1, wzr, eq
+#endif
 
 	/* Ensure quad-word stack alignment.  */
-	and	x0, x0, #~15
+	and	x0, x1, #~15
 	mov	sp, x0
 
 	/* Setup an initial dummy frame with saved fp=0 and saved lr=0 */
@@ -114,7 +167,7 @@
 	ldr	x2, .Lenvp	/* envp */
 
 	/* Put NULL at end of argv array.  */
-	str	x0, [x1, #-8]!
+	str	PTR_REG (0), [x1, #-PTR_SIZE]!
 
 	/* Skip leading blanks.  */
 .Lnext: ldrb	w3, [x8], #1
@@ -133,7 +186,7 @@
 	cinc	x8, x8, eq
 
 	/* Push arg pointer to argv, and bump argc.  */
-	str	x8, [x1, #-8]!
+	str	PTR_REG (8), [x1, #-PTR_SIZE]!
 	add	x0, x0, #1
 
 	/* Find end of arg string.  */
@@ -149,14 +202,14 @@
 
 	/* Reverse argv array.  */
 .Lendstr:
-	add	x3, x1, #0		/* sp = &argv[0] */
-	add	x4, x1, w0, uxtw #3	/* ep = &argv[argc] */
+	add	x3, x1, #0			/* sp = &argv[0] */
+	add	x4, x1, w0, uxtw #PTR_LOG_SIZE	/* ep = &argv[argc] */
 	cmp	x4, x3
 	b.lo	2f
-1:	ldr	x5, [x4, #-8]		/* x5 = ep[-1] */
-	ldr	x6, [x3]		/* x6 = *sp */
-	str	x6, [x4, #-8]!		/* *--ep = x6 */
-	str	x5, [x3], #8		/* *sp++ = x5 */
+1:	ldr	PTR_REG (5), [x4, #-PTR_SIZE]	/* PTR_REG (5) = ep[-1] */
+	ldr	PTR_REG (6), [x3]		/* PTR_REG (6) = *sp */
+	str	PTR_REG (6), [x4, #-PTR_SIZE]!	/* *--ep = PTR_REG (6) */
+	str	PTR_REG (5), [x3], #PTR_SIZE	/* *sp++ = PTR_REG (5) */
 	cmp	x4, x3
 	b.hi	1b
 2:
@@ -177,27 +230,32 @@ FUNCTION (_cpu_init_hook):
 
 	.align 3
 .LC0:
-	.dword	HeapBase
+	GEN_DWORD HeapBase
 .LC1:
-	.dword	__bss_start__
+	GEN_DWORD __bss_start__
 .LC2:
-	.dword	__bss_end__
+	GEN_DWORD __bss_end__
 .Lfini:
-	.dword	FUNCTION(_fini)
+	GEN_DWORD FUNCTION(_fini)
 .Lenvp:
-	.dword	env
+	GEN_DWORD env
 .Lcmdline:
-	.dword	CommandLine
+	GEN_DWORD CommandLine
 	.dword	255
 
 /*  Workspace for Angel calls.  */
 	.data
 	.align 3
 /*  Data returned by monitor SVC.  */
+#if defined(__ILP32__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	.set __stack_base__, StackBase + 4
+#else
+	.set __stack_base__, StackBase
+#endif
 	.global	__stack_base__
 HeapBase:	.dword	0
 HeapLimit:	.dword	0
-__stack_base__:	.dword	0
+StackBase:	.dword	0
 StackLimit:	.dword	0
 env:		.dword	0	/* Dummy environment array */
 CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled.  */
