@@ -2,7 +2,7 @@
 		   to wchar_t Win32 path including long path prefix if
 		   necessary.
 
-   Copyright 2009, 2011 Red Hat, Inc.
+   Copyright 2009, 2011, 2013 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -19,12 +19,12 @@ class wide_path
 
 public:
   wide_path () : wp (NULL) {}
-  wide_path (const char *mb_path)
+  wide_path (const char *mb_path, bool do_prefix = true)
   {
     int len = mbstowcs (NULL, mb_path, 0) + 1;
     wp = (wchar_t *) malloc ((len + 6) * sizeof (wchar_t));
     wchar_t *wp_p = wp;
-    if (len >= MAX_PATH && strncmp (mb_path, "\\\\?\\", 4) != 0)
+    if (do_prefix && len >= MAX_PATH && strncmp (mb_path, "\\\\?\\", 4) != 0)
       {
 	wcscpy (wp_p, L"\\\\?\\");
 	wp_p += 4;
