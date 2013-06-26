@@ -1,3 +1,7 @@
+2013-06-26  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* aarch64.h: Add ELF32 reloc codes and remove fake ELF64 ones.
+
 2013-06-24  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h (ELF_ST_IS_MIPS_PLT): Respect STO_MIPS16 setting.
