@@ -377,7 +377,7 @@ struct mips_opcode
 
    Each of these characters corresponds to a mask field defined above.
 
-   "1" 5 bit sync type (OP_*_SHAMT)
+   "1" 5 bit sync type (OP_*_STYPE)
    "<" 5 bit shift amount (OP_*_SHAMT)
    ">" shift amount between 32 and 63, stored after subtracting 32 (OP_*_SHAMT)
    "a" 26 bit target address (OP_*_TARGET)
@@ -1742,7 +1742,7 @@ extern const int bfd_mips16_num_opcodes;
    others too).
 
    "." 10-bit signed offset/number (MICROMIPSOP_*_OFFSET10)
-   "1" 5-bit sync type (MICROMIPSOP_*_SHAMT)
+   "1" 5-bit sync type (MICROMIPSOP_*_STYPE)
    "<" 5-bit shift amount (MICROMIPSOP_*_SHAMT)
    ">" shift amount between 32 and 63, stored after subtracting 32
        (MICROMIPSOP_*_SHAMT)
@@ -1814,9 +1814,9 @@ extern const int bfd_mips16_num_opcodes;
 
    Coprocessor instructions:
    "E" 5-bit target register (MICROMIPSOP_*_RT)
-   "G" 5-bit destination register (MICROMIPSOP_*_RS)
+   "G" 5-bit source register (MICROMIPSOP_*_RS)
    "H" 3-bit sel field for (D)MTC* and (D)MFC* (MICROMIPSOP_*_SEL)
-   "+D" combined destination register ("G") and sel ("H") for CP0 ops,
+   "+D" combined source register ("G") and sel ("H") for CP0 ops,
 	for pretty-printing in disassembly only
 
    Macro instructions:

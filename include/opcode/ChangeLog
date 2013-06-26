@@ -1,3 +1,8 @@
+2013-06-26  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h: Fix comment for "1": it is now STYPE rather than SHAMT.
+	Use "source" rather than "destination" for microMIPS "G".
+
 2013-06-25  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h: Add M_JRADDIUSP, M_JRC and M_MOVEP anonymous enum
