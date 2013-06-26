@@ -763,8 +763,6 @@ void _reclaim_reent _PARAMS ((struct _reent *));
 
 /* #define _REENT_ONLY define this to get only reentrant routines */
 
-#ifndef _REENT_ONLY
-
 #if defined(__DYNAMIC_REENT__) && !defined(__SINGLE_THREAD__)
 #ifndef __getreent
   struct _reent * _EXFUN(__getreent, (void));
@@ -773,8 +771,6 @@ void _reclaim_reent _PARAMS ((struct _reent *));
 #else /* __SINGLE_THREAD__ || !__DYNAMIC_REENT__ */
 # define _REENT _impure_ptr
 #endif /* __SINGLE_THREAD__ || !__DYNAMIC_REENT__ */
-
-#endif /* !_REENT_ONLY */
 
 #define _GLOBAL_REENT _global_impure_ptr
 

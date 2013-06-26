@@ -179,13 +179,8 @@ int	_EXFUN(_wscanf_r, (struct _reent *, const wchar_t *, ...));
 
 #define getwc(fp)	fgetwc(fp)
 #define putwc(wc,fp)	fputwc((wc), (fp))
-#ifndef _REENT_ONLY
 #define getwchar()	fgetwc(_REENT->_stdin)
 #define putwchar(wc)	fputwc((wc), _REENT->_stdout)
-#else
-#define getwchar()	fgetwc(_impure_ptr->_stdin)
-#define putwchar(wc)	fputwc((wc), _impure_ptr->_stdout)
-#endif
 
 _END_STD_C
 

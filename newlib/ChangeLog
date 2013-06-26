@@ -1,3 +1,11 @@
+2013-06-26  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdio.h: Specify std streams always in terms
+	of _REENT.
+	* libc/include/wchar.h: Ditto.
+	* libc/include/sys/reent.h: Remove _RENT_ONLY check around
+	setting of _REENT macro.
+
 2013-06-24  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/string.h (rawmemchr): Declare.
