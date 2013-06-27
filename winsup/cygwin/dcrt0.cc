@@ -482,7 +482,7 @@ child_info_fork::alloc_stack ()
   else
     {
       char *st = (char *) stacktop;
-      while (_tlstop >= st)
+      while (_tlstop > st)
 	stackp = getstack (stackp);
       stackaddr = 0;
       /* This only affects forked children of a process started from a native

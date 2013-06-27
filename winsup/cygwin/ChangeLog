@@ -1,3 +1,9 @@
+2013-06-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (child_info_fork::alloc_stack): Fix a comparison to avoid
+	taking 4K more stack in forked child.
+	* fork.cc (frok::parent): Print child exit code in hex if sync failed.
+
 2013-06-24  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* common.din (rawmemchr): Export.
