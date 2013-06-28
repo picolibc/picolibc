@@ -42,6 +42,10 @@
 #include <sys/wait.h>
 #include "svc.h"
 
+/* Safe casting in both LP64 and ILP32.  */
+#define POINTER_TO_PARAM_BLOCK_T(PTR)		\
+  (param_block_t)(unsigned long) (PTR)
+
 /* Forward prototypes.  */
 int _system _PARAMS ((const char *));
 int _rename _PARAMS ((const char *, const char *));
@@ -175,17 +179,17 @@ initialise_monitor_handles (void)
 
   param_block_t block[3];
 
-  block[0] = (param_block_t) ":tt";
+  block[0] = POINTER_TO_PARAM_BLOCK_T (":tt");
   block[2] = 3;			/* length of filename */
   block[1] = 0;			/* mode "r" */
   monitor_stdin = do_AngelSVC (AngelSVC_Reason_Open, block);
 
-  block[0] = (param_block_t) ":tt";
+  block[0] = POINTER_TO_PARAM_BLOCK_T (":tt");
   block[2] = 3;			/* length of filename */
   block[1] = 4;			/* mode "w" */
   monitor_stdout = do_AngelSVC (AngelSVC_Reason_Open, block);
 
-  block[0] = (param_block_t) ":tt";
+  block[0] = POINTER_TO_PARAM_BLOCK_T (":tt");
   block[2] = 3;			/* length of filename */
   block[1] = 8;			/* mode "a" */
   monitor_stderr = do_AngelSVC (AngelSVC_Reason_Open, block);
@@ -241,7 +245,7 @@ _swiread (int fh, char *ptr, int len)
   param_block_t block[3];
 
   block[0] = fh;
-  block[1] = (param_block_t) ptr;
+  block[1] = POINTER_TO_PARAM_BLOCK_T (ptr);
   block[2] = len;
 
   return checkerror (do_AngelSVC (AngelSVC_Reason_Read, block));
@@ -349,7 +353,7 @@ _swiwrite (int fh, char *ptr, int len)
   param_block_t block[3];
 
   block[0] = fh;
-  block[1] = (param_block_t) ptr;
+  block[1] = POINTER_TO_PARAM_BLOCK_T (ptr);
   block[2] = len;
 
   return checkerror (do_AngelSVC (AngelSVC_Reason_Write, block));
@@ -441,7 +445,7 @@ _swiopen (const char *path, int flags)
       aflags |= 8;
     }
 
-  block[0] = (param_block_t) path;
+  block[0] = POINTER_TO_PARAM_BLOCK_T (path);
   block[2] = strlen (path);
   block[1] = aflags;
 
@@ -617,7 +621,7 @@ _unlink (const char *path)
 {
   int res;
   param_block_t block[2];
-  block[0] = (param_block_t) path;
+  block[0] = POINTER_TO_PARAM_BLOCK_T (path);
   block[1] = strlen (path);
   res = do_AngelSVC (AngelSVC_Reason_Remove, block);
   if (res == -1)
@@ -710,7 +714,7 @@ _system (const char *s)
      meaning to its return value.  Try to do something reasonable....  */
   if (!s)
     return 1;			/* maybe there is a shell available? we can hope. :-P */
-  block[0] = (param_block_t) s;
+  block[0] = POINTER_TO_PARAM_BLOCK_T (s);
   block[1] = strlen (s);
   e = checkerror (do_AngelSVC (AngelSVC_Reason_System, block));
   if ((e >= 0) && (e < 256))
@@ -730,9 +734,9 @@ int
 _rename (const char *oldpath, const char *newpath)
 {
   param_block_t block[4];
-  block[0] = (param_block_t) oldpath;
+  block[0] = POINTER_TO_PARAM_BLOCK_T (oldpath);
   block[1] = strlen (oldpath);
-  block[2] = (param_block_t) newpath;
+  block[2] = POINTER_TO_PARAM_BLOCK_T (newpath);
   block[3] = strlen (newpath);
   return checkerror (do_AngelSVC (AngelSVC_Reason_Rename, block)) ? -1 : 0;
 }

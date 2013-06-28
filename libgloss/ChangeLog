@@ -1,3 +1,15 @@
+2013-06-28  Yufeng Zhang  <Yufeng.Zhang@arm.com>
+
+	* aarch64/syscalls.c (POINTER_TO_PARAM_BLOCK_T): New macro.
+	(initialise_monitor_handles): Replace cast with macro
+	POINTER_TO_PARAM_BLOCK_T.
+	(_swiread): Likewise.
+	(_swiwrite): Likewise.
+	(_swiopen): Likewise.
+	(_unlink): Likewise.
+	(_system): Likewise.
+	(_rename): Likewise.
+
 2013-06-25  Yufeng Zhang  <Yufeng.Zhang@arm.com>
 
 	* aarch64/crt0.S (GEN_DWORD): New macro definition.
