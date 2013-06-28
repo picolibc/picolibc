@@ -3944,7 +3944,7 @@ find_fast_cwd_pointer ()
       /* Test if lock address is FastPebLock. */
       if (lockaddr != NtCurrentTeb ()->Peb->FastPebLock)
         return NULL;
-      /* Search `mov rbx, rel(rip)'.  This is the instruction fetching the
+      /* Search `mov rel(%rip),%rbx'.  This is the instruction fetching the
          address of the current fcwd_access_t pointer, and it should be pretty
 	 near to the locking stuff. */
       movrbx = (const uint8_t *) memmem ((const char *) lock, 40,
@@ -3952,19 +3952,30 @@ find_fast_cwd_pointer ()
     }
   else
     {
-      /* Search lea rcx, rel(rip).  This loads the address of the lock into
-         $rcx for the subsequent RtlEnterCriticalSection call. */
+      /* Usually the callq RtlEnterCriticalSection follows right after
+	 fetching the lock address. */
+      int call_rtl_offset = 7;
+      /* Search `lea rel(%rip),%rcx'.  This loads the address of the lock into
+         %rcx for the subsequent RtlEnterCriticalSection call. */
       lock = (const uint8_t *) memmem ((const char *) use_cwd, 80,
                                        "\x48\x8d\x0d", 3);
       if (!lock)
-        return NULL;
+	{
+	  /* Windows 8.1 Preview calls `lea rel(rip),%r12' then some unrelated
+	     or, then `mov %r12,%rcx', then `callq RtlEnterCriticalSection'. */
+	  lock = (const uint8_t *) memmem ((const char *) use_cwd, 80,
+					   "\x4c\x8d\x25", 3);
+	  if (!lock)
+	    return NULL;
+	  call_rtl_offset = 14;
+	}
       PRTL_CRITICAL_SECTION lockaddr =
         (PRTL_CRITICAL_SECTION) (lock + 7 + peek32 (lock + 3));
       /* Test if lock address is FastPebLock. */
       if (lockaddr != NtCurrentTeb ()->Peb->FastPebLock)
         return NULL;
-      /* Next is the call RtlEnterCriticalSection. */
-      lock += 7;
+      /* Next is the `callq RtlEnterCriticalSection'. */
+      lock += call_rtl_offset;
       if (lock[0] != 0xe8)
         return NULL;
       const uint8_t *call_addr = (const uint8_t *)
@@ -3972,7 +3983,7 @@ find_fast_cwd_pointer ()
       if (call_addr != ent_crit)
         return NULL;
       /* In contrast to the above Windows 8 code, we don't have to search
-	 for the `mov rbx, rel(rip)' instruction.  It follows right after
+	 for the `mov rel(%rip),%rbx' instruction.  It follows right after
 	 the call to RtlEnterCriticalSection. */
       movrbx = lock + 5;
     }
@@ -4012,19 +4023,19 @@ find_fast_cwd_pointer ()
      performs some other actions, not important to us. */
   ptrdiff_t offset = (ptrdiff_t) peek32 (rcall + 1);
   const uint8_t *use_cwd = rcall + 5 + offset;
-  /* Find first "push edi" instruction. */
+  /* Find first `push %edi' instruction. */
   const uint8_t *pushedi = (const uint8_t *) memchr (use_cwd, 0x57, 32);
-  /* ...which should be followed by "mov edi, crit-sect-addr" then
-     "push edi", or by just a single "push crit-sect-addr". */
+  /* ...which should be followed by `mov crit-sect-addr,%edi' then
+     `push %edi', or by just a single `push crit-sect-addr'. */
   const uint8_t *movedi = pushedi + 1;
   const uint8_t *mov_pfast_cwd;
-  if (movedi[0] == 0x8b && movedi[1] == 0xff)	/* mov edi,edi -> W8 */
+  if (movedi[0] == 0x8b && movedi[1] == 0xff)	/* mov %edi,%edi -> W8 */
     {
       /* Windows 8 does not call RtlEnterCriticalSection.  The code manipulates
       	 the FastPebLock manually, probably because RtlEnterCriticalSection has
 	 been converted to an inline function.
 
-	 Next we search for a `mov eax, some address'.  This address points
+	 Next we search for a `mov some address,%eax'.  This address points
 	 to the LockCount member of the FastPebLock structure, so the address
 	 is equal to FastPebLock + 4. */
       const uint8_t *moveax = (const uint8_t *) memchr (movedi, 0xb8, 16);
@@ -4052,6 +4063,14 @@ find_fast_cwd_pointer ()
 	rcall = movedi + 6;
       else if (movedi[0] == 0x68)
 	rcall = movedi + 5;
+      else if (movedi[0] == 0x88 && movedi[4] == 0x83 && movedi[7] == 0x68)
+	{
+	  /* Windows 8.1 Preview: The `mov lock_addr,%edi' is actually a
+	     `mov %cl,15(%esp), followed by an `or #-1,%ebx, followed by a
+	     `push lock_addr'. */
+	  movedi += 7;
+	  rcall = movedi + 5;
+	}
       else
 	return NULL;
       /* Compare the address used for the critical section with the known
