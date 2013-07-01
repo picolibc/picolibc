@@ -242,8 +242,8 @@ def_fn memcpy p2align=6
 .Lcpy_not_short:
 	/* At least 64 bytes to copy, but don't know the alignment yet.  */
 	str	tmp2, [sp, #-FRAME_SIZE]!
-	and	tmp2, src, #3
-	and	tmp1, dst, #3
+	and	tmp2, src, #7
+	and	tmp1, dst, #7
 	cmp	tmp1, tmp2
 	bne	.Lcpy_notaligned
 

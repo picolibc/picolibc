@@ -1,3 +1,8 @@
+2013-07-01  Will Newton  <will.newton@linaro.org>
+
+	* libc/machine/arm/memcpy-armv7a.S: Adjust entry to
+	 aligned loop to improve misaligned copy performance.
+
 2013-06-26  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdio.h: Specify std streams always in terms
