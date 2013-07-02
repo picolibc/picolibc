@@ -19,5 +19,14 @@ _DEFUN (__cxa_atexit,
 	void *arg _AND
 	void *d)
 {
-  return __register_exitproc (__et_cxa, (void (*)(void)) fn, arg, d);
+#ifdef _LITE_EXIT
+  /* Refer to comments in __atexit.c for more details of lite exit.  */
+  int __register_exitproc _PARAMS ((int, void (*fn) (void), _PTR, _PTR))
+    __attribute__ ((weak));
+
+  if (!__register_exitproc)
+    return 0;
+  else
+#endif
+    return __register_exitproc (__et_cxa, (void (*)(void)) fn, arg, d);
 }

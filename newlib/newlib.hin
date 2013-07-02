@@ -70,6 +70,9 @@
 /* Define if unbuffered stream file optimization is supported.  */
 #undef _UNBUF_STREAM_OPT
 
+/* Define if lite version of exit supported.  */
+#undef _LITE_EXIT
+
 /*
  * Iconv encodings enabled ("to" direction)
  */

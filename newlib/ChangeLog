@@ -1,3 +1,19 @@
+2013-07-02  Joey Ye  <joey.ye@arm.com>
+
+	Lite exit support.
+	* README: Add information about lite-exit.
+	* acconfig.h (_LITE_EXIT): New macro.
+	* configure.in (enable-lite-exit): New option.
+	(_LITE_EXIT): Define new macro.
+	* configure: Regenerated.
+	* newlib.hin (_LITE_EXIT): New macro.
+	* libc/stdlib/__atexit.c [_LITE_EXIT]: Add dummy explicit 
+	reference to __call_exitprocs.
+	* libc/stdlib/cxa_atexit.c [_LITE_EXIT]: Make __register_exitproc a
+	weak reference.
+	* libc/stdlib/exit.c (exit)[_LITE_EXIT]: Remove TWS and weakly reference
+	__call_exitprocs.
+
 2013-07-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/reent.h: Fix typo in comment.

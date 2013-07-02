@@ -361,6 +361,11 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      Disable newlib from supplying syscalls.
      Enabled by default.
 
+`--enable-lite-exit'
+     Enable lite exit, a size-reduced implementation of exit that doesn't
+     invoke clean-up functions such as _fini or global destructors.
+     Disabled by default.
+
 Running the Testsuite
 =====================
 
