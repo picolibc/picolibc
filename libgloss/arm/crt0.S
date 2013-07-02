@@ -390,12 +390,21 @@ __change_mode:
 	   for _fini to be called at program exit.  */
 	movs	r4, r0
 	movs	r5, r1
+#ifdef _LITE_EXIT
+	/* Make reference to atexit weak to avoid unconditionally pulling in
+	   support code.  Refer to comments in __atexit.c for more details.  */
+	.weak	FUNCTION(atexit)
+	ldr	r0, .Latexit
+	cmp	r0, #0
+	beq	.Lweak_atexit
+#endif
 	ldr	r0, .Lfini
 	bl	FUNCTION (atexit)
+.Lweak_atexit:
 	bl	FUNCTION (_init)
 	movs	r0, r4
 	movs	r1, r5
-#endif	
+#endif
 	bl	FUNCTION (main)
 
 	bl	FUNCTION (exit)		/* Should not return.  */
@@ -465,6 +474,13 @@ change_back:
 .LC2:
 	.word	__bss_end__
 #ifdef __USES_INITFINI__
+#ifdef _LITE_EXIT
+.Latexit:
+	.word	FUNCTION(atexit)
+
+	/* Weak reference _fini in case of lite exit.  */
+	.weak	FUNCTION(_fini)
+#endif
 .Lfini:
 	.word	FUNCTION(_fini)
 #endif
