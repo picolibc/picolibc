@@ -1,3 +1,7 @@
+2013-07-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/reent.h: Fix typo in comment.
+
 2013-07-01  Will Newton  <will.newton@linaro.org>
 
 	* libc/machine/arm/memcpy-armv7a.S: Adjust entry to

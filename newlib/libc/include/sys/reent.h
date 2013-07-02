@@ -362,7 +362,7 @@ struct _misc_reent
   _mbstate_t _wcsrtombs_state;
 };
 
-/* This version of _reent is layed our with "int"s in pairs, to help
+/* This version of _reent is laid out with "int"s in pairs, to help
  * ports with 16-bit int's but 32-bit pointers, align nicely.  */
 struct _reent
 {
