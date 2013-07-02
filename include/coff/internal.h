@@ -343,6 +343,8 @@ struct internal_aouthdr
 #define C_FUN           (0x8e)
 #define C_BSTAT         (0x8f)
 #define C_ESTAT         (0x90)
+#define C_GTLS          (0x97)
+#define C_STTLS         (0x98)
 
 /* Storage classes for Thumb symbols */
 #define C_THUMBEXT      (128 + C_EXT)		/* 130 */
