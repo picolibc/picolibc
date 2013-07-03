@@ -21,3 +21,6 @@ Bug fixes:
 
 - Fix character comparisons in certain scenarios within the functions glob(3),
   fnmatch(3), and regcomp(3).  All Unicode chars beyond U+0100 are affected.
+
+- Fix problem with pty closing which manifested as a screen issue:
+  Fixes: http://cygwin.com/ml/cygwin/2013-06/msg00196.html
