@@ -1,3 +1,9 @@
+2013-07-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* fhandler.cc (fhandler_base::close_with_arch): Make sure that the
+	archetype is deleted when close_with_arch is referenced *via* the
+	archetype.
+
 2013-06-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (find_fast_cwd_pointer): Use gas syntax for assembler

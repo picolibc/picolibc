@@ -1076,32 +1076,30 @@ fhandler_base::close_with_arch ()
   fhandler_base *fh;
   if (usecount)
     {
-      if (!--usecount)
-	debug_printf ("closing passed in archetype, usecount %d", usecount);
-      else
+      /* This was the archetype itself. */
+      if (--usecount)
 	{
-	  debug_printf ("not closing passed in archetype, usecount %d", usecount);
+	  debug_printf ("not closing passed in archetype %p, usecount %d", archetype, usecount);
 	  return 0;
 	}
-      fh = this;
+      debug_printf ("closing passed in archetype %p, usecount %d", archetype, usecount);
+      /* Set archetype temporarily so that it will eventually be deleted. */
+      archetype = fh = this;
     }
   else if (!archetype)
     fh = this;
+  else if (archetype_usecount (-1) == 0)
+    {
+      debug_printf ("closing archetype");
+      fh = archetype;
+    }
   else
     {
-      cleanup ();
-      if (archetype_usecount (-1) == 0)
-	{
-	  debug_printf ("closing archetype");
-	  fh = archetype;
-	}
-      else
-	{
-	  debug_printf ("not closing archetype");
-	  return 0;
-	}
+      debug_printf ("not closing archetype");
+      return 0;
     }
 
+  cleanup ();
   res = fh->close ();
   if (archetype)
     {
