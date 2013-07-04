@@ -109,7 +109,11 @@ static struct fdent *findslot _PARAMS ((int));
 static int newslot _PARAMS ((void));
 
 /* Register name faking - works in collusion with the linker.  */
+#ifdef __ILP32__
+register char * stack_ptr asm ("wsp");
+#else
 register char * stack_ptr asm ("sp");
+#endif
 
 
 /* following is copied from libc/stdio/local.h to check std streams */

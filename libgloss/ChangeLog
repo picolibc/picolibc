@@ -1,3 +1,8 @@
+2013-07-04  Yufeng Zhang  <Yufeng.Zhang@arm.com>
+
+	* aarch64/syscalls.c (stack_ptr): Defined with asm ("wsp") if __ILP32__
+	is defined.
+
 2013-07-02  Joey Ye  <joey.ye@arm.com>
 
 	* arm/crt0.S (_mainCRTStartup): Weak reference to atexit and _fini
