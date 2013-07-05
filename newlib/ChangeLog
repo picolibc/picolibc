@@ -1,3 +1,8 @@
+2013-07-05  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* libc/include/sys/types.h (u_char): Add redefinition guard.
+	(u_short, u_int, u_long, caddr_t, daddr_t): Ditto.
+
 2013-07-02  Joey Ye  <joey.ye@arm.com>
 
 	Lite exit support.
