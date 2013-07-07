@@ -448,8 +448,6 @@ struct mips_opcode
    "e" 5 bit vector register byte specifier (OP_*_VECBYTE)
    "%" 3 bit immediate vr5400 vector alignment operand (OP_*_VECALIGN)
    see also "k" above
-   "+D" Combined destination register ("G") and sel ("H") for CP0 ops,
-	for pretty-printing in disassembly only.
 
    Macro instructions:
    "A" General 32 bit expression
@@ -489,7 +487,6 @@ struct mips_opcode
    "&" 2 bit dsp/smartmips accumulator register (OP_*_MTACC_D)
    "g" 5 bit coprocessor 1 and 2 destination register (OP_*_RD)
    "+t" 5 bit coprocessor 0 destination register (OP_*_RT)
-   "+T" 5 bit coprocessor 0 destination register (OP_*_RT) - disassembly only
 
    MCU ASE usage:
    "~" 12 bit offset (OP_*_OFFSET12)
@@ -543,7 +540,7 @@ struct mips_opcode
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
    "1234"
-   "ABCDEFGHIJPQSTXZ"
+   "ABCEFGHIJPQSXZ"
    "abcjpstxz"
 */
 
@@ -1816,8 +1813,6 @@ extern const int bfd_mips16_num_opcodes;
    "E" 5-bit target register (MICROMIPSOP_*_RT)
    "G" 5-bit source register (MICROMIPSOP_*_RS)
    "H" 3-bit sel field for (D)MTC* and (D)MFC* (MICROMIPSOP_*_SEL)
-   "+D" combined source register ("G") and sel ("H") for CP0 ops,
-	for pretty-printing in disassembly only
 
    Macro instructions:
    "A" general 32 bit expression
@@ -1859,7 +1854,7 @@ extern const int bfd_mips16_num_opcodes;
    following), for quick reference when adding more:
    "j"
    ""
-   "ABCDEFGHI"
+   "ABCEFGHI"
    ""
 
    Extension character sequences used so far ("m" followed by the
