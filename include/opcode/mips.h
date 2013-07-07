@@ -379,6 +379,7 @@ struct mips_opcode
    "<" 5 bit shift amount (OP_*_SHAMT)
    ">" shift amount between 32 and 63, stored after subtracting 32 (OP_*_SHAMT)
    "a" 26 bit target address (OP_*_TARGET)
+   "+i" likewise, but flips bit 0
    "b" 5 bit base register (OP_*_RS)
    "c" 10 bit breakpoint code (OP_*_CODE)
    "d" 5 bit destination register specifier (OP_*_RD)
@@ -539,7 +540,7 @@ struct mips_opcode
    following), for quick reference when adding more:
    "1234"
    "ABCEFGHIJPQSXZ"
-   "abcjpstxz"
+   "abcijpstxz"
 */
 
 /* These are the bits which may be set in the pinfo field of an
@@ -1383,6 +1384,7 @@ extern int bfd_mips_num_opcodes;
    "Y" 5 bit MIPS register (MIPS16OP_*_REG32R)
    "6" 6 bit unsigned break code (MIPS16OP_*_IMM6)
    "a" 26 bit jump address
+   "i" likewise, but flips bit 0
    "e" 11 bit extension value
    "l" register list for entry instruction
    "L" register list for exit instruction
@@ -1741,6 +1743,7 @@ extern const int bfd_mips16_num_opcodes;
    "|" 4-bit trap code (MICROMIPSOP_*_TRAP)
    "~" 12-bit signed offset (MICROMIPSOP_*_OFFSET12)
    "a" 26-bit target address (MICROMIPSOP_*_TARGET)
+   "+i" likewise, but flips bit 0
    "b" 5-bit base register (MICROMIPSOP_*_RS)
    "c" 10-bit higher breakpoint code (MICROMIPSOP_*_CODE)
    "d" 5-bit destination register specifier (MICROMIPSOP_*_RD)
@@ -1846,10 +1849,10 @@ extern const int bfd_mips16_num_opcodes;
 
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
-   "j"
+   ""
    ""
    "ABCEFGHI"
-   ""
+   "ij"
 
    Extension character sequences used so far ("m" followed by the
    following), for quick reference when adding more:

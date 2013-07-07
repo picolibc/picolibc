@@ -1,5 +1,9 @@
 2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
 
+	* mips.h: Document "+i".
+
+2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
+
 	* mips.h: Remove "mi" documentation.  Update "mh" documentation.
 	(OP_MASK_MI, OP_SH_MI, MICROMIPSOP_MASK_MI, MICROMIPSOP_MASK_MI):
 	Delete.
