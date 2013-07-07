@@ -387,7 +387,6 @@ struct mips_opcode
    "i" 16 bit unsigned immediate (OP_*_IMMEDIATE)
    "j" 16 bit signed immediate (OP_*_DELTA)
    "k" 5 bit cache opcode in target register position (OP_*_CACHE)
-       Also used for immediate operands in vr5400 vector insns.
    "o" 16 bit signed offset (OP_*_DELTA)
    "p" 16 bit PC relative branch target address (OP_*_DELTA)
    "q" 10 bit extra breakpoint code (OP_*_CODE2)
@@ -446,7 +445,6 @@ struct mips_opcode
    "P" 5 bit performance-monitor register (OP_*_PERFREG)
    "e" 5 bit vector register byte specifier (OP_*_VECBYTE)
    "%" 3 bit immediate vr5400 vector alignment operand (OP_*_VECALIGN)
-   see also "k" above
 
    Macro instructions:
    "A" General 32 bit expression
@@ -457,13 +455,14 @@ struct mips_opcode
    "f" 32 bit floating point constant
    "l" 32 bit floating point constant in .lit4
 
-   MDMX instruction operands (note that while these use the FP register
-   fields, they accept both $fN and $vN names for the registers):  
-   "O"	MDMX alignment offset (OP_*_ALN)
-   "Q"	MDMX vector/scalar/immediate source (OP_*_VSEL and OP_*_FT)
-   "X"	MDMX destination register (OP_*_FD) 
-   "Y"	MDMX source register (OP_*_FS)
-   "Z"	MDMX source register (OP_*_FT)
+   MDMX and VR5400 instruction operands (note that while these use the
+   FP register fields, the MDMX instructions accept both $fN and $vN names
+   for the registers):
+   "O"	alignment offset (OP_*_ALN)
+   "Q"	vector/scalar/immediate source (OP_*_VSEL and OP_*_FT)
+   "X"	destination register (OP_*_FD)
+   "Y"	source register (OP_*_FS)
+   "Z"	source register (OP_*_FT)
 
    DSP ASE usage:
    "2" 2 bit unsigned immediate for byte align (OP_*_BP)
@@ -526,7 +525,6 @@ struct mips_opcode
    Other:
    "()" parens surrounding optional value
    ","  separates operands
-   "[]" brackets around index for vector-op scalar operand specifier (vr5400)
    "+"  Start of extension sequence.
 
    Characters used so far, for quick reference when adding more:
