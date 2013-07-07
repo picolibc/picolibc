@@ -1,5 +1,9 @@
 2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
 
+	* mips.h: Update documentation of "+s" and "+S".
+
+2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
+
 	* mips.h: Document "+i".
 
 2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>

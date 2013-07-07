@@ -508,11 +508,10 @@ struct mips_opcode
    "+P" Position field of cins/exts aliasing cins32/exts32.  Matches if
 	32 <= pos < 64, otherwise skips to next candidate.
    "+Q" Immediate field of seqi/snei.  Enforces -512 <= imm < 512.
-   "+s" Length-minus-one field of cins/exts.  Enforces: 0 <= lenm1 < 32.
-   "+S" Length-minus-one field of cins32/exts32 or cins/exts aliasing
-	cint32/exts32.  Enforces non-negative value and that
-	pos + lenm1 < 32 or pos + lenm1 < 64 depending whether previous
-	position field is "+p" or "+P".
+   "+s" Length-minus-one field of cins32/exts32.  Requires msb position
+	of the field to be <= 31.
+   "+S" Length-minus-one field of cins/exts.  Requires msb position
+	of the field to be <= 63.
 
    Loongson-3A:
    "+a" 8-bit signed offset in bit 6 (OP_*_OFFSET_A)
