@@ -279,8 +279,6 @@
 #define OP_SH_MG		0
 #define OP_MASK_MH		0
 #define OP_SH_MH		0
-#define OP_MASK_MI		0
-#define OP_SH_MI		0
 #define OP_MASK_MJ		0
 #define OP_SH_MJ		0
 #define OP_MASK_ML		0
@@ -685,8 +683,8 @@ struct mips_opcode
 #define INSN2_UNCOND_BRANCH	    0x10000000
 /* Is a conditional branch insn. */
 #define INSN2_COND_BRANCH	    0x20000000
-/* Modifies the general purpose registers in MICROMIPSOP_*_MH/I.  */
-#define INSN2_WRITE_GPR_MHI	    0x40000000
+/* Modifies the general purpose registers in MICROMIPSOP_*_MH.  */
+#define INSN2_WRITE_GPR_MH	    0x40000000
 /* Reads the general purpose registers in MICROMIPSOP_*_MM/N.  */
 #define INSN2_READ_GPR_MMN	    0x80000000
 
@@ -1555,8 +1553,6 @@ extern const int bfd_mips16_num_opcodes;
 #define MICROMIPSOP_SH_MG		0
 #define MICROMIPSOP_MASK_MH		0x7
 #define MICROMIPSOP_SH_MH		7
-#define MICROMIPSOP_MASK_MI		0x7
-#define MICROMIPSOP_SH_MI		7
 #define MICROMIPSOP_MASK_MJ		0x1f
 #define MICROMIPSOP_SH_MJ		0
 #define MICROMIPSOP_MASK_ML		0x7
@@ -1696,9 +1692,7 @@ extern const int bfd_mips16_num_opcodes;
         The same register used as both source and target.
    "mf" 3-bit MIPS registers 2-7, 16, 17 (MICROMIPSOP_*_MF) at bit 3
    "mg" 3-bit MIPS registers 2-7, 16, 17 (MICROMIPSOP_*_MG) at bit 0
-   "mh" MIPS registers 4, 5, 6 (MICROMIPSOP_*_MH) at bit 7
-   "mi" MIPS registers 5, 6, 7, 21, 22 (MICROMIPSOP_*_MI) at bit 7
-	("mh" and "mi" form a valid 3-bit register pair)
+   "mh" 3-bit MIPS register pair (MICROMIPSOP_*_MH) at bit 7
    "mj" 5-bit MIPS registers (MICROMIPSOP_*_MJ) at bit 0
    "ml" 3-bit MIPS registers 2-7, 16, 17 (MICROMIPSOP_*_ML) at bit 4
    "mm" 3-bit MIPS registers 0, 2, 3, 16-20 (MICROMIPSOP_*_MM) at bit 1

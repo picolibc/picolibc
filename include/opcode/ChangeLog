@@ -1,5 +1,13 @@
 2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
 
+	* mips.h: Remove "mi" documentation.  Update "mh" documentation.
+	(OP_MASK_MI, OP_SH_MI, MICROMIPSOP_MASK_MI, MICROMIPSOP_MASK_MI):
+	Delete.
+	(INSN2_WRITE_GPR_MHI): Rename to...
+	(INSN2_WRITE_GPR_MH): ...this.
+
+2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
+
 	* mips.h: Remove documentation of "+D" and "+T".
 
 2013-06-26  Richard Sandiford  <rdsandiford@googlemail.com>
