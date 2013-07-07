@@ -590,11 +590,26 @@ cygwin_info (HANDLE h)
   return;
 }
 
+/* Special case.  Don't complain about this one.  */
+#define CYGLSA64_DLL "\\cyglsa64.dll"
+
 static void
 dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 {
   DWORD junk;
   int i;
+  if (is_symlink (fh))
+    {
+      if (!verbose)
+	puts ("");
+      else
+	{
+	  char buf[PATH_MAX + 1] = "";
+	  readlink (fh, buf, sizeof(buf) - 1);
+	  printf (" (symlink to %s)\n", buf);
+	}
+      return;
+    }
   int pe_header_offset = get_dword (fh, 0x3c);
   if (GetLastError () != NO_ERROR)
     display_error ("get_dword");
@@ -604,18 +619,14 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 #ifdef __x86_64__
   if (arch != IMAGE_FILE_MACHINE_AMD64)
     {
-      fputc ('\n', stderr);
-      display_error ("Wrong architecture. Only x86_64 executables supported.",
-		     false, false);
+      puts (verbose ? " (not x86_64 dll)" : "\n");
       return;
     }
   int base_off = 108;
 #else
   if (arch != IMAGE_FILE_MACHINE_I386)
     {
-      fputc ('\n', stderr);
-      display_error ("Wrong architecture. Only ix86 executables supported.",
-		     false, false);
+      puts (verbose ? " (not x86 dll)" : "\n");
       return;
     }
   int base_off = 92;
