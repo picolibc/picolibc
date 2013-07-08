@@ -1,3 +1,7 @@
+2013-07-08  Tristan Gingold  <gingold@adacore.com>
+
+	* ia64.h (STB_VMS_WEAK, STB_VMS_SYSTEM): Add.
+
 2013-07-05  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
 
 	* s390.h: Add new relocs R_390_PC12DBL, R_390_PLT12DBL,
