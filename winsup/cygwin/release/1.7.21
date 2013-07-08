@@ -3,6 +3,10 @@ What's new:
 
 - New API: rawmemchr.
 
+- Make cygcheck report when scanned DLLs are symlinks or are not meant
+  for the current architecture (x86 vs. x86_64).
+  See: http://cygwin.com/ml/cygwin/2013-07/msg00143.html
+
 Bug fixes:
 ----------
 
@@ -23,4 +27,4 @@ Bug fixes:
   fnmatch(3), and regcomp(3).  All Unicode chars beyond U+0100 are affected.
 
 - Fix problem with pty closing which manifested as a screen issue:
-  Fixes: http://cygwin.com/ml/cygwin/2013-06/msg00196.html
+  See: http://cygwin.com/ml/cygwin/2013-06/msg00196.html
