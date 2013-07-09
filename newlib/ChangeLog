@@ -1,5 +1,13 @@
 2013-07-09  Sabrina Ni  <sabrina@andestech.com>
 
+	* libc/machine/nds32/Makefile.am (lib_a_SOURCES): Add abort.c, memcpy.S,
+	memset.S, strcmp.S, and strcpy.S.
+	* libc/machine/nds32/Makefile.in: Regenerated.
+	* libc/machine/nds32/{abort.c, memcpy.S, memset.S, strcmp.S, strcpy.S}:
+	New.
+
+2013-07-09  Sabrina Ni  <sabrina@andestech.com>
+
 	* configure.host (machine_dir, syscall_dir, newlib_cflags):
 	Add settings for nds32*.
 	* libc/include/machine/ieeefp.h (IEEE_BIG_ENDIAN, IEEE_LITTLE_ENDIAN):
