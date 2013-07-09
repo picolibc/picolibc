@@ -1,3 +1,7 @@
+2013-07-09  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/config.h (__DYNAMIC_REENT__): Define for RTEMS.
+
 2013-07-09  Bin Cheng  <bin.cheng@arm.com>
 
 	* libc/stdio/fwalk.c (_fwalk): Remove redundant test.
