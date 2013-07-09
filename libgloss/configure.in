@@ -51,6 +51,9 @@ case "${target}" in
   m68hc11-*-* | m6811-*-* | m68hc12-*-* | m6812-*-*)
 	AC_CONFIG_SUBDIRS([m68hc11])
 	;;
+  nds32*-*-*)
+	AC_CONFIG_SUBDIRS([nds32])
+	;;
   fido-*-* | m68*-*-*)
 	AC_CONFIG_SUBDIRS([m68k])
 	;;
