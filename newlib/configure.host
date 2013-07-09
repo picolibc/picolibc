@@ -79,7 +79,7 @@ case "${target_optspace}:${host}" in
   yes:*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
-  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* | :msp430*-* )
+  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* | :msp430*-* | :nds32* )
     newlib_cflags="${newlib_cflags} -Os"
     ;;
   no:* | :*)
@@ -232,6 +232,12 @@ case "${host_cpu}" in
 	;;
   mt*)
 	machine_dir=mt
+	;;
+  nds32*)
+	machine_dir=nds32
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED "
+	newlib_cflags="${newlib_cflags} -DSMALL_MEMORY "
+	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections"
 	;;
   nios2*)
 	machine_dir=nios2
@@ -718,6 +724,9 @@ case "${host}" in
   nios2*)
 	syscall_dir=
 	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_SYSTEM -DMISSING_SYSCALL_NAMES"
+	;;
+  nds32*)
+	syscall_dir=syscalls
 	;;
   powerpc*-*-eabialtivec*)
 	default_newlib_io_long_long="yes"

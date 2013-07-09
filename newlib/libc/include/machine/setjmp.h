@@ -55,6 +55,13 @@ _BEGIN_STD_C
 #define _JBLEN  32
 #endif
 
+#ifdef __nds32__
+/* Only 17 words are currently needed.
+   Preserve one word slot if we need to expand.
+   Check newlib/libc/machine/nds32/setjmp.S for more information.  */
+#define _JBLEN 18
+#endif
+
 #if defined(__Z8001__) || defined(__Z8002__)
 /* 16 regs + pc */
 #define _JBLEN 20

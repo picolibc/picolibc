@@ -86,6 +86,14 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __nds32__
+#ifdef __big_endian__
+#define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
+#endif
+
 #ifdef __SPU__
 #define __IEEE_BIG_ENDIAN
 

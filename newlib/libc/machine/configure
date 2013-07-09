@@ -816,6 +816,7 @@ mn10300
 moxie
 msp430
 mt
+nds32
 necv70
 nios2
 powerpc
@@ -11471,7 +11472,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11473 "configure"
+#line 11475 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11577,7 +11578,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11579 "configure"
+#line 11581 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11883,6 +11884,8 @@ subdirs="$subdirs a29k"
 	msp430) subdirs="$subdirs msp430"
  ;;
 	mt) subdirs="$subdirs mt"
+ ;;
+	nds32) subdirs="$subdirs nds32"
  ;;
 	necv70) subdirs="$subdirs necv70"
  ;;
