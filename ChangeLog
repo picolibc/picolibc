@@ -1,3 +1,9 @@
+2013-07-10  Jack Howarth  <howarth@bromo.med.uc.edu>
+
+	PR target/57792
+	* configure.ac: Use --with-sysroot=\"`xcrun --show-sdk-path`\" on darwin13 and later.
+	* configure: Regenerated.
+
 2013-06-22  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	* configure.ac (mips*-*-bsd*, mips*-*-ultrix*, mips*-*-osf*)
