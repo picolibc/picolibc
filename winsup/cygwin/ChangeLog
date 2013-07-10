@@ -1,3 +1,11 @@
+2013-07-10  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* gentlsoffsets: Clean up a little.
+
+	* thread.cc (semaphore::_fixup_after_fork): Report on potential problem
+	parameter.  Make sure that currentvalue is never zero.
+	(semaphore::init): Make cosmetic change.
+
 2013-07-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.sc.in (.text.*): Fold into .text on all platforms.

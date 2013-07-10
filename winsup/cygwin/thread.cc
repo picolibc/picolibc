@@ -3529,11 +3529,13 @@ semaphore::_fixup_after_fork ()
   if (shared == PTHREAD_PROCESS_PRIVATE)
     {
       pthread_printf ("sem %p", this);
+      if (!currentvalue)
+	currentvalue = 1;
       /* FIXME: duplicate code here and in the constructor. */
-      this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
+      win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
 					      INT32_MAX, NULL);
       if (!win32_obj_id)
-	api_fatal ("failed to create new win32 semaphore, %E");
+	api_fatal ("failed to create new win32 semaphore, currentvalue %ld, %E", currentvalue);
     }
 }
 
@@ -3557,9 +3559,7 @@ semaphore::init (sem_t *sem, int pshared, unsigned int value)
      contents happen to be a valid pointer
    */
   if (is_good_object (sem))
-    {
-      paranoid_printf ("potential attempt to reinitialise a semaphore");
-    }
+    paranoid_printf ("potential attempt to reinitialise a semaphore");
 
   if (value > SEM_VALUE_MAX)
     {
