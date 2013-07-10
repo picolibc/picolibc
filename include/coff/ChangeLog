@@ -1,5 +1,10 @@
+2013-07-10  Tristan Gingold  <gingold@adacore.com>
+
+	* rs6000.h (external_core_dumpx): New structure.
+	(external_ld_info32): Ditto.
+
 2013-07-02  Tristan Gingold  <gingold@adacore.com>
-	   
+
 	* internal.h (C_STTLS, C_GTLS): Define.
 	* xcoff.h (XMC_TL, XMC_TU, XMC_TE): Define.
 

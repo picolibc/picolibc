@@ -46,7 +46,7 @@ struct external_filehdr {
 /********************** AOUT "OPTIONAL HEADER" **********************/
 
 
-typedef struct 
+typedef struct
 {
   unsigned char	magic[2];	/* type of file			*/
   unsigned char	vstamp[2];	/* version stamp		*/
@@ -204,7 +204,7 @@ union external_auxent {
 };
 
 #define	SYMENT	struct external_syment
-#define	SYMESZ	18	
+#define	SYMESZ	18
 #define	AUXENT	union external_auxent
 #define	AUXESZ	18
 #define DBXMASK 0x80		/* for dbx storage mask */
@@ -291,3 +291,63 @@ struct external_exceptab
 };
 
 #define EXCEPTSZ (4 + 2)
+
+/******************** Core files *************************/
+
+struct external_core_dumpx
+{
+  unsigned char c_signo[1];
+  unsigned char c_flag[1];
+  unsigned char c_entries[2];
+
+  unsigned char c_version[4];
+
+  unsigned char c_fdsinfox[8];
+  unsigned char c_loader[8];
+  unsigned char c_lsize[8];
+
+  unsigned char c_n_thr[4];
+  unsigned char c_reserved0[4];
+  unsigned char c_thr[8];
+
+  unsigned char c_segs[8];
+  unsigned char c_segregion[8];
+
+  unsigned char c_stack[8];
+  unsigned char c_stackorg[8];
+  unsigned char c_size[8];
+
+  unsigned char c_data[8];
+  unsigned char c_dataorg[8];
+  unsigned char c_datasize[8];
+  unsigned char c_sdorg[8];
+  unsigned char c_sdsize[8];
+
+  unsigned char c_vmmregions[8];
+  unsigned char c_vmm[8];
+
+  unsigned char c_impl[4];
+  unsigned char c_pad[4];
+  unsigned char c_cprs[8];
+  unsigned char c_reserved[7 * 8];
+
+  /* Followed by:
+     - context of the faulting thread.
+     - user structure.  */
+};
+
+
+/* Core file verion.  */
+#define CORE_DUMPX_VERSION 0x0feeddb1
+#define CORE_DUMPXX_VERSION 0x0feeddb2
+
+struct external_ld_info32
+{
+  unsigned char ldinfo_next[4];
+  unsigned char core_offset[4];
+  unsigned char ldinfo_textorg[4];
+  unsigned char ldinfo_textsize[4];
+  unsigned char ldinfo_dataorg[4];
+  unsigned char ldinfo_datasize[4];
+  unsigned char ldinfo_filename[2];
+};
