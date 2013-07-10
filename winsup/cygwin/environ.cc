@@ -470,7 +470,7 @@ posify_maybe (char **here, const char *value, char *outenv)
   environment array, for use by setenv(3) and unsetenv(3).
   Explicitly removes '=' in argument name.  */
 
-static char * __stdcall
+static char *
 my_findenv (const char *name, int *offset)
 {
   register int len;
@@ -498,7 +498,7 @@ my_findenv (const char *name, int *offset)
 
 /* Primitive getenv before the environment is built.  */
 
-static char __stdcall *
+static char *
 getearly (const char * name, int *)
 {
   char *ret;
@@ -520,7 +520,7 @@ getearly (const char * name, int *)
   return NULL;
 }
 
-static char * (*findenv_func)(const char *, int *) = (char * (*)(const char *, int *)) getearly;
+static char * (*findenv_func)(const char *, int *) = getearly;
 
 /* Returns ptr to value associated with name, if any, else NULL.  */
 

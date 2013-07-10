@@ -15,9 +15,7 @@ SECTIONS
   {
      *(.init)
     *(.text)
-#ifdef __x86_64__
     *(.text.*)
-#endif
     *(SORT(.text$*))
     *(.glue_7t)
     *(.glue_7)
@@ -63,6 +61,10 @@ SECTIONS
     *(SORT(.rdata$*))
     *(.eh_frame)
     *(.rdata_cygwin_nocopy)
+  }
+  .eh_frame ALIGN(__section_alignment__) :
+  {
+    *(.eh_frame*)
   }
   .pdata ALIGN(__section_alignment__) :
   {
