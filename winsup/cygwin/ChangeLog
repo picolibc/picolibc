@@ -1,3 +1,7 @@
+2013-07-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uname.cc (uname): Drop unused code.
+
 2013-07-10  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* gentlsoffsets: Clean up a little.

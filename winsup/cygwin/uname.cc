@@ -1,7 +1,7 @@
 /* uname.cc
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008 Red Hat, Inc.
+   2006, 2007, 2008, 2013 Red Hat, Inc.
    Written by Steve Chamberlain of Cygnus Support, sac@cygnus.com
    Rewritten by Geoffrey Noer of Cygnus Solutions, noer@cygnus.com
 
@@ -31,22 +31,13 @@ uname (struct utsname *name)
   memset (name, 0, sizeof (*name));
   __small_sprintf (name->sysname, "CYGWIN_%s", wincap.osname ());
 
-#if 0
-  /* Recognition of the real 64 bit CPU inside of a WOW64 system, irritates
-     build systems which think the native system is a 64 bit system.  Since
-     we're actually running in a 32 bit environment, it looks more correct
-     just to use the CPU info given by WOW64. */
-  if (wincap.is_wow64 ())
-    GetNativeSystemInfo (&sysinfo);
-  else
-#else
-  /* But it seems ok to add a hint to the sysname, that we're running under
-     WOW64.  This might give an early clue if somebody encounters problems. */
+  /* Add a hint to the sysname, that we're running under WOW64.  This might
+     give an early clue if somebody encounters problems. */
   if (wincap.is_wow64 ())
     strncat (name->sysname, "-WOW64",
 	     sizeof name->sysname - strlen (name->sysname) - 1);
-#endif
-    GetSystemInfo (&sysinfo);
+
+  GetSystemInfo (&sysinfo);
 
   /* Computer name */
   cygwin_gethostname (name->nodename, sizeof (name->nodename) - 1);
