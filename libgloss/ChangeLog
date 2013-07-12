@@ -1,3 +1,7 @@
+2013-07-12  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* aarch64/cpu-init/rdimon-aem-el3.S (vectors): Page align.
+
 2013-07-09  Sabrina Ni  <sabrina@andestech.com>
 
 	* configure.in: Add nds32 subdir.

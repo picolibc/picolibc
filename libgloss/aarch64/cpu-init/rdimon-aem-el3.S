@@ -78,10 +78,9 @@ lower_a32_serror:
 	b	\label
 	.endm
 
-	.align	7
-
 	/* AArch64 Exception Model -- 3.5.5 Exception Vectors.  */
 
+	.align	12
 vectors:
 	/* Current EL with SP0.  */
 	ventry	curr_sp0_sync		/* Synchronous  */
