@@ -191,6 +191,9 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
    (regs are 32-bits wide).  */
 #define EF_MIPS_32BITMODE	0x00000100
 
+/* Code in file uses the IEEE 754-2008 NaN encoding convention.  */
+#define EF_MIPS_NAN2008		0x00000400
+
 /* Architectural Extensions used by this file */
 #define EF_MIPS_ARCH_ASE	0x0f000000
 
