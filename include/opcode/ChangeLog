@@ -1,3 +1,7 @@
+2013-07-14  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h: Document MIPS16 "I" opcode.
+
 2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	* mips.h (M_ACLR_OB, M_ASET_OB, M_CACHE_OB, M_CACHEE_OB, M_L_DOB)

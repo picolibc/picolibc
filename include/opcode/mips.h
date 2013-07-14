@@ -1305,6 +1305,8 @@ extern int bfd_mips_num_opcodes;
    "l" register list for entry instruction
    "L" register list for exit instruction
 
+   "I" an immediate value used for macros
+
    The remaining codes may be extended.  Except as otherwise noted,
    the full extended operand is a 16 bit signed value.
    "<" 3 bit unsigned shift count * 0 (MIPS16OP_*_RZ) (full 5 bit unsigned)
