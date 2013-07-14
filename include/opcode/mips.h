@@ -375,6 +375,13 @@ enum mips_operand_type {
      size determines whether the 16-bit or 32-bit encoding is required.  */
   OP_LWM_SWM_LIST,
 
+  /* The register list for an emulated MIPS16 ENTRY or EXIT instruction.  */
+  OP_ENTRY_EXIT_LIST,
+
+  /* The register list and frame size for a MIPS16 SAVE or RESTORE
+     instruction.  */
+  OP_SAVE_RESTORE_LIST,
+
   /* A 10-bit field VVVVVNNNNN used for octobyte and quadhalf instructions:
 
      V      Meaning
@@ -1680,6 +1687,7 @@ extern int bfd_mips_num_opcodes;
    FP_D (never used)
    */
 
+extern const struct mips_operand *decode_mips16_operand (char, bfd_boolean);
 extern const struct mips_opcode mips16_opcodes[];
 extern const int bfd_mips16_num_opcodes;
 

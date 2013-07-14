@@ -1,5 +1,11 @@
 2013-07-14  Richard Sandiford  <rdsandiford@googlemail.com>
 
+	* mips.h (mips_operand_type): Add OP_ENTRY_EXIT_LIST and
+	OP_SAVE_RESTORE_LIST.
+	(decode_mips16_operand): Declare.
+
+2013-07-14  Richard Sandiford  <rdsandiford@googlemail.com>
+
 	* mips.h (mips_operand_type, mips_reg_operand_type): New enums.
 	(mips_operand, mips_int_operand, mips_mapped_int_operand)
 	(mips_msb_operand, mips_reg_operand, mips_reg_pair_operand)
