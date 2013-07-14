@@ -1,5 +1,15 @@
 2013-07-14  Richard Sandiford  <rdsandiford@googlemail.com>
 
+	* mips.h (mips_operand_type, mips_reg_operand_type): New enums.
+	(mips_operand, mips_int_operand, mips_mapped_int_operand)
+	(mips_msb_operand, mips_reg_operand, mips_reg_pair_operand)
+	(mips_pcrel_operand): New structures.
+	(mips_insert_operand, mips_extract_operand, mips_signed_operand)
+	(mips_decode_int_operand, mips_decode_pcrel_operand): New functions.
+	(decode_mips_operand, decode_micromips_operand): Declare.
+
+2013-07-14  Richard Sandiford  <rdsandiford@googlemail.com>
+
 	* mips.h: Document MIPS16 "I" opcode.
 
 2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>

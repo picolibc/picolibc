@@ -332,6 +332,292 @@
 #define OP_SH_EVAOFFSET		7
 #define OP_MASK_EVAOFFSET	0x1ff
 
+/* Enumerates the various types of MIPS operand.  */
+enum mips_operand_type {
+  /* Described by mips_int_operand.  */
+  OP_INT,
+
+  /* Described by mips_mapped_int_operand.  */
+  OP_MAPPED_INT,
+
+  /* Described by mips_msb_operand.  */
+  OP_MSB,
+
+  /* Described by mips_reg_operand.  */
+  OP_REG,
+
+  /* Described by mips_reg_pair_operand.  */
+  OP_REG_PAIR,
+
+  /* Described by mips_pcrel_operand.  */
+  OP_PCREL,
+
+  /* A performance register.  The field is 5 bits in size, but the supported
+     values are much more restricted.  */
+  OP_PERF_REG,
+
+  /* The final operand in a microMIPS ADDIUSP instruction.  It mostly acts
+     as a normal 9-bit signed offset that is multiplied by four, but there
+     are four special cases:
+
+     -2 * 4 => -258 * 4
+     -1 * 4 => -257 * 4
+      0 * 4 =>  256 * 4
+      1 * 4 =>  257 * 4.  */
+  OP_ADDIUSP_INT,
+
+  /* The target of a (D)CLO or (D)CLZ instruction.  The operand spans two
+     5-bit register fields, both of which must be set to the destination
+     register.  */
+  OP_CLO_CLZ_DEST,
+
+  /* A register list for a microMIPS LWM or SWM instruction.  The operand
+     size determines whether the 16-bit or 32-bit encoding is required.  */
+  OP_LWM_SWM_LIST,
+
+  /* A 10-bit field VVVVVNNNNN used for octobyte and quadhalf instructions:
+
+     V      Meaning
+     -----  -------
+     0EEE0  8 copies of $vN[E], OB format
+     0EE01  4 copies of $vN[E], QH format
+     10110  all 8 elements of $vN, OB format
+     10101  all 4 elements of $vN, QH format
+     11110  8 copies of immediate N, OB format
+     11101  4 copies of immediate N, QH format.  */
+  OP_MDMX_IMM_REG,
+
+  /* A register operand that must match the destination register.  */
+  OP_REPEAT_DEST_REG,
+
+  /* A register operand that must match the previous register.  */
+  OP_REPEAT_PREV_REG,
+
+  /* $pc, which has no encoding in the architectural instruction.  */
+  OP_PC
+};
+
+/* Enumerates the types of MIPS register.  */
+enum mips_reg_operand_type {
+  /* General registers $0-$31.  Software names like $at can also be used.  */
+  OP_REG_GP,
+
+  /* Floating-point registers $f0-$f31.  */
+  OP_REG_FP,
+
+  /* Coprocessor condition code registers $cc0-$cc7.  FPU condition codes
+     can also be written $fcc0-$fcc7.  */
+  OP_REG_CCC,
+
+  /* FPRs used in a vector capacity.  They can be written $f0-$f31
+     or $v0-$v31, although the latter form is not used for the VR5400
+     vector instructions.  */
+  OP_REG_VEC,
+
+  /* DSP accumulator registers $ac0-$ac3.  */
+  OP_REG_ACC,
+
+  /* Coprocessor registers $0-$31.  Mnemonic names like c0_cause can
+     also be used in some contexts.  */
+  OP_REG_COPRO,
+
+  /* Hardware registers $0-$31.  Mnemonic names like hwr_cpunum can
+     also be used in some contexts.  */
+  OP_REG_HW
+};
+
+/* Base class for all operands.  */
+struct mips_operand
+{
+  /* The type of the operand.  */
+  enum mips_operand_type type;
+
+  /* The operand occupies SIZE bits of the instruction, starting at LSB.  */
+  unsigned short size;
+  unsigned short lsb;
+};
+
+/* Describes an integer operand with a regular encoding pattern.  */
+struct mips_int_operand
+{
+  struct mips_operand root;
+
+  /* The low ROOT.SIZE bits of MAX_VAL encodes (MAX_VAL + BIAS) << SHIFT.
+     The cyclically previous field value encodes 1 << SHIFT less than that,
+     and so on.  E.g.
+
+     - for { { T, 4, L }, 14, 0, 0 }, field values 0...14 encode themselves,
+       but 15 encodes -1.
+
+     - { { T, 8, L }, 127, 0, 2 } is a normal signed 8-bit operand that is
+       shifted left two places.
+
+     - { { T, 3, L }, 8, 0, 0 } is a normal unsigned 3-bit operand except
+       that 0 encodes 8.
+
+     - { { ... }, 0, 1, 3 } means that N encodes (N + 1) << 3.  */
+  unsigned int max_val;
+  int bias;
+  unsigned int shift;
+
+  /* True if the operand should be printed as hex rather than decimal.  */
+  bfd_boolean print_hex;
+};
+
+/* Uses a lookup table to describe a small integer operand.  */
+struct mips_mapped_int_operand
+{
+  struct mips_operand root;
+
+  /* Maps each encoding value to the integer that it represents.  */
+  const int *int_map;
+
+  /* True if the operand should be printed as hex rather than decimal.  */
+  bfd_boolean print_hex;
+};
+
+/* An operand that encodes the most significant bit position of a bitfield.
+   Given a bitfield that spans bits [MSB, LSB], some operands of this type
+   encode MSB directly while others encode MSB - LSB.  Each operand of this
+   type is preceded by an integer operand that specifies LSB.
+
+   The assembly form varies between instructions.  For some instructions,
+   such as EXT, the operand is written as the bitfield size.  For others,
+   such as EXTS, it is written in raw MSB - LSB form.  */
+struct mips_msb_operand
+{
+  struct mips_operand root;
+
+  /* The assembly-level operand encoded by a field value of 0.  */
+  int bias;
+
+  /* True if the operand encodes MSB directly, false if it encodes
+     MSB - LSB.  */
+  bfd_boolean add_lsb;
+
+  /* The maximum value of MSB + 1.  */
+  unsigned int opsize;
+};
+
+/* Describes a single register operand.  */
+struct mips_reg_operand
+{
+  struct mips_operand root;
+
+  /* The type of register.  */
+  enum mips_reg_operand_type reg_type;
+
+  /* If nonnull, REG_MAP[N] gives the register associated with encoding N,
+     otherwise the encoding is the same as the register number.  */
+  const unsigned char *reg_map;
+};
+
+/* Describes an operand that encodes a pair of registers.  */
+struct mips_reg_pair_operand
+{
+  struct mips_operand root;
+
+  /* The type of register.  */
+  enum mips_reg_operand_type reg_type;
+
+  /* Encoding N represents REG1_MAP[N], REG2_MAP[N].  */
+  unsigned char *reg1_map;
+  unsigned char *reg2_map;
+};
+
+/* Describes an operand that is calculated relative to a base PC.
+   The base PC is usually the address of the following instruction,
+   but the rules for MIPS16 instructions like ADDIUPC are more complicated.  */
+struct mips_pcrel_operand
+{
+  struct mips_operand root;
+
+  /* The low ALIGN_LOG2 bits of the base PC are cleared to give PC'.  */
+  unsigned int align_log2 : 8;
+
+  /* The operand is shifted left SHIFT places and added to PC'.
+     The operand is signed if IS_SIGNED.  */
+  unsigned int shift : 8;
+  unsigned int is_signed : 1;
+
+  /* If INCLUDE_ISA_BIT, the ISA bit of the original base PC is then
+     reinstated.  This is true for jumps and branches and false for
+     PC-relative data instructions.  */
+  unsigned int include_isa_bit : 1;
+
+  /* If FLIP_ISA_BIT, the ISA bit of the result is inverted.
+     This is true for JALX and false otherwise.  */
+  unsigned int flip_isa_bit : 1;
+};
+
+/* Return a version of INSN in which the field specified by OPERAND
+   has value UVAL.  */
+
+static inline unsigned int
+mips_insert_operand (const struct mips_operand *operand, unsigned int insn,
+		     unsigned int uval)
+{
+  unsigned int mask;
+
+  mask = (1 << operand->size) - 1;
+  insn &= ~(mask << operand->lsb);
+  insn |= (uval & mask) << operand->lsb;
+  return insn;
+}
+
+/* Extract OPERAND from instruction INSN.  */
+
+static inline unsigned int
+mips_extract_operand (const struct mips_operand *operand, unsigned int insn)
+{
+  return (insn >> operand->lsb) & ((1 << operand->size) - 1);
+}
+
+/* UVAL is the value encoded by OPERAND.  Return it in signed form.  */
+
+static inline int
+mips_signed_operand (const struct mips_operand *operand, unsigned int uval)
+{
+  unsigned int sign_bit, mask;
+
+  mask = (1 << operand->size) - 1;
+  sign_bit = 1 << (operand->size - 1);
+  return ((uval + sign_bit) & mask) - sign_bit;
+}
+
+/* Return the integer that OPERAND encodes as UVAL.  */
+
+static inline int
+mips_decode_int_operand (const struct mips_int_operand *operand,
+			 unsigned int uval)
+{
+  uval |= (operand->max_val - uval) & -(1 << operand->root.size);
+  uval += operand->bias;
+  uval <<= operand->shift;
+  return uval;
+}
+
+/* PC-relative operand OPERAND has value UVAL and is relative to BASE_PC.
+   Return the address that it encodes.  */
+
+static inline bfd_vma
+mips_decode_pcrel_operand (const struct mips_pcrel_operand *operand,
+			   bfd_vma base_pc, unsigned int uval)
+{
+  bfd_vma addr;
+
+  addr = base_pc & -(1 << operand->align_log2);
+  if (operand->is_signed)
+    addr += mips_signed_operand (&operand->root, uval) * (1 << operand->shift);
+  else
+    addr += uval << operand->shift;
+  if (operand->include_isa_bit)
+    addr |= base_pc & 1;
+  if (operand->flip_isa_bit)
+    addr ^= 1;
+  return addr;
+}
+
 /* This structure holds information for a particular instruction.  */
 
 struct mips_opcode
@@ -1215,6 +1501,7 @@ enum
    Many instructions are short hand for other instructions (i.e., The
    jal <register> instruction is short for jalr <register>).  */
 
+extern const struct mips_operand *decode_mips_operand (const char *);
 extern const struct mips_opcode mips_builtin_opcodes[];
 extern const int bfd_mips_num_builtin_opcodes;
 extern struct mips_opcode *mips_opcodes;
@@ -1780,6 +2067,7 @@ extern const int bfd_mips16_num_opcodes;
    " bcdefghij lmn pq st   xyz"
 */
 
+extern const struct mips_operand *decode_micromips_operand (const char *);
 extern const struct mips_opcode micromips_opcodes[];
 extern const int bfd_micromips_num_opcodes;
 
