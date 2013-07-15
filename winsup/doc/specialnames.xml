@@ -270,10 +270,6 @@ Cygwin supports the following character devices commonly found on POSIX systems:
 /dev/pipe
 /dev/fifo
 
-/dev/mem	The physical memory of the machine.  Note that access to the
-/dev/port	physical memory has been restricted with Windows Server 2003.
-/dev/kmem	Since this OS, you can't access physical memory from user space.
-
 /dev/kmsg	Kernel message pipe, for usage with sys logger services.
 
 /dev/random	Random number generator.

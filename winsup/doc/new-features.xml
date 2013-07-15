@@ -4,6 +4,19 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.22"><title>What's new and what changed from 1.7.21 to 1.7.22</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Support for /dev/mem, /dev/kmem and /dev/port removed, since OS support
+was limited to 32 bit Windows XP only.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.21"><title>What's new and what changed from 1.7.20 to 1.7.21</title>
 
 <itemizedlist mark="bullet">
