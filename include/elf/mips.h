@@ -1129,11 +1129,30 @@ extern void bfd_mips_elf64_swap_reginfo_out
 enum
 {
   /* 0-3 are generic.  */
-  Tag_GNU_MIPS_ABI_FP = 4, /* Value 1 for hard-float -mdouble-float, 2
-			      for hard-float -msingle-float, 3 for
-			      soft-float, 4 for -mips32r2 -mfp64; 0 for
-			      not tagged or not using any ABIs affected
-			      by the differences.  */
+
+  /* Floating-point ABI used by this object file.  */
+  Tag_GNU_MIPS_ABI_FP = 4,
+};
+
+/* Object attribute values.  */
+enum
+{
+  /* Values defined for Tag_GNU_MIPS_ABI_FP.  */
+
+  /* Not tagged or not using any ABIs affected by the differences.  */
+  Val_GNU_MIPS_ABI_FP_ANY = 0,
+
+  /* Using hard-float -mdouble-float.  */
+  Val_GNU_MIPS_ABI_FP_DOUBLE = 1,
+
+  /* Using hard-float -msingle-float.  */
+  Val_GNU_MIPS_ABI_FP_SINGLE = 2,
+
+  /* Using soft-float.  */
+  Val_GNU_MIPS_ABI_FP_SOFT = 3,
+
+  /* Using -mips32r2 -mfp64.  */
+  Val_GNU_MIPS_ABI_FP_64 = 4,
 };
 
 #endif /* _ELF_MIPS_H */
