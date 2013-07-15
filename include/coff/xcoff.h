@@ -171,6 +171,10 @@
 #define XMC_TD	16		/* Read-write data in TOC */
 #define	XMC_SV64   17		/* Read-only 64 bit supervisor call */
 #define	XMC_SV3264 18		/* Read-only 32 or 64 bit supervisor call */
+/*                19   ??? */
+#define XMC_TL     20          /* Read-write initialized TLS data */
+#define XMC_TU     21          /* Read-write uninitialized TLS data */
+#define XMC_TE     22          /* Same as XMC_TC but mapped after it */
 
 /* The ldhdr structure.  This appears at the start of the .loader
    section.  */

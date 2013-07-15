@@ -145,6 +145,21 @@
 #define __BUFSIZ__ 16
 #define _REENT_SMALL
 #endif
+
+#if defined __MSP430__
+#ifndef _REENT_SMALL
+#define _REENT_SMALL
+#endif
+
+#define __SMALL_BITFIELDS
+
+#ifdef __MSP430X_LARGE__
+#define _POINTER_INT long
+#else
+#define _POINTER_INT int
+#endif
+#endif
+
 #ifdef __m32c__
 #define __SMALL_BITFIELDS
 #undef INT_MAX
@@ -217,6 +232,8 @@
 #if defined(__rtems__)
 #define __FILENAME_MAX__ 255
 #define _READ_WRITE_RETURN_TYPE _ssize_t
+#define __DYNAMIC_REENT__
+#define _REENT_GLOBAL_ATEXIT
 #endif
 
 #ifndef __EXPORT

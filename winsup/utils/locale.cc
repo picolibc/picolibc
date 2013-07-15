@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2011 Corinna Vinschen
+ * Copyright (c) 2010, 2011, 2012, 2013 Corinna Vinschen
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -520,7 +520,7 @@ print_lc_sepstrings (int key, const char *name, const char *value)
 	}
       else
 	{
-	  printf ("%.*s", c - value, value);
+	  printf ("%.*s", (int) (c - value), value);
 	  value = c + 1;
 	}
       if (key)

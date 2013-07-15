@@ -1,0 +1,31 @@
+What's new:
+-----------
+
+- New API: rawmemchr.
+
+- Make cygcheck report when scanned DLLs are symlinks or are not meant
+  for the current architecture (x86 vs. x86_64).
+  See: http://cygwin.com/ml/cygwin/2013-07/msg00143.html
+
+Bug fixes:
+----------
+
+- Fix long-standing problem which allows to access files via ".." using an
+  invalid POSIX path, for instance, `cd nonexistant/../existing_dir".
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00222.html
+
+- Fix EFAULT when reading large clipboard.
+  Fixes: http://cygwin.com/ml/cygwin/2013-06/msg00311.html
+
+- Fix creation of relative native symlinks.
+  Fixes: http://cygwin.com/ml/cygwin/2013-06/msg00340.html
+	 http://cygwin.com/ml/cygwin/2013-07/msg00286.html
+
+- Update profiling code to latest from Mingw-w64.  Allows profiling on x86_64
+  now and fixes http://cygwin.com/ml/cygwin/2013-06/msg00376.html
+
+- Fix character comparisons in certain scenarios within the functions glob(3),
+  fnmatch(3), and regcomp(3).  All Unicode chars beyond U+0100 are affected.
+
+- Fix problem with pty closing which manifested as a screen issue:
+  See: http://cygwin.com/ml/cygwin/2013-06/msg00196.html

@@ -145,6 +145,8 @@ _DEFUN(fputws, (ws, fp),
 	const wchar_t *ws _AND
 	FILE *fp)
 {
-  CHECK_INIT (_REENT, fp);
-  return _fputws_r (_REENT, ws, fp);
+  struct _reent *reent = _REENT;
+
+  CHECK_INIT (reent, fp);
+  return _fputws_r (reent, ws, fp);
 }

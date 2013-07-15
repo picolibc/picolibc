@@ -42,6 +42,8 @@ moxie			Anthony Green		green@moxielogic.com
 rl78			DJ Delorie		dj@redhat.com
 aarch64			Richard Earnshaw	richard.earnshaw@arm.com
 			Marcus Shawcroft	marcus.shawcroft@arm.com
+msp430			DJ Delorie		dj@redhat.com
+			Nick Clifton		nickc@redhat.com
 
 
 			Write After Approval
@@ -53,3 +55,4 @@ DJ Delorie			dj@redhat.com
 Jim Wilson			wilson@specifixinc.com
 Nick Clifton			nickc@redhat.com
 Eric Blake			eblake@redhat.com
+Will Newton			will.newton@linaro.org

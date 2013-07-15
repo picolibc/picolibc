@@ -1,3 +1,10 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<qandadiv id="faq.using">
+<title>Using Cygwin</title>
+
 <!-- faq-problems.xml -->
 <qandaentry id="faq.using.missing-dlls">
 <question><para>Why can't my application locate cygncurses-8.dll?  or cygintl-3.dll?  or cygreadline6.dll?  or ...?</para></question>
@@ -388,18 +395,33 @@ set is 65001.</para>
 <qandaentry id="faq.using.multiple-copies">
 <question><para>Is it OK to have multiple copies of the DLL?</para></question>
 <answer>
-<para>You should only have one copy of the Cygwin DLL on your system.  If you
-have multiple versions, they will conflict and cause problems.
+<para>Yes, as long as they are used in strictly separated installations.</para>
+<para>The Cygwin DLL has to handle various sharing situations between
+multiple processes.  It has to keep a process table.  It has to maintain
+a mount table which is based on the installation path of the Cygwin DLL.</para>
+<para>For that reason, the Cygwin DLL maintains shared resources based on
+a hash value created from its own installation path.  Each Cygwin DLL
+on the machine constitutes a Cygwin installation, with the directory
+the Cygwin DLL resides in treated as "/bin", the parent directory as "/".
 </para>
+<para>Therefore, you can install two or more separate Cygwin distros on
+a single machine.  Each of these installations use their own Cygwin DLL,
+and they don't share the default POSIX paths, nor process tables, nor
+any other shared resource used to maintain the installation.</para>
+<para>However, a clean separation requires that you don't try to run
+executables of one Cygwin installation from processes running in another
+Cygwin installation.  This may or may not work, but the chances that the
+result is not what you expect are pretty high.</para>
 <para>If you get the error "shared region is corrupted" or "shared region
 version mismatch" it means you have multiple versions of cygwin1.dll
-running at the same time which conflict with each other.  This could happen,
-for example, if you update cygwin1.dll without exiting
-<emphasis>all</emphasis> Cygwin apps (including inetd) beforehand.
-</para>
+running at the same time which conflict with each other.  Apart from
+mixing executables of different Cygwin installations, this could also happen
+if you have one a single Cygwin installation, for example, if you update the
+Cygwin package without exiting <emphasis>all</emphasis> Cygwin apps (including
+services like sshd) beforehand.</para>
 <para>The only DLL that is sanctioned by the Cygwin project is the one that
 you get by running <ulink url="http://cygwin.com/setup.exe">setup.exe</ulink>,
-installed in the directory controlled by this program.  If you have other
+installed in a directory controlled by this program.  If you have other
 versions on your system and desire help from the cygwin project, you should
 delete or rename all DLLs that are not installed by
 <filename>setup.exe</filename>.
@@ -415,15 +437,17 @@ cygwin-mounted filesystems (as Cygwin 'find' would do).
 <qandaentry id="faq.using.third-party.multiple-copies">
 <question><para>
 I read the above but I want to bundle Cygwin with a product, and ship it
-to customer sites.  How can I do this without conflicting with any
-Cygwin installed by the user?
+to customer sites.  How can I do this without conflicting with any Cygwin
+installed by the user?
 </para></question>
 <answer><para>
-Third party developers who wish to use Cygwin should check if
-there is a version of cygwin installed and use the installed
-version if it is newer, or conditionally upgrade if it is not.
-(If you write a tool to make this easy, consider contributing
-it for others to use)
+Usually, if you keep your installation separate, nothing bad should happen.
+However, for the user's convenience, and to avoid potential problems which
+still can occur, consider to integrate your product with an already existing
+Cygwin installation on the user's machine, or, if there is none, consider
+to install the official Cygwin distro on behalf of the user and integrate
+your tools from there.  (If you write a tool to make this easy, consider
+contributing it for others to use)
 </para></answer></qandaentry>
 
 <qandaentry id="faq.using.bundling-cygwin">
@@ -432,33 +456,12 @@ Can I bundle Cygwin with my product for free?
 </para></question>
 <answer><para>
 Only if you comply with Cygwin's <ulink
-url="http://cygwin.com/license.html">license</ulink> very carefully.  If you
+url="http://cygwin.com/licensing.html">license</ulink> very carefully.  If you
 choose to distribute cygwin1.dll, you must be willing to distribute the
 exact source code used to build that copy of cygwin1.dll as per the
 terms of the GPL.  If you ship applications that link with cygwin1.dll,
 you must either provide those applications' source code under a
 GPL-compatible license, *or* purchase a cygwin license from Red Hat.
-</para></answer></qandaentry>
-
-<qandaentry id="faq.using.private-cygwin">
-<question><para>
-So I can't install a private version of the Cygwin DLL without
-conflicting with the system cygwin?
-</para></question>
-<answer><para>
-Actually, if you are very careful, you can have two different versions
-of the Cygwin DLL installed on your system at the same time but they
-must be run serially.  The only exception from this rule is, if one of
-the DLLs is a pre-1.7 DLL and the other is a 1.7.0 or later DLL.  These
-DLLs can work concurrently without knowing about each other due to
-massive changes using shared resources in Cygwin 1.7.  However,
-processes using different DLLs will not interact with each other
-correctly, so keep them separate except you really really know what
-you're doing.
-</para>
-<para>This usage is not recommeded for novices.  Only limited support will be
-provided in the <ulink url="http://cygwin.com/lists.html">mailing lists</ulink>
-if you run into problems.
 </para></answer></qandaentry>
 
 <qandaentry id="faq.using.older-cygwin-conflict">
@@ -621,7 +624,7 @@ of poorly written firewall-type software that causes things to break.
 Note that with many of these products, simply disabling the firewall
 does not remove these changes; it must be completely uninstalled.
 </para>
-<para>See also <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda" />
+<para>See also <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda" />
 for a list of applications that have been known, at one time or another, to 
 interfere with the normal functioning of Cygwin.
 </para>
@@ -771,7 +774,7 @@ contents are exempt from scanning.  In a default installation, this
 would be <literal>C:\cygwin\bin</literal>.  Obviously, this could be
 exploited by a hostile non-Cygwin program, so do this at your own risk.
 </para>
-<para>See also <ulink url="http://cygwin.com/faq/faq.using.html#faq.using.bloda" />
+<para>See also <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda" />
 for a list of applications that have been known, at one time or another, to
 interfere with the normal functioning of Cygwin.
 </para>
@@ -1101,10 +1104,6 @@ IPv6-capable and that's why you see the "Address family not supported"
 error message.  Note, however, that the IPv6 stack on these systems
 don't fully support all features of IPv6.</para>
 
-<para>There's also a very experimental IPv6 stack for Windows 2000, and
-Cygwin will try its best to support it, but it's not recommended to install
-it.</para>
-
 <para>For more information about IPv6 on Windows and how to install the
 IPv6 stack, see the <ulink url="http://www.microsoft.com/technet/network/ipv6/ipv6faq.mspx">Microsoft TechNet IPv6 FAQ article</ulink>
 </para></answer></qandaentry>
@@ -1247,3 +1246,4 @@ such as virtual memory paging and file caching.</para>
   difficult to make <literal>fork()</literal> work reliably.</para>
 </answer>
 </qandaentry>
+</qandadiv>

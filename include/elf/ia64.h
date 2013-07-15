@@ -209,6 +209,10 @@
 # define VMS_STL_STD	   2	  /* Standard linkage with return value.  */
 # define VMS_STL_LNK	   3	  /* Explicit represented in .vms_linkages.  */
 
+/* OpenVMS specific symbol binding values.  */
+#define STB_VMS_WEAK	11	/* VMS weak symbol.  */
+#define STB_VMS_SYSTEM	12	/* System symbol.  */
+
 /* OpenVMS specific fixup and relocation structures.  */
 
 typedef struct

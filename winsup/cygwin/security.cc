@@ -1,7 +1,7 @@
 /* security.cc: NT file access control functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
    Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
@@ -31,10 +31,10 @@ details. */
 				  | GROUP_SECURITY_INFORMATION \
 				  | OWNER_SECURITY_INFORMATION)
 
-static NO_COPY GENERIC_MAPPING file_mapping = { FILE_GENERIC_READ,
-						FILE_GENERIC_WRITE,
-						FILE_GENERIC_EXECUTE,
-						FILE_ALL_ACCESS };
+static GENERIC_MAPPING NO_COPY_RO file_mapping = { FILE_GENERIC_READ,
+						   FILE_GENERIC_WRITE,
+						   FILE_GENERIC_EXECUTE,
+						   FILE_ALL_ACCESS };
 
 LONG
 get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
@@ -58,7 +58,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 				      sd, len, &rlen);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtQuerySecurityObject (%S), status %p",
+	  debug_printf ("NtQuerySecurityObject (%S), status %y",
 			pc.get_nt_native_path (), status);
 	  fh = NULL;
 	}
@@ -152,7 +152,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 			   | FILE_OPEN_REPARSE_POINT);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtOpenFile (%S), status %p", &dirname, status);
+	  debug_printf ("NtOpenFile (%S), status %y", &dirname, status);
 	  return 0;
 	}
       /* ... fetch the parent's security descriptor ... */
@@ -162,7 +162,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
       NtClose (fh);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtQuerySecurityObject (%S), status %p",
+	  debug_printf ("NtQuerySecurityObject (%S), status %y",
 			&dirname, status);
 	  return 0;
 	}
@@ -177,7 +177,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 						      &file_mapping);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("RtlConvertToAutoInheritSecurityObject (%S), status %p",
+	  debug_printf ("RtlConvertToAutoInheritSecurityObject (%S), status %y",
 			&dirname, status);
 	  return 0;
 	}
@@ -330,7 +330,7 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 
 static void
 get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
-		  __uid32_t *uidret, __gid32_t *gidret)
+		  uid_t *uidret, gid_t *gidret)
 {
   if (!psd)
     {
@@ -352,13 +352,13 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
 
   status = RtlGetOwnerSecurityDescriptor (psd, (PSID *) &owner_sid, &dummy);
   if (!NT_SUCCESS (status))
-    debug_printf ("RtlGetOwnerSecurityDescriptor: %p", status);
+    debug_printf ("RtlGetOwnerSecurityDescriptor: %y", status);
   status = RtlGetGroupSecurityDescriptor (psd, (PSID *) &group_sid, &dummy);
   if (!NT_SUCCESS (status))
-    debug_printf ("RtlGetGroupSecurityDescriptor: %p", status);
+    debug_printf ("RtlGetGroupSecurityDescriptor: %y", status);
 
-  __uid32_t uid;
-  __gid32_t gid;
+  uid_t uid;
+  gid_t gid;
   bool grp_member = get_sids_info (owner_sid, group_sid, &uid, &gid);
   if (uidret)
     *uidret = uid;
@@ -367,7 +367,7 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
 
   if (!attribute)
     {
-      syscall_printf ("uid %d, gid %d", uid, gid);
+      syscall_printf ("uid %u, gid %u", uid, gid);
       return;
     }
 
@@ -385,7 +385,7 @@ get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
   else
     get_attribute_from_acl (attribute, acl, owner_sid, group_sid, grp_member);
 
-  syscall_printf ("%sACL %x, uid %d, gid %d",
+  syscall_printf ("%sACL %y, uid %u, gid %u",
 		  (!acl_exists || !acl)?"NO ":"", *attribute, uid, gid);
 }
 
@@ -414,8 +414,8 @@ get_reg_sd (HANDLE handle, security_descriptor &sd_ret)
 }
 
 int
-get_reg_attribute (HKEY hkey, mode_t *attribute, __uid32_t *uidret,
-		   __gid32_t *gidret)
+get_reg_attribute (HKEY hkey, mode_t *attribute, uid_t *uidret,
+		   gid_t *gidret)
 {
   security_descriptor sd;
 
@@ -430,7 +430,7 @@ get_reg_attribute (HKEY hkey, mode_t *attribute, __uid32_t *uidret,
 
 int
 get_file_attribute (HANDLE handle, path_conv &pc,
-		    mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
+		    mode_t *attribute, uid_t *uidret, gid_t *gidret)
 {
   if (pc.has_acls ())
     {
@@ -496,7 +496,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
 }
 
 static PSECURITY_DESCRIPTOR
-alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
+alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 	  security_descriptor &sd_ret)
 {
   NTSTATUS status;
@@ -506,17 +506,17 @@ alloc_sd (path_conv &pc, __uid32_t uid, __gid32_t gid, int attribute,
   /* NOTE: If the high bit of attribute is set, we have just created
      a file or directory.  See below for an explanation. */
 
-  debug_printf("uid %d, gid %d, attribute %x", uid, gid, attribute);
+  debug_printf("uid %u, gid %u, attribute %y", uid, gid, attribute);
 
   /* Get owner and group from current security descriptor. */
   PSID cur_owner_sid = NULL;
   PSID cur_group_sid = NULL;
   status = RtlGetOwnerSecurityDescriptor (sd_ret, &cur_owner_sid, &dummy);
   if (!NT_SUCCESS (status))
-    debug_printf ("RtlGetOwnerSecurityDescriptor: %p", status);
+    debug_printf ("RtlGetOwnerSecurityDescriptor: %y", status);
   status = RtlGetGroupSecurityDescriptor (sd_ret, &cur_group_sid, &dummy);
   if (!NT_SUCCESS (status))
-    debug_printf ("RtlGetGroupSecurityDescriptor: %p", status);
+    debug_printf ("RtlGetGroupSecurityDescriptor: %y", status);
 
   /* Get SID of owner. */
   cygsid owner_sid;
@@ -899,7 +899,7 @@ get_object_sd (HANDLE handle, security_descriptor &sd)
 }
 
 int
-get_object_attribute (HANDLE handle, __uid32_t *uidret, __gid32_t *gidret,
+get_object_attribute (HANDLE handle, uid_t *uidret, gid_t *gidret,
 		      mode_t *attribute)
 {
   security_descriptor sd;
@@ -911,7 +911,7 @@ get_object_attribute (HANDLE handle, __uid32_t *uidret, __gid32_t *gidret,
 }
 
 int
-create_object_sd_from_attribute (HANDLE handle, __uid32_t uid, __gid32_t gid,
+create_object_sd_from_attribute (HANDLE handle, uid_t uid, gid_t gid,
 				 mode_t attribute, security_descriptor &sd)
 {
   path_conv pc;
@@ -936,7 +936,7 @@ set_object_sd (HANDLE handle, security_descriptor &sd, bool chown)
 }
 
 int
-set_object_attribute (HANDLE handle, __uid32_t uid, __gid32_t gid,
+set_object_attribute (HANDLE handle, uid_t uid, gid_t gid,
 		      mode_t attribute)
 {
   security_descriptor sd;
@@ -949,7 +949,7 @@ set_object_attribute (HANDLE handle, __uid32_t uid, __gid32_t gid,
 
 int
 set_file_attribute (HANDLE handle, path_conv &pc,
-		    __uid32_t uid, __gid32_t gid, mode_t attribute)
+		    uid_t uid, gid_t gid, mode_t attribute)
 {
   int ret = -1;
 
@@ -964,7 +964,7 @@ set_file_attribute (HANDLE handle, path_conv &pc,
     }
   else
     ret = 0;
-  syscall_printf ("%d = set_file_attribute(%S, %d, %d, %p)",
+  syscall_printf ("%d = set_file_attribute(%S, %d, %d, %y)",
 		  ret, pc.get_nt_native_path (), uid, gid, attribute);
   return ret;
 }
@@ -1061,7 +1061,7 @@ check_file_access (path_conv &pc, int flags, bool effective)
     desired |= FILE_EXECUTE;
   if (!get_file_sd (pc.handle (), pc, sd, false))
     ret = check_access (sd, file_mapping, desired, flags, effective);
-  debug_printf ("flags %x, ret %d", flags, ret);
+  debug_printf ("flags %y, ret %d", flags, ret);
   return ret;
 }
 
@@ -1070,10 +1070,10 @@ check_registry_access (HANDLE hdl, int flags, bool effective)
 {
   security_descriptor sd;
   int ret = -1;
-  static GENERIC_MAPPING NO_COPY reg_mapping = { KEY_READ,
-						 KEY_WRITE,
-						 KEY_EXECUTE,
-						 KEY_ALL_ACCESS };
+  static GENERIC_MAPPING NO_COPY_RO reg_mapping = { KEY_READ,
+						    KEY_WRITE,
+						    KEY_EXECUTE,
+						    KEY_ALL_ACCESS };
   ACCESS_MASK desired = 0;
   if (flags & R_OK)
     desired |= KEY_ENUMERATE_SUB_KEYS;
@@ -1094,6 +1094,6 @@ check_registry_access (HANDLE hdl, int flags, bool effective)
       set_errno (EROFS);
       ret = -1;
     }
-  debug_printf ("flags %x, ret %d", flags, ret);
+  debug_printf ("flags %y, ret %d", flags, ret);
   return ret;
 }

@@ -61,7 +61,7 @@ malloc (size_t size)
       res = dlmalloc (size);
       __malloc_unlock ();
     }
-  malloc_printf ("(%d) = %x, called by %p", size, res, __builtin_return_address (0));
+  malloc_printf ("(%ld) = %p, called by %p", size, res, __builtin_return_address (0));
   return res;
 }
 
@@ -77,7 +77,7 @@ realloc (void *p, size_t size)
       res = dlrealloc (p, size);
       __malloc_unlock ();
     }
-  malloc_printf ("(%x, %d) = %x, called by %x", p, size, res, __builtin_return_address (0));
+  malloc_printf ("(%p, %ld) = %p, called by %p", p, size, res, __builtin_return_address (0));
   return res;
 }
 
@@ -104,7 +104,7 @@ calloc (size_t nmemb, size_t size)
       res = dlcalloc (nmemb, size);
       __malloc_unlock ();
     }
-  malloc_printf ("(%d, %d) = %x, called by %x", nmemb, size, res, __builtin_return_address (0));
+  malloc_printf ("(%ld, %ld) = %p, called by %p", nmemb, size, res, __builtin_return_address (0));
   return res;
 }
 

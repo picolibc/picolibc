@@ -1,3 +1,58 @@
+2013-07-08  Tristan Gingold  <gingold@adacore.com>
+
+	* ia64.h (STB_VMS_WEAK, STB_VMS_SYSTEM): Add.
+
+2013-07-05  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* s390.h: Add new relocs R_390_PC12DBL, R_390_PLT12DBL,
+	R_390_PC24DBL, and R_390_PLT24DBL.
+
+2013-06-26  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* aarch64.h: Add ELF32 reloc codes and remove fake ELF64 ones.
+
+2013-06-24  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h (ELF_ST_IS_MIPS_PLT): Respect STO_MIPS16 setting.
+	(ELF_ST_SET_MIPS_PLT): Likewise.
+
+2013-06-19  Will Newton  <will.newton@linaro.org>
+
+	* aarch64.h: Remove R_AARCH64_IRELATIVE.
+
+2013-06-07  Will Newton  <will.newton@linaro.org>
+
+	* aarch64.h: Add R_AARCH64_IRELATIVE reloc.
+
+2013-06-06  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h (ELF_ST_SET_MIPS_PIC): Clear any STO_MIPS16 setting.
+
+2013-05-30  Paul Brook  <paul@codesourcery.com>
+
+	* mips.h (R_MIPS_EH): New.
+
+2013-05-28  Yufeng Zhang  <yufeng.zhang@arm.com>
+
+	* aarch64.h (R_AARCH64_TLSDESC_LD64_PREL19): Rename to ...
+	(R_AARCH64_TLSDESC_LD_PREL19): ... this.
+	(R_AARCH64_TLSDESC_ADR_PAGE): Rename to ...
+	(R_AARCH64_TLSDESC_ADR_PAGE21): ... this.
+
+2013-05-22  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* common.h (EM_INTEL205): New.
+	(EM_INTEL206): Likewise.
+	(EM_INTEL207): Likewise.
+	(EM_INTEL208): Likewise.
+	(EM_INTEL209): Likewise.
+
+2013-05-02  Nick Clifton  <nickc@redhat.com>
+
+	* msp430.h: Add MSP430X relocs.
+	Add some more MSP430 machine numbers.
+	Add values used by .MSP430.attributes section.
+
 2013-03-21  Michael Schewe  <michael.schewe@gmx.net>
 
 	* h8.h: Add new reloc R_H8_DISP32A16 for relaxation of

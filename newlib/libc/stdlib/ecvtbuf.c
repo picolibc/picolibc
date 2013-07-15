@@ -233,6 +233,7 @@ _DEFUN (fcvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
 	int *sign _AND
 	char *fcvt_buf)
 {
+  struct _reent *reent = _REENT;
   char *save;
   char *p;
   char *end;
@@ -240,27 +241,27 @@ _DEFUN (fcvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
 
   if (fcvt_buf == NULL)
     {
-      if (_REENT->_cvtlen <= ndigit + 35)
+      if (reent->_cvtlen <= ndigit + 35)
 	{
-	  if ((fcvt_buf = (char *) _realloc_r (_REENT, _REENT->_cvtbuf,
+	  if ((fcvt_buf = (char *) _realloc_r (reent, reent->_cvtbuf,
 					       ndigit + 36)) == NULL)
 	    return NULL;
-	  _REENT->_cvtlen = ndigit + 36;
-	  _REENT->_cvtbuf = fcvt_buf;
+	  reent->_cvtlen = ndigit + 36;
+	  reent->_cvtbuf = fcvt_buf;
 	}
 
-      fcvt_buf = _REENT->_cvtbuf ;
+      fcvt_buf = reent->_cvtbuf ;
     }
 
   save = fcvt_buf;
 
   if (invalue < 1.0 && invalue > -1.0)
     {
-      p = _dtoa_r (_REENT, invalue, 2, ndigit, decpt, sign, &end);
+      p = _dtoa_r (reent, invalue, 2, ndigit, decpt, sign, &end);
     }
   else
     {
-      p = _dtoa_r (_REENT, invalue, 3, ndigit, decpt, sign, &end);
+      p = _dtoa_r (reent, invalue, 3, ndigit, decpt, sign, &end);
     }
 
   /* Now copy */
@@ -289,6 +290,7 @@ _DEFUN (ecvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
 	int *sign _AND
 	char *fcvt_buf)
 {
+  struct _reent *reent = _REENT;
   char *save;
   char *p;
   char *end;
@@ -296,21 +298,21 @@ _DEFUN (ecvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
 
   if (fcvt_buf == NULL)
     {
-      if (_REENT->_cvtlen <= ndigit)
+      if (reent->_cvtlen <= ndigit)
 	{
-	  if ((fcvt_buf = (char *) _realloc_r (_REENT, _REENT->_cvtbuf,
+	  if ((fcvt_buf = (char *) _realloc_r (reent, reent->_cvtbuf,
 					       ndigit + 1)) == NULL)
 	    return NULL;
-	  _REENT->_cvtlen = ndigit + 1;
-	  _REENT->_cvtbuf = fcvt_buf;
+	  reent->_cvtlen = ndigit + 1;
+	  reent->_cvtbuf = fcvt_buf;
 	}
 
-      fcvt_buf = _REENT->_cvtbuf ;
+      fcvt_buf = reent->_cvtbuf ;
     }
 
   save = fcvt_buf;
 
-  p = _dtoa_r (_REENT, invalue, 2, ndigit, decpt, sign, &end);
+  p = _dtoa_r (reent, invalue, 2, ndigit, decpt, sign, &end);
 
   /* Now copy */
 

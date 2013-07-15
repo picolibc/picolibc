@@ -89,6 +89,32 @@ tty_is_gone (const char *buf)
     }
 }
 
+static void
+set_winsymlinks (const char *buf)
+{
+  if (!buf || !*buf)
+    allow_winsymlinks = WSYM_lnk;
+  else if (ascii_strncasematch (buf, "lnk", 3))
+    allow_winsymlinks = WSYM_lnk;
+  /* Make sure to try native symlinks only on systems supporting them. */
+  else if (ascii_strncasematch (buf, "native", 6))
+    {
+      if (wincap.max_sys_priv () < SE_CREATE_SYMBOLIC_LINK_PRIVILEGE)
+	{
+	  if (!user_shared->warned_nonativesyms)
+	    {
+	      small_printf ("\"winsymlinks:%s\" option detected in CYGWIN environment variable.\n"
+			    "Native symlinks are not supported on Windows versions prior to\n"
+			    "Windows Vista/Server 2008.  This option will be ignored.\n", buf);
+	      user_shared->warned_nonativesyms = 1;
+	    }
+	}
+      else
+	allow_winsymlinks = ascii_strcasematch (buf + 6, "strict")
+			    ? WSYM_nativestrict : WSYM_native;
+    }
+}
+
 /* The structure below is used to set up an array which is used to
    parse the CYGWIN environment variable or, if enabled, options from
    the registry.  */
@@ -121,7 +147,7 @@ static struct parse_thing
   {"proc_retry", {func: set_proc_retry}, isfunc, NULL, {{0}, {5}}},
   {"reset_com", {&reset_com}, setbool, NULL, {{false}, {true}}},
   {"tty", {func: tty_is_gone}, isfunc, NULL, {{0}, {0}}},
-  {"winsymlinks", {&allow_winsymlinks}, setbool, NULL, {{false}, {true}}},
+  {"winsymlinks", {func: set_winsymlinks}, isfunc, NULL, {{0}, {0}}},
   {NULL, {0}, setdword, 0, {{0}, {0}}}
 };
 
@@ -187,7 +213,7 @@ parse_options (const char *inbuf)
 		  *k->setting.x = k->values[istrue].i;
 		else
 		  *k->setting.x = strtol (eq, NULL, 0);
-		debug_printf ("%s %d", k->name, *k->setting.x);
+		debug_printf ("%s %u", k->name, *k->setting.x);
 		break;
 	      case setbool:
 		if (!istrue || !eq)
@@ -360,11 +386,11 @@ win_env::add_cache (const char *in_posix, const char *in_native)
   MALLOC_CHECK;
   if (immediate && cygwin_finished_initializing)
     {
-      char s[namelen];
-      size_t n = namelen - 1;
-      memcpy (s, name, n);
-      s[n] = '\0';
-      SetEnvironmentVariable (s, native + namelen);
+      wchar_t s[sys_mbstowcs (NULL, 0, native) + 1];
+      sys_mbstowcs (s, sizeof s, native);
+      /* Hack. Relies on affected variables only having ASCII names. */
+      s[namelen - 1] = L'\0';
+      SetEnvironmentVariableW (s, s + namelen);
     }
   debug_printf ("posix %s", posix);
   debug_printf ("native %s", native);
@@ -444,7 +470,7 @@ posify_maybe (char **here, const char *value, char *outenv)
   environment array, for use by setenv(3) and unsetenv(3).
   Explicitly removes '=' in argument name.  */
 
-static char * __stdcall
+static char *
 my_findenv (const char *name, int *offset)
 {
   register int len;
@@ -472,7 +498,7 @@ my_findenv (const char *name, int *offset)
 
 /* Primitive getenv before the environment is built.  */
 
-static char __stdcall *
+static char *
 getearly (const char * name, int *)
 {
   char *ret;
@@ -494,7 +520,7 @@ getearly (const char * name, int *)
   return NULL;
 }
 
-static char * (*findenv_func)(const char *, int *) = (char * (*)(const char *, int *)) getearly;
+static char * (*findenv_func)(const char *, int *) = getearly;
 
 /* Returns ptr to value associated with name, if any, else NULL.  */
 
@@ -1048,7 +1074,7 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
   else
     {
       *pass_dstp = NULL;
-      debug_printf ("env count %d, bytes %d", pass_envc, tl);
+      debug_printf ("env count %ld, bytes %d", pass_envc, tl);
       win_env temp;
       temp.reset ();
 
@@ -1118,6 +1144,7 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
   return newenv;
 }
 
+#ifndef __x86_64__
 /* This idiocy is necessary because the early implementers of cygwin
    did not seem to know about importing data variables from the DLL.
    So, we have to synchronize cygwin's idea of the environment with the
@@ -1133,3 +1160,4 @@ cur_environ ()
 
   return __cygwin_environ;
 }
+#endif

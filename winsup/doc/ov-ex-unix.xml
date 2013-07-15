@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="ov-ex-unix">
+<title>Quick Start Guide for those more experienced with UNIX</title>
+<para>
+If you are an experienced UNIX user who misses a powerful command-line
+environment, you will enjoy Cygwin.
+Developers coming from a UNIX background will find a set of utilities
+they are already comfortable using, including a working UNIX shell.  The
+compiler tools are the standard GNU compilers most people will have previously
+used under UNIX, only ported to the Windows host.  Programmers wishing to port
+UNIX software to Windows NT will find that the Cygwin library provides
+an easy way to port many UNIX packages, with only minimal source code
+changes.
+</para>
+<para>
+Note that there are some workarounds that cause Cygwin to behave differently
+than most UNIX-like operating systems; these are described in more detail in 
+<xref linkend="using-effectively"></xref>.
+</para>
+<para>
+Use the graphical command <command>setup.exe</command> any time you want
+to update or install a Cygwin package.  This program must be run
+manually every time you want to check for updated packages since Cygwin
+does not currently include a mechanism for automatically detecting
+package updates.
+</para>
+<para>
+By default, <command>setup.exe</command> only installs a minimal subset of
+packages.  Add any other packages by clicking on the <literal>+</literal>
+next to the Category name and selecting the package from the displayed
+list.  You may search for specfic tools by using the
+<ulink url="http://cygwin.com/packages/">Setup Package Search</ulink>
+at the Cygwin web site.
+</para>
+<para>
+Another option is to install everything by clicking on the
+<literal>Default</literal> field next to the <literal>All</literal>
+category. However, be advised that this will download and install
+several hundreds of megabytes of software to your computer. The best
+plan is probably to click on individual categories and install either
+entire categories or packages from the categories themselves.
+After installation, you can find Cygwin-specific documentation in
+the <literal>/usr/share/doc/Cygwin/</literal> directory.
+</para>
+<para>
+For more information about what each option in
+<command>setup.exe</command> means, see <xref
+linkend="internet-setup"></xref>.
+</para>
+
+</sect1>

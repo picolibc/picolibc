@@ -32,34 +32,60 @@ bool NO_COPY wsock_started;
  *
  * So, immediately following the the call to one of the above routines
  * we have:
- *  DLL info (4 bytes)	 Pointer to a block of information concerning
+ *  DLL info (4/8 bytes) Pointer to a block of information concerning
  *			 the DLL (see below).
  *  DLL args (4 bytes)	 The number of arguments pushed on the stack by
  *			 the call.  If this is an odd value then this
  *			 is a flag that non-existence of this function
  *			 is not a fatal error
+ *  func addr (8 bytes)  (64 bit ONLY!)
+ *			 Address of the actual Win32 function.  For the
+ *			 reason why this is necessary, see the below
+ *			 description of the load_state.
  *  func name (n bytes)	 asciz string containing the name of the function
  *			 to be loaded.
  *
  * The DLL info block consists of the following
- *  load_state (4 bytes) Pointer to a word containing the routine used
+ *  load_state (4/8 bytes) Pointer to a word containing the routine used
  *			 to eventually invoke the function.  Initially
- *			 points to an init function which loads the
- *			 DLL, gets the process's load address,
- *			 changes the contents here to point to the
- *			 function address, and changes the call *(%eax)
- *			 to a jmp func.  If the initialization has been
- *			 done, only the load part is done.
- *  DLL handle (4 bytes) The handle to use when loading the DLL.
+ *			 points to an init function which loads the DLL,
+ *			 gets the process's load address, changes the contents
+ *			 here to point to the function address, and changes
+ *			 the address argument of the initial jmp call.
+ *			 On 64 bit, the jmp is not tweaked directly.  Rather,
+ *			 the address of the Win32 function is stored in the
+ *			 aforementioned Win32 function address slot and fetched
+ *			 there for a jmp *%rax call.  This indirection is
+ *			 necessary to workaround the lack of a jmp opcode with
+ *			 offset values > 32 bit.  If the initialization has
+ *			 been done, only the load part is done.
+ *  DLL handle (4/8 bytes) The handle to use when loading the DLL.
  *  DLL locker (4 bytes) Word to use to avoid multi-thread access during
  *			 initialization.
- *  extra init (4 bytes) Extra initialization function.
+ *  extra init (4/8 bytes) Extra initialization function.
  *  DLL name (n bytes)	 asciz string containing the name of the DLL.
  */
 
 /* LoadDLLprime is used to prime the DLL info information, providing an
    additional initialization routine to call prior to calling the first
    function.  */
+#ifdef __x86_64__
+#define LoadDLLprime(dllname, init_also, no_resolve_on_fork) __asm__ ("	\n\
+.ifndef " #dllname "_primed				\n\
+  .section	.data_cygwin_nocopy,\"w\"		\n\
+  .align	8					\n\
+."#dllname "_info:					\n\
+  .quad		_std_dll_init				\n\
+  .quad		" #no_resolve_on_fork "			\n\
+  .long		-1					\n\
+  .align	8					\n\
+  .quad		" #init_also "				\n\
+  .string16	\"" #dllname ".dll\"			\n\
+  .text							\n\
+  .set		" #dllname "_primed, 1			\n\
+.endif							\n\
+");
+#else
 #define LoadDLLprime(dllname, init_also, no_resolve_on_fork) __asm__ ("	\n\
 .ifndef " #dllname "_primed				\n\
   .section	.data_cygwin_nocopy,\"w\"		\n\
@@ -74,6 +100,7 @@ bool NO_COPY wsock_started;
   .set		" #dllname "_primed, 1			\n\
 .endif							\n\
 ");
+#endif
 
 /* Create a "decorated" name */
 #define mangle(name, n) #name "@" #n
@@ -88,6 +115,32 @@ bool NO_COPY wsock_started;
   LoadDLLfuncEx3(name, n, dllname, notimp, err, 0)
 
 /* Main DLL setup stuff. */
+#ifdef __x86_64__
+#define LoadDLLfuncEx3(name, n, dllname, notimp, err, no_resolve_on_fork) \
+  LoadDLLprime (dllname, dll_func_load, no_resolve_on_fork) \
+  __asm__ ("						\n\
+  .section	." #dllname "_autoload_text,\"wx\"	\n\
+  .global	" #name "				\n\
+  .global	_win32_" #name "			\n\
+  .align	16					\n\
+" #name ":						\n\
+_win32_" #name ":					\n\
+  movq		3f(%rip),%rax				\n\
+  jmp		*%rax					\n\
+1:movq		2f(%rip),%rax				\n\
+  push		%rbp		# Keep 16 byte aligned	\n\
+  push		%r9					\n\
+  push		%r8					\n\
+  push		%rdx					\n\
+  push		%rcx					\n\
+  call		*(%rax)					\n\
+2:.quad		." #dllname "_info			\n\
+  .long		(" #n "+" #notimp ") | (((" #err ") & 0xff) <<16) \n\
+3:.quad		1b					\n\
+  .asciz	\"" #name "\"				\n\
+  .text							\n\
+");
+#else
 #define LoadDLLfuncEx3(name, n, dllname, notimp, err, no_resolve_on_fork) \
   LoadDLLprime (dllname, dll_func_load, no_resolve_on_fork) \
   __asm__ ("						\n\
@@ -106,6 +159,7 @@ _win32_" mangle (name, n) ":				\n\
   .asciz	\"" #name "\"				\n\
   .text							\n\
 ");
+#endif
 
 /* DLL loader helper functions used during initialization. */
 
@@ -121,6 +175,69 @@ extern "C" void dll_chain () __asm__ ("dll_chain");
 
 extern "C" {
 
+#ifdef __x86_64__
+__asm__ ("								\n\
+	 .section .rdata,\"r\"							\n\
+msg1:									\n\
+	.ascii	\"couldn't dynamically determine load address for '%s' (handle %p), %E\\0\"\n\
+									\n\
+	 .text								\n\
+	.p2align 4,,15							\n\
+noload:									\n\
+	movq	40(%rsp),%rdx	# Get the address of the information block\n\
+	movl	8(%rdx),%eax	# Should we 'ignore' the lack		\n\
+	test	$1,%eax		#  of this function?			\n\
+	jz	1f		# Nope.					\n\
+	andl	$0xffff0000,%eax# upper word (== desired return value)	\n\
+	movl	%eax,32(%rsp)	# Save for later (in shadow space)	\n\
+	movl	$127,%ecx	# ERROR_PROC_NOT_FOUND			\n\
+	call	SetLastError	# Set it				\n\
+	movl	32(%rsp),%eax	# Get back return value			\n\
+	sarl	$16,%eax	# swap to low order word		\n\
+	addq	$40,%rsp	# Revert stack				\n\
+	pop	%r10		# Drop pointer to 'return address'	\n\
+	pop	%rcx		# Restore arg registers			\n\
+	pop	%rdx							\n\
+	pop	%r8							\n\
+	pop	%r9							\n\
+	pop	%rbp		# ...and restore frame pointer		\n\
+	ret			# Return				\n\
+1:									\n\
+	movq	(%rdx),%rax	# Handle value				\n\
+	movq	8(%rax),%r8						\n\
+	lea	20(%rdx),%rdx	# Location of name of function		\n\
+	lea	msg1(%rip),%rcx	# The message				\n\
+	call	api_fatal	# Print message. Never returns		\n\
+									\n\
+	.globl	dll_func_load						\n\
+dll_func_load:								\n\
+	movq	(%rsp),%rdx	# 'Return address' contains load info	\n\
+	movq	(%rdx),%rcx	# Where handle lives			\n\
+	movq	8(%rcx),%rcx	# Address of Handle to DLL		\n\
+	addq	$20,%rdx	# Address of name of function to load	\n\
+	subq	$40,%rsp	# Shadow space + 8 byte for alignment	\n\
+	call	GetProcAddress	# Load it				\n\
+	test	%rax,%rax	# Success?				\n\
+	jne	gotit		# Yes					\n\
+	jmp	noload		# Issue an error or return		\n\
+gotit:									\n\
+	addq	$40,%rsp	# Revert stack				\n\
+	pop 	%r10		# Pointer to 'return address'		\n\
+	movq	%rax,12(%r10)	# Move absolute address to address slot	\n\
+	subq	$25,%r10	# Point to jmp				\n\
+	pop	%rcx		# Restore arg registers			\n\
+	pop	%rdx							\n\
+	pop	%r8							\n\
+	pop	%r9							\n\
+	pop	%rbp		# ...and restore frame pointer		\n\
+	jmp	*%r10		# Jump to actual function		\n\
+									\n\
+	.global	dll_chain						\n\
+dll_chain:								\n\
+	push	%rax		# Restore 'return address'		\n\
+	jmp	*%rdx		# Jump to next init function		\n\
+");
+#else
 __asm__ ("								\n\
 	 .text								\n\
 msg1:									\n\
@@ -177,13 +294,14 @@ dll_chain:								\n\
 	pushl	%eax		# Restore 'return address'		\n\
 	jmp	*%edx		# Jump to next init function		\n\
 ");
+#endif
 
 /* C representations of the two info blocks described above.
    FIXME: These structures confuse gdb for some reason.  GDB can print
    the whole structure but has problems with the name field? */
 struct dll_info
 {
-  DWORD load_state;
+  UINT_PTR load_state;
   HANDLE handle;
   LONG here;
   void (*init) ();
@@ -194,14 +312,22 @@ struct func_info
 {
   struct dll_info *dll;
   LONG decoration;
+#ifdef __x86_64__
+  UINT_PTR func_addr;
+#endif
   char name[];
 };
 
 /* Mechanism for setting up info for passing to dll_chain routines. */
+#ifdef __x86_64__
+typedef __uint128_t two_addr_t;
+#else
+typedef __uint64_t two_addr_t;
+#endif
 union retchain
 {
-  struct {long high; long low;};
-  long long ll;
+  struct {uintptr_t high; uintptr_t low;};
+  two_addr_t ll;
 };
 
 
@@ -228,10 +354,56 @@ dll_load (HANDLE& handle, WCHAR *name)
 #define RETRY_COUNT 10
 
 /* The standard DLL initialization routine. */
-__attribute__ ((used, noinline)) static long long
+#ifdef __x86_64__
+
+/* On x86_64, we need assembler wrappers for std_dll_init and wsock_init.
+   In the x86_64 ABI it's no safe bet that frame[1] (aka 8(%rbp)) contains
+   the return address.  Consequentially, if we try to overwrite frame[1]
+   with the address of dll_chain, we end up with a scrambled stack, the
+   result depending on the optimization settings and the current frame of
+   mind of the compiler.  So for x86_64, we disable overwriting the return
+   address in the real std_dll_init/wsock_init function, but rather do this
+   in the wrapper, after return from the function, when we exactly know
+   where the original return address is stored on the stack. */
+
+#define INIT_WRAPPER(func) \
+__asm__ ("								\n\
+	.text								\n\
+	.p2align 4,,15							\n\
+	.seh_proc _" #func "						\n\
+_" #func ":								\n\
+	pushq	%rbp							\n\
+	.seh_pushreg %rbp						\n\
+	movq	%rsp,%rbp						\n\
+	.seh_setframe %rbp,0						\n\
+	subq	$0x20,%rsp						\n\
+	.seh_stackalloc 32						\n\
+	.seh_endprologue						\n\
+	movq	0x28(%rsp),%rcx		# return address as parameter	\n\
+	call	" #func "						\n\
+	movdqa	%xmm0,0x10(%rsp)	# 128 bit return value in xmm0	\n\
+	movq	0x10(%rsp),%rax		# copy over to %rax and %rdx	\n\
+	movq	0x18(%rsp),%rdx						\n\
+	leaq	dll_chain(%rip),%rcx	# load address of dll_chain	\n\
+	movq	%rcx,0x28(%rsp)		# and overwrite return address	\n\
+	addq	$0x20,%rsp						\n\
+	popq	%rbp							\n\
+	ret								\n\
+	.seh_endproc							\n\
+");
+
+INIT_WRAPPER (std_dll_init)
+
+__attribute__ ((used, noinline)) static two_addr_t
+std_dll_init (struct func_info *func)
+#else
+__attribute__ ((used, noinline)) static two_addr_t
 std_dll_init ()
+#endif
 {
+#ifndef __x86_64__
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
+#endif
   struct dll_info *dll = func->dll;
   retchain ret;
 
@@ -284,26 +456,38 @@ std_dll_init ()
     }
 
   /* Set "arguments" for dll_chain. */
-  ret.low = (long) dll->init;
-  ret.high = (long) func;
+  ret.low = (uintptr_t) dll->init;
+  ret.high = (uintptr_t) func;
 
   InterlockedDecrement (&dll->here);
 
+#ifndef __x86_64__
   /* Kludge alert.  Redirects the return address to dll_chain. */
-  __asm__ __volatile__ ("		\n\
-	movl	$dll_chain,4(%ebp)	\n\
-  ");
+  uintptr_t *volatile frame = (uintptr_t *) __builtin_frame_address (0);
+  frame[1] = (uintptr_t) dll_chain;
+#endif
 
   return ret.ll;
 }
 
 /* Initialization function for winsock stuff. */
 WSADATA NO_COPY wsadata;
-static long long __attribute__ ((used, noinline))
+
+#ifdef __x86_64__
+/* See above comment preceeding std_dll_init. */
+INIT_WRAPPER (wsock_init)
+
+__attribute__ ((used, noinline)) static two_addr_t
+wsock_init (struct func_info *func)
+#else
+__attribute__ ((used, noinline)) static two_addr_t
 wsock_init ()
+#endif
 {
   static LONG NO_COPY here = -1L;
+#ifndef __x86_64__
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
+#endif
   struct dll_info *dll = func->dll;
 
   while (InterlockedIncrement (&here))
@@ -330,23 +514,23 @@ wsock_init ()
 	  debug_printf ("szSystemStatus %s", wsadata.szSystemStatus);
 	  debug_printf ("iMaxSockets %d", wsadata.iMaxSockets);
 	  debug_printf ("iMaxUdpDg %d", wsadata.iMaxUdpDg);
-	  debug_printf ("lpVendorInfo %d", wsadata.lpVendorInfo);
 
 	  wsock_started = 1;
 	}
     }
 
+#ifndef __x86_64__
   /* Kludge alert.  Redirects the return address to dll_chain. */
-  __asm__ __volatile__ ("		\n\
-	movl	$dll_chain,4(%ebp)	\n\
-  ");
+  uintptr_t *volatile frame = (uintptr_t *) __builtin_frame_address (0);
+  frame[1] = (uintptr_t) dll_chain;
+#endif
 
   InterlockedDecrement (&here);
 
   volatile retchain ret;
   /* Set "arguments for dll_chain. */
-  ret.low = (long) dll_func_load;
-  ret.high = (long) func;
+  ret.low = (uintptr_t) dll_func_load;
+  ret.high = (uintptr_t) func;
   return ret.ll;
 }
 
@@ -383,19 +567,17 @@ LoadDLLfunc (ReportEventW, 36, advapi32)
 LoadDLLfunc (DnsQuery_A, 24, dnsapi)
 LoadDLLfunc (DnsRecordListFree, 8, dnsapi)
 
-// 50 = ERROR_NOT_SUPPORTED.  Returned if OS doesn't support iphlpapi funcs
-LoadDLLfuncEx2 (GetAdaptersAddresses, 20, iphlpapi, 1, 50)
+LoadDLLfunc (GetAdaptersAddresses, 20, iphlpapi)
 LoadDLLfunc (GetIfEntry, 4, iphlpapi)
 LoadDLLfunc (GetIpAddrTable, 12, iphlpapi)
 LoadDLLfunc (GetIpForwardTable, 12, iphlpapi)
 LoadDLLfunc (GetNetworkParams, 8, iphlpapi)
 LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 
-LoadDLLfuncEx (AttachConsole, 4, kernel32, 1)
-LoadDLLfuncEx (GetModuleHandleExW, 12, kernel32, 1)
+LoadDLLfuncEx (CancelSynchronousIo, 4, kernel32, 1)
+LoadDLLfunc (CreateSymbolicLinkW, 12, kernel32)
 LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
-LoadDLLfuncEx (GetSystemWow64DirectoryW, 8, kernel32, 1)
-LoadDLLfuncEx (GetVolumePathNamesForVolumeNameW, 16, kernel32, 1)
+LoadDLLfunc (GetSystemTimePreciseAsFileTime, 4, kernel32)
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
 
 LoadDLLfunc (WNetCloseEnum, 4, mpr)

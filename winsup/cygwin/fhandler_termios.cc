@@ -306,6 +306,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
 	  else
 	    set_input_done (iscanon);
 	}
+
       if (iscanon && ti.c_lflag & IEXTEN && CCEQ (ti.c_cc[VDISCARD], c))
 	{
 	  ti.c_lflag ^= FLUSHO;
@@ -392,8 +393,8 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
   return ret;
 }
 
-_off64_t
-fhandler_termios::lseek (_off64_t, int)
+off_t
+fhandler_termios::lseek (off_t, int)
 {
   set_errno (ESPIPE);
   return -1;
@@ -426,7 +427,7 @@ fhandler_termios::ioctl (int cmd, void *varg)
   if (cmd != TIOCSCTTY)
     return 1;		/* Not handled by this function */
 
-  int arg = (int) varg;
+  int arg = (int) (intptr_t) varg;
 
   if (arg != 0 && arg != 1)
     {

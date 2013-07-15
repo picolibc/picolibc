@@ -1,7 +1,7 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013
-   Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+   2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -36,19 +36,19 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-static _off64_t format_proc_loadavg (void *, char *&);
-static _off64_t format_proc_meminfo (void *, char *&);
-static _off64_t format_proc_stat (void *, char *&);
-static _off64_t format_proc_version (void *, char *&);
-static _off64_t format_proc_uptime (void *, char *&);
-static _off64_t format_proc_cpuinfo (void *, char *&);
-static _off64_t format_proc_partitions (void *, char *&);
-static _off64_t format_proc_self (void *, char *&);
-static _off64_t format_proc_mounts (void *, char *&);
-static _off64_t format_proc_filesystems (void *, char *&);
-static _off64_t format_proc_swaps (void *, char *&);
-static _off64_t format_proc_devices (void *, char *&);
-static _off64_t format_proc_misc (void *, char *&);
+static off_t format_proc_loadavg (void *, char *&);
+static off_t format_proc_meminfo (void *, char *&);
+static off_t format_proc_stat (void *, char *&);
+static off_t format_proc_version (void *, char *&);
+static off_t format_proc_uptime (void *, char *&);
+static off_t format_proc_cpuinfo (void *, char *&);
+static off_t format_proc_partitions (void *, char *&);
+static off_t format_proc_self (void *, char *&);
+static off_t format_proc_mounts (void *, char *&);
+static off_t format_proc_filesystems (void *, char *&);
+static off_t format_proc_swaps (void *, char *&);
+static off_t format_proc_devices (void *, char *&);
+static off_t format_proc_misc (void *, char *&);
 
 /* names of objects in /proc */
 static const virt_tab_t proc_tab[] = {
@@ -185,7 +185,7 @@ fhandler_proc::fhandler_proc ():
 }
 
 int __reg2
-fhandler_proc::fstat (struct __stat64 *buf)
+fhandler_proc::fstat (struct stat *buf)
 {
   const char *path = get_name ();
   debug_printf ("fstat (%s)", path);
@@ -377,7 +377,7 @@ success:
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();
 out:
-  syscall_printf ("%d = fhandler_proc::open(%p, %d)", res, flags, mode);
+  syscall_printf ("%d = fhandler_proc::open(%y, 0%o)", res, flags, mode);
   return res;
 }
 
@@ -393,7 +393,7 @@ fhandler_proc::fill_filebuf ()
   return false;
 }
 
-static _off64_t
+static off_t
 format_proc_version (void *, char *&destbuf)
 {
   tmp_pathbuf tp;
@@ -411,7 +411,7 @@ format_proc_version (void *, char *&destbuf)
   return bufptr - buf;
 }
 
-static _off64_t
+static off_t
 format_proc_loadavg (void *, char *&destbuf)
 {
   extern int get_process_state (DWORD dwProcessId);
@@ -431,7 +431,7 @@ format_proc_loadavg (void *, char *&destbuf)
 				    0, 0, 0, 0, 0, 0, running, pids.npids);
 }
 
-static _off64_t
+static off_t
 format_proc_meminfo (void *, char *&destbuf)
 {
   unsigned long long mem_total, mem_free, swap_total, swap_free;
@@ -457,12 +457,12 @@ format_proc_meminfo (void *, char *&destbuf)
 			   swap_total >> 10, swap_free >> 10);
 }
 
-static _off64_t
+static off_t
 format_proc_uptime (void *, char *&destbuf)
 {
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
   NTSTATUS status;
-  SYSTEM_TIME_OF_DAY_INFORMATION stodi;
+  SYSTEM_TIMEOFDAY_INFORMATION stodi;
   /* Sizeof SYSTEM_PERFORMANCE_INFORMATION on 64 bit systems.  It
      appears to contain some trailing additional information from
      what I can tell after examining the content.
@@ -477,7 +477,7 @@ format_proc_uptime (void *, char *&destbuf)
     uptime = (stodi.CurrentTime.QuadPart - stodi.BootTime.QuadPart) / 100000ULL;
   else
     debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
-		  "status %p", status);
+		  "status %y", status);
 
   if (NT_SUCCESS (NtQuerySystemInformation (SystemPerformanceInformation,
 						 spi, sizeof_spi, NULL)))
@@ -490,7 +490,7 @@ format_proc_uptime (void *, char *&destbuf)
 			  idle_time / 100, long (idle_time % 100));
 }
 
-static _off64_t
+static off_t
 format_proc_stat (void *, char *&destbuf)
 {
   unsigned long pages_in = 0UL, pages_out = 0UL, interrupt_count = 0UL,
@@ -504,18 +504,19 @@ format_proc_stat (void *, char *&destbuf)
   const size_t sizeof_spi = sizeof (SYSTEM_PERFORMANCE_INFORMATION) + 16;
   PSYSTEM_PERFORMANCE_INFORMATION spi = (PSYSTEM_PERFORMANCE_INFORMATION)
 					alloca (sizeof_spi);
-  SYSTEM_TIME_OF_DAY_INFORMATION stodi;
+  SYSTEM_TIMEOFDAY_INFORMATION stodi;
   tmp_pathbuf tp;
 
   char *buf = tp.c_get ();
   char *eobuf = buf;
 
-  SYSTEM_PROCESSOR_TIMES spt[wincap.cpu_count ()];
-  status = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) spt,
+  SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION spt[wincap.cpu_count ()];
+  status = NtQuerySystemInformation (SystemProcessorPerformanceInformation,
+				     (PVOID) spt,
 				     sizeof spt[0] * wincap.cpu_count (), NULL);
   if (!NT_SUCCESS (status))
-    debug_printf ("NtQuerySystemInformation(SystemProcessorTimes), "
-		  "status %p", status);
+    debug_printf ("NtQuerySystemInformation(SystemProcessorPerformanceInformation), "
+		  "status %y", status);
   else
     {
       unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
@@ -545,14 +546,14 @@ format_proc_stat (void *, char *&destbuf)
       if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("NtQuerySystemInformation(SystemPerformanceInformation)"
-			", status %p", status);
+			", status %y", status);
 	  memset (spi, 0, sizeof_spi);
 	}
       status = NtQuerySystemInformation (SystemTimeOfDayInformation,
 					 (PVOID) &stodi, sizeof stodi, NULL);
       if (!NT_SUCCESS (status))
 	debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
-		      "status %p", status);
+		      "status %y", status);
     }
   if (!NT_SUCCESS (status))
     {
@@ -569,7 +570,7 @@ format_proc_stat (void *, char *&destbuf)
   swap_in = spi->PagesRead;
   swap_out = spi->PagefilePagesWritten;
   context_switches = spi->ContextSwitches;
-  boot_time = to_time_t ((FILETIME *) &stodi.BootTime.QuadPart);
+  boot_time = to_time_t (&stodi.BootTime);
 
   eobuf += __small_sprintf (eobuf, "page %u %u\n"
 				   "swap %u %u\n"
@@ -588,7 +589,7 @@ format_proc_stat (void *, char *&destbuf)
 
 #define print(x) { bufptr = stpcpy (bufptr, (x)); }
 
-static _off64_t
+static off_t
 format_proc_cpuinfo (void *, char *&destbuf)
 {
   DWORD orig_affinity_mask;
@@ -1078,7 +1079,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
   return bufptr - buf;
 }
 
-static _off64_t
+static off_t
 format_proc_partitions (void *, char *&destbuf)
 {
   OBJECT_ATTRIBUTES attr;
@@ -1098,7 +1099,7 @@ format_proc_partitions (void *, char *&destbuf)
   status = NtOpenDirectoryObject (&dirhdl, DIRECTORY_QUERY, &attr);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtOpenDirectoryObject, status %p", status);
+      debug_printf ("NtOpenDirectoryObject, status %y", status);
       __seterrno_from_nt_status (status);
       return 0;
     }
@@ -1138,14 +1139,11 @@ format_proc_partitions (void *, char *&destbuf)
       upath.MaximumLength = upath.Length + sizeof (WCHAR);
       InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
 				  dirhdl, NULL);
-      /* Up to W2K the handle needs read access to fetch the partition info. */
-      status = NtOpenFile (&devhdl, wincap.has_disk_ex_ioctls ()
-				    ? READ_CONTROL
-				    : READ_CONTROL | FILE_READ_DATA,
-			   &attr, &io, FILE_SHARE_VALID_FLAGS, 0);
+      status = NtOpenFile (&devhdl, READ_CONTROL, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, 0);
       if (!NT_SUCCESS (status))
 	{
-	  debug_printf ("NtOpenFile(%S), status %p", &upath, status);
+	  debug_printf ("NtOpenFile(%S), status %y", &upath, status);
 	  __seterrno_from_nt_status (status);
 	  continue;
 	}
@@ -1155,9 +1153,8 @@ format_proc_partitions (void *, char *&destbuf)
 	  got_one = true;
 	}
       /* Fetch partition info for the entire disk to get its size. */
-      if (wincap.has_disk_ex_ioctls ()
-	  && DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
-			      ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+      if (DeviceIoControl (devhdl, IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
+			   ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
 	{
 	  pix = (PARTITION_INFORMATION_EX *) ioctl_buf;
 	  size = pix->PartitionLength.QuadPart;
@@ -1179,9 +1176,8 @@ format_proc_partitions (void *, char *&destbuf)
 				 dev.get_major (), dev.get_minor (),
 				 size >> 10, dev.name + 5);
       /* Fetch drive layout info to get size of all partitions on the disk. */
-      if (wincap.has_disk_ex_ioctls ()
-	  && DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
-			      NULL, 0, ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
+      if (DeviceIoControl (devhdl, IOCTL_DISK_GET_DRIVE_LAYOUT_EX,
+			   NULL, 0, ioctl_buf, NT_MAX_PATH, &bytes_read, NULL))
 	{
 	  PDRIVE_LAYOUT_INFORMATION_EX pdlix = (PDRIVE_LAYOUT_INFORMATION_EX)
 					       ioctl_buf;
@@ -1213,13 +1209,7 @@ format_proc_partitions (void *, char *&destbuf)
 	    else
 	      {
 		size = pi->PartitionLength.QuadPart;
-		/* Pre-W2K you can't rely on the partition number info for
-		   unused partitions. */
-		if (pi->PartitionType == PARTITION_ENTRY_UNUSED
-		    || pi->PartitionType == PARTITION_EXTENDED)
-		  part_num = 0;
-		else
-		  part_num = pi->PartitionNumber;
+		part_num = pi->PartitionNumber;
 		++pi;
 	      }
 	    /* A partition number of 0 denotes an extended partition or a
@@ -1244,21 +1234,21 @@ format_proc_partitions (void *, char *&destbuf)
   return bufptr - buf;
 }
 
-static _off64_t
+static off_t
 format_proc_self (void *, char *&destbuf)
 {
   destbuf = (char *) crealloc_abort (destbuf, 16);
   return __small_sprintf (destbuf, "%d", getpid ());
 }
 
-static _off64_t
+static off_t
 format_proc_mounts (void *, char *&destbuf)
 {
   destbuf = (char *) crealloc_abort (destbuf, sizeof ("self/mounts"));
   return __small_sprintf (destbuf, "self/mounts");
 }
 
-static _off64_t
+static off_t
 format_proc_filesystems (void *, char *&destbuf)
 {
   tmp_pathbuf tp;
@@ -1276,7 +1266,7 @@ format_proc_filesystems (void *, char *&destbuf)
   return bufptr - buf;
 }
 
-static _off64_t
+static off_t
 format_proc_swaps (void *, char *&destbuf)
 {
   unsigned long long total = 0ULL, used = 0ULL;
@@ -1338,7 +1328,7 @@ format_proc_swaps (void *, char *&destbuf)
   return bufptr - buf;
 }
 
-static _off64_t
+static off_t
 format_proc_devices (void *, char *&destbuf)
 {
   tmp_pathbuf tp;
@@ -1382,7 +1372,7 @@ format_proc_devices (void *, char *&destbuf)
   return bufptr - buf;
 }
 
-static _off64_t
+static off_t
 format_proc_misc (void *, char *&destbuf)
 {
   tmp_pathbuf tp;

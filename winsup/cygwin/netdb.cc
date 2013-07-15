@@ -1,6 +1,6 @@
 /* netdb.cc: network database related routines.
 
-   Copyright 2002, 2003, 2007, 2008, 2010, 2011 Red Hat, Inc.
+   Copyright 2002, 2003, 2007, 2008, 2010, 2011, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -115,7 +115,7 @@ get_entire_line (FILE *fd)
 
 /* Characters representing whitespace.  Used by parse_* routines to
 delimit tokens.  */
-static const NO_COPY char *SPACE = " \t\n\r\f";
+static const char *SPACE = " \t\n\r\f";
 
 /* Parse a list aliases from a network database file.  Returns a
 char** structure terminated by a NULL. */

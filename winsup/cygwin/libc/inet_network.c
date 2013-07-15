@@ -62,7 +62,7 @@ cygwin_inet_network(cp)
 	in_addr_t val, base, n;
 	char c;
 	in_addr_t parts[4], *pp = parts;
-	int i, digit;
+	unsigned int i, digit;
 
 again:
 	val = 0; base = 10; digit = 0;

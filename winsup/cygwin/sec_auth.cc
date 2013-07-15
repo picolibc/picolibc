@@ -1,7 +1,7 @@
 /* sec_auth.cc: NT authentication functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -87,7 +87,7 @@ get_full_privileged_inheritable_token (HANDLE token)
 void
 set_imp_token (HANDLE token, int type)
 {
-  debug_printf ("set_imp_token (%d, %d)", token, type);
+  debug_printf ("set_imp_token (%p, %d)", token, type);
   cygheap->user.external_token = (token == INVALID_HANDLE_VALUE
 				  ? NO_IMPERSONATION : token);
   cygheap->user.ext_token_is_restricted = (type == CW_TOKEN_RESTRICTED);
@@ -108,7 +108,7 @@ extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user)
   DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
   SID_NAME_USE use;
 
-  debug_printf ("pw_gecos %x (%s)", pw->pw_gecos, pw->pw_gecos);
+  debug_printf ("pw_gecos %p (%s)", pw->pw_gecos, pw->pw_gecos);
 
   if (psid.getfrompw (pw)
       && LookupAccountSidW (NULL, psid, user, &ulen, domain, &dlen, &use))
@@ -259,8 +259,14 @@ get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
   if (ret)
     {
       __seterrno_from_win_error (ret);
-      /* It's no error when the user name can't be found. */
-      return ret == NERR_UserNotFound;
+      /* It's no error when the user name can't be found.
+	 It's also no error if access has been denied.  Yes, sounds weird, but
+	 keep in mind that ERROR_ACCESS_DENIED means the current user has no
+	 permission to access the AD user information.  However, if we return
+	 an error, Cygwin will call DsGetDcName with DS_FORCE_REDISCOVERY set
+	 to ask for another server.  This is not only time consuming, it's also
+	 useless; the next server will return access denied again. */
+      return ret == NERR_UserNotFound || ret == ERROR_ACCESS_DENIED;
     }
 
   len = wcslen (domain);
@@ -283,7 +289,7 @@ get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
       else if (legal_sid_type (use))
 	grp_list += gsid;
       else
-	debug_printf ("Global group %W invalid. Use: %d", dgroup, use);
+	debug_printf ("Global group %W invalid. Use: %u", dgroup, use);
     }
 
   NetApiBufferFree (buf);
@@ -332,7 +338,7 @@ get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
 	  else if (legal_sid_type (use))
 	    grp_list += gsid;
 	  else
-	    debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
+	    debug_printf ("Rejecting local %W. use: %u", dg_ptr, use);
 	}
       else if (GetLastError () == ERROR_NONE_MAPPED)
 	{
@@ -360,7 +366,7 @@ get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
 				      dom, &domlen, &use))
 		{
 		  if (!legal_sid_type (use))
-		    debug_printf ("Rejecting local %W. use: %d", dg_ptr, use);
+		    debug_printf ("Rejecting local %W. use: %u", dg_ptr, use);
 		  else
 		    grp_list *= gsid;
 		}
@@ -389,12 +395,12 @@ sid_in_token_groups (PTOKEN_GROUPS grps, cygpsid sid)
 static void
 get_unix_group_sidlist (struct passwd *pw, cygsidlist &grp_list)
 {
-  struct __group32 *gr;
+  struct group *gr;
   cygsid gsid;
 
   for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
     {
-      if (gr->gr_gid == (__gid32_t) pw->pw_gid)
+      if (gr->gr_gid == pw->pw_gid)
 	goto found;
       else if (gr->gr_mem)
 	for (int gi = 0; gr->gr_mem[gi]; ++gi)
@@ -689,7 +695,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
       status = NtQueryInformationToken (token, TokenSource, &ts, sizeof ts,
 					&size);
       if (!NT_SUCCESS (status))
-	debug_printf ("NtQueryInformationToken(), %p", status);
+	debug_printf ("NtQueryInformationToken(), %y", status);
       else
 	*pintern = intern = !memcmp (ts.SourceName, "Cygwin.1", 8);
     }
@@ -698,7 +704,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
   status = NtQueryInformationToken (token, TokenUser, &tok_usersid,
 				    sizeof tok_usersid, &size);
   if (!NT_SUCCESS (status))
-    debug_printf ("NtQueryInformationToken(), %p", status);
+    debug_printf ("NtQueryInformationToken(), %y", status);
   if (usersid != tok_usersid)
     return false;
 
@@ -713,14 +719,14 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
       status = NtQuerySecurityObject (token, GROUP_SECURITY_INFORMATION,
 				      sd_buf, sd_buf_siz, &size);
       if (!NT_SUCCESS (status))
-	debug_printf ("NtQuerySecurityObject(), %p", status);
+	debug_printf ("NtQuerySecurityObject(), %y", status);
       else
 	{
 	  BOOLEAN dummy;
 	  status = RtlGetGroupSecurityDescriptor (sd_buf, (PSID *) &gsid,
 						  &dummy);
 	  if (!NT_SUCCESS (status))
-	    debug_printf ("RtlGetGroupSecurityDescriptor(), %p", status);
+	    debug_printf ("RtlGetGroupSecurityDescriptor(), %y", status);
 	}
       if (well_known_null_sid != gsid)
 	return gsid == groups.pgsid;
@@ -731,14 +737,14 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
   status = NtQueryInformationToken (token, TokenGroups, NULL, 0, &size);
   if (!NT_SUCCESS (status) && status != STATUS_BUFFER_TOO_SMALL)
     {
-      debug_printf ("NtQueryInformationToken(token, TokenGroups), %p", status);
+      debug_printf ("NtQueryInformationToken(token, TokenGroups), %y", status);
       return false;
     }
   my_grps = (PTOKEN_GROUPS) alloca (size);
   status = NtQueryInformationToken (token, TokenGroups, my_grps, size, &size);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("NtQueryInformationToken(my_token, TokenGroups), %p",
+      debug_printf ("NtQueryInformationToken(my_token, TokenGroups), %y",
 		    status);
       return false;
     }
@@ -748,7 +754,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
   if (groups.issetgroups ()) /* setgroups was called */
     {
       cygsid gsid;
-      struct __group32 *gr;
+      struct group *gr;
       bool saw[groups.sgsids.count ()];
       memset (saw, 0, sizeof(saw));
 
@@ -851,7 +857,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 					    &stats, sizeof stats, &size);
 	  if (!NT_SUCCESS (status))
 	    debug_printf ("NtQueryInformationToken(hProcToken, "
-			  "TokenStatistics), %p", status);
+			  "TokenStatistics), %y", status);
 	  else
 	    auth_luid = stats.AuthenticationId;
 	}
@@ -861,7 +867,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
       status = NtQueryInformationToken (hProcToken, TokenGroups, NULL, 0,
 					&size);
       if (!NT_SUCCESS (status) && status != STATUS_BUFFER_TOO_SMALL)
-	debug_printf ("NtQueryInformationToken(hProcToken, TokenGroups), %p",
+	debug_printf ("NtQueryInformationToken(hProcToken, TokenGroups), %y",
 		      status);
       else if (!(my_tok_gsids = (PTOKEN_GROUPS) malloc (size)))
 	debug_printf ("malloc (my_tok_gsids) failed.");
@@ -872,7 +878,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 	  if (!NT_SUCCESS (status))
 	    {
 	      debug_printf ("NtQueryInformationToken(hProcToken, TokenGroups), "
-			    "%p", status);
+			    "%y", status);
 	      free (my_tok_gsids);
 	      my_tok_gsids = NULL;
 	    }
@@ -995,7 +1001,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   status = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
   if (status != STATUS_SUCCESS)
     {
-      debug_printf ("LsaRegisterLogonProcess: %p", status);
+      debug_printf ("LsaRegisterLogonProcess: %y", status);
       __seterrno_from_nt_status (status);
       goto out;
     }
@@ -1009,7 +1015,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
   if (status != STATUS_SUCCESS)
     {
-      debug_printf ("LsaLookupAuthenticationPackage: %p", status);
+      debug_printf ("LsaLookupAuthenticationPackage: %y", status);
       __seterrno_from_nt_status (status);
       goto out;
     }
@@ -1033,11 +1039,6 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid, pw,
 				    NULL, auth_luid, auth_pos))
     goto out;
-  /* The logon SID entry is not generated automatically on Windows 2000
-     and earlier for some reason.  So add fake logon sid here, which is
-     filled with logon id values in the authentication package. */
-  if (wincap.needs_logon_sid_in_sid_list ())
-    tmp_gsids += fake_logon_sid;
 
   tmp_gsids.debug_print ("tmp_gsids");
 
@@ -1131,10 +1132,6 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
       gsids->Groups[i].Attributes = SE_GROUP_MANDATORY
 				    | SE_GROUP_ENABLED_BY_DEFAULT
 				    | SE_GROUP_ENABLED;
-      /* Mark logon SID as logon SID :) */
-      if (wincap.needs_logon_sid_in_sid_list ()
-	  && tmp_gsids.sids[tmpidx] == fake_logon_sid)
-	gsids->Groups[i].Attributes += SE_GROUP_LOGON_ID;
       RtlCopySid (RtlLengthSid (tmp_gsids.sids[tmpidx]),
 		  (PSID) ((PBYTE) &authinf->inf + sids_offset),
 		  tmp_gsids.sids[tmpidx]);
@@ -1171,7 +1168,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 			 &sub_status);
   if (status != STATUS_SUCCESS)
     {
-      debug_printf ("LsaLogonUser: %p (sub-status %p)", status, sub_status);
+      debug_printf ("LsaLogonUser: %y (sub-status %y)", status, sub_status);
       __seterrno_from_nt_status (status);
       goto out;
     }

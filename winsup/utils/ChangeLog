@@ -1,3 +1,35 @@
+2013-07-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* cygcheck.cc (dll_info): Detect and report on symlinks.  Output wrong
+	architecture message inline with stdout for clarity.
+	* path.cc (is_symlink): Always reset file pointer to beginning on exit.
+	(readlink): Assume that file pointer is set to the beginning.
+
+2013-06-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (do_pathconv): when -p option is given, generate wide 
+	path without long path prefixing.
+	* wide_path.h (wide_path::wide_path): Allow extra bool parameter to
+	specify whether or not performing Windows long path prefixing.
+
+2013-05-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	Reinstantiate accidentally removed patch from 2009-05-16:
+	* Makefile.in (cygpath.exe): Link against cygwin.a before linking
+	against ntdll.dll to avoid linking symbols defined in both DLLs
+	from ntdll.
+	(ps.exe): Ditto.
+
+2013-05-10  Warren Young  <warren@etr-usa.com>
+
+	* utils.sgml utils.xml: Renamed utils.sgml to utils.xml, added
+	<?xml> and <!DOCTYPE> tags to the top, and formatted it.  No 
+	content change.
+
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Merge in cygwin-64bit-branch.  See ChangeLog.64bit for details.
+
 2013-02-20  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* Makefile.in (CYGWIN_LDFLAGS): Replace -static-lib* with -static.

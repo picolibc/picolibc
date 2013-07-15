@@ -1,0 +1,13 @@
+2013-02-22  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* configure.ac: Skip check for i686-w64-mingw32-g++ on x86_64.
+	* configure: Regenerate.
+
+2013-02-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (target_cpu): Define.  Check for target_cpu rather than
+	target_alias for conditional compilation issues.
+
+2013-02-15  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* Makefile.in: Do not build or install 32bit DLL for 64bit target.

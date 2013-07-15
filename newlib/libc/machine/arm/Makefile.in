@@ -208,6 +208,7 @@ lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
+MEMCPY_DEP = memcpy-armv7a.S memcpy-armv7m.S
 all: all-am
 
 .SUFFIXES:
@@ -502,6 +503,10 @@ uninstall-am:
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am
 
+
+$(lpfx)memcpy.o: $(MEMCPY_DEP)
+
+$(lpfx)memcpy.obj: $(MEMCPY_DEP)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

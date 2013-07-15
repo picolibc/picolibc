@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="using-pathnames"><title>Mapping path names</title>
+
+<sect2 id="pathnames-intro"><title>Introduction</title>
+
+<para>Cygwin supports both POSIX- and Win32-style paths.  Directory
+delimiters may be either forward slashes or backslashes.  Paths using
+backslashes or starting with a drive letter are always handled as
+Win32 paths.  POSIX paths must only use forward slashes as delimiter,
+otherwise they are treated as Win32 paths and file access might fail
+in surprising ways.</para>
+
+<note><para>The usage of Win32 paths, though possible, is deprecated,
+since it circumvents important internal path handling mechanisms. 
+See <xref linkend="pathnames-win32"></xref> and
+<xref linkend="pathnames-win32-api"></xref> for more information.
+</para></note>
+
+<para>POSIX operating systems (such as Linux) do not have the concept
+of drive letters.  Instead, all absolute paths begin with a
+slash (instead of a drive letter such as "c:") and all file systems
+appear as subdirectories (for example, you might buy a new disk and
+make it be the <filename>/disk2</filename> directory).</para>
+
+<para>Because many programs written to run on UNIX systems assume
+the existence of a single unified POSIX file system structure, Cygwin
+maintains a special internal POSIX view of the Win32 file system
+that allows these programs to successfully run under Windows.  Cygwin
+uses this mapping to translate from POSIX to Win32 paths as
+necessary.</para>
+
+</sect2>
+
+<sect2 id="mount-table"><title>The Cygwin Mount Table</title>
+
+<para>The <filename>/etc/fstab</filename> file is used to map Win32
+drives and network shares into Cygwin's internal POSIX directory tree.
+This is a similar concept to the typical UNIX fstab file.  The mount
+points stored in <filename>/etc/fstab</filename> are globally set for
+all users.  Sometimes there's a requirement to have user specific
+mount points.  The Cygwin DLL supports user specific fstab files.
+These are stored in the directory <filename>/etc/fstab.d</filename>
+and the name of the file is the Cygwin username of the user, as it's
+stored in the <filename>/etc/passwd</filename> file.  The structure of the
+user specific file is identical to the system-wide
+<filename>fstab</filename> file.</para>
+
+<para>The file fstab contains descriptive information about the various file
+systems.  fstab is only read by programs, and not written; it is the
+duty of the system administrator to properly create and maintain this
+file.  Each filesystem is described on a separate line; fields on each
+line are separated by tabs or spaces.  Lines starting with '#' are
+comments.</para>
+
+<para>The first field describes the block special device or
+remote filesystem to be mounted.  On Cygwin, this is the native Windows
+path which the mount point links in.  As path separator you MUST use a
+slash.  Usage of a backslash might lead to unexpected results.  UNC
+paths (using slashes, not backslashes) are allowed.  If the path
+contains spaces these can be escaped as <literal>'\040'</literal>.</para>
+
+<para>The second field describes the mount point for the filesystem. 
+If the name of the mount point contains spaces these can be
+escaped as '\040'.</para>
+
+<para>The third field describes the type of the filesystem.  Cygwin supports
+any string here, since the file system type is usually not evaluated.  So it
+doesn't matter if you write <literal>FAT</literal> into this field even if
+the filesystem is NTFS.  Cygwin figures out the filesystem type and its
+capabilities by itself.</para>
+
+<para>The only exception is the file system type cygdrive.  This type is
+used to set the cygdrive prefix.  For a description of the cygdrive prefix
+see <xref linkend="cygdrive"></xref></para>
+
+<para>The fourth field describes the mount options associated
+with the filesystem.  It is formatted as a comma separated list of
+options.  It contains at least the type of mount (binary or text) plus
+any additional options appropriate to the filesystem type.  Recognized
+options are binary, text, nouser, user, exec, notexec, cygexec, nosuid,
+posix=[0|1].  The meaning of the options is as follows.</para>
+
+<screen>
+  acl       - Cygwin uses the filesystem's access control lists (ACLs) to
+              implement real POSIX permissions (default).  This flag only
+	      affects filesystems supporting ACLs (NTFS, for instance) and
+	      is ignored otherwise.
+  auto      - Ignored.
+  binary    - Files default to binary mode (default).
+  bind      - Allows to remount part of the file hierarchy somewhere else.
+              In contrast to other entries, the first field in the fstab
+	      line specifies an absolute POSIX path.  This path is remounted
+	      to the POSIX path specified as the second path.  The conversion
+	      to a Win32 path is done on the fly.  Only the root path and
+	      paths preceding the bind entry in the fstab file are used to
+	      convert the POSIX path in the first field to an absolute Win32
+	      path.  Note that symlinks are ignored while performing this path
+	      conversion.
+  cygexec   - Treat all files below mount point as cygwin executables.
+  dos       - Always convert leading spaces and trailing dots and spaces to
+	      characters in the UNICODE private use area.  This allows to use
+	      broken filesystems which only allow DOS filenames, even if they
+	      are not recognized as such by Cygwin.
+  exec      - Treat all files below mount point as executable.
+  ihash     - Always fake inode numbers rather than using the ones returned
+	      by the filesystem.  This allows to use broken filesystems which
+	      don't return unambiguous inode numbers, even if they are not
+	      recognized as such by Cygwin.
+  noacl     - Cygwin ignores filesystem ACLs and only fakes a subset of
+	      permission bits based on the DOS readonly attribute.  This
+	      behaviour is the default on FAT and FAT32.  The flag is
+	      ignored on NFS filesystems.
+  nosuid    - No suid files are allowed (currently unimplemented).
+  notexec   - Treat all files below mount point as not executable.
+  nouser    - Mount is a system-wide mount.
+  override  - Force the override of an immutable mount point (currently "/").
+  posix=0   - Switch off case sensitivity for paths under this mount point
+	      (default for the cygdrive prefix).
+  posix=1   - Switch on case sensitivity for paths under this mount point
+	      (default for all other mount points).
+  sparse    - Switch on support for sparse files.  This option only makes
+              sense on NTFS and then only if you really need sparse files.
+	      Cygwin does not try to create sparse files by default for
+	      performance reasons.
+  text      - Files default to CRLF text mode line endings.
+  user      - Mount is a user mount.
+</screen>
+
+<para>While normally the execute permission bits are used to evaluate
+executability, this is not possible on filesystems which don't support
+permissions at all (like FAT/FAT32), or if ACLs are ignored on filesystems
+supporting them (see the aforementioned <literal>acl</literal> mount option).
+In these cases, the following heuristic is used to evaluate if a file is
+executable: Files ending in certain extensions (.exe, .com, .bat, .btm,
+.cmd) are assumed to be executable.  Files whose first two characters begin
+with '#!' are also considered to be executable.
+The <literal>exec</literal> option is used to instruct Cygwin that the
+mounted file is "executable".  If the <literal>exec</literal> option is used
+with a directory then all files in the directory are executable.
+This option allows other files to be marked as executable and avoids the
+overhead of opening each file to check for a '#!'.  The
+<literal>cygexec</literal> option is very similar to <literal>exec</literal>,
+but also prevents Cygwin from setting up commands and environment variables
+for a normal Windows program, adding another small performance gain.  The
+opposite of these options is the <literal>notexec</literal> option, which
+means that no files should be marked as executable under that mount point.</para>
+<para>A correct root directory is quite essential to the operation of
+Cygwin.  A default root directory is evaluated at startup so a
+<filename>fstab</filename> entry for the root directory is not necessary.
+If it's wrong, nothing will work as expected.  Therefore, the root directory
+evaluated by Cygwin itself is treated as an immutable mount point and can't
+be overridden in /etc/fstab... unless you think you really know what you're
+doing.  In this case, use the <literal>override</literal> flag in the options
+field in the <filename>/etc/fstab</filename> file.  Since this is a dangerous
+thing to do, do so at your own risk.</para>
+
+<para><filename>/usr/bin</filename> and <filename>/usr/lib</filename> are
+by default also automatic mount points generated by the Cygwin DLL similar
+to the way the root directory is evaluated.  <filename>/usr/bin</filename>
+points to the directory the Cygwin DLL is installed in,
+<filename>/usr/lib</filename> is supposed to point to the
+<filename>/lib</filename> directory.  This choice is safe and usually
+shouldn't be changed.  An fstab entry for them is not required.</para>
+
+<para><literal>nouser</literal> mount points are not overridable by a later
+call to <command>mount</command>.
+Mount points given in <filename>/etc/fstab</filename> are by default
+<literal>nouser</literal> mount points, unless you specify the option
+<literal>user</literal>.  This allows the administrator to set certain
+paths so that they are not overridable by users.  In contrast, all mount
+points in the user specific fstab file are <literal>user</literal> mount
+points.</para>
+
+<para>The fifth and sixth field are ignored.  They are
+so far only specified to keep a Linux-like fstab file layout.</para>
+
+<para>Note that you don't have to specify an fstab entry for the root dir,
+unless you want to have the root dir pointing to somewhere entirely
+different (hopefully you know what you're doing), or if you want to
+mount the root dir with special options (for instance, as text mount).</para>
+
+<para>Example entries:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+  <para>Just a normal mount point:</para>
+  <screen>  c:/foo /bar fat32 binary 0 0</screen>
+</listitem>
+<listitem>
+  <para>A mount point for a textmode mount with case sensitivity switched off:</para>
+  <screen>  C:/foo /bar/baz ntfs text,posix=0 0 0</screen>
+</listitem>
+<listitem>
+  <para>A mount point for a Windows directory with spaces in it:</para>
+  <screen>  C:/Documents\040and\040Settings /docs ext3 binary 0 0</screen>
+</listitem>
+<listitem>
+  <para>A mount point for a remote directory, don't store POSIX permissions in ACLs:</para>
+  <screen>  //server/share/subdir /srv/subdir smbfs binary,noacl 0 0</screen>
+</listitem>
+<listitem>
+  <para>This is just a comment:</para>
+  <screen>  # This is just a comment</screen>
+</listitem>
+<listitem>
+  <para>Set the cygdrive prefix to /mnt:</para>
+  <screen>  none /mnt cygdrive binary 0 0</screen>
+</listitem>
+<listitem>
+  <para>Remount /var to /usr/var:</para>
+  <screen>  /var /usr/var none bind</screen>
+  <para>Assuming <filename>/var</filename> points to
+  <filename>C:/cygwin/var</filename>, <filename>/usr/var</filename> now
+  also points to <filename>C:/cygwin/var</filename>.  This is equivalent
+  to the Linux <literal>bind</literal> option available since
+  Linux 2.4.0.</para>
+</listitem>
+</itemizedlist>
+
+<para>Whenever Cygwin generates a Win32 path from a POSIX one, it uses
+the longest matching prefix in the mount table.  Thus, if
+<filename>C:</filename> is mounted as <filename>/c</filename> and also
+as <filename>/</filename>, then Cygwin would translate
+<filename>C:/foo/bar</filename> to <filename>/c/foo/bar</filename>.
+This translation is normally only used when trying to derive the
+POSIX equivalent current directory.  Otherwise, the handling of MS-DOS
+filenames bypasses the mount table.
+</para>
+
+<para>If you want to see the current set of mount points valid in your
+session, you can invoke the Cygwin tool <command>mount</command> without
+arguments:</para>
+
+<example id="pathnames-mount-ex">
+<title>Displaying the current set of mount points</title>
+<screen>
+  <prompt>bash$</prompt> <userinput>mount</userinput>
+  f:/cygwin/bin on /usr/bin type ntfs (binary,auto)
+  f:/cygwin/lib on /usr/lib type ntfs (binary,auto)
+  f:/cygwin on / type ntfs (binary,auto)
+  e:/src on /usr/src type vfat (binary)
+  c: on /cygdrive/c type ntfs (binary,posix=0,user,noumount,auto)
+  e: on /cygdrive/e type vfat (binary,posix=0,user,noumount,auto)
+</screen>
+</example>
+
+<para>You can also use the <command>mount</command> command to add
+new mount points, and the <command>umount</command> to delete
+them.  However, since they are only stored in memory, these mount
+points will disappear as soon as your last Cygwin process ends.
+See <xref linkend="mount"></xref> and <xref linkend="umount"></xref> for more
+information.</para>
+
+<note><para>
+When you upgrade an existing older Cygwin installation to Cygwin 1.7,
+your old system mount points (stored in the HKEY_LOCAL_MACHINE branch
+of your registry) are read by a script and the <filename>/etc/fstab</filename>
+file is generated from these entries.  Note that entries for
+<filename>/</filename>, <filename>/usr/bin</filename>, and
+<filename>/usr/lib</filename> are <emphasis role='bold'>never</emphasis>
+generated.
+</para>
+
+<para>
+The old user mount points in your HKEY_CURRENT_USER branch of the registry
+are not used to generate <filename>/etc/fstab</filename>.  If you want
+to create a user specific <filename>/etc/fstab.d/${USER}</filename> file
+from your old entries, there's a script available which does exactly
+that for you, <filename>/bin/copy-user-registry-fstab</filename>.  Just
+start the script and it will create your user specific fstab file.  Stop
+all your Cygwin processes and restart them, and you can simply use your
+old user mount points as before.
+</para></note>
+
+</sect2>
+
+<sect2 id="unc-paths"><title>UNC paths</title>
+
+<para>Apart from the unified POSIX tree starting at the <filename>/</filename>
+directory, UNC pathnames starting with two slashes and a server name
+(<filename>//machine/share/...</filename>) are supported as well.
+They are handled as POSIX paths if only containing forward slashes.  There's
+also a virtual directory <filename>//</filename> which allows to enumerate
+the fileservers known to the local machine with <command>ls</command>.
+Same goes for the UNC paths of the type <filename>//machine</filename>,
+which allow to enumerate the shares provided by the server
+<literal>machine</literal>. For often used UNC paths it makes sense to
+add them to the mount table (see <xref linkend="mount-table"></xref> so
+they are included in the unified POSIX path tree.</para>
+
+</sect2>
+
+<sect2 id="cygdrive"><title>The cygdrive path prefix</title>
+
+<para>As already outlined in <xref linkend="ov-hi-files"></xref>, you can
+access arbitary drives on your system by using the cygdrive path prefix.
+The default value for this prefix is <filename>/cygdrive</filename>, and
+a path to any drive can be constructed by using the cygdrive prefix and
+appending the drive letter as subdirectory, like this:</para>
+
+<screen>
+  bash$ ls -l /cygdrive/f/somedir
+</screen>
+
+<para>This lists the content of the directory F:\somedir.</para>
+
+<para>The cygdrive prefix is a virtual directory under which all drives
+on a system are subsumed.  The mount options of the cygdrive prefix is
+used for all file access through the cygdrive prefixed drives.  For instance,
+assuming the cygdrive mount options are <literal>binary,posix=0</literal>,
+then any file <filename>/cygdrive/x/file</filename> will be opened in
+binary mode by default (mount option <literal>binary</literal>), and the case
+of the filename doesn't matter (mount option <literal>posix=0</literal>).
+</para>
+
+<para>The cygdrive prefix flags are also used for all UNC paths starting with
+two slashes, unless they are accessed through a mount point.  For instance,
+consider these <filename>/etc/fstab</filename> entries:</para>
+
+<screen>
+  //server/share /mysrv    ntfs     posix=1,acl   0 0
+  none           /cygdrive cygdrive posix=0,noacl 0 0
+</screen>
+
+<para>Assume there's a file <filename>\\server\share\foo</filename> on the
+share.  When accessing it as <filename>/mysrv/foo</filename>, then the flags
+<literal>posix=1,acl</literal> of the /mysrv mount point are used.  When
+accessing it as <filename>//server/share/foo</filename>, then the flags
+for the cygdrive prefix, <literal>posix=0,noacl</literal> are used.</para>
+
+<note><para>This only applies to UNC paths using forward slashes.  When
+using backslashes the flags for native paths are used.  See
+<xref linkend="pathnames-win32"></xref>.</para></note>
+
+<para>The cygdrive prefix may be changed in the fstab file as outlined above.
+Please note that you must not use the cygdrive prefix for any other mount
+point.  For instance this:</para>
+
+<screen>
+  none /cygdrive cygdrive binary 0 0
+  D:   /cygdrive/d somefs text 0 0
+</screen>
+
+<para>will not make file access using the /mnt/d path prefix suddenly using
+textmode.  If you want to mount any drive explicitly in another mode than
+the cygdrive prefix, use a distinct path prefix:</para>
+
+<screen>
+  none /cygdrive cygdrive binary 0 0
+  D:   /mnt/d somefs text 0 0
+</screen>
+
+</sect2>
+
+<sect2 id="pathnames-symlinks"><title>Symbolic links</title>
+
+<para>Symbolic links are not present and supported on Windows until Windows
+Vista/Server 2008, and then only on some filesystems.  Since POSIX applications
+are rightfully expecting to use symlinks and the
+<literal>symlink(2)</literal> system call, Cygwin had to find a
+workaround for this Windows flaw.</para>
+
+<para>Cygwin creates symbolic links potentially in multiple different
+ways:</para>
+
+<itemizedlist mark="bullet">
+
+<listitem>
+<para>The default symlinks are plain files containing a magic cookie
+followed by the path to which the link points.  They are marked with the
+DOS SYSTEM attribute so that only files with that attribute have to be
+read to determine whether or not the file is a symbolic link.</para>
+
+<note><para>Starting with Cygwin 1.7, symbolic links are using UTF-16 to encode
+the filename of the target file, to better support internationalization.
+Symlinks created by older Cygwin releases can be read just fine.  However,
+you could run into problems with them if you're now using another character
+set than the one you used when creating these symlinks
+(see <xref linkend="setup-locale-problems"></xref>).  Please note that this
+new UTF-16 style of symlinks is not compatible with older Cygwin release,
+which can't read the target filename correctly.</para></note>
+</listitem>
+
+<listitem>
+<para>The shortcut style symlinks are Windows <literal>.lnk</literal>
+shortcut files with a special header and the DOS READONLY attribute set.
+This symlink type is created if the environment variable
+<literal>CYGWIN</literal> (see <xref linkend="using-cygwinenv"></xref>)
+is set to contain the string <literal>winsymlinks</literal> or
+<literal>winsymlinks:lnk</literal>.  On the MVFS filesystem, which does
+not support the DOS SYSTEM attribute, this is the one and only supported
+symlink type, independently from the <literal>winsymlinks</literal>
+setting.</para> 
+</listitem>
+
+<listitem>
+<para>Native Windows symlinks are only created on Windows Vista/2008 and later,
+and only on filesystems supporting reparse points.  Due to to their weird
+restrictions and behaviour, they are only created if the user
+explicitely requests creating them.  This is done by setting the
+environment variable <literal>CYGWIN</literal> to contain the string
+<literal>winsymlinks:native</literal> or
+<literal>winsymlinks:nativestrict</literal>.  For the difference between
+these two settings, see <xref linkend="using-cygwinenv"></xref>.
+On AFS, native symlinks are the only supported type of symlink due to
+AFS lacking support for DOS attributes.  This is independent from the
+<literal>winsymlinks</literal> setting.</para>
+</listitem>
+
+<listitem>
+<para>On the NFS filesystem, Cygwin always creates real NFS symlinks.</para>
+</listitem>
+
+</itemizedlist>
+
+<para>All of the above four symlink types are recognized and used as symlinks
+under all circumstances.  However, if the default plain file symlink type
+is lacking its DOS SYSTEM bit, or if the shortcut file is lacking the DOS
+READONLY attribute, they are not recognized as symlink.</para>
+
+<para>Apart from these four types, there's also a fifth type, which is
+recognized as symlink but never generated by Cygwin, directory
+junctions.  This is an older reparse point type, supported by Windows
+since Windows 2000.  Filesystem junctions on the other hand are not
+handled as symlinks, since otherwise they would not be recognized as
+filesystem borders by commands like <command>find -xdev</command>.</para>
+
+</sect2>
+
+<sect2 id="pathnames-win32"><title>Using native Win32 paths</title>
+
+<para>Using native Win32 paths in Cygwin, while possible, is generally
+inadvisable.  Those paths circumvent all internal integrity checking and
+bypass the information given in the Cygwin mount table.</para>
+
+<para>The following paths are treated as native Win32 paths in Cygwin:</para>
+
+<itemizedlist spacing="compact">
+  <listitem>
+    <para>All paths starting with a drive specifier</para>
+<screen>
+  C:\foo
+  C:/foo
+</screen>
+  </listitem>
+  <listitem>
+    <para>All paths containing at least one backslash as path component</para>
+<screen>
+  C:/foo/bar<emphasis role='bold'>\</emphasis>baz/...
+</screen>
+  </listitem>
+  <listitem>
+    <para>UNC paths using backslashes</para>
+<screen>
+  \\server\share\...
+</screen>
+  </listitem>
+</itemizedlist>
+
+<para>When accessing files using native Win32 paths as above, Cygwin uses a
+default setting for the mount flags.  All paths using DOS notation will be
+treated as case insensitive, and permissions are just faked as if the
+underlying drive is a FAT drive.  This also applies to NTFS and other
+filesystems which usually are capable of case sensitivity and storing
+permissions.</para>
+
+</sect2>
+
+<sect2 id="pathnames-win32-api"><title>Using the Win32 file API in Cygwin applications</title>
+
+<para>Special care must be taken if your application uses Win32 file API
+functions like <function>CreateFile</function> to access files using
+relative pathnames, or if your application uses functions like
+<function>CreateProcess</function> or <function>ShellExecute</function>
+to start other applications.</para>
+
+<para>When a Cygwin application is started, the Windows idea of the current
+working directory (CWD) is not necessarily the same as the Cygwin CWD.
+There are a couple of restrictions in the Win32 API, which disallow certain
+directories as Win32 CWD:</para>
+
+<itemizedlist spacing="compact">
+  <listitem>
+    <para>The Windows subsystem only supports CWD paths of up to 258 chars.
+    This restriction doesn't apply for Cygwin processes, at least not as
+    long as they use the POSIX API (chdir, getcwd).  This means, if a Cygwin
+    process has a CWD using an absolute path longer than 258 characters, the
+    Cygwin CWD and the Windows CWD differ.</para>
+  </listitem>
+
+  <listitem>
+    <para>The Win32 API call to set the current directory,
+    <function>SetCurrentDirectory</function>, fails for directories for which
+    the user has no permissions, even if the user is an administrator.  This
+    restriction doesn't apply for Cygwin processes, if they are running under
+    an administrator account.</para>
+  </listitem>
+
+  <listitem>
+    <para><function>SetCurrentDirectory</function> does not support
+    case-sensitive filenames.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>Last, but not least, <function>SetCurrentDirectory</function> can't
+    work on virtual Cygwin paths like /proc or /cygdrive.  These paths only
+    exists in the Cygwin realm so they have no meaning to a native Win32
+    process.</para>
+  </listitem>
+</itemizedlist>
+
+<para>As long as the Cygwin CWD is usable as Windows CWD, the Cygwin and
+Windows CWDs are in sync within a process.  However, if the Cygwin process
+changes its working directory into one of the directories which are
+unusable as Windows CWD, we're in trouble.  If the process uses the
+Win32 API to access a file using a relative pathname, the resulting
+absolute path would not match the expectations of the process.  In the
+worst case, the wrong files are deleted.</para>
+
+<para>To workaround this problem, Cygwin sets the Windows CWD to a special
+directory in this case.  This special directory points to a virtual
+filesystem within the native NT namespace (<filename>\??\PIPE\</filename>).
+Since it's not a real filesystem, the deliberate effect is that a call to,
+for instance, <function>CreateFile ("foo", ...);</function> will fail,
+as long as the processes CWD doesn't work as Windows CWD.</para>
+
+<para>So, in general, don't use the Win32 file API in Cygwin applications.
+If you <emphasis role='bold'>really</emphasis> need to access files using
+the Win32 API, or if you <emphasis role='bold'>really</emphasis> have to use
+<function>CreateProcess</function> to start applications, rather than
+the POSIX <function>exec(3)</function> family of functions, you have to
+make sure that the Cygwin CWD is set to some directory which is valid as
+Win32 CWD.</para>
+
+</sect2>
+
+<sect2 id="pathnames-additional"><title>Additional Path-related Information</title>
+
+<para>The <command>cygpath</command> program provides the ability to
+translate between Win32 and POSIX pathnames in shell scripts. See
+<xref linkend="cygpath"></xref> for the details.</para>
+
+<para>The <envar>HOME</envar>, <envar>PATH</envar>, and
+<envar>LD_LIBRARY_PATH</envar> environment variables are automatically
+converted from Win32 format to POSIX format (e.g.  from
+<filename>c:/cygwin\bin</filename> to <filename>/bin</filename>, if
+there was a mount from that Win32 path to that POSIX path) when a Cygwin
+process first starts.</para>
+
+<para>Symbolic links can also be used to map Win32 pathnames to POSIX.
+For example, the command
+<command>ln -s //pollux/home/joe/data /data</command> would have about
+the same effect as creating a mount point from
+<filename>//pollux/home/joe/data</filename> to <filename>/data</filename>
+using <command>mount</command>, except that symbolic links cannot set
+the default file access mode.  Other differences are that the mapping is
+distributed throughout the file system and proceeds by iteratively
+walking the directory tree instead of matching the longest prefix in a
+kernel table.  Note that symbolic links will only work on network
+drives that are properly configured to support the "system" file
+attribute.  Many do not do so by default (the Unix Samba server does
+not by default, for example).</para>
+
+</sect2>
+
+</sect1>

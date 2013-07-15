@@ -1,7 +1,7 @@
 /* resource.cc: getrusage () and friends.
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2010,
-   2011 Red Hat, Inc.
+   2011, 2012, 2013 Red Hat, Inc.
 
    Written by Steve Chamberlain (sac@cygnus.com), Doug Evans (dje@cygnus.com),
    Geoffrey Noer (noer@cygnus.com) of Cygnus Support.
@@ -65,18 +65,16 @@ add_rusage (struct rusage *r1, struct rusage *r2)
 void __stdcall
 fill_rusage (struct rusage *r, HANDLE h)
 {
-  FILETIME creation_time = {0,0};
-  FILETIME exit_time = {0,0};
-  FILETIME kernel_time = {0,0};
-  FILETIME user_time = {0,0};
+  KERNEL_USER_TIMES kut;
 
   struct timeval tv;
 
-  memset (r, 0, sizeof (*r));
-  GetProcessTimes (h, &creation_time, &exit_time, &kernel_time, &user_time);
-  totimeval (&tv, &kernel_time, 0, 0);
+  memset (&kut, 0, sizeof kut);
+  memset (r, 0, sizeof *r);
+  NtQueryInformationProcess (h, ProcessTimes, &kut, sizeof kut, NULL);
+  totimeval (&tv, &kut.KernelTime, 0, 0);
   add_timeval (&r->ru_stime, &tv);
-  totimeval (&tv, &user_time, 0, 0);
+  totimeval (&tv, &kut.UserTime, 0, 0);
   add_timeval (&r->ru_utime, &tv);
 
   VM_COUNTERS vmc;
@@ -137,9 +135,9 @@ getrlimit (int resource, struct rlimit *rlp)
 	debug_printf ("couldn't get stack info, returning def.values. %E");
       else
 	{
-	  rlp->rlim_cur = (DWORD) &m - (DWORD) m.AllocationBase;
-	  rlp->rlim_max = (DWORD) m.BaseAddress + m.RegionSize
-			  - (DWORD) m.AllocationBase;
+	  rlp->rlim_cur = (rlim_t) &m - (rlim_t) m.AllocationBase;
+	  rlp->rlim_max = (rlim_t) m.BaseAddress + m.RegionSize
+			  - (rlim_t) m.AllocationBase;
 	}
       break;
     case RLIMIT_NOFILE:
@@ -167,16 +165,21 @@ setrlimit (int resource, const struct rlimit *rlp)
 
   struct rlimit oldlimits;
 
-  // Check if the request is to actually change the resource settings.
-  // If it does not result in a change, take no action and do not
-  // fail.
+  /* Check if the request is to actually change the resource settings.
+     If it does not result in a change, take no action and do not fail. */
   if (getrlimit (resource, &oldlimits) < 0)
     return -1;
 
   if (oldlimits.rlim_cur == rlp->rlim_cur &&
       oldlimits.rlim_max == rlp->rlim_max)
-    // No change in resource requirements, succeed immediately
+    /* No change in resource requirements, succeed immediately */
     return 0;
+
+  if (rlp->rlim_cur > rlp->rlim_max)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
   switch (resource)
     {

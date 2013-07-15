@@ -1,6 +1,6 @@
 /* threaded_queue.h
 
-   Copyright 2001, 2002, 2003 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2012 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -50,7 +50,7 @@ public:
   void add (queue_request *);
 
 private:
-  long _workers_count;
+  LONG _workers_count;
   bool _running;
 
   queue_submission_loop *_submitters_head;

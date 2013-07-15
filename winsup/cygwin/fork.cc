@@ -262,6 +262,11 @@ frok::parent (volatile char * volatile stack_here)
 
   int c_flags = GetPriorityClass (GetCurrentProcess ());
   debug_printf ("priority class %d", c_flags);
+  /* Per MSDN, this must be specified even if lpEnvironment is set to NULL,
+     otherwise UNICODE characters in the parent environment are not copied
+     correctly to the child.  Omitting it may scramble %PATH% on non-English
+     systems. */
+  c_flags |= CREATE_UNICODE_ENVIRONMENT;
 
   errmsg = NULL;
   hchild = NULL;
@@ -302,17 +307,17 @@ frok::parent (volatile char * volatile stack_here)
 
   ch.forker_finished = forker_finished;
 
+  PTEB teb = NtCurrentTeb ();
   ch.stackbottom = _tlsbase;
   ch.stacktop = (void *) _tlstop;
-  ch.stackaddr = 0;
+  ch.stackaddr = teb->DeallocationStack;
   ch.guardsize = 0;
   if (&_my_tls != _main_tls)
     {
       /* We have not been started from the main thread.  Fetch the
 	 information required to set up the thread stack identically
 	 in the child. */
-      PTEB teb = NtCurrentTeb ();
-      if (!teb->DeallocationStack)
+      if (!ch.stackaddr)
 	{
 	  /* Pthread with application-provided stack.  Don't set up a
 	     PAGE_GUARD page.  guardsize == -1 is used in alloc_stack_hard_way
@@ -320,15 +325,11 @@ frok::parent (volatile char * volatile stack_here)
 	  ch.stackaddr = _my_tls.tid->attr.stackaddr;
 	  ch.guardsize = (size_t) -1;
 	}
-      else
-	{
-	  ch.stackaddr = teb->DeallocationStack;
-	  /* If it's a pthread, fetch guardsize from thread attributes. */
-	  if (_my_tls.tid)
-	    ch.guardsize = _my_tls.tid->attr.guardsize;
-	}
+      else if (_my_tls.tid)
+	/* If it's a pthread, fetch guardsize from thread attributes. */
+	ch.guardsize = _my_tls.tid->attr.guardsize;
     }
-  debug_printf ("stack - bottom %p, top %p, addr %p, guardsize %p",
+  debug_printf ("stack - bottom %p, top %p, addr %p, guardsize %ly",
 		ch.stackbottom, ch.stacktop, ch.stackaddr, ch.guardsize);
 
   PROCESS_INFORMATION pi;
@@ -340,7 +341,7 @@ frok::parent (volatile char * volatile stack_here)
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
-  syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %p, 0, 0, %p, %p)",
+  syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %y, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
   time_t start_time = time (NULL);
@@ -355,7 +356,11 @@ frok::parent (volatile char * volatile stack_here)
     {
       hchild = NULL;
       rc = CreateProcessW (myself->progname,	/* image to run */
-			   myself->progname,	/* what we send in arg0 */
+			   GetCommandLineW (),	/* Take same space for command
+						   line as in parent to make
+						   sure child stack is allocated
+						   in the same memory location
+						   as in parent. */
 			   &sec_none_nih,
 			   &sec_none_nih,
 			   TRUE,		/* inherit handles from parent */
@@ -393,7 +398,7 @@ frok::parent (volatile char * volatile stack_here)
       /* Wait for subproc to initialize itself. */
       if (!ch.sync (pi.dwProcessId, hchild, FORK_WAIT_TIMEOUT))
 	{
-	  if (!error ("forked process %u died unexpectedly, retry %d, exit code %d",
+	  if (!error ("forked process %u died unexpectedly, retry %d, exit code %y",
 		      pi.dwProcessId, ch.retry, ch.exit_code))
 	    continue;
 	  this_errno = EAGAIN;
@@ -598,14 +603,18 @@ fork ()
 
     ischild = !!setjmp (grouped.ch.jmp);
 
-    volatile char * volatile esp;
-    __asm__ volatile ("movl %%esp,%0": "=r" (esp));
+    volatile char * volatile stackp;
+#ifdef __x86_64__
+    __asm__ volatile ("movq %%rsp,%0": "=r" (stackp));
+#else
+    __asm__ volatile ("movl %%esp,%0": "=r" (stackp));
+#endif
 
     if (!ischild)
-      res = grouped.parent (esp);
+      res = grouped.parent (stackp);
     else
       {
-	res = grouped.child (esp);
+	res = grouped.child (stackp);
 	in_forkee = false;
 	ischild = true;	/* might have been reset by fork mem copy */
       }
@@ -664,12 +673,12 @@ child_copy (HANDLE hp, bool write, ...)
     {
       char *low = va_arg (args, char *);
       char *high = va_arg (args, char *);
-      DWORD todo = high - low;
+      SIZE_T todo = high - low;
       char *here;
 
       for (here = low; here < high; here += todo)
 	{
-	  DWORD done = 0;
+	  SIZE_T done = 0;
 	  if (here + todo > high)
 	    todo = high - here;
 	  int res;
@@ -684,7 +693,7 @@ child_copy (HANDLE hp, bool write, ...)
 		__seterrno ();
 	      /* If this happens then there is a bug in our fork
 		 implementation somewhere. */
-	      system_printf ("%s %s copy failed, %p..%p, done %d, windows pid %u, %E",
+	      system_printf ("%s %s copy failed, %p..%p, done %lu, windows pid %u, %E",
 			    what, huh[write], low, high, done, myself->dwProcessId);
 	      goto err;
 	    }

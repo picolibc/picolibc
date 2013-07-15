@@ -4,7 +4,7 @@
    sys/config.h before.  This way we can manaage our configuration
    setting without bothering newlib.
 
-   Copyright 2003, 2007, 2008, 2009, 2010, 2012 Red Hat, Inc.
+   Copyright 2003, 2007, 2008, 2009, 2010, 2012, 2013 Red Hat, Inc.
    Written by C. Vinschen.
 
 This file is part of Cygwin.
@@ -38,10 +38,30 @@ extern "C" {
    we might as well just use it here.  */
 
 #ifdef _COMPILING_NEWLIB
+#ifdef __x86_64__
+#include "../tlsoffsets64.h"
+/* We would like to use just "%gs:8", but on x86_64 gcc uses pc-relative
+   addressing and translates "gs:8" into the wrong addressing mode. */
+static inline char *___getreent (void)
+{
+  register char *ret;
+  __asm __volatile__ ("movq %%gs:8,%0" : "=r" (ret));
+  return ret + tls_local_clib;
+}
+#define __getreent() ((struct _reent *) ___getreent())
+#else
 #include "../tlsoffsets.h"
 extern char *_tlsbase __asm__ ("%fs:4");
 #define __getreent() (struct _reent *)(_tlsbase + tls_local_clib)
+#endif
 #endif  /* _COMPILING_NEWLIB */
+
+#ifdef __x86_64__
+# define __SYMBOL_PREFIX
+#else
+# define __SYMBOL_PREFIX "_"
+#endif
+#define _SYMSTR(x)	__SYMBOL_PREFIX #x
 
 #define __FILENAME_MAX__ 4096	/* Keep in sync with PATH_MAX in limits.h. */
 

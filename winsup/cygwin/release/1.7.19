@@ -1,0 +1,45 @@
+What's new:
+-----------
+
+- Drop support for Windows 2000 and Windows XP pre-SP3.
+
+- Add support for building a 64 bit version of Cygwin on x86_64 natively.
+
+- Add support for creating native symlinks (CYGWIN=winsymlinks:native or
+  CYGWIN=winsymlinks:nativestrict).
+
+- Add support for the AFS filesystem.
+
+- Preliminary support for mandatory locking via fcntl/flock/lockf, using
+  Windows locking semantics.  New F_LCK_MANDATORY fcntl command.
+
+- New APIs: __b64_ntop, __b64_pton, arc4random, arc4random_addrandom,
+  arc4random_buf, arc4random_stir, arc4random_uniform.
+
+Bug fixes:
+----------
+
+- getgrouplist now always creates a group list, even if it's empty.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00157.html
+
+- In fork, call CreateProcessW with the same command line as the parent
+  process.  This seems to make sure the stack is created in the same
+  memory location as in the parent.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00340.html
+
+- Fix a build problem resulting in Cygwin functions picking up the wrong
+  new/delete.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00331.html
+
+- Fix an incorrect condition which breaks fork after all dlopen'ed DLLs
+  have already been dlclose'd.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00376.html
+
+- Fix buggy usage of NtReadFile when reading from device under /proc/sys.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00392.html
+
+- Fix an include in <cygwin/if.h> to avoid circular dependency.
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00451.html
+
+- Fix a hang on exit when calling pthread_join in global desctructor.
+  Fixes: http://cygwin.com/ml/cygwin/2013-06/msg00017.html

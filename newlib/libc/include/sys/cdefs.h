@@ -267,7 +267,9 @@
 #define	_Alignof(x)		__alignof(x)
 #define	_Noreturn		__dead2
 #define	_Thread_local		__thread
-#ifdef __COUNTER__
+#if __GNUC_PREREQ__(4, 6) && !defined(__cplusplus)
+/*  Do nothing: _Static_assert() works as per C11 */
+#elif defined(__COUNTER__)
 #define	_Static_assert(x, y)	__Static_assert(x, __COUNTER__)
 #define	__Static_assert(x, y)	___Static_assert(x, y)
 #define	___Static_assert(x, y)	typedef char __assert_ ## y[(x) ? 1 : -1]
@@ -646,6 +648,19 @@
 #define	__BSD_VISIBLE		1
 #define	__ISO_C_VISIBLE		2011
 #endif
+#endif
+
+#ifndef	__has_extension
+#define	__has_extension  __has_feature
+#endif
+#ifndef	__has_feature
+#define	__has_feature(x) 0
+#endif
+#ifndef	__has_include
+#define	__has_include(x) 0
+#endif
+#ifndef	__has_builtin
+#define	__has_builtin(x) 0
 #endif
 
 #endif /* !_SYS_CDEFS_H_ */

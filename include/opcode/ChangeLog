@@ -1,3 +1,109 @@
+2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h (M_ACLR_OB, M_ASET_OB, M_CACHE_OB, M_CACHEE_OB, M_L_DOB)
+	(M_LB_A, M_LBE_OB, M_LBU_A, M_LBUE_OB, M_LD_A, M_LD_OB, M_LDC2_OB)
+	(M_LDL_OB, M_LDM_OB, M_LDP_OB, M_LDR_OB, M_LH_A, M_LHE_OB, M_LHU_A)
+	(M_LHUE_OB, M_LL_OB, M_LLD_OB, M_LLE_OB, M_LS_A, M_LW_A, M_LWE_OB)
+	(M_LWC0_A, M_LWC1_A, M_LWC2_A, M_LWC2_OB, M_LWC3_A, M_LWL_A, M_LWL_OB)
+	(M_LWLE_OB, M_LWM_OB, M_LWP_OB, M_LWR_A, M_LWR_OB, M_LWRE_OB, M_LWU_OB)
+	(M_PREF_OB, M_PREFE_OB, M_S_DOB, M_SAA_OB, M_SAAD_OB, M_SC_OB)
+	(M_SCD_OB, M_SCE_OB, M_SD_A, M_SD_OB, M_SDC2_OB, M_SDL_OB, M_SDM_OB)
+	(M_SDP_OB, M_SDR_OB, M_SB_A, M_SBE_OB, M_SH_A, M_SHE_OB, M_SW_A)
+	(M_SWE_OB, M_SWC0_A, M_SWC1_A, M_SWC2_A, M_SWC2_OB, M_SWC3_A, M_SWL_A)
+	(M_SWL_OB, M_SWLE_OB, M_SWM_OB, M_SWP_OB, M_SWR_A, M_SWR_OB, M_SWRE_OB)
+	(M_ULD, M_ULH, M_ULHU, M_ULW, M_USH, M_USW, M_USD): Delete.
+	(M_ULD_A, M_ULH_A, M_ULHU_A, M_ULW_A, M_USH_A, M_USW_A, M_USD_A):
+	Rename to...
+	(M_ULD_AB, M_ULH_AB, M_ULHU_AB, M_ULW_AB, M_USH_AB, M_USW_AB)
+	(M_USD_AB): ...these.
+
+2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h: Remove documentation of "[" and "]".  Update documentation
+	of "k" and the MDMX formats.
+
+2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h: Update documentation of "+s" and "+S".
+
+2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h: Document "+i".
+
+2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h: Remove "mi" documentation.  Update "mh" documentation.
+	(OP_MASK_MI, OP_SH_MI, MICROMIPSOP_MASK_MI, MICROMIPSOP_MASK_MI):
+	Delete.
+	(INSN2_WRITE_GPR_MHI): Rename to...
+	(INSN2_WRITE_GPR_MH): ...this.
+
+2013-07-07  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h: Remove documentation of "+D" and "+T".
+
+2013-06-26  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h: Fix comment for "1": it is now STYPE rather than SHAMT.
+	Use "source" rather than "destination" for microMIPS "G".
+
+2013-06-25  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* mips.h: Add M_JRADDIUSP, M_JRC and M_MOVEP anonymous enum
+	values.
+
+2013-06-23  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h: Fix comment typo: "G" is _RS rather than _RD for microMIPS.
+
+2013-06-17  Catherine Moore  <clm@codesourcery.com>
+	    Maciej W. Rozycki  <macro@codesourcery.com>
+	    Chao-Ying Fu  <fu@mips.com>
+
+	* mips.h (OP_SH_EVAOFFSET): Define.
+	(OP_MASK_EVAOFFSET): Define.
+	(INSN_ASE_MASK): Delete.
+	(ASE_EVA): Define.
+	(M_CACHEE_AB, M_CACHEE_OB): New.
+	(M_LBE_OB, M_LBE_AB): New.
+	(M_LBUE_OB, M_LBUE_AB): New.
+	(M_LHE_OB, M_LHE_AB): New.
+	(M_LHUE_OB, M_LHUE_AB): New.
+	(M_LLE_AB, M_LLE_OB): New.
+	(M_LWE_OB, M_LWE_AB): New.
+	(M_LWLE_AB, M_LWLE_OB): New.
+	(M_LWRE_AB, M_LWRE_OB): New.
+	(M_PREFE_AB, M_PREFE_OB): New.
+	(M_SCE_AB, M_SCE_OB): New.
+	(M_SBE_OB, M_SBE_AB): New.
+	(M_SHE_OB, M_SHE_AB): New.
+	(M_SWE_OB, M_SWE_AB): New.
+	(M_SWLE_AB, M_SWLE_OB): New.
+	(M_SWRE_AB, M_SWRE_OB): New.
+	(MICROMIPSOP_SH_EVAOFFSET): Define.
+	(MICROMIPSOP_MASK_EVAOFFSET): Define.
+
+2013-06-12  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* nios2.h (OP_MATCH_ERET): Correct eret encoding.
+
+2013-05-22  Jürgen Urban  <JuergenUrban@gmx.de>
+
+	* mips.h (M_LQC2_AB, M_SQC2_AB): New macros.
+
+2013-05-09  Andrew Pinski  <apinski@cavium.com>
+
+	* mips.h (OP_MASK_CODE10): Correct definition.
+	(OP_SH_CODE10): Likewise.
+	Add a comment that "+J" is used now for OP_*CODE10.
+	(INSN_ASE_MASK): Update.
+	(INSN_VIRT): New macro.
+	(INSN_VIRT64): New macro
+
+2013-05-02  Nick Clifton  <nickc@redhat.com>
+
+	* msp430.h: Add patterns for MSP430X instructions.
+
 2013-04-06  David S. Miller  <davem@davemloft.net>
 
 	* sparc.h (F_PREFERRED): Define.

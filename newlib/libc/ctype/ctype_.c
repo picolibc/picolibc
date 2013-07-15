@@ -111,14 +111,21 @@ _CONST
 char __EXPORT *__ctype_ptr__ = (char *) _ctype_b + 127;
 
 #  ifdef __CYGWIN__
-
+#    ifdef __x86_64__
+__asm__ ("					\n\
+        .data					\n\
+	.globl  _ctype_				\n\
+	.set    _ctype_,_ctype_b+127		\n\
+	.text                                   \n\
+");
+#    else
 __asm__ ("					\n\
         .data					\n\
 	.globl  __ctype_			\n\
 	.set    __ctype_,__ctype_b+127		\n\
 	.text                                   \n\
 ");
-
+#    endif
 #  else /* !__CYGWIN__ */
 
 _CONST char _ctype_[1 + 256] = {

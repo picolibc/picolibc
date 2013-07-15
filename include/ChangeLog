@@ -1,3 +1,23 @@
+2013-06-08  Catherine Moore  <clm@codesourcery.com>
+
+	* opcode/mips.h (mips_opcode): Add ase field.
+	(INSN_ASE_MASK): Delete.
+	(INSN_DSP): Rename to ASE_DSP.  Provide new value.
+	(INSN_DSPR2): Rename to ASE_DSPR2.  Provide new value.
+	(INSN_MCU): Rename to ASE_MCU.  Provide new value.
+	(INSN_MDMX): Rename to ASE_MDMX.  Provide new value.
+	(INSN_MIPS3d): Rename to ASE_MIPS3D.  Provide new value.
+	(INSN_MT): Rename to ASE_MT.  Provide new value.
+	(INSN_SMARTMIPS): Rename to ASE_SMARTMIPS.  Provide new value.
+	(INSN_VIRT): Rename to ASE_VIRT.  Provide new value.
+	(INSN_VIRT64): Rename to ASE_VIRT64.  Provide new value.
+	(opcode_is_member): Add ase argument.  Check ase.
+
+2013-05-06  Paul Brook  <paul@codesourcery.com>
+
+        include/elf/
+        * mips.h (R_MIPS_PC32): Update comment.
+
 2013-04-03  Jason Merrill  <jason@redhat.com>
 
 	Demangle C++11 ref-qualifier.

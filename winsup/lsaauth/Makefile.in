@@ -1,4 +1,4 @@
-# Copyright (c) 2006, 2008, 2009, 2011, 2012 Red Hat, Inc.
+# Copyright (c) 2006, 2008, 2009, 2011, 2012, 2013 Red Hat, Inc.
 #
 #     This program is free software; you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,8 @@ CFLAGS          := @CFLAGS@
 
 include $(srcdir)/../Makefile.common
 
+target_cpu:=@target_cpu@
+
 WIN32_INCLUDES  := -I. -I$(srcdir)
 WIN32_CFLAGS    := $(CFLAGS) $(WIN32_INCLUDES)
 WIN32_LDFLAGS	:= $(CFLAGS) -nostdlib -Wl,-shared
@@ -46,9 +48,11 @@ WIN32_LDFLAGS	:= $(CFLAGS) -nostdlib -Wl,-shared
 # not recognized by LSA.
 LIBS		:= -ladvapi32 -lkernel32 -lntdll
 
+ifneq ($(target_cpu),x86_64)
 DLL32	:=	cyglsa.dll
 DEF32	:=	cyglsa.def
 OBJ32	:=	cyglsa.o
+endif
 
 DLL64	:=	cyglsa64.dll
 DEF64	:=	cyglsa64.def
@@ -84,6 +88,8 @@ clean:
 
 install: all
 	/bin/mkdir -p $(DESTDIR)$(bindir)
+ifneq ($(target_cpu),x86_64)
 	$(INSTALL_PROGRAM) $(DLL32) $(DESTDIR)$(bindir)/$(DLL32)
+endif
 	$(INSTALL_PROGRAM) $(DLL64) $(DESTDIR)$(bindir)/$(DLL64)
 	$(INSTALL_PROGRAM) $(srcdir)/cyglsa-config $(DESTDIR)$(bindir)/cyglsa-config

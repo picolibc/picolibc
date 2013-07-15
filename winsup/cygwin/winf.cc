@@ -73,7 +73,6 @@ linebuf::fromargv (av& newargv, const char *real_path, bool cmdlenoverflow_ok)
       char *p = NULL;
       const char *a;
 
-      newargv.dup_maybe (i);
       a = i ? newargv[i] : (char *) real_path;
       int len = strlen (a);
       if (len != 0 && !strpbrk (a, " \t\n\r\""))

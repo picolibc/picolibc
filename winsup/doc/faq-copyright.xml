@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<!-- faq-copyright.xml -->
+
+<qandadiv id="faq.copyright">
+  <title>Copyright</title>
+
+  <qandaentry id="faq.what.copyright">
+    <question><para>What are the copyrights?</para></question>
+
+    <answer>
+      <para>Please see <ulink url="http://cygwin.com/licensing.html"/>
+      for more information about Cygwin copyright and licensing.</para>
+    </answer>
+  </qandaentry>
+</qandadiv>

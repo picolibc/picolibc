@@ -1,6 +1,7 @@
 /* Posix dirent.h for WIN32.
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2010, 2012 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2010, 2012,
+   2013 Red Hat, Inc.
 
    This software is a copyrighted work licensed under the terms of the
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -16,38 +17,50 @@
 
 #define __DIRENT_VERSION	2
 
+#ifndef __x86_64__
 #pragma pack(push,4)
+#endif
 #define _DIRENT_HAVE_D_TYPE
 struct dirent
 {
-  long __d_version;			/* Used internally */
-  __ino64_t d_ino;
+  uint32_t __d_version;			/* Used internally */
+  ino_t d_ino;
   unsigned char d_type;
   unsigned char __d_unused1[3];
   __uint32_t __d_internal1;
   char d_name[NAME_MAX + 1];
 };
+#ifndef __x86_64__
 #pragma pack(pop)
+#endif
 
 #define d_fileno d_ino			/* BSD compatible definition */
 
+#ifdef __x86_64__
+#define __DIRENT_COOKIE 0xcdcd8484
+#else
 #define __DIRENT_COOKIE 0xdede4242
+#endif
 
+#ifndef __x86_64__
 #pragma pack(push,4)
+#endif
 typedef struct __DIR
 {
   /* This is first to set alignment in non _COMPILING_NEWLIB case.  */
   unsigned long __d_cookie;
   struct dirent *__d_dirent;
   char *__d_dirname;			/* directory name with trailing '*' */
-  long __d_position;			/* used by telldir/seekdir */
+  __int32_t __d_position;			/* used by telldir/seekdir */
   int __d_fd;
-  unsigned __d_internal;
+  uintptr_t __d_internal;
   void *__handle;
   void *__fh;
   unsigned __flags;
 } DIR;
+#ifndef __x86_64__
 #pragma pack(pop)
+#endif
 
 DIR *opendir (const char *);
 DIR *fdopendir (int);

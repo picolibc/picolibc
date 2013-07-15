@@ -16,3 +16,9 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
+
+MEMCPY_DEP=memcpy-armv7a.S memcpy-armv7m.S
+
+$(lpfx)memcpy.o: $(MEMCPY_DEP)
+
+$(lpfx)memcpy.obj: $(MEMCPY_DEP)

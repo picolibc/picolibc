@@ -53,7 +53,6 @@ details. */
  * should be >= NOFILE (param.h).
  */
 
-typedef long fd_mask;
 #define UNIX_NFDBITS (sizeof (fd_mask) * NBBY)       /* bits per mask */
 #ifndef unix_howmany
 #define unix_howmany(x,y) (((x)+((y)-1))/(y))
@@ -63,7 +62,7 @@ typedef long fd_mask;
 
 #define NULL_fd_set ((fd_set *) NULL)
 #define sizeof_fd_set(n) \
-  ((unsigned) (NULL_fd_set->fds_bits + unix_howmany ((n), UNIX_NFDBITS)))
+  ((size_t) (NULL_fd_set->fds_bits + unix_howmany ((n), UNIX_NFDBITS)))
 #define UNIX_FD_SET(n, p) \
   ((p)->fds_bits[(n)/UNIX_NFDBITS] |= (1L << ((n) % UNIX_NFDBITS)))
 #define UNIX_FD_CLR(n, p) \
@@ -114,7 +113,7 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	ms = 1;			/* At least 1 ms granularity */
 
       if (to)
-	select_printf ("to->tv_sec %d, to->tv_usec %d, ms %d", to->tv_sec, to->tv_usec, ms);
+	select_printf ("to->tv_sec %ld, to->tv_usec %ld, ms %d", to->tv_sec, to->tv_usec, ms);
       else
 	select_printf ("to NULL, ms %x", ms);
 
@@ -295,7 +294,7 @@ select_record::dump_select_record ()
 		 read_ready, write_ready, except_ready);
   select_printf ("read_selected %d, write_selected %d, except_selected %d, except_on_write %d",
 		 read_selected, write_selected, except_selected, except_on_write);
-
+                    
   select_printf ("startup %p, peek %p, verify %p cleanup %p, next %p",
 		 startup, peek, verify, cleanup, next);
 }
@@ -539,7 +538,7 @@ no_verify (select_record *, fd_set *, fd_set *, fd_set *)
 static int
 pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 {
-  IO_STATUS_BLOCK iosb = {0};
+  IO_STATUS_BLOCK iosb = {{0}, 0};
   FILE_PIPE_LOCAL_INFORMATION fpli = {0};
 
   bool res;
@@ -568,7 +567,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
        that.  This means that a pipe could still block since you could
        be trying to write more to the pipe than is available in the
        buffer but that is the hazard of select().  */
-    paranoid_printf ("fd %d, %s, write: size %lu, avail %lu", fd,
+    paranoid_printf ("fd %d, %s, write: size %u, avail %u", fd,
 		     fh->get_name (), fpli.OutboundQuota,
 		     fpli.WriteQuotaAvailable);
   else if ((res = (fpli.OutboundQuota < PIPE_BUF &&
@@ -576,7 +575,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
     /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
        the pipe writable only if it is completely empty, to minimize the
        probability that a subsequent write will block.  */
-    select_printf ("fd, %s, write tiny pipe: size %lu, avail %lu",
+    select_printf ("fd, %s, write tiny pipe: size %u, avail %u",
 		   fd, fh->get_name (), fpli.OutboundQuota,
 		   fpli.WriteQuotaAvailable);
   return res ?: -!!(fpli.NamedPipeState & FILE_PIPE_CLOSING_STATE);

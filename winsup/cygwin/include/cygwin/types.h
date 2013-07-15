@@ -19,6 +19,7 @@ extern "C"
 
 #include <stdint.h>
 #include <endian.h>
+#include <bits/wordsize.h>
 
 #ifndef __timespec_t_defined
 #define __timespec_t_defined
@@ -32,68 +33,72 @@ typedef struct timespec timestruc_t;
 
 #ifndef __off_t_defined
 #define __off_t_defined
+/* Based on the newlib definitions. */
+#if __WORDSIZE == 64
+typedef _off_t off_t;
+#else
 typedef _off64_t off_t;
+#endif
 #endif /*__off_t_defined*/
 
 typedef __loff_t loff_t;
 
 #ifndef __dev_t_defined
 #define __dev_t_defined
-typedef short __dev16_t;
-typedef unsigned long __dev32_t;
-typedef __dev32_t dev_t;
+typedef __int16_t __dev16_t;
+typedef __uint32_t dev_t;
 #endif /*__dev_t_defined*/
 
 #ifndef __blksize_t_defined
 #define __blksize_t_defined
-typedef long blksize_t;
+typedef __int32_t blksize_t;
 #endif /*__blksize_t_defined*/
 
 #ifndef __blkcnt_t_defined
 #define __blkcnt_t_defined
-typedef long __blkcnt32_t;
-typedef long long __blkcnt64_t;
-typedef __blkcnt64_t  blkcnt_t;
+typedef __int32_t __blkcnt32_t;
+typedef __int64_t blkcnt_t;
 #endif /*__blkcnt_t_defined*/
 
 #ifndef __fsblkcnt_t_defined
 #define __fsblkcnt_t_defined
+/* Keep as is.  32 bit on i386, 64 bit on x86_64. */
 typedef unsigned long fsblkcnt_t;
 #endif /* __fsblkcnt_t_defined */
 
 #ifndef __fsfilcnt_t_defined
 #define __fsfilcnt_t_defined
+/* Keep as is.  32 bit on i386, 64 bit on x86_64. */
 typedef unsigned long fsfilcnt_t;
 #endif /* __fsfilcnt_t_defined */
 
 #ifndef __uid_t_defined
 #define __uid_t_defined
 typedef unsigned short __uid16_t;
-typedef unsigned long  __uid32_t;
-typedef __uid32_t uid_t;
+typedef __uint32_t uid_t;
 #endif /*__uid_t_defined*/
 
 #ifndef __gid_t_defined
 #define __gid_t_defined
 typedef unsigned short __gid16_t;
-typedef unsigned long  __gid32_t;
-typedef __gid32_t gid_t;
+typedef __uint32_t gid_t;
 #endif /*__gid_t_defined*/
 
 #ifndef __ino_t_defined
 #define __ino_t_defined
-typedef unsigned long __ino32_t;
-typedef unsigned long long __ino64_t;
-typedef __ino64_t ino_t;
+#ifndef __x86_64__
+typedef __uint32_t __ino32_t;
+#endif
+typedef __uint64_t ino_t;
 #endif /*__ino_t_defined*/
 
 /* Generic ID type, must match at least pid_t, uid_t and gid_t in size. */
 #ifndef __id_t_defined
 #define __id_t_defined
-typedef unsigned long id_t;
+typedef __uint32_t id_t;
 #endif /* __id_t_defined */
 
-#if defined (__INSIDE_CYGWIN__)
+#if defined (__INSIDE_CYGWIN__) && !defined (__x86_64__)
 struct __flock32 {
 	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */
 	short	 l_whence;	/* flag to choose starting offset */
@@ -101,14 +106,6 @@ struct __flock32 {
 	_off_t	 l_len;		/* length, in bytes; 0 means lock to EOF */
 	short	 l_pid;		/* returned with F_GETLK */
 	short	 l_xxx;		/* reserved for future use */
-};
-
-struct __flock64 {
-	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */
-	short	 l_whence;	/* flag to choose starting offset */
-	_off64_t l_start;	/* relative offset, in bytes */
-	_off64_t l_len;		/* length, in bytes; 0 means lock to EOF */
-	pid_t	 l_pid;		/* returned with F_GETLK */
 };
 #endif
 

@@ -106,7 +106,7 @@ AC_ARG_ENABLE(newlib-iconv-external-ccs,
 
 dnl Support --disable-newlib-atexit-dynamic-alloc
 AC_ARG_ENABLE(newlib-atexit-dynamic-alloc,
-[  --disable-newlib-atexit-alloc    disable dynamic allocation of atexit entries],
+[  --disable-newlib-atexit-dynamic-alloc    disable dynamic allocation of atexit entries],
 [if test "${newlib_atexit_dynamic_alloc+set}" != set; then
   case "${enableval}" in
     yes) newlib_atexit_dynamic_alloc=yes ;;
@@ -156,6 +156,43 @@ AC_ARG_ENABLE(newlib_wide_orient,
    no)  newlib_wide_orient=no ;;
    *) AC_MSG_ERROR(bad value ${enableval} for newlib-wide-orient) ;;
  esac],[newlib_wide_orient=yes])
+
+dnl Support --enable-newlib-nano-malloc
+dnl This option is also read in libc/configure.in.  It is repeated
+dnl here so that it shows up in the help text.
+AC_ARG_ENABLE(newlib-nano-malloc,
+[  --enable-newlib-nano-malloc    use small-footprint nano-malloc implementation],
+[if test "${newlib_nano_malloc+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_nano_malloc=yes ;;
+    no)  newlib_nano_malloc=no  ;;
+    *)   AC_MSG_ERROR(bad value ${enableval} for newlib-nano-malloc option) ;;
+  esac
+ fi], [newlib_nano_malloc=no])dnl
+
+dnl Support --disable-newlib-unbuf-stream-opt
+AC_ARG_ENABLE(newlib-unbuf-stream-opt,
+[  --disable-newlib-unbuf-stream-opt    disable unbuffered stream optimization in streamio],
+[if test "${newlib_unbuf_stream_opt+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_unbuf_stream_opt=yes ;;
+    no)  newlib_unbuf_stream_opt=no  ;;
+    *)   AC_MSG_ERROR(bad value ${enableval} for newlib-unbuf-stream-opt option) ;;
+  esac
+ fi], [newlib_unbuf_stream_opt=yes])dnl
+
+dnl Support --enable-lite-exit
+dnl Lite exit is a size-reduced implementation of exit that doesn't invoke
+dnl clean-up functions such as _fini or global destructors.
+AC_ARG_ENABLE(lite-exit,
+[  --enable-lite-exit	enable light weight exit],
+[if test "${lite_exit+set}" != set; then
+  case "${enableval}" in
+    yes) lite_exit=yes ;;
+    no)  lite_exit=no  ;;
+    *)   AC_MSG_ERROR(bad value ${enableval} for lite-exit option) ;;
+  esac
+ fi], [lite_exit=no])dnl
 
 NEWLIB_CONFIGURE(.)
 
@@ -345,17 +382,29 @@ fi
 if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
 AC_DEFINE_UNQUOTED(_ATEXIT_DYNAMIC_ALLOC)
 fi
- 
+
 if test "${newlib_fvwrite_in_streamio}" = "yes"; then
 AC_DEFINE_UNQUOTED(_FVWRITE_IN_STREAMIO)
 fi
- 
+
 if test "${newlib_fseek_optimization}" = "yes"; then
 AC_DEFINE_UNQUOTED(_FSEEK_OPTIMIZATION)
 fi
- 
+
 if test "${newlib_wide_orient}" = "yes"; then
 AC_DEFINE_UNQUOTED(_WIDE_ORIENT)
+fi
+
+if test "${newlib_nano_malloc}" = "yes"; then
+AC_DEFINE_UNQUOTED(_NANO_MALLOC)
+fi
+
+if test "${newlib_unbuf_stream_opt}" = "yes"; then
+AC_DEFINE_UNQUOTED(_UNBUF_STREAM_OPT)
+fi
+
+if test "${lite_exit}" = "yes"; then
+AC_DEFINE_UNQUOTED(_LITE_EXIT)
 fi
 
 dnl

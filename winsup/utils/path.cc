@@ -1,7 +1,7 @@
 /* path.cc
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-   Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+   2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -25,6 +25,7 @@ details. */
 #include "path.h"
 #include "../cygwin/include/cygwin/version.h"
 #include "../cygwin/include/sys/mount.h"
+#define _NOMNTENT_MACROS
 #include "../cygwin/include/mntent.h"
 #include "testsuite.h"
 #ifdef FSTAB_ONLY
@@ -139,9 +140,10 @@ is_exe (HANDLE fh)
 bool
 is_symlink (HANDLE fh)
 {
+  bool ret = false;
   int magic = get_word (fh, 0x0);
   if (magic != SHORTCUT_MAGIC && magic != SYMLINK_MAGIC)
-    return false;
+    goto out;
   DWORD got;
   BY_HANDLE_FILE_INFORMATION local;
   if (!GetFileInformationByHandle (fh, &local))
@@ -150,31 +152,34 @@ is_symlink (HANDLE fh)
     {
       DWORD size;
       if (!local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
-	return false; /* Not a Cygwin symlink. */
+	goto out; /* Not a Cygwin symlink. */
       if ((size = GetFileSize (fh, NULL)) > 8192)
-	return false; /* Not a Cygwin symlink. */
+	goto out; /* Not a Cygwin symlink. */
       char buf[size];
       SetFilePointer (fh, 0, 0, FILE_BEGIN);
       if (!ReadFile (fh, buf, size, &got, 0))
-	return false;
+	goto out;
       if (got != size || !cmp_shortcut_header ((win_shortcut_hdr *) buf))
-	return false; /* Not a Cygwin symlink. */
+	goto out; /* Not a Cygwin symlink. */
       /* TODO: check for invalid path contents
 	 (see symlink_info::check() in ../cygwin/path.cc) */
     }
   else /* magic == SYMLINK_MAGIC */
     {
       if (!local.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
-	return false; /* Not a Cygwin symlink. */
+	goto out; /* Not a Cygwin symlink. */
       char buf[sizeof (SYMLINK_COOKIE) - 1];
       SetFilePointer (fh, 0, 0, FILE_BEGIN);
       if (!ReadFile (fh, buf, sizeof (buf), &got, 0))
-	return false;
+	goto out;
       if (got != sizeof (buf) ||
 	  memcmp (buf, SYMLINK_COOKIE, sizeof (buf)) != 0)
-	return false; /* Not a Cygwin symlink. */
+	goto out; /* Not a Cygwin symlink. */
     }
-  return true;
+  ret = true;
+out:
+  SetFilePointer (fh, 0, 0, FILE_BEGIN);
+  return ret;
 }
 
 /* Assumes is_symlink(fh) is true */
@@ -195,8 +200,7 @@ readlink (HANDLE fh, char *path, int maxlen)
   buf = (char *) alloca (fi.nFileSizeLow + 1);
   file_header = (win_shortcut_hdr *) buf;
 
-  if (SetFilePointer (fh, 0L, NULL, FILE_BEGIN) == INVALID_SET_FILE_POINTER
-      || !ReadFile (fh, buf, fi.nFileSizeLow, &rv, NULL)
+  if (!ReadFile (fh, buf, fi.nFileSizeLow, &rv, NULL)
       || rv != fi.nFileSizeLow)
     return false;
 
@@ -841,7 +845,7 @@ vcygpath (const char *cwd, const char *s, va_list v)
       if (n < max_len || !path_prefix_p (m->posix, path, n))
 	continue;
       if ((m->flags & MOUNT_CYGDRIVE)
-	  && (strlen (path) < n + 2
+	  && ((int) strlen (path) < n + 2
 	      || path[n] != '/'
 	      || !isalpha (path[n + 1])
 	      || path[n + 2] != '/'))
@@ -917,7 +921,8 @@ getmntent (FILE *)
   if (!mnt.mnt_opts)
     mnt.mnt_opts = (char *) malloc (64);
 
-  strcpy (mnt.mnt_type, (char *) (m->flags & MOUNT_SYSTEM) ? "system" : "user");
+  strcpy (mnt.mnt_type,
+	  (char *) ((m->flags & MOUNT_SYSTEM) ? "system" : "user"));
 
   if (!(m->flags & MOUNT_BINARY))
     strcpy (mnt.mnt_opts, (char *) "text");

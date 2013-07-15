@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<book id="cygwin-ug-net" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <bookinfo>
+    <date>2009-03-18</date>
+    <title>Cygwin User's Guide</title>
+		<xi:include href="legal.xml"/>
+  </bookinfo>
+
+	<xi:include href="overview.xml"/>
+	<xi:include href="setup-net.xml"/>
+	<xi:include href="using.xml"/>
+	<xi:include href="programming.xml"/>
+</book>

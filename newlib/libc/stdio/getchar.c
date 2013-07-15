@@ -91,9 +91,11 @@ _DEFUN(_getchar_r, (reent),
 int
 _DEFUN_VOID(getchar)
 {
+  struct _reent *reent = _REENT;
+
   /* CHECK_INIT is called (eventually) by __srefill_r.  */
-  _REENT_SMALL_CHECK_INIT (_REENT);
-  return _getc_r (_REENT, _stdin_r (_REENT));
+  _REENT_SMALL_CHECK_INIT (reent);
+  return _getc_r (reent, _stdin_r (reent));
 }
 
 #endif

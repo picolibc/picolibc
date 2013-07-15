@@ -44,6 +44,7 @@ enum fs_info_type
   cifs,
   nwfs,
   ncfsd,
+  afs,
   /* Always last. */
   max_fs_type
 };
@@ -114,6 +115,7 @@ class fs_info
   IMPLEMENT_FS_FLAG (cifs)
   IMPLEMENT_FS_FLAG (nwfs)
   IMPLEMENT_FS_FLAG (ncfsd)
+  IMPLEMENT_FS_FLAG (afs)
   fs_info_type what_fs () const { return status.fs_type; }
   bool got_fs () const { return status.fs_type != none; }
 

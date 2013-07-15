@@ -1,6 +1,6 @@
 /* bsd_helper.h: Helps integrating BSD kernel code
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2003, 2012 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -60,7 +60,7 @@ vm_object_t vm_object_duplicate (struct thread *td, vm_object_t object);
 void vm_object_deallocate (vm_object_t object);
 
 void tunable_param_init (const char *, bool);
-void tunable_int_fetch (const char *, long *);
+void tunable_int_fetch (const char *, int32_t *);
 void tunable_bool_fetch (const char *, tun_bool_t *);
 
 #endif /* _BSD_HELPER_H */

@@ -1,0 +1,34 @@
+#!/bin/sh
+if [ "$1" = "-r" ]
+then
+	# We're being called recursively by another xidepend instance, so
+	# suppress outputs that only happen at the top level.
+	shift
+	subproc=1
+else
+	subproc=0
+fi
+
+for f in "$@"
+do
+	if fgrep -q 'xi:include' "$f"
+	then
+		# This file uses XIncludes.  Let's chase its deps recursively.
+		base=`basename "$f" .xml`
+		if [ $subproc -eq 0 ] ; then echo -n "$base/$base.html:" ; fi
+
+		deps=`grep 'xi:include.*href' "$f" | cut -f2 -d\" | tr '\n' ' '`
+		echo -n " $deps"
+		for d in $deps
+		do
+			# Call ourselves recursively to continue to collect deps.
+			# The -r flag tells our subprocess that it is merely
+			# contributing to a dependency line in progress.
+			$0 -r $d
+		done
+
+		# If we're at the top recursion level, we have nothing else to
+		# add to this dependency line other than the newline.
+		if [ $subproc -eq 0 ] ; then echo ; fi
+	fi
+done

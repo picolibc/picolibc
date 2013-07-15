@@ -152,10 +152,10 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
   FAKE_RELOC (R_MICROMIPS_max, 174)
 
   /* This was a GNU extension used by embedded-PIC.  It was co-opted by
-     mips-linux for exception-handling data.  It is no longer used, but
-     should continue to be supported by the linker for backward
-     compatibility.  (GCC stopped using it in May, 2004.)  */
+     mips-linux for exception-handling data.  GCC stopped using it in
+     May, 2004, then started using it again for compact unwind tables.  */
   RELOC_NUMBER (R_MIPS_PC32, 248)
+  RELOC_NUMBER (R_MIPS_EH, 249)
   /* FIXME: this relocation is used internally by gas.  */
   RELOC_NUMBER (R_MIPS_GNU_REL16_S2, 250)
   /* These are GNU extensions to enable C++ vtable garbage collection.  */
@@ -803,15 +803,24 @@ extern void bfd_mips_elf32_swap_reginfo_out
    PLT entries and traditional MIPS lazy binding stubs.  We mark the former
    with STO_MIPS_PLT to distinguish them from the latter.  */
 #define STO_MIPS_PLT		0x8
-#define ELF_ST_IS_MIPS_PLT(other) (((other) & STO_MIPS_FLAGS) == STO_MIPS_PLT)
-#define ELF_ST_SET_MIPS_PLT(other) (((other) & ~STO_MIPS_FLAGS) | STO_MIPS_PLT)
+#define ELF_ST_IS_MIPS_PLT(other)					\
+  ((ELF_ST_IS_MIPS16 (other)						\
+    ? ((other) & (~STO_MIPS16 & STO_MIPS_FLAGS))			\
+    : ((other) & STO_MIPS_FLAGS)) == STO_MIPS_PLT)
+#define ELF_ST_SET_MIPS_PLT(other)					\
+  ((ELF_ST_IS_MIPS16 (other)						\
+    ? ((other) & (STO_MIPS16 | ~STO_MIPS_FLAGS))			\
+    : ((other) & ~STO_MIPS_FLAGS)) | STO_MIPS_PLT)
 
 /* This value is used to mark PIC functions in an object that mixes
    PIC and non-PIC.  Note that this bit overlaps with STO_MIPS16,
    although MIPS16 symbols are never considered to be MIPS_PIC.  */
 #define STO_MIPS_PIC		0x20
 #define ELF_ST_IS_MIPS_PIC(other) (((other) & STO_MIPS_FLAGS) == STO_MIPS_PIC)
-#define ELF_ST_SET_MIPS_PIC(other) (((other) & ~STO_MIPS_FLAGS) | STO_MIPS_PIC)
+#define ELF_ST_SET_MIPS_PIC(other)					\
+  ((ELF_ST_IS_MIPS16 (other)						\
+    ? ((other) & ~(STO_MIPS16 | STO_MIPS_FLAGS))			\
+    : ((other) & ~STO_MIPS_FLAGS)) | STO_MIPS_PIC)
 
 /* This value is used for a mips16 .text symbol.  */
 #define STO_MIPS16		0xf0

@@ -1,6 +1,6 @@
 /* profil.c -- win32 profil.c equivalent
 
-   Copyright 1998, 1999, 2000, 2001, 2003, 2009, 2010 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -8,11 +8,20 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#include "winlean.h"
+/*
+ * This file is taken from Cygwin distribution. Please keep it in sync.
+ * The differences should be within __MINGW32__ guard.
+ */
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <errno.h>
-
-#include <profil.h>
+#include <math.h>
+#include "profil.h"
 
 #define SLEEPTIME (1000 / PROF_HZ)
 
@@ -21,20 +30,25 @@ static struct profinfo prof;
 
 /* Get the pc for thread THR */
 
-static u_long
+static size_t
 get_thrpc (HANDLE thr)
 {
   CONTEXT ctx;
-  u_long pc;
+  size_t pc;
   int res;
 
   res = SuspendThread (thr);
   if (res == -1)
-    return (u_long) - 1;
+    return (size_t) - 1;
   ctx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-  pc = (u_long) - 1;
-  if (GetThreadContext (thr, &ctx))
+  pc = (size_t) - 1;
+  if (GetThreadContext (thr, &ctx)) {
+#ifndef _WIN64
     pc = ctx.Eip;
+#else
+    pc = ctx.Rip;
+#endif
+  }
   ResumeThread (thr);
   return pc;
 }
@@ -54,17 +68,17 @@ print_prof (struct profinfo *p)
 /* Everytime we wake up use the main thread pc to hash into the cell in the
    profile buffer ARG. */
 
-static DWORD CALLBACK
+static void CALLBACK profthr_func (LPVOID);
+
+static void CALLBACK
 profthr_func (LPVOID arg)
 {
   struct profinfo *p = (struct profinfo *) arg;
-  u_long pc, idx;
-
-  SetThreadPriority(p->profthr, THREAD_PRIORITY_TIME_CRITICAL);
+  size_t pc, idx;
 
   for (;;)
     {
-      pc = (u_long) get_thrpc (p->targthr);
+      pc = (size_t) get_thrpc (p->targthr);
       if (pc >= p->lowpc && pc < p->highpc)
 	{
 	  idx = PROFIDX (pc, p->lowpc, p->scale);
@@ -73,9 +87,10 @@ profthr_func (LPVOID arg)
 #if 0
       print_prof (p);
 #endif
-      Sleep (SLEEPTIME);
+      /* Check quit condition, WAIT_OBJECT_0 or WAIT_TIMEOUT */
+      if (WaitForSingleObject (p->quitevt, SLEEPTIME) == WAIT_OBJECT_0)
+	return;
     }
-  return 0;
 }
 
 /* Stop profiling to the profiling buffer pointed to by P. */
@@ -85,7 +100,8 @@ profile_off (struct profinfo *p)
 {
   if (p->profthr)
     {
-      TerminateThread (p->profthr, 0);
+      SignalObjectAndWait (p->quitevt, p->profthr, INFINITE, FALSE);
+      CloseHandle (p->quitevt);
       CloseHandle (p->profthr);
     }
   if (p->targthr)
@@ -109,14 +125,34 @@ profile_on (struct profinfo *p)
       return -1;
     }
 
-  p->profthr = CreateThread (0, 0, profthr_func, (void *) p, 0, &thrid);
-  if (!p->profthr)
+  p->quitevt = CreateEvent (NULL, TRUE, FALSE, NULL);
+
+  if (!p->quitevt)
     {
-      CloseHandle (p->targthr);
+      CloseHandle (p->quitevt);
       p->targthr = 0;
       errno = EAGAIN;
       return -1;
     }
+
+  p->profthr = CreateThread (0, 0, (DWORD (WINAPI *)(LPVOID)) profthr_func,
+                             (void *) p, 0, &thrid);
+
+  if (!p->profthr)
+    {
+      CloseHandle (p->targthr);
+      CloseHandle (p->quitevt);
+      p->targthr = 0;
+      errno = EAGAIN;
+      return -1;
+    }
+
+  /* Set profiler thread priority to highest to be sure that it gets the
+     processor as soon it request it (i.e. when the Sleep terminate) to get
+     the next data out of the profile. */
+
+  SetThreadPriority (p->profthr, THREAD_PRIORITY_TIME_CRITICAL);
+
   return 0;
 }
 
@@ -134,9 +170,9 @@ profile_on (struct profinfo *p)
  */
 int
 profile_ctl (struct profinfo * p, char *samples, size_t size,
-	     u_long offset, u_int scale)
+	     size_t offset, u_int scale)
 {
-  u_long maxbin;
+  size_t maxbin;
 
   if (scale > 65536)
     {
@@ -166,7 +202,7 @@ profile_ctl (struct profinfo * p, char *samples, size_t size,
    The word pointed to by this address is incremented.  Buf is unused. */
 
 int
-profil (char *samples, size_t size, u_long offset, u_int scale)
+profil (char *samples, size_t size, size_t offset, u_int scale)
 {
   return profile_ctl (&prof, samples, size, offset, scale);
 }

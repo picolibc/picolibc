@@ -1,7 +1,7 @@
 /* mount.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -22,9 +22,6 @@ details. */
 #include <dirent.h>
 #include "path.h"
 
-#ifdef errno
-#undef errno
-#endif
 #include <errno.h>
 
 #define NT_MAX_PATH 32768
@@ -104,7 +101,7 @@ do_mount (const char *dev, const char *where, int flags)
 	  fprintf (stderr,
       "%s: defaulting to 'notexec' mount option for speed since native path\n"
       "%*creferences a remote share.  Use '-f' option to override.\n",
-		   progname, strlen(progname) + 2, ' ');
+		   progname, (int) strlen(progname) + 2, ' ');
 	  flags |= MOUNT_NOTEXEC;
 	}
     }

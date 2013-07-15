@@ -173,12 +173,18 @@ extern "C" {
 #define _POSIX2_SW_DEV				200112L
 #define _POSIX2_UPE				200112L
 #define _POSIX_V6_ILP32_OFF32			    -1
-#define _XBS5_ILP32_OFF32			_POSIX_V6_ILP32_OFF32
+#ifdef __LP64__
+#define _POSIX_V6_ILP32_OFFBIG			    -1
+#define _POSIX_V6_LP64_OFF64			     1
+#define _POSIX_V6_LPBIG_OFFBIG			     1
+#else
 #define _POSIX_V6_ILP32_OFFBIG			     1
-#define _XBS5_ILP32_OFFBIG			_POSIX_V6_ILP32_OFFBIG
 #define _POSIX_V6_LP64_OFF64			    -1
-#define _XBS5_LP64_OFF64			_POSIX_V6_LP64_OFF64
 #define _POSIX_V6_LPBIG_OFFBIG			    -1
+#endif
+#define _XBS5_ILP32_OFF32			_POSIX_V6_ILP32_OFF32
+#define _XBS5_ILP32_OFFBIG			_POSIX_V6_ILP32_OFFBIG
+#define _XBS5_LP64_OFF64			_POSIX_V6_LP64_OFF64
 #define _XBS5_LPBIG_OFFBIG			_POSIX_V6_LPBIG_OFFBIG
 #define _XOPEN_CRYPT				     1
 #define _XOPEN_ENH_I18N				     1

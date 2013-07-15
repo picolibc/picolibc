@@ -1,7 +1,7 @@
 /* times.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -31,28 +31,27 @@ hires_ms NO_COPY gtod;
 
 hires_ns NO_COPY ntod;
 
-static inline LONGLONG
-systime_ns ()
+/* Temporary declare here until 32 bit w32api follows suit. */
+extern "C" { void WINAPI GetSystemTimePreciseAsFileTime (LPFILETIME); }
+
+static inline void __attribute__ ((always_inline))
+get_system_time (PLARGE_INTEGER systime)
 {
-  LARGE_INTEGER x;
-  GetSystemTimeAsFileTime ((LPFILETIME) &x);
-  x.QuadPart -= FACTOR;		/* Add conversion factor for UNIX vs. Windows base time */
-  return x.QuadPart;
+  wincap.has_precise_system_time ()
+  	? GetSystemTimePreciseAsFileTime ((LPFILETIME) systime)
+	: GetSystemTimeAsFileTime ((LPFILETIME) systime);
 }
 
 /* Cygwin internal */
-static unsigned long long __stdcall
-__to_clock_t (FILETIME *src, int flag)
+static uint64_t __stdcall
+__to_clock_t (PLARGE_INTEGER src, int flag)
 {
-  unsigned long long total = ((unsigned long long) src->dwHighDateTime << 32) + ((unsigned)src->dwLowDateTime);
-  syscall_printf ("dwHighDateTime %u, dwLowDateTime %u", src->dwHighDateTime, src->dwLowDateTime);
-
+  uint64_t total = src->QuadPart;
   /* Convert into clock ticks - the total is in 10ths of a usec.  */
   if (flag)
     total -= FACTOR;
 
-  total /= (unsigned long long) (NSPERSEC / CLOCKS_PER_SEC);
-  syscall_printf ("total %08x %08x", (unsigned) (total>>32), (unsigned) (total));
+  total /= NSPERSEC / CLOCKS_PER_SEC;
   return total;
 }
 
@@ -60,30 +59,36 @@ __to_clock_t (FILETIME *src, int flag)
 extern "C" clock_t
 times (struct tms *buf)
 {
-  FILETIME creation_time, exit_time, kernel_time, user_time;
-
   myfault efault;
   if (efault.faulted (EFAULT))
     return ((clock_t) -1);
 
-  LONGLONG ticks = gtod.uptime ();
-  /* Ticks is in milliseconds, convert to our ticks. Use long long to prevent
-     overflow. */
-  clock_t tc = (clock_t) (ticks * CLOCKS_PER_SEC / 1000);
+  static SYSTEM_TIMEOFDAY_INFORMATION stodi;
+  KERNEL_USER_TIMES kut;
+  LARGE_INTEGER ticks;
 
-  GetProcessTimes (GetCurrentProcess (), &creation_time, &exit_time,
-		   &kernel_time, &user_time);
+  /* Fetch boot time if we haven't already. */
+  if (!stodi.BootTime.QuadPart)
+    NtQuerySystemInformation (SystemTimeOfDayInformation,
+			      &stodi, sizeof stodi, NULL);
 
-  syscall_printf ("ticks %d, CLOCKS_PER_SEC %d", ticks, CLOCKS_PER_SEC);
-  syscall_printf ("user_time %d, kernel_time %d, creation_time %d, exit_time %d",
-		  user_time, kernel_time, creation_time, exit_time);
-  buf->tms_stime = __to_clock_t (&kernel_time, 0);
-  buf->tms_utime = __to_clock_t (&user_time, 0);
-  timeval_to_filetime (&myself->rusage_children.ru_stime, &kernel_time);
-  buf->tms_cstime = __to_clock_t (&kernel_time, 1);
-  timeval_to_filetime (&myself->rusage_children.ru_utime, &user_time);
-  buf->tms_cutime = __to_clock_t (&user_time, 1);
+  NtQueryInformationProcess (NtCurrentProcess (), ProcessTimes,
+			     &kut, sizeof kut, NULL);
+  get_system_time (&ticks);
 
+  /* uptime */
+  ticks.QuadPart -= stodi.BootTime.QuadPart;
+  /* ticks is in in 100ns, convert to clock ticks. */
+  clock_t tc = (clock_t) (ticks.QuadPart * CLOCKS_PER_SEC / NSPERSEC);
+
+  buf->tms_stime = __to_clock_t (&kut.KernelTime, 0);
+  buf->tms_utime = __to_clock_t (&kut.UserTime, 0);
+  timeval_to_filetime (&myself->rusage_children.ru_stime, &kut.KernelTime);
+  buf->tms_cstime = __to_clock_t (&kut.KernelTime, 1);
+  timeval_to_filetime (&myself->rusage_children.ru_utime, &kut.UserTime);
+  buf->tms_cutime = __to_clock_t (&kut.UserTime, 1);
+
+  syscall_printf ("%D = times(%p)", tc, buf);
   return tc;
 }
 
@@ -123,7 +128,7 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
   if (res)
     set_errno (EPERM);
 
-  syscall_printf ("%R = settimeofday(%x, %x)", res, tv, tz);
+  syscall_printf ("%R = settimeofday(%p, %p)", res, tv, tz);
   return res;
 }
 
@@ -140,15 +145,15 @@ timezone (void)
 
 /* Cygwin internal */
 void __stdcall
-totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
+totimeval (struct timeval *dst, PLARGE_INTEGER src, int sub, int flag)
 {
-  long long x = __to_clock_t (src, flag);
+  int64_t x = __to_clock_t (src, flag);
 
-  x *= (int) (1e6) / CLOCKS_PER_SEC; /* Turn x into usecs */
-  x -= (long long) sub * (int) (1e6);
+  x *= (int64_t) 1000000 / CLOCKS_PER_SEC; /* Turn x into usecs */
+  x -= (int64_t) sub * 1000000;
 
-  dst->tv_usec = x % (long long) (1e6); /* And split */
-  dst->tv_sec = x / (long long) (1e6);
+  dst->tv_usec = x % 1000000; /* And split */
+  dst->tv_sec = x / 1000000;
 }
 
 /* FIXME: Make thread safe */
@@ -182,37 +187,22 @@ gettimeofday (struct timeval *tv, void *tzvp)
 EXPORT_ALIAS (gettimeofday, _gettimeofday)
 
 /* Cygwin internal */
-void
-time_t_to_filetime (time_t time_in, FILETIME *out)
-{
-  long long x = time_in * NSPERSEC + FACTOR;
-  out->dwHighDateTime = x >> 32;
-  out->dwLowDateTime = x;
-}
-
-/* Cygwin internal */
 void __stdcall
-timespec_to_filetime (const struct timespec *time_in, FILETIME *out)
+timespec_to_filetime (const struct timespec *time_in, PLARGE_INTEGER out)
 {
   if (time_in->tv_nsec == UTIME_OMIT)
-    out->dwHighDateTime = out->dwLowDateTime = 0;
+    out->QuadPart = 0;
   else
-    {
-      long long x = time_in->tv_sec * NSPERSEC +
-			    time_in->tv_nsec / (1000000000/NSPERSEC) + FACTOR;
-      out->dwHighDateTime = x >> 32;
-      out->dwLowDateTime = x;
-    }
+    out->QuadPart = time_in->tv_sec * NSPERSEC
+		    + time_in->tv_nsec / (1000000000/NSPERSEC) + FACTOR;
 }
 
 /* Cygwin internal */
 void __stdcall
-timeval_to_filetime (const struct timeval *time_in, FILETIME *out)
+timeval_to_filetime (const struct timeval *time_in, PLARGE_INTEGER out)
 {
-  long long x = time_in->tv_sec * NSPERSEC +
-			time_in->tv_usec * (NSPERSEC/1000000) + FACTOR;
-  out->dwHighDateTime = x >> 32;
-  out->dwLowDateTime = x;
+  out->QuadPart = time_in->tv_sec * NSPERSEC
+		  + time_in->tv_usec * (NSPERSEC/1000000) + FACTOR;
 }
 
 /* Cygwin internal */
@@ -251,36 +241,36 @@ timeval_to_timespec (const struct timeval *tvp, struct timespec *tmp)
 
 /* Cygwin internal */
 /* Convert a Win32 time to "UNIX" format. */
-long __stdcall
-to_time_t (FILETIME *ptr)
+time_t __stdcall
+to_time_t (PLARGE_INTEGER ptr)
 {
   /* A file time is the number of 100ns since jan 1 1601
      stuffed into two long words.
      A time_t is the number of seconds since jan 1 1970.  */
 
-  long long x = ((long long) ptr->dwHighDateTime << 32) + ((unsigned)ptr->dwLowDateTime);
+  int64_t x = ptr->QuadPart;
 
   /* pass "no time" as epoch */
   if (x == 0)
     return 0;
 
   x -= FACTOR;			/* number of 100ns between 1601 and 1970 */
-  x /= (long long) NSPERSEC;		/* number of 100ns in a second */
+  x /= NSPERSEC;		/* number of 100ns in a second */
   return x;
 }
 
 /* Cygwin internal */
 /* Convert a Win32 time to "UNIX" timestruc_t format. */
 void __stdcall
-to_timestruc_t (FILETIME *ptr, timestruc_t *out)
+to_timestruc_t (PLARGE_INTEGER ptr, timestruc_t *out)
 {
   /* A file time is the number of 100ns since jan 1 1601
      stuffed into two long words.
      A timestruc_t is the number of seconds and microseconds since jan 1 1970
      stuffed into a time_t and a long.  */
 
-  long rem;
-  long long x = ((long long) ptr->dwHighDateTime << 32) + ((unsigned)ptr->dwLowDateTime);
+  int64_t rem;
+  int64_t x = ptr->QuadPart;
 
   /* pass "no time" as epoch */
   if (x == 0)
@@ -291,8 +281,8 @@ to_timestruc_t (FILETIME *ptr, timestruc_t *out)
     }
 
   x -= FACTOR;			/* number of 100ns between 1601 and 1970 */
-  rem = x % ((long long)NSPERSEC);
-  x /= (long long) NSPERSEC;		/* number of 100ns in a second */
+  rem = x % NSPERSEC;
+  x /= NSPERSEC;		/* number of 100ns in a second */
   out->tv_nsec = rem * 100;	/* as tv_nsec is in nanoseconds */
   out->tv_sec = x;
 }
@@ -302,10 +292,10 @@ to_timestruc_t (FILETIME *ptr, timestruc_t *out)
 void __stdcall
 time_as_timestruc_t (timestruc_t * out)
 {
-  FILETIME filetime;
+  LARGE_INTEGER systime;
 
-  GetSystemTimeAsFileTime (&filetime);
-  to_timestruc_t (&filetime, out);
+  get_system_time (&systime);
+  to_timestruc_t (&systime, out);
 }
 
 /* time: POSIX 4.5.1.1, C 4.12.2.4 */
@@ -314,14 +304,14 @@ extern "C" time_t
 time (time_t * ptr)
 {
   time_t res;
-  FILETIME filetime;
+  LARGE_INTEGER systime;
 
-  GetSystemTimeAsFileTime (&filetime);
-  res = to_time_t (&filetime);
+  get_system_time (&systime);
+  res = to_time_t (&systime);
   if (ptr)
     *ptr = res;
 
-  syscall_printf ("%d = time(%x)", res, ptr);
+  syscall_printf ("%d = time(%p)", res, ptr);
 
   return res;
 }
@@ -425,7 +415,7 @@ utime (const char *path, const struct utimbuf *buf)
   if (buf == 0)
     return utimes (path, 0);
 
-  debug_printf ("incoming utime act %x", buf->actime);
+  debug_printf ("incoming utime act %lx", buf->actime);
   tmp[0] = time_t_to_timeval (buf->actime);
   tmp[1] = time_t_to_timeval (buf->modtime);
 
@@ -484,7 +474,7 @@ hires_ns::nsecs (bool monotonic)
   if (inited < 0)
     {
       set_errno (ENOSYS);
-      return (long long) -1;
+      return (LONGLONG) -1;
     }
 
   LARGE_INTEGER now;
@@ -496,77 +486,17 @@ hires_ns::nsecs (bool monotonic)
 
   // FIXME: Use round() here?
   now.QuadPart = (LONGLONG) (freq * (double)
-  		 (now.QuadPart - (monotonic ? 0LL : primed_pc.QuadPart)));
+		 (now.QuadPart - (monotonic ? 0LL : primed_pc.QuadPart)));
   return now.QuadPart;
-}
-
-LONGLONG
-hires_ms::timeGetTime_ns ()
-{
-  LARGE_INTEGER t;
-
-  /* This is how timeGetTime is implemented in winmm.dll.
-     The real timeGetTime subtracts and adds some values which are constant
-     over the lifetime of the process.  Since we don't need absolute accuracy
-     of the value returned by timeGetTime, only relative accuracy, we can skip
-     this step.  However, if we ever find out that we need absolute accuracy,
-     here's how it works in it's full beauty:
-
-     - At process startup, winmm initializes two calibration values:
-
-       DWORD tick_count_start;
-       LARGE_INTEGER int_time_start;
-       do
-	 {
-	   tick_count_start = GetTickCount ();
-	   do
-	     {
-	       int_time_start.HighPart = SharedUserData.InterruptTime.High1Time;
-	       int_time_start.LowPart = SharedUserData.InterruptTime.LowPart;
-	     }
-	   while (int_time_start.HighPart
-		  != SharedUserData.InterruptTime.High2Time);
-	 }
-       while (tick_count_start != GetTickCount ();
-
-     - timeGetTime computes its return value in the loop as below, and then:
-
-       t.QuadPart -= int_time_start.QuadPart;
-       t.QuadPart /= 10000;
-       t.LowPart += tick_count_start;
-       return t.LowPart;
-  */
-  do
-    {
-      t.HighPart = SharedUserData.InterruptTime.High1Time;
-      t.LowPart = SharedUserData.InterruptTime.LowPart;
-    }
-  while (t.HighPart != SharedUserData.InterruptTime.High2Time);
-  /* We use the value in full 100ns resolution in the calling functions
-     anyway, so we can skip dividing by 10000 here. */
-  return t.QuadPart;
-}
-
-void
-hires_ms::prime ()
-{
-  if (!inited)
-    {
-      int priority = GetThreadPriority (GetCurrentThread ());
-      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-      initime_ns = systime_ns () - timeGetTime_ns ();
-      inited = true;
-      SetThreadPriority (GetCurrentThread (), priority);
-    }
-  return;
 }
 
 LONGLONG
 hires_ms::nsecs ()
 {
-  if (!inited)
-    prime ();
-  return systime_ns ();
+  LARGE_INTEGER systime;
+  get_system_time (&systime);
+  /* Add conversion factor for UNIX vs. Windows base time */
+  return systime.QuadPart - FACTOR;
 }
 
 extern "C" int
@@ -577,8 +507,7 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
       pid_t pid = CLOCKID_TO_PID (clk_id);
       HANDLE hProcess;
       KERNEL_USER_TIMES kut;
-      ULONG sizeof_kut = sizeof (KERNEL_USER_TIMES);
-      long long x;
+      int64_t x;
 
       if (pid == 0)
 	pid = getpid ();
@@ -591,11 +520,12 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
 	}
 
       hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, 0, p->dwProcessId);
-      NtQueryInformationProcess (hProcess, ProcessTimes, &kut, sizeof_kut, &sizeof_kut);
+      NtQueryInformationProcess (hProcess, ProcessTimes,
+				 &kut, sizeof kut, NULL);
 
       x = kut.KernelTime.QuadPart + kut.UserTime.QuadPart;
-      tp->tv_sec = x / (long long) NSPERSEC;
-      tp->tv_nsec = (x % (long long) NSPERSEC) * 100LL;
+      tp->tv_sec = x / NSPERSEC;
+      tp->tv_nsec = (x % NSPERSEC) * 100LL;
 
       CloseHandle (hProcess);
       return 0;
@@ -606,8 +536,7 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
       long thr_id = CLOCKID_TO_THREADID (clk_id);
       HANDLE hThread;
       KERNEL_USER_TIMES kut;
-      ULONG sizeof_kut = sizeof (KERNEL_USER_TIMES);
-      long long x;
+      int64_t x;
 
       if (thr_id == 0)
 	thr_id = pthread::self ()->getsequence_np ();
@@ -619,11 +548,12 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
 	  return -1;
 	}
 
-      NtQueryInformationThread (hThread, ThreadTimes, &kut, sizeof_kut, &sizeof_kut);
+      NtQueryInformationThread (hThread, ThreadTimes,
+				&kut, sizeof kut, NULL);
 
       x = kut.KernelTime.QuadPart + kut.UserTime.QuadPart;
-      tp->tv_sec = x / (long long) NSPERSEC;
-      tp->tv_nsec = (x % (long long) NSPERSEC) * 100LL;
+      tp->tv_sec = x / NSPERSEC;
+      tp->tv_nsec = (x % NSPERSEC) * 100LL;
 
       CloseHandle (hThread);
       return 0;
@@ -687,7 +617,7 @@ clock_settime (clockid_t clk_id, const struct timespec *tp)
   return settimeofday (&tv, NULL);
 }
 
-static DWORD minperiod;	// FIXME: Maintain period after a fork.
+static ULONG minperiod;	// FIXME: Maintain period after a fork.
 
 LONGLONG
 hires_ns::resolution ()
@@ -697,7 +627,7 @@ hires_ns::resolution ()
   if (inited < 0)
     {
       set_errno (ENOSYS);
-      return (long long) -1;
+      return (LONGLONG) -1;
     }
 
   return (freq <= 1.0) ? 1LL : (LONGLONG) freq;
@@ -708,39 +638,13 @@ hires_ms::resolution ()
 {
   if (!minperiod)
     {
-      NTSTATUS status;
       ULONG coarsest, finest, actual;
 
-      status = NtQueryTimerResolution (&coarsest, &finest, &actual);
-      if (NT_SUCCESS (status))
-	/* The actual resolution of the OS timer is a system-wide setting which
-	   can be changed any time, by any process.  The only fixed value we
-	   can rely on is the coarsest value. */
-	minperiod = coarsest;
-      else
-	{
-	  /* There's no good reason that NtQueryTimerResolution should fail
-	     at all, but let's play it safe.  Try to empirically determine
-	     current timer resolution */
-	  int priority = GetThreadPriority (GetCurrentThread ());
-	  SetThreadPriority (GetCurrentThread (),
-			     THREAD_PRIORITY_TIME_CRITICAL);
-	  LONGLONG period = 0;
-	  for (int i = 0; i < 4; i++)
-	    {
-	      LONGLONG now;
-	      LONGLONG then = timeGetTime_ns ();
-	      while ((now = timeGetTime_ns ()) == then)
-		continue;
-	      then = now;
-	      while ((now = timeGetTime_ns ()) == then)
-		continue;
-	      period += now - then;
-	    }
-	  SetThreadPriority (GetCurrentThread (), priority);
-	  period /= 4L;
-	  minperiod = (DWORD) period;
-	}
+      NtQueryTimerResolution (&coarsest, &finest, &actual);
+      /* The actual resolution of the OS timer is a system-wide setting which
+	 can be changed any time, by any process.  The only fixed value we
+	 can rely on is the coarsest value. */
+      minperiod = coarsest;
     }
   return minperiod;
 }

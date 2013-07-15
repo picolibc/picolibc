@@ -128,11 +128,17 @@ THIS SOFTWARE.
 #ifndef NO_IEEE_Scale
 #define Avoid_Underflow
 #undef tinytens
-/* The factor of 2^53 in tinytens[4] helps us avoid setting the underflow */
+/* The factor of 2^106 in tinytens[4] helps us avoid setting the underflow */
 /* flag unnecessarily.  It leads to a song and dance at the end of strtod. */
-static _CONST double tinytens[] = { 1e-16, 1e-32, 1e-64, 1e-128,
-		9007199254740992.e-256
-		};
+static _CONST double tinytens[] = { 1e-16, 1e-32,
+#ifdef _DOUBLE_IS_32BITS
+				    0.0, 0.0, 0.0
+#else
+				    1e-64, 1e-128,
+				    9007199254740992. * 9007199254740992.e-256
+#endif
+				  };
+
 #endif
 #endif
 
@@ -143,6 +149,28 @@ static _CONST double tinytens[] = { 1e-16, 1e-32, 1e-64, 1e-128,
 #else
 #define Rounding Flt_Rounds
 #endif
+
+#ifdef Avoid_Underflow /*{*/
+ static double
+_DEFUN (sulp, (x, scale),
+       	U x _AND
+	int scale)
+{
+        U u;
+        double rv;
+        int i;
+
+        rv = ulp(dval(x));
+        if (!scale || (i = 2*P + 1 - ((dword0(x) & Exp_mask) >> Exp_shift)) <= 0)
+                return rv; /* Is there an example where i <= 0 ? */
+        dword0(u) = Exp_1 + (i << Exp_shift);
+#ifndef _DOUBLE_IS_32BITS
+        dword1(u) = 0;
+#endif
+        return rv * u.d;
+        }
+#endif /*}*/
+
 
 #ifndef NO_HEX_FP
 
@@ -221,7 +249,10 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 	U aadj1, rv, rv0;
 	Long L;
 	__ULong y, z;
-	_Bigint *bb, *bb1, *bd, *bd0, *bs, *delta;
+	_Bigint *bb = NULL, *bb1, *bd = NULL, *bd0, *bs = NULL, *delta = NULL;
+#ifdef Avoid_Underflow
+	__ULong Lsb, Lsb1;
+#endif
 #ifdef SET_INEXACT
 	int inexact, oldinexact;
 #endif
@@ -256,7 +287,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 	if (*s == '0') {
 #ifndef NO_HEX_FP
 		{
-		static FPI fpi = { 53, 1-1023-53+1, 2046-1023-53+1, 1, SI };
+		static _CONST FPI fpi = { 53, 1-1023-53+1, 2046-1023-53+1, 1, SI };
 		Long exp;
 		__ULong bits[2];
 		switch(s[1]) {
@@ -279,6 +310,8 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 			switch((i = gethex(ptr, &s, &fpi1, &exp, &bb, sign)) & STRTOG_Retmask) {
 			  case STRTOG_NoNumber:
 				s = s00;
+				sign = 0;
+				/* FALLTHROUGH */
 			  case STRTOG_Zero:
 				break;
 			  default:
@@ -299,14 +332,11 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 		}
 	s0 = s;
 	y = z = 0;
-	for(nd = nf = 0; (c = *s) >= '0' && c <= '9'; nd++, s++) {
-		if (nd < DBL_DIG + 1) {
-			if (nd < 9)
-				y = 10*y + c - '0';
-			else
-				z = 10*z + c - '0';
-		}
-        }
+	for(nd = nf = 0; (c = *s) >= '0' && c <= '9'; nd++, s++)
+		if (nd < 9)
+			y = 10*y + c - '0';
+		else
+			z = 10*z + c - '0';
 	nd0 = nd;
 	if (strncmp (s, _localeconv_r (ptr)->decimal_point,
 		     strlen (_localeconv_r (ptr)->decimal_point)) == 0)
@@ -329,20 +359,15 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 			nz++;
 			if (c -= '0') {
 				nf += nz;
-				for(i = 1; i < nz; i++) {
-					if (nd++ <= DBL_DIG + 1) {
-						if (nd < 10)
-							y *= 10;
-						else
-							z *= 10;
-					}
-				}
-				if (nd++ <= DBL_DIG + 1) {
-					if (nd < 10)
-						y = 10*y + c;
-					else
-						z = 10*z + c;
-				}
+				for(i = 1; i < nz; i++)
+					if (nd++ < 9)
+						y *= 10;
+					else if (nd <= DBL_DIG + 1)
+						z *= 10;
+				if (nd++ < 9)
+					y = 10*y + c;
+				else if (nd <= DBL_DIG + 1)
+					z = 10*z + c;
 				nz = 0;
 				}
 			}
@@ -390,7 +415,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #ifdef INFNAN_CHECK
 			/* Check for Nan and Infinity */
 			__ULong bits[2];
-			static FPI fpinan =	/* only 52 explicit bits */
+			static _CONST FPI fpinan =	/* only 52 explicit bits */
 				{ 52, 1-1023-53+1, 2046-1023-53+1, 1, SI };
 			if (!decpt)
 			 switch(c) {
@@ -691,12 +716,20 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 	/* Put digits into bd: true value = bd * 10^e */
 
 	bd0 = s2b(ptr, s0, nd0, nd, y);
+	if (bd0 == NULL)
+		goto ovfl;
 
 	for(;;) {
 		bd = Balloc(ptr,bd0->_k);
+		if (bd == NULL)
+			goto ovfl;
 		Bcopy(bd, bd0);
 		bb = d2b(ptr,dval(rv), &bbe, &bbbits);	/* rv = bb * 2^bbe */
+		if (bb == NULL)
+			goto ovfl;
 		bs = i2b(ptr,1);
+		if (bs == NULL)
+			goto ovfl;
 
 		if (e >= 0) {
 			bb2 = bb5 = 0;
@@ -716,12 +749,19 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 			bs2++;
 #endif
 #ifdef Avoid_Underflow
+		Lsb = LSB;
+		Lsb1 = 0;
 		j = bbe - scale;
 		i = j + bbbits - 1;	/* logb(rv) */
-		if (i < Emin)	/* denormal */
-			j += P - Emin;
-		else
-			j = P + 1 - bbbits;
+		j = P + 1 - bbbits;
+		if (i < Emin) {	/* denormal */
+			i = Emin - i;
+			j -= i;
+			if (i < 32)
+				Lsb <<= i;
+			else
+				Lsb1 = Lsb << (i-32);
+			}
 #else /*Avoid_Underflow*/
 #ifdef Sudden_Underflow
 #ifdef IBM
@@ -753,19 +793,37 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 			}
 		if (bb5 > 0) {
 			bs = pow5mult(ptr, bs, bb5);
+			if (bs == NULL)
+				goto ovfl;
 			bb1 = mult(ptr, bs, bb);
+			if (bb1 == NULL)
+				goto ovfl;
 			Bfree(ptr, bb);
 			bb = bb1;
 			}
-		if (bb2 > 0)
+		if (bb2 > 0) {
 			bb = lshift(ptr, bb, bb2);
-		if (bd5 > 0)
+			if (bb == NULL)
+				goto ovfl;
+			}
+		if (bd5 > 0) {
 			bd = pow5mult(ptr, bd, bd5);
-		if (bd2 > 0)
+			if (bd == NULL)
+				goto ovfl;
+			}
+		if (bd2 > 0) {
 			bd = lshift(ptr, bd, bd2);
-		if (bs2 > 0)
+			if (bd == NULL)
+				goto ovfl;
+			}
+		if (bs2 > 0) {
 			bs = lshift(ptr, bs, bs2);
+			if (bs == NULL)
+				goto ovfl;
+			}
 		delta = diff(ptr, bb, bd);
+		if (delta == NULL)
+			goto ovfl;
 		dsign = delta->_sign;
 		delta->_sign = 0;
 		i = cmp(delta, bs);
@@ -789,7 +847,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 				else if (!dsign) {
 					adj = -1.;
 					if (!dword1(rv)
-					 && !(dword0(rv) & Frac_mask)) {
+					    && !(dword0(rv) & Frac_mask)) {
 						y = dword0(rv) & Exp_mask;
 #ifdef Avoid_Underflow
 						if (!scale || y > 2*P*Exp_msk1)
@@ -852,7 +910,9 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #endif /*Sudden_Underflow*/
 #endif /*Avoid_Underflow*/
 			adj *= ulp(dval(rv));
-			if (dsign)
+			if (dsign) {
+				if (dword0(rv) == Big0 && dword1(rv) == Big1)
+					goto ovfl;
 				dval(rv) += adj;
 			else
 				dval(rv) -= adj;
@@ -902,6 +962,8 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #endif
 						   0xffffffff)) {
 					/*boundary case -- increment exponent*/
+					if (dword0(rv) == Big0 && dword1(rv) == Big1)
+						goto ovfl;
 					dword0(rv) = (dword0(rv) & Exp_mask)
 						+ Exp_msk1
 #ifdef IBM
@@ -960,14 +1022,31 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #endif
 				}
 #ifndef ROUND_BIASED
+#ifdef Avoid_Underflow
+			if (Lsb1) {
+				if (!(dword0(rv) & Lsb1))
+					break;
+				}
+			else if (!(dword1(rv) & Lsb))
+				break;
+#else
 			if (!(dword1(rv) & LSB))
 				break;
 #endif
+#endif
 			if (dsign)
+#ifdef Avoid_Underflow
+				dval(rv) += sulp(rv, scale);
+#else
 				dval(rv) += ulp(dval(rv));
+#endif
 #ifndef ROUND_BIASED
 			else {
+#ifdef Avoid_Underflow
+				dval(rv) -= sulp(rv, scale);
+#else
 				dval(rv) -= ulp(dval(rv));
+#endif
 #ifndef Sudden_Underflow
 				if (!dval(rv))
 					goto undfl;
@@ -1044,7 +1123,7 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 #ifdef Avoid_Underflow
 			if (scale && y <= 2*P*Exp_msk1) {
 				if (aadj <= 0x7fffffff) {
-					if ((z = aadj) <= 0)
+					if ((z = aadj) == 0)
 						z = 1;
 					aadj = z;
 					dval(aadj1) = dsign ? aadj : -aadj;

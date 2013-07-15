@@ -30,43 +30,41 @@ details. */
 #define NO_SID ((PSID)NULL)
 
 #ifndef SE_CREATE_TOKEN_PRIVILEGE
-#define SE_CREATE_TOKEN_PRIVILEGE            2UL
-#define SE_ASSIGNPRIMARYTOKEN_PRIVILEGE      3UL
-#define SE_LOCK_MEMORY_PRIVILEGE             4UL
-#define SE_INCREASE_QUOTA_PRIVILEGE          5UL
-#define SE_MACHINE_ACCOUNT_PRIVILEGE         6UL
-#define SE_TCB_PRIVILEGE                     7UL
-#define SE_SECURITY_PRIVILEGE                8UL
-#define SE_TAKE_OWNERSHIP_PRIVILEGE          9UL
-#define SE_LOAD_DRIVER_PRIVILEGE            10UL
-#define SE_SYSTEM_PROFILE_PRIVILEGE         11UL
-#define SE_SYSTEMTIME_PRIVILEGE             12UL
-#define SE_PROF_SINGLE_PROCESS_PRIVILEGE    13UL
-#define SE_INC_BASE_PRIORITY_PRIVILEGE      14UL
-#define SE_CREATE_PAGEFILE_PRIVILEGE        15UL
-#define SE_CREATE_PERMANENT_PRIVILEGE       16UL
-#define SE_BACKUP_PRIVILEGE                 17UL
-#define SE_RESTORE_PRIVILEGE                18UL
-#define SE_SHUTDOWN_PRIVILEGE               19UL
-#define SE_DEBUG_PRIVILEGE                  20UL
-#define SE_AUDIT_PRIVILEGE                  21UL
-#define SE_SYSTEM_ENVIRONMENT_PRIVILEGE     22UL
-#define SE_CHANGE_NOTIFY_PRIVILEGE          23UL
-#define SE_REMOTE_SHUTDOWN_PRIVILEGE        24UL
-/* Starting with Windows 2000 */
-#define SE_UNDOCK_PRIVILEGE                 25UL
-#define SE_SYNC_AGENT_PRIVILEGE             26UL
-#define SE_ENABLE_DELEGATION_PRIVILEGE      27UL
-#define SE_MANAGE_VOLUME_PRIVILEGE          28UL
-/* Starting with Windows 2000 SP4, XP SP2, 2003 Server */
-#define SE_IMPERSONATE_PRIVILEGE            29UL
-#define SE_CREATE_GLOBAL_PRIVILEGE          30UL
+#define SE_CREATE_TOKEN_PRIVILEGE            2U
+#define SE_ASSIGNPRIMARYTOKEN_PRIVILEGE      3U
+#define SE_LOCK_MEMORY_PRIVILEGE             4U
+#define SE_INCREASE_QUOTA_PRIVILEGE          5U
+#define SE_MACHINE_ACCOUNT_PRIVILEGE         6U
+#define SE_TCB_PRIVILEGE                     7U
+#define SE_SECURITY_PRIVILEGE                8U
+#define SE_TAKE_OWNERSHIP_PRIVILEGE          9U
+#define SE_LOAD_DRIVER_PRIVILEGE            10U
+#define SE_SYSTEM_PROFILE_PRIVILEGE         11U
+#define SE_SYSTEMTIME_PRIVILEGE             12U
+#define SE_PROF_SINGLE_PROCESS_PRIVILEGE    13U
+#define SE_INC_BASE_PRIORITY_PRIVILEGE      14U
+#define SE_CREATE_PAGEFILE_PRIVILEGE        15U
+#define SE_CREATE_PERMANENT_PRIVILEGE       16U
+#define SE_BACKUP_PRIVILEGE                 17U
+#define SE_RESTORE_PRIVILEGE                18U
+#define SE_SHUTDOWN_PRIVILEGE               19U
+#define SE_DEBUG_PRIVILEGE                  20U
+#define SE_AUDIT_PRIVILEGE                  21U
+#define SE_SYSTEM_ENVIRONMENT_PRIVILEGE     22U
+#define SE_CHANGE_NOTIFY_PRIVILEGE          23U
+#define SE_REMOTE_SHUTDOWN_PRIVILEGE        24U
+#define SE_UNDOCK_PRIVILEGE                 25U
+#define SE_SYNC_AGENT_PRIVILEGE             26U
+#define SE_ENABLE_DELEGATION_PRIVILEGE      27U
+#define SE_MANAGE_VOLUME_PRIVILEGE          28U
+#define SE_IMPERSONATE_PRIVILEGE            29U
+#define SE_CREATE_GLOBAL_PRIVILEGE          30U
 /* Starting with Vista */
-#define SE_TRUSTED_CREDMAN_ACCESS_PRIVILEGE 31UL
-#define SE_RELABEL_PRIVILEGE                32UL
-#define SE_INCREASE_WORKING_SET_PRIVILEGE   33UL
-#define SE_TIME_ZONE_PRIVILEGE              34UL
-#define SE_CREATE_SYMBOLIC_LINK_PRIVILEGE   35UL
+#define SE_TRUSTED_CREDMAN_ACCESS_PRIVILEGE 31U
+#define SE_RELABEL_PRIVILEGE                32U
+#define SE_INCREASE_WORKING_SET_PRIVILEGE   33U
+#define SE_TIME_ZONE_PRIVILEGE              34U
+#define SE_CREATE_SYMBOLIC_LINK_PRIVILEGE   35U
 
 #define SE_MAX_WELL_KNOWN_PRIVILEGE SE_CREATE_SYMBOLIC_LINK_PRIVILEGE
 
@@ -114,7 +112,7 @@ public:
   cygpsid (PSID nsid) { psid = nsid; }
   operator PSID () const { return psid; }
   const PSID operator= (PSID nsid) { return psid = nsid;}
-  __uid32_t get_id (BOOL search_grp, int *type = NULL);
+  uid_t get_id (BOOL search_grp, int *type = NULL);
   int get_uid () { return get_id (FALSE); }
   int get_gid () { return get_id (TRUE); }
 
@@ -187,7 +185,7 @@ public:
   inline PSID set () { return psid = (PSID) sbuf; }
 
   BOOL getfrompw (const struct passwd *pw);
-  BOOL getfromgr (const struct __group32 *gr);
+  BOOL getfromgr (const struct group *gr);
 
   void debug_print (const char *prefix = NULL) const
     {
@@ -217,7 +215,7 @@ public:
     }
   ~cygsidlist () { if (type == cygsidlist_auto) delete [] sids; }
 
-  BOOL addfromgr (struct __group32 *gr) /* Only with alloc */
+  BOOL addfromgr (struct group *gr) /* Only with alloc */
     { return sids[cnt].getfromgr (gr) && ++cnt; }
 
   /* += adds a "normal" SID, *= adds a well-known SID.  See comment in class
@@ -346,7 +344,6 @@ extern cygpsid well_known_system_sid;
 extern cygpsid well_known_builtin_sid;
 extern cygpsid well_known_admins_sid;
 extern cygpsid well_known_users_sid;
-extern cygpsid fake_logon_sid;
 extern cygpsid mandatory_medium_integrity_sid;
 extern cygpsid mandatory_high_integrity_sid;
 extern cygpsid mandatory_system_integrity_sid;
@@ -370,17 +367,17 @@ legal_sid_type (SID_NAME_USE type)
 class path_conv;
 /* File manipulation */
 int __reg3 get_file_attribute (HANDLE, path_conv &, mode_t *,
-				  __uid32_t *, __gid32_t *);
+				  uid_t *, gid_t *);
 int __reg3 set_file_attribute (HANDLE, path_conv &,
-				  __uid32_t, __gid32_t, mode_t);
+				  uid_t, gid_t, mode_t);
 int __reg2 get_object_sd (HANDLE, security_descriptor &);
-int __reg3 get_object_attribute (HANDLE, __uid32_t *, __gid32_t *, mode_t *);
-int __reg3 set_object_attribute (HANDLE, __uid32_t, __gid32_t, mode_t);
-int __reg3 create_object_sd_from_attribute (HANDLE, __uid32_t, __gid32_t,
+int __reg3 get_object_attribute (HANDLE, uid_t *, gid_t *, mode_t *);
+int __reg3 set_object_attribute (HANDLE, uid_t, gid_t, mode_t);
+int __reg3 create_object_sd_from_attribute (HANDLE, uid_t, gid_t,
 					       mode_t, security_descriptor &);
 int __reg3 set_object_sd (HANDLE, security_descriptor &, bool);
 
-int __reg3 get_reg_attribute (HKEY hkey, mode_t *, __uid32_t *, __gid32_t *);
+int __reg3 get_reg_attribute (HKEY hkey, mode_t *, uid_t *, gid_t *);
 LONG __reg3 get_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool);
 LONG __reg3 set_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool);
 bool __reg3 add_access_allowed_ace (PACL, int, DWORD, PSID, size_t &, DWORD);
@@ -392,14 +389,14 @@ void set_security_attribute (path_conv &pc, int attribute,
 			     PSECURITY_ATTRIBUTES psa,
 			     security_descriptor &sd_buf);
 
-bool get_sids_info (cygpsid, cygpsid, __uid32_t * , __gid32_t *);
+bool get_sids_info (cygpsid, cygpsid, uid_t * , gid_t *);
 
 /* sec_acl.cc */
-struct __acl32;
-extern "C" int aclsort32 (int, int, __acl32 *);
-extern "C" int acl32 (const char *, int, int, __acl32 *);
-int getacl (HANDLE, path_conv &, int, __acl32 *);
-int setacl (HANDLE, path_conv &, int, __acl32 *, bool &);
+struct acl;
+extern "C" int aclsort32 (int, int, struct acl *);
+extern "C" int acl32 (const char *, int, int, struct acl *);
+int getacl (HANDLE, path_conv &, int, struct acl *);
+int setacl (HANDLE, path_conv &, int, struct acl *, bool &);
 
 /* Set impersonation or restricted token.  */
 void set_imp_token (HANDLE token, int type);

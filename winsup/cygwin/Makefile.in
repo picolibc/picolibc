@@ -29,8 +29,9 @@ export CCWRAP_HEADERS:=. ${srcdir}
 export CCWRAP_SYSTEM_HEADERS:=@cygwin_headers@ @newlib_headers@
 export CCWRAP_DIRAFTER_HEADERS:=@windows_headers@
 
-VPATH+=$(CONFIG_DIR) $(srcdir)/regex $(srcdir)/lib $(srcdir)/libc
+VPATH+=$(srcdir)/regex $(srcdir)/lib $(srcdir)/libc
 
+target_cpu:=@target_cpu@
 target_alias:=@target_alias@
 build_alias:=@build_alias@
 host_alias:=@host_alias@
@@ -73,10 +74,12 @@ CRT0:=$(cygwin_build)/crt0.o
 # --enable options from configure
 #
 MT_SAFE:=@MT_SAFE@
-DEFS:=@DEFS@
 CCEXTRA=
 COMMON_CFLAGS=-MMD ${$(*F)_CFLAGS} -Werror -fmerge-constants -ftracer $(CCEXTRA)
-COMPILE.cc+=${COMMON_CFLAGS} -mno-use-libstdc-wrappers
+ifeq ($(target_cpu),x86_64)
+COMMON_CFLAGS+=-mcmodel=small
+endif
+COMPILE.cc+=${COMMON_CFLAGS}
 COMPILE.c+=${COMMON_CFLAGS}
 
 AR:=@AR@
@@ -110,23 +113,26 @@ RUNTESTFLAGS =
 # native rebuilding issues (we don't want the build tools to see a partially
 # built cygwin.dll and attempt to use it instead of the old one).
 
-DLL_NAME:=cygwin1.dll
-TEST_DLL_NAME:=cygwin0.dll
+DLL_NAME:=@DLL_NAME@
+TEST_DLL_NAME:=${patsubst %1.dll,%0.dll,@DLL_NAME@}
 TEST_LIB_NAME:=libcygwin0.a
 STATIC_LIB_NAME:=libcygwin_s.a
+DIN_FILE=@DIN_FILE@ common.din
 DEF_FILE:=cygwin.def
+TLSOFFSETS_H:=@TLSOFFSETS_H@
 DLL_ENTRY:=@DLL_ENTRY@
 
 LIBGMON_A:=libgmon.a
 CYGWIN_START:=crt0.o
 GMON_START:=gcrt0.o
 
-toolopts:=--ar=${AR} --as=${AS} --nm=${NM} --objcopy=${OBJCOPY} 
+toolopts:=--cpu=${target_cpu} --ar=${AR} --as=${AS} --nm=${NM} --objcopy=${OBJCOPY}
 speclib=\
     ${srcdir}/speclib ${toolopts} \
 	--exclude='cygwin' \
 	--exclude='(?i:dll)' \
 	--exclude='reloc' \
+	--exclude='^main$$' \
 	--exclude='^_main$$' \
 	$^
 
@@ -139,19 +145,17 @@ LIBCOS:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(srcdir)/lib/*.c}}
 
 # Build all source files in the config directory
 
-EXTRA_DLL_OFILES:=${addsuffix .o,${basename ${notdir ${wildcard $(CONFIG_DIR)/*.c}}}}
-
 EXTRA_OFILES:=
 
-MALLOC_OFILES:=@MALLOC_OFILES@
+MALLOC_OFILES:=malloc.o
 
 DLL_IMPORTS:=${shell $(CC) -print-file-name=w32api/libkernel32.a} ${shell $(CC) -print-file-name=w32api/libntdll.a}
 
 MT_SAFE_OBJECTS:=
 #
-DLL_OFILES:=advapi32.o assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o \
-	cygthread.o cygtls.o cygwait.o cygxdr.o dcrt0.o debug.o devices.o \
-	dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o exceptions.o \
+DLL_OFILES:=advapi32.o arc4random.o assert.o autoload.o base64.o bsdlib.o ctype.o \
+	cxx.o cygheap.o cygthread.o cygtls.o cygwait.o cygxdr.o dcrt0.o debug.o \
+	devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o exceptions.o \
 	exec.o external.o fcntl.o fenv.o fhandler.o fhandler_clipboard.o \
 	fhandler_console.o fhandler_dev.o fhandler_disk_file.o fhandler_dsp.o \
 	fhandler_fifo.o fhandler_floppy.o fhandler_mailslot.o fhandler_mem.o \
@@ -173,7 +177,7 @@ DLL_OFILES:=advapi32.o assert.o autoload.o bsdlib.o ctype.o cxx.o cygheap.o \
 	strfuncs.o strptime.o strsep.o strsig.o sync.o syscalls.o sysconf.o \
 	syslog.o termios.o thread.o timer.o times.o tls_pbuf.o tty.o uinfo.o \
 	uname.o wait.o wincap.o window.o winf.o wow64.o xsique.o \
-	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
+	$(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
 
 EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
 	cygtls.o \
@@ -191,8 +195,16 @@ override EXTRA_OFILES=$(patsubst %.o,%_E,${DLL_OFILES}))
 override MALLOC_OFILES:=$(patsubst %.o,%.E,${MALLOC_OFILES})
 endif #PREPROCESS
 
-GMON_OFILES:=gmon.o mcount.o profil.o
+ifeq ($(target_cpu),x86_64)
+# Needed by mcountFunc.S to choose the right code path and symbol names
+ASFLAGS:=-D_WIN64
+endif
 
+GMON_OFILES:=gmon.o mcount.o profil.o mcountFunc.o
+
+ifeq ($(target_cpu),x86_64)
+NEW_FUNCTIONS:=
+else
 NEW_FUNCTIONS:=$(addprefix --replace=,\
 	acl=_acl32 \
 	aclcheck=_aclcheck32 \
@@ -245,6 +257,7 @@ NEW_FUNCTIONS:=$(addprefix --replace=,\
 	tmpfile=_tmpfile64 \
 	truncate=_truncate64 \
 )
+endif
 
 API_VER:=$(srcdir)/include/cygwin/version.h
 
@@ -260,7 +273,7 @@ cygthread_CFLAGS:=-fomit-frame-pointer
 cygtls_CFLAGS:=-fomit-frame-pointer
 cygwait_CFLAGS=-fomit-frame-pointer
 delqueue_CFLAGS:=-fomit-frame-pointer
-devices_CFLAGS:=-fomit-frame-pointer -Os
+devices_CFLAGS:=-fomit-frame-pointer
 dir_CFLAGS:=-fomit-frame-pointer
 dlfcn_CFLAGS:=-fomit-frame-pointer
 dll_init_CFLAGS:=-fomit-frame-pointer
@@ -292,6 +305,7 @@ fhandler_zero_CFLAGS:=-fomit-frame-pointer
 flock_CFLAGS:=-fomit-frame-pointer
 grp_CFLAGS:=-fomit-frame-pointer
 libstdcxx_wrapper_CFLAGS:=-fomit-frame-pointer
+localtime_CFLAGS:=-fwrapv
 malloc_CFLAGS:=-fomit-frame-pointer -O3
 malloc_wrapper_CFLAGS:=-fomit-frame-pointer
 miscfuncs_CFLAGS:=-fomit-frame-pointer
@@ -390,20 +404,20 @@ uninstall-headers:
 uninstall-man:
 	cd $(srcdir); \
 	for i in `find . -type f -name '*.2'`; do \
-	    rm -f $(tooldir)/man/man2/`basename $$i` ; \
+	    rm -f $(DESTDIR)$(mandir)/man2/`basename $$i` ; \
 	done; \
 	for i in `find . -type f -name '*.3'`; do \
-	    rm -f $(tooldir)/man/man3/`basename $$i` ; \
+	    rm -f $(DESTDIR)$(mandir)/man3/`basename $$i` ; \
 	done; \
 	for i in `find . -type f -name '*.5'`; do \
-	    rm -f $(tooldir)/man/man5/`basename $$i` ; \
+	    rm -f $(DESTDIR)$(mandir)/man5/`basename $$i` ; \
 	done; \
 	for i in `find . -type f -name '*.7'`; do \
-	    rm -f $(tooldir)/man/man7/`basename $$i` ; \
+	    rm -f $(DESTDIR)$(mandir)/man7/`basename $$i` ; \
 	done
 
 clean:
-	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h $(srcdir)/tlsoffsets.h $(srcdir)/devices.cc
+	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h $(srcdir)/$(TLSOFFSETS_H) $(srcdir)/devices.cc
 	-@$(MAKE) -C ${cygserver_blddir} libclean
 
 maintainer-clean realclean: clean
@@ -411,10 +425,15 @@ maintainer-clean realclean: clean
 	@echo "it deletes files that may require special tools to rebuild."
 	-rm -fr configure
 
+# Rule to build LDSCRIPT
+$(LDSCRIPT): $(LDSCRIPT).in
+	$(CC) -E - -P < $^ -o $@
 
 # Rule to build cygwin.dll
 $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
-	$(CXX) $(CXXFLAGS) -L${WINDOWS_LIBDIR} -Wl,--gc-sections $(nostdlib) -Wl,-T$(firstword $^) -static \
+	$(CXX) $(CXXFLAGS) \
+	-mno-use-libstdc-wrappers -L${WINDOWS_LIBDIR} \
+	-Wl,--gc-sections $(nostdlib) -Wl,-T$(firstword $^) -static \
 	-Wl,--heap=0 -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(MALLOC_OBJ) $(LIBSERVER) $(LIBM) $(LIBC) \
@@ -423,8 +442,8 @@ $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(LIBSERVER) $(LIBC) $(LIB
 	@ln -f $@ new-$(DLL_NAME)
 
 # Rule to build libcygwin.a
-$(LIB_NAME): $(LIBCOS) | $(TEST_DLL_NAME) 
-	${srcdir}/mkimport ${toolopts} ${NEW_FUNCTIONS} $@ cygdll.a $^
+$(LIB_NAME): $(DEF_FILE) $(LIBCOS) | $(TEST_DLL_NAME)
+	${srcdir}/mkimport ${toolopts} ${NEW_FUNCTIONS} $@ cygdll.a $(wordlist 2,99,$^)
 
 ${STATIC_LIB_NAME}: mkstatic ${TEST_DLL_NAME}
 	perl -d $< -x ${EXCLUDE_STATIC_OFILES} --library=${LIBC} --library=${LIBM} --ar=${AR} $@ cygwin.map
@@ -445,9 +464,6 @@ dll_ofiles: $(DLL_OFILES)
 
 $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
 	$(AR) rcv $(LIBGMON_A) $(GMON_OFILES)
-
-$(API_VER): $(srcdir)/cygwin.din
-	@echo Error: Version info is older than DLL API!
 
 version.cc winver.o: winver_stamp
 	@ :
@@ -500,14 +516,14 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	$(COMPILE.cc) -c -o version.o version.cc && \
 	touch $@
 
-Makefile: cygwin.din ${srcdir}/Makefile.in
+Makefile: ${srcdir}/Makefile.in
 	/bin/sh ./config.status
 
-$(DEF_FILE): gendef cygwin.din $(srcdir)/tlsoffsets.h
-	$^ $@ sigfe.s
+$(DEF_FILE): gendef $(srcdir)/$(TLSOFFSETS_H) $(DIN_FILE)
+	$(word 1,$^) --cpu=${target_cpu} --output-def=$@  --tlsoffsets=$(word 2,$^) $(wordlist 3,99,$^)
 
-$(srcdir)/tlsoffsets.h: gentls_offsets cygtls.h
-	$^ $@ $(COMPILE.cc) -c
+$(srcdir)/$(TLSOFFSETS_H): gentls_offsets cygtls.h
+	$^ $@ $(target_cpu) $(COMPILE.cc) -c
 
 sigfe.s: $(DEF_FILE)
 	@[ -s $@ ] || \

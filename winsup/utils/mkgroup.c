@@ -1,7 +1,7 @@
 /* mkgroup.c:
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -18,6 +18,7 @@
 #include <locale.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <inttypes.h>
 #include <getopt.h>
 #include <io.h>
 #include <sys/fcntl.h>
@@ -62,9 +63,11 @@ _print_win_error (DWORD code, int line)
       code,
       MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
       (LPTSTR) buf, sizeof (buf), NULL))
-    fprintf (stderr, "mkgroup (%d): [%lu] %s", line, code, buf);
+    fprintf (stderr, "mkgroup (%d): [%" PRIu32 "] %s",
+	     line, (unsigned int) code, buf);
   else
-    fprintf (stderr, "mkgroup (%d): error %lu", line, code);
+    fprintf (stderr, "mkgroup (%d): error %" PRIu32 ,
+	     line, (unsigned int) code);
 }
 
 static PWCHAR
@@ -104,7 +107,7 @@ put_sid (PSID psid)
   strcat (s, t);
   for (i = 0; i < *GetSidSubAuthorityCount (psid); ++i)
     {
-      sprintf(t, "-%lu", *GetSidSubAuthority (psid, i));
+      sprintf(t, "-%" PRIu32 , (unsigned int) *GetSidSubAuthority (psid, i));
       strcat (s, t);
     }
   return s;
@@ -164,12 +167,12 @@ current_group (const char *sep, DWORD id_offset)
     }
   gid = *GetSidSubAuthority (curr_pgrp.psid,
 			     *GetSidSubAuthorityCount(curr_pgrp.psid) - 1);
-  printf ("%ls%s%ls:%s:%lu:\n",
+  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
 	  sep ? dom : L"",
 	  sep ?: "",
 	  grp,
 	  put_sid (curr_pgrp.psid),
-	  id_offset + gid);
+	  (unsigned int) (id_offset + gid));
 }
 
 static void
@@ -225,14 +228,14 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 				       dom,
 				       (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
 				       &acc_type))
-	    printf ("%s%s%ls:%s:%lu:\n",
+	    printf ("%s%s%ls:%s:%" PRIu32 ":\n",
 		    with_dom ? "Unix Group" : "",
 		    with_dom ? sep : "",
 		    p,
 		    put_sid (psid),
-		    id_offset +
+		    (unsigned int) (id_offset +
 		    *GetSidSubAuthority (psid,
-					 *GetSidSubAuthorityCount(psid) - 1));
+					 *GetSidSubAuthorityCount(psid) - 1)));
 	}
       else
 	{
@@ -262,12 +265,12 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 				     (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
 				     &acc_type)
 		  && !iswdigit (grp[0]))
-		printf ("%s%s%ls:%s:%lu:\n",
+		printf ("%s%s%ls:%s:%" PRIu32 ":\n",
 			with_dom ? "Unix Group" : "",
 			with_dom ? sep : "",
 			grp,
 			put_sid (psid),
-			id_offset + start);
+			(unsigned int) (id_offset + start));
 	    }
 	}
     }
@@ -288,7 +291,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
   LOCALGROUP_INFO_0 *buffer;
   DWORD entriesread = 0;
   DWORD totalentries = 0;
-  DWORD resume_handle = 0;
+  DWORD_PTR resume_handle = 0;
   WCHAR gname[GNLEN + 1];
   DWORD rc;
 
@@ -411,12 +414,12 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	    got_curr_pgrp = TRUE;
 
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
-	  printf ("%ls%s%ls:%s:%ld:\n",
+	  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
 		  with_dom && !is_builtin ? domain_name : L"",
 		  with_dom && !is_builtin ? sep : "",
 		  buffer[i].lgrpi0_name,
 		  put_sid (psid),
-		  gid + (is_builtin ? 0 : id_offset));
+		  (unsigned int) (gid + (is_builtin ? 0 : id_offset)));
 skip_group:
 	  ;
 	}
@@ -443,7 +446,7 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
   GROUP_INFO_2 *buffer;
   DWORD entriesread = 0;
   DWORD totalentries = 0;
-  DWORD resume_handle = 0;
+  DWORD_PTR resume_handle = 0;
   WCHAR gname[GNLEN + 1];
   DWORD rc;
 
@@ -543,12 +546,12 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	  else if (EqualSid (curr_pgrp.psid, psid))
 	    got_curr_pgrp = TRUE;
 
-	  printf ("%ls%s%ls:%s:%lu:\n",
+	  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
 		  with_dom ? domain_name : L"",
 		  with_dom ? sep : "",
 		  buffer[i].grpi2_name,
 		  put_sid (psid),
-		  id_offset + gid);
+		  (unsigned int) (id_offset + gid));
 	}
 
       NetApiBufferFree (buffer);
@@ -591,7 +594,8 @@ print_special_by_sid (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
 	    rid = sub2;
 	  else
 	    rid = sub1;
-	  printf ("%ls:%s:%lu:\n", grp, put_sid (psid), rid);
+	  printf ("%ls:%s:%" PRIu32 ":\n", grp, put_sid (psid),
+	  	  (unsigned int) rid);
 	}
       FreeSid (psid);
     }
@@ -797,7 +801,7 @@ main (int argc, char **argv)
 	    }
 	if (!(domlist[print_domlist].str = opt))
 	  print_system = 1;
-	domlist[print_domlist].id_offset = ULONG_MAX;
+	domlist[print_domlist].id_offset = UINT32_MAX;
 	if (opt && (p = strchr (opt, ',')))
 	  {
 	    if (p == opt
@@ -884,7 +888,7 @@ skip:
   for (i = 0; i < print_domlist; ++i)
     {
       DWORD my_off = (domlist[i].domain || domlist[i].str)
-		     ? domlist[i].id_offset != ULONG_MAX
+		     ? domlist[i].id_offset != UINT_MAX
 		       ? domlist[i].id_offset : off : 0;
       if (!enum_local_groups (domlist[i].domain, domlist + i, sep_char,
 			      my_off, disp_groupname, print_builtin, print_current))

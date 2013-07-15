@@ -792,6 +792,9 @@ enable_newlib_reent_small
 enable_newlib_fvwrite_in_streamio
 enable_newlib_fseek_optimization
 enable_newlib_wide_orient
+enable_newlib_nano_malloc
+enable_newlib_unbuf_stream_opt
+enable_lite_exit
 enable_multilib
 enable_target_optspace
 enable_malloc_debugging
@@ -1453,11 +1456,14 @@ Optional Features:
   --enable-newlib-iconv-from-encodings   enable specific comma-separated list of \"from\" iconv encodings to be built-in
   --enable-newlib-iconv-to-encodings   enable specific comma-separated list of \"to\" iconv encodings to be built-in
   --enable-newlib-iconv-external-ccs     enable capabilities to load external CCS files for iconv
-  --disable-newlib-atexit-alloc    disable dynamic allocation of atexit entries
+  --disable-newlib-atexit-dynamic-alloc    disable dynamic allocation of atexit entries
   --enable-newlib-reent-small   enable small reentrant struct support
   --disable-newlib-fvwrite-in-streamio    disable iov in streamio
   --disable-newlib-fseek-optimization    disable fseek optimization
   --disable-newlib-wide-orient    Turn off wide orientation in streamio
+  --enable-newlib-nano-malloc    use small-footprint nano-malloc implementation
+  --disable-newlib-unbuf-stream-opt    disable unbuffered stream optimization in streamio
+  --enable-lite-exit	enable light weight exit
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -2394,6 +2400,45 @@ else
   newlib_wide_orient=yes
 fi
 
+
+# Check whether --enable-newlib-nano-malloc was given.
+if test "${enable_newlib_nano_malloc+set}" = set; then :
+  enableval=$enable_newlib_nano_malloc; if test "${newlib_nano_malloc+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_nano_malloc=yes ;;
+    no)  newlib_nano_malloc=no  ;;
+    *)   as_fn_error $? "bad value ${enableval} for newlib-nano-malloc option" "$LINENO" 5 ;;
+  esac
+ fi
+else
+  newlib_nano_malloc=no
+fi
+
+# Check whether --enable-newlib-unbuf-stream-opt was given.
+if test "${enable_newlib_unbuf_stream_opt+set}" = set; then :
+  enableval=$enable_newlib_unbuf_stream_opt; if test "${newlib_unbuf_stream_opt+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_unbuf_stream_opt=yes ;;
+    no)  newlib_unbuf_stream_opt=no  ;;
+    *)   as_fn_error $? "bad value ${enableval} for newlib-unbuf-stream-opt option" "$LINENO" 5 ;;
+  esac
+ fi
+else
+  newlib_unbuf_stream_opt=yes
+fi
+
+# Check whether --enable-lite-exit was given.
+if test "${enable_lite_exit+set}" = set; then :
+  enableval=$enable_lite_exit; if test "${lite_exit+set}" != set; then
+  case "${enableval}" in
+    yes) lite_exit=yes ;;
+    no)  lite_exit=no  ;;
+    *)   as_fn_error $? "bad value ${enableval} for lite-exit option" "$LINENO" 5 ;;
+  esac
+ fi
+else
+  lite_exit=no
+fi
 
 
 # Make sure we can run config.sub.
@@ -11695,7 +11740,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11684 "configure"
+#line 11743 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11801,7 +11846,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11790 "configure"
+#line 11849 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12293,6 +12338,27 @@ fi
 if test "${newlib_wide_orient}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
 #define _WIDE_ORIENT 1
+_ACEOF
+
+fi
+
+if test "${newlib_nano_malloc}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _NANO_MALLOC 1
+_ACEOF
+
+fi
+
+if test "${newlib_unbuf_stream_opt}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _UNBUF_STREAM_OPT 1
+_ACEOF
+
+fi
+
+if test "${lite_exit}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _LITE_EXIT 1
 _ACEOF
 
 fi

@@ -1,5 +1,6 @@
 # -*- Makefile -*- for winsup/doc
-# Copyright (c) 1998-2000,2001 Red Hat, Inc.
+# Copyright (c) 1998-2000, 2001, 2002, 2004, 2005, 2006, 2008, 2009, 2010,
+# 2013 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -11,7 +12,7 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-SGMLDIRS =  -d $(srcdir) -d $(utils_source) -d $(cygwin_source)
+DBXDIRS =  -d $(srcdir) -d $(srcdir)/../utils -d $(srcdir)/../cygwin
 
 CC:=@CC@
 CC_FOR_TARGET:=@CC@
@@ -21,73 +22,76 @@ XMLTO:=xmlto --skip-validation --with-dblatex
 
 include $(srcdir)/../Makefile.common
 
-TOCLEAN:=faq.txt ./*.html readme.txt doctool.o doctool.exe *.junk \
-	 cygwin-ug.sgml cygwin-ug cygwin-ug-net.html.gz \
-	 cygwin-ug-net.sgml cygwin-ug-net cygwin-ug-net.html \
-	 cygwin-api.sgml cygwin-api cygwin-api-int.sgml cygwin-api-int \
-	 faq
+FAQ_SOURCES:= $(wildcard ${srcdir}/faq*.xml)
 
-FAQ_SOURCES:= faq-api.xml faq-programming.xml faq-resources.xml \
-	      faq-sections.xml faq-setup.xml faq-using.xml faq-what.xml faq.xml
+.SUFFIXES: .html .body
 
-.SUFFIXES:
+.html.body:
+	$(srcdir)/bodysnatcher.pl $<
 
-all : \
+all: Makefile Makefile.dep \
 	cygwin-ug-net/cygwin-ug-net.html \
 	cygwin-ug-net/cygwin-ug-net-nochunks.html.gz \
 	cygwin-api/cygwin-api.html \
-	faq/faq.html faq/faq-nochunks.html \
+	faq/faq.body faq/faq.html \
 	cygwin-ug-net/cygwin-ug-net.pdf \
 	cygwin-api/cygwin-api.pdf
 
+Makefile: ${srcdir}/Makefile.in
+	/bin/sh ./config.status
+
 clean:
-	rm -Rf $(TOCLEAN)
+	rm -f Makefile.dep
+	rm -f doctool.exe doctool.o
+	rm -f cygwin-api.xml
+	rm -f *.html *.html.gz
+	rm -Rf cygwin-api cygwin-ug cygwin-ug-net faq
 
 install:	all
 
-cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : cygwin-ug-net.sgml doctool
-	-${XMLTO} html-nochunks -m $(srcdir)/cygwin.dsl $<
+cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : cygwin-ug-net.xml
+	-${XMLTO} html-nochunks -m $(srcdir)/cygwin.xsl $<
 	-cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
 	-rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
 	-gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
-cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.sgml doctool
-	-${XMLTO} html -o cygwin-ug-net/ -m $(srcdir)/cygwin.dsl $<
+cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.xml
+	-${XMLTO} html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
 
 # Some versions of jw hang with the -o option
-cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.sgml
+cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.xml
 	-${XMLTO} pdf -o cygwin-ug-net/ $<
 
-cygwin-ug-net.sgml : cygwin-ug-net.in.sgml ./doctool Makefile
-	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
+cygwin-api/cygwin-api.html : cygwin-api.xml
+	-${XMLTO} html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
 
-cygwin-api/cygwin-api.html : cygwin-api.sgml
-	-${XMLTO} html -o cygwin-api/ -m $(srcdir)/cygwin.dsl $<
-
-cygwin-api/cygwin-api.pdf : cygwin-api.sgml
+cygwin-api/cygwin-api.pdf : cygwin-api.xml
 	-${XMLTO} pdf -o cygwin-api/ $<
 
-cygwin-api.sgml : cygwin-api.in.sgml ./doctool Makefile
-	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
+cygwin-api.xml : cygwin-api.in.xml ./doctool Makefile
+	-./doctool -m $(DBXDIRS) -s $(srcdir) -o $@ $<
 
 faq/faq.html : $(FAQ_SOURCES)
-	-${XMLTO} html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq-sections.xml
-	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq.*.html
-
-faq/faq-nochunks.html : $(FAQ_SOURCES)
-	-${XMLTO} html -o faq -m $(srcdir)/cygwin.dsl $(srcdir)/faq.xml
-	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq-nochunks.html
+	-${XMLTO} html -o faq -m $(srcdir)/cygwin.xsl $(srcdir)/faq.xml
+	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq.html
 
 ./doctool : doctool.c
 	gcc -g $< -o $@
 
 TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
-	  cygwin-ug-net.pdf cygwin-ug-net.sgml \
+	  cygwin-ug-net.pdf cygwin-ug-net.xml \
 	  cygwin-api.dvi cygwin-api.rtf cygwin-api.ps \
-	  cygwin-api.pdf cygwin-api.sgml
+	  cygwin-api.pdf cygwin-api.xml
 TBDIRS = cygwin-ug-net cygwin-api
 TBDEPS = cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 
 tarball : cygwin-docs.tar.bz2
 cygwin-docs.tar.bz2 : $(TBFILES) $(TBDEPS)
 	find $(TBFILES) $(TBDIRS) \! -type d | sort | tar -T - -cf -  | bzip2 > cygwin-docs.tar.bz2
+
+Makefile.dep: cygwin-ug-net.xml
+	builddir=`pwd` \
+	&& cd $(srcdir) \
+	&& $(srcdir)/xidepend $^ > "$${builddir}/$@"
+
+-include Makefile.dep

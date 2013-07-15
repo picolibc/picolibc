@@ -16,49 +16,6 @@ details. */
 extern "C" {
 #endif
 
-#if defined (__INSIDE_CYGWIN__) || defined (_COMPILING_NEWLIB)
-struct __stat32
-{
-  __dev16_t	st_dev;
-  __ino32_t	st_ino;
-  mode_t	st_mode;
-  nlink_t       st_nlink;
-  __uid16_t     st_uid;
-  __gid16_t     st_gid;
-  __dev16_t     st_rdev;
-  _off_t        st_size;
-  timestruc_t   st_atim;
-  timestruc_t   st_mtim;
-  timestruc_t   st_ctim;
-  blksize_t     st_blksize;
-  __blkcnt32_t  st_blocks;
-  long          st_spare4[2];
-};
-
-struct __stat64
-{
-  __dev32_t     st_dev;
-  __ino64_t     st_ino;
-  mode_t        st_mode;
-  nlink_t       st_nlink;
-  __uid32_t     st_uid;
-  __gid32_t     st_gid;
-  __dev32_t     st_rdev;
-  _off64_t      st_size;
-  timestruc_t   st_atim;
-  timestruc_t   st_mtim;
-  timestruc_t   st_ctim;
-  blksize_t     st_blksize;
-  __blkcnt64_t  st_blocks;
-  timestruc_t   st_birthtim;
-};
-
-extern int fstat64 (int fd, struct __stat64 *buf);
-extern int stat64 (const char *file_name, struct __stat64 *buf);
-extern int lstat64 (const char *file_name, struct __stat64 *buf);
-
-#endif
-
 struct stat
 {
   dev_t         st_dev;
@@ -76,6 +33,33 @@ struct stat
   blkcnt_t      st_blocks;
   timestruc_t   st_birthtim;
 };
+
+#if defined (__INSIDE_CYGWIN__) || defined (_COMPILING_NEWLIB)
+#ifndef __x86_64__
+struct __stat32
+{
+  __dev16_t	st_dev;
+  __ino32_t	st_ino;
+  mode_t	st_mode;
+  nlink_t       st_nlink;
+  __uid16_t     st_uid;
+  __gid16_t     st_gid;
+  __dev16_t     st_rdev;
+  _off_t        st_size;
+  timestruc_t   st_atim;
+  timestruc_t   st_mtim;
+  timestruc_t   st_ctim;
+  blksize_t     st_blksize;
+  __blkcnt32_t  st_blocks;
+  long          st_spare4[2];
+};
+#endif
+
+extern int fstat64 (int fd, struct stat *buf);
+extern int stat64 (const char *file_name, struct stat *buf);
+extern int lstat64 (const char *file_name, struct stat *buf);
+
+#endif
 
 #define st_atime st_atim.tv_sec
 #define st_mtime st_mtim.tv_sec

@@ -29,7 +29,7 @@ details. */
  * changed? How does /dev/clipboard operate under (say) linux?
  */
 
-static const NO_COPY WCHAR *CYGWIN_NATIVE = L"CYGWIN_NATIVE_CLIPBOARD";
+static const WCHAR *CYGWIN_NATIVE = L"CYGWIN_NATIVE_CLIPBOARD";
 /* this is MT safe because windows format id's are atomic */
 static UINT cygnativeformat;
 
@@ -181,7 +181,7 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
 }
 
 int __reg2
-fhandler_dev_clipboard::fstat (struct __stat64 *buf)
+fhandler_dev_clipboard::fstat (struct stat *buf)
 {
   buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
   buf->st_uid = geteuid32 ();
@@ -243,7 +243,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
     {
       cygcb_t *clipbuf = (cygcb_t *) cb_data;
 
-      if (pos < clipbuf->len)
+      if (pos < (off_t) clipbuf->len)
 	{
 	  ret = ((len > (clipbuf->len - pos)) ? (clipbuf->len - pos) : len);
 	  memcpy (ptr, clipbuf->data + pos , ret);
@@ -267,7 +267,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
       wchar_t *buf = (wchar_t *) cb_data;
 
       size_t glen = GlobalSize (hglb) / sizeof (WCHAR) - 1;
-      if (pos < glen)
+      if (pos < (off_t) glen)
 	{
 	  /* If caller's buffer is too small to hold at least one
 	     max-size character, redirect algorithm to local
@@ -295,7 +295,8 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
 		  != (size_t) -1
 		 && (ret > conv_len
 			/* Skip separated high surrogate: */
-		     || ((buf [pos + glen - 1] & 0xFC00) == 0xD800 && glen - pos > 1)))
+		     || ((buf [glen - 1] & 0xFC00) == 0xD800
+			 && glen - pos > 1)))
 	     --glen;
 	  if (ret == (size_t) -1)
 	    ret = 0;
@@ -325,8 +326,8 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
   len = ret;
 }
 
-_off64_t
-fhandler_dev_clipboard::lseek (_off64_t offset, int whence)
+off_t
+fhandler_dev_clipboard::lseek (off_t offset, int whence)
 {
   /* On reads we check this at read time, not seek time.
    * On writes we use this to decide how to write - empty and write, or open, copy, empty

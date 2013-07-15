@@ -1,7 +1,7 @@
 #!/bin/sh
 # cygmagic - Generate "magic numbers" from a structure.
 #
-#   Copyright 2001, 2002, 2005 Red Hat, Inc.
+#   Copyright 2001, 2002, 2005, 2013 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -24,7 +24,7 @@ sumit() {
 while [ -n "$1" ]; do
     define=$1; shift
     struct=$1; shift
-    sum=`$gcc -E $file | sed -n "/^$struct/,/^};/p" | sed -e 's/[ 	]//g' -e '/^$/d' | sumit | awk '{printf "0x%xU", $1}'`
+    sum=`$gcc -D__CYGMAGIC__ -E $file | sed -n "/^$struct/,/^};/p" | sed -e 's/[ 	]//g' -e '/^$/d' | sumit | awk '{printf "0x%xU", $1}'`
     echo "#define $define $sum"
     curr=`sed -n "s/^#[ 	]*define CURR_$define[ 	][ 	]*\([^ 	][^ 	]*\)/\1/p" $file`
     [ "$curr" != "$sum" ] && echo "*** WARNING WARNING WARNING WARNING WARNING ***

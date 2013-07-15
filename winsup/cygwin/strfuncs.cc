@@ -410,7 +410,7 @@ __big5_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
        to buffer size, it's a bug in Cygwin and the buffer in the calling
        function should be raised.
 */
-size_t __stdcall
+size_t __reg3
 sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
 		 const wchar_t *src, size_t nwc)
 {
@@ -496,7 +496,7 @@ sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
   return n;
 }
 
-size_t __stdcall
+size_t __reg3
 sys_wcstombs (char *dst, size_t len, const wchar_t * src, size_t nwc)
 {
   return sys_cp_wcstombs (cygheap->locale.wctomb, cygheap->locale.charset,
@@ -513,7 +513,7 @@ sys_wcstombs (char *dst, size_t len, const wchar_t * src, size_t nwc)
    Note that this code is shared by cygserver (which requires it via
    __small_vsprintf) and so when built there plain calloc is the
    only choice.  */
-size_t __stdcall
+size_t __reg3
 sys_wcstombs_alloc (char **dst_p, int type, const wchar_t *src, size_t nwc)
 {
   size_t ret;
@@ -539,7 +539,7 @@ sys_wcstombs_alloc (char **dst_p, int type, const wchar_t *src, size_t nwc)
    conversion.  This is so that fhandler_console can switch to an alternate
    charset, which is the charset returned by GetConsoleCP ().  Most of the
    time this is used for box and line drawing characters. */
-size_t __stdcall
+size_t __reg3
 sys_cp_mbstowcs (mbtowc_p f_mbtowc, const char *charset, wchar_t *dst,
 		 size_t dlen, const char *src, size_t nms)
 {
@@ -648,7 +648,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, const char *charset, wchar_t *dst,
   return count;
 }
 
-size_t __stdcall
+size_t __reg3
 sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src, size_t nms)
 {
   return sys_cp_mbstowcs (cygheap->locale.mbtowc, cygheap->locale.charset,
@@ -656,7 +656,7 @@ sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src, size_t nms)
 }
 
 /* Same as sys_wcstombs_alloc, just backwards. */
-size_t __stdcall
+size_t __reg3
 sys_mbstowcs_alloc (wchar_t **dst_p, int type, const char *src, size_t nms)
 {
   size_t ret;

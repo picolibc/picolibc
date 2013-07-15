@@ -1,6 +1,6 @@
 /* cygserver.h
 
-   Copyright 2001, 2002, 2003, 2004, 2008 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2008, 2012, 2013 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -61,7 +61,7 @@ protected:
     union
     {
       request_code_t request_code;
-      ssize_t error_code;
+      int error_code;
     };
 
     header_t () {};
@@ -80,8 +80,8 @@ public:
 
   request_code_t request_code () const { return _header.request_code; }
 
-  ssize_t error_code () const { return _header.error_code; };
-  void error_code (ssize_t error_code) { _header.error_code = error_code; };
+  int error_code () const { return _header.error_code; };
+  void error_code (int error_code) { _header.error_code = error_code; };
 
   size_t msglen () const { return _header.msglen; };
   void msglen (size_t len) { _header.msglen = len; };

@@ -1,7 +1,7 @@
 /* net.cc: network-related routines.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -157,7 +157,7 @@ struct tl
   int e;
 };
 
-static NO_COPY struct tl errmap[] = {
+static const struct tl errmap[] = {
   {WSAEINTR, "WSAEINTR", EINTR},
   {WSAEWOULDBLOCK, "WSAEWOULDBLOCK", EWOULDBLOCK},
   {WSAEINPROGRESS, "WSAEINPROGRESS", EINPROGRESS},
@@ -219,14 +219,14 @@ __set_winsock_errno (const char *fn, int ln)
   int err = find_winsock_errno (werr);
 
   set_errno (err);
-  syscall_printf ("%s:%d - winsock error %d -> errno %d", fn, ln, werr, err);
+  syscall_printf ("%s:%d - winsock error %u -> errno %d", fn, ln, werr, err);
 }
 
 /*
  * Since the member `s' isn't used for debug output we can use it
  * for the error text returned by herror and hstrerror.
  */
-static NO_COPY struct tl host_errmap[] = {
+static const struct tl host_errmap[] = {
   {WSAHOST_NOT_FOUND, "Unknown host", HOST_NOT_FOUND},
   {WSATRY_AGAIN, "Host name lookup failure", TRY_AGAIN},
   {WSANO_RECOVERY, "Unknown server error", NO_RECOVERY},
@@ -305,6 +305,22 @@ realloc_ent (int sz, hostent *)
    The 'unionent' struct is a union of all of the currently used
    *ent structure.  */
 
+#ifdef __x86_64__
+/* For some baffling reason, somebody at Microsoft decided that it would be
+   a good idea to exchange the s_port and s_proto members in the servent
+   structure. */
+struct win64_servent
+{
+  char  *s_name;
+  char **s_aliases;
+  char  *s_proto;
+  short  s_port;
+};
+#define WIN_SERVENT(x)	((win64_servent *)(x))
+#else
+#define WIN_SERVENT(x)	((servent *)(x))
+#endif
+
 #ifdef DEBUGGING
 static void *
 #else
@@ -369,8 +385,8 @@ dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
   int addr_list_len = 0;
   if (type == unionent::t_servent)
     {
-      if (src->s_proto)
-	sz += (protolen = strlen_round (src->s_proto));
+      if (WIN_SERVENT (src)->s_proto)
+	sz += (protolen = strlen_round (WIN_SERVENT (src)->s_proto));
     }
   else if (type == unionent::t_hostent)
     {
@@ -392,8 +408,12 @@ dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
     {
       memset (dst, 0, sz);
       /* This field is common to all *ent structures but named differently
-	 in each, of course.  */
-      dst->port_proto_addrtype = src->port_proto_addrtype;
+	 in each, of course.  Also, take 64 bit Windows servent weirdness
+	 into account. */
+      if (type == unionent::t_servent)
+	dst->port_proto_addrtype = WIN_SERVENT (src)->s_port;
+      else
+	dst->port_proto_addrtype = src->port_proto_addrtype;
 
       char *dp = ((char *) dst) + struct_sz;
       if (namelen)
@@ -420,12 +440,12 @@ dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
 
       /* Do servent/protoent/hostent specific processing. */
       if (type == unionent::t_protoent)
-	debug_printf ("protoent %s %x %x", dst->name, dst->list, dst->port_proto_addrtype);
+	debug_printf ("protoent %s %p %y", dst->name, dst->list, dst->port_proto_addrtype);
       else if (type == unionent::t_servent)
 	{
-	  if (src->s_proto)
+	  if (WIN_SERVENT (src)->s_proto)
 	    {
-	      strcpy (dst->s_proto = dp, src->s_proto);
+	      strcpy (dst->s_proto = dp, WIN_SERVENT (src)->s_proto);
 	      dp += protolen;
 	    }
 	}
@@ -534,7 +554,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
       ret = WSAIoctl (soc, SIO_BASE_HANDLE, NULL, 0, (void *) &base_soc,
 		      sizeof (base_soc), &bret, NULL, NULL);
       if (ret)
-	debug_printf ("WSAIoctl: %lu", WSAGetLastError ());
+	debug_printf ("WSAIoctl: %u", WSAGetLastError ());
       else if (base_soc != soc)
 	{
 	  /* LSPs are often BLODAs as well.  So we print an info about
@@ -585,26 +605,35 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
      handle inheritance.  An explanation for this weird behaviour would
      be nice, though.
 
+     NOTE 2.  Testing on x86_64 (XP, Vista, 2008 R2, W8) indicates that
+     this is no problem on 64 bit.  So we set the default buffer size to
+     the default values in current 3.x Linux versions.
+
      (*) Maximum normal TCP window size.  Coincidence?  */
+#ifdef __x86_64__
+  ((fhandler_socket *) fd)->rmem () = 212992;
+  ((fhandler_socket *) fd)->wmem () = 212992;
+#else
   ((fhandler_socket *) fd)->rmem () = 65535;
   ((fhandler_socket *) fd)->wmem () = 65535;
+#endif
   if (::setsockopt (soc, SOL_SOCKET, SO_RCVBUF,
 		    (char *) &((fhandler_socket *) fd)->rmem (), sizeof (int)))
     {
-      debug_printf ("setsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());
+      debug_printf ("setsockopt(SO_RCVBUF) failed, %u", WSAGetLastError ());
       if (::getsockopt (soc, SOL_SOCKET, SO_RCVBUF,
 			(char *) &((fhandler_socket *) fd)->rmem (),
 			(size = sizeof (int), &size)))
-	system_printf ("getsockopt(SO_RCVBUF) failed, %lu", WSAGetLastError ());
+	system_printf ("getsockopt(SO_RCVBUF) failed, %u", WSAGetLastError ());
     }
   if (::setsockopt (soc, SOL_SOCKET, SO_SNDBUF,
 		    (char *) &((fhandler_socket *) fd)->wmem (), sizeof (int)))
     {
-      debug_printf ("setsockopt(SO_SNDBUF) failed, %lu", WSAGetLastError ());
+      debug_printf ("setsockopt(SO_SNDBUF) failed, %u", WSAGetLastError ());
       if (::getsockopt (soc, SOL_SOCKET, SO_SNDBUF,
 			(char *) &((fhandler_socket *) fd)->wmem (),
 			(size = sizeof (int), &size)))
-	system_printf ("getsockopt(SO_SNDBUF) failed, %lu", WSAGetLastError ());
+	system_printf ("getsockopt(SO_SNDBUF) failed, %u", WSAGetLastError ());
     }
 
   return true;
@@ -620,7 +649,7 @@ cygwin_socket (int af, int type, int protocol)
   int flags = type & _SOCK_FLAG_MASK;
   type &= ~_SOCK_FLAG_MASK;
 
-  debug_printf ("socket (%d, %d (flags %p), %d)", af, type, flags, protocol);
+  debug_printf ("socket (%d, %d (flags %y), %d)", af, type, flags, protocol);
 
   if ((flags & ~(SOCK_NONBLOCK | SOCK_CLOEXEC)) != 0)
     {
@@ -670,7 +699,7 @@ cygwin_socket (int af, int type, int protocol)
 	    DWORD blen;
 	    if (WSAIoctl (soc, SIO_UDP_CONNRESET, &cr, sizeof cr, NULL, 0,
 			  &blen, NULL, NULL) == SOCKET_ERROR)
-	      debug_printf ("Reset SIO_UDP_CONNRESET: WinSock error %lu",
+	      debug_printf ("Reset SIO_UDP_CONNRESET: WinSock error %u",
 			    WSAGetLastError ());
 	  }
 	res = fd;
@@ -678,17 +707,19 @@ cygwin_socket (int af, int type, int protocol)
   }
 
 done:
-  syscall_printf ("%R = socket(%d, %d (flags %p), %d)",
+  syscall_printf ("%R = socket(%d, %d (flags %y), %d)",
 		  res, af, type, flags, protocol);
   return res;
 }
 
 /* exported as sendto: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_sendto (int fd, const void *buf, size_t len, int flags,
 	       const struct sockaddr *to, socklen_t tolen)
 {
-  int res;
+  ssize_t res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -698,17 +729,19 @@ cygwin_sendto (int fd, const void *buf, size_t len, int flags,
   else
     res = fh->sendto (buf, len, flags, to, tolen);
 
-  syscall_printf ("%R = sendto(%d, %p, %d, %x, %p, %d)",
+  syscall_printf ("%lR = sendto(%d, %p, %ld, %y, %p, %d)",
 		  res, fd, buf, len, flags, to, tolen);
   return res;
 }
 
 /* exported as recvfrom: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
 		 struct sockaddr *from, socklen_t *fromlen)
 {
-  int res;
+  ssize_t res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -722,7 +755,7 @@ cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
        to deliver valid error conditions and peer address. */
     res = fh->recvfrom (buf, len, flags, from, fromlen);
 
-  syscall_printf ("%R = recvfrom(%d, %p, %d, %x, %p, %p)",
+  syscall_printf ("%lR = recvfrom(%d, %p, %ld, %y, %p, %p)",
 		  res, fd, buf, len, flags, from, fromlen);
   return res;
 }
@@ -786,8 +819,8 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	res = setsockopt (fh->get_socket (), level, optname,
 			  (const char *) optval, optlen);
 
-      if (optlen == 4)
-	syscall_printf ("setsockopt optval=%x", *(long *) optval);
+      if (optlen == sizeof (int))
+	syscall_printf ("setsockopt optval=%x", *(int *) optval);
 
       if (res)
 	{
@@ -837,7 +870,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	  }
     }
 
-  syscall_printf ("%R = setsockopt(%d, %d, %x, %p, %d)",
+  syscall_printf ("%R = setsockopt(%d, %d, %y, %p, %d)",
 		  res, fd, level, optname, optval, optlen);
   return res;
 }
@@ -897,13 +930,13 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 	}
     }
 
-  syscall_printf ("%R = getsockopt(%d, %d, 0x%x, %p, %p)",
+  syscall_printf ("%R = getsockopt(%d, %d, %y, %p, %p)",
 		  res, fd, level, optname, optval, optlen);
   return res;
 }
 
 extern "C" int
-getpeereid (int fd, __uid32_t *euid, __gid32_t *egid)
+getpeereid (int fd, uid_t *euid, gid_t *egid)
 {
   fhandler_socket *fh = get (fd);
   if (fh)
@@ -916,6 +949,8 @@ extern "C" int
 cygwin_connect (int fd, const struct sockaddr *name, socklen_t namelen)
 {
   int res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -1293,6 +1328,8 @@ cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
 {
   int res;
 
+  pthread_testcancel ();
+
   fhandler_socket *fh = get (fd);
 
   myfault efault;
@@ -1310,6 +1347,8 @@ accept4 (int fd, struct sockaddr *peer, socklen_t *len, int flags)
 {
   int res;
 
+  pthread_testcancel ();
+
   fhandler_socket *fh = get (fd);
 
   myfault efault;
@@ -1323,7 +1362,7 @@ accept4 (int fd, struct sockaddr *peer, socklen_t *len, int flags)
   else
     res = fh->accept4 (peer, len, flags);
 
-  syscall_printf ("%R = accept4(%d, %p, %p, %p)", res, fd, peer, len, flags);
+  syscall_printf ("%R = accept4(%d, %p, %p, %y)", res, fd, peer, len, flags);
   return res;
 }
 
@@ -1457,15 +1496,18 @@ cygwin_getpeername (int fd, struct sockaddr *name, socklen_t *len)
   else
     res = fh->getpeername (name, len);
 
-  syscall_printf ("%R = getpeername(%d) %d", res, fd, (fh ? fh->get_socket () : -1));
+  syscall_printf ("%R = getpeername(%d) %p", res, fd,
+  		  (fh ? fh->get_socket () : (SOCKET) -1));
   return res;
 }
 
 /* exported as recv: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_recv (int fd, void *buf, size_t len, int flags)
 {
-  int res;
+  ssize_t res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -1479,15 +1521,17 @@ cygwin_recv (int fd, void *buf, size_t len, int flags)
        to deliver valid error conditions. */
     res = fh->recvfrom (buf, len, flags, NULL, NULL);
 
-  syscall_printf ("%R = recv(%d, %p, %d, %x)", res, fd, buf, len, flags);
+  syscall_printf ("%lR = recv(%d, %p, %ld, %y)", res, fd, buf, len, flags);
   return res;
 }
 
 /* exported as send: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_send (int fd, const void *buf, size_t len, int flags)
 {
-  int res;
+  ssize_t res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -1497,7 +1541,7 @@ cygwin_send (int fd, const void *buf, size_t len, int flags)
   else
     res = fh->sendto (buf, len, flags, NULL, 0);
 
-  syscall_printf ("%R = send(%d, %p, %d, %x)", res, fd, buf, len, flags);
+  syscall_printf ("%lR = send(%d, %p, %ld, %y)", res, fd, buf, len, flags);
   return res;
 }
 
@@ -1855,12 +1899,57 @@ get_hwaddr (struct ifall *ifp, PIP_ADAPTER_ADDRESSES pap)
     else
       ifp->ifa_hwaddr.sa_data[i] = pap->PhysicalAddress[i];
 }
+
 /*
- * Get network interfaces XP SP1 and above.
- * Use IP Helper function GetAdaptersAddresses.
+ * Generate short, unique interface name for usage with aged
+ * applications still using the old pre-1.7 ifreq structure.
+ */
+static void
+gen_old_if_name (char *name, PIP_ADAPTER_ADDRESSES pap, DWORD idx)
+{
+  /* Note: The returned name must be < 16 chars. */
+  const char *prefix;
+
+  switch (pap->IfType)
+    {
+      case IF_TYPE_ISO88025_TOKENRING:
+	prefix = "tok";
+	break;
+      case IF_TYPE_PPP:
+	prefix = "ppp";
+	break;
+      case IF_TYPE_SOFTWARE_LOOPBACK:
+      	prefix = "lo";
+	break;
+      case IF_TYPE_ATM:
+      	prefix = "atm";
+	break;
+      case IF_TYPE_IEEE80211:
+      	prefix = "wlan";
+	break;
+      case IF_TYPE_SLIP:
+      case IF_TYPE_RS232:
+      case IF_TYPE_MODEM:
+	prefix = "slp";
+	break;
+      case IF_TYPE_TUNNEL:
+      	prefix = "tun";
+	break;
+      default:
+	prefix = "eth";
+	break;
+    }
+  if (idx)
+    __small_sprintf (name, "%s%u:%u", prefix, pap->IfIndex, idx);
+  else
+    __small_sprintf (name, "%s%u", prefix, pap->IfIndex, idx);
+}
+
+/*
+ * Get network interfaces.  Use IP Helper function GetAdaptersAddresses.
  */
 static struct ifall *
-get_xp_ifs (ULONG family)
+get_ifs (ULONG family)
 {
   PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
   PIP_ADAPTER_UNICAST_ADDRESS pua;
@@ -1897,7 +1986,10 @@ get_xp_ifs (ULONG family)
 	    /* Next in chain */
 	    ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
 	    /* Interface name */
-	    if (idx)
+
+	    if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
+	      gen_old_if_name (ifp->ifa_name, pap, idx);
+	    else if (idx)
 	      __small_sprintf (ifp->ifa_name, "%s:%u", pap->AdapterName, idx);
 	    else
 	      strcpy (ifp->ifa_name, pap->AdapterName);
@@ -1941,7 +2033,9 @@ get_xp_ifs (ULONG family)
 	    /* Next in chain */
 	    ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
 	    /* Interface name */
-	    if (sa->sa_family == AF_INET && idx)
+	    if (CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
+	      gen_old_if_name (ifp->ifa_name, pap, idx);
+	    else if (sa->sa_family == AF_INET && idx)
 	      __small_sprintf (ifp->ifa_name, "%s:%u", pap->AdapterName, idx);
 	    else
 	      strcpy (ifp->ifa_name, pap->AdapterName);
@@ -2038,201 +2132,6 @@ done:
   return ifret;
 }
 
-/*
- * Get network interfaces up to XP w/o service packs.
- */
-static struct ifall *
-get_2k_ifs ()
-{
-  int ethId = 0, pppId = 0, slpId = 0, tokId = 0;
-
-  DWORD ip_cnt;
-  DWORD siz_ip_table = 0;
-  PMIB_IPADDRTABLE ipt;
-  PMIB_IFROW ifrow;
-  struct ifall *ifret = NULL, *ifp = NULL;
-  struct sockaddr_in *if_sin;
-
-  struct ifcount_t
-  {
-    DWORD ifIndex;
-    size_t count;
-    unsigned int enumerated;	// for eth0:1
-    unsigned int classId;	// for eth0, tok0 ...
-
-  };
-  ifcount_t *iflist, *ifEntry;
-
-  if (GetIpAddrTable (NULL, &siz_ip_table, TRUE) == ERROR_INSUFFICIENT_BUFFER
-      && (ifrow = (PMIB_IFROW) alloca (sizeof (MIB_IFROW)))
-      && (ipt = (PMIB_IPADDRTABLE) alloca (siz_ip_table))
-      && !GetIpAddrTable (ipt, &siz_ip_table, TRUE))
-    {
-      if (!(ifret = (struct ifall *) calloc (ipt->dwNumEntries, sizeof (struct ifall))))
-	goto done;
-      ifp = ifret;
-
-      iflist =
-	(ifcount_t *) alloca (sizeof (ifcount_t) * (ipt->dwNumEntries + 1));
-      memset (iflist, 0, sizeof (ifcount_t) * (ipt->dwNumEntries + 1));
-      for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt)
-	{
-	  ifEntry = iflist;
-	  /* search for matching entry (and stop at first free entry) */
-	  while (ifEntry->count != 0)
-	    {
-	      if (ifEntry->ifIndex == ipt->table[ip_cnt].dwIndex)
-		break;
-	      ifEntry++;
-	    }
-	  if (ifEntry->count == 0)
-	    {
-	      ifEntry->count = 1;
-	      ifEntry->ifIndex = ipt->table[ip_cnt].dwIndex;
-	    }
-	  else
-	    {
-	      ifEntry->count++;
-	    }
-	}
-      /* reset the last element. This is just the stopper for the loop. */
-      iflist[ipt->dwNumEntries].count = 0;
-
-      /* Iterate over all configured IP-addresses */
-      for (ip_cnt = 0; ip_cnt < ipt->dwNumEntries; ++ip_cnt)
-	{
-	  memset (ifrow, 0, sizeof (MIB_IFROW));
-	  ifrow->dwIndex = ipt->table[ip_cnt].dwIndex;
-	  if (GetIfEntry (ifrow) != NO_ERROR)
-	    continue;
-
-	  ifcount_t *ifEntry = iflist;
-
-	  /* search for matching entry (and stop at first free entry) */
-	  while (ifEntry->count != 0)
-	    {
-	      if (ifEntry->ifIndex == ipt->table[ip_cnt].dwIndex)
-		break;
-	      ifEntry++;
-	    }
-
-	  /* Next in chain */
-	  ifp->ifa_ifa.ifa_next = (struct ifaddrs *) &ifp[1].ifa_ifa;
-	  /* Interface name */
-	  if (ifrow->dwType == IF_TYPE_SOFTWARE_LOOPBACK)
-	    strcpy (ifp->ifa_name, "lo");
-	  else
-	    {
-	      const char *name = "";
-	      switch (ifrow->dwType)
-		{
-		  case IF_TYPE_ISO88025_TOKENRING:
-		    name = "tok";
-		    if (ifEntry->enumerated == 0)
-		      ifEntry->classId = tokId++;
-		    break;
-		  case IF_TYPE_ETHERNET_CSMACD:
-		    name = "eth";
-		    if (ifEntry->enumerated == 0)
-		      ifEntry->classId = ethId++;
-		    break;
-		  case IF_TYPE_PPP:
-		    name = "ppp";
-		    if (ifEntry->enumerated == 0)
-		      ifEntry->classId = pppId++;
-		    break;
-		  case IF_TYPE_SLIP:
-		    name = "slp";
-		    if (ifEntry->enumerated == 0)
-		      ifEntry->classId = slpId++;
-		    break;
-		  default:
-		    continue;
-		}
-	      __small_sprintf (ifp->ifa_name,
-			       ifEntry->enumerated ? "%s%u:%u" : "%s%u",
-			       name, ifEntry->classId, ifEntry->enumerated);
-	      ifEntry->enumerated++;
-	    }
-	  ifp->ifa_ifa.ifa_name = ifp->ifa_name;
-	  /* Flags */
-	  if (ifrow->dwType == IF_TYPE_SOFTWARE_LOOPBACK)
-	    ifp->ifa_ifa.ifa_flags |= IFF_LOOPBACK;
-	  else if (ifrow->dwType == IF_TYPE_PPP
-		   || ifrow->dwType == IF_TYPE_SLIP)
-	    ifp->ifa_ifa.ifa_flags |= IFF_POINTOPOINT | IFF_NOARP;
-	  else
-	    ifp->ifa_ifa.ifa_flags |= IFF_BROADCAST;
-	  if (ifrow->dwAdminStatus == IF_ADMIN_STATUS_UP)
-	    {
-	      ifp->ifa_ifa.ifa_flags |= IFF_UP | IFF_LOWER_UP;
-	      if (ifrow->dwOperStatus >= IF_OPER_STATUS_CONNECTED)
-		ifp->ifa_ifa.ifa_flags |= IFF_RUNNING;
-	    }
-	  /* Address */
-	  if_sin = (struct sockaddr_in *) &ifp->ifa_addr;
-	  if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwAddr;
-	  if_sin->sin_family = AF_INET;
-	  ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
-	  /* Netmask */
-	  if_sin = (struct sockaddr_in *) &ifp->ifa_netmask;
-	  if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwMask;
-	  if_sin->sin_family = AF_INET;
-	  ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;
-	  if_sin = (struct sockaddr_in *) &ifp->ifa_brddstaddr;
-	  if (ifrow->dwType == IF_TYPE_PPP
-	      || ifrow->dwType == IF_TYPE_SLIP)
-	    {
-	      /* Destination address */
-	      if_sin->sin_addr.s_addr =
-		get_routedst (ipt->table[ip_cnt].dwIndex);
-	      ifp->ifa_ifa.ifa_dstaddr = (struct sockaddr *)
-					 &ifp->ifa_brddstaddr;
-	    }
-	  else
-	    {
-	      /* Broadcast address */
-#if 0
-	      /* Unfortunately, the field returns only crap. */
-	      if_sin->sin_addr.s_addr = ipt->table[ip_cnt].dwBCastAddr;
-#else
-	      uint32_t mask = ipt->table[ip_cnt].dwMask;
-	      if_sin->sin_addr.s_addr = (ipt->table[ip_cnt].dwAddr & mask) | ~mask;
-#endif
-	      ifp->ifa_ifa.ifa_broadaddr = (struct sockaddr *)
-					   &ifp->ifa_brddstaddr;
-	    }
-	  if_sin->sin_family = AF_INET;
-	  /* Hardware address */
-	  for (UINT i = 0; i < IFHWADDRLEN; ++i)
-	    if (i >= ifrow->dwPhysAddrLen)
-	      ifp->ifa_hwaddr.sa_data[i] = '\0';
-	    else
-	      ifp->ifa_hwaddr.sa_data[i] = ifrow->bPhysAddr[i];
-	  /* Metric */
-	  ifp->ifa_metric = 1;
-	  /* MTU */
-	  ifp->ifa_mtu = ifrow->dwMtu;
-	  /* Interface index */
-	  ifp->ifa_ifindex = ifrow->dwIndex;
-	  /* Friendly name */
-	  struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
-					 &ifp->ifa_frndlyname;
-	  iff->ifrf_len = sys_wcstombs (iff->ifrf_friendlyname,
-					IFRF_FRIENDLYNAMESIZ,
-					ifrow->wszName);
-	  ++ifp;
-	}
-    }
-  /* Since every entry is set to the next entry, the last entry points to an
-     invalid next entry now.  Fix it retroactively. */
-  if (ifp > ifret)
-    ifp[-1].ifa_ifa.ifa_next = NULL;
-
-done:
-  return ifret;
-}
-
 extern "C" int
 getifaddrs (struct ifaddrs **ifap)
 {
@@ -2242,10 +2141,7 @@ getifaddrs (struct ifaddrs **ifap)
       return -1;
     }
   struct ifall *ifp;
-  if (wincap.has_gaa_prefixes () && !CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-    ifp = get_xp_ifs (AF_UNSPEC);
-  else
-    ifp = get_2k_ifs ();
+  ifp = get_ifs (AF_UNSPEC);
   *ifap = &ifp->ifa_ifa;
   return ifp ? 0 : -1;
 }
@@ -2272,10 +2168,7 @@ get_ifconf (struct ifconf *ifc, int what)
     }
 
   struct ifall *ifret, *ifp;
-  if (wincap.has_gaa_prefixes () && !CYGWIN_VERSION_CHECK_FOR_OLD_IFREQ)
-    ifret = get_xp_ifs (AF_INET);
-  else
-    ifret = get_2k_ifs ();
+  ifret = get_ifs (AF_INET);
   if (!ifret)
     return -1;
 
@@ -2354,8 +2247,7 @@ if_nametoindex (const char *name)
   if (efault.faulted (EFAULT))
     return 0;
 
-  if (wincap.has_gaa_prefixes ()
-      && get_adapters_addresses (&pa0, AF_UNSPEC))
+  if (get_adapters_addresses (&pa0, AF_UNSPEC))
     {
       char lname[IF_NAMESIZE], *c;
 
@@ -2384,8 +2276,7 @@ if_indextoname (unsigned ifindex, char *ifname)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  if (wincap.has_gaa_prefixes ()
-      && get_adapters_addresses (&pa0, AF_UNSPEC))
+  if (get_adapters_addresses (&pa0, AF_UNSPEC))
     {
       for (pap = pa0; pap; pap = pap->Next)
 	if (ifindex == (pap->Ipv6IfIndex ?: pap->IfIndex))
@@ -2424,8 +2315,7 @@ if_nameindex (void)
   if (efault.faulted (EFAULT))
     return NULL;
 
-  if (wincap.has_gaa_prefixes ()
-      && get_adapters_addresses (&pa0, AF_UNSPEC))
+  if (get_adapters_addresses (&pa0, AF_UNSPEC))
     {
       int cnt = 0;
       for (pap = pa0; pap; pap = pap->Next)
@@ -2780,10 +2670,12 @@ endhostent (void)
 }
 
 /* exported as recvmsg: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 {
-  int res;
+  ssize_t res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -2801,15 +2693,17 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 	res = fh->recvmsg (msg, flags);
     }
 
-  syscall_printf ("%R = recvmsg(%d, %p, %x)", res, fd, msg, flags);
+  syscall_printf ("%lR = recvmsg(%d, %p, %y)", res, fd, msg, flags);
   return res;
 }
 
 /* exported as sendmsg: standards? */
-extern "C" int
+extern "C" ssize_t
 cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 {
-  int res;
+  ssize_t res;
+
+  pthread_testcancel ();
 
   fhandler_socket *fh = get (fd);
 
@@ -2823,7 +2717,7 @@ cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 	res = fh->sendmsg (msg, flags);
     }
 
-  syscall_printf ("%R = sendmsg(%d, %p, %x)", res, fd, msg, flags);
+  syscall_printf ("%lR = sendmsg(%d, %p, %y)", res, fd, msg, flags);
   return res;
 }
 
@@ -4144,11 +4038,9 @@ w32_to_gai_err (int w32_err)
   return w32_err;
 }
 
-/* We can't use autoload here because we don't know where the functions
-   are loaded from.  On Win2K, the functions are available in the
-   ipv6 technology preview lib called wship6.dll, in XP and above they
-   are implemented in ws2_32.dll.  For older systems we use the ipv4-only
-   version above. */
+/* We can't use autoload here because we don't know if the functions
+   are available (pre-Vista).  For those systems we redirect to the
+   ipv4-only version above. */
 
 static void (WINAPI *ws_freeaddrinfo)(const struct addrinfo *);
 static int (WINAPI *ws_getaddrinfo)(const char *, const char *,
@@ -4189,13 +4081,6 @@ load_ipv6_funcs ()
   WSAGetLastError ();	/* Kludge.  Enforce WSAStartup call. */
   lib_name = wcpcpy (lib_path, windows_system_directory);
   wcpcpy (lib_name, L"ws2_32.dll");
-  if ((lib = LoadLibraryW (lib_path)))
-    {
-      if (get_ipv6_funcs (lib))
-	goto out;
-      FreeLibrary (lib);
-    }
-  wcpcpy (lib_name, L"wship6.dll");
   if ((lib = LoadLibraryW (lib_path)))
     {
       if (get_ipv6_funcs (lib))

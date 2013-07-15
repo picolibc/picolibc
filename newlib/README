@@ -233,6 +233,139 @@ prefer; but you may abbreviate option names if you use `--'.
      There is no convenient way to generate a list of all available
      hosts.
 
+To fit diverse usage models, NEWLIB supports a group of configuration
+options so that library features can be turned on/off according to
+target system's requirements.
+
+One feature can be enabled by specifying `--enable-FEATURE=yes' or
+`--enable-FEATURE'.  Or it can be disable by `--enable-FEATURE=no' or
+`--disable-FEATURE'.
+
+`--enable-newlib-io-pos-args'
+     Enable printf-family positional arg support.
+     Disabled by default, but some hosts enable it in configure.host.
+
+`--enable-newlib-io-c99-formats'
+     Enable C99 support in IO functions like printf/scanf.
+     Disabled by default, but some hosts enable it in configure.host.
+
+`--enable-newlib-register-fini'
+     Enable finalization function registration using atexit.
+     Disabled by default.
+
+`--enable-newlib-io-long-long'
+     Enable long long type support in IO functions like printf/scanf.
+     Disabled by default, but many hosts enable it in configure.host.
+
+`--enable-newlib-io-long-double'
+     Enable long double type support in IO functions printf/scanf.
+     Disabled by default, but some hosts enable it in configure.host.
+
+`--enable-newlib-mb'
+     Enable multibyte support.
+     Disabled by default.
+
+`--enable-newlib-iconv-encodings'
+     Enable specific comma-separated list of bidirectional iconv
+     encodings to be built-in.
+     Disabled by default.
+
+`--enable-newlib-iconv-from-encodings'
+     Enable specific comma-separated list of \"from\" iconv encodings
+     to be built-in.
+     Disabled by default.
+
+`--enable-newlib-iconv-to-encodings'
+     Enable specific comma-separated list of \"to\" iconv encodings
+     to be built-in.
+     Disabled by default.
+
+`--enable-newlib-iconv-external-ccs'
+     Enable capabilities to load external CCS files for iconv.
+     Disabled by default.
+
+`--disable-newlib-atexit-dynamic-alloc'
+     Disable dynamic allocation of atexit entries.
+     Most hosts and targets have it enabled in configure.host.
+
+`--enable-newlib-reent-small'
+     Enable small reentrant struct support.
+     Disabled by default.
+
+`--disable-newlib-fvwrite-in-streamio'
+     NEWLIB implements the vector buffer mechanism to support stream IO
+     buffering required by C standard.  This feature is possibly
+     unnecessary for embedded systems which won't change file buffering
+     with functions like `setbuf' or `setvbuf'.  The buffering mechanism
+     still acts as default for STDIN/STDOUT/STDERR even if this option
+     is specified.
+     Enabled by default.
+
+`--disable-newlib-fseek-optimization'
+     Disable fseek optimization.  It can decrease code size of application
+     calling `fseek`.
+     Enabled by default.
+
+`--disable-newlib-wide-orient'
+     C99 states that each stream has an orientation, wide or byte.  This
+     feature is possibly unnecessary for embedded systems which only do
+     byte input/output operations on stream.  It can decrease code size
+     by disable the feature.
+     Enabled by default.
+
+`--enable-newlib-nano-malloc'
+     NEWLIB has two implementations of malloc family's functions, one in
+     `mallocr.c' and the other one in `nano-mallocr.c'.  This options
+     enables the nano-malloc implementation, which is for small systems
+     with very limited memory.  Note that this implementation does not
+     support `--enable-malloc-debugging' any more.
+     Disabled by default.
+
+`--disable-newlib-unbuf-stream-opt'
+     NEWLIB does optimization when `fprintf to write only unbuffered unix
+     file'.  It creates a temorary buffer to do the optimization that
+     increases stack consumption by about `BUFSIZ' bytes.  This option
+     disables the optimization and saves size of text and stack.
+     Enabled by default.
+
+`--enable-multilib'
+     Build many library versions.
+     Enabled by default.
+
+`--enable-target-optspace'
+     Optimize for space.
+     Disabled by default.
+
+`--enable-malloc-debugging'
+     Indicate malloc debugging requested.
+     Disabled by default.
+
+`--enable-newlib-multithread'
+     Enable support for multiple threads.
+     Enabled by default.
+
+`--enable-newlib-iconv'
+     Enable iconv library support.
+     Disabled by default.
+
+`--enable-newlib-elix-level'
+     Supply desired elix library level (1-4).  Please refer to HOWTO for
+     more information about this option.
+     Set to level 0 by default.
+
+`--disable-newlib-io-float'
+     Disable printf/scanf family float support.
+     Enabled by default.
+
+`--disable-newlib-supplied-syscalls'
+     Disable newlib from supplying syscalls.
+     Enabled by default.
+
+`--enable-lite-exit'
+     Enable lite exit, a size-reduced implementation of exit that doesn't
+     invoke clean-up functions such as _fini or global destructors.
+     Disabled by default.
+
 Running the Testsuite
 =====================
 
