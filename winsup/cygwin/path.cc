@@ -1570,11 +1570,12 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
 
       /* Try hard to keep Windows symlink path relative. */
 
-      /* 1. Find common path prefix. */
-      PWCHAR c_old = win32_oldpath.get_nt_native_path ()->Buffer;
-      PWCHAR c_new = win32_newpath.get_nt_native_path ()->Buffer;
-      /* Windows compatible == always check case insensitive. */
-      while (towupper (*c_old++) == towupper (*c_new++))
+      /* 1. Find common path prefix.  Skip leading \\?\, but take pre-increment
+            of the following loop into account. */
+      PWCHAR c_old = win32_oldpath.get_nt_native_path ()->Buffer + 3;
+      PWCHAR c_new = win32_newpath.get_nt_native_path ()->Buffer + 3;
+      /* Windows compatible == always check case insensitive.  */
+      while (towupper (*++c_old) == towupper (*++c_new))
 	;
       /* The last component could share a common prefix, so make sure we end
          up on the first char after the last common backslash. */

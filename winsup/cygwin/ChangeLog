@@ -1,3 +1,7 @@
+2013-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_native): Fix common prefix search.  Enhance comment.
+
 2013-07-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uname.cc (uname): Drop unused code.
