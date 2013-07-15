@@ -1,5 +1,20 @@
 2013-07-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	Remove /dev/mem, /dev/kmem, /dev/port support.
+	* Makefile.in (DLL_OFILES): Drop fhandler_mem.o.
+	(fhandler_mem_CFLAGS): Remove rule.
+	* devices.in (enum fh_devices): Remove FH_MEM, FH_KMEM and FH_PORT.
+	* devices.cc: Regenerate.
+	* dtable.cc (fh_alloc): Drop handling for FH_MEM, FH_KMEM and FH_PORT.
+	* fhandler.h (class fhandler_dev_mem): Remove.
+	* fhandler_mem.cc: Remove file.
+	* globals.cc (ro_u_pmem): Remove.
+	* mmap.cc (fhandler_dev_mem::mmap): Remove.
+	(fhandler_dev_mem::munmap): Remove.
+	(fhandler_dev_mem::fixup_mmap_after_fork): Remove.
+
+2013-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 22.
 
 2013-07-15  Corinna Vinschen  <corinna@vinschen.de>

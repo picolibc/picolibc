@@ -127,7 +127,6 @@ extern "C" {
   extern UNICODE_STRING _RDATA ro_u_sys = _ROU (L".sys");
   extern UNICODE_STRING _RDATA ro_u_proc = _ROU (L"proc");
   extern UNICODE_STRING _RDATA ro_u_dev = _ROU (L"dev");
-  extern UNICODE_STRING _RDATA ro_u_pmem = _ROU (L"\\Device\\PhysicalMemory");
   extern UNICODE_STRING _RDATA ro_u_natp = _ROU (L"\\??\\");
   extern UNICODE_STRING _RDATA ro_u_uncp = _ROU (L"\\??\\UNC\\");
   extern UNICODE_STRING _RDATA ro_u_mtx = _ROU (L"mtx");

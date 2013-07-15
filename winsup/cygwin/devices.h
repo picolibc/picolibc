@@ -232,10 +232,7 @@ enum fh_devices
   FH_SDDX    = FHDEV (DEV_SD7_MAJOR, 240),
 
   DEV_MEM_MAJOR = 1,
-  FH_MEM     = FHDEV (DEV_MEM_MAJOR, 1),
-  FH_KMEM    = FHDEV (DEV_MEM_MAJOR, 2),	/* not implemented yet */
   FH_NULL    = FHDEV (DEV_MEM_MAJOR, 3),
-  FH_PORT    = FHDEV (DEV_MEM_MAJOR, 4),
   FH_ZERO    = FHDEV (DEV_MEM_MAJOR, 5),
   FH_FULL    = FHDEV (DEV_MEM_MAJOR, 7),
   FH_RANDOM  = FHDEV (DEV_MEM_MAJOR, 8),

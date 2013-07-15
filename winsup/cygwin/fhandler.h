@@ -1687,46 +1687,6 @@ class fhandler_dev_random: public fhandler_base
   }
 };
 
-class fhandler_dev_mem: public fhandler_base
-{
- protected:
-  SIZE_T mem_size;
-  off_t pos;
-
- public:
-  fhandler_dev_mem ();
-  ~fhandler_dev_mem ();
-
-  int open (int flags, mode_t mode = 0);
-  ssize_t __stdcall write (const void *ptr, size_t ulen);
-  void __reg3 read (void *ptr, size_t& len);
-  off_t lseek (off_t offset, int whence);
-  int __reg2 fstat (struct stat *buf);
-
-  HANDLE mmap (caddr_t *addr, size_t len, int prot, int flags, off_t off);
-  int munmap (HANDLE h, caddr_t addr, size_t len);
-  int msync (HANDLE h, caddr_t addr, size_t len, int flags);
-  bool fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-			      off_t offset, DWORD size, void *address);
-
-  fhandler_dev_mem (void *) {}
-
-  void copyto (fhandler_base *x)
-  {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev_mem *> (x) = *this;
-    x->reset (this);
-  }
-
-  fhandler_dev_mem *clone (cygheap_types malloc_type = HEAP_FHANDLER)
-  {
-    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_mem));
-    fhandler_dev_mem *fh = new (ptr) fhandler_dev_mem (ptr);
-    copyto (fh);
-    return fh;
-  }
-};
-
 class fhandler_dev_clipboard: public fhandler_base
 {
   off_t pos;
@@ -2148,7 +2108,6 @@ typedef union
   char __dev_clipboard[sizeof (fhandler_dev_clipboard)];
   char __dev_dsp[sizeof (fhandler_dev_dsp)];
   char __dev_floppy[sizeof (fhandler_dev_floppy)];
-  char __dev_mem[sizeof (fhandler_dev_mem)];
   char __dev_null[sizeof (fhandler_dev_null)];
   char __dev_random[sizeof (fhandler_dev_random)];
   char __dev_raw[sizeof (fhandler_dev_raw)];

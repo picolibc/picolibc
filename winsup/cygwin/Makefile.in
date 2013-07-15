@@ -158,7 +158,7 @@ DLL_OFILES:=advapi32.o arc4random.o assert.o autoload.o base64.o bsdlib.o ctype.
 	devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o exceptions.o \
 	exec.o external.o fcntl.o fenv.o fhandler.o fhandler_clipboard.o \
 	fhandler_console.o fhandler_dev.o fhandler_disk_file.o fhandler_dsp.o \
-	fhandler_fifo.o fhandler_floppy.o fhandler_mailslot.o fhandler_mem.o \
+	fhandler_fifo.o fhandler_floppy.o fhandler_mailslot.o \
 	fhandler_netdrive.o fhandler_nodevice.o fhandler_proc.o \
 	fhandler_process.o fhandler_procnet.o fhandler_procsys.o \
 	fhandler_procsysvipc.o fhandler_random.o fhandler_raw.o \
@@ -286,7 +286,6 @@ fhandler_console_CFLAGS:=-fomit-frame-pointer
 fhandler_disk_file_CFLAGS:=-fomit-frame-pointer
 fhandler_dsp_CFLAGS:=-fomit-frame-pointer
 fhandler_floppy_CFLAGS:=-fomit-frame-pointer
-fhandler_mem_CFLAGS:=-fomit-frame-pointer
 fhandler_netdrive_CFLAGS:=-fomit-frame-pointer
 fhandler_proc_CFLAGS:=-fomit-frame-pointer
 fhandler_process_CFLAGS:=-fomit-frame-pointer

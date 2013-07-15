@@ -1,0 +1,14 @@
+What's new:
+-----------
+
+
+What changed:
+-----------
+
+- Support for /dev/mem, /dev/kmem and /dev/port removed, since OS support
+  was limited to 32 bit Windows XP only.
+
+
+Bug fixes:
+----------
+

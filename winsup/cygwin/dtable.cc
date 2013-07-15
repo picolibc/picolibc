@@ -528,11 +528,6 @@ fh_alloc (path_conv& pc)
 	case FH_URANDOM:
 	  fh = cnew (fhandler_dev_random);
 	  break;
-	case FH_MEM:
-	case FH_KMEM:
-	case FH_PORT:
-	  fh = cnew (fhandler_dev_mem);
-	  break;
 	case FH_CLIPBOARD:
 	  fh = cnew (fhandler_dev_clipboard);
 	  break;
