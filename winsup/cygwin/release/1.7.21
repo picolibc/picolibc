@@ -19,6 +19,7 @@ Bug fixes:
 
 - Fix creation of relative native symlinks.
   Fixes: http://cygwin.com/ml/cygwin/2013-06/msg00340.html
+	 http://cygwin.com/ml/cygwin/2013-07/msg00286.html
 
 - Update profiling code to latest from Mingw-w64.  Allows profiling on x86_64
   now and fixes http://cygwin.com/ml/cygwin/2013-06/msg00376.html
