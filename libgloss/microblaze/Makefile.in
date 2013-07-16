@@ -77,7 +77,11 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 
 CRT = crt0.o crt1.o crt2.o crt3.o crt4.o crtinit.o pgcrtinit.o sim-crtinit.o sim-pgcrtinit.o
 LIB = libgloss.a
-OBJS = sbrk.o timer.o _exception_handler.o _hw_exception_handler.o _interrupt_handler.o _program_clean.o _program_init.o xil_malloc.o xil_sbrk.o 
+GENOBJS = fstat.o getpid.o isatty.o kill.o lseek.o print.o putnum.o stat.o unlink.o \
+          open.o close.o read.o write.o
+OBJS = ${GENOBJS} sbrk.o timer.o _exception_handler.o _hw_exception_handler.o \
+       _interrupt_handler.o _program_clean.o _program_init.o \
+       xil_malloc.o xil_sbrk.o xil_printf.o
 SCRIPTS	= xilinx.ld
 
 CPU = @CPU@
@@ -103,6 +107,9 @@ crtinit.o: crtinit.S
 sim-crtinit.o: sim-crtinit.S
 sim-pgcrtinit.o: sim-pgcrtinit.S
 
+# target specific makefile fragment comes in here.
+@target_makefile_frag@
+
 clean mostlyclean:
 	rm -f *.o *.a *.map *.x
 
@@ -118,7 +125,7 @@ info doc dvi:
 install-info:
 clean-info:
 
-Makefile: Makefile.in config.status @host_makefile_frag_path@ \
+Makefile: Makefile.in config.status @host_makefile_frag_path@ @target_makefile_frag_path@ \
 	$(SHELL) config.status
 
 config.status: configure

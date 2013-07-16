@@ -1,5 +1,12 @@
 2013-07-16  David Holsgrove <david.holsgrove@xilinx.com>
 
+	* microblaze/Makefile.in: Add GENOBJS and target_makefile_frag.
+	* microblaze/configure.in: Add target_makefile_frag.
+	* microblaze/configure: Regenerate.
+	* microblaze/xil_printf.c: Add new file.
+
+2013-07-16  David Holsgrove <david.holsgrove@xilinx.com>
+
 	* configure.in: Change to microblaze*.
 	* configure: Regenerate.
 	* microblaze/xilinx.ld: Remove OUTPUT_FORMAT.
