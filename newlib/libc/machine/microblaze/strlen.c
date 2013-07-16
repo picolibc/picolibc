@@ -120,13 +120,16 @@ _DEFUN (strlen, (str),
 
 #else
 
+#include "mb_endian.h"
+
   asm volatile ("                                               \n\
         or      r9, r0, r0              /* Index register */    \n\
 check_alignment:                                                \n\
         andi    r3, r5, 3                                       \n\
         bnei    r3, align_arg                                   \n\
-len_loop:                                                       \n\
-        lw      r3, r5, r9                                      \n\
+len_loop:                                                       \n"
+        LOAD4BYTES("r3", "r5", "r9")
+"                                                               \n\
         pcmpbf  r4, r3, r0                                      \n\
         bnei    r4, end_len                                     \n\
         brid    len_loop                                        \n\

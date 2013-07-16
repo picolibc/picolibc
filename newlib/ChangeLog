@@ -1,3 +1,12 @@
+2013-07-16  David Holsgrove <david.holsgrove@xilinx.com>
+
+	* configure.host: Change to microblaze*.
+	* libc/include/machine/ieeefp.h: Add __MICROBLAZEEL__.
+	* libc/machine/microblaze/mb_endian.h: New file.
+	* newlib/libc/machine/microblaze/strcmp.c: Add little endian support.
+	* newlib/libc/machine/microblaze/strcpy.c: Likewise.
+	* newlib/libc/machine/microblaze/strlen.c: Likewise.
+
 2013-07-09  Sabrina Ni  <sabrina@andestech.com>
 
 	* libc/machine/nds32/Makefile.am (lib_a_SOURCES): Add abort.c, memcpy.S,

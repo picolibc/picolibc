@@ -117,7 +117,7 @@ case "${target}" in
   moxie-*-*)
 	AC_CONFIG_SUBDIRS([moxie])
 	;;
-  microblaze-*-*)
+  microblaze*-*-*)
 	AC_CONFIG_SUBDIRS([microblaze])
 	;;
   mt-*-*)

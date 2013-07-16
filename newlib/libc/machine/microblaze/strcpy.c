@@ -131,18 +131,22 @@ _DEFUN (strcpy, (dst0, src0),
 
 #else    
 
-  asm volatile ("                                                     \
-            or      r9, r0, r0              /* Index register */    \n\
+#include "mb_endian.h"
+
+  asm volatile ("                                                   \n\
+        or      r9, r0, r0              /* Index register */        \n\
 check_alignment:                                                    \n\
         andi    r3, r5, 3                                           \n\
         andi    r4, r6, 3                                           \n\
         bnei    r3, try_align_args                                  \n\
         bnei    r4, regular_strcpy      /* At this point we dont have a choice */       \n\
-cpy_loop:                                   \n\
-        lw      r3, r6, r9                  \n\
+cpy_loop:                                   \n"
+        LOAD4BYTES("r3", "r6", "r9")
+"                                           \n\
         pcmpbf  r4, r0, r3                  \n\
-        bnei    r4, cpy_bytes           /* If r4 != 0, then null present within string */\n\
-        sw      r3, r5, r9                  \n\
+        bnei    r4, cpy_bytes           /* If r4 != 0, then null present within string */\n"
+        STORE4BYTES("r3", "r5", "r9")
+"                                           \n\
         brid    cpy_loop                    \n\
         addik   r9, r9, 4                   \n\
 cpy_bytes:                                  \n\

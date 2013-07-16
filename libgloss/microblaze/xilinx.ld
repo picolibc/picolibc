@@ -1,6 +1,4 @@
 /* Default linker script, for normal executables */
-OUTPUT_FORMAT("elf32-microblaze", "",
-	      "")
 /*SEARCH_DIR("/proj/fv1/gnu_builds/head/mb/release/lin/mb/microblaze-xilinx-elf/lib");*/
 /*SEARCH_DIR("/proj/fv1/gnu_builds/head/mb/release/lin/mb/microblaze-xilinx-elf/lib");*/
 ENTRY(_start)

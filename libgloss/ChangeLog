@@ -1,3 +1,9 @@
+2013-07-16  David Holsgrove <david.holsgrove@xilinx.com>
+
+	* configure.in: Change to microblaze*.
+	* configure: Regenerate.
+	* microblaze/xilinx.ld: Remove OUTPUT_FORMAT.
+
 2013-07-12  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* aarch64/cpu-init/rdimon-aem-el3.S (vectors): Page align.

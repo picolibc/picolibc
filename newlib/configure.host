@@ -203,7 +203,7 @@ case "${host_cpu}" in
 	;;
   mcore)
 	;;
-  microblaze)
+  microblaze*)
 	machine_dir=microblaze
 	;;
   mep)
@@ -479,7 +479,7 @@ case "${host}" in
 	default_newlib_io_long_long="yes"
 	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
 	;;
-  microblaze-*-*)
+  microblaze*-*-*)
 	machine_dir=microblaze
 	;;
   mips*-dec-*)
@@ -696,7 +696,7 @@ case "${host}" in
   mcore-*-*)
 	syscall_dir=syscalls
 	;;
-  microblaze-*-*)
+  microblaze*-*-*)
    	default_newlib_io_long_long="yes"
  	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DSMALL_MEMORY -D_REENT_SMALL"
 	;;

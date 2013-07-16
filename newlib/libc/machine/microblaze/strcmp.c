@@ -138,16 +138,19 @@ _DEFUN (strcmp, (s1, s2),
 
 #else
 
+#include "mb_endian.h"
+
     asm volatile ("                                          \n\
-       or      r9, r0, r0               /* Index register */ \n\
+        or      r9, r0, r0               /* Index register */\n\
 check_alignment:                                             \n\
         andi    r3, r5, 3                                    \n\
         andi    r4, r6, 3                                    \n\
         bnei    r3, try_align_args                           \n\
         bnei    r4, regular_strcmp     /* At this point we don't have a choice */ \n\
-cmp_loop:                                                                       \n\
-        lw      r3, r5, r9                                                      \n\
-        lw      r4, r6, r9                                                      \n\
+cmp_loop:                                                                       \n"
+        LOAD4BYTES("r3", "r5", "r9")
+        LOAD4BYTES("r4", "r6", "r9")
+"                                                                                      \n\
         pcmpbf  r7, r3, r0              /* See if there is Null byte */                         \n\
         bnei    r7, end_cmp_loop        /* IF yes (r7 > 0) use byte compares in end_cmp_loop */ \n\
         cmpu    r7, r4, r3              /* ELSE compare whole word */                   \n\
