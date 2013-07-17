@@ -79,7 +79,7 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(lib_a_SOURCES)
+SOURCES = $(lib_a_SOURCES) $(EXTRA_lib_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -157,7 +157,6 @@ docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 extra_objs = @extra_objs@
-extra_sources = @extra_sources@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -202,13 +201,19 @@ lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_LIBADD = @extra_objs@
 lib_a_DEPENDENCIES = @extra_objs@
+EXTRA_lib_a_SOURCES = \
+  vfprintf.c vfscanf.c \
+  vec_malloc.c vec_calloc.c vec_free.c vec_realloc.c vec_mallocr.c \
+  atosfix16.c atosfix32.c atosfix64.c atoufix16.c atoufix32.c atoufix64.c \
+  simdldtoa.c strtosfix16.c strtosfix32.c strtosfix64.c strtoufix16.c \
+  strtoufix32.c strtoufix64.c ufix64toa.c
+
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../.. 
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
-VEC_MALLOC_COMPILE = $(COMPILE) -DINTERNAL_NEWLIB
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .S .o .obj
+.SUFFIXES: .S .c .o .obj
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -268,6 +273,138 @@ lib_a-setjmp.o: setjmp.S
 
 lib_a-setjmp.obj: setjmp.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
+
+.c.o:
+	$(COMPILE) -c $<
+
+.c.obj:
+	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-vfprintf.o: vfprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vfprintf.o `test -f 'vfprintf.c' || echo '$(srcdir)/'`vfprintf.c
+
+lib_a-vfprintf.obj: vfprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vfprintf.obj `if test -f 'vfprintf.c'; then $(CYGPATH_W) 'vfprintf.c'; else $(CYGPATH_W) '$(srcdir)/vfprintf.c'; fi`
+
+lib_a-vfscanf.o: vfscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vfscanf.o `test -f 'vfscanf.c' || echo '$(srcdir)/'`vfscanf.c
+
+lib_a-vfscanf.obj: vfscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vfscanf.obj `if test -f 'vfscanf.c'; then $(CYGPATH_W) 'vfscanf.c'; else $(CYGPATH_W) '$(srcdir)/vfscanf.c'; fi`
+
+lib_a-vec_malloc.o: vec_malloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_malloc.o `test -f 'vec_malloc.c' || echo '$(srcdir)/'`vec_malloc.c
+
+lib_a-vec_malloc.obj: vec_malloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_malloc.obj `if test -f 'vec_malloc.c'; then $(CYGPATH_W) 'vec_malloc.c'; else $(CYGPATH_W) '$(srcdir)/vec_malloc.c'; fi`
+
+lib_a-vec_calloc.o: vec_calloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_calloc.o `test -f 'vec_calloc.c' || echo '$(srcdir)/'`vec_calloc.c
+
+lib_a-vec_calloc.obj: vec_calloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_calloc.obj `if test -f 'vec_calloc.c'; then $(CYGPATH_W) 'vec_calloc.c'; else $(CYGPATH_W) '$(srcdir)/vec_calloc.c'; fi`
+
+lib_a-vec_free.o: vec_free.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_free.o `test -f 'vec_free.c' || echo '$(srcdir)/'`vec_free.c
+
+lib_a-vec_free.obj: vec_free.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_free.obj `if test -f 'vec_free.c'; then $(CYGPATH_W) 'vec_free.c'; else $(CYGPATH_W) '$(srcdir)/vec_free.c'; fi`
+
+lib_a-vec_realloc.o: vec_realloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_realloc.o `test -f 'vec_realloc.c' || echo '$(srcdir)/'`vec_realloc.c
+
+lib_a-vec_realloc.obj: vec_realloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_realloc.obj `if test -f 'vec_realloc.c'; then $(CYGPATH_W) 'vec_realloc.c'; else $(CYGPATH_W) '$(srcdir)/vec_realloc.c'; fi`
+
+lib_a-vec_mallocr.o: vec_mallocr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_mallocr.o `test -f 'vec_mallocr.c' || echo '$(srcdir)/'`vec_mallocr.c
+
+lib_a-vec_mallocr.obj: vec_mallocr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_mallocr.obj `if test -f 'vec_mallocr.c'; then $(CYGPATH_W) 'vec_mallocr.c'; else $(CYGPATH_W) '$(srcdir)/vec_mallocr.c'; fi`
+
+lib_a-atosfix16.o: atosfix16.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atosfix16.o `test -f 'atosfix16.c' || echo '$(srcdir)/'`atosfix16.c
+
+lib_a-atosfix16.obj: atosfix16.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atosfix16.obj `if test -f 'atosfix16.c'; then $(CYGPATH_W) 'atosfix16.c'; else $(CYGPATH_W) '$(srcdir)/atosfix16.c'; fi`
+
+lib_a-atosfix32.o: atosfix32.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atosfix32.o `test -f 'atosfix32.c' || echo '$(srcdir)/'`atosfix32.c
+
+lib_a-atosfix32.obj: atosfix32.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atosfix32.obj `if test -f 'atosfix32.c'; then $(CYGPATH_W) 'atosfix32.c'; else $(CYGPATH_W) '$(srcdir)/atosfix32.c'; fi`
+
+lib_a-atosfix64.o: atosfix64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atosfix64.o `test -f 'atosfix64.c' || echo '$(srcdir)/'`atosfix64.c
+
+lib_a-atosfix64.obj: atosfix64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atosfix64.obj `if test -f 'atosfix64.c'; then $(CYGPATH_W) 'atosfix64.c'; else $(CYGPATH_W) '$(srcdir)/atosfix64.c'; fi`
+
+lib_a-atoufix16.o: atoufix16.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atoufix16.o `test -f 'atoufix16.c' || echo '$(srcdir)/'`atoufix16.c
+
+lib_a-atoufix16.obj: atoufix16.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atoufix16.obj `if test -f 'atoufix16.c'; then $(CYGPATH_W) 'atoufix16.c'; else $(CYGPATH_W) '$(srcdir)/atoufix16.c'; fi`
+
+lib_a-atoufix32.o: atoufix32.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atoufix32.o `test -f 'atoufix32.c' || echo '$(srcdir)/'`atoufix32.c
+
+lib_a-atoufix32.obj: atoufix32.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atoufix32.obj `if test -f 'atoufix32.c'; then $(CYGPATH_W) 'atoufix32.c'; else $(CYGPATH_W) '$(srcdir)/atoufix32.c'; fi`
+
+lib_a-atoufix64.o: atoufix64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atoufix64.o `test -f 'atoufix64.c' || echo '$(srcdir)/'`atoufix64.c
+
+lib_a-atoufix64.obj: atoufix64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-atoufix64.obj `if test -f 'atoufix64.c'; then $(CYGPATH_W) 'atoufix64.c'; else $(CYGPATH_W) '$(srcdir)/atoufix64.c'; fi`
+
+lib_a-simdldtoa.o: simdldtoa.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-simdldtoa.o `test -f 'simdldtoa.c' || echo '$(srcdir)/'`simdldtoa.c
+
+lib_a-simdldtoa.obj: simdldtoa.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-simdldtoa.obj `if test -f 'simdldtoa.c'; then $(CYGPATH_W) 'simdldtoa.c'; else $(CYGPATH_W) '$(srcdir)/simdldtoa.c'; fi`
+
+lib_a-strtosfix16.o: strtosfix16.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtosfix16.o `test -f 'strtosfix16.c' || echo '$(srcdir)/'`strtosfix16.c
+
+lib_a-strtosfix16.obj: strtosfix16.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtosfix16.obj `if test -f 'strtosfix16.c'; then $(CYGPATH_W) 'strtosfix16.c'; else $(CYGPATH_W) '$(srcdir)/strtosfix16.c'; fi`
+
+lib_a-strtosfix32.o: strtosfix32.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtosfix32.o `test -f 'strtosfix32.c' || echo '$(srcdir)/'`strtosfix32.c
+
+lib_a-strtosfix32.obj: strtosfix32.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtosfix32.obj `if test -f 'strtosfix32.c'; then $(CYGPATH_W) 'strtosfix32.c'; else $(CYGPATH_W) '$(srcdir)/strtosfix32.c'; fi`
+
+lib_a-strtosfix64.o: strtosfix64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtosfix64.o `test -f 'strtosfix64.c' || echo '$(srcdir)/'`strtosfix64.c
+
+lib_a-strtosfix64.obj: strtosfix64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtosfix64.obj `if test -f 'strtosfix64.c'; then $(CYGPATH_W) 'strtosfix64.c'; else $(CYGPATH_W) '$(srcdir)/strtosfix64.c'; fi`
+
+lib_a-strtoufix16.o: strtoufix16.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoufix16.o `test -f 'strtoufix16.c' || echo '$(srcdir)/'`strtoufix16.c
+
+lib_a-strtoufix16.obj: strtoufix16.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoufix16.obj `if test -f 'strtoufix16.c'; then $(CYGPATH_W) 'strtoufix16.c'; else $(CYGPATH_W) '$(srcdir)/strtoufix16.c'; fi`
+
+lib_a-strtoufix32.o: strtoufix32.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoufix32.o `test -f 'strtoufix32.c' || echo '$(srcdir)/'`strtoufix32.c
+
+lib_a-strtoufix32.obj: strtoufix32.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoufix32.obj `if test -f 'strtoufix32.c'; then $(CYGPATH_W) 'strtoufix32.c'; else $(CYGPATH_W) '$(srcdir)/strtoufix32.c'; fi`
+
+lib_a-strtoufix64.o: strtoufix64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoufix64.o `test -f 'strtoufix64.c' || echo '$(srcdir)/'`strtoufix64.c
+
+lib_a-strtoufix64.obj: strtoufix64.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoufix64.obj `if test -f 'strtoufix64.c'; then $(CYGPATH_W) 'strtoufix64.c'; else $(CYGPATH_W) '$(srcdir)/strtoufix64.c'; fi`
+
+lib_a-ufix64toa.o: ufix64toa.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ufix64toa.o `test -f 'ufix64toa.c' || echo '$(srcdir)/'`ufix64toa.c
+
+lib_a-ufix64toa.obj: ufix64toa.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ufix64toa.obj `if test -f 'ufix64toa.c'; then $(CYGPATH_W) 'ufix64toa.c'; else $(CYGPATH_W) '$(srcdir)/ufix64toa.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -440,11 +577,11 @@ uninstall-am:
 	uninstall-am
 
 
-$(lpfx)vec_reallocr.o: vec_mallocr.c
-	$(VEC_MALLOC_COMPILE) -DDEFINE_VECREALLOC -c $(srcdir)/vec_mallocr.c -o $@
+lib_a-vec_reallocr.o: vec_mallocr.c
+	$(CC) $(DEFS) -DINTERNAL_NEWLIB -DDEFINE_VECREALLOC $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_reallocr.o `test -f 'vec_mallocr.c' || echo '$(srcdir)/'`vec_mallocr.c
 
-$(lpfx)vec_callocr.o: vec_mallocr.c
-	$(VEC_MALLOC_COMPILE) -DDEFINE_VECCALLOC -c $(srcdir)/vec_mallocr.c -o $@
+lib_a-vec_callocr.o: vec_mallocr.c
+	$(CC) $(DEFS) -DINTERNAL_NEWLIB -DDEFINE_VECCALLOC $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vec_callocr.o `test -f 'vec_mallocr.c' || echo '$(srcdir)/'`vec_mallocr.c
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -11,19 +11,15 @@ AC_CONFIG_AUX_DIR(../../../..)
 NEWLIB_CONFIGURE(../../..)
 
 extra_objs=
-extra_sources=
 case $host in
   powerpc*-*altivec*)
-	extra_objs="vfprintf.o vfscanf.o vec_malloc.o vec_calloc.o vec_free.o vec_realloc.o vec_reallocr.o vec_callocr.o"
-	extra_sources="vfprintf.c vfscanf.c vec_malloc.c vec_calloc.c vec_free.c vec_realloc.c vec_mallocr.c"
+	extra_objs="lib_a-vfprintf.o lib_a-vfscanf.o lib_a-vec_malloc.o lib_a-vec_calloc.o lib_a-vec_free.o lib_a-vec_realloc.o lib_a-vec_mallocr.o lib_a-vec_callocr.o lib_a-vec_reallocr.o"
 	;;
   powerpc*-*spe*)
-	extra_objs="atosfix16.o atosfix32.o atosfix64.o atoufix16.o atoufix32.o atoufix64.o simdldtoa.o strtosfix16.o strtosfix32.o strtosfix64.o strtoufix16.o strtoufix32.o strtoufix64.o ufix64toa.o vfprintf.o vfscanf.o"
-	extra_sources="atosfix16.c atosfix32.c atosfix64.c atoufix16.c atoufix32.c atoufix64.c simdldtoa.c strtosfix16.c strtosfix32.c strtosfix64.c strtoufix16.c strtoufix32.c strtoufix64.c ufix64toa.c vfprintf.c vfscanf.c"
+	extra_objs="lib_a-atosfix16.o lib_a-atosfix32.o lib_a-atosfix64.o lib_a-atoufix16.o lib_a-atoufix32.o lib_a-atoufix64.o lib_a-simdldtoa.o lib_a-strtosfix16.o lib_a-strtosfix32.o lib_a-strtosfix64.o lib_a-strtoufix16.o lib_a-strtoufix32.o lib_a-strtoufix64.o lib_a-ufix64toa.o lib_a-vfprintf.o lib_a-vfscanf.o"
 	;;
 esac
 AC_SUBST(extra_objs)
-AC_SUBST(extra_sources)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

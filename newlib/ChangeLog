@@ -1,3 +1,11 @@
+2013-07-17  Janis Johnson  <janisjo@codesourcery.com>
+
+	* libc/machine/powerpc/configure.in: Remove extra_sources; fix
+	extra_objs for powerpc*-*altivec.
+	* libc/machine/powerpc/Makefile.am: Define EXTRA_lib_a_SOURCES.
+	* libc/machine/powerpc/configure: Regenerated.
+	* libc/machine/powerpc/Makefile.in: Regenerated.
+
 2013-07-16  David Holsgrove <david.holsgrove@xilinx.com>
 
 	* configure.host: Change to microblaze*.
