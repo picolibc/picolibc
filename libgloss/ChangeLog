@@ -1,3 +1,9 @@
+2013-07-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* lm32/configure: Regenerate.
+	* moxie/configure: Ditto.
+	* spu/configure: Ditto.
+
 2013-07-16  David Holsgrove <david.holsgrove@xilinx.com>
 
 	* microblaze/Makefile.in: Add GENOBJS and target_makefile_frag.
