@@ -509,12 +509,11 @@ initial_env ()
     _cygwin_testing = 1;
 
 #ifdef DEBUGGING
-  DWORD len;
   char buf[NT_MAX_PATH];
   if (GetEnvironmentVariableA ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
     {
       char buf1[NT_MAX_PATH];
-      len = GetModuleFileName (NULL, buf1, NT_MAX_PATH);
+      GetModuleFileName (NULL, buf1, NT_MAX_PATH);
       strlwr (buf1);
       strlwr (buf);
       char *p = strpbrk (buf, ":=");
@@ -1304,7 +1303,7 @@ are unable to find another cygwin DLL.",
 }
 
 #ifdef DEBUGGING
-void __stdcall
+void __reg1
 cygbench (const char *s)
 {
   if (GetEnvironmentVariableA ("CYGWIN_BENCH", NULL, 0))
