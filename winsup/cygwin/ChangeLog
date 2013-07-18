@@ -1,3 +1,9 @@
+2013-07-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (normalize_posix_path): Start checking path before ".." at
+	dst, rather than at dst_start, otherwise suffer loss of one leading
+	slash in case of UNC paths.
+
 2013-07-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* winsup.h (cygbench): Fix declaration to match definition.

@@ -312,8 +312,8 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
 		  if (check_parent)
 		    {
 		      *tail = 0;
-		      debug_printf ("checking %s before '..'", dst_start);
-		      path_conv head (dst_start);
+		      debug_printf ("checking %s before '..'", dst);
+		      path_conv head (dst);
 		      if (!head.isdir())
 		        return ENOENT;
 		      check_parent = false;
