@@ -1,5 +1,5 @@
 /* Basic semantics ops support for CGEN.
-   Copyright 2005, 2007, 2009 Free Software Foundation, Inc.
+   Copyright 2005-2013 Free Software Foundation, Inc.
    Contributed by Red Hat.
 
    This file is part of the GNU opcodes library.
@@ -295,11 +295,11 @@ extern SI TRUNCDISI (DI);
    significant and word number 0 is the most significant word.
    ??? May also wish an endian-dependent version.  Later.  */
 
-QI SUBWORDSIQI (SI, int);
-HI SUBWORDSIHI (SI, int);
-QI SUBWORDDIQI (DI, int);
-HI SUBWORDDIHI (DI, int);
-SI SUBWORDDISI (DI, int);
+static QI SUBWORDSIQI (SI, int);
+static HI SUBWORDSIHI (SI, int);
+static QI SUBWORDDIQI (DI, int);
+static HI SUBWORDDIHI (DI, int);
+static SI SUBWORDDISI (DI, int);
 
 #ifdef SEMOPS_DEFINE_INLINE
 
