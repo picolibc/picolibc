@@ -12,3 +12,19 @@ What changed:
 Bug fixes:
 ----------
 
+- Fix an off-by-one error in path handling which made the access check
+  for the existing path before a ".." component (introduced with 1.7.21)
+  fail for UNC paths (//server/share/path).
+  Fixes: http://cygwin.com/ml/cygwin/2013-07/msg00375.html
+
+- Fix long-standing problem which allows to access files via ".." using an
+  invalid POSIX path, for instance, `cd nonexistant/../existing_dir".
+  Fixes: http://cygwin.com/ml/cygwin/2013-05/msg00222.html
+
+- Fix an initialization bug in XSI IPC on, which could result in
+  XSI IPC functions misbehave on x86_64.
+  Fixes: http://cygwin.com/ml/cygwin-apps/2013-07/msg00063.html
+         http://cygwin.com/ml/cygwin-apps/2013-07/msg00229.html
+
+- Fix a timer handle leak in sleep family of functions.
+  Fixes: http://cygwin.com/ml/cygwin/2013-07/msg00379.html
