@@ -431,7 +431,7 @@ ucmd ()
   return &wcmd;
 }
 
-/* Cygwin replacement for GetCommandLineA.  Returns a concatenated wide string
+/* Cygwin replacement for GetCommandLineW.  Returns a concatenated wide string
    representing the argv list, constructed using roughly the same mechanism as
    child_info_spawn::worker */
 extern "C" LPWSTR WINAPI
