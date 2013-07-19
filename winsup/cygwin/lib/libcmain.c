@@ -31,8 +31,8 @@ main ()
 
   if (!nexts)
     nexts = strchr (s, '\0');
-  else
-    nexts += strspn (nexts + 1, SP);
+  else if (*++nexts)
+    nexts += strspn (nexts, SP);
 
   GetStartupInfo (&si);
 

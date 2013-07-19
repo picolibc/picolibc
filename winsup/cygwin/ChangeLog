@@ -1,5 +1,10 @@
 2013-07-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* lib/libcmain.c (main): Don't point to last quoted character if the
+	only thing in the buffer is the program name.
+
+2013-07-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* common.din: Export GetCommandLine{A,W}.
 	* kernel32.cc: Add includes needed for GetCommandLine functions.
 	(ucmd): New function.
