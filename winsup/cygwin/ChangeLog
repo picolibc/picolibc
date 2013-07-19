@@ -1,5 +1,9 @@
 2013-07-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* exceptions.cc (signal_exit): Add a FIXME comment.
+
+2013-07-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* exceptions.cc (signal_exit): Only dump core when it's a "kernel"
 	signal.  Only use RtlCaptureContext on x86_64.  It doesn't seem to do
 	what's expected on x86.

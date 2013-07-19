@@ -1219,6 +1219,8 @@ signal_exit (int sig, siginfo_t *si)
 	  sig |= 0x80;		/* Flag that we've "dumped core" */
 	if (try_to_debug ())
 	  break;
+	/* FIXME: We're still dumping core even if !(sig & 0x80).  Need to
+	   investigate if the else clause can just be nuked.  */
 	if (si->si_code != SI_USER && si->si_cyg)
 	  ((cygwin_exception *) si->si_cyg)->dumpstack ();
 	else
