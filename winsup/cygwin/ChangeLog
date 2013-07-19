@@ -1,3 +1,9 @@
+2013-07-19  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* cygserver_ipc.h (ipc_retval::ipc_retval): Take ssize_t as argument
+	to make sure entire ipc_retval union is initialized on all supported
+	platforms.
+
 2013-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (normalize_posix_path): Start checking path before ".." at

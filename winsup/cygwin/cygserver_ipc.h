@@ -59,7 +59,7 @@ private:
   };
 
 public:
-  ipc_retval (int ni) { i = ni; }
+  ipc_retval (ssize_t nssz) { ssz = nssz; }
 
   operator int () const { return i; }
   int operator = (int ni) { return i = ni; }
