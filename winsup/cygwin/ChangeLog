@@ -1,5 +1,13 @@
 2013-07-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* spawn.cc (child_info_spawn::worker): Reinstate using temp buffer for
+	wide character command-line storage.  Use wcs method to convert command
+	line.
+	* winf.h (lb_wcs): Delete.
+	(linebuf::wcs): Implement new single-argument method.
+
+2013-07-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* lib/libcmain.c (main): Don't point to last quoted character if the
 	only thing in the buffer is the program name.
 

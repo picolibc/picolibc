@@ -612,6 +612,7 @@ loop:
   if (!real_path.iscygexec () && mode == _P_OVERLAY)
     myself->process_state |= PID_NOTCYGWIN;
 
+  wchar_t wcmd[(size_t) cmd];
   if (!::cygheap->user.issetuid ()
       || (::cygheap->user.saved_uid == ::cygheap->user.real_uid
 	  && ::cygheap->user.saved_gid == ::cygheap->user.real_gid
@@ -619,7 +620,7 @@ loop:
 	  && !::cygheap->user.setuid_to_restricted))
     {
       rc = CreateProcessW (runpath,	  /* image name - with full path */
-			   lb_wcs (cmd),  /* what was passed to exec */
+			   cmd.wcs (wcmd),/* what was passed to exec */
 			   &sec_none_nih, /* process security attrs */
 			   &sec_none_nih, /* thread security attrs */
 			   TRUE,	  /* inherit handles from parent */
@@ -682,7 +683,7 @@ loop:
 
       rc = CreateProcessAsUserW (::cygheap->user.primary_token (),
 			   runpath,	  /* image name - with full path */
-			   lb_wcs (cmd),  /* what was passed to exec */
+			   cmd.wcs (wcmd),/* what was passed to exec */
 			   &sec_none_nih, /* process security attrs */
 			   &sec_none_nih, /* thread security attrs */
 			   TRUE,	  /* inherit handles from parent */

@@ -86,6 +86,7 @@ class linebuf
     wchar_t *wbuf = (wchar_t *) malloc (sizeof (wchar_t) * n);
     return wcs (wbuf, n);
   }
+  wchar_t *wcs (wchar_t *wbuf) { return wcs (wbuf, ix + 1); }
   wchar_t *wcs (wchar_t *wbuf, size_t n)
   {
     if (n == 1)
@@ -95,12 +96,3 @@ class linebuf
     return wbuf;
   }
 };
-
-/* Return a temporary buffer representing the wide character version
-   of a linebuf command line. */
-#define lb_wcs(__x) \
-({ \
- wchar_t __wbuf[(size_t) __x]; \
- __x.wcs (__wbuf, sizeof (__wbuf) / sizeof (__wbuf[0])); \
- __wbuf; \
-})
