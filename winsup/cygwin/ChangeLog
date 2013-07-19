@@ -6,9 +6,9 @@
 	(cygwin_GetCommandLineW): Ditto.
 	(cygwin_GetCommandLineA): Ditto.
 	* spawn.cc (child_info_spawn::worker): Rename one_line -> cmd.  Use
-	linebuf_wcs macro to generate a wide character version of the
-	line buffer.  Remove duplicate printing of command line.  Don't access
-	members of linebuf directly.
+	lb_wcs macro to generate a wide character version of the line buffer.
+	Remove duplicate printing of command line.  Don't access members of
+	linebuf directly.
 	* winf.h: Use pragma once.
 	(linebuf): Make storage private.
 	(linebuf::operator size_t): New operator.  Return size of buf.
