@@ -1,3 +1,24 @@
+2013-07-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* common.din: Export GetCommandLine{A,W}.
+	* kernel32.cc: Add includes needed for GetCommandLine functions.
+	(ucmd): New function.
+	(cygwin_GetCommandLineW): Ditto.
+	(cygwin_GetCommandLineA): Ditto.
+	* spawn.cc (child_info_spawn::worker): Rename one_line -> cmd.  Use
+	linebuf_wcs macro to generate a wide character version of the
+	line buffer.  Remove duplicate printing of command line.  Don't access
+	members of linebuf directly.
+	* winf.h: Use pragma once.
+	(linebuf): Make storage private.
+	(linebuf::operator size_t): New operator.  Return size of buf.
+	(linebuf::operator wchar_t): New operator.
+	(linebuf::wcs): New function.
+	(lb_wcs): New macro.
+	* include/cygwin/version.h: Bump API minor number to 268.
+
+	* strfuncs.cc: Clarify descriptive file comment.
+
 2013-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (_cygtls::remove): Close cw_timer handle, thus avoiding

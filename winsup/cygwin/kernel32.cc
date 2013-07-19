@@ -1,6 +1,6 @@
 /* kernel32.cc: Win32 replacement functions.
 
-   Copyright 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,6 +11,15 @@ details. */
 #include "winsup.h"
 #include "shared_info.h"
 #include "ntdll.h"
+#include "cygerrno.h"
+#include "security.h"
+#include "path.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygheap.h"
+#include "tls_pbuf.h"
+#include "winf.h"
+#include "sys/cygwin.h"
 
 /* Implement CreateEvent/OpenEvent so that named objects are always created in
    Cygwin shared object namespace. */
@@ -401,4 +410,44 @@ OpenFileMappingA (DWORD dwDesiredAccess, BOOL bInheritHandle, LPCSTR lpName)
       return NULL;
     }
   return OpenFileMappingW (dwDesiredAccess, bInheritHandle, lpName ? name : NULL);
+}
+
+/* The external functions below wrap Windows functions of the same name
+   and provide a Windows interface to Cygwin functionality.  */
+
+/* Construct a unicode version of the Cygwin command line from __argv) */
+static UNICODE_STRING *
+ucmd ()
+{
+  static UNICODE_STRING wcmd;
+  if (!wcmd.Buffer)
+    {
+      linebuf cmd;
+      path_conv real_path (__argv[0]);
+      av newargv (__argc, __argv);
+      cmd.fromargv (newargv, real_path.get_win32 (), true);
+      RtlInitUnicodeString (&wcmd, cmd);
+    }
+  return &wcmd;
+}
+
+/* Cygwin replacement for GetCommandLineA.  Returns a concatenated wide string
+   representing the argv list, constructed using roughly the same mechanism as
+   child_info_spawn::worker */
+extern "C" LPWSTR WINAPI
+cygwin_GetCommandLineW (void)
+{
+  return ucmd ()->Buffer;
+}
+
+/* Cygwin replacement for GetCommandLineA.  Returns a concatenated string
+   representing the argv list, constructed using roughly the same mechanism
+   as child_info_spawn::worker */
+extern "C" LPSTR WINAPI
+cygwin_GetCommandLineA (void)
+{
+  static ANSI_STRING cmd;
+  if (!cmd.Buffer)
+    RtlUnicodeStringToAnsiString (&cmd, ucmd (), TRUE);
+  return cmd.Buffer;
 }

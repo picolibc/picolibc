@@ -457,6 +457,8 @@ gammaf NOSIGFE
 gammaf_r NOSIGFE
 gcvt SIGFE
 gcvtf SIGFE
+GetCommandLineA@0 = cygwin_GetCommandLineA@0 NOSIGFE
+GetCommandLineW@0 = cygwin_GetCommandLineW@0 NOSIGFE
 get_avphys_pages SIGFE
 get_current_dir_name SIGFE
 get_nprocs SIGFE

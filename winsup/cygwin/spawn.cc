@@ -319,7 +319,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
     }
 
   av newargv;
-  linebuf one_line;
+  linebuf cmd;
   PWCHAR envblock = NULL;
   path_conv real_path;
   bool reset_sendsig = false;
@@ -387,16 +387,16 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
     {
       real_path.check (prog_arg);
-      one_line.add ("\"");
+      cmd.add ("\"");
       if (!real_path.error)
-	one_line.add (real_path.get_win32 ());
+	cmd.add (real_path.get_win32 ());
       else
-	one_line.add (argv[0]);
-      one_line.add ("\"");
-      one_line.add (" ");
-      one_line.add (argv[1]);
-      one_line.add (" ");
-      one_line.add (argv[2]);
+	cmd.add (argv[0]);
+      cmd.add ("\"");
+      cmd.add (" ");
+      cmd.add (argv[1]);
+      cmd.add (" ");
+      cmd.add (argv[2]);
       real_path.set_path (argv[0]);
       null_app_name = true;
     }
@@ -407,7 +407,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  moreinfo->argc = newargv.argc;
 	  moreinfo->argv = newargv;
 	}
-      else if (!one_line.fromargv (newargv, real_path.get_win32 (),
+      else if (!cmd.fromargv (newargv, real_path.get_win32 (),
 				   real_path.iscygexec ()))
 	{
 	  res = -1;
@@ -423,11 +423,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       else
 	VerifyHandle (moreinfo->myself_pinfo);
     }
-  WCHAR wone_line[one_line.ix + 1];
-  if (one_line.ix)
-    sys_mbstowcs (wone_line, one_line.ix + 1, one_line.buf);
-  else
-    wone_line[0] = L'\0';
 
   PROCESS_INFORMATION pi;
   pi.hProcess = pi.hThread = NULL;
@@ -539,8 +534,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  goto out;
 	}
     }
-  syscall_printf ("null_app_name %d (%W, %.9500W)", null_app_name,
-		  runpath, wone_line);
 
   cygbench ("spawn-worker");
 
@@ -626,7 +619,7 @@ loop:
 	  && !::cygheap->user.setuid_to_restricted))
     {
       rc = CreateProcessW (runpath,	  /* image name - with full path */
-			   wone_line,	  /* what was passed to exec */
+			   lb_wcs (cmd),  /* what was passed to exec */
 			   &sec_none_nih, /* process security attrs */
 			   &sec_none_nih, /* thread security attrs */
 			   TRUE,	  /* inherit handles from parent */
@@ -689,7 +682,7 @@ loop:
 
       rc = CreateProcessAsUserW (::cygheap->user.primary_token (),
 			   runpath,	  /* image name - with full path */
-			   wone_line,	  /* what was passed to exec */
+			   lb_wcs (cmd),  /* what was passed to exec */
 			   &sec_none_nih, /* process security attrs */
 			   &sec_none_nih, /* thread security attrs */
 			   TRUE,	  /* inherit handles from parent */
@@ -763,7 +756,7 @@ loop:
 
   /* We print the original program name here so the user can see that too.  */
   syscall_printf ("pid %d, prog_arg %s, cmd line %.9500s)",
-		  rc ? cygpid : (unsigned int) -1, prog_arg, one_line.buf);
+		  rc ? cygpid : (unsigned int) -1, prog_arg, (const char *) cmd);
 
   /* Name the handle similarly to proc_subproc. */
   ProtectHandle1 (pi.hProcess, childhProc);
