@@ -8,6 +8,9 @@ What changed:
 - Support for /dev/mem, /dev/kmem and /dev/port removed, since OS support
   was limited to 32 bit Windows XP only.
 
+- Added cygwin GetCommandLine wrappers which will allow Cygwin programs to
+  (appear to) use the Windows command line functions.
+
 
 Bug fixes:
 ----------
