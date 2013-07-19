@@ -1215,7 +1215,8 @@ signal_exit (int sig, siginfo_t *si)
       case SIGTRAP:
       case SIGXCPU:
       case SIGXFSZ:
-	sig |= 0x80;		/* Flag that we've "dumped core" */
+	if (si->si_code == SI_KERNEL)
+	  sig |= 0x80;		/* Flag that we've "dumped core" */
 	if (try_to_debug ())
 	  break;
 	if (si->si_code != SI_USER && si->si_cyg)
@@ -1224,10 +1225,11 @@ signal_exit (int sig, siginfo_t *si)
 	  {
 	    CONTEXT c;
 	    c.ContextFlags = CONTEXT_FULL;
-	    RtlCaptureContext (&c);
 #ifdef __x86_64__
+	    RtlCaptureContext (&c);
 	    cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.rbp, &c);
 #else
+	    GetThreadContext (GetCurrentThread (), &c);
 	    cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.ebp, &c);
 #endif
 	    exc.dumpstack ();
