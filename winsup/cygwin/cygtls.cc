@@ -1,7 +1,7 @@
 /* cygtls.cc
 
-   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Red
-   Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+   2013 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -193,6 +193,9 @@ _cygtls::remove (DWORD wait)
   free_local (hostent_buf);
   /* Free temporary TLS path buffers. */
   locals.pathbufs.destroy ();
+  /* Close timer handle. */
+  if (locals.cw_timer)
+    NtClose (locals.cw_timer);
   cygheap->remove_tls (this, wait);
   remove_wq (wait);
 }

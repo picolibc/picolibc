@@ -1,3 +1,8 @@
+2013-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (_cygtls::remove): Close cw_timer handle, thus avoiding
+	handle leak.
+
 2013-07-19  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* cygserver_ipc.h (ipc_retval::ipc_retval): Take ssize_t as argument
