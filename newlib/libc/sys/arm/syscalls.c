@@ -48,7 +48,6 @@ static int	wrap		_PARAMS ((int));
 static int	error		_PARAMS ((int));
 static int	get_errno	_PARAMS ((void));
 static int	remap_handle	_PARAMS ((int));
-static int	do_AngelSWI	_PARAMS ((int, void *));
 static int 	findslot	_PARAMS ((int));
 
 /* Register name faking - works in collusion with the linker.  */
@@ -93,26 +92,6 @@ findslot (int fh)
       break;
   return i;
 }
-
-#ifdef ARM_RDI_MONITOR
-
-static inline int
-do_AngelSWI (int reason, void * arg)
-{
-  int value;
-  asm volatile ("mov r0, %1; mov r1, %2; " AngelSWIInsn " %a3; mov %0, r0"
-       : "=r" (value) /* Outputs */
-       : "r" (reason), "r" (arg), "i" (AngelSWI) /* Inputs */
-       : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc"
-		/* Clobbers r0 and r1, and lr if in supervisor mode */);
-                /* Accordingly to page 13-77 of ARM DUI 0040D other registers
-                   can also be clobbered.  Some memory positions may also be
-                   changed by a system call, so they should not be kept in
-                   registers. Note: we are assuming the manual is right and
-                   Angel is respecting the APCS.  */
-  return value;
-}
-#endif /* ARM_RDI_MONITOR */
 
 /* Function to convert std(in|out|err) handles to internal versions.  */
 static int
