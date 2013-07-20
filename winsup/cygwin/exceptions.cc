@@ -1218,8 +1218,6 @@ signal_exit (int sig, siginfo_t *si)
 	sig |= 0x80;		/* Flag that we've "dumped core" */
 	if (try_to_debug ())
 	  break;
-	/* FIXME: We're still dumping core even if !(sig & 0x80).  Need to
-	   investigate if this should be shortcircuited in that case.  */
 	if (si->si_code != SI_USER && si->si_cyg)
 	  ((cygwin_exception *) si->si_cyg)->dumpstack ();
 	else
@@ -1228,10 +1226,10 @@ signal_exit (int sig, siginfo_t *si)
 	    c.ContextFlags = CONTEXT_FULL;
 #ifdef __x86_64__
 	    RtlCaptureContext (&c);
-	    cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.rbp, &c);
+	    cygwin_exception exc ((PUINT_PTR) __builtin_frame_address (0), &c);
 #else
 	    GetThreadContext (GetCurrentThread (), &c);
-	    cygwin_exception exc ((PUINT_PTR) _my_tls.thread_context.ebp, &c);
+	    cygwin_exception exc ((PUINT_PTR) __builtin_frame_address (0), &c);
 #endif
 	    exc.dumpstack ();
 	  }
