@@ -1,3 +1,11 @@
+2013-07-20  Warren Young  <warren@etr-usa.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygwin-ug-net/cygwin-ug-net.pdf): Process input via
+	xsltproc and fop.
+	(cygwin-api/cygwin-api.pdf): Ditto.
+	* fo.xsl: New file.
+
 2013-07-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.sgml (ov-new1.7.22): New section.  Document dropped

@@ -47,7 +47,7 @@ clean:
 	rm -f *.html *.html.gz
 	rm -Rf cygwin-api cygwin-ug cygwin-ug-net faq
 
-install:	all
+install: all
 
 cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : cygwin-ug-net.xml
 	-${XMLTO} html-nochunks -m $(srcdir)/cygwin.xsl $<
@@ -58,15 +58,14 @@ cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : cygwin-ug-net.xml
 cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.xml
 	-${XMLTO} html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
 
-# Some versions of jw hang with the -o option
 cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.xml
-	-${XMLTO} pdf -o cygwin-ug-net/ $<
+	-xsltproc --xinclude $(srcdir)/fo.xsl $< | fop -q -fo - $@
 
 cygwin-api/cygwin-api.html : cygwin-api.xml
 	-${XMLTO} html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
 
 cygwin-api/cygwin-api.pdf : cygwin-api.xml
-	-${XMLTO} pdf -o cygwin-api/ $<
+	-xsltproc --xinclude $(srcdir)/fo.xsl $< | fop -q -fo - $@
 
 cygwin-api.xml : cygwin-api.in.xml ./doctool Makefile
 	-./doctool -m $(DBXDIRS) -s $(srcdir) -o $@ $<
