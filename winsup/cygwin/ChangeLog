@@ -1,3 +1,8 @@
+2013-07-20  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* exceptions.cc (signal_exit): Nope.  Nevermind.  Dump core
+	unconditionally.
+
 2013-07-19  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* exceptions.cc (signal_exit): Add a FIXME comment.

@@ -1215,8 +1215,7 @@ signal_exit (int sig, siginfo_t *si)
       case SIGTRAP:
       case SIGXCPU:
       case SIGXFSZ:
-	if (si->si_code == SI_KERNEL)
-	  sig |= 0x80;		/* Flag that we've "dumped core" */
+	sig |= 0x80;		/* Flag that we've "dumped core" */
 	if (try_to_debug ())
 	  break;
 	/* FIXME: We're still dumping core even if !(sig & 0x80).  Need to
