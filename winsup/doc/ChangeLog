@@ -1,3 +1,14 @@
+2013-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygwin-ug-net/cygwin-ug-net.html): Add dependency to
+	cygwin.xsl.
+	(cygwin-api/cygwin-api.html): Ditto.
+	(cygwin-ug-net/cygwin-ug-net.pdf): Add dependency to fo.xsl.
+	(cygwin-api/cygwin-api.pdf): Ditto.
+	(cygwin-api.xml): Drop "." path component from doctool dependency.
+	Change Makefile to Makefile.in dep.
+	(doctool): Drop "." path component from target.
+
 2013-07-20  Warren Young  <warren@etr-usa.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

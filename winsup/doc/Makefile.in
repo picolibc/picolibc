@@ -55,26 +55,26 @@ cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : cygwin-ug-net.xml
 	-rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
 	-gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
-cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.xml
+cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.xml cygwin.xsl
 	-${XMLTO} html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
 
-cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.xml
+cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.xml fo.xsl
 	-xsltproc --xinclude $(srcdir)/fo.xsl $< | fop -q -fo - $@
 
-cygwin-api/cygwin-api.html : cygwin-api.xml
+cygwin-api/cygwin-api.html : cygwin-api.xml cygwin.xsl
 	-${XMLTO} html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
 
-cygwin-api/cygwin-api.pdf : cygwin-api.xml
+cygwin-api/cygwin-api.pdf : cygwin-api.xml fo.xsl
 	-xsltproc --xinclude $(srcdir)/fo.xsl $< | fop -q -fo - $@
 
-cygwin-api.xml : cygwin-api.in.xml ./doctool Makefile
+cygwin-api.xml : cygwin-api.in.xml doctool Makefile.in
 	-./doctool -m $(DBXDIRS) -s $(srcdir) -o $@ $<
 
 faq/faq.html : $(FAQ_SOURCES)
 	-${XMLTO} html -o faq -m $(srcdir)/cygwin.xsl $(srcdir)/faq.xml
 	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq.html
 
-./doctool : doctool.c
+doctool : doctool.c
 	gcc -g $< -o $@
 
 TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
