@@ -11,6 +11,11 @@ What changed:
 - Added cygwin GetCommandLine wrappers which will allow Cygwin programs to
   (appear to) use the Windows command line functions.
 
+- regcomp(3) now allows character values >= 0x80 if the current codeset is
+  ASCII (default codeset in the "C"/"POSIX" locale).  This allows patterns
+  containing arbitrary byte values as GLibc's regcomp.
+  Fixes: http://cygwin.com/ml/cygwin/2013-07/msg00405.html
+
 
 Bug fixes:
 ----------

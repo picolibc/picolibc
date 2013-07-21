@@ -1128,6 +1128,18 @@ wgetnext(struct parse *p)
 	wint_t ret;
 	size_t n;
 
+#ifdef __CYGWIN__
+	/* Kludge for more glibc compatibility.  On Cygwin as well as on
+	   Linux, mbrtowc returns -1 if the current local's codeset is ASCII
+	   and the character is >= 0x80.  Nevertheless, glibc's regcomp allows
+	   any char value, even stuff like [\xc0-\xff], if the locale's codeset
+	   is ASCII, so in regcomp it ignores the fact that chars >= 0x80 are
+	   invalid ASCII chars.  To be more Linux-compatible, we align the
+	   behaviour to glibc here.  Allow any character value if the current
+	   local's codeset is ASCII. */
+	if (*__locale_charset () == 'A') /* SCII */
+	  return (wint_t) (unsigned char) *p->next++;
+#endif
 	memset(&mbs, 0, sizeof(mbs));
 	n = mbrtowc(&wc, p->next, p->end - p->next, &mbs);
 	if (n == (size_t)-1 || n == (size_t)-2) {
