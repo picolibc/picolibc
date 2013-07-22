@@ -70,6 +70,12 @@ VER = `	if grep 'AM_INIT_AUTOMAKE.*BFD_VERSION' $(TOOL)/configure.in >/dev/null 
 	  bfd/configure --version | sed -n -e '1s,.* ,,p'; \
 	elif grep AM_INIT_AUTOMAKE $(TOOL)/configure.in >/dev/null 2>&1; then \
 	  sed < $(TOOL)/configure.in -n 's/AM_INIT_AUTOMAKE[^,]*, *\([^)]*\))/\1/p'; \
+	elif test -f $(TOOL)/common/create-version.sh; then \
+	  $(TOOL)/common/create-version.sh $(TOOL) \
+	    'dummy-host' 'dummy-target' \
+	    VER.tmp; \
+	  cat VER.tmp | grep 'version\[\]' | sed 's/.*"\([^"]*\)".*/\1/'; \
+          rm -f VER.tmp; \
 	elif test -f $(TOOL)/version.in; then \
 	  head -1 $(TOOL)/version.in; \
 	elif grep VERSION $(TOOL)/Makefile.in > /dev/null 2>&1; then \
