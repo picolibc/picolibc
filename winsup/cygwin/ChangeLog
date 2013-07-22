@@ -1,3 +1,7 @@
+2013-07-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 23.
+
 2013-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regex/regcomp.c (wgetnext): Add a kludge to be more glibc compatible.
