@@ -1,3 +1,19 @@
+2013-07-23  Nagaraju Mekala  <nagaraju.mekala@xilinx.com>
+
+	* microblaze/_exception_handler.S: Adjust to be weak.
+
+2013-07-23  Edgar E. Iglesias  <edgar.iglesias@xilinx.com>
+
+	* microblaze/Makefile.in: Add LINUX_BSP.
+	* microblaze/elf-gloss-linux.ld: New file.
+	* microblaze/elf-gloss-linux.specs: Likewise.
+	* microblaze/linux-crt0.S: Likewise.
+	* microblaze/linux-inbyte.c: Likewise.
+	* microblaze/linux-outbyte.c: Likewise.
+	* microblaze/linux-syscalls-wrap.c: Likewise.
+	* microblaze/linux-syscalls.S: Likewise.
+	* microblaze/linux-syscalls.h: Likewise.
+
 2013-07-17  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* lm32/configure: Regenerate.

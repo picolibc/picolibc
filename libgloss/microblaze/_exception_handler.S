@@ -30,9 +30,11 @@
 */
 
 	.text
-	.globl _exception_handler    # Exception Handler Label 
 	.align 2
+	.weakext _exception_handler
+	.ent _exception_handler
+	.type _exception_handler, @function
 	
 	_exception_handler:
-	rtsd    r17, 0
-	nop
+	addi r11,r11,8
+	bra r11
