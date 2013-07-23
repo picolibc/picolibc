@@ -1,5 +1,28 @@
 2013-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h (struct _SEMAPHORE_BASIC_INFORMATION): Define.
+	(enum _SEMAPHORE_INFORMATION_CLASS): Define.
+	(NtQuerySemaphore): Declare.
+	* thread.h (class semaphore): Add member startvalue.
+	(semaphore::fixup_before_fork): New inline method.
+	(semaphore::_fixup_before_fork): Declare.
+	* thread.cc (MTinterface::fixup_before_fork): Additionally call
+	semaphore::fixup_before_fork.
+	(semaphore::semaphore): Set currentvalue to -1.  Set startvalue to
+	incoming initializer value.
+	(semaphore::_getvalue): Just query semaphore using NtQuerySemaphore
+	rather then using WFSO/Release.
+	(semaphore::_post): Drop setting currentvalue.  It's not thread-safe.
+	(semaphore::_trywait): Ditto.
+	(semaphore::_timedwait): Ditto.
+	(semaphore::_wait): Ditto.
+	(semaphore::_fixup_before_fork): New method, setting currentvalue from
+	actual windows semaphore right before fork.
+	(semaphore::_fixup_after_fork): Drop kludge from 2013-07-10.  Drop
+	FIXME comment.
+
+2013-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.cc (well_known_dlls): Add kernelbase.dll.
 
 2013-07-22  Corinna Vinschen  <corinna@vinschen.de>

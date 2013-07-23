@@ -316,6 +316,7 @@ void
 MTinterface::fixup_before_fork ()
 {
   pthread_key::fixup_before_fork ();
+  semaphore::fixup_before_fork ();
 }
 
 /* This function is called from a single threaded process */
@@ -3376,7 +3377,8 @@ List<semaphore> semaphore::semaphores;
 semaphore::semaphore (int pshared, unsigned int value)
 : verifyable_object (SEM_MAGIC),
   shared (pshared),
-  currentvalue (value),
+  currentvalue (-1),
+  startvalue (value),
   fd (-1),
   hash (0ULL),
   sem (NULL)
@@ -3394,7 +3396,8 @@ semaphore::semaphore (unsigned long long shash, LUID sluid, int sfd,
 		      sem_t *ssem, int oflag, mode_t mode, unsigned int value)
 : verifyable_object (SEM_MAGIC),
   shared (PTHREAD_PROCESS_SHARED),
-  currentvalue (value),		/* Unused for named semaphores. */
+  currentvalue (-1),		/* Unused for named semaphores. */
+  startvalue (value),
   fd (sfd),
   hash (shash),
   luid (sluid),
@@ -3428,29 +3431,21 @@ semaphore::~semaphore ()
 void
 semaphore::_post ()
 {
-  if (ReleaseSemaphore (win32_obj_id, 1, &currentvalue))
-    currentvalue++;
+  LONG dummy;
+  ReleaseSemaphore (win32_obj_id, 1, &dummy);
 }
 
 int
 semaphore::_getvalue (int *sval)
 {
-  LONG val;
+  NTSTATUS status;
+  SEMAPHORE_BASIC_INFORMATION sbi;
 
-  switch (WaitForSingleObject (win32_obj_id, 0))
-    {
-      case WAIT_OBJECT_0:
-	ReleaseSemaphore (win32_obj_id, 1, &val);
-	*sval = val + 1;
-	break;
-      case WAIT_TIMEOUT:
-	*sval = 0;
-	break;
-      default:
-	set_errno (EAGAIN);
-	return -1;
-    }
-  return 0;
+  status = NtQuerySemaphore (win32_obj_id, SemaphoreBasicInformation, &sbi,
+			     sizeof sbi, NULL);
+  if (NT_SUCCESS (status))
+    return sbi.CurrentCount;
+  return startvalue;
 }
 
 int
@@ -3463,7 +3458,6 @@ semaphore::_trywait ()
       set_errno (EAGAIN);
       return -1;
     }
-  currentvalue--;
   return 0;
 }
 
@@ -3489,7 +3483,6 @@ semaphore::_timedwait (const struct timespec *abstime)
   switch (cygwait (win32_obj_id, &timeout, cw_cancel | cw_cancel_self | cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
-      currentvalue--;
       break;
     case WAIT_SIGNALED:
       set_errno (EINTR);
@@ -3511,7 +3504,6 @@ semaphore::_wait ()
   switch (cygwait (win32_obj_id, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
-      currentvalue--;
       break;
     case WAIT_SIGNALED:
       set_errno (EINTR);
@@ -3524,18 +3516,30 @@ semaphore::_wait ()
 }
 
 void
+semaphore::_fixup_before_fork ()
+{
+  NTSTATUS status;
+  SEMAPHORE_BASIC_INFORMATION sbi;
+
+  status = NtQuerySemaphore (win32_obj_id, SemaphoreBasicInformation, &sbi,
+			     sizeof sbi, NULL);
+  if (NT_SUCCESS (status))
+    currentvalue = sbi.CurrentCount;
+  else
+    currentvalue = startvalue;
+}
+
+void
 semaphore::_fixup_after_fork ()
 {
   if (shared == PTHREAD_PROCESS_PRIVATE)
     {
       pthread_printf ("sem %p", this);
-      if (!currentvalue)
-	currentvalue = 1;
-      /* FIXME: duplicate code here and in the constructor. */
       win32_obj_id = ::CreateSemaphore (&sec_none_nih, currentvalue,
-					      INT32_MAX, NULL);
+					INT32_MAX, NULL);
       if (!win32_obj_id)
-	api_fatal ("failed to create new win32 semaphore, currentvalue %ld, %E", currentvalue);
+	api_fatal ("failed to create new win32 semaphore, "
+		   "currentvalue %ld, %E", currentvalue);
     }
 }
 

@@ -638,6 +638,7 @@ public:
   HANDLE win32_obj_id;
   int shared;
   LONG currentvalue;
+  LONG startvalue;
   int fd;
   unsigned long long hash;
   LUID luid;
@@ -648,6 +649,10 @@ public:
   ~semaphore ();
 
   class semaphore * next;
+  static void fixup_before_fork ()
+  {
+    semaphores.for_each (&semaphore::_fixup_before_fork);
+  }
   static void fixup_after_fork ()
   {
     semaphores.fixup_after_fork ();
@@ -666,6 +671,7 @@ private:
   int _trywait ();
   int _timedwait (const struct timespec *abstime);
 
+  void _fixup_before_fork ();
   void _fixup_after_fork ();
   void _terminate ();
 
