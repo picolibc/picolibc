@@ -46,6 +46,7 @@ const wchar_t *well_known_dlls[] =
 {
   L"advapi32.dll",
   L"kernel32.dll",
+  L"kernelbase.dll",
   L"mswsock.dll",
   L"ntdll.dll",
   L"ole32.dll",
