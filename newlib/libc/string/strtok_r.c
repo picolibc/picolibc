@@ -91,9 +91,9 @@ cont:
 
 char *
 _DEFUN (strtok_r, (s, delim, lasts),
-	register char *s _AND
-	register const char *delim _AND
-	char **lasts)
+	register char *__restrict s _AND
+	register const char *__restrict delim _AND
+	char **__restrict lasts)
 {
 	return __strtok_r (s, delim, lasts, 1);
 }

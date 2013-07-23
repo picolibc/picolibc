@@ -36,7 +36,7 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <string.h>
-	char *strcpy(char *<[dst]>, const char *<[src]>);
+	char *strcpy(char *restrict <[dst]>, const char *restrict <[src]>);
 
 TRAD_SYNOPSIS
 	#include <string.h>
@@ -88,8 +88,8 @@ QUICKREF
 
 char*
 _DEFUN (strcpy, (dst0, src0),
-	char *dst0 _AND
-	_CONST char *src0)
+	char *__restrict dst0 _AND
+	_CONST char *__restrict src0)
 {
 
 #ifndef HAVE_HW_PCMP

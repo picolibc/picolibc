@@ -7,7 +7,8 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <string.h>
-	char *stpncpy(char *<[dst]>, const char *<[src]>, size_t <[length]>);
+	char *stpncpy(char *restrict <[dst]>, const char *restrict <[src]>,
+                      size_t <[length]>);
 
 TRAD_SYNOPSIS
 	#include <string.h>
@@ -68,8 +69,8 @@ QUICKREF
 
 char *
 _DEFUN (stpncpy, (dst, src),
-	char *dst _AND
-	_CONST char *src _AND
+	char *__restrict dst _AND
+	_CONST char *__restrict src _AND
 	size_t count)
 {
   char *ret = NULL;

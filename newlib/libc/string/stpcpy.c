@@ -7,7 +7,7 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <string.h>
-	char *stpcpy(char *<[dst]>, const char *<[src]>);
+	char *stpcpy(char *restrict <[dst]>, const char *restrict <[src]>);
 
 TRAD_SYNOPSIS
 	#include <string.h>
@@ -60,8 +60,8 @@ QUICKREF
 
 char*
 _DEFUN (stpcpy, (dst, src),
-	char *dst _AND
-	_CONST char *src)
+	char *__restrict dst _AND
+	_CONST char *__restrict src)
 {
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   long *aligned_dst;

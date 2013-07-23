@@ -4,7 +4,7 @@ FUNCTION
 
 ANSI_SYNOPSIS
         #include <string.h>
-        void* memccpy(void *<[out]>, const void *<[in]>, 
+        void* memccpy(void *restrict <[out]>, const void *restrict <[in]>, 
                       int <[endchar]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
@@ -64,8 +64,8 @@ PORTABILITY
 
 _PTR
 _DEFUN (memccpy, (dst0, src0, endchar, len0),
-	_PTR dst0 _AND
-	_CONST _PTR src0 _AND
+	_PTR __restrict dst0 _AND
+	_CONST _PTR __restrict src0 _AND
 	int endchar0 _AND
 	size_t len0)
 {

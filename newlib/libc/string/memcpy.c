@@ -4,7 +4,8 @@ FUNCTION
 
 ANSI_SYNOPSIS
         #include <string.h>
-        void* memcpy(void *<[out]>, const void *<[in]>, size_t <[n]>);
+        void* memcpy(void *restrict <[out]>, const void *restrict <[in]>,
+                     size_t <[n]>);
 
 TRAD_SYNOPSIS
         #include <string.h>
@@ -51,8 +52,8 @@ QUICKREF
 
 _PTR
 _DEFUN (memcpy, (dst0, src0, len0),
-	_PTR dst0 _AND
-	_CONST _PTR src0 _AND
+	_PTR __restrict dst0 _AND
+	_CONST _PTR __restrict src0 _AND
 	size_t len0)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

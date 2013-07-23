@@ -8,7 +8,7 @@
 #include "xscale.h"
 
 void *
-memcpy (void *dst0, const void *src0, size_t len)
+memcpy (void *__restrict dst0, const void *__restrict src0, size_t len)
 {
   int dummy;
   asm volatile (

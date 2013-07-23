@@ -1473,8 +1473,9 @@ rfc3484_sort (const void *p1, const void *p2)
 
 
 int
-getaddrinfo (const char *name, const char *service,
-	     const struct addrinfo *hints, struct addrinfo **pai)
+getaddrinfo (const char *__restrict name, const char *__restrict service,
+	     const struct addrinfo *__restrict hints,
+	     struct addrinfo **__restrict pai)
 {
   int i = 0, j = 0, last_i = 0;
   int nresults = 0;

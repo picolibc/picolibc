@@ -256,10 +256,12 @@ void		sethostent_r(int, FILE **, int *);
 /* void		sethostfile(const char *); */
 void		setnetent(int);
 void		setprotoent(int);
-int		getaddrinfo(const char *, const char *,
-			    const struct addrinfo *, struct addrinfo **);
-int		getnameinfo(const struct sockaddr *, socklen_t, char *,
-			    socklen_t, char *, socklen_t, unsigned int);
+int		getaddrinfo(const char *__restrict, const char *__restrict,
+			    const struct addrinfo *__restrict,
+			    struct addrinfo **__restrict);
+int		getnameinfo(const struct sockaddr *__restrict, socklen_t,
+			    char *__restrict, socklen_t, char *__restrict,
+			    socklen_t, unsigned int);
 void		freeaddrinfo(struct addrinfo *);
 char		*gai_strerror(int);
 int		setnetgrent(const char *);

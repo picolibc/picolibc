@@ -13,9 +13,11 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <string.h>
-      	char *strtok(char *<[source]>, const char *<[delimiters]>)
-      	char *strtok_r(char *<[source]>, const char *<[delimiters]>,
-			char **<[lasts]>)
+      	char *strtok(char *restrict <[source]>,
+                     const char *restrict <[delimiters]>)
+      	char *strtok_r(char *restrict <[source]>,
+                       const char *restrict <[delimiters]>,
+                       char **<[lasts]>)
       	char *strsep(char **<[source_ptr]>, const char *<[delimiters]>)
 
 TRAD_SYNOPSIS
@@ -92,8 +94,8 @@ extern char *__strtok_r (char *, const char *, char **, int);
 
 char *
 _DEFUN (strtok, (s, delim),
-	register char *s _AND
-	register const char *delim)
+	register char *__restrict s _AND
+	register const char *__restrict delim)
 {
 	struct _reent *reent = _REENT;
 

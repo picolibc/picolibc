@@ -1,3 +1,19 @@
+2013-07-23  Sahil Patnayakuni  <sahilp@rtems.org>
+
+	* libc/sys/linux/include/netdb.h, libc/sys/linux/net/getaddrinfo.c,
+	libc/sys/linux/net/getnameinfo.c: Add restrict keyword to getnameinfo()
+	and getaddrinfo() to increase standards compliance and match glibc.
+
+2013-07-23  Sahil Patnayakuni  <sahilp@rtems.org>
+
+	* libc/include/string.h, libc/string/memccpy.c, libc/string/memcpy.c,
+	libc/string/stpcpy.c, libc/string/stpncpy.c, libc/string/strcat.c,
+	libc/string/strncat.c, libc/string/strncpy.c, libc/string/strtok.c,
+	libc/string/strtok_r.c, libc/string/strxfrm.c
+	libc/machine/microblaze/strcpy.c, libc/machine/xscale/memcpy.c,
+	libc/machine/cris/memcpy.c: Add __restrict to prototype to
+	increase standards compliance.
+
 2013-07-18  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
 
 	* libc/sys/arm/syscalls.c (do_AngelSWI): Delete.

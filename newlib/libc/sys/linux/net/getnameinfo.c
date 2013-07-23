@@ -160,9 +160,9 @@ nrl_domainname (void)
 
 
 int
-getnameinfo (const struct sockaddr *sa, socklen_t addrlen, char *host,
-	     socklen_t hostlen, char *serv, socklen_t servlen,
-	     unsigned int flags)
+getnameinfo (const struct sockaddr *__restrict sa, socklen_t addrlen,
+	     char *__restrict host, socklen_t hostlen, char *__restrict serv,
+	     socklen_t servlen, unsigned int flags)
 {
   int serrno = errno;
   int tmpbuflen = 1024;

@@ -40,7 +40,7 @@
 __asm__ (".syntax no_register_prefix");
 
 void *
-memcpy(void *pdst, const void *psrc, size_t pn)
+memcpy(void *__restrict pdst, const void *__restrict psrc, size_t pn)
 {
   /* Now we want the parameters put in special registers.
      Make sure the compiler is able to make something useful of this.
