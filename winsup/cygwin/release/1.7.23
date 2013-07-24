@@ -1,0 +1,15 @@
+What's new:
+-----------
+
+
+What changed:
+-----------
+
+
+Bug fixes:
+----------
+
+- Fix race condition in POSIX semaphores which potentially breaks fork() when
+  using POSIX semaphores in a multithreaded process.
+  Fixes: http://cygwin.com/ml/cygwin/2013-07/msg00404.html
+         http://cygwin.com/ml/cygwin/2013-07/msg00198.html
