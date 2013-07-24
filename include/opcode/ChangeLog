@@ -1,3 +1,9 @@
+2013-07-24  Anna Tikhonova  <anna.tikhonova@intel.com>
+	    Kirill Yukhin  <kirill.yukhin@intel.com>
+	    Michael Zolotukhin  <michael.v.zolotukhin@intel.com>
+
+	* i386.h (BND_PREFIX_OPCODE): New.
+
 2013-07-14  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	* mips.h (mips_operand_type): Add OP_ENTRY_EXIT_LIST and
