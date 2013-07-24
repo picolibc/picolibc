@@ -1,3 +1,8 @@
+
+2013-07-24  Steve Ellcey  <sellcey@mips.com>
+
+	* mips/idtmon.S (unlink, lseek, stat): Add new functions.
+
 2013-07-23  Nagaraju Mekala  <nagaraju.mekala@xilinx.com>
 
 	* microblaze/_exception_handler.S: Adjust to be weak.
