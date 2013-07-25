@@ -81,9 +81,10 @@ my_read (int fd, void *buffer, size_t bytes_to_read)
 a bad bug.  The assumption that the size of ssize_t is the same as the size
 of DWORD is wrong for 64 bit.  In fact, since
 <function>sizeof(ssize_t)</function> is 8, <function>ReadFile</function>
-will write the number of read bytes into the upper 4 bytes of the variable
-<literal>bytes_read</literal>.  <function>my_read</function> will
-return the wrong number of read bytes to the caller.</para>
+will write the number of read bytes into the lower 4 bytes of the variable
+<literal>bytes_read</literal>, while the upper 4 bytes will contain an
+undefined value.  <function>my_read</function> will very likely return the
+wrong number of read bytes to the caller.</para>
 
 <para>Here's the fixed version of <function>my_read</function>:</para>
 
@@ -97,7 +98,7 @@ my_read (int fd, void *buffer, size_t bytes_to_read)
   DWORD bytes_read;
 
   if (ReadFile (fh, buffer, bytes_to_read, &amp;bytes_read, NULL))
-    return bytes_read;
+    return (ssize_t) bytes_read;
   set_errno_from_get_last_error ();
   return -1;
 }

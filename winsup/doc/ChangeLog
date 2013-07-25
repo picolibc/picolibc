@@ -1,5 +1,9 @@
 2013-07-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* gcc.xml (gcc-64): Fix example.
+
+2013-07-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* gcc.xml (gcc-default: Rename from gcc-cons.  Change title.
 	(gcc-64): New section explaininig differences in programming for
 	64 bit Cygwin.
