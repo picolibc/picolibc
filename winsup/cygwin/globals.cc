@@ -67,12 +67,13 @@ int NO_COPY dynamically_loaded;
 
 /* Some CYGWIN environment variable variables. */
 bool allow_glob = true;
-bool ignore_case_with_glob = false;
+bool detect_bloda;
 bool dos_file_warning = true;
+bool ignore_case_with_glob;
+bool pipe_byte;
+bool reset_com;
+bool wincmdln;
 winsym_t allow_winsymlinks = WSYM_sysfile;
-bool reset_com = false;
-bool pipe_byte = false;
-bool detect_bloda = false;
 
 bool NO_COPY in_forkee;
 

@@ -82,6 +82,12 @@ time and when handles are inherited.  Defaults to set.</para>
 </listitem>
 
 <listitem>
+<para><envar>(no)wincmdln</envar> - if set, the windows complete command
+line (truncated to ~32K) will be passed on any processes that it creates
+in addition to the normal UNIX argv list.  Defaults to not set.</para>
+</listitem>
+
+<listitem>
 <para><envar>winsymlinks:{lnk,native,nativestrict}</envar> - if set to just
 <literal>winsymlinks</literal> or <literal>winsymlinks:lnk</literal>,
 Cygwin creates symlinks as Windows shortcuts with a special header and

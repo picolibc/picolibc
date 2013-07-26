@@ -5,6 +5,9 @@ What's new:
 What changed:
 -----------
 
+- Added CYGWIN environment variable keyword which causes the full windows command
+  line (<=32K) to always be sent to subprocesses.
+  See: http://cygwin.com/ml/cygwin/2013-07/threads.html#00523
 
 Bug fixes:
 ----------

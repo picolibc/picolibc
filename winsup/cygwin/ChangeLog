@@ -1,3 +1,12 @@
+2013-07-26  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* environ.cc (tty_is_gone): Delete.
+	(known): Delete tty, add wincmdln.
+	* globals.cc: Reorganize list of environment bools, remove explicit =
+	false for slight load time optimization.
+	(wincmdln): New global.
+	* spawn.cc (child_info_spawn::worker): Honor wincmdln.
+
 2013-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (struct _SEMAPHORE_BASIC_INFORMATION): Define.
