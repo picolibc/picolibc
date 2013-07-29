@@ -1,3 +1,9 @@
+2013-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cyglsa.dll): Explicitely specify DLL entry point to
+	harden against gcc function and block reordering optimizations.
+	(cyglsa64.dll): Ditto.
+
 2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Merge in cygwin-64bit-branch.  See ChangeLog.64bit for details.
