@@ -1,6 +1,6 @@
 2013-07-26  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
-	* new-features.sgml (ov-new1.7.23): Add new section.  Mention wincmdln.
+	* new-features.xml (ov-new1.7.23): Add new section.  Mention wincmdln.
 	* cygwinenv.xml: Mention wincmdln.
 
 2013-07-25  Corinna Vinschen  <corinna@vinschen.de>
