@@ -5,8 +5,8 @@ What's new:
 What changed:
 -----------
 
-- Added CYGWIN environment variable keyword which causes the full windows command
-  line (<=32K) to always be sent to subprocesses.
+- Added CYGWIN environment variable keyword which causes the full windows
+  command line (<=32K) to always be sent to subprocesses.
   See: http://cygwin.com/ml/cygwin/2013-07/threads.html#00523
 
 Bug fixes:
@@ -16,3 +16,7 @@ Bug fixes:
   using POSIX semaphores in a multithreaded process.
   Fixes: http://cygwin.com/ml/cygwin/2013-07/msg00404.html
          http://cygwin.com/ml/cygwin/2013-07/msg00198.html
+
+- Fix cyglsa build problem which made the cyglsa DLLs entirely non-functional
+  when built with newer gcc versions.
+  Fixes: http://cygwin.com/ml/cygwin/2013-07/msg00656.html
