@@ -311,11 +311,14 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
 		     double check in case of foo/bar/../.. */
 		  if (check_parent)
 		    {
-		      *tail = 0;
-		      debug_printf ("checking %s before '..'", dst);
-		      path_conv head (dst);
-		      if (!head.isdir())
-		        return ENOENT;
+		      if (tail > dst_start) /* Don't check for / or // dir. */
+		      	{
+			  *tail = 0;
+			  debug_printf ("checking %s before '..'", dst);
+			  path_conv head (dst);
+			  if (!head.isdir())
+			    return ENOENT;
+			}
 		      check_parent = false;
 		    }
 		  while (tail > dst_start && !isslash (*--tail))
