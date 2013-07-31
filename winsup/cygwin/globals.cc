@@ -17,6 +17,7 @@ details. */
 #include "thread.h"
 #include <malloc.h>
 #include <cygwin/version.h>
+#include <cygwin/callout.h>
 
 HANDLE NO_COPY hMainThread;
 HANDLE NO_COPY hProcToken;
@@ -74,6 +75,11 @@ bool pipe_byte;
 bool reset_com;
 bool wincmdln;
 winsym_t allow_winsymlinks = WSYM_sysfile;
+
+extern "C" {
+cw_callout_return_t dummy_callout (cw_callout_t, ...);
+cw_callout_function_t callout = dummy_callout;
+};
 
 bool NO_COPY in_forkee;
 

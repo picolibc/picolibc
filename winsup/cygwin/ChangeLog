@@ -1,5 +1,20 @@
 2013-07-31  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* environ.cc (known): Add preload keyword.
+	* external.cc: Include new callout.h header.
+	(cygwin_internal): Initial implementation of CW_CALLOUT and
+	CW_CYGHEAP_MALLOC.
+	(dll_preload): Handle CYGWIN=preload:foo.dll.
+	(dummy_callout): Default NULL callout function.
+	* globals.cc: Include new callout.h header.
+	(callout): Declare/define.
+	* uname.cc (uname): Initial implementation of callout handling.
+	* winsup.h (dll_preload): Declare.
+	* include/cygwin/version.h: Bump API minor number to 269.
+	* include/sys/cygwin.h: Define CW_CALLOUT, CW_CYGHEAP_MALLOC.
+
+2013-07-31  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* cygheap.cc (cmalloc): Use size_t for size field.
 	(cmalloc_abort): Ditto.
 	(crealloc): Ditto.

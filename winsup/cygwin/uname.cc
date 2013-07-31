@@ -15,6 +15,7 @@ details. */
 #include <sys/utsname.h>
 #include "cygwin_version.h"
 #include "cygtls.h"
+#include <cygwin/callout.h>
 
 /* uname: POSIX 4.4.1.1 */
 extern "C" int
@@ -91,5 +92,12 @@ uname (struct utsname *name)
 	break;
     }
 
+  switch (callout (CO_UNAME, name))
+    {
+    case CO_R_KEEP_GOING:
+      break;
+    default:
+      return -1;
+    }
   return 0;
 }

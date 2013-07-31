@@ -30,6 +30,7 @@ details. */
 #include <stdlib.h>
 #include <wchar.h>
 #include <iptypes.h>
+#include <cygwin/callout.h>
 
 child_info *get_cygwin_startup_info ();
 static void exit_process (UINT, bool) __attribute__((noreturn));
@@ -553,9 +554,30 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
 	break;
 
+      case CW_CALLOUT:
+	callout = va_arg (arg, cw_callout_function_t);
+	break;
+
+      case CW_CYGHEAP_MALLOC:
+	res = (uintptr_t) cmalloc (HEAP_USER, va_arg (arg, size_t));
+	break;
+
       default:
 	set_errno (ENOSYS);
     }
   va_end (arg);
   return res;
+}
+
+extern "C" void
+dll_preload (const char *dll)
+{
+  if (!LoadLibrary (dll))
+    api_fatal ("couldn't load CYGWIN=preload DLL: %s, %E", dll);
+}
+
+extern "C" cw_callout_return_t
+dummy_callout (cw_callout_t, ...)
+{
+  return CO_R_KEEP_GOING;
 }
