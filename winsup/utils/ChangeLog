@@ -1,3 +1,8 @@
+2013-07-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (MINGW_LDFLAGS): Don't link against w32api libs.  These
+	are only for Cygwin executables.
+
 2013-07-07  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* cygcheck.cc (dll_info): Detect and report on symlinks.  Output wrong
