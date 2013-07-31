@@ -1,5 +1,10 @@
 2013-07-31  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* fhandler_tty.cc: Revert accidental checkin.
+	* update-copyright: Ditto.
+
+2013-07-31  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* cygheap.cc (cmalloc): Use size_t for size field.
 	(cmalloc_abort): Ditto.
 	(crealloc): Ditto.

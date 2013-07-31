@@ -54,10 +54,10 @@ sub update_maybe($%) {
     while (<>) {
 	if ($copyright) {
 	    push @file, $_;
-	} elsif (/^(?:dnl\s|.*"|[#\s]*)Copyright/o) {
+	} elsif (/^(?:dnl\s|[#\s]*)Copyright/o) {
 	    $copyright = $_;
 	    $copyright .= scalar <> while $copyright =~ /,\s*$/o;
-	    if ($copyright !~ /Red Hat, Inc\.(?: 1996\s*-\s*.*)?\n/so) {
+	    if ($copyright !~ /Red Hat, Inc\.\n/o) {
 		push @file, $copyright;
 		next;
 	    }
