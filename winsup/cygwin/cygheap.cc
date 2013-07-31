@@ -391,7 +391,7 @@ creturn (cygheap_types x, cygheap_entry * c, unsigned len, const char *fn = NULL
 }
 
 inline static void *
-cmalloc (cygheap_types x, DWORD n, const char *fn)
+cmalloc (cygheap_types x, size_t n, const char *fn)
 {
   cygheap_entry *c;
   MALLOC_CHECK;
@@ -400,19 +400,19 @@ cmalloc (cygheap_types x, DWORD n, const char *fn)
 }
 
 extern "C" void *
-cmalloc (cygheap_types x, DWORD n)
+cmalloc (cygheap_types x, size_t n)
 {
   return cmalloc (x, n, NULL);
 }
 
 extern "C" void *
-cmalloc_abort (cygheap_types x, DWORD n)
+cmalloc_abort (cygheap_types x, size_t n)
 {
   return cmalloc (x, n, "cmalloc");
 }
 
 inline static void *
-crealloc (void *s, DWORD n, const char *fn)
+crealloc (void *s, size_t n, const char *fn)
 {
   MALLOC_CHECK;
   if (s == NULL)
@@ -426,13 +426,13 @@ crealloc (void *s, DWORD n, const char *fn)
 }
 
 extern "C" void *__reg2
-crealloc (void *s, DWORD n)
+crealloc (void *s, size_t n)
 {
   return crealloc (s, n, NULL);
 }
 
 extern "C" void *__reg2
-crealloc_abort (void *s, DWORD n)
+crealloc_abort (void *s, size_t n)
 {
   return crealloc (s, n, "crealloc");
 }
@@ -454,7 +454,7 @@ cfree_and_set (char *&s, char *what)
 }
 
 inline static void *
-ccalloc (cygheap_types x, DWORD n, DWORD size, const char *fn)
+ccalloc (cygheap_types x, size_t n, size_t size, const char *fn)
 {
   cygheap_entry *c;
   MALLOC_CHECK;
@@ -466,13 +466,13 @@ ccalloc (cygheap_types x, DWORD n, DWORD size, const char *fn)
 }
 
 extern "C" void *__reg3
-ccalloc (cygheap_types x, DWORD n, DWORD size)
+ccalloc (cygheap_types x, size_t n, size_t size)
 {
   return ccalloc (x, n, size, NULL);
 }
 
 extern "C" void *__reg3
-ccalloc_abort (cygheap_types x, DWORD n, DWORD size)
+ccalloc_abort (cygheap_types x, size_t n, size_t size)
 {
   return ccalloc (x, n, size, "ccalloc");
 }

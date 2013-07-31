@@ -1,3 +1,24 @@
+2013-07-31  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* cygheap.cc (cmalloc): Use size_t for size field.
+	(cmalloc_abort): Ditto.
+	(crealloc): Ditto.
+	(crealloc_abort): Ditto.
+	(ccalloc): Ditto.
+	(ccalloc_abort): Ditto.
+	* cygheap_malloc.h (HEAP_USER): Add.
+	(cmalloc): Use size_t for size field in declaration.
+	(cmalloc_abort): Ditto.
+	(crealloc): Ditto.
+	(crealloc_abort): Ditto.
+	(ccalloc): Ditto.
+	(ccalloc_abort): Ditto.
+
+2013-07-31 Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (normalize_posix_path): Don't check existence of / or // dir
+	in parent dir check.
+
 2013-07-31 Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (normalize_posix_path): Don't check existence of / or // dir
@@ -921,7 +942,7 @@
 	* cygtls.h (_cygtls::signal_debugger): Change argument type.
 	(_cygtls::copy_context): Delete declaration.
 	* exceptions.cc (exception::handle): Don't call copy_context() here.
-	Move signal_handler call earlier and always call it.  
+	Move signal_handler call earlier and always call it.
 	(_cygtls::copy_context): Delete definition.
 	(_cygtls::signal_debugger): Move copy_context logic here.  Suspend
 	thread receiving signal before gathering context information.

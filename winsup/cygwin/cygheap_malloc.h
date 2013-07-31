@@ -25,6 +25,7 @@ enum cygheap_types
   HEAP_ARCHETYPES,
   HEAP_TLS,
   HEAP_COMMUNE,
+  HEAP_USER,
   HEAP_1_START,
   HEAP_1_HOOK,
   HEAP_1_STR,
@@ -41,12 +42,12 @@ enum cygheap_types
 
 extern "C" {
 void __reg1 cfree (void *);
-void *__reg2 cmalloc (cygheap_types, DWORD);
-void *__reg2 crealloc (void *, DWORD);
-void *__reg3 ccalloc (cygheap_types, DWORD, DWORD);
-void *__reg2 cmalloc_abort (cygheap_types, DWORD);
-void *__reg2 crealloc_abort (void *, DWORD);
-void *__reg3 ccalloc_abort (cygheap_types, DWORD, DWORD);
+void *__reg2 cmalloc (cygheap_types, size_t);
+void *__reg2 crealloc (void *, size_t);
+void *__reg3 ccalloc (cygheap_types, size_t, size_t);
+void *__reg2 cmalloc_abort (cygheap_types, size_t);
+void *__reg2 crealloc_abort (void *, size_t);
+void *__reg3 ccalloc_abort (cygheap_types, size_t, size_t);
 PWCHAR __reg1 cwcsdup (const PWCHAR);
 PWCHAR __reg1 cwcsdup1 (const PWCHAR);
 char *__reg1 cstrdup (const char *);
