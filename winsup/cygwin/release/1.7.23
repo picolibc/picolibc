@@ -20,3 +20,6 @@ Bug fixes:
 - Fix cyglsa build problem which made the cyglsa DLLs entirely non-functional
   when built with newer gcc versions.
   Fixes: http://cygwin.com/ml/cygwin/2013-07/msg00656.html
+
+- Fix incorrect handling of /.. or //.. in parent path existence check.
+  Fixes: http://cygwin.com/ml/cygwin/2013-07/msg00689.html
