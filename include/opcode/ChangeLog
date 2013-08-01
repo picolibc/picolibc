@@ -1,3 +1,9 @@
+2013-08-01  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h (MIPS16_INSN_WRITE_SP, MIPS16_INSN_READ_31)
+	(MIPS16_INSN_READ_PC, MIPS16_INSN_UNCOND_BRANCH)
+	(MIPS16_INSN_COND_BRANCH): Delete.
+
 2013-07-24  Anna Tikhonova  <anna.tikhonova@intel.com>
 	    Kirill Yukhin  <kirill.yukhin@intel.com>
 	    Michael Zolotukhin  <michael.v.zolotukhin@intel.com>

@@ -1644,8 +1644,6 @@ extern int bfd_mips_num_opcodes;
 #define MIPS16_INSN_WRITE_Z		    0x00000004
 /* Modifies the T ($24) register.  */
 #define MIPS16_INSN_WRITE_T		    0x00000008
-/* Modifies the SP ($29) register.  */
-#define MIPS16_INSN_WRITE_SP		    0x00000010
 /* Modifies the RA ($31) register.  */
 #define MIPS16_INSN_WRITE_31		    0x00000020
 /* Modifies the general purpose register in MIPS16OP_*_REG32R.  */
@@ -1660,16 +1658,8 @@ extern int bfd_mips_num_opcodes;
 #define MIPS16_INSN_READ_T		    0x00000400
 /* Reads the SP ($29) register.  */
 #define MIPS16_INSN_READ_SP		    0x00000800
-/* Reads the RA ($31) register.  */
-#define MIPS16_INSN_READ_31		    0x00001000
-/* Reads the program counter.  */
-#define MIPS16_INSN_READ_PC		    0x00002000
 /* Reads the general purpose register in MIPS16OP_*_REGR32.  */
 #define MIPS16_INSN_READ_GPR_X		    0x00004000
-/* Is an unconditional branch insn. */
-#define MIPS16_INSN_UNCOND_BRANCH	    0x00008000
-/* Is a conditional branch insn. */
-#define MIPS16_INSN_COND_BRANCH		    0x00010000
 
 /* The following flags have the same value for the mips16 opcode
    table:
