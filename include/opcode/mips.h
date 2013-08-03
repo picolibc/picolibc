@@ -537,15 +537,12 @@ struct mips_reg_pair_operand
    but the rules for MIPS16 instructions like ADDIUPC are more complicated.  */
 struct mips_pcrel_operand
 {
-  struct mips_operand root;
+  /* Encodes the offset.  */
+  struct mips_int_operand root;
 
-  /* The low ALIGN_LOG2 bits of the base PC are cleared to give PC'.  */
+  /* The low ALIGN_LOG2 bits of the base PC are cleared to give PC',
+     which is then added to the offset encoded by ROOT.  */
   unsigned int align_log2 : 8;
-
-  /* The operand is shifted left SHIFT places and added to PC'.
-     The operand is signed if IS_SIGNED.  */
-  unsigned int shift : 8;
-  unsigned int is_signed : 1;
 
   /* If INCLUDE_ISA_BIT, the ISA bit of the original base PC is then
      reinstated.  This is true for jumps and branches and false for
@@ -604,6 +601,25 @@ mips_decode_int_operand (const struct mips_int_operand *operand,
   return uval;
 }
 
+/* Return the maximum value that can be encoded by OPERAND.  */
+
+static inline int
+mips_int_operand_max (const struct mips_int_operand *operand)
+{
+  return (operand->max_val + operand->bias) << operand->shift;
+}
+
+/* Return the minimum value that can be encoded by OPERAND.  */
+
+static inline int
+mips_int_operand_min (const struct mips_int_operand *operand)
+{
+  unsigned int mask;
+
+  mask = (1 << operand->root.size) - 1;
+  return mips_int_operand_max (operand) - (mask << operand->shift);
+}
+
 /* Return the register that OPERAND encodes as UVAL.  */
 
 static inline int
@@ -625,10 +641,7 @@ mips_decode_pcrel_operand (const struct mips_pcrel_operand *operand,
   bfd_vma addr;
 
   addr = base_pc & -(1 << operand->align_log2);
-  if (operand->is_signed)
-    addr += mips_signed_operand (&operand->root, uval) * (1 << operand->shift);
-  else
-    addr += uval << operand->shift;
+  addr += mips_decode_int_operand (&operand->root, uval);
   if (operand->include_isa_bit)
     addr |= base_pc & 1;
   if (operand->flip_isa_bit)

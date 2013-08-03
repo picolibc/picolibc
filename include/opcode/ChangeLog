@@ -1,3 +1,9 @@
+2013-08-03  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h (mips_pcrel_operand): Inherit from mips_int_operand.
+	(mips_int_operand_min, mips_int_operand_max): New functions.
+	(mips_decode_pcrel_operand): Use mips_decode_int_operand.
+
 2013-08-01  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	* mips.h (mips_decode_reg_operand): New function.
