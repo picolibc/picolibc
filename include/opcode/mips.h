@@ -401,7 +401,15 @@ enum mips_operand_type {
   OP_REPEAT_PREV_REG,
 
   /* $pc, which has no encoding in the architectural instruction.  */
-  OP_PC
+  OP_PC,
+
+  /* A 4-bit XYZW channel mask or 2-bit XYZW index; the size determines
+     which.  */
+  OP_VU0_SUFFIX,
+
+  /* Like OP_VU0_SUFFIX, but used when the operand's value has already
+     been set.  Any suffix used here must match the previous value.  */
+  OP_VU0_MATCH_SUFFIX
 };
 
 /* Enumerates the types of MIPS register.  */
@@ -430,7 +438,19 @@ enum mips_reg_operand_type {
 
   /* Hardware registers $0-$31.  Mnemonic names like hwr_cpunum can
      also be used in some contexts.  */
-  OP_REG_HW
+  OP_REG_HW,
+
+  /* Floating-point registers $vf0-$vf31.  */
+  OP_REG_VF,
+
+  /* Integer registers $vi0-$vi31.  */
+  OP_REG_VI,
+
+  /* R5900 VU0 registers $I, $Q, $R and $ACC.  */
+  OP_REG_R5900_I,
+  OP_REG_R5900_Q,
+  OP_REG_R5900_R,
+  OP_REG_R5900_ACC
 };
 
 /* Base class for all operands.  */
@@ -781,6 +801,26 @@ struct mips_opcode
    "Y"	source register (OP_*_FS)
    "Z"	source register (OP_*_FT)
 
+   R5900 VU0 Macromode instructions:
+   "+5" 5 bit floating point register (FD)
+   "+6" 5 bit floating point register (FS)
+   "+7" 5 bit floating point register (FT)
+   "+8" 5 bit integer register (FD)
+   "+9" 5 bit integer register (FS)
+   "+0" 5 bit integer register (FT)
+   "+K" match an existing 4-bit channel mask starting at bit 21
+   "+L" 2-bit channel index starting at bit 21
+   "+M" 2-bit channel index starting at bit 23
+   "+N" match an existing 2-bit channel index starting at bit 0
+   "+f" 15 bit immediate for VCALLMS
+   "+g" 5 bit signed immediate for VIADDI
+   "+m" $ACC register (syntax only)
+   "+q" $Q register (syntax only)
+   "+r" $R register (syntax only)
+   "+y" $I register (syntax only)
+   "#+" "++" decorator in ($reg++) sequence
+   "#-" "--" decorator in (--$reg) sequence
+
    DSP ASE usage:
    "2" 2 bit unsigned immediate for byte align (OP_*_BP)
    "3" 3 bit unsigned immediate (OP_*_SA3)
@@ -846,15 +886,15 @@ struct mips_opcode
 
    Characters used so far, for quick reference when adding more:
    "1234567890"
-   "%[]<>(),+:'@!$*&\~"
+   "%[]<>(),+:'@!#$*&\~"
    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
    "abcdefghijklopqrstuvwxz"
 
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
-   "1234"
-   "ABCEFGHIJPQSXZ"
-   "abcijpstxz"
+   "1234567890"
+   "ABCEFGHIJKLMNPQSXZ"
+   "abcfgijmpqrstxyz"
 */
 
 /* These are the bits which may be set in the pinfo field of an
@@ -960,6 +1000,8 @@ struct mips_opcode
 #define INSN2_COND_BRANCH	    0x00001000
 /* Reads from $16.  This is true of the MIPS16 0x6500 nop.  */
 #define INSN2_READ_GPR_16           0x00002000
+/* Has an "\.x?y?z?w?" suffix based on mips_vu0_channel_mask.  */
+#define INSN2_VU0_CHANNEL_SUFFIX    0x00004000
 
 /* Masks used to mark instructions to indicate which MIPS ISA level
    they were introduced in.  INSN_ISA_MASK masks an enumeration that
@@ -1490,6 +1532,7 @@ enum
    Many instructions are short hand for other instructions (i.e., The
    jal <register> instruction is short for jalr <register>).  */
 
+extern const struct mips_operand mips_vu0_channel_mask;
 extern const struct mips_operand *decode_mips_operand (const char *);
 extern const struct mips_opcode mips_builtin_opcodes[];
 extern const int bfd_mips_num_builtin_opcodes;

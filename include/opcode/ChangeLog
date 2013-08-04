@@ -1,3 +1,13 @@
+2013-08-04  Jürgen Urban  <JuergenUrban@gmx.de>
+	    Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* mips.h: Document new VU0 operand characters.
+	(OP_VU0_SUFFIX, OP_VU0_MATCH_SUFFIX): New mips_operand_types.
+	(OP_REG_VF, OP_REG_VI, OP_REG_R5900_I, OP_REG_R5900_Q, OP_REG_R5900_R)
+	(OP_REG_R5900_ACC): New mips_reg_operand_types.
+	(INSN2_VU0_CHANNEL_SUFFIX): New macro.
+	(mips_vu0_channel_mask): Declare.
+
 2013-08-03  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	* mips.h (mips_pcrel_operand): Inherit from mips_int_operand.
