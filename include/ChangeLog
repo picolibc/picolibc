@@ -1,3 +1,8 @@
+2013-08-05  Eric Botcazou  <ebotcazou@adacore.com>
+            Konrad Eisele  <konrad@gaisler.com>
+
+	* opcode/sparc.h (sparc_opcode_arch_val): Add SPARC_OPCODE_ARCH_LEON.
+
 2013-06-08  Catherine Moore  <clm@codesourcery.com>
 
 	* opcode/mips.h (mips_opcode): Add ase field.

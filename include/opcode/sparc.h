@@ -42,6 +42,7 @@ enum sparc_opcode_arch_val
   SPARC_OPCODE_ARCH_V6 = 0,
   SPARC_OPCODE_ARCH_V7,
   SPARC_OPCODE_ARCH_V8,
+  SPARC_OPCODE_ARCH_LEON,
   SPARC_OPCODE_ARCH_SPARCLET,
   SPARC_OPCODE_ARCH_SPARCLITE,
   /* V9 variants must appear last.  */
