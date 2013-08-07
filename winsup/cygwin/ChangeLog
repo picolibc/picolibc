@@ -1,3 +1,7 @@
+2013-08-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_base::open_fs): Fix indentation.
+
 2013-07-31  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* fhandler_tty.cc: Revert accidental checkin.
@@ -19,12 +23,12 @@
 	(ccalloc): Ditto.
 	(ccalloc_abort): Ditto.
 
-2013-07-31 Corinna Vinschen  <corinna@vinschen.de>
+2013-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (normalize_posix_path): Don't check existence of / or // dir
 	in parent dir check.
 
-2013-07-31 Corinna Vinschen  <corinna@vinschen.de>
+2013-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (normalize_posix_path): Don't check existence of / or // dir
 	in parent dir check.
