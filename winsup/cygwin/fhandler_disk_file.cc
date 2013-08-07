@@ -1486,10 +1486,10 @@ fhandler_base::open_fs (int flags, mode_t mode)
       return 0;
     }
 
-    ino = pc.get_ino_by_handle (get_handle ());
-    /* A unique ID is necessary to recognize fhandler entries which are
-       duplicated by dup(2) or fork(2). */
-    NtAllocateLocallyUniqueId ((PLUID) &unique_id);
+  ino = pc.get_ino_by_handle (get_handle ());
+  /* A unique ID is necessary to recognize fhandler entries which are
+     duplicated by dup(2) or fork(2). */
+  NtAllocateLocallyUniqueId ((PLUID) &unique_id);
 
 out:
   syscall_printf ("%d = fhandler_disk_file::open(%S, %y)", res,

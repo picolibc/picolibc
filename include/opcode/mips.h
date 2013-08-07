@@ -332,310 +332,6 @@
 #define OP_SH_EVAOFFSET		7
 #define OP_MASK_EVAOFFSET	0x1ff
 
-/* Enumerates the various types of MIPS operand.  */
-enum mips_operand_type {
-  /* Described by mips_int_operand.  */
-  OP_INT,
-
-  /* Described by mips_mapped_int_operand.  */
-  OP_MAPPED_INT,
-
-  /* Described by mips_msb_operand.  */
-  OP_MSB,
-
-  /* Described by mips_reg_operand.  */
-  OP_REG,
-
-  /* Described by mips_reg_pair_operand.  */
-  OP_REG_PAIR,
-
-  /* Described by mips_pcrel_operand.  */
-  OP_PCREL,
-
-  /* A performance register.  The field is 5 bits in size, but the supported
-     values are much more restricted.  */
-  OP_PERF_REG,
-
-  /* The final operand in a microMIPS ADDIUSP instruction.  It mostly acts
-     as a normal 9-bit signed offset that is multiplied by four, but there
-     are four special cases:
-
-     -2 * 4 => -258 * 4
-     -1 * 4 => -257 * 4
-      0 * 4 =>  256 * 4
-      1 * 4 =>  257 * 4.  */
-  OP_ADDIUSP_INT,
-
-  /* The target of a (D)CLO or (D)CLZ instruction.  The operand spans two
-     5-bit register fields, both of which must be set to the destination
-     register.  */
-  OP_CLO_CLZ_DEST,
-
-  /* A register list for a microMIPS LWM or SWM instruction.  The operand
-     size determines whether the 16-bit or 32-bit encoding is required.  */
-  OP_LWM_SWM_LIST,
-
-  /* The register list for an emulated MIPS16 ENTRY or EXIT instruction.  */
-  OP_ENTRY_EXIT_LIST,
-
-  /* The register list and frame size for a MIPS16 SAVE or RESTORE
-     instruction.  */
-  OP_SAVE_RESTORE_LIST,
-
-  /* A 10-bit field VVVVVNNNNN used for octobyte and quadhalf instructions:
-
-     V      Meaning
-     -----  -------
-     0EEE0  8 copies of $vN[E], OB format
-     0EE01  4 copies of $vN[E], QH format
-     10110  all 8 elements of $vN, OB format
-     10101  all 4 elements of $vN, QH format
-     11110  8 copies of immediate N, OB format
-     11101  4 copies of immediate N, QH format.  */
-  OP_MDMX_IMM_REG,
-
-  /* A register operand that must match the destination register.  */
-  OP_REPEAT_DEST_REG,
-
-  /* A register operand that must match the previous register.  */
-  OP_REPEAT_PREV_REG,
-
-  /* $pc, which has no encoding in the architectural instruction.  */
-  OP_PC
-};
-
-/* Enumerates the types of MIPS register.  */
-enum mips_reg_operand_type {
-  /* General registers $0-$31.  Software names like $at can also be used.  */
-  OP_REG_GP,
-
-  /* Floating-point registers $f0-$f31.  */
-  OP_REG_FP,
-
-  /* Coprocessor condition code registers $cc0-$cc7.  FPU condition codes
-     can also be written $fcc0-$fcc7.  */
-  OP_REG_CCC,
-
-  /* FPRs used in a vector capacity.  They can be written $f0-$f31
-     or $v0-$v31, although the latter form is not used for the VR5400
-     vector instructions.  */
-  OP_REG_VEC,
-
-  /* DSP accumulator registers $ac0-$ac3.  */
-  OP_REG_ACC,
-
-  /* Coprocessor registers $0-$31.  Mnemonic names like c0_cause can
-     also be used in some contexts.  */
-  OP_REG_COPRO,
-
-  /* Hardware registers $0-$31.  Mnemonic names like hwr_cpunum can
-     also be used in some contexts.  */
-  OP_REG_HW
-};
-
-/* Base class for all operands.  */
-struct mips_operand
-{
-  /* The type of the operand.  */
-  enum mips_operand_type type;
-
-  /* The operand occupies SIZE bits of the instruction, starting at LSB.  */
-  unsigned short size;
-  unsigned short lsb;
-};
-
-/* Describes an integer operand with a regular encoding pattern.  */
-struct mips_int_operand
-{
-  struct mips_operand root;
-
-  /* The low ROOT.SIZE bits of MAX_VAL encodes (MAX_VAL + BIAS) << SHIFT.
-     The cyclically previous field value encodes 1 << SHIFT less than that,
-     and so on.  E.g.
-
-     - for { { T, 4, L }, 14, 0, 0 }, field values 0...14 encode themselves,
-       but 15 encodes -1.
-
-     - { { T, 8, L }, 127, 0, 2 } is a normal signed 8-bit operand that is
-       shifted left two places.
-
-     - { { T, 3, L }, 8, 0, 0 } is a normal unsigned 3-bit operand except
-       that 0 encodes 8.
-
-     - { { ... }, 0, 1, 3 } means that N encodes (N + 1) << 3.  */
-  unsigned int max_val;
-  int bias;
-  unsigned int shift;
-
-  /* True if the operand should be printed as hex rather than decimal.  */
-  bfd_boolean print_hex;
-};
-
-/* Uses a lookup table to describe a small integer operand.  */
-struct mips_mapped_int_operand
-{
-  struct mips_operand root;
-
-  /* Maps each encoding value to the integer that it represents.  */
-  const int *int_map;
-
-  /* True if the operand should be printed as hex rather than decimal.  */
-  bfd_boolean print_hex;
-};
-
-/* An operand that encodes the most significant bit position of a bitfield.
-   Given a bitfield that spans bits [MSB, LSB], some operands of this type
-   encode MSB directly while others encode MSB - LSB.  Each operand of this
-   type is preceded by an integer operand that specifies LSB.
-
-   The assembly form varies between instructions.  For some instructions,
-   such as EXT, the operand is written as the bitfield size.  For others,
-   such as EXTS, it is written in raw MSB - LSB form.  */
-struct mips_msb_operand
-{
-  struct mips_operand root;
-
-  /* The assembly-level operand encoded by a field value of 0.  */
-  int bias;
-
-  /* True if the operand encodes MSB directly, false if it encodes
-     MSB - LSB.  */
-  bfd_boolean add_lsb;
-
-  /* The maximum value of MSB + 1.  */
-  unsigned int opsize;
-};
-
-/* Describes a single register operand.  */
-struct mips_reg_operand
-{
-  struct mips_operand root;
-
-  /* The type of register.  */
-  enum mips_reg_operand_type reg_type;
-
-  /* If nonnull, REG_MAP[N] gives the register associated with encoding N,
-     otherwise the encoding is the same as the register number.  */
-  const unsigned char *reg_map;
-};
-
-/* Describes an operand that encodes a pair of registers.  */
-struct mips_reg_pair_operand
-{
-  struct mips_operand root;
-
-  /* The type of register.  */
-  enum mips_reg_operand_type reg_type;
-
-  /* Encoding N represents REG1_MAP[N], REG2_MAP[N].  */
-  unsigned char *reg1_map;
-  unsigned char *reg2_map;
-};
-
-/* Describes an operand that is calculated relative to a base PC.
-   The base PC is usually the address of the following instruction,
-   but the rules for MIPS16 instructions like ADDIUPC are more complicated.  */
-struct mips_pcrel_operand
-{
-  struct mips_operand root;
-
-  /* The low ALIGN_LOG2 bits of the base PC are cleared to give PC'.  */
-  unsigned int align_log2 : 8;
-
-  /* The operand is shifted left SHIFT places and added to PC'.
-     The operand is signed if IS_SIGNED.  */
-  unsigned int shift : 8;
-  unsigned int is_signed : 1;
-
-  /* If INCLUDE_ISA_BIT, the ISA bit of the original base PC is then
-     reinstated.  This is true for jumps and branches and false for
-     PC-relative data instructions.  */
-  unsigned int include_isa_bit : 1;
-
-  /* If FLIP_ISA_BIT, the ISA bit of the result is inverted.
-     This is true for JALX and false otherwise.  */
-  unsigned int flip_isa_bit : 1;
-};
-
-/* Return a version of INSN in which the field specified by OPERAND
-   has value UVAL.  */
-
-static inline unsigned int
-mips_insert_operand (const struct mips_operand *operand, unsigned int insn,
-		     unsigned int uval)
-{
-  unsigned int mask;
-
-  mask = (1 << operand->size) - 1;
-  insn &= ~(mask << operand->lsb);
-  insn |= (uval & mask) << operand->lsb;
-  return insn;
-}
-
-/* Extract OPERAND from instruction INSN.  */
-
-static inline unsigned int
-mips_extract_operand (const struct mips_operand *operand, unsigned int insn)
-{
-  return (insn >> operand->lsb) & ((1 << operand->size) - 1);
-}
-
-/* UVAL is the value encoded by OPERAND.  Return it in signed form.  */
-
-static inline int
-mips_signed_operand (const struct mips_operand *operand, unsigned int uval)
-{
-  unsigned int sign_bit, mask;
-
-  mask = (1 << operand->size) - 1;
-  sign_bit = 1 << (operand->size - 1);
-  return ((uval + sign_bit) & mask) - sign_bit;
-}
-
-/* Return the integer that OPERAND encodes as UVAL.  */
-
-static inline int
-mips_decode_int_operand (const struct mips_int_operand *operand,
-			 unsigned int uval)
-{
-  uval |= (operand->max_val - uval) & -(1 << operand->root.size);
-  uval += operand->bias;
-  uval <<= operand->shift;
-  return uval;
-}
-
-/* Return the register that OPERAND encodes as UVAL.  */
-
-static inline int
-mips_decode_reg_operand (const struct mips_reg_operand *operand,
-			 unsigned int uval)
-{
-  if (operand->reg_map)
-    uval = operand->reg_map[uval];
-  return uval;
-}
-
-/* PC-relative operand OPERAND has value UVAL and is relative to BASE_PC.
-   Return the address that it encodes.  */
-
-static inline bfd_vma
-mips_decode_pcrel_operand (const struct mips_pcrel_operand *operand,
-			   bfd_vma base_pc, unsigned int uval)
-{
-  bfd_vma addr;
-
-  addr = base_pc & -(1 << operand->align_log2);
-  if (operand->is_signed)
-    addr += mips_signed_operand (&operand->root, uval) * (1 << operand->shift);
-  else
-    addr += uval << operand->shift;
-  if (operand->include_isa_bit)
-    addr |= base_pc & 1;
-  if (operand->flip_isa_bit)
-    addr ^= 1;
-  return addr;
-}
-
 /* This structure holds information for a particular instruction.  */
 
 struct mips_opcode
@@ -847,67 +543,71 @@ struct mips_opcode
 /* These are the bits which may be set in the pinfo field of an
    instructions, if it is not equal to INSN_MACRO.  */
 
-/* Writes to operand number N.  */
-#define INSN_WRITE_SHIFT            0
-#define INSN_WRITE_1                0x00000001
-#define INSN_WRITE_2                0x00000002
-#define INSN_WRITE_ALL              0x00000003
-/* Reads from operand number N.  */
-#define INSN_READ_SHIFT             2
-#define INSN_READ_1                 0x00000004
-#define INSN_READ_2                 0x00000008
-#define INSN_READ_3                 0x00000010
-#define INSN_READ_4                 0x00000020
-#define INSN_READ_ALL               0x0000003c
+/* Modifies the general purpose register in OP_*_RD.  */
+#define INSN_WRITE_GPR_D            0x00000001
+/* Modifies the general purpose register in OP_*_RT.  */
+#define INSN_WRITE_GPR_T            0x00000002
 /* Modifies general purpose register 31.  */
-#define INSN_WRITE_GPR_31           0x00000040
+#define INSN_WRITE_GPR_31           0x00000004
+/* Modifies the floating point register in OP_*_FD.  */
+#define INSN_WRITE_FPR_D            0x00000008
+/* Modifies the floating point register in OP_*_FS.  */
+#define INSN_WRITE_FPR_S            0x00000010
+/* Modifies the floating point register in OP_*_FT.  */
+#define INSN_WRITE_FPR_T            0x00000020
+/* Reads the general purpose register in OP_*_RS.  */
+#define INSN_READ_GPR_S             0x00000040
+/* Reads the general purpose register in OP_*_RT.  */
+#define INSN_READ_GPR_T             0x00000080
+/* Reads the floating point register in OP_*_FS.  */
+#define INSN_READ_FPR_S             0x00000100
+/* Reads the floating point register in OP_*_FT.  */
+#define INSN_READ_FPR_T             0x00000200
+/* Reads the floating point register in OP_*_FR.  */
+#define INSN_READ_FPR_R		    0x00000400
 /* Modifies coprocessor condition code.  */
-#define INSN_WRITE_COND_CODE        0x00000080
+#define INSN_WRITE_COND_CODE        0x00000800
 /* Reads coprocessor condition code.  */
-#define INSN_READ_COND_CODE         0x00000100
+#define INSN_READ_COND_CODE         0x00001000
 /* TLB operation.  */
-#define INSN_TLB                    0x00000200
+#define INSN_TLB                    0x00002000
 /* Reads coprocessor register other than floating point register.  */
-#define INSN_COP                    0x00000400
+#define INSN_COP                    0x00004000
 /* Instruction loads value from memory, requiring delay.  */
-#define INSN_LOAD_MEMORY_DELAY      0x00000800
+#define INSN_LOAD_MEMORY_DELAY      0x00008000
 /* Instruction loads value from coprocessor, requiring delay.  */
-#define INSN_LOAD_COPROC_DELAY	    0x00001000
+#define INSN_LOAD_COPROC_DELAY	    0x00010000
 /* Instruction has unconditional branch delay slot.  */
-#define INSN_UNCOND_BRANCH_DELAY    0x00002000
+#define INSN_UNCOND_BRANCH_DELAY    0x00020000
 /* Instruction has conditional branch delay slot.  */
-#define INSN_COND_BRANCH_DELAY      0x00004000
+#define INSN_COND_BRANCH_DELAY      0x00040000
 /* Conditional branch likely: if branch not taken, insn nullified.  */
-#define INSN_COND_BRANCH_LIKELY	    0x00008000
+#define INSN_COND_BRANCH_LIKELY	    0x00080000
 /* Moves to coprocessor register, requiring delay.  */
-#define INSN_COPROC_MOVE_DELAY      0x00010000
+#define INSN_COPROC_MOVE_DELAY      0x00100000
 /* Loads coprocessor register from memory, requiring delay.  */
-#define INSN_COPROC_MEMORY_DELAY    0x00020000
+#define INSN_COPROC_MEMORY_DELAY    0x00200000
 /* Reads the HI register.  */
-#define INSN_READ_HI		    0x00040000
+#define INSN_READ_HI		    0x00400000
 /* Reads the LO register.  */
-#define INSN_READ_LO		    0x00080000
+#define INSN_READ_LO		    0x00800000
 /* Modifies the HI register.  */
-#define INSN_WRITE_HI		    0x00100000
+#define INSN_WRITE_HI		    0x01000000
 /* Modifies the LO register.  */
-#define INSN_WRITE_LO		    0x00200000
+#define INSN_WRITE_LO		    0x02000000
 /* Not to be placed in a branch delay slot, either architecturally
    or for ease of handling (such as with instructions that take a trap).  */
-#define INSN_NO_DELAY_SLOT	    0x00400000
+#define INSN_NO_DELAY_SLOT	    0x04000000
 /* Instruction stores value into memory.  */
-#define INSN_STORE_MEMORY	    0x00800000
+#define INSN_STORE_MEMORY	    0x08000000
 /* Instruction uses single precision floating point.  */
-#define FP_S			    0x01000000
+#define FP_S			    0x10000000
 /* Instruction uses double precision floating point.  */
-#define FP_D			    0x02000000
+#define FP_D			    0x20000000
 /* Instruction is part of the tx39's integer multiply family.    */
-#define INSN_MULT                   0x04000000
-/* Reads general purpose register 24.  */
-#define INSN_READ_GPR_24            0x08000000
-/* Writes to general purpose register 24.  */
-#define INSN_WRITE_GPR_24           0x10000000
-/* A user-defined instruction.  */
-#define INSN_UDI                    0x20000000
+#define INSN_MULT                   0x40000000
+/* Modifies the general purpose register in MICROMIPSOP_*_RS.  */
+#define INSN_WRITE_GPR_S	    0x80000000
 /* Instruction is actually a macro.  It should be ignored by the
    disassembler, and requires special treatment by the assembler.  */
 #define INSN_MACRO                  0xffffffff
@@ -929,24 +629,62 @@ struct mips_opcode
    only be set for macros.  For instructions, FP_D in pinfo carries the
    same information.  */
 #define INSN2_M_FP_D		    0x00000010
+/* Modifies the general purpose register in OP_*_RZ.  */
+#define INSN2_WRITE_GPR_Z	    0x00000020
+/* Modifies the floating point register in OP_*_FZ.  */
+#define INSN2_WRITE_FPR_Z	    0x00000040
+/* Reads the general purpose register in OP_*_RZ.  */
+#define INSN2_READ_GPR_Z	    0x00000080
+/* Reads the floating point register in OP_*_FZ.  */
+#define INSN2_READ_FPR_Z	    0x00000100
+/* Reads the general purpose register in OP_*_RD.  */
+#define INSN2_READ_GPR_D	    0x00000200
+
+
 /* Instruction has a branch delay slot that requires a 16-bit instruction.  */
-#define INSN2_BRANCH_DELAY_16BIT    0x00000020
+#define INSN2_BRANCH_DELAY_16BIT    0x00000400
 /* Instruction has a branch delay slot that requires a 32-bit instruction.  */
-#define INSN2_BRANCH_DELAY_32BIT    0x00000040
-/* Writes to the stack pointer ($29).  */
-#define INSN2_WRITE_SP		    0x00000080
-/* Reads from the stack pointer ($29).  */
-#define INSN2_READ_SP		    0x00000100
+#define INSN2_BRANCH_DELAY_32BIT    0x00000800
+/* Reads the floating point register in MICROMIPSOP_*_FD.  */
+#define INSN2_READ_FPR_D	    0x00001000
+/* Modifies the general purpose register in MICROMIPSOP_*_MB.  */
+#define INSN2_WRITE_GPR_MB	    0x00002000
+/* Reads the general purpose register in MICROMIPSOP_*_MC.  */
+#define INSN2_READ_GPR_MC	    0x00004000
+/* Reads/writes the general purpose register in MICROMIPSOP_*_MD.  */
+#define INSN2_MOD_GPR_MD	    0x00008000
+/* Reads the general purpose register in MICROMIPSOP_*_ME.  */
+#define INSN2_READ_GPR_ME	    0x00010000
+/* Reads/writes the general purpose register in MICROMIPSOP_*_MF.  */
+#define INSN2_MOD_GPR_MF	    0x00020000
+/* Reads the general purpose register in MICROMIPSOP_*_MG.  */
+#define INSN2_READ_GPR_MG	    0x00040000
+/* Reads the general purpose register in MICROMIPSOP_*_MJ.  */
+#define INSN2_READ_GPR_MJ	    0x00080000
+/* Modifies the general purpose register in MICROMIPSOP_*_MJ.  */
+#define INSN2_WRITE_GPR_MJ	    0x00100000
+/* Reads the general purpose register in MICROMIPSOP_*_MP.  */
+#define INSN2_READ_GPR_MP	    0x00200000
+/* Modifies the general purpose register in MICROMIPSOP_*_MP.  */
+#define INSN2_WRITE_GPR_MP	    0x00400000
+/* Reads the general purpose register in MICROMIPSOP_*_MQ.  */
+#define INSN2_READ_GPR_MQ	    0x00800000
+/* Reads/Writes the stack pointer ($29).  */
+#define INSN2_MOD_SP		    0x01000000
 /* Reads the RA ($31) register.  */
-#define INSN2_READ_GPR_31	    0x00000200
+#define INSN2_READ_GPR_31	    0x02000000
+/* Reads the global pointer ($28).  */
+#define INSN2_READ_GP		    0x04000000
 /* Reads the program counter ($pc).  */
-#define INSN2_READ_PC		    0x00000400
+#define INSN2_READ_PC		    0x08000000
 /* Is an unconditional branch insn. */
-#define INSN2_UNCOND_BRANCH	    0x00000800
+#define INSN2_UNCOND_BRANCH	    0x10000000
 /* Is a conditional branch insn. */
-#define INSN2_COND_BRANCH	    0x00001000
-/* Reads from $16.  This is true of the MIPS16 0x6500 nop.  */
-#define INSN2_READ_GPR_16           0x00002000
+#define INSN2_COND_BRANCH	    0x20000000
+/* Modifies the general purpose registers in MICROMIPSOP_*_MH.  */
+#define INSN2_WRITE_GPR_MH	    0x40000000
+/* Reads the general purpose registers in MICROMIPSOP_*_MM/N.  */
+#define INSN2_READ_GPR_MMN	    0x80000000
 
 /* Masks used to mark instructions to indicate which MIPS ISA level
    they were introduced in.  INSN_ISA_MASK masks an enumeration that
@@ -1477,7 +1215,6 @@ enum
    Many instructions are short hand for other instructions (i.e., The
    jal <register> instruction is short for jalr <register>).  */
 
-extern const struct mips_operand *decode_mips_operand (const char *);
 extern const struct mips_opcode mips_builtin_opcodes[];
 extern const int bfd_mips_num_builtin_opcodes;
 extern struct mips_opcode *mips_opcodes;
@@ -1568,8 +1305,6 @@ extern int bfd_mips_num_opcodes;
    "l" register list for entry instruction
    "L" register list for exit instruction
 
-   "I" an immediate value used for macros
-
    The remaining codes may be extended.  Except as otherwise noted,
    the full extended operand is a 16 bit signed value.
    "<" 3 bit unsigned shift count * 0 (MIPS16OP_*_RZ) (full 5 bit unsigned)
@@ -1602,6 +1337,44 @@ extern int bfd_mips_num_opcodes;
 #define MIPS16_ALL_ARGS    0xe
 #define MIPS16_ALL_STATICS 0xb
 
+/* For the mips16, we use the same opcode table format and a few of
+   the same flags.  However, most of the flags are different.  */
+
+/* Modifies the register in MIPS16OP_*_RX.  */
+#define MIPS16_INSN_WRITE_X		    0x00000001
+/* Modifies the register in MIPS16OP_*_RY.  */
+#define MIPS16_INSN_WRITE_Y		    0x00000002
+/* Modifies the register in MIPS16OP_*_RZ.  */
+#define MIPS16_INSN_WRITE_Z		    0x00000004
+/* Modifies the T ($24) register.  */
+#define MIPS16_INSN_WRITE_T		    0x00000008
+/* Modifies the SP ($29) register.  */
+#define MIPS16_INSN_WRITE_SP		    0x00000010
+/* Modifies the RA ($31) register.  */
+#define MIPS16_INSN_WRITE_31		    0x00000020
+/* Modifies the general purpose register in MIPS16OP_*_REG32R.  */
+#define MIPS16_INSN_WRITE_GPR_Y		    0x00000040
+/* Reads the register in MIPS16OP_*_RX.  */
+#define MIPS16_INSN_READ_X		    0x00000080
+/* Reads the register in MIPS16OP_*_RY.  */
+#define MIPS16_INSN_READ_Y		    0x00000100
+/* Reads the register in MIPS16OP_*_MOVE32Z.  */
+#define MIPS16_INSN_READ_Z		    0x00000200
+/* Reads the T ($24) register.  */
+#define MIPS16_INSN_READ_T		    0x00000400
+/* Reads the SP ($29) register.  */
+#define MIPS16_INSN_READ_SP		    0x00000800
+/* Reads the RA ($31) register.  */
+#define MIPS16_INSN_READ_31		    0x00001000
+/* Reads the program counter.  */
+#define MIPS16_INSN_READ_PC		    0x00002000
+/* Reads the general purpose register in MIPS16OP_*_REGR32.  */
+#define MIPS16_INSN_READ_GPR_X		    0x00004000
+/* Is an unconditional branch insn. */
+#define MIPS16_INSN_UNCOND_BRANCH	    0x00008000
+/* Is a conditional branch insn. */
+#define MIPS16_INSN_COND_BRANCH		    0x00010000
+
 /* The following flags have the same value for the mips16 opcode
    table:
 
@@ -1618,7 +1391,6 @@ extern int bfd_mips_num_opcodes;
    FP_D (never used)
    */
 
-extern const struct mips_operand *decode_mips16_operand (char, bfd_boolean);
 extern const struct mips_opcode mips16_opcodes[];
 extern const int bfd_mips16_num_opcodes;
 
@@ -2006,7 +1778,6 @@ extern const int bfd_mips16_num_opcodes;
    " bcdefghij lmn pq st   xyz"
 */
 
-extern const struct mips_operand *decode_micromips_operand (const char *);
 extern const struct mips_opcode micromips_opcodes[];
 extern const int bfd_micromips_num_opcodes;
 
