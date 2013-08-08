@@ -7,7 +7,7 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <string.h>
-	char *strncat(char *<restrict [dst]>, const char *<restrict [src]>,
+	char *strncat(char *restrict <[dst]>, const char *restrict <[src]>,
                       size_t <[length]>);
 
 TRAD_SYNOPSIS
