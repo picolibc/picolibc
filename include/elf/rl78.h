@@ -1,5 +1,5 @@
 /* RL78 ELF support for BFD.
-   Copyright (C) 2008, 2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 2008-2013 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -104,8 +104,9 @@ END_RELOC_NUMBERS (R_RL78_max)
 #define EF_RL78_ALL_FLAGS	(EF_RL78_CPU_MASK)
 
 /* Values for the e_flags field in the ELF header.  */
-#define E_FLAG_RL78_64BIT_DOUBLES		(1 << 0)
+#define E_FLAG_RL78_64BIT_DOUBLES	(1 << 0)
 #define E_FLAG_RL78_DSP			(1 << 1) /* Defined in the RL78 CPU Object file specification, but not explained.  */
+#define E_FLAG_RL78_G10			(1 << 2) /* CPU is missing register banks 1-3, so uses different ABI.  */
 
 /* These define the addend field of R_RL78_RH_RELAX relocations.  */
 #define	RL78_RELAXA_BRA		0x00000010	/* Any type of branch (must be decoded).  */

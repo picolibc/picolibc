@@ -1,3 +1,7 @@
+2013-08-09  Nick Clifton  <nickc@redhat.com>
+
+	* rl78.c (E_FLAG_RL78_G10): Define.
+
 2013-07-15  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* mips.h (Tag_GNU_MIPS_ABI_FP): Remove comment.
