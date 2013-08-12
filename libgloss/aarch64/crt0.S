@@ -81,7 +81,6 @@
 
 	FUNC_START	_mainCRTStartup
 	FUNC_START	_start
-	FUNC_START	start
 
 /* Start by setting up a stack */
 

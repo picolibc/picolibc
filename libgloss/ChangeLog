@@ -1,3 +1,8 @@
+2013-08-12  Yufeng Zhang <Yufeng.Zhang@arm.com>
+
+	* aarch64/crt0.S: Remove 'start'.
+	* arm/crt0.S: Ditto.
+	* arm/redboot-crt0.S: Ditto.
 
 2013-07-24  Steve Ellcey  <sellcey@mips.com>
 
