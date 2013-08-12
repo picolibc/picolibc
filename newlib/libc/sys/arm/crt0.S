@@ -72,7 +72,6 @@
 
 	FUNC_START	_mainCRTStartup
 	FUNC_START	_start
-	FUNC_START	start
 #if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
 	/* Annotation for EABI unwinding tables.  */
 	.fnstart

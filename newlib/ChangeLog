@@ -1,3 +1,7 @@
+2013-08-12  Yufeng Zhang  <Yufeng.Zhang@arm.com>
+
+	* libc/sys/arm/crt0.S: Remove 'start'.
+
 2013-08-08  Freddie Chopin  <freddie_chopin@op.pl>
 
 	* libc/string/strncat.c: Fix typo in documentation.
