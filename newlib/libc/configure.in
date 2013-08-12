@@ -17,16 +17,6 @@ AC_ARG_ENABLE(newlib-io-pos-args,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-pos-args option) ;;
  esac], [newlib_io_pos_args=no])dnl
 
-dnl Support --enable-newlib-wide-orient used by libc/stdio
-AC_ARG_ENABLE(newlib_wide_orient,
-[  --disable-newlib-wide-orient    Turn off wide char orient in streamio],
-[case "${enableval}" in
-   yes) newlib_wide_orient=yes ;;
-   no)  newlib_wide_orient=no ;;
-   *) AC_MSG_ERROR(bad value ${enableval} for newlib-wide-orient) ;;
- esac],[newlib_wide_orient=yes])
-AM_CONDITIONAL(NEWLIB_WIDE_ORIENT, test x$newlib_wide_orient = xyes)
-
 dnl Support --enable-newlib-nano-malloc used by libc/stdlib
 AC_ARG_ENABLE(newlib_nano_malloc,
 [  --enable-newlib-nano-malloc    Use small-footprint nano-malloc implementation],

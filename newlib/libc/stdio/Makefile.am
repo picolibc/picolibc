@@ -112,7 +112,6 @@ else
 if ELIX_LEVEL_3
 ELIX_4_SOURCES =
 else
-if NEWLIB_WIDE_ORIENT
 ELIX_4_SOURCES = \
 	asniprintf.c		\
 	asnprintf.c		\
@@ -146,21 +145,7 @@ ELIX_4_SOURCES = \
 	vwscanf.c		\
 	wprintf.c		\
 	wscanf.c
-else
-ELIX_4_SOURCES = \
-	asniprintf.c		\
-	asnprintf.c		\
-	diprintf.c		\
-	dprintf.c		\
-	fmemopen.c		\
-	fopencookie.c		\
-	fpurge.c		\
-	funopen.c		\
-	open_memstream.c	\
-	vasniprintf.c		\
-	vasnprintf.c
 
-endif !NEWLIB_WIDE_ORIENT
 endif !ELIX_LEVEL_3
 endif !ELIX_LEVEL_2
 endif !ELIX_LEVEL_1

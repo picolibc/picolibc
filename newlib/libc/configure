@@ -751,8 +751,6 @@ MAY_SUPPLY_SYSCALLS_FALSE
 MAY_SUPPLY_SYSCALLS_TRUE
 NEWLIB_NANO_MALLOC_FALSE
 NEWLIB_NANO_MALLOC_TRUE
-NEWLIB_WIDE_ORIENT_FALSE
-NEWLIB_WIDE_ORIENT_TRUE
 target_alias
 host_alias
 build_alias
@@ -795,7 +793,6 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_newlib_io_pos_args
-enable_newlib_wide_orient
 enable_newlib_nano_malloc
 enable_multilib
 enable_target_optspace
@@ -1446,7 +1443,6 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-newlib-io-pos-args enable printf-family positional arg support
-  --disable-newlib-wide-orient    Turn off wide char orient in streamio
   --enable-newlib-nano-malloc    Use small-footprint nano-malloc implementation
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
@@ -2219,26 +2215,6 @@ if test "${enable_newlib_io_pos_args+set}" = set; then :
 else
   newlib_io_pos_args=no
 fi
-
-# Check whether --enable-newlib_wide_orient was given.
-if test "${enable_newlib_wide_orient+set}" = set; then :
-  enableval=$enable_newlib_wide_orient; case "${enableval}" in
-   yes) newlib_wide_orient=yes ;;
-   no)  newlib_wide_orient=no ;;
-   *) as_fn_error $? "bad value ${enableval} for newlib-wide-orient" "$LINENO" 5 ;;
- esac
-else
-  newlib_wide_orient=yes
-fi
-
- if test x$newlib_wide_orient = xyes; then
-  NEWLIB_WIDE_ORIENT_TRUE=
-  NEWLIB_WIDE_ORIENT_FALSE='#'
-else
-  NEWLIB_WIDE_ORIENT_TRUE='#'
-  NEWLIB_WIDE_ORIENT_FALSE=
-fi
-
 
 # Check whether --enable-newlib_nano_malloc was given.
 if test "${enable_newlib_nano_malloc+set}" = set; then :
@@ -12237,10 +12213,6 @@ LIBOBJS=$ac_libobjs
 LTLIBOBJS=$ac_ltlibobjs
 
 
-if test -z "${NEWLIB_WIDE_ORIENT_TRUE}" && test -z "${NEWLIB_WIDE_ORIENT_FALSE}"; then
-  as_fn_error $? "conditional \"NEWLIB_WIDE_ORIENT\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${NEWLIB_NANO_MALLOC_TRUE}" && test -z "${NEWLIB_NANO_MALLOC_FALSE}"; then
   as_fn_error $? "conditional \"NEWLIB_NANO_MALLOC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
