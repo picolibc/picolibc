@@ -1,0 +1,13 @@
+What's new:
+-----------
+
+- Allow application override of posix_memalign.
+
+
+What changed:
+-------------
+
+
+Bug fixes:
+----------
+

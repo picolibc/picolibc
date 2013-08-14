@@ -1,3 +1,14 @@
+2013-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/cygwin.h (struct per_process): Add posix_memalign.  Reduce
+	size of unused2 accordingly.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* lib/_cygwin_crt0_common.cc (_cygwin_crt0_common): Initialize
+	u->posix_memalign with address of posix_memalign.
+	* malloc_wrapper.cc (posix_memalign): Call user-provided posix_memalign
+	rather than just returning ENOSYS.
+	* globals.cc (__cygwin_user_data): Initialize posix_memalign member.
+
 2013-08-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 24.

@@ -438,12 +438,13 @@ details. */
 	   arc4random_stir, arc4random_uniform.
       267: Export rawmemchr.
       268: Export GetCommandLineA, GetCommandLineW
+      269: Allow application override of posix_memalign.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 268
+#define CYGWIN_VERSION_API_MINOR 269
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

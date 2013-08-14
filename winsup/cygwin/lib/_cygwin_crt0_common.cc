@@ -145,6 +145,7 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->free = &free;
   u->realloc = &realloc;
   u->calloc = &calloc;
+  u->posix_memalign = &posix_memalign;
 
   /* Likewise for the C++ memory operators, if any, but not if we
      were dlopen()'d, as we might get dlclose()'d and that would

@@ -304,10 +304,13 @@ struct per_process
   /* For future expansion, so apps won't have to be relinked if we
      add an item. */
 #ifdef __x86_64__
-  DWORD_PTR unused2[5];
+  DWORD_PTR unused2[4];
 #else
-  DWORD_PTR unused2[3];
+  DWORD_PTR unused2[2];
 #endif
+
+  int (*posix_memalign)(void **, size_t, size_t);
+
   void *pseudo_reloc_start;
   void *pseudo_reloc_end;
   void *image_base;

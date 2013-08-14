@@ -194,6 +194,7 @@ extern "C" {
    /* api_major */ 0,
    /* api_minor */ 0,
    /* unused2 */ {},
+   /* posix_memalign */ posix_memalign,
    /* pseudo_reloc_start */ NULL,
    /* pseudo_reloc_end */ NULL,
    /* image_base */ NULL,

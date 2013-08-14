@@ -115,7 +115,7 @@ posix_memalign (void **memptr, size_t alignment, size_t bytes)
 
   void *res;
   if (!use_internal)
-    return ENOSYS;
+    return user_data->posix_memalign (memptr, alignment, bytes);
   if ((alignment & (alignment - 1)) != 0)
     return EINVAL;
   __malloc_lock ();
