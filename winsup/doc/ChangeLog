@@ -1,3 +1,8 @@
+2013-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.24): Add new section.  Mention
+	posix_memalign override.
+
 2013-07-26  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* new-features.xml (ov-new1.7.23): Add new section.  Mention wincmdln.

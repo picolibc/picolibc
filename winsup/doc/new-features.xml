@@ -4,13 +4,25 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.24"><title>What's new and what changed from 1.7.23 to 1.7.24</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Allow application override of posix_memalign.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.23"><title>What's new and what changed from 1.7.22 to 1.7.23</title>
 
 <itemizedlist mark="bullet">
 
 <listitem><para>
-Added CYGWIN environment variable keyword "wincmdln" which causes Cygwin to send the full
-windows command line to any subprocesses.
+Added CYGWIN environment variable keyword "wincmdln" which causes Cygwin to
+send the full windows command line to any subprocesses.
 </para></listitem>
 
 </itemizedlist>
