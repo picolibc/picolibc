@@ -43,11 +43,6 @@
 	* path.cc (normalize_posix_path): Don't check existence of / or // dir
 	in parent dir check.
 
-2013-07-31  Corinna Vinschen  <corinna@vinschen.de>
-
-	* path.cc (normalize_posix_path): Don't check existence of / or // dir
-	in parent dir check.
-
 2013-07-26  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* environ.cc (tty_is_gone): Delete.
