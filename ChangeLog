@@ -1,3 +1,8 @@
+2013-08-16  Joel Brobecker  <brobecker@adacore.com>
+
+	* src-release (VER): When using $(TOOL)/common/create-version.sh,
+	strip the "-cvs" suffix from the version number if present.
+
 2013-08-12  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
 	* configure.ac: Sync with GCC repo.

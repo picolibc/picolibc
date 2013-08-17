@@ -74,7 +74,7 @@ VER = `	if grep 'AM_INIT_AUTOMAKE.*BFD_VERSION' $(TOOL)/configure.in >/dev/null 
 	  $(TOOL)/common/create-version.sh $(TOOL) \
 	    'dummy-host' 'dummy-target' \
 	    VER.tmp; \
-	  cat VER.tmp | grep 'version\[\]' | sed 's/.*"\([^"]*\)".*/\1/'; \
+	  cat VER.tmp | grep 'version\[\]' | sed 's/.*"\([^"]*\)".*/\1/' | sed 's/-cvs$$//'; \
           rm -f VER.tmp; \
 	elif test -f $(TOOL)/version.in; then \
 	  head -1 $(TOOL)/version.in; \
