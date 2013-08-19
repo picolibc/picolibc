@@ -1,5 +1,9 @@
 2013-08-19  Richard Sandiford  <rdsandiford@googlemail.com>
 
+	* mips.h (M_DEXT, M_DINS): Delete.
+
+2013-08-19  Richard Sandiford  <rdsandiford@googlemail.com>
+
 	* mips.h (OP_OPTIONAL_REG): New mips_operand_type.
 	(mips_optional_operand_p): New function.
 

@@ -1354,8 +1354,6 @@ enum
   M_DDIV_3I,
   M_DDIVU_3,
   M_DDIVU_3I,
-  M_DEXT,
-  M_DINS,
   M_DIV_3,
   M_DIV_3I,
   M_DIVU_3,
