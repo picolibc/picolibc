@@ -346,6 +346,10 @@ enum mips_operand_type {
   /* Described by mips_reg_operand.  */
   OP_REG,
 
+  /* Like OP_REG, but can be omitted if the register is the same as the
+     previous operand.  */
+  OP_OPTIONAL_REG,
+
   /* Described by mips_reg_pair_operand.  */
   OP_REG_PAIR,
 
@@ -573,6 +577,15 @@ struct mips_pcrel_operand
      This is true for JALX and false otherwise.  */
   unsigned int flip_isa_bit : 1;
 };
+
+/* Return true if the assembly syntax allows OPERAND to be omitted.  */
+
+static inline bfd_boolean
+mips_optional_operand_p (const struct mips_operand *operand)
+{
+  return (operand->type == OP_OPTIONAL_REG
+	  || operand->type == OP_REPEAT_PREV_REG);
+}
 
 /* Return a version of INSN in which the field specified by OPERAND
    has value UVAL.  */
