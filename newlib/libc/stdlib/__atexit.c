@@ -104,6 +104,8 @@ _DEFUN (__register_exitproc,
 #ifndef _REENT_SMALL
       p->_on_exit_args._fntypes = 0;
       p->_on_exit_args._is_cxa = 0;
+#else
+      p->_on_exit_args_ptr = NULL;
 #endif
 #endif
     }
