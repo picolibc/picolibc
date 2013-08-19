@@ -799,7 +799,6 @@ struct mips_opcode
    Macro instructions:
    "A" General 32 bit expression
    "I" 32 bit immediate (value placed in imm_expr).
-   "+I" 32 bit immediate (value placed in imm2_expr).
    "F" 64 bit floating point constant in .rdata
    "L" 64 bit floating point constant in .lit8
    "f" 32 bit floating point constant
@@ -906,7 +905,7 @@ struct mips_opcode
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
    "1234567890"
-   "ABCEFGHIJKLMNPQSXZ"
+   "ABCEFGHJKLMNPQSXZ"
    "abcfgijmpqrstxyz"
 */
 
@@ -2025,7 +2024,6 @@ extern const int bfd_mips16_num_opcodes;
    Macro instructions:
    "A" general 32 bit expression
    "I" 32-bit immediate (value placed in imm_expr).
-   "+I" 32-bit immediate (value placed in imm2_expr).
    "F" 64-bit floating point constant in .rdata
    "L" 64-bit floating point constant in .lit8
    "f" 32-bit floating point constant
@@ -2062,7 +2060,7 @@ extern const int bfd_mips16_num_opcodes;
    following), for quick reference when adding more:
    ""
    ""
-   "ABCEFGHI"
+   "ABCEFGH"
    "ij"
 
    Extension character sequences used so far ("m" followed by the

@@ -1,5 +1,9 @@
 2013-08-19  Richard Sandiford  <rdsandiford@googlemail.com>
 
+	* mips.h: Remove references to "+I" and imm2_expr.
+
+2013-08-19  Richard Sandiford  <rdsandiford@googlemail.com>
+
 	* mips.h (M_DEXT, M_DINS): Delete.
 
 2013-08-19  Richard Sandiford  <rdsandiford@googlemail.com>
