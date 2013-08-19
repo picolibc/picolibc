@@ -392,8 +392,7 @@ mtinfo_drive::_set_pos (HANDLE mt, int mode, int32_t count, int partition,
 }
 
 int
-mtinfo_drive::set_pos (HANDLE mt, int mode, int32_t count,
-		       bool sfm_func)
+mtinfo_drive::set_pos (HANDLE mt, int mode, int32_t count, bool sfm_func)
 {
   int err = 0;
   int32_t undone = count;
@@ -819,8 +818,8 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
       if (mp ()->WriteProtected)
 	get->mt_gstat |= GMT_WR_PROT (-1);
 
-      get->mt_capacity = get_ll (mp ()->Capacity);
-      get->mt_remaining = get_ll (mp ()->Remaining);
+      get->mt_capacity = mp ()->Capacity.QuadPart;
+      get->mt_remaining = mp ()->Remaining.QuadPart;
   }
 
   if (notape)

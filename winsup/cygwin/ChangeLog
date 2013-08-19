@@ -1,3 +1,8 @@
+2013-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tape.cc (mtinfo_drive::set_pos): Remove unneeded linebreak.
+	(mtinfo_drive::get_status): Drop using get_ll when it's not required.
+
 2013-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/cygwin.h (struct per_process): Add posix_memalign.  Reduce
