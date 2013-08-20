@@ -1,0 +1,15 @@
+What's new:
+-----------
+
+
+What changed:
+-------------
+
+
+Bug fixes:
+----------
+
+- Fix creating two partitions on tape drives supporting initiator partitions.
+
+- Update the internally used blocksize after setting a new blocksize for the
+  current tape.

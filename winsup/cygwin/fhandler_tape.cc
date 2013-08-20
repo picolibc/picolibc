@@ -557,9 +557,8 @@ mtinfo_drive::create_partitions (HANDLE mt, int32_t count)
   debug_printf ("Format tape with %s partition(s)", count <= 0 ? "one" : "two");
   if (get_feature (TAPE_DRIVE_INITIATOR))
     {
-      if (count <= 0)
-	TAPE_FUNC (CreateTapePartition (mt, TAPE_INITIATOR_PARTITIONS,
-					count <= 0 ? 0 : 2, (DWORD) count));
+      TAPE_FUNC (CreateTapePartition (mt, TAPE_INITIATOR_PARTITIONS,
+				      count <= 0 ? 0 : 2, (DWORD) count));
     }
   else if (get_feature (TAPE_DRIVE_FIXED))
     {
@@ -741,7 +740,8 @@ mtinfo_drive::set_blocksize (HANDLE mt, DWORD count)
 {
   TAPE_SET_MEDIA_PARAMETERS smp = {count};
   TAPE_FUNC (SetTapeParameters (mt, SET_TAPE_MEDIA_INFORMATION, &smp));
-  return error ("set_blocksize");
+  /* Make sure to update blocksize info! */
+  return lasterr ? error ("set_blocksize") : get_mp (mt);
 }
 
 int
@@ -755,6 +755,9 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
 
   if ((tstat = GetTapeStatus (mt)) == ERROR_NO_MEDIA_IN_DRIVE)
     notape = 1;
+
+  if (get_mp (mt))
+    return lasterr;
 
   memset (get, 0, sizeof *get);
 
