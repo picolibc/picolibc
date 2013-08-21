@@ -1,3 +1,13 @@
+2013-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tape.cc (mtinfo_drive::create_partitions): Allow partitioning
+	of drives supporting select partitions.
+	(mtinfo_drive::get_status): Fill in current partition and number of
+	partitions on tape into mt_resid.
+	* include/cygwin/mtio.h (struct mtget): Align mt_resid comment to
+	aforementioned change.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2013-08-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tape.cc (mtinfo_drive::create_partitions): Fix long-standing

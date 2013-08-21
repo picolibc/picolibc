@@ -560,6 +560,11 @@ mtinfo_drive::create_partitions (HANDLE mt, int32_t count)
       TAPE_FUNC (CreateTapePartition (mt, TAPE_INITIATOR_PARTITIONS,
 				      count <= 0 ? 0 : 2, (DWORD) count));
     }
+  else if (get_feature (TAPE_DRIVE_SELECT))
+    {
+      TAPE_FUNC (CreateTapePartition (mt, TAPE_SELECT_PARTITIONS,
+				      count <= 0 ? 0 : 2, 0));
+    }
   else if (get_feature (TAPE_DRIVE_FIXED))
     {
       /* This is supposed to work for Tandberg SLR drivers up to version
@@ -798,7 +803,8 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
 
   if (!notape)
     {
-      get->mt_resid = partition;
+      get->mt_resid = (partition & 0xffff)
+		      | ((mp ()->PartitionCount & 0xffff) << 16);
       get->mt_fileno = part (partition)->file;
       get->mt_blkno = part (partition)->fblock;
 

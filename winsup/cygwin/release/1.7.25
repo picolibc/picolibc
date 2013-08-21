@@ -5,6 +5,9 @@ What's new:
 What changed:
 -------------
 
+- Redefine content of mtget tape info struct to allow fetching the number of
+  partitions on a tape.
+
 
 Bug fixes:
 ----------
