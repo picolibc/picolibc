@@ -1,6 +1,6 @@
 /* Basic 80960 instruction formats.
 
-   Copyright 2001, 2010 Free Software Foundation, Inc.
+   Copyright 2001-2013 Free Software Foundation, Inc.
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -141,7 +141,7 @@ struct i960_opcode {
 	char operand[3];/* Operand descriptors; same order as assembler instr */
 };
 
-/* Classes of 960 intructions:
+/* Classes of 960 instructions:
  *	- each instruction falls into one class.
  *	- each target architecture supports one or more classes.
  *
