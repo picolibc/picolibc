@@ -1,3 +1,8 @@
+2013-08-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* child_info.h (PROC_MAGIC_GENERIC): Define differently for x86 vs.
+	x86_64.
+
 2013-08-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.h (enum path_types): Drop definition of PATH_64BITEXEC.

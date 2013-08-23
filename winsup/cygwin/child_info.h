@@ -30,7 +30,11 @@ enum child_status
 #define OPROC_MAGIC_MASK 0xff00ff00
 #define OPROC_MAGIC_GENERIC 0xaf00f000
 
-#define PROC_MAGIC_GENERIC 0xaf00fa00
+#ifdef __x86_64__
+#define PROC_MAGIC_GENERIC 0xaf00fa64
+#else /*!x86_64*/
+#define PROC_MAGIC_GENERIC 0xaf00fa32
+#endif
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
