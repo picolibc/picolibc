@@ -554,8 +554,17 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   __stdout = in__stdout;
   record_children ();
 
-  si.lpReserved2 = (LPBYTE) this;
-  si.cbReserved2 = sizeof (*this);
+  /* Don't propagate the child_info_spawn structure to the process if it
+     hasn't been recognized as a Cygwin executable.  This also covers Cygwin
+     executables of a different target (32 vs. 64 bit).  Native processes
+     usually still work, even if lpReserved2 contains garbage from their
+     point of view, but Cygwin processes of different bitsize will recognize
+     it as Cygwin info and get all excited about the differences. */
+  if (real_path.iscygexec ())
+    {
+      si.lpReserved2 = (LPBYTE) this;
+      si.cbReserved2 = sizeof (*this);
+    }
 
   /* Depends on set call above.
      Some file types might need extra effort in the parent after CreateProcess

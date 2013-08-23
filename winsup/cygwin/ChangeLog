@@ -1,3 +1,13 @@
+2013-08-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.h (enum path_types): Drop definition of PATH_64BITEXEC.
+	(path_conv::iscygexec32): Drop unused inline function.
+	(path_conv::iscygexec64): Ditto.
+	(path_conv::set_cygexec): Remove unnecessary setting of PATH_64BITEXEC.
+	* spawn.cc (child_info_spawn::worker): Disable setting of
+	STARTUPINFOW::lpReserved2 and STARTUPINFOW::cbReserved2 for non-Cygwin
+	child processes.  Explain why.
+
 2013-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tape.cc (mtinfo_drive::create_partitions): Allow partitioning
