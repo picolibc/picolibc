@@ -4,6 +4,26 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.25"><title>What's new and what changed from 1.7.24 to 1.7.25</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Disable code which disallowed to start 32 bit Cygwin processes from 64 bit
+Cygwin processes and vice versa.  32 bit processes are not recognized as
+Cygwin processes by a 64 bit parent process and vice versa, so there is no
+IPC other than what you get with non-Cygwin processes.
+</para></listitem>
+
+<listitem><para>
+Redefine content of mtget tape info struct to allow fetching the number of
+partitions on a tape.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.24"><title>What's new and what changed from 1.7.23 to 1.7.24</title>
 
 <itemizedlist mark="bullet">
