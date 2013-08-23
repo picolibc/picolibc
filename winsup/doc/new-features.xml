@@ -9,10 +9,8 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
-Disable code which disallowed to start 32 bit Cygwin processes from 64 bit
-Cygwin processes and vice versa.  32 bit processes are not recognized as
-Cygwin processes by a 64 bit parent process and vice versa, so there is no
-IPC other than what you get with non-Cygwin processes.
+Change magic number associated with process information block so that 32-bit
+Cygwin processes don't try to interpret 64-bit information and vice-versa.
 </para></listitem>
 
 <listitem><para>

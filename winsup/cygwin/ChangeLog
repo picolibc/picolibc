@@ -1,5 +1,10 @@
 2013-08-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* spawn.cc (child_info_spawn): Revert previous change.  Always set
+	lpReserved2.
+
+2013-08-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* child_info.h (PROC_MAGIC_GENERIC): Define differently for x86 vs.
 	x86_64.
 

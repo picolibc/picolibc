@@ -5,10 +5,8 @@ What's new:
 What changed:
 -------------
 
-- Disable code which disallowed to start 32 bit Cygwin processes from 64 bit
-  Cygwin processes and vice versa.  32 bit processes are not recognized as
-  Cygwin processes by a 64 bit parent process and vice versa, so there is
-  no IPC other than what you have with non-Cygwin processes.
+- Change magic number associated with process information block so that 32-bit
+  Cygwin processes don't try to interpret 64-bit information and vice-versa.
 
 - Redefine content of mtget tape info struct to allow fetching the number of
   partitions on a tape.
