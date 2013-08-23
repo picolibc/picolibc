@@ -564,7 +564,7 @@ lockf_t::from_obj_name (inode_t *node, lockf_t **head, const wchar_t *name)
     return false;
   lf_id = wcstoll (endptr + 1, &endptr, 16);
   if (!endptr || *endptr != L'-'
-      || ((lf_flags & F_POSIX) && (lf_id < 1 || lf_id > ULONG_MAX)))
+      || ((lf_flags & F_POSIX) && (lf_id < 1 || lf_id > UINT32_MAX)))
     return false;
   lf_wid = wcstoul (endptr + 1, &endptr, 16);
   if (!endptr || *endptr != L'-')
