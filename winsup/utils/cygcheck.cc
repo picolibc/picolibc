@@ -2176,7 +2176,7 @@ package_grep (char *search)
     }
 
   /* construct the actual URL by escaping  */
-  char *url = (char *) alloca (sizeof (base_url) + strlen (search) * 3);
+  char *url = (char *) alloca (sizeof (base_url) + strlen ("&arch=x86_64") + strlen (search) * 3);
   strcpy (url, base_url);
 
   char *dest;
@@ -2194,7 +2194,11 @@ package_grep (char *search)
 	  dest += 2;
 	}
     }
-  *dest = 0;
+#ifdef __x86_64__
+  strcpy (dest, "&arch=x86_64");
+#else
+  strcpy (dest, "&arch=x86");
+#endif
 
   /* Connect to the net and open the URL.  */
   if (pInternetAttemptConnect (0) != ERROR_SUCCESS)

@@ -1,3 +1,7 @@
+2013-08-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* cygcheck.cc (package_grep): Accommodate arch-specific package layout.
+
 2013-07-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (MINGW_LDFLAGS): Don't link against w32api libs.  These
