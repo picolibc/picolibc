@@ -1,3 +1,23 @@
+2013-08-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mtinfo.h (class mtinfo_part): Change type of block numbers to int64_t.
+	(mtinfo_part::initialize): Ditto for nblock parameter in declaration.
+	(class mtinfo_drive): Change type of block number to int64_t.  Change
+	all parameters indicating a block number to int64_t in method
+	declarations.
+	* fhandler_tape.cc (mtinfo_part::initialize): Ditto in definition.
+	(mtinfo_drive::get_pos): Ditto.  Replace low and high with a
+	ULARGE_INTEGER and use it's components in call to GetTapePosition.
+	Store full value in block.
+	(mtinfo_drive::_set_pos): Change type of count parameter to int64_t.
+	Change call to SetTapePosition accordingly.
+	(mtinfo_drive::set_pos): Change type of count parameter to int64_t.
+	Change local variables holding block numbers accordingly.
+	(mtinfo_drive::get_status): Don't bail out early if fetching media
+	parameters fails.
+	(mtinfo_drive::ioctl): Add explicit cast matching receiving type in
+	MTTELL and MTIOCPOS calls.
+
 2013-08-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (lockf_t::from_obj_name): Fix test for valid pid.

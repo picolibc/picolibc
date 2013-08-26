@@ -53,7 +53,7 @@ details. */
 /* mtinfo_part */
 
 void
-mtinfo_part::initialize (int32_t nblock)
+mtinfo_part::initialize (int64_t nblock)
 {
   block = nblock;
   if (block == 0)
@@ -353,18 +353,21 @@ mtinfo_drive::write (HANDLE mt, LPOVERLAPPED pov, const void *ptr, size_t &len)
 }
 
 int
-mtinfo_drive::get_pos (HANDLE mt, int32_t *ppartition, int32_t *pblock)
+mtinfo_drive::get_pos (HANDLE mt, int32_t *ppartition, int64_t *pblock)
 {
-  DWORD p, low, high;
+  DWORD p;
+  ULARGE_INTEGER b;
 
-  TAPE_FUNC (GetTapePosition (mt, TAPE_LOGICAL_POSITION, &p, &low, &high));
+  TAPE_FUNC (GetTapePosition (mt, TAPE_LOGICAL_POSITION, &p,
+			      &b.LowPart, &b.HighPart));
   if (lasterr == ERROR_INVALID_FUNCTION)
-    TAPE_FUNC (GetTapePosition (mt, TAPE_ABSOLUTE_POSITION, &p, &low, &high));
+    TAPE_FUNC (GetTapePosition (mt, TAPE_ABSOLUTE_POSITION, &p,
+				&b.LowPart, &b.HighPart));
   if (!lasterr)
     {
       if (p > 0)
 	partition = (int32_t) p - 1;
-      block = (int32_t) low;
+      block = (int64_t) b.QuadPart;
       if (ppartition)
 	*ppartition= partition;
       if (pblock)
@@ -379,23 +382,24 @@ mtinfo_drive::get_pos (HANDLE mt, int32_t *ppartition, int32_t *pblock)
 }
 
 int
-mtinfo_drive::_set_pos (HANDLE mt, int mode, int32_t count, int partition,
+mtinfo_drive::_set_pos (HANDLE mt, int mode, int64_t count, int partition,
 			BOOL dont_wait)
 {
   /* If an async write is still pending, wait for completion. */
   if (dirty == async_write_pending)
     lasterr = async_wait (mt, NULL);
   dirty = clean;
-  TAPE_FUNC (SetTapePosition (mt, mode, partition, count, count < 0 ? -1 : 0,
+  LARGE_INTEGER c = { QuadPart:count };
+  TAPE_FUNC (SetTapePosition (mt, mode, partition, c.LowPart, c.HighPart,
 			      dont_wait));
   return lasterr;
 }
 
 int
-mtinfo_drive::set_pos (HANDLE mt, int mode, int32_t count, bool sfm_func)
+mtinfo_drive::set_pos (HANDLE mt, int mode, int64_t count, bool sfm_func)
 {
   int err = 0;
-  int32_t undone = count;
+  int64_t undone = count;
   BOOL dont_wait = FALSE;
 
   switch (mode)
@@ -589,12 +593,12 @@ mtinfo_drive::set_partition (HANDLE mt, int32_t count)
     lasterr = ERROR_IO_DEVICE;
   else
     {
-      int part_block = part (count)->block >= 0 ? part (count)->block : 0;
+      uint64_t part_block = part (count)->block >= 0 ? part (count)->block : 0;
       int err = _set_pos (mt, TAPE_LOGICAL_BLOCK, part_block, count + 1, FALSE);
       if (err)
 	{
-	  int sav_block = block;
-	  int sav_partition = partition;
+	  int64_t sav_block = block;
+	  int32_t sav_partition = partition;
 	  get_pos (mt);
 	  if (sav_partition != partition)
 	    {
@@ -649,8 +653,8 @@ mtinfo_drive::write_marks (HANDLE mt, int marktype, DWORD count)
     }
   else
     {
-      int sav_block = block;
-      int sav_partition = partition;
+      int64_t sav_block = block;
+      int32_t sav_partition = partition;
       get_pos (mt);
       if (sav_partition != partition)
 	{
@@ -758,11 +762,9 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
   if (!get)
     return ERROR_INVALID_PARAMETER;
 
-  if ((tstat = GetTapeStatus (mt)) == ERROR_NO_MEDIA_IN_DRIVE)
+  if ((tstat = GetTapeStatus (mt)) == ERROR_NO_MEDIA_IN_DRIVE
+      || get_mp (mt) == ERROR_NO_MEDIA_IN_DRIVE)
     notape = 1;
-
-  if (get_mp (mt))
-    return lasterr;
 
   memset (get, 0, sizeof *get);
 
@@ -1082,7 +1084,7 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
 	    break;
 	  case MTTELL:
 	    if (!get_pos (mt))
-	      op->mt_count = block;
+	      op->mt_count = (int) block;
 	    break;
 	  case MTFSS:
 	    set_pos (mt, TAPE_SPACE_SETMARKS, op->mt_count, false);
@@ -1123,7 +1125,7 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
   else if (cmd == MTIOCGET)
     get_status (mt, (struct mtget *) buf);
   else if (cmd == MTIOCPOS && !get_pos (mt))
-    ((struct mtpos *) buf)->mt_blkno = block;
+    ((struct mtpos *) buf)->mt_blkno = (long) block;
 
   return lasterr;
 }
