@@ -21,5 +21,7 @@ Bug fixes:
   current tape.
 
 - Fix problem with queued signals as manifested by:
+  http://cygwin.com/ml/cygwin/2013-08/msg00534.html
 
-http://cygwin.com/ml/cygwin/2013-08/msg00534.html
+- Fix bug in sbrk breaking extending the heap beyond its default size.
+  Fixes: http://cygwin.com/ml/cygwin/2013-08/msg00520.html
