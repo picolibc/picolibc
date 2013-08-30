@@ -19,3 +19,7 @@ Bug fixes:
 
 - Update the internally used blocksize after setting a new blocksize for the
   current tape.
+
+- Fix problem with queued signals as manifested by:
+
+http://cygwin.com/ml/cygwin/2013-08/msg00534.html
