@@ -1,3 +1,9 @@
+2013-08-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* sigproc.cc (pending_signals::add): Properly maintain linked list.
+	(wait_sig): Use already calculated 'next' element when signal is
+	blocked.
+
 2013-08-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mtinfo.h (class mtinfo_part): Change type of block numbers to int64_t.

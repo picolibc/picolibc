@@ -1190,7 +1190,7 @@ pending_signals::add (sigpacket& pack)
   if (se->si.si_signo)
     return;
   *se = pack;
-  se->next = NULL;
+  se->next = start.next;
   start.next = se;
 }
 
@@ -1276,7 +1276,7 @@ wait_sig (VOID *)
 	      }
 	  }
 	  break;
-	default:
+	default:	/* Normal (positive) signal */
 	  if (pack.si.si_signo < 0)
 	    sig_clear (-pack.si.si_signo);
 	  else
@@ -1293,7 +1293,7 @@ wait_sig (VOID *)
 	      while ((qnext = q->next))
 		{
 		  if (qnext->si.si_signo && qnext->process () <= 0)
-		    q = q->next;
+		    q = qnext;
 		  else
 		    {
 		      q->next = qnext->next;
