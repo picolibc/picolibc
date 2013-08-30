@@ -1,3 +1,8 @@
+2013-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tape.cc (mtinfo_drive::open): Handle bus reset gracefully
+	after opening the device.
+
 2013-08-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* sigproc.cc (pending_signals::add): Properly maintain linked list.

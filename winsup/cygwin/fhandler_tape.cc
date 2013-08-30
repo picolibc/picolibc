@@ -107,7 +107,10 @@ mtinfo_drive::get_mp (HANDLE mt)
 int
 mtinfo_drive::open (HANDLE mt)
 {
-  get_dp (mt);
+  /* First access after opening the device can return BUS RESET, but we
+     need the drive parameters, so just try again. */
+  while (get_dp (mt) == ERROR_BUS_RESET)
+    ;
   get_mp (mt);
   get_pos (mt);
   if (partition < MAX_PARTITION_NUM && part (partition)->block != block)
