@@ -341,7 +341,8 @@ shared_info::initialize ()
   else if (cb != sizeof (*this))
     system_printf ("size of shared memory region changed from %lu to %u",
 		   sizeof (*this), cb);
-  heap_init ();
+  /* FIXME? Shouldn't this be in memory_init? */
+  cygheap->user_heap.init ();
 }
 
 void

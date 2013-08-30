@@ -1,3 +1,16 @@
+2013-08-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* cygheap.h (user_heap_info::sbrk): Declare new function.
+	(user_heap_info::init): Ditto.
+	* heap.cc (user_heap_info::init): Rename from heap_init().  Avoid
+	explictly using cygheap->user_heap.
+	(sbrk): Use user_heap_info method via cygheap->user_heap.
+	(user_heap_info::sbrk): Renamed from sbrk().  Eliminate explicit use of
+	cygheap->user_heap.  Change some pointer arithmetic to use (char *) for
+	consistency.
+	* shared.cc (shared_info::initialize): Change heap_init call to
+	cygheap->user_heap.init.
+
 2013-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* heap.cc (sbrk): Add a FIXME comment to VirtualFree call.  Fix memory

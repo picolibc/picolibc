@@ -351,6 +351,8 @@ struct user_heap_info
   void *top;
   void *max;
   SIZE_T chunk;
+  void __reg2 *sbrk (ptrdiff_t);
+  void __reg1 init ();
 };
 
 struct hook_chain
