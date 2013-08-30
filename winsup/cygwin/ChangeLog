@@ -1,5 +1,12 @@
 2013-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* heap.cc (sbrk): Add a FIXME comment to VirtualFree call.  Fix memory
+	reservation and commit strategy when more memory is requested than
+	available on the heap.  Release newly reserved memory if commiting
+	it fails.  Add more comments to explain what we do.
+
+2013-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_tape.cc (mtinfo_drive::open): Handle bus reset gracefully
 	after opening the device.
 
