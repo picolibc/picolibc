@@ -245,7 +245,7 @@ extern "C" void *
 sbrk (ptrdiff_t n)
 {
   char *newtop, *newbrk;
-  SIZE_T commitbytes, newbrksize;
+  SIZE_T commitbytes, newbrksize, reservebytes;
 
   if (n == 0)
     return cygheap->user_heap.ptr;		/* Just wanted to find current cygheap->user_heap.ptr address */
@@ -261,6 +261,9 @@ sbrk (ptrdiff_t n)
     {						/* Freeing memory */
       assert (newtop < cygheap->user_heap.top);
       n = (char *) cygheap->user_heap.top - newtop;
+      /* FIXME: This doesn't work if we cross a virtual memory reservation
+	 border.  If that happens, we have to free the space in multiple
+	 VirtualFree calls, aligned to the former reservation borders. */
       if (VirtualFree (newtop, n, MEM_DECOMMIT)) /* Give it back to OS */
 	goto good;
       goto err;					/*  Didn't take */
@@ -277,27 +280,49 @@ sbrk (ptrdiff_t n)
      reserved.  */
   if (newtop <= cygheap->user_heap.max)
     {
-      if (VirtualAlloc (cygheap->user_heap.top, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL)
+      if (VirtualAlloc (cygheap->user_heap.top, commitbytes,
+			MEM_COMMIT, PAGE_READWRITE) != NULL)
 	goto good;
     }
 
-  /* Couldn't allocate memory.  Maybe we can reserve some more.
-     Reserve either the maximum of the standard cygwin_shared->heap_chunk_size ()
-     or the requested amount.  Then attempt to actually allocate it.  */
-  if ((newbrksize = cygheap->user_heap.chunk) < commitbytes)
-    newbrksize = commitbytes;
+  /* The remainder of the existing heap is too small to fulfil the memory
+     request.  We have to extend the heap, so we reserve some more memory
+     and then commit the remainder of the old heap, if any, and the rest of
+     the required space from the extended heap. */
 
-   if ((VirtualAlloc (cygheap->user_heap.top, newbrksize,
-		      MEM_RESERVE, PAGE_NOACCESS)
-	|| VirtualAlloc (cygheap->user_heap.top, newbrksize = commitbytes,
-			 MEM_RESERVE, PAGE_NOACCESS))
-       && VirtualAlloc (cygheap->user_heap.top, commitbytes,
-			MEM_COMMIT, PAGE_READWRITE) != NULL)
-     {
-	cygheap->user_heap.max = (char *) cygheap->user_heap.max
-				 + pround (newbrksize);
-	goto good;
-     }
+  /* Reserve either the maximum of the standard heap chunk size
+     or the requested amount.  Then attempt to actually allocate it.  */
+  reservebytes = commitbytes - ((ptrdiff_t) cygheap->user_heap.max
+				- (ptrdiff_t) cygheap->user_heap.top);
+  commitbytes -= reservebytes;
+  if ((newbrksize = cygheap->user_heap.chunk) < reservebytes)
+    newbrksize = reservebytes;
+
+  if (VirtualAlloc (cygheap->user_heap.max, newbrksize,
+		    MEM_RESERVE, PAGE_NOACCESS)
+      || VirtualAlloc (cygheap->user_heap.max, newbrksize = reservebytes,
+		       MEM_RESERVE, PAGE_NOACCESS))
+    {
+      /* Now commit the requested memory.  Windows keeps all virtual
+	 reservations separate, so we can't commit the two regions in a single,
+	 combined call or we suffer an ERROR_INVALID_ADDRESS.  The same error
+	 is returned when trying to VirtualAlloc 0 bytes, which would occur if
+	 the existing heap was already full. */
+      if ((!commitbytes || VirtualAlloc (cygheap->user_heap.top, commitbytes,
+					 MEM_COMMIT, PAGE_READWRITE))
+	  && VirtualAlloc (cygheap->user_heap.max, reservebytes,
+			   MEM_COMMIT, PAGE_READWRITE))
+	{
+	  cygheap->user_heap.max = (char *) cygheap->user_heap.max
+				   + pround (newbrksize);
+	  goto good;
+	}
+      /* If committing the memory failed, we must free the extendend reserved
+         region, otherwise any other try to fetch memory (for instance by using
+	 mmap) may fail just because we still reserve memory we don't even know
+	 about. */
+      VirtualFree (cygheap->user_heap.max, newbrksize, MEM_RELEASE);
+    }
 
 err:
   set_errno (ENOMEM);
