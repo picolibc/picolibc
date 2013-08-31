@@ -24,7 +24,10 @@ details. */
 
 static ptrdiff_t page_const;
 
+/* Minimum size of the base heap. */
 #define MINHEAP_SIZE (4 * 1024 * 1024)
+/* Chunksize of subsequent heap reservations. */
+#define RAISEHEAP_SIZE (1 * 1024 * 1024)
 
 static uintptr_t
 eval_start_address ()
@@ -277,20 +280,23 @@ user_heap_info::sbrk (ptrdiff_t n)
      we have used up previously reserved memory.  Or, we're just plumb out
      of memory.  Only attempt to commit memory that we know we've previously
      reserved.  */
-  if (newtop <= max && VirtualAlloc (top, commitbytes, MEM_COMMIT,
-				     PAGE_READWRITE))
-      goto good;
+  if (newtop <= max)
+    {
+      if (VirtualAlloc (top, commitbytes, MEM_COMMIT, PAGE_READWRITE))
+	goto good;
+      goto err;
+    }
 
   /* The remainder of the existing heap is too small to fulfill the memory
      request.  We have to extend the heap, so we reserve some more memory
      and then commit the remainder of the old heap, if any, and the rest of
      the required space from the extended heap. */
 
-  /* Reserve either the maximum of the standard heap chunk size
-     or the requested amount.  Then attempt to actually allocate it.  */
+  /* For subsequent chunks following the base heap, reserve either 1 Megs
+     per chunk, or the requested amount if it's bigger than 1 Megs. */
   reservebytes = commitbytes - ((char *) max - (char *) top);
   commitbytes -= reservebytes;
-  if ((newbrksize = chunk) < reservebytes)
+  if ((newbrksize = RAISEHEAP_SIZE) < reservebytes)
     newbrksize = reservebytes;
 
   if (VirtualAlloc (max, newbrksize, MEM_RESERVE, PAGE_NOACCESS)
