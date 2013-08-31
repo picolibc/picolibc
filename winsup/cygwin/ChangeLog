@@ -1,5 +1,10 @@
 2013-08-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Belatedly bump
+	to 25.
+
+2013-08-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* heap.cc (RAISEHEAP_SIZE): New definition.
 	(user_heap_info::sbrk): Make failed commit an error condition again.
 	Only reserve RAISEHEAP_SIZE sized chunk for further heap reservations
