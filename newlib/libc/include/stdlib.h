@@ -47,6 +47,11 @@ typedef struct
 } lldiv_t;
 #endif
 
+#ifndef __compar_fn_t_defined
+#define __compar_fn_t_defined
+typedef int (*__compar_fn_t) (const _PTR, const _PTR);
+#endif
+
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
 
@@ -71,7 +76,7 @@ _PTR	_EXFUN(bsearch,(const _PTR __key,
 		       const _PTR __base,
 		       size_t __nmemb,
 		       size_t __size,
-		       int _EXFNPTR(_compar,(const _PTR, const _PTR))));
+		       __compar_fn_t _compar));
 _PTR	_EXFUN_NOTHROW(calloc,(size_t __nmemb, size_t __size));
 div_t	_EXFUN(div,(int __numer, int __denom));
 _VOID	_EXFUN(exit,(int __status) _ATTRIBUTE ((noreturn)));
@@ -113,7 +118,7 @@ int	_EXFUN(_mkstemp_r, (struct _reent *, char *));
 int	_EXFUN(_mkstemps_r, (struct _reent *, char *, int));
 char *	_EXFUN(_mktemp_r, (struct _reent *, char *) _ATTRIBUTE ((__warning__ ("the use of `mktemp' is dangerous; use `mkstemp' instead"))));
 #endif
-_VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, int(*_compar)(const _PTR, const _PTR)));
+_VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, __compar_fn_t _compar));
 int	_EXFUN(rand,(_VOID));
 _PTR	_EXFUN_NOTHROW(realloc,(_PTR __r, size_t __size));
 #ifndef __STRICT_ANSI__
