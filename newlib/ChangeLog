@@ -1,3 +1,9 @@
+2013-09-12  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/cdefs.h: Synchronize with latest FreeBSD
+	version.
+	* libc/include/stdatomic.h: Likewise.
+
 2013-09-08  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
 	* libc/include/search.h (__compar_fn_t): Add typedef.
