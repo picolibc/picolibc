@@ -72,7 +72,7 @@
 #define nano_malloc_usable_size _malloc_usable_size_r
 #define nano_malloc_stats	_malloc_stats_r
 #define nano_mallinfo		_mallinfo_r
-#define nano_allopt		_mallopt_r
+#define nano_mallopt		_mallopt_r
 
 #else /* ! INTERNAL_NEWLIB */
 
@@ -94,7 +94,7 @@
 #define nano_malloc_usable_size malloc_usable_size
 #define nano_malloc_stats	malloc_stats
 #define nano_mallinfo		mallinfo
-#define nano_allopt		mallopt
+#define nano_mallopt		mallopt
 #endif /* ! INTERNAL_NEWLIB */
 
 /* Define free_list as internal name to avoid conflict with user names */

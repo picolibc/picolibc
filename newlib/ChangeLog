@@ -1,3 +1,8 @@
+2013-09-13  Joey Ye  <joey.ye@arm.com>
+
+	* libc/stdlib/nano-mallocr.c (nano_allopt): Typo fixed to ...
+	(nano_mallopt): ... this.
+
 2013-09-12  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/cdefs.h: Synchronize with latest FreeBSD
