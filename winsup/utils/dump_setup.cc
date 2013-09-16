@@ -41,18 +41,13 @@ typedef struct
 static int
 find_tar_ext (const char *path)
 {
-  char *p = strchr (path, '\0') - 7;
+  char *p = strchr (path, '\0') - 9;
   if (p <= path)
     return 0;
-  if (*p == '.')
-    {
-      if (strcmp (p, ".tar.gz") != 0)
-	return 0;
-    }
-  else if (--p <= path || strcmp (p, ".tar.bz2") != 0)
+  if ((p = strstr (p, ".tar")) != NULL)
+    return p - path;
+  else
     return 0;
-
-  return p - path;
 }
 
 static char *

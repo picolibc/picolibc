@@ -1,3 +1,8 @@
+2013-09-16  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* dump_setup.cc (find_tar_ext): Generalize search for .tar extension,
+	avoiding looking for specific compression types.
+
 2013-08-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* cygcheck.cc (package_grep): Accommodate arch-specific package layout.
