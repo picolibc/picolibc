@@ -1,19 +1,13 @@
-2013-08-16  Joel Brobecker  <brobecker@adacore.com>
-
-	* src-release (VER): When using $(TOOL)/common/create-version.sh,
-	strip the "-cvs" suffix from the version number if present.
-
-2013-08-12  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
-
-	* configure.ac: Sync with GCC repo.
-	* Makefile.def: Ditto.
-	* configure: Regenerate.
-	* Makefile.in: Ditto.
-
 2013-07-22  Joel Brobecker  <brobecker@adacore.com>
 
 	* src-release (VER): Use $(TOOL)/common/create-version.sh
 	if it exists.
+
+2013-07-10  Jack Howarth  <howarth@bromo.med.uc.edu>
+
+	PR target/57792
+	* configure.ac: Use --with-sysroot=\"`xcrun --show-sdk-path`\" on darwin13 and later.
+	* configure: Regenerated.
 
 2013-06-22  Richard Sandiford  <rdsandiford@googlemail.com>
 
@@ -24,8 +18,8 @@
 
 2013-06-01  George Thomas <george.thomas@atmel.com>
 
-	* include/opcode/avr.h: Rename AVR_ISA_XCH to AVR_ISA_RMW. Remove
-	from AVR_ISA_XMEGA and add new AVR_ISA_XMEGAU
+        * include/opcode/avr.h: Rename AVR_ISA_XCH to AVR_ISA_RMW. Remove
+        from AVR_ISA_XMEGA and add new AVR_ISA_XMEGAU
 
 2013-05-06  Sandra Loosemore  <sandra@codesourcery.com>
 
