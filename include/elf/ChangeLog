@@ -1,3 +1,7 @@
+2013-09-17  Doug Gilmore  <Doug.Gilmore@imgtec.com>
+
+	* mips.h (EF_MIPS_FP64): New e_flags bit.
+
 2013-08-09  Nick Clifton  <nickc@redhat.com>
 
 	* rl78.c (E_FLAG_RL78_G10): Define.

@@ -191,6 +191,9 @@ END_RELOC_NUMBERS (R_MIPS_maxext)
    (regs are 32-bits wide).  */
 #define EF_MIPS_32BITMODE	0x00000100
 
+/* 32-bit machine but FP registers are 64 bit (-mfp64).  */
+#define EF_MIPS_FP64		0x00000200
+
 /* Code in file uses the IEEE 754-2008 NaN encoding convention.  */
 #define EF_MIPS_NAN2008		0x00000400
 
