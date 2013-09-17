@@ -77,6 +77,7 @@ GCC_LDFLAGS = `if [ -d ${objroot}/../gcc ] ; \
 	then echo -L${objroot}/../gcc ; fi`
 
 OUTPUTS = libnosys.a
+SPECS = ${srcdir}/nosys.specs
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -101,7 +102,7 @@ distclean maintainer-clean realclean: clean
 
 .PHONY: install info install-info clean-info
 install:
-	@for outputs in ${OUTPUTS}; do\
+	@for outputs in ${OUTPUTS} ${SPECS}; do\
 	 mkdir -p $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
 	 $(INSTALL_DATA) $${outputs} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
 	done

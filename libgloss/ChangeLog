@@ -1,3 +1,8 @@
+2013-09-17  Joey Ye  <joey.ye@arm.com>
+
+	* libnosys/Makefile.in: Install nosys.specs.
+	* libnosys/nosys.specs: New specs.
+
 2013-08-12  Yufeng Zhang  <Yufeng.Zhang@arm.com>
 
 	* aarch64/crt0.S: Remove 'start'.
