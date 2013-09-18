@@ -15,10 +15,13 @@
 OUTPUT_ARCH(msp430)
 ENTRY(_start)
 
+INCLUDE intr_vectors.ld
+
 /* Do we need any of these for elf?
    __DYNAMIC = 0;    */
 
-MEMORY {
+MEMORY
+{
 	RAM (w)      : ORIGIN = 0x01c00, LENGTH = 0x04000
 	LOWROM (w)   : ORIGIN = 0x05c00, LENGTH = 0x0a3fe
 	RESETVEC (w) : ORIGIN = 0x0fffe, LENGTH = 0x00002
@@ -113,13 +116,22 @@ SECTIONS
     *(.sbss .sbss.*)
     *(.bss .bss.* .gnu.linkonce.b.*)
     . = ALIGN(2);
-    *(COMMON)
-    . = ALIGN(2);
     PROVIDE (__bssend = .);
-    _end = .;
-    PROVIDE (end = .);
   } > RAM
   PROVIDE (__bsssize = SIZEOF(.bss));
+
+  /* This section contains data that is not initialised at startup.  */
+  .noinit : {
+    . = ALIGN(2);
+    PROVIDE (__noinit_start = .);
+    *(.noinit)
+    . = ALIGN(2);
+    *(COMMON)
+    PROVIDE (__noinit_end = .);
+  } > RAM
+
+  _end = .;
+  PROVIDE (end = .);
 
   .stack (ORIGIN (RAM) + LENGTH(RAM)) :
   {
@@ -132,7 +144,11 @@ SECTIONS
   {
     PROVIDE (_start = .);
     . = ALIGN(2);
-    *(.lowtext)
+    KEEP (*(.crt_init))
+    KEEP (*(.crt_bss))
+    KEEP (*(.crt_movedata))
+    KEEP (*(.crt_main))
+    KEEP (*(.lowtext))
   } > LOWROM
 
   .text           :
@@ -149,6 +165,7 @@ SECTIONS
     . = ALIGN(2);
     KEEP (*(.init))
     KEEP (*(.fini))
+    KEEP (*(.tm_clone_table))
   } > ROM
 
   /* The rest are all not normally part of the runtime image.  */
@@ -183,7 +200,7 @@ SECTIONS
   /* DWARF 2 */
   .debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
   .debug_abbrev   0 : { *(.debug_abbrev) }
-  .debug_line     0 : { *(.debug_line) }
+  .debug_line     0 : { *(.debug_line .debug_line.* .debug_line_end ) }
   .debug_frame    0 : { *(.debug_frame) }
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }

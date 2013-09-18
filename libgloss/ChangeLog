@@ -1,3 +1,22 @@
+2013-09-18  Nick Clifton  <nickc@redhat.com>
+
+	* msp430/Makefile.in (SCRIPTS): Add intr_vectors.ld.
+	(LIB_CRT): New.
+	(CRT_OBJS): New.
+	(all): Add dependency upon LIB_CRT.
+	(install): Likewise.
+	* msp430/msp430-sim.ld: Include intr_vectors.ld.
+	KEEP crt code, lowtext code and tm_clone_table.
+	Separate the noinit section from the .bss section.
+	Allow for extended .debug_line sections.
+	* msp430/msp430.ld: Likewise.
+	* msp430/msp430F5438A-l.ld: Likewise.
+	* msp430/msp430F5438A-s.ld: Likewise.
+	* msp430/msp430xl-sim.ld: Likewise
+.	* msp430/crt_movedata.S: New.
+	* msp430/crt_bss.S: New.
+	* msp430/intr_vectors.ld: New.
+
 2013-09-17  Joey Ye  <joey.ye@arm.com>
 
 	* libnosys/Makefile.in: Install nosys.specs.

@@ -60,6 +60,7 @@ SCRIPTS = $(srcdir)/msp430.ld $(srcdir)/msp430-sim.ld
 SCRIPTS += $(srcdir)/msp430xl-sim.ld
 SCRIPTS += $(srcdir)/msp430F5438A-s.ld
 SCRIPTS += $(srcdir)/msp430F5438A-l.ld
+
 CRT = gcrt0.o crt0.o crtn.o
 SIM_BSP = libsim.a
 LIBNOSYS = libnosys.a
@@ -74,6 +75,12 @@ NOSYS_OBJS = nosyscalls.o \
 	write.o \
 	sbrk.o
 
+SCRIPTS += $(srcdir)/intr_vectors.ld
+
+LIB_CRT = libcrt.a
+
+CRT_OBJS = crt_bss.o crt_movedata.o
+
 #### Host specific Makefile fragment comes in here.
 @host_makefile_frag@
 
@@ -82,14 +89,17 @@ NOSYS_OBJS = nosyscalls.o \
 .S.o:
 	$(CC) -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
 
-all: $(CRT) $(SIM_BSP) $(LIBNOSYS) copy_scripts_to_objdir
+all: $(CRT) $(SIM_BSP) $(LIBNOSYS) $(LIB_CRT) copy_scripts_to_objdir
 
 $(SIM_BSP): $(SIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
-
 $(LIBNOSYS): $(NOSYS_OBJS)
+	$(AR) $(ARFLAGS) $@ $?
+	$(RANLIB) $@
+
+$(LIB_CRT): $(CRT_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
@@ -126,8 +136,8 @@ unlink.o : $(SDEPS)
 utime.o : $(SDEPS)
 write.o : $(SDEPS)
 
-install: $(CRT) $(SIM_BSP) $(LIBNOSYS) $(SCRIPTS)
-	for c in $(CRT) $(SIM_BSP) $(LIBNOSYS); do \
+install: $(CRT) $(SIM_BSP) $(LIBNOSYS) $(LIB_CRT) $(SCRIPTS)
+	for c in $(CRT) $(SIM_BSP) $(LIBNOSYS) $(LIB_CRT); do \
 	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$c ;\
 	done
 	for c in $(SCRIPTS); do \
