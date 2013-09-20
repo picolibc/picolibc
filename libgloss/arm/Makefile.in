@@ -41,6 +41,8 @@ AR = @AR@
 LD = @LD@
 RANLIB = @RANLIB@
 
+SUBDIRS = @subdirs@
+
 OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
 	then echo ${objroot}/../binutils/objdump ; \
 	else t='$(program_transform_name)'; echo objdump | sed -e $$t ; fi`
@@ -73,7 +75,7 @@ RDPMON_INSTALL	= install-rdpmon
 RDIMON_CRT0	= rdimon-crt0.o
 RDIMON_BSP	= librdimon.a
 RDIMON_OBJS	= $(patsubst %,rdimon-%,$(RDPMON_OBJS))
-RDIMON_SCRIPTS	= rdimon.specs
+RDIMON_SCRIPTS	= rdimon.specs aprofile-ve.specs
 RDIMON_INSTALL	= install-rdimon
 
 CFLAGS		= -g
@@ -94,6 +96,15 @@ IQ80310_INSTALL	= install-iq80310
 # it to link is a good test, so we ignore all the errors for now.
 #
 all: ${CRT0} ${LINUX_CRT0} ${LINUX_BSP} ${REDBOOT_CRT0} ${REDBOOT_OBJS} ${RDPMON_CRT0} ${RDPMON_BSP} ${RDIMON_CRT0} ${RDIMON_BSP}
+	@rootpre=`pwd`/; export rootpre; \
+	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
+	for dir in .. ${SUBDIRS}; do \
+	  if [ x$$dir != x.. ]; then \
+	    if [ -d $$dir ]; then \
+	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS)); \
+	    else true; fi; \
+	  else true; fi; \
+	done
 
 #
 # here's where we build the test programs for each target
@@ -141,12 +152,30 @@ $(RDIMON_BSP): $(RDIMON_OBJS)
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP) $(IQ80310_BSP)
+	@rootpre=`pwd`/; export rootpre; \
+	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
+	for dir in .. ${SUBDIRS}; do \
+	  if [ x$$dir != x.. ]; then \
+	    if [ -d $$dir ]; then \
+	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) clean); \
+	    else true; fi; \
+	  else true; fi; \
+	done
 
 distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~
 
 .PHONY: install info install-info clean-info
 install: ${CRT0_INSTALL} ${LINUX_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL}
+	@rootpre=`pwd`/; export rootpre; \
+	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
+	for dir in .. ${SUBDIRS}; do \
+	  if [ x$$dir != x.. ]; then \
+	    if [ -d $$dir ]; then \
+	      (cd $$dir; $(MAKE) $(FLAGS_TO_PASS) install); \
+	    else true; fi; \
+	  else true; fi; \
+	done
 
 install-crt0:
 	${INSTALL_DATA} ${CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x

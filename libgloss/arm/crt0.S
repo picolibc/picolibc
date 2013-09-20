@@ -77,6 +77,12 @@
 	.fnstart
 #endif
 
+/*  The init hook does not use the stack and is called before the stack has been set up.  */
+#ifdef ARM_RDI_MONITOR
+	bl	_rdimon_hw_init_hook
+	.weak	FUNCTION (_rdimon_hw_init_hook)
+#endif
+
 /* Start by setting up a stack */
 #ifdef ARM_RDP_MONITOR
 	/*  Issue Demon SWI to read stack info */

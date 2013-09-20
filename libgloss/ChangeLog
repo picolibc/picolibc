@@ -1,3 +1,17 @@
+2013-09-20  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+	    Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+	    Greta Yorsh  <greta.yorsh@arm.com>
+
+	* arm/Makefile.in: Add support for cpu-init directory and add
+	elf-aprofile-ve.specs.
+	* arm/configure.in: Likewise.
+	* arm/configure: Regenerate.
+	* arm/cpu-init: New directory.
+	* arm/cpu-init/Makefile.in: New file.
+	* arm/cpu-init/rdimon-aem.S: Likewise.
+	* arm/crt0.S: Call _rdimon_init_hook
+	* arm/elf-aprofile-ve.specs: New file.
+
 2013-09-18  Nick Clifton  <nickc@redhat.com>
 
 	* msp430/Makefile.in (SCRIPTS): Add intr_vectors.ld.

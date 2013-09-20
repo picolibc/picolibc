@@ -650,6 +650,7 @@ CCAS
 CCASFLAGS
 objtype
 host_makefile_frag_path
+subdirs
 LIBOBJS
 LTLIBOBJS'
 ac_subst_files='host_makefile_frag'
@@ -2556,6 +2557,14 @@ host_makefile_frag_path=$host_makefile_frag
 
 
 
+# Configure cpu init plug-ins
+if test -d "${srcdir}/cpu-init"; then
+  subdirs="${subdirs} cpu-init"
+  ac_config_files="$ac_config_files cpu-init/Makefile"
+
+
+fi
+
 ac_config_files="$ac_config_files Makefile"
 
 cat >confcache <<\_ACEOF
@@ -3141,6 +3150,13 @@ cat >>$CONFIG_STATUS <<_ACEOF
 #
 AMDEP_TRUE="$AMDEP_TRUE" ac_aux_dir="$ac_aux_dir"
 srcdir=${srcdir}
+  target=${target}
+  with_multisubdir=${with_multisubdir}
+  ac_configure_args="${ac_configure_args} --enable-multilib"
+  CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
+  libgloss_topdir=${libgloss_topdir}
+
+srcdir=${srcdir}
 target=${target}
 with_multisubdir=${with_multisubdir}
 ac_configure_args="${ac_configure_args} --enable-multilib"
@@ -3157,6 +3173,7 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
+    "cpu-init/Makefile") CONFIG_FILES="$CONFIG_FILES cpu-init/Makefile" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
 
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
@@ -3297,11 +3314,12 @@ CCAS!$CCAS$ac_delim
 CCASFLAGS!$CCASFLAGS$ac_delim
 objtype!$objtype$ac_delim
 host_makefile_frag_path!$host_makefile_frag_path$ac_delim
+subdirs!$subdirs$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 75; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 76; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
@@ -3734,6 +3752,7 @@ echo "$as_me: error: cannot create directory $as_dir" >&2;}
   done
 done
  ;;
+    "cpu-init/Makefile":F) . ${libgloss_topdir}/config-ml.in ;;
     "Makefile":F) . ${libgloss_topdir}/config-ml.in ;;
 
   esac
