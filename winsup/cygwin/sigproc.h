@@ -133,7 +133,7 @@ public:
 
 class hold_everything
 {
-  bool ischild;
+  bool& ischild;
   /* Note the order of the locks below.  It is important,
      to avoid races, that the lock order be preserved.
 
@@ -150,7 +150,7 @@ class hold_everything
   lock_process process;
 
 public:
-  hold_everything (bool x = false): ischild (x) {}
+  hold_everything (bool& x): ischild (x) {}
   operator int () const {return signals;}
 
   ~hold_everything()

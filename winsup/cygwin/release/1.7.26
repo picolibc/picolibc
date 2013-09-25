@@ -1,0 +1,13 @@
+What's new:
+-----------
+
+
+What changed:
+-------------
+
+
+Bug fixes:
+----------
+
+- pthread_atparent hook should not be called in the child.
+  Fixes: http://cygwin.com/ml/cygwin/2013-09/msg00365.html
