@@ -1,5 +1,9 @@
 2013-09-25  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 26.
+
+2013-09-25  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* sigproc.h (hold_everything::ischild): Declare as reference.
 	(hold_everything::hold_everything): Store address of caller's notion of
 	"ischild".
