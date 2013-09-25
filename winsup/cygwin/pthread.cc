@@ -185,7 +185,7 @@ sem_timedwait (sem_t * sem, const struct timespec *abstime)
 }
 
 int
-sem_post (sem_t * sem)
+sem_post (sem_t *sem)
 {
   return semaphore::post (sem);
 }

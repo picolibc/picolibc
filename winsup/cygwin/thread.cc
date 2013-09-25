@@ -3443,9 +3443,19 @@ semaphore::_getvalue (int *sval)
 
   status = NtQuerySemaphore (win32_obj_id, SemaphoreBasicInformation, &sbi,
 			     sizeof sbi, NULL);
+  int res;
   if (NT_SUCCESS (status))
-    return sbi.CurrentCount;
-  return startvalue;
+    {
+      *sval = sbi.CurrentCount;
+      res = 0;
+    }
+  else
+    {
+      *sval = startvalue;
+      __seterrno_from_nt_status (status);
+      res = -1;
+    }
+  return res;
 }
 
 int
