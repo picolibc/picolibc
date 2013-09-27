@@ -75,7 +75,7 @@ RDPMON_INSTALL	= install-rdpmon
 RDIMON_CRT0	= rdimon-crt0.o
 RDIMON_BSP	= librdimon.a
 RDIMON_OBJS	= $(patsubst %,rdimon-%,$(RDPMON_OBJS))
-RDIMON_SCRIPTS	= rdimon.specs aprofile-ve.specs
+RDIMON_SCRIPTS	= rdimon.specs aprofile-validation.specs aprofile-ve.specs
 RDIMON_INSTALL	= install-rdimon
 
 CFLAGS		= -g
