@@ -1,3 +1,7 @@
+2013-09-30  Steve Ellcey  <sellcey@mips.com>
+
+	* mips/Makefile.in (install): Add mkdir, fix install command.
+
 2013-09-27  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* arm/Makefile.in (RDIMON_SCRIPTS): Add aprofile-validation.specs.
