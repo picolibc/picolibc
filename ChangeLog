@@ -1,3 +1,7 @@
+2013-10-01  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Update with new copyright.
+
 2013-09-21  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
 	* configure.ac: Update from GCC.
