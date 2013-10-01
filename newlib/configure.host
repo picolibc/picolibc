@@ -458,6 +458,7 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -D_I386MACH_ALLOW_HW_INTERRUPTS"
 	newlib_cflags="${newlib_cflags} -DHAVE_FCNTL"
 	newlib_cflags="${newlib_cflags} -DHAVE_GETOPT"
+	newlib_cflags="${newlib_cflags} -D_NO_POSIX_SPAWN"
 	# --- Required when building a shared library ------------------------
 	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
 	# --- The three lines below are optional ------------------------------
@@ -568,7 +569,7 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -D_COMPILING_NEWLIB"
 	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED -DEXIT_PROVIDED -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_NANOSLEEP -DHAVE_BLKSIZE -DHAVE_FCNTL -DHAVE_ASSERT_FUNC"
         # turn off unsupported items in posix directory 
-	newlib_cflags="${newlib_cflags} -D_NO_GETLOGIN -D_NO_GETPWENT -D_NO_GETUT -D_NO_GETPASS -D_NO_SIGSET -D_NO_WORDEXP -D_NO_POPEN"
+	newlib_cflags="${newlib_cflags} -D_NO_GETLOGIN -D_NO_GETPWENT -D_NO_GETUT -D_NO_GETPASS -D_NO_SIGSET -D_NO_WORDEXP -D_NO_POPEN -D_NO_POSIX_SPAWN"
 	;;
 # VxWorks supplies its own version of malloc, and the newlib one
 # doesn't work because VxWorks does not have sbrk.
@@ -746,7 +747,7 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -mrelocatable-lib -mno-eabi -mstrict-align -DMISSING_SYSCALL_NAMES"
 	;;
   powerpcle-*-pe)
-	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DHAVE_FCNTL"
+	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DHAVE_FCNTL -D_NO_POSIX_SPAWN"
 	syscall_dir=syscalls
 	;;
   sh*-*-*)

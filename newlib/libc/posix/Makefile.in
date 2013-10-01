@@ -87,7 +87,7 @@ am__objects_3 = lib_a-execl.$(OBJEXT) lib_a-execle.$(OBJEXT) \
 	lib_a-execlp.$(OBJEXT) lib_a-execv.$(OBJEXT) \
 	lib_a-execve.$(OBJEXT) lib_a-execvp.$(OBJEXT) \
 	lib_a-wordexp.$(OBJEXT) lib_a-wordfree.$(OBJEXT)
-am__objects_4 = lib_a-popen.$(OBJEXT)
+am__objects_4 = lib_a-popen.$(OBJEXT) lib_a-posix_spawn.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_5 = $(am__objects_2) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_3) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_4)
@@ -107,7 +107,7 @@ am__objects_6 = closedir.lo collate.lo collcmp.lo creat.lo fnmatch.lo \
 am__objects_7 = scandir.lo seekdir.lo
 am__objects_8 = execl.lo execle.lo execlp.lo execv.lo execve.lo \
 	execvp.lo wordexp.lo wordfree.lo
-am__objects_9 = popen.lo
+am__objects_9 = popen.lo posix_spawn.lo
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_10 = $(am__objects_7) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_8) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_9)
@@ -305,7 +305,7 @@ ELIX_3_SOURCES = \
 	execve.c execvp.c wordexp.c wordfree.c
 
 ELIX_4_SOURCES = \
-	popen.c 
+	popen.c posix_spawn.c
 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES) $(ELIX_4_SOURCES)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES)
@@ -575,6 +575,12 @@ lib_a-popen.o: popen.c
 
 lib_a-popen.obj: popen.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-popen.obj `if test -f 'popen.c'; then $(CYGPATH_W) 'popen.c'; else $(CYGPATH_W) '$(srcdir)/popen.c'; fi`
+
+lib_a-posix_spawn.o: posix_spawn.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-posix_spawn.o `test -f 'posix_spawn.c' || echo '$(srcdir)/'`posix_spawn.c
+
+lib_a-posix_spawn.obj: posix_spawn.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-posix_spawn.obj `if test -f 'posix_spawn.c'; then $(CYGPATH_W) 'posix_spawn.c'; else $(CYGPATH_W) '$(srcdir)/posix_spawn.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

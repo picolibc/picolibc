@@ -1,3 +1,12 @@
+2013-10-01  Petr Hosek  <phosek@chromium.org>
+
+	* configure.host: Disable new posix_spawn function for all
+	users of posix dir except Cygwin.
+	* libc/posix/Makefile.am: Add support for new posix_spawn function.
+	* libc/posix/Makefile.in: Regenerate.
+	* libc/posix/posix_spawn.c: New file.
+	* libc/include/spawn.h: Ditto.
+
 2013-09-13  Joey Ye  <joey.ye@arm.com>
 
 	* libc/stdlib/nano-mallocr.c (nano_allopt): Typo fixed to ...

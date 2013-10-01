@@ -20,7 +20,7 @@ ELIX_3_SOURCES = \
 	execve.c execvp.c wordexp.c wordfree.c
 
 ELIX_4_SOURCES = \
-	popen.c 
+	popen.c posix_spawn.c
 
 if ELIX_LEVEL_1
 ELIX_SOURCES =
