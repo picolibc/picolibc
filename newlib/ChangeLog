@@ -1,3 +1,10 @@
+2013-10-03  Steve Ellcey  <sellcey@mips.com>
+
+	* libc/machine/mips/memset.c: Remove.
+	* libc/machine/mips/memset.S: New.
+	* libc/machine/mips/Makefile.am: Change memset.c to memset.S
+	* libc/machine/mips/Makefile.in: Regenerate.
+
 2013-10-01  Petr Hosek  <phosek@chromium.org>
 
 	* configure.host: Disable new posix_spawn function for all
