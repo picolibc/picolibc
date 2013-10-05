@@ -1,3 +1,7 @@
+2013-10-05  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* ntdll.h: Guard against new header files.
+
 2013-09-25  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 26.

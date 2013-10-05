@@ -69,7 +69,9 @@
 #define SYMBOLIC_LINK_QUERY 1
 
 /* Transaction access rights. */
+#ifndef TRANSACTION_ALL_ACCESS
 #define TRANSACTION_ALL_ACCESS (STANDARD_RIGHTS_REQUIRED | 0x3F)
+#endif
 
 /* Event object access rights. */
 #define EVENT_QUERY_STATE 1
