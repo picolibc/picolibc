@@ -48,7 +48,7 @@ int main()
       CHECK (iswlower(0x03b3));
       CHECK (!iswlower(0x04aa));
       CHECK (iswprint(0x0b13));
-      CHECK (!iswprint(0x0ce2));
+      CHECK (!iswprint(0x0ce4));
       CHECK (iswpunct(0x002d));
       CHECK (!iswpunct(0x0a84));
       CHECK (iswspace(0x000a));
