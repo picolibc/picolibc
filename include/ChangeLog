@@ -1,3 +1,8 @@
+2013-10-10  Sean Keys <skeys@ipdatasys.com>
+
+	* xgate.h : Cleanup after opcode
+        table modification..
+
 2013-08-20  Alan Modra  <amodra@gmail.com>
 
 	* floatformat.h (floatformat_ibm_long_double): Delete.

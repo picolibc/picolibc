@@ -46,38 +46,24 @@
 #define XGATE_CYCLE_A	0x40
 #define XGATE_CYCLE_f	0x80
 
-/* Opcode format abbreviations.  */
-#define XG_INH		0x0001  /* Inherent.  */
-#define XG_I		0x0002  /* 3-bit immediate address.  */
-#define XG_R_I		0x0004  /* Register followed by 4/8-bit immediate value.  */
-#define XG_R_R		0x0008  /* Register followed by a register.  */
-#define XG_R_R_R	0x0010  /* Register followed by two registers.  */
-#define XG_R		0x0020  /* Single register.  */
-#define XG_PC		0x0040  /* PC relative 10 or 11 bit.  */
-#define XG_R_C		0x0080  /* General register followed by ccr register.  */
-#define XG_C_R		0x0100  /* CCR register followed by a general register.  */
-#define XG_R_P		0x0200  /* General register followed by pc register.  */
-#define XG_R_R_I	0x0400  /* Two general registers followed by an immediate value.  */
-#define XG_PCREL	0x0800  /* Immediate value that is relative to the current pc.  */
-
 /* XGATE operand formats as stored in the XGATE_opcode table.
    They are only used by GAS to recognize operands.  */
-#define XGATE_OP_INH		""
-#define XGATE_OP_TRI		"r,r,r"
-#define XGATE_OP_DYA		"r,r"
-#define XGATE_OP_IMM16          "r,if"
-#define XGATE_OP_IMM8	        "r,i8"
-#define XGATE_OP_IMM4           "r,i4"
-#define XGATE_OP_IMM3	        "i3"
-#define XGATE_OP_MON		"r"
-#define XGATE_OP_MON_R_C	"r,c"
-#define XGATE_OP_MON_C_R	"c,r"
-#define XGATE_OP_MON_R_P	"r,p"
-#define XGATE_OP_IDR		"r,r,+"
-#define XGATE_OP_IDO5	        "r,r,i5"
-#define XGATE_OP_REL9	        "b9"
-#define XGATE_OP_REL10	        "ba"
-#define XGATE_OP_DYA_MON	"=r"
+#define XGATE_OP_INH                  ""  /* Inherent.  */
+#define XGATE_OP_TRI		 "r,r,r"  /* Register followed by two registers.                    */
+#define XGATE_OP_DYA		   "r,r"  /* Register followed by a register.                       */
+#define XGATE_OP_IMM16            "r,if"  /* Register followed by 16-bit value.                    */
+#define XGATE_OP_IMM8	          "r,i8"  /* Register followed by 8-bit value.                      */
+#define XGATE_OP_IMM4             "r,i4"  /* Register followed by 4-bit value.                     */
+#define XGATE_OP_IMM3	            "i3"  /* Register followed by 3-bit value.                      */
+#define XGATE_OP_MON		     "r"  /* Single register.                                       */
+#define XGATE_OP_MON_R_C	   "r,c"  /* General register followed by ccr register.             */
+#define XGATE_OP_MON_C_R	   "c,r"  /* CCR register followed by a general register.           */
+#define XGATE_OP_MON_R_P	   "r,p"  /* General register followed by pc register.              */
+#define XGATE_OP_IDR		 "r,r,+"  /* Three registers with the third having a -/+ directive. */
+#define XGATE_OP_IDO5	        "r,r,i5"  /* Two general registers followed by an immediate value.  */
+#define XGATE_OP_REL9	            "b9"  /* 9-bit value that is relative to the current pc.        */
+#define XGATE_OP_REL10	            "ba"  /* 10-bit value that is relative to the current pc.       */
+#define XGATE_OP_DYA_MON	    "=r"
 /* Macro definitions.  */
 #define XGATE_OP_IMM16mADD    "r,if; addl addh"
 #define XGATE_OP_IMM16mAND    "r,if; andl andh"
@@ -90,18 +76,12 @@
 #define XGATE_V2 0x2
 #define XGATE_V3 0x4
 
-/* Max opcodes per opcode handle.  */
-#define MAX_OPCODES     0x05
-
-#define MAX_DETECT_CHARS 0x10
-
 /* The opcode table definitions.  */
 struct xgate_opcode
 {
   char * name;                  /* Op-code name.  */
   char * constraints;           /* Constraint chars.  */
   char * format;                /* Bit definitions.  */
-  unsigned int sh_format;       /* Shorthand format mask.  */
   unsigned int size;            /* Opcode size in bytes.  */
   unsigned int bin_opcode;      /* Binary opcode with operands masked off.  */
   unsigned char cycles_min;     /* Minimum cpu cycles needed.  */
