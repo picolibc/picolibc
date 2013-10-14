@@ -1,3 +1,8 @@
+2013-10-14  Chao-ying Fu  <Chao-ying.Fu@imgtec.com>
+
+	* mips.h (enum): Add Tag_GNU_MIPS_ABI_MSA.
+	(enum): Add Val_GNU_MIPS_ABI_MSA_ANY and Val_GNU_MIPS_ABI_MSA_128.
+
 2013-09-17  Doug Gilmore  <Doug.Gilmore@imgtec.com>
 
 	* mips.h (EF_MIPS_FP64): New e_flags bit.
