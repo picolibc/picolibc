@@ -1,3 +1,9 @@
+2013-10-14  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+
+	* arm/cpu-init/rdimon-aem.S: Disable for M class cores.
+	* arm/crt0.S: Don't call _rdimon_hw_init_hook for non-A class cores.
+	* arm/cpu-init/Makefile.in (CPU_INIT_OBJS): Use CFLAGS.
+
 2013-09-30  Steve Ellcey  <sellcey@mips.com>
 
 	* mips/Makefile.in (install): Add mkdir, fix install command.

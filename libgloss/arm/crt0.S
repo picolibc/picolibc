@@ -77,10 +77,17 @@
 	.fnstart
 #endif
 
+	/* __ARM_ARCH_PROFILE is defined from GCC 4.8 onwards, however __ARM_ARCH_7A
+	has been defined since 4.2 onwards, which is when v7-a support was added
+	and hence 'A' profile support was added in the compiler.  Allow for this
+	file to be built with older compilers.  We only call this for A profile
+	cores.  */
+#if defined (__ARM_ARCH_7A__) || (__ARM_ARCH_PROFILE == 'A')
 /*  The init hook does not use the stack and is called before the stack has been set up.  */
 #ifdef ARM_RDI_MONITOR
 	bl	_rdimon_hw_init_hook
 	.weak	FUNCTION (_rdimon_hw_init_hook)
+#endif
 #endif
 
 /* Start by setting up a stack */

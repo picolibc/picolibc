@@ -37,18 +37,22 @@
    It does not change processor state from the startup privilege and security
    level.
 
+   This has only been tested to work in ARM state.
+
    By default it assumes exception vectors are located from address 0.
    However, if this is not true they can be moved by defining the
    _rdimon_vector_base symbol.  For example if you have HIVECS enabled you
    may pass --defsym _rdimon_vector_base=0xffff0000 on the linker command
    line.  */
 
+   /* __ARM_ARCH_PROFILE is defined from GCC 4.8 onwards, however __ARM_ARCH_7A
+	has been defined since 4.2 onwards, which is when v7-a support was added
+	and hence 'A' profile support was added in the compiler.  Allow for this
+	file to be built with older compilers.  */
+#if defined(__ARM_ARCH_7A__) || (__ARM_ARCH_PROFILE == 'A')
     .syntax	unified
     .arch	armv7-a
-
-#if defined(__thumb__)
-    .thumb
-#endif
+    .arm
 
     @ CPU Initialisation
     .globl	_rdimon_hw_init_hook
@@ -81,6 +85,7 @@ spin:
 
     @ For Cortex-A15 and Cortex-A7 only:
     @ Write zero into the ACTLR to turn everything on.
+    itt		eq
     moveq       r4, #0
     mcreq       15, 0, r4, c1, c0, 1
     isb
@@ -88,6 +93,7 @@ spin:
     @ For Cortex-A15 and Cortex-A7 only:
     @ Set ACTLR:SMP bit before enabling the caches and MMU,
     @ or performing any cache and TLB maintenance operations.
+    ittt	eq
     mrceq       15, 0, r4, c1, c0, 1    @ Read ACTLR
     orreq       r4, r4, #(1<<6)         @ Enable ACTLR:SMP
     mcreq       15, 0, r4, c1, c0, 1    @ Write ACTLR
@@ -245,7 +251,7 @@ vector_common_adr:
    .word        vector_common_2         @ Common handling code
 
                                         @ Vector stack
-   .align       3                       @ Align to 8 byte boundary boundary to
+   .p2align       3                       @ Align to 8 byte boundary boundary to
 					@ keep ABI compatibility
    .fill        32, 4, 0                @ 32-entry stack is enough for vector
 					@ handlers.
@@ -365,7 +371,8 @@ register_names:
     .asciz	"r12  "
     .asciz	"r14  "
 
-    .align
+    .p2align      3
+
 
     @ Enable the caches
 __enable_caches:
@@ -386,7 +393,7 @@ __enable_caches:
     cmp         r0, #0
     it		ne
     orrne       r4, r4, #4
-    mcr         15, 0, r4, cr1, cr0, 0  @ Eanble D-Cache
+    mcr         15, 0, r4, cr1, cr0, 0  @ Enable D-Cache
     bx          r5                      @ Return
 
 __reset_caches:
@@ -414,7 +421,9 @@ __reset_caches:
     orrne       r1, r1, #0x1000         @ Enable I-Cache now -
                                         @ We actually only do this if we have a
                                         @ Harvard style cache.
+    it		eq
     bleq        init_cpu_client_enable_dcache
+    itt		eq
     cmpeq       r0, #0
     beq         Finished1
 
@@ -483,6 +492,7 @@ is_a15_a7:
     cmp         r8, r9
     movw        r9, #0xc070
     movt        r9, #0x410f
+    it		ne
     cmpne       r8, r9
     bx          lr
 
@@ -516,3 +526,5 @@ is_a15_a7:
     .p2align    14
 page_tables:
      PT7(0x1c0e)
+
+#endif //#if defined(__ARM_ARCH_7A__) || __ARM_ARCH_PROFILE == 'A'
