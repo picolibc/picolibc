@@ -1,3 +1,16 @@
+2013-10-14  Chao-ying Fu  <Chao-ying.Fu@imgtec.com>
+
+	* mips.h (mips_operand_type): Add OP_IMM_INDEX and OP_REG_INDEX.
+	(mips_reg_operand_type): Add OP_REG_MSA and OP_REG_MSA_CTRL.
+	For MIPS, add comments for +d, +e, +h, +k, +l, +n, +o, +u, +v, +w,
+	+T, +U, +V, +W, +~, +!, +@, +#, +$, +%, +^, +&, +*, +|.
+	For MIPS, update extension character sequences after +.
+	(ASE_MSA): New define.
+	(ASE_MSA64): New define.
+	For microMIPS, add comments for +d, +e, +h, +k, +l, +n, +o, +u, +v, +w,
+	+x, +T, +U, +V, +W, +~, +!, +@, +#, +$, +%, +^, +&, +*, +|.
+	For microMIPS, update extension character sequences after +.
+
 2013-08-23  Yuri Chornoivan  <yurchor@ukr.net>
 
 	PR binutils/15834
