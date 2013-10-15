@@ -1,7 +1,7 @@
 2013-10-09  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
-        * testsuite/newlib.wctype/twctype.c (main): Update
-        iswprint(0xce2) test case.
+	* testsuite/newlib.wctype/twctype.c (main): Update
+	iswprint(0xce2) test case.
 
 2013-10-03  Steve Ellcey  <sellcey@mips.com>
 
