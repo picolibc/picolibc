@@ -1,3 +1,10 @@
+2013-10-15  Hans-Peter Nilsson  <hp@axis.com>
+
+	* src-release (do-proto-toplevel): Support subdir-path-prefixed
+	files in SUPPORT_FILES.
+	(SIM_SUPPORT_DIRS): New variable.
+	(sim.tar.bz2): New rule.
+
 2013-10-08  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
 	* configure.ac: Update from GCC.

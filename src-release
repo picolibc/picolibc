@@ -165,7 +165,15 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	    else \
 	      ln -s ../$$d proto-toplev/$$d ; \
 	    fi ; \
-	  else ln -s ../$$d proto-toplev/$$d ; fi ; \
+	  else \
+	    if (echo x$$d | grep / >/dev/null); then \
+	      mkdir -p proto-toplev/`dirname $$d` ; \
+	      x=`dirname $$d` ; \
+	      ln -s ../`echo $$x/ | sed -e 's,[^/]*/,../,g'`$$d proto-toplev/$$d ; \
+	    else \
+	      ln -s ../$$d proto-toplev/$$d ; \
+	    fi ; \
+	  fi ; \
 	done
 	cd etc && $(MAKE) MAKEINFOFLAGS="$(MAKEINFOFLAGS)" info
 	$(MAKE) distclean
@@ -285,6 +293,14 @@ gdb.tar: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f $(SELF) gdb-tar TOOL=gdb \
 		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(GDB_SUPPORT_DIRS)"
+
+# Corresponding to the CVS "sim" module.
+.PHONY: sim.tar.bz2
+SIM_SUPPORT_DIRS= bfd opcodes libiberty include intl gdb/version.in makefile.vms
+sim.tar.bz2: $(DIST_SUPPORT) $(SIM_SUPPORT_DIRS) sim
+	$(MAKE) -f $(SELF) taz TOOL=sim \
+		MD5PROG="$(MD5PROG)" \
+		SUPPORT_FILES="$(SIM_SUPPORT_DIRS)"
 
 .PHONY: insight.tar.bz2
 INSIGHT_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl tk itcl libgui
