@@ -10,6 +10,9 @@
 typedef __int32_t blksize_t;
 typedef __int32_t blkcnt_t;
 
+typedef __uint64_t __dev_t;
+#define __dev_t_defined 1
+
 #if defined(__arm__) || defined(__i386__) || defined(__m68k__) || defined(__mips__) || defined(__PPC__) || defined(__sparc__)
 /* Use 64bit types */
 typedef __int64_t _off_t;

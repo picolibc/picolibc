@@ -16,13 +16,8 @@
 typedef long _off_t;
 #endif
 
-#if defined(__rtems__)
-/* device numbers are 32-bit major and and 32-bit minor */
-typedef unsigned long long __dev_t;
-#else
 #ifndef __dev_t_defined
 typedef short __dev_t;
-#endif
 #endif
 
 #ifndef __uid_t_defined

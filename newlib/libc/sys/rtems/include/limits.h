@@ -32,6 +32,7 @@
 #define _POSIX_ARG_MAX          4096
 #define _POSIX_CHILD_MAX        6
 #define _POSIX_DELAYTIMER_MAX   32
+#define _POSIX_HOST_NAME_MAX    255
 #define _POSIX_LINK_MAX         8
 #define _POSIX_MAX_CANON        255
 #define _POSIX_MAX_INPUT        255
