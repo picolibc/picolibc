@@ -1,3 +1,8 @@
+2013-10-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Convert pagesize from DWORD to size_t to avoid
+	a rounding error for allocations beyond 4 Gigs.
+
 2013-10-05  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* ntdll.h: Guard against new header files.

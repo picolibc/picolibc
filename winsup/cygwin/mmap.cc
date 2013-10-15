@@ -901,7 +901,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
   caddr_t base = NULL;
   struct stat st;
 
-  DWORD pagesize = wincap.allocation_granularity ();
+  size_t pagesize = wincap.allocation_granularity ();
 
   fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
   fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
