@@ -1,5 +1,9 @@
 2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
+	* libc/sys/rtems/machine/_types.h (_HAVE_SYSTYPES): Define.
+
+2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
 	* libc/sys/rtems/machine/_types.h (__dev_t): Define.
 	(__dev_t_defined) Likewise.
 	* libc/include/sys/_types.h (__dev_t): Delete RTEMS specific
