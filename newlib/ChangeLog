@@ -1,5 +1,23 @@
 2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
+	* libc/include/machine/_default_types.h (__int8_t): Define via
+	<stdint.h> provided type.
+	(__uint8_t): Likewise.
+	(__int8_least_t): Likewise.
+	(__uint8_least_t): Likewise.
+	(__int16_t): Likewise.
+	(__uint16_t): Likewise.
+	(__int16_least_t): Likewise.
+	(__uint16_least_t): Likewise.
+	(__int32_t): Likewise.
+	(__uint32_t): Likewise.
+	(__int32_least_t): Likewise.
+	(__uint32_least_t): Likewise.
+	(__int64_t): Likewise.
+	(__uint64_t): Likewise.
+
+2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
 	* libc/include/paths.h (_PATH_DEVNULL): Define.
 	(_PATH_DEVZERO): Likewise.
 
