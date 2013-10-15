@@ -1,5 +1,10 @@
 2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
+	* libc/sys/rtems/machine/_types.h (_ssize_t): Delete.
+	(__ssize_t_defined) Likewise.
+
+2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
 	* libc/include/machine/_default_types.h (__int8_t): Define via
 	<stdint.h> provided type.
 	(__uint8_t): Likewise.
