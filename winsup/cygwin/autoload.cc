@@ -537,9 +537,6 @@ wsock_init ()
 LoadDLLprime (ws2_32, _wsock_init, 0)
 
 LoadDLLfunc (CreateProcessAsUserW, 44, advapi32)
-LoadDLLfunc (CryptAcquireContextW, 20, advapi32)
-LoadDLLfunc (CryptGenRandom, 12, advapi32)
-LoadDLLfunc (CryptReleaseContext, 8, advapi32)
 LoadDLLfunc (DeregisterEventSource, 4, advapi32)
 LoadDLLfunc (LogonUserW, 24, advapi32)
 LoadDLLfunc (LookupAccountNameW, 28, advapi32)
@@ -563,6 +560,7 @@ LoadDLLfunc (RegQueryInfoKeyW, 48, advapi32)
 LoadDLLfunc (RegQueryValueExW, 24, advapi32)
 LoadDLLfunc (RegisterEventSourceW, 8, advapi32)
 LoadDLLfunc (ReportEventW, 36, advapi32)
+LoadDLLfunc (SystemFunction036, 8, advapi32)	/* Aka "RtlGenRandom" */
 
 LoadDLLfunc (DnsQuery_A, 24, dnsapi)
 LoadDLLfunc (DnsRecordListFree, 8, dnsapi)

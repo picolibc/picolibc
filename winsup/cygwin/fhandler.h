@@ -1652,7 +1652,6 @@ class fhandler_dev_zero: public fhandler_base
 class fhandler_dev_random: public fhandler_base
 {
  protected:
-  HCRYPTPROV crypt_prov;
   uint32_t pseudo;
   off_t dummy_offset;
 
@@ -1661,14 +1660,13 @@ class fhandler_dev_random: public fhandler_base
   int pseudo_read (void *ptr, size_t len);
 
  public:
-  fhandler_dev_random ();
   int open (int flags, mode_t mode = 0);
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
   off_t lseek (off_t offset, int whence);
   int close ();
-  int dup (fhandler_base *child, int);
 
+  fhandler_dev_random () : fhandler_base () {}
   fhandler_dev_random (void *) {}
 
   void copyto (fhandler_base *x)

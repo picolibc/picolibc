@@ -1,8 +1,7 @@
 /* fhandler_random.cc: code to access /dev/random and /dev/urandom
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009, 2011 Red Hat, Inc.
-
-   Written by Corinna Vinschen (vinschen@cygnus.com)
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2009, 2011, 2013
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -23,13 +22,11 @@ details. */
 #define RANDOM   8
 #define URANDOM  9
 
+/* The system PRNG is reseeded after reading 128K bytes. */
+#define RESEED_INTERVAL	(128 * 1024)
+
 #define PSEUDO_MULTIPLIER       (6364136223846793005LL)
 #define PSEUDO_SHIFTVAL		(21)
-
-fhandler_dev_random::fhandler_dev_random ()
-  : fhandler_base (), crypt_prov ((HCRYPTPROV) NULL)
-{
-}
 
 int
 fhandler_dev_random::open (int flags, mode_t)
@@ -41,22 +38,18 @@ fhandler_dev_random::open (int flags, mode_t)
   return 1;
 }
 
+/* There's a bug in ntsecapi.h (Mingw as well as MSFT).  SystemFunction036
+   is, in fact, a WINAPI function, but it's not defined as such.  Therefore
+   we have to do it correctly here. */
+#define RtlGenRandom SystemFunction036
+extern "C" BOOLEAN WINAPI RtlGenRandom (PVOID, ULONG);
+
 bool
 fhandler_dev_random::crypt_gen_random (void *ptr, size_t len)
 {
-  if (!crypt_prov
-      && !CryptAcquireContextW (&crypt_prov, NULL, MS_DEF_PROV_W, PROV_RSA_FULL,
-				CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET)
-      && !CryptAcquireContextW (&crypt_prov, NULL, MS_DEF_PROV_W, PROV_RSA_FULL,
-				CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET
-				| CRYPT_NEWKEYSET))
+  if (!RtlGenRandom (ptr, len))
     {
-      debug_printf ("%E = CryptAquireContext()");
-      return false;
-    }
-  if (!CryptGenRandom (crypt_prov, len, (BYTE *)ptr))
-    {
-      debug_printf ("%E = CryptGenRandom()");
+      debug_printf ("%E = RtlGenRandom()");
       return false;
     }
   return true;
@@ -127,20 +120,35 @@ fhandler_dev_random::read (void *ptr, size_t& len)
       return;
     }
 
-  if (crypt_gen_random (ptr, len))
-    return;
-
-  /* If device is /dev/urandom, use pseudo number generator as fallback.
-     Don't do this for /dev/random since it's intended for uses that need
-     very high quality randomness. */
-  if (dev () == FH_URANDOM)
+  /* /dev/random has to provide high quality random numbers.  Therefore we
+     re-seed the system PRNG for each block of 512 bytes.  This results in
+     sufficiently random sequences, comparable to the Linux /dev/random. */
+  if (dev () == FH_RANDOM)
     {
-      len = pseudo_read (ptr, len);
-      return;
+      void *dummy = malloc (RESEED_INTERVAL);
+      if (!dummy)
+	{
+	  __seterrno ();
+	  len = (size_t) -1;
+	  return;
+	}
+      for (size_t offset = 0; offset < len; offset += 512)
+	{
+	  if (!crypt_gen_random (dummy, RESEED_INTERVAL) ||
+	      !crypt_gen_random ((PBYTE) ptr + offset, len - offset))
+	    {
+	      __seterrno ();
+	      len = (size_t) -1;
+	      break;
+	    }
+	}
+      free (dummy);
     }
 
-  __seterrno ();
-  len = (size_t) -1;
+  /* If device is /dev/urandom, just use system RNG as is, with our own
+     PRNG as fallback. */
+  else if (!crypt_gen_random (ptr, len))
+    len = pseudo_read (ptr, len);
 }
 
 off_t
@@ -174,17 +182,5 @@ fhandler_dev_random::lseek (off_t off, int whence)
 int
 fhandler_dev_random::close ()
 {
-  if (!have_execed && crypt_prov)
-    while (!CryptReleaseContext (crypt_prov, 0)
-	   && GetLastError () == ERROR_BUSY)
-      Sleep (10);
-  return 0;
-}
-
-int
-fhandler_dev_random::dup (fhandler_base *child, int)
-{
-  fhandler_dev_random *fhr = (fhandler_dev_random *) child;
-  fhr->crypt_prov = (HCRYPTPROV)NULL;
   return 0;
 }

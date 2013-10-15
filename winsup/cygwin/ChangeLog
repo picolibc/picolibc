@@ -1,5 +1,26 @@
 2013-10-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (CryptAcquireContextW): Remove.
+	(CryptGenRandom): Remove.
+	(CryptReleaseContext): Remove.
+	(SystemFunction036): Define.  Add comment to explain that this is
+	actually the RtlGenRandom function.
+	* fhandler.h (class fhandler_dev_random): Drop crypt_prov member.
+	(fhandler_dev_random::fhandler_dev_random): Define inline.
+	(fhandler_dev_random::dup): Drop declaration.
+	* fhandler_random.cc (fhandler_dev_random::fhandler_dev_random): Remove
+	here.
+	(fhandler_dev_random::crypt_gen_random): Use RtlGenRandom to drop
+	dependency to old Crypto API.
+	(fhandler_dev_random::read): Implement an enhanced version of reading
+	random bytes from RtlGenRandom for the sake of a better /dev/random
+	emulation.
+	(fhandler_dev_random::close): Just return 0 since crypt_prov doesn't
+	exisyt anymore.
+	(fhandler_dev_random::dup): Drop entirely for the same reason.
+
+2013-10-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (mmap64): Convert pagesize from DWORD to size_t to avoid
 	a rounding error for allocations beyond 4 Gigs.
 
