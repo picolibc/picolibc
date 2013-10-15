@@ -1,3 +1,8 @@
+2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/include/paths.h (_PATH_DEVNULL): Define.
+	(_PATH_DEVZERO): Likewise.
+
 2013-10-09  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* testsuite/newlib.wctype/twctype.c (main): Update
