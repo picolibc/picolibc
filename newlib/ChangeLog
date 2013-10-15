@@ -1,5 +1,10 @@
 2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
+	* libc/libc/sys/rtems/sys/param.h: Update some parameters to
+	the latest FreeBSD values.
+
+2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
 	* libc/sys/rtems/machine/_types.h (_HAVE_SYSTYPES): Define.
 
 2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>

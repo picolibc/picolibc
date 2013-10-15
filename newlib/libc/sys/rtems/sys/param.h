@@ -66,19 +66,19 @@
  * Redefined constants are from POSIX 1003.1 limits file.
  *
  * MAXCOMLEN should be >= sizeof(ac_comm) (see <acct.h>)
- * MAXLOGNAME should be >= UT_NAMESIZE (see <utmp.h>)
  */
 #include <sys/syslimits.h>
 
-#define	MAXCOMLEN	16		/* max command name remembered */
-#define	MAXINTERP	32		/* max interpreter file name length */
-#define	MAXLOGNAME	12		/* max login name length */
+#define	MAXCOMLEN	19		/* max command name remembered */
+#define	MAXINTERP	PATH_MAX	/* max interpreter file name length */
+#define	MAXLOGNAME	33		/* max login name length (incl. NUL) */
 #define	MAXUPRC		CHILD_MAX	/* max simultaneous processes */
 #define	NCARGS		ARG_MAX		/* max bytes for an exec function */
-#define	NGROUPS		NGROUPS_MAX	/* max number groups */
+#define	NGROUPS		(NGROUPS_MAX+1)	/* max number groups */
 #define	NOFILE		OPEN_MAX	/* max open files per process */
 #define	NOGROUP		65535		/* marker for empty group set member */
 #define MAXHOSTNAMELEN	256		/* max hostname size */
+#define SPECNAMELEN	63		/* max length of devicename */
 
 /* More types and definitions used throughout the kernel. */
 #if defined(KERNEL) || defined(_KERNEL)
@@ -123,21 +123,29 @@
 /*
  * File system parameters and macros.
  *
- * The file system is made out of blocks of at most MAXBSIZE units, with
- * smaller units (fragments) only in the last direct block.  MAXBSIZE
- * primarily determines the size of buffers in the buffer pool.  It may be
- * made larger without any effect on existing file systems; however making
- * it smaller make make some file systems unmountable.  Also, MAXBSIZE
- * must be less than MAXPHYS!!!  DFLTBSIZE is the average amount of
- * memory allocated by vfs_bio per nbuf.  BKVASIZE is the average amount
- * of kernel virtual space allocated per nbuf.  BKVASIZE should be >=
- * DFLTBSIZE.  If it is significantly bigger than DFLTBSIZE, then
- * kva fragmentation causes fewer performance problems.
+ * MAXBSIZE -	Filesystems are made out of blocks of at most MAXBSIZE bytes
+ *		per block.  MAXBSIZE may be made larger without effecting
+ *		any existing filesystems as long as it does not exceed MAXPHYS,
+ *		and may be made smaller at the risk of not being able to use
+ *		filesystems which require a block size exceeding MAXBSIZE.
+ *
+ * BKVASIZE -	Nominal buffer space per buffer, in bytes.  BKVASIZE is the
+ *		minimum KVM memory reservation the kernel is willing to make.
+ *		Filesystems can of course request smaller chunks.  Actual 
+ *		backing memory uses a chunk size of a page (PAGE_SIZE).
+ *
+ *		If you make BKVASIZE too small you risk seriously fragmenting
+ *		the buffer KVM map which may slow things down a bit.  If you
+ *		make it too big the kernel will not be able to optimally use 
+ *		the KVM memory reserved for the buffer cache and will wind 
+ *		up with too-few buffers.
+ *
+ *		The default is 16384, roughly 2x the block size used by a
+ *		normal UFS filesystem.
  */
-#define	MAXBSIZE	65536
-#define BKVASIZE	8192
-#define DFLTBSIZE	4096
-#define MAXFRAG 	8
+#define MAXBSIZE	65536	/* must be power of 2 */
+#define BKVASIZE	16384	/* must be power of 2 */
+#define BKVAMASK	(BKVASIZE-1)
 
 /*
  * MAXPATHLEN defines the longest permissible path length after expanding
@@ -154,10 +162,12 @@
 #define MAXSYMLINKS	32
 
 /* Bit map related macros. */
-#define	setbit(a,i)	((a)[(i)/NBBY] |= 1<<((i)%NBBY))
-#define	clrbit(a,i)	((a)[(i)/NBBY] &= ~(1<<((i)%NBBY)))
-#define	isset(a,i)	((a)[(i)/NBBY] & (1<<((i)%NBBY)))
-#define	isclr(a,i)	(((a)[(i)/NBBY] & (1<<((i)%NBBY))) == 0)
+#define	setbit(a,i)	(((unsigned char *)(a))[(i)/NBBY] |= 1<<((i)%NBBY))
+#define	clrbit(a,i)	(((unsigned char *)(a))[(i)/NBBY] &= ~(1<<((i)%NBBY)))
+#define	isset(a,i)							\
+	(((const unsigned char *)(a))[(i)/NBBY] & (1<<((i)%NBBY)))
+#define	isclr(a,i)							\
+	((((const unsigned char *)(a))[(i)/NBBY] & (1<<((i)%NBBY))) == 0)
 
 /* Macros for counting and rounding. */
 #ifndef howmany
