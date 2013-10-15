@@ -5,9 +5,13 @@ What's new:
 What changed:
 -------------
 
+- Slightly improve randomness of /dev/random emulation.
 
 Bug fixes:
 ----------
 
 - pthread_atparent hook should not be called in the child.
   Fixes: http://cygwin.com/ml/cygwin/2013-09/msg00365.html
+
+- 64 bit only:  Correctly mmap'ing regions > 4 Gigs.
+  Fixes: http://cygwin.com/ml/cygwin/2013-09/msg00155.html
