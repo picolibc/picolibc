@@ -1,3 +1,9 @@
+2013-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (format_process_ctty): Fix random content of
+	/proc/$PID/ctty if the process has no controlling tty.  Set to just
+	"\n" instead.
+
 2013-10-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (CryptAcquireContextW): Remove.

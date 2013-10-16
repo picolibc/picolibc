@@ -433,8 +433,13 @@ format_process_gid (void *data, char *&destbuf)
 static off_t
 format_process_ctty (void *data, char *&destbuf)
 {
-  device d;
   _pinfo *p = (_pinfo *) data;
+  if (p->ctty < 0)
+    {
+      destbuf = (char *) crealloc_abort (destbuf, 2);
+      return __small_sprintf (destbuf, "\n");
+    }
+  device d;
   d.parse (p->ctty);
   destbuf = (char *) crealloc_abort (destbuf, strlen (d.name) + 2);
   return __small_sprintf (destbuf, "%s\n", d.name);
