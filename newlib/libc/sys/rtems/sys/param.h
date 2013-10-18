@@ -156,9 +156,7 @@
  * It should be set high enough to allow all legitimate uses, but halt
  * infinite loops reasonably quickly.
  */
-#if !defined(__rtems__)
 #define	MAXPATHLEN	PATH_MAX
-#endif
 #define MAXSYMLINKS	32
 
 /* Bit map related macros. */

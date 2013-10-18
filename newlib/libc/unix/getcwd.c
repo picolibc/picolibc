@@ -32,6 +32,7 @@
 static char sccsid[] = "@(#)getcwd.c	5.11 (Berkeley) 2/24/91";
 #endif /* LIBC_SCCS and not lint */
 
+#include <sys/param.h>
 #include <sys/stat.h>
 #include <errno.h>
 #include <dirent.h>

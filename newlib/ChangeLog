@@ -1,3 +1,10 @@
+2013-10-18  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/unistd.h (MAXPATHLEN): Delete.
+	* libc/include/sys/param.h (MAXPATHLEN): Define.
+	* libc/sys/rtems/sys/param.h (MAXPATHLEN): Likewise.
+	* libc/unix/getcwd.c: Include <sys/param.h> for MAXPATHLEN.
+
 2013-10-10  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/libc/sys/rtems/sys/param.h: Update some parameters to

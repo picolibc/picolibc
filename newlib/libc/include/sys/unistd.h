@@ -500,10 +500,6 @@ int	_EXFUN(unlinkat, (int, const char *, int));
 #define _CS_V6_ENV                            _CS_V7_ENV
 #endif
 
-#ifndef __CYGWIN__
-# define	MAXPATHLEN	1024
-#endif
-
 #ifdef __cplusplus
 }
 #endif
