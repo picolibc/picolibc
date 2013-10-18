@@ -288,6 +288,12 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      Disable dynamic allocation of atexit entries.
      Most hosts and targets have it enabled in configure.host.
 
+`--enable-newlib-global-atexit'
+     Enable atexit data structure as global variable.  By doing so it is
+     move out of _reent structure, and can be garbage collected if atexit
+     is not referenced.
+     Disabled by default.
+
 `--enable-newlib-reent-small'
      Enable small reentrant struct support.
      Disabled by default.

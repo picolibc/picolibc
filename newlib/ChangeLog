@@ -1,3 +1,11 @@
+2013-10-18  Joey Ye  <joey.ye@arm.com>
+
+	* configure.in (enable-newlib-global-atexit): New option.
+	* configure: Regenerated.
+	* newlib.hin (_REENT_GLOBAL_ATEXIT): Place-holder.
+	* README (enable-newlib-global-atexit): Description for
+	new option.
+
 2013-10-18  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/unistd.h (MAXPATHLEN): Delete.

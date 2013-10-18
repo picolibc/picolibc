@@ -788,6 +788,7 @@ enable_newlib_iconv_from_encodings
 enable_newlib_iconv_to_encodings
 enable_newlib_iconv_external_ccs
 enable_newlib_atexit_dynamic_alloc
+enable_newlib_global_atexit
 enable_newlib_reent_small
 enable_newlib_fvwrite_in_streamio
 enable_newlib_fseek_optimization
@@ -1457,6 +1458,7 @@ Optional Features:
   --enable-newlib-iconv-to-encodings   enable specific comma-separated list of \"to\" iconv encodings to be built-in
   --enable-newlib-iconv-external-ccs     enable capabilities to load external CCS files for iconv
   --disable-newlib-atexit-dynamic-alloc    disable dynamic allocation of atexit entries
+  --enable-newlib-global-atexit	enable atexit data structure as global
   --enable-newlib-reent-small   enable small reentrant struct support
   --disable-newlib-fvwrite-in-streamio    disable iov in streamio
   --disable-newlib-fseek-optimization    disable fseek optimization
@@ -2350,6 +2352,19 @@ if test "${enable_newlib_atexit_dynamic_alloc+set}" = set; then :
  fi
 else
   newlib_atexit_dynamic_alloc=${newlib_atexit_dynamic_alloc}
+fi
+
+# Check whether --enable-newlib-global-atexit was given.
+if test "${enable_newlib_global_atexit+set}" = set; then :
+  enableval=$enable_newlib_global_atexit; if test "${newlib_global_atexit+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_global_atexit=yes ;;
+    no)  newlib_global_atexit=no  ;;
+    *)   as_fn_error $? "bad value ${enableval} for newlib-global-atexit option" "$LINENO" 5 ;;
+  esac
+ fi
+else
+  newlib_global_atexit=no
 fi
 
 # Check whether --enable-newlib-reent-small was given.
@@ -12317,6 +12332,13 @@ fi
 if test "${newlib_atexit_dynamic_alloc}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
 #define _ATEXIT_DYNAMIC_ALLOC 1
+_ACEOF
+
+fi
+
+if test "${newlib_global_atexit}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _REENT_GLOBAL_ATEXIT 1
 _ACEOF
 
 fi

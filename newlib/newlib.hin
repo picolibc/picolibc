@@ -73,6 +73,9 @@
 /* Define if lite version of exit supported.  */
 #undef _LITE_EXIT
 
+/* Define if declare atexit data as global.  */
+#undef _REENT_GLOBAL_ATEXIT
+
 /*
  * Iconv encodings enabled ("to" direction)
  */
