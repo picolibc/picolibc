@@ -141,7 +141,7 @@ tty_list::allocate (HANDLE& r, HANDLE& w)
       {
 	t = ttys + i;
 	t->init ();
-	t->setsid (-1);
+	t->setsid (0);
 	freetty = i;
 	break;
       }

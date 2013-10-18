@@ -1,3 +1,8 @@
+2013-10-18  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* tty.cc (tty_list::allocate): Set sid to 0 rather than -1 since -1 is
+	an error condition.
+
 2013-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_process.cc (format_process_ctty): Fix random content of
