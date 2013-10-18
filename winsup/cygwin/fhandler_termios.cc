@@ -137,7 +137,7 @@ tty_min::kill_pgrp (int sig)
       if (!p->exists () || p->ctty != ntty || p->pgid != pgid)
 	continue;
       if (p == myself)
-	killself = sig != __SIGSETPGRP;
+	killself = sig != __SIGSETPGRP && !exit_state;
       else
 	sig_send (p, si);
     }
