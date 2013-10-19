@@ -18,3 +18,6 @@ Bug fixes:
 
 - Fix random content of /proc/$PID/ctty if the process has no controlling
   tty.  Set to just "\n" instead.
+
+- Properly set process sid rather than always using -1.
+  Fixes: http://cygwin.com/ml/cygwin/2013-10/threads.html#00237 
