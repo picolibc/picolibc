@@ -1109,6 +1109,11 @@ fhandler_base::close_with_arch ()
   return res;
 }
 
+void
+fhandler_base::cleanup ()
+{
+}
+
 int
 fhandler_base::close ()
 {

@@ -315,7 +315,7 @@ class fhandler_base
 
   int close_with_arch ();
   virtual int close ();
-  virtual void cleanup () { return; }
+  virtual void cleanup ();
   int _archetype_usecount (const char *fn, int ln, int n)
   {
     if (!archetype)

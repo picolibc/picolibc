@@ -573,6 +573,7 @@ fhandler_pty_slave::cleanup ()
      synced or before a non-cygwin process has exited, it should be safe to
      just close this normally.  cgf 2006-05-20 */
   report_tty_counts (this, "closed", "");
+  fhandler_base::cleanup ();
 }
 
 int
@@ -1277,6 +1278,7 @@ fhandler_pty_master::cleanup ()
   report_tty_counts (this, "closing master", "");
   if (archetype)
     from_master = to_master = NULL;
+  fhandler_base::cleanup ();
 }
 
 int

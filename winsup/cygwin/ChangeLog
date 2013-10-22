@@ -1,3 +1,11 @@
+2013-10-22  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* fhandler.h (fhandler_base::cleanup): Mark as extern rather than
+	inline.
+	* fhandler_base.cc (fhandler_base::cleanup): Define.
+	* fhandler_tty.cc (fhandler_pty_slave::cleanup): Call fhandler_base::cleanup.
+	(fhandler_pty_master::cleanup): Ditto.
+
 2013-10-18  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* fhandler_termios.cc (tty_min::kill_pgrp): Don't send a signal to
