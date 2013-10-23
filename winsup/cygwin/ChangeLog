@@ -1,3 +1,8 @@
+2013-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::fstat): Drop FH_FULL case to align
+	/dev/full permissions to Linux.
+
 2013-10-22  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* fhandler.h (fhandler_base::cleanup): Mark as extern rather than
