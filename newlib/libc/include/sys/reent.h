@@ -11,6 +11,7 @@ extern "C" {
 #define _SYS_REENT_H_
 
 #include <_ansi.h>
+#include <stddef.h>
 #include <sys/_types.h>
 
 #define _NULL 0
@@ -192,9 +193,10 @@ struct __sFILE {
   _PTR	_cookie;	/* cookie passed to io functions */
 
   _READ_WRITE_RETURN_TYPE _EXFNPTR(_read, (struct _reent *, _PTR,
-					   char *, int));
+					   char *, _READ_WRITE_BUFSIZE_TYPE));
   _READ_WRITE_RETURN_TYPE _EXFNPTR(_write, (struct _reent *, _PTR,
-					    const char *, int));
+					    const char *,
+					    _READ_WRITE_BUFSIZE_TYPE));
   _fpos_t _EXFNPTR(_seek, (struct _reent *, _PTR, _fpos_t, int));
   int _EXFNPTR(_close, (struct _reent *, _PTR));
 
@@ -247,9 +249,10 @@ struct __sFILE64 {
   _PTR	_cookie;	/* cookie passed to io functions */
 
   _READ_WRITE_RETURN_TYPE _EXFNPTR(_read, (struct _reent *, _PTR,
-					   char *, int));
+					   char *, _READ_WRITE_BUFSIZE_TYPE));
   _READ_WRITE_RETURN_TYPE _EXFNPTR(_write, (struct _reent *, _PTR,
-					    const char *, int));
+					    const char *,
+					    _READ_WRITE_BUFSIZE_TYPE));
   _fpos_t _EXFNPTR(_seek, (struct _reent *, _PTR, _fpos_t, int));
   int _EXFNPTR(_close, (struct _reent *, _PTR));
 

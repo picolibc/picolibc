@@ -51,10 +51,10 @@ _DEFUN(__swrite64, (ptr, cookie, buf, n),
        struct _reent *ptr _AND
        void *cookie _AND
        char const *buf _AND
-       int n)
+       _READ_WRITE_BUFSIZE_TYPE n)
 {
   register FILE *fp = (FILE *) cookie;
-  int w;
+  _READ_WRITE_RETURN_TYPE w;
 #ifdef __SCLE
   int oldmode=0;
 #endif

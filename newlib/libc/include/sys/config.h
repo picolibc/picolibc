@@ -250,6 +250,12 @@
 #ifndef _READ_WRITE_RETURN_TYPE
 #define _READ_WRITE_RETURN_TYPE int
 #endif
+/* Define `count' parameter of read/write routines.  In POSIX, the `count'
+   parameter is "size_t" but legacy newlib code has been using "int" for some
+   time.  If not specified, "int" is defaulted.  */
+#ifndef _READ_WRITE_BUFSIZE_TYPE
+#define _READ_WRITE_BUFSIZE_TYPE int
+#endif
 
 #ifndef __WCHAR_MAX__
 #if __INT_MAX__ == 32767 || defined (_WIN32)

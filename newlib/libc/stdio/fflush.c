@@ -75,10 +75,12 @@ _DEFUN(__sflush_r, (ptr, fp),
        register FILE * fp)
 {
   register unsigned char *p;
-  register int n, t;
+  register _READ_WRITE_BUFSIZE_TYPE n;
+  register _READ_WRITE_RETURN_TYPE t;
+  short flags;
 
-  t = fp->_flags;
-  if ((t & __SWR) == 0)
+  flags = fp->_flags;
+  if ((flags & __SWR) == 0)
     {
 #ifdef _FSEEK_OPTIMIZATION
       /* For a read stream, an fflush causes the next seek to be
@@ -186,7 +188,7 @@ _DEFUN(__sflush_r, (ptr, fp),
    * write function.
    */
   fp->_p = p;
-  fp->_w = t & (__SLBF | __SNBF) ? 0 : fp->_bf._size;
+  fp->_w = flags & (__SLBF | __SNBF) ? 0 : fp->_bf._size;
 
   while (n > 0)
     {

@@ -149,11 +149,13 @@ extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
 extern int    _EXFUN(__sflush_r,(struct _reent *,FILE *));
 extern int    _EXFUN(__srefill_r,(struct _reent *,FILE *));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(struct _reent *, void *, char *,
-					       int));
+					       _READ_WRITE_BUFSIZE_TYPE));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__seofread,(struct _reent *, void *,
-						  char *, int));
+						  char *,
+						  _READ_WRITE_BUFSIZE_TYPE));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite,(struct _reent *, void *,
-						const char *, int));
+						const char *,
+						_READ_WRITE_BUFSIZE_TYPE));
 extern _fpos_t _EXFUN(__sseek,(struct _reent *, void *, _fpos_t, int));
 extern int    _EXFUN(__sclose,(struct _reent *, void *));
 extern int    _EXFUN(__stextmode,(int));
@@ -168,7 +170,8 @@ extern int _EXFUN(__submore, (struct _reent *, FILE *));
 #ifdef __LARGE64_FILES
 extern _fpos64_t _EXFUN(__sseek64,(struct _reent *, void *, _fpos64_t, int));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite64,(struct _reent *, void *,
-						  const char *, int));
+						  const char *,
+						  _READ_WRITE_BUFSIZE_TYPE));
 #endif
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */

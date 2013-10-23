@@ -87,7 +87,7 @@ _DEFUN(fmemreader, (ptr, cookie, buf, n),
        struct _reent *ptr _AND
        void *cookie _AND
        char *buf _AND
-       int n)
+       _READ_WRITE_BUFSIZE_TYPE n)
 {
   fmemcookie *c = (fmemcookie *) cookie;
   /* Can't read beyond current size, but EOF condition is not an error.  */
@@ -107,7 +107,7 @@ _DEFUN(fmemwriter, (ptr, cookie, buf, n),
        struct _reent *ptr _AND
        void *cookie _AND
        const char *buf _AND
-       int n)
+       _READ_WRITE_BUFSIZE_TYPE n)
 {
   fmemcookie *c = (fmemcookie *) cookie;
   int adjust = 0; /* true if at EOF, but still need to write NUL.  */

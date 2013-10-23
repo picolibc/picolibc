@@ -34,10 +34,10 @@ _DEFUN(__sread, (ptr, cookie, buf, n),
        struct _reent *ptr _AND
        void *cookie _AND
        char *buf _AND
-       int n)
+       _READ_WRITE_BUFSIZE_TYPE n)
 {
   register FILE *fp = (FILE *) cookie;
-  register int ret;
+  register ssize_t ret;
 
 #ifdef __SCLE
   int oldmode = 0;
@@ -67,7 +67,7 @@ _DEFUN(__seofread, (ptr, cookie, buf, len),
        struct _reent *_ptr _AND
        _PTR cookie _AND
        char *buf   _AND
-       int len)
+       _READ_WRITE_BUFSIZE_TYPE len)
 {
   return 0;
 }
@@ -77,10 +77,10 @@ _DEFUN(__swrite, (ptr, cookie, buf, n),
        struct _reent *ptr _AND
        void *cookie _AND
        char const *buf _AND
-       int n)
+       _READ_WRITE_BUFSIZE_TYPE n)
 {
   register FILE *fp = (FILE *) cookie;
-  int w;
+  ssize_t w;
 #ifdef __SCLE
   int oldmode=0;
 #endif

@@ -1,3 +1,41 @@
+2013-10-23  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/stdio.h (funopen): Change prototype of
+	__readfn and __writefn parameter to match new definition of
+	FILE's _read and _write methods.
+	(_funopen_r): Ditto.
+	(funopen): Ditto.
+	(_funopen_r): Ditto.
+	* libc/include/sys/config.h (_READ_WRITE_BUFSIZE_TYPE) Define
+	as type int if not already defined.  Add comment to explain.
+	* libc/include/sys/reent.h: Include stddef.h.
+	(struct __sFILE): Change type of last parameter in declaration
+	of _read and _write methods to _READ_WRITE_BUFSIZE_TYPE.
+	(struct __sFILE64): Ditto.
+	* libc/stdio/local.h (__sread): Declare with last parameter set
+	to _READ_WRITE_BUFSIZE_TYPE.
+	(__seofread): Ditto.
+	(__swrite): Ditto.
+	(__swrite64): Ditto.
+	* libc/stdio/fvwrite.c (__sfvwrite_r): Change type of local
+	variables w and s to _READ_WRITE_RETURN_TYPE.
+	* libc/stdio/fflush.c (__sflush_r): Change type of local variables
+	n and t to _READ_WRITE_BUFSIZE_TYPE and _READ_WRITE_RETURN_TYPE.
+	Add local variables flags to keep _flags value.
+	* libc/stdio/fmemopen.c (fmemreader): Align to above change.
+	(fmemwriter): Ditto.
+	* libc/stdio/fopencookie.c (fcreader): Ditto.
+	(fcwriter): Ditto.
+	* libc/stdio/funopen.c (funread): Ditto.
+	(funwrite): Ditto.
+	(funreader): Ditto.
+	(funwriter): Ditto.
+	* libc/stdio/open_memstream.c (memwriter): Ditto.
+	* libc/stdio/stdio.c (__sread): Ditto.
+	(__seofread): Ditto.
+	(__swrite): Ditto.
+	* libc/stdio64/stdio64.c (__swrite64): Ditto.
+
 2013-10-18  Joey Ye  <joey.ye@arm.com>
 
 	* configure.in (enable-newlib-global-atexit): New option.

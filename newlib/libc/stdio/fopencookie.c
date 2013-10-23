@@ -101,7 +101,7 @@ _DEFUN(fcreader, (ptr, cookie, buf, n),
        struct _reent *ptr _AND
        void *cookie _AND
        char *buf _AND
-       int n)
+       _READ_WRITE_BUFSIZE_TYPE n)
 {
   int result;
   fccookie *c = (fccookie *) cookie;
@@ -116,7 +116,7 @@ _DEFUN(fcwriter, (ptr, cookie, buf, n),
        struct _reent *ptr _AND
        void *cookie _AND
        const char *buf _AND
-       int n)
+       _READ_WRITE_BUFSIZE_TYPE n)
 {
   int result;
   fccookie *c = (fccookie *) cookie;
