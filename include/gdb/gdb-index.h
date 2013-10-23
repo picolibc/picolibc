@@ -1,5 +1,5 @@
 /* Public attributes of the .gdb_index section.
-   Copyright 2012-2013 Free Software Foundation, Inc.
+   Copyright 2012 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -68,7 +68,7 @@ typedef enum {
      Give the unused bits a value so gdb will print them sensibly.  */
   GDB_INDEX_SYMBOL_KIND_UNUSED5 = 5,
   GDB_INDEX_SYMBOL_KIND_UNUSED6 = 6,
-  GDB_INDEX_SYMBOL_KIND_UNUSED7 = 7,
+  GDB_INDEX_SYMBOL_KIND_UNUSED7 = 7
 } gdb_index_symbol_kind;
 
 #define GDB_INDEX_SYMBOL_KIND_SHIFT 28
