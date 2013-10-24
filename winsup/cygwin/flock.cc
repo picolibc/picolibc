@@ -454,7 +454,7 @@ fixup_lockf_after_exec ()
       while (cfd.next () >= 0)
 	if (cfd->get_dev () == node->i_dev
 	    && cfd->get_ino () == node->i_ino
-	    && ++cnt > 1)
+	    && ++cnt >= 1)
 	  break;
       if (cnt == 0)
 	{
@@ -919,20 +919,20 @@ static void     lf_wakelock (lockf_t *, HANDLE);
    of mandatory locks using the Windows mandatory locking functions, see the
    fhandler_disk_file::mand_lock method at the end of this file. */
 int
-fhandler_base::lock (int, struct flock *)
-{
-  set_errno (EINVAL);
-  return -1;
-}
-
-int
-fhandler_disk_file::lock (int a_op, struct flock *fl)
+fhandler_base::lock (int a_op, struct flock *fl)
 {
   off_t start, end, oadd;
   int error = 0;
 
   short a_flags = fl->l_type & (F_POSIX | F_FLOCK);
   short type = fl->l_type & (F_RDLCK | F_WRLCK | F_UNLCK);
+
+  if (nohandle ())
+    {
+      set_errno (EINVAL);
+      debug_printf ("Locking on nohandle device, return EINVAL.");
+      return -1;
+    }
 
   if (!a_flags)
     a_flags = F_POSIX; /* default */
@@ -952,16 +952,24 @@ fhandler_disk_file::lock (int a_op, struct flock *fl)
 	   been opened with a specific open mode, in contrast to POSIX locks
 	   which require that a file is opened for reading to place a read
 	   lock and opened for writing to place a write lock. */
-	if ((a_flags & F_POSIX) && !(get_access () & GENERIC_READ))
+	/* CV 2013-10-22: Test POSIX R/W mode flags rather than Windows R/W
+	   access flags.  The reason is that POSIX mode flags are set for
+	   all types of fhandlers, while Windows access flags are only set
+	   for most of the actual Windows device backed fhandlers. */
+	if ((a_flags & F_POSIX)
+	    && ((get_flags () & O_ACCMODE) == O_WRONLY))
 	  {
+	    system_printf ("get_access() == %x", get_access ());
 	    set_errno (EBADF);
 	    return -1;
 	  }
 	break;
       case F_WRLCK:
 	/* See above comment. */
-	if ((a_flags & F_POSIX) && !(get_access () & GENERIC_WRITE))
+	if ((a_flags & F_POSIX)
+	    && ((get_flags () & O_ACCMODE) == O_RDONLY))
 	  {
+	    system_printf ("get_access() == %x", get_access ());
 	    set_errno (EBADF);
 	    return -1;
 	  }
@@ -982,29 +990,32 @@ fhandler_disk_file::lock (int a_op, struct flock *fl)
 
     case SEEK_CUR:
       if ((start = lseek (0, SEEK_CUR)) == ILLEGAL_SEEK)
-	return -1;
+	start = 0;
       break;
 
     case SEEK_END:
-      {
-	NTSTATUS status;
-	IO_STATUS_BLOCK io;
-	FILE_STANDARD_INFORMATION fsi;
+      if (get_device () != FH_FS)
+      	start = 0;
+      else
+	{
+	  NTSTATUS status;
+	  IO_STATUS_BLOCK io;
+	  FILE_STANDARD_INFORMATION fsi;
 
-	status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
-					 FileStandardInformation);
-	if (!NT_SUCCESS (status))
-	  {
-	    __seterrno_from_nt_status (status);
-	    return -1;
-	  }
-	if (fl->l_start > 0 && fsi.EndOfFile.QuadPart > OFF_MAX - fl->l_start)
-	  {
-	    set_errno (EOVERFLOW);
-	    return -1;
-	  }
-	start = fsi.EndOfFile.QuadPart + fl->l_start;
-      }
+	  status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
+					   FileStandardInformation);
+	  if (!NT_SUCCESS (status))
+	    {
+	      __seterrno_from_nt_status (status);
+	      return -1;
+	    }
+	  if (fl->l_start > 0 && fsi.EndOfFile.QuadPart > OFF_MAX - fl->l_start)
+	    {
+	      set_errno (EOVERFLOW);
+	      return -1;
+	    }
+	  start = fsi.EndOfFile.QuadPart + fl->l_start;
+	}
       break;
 
     default:

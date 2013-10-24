@@ -90,7 +90,7 @@ public:
   friend void dtable_init ();
   friend void __stdcall close_all_files (bool);
   friend int dup_finish (int, int, int);
-  friend class fhandler_disk_file;
+  friend class fhandler_base;
   friend class cygheap_fdmanip;
   friend class cygheap_fdget;
   friend class cygheap_fdnew;

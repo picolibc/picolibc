@@ -1401,9 +1401,6 @@ fhandler_disk_file::close ()
   /* Close extra pread/pwrite handle, if it exists. */
   if (prw_handle)
     NtClose (prw_handle);
-  /* Delete all POSIX locks on the file.  Delete all flock locks on the
-     file if this is the last reference to this file. */
-  del_my_locks (on_close);
   return fhandler_base::close ();
 }
 
@@ -1414,19 +1411,10 @@ fhandler_disk_file::fcntl (int cmd, intptr_t arg)
 
   switch (cmd)
     {
-    case F_LCK_MANDATORY:
+    case F_LCK_MANDATORY:	/* Mandatory locking only works on files. */
       mandatory_locking (!!arg);
       need_fork_fixup (true);
       res = 0;
-      break;
-    case F_GETLK:
-    case F_SETLK:
-    case F_SETLKW:
-      {
-	struct flock *fl = (struct flock *) arg;
-	fl->l_type &= F_RDLCK | F_WRLCK | F_UNLCK;
-	res = mandatory_locking () ? mand_lock (cmd, fl) : lock (cmd, fl);
-      }
       break;
     default:
       res = fhandler_base::fcntl (cmd, arg);
@@ -1487,9 +1475,6 @@ fhandler_base::open_fs (int flags, mode_t mode)
     }
 
   ino = pc.get_ino_by_handle (get_handle ());
-  /* A unique ID is necessary to recognize fhandler entries which are
-     duplicated by dup(2) or fork(2). */
-  NtAllocateLocallyUniqueId ((PLUID) &unique_id);
 
 out:
   syscall_printf ("%d = fhandler_disk_file::open(%S, %y)", res,

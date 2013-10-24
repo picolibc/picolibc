@@ -1,6 +1,6 @@
 /* fhandler_dev_zero.cc: code to access /dev/zero
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2013 Red Hat, Inc.
 
    Written by DJ Delorie (dj@cygnus.com)
 
@@ -19,15 +19,6 @@ details. */
 fhandler_dev_zero::fhandler_dev_zero ()
   : fhandler_base ()
 {
-}
-
-int
-fhandler_dev_zero::open (int flags, mode_t)
-{
-  set_flags ((flags & ~O_TEXT) | O_BINARY);
-  nohandle (true);
-  set_open_status ();
-  return 1;
 }
 
 ssize_t __stdcall

@@ -636,6 +636,11 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 	system_printf ("getsockopt(SO_SNDBUF) failed, %u", WSAGetLastError ());
     }
 
+  /* A unique ID is necessary to recognize fhandler entries which are
+     duplicated by dup(2) or fork(2).  This is used in BSD flock calls
+     to identify the descriptor. */
+  ((fhandler_socket *) fd)->set_unique_id ();
+
   return true;
 }
 

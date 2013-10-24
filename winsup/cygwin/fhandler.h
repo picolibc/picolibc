@@ -296,7 +296,7 @@ class fhandler_base
   bool has_attribute (DWORD x) const {return pc.has_attribute (x);}
   const char *get_name () const { return pc.normalized_path; }
   const char *get_win32_name () { return pc.get_win32 (); }
-  dev_t get_dev () { return pc.fs_serial_number (); }
+  virtual dev_t get_dev () { return get_device (); }
   ino_t get_ino () { return ino ?: ino = hash_path_name (0, pc.get_nt_native_path ()); }
   long long get_unique_id () const { return unique_id; }
   /* Returns name used for /proc/<pid>/fd in buf. */
@@ -312,6 +312,7 @@ class fhandler_base
   int open_with_arch (int, mode_t = 0);
   virtual int open (int, mode_t);
   virtual void open_setup (int flags) { return; }
+  void set_unique_id () { NtAllocateLocallyUniqueId ((PLUID) &unique_id); }
 
   int close_with_arch ();
   virtual int close ();
@@ -979,7 +980,6 @@ class fhandler_disk_file: public fhandler_base
   int fcntl (int cmd, intptr_t);
   int dup (fhandler_base *child, int);
   void fixup_after_fork (HANDLE parent);
-  int lock (int, struct flock *);
   int mand_lock (int, struct flock *);
   bool isdevice () const { return false; }
   int __reg2 fstat (struct stat *buf);
@@ -1012,6 +1012,7 @@ class fhandler_disk_file: public fhandler_base
   ssize_t __reg3 pwrite (void *, size_t, off_t);
 
   fhandler_disk_file (void *) {}
+  dev_t get_dev () { return pc.fs_serial_number (); }
 
   void copyto (fhandler_base *x)
   {
@@ -1618,7 +1619,6 @@ class fhandler_dev_zero: public fhandler_base
 {
  public:
   fhandler_dev_zero ();
-  int open (int flags, mode_t mode = 0);
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
   off_t lseek (off_t offset, int whence);

@@ -152,8 +152,8 @@ const device dev_error_storage =
 "/dev/conin", BRACK(FH_CONIN), "/dev/conin", exists_console, S_IFCHR
 "/dev/conout", BRACK(FH_CONOUT), "/dev/conout", exists_console, S_IFCHR
 "/dev/null", BRACK(FH_NULL), "\\Device\\Null", exists_ntdev, S_IFCHR
-"/dev/zero", BRACK(FH_ZERO), "/dev/zero", exists, S_IFCHR
-"/dev/full", BRACK(FH_FULL), "/dev/full", exists, S_IFCHR
+"/dev/zero", BRACK(FH_ZERO), "\\Device\\Null", exists_ntdev, S_IFCHR
+"/dev/full", BRACK(FH_FULL), "\\Device\\Null", exists_ntdev, S_IFCHR
 "/dev/random", BRACK(FH_RANDOM), "/dev/random", exists, S_IFCHR
 "/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", exists, S_IFCHR, =urandom_dev
 "/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard", exists, S_IFCHR
