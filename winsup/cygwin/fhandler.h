@@ -311,7 +311,7 @@ class fhandler_base
 
   int open_with_arch (int, mode_t = 0);
   virtual int open (int, mode_t);
-  virtual void open_setup (int flags) { return; }
+  virtual void open_setup (int flags);
   void set_unique_id () { NtAllocateLocallyUniqueId ((PLUID) &unique_id); }
 
   int close_with_arch ();

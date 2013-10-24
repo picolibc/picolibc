@@ -76,6 +76,13 @@ fillout_pinfo (pid_t pid, int winpid)
 	}
       else if (nextpid || p->pid == pid || (winpid && thispid == (DWORD) pid))
 	{
+	  /* It is possible that this pinfo is not completely set up yet.  Wait
+	     a while if so.  */
+	  for (int i = 0; i < 2000; i++)
+	    if (p->start_time)
+	      break;
+	    else
+	      Sleep (1);
 	  ep.ctty = (p->ctty < 0 || iscons_dev (p->ctty)) ? p->ctty : device::minor (p->ctty);
 	  ep.pid = p->pid;
 	  ep.ppid = p->ppid;

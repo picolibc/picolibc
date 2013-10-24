@@ -720,6 +720,11 @@ done:
   return res;
 }
 
+void
+fhandler_base::open_setup (int)
+{
+}
+
 /* states:
    open buffer in binary mode?  Just do the read.
 

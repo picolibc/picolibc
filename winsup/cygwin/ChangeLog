@@ -1,3 +1,15 @@
+2013-10-24  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* external.cc (fillout_pinfo): If start_time is 0, wait a while before
+	returning the pinfo structure.
+
+	* fhandler.cc (fhandler_base::open_setup): Convert from inline.
+	* fhandler.h (fhandler_base::open_setup): Declare.
+	* fhandler_console.cc (fhandler_console::open_setup): Always call
+	fhandler_base::open_setup.
+	* fhandler_tty.cc (fhandler_pty_slave::open_setup): Ditto.
+	(fhandler_pty_master::open_setup): Ditto.
+
 2013-10-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* devices.in (dev_storage): Map /dev/zero and /dev/full to \Device\Null.
