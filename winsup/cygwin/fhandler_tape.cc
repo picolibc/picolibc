@@ -1368,6 +1368,11 @@ fhandler_dev_tape::raw_write (const void *ptr, size_t len)
 off_t
 fhandler_dev_tape::lseek (off_t offset, int whence)
 {
+#if 1
+  /* On Linux lseek on tapes is a no-op.  For now, let's keep the old code
+     intact but commented out, should incompatibilities arise. */
+  return 0;
+#else
   struct mtop op;
   struct mtpos pos;
   DWORD block_size;
@@ -1426,6 +1431,7 @@ fhandler_dev_tape::lseek (off_t offset, int whence)
 
 out:
   return unlock (ret);
+#endif
 }
 
 int __reg2

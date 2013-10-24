@@ -1,6 +1,6 @@
 /* fhandler_dev_dsp: code to emulate OSS sound model /dev/dsp
 
-   Copyright 2001, 2002, 2003, 2004, 2008, 2011, 2012 Red Hat, Inc
+   Copyright 2001, 2002, 2003, 2004, 2008, 2011, 2012, 2013 Red Hat, Inc
 
    Written by Andy Younger (andy@snoogie.demon.co.uk)
    Extended by Gerd Spalink (Gerd.Spalink@t-online.de)
@@ -1129,12 +1129,6 @@ fhandler_dev_dsp::read (void *ptr, size_t& len)
     }
 
   audio_in_->read ((char *)ptr, (int&)len);
-}
-
-off_t
-fhandler_dev_dsp::lseek (off_t offset, int whence)
-{
-  return 0;
 }
 
 void

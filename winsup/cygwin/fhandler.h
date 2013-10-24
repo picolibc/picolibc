@@ -1621,7 +1621,7 @@ class fhandler_dev_zero: public fhandler_base
   fhandler_dev_zero ();
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
-  off_t lseek (off_t offset, int whence);
+  off_t lseek (off_t, int) { return 0; }
 
   virtual HANDLE mmap (caddr_t *addr, size_t len, int prot,
 		       int flags, off_t off);
@@ -1653,7 +1653,6 @@ class fhandler_dev_random: public fhandler_base
 {
  protected:
   uint32_t pseudo;
-  off_t dummy_offset;
 
   bool crypt_gen_random (void *ptr, size_t len);
   int pseudo_write (const void *ptr, size_t len);
@@ -1663,7 +1662,7 @@ class fhandler_dev_random: public fhandler_base
   int open (int flags, mode_t mode = 0);
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
-  off_t lseek (off_t offset, int whence);
+  off_t lseek (off_t, int) { return 0; }
   int close ();
 
   fhandler_dev_random () : fhandler_base () {}
@@ -1780,7 +1779,7 @@ class fhandler_dev_dsp: public fhandler_base
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
   int ioctl (unsigned int cmd, void *);
-  off_t lseek (off_t, int);
+  off_t lseek (off_t, int) { return 0; }
   int close ();
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
