@@ -533,7 +533,7 @@ FILE	*_EXFUN(_funopen_r,(struct _reent *, const _PTR __cookie,
 FILE	*_EXFUN(funopen,(const _PTR __cookie,
 		int (*__readfn)(_PTR __cookie, char *__buf,
 				_READ_WRITE_BUFSIZE_TYPE __n),
-		int (*__writefn)(_PTR __cookie, const char *__buf
+		int (*__writefn)(_PTR __cookie, const char *__buf,
 				 _READ_WRITE_BUFSIZE_TYPE __n),
 		fpos_t (*__seekfn)(_PTR __cookie, fpos_t __off, int __whence),
 		int (*__closefn)(_PTR __cookie)));

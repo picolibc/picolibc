@@ -1,3 +1,8 @@
+2013-10-24  Hans-Peter Nilsson  <hp@axis.com>
+
+	* libc/include/stdio.h [!__LARGE64_FILES] (funopen): Fix typo
+	in last change.
+
 2013-10-23  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/stdio.h (funopen): Change prototype of
