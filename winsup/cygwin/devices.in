@@ -154,8 +154,8 @@ const device dev_error_storage =
 "/dev/null", BRACK(FH_NULL), "\\Device\\Null", exists_ntdev, S_IFCHR
 "/dev/zero", BRACK(FH_ZERO), "\\Device\\Null", exists_ntdev, S_IFCHR
 "/dev/full", BRACK(FH_FULL), "\\Device\\Null", exists_ntdev, S_IFCHR
-"/dev/random", BRACK(FH_RANDOM), "/dev/random", exists, S_IFCHR
-"/dev/urandom", BRACK(FH_URANDOM), "/dev/urandom", exists, S_IFCHR, =urandom_dev
+"/dev/random", BRACK(FH_RANDOM), "\\Device\\Null", exists_ntdev, S_IFCHR
+"/dev/urandom", BRACK(FH_URANDOM), "\\Device\\Null", exists_ntdev, S_IFCHR, =urandom_dev
 "/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard", exists, S_IFCHR
 "/dev/com%(1-16)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1 - 1})), "\\??\\COM{$1}", exists_ntdev_silent, S_IFCHR
 "/dev/ttyS%(0-63)d", BRACK(FHDEV(DEV_SERIAL_MAJOR, {$1})), "\\??\\COM{$1 + 1}", exists_ntdev, S_IFCHR

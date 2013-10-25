@@ -48,8 +48,6 @@ extern "C" {
 int sscanf (const char *, const char *, ...);
 } /* End of "C" section */
 
-fhandler_dev_random* entropy_source;
-
 static inline mode_t
 adjust_socket_file_mode (mode_t mode)
 {
@@ -445,25 +443,9 @@ fhandler_socket::af_local_copy (fhandler_socket *sock)
 void
 fhandler_socket::af_local_set_secret (char *buf)
 {
-  if (!entropy_source)
-    {
-      void *buf = malloc (sizeof (fhandler_dev_random));
-      entropy_source = new (buf) fhandler_dev_random ();
-      entropy_source->dev () = *urandom_dev;
-    }
-  if (entropy_source &&
-      !entropy_source->open (O_RDONLY))
-    {
-      delete entropy_source;
-      entropy_source = NULL;
-    }
-  if (entropy_source)
-    {
-      size_t len = sizeof (connect_secret);
-      entropy_source->read (connect_secret, len);
-      if (len != sizeof (connect_secret))
-	bzero ((char*) connect_secret, sizeof (connect_secret));
-    }
+  if (!fhandler_dev_random::crypt_gen_random (connect_secret,
+					      sizeof (connect_secret)))
+    bzero ((char*) connect_secret, sizeof (connect_secret));
   __small_sprintf (buf, "%08x-%08x-%08x-%08x",
 		   connect_secret [0], connect_secret [1],
 		   connect_secret [2], connect_secret [3]);

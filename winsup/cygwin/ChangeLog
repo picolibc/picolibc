@@ -1,3 +1,18 @@
+2013-10-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.in (dev_storage): Map /dev/random and /dev/urandom to
+	\Device\Null.
+	* devices.cc: Regenerate.
+	* fhandler.h (fhandler_dev_random::open): Drop declaration.
+	(fhandler_dev_random::close): Ditto.
+	(fhandler_dev_random::crypt_gen_random): Convert to static method.
+	* fhandler_random.cc (fhandler_dev_random::open): Remove so that default
+	fhandler_base::open is used to open \Device\Null.
+	(fhandler_dev_random::close): Ditto.
+	* fhandler_socket.cc (entropy_source): Delete.
+	(fhandler_socket::af_local_set_secret): Remove entropy_source code and
+	call fhandler_dev_random::crypt_gen_random directly instead.
+
 2013-10-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_dev_zero::lseek): Convert to inline method.

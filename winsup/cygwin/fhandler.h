@@ -1654,16 +1654,15 @@ class fhandler_dev_random: public fhandler_base
  protected:
   uint32_t pseudo;
 
-  bool crypt_gen_random (void *ptr, size_t len);
   int pseudo_write (const void *ptr, size_t len);
   int pseudo_read (void *ptr, size_t len);
 
  public:
-  int open (int flags, mode_t mode = 0);
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
   off_t lseek (off_t, int) { return 0; }
-  int close ();
+
+  static bool crypt_gen_random (void *ptr, size_t len);
 
   fhandler_dev_random () : fhandler_base () {}
   fhandler_dev_random (void *) {}

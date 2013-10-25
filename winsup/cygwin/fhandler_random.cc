@@ -28,15 +28,6 @@ details. */
 #define PSEUDO_MULTIPLIER       (6364136223846793005LL)
 #define PSEUDO_SHIFTVAL		(21)
 
-int
-fhandler_dev_random::open (int flags, mode_t)
-{
-  set_flags ((flags & ~O_TEXT) | O_BINARY);
-  nohandle (true);
-  set_open_status ();
-  return 1;
-}
-
 /* There's a bug in ntsecapi.h (Mingw as well as MSFT).  SystemFunction036
    is, in fact, a WINAPI function, but it's not defined as such.  Therefore
    we have to do it correctly here. */
@@ -148,10 +139,4 @@ fhandler_dev_random::read (void *ptr, size_t& len)
      PRNG as fallback. */
   else if (!crypt_gen_random (ptr, len))
     len = pseudo_read (ptr, len);
-}
-
-int
-fhandler_dev_random::close ()
-{
-  return 0;
 }

@@ -7,9 +7,9 @@ What changed:
 
 - Slightly improve randomness of /dev/random emulation.
 
-- Allow to use advisory locking on any device which is backed by an OS handle.
-  Right now this excludes /dev/clipboard, /dev/dsp, /dev/random, /dev/urandom,
-  as well as almost all virtual files under /proc.
+- Allow to use advisory locking on any device which is backed by an OS
+  handle.  Right now this excludes /dev/clipboard, /dev/dsp, as well as
+  almost all virtual files under /proc.
 
 
 Bug fixes:
