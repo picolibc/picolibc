@@ -1,5 +1,17 @@
 2013-10-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* devices.in (dev_storage): Map /dev/clipboard to \Device\Null.
+	* devices.cc: Regenerate.
+	* fhandler.h (fhandler_dev_clipboard::open): Drop declaration.
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::dup): Drop call to
+	open.  Set private members to 0 and call fhandler_base::dup.
+	(fhandler_dev_clipboard::open): Remove so that default
+	fhandler_base::open is used to open \Device\Null.
+	(set_clipboard): Drop gratuitios call to RegisterClipboardFormatW.
+	(fhandler_dev_clipboard::close): Call fhandler_base::close from here.
+
+2013-10-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Fix comment.
 
 2013-10-25  Corinna Vinschen  <corinna@vinschen.de>

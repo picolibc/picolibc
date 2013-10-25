@@ -142,7 +142,7 @@ const device dev_error_storage =
 const _RDATA device dev_storage[] =
 {
   {"/dev", BRACK(FH_DEV), "/dev", exists, S_IFDIR, false},
-  {"/dev/clipboard", BRACK(FH_CLIPBOARD), "/dev/clipboard", exists, S_IFCHR, true},
+  {"/dev/clipboard", BRACK(FH_CLIPBOARD), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
   {"/dev/com1", BRACK(FHDEV(DEV_SERIAL_MAJOR, 0)), "\\??\\COM1", exists_ntdev_silent, S_IFCHR, true},
   {"/dev/com2", BRACK(FHDEV(DEV_SERIAL_MAJOR, 1)), "\\??\\COM2", exists_ntdev_silent, S_IFCHR, true},
   {"/dev/com3", BRACK(FHDEV(DEV_SERIAL_MAJOR, 2)), "\\??\\COM3", exists_ntdev_silent, S_IFCHR, true},

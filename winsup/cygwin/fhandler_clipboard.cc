@@ -55,25 +55,12 @@ fhandler_dev_clipboard::fhandler_dev_clipboard ()
  */
 
 int
-fhandler_dev_clipboard::dup (fhandler_base * child, int)
+fhandler_dev_clipboard::dup (fhandler_base * child, int flags)
 {
   fhandler_dev_clipboard *fhc = (fhandler_dev_clipboard *) child;
-
-  if (!fhc->open (get_flags (), 0))
-    system_printf ("error opening clipboard, %E");
-  return 0;
-}
-
-int
-fhandler_dev_clipboard::open (int flags, mode_t)
-{
-  set_flags (flags | O_TEXT);
-  pos = 0;
-  if (!cygnativeformat)
-    cygnativeformat = RegisterClipboardFormatW (CYGWIN_NATIVE);
-  nohandle (true);
-  set_open_status ();
-  return 1;
+  fhc->pos = fhc->msize = 0;
+  fhc->membuffer = NULL;
+  return fhandler_base::dup (child, flags);
 }
 
 static int
@@ -100,8 +87,6 @@ set_clipboard (const void *buf, size_t len)
 
       GlobalUnlock (hmem);
       EmptyClipboard ();
-      if (!cygnativeformat)
-	cygnativeformat = RegisterClipboardFormatW (CYGWIN_NATIVE);
       HANDLE ret = SetClipboardData (cygnativeformat, hmem);
       CloseClipboard ();
       /* According to MSDN, hmem must not be free'd after transferring the
@@ -346,15 +331,14 @@ fhandler_dev_clipboard::close ()
 {
   if (!have_execed)
     {
-      pos = 0;
+      pos = msize = 0;
       if (membuffer)
 	{
 	  free (membuffer);
 	  membuffer = NULL;
 	}
-      msize = 0;
     }
-  return 0;
+  return fhandler_base::close ();
 }
 
 void

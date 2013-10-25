@@ -1691,7 +1691,6 @@ class fhandler_dev_clipboard: public fhandler_base
  public:
   fhandler_dev_clipboard ();
   int is_windows () { return 1; }
-  int open (int flags, mode_t mode = 0);
   int __reg2 fstat (struct stat *buf);
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
