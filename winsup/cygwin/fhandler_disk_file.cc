@@ -492,7 +492,7 @@ fhandler_base::fstat_fs (struct stat *buf)
   if (oret)
     {
       /* We now have a valid handle, regardless of the "nohandle" state.
-	 Since fhandler_base::open only calls CloseHandle if !nohandle,
+	 Since fhandler_base::close only calls CloseHandle if !nohandle,
 	 we have to set it to false before calling close and restore
 	 the state afterwards. */
       res = pc.fs_is_nfs () ? fstat_by_nfs_ea (buf) : fstat_by_handle (buf);
