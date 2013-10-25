@@ -26,3 +26,5 @@ Bug fixes:
 
 - Properly set process sid rather than always using -1.
   Fixes: http://cygwin.com/ml/cygwin/2013-10/threads.html#00237 
+
+- Fix a potential crash after calling lseek on /dev/clipboard.

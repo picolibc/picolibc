@@ -1,5 +1,12 @@
 2013-10-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::open): Drop gratuitios
+	handling of membuffer.  It's NULL anyway.
+	(fhandler_dev_clipboard::lseek): Set membuffer to NULL after freeing
+	it to avoid subsequent crashes when accessing invalid pointer.
+
+2013-10-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.in (dev_storage): Map /dev/random and /dev/urandom to
 	\Device\Null.
 	* devices.cc: Regenerate.

@@ -69,9 +69,6 @@ fhandler_dev_clipboard::open (int flags, mode_t)
 {
   set_flags (flags | O_TEXT);
   pos = 0;
-  if (membuffer)
-    free (membuffer);
-  membuffer = NULL;
   if (!cygnativeformat)
     cygnativeformat = RegisterClipboardFormatW (CYGWIN_NATIVE);
   nohandle (true);
@@ -336,7 +333,10 @@ fhandler_dev_clipboard::lseek (off_t offset, int whence)
   pos = offset;
   /* treat seek like rewind */
   if (membuffer)
-    free (membuffer);
+    {
+      free (membuffer);
+      membuffer = NULL;
+    }
   msize = 0;
   return 0;
 }
