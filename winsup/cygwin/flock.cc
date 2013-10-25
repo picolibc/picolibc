@@ -927,15 +927,21 @@ fhandler_base::lock (int a_op, struct flock *fl)
   short a_flags = fl->l_type & (F_POSIX | F_FLOCK);
   short type = fl->l_type & (F_RDLCK | F_WRLCK | F_UNLCK);
 
-  if (nohandle ())
+  if (!a_flags)
+    a_flags = F_POSIX; /* default */
+
+  /* FIXME: For BSD flock(2) we need a valid, per file table entry OS handle.
+     Therefore we can't allow using flock(2) on nohandle devices and
+     pre-Windows 8 console handles (recognized by their odd handle value). */
+  if ((a_flags & F_FLOCK)
+      && (nohandle () || (((uintptr_t) get_handle () & 0x3) == 0x3)))
     {
       set_errno (EINVAL);
-      debug_printf ("Locking on nohandle device, return EINVAL.");
+      debug_printf ("BSD locking on nohandle and old-style console devices "
+		    "not supported");
       return -1;
     }
 
-  if (!a_flags)
-    a_flags = F_POSIX; /* default */
   if (a_op == F_SETLKW)
     {
       a_op = F_SETLK;

@@ -1,5 +1,14 @@
 2013-10-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (fhandler_base::lock): Only refuse to lock nohandle and
+	old-style console devices when called to perform BSD flock locking.
+	Add a FIXME to comment and align description.
+
+	* ntdll.h (THREADINFOCLASS): Following MSDN, rename throughout from
+	THREAD_INFORMATION_CLASS.
+
+2013-10-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.in (dev_storage): Map /dev/clipboard to \Device\Null.
 	* devices.cc: Regenerate.
 	* fhandler.h (fhandler_dev_clipboard::open): Drop declaration.

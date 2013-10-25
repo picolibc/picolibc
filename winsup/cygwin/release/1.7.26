@@ -8,8 +8,8 @@ What changed:
 - Slightly improve randomness of /dev/random emulation.
 
 - Allow to use advisory locking on any device which is backed by an OS handle.
-  Right now this excludes /dev/dsp as well as almost all virtual files under
-  /proc.
+  Right now this excludes /dev/dsp, console windows on pre Windows 8, as well
+  as almost all virtual files under /proc.
 
 
 Bug fixes:
