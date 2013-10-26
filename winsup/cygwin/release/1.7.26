@@ -8,8 +8,8 @@ What changed:
 - Slightly improve randomness of /dev/random emulation.
 
 - Allow to use advisory locking on any device which is backed by an OS handle.
-  Right now this excludes /dev/dsp, console windows on pre Windows 8, as well
-  as almost all virtual files under /proc.
+  Right now this excludes console windows on pre Windows 8, as well as almost
+  all virtual files under /proc.
 
 
 Bug fixes:
@@ -28,3 +28,7 @@ Bug fixes:
   Fixes: http://cygwin.com/ml/cygwin/2013-10/threads.html#00237 
 
 - Fix a potential crash after calling lseek on /dev/clipboard.
+
+- Fix a handle inheritance bug in raw disk and tape device handling which
+  led to EBADF errors in child processes.
+

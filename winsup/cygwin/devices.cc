@@ -226,7 +226,7 @@ const _RDATA device dev_storage[] =
   {"/dev/cons62", BRACK(FHDEV(DEV_CONS_MAJOR, 62)), "/dev/cons62", exists_console, S_IFCHR, true},
   {"/dev/cons63", BRACK(FHDEV(DEV_CONS_MAJOR, 63)), "/dev/cons63", exists_console, S_IFCHR, true},
   {"/dev/console", BRACK(FH_CONSOLE), "/dev/console", exists_console, S_IFCHR, true},
-  {"/dev/dsp", BRACK(FH_OSS_DSP), "/dev/dsp", exists, S_IFCHR, true},
+  {"/dev/dsp", BRACK(FH_OSS_DSP), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
   {"/dev/fd0", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 0)), "\\Device\\Floppy0", exists_ntdev, S_IFBLK, true},
   {"/dev/fd1", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 1)), "\\Device\\Floppy1", exists_ntdev, S_IFBLK, true},
   {"/dev/fd2", BRACK(FHDEV(DEV_FLOPPY_MAJOR, 2)), "\\Device\\Floppy2", exists_ntdev, S_IFBLK, true},

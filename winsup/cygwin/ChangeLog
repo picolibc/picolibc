@@ -1,4 +1,16 @@
-2013-10-25  Corinna Vinschen  <corinna@vinschen.de>
+2013-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.in (dev_storage): Map /dev/dsp to \Device\Null.
+	* devices.cc: Regenerate.
+	* fhandler_dsp.cc (fhandler_dev_dsp::open): Call fhandler_base::open.
+	(fhandler_dev_dsp::close): Call fhandler_base::close.
+	(fhandler_dev_dsp::fixup_after_fork): Call
+	fhandler_base::fixup_after_fork.
+
+	* fhandler_raw.cc (fhandler_dev_raw::fixup_after_fork): Call
+	fhandler_base::fixup_after_fork.
+
+2013-10-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exception.h (_exception_list): Drop redefinition for x86_64.
 	* include/exceptions.h: Disable content for x86_64 since it's not

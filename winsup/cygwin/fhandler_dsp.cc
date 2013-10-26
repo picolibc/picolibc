@@ -1006,7 +1006,7 @@ fhandler_dev_dsp::fhandler_dev_dsp ():
 int
 fhandler_dev_dsp::open (int flags, mode_t mode)
 {
-  int err = 0;
+  int ret = 0, err = 0;
   UINT num_in = 0, num_out = 0;
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   // Work out initial sample format & frequency, /dev/dsp defaults
@@ -1032,18 +1032,14 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
       err = EINVAL;
     }
 
-  if (!err)
-    {
-      set_open_status ();
-      need_fork_fixup (true);
-      nohandle (true);
-    }
-  else
+  if (err)
     set_errno (err);
+  else
+    ret = fhandler_base::open (flags, mode);
 
-  debug_printf ("ACCMODE=%y audio_in=%d audio_out=%d, err=%d",
-		flags & O_ACCMODE, num_in, num_out, err);
-  return !err;
+  debug_printf ("ACCMODE=%y audio_in=%d audio_out=%d, err=%d, ret=%d",
+		flags & O_ACCMODE, num_in, num_out, err, ret);
+  return ret;
 }
 
 #define IS_WRITE() ((get_flags() & O_ACCMODE) != O_RDONLY)
@@ -1159,7 +1155,7 @@ fhandler_dev_dsp::close ()
   debug_printf ("audio_in=%p audio_out=%p", audio_in_, audio_out_);
   close_audio_in ();
   close_audio_out (exit_state != ES_NOT_EXITING);
-  return 0;
+  return fhandler_base::close ();
 }
 
 int
@@ -1371,6 +1367,7 @@ fhandler_dev_dsp::fixup_after_fork (HANDLE parent)
   debug_printf ("audio_in=%p audio_out=%p",
 		audio_in_, audio_out_);
 
+  fhandler_base::fixup_after_fork (parent);
   if (audio_in_)
     audio_in_->fork_fixup (parent);
   if (audio_out_)

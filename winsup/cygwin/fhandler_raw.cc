@@ -105,8 +105,9 @@ fhandler_dev_raw::dup (fhandler_base *child, int flags)
 }
 
 void
-fhandler_dev_raw::fixup_after_fork (HANDLE)
+fhandler_dev_raw::fixup_after_fork (HANDLE parent)
 {
+  fhandler_base::fixup_after_fork (parent);
   devbufstart = 0;
   devbufend = 0;
   lastblk_to_read (false);

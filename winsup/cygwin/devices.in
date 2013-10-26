@@ -148,7 +148,7 @@ const device dev_error_storage =
 "/dev/console", BRACK(FH_CONSOLE), "/dev/console", exists_console, S_IFCHR, =console_dev
 "/dev/ptmx", BRACK(FH_PTMX), "/dev/ptmx", exists, S_IFCHR
 "/dev/windows", BRACK(FH_WINDOWS), "/dev/windows", exists, S_IFCHR
-"/dev/dsp", BRACK(FH_OSS_DSP), "/dev/dsp", exists, S_IFCHR
+"/dev/dsp", BRACK(FH_OSS_DSP), "\\Device\\Null", exists_ntdev, S_IFCHR
 "/dev/conin", BRACK(FH_CONIN), "/dev/conin", exists_console, S_IFCHR
 "/dev/conout", BRACK(FH_CONOUT), "/dev/conout", exists_console, S_IFCHR
 "/dev/null", BRACK(FH_NULL), "\\Device\\Null", exists_ntdev, S_IFCHR
