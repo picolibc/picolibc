@@ -8,10 +8,6 @@ details. */
 
 #pragma once
 
-#ifdef __x86_64__
-#define _exception_list _EXCEPTION_REGISTRATION_RECORD
-#endif
-
 #include <exceptions.h>
 
 #ifndef __x86_64__

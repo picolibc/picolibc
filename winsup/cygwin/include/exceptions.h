@@ -1,6 +1,6 @@
 /* exceptions.h
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2005 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2005, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -10,6 +10,8 @@ details. */
 
 #ifndef _EXCEPTIONS_H
 #define _EXCEPTIONS_H
+
+#ifndef __x86_64__
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,5 +113,7 @@ typedef struct _exception_list
 #ifdef __cplusplus
 };
 #endif /* __cplusplus */
+
+#endif /* __x86_64__ */
 
 #endif /* _EXCEPTIONS_H */

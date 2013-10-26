@@ -1,5 +1,11 @@
 2013-10-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exception.h (_exception_list): Drop redefinition for x86_64.
+	* include/exceptions.h: Disable content for x86_64 since it's not
+	using frame based exception handling anymore.
+
+2013-10-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* flock.cc (fhandler_base::lock): Only refuse to lock nohandle and
 	old-style console devices when called to perform BSD flock locking.
 	Add a FIXME to comment and align description.
