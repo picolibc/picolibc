@@ -11,6 +11,9 @@ What changed:
   Right now this excludes console windows on pre Windows 8, as well as almost
   all virtual files under /proc.
 
+- The header /usr/include/exceptions.h, containing implementation details for
+  32 bit Windows' exception handling only, has been removed.
+
 
 Bug fixes:
 ----------
