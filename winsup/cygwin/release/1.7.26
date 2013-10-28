@@ -7,9 +7,10 @@ What changed:
 
 - Slightly improve randomness of /dev/random emulation.
 
-- Allow to use advisory locking on any device which is backed by an OS handle.
-  Right now this excludes console windows on pre Windows 8, as well as almost
-  all virtual files under /proc.
+- Allow to use advisory locking on any device.  POSIX fcntl and lockf locking
+  works with any device, BSD flock locking only with devices backed by an OS
+  handle.  Right now this excludes console windows on pre Windows 8, as well as
+  almost all virtual files under /proc from BSD flock locking.
 
 - The header /usr/include/exceptions.h, containing implementation details for
   32 bit Windows' exception handling only, has been removed.
