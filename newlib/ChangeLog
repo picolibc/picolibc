@@ -1,4 +1,17 @@
-2013-10-30  Sebastian Huber <sebastian.huber@embedded-brains.de>
+2013-10-30  Joey Ye  <joey.ye@arm.com>
+
+	Implement malloc_stats for nano.
+	* libc/stdlib/nano-mallocr.c (RONECALL): New parameter macro.
+	(sbrk_start): New variable.
+	(current_mallinfo, free_list): Forward declaration of data.
+	(chunk): Define size as long type.
+	(mallinfo): Synchronize with latest malloc.h.
+	(nano_*): Forward declaration of functions.
+	(get_chunk_from_ptr): Defined to static inline.
+	(nano_mallinfo): Implement this function.
+	(nano_malloc_stats): Implement this function.
+
+2013-10-30  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/include/machine/_default_types.h: Revert change from 2013-10-10.
 
