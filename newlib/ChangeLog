@@ -1,3 +1,7 @@
+2013-10-30  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/include/machine/_default_types.h: Revert change from 2013-10-10.
+
 2013-10-24  Hans-Peter Nilsson  <hp@axis.com>
 
 	* libc/include/stdio.h [!__LARGE64_FILES] (funopen): Fix typo
@@ -81,6 +85,10 @@
 
 	* libc/sys/rtems/machine/_types.h (_ssize_t): Delete.
 	(__ssize_t_defined) Likewise.
+
+2013-10-30  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/include/machine/_default_types.h: Revert change from 2013-10-10.
 
 2013-10-10  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
