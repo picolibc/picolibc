@@ -36,3 +36,14 @@ Bug fixes:
 - Fix a handle inheritance bug in raw disk and tape device handling which
   led to EBADF errors in child processes.
 
+- open("/dev", O_CREAT) accidentally created a /dev file if no /dev
+  exists at the time.
+
+- DIR *d = opendir ("foo"); flock (dirfd (d), ...); worked, but did the
+  wrong thing.
+
+- Reading from /dev/windows was broken for some time.
+
+- select'ing on /dev/windows accidentally didn't take the setting of
+  ioctl (WINDOWS_HWND) into account.
+
