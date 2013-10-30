@@ -1,7 +1,7 @@
 /* fhandler_windows.cc: code to access windows message queues.
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2009, 2011, 2012
-   Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2009, 2011, 2012,
+   2013 Red Hat, Inc.
 
    Written by Sergey S. Okhapkin (sos@prospect.com.ru).
    Feedback and testing by Andy Piper (andyp@parallax.co.uk).
@@ -54,12 +54,9 @@ fhandler_windows::fhandler_windows ()
 }
 
 int
-fhandler_windows::open (int flags, mode_t)
+fhandler_windows::open (int flags, mode_t mode)
 {
-  set_flags ((flags & ~O_TEXT) | O_BINARY);
-  close_on_exec (true);
-  set_open_status ();
-  return 1;
+  return fhandler_base::open ((flags & ~O_TEXT) | O_BINARY, mode);
 }
 
 ssize_t __stdcall
@@ -96,10 +93,10 @@ fhandler_windows::read (void *buf, size_t& len)
       return;
     }
 
-  HANDLE w4[3] = { get_handle (), };
-  set_signal_arrived here (w4[1]);
-  DWORD cnt = 2;
-  if ((w4[cnt] = pthread::get_cancel_event ()) != NULL)
+  HANDLE w4[2];
+  set_signal_arrived here (w4[0]);
+  DWORD cnt = 1;
+  if ((w4[1] = pthread::get_cancel_event ()) != NULL)
     ++cnt;
   for (;;)
     {
@@ -109,6 +106,19 @@ fhandler_windows::read (void *buf, size_t& len)
 					   MWMO_INPUTAVAILABLE))
 	{
 	case WAIT_OBJECT_0:
+	  if (_my_tls.call_signal_handler ())
+	    continue;
+	  len = (size_t) -1;
+	  set_errno (EINTR);
+	  break;
+	case WAIT_OBJECT_0 + 1:
+	  if (cnt > 1) /* WAIT_OBJECT_0 + 1 is the cancel event object. */
+	    {
+	      pthread::static_cancel_self ();
+	      break;
+	    }
+	  /*FALLTHRU*/
+	case WAIT_OBJECT_0 + 2:
 	  if (!PeekMessageW (ptr, hWnd_, 0, 0, PM_REMOVE))
 	    {
 	      len = (size_t) -1;
@@ -118,15 +128,6 @@ fhandler_windows::read (void *buf, size_t& len)
 	    len = 0;
 	  else
 	    len = sizeof (MSG);
-	  break;
-	case WAIT_OBJECT_0 + 1:
-	  if (_my_tls.call_signal_handler ())
-	    continue;
-	  len = (size_t) -1;
-	  set_errno (EINTR);
-	  break;
-	case WAIT_OBJECT_0 + 2:
-	  pthread::static_cancel_self ();
 	  break;
 	case WAIT_TIMEOUT:
 	  len = (size_t) -1;
@@ -162,26 +163,4 @@ fhandler_windows::ioctl (unsigned int cmd, void *val)
       return fhandler_base::ioctl (cmd, val);
     }
   return 0;
-}
-
-void
-fhandler_windows::set_close_on_exec (bool val)
-{
-  if (get_handle ())
-    fhandler_base::set_close_on_exec (val);
-  else
-    fhandler_base::close_on_exec (val);
-  void *h = hWnd_;
-  if (h)
-    set_no_inheritance (h, val);
-}
-
-void
-fhandler_windows::fixup_after_fork (HANDLE parent)
-{
-  if (get_handle ())
-    fhandler_base::fixup_after_fork (parent);
-  void *h = hWnd_;
-  if (h)
-    fork_fixup (parent, h, "hWnd_");
 }

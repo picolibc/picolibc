@@ -1542,6 +1542,8 @@ peek_windows (select_record *me, bool)
   MSG m;
   HANDLE h;
   set_handle_or_return_if_not_open (h, me);
+  /* We need the hWnd value, not the io_handle. */
+  h = ((fhandler_windows *) me->fh)->get_hwnd ();
 
   if (me->read_selected && me->read_ready)
     return 1;
@@ -1576,7 +1578,6 @@ fhandler_windows::select_read (select_stuff *ss)
   s->peek = peek_windows;
   s->read_selected = true;
   s->read_ready = false;
-  s->h = get_handle ();
   s->windows_handle = true;
   return s;
 }
@@ -1591,7 +1592,6 @@ fhandler_windows::select_write (select_stuff *ss)
       s->verify = verify_ok;
     }
   s->peek = peek_windows;
-  s->h = get_handle ();
   s->write_selected = true;
   s->write_ready = true;
   s->windows_handle = true;
@@ -1608,7 +1608,6 @@ fhandler_windows::select_except (select_stuff *ss)
       s->verify = verify_ok;
     }
   s->peek = peek_windows;
-  s->h = get_handle ();
   s->except_selected = true;
   s->except_ready = false;
   s->windows_handle = true;

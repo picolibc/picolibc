@@ -16,6 +16,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "devices.h"
+#include "tls_pbuf.h"
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -49,21 +50,27 @@ fhandler_dev::open (int flags, mode_t mode)
       set_errno (EISDIR);
       return 0;
     }
-  int ret = fhandler_disk_file::open (flags, mode);
+  /* Filter O_CREAT flag to avoid creating a file called /dev accidentally. */
+  int ret = fhandler_disk_file::open (flags & ~O_CREAT, mode);
   if (!ret)
     {
-      flags |= O_DIROPEN;
-      set_flags (flags);
-      nohandle (true);
+      dir_exists = false;
+      /* Open a fake handle to \\Device\\Null, but revert to the old path
+	 string afterwards, otherwise readdir will return with an EFAULT
+	 when trying to fetch the inode number of ".." */
+      tmp_pathbuf tp;
+      char *orig_path = tp.c_get ();
+      stpcpy (orig_path, get_win32_name ());
+      pc.set_path (dev ().native);
+      ret = fhandler_base::open (flags, mode);
+      pc.set_path (orig_path);
     }
-  return 1;
+  return ret;
 }
 
 int
 fhandler_dev::close ()
 {
-  if (nohandle ())
-    return 0;
   return fhandler_disk_file::close ();
 }
 
@@ -87,25 +94,24 @@ fhandler_dev::fstatvfs (struct statvfs *sfs)
   int ret = -1, opened = 0;
   HANDLE fh = get_handle ();
 
-  if (!fh && !nohandle ())
+  if (!fh)
     {
       if (!open (O_RDONLY, 0))
 	return -1;
       opened = 1;
     }
-  if (!nohandle ())
+  if (pc.fs_got_fs ())
+    ret = fhandler_disk_file::fstatvfs (sfs);
+  else
     {
-      ret = fhandler_disk_file::fstatvfs (sfs);
-      goto out;
+      /* Virtual file system.  Just return an empty buffer with a few values
+	 set to something useful similar to Linux. */
+      memset (sfs, 0, sizeof (*sfs));
+      sfs->f_bsize = sfs->f_frsize = 4096;
+      sfs->f_flag = ST_RDONLY;
+      sfs->f_namemax = NAME_MAX;
+      ret = 0;
     }
-  /* Virtual file system.  Just return an empty buffer with a few values
-     set to something useful.  Just as on Linux. */
-  memset (sfs, 0, sizeof (*sfs));
-  sfs->f_bsize = sfs->f_frsize = 4096;
-  sfs->f_namemax = NAME_MAX;
-  ret = 0;
-
-out:
   if (opened)
     close ();
   return ret;
@@ -114,13 +120,10 @@ out:
 DIR *
 fhandler_dev::opendir (int fd)
 {
-  DIR *dir;
-  DIR *res = NULL;
-
-  dir = fhandler_disk_file::opendir (fd);
+  DIR *dir = fhandler_disk_file::opendir (fd);
   if (dir)
-    return dir;
-  if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
+    dir_exists = true;
+  else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);
   else if ((dir->__d_dirent =
 	    (struct dirent *) malloc (sizeof (struct dirent))) == NULL)
@@ -144,26 +147,28 @@ fhandler_dev::opendir (int fd)
 
       if (fd >= 0)
 	dir->__d_fd = fd;
+      else if (!open (O_RDONLY, 0))
+	goto free_dirent;
       else
 	{
 	  cfd = this;
 	  dir->__d_fd = cfd;
-	  cfd->nohandle (true);
 	}
       set_close_on_exec (true);
       dir->__fh = this;
-      devidx = dev_storage_scan_start;
-      res = dir;
+      dir_exists = false;
     }
 
-  syscall_printf ("%p = opendir (%s)", res, get_name ());
-  return res;
+  devidx = dir_exists ? NULL : dev_storage_scan_start;
+
+  syscall_printf ("%p = opendir (%s)", dir, get_name ());
+  return dir;
 
 free_dirent:
   free (dir->__d_dirent);
 free_dir:
   free (dir);
-  return res;
+  return NULL;
 }
 
 int
@@ -226,5 +231,7 @@ void
 fhandler_dev::rewinddir (DIR *dir)
 {
   devidx = dir_exists ? NULL : dev_storage_scan_start;
-  fhandler_disk_file::rewinddir (dir);
+  dir->__d_position = 0;
+  if (dir_exists)
+    fhandler_disk_file::rewinddir (dir);
 }

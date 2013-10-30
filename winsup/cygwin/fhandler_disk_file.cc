@@ -1833,11 +1833,17 @@ fhandler_disk_file::opendir (int fd)
       dir->__d_position = 0;
       dir->__flags = (get_name ()[0] == '/' && get_name ()[1] == '\0')
 		     ? dirent_isroot : 0;
-      dir->__d_internal = (uintptr_t) new __DIR_mounts (get_name ());
-      d_cachepos (dir) = 0;
+      dir->__d_internal = 0;
 
-      if (!pc.iscygdrive ())
+      if (pc.iscygdrive ())
 	{
+	  if (fd < 0 && !open (O_RDONLY, 0))
+	    goto free_mounts;
+	}
+      else
+	{
+	  dir->__d_internal = (uintptr_t) new __DIR_mounts (get_name ());
+	  d_cachepos (dir) = 0;
 	  if (fd < 0)
 	    {
 	      /* opendir() case.  Initialize with given directory name and
@@ -1918,8 +1924,6 @@ fhandler_disk_file::opendir (int fd)
 	     time on exit.  Nasty, nasty... */
 	  cfd = this;
 	  dir->__d_fd = cfd;
-	  if (pc.iscygdrive ())
-	    cfd->nohandle (true);
 	}
       set_close_on_exec (true);
       dir->__fh = this;
@@ -2380,16 +2384,16 @@ fhandler_cygdrive::open (int flags, mode_t mode)
       set_errno (EISDIR);
       return 0;
     }
-  flags |= O_DIROPEN;
-  set_flags (flags);
-  nohandle (true);
-  return 1;
-}
-
-int
-fhandler_cygdrive::close ()
-{
-  return 0;
+  /* Open a fake handle to \\Device\\Null, but revert to the old path
+     string afterwards, otherwise readdir will return with an EFAULT
+     when trying to fetch the inode number of ".." */
+  tmp_pathbuf tp;
+  char *orig_path = tp.c_get ();
+  stpcpy (orig_path, get_win32_name ());
+  pc.set_path (dev ().native);
+  int ret = fhandler_base::open (flags, mode);
+  pc.set_path (orig_path);
+  return ret;
 }
 
 void
@@ -2416,6 +2420,7 @@ fhandler_cygdrive::fstatvfs (struct statvfs *sfs)
      set to something useful.  Just as on Linux. */
   memset (sfs, 0, sizeof (*sfs));
   sfs->f_bsize = sfs->f_frsize = 4096;
+  sfs->f_flag = ST_RDONLY;
   sfs->f_namemax = NAME_MAX;
   return 0;
 }

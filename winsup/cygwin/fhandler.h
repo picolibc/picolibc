@@ -1045,6 +1045,8 @@ public:
   void rewinddir (DIR *);
 
   fhandler_dev (void *) {}
+  dev_t get_dev () { return dir_exists ? pc.fs_serial_number ()
+				       : get_device (); }
 
   void copyto (fhandler_base *x)
   {
@@ -1075,7 +1077,6 @@ class fhandler_cygdrive: public fhandler_disk_file
  public:
   fhandler_cygdrive ();
   int open (int flags, mode_t mode);
-  int close ();
   DIR __reg2 *opendir (int fd);
   int __reg3 readdir (DIR *, dirent *);
   void rewinddir (DIR *);
@@ -1084,6 +1085,7 @@ class fhandler_cygdrive: public fhandler_disk_file
   int __reg2 fstatvfs (struct statvfs *buf);
 
   fhandler_cygdrive (void *) {}
+  dev_t get_dev () { return get_device (); }
 
   void copyto (fhandler_base *x)
   {
@@ -1726,6 +1728,7 @@ class fhandler_windows: public fhandler_base
  public:
   fhandler_windows ();
   int is_windows () { return 1; }
+  HWND get_hwnd () { return hWnd_; }
   int open (int flags, mode_t mode = 0);
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
@@ -1733,8 +1736,6 @@ class fhandler_windows: public fhandler_base
   off_t lseek (off_t, int) { return 0; }
   int close () { return 0; }
 
-  void set_close_on_exec (bool val);
-  void fixup_after_fork (HANDLE parent);
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);

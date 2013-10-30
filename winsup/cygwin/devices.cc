@@ -91,7 +91,7 @@ exists_pty (const device& dev)
 }
 
 const device dev_cygdrive_storage =
-  {"/cygdrive", {FH_CYGDRIVE}, "/cygdrive", exists};
+  {"/cygdrive", {FH_CYGDRIVE}, "\\Device\\Null", exists};
 
 const device dev_fs_storage =
   {"", {FH_FS}, "", exists};
@@ -141,7 +141,7 @@ const device dev_error_storage =
 #define BRACK(x) {devn_int: x}
 const _RDATA device dev_storage[] =
 {
-  {"/dev", BRACK(FH_DEV), "/dev", exists, S_IFDIR, false},
+  {"/dev", BRACK(FH_DEV), "\\Device\\Null", exists, S_IFDIR, false},
   {"/dev/clipboard", BRACK(FH_CLIPBOARD), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
   {"/dev/com1", BRACK(FHDEV(DEV_SERIAL_MAJOR, 0)), "\\??\\COM1", exists_ntdev_silent, S_IFCHR, true},
   {"/dev/com2", BRACK(FHDEV(DEV_SERIAL_MAJOR, 1)), "\\??\\COM2", exists_ntdev_silent, S_IFCHR, true},
@@ -2714,7 +2714,7 @@ const _RDATA device dev_storage[] =
   {"/dev/ttyS62", BRACK(FHDEV(DEV_SERIAL_MAJOR, 62)), "\\??\\COM63", exists_ntdev, S_IFCHR, true},
   {"/dev/ttyS63", BRACK(FHDEV(DEV_SERIAL_MAJOR, 63)), "\\??\\COM64", exists_ntdev, S_IFCHR, true},
   {"/dev/urandom", BRACK(FH_URANDOM), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
-  {"/dev/windows", BRACK(FH_WINDOWS), "/dev/windows", exists, S_IFCHR, true},
+  {"/dev/windows", BRACK(FH_WINDOWS), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
   {"/dev/zero", BRACK(FH_ZERO), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
   {":fifo", BRACK(FH_FIFO), "/dev/fifo", exists_internal, S_IFCHR, false},
   {":pipe", BRACK(FH_PIPE), "/dev/pipe", exists_internal, S_IFCHR, false},

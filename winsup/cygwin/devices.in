@@ -87,7 +87,7 @@ exists_pty (const device& dev)
 }
 
 const device dev_cygdrive_storage =
-  {"/cygdrive", {FH_CYGDRIVE}, "/cygdrive", exists};
+  {"/cygdrive", {FH_CYGDRIVE}, "\\Device\\Null", exists};
 
 const device dev_fs_storage =
   {"", {FH_FS}, "", exists};
@@ -140,14 +140,14 @@ const device dev_error_storage =
 /* Internal devices below are prefixed with a ":".  This moves them out of
    the POSIX namespace.  */
 %%
-"/dev", BRACK(FH_DEV), "/dev", exists, S_IFDIR
+"/dev", BRACK(FH_DEV), "\\Device\\Null", exists, S_IFDIR
 "/dev/tty", BRACK(FH_TTY), "/dev/tty", exists, S_IFCHR
 "/dev/pty%(0-63)d", BRACK(FHDEV(DEV_PTYS_MAJOR, {$1})), "/dev/pty{$1}", exists_pty, S_IFCHR, =ptys_dev
 ":ptym%(0-63)d", BRACK(FHDEV(DEV_PTYM_MAJOR, {$1})), "/dev/ptym{$1}", exists_internal, S_IFCHR, =ptym_dev
 "/dev/cons%(0-63)d", BRACK(FHDEV(DEV_CONS_MAJOR, {$1})), "/dev/cons{$1}", exists_console, S_IFCHR, =cons_dev
 "/dev/console", BRACK(FH_CONSOLE), "/dev/console", exists_console, S_IFCHR, =console_dev
 "/dev/ptmx", BRACK(FH_PTMX), "/dev/ptmx", exists, S_IFCHR
-"/dev/windows", BRACK(FH_WINDOWS), "/dev/windows", exists, S_IFCHR
+"/dev/windows", BRACK(FH_WINDOWS), "\\Device\\Null", exists_ntdev, S_IFCHR
 "/dev/dsp", BRACK(FH_OSS_DSP), "\\Device\\Null", exists_ntdev, S_IFCHR
 "/dev/conin", BRACK(FH_CONIN), "/dev/conin", exists_console, S_IFCHR
 "/dev/conout", BRACK(FH_CONOUT), "/dev/conout", exists_console, S_IFCHR

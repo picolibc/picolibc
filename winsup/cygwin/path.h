@@ -380,6 +380,7 @@ class path_conv
       cfree (modifiable_path ());
     char *new_path = (char *) cmalloc_abort (HEAP_STR, strlen (p) + 7);
     strcpy (new_path, p);
+    cfree_and_null (wide_path);
     return path = new_path;
   }
   bool is_binary ();

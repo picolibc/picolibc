@@ -1,3 +1,47 @@
+2013-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.in (dev_cygdrive_storage): Map to \Device\Null.
+	(dev_storage): Map /dev and /dev/windows to \Device\Null.
+	* devices.cc: Regenerate.
+	* dir.cc (opendir): Create unique id.  Explain why.
+	* fhandler.h (fhandler_dev::get_dev): Implement inline.
+	(fhandler_cygdrive::close): Drop declaration.
+	(fhandler_cygdrive::get_dev): Implement inline.
+	(fhandler_windows::get_hwnd): Ditto.
+	(fhandler_windows::set_close_on_exec): Drop declaration.
+	(fhandler_windows::fixup_after_fork): Ditto.
+	* fhandler_dev.cc (fhandler_dev::open): Call fhandler_disk_file::open
+	without O_CREAT flag.  Explain why.  Create \Device\Null handle if
+	/dev/ doesn't actually exist.
+	(fhandler_dev::close): Drop nohandle case.
+	(fhandler_dev::fstatvfs): Drop nohandle check.  Test for fs_got_fs
+	instead.  Set ST_RDONLY fs flag for simulated /dev.
+	(fhandler_dev::opendir): If /dev doesn't exist, call open() to create
+	fake \Device\Null handle.  Don't set nohandle.  Set dir_exists
+	correctly.
+	(fhandler_dev::rewinddir): Call fhandler_disk_file::rewinddir only if
+	/dev is a real directory.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): If called for
+	the cygdrive dir, call open() to create fake \Device\Null handle.
+	Only attach __DIR_mounts buffer to dir if not called for cygdrive dir.
+	Don't set nohandle.
+	(fhandler_cygdrive::open): Create \Device\Null handle.
+	(fhandler_cygdrive::close): Remove.
+	(fhandler_cygdrive::fstatvfs): Set ST_RDONLY fs flag.
+	* fhandler_windows.cc (fhandler_windows::open): Create \Device\Null
+	handle.
+	(fhandler_windows::read): Don't add io_handle to WFMO handle array.
+	Change subsequent test for return value accordingly.  Fix test for
+	"message arrived".
+	(fhandler_windows::set_close_on_exec): Remove.
+	(fhandler_windows::fixup_after_fork): Remove.
+	* path.h (path_conv::set_path): Make sure wide_path is NULL when
+	setting a new path.
+	* select.cc (peek_windows): Use correct hWnd value, not io_handle.
+	(fhandler_windows::select_read): Don't use io_handle as wait object.
+	(fhandler_windows::select_write): Ditto.
+	(fhandler_windows::select_except): Ditto.
+
 2013-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exception.h: Fold in content of include/exceptions.h.
