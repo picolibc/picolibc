@@ -1,3 +1,8 @@
+2013-10-31  Terraneo Federico  <fede.tft@hotmail.it>
+
+	* libc/stdio/fvwrite.h: change type of uio_resid from int to size_t to
+	fix fwrite() of > 2GByte buffers.
+
 2013-10-30  Joey Ye  <joey.ye@arm.com>
 
 	Implement malloc_stats for nano.

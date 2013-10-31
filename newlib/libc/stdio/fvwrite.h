@@ -28,7 +28,7 @@ struct __siov {
 struct __suio {
 	struct	__siov *uio_iov;
 	int	uio_iovcnt;
-	int	uio_resid;
+	size_t	uio_resid;
 };
 
 
