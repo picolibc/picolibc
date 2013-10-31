@@ -1,5 +1,35 @@
 2013-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* devices.in (dev_cygdrive_storage): Revert mapping to \Device\Null.
+	(dev_storage): Ditto for /dev.
+	* devices.cc: Regenerate.
+	* fhandler.cc (fhandler_base::open_null): New method to open a fake
+	\Device\Null handler.
+	(fhandler_base::open): Fix formatting.  Change O_ACCMODE test to a
+	switch statement.  Simplify a test which still tested for a now unused
+	create_disposition.
+	* fhandler.h (fhandler_base::open_null): Declare.
+	(fhandler_netdrive::close): Declare.
+	* fhandler_dev.cc (fhandler_dev::open): Open fake \Device\Null handle
+	by just calling new open_null method.
+	* fhandler_disk_file.cc (fhandler_cygdrive::open): Ditto.
+	* fhandler_netdrive.cc (fhandler_netdrive::open): Call open_null
+	rather than setting nohandle.
+	(fhandler_netdrive::close): New method.
+	* fhandler_registry.cc (fetch_hkey): Fix token in RegOpenUserClassesRoot
+	call.  Create valid key for HKEY_CURRENT_CONFIG by mapping to real key
+	HKEY_LOCAL_MACHINE\System\CurrentControlSet\Hardware Profiles\Current.
+	(fhandler_registry::open): Set nohandle only when using pseudo registry
+	handle.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Call open rather
+	than just setting nohandle here.
+	* fhandler_virtual::fstatvfs): Set ST_RDONLY fs flag.
+	* globals.cc (ro_u_null): New readonly UNICODE_STRING for \Device\Null.
+	* path.h (path_conv::set_path): Revert previous change caring for
+	wide_path.
+
+2013-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.in (dev_cygdrive_storage): Map to \Device\Null.
 	(dev_storage): Map /dev and /dev/windows to \Device\Null.
 	* devices.cc: Regenerate.

@@ -91,7 +91,7 @@ exists_pty (const device& dev)
 }
 
 const device dev_cygdrive_storage =
-  {"/cygdrive", {FH_CYGDRIVE}, "\\Device\\Null", exists};
+  {"/cygdrive", {FH_CYGDRIVE}, "", exists};
 
 const device dev_fs_storage =
   {"", {FH_FS}, "", exists};
@@ -141,7 +141,7 @@ const device dev_error_storage =
 #define BRACK(x) {devn_int: x}
 const _RDATA device dev_storage[] =
 {
-  {"/dev", BRACK(FH_DEV), "\\Device\\Null", exists, S_IFDIR, false},
+  {"/dev", BRACK(FH_DEV), "", exists, S_IFDIR, false},
   {"/dev/clipboard", BRACK(FH_CLIPBOARD), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
   {"/dev/com1", BRACK(FHDEV(DEV_SERIAL_MAJOR, 0)), "\\??\\COM1", exists_ntdev_silent, S_IFCHR, true},
   {"/dev/com2", BRACK(FHDEV(DEV_SERIAL_MAJOR, 1)), "\\??\\COM2", exists_ntdev_silent, S_IFCHR, true},

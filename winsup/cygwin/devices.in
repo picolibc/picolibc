@@ -87,7 +87,7 @@ exists_pty (const device& dev)
 }
 
 const device dev_cygdrive_storage =
-  {"/cygdrive", {FH_CYGDRIVE}, "\\Device\\Null", exists};
+  {"/cygdrive", {FH_CYGDRIVE}, "", exists};
 
 const device dev_fs_storage =
   {"", {FH_FS}, "", exists};
@@ -140,7 +140,7 @@ const device dev_error_storage =
 /* Internal devices below are prefixed with a ":".  This moves them out of
    the POSIX namespace.  */
 %%
-"/dev", BRACK(FH_DEV), "\\Device\\Null", exists, S_IFDIR
+"/dev", BRACK(FH_DEV), "", exists, S_IFDIR
 "/dev/tty", BRACK(FH_TTY), "/dev/tty", exists, S_IFCHR
 "/dev/pty%(0-63)d", BRACK(FHDEV(DEV_PTYS_MAJOR, {$1})), "/dev/pty{$1}", exists_pty, S_IFCHR, =ptys_dev
 ":ptym%(0-63)d", BRACK(FHDEV(DEV_PTYM_MAJOR, {$1})), "/dev/ptym{$1}", exists_internal, S_IFCHR, =ptym_dev

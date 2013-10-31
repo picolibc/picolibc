@@ -16,7 +16,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "devices.h"
-#include "tls_pbuf.h"
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -54,16 +53,9 @@ fhandler_dev::open (int flags, mode_t mode)
   int ret = fhandler_disk_file::open (flags & ~O_CREAT, mode);
   if (!ret)
     {
+      /* Open a fake handle to \\Device\\Null */
+      ret = open_null (flags);
       dir_exists = false;
-      /* Open a fake handle to \\Device\\Null, but revert to the old path
-	 string afterwards, otherwise readdir will return with an EFAULT
-	 when trying to fetch the inode number of ".." */
-      tmp_pathbuf tp;
-      char *orig_path = tp.c_get ();
-      stpcpy (orig_path, get_win32_name ());
-      pc.set_path (dev ().native);
-      ret = fhandler_base::open (flags, mode);
-      pc.set_path (orig_path);
     }
   return ret;
 }

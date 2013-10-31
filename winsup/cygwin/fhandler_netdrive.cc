@@ -295,30 +295,23 @@ fhandler_netdrive::closedir (DIR *dir)
 int
 fhandler_netdrive::open (int flags, mode_t mode)
 {
-  int res = fhandler_virtual::open (flags, mode);
-  if (!res)
-    goto out;
-
-  nohandle (true);
-
   if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
     {
       set_errno (EEXIST);
-      res = 0;
-      goto out;
+      return 0;
     }
-  else if (flags & O_WRONLY)
+  if (flags & O_WRONLY)
     {
       set_errno (EISDIR);
-      res = 0;
-      goto out;
+      return 0;
     }
-
-  res = 1;
-  set_flags ((flags & ~O_TEXT) | O_BINARY | O_DIROPEN);
-  set_open_status ();
-out:
-  syscall_printf ("%d = fhandler_netdrive::open(%y, 0%o)", res, flags, mode);
-  return res;
+  /* Open a fake handle to \\Device\\Null */
+  return open_null (flags);
 }
 
+int
+fhandler_netdrive::close ()
+{
+  /* Skip fhandler_virtual::close, which is a no-op. */
+  return fhandler_base::close ();
+}

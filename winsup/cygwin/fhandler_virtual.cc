@@ -1,7 +1,7 @@
 /* fhandler_virtual.cc: base fhandler class for virtual filesystems
 
-   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-   Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+   2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -84,10 +84,9 @@ fhandler_virtual::opendir (int fd)
       else
 	{
 	  cygheap_fdnew cfd;
-	  if (cfd >= 0)
+	  if (cfd >= 0 && open (O_RDONLY, 0))
 	    {
 	      cfd = this;
-	      cfd->nohandle (true);
 	      dir->__d_fd = cfd;
 	      dir->__fh = this;
 	      res = dir;
@@ -273,6 +272,7 @@ fhandler_virtual::fstatvfs (struct statvfs *sfs)
      set to something useful.  Just as on Linux. */
   memset (sfs, 0, sizeof (*sfs));
   sfs->f_bsize = sfs->f_frsize = 4096;
+  sfs->f_flag = ST_RDONLY;
   sfs->f_namemax = NAME_MAX;
   return 0;
 }

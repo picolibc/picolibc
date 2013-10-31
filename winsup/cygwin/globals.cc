@@ -146,6 +146,7 @@ extern "C" {
   extern UNICODE_STRING _RDATA ro_u_volume = _ROU (L"\\??\\Volume{");
   extern UNICODE_STRING _RDATA ro_u_pipedir = _ROU (L"\\\\?\\PIPE\\");
   extern UNICODE_STRING _RDATA ro_u_globalroot = _ROU (L"\\\\.\\GLOBALROOT");
+  extern UNICODE_STRING _RDATA ro_u_null = _ROU (L"\\Device\\Null");
   #undef _ROU
 
   /* Cygwin properties are meant to be readonly data placed in the DLL, but

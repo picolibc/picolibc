@@ -2384,16 +2384,8 @@ fhandler_cygdrive::open (int flags, mode_t mode)
       set_errno (EISDIR);
       return 0;
     }
-  /* Open a fake handle to \\Device\\Null, but revert to the old path
-     string afterwards, otherwise readdir will return with an EFAULT
-     when trying to fetch the inode number of ".." */
-  tmp_pathbuf tp;
-  char *orig_path = tp.c_get ();
-  stpcpy (orig_path, get_win32_name ());
-  pc.set_path (dev ().native);
-  int ret = fhandler_base::open (flags, mode);
-  pc.set_path (orig_path);
-  return ret;
+  /* Open a fake handle to \\Device\\Null */
+  return open_null (flags);
 }
 
 void

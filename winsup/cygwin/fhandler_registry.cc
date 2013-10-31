@@ -87,7 +87,7 @@ fetch_hkey (int idx) /* idx *must* be valid */
   if (registry_keys[idx] == HKEY_CLASSES_ROOT)
     {
       if (RegOpenUserClassesRoot (cygheap->user.issetuid ()
-				  ? cygheap->user.imp_token () : hProcImpToken,
+				  ? cygheap->user.imp_token () : hProcToken,
 				  0, KEY_READ, &key) == ERROR_SUCCESS)
 	return key;
     }
@@ -96,6 +96,17 @@ fetch_hkey (int idx) /* idx *must* be valid */
       if (RegOpenCurrentUser (KEY_READ, &key) == ERROR_SUCCESS)
 	return key;
     }
+  else if (registry_keys[idx] == HKEY_CURRENT_CONFIG)
+    {
+      if (RegOpenKeyExW (HKEY_LOCAL_MACHINE,
+		       L"System\\CurrentControlSet\\Hardware Profiles\\Current",
+		       0, KEY_READ, &key) == ERROR_SUCCESS)
+	return key;
+    }
+  /* Unfortunately there's no way to generate a valid OS registry key for
+     the other root keys.  HKEY_USERS and HKEY_LOCAL_MACHINE are file
+     handles internally, HKEY_PERFORMANCE_DATA is just a bad hack and
+     no registry key at all. */
   return registry_keys[idx];
 }
 
@@ -820,7 +831,8 @@ fhandler_registry::open (int flags, mode_t mode)
 		set_io_handle (fetch_hkey (i));
 		/* Marking as nohandle allows to call dup on pseudo registry
 		   handles. */
-		nohandle (true);
+		if (get_handle () >= HKEY_CLASSES_ROOT)
+		  nohandle (true);
 		flags |= O_DIROPEN;
 		goto success;
 	      }

@@ -507,6 +507,38 @@ fhandler_base::open_with_arch (int flags, mode_t mode)
   return res;
 }
 
+/* Open a fake handle to \\Device\\Null.  This is a helper function for
+   fhandlers which just need some handle to keep track of BSD flock locks. */
+int
+fhandler_base::open_null (int flags)
+{
+  int res = 0;
+  HANDLE fh;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  NTSTATUS status;
+
+  InitializeObjectAttributes (&attr, &ro_u_null, OBJ_CASE_INSENSITIVE |
+			      ((flags & O_CLOEXEC) ? 0 : OBJ_INHERIT),
+			      NULL, NULL);
+  status = NtCreateFile (&fh, GENERIC_READ | SYNCHRONIZE, &attr, &io, NULL, 0,
+			 FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_OPEN,
+			 FILE_SYNCHRONOUS_IO_NONALERT, NULL, 0);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      goto done;
+    }
+  set_io_handle (fh);
+  set_flags (flags, pc.binmode ());
+  res = 1;
+  set_open_status ();
+done:
+  debug_printf ("%y = NtCreateFile (%p, ... %S ...)", status, fh, &ro_u_null);
+  syscall_printf ("%d = fhandler_base::open_null (%y)", res, flags);
+  return res;
+}
+
 /* Open system call handler function. */
 int
 fhandler_base::open (int flags, mode_t mode)
@@ -529,38 +561,44 @@ fhandler_base::open (int flags, mode_t mode)
   options = FILE_OPEN_FOR_BACKUP_INTENT;
   switch (query_open ())
     {
-      case query_read_control:
-	access = READ_CONTROL;
-	break;
-      case query_read_attributes:
-	access = READ_CONTROL | FILE_READ_ATTRIBUTES;
-	break;
-      case query_write_control:
-	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
-	break;
-      case query_write_dac:
-	access = READ_CONTROL | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
-	break;
-      case query_write_attributes:
-	access = READ_CONTROL | FILE_WRITE_ATTRIBUTES;
-	break;
-      default:
-	if ((flags & O_ACCMODE) == O_RDONLY)
+    case query_read_control:
+      access = READ_CONTROL;
+      break;
+    case query_read_attributes:
+      access = READ_CONTROL | FILE_READ_ATTRIBUTES;
+      break;
+    case query_write_control:
+      access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
+      break;
+    case query_write_dac:
+      access = READ_CONTROL | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
+      break;
+    case query_write_attributes:
+      access = READ_CONTROL | FILE_WRITE_ATTRIBUTES;
+      break;
+    default:
+      switch (flags & O_ACCMODE)
+	{
+	case O_RDONLY:
 	  access = GENERIC_READ;
-	else if ((flags & O_ACCMODE) == O_WRONLY)
+	  break;
+	case O_WRONLY:
 	  access = GENERIC_WRITE | READ_CONTROL | FILE_READ_ATTRIBUTES;
-	else
+	  break;
+	default:
 	  access = GENERIC_READ | GENERIC_WRITE;
-	if (flags & O_SYNC)
-	  options |= FILE_WRITE_THROUGH;
-	if (flags & O_DIRECT)
-	  options |= FILE_NO_INTERMEDIATE_BUFFERING;
-	if (get_major () != DEV_SERIAL_MAJOR && get_major () != DEV_TAPE_MAJOR)
-	  {
-	    options |= FILE_SYNCHRONOUS_IO_NONALERT;
-	    access |= SYNCHRONIZE;
-	  }
-	break;
+	  break;
+	}
+      if (flags & O_SYNC)
+	options |= FILE_WRITE_THROUGH;
+      if (flags & O_DIRECT)
+	options |= FILE_NO_INTERMEDIATE_BUFFERING;
+      if (get_major () != DEV_SERIAL_MAJOR && get_major () != DEV_TAPE_MAJOR)
+	{
+	  options |= FILE_SYNCHRONOUS_IO_NONALERT;
+	  access |= SYNCHRONIZE;
+	}
+      break;
     }
 
   /* Don't use the FILE_OVERWRITE{_IF} flags here.  See below for an
@@ -596,7 +634,7 @@ fhandler_base::open (int flags, mode_t mode)
 	 and/or FILE_ATTRIBUTE_SYSTEM attribute set, NtCreateFile fails with
 	 STATUS_ACCESS_DENIED.  Per MSDN you have to create the file with the
 	 same attributes as already specified for the file. */
-      if (((flags & O_CREAT) || create_disposition == FILE_OVERWRITE)
+      if (create_disposition == FILE_CREATE
 	  && has_attribute (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
 	file_attributes |= pc.file_attributes ();
 
