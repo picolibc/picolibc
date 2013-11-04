@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <limits.h>
 #include "local.h"
 #include "fvwrite.h"
 
@@ -89,12 +90,14 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
   if (fp->_flags & __SNBF)
     {
       /*
-       * Unbuffered: write up to BUFSIZ bytes at a time.
+       * Unbuffered: Split buffer in the largest multiple of BUFSIZ < INT_MAX
+       * as some legacy code may expect int instead of size_t.
        */
       do
 	{
 	  GETIOV (;);
-	  w = fp->_write (ptr, fp->_cookie, p, MIN (len, BUFSIZ));
+	  w = fp->_write (ptr, fp->_cookie, p,
+			  MIN (len, INT_MAX - INT_MAX % BUFSIZ));
 	  if (w <= 0)
 	    goto err;
 	  p += w;
@@ -177,29 +180,23 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	      fp->_p += w;
 	      w = len;		/* but pretend copied all */
 	    }
-	  else if (fp->_p > fp->_bf._base && len > w)
+	  else if (fp->_p > fp->_bf._base || len < fp->_bf._size)
 	    {
-	      /* fill and flush */
+	      /* pass through the buffer */
+	      w = MIN (len, w);
 	      COPY (w);
-	      /* fp->_w -= w; *//* unneeded */
+	      fp->_w -= w;
 	      fp->_p += w;
-	      if (_fflush_r (ptr, fp))
-		goto err;
-	    }
-	  else if (len >= (w = fp->_bf._size))
-	    {
-	      /* write directly */
-	      w = fp->_write (ptr, fp->_cookie, p, w);
-	      if (w <= 0)
+	      if (fp->_w == 0 && _fflush_r (ptr, fp))
 		goto err;
 	    }
 	  else
 	    {
-	      /* fill and done */
-	      w = len;
-	      COPY (w);
-	      fp->_w -= w;
-	      fp->_p += w;
+	      /* write directly */
+	      w = ((int)MIN (len, INT_MAX)) / fp->_bf._size * fp->_bf._size;
+	      w = fp->_write (ptr, fp->_cookie, p, w);
+	      if (w <= 0)
+		goto err;
 	    }
 	  p += w;
 	  len -= w;

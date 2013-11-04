@@ -1,3 +1,8 @@
+2013-11-04  Terraneo Federico  <fede.tft@hotmail.it>
+
+	* libc/stdio/fvwrite.c: Allow writing in larger chunks for fully
+	buffered and unbuffered files, to improve write performance.
+
 2013-10-31  Terraneo Federico  <fede.tft@hotmail.it>
 
 	* libc/stdio/fvwrite.h: change type of uio_resid from int to size_t to
