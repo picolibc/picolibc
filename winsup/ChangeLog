@@ -1,3 +1,7 @@
+2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* Makefile.in: Reinstate ignoring of errors for doc target.
+
 2013-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.common: Add rule to build assembler code.
