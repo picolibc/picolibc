@@ -1,5 +1,10 @@
 2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* Makefile.in: Properly cd to directory sans install_ prefix.  Report
+	on errors on doc install.  Only 'all' is special.
+
+2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* configure.ac: Detect windows headers/libs after we've figured out the
 	C compiler.
 	* configure: Regenerate.

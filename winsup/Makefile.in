@@ -79,13 +79,13 @@ install-info:
 info:
 
 $(SUBDIRS):
-	${MAKE} -C $@ all || ([ "$@" == doc ] && echo "*** error ignored")
+	@${MAKE} -C $@ all || ([ "$@" == doc ] && echo "*** error ignored")
 
 $(INSTALL_SUBDIRS):
-	${MAKE} -C $@ all || ([ "$@" == install_doc ] && echo "*** error ignored")
+	@${MAKE} -C $(patsubst install_%,%,$@) install
 
 $(CLEAN_SUBDIRS):
-	@if cd ${patsubst clean_%,%,$@} 2>/dev/null; then \
+	@if cd $(patsubst clean_%,%,$@) 2>/dev/null; then \
 	    $(MAKE) clean || exit 1; \
 	fi || exit 0
 
