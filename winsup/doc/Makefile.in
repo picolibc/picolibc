@@ -16,7 +16,6 @@ DBXDIRS =  -d $(srcdir) -d $(srcdir)/../utils -d $(srcdir)/../cygwin
 
 CC:=@CC@
 CC_FOR_TARGET:=@CC@
-exeext:=@build_exeext@
 
 XMLTO:=xmlto --skip-validation --with-dblatex
 
@@ -89,8 +88,6 @@ cygwin-docs.tar.bz2 : $(TBFILES) $(TBDEPS)
 	find $(TBFILES) $(TBDIRS) \! -type d | sort | tar -T - -cf -  | bzip2 > cygwin-docs.tar.bz2
 
 Makefile.dep: cygwin-ug-net.xml
-	builddir=`pwd` \
-	&& cd $(srcdir) \
-	&& $(srcdir)/xidepend $^ > "$${builddir}/$@"
+	cd $(srcdir) && ./xidepend $^ > "${CURDIR}/$@"
 
 -include Makefile.dep

@@ -1,3 +1,10 @@
+2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* configure.ac: Detect windows headers/libs after we've figured out the
+	C compiler.
+	* configure: Regenerate.
+	* aclocal.m4: Regenerate.
+
 2013-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* devices.in (dev_cygdrive_storage): Revert mapping to \Device\Null.

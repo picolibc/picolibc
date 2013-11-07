@@ -1,5 +1,13 @@
 2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* configure.ac: Detect windows headers/libs after we've figured out the
+	C compiler.
+	* configure: Regenerate.
+	* aclocal.m4: Regenerate.
+	* configure.cygwin: Default to '.' if can't find a winsup directory.
+
+2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* Makefile.in: Reinstate ignoring of errors for doc target.
 
 2013-06-18  Corinna Vinschen  <corinna@vinschen.de>

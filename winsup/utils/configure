@@ -596,6 +596,7 @@ windows_headers
 ac_ct_CXX
 CXXFLAGS
 CXX
+windows_libdir
 OBJEXT
 EXEEXT
 ac_ct_CC
@@ -615,7 +616,6 @@ build_os
 build_vendor
 build_cpu
 build
-windows_libdir
 target_alias
 host_alias
 build_alias
@@ -1845,34 +1845,6 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 . ${srcdir}/../configure.cygwin
 
-
-
-# Check whether --with-windows-headers was given.
-if test "${with_windows_headers+set}" = set; then :
-  withval=$with_windows_headers; test -z "$withval" && as_fn_error $? "must specify value for --with-windows-headers" "$LINENO" 5
-
-fi
-
-
-
-
-# Check whether --with-windows-libs was given.
-if test "${with_windows_libs+set}" = set; then :
-  withval=$with_windows_libs; test -z "$withval" && as_fn_error $? "must specify value for --with-windows-libs" "$LINENO" 5
-
-fi
-
-windows_libdir=$(realdirpath "$with_windows_libs")
-if test -z "$windows_libdir"; then
-    windows_libdir=$(realdirpath $(${ac_cv_prog_CC:-$CC} -xc /dev/null  -Wl,--verbose=1 -lntdll 2>&1 | sed -rn 's%^.*\s(\S+)/libntdll\..*succeeded%\1%p'))
-    if test -z "$windows_libdir"; then
-	as_fn_error $? "cannot find windows library files" "$LINENO" 5
-    fi
-fi
-
-
-
-
 # Make sure we can run config.sub.
 $SHELL "$ac_aux_dir/config.sub" sun4 >/dev/null 2>&1 ||
   as_fn_error $? "cannot run $SHELL $ac_aux_dir/config.sub" "$LINENO" 5
@@ -2849,6 +2821,35 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+
+# Check whether --with-windows-headers was given.
+if test "${with_windows_headers+set}" = set; then :
+  withval=$with_windows_headers; test -z "$withval" && as_fn_error $? "must specify value for --with-windows-headers" "$LINENO" 5
+
+fi
+
+
+
+
+# Check whether --with-windows-libs was given.
+if test "${with_windows_libs+set}" = set; then :
+  withval=$with_windows_libs; test -z "$withval" && as_fn_error $? "must specify value for --with-windows-libs" "$LINENO" 5
+
+fi
+
+windows_libdir=$(realdirpath "$with_windows_libs")
+if test -z "$windows_libdir"; then
+    windows_libdir=$(realdirpath $(${ac_cv_prog_CC:-$CC} -xc /dev/null  -Wl,--verbose=1 -lntdll 2>&1 | sed -rn 's%^.*\s(\S+)/libntdll\..*succeeded%\1%p'))
+    if test -z "$windows_libdir"; then
+	as_fn_error $? "cannot find windows library files" "$LINENO" 5
+    fi
+fi
+
+
+
 
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'

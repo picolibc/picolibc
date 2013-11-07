@@ -1,3 +1,8 @@
+2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* Makefile.in: Fix problems accessing xidepend when configured with a
+	(discouraged) relative path to source directory.
+
 2013-08-23  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* new-features.xml (ov-new1.7.25): Change wording.

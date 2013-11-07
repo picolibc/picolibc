@@ -44,6 +44,5 @@ for d in . .. ../.. ../../..; do
 done
 
 if test -z "$target_builddir"; then
-    echo "cannot determine top build dir, looking for $lookfor" 1>&2
-    exit 1
+    target_builddir=$(pwd)
 fi
