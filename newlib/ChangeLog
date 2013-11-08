@@ -1,3 +1,11 @@
+2013-11-08  Terry Guo  <terry.guo@arm.com>
+
+	* libm/libm.texinfo: Rename node Index to Document Index.
+
+2013-11-08  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/libc.texinfo: Rename node Library Index to Document Index.
+
 2013-11-04  Terraneo Federico  <fede.tft@hotmail.it>
 
 	* libc/stdio/fvwrite.c: Allow writing in larger chunks for fully

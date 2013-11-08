@@ -172,7 +172,7 @@ into another language, under the above conditions for modified versions.
 * Iconv::
 @end ifset
 
-* Library Index::
+* Document Index::
 @end menu
 @end ifnottex
 
@@ -424,8 +424,8 @@ argument list @var{ap} any further.
 The @code{va_end} defined in @file{varargs.h} has the same syntax and
 usage as the ANSI C version from @file{stdarg.h}.
 
-@node Library Index
-@unnumbered Index
+@node Document Index
+@unnumbered Document Index
 @printindex cp
 
 @tex

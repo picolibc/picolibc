@@ -96,7 +96,7 @@ into another language, under the above conditions for modified versions.
 * Complex::        The mathematical complex functions (`complex.h').
 * Reentrancy::     The functions in libm are not reentrant by default.
 * Long Double Functions:: The long double function support of libm.
-* Index::
+* Document Index::
 @end menu
 
 @include targetdep.tex
@@ -130,8 +130,8 @@ calls; in that situation, the math functions behave reentrantly.
 Currently, the full set of long double math functions is only provided
 on platforms where long double equals double.
 For such platforms, the long double math functions are implemented as calls to the double versions.
-@node Index
-@unnumbered Index
+@node Document Index
+@unnumbered Document Index
 @printindex cp
 
 @tex
