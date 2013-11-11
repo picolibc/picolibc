@@ -8,11 +8,25 @@
 <sect1 id="internet-setup">
 <title>Internet Setup</title>
 <para>To install the Cygwin net release, go to <ulink
-url="http://cygwin.com/">http://cygwin.com/</ulink> and click on <ulink
-url="http://cygwin.com/setup.exe">"Install Cygwin Now!"</ulink>.  This will
-download a GUI installer called <command>setup.exe</command> which can
-be run to download a complete cygwin installation via the internet.
-Follow the instructions on each screen to install Cygwin.
+url="http://cygwin.com/">http://cygwin.com/</ulink> and run either
+<ulink url="http://cygwin.com/setup-x86.exe">setup-x86.exe</ulink>
+to install the 32 bit version of Cygwin, or
+<ulink url="http://cygwin.com/setup-x86_64.exe">setup-x86_64.exe</ulink>
+to install the 64 bit version of Cygwin.  This will download a GUI
+installer which can be run to download a complete cygwin installation
+via the internet.  Follow the instructions on each screen to install Cygwin.
+</para>
+
+<para>
+<note>
+For easier reading the installer is called <command>setup.exe</command>
+throughout the following sections.  This refers likewise to both
+installer applications,
+<ulink url="http://cygwin.com/setup-x86.exe">setup-x86.exe</ulink>
+for 32 bit, as well as
+<ulink url="http://cygwin.com/setup-x86_64.exe">setup-x86_64.exe</ulink>
+for 64 bit.  Apart from the target architecture they are the same thing.
+</note>
 </para>
 
 <para>
@@ -22,6 +36,14 @@ experienced. The volunteer development team is constantly working
 on <command>setup.exe</command>; before requesting a new feature,
 check the wishlist in the <ulink url="http://sourceware.org/cgi-bin/cvsweb.cgi/setup/README?cvsroot=cygwin-apps&amp;rev=2">CVS <literal>README</literal>
 </ulink>. It may already be present in the CVS version!
+</para>
+
+<para>
+On Windows Vista and later, <command>setup.exe</command> will check by
+default if it runs with administrative privileges and, if not, will try 
+to elevate the process.  If you want to avoid this behaviour and install
+under an unprivileged account just for your own usage, run
+<command>setup.exe</command> with the <literal>--no-admin</literal> option.
 </para>
 
 <para>

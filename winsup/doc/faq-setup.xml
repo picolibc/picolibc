@@ -37,10 +37,10 @@ see <ulink url="http://cygwin.com/packages/">http://cygwin.com/packages/</ulink>
 <para>The Cygwin Setup program is designed to be interactive, but there are
 a few different ways to automate it. If you are deploying to multiple systems,
 the best way is to run through a full installation once, saving the entire 
-downloaded package tree. Then, on target systems, run setup.exe as a "Local
-Install" pointed at your downloaded package tree. You could do this 
-non-interactively with the command line options 
-<literal>setup.exe -q -L -l x:\cygwin-local\</literal>, where your downloaded 
+downloaded package tree. Then, on target systems, run Cygwin Setup as a
+"Local Install" pointed at your downloaded package tree. You could do this 
+non-interactively with the command line options
+<literal>-q -L -l x:\cygwin-local\</literal>, where your downloaded 
 package tree is in <literal>x:\cygwin-local\</literal> (see the next FAQ for
 an explanation of those options.)
 </para>
@@ -52,37 +52,67 @@ For other options, search the mailing lists with terms such as
 </answer></qandaentry>
 
 <qandaentry id="faq.setup.cli">
-<question><para>Does setup.exe accept command-line arguments?</para></question>
+<question><para>Does Setup accept command-line arguments?</para></question>
 <answer>
 
 <para>Yes, the full listing is written to the <literal>setup.log</literal> file 
-when you run <literal>setup.exe --help</literal>. The current options are:
+when you run <literal>setup-x86.exe --help</literal> or
+<literal>setup-x86_64.exe --help</literal>. The current options are:
 <screen>
 Command Line Options:
- -A --disable-buggy-antivirus           Disable known or suspected buggy anti
- 					virus software packages during execution.
- -C --categories                        Specify entire categories to install
- -D --download                          Download from internet
- -d --no-desktop                        Disable creation of desktop shortcut
- -h --help                              print help
- -K --pubkey                            URL of extra public key file (gpg format)
- -L --local-install                     Install from local directory
- -l --local-package-dir                 Local package directory
- -n --no-shortcuts                      Disable creation of desktop and start menu
- 					shortcuts
- -N --no-startmenu                      Disable creation of start menu shortcut
- -O --only-site                         Ignore all sites except for -s
- -P --packages                          Specify packages to install
- -p --proxy                             HTTP/FTP proxy (host:port)
- -q --quiet-mode                        Unattended setup mode
- -r --no-replaceonreboot                Disable replacing in-use files on next
- 					reboot.
- -R --root                              Root installation directory
- -S --sexpr-pubkey                      Extra public key in s-expr format
- -s --site                              Download site
- -U --keep-untrusted-keys               Use untrusted keys and retain all
- -u --untrusted-keys                    Use untrusted keys from last-extrakeys
- -X --no-verify                         Don't verify setup.ini signatures
+ -D --download                     Download from internet
+ -L --local-install                Install from local directory
+ -s --site                         Download site
+ -O --only-site                    Ignore all sites except for -s
+ -R --root                         Root installation directory
+ -x --remove-packages              Specify packages to uninstall
+ -c --remove-categories            Specify categories to uninstall
+ -P --packages                     Specify packages to install
+ -C --categories                   Specify entire categories to install
+ -p --proxy                        HTTP/FTP proxy (host:port)
+ -a --arch                         architecture to install (x86_64 or x86)
+ -q --quiet-mode                   Unattended setup mode
+ -M --package-manager              Semi-attended chooser-only mode
+ -B --no-admin                     Do not check for and enforce running as
+                                   Administrator
+ -h --help                         print help
+ -l --local-package-dir            Local package directory
+ -r --no-replaceonreboot           Disable replacing in-use files on next
+                                   reboot.
+ -X --no-verify                    Don't verify setup.ini signatures
+ -n --no-shortcuts                 Disable creation of desktop and start menu
+                                   shortcuts
+ -N --no-startmenu                 Disable creation of start menu shortcut
+ -d --no-desktop                   Disable creation of desktop shortcut
+ -K --pubkey                       URL of extra public key file (gpg format)
+ -S --sexpr-pubkey                 Extra public key in s-expr format
+ -u --untrusted-keys               Use untrusted keys from last-extrakeys
+ -U --keep-untrusted-keys          Use untrusted keys and retain all
+ -g --upgrade-also                 also upgrade installed packages
+ -o --delete-orphans               remove orphaned packages
+ -A --disable-buggy-antivirus      Disable known or suspected buggy anti virus
+                                   software packages during execution.
+</screen>
+</para>
+</answer></qandaentry>
+
+<qandaentry id="faq.setup.noroot">
+<question><para>Can I install Cygwin without administrator rights?</para></question>
+<answer>
+
+<para>Yes.  The default installation requests administrator rights because
+this allows to set up the Cygwin environment so that all users can start
+a Cygwin shell out of the box.  However, if you don't have administrator
+rights for your machine, and the admins don't want to install it for you,
+you can install Cygwin just for yourself by downloading
+<command>setup-x86.exe</command> (for a 32 bit install) or
+<command>setup-x86_64.exe</command> (for a 64 bit install) and then start
+it from the command line or via the "Run..." dialog from the start menu
+using the <literal>--no-admin</literal> option, for instance:</para>
+
+<para>
+<screen>
+  setup-x86.exe --no-admin
 </screen>
 </para>
 </answer></qandaentry>
@@ -168,7 +198,8 @@ archives.  If this happens to you, consider disabling your anti-virus
 software when running Cygwin Setup.  The following procedure should be
 a fairly safe way to do that:
 </para>
-<orderedlist><listitem><para>Download <literal>setup.exe</literal> and scan it explicitly.
+<orderedlist><listitem><para>Download <literal>setup-x86.exe</literal> or
+<literal>setup-x86_64.exe</literal> and scan it explicitly.
 </para>
 </listitem>
 <listitem><para>Turn off the anti-virus software.
@@ -275,10 +306,11 @@ installed, not including the package archives themselves nor the source
 code.
 </para>
 <para>After installation, the package archives remain in your ``Local
-Package Directory'', by default the location of <literal>setup.exe</literal>.  You
-may conserve disk space by deleting the subdirectories there.  These
-directories will have very weird looking names, being encoded with
-their URLs  (named <literal>ftp%3a%2f...</literal>).
+Package Directory''.  By default the location of
+<literal>setup-x86{_64}.exe</literal>.  You may conserve disk space by
+deleting the subdirectories there.  These directories will have very weird
+looking names, being encoded with their URLs
+(named <literal>ftp%3a%2f...</literal>).
 </para>
 <para>Of course, you can keep them around in case you want to reinstall a
 package. If you want to clean out only the outdated packages, Michael Chase
@@ -330,35 +362,6 @@ If that search proves fruitless, send a query to the Cygwin mailing
 list.  You must provide complete details in your query: version of
 setup, options you selected, contents of setup.log and setup.log.full,
 what happened that wasn't supposed to happen, etc.
-</para>
-</answer></qandaentry>
-
-<qandaentry id="faq.setup.setup-fails-on-ts">
-<question><para>My installation on a Terminal Server machine goes wrong.  What can I do?</para></question>
-<answer>
-
-<para>The problem is that Terminal Server machines do some compatibility
-checks when running applications which are not marked as
-"Terminal Server-aware", and this compatibility check seems to be buggy,
-leaving parts of the application in a non-executable state.  Curious enough,
-this only happens if DEP (Data Execution Prevention) is turned on for
-all applications.</para>
-
-<para>So far, only few Cygwin packages have their binaries marked as
-TS-aware, which means there's a good chance that the postinstall scripts
-during the installation will break, and that after installation you
-can't start a shell, etc.</para>
-
-<para>So, for the time being, here's how you install Cygwin on a Terminal
-Server.  First, switch DEP to "Turn on DEP for essential Windows programs
-and services only" and reboot the machine.  Then install via setup.exe.
-You can leave it at that and run the Terminal Server in the aforementioned
-DEP setting.  Or use the peflags tool from the rebase package to set
-the TS-aware flag in all executables, switch DEP back to "Turn on DEP for
-all programs and services except [...]" and reboot again.  However,
-please keep in mind that a package update might re-install a binary
-with the TS-aware flag switched off again.  So you will have to re-use
-the peflags utility once in a while.
 </para>
 </answer></qandaentry>
 
@@ -493,10 +496,11 @@ this in Cygwin by typing <literal>chown -R user /</literal> or by using other
 tools such as <literal>CACLS.EXE</literal>. 
 </para>
 </listitem>
-<listitem><para>Delete the Cygwin shortcuts on the Desktop and Start Menu, and anything 
-left by setup.exe in the download directory.  However, if you plan to reinstall 
-Cygwin it's a good idea to keep your setup.exe download directory since you can 
-reinstall the packages left in its cache without redownloading them.
+<listitem><para>Delete the Cygwin shortcuts on the Desktop and Start Menu, and
+anything left by setup-x86{_64}.exe in the download directory.  However, if you
+plan to reinstall Cygwin it's a good idea to keep your setup-x86{_64}.exe
+download directory since you can reinstall the packages left in its cache
+without redownloading them.
 </para>
 </listitem>
 <listitem><para>If you added Cygwin to your system path, you should remove it unless you 
@@ -609,7 +613,7 @@ this up for Cygwin 1.7, we might add this information here.
 
 <para>Since Cygwin 1.7, there's nothing important in the registry anymore,
 except for the installation directory information stored there for the sake
-of setup.exe.  There's nothing left to manipulate anymore.
+of setup-x86{_64}.exe.  There's nothing left to manipulate anymore.
 </para></answer></qandaentry>
 </qandadiv>
 

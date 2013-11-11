@@ -1,3 +1,14 @@
+2013-11-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-setup.xml: Throughout remove setup.exe, use setup or setup-x86...
+	instead.
+	(faq.setup.cli): Reproduce latest --help output.
+	(faq.setup.noroot): New section.
+	(faq.setup.setup-fails-on-ts): Remove section.
+	* setup-net.xml (internet-setup): Mention setup-x86{_64} in first
+	paragraph.  Add note to allow using setup.exe in subsequent paragraphs.
+	Add paragraph to introduce --no-admin option.
+
 2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* Makefile.in: Fix problems accessing xidepend when configured with a
