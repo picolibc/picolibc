@@ -1,3 +1,7 @@
+2013-11-12  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/libc/stdlib/getopt.c (getopt_internal): Fix NULL pointer access.
+
 2013-11-08  Terry Guo  <terry.guo@arm.com>
 
 	* libm/libm.texinfo: Rename node Index to Document Index.

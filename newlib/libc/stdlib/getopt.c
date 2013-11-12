@@ -269,6 +269,10 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 	  break;
 	}
     }
+  /* End of option list? */
+  if (argv[data->optind] == 0)
+    return EOF;
+
   /* we've got an option, so parse it */
 
   /* first, is it a long option? */
