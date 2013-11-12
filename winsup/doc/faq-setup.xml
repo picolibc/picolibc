@@ -476,6 +476,15 @@ reinstall, first save the output of <literal>mount -m</literal> as described at
 <ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html#mount" />.
 </para>
 </listitem>
+<listitem><para>If you installed <literal>cyglsa.dll</literal> by running the
+shell script <literal>/usr/bin/cyglsa-config</literal> as described in
+<ulink url="http://cygwin.com/cygwin-ug-net/ntsec.html" />, then you need to
+configure Windows to stop using the LSA authentication package.  You do so by
+editing the registry and restoring
+<literal>/HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Control/Lsa/Authentication Packages</literal>
+back to it's original value of <literal>msv1_0</literal>, and then rebooting.
+</para>
+</listitem>
 <listitem><para>Delete the Cygwin root folder and all subfolders.  If you get an error 
 that an object is in use, then ensure that you've stopped all services and 
 closed all Cygwin programs.  If you get a 'Permission Denied' error then you 
