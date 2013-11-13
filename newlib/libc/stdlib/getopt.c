@@ -177,7 +177,9 @@ write_globals (struct getopt_data *data)
   optwhere = data->optwhere;
 }
 
-/* getopt_internal:  the function that does all the dirty work */
+/* getopt_internal:  the function that does all the dirty work
+   NOTE: to reduce the code and RAM footprint this function uses
+   fputs()/fputc() to do output to stderr instead of fprintf(). */
 static int
 getopt_internal (int argc, char *const argv[], const char *shortopts,
 		 const struct option *longopts, int *longind, int only,
@@ -301,7 +303,7 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 	       match_chars) == 0)
 	    {
 	      /* do we have an exact match? */
-	      if (match_chars == (int) (strlen (longopts[optindex].name)))
+	      if (match_chars == strlen (longopts[optindex].name))
 		{
 		  longopt_match = optindex;
 		  break;
@@ -315,12 +317,14 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 		    {
 		      /* we have ambiguous options */
 		      if (data->opterr)
-			fprintf (stderr, "%s: option `%s' is ambiguous "
-				 "(could be `--%s' or `--%s')\n",
-				 argv[0],
-				 argv[data->optind],
-				 longopts[longopt_match].name,
-				 longopts[optindex].name);
+			fputs (argv[0], stderr);
+			fputs (": option `", stderr);
+			fputs (argv[data->optind], stderr);
+			fputs ("' is ambiguous (could be `--", stderr);
+			fputs (longopts[longopt_match].name, stderr);
+			fputs ("' or `--", stderr);
+			fputs (longopts[optindex].name, stderr);
+			fputs ("')\n", stderr);
 		      return (data->optopt = '?');
 		    }
 		}
@@ -338,9 +342,10 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 	{
 	  /* couldn't find option in shortopts */
 	  if (data->opterr)
-	    fprintf (stderr,
-		     "%s: invalid option -- `-%c'\n",
-		     argv[0], argv[data->optind][data->optwhere]);
+	    fputs (argv[0], stderr);
+	    fputs (": invalid option -- `-", stderr);
+	    fputc (argv[data->optind][data->optwhere], stderr);
+	    fputs ("'\n", stderr);
 	  data->optwhere++;
 	  if (argv[data->optind][data->optwhere] == '\0')
 	    {
@@ -377,17 +382,20 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 	{
 	  if (data->opterr)
 	    {
-	      fprintf (stderr, "%s: argument required for option `", argv[0]);
+	      fputs (argv[0], stderr);
+	      fputs (": argument required for option `-", stderr);
 	      if (longopt_match >= 0)
 		{
-		  fprintf (stderr, "--%s'\n", longopts[longopt_match].name);
+		  fputc ('-', stderr);
+		  fputs (longopts[longopt_match].name, stderr);
 		  data->optopt = initial_colon ? ':' : '\?';
 		}
 	      else
 		{
-		  fprintf (stderr, "-%c'\n", *cp);
+		  fputc (*cp, stderr);
 		  data->optopt = *cp;
 		}
+	      fputs ("'\n", stderr);
 	    }
 	  data->optind++;
 	  return initial_colon ? ':' : '\?';

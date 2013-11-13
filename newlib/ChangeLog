@@ -1,3 +1,11 @@
+2013-11-13  Freddie Chopin  <freddie_chopin@op.pl>
+
+	* newlib/libc/include/getopt.h (struct option): name field should be
+	"const char *".
+	* newlib/libc/stdlib/getopt.c (getopt_internal): Use fputs()/fputc()
+	instead of fprintf() to save code space.  Fix signed/unsigned
+	comparison.
+
 2013-11-12  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/libc/stdlib/getopt.c (getopt_internal): Fix NULL pointer access.
