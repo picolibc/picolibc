@@ -317,14 +317,16 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 		    {
 		      /* we have ambiguous options */
 		      if (data->opterr)
-			fputs (argv[0], stderr);
-			fputs (": option `", stderr);
-			fputs (argv[data->optind], stderr);
-			fputs ("' is ambiguous (could be `--", stderr);
-			fputs (longopts[longopt_match].name, stderr);
-			fputs ("' or `--", stderr);
-			fputs (longopts[optindex].name, stderr);
-			fputs ("')\n", stderr);
+			{
+			  fputs (argv[0], stderr);
+			  fputs (": option `", stderr);
+			  fputs (argv[data->optind], stderr);
+			  fputs ("' is ambiguous (could be `--", stderr);
+			  fputs (longopts[longopt_match].name, stderr);
+			  fputs ("' or `--", stderr);
+			  fputs (longopts[optindex].name, stderr);
+			  fputs ("')\n", stderr);
+			}
 		      return (data->optopt = '?');
 		    }
 		}
@@ -342,10 +344,12 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 	{
 	  /* couldn't find option in shortopts */
 	  if (data->opterr)
-	    fputs (argv[0], stderr);
-	    fputs (": invalid option -- `-", stderr);
-	    fputc (argv[data->optind][data->optwhere], stderr);
-	    fputs ("'\n", stderr);
+	    {
+	      fputs (argv[0], stderr);
+	      fputs (": invalid option -- `-", stderr);
+	      fputc (argv[data->optind][data->optwhere], stderr);
+	      fputs ("'\n", stderr);
+	    }
 	  data->optwhere++;
 	  if (argv[data->optind][data->optwhere] == '\0')
 	    {

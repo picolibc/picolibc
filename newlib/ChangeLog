@@ -1,3 +1,7 @@
+2013-11-13  Gregory Pietsch <gpietsch@comcast.net>
+
+	* newlib/libc/stdlib/getopt.c (getopt_internal): Add missing braces.
+
 2013-11-13  Freddie Chopin  <freddie_chopin@op.pl>
 
 	* newlib/libc/include/getopt.h (struct option): name field should be
