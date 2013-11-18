@@ -73,7 +73,7 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-OBJS = syscalls.o libcfunc.o _exit.o _kill.o
+OBJS = ftruncate.o libcfunc.o syscalls.o truncate.o _exit.o _kill.o
 CRT0		= crt0.o
 CRT0_INSTALL	= install-crt0
 
@@ -122,13 +122,19 @@ rdimon-crt0.o: crt0.S
 rdimon-_exit.o: _exit.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
+rdimon-ftruncate.o: ftruncate.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+
 rdimon-_kill.o: _kill.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-libcfunc.o: libcfunc.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-syscalls.o: syscalls.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
-rdimon-libcfunc.o: libcfunc.c
+rdimon-truncate.o: truncate.c
 	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 $(RDIMON_BSP): $(RDIMON_OBJS)
