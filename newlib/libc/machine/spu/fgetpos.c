@@ -45,8 +45,8 @@ typedef struct
 
 int
 _DEFUN (fgetpos, (fp, pos),
-	FILE * fp _AND
-	_fpos_t * pos)
+	FILE *__restrict fp _AND
+	_fpos_t *__restrict pos)
 {
   c99_fgetpos_t arg;
 

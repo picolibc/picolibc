@@ -58,8 +58,8 @@ typedef struct
 
 int
 _DEFUN (vsscanf, (str, fmt, ap),
-    _CONST char *str _AND
-    _CONST char *fmt _AND
+    _CONST char *__restrict str _AND
+    _CONST char *__restrict fmt _AND
     va_list ap)
 {
   c99_vsscanf_t args;

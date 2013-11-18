@@ -58,8 +58,8 @@ typedef struct
 
 int
 _DEFUN (vfprintf, (fp, fmt0, ap),
-	FILE * fp _AND
-	_CONST char *fmt0 _AND
+	FILE *__restrict fp _AND
+	_CONST char *__restrict fmt0 _AND
 	va_list ap)
 {
   c99_vfprintf_t args;

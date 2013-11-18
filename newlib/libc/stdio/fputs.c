@@ -26,10 +26,10 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
-	int fputs(const char *<[s]>, FILE *<[fp]>);
+	int fputs(const char *restrict <[s]>, FILE *restrict <[fp]>);
 
 	#include <stdio.h>
-	int _fputs_r(struct _reent *<[ptr]>, const char *<[s]>, FILE *<[fp]>);
+	int _fputs_r(struct _reent *<[ptr]>, const char *restrict <[s]>, FILE *restrict <[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -74,8 +74,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 int
 _DEFUN(_fputs_r, (ptr, s, fp),
        struct _reent * ptr _AND
-       char _CONST * s _AND
-       FILE * fp)
+       char _CONST *__restrict s _AND
+       FILE *__restrict fp)
 {
 #ifdef _FVWRITE_IN_STREAMIO
   int result;
@@ -122,8 +122,8 @@ error:
 #ifndef _REENT_ONLY
 int
 _DEFUN(fputs, (s, fp),
-       char _CONST * s _AND
-       FILE * fp)
+       char _CONST *__restrict s _AND
+       FILE *__restrict fp)
 {
   return _fputs_r (_REENT, s, fp);
 }

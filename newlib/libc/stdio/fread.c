@@ -26,12 +26,12 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
-	size_t fread(void *<[buf]>, size_t <[size]>, size_t <[count]>,
-		     FILE *<[fp]>);
+	size_t fread(void *restrict <[buf]>, size_t <[size]>, size_t <[count]>,
+		     FILE *restrict <[fp]>);
 
 	#include <stdio.h>
-	size_t _fread_r(struct _reent *<[ptr]>, void *<[buf]>,
-	                size_t <[size]>, size_t <[count]>, FILE *<[fp]>);
+	size_t _fread_r(struct _reent *<[ptr]>, void *restrict <[buf]>,
+	                size_t <[size]>, size_t <[count]>, FILE *restrict <[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -131,10 +131,10 @@ _DEFUN(crlf_r, (ptr, fp, buf, count, eof),
 size_t
 _DEFUN(_fread_r, (ptr, buf, size, count, fp),
        struct _reent * ptr _AND
-       _PTR buf _AND
+       _PTR __restrict buf _AND
        size_t size _AND
        size_t count _AND
-       FILE * fp)
+       FILE * __restrict fp)
 {
   register size_t resid;
   register char *p;
@@ -248,10 +248,10 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 #ifndef _REENT_ONLY
 size_t
 _DEFUN(fread, (buf, size, count, fp),
-       _PTR buf _AND
+       _PTR __restrict  buf _AND
        size_t size _AND
        size_t count _AND
-       FILE * fp)
+       FILE *__restrict fp)
 {
    return _fread_r (_REENT, buf, size, count, fp);
 }

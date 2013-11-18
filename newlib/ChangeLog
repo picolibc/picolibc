@@ -1,5 +1,28 @@
 2013-11-18  Sahil Patnayakuni  <sahilp@oarcorp.com>
 
+	* libc/include/stdio.h, libc/machine/powerpc/vfscanf.c,
+	libc/machine/spu/fgetpos.c, libc/machine/spu/fgets.c,
+	libc/machine/spu/fopen.c, libc/machine/spu/fputs.c,
+	libc/machine/spu/fread.c, libc/machine/spu/freopen.c,
+	libc/machine/spu/fwrite.c, libc/machine/spu/setbuf.c,
+	libc/machine/spu/vfprintf.c, libc/machine/spu/vfscanf.c,
+	libc/machine/spu/vsnprintf.c, libc/machine/spu/vsprintf.c,
+	libc/machine/spu/vsscanf.c, libc/stdio/asnprintf.c,
+	libc/stdio/asprintf.c, libc/stdio/dprintf.c,
+	libc/stdio/fgetpos.c, libc/stdio/fgets.c,
+	libc/stdio/fmemopen.c, libc/stdio/fopen.c,
+	libc/stdio/fprintf.c, libc/stdio/fputs.c,
+	libc/stdio/fread.c, libc/stdio/freopen.c,
+	libc/stdio/fscanf.c, libc/stdio/fwrite.c,
+	libc/stdio/printf.c, libc/stdio/scanf.c,
+	libc/stdio/setbuf.c, libc/stdio/snprintf.c,
+	libc/stdio/sprintf.c, libc/stdio/sscanf.c,
+	libc/stdio/vdprintf.c, libc/stdio/vprintf.c,
+	libc/stdio/vscanf.c, libc/stdio/vsnprintf.c,
+	libc/stdio/vsprintf.c, libc/stdio/vsscanf.c: Add restrict keyword.
+
+2013-11-18  Sahil Patnayakuni  <sahilp@oarcorp.com>
+
 	* libc/include/stdlib.h, libc/stdlib/mbstowcs.c,
 	libc/stdlib/mbstowcs_r.c, libc/stdlib/mbtowc.c,
 	libc/stdlib/mbtowc_r.c, libc/stdlib/strtod.c,

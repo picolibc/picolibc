@@ -126,8 +126,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 FILE *
 _DEFUN(_fopen_r, (ptr, file, mode),
        struct _reent *ptr _AND
-       _CONST char *file _AND
-       _CONST char *mode)
+       _CONST char *__restrict file _AND
+       _CONST char *__restrict mode)
 {
   register FILE *fp;
   register int f;

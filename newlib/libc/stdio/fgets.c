@@ -26,10 +26,10 @@ INDEX
 
 ANSI_SYNOPSIS
         #include <stdio.h>
-	char *fgets(char *<[buf]>, int <[n]>, FILE *<[fp]>);
+	char *fgets(char *restrict <[buf]>, int <[n]>, FILE *restrict <[fp]>);
 
         #include <stdio.h>
-	char *_fgets_r(struct _reent *<[ptr]>, char *<[buf]>, int <[n]>, FILE *<[fp]>);
+	char *_fgets_r(struct _reent *<[ptr]>, char *restrict <[buf]>, int <[n]>, FILE *restrict <[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -83,9 +83,9 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 char *
 _DEFUN(_fgets_r, (ptr, buf, n, fp),
        struct _reent * ptr _AND
-       char *buf _AND
+       char *__restrict buf _AND
        int n     _AND
-       FILE * fp)
+       FILE *__restrict fp)
 {
   size_t len;
   char *s;
@@ -177,9 +177,9 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 
 char *
 _DEFUN(fgets, (buf, n, fp),
-       char *buf _AND
+       char *__restrict buf _AND
        int n     _AND
-       FILE * fp)
+       FILE *__restrict fp)
 {
   return _fgets_r (_REENT, buf, n, fp);
 }

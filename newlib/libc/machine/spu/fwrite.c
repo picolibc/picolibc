@@ -50,7 +50,7 @@ typedef struct
 
 size_t
 _DEFUN (fwrite, (buf, size, count, fp),
-	_CONST _PTR buf _AND
+	_CONST _PTR __restrict buf _AND
 	size_t size _AND
 	size_t count _AND
 	FILE * fp)

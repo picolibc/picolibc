@@ -24,8 +24,8 @@
 int
 _DEFUN(_fprintf_r, (ptr, fp, fmt),
        struct _reent *ptr _AND
-       FILE *fp _AND
-       const char *fmt _DOTS)
+       FILE *__restrict fp _AND
+       const char *__restrict fmt _DOTS)
 {
   int ret;
   va_list ap;
@@ -40,8 +40,8 @@ _DEFUN(_fprintf_r, (ptr, fp, fmt),
 
 int
 _DEFUN(fprintf, (fp, fmt),
-       FILE *fp _AND
-       const char *fmt _DOTS)
+       FILE *__restrict fp _AND
+       const char *__restrict fmt _DOTS)
 {
   int ret;
   va_list ap;

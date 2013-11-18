@@ -47,26 +47,26 @@ INDEX
 ANSI_SYNOPSIS
         #include <stdio.h>
 
-        int printf(const char *<[format]>, ...);
-        int fprintf(FILE *<[fd]>, const char *<[format]>, ...);
-        int sprintf(char *<[str]>, const char *<[format]>, ...);
-        int snprintf(char *<[str]>, size_t <[size]>, const char *<[format]>,
+        int printf(const char *restrict <[format]>, ...);
+        int fprintf(FILE *restrict <[fd]>, const char *restrict <[format]>, ...);
+        int sprintf(char *restrict <[str]>, const char *restrict <[format]>, ...);
+        int snprintf(char *restrict <[str]>, size_t <[size]>, const char *restrict <[format]>,
                      ...);
-        int asprintf(char **<[strp]>, const char *<[format]>, ...);
-        char *asnprintf(char *<[str]>, size_t *<[size]>, const char *<[format]>,
+        int asprintf(char **restrict <[strp]>, const char *restrict <[format]>, ...);
+        char *asnprintf(char *restrict <[str]>, size_t *restrict <[size]>, const char *restrict <[format]>,
                         ...);
 
-        int _printf_r(struct _reent *<[ptr]>, const char *<[format]>, ...);
-        int _fprintf_r(struct _reent *<[ptr]>, FILE *<[fd]>,
-                       const char *<[format]>, ...);
-        int _sprintf_r(struct _reent *<[ptr]>, char *<[str]>,
-                       const char *<[format]>, ...);
-        int _snprintf_r(struct _reent *<[ptr]>, char *<[str]>, size_t <[size]>,
-                        const char *<[format]>, ...);
-        int _asprintf_r(struct _reent *<[ptr]>, char **<[strp]>,
-                        const char *<[format]>, ...);
-        char *_asnprintf_r(struct _reent *<[ptr]>, char *<[str]>,
-                           size_t *<[size]>, const char *<[format]>, ...);
+        int _printf_r(struct _reent *<[ptr]>, const char *restrict <[format]>, ...);
+        int _fprintf_r(struct _reent *<[ptr]>, FILE *restrict <[fd]>,
+                       const char *restrict <[format]>, ...);
+        int _sprintf_r(struct _reent *<[ptr]>, char *restrict <[str]>,
+                       const char *restrict <[format]>, ...);
+        int _snprintf_r(struct _reent *<[ptr]>, char *restrict <[str]>, size_t <[size]>,
+                        const char *restrict <[format]>, ...);
+        int _asprintf_r(struct _reent *<[ptr]>, char **restrict <[strp]>,
+                        const char *restrict <[format]>, ...);
+        char *_asnprintf_r(struct _reent *<[ptr]>, char *restrict <[str]>,
+                           size_t *restrict <[size]>, const char *restrict <[format]>, ...);
 
 DESCRIPTION
         <<printf>> accepts a series of arguments, applies to each a
@@ -579,13 +579,13 @@ int
 #ifdef _HAVE_STDC
 _DEFUN(_sprintf_r, (ptr, str, fmt),
        struct _reent *ptr _AND
-       char *str          _AND
-       _CONST char *fmt _DOTS)
+       char *__restrict str          _AND
+       _CONST char *__restrict fmt _DOTS)
 #else
 _sprintf_r(ptr, str, fmt, va_alist)
            struct _reent *ptr;
-           char *str;
-           _CONST char *fmt;
+           char *__restrict str;
+           _CONST char *__restrict fmt;
            va_dcl
 #endif
 {
@@ -613,8 +613,8 @@ _sprintf_r(ptr, str, fmt, va_alist)
 int
 #ifdef _HAVE_STDC
 _DEFUN(sprintf, (str, fmt),
-       char *str _AND
-       _CONST char *fmt _DOTS)
+       char *__restrict str _AND
+       _CONST char *__restrict fmt _DOTS)
 #else
 sprintf(str, fmt, va_alist)
         char *str;

@@ -58,8 +58,8 @@ typedef struct
 
 int
 _DEFUN (vfscanf, (fp, fmt, ap),
-    FILE *fp _AND
-    _CONST char *fmt _AND
+    FILE *__restrict fp _AND
+    _CONST char *__restrict fmt _AND
     va_list ap)
 {
   c99_vfscanf_t args;

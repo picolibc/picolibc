@@ -26,10 +26,10 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
-	FILE *freopen(const char *<[file]>, const char *<[mode]>,
-		      FILE *<[fp]>);
-	FILE *_freopen_r(struct _reent *<[ptr]>, const char *<[file]>,
-		      const char *<[mode]>, FILE *<[fp]>);
+	FILE *freopen(const char *restrict <[file]>, const char *restrict <[mode]>,
+		      FILE *restrict <[fp]>);
+	FILE *_freopen_r(struct _reent *<[ptr]>, const char *restrict <[file]>,
+		      const char *restrict <[mode]>, FILE *restrict <[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -90,9 +90,9 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 FILE *
 _DEFUN(_freopen_r, (ptr, file, mode, fp),
        struct _reent *ptr _AND
-       const char *file _AND
-       const char *mode _AND
-       register FILE *fp)
+       const char *__restrict file _AND
+       const char *__restrict mode _AND
+       register FILE *__restrict fp)
 {
   register int f;
   int flags, oflags;
@@ -252,9 +252,9 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
 
 FILE *
 _DEFUN(freopen, (file, mode, fp),
-       _CONST char *file _AND
-       _CONST char *mode _AND
-       register FILE *fp)
+       _CONST char *__restrict file _AND
+       _CONST char *__restrict mode _AND
+       register FILE *__restrict fp)
 {
   return _freopen_r (_REENT, file, mode, fp);
 }

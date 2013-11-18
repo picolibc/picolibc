@@ -29,7 +29,7 @@
 
 int
 #ifdef _HAVE_STDC
-fscanf(FILE *fp, _CONST char *fmt, ...)
+fscanf(FILE *__restrict fp, _CONST char *__restrict fmt, ...)
 #else
 fscanf(FILE *fp, fmt, va_alist)
        FILE *fp;
@@ -54,7 +54,7 @@ fscanf(FILE *fp, fmt, va_alist)
 
 int
 #ifdef _HAVE_STDC
-_fscanf_r(struct _reent *ptr, FILE *fp, _CONST char *fmt, ...)
+_fscanf_r(struct _reent *ptr, FILE *__restrict fp, _CONST char *__restrict fmt, ...)
 #else
 _fscanf_r(ptr, FILE *fp, fmt, va_alist)
           struct _reent *ptr;

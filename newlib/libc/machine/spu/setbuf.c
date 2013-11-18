@@ -47,8 +47,8 @@ typedef struct
 
 void
 _DEFUN (setbuf, (fp, buf),
-	FILE * fp _AND
-	char *buf)
+	FILE *__restrict fp _AND
+	char *__restrict buf)
 {
   c99_setbuf_t args;
 

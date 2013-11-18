@@ -12,15 +12,15 @@ INDEX
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
-	int vscanf(const char *<[fmt]>, va_list <[list]>);
-	int vfscanf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
-	int vsscanf(const char *<[str]>, const char *<[fmt]>, va_list <[list]>);
+	int vscanf(const char *restrict <[fmt]>, va_list <[list]>);
+	int vfscanf(FILE *restrict <[fp]>, const char *restrict <[fmt]>, va_list <[list]>);
+	int vsscanf(const char *restrict <[str]>, const char *restrict <[fmt]>, va_list <[list]>);
 
-	int _vscanf_r(void *<[reent]>, const char *<[fmt]>, 
+	int _vscanf_r(void *<[reent]>, const char *restrict <[fmt]>, 
                        va_list <[list]>);
-	int _vfscanf_r(void *<[reent]>, FILE *<[fp]>, const char *<[fmt]>, 
+	int _vfscanf_r(void *<[reent]>, FILE *restrict <[fp]>, const char *restrict <[fmt]>, 
                        va_list <[list]>);
-	int _vsscanf_r(void *<[reent]>, const char *<[str]>, const char *<[fmt]>, 
+	int _vsscanf_r(void *<[reent]>, const char *restrict <[str]>, const char *restrict <[fmt]>, 
                        va_list <[list]>);
 
 TRAD_SYNOPSIS
@@ -218,8 +218,8 @@ typedef union
 
 int
 _DEFUN (vfscanf, (fp, fmt, ap), 
-    register FILE *fp _AND 
-    _CONST char *fmt _AND 
+    register FILE *__restrict fp _AND 
+    _CONST char *__restrict fmt _AND 
     va_list ap)
 {
   CHECK_INIT(_REENT, fp);
@@ -240,8 +240,8 @@ __svfscanf (fp, fmt0, ap)
 int
 _DEFUN (_vfscanf_r, (data, fp, fmt, ap),
     struct _reent *data _AND 
-    register FILE *fp _AND 
-    _CONST char *fmt _AND 
+    register FILE *__restrict fp _AND 
+    _CONST char *__restrict fmt _AND 
     va_list ap)
 {
   return __svfscanf_r (data, fp, fmt, ap);

@@ -26,8 +26,8 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
-	int fgetpos(FILE *<[fp]>, fpos_t *<[pos]>);
-	int _fgetpos_r(struct _reent *<[ptr]>, FILE *<[fp]>, fpos_t *<[pos]>);
+	int fgetpos(FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
+	int _fgetpos_r(struct _reent *<[ptr]>, FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -78,8 +78,8 @@ No supporting OS subroutines are required.
 int
 _DEFUN(_fgetpos_r, (ptr, fp, pos),
        struct _reent * ptr _AND
-       FILE * fp           _AND
-       _fpos_t * pos)
+       FILE *__restrict fp           _AND
+       _fpos_t *__restrict pos)
 {
   *pos = _ftell_r (ptr, fp);
 
@@ -94,8 +94,8 @@ _DEFUN(_fgetpos_r, (ptr, fp, pos),
 
 int
 _DEFUN(fgetpos, (fp, pos),
-       FILE * fp _AND
-       _fpos_t * pos)
+       FILE *__restrict fp _AND
+       _fpos_t *__restrict pos)
 {
   return _fgetpos_r (_REENT, fp, pos);
 }

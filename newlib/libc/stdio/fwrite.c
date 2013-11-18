@@ -26,12 +26,12 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
-	size_t fwrite(const void *<[buf]>, size_t <[size]>,
-		      size_t <[count]>, FILE *<[fp]>);
+	size_t fwrite(const void *restrict <[buf]>, size_t <[size]>,
+		      size_t <[count]>, FILE *restrict <[fp]>);
 
 	#include <stdio.h>
-	size_t _fwrite_r(struct _reent *<[ptr]>, const void *<[buf]>, size_t <[size]>,
-		      size_t <[count]>, FILE *<[fp]>);
+	size_t _fwrite_r(struct _reent *<[ptr]>, const void *restrict <[buf]>, size_t <[size]>,
+		      size_t <[count]>, FILE *restrict <[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -97,10 +97,10 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 size_t
 _DEFUN(_fwrite_r, (ptr, buf, size, count, fp),
        struct _reent * ptr _AND
-       _CONST _PTR buf _AND
+       _CONST _PTR __restrict buf _AND
        size_t size     _AND
        size_t count    _AND
-       FILE * fp)
+       FILE * __restrict fp)
 {
   size_t n;
 #ifdef _FVWRITE_IN_STREAMIO
@@ -158,7 +158,7 @@ ret:
 #ifndef _REENT_ONLY
 size_t
 _DEFUN(fwrite, (buf, size, count, fp),
-       _CONST _PTR buf _AND
+       _CONST _PTR __restrict buf _AND
        size_t size     _AND
        size_t count    _AND
        FILE * fp)

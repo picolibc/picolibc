@@ -72,8 +72,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 _VOID
 _DEFUN(setbuf, (fp, buf),
-       FILE * fp _AND
-       char *buf)
+       FILE *__restrict fp _AND
+       char *__restrict buf)
 {
   _CAST_VOID setvbuf (fp, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }

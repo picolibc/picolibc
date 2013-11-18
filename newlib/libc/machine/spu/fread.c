@@ -50,10 +50,10 @@ typedef struct
 
 size_t
 _DEFUN (fread, (buf, size, count, fp),
-	_PTR buf _AND
+	_PTR __restrict  buf _AND
 	size_t size _AND
 	size_t count _AND
-	FILE * fp)
+	FILE *__restrict fp)
 {
   c99_fread_t args;
 

@@ -48,9 +48,9 @@ typedef struct
 
 FILE *
 _DEFUN (freopen, (file, mode, fp),
-	const char *file _AND
-	const char *mode _AND
-	FILE *fp)
+	const char *__restrict file _AND
+	const char *__restrict mode _AND
+	FILE *__restrict fp)
 {
   int ret;
   c99_freopen_t args;

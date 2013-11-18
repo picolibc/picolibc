@@ -270,9 +270,9 @@ _DEFUN(fmemcloser, (ptr, cookie),
 FILE *
 _DEFUN(_fmemopen_r, (ptr, buf, size, mode),
        struct _reent *ptr _AND
-       void *buf _AND
+       void *__restrict buf _AND
        size_t size _AND
-       const char *mode)
+       const char *__restrict mode)
 {
   FILE *fp;
   fmemcookie *c;
@@ -362,9 +362,9 @@ _DEFUN(_fmemopen_r, (ptr, buf, size, mode),
 #ifndef _REENT_ONLY
 FILE *
 _DEFUN(fmemopen, (buf, size, mode),
-       void *buf _AND
+       void *__restrict buf _AND
        size_t size _AND
-       const char *mode)
+       const char *__restrict mode)
 {
   return _fmemopen_r (_REENT, buf, size, mode);
 }
