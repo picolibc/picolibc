@@ -7,7 +7,7 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdlib.h>
-	int mbstowcs(wchar_t *<[pwc]>, const char *<[s]>, size_t <[n]>);
+	int mbstowcs(wchar_t *restrict <[pwc]>, const char *restrict <[s]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
@@ -55,8 +55,8 @@ effects vary with the locale.
 
 size_t
 _DEFUN (mbstowcs, (pwcs, s, n),
-        wchar_t *pwcs _AND
-        const char *s _AND
+        wchar_t *__restrict pwcs _AND
+        const char *__restrict s _AND
         size_t n)
 {
 #ifdef _MB_CAPABLE

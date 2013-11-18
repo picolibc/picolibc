@@ -7,7 +7,7 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdlib.h>
-	size_t wcstombs(char *<[s]>, const wchar_t *<[pwc]>, size_t <[n]>);
+	size_t wcstombs(char *restrict <[s]>, const wchar_t *restrict <[pwc]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
@@ -56,8 +56,8 @@ effects vary with the locale.
 
 size_t
 _DEFUN (wcstombs, (s, pwcs, n),
-        char          *s    _AND
-        const wchar_t *pwcs _AND
+        char          *__restrict s    _AND
+        const wchar_t *__restrict pwcs _AND
         size_t         n)
 {
 #ifdef _MB_CAPABLE

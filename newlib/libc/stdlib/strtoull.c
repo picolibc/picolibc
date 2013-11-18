@@ -9,11 +9,11 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdlib.h>
-        unsigned long long strtoull(const char *<[s]>, char **<[ptr]>,
+        unsigned long long strtoull(const char *restrict <[s]>, char **restrict <[ptr]>,
                               int <[base]>);
 
-        unsigned long long _strtoull_r(void *<[reent]>, const char *<[s]>,
-                              char **<[ptr]>, int <[base]>);
+        unsigned long long _strtoull_r(void *<[reent]>, const char *restrict <[s]>,
+                              char **restrict <[ptr]>, int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
@@ -129,8 +129,8 @@ PORTABILITY
 
 unsigned long long
 _DEFUN (strtoull, (s, ptr, base),
-	_CONST char *s _AND
-	char **ptr _AND
+	_CONST char *__restrict s _AND
+	char **__restrict ptr _AND
 	int base)
 {
 	return _strtoull_r (_REENT, s, ptr, base);

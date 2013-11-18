@@ -19,8 +19,8 @@ int (*__mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
 int
 _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
         struct _reent *r   _AND
-        wchar_t       *pwc _AND 
-        const char    *s   _AND        
+        wchar_t       *__restrict pwc _AND 
+        const char    *__restrict s   _AND        
         size_t         n   _AND
         mbstate_t      *state)
 {

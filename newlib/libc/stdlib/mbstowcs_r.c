@@ -5,8 +5,8 @@
 size_t
 _DEFUN (_mbstowcs_r, (reent, pwcs, s, n, state),
         struct _reent *r    _AND         
-        wchar_t       *pwcs _AND
-        const char    *s    _AND
+        wchar_t       *__restrict pwcs _AND
+        const char    *__restrict s    _AND
         size_t         n    _AND
         mbstate_t     *state)
 {

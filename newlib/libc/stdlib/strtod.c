@@ -11,11 +11,11 @@ INDEX
 
 ANSI_SYNOPSIS
         #include <stdlib.h>
-        double strtod(const char *<[str]>, char **<[tail]>);
-        float strtof(const char *<[str]>, char **<[tail]>);
+        double strtod(const char *restrict <[str]>, char **restrict <[tail]>);
+        float strtof(const char *restrict <[str]>, char **restrict <[tail]>);
 
         double _strtod_r(void *<[reent]>,
-                         const char *<[str]>, char **<[tail]>);
+                         const char *restrict <[str]>, char **restrict <[tail]>);
 
 TRAD_SYNOPSIS
         #include <stdlib.h>
@@ -236,8 +236,8 @@ _DEFUN (match, (sp, t),
 double
 _DEFUN (_strtod_r, (ptr, s00, se),
 	struct _reent *ptr _AND
-	_CONST char *s00 _AND
-	char **se)
+	_CONST char *__restrict s00 _AND
+	char **__restrict se)
 {
 #ifdef Avoid_Underflow
 	int scale;
@@ -1255,15 +1255,15 @@ _DEFUN (_strtod_r, (ptr, s00, se),
 
 double
 _DEFUN (strtod, (s00, se),
-	_CONST char *s00 _AND char **se)
+	_CONST char *__restrict s00 _AND char **__restrict se)
 {
   return _strtod_r (_REENT, s00, se);
 }
 
 float
 _DEFUN (strtof, (s00, se),
-	_CONST char *s00 _AND
-	char **se)
+	_CONST char *__restrict s00 _AND
+	char **__restrict se)
 {
   double retval = _strtod_r (_REENT, s00, se);
   if (isnan (retval))

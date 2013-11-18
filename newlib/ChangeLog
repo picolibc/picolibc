@@ -1,3 +1,14 @@
+2013-11-18  Sahil Patnayakuni  <sahilp@oarcorp.com>
+
+	* libc/include/stdlib.h, libc/stdlib/mbstowcs.c,
+	libc/stdlib/mbstowcs_r.c, libc/stdlib/mbtowc.c,
+	libc/stdlib/mbtowc_r.c, libc/stdlib/strtod.c,
+	libc/stdlib/strtol.c, libc/stdlib/strtold.c,
+	libc/stdlib/strtoll.c, libc/stdlib/strtoll_r.c,
+	libc/stdlib/strtoul.c, libc/stdlib/strtoull.c,
+	libc/stdlib/strtoull_r.c, libc/stdlib/wcstombs.c,
+	libc/stdlib/wcstombs_r.c: Add restrict keyword.
+
 2013-11-18  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* libc/include/sys/unistd.h (ftruncate, truncate): Define

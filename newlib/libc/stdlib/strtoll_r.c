@@ -58,8 +58,8 @@
 long long
 _DEFUN (_strtoll_r, (rptr, nptr, endptr, base),
 	struct _reent *rptr _AND
-	_CONST char *nptr _AND
-	char **endptr _AND
+	_CONST char *__restrict nptr _AND
+	char **__restrict endptr _AND
 	int base)
 {
 	register const unsigned char *s = (const unsigned char *)nptr;

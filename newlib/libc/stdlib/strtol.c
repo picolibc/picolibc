@@ -9,10 +9,10 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdlib.h>
-        long strtol(const char *<[s]>, char **<[ptr]>,int <[base]>);
+        long strtol(const char *restrict <[s]>, char **restrict <[ptr]>,int <[base]>);
 
         long _strtol_r(void *<[reent]>, 
-                       const char *<[s]>, char **<[ptr]>,int <[base]>);
+                       const char *restrict <[s]>, char **restrict <[ptr]>,int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
@@ -133,8 +133,8 @@ No supporting OS subroutines are required.
 long
 _DEFUN (_strtol_r, (rptr, nptr, endptr, base),
 	struct _reent *rptr _AND
-	_CONST char *nptr _AND
-	char **endptr _AND
+	_CONST char *__restrict nptr _AND
+	char **__restrict endptr _AND
 	int base)
 {
 	register const unsigned char *s = (const unsigned char *)nptr;
@@ -216,8 +216,8 @@ _DEFUN (_strtol_r, (rptr, nptr, endptr, base),
 
 long
 _DEFUN (strtol, (s, ptr, base),
-	_CONST char *s _AND
-	char **ptr _AND
+	_CONST char *__restrict s _AND
+	char **__restrict ptr _AND
 	int base)
 {
 	return _strtol_r (_REENT, s, ptr, base);

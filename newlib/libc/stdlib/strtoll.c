@@ -9,10 +9,10 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdlib.h>
-        long long strtoll(const char *<[s]>, char **<[ptr]>,int <[base]>);
+        long long strtoll(const char *restrict <[s]>, char **restrict <[ptr]>,int <[base]>);
 
         long long _strtoll_r(void *<[reent]>, 
-                       const char *<[s]>, char **<[ptr]>,int <[base]>);
+                       const char *restrict <[s]>, char **restrict <[ptr]>,int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
@@ -128,8 +128,8 @@ No supporting OS subroutines are required.
 
 long long
 _DEFUN (strtoll, (s, ptr, base),
-	_CONST char *s _AND
-	char **ptr _AND
+	_CONST char *__restrict s _AND
+	char **__restrict ptr _AND
 	int base)
 {
 	return _strtoll_r (_REENT, s, ptr, base);

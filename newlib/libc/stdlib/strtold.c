@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* On platforms where long double is as wide as double.  */
 #ifdef _LDBL_EQ_DBL
 long double
-strtold (const char *s00, char **se)
+strtold (const char *__restrict s00, char **__restrict se)
 {
   return strtod(s00, se);
 }
