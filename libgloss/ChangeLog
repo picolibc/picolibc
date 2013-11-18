@@ -1,3 +1,10 @@
+2013-11-18  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* arm/ftruncate.c: New.
+	* arm/truncate.c: New.
+	* arm/Makefile.in (RDPMON_OBJS): Add ftruncate.o and truncate.o.
+	(rdimon-ftruncate.o, rdimon-truncate.o): New rule:
+
 2013-10-14  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
 
 	* arm/cpu-init/rdimon-aem.S: Disable for M class cores.

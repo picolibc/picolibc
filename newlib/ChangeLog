@@ -1,3 +1,8 @@
+2013-11-18  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* libc/include/sys/unistd.h (ftruncate, truncate): Define
+	for __arm__.
+
 2013-11-13  Gregory Pietsch <gpietsch@comcast.net>
 
 	* newlib/libc/stdlib/getopt.c (getopt_internal): Add missing braces.
