@@ -43,11 +43,11 @@ struct wincaps
 
 class wincapc
 {
-  SYSTEM_INFO      system_info;
-  OSVERSIONINFOEX  version;
-  char             osnam[40];
-  ULONG_PTR        wow64;
-  void             *caps;
+  SYSTEM_INFO		system_info;
+  RTL_OSVERSIONINFOEXW	version;
+  char			osnam[40];
+  ULONG_PTR		wow64;
+  void			*caps;
 
 public:
   void init ();

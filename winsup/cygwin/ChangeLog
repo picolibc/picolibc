@@ -1,5 +1,13 @@
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h (RtlGetVersion): Declare.
+	* wincap.cc (wincapc::init): Rather than GetVersionEx, call
+	RtlGetVersion which is not crippled by missing Windows 8.1 manifest.
+	* wincap.h (wincapc): Change type of version to RTL_OSVERSIONINFOEXW.
+	Align formatting of all class members.
+
+2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* wincap.cc (wincapc::init): Revert previous change.  It's not working.
 
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>

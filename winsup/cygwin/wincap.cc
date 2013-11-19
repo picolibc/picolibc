@@ -172,8 +172,8 @@ wincapc::init ()
     return;		// already initialized
 
   GetSystemInfo (&system_info);
-  version.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
-  GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version));
+  version.dwOSVersionInfoSize = sizeof (RTL_OSVERSIONINFOEXW);
+  RtlGetVersion (&version);
 
   switch (version.dwMajorVersion)
     {

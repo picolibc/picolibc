@@ -56,3 +56,7 @@ Bug fixes:
 
 - Fix typos in cygcheck which could crash Windows 8 and 8.1 machines.
   Fixes: http://cygwin.com/ml/cygwin/2013-11/msg00334.html
+
+- Show OS version correctly even on Windows 8.1 and Server 2012 R2.
+  Fixes: http://cygwin.com/ml/cygwin/2013-11/msg00343.html
+
