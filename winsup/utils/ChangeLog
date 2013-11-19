@@ -15,6 +15,9 @@
 	(PRODUCT_PROFESSIONAL_WMC): Ditto.
 	(package_grep): Delete code loading wininet functions dynamically, just
 	call functions directly.
+	* module_info.cc: Drop code loading psapi functions dynamically since
+	all supported OS versions have it anyway.  Call psapi functions
+	directly.
 
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
