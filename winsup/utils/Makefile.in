@@ -86,7 +86,7 @@ mount.exe: path-mount.o
 
 # Provide any necessary per-target variable overrides.
 
-cygcheck.exe: MINGW_LDFLAGS += ${ZLIB} -lpsapi -lntdll
+cygcheck.exe: MINGW_LDFLAGS += ${ZLIB} -lwininet -lpsapi -lntdll
 cygcheck.exe: ${CYGCHECK_OBJS}
 
 cygpath.o: CXXFLAGS += -fno-threadsafe-statics
@@ -108,7 +108,7 @@ CYGWIN_BINS += dumper.exe
 dumper.o module_info.o parse_pe.o: CXXFLAGS += -I$(top_srcdir)/include
 dumper.o parse_pe.o: dumper.h
 dumper.exe: module_info.o parse_pe.o
-dumper.exe: CYGWIN_LDFLAGS += -lbfd -lintl -liconv -liberty ${ZLIB}
+dumper.exe: CYGWIN_LDFLAGS += -lpsapi -lbfd -lintl -liconv -liberty ${ZLIB}
 else
 all: warn_dumper
 endif

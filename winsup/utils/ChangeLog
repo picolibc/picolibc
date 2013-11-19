@@ -1,5 +1,16 @@
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (cygcheck.exe): Link against wininet.dll.
+	(dumper.exe): Link against psapi.dll.
+	* cygcheck.cc (_WIN32_WINNT): Define as 0x0602.
+	(pInternetCloseHandle): Drop pointer.
+	(PRODUCT_UNLICENSED): Drop definition.
+	(PRODUCT_PROFESSIONAL_WMC): Ditto.
+	(package_grep): Delete code loading wininet functions dynamically, just
+	call functions directly.
+
+2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygcheck.cc (dump_sysinfo): Distinguish Windows 8 and 8.1, as well
 	as Windows Server 2012 and 2012 R2.  Add missing commas in products
 	array to avoid crashes.  Drop Windows NT4 and 2000 printouts.  Just

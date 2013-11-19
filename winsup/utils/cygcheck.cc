@@ -9,6 +9,7 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#define _WIN32_WINNT 0x0602
 #define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>
 #include <stdlib.h>
@@ -52,10 +53,6 @@ int del_orphaned_reg = 0;
 int unique_object_name_opt = 0;
 
 static char emptystr[] = "";
-
-/* This is global because it's used in both internet_display_error as well
-   as package_grep.  */
-BOOL (WINAPI *pInternetCloseHandle) (HINTERNET);
 
 #ifdef __GNUC__
 typedef long long longlong;
@@ -230,7 +227,7 @@ display_internet_error (const char *message, ...)
 
   va_start (hptr, message);
   while ((h = va_arg (hptr, HINTERNET)) != 0)
-    pInternetCloseHandle (h);
+    InternetCloseHandle (h);
   va_end (hptr);
 
   return 1;
@@ -1498,10 +1495,6 @@ dump_sysinfo ()
 			      osversion.wServicePackMinor,
 			      &prod))
 	    {
-#define       PRODUCT_UNLICENSED 0xabcdabcd
-#ifndef PRODUCT_PROFESSIONAL_WMC
-#define       PRODUCT_PROFESSIONAL_WMC 0x00000067
-#endif
 	      const char *products[] =
 		{
  /* 0x00000000 */ "",
@@ -2114,43 +2107,6 @@ package_grep (char *search)
 {
   char buf[1024];
 
-  /* Attempt to dynamically load the necessary WinInet API functions so that
-     cygcheck can still function on older systems without IE.  */
-  HMODULE hWinInet;
-  if (!(hWinInet = LoadLibrary ("wininet.dll")))
-    {
-      fputs ("Unable to locate WININET.DLL.  This feature requires Microsoft "
-	     "Internet Explorer v3 or later to function.\n", stderr);
-      return 1;
-    }
-
-  /* InternetCloseHandle is used outside this function so it is declared
-     global.  The rest of these functions are only used here, so declare them
-     and call GetProcAddress for each of them with the following macro.  */
-
-  pInternetCloseHandle = (BOOL (WINAPI *) (HINTERNET))
-			    GetProcAddress (hWinInet, "InternetCloseHandle");
-#define make_func_pointer(name, ret, args) ret (WINAPI * p##name) args = \
-	    (ret (WINAPI *) args) GetProcAddress (hWinInet, #name);
-  make_func_pointer (InternetAttemptConnect, DWORD, (DWORD));
-  make_func_pointer (InternetOpenA, HINTERNET, (LPCSTR, DWORD, LPCSTR, LPCSTR,
-						DWORD));
-  make_func_pointer (InternetOpenUrlA, HINTERNET, (HINTERNET, LPCSTR, LPCSTR,
-						   DWORD, DWORD, DWORD));
-  make_func_pointer (InternetReadFile, BOOL, (HINTERNET, PVOID, DWORD, PDWORD));
-  make_func_pointer (HttpQueryInfoA, BOOL, (HINTERNET, DWORD, PVOID, PDWORD,
-					    PDWORD));
-#undef make_func_pointer
-
-  if(!pInternetCloseHandle || !pInternetAttemptConnect || !pInternetOpenA
-     || !pInternetOpenUrlA || !pInternetReadFile || !pHttpQueryInfoA)
-    {
-      fputs ("Unable to load one or more functions from WININET.DLL.  This "
-	     "feature requires Microsoft Internet Explorer v3 or later to "
-	     "function.\n", stderr);
-      return 1;
-    }
-
   /* construct the actual URL by escaping  */
   char *url = (char *) alloca (sizeof (base_url) + strlen ("&arch=x86_64") + strlen (search) * 3);
   strcpy (url, base_url);
@@ -2177,7 +2133,7 @@ package_grep (char *search)
 #endif
 
   /* Connect to the net and open the URL.  */
-  if (pInternetAttemptConnect (0) != ERROR_SUCCESS)
+  if (InternetAttemptConnect (0) != ERROR_SUCCESS)
     {
       fputs ("An internet connection is required for this function.\n", stderr);
       return 1;
@@ -2185,16 +2141,16 @@ package_grep (char *search)
 
   /* Initialize WinInet and attempt to fetch our URL.  */
   HINTERNET hi = NULL, hurl = NULL;
-  if (!(hi = pInternetOpenA ("cygcheck", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0)))
+  if (!(hi = InternetOpenA ("cygcheck", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0)))
     return display_internet_error ("InternetOpen() failed", NULL);
 
-  if (!(hurl = pInternetOpenUrlA (hi, url, NULL, 0, 0, 0)))
+  if (!(hurl = InternetOpenUrlA (hi, url, NULL, 0, 0, 0)))
     return display_internet_error ("unable to contact cygwin.com site, "
 				   "InternetOpenUrl() failed", hi, NULL);
 
   /* Check the HTTP response code.  */
   DWORD rc = 0, rc_s = sizeof (DWORD);
-  if (!pHttpQueryInfoA (hurl, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER,
+  if (!HttpQueryInfoA (hurl, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER,
 		      (void *) &rc, &rc_s, NULL))
     return display_internet_error ("HttpQueryInfo() failed", hurl, hi, NULL);
 
@@ -2209,15 +2165,15 @@ package_grep (char *search)
   DWORD numread;
   do
     {
-      if (!pInternetReadFile (hurl, (void *) buf, sizeof (buf), &numread))
+      if (!InternetReadFile (hurl, (void *) buf, sizeof (buf), &numread))
 	return display_internet_error ("InternetReadFile failed", hurl, hi, NULL);
       if (numread)
 	fwrite ((void *) buf, (size_t) numread, 1, stdout);
     }
   while (numread);
 
-  pInternetCloseHandle (hurl);
-  pInternetCloseHandle (hi);
+  InternetCloseHandle (hurl);
+  InternetCloseHandle (hi);
   return 0;
 }
 
