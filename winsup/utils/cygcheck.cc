@@ -1479,9 +1479,16 @@ dump_sysinfo ()
 	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
 			      ? "7" : "2008 R2");
 	      break;
+	    case 2:
 	    default:
-	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			      ? "8" : "2012");
+	      /* No way to distinguish W8 and W8.1 by OS version numbers
+		 alone. */
+	      if (osversion.dwBuildNumber >= 9200)
+		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+				? "8.1" : "2012 R2");
+	      else
+		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+				? "8" : "2012");
 	      break;
 	    }
 	  DWORD prod;
@@ -1528,7 +1535,7 @@ dump_sysinfo ()
  /* 0x0000001c */ " Ultimate N",
  /* 0x0000001d */ " Web Server Core",
  /* 0x0000001e */ " Essential Business Server Management Server",
- /* 0x0000001f */ " Essential Business Server Security Server"
+ /* 0x0000001f */ " Essential Business Server Security Server",
  /* 0x00000020 */ " Essential Business Server Messaging Server",
  /* 0x00000021 */ " Server Foundation",
  /* 0x00000022 */ " Home Server 2011",
@@ -1547,7 +1554,7 @@ dump_sysinfo ()
  /* 0x0000002f */ " Starter N",
  /* 0x00000030 */ " Professional",
  /* 0x00000031 */ " Professional N",
- /* 0x00000032 */ " Small Business Server 2011 Essentials"
+ /* 0x00000032 */ " Small Business Server 2011 Essentials",
  /* 0x00000033 */ " Server For SB Solutions",
  /* 0x00000034 */ " Server Solutions Premium",
  /* 0x00000035 */ " Server Solutions Premium Core",
@@ -1568,7 +1575,7 @@ dump_sysinfo ()
  /* 0x00000044 */ " Home Premium E",
  /* 0x00000045 */ " Professional E",
  /* 0x00000046 */ " Enterprise E",
- /* 0x00000047 */ " Ultimate E"
+ /* 0x00000047 */ " Ultimate E",
  /* 0x00000048 */ " Server Enterprise (Evaluation inst.)",
  /* 0x00000049 */ "",
  /* 0x0000004a */ "",
@@ -1615,19 +1622,8 @@ dump_sysinfo ()
 	}
       else if (osversion.dwMajorVersion == 5)
 	{
-	  if (osversion.dwMinorVersion == 0)
-	    {
-	      strcpy (osname, "2000");
-	      if (osversion.wProductType == VER_NT_WORKSTATION)
-		strcat (osname, " Professional");
-	      else if (osversion.wSuiteMask & VER_SUITE_DATACENTER)
-		strcat (osname, " Datacenter Server");
-	      else if (osversion.wSuiteMask & VER_SUITE_ENTERPRISE)
-		strcat (osname, " Advanced Server");
-	      else
-		strcat (osname, " Server");
-	    }
-	  else if (osversion.dwMinorVersion == 1)
+	  /* cygcheck won't run on Windows 200 or earlier. */
+	  if (osversion.dwMinorVersion == 1)
 	    {
 	      strcpy (osname, "XP");
 	      if (GetSystemMetrics (SM_MEDIACENTER))
@@ -1656,21 +1652,6 @@ dump_sysinfo ()
 		strcat (osname, " Compute Cluster Edition");
 	    }
 	}
-      else if (osversion.dwMajorVersion == 4)
-	{
-	  strcpy (osname, "NT 4");
-	  if (more_info)
-	    {
-	      if (osversion.wProductType == VER_NT_WORKSTATION)
-		strcat (osname, " Workstation");
-	      else
-		{
-		  strcat (osname, " Server");
-		  if (osversion.wSuiteMask & VER_SUITE_ENTERPRISE)
-		    strcat (osname, " Enterprise Edition");
-		}
-	    }
-	}
       else
 	strcpy (osname, "NT");
       break;
@@ -1689,15 +1670,11 @@ dump_sysinfo ()
       || osversion.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
     exit (EXIT_FAILURE);
 
-  BOOL (WINAPI *wow64_func) (HANDLE, PBOOL) = (BOOL (WINAPI *) (HANDLE, PBOOL))
-    GetProcAddress (k32, "IsWow64Process");
   BOOL is_wow64 = FALSE;
-  if (wow64_func && wow64_func (GetCurrentProcess (), &is_wow64) && is_wow64)
+  if (IsWow64Process (GetCurrentProcess (), &is_wow64) && is_wow64)
     {
-      void (WINAPI *nativinfo) (LPSYSTEM_INFO) = (void (WINAPI *)
-	(LPSYSTEM_INFO)) GetProcAddress (k32, "GetNativeSystemInfo");
       SYSTEM_INFO natinfo;
-      nativinfo (&natinfo);
+      GetNativeSystemInfo (&natinfo);
       fputs ("\nRunning under WOW64 on ", stdout);
       switch (natinfo.wProcessorArchitecture)
 	{
@@ -1833,10 +1810,6 @@ dump_sysinfo ()
     SetErrorMode (SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX);
   int drivemask = GetLogicalDrives ();
 
-  BOOL (WINAPI * gdfse) (LPCSTR, long long *, long long *, long long *) =
-    (BOOL (WINAPI *) (LPCSTR, long long *, long long *, long long *))
-    GetProcAddress (k32, "GetDiskFreeSpaceExA");
-
   for (i = 0; i < 26; i++)
     {
       if (!(drivemask & (1 << i)))
@@ -1886,11 +1859,14 @@ dump_sysinfo ()
       long capacity_mb = -1;
       int percent_full = -1;
 
-      long long free_me = 0ULL, free_bytes = 0ULL, total_bytes = 1ULL;
-      if (gdfse != NULL && gdfse (drive, &free_me, &total_bytes, &free_bytes))
+      ULARGE_INTEGER free_me, free_bytes, total_bytes;
+      free_me.QuadPart = free_bytes.QuadPart = 0ULL;
+      total_bytes.QuadPart = 1ULL;
+      if (GetDiskFreeSpaceEx (drive, &free_me, &total_bytes, &free_bytes))
 	{
-	  capacity_mb = total_bytes / (1024L * 1024L);
-	  percent_full = 100 - (int) ((100.0 * free_me) / total_bytes);
+	  capacity_mb = total_bytes.QuadPart / (1024L * 1024L);
+	  percent_full = 100 - (int) ((100.0 * free_me.QuadPart)
+				      / total_bytes.QuadPart);
 	}
       else
 	{

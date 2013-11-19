@@ -1,3 +1,13 @@
+2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Distinguish Windows 8 and 8.1, as well
+	as Windows Server 2012 and 2012 R2.  Add missing commas in products
+	array to avoid crashes.  Drop Windows NT4 and 2000 printouts.  Just
+	call IsWow64Process, GetNativeSystemInfo, and GetDiskFreeSpaceEx
+	directly, rather than loading them dynamically, since they are exported
+	by all supported OS versions.  Fix questionable type usage in call to
+	GetDiskFreeSpaceEx.
+
 2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* configure.ac: Detect windows headers/libs after we've figured out the
