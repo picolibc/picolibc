@@ -60,11 +60,6 @@ struct dirent *tmpdp;
 #ifdef HAVE_DD_LOCK
   __lock_acquire_recursive(dirp->dd_lock);
 #endif
-
-  if (dirp->dd_fd == -1) {
-    *dpp = NULL;
-    return errno = EBADF;
-  }
  
   for (;;) {
     if (dirp->dd_loc == 0) {

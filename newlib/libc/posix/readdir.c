@@ -53,9 +53,6 @@ _DEFUN(readdir, (dirp),
 #ifdef HAVE_DD_LOCK
   __lock_acquire_recursive(dirp->dd_lock);
 #endif
-
-  if (dirp->dd_fd == -1)
-    return NULL;
  
   for (;;) {
     if (dirp->dd_loc == 0) {

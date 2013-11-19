@@ -52,25 +52,19 @@ int
 _DEFUN(closedir, (dirp),
        register DIR *dirp)
 {
-	int fd, rc;
+	int rc;
 
 #ifdef HAVE_DD_LOCK
 	__lock_acquire_recursive(dirp->dd_lock);
 #endif
-	rc = 0;
-	fd = dirp->dd_fd;
-	if (fd != -1) {
-		dirp->dd_fd = -1;
-		dirp->dd_loc = 0;
-		(void)free((void *)dirp->dd_buf);
-		(void)free((void *)dirp);
-		rc = close(fd);
-		_cleanupdir(dirp);
-	}
+	rc = close(dirp->dd_fd);
+	_cleanupdir(dirp);
+	free((void *)dirp->dd_buf);
 #ifdef HAVE_DD_LOCK
 	__lock_release_recursive(dirp->dd_lock);
 	__lock_close_recursive(dirp->dd_lock);
 #endif
+	free((void *)dirp);
 	return rc;
 }
 

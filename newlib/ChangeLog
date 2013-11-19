@@ -1,3 +1,10 @@
+2013-11-19  Terraneo Federico  <fede.tft@hotmail.it>
+
+	* libc/posix/closedir.c: Fix use after free.
+	Remove useless test dd_fd != -1
+	* libc/posix/readdir.c: Remove useless test dd_fd == -1
+	* libc/posix/readdir_r.c: Ditto.
+
 2013-11-18  Sahil Patnayakuni  <sahilp@oarcorp.com>
 
 	* libc/include/stdio.h, libc/machine/powerpc/vfscanf.c,
