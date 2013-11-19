@@ -69,7 +69,7 @@ static int resolve_path(char *path,char *result,char *pos)
 }
 
 
-char *realpath(const char *path,char *resolved_path)
+char *realpath(const char *__restrict path,char *__restrict resolved_path)
 {
     char cwd[PATH_MAX];
     char *path_copy;

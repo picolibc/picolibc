@@ -1,3 +1,8 @@
+2013-11-18  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/include/stdlib.h: Add prototype of realpath().
+	* libc/sys/linux/realpath.c: Add restrict keyword.
+
 2013-11-19  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libm/common/modfl.c: Add cast to remove compiler warning.
