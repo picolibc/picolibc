@@ -1,3 +1,7 @@
+3013-11-19  Jennifer Averett <jennifer.averett@oarcorp.com>
+
+	* libc/sys/rtems/sys/cpuset.h: New file.
+
 2013-11-19  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/include/stdlib.h: Add prototype of realpath().
