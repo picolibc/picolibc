@@ -1422,6 +1422,8 @@ handle_unique_object_name (int opt, char *path)
   return 1;
 }
 
+extern "C" NTSTATUS NTAPI RtlGetVersion (PRTL_OSVERSIONINFOEXW);
+
 static void
 dump_sysinfo ()
 {
@@ -1438,12 +1440,9 @@ dump_sysinfo ()
   time (&now);
   printf ("Current System Time: %s\n", ctime (&now));
 
-  OSVERSIONINFOEX osversion;
-  osversion.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
-  if (!GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&osversion)))
-    display_error ("dump_sysinfo: GetVersionEx()");
-
-  HMODULE k32 = GetModuleHandleW (L"kernel32.dll");
+  RTL_OSVERSIONINFOEXW osversion;
+  osversion.dwOSVersionInfoSize = sizeof (RTL_OSVERSIONINFOEXW);
+  RtlGetVersion (&osversion);
 
   switch (osversion.dwPlatformId)
     {
@@ -1451,6 +1450,7 @@ dump_sysinfo ()
       is_nt = true;
       if (osversion.dwMajorVersion == 6)
 	{
+	  HMODULE k32 = GetModuleHandleW (L"kernel32.dll");
 	  BOOL (WINAPI *GetProductInfo) (DWORD, DWORD, DWORD, DWORD, PDWORD) =
 		  (BOOL (WINAPI *)(DWORD, DWORD, DWORD, DWORD, PDWORD))
 		  GetProcAddress (k32, "GetProductInfo");
@@ -1468,7 +1468,7 @@ dump_sysinfo ()
 	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
 			      ? "8" : "2012");
 	      break;
-	    case 3:	/* Unreached due to mainfest nonsense. */
+	    case 3:
 	    default:
 	      osversion.dwMinorVersion = 3;
 	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
@@ -1639,12 +1639,12 @@ dump_sysinfo ()
       strcpy (osname, "??");
       break;
     }
-  printf ("Windows %s Ver %lu.%lu Build %lu %s\n", osname,
+  printf ("Windows %s Ver %lu.%lu Build %lu %ls\n", osname,
 	  osversion.dwMajorVersion, osversion.dwMinorVersion,
 	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
 	  osversion.dwBuildNumber : (osversion.dwBuildNumber & 0xffff),
 	  osversion.dwPlatformId == VER_PLATFORM_WIN32_NT ?
-	  osversion.szCSDVersion : "");
+	  osversion.szCSDVersion : L"");
 
   if (osversion.dwPlatformId == VER_PLATFORM_WIN32s
       || osversion.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)

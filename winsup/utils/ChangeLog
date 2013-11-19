@@ -1,5 +1,14 @@
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygcheck.cc (RtlGetVersion): Declare.
+	(dump_sysinfo): Call RtlGetVersion rather than GetVersionEx to get
+	correct OS info even on Windows 8.1.  Don't check return value since
+	RtlGetVersion never fails per MSDN.  Move fetching kernel32 module
+	handle where it's really needed.  Drop temporary comment added by
+	previous checkin.
+
+2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygcheck.cc (dump_sysinfo): Revert Windows 8.1 hack.  It's not
 	working.  Add a (hopefully temporary) comment.
 
