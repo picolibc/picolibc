@@ -47,3 +47,5 @@ Bug fixes:
 - select'ing on /dev/windows accidentally didn't take the setting of
   ioctl (WINDOWS_HWND) into account.
 
+- Fix typos in cygcheck which could crash Windows 8 and 8.1 machines.
+  Fixes: http://cygwin.com/ml/cygwin/2013-11/msg00334.html
