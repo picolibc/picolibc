@@ -197,6 +197,15 @@ wincapc::init ()
 	    case 1:
 	      caps = &wincap_7;
 	      break;
+	    case 2:
+	      /* Hack for Windows 8.1 and Server 2012R2:  If the executable is
+		 missing a Windows 8.1 mainfest, the OS returns dwMinorVersion
+		 2, as if it's running on Windows 8 or Server 2012.  The
+		 correct dwMinorVersion is 3 for 8.1/2012R2, though, so we're
+		 fixing this up here. */
+	      if (version.dwBuildNumber >= 9200)
+		version.dwMinorVersion = 3;
+	      /*FALLTHRU*/
 	    default:
 	      caps = &wincap_8;
 	      break;

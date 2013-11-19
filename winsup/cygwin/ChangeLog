@@ -1,5 +1,10 @@
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* wincap.cc (wincapc::init): Fix dwMinorVersion for Windows 8.1 and
+	Server 2012.  Explain why this is necessary.
+
+2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (IdnToAscii): Define.
 	(IdnToUnicode): Define.
 	(FreeAddrInfoW): Define.
