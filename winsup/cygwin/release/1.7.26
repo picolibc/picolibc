@@ -22,6 +22,10 @@ What changed:
 - The header /usr/include/exceptions.h, containing implementation details for
   32 bit Windows' exception handling only, has been removed.
 
+- Against all odds, report correct OS kernel version number on Windows 8.1
+  and Windows Server 2012 R2.
+  See: http://cygwin.com/ml/cygwin/2013-11/msg00343.html
+
 
 Bug fixes:
 ----------
