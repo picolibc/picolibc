@@ -1,3 +1,47 @@
+2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (IdnToAscii): Define.
+	(IdnToUnicode): Define.
+	(FreeAddrInfoW): Define.
+	(GetAddrInfoW): Define.
+	(GetNameInfoW): Define.
+	* net.cc: Drop W. Richard STEVENS libgai implementation.
+	(cygwin_freeaddrinfo): Move code from ipv4_freeaddrinfo here.  Move
+	definition up in file to avoid forward declaration in ga_duplist.
+	(ga_dup): Take addrinfoW as input.  Add parameters to get IDN flags
+	and to set error value.  Handle IDN flags and especially AI_CANONIDN.
+	Convert input wchar_t ai_canonname string to multibyte for output.
+	(ga_duplist): Add parameters to get IDN flags and to set error value
+	and propagate to ga_dup.  Call cygwin_freeaddrinfo.
+	(gai_errmap): Add comments.  Align error strings to GLibc.  Add
+	EAI_IDN_ENCODE entry.
+	(get_ipv6_funcs): Remove.
+	(load_ipv6_guard): Remove.
+	(ipv6_inited): Remove.
+	(load_ipv6): Remove.
+	(load_ipv6_funcs): Remove.
+	(cygwin_getaddrinfo): Drop calling load_ipv6.  Handle AI_IDN* flags.
+	Convert input strings to wchar_t and call GetAddrInfoW/FreeAddrInfoW.
+	In case hints is NULL, set default ai_flags explicitely to
+	AI_V4MAPPED | AI_ADDRCONFIG, as documented for Glibc.  Only add AI_ALL
+	if AI_ADDRCONFIG is not given.  Unconditionally add Windows-specific
+	AI_DISABLE_IDN_ENCODING to ai_flags to make IDN behaviour compatible
+	to Glibc even on Windows 8 and later.
+	(cygwin_getnameinfo): Drop calling load_ipv6.  Handle NI_IDN* flags.
+	Call GetNameInfoW and convert returned strings from wchar_t to
+	multibyte.
+	* include/netdb.h: Add comments to describe flags and error values.
+	(AI_*): Define all flags using hex values for clearness.
+	(AI_IDN): Define.
+	(AI_CANONIDN): Define.
+	(AI_IDN_ALLOW_UNASSIGNED): Define.
+	(AI_IDN_USE_STD3_ASCII_RULES): Define.
+	(NI_*): Define all flags using hex values for clearness.
+	(NI_IDN): Define.
+	(NI_IDN_ALLOW_UNASSIGNED): Define.
+	(NI_IDN_USE_STD3_ASCII_RULES): Define.
+	(EAI_IDN_ENCODE): Define.
+
 2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* configure.ac: Detect windows headers/libs after we've figured out the

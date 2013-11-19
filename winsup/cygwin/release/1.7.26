@@ -1,6 +1,13 @@
 What's new:
 -----------
 
+- getaddrinfo now supports glibc-specific International Domain Name (IDN)
+  extension flags: AI_IDN, AI_CANONIDN, AI_IDN_ALLOW_UNASSIGNED,
+  AI_IDN_USE_STD3_ASCII_RULES.
+
+- getnameinfo now supports glibc-specific International Domain Name (IDN)
+  extension flags: NI_IDN, NI_IDN_ALLOW_UNASSIGNED, NI_IDN_USE_STD3_ASCII_RULES.
+
 
 What changed:
 -------------

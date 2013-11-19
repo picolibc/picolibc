@@ -152,38 +152,61 @@ extern __declspec(dllimport) int h_errno;
 #define	NO_DATA		4 /* Valid name, no data record of requested type */
 #define	NO_ADDRESS	NO_DATA		/* no address, look for MX record */
 
-#define AI_PASSIVE      1
-#define AI_CANONNAME    2
-#define AI_NUMERICHOST  4
-#define AI_NUMERICSERV  8
-#define AI_ALL          256
-#define AI_ADDRCONFIG   1024 /* Only available on Vista.  Unchangable default
-				on older systems. */
-#define AI_V4MAPPED     2048
+/* Flag values for getaddrinfo function. */
+#define AI_PASSIVE      0x1	/* Intend socket address for bind. */
+#define AI_CANONNAME    0x2	/* Return canonical node name. */
+#define AI_NUMERICHOST  0x4	/* Input is address, don't resolve. */
+#define AI_NUMERICSERV  0x8	/* Input is port number, don't resolve. */
+#define AI_ALL          0x100	/* Return v4-mapped and v6 addresses. */
+#define AI_ADDRCONFIG   0x400	/* Only available on Vista.  Unchangable default
+				   on older systems. */
+#define AI_V4MAPPED     0x800
+/* Glibc extensions. We use numerical values taken by winsock-specific
+   extensions. */
+#define AI_IDN          0x4000	/* Encode IDN input from current local to
+				   punycode per RFC 3490. */
+#define AI_CANONIDN     0x8000	/* Convert ai_canonname from punycode to IDN
+				   in current locale. */
+#define AI_IDN_ALLOW_UNASSIGNED 0x10000	    /* Allow unassigned code points in
+					       input string.  */
+#define AI_IDN_USE_STD3_ASCII_RULES 0x20000 /* Filter ASCII chars according to
+					       STD3 rules.  */
 
-#define NI_NOFQDN       1
-#define NI_NUMERICHOST  2
-#define NI_NAMEREQD     4
-#define NI_NUMERICSERV  8
-#define NI_DGRAM        16
+/* Flag values for getnameinfo function. */
+#define NI_NOFQDN       0x1	/* Don't lookup hostname. */
+#define NI_NUMERICHOST  0x2	/* Return host address, rather than name. */
+#define NI_NAMEREQD     0x4	/* Not being able to resolve is an error. */
+#define NI_NUMERICSERV  0x8	/* Return port number, rather than name. */
+#define NI_DGRAM        0x10	/* Lookup datagram (UDP) service. */
+/* Glibc extensions. We use numerical values taken by winsock-specific
+   extensions. */
+#define NI_IDN          0x4000	/* Decode name from punycode to IDN in
+				   current locale.  */
+#define NI_IDN_ALLOW_UNASSIGNED 0x10000	    /* Allow unassigned code points in
+					       output string.  */
+#define NI_IDN_USE_STD3_ASCII_RULES 0x20000 /* Filter ASCII chars according to
+					       STD3 rules.  */
 
-#define NI_MAXHOST      1025
-#define NI_MAXSERV      32
+#define NI_MAXHOST      1025	/* Best effort maximum hostname length. */
+#define NI_MAXSERV      32	/* Best effort maximum service name length. */
 
-#define EAI_ADDRFAMILY  1
-#define EAI_AGAIN       2
-#define EAI_BADFLAGS    3
-#define EAI_FAIL        4
-#define EAI_FAMILY      5
-#define EAI_MEMORY      6
-#define EAI_NODATA      7
-#define EAI_NONAME      8
-#define EAI_SERVICE     9
-#define EAI_SOCKTYPE    10
-#define EAI_SYSTEM      11
-#define EAI_BADHINTS    12
-#define EAI_PROTOCOL    13
-#define EAI_OVERFLOW    14
+/* Error codes returned by getaddrinfo and getnameinfo. */
+#define EAI_ADDRFAMILY  1	/* Address family for hostname not supported */
+#define EAI_AGAIN       2	/* Temporary failure in name resolution */
+#define EAI_BADFLAGS    3	/* Bad value for ai_flags */
+#define EAI_FAIL        4	/* Non-recoverable failure in name resolution */
+#define EAI_FAMILY      5	/* ai_family not supported */
+#define EAI_MEMORY      6	/* Memory allocation failure */
+#define EAI_NODATA      7	/* No address associated with hostname */
+#define EAI_NONAME      8	/* Name or service not known */
+#define EAI_SERVICE     9	/* Servname not supported for ai_socktype */
+#define EAI_SOCKTYPE    10	/* ai_socktype not supported */
+#define EAI_SYSTEM      11	/* System error */
+#define EAI_BADHINTS    12	/* Invalid value for hints */
+#define EAI_PROTOCOL    13	/* Resolved protocol is unknown */
+#define EAI_OVERFLOW    14	/* An argument buffer overflowed */
+/* Glibc extensions. */
+#define EAI_IDN_ENCODE	15	/* Parameter string not correctly encoded */
 
 #ifndef __INSIDE_CYGWIN_NET__
 void		endhostent (void);

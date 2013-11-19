@@ -28,7 +28,7 @@ const char *getprogname (void);
 void	setprogname (const char *);
 
 #ifndef __STRICT_ANSI__
-char *realpath (const char *, char *);
+char *realpath (const char  *__restrict, char *__restrict );
 char *canonicalize_file_name (const char *);
 int unsetenv (const char *);
 char *initstate (unsigned seed, char *state, size_t size);
