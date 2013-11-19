@@ -3294,9 +3294,8 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 		    | AI_NUMERICSERV | AI_ADDRCONFIG | AI_V4MAPPED
 		    | AI_IDN_MASK)))
     return EAI_BADFLAGS;
-  /* AI_NUMERICSERV is not supported in our replacement getaddrinfo, nor
-     is it supported by WinSock prior to Vista.  We just check the servname
-     parameter by ourselves here. */
+  /* AI_NUMERICSERV is not supported prior to Windows Vista.  We just check
+     the servname parameter by ourselves here. */
   if (hints && (hints->ai_flags & AI_NUMERICSERV))
     {
       char *p;
@@ -3341,9 +3340,13 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	return EAI_MEMORY;
     }
 
-  memset (&whints, 0, sizeof whints);
   if (!hints)
-    whints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
+    {
+      /* Default settings per glibc man page. */
+      memset (&whints, 0, sizeof whints);
+      whints.ai_family = PF_UNSPEC;
+      whints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
+    }
   else
     {
       /* sizeof addrinfo == sizeof addrinfoW */
@@ -3355,8 +3358,8 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	 apparently for performance reasons.  To get the POSIX default
 	 behaviour, the AI_ALL flag has to be set. */
       if (wincap.supports_all_posix_ai_flags ()
-	  && hints->ai_family == PF_UNSPEC
-	  && !(hints->ai_flags & AI_ADDRCONFIG))
+	  && whints.ai_family == PF_UNSPEC
+	  && !(whints.ai_flags & AI_ADDRCONFIG))
 	whints.ai_flags |= AI_ALL;
     }
   /* Disable automatic IDN conversion on W8 and later. */

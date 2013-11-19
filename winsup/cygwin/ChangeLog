@@ -1,5 +1,12 @@
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (cygwin_getaddrinfo): Fix a comment.  Only memset whints if
+	hints is NULL.  Add a comment and set whints.ai_family explicitely to
+	AF_UNSPEC to follow glibc man page closely.  Check flags against whints
+	for locality.
+
+2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* wincap.cc (wincapc::init): Fix dwMinorVersion for Windows 8.1 and
 	Server 2012.  Explain why this is necessary.
 
