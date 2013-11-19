@@ -1430,7 +1430,6 @@ dump_sysinfo ()
   time_t now;
   char *found_cygwin_dll;
   bool is_nt = false;
-  bool more_info = true;
   char osname[128];
   DWORD obcaseinsensitive = 1;
   HKEY key;
@@ -1442,23 +1441,12 @@ dump_sysinfo ()
   OSVERSIONINFOEX osversion;
   osversion.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
   if (!GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&osversion)))
-    {
-      more_info = false;
-      osversion.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-      if (!GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&osversion)))
-	display_error ("dump_sysinfo: GetVersionEx()");
-    }
+    display_error ("dump_sysinfo: GetVersionEx()");
 
   HMODULE k32 = GetModuleHandleW (L"kernel32.dll");
 
   switch (osversion.dwPlatformId)
     {
-    case VER_PLATFORM_WIN32s:
-      strcpy (osname, "32s (not supported)");
-      break;
-    case VER_PLATFORM_WIN32_WINDOWS:
-      strcpy (osname, "95/98/Me (not supported)");
-      break;
     case VER_PLATFORM_WIN32_NT:
       is_nt = true;
       if (osversion.dwMajorVersion == 6)
@@ -1477,15 +1465,21 @@ dump_sysinfo ()
 			      ? "7" : "2008 R2");
 	      break;
 	    case 2:
-	    default:
 	      /* No way to distinguish W8 and W8.1 by OS version numbers
-		 alone. */
-	      if (osversion.dwBuildNumber >= 9200)
-		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-				? "8.1" : "2012 R2");
-	      else
-		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-				? "8" : "2012");
+		 alone, unless the executables have a matching manifest.
+		 What a big, fat mess. */
+	      if (osversion.dwBuildNumber < 9200)
+		{
+		  strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+				  ? "8" : "2012");
+		  break;
+		}
+	      /*FALLTHRU*/
+	    case 3:
+	    default:
+	      osversion.dwMinorVersion = 3;
+	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+			      ? "8.1" : "2012 R2");
 	      break;
 	    }
 	  DWORD prod;

@@ -1,5 +1,12 @@
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygcheck.cc (dump_sysinfo): Drop code trying to fetch OSVERSIONINFO
+	if fetching OSVERSIONINFOEX failed.  Drop code handling unsupported
+	platform IDs.  Add code to tweak dwMinorVersion on Windows 8.1 if no
+	manifest is present.
+
+2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (cygcheck.exe): Link against wininet.dll.
 	(dumper.exe): Link against psapi.dll.
 	* cygcheck.cc (_WIN32_WINNT): Define as 0x0602.
