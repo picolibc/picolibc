@@ -1465,17 +1465,10 @@ dump_sysinfo ()
 			      ? "7" : "2008 R2");
 	      break;
 	    case 2:
-	      /* No way to distinguish W8 and W8.1 by OS version numbers
-		 alone, unless the executables have a matching manifest.
-		 What a big, fat mess. */
-	      if (osversion.dwBuildNumber < 9200)
-		{
-		  strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-				  ? "8" : "2012");
-		  break;
-		}
-	      /*FALLTHRU*/
-	    case 3:
+	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+			      ? "8" : "2012");
+	      break;
+	    case 3:	/* Unreached due to mainfest nonsense. */
 	    default:
 	      osversion.dwMinorVersion = 3;
 	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
