@@ -1,5 +1,9 @@
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* wincap.cc (wincapc::init): Revert previous change.  It's not working.
+
+2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (cygwin_getaddrinfo): Fix a comment.  Only memset whints if
 	hints is NULL.  Add a comment and set whints.ai_family explicitely to
 	AF_UNSPEC to follow glibc man page closely.  Check flags against whints
