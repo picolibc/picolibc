@@ -1,3 +1,7 @@
+2013-11-19  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libm/common/modfl.c: Add cast to remove compiler warning.
+
 2013-11-19  Terraneo Federico  <fede.tft@hotmail.it>
 
 	* libc/posix/closedir.c: Fix use after free.

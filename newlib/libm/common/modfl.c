@@ -36,7 +36,7 @@ POSSIBILITY OF SUCH DAMAGE.
 long double
 modfl (long double x, long double *iptr)
 {
-  return modf(x, iptr);
+  return modf(x, (double *)iptr);
 }
 #endif
 
