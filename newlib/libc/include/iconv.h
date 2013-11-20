@@ -41,7 +41,8 @@ iconv_t
 _EXFUN(iconv_open, (_CONST char *, _CONST char *));
 
 size_t
-_EXFUN(iconv, (iconv_t, char **, size_t *, char **, size_t *));
+_EXFUN(iconv, (iconv_t, char **__restrict, size_t *__restrict, 
+               char **__restrict, size_t *__restrict));
 
 int
 _EXFUN(iconv_close, (iconv_t));

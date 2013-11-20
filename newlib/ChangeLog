@@ -1,3 +1,8 @@
+2013-11-20  Daniel Ramirez <javamonn@gmail.com>
+
+	* libc/iconv/lib/iconv.c, libc/include/iconv.h, 
+	libc/sys/linux/iconv/iconv.c: Add restrict keyword.
+
 2013-11-20  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/stdlib.h: Declare realpath only if !__STRICT_ANSI__.

@@ -29,8 +29,10 @@
 
 
 size_t
-iconv (iconv_t cd, char **inbuf, size_t *inbytesleft, char **outbuf,
-       size_t *outbytesleft)
+iconv (iconv_t cd, char **__restrict inbuf,
+       size_t *__restrict inbytesleft,
+       char **__restrict outbuf,
+       size_t *__restrict outbytesleft)
 {
   __gconv_t gcd = (__gconv_t) cd;
   char *outstart = outbuf ? *outbuf : NULL;

@@ -45,9 +45,10 @@ ANSI_SYNOPSIS
 	#include <iconv.h>
 	iconv_t iconv_open (const char *<[to]>, const char *<[from]>);
 	int iconv_close (iconv_t <[cd]>);
-        size_t iconv (iconv_t <[cd]>, char **<[inbuf]>, 
-	              size_t *<[inbytesleft]>, 
-		      char **<[outbuf]>, size_t *<[outbytesleft]>),
+        size_t iconv (iconv_t <[cd]>, char **__restrict<[inbuf]>, 
+	              size_t *__restrict<[inbytesleft]>, 
+		      char **__restrict<[outbuf]>, 
+                      size_t *__restrict<[outbytesleft]>),
 
 	iconv_t _iconv_open_r (struct _reent *<[rptr]>, 
 			       const char *<[to]>, const char *<[from]>);
@@ -168,10 +169,10 @@ _DEFUN(iconv_open, (to, from),
 size_t
 _DEFUN(iconv, (cd, inbuf, inbytesleft, outbuf, outbytesleft),
               iconv_t cd          _AND
-              char **inbuf _AND
-              size_t *inbytesleft _AND
-              char **outbuf       _AND
-              size_t *outbytesleft)
+              char **__restrict inbuf _AND
+              size_t *__restrict inbytesleft _AND
+              char **__restrict outbuf       _AND
+              size_t *__restrict outbytesleft)
 {
     return _iconv_r (_REENT, cd, (_CONST char **) inbuf, inbytesleft,
 		     outbuf, outbytesleft);
