@@ -1,4 +1,8 @@
-3013-11-19  Jennifer Averett <jennifer.averett@oarcorp.com>
+2013-11-20  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/stdlib.h: Declare realpath only if !__STRICT_ANSI__.
+
+2013-11-19  Jennifer Averett <jennifer.averett@oarcorp.com>
 
 	* libc/sys/rtems/sys/cpuset.h: New file.
 
