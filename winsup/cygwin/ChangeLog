@@ -1,3 +1,8 @@
+2013-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/stdlib.h (realpath): Drop declaration.  It's declared
+	in newlib's stdlib.h now.
+
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (RtlGetVersion): Declare.
