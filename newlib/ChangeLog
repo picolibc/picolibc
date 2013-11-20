@@ -1,3 +1,7 @@
+2013-11-20  Daniel Ramirez <javamonn@gmail.com>
+
+	* libc/include/search.h, libc/search/tdelete.c: Add restrict keyword.
+
 2013-11-20  Chirayu Desai  <chirayudesai1@gmail.com>
 
 	* libc/include/regex.h, libc/posix/regcomp.c,

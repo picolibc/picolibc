@@ -54,7 +54,7 @@ ENTRY	*hsearch(ENTRY, ACTION);
 int	 hcreate_r(size_t, struct hsearch_data *);
 void	 hdestroy_r(struct hsearch_data *);
 int	hsearch_r(ENTRY, ACTION, ENTRY **, struct hsearch_data *);
-void	*tdelete(const void *, void **, __compar_fn_t);
+void	*tdelete(const void *__restrict, void **__restrict, __compar_fn_t);
 void	tdestroy (void *, void (*)(void *));
 void	*tfind(const void *, void **, __compar_fn_t);
 void	*tsearch(const void *, void **, __compar_fn_t);
