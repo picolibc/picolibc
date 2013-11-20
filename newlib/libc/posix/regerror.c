@@ -107,14 +107,15 @@ static struct rerr {
 
 /*
  - regerror - the interface to error numbers
- = extern size_t regerror(int, const regex_t *, char *, size_t);
+ = extern size_t regerror(int, const regex_t *__restrict,
+ =			char *__restrict, size_t);
  */
 /* ARGSUSED */
 size_t
 regerror(errcode, preg, errbuf, errbuf_size)
 int errcode;
-const regex_t *preg;
-char *errbuf;
+const regex_t *__restrict preg;
+char *__restrict errbuf;
 size_t errbuf_size;
 {
 	struct rerr *r;

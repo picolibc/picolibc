@@ -1,3 +1,9 @@
+2013-11-20  Chirayu Desai  <chirayudesai1@gmail.com>
+
+	* libc/include/regex.h, libc/posix/regcomp.c,
+	libc/posix/regerror.c, libc/posix/regex.3
+	libc/posix/regexec.c: Add restrict keyword.
+
 2013-11-20  Daniel Ramirez <javamonn@gmail.com>
 
 	* libc/iconv/lib/iconv.c, libc/include/iconv.h, 

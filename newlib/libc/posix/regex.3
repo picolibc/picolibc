@@ -51,16 +51,16 @@
 .In sys/types.h
 .In regex.h
 .Ft int
-.Fn regcomp "regex_t *preg" "const char *pattern" "int cflags"
+.Fn regcomp "regex_t *restrict preg" "const char *_restrictpattern" "int cflags"
 .Ft int
 .Fo regexec
-.Fa "const regex_t *preg" "const char *string"
-.Fa "size_t nmatch" "regmatch_t pmatch[]" "int eflags"
+.Fa "const regex_t *_restrict preg" "const char *_restrict string"
+.Fa "size_t nmatch" "regmatch_t pmatch[_restrict]" "int eflags"
 .Fc
 .Ft size_t
 .Fo regerror
-.Fa "int errcode" "const regex_t *preg"
-.Fa "char *errbuf" "size_t errbuf_size"
+.Fa "int errcode" "const regex_t *_restrict preg"
+.Fa "char *_restrict errbuf" "size_t errbuf_size"
 .Fc
 .Ft void
 .Fn regfree "regex_t *preg"

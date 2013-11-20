@@ -174,7 +174,7 @@ static int never = 0;		/* for use in asserts; shuts lint up */
 
 /*
  - regcomp - interface for parser and compilation
- = extern int regcomp(regex_t *, const char *, int);
+ = extern int regcomp(regex_t *__restrict, const char *__restrict, int);
  = #define	REG_BASIC	0000
  = #define	REG_EXTENDED	0001
  = #define	REG_ICASE	0002
@@ -186,8 +186,8 @@ static int never = 0;		/* for use in asserts; shuts lint up */
  */
 int				/* 0 success, otherwise REG_something */
 regcomp(preg, pattern, cflags)
-regex_t *preg;
-const char *pattern;
+regex_t *__restrict preg;
+const char *__restrict pattern;
 int cflags;
 {
 	struct parse pa;

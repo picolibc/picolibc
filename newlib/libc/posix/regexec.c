@@ -140,8 +140,8 @@ static int nope = 0;		/* for use in asserts; shuts lint up */
 
 /*
  - regexec - interface for matching
- = extern int regexec(const regex_t *, const char *, size_t, \
- =					regmatch_t [], int);
+ = extern int regexec(const regex_t *__restrict, const char *__restrict,
+ =					size_t, regmatch_t [__restrict], int);
  = #define	REG_NOTBOL	00001
  = #define	REG_NOTEOL	00002
  = #define	REG_STARTEND	00004
@@ -155,10 +155,10 @@ static int nope = 0;		/* for use in asserts; shuts lint up */
  */
 int				/* 0 success, REG_NOMATCH failure */
 regexec(preg, string, nmatch, pmatch, eflags)
-const regex_t *preg;
-const char *string;
+const regex_t *__restrict preg;
+const char *__restrict string;
 size_t nmatch;
-regmatch_t pmatch[];
+regmatch_t pmatch[__restrict];
 int eflags;
 {
 	struct re_guts *g = preg->re_g;
