@@ -1,3 +1,14 @@
+2013-11-21  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/sys/rdos/chown.c, libc/sys/rdos/close.c, libc/sys/rdos/execve.c,
+	libc/sys/rdos/fork.c, libc/sys/rdos/fstat.c, libc/sys/rdos/getpid.c,
+	libc/sys/rdos/gettod.c, libc/sys/rdos/isatty.c, libc/sys/rdos/kill.c,
+	libc/sys/rdos/link.c, libc/sys/rdos/lseek.c, libc/sys/rdos/open.c,
+	libc/sys/rdos/rdos.h, libc/sys/rdos/read.c, libc/sys/rdos/readlink.c,
+	libc/sys/rdos/sbrk.c, libc/sys/rdos/stat.c, libc/sys/rdos/symlink.c,
+	libc/sys/rdos/times.c, libc/sys/rdos/unlink.c, libc/sys/rdos/wait.c,
+	libc/sys/rdos/write.c: Convert from DOS to UNIX CRLF.
+
 2013-11-21  Julio Gutierrez <jgutleyva@gmail.com>
 
 	* libc/include/glob.h (glob): Add restrict keyword.
