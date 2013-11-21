@@ -1,3 +1,10 @@
+2013-11-21  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* aarch64/ftruncate.c: Include errno.h.
+	(ftruncate) Set errno.
+	* aarch64/truncate.c: Include errno.h.
+	(truncate) Set errno.
+
 2013-11-20  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* arm/ftruncate.c: Include errno.h.

@@ -23,10 +23,12 @@
  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#include <errno.h>
 #include <sys/types.h>
 
 int
 truncate (const char *path, off_t length)
 {
+  errno = ENOSYS;
   return -1;
 }
