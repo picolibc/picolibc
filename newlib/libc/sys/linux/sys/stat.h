@@ -20,14 +20,14 @@
 int     _EXFUN(fstat,( int __fd, struct stat *__sbuf ));
 int     _EXFUN(mkdir,( const char *_path, mode_t __mode ));
 int     _EXFUN(mkfifo,( const char *__path, mode_t __mode ));
-int     _EXFUN(stat,( const char *__path, struct stat *__sbuf ));
+int     _EXFUN(stat,( const char *__restrict __path, struct stat *__restrict __sbuf ));
 mode_t  _EXFUN(umask,( mode_t __mask ));
 
 #ifndef _POSIX_SOURCE
 int     _EXFUN(fstat64,( int __fd, struct stat64 *__sbuf ));
-int	_EXFUN(lstat,( const char *file_name, struct stat64 *buf));
-int	_EXFUN(lstat64,( const char *file_name, struct stat64 *buf));
-int     _EXFUN(stat64,( const char *__path, struct stat64 *__sbuf ));
+int	_EXFUN(lstat,( const char *__restrict file_name, struct stat64 *__restrict buf));
+int	_EXFUN(lstat64,( const char *__restrict file_name, struct stat64 *__restrict buf));
+int     _EXFUN(stat64,( const char *__restrict __path, struct stat64 *__restrict __sbuf ));
 #endif /* _POSIX_SOURCE */
 
 #endif /* _SYS_STAT_H */

@@ -1,3 +1,9 @@
+2013-11-21  Daniel Ramirez <javamonn@gmail.com>
+
+	* libc/include/sys/stat.h, libc/sys/linux/sys/stat.h, 
+	libc/sys/m88kbug/syscalls.c, libc/sys/rdos/stat.c, 
+	libc/sys/sparc64/sys/stat.h: Add restrict keyword.
+
 2013-11-20  Daniel Ramirez <javamonn@gmail.com>
 
 	* libc/include/search.h, libc/search/tdelete.c: Add restrict keyword.

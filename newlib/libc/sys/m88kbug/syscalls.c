@@ -76,7 +76,7 @@ int fstat(int file, struct stat *st) {
   return(0);
 }
 
-int stat(char *filename, struct stat *st) {
+int stat(char *__restrict filename, struct stat *__restrict st) {
   st->st_mode = S_IFCHR;
   return(0);
 }

@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 
-int stat(const char *file, struct stat *st)
++int stat(const char *__restrict file, struct stat *__restrict st)
 {
   errno = ENOSYS;
   return -1;

@@ -122,7 +122,7 @@ int	_EXFUN(chmod,( const char *_path, mode_t _mode ));
 int	_EXFUN(fstat,( int _fd, struct stat *_sbuf ));
 int	_EXFUN(mkdir,( char *_path, mode_t _mode ));
 int	_EXFUN(mkfifo,( char *_path, mode_t _mode ));
-int	_EXFUN(stat,( const char *_path, struct stat *_sbuf ));
+int	_EXFUN(stat,( const char *__restrict _path, struct stat *__restrict _sbuf ));
 mode_t	_EXFUN(umask,( mode_t _mask ));
 
 #ifdef __cplusplus
