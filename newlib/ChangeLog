@@ -1,3 +1,7 @@
+2013-11-21  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/sys/rdos/stat.c: Remove stray +.
+
 2013-11-21  Daniel Ramirez <javamonn@gmail.com>
 
 	* libc/include/sys/stat.h, libc/sys/linux/sys/stat.h, 
