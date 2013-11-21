@@ -34,7 +34,7 @@
  */
 
 
-int stat (const char *filename, struct stat *buf)
+int stat (const char *__restrict filename, struct stat *__restrict buf)
 {
 #if HOSTED
   gdb_parambuf_t parameters;

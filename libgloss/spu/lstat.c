@@ -44,7 +44,7 @@ typedef struct
 } syscall_stat_t;
 
 int
-lstat (const char *pathname, struct stat *pstat)
+lstat (const char *__restrict pathname, struct stat *__restrict pstat)
 {
   syscall_stat_t sys;
   struct jsre_stat pjstat;

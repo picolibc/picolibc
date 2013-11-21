@@ -1,3 +1,8 @@
+2013-11-21  Daniel Ramirez <javamonn@gmail.com>
+
+	* d30v/syscalls.c, i960/mon960.c, m68k/io-stat.c, mt/stat.c,
+	spu/lstat.c, spu/stat.c: Add restrict keyword.
+
 2013-11-21  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* aarch64/ftruncate.c: Include errno.h.

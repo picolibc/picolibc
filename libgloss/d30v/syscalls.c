@@ -119,7 +119,7 @@ chdir (char *dir)
 }
 
 int
-stat (const char *filename, void *info)
+stat (const char *__restrict filename, void *__restrict info)
 {
   return __syscall (filename, info, 0, 0, SYS_stat);
 }

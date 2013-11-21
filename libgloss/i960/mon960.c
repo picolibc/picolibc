@@ -37,7 +37,7 @@ fstat (int file, struct stat *st)
 }
 
 int
-stat (const char *filename, struct stat *st)
+stat (const char *__restrict filename, struct stat *__restrict st)
 {
   st->st_mode = S_IFCHR;
   return 0;

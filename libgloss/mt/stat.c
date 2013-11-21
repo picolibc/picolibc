@@ -5,7 +5,7 @@
 
 
 int
-stat (const char *path, struct stat *st)
+stat (const char *__restrict path, struct stat *__restrict st)
 
 {
   return TRAP0 (SYS_stat, path, st, 0);
