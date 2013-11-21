@@ -1,3 +1,8 @@
+2013-11-21  Julio Gutierrez <jgutleyva@gmail.com>
+
+	* libc/include/glob.h (glob): Add restrict keyword.
+	* libc/posix/glob.c (glob): Ditto.
+
 2013-11-21  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/posix/readdir_r.c: Add restrict keyword.

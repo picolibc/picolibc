@@ -158,9 +158,9 @@ static void	 qprintf(const char *, Char *);
 
 int
 glob(pattern, flags, errfunc, pglob)
-	const char *pattern;
+	const char *__restrict pattern;
 	int flags, (*errfunc)(const char *, int);
-	glob_t *pglob;
+	glob_t *__restrict pglob;
 {
 	const u_char *patnext;
 	int c, limit;

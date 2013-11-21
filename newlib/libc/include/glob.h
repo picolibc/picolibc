@@ -82,7 +82,8 @@ typedef struct {
 #define	GLOB_ABEND	(-2)	/* Unignored error. */
 
 __BEGIN_DECLS
-int	glob(const char *, int, int (*)(const char *, int), glob_t *);
+int	glob(const char *__restrict, int, int (*)(const char *, int), 
+		glob_t *__restrict);
 void	globfree(glob_t *);
 __END_DECLS
 
