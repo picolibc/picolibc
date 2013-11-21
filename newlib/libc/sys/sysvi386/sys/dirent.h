@@ -20,6 +20,8 @@ typedef struct _dirdesc {
 
 DIR *opendir (const char *);
 struct dirent *readdir (DIR *);
+int readdir_r (DIR *__restrict, struct dirent *__restrict,
+               struct dirent **__restrict);
 void rewinddir (DIR *);
 int closedir (DIR *);
 

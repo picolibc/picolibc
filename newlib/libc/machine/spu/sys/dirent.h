@@ -54,6 +54,8 @@ typedef struct {
 DIR *opendir(const char *);
 int closedir(DIR *);
 struct dirent *readdir (DIR *);
+int readdir_r (DIR *__restrict, struct dirent *__restrict,
+              struct dirent **__restrict);
 void rewinddir(DIR *);
 void seekdir(DIR *dir, off_t offset);
 off_t telldir(DIR *dir);

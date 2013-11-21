@@ -1,5 +1,13 @@
 2013-11-21  Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* libc/posix/readdir_r.c: Add restrict keyword.
+	* libc/machine/spu/sys/dirent.h, libc/sys/decstation/sys/dirent.h,
+	libc/sys/linux/sys/dirent.h, libc/sys/rtems/sys/dirent.h,
+	libc/sys/sparc64/sys/dirent.h, libc/sys/sun4/sys/dirent.h,
+	libc/sys/sysvi386/sys/dirent.h: Add readdir_r() prototype.
+
+2013-11-21  Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* libc/sys/rdos/stat.c: Remove stray +.
 
 2013-11-21  Daniel Ramirez <javamonn@gmail.com>
