@@ -1,3 +1,11 @@
+2013-11-22  Chirayu Desai  <chirayudesai1@gmail.com>
+
+	* libc/include/sys/unistd.h (readlink): Add restrict keyword.
+	(readlinkat): Ditto.
+	(swab): Ditto.
+	* libc/sys/rdos/readlink.c (readlink): Ditto.
+	* libc/string/swab.c (swab): Ditto.
+
 2013-11-21  Daniel Ramirez <javamonn@gmail.com>
 
 	* libc/sys/linux/statvfs.c (statvfs): Added restrict keyword.

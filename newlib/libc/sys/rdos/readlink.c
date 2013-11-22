@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <sys/types.h>
 
-int readlink(const char *path, char *buf, size_t bufsize)
+int readlink(const char *__restrict path, char *__restrict buf, size_t bufsize)
 {
   errno = ENOSYS;
   return -1;
