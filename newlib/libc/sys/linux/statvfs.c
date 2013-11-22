@@ -30,7 +30,7 @@
 
 
 int
-statvfs (const char *file, struct statvfs *buf)
+statvfs (const char *__restrict file, struct statvfs *__restrict buf)
 {
   struct statfs fsbuf;
   struct stat64 st;

@@ -1,3 +1,7 @@
+2013-11-21  Daniel Ramirez <javamonn@gmail.com>
+
+	* libc/sys/linux/statvfs.c (statvfs): Added restrict keyword.
+
 2013-11-21  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/sys/rdos/chown.c, libc/sys/rdos/close.c, libc/sys/rdos/execve.c,
