@@ -1,3 +1,10 @@
+2013-11-22  Bryan Dunsmore <dunsmoreb@gmail.com>
+
+	* libc/include/sys/time.h (gettimeofday): Add restrict keyword.
+	(setitimer): Likewise.
+	* libc/sys/rdos/gettod.c (gettimeofday): Likewise.
+	* libc/sys/rtems/crt0.c (gettimeofday): Likewise.
+
 2013-11-22  Chirayu Desai  <chirayudesai1@gmail.com>
 
 	* libc/include/sys/unistd.h (readlink): Add restrict keyword.
