@@ -1,3 +1,10 @@
+2013-11-23  Eric Blake  <eblake@redhat.com>
+
+	dup2: fix off-by-one crash
+	* dtable.cc (dup3): Fix off-by-one.
+	(find_unused_handle): Reduce time spent expanding during dup.
+	* syscalls.cc (setdtablesize): Report error on invalid value.
+
 2013-11-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/stdlib.h (realpath): Drop declaration.  It's declared

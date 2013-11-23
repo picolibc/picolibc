@@ -2578,6 +2578,12 @@ system (const char *cmdstring)
 extern "C" int
 setdtablesize (int size)
 {
+  if (size < 0)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
   if (size <= (int)cygheap->fdtab.size || cygheap->fdtab.extend (size - cygheap->fdtab.size))
     return 0;
 

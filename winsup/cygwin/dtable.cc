@@ -233,7 +233,7 @@ dtable::find_unused_handle (int start)
 	if (fds[i] == NULL)
 	  return i;
     }
-  while (extend (NOFILE_INCR));
+  while (extend (MAX (NOFILE_INCR, start - size)));
   return -1;
 }
 
@@ -754,7 +754,7 @@ dtable::dup3 (int oldfd, int newfd, int flags)
 
   if (!not_open (newfd))
     close (newfd);
-  else if ((size_t) newfd > size
+  else if ((size_t) newfd >= size
 	   && find_unused_handle (newfd) < 0)
     /* couldn't extend fdtab */
     {
