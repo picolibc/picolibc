@@ -1,3 +1,8 @@
+2013-11-23 Bryan Dunsmore <dunsmoreb@gmail.com>
+
+	* libc/include/wordexp.h (wordexp): Add restrict keyword.
+	* libc/posix/wordexp.c (wordexp): Ditto.
+
 2013-11-22  Bryan Dunsmore <dunsmoreb@gmail.com>
 
 	* libc/include/sys/time.h (gettimeofday): Add restrict keyword.

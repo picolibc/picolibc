@@ -29,7 +29,7 @@
    that supports the --wordexp and --protected arguments to be present
    on the system.  It does not support the WRDE_UNDEF flag. */
 int
-wordexp(const char *words, wordexp_t *pwordexp, int flags)
+wordexp(const char *__restrict words, wordexp_t *__restrict pwordexp, int flags)
 {
   FILE *f = NULL;
   FILE *f_err = NULL;

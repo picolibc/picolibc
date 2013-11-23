@@ -43,7 +43,7 @@ enum {
 /* Note: This implementation of wordexp requires a version of bash
    that supports the --wordexp and --protected arguments to be present
    on the system.  It does not support the WRDE_UNDEF flag. */
-int wordexp(const char *, wordexp_t *, int);
+int wordexp(const char *__restrict, wordexp_t *__restrict, int);
 void wordfree(wordexp_t *);
 
 #ifdef __cplusplus
