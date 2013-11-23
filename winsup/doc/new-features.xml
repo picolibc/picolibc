@@ -9,6 +9,41 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
+getaddrinfo now supports glibc-specific International Domain Name (IDN)
+extension flags: AI_IDN, AI_CANONIDN, AI_IDN_ALLOW_UNASSIGNED,
+AI_IDN_USE_STD3_ASCII_RULES.
+</para></listitem>
+
+<listitem><para>
+getnameinfo now supports glibc-specific International Domain Name (IDN)
+extension flags: NI_IDN, NI_IDN_ALLOW_UNASSIGNED, NI_IDN_USE_STD3_ASCII_RULES.
+</para></listitem>
+
+<listitem><para>
+Slightly improve randomness of /dev/random emulation.
+</para></listitem>
+
+<listitem><para>
+Allow to use advisory locking on any device.  POSIX fcntl and lockf locking
+works with any device, BSD flock locking only with devices backed by an OS
+handle.  Right now this excludes console windows on pre Windows 8, as well as
+almost all virtual files under /proc from BSD flock locking.
+</para></listitem>
+
+<listitem><para>
+The header /usr/include/exceptions.h, containing implementation details for
+32 bit Windows' exception handling only, has been removed.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
+<sect2 id="ov-new1.7.25"><title>What's new and what changed from 1.7.24 to 1.7.25</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
 Change magic number associated with process information block so that 32-bit
 Cygwin processes don't try to interpret 64-bit information and vice-versa.
 </para></listitem>

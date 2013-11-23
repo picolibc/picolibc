@@ -1,3 +1,7 @@
+2013-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.26): Add new section.
+
 2013-11-12  Tom Schutter  <t.schutter@comcast.net>
 
 	* faq-setup.xml (faq.setup.uninstall-service): Describe how to unhook
