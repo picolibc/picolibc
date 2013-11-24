@@ -60,3 +60,5 @@ Bug fixes:
 - Show OS version correctly even on Windows 8.1 and Server 2012 R2.
   Fixes: http://cygwin.com/ml/cygwin/2013-11/msg00343.html
 
+- dup2() could crash in some cases for a destination >= 256
+  Fixes: http://cygwin.com/ml/cygwin/2013-09/msg00397.html
