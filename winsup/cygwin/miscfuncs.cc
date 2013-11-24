@@ -17,9 +17,6 @@ details. */
 #include <limits.h>
 #include <sys/param.h>
 #include <wchar.h>
-#include <wingdi.h>
-#include <winuser.h>
-#include <winnls.h>
 #include "cygtls.h"
 #include "ntdll.h"
 #include "path.h"

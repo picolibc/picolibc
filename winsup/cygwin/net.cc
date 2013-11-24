@@ -20,7 +20,6 @@ details. */
 	  system functions on Vista and later. */
 #define _INC_NETIOAPI
 #include "winsup.h"
-#include <winnls.h>
 #include <ws2tcpip.h>
 #include <mswsock.h>
 #include <iphlpapi.h>

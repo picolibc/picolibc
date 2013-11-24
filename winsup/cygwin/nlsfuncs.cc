@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <winnls.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>

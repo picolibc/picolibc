@@ -12,8 +12,6 @@ details. */
 #define CYGTLS_HANDLE
 #include "winsup.h"
 #include "miscfuncs.h"
-#include <wingdi.h>
-#include <winuser.h>
 #include <imagehlp.h>
 #include <stdlib.h>
 #include <syslog.h>

@@ -14,9 +14,6 @@ details. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
-#include <wingdi.h>
-#include <winuser.h>
-#include <winnls.h>
 #include <ctype.h>
 #include <sys/param.h>
 #include <sys/cygwin.h>

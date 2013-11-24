@@ -14,8 +14,6 @@ details. */
 #include <unistd.h>
 #include <process.h>
 #include <sys/wait.h>
-#include <wingdi.h>
-#include <winuser.h>
 #include <wchar.h>
 #include <ctype.h>
 #include <sys/cygwin.h>

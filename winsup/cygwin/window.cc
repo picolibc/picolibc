@@ -13,8 +13,6 @@ details. */
 
 #include "winsup.h"
 #include <sys/time.h>
-#include <wingdi.h>
-#include <winuser.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include "perprocess.h"

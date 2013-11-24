@@ -1,3 +1,14 @@
+2013-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	Throughout, drop unnecessary explicit includes of windows header files
+	included by default.
+	* winlean.h: Add long comment to explain why we have to define certain
+	symbols.
+	(_NORMALIZE_): Define.
+	(_WINNLS_): Drop definition and subsequent undef.
+	(_WINNETWK_): Ditto.
+	(_WINSVC_): Ditto.
+	
 2013-11-23  Eric Blake  <eblake@redhat.com>
 
 	dup2: fix off-by-one crash

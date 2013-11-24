@@ -17,7 +17,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "cygthread.h"
-#include <winnetwk.h>
 
 #include <dirent.h>
 

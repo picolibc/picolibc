@@ -26,8 +26,6 @@ details. */
 #include "spinlock.h"
 #include <alloca.h>
 #include <wchar.h>
-#include <wingdi.h>
-#include <winuser.h>
 
 shared_info NO_COPY *cygwin_shared;
 user_info NO_COPY *user_shared;

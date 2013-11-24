@@ -19,8 +19,6 @@ details. */
 #include <sys/param.h>
 #include "ntdll.h"
 
-#include <wingdi.h>
-#include <winuser.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include <netdb.h>

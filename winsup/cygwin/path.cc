@@ -52,10 +52,6 @@
 #include "miscfuncs.h"
 #include <ctype.h>
 #include <winioctl.h>
-#include <wingdi.h>
-#include <winuser.h>
-#include <winnetwk.h>
-#include <winnls.h>
 #include <shlobj.h>
 #include <sys/param.h>
 #include <sys/cygwin.h>

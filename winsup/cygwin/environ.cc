@@ -16,7 +16,6 @@ details. */
 #include <locale.h>
 #include <assert.h>
 #include <cygwin/version.h>
-#include <winnls.h>
 #include "pinfo.h"
 #include "perprocess.h"
 #include "path.h"
