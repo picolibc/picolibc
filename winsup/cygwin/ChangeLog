@@ -1,5 +1,9 @@
 2013-11-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dtable.cc: Include sys/param.h for MAX definition.
+
+2013-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	Throughout, drop unnecessary explicit includes of windows header files
 	included by default.
 	* winlean.h: Add long comment to explain why we have to define certain

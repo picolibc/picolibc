@@ -16,6 +16,7 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 #include <wchar.h>
+#include <sys/param.h>
 
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
