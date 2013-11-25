@@ -66,7 +66,7 @@ int _EXFUN(posix_spawnp, (pid_t * __restrict, const char * __restrict,
  * File descriptor actions
  */
 int _EXFUN(posix_spawn_file_actions_init, (posix_spawn_file_actions_t *));
-int _EXFUN(posix_spawn_file_action_destroy, (posix_spawn_file_actions_t *));
+int _EXFUN(posix_spawn_file_actions_destroy, (posix_spawn_file_actions_t *));
 
 int _EXFUN(posix_spawn_file_actions_addopen,
 	(posix_spawn_file_actions_t * __restrict, int, const char * __restrict, int, mode_t)

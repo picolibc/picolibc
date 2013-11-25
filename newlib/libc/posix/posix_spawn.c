@@ -339,7 +339,7 @@ _DEFUN(posix_spawn_file_actions_init, (ret),
 }
 
 int
-_DEFUN(posix_spawn_file_action_destroy, (fa),
+_DEFUN(posix_spawn_file_actions_destroy, (fa),
 	posix_spawn_file_actions_t *fa)
 {
 	posix_spawn_file_actions_entry_t *fae;

@@ -1,3 +1,9 @@
+2013-11-25  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/spawn.h (posix_spawn_file_actions_destroy): Fix typo
+	in function name.
+	* libc/posix/posix_spawn.c (posix_spawn_file_actions_destroy): Ditto.
+
 2013-11-25  Sahil Patnayakuni <sahil.patnayakuni@gmail.com>
 
 	* libc/include/time.h (time): Add restrict keyword.
