@@ -177,7 +177,7 @@ readdir (DIR *dir)
 }
 
 extern "C" int
-readdir_r (DIR *dir, dirent *de, dirent **ode)
+readdir_r (DIR *__restrict dir, dirent *__restrict de, dirent **__restrict ode)
 {
   int res = readdir_worker (dir, de);
   if (!res)

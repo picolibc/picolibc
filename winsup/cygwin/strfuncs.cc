@@ -681,7 +681,7 @@ sys_mbstowcs_alloc (wchar_t **dst_p, int type, const char *src, size_t nms)
    NUL-terminate the destination string (s1).
    Return pointer to terminating byte in dst string.  */
 char * __stdcall
-strccpy (char *s1, const char **s2, char c)
+strccpy (char *__restrict s1, const char **__restrict s2, char c)
 {
   while (**s2 && **s2 != c)
     *s1++ = *((*s2)++);

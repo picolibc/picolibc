@@ -1,3 +1,8 @@
+2013-11-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	Throughout, keep function definitions and declarations in sync with
+	newlib in terms of C99 "restrict" keyword.
+
 2013-11-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc: Include sys/param.h for MAX definition.

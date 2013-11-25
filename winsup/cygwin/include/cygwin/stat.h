@@ -1,6 +1,6 @@
 /* cygwin/stat.h
 
-   Copyright 2002, 2007, 2010 Red Hat Inc.
+   Copyright 2002, 2007, 2010, 2013 Red Hat Inc.
    Written by Corinna Vinschen <corinna@vinschen.de>
 
 This file is part of Cygwin.
@@ -56,8 +56,10 @@ struct __stat32
 #endif
 
 extern int fstat64 (int fd, struct stat *buf);
-extern int stat64 (const char *file_name, struct stat *buf);
-extern int lstat64 (const char *file_name, struct stat *buf);
+extern int stat64 (const char *__restrict file_name,
+		   struct stat *__restrict buf);
+extern int lstat64 (const char *__restrict file_name,
+		    struct stat *__restrict buf);
 
 #endif
 

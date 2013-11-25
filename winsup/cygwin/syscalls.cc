@@ -1885,7 +1885,7 @@ stat_worker (path_conv &pc, struct stat *buf)
 }
 
 extern "C" int
-stat64 (const char *name, struct stat *buf)
+stat64 (const char *__restrict name, struct stat *__restrict buf)
 {
   syscall_printf ("entering");
   path_conv pc (name, PC_SYM_FOLLOW | PC_POSIX | PC_KEEP_HANDLE,
@@ -1894,7 +1894,8 @@ stat64 (const char *name, struct stat *buf)
 }
 
 extern "C" int
-_stat64_r (struct _reent *ptr, const char *name, struct stat *buf)
+_stat64_r (struct _reent *__restrict ptr, const char *__restrict name,
+	   struct stat *buf)
 {
   int ret;
 
@@ -1908,7 +1909,7 @@ EXPORT_ALIAS (stat64, stat)
 EXPORT_ALIAS (_stat64_r, _stat_r)
 #else
 extern "C" int
-stat (const char *name, struct stat *buf)
+stat (const char *__restrict name, struct stat *__restrict buf)
 {
   struct stat buf64;
   int ret = stat64 (name, &buf64);
@@ -1918,7 +1919,8 @@ stat (const char *name, struct stat *buf)
 }
 
 extern "C" int
-_stat_r (struct _reent *ptr, const char *name, struct stat *buf)
+_stat_r (struct _reent *__restrict ptr, const char *__restrict name,
+	 struct stat *__restrict buf)
 {
   int ret;
 
@@ -1930,7 +1932,7 @@ _stat_r (struct _reent *ptr, const char *name, struct stat *buf)
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
 extern "C" int
-lstat64 (const char *name, struct stat *buf)
+lstat64 (const char *__restrict name, struct stat *__restrict buf)
 {
   syscall_printf ("entering");
   path_conv pc (name, PC_SYM_NOFOLLOW | PC_POSIX | PC_KEEP_HANDLE,
@@ -1943,7 +1945,7 @@ EXPORT_ALIAS (lstat64, lstat)
 #else
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
 extern "C" int
-lstat (const char *name, struct stat *buf)
+lstat (const char *__restrict name, struct stat *__restrict buf)
 {
   struct stat buf64;
   int ret = lstat64 (name, &buf64);
@@ -4462,7 +4464,8 @@ fchownat (int dirfd, const char *pathname, uid_t uid, gid_t gid, int flags)
 }
 
 extern "C" int
-fstatat (int dirfd, const char *pathname, struct stat *st, int flags)
+fstatat (int dirfd, const char *__restrict pathname, struct stat *__restrict st,
+	 int flags)
 {
   tmp_pathbuf tp;
   myfault efault;
@@ -4592,7 +4595,8 @@ mknodat (int dirfd, const char *pathname, mode_t mode, dev_t dev)
 }
 
 extern "C" ssize_t
-readlinkat (int dirfd, const char *pathname, char *buf, size_t bufsize)
+readlinkat (int dirfd, const char *__restrict pathname, char *__restrict buf,
+	    size_t bufsize)
 {
   tmp_pathbuf tp;
   myfault efault;

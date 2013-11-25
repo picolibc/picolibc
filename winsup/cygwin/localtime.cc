@@ -1749,7 +1749,7 @@ localsub(const timezone_t sp, const time_t * const timep, const long offset,
 ** Re-entrant version of localtime.
 */
 extern "C" struct tm *
-localtime_r(const time_t *timep, struct tm *tmp)
+localtime_r(const time_t *__restrict timep, struct tm *__restrict tmp)
 {
 	tzset_guard.init ("tzset_guard")->acquire ();
 	tzset_unlocked();
@@ -1820,7 +1820,7 @@ gmtime(const time_t *const timep)
 */
 
 extern "C" struct tm *
-gmtime_r(const time_t * const timep, struct tm *tmp)
+gmtime_r(const time_t *__restrict const timep, struct tm *__restrict tmp)
 {
 	tmp = gmtsub(NULL, timep, 0L, tmp);
 

@@ -65,7 +65,8 @@ typedef struct __DIR
 DIR *opendir (const char *);
 DIR *fdopendir (int);
 struct dirent *readdir (DIR *);
-int readdir_r (DIR *, struct dirent *, struct dirent **);
+int readdir_r (DIR * __restrict, struct dirent * __restrict,
+	       struct dirent ** __restrict);
 void rewinddir (DIR *);
 int closedir (DIR *);
 

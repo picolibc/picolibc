@@ -2989,7 +2989,7 @@ symlink_info::set (char *path)
 /* readlink system call */
 
 extern "C" ssize_t
-readlink (const char *path, char *buf, size_t buflen)
+readlink (const char *__restrict path, char *__restrict buf, size_t buflen)
 {
   if (buflen < 0)
     {
@@ -3413,7 +3413,7 @@ cygwin_conv_to_full_posix_path (const char *path, char *posix_path)
 /* The realpath function is required by POSIX:2008.  */
 
 extern "C" char *
-realpath (const char *path, char *resolved)
+realpath (const char *__restrict path, char *__restrict resolved)
 {
   /* Make sure the right errno is returned if path is NULL. */
   if (!path)

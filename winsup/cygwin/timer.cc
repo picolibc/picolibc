@@ -1,6 +1,6 @@
 /* timer.cc
 
-   Copyright 2004, 2005, 2006, 2008, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2004, 2005, 2006, 2008, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -295,7 +295,8 @@ timer_gettime (timer_t timerid, struct itimerspec *ovalue)
 }
 
 extern "C" int
-timer_create (clockid_t clock_id, struct sigevent *evp, timer_t *timerid)
+timer_create (clockid_t clock_id, struct sigevent *__restrict evp,
+	      timer_t *__restrict timerid)
 {
   myfault efault;
   if (efault.faulted (EFAULT))
@@ -318,8 +319,9 @@ timer_create (clockid_t clock_id, struct sigevent *evp, timer_t *timerid)
 }
 
 extern "C" int
-timer_settime (timer_t timerid, int flags, const struct itimerspec *value,
-	       struct itimerspec *ovalue)
+timer_settime (timer_t timerid, int flags,
+	       const struct itimerspec *__restrict value,
+	       struct itimerspec *__restrict ovalue)
 {
   timer_tracker *tt = (timer_tracker *) timerid;
   myfault efault;
@@ -374,7 +376,8 @@ fixup_timers_after_fork ()
 
 
 extern "C" int
-setitimer (int which, const struct itimerval *value, struct itimerval *ovalue)
+setitimer (int which, const struct itimerval *__restrict value,
+	   struct itimerval *__restrict ovalue)
 {
   int ret;
   if (which != ITIMER_REAL)

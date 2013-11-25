@@ -158,7 +158,7 @@ totimeval (struct timeval *dst, PLARGE_INTEGER src, int sub, int flag)
 
 /* FIXME: Make thread safe */
 extern "C" int
-gettimeofday (struct timeval *tv, void *tzvp)
+gettimeofday (struct timeval *__restrict tv, void *__restrict tzvp)
 {
   struct timezone *tz = (struct timezone *) tzvp;
   static bool tzflag;

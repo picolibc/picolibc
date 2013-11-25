@@ -793,7 +793,7 @@ memset (void *s, int c, size_t n)
 }
 
 extern "C" void *
-memcpy(void *dest, const void *src, size_t n)
+memcpy(void *__restrict dest, const void *__restrict src, size_t n)
 {
   RtlCopyMemory (dest, src, n);
   return dest;

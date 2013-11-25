@@ -1,6 +1,6 @@
 /* string.h: Extra string defs
 
-   Copyright 2001, 2002, 2003, 2007, 2008, 2011, 2012 Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2007, 2008, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -89,7 +89,8 @@ char * __stdcall cygwin_strupr (char *);
 
 #endif /* __INSIDE_CYGWIN__ */
 
-char *__stdcall strccpy (char *s1, const char **s2, char c);
+char *__stdcall strccpy (char *__restrict s1, const char **__restrict s2,
+			 char c);
 
 #ifdef __cplusplus
 }
