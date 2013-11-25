@@ -51,12 +51,17 @@ char	  *_EXFUN(ctime,    (const time_t *_time));
 struct tm *_EXFUN(gmtime,   (const time_t *_timer));
 struct tm *_EXFUN(localtime,(const time_t *_timer));
 #endif
-size_t	   _EXFUN(strftime, (char *_s, size_t _maxsize, const char *_fmt, const struct tm *_t));
+size_t	   _EXFUN(strftime, (char *__restrict _s,
+			     size_t _maxsize, const char *__restrict _fmt,
+			     const struct tm *__restrict _t));
 
-char	  *_EXFUN(asctime_r,	(const struct tm *, char *));
+char	  *_EXFUN(asctime_r,	(const struct tm *__restrict,
+				 char *__restrict));
 char	  *_EXFUN(ctime_r,	(const time_t *, char *));
-struct tm *_EXFUN(gmtime_r,	(const time_t *, struct tm *));
-struct tm *_EXFUN(localtime_r,	(const time_t *, struct tm *));
+struct tm *_EXFUN(gmtime_r,	(const time_t *__restrict,
+				 struct tm *__restrict));
+struct tm *_EXFUN(localtime_r,	(const time_t *__restrict,
+				 struct tm *__restrict));
 
 _END_STD_C
 
@@ -65,7 +70,9 @@ extern "C" {
 #endif
 
 #ifndef __STRICT_ANSI__
-char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
+char      *_EXFUN(strptime,     (const char *__restrict,
+				 const char *__restrict,
+				 struct tm *__restrict));
 _VOID      _EXFUN(tzset,	(_VOID));
 _VOID      _EXFUN(_tzset_r,	(struct _reent *));
 
@@ -150,7 +157,9 @@ int _EXFUN(clock_getres,  (clockid_t clock_id, struct timespec *res));
 /* Create a Per-Process Timer, P1003.1b-1993, p. 264 */
 
 int _EXFUN(timer_create,
-  (clockid_t clock_id, struct sigevent *evp, timer_t *timerid));
+  	(clockid_t clock_id,
+ 	struct sigevent *__restrict evp,
+	timer_t *__restrict timerid));
 
 /* Delete a Per_process Timer, P1003.1b-1993, p. 266 */
 
@@ -159,8 +168,9 @@ int _EXFUN(timer_delete, (timer_t timerid));
 /* Per-Process Timers, P1003.1b-1993, p. 267 */
 
 int _EXFUN(timer_settime,
-  (timer_t timerid, int flags, const struct itimerspec *value,
-   struct itimerspec *ovalue));
+	(timer_t timerid, int flags,
+	const struct itimerspec *__restrict value,
+	struct itimerspec *__restrict ovalue));
 int _EXFUN(timer_gettime, (timer_t timerid, struct itimerspec *value));
 int _EXFUN(timer_getoverrun, (timer_t timerid));
 

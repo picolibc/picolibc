@@ -29,8 +29,8 @@ int
 timer_settime (timerid, flags, value, ovalue)
      timer_t timerid;
      int flags;
-     const struct itimerspec *value;
-     struct itimerspec *ovalue;
+     const struct itimerspec *__restrict value;
+     struct itimerspec *__restrict ovalue;
 {
   struct timer_node *timer;
   struct thread_node *thread = NULL;

@@ -7,8 +7,8 @@
 
 char *
 _DEFUN (asctime_r, (tim_p, result),
-	_CONST struct tm *tim_p _AND
-	char *result)
+	_CONST struct tm *__restrict tim_p _AND
+	char *__restrict result)
 {
   static _CONST char day_name[7][3] = {
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"

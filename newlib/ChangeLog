@@ -1,3 +1,14 @@
+2013-11-25  Sahil Patnayakuni <sahil.patnayakuni@gmail.com>
+
+	* libc/include/time.h (time): Add restrict keyword.
+	* libc/include/wchar.h (wcsftime): Add restrict keyword.
+	* libc/time/asctime_r.c (asctime_r): Same.
+	* libc/time/gmtime_r.c (gmtime_r): Same.  
+	* libc/time/lcltime_r.c (lcltime_r): Same.     
+	* libc/time/strftime.c (strftime): Same.   
+	* libc/time/strptime.c (strptime): Same.  
+	* libc/sys/linux/linuxthreads/timer_create.c (timer_create): Same.   
+	* libc/sys/linux/linuxthreads/timer_settime.c (timer_settime): Same.                            
 2013-11-23 Bryan Dunsmore <dunsmoreb@gmail.com>
 
 	* libc/include/wordexp.h (wordexp): Add restrict keyword.

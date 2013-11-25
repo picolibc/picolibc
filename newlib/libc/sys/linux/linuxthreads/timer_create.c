@@ -30,8 +30,8 @@
 int
 timer_create (clock_id, evp, timerid)
      clockid_t clock_id;
-     struct sigevent *evp;
-     timer_t *timerid;
+     struct sigevent *__restrict evp;
+     timer_t *__restrict timerid;
 {
   int retval = -1;
   struct timer_node *newtimer = NULL;

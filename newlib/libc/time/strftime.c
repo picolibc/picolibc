@@ -24,8 +24,9 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <time.h>
-	size_t strftime(char *<[s]>, size_t <[maxsize]>,
-			const char *<[format]>, const struct tm *<[timp]>);
+	size_t strftime(char *restrict<[s]>, size_t <[maxsize]>,
+			const char *restrict<[format]>,
+                        const struct tm *restrict<[timp]>);
 
 TRAD_SYNOPSIS
 	#include <time.h>
@@ -662,10 +663,10 @@ static size_t __strftime (CHAR *, size_t, const CHAR *, const struct tm *,
 
 size_t
 _DEFUN (strftime, (s, maxsize, format, tim_p),
-	CHAR *s _AND
+	CHAR *__restrict s _AND
 	size_t maxsize _AND
-	_CONST CHAR *format _AND
-	_CONST struct tm *tim_p)
+	_CONST CHAR *__restrict format _AND
+	_CONST struct tm *__restrict tim_p)
 {
   era_info_t *era_info = NULL;
   alt_digits_t *alt_digits = NULL;
@@ -686,10 +687,10 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
 
 size_t
 _DEFUN (strftime, (s, maxsize, format, tim_p),
-	CHAR *s _AND
+	CHAR *__restrict s _AND
 	size_t maxsize _AND
-	_CONST CHAR *format _AND
-	_CONST struct tm *tim_p)
+	_CONST CHAR *__restrict format _AND
+	_CONST struct tm *__restrict tim_p)
 #endif /* !_WANT_C99_TIME_FORMATS */
 {
   size_t count = 0;
