@@ -1,3 +1,8 @@
+2013-11-25  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/iconv/lib/iconv.c, libc/time/strftime.c: Change "restrict<" to
+	"restrict <" to fix formatting.
+
 2013-11-25  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/spawn.h (posix_spawn_file_actions_destroy): Fix typo
