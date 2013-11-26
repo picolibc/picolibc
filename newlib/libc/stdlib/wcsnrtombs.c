@@ -13,8 +13,9 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-	size_t wcsrtombs(char *<[dst]>, const wchar_t **<[src]>, size_t <[len]>,
-			 mbstate_t *<[ps]>);
+	size_t wcsrtombs(char *__restrict <[dst]>,
+			 const wchar_t **__restrict <[src]>, size_t <[len]>,
+			 mbstate_t *__restrict <[ps]>);
 
 	#include <wchar.h>
 	size_t _wcsrtombs_r(struct _reent *<[ptr]>, char *<[dst]>,
@@ -22,8 +23,10 @@ ANSI_SYNOPSIS
 			    mbstate_t *<[ps]>);
 
 	#include <wchar.h>
-	size_t wcsnrtombs(char *<[dst]>, const wchar_t **<[src]>,
-			  size_t <[nwc]>, size_t <[len]>, mbstate_t *<[ps]>);
+	size_t wcsnrtombs(char *__restrict <[dst]>,
+			  const wchar_t **__restrict <[src]>,
+			  size_t <[nwc]>, size_t <[len]>,
+			  mbstate_t *__restrict <[ps]>);
 
 	#include <wchar.h>
 	size_t _wcsnrtombs_r(struct _reent *<[ptr]>, char *<[dst]>,
@@ -33,10 +36,10 @@ ANSI_SYNOPSIS
 TRAD_SYNOPSIS
 	#include <wchar.h>
 	size_t wcsrtombs(<[dst]>, <[src]>, <[len]>, <[ps]>)
-	char *<[dst]>;
-	const wchar_t **<[src]>;
+	char *__restrict <[dst]>;
+	const wchar_t **__restrict <[src]>;
 	size_t <[len]>;
-	mbstate_t *<[ps]>;
+	mbstate_t *__restrict <[ps]>;
 
 	#include <wchar.h>
 	size_t _wcsrtombs_r(<[ptr]>, <[dst]>, <[src]>, <[len]>, <[ps]>)
@@ -48,11 +51,11 @@ TRAD_SYNOPSIS
 
 	#include <wchar.h>
 	size_t wcsnrtombs(<[dst]>, <[src]>, <[nwc]>, <[len]>, <[ps]>)
-	char *<[dst]>;
-	const wchar_t **<[src]>;
+	char *__restrict <[dst]>;
+	const wchar_t **__restrict <[src]>;
 	size_t <[nwc]>;
 	size_t <[len]>;
-	mbstate_t *<[ps]>;
+	mbstate_t *__restrict <[ps]>;
 
 	#include <wchar.h>
 	size_t _wcsnrtombs_r(<[ptr]>, <[dst]>, <[src]>, <[nwc]>, <[len]>, <[ps]>)
@@ -174,11 +177,11 @@ _DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
 #ifndef _REENT_ONLY
 size_t
 _DEFUN (wcsnrtombs, (dst, src, nwc, len, ps),
-	char *dst _AND
-	const wchar_t **src _AND
+	char *__restrict dst _AND
+	const wchar_t **__restrict src _AND
 	size_t nwc _AND
 	size_t len _AND
-	mbstate_t *ps)
+	mbstate_t *__restrict ps)
 {
   return _wcsnrtombs_r (_REENT, dst, src, nwc, len, ps);
 }

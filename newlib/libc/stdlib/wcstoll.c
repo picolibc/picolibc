@@ -9,7 +9,8 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-        long long wcstoll(const wchar_t *<[s]>, wchar_t **<[ptr]>,int <[base]>);
+        long long wcstoll(const wchar_t *__restrict <[s]>,
+        	wchar_t **__restrict <[ptr]>,int <[base]>);
 
         long long _wcstoll_r(void *<[reent]>, 
                        const wchar_t *<[s]>, wchar_t **<[ptr]>,int <[base]>);
@@ -17,8 +18,8 @@ ANSI_SYNOPSIS
 TRAD_SYNOPSIS
 	#include <stdlib.h>
 	long long wcstoll (<[s]>, <[ptr]>, <[base]>)
-        const wchar_t *<[s]>;
-        wchar_t **<[ptr]>;
+        const wchar_t *__restrict <[s]>;
+        wchar_t **__restrict <[ptr]>;
         int <[base]>;
 
 	long long _wcstoll_r (<[reent]>, <[s]>, <[ptr]>, <[base]>)
@@ -128,8 +129,8 @@ No supporting OS subroutines are required.
 
 long long
 _DEFUN (wcstoll, (s, ptr, base),
-	_CONST wchar_t *s _AND
-	wchar_t **ptr _AND
+	_CONST wchar_t *__restrict s _AND
+	wchar_t **__restrict ptr _AND
 	int base)
 {
 	return _wcstoll_r (_REENT, s, ptr, base);

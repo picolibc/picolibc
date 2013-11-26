@@ -42,9 +42,9 @@ _DEFUN (_wcrtomb_r, (ptr, s, wc, ps),
 #ifndef _REENT_ONLY
 size_t
 _DEFUN (wcrtomb, (s, wc, ps),
-	char *s _AND
+	char *__restrict s _AND
 	wchar_t wc _AND
-	mbstate_t *ps)
+	mbstate_t *__restrict ps)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   return _wcrtomb_r (_REENT, s, wc, ps);

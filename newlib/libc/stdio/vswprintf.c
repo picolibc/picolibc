@@ -71,9 +71,9 @@ _DEFUN(_vswprintf_r, (ptr, str, size, fmt, ap),
 
 int
 _DEFUN(vswprintf, (str, size, fmt, ap),
-       wchar_t *str        _AND
+       wchar_t *__restrict str        _AND
        size_t size      _AND
-       const wchar_t *fmt _AND
+       const wchar_t *__restrict fmt _AND
        va_list ap)
 {
   return _vswprintf_r (_REENT, str, size, fmt, ap);

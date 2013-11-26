@@ -35,14 +35,16 @@ INDEX
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
-	int vwscanf(const wchar_t *<[fmt]>, va_list <[list]>);
-	int vfwscanf(FILE *<[fp]>, const wchar_t *<[fmt]>, va_list <[list]>);
-	int vswscanf(const wchar_t *<[str]>, const wchar_t *<[fmt]>, va_list <[list]>);
+	int vwscanf(const wchar_t *__restrict <[fmt]>, va_list <[list]>);
+	int vfwscanf(FILE *__restrict <[fp]>,
+                     const wchar_t *__restrict <[fmt]>, va_list <[list]>);
+	int vswscanf(const wchar_t *__restrict <[str]>,
+                     const wchar_t *__restrict <[fmt]>, va_list <[list]>);
 
 	int _vwscanf(struct _reent *<[reent]>, const wchar_t *<[fmt]>,
                        va_list <[list]>);
-	int _vfwscanf(struct _reent *<[reent]>, FILE *<[fp]>, const wchar_t *<[fmt]>,
-                       va_list <[list]>);
+	int _vfwscanf(struct _reent *<[reent]>, FILE *<[fp]>,
+                      const wchar_t *<[fmt]>, va_list <[list]>);
 	int _vswscanf(struct _reent *<[reent]>, const wchar_t *<[str]>,
                        const wchar_t *<[fmt]>, va_list <[list]>);
 
@@ -50,17 +52,17 @@ TRAD_SYNOPSIS
 	#include <stdio.h>
 	#include <varargs.h>
 	int vwscanf( <[fmt]>, <[ist]>)
-	wchar_t *<[fmt]>;
+	wchar_t *__restrict <[fmt]>;
 	va_list <[list]>;
 
 	int vfwscanf( <[fp]>, <[fmt]>, <[list]>)
-	FILE *<[fp]>;
-	wchar_t *<[fmt]>;
+	FILE *__restrict <[fp]>;
+	wchar_t *__restrict <[fmt]>;
 	va_list <[list]>;
 
 	int vswscanf( <[str]>, <[fmt]>, <[list]>)
-	wchar_t *<[str]>;
-	wchar_t *<[fmt]>;
+	wchar_t *__restrict <[str]>;
+	wchar_t *__restrict <[fmt]>;
 	va_list <[list]>;
 
 	int _vwscanf( <[reent]>, <[fmt]>, <[ist]>)
@@ -254,8 +256,8 @@ static void * get_arg (int, va_list *, int *, void **);
 
 int
 _DEFUN(VFWSCANF, (fp, fmt, ap),
-       register FILE *fp _AND
-       _CONST wchar_t *fmt _AND
+       register FILE *__restrict fp _AND
+       _CONST wchar_t *__restrict fmt _AND
        va_list ap)
 {
   struct _reent *reent = _REENT;

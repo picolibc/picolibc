@@ -9,8 +9,8 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-        unsigned long long wcstoull(const wchar_t *<[s]>, wchar_t **<[ptr]>,
-                              int <[base]>);
+        unsigned long long wcstoull(const wchar_t *__restrict <[s]>,
+                              wchar_t **__restrict <[ptr]>, int <[base]>);
 
         unsigned long long _wcstoull_r(void *<[reent]>, const wchar_t *<[s]>,
                               wchar_t **<[ptr]>, int <[base]>);
@@ -18,8 +18,8 @@ ANSI_SYNOPSIS
 TRAD_SYNOPSIS
 	#include <wchar.h>
         unsigned long long wcstoull(<[s]>, <[ptr]>, <[base]>)
-        wchar_t *<[s]>;
-        wchar_t **<[ptr]>;
+        wchar_t *__restrict <[s]>;
+        wchar_t **__restrict <[ptr]>;
         int <[base]>;
 
         unsigned long long _wcstoull_r(<[reent]>, <[s]>, <[ptr]>, <[base]>)
@@ -130,8 +130,8 @@ PORTABILITY
 
 unsigned long long
 _DEFUN (wcstoull, (s, ptr, base),
-	_CONST wchar_t *s _AND
-	wchar_t **ptr _AND
+	_CONST wchar_t *__restrict s _AND
+	wchar_t **__restrict ptr _AND
 	int base)
 {
 	return _wcstoull_r (_REENT, s, ptr, base);

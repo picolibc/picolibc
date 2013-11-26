@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* On platforms where long double is as wide as double.  */
 #ifdef _LDBL_EQ_DBL
 long double
-wcstold (const wchar_t *nptr, wchar_t **endptr)
+wcstold (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
 {
   return wcstod(nptr, endptr);
 }

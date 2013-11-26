@@ -7,13 +7,14 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-	int wcsxfrm(wchar_t *<[stra]>, const wchar_t * <[strb]>, size_t <[n]>);
+	int wcsxfrm(wchar_t *__restrict <[stra]>,
+		    const wchar_t *__restrict <[strb]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
 	#include <wchar.h>
 	size_t wcsxfrm(<[stra]>, <[strb]>, <[n]>)
-	wchar_t *<[stra]>;
-	wchar_t *<[strb]>;
+	wchar_t *__restrict <[stra]>;
+	wchar_t *__restrict <[strb]>;
 	size_t   <[n]>
 
 DESCRIPTION
@@ -43,8 +44,8 @@ PORTABILITY
 
 size_t
 _DEFUN (wcsxfrm, (a, b, n),
-	wchar_t *a _AND
-	_CONST wchar_t *b _AND
+	wchar_t *__restrict a _AND
+	_CONST wchar_t *__restrict b _AND
 	size_t n)
 
 {

@@ -13,8 +13,10 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-	size_t mbsrtowcs(wchar_t *<[dst]>, const char **<[src]>, size_t <[len]>,
-			 mbstate_t *<[ps]>);
+	size_t mbsrtowcs(wchar_t *__restrict <[dst]>,
+			 const char **__restrict <[src]>,
+			 size_t <[len]>,
+			 mbstate_t *__restrict <[ps]>);
 
 	#include <wchar.h>
 	size_t _mbsrtowcs_r(struct _reent *<[ptr]>, wchar_t *<[dst]>,
@@ -22,8 +24,9 @@ ANSI_SYNOPSIS
 			    mbstate_t *<[ps]>);
 
 	#include <wchar.h>
-	size_t mbsnrtowcs(wchar_t *<[dst]>, const char **<[src]>,
-			  size_t <[nms]>, size_t <[len]>, mbstate_t *<[ps]>);
+	size_t mbsnrtowcs(wchar_t *__ restrict <[dst]>, 
+			  const char **__restrict <[src]>, size_t <[nms]>,
+			  size_t <[len]>, mbstate_t *__restrict <[ps]>);
 
 	#include <wchar.h>
 	size_t _mbsnrtowcs_r(struct _reent *<[ptr]>, wchar_t *<[dst]>,
@@ -33,10 +36,10 @@ ANSI_SYNOPSIS
 TRAD_SYNOPSIS
 	#include <wchar.h>
 	size_t mbsrtowcs(<[dst]>, <[src]>, <[len]>, <[ps]>)
-	wchar_t *<[dst]>;
-	const char **<[src]>;
+	wchar_t *__restrict <[dst]>;
+	const char **__restrict <[src]>;
 	size_t <[len]>;
-	mbstate_t *<[ps]>;
+	mbstate_t *__restrict <[ps]>;
 
 	#include <wchar.h>
 	size_t _mbsrtowcs_r(<[ptr]>, <[dst]>, <[src]>, <[len]>, <[ps]>)
@@ -48,11 +51,11 @@ TRAD_SYNOPSIS
 
 	#include <wchar.h>
 	size_t mbsnrtowcs(<[dst]>, <[src]>, <[nms]>, <[len]>, <[ps]>)
-	wchar_t *<[dst]>;
-	const char **<[src]>;
+	wchar_t *__restrict <[dst]>;
+	const char **__restrict <[src]>;
 	size_t <[nms]>;
 	size_t <[len]>;
-	mbstate_t *<[ps]>;
+	mbstate_t *__restrict <[ps]>;
 
 	#include <wchar.h>
 	size_t _mbsnrtowcs_r(<[ptr]>, <[dst]>, <[src]>, <[nms]>, <[len]>, <[ps]>)
@@ -168,11 +171,11 @@ _DEFUN (_mbsnrtowcs_r, (r, dst, src, nms, len, ps),
 #ifndef _REENT_ONLY
 size_t
 _DEFUN (mbsnrtowcs, (dst, src, nms, len, ps),
-	wchar_t *dst _AND
-	const char **src _AND
+	wchar_t *__restrict dst _AND
+	const char **__restrict src _AND
 	size_t nms _AND
 	size_t len _AND
-	mbstate_t *ps)
+	mbstate_t *__restrict ps)
 {
   return _mbsnrtowcs_r (_REENT, dst, src, nms, len, ps);
 }

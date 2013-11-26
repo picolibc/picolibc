@@ -36,15 +36,16 @@ ANSI_SYNOPSIS
         #include <wchar.h>
 
         int wprintf(const wchar_t *<[format]>, ...);
-        int fwprintf(FILE *<[fd]>, const wchar_t *<[format]>, ...);
-        int swprintf(wchar_t *<[str]>, size_t <[size]>,
-			const wchar_t *<[format]>, ...);
+        int fwprintf(FILE *__restrict <[fd]>,
+        	const wchar_t *__restrict <[format]>, ...);
+        int swprintf(wchar_t *__restrict <[str]>, size_t <[size]>,
+                     const wchar_t *__restrict <[format]>, ...);
 
         int _wprintf_r(struct _reent *<[ptr]>, const wchar_t *<[format]>, ...);
         int _fwprintf_r(struct _reent *<[ptr]>, FILE *<[fd]>,
-			const wchar_t *<[format]>, ...);
+                        const wchar_t *<[format]>, ...);
         int _swprintf_r(struct _reent *<[ptr]>, wchar_t *<[str]>,
-			size_t <[size]>, const wchar_t *<[format]>, ...);
+                        size_t <[size]>, const wchar_t *<[format]>, ...);
 
 DESCRIPTION
         <<wprintf>> accepts a series of arguments, applies to each a
@@ -590,9 +591,9 @@ _DEFUN(_swprintf_r, (ptr, str, size, fmt),
 
 int
 _DEFUN(swprintf, (str, size, fmt),
-       wchar_t *str   _AND
+       wchar_t *__restrict str   _AND
        size_t size _AND
-       _CONST wchar_t *fmt _DOTS)
+       _CONST wchar_t *__restrict fmt _DOTS)
 {
   int ret;
   va_list ap;

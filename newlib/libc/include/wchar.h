@@ -49,78 +49,92 @@ typedef _mbstate_t mbstate_t;
 
 wint_t	_EXFUN(btowc, (int));
 int	_EXFUN(wctob, (wint_t));
-size_t	_EXFUN(mbrlen, (const char * , size_t, mbstate_t *));
-size_t	_EXFUN(mbrtowc, (wchar_t * , const char * , size_t, mbstate_t *));
+size_t	_EXFUN(mbrlen, (const char *__restrict, size_t, mbstate_t *__restrict));
+size_t	_EXFUN(mbrtowc, (wchar_t *__restrict, const char *__restrict, size_t,
+						mbstate_t *__restrict));
 size_t	_EXFUN(_mbrtowc_r, (struct _reent *, wchar_t * , const char * , 
 			size_t, mbstate_t *));
 int	_EXFUN(mbsinit, (const mbstate_t *));
-size_t	_EXFUN(mbsnrtowcs, (wchar_t * , const char ** , size_t, size_t,
-			mbstate_t *));
+size_t	_EXFUN(mbsnrtowcs, (wchar_t *__restrict, const char **__restrict,
+				size_t, size_t, mbstate_t *__restrict));
 size_t	_EXFUN(_mbsnrtowcs_r, (struct _reent *, wchar_t * , const char ** ,
 			size_t, size_t, mbstate_t *));
-size_t	_EXFUN(mbsrtowcs, (wchar_t * , const char ** , size_t, mbstate_t *));
+size_t	_EXFUN(mbsrtowcs, (wchar_t *__restrict, const char **__restrict, size_t,
+				mbstate_t *__restrict));
 size_t	_EXFUN(_mbsrtowcs_r, (struct _reent *, wchar_t * , const char ** , size_t, mbstate_t *));
-size_t	_EXFUN(wcrtomb, (char * , wchar_t, mbstate_t *));
+size_t	_EXFUN(wcrtomb, (char *__restrict, wchar_t, mbstate_t *__restrict));
 size_t	_EXFUN(_wcrtomb_r, (struct _reent *, char * , wchar_t, mbstate_t *));
-size_t	_EXFUN(wcsnrtombs, (char * , const wchar_t ** , size_t, size_t,
-			mbstate_t *));
+size_t	_EXFUN(wcsnrtombs, (char *__restrict, const wchar_t **__restrict,
+				size_t, size_t, mbstate_t *__restrict));
 size_t	_EXFUN(_wcsnrtombs_r, (struct _reent *, char * , const wchar_t ** , 
 			size_t, size_t, mbstate_t *));
-size_t	_EXFUN(wcsrtombs, (char * , const wchar_t ** , size_t, mbstate_t *));
+size_t	_EXFUN(wcsrtombs, (char *__restrict, const wchar_t **__restrict,
+				size_t, mbstate_t *__restrict));
 size_t	_EXFUN(_wcsrtombs_r, (struct _reent *, char * , const wchar_t ** , 
 			size_t, mbstate_t *));
 int	_EXFUN(wcscasecmp, (const wchar_t *, const wchar_t *));
-wchar_t	*_EXFUN(wcscat, (wchar_t * , const wchar_t *));
+wchar_t	*_EXFUN(wcscat, (wchar_t *__restrict, const wchar_t *__restrict));
 wchar_t	*_EXFUN(wcschr, (const wchar_t *, wchar_t));
 int	_EXFUN(wcscmp, (const wchar_t *, const wchar_t *));
 int	_EXFUN(wcscoll, (const wchar_t *, const wchar_t *));
-wchar_t	*_EXFUN(wcscpy, (wchar_t * , const wchar_t *));
-wchar_t	*_EXFUN(wcpcpy, (wchar_t * , const wchar_t *));
+wchar_t	*_EXFUN(wcscpy, (wchar_t *__restrict, const wchar_t *__restrict));
+wchar_t	*_EXFUN(wcpcpy, (wchar_t *__restrict,
+				 const wchar_t *__restrict));
 wchar_t	*_EXFUN(wcsdup, (const wchar_t *));
 wchar_t	*_EXFUN(_wcsdup_r, (struct _reent *, const wchar_t * ));
 size_t	_EXFUN(wcscspn, (const wchar_t *, const wchar_t *));
 size_t  _EXFUN(wcsftime, (wchar_t *__restrict, size_t,
-               const wchar_t *__restrict, const struct tm *__restrict));
+				const wchar_t *__restrict, const struct tm *__restrict));
 size_t	_EXFUN(wcslcat, (wchar_t *, const wchar_t *, size_t));
 size_t	_EXFUN(wcslcpy, (wchar_t *, const wchar_t *, size_t));
 size_t	_EXFUN(wcslen, (const wchar_t *));
 int	_EXFUN(wcsncasecmp, (const wchar_t *, const wchar_t *, size_t));
-wchar_t	*_EXFUN(wcsncat, (wchar_t * , const wchar_t * , size_t));
+wchar_t	*_EXFUN(wcsncat, (wchar_t *__restrict,
+				 const wchar_t *__restrict, size_t));
 int	_EXFUN(wcsncmp, (const wchar_t *, const wchar_t *, size_t));
-wchar_t	*_EXFUN(wcsncpy, (wchar_t *  , const wchar_t * , size_t));
-wchar_t	*_EXFUN(wcpncpy, (wchar_t *  , const wchar_t * , size_t));
+wchar_t	*_EXFUN(wcsncpy, (wchar_t *__restrict,
+				 const wchar_t *__restrict, size_t));
+wchar_t	*_EXFUN(wcpncpy, (wchar_t *__restrict,
+				 const wchar_t *__restrict, size_t));
 size_t	_EXFUN(wcsnlen, (const wchar_t *, size_t));
 wchar_t	*_EXFUN(wcspbrk, (const wchar_t *, const wchar_t *));
 wchar_t	*_EXFUN(wcsrchr, (const wchar_t *, wchar_t));
 size_t	_EXFUN(wcsspn, (const wchar_t *, const wchar_t *));
-wchar_t	*_EXFUN(wcsstr, (const wchar_t *, const wchar_t *));
-wchar_t	*_EXFUN(wcstok, (wchar_t *, const wchar_t *, wchar_t **));
-double _EXFUN(wcstod, (const wchar_t *, wchar_t **));
+wchar_t	*_EXFUN(wcsstr, (const wchar_t *__restrict,
+				 const wchar_t *__restrict));
+wchar_t	*_EXFUN(wcstok, (wchar_t *__restrict, const wchar_t *__restrict,
+				 wchar_t **__restrict));
+double _EXFUN(wcstod, (const wchar_t *__restrict, wchar_t **__restrict));
 double _EXFUN(_wcstod_r, (struct _reent *, const wchar_t *, wchar_t **));
-float _EXFUN(wcstof, (const wchar_t *, wchar_t **));
+float _EXFUN(wcstof, (const wchar_t *__restrict, wchar_t **__restrict));
 float _EXFUN(_wcstof_r, (struct _reent *, const wchar_t *, wchar_t **));
 int	_EXFUN(wcswidth, (const wchar_t *, size_t));
-size_t	_EXFUN(wcsxfrm, (wchar_t *, const wchar_t *, size_t));
+size_t	_EXFUN(wcsxfrm, (wchar_t *__restrict, const wchar_t *__restrict,
+				size_t));
 int	_EXFUN(wcwidth, (const wchar_t));
 wchar_t	*_EXFUN(wmemchr, (const wchar_t *, wchar_t, size_t));
 int	_EXFUN(wmemcmp, (const wchar_t *, const wchar_t *, size_t));
-wchar_t	*_EXFUN(wmemcpy, (wchar_t * , const wchar_t * , size_t));
+wchar_t	*_EXFUN(wmemcpy, (wchar_t *__restrict, const wchar_t *__restrict,
+				 size_t));
 wchar_t	*_EXFUN(wmemmove, (wchar_t *, const wchar_t *, size_t));
 wchar_t	*_EXFUN(wmemset, (wchar_t *, wchar_t, size_t));
 
-long    _EXFUN(wcstol, (const wchar_t *, wchar_t **, int));
-long long _EXFUN(wcstoll, (const wchar_t *, wchar_t **, int));
-unsigned long _EXFUN(wcstoul, (const wchar_t *, wchar_t **, int));
-unsigned long long _EXFUN(wcstoull, (const wchar_t *, wchar_t **, int));
+long    _EXFUN(wcstol, (const wchar_t *__restrict, wchar_t **__restrict, int));
+long long _EXFUN(wcstoll, (const wchar_t *__restrict, wchar_t **__restrict,
+				  int));
+unsigned long _EXFUN(wcstoul, (const wchar_t *__restrict, wchar_t **__restrict,
+					  int));
+unsigned long long _EXFUN(wcstoull, (const wchar_t *__restrict,
+						   wchar_t **__restrict, int));
 long    _EXFUN(_wcstol_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 long long _EXFUN(_wcstoll_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 unsigned long _EXFUN(_wcstoul_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 unsigned long long _EXFUN(_wcstoull_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 
 wint_t _EXFUN(fgetwc, (__FILE *));
-wchar_t *_EXFUN(fgetws, (wchar_t *, int, __FILE *));
+wchar_t *_EXFUN(fgetws, (wchar_t *__restrict, int, __FILE *__restrict));
 wint_t _EXFUN(fputwc, (wchar_t, __FILE *));
-int _EXFUN(fputws, (const wchar_t *, __FILE *));
+int _EXFUN(fputws, (const wchar_t *__restrict, __FILE *__restrict));
 int _EXFUN (fwide, (__FILE *, int));
 wint_t _EXFUN (getwc, (__FILE *));
 wint_t _EXFUN (getwchar, (void));
@@ -150,12 +164,15 @@ __FILE *_EXFUN (_open_wmemstream_r, (struct _reent *, wchar_t **, size_t *));
 #endif
 #endif
 
-int	_EXFUN(fwprintf, (__FILE *, const wchar_t *, ...));
-int	_EXFUN(swprintf, (wchar_t *, size_t, const wchar_t *, ...));
-int	_EXFUN(vfwprintf, (__FILE *, const wchar_t *, __VALIST));
-int	_EXFUN(vswprintf, (wchar_t *, size_t, const wchar_t *, __VALIST));
-int	_EXFUN(vwprintf, (const wchar_t *, __VALIST));
-int	_EXFUN(wprintf, (const wchar_t *, ...));
+int	_EXFUN(fwprintf, (__FILE *__restrict, const wchar_t *__restrict, ...));
+int	_EXFUN(swprintf, (wchar_t *__restrict, size_t,
+			const wchar_t *__restrict, ...));
+int	_EXFUN(vfwprintf, (__FILE *__restrict, const wchar_t *__restrict,
+			__VALIST));
+int	_EXFUN(vswprintf, (wchar_t *__restrict, size_t,
+			const wchar_t *__restrict, __VALIST));
+int	_EXFUN(vwprintf, (const wchar_t *__restrict, __VALIST));
+int	_EXFUN(wprintf, (const wchar_t *__restrict, ...));
 
 int	_EXFUN(_fwprintf_r, (struct _reent *, __FILE *, const wchar_t *, ...));
 int	_EXFUN(_swprintf_r, (struct _reent *, wchar_t *, size_t, const wchar_t *, ...));
@@ -164,12 +181,15 @@ int	_EXFUN(_vswprintf_r, (struct _reent *, wchar_t *, size_t, const wchar_t *, _
 int	_EXFUN(_vwprintf_r, (struct _reent *, const wchar_t *, __VALIST));
 int	_EXFUN(_wprintf_r, (struct _reent *, const wchar_t *, ...));
 
-int	_EXFUN(fwscanf, (__FILE *, const wchar_t *, ...));
-int	_EXFUN(swscanf, (const wchar_t *, const wchar_t *, ...));
-int	_EXFUN(vfwscanf, (__FILE *, const wchar_t *, __VALIST));
-int	_EXFUN(vswscanf, (const wchar_t *, const wchar_t *, __VALIST));
-int	_EXFUN(vwscanf, (const wchar_t *, __VALIST));
-int	_EXFUN(wscanf, (const wchar_t *, ...));
+int	_EXFUN(fwscanf, (__FILE *__restrict, const wchar_t *__restrict, ...));
+int	_EXFUN(swscanf, (const wchar_t *__restrict,
+			const wchar_t *__restrict, ...));
+int	_EXFUN(vfwscanf, (__FILE *__restrict, const wchar_t *__restrict,
+			__VALIST));
+int	_EXFUN(vswscanf, (const wchar_t *__restrict, const wchar_t *__restrict,
+			__VALIST));
+int	_EXFUN(vwscanf, (const wchar_t *__restrict, __VALIST));
+int	_EXFUN(wscanf, (const wchar_t *__restrict, ...));
 
 int	_EXFUN(_fwscanf_r, (struct _reent *, __FILE *, const wchar_t *, ...));
 int	_EXFUN(_swscanf_r, (struct _reent *, const wchar_t *, const wchar_t *, ...));

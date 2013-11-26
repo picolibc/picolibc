@@ -27,7 +27,7 @@
 
 int
 _DEFUN(vwprintf, (fmt, ap),
-       _CONST wchar_t *fmt _AND
+       _CONST wchar_t *__restrict fmt _AND
        va_list ap)
 {
   struct _reent *reent = _REENT;

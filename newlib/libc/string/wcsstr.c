@@ -4,12 +4,13 @@ FUNCTION
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-	wchar_t *wcsstr(const wchar_t *<[big]>, const wchar_t *<[little]>);
+	wchar_t *wcsstr(const wchar_t *__restrict <[big]>,
+			const wchar_t *__restrict <[little]>);
 
 TRAD_SYNOPSIS
 	wchar_t *wcsstr(<[big]>, <[little]>
-	const wchar_t *<[big]>;
-	const wchar_t *<[little]>;
+	const wchar_t *__restrict <[big]>;
+	const wchar_t *__restrict <[little]>;
 
 DESCRIPTION
 	The <<wcsstr>> function locates the first occurrence in the
@@ -66,8 +67,8 @@ PORTABILITY
 
 wchar_t *
 _DEFUN (wcsstr, (big, little),
-	_CONST wchar_t * big _AND
-	_CONST wchar_t * little)
+	_CONST wchar_t *__restrict big _AND
+	_CONST wchar_t *__restrict little)
 {
   _CONST wchar_t *p;
   _CONST wchar_t *q;

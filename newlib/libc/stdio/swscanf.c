@@ -35,9 +35,11 @@ INDEX
 ANSI_SYNOPSIS
         #include <stdio.h>
 
-        int wscanf(const wchar_t *<[format]>, ...);
-        int fwscanf(FILE *<[fd]>, const wchar_t *<[format]>, ...);
-        int swscanf(const wchar_t *<[str]>, const wchar_t *<[format]>, ...);
+        int wscanf(const wchar_t *__restrict <[format]>, ...);
+        int fwscanf(FILE *__restrict <[fd]>,
+                    const wchar_t *__restrict <[format]>, ...);
+        int swscanf(const wchar_t *__restrict <[str]>, 
+                    const wchar_t *__restrict <[format]>, ...);
 
         int _wscanf_r(struct _reent *<[ptr]>, const wchar_t *<[format]>, ...);
         int _fwscanf_r(struct _reent *<[ptr]>, FILE *<[fd]>, 
@@ -50,15 +52,15 @@ TRAD_SYNOPSIS
 	#include <stdio.h>
 
 	int wscanf(<[format]> [, <[arg]>, ...])
-	wchar_t *<[format]>;
+	wchar_t *__restrict <[format]>;
 
 	int fwscanf(<[fd]>, <[format]> [, <[arg]>, ...]);
 	FILE *<[fd]>;
 	wchar_t *<[format]>;
 
 	int swscanf(<[str]>, <[format]> [, <[arg]>, ...]);
-	wchar_t *<[str]>;
-	wchar_t *<[format]>;
+	wchar_t *__restrict <[str]>;
+	wchar_t *__restrict <[format]>;
 
 	int _wscanf_r(<[ptr]>, <[format]> [, <[arg]>, ...])
         struct _reent *<[ptr]>;
@@ -378,7 +380,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifndef _REENT_ONLY 
 
 int 
-swscanf (_CONST wchar_t *str, _CONST wchar_t *fmt, ...)
+swscanf (_CONST wchar_t *__restrict str, _CONST wchar_t *__restrict fmt, ...)
 {
   int ret;
   va_list ap;

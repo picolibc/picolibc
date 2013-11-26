@@ -51,10 +51,11 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
 	#include <wchar.h>
-	int vwprintf(const wchar_t *<[fmt]>, va_list <[list]>);
-	int vfwprintf(FILE *<[fp]>, const wchar_t *<[fmt]>, va_list <[list]>);
-	int vswprintf(wchar_t *<[str]>, size_t <[size]>, const wchar_t *<[fmt]>,
-			va_list <[list]>);
+	int vwprintf(const wchar_t *__restrict <[fmt]>, va_list <[list]>);
+	int vfwprintf(FILE *__restrict <[fp]>,
+		const wchar_t *__restrict <[fmt]>, va_list <[list]>);
+	int vswprintf(wchar_t * __restrict <[str]>, size_t <[size]>,
+		const wchar_t *__ restrict <[fmt]>, va_list <[list]>);
 
 	int _vwprintf_r(struct _reent *<[reent]>, const wchar_t *<[fmt]>,
 		va_list <[list]>);
@@ -366,8 +367,8 @@ _EXFUN(get_arg, (struct _reent *data, int n, wchar_t *fmt,
 #ifndef STRING_ONLY
 int
 _DEFUN(VFWPRINTF, (fp, fmt0, ap),
-       FILE * fp         _AND
-       _CONST wchar_t *fmt0 _AND
+       FILE *__restrict fp         _AND
+       _CONST wchar_t *__restrict fmt0 _AND
        va_list ap)
 {
   int result;

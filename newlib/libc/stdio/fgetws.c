@@ -35,17 +35,19 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-	wchar_t *fgetws(wchar_t *<[ws]>, int <[n]>, FILE *<[fp]>);
+	wchar_t *fgetws(wchar_t *__restrict <[ws]>, int <[n]>,
+                        FILE *__restrict <[fp]>);
 
 	#include <wchar.h>
-	wchar_t *_fgetws_r(struct _reent *<[ptr]>, wchar_t *<[ws]>, int <[n]>, FILE *<[fp]>);
+	wchar_t *_fgetws_r(struct _reent *<[ptr]>, wchar_t *<[ws]>,
+                           int <[n]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <wchar.h>
 	wchar_t *fgetws(<[ws]>,<[n]>,<[fp]>)
-	wchar_t *<[ws]>;
+	wchar_t *__restrict <[ws]>;
 	int <[n]>;
-	FILE *<[fp]>;
+	FILE *__restrict <[fp]>;
 
 	#include <wchar.h>
 	wchar_t *_fgetws_r(<[ptr]>, <[ws]>,<[n]>,<[fp]>)
@@ -156,9 +158,9 @@ error:
 
 wchar_t *
 _DEFUN(fgetws, (ws, n, fp),
-	wchar_t *ws _AND
+	wchar_t *__restrict ws _AND
 	int n _AND
-	FILE *fp)
+	FILE *__restrict fp)
 {
   struct _reent *reent = _REENT;
 

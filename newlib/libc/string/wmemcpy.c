@@ -4,12 +4,13 @@ FUNCTION
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-	wchar_t *wmemcpy(wchar_t *<[d]>, const wchar_t *<[s]>, size_t <[n]>);
+	wchar_t *wmemcpy(wchar_t *__restrict <[d]>,
+			 const wchar_t *__restrict <[s]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
 	wchar_t *wmemcpy(<[d]>, <[s]>, <[n]>
-	wchar_t *<[d]>;
-	const wchar_t *<[s]>;
+	wchar_t *__restrict <[d]>;
+	const wchar_t *__restrict <[s]>;
 	size_t <[n]>;
 
 DESCRIPTION
@@ -67,8 +68,8 @@ No supporting OS subroutines are required.
 
 wchar_t *
 _DEFUN (wmemcpy, (d, s, n),
-	wchar_t * d _AND
-	_CONST wchar_t * s _AND
+	wchar_t *__restrict d _AND
+	_CONST wchar_t *__restrict s _AND
 	size_t n)
 {
 

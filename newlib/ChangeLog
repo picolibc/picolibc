@@ -1,3 +1,44 @@
+2013-11-26  Julio Gutierrez <jgutleyva@gmail.com>
+
+	*libc/include/wchar.h: Add restrict keyword.
+	*libc/stdio/fgetws.c (fgetws): ditto.
+	*libc/stdio/fputws.c (fputws): ditto.
+	*libc/stdio/fwprintf.c (fwprintf): ditto.
+	*libc/stdio/fwscanf.c (fwscanf): ditto.
+	*libc/stdio/swprintf.c (swprintf): ditto.
+	*libc/stdio/swscanf.c (swscanf): ditto.
+	*libc/stdio/vfwprintf.c (vfwprintf): ditto.
+	*libc/stdio/vfwscanf.c (vfwscanf): ditto.
+	*libc/stdio/vswprintf.c (vswprintf): ditto.
+	*libc/stdio/vswscanf.c (vswscanf): ditto.
+	*libc/stdio/vwprintf.c (vwprintf): ditto.
+	*libc/stdio/vwscanf.c (vwscanf): ditto.
+	*libc/stdio/wprintf.c (wprintf): ditto.
+	*libc/stdio/wscanf.c (wscanf): ditto.
+	*libc/stdlib/mbrlen.c (mbrlen): ditto.
+	*libc/stdlib/mbrtowc.c (mbrtowc): ditto.
+	*libc/stdlib/mbsnrtowcs.c (mbsnrtowcs): ditto.
+	*libc/stdlib/mbsrtowcs.c (mbsrtowcs): ditto.
+	*libc/stdlib/wcrtomb.c (wcrtomb): ditto.
+	*libc/stdlib/wcsnrtombs.c (wcsnrtombs): ditto.
+	*libc/stdlib/wcsrtombs.c (wcsrtombs): ditto.
+	*libc/stdlib/wcstod.c (wcstod): ditto.
+	*libc/stdlib/wcstol.c (wcstol): ditto.
+	*libc/stdlib/wcstold.c (wcstold): ditto.
+	*libc/stdlib/wcstoll.c (wcstoll): ditto.
+	*libc/stdlib/wcstoul.c (wcstoul): ditto.
+	*libc/stdlib/wcstoull.c (cstoull): ditto.
+	*libc/string/wcpcpy.c (wcpcpy): ditto.
+	*libc/string/wcpncpy.c (wcpncpy): ditto.
+	*libc/string/wcscat.c (wcscat): ditto.
+	*libc/string/wcscpy.c (wcscpy): ditto.
+	*libc/string/wcsncat.c (wcsncat): ditto.
+	*libc/string/wcsncpy.c (wcsncpy): ditto.
+	*libc/string/wcsstr.c (wcsstr): ditto.
+	*libc/string/wcstok.c (wcstok): ditto.
+	*libc/string/wcsxfrm.c (wcsxfrm): ditto.
+	*libc/string/wmemcpy.c (wmemcpy): ditto.
+
 2013-11-26  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/posix/posix_spawn.c: Drop using namespace.h.

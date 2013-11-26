@@ -14,7 +14,8 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
+/* Doc in swscanf.c */
+ 
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
@@ -25,7 +26,7 @@
 #ifndef _REENT_ONLY
 
 int
-fwscanf (FILE *fp, _CONST wchar_t *fmt, ...)
+fwscanf (FILE *__restrict fp, _CONST wchar_t *__restrict fmt, ...)
 {
   int ret;
   va_list ap;

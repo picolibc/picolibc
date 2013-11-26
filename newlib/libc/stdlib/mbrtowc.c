@@ -43,10 +43,10 @@ _DEFUN (_mbrtowc_r, (ptr, pwc, s, n, ps),
 #ifndef _REENT_ONLY
 size_t
 _DEFUN (mbrtowc, (pwc, s, n, ps),
-	wchar_t *pwc _AND
-	const char *s _AND
+	wchar_t *__restrict pwc _AND
+	const char *__restrict s _AND
 	size_t n _AND
-	mbstate_t *ps)
+	mbstate_t *__restrict ps)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   return _mbrtowc_r (_REENT, pwc, s, n, ps);

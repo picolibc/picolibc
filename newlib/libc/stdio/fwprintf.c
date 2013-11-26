@@ -41,8 +41,8 @@ _DEFUN(_fwprintf_r, (ptr, fp, fmt),
 
 int
 _DEFUN(fwprintf, (fp, fmt),
-       FILE *fp _AND
-       const wchar_t *fmt _DOTS)
+       FILE *__restrict fp _AND
+       const wchar_t *__restrict fmt _DOTS)
 {
   int ret;
   va_list ap;

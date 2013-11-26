@@ -8,15 +8,16 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-      	wchar_t *wcstok(wchar_t *<[source]>, const wchar_t *<[delimiters]>,
-			wchar_t **<[lasts]>)
+      	wchar_t *wcstok(wchar_t *__restrict <[source]>,
+      			const wchar_t *__restrict <[delimiters]>,
+			wchar_t **__restrict <[lasts]>)
 
 TRAD_SYNOPSIS
 	#include <wchar.h>
 	wchar_t *wcstok(<[source]>, <[delimiters]>, <[lasts]>)
-	wchar_t *<[source]>;
-	wchar_t *<[delimiters]>;
-	wchar_t **<[lasts]>;
+	wchar_t *__restrict <[source]>;
+	wchar_t *__restrict <[delimiters]>;
+	wchar_t **__restrict <[lasts]>;
 
 DESCRIPTION
 	The <<wcstok>> function is the wide-character equivalent of the
@@ -97,9 +98,9 @@ QUICKREF
 
 wchar_t *
 _DEFUN (wcstok, (s, delim, lasts),
-	register wchar_t *s _AND
-	register const wchar_t *delim _AND
-	wchar_t **lasts)
+	register wchar_t *__restrict s _AND
+	register const wchar_t *__restrict delim _AND
+	wchar_t **__restrict lasts)
 {
 	register const wchar_t *spanp;
 	register int c, sc;

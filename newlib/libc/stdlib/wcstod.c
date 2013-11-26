@@ -13,8 +13,10 @@ INDEX
 
 ANSI_SYNOPSIS
         #include <stdlib.h>
-        double wcstod(const wchar_t *<[str]>, wchar_t **<[tail]>);
-        float wcstof(const wchar_t *<[str]>, wchar_t **<[tail]>);
+        double wcstod(const wchar_t *__restrict <[str]>,
+            wchar_t **__restrict <[tail]>);
+        float wcstof(const wchar_t *__restrict <[str]>,
+            wchar_t **__restrict <[tail]>);
 
         double _wcstod_r(void *<[reent]>,
                          const wchar_t *<[str]>, wchar_t **<[tail]>);
@@ -24,12 +26,12 @@ ANSI_SYNOPSIS
 TRAD_SYNOPSIS
         #include <stdlib.h>
         double wcstod(<[str]>,<[tail]>)
-        wchar_t *<[str]>;
-        wchar_t **<[tail]>;
+        wchar_t *__restrict <[str]>;
+        wchar_t **__restrict <[tail]>;
 
         float wcstof(<[str]>,<[tail]>)
-        wchar_t *<[str]>;
-        wchar_t **<[tail]>;
+        wchar_t *__restrict <[str]>;
+        wchar_t **__restrict <[tail]>;
 
         double _wcstod_r(<[reent]>,<[str]>,<[tail]>)
 	wchar_t *<[reent]>;
@@ -211,15 +213,15 @@ _DEFUN (_wcstof_r, (ptr, nptr, endptr),
 
 double
 _DEFUN (wcstod, (nptr, endptr),
-	_CONST wchar_t *nptr _AND wchar_t **endptr)
+	_CONST wchar_t *__restrict nptr _AND wchar_t **__restrict endptr)
 {
   return _wcstod_r (_REENT, nptr, endptr);
 }
 
 float
 _DEFUN (wcstof, (nptr, endptr),
-	_CONST wchar_t *nptr _AND
-	wchar_t **endptr)
+	_CONST wchar_t *__restrict nptr _AND
+	wchar_t **__restrict endptr)
 {
   double retval = _wcstod_r (_REENT, nptr, endptr);
   if (isnan (retval))

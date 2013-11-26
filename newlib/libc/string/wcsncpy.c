@@ -4,12 +4,13 @@ FUNCTION
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-	wchar_t *wcsncpy(wchar_t *<[s1]>, const wchar_t *<[s2]>, size_t <[n]>);
+	wchar_t *wcsncpy(wchar_t *__restrict <[s1]>,
+			const wchar_t *__restrict <[s2]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
 	wchar_t *wcsncpy(<[s1]>, <[s2]>, <[n]>
-	wchar_t *<[s1]>;
-	const wchar_t *<[s2]>;
+	wchar_t *__restrict <[s1]>;
+	const wchar_t *__restrict <[s2]>;
 	size_t <[n]>;
 
 DESCRIPTION
@@ -41,8 +42,8 @@ No supporting OS subroutines are required.
 
 wchar_t *
 _DEFUN (wcsncpy, (s1, s2, n),
-	wchar_t * s1 _AND
-	_CONST wchar_t * s2 _AND
+	wchar_t *__restrict s1 _AND
+	_CONST wchar_t *__restrict s2 _AND
 	size_t n)
 {
   wchar_t *dscan=s1;

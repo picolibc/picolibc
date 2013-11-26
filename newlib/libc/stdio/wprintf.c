@@ -42,7 +42,7 @@ _DEFUN(_wprintf_r, (ptr, fmt),
 
 int
 _DEFUN(wprintf, (fmt),
-       const wchar_t *fmt _DOTS)
+       const wchar_t *__restrict fmt _DOTS)
 {
   int ret;
   va_list ap;

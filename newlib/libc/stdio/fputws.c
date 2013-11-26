@@ -35,16 +35,17 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-	int fputws(const wchar_t *<[ws]>, FILE *<[fp]>);
+	int fputws(const wchar_t *__restrict <[ws]>, FILE *__restrict <[fp]>);
 
 	#include <wchar.h>
-	int _fputws_r(struct _reent *<[ptr]>, const wchar_t *<[ws]>, FILE *<[fp]>);
+	int _fputws_r(struct _reent *<[ptr]>, const wchar_t *<[ws]>,
+                      FILE *<[fp]>);
 
 TRAD_SYNOPSIS   
 	#include <wchar.h>
 	int fputws(<[ws]>, <[fp]>)
-	wchar_t *<[ws]>;
-	FILE *<[fp]>;
+	wchar_t *__restrict <[ws]>;
+	FILE *__restrict <[fp]>;
 
 	#include <wchar.h>
 	int _fputws_r(<[ptr]>, <[ws]>, <[fp]>)
@@ -142,8 +143,8 @@ error:
 
 int
 _DEFUN(fputws, (ws, fp),
-	const wchar_t *ws _AND
-	FILE *fp)
+	const wchar_t *__restrict ws _AND
+	FILE *__restrict fp)
 {
   struct _reent *reent = _REENT;
 

@@ -6,7 +6,7 @@
 #include <errno.h>
 
 size_t
-mbrlen(const char *s, size_t n, mbstate_t *ps)
+mbrlen(const char *__restrict s, size_t n, mbstate_t *__restrict ps)
 {
 #ifdef _MB_CAPABLE
   if (ps == NULL)
