@@ -1,3 +1,8 @@
+2013-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (strcoll): Add "__restrict" to definition.
+	(strxfrm): Ditto.
+
 2013-11-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	Throughout, keep function definitions and declarations in sync with

@@ -1163,7 +1163,7 @@ wcscoll (const wchar_t *ws1, const wchar_t *ws2)
 }
 
 extern "C" int
-strcoll (const char *s1, const char *s2)
+strcoll (const char *__restrict s1, const char *__restrict s2)
 {
   size_t n1, n2;
   wchar_t *ws1, *ws2;
@@ -1230,7 +1230,7 @@ wcsxfrm (wchar_t *ws1, const wchar_t *ws2, size_t wsn)
 }
 
 extern "C" size_t
-strxfrm (char *s1, const char *s2, size_t sn)
+strxfrm (char *__restrict s1, const char *__restrict s2, size_t sn)
 {
   size_t ret;
   size_t n2;
