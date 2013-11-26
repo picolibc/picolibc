@@ -1,3 +1,14 @@
+2013-11-26  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* libc/machine/powerpc/vfscanf.c, libc/stdio/fgetpos.c,
+	libc/stdio/fgets.c, libc/stdio/fputs.c, libc/stdio/fread.c,
+	libc/stdio/freopen.c, libc/stdio/fwrite.c, libc/stdio/sscanf.c,
+	libc/stdlib/mbstowcs.c, libc/stdlib/mbtowc.c,
+	libc/stdlib/strtod.c, libc/stdlib/strtol.c, libc/stdlib/strtoll.c,
+	libc/stdlib/strtoul.c, libc/stdlib/strtoull.c,
+	libc/stdlib/wcstombs.c: Fix documentation prototypes which were
+	over eighty columns.
+
 2013-11-26  Julio Gutierrez <jgutleyva@gmail.com>
 
 	*libc/include/wchar.h: Add restrict keyword.
