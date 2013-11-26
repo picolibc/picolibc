@@ -23,6 +23,24 @@
 #define NUM_GPRS_SAVED 11
 
 #ifdef __mips_hard_float
+#if _MIPS_SIM == _ABIN32
+	FPR_OFFSET ($f20, 0);	\
+	FPR_OFFSET ($f22, 1);	\
+	FPR_OFFSET ($f24, 2);	\
+	FPR_OFFSET ($f26, 3);	\
+	FPR_OFFSET ($f28, 4);	\
+	FPR_OFFSET ($f30, 5);
+#elif _MIPS_SIM == _ABI64
+#define FPR_LAYOUT		\
+	FPR_OFFSET ($f24, 0);	\
+	FPR_OFFSET ($f25, 1);	\
+	FPR_OFFSET ($f26, 2);	\
+	FPR_OFFSET ($f27, 3);	\
+	FPR_OFFSET ($f28, 4);	\
+	FPR_OFFSET ($f29, 5);	\
+	FPR_OFFSET ($f30, 6);	\
+	FPR_OFFSET ($f31, 7);
+#else /* Assuming _MIPS_SIM == _ABIO32 */
 #define FPR_LAYOUT		\
 	FPR_OFFSET ($f20, 0);	\
 	FPR_OFFSET ($f21, 1);	\
@@ -35,11 +53,12 @@
 	FPR_OFFSET ($f28, 8);	\
 	FPR_OFFSET ($f29, 9);	\
 	FPR_OFFSET ($f30, 10);	\
-	FPR_OFFSET ($f31, 11)
+	FPR_OFFSET ($f31, 11);
+#endif
 #else
 #define FPR_LAYOUT
 #endif
-
+	
 #ifdef __mips64
 #define BYTES_PER_WORD 8
 #define LOAD_GPR ld
@@ -47,11 +66,17 @@
 #define STORE_GPR sd
 #define STORE_FPR sdc1
 #else
-#define BYTES_PER_WORD 4
 #define LOAD_GPR lw
-#define LOAD_FPR lwc1
 #define STORE_GPR sw
+#if __mips_fpr == 64
+#define BYTES_PER_WORD 8
+#define LOAD_FPR l.d
+#define STORE_FPR s.d
+#else
+#define BYTES_PER_WORD 4
+#define LOAD_FPR lwc1
 #define STORE_FPR swc1
+#endif
 #endif
 
 #define GPOFF(INDEX) (INDEX * BYTES_PER_WORD)

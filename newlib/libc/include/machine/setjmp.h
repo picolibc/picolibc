@@ -106,14 +106,14 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __mips__
-#ifdef __mips64
-#define _JBTYPE long long
-#endif
-#ifdef __mips_soft_float
-#define _JBLEN 11
-#else
-#define _JBLEN 23
-#endif
+# if defined(__mips64) || (__mips_fpr == 64)
+#  define _JBTYPE long long
+# endif
+# ifdef __mips_soft_float
+#  define _JBLEN 11
+# else
+#  define _JBLEN 23
+# endif
 #endif
 
 #ifdef __m88000__

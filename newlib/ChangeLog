@@ -1,3 +1,10 @@
+2013-11-26  Matheus Almeida  <Matheus.Almeida@imgtec.com>
+
+	* libc/include/machine/setjmp.h: Add support for __mips_fpr being
+	64 and treat it the same as if __mips64 is set.
+	* libc/machine/mips/setjmp.S: Ditto, plus add checks for _MIPS_SIM
+	being _ABIN32 and _ABI64.
+
 2013-11-26  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/machine/powerpc/vfscanf.c, libc/stdio/fgetpos.c,
