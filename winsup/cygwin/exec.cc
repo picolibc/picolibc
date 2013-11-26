@@ -93,6 +93,7 @@ execve (const char *path, char *const argv[], char *const envp[])
   MALLOC_CHECK;
   return spawnve (_P_OVERLAY, path, argv, envp);
 }
+EXPORT_ALIAS (execve, _execve)	/* For newlib */
 
 extern "C" int
 execvp (const char *file, char * const *argv)

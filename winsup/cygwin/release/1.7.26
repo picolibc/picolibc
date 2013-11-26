@@ -8,6 +8,9 @@ What's new:
 - getnameinfo now supports glibc-specific International Domain Name (IDN)
   extension flags: NI_IDN, NI_IDN_ALLOW_UNASSIGNED, NI_IDN_USE_STD3_ASCII_RULES.
 
+- Preliminary, experimental support of the posix_spawn family of functions.
+  New associated header /usr/include/spawn.h.
+
 
 What changed:
 -------------

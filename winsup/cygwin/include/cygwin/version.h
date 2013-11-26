@@ -441,12 +441,13 @@ details. */
       269: Allow application override of posix_memalign.
       270: Redefine mtget.mt_resid field to contain current partition as well
            as number of partitions on tape.
+      271: Export posix_spawn, posix_spawnp, and helper functions.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 270
+#define CYGWIN_VERSION_API_MINOR 271
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
