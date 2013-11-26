@@ -1,3 +1,13 @@
+2013-11-26  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/posix/posix_spawn.c: Eliminate OS function calls not present
+	in newlib or Cygwin.
+	(process_spawnattr): Use sigprocmask rather than _sigprocmask.  Use
+	sigaction rather than _sigaction.
+	(process_file_actions_entry): Use dup2 rather than _dup2.
+	(do_posix_spawn): Use execvpe rather than _execvpe.  Use waitpid
+	rather than _waitpid.
+
 2013-11-25  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/iconv/lib/iconv.c, libc/time/strftime.c: Change "restrict<" to

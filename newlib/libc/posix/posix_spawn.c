@@ -80,9 +80,9 @@ argument is unspecified.
 PORTABILITY
 POSIX.1-2008 requires <<posix_spawn>> and <<posix_spawnp>>.
 
-Supporting OS subroutines required: <<_close>>, <<_dup2>>, <<_fcntl>>,
-<<_execve>>, <<_execvpe>>, <<_exit>>, <<_open>>, <<_sigaction>>,
-<<_sigprocmask>>, <<_waitpid>>, <<sched_setscheduler>>,
+Supporting OS subroutines required: <<_close>>, <<dup2>>, <<_fcntl>>,
+<<_execve>>, <<execvpe>>, <<_exit>>, <<_open>>, <<sigaction>>,
+<<sigprocmask>>, <<waitpid>>, <<sched_setscheduler>>,
 <<sched_setparam>>, <<setegid>>, <<seteuid>>, <<setpgid>>, <<vfork>>.
 */
 
@@ -186,13 +186,13 @@ process_spawnattr(_CONST posix_spawnattr_t sa)
 
 	/* Set signal masks/defaults */
 	if (sa->sa_flags & POSIX_SPAWN_SETSIGMASK) {
-		_sigprocmask(SIG_SETMASK, &sa->sa_sigmask, NULL);
+		sigprocmask(SIG_SETMASK, &sa->sa_sigmask, NULL);
 	}
 
 	if (sa->sa_flags & POSIX_SPAWN_SETSIGDEF) {
 		for (i = 1; i < NSIG; i++) {
 			if (sigismember(&sa->sa_sigdefault, i))
-				if (_sigaction(i, &sigact, NULL) != 0)
+				if (sigaction(i, &sigact, NULL) != 0)
 					return (errno);
 		}
 	}
@@ -212,7 +212,7 @@ process_file_actions_entry(posix_spawn_file_actions_entry_t *fae)
 		if (fd < 0)
 			return (errno);
 		if (fd != fae->fae_fildes) {
-			if (_dup2(fd, fae->fae_fildes) == -1)
+			if (dup2(fd, fae->fae_fildes) == -1)
 				return (errno);
 			if (_close(fd) != 0) {
 				if (errno == EBADF)
@@ -226,7 +226,7 @@ process_file_actions_entry(posix_spawn_file_actions_entry_t *fae)
 		break;
 	case FAE_DUP2:
 		/* Perform a dup2() */
-		if (_dup2(fae->fae_fildes, fae->fae_newfildes) == -1)
+		if (dup2(fae->fae_fildes, fae->fae_newfildes) == -1)
 			return (errno);
 #ifdef HAVE_FCNTL
 		if (_fcntl(fae->fae_newfildes, F_SETFD, 0) == -1)
@@ -281,14 +281,14 @@ do_posix_spawn(pid_t *pid, _CONST char *path,
 				_exit(127);
 		}
 		if (use_env_path)
-			_execvpe(path, argv, envp != NULL ? envp : *p_environ);
+			execvpe(path, argv, envp != NULL ? envp : *p_environ);
 		else
 			_execve(path, argv, envp != NULL ? envp : *p_environ);
 		error = errno;
 		_exit(127);
 	default:
 		if (error != 0)
-			_waitpid(p, NULL, WNOHANG);
+			waitpid(p, NULL, WNOHANG);
 		else if (pid != NULL)
 			*pid = p;
 		return (error);
