@@ -90,7 +90,6 @@ Supporting OS subroutines required: <<_close>>, <<dup2>>, <<_fcntl>>,
 
 #include <sys/cdefs.h>
 
-#include "namespace.h"
 #include <sys/signal.h>
 #include <sys/queue.h>
 #include <sys/wait.h>
@@ -103,7 +102,6 @@ Supporting OS subroutines required: <<_close>>, <<dup2>>, <<_fcntl>>,
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "un-namespace.h"
 
 /* Only deal with a pointer to environ, to work around subtle bugs with shared
    libraries and/or small data systems where the user declares his own

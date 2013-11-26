@@ -1,5 +1,9 @@
 2013-11-26  Corinna Vinschen  <vinschen@redhat.com>
 
+	* libc/posix/posix_spawn.c: Drop using namespace.h.
+
+2013-11-26  Corinna Vinschen  <vinschen@redhat.com>
+
 	* libc/posix/posix_spawn.c: Eliminate OS function calls not present
 	in newlib or Cygwin.
 	(process_spawnattr): Use sigprocmask rather than _sigprocmask.  Use
