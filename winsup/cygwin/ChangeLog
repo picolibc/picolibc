@@ -1,5 +1,10 @@
 2013-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* nlsfuncs.cc (wcscoll): Add "__restrict" to definition.
+	(wcsxfrm): Ditto.
+
+2013-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* common.din: Export posix_spawn[...] functions.
 	* exec.cc (execve): Add EXPORT_ALIAS _execve.
 	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
