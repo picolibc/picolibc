@@ -232,7 +232,7 @@ enum bin_status
 };
 
 static bin_status
-try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
+try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 {
   bin_status bin_stat = move_to_bin;
   NTSTATUS status;
@@ -268,12 +268,37 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
      them into the recycler. */
   if (pfni->FileNameLength == 2) /* root dir. */
     goto out;
+  /* The recycler name on Vista and later is $Recycler.Bin by default.  If the
+     recycler dir disappeared for some reason, the shell32.dll recreates the
+     directory in all upper case.  So, we never know beforehand if the dir
+     is written in mixed case or in all upper case.  That's a problem when
+     using casesensitivity.  If the file handle given to FileRenameInformation
+     has been opened casesensitive, the call also handles the path to the
+     target dir casesensitive.  Rather then trying to find the right name
+     of the recycler, we just reopen the file to move with OBJ_CASE_INSENSITIVE,
+     so the subsequent FileRenameInformation works caseinsensitive in terms of
+     the recycler directory name, too. */
+  if (!pc.objcaseinsensitive ())
+    {
+      HANDLE fh_dup;
+      InitializeObjectAttributes (&attr, &ro_u_empty, OBJ_CASE_INSENSITIVE,
+				  fh, NULL);
+      status = NtOpenFile (&fh_dup, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
+			   flags);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtOpenFile (reopen) failed, status = %y", status);
+      else
+	{
+	  NtClose (fh);
+	  fh = fh_dup;
+	}
+    }
   /* Initialize recycler path. */
   RtlInitEmptyUnicodeString (&recycler, recyclerbuf, sizeof recyclerbuf);
   if (!pc.isremote ())
     {
       if (wincap.has_recycle_dot_bin ()) /* NTFS and FAT since Vista, ReFS */
-	RtlAppendUnicodeToString (&recycler, L"\\$RECYCLE.BIN\\");
+	RtlAppendUnicodeToString (&recycler, L"\\$Recycle.Bin\\");
       else if (pc.fs_is_ntfs ())	/* NTFS up to 2K3 */
 	RtlAppendUnicodeToString (&recycler, L"\\RECYCLER\\");
       else if (pc.fs_is_fat ())	/* FAT up to 2K3 */
@@ -359,6 +384,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access)
   pfri->FileNameLength = recycler.Length;
   memcpy (pfri->FileName, recycler.Buffer, recycler.Length);
   frisiz = sizeof *pfri + pfri->FileNameLength - sizeof (WCHAR);
+
   status = NtSetInformationFile (fh, &io, pfri, frisiz, FileRenameInformation);
   if (status == STATUS_OBJECT_PATH_NOT_FOUND && !pc.isremote ())
     {
@@ -786,7 +812,7 @@ unlink_nt (path_conv &pc)
   /* Try to move to bin if a sharing violation occured.  If that worked,
      we're done. */
   if (bin_stat == move_to_bin
-      && (bin_stat = try_to_bin (pc, fh, access)) >= has_been_moved)
+      && (bin_stat = try_to_bin (pc, fh, access, flags)) >= has_been_moved)
     {
       if (bin_stat == has_been_moved)
 	status = STATUS_SUCCESS;
@@ -856,7 +882,7 @@ try_again:
 			{
 			  debug_printf ("Try-to-bin %S",
 					pc.get_nt_native_path ());
-			  bin_stat = try_to_bin (pc, fh, access);
+			  bin_stat = try_to_bin (pc, fh, access, flags);
 			}
 		    }
 		  /* Do NOT handle bin_stat == dir_not_empty here! */
@@ -916,7 +942,7 @@ try_again:
 		 succeeds, we got rid of the file in some way, even if
 		 unlinking didn't work. */
 	      if (bin_stat == dont_move)
-		bin_stat = try_to_bin (pc, fh, access);
+		bin_stat = try_to_bin (pc, fh, access, flags);
 	      if (bin_stat >= has_been_moved)
 		status = bin_stat == has_been_moved
 				     ? STATUS_SUCCESS

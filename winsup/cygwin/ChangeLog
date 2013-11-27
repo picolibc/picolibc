@@ -1,3 +1,11 @@
+2013-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (try_to_bin): Take additional parameter to get file open
+	flags.  If the file to move to the bin has been opened casesensitive,
+	reopen it caseinsensitive.  Explain why.  Revert the default name of
+	the Vista-and-later recycler to mixed case for readability.
+	(unlink_nt): Call try_to_bin with file open flags as evaluated.
+
 2013-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nlsfuncs.cc (wcscoll): Add "__restrict" to definition.
