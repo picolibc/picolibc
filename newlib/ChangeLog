@@ -1,3 +1,8 @@
+2013-11-27  Matheus Almeida  <Matheus.Almeida@imgtec.com>
+
+	* libc/machine/mips/setjmp.S: Fix definition of macro FPR_LAYOUT
+	for ABI == N32.
+
 2013-11-26  Matheus Almeida  <Matheus.Almeida@imgtec.com>
 
 	* libc/include/machine/setjmp.h: Add support for __mips_fpr being

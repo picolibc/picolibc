@@ -24,6 +24,7 @@
 
 #ifdef __mips_hard_float
 #if _MIPS_SIM == _ABIN32
+#define FPR_LAYOUT		\
 	FPR_OFFSET ($f20, 0);	\
 	FPR_OFFSET ($f22, 1);	\
 	FPR_OFFSET ($f24, 2);	\
