@@ -69,7 +69,8 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-dummysys.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-dummysys.$(OBJEXT) \
+	lib_a-cpusetalloc.$(OBJEXT) lib_a-cpusetfree.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -193,7 +194,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = dummysys.c
+lib_a_SOURCES = dummysys.c cpusetalloc.c cpusetfree.c
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -261,6 +262,18 @@ lib_a-dummysys.o: dummysys.c
 
 lib_a-dummysys.obj: dummysys.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dummysys.obj `if test -f 'dummysys.c'; then $(CYGPATH_W) 'dummysys.c'; else $(CYGPATH_W) '$(srcdir)/dummysys.c'; fi`
+
+lib_a-cpusetalloc.o: cpusetalloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpusetalloc.o `test -f 'cpusetalloc.c' || echo '$(srcdir)/'`cpusetalloc.c
+
+lib_a-cpusetalloc.obj: cpusetalloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpusetalloc.obj `if test -f 'cpusetalloc.c'; then $(CYGPATH_W) 'cpusetalloc.c'; else $(CYGPATH_W) '$(srcdir)/cpusetalloc.c'; fi`
+
+lib_a-cpusetfree.o: cpusetfree.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpusetfree.o `test -f 'cpusetfree.c' || echo '$(srcdir)/'`cpusetfree.c
+
+lib_a-cpusetfree.obj: cpusetfree.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cpusetfree.obj `if test -f 'cpusetfree.c'; then $(CYGPATH_W) 'cpusetfree.c'; else $(CYGPATH_W) '$(srcdir)/cpusetfree.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

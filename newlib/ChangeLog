@@ -1,3 +1,45 @@
+2013-11-27  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/sys/rtems/cpusetalloc.c: New file.
+	* libc/sys/rtems/cpusetfree.c: Likewise.
+	* libc/sys/rtems/Makefile.am (lib_a_SOURCES): Add new files.
+	* libc/sys/rtems/Makefile.in: Regenerate.
+	* libc/sys/rtems/sys/cpuset.h: Delete #if 0 block.  Include
+	<stddef.h> for size_t.
+	(_NCPUBITS): Avoid NBBY and assume 8 bits per char.
+	(__cpuset_mask): Use int instead of size_t parameter for Linux
+	compatibility.
+	(__cpuset_index): Likewise.
+	(__cpuset_alloc): Declare.
+	(__cpuset_free): Likewise.
+	(CPU_ALLOC_SIZE): Likewise.
+	(CPU_ALLOC): Define.
+	(CPU_FREE): Likewise.
+	(CPU_ZERO_S): Likewise.
+	(CPU_FILL_S): Likewise.
+	(CPU_SET_S): Likewise.
+	(CPU_CLR_S): Likewise.
+	(CPU_ISSET_S): Likewise.
+	(CPU_COUNT_S): Likewise.
+	(CPU_AND_S): Likewise.
+	(CPU_OR_S): Likewise.
+	(CPU_XOR_S): Likewise.
+	(CPU_NAND_S): Likewise.
+	(CPU_EQUAL_S): Likewise.
+	(CPU_ZERO): Use CPU_ZERO_S().
+	(CPU_FILL): Use CPU_FILL_S().
+	(CPU_SET): Use CPU_SET_S().
+	(CPU_CLR): Use CPU_CLR_S().
+	(CPU_ISSET): Use CPU_ISSET_S().
+	(CPU_COUNT): Use CPU_COUNT_S().
+	(CPU_AND): Use CPU_AND_S().
+	(CPU_OR): Use CPU_OR_S().
+	(CPU_XOR): Use CPU_XOR_S().
+	(CPU_NAND): Use CPU_NAND_S().
+	(CPU_EQUAL): Use CPU_EQUAL_S().
+	(CPU_CMP): Delete superfluous const qualifier.
+	(CPU_EMPTY): Likewise.
+
 2013-11-27  Matheus Almeida  <Matheus.Almeida@imgtec.com>
 
 	* libc/machine/mips/setjmp.S: Fix definition of macro FPR_LAYOUT
