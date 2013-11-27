@@ -280,17 +280,16 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
      the recycler directory name, too. */
   if (!pc.objcaseinsensitive ())
     {
-      HANDLE fh_dup;
       InitializeObjectAttributes (&attr, &ro_u_empty, OBJ_CASE_INSENSITIVE,
 				  fh, NULL);
-      status = NtOpenFile (&fh_dup, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
+      status = NtOpenFile (&tmp_fh, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   flags);
       if (!NT_SUCCESS (status))
 	debug_printf ("NtOpenFile (reopen) failed, status = %y", status);
       else
 	{
 	  NtClose (fh);
-	  fh = fh_dup;
+	  fh = tmp_fh;
 	}
     }
   /* Initialize recycler path. */

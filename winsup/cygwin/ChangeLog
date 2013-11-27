@@ -1,5 +1,9 @@
 2013-11-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (try_to_bin): Drop fh_dup, reuse tmp_fh instead.
+
+2013-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (try_to_bin): Take additional parameter to get file open
 	flags.  If the file to move to the bin has been opened casesensitive,
 	reopen it caseinsensitive.  Explain why.  Revert the default name of
