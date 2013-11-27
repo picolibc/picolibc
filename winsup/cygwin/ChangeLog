@@ -1,5 +1,9 @@
 2013-11-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (try_to_bin): Enhance debug output in case reopen fails.
+
+2013-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (try_to_bin): Drop fh_dup, reuse tmp_fh instead.
 
 2013-11-27  Corinna Vinschen  <corinna@vinschen.de>

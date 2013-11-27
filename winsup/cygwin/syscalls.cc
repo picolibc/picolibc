@@ -285,7 +285,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
       status = NtOpenFile (&tmp_fh, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   flags);
       if (!NT_SUCCESS (status))
-	debug_printf ("NtOpenFile (reopen) failed, status = %y", status);
+	debug_printf ("NtOpenFile (%S) for reopening caseinsensitive failed, "
+		      "status = %y", pc.get_nt_native_path (), status);
       else
 	{
 	  NtClose (fh);
