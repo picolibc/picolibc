@@ -1,3 +1,7 @@
+2013-11-28  Alexey Pavlov  <alexpux@gmail.com>
+
+	* include/glob.h: Fix invalid use of 'restrict' error.
+
 2013-11-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (try_to_bin): Enhance debug output in case reopen fails.
