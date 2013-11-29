@@ -1,3 +1,16 @@
+2013-11-29  Sebastian Huber <sebastian.huber@embedded-brains.de>
+
+	* libc/include/pthread.h (pthread_cleanup_push): Delete prototype
+	and add macro of the same name.
+	(pthread_cleanup_pop): Likewise.
+	(_pthread_cleanup_context): Define.
+	(_pthread_cleanup_push): Likewise.
+	(_pthread_cleanup_pop): Likewise.
+	(pthread_cleanup_push_defer_np): Define if _GNU_SOURCE is defined.
+	(pthread_cleanup_pop_restore_np): Likewise.
+	(_pthread_cleanup_push_defer): Likewise.
+	(_pthread_cleanup_pop_restore): Likewise.
+
 2013-11-29  Jennifer Averett <jennifer.averett@oarcorp.com>
 
 	* libc/include/pthread.h (pthread_attr_setaffinity_np):
