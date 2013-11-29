@@ -2,7 +2,7 @@
  *
  *  Written by Joel Sherrill <joel@OARcorp.com>.
  *
- *  COPYRIGHT (c) 1989-2010.
+ *  COPYRIGHT (c) 1989-2013.
  *  On-Line Applications Research Corporation (OAR).
  *
  *  Permission to use, copy, modify, and distribute this software for any
@@ -32,6 +32,7 @@ extern "C" {
 #include <sys/types.h>
 #include <time.h>
 #include <sys/sched.h>
+#include <sys/cdefs.h>
 
 /* Register Fork Handlers */
 int	_EXFUN(pthread_atfork,(void (*prepare)(void), void (*parent)(void),
@@ -205,6 +206,29 @@ int	_EXFUN(pthread_attr_getguardsize,
 	(_CONST pthread_attr_t *__attr, size_t *__guardsize));
 int	_EXFUN(pthread_attr_setguardsize,
 	(pthread_attr_t *__attr, size_t __guardsize));
+
+/* POSIX thread APIs beyond the POSIX standard but provided 
+ * in GNU/Linux. They may be provided by other OSes for
+ * compatibility.
+ */
+#if defined(__GNU_VISIBLE)
+#if defined(__rtems__) 
+int	_EXFUN(pthread_attr_setaffinity_np,
+	(pthread_attr_t *__attr, size_t __cpusetsize, 
+	const cpu_set_t *__cpuset));
+int 	_EXFUN(pthread_attr_getaffinity_np,
+	(const pthread_attr_t *__attr, size_t __cpusetsize,
+	cpu_set_t *__cpuset));
+
+int	_EXFUN(pthread_setaffinity_np,
+	(pthread_t __id, size_t __cpusetsize, const cpu_set_t *__cpuset));
+int	_EXFUN(pthread_getaffinity_np,
+	(const pthread_t __id, size_t __cpusetsize, cpu_set_t *__cpuset));
+
+int	_EXFUN(pthread_getattr_np,
+	(pthread_t __id, pthread_attr_t *__attr));
+#endif /* defined(__rtems__) */
+#endif /* defined(__GNU_VISIBLE) */
 
 /* Thread Creation, P1003.1c/Draft 10, p. 144 */
 

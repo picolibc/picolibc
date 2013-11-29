@@ -693,7 +693,13 @@
 #define	__XSI_VISIBLE		0
 #define	__BSD_VISIBLE		0
 #define	__ISO_C_VISIBLE		2011
-#else				/* Default environment: show everything. */
+#elif defined(_GNU_SOURCE)	/* Everything and the kitchen sink. */
+#define	__POSIX_VISIBLE		200809
+#define	__XSI_VISIBLE		700
+#define	__BSD_VISIBLE		1
+#define	__ISO_C_VISIBLE		2011
+#define	__GNU_VISIBLE		1
+#else				/* Default: everything except __GNU_VISIBLE. */
 #define	__POSIX_VISIBLE		200809
 #define	__XSI_VISIBLE		700
 #define	__BSD_VISIBLE		1

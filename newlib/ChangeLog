@@ -1,3 +1,16 @@
+2013-11-29  Jennifer Averett <jennifer.averett@oarcorp.com>
+
+	* libc/include/pthread.h (pthread_attr_setaffinity_np):
+	Add pthread SMP affinity attributes to methods to RTEMS for
+	compatibility with GNU/Linux.
+	(pthread_attr_getaffinity_np): Likewise.
+	(pthread_setaffinity_np): Likewise.
+	(pthread_getaffinity_np): Likewise.
+	(pthread_getattr_np): Add for GNU/Linux compatibility.
+	* libc/include/sys/types.h: Add cpuset to pthread_attr_t for RTEMS.
+	* libc/include/sys/cdefs.h (_GNU_SOURCE): Defining _GNU_SOURCE
+	turns on all _XXX_VISBLE feature flags.
+
 2013-11-27  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/sys/rtems/cpusetalloc.c: New file.

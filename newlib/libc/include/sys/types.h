@@ -322,6 +322,10 @@ typedef __uint32_t pthread_t;            /* identify a thread */
 #define PTHREAD_CREATE_DETACHED 0
 #define PTHREAD_CREATE_JOINABLE  1
 
+#if defined(__rtems__)
+  #include <sys/cpuset.h>
+#endif
+
 #if defined(__XMK__)
 typedef struct pthread_attr_s {
   int contentionscope;
@@ -351,7 +355,11 @@ typedef struct {
   int  cputime_clock_allowed;  /* see time.h */
 #endif
   int  detachstate;
-
+#if defined(__rtems__)
+  size_t affinitysetsize;
+  cpu_set_t *affinityset;
+  cpu_set_t affinitysetpreallocated;
+#endif
 } pthread_attr_t;
 
 #endif /* !defined(__XMK__) */
