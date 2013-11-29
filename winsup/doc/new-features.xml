@@ -4,7 +4,7 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
-<sect2 id="ov-new1.7.25"><title>What's new and what changed from 1.7.24 to 1.7.25</title>
+<sect2 id="ov-new1.7.26"><title>What's new and what changed from 1.7.25 to 1.7.26</title>
 
 <itemizedlist mark="bullet">
 
@@ -33,6 +33,11 @@ almost all virtual files under /proc from BSD flock locking.
 <listitem><para>
 The header /usr/include/exceptions.h, containing implementation details for
 32 bit Windows' exception handling only, has been removed.
+</para></listitem>
+
+<listitem><para>
+Preliminary, experimental support of the posix_spawn family of functions.
+New associated header /usr/include/spawn.h.
 </para></listitem>
 
 </itemizedlist>
