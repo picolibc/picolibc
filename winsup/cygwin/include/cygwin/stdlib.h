@@ -30,10 +30,14 @@ void	setprogname (const char *);
 #ifndef __STRICT_ANSI__
 char *canonicalize_file_name (const char *);
 int unsetenv (const char *);
+#endif /*__STRICT_ANSI__*/
+#if !defined(__STRICT_ANSI__) || (_XOPEN_SOURCE >= 500) || (defined(_XOPEN_SOURCE) && defined(_XOPEN_SOURCE_EXTENDED))
 char *initstate (unsigned seed, char *state, size_t size);
 long random (void);
 char *setstate (const char *state);
 void srandom (unsigned);
+#endif
+#ifndef __STRICT_ANSI__
 char *ptsname (int);
 int ptsname_r(int, char *, size_t);
 int getpt (void);

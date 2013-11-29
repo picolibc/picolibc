@@ -1,3 +1,8 @@
+2013-11-13  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* include/cygwin/stdlib.h(initstate, random, setstate, srandom) :
+	Prototype if not __STRICT_ANSI__ or _XOPEN_SOURCE is defined appropriately.
+
 2013-11-28  Alexey Pavlov  <alexpux@gmail.com>
 
 	* include/glob.h: Fix invalid use of 'restrict' error.
