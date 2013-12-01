@@ -32,7 +32,7 @@ class dtable
   unsigned narchetypes;
   unsigned farchetype;
   static const int initial_archetype_size = 8;
-  int first_fd_for_open;
+  size_t first_fd_for_open;
   int cnt_need_fixup_before;
   void lock () {lock_process::locker.acquire ();}
   void unlock () {lock_process::locker.release ();}
@@ -54,7 +54,7 @@ public:
   void vfork_parent_restore ();
   void vfork_child_fixup ();
   fhandler_base *dup_worker (fhandler_base *oldfh, int flags);
-  int extend (int howmuch);
+  int extend (size_t howmuch);
   void fixup_after_fork (HANDLE);
   void fixup_close (size_t, fhandler_base *);
 
@@ -65,7 +65,7 @@ public:
     unlock ();
     return res;
   }
-  int find_unused_handle (int start);
+  int find_unused_handle (size_t start);
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
   void __reg2 release (int fd);
   void init_std_file_from_handle (int fd, HANDLE handle);

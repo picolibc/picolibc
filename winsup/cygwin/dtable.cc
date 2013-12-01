@@ -16,7 +16,6 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 #include <wchar.h>
-#include <sys/param.h>
 
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
@@ -73,13 +72,10 @@ set_std_handle (int fd)
 }
 
 int
-dtable::extend (int howmuch)
+dtable::extend (size_t howmuch)
 {
   int new_size = size + howmuch;
   fhandler_base **newfds;
-
-  if (howmuch <= 0)
-    return 0;
 
   if (new_size > OPEN_MAX_MAX)
     {
@@ -225,8 +221,10 @@ dtable::delete_archetype (fhandler_base *fh)
 }
 
 int
-dtable::find_unused_handle (int start)
+dtable::find_unused_handle (size_t start)
 {
+  size_t extendby = (start > size) ? start - size : NOFILE_INCR;
+  /* This do loop should only ever execute twice. */
   do
     {
       for (size_t i = start; i < size; i++)
@@ -234,7 +232,7 @@ dtable::find_unused_handle (int start)
 	if (fds[i] == NULL)
 	  return i;
     }
-  while (extend (MAX (NOFILE_INCR, start - size)));
+  while (extend (extendby));
   return -1;
 }
 

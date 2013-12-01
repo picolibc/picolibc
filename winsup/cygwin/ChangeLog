@@ -1,5 +1,15 @@
 2013-11-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* dtable.h (dtable::first_fd_for_open): Change declaration to size_t.
+	(dtable::extend): Change parameter to size_t.
+	(dtable::find_unused_handle): Ditto.
+	* dtable.cc: Remove now-unused header.
+	(dtable::extend): Remove pointless test.  Change parameter to size_t.
+	(dtable::find_unused_handle): Rework to avoid MAX calculation in
+	extend() call.  Change parameter to size_t.
+
+2013-11-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* dtable.cc (build_fh_pc): When creating an archetype, use native name
 	rather than unix name if name doesn't exist.
 
