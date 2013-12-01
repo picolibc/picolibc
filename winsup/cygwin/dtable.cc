@@ -74,7 +74,7 @@ set_std_handle (int fd)
 int
 dtable::extend (size_t howmuch)
 {
-  int new_size = size + howmuch;
+  size_t new_size = size + howmuch;
   fhandler_base **newfds;
 
   if (new_size > OPEN_MAX_MAX)

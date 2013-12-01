@@ -1,3 +1,10 @@
+2013-12-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::extend): Change local variable new_size to size_t
+	as well.
+
+	* thread.cc: Fix comment.
+
 2013-11-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* dtable.h (dtable::first_fd_for_open): Change declaration to size_t.
