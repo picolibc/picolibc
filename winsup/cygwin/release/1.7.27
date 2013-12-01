@@ -1,6 +1,9 @@
-What's new:
------------
+Bug Fixes
+---------
 
 - Some devices, like, /dev/dsp are no longer detected due to the new
   use of \Device\Null for devices which have no real handle.
+  Fixes: http://cygwin.com/ml/cygwin/2013-12/threads.html#00000
+
+- Cygwin could easily run out of file handles.
   Fixes: http://cygwin.com/ml/cygwin/2013-12/threads.html#00000
