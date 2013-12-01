@@ -1,5 +1,9 @@
 2013-12-01  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* dtable.cc (dtable::find_unused_handle): Break out of the right loop.
+
+2013-12-01  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* dtable.cc (dtable::find_unused_handle): Fix off-by-one error.  Always
 	exit through the bottom.
 	(cygwin_attach_handle_to_fd): Make sure that fd tab is locked for the

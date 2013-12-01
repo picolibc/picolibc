@@ -230,14 +230,14 @@ dtable::find_unused_handle (size_t start)
   do
     {
       for (size_t i = start; i < size; i++)
-	/* See if open -- no need for overhead of not_open */
 	if (fds[i] == NULL)
 	  {
 	    res = (int) i;
-	    break;
+	    goto out;
 	  }
     }
   while (extend (extendby));
+out:
   return res;
 }
 
