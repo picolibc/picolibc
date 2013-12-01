@@ -1,3 +1,13 @@
+2013-12-01  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* dtable.cc (dtable::find_unused_handle): Fix off-by-one error.  Always
+	exit through the bottom.
+	(cygwin_attach_handle_to_fd): Make sure that fd tab is locked for the
+	duration of this function.
+	* dtable.h (dtable::lock): Make public.
+	(dtable::unlock): Ditto.
+	(dtable): Remove friends.
+
 2013-12-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::extend): Change local variable new_size to size_t

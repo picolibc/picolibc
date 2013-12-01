@@ -34,8 +34,6 @@ class dtable
   static const int initial_archetype_size = 8;
   size_t first_fd_for_open;
   int cnt_need_fixup_before;
-  void lock () {lock_process::locker.acquire ();}
-  void unlock () {lock_process::locker.release ();}
 public:
   size_t size;
 
@@ -87,15 +85,8 @@ public:
   void delete_archetype (fhandler_base *);
   void fixup_before_exec (DWORD win_proc_id);
   void fixup_before_fork (DWORD win_proc_id);
-  friend void dtable_init ();
-  friend void __stdcall close_all_files (bool);
-  friend int dup_finish (int, int, int);
-  friend class fhandler_base;
-  friend class cygheap_fdmanip;
-  friend class cygheap_fdget;
-  friend class cygheap_fdnew;
-  friend class cygheap_fdenum;
-  friend class lock_process;
+  void lock () {lock_process::locker.acquire ();}
+  void unlock () {lock_process::locker.release ();}
 };
 
 fhandler_base *build_fh_dev (const device&, const char * = NULL);

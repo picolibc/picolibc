@@ -223,17 +223,22 @@ dtable::delete_archetype (fhandler_base *fh)
 int
 dtable::find_unused_handle (size_t start)
 {
-  size_t extendby = (start > size) ? start - size : NOFILE_INCR;
+  size_t extendby = (start >= size) ? 1 + start - size : NOFILE_INCR;
+
   /* This do loop should only ever execute twice. */
+  int res = -1;
   do
     {
       for (size_t i = start; i < size; i++)
 	/* See if open -- no need for overhead of not_open */
 	if (fds[i] == NULL)
-	  return i;
+	  {
+	    res = (int) i;
+	    break;
+	  }
     }
   while (extend (extendby));
-  return -1;
+  return res;
 }
 
 void
@@ -251,14 +256,19 @@ extern "C" int
 cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 			    DWORD myaccess)
 {
+  cygheap->fdtab.lock ();
   if (fd == -1)
     fd = cygheap->fdtab.find_unused_handle ();
   fhandler_base *fh = build_fh_name (name);
   if (!fh)
-    return -1;
-  cygheap->fdtab[fd] = fh;
-  cygheap->fdtab[fd]->inc_refcnt ();
-  fh->init (handle, myaccess, bin ?: fh->pc_binmode ());
+    fd = -1;
+  else
+    {
+      cygheap->fdtab[fd] = fh;
+      cygheap->fdtab[fd]->inc_refcnt ();
+      fh->init (handle, myaccess, bin ?: fh->pc_binmode ());
+    }
+  cygheap->fdtab.unlock ();
   return fd;
 }
 
