@@ -641,7 +641,7 @@ build_fh_pc (path_conv& pc)
   else
     {
       if (!fh->get_name ())
-	fh->set_name (fh->dev ().name);
+	fh->set_name (fh->dev ().native);
       fh->archetype = fh->clone ();
       debug_printf ("created an archetype (%p) for %s(%d/%d)", fh->archetype, fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor ());
       fh->archetype->archetype = NULL;

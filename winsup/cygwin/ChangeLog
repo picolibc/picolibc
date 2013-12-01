@@ -1,3 +1,8 @@
+2013-11-30  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* dtable.cc (build_fh_pc): When creating an archetype, use native name
+	rather than unix name if name doesn't exist.
+
 2013-11-29  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 27.
