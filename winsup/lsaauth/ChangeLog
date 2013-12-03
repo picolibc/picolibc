@@ -1,5 +1,10 @@
 2013-12-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* configure.ac: Back out stupid change.
+	* configure: Regenerate.
+
+2013-12-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* configure.ac: Don't require 64-bit compiler for 32-bit builds.
 	* configure: Regenerate.
 

@@ -30,12 +30,10 @@ i?86)
   AC_CHECK_PROGS(MINGW32_CC, i686-w64-mingw32-gcc)
   test -z "$MINGW32_CC" && AC_MSG_ERROR([no acceptable mingw32 cc found in \$PATH])
   ;;
-x86_64)
-  AC_CHECK_PROGS(MINGW64_CC, x86_64-w64-mingw32-gcc)
-  test -z "$MINGW64_CC" && AC_MSG_ERROR([no acceptable mingw64 cc found in \$PATH])
-  ;;
 esac
 
+AC_CHECK_PROGS(MINGW64_CC, x86_64-w64-mingw32-gcc)
+test -z "$MINGW64_CC" && AC_MSG_ERROR([no acceptable mingw64 cc found in \$PATH])
 
 AC_ARG_PROGRAM
 
