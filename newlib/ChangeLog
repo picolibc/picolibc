@@ -1,5 +1,9 @@
 2013-12-03  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
+	* libc/sys/rtems/sys/cpuset.h: Use __inline instead of inline.
+
+2013-12-03  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
 	* libc/include/machine/_default_types.h: Move extern "C" after
 	header includes.  Include <sys/features.h> for
 	__GNUC_PREREQ__().
