@@ -1,3 +1,27 @@
+2013-12-03  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/machine/_default_types.h: Move extern "C" after
+	header includes.  Include <sys/features.h> for
+	__GNUC_PREREQ__().
+	(__u?int.*_t): Define via GCC provided __U?INT.*_TYPE__ if
+	available.
+	(__intptr_t): Define.
+	(__uintptr_t): Likewise.
+	* libc/include/stdint.h: Include <machine/_default_types.h>
+	instead of <_ansi.h>.
+	(u?int.*_t): Define via __u?int.*_t provided by
+	<machine/_default_types.h>.
+	(u?int_fast.*_t): Define via GCC provided
+	__U?INT_FAST.*_TYPE__ if available.
+	(U?INT.*(MIN|MAX)): Define via GCC provided __U?INT.*(MIN|MAX)__
+	if available.
+	(U?INT.*_C): Define via GCC provided __U?INT.*_C if available.
+	* libc/include/sys/cdefs.h: Use <machine/_default_types.h>
+	instead of <stdint.h>.
+	* libc/sys/rtems/sys/cpuset.h: Likewise.
+	* libc/sys/rtems/machine/_types.h: Include <stdint.h> for
+	FreeBSD compatibility.
+
 2013-11-29  Sebastian Huber <sebastian.huber@embedded-brains.de>
 
 	* libc/include/pthread.h (pthread_cleanup_push): Delete prototype

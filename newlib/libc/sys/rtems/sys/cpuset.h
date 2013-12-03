@@ -45,8 +45,8 @@
 #ifndef _SYS_CPUSET_H_
 #define _SYS_CPUSET_H_
 
+#include <machine/_default_types.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,7 +58,7 @@ extern "C" {
 #endif
 
 /* word in the cpu set */
-typedef uint32_t cpu_set_word_t;
+typedef __uint32_t cpu_set_word_t;
 
 /* Number of bits per cpu_set_t element */
 #define _NCPUBITS  (sizeof(cpu_set_word_t) * 8)
