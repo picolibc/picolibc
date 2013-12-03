@@ -189,8 +189,11 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  copyfd_set (readfds, r, maxfds);
 	  copyfd_set (writefds, w, maxfds);
 	  copyfd_set (exceptfds, e, maxfds);
-	  /* Actually set the bit mask from sel records */
-	  res = (res == select_stuff::select_set_zero) ? 0 : sel.poll (readfds, writefds, exceptfds);
+	  if (res == select_stuff::select_set_zero)
+	    res = 0;
+	  else
+	    /* Set the bit mask from sel records */
+	    res = sel.poll (readfds, writefds, exceptfds) ?: select_stuff::select_loop;
 	}
       /* Always clean up everything here.  If we're looping then build it
 	 all up again.  */
@@ -389,7 +392,7 @@ next_while:;
     wait_ret = MsgWaitForMultipleObjectsEx (m, w4, ms,
 					    QS_ALLINPUT | QS_ALLPOSTMESSAGE,
 					    MWMO_INPUTAVAILABLE);
-  select_printf ("wait_ret %d.  verifying", wait_ret);
+  select_printf ("wait_ret %d, m = %d.  verifying", wait_ret, m);
 
   wait_states res;
   switch (wait_ret)

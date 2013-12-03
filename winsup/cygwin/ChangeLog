@@ -1,3 +1,8 @@
+2013-12-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* select.cc (select): Add workaround for, as yet undebugged,
+	pathological case.
+
 2013-12-01  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* dtable.cc (dtable::find_unused_handle): Break out of the right loop.
