@@ -1,3 +1,8 @@
+2013-12-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* configure.ac: Don't require 64-bit compiler for 32-bit builds.
+	* configure: Regenerate.
+
 2013-07-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (cyglsa.dll): Explicitely specify DLL entry point to
