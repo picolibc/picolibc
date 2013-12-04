@@ -1,3 +1,7 @@
+2013-12-04  Steve Ellcey <sellcey@mips.com>
+
+	* mips/cfe_api.h: Include stdint.h.
+
 2013-11-21  Daniel Ramirez <javamonn@gmail.com>
 
 	* d30v/syscalls.c, i960/mon960.c, m68k/io-stat.c, mt/stat.c,

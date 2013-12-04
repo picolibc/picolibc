@@ -59,6 +59,7 @@
  * CFE_API_* can be defined here as desired.
  */
 /* Begin customization. */
+#include <stdint.h>
 #include <string.h>
 #define cfe_strlen(s)	strlen(s)
 
