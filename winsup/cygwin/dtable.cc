@@ -223,7 +223,9 @@ dtable::delete_archetype (fhandler_base *fh)
 int
 dtable::find_unused_handle (size_t start)
 {
-  size_t extendby = (start >= size) ? 1 + start - size : NOFILE_INCR;
+  /* When extending, always make sure that there is a NOFILE_INCR chunk
+     following the empty fd.  */
+  size_t extendby = NOFILE_INCR + ((start >= size) ? 1 + start - size : 0);
 
   /* This do loop should only ever execute twice. */
   int res = -1;

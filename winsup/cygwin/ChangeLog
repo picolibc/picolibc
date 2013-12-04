@@ -1,3 +1,8 @@
+2013-12-04  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* dtable.cc (dtable::find_unused_handle): When extending, always make
+	sure that there is a NOFILE_INCR chunk following the free fd.
+
 2013-12-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* select.cc (select): Add workaround for, as yet undebugged,
