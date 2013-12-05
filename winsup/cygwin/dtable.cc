@@ -58,7 +58,7 @@ void
 dtable_init ()
 {
   if (!cygheap->fdtab.size)
-    cygheap->fdtab.extend (NOFILE_INCR);
+    cygheap->fdtab.extend (NOFILE_INCR, 0);
 }
 
 void __stdcall
@@ -72,12 +72,16 @@ set_std_handle (int fd)
 }
 
 int
-dtable::extend (size_t howmuch)
+dtable::extend (size_t howmuch, size_t min)
 {
   size_t new_size = size + howmuch;
   fhandler_base **newfds;
 
-  if (new_size > OPEN_MAX_MAX)
+  if (new_size <= OPEN_MAX_MAX)
+    /* ok */;
+  else if (size < OPEN_MAX_MAX && min < OPEN_MAX_MAX)
+    new_size = OPEN_MAX_MAX;
+  else
     {
       set_errno (EMFILE);
       return 0;
@@ -223,7 +227,7 @@ dtable::delete_archetype (fhandler_base *fh)
 int
 dtable::find_unused_handle (size_t start)
 {
-  /* When extending, always make sure that there is a NOFILE_INCR chunk
+  /* When extending, try to allocate a NOFILE_INCR chunk
      following the empty fd.  */
   size_t extendby = NOFILE_INCR + ((start >= size) ? 1 + start - size : 0);
 
@@ -238,7 +242,7 @@ dtable::find_unused_handle (size_t start)
 	    goto out;
 	  }
     }
-  while (extend (extendby));
+  while (extend (extendby, start));
 out:
   return res;
 }

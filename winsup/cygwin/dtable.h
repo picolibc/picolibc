@@ -52,7 +52,7 @@ public:
   void vfork_parent_restore ();
   void vfork_child_fixup ();
   fhandler_base *dup_worker (fhandler_base *oldfh, int flags);
-  int extend (size_t howmuch);
+  int extend (size_t, size_t) __reg3;
   void fixup_after_fork (HANDLE);
   void fixup_close (size_t, fhandler_base *);
 

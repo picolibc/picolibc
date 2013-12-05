@@ -1,3 +1,16 @@
+2013-12-05  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* cygheap.h (cygheap_fdnew): Avoid setting errno directly since it will
+	have been set by a previous function.
+	* dtable.h (dtable::extend): Accept second size_t argument.
+	* dtable.cc (dtable::extend): Accept second "min" argument which allows
+	checking for OPEN_MAX_MAX boundary conditions.
+	(dtable_init): Accommodate second argument to dtable::extend.
+	(dtable::find_unused_handle): Ditto.
+	* syscalls.cc (setdtablesize): Ditto.
+	(dup): Return any error passed by cygheap_fdnew() directly.
+	(getdtablesize): Just return dtable size directly.
+
 2013-12-04  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* dtable.cc (dtable::find_unused_handle): When extending, always make

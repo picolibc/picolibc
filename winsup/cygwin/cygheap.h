@@ -457,7 +457,7 @@ class cygheap_fdnew : public cygheap_fdmanip
       locked = lockit;
     else
       {
-	set_errno (EMFILE);
+	/* errno set by find_unused_handle */
 	if (lockit)
 	  cygheap->fdtab.unlock ();
 	locked = false;

@@ -120,7 +120,12 @@ close_all_files (bool norelease)
 extern "C" int
 dup (int fd)
 {
-  int res = cygheap->fdtab.dup3 (fd, cygheap_fdnew (), 0);
+  int res;
+  int newfd = cygheap_fdnew ();
+  if (newfd < 0)
+    res = -1;
+  else
+    res = cygheap->fdtab.dup3 (fd, newfd, 0);
   syscall_printf ("%R = dup(%d)", res, fd);
   return res;
 }
@@ -2611,7 +2616,8 @@ setdtablesize (int size)
       return -1;
     }
 
-  if (size <= (int)cygheap->fdtab.size || cygheap->fdtab.extend (size - cygheap->fdtab.size))
+  if (size <= (int) cygheap->fdtab.size
+      || cygheap->fdtab.extend (size - cygheap->fdtab.size, OPEN_MAX_MAX))
     return 0;
 
   return -1;
@@ -2620,7 +2626,7 @@ setdtablesize (int size)
 extern "C" int
 getdtablesize ()
 {
-  return cygheap->fdtab.size > OPEN_MAX ? cygheap->fdtab.size : OPEN_MAX;
+  return cygheap->fdtab.size;
 }
 
 extern "C" int
