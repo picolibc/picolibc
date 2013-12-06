@@ -1,3 +1,7 @@
+2013-12-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* syscalls.cc (dup): Use cygheap_fdnew properly.
+
 2013-12-05  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* cygheap.h (cygheap_fdnew): Avoid setting errno directly since it will

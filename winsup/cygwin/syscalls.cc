@@ -121,7 +121,7 @@ extern "C" int
 dup (int fd)
 {
   int res;
-  int newfd = cygheap_fdnew ();
+  cygheap_fdnew newfd;
   if (newfd < 0)
     res = -1;
   else
