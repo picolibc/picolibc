@@ -4,6 +4,21 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.27"><title>What's new and what changed from 1.7.26 to 1.7.27</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Don't create native symlinks with target paths having long path prefixes
+"\\?\" if the target path is shorter than MAX_PATH characters.  This works
+around a Windows 8.1 bug:  The ShellExecuteW fails if the lpFile parameter
+points to a native NTFS symlink with a target path prefixed with "\\?\".
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.26"><title>What's new and what changed from 1.7.25 to 1.7.26</title>
 
 <itemizedlist mark="bullet">
