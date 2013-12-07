@@ -1553,7 +1553,6 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
     {
       win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
       final_oldpath = win32_oldpath.get_nt_native_path ();
-      final_oldpath->Buffer[1] = L'\\';
     }
   else
     {
@@ -1591,7 +1590,6 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
 	{
 	  /* 3a. No valid common path prefix: Create absolute symlink. */
 	  final_oldpath = win32_oldpath.get_nt_native_path ();
-	  final_oldpath->Buffer[1] = L'\\';
 	}
       else
 	{
@@ -1619,15 +1617,34 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
       SetLastError (ERROR_FILE_NOT_FOUND);
       return -1;
     }
-  /* Convert native path to DOS UNC path. */
+  /* Convert native paths to Win32 UNC paths. */
   final_newpath = win32_newpath.get_nt_native_path ();
   final_newpath->Buffer[1] = L'\\';
+  /* oldpath may be relative.  Make sure to convert only absolute paths
+     to Win32 paths. */
+  if (final_oldpath->Buffer[0] == L'\\')
+    {
+      /* Workaround Windows 8.1 bug.  On Windows 8.1, the ShellExecuteW
+	 function does not handle the long path prefix correctly for symlink
+	 targets.  Thus, we create simple short paths < MAX_PATH without
+	 long path prefix. */
+      if (RtlEqualUnicodePathPrefix (final_oldpath, &ro_u_uncp, TRUE)
+	  && final_oldpath->Length < (MAX_PATH + 6) * sizeof (WCHAR))
+	{
+	  final_oldpath->Buffer += 6;
+	  final_oldpath->Buffer[0] = L'\\';
+	}
+      else if (final_oldpath->Length < (MAX_PATH + 4) * sizeof (WCHAR))
+	final_oldpath->Buffer += 4;
+      else /* Stick to long path, fix native prefix for Win32 API calls. */
+	final_oldpath->Buffer[1] = L'\\';
+    }
   /* Try to create native symlink. */
   if (!CreateSymbolicLinkW (final_newpath->Buffer, final_oldpath->Buffer,
 			    win32_oldpath.isdir ()
 			    ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0))
     {
-      /* Repair native path, we still need it. */
+      /* Repair native newpath, we still need it. */
       final_newpath->Buffer[1] = L'?';
       return -1;
     }

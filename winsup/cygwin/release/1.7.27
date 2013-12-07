@@ -1,3 +1,12 @@
+What changed:
+-------------
+
+- Don't create native symlinks with target paths having long path prefixes
+  "\\?\" if the target path is shorter than MAX_PATH characters.  This works
+  around a Windows 8.1 bug:  The ShellExecuteW fails if the lpFile parameter
+  points to a native NTFS symlink with a target path prefixed with "\\?\".
+
+
 Bug Fixes
 ---------
 

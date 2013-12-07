@@ -1,3 +1,8 @@
+2013-12-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_native): Workaround Windows 8.1 bug: Drop long path
+	prefix from symlink target path.  Add comment to explain why.
+
 2013-12-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* syscalls.cc (dup): Use cygheap_fdnew properly.
