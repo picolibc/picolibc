@@ -5,6 +5,7 @@ What changed:
   "\\?\" if the target path is shorter than MAX_PATH characters.  This works
   around a Windows 8.1 bug:  The ShellExecuteW fails if the lpFile parameter
   points to a native NTFS symlink with a target path prefixed with "\\?\".
+  Fixes: http://cygwin.com/ml/cygwin/2013-12/msg00101.html
 
 
 Bug Fixes
