@@ -1,0 +1,10 @@
+What changed:
+-------------
+
+
+Bug Fixes
+---------
+
+- Signals should no longer hang when they occur within a low-level
+  Windows DLL.
+  Fixes: http://cygwin.com/ml/cygwin/2013-12/threads.html#00151
