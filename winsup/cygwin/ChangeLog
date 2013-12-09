@@ -1,3 +1,10 @@
+2013-12-09  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* globals.cc (hntdll): Define/declare.
+	* exceptions.cc (inside_kernel): Don't call GetModuleFileName if we
+	know we're in ntdll.
+	* sigproc.cc (wait_sig): Initialize hntdll.
+
 2013-12-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/stdlib.h (initstate, random, setstate, srandom):

@@ -394,6 +394,9 @@ _cygtls::inside_kernel (CONTEXT *cx)
 # define h ((HMODULE) m.AllocationBase)
   if (!h || m.State != MEM_COMMIT)	/* Be defensive */
     res = true;
+  else if (h == hntdll)
+    res = true;				/* Calling GetModuleFilename on ntdll.dll
+					   can hang */
   else if (h == user_data->hmodule)
     res = false;
   else if (!GetModuleFileNameW (h, checkdir, windows_system_directory_length + 6))

@@ -1205,6 +1205,8 @@ wait_sig (VOID *)
   sigproc_printf ("entering ReadFile loop, my_readsig %p, my_sendsig %p",
 		  my_readsig, my_sendsig);
 
+  hntdll = GetModuleHandle ("ntdll.dll");
+
   for (;;)
     {
       DWORD nb;

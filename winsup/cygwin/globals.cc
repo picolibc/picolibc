@@ -23,6 +23,7 @@ HANDLE NO_COPY hProcToken;
 HANDLE NO_COPY hProcImpToken;
 HANDLE my_wr_proc_pipe;
 HMODULE NO_COPY cygwin_hmodule;
+HMODULE NO_COPY hntdll;
 int NO_COPY sigExeced;
 WCHAR windows_system_directory[MAX_PATH];
 UINT windows_system_directory_length;
