@@ -1,7 +1,3 @@
-2013-12-04  Richard Sandiford  <rdsandiford@googlemail.com>
-
-	* longlong.h: New file.
-
 2013-10-29  Marc Glisse  <marc.glisse@inria.fr>
 
 	PR tree-optimization/58689

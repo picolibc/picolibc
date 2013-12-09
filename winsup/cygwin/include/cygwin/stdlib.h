@@ -31,7 +31,9 @@ void	setprogname (const char *);
 char *canonicalize_file_name (const char *);
 int unsetenv (const char *);
 #endif /*__STRICT_ANSI__*/
-#if !defined(__STRICT_ANSI__) || (_XOPEN_SOURCE >= 500) || (defined(_XOPEN_SOURCE) && defined(_XOPEN_SOURCE_EXTENDED))
+#if !defined(__STRICT_ANSI__) \
+    || (defined(_XOPEN_SOURCE) \
+	&& ((_XOPEN_SOURCE - 0 >= 500) || defined(_XOPEN_SOURCE_EXTENDED)))
 char *initstate (unsigned seed, char *state, size_t size);
 long random (void);
 char *setstate (const char *state);
