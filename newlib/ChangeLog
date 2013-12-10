@@ -1,3 +1,15 @@
+2013-12-10  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* acconfig.h: Add _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL.
+	* newlib.hin: Ditto.
+	* configure: Regenerate.
+	* configure.in: Add setting of _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL.
+	* libc/string/local.h: Add check for _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
+	and set __inhibit_loop_to_libcall macro appropriately.
+	* libc/string/memmove.c: Use __inhibit_loop_to_libcall macro in
+	function declaration.
+	* libc/string/memset.c: Ditto.
+
 2013-12-10  Chirayu Desai  <chirayudesai1@gmail.com>
 
 	* libc/sys/rtems/include/limits.h: Update page size to match

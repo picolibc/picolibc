@@ -34,12 +34,14 @@ QUICKREF
 */
 
 #include <string.h>
+#include "local.h"
 
 #define LBLOCKSIZE (sizeof(long))
 #define UNALIGNED(X)   ((long)X & (LBLOCKSIZE - 1))
 #define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)
 
 _PTR
+__inhibit_loop_to_libcall
 _DEFUN (memset, (m, c, n),
 	_PTR m _AND
 	int c _AND

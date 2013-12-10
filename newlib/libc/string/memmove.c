@@ -39,6 +39,7 @@ QUICKREF
 #include <_ansi.h>
 #include <stddef.h>
 #include <limits.h>
+#include "local.h"
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
 #define UNALIGNED(X, Y) \
@@ -55,6 +56,7 @@ QUICKREF
 
 /*SUPPRESS 20*/
 _PTR
+__inhibit_loop_to_libcall
 _DEFUN (memmove, (dst_void, src_void, length),
 	_PTR dst_void _AND
 	_CONST _PTR src_void _AND

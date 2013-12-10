@@ -52,6 +52,9 @@
 /* Define if the platform supports long double type.  */
 #undef  _HAVE_LONG_DOUBLE
 
+/* Define if compiler supports -fno-tree-loop-distribute-patterns. */
+#undef  _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
+
 /* Define if the platform long double type is equal to double.  */
 #undef  _LDBL_EQ_DBL
  

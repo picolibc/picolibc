@@ -526,6 +526,25 @@ if test $libc_cv_initfinit_array = yes; then
   AC_DEFINE_UNQUOTED(HAVE_INITFINI_ARRAY)
 fi
 
+AC_CACHE_CHECK(if $CC accepts -fno-tree-loop-distribute-patterns with \
+__attribute__ ((__optimize__)), libc_cv_cc_loop_to_function, [dnl
+cat > conftest.c <<EOF
+void
+__attribute__ ((__optimize__ ("-fno-tree-loop-distribute-patterns")))
+foo (void) {}
+EOF
+libc_cv_cc_loop_to_function=no
+if AC_TRY_COMMAND([${CC-cc} $CFLAGS $CPPFLAGS -c
+			    -fno-tree-loop-distribute-patterns conftest.c])
+then
+  libc_cv_cc_loop_to_function=yes
+fi
+rm -f conftest*])
+if test $libc_cv_cc_loop_to_function = yes; then
+  AC_DEFINE(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
+fi
+AC_SUBST(libc_cv_cc_loop_to_function)
+
 dnl Autoconf 2.59 doesn't support the AC_TYPE_LONG_DOUBLE macro. Instead of:
 dnl   AC_TYPE_LONG_DOUBLE
 dnl   AM_CONDITIONAL(HAVE_LONG_DOUBLE, test x"$ac_cv_type_long_double" = x"yes")
