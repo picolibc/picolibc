@@ -1,3 +1,12 @@
+2013-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_dev_clipboard): Add private member
+	cygnativeformat.  Declare private method set_clipboard.
+	* fhandler_clipboard.cc (cygnativeformat): Convert static variable to
+	fhandler_dev_clipboard member.
+	(fhandler_dev_clipboard::set_clipboard): Convert from static function
+	to fhandler_dev_clipboard method.
+
 2013-12-09  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* globals.cc (hntdll): Define/declare.

@@ -1688,9 +1688,12 @@ class fhandler_dev_random: public fhandler_base
 
 class fhandler_dev_clipboard: public fhandler_base
 {
+  UINT cygnativeformat;
   off_t pos;
   void *membuffer;
   size_t msize;
+  int set_clipboard (const void *buf, size_t len);
+
  public:
   fhandler_dev_clipboard ();
   int is_windows () { return 1; }

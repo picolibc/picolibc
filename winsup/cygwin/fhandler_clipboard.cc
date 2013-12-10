@@ -28,8 +28,6 @@ details. */
  */
 
 static const WCHAR *CYGWIN_NATIVE = L"CYGWIN_NATIVE_CLIPBOARD";
-/* this is MT safe because windows format id's are atomic */
-static UINT cygnativeformat;
 
 typedef struct
 {
@@ -61,8 +59,8 @@ fhandler_dev_clipboard::dup (fhandler_base * child, int flags)
   return fhandler_base::dup (child, flags);
 }
 
-static int
-set_clipboard (const void *buf, size_t len)
+int
+fhandler_dev_clipboard::set_clipboard (const void *buf, size_t len)
 {
   HGLOBAL hmem;
   /* Native CYGWIN format */
