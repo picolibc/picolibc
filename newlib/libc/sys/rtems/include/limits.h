@@ -66,7 +66,7 @@
 #define DELAYTIMER_MAX          32
 #define MQ_OPEN_MAX             8
 #define MQ_PRIO_MAX             32
-#define PAGESIZE                1
+#define PAGESIZE                (1<<12)
 #define RTSIG_MAX               8
 #define SEM_NSEMS_MAX           256
 #define SEM_VALUE_MAX           32767
