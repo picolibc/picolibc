@@ -185,6 +185,11 @@ dup3 (int oldfd, int newfd, int flags)
   return res;
 }
 
+/* Define macro to simplify checking for a transactional error code. */
+#define NT_TRANSACTIONAL_ERROR(s)	\
+		(((ULONG)(s) >= (ULONG)STATUS_TRANSACTIONAL_CONFLICT) \
+		 && ((ULONG)(s) <= (ULONG)STATUS_LOG_GROWTH_FAILED))
+
 static inline void
 start_transaction (HANDLE &old_trans, HANDLE &trans)
 {
@@ -204,7 +209,7 @@ start_transaction (HANDLE &old_trans, HANDLE &trans)
 }
 
 static inline NTSTATUS
-stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE trans)
+stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE &trans)
 {
   RtlSetCurrentTransaction (old_trans);
   if (NT_SUCCESS (status))
@@ -212,6 +217,7 @@ stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE trans)
   else
     status = NtRollbackTransaction (trans, TRUE);
   NtClose (trans);
+  trans = NULL;
   return status;
 }
 
@@ -702,7 +708,7 @@ unlink_nt (path_conv &pc)
       if (wincap.has_transactions ()
 	  && (pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
 	start_transaction (old_trans, trans);
-
+retry_open:
       status = NtOpenFile (&fh_ro, FILE_WRITE_ATTRIBUTES, &attr, &io,
 			   FILE_SHARE_VALID_FLAGS, flags);
       if (NT_SUCCESS (status))
@@ -718,8 +724,18 @@ unlink_nt (path_conv &pc)
 	  pc.init_reopen_attr (&attr, fh_ro);
 	}
       else
-	debug_printf ("Opening %S for removing R/O failed, status = %y",
-		      pc.get_nt_native_path (), status);
+	{
+	  debug_printf ("Opening %S for removing R/O failed, status = %y",
+			pc.get_nt_native_path (), status);
+	  if (NT_TRANSACTIONAL_ERROR (status) && trans)
+	    {
+	      /* If NtOpenFile fails due to transactional problems, stop
+		 transaction and go ahead without. */
+	      stop_transaction (status, old_trans, trans);
+	      debug_printf ("Transaction failure.  Retry open.");
+	      goto retry_open;
+	    }
+	}
       if (pc.is_lnk_symlink ())
 	{
 	  status = NtQueryInformationFile (fh_ro, &io, &fsi, sizeof fsi,
@@ -984,11 +1000,8 @@ try_again:
     }
 out:
   /* Stop transaction if we started one. */
-  if ((access & FILE_WRITE_ATTRIBUTES)
-      && wincap.has_transactions ()
-      && (pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
+  if (trans)
     stop_transaction (status, old_trans, trans);
-
   syscall_printf ("%S, return status = %y", pc.get_nt_native_path (), status);
   return status;
 }
@@ -2421,6 +2434,14 @@ retry:
 	      goto retry;
 	    }
 	}
+      else if (NT_TRANSACTIONAL_ERROR (status) && trans)
+	{
+	  /* If NtOpenFile fails due to transactional problems, stop
+	     transaction and go ahead without. */
+	  stop_transaction (status, old_trans, trans);
+	  debug_printf ("Transaction failure.  Retry open.");
+	  goto retry;
+	}
       __seterrno_from_nt_status (status);
       goto out;
     }
@@ -2542,6 +2563,7 @@ retry:
 	     Fortunately nothing has happened yet, so the atomicity of the
 	     rename functionality is not spoiled. */
 	  NtClose (fh);
+retry_reopen:
 	  status = NtOpenFile (&fh, DELETE,
 			       oldpc.get_object_attr (attr, sec_none_nih),
 			       &io, FILE_SHARE_VALID_FLAGS,
@@ -2550,6 +2572,14 @@ retry:
 				  ? FILE_OPEN_REPARSE_POINT : 0));
 	  if (!NT_SUCCESS (status))
 	    {
+	      if (NT_TRANSACTIONAL_ERROR (status) && trans)
+		{
+		  /* If NtOpenFile fails due to transactional problems, stop
+		     transaction and go ahead without. */
+		  stop_transaction (status, old_trans, trans);
+		  debug_printf ("Transaction failure.  Retry open.");
+		  goto retry_reopen;
+		}
 	      __seterrno_from_nt_status (status);
 	      goto out;
 	    }
@@ -2571,7 +2601,8 @@ retry:
 out:
   if (fh)
     NtClose (fh);
-  if (wincap.has_transactions () && trans)
+  /* Stop transaction if we started one. */
+  if (trans)
     stop_transaction (status, old_trans, trans);
   syscall_printf ("%R = rename(%s, %s)", res, oldpath, newpath);
   return res;

@@ -8,3 +8,8 @@ Bug Fixes
 - Signals should no longer hang when they occur within a low-level
   Windows DLL.
   Fixes: http://cygwin.com/ml/cygwin/2013-12/threads.html#00151
+
+- If it turns out that transactions don't work during unlink(2) or rename(2),
+  despite the fact that the filesystem claims to handle them, stop transaction
+  and try again without.
+  Fixes: http://cygwin.com/ml/cygwin/2013-12/msg00119.html

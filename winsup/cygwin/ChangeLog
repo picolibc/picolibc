@@ -1,5 +1,17 @@
 2013-12-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (NT_TRANSACTIONAL_ERROR): Define.
+	(stop_transaction): Take "trans" HANDLE by reference and set it to
+	NULL after closing it.
+	(unlink_nt): If NtOpenFile fails due to a transactional error, stop
+	transaction and retry NtOpenFile.  Simplify check for having to call
+	stop_transaction.
+	(rename): If NtOpenFile fails due to a transactional error, stop
+	transaction and retry NtOpenFile in both affected cases.  Simplify check
+	for having to call stop_transaction and add comment from unlink_nt.
+
+2013-12-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (fs_info::update): Fix formatting.
 
 2013-12-10  Corinna Vinschen  <corinna@vinschen.de>
