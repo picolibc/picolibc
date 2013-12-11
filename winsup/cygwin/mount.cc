@@ -264,8 +264,8 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	NtClose (vol);
       return false;
     }
-   flags (ffai_buf.ffai.FileSystemAttributes);
-   name_len (ffai_buf.ffai.MaximumComponentNameLength);
+  flags (ffai_buf.ffai.FileSystemAttributes);
+  name_len (ffai_buf.ffai.MaximumComponentNameLength);
   RtlInitCountedUnicodeString (&fsname, ffai_buf.ffai.FileSystemName,
 			       ffai_buf.ffai.FileSystemNameLength);
   if (is_remote_drive ())

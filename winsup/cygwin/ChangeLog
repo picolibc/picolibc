@@ -1,3 +1,7 @@
+2013-12-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (fs_info::update): Fix formatting.
+
 2013-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_dev_clipboard): Add private member
