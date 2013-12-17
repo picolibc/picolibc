@@ -13,3 +13,6 @@ Bug Fixes
   despite the fact that the filesystem claims to handle them, stop transaction
   and try again without.
   Fixes: http://cygwin.com/ml/cygwin/2013-12/msg00119.html
+
+- Closing a dup'ed master tty handle should no longer invalidate the dup'ed fd.
+  Fixes: http://cygwin.com/ml/cygwin/2013-12/threads.html#00279

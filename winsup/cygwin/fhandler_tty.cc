@@ -1326,15 +1326,6 @@ fhandler_pty_master::close ()
   return 0;
 }
 
-/* This is just to catch error conditions.  Since the constructor
-   actually opens some handles, and stat() does not open an fd, they need
-   to be closed when the fhandler goes away. */
-fhandler_pty_master::~fhandler_pty_master ()
-{
-  if (from_master && to_master)
-    close_with_arch ();
-}
-
 ssize_t __stdcall
 fhandler_pty_master::write (const void *ptr, size_t len)
 {

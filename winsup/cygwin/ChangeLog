@@ -1,3 +1,8 @@
+2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* fhandler.h (fhandler_pty_master::~fhandler_pty_master): Delete.
+	* fhandler_tty.cc (fhandler_pty_master::~fhandler_pty_master): Ditto.
+
 2013-12-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (NT_TRANSACTIONAL_ERROR): Define.

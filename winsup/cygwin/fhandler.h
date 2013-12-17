@@ -1573,7 +1573,6 @@ public:
   void flush_to_slave ();
 
   fhandler_pty_master (void *) {}
-  ~fhandler_pty_master ();
 
   void copyto (fhandler_base *x)
   {
