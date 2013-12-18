@@ -1,5 +1,9 @@
 2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* sigproc.cc (sig_send): Set PIPE_NOWAIT for pipes which are not us.
+
+2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* fhandler.h (fhandler_pty_master::~fhandler_pty_master): Delete.
 	* fhandler_tty.cc (fhandler_pty_master::~fhandler_pty_master): Ditto.
 
