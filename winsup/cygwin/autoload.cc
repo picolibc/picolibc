@@ -643,6 +643,7 @@ LoadDLLfunc (SetParent, 8, user32)
 LoadDLLfunc (SetProcessWindowStation, 4, user32)
 LoadDLLfunc (SetThreadDesktop, 4, user32)
 
+LoadDLLfunc (timeBeginPeriod, 4, winmm)
 LoadDLLfuncEx3 (waveInAddBuffer, 12, winmm, 1, 0, 1)
 LoadDLLfuncEx3 (waveInClose, 4, winmm, 1, 0, 1)
 LoadDLLfuncEx3 (waveInGetNumDevs, 0, winmm, 1, 0, 1)

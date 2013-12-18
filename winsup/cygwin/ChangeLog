@@ -1,5 +1,15 @@
 2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* autoload.cc (timeBeginPeriod): Autoload.
+	* dcrt0.cc (dll_crt0_1): Use timeBeginPeriod to set default resolution
+	to 1 ms.
+	* pinfo.cc (pinfo::thisproc): Set ppid for redirected _pinfo blocks too.
+	(pinfo::init): Avoid using VirtualQuery.  Just rely on the assumption that
+	procinfo will be populated.
+	* pinfo.h (_pinfo::ppid): Move into redirected block.
+
+2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* external.cc (fillout_pinfo): Remove nonsensical loop.
 	* fork.cc (frok::parent): When initializing pinfo for child new PID_NEW
 	flag + actual defined constant rather than raw number.  Don't set

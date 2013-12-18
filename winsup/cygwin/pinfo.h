@@ -50,15 +50,14 @@ public:
      constants in <sys/cygwin.h>. */
   DWORD process_state;
 
+  pid_t ppid;		/* Parent process id.  */
+
   DWORD exitcode;	/* set when process exits */
 
 #define PINFO_REDIR_SIZE ((char *) &myself.procinfo->exitcode - (char *) myself.procinfo)
 
   /* > 0 if started by a cygwin process */
   DWORD cygstarted;
-
-  /* Parent process id.  */
-  pid_t ppid;
 
   /* dwProcessId contains the processid used for sending signals.  It
     will be reset in a child process when it is capable of receiving

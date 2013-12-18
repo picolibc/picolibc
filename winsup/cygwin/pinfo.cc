@@ -77,6 +77,7 @@ pinfo::thisproc (HANDLE h)
       myself_identity.init (cygwin_pid (procinfo->dwProcessId), PID_EXECED, NULL);
       procinfo->exec_sendsig = NULL;
       procinfo->exec_dwProcessId = 0;
+      myself_identity->ppid = procinfo->pid;
     }
 }
 
@@ -317,14 +318,9 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	 If the block has been allocated with PINFO_REDIR_SIZE but not yet
 	 updated with a PID_EXECED state then we'll retry.  */
       if (!created && !(flag & PID_NEW))
-	{
-	  MEMORY_BASIC_INFORMATION mbi;
-	  for (int i = 0; i < 1000 && !procinfo->ppid; i++)
-	    Sleep (0);
-	  if (procinfo->exists () && VirtualQuery (procinfo, &mbi, sizeof (mbi))
-	      && mbi.RegionSize < sizeof (_pinfo))
-	    goto loop;
-	}
+	/* If not populated, wait 2 seconds for procinfo to become populated  */
+	for (int i = 0; i < 2000 && !procinfo->ppid; i++)
+	  Sleep (1);
 
       if (!created && createit && (procinfo->process_state & PID_REAPED))
 	{
