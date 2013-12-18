@@ -22,3 +22,6 @@ Bug Fixes
 
 - Using gdb from a Windows console rather than a pty should no longer randomly
   hang.
+
+- Fix locale-specific radix char handling in scanf family of functions.
+  Fixes: http://cygwin.com/ml/cygwin/2013-12/msg00294.html
