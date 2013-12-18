@@ -56,16 +56,21 @@ pinfo::thisproc (HANDLE h)
 {
   procinfo = NULL;
 
+  DWORD flags = PID_IN_USE | PID_ACTIVE;
   if (!h)
-    cygheap->pid = cygwin_pid (myself_initial.pid);
+    {
+      h = INVALID_HANDLE_VALUE;
+      cygheap->pid = cygwin_pid (myself_initial.pid);
+      flags |= PID_NEW;
+    }
 
-  init (cygheap->pid, PID_IN_USE, h ?: INVALID_HANDLE_VALUE);
+  init (cygheap->pid, flags, h);
   procinfo->process_state |= PID_IN_USE;
   procinfo->dwProcessId = myself_initial.pid;
   procinfo->sendsig = myself_initial.sendsig;
   wcscpy (procinfo->progname, myself_initial.progname);
   debug_printf ("myself dwProcessId %u", procinfo->dwProcessId);
-  if (h)
+  if (h != INVALID_HANDLE_VALUE)
     {
       /* here if execed */
       static pinfo NO_COPY myself_identity;
@@ -73,9 +78,6 @@ pinfo::thisproc (HANDLE h)
       procinfo->exec_sendsig = NULL;
       procinfo->exec_dwProcessId = 0;
     }
-  else if (!child_proc_info)	/* child_proc_info is only set when this process
-				   was started by another cygwin process */
-    procinfo->start_time = time (NULL); /* Register our starting time. */
 }
 
 /* Initialize the process table entry for the current task.
@@ -94,20 +96,20 @@ pinfo_init (char **envp, int envc)
       /* Invent our own pid.  */
 
       myself.thisproc (NULL);
-      myself->ppid = 1;
       myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;
       myself->uid = ILLEGAL_UID;
       myself->gid = UNKNOWN_GID;
       environ_init (NULL, 0);	/* call after myself has been set up */
       myself->nice = winprio_to_nice (GetPriorityClass (GetCurrentProcess ()));
+      myself->ppid = 1;		/* always set last */
       debug_printf ("Set nice to %d", myself->nice);
     }
 
   myself->process_state |= PID_ACTIVE;
   myself->process_state &= ~(PID_INITIALIZING | PID_EXITED | PID_REAPED);
   myself.preserve ();
-  debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
+  debug_printf ("pid %d, pgid %d, process_state %y", myself->pid, myself->pgid, myself->process_state);
 }
 
 DWORD
@@ -314,11 +316,15 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
       /* Detect situation where a transitional memory block is being retrieved.
 	 If the block has been allocated with PINFO_REDIR_SIZE but not yet
 	 updated with a PID_EXECED state then we'll retry.  */
-      MEMORY_BASIC_INFORMATION mbi;
-      if (!created && procinfo->exists ()
-	  && VirtualQuery (procinfo, &mbi, sizeof (mbi))
-	  && mbi.RegionSize < sizeof (_pinfo))
-	goto loop;
+      if (!created && !(flag & PID_NEW))
+	{
+	  MEMORY_BASIC_INFORMATION mbi;
+	  for (int i = 0; i < 1000 && !procinfo->ppid; i++)
+	    Sleep (0);
+	  if (procinfo->exists () && VirtualQuery (procinfo, &mbi, sizeof (mbi))
+	      && mbi.RegionSize < sizeof (_pinfo))
+	    goto loop;
+	}
 
       if (!created && createit && (procinfo->process_state & PID_REAPED))
 	{
@@ -360,6 +366,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	  goto loop;
 	}
 
+      if (flag & PID_NEW)
+	procinfo->start_time = time (NULL);
       if (!created)
 	/* nothing */;
       else if (!(flag & PID_EXECED))
@@ -1112,19 +1120,23 @@ cygwin_winpid_to_pid (int winpid)
 #define size_pinfolist(i) (sizeof (pinfolist[0]) * ((i) + 1))
 class _onreturn
 {
-  HANDLE *h;
+  HANDLE h;
 public:
   ~_onreturn ()
   {
-    if (h && *h)
+    if (h)
       {
-	CloseHandle (*h);
-	*h = NULL;
-	h = NULL;
+	CloseHandle (h);
       }
   }
-  void no_close_p_handle () {h = NULL;}
-  _onreturn (HANDLE& _h): h (&_h) {}
+  void no_close_handle (pinfo& p)
+  {
+    p.hProcess = h;
+    h = NULL;
+  }
+  _onreturn (): h (NULL) {}
+  void operator = (HANDLE h0) {h = h0;}
+  operator HANDLE () const {return h;}
 };
 
 inline void
@@ -1139,23 +1151,28 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
       pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
     }
 
+  _onreturn onreturn;
   pinfo& p = pinfolist[nelem];
   memset (&p, 0, sizeof (p));
 
-  /* Open a process to prevent a subsequent exit from invalidating the
-     shared memory region. */
-  p.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, false, pid);
-  _onreturn onreturn (p.hProcess);
-
-  /* If we couldn't open the process then we don't have rights to it and should
-     make a copy of the shared memory area if it exists (it may not).  */
   bool perform_copy;
-  if (!p.hProcess)
-    perform_copy = true;
+  if (cygpid == myself->pid)
+    {
+      p = myself;
+      perform_copy = false;
+    }
   else
-    perform_copy = make_copy;
+    {
+      /* Open a process to prevent a subsequent exit from invalidating the
+	 shared memory region. */
+      onreturn = OpenProcess (PROCESS_QUERY_INFORMATION, false, pid);
 
-  p.init (cygpid, PID_NOREDIR | pinfo_access, NULL);
+      /* If we couldn't open the process then we don't have rights to it and should
+	 make a copy of the shared memory area when it exists (it may not).  */
+      perform_copy = onreturn ? make_copy : true;
+
+      p.init (cygpid, PID_NOREDIR | pinfo_access, NULL);
+    }
 
   /* If we're just looking for winpids then don't do any special cygwin "stuff* */
   if (winpid)
@@ -1170,7 +1187,7 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
       p.init (cygpid, PID_NOREDIR, NULL);
       if (!p)
 	return;
-      }
+    }
 
   /* Scan list of previously recorded pids to make sure that this pid hasn't
      shown up before.  This can happen when a process execs. */
@@ -1212,12 +1229,12 @@ out:
 	/* handle specially.  Close the handle but (eventually) don't
 	   deallocate procinfo in release call */;
       else if (!perform_copy)
-	onreturn.no_close_p_handle ();	/* Don't close the handle until release */
+	onreturn.no_close_handle (p);	/* Don't close the handle until release */
       else
 	{
 	  _pinfo *pnew = (_pinfo *) malloc (sizeof (*p.procinfo));
 	  if (!pnew)
-	    onreturn.no_close_p_handle ();
+	    onreturn.no_close_handle (p);
 	  else
 	    {
 	      *pnew = *p.procinfo;
@@ -1246,23 +1263,17 @@ winpids::enum_processes (bool winpid)
   HANDLE dir = get_shared_parent_dir ();
   BOOLEAN restart = TRUE;
 
-  do
+  while (NT_SUCCESS (NtQueryDirectoryObject (dir, &f, sizeof f, TRUE, restart,
+					     &context, NULL)))
     {
-      status = NtQueryDirectoryObject (dir, &f, sizeof f, TRUE, restart,
-				       &context, NULL);
-      if (NT_SUCCESS (status))
+      restart = FALSE;
+      f.dbi.ObjectName.Buffer[f.dbi.ObjectName.Length / sizeof (WCHAR)] = L'\0';
+      if (wcsncmp (f.dbi.ObjectName.Buffer, L"cygpid.", 7) == 0)
 	{
-	  restart = FALSE;
-	  f.dbi.ObjectName.Buffer[f.dbi.ObjectName.Length / sizeof (WCHAR)]
-	    = L'\0';
-	  if (wcsncmp (f.dbi.ObjectName.Buffer, L"cygpid.", 7) == 0)
-	    {
-	      DWORD pid = wcstoul (f.dbi.ObjectName.Buffer + 7, NULL, 10);
-	      add (nelem, false, pid);
-	    }
+	  DWORD pid = wcstoul (f.dbi.ObjectName.Buffer + 7, NULL, 10);
+	  add (nelem, false, pid);
 	}
     }
-  while (NT_SUCCESS (status));
   cygwin_pid_nelem = nelem;
 
   if (winpid)
@@ -1332,18 +1343,15 @@ winpids::enum_processes (bool winpid)
 	  px = (PSYSTEM_PROCESS_INFORMATION) ((char *) px + px->NextEntryOffset);
 	}
     }
-
   return nelem;
 }
 
 void
 winpids::set (bool winpid)
 {
-  __malloc_lock ();
   npids = enum_processes (winpid);
   if (pidlist)
     pidlist[npids] = 0;
-  __malloc_unlock ();
 }
 
 DWORD

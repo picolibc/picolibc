@@ -220,7 +220,7 @@ enum
   PID_MYSELF	       = 0x00200, /* Flag that pid is me. */
   PID_NOCLDSTOP	       = 0x00400, /* Set if no SIGCHLD signal on stop. */
   PID_INITIALIZING     = 0x00800, /* Set until ready to receive signals. */
-  PID_UNUSED1	       = 0x01000, /* Available. */
+  PID_NEW	       = 0x01000, /* Available. */
   PID_ALLPIDS	       = 0x02000, /* used by pinfo scanner */
   PID_EXECED	       = 0x04000, /* redirect to original pid info block */
   PID_NOREDIR	       = 0x08000, /* don't redirect if execed */

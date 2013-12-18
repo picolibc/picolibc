@@ -1,5 +1,27 @@
 2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* external.cc (fillout_pinfo): Remove nonsensical loop.
+	* fork.cc (frok::parent): When initializing pinfo for child new PID_NEW
+	flag + actual defined constant rather than raw number.  Don't set
+	start_time here.
+	* pinfo.cc (pinfo::thisproc): Use PID_NEW when initializing pinfo.
+	Avoid checking h for NULL multiple times.  Don't set start_time here.
+	(pinfo_init): Aways set ppid last.  Tweak strace output.
+	(pinfo::init): Handle new PID_NEW flag.  Wait for shared memory to
+	contain useful information.  Set start_time if PID_NEW.
+	(_onreturn:h): Define as HANDLE rather than HANDLE *.
+	(_onreturn::~onreturn): Accommodate h definition change.
+	(_onreturn::no_close_handle): Rename from no_close_p_handle.  Take a
+	pinfo arg and set hProcess to h before zeroing.
+	(winpids::add): Don't open a handle to our own process.  Change logic
+	associated with when a handle gets closed.  Accommodate no_close_handle
+	changes.
+	(winpids::enum_processes): Simplify process enumeration loop.
+	(winpids::set): Eliminate ill-considered malloc locking.
+	* sigproc.cc (proc_subproc): Always set ppid last.
+
+2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* sigproc.cc (sig_send): Set PIPE_NOWAIT for pipes which are not us.
 
 2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>

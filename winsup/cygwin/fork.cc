@@ -344,7 +344,6 @@ frok::parent (volatile char * volatile stack_here)
   syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %y, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
-  time_t start_time = time (NULL);
 
   /* Remove impersonation */
   cygheap->user.deimpersonate ();
@@ -412,7 +411,7 @@ frok::parent (volatile char * volatile stack_here)
   fix_impersonation = false;
 
   child_pid = cygwin_pid (pi.dwProcessId);
-  child.init (child_pid, 1, NULL);
+  child.init (child_pid, PID_IN_USE | PID_NEW, NULL);
 
   if (!child)
     {
@@ -421,7 +420,6 @@ frok::parent (volatile char * volatile stack_here)
       goto cleanup;
     }
 
-  child->start_time = start_time; /* Register child's starting time. */
   child->nice = myself->nice;
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
