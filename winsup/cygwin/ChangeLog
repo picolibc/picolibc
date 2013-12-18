@@ -1,5 +1,11 @@
 2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
+	* autoload.cc (timeBeginPeriod): Delete.
+	* dcrt0.cc (dll_crt0_1): Use NtSetTimerResolution rather than
+	timeBeginPeriod.
+
+2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
 	* autoload.cc (timeBeginPeriod): Autoload.
 	* dcrt0.cc (dll_crt0_1): Use timeBeginPeriod to set default resolution
 	to 1 ms.

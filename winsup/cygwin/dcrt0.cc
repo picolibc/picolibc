@@ -836,7 +836,7 @@ dll_crt0_1 (void *)
 {
   extern void initial_setlocale ();
 
-  timeBeginPeriod (1);
+  NtSetTimerResolution (10000, TRUE, NULL);
   _my_tls.incyg++;
   /* Inherit "parent" exec'ed process sigmask */
   if (spawn_info && !in_forkee)
