@@ -318,9 +318,11 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 	 If the block has been allocated with PINFO_REDIR_SIZE but not yet
 	 updated with a PID_EXECED state then we'll retry.  */
       if (!created && !(flag & PID_NEW))
-	/* If not populated, wait 2 seconds for procinfo to become populated  */
-	for (int i = 0; i < 2000 && !procinfo->ppid; i++)
-	  Sleep (1);
+	/* If not populated, wait 2 seconds for procinfo to become populated.
+	   Would like to wait with finer granularity but that is not easily
+	   doable.  */
+	for (int i = 0; i < 200 && !procinfo->ppid; i++)
+	  Sleep (10);
 
       if (!created && createit && (procinfo->process_state & PID_REAPED))
 	{

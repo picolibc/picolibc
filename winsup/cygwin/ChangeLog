@@ -1,3 +1,9 @@
+2013-12-18  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* dcrt0.cc (dll_crt0_1): Remove NtSetTimerResolution.
+	* pinfo.cc (pinfo::init): Increase wait interval when waiting for
+	procinfo to stabilize.
+
 2013-12-17  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* autoload.cc (timeBeginPeriod): Delete.
