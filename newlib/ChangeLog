@@ -1,3 +1,11 @@
+2013-12-18  Corinna Vinschen  <vinschen@redhat.com>
+
+	* vfscanf.c (BUF): Change definition to take multibyte decimal point
+	into account.
+	(__SVFSCANF_R): Handle radix char language-dependent
+	per POSIX.
+	(__SVFWSCANF_R): Ditto.
+
 2013-12-10  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* acconfig.h: Add _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL.

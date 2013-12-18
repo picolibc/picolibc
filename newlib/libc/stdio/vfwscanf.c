@@ -161,6 +161,9 @@ C99, POSIX-1.2008
 #ifdef FLOATING_POINT
 #include <math.h>
 #include <float.h>
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+#include "../locale/lnumeric.h"
+#endif
 
 /* Currently a test is made to see if long double processing is warranted.
    This could be changed in the future should the _ldtoa_r code be
@@ -414,6 +417,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
   float *flp;
   _LONG_DOUBLE *ldp;
   double *dp;
+  wchar_t decpt;
 #endif
   long *lp;
 #ifndef _NO_LONGLONG
@@ -439,6 +443,27 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 #else
 # define GET_ARG(n, ap, type) (va_arg (ap, type))
 #endif
+
+#ifdef FLOATING_POINT
+#ifdef _MB_CAPABLE
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	  decpt = *__get_current_numeric_locale ()->wdecimal_point;
+#else
+	  {
+	    size_t nconv;
+
+	    memset (&state, '\0', sizeof (state));
+	    nconv = _mbrtowc_r (data, &decpt,
+				_localeconv_r (data)->decimal_point,
+				MB_CUR_MAX, &state);
+	    if (nconv == (size_t) -1 || nconv == (size_t) -2)
+	      decpt = L'.';
+	  }
+#endif /* !__HAVE_LOCALE_INFO_EXTENDED__ */
+#else
+	  decpt = (wchar_t) *_localeconv_r (data)->decimal_point;
+#endif /* !_MB_CAPABLE */
+#endif /* FLOATING_POINT */
 
   _newlib_flockfile_start (fp);
 
@@ -1271,14 +1296,6 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 		      goto fok;
 		    }
 		  break;
-		case L'.':
-		  if (flags & DPTOK)
-		    {
-		      flags &= ~(SIGNOK | DPTOK);
-		      leading_zeroes = zeroes;
-		      goto fok;
-		    }
-		  break;
 		case L'e':
 		case L'E':
 		  /* no exponent without some digits */
@@ -1294,6 +1311,14 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 			(flags & ~(EXPOK | DPTOK)) |
 			SIGNOK | NDIGITS;
 		      zeroes = 0;
+		      goto fok;
+		    }
+		  break;
+		default:
+		  if ((wchar_t) c == decpt && (flags & DPTOK))
+		    {
+		      flags &= ~(SIGNOK | DPTOK);
+		      leading_zeroes = zeroes;
 		      goto fok;
 		    }
 		  break;

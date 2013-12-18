@@ -162,6 +162,7 @@ Supporting OS subroutines required:
 #ifdef FLOATING_POINT
 #include <math.h>
 #include <float.h>
+#include <locale.h>
 
 /* Currently a test is made to see if long double processing is warranted.
    This could be changed in the future should the _ldtoa_r code be
@@ -174,11 +175,7 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 
 #include "floatio.h"
 
-#if ((MAXEXP+MAXFRACT+3) > MB_LEN_MAX)
-#  define BUF (MAXEXP+MAXFRACT+3)        /* 3 = sign + decimal point + NUL */
-#else
-#  define BUF MB_LEN_MAX
-#endif
+#define BUF (MAXEXP+MAXFRACT+MB_LEN_MAX+2) /* decimal point + sign + NUL */
 
 /* An upper bound for how long a long prints in decimal.  4 / 13 approximates
    log (2).  Add one char for roundoff compensation and one for the sign.  */
@@ -1288,6 +1285,10 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  unsigned width_left = 0;
 	  char nancount = 0;
 	  char infcount = 0;
+	  const char *decpt = _localeconv_r (rptr)->decimal_point;
+#ifdef _MB_CAPABLE
+	  int decptpos = 0;
+#endif
 #ifdef hardway
 	  if (width == 0 || width > sizeof (buf) - 1)
 #else
@@ -1416,14 +1417,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		      goto fok;
 		    }
 		  break;
-		case '.':
-		  if (flags & DPTOK)
-		    {
-		      flags &= ~(SIGNOK | DPTOK);
-		      leading_zeroes = zeroes;
-		      goto fok;
-		    }
-		  break;
 		case 'e':
 		case 'E':
 		  /* no exponent without some digits */
@@ -1442,6 +1435,53 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		      goto fok;
 		    }
 		  break;
+		default:
+#ifndef _MB_CAPABLE
+		  if ((unsigned char) c == (unsigned char) decpt[0]
+		      && (flags & DPTOK))
+		    {
+		      flags &= ~(SIGNOK | DPTOK);
+		      leading_zeroes = zeroes;
+		      goto fok;
+		    }
+		  break;
+#else
+		  if (flags & DPTOK)
+		    {
+		      while ((unsigned char) c
+			     == (unsigned char) decpt[decptpos])
+			{
+			  if (decpt[++decptpos] == '\0')
+			    {
+			      /* We read the complete decpt seq. */
+			      flags &= ~(SIGNOK | DPTOK);
+			      leading_zeroes = zeroes;
+			      p = stpncpy (p, decpt, decptpos);
+			      decptpos = 0;
+			      goto fskip;
+			    }
+			  ++nread;
+			  if (--fp->_r > 0)
+			    fp->_p++;
+			  else if (__srefill_r (rptr, fp))
+			    break;		/* EOF */
+			  c = *fp->_p;
+			}
+		      if (decptpos > 0)
+			{
+			  /* We read part of a multibyte decimal point,
+			     but the rest is invalid or we're at EOF,
+			     so back off. */
+			  while (decptpos-- > 0)
+			    {
+			      _ungetc_r (rptr, (unsigned char) decpt[decptpos],
+					 fp);
+			      --nread;
+			    }
+			}
+		    }
+		  break;
+#endif
 		}
 	      break;
 	    fok:
