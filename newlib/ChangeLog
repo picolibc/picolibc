@@ -1,10 +1,10 @@
 2013-12-18  Corinna Vinschen  <vinschen@redhat.com>
 
-	* vfscanf.c (BUF): Change definition to take multibyte decimal point
-	into account.
+	* libc/stdio/vfscanf.c (BUF): Change definition to take multibyte
+	decimal point into account.
 	(__SVFSCANF_R): Handle radix char language-dependent
 	per POSIX.
-	(__SVFWSCANF_R): Ditto.
+	* libc/stdio/vfwscanf.c (__SVFWSCANF_R): Ditto.
 
 2013-12-10  Jeff Johnston  <jjohnstn@redhat.com>
 
