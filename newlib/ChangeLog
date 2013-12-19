@@ -1,3 +1,8 @@
+2013-12-19  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/vfwscanf.c (__SVFWSCANF_R): Fix fetching decimal_point in
+	!_MB_CAPABLE as well as in !__HAVE_LOCALE_INFO_EXTENDED__ case.
+
 2013-12-18  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/vfscanf.c (BUF): Change definition to take multibyte

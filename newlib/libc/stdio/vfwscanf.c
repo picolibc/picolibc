@@ -161,6 +161,7 @@ C99, POSIX-1.2008
 #ifdef FLOATING_POINT
 #include <math.h>
 #include <float.h>
+#include <locale.h>
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
 #include "../locale/lnumeric.h"
 #endif
@@ -452,16 +453,16 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	  {
 	    size_t nconv;
 
-	    memset (&state, '\0', sizeof (state));
-	    nconv = _mbrtowc_r (data, &decpt,
-				_localeconv_r (data)->decimal_point,
-				MB_CUR_MAX, &state);
+	    memset (&mbs, '\0', sizeof (mbs));
+	    nconv = _mbrtowc_r (rptr, &decpt,
+				_localeconv_r (rptr)->decimal_point,
+				MB_CUR_MAX, &mbs);
 	    if (nconv == (size_t) -1 || nconv == (size_t) -2)
 	      decpt = L'.';
 	  }
 #endif /* !__HAVE_LOCALE_INFO_EXTENDED__ */
 #else
-	  decpt = (wchar_t) *_localeconv_r (data)->decimal_point;
+	  decpt = (wchar_t) *_localeconv_r (rptr)->decimal_point;
 #endif /* !_MB_CAPABLE */
 #endif /* FLOATING_POINT */
 
