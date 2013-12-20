@@ -1,3 +1,8 @@
+2013-12-20  Nick Clifton  <nickc@redhat.com>
+
+	* configure.host (newlib_cflags): Use -Os, -ffunction-sections and
+	-fdata-sections for RL78.
+
 2013-12-19  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/vfwscanf.c (__SVFWSCANF_R): Fix fetching decimal_point in

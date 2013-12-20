@@ -79,7 +79,7 @@ case "${target_optspace}:${host}" in
   yes:*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
-  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* | :msp430*-* | :nds32* )
+  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* | :msp430*-* | :nds32* | :rl78-* )
     newlib_cflags="${newlib_cflags} -Os"
     ;;
   no:* | :*)
@@ -252,6 +252,7 @@ case "${host_cpu}" in
   rl78)
 	machine_dir=rl78
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
+	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections "
 	;;
   rx)
 	machine_dir=rx
@@ -290,8 +291,8 @@ case "${host_cpu}" in
 	machine_dir=x86_64
 	;;
   xc16x*)
-    machine_dir=xc16x
-    ;;
+        machine_dir=xc16x
+        ;;
   xstormy16)
 	machine_dir=xstormy16
 	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED"
