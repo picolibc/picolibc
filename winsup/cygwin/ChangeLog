@@ -1,3 +1,8 @@
+2013-12-22  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* strace.cc (strace::vsprntf): Fix potential (if unlikely) use of
+	uninitialized variable.
+
 2013-12-18  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* dcrt0.cc (dll_crt0_1): Remove NtSetTimerResolution.
