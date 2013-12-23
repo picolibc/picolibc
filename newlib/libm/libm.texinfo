@@ -13,7 +13,7 @@ END-INFO-DIR-ENTRY
 @ifinfo
 This file documents an ANSI-C conforming mathematical subroutine library.
 
-Copyright (C) 1992, 1993, 1995, 1996-2012 Red Hat, Inc. 
+Copyright (C) 1992, 1993, 1995, 1996-2013 Red Hat, Inc. 
 
 @file{libm} includes software developed at SunPro, a Sun Microsystems,
 Inc. business.  Permission to use, copy, modify, and distribute this
@@ -46,8 +46,8 @@ into another language, under the above conditions for modified versions.
 @titlepage
 @title The Red Hat newlib C Math Library
 @sp 1
-@subtitle @code{libm} 2.0.0
-@subtitle December 2012
+@subtitle @code{libm} 2.1.0
+@subtitle December 2013
 @author {Steve Chamberlain}
 @author {Roland Pesch}
 @author {Red Hat Support}

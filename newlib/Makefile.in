@@ -286,6 +286,7 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+libc_cv_cc_loop_to_function = @libc_cv_cc_loop_to_function@
 libc_cv_initfinit_array = @libc_cv_initfinit_array@
 libdir = @libdir@
 libexecdir = @libexecdir@

@@ -1,3 +1,19 @@
+*** Major changes in newlib version 2.1.0:
+
+- multibyte decimal point support added to
+  scanf family
+- multiple changes for FreeBSD compatibility
+- multiple RTEMS changes for Linux compatibility
+- addition of restrict keyword
+- nano-malloc support added
+- global atexit support added
+- new nds32 platform support
+- new msp430 platform support
+- new nios2 platform support
+- lite exit support
+- updated arm support (aarch64)
+- newlib ported to x86_64-pc-cygwin
+
 *** Major changes in newlib version 2.0.0:
 
 - addition of aarch64 platform support

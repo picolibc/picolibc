@@ -45,3 +45,7 @@ VERS_1.20 {
 VERS_2.0 {
 	global: *;
 };
+
+VERS_2.1 {
+	global: *;
+};
