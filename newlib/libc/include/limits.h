@@ -96,7 +96,8 @@
 #    define __LONG_LONG_MAX__ 9223372036854775807LL
 #   endif
 
-#   if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#   if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) ||   \
+  (defined(__cplusplus) && __cplusplus >= 201103L)
 /* Minimum and maximum values a `signed long long int' can hold.  */
 #    undef LLONG_MIN
 #    define LLONG_MIN (-LLONG_MAX-1)
@@ -143,4 +144,3 @@
 #ifndef PATH_MAX
 #define PATH_MAX	4096
 #endif
-

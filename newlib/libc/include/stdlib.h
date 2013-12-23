@@ -39,7 +39,9 @@ typedef struct
   long rem; /* remainder */
 } ldiv_t;
 
-#ifndef __STRICT_ANSI__
+#if !defined(__STRICT_ANSI__) || \
+  (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+  (defined(__cplusplus) && __cplusplus >= 201103L)
 typedef struct
 {
   long long int quot; /* quotient */
@@ -233,7 +235,6 @@ _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *))
 #if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L) || (__cplusplus >= 201103L)
 extern long double strtold (const char *__restrict, char **__restrict);
 #endif
-extern long double wcstold (const wchar_t *, wchar_t **);
 #endif /* _LDBL_EQ_DBL */
 
 _END_STD_C

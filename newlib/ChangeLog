@@ -1,3 +1,14 @@
+2013-12-22  JF Bastien  <jfb@chromium.org>
+
+	* libc/include/limits.h: Define LLONG_MIN, LLONG_MAX and ULLONG_MAX 
+	for C++11 too.
+	* libc/include/stdlib.h: Define struct lldiv_t, _Exit, atoll, llabs 
+	and lldiv for C99 and C++11.  Move wcstold to wchar.h.
+	* libc/include/wchar.h: Define WCHAR_MIN and WCHAR_MAX according to
+	__WCHAR_UNSIGNED__ if it is provided, and correct the limit when
+	unsigned (to 32 all-1 bits, not 31).  Define FILE as in stdio.h.
+	Move wcstold from stdlib.h here.
+
 2013-12-20  Nick Clifton  <nickc@redhat.com>
 
 	* configure.host (newlib_cflags): Use -Os, -ffunction-sections and

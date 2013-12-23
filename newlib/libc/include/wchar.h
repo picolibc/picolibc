@@ -25,18 +25,29 @@
 #endif
 
 #ifndef WCHAR_MIN
-#define WCHAR_MIN 0
+#ifdef __WCHAR_MIN__
+#define WCHAR_MIN __WCHAR_MIN__
+#elif defined(__WCHAR_UNSIGNED__) || (L'\0' - 1 > 0)
+#define WCHAR_MIN (0 + L'\0')
+#else
+#define WCHAR_MIN (-0x7fffffff - 1 + L'\0')
+#endif
 #endif
 
 #ifndef WCHAR_MAX
 #ifdef __WCHAR_MAX__
 #define WCHAR_MAX __WCHAR_MAX__
+#elif defined(__WCHAR_UNSIGNED__) || (L'\0' - 1 > 0)
+#define WCHAR_MAX (0xffffffffu + L'\0')
 #else
-#define WCHAR_MAX 0x7fffffffu
+#define WCHAR_MAX (0x7fffffff + L'\0')
 #endif
 #endif
 
 _BEGIN_STD_C
+
+/* As in stdio.h, <sys/reent.h> defines __FILE. */
+typedef __FILE FILE;
 
 /* As required by POSIX.1-2008, declare tm as incomplete type.
    The actual definition is in time.h. */
@@ -130,6 +141,10 @@ long    _EXFUN(_wcstol_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 long long _EXFUN(_wcstoll_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 unsigned long _EXFUN(_wcstoul_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 unsigned long long _EXFUN(_wcstoull_r, (struct _reent *, const wchar_t *, wchar_t **, int));
+/* On platforms where long double equals double.  */
+#ifdef _LDBL_EQ_DBL
+long double _EXFUN(wcstold, (const wchar_t *, wchar_t **));
+#endif /* _LDBL_EQ_DBL */
 
 wint_t _EXFUN(fgetwc, (__FILE *));
 wchar_t *_EXFUN(fgetws, (wchar_t *__restrict, int, __FILE *__restrict));
