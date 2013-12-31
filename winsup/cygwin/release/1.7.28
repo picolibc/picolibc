@@ -25,3 +25,7 @@ Bug Fixes
 
 - Fix locale-specific radix char handling in scanf family of functions.
   Fixes: http://cygwin.com/ml/cygwin/2013-12/msg00294.html
+
+- The console buffer should no longer be cleared when the resolution of the
+  console exceeds some magic threshold.
+  Fixes: http://cygwin.com/ml/cygwin/2013-12/threads.html#00406
