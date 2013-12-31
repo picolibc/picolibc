@@ -1,3 +1,11 @@
+2013-12-31  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* fhandler_console.cc (region_split): New function.
+	(delta): Ditto.
+	(ReadConsoleOutputWrapper): Ditto.
+	(fhandler_console::char_command): Use ReadConsoleOutputWrapper to avoid
+	OOM condition from ReadConsoleOutputW.  Add more debugging.
+
 2013-12-22  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* strace.cc (strace::vsprntf): Fix potential (if unlikely) use of

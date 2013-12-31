@@ -315,6 +315,71 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
 		 || dev_state.use_mouse >= 3));
 }
 
+/* The following three functions were adapted (i.e., mildly modified) from
+   http://stackoverflow.com/questions/14699043/replacement-to-systemcolor */
+
+/* Split a rectangular region into two smaller rectangles based on the
+   largest dimension. */
+static void
+region_split (SHORT width, SHORT height, COORD coord,
+	      const SMALL_RECT& region, COORD& coord_a,
+	      SMALL_RECT& region_a, COORD& coord_b,
+	      SMALL_RECT& region_b)
+{
+  coord_a = coord_b = coord;
+  region_a = region_b = region;
+
+  if (height >= width)
+    {
+      SHORT half = height / 2;
+      coord_b.Y += half;
+      region_b.Top += half;
+      region_a.Bottom = region_b.Top - 1;
+    }
+  else
+    {
+      SHORT half = width / 2;
+      coord_b.X += half;
+      region_b.Left += half;
+      region_a.Right = region_b.Left - 1;
+    }
+}
+
+/* Utility function to figure out the distance between two points. */
+static SHORT
+delta (SHORT first, SHORT second)
+{
+  return (second >= first) ? (second - first + 1) : 0;
+}
+
+/* Subdivide the ReadConsoleInput operation into smaller and smaller chunks as
+   needed until it succeeds in reading the entire screen buffer. */
+static BOOL
+ReadConsoleOutputWrapper (HANDLE h, PCHAR_INFO buf,
+			  COORD bufsiz, COORD coord,
+			  SMALL_RECT& region)
+{
+  SHORT width = delta (region.Left, region.Right);
+  SHORT height = delta (region.Top, region.Bottom);
+
+  if ((width == 0) || (height == 0))
+    return TRUE;
+
+  BOOL success = ReadConsoleOutputW (h, buf, bufsiz, coord, &region);
+  if (success)
+    /* it worked */;
+  else if (GetLastError () == ERROR_NOT_ENOUGH_MEMORY && (width * height) > 1)
+    {
+      COORD coord_a, coord_b;
+      SMALL_RECT region_a, region_b;
+      region_split (width, height, coord, region, coord_a, region_a,
+		    coord_b, region_b);
+      success = ReadConsoleOutputWrapper (h, buf, bufsiz, coord_a, region_a)
+		&& ReadConsoleOutputWrapper (h, buf, bufsiz, coord_b, region_b);
+    }
+  return success;
+}
+
 void __reg3
 fhandler_console::read (void *pv, size_t& buflen)
 {
@@ -1573,25 +1638,34 @@ fhandler_console::char_command (char c)
 
 	      if (dev_state.savebuf)
 		cfree (dev_state.savebuf);
-	      dev_state.savebuf = (PCHAR_INFO) cmalloc_abort (HEAP_1_BUF, sizeof (CHAR_INFO) *
-					     dev_state.savebufsiz.X * dev_state.savebufsiz.Y);
+	      size_t screen_size = sizeof (CHAR_INFO) * dev_state.savebufsiz.X * dev_state.savebufsiz.Y;
+	      dev_state.savebuf = (PCHAR_INFO) cmalloc_abort (HEAP_1_BUF, screen_size);
 
-	      ReadConsoleOutputW (get_output_handle (), dev_state.savebuf,
-				  dev_state.savebufsiz, cob, &now.srWindow);
+	      BOOL res = ReadConsoleOutputWrapper (get_output_handle (),
+						   dev_state.savebuf,
+						   dev_state.savebufsiz, cob,
+						   now.srWindow);
+	      if (!res)
+		debug_printf ("ReadConsoleOutputWrapper failed, %E");
 	    }
 	  else		/* restore */
 	    {
+	      if (!dev_state.savebuf)
+		break;
+
 	      CONSOLE_SCREEN_BUFFER_INFO now;
 	      COORD cob = { 0, 0 };
 
 	      if (!GetConsoleScreenBufferInfo (get_output_handle (), &now))
-		break;
+		{
+		  debug_printf ("GetConsoleScreenBufferInfo(%y, %y), %E", get_output_handle (), &now);
+		  break;
+		}
 
-	      if (!dev_state.savebuf)
-		break;
-
-	      WriteConsoleOutputW (get_output_handle (), dev_state.savebuf,
-				   dev_state.savebufsiz, cob, &now.srWindow);
+	      BOOL res = WriteConsoleOutputW (get_output_handle (), dev_state.savebuf,
+					      dev_state.savebufsiz, cob, &now.srWindow);
+	      if (!res)
+		debug_printf ("WriteConsoleOutputW failed, %E");
 
 	      cfree (dev_state.savebuf);
 	      dev_state.savebuf = NULL;
