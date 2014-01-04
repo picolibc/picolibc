@@ -29,3 +29,6 @@ Bug Fixes
 - The console buffer should no longer be cleared when the resolution of the
   console exceeds some magic threshold.
   Fixes: http://cygwin.com/ml/cygwin/2013-12/threads.html#00406
+
+- Fix inadvertent clearing of entire console buffer on clear screen.
+  See: http://cygwin.com/ml/cygwin/2014-01/msg00011.html

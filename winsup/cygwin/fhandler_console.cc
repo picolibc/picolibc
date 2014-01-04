@@ -1,7 +1,7 @@
 /* fhandler_console.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -294,16 +294,12 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
   /* Adjust mouse position by window scroll buffer offset
      and remember adjusted position in state for use by read() */
   CONSOLE_SCREEN_BUFFER_INFO now;
-  if (GetConsoleScreenBufferInfo (get_output_handle (), &now))
-    {
-      dev_state.dwMousePosition.X = mouse_event.dwMousePosition.X - now.srWindow.Left;
-      dev_state.dwMousePosition.Y = mouse_event.dwMousePosition.Y - now.srWindow.Top;
-    }
-  else
-    {
-      /* Cannot adjust position by window scroll buffer offset */
-      return 0;
-    }
+  if (!GetConsoleScreenBufferInfo (get_output_handle (), &now))
+    /* Cannot adjust position by window scroll buffer offset */
+    return 0;
+
+  dev_state.dwMousePosition.X = mouse_event.dwMousePosition.X - now.srWindow.Left;
+  dev_state.dwMousePosition.Y = mouse_event.dwMousePosition.Y - now.srWindow.Top;
 
   return ((mouse_event.dwEventFlags == 0 || mouse_event.dwEventFlags == DOUBLE_CLICK)
 	  && mouse_event.dwButtonState != dev_state.dwLastButtonState)
@@ -313,71 +309,6 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
 		 || dev_state.dwMousePosition.Y != dev_state.dwLastMousePosition.Y)
 	     && ((dev_state.use_mouse >= 2 && mouse_event.dwButtonState)
 		 || dev_state.use_mouse >= 3));
-}
-
-/* The following three functions were adapted (i.e., mildly modified) from
-   http://stackoverflow.com/questions/14699043/replacement-to-systemcolor */
-
-/* Split a rectangular region into two smaller rectangles based on the
-   largest dimension. */
-static void
-region_split (SHORT width, SHORT height, COORD coord,
-	      const SMALL_RECT& region, COORD& coord_a,
-	      SMALL_RECT& region_a, COORD& coord_b,
-	      SMALL_RECT& region_b)
-{
-  coord_a = coord_b = coord;
-  region_a = region_b = region;
-
-  if (height >= width)
-    {
-      SHORT half = height / 2;
-      coord_b.Y += half;
-      region_b.Top += half;
-      region_a.Bottom = region_b.Top - 1;
-    }
-  else
-    {
-      SHORT half = width / 2;
-      coord_b.X += half;
-      region_b.Left += half;
-      region_a.Right = region_b.Left - 1;
-    }
-}
-
-/* Utility function to figure out the distance between two points. */
-static SHORT
-delta (SHORT first, SHORT second)
-{
-  return (second >= first) ? (second - first + 1) : 0;
-}
-
-/* Subdivide the ReadConsoleInput operation into smaller and smaller chunks as
-   needed until it succeeds in reading the entire screen buffer. */
-static BOOL
-ReadConsoleOutputWrapper (HANDLE h, PCHAR_INFO buf,
-			  COORD bufsiz, COORD coord,
-			  SMALL_RECT& region)
-{
-  SHORT width = delta (region.Left, region.Right);
-  SHORT height = delta (region.Top, region.Bottom);
-
-  if ((width == 0) || (height == 0))
-    return TRUE;
-
-  BOOL success = ReadConsoleOutputW (h, buf, bufsiz, coord, &region);
-  if (success)
-    /* it worked */;
-  else if (GetLastError () == ERROR_NOT_ENOUGH_MEMORY && (width * height) > 1)
-    {
-      COORD coord_a, coord_b;
-      SMALL_RECT region_a, region_b;
-      region_split (width, height, coord, region, coord_a, region_a,
-		    coord_b, region_b);
-      success = ReadConsoleOutputWrapper (h, buf, bufsiz, coord_a, region_a)
-		&& ReadConsoleOutputWrapper (h, buf, bufsiz, coord_b, region_b);
-    }
-  return success;
 }
 
 void __reg3
@@ -870,6 +801,7 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
   fill.Attributes = dev_state.current_win32_attr;
   ScrollConsoleScreenBuffer (get_output_handle (), &sr1, &sr2, dest, &fill);
 
+#if 0 /* CGF: 2014-01-04 Assuming that we don't need this anymore */
   /* ScrollConsoleScreenBuffer on Windows 95 is buggy - when scroll distance
    * is more than half of screen, filling doesn't work as expected */
 
@@ -879,6 +811,7 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
     clear_screen (0, 1 + dest.Y + sr1.Bottom - sr1.Top, sr2.Right, sr2.Bottom);
   else			/* reverse scroll */
     clear_screen (0, sr1.Top, sr2.Right, dest.Y - 1);
+#endif
 }
 
 int
@@ -1257,12 +1190,32 @@ dev_console::set_default_attr ()
   set_color (NULL);
 }
 
+int
+dev_console::console_attrs::set_cl_x (cltype x)
+{
+  if (x == cl_disp_beg)
+    return 0;
+  if (x == cl_disp_end)
+    return dwWinSize.X - 1;
+  return dwCursorPosition.X;
+}
+
+int
+dev_console::console_attrs::set_cl_y (cltype y)
+{
+  if (y == cl_disp_end)
+    return winBottom;
+  if (y == cl_disp_beg)
+    return winTop;
+  return dwCursorPosition.Y;
+}
+  
 /*
  * Clear the screen context from x1/y1 to x2/y2 cell.
  * Negative values represents current screen dimensions
  */
 void
-fhandler_console::clear_screen (int x1, int y1, int x2, int y2)
+fhandler_console::clear_screen (cltype xc1, cltype yc1, cltype xc2, cltype yc2)
 {
   COORD tlc;
   DWORD done;
@@ -1270,14 +1223,10 @@ fhandler_console::clear_screen (int x1, int y1, int x2, int y2)
 
   dev_state.fillin_info (get_output_handle ());
 
-  if (x1 < 0)
-    x1 = dev_state.info.dwWinSize.X - 1;
-  if (y1 < 0)
-    y1 = dev_state.info.winBottom;
-  if (x2 < 0)
-    x2 = dev_state.info.dwWinSize.X - 1;
-  if (y2 < 0)
-    y2 = dev_state.info.winBottom;
+  int x1 = dev_state.info.set_cl_x (xc1);
+  int y1 = dev_state.info.set_cl_y (yc1);
+  int x2 = dev_state.info.set_cl_x (xc2);
+  int y2 = dev_state.info.set_cl_y (yc2);
 
   num = abs (y1 - y2) * dev_state.info.dwBufferSize.X + abs (x1 - x2) + 1;
 
@@ -1410,6 +1359,60 @@ bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
       buf += done;
     }
   return true;
+}
+
+/* The following three functions were adapted (i.e., mildly modified) from
+   http://stackoverflow.com/questions/14699043/replacement-to-systemcolor */
+
+/* Split a rectangular region into two smaller rectangles based on the
+   largest dimension. */
+static void
+region_split (PCHAR_INFO& buf, COORD& bufsiz, SMALL_RECT& region,
+	      PCHAR_INFO& buf_b, COORD& bufsiz_b, SMALL_RECT& region_b)
+{
+  region_b = region;
+  bufsiz_b = bufsiz;
+
+  SHORT half = (1 + region.Bottom - region.Top) / 2;
+  region_b.Top += half;
+  region.Bottom = (bufsiz.Y = region_b.Top) - 1;
+  buf_b = buf + (half * (1 + region.Right));
+  bufsiz_b.Y = region_b.Bottom - region_b.Top;
+}
+
+/* Utility function to figure out the distance between two points. */
+static SHORT
+delta (SHORT first, SHORT second)
+{
+  return (second >= first) ? (second - first + 1) : 0;
+}
+
+/* Subdivide the ReadConsoleInput operation into smaller and smaller chunks as
+   needed until it succeeds in reading the entire screen buffer. */
+static BOOL
+ReadConsoleOutputWrapper (HANDLE h, PCHAR_INFO buf, COORD bufsiz,
+			  SMALL_RECT& region)
+{
+  COORD coord = {};
+  SHORT width = delta (region.Left, region.Right);
+  SHORT height = delta (region.Top, region.Bottom);
+
+  if ((width == 0) || (height == 0))
+    return TRUE;
+
+  BOOL success = ReadConsoleOutputW (h, buf, bufsiz, coord, &region);
+  if (success)
+    /* it worked */;
+  else if (GetLastError () == ERROR_NOT_ENOUGH_MEMORY && (width * height) > 1)
+    {
+      PCHAR_INFO buf_b;
+      COORD bufsiz_b;
+      SMALL_RECT region_b;
+      region_split (buf, bufsiz, region, buf_b, bufsiz_b, region_b);
+      success = ReadConsoleOutputWrapper (h, buf, bufsiz, region)
+		&& ReadConsoleOutputWrapper (h, buf_b, bufsiz_b, region_b);
+    }
+  return success;
 }
 
 #define BAK 1
@@ -1628,13 +1631,13 @@ fhandler_console::char_command (char c)
 	  if (c == 'h') /* save */
 	    {
 	      CONSOLE_SCREEN_BUFFER_INFO now;
-	      COORD cob = { 0, 0 };
 
 	      if (!GetConsoleScreenBufferInfo (get_output_handle (), &now))
 		break;
 
-	      dev_state.savebufsiz.X = now.srWindow.Right - now.srWindow.Left + 1;
-	      dev_state.savebufsiz.Y = now.srWindow.Bottom - now.srWindow.Top + 1;
+	      /* Assume starting from 0/0 */
+	      dev_state.savebufsiz.X = 1 + now.srWindow.Right;
+	      dev_state.savebufsiz.Y = 1 + now.srWindow.Bottom;
 
 	      if (dev_state.savebuf)
 		cfree (dev_state.savebuf);
@@ -1643,7 +1646,7 @@ fhandler_console::char_command (char c)
 
 	      BOOL res = ReadConsoleOutputWrapper (get_output_handle (),
 						   dev_state.savebuf,
-						   dev_state.savebufsiz, cob,
+						   dev_state.savebufsiz,
 						   now.srWindow);
 	      if (!res)
 		debug_printf ("ReadConsoleOutputWrapper failed, %E");
@@ -1718,16 +1721,15 @@ fhandler_console::char_command (char c)
       switch (dev_state.args_[0])
 	{
 	case 0:			/* Clear to end of screen */
-	  cursor_get (&x, &y);
-	  clear_screen (x, y, -1, -1);
+	  clear_screen (cl_curr_pos, cl_curr_pos, cl_disp_end, cl_disp_end);
 	  break;
 	case 1:			/* Clear from beginning of screen to cursor */
 	  cursor_get (&x, &y);
-	  clear_screen (0, 0, x, y);
+	  clear_screen (cl_disp_beg, cl_disp_beg, cl_curr_pos, cl_curr_pos);
 	  break;
 	case 2:			/* Clear screen */
-	  clear_screen (0, 0, -1, -1);
-	  cursor_set (true, 0,0);
+	  clear_screen (cl_disp_beg, cl_disp_beg, cl_disp_end, cl_disp_end);
+	  cursor_set (true, 0, 0);
 	  break;
 	default:
 	  goto bad_escape;
@@ -1750,16 +1752,13 @@ fhandler_console::char_command (char c)
       switch (dev_state.args_[0])
 	{
 	  case 0:		/* Clear to end of line */
-	    cursor_get (&x, &y);
-	    clear_screen (x, y, -1, y);
+	    clear_screen (cl_curr_pos, cl_curr_pos, cl_disp_end, cl_curr_pos);
 	    break;
 	  case 2:		/* Clear line */
-	    cursor_get (&x, &y);
-	    clear_screen (0, y, -1, y);
+	    clear_screen (cl_disp_beg, cl_curr_pos, cl_disp_end, cl_curr_pos);
 	    break;
 	  case 1:		/* Clear from bol to cursor */
-	    cursor_get (&x, &y);
-	    clear_screen (0, y, x, y);
+	    clear_screen (cl_disp_beg, cl_curr_pos, cl_curr_pos, cl_curr_pos);
 	    break;
 	  default:
 	    goto bad_escape;
@@ -2165,7 +2164,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      dev_state.vt100_graphics_mode_G0 = false;
 	      dev_state.vt100_graphics_mode_G1 = false;
 	      dev_state.iso_2022_G1 = false;
-	      clear_screen (0, 0, -1, -1);
+	      clear_screen (cl_disp_beg, cl_disp_beg, cl_disp_end, cl_disp_end);
 	      cursor_set (true, 0, 0);
 	      dev_state.state_ = normal;
 	    }
@@ -2208,9 +2207,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      dev_state.state_ = gotcommand;
 	    }
 	  else
-	    {
-	      dev_state.state_ = gotcommand;
-	    }
+	    dev_state.state_ = gotcommand;
 	  break;
 	case gotcommand:
 	  char_command (*src++);
