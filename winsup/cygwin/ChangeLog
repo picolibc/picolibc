@@ -1,13 +1,12 @@
 2014-01-04  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
-	* fhandler.h: Update copyright.
-	(cltype): New enum.
+	* fhandler.h (cltype): New enum.
 	(dev_console::console_attrs): Define struct name.
 	(dev_console::console_attrs::set_cl_x): New function.
 	(dev_console::console_attrs::set_cl_y): New function.
 	(fhandler_console::clear_screen): Redefine input params.
-	* fhandler_console.cc: Update copyright.  Throughout, reflect change in
-	arguments to fhandler_console::clear_screeen.
+	* fhandler_console.cc: Throughout, reflect change in arguments to
+	fhandler_console::clear_screeen.
 	(fhandler_console::mouse_aware): Simplify logic slightly.
 	(fhandler_console::scroll_screen): Remove hopefully obsolete win95
 	code.
