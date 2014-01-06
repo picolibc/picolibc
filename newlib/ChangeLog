@@ -1,4 +1,12 @@
-2013-01-06  Mike Frysinger  <vapier@gentoo.org>
+2014-01-06  Mike Frysinger  <vapier@gentoo.org>
+
+	* libc/search/hash.c (hash_delete): Change __uint32_t to u_int.
+	(hash_get): Likewise.
+	(hash_put): Likewise.
+	(hash_seq): Likewise.
+	(hash_sync): Likewise.
+					
+2014-01-06  Mike Frysinger  <vapier@gentoo.org>
 
 	* libc/ctype/jp2uc.c: Include string.h.
 	
