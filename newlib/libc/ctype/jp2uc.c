@@ -37,6 +37,7 @@
 #ifndef __CYGWIN__
 
 #include <_ansi.h>
+#include <string.h>
 #include <wctype.h>
 #include "local.h"
 #include "jp2uc.h"
