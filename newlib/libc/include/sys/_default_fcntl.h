@@ -5,6 +5,7 @@ extern "C" {
 #endif
 #define	_SYS__DEFAULT_FCNTL_H_
 #include <_ansi.h>
+#include <sys/cdefs.h>
 #define	_FOPEN		(-1)	/* from sys/file.h, kernel use only */
 #define	_FREAD		0x0001	/* read enabled */
 #define	_FWRITE		0x0002	/* write enabled */
@@ -136,7 +137,7 @@ extern "C" {
 #define	F_UNLKSYS	4	/* remove remote locks for a given system */
 #endif	/* !_POSIX_SOURCE */
 
-#ifdef __CYGWIN__
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || defined(__CYGWIN__)
 /* Special descriptor value to denote the cwd in calls to openat(2) etc. */
 #define AT_FDCWD -2
 
@@ -180,12 +181,14 @@ struct eflock {
 #include <sys/stat.h>		/* sigh. for the mode bits for open/creat */
 
 extern int open _PARAMS ((const char *, int, ...));
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || defined(__CYGWIN__)
+extern int openat _PARAMS ((int, const char *, int, ...));
+#endif
 extern int creat _PARAMS ((const char *, mode_t));
 extern int fcntl _PARAMS ((int, int, ...));
 #ifdef __CYGWIN__
 #include <sys/time.h>
 extern int futimesat _PARAMS ((int, const char *, const struct timeval *));
-extern int openat _PARAMS ((int, const char *, int, ...));
 #endif
 
 /* Provide _<systemcall> prototypes for functions provided by some versions

@@ -6,10 +6,11 @@ extern "C" {
 #endif
 
 #include <_ansi.h>
-#include <sys/types.h>
-#include <sys/_types.h>
 #define __need_size_t
 #define __need_ptrdiff_t
+#include <sys/cdefs.h>
+#include <sys/types.h>
+#include <sys/_types.h>
 #include <stddef.h>
 
 extern char **environ;
@@ -54,6 +55,8 @@ int     _EXFUN(execve, (const char *__path, char * const __argv[], char * const 
 int     _EXFUN(execvp, (const char *__file, char * const __argv[] ));
 #if defined(__CYGWIN__)
 int     _EXFUN(execvpe, (const char *__file, char * const __argv[], char * const __envp[] ));
+#endif
+#if __POSIX_VISIBLE >= 200809 || __BSD_VISIBLE || defined(__CYGWIN__)
 int	_EXFUN(faccessat, (int __dirfd, const char *__path, int __mode, int __flags));
 #endif
 #if defined(__CYGWIN__) || defined(__rtems__) || defined(__SPU__)
@@ -63,8 +66,10 @@ int     _EXFUN(fchmod, (int __fildes, mode_t __mode ));
 #if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(fchown, (int __fildes, uid_t __owner, gid_t __group ));
 #endif
-#if defined(__CYGWIN__)
+#if __POSIX_VISIBLE >= 200809 || __BSD_VISIBLE || defined(__CYGWIN__)
 int	_EXFUN(fchownat, (int __dirfd, const char *__path, uid_t __owner, gid_t __group, int __flags));
+#endif
+#if defined(__CYGWIN__)
 int	_EXFUN(fexecve, (int __fd, char * const __argv[], char * const __envp[] ));
 #endif
 pid_t   _EXFUN(fork, (void ));
@@ -116,7 +121,7 @@ int     _EXFUN(isatty, (int __fildes ));
 int     _EXFUN(lchown, (const char *__path, uid_t __owner, gid_t __group ));
 #endif
 int     _EXFUN(link, (const char *__path1, const char *__path2 ));
-#if defined(__CYGWIN__)
+#if __POSIX_VISIBLE >= 200809 || __BSD_VISIBLE || defined(__CYGWIN__)
 int     _EXFUN(linkat, (int __dirfd1, const char *__path1, int __dirfd2, const char *__path2, int __flags ));
 #endif
 int	_EXFUN(nice, (int __nice_value ));
@@ -246,12 +251,12 @@ void    _EXFUN(sync, (void));
 
 ssize_t _EXFUN(readlink, (const char *__restrict __path,
                           char *__restrict __buf, size_t __buflen));
-#if defined(__CYGWIN__)
+#if __POSIX_VISIBLE >= 200809 || __BSD_VISIBLE || defined(__CYGWIN__)
 ssize_t        _EXFUN(readlinkat, (int __dirfd1, const char *__restrict __path,
                             char *__restrict __buf, size_t __buflen));
 #endif
 int     _EXFUN(symlink, (const char *__name1, const char *__name2));
-#if defined(__CYGWIN__)
+#if __POSIX_VISIBLE >= 200809 || __BSD_VISIBLE || defined(__CYGWIN__)
 int	_EXFUN(symlinkat, (const char *, int, const char *));
 int	_EXFUN(unlinkat, (int, const char *, int));
 #endif

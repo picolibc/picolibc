@@ -32,6 +32,7 @@
 
 #define __need_size_t
 #define __need_NULL
+#include <sys/cdefs.h>
 #include <stddef.h>
 
 #define __need___va_list
@@ -336,7 +337,7 @@ FILE *	_EXFUN(fmemopen, (void *__restrict, size_t, const char *__restrict));
 /* getdelim - see __getdelim for now */
 /* getline - see __getline for now */
 FILE *	_EXFUN(open_memstream, (char **, size_t *));
-#if defined (__CYGWIN__)
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || defined(__CYGWIN__)
 int	_EXFUN(renameat, (int, const char *, int, const char *));
 #endif
 int	_EXFUN(vdprintf, (int, const char *__restrict, __VALIST)
