@@ -1,3 +1,8 @@
+2014-01-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* arm/configure.in: Fix host_makefile_frag to use ac_abs_srcdir.
+	* arm/configure: Regenerated.
+
 2013-12-04  Steve Ellcey <sellcey@mips.com>
 
 	* mips/cfe_api.h: Include stdint.h.

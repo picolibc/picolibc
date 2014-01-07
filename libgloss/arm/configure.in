@@ -59,7 +59,7 @@ esac
 
 AC_SUBST(objtype)
 
-host_makefile_frag=${srcdir}/../config/default.mh
+host_makefile_frag=${ac_abs_srcdir}/../config/default.mh
 
 dnl We have to assign the same value to other variables because autoconf
 dnl doesn't provide a mechanism to substitute a replacement keyword with
