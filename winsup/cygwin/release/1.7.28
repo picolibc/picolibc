@@ -32,3 +32,6 @@ Bug Fixes
 
 - Fix inadvertent clearing of entire console buffer on clear screen.
   See: http://cygwin.com/ml/cygwin/2014-01/msg00011.html
+
+- Make sure that stackdump file is closed after use.
+  See: http://cygwin.com/ml/cygwin/2014-01/threads.html#00029
