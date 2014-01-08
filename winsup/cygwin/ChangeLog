@@ -1,3 +1,13 @@
+2014-01-08  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* exceptions.h (cygwin_exception::open_stackdumpfile): Move old
+	function into class.
+	(cygwin_exception::h): New member.
+	(cygwin_exception::cygwin_exception): Initialize h to NULL.
+	* exceptions.cc (cygwin_exception::open_stackdumpfile): Move into
+	cygwin_exception class.  Use 'h' class member.
+	(cygwin_exception::dumpstack): Close stack dump file handle if opened.
+
 2014-01-04  Christopher Faylor  <me.cygwin2013@cgf.cx>
 
 	* fhandler.h (cltype): New enum.

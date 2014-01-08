@@ -1,6 +1,6 @@
 /* exception.h
 
-   Copyright 1996, 1997, 1998, 2000, 2001, 2005, 2010, 2011, 1012, 2013
+   Copyright 1996, 1997, 1998, 2000, 2001, 2005, 2010, 2011, 1012, 2013, 2014
    Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
@@ -147,10 +147,12 @@ class cygwin_exception
   PUINT_PTR framep;
   PCONTEXT ctx;
   EXCEPTION_RECORD *e;
+  HANDLE h;
   void dump_exception ();
+  void open_stackdumpfile ();
 public:
   cygwin_exception (PUINT_PTR in_framep, PCONTEXT in_ctx = NULL, EXCEPTION_RECORD *in_e = NULL):
-    framep (in_framep), ctx (in_ctx), e (in_e) {}
+    framep (in_framep), ctx (in_ctx), e (in_e), h (NULL) {}
   void dumpstack ();
   PCONTEXT context () const {return ctx;}
 };

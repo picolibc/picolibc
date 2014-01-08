@@ -1,7 +1,7 @@
 /* exceptions.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -122,8 +122,8 @@ error_start_init (const char *buf)
   __small_sprintf (debugger_command, "%s \"%s\"", buf, pgm);
 }
 
-static void
-open_stackdumpfile ()
+void
+cygwin_exception::open_stackdumpfile ()
 {
   /* If we have no executable name, or if the CWD handle is NULL,
      which means, the CWD is a virtual path, don't even try to open
@@ -149,7 +149,6 @@ open_stackdumpfile ()
 	 in Cygwin's cwd.  Stick to caseinsensitivity. */
       InitializeObjectAttributes (&attr, &ucore, OBJ_CASE_INSENSITIVE,
 				  cygheap->cwd.get_handle (), NULL);
-      HANDLE h;
       IO_STATUS_BLOCK io;
       NTSTATUS status;
       /* Try to open it to dump the stack in it. */
@@ -372,6 +371,8 @@ cygwin_exception::dumpstack ()
     }
   small_printf ("End of stack trace%s\n",
 	      i == 16 ? " (more stack frames may be present)" : "");
+  if (h)
+    NtClose (h);
 }
 
 bool
