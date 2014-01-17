@@ -4236,11 +4236,36 @@ extern "C" FILE *
 popen (const char *command, const char *in_type)
 {
   const char *type = in_type;
-  char rw = *type++;
+  char fdopen_flags[3] = "\0\0";
+  int pipe_flags = 0;
 
-  /* Sanity check in_type */
-  if (*type == 'b' || *type == 't')
-    type++;
+#define rw	fdopen_flags[0]
+#define bintext	fdopen_flags[1]
+
+  /* Sanity check.  GLibc allows any order and any number of repetition,
+     as long as the string doesn't contradict itself.  We do the same here. */
+  while (*type)
+    {
+      if (*type == 'r' || *type == 'w')
+	{
+	  if (rw && rw != *type)
+	    break;
+	  rw = *type++;
+	}
+      else if (*type == 'b' || *type == 't')
+	{
+	  if (bintext && bintext != *type)
+	    break;
+	  bintext = *type++;
+	}
+      else if (*type == 'e')
+	{
+	  pipe_flags = O_CLOEXEC;
+	  ++type;
+	}
+      else
+	break;
+    }
   if ((rw != 'r' && rw != 'w') || (*type != '\0'))
     {
       set_errno (EINVAL);
@@ -4248,13 +4273,13 @@ popen (const char *command, const char *in_type)
     }
 
   int fds[2];
-  if (pipe (fds) < 0)
+  if (pipe2 (fds, pipe_flags) < 0)
     return NULL;
 
   int myix = rw == 'r' ? 0 : 1;
 
   lock_process now;
-  FILE *fp = fdopen (fds[myix], in_type);
+  FILE *fp = fdopen (fds[myix], fdopen_flags);
   if (fp)
     {
       /* If fds are in the range of stdin/stdout/stderr, move them
@@ -4290,9 +4315,13 @@ popen (const char *command, const char *in_type)
 	  NULL
 	};
 
-      /* Don't pass our end of the pipe to the child process */
-      int fd_state = fcntl64 (myfd, F_GETFD, 0);
-      fcntl64 (myfd, F_SETFD, fd_state | FD_CLOEXEC);
+      /* With 'e' flag given, we have to revert the close-on-exec on the child
+         end of the pipe.  Otherwise don't pass our end of the pipe to the
+	 child process. */
+      if (pipe_flags & O_CLOEXEC)
+	fcntl64 (__std[stdchild], F_SETFD, 0);
+      else
+	fcntl64 (myfd, F_SETFD, FD_CLOEXEC);
 
       /* Also don't pass the file handle currently associated with stdin/stdout
 	 to the child.  This function may actually fail if the stdchild fd
@@ -4318,10 +4347,8 @@ popen (const char *command, const char *in_type)
 	  if (fds[myix] != orig_fds[myix])
 	    cygheap->fdtab.move_fd (fds[myix], myfd = orig_fds[myix]);
 	  fhandler_pipe *fh = (fhandler_pipe *) cygheap->fdtab[myfd];
-	  /* Flag that this handle is associated with popen and then reset
-	     the handle's original close-on-exec state. */
+	  /* Flag that this handle is associated with popen. */
 	  fh->set_popen_pid (pid);
-	  fcntl64 (myfd, F_SETFD, fd_state);
 	  return fp;
 	}
     }
@@ -4332,6 +4359,10 @@ popen (const char *command, const char *in_type)
   close (fds[0]);
   close (fds[1]);
   set_errno (save_errno);
+
+#undef rw
+#undef bintext
+
   return NULL;
 }
 

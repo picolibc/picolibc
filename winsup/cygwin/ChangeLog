@@ -1,5 +1,10 @@
 2014-01-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (popen): Introduce Glibc 'e' flag to allow thread-safe
+	opening of the pipe with O_CLOEXEC flag.  Simplify FD_CLOEXEC handling.
+
+2014-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/sys/file.h (LOCK_SH): Drop definition in favor of new
 	definitions in newlib.
 	(LOCK_EX): Ditto.
