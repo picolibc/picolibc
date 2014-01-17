@@ -4,7 +4,7 @@
    sys/config.h before.  This way we can manaage our configuration
    setting without bothering newlib.
 
-   Copyright 2003, 2007, 2008, 2009, 2010, 2012, 2013 Red Hat, Inc.
+   Copyright 2003, 2007, 2008, 2009, 2010, 2012, 2013, 2014 Red Hat, Inc.
    Written by C. Vinschen.
 
 This file is part of Cygwin.
@@ -78,6 +78,7 @@ extern char *_tlsbase __asm__ ("%fs:4");
 #define __HAVE_LOCALE_INFO_EXTENDED__ 1
 #define _WANT_C99_TIME_FORMATS 1
 #define _GLIBC_EXTENSION 1
+#define _STDIO_BSD_SEMANTICS 1
 #if defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
 #define __EXPORT __declspec(dllexport)
 #define __IMPORT
