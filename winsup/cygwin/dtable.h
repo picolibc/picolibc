@@ -85,8 +85,8 @@ public:
   void delete_archetype (fhandler_base *);
   void fixup_before_exec (DWORD win_proc_id);
   void fixup_before_fork (DWORD win_proc_id);
-  static void lock () {lock_process::locker.acquire ();}
-  static void unlock () {lock_process::locker.release ();}
+  void lock () {lock_process::locker.acquire ();}
+  void unlock () {lock_process::locker.release ();}
 };
 
 fhandler_base *build_fh_dev (const device&, const char * = NULL);
