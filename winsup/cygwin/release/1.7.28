@@ -1,5 +1,17 @@
+What's new:
+-----------
+
+- popen now supports the Glibc 'e' flag to set the FD_CLOEXEC flag on the pipe
+  in a thread-safe way.
+
+
 What changed:
 -------------
+
+- Switch to BSD FILE stream fopen/exit semantics, as in all BSD variants and
+  Linux/GLibc:  Don't fflush/lseek a FILE stream on fclose and exit, if it
+  only has been read from.
+  See: http://cygwin.com/ml/cygwin/2014-01/msg00110.html
 
 
 Bug Fixes
