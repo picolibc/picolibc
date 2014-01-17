@@ -204,6 +204,19 @@ _DEFUN(__sflush_r, (ptr, fp),
   return 0;
 }
 
+#ifdef _STDIO_BSD_SEMANTICS
+/* Called from _cleanup_r.  At exit time, we don't need file locking,
+   and we don't want to move the underlying file pointer unless we're
+   writing. */
+int
+_DEFUN(__sflushw_r, (ptr, fp),
+       struct _reent *ptr _AND
+       register FILE *fp)
+{
+  return (fp->_flags & __SWR) ?  __sflush_r (ptr, fp) : 0;
+}
+#endif
+
 int
 _DEFUN(_fflush_r, (ptr, fp),
        struct _reent *ptr _AND

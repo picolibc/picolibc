@@ -147,6 +147,9 @@ int	      _EXFUN(_svfiwprintf_r,(struct _reent *, FILE *, const wchar_t *,
 extern FILE  *_EXFUN(__sfp,(struct _reent *));
 extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
 extern int    _EXFUN(__sflush_r,(struct _reent *,FILE *));
+#ifdef _STDIO_BSD_SEMANTICS
+extern int    _EXFUN(__sflushw_r,(struct _reent *,FILE *));
+#endif
 extern int    _EXFUN(__srefill_r,(struct _reent *,FILE *));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(struct _reent *, void *, char *,
 					       _READ_WRITE_BUFSIZE_TYPE));

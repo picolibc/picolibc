@@ -1,3 +1,18 @@
+2014-01-17  Corinna Vinschen  <vinschen@redhat.com>
+
+	Introduce _STDIO_BSD_SEMANTICS flag to switch fclose/exit file flushing
+	semantics from POSIX to BSD.
+	* libc/stdio/fclose.c (_fclose_r): Conditionalize file flushing on
+	_STDIO_BSD_SEMANTICS.  Call __sflush_r rather than _fflush_r.  Add
+	comment.
+	* libc/stdio/fflush.c (__sflushw_r): New function, only available
+	if _STDIO_BSD_SEMANTICS is defined.
+	* libc/stdio/findfp.c (_cleanup_r): Call _fwalk_reent rather than
+	_fwalk.  Conditionalize cleanup function call on _STDIO_BSD_SEMANTICS.
+	Add comments.  Add FIXME.
+	* libc/stdio/local.h (__sflushw_r): Declare if _STDIO_BSD_SEMANTICS is
+	defined.
+
 2014-01-06  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/_default_fcntl.h (AT_FDCWD): Define according

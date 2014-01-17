@@ -92,10 +92,15 @@ _DEFUN(_fclose_r, (rptr, fp),
 #endif
       return (0);
     }
-  /* Unconditionally flush to allow special handling for seekable read
-     files to reposition file to last byte processed as opposed to
-     last byte read ahead into the buffer.  */
-  r = _fflush_r (rptr, fp);
+#ifdef _STDIO_BSD_SEMANTICS
+  /* BSD and Glibc systems only flush streams which have been written to. */
+  r = (fp->_flags & __SWR) ? __sflush_r (rptr, fp) : 0;
+#else
+  /* Follow POSIX semantics exactly.  Unconditionally flush to allow
+     special handling for seekable read files to reposition file to last
+     byte processed as opposed to last byte read ahead into the buffer. */
+  r = __sflush_r (rptr, fp);
+#endif
   if (fp->_close != NULL && fp->_close (rptr, fp->_cookie) < 0)
     r = EOF;
   if (fp->_flags & __SMBF)
