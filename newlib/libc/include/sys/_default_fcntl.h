@@ -148,6 +148,14 @@ extern "C" {
 #define AT_REMOVEDIR            8
 #endif
 
+#if __BSD_VISIBLE
+/* lock operations for flock(2) */
+#define	LOCK_SH		0x01		/* shared file lock */
+#define	LOCK_EX		0x02		/* exclusive file lock */
+#define	LOCK_NB		0x04		/* don't block when locking */
+#define	LOCK_UN		0x08		/* unlock file */
+#endif
+
 /*#include <sys/stdtypes.h>*/
 
 #ifndef __CYGWIN__
@@ -176,7 +184,6 @@ struct eflock {
 };
 #endif	/* !_POSIX_SOURCE */
 
-
 #include <sys/types.h>
 #include <sys/stat.h>		/* sigh. for the mode bits for open/creat */
 
@@ -186,6 +193,9 @@ extern int openat _PARAMS ((int, const char *, int, ...));
 #endif
 extern int creat _PARAMS ((const char *, mode_t));
 extern int fcntl _PARAMS ((int, int, ...));
+#if __BSD_VISIBLE
+extern int flock _PARAMS ((int, int));
+#endif
 #ifdef __CYGWIN__
 #include <sys/time.h>
 extern int futimesat _PARAMS ((int, const char *, const struct timeval *));
