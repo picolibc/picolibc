@@ -1,3 +1,7 @@
+2014-01-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/netinet/ip6.h: New file, copied from FreeBSD vebatim.
+
 2014-01-17  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* dtable.h (dtable::lock): Revert static.

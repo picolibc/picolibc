@@ -4,6 +4,8 @@ What's new:
 - popen now supports the Glibc 'e' flag to set the FD_CLOEXEC flag on the pipe
   in a thread-safe way.
 
+- netinet/ip6.h header.
+
 
 What changed:
 -------------
