@@ -1,3 +1,8 @@
+2014-01-19  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/setjmp.h (longjmp): Mark "noreturn" when building with
+	GCC.
+
 2014-01-17  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/pwd.h: Use __foo_VISIBLE macros from sys/cdefs.h.

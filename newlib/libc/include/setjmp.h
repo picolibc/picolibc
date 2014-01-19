@@ -11,7 +11,11 @@
 
 _BEGIN_STD_C
 
-void	_EXFUN(longjmp,(jmp_buf __jmpb, int __retval));
+#ifdef __GNUC__
+#else
+void	_EXFUN(longjmp,(jmp_buf __jmpb, int __retval))
+			__attribute__ ((__noreturn__));
+#endif
 int	_EXFUN(setjmp,(jmp_buf __jmpb));
 
 _END_STD_C
