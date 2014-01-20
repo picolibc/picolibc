@@ -12,9 +12,10 @@
 _BEGIN_STD_C
 
 #ifdef __GNUC__
-#else
 void	_EXFUN(longjmp,(jmp_buf __jmpb, int __retval))
 			__attribute__ ((__noreturn__));
+#else
+void	_EXFUN(longjmp,(jmp_buf __jmpb, int __retval));
 #endif
 int	_EXFUN(setjmp,(jmp_buf __jmpb));
 

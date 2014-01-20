@@ -1,3 +1,7 @@
+2014-01-20  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/setjmp.h (longjmp): Fix copy/paste error.
+
 2014-01-19  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/setjmp.h (longjmp): Mark "noreturn" when building with
