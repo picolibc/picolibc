@@ -1,7 +1,7 @@
 /* cygwin/socket.h
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009, 2010, 2012,
-   2013 Red Hat, Inc.
+   2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -233,21 +233,22 @@ struct OLD_msghdr
 #define IP_MAX_MEMBERSHIPS              20
 
 /* IP options for use with getsockopt/setsockopt */
-#define IP_OPTIONS			 1
-#define IP_HDRINCL			 2
-#define IP_TOS				 3
-#define IP_TTL				 4
-#define IP_MULTICAST_IF			 9
-#define IP_MULTICAST_TTL		10
-#define IP_MULTICAST_LOOP		11
-#define IP_ADD_MEMBERSHIP		12
-#define IP_DROP_MEMBERSHIP		13
-#define IP_DONTFRAGMENT			14
+#define IP_OPTIONS                       1
+#define IP_HDRINCL                       2
+#define IP_TOS                           3
+#define IP_TTL                           4
+#define IP_MULTICAST_IF                  9
+#define IP_MULTICAST_TTL                10
+#define IP_MULTICAST_LOOP               11
+#define IP_ADD_MEMBERSHIP               12
+#define IP_DROP_MEMBERSHIP              13
+#define IP_DONTFRAGMENT                 14
 #define IP_ADD_SOURCE_MEMBERSHIP        15
 #define IP_DROP_SOURCE_MEMBERSHIP       16
 #define IP_BLOCK_SOURCE                 17
 #define IP_UNBLOCK_SOURCE               18
 #define IP_PKTINFO                      19
+#define IP_UNICAST_IF                   31
 
 /* IPv6 options for use with getsockopt/setsockopt */
 #define IPV6_HOPOPTS                     1
@@ -257,15 +258,16 @@ struct OLD_msghdr
 #define IPV6_MULTICAST_LOOP             11
 #define IPV6_ADD_MEMBERSHIP             12
 #define IPV6_DROP_MEMBERSHIP            13
-#define IPV6_JOIN_GROUP                 IPV6_ADD_MEMBERSHIP
-#define IPV6_LEAVE_GROUP                IPV6_DROP_MEMBERSHIP
 #define IPV6_DONTFRAG                   14
 #define IPV6_PKTINFO                    19
 #define IPV6_HOPLIMIT                   21
 #define IPV6_CHECKSUM                   26
 #define IPV6_V6ONLY                     27
+#define IPV6_UNICAST_IF                 31
 #define IPV6_RTHDR                      32
 #define IPV6_RECVRTHDR                  38
+#define IPV6_TCLASS                     39
+#define IPV6_RECVTCLASS                 40
 
 /* IP agnostic options for use with getsockopt/setsockopt */
 #define MCAST_JOIN_GROUP                41

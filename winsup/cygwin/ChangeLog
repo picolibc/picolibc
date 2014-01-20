@@ -1,3 +1,14 @@
+2014-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/in6.h (struct ipv6_rt_hdr): Define.
+	* include/cygwin/socket.h: Fix formatting.
+	(IP_UNICAST_IF): Define.
+	(IPV6_JOIN_GROUP): Remove Windowism.
+	(IPV6_LEAVE_GROUP): Ditto.
+	(IPV6_UNICAST_IF): Define.
+	(IPV6_TCLASS): Ditto.
+	(IPV6_RECVTCLASS): Ditto.
+
 2014-01-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/netinet/ip6.h: New file, copied from FreeBSD vebatim.
