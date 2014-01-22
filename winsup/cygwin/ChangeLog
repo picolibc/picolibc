@@ -1,3 +1,8 @@
+2014-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (etc::test_file_change): In case of NtQueryFullAttributesFile
+	returning an error, only return true if file actually exists.
+
 2014-01-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/in6.h (struct ipv6_rt_hdr): Define.
