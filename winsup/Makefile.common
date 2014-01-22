@@ -19,8 +19,8 @@ endef
 export PATH:=${winsup_srcdir}:${PATH}
 
 # Allow CFLAGS=-O,-g to control CXXFLAGS too
-opt=$(filter -O%,${CFLAGS}) $(filter -g,${CFLAGS})
-override CXXFLAGS:=${filter-out -g,$(filter-out -O%,${CXXFLAGS})} ${opt}
+opt=$(filter -O%,${CFLAGS}) $(filter -g%,${CFLAGS})
+override CXXFLAGS:=${filter-out -g%,$(filter-out -O%,${CXXFLAGS})} ${opt}
 
 cflags_common:=-Wall -Wstrict-aliasing -Wwrite-strings -fno-common -pipe -fbuiltin -fmessage-length=0
 COMPILE.cc=c++wrap ${CXXFLAGS} -fno-rtti -fno-exceptions ${cflags_common}
