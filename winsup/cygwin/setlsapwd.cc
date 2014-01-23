@@ -1,6 +1,6 @@
 /* setlsapwd.cc: Set LSA private data password for current user.
 
-   Copyright 2008, 2009, 2011 Red Hat, Inc.
+   Copyright 2008, 2009, 2011, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -71,8 +71,7 @@ setlsapwd (const char *passwd, const char *username)
       if (data_buf)
 	RtlInitUnicodeString (&data, data_buf);
       /* First try it locally.  Works for admin accounts. */
-      if ((lsa = open_local_policy (POLICY_CREATE_SECRET))
-	  != INVALID_HANDLE_VALUE)
+      if (!(lsa = lsa_open_policy (NULL, POLICY_CREATE_SECRET)))
 	{
 	  NTSTATUS status = LsaStorePrivateData (lsa, &key,
 						 data.Length ? &data : NULL);
@@ -83,7 +82,7 @@ setlsapwd (const char *passwd, const char *username)
 	    ret = 0;
 	  else
 	    __seterrno_from_nt_status (status);
-	  LsaClose (lsa);
+	  lsa_close_policy (lsa);
 	}
       else if (ret && !username)
 	{

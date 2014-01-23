@@ -1,7 +1,7 @@
 /* sec_auth.cc: NT authentication functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -191,28 +191,32 @@ str2buf2lsa (LSA_STRING &tgt, char *buf, const char *srcstr)
 }
 
 HANDLE
-open_local_policy (ACCESS_MASK access)
+lsa_open_policy (PWCHAR server, ACCESS_MASK access)
 {
-  LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
-  HANDLE lsa = INVALID_HANDLE_VALUE;
+  LSA_UNICODE_STRING srvbuf;
+  PLSA_UNICODE_STRING srv = NULL;
+  static LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
+  HANDLE lsa;
 
-  NTSTATUS status = LsaOpenPolicy (NULL, &oa, access, &lsa);
+  if (server)
+    {
+      srv = &srvbuf;
+      RtlInitUnicodeString (srv, server);
+    }
+  NTSTATUS status = LsaOpenPolicy (srv, &oa, access, &lsa);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      /* Some versions of Windows set the lsa handle to NULL when
-	 LsaOpenPolicy fails. */
-      lsa = INVALID_HANDLE_VALUE;
+      lsa = NULL;
     }
   return lsa;
 }
 
-static void
-close_local_policy (LSA_HANDLE &lsa)
+void
+lsa_close_policy (HANDLE lsa)
 {
-  if (lsa != INVALID_HANDLE_VALUE)
+  if (lsa)
     LsaClose (lsa);
-  lsa = INVALID_HANDLE_VALUE;
 }
 
 bool
@@ -836,7 +840,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   push_self_privilege (SE_CREATE_TOKEN_PRIVILEGE, true);
 
   /* Open policy object. */
-  if ((lsa = open_local_policy (POLICY_EXECUTE)) == INVALID_HANDLE_VALUE)
+  if (!(lsa = lsa_open_policy (NULL, POLICY_EXECUTE)))
     goto out;
 
   /* User, owner, primary group. */
@@ -954,7 +958,7 @@ out:
     free (privs);
   if (my_tok_gsids)
     free (my_tok_gsids);
-  close_local_policy (lsa);
+  lsa_close_policy (lsa);
 
   debug_printf ("%p = create_token ()", primary_token);
   return primary_token;
@@ -1021,7 +1025,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     }
 
   /* Open policy object. */
-  if ((lsa = open_local_policy (POLICY_EXECUTE)) == INVALID_HANDLE_VALUE)
+  if (!(lsa = lsa_open_policy (NULL, POLICY_EXECUTE)))
     goto out;
 
   /* Create origin. */
@@ -1192,7 +1196,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 out:
   if (privs)
     free (privs);
-  close_local_policy (lsa);
+  lsa_close_policy (lsa);
   if (lsa_hdl)
     LsaDeregisterLogonProcess (lsa_hdl);
   pop_self_privilege ();
@@ -1220,8 +1224,7 @@ lsaprivkeyauth (struct passwd *pw)
   push_self_privilege (SE_TCB_PRIVILEGE, true);
 
   /* Open policy object. */
-  if ((lsa = open_local_policy (POLICY_GET_PRIVATE_INFORMATION))
-      == INVALID_HANDLE_VALUE)
+  if (!(lsa = lsa_open_policy (NULL, POLICY_GET_PRIVATE_INFORMATION)))
     goto out;
 
   /* Needed for Interix key and LogonUser. */
@@ -1263,7 +1266,7 @@ lsaprivkeyauth (struct passwd *pw)
     token = get_full_privileged_inheritable_token (token);
 
 out:
-  close_local_policy (lsa);
+  lsa_close_policy (lsa);
   pop_self_privilege ();
   return token;
 }

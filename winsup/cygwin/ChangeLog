@@ -1,3 +1,19 @@
+2014-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.h (open_local_policy): Remove declaration.
+	(lsa_open_policy): Declare.
+	(lsa_close_policy): Declare.
+	* sec_auth.cc (lsa_open_policy): Rename from open_local_policy.  Take
+	server name as parameter.  Return NULL in case of error, rather than
+	INVALID_HANDLE_VALUE.
+	(lsa_close_policy): Rename from close_local_policy.  Make externally
+	available.  Get handle by value.
+	(create_token): Convert call to open_local_policy/close_local_policy
+	according to aforementioned changes.
+	(lsaauth): Ditto.
+	(lsaprivkeyauth): Ditto.
+	* setlsapwd.cc (setlsapwd): Ditto.
+
 2014-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (etc::test_file_change): In case of NtQueryFullAttributesFile

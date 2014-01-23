@@ -1,7 +1,7 @@
 /* security.h: security declarations
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013 Red Hat, Inc.
+   2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -416,7 +416,8 @@ void extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user);
 /* Get default logonserver for a domain. */
 bool get_logon_server (PWCHAR domain, PWCHAR wserver, bool rediscovery);
 
-HANDLE open_local_policy (ACCESS_MASK access);
+HANDLE lsa_open_policy (PWCHAR server, ACCESS_MASK access);
+void lsa_close_policy (HANDLE lsa);
 
 /* sec_helper.cc: Security helper functions. */
 int set_privilege (HANDLE token, DWORD privilege, bool enable);
