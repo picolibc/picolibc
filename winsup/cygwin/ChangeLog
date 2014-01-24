@@ -1,3 +1,7 @@
+2014-01-24  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* winf.cc (linebuf::fromargv): Treat '=' as a special character.
+
 2014-01-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.h (open_local_policy): Remove declaration.

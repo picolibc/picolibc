@@ -75,7 +75,7 @@ linebuf::fromargv (av& newargv, const char *real_path, bool cmdlenoverflow_ok)
 
       a = i ? newargv[i] : (char *) real_path;
       int len = strlen (a);
-      if (len != 0 && !strpbrk (a, " \t\n\r\""))
+      if (len != 0 && !strpbrk (a, " \t\n\r\"="))
 	add (a, len);
       else
 	{
