@@ -1,10 +1,14 @@
+2014-01-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.28): Add new section.
+
 2014-01-07  Mark Geisert  <mark@maxrnd.com>
 
 	* faq-programming.xml: Update packages needed to build Cygwin.
 
 2013-12-07  Corinna Vinschen  <corinna@vinschen.de>
 
-	* new-features.xml (ov-new1.7.26): Add new section.
+	* new-features.xml (ov-new1.7.27): Add new section.
 
 2013-11-29  Corinna Vinschen  <corinna@vinschen.de>
 

@@ -4,6 +4,29 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.28"><title>What's new and what changed from 1.7.27 to 1.7.28</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+popen now supports the Glibc 'e' flag to set the FD_CLOEXEC flag on the pipe
+in a thread-safe way.
+</para></listitem>
+
+<listitem><para>
+New netinet/ip6.h header.
+</para></listitem>
+
+<listitem><para>
+Switch to BSD FILE stream fopen/exit semantics, as in all BSD variants
+and Linux/GLibc:  Don't fflush/lseek a FILE stream on fclose and exit,
+if it only has been read from.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.27"><title>What's new and what changed from 1.7.26 to 1.7.27</title>
 
 <itemizedlist mark="bullet">
