@@ -1,3 +1,9 @@
+2014-01-27  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* gendef (_setjmp (x86)): Save FPU control word location in sequential
+	location.  Adjust sigstack save accordingly.
+	(_longjmp (x86)): Ditto for restore.
+
 2014-01-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gendef (sigdelayed (x86_64)): Save and restore FPU control word.
