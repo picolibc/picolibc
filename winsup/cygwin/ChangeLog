@@ -76,7 +76,7 @@
 
 2014-01-08  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
-	* exceptions.h (cygwin_exception::open_stackdumpfile): Move old
+	* exception.h (cygwin_exception::open_stackdumpfile): Move old
 	function into class.
 	(cygwin_exception::h): New member.
 	(cygwin_exception::cygwin_exception): Initialize h to NULL.
