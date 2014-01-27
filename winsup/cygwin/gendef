@@ -225,8 +225,9 @@ sigdelayed:
 	pushq	%rax
 	.seh_pushreg %rax
 	pushf
-	subq	\$0x120,%rsp
-	.seh_stackalloc 0x120
+	subq	\$0x130,%rsp
+	.seh_stackalloc 0x130
+	fnstcw	0x120(%rsp)
 	movdqa	%xmm15,0x110(%rsp)
 	movdqa	%xmm14,0x100(%rsp)
 	movdqa	%xmm13,0xf0(%rsp)
@@ -285,7 +286,9 @@ sigdelayed:
 	movdqa	0xf0(%rsp),%xmm13
 	movdqa	0x100(%rsp),%xmm14
 	movdqa	0x110(%rsp),%xmm15
-	addq	\$0x120,%rsp
+	fninit
+	fldcw	0x120(%rsp)
+	addq	\$0x130,%rsp
 	popf
 	popq	%rax
 	popq	%rbx
@@ -449,6 +452,8 @@ __sigbe:						# return here after cygwin syscall
 _sigdelayed:
 	pushl   %ebp
 	movl    %esp,%ebp
+	# We could be called from an interrupted thread which doesn't know
+	# about his fate, so save and restore everything and the kitchen sink.
 	pushf
 	pushl   %esi
 	pushl   %edi
@@ -456,6 +461,16 @@ _sigdelayed:
 	pushl   %ecx
 	pushl   %ebx
 	pushl   %eax
+	subl	\$0x84,%esp
+	fnstcw  0x80(%esp)
+	movdqu	%xmm7,0x70(%esp)
+	movdqu	%xmm6,0x60(%esp)
+	movdqu	%xmm5,0x50(%esp)
+	movdqu	%xmm4,0x40(%esp)
+	movdqu	%xmm3,0x30(%esp)
+	movdqu	%xmm2,0x20(%esp)
+	movdqu	%xmm1,0x10(%esp)
+	movdqu	%xmm0,(%esp)
 	movl	%fs:4,%ebx				# get tls
 	pushl   $tls::saved_errno(%ebx) # saved errno
 
@@ -480,11 +495,22 @@ _sigdelayed:
 	xadd	%eax,$tls::stackptr(%ebx)		#  and get pointer
 	xorl	%ebp,%ebp
 	xchgl	%ebp,-4(%eax)				# get return address from signal stack
-	xchgl	%ebp,28(%esp)				# store real return address
+	xchgl	%ebp,0xa0(%esp)				# store real return address
 leave:	xorl	%eax,%eax
 	movl	%eax,$tls::incyg(%ebx)
 	movl	%eax,$tls::stacklock(%ebx)		# unlock
 
+	movdqu	(%esp),%xmm0
+	movdqu	0x10(%esp),%xmm1
+	movdqu	0x20(%esp),%xmm2
+	movdqu	0x30(%esp),%xmm3
+	movdqu	0x40(%esp),%xmm4
+	movdqu	0x50(%esp),%xmm5
+	movdqu	0x60(%esp),%xmm6
+	movdqu	0x70(%esp),%xmm7
+	fninit
+	fldcw   0x80(%esp)
+	addl	\$0x84,%esp
 	popl	%eax
 	popl	%ebx
 	popl	%ecx
@@ -745,6 +771,7 @@ _setjmp:
 	movw	%ax,42(%edi)
 	movl	%fs:0,%eax
 	movl	%eax,44(%edi)
+	fnstcw	56(%edi)
 	pushl	%ebx
 	call	stabilize_sig_stack
 	movl	$tls::stackptr(%ebx),%eax		# save stack pointer contents
@@ -847,6 +874,8 @@ _longjmp:
 	movl	24(%edi),%ebp
 	pushfl
 	popl	%ebx
+	fninit
+	fldcw	56(%edi)
 	movl	44(%edi),%eax
 	movl	%eax,%fs:0
 	movw	42(%edi),%ax

@@ -1,3 +1,11 @@
+2014-01-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (sigdelayed (x86_64)): Save and restore FPU control word.
+	(_sigdelayed (x86)): Ditto.  Save and restore XMM registers.  Add
+	comment.
+	(_setjmp (x86)): Save FPU control word, following FreeBSD here.
+	(_longjmp (x86)): Restore FPU control word.
+
 2014-01-24  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* winf.cc (linebuf::fromargv): Treat '=' as a special character.
