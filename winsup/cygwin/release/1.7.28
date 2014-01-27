@@ -19,6 +19,10 @@ What changed:
 Bug Fixes
 ---------
 
+- Store and restore FPU control word and XMM registers when a signal is
+  handled.
+  Fixes: http://cygwin.com/ml/cygwin/2014-01/msg00075.html
+
 - Signals should no longer hang when they occur within a low-level
   Windows DLL.
   Fixes: http://cygwin.com/ml/cygwin/2013-12/threads.html#00151
