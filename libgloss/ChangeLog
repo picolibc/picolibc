@@ -1,3 +1,8 @@
+2014-01-28  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* aarch64/cpu-init/rdimon-aem-el3.S (flat_map): Use bic-immediate
+	form to clear WXN bit.
+
 2014-01-24  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* aarch64/cpu-init/rdimon-aem-el3.S (flat_map): Clear WXN bit

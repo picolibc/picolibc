@@ -139,8 +139,7 @@ _flat_map:
 	mrs	x0, sctlr_el3
 	ldr	x1, =0x100d			/* bits I(12) SA(3) C(2) M(0) */
 	bic	x0, x0, #(1 << 1)		/* clear bit A(1) */
-	mov	x2, #(1 << 19)			/* clear WXN */
-	bic	x0, x0, x2
+	bic	x0, x0, #(1 << 19)		/* clear WXN */
 	orr	x0, x0, x1			/* set bits */
 
 	dsb	sy
