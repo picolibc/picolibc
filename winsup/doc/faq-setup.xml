@@ -11,16 +11,14 @@
 <answer>
 
 <para>There is only one recommended way to install Cygwin, which is to use the GUI
-installer ``Cygwin Setup''.  It is flexible and easy to use.  
+installer <command>setup-*.exe</command>.  It is flexible and easy to use.  
 You can pick and choose the packages you wish to install, and update
 them individually.  Full source code is available for all packages and
 tools.  More information on using Cygwin Setup may be found at
 <ulink url="http://cygwin.com/cygwin-ug-net/setup-net.html" />.
 </para>
-<para>If you do it any other way, you're on your own!  That said, keep in mind
-that the GUI installer is a "work in progress", so there might be a few
-difficulties, especially if you are behind a firewall or have other
-specific requirements.  If something doesn't work right for you, and
+<para>If you do it any other way, you're on your own!
+If something doesn't work right for you, and
 it's not covered here or in the latest development snapshot at
 <ulink url="http://cygwin.com/snapshots/">http://cygwin.com/snapshots/</ulink>, then by all means report it to the
 mailing list.
@@ -335,8 +333,7 @@ prior actions is in <literal>/var/log/setup.log</literal>.
 <answer>
 
 <para>First, make sure that you are using the latest version of Cygwin Setup.
-The latest version is always available from the 'Install Cygwin now' link on
-the Cygwin Home Page at <ulink
+The latest version is always available from the Cygwin Home Page at <ulink
 url="http://cygwin.com/">http://cygwin.com/</ulink>.  </para>
 <para>If you are downloading from the Internet, setup will fail if it cannot
 download the list of mirrors at <ulink
@@ -538,10 +535,6 @@ have not been tested.  Use them <emphasis role='bold'>only</emphasis> if there i
 bugfix that you need to try, and you are willing to deal with any
 problems, or at the request of a Cygwin developer.
 </para>
-<para>You should generally install the full
-<literal>cygwin-inst-YYYYMMDD.tar.bz2</literal> update, rather than just the DLL,
-otherwise some components may be out of sync.
-</para>
 <para>You cannot use Cygwin Setup to install a snapshot.
 </para>
 <para>First, you will need to download the snapshot from the snapshots
@@ -561,8 +554,8 @@ you are only installing the DLL snapshot, skip the first tar command.  Open
 a <literal>bash</literal> shell (it should be the only running Cygwin process) and issue
 the following commands:
 <screen>
-	/bin/tar -C/ -jxvf /posix/path/to/cygwin-inst-YYYYMMDD.tar.bz2 --exclude=usr/bin/cygwin1.dll
-	/bin/tar -C/tmp -jxvf /posix/path/to/cygwin-inst-YYYYMMDD.tar.bz2 usr/bin/cygwin1.dll
+	/bin/tar -C / -xvf /posix/path/to/cygwin-inst-YYYYMMDD.tar.* --exclude=usr/bin/cygwin1.dll
+	/bin/tar -C /tmp -xvf /posix/path/to/cygwin-inst-YYYYMMDD.tar.* usr/bin/cygwin1.dll
 </screen>
 </para>
 <para>Exit the bash shell, and use Explorer or the Windows command shell to

@@ -332,7 +332,7 @@ to determine whether they are executable.
 <question><para>How do I print under Cygwin?</para></question>
 <answer>
 
-<para>lpr is available in the <ulink url="http://cygwin.com/setup.exe">setup.exe</ulink> cygutils package.  Some <ulink url="http://cygwin.com/ml/cygwin/2008-05/msg00123.html">usage hints</ulink> are available courtesy of Rodrigo Medina.
+<para>lpr is available in the cygutils package.  Some <ulink url="http://cygwin.com/ml/cygwin/2008-05/msg00123.html">usage hints</ulink> are available courtesy of Rodrigo Medina.
 </para>
 <para>Jason Tishler has written a couple of messages that explain how to use
 a2ps (for nicely formatted text in PostScript) and ghostscript (to print
@@ -420,7 +420,7 @@ if you have one a single Cygwin installation, for example, if you update the
 Cygwin package without exiting <emphasis>all</emphasis> Cygwin apps (including
 services like sshd) beforehand.</para>
 <para>The only DLL that is sanctioned by the Cygwin project is the one that
-you get by running <ulink url="http://cygwin.com/setup.exe">setup.exe</ulink>,
+you get by running <ulink url="http://cygwin.com/install.html">setup.exe</ulink>,
 installed in a directory controlled by this program.  If you have other
 versions on your system and desire help from the cygwin project, you should
 delete or rename all DLLs that are not installed by

@@ -112,8 +112,8 @@ the efforts of net volunteers who maintain the Cygwin binary ports.
 Each package has its own version numbers and its own release process.
 </para>
 <para>So, how do you get the most up-to-date version of Cygwin?  Easy.  Just
-download the Cygwin Setup program from
-<ulink url='http://cygwin.com/setup.exe'>http://cygwin.com/setup.exe</ulink>.  This program will handle the task
+download the Cygwin Setup program by following the instructions
+<ulink url='http://cygwin.com/install.html'>here</ulink>.  The setup program will handle the task
 of updating the packages on your system to the latest version. For
 more information about using Cygwin's <filename>setup.exe</filename>, see 
 <ulink url='http://cygwin.com/cygwin-ug-net/setup-net.html'>Setting Up Cygwin</ulink>

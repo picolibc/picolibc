@@ -1,3 +1,10 @@
+2014-01-29  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* faq-setup.xml: Minor snapshot instruction rewording.  Update
+	discussion about setup*.exe.
+	* faq-using.xml: Update information about setup*.exe.
+	* faq-what.xml: Ditto.
+
 2014-01-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new1.7.28): Add new section.
