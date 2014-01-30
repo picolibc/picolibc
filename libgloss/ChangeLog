@@ -1,3 +1,16 @@
+2014-01-29  DJ Delorie  <dj@redhat.com>
+
+	* msp430/Makefile.in (crt0-minrt.o, crtn-minrt.o): New.  Build
+	from crt0.S with -DMINRT.
+	(CRT_OBJS): Expand.
+	(crt_%.o): New rule pattern.  Build multiple objects from crt0.S.
+	* msp430/crt0.S: Further break out functionality.  Support -DMINRT
+	that omits all init/fini logic.
+	* msp430/crtn.S: Likewise.
+	* msp430/msp430-sim.ld: Wildcard all .crt_* sections, sorted.
+	* msp430/msp430.ld: Likewise.
+	* msp430/msp430xl-sim.ld: Likewise.
+
 2014-01-28  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* aarch64/cpu-init/rdimon-aem-el3.S (flat_map): Use bic-immediate

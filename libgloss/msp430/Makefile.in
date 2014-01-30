@@ -61,7 +61,7 @@ SCRIPTS += $(srcdir)/msp430xl-sim.ld
 SCRIPTS += $(srcdir)/msp430F5438A-s.ld
 SCRIPTS += $(srcdir)/msp430F5438A-l.ld
 
-CRT = gcrt0.o crt0.o crtn.o
+CRT = gcrt0.o crt0.o crt0-minrt.o crtn.o crtn-minrt.o
 SIM_BSP = libsim.a
 LIBNOSYS = libnosys.a
 
@@ -79,17 +79,34 @@ SCRIPTS += $(srcdir)/intr_vectors.ld
 
 LIB_CRT = libcrt.a
 
-CRT_OBJS = crt_bss.o crt_movedata.o
+# Each crt_*.o is built from crt0.S using -DL*.  crt0.o is built from
+# crt0.s with -DL0 via the default rule below.
+CRT_OBJS = \
+	crt_bss.o \
+	crt_movedata.o \
+	crt_main.o \
+	crt_main_minrt.o \
+	crt_callexit.o \
+	crt_init.o
 
 #### Host specific Makefile fragment comes in here.
 @host_makefile_frag@
 
 
+all: $(CRT) $(SIM_BSP) $(LIBNOSYS) $(LIB_CRT) copy_scripts_to_objdir
+
+crt_%.o : crt0.S
+	$(CC) -DL$* -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $< -o $@
+
+crt0-minrt.o : crt0.S
+	$(CC) -DL0 -DMINRT -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $< -o $@
+
+crtn-minrt.o : crtn.S
+	$(CC) -DL0 -DMINRT -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $< -o $@
+
 # Override .S.o rule to pass assembler debugging flags
 .S.o:
-	$(CC) -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
-
-all: $(CRT) $(SIM_BSP) $(LIBNOSYS) $(LIB_CRT) copy_scripts_to_objdir
+	$(CC) -DL0 -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
 
 $(SIM_BSP): $(SIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?

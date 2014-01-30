@@ -79,12 +79,8 @@ SECTIONS
   {
     . = ALIGN(2);
     PROVIDE (_start = .);
-    KEEP (*(.crt_init))
-    KEEP (*(.crt_bss))
-    KEEP (*(.crt_movedata))
-    KEEP (*(.crt_main))
-    KEEP (*(.lowtext))
-    *(.text .stub .text.* .gnu.linkonce.t.* .text:*)
+    KEEP (*(SORT(.crt_*)))
+    *(.lowtext .text .stub .text.* .gnu.linkonce.t.* .text:*)
     KEEP (*(.text.*personality*))
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)

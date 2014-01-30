@@ -144,10 +144,7 @@ SECTIONS
   {
     PROVIDE (_start = .);
     . = ALIGN(2);
-    KEEP (*(.crt_init))
-    KEEP (*(.crt_bss))
-    KEEP (*(.crt_movedata))
-    KEEP (*(.crt_main))
+    KEEP (*(SORT(.crt_*)))
     KEEP (*(.lowtext))
   } > LOWROM
 

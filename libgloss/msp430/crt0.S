@@ -13,18 +13,38 @@
 
 #include "memmodel.h"
 
+;; The linker links all .crt_* sections in asciibetical order at the
+;; same place.  So, the four digits in .crt_NNNN determine the link
+;; order, so, keep them in sequential order here.  The first two
+;; digits are set here, the second two allow users to insert code
+;; between code fragments here.
+
+#if L0
 	.section ".resetvec", "a"
 __msp430_resetvec_hook:
 	.word	__start
 
-	.section ".lowtext", "ax", @progbits
+	.section ".crt_0000init", "ax", @progbits
+	.refsym	__msp430_resetvec_hook
+#ifdef MINRT
+	.refsym	__crt0_call_just_main
+#else
+	.refsym	__crt0_call_init_then_main
+#endif
 	.global __start
 __start:
 	mov_	#__stack, R1
 
 	;; Disable watchdog timer.
 	MOV	#0x5a80, &0x15C
+#endif
 
+#if Lbss
+	.section ".crt_0100bss", "ax", @progbits
+
+	.global __crt0_init_bss
+__crt0_init_bss:	
+	
 	mov_	#__bssstart, R12
 	clr.w	R13
 	mov.w	#__bsssize, R14
@@ -32,7 +52,14 @@ __start:
 	clr.w	R15		; We assume that __bsssize is never > 64M
 #endif
 	call_	#memset
+#endif
 
+#if Lmovedata
+	.section ".crt_0200movedata", "ax", @progbits
+
+	.global __crt0_movedata
+__crt0_movedata:	
+	
 	mov_	#__datastart, R12
 	mov_	#__romdatastart, R13
 
@@ -46,17 +73,38 @@ __start:
 #endif
 	call_	#memmove
 1:	
+#endif
+
+#if Lmain_minrt
+	.section ".crt_0300main", "ax", @progbits
+	.global	__crt0_call_just_main
+__crt0_call_just_main:
+	clr.w	R12		; Set argc == 0
+	call_	#main
+#endif
+
+#if Lmain
+	.section ".crt_0300main", "ax", @progbits
+	.global	__crt0_call_init_then_main
+__crt0_call_init_then_main:
 	call_	#__msp430_init
 
 	clr.w	R12		; Set argc == 0
 	call_	#main
+#endif
 
+#if Lcallexit
+	.section ".crt_0400main_exit", "ax", @progbits
+	.global	__crt0_call_exit
+__crt0_call_exit:
 	call_	#_exit
-
-	.word	__msp430_resetvec_hook
+#endif
 
 ;----------------------------------------
 
+#ifndef MINRT
+#if L0
+	.section ".crt_0500main_init", "ax", @progbits
 	.global	_msp430_run_init_array
 	.type	_msp430_run_init_array,@function
 _msp430_run_init_array:
@@ -104,3 +152,6 @@ __msp430_init:
 	.global __msp430_fini
 __msp430_fini:
 	call_	#_msp430_run_fini_array
+	
+#endif
+#endif
