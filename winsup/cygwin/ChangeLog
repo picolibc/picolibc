@@ -1,3 +1,7 @@
+2014-01-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (opendir): Call set_unique_id only with valid fh.
+
 2014-01-30  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* fhandler.h (cltype): Add cl_buf_beg, cl_buf_end.
