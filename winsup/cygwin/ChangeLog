@@ -1,3 +1,12 @@
+2014-01-30  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler.h (cltype): Add cl_buf_beg, cl_buf_end.
+	* fhandler_console.cc (dev_console::console_attrs::set_cl_x): Honor
+	buffer locations.
+	(dev_console::console_attrs::set_cl_y): Ditto.
+	(fhandler_console::write): On reset, use absolute positioning to go to
+	beginning of buffer.  Clear entire buffer.
+
 2014-01-27  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* gendef (_setjmp (x86)): Save FPU control word location in sequential

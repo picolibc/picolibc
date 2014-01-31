@@ -42,14 +42,6 @@ details. */
 #define ALT_PRESSED (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)
 #define CTRL_PRESSED (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)
 
-/*
- * Scroll the screen context.
- * x1, y1 - ul corner
- * x2, y2 - dr corner
- * xn, yn - new ul corner
- * Negative values represents current screen dimensions
- */
-
 #define dev_state (shared_console_info->dev_state)
 #define srTop (dev_state.info.winTop + dev_state.scroll_region.Top)
 #define srBottom ((dev_state.scroll_region.Bottom < 0) ? dev_state.info.winBottom : dev_state.info.winTop + dev_state.scroll_region.Bottom)
@@ -768,6 +760,12 @@ dev_console::fillin_info (HANDLE h)
   return ret;
 }
 
+/* Scroll the screen context.
+   x1, y1 - ul corner
+   x2, y2 - dr corner
+   xn, yn - new ul corner
+   Negative values represents current screen dimensions
+*/
 void
 fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
 {
@@ -1193,20 +1191,26 @@ dev_console::set_default_attr ()
 int
 dev_console::console_attrs::set_cl_x (cltype x)
 {
-  if (x == cl_disp_beg)
+  if (x == cl_disp_beg || x == cl_buf_beg)
     return 0;
   if (x == cl_disp_end)
     return dwWinSize.X - 1;
+  if (x == cl_buf_end)
+    return dwBufferSize.X - 1;
   return dwCursorPosition.X;
 }
 
 int
 dev_console::console_attrs::set_cl_y (cltype y)
 {
-  if (y == cl_disp_end)
-    return winBottom;
+  if (y == cl_buf_beg)
+    return 0;
   if (y == cl_disp_beg)
     return winTop;
+  if (y == cl_disp_end)
+    return winBottom;
+  if (y == cl_buf_end)
+    return dwBufferSize.Y - 1;
   return dwCursorPosition.Y;
 }
   
@@ -2164,8 +2168,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      dev_state.vt100_graphics_mode_G0 = false;
 	      dev_state.vt100_graphics_mode_G1 = false;
 	      dev_state.iso_2022_G1 = false;
-	      clear_screen (cl_disp_beg, cl_disp_beg, cl_disp_end, cl_disp_end);
-	      cursor_set (true, 0, 0);
+	      cursor_set (false, 0, 0);
+	      clear_screen (cl_buf_beg, cl_buf_beg, cl_buf_end, cl_buf_end);
 	      dev_state.state_ = normal;
 	    }
 	  else if (*src == '8')		/* DECRC Restore cursor position */

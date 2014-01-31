@@ -1250,7 +1250,9 @@ enum cltype
 {
   cl_curr_pos = 1,
   cl_disp_beg,
-  cl_disp_end
+  cl_disp_end,
+  cl_buf_beg,
+  cl_buf_end
 };
 
 class dev_console
