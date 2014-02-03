@@ -1,3 +1,10 @@
+2014-02-03  Richard Earnshaw  <rearnsha@arm.com>
+
+	* aarch64/Makefile.in (RDIMON_SCRIPTS): Rule to build in-tree copies
+	of scripts.
+	(all): Build the in-tree copies of the scripts.
+	(clean): Also delete the in-tree copies of the scripts.
+
 2014-01-29  DJ Delorie  <dj@redhat.com>
 
 	* msp430/Makefile.in (crt0-minrt.o, crtn-minrt.o): New.  Build

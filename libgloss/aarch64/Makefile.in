@@ -93,7 +93,7 @@ CFLAGS		= -g
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
-all: ${CRT0} ${RDIMON_CRT0} ${RDIMON_BSP}
+all: ${CRT0} ${RDIMON_CRT0} ${RDIMON_BSP} ${RDIMON_SCRIPTS}
 	@rootpre=`pwd`/; export rootpre; \
 	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
 	for dir in .. ${SUBDIRS}; do \
@@ -142,7 +142,7 @@ $(RDIMON_BSP): $(RDIMON_OBJS)
 	${RANLIB} $@
 
 clean mostlyclean:
-	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP)
+	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP) ${RDIMON_SCRIPTS}
 	@rootpre=`pwd`/; export rootpre; \
 	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
 	for dir in .. ${SUBDIRS}; do \
@@ -175,6 +175,9 @@ install-rdimon:
 	set -e; for x in ${RDIMON_CRT0} ${RDIMON_BSP}; do ${INSTALL_DATA} $$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 	set -e; for x in ${RDIMON_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
+# Make copies of the scripts to facilitate in-tree bootstrapping.
+${RDIMON_SCRIPTS}: %: ${objtype}%
+	cp $< $@
 
 doc:
 info:
