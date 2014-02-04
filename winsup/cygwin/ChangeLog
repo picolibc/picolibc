@@ -1,3 +1,7 @@
+2014-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 29.
+
 2014-01-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dir.cc (opendir): Call set_unique_id only with valid fh.
