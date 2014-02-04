@@ -1,3 +1,7 @@
+2014-02-04  Matthias Braun  <matze@braunis.de>
+
+	* libm/mathfp/sf_numtest.c: Fix NaN/Inf detection logic.
+
 2014-01-20  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/setjmp.h (longjmp): Fix copy/paste error.
