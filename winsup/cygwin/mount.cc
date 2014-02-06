@@ -1,7 +1,7 @@
 /* mount.cc: mount handling.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1180,6 +1180,7 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
   IO_STATUS_BLOCK io;
   NTSTATUS status;
   HANDLE fh;
+  tmp_pathbuf tp;
 
   if (user)
     {
@@ -1204,13 +1205,13 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
       return false;
     }
 
-  char buf[NT_MAX_PATH];
+  char *buf = tp.c_get ();
   char *got = buf;
   DWORD len = 0;
   unsigned line = 1;
   /* Using buffer size - 2 leaves space to append two \0. */
   while (NT_SUCCESS (NtReadFile (fh, NULL, NULL, NULL, &io, got,
-				 (sizeof (buf) - 2) - (got - buf), NULL, NULL)))
+				 (NT_MAX_PATH - 2) - (got - buf), NULL, NULL)))
     {
       char *end;
 
@@ -1232,7 +1233,7 @@ retry:
 	  got = end + 1;
 	  ++line;
 	}
-      if (len < (sizeof (buf) - 2))
+      if (len < (NT_MAX_PATH - 2))
 	break;
       /* Check if the buffer contained at least one \n.  If not, the
 	 line length is > 32K.  We don't take such long lines.  Print
@@ -1241,7 +1242,7 @@ retry:
 	{
 	  system_printf ("%W: Line %d too long, skipping...", fstab, line);
 	  while (NT_SUCCESS (NtReadFile (fh, NULL, NULL, NULL, &io, buf,
-					 (sizeof (buf) - 2), NULL, NULL)))
+					 (NT_MAX_PATH - 2), NULL, NULL)))
 	    {
 	      len = io.Information;
 	      buf[len] = buf[len + 1] = '\0';

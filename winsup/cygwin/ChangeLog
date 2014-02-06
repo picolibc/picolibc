@@ -1,3 +1,15 @@
+2014-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fchown): Fix typo in
+	comment.
+	* mount.cc (mount_info::from_fstab): Use tmp_pathbuf rather than
+	stack for big local buffer.
+	* net.cc (cygwin_gethostname): Call GetComputerNameExA rather than
+	GetComputerNameA if gethostname failed.
+	* shared.cc (user_info::initialize): Fix formatting.
+	* include/sys/file.h: Define flock and accompanying macros if not
+	already defined in sys/_default_fcntl.h.
+
 2014-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 29.

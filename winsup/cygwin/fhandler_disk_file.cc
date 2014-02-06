@@ -1,7 +1,7 @@
 /* fhandler_disk_file.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -928,7 +928,7 @@ fhandler_disk_file::fchown (uid_t uid, gid_t gid)
       if (pc.issymlink ())
 	attrib = S_IFLNK | STD_RBITS | STD_WBITS;
       res = set_file_attribute (get_handle (), pc, uid, gid, attrib);
-      /* If you're running a Samba server which has no winbidd running, the
+      /* If you're running a Samba server which has no winbind running, the
 	 uid<->SID mapping is disfunctional.  Even trying to chown to your
 	 own account fails since the account used on the server is the UNIX
 	 account which gets used for the standard user mapping.  This is a
