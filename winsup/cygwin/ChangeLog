@@ -1,3 +1,11 @@
+2014-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.h (class NT_readline): New class to implement line-wise
+	reading from file using native NT functions.
+	* miscfuncs.cc (NT_readline::init): New method.
+	* mount.cc (mount_info::from_fstab): Utilize NT_readline to read
+	fstab files.
+
 2014-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fchown): Fix typo in

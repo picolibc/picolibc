@@ -1,7 +1,7 @@
 /* miscfuncs.cc: misc funcs that don't belong anywhere else
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -382,6 +382,82 @@ WritePipeOverlapped (HANDLE h, LPCVOID buf, DWORD len, LPDWORD ret_len,
     }
   CloseHandle (ov.hEvent);
   return ret;
+}
+
+bool
+NT_readline::init (POBJECT_ATTRIBUTES attr, PCHAR in_buf, ULONG in_buflen)
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+
+  status = NtOpenFile (&fh, SYNCHRONIZE | FILE_READ_DATA, attr, &io,
+                       FILE_SHARE_VALID_FLAGS,
+                       FILE_SYNCHRONOUS_IO_NONALERT
+                       | FILE_OPEN_FOR_BACKUP_INTENT);
+  if (!NT_SUCCESS (status))
+    {
+      paranoid_printf ("NtOpenFile(%S) failed, status %y",
+		       &attr->ObjectName, status);
+      return false;
+    }
+  buf = in_buf;
+  buflen = in_buflen;
+  got = end = buf;
+  len = 0;
+  line = 1;
+  return true;
+}
+
+PCHAR 
+NT_readline::gets ()
+{
+  IO_STATUS_BLOCK io;
+
+  while (true)
+    {
+      /* len == 0 indicates we have to read from the file. */
+      if (!len)
+	{
+	  if (!NT_SUCCESS (NtReadFile (fh, NULL, NULL, NULL, &io, got,
+				       (buflen - 2) - (got - buf), NULL, NULL)))
+	    return NULL;
+	  len = io.Information;
+	  /* Set end marker. */
+	  got[len] = got[len + 1] = '\0';
+	  /* Set len to the absolute len of bytes in buf. */
+	  len += got - buf;
+	  /* Reset got to start reading at the start of the buffer again. */
+	  got = end = buf;
+	}
+      else
+	{
+	  got = end + 1;
+	  ++line;
+	}
+      /* Still some valid full line? */
+      if (got < buf + len)
+	{
+	  if ((end = strchr (got, '\n')))
+	    {
+	      end[end[-1] == '\r' ? -1 : 0] = '\0';
+	      return got;
+	    }
+	  /* Last line missing a \n at EOF? */
+	  if (len < buflen - 2)
+	    {
+	      len = 0;
+	      return got;
+	    }
+	}
+      /* We have to read once more.  Move remaining bytes to the start of
+         the buffer and reposition got so that it points to the end of
+         the remaining bytes. */
+      len = buf + len - got;
+      memmove (buf, got, len);
+      got = buf + len;
+      buf[len] = buf[len + 1] = '\0';
+      len = 0;
+    }
 }
 
 /* backslashify: Convert all forward slashes in src path to back slashes
