@@ -3,6 +3,7 @@
 	* miscfuncs.h (class NT_readline): New class to implement line-wise
 	reading from file using native NT functions.
 	* miscfuncs.cc (NT_readline::init): New method.
+	(NT_readline::fgets): New method.
 	* mount.cc (mount_info::from_fstab): Utilize NT_readline to read
 	fstab files.
 
