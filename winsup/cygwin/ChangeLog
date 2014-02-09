@@ -1,3 +1,8 @@
+2014-02-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* sigproc.cc (sig_send): Don't bother with an error message if we are
+	exiting.
+
 2014-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.h (class NT_readline): New class to implement line-wise
