@@ -1,6 +1,6 @@
 /* fhandler_procsysvipc.cc: fhandler for /proc/sysvipc virtual filesystem
 
-   Copyright 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -24,7 +24,6 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include "cygtls.h"
-#include "pwdgrp.h"
 #include "tls_pbuf.h"
 #include <sys/param.h>
 #include <ctype.h>

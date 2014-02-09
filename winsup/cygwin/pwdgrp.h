@@ -1,6 +1,6 @@
 /* pwdgrp.h
 
-   Copyright 2001, 2002, 2003 Red Hat inc.
+   Copyright 2001, 2002, 2003, 2014 Red Hat inc.
 
    Stuff common to pwd and grp handling.
 
@@ -10,42 +10,65 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#pragma once
+
 /* These functions are needed to allow searching and walking through
    the passwd and group lists */
 extern struct passwd *internal_getpwsid (cygpsid &);
-extern struct passwd *internal_getpwnam (const char *, bool = FALSE);
-extern struct passwd *internal_getpwuid (uid_t, bool = FALSE);
+extern struct passwd *internal_getpwnam (const char *);
+extern struct passwd *internal_getpwuid (uid_t);
 extern struct group *internal_getgrsid (cygpsid &);
-extern struct group *internal_getgrgid (gid_t gid, bool = FALSE);
-extern struct group *internal_getgrnam (const char *, bool = FALSE);
-extern struct group *internal_getgrent (int);
+extern struct group *internal_getgrgid (gid_t);
+extern struct group *internal_getgrnam (const char *);
 int internal_getgroups (int, gid_t *, cygpsid * = NULL);
 
 #include "sync.h"
-#include "cygtls.h"
+
+enum fetch_user_arg_type_t {
+  SID_arg,
+  NAME_arg,
+  ID_arg
+};
+
+struct fetch_user_arg_t
+{
+  fetch_user_arg_type_t type;
+  union {
+    cygpsid *sid;
+    const char *name;
+    uint32_t id;
+  };
+  /* Only used in fetch_account_from_file/line. */
+  size_t len;
+};
+
+struct pg_pwd
+{
+  struct passwd p;
+  cygsid sid;
+};
+
+struct pg_grp
+{
+  struct group g;
+  cygsid sid;
+};
+
 class pwdgrp
 {
   unsigned pwdgrp_buf_elem_size;
-  union
-  {
-    passwd **passwd_buf;
-    group **group_buf;
-    void **pwdgrp_buf;
-  };
-  void (pwdgrp::*read) ();
+  void *pwdgrp_buf;
   bool (pwdgrp::*parse) ();
-  int etc_ix;
-  UNICODE_STRING upath;
-  PWCHAR path;
-  char *buf, *lptr;
-  int max_lines;
-  bool initialized;
+  UNICODE_STRING path;
+  OBJECT_ATTRIBUTES attr;
+  LARGE_INTEGER last_modified;
+  char *lptr;
+  ULONG curr_lines;
+  ULONG max_lines;
   static muto pglock;
 
   bool parse_passwd ();
   bool parse_group ();
-  void read_passwd ();
-  void read_group ();
   char *add_line (char *);
   char *raw_ptr () const {return lptr;}
   char *next_str (char);
@@ -64,21 +87,96 @@ class pwdgrp
     i = (int) x;
     return res;
   }
+  void *add_account_post_fetch (char *line);
+  void *add_account_from_file (cygpsid &sid);
+  void *add_account_from_file (const char *name);
+  void *add_account_from_file (uint32_t id);
+  void *add_account_from_windows (cygpsid &sid, bool group);
+  void *add_account_from_windows (const char *name, bool group);
+  void *add_account_from_windows (uint32_t id, bool group);
+  char *fetch_account_from_line (fetch_user_arg_t &arg, const char *line);
+  char *fetch_account_from_file (fetch_user_arg_t &arg);
+  char *fetch_account_from_windows (fetch_user_arg_t &arg, bool group);
+  pwdgrp *prep_tls_pwbuf ();
+  pwdgrp *prep_tls_grbuf ();
 
 public:
-  int curr_lines;
+  ULONG cached_users () const { return curr_lines; }
+  ULONG cached_groups () const { return curr_lines; }
+  bool check_file (bool group);
 
-  void load (const wchar_t *);
-  inline void refresh (bool check)
-  {
-    if (!check && initialized)
-      return;
-    if (pglock.acquire () == 1 &&
-	(!initialized || (check && etc::file_changed (etc_ix))))
-      (this->*read) ();
-    pglock.release ();
-  }
+  void init_pwd ();
+  pg_pwd *passwd () const { return (pg_pwd *) pwdgrp_buf; };
+  inline struct passwd *add_user_from_file (cygpsid &sid)
+    { return (struct passwd *) add_account_from_file (sid); }
+  struct passwd *add_user_from_file (const char *name)
+    { return (struct passwd *) add_account_from_file (name); }
+  struct passwd *add_user_from_file (uint32_t id)
+    { return (struct passwd *) add_account_from_file (id); }
+  struct passwd *add_user_from_windows (cygpsid &sid)
+    { return (struct passwd *) add_account_from_windows (sid, false); }
+  struct passwd *add_user_from_windows (const char *name)
+    { return (struct passwd *) add_account_from_windows (name, false); }
+  struct passwd *add_user_from_windows (uint32_t id)
+    { return (struct passwd *) add_account_from_windows (id, false); }
+  struct passwd *find_user (cygpsid &sid);
+  struct passwd *find_user (const char *name);
+  struct passwd *find_user (uid_t uid);
 
-  pwdgrp (passwd *&pbuf);
-  pwdgrp (group *&gbuf);
+  void init_grp ();
+  pg_grp *group () const { return (pg_grp *) pwdgrp_buf; };
+  struct group *add_group_from_file (cygpsid &sid)
+    { return (struct group *) add_account_from_file (sid); }
+  struct group *add_group_from_file (const char *name)
+    { return (struct group *) add_account_from_file (name); }
+  struct group *add_group_from_file (uint32_t id)
+    { return (struct group *) add_account_from_file (id); }
+  struct group *add_group_from_windows (cygpsid &sid)
+    { return (struct group *) add_account_from_windows (sid, true); }
+  struct group *add_group_from_windows (const char *name)
+    { return (struct group *) add_account_from_windows (name, true); }
+  struct group *add_group_from_windows (uint32_t id)
+    { return (struct group *) add_account_from_windows (id, true); }
+  struct group *find_group (cygpsid &sid);
+  struct group *find_group (const char *name);
+  struct group *find_group (gid_t gid);
 };
+
+class ugid_cache_t
+{
+  struct idmap {
+    uint32_t nfs_id;
+    uint32_t cyg_id;
+  };
+  class idmaps {
+    uint32_t _cnt;
+    uint32_t _max;
+    idmap *_map;
+  public:
+    idmaps () : _cnt (0), _max (0), _map (NULL) {}
+    uint32_t get (uint32_t id) const
+    {
+      for (uint32_t i = 0; i < _cnt; ++i)
+	if (_map[i].nfs_id == id)
+	  return _map[i].cyg_id;
+      return (uint32_t) -1;
+    }
+    void add (uint32_t nfs_id, uint32_t cyg_id)
+    {
+      if (_cnt >= _max)
+	_map = (idmap *) realloc (_map, (_max += 10) * sizeof (*_map));
+      _map[_cnt].nfs_id = nfs_id;
+      _map[_cnt].cyg_id = cyg_id;
+      ++_cnt;
+    }
+  };
+  idmaps uids;
+  idmaps gids;
+
+public:
+  uid_t get_uid (uid_t uid) const { return uids.get (uid); }
+  gid_t get_gid (gid_t gid) const { return gids.get (gid); }
+  void add_uid (uid_t nfs_uid, uid_t cyg_uid) { uids.add (nfs_uid, cyg_uid); }
+  void add_gid (gid_t nfs_gid, gid_t cyg_gid) { gids.add (nfs_gid, cyg_gid); }
+};
+extern ugid_cache_t ugid_cache;

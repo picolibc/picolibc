@@ -1,7 +1,7 @@
 /* fhandler_process.cc: fhandler for /proc/<pid> virtual filesystem
 
    Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
-   2013 Red Hat, Inc.
+   2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -24,7 +24,6 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include "cygtls.h"
-#include "pwdgrp.h"
 #include "mount.h"
 #include "tls_pbuf.h"
 #include <sys/sysmacros.h>

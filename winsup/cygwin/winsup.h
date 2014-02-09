@@ -1,7 +1,7 @@
 /* winsup.h: main Cygwin header file.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -172,19 +172,7 @@ void __reg1 do_exit (int) __attribute__ ((noreturn));
 /* libstdc++ malloc operator wrapper support.  */
 extern struct per_process_cxx_malloc default_cygwin_cxx_malloc;
 
-/* UID/GID */
-void uinfo_init ();
-
-#define ILLEGAL_UID ((uid_t)-1)
-#define ILLEGAL_GID ((gid_t)-1)
 #define ILLEGAL_SEEK ((off_t)-1)
-
-#ifndef __x86_64__
-#define ILLEGAL_UID16 ((__uid16_t)-1)
-#define ILLEGAL_GID16 ((__gid16_t)-1)
-#define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(uid_t)(u16))
-#define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(gid_t)(g16))
-#endif
 
 /* Convert LARGE_INTEGER into long long */
 #define get_ll(pl)  (((long long) (pl).HighPart << 32) | (pl).LowPart)

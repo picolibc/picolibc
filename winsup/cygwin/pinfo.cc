@@ -41,7 +41,7 @@ pinfo_basic::pinfo_basic ()
   GetModuleFileNameW (NULL, progname, sizeof (progname));
   /* Default uid/gid are needed very early to initialize shared user info. */
   uid = ILLEGAL_UID;
-  gid = UNKNOWN_GID;
+  gid = ILLEGAL_GID;
 }
 
 pinfo_basic myself_initial NO_COPY;
@@ -100,7 +100,7 @@ pinfo_init (char **envp, int envc)
       myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;
       myself->uid = ILLEGAL_UID;
-      myself->gid = UNKNOWN_GID;
+      myself->gid = ILLEGAL_GID;
       environ_init (NULL, 0);	/* call after myself has been set up */
       myself->nice = winprio_to_nice (GetPriorityClass (GetCurrentProcess ()));
       myself->ppid = 1;		/* always set last */

@@ -447,21 +447,4 @@ int normalize_win32_path (const char *, char *, char *&);
 int normalize_posix_path (const char *, char *, char *&);
 PUNICODE_STRING __reg3 get_nt_native_path (const char *, UNICODE_STRING&, bool);
 
-/* FIXME: Move to own include file eventually */
-
-#define MAX_ETC_FILES 2
-class etc
-{
-  friend class dtable;
-  static int curr_ix;
-  static bool change_possible[MAX_ETC_FILES + 1];
-  static OBJECT_ATTRIBUTES fn[MAX_ETC_FILES + 1];
-  static LARGE_INTEGER last_modified[MAX_ETC_FILES + 1];
-  static bool dir_changed (int);
-  static int init (int, POBJECT_ATTRIBUTES);
-  static bool file_changed (int);
-  static bool test_file_change (int);
-  friend class pwdgrp;
-};
-
 int __reg3 symlink_worker (const char *, const char *, bool);

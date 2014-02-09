@@ -17,7 +17,6 @@ details. */
 #include "cygheap.h"
 #include "security.h"
 #include "cygserver_setpwd.h"
-#include "pwdgrp.h"
 #include "ntdll.h"
 #include <ntsecapi.h>
 #include <stdlib.h>
@@ -51,7 +50,7 @@ setlsapwd (const char *passwd, const char *username)
   if (username)
     {
       cygsid psid;
-      struct passwd *pw = internal_getpwnam (username, false);
+      struct passwd *pw = internal_getpwnam (username);
 
       if (!pw || !psid.getfrompw (pw))
 	{

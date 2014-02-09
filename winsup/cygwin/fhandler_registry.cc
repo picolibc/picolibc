@@ -586,8 +586,8 @@ fhandler_registry::fstat (struct stat *buf)
 	     and it's also rather unlikely that the user is the owner.
 	     Therefore it's probably most safe to assume unknown ownership
 	     and no permissions for nobody. */
-	  buf->st_uid = UNKNOWN_UID;
-	  buf->st_gid = UNKNOWN_GID;
+	  buf->st_uid = ILLEGAL_UID;
+	  buf->st_gid = ILLEGAL_GID;
 	  buf->st_mode &= ~0777;
 	}
     }

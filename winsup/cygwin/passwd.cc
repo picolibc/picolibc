@@ -19,125 +19,158 @@ details. */
 #include "dtable.h"
 #include "pinfo.h"
 #include "cygheap.h"
-#include "pwdgrp.h"
 #include "shared_info.h"
-
-/* Read /etc/passwd only once for better performance.  This is done
-   on the first call that needs information from it. */
-
-passwd *passwd_buf;
-static pwdgrp pr (passwd_buf);
 
 /* Parse /etc/passwd line into passwd structure. */
 bool
 pwdgrp::parse_passwd ()
 {
-  passwd &res = (*passwd_buf)[curr_lines];
-  res.pw_name = next_str (':');
-  res.pw_passwd = next_str (':');
-  if (!next_num (res.pw_uid))
+  pg_pwd &res = passwd ()[curr_lines];
+  res.p.pw_name = next_str (':');
+  res.p.pw_passwd = next_str (':');
+  if (!next_num (res.p.pw_uid))
     return false;
-  if (!next_num (res.pw_gid))
+  if (!next_num (res.p.pw_gid))
     return false;
-  res.pw_comment = NULL;
-  res.pw_gecos = next_str (':');
-  res.pw_dir =  next_str (':');
-  res.pw_shell = next_str (':');
+  res.p.pw_comment = NULL;
+  res.p.pw_gecos = next_str (':');
+  res.p.pw_dir =  next_str (':');
+  res.p.pw_shell = next_str (':');
+  res.sid.getfrompw (&res.p);
   return true;
 }
 
-/* Read in /etc/passwd and save contents in the password cache.
-   This sets pr to loaded or emulated so functions in this file can
-   tell that /etc/passwd has been read in or will be emulated. */
 void
-pwdgrp::read_passwd ()
+pwdgrp::init_pwd ()
 {
-  load (L"\\etc\\passwd");
+  pwdgrp_buf_elem_size = sizeof (pg_pwd);
+  parse = &pwdgrp::parse_passwd;
+}
 
-  char strbuf[128] = "";
-  bool searchentry = true;
-  struct passwd *pw;
-  /* must be static */
-  static char NO_COPY pretty_ls[] = "????????:*:-1:-1:::";
-
-  add_line (pretty_ls);
-  cygsid tu = cygheap->user.sid ();
-  tu.string (strbuf);
-  if (!user_shared->cb || myself->uid == ILLEGAL_UID)
-    searchentry = !internal_getpwsid (tu);
-  if (searchentry
-      && (!(pw = internal_getpwnam (cygheap->user.name ()))
-	  || !user_shared->cb
-	  || (myself->uid != ILLEGAL_UID
-	      && myself->uid != pw->pw_uid
-	      && !internal_getpwuid (myself->uid))))
+pwdgrp *
+pwdgrp::prep_tls_pwbuf ()
+{
+  if (!_my_tls.locals.pwbuf)
     {
-      static char linebuf[1024];	// must be static and
-					// should not be NO_COPY
-      snprintf (linebuf, sizeof (linebuf), "%s:*:%u:%u:,%s:%s:/bin/sh",
-		cygheap->user.name (),
-		(!user_shared->cb || myself->uid == ILLEGAL_UID)
-		? UNKNOWN_UID : myself->uid,
-		!user_shared->cb ? UNKNOWN_GID : myself->gid,
-		strbuf, getenv ("HOME") ?: "");
-      debug_printf ("Completing /etc/passwd: %s", linebuf);
-      add_line (linebuf);
+      _my_tls.locals.pwbuf = ccalloc_abort (HEAP_BUF, 1,
+					    sizeof (pwdgrp) + sizeof (pg_pwd));
+      pwdgrp *pw = (pwdgrp *) _my_tls.locals.pwbuf;
+      pw->init_pwd ();
+      pw->pwdgrp_buf = (void *) (pw + 1);
+      pw->max_lines = 1;
     }
+  pwdgrp *pw = (pwdgrp *) _my_tls.locals.pwbuf;
+  if (pw->curr_lines)
+    {
+      cfree (pw->passwd ()[0].p.pw_name);
+      pw->curr_lines = 0;
+    }
+  return pw;
+}
+
+struct passwd *
+pwdgrp::find_user (cygpsid &sid)
+{
+  for (ULONG i = 0; i < curr_lines; i++)
+    if (sid == passwd ()[i].sid)
+      return &passwd ()[i].p;
+  return NULL;
+}
+
+struct passwd *
+pwdgrp::find_user (const char *name)
+{
+  for (ULONG i = 0; i < curr_lines; i++)
+    /* on Windows NT user names are case-insensitive */
+    if (strcasematch (name, passwd ()[i].p.pw_name))
+      return &passwd ()[i].p;
+  return NULL;
+}
+
+struct passwd *
+pwdgrp::find_user (uid_t uid)
+{
+  for (ULONG i = 0; i < curr_lines; i++)
+    if (uid == passwd ()[i].p.pw_uid)
+      return &passwd ()[i].p;
+  return NULL;
 }
 
 struct passwd *
 internal_getpwsid (cygpsid &sid)
 {
-  struct passwd *pw;
-  char *ptr1, *ptr2, *endptr;
-  char sid_string[128] = {0,','};
+  struct passwd *ret;
 
-  pr.refresh (false);
-
-  if (sid.string (sid_string + 2))
+  cygheap->pg.nss_init ();
+  if (cygheap->pg.nss_pwd_files ())
     {
-      endptr = strchr (sid_string + 2, 0) - 1;
-      for (int i = 0; i < pr.curr_lines; i++)
-	{
-	  pw = passwd_buf + i;
-	  if (pw->pw_dir > pw->pw_gecos + 8)
-	    for (ptr1 = endptr, ptr2 = pw->pw_dir - 2;
-		 *ptr1 == *ptr2; ptr2--)
-	      if (!*--ptr1)
-		return pw;
-	}
+      cygheap->pg.pwd_cache.file.check_file (false);
+      if ((ret = cygheap->pg.pwd_cache.file.find_user (sid)))
+	return ret;
+      if ((ret = cygheap->pg.pwd_cache.file.add_user_from_file (sid)))
+	return ret;
+    }
+  if (cygheap->pg.nss_pwd_db ())
+    {
+      if ((ret = cygheap->pg.pwd_cache.win.find_user (sid)))
+	return ret;
+      return cygheap->pg.pwd_cache.win.add_user_from_windows (sid);
     }
   return NULL;
 }
 
 struct passwd *
-internal_getpwuid (uid_t uid, bool check)
+internal_getpwnam (const char *name)
 {
-  pr.refresh (check);
+  struct passwd *ret;
 
-  for (int i = 0; i < pr.curr_lines; i++)
-    if (uid == passwd_buf[i].pw_uid)
-      return passwd_buf + i;
+  cygheap->pg.nss_init ();
+  if (cygheap->pg.nss_pwd_files ())
+    {
+      cygheap->pg.pwd_cache.file.check_file (false);
+      if ((ret = cygheap->pg.pwd_cache.file.find_user (name)))
+	return ret;
+      if ((ret = cygheap->pg.pwd_cache.file.add_user_from_file (name)))
+	return ret;
+    }
+  if (cygheap->pg.nss_pwd_db ())
+    {
+      if ((ret = cygheap->pg.pwd_cache.win.find_user (name)))
+	return ret;
+      return cygheap->pg.pwd_cache.win.add_user_from_windows (name);
+    }
   return NULL;
 }
 
 struct passwd *
-internal_getpwnam (const char *name, bool check)
+internal_getpwuid (uid_t uid)
 {
-  pr.refresh (check);
+  struct passwd *ret;
 
-  for (int i = 0; i < pr.curr_lines; i++)
-    /* on Windows NT user names are case-insensitive */
-    if (strcasematch (name, passwd_buf[i].pw_name))
-      return passwd_buf + i;
+  cygheap->pg.nss_init ();
+  if (cygheap->pg.nss_pwd_files ())
+    {
+      cygheap->pg.pwd_cache.file.check_file (false);
+      if ((ret = cygheap->pg.pwd_cache.file.find_user (uid)))
+	return ret;
+      if ((ret = cygheap->pg.pwd_cache.file.add_user_from_file (uid)))
+	return ret;
+    }
+  if (cygheap->pg.nss_pwd_db ())
+    {
+      if ((ret = cygheap->pg.pwd_cache.win.find_user (uid)))
+	return ret;
+      return cygheap->pg.pwd_cache.win.add_user_from_windows (uid);
+    }
+  else if (uid == ILLEGAL_UID)
+    return cygheap->pg.pwd_cache.win.add_user_from_windows (uid);
   return NULL;
 }
-
 
 extern "C" struct passwd *
 getpwuid32 (uid_t uid)
 {
-  struct passwd *temppw = internal_getpwuid (uid, true);
+  struct passwd *temppw = internal_getpwuid (uid);
   pthread_testcancel ();
   return temppw;
 }
@@ -160,7 +193,7 @@ getpwuid_r32 (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struc
   if (!pwd || !buffer)
     return ERANGE;
 
-  struct passwd *temppw = internal_getpwuid (uid, true);
+  struct passwd *temppw = internal_getpwuid (uid);
   pthread_testcancel ();
   if (!temppw)
     return 0;
@@ -198,7 +231,7 @@ getpwuid_r (__uid16_t uid, struct passwd *pwd, char *buffer, size_t bufsize, str
 extern "C" struct passwd *
 getpwnam (const char *name)
 {
-  struct passwd *temppw = internal_getpwnam (name, true);
+  struct passwd *temppw = internal_getpwnam (name);
   pthread_testcancel ();
   return temppw;
 }
@@ -216,7 +249,7 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
   if (!pwd || !buffer || !nam)
     return ERANGE;
 
-  struct passwd *temppw = internal_getpwnam (nam, true);
+  struct passwd *temppw = internal_getpwnam (nam);
   pthread_testcancel ();
 
   if (!temppw)
@@ -245,11 +278,19 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
 extern "C" struct passwd *
 getpwent (void)
 {
-  if (_my_tls.locals.pw_pos == 0)
-    pr.refresh (true);
-  if (_my_tls.locals.pw_pos < pr.curr_lines)
-    return passwd_buf + _my_tls.locals.pw_pos++;
-
+  pwdgrp &prf = cygheap->pg.pwd_cache.file;
+  if (cygheap->pg.nss_pwd_files ())
+    {
+      cygheap->pg.pwd_cache.file.check_file (false);
+      if (_my_tls.locals.pw_pos < prf.cached_users ())
+	return &prf.passwd ()[_my_tls.locals.pw_pos++].p;
+    }
+  if ((cygheap->pg.nss_pwd_db ()) && cygheap->pg.nss_db_caching ())
+    {
+      pwdgrp &prw = cygheap->pg.pwd_cache.win;
+      if (_my_tls.locals.pw_pos - prf.cached_users () < prw.cached_users ())
+	return &prw.passwd ()[_my_tls.locals.pw_pos++ - prf.cached_users ()].p;
+    }
   return NULL;
 }
 

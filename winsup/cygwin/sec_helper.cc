@@ -1,7 +1,7 @@
 /* sec_helper.cc: NT security helper functions
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013 Red Hat, Inc.
+   2011, 2012, 2013, 2014 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -22,8 +22,8 @@ details. */
 #include "dtable.h"
 #include "pinfo.h"
 #include "cygheap.h"
-#include "pwdgrp.h"
 #include "ntdll.h"
+#include "ldap.h"
 
 /* General purpose security attribute objects for global use. */
 static NO_COPY_RO SECURITY_DESCRIPTOR null_sdp =
@@ -126,7 +126,7 @@ cygpsid::get_id (BOOL search_grp, int *type)
 }
 
 PWCHAR
-cygpsid::string (PWCHAR nsidstr) const
+cygpsid::pstring (PWCHAR nsidstr) const
 {
   UNICODE_STRING sid;
 
@@ -134,11 +134,19 @@ cygpsid::string (PWCHAR nsidstr) const
     return NULL;
   RtlInitEmptyUnicodeString (&sid, nsidstr, 256);
   RtlConvertSidToUnicodeString (&sid, psid, FALSE);
-  return nsidstr;
+  return nsidstr + sid.Length / sizeof (WCHAR);
+}
+
+PWCHAR
+cygpsid::string (PWCHAR nsidstr) const
+{
+  if (pstring (nsidstr))
+    return nsidstr;
+  return NULL;
 }
 
 char *
-cygpsid::string (char *nsidstr) const
+cygpsid::pstring (char *nsidstr) const
 {
   char *t;
   DWORD i;
@@ -147,10 +155,18 @@ cygpsid::string (char *nsidstr) const
     return NULL;
   strcpy (nsidstr, "S-1-");
   t = nsidstr + sizeof ("S-1-") - 1;
-  t += __small_sprintf (t, "%u", RtlIdentifierAuthoritySid (psid)->Value[5]);
+  t += __small_sprintf (t, "%u", sid_id_auth (psid));
   for (i = 0; i < *RtlSubAuthorityCountSid (psid); ++i)
-    t += __small_sprintf (t, "-%lu", *RtlSubAuthoritySid (psid, i));
-  return nsidstr;
+    t += __small_sprintf (t, "-%lu", sid_sub_auth (psid, i));
+  return t;
+}
+
+char *
+cygpsid::string (char *nsidstr) const
+{
+  if (pstring (nsidstr))
+    return nsidstr;
+  return NULL;
 }
 
 PSID
@@ -182,6 +198,24 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
     well_known_sid = (s != SECURITY_NT_AUTH
 		      || r[0] != SECURITY_NT_NON_UNIQUE);
   return psid;
+}
+
+const PSID
+cygsid::getfromstr (PCWSTR nsidstr, bool well_known)
+{
+  PWCHAR lasts;
+  DWORD s, cnt = 0;
+  DWORD r[8];
+
+  if (nsidstr && !wcsncmp (nsidstr, L"S-1-", 4))
+    {
+      s = wcstoul (nsidstr + 4, &lasts, 10);
+      while (cnt < 8 && *lasts == '-')
+	r[cnt++] = wcstoul (lasts + 1, &lasts, 10);
+      if (!*lasts)
+	return get_sid (s, cnt, r, well_known);
+    }
+  return psid = NO_SID;
 }
 
 const PSID
@@ -264,12 +298,34 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
   struct passwd *pw;
   struct group *gr = NULL;
   bool ret = false;
+  PWCHAR domain;
+  cyg_ldap cldap;
+  bool ldap_open = false;
 
   owner_sid.debug_print ("get_sids_info: owner SID =");
   group_sid.debug_print ("get_sids_info: group SID =");
 
   if (group_sid == cygheap->user.groups.pgsid)
     *gidret = myself->gid;
+  else if (sid_id_auth (group_sid) == 22)
+    {
+      /* Samba UNIX group.  Try to map to Cygwin gid.  If there's no mapping in
+	 the cache, try to fetch it from the configured RFC 2307 domain (see
+	 last comment in cygheap_domain_info::init() for more information) and
+	 add it to the mapping cache. */
+      gid_t gid = sid_sub_auth_rid (group_sid);
+      gid_t map_gid = ugid_cache.get_gid (gid);
+      if (map_gid == ILLEGAL_GID)
+	{
+	  domain = cygheap->dom.get_rfc2307_domain ();
+	  if ((ldap_open = cldap.open (domain)))
+	    map_gid = cldap.remap_gid (gid);
+	  if (map_gid == ILLEGAL_GID)
+	    map_gid = MAP_UNIX_TO_CYGWIN_ID (gid);
+	  ugid_cache.add_gid (gid, map_gid);
+	}
+      *gidret = map_gid;
+    }
   else if ((gr = internal_getgrsid (group_sid)))
     *gidret = gr->gr_gid;
   else
@@ -282,6 +338,22 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
 	ret = true;
       else
 	ret = (internal_getgroups (0, NULL, &group_sid) > 0);
+    }
+  else if (sid_id_auth (owner_sid) == 22)
+    {
+      /* Samba UNIX user.  See comment above. */
+      uid_t uid = sid_sub_auth_rid (owner_sid);
+      uid_t map_uid = ugid_cache.get_uid (uid);
+      if (map_uid == ILLEGAL_UID)
+	{
+	  domain = cygheap->dom.get_rfc2307_domain ();
+	  if ((ldap_open || cldap.open (domain)))
+	    map_uid = cldap.remap_uid (uid);
+	  if (map_uid == ILLEGAL_UID)
+	    map_uid = MAP_UNIX_TO_CYGWIN_ID (uid);
+	  ugid_cache.add_uid (uid, map_uid);
+	}
+      *uidret = map_uid;
     }
   else if ((pw = internal_getpwsid (owner_sid)))
     {

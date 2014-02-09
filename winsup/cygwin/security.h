@@ -12,14 +12,38 @@ details. */
 #pragma once
 
 #include <accctrl.h>
+#include <dsgetdc.h>
 
 /* Special file attribute set, for instance, in open() and mkdir() to
    flag that a file has just been created.  Used in alloc_sd, see there. */
 #define S_JUSTCREATED 0x80000000
 
-#define DEFAULT_UID DOMAIN_USER_RID_ADMIN
-#define UNKNOWN_UID 400 /* Non conflicting number */
-#define UNKNOWN_GID 401
+/* UID/GID */
+void uinfo_init ();
+
+#define ILLEGAL_UID ((uid_t)-1)
+#define ILLEGAL_GID ((gid_t)-1)
+
+/* For UNIX accounts not mapped to Windows accounts via winbind, Samba returns
+   SIDs of the form S-1-22-x-y, with x == 1 for users and x == 2 for groups,
+   and y == UNIX uid/gid.  NFS returns no SIDs at all, but the plain UNIX
+   uid/gid values.
+   
+   UNIX uid/gid values are mapped to Cygwin uid/gid values 0xff000000 +
+   unix uid/gid.  This *might* collide with a posix_offset of some trusted
+   domain, but it's *very* unlikely.  Define the mapping as macro. */
+#define UNIX_POSIX_OFFSET		(0xff000000)
+#define UNIX_POSIX_MASK			(0x00ffffff)
+#define MAP_UNIX_TO_CYGWIN_ID(id)	(UNIX_POSIX_OFFSET \
+					 | ((id) & UNIX_POSIX_MASK))
+
+#ifndef __x86_64__
+#define ILLEGAL_UID16 ((__uid16_t)-1)
+#define ILLEGAL_GID16 ((__gid16_t)-1)
+#define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(uid_t)(u16))
+#define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(gid_t)(g16))
+#endif
+
 
 #define MAX_SID_LEN 40
 #define MAX_DACL_LEN(n) (sizeof (ACL) \
@@ -92,6 +116,16 @@ cygpsid NO_COPY name = (PSID) &name##_struct;
 #define FILE_WRITE_BITS  (FILE_WRITE_DATA | GENERIC_WRITE | GENERIC_ALL)
 #define FILE_EXEC_BITS   (FILE_EXECUTE | GENERIC_EXECUTE | GENERIC_ALL)
 
+/* Convenience macros.  The Windows SID access functions are crude. */
+#define sid_id_auth(s)		\
+	(RtlIdentifierAuthoritySid (s)->Value[5])
+#define sid_sub_auth_count(s)	\
+	(*RtlSubAuthorityCountSid ((s)))
+#define sid_sub_auth(s,i)	\
+	(*RtlSubAuthoritySid ((s),(i)))
+#define sid_sub_auth_rid(s)	\
+	(*RtlSubAuthoritySid ((s), (*RtlSubAuthorityCountSid ((s)) - 1)))
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -116,7 +150,9 @@ public:
   int get_uid () { return get_id (FALSE); }
   int get_gid () { return get_id (TRUE); }
 
+  PWCHAR pstring (PWCHAR nsidstr) const;
   PWCHAR string (PWCHAR nsidstr) const;
+  char *pstring (char *nsidstr) const;
   char *string (char *nsidstr) const;
 
   bool operator== (const PSID nsid) const
@@ -142,6 +178,7 @@ class cygsid : public cygpsid {
   char sbuf[MAX_SID_LEN];
   bool well_known_sid;
 
+  const PSID getfromstr (PCWSTR nsidstr, bool well_known);
   const PSID getfromstr (const char *nsidstr, bool well_known);
   PSID get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known);
 
@@ -169,12 +206,16 @@ public:
     { return assign (nsid, nsid.well_known_sid); }
   inline const PSID operator= (const PSID nsid)
     { return assign (nsid, false); }
+  inline const PSID operator= (PCWSTR nsidstr)
+    { return getfromstr (nsidstr, false); }
   inline const PSID operator= (const char *nsidstr)
     { return getfromstr (nsidstr, false); }
   inline const PSID operator*= (cygsid &nsid)
     { return assign (nsid, true); }
   inline const PSID operator*= (const PSID nsid)
     { return assign (nsid, true); }
+  inline const PSID operator*= (PCWSTR nsidstr)
+    { return getfromstr (nsidstr, true); }
   inline const PSID operator*= (const char *nsidstr)
     { return getfromstr (nsidstr, true); }
 
@@ -414,7 +455,7 @@ bool get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw);
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user);
 /* Get default logonserver for a domain. */
-bool get_logon_server (PWCHAR domain, PWCHAR wserver, bool rediscovery);
+bool get_logon_server (PWCHAR domain, PWCHAR wserver, ULONG flags);
 
 HANDLE lsa_open_policy (PWCHAR server, ACCESS_MASK access);
 void lsa_close_policy (HANDLE lsa);

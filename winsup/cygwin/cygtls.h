@@ -1,7 +1,7 @@
 /* cygtls.h
 
-   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-   Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
+   2014 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -79,19 +79,18 @@ public:
 
 struct _local_storage
 {
-  /*
-     Needed for the group functions
-   */
-  int grp_pos;
+  /* passwd.cc */
+  void *pwbuf;
+  char pass[_PASSWORD_LEN];
+  ULONG pw_pos;
+
+  /* grp.cc */
+  void *grbuf;
+  ULONG grp_pos;
 
   /* dlfcn.cc */
   int dl_error;
   char dl_buffer[256];
-
-  /* passwd.cc */
-  struct passwd res;
-  char pass[_PASSWORD_LEN];
-  int pw_pos;
 
   /* path.cc */
   struct mntent mntbuf;

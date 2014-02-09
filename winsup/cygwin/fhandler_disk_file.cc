@@ -10,6 +10,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <winioctl.h>
+#include <lm.h>
 #include <stdlib.h>
 #include <sys/acl.h>
 #include <sys/statvfs.h>
@@ -23,10 +25,8 @@ details. */
 #include "pinfo.h"
 #include "ntdll.h"
 #include "tls_pbuf.h"
-#include "pwdgrp.h"
-#include <winioctl.h>
-#include <lm.h>
 #include "devices.h"
+#include "ldap.h"
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -323,6 +323,9 @@ int __reg2
 fhandler_base::fstat_by_nfs_ea (struct stat *buf)
 {
   fattr3 *nfs_attr = pc.nfsattr ();
+  PWCHAR domain;
+  cyg_ldap cldap;
+  bool ldap_open = false;
 
   if (get_io_handle ())
     {
@@ -340,14 +343,36 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
   buf->st_mode = (nfs_attr->mode & 0xfff)
 		 | nfs_type_mapping[nfs_attr->type & 7];
   buf->st_nlink = nfs_attr->nlink;
-  /* FIXME: How to convert UNIX uid/gid to Windows SIDs? */
-#if 0
-  buf->st_uid = nfs_attr->uid;
-  buf->st_gid = nfs_attr->gid;
-#else
-  buf->st_uid = myself->uid;
-  buf->st_gid = myself->gid;
-#endif
+  /* Try to map UNIX uid/gid to Cygwin uid/gid.  If there's no mapping in
+     the cache, try to fetch it from the configured RFC 2307 domain (see
+     last comment in cygheap_domain_info::init() for more information) and
+     add it to the mapping cache. */
+  buf->st_uid = ugid_cache.get_uid (nfs_attr->uid);
+  buf->st_gid = ugid_cache.get_gid (nfs_attr->gid);
+  if (buf->st_uid == ILLEGAL_UID)
+    {
+      uid_t map_uid = ILLEGAL_UID;
+
+      domain = cygheap->dom.get_rfc2307_domain ();
+      if ((ldap_open = cldap.open (domain)))
+	map_uid = cldap.remap_uid (nfs_attr->uid);
+      if (map_uid == ILLEGAL_UID)
+	map_uid = MAP_UNIX_TO_CYGWIN_ID (nfs_attr->uid);
+      ugid_cache.add_uid (nfs_attr->uid, map_uid);
+      buf->st_uid = map_uid;
+    }
+  if (buf->st_gid == ILLEGAL_GID)
+    {
+      gid_t map_gid = ILLEGAL_GID;
+
+      domain = cygheap->dom.get_rfc2307_domain ();
+      if ((ldap_open || cldap.open (domain)))
+	map_gid = cldap.remap_gid (nfs_attr->gid);
+      if (map_gid == ILLEGAL_GID)
+	map_gid = MAP_UNIX_TO_CYGWIN_ID (nfs_attr->gid);
+      ugid_cache.add_gid (nfs_attr->gid, map_gid);
+      buf->st_gid = map_gid;
+    }
   buf->st_rdev = makedev (nfs_attr->rdev.specdata1,
 			  nfs_attr->rdev.specdata2);
   buf->st_size = nfs_attr->size;

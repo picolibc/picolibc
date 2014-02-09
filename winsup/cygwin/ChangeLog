@@ -1,3 +1,144 @@
+2014-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	Introduce reading passwd/group entries from SAM/AD.  Introduce
+	/etc/nsswitch.conf file to configure it.
+	* Makefile.in (DLL_OFILES): Add ldap.o.
+	* autoload.cc: Import ldap functions from wldap32.dll.
+	(DsEnumerateDomainTrustsW): Import.
+	(NetGroupGetInfo): Import.
+	* cygheap.h (class cygheap_domain_info): New class to keep global
+	domain info.
+	(class cygheap_pwdgrp): New class to keep passwd/group caches and
+	configuration info from /etc/nssswitch.conf.
+	(struct init_cygheap): Add cygheap_domain_info member "dom" and
+	cygheap_pwdgrp member "pg".
+	* cygtls.h (struct _local_storage): Remove unused member "res".
+	Rearrange slightly, Add members pwbuf and grbuf to implement non-caching
+	passwd/group fetching from SAM/AD.  Make pw_pos and pw_pos unsigned.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Add RFC 2307
+	uid/gid mapping.
+	* fhandler_process.cc: Drop including pwdgrp.h.
+	* fhandler_procsysvipc.cc: Ditto.
+	* fhandler_registry.cc (fhandler_registry::fstat): Set key uid/gid
+	to ILLEGAL_UID/ILLEGAL_GID rather than UNKNOWN_UID/UNKNOWN_GID.
+	* grp.cc (group_buf): Drop.
+	(gr): Drop.
+	(pwdgrp::parse_group): Fill pg_grp.
+	(pwdgrp::read_group): Remove.
+	(pwdgrp::init_grp): New method.
+	(pwdgrp::prep_tls_grbuf): New method.
+	(pwdgrp::find_group): New methods.
+	(internal_getgrsid): Convert to call new pwdgrp methods.
+	(internal_getgrnam): Ditto.
+	(internal_getgrgid): Ditto.
+	(getgrgid_r): Drop 2nd parameter from internal_getgrgid call.
+	(getgrgid32): Ditto.
+	(getgrnam_r): Ditto for internal_getgrnam.
+	(getgrnam32): Ditto.
+	(getgrent32): Convert to call new pwdgrp methods.
+	(internal_getgrent): Remove.
+	(internal_getgroups): Simplify, especially drop calls to
+	internal_getgrent.
+	* ldap.cc: New file implementing cyg_ldap class for LDAP access to AD
+	and RFC 2307 server.
+	* ldap.h: New header, declaring cyg_ldap class.
+	* passwd.cc (passwd_buf): Drop.
+	(pr): Drop.
+	(pwdgrp::parse_passwd): Fill pg_pwd.
+	(pwdgrp::read_passwd): Remove.
+	(pwdgrp::init_pwd): New method.
+	(pwdgrp::prep_tls_pwbuf): New method.
+	(find_user): New methods.
+	(internal_getpwsid): Convert to call new pwdgrp methods.
+	(internal_getpwnam): Ditto.
+	(internal_getpwuid): Ditto.
+	(getpwuid32): Drop 2nd parameter from internal_getpwuid call.
+	(getpwuid_r): Ditto.
+	(getpwnam): Ditto for internal_getpwnam.
+	(getpwnam_r): Ditto.
+	(getpwent): Convert to call new pwdgrp methods.
+	* path.cc (class etc): Remove all methods.
+	* path.h (class etc): Drop.
+	* pinfo.cc (pinfo_basic::pinfo_basic): Set gid to ILLEGAL_GID rather
+	than UNKNOWN_GID.
+	(pinfo_init): Ditto.
+	* pwdgrp.h (internal_getpwnam): Drop 2nd parameter from declaration.
+	(internal_getpwuid): Ditto.
+	(internal_getgrgid): Ditto.
+	(internal_getgrnam): Ditto.
+	(internal_getgrent): Drop declaration.
+	(enum fetch_user_arg_type_t): New type.
+	(struct fetch_user_arg_t): New type.
+	(struct pg_pwd): New type.
+	(struct pg_grp): New type.
+	(class pwdgrp): Rework to provide functions for file and db requests
+	and caching.
+	(class ugid_cache_t): New class to provide RFC 2307 uid map caching.
+	(ugid_cache): Declare.
+	* sec_acl.cc: Drop including pwdgrp.h.
+	* sec_auth.cc: Drop including dsgetdc.h and pwdgrp.h.
+	(get_logon_server): Convert third parameter to ULONG flags argument
+	to allow arbitrary flags values in DsGetDcNameW call and change calls
+	to this function throughout.  Use cached account domain name rather
+	than calling GetComputerNameW.
+	(get_unix_group_sidlist): Remove.
+	(get_server_groups): Drop call to get_unix_group_sidlist.
+	(verify_token): Rework token group check without calling
+	internal_getgrent.
+	* sec_helper.cc (cygpsid::pstring): New methods, like string() but
+	return pointer to end of string.
+	(cygsid::getfromstr): Add wide character implementation.
+	(get_sids_info): Add RFC 2307 uid/gid mapping for Samba shares.
+	* security.cc: Drop including pwdgrp.h.
+	* security.h (DEFAULT_UID): Remove.
+	(UNKNOWN_UID): Remove.
+	(UNKNOWN_GID): Remove.
+	(uinfo_init): Move here from winsup.h.
+	(ILLEGAL_UID): Ditto.
+	(ILLEGAL_GID): Ditto.
+	(UNIX_POSIX_OFFSET): Define.  Add lengthy comment.
+	(UNIX_POSIX_MASK): Ditto.
+	(MAP_UNIX_TO_CYGWIN_ID): Ditto.
+	(ILLEGAL_UID16): Move here from winsup.h.
+	(ILLEGAL_GID16): Ditto.
+	(uid16touid32): Ditto.
+	(gid16togid32): Ditto.
+	(sid_id_auth): New convenience macro for SID component access.
+	(sid_sub_auth_count): Ditto.
+	(sid_sub_auth): Ditto.
+	(sid_sub_auth_rid): Ditto.
+	(cygpsid::pstring): Declare.
+	(cygsid::getfromstr): Declare wide character variant.
+	(cygsid::operator=): Ditto.
+	(cygsid::operator*=): Ditto.
+	(get_logon_server): Change declaration according to source code.
+	* setlsapwd.cc (setlsapwd): Drop 2nd parameter from internal_getpwnam
+	call.
+	* shared.cc (memory_init): Call cygheap->pg.init in first process.
+	* syscalls.cc: Drop including pwdgrp.h.
+	* tlsoffsets.h: Regenerate.
+	* tlsoffsets64.h: Ditto.
+	* uinfo.cc (internal_getlogin): Drop gratuitious internal_getpwuid
+	call.  Fix debug output.  Overwrite user gid in border case of a
+	missing passwd file while a group file exists.
+	(pwdgrp::add_line): Allocate memory on cygheap.
+	(pwdgrp::load): Remove.
+	(ugid_cache): Define.
+	(cygheap_pwdgrp::init): New method.
+	(cygheap_pwdgrp::nss_init_line): New method.
+	(cygheap_pwdgrp::_nss_init): New method.
+	(cygheap_domain_info::init): New method.
+	(logon_sid): Define.
+	(get_logon_sid): New function.
+	(pwdgrp::add_account_post_fetch): New method.
+	(pwdgrp::add_account_from_file): New methods.
+	(pwdgrp::add_account_from_windows): New methods.
+	(pwdgrp::check_file): New method.
+	(pwdgrp::fetch_account_from_line): New method.
+	(pwdgrp::fetch_account_from_file): New method.
+	(pwdgrp::fetch_account_from_windows): New method.
+	* winsup.h: Move aforementioned macros and declarations to security.h.
+
 2014-02-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* sigproc.cc (sig_send): Don't bother with an error message if we are
@@ -21,6 +162,9 @@
 	* net.cc (cygwin_gethostname): Call GetComputerNameExA rather than
 	GetComputerNameA if gethostname failed.
 	* shared.cc (user_info::initialize): Fix formatting.
+
+2014-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/sys/file.h: Define flock and accompanying macros if not
 	already defined in sys/_default_fcntl.h.
 

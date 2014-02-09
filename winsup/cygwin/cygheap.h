@@ -1,7 +1,7 @@
 /* cygheap.h: Cygwin heap manager.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013 Red Hat, Inc.
+   2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,6 +11,7 @@ details. */
 
 #include "hires.h"
 #include "cygheap_malloc.h"
+#include "pwdgrp.h"
 
 #define incygheap(s) (cygheap && ((char *) (s) >= (char *) cygheap) && ((char *) (s) <= ((char *) cygheap_max)))
 
@@ -355,6 +356,84 @@ struct user_heap_info
   void __reg1 init ();
 };
 
+class cygheap_domain_info
+{
+  PWCHAR pdom_name;
+  PWCHAR pdom_dns_name;
+  cygsid pdom_sid;
+
+  PWCHAR adom_name;
+  cygsid adom_sid;
+
+  PDS_DOMAIN_TRUSTSW tdom;
+  ULONG tdom_count;
+
+  PWCHAR rfc2307_domain_buf;
+
+public:
+  ULONG lowest_tdo_posix_offset;
+
+  bool init ();
+
+  inline PCWSTR primary_flat_name () const { return pdom_name; }
+  inline PCWSTR primary_dns_name () const { return pdom_dns_name; }
+  inline cygsid &primary_sid () { return pdom_sid; }
+
+  inline bool member_machine () const { return pdom_sid != NO_SID; }
+
+  inline PCWSTR account_flat_name () const { return adom_name; }
+  inline cygsid &account_sid () { return adom_sid; }
+
+  inline PDS_DOMAIN_TRUSTSW trusted_domain (ULONG idx) const
+    { return (idx < tdom_count) ? tdom + idx : NULL; }
+
+  inline PWCHAR get_rfc2307_domain () const
+    { return rfc2307_domain_buf ?: NULL; }
+};
+
+class cygheap_pwdgrp
+{
+  static const int NSS_FILES = 1;
+  static const int NSS_DB = 2;
+  enum pfx_t {
+    NSS_AUTO = 0,
+    NSS_PRIMARY,
+    NSS_ALWAYS
+  };
+  bool  nss_inited;
+  int   pwd_src;
+  int   grp_src;
+  pfx_t prefix;
+  WCHAR separator[2];
+  bool  caching;
+
+  void nss_init_line (const char *line);
+  void _nss_init ();
+
+public:
+  struct {
+    pwdgrp file;
+    pwdgrp win;
+  } pwd_cache;
+  struct {
+    pwdgrp file;
+    pwdgrp win;
+  } grp_cache;
+
+  void init ();
+
+  inline void nss_init () { if (!nss_inited) _nss_init (); }
+  inline bool nss_pwd_files () const { return !!(pwd_src & NSS_FILES); }
+  inline bool nss_pwd_db () const { return !!(pwd_src & NSS_DB); }
+  inline bool nss_grp_files () const { return !!(grp_src & NSS_FILES); }
+  inline bool nss_grp_db () const { return !!(grp_src & NSS_DB); }
+  inline bool nss_prefix_auto () const { return prefix == NSS_AUTO; }
+  inline bool nss_prefix_primary () const { return prefix == NSS_PRIMARY; }
+  inline bool nss_prefix_always () const { return prefix == NSS_ALWAYS; }
+  inline PCWSTR nss_separator () const { return separator; }
+  inline bool nss_db_caching () const { return caching; }
+};
+
 struct hook_chain
 {
   void **loc;
@@ -378,6 +457,8 @@ struct init_cygheap: public mini_cygheap
   UNICODE_STRING installation_key;
   WCHAR installation_key_buf[18];
   cygheap_root root;
+  cygheap_domain_info dom;
+  cygheap_pwdgrp pg;
   cygheap_user user;
   user_heap_info user_heap;
   mode_t umask;

@@ -14,7 +14,6 @@ details. */
 #include <wchar.h>
 #include <wininet.h>
 #include <ntsecapi.h>
-#include <dsgetdc.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -25,7 +24,6 @@ details. */
 #include "tls_pbuf.h"
 #include <lm.h>
 #include <iptypes.h>
-#include "pwdgrp.h"
 #include "cyglsa.h"
 #include "cygserver_setpwd.h"
 #include <cygwin/version.h>
@@ -220,28 +218,25 @@ lsa_close_policy (HANDLE lsa)
 }
 
 bool
-get_logon_server (PWCHAR domain, WCHAR *server, bool rediscovery)
+get_logon_server (PWCHAR domain, WCHAR *server, ULONG flags)
 {
   DWORD ret;
   PDOMAIN_CONTROLLER_INFOW pci;
-  DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
 
   /* Empty domain is interpreted as local system */
-  if ((GetComputerNameW (server + 2, &size)) &&
-      (!wcscasecmp (domain, server + 2) || !domain[0]))
+  if (!domain[0] || !wcscasecmp (domain, cygheap->dom.account_flat_name ()))
     {
-      server[0] = server[1] = L'\\';
+      wcpcpy (wcpcpy (server, L"\\\\"), cygheap->dom.account_flat_name ());
       return true;
     }
 
   /* Try to get any available domain controller for this domain */
-  ret = DsGetDcNameW (NULL, domain, NULL, NULL,
-		      rediscovery ? DS_FORCE_REDISCOVERY : 0, &pci);
+  ret = DsGetDcNameW (NULL, domain, NULL, NULL, flags, &pci);
   if (ret == ERROR_SUCCESS)
     {
       wcscpy (server, pci->DomainControllerName);
       NetApiBufferFree (pci);
-      debug_printf ("DC: rediscovery: %d, server: %W", rediscovery, server);
+      debug_printf ("DC: server: %W", server);
       return true;
     }
   __seterrno_from_win_error (ret);
@@ -397,28 +392,6 @@ sid_in_token_groups (PTOKEN_GROUPS grps, cygpsid sid)
 }
 
 static void
-get_unix_group_sidlist (struct passwd *pw, cygsidlist &grp_list)
-{
-  struct group *gr;
-  cygsid gsid;
-
-  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-    {
-      if (gr->gr_gid == pw->pw_gid)
-	goto found;
-      else if (gr->gr_mem)
-	for (int gi = 0; gr->gr_mem[gi]; ++gi)
-	  if (strcasematch (pw->pw_name, gr->gr_mem[gi]))
-	    goto found;
-      continue;
-    found:
-      if (gsid.getfromgr (gr))
-	grp_list += gsid;
-
-    }
-}
-
-static void
 get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
 			 LUID auth_luid, int &auth_pos)
 {
@@ -479,7 +452,6 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
   if (well_known_system_sid == usersid)
     {
       grp_list *= well_known_admins_sid;
-      get_unix_group_sidlist (pw, grp_list);
       return true;
     }
 
@@ -491,12 +463,9 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
       __seterrno ();
       return false;
     }
-  if (get_logon_server (domain, server, false)
-      && !get_user_groups (server, grp_list, user, domain)
-      && get_logon_server (domain, server, true))
+  if (get_logon_server (domain, server, DS_IS_FLAT_NAME))
     get_user_groups (server, grp_list, user, domain);
   get_user_local_groups (server, domain, grp_list, user);
-  get_unix_group_sidlist (pw, grp_list);
   return true;
 }
 
@@ -757,35 +726,26 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 
   if (groups.issetgroups ()) /* setgroups was called */
     {
-      cygsid gsid;
-      struct group *gr;
+      cygpsid gsid;
       bool saw[groups.sgsids.count ()];
-      memset (saw, 0, sizeof(saw));
 
-      /* token groups found in /etc/group match the user.gsids ? */
-      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-	if (gsid.getfromgr (gr) && sid_in_token_groups (my_grps, gsid))
-	  {
-	    int pos = groups.sgsids.position (gsid);
-	    if (pos >= 0)
-	      saw[pos] = true;
-	    else if (groups.pgsid == gsid)
-	      sawpg = true;
-#if 0
-	    /* With this `else', verify_token returns false if we find
-	       groups in the token, which are not in the group list set
-	       with setgroups().  That's rather dangerous.  What we're
-	       really interested in is that all groups in the setgroups()
-	       list are in the token.  A token created through ADVAPI
-	       should be allowed to contain more groups than requested
-	       through setgroups(), esecially since Vista and the
-	       addition of integrity groups. So we disable this statement
-	       for now. */
-	    else if (gsid != well_known_world_sid
-		     && gsid != usersid)
-	      goto done;
-#endif
-	  }
+      /* Check that all groups in the setgroups () list are in the token.
+	 A token created through ADVAPI should be allowed to contain more
+	 groups than requested through setgroups(), especially since Vista
+	 and the addition of integrity groups. */
+      memset (saw, 0, sizeof(saw));
+      for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
+	{
+	  gsid = groups.sgsids.sids[gidx];
+	  if (sid_in_token_groups (my_grps, gsid))
+	    {
+	      int pos = groups.sgsids.position (gsid);
+	      if (pos >= 0)
+		saw[pos] = true;
+	      else if (groups.pgsid == gsid)
+		sawpg = true;
+	    }
+	}
       /* user.sgsids groups must be in the token, except for builtin groups.
 	 These can be different on domain member machines compared to
 	 domain controllers, so these builtin groups may be validly missing

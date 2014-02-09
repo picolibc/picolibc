@@ -1,7 +1,7 @@
 /* autoload.cc: all dynamic load stuff.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013 Red Hat, Inc.
+   2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -580,14 +580,37 @@ LoadDLLfuncEx2 (IdnToAscii, 20, kernel32, 1, 0)
 LoadDLLfuncEx2 (IdnToUnicode, 20, kernel32, 1, 0)
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
 
+/* ldap functions are cdecl! */
+#pragma push_macro ("mangle")
+#undef mangle
+#define mangle(name, n) #name
+LoadDLLfunc (ldap_bind_s, 0, wldap32)
+LoadDLLfunc (ldap_count_valuesW, 0, wldap32)
+LoadDLLfunc (ldap_first_entry, 0, wldap32)
+LoadDLLfunc (ldap_get_valuesW, 0, wldap32)
+LoadDLLfunc (ldap_get_values_lenW, 0, wldap32)
+LoadDLLfunc (ldap_initW, 0, wldap32)
+LoadDLLfunc (ldap_memfreeW, 0, wldap32)
+LoadDLLfunc (ldap_next_entry, 0, wldap32)
+LoadDLLfunc (ldap_search_stW, 0, wldap32)
+LoadDLLfunc (ldap_set_option, 0, wldap32)
+LoadDLLfunc (ldap_sslinitW, 0, wldap32)
+LoadDLLfunc (ldap_unbind, 0, wldap32)
+LoadDLLfunc (ldap_value_freeW, 0, wldap32)
+LoadDLLfunc (ldap_value_free_len, 0, wldap32)
+LoadDLLfunc (LdapGetLastError, 0, wldap32)
+#pragma pop_macro ("mangle")
+
 LoadDLLfunc (WNetCloseEnum, 4, mpr)
 LoadDLLfunc (WNetEnumResourceA, 16, mpr)
 LoadDLLfunc (WNetGetProviderNameA, 12, mpr)
 LoadDLLfunc (WNetGetResourceInformationA, 16, mpr)
 LoadDLLfunc (WNetOpenEnumA, 20, mpr)
 
+LoadDLLfunc (DsEnumerateDomainTrustsW, 16, netapi32)
 LoadDLLfunc (DsGetDcNameW, 24, netapi32)
 LoadDLLfunc (NetApiBufferFree, 4, netapi32)
+LoadDLLfunc (NetGroupGetInfo, 16, netapi32)
 LoadDLLfunc (NetUseGetInfo, 16, netapi32)
 LoadDLLfunc (NetUserGetGroups, 28, netapi32)
 LoadDLLfunc (NetUserGetInfo, 16, netapi32)
