@@ -1,3 +1,8 @@
+2014-02-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* environ.cc (strbrk): New function.
+	(parse_options): Use strbrk to parse CYGWIN environment variable.
+
 2014-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	Introduce reading passwd/group entries from SAM/AD.  Introduce

@@ -137,13 +137,54 @@ static struct parse_thing
   {NULL, {0}, setdword, 0, {{0}, {0}}}
 };
 
+/* Return a possibly-quoted token.
+   Returns NULL when no more tokens available.  */
+static char *
+strbrk(char *&buf)
+{
+  buf += strspn(buf, " \t");
+  if (!*buf)
+    return NULL;
+  char *tok = buf;
+  char *sep = buf + strcspn(buf, " \t");
+  char *quotestart = strchr(buf, '"');
+  if (quotestart > sep)
+    {
+      quotestart = NULL;
+      buf = sep + 1;
+    }
+  else
+    {
+      char *quote = quotestart;
+      sep = NULL;
+      while (!sep)
+	{
+	  char *clquote = strchr (quote + 1, '"');
+	  if (!clquote)
+	    sep = strchr (quote, '\0');
+	  else if (clquote[-1] != '\\')
+	    sep = clquote;
+	  else
+	    {
+	      memmove (clquote - 1, clquote, 1 + strchr (clquote, '\0') - clquote);
+	      quote = clquote - 1;
+	    }
+	}
+      buf = sep + 1;
+      memmove (quotestart, quotestart + 1, sep - quotestart);
+      sep--;
+    }
+  *sep = '\0';
+  return tok;
+}
+
+
 /* Parse a string of the form "something=stuff somethingelse=more-stuff",
    silently ignoring unknown "somethings".  */
 static void __stdcall
 parse_options (const char *inbuf)
 {
   int istrue;
-  char *p, *lasts;
   parse_thing *k;
 
   if (inbuf == NULL)
@@ -168,9 +209,8 @@ parse_options (const char *inbuf)
     }
 
   char *buf = strcpy ((char *) alloca (strlen (inbuf) + 1), inbuf);
-  for (p = strtok_r (buf, " \t", &lasts);
-       p != NULL;
-       p = strtok_r (NULL, " \t", &lasts))
+
+  while (char *p = strbrk (buf))
     {
       char *keyword_here = p;
       if (!(istrue = !ascii_strncasematch (p, "no", 2)))
