@@ -1,5 +1,10 @@
 2014-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (cygheap_domain_info::init): Drop accidentally leftover if
+	statement.
+
+2014-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (cygheap_domain_info::init): Fix handling of account domain
 	on donmain controllers.  Explain why.
 

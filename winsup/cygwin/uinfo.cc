@@ -750,8 +750,7 @@ cygheap_domain_info::init ()
      trying to compute the uid/gid values.  Therefore we invalidate the account
      domain name if we're running on a DC. */
   adom_sid = adom->DomainSid;
-  if (pdom_sid == adom_sid)
-    adom_name = cwcsdup (pdom_sid == adom_sid ? L"@" : adom->DomainName.Buffer);
+  adom_name = cwcsdup (pdom_sid == adom_sid ? L"@" : adom->DomainName.Buffer);
   LsaFreeMemory (adom);
   lsa_close_policy (lsa);
   if (cygheap->dom.member_machine ())
