@@ -1,5 +1,10 @@
 2014-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (cygheap_domain_info::init): Fix handling of account domain
+	on donmain controllers.  Explain why.
+
+2014-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (cwcsdup): Change parameter to correct PWCSTR.
 	(cwcsdup1): Ditto.
 	* cygheap_malloc.h: Change declarations accordingly.

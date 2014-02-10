@@ -745,9 +745,13 @@ cygheap_domain_info::init ()
       system_printf ("LsaQueryInformationPolicy(Account) %u", status);
       return false;
     }
-  /* Copy account domain info to cygheap. */
-  adom_name = cwcsdup (adom->DomainName.Buffer);
+  /* Copy account domain info to cygheap.  If we're running on a DC the account
+     domain is identical to the primary domain.  This leads to confusion when
+     trying to compute the uid/gid values.  Therefore we invalidate the account
+     domain name if we're running on a DC. */
   adom_sid = adom->DomainSid;
+  if (pdom_sid == adom_sid)
+    adom_name = cwcsdup (pdom_sid == adom_sid ? L"@" : adom->DomainName.Buffer);
   LsaFreeMemory (adom);
   lsa_close_policy (lsa);
   if (cygheap->dom.member_machine ())
