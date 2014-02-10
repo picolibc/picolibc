@@ -1,7 +1,7 @@
 /* cygheap_malloc.h: Cygwin heap manager allocation functions.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011
-   Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011,
+   2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -48,8 +48,8 @@ void *__reg3 ccalloc (cygheap_types, size_t, size_t);
 void *__reg2 cmalloc_abort (cygheap_types, size_t);
 void *__reg2 crealloc_abort (void *, size_t);
 void *__reg3 ccalloc_abort (cygheap_types, size_t, size_t);
-PWCHAR __reg1 cwcsdup (const PWCHAR);
-PWCHAR __reg1 cwcsdup1 (const PWCHAR);
+PWCHAR __reg1 cwcsdup (PCWSTR);
+PWCHAR __reg1 cwcsdup1 (PCWSTR);
 char *__reg1 cstrdup (const char *);
 char *__reg1 cstrdup1 (const char *);
 void __reg2 cfree_and_set (char *&, char * = NULL);
