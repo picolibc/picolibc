@@ -655,7 +655,7 @@ child_info_spawn::get_parent_handle ()
 void
 child_info_spawn::handle_spawn ()
 {
-  extern void fixup_lockf_after_exec ();
+  extern void fixup_lockf_after_exec (bool);
   HANDLE h;
   if (!dynamically_loaded || get_parent_handle ())
       {
@@ -706,7 +706,7 @@ child_info_spawn::handle_spawn ()
     }
 
   signal_fixup_after_exec ();
-  fixup_lockf_after_exec ();
+  fixup_lockf_after_exec (type == _CH_EXEC);
 }
 
 /* Retrieve and store system directory for later use.  Note that the
