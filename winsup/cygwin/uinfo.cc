@@ -1443,6 +1443,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 		debug_printf ("NetUserGetInfo(%W,%W) %u", domain, name, nas);
 	      else
 		{
+		  PWCHAR pgrp = NULL;
 		  struct {
 		    PCWSTR str;
 		    size_t len;
@@ -1450,7 +1451,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 		  } search[] = {
 		    { L"name=\"", 6, &user },
 		    { L"home=\"", 6, &home },
-		    { L"shell=\"", 7, &shell }
+		    { L"shell=\"", 7, &shell },
+		    { L"group=\"", 7, &pgrp }
 		  };
 		  PWCHAR s, e;
 
@@ -1494,6 +1496,25 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 			}
 		    }
 		  NetApiBufferFree (ui);
+		  if (pgrp)
+		    {
+		      /* For setting the primary group, we have to test all
+			 three possible Cygwin name variations:
+
+			 MACHINE+group, +group, group
+		      */
+		      char gname[2 * (DNLEN + UNLEN + 1)];
+		      char *sep;
+		      struct group *gr;
+
+		      sep += sys_wcstombs (sep = gname, 2 * DNLEN + 1, domain);
+		      *sep = cygheap->pg.nss_separator ()[0];
+		      sys_wcstombs (sep + 1, 2 * UNLEN + 1, pgrp);
+		      if ((gr = internal_getgrnam (gname))
+			  || (gr = internal_getgrnam (sep))
+			  || (gr = internal_getgrnam (sep + 1)))
+			gid = gr->gr_gid;
+		    }
 		}
 	    }
 	  else /* SidTypeGroup */
