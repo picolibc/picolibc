@@ -148,10 +148,10 @@ strbrk(char *&buf)
   char *tok = buf;
   char *sep = buf + strcspn(buf, " \t");
   char *quotestart = strchr(buf, '"');
-  if (quotestart > sep)
+  if (!quotestart || quotestart > sep)
     {
+      buf = sep + !!*sep;	/* Don't point beyond EOS */
       quotestart = NULL;
-      buf = sep + 1;
     }
   else
     {
