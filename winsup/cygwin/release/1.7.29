@@ -5,6 +5,9 @@ What's new:
   to do without /etc/passwd and /etc/group files.  Introduce /etc/nsswitch.conf
   file to configure passwd/group handling.
 
+- Allow quoting of arguments to the CYGWIN environment variable, i.e.,
+  set CYGWIN=error_start="c:\bin\someprogram -T"
+
 
 What changed:
 -------------
