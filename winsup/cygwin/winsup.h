@@ -285,6 +285,10 @@ extern "C" char _data_start__, _data_end__, _bss_start__, _bss_end__;
 extern "C" void (*__CTOR_LIST__) (void);
 extern "C" void (*__DTOR_LIST__) (void);
 
+#define InterlockedDecrement _InterlockedDecrement
+#define InterlockedExchange _InterlockedExchange
+#define InterlockedIncrement _InterlockedIncrement
+
 #ifndef NO_GLOBALS_H
 #define _RDATA	/* See globals.h */
 #include "globals.h"
