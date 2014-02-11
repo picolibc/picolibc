@@ -285,9 +285,16 @@ extern "C" char _data_start__, _data_end__, _bss_start__, _bss_end__;
 extern "C" void (*__CTOR_LIST__) (void);
 extern "C" void (*__DTOR_LIST__) (void);
 
+#ifdef NEEDED
+/* This was inexplicably needed after updating a toolchain.
+   The need disappeared when updating further but I'm keeping
+   it around temporarily in case the issue crops up again.
+   This manifests as SEGVs in one of the Interlocked functions below
+   in kernel32.dll.  */
 #define InterlockedDecrement _InterlockedDecrement
 #define InterlockedExchange _InterlockedExchange
 #define InterlockedIncrement _InterlockedIncrement
+#endif /*NEEDED*/
 
 #ifndef NO_GLOBALS_H
 #define _RDATA	/* See globals.h */
