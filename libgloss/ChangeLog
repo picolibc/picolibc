@@ -1,3 +1,8 @@
+2014-02-11  Joey Ye  <joey.ye@arm.com>
+
+        * arm/syscalls.c (_sbrk): Define as weak symbols.
+        (_read, _write): Ditto.
+
 2014-02-03  Richard Earnshaw  <rearnsha@arm.com>
 
 	* aarch64/Makefile.in (RDIMON_SCRIPTS): Rule to build in-tree copies
