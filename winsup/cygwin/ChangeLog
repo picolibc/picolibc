@@ -1,5 +1,13 @@
 2014-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ldap.cc (rediscover_thread): Give argument a useful name.
+	* miscfuncs.cc (NT_readline::init): It's a really bad idea trying to
+	print a pointer to a PUNICODE_STRING as PUNICODE_STRING.  Fix it.
+	* uinfo.cc (cygheap_domain_info::init): Print status codes as hex
+	values in debug output.
+
+2014-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (NetLocalGroupGetInfo): Replace NetGroupGetInfo.
 	* cygheap.h (class cygheap_ugid_cache): Move ugid_cache_t type here
 	and rename.

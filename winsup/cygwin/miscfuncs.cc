@@ -397,7 +397,7 @@ NT_readline::init (POBJECT_ATTRIBUTES attr, PCHAR in_buf, ULONG in_buflen)
   if (!NT_SUCCESS (status))
     {
       paranoid_printf ("NtOpenFile(%S) failed, status %y",
-		       &attr->ObjectName, status);
+		       attr->ObjectName, status);
       return false;
     }
   buf = in_buf;

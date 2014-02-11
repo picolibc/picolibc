@@ -73,15 +73,15 @@ PWCHAR rfc2307_gid_attr[] =
 };
 
 DWORD WINAPI
-rediscover_thread (LPVOID dummy)
+rediscover_thread (LPVOID domain)
 {
   PDOMAIN_CONTROLLER_INFOW pdci;
-  DWORD ret = DsGetDcNameW (NULL, (PWCHAR) dummy, NULL, NULL,
+  DWORD ret = DsGetDcNameW (NULL, (PWCHAR) domain, NULL, NULL,
 			    DS_FORCE_REDISCOVERY | DS_ONLY_LDAP_NEEDED, &pdci);
   if (ret == ERROR_SUCCESS)
     NetApiBufferFree (pdci);
   else
-    debug_printf ("DsGetDcNameW(%W) failed with error %u", dummy, ret);
+    debug_printf ("DsGetDcNameW(%W) failed with error %u", domain, ret);
   return 0;
 }
 

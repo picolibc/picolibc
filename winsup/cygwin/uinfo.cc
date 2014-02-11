@@ -726,7 +726,7 @@ cygheap_domain_info::init ()
 				      (PVOID *) &pdom);
   if (status != STATUS_SUCCESS)
     {
-      system_printf ("LsaQueryInformationPolicy(Primary) %u", status);
+      system_printf ("LsaQueryInformationPolicy(Primary) %y", status);
       return false;
     }
   /* Copy primary domain info to cygheap. */
@@ -740,7 +740,7 @@ cygheap_domain_info::init ()
 				      (PVOID *) &adom);
   if (status != STATUS_SUCCESS)
     {
-      system_printf ("LsaQueryInformationPolicy(Account) %u", status);
+      system_printf ("LsaQueryInformationPolicy(Account) %y", status);
       return false;
     }
   /* Copy account domain info to cygheap.  If we're running on a DC the account
