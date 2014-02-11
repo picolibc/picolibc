@@ -347,8 +347,8 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
      the cache, try to fetch it from the configured RFC 2307 domain (see
      last comment in cygheap_domain_info::init() for more information) and
      add it to the mapping cache. */
-  buf->st_uid = ugid_cache.get_uid (nfs_attr->uid);
-  buf->st_gid = ugid_cache.get_gid (nfs_attr->gid);
+  buf->st_uid = cygheap->ugid_cache.get_uid (nfs_attr->uid);
+  buf->st_gid = cygheap->ugid_cache.get_gid (nfs_attr->gid);
   if (buf->st_uid == ILLEGAL_UID)
     {
       uid_t map_uid = ILLEGAL_UID;
@@ -358,7 +358,7 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
 	map_uid = cldap.remap_uid (nfs_attr->uid);
       if (map_uid == ILLEGAL_UID)
 	map_uid = MAP_UNIX_TO_CYGWIN_ID (nfs_attr->uid);
-      ugid_cache.add_uid (nfs_attr->uid, map_uid);
+      cygheap->ugid_cache.add_uid (nfs_attr->uid, map_uid);
       buf->st_uid = map_uid;
     }
   if (buf->st_gid == ILLEGAL_GID)
@@ -370,7 +370,7 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
 	map_gid = cldap.remap_gid (nfs_attr->gid);
       if (map_gid == ILLEGAL_GID)
 	map_gid = MAP_UNIX_TO_CYGWIN_ID (nfs_attr->gid);
-      ugid_cache.add_gid (nfs_attr->gid, map_gid);
+      cygheap->ugid_cache.add_gid (nfs_attr->gid, map_gid);
       buf->st_gid = map_gid;
     }
   buf->st_rdev = makedev (nfs_attr->rdev.specdata1,

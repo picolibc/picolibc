@@ -1,3 +1,23 @@
+2014-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (NetLocalGroupGetInfo): Replace NetGroupGetInfo.
+	* cygheap.h (class cygheap_ugid_cache): Move ugid_cache_t type here
+	and rename.
+	(struct init_cygheap): Add cygheap_ugid_cache member "ugid_cache".
+	* pwdgrp.h (class ugid_cache_t): Remove here.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Accommodate
+	move of ugid_cache to cygheap.
+	* sec_helper.cc (get_sids_info): Ditto.
+	* uinfo.cc (ugid_cache): Remove.
+	(pwdgrp::fetch_account_from_windows): Define id_val globally.
+	Move SidTypeAlias handling into SidTypeUser/SidTypeGroup branch since
+	aliases are handled like groups in SAM.  Accommodate move of ugid_cache
+	to cygheap.  Consolidate code reading SAM comments into a single branch
+	for both, SidTypeUser and SidTypeAlias.  For SidTypeAlias, fix thinko
+	and call NetLocalGroupGetInfo rather than NetGroupGetInfo.  Simplify
+	code setting Cygwin primary group for SAM accounts.  Add code to handle
+	UNIX uid/gid from SAM comment.
+
 2014-02-11  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* winsup.h (Interlocked*): Use intrinsic versions of Interlocked

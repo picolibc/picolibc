@@ -314,7 +314,7 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
 	 last comment in cygheap_domain_info::init() for more information) and
 	 add it to the mapping cache. */
       gid_t gid = sid_sub_auth_rid (group_sid);
-      gid_t map_gid = ugid_cache.get_gid (gid);
+      gid_t map_gid = cygheap->ugid_cache.get_gid (gid);
       if (map_gid == ILLEGAL_GID)
 	{
 	  domain = cygheap->dom.get_rfc2307_domain ();
@@ -322,7 +322,7 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
 	    map_gid = cldap.remap_gid (gid);
 	  if (map_gid == ILLEGAL_GID)
 	    map_gid = MAP_UNIX_TO_CYGWIN_ID (gid);
-	  ugid_cache.add_gid (gid, map_gid);
+	  cygheap->ugid_cache.add_gid (gid, map_gid);
 	}
       *gidret = map_gid;
     }
@@ -343,7 +343,7 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
     {
       /* Samba UNIX user.  See comment above. */
       uid_t uid = sid_sub_auth_rid (owner_sid);
-      uid_t map_uid = ugid_cache.get_uid (uid);
+      uid_t map_uid = cygheap->ugid_cache.get_uid (uid);
       if (map_uid == ILLEGAL_UID)
 	{
 	  domain = cygheap->dom.get_rfc2307_domain ();
@@ -351,7 +351,7 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
 	    map_uid = cldap.remap_uid (uid);
 	  if (map_uid == ILLEGAL_UID)
 	    map_uid = MAP_UNIX_TO_CYGWIN_ID (uid);
-	  ugid_cache.add_uid (uid, map_uid);
+	  cygheap->ugid_cache.add_uid (uid, map_uid);
 	}
       *uidret = map_uid;
     }

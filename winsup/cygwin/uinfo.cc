@@ -548,8 +548,6 @@ pwdgrp::add_line (char *eptr)
   return eptr;
 }
 
-ugid_cache_t ugid_cache;
-
 void
 cygheap_pwdgrp::init ()
 {
@@ -1100,6 +1098,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
   WCHAR sidstr[128];
   /* Temporary stuff. */
   ULONG posix_offset = 0;
+  uint32_t id_val;
   cyg_ldap cldap;
   bool ldap_open = false;
 
@@ -1240,8 +1239,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 		 Skip primary domain. */
 	      if (!td->PosixOffset && !(td->Flags & DS_DOMAIN_PRIMARY))
 		{
-		  uint32_t id_val;
-
 		  if (!ldap_open && !(ldap_open = cldap.open (NULL)))
 		    id_val = cygheap->dom.lowest_tdo_posix_offset
 			     - 0x01000000;
@@ -1287,18 +1284,29 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 	 if a process is running as LocalSystem service. */
       if (acc_type == SidTypeUser && sid_sub_auth_count (sid) <= 3)
 	acc_type = SidTypeWellKnownGroup;
-      /* Alias?  There are two types, the builtin aliases like "Administrators"
-	 and the local groups in SAM.  Handle local groups as groups. */
-      else if (acc_type == SidTypeAlias
-	       && sid_sub_auth (sid, 0) == SECURITY_NT_NON_UNIQUE)
-	acc_type = SidTypeGroup;
-
       switch (acc_type)
       	{
 	case SidTypeUser:
 	case SidTypeGroup:
+	case SidTypeAlias:
+	  /* Predefined alias? */
+	  if (acc_type == SidTypeAlias
+	      && sid_sub_auth (sid, 0) != SECURITY_NT_NON_UNIQUE)
+	    {
+#ifdef INTERIX_COMPATIBLE
+	      posix_offset = 0x30000;
+	      uid = 0x1000 * sid_sub_auth (sid, 0)
+		    + (sid_sub_auth_rid (sid) & 0xffff);
+#else
+	      posix_offset = 0;
+#endif
+	      name_style = (cygheap->pg.nss_prefix_always ()) ? fully_qualified
+							      : plus_prepended;
+	      domain = cygheap->dom.account_flat_name ();
+	      is_domain_account = false;
+	    }
 	  /* Account domain account? */
-	  if (!wcscmp (dom, cygheap->dom.account_flat_name ()))
+	  else if (!wcscmp (dom, cygheap->dom.account_flat_name ()))
 	    {
 	      posix_offset = 0x30000;
 	      if (cygheap->dom.member_machine ()
@@ -1345,8 +1353,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 			 fetch it. */
 		      if (!posix_offset)
 			{
-			  uint32_t id_val;
-
 			  if (!ldap_open && !(ldap_open = cldap.open (NULL)))
 			    {
 			      /* We're probably running under a local account,
@@ -1385,7 +1391,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 	      return NULL;
 	    }
 	  /* Generate values. */
-	  uid = posix_offset + sid_sub_auth_rid (sid);
+	  if (uid == ILLEGAL_UID)
+	    uid = posix_offset + sid_sub_auth_rid (sid);
 	  gid = posix_offset + DOMAIN_GROUP_RID_USERS; /* Default. */
 
 	  if (is_domain_account)
@@ -1396,9 +1403,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 	      if (cldap.fetch_ad_account (sid, group))
 		{
 		  PWCHAR val;
-		  uint32_t id_val;
-
-		  if (!group)
+		  if (acc_type == SidTypeUser)
 		    {
 		      if ((id_val = cldap.get_primary_gid ()) != ILLEGAL_GID)
 			gid = posix_offset + id_val;
@@ -1419,10 +1424,11 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 			 id mapping on the fly. */
 		      id_val = cldap.get_unix_uid ();
 		      if (id_val != ILLEGAL_UID
-			  && ugid_cache.get_uid (id_val) == ILLEGAL_UID)
-			ugid_cache.add_uid (id_val, uid);
+			  && cygheap->ugid_cache.get_uid (id_val)
+			     == ILLEGAL_UID)
+			cygheap->ugid_cache.add_uid (id_val, uid);
 		    }
-		  else
+		  else /* SidTypeGroup */
 		    {
 		      if ((val = cldap.get_group_name ())
 			  && wcscmp (name, val))
@@ -1430,136 +1436,124 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 				       * sizeof (WCHAR)), val);
 		      id_val = cldap.get_unix_gid ();
 		      if (id_val != ILLEGAL_GID
-			  && ugid_cache.get_gid (id_val) == ILLEGAL_GID)
-			ugid_cache.add_gid (id_val, uid);
+			  && cygheap->ugid_cache.get_gid (id_val)
+			     == ILLEGAL_GID)
+			cygheap->ugid_cache.add_gid (id_val, uid);
 		    }
 		}
 	    }
 	  /* Otherwise check account domain (local SAM).*/
-	  else if (acc_type == SidTypeUser)
+	  else
 	    {
 	      NET_API_STATUS nas;
 	      PUSER_INFO_4 ui;
+	      PLOCALGROUP_INFO_1 gi;
+	      PCWSTR comment;
+	      PWCHAR pgrp = NULL;
+	      PWCHAR uxid = NULL;
+	      struct {
+		PCWSTR str;
+		size_t len;
+		PWCHAR *tgt;
+		bool group;
+	      } search[] = {
+		{ L"name=\"", 6, &user, true },
+		{ L"unix=\"", 6, &uxid, true },
+		{ L"home=\"", 6, &home, false },
+		{ L"shell=\"", 7, &shell, false },
+		{ L"group=\"", 7, &pgrp, false },
+		{ NULL, 0, NULL }
+	      };
+	      PWCHAR s, e;
 
-	      nas = NetUserGetInfo (domain, name, 4, (PBYTE *) &ui);
-	      if (nas != NERR_Success)
-		debug_printf ("NetUserGetInfo(%W,%W) %u", domain, name, nas);
-	      else
+	      if (acc_type == SidTypeUser)
 		{
-		  PWCHAR pgrp = NULL;
-		  struct {
-		    PCWSTR str;
-		    size_t len;
-		    PWCHAR *tgt;
-		  } search[] = {
-		    { L"name=\"", 6, &user },
-		    { L"home=\"", 6, &home },
-		    { L"shell=\"", 7, &shell },
-		    { L"group=\"", 7, &pgrp }
-		  };
-		  PWCHAR s, e;
-
-		  /* Fetch primary group. */
-		  gid = posix_offset + ui->usri4_primary_group_id;
-		  /* Local SAM accounts have only a handful attributes
-		     available to home users.  Therefore, fetch different
-		     Cygwin user name, Cygwin home dir, and Cygwin login
-		     shell from the "Description" field in XML short
-		     style. */
-		  if ((s = wcsstr (ui->usri4_comment, L"<cygwin "))
-		      && (e = wcsstr (s + 8, L"/>")))
+		  nas = NetUserGetInfo (NULL, name, 4, (PBYTE *) &ui);
+		  if (nas != NERR_Success)
 		    {
-		      s += 8;
-		      *e = L'\0';
-		      while (*s)
-			{
-			  while (*s == L' ')
-			    ++s;
-			  for (size_t i = 0;
-			       i < sizeof search / sizeof search[0];
-			       ++i)
-			    if (!wcsncmp (s, search[i].str, search[i].len))
-			      {
-				s += search[i].len;
-				if ((e = wcschr (s, L'"'))
-				    && (i > 0 || wcsncmp (name, s, e - s)))
-				  {
-				    *search[i].tgt =
-					(PWCHAR) alloca ((e - s + 1)
-							 * sizeof (WCHAR));
-				    *wcpncpy (*search[i].tgt, s, e - s) = L'\0';
-				    s = e + 1;
-				  }
-				else
-				  {
-				    *s = L'\0';
-				    break;
-				  }
-			      }
-			}
+		      debug_printf ("NetUserGetInfo(%W) %u", name, nas);
+		      break;
 		    }
-		  NetApiBufferFree (ui);
-		  if (pgrp)
+		  /* Set comment variable for below attribute loop. */
+		  comment = ui->usri4_comment;
+		}
+	      else /* SidTypeGroup || SidTypeAlias */
+		{
+		  nas = NetLocalGroupGetInfo (NULL, name, 1, (PBYTE *) &gi);
+		  if (nas != NERR_Success)
 		    {
-		      /* For setting the primary group, we have to test all
-			 three possible Cygwin name variations:
+		      debug_printf ("NetLocalGroupGetInfo(%W) %u", name, nas);
+		      break;
+		    }
+		  /* Set comment variable for below attribute loop. */
+		  comment = gi->lgrpi1_comment;
+		}
+	      /* Local SAM accounts have only a handful attributes
+		 available to home users.  Therefore, fetch additional
+		 passwd/group attributes from the "Description" field
+		 in XML short style. */
+	      if ((s = wcsstr (comment, L"<cygwin "))
+		  && (e = wcsstr (s + 8, L"/>")))
+		{
+		  s += 8;
+		  *e = L'\0';
+		  while (*s)
+		    {
+		      bool found = false;
 
-			 MACHINE+group, +group, group
-		      */
-		      char gname[2 * (DNLEN + UNLEN + 1)];
-		      char *sep;
-		      struct group *gr;
-
-		      sep += sys_wcstombs (sep = gname, 2 * DNLEN + 1, domain);
-		      *sep = cygheap->pg.nss_separator ()[0];
-		      sys_wcstombs (sep + 1, 2 * UNLEN + 1, pgrp);
-		      if ((gr = internal_getgrnam (gname))
-			  || (gr = internal_getgrnam (sep))
-			  || (gr = internal_getgrnam (sep + 1)))
-			gid = gr->gr_gid;
+		      while (*s == L' ')
+			++s;
+		      for (size_t i = 0; search[i].str; ++i)
+			if ((acc_type == SidTypeUser || search[i].group)
+			    && !wcsncmp (s, search[i].str, search[i].len))
+			  {
+			    s += search[i].len;
+			    if ((e = wcschr (s, L'"'))
+				&& (i > 0 || wcsncmp (name, s, e - s)))
+			      {
+				*search[i].tgt =
+				    (PWCHAR) alloca ((e - s + 1)
+						     * sizeof (WCHAR));
+				*wcpncpy (*search[i].tgt, s, e - s) = L'\0';
+				s = e + 1;
+				found = true;
+			      }
+			    else
+			      break;
+			  }
+		      if (!found)
+			break;
 		    }
 		}
-	    }
-	  else /* SidTypeGroup */
-	    {
-	      NET_API_STATUS nas;
-	      PGROUP_INFO_3 gi;
-
-	      nas = NetGroupGetInfo (domain, name, 3, (PBYTE *) &gi);
-	      if (nas != NERR_Success)
-		debug_printf ("NetGroupGetInfo(%W,%W) %u", domain, name, nas);
+	      if (acc_type == SidTypeUser)
+		NetApiBufferFree (ui);
 	      else
+		NetApiBufferFree (gi);
+	      if (pgrp)
 		{
-		  PWCHAR s, e;
+		  /* For setting the primary group, we have to test 
+		     with and without prepended separator. */
+		  char gname[2 * UNLEN + 2];
+		  struct group *gr;
 
-		  /* Fetch different Cygwin group name from description. */
-		  if ((s = wcsstr (gi->grpi3_comment, L"<cygwin "))
-		      && (e = wcsstr (s + 8, L"/>")))
+		  *gname = cygheap->pg.nss_separator ()[0];
+		  sys_wcstombs (gname + 1, 2 * UNLEN + 1, pgrp);
+		  if ((gr = internal_getgrnam (gname))
+		      || (gr = internal_getgrnam (gname + 1)))
+		    gid = gr->gr_gid;
+		}
+	      if (uxid && ((id_val = wcstoul (uxid, &e, 10)), !*e))
+		{
+		  if (acc_type == SidTypeUser)
 		    {
-		      s += 8;
-		      *e = L'\0';
-		      while (*s)
-			{
-			  while (*s == L' ')
-			    ++s;
-			  if (!wcsncmp (s, L"name=\"", 6))
-			    {
-			      s += 6;
-			      if ((e = wcschr (s, L'"')))
-			      	{
-				  *wcpncpy (name = namebuf, s, e - s) = L'\0';
-				  s = e + 1;
-				}
-			      else
-			      	break;
-			    }
-			}
+		      if (cygheap->ugid_cache.get_uid (id_val) == ILLEGAL_UID)
+			cygheap->ugid_cache.add_uid (id_val, uid);
 		    }
-		  NetApiBufferFree (gi);
+		  else if (cygheap->ugid_cache.get_gid (id_val) == ILLEGAL_GID)
+		    cygheap->ugid_cache.add_gid (id_val, uid);
 		}
 	    }
 	  break;
-	case SidTypeAlias:
 	case SidTypeWellKnownGroup:
 	  name_style = (cygheap->pg.nss_prefix_always ()) ? fully_qualified
 							  : plus_prepended;
@@ -1569,8 +1563,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 	    {
 	      uid = 0x1000 * sid_sub_auth (sid, 0)
 		    + (sid_sub_auth_rid (sid) & 0xffff);
-	      if (sid_sub_auth (sid, 0) > SECURITY_BUILTIN_DOMAIN_RID)
-	      	name_style = fully_qualified;
+	      name_style = fully_qualified;
 	    }
 	  else
 	    uid = 0x10000 + 0x100 * sid_id_auth (sid)
@@ -1585,7 +1578,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 	    {
 	      uid = 0x1000 * sid_sub_auth (sid, 0)
 		    + (sid_sub_auth_rid (sid) & 0xffff);
-	      //name_style = fully_qualified;
 	    }
 #endif
 	  /* Special case for "Everyone".  We don't want to return Everyone

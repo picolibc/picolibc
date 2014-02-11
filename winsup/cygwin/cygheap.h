@@ -434,6 +434,43 @@ public:
   inline bool nss_db_caching () const { return caching; }
 };
 
+class cygheap_ugid_cache
+{
+  struct idmap {
+    uint32_t nfs_id;
+    uint32_t cyg_id;
+  };
+  class idmaps {
+    uint32_t _cnt;
+    uint32_t _max;
+    idmap *_map;
+  public:
+    uint32_t get (uint32_t id) const
+    {
+      for (uint32_t i = 0; i < _cnt; ++i)
+	if (_map[i].nfs_id == id)
+	  return _map[i].cyg_id;
+      return (uint32_t) -1;
+    }
+    void add (uint32_t nfs_id, uint32_t cyg_id)
+    {
+      if (_cnt >= _max)
+	_map = (idmap *) crealloc (_map, (_max += 10) * sizeof (*_map));
+      _map[_cnt].nfs_id = nfs_id;
+      _map[_cnt].cyg_id = cyg_id;
+      ++_cnt;
+    }
+  };
+  idmaps uids;
+  idmaps gids;
+
+public:
+  uid_t get_uid (uid_t uid) const { return uids.get (uid); }
+  gid_t get_gid (gid_t gid) const { return gids.get (gid); }
+  void add_uid (uid_t nfs_uid, uid_t cyg_uid) { uids.add (nfs_uid, cyg_uid); }
+  void add_gid (gid_t nfs_gid, gid_t cyg_gid) { gids.add (nfs_gid, cyg_gid); }
+};
+
 struct hook_chain
 {
   void **loc;
@@ -459,6 +496,7 @@ struct init_cygheap: public mini_cygheap
   cygheap_root root;
   cygheap_domain_info dom;
   cygheap_pwdgrp pg;
+  cygheap_ugid_cache ugid_cache;
   cygheap_user user;
   user_heap_info user_heap;
   mode_t umask;
