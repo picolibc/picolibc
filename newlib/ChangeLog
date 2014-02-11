@@ -1,3 +1,8 @@
+2014-02-11  Joey Ye  <joey.ye@arm.com>
+
+	* libc/sys/arm/syscalls.c (_sbrk): Define as weak symbols.
+	(_read, _write): Ditto.
+
 2014-02-09  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/pwd.h: Include <sys/cdefs.h>.
