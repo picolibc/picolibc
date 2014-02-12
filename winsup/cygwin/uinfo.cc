@@ -646,7 +646,7 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 	{
 	  c += 10;
 	  c += strspn (c, " \t");
-	  if ((unsigned char) *c <= 0x7f && strchr (" \t", c[1]))
+	  if ((unsigned char) *c <= 0x7f && *c != ':' && strchr (" \t", c[1]))
 	    separator[0] = (unsigned char) *c;
 	  else
 	    debug_printf ("Invalid nsswitch.conf content: %s", line);

@@ -1,3 +1,8 @@
+2014-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (cygheap_pwdgrp::nss_init_line): Explicitely ignore a colon
+	as separator char.
+
 2014-02-11  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* winsup.h: Turn off previous workaround but leave a comment.
