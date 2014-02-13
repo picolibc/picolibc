@@ -4,7 +4,7 @@
 	has no dot, it's a Netbios name.  Change the search filter expression
 	accordingly and filter by flatName.  Add comment.
 	* uinfo.cc (cygheap_domain_info::init):  Gracefully handle NULL
-	DnsDomainName and DomainSid members in DS_DOMAIN_TRUSTSW strutures.
+	DnsDomainName and DomainSid members in DS_DOMAIN_TRUSTSW structure.
 	Add comment.  Fix comment preceeding fetching the mapping server
 	from registry.
 	(pwdgrp::fetch_account_from_file): Convert str to a local array.
