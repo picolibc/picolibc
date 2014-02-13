@@ -777,22 +777,32 @@ cygheap_domain_info::init ()
 	{
 	  /* Copy... */
 	  tdom[idx].NetbiosDomainName = cwcsdup (td[idx].NetbiosDomainName);
-	  tdom[idx].DnsDomainName = cwcsdup (td[idx].DnsDomainName);
-	  ULONG len = RtlLengthSid (td[idx].DomainSid);
-	  tdom[idx].DomainSid = cmalloc_abort(HEAP_BUF, len);
-	  RtlCopySid (len, tdom[idx].DomainSid, td[idx].DomainSid);
+	  /* DnsDomainName as well as DomainSid can be NULL.  The reason is
+	     usually a domain of type TRUST_TYPE_DOWNLEVEL.  This can be an
+	     old pre-AD domain, or a Netware domain, etc.  If DnsDomainName
+	     is NULL, just set it to NetbiosDomainName.  This simplifies
+	     subsequent code which doesn't have to check for a NULL pointer. */
+	  tdom[idx].DnsDomainName = td[idx].DnsDomainName
+				    ? cwcsdup (td[idx].DnsDomainName)
+				    : tdom[idx].NetbiosDomainName;
+	  if (td[idx].DomainSid)
+	    {
+	      ULONG len = RtlLengthSid (td[idx].DomainSid);
+	      tdom[idx].DomainSid = cmalloc_abort(HEAP_BUF, len);
+	      RtlCopySid (len, tdom[idx].DomainSid, td[idx].DomainSid);
+	    }
 	  /* ...and set PosixOffset to 0.  This */
 	  tdom[idx].PosixOffset = 0;
 	}
       NetApiBufferFree (td);
       tdom_count = tdom_cnt;
     }
-  /* If we have NFS installed, we make use of a name mapping server.  This
-     can be either Active Directory to map uids/gids directly to Windows SIDs,
-     or an AD LDS or other RFC 2307 compatible identity store.  The name of
-     the mapping domain can be fetched from the registry key created by the
-     NFS client installation and entered by the user via nfsadmin or the
-     "Services For NFS" MMC snap-in.
+  /* If we have Microsoft Client for NFS installed, we make use of a name
+     mapping server.  This can be either Active Directory to map uids/gids
+     directly to Windows SIDs, or an AD LDS or other RFC 2307 compatible
+     identity store.  The name of the mapping domain can be fetched from the
+     registry key created by the NFS client installation and entered by the
+     user via nfsadmin or the "Services For NFS" MMC snap-in.
 
      Reference:
      http://blogs.technet.com/b/filecab/archive/2012/10/09/nfs-identity-mapping-in-windows-server-2012.aspx
@@ -1042,7 +1052,7 @@ pwdgrp::fetch_account_from_file (fetch_user_arg_t &arg)
   NT_readline rl;
   tmp_pathbuf tp;
   char *buf = tp.c_get ();
-  char *str = tp.c_get ();
+  char str[128];
   char *ret = NULL;
 
   /* Create search string. */
@@ -1064,6 +1074,34 @@ pwdgrp::fetch_account_from_file (fetch_user_arg_t &arg)
       if ((ret = fetch_account_from_line (arg, buf)))
 	return ret;
   return NULL;
+}
+
+static ULONG
+fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, bool &ldap_open, cyg_ldap &cldap)
+{
+  uint32_t id_val;
+
+  if (!td->PosixOffset && !(td->Flags & DS_DOMAIN_PRIMARY) && td->DomainSid)
+    {
+      if (!ldap_open && !(ldap_open = cldap.open (NULL)))
+	{
+	  /* We're probably running under a local account, so we're not allowed
+	     to fetch any information from AD beyond the most obvious.  Never
+	     mind, just fake a reasonable posix offset. */
+	  id_val = cygheap->dom.lowest_tdo_posix_offset
+		   - 0x01000000;
+	}
+      else
+	id_val = cldap.fetch_posix_offset_for_domain (td->DnsDomainName);
+      if (id_val)
+	{
+	  td->PosixOffset = id_val;
+	  if (id_val < cygheap->dom.lowest_tdo_posix_offset)
+	    cygheap->dom.lowest_tdo_posix_offset = id_val;
+
+	}
+    }
+  return td->PosixOffset;
 }
 
 char *
@@ -1111,6 +1149,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
     case SID_arg:
       sid = *arg.sid;
       ret = LookupAccountSidW (NULL, sid, name, &nlen, dom, &dlen, &acc_type);
+      if (!ret)
+	debug_printf ("LookupAccountSid(%W), %E", sid.string (sidstr));
       break;
     case NAME_arg:
       /* Skip leading domain separator.  This denotes an alias or well-known
@@ -1235,23 +1275,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 
 	  for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
 	    {
-	      /* If we don't have the PosixOffset of the domain, fetch it.
-		 Skip primary domain. */
-	      if (!td->PosixOffset && !(td->Flags & DS_DOMAIN_PRIMARY))
-		{
-		  if (!ldap_open && !(ldap_open = cldap.open (NULL)))
-		    id_val = cygheap->dom.lowest_tdo_posix_offset
-			     - 0x01000000;
-		  else
-		    id_val =
-		      cldap.fetch_posix_offset_for_domain (td->DnsDomainName);
-		  if (id_val)
-		    {
-		      td->PosixOffset = id_val;
-		      if (id_val < cygheap->dom.lowest_tdo_posix_offset)
-			cygheap->dom.lowest_tdo_posix_offset = id_val;
-		    }
-		}
+	      fetch_posix_offset (td, ldap_open, cldap);
 	      if (td->PosixOffset > posix_offset && td->PosixOffset <= arg.id)
 		posix_offset = td->PosixOffset;
 	    }
@@ -1344,36 +1368,13 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 		  for (ULONG idx = 0;
 		       (td = cygheap->dom.trusted_domain (idx));
 		       ++idx)
-		    {
-		      if (wcscmp (dom, td->NetbiosDomainName))
-			continue;
-		      domain = td->DnsDomainName;
-		      posix_offset = td->PosixOffset;
-		      /* If we don't have the PosixOffset of the domain,
-			 fetch it. */
-		      if (!posix_offset)
-			{
-			  if (!ldap_open && !(ldap_open = cldap.open (NULL)))
-			    {
-			      /* We're probably running under a local account,
-				 so we're not allowed to fetch any information
-				 from AD beyond the most obvious.  Never mind,
-				 just fake a reasonable posix offset. */
-			      id_val = cygheap->dom.lowest_tdo_posix_offset
-				       - 0x01000000;
-			    }
-			  else
-			    id_val =
-			      cldap.fetch_posix_offset_for_domain (domain);
-			  if (id_val)
-			    {
-			      td->PosixOffset = posix_offset = id_val;
-			      if (id_val < cygheap->dom.lowest_tdo_posix_offset)
-				cygheap->dom.lowest_tdo_posix_offset = id_val;
-			    }
-			}
-		      break;
-		    }
+		    if (!wcscmp (dom, td->NetbiosDomainName))
+		      {
+			domain = td->DnsDomainName;
+			posix_offset =
+			  fetch_posix_offset (td, ldap_open, cldap);
+			break;
+		      }
 
 		  if (!domain)
 		    {
@@ -1640,8 +1641,36 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
     }
   else
     {
-      wcpcpy (dom, L"Unknown");
-      wcpcpy (name = namebuf, group ? L"Group" : L"User");
+      if (sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
+	  && sid_sub_auth (sid, 0) == SECURITY_NT_NON_UNIQUE)
+	{
+	  /* Check if we know the domain.  If so, create a passwd/group
+	     entry with domain prefix and RID as username. */
+	  PDS_DOMAIN_TRUSTSW td = NULL;
+
+	  sid_sub_auth_count (sid) = sid_sub_auth_count (sid) - 1;
+	  for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
+	    if (td->DomainSid && RtlEqualSid (sid, td->DomainSid))
+	      {
+		domain = td->NetbiosDomainName;
+		posix_offset = fetch_posix_offset (td, ldap_open, cldap);
+		break;
+	      }
+	}
+      if (domain)
+	{
+	  sid_sub_auth_count (sid) = sid_sub_auth_count (sid) + 1;
+	  wcscpy (dom, domain);
+	  __small_swprintf (name = namebuf, L"%W(%u)",
+			    group ? L"Group" : L"User",
+			    sid_sub_auth_rid (sid));
+	  uid = posix_offset + sid_sub_auth_rid (sid);
+	}
+      else
+	{
+	  wcpcpy (dom, L"Unknown");
+	  wcpcpy (name = namebuf, group ? L"Group" : L"User");
+	}
       name_style = fully_qualified;
     }
 

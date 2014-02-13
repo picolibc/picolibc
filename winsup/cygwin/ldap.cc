@@ -289,7 +289,10 @@ cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
       ldap_value_freeW (val);
       val = NULL;
     }
-  __small_swprintf (filter, L"(&(objectClass=trustedDomain)(name=%W))", domain);
+  /* If domain name has no dot, it's a Netbios name.  In that case, filter
+     by flatName rather than by name. */
+  __small_swprintf (filter, L"(&(objectClass=trustedDomain)(%W=%W))",
+		    wcschr (domain, L'.') ? L"name" : L"flatName", domain);
   if ((ret = ldap_search_stW (lh, rootdse, LDAP_SCOPE_SUBTREE, filter,
 			      attr = tdom_attr, 0, &tv, &msg)) != LDAP_SUCCESS)
     {
