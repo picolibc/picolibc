@@ -1698,7 +1698,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 		      dom, name,
 		      sid.string (sidstr),
 		      home ? L"" : L"/home/", home ?: user ?: name,
-		      shell ?: L"/bin/sh");
+		      shell ?: L"/bin/bash");
   sys_wcstombs_alloc (&line, HEAP_BUF, linebuf);
   debug_printf ("line: <%s>", line);
   return line;

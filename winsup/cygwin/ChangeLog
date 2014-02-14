@@ -1,3 +1,8 @@
+2014-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Default to /bin/bash
+	as login shell.
+
 2014-02-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ldap.cc (cyg_ldap::fetch_posix_offset_for_domain): If domain name
