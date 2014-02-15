@@ -1,3 +1,11 @@
+2014-02-14  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* pinfo.cc (winpids::add): Always copy pinfo structure when winpid.
+	Fill out dwProcessId explicitly to handle exec from a windows process.
+	(winpids::enum_processes): Reorganize to iterate over known cygwin pids
+	when !winpid.  Simplify logic.  Don't do duplicate detection for
+	winpid.
+
 2014-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Default to /bin/bash
