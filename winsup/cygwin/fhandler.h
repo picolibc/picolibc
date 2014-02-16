@@ -1263,9 +1263,9 @@ class dev_console
   int meta_mask;
 
 /* Output state */
-  int state_;
-  int args_[MAXARGS];
-  int nargs_;
+  int state;
+  int args[MAXARGS];
+  int nargs;
   unsigned rarg;
   bool saw_question_mark;
   bool saw_greater_than_sign;
@@ -1295,17 +1295,14 @@ class dev_console
     {
       short Top, Bottom;
     } scroll_region;
-  struct console_attrs
-    {
-      SHORT winTop;
-      SHORT winBottom;
-      COORD dwWinSize;
-      COORD dwBufferSize;
-      COORD dwCursorPosition;
-      WORD wAttributes;
-      int set_cl_x (cltype);
-      int set_cl_y (cltype);
-    } info;
+
+  SHORT winTop;
+  SHORT winBottom;
+  COORD dwWinSize;
+  COORD dwBufferSize;
+  COORD dwCursorPosition;
+  WORD wAttributes;
+  COORD dwEnd;
 
   COORD dwLastCursorPosition;
   COORD dwMousePosition;	/* scroll-adjusted coord of mouse event */
@@ -1326,8 +1323,12 @@ class dev_console
   DWORD con_to_str (char *d, int dlen, WCHAR w);
   DWORD str_to_con (mbtowc_p, const char *, PWCHAR d, const char *s, DWORD sz);
   void set_color (HANDLE);
-  bool fillin_info (HANDLE);
   void set_default_attr ();
+  int set_cl_x (cltype);
+  int set_cl_y (cltype);
+  bool fillin (HANDLE);
+  bool is_fullscreen (int, int, int, int);
+  void scroll_window (HANDLE);
 
   friend class fhandler_console;
 };
@@ -1358,7 +1359,7 @@ private:
   void set_default_attr ();
 
   void clear_screen (cltype, cltype, cltype, cltype);
-  void scroll_screen (int, int, int, int, int, int);
+  void scroll_buffer (int, int, int, int, int, int);
   void cursor_set (bool, int, int);
   void cursor_get (int *, int *);
   void cursor_rel (int, int);

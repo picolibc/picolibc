@@ -43,8 +43,8 @@ details. */
 #define CTRL_PRESSED (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)
 
 #define dev_state (shared_console_info->dev_state)
-#define srTop (dev_state.info.winTop + dev_state.scroll_region.Top)
-#define srBottom ((dev_state.scroll_region.Bottom < 0) ? dev_state.info.winBottom : dev_state.info.winTop + dev_state.scroll_region.Bottom)
+#define srTop (dev_state.winTop + dev_state.scroll_region.Top)
+#define srBottom ((dev_state.scroll_region.Bottom < 0) ? dev_state.winBottom : dev_state.winTop + dev_state.scroll_region.Bottom)
 
 const char *get_nonascii_key (INPUT_RECORD&, char *);
 
@@ -172,7 +172,6 @@ fhandler_console::setup ()
 {
   if (set_unit ())
       {
-
 	dev_state.scroll_region.Bottom = -1;
 	dev_state.dwLastCursorPosition.X = -1;
 	dev_state.dwLastCursorPosition.Y = -1;
@@ -264,11 +263,11 @@ fhandler_console::set_cursor_maybe ()
 void
 fhandler_console::send_winch_maybe ()
 {
-  SHORT y = dev_state.info.dwWinSize.Y;
-  SHORT x = dev_state.info.dwWinSize.X;
-  dev_state.fillin_info (get_output_handle ());
+  SHORT y = dev_state.dwWinSize.Y;
+  SHORT x = dev_state.dwWinSize.X;
+  dev_state.fillin (get_output_handle ());
 
-  if (y != dev_state.info.dwWinSize.Y || x != dev_state.info.dwWinSize.X)
+  if (y != dev_state.dwWinSize.Y || x != dev_state.dwWinSize.X)
     {
       dev_state.scroll_region.Top = 0;
       dev_state.scroll_region.Bottom = -1;
@@ -734,27 +733,31 @@ fhandler_console::set_input_state ()
 }
 
 bool
-dev_console::fillin_info (HANDLE h)
+dev_console::fillin (HANDLE h)
 {
   bool ret;
   CONSOLE_SCREEN_BUFFER_INFO linfo;
 
   if ((ret = GetConsoleScreenBufferInfo (h, &linfo)))
     {
-      info.winTop = linfo.srWindow.Top;
-      info.winBottom = linfo.srWindow.Bottom;
-      info.dwWinSize.Y = 1 + linfo.srWindow.Bottom - linfo.srWindow.Top;
-      info.dwWinSize.X = 1 + linfo.srWindow.Right - linfo.srWindow.Left;
-      info.dwBufferSize = linfo.dwSize;
-      info.dwCursorPosition = linfo.dwCursorPosition;
-      info.wAttributes = linfo.wAttributes;
+      winTop = linfo.srWindow.Top;
+      winBottom = linfo.srWindow.Bottom;
+      dwWinSize.Y = 1 + linfo.srWindow.Bottom - linfo.srWindow.Top;
+      dwWinSize.X = 1 + linfo.srWindow.Right - linfo.srWindow.Left;
+      if (dwBufferSize.Y != linfo.dwSize.Y || dwBufferSize.X != linfo.dwSize.X)
+	dwEnd.X = dwEnd.Y = 0;
+      dwBufferSize = linfo.dwSize;
+      dwCursorPosition = linfo.dwCursorPosition;
+      if (dwCursorPosition.Y > dwEnd.Y
+	  || (dwCursorPosition.Y >= dwEnd.Y && dwCursorPosition.X > dwEnd.X))
+	dwEnd = dwCursorPosition;
+      wAttributes = linfo.wAttributes;
     }
   else
     {
-      memset (&info, 0, sizeof info);
-      info.dwWinSize.Y = 25;
-      info.dwWinSize.X = 80;
-      info.winBottom = 24;
+      dwWinSize.Y = 25;
+      dwWinSize.X = 80;
+      winBottom = 24;
     }
 
   return ret;
@@ -767,37 +770,28 @@ dev_console::fillin_info (HANDLE h)
    Negative values represents current screen dimensions
 */
 void
-fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
+fhandler_console::scroll_buffer (int x1, int y1, int x2, int y2, int xn, int yn)
 {
   SMALL_RECT sr1, sr2;
   CHAR_INFO fill;
   COORD dest;
+  fill.Char.AsciiChar = ' ';
+  fill.Attributes = dev_state.current_win32_attr;
 
-  dev_state.fillin_info (get_output_handle ());
-  sr1.Left = x1 >= 0 ? x1 : dev_state.info.dwWinSize.X - 1;
-  if (y1 == 0)
-    sr1.Top = dev_state.info.winTop;
-  else
-    sr1.Top = y1 > 0 ? y1 : dev_state.info.winBottom;
-  sr1.Right = x2 >= 0 ? x2 : dev_state.info.dwWinSize.X - 1;
-  if (y2 == 0)
-    sr1.Bottom = dev_state.info.winTop;
-  else
-    sr1.Bottom = y2 > 0 ? y2 : dev_state.info.winBottom;
+  dev_state.fillin (get_output_handle ());
+  sr1.Left = x1 >= 0 ? x1 : dev_state.dwWinSize.X - 1;
+  sr1.Top = y1 >= 0 ? y1 : dev_state.winBottom;
+  sr1.Right = x2 >= 0 ? x2 : dev_state.dwWinSize.X - 1;
+  sr1.Bottom = y2 >= 0 ? y2 : dev_state.winBottom;
   sr2.Top = srTop;
   sr2.Left = 0;
   sr2.Bottom = srBottom;
-  sr2.Right = dev_state.info.dwWinSize.X - 1;
+  sr2.Right = dev_state.dwWinSize.X - 1;
   if (sr1.Bottom > sr2.Bottom && sr1.Top <= sr2.Bottom)
     sr1.Bottom = sr2.Bottom;
-  dest.X = xn >= 0 ? xn : dev_state.info.dwWinSize.X - 1;
-  if (yn == 0)
-    dest.Y = dev_state.info.winTop;
-  else
-    dest.Y = yn > 0 ? yn : dev_state.info.winBottom;
-  fill.Char.AsciiChar = ' ';
-  fill.Attributes = dev_state.current_win32_attr;
-  ScrollConsoleScreenBuffer (get_output_handle (), &sr1, &sr2, dest, &fill);
+  dest.X = xn >= 0 ? xn : dev_state.dwWinSize.X - 1;
+  dest.Y = yn >= 0 ? yn : dev_state.winBottom;
+  ScrollConsoleScreenBuffer (get_output_handle (), &sr1, NULL, dest, &fill);
 
 #if 0 /* CGF: 2014-01-04 Assuming that we don't need this anymore */
   /* ScrollConsoleScreenBuffer on Windows 95 is buggy - when scroll distance
@@ -860,11 +854,11 @@ fhandler_console::open (int flags, mode_t)
     }
   set_output_handle (h);
 
-  if (dev_state.fillin_info (get_output_handle ()))
+  if (dev_state.fillin (get_output_handle ()))
     {
-      dev_state.current_win32_attr = dev_state.info.wAttributes;
+      dev_state.current_win32_attr = dev_state.wAttributes;
       if (!dev_state.default_color)
-	dev_state.default_color = dev_state.info.wAttributes;
+	dev_state.default_color = dev_state.wAttributes;
       dev_state.set_default_attr ();
     }
 
@@ -912,13 +906,13 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
       case TIOCGWINSZ:
 	int st;
 
-	st = dev_state.fillin_info (get_output_handle ());
+	st = dev_state.fillin (get_output_handle ());
 	if (st)
 	  {
 	    /* *not* the buffer size, the actual screen size... */
 	    /* based on Left Top Right Bottom of srWindow */
-	    ((struct winsize *) arg)->ws_row = dev_state.info.dwWinSize.Y;
-	    ((struct winsize *) arg)->ws_col = dev_state.info.dwWinSize.X;
+	    ((struct winsize *) arg)->ws_row = dev_state.dwWinSize.Y;
+	    ((struct winsize *) arg)->ws_col = dev_state.dwWinSize.X;
 	    syscall_printf ("WINSZ: (row=%d,col=%d)",
 			   ((struct winsize *) arg)->ws_row,
 			   ((struct winsize *) arg)->ws_col);
@@ -1189,7 +1183,7 @@ dev_console::set_default_attr ()
 }
 
 int
-dev_console::console_attrs::set_cl_x (cltype x)
+dev_console::set_cl_x (cltype x)
 {
   if (x == cl_disp_beg || x == cl_buf_beg)
     return 0;
@@ -1201,7 +1195,7 @@ dev_console::console_attrs::set_cl_x (cltype x)
 }
 
 int
-dev_console::console_attrs::set_cl_y (cltype y)
+dev_console::set_cl_y (cltype y)
 {
   if (y == cl_buf_beg)
     return 0;
@@ -1213,7 +1207,26 @@ dev_console::console_attrs::set_cl_y (cltype y)
     return dwBufferSize.Y - 1;
   return dwCursorPosition.Y;
 }
-  
+
+bool
+dev_console::is_fullscreen (int x1, int y1, int x2, int y2)
+{
+  return !savebuf
+	 && x1 == 0 && x2 == dwWinSize.X - 1 && y1 == winTop && y2 == winBottom
+	 && dwBufferSize.Y > dwWinSize.Y;
+}
+
+void
+dev_console::scroll_window (HANDLE h)
+{
+  SMALL_RECT sr;
+  sr.Top = sr.Bottom = 1 + dwEnd.Y - winTop;
+  sr.Left = sr.Right = 0;
+  SetConsoleWindowInfo (h, FALSE, &sr);
+  dwEnd.X = 0;
+  SetConsoleCursorPosition (h, dwEnd);
+}
+
 /*
  * Clear the screen context from x1/y1 to x2/y2 cell.
  * Negative values represents current screen dimensions
@@ -1225,16 +1238,24 @@ fhandler_console::clear_screen (cltype xc1, cltype yc1, cltype xc2, cltype yc2)
   DWORD done;
   int num;
 
-  dev_state.fillin_info (get_output_handle ());
+  dev_state.fillin (get_output_handle ());
 
-  int x1 = dev_state.info.set_cl_x (xc1);
-  int y1 = dev_state.info.set_cl_y (yc1);
-  int x2 = dev_state.info.set_cl_x (xc2);
-  int y2 = dev_state.info.set_cl_y (yc2);
+  int x1 = dev_state.set_cl_x (xc1);
+  int y1 = dev_state.set_cl_y (yc1);
+  int x2 = dev_state.set_cl_x (xc2);
+  int y2 = dev_state.set_cl_y (yc2);
 
-  num = abs (y1 - y2) * dev_state.info.dwBufferSize.X + abs (x1 - x2) + 1;
+  /* Detect special case - scroll the screen if we have a buffer to
+     preserve the buffer. */
+  if (dev_state.is_fullscreen (x1, y1, x2, y2))
+    {
+      dev_state.scroll_window (get_output_handle ());
+      return;
+    }
 
-  if ((y2 * dev_state.info.dwBufferSize.X + x2) > (y1 * dev_state.info.dwBufferSize.X + x1))
+  num = abs (y1 - y2) * dev_state.dwBufferSize.X + abs (x1 - x2) + 1;
+
+  if ((y2 * dev_state.dwBufferSize.X + x2) > (y1 * dev_state.dwBufferSize.X + x1))
     {
       tlc.X = x1;
       tlc.Y = y1;
@@ -1260,7 +1281,7 @@ fhandler_console::cursor_set (bool rel_to_top, int x, int y)
 {
   COORD pos;
 
-  dev_state.fillin_info (get_output_handle ());
+  dev_state.fillin (get_output_handle ());
 #if 0
   /* Setting y to the current winBottom here is the reason that the window
      isn't scrolled back to the current cursor position like it's done in
@@ -1269,17 +1290,17 @@ fhandler_console::cursor_set (bool rel_to_top, int x, int y)
      output is generated while the user had the window scrolled back.  This
      behaviour is very old, it has no matching ChangeLog entry.
      Just disable for now but keep the code in for future reference. */
-  if (y > dev_state.info.winBottom)
-    y = dev_state.info.winBottom;
+  if (y > dev_state.winBottom)
+    y = dev_state.winBottom;
   else
 #endif
   if (y < 0)
     y = 0;
   else if (rel_to_top)
-    y += dev_state.info.winTop;
+    y += dev_state.winTop;
 
-  if (x > dev_state.info.dwWinSize.X)
-    x = dev_state.info.dwWinSize.X - 1;
+  if (x > dev_state.dwWinSize.X)
+    x = dev_state.dwWinSize.X - 1;
   else if (x < 0)
     x = 0;
 
@@ -1291,18 +1312,18 @@ fhandler_console::cursor_set (bool rel_to_top, int x, int y)
 void
 fhandler_console::cursor_rel (int x, int y)
 {
-  dev_state.fillin_info (get_output_handle ());
-  x += dev_state.info.dwCursorPosition.X;
-  y += dev_state.info.dwCursorPosition.Y;
+  dev_state.fillin (get_output_handle ());
+  x += dev_state.dwCursorPosition.X;
+  y += dev_state.dwCursorPosition.Y;
   cursor_set (false, x, y);
 }
 
 void
 fhandler_console::cursor_get (int *x, int *y)
 {
-  dev_state.fillin_info (get_output_handle ());
-  *y = dev_state.info.dwCursorPosition.Y;
-  *x = dev_state.info.dwCursorPosition.X;
+  dev_state.fillin (get_output_handle ());
+  *y = dev_state.dwCursorPosition.Y;
+  *x = dev_state.dwCursorPosition.X;
 }
 
 /* VT100 line drawing graphics mode maps `abcdefghijklmnopqrstuvwxyz{|}~ to
@@ -1474,14 +1495,14 @@ static const char base_chars[256] =
 void
 fhandler_console::char_command (char c)
 {
-  int x, y;
+  int x, y, n;
   char buf[40];
 
   switch (c)
     {
     case 'm':   /* Set Graphics Rendition */
-       for (int i = 0; i <= dev_state.nargs_; i++)
-	 switch (dev_state.args_[i])
+       for (int i = 0; i <= dev_state.nargs; i++)
+	 switch (dev_state.args[i])
 	   {
 	     case 0:    /* normal color */
 	       dev_state.set_default_attr ();
@@ -1585,7 +1606,7 @@ fhandler_console::char_command (char c)
 	{
 	    CONSOLE_CURSOR_INFO console_cursor_info;
 	    GetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
-	    switch (dev_state.args_[0])
+	    switch (dev_state.args[0])
 	      {
 		case 0: /* blinking block */
 		case 1: /* blinking block (default) */
@@ -1599,7 +1620,7 @@ fhandler_console::char_command (char c)
 		  SetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
 		  break;
 		default: /* use value as percentage */
-		  console_cursor_info.dwSize = dev_state.args_[0];
+		  console_cursor_info.dwSize = dev_state.args[0];
 		  SetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
 		  break;
 	      }
@@ -1609,7 +1630,7 @@ fhandler_console::char_command (char c)
     case 'l':
       if (!dev_state.saw_question_mark)
 	{
-	  switch (dev_state.args_[0])
+	  switch (dev_state.args[0])
 	    {
 	    case 4:    /* Insert mode */
 	      dev_state.insert_mode = (c == 'h') ? true : false;
@@ -1618,7 +1639,7 @@ fhandler_console::char_command (char c)
 	    }
 	  break;
 	}
-      switch (dev_state.args_[0])
+      switch (dev_state.args[0])
 	{
 	case 25: /* Show/Hide Cursor (DECTCEM) */
 	  {
@@ -1717,23 +1738,23 @@ fhandler_console::char_command (char c)
 	  break;
 
 	default: /* Ignore */
-	  syscall_printf ("unknown h/l command: %d", dev_state.args_[0]);
+	  syscall_printf ("unknown h/l command: %d", dev_state.args[0]);
 	  break;
 	}
       break;
     case 'J':
-      switch (dev_state.args_[0])
+      switch (dev_state.args[0])
 	{
 	case 0:			/* Clear to end of screen */
 	  clear_screen (cl_curr_pos, cl_curr_pos, cl_disp_end, cl_disp_end);
 	  break;
 	case 1:			/* Clear from beginning of screen to cursor */
-	  cursor_get (&x, &y);
 	  clear_screen (cl_disp_beg, cl_disp_beg, cl_curr_pos, cl_curr_pos);
 	  break;
 	case 2:			/* Clear screen */
+	  cursor_get (&x, &y);
 	  clear_screen (cl_disp_beg, cl_disp_beg, cl_disp_end, cl_disp_end);
-	  cursor_set (true, 0, 0);
+	  cursor_set (false, x, y);
 	  break;
 	default:
 	  goto bad_escape;
@@ -1741,19 +1762,19 @@ fhandler_console::char_command (char c)
       break;
 
     case 'A':
-      cursor_rel (0, -(dev_state.args_[0] ? dev_state.args_[0] : 1));
+      cursor_rel (0, -(dev_state.args[0] ?: 1));
       break;
     case 'B':
-      cursor_rel (0, dev_state.args_[0] ? dev_state.args_[0] : 1);
+      cursor_rel (0, dev_state.args[0] ?: 1);
       break;
     case 'C':
-      cursor_rel (dev_state.args_[0] ? dev_state.args_[0] : 1, 0);
+      cursor_rel (dev_state.args[0] ?: 1, 0);
       break;
     case 'D':
-      cursor_rel (-(dev_state.args_[0] ? dev_state.args_[0] : 1),0);
+      cursor_rel (-(dev_state.args[0] ?: 1),0);
       break;
     case 'K':
-      switch (dev_state.args_[0])
+      switch (dev_state.args[0])
 	{
 	  case 0:		/* Clear to end of line */
 	    clear_screen (cl_curr_pos, cl_curr_pos, cl_disp_end, cl_curr_pos);
@@ -1770,20 +1791,20 @@ fhandler_console::char_command (char c)
       break;
     case 'H':
     case 'f':
-      cursor_set (true, (dev_state.args_[1] ? dev_state.args_[1] : 1) - 1,
-			(dev_state.args_[0] ? dev_state.args_[0] : 1) - 1);
+      cursor_set (true, (dev_state.args[1] ?: 1) - 1,
+			(dev_state.args[0] ?: 1) - 1);
       break;
     case 'G':   /* hpa - position cursor at column n - 1 */
       cursor_get (&x, &y);
-      cursor_set (false, (dev_state.args_[0] ? dev_state.args_[0] - 1 : 0), y);
+      cursor_set (false, (dev_state.args[0] ? dev_state.args[0] - 1 : 0), y);
       break;
     case 'd':   /* vpa - position cursor at line n */
       cursor_get (&x, &y);
-      cursor_set (true, x, (dev_state.args_[0] ? dev_state.args_[0] - 1 : 0));
+      cursor_set (true, x, (dev_state.args[0] ? dev_state.args[0] - 1 : 0));
       break;
     case 's':   /* Save cursor position */
       cursor_get (&dev_state.savex, &dev_state.savey);
-      dev_state.savey -= dev_state.info.winTop;
+      dev_state.savey -= dev_state.winTop;
       break;
     case 'u':   /* Restore cursor position */
       cursor_set (true, dev_state.savex, dev_state.savey);
@@ -1793,39 +1814,39 @@ fhandler_console::char_command (char c)
       cursor_set (false, 8 * (x / 8 + 1), y);
       break;
     case 'L':				/* AL - insert blank lines */
-      dev_state.args_[0] = dev_state.args_[0] ? dev_state.args_[0] : 1;
+      n = dev_state.args[0] ?: 1;
       cursor_get (&x, &y);
-      scroll_screen (0, y, -1, -1, 0, y + dev_state.args_[0]);
+      scroll_buffer (0, y, -1, -1, 0, y + n);
       break;
     case 'M':				/* DL - delete lines */
-      dev_state.args_[0] = dev_state.args_[0] ? dev_state.args_[0] : 1;
+      n = dev_state.args[0] ?: 1;
       cursor_get (&x, &y);
-      scroll_screen (0, y + dev_state.args_[0], -1, -1, 0, y);
+      scroll_buffer (0, y + dev_state.args[0], -1, -1, 0, y);
       break;
     case '@':				/* IC - insert chars */
-      dev_state.args_[0] = dev_state.args_[0] ? dev_state.args_[0] : 1;
+      n = dev_state.args[0] ?: 1;
       cursor_get (&x, &y);
-      scroll_screen (x, y, -1, y, x + dev_state.args_[0], y);
+      scroll_buffer (x, y, -1, y, x + n, y);
       break;
     case 'P':				/* DC - delete chars */
-      dev_state.args_[0] = dev_state.args_[0] ? dev_state.args_[0] : 1;
+      n = dev_state.args[0] ?: 1;
       cursor_get (&x, &y);
-      scroll_screen (x + dev_state.args_[0], y, -1, y, x, y);
+      scroll_buffer (x + n, y, -1, y, x, y);
       break;
     case 'S':				/* SF - Scroll forward */
-      dev_state.args_[0] = dev_state.args_[0] ? dev_state.args_[0] : 1;
-      scroll_screen (0, dev_state.args_[0], -1, -1, 0, 0);
+      n = dev_state.args[0] ?: 1;
+      scroll_buffer (0, n, -1, -1, 0, 0);
       break;
     case 'T':				/* SR - Scroll down */
-      dev_state.fillin_info (get_output_handle ());
-      dev_state.args_[0] = dev_state.args_[0] ? dev_state.args_[0] : 1;
-      scroll_screen (0, 0, -1, -1, 0, dev_state.info.winTop + dev_state.args_[0]);
+      dev_state.fillin (get_output_handle ());
+      n = dev_state.winTop + dev_state.args[0] ?: 1;
+      scroll_buffer (0, dev_state.winTop, -1, -1, 0, n);
       break;
     case 'X':				/* ec - erase chars */
-      dev_state.args_[0] = dev_state.args_[0] ? dev_state.args_[0] : 1;
+      n = dev_state.args[0] ?: 1;
       cursor_get (&x, &y);
-      scroll_screen (x + dev_state.args_[0], y, -1, y, x, y);
-      scroll_screen (x, y, -1, y, x + dev_state.args_[0], y);
+      scroll_buffer (x + n, y, -1, y, x, y);
+      scroll_buffer (x, y, -1, y, x + n, y);
       break;
     case 'Z':				/* Back tab */
       cursor_get (&x, &y);
@@ -1835,10 +1856,10 @@ fhandler_console::char_command (char c)
       if (dev_state.insert_mode)
 	{
 	  cursor_get (&x, &y);
-	  scroll_screen (x, y, -1, y, x + dev_state.args_[1], y);
+	  scroll_buffer (x, y, -1, y, x + dev_state.args[1], y);
 	}
-      while (dev_state.args_[1]--)
-	WriteFile (get_output_handle (), &dev_state.args_[0], 1, (DWORD *) &x, 0);
+      while (dev_state.args[1]--)
+	WriteFile (get_output_handle (), &dev_state.args[0], 1, (DWORD *) &x, 0);
       break;
     case 'c':				/* u9 - Terminal enquire string */
       if (dev_state.saw_greater_than_sign)
@@ -1854,12 +1875,12 @@ fhandler_console::char_command (char c)
       puts_readahead (buf);
       break;
     case 'n':
-      switch (dev_state.args_[0])
+      switch (dev_state.args[0])
 	{
 	case 6:				/* u7 - Cursor position request */
 	  cursor_get (&x, &y);
-	  y -= dev_state.info.winTop;
-	  /* x -= dev_state.info.winLeft;		// not available yet */
+	  y -= dev_state.winTop;
+	  /* x -= dev_state.winLeft;		// not available yet */
 	  __small_sprintf (buf, "\033[%d;%dR", y + 1, x + 1);
 	  puts_readahead (buf);
 	  break;
@@ -1868,8 +1889,8 @@ fhandler_console::char_command (char c)
 	}
       break;
     case 'r':				/* Set Scroll region */
-      dev_state.scroll_region.Top = dev_state.args_[0] ? dev_state.args_[0] - 1 : 0;
-      dev_state.scroll_region.Bottom = dev_state.args_[1] ? dev_state.args_[1] - 1 : -1;
+      dev_state.scroll_region.Top = dev_state.args[0] ? dev_state.args[0] - 1 : 0;
+      dev_state.scroll_region.Bottom = dev_state.args[1] ? dev_state.args[1] - 1 : -1;
       cursor_set (true, 0, 0);
       break;
     case 'g':				/* TAB set/clear */
@@ -2011,7 +2032,7 @@ do_print:
 	{
 	  int x, y;
 	  cursor_get (&x, &y);
-	  scroll_screen (x, y, -1, y, x + buf_len, y);
+	  scroll_buffer (x, y, -1, y, x + buf_len, y);
 	}
 
       if (!write_console (write_buf, buf_len, done))
@@ -2041,17 +2062,17 @@ do_print:
 	  beep ();
 	  break;
 	case ESC:
-	  dev_state.state_ = gotesc;
+	  dev_state.state = gotesc;
 	  break;
 	case DWN:
 	  cursor_get (&x, &y);
 	  if (y >= srBottom)
 	    {
-	      if (y >= dev_state.info.winBottom && !dev_state.scroll_region.Top)
+	      if (y >= dev_state.winBottom && !dev_state.scroll_region.Top)
 		WriteConsoleW (get_output_handle (), L"\n", 1, &done, 0);
 	      else
 		{
-		  scroll_screen (0, srTop + 1, -1, srBottom, 0, srTop);
+		  scroll_buffer (0, srTop + 1, -1, srBottom, 0, srTop);
 		  y--;
 		}
 	    }
@@ -2123,8 +2144,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 
   while (src < end)
     {
-      paranoid_printf ("char %0c state is %d", *src, dev_state.state_);
-      switch (dev_state.state_)
+      paranoid_printf ("char %0c state is %d", *src, dev_state.state);
+      switch (dev_state.state)
 	{
 	case normal:
 	  src = write_normal (src, end);
@@ -2134,33 +2155,33 @@ fhandler_console::write (const void *vsrc, size_t len)
 	case gotesc:
 	  if (*src == '[')		/* CSI Control Sequence Introducer */
 	    {
-	      dev_state.state_ = gotsquare;
+	      dev_state.state = gotsquare;
 	      dev_state.saw_question_mark = false;
 	      dev_state.saw_greater_than_sign = false;
 	      dev_state.saw_space = false;
-	      for (dev_state.nargs_ = 0; dev_state.nargs_ < MAXARGS; dev_state.nargs_++)
-		dev_state.args_[dev_state.nargs_] = 0;
-	      dev_state.nargs_ = 0;
+	      for (dev_state.nargs = 0; dev_state.nargs < MAXARGS; dev_state.nargs++)
+		dev_state.args[dev_state.nargs] = 0;
+	      dev_state.nargs = 0;
 	    }
 	  else if (*src == ']')		/* OSC Operating System Command */
 	    {
 	      dev_state.rarg = 0;
 	      dev_state.my_title_buf[0] = '\0';
-	      dev_state.state_ = gotrsquare;
+	      dev_state.state = gotrsquare;
 	    }
 	  else if (*src == '(')		/* Designate G0 character set */
 	    {
-	      dev_state.state_ = gotparen;
+	      dev_state.state = gotparen;
 	    }
 	  else if (*src == ')')		/* Designate G1 character set */
 	    {
-	      dev_state.state_ = gotrparen;
+	      dev_state.state = gotrparen;
 	    }
 	  else if (*src == 'M')		/* Reverse Index (scroll down) */
 	    {
-	      dev_state.fillin_info (get_output_handle ());
-	      scroll_screen (0, 0, -1, -1, 0, dev_state.info.winTop + 1);
-	      dev_state.state_ = normal;
+	      dev_state.fillin (get_output_handle ());
+	      scroll_buffer (0, 0, -1, -1, 0, dev_state.winTop + 1);
+	      dev_state.state = normal;
 	    }
 	  else if (*src == 'c')		/* RIS Full Reset */
 	    {
@@ -2170,60 +2191,60 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      dev_state.iso_2022_G1 = false;
 	      cursor_set (false, 0, 0);
 	      clear_screen (cl_buf_beg, cl_buf_beg, cl_buf_end, cl_buf_end);
-	      dev_state.state_ = normal;
+	      dev_state.state = normal;
 	    }
 	  else if (*src == '8')		/* DECRC Restore cursor position */
 	    {
 	      cursor_set (true, dev_state.savex, dev_state.savey);
-	      dev_state.state_ = normal;
+	      dev_state.state = normal;
 	    }
 	  else if (*src == '7')		/* DECSC Save cursor position */
 	    {
 	      cursor_get (&dev_state.savex, &dev_state.savey);
-	      dev_state.savey -= dev_state.info.winTop;
-	      dev_state.state_ = normal;
+	      dev_state.savey -= dev_state.winTop;
+	      dev_state.state = normal;
 	    }
 	  else if (*src == 'R')		/* ? */
-	      dev_state.state_ = normal;
+	      dev_state.state = normal;
 	  else
 	    {
-	      dev_state.state_ = normal;
+	      dev_state.state = normal;
 	    }
 	  src++;
 	  break;
 	case gotarg1:
 	  if (isdigit (*src))
 	    {
-	      dev_state.args_[dev_state.nargs_] = dev_state.args_[dev_state.nargs_] * 10 + *src - '0';
+	      dev_state.args[dev_state.nargs] = dev_state.args[dev_state.nargs] * 10 + *src - '0';
 	      src++;
 	    }
 	  else if (*src == ';')
 	    {
 	      src++;
-	      dev_state.nargs_++;
-	      if (dev_state.nargs_ >= MAXARGS)
-		dev_state.nargs_--;
+	      dev_state.nargs++;
+	      if (dev_state.nargs >= MAXARGS)
+		dev_state.nargs--;
 	    }
 	  else if (*src == ' ')
 	    {
 	      src++;
 	      dev_state.saw_space = true;
-	      dev_state.state_ = gotcommand;
+	      dev_state.state = gotcommand;
 	    }
 	  else
-	    dev_state.state_ = gotcommand;
+	    dev_state.state = gotcommand;
 	  break;
 	case gotcommand:
 	  char_command (*src++);
-	  dev_state.state_ = normal;
+	  dev_state.state = normal;
 	  break;
 	case gotrsquare:
 	  if (isdigit (*src))
 	    dev_state.rarg = dev_state.rarg * 10 + (*src - '0');
 	  else if (*src == ';' && (dev_state.rarg == 2 || dev_state.rarg == 0))
-	    dev_state.state_ = gettitle;
+	    dev_state.state = gettitle;
 	  else
-	    dev_state.state_ = eattitle;
+	    dev_state.state = eattitle;
 	  src++;
 	  break;
 	case eattitle:
@@ -2232,9 +2253,9 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    int n = strlen (dev_state.my_title_buf);
 	    if (*src < ' ')
 	      {
-		if (*src == '\007' && dev_state.state_ == gettitle)
+		if (*src == '\007' && dev_state.state == gettitle)
 		  set_console_title (dev_state.my_title_buf);
-		dev_state.state_ = normal;
+		dev_state.state = normal;
 	      }
 	    else if (n < TITLESIZE)
 	      {
@@ -2247,12 +2268,12 @@ fhandler_console::write (const void *vsrc, size_t len)
 	case gotsquare:
 	  if (*src == ';')
 	    {
-	      dev_state.state_ = gotarg1;
-	      dev_state.nargs_++;
+	      dev_state.state = gotarg1;
+	      dev_state.nargs++;
 	      src++;
 	    }
 	  else if (isalpha (*src))
-	    dev_state.state_ = gotcommand;
+	    dev_state.state = gotcommand;
 	  else if (*src != '@' && !isalpha (*src) && !isdigit (*src))
 	    {
 	      if (*src == '?')
@@ -2263,14 +2284,14 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      src++;
 	    }
 	  else
-	    dev_state.state_ = gotarg1;
+	    dev_state.state = gotarg1;
 	  break;
 	case gotparen:	/* Designate G0 Character Set (ISO 2022) */
 	  if (*src == '0')
 	    dev_state.vt100_graphics_mode_G0 = true;
 	  else
 	    dev_state.vt100_graphics_mode_G0 = false;
-	  dev_state.state_ = normal;
+	  dev_state.state = normal;
 	  src++;
 	  break;
 	case gotrparen:	/* Designate G1 Character Set (ISO 2022) */
@@ -2278,7 +2299,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    dev_state.vt100_graphics_mode_G1 = true;
 	  else
 	    dev_state.vt100_graphics_mode_G1 = false;
-	  dev_state.state_ = normal;
+	  dev_state.state = normal;
 	  src++;
 	  break;
 	}

@@ -16,3 +16,6 @@ What changed:
 Bug Fixes
 ---------
 
+- Try harder to do the right thing in the presence of console screen buffers,
+  i.e., never clear the screen buffer unless the user asked for it.  Also
+  fix screen escape sequences which attempted to scroll the screen.
