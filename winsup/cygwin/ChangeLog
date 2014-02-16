@@ -1,3 +1,8 @@
+2014-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (dll_crt0_1): Call initial_setlocale before fetching
+	current user information.
+
 2014-02-15  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* DevNotes: Add entry cgf-000024.

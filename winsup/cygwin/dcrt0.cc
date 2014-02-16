@@ -929,13 +929,13 @@ dll_crt0_1 (void *)
   /* Allocate cygheap->fdtab */
   dtable_init ();
 
+  /* Set internal locale to the environment settings. */
+  initial_setlocale ();
+
   uinfo_init ();	/* initialize user info */
 
   /* Connect to tty. */
   tty::init_session ();
-
-  /* Set internal locale to the environment settings. */
-  initial_setlocale ();
 
   if (!__argc)
     {
