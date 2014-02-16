@@ -222,6 +222,7 @@ public:
   inline cygsid () : cygpsid ((PSID) sbuf), well_known_sid (false) {}
   inline cygsid (const PSID nsid) { *this = nsid; }
   inline cygsid (const char *nstrsid) { *this = nstrsid; }
+  inline cygsid (cygsid &nsid) { *this = nsid; }
 
   inline PSID set () { return psid = (PSID) sbuf; }
 

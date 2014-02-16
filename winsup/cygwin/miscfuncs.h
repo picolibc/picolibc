@@ -38,7 +38,8 @@ public:
   NT_readline () : fh (NULL) {}
   bool init (POBJECT_ATTRIBUTES attr, char *buf, ULONG buflen);
   PCHAR gets ();
-  ~NT_readline () { if (fh) NtClose (fh); }
+  void close () { if (fh) NtClose (fh); fh = NULL; }
+  ~NT_readline () { close (); }
 };
 
 extern "C" void yield ();

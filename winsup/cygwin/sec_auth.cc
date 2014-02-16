@@ -673,7 +673,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 	*pintern = intern = !memcmp (ts.SourceName, "Cygwin.1", 8);
     }
   /* Verify usersid */
-  cygsid tok_usersid = NO_SID;
+  cygsid tok_usersid (NO_SID);
   status = NtQueryInformationToken (token, TokenUser, &tok_usersid,
 				    sizeof tok_usersid, &size);
   if (!NT_SUCCESS (status))

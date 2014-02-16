@@ -1,5 +1,13 @@
 2014-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.h (NT_readline::close): New function to close handle.
+	(NT_readline::~NT_readline): Call close.
+	* sec_auth.cc (verify_token): Use constructor to initialize tok_usersid.
+	* security.h (cygsid::cygsid): Add copy constructor taking cygsid as
+	source.
+
+2014-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (dll_crt0_1): Call initial_setlocale before fetching
 	current user information.
 
