@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#pragma once
+
 #pragma push_macro ("DECLSPEC_IMPORT")
 #undef DECLSPEC_IMPORT
 #define DECLSPEC_IMPORT
@@ -32,6 +34,7 @@ class cyg_ldap {
   PWCHAR *val;
   PWCHAR *attr;
   bool isAD;
+  ULONG msg_id;
 
   bool connect_ssl (PCWSTR domain);
   bool connect_non_ssl (PCWSTR domain);
@@ -42,7 +45,7 @@ class cyg_ldap {
 
 public:
   cyg_ldap () : lh (NULL), rootdse (NULL), msg (NULL), entry (NULL),
-		val (NULL), isAD (false)
+		val (NULL), isAD (false), msg_id ((ULONG) -1)
   {}
   ~cyg_ldap () { close (); }
 
@@ -50,6 +53,8 @@ public:
   bool open (PCWSTR in_domain);
   void close ();
   bool fetch_ad_account (PSID sid, bool group);
+  bool enumerate_ad_accounts (PCWSTR domain, bool group);
+  bool next_account (cygsid &sid);
   uint32_t fetch_posix_offset_for_domain (PCWSTR domain);
   uid_t remap_uid (uid_t uid);
   gid_t remap_gid (gid_t gid);

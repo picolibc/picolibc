@@ -400,12 +400,14 @@ class cygheap_pwdgrp
     NSS_PRIMARY,
     NSS_ALWAYS
   };
-  bool  nss_inited;
-  int   pwd_src;
-  int   grp_src;
-  pfx_t prefix;
-  WCHAR separator[2];
-  bool  caching;
+  bool   nss_inited;
+  int    pwd_src;
+  int    grp_src;
+  pfx_t  prefix;
+  WCHAR  separator[2];
+  bool   caching;
+  int	 enums;
+  PWCHAR enum_tdoms;
 
   void nss_init_line (const char *line);
   void _nss_init ();
@@ -432,6 +434,8 @@ public:
   inline bool nss_prefix_always () const { return prefix == NSS_ALWAYS; }
   inline PCWSTR nss_separator () const { return separator; }
   inline bool nss_db_caching () const { return caching; }
+  inline int nss_db_enums () const { return enums; }
+  inline PCWSTR nss_db_enum_tdoms () const { return enum_tdoms; }
 };
 
 class cygheap_ugid_cache

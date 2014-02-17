@@ -562,15 +562,18 @@ cygheap_pwdgrp::init ()
      db_prefix: auto
      db_cache: yes
      db_separator: +
+     db_enum: cache builtin
   */
   pwd_src = (NSS_FILES | NSS_DB);
   grp_src = (NSS_FILES | NSS_DB);
   prefix = NSS_AUTO;
   separator[0] = L'+';
   caching = true;
+  enums = (ENUM_CACHE | ENUM_BUILTIN);
+  enum_tdoms = NULL;
 }
 
-/* The /etc/nssswitch.conf file is read exactly once by the root process of a
+/* The /etc/nsswitch.conf file is read exactly once by the root process of a
    process tree.  We can't afford methodical changes during the lifetime of a 
    process tree. */
 void
@@ -661,6 +664,58 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 	    caching = false;
 	  else
 	    debug_printf ("Invalid nsswitch.conf content: %s", line);
+	}
+      else if (!strncmp (c, "enum:", 5))
+	{
+	  tmp_pathbuf tp;
+	  char *tdoms = tp.c_get ();
+	  char *td = tdoms;
+	  int new_enums = ENUM_NONE;
+
+	  td[0] = '\0';
+	  c += 5;
+	  c += strspn (c, " \t");
+	  while (!strchr (" \t", *c))
+	    {
+	      const char *e = c + strcspn (c, " \t");
+	      if (!strncmp (c, "none", 4) && strchr (" \t", c[4]))
+		new_enums = ENUM_NONE;
+	      else if (!strncmp (c, "builtin", 7) && strchr (" \t", c[7]))
+		new_enums |= ENUM_BUILTIN;
+	      else if (!strncmp (c, "cache", 5) && strchr (" \t", c[5]))
+		new_enums |= ENUM_CACHE;
+	      else if (!strncmp (c, "files", 5) && strchr (" \t", c[5]))
+		new_enums |= ENUM_FILES;
+	      else if (!strncmp (c, "local", 5) && strchr (" \t", c[5]))
+		new_enums |= ENUM_LOCAL;
+	      else if (!strncmp (c, "primary", 7) && strchr (" \t", c[7]))
+		new_enums |= ENUM_PRIMARY;
+	      else if (!strncmp (c, "alltrusted", 10) && strchr (" \t", c[10]))
+		new_enums |= ENUM_TDOMS | ENUM_TDOMS_ALL;
+	      else if (!strncmp (c, "all", 3) && strchr (" \t", c[3]))
+		new_enums |= ENUM_ALL;
+	      else
+		{
+		  td = stpcpy (stpncpy (td, c, e - c), " ");
+		  new_enums |= ENUM_TDOMS;
+		}
+	      c = e;
+	      c += strspn (c, " \t");
+	    }
+	  if ((new_enums & (ENUM_TDOMS | ENUM_TDOMS_ALL)) == ENUM_TDOMS)
+	    {
+	      if (td > tdoms)
+		{
+		  PWCHAR spc;
+		  sys_mbstowcs_alloc (&enum_tdoms, HEAP_BUF, tdoms);
+		  /* Convert string to REG_MULTI_SZ-style. */
+		  while ((spc = wcsrchr (enum_tdoms, L' ')))
+		    *spc = L'\0';
+		}
+	      else
+	      	new_enums &= ~(ENUM_TDOMS | ENUM_TDOMS_ALL);
+	    }
+	  enums = new_enums;
 	}
       break;
     case '\0':
@@ -867,15 +922,17 @@ get_logon_sid ()
 }
 
 void *
-pwdgrp::add_account_post_fetch (char *line)
+pwdgrp::add_account_post_fetch (char *line, bool lock)
 {
   if (line)
     { 
       void *ret;
-      pglock.init ("pglock")->acquire ();
+      if (lock)
+	pglock.init ("pglock")->acquire ();
       add_line (line);
       ret = ((char *) pwdgrp_buf) + (curr_lines - 1) * pwdgrp_buf_elem_size;
-      pglock.release ();
+      if (lock)
+	pglock.release ();
       return ret;
     }
   return NULL;
@@ -890,7 +947,7 @@ pwdgrp::add_account_from_file (cygpsid &sid)
   arg.type = SID_arg;
   arg.sid = &sid;
   char *line = fetch_account_from_file (arg);
-  return (struct passwd *) add_account_post_fetch (line);
+  return (struct passwd *) add_account_post_fetch (line, true);
 }
 
 void *
@@ -902,7 +959,7 @@ pwdgrp::add_account_from_file (const char *name)
   arg.type = NAME_arg;
   arg.name = name;
   char *line = fetch_account_from_file (arg);
-  return (struct passwd *) add_account_post_fetch (line);
+  return (struct passwd *) add_account_post_fetch (line, true);
 }
 
 void *
@@ -914,7 +971,7 @@ pwdgrp::add_account_from_file (uint32_t id)
   arg.type = ID_arg;
   arg.id = id;
   char *line = fetch_account_from_file (arg);
-  return (struct passwd *) add_account_post_fetch (line);
+  return (struct passwd *) add_account_post_fetch (line, true);
 }
 
 void *
@@ -927,8 +984,8 @@ pwdgrp::add_account_from_windows (cygpsid &sid, bool group)
   if (!line)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
-    return add_account_post_fetch (line);
-  return (prep_tls_pwbuf ())->add_account_post_fetch (line);
+    return add_account_post_fetch (line, true);
+  return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
 }
 
 void *
@@ -941,8 +998,8 @@ pwdgrp::add_account_from_windows (const char *name, bool group)
   if (!line)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
-    return add_account_post_fetch (line);
-  return (prep_tls_pwbuf ())->add_account_post_fetch (line);
+    return add_account_post_fetch (line, true);
+  return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
 }
 
 void *
@@ -955,8 +1012,8 @@ pwdgrp::add_account_from_windows (uint32_t id, bool group)
   if (!line)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
-    return add_account_post_fetch (line);
-  return (prep_tls_pwbuf ())->add_account_post_fetch (line);
+    return add_account_post_fetch (line, true);
+  return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
 }
 
 /* Check if file exists and if it has been written to since last checked.
@@ -1149,6 +1206,28 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
     case SID_arg:
       sid = *arg.sid;
       ret = LookupAccountSidW (NULL, sid, name, &nlen, dom, &dlen, &acc_type);
+      if (!ret
+	  && cygheap->dom.member_machine ()
+	  && sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
+	  && sid_sub_auth (sid, 0) == SECURITY_BUILTIN_DOMAIN_RID)
+	{
+	  /* LookupAccountSid called on a non-DC cannot resolve aliases which
+	     are not defined in the local SAM.  If we encounter an alias which
+	     can't be resolved, and if we're a domain member machine, ask a DC.
+	     Do *not* use LookupAccountSidW.  It can take ages when called on a
+	     DC for some weird reason.  Use LDAP instead. */
+	  PWCHAR val;
+
+	  if ((ldap_open = cldap.open (NULL))
+	      && cldap.fetch_ad_account (sid, group)
+	      && (val = cldap.get_group_name ()))
+	    {
+	      wcpcpy (name, val);
+	      wcpcpy (dom, L"BUILTIN");
+	      acc_type = SidTypeAlias;
+	      ret = true;
+	    }
+	}
       if (!ret)
 	debug_printf ("LookupAccountSid(%W), %E", sid.string (sidstr));
       break;
@@ -1478,7 +1557,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 		  /* Set comment variable for below attribute loop. */
 		  comment = ui->usri4_comment;
 		}
-	      else /* SidTypeGroup || SidTypeAlias */
+	      else if (acc_type == SidTypeAlias)
 		{
 		  nas = NetLocalGroupGetInfo (NULL, name, 1, (PBYTE *) &gi);
 		  if (nas != NERR_Success)
@@ -1489,6 +1568,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 		  /* Set comment variable for below attribute loop. */
 		  comment = gi->lgrpi1_comment;
 		}
+	      else /* SidTypeGroup.  No way to add a comment to "None" :(  */
+		break;
 	      /* Local SAM accounts have only a handful attributes
 		 available to home users.  Therefore, fetch additional
 		 passwd/group attributes from the "Description" field

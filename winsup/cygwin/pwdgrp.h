@@ -23,6 +23,8 @@ extern struct group *internal_getgrnam (const char *);
 int internal_getgroups (int, gid_t *, cygpsid * = NULL);
 
 #include "sync.h"
+#include "ldap.h"
+#include "miscfuncs.h"
 
 enum fetch_user_arg_type_t {
   SID_arg,
@@ -56,6 +58,10 @@ struct pg_grp
 
 class pwdgrp
 {
+  friend class pg_ent;
+  friend class pw_ent;
+  friend class gr_ent;
+
   unsigned pwdgrp_buf_elem_size;
   void *pwdgrp_buf;
   bool (pwdgrp::*parse) ();
@@ -87,7 +93,7 @@ class pwdgrp
     i = (int) x;
     return res;
   }
-  void *add_account_post_fetch (char *line);
+  void *add_account_post_fetch (char *line, bool lock);
   void *add_account_from_file (cygpsid &sid);
   void *add_account_from_file (const char *name);
   void *add_account_from_file (uint32_t id);
@@ -103,6 +109,7 @@ class pwdgrp
 public:
   ULONG cached_users () const { return curr_lines; }
   ULONG cached_groups () const { return curr_lines; }
+  POBJECT_ATTRIBUTES file_attr () { return &attr; }
   bool check_file (bool group);
 
   void init_pwd ();
@@ -140,4 +147,97 @@ public:
   struct group *find_group (cygpsid &sid);
   struct group *find_group (const char *name);
   struct group *find_group (gid_t gid);
+};
+
+enum nss_enum_t
+{
+  ENUM_NONE = 0x00,
+  ENUM_CACHE = 0x01,
+  ENUM_FILES = 0x02,
+  ENUM_BUILTIN = 0x04,
+  ENUM_LOCAL = 0x08,
+  ENUM_PRIMARY = 0x10,
+  ENUM_TDOMS = 0x20,
+  ENUM_TDOMS_ALL = 0x40,
+  ENUM_ALL = 0x7f
+};
+
+class pg_ent
+{
+protected:
+  pwdgrp        pg;
+  bool		group;
+  pg_pwd        pwd;
+  pg_grp        grp;
+  NT_readline	rl;
+  cyg_ldap	cldap;
+  PCHAR         buf;
+  ULONG         cnt;
+  ULONG         max;
+  ULONG_PTR     resume;
+  int           enums;
+  PCWSTR        enum_tdoms;
+  bool		from_files;
+  bool		from_db;
+  enum {
+    rewound = 0,
+    from_cache,
+    from_file,
+    from_builtin,
+    from_local,
+    from_sam,
+    from_ad,
+    finished
+  } state;
+
+  void clear_cache ();
+  inline bool nss_db_enum_caches () const { return !!(enums & ENUM_CACHE); }
+  inline bool nss_db_enum_files () const { return !!(enums & ENUM_FILES); }
+  inline bool nss_db_enum_builtin () const { return !!(enums & ENUM_BUILTIN); }
+  inline bool nss_db_enum_local () const { return !!(enums & ENUM_LOCAL); }
+  inline bool nss_db_enum_primary () const { return !!(enums & ENUM_PRIMARY); }
+  inline bool nss_db_enum_tdom (PWCHAR domain)
+    {
+      if (enums & ENUM_TDOMS_ALL)
+        return true;
+      if (!(enums & ENUM_TDOMS) || !enum_tdoms || !domain)
+        return false;
+      for (PCWSTR td = enum_tdoms; td && *td; td = wcschr (td, L'\0'))
+        if (!wcscasecmp (td, domain))
+          return true;
+      return false;
+    }
+  virtual void *enumerate_caches () = 0;
+  virtual void *enumerate_file ();
+  virtual void *enumerate_builtin ();
+  virtual void *enumerate_local () = 0;
+  virtual void *enumerate_sam ();
+  virtual void *enumerate_ad ();
+
+public:
+  void setent (bool _group, int _enums = 0, PCWSTR _enum_tdoms = NULL);
+  void *getent ();
+  void endent (bool _group);
+};
+
+class pw_ent : public pg_ent
+{
+  void *enumerate_caches ();
+  void *enumerate_local ();
+public:
+  inline void setpwent (int _enums = 0, PCWSTR _enum_tdoms = NULL)
+    { setent (false, _enums, _enum_tdoms); }
+  struct passwd *getpwent ();
+  inline void endpwent () { endent (false); }
+};
+
+class gr_ent : public pg_ent
+{
+  void *enumerate_caches ();
+  void *enumerate_local ();
+public:
+  inline void setgrent (int _enums = 0, PCWSTR _enum_tdoms = NULL)
+    { setent (true, _enums, _enum_tdoms); }
+  struct group *getgrent ();
+  inline void endgrent () { endent (true); }
 };

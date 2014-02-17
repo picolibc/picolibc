@@ -82,11 +82,9 @@ struct _local_storage
   /* passwd.cc */
   void *pwbuf;
   char pass[_PASSWORD_LEN];
-  ULONG pw_pos;
 
   /* grp.cc */
   void *grbuf;
-  ULONG grp_pos;
 
   /* dlfcn.cc */
   int dl_error;

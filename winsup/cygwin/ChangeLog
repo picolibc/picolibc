@@ -1,3 +1,72 @@
+2014-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (ldap_abandon): Import.
+	(ldap_result): Import.
+	(ldap_searchW): Import.
+	(NetGroupEnum): Import.
+	(NetLocalGroupEnum): Import.
+	(NetUserEnum): Import.
+	* cygheap.h (class cygheap_pwdgrp): Add members enums and enum_tdoms.
+	(cygheap_pwdgrp::nss_db_enums): New inline method.
+	(cygheap_pwdgrp::nss_db_enum_tdoms): Ditto.
+	* cygtls.h (struct _local_storage): Drop unused members pw_pos and
+	grp_pos.
+	* grp.cc (grent): New static variable of class gr_ent.
+	(gr_ent::enumerate_caches): New method.
+	(gr_ent::enumerate_local): New method.
+	(gr_ent::getgrent): New method.
+	(setgrent): Call gr_ent method.
+	(getgrent32): Ditto.
+	(endgrent): Ditto.
+	* ldap.cc (sid_attr): Rename from nfs_attr.
+	(cyg_ldap::close): Abandon still running asynchronous search.
+	(cyg_ldap::fetch_ad_account): Reduce filter buffer size.
+	(cyg_ldap::enumerate_ad_accounts): New method.
+	(cyg_ldap::next_account): New method.
+	(cyg_ldap::fetch_posix_offset_for_domain): Reduce filter buffer size.
+	(cyg_ldap::fetch_unix_sid_from_ad): Ditto.  Fix return value in case
+	no value has been read.
+	(cyg_ldap::fetch_unix_name_from_rfc2307): Reduce filter buffer size.
+	* ldap.h (class cyg_ldap): Add msg_id member.
+	(cyg_ldap::enumerate_ad_accounts): Declare.
+	(cyg_ldap::next_account): Declare:
+	* passwd.cc (pwent): New static variable of class pw_ent.
+	(pg_ent::clear_cache): New method.
+	(pg_ent::setent): New method.
+	(pg_ent::getent): New method.
+	(pg_ent::endent): New method.
+	(pg_ent::enumerate_file): New method.
+	(pg_ent::enumerate_builtin): New method.
+	(pg_ent::enumerate_sam): New method.
+	(pg_ent::enumerate_ad): New method.
+	(pw_ent::enumerate_caches): New method.
+	(pw_ent::enumerate_local): New method.
+	(pw_ent::getpwent): New method.
+	(setpwent): Call pw_ent method.
+	(getpwent): Ditto.
+	(endpwent): Ditto.
+	* pwdgrp.h (class pwdgrp): Define pg_ent, pw_ent and gr_ent as friend
+	classes.
+	(pwdgrp::add_account_post_fetch): Declare with extra bool parameter.
+	(pwdgrp::file_attr): New inline method.
+	(enum nss_enum_t): Define.
+	(class pg_ent): Define.
+	(class pw_ent): Define.
+	(class gr_ent): Define.
+	* tlsoffsets.h: Regenerate.
+	* tlsoffsets64.h: Ditto.
+	* uinfo.cc (cygheap_pwdgrp::init): Initialize enums and enum_tdoms.
+	(cygheap_pwdgrp::nss_init_line): Fix typo in preceeding comment.
+	Handle new "db_enum" keyword.
+	(pwdgrp::add_account_post_fetch): Take additional `bool lock' parameter
+	and acquire pglock before adding element to array if lock is true.
+	(pwdgrp::add_account_from_file): Call add_account_post_fetch with lock
+	set to true.
+	(pwdgrp::add_account_from_windows): Ditto in case of caching.
+	(pwdgrp::fetch_account_from_windows): Handle builtin aliases only
+	known to the domain controller.  Only call NetLocalGroupGetInfo for
+	aliases.
+
 2014-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.h (NT_readline::close): New function to close handle.

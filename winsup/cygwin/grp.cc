@@ -13,6 +13,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <lm.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +24,9 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
+#include "miscfuncs.h"
+#include "ldap.h"
+#include "tls_pbuf.h"
 
 static char * NO_COPY_RO null_ptr;
 
@@ -309,29 +313,102 @@ getgrnam (const char *name)
 }
 #endif
 
-extern "C" void
-endgrent ()
+/* getgrent functions are not reentrant. */
+static gr_ent grent;
+
+void *
+gr_ent::enumerate_caches ()
 {
-  _my_tls.locals.grp_pos = 0;
+  if (!max && from_files)
+    {
+      pwdgrp &grf = cygheap->pg.grp_cache.file;
+      grf.check_file (true);
+      if (cnt < grf.cached_groups ())
+        return &grf.group ()[cnt++].g;
+      cnt = 0;
+      max = 1;
+    }
+  if (from_db && cygheap->pg.nss_db_caching ())
+    {
+      pwdgrp &grw = cygheap->pg.grp_cache.win;
+      if (cnt < grw.cached_groups ())
+        return &grw.group ()[cnt++].g;
+    }
+  cnt = max = 0;
+  return NULL;
+}
+
+void *
+gr_ent::enumerate_local ()
+{
+  while (true)
+    {
+      if (!cnt)
+	{
+	  DWORD total;
+	  NET_API_STATUS ret;
+
+	  if (buf)
+	    {
+	      NetApiBufferFree (buf);
+	      buf = NULL;
+	    }
+	  if (resume == ULONG_MAX)
+	    ret = ERROR_NO_MORE_ITEMS;
+	  else
+	    ret = NetLocalGroupEnum (NULL, 0, (PBYTE *) &buf,
+				     MAX_PREFERRED_LENGTH,
+				     &max, &total, &resume);
+	  if (ret == NERR_Success)
+	    resume = ULONG_MAX;
+	  else if (ret != ERROR_MORE_DATA)
+	    {
+	      cnt = max = resume = 0;
+	      return NULL;
+	    }
+	}
+      while (cnt < max)
+	{
+	  cygsid sid;
+	  DWORD slen = MAX_SID_LEN;
+	  WCHAR dom[DNLEN + 1];
+	  DWORD dlen = DNLEN + 1;
+	  SID_NAME_USE acc_type;
+
+	  LookupAccountNameW (NULL,
+			      ((PLOCALGROUP_INFO_0) buf)[cnt++].lgrpi0_name,
+			      sid, &slen, dom, &dlen, &acc_type);
+	  fetch_user_arg_t arg;
+	  arg.type = SID_arg;
+	  arg.sid = &sid;
+	  char *line = pg.fetch_account_from_windows (arg, true);
+	  if (line)
+	    return pg.add_account_post_fetch (line, false);
+	}
+      cnt = 0;
+    }
+}
+
+struct group *
+gr_ent::getgrent (void)
+{
+  if (state == rewound)
+    setent (true);
+  else
+    clear_cache ();
+  return (struct group *) getent ();
+}
+
+extern "C" void
+setgrent ()
+{
+  grent.setgrent ();
 }
 
 extern "C" struct group *
-getgrent32 ()
+getgrent32 (void)
 {
-  pwdgrp &grf = cygheap->pg.grp_cache.file;
-  if (cygheap->pg.nss_grp_files ())
-    {
-      cygheap->pg.grp_cache.file.check_file (true);
-      if (_my_tls.locals.grp_pos < grf.cached_groups ())
-	return &grf.group ()[_my_tls.locals.grp_pos++].g;
-    }
-  if ((cygheap->pg.nss_grp_db ()) && cygheap->pg.nss_db_caching ())
-    {
-      pwdgrp &grw = cygheap->pg.grp_cache.win;
-      if (_my_tls.locals.grp_pos - grf.cached_groups () < grw.cached_groups ())
-	return &grw.group ()[_my_tls.locals.grp_pos++ - grf.cached_groups ()].g;
-    }
-  return NULL;
+  return grent.getgrent ();
 }
 
 #ifdef __x86_64__
@@ -347,9 +424,9 @@ getgrent ()
 #endif
 
 extern "C" void
-setgrent ()
+endgrent (void)
 {
-  _my_tls.locals.grp_pos = 0;
+  grent.endgrent ();
 }
 
 int

@@ -20,6 +20,7 @@ details. */
 #include "pinfo.h"
 #include "lm.h"
 #include "dsgetdc.h"
+#include "tls_pbuf.h"
 
 static LDAP_TIMEVAL tv = { 3, 0 };
 
@@ -54,7 +55,7 @@ PWCHAR tdom_attr[] =
   NULL
 };
 
-PWCHAR nfs_attr[] =
+PWCHAR sid_attr[] =
 {
   (PWCHAR) L"objectSid",
   NULL
@@ -216,6 +217,8 @@ err:
 void
 cyg_ldap::close ()
 {
+  if (msg_id != (ULONG) -1)
+    ldap_abandon (lh, msg_id);
   if (lh)
     ldap_unbind (lh);
   if (msg)
@@ -228,12 +231,13 @@ cyg_ldap::close ()
   msg = entry = NULL;
   val = NULL;
   rootdse = NULL;
+  msg_id = (ULONG) -1;
 }
 
 bool
 cyg_ldap::fetch_ad_account (PSID sid, bool group)
 {
-  WCHAR filter[512], *f;
+  WCHAR filter[140], *f;
   LONG len = (LONG) RtlLengthSid (sid);
   PBYTE s = (PBYTE) sid;
   static WCHAR hex_wchars[] = L"0123456789abcdef";
@@ -273,10 +277,109 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group)
   return true;
 }
 
+bool
+cyg_ldap::enumerate_ad_accounts (PCWSTR domain, bool group)
+{
+  tmp_pathbuf tp;
+  PCWSTR filter;
+  PWCHAR dse;
+
+  if (msg)
+    {
+      ldap_memfreeW ((PWCHAR) msg);
+      msg = entry = NULL;
+    }
+  if (val)
+    {
+      ldap_value_freeW (val);
+      val = NULL;
+    }
+  if (!group)
+    filter = L"(&(objectClass=User)"
+	        "(objectCategory=Person)"
+		/* 512 == ADS_UF_NORMAL_ACCOUNT */
+	        "(userAccountControl:" LDAP_MATCHING_RULE_BIT_AND ":=512)"
+	        "(objectSid=*))";
+  else if (!domain)
+    filter = L"(&(objectClass=Group)"
+		"(objectSid=*))";
+  else
+    filter = L"(&(objectClass=Group)"
+		/* 1 == ACCOUNT_GROUP */
+		"(!(groupType:" LDAP_MATCHING_RULE_BIT_AND ":=1))"
+		"(objectSid=*))";
+  if (!domain)
+    dse = rootdse;
+  else
+    {
+      /* create rootdse from domain name. */
+      dse = tp.w_get ();
+      PCWSTR ps, pe;
+      PWCHAR d;
+
+      d = dse;
+      for (ps = domain; (pe = wcschr (ps, L'.')); ps = pe + 1)
+	{
+	  if (d > dse)
+	    d = wcpcpy (d, L",");
+	  d = wcpncpy (wcpcpy (d, L"DC="), ps, pe - ps);
+	}
+      if (d > dse)
+	d = wcpcpy (d, L",");
+      d = wcpcpy (wcpcpy (d, L"DC="), ps);
+    }
+  msg_id = ldap_searchW (lh, dse, LDAP_SCOPE_SUBTREE, (PWCHAR) filter,
+			 sid_attr, 0);
+  if (msg_id == (ULONG) -1)
+    {
+      debug_printf ("ldap_searchW(%W,%W) error 0x%02x", dse, filter,
+		    LdapGetLastError ());
+      return false;
+    }
+  return true;
+}
+
+bool
+cyg_ldap::next_account (cygsid &sid)
+{
+  ULONG ret;
+  PLDAP_BERVAL *bval;
+
+  if (msg)
+    {
+      ldap_memfreeW ((PWCHAR) msg);
+      msg = entry = NULL;
+    }
+  if (val)
+    {
+      ldap_value_freeW (val);
+      val = NULL;
+    }
+  ret = ldap_result (lh, msg_id, LDAP_MSG_ONE, &tv, &msg);
+  if (ret == 0)
+    {
+      debug_printf ("ldap_result() timeout!");
+      return false;
+    }
+  if (ret == (ULONG) -1)
+    {
+      debug_printf ("ldap_result() error 0x%02x", LdapGetLastError ());
+      return false;
+    }
+  if ((entry = ldap_first_entry (lh, msg))
+      && (bval = ldap_get_values_lenW (lh, entry, sid_attr[0])))
+    {
+      sid = (PSID) bval[0]->bv_val;
+      ldap_value_free_len (bval);
+      return true;
+    }
+  return false;
+}
+
 uint32_t
 cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
 {
-  WCHAR filter[512];
+  WCHAR filter[300];
   ULONG ret;
 
   if (msg)
@@ -331,7 +434,7 @@ cyg_ldap::get_num_attribute (int idx)
 bool
 cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
 {
-  WCHAR filter[512];
+  WCHAR filter[48];
   ULONG ret;
   PLDAP_BERVAL *bval;
 
@@ -345,25 +448,26 @@ cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
   else
     __small_swprintf (filter, L"(&(objectClass=User)(uidNumber=%u))", id);
   if ((ret = ldap_search_stW (lh, rootdse, LDAP_SCOPE_SUBTREE, filter,
-			      nfs_attr, 0, &tv, &msg)) != LDAP_SUCCESS)
+			      sid_attr, 0, &tv, &msg)) != LDAP_SUCCESS)
     {
       debug_printf ("ldap_search_stW(%W,%W) error 0x%02x",
 		    rootdse, filter, ret);
       return false;
     }
   if ((entry = ldap_first_entry (lh, msg))
-      && (bval = ldap_get_values_lenW (lh, entry, nfs_attr[0])))
+      && (bval = ldap_get_values_lenW (lh, entry, sid_attr[0])))
     {
       sid = (PSID) bval[0]->bv_val;
       ldap_value_free_len (bval);
+      return true;
     }
-  return true;
+  return false;
 }
 
 PWCHAR
 cyg_ldap::fetch_unix_name_from_rfc2307 (uint32_t id, bool group)
 {
-  WCHAR filter[512];
+  WCHAR filter[52];
   ULONG ret;
 
   if (msg)

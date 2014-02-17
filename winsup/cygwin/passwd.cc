@@ -10,6 +10,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <lm.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "cygerrno.h"
@@ -20,6 +21,9 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "shared_info.h"
+#include "miscfuncs.h"
+#include "ldap.h"
+#include "tls_pbuf.h"
 
 /* Parse /etc/passwd line into passwd structure. */
 bool
@@ -275,23 +279,365 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
   return 0;
 }
 
+/* getpwent functions are not reentrant. */
+static pw_ent pwent;
+
+void
+pg_ent::clear_cache ()
+{
+  if (pg.curr_lines)
+    {
+      if (state > from_file)
+	cfree (group ? grp.g.gr_name : pwd.p.pw_name);
+      pg.curr_lines = 0;
+    }
+}
+
+void
+pg_ent::setent (bool _group, int _enums, PCWSTR _enum_tdoms)
+{
+  endent (_group);
+  if (!_enums && !_enum_tdoms)
+    {
+      enums = cygheap->pg.nss_db_enums ();
+      enum_tdoms = cygheap->pg.nss_db_enum_tdoms ();
+    }
+  else
+    {
+      enums = _enums;
+      enum_tdoms = _enum_tdoms;
+    }
+  if (_group)
+    {
+      from_files = cygheap->pg.nss_grp_files ();
+      from_db = cygheap->pg.nss_grp_db ();
+    }
+  else
+    {
+      from_files = cygheap->pg.nss_pwd_files ();
+      from_db = cygheap->pg.nss_pwd_db ();
+    }
+}
+
+void *
+pg_ent::getent (void)
+{
+  void *entry;
+
+  switch (state)
+    {
+    case rewound:
+      state = from_cache;
+      /*FALLTHRU*/
+    case from_cache:
+      if (nss_db_enum_caches ()
+	  && (entry = enumerate_caches ()))
+	return entry;
+      state = from_file;
+      /*FALLTHRU*/
+    case from_file:
+      if (from_files
+	  && nss_db_enum_files ()
+	  && (entry = enumerate_file ()))
+	return entry;
+      state = from_builtin;
+      /*FALLTHRU*/
+    case from_builtin:
+      if (from_db
+	  && nss_db_enum_builtin ()
+	  && (entry = enumerate_builtin ()))
+	return entry;
+      state = from_local;
+      /*FALLTHRU*/
+    case from_local:
+      if (from_db
+	  && nss_db_enum_local ()
+	  && (!cygheap->dom.member_machine ()
+	      || !nss_db_enum_primary ())
+	  && (entry = enumerate_local ()))
+	return entry;
+      state = from_sam;
+      /*FALLTHRU*/
+    case from_sam:
+      if (from_db
+	  && nss_db_enum_local ()
+	  && (entry = enumerate_sam ()))
+	return entry;
+      state = from_ad;
+      /*FALLTHRU*/
+    case from_ad:
+      if (cygheap->dom.member_machine ()
+	  && from_db
+	  && (entry = enumerate_ad ()))
+	return entry;
+      state = finished;
+      /*FALLTHRU*/
+    case finished:
+      break;
+    }
+  return NULL;
+}
+
+void
+pg_ent::endent (bool _group)
+{
+  if (buf)
+    {
+      if (state == from_file)
+	free (buf);
+      else if (state == from_local || state == from_sam)
+      	NetApiBufferFree (buf);
+      buf = NULL;
+    }
+  if (!pg.curr_lines)
+    {
+      if ((group = _group))
+	{
+	  pg.init_grp ();
+	  pg.pwdgrp_buf = (void *) &grp;
+	}
+      else
+	{
+	  pg.init_pwd ();
+	  pg.pwdgrp_buf = (void *) &pwd;
+	}
+      pg.max_lines = 1;
+    }
+  else
+    clear_cache ();
+  cldap.close ();
+  rl.close ();
+  cnt = max = resume = 0;
+  enums = 0;
+  enum_tdoms = NULL;
+  state = rewound;
+}
+
+void *
+pg_ent::enumerate_file ()
+{
+  void *entry;
+
+  if (!cnt)
+    {
+      pwdgrp &prf = group ? cygheap->pg.grp_cache.file
+			  : cygheap->pg.pwd_cache.file;
+      if (prf.check_file (group))
+	{
+	  if (!buf)
+	    buf = (char *) malloc (NT_MAX_PATH);
+	  if (buf
+	      && !rl.init (prf.file_attr (), buf, NT_MAX_PATH))
+	    {
+	      free (buf);
+	      buf = NULL;
+	    }
+	}
+    }
+  ++cnt;
+  if ((entry = pg.add_account_post_fetch (rl.gets (), false)))
+    return entry;
+  rl.close ();
+  free (buf);
+  buf = NULL;
+  cnt = max = resume = 0;
+  return NULL;
+}
+
+void *
+pg_ent::enumerate_builtin ()
+{
+  static const char *pwd_builtins[] = {
+    /* SYSTEM */
+    "S-1-5-18",
+    /* LocalService */
+    "S-1-5-19",
+    /* NetworkService */
+    "S-1-5-20",
+    /* Administrators */
+    "S-1-5-32-544",
+    /* TrustedInstaller */
+    "S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",
+    /* The end */
+    NULL
+  };
+  static const char *grp_builtins[] = {
+    /* SYSTEM */
+    "S-1-5-18",
+    /* TrustedInstaller */
+    "S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",
+    /* The end */
+    NULL
+  };
+
+  const char **builtins = group ? grp_builtins : pwd_builtins;
+  if (!builtins[cnt])
+    {
+      cnt = max = resume = 0;
+      return NULL;
+    }
+  cygsid sid (builtins[cnt++]);
+  fetch_user_arg_t arg;
+  arg.type = SID_arg;
+  arg.sid = &sid;
+  char *line = pg.fetch_account_from_windows (arg, group);
+  return pg.add_account_post_fetch (line, false);
+} 
+
+void *
+pg_ent::enumerate_sam ()
+{
+  while (true)
+    {
+      if (!cnt)
+	{
+	  DWORD total;
+	  NET_API_STATUS ret;
+
+	  if (buf)
+	    {
+	      NetApiBufferFree (buf);
+	      buf = NULL;
+	    }
+	  if (resume == ULONG_MAX)
+	    ret = ERROR_NO_MORE_ITEMS;
+	  else if (group)
+	    ret = NetGroupEnum (NULL, 2, (PBYTE *) &buf, MAX_PREFERRED_LENGTH,
+				&max, &total, &resume);
+	  else
+	    ret = NetUserEnum (NULL, 20, FILTER_NORMAL_ACCOUNT, (PBYTE *) &buf,
+			       MAX_PREFERRED_LENGTH, &max, &total,
+			       (PDWORD) &resume);
+	  if (ret == NERR_Success)
+	    resume = ULONG_MAX;
+	  else if (ret != ERROR_MORE_DATA)
+	    {
+	      cnt = max = resume = 0;
+	      return NULL;
+	    }
+	}
+      while (cnt < max)
+	{
+	  cygsid sid (cygheap->dom.account_sid ());
+	  sid_sub_auth (sid, sid_sub_auth_count (sid)) = 
+	    group ? ((PGROUP_INFO_2) buf)[cnt].grpi2_group_id
+		  : ((PUSER_INFO_20) buf)[cnt].usri20_user_id;
+	  ++cnt;
+	  ++sid_sub_auth_count (sid);
+	  fetch_user_arg_t arg;
+	  arg.type = SID_arg;
+	  arg.sid = &sid;
+	  char *line = pg.fetch_account_from_windows (arg, group);
+	  if (line)
+	    return pg.add_account_post_fetch (line, false);
+	}
+      cnt = 0;
+    }
+}
+
+void *
+pg_ent::enumerate_ad ()
+{
+  while (true)
+    {
+      if (!cnt)
+	{
+	  PDS_DOMAIN_TRUSTSW td;
+
+	  if (!resume)
+	    {
+	      if (!cldap.open (NULL))
+		return NULL;
+	      ++resume;
+	      if (!nss_db_enum_primary ()
+		  || !cldap.enumerate_ad_accounts (NULL, group))
+		continue;
+	    }
+	  else if ((td = cygheap->dom.trusted_domain (resume - 1)))
+	    {
+	      ++resume;
+	      if ((td->Flags & DS_DOMAIN_PRIMARY)
+		  || !td->DomainSid
+		  || (!nss_db_enum_tdom (td->NetbiosDomainName)
+		      && !nss_db_enum_tdom (td->DnsDomainName))
+		  || !cldap.enumerate_ad_accounts (td->DnsDomainName, group))
+		continue;
+	    }
+	  else
+	    {
+	      cldap.close ();
+	      return NULL;
+	    }
+	}
+      ++cnt;
+      cygsid sid;
+      if (cldap.next_account (sid))
+	{
+	  fetch_user_arg_t arg;
+	  arg.type = SID_arg;
+	  arg.sid = &sid;
+	  char *line = pg.fetch_account_from_windows (arg, group);
+	  if (line)
+	    return pg.add_account_post_fetch (line, false);
+	}
+      cnt = 0;
+    }
+}
+
+void *
+pw_ent::enumerate_caches ()
+{
+  if (!max && from_files)
+    {
+      pwdgrp &prf = cygheap->pg.pwd_cache.file;
+      prf.check_file (false);
+      if (cnt < prf.cached_users ())
+        return &prf.passwd ()[cnt++].p;
+      cnt = 0;
+      max = 1;
+    }
+  if (from_db && cygheap->pg.nss_db_caching ())
+    {
+      pwdgrp &prw = cygheap->pg.pwd_cache.win;
+      if (cnt < prw.cached_users ())
+        return &prw.passwd ()[cnt++].p;
+    }
+  cnt = max = 0;
+  return NULL;
+}
+
+void *
+pw_ent::enumerate_local ()
+{
+  return NULL;
+}
+
+struct passwd *
+pw_ent::getpwent (void)
+{
+  if (state == rewound)
+    setent (false);
+  else
+    clear_cache ();
+  return (struct passwd *) getent ();
+}
+
+extern "C" void
+setpwent ()
+{
+  pwent.setpwent ();
+}
+
 extern "C" struct passwd *
 getpwent (void)
 {
-  pwdgrp &prf = cygheap->pg.pwd_cache.file;
-  if (cygheap->pg.nss_pwd_files ())
-    {
-      cygheap->pg.pwd_cache.file.check_file (false);
-      if (_my_tls.locals.pw_pos < prf.cached_users ())
-	return &prf.passwd ()[_my_tls.locals.pw_pos++].p;
-    }
-  if ((cygheap->pg.nss_pwd_db ()) && cygheap->pg.nss_db_caching ())
-    {
-      pwdgrp &prw = cygheap->pg.pwd_cache.win;
-      if (_my_tls.locals.pw_pos - prf.cached_users () < prw.cached_users ())
-	return &prw.passwd ()[_my_tls.locals.pw_pos++ - prf.cached_users ()].p;
-    }
-  return NULL;
+  return pwent.getpwent ();
+}
+
+extern "C" void
+endpwent (void)
+{
+  pwent.endpwent ();
 }
 
 #ifndef __x86_64__
@@ -301,18 +647,6 @@ getpwduid (__uid16_t)
   return NULL;
 }
 #endif
-
-extern "C" void
-setpwent (void)
-{
-  _my_tls.locals.pw_pos = 0;
-}
-
-extern "C" void
-endpwent (void)
-{
-  _my_tls.locals.pw_pos = 0;
-}
 
 extern "C" int
 setpassent (int)
