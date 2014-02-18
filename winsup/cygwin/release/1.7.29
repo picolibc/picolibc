@@ -19,3 +19,11 @@ Bug Fixes
 - Try harder to do the right thing in the presence of console screen buffers,
   i.e., never clear the screen buffer unless the user asked for it.  Also
   fix screen escape sequences which attempted to scroll the screen.
+  Addresses: http://cygwin.com/ml/cygwin/2014-02/threads.html#00274
+
+- Make "ps -W" report different WINPIDs for processes that have been execed
+  from, e.g., cmd.
+  Addresses: http://cygwin.com/ml/cygwin/2014-02/threads.html#00382
+
+- Avoid error messages from the signal handler if we're exiting.
+  Addresses: A random irc #cygwin complaint.
