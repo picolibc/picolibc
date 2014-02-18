@@ -1,3 +1,7 @@
+2014-02-18  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* Makefile.in: Ignore errors on doc install.
+
 2013-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.common: Don't drop -gFOO switches when filtering CFLAGS

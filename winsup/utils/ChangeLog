@@ -1,3 +1,9 @@
+2014-02-07  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* minidumper.cc: New file.
+	* Makefile.in (CYGWIN_BINS): Add minidumper.
+	* utils.xml (minidumper): New section.
+
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (RtlGetVersion): Declare.
