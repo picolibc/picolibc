@@ -1,5 +1,27 @@
 2014-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* external.cc (cygwin_internal): Handle new CW_SETENT, CW_GETENT and
+	CW_ENDENT info types.
+	* grp.cc (setgrent_filtered): New function, called from cygwin_internal.
+	(getgrent_filtered): Ditto.
+	(endgrent_filtered): Ditto.
+	* passwd.cc (pg_ent::setent): Set state explicitely to from_cache.
+	(pg_ent::getent): Handle the fact that a DC has no SAM and enumerating
+	local accounts is equivalent to enumerating domain accounts.
+	(setpwent_filtered): New function, called from cygwin_internal.
+	(getpwent_filtered): Ditto.
+	(endpwent_filtered): Ditto.
+	* pwdgrp.h (setpwent_filtered): Declare.
+	(getgrent_filtered): Ditto.
+	(endgrent_filtered): Ditto.
+	(setpwent_filtered): Ditto.
+	(getpwent_filtered): Ditto.
+	(endpwent_filtered): Ditto.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_SETENT, CW_GETENT,
+	and CW_ENDENT.
+
+2014-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* setlsapwd.cc (setlsapwd): Fix conditional expression after breaking
 	it on 2014-01-23.
 

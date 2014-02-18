@@ -429,6 +429,28 @@ endgrent (void)
   grent.endgrent ();
 }
 
+/* *_filtered functions are called from mkgroup */
+void *
+setgrent_filtered (int enums, PCWSTR enum_tdoms)
+{
+  gr_ent *gr = new gr_ent;
+  if (gr)
+    gr->setgrent (enums, enum_tdoms);
+  return (void *) gr;
+}
+
+void *
+getgrent_filtered (void *gr)
+{
+  return (void *) ((gr_ent *) gr)->getgrent ();
+}
+
+void
+endgrent_filtered (void *gr)
+{
+  ((gr_ent *) gr)->endgrent ();
+}
+
 int
 internal_getgroups (int gidsetsize, gid_t *grouplist, cygpsid *srchsid)
 {

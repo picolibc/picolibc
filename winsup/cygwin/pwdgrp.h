@@ -22,6 +22,14 @@ extern struct group *internal_getgrgid (gid_t);
 extern struct group *internal_getgrnam (const char *);
 int internal_getgroups (int, gid_t *, cygpsid * = NULL);
 
+/* These functions are called from mkpasswd/mkgroup via cygwin_internal. */
+void *setpwent_filtered (int enums, PCWSTR enum_tdoms);
+void *getpwent_filtered (void *gr);
+void endpwent_filtered (void *gr);
+void *setgrent_filtered (int enums, PCWSTR enum_tdoms);
+void *getgrent_filtered (void *gr);
+void endgrent_filtered (void *gr);
+
 #include "sync.h"
 #include "ldap.h"
 #include "miscfuncs.h"

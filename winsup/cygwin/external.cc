@@ -1,7 +1,7 @@
 /* external.cc: Interface to Cygwin internals from external programs.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2014 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -26,6 +26,7 @@ details. */
 #include "child_info.h"
 #include "environ.h"
 #include "cygserver_setpwd.h"
+#include "pwdgrp.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <wchar.h>
@@ -550,6 +551,47 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  if (ddm)
 	    delete ddm;
 	  res = 0;
+	}
+	break;
+
+      case CW_SETENT:
+	{
+	  int group = va_arg (arg, int);
+	  int enums = va_arg (arg, int);
+	  PCWSTR enum_tdoms = va_arg (arg, PCWSTR);
+	  if (group)
+	    res = (uintptr_t) setgrent_filtered (enums, enum_tdoms);
+	  else
+	    res = (uintptr_t) setpwent_filtered (enums, enum_tdoms);
+	}
+	break;
+
+      case CW_GETENT:
+	{
+	  int group = va_arg (arg, int);
+	  void *obj = va_arg (arg, void *);
+	  if (obj)
+	    {
+	      if (group)
+		res = (uintptr_t) getgrent_filtered (obj);
+	      else
+		res = (uintptr_t) getpwent_filtered (obj);
+	    }
+	}
+	break;
+
+      case CW_ENDENT:
+	{
+	  int group = va_arg (arg, int);
+	  void *obj = va_arg (arg, void *);
+	  if (obj)
+	    {
+	      if (group)
+		endgrent_filtered (obj);
+	      else
+		endpwent_filtered (obj);
+	      res = 0;
+	    }
 	}
 	break;
 
