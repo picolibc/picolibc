@@ -1177,10 +1177,9 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
 {
   UNICODE_STRING upath;
   OBJECT_ATTRIBUTES attr;
-  IO_STATUS_BLOCK io;
-  NTSTATUS status;
-  HANDLE fh;
+  NT_readline rl;
   tmp_pathbuf tp;
+  char *buf = tp.c_get ();
 
   if (user)
     {
@@ -1195,81 +1194,10 @@ mount_info::from_fstab (bool user, WCHAR fstab[], PWCHAR fstab_end)
   RtlInitUnicodeString (&upath, fstab);
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
   debug_printf ("Try to read mounts from %W", fstab);
-  status = NtOpenFile (&fh, SYNCHRONIZE | FILE_READ_DATA, &attr, &io,
-		       FILE_SHARE_VALID_FLAGS,
-		       FILE_SYNCHRONOUS_IO_NONALERT
-		       | FILE_OPEN_FOR_BACKUP_INTENT);
-  if (!NT_SUCCESS (status))
-    {
-      debug_printf ("NtOpenFile(%S) failed, %y", &upath, status);
-      return false;
-    }
-
-  char *buf = tp.c_get ();
-  char *got = buf;
-  DWORD len = 0;
-  unsigned line = 1;
-  /* Using buffer size - 2 leaves space to append two \0. */
-  while (NT_SUCCESS (NtReadFile (fh, NULL, NULL, NULL, &io, got,
-				 (NT_MAX_PATH - 2) - (got - buf), NULL, NULL)))
-    {
-      char *end;
-
-      len = io.Information;
-      /* Set end marker. */
-      got[len] = got[len + 1] = '\0';
-      /* Set len to the absolute len of bytes in buf. */
-      len += got - buf;
-      /* Reset got to start reading at the start of the buffer again. */
-      got = buf;
-retry:
-      bool got_nl = false;
-      while (got < buf + len && (end = strchr (got, '\n')))
-	{
-	  got_nl = true;
-	  end[end[-1] == '\r' ? -1 : 0] = '\0';
-	  if (!from_fstab_line (got, user))
-	    goto done;
-	  got = end + 1;
-	  ++line;
-	}
-      if (len < (NT_MAX_PATH - 2))
+  if (rl.init (&attr, buf, NT_MAX_PATH))
+    while ((buf = rl.gets ()))
+      if (!from_fstab_line (buf, user))
 	break;
-      /* Check if the buffer contained at least one \n.  If not, the
-	 line length is > 32K.  We don't take such long lines.  Print
-	 a debug message and skip this line entirely. */
-      if (!got_nl)
-	{
-	  system_printf ("%W: Line %d too long, skipping...", fstab, line);
-	  while (NT_SUCCESS (NtReadFile (fh, NULL, NULL, NULL, &io, buf,
-					 (NT_MAX_PATH - 2), NULL, NULL)))
-	    {
-	      len = io.Information;
-	      buf[len] = buf[len + 1] = '\0';
-	      got = strchr (buf, '\n');
-	      if (got)
-		{
-		  ++got;
-		  ++line;
-		  goto retry;
-		}
-	    }
-	  got = buf;
-	  break;
-	}
-      /* We have to read once more.  Move remaining bytes to the start of
-	 the buffer and reposition got so that it points to the end of
-	 the remaining bytes. */
-      len = buf + len - got;
-      memmove (buf, got, len);
-      got = buf + len;
-      buf[len] = buf[len + 1] = '\0';
-    }
-  /* Catch a last line without trailing \n. */
-  if (got > buf)
-    from_fstab_line (got, user);
-done:
-  NtClose (fh);
   return true;
 }
 
