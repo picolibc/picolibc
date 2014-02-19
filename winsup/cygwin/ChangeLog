@@ -1,5 +1,11 @@
 2014-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.cc (cwcsdup): Change parameter to correct PWCSTR.
+	(cwcsdup1): Ditto.
+	* cygheap_malloc.h: Change declarations accordingly.
+
+2014-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (child_info_spawn::handle_spawn): Call fixup_lockf_after_exec
 	with additional argument to specify if the process has been execed
 	or spawned.
