@@ -224,7 +224,9 @@ get_logon_server (PWCHAR domain, WCHAR *server, ULONG flags)
   PDOMAIN_CONTROLLER_INFOW pci;
 
   /* Empty domain is interpreted as local system */
-  if (!domain[0] || !wcscasecmp (domain, cygheap->dom.account_flat_name ()))
+  if (cygheap->dom.init ()
+      && (!domain[0]
+	  || !wcscasecmp (domain, cygheap->dom.account_flat_name ())))
     {
       wcpcpy (wcpcpy (server, L"\\\\"), cygheap->dom.account_flat_name ());
       return true;

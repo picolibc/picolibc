@@ -296,6 +296,7 @@ pg_ent::clear_cache ()
 void
 pg_ent::setent (bool _group, int _enums, PCWSTR _enum_tdoms)
 {
+  cygheap->dom.init ();
   endent (_group);
   if (!_enums && !_enum_tdoms)
     {

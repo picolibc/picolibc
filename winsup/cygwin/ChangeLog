@@ -1,3 +1,8 @@
+2014-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.cc (pg_ent::setent): Initialize cygheap domain info.
+	* sec_auth.cc (get_logon_server): Ditto.
+
 2014-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (cygwin_internal): Handle new CW_SETENT, CW_GETENT and
