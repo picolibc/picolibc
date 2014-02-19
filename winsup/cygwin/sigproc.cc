@@ -639,12 +639,9 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  sigproc_printf ("WriteFile for pipe %p failed, %E", sendsig);
 	  ForceCloseHandle (sendsig);
 	}
-      else
-	{
-	  if (!p->exec_sendsig)
-	    system_printf ("error sending signal %d to pid %d, pipe handle %p, %E",
-			   si.si_signo, p->pid, sendsig);
-	}
+      else if (!p->exec_sendsig && !exit_state)
+	system_printf ("error sending signal %d, pipe handle %p, nb %u, packsize %u, %E",
+		       si.si_signo, p->pid, sendsig, nb, packsize);
       if (GetLastError () == ERROR_BROKEN_PIPE)
 	set_errno (ESRCH);
       else
