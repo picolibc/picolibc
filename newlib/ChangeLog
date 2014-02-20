@@ -1,3 +1,8 @@
+2014-02-20  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/open_memstream.c (internal_open_memstream_r): Initialize
+	c->pos to 0.
+
 2014-02-11  Joey Ye  <joey.ye@arm.com>
 
 	* libc/sys/arm/syscalls.c (_sbrk): Define as weak symbols.
