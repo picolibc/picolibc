@@ -27,3 +27,8 @@ Bug Fixes
 
 - Avoid error messages from the signal handler if we're exiting.
   Addresses: A random irc #cygwin complaint.
+
+- Fix return value from getgrouplist function to behave like glibc.
+
+- Fix initialization of open_memstream which could lead to dropping the
+  entire string.
