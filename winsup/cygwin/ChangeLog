@@ -1,5 +1,10 @@
 2014-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* grp.cc (getgrouplist): Fix previous fix so ret is only set to ngroups
+	if ngroups isn't too small.
+
+2014-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (get_groups): Don't add gid to list if it's ILLEGAL_GID.
 	(getgrouplist): Return number of groups, just like glibc.
 

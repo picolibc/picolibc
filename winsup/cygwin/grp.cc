@@ -624,9 +624,11 @@ getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
 	  groups[cnt] = grp->gr_gid;
 	++cnt;
       }
+  *ngroups = cnt;
   if (cnt > *ngroups)
     ret = -1;
-  ret = *ngroups = cnt;
+  else
+    ret = cnt;
 
   syscall_printf ( "%d = getgrouplist(%s, %u, %p, %d)",
 		  ret, user, gid, groups, *ngroups);
