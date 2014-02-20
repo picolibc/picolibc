@@ -1,3 +1,8 @@
+2014-02-20  Agustin Henze  <tin@sluc.org.ar>
+
+	* libm/complex/complex.tex: Fix wrong syntax in documentation.
+	* libm/math/math.tex: Ditto.
+
 2014-02-20  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/open_memstream.c (internal_open_memstream_r): Initialize
