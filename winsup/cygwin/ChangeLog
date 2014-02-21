@@ -33,6 +33,10 @@
 	when !winpid.  Simplify logic.  Don't do duplicate detection for
 	winpid.
 
+2014-02-11  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* cygwin.sc.in: More closely emulate default pe/i386 linker script.
+
 2014-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc (cwcsdup): Change parameter to correct PWCSTR.
