@@ -487,7 +487,7 @@ pg_ent::enumerate_builtin ()
   fetch_user_arg_t arg;
   arg.type = SID_arg;
   arg.sid = &sid;
-  char *line = pg.fetch_account_from_windows (arg, group);
+  char *line = pg.fetch_account_from_windows (arg, group, false);
   return pg.add_account_post_fetch (line, false);
 } 
 
@@ -534,7 +534,7 @@ pg_ent::enumerate_sam ()
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
 	  arg.sid = &sid;
-	  char *line = pg.fetch_account_from_windows (arg, group);
+	  char *line = pg.fetch_account_from_windows (arg, group, false);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);
 	}
@@ -583,7 +583,7 @@ pg_ent::enumerate_ad ()
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
 	  arg.sid = &sid;
-	  char *line = pg.fetch_account_from_windows (arg, group);
+	  char *line = pg.fetch_account_from_windows (arg, group, false);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);
 	}

@@ -110,7 +110,8 @@ class pwdgrp
   void *add_account_from_windows (uint32_t id, bool group);
   char *fetch_account_from_line (fetch_user_arg_t &arg, const char *line);
   char *fetch_account_from_file (fetch_user_arg_t &arg);
-  char *fetch_account_from_windows (fetch_user_arg_t &arg, bool group);
+  char *fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
+				    bool ugid_caching = true);
   pwdgrp *prep_tls_pwbuf ();
   pwdgrp *prep_tls_grbuf ();
 

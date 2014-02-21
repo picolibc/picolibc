@@ -381,7 +381,7 @@ gr_ent::enumerate_local ()
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
 	  arg.sid = &sid;
-	  char *line = pg.fetch_account_from_windows (arg, true);
+	  char *line = pg.fetch_account_from_windows (arg, true, false);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);
 	}

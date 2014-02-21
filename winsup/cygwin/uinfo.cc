@@ -1162,7 +1162,8 @@ fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, bool &ldap_open, cyg_ldap &cldap)
 }
 
 char *
-pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
+pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
+				    bool ugid_caching)
 {
   /* Used in LookupAccount calls. */
   WCHAR namebuf[UNLEN + 1], *name = namebuf;
@@ -1502,11 +1503,14 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 					* sizeof (WCHAR)), val);
 		      /* Check and, if necessary, add unix<->windows
 			 id mapping on the fly. */
-		      id_val = cldap.get_unix_uid ();
-		      if (id_val != ILLEGAL_UID
-			  && cygheap->ugid_cache.get_uid (id_val)
-			     == ILLEGAL_UID)
-			cygheap->ugid_cache.add_uid (id_val, uid);
+		      if (ugid_caching)
+			{
+			  id_val = cldap.get_unix_uid ();
+			  if (id_val != ILLEGAL_UID
+			      && cygheap->ugid_cache.get_uid (id_val)
+				 == ILLEGAL_UID)
+			    cygheap->ugid_cache.add_uid (id_val, uid);
+			}
 		    }
 		  else /* SidTypeGroup */
 		    {
@@ -1514,11 +1518,16 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 			  && wcscmp (name, val))
 			user = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
 				       * sizeof (WCHAR)), val);
-		      id_val = cldap.get_unix_gid ();
-		      if (id_val != ILLEGAL_GID
-			  && cygheap->ugid_cache.get_gid (id_val)
-			     == ILLEGAL_GID)
-			cygheap->ugid_cache.add_gid (id_val, uid);
+		      /* Check and, if necessary, add unix<->windows
+			 id mapping on the fly. */
+		      if (ugid_caching)
+			{
+			  id_val = cldap.get_unix_gid ();
+			  if (id_val != ILLEGAL_GID
+			      && cygheap->ugid_cache.get_gid (id_val)
+				 == ILLEGAL_GID)
+			    cygheap->ugid_cache.add_gid (id_val, uid);
+			}
 		    }
 		}
 	    }
@@ -1624,7 +1633,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group)
 		      || (gr = internal_getgrnam (gname + 1)))
 		    gid = gr->gr_gid;
 		}
-	      if (uxid && ((id_val = wcstoul (uxid, &e, 10)), !*e))
+	      if (ugid_caching && uxid
+		  && ((id_val = wcstoul (uxid, &e, 10)), !*e))
 		{
 		  if (acc_type == SidTypeUser)
 		    {

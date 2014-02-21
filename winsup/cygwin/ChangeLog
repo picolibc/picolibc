@@ -1,3 +1,15 @@
+2014-02-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pwdgrp.h (pwdgrp::fetch_account_from_windows): Add bool parameter
+	to declaration, set to true by default.
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Add bool parameter
+	"ugid_caching".  Only add account to ugid_cache if set to true.
+	* grp.cc (gr_ent::enumerate_local): Call fetch_account_from_windows
+	with ugid_caching parameter set to false.
+	* passwd.cc (pg_ent::enumerate_builtin): Ditto.
+	(pg_ent::enumerate_sam): Ditto.
+	(pg_ent::enumerate_ad): Ditto.
+
 2014-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (getgrouplist): Fix previous fix so ret is only set to ngroups
