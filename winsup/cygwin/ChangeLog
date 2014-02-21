@@ -1,3 +1,30 @@
+2014-02-15  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* DevNotes: Add entry cgf-000024.
+	* fhandler.h (dev_console::state): Remove trailing underscore.
+	(dev_console::args): Ditto.
+	(dev_console::nargs): Ditto.
+	(dev_console::info): Eliminate subclass.
+	(dev_console::dwEnd): New field.
+	(dev_console::scroll_window): New function.
+	(dev_console::is_fullscreen): Ditto.
+	(dev_console::fillin): Rename from fillin_info.
+	(fhandler_console::scroll_buffer): Rename from scroll_screen.
+	* fhandler_console.cc: Throughout s/dev_state\.info/dev_state/g.
+	Accommodate other name changes.
+	(dev_console::fillin): Accommodate rename.  Notice max x/y written to.
+	Forgo memset if GetConsoleScreenBufferInfo fails.
+	(fhandler_console::scroll_buffer): Accommodate rename.  Don't treat y
+	coordinate of zero as top of screen.
+	(dev_console::is_fullscreen): New function.
+	(dev_console::scroll_window): Ditto.
+	(fhandler_console::clear_screen): Just scroll the screen when clearing
+	the screen in a state where the screen buffer is bigger than the
+	screen.
+	(fhandler_console::char_command): Try harder to get 'S' and 'T' working
+	in the presence of a screen buffer.  Use temporary 'n' variable rather
+	than dev_state.args[0].  Use GNU ?: shortcut method.
+
 2014-02-14  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* pinfo.cc (winpids::add): Always copy pinfo structure when winpid.

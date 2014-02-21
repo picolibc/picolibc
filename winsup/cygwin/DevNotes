@@ -1,3 +1,11 @@
+2014-02-15  cgf-000024
+
+Wow.  It's hard getting the screen handling stuff working correctly when
+there is a screen buffer larger than screen size and vice versa.  These
+changes attempt to use SetConsoleWindowInfo whenever possible so that
+the contents of the screen buffer are never wiped out.  They also fix
+some previously misbehaving "scroll the screen" commands.
+
 2013-06-07  cgf-000023
 
 Given the fact that the signal thread never exits there is no need
