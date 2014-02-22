@@ -595,6 +595,30 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
 	break;
 
+      case CW_GETNSSSEP:
+	res = (uintptr_t) cygheap->pg.nss_separator ();
+	break;
+
+      case CW_GETPWSID:
+	{
+	  int db_only = va_arg (arg, int);
+	  PSID psid = va_arg (arg, PSID);
+	  cygpsid sid (psid);
+	  res = (uintptr_t) (db_only ? internal_getpwsid_from_db (sid)
+				     : internal_getpwsid (sid));
+	}
+	break;
+
+      case CW_GETGRSID:
+	{
+	  int db_only = va_arg (arg, int);
+	  PSID psid = va_arg (arg, PSID);
+	  cygpsid sid (psid);
+	  res = (uintptr_t) (db_only ? internal_getgrsid_from_db (sid)
+				     : internal_getgrsid (sid));
+	}
+	break;
+
       default:
 	set_errno (ENOSYS);
     }

@@ -15,9 +15,11 @@ details. */
 /* These functions are needed to allow searching and walking through
    the passwd and group lists */
 extern struct passwd *internal_getpwsid (cygpsid &);
+extern struct passwd *internal_getpwsid_from_db (cygpsid &sid);
 extern struct passwd *internal_getpwnam (const char *);
 extern struct passwd *internal_getpwuid (uid_t);
 extern struct group *internal_getgrsid (cygpsid &);
+extern struct group *internal_getgrsid_from_db (cygpsid &sid);
 extern struct group *internal_getgrgid (gid_t);
 extern struct group *internal_getgrnam (const char *);
 int internal_getgroups (int, gid_t *, cygpsid * = NULL);
@@ -158,19 +160,6 @@ public:
   struct group *find_group (gid_t gid);
 };
 
-enum nss_enum_t
-{
-  ENUM_NONE = 0x00,
-  ENUM_CACHE = 0x01,
-  ENUM_FILES = 0x02,
-  ENUM_BUILTIN = 0x04,
-  ENUM_LOCAL = 0x08,
-  ENUM_PRIMARY = 0x10,
-  ENUM_TDOMS = 0x20,
-  ENUM_TDOMS_ALL = 0x40,
-  ENUM_ALL = 0x7f
-};
-
 class pg_ent
 {
 protected:
@@ -184,7 +173,7 @@ protected:
   ULONG         cnt;
   ULONG         max;
   ULONG_PTR     resume;
-  int           enums;
+  int           enums;		/* ENUM_xxx values defined in sys/cygwin.h. */
   PCWSTR        enum_tdoms;
   bool		from_files;
   bool		from_db;

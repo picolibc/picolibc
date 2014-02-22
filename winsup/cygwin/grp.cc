@@ -139,6 +139,14 @@ internal_getgrsid (cygpsid &sid)
   return NULL;
 }
 
+/* This function gets only called from mkgroup via cygwin_internal. */
+struct group *
+internal_getgrsid_from_db (cygpsid &sid)
+{
+  cygheap->pg.nss_init ();
+  return cygheap->pg.grp_cache.win.add_group_from_windows (sid);
+}
+
 struct group *
 internal_getgrnam (const char *name)
 {

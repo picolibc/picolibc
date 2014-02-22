@@ -1720,12 +1720,12 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
     {
       /* Samba UNIX Users/Groups
 
-         This *might* colide with a posix_offset of some trusted domain.
+         This *might* collide with a posix_offset of some trusted domain.
          It's just very unlikely. */
       uid = MAP_UNIX_TO_CYGWIN_ID (sid_sub_auth_rid (sid));
       /* Unfortunately we have no access to the file server from here,
 	 so we can't generate correct user names. */
-      p = wcpcpy (dom, L"UNIX_");
+      p = wcpcpy (dom, L"Unix_");
       wcpcpy (p, sid_sub_auth (sid, 0) == 1 ? L"User" : L"Group");
       __small_swprintf (name = namebuf, L"%d", uid & UNIX_POSIX_MASK);
       name_style = fully_qualified;

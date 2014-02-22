@@ -123,6 +123,14 @@ internal_getpwsid (cygpsid &sid)
   return NULL;
 }
 
+/* This function gets only called from mkpasswd via cygwin_internal. */
+struct passwd *
+internal_getpwsid_from_db (cygpsid &sid)
+{
+  cygheap->pg.nss_init ();
+  return cygheap->pg.pwd_cache.win.add_user_from_windows (sid);
+}
+
 struct passwd *
 internal_getpwnam (const char *name)
 {
@@ -300,23 +308,28 @@ pg_ent::setent (bool _group, int _enums, PCWSTR _enum_tdoms)
   endent (_group);
   if (!_enums && !_enum_tdoms)
     {
+      /* This is the default, when called from the usual setpwent/setgrent
+         functions. */
       enums = cygheap->pg.nss_db_enums ();
       enum_tdoms = cygheap->pg.nss_db_enum_tdoms ();
+      if (_group)
+	{
+	  from_files = cygheap->pg.nss_grp_files ();
+	  from_db = cygheap->pg.nss_grp_db ();
+	}
+      else
+	{
+	  from_files = cygheap->pg.nss_pwd_files ();
+	  from_db = cygheap->pg.nss_pwd_db ();
+	}
     }
   else
     {
+      /* This case is when called from mkpasswd/mkgroup via cygwin_internal. */
       enums = _enums;
       enum_tdoms = _enum_tdoms;
-    }
-  if (_group)
-    {
-      from_files = cygheap->pg.nss_grp_files ();
-      from_db = cygheap->pg.nss_grp_db ();
-    }
-  else
-    {
-      from_files = cygheap->pg.nss_pwd_files ();
-      from_db = cygheap->pg.nss_pwd_db ();
+      from_files = false;
+      from_db = true;
     }
   state = from_cache;
 }

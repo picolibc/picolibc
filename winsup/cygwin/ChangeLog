@@ -1,3 +1,20 @@
+2014-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): Add cases for CW_GETNSSSEP,
+	CW_GETPWSID and CW_GETGRSID.
+	* grp.cc (internal_getgrsid_from_db): New function.
+	* passwd.cc (internal_getpwsid_from_db): New function.
+	(pg_ent::setent): Add special case for call from mkpasswd/mkgroup.
+	* pwdgrp.h (internal_getpwsid_from_db): Declare.
+	(internal_getgrsid_from_db): Declare.
+	(enum nss_enum_t): Move to include/sys/cygwin.h.
+	(class pg_ent): Add comment.
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Fix typo in comment.
+	Change "UNIX" to "Unix" in domain name.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_GETNSSSEP,
+	CW_GETPWSID and CW_GETGRSID.
+	(enum nss_enum_t): Define here.
+
 2014-02-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pwdgrp.h (pwdgrp::fetch_account_from_windows): Add bool parameter
