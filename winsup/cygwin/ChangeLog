@@ -1,3 +1,10 @@
+2014-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): Add cases for CW_GETPWSID and
+	CW_GETGRSID.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_SETENT, CW_GETENT,
+	CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID and CW_GETGRSID.
+
 2014-02-22  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* dev_console::scroll_buffer): Reinstate clipping region.
