@@ -791,7 +791,7 @@ dev_console::scroll_buffer (HANDLE h, int x1, int y1, int x2, int y2, int xn, in
     sr1.Bottom = sr2.Bottom;
   dest.X = xn >= 0 ? xn : dwWinSize.X - 1;
   dest.Y = yn >= 0 ? yn : winBottom;
-  ScrollConsoleScreenBuffer (h, &sr1, NULL, dest, &fill);
+  ScrollConsoleScreenBuffer (h, &sr1, &sr2, dest, &fill);
 
 #if 0 /* CGF: 2014-01-04 Assuming that we don't need this anymore */
   /* ScrollConsoleScreenBuffer on Windows 95 is buggy - when scroll distance

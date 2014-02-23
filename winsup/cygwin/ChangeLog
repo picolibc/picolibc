@@ -1,5 +1,9 @@
 2014-02-22  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
+	* dev_console::scroll_buffer): Reinstate clipping region.
+
+2014-02-22  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
 	* fhandler.h (dev_console::is_fullscreen): Delete.
 	(dev_console::scroll_window): Return bool indicating success.
 	(dev_console::scroll_screen): New function.
