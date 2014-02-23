@@ -763,35 +763,35 @@ dev_console::fillin (HANDLE h)
   return ret;
 }
 
+void __reg3
+dev_console::scroll_buffer (HANDLE h, int x1, int y1, int x2, int y2, int xn, int yn)
+{
 /* Scroll the screen context.
    x1, y1 - ul corner
    x2, y2 - dr corner
    xn, yn - new ul corner
    Negative values represents current screen dimensions
 */
-void
-fhandler_console::scroll_buffer (int x1, int y1, int x2, int y2, int xn, int yn)
-{
   SMALL_RECT sr1, sr2;
   CHAR_INFO fill;
   COORD dest;
   fill.Char.AsciiChar = ' ';
-  fill.Attributes = dev_state.current_win32_attr;
+  fill.Attributes = current_win32_attr;
 
-  dev_state.fillin (get_output_handle ());
-  sr1.Left = x1 >= 0 ? x1 : dev_state.dwWinSize.X - 1;
-  sr1.Top = y1 >= 0 ? y1 : dev_state.winBottom;
-  sr1.Right = x2 >= 0 ? x2 : dev_state.dwWinSize.X - 1;
-  sr1.Bottom = y2 >= 0 ? y2 : dev_state.winBottom;
-  sr2.Top = srTop;
+  fillin (h);
+  sr1.Left = x1 >= 0 ? x1 : dwWinSize.X - 1;
+  sr1.Top = y1 >= 0 ? y1 : winBottom;
+  sr1.Right = x2 >= 0 ? x2 : dwWinSize.X - 1;
+  sr1.Bottom = y2 >= 0 ? y2 : winBottom;
+  sr2.Top = winTop + scroll_region.Top;
   sr2.Left = 0;
-  sr2.Bottom = srBottom;
-  sr2.Right = dev_state.dwWinSize.X - 1;
+  sr2.Bottom = (scroll_region.Bottom < 0) ? winBottom : winTop + scroll_region.Bottom;
+  sr2.Right = dwWinSize.X - 1;
   if (sr1.Bottom > sr2.Bottom && sr1.Top <= sr2.Bottom)
     sr1.Bottom = sr2.Bottom;
-  dest.X = xn >= 0 ? xn : dev_state.dwWinSize.X - 1;
-  dest.Y = yn >= 0 ? yn : dev_state.winBottom;
-  ScrollConsoleScreenBuffer (get_output_handle (), &sr1, NULL, dest, &fill);
+  dest.X = xn >= 0 ? xn : dwWinSize.X - 1;
+  dest.Y = yn >= 0 ? yn : winBottom;
+  ScrollConsoleScreenBuffer (h, &sr1, NULL, dest, &fill);
 
 #if 0 /* CGF: 2014-01-04 Assuming that we don't need this anymore */
   /* ScrollConsoleScreenBuffer on Windows 95 is buggy - when scroll distance
@@ -804,6 +804,12 @@ fhandler_console::scroll_buffer (int x1, int y1, int x2, int y2, int xn, int yn)
   else			/* reverse scroll */
     clear_screen (0, sr1.Top, sr2.Right, dest.Y - 1);
 #endif
+}
+
+inline void
+fhandler_console::scroll_buffer (int x1, int y1, int x2, int y2, int xn, int yn)
+{
+  dev_state.scroll_buffer (get_output_handle (), x1, y1, x2, y2, xn, yn);
 }
 
 int
@@ -1209,53 +1215,72 @@ dev_console::set_cl_y (cltype y)
 }
 
 bool
-dev_console::is_fullscreen (int x1, int y1, int x2, int y2)
+dev_console::scroll_window (HANDLE h, int x1, int y1, int x2, int y2)
 {
-  return !savebuf
-	 && x1 == 0 && x2 == dwWinSize.X - 1 && y1 == winTop && y2 == winBottom
-	 && dwBufferSize.Y > dwWinSize.Y;
-}
+  if (savebuf || x1 != 0 || x2 != dwWinSize.X - 1 || y1 != winTop
+      || y2 != winBottom || dwBufferSize.Y <= dwWinSize.Y)
+    return false;
 
-void
-dev_console::scroll_window (HANDLE h)
-{
   SMALL_RECT sr;
-  sr.Top = sr.Bottom = 1 + dwEnd.Y - winTop;
-  sr.Left = sr.Right = 0;
-  SetConsoleWindowInfo (h, FALSE, &sr);
-  dwEnd.X = 0;
+  int toscroll = 2 + dwEnd.Y - winTop;
+  int shrink = 1 + toscroll + winBottom - dwBufferSize.Y;
+  sr.Left = sr.Right = dwEnd.X = 0;
+  /* Can't increment dwEnd yet since we may not have space in
+     the buffer.  */
   SetConsoleCursorPosition (h, dwEnd);
+  if (shrink > 0)
+    {
+      COORD c = dwBufferSize;
+      c.Y = dwEnd.Y - shrink;
+      SetConsoleScreenBufferSize (h, c);
+      SetConsoleScreenBufferSize (h, dwBufferSize);
+      dwEnd.Y = 0;
+      fillin (h);
+      toscroll = 2 + dwEnd.Y - winTop;
+    }
+
+  sr.Top = sr.Bottom = toscroll;
+
+  SetConsoleWindowInfo (h, FALSE, &sr);
+
+  dwEnd.Y++;
+  SetConsoleCursorPosition (h, dwEnd);
+
+  fillin (h);
+  return true;
 }
 
 /*
  * Clear the screen context from x1/y1 to x2/y2 cell.
  * Negative values represents current screen dimensions
  */
-void
+void __reg3
 fhandler_console::clear_screen (cltype xc1, cltype yc1, cltype xc2, cltype yc2)
 {
-  COORD tlc;
-  DWORD done;
-  int num;
-
-  dev_state.fillin (get_output_handle ());
+  HANDLE h = get_output_handle ();
+  dev_state.fillin (h);
 
   int x1 = dev_state.set_cl_x (xc1);
   int y1 = dev_state.set_cl_y (yc1);
   int x2 = dev_state.set_cl_x (xc2);
   int y2 = dev_state.set_cl_y (yc2);
 
-  /* Detect special case - scroll the screen if we have a buffer to
+  /* Detect special case - scroll the screen if we have a buffer in order to
      preserve the buffer. */
-  if (dev_state.is_fullscreen (x1, y1, x2, y2))
-    {
-      dev_state.scroll_window (get_output_handle ());
-      return;
-    }
+  if (!dev_state.scroll_window (h, x1, y1, x2, y2))
+    dev_state.clear_screen (h, x1, y1, x2, y2);
+}
 
-  num = abs (y1 - y2) * dev_state.dwBufferSize.X + abs (x1 - x2) + 1;
+void __reg3
+dev_console::clear_screen (HANDLE h, int x1, int y1, int x2, int y2)
+{
+  COORD tlc;
+  DWORD done;
+  int num;
 
-  if ((y2 * dev_state.dwBufferSize.X + x2) > (y1 * dev_state.dwBufferSize.X + x1))
+  num = abs (y1 - y2) * dwBufferSize.X + abs (x1 - x2) + 1;
+
+  if ((y2 * dwBufferSize.X + x2) > (y1 * dwBufferSize.X + x1))
     {
       tlc.X = x1;
       tlc.Y = y1;
@@ -1265,18 +1290,11 @@ fhandler_console::clear_screen (cltype xc1, cltype yc1, cltype xc2, cltype yc2)
       tlc.X = x2;
       tlc.Y = y2;
     }
-  FillConsoleOutputCharacterA (get_output_handle (), ' ',
-			       num,
-			       tlc,
-			       &done);
-  FillConsoleOutputAttribute (get_output_handle (),
-			       dev_state.current_win32_attr,
-			       num,
-			       tlc,
-			       &done);
+  FillConsoleOutputCharacterA (h, ' ', num, tlc, &done);
+  FillConsoleOutputAttribute (h, current_win32_attr, num, tlc, &done);
 }
 
-void
+void __reg3
 fhandler_console::cursor_set (bool rel_to_top, int x, int y)
 {
   COORD pos;
@@ -1309,7 +1327,7 @@ fhandler_console::cursor_set (bool rel_to_top, int x, int y)
   SetConsoleCursorPosition (get_output_handle (), pos);
 }
 
-void
+void __reg3
 fhandler_console::cursor_rel (int x, int y)
 {
   dev_state.fillin (get_output_handle ());
@@ -1318,7 +1336,7 @@ fhandler_console::cursor_rel (int x, int y)
   cursor_set (false, x, y);
 }
 
-void
+void __reg3
 fhandler_console::cursor_get (int *x, int *y)
 {
   dev_state.fillin (get_output_handle ());
@@ -2180,7 +2198,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  else if (*src == 'M')		/* Reverse Index (scroll down) */
 	    {
 	      dev_state.fillin (get_output_handle ());
-	      scroll_buffer (0, 0, -1, -1, 0, dev_state.winTop + 1);
+	      scroll_buffer (0, 0, -1, -1, 0, 1);
 	      dev_state.state = normal;
 	    }
 	  else if (*src == 'c')		/* RIS Full Reset */
