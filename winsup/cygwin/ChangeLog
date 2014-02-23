@@ -1,4 +1,29 @@
-2014-02-22  Corinna Vinschen  <corinna@vinschen.de>
+2014-02-22  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler.h (dev_console::is_fullscreen): Delete.
+	(dev_console::scroll_window): Return bool indicating success.
+	(dev_console::scroll_screen): New function.
+	(dev_console::clear_screen): New function.
+	(fhandler_console::clear_screen): Make __reg3.
+	(fhandler_console::cursor_set): Ditto.
+	(fhandler_console::cursor_get): Ditto.
+	(fhandler_console::cursor_rel): Ditto.
+	* fhandler_console.cc (dev_console::scroll_buffer): Adapt from
+	fhandler_console.
+	(fhandler_console::scroll_buffer): Use dev_console function.
+	(dev_console::is_fullscreen): Delete.
+	(dev_console::scroll_window): Return true if we cleared the screen.
+	Shrink/grow buffer first before scrolling to ensure that there is
+	sufficient space after scrolling.
+	(fhandler_console::clear_screen): Make reg3, use dev_console function.
+	(dev_console::clear_screen): New function adapted from
+	fhandler_console.
+	(fhandler_console::cursor_set): Make __reg3.
+	(fhandler_console::cursor_rel): Ditto.
+	(fhandler_console::cursor_get): Ditto.
+	(fhandler_console::write): Fix "reverse index".
+
+014-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (cygwin_internal): Add cases for CW_GETNSSSEP,
 	CW_GETPWSID and CW_GETGRSID.

@@ -1327,8 +1327,9 @@ class dev_console
   int set_cl_x (cltype);
   int set_cl_y (cltype);
   bool fillin (HANDLE);
-  bool is_fullscreen (int, int, int, int);
-  void scroll_window (HANDLE);
+  bool __reg3 scroll_window (HANDLE, int, int, int, int);
+  void __reg3 scroll_buffer (HANDLE, int, int, int, int, int, int);
+  void __reg3 clear_screen (HANDLE, int, int, int, int);
 
   friend class fhandler_console;
 };
@@ -1358,11 +1359,11 @@ private:
 /* Output calls */
   void set_default_attr ();
 
-  void clear_screen (cltype, cltype, cltype, cltype);
   void scroll_buffer (int, int, int, int, int, int);
-  void cursor_set (bool, int, int);
-  void cursor_get (int *, int *);
-  void cursor_rel (int, int);
+  void __reg3 clear_screen (cltype, cltype, cltype, cltype);
+  void __reg3 cursor_set (bool, int, int);
+  void __reg3 cursor_get (int *, int *);
+  void __reg3 cursor_rel (int, int);
   inline void write_replacement_char ();
   inline bool write_console (PWCHAR, DWORD, DWORD&);
   const unsigned char *write_normal (unsigned const char*, unsigned const char *);
