@@ -1,3 +1,37 @@
+2013-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (domlist_t): Drop id_offset.
+	(get_dcname): Remove.
+	(current_group): Remove.
+	(enum_unix_groups): Simplify.  Change space to underscore in domain
+	name.
+	(enum_local_groups): Simplify to accommodate the fact that it's only
+	called for foreign machines.
+	(enum_groups): Ditto.
+	(print_special_by_sid): Remove.
+	(print_special_by_name): Remove.
+	(usage): Align to new code.
+	(fetch_primary_domain): Remove.
+	(main): Use cygwin_internal CW_SETENT, CW_GETENT and CW_ENDENT method.
+	Call enum_local_groups, enum_groups, and enum_unix_groups only for
+	foreign machines.
+	* mkpasswd.c (get_dcname): Remove.
+	(current_user): Remove.
+	(enum_unix_users): Simplify.  Change space to underscore in domain name.
+	(enum_users): Simplify to accommodate the fact that it's only
+	called for foreign machines.
+	(print_special_by_sid): Remove.
+	(usage): Align to new code.
+	(longopts): Add -b/--no-builtin option.
+	(opts): Add -b option.
+	(print_special_by_name): Remove.
+	(enum_std_accounts): Remove.
+	(fetch_primary_domain): Remove.
+	(main): Use cygwin_internal CW_SETENT, CW_GETENT and CW_ENDENT method.
+	Call enum_users and enum_unix_users only for foreign machines.
+	* utils.xml (mkgroup): Align documentation to new usage.
+	(mkpasswd): Ditto.
+
 2014-02-23  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* minidumper.cc (minidump): Fix -t option argument handling.

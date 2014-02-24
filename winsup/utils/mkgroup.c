@@ -1,7 +1,7 @@
 /* mkgroup.c:
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -21,6 +21,7 @@
 #include <inttypes.h>
 #include <getopt.h>
 #include <io.h>
+#include <grp.h>
 #include <sys/fcntl.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
@@ -29,9 +30,7 @@
 #include <wininet.h>
 #include <iptypes.h>
 #include <ntsecapi.h>
-#include <dsgetdc.h>
 #include <ntdef.h>
-#include "loadlib.h"
 
 #define print_win_error(x) _print_win_error(x, __LINE__)
 
@@ -47,7 +46,6 @@ SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
 typedef struct
 {
   char *str;
-  DWORD id_offset;
   BOOL domain;
   BOOL with_dom;
 } domlist_t;
@@ -68,31 +66,6 @@ _print_win_error (DWORD code, int line)
   else
     fprintf (stderr, "mkgroup (%d): error %" PRIu32 ,
 	     line, (unsigned int) code);
-}
-
-static PWCHAR
-get_dcname (char *domain)
-{
-  static WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  DWORD rc;
-  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
-  PDOMAIN_CONTROLLER_INFOW pdci = NULL;
-
-  if (domain)
-    {
-      mbstowcs (domain_name, domain, strlen (domain) + 1);
-      rc = DsGetDcNameW (NULL, domain_name, NULL, NULL, 0, &pdci);
-    }
-  else
-    rc = DsGetDcNameW (NULL, NULL, NULL, NULL, 0, &pdci);
-  if (rc != ERROR_SUCCESS)
-    {
-      print_win_error (rc);
-      return (PWCHAR) -1;
-    }
-  wcscpy (server, pdci->DomainControllerName);
-  NetApiBufferFree (pdci);
-  return server;
 }
 
 static char *
@@ -149,40 +122,10 @@ fetch_current_pgrp_sid ()
 }
 
 static void
-current_group (const char *sep, DWORD id_offset)
-{
-  WCHAR grp[GNLEN + 1];
-  WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
-  DWORD glen = GNLEN + 1;
-  DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
-  int gid;
-  SID_NAME_USE acc_type;
-
-  if (!curr_pgrp.psid
-      || !LookupAccountSidW (NULL, curr_pgrp.psid, grp, &glen, dom, &dlen,
-			     &acc_type))
-    {
-      print_win_error (GetLastError ());
-      return;
-    }
-  gid = *GetSidSubAuthority (curr_pgrp.psid,
-			     *GetSidSubAuthorityCount(curr_pgrp.psid) - 1);
-  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
-	  sep ? dom : L"",
-	  sep ?: "",
-	  grp,
-	  put_sid (curr_pgrp.psid),
-	  (unsigned int) (id_offset + gid));
-}
-
-static void
-enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
+enum_unix_groups (domlist_t *mach, const char *sep, DWORD id_offset,
 		  char *unix_grp_list)
 {
   WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  PWCHAR servername = NULL;
-  char *d_or_m = dom_or_machine ? dom_or_machine->str : NULL;
-  BOOL with_dom = dom_or_machine ? dom_or_machine->with_dom : FALSE;
   SID_IDENTIFIER_AUTHORITY auth = { { 0, 0, 0, 0, 0, 22 } };
   char *gstr, *grp_list;
   WCHAR grp[GNLEN + sizeof ("Unix Group\\") + 1];
@@ -192,17 +135,13 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
   char psid_buffer[MAX_SID_LEN];
   SID_NAME_USE acc_type;
 
-  if (!d_or_m)
-    return;
-
-  int ret = mbstowcs (machine, d_or_m, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+  int ret = mbstowcs (machine, mach->str, INTERNET_MAX_HOST_NAME_LENGTH + 1);
   if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
     {
       fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
-	       program_invocation_short_name, d_or_m);
+	       program_invocation_short_name, mach->str);
       return;
     }
-  servername = machine;
 
   if (!AllocateAndInitializeSid (&auth, 2, 2, 0, 0, 0, 0, 0, 0, 0, &psid))
     return;
@@ -222,15 +161,15 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 	  if (ret < 1 || ret >= GNLEN + 1)
 	    fprintf (stderr, "%s: Invalid group name '%s'.  Skipping...\n",
 		     program_invocation_short_name, gstr);
-	  else if (LookupAccountNameW (servername, grp,
+	  else if (LookupAccountNameW (machine, grp,
 				       psid = (PSID) psid_buffer,
 				       (sidlen = MAX_SID_LEN, &sidlen),
 				       dom,
 				       (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
 				       &acc_type))
 	    printf ("%s%s%ls:%s:%" PRIu32 ":\n",
-		    with_dom ? "Unix Group" : "",
-		    with_dom ? sep : "",
+		    mach->with_dom ? "Unix_Group" : "",
+		    mach->with_dom ? sep : "",
 		    p,
 		    put_sid (psid),
 		    (unsigned int) (id_offset +
@@ -259,15 +198,15 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 	    {
 	      *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1)
 	      = start;
-	      if (LookupAccountSidW (servername, psid,
+	      if (LookupAccountSidW (machine, psid,
 				     grp, (glen = GNLEN + 1, &glen),
 				     dom,
 				     (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
 				     &acc_type)
 		  && !iswdigit (grp[0]))
 		printf ("%s%s%ls:%s:%" PRIu32 ":\n",
-			with_dom ? "Unix Group" : "",
-			with_dom ? sep : "",
+			mach->with_dom ? "Unix_Group" : "",
+			mach->with_dom ? sep : "",
 			grp,
 			put_sid (psid),
 			(unsigned int) (id_offset + start));
@@ -280,14 +219,11 @@ enum_unix_groups (domlist_t *dom_or_machine, const char *sep, DWORD id_offset,
 }
 
 static int
-enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
+enum_local_groups (domlist_t *mach, const char *sep,
 		   DWORD id_offset, char *disp_groupname, int print_builtin,
 		   int print_current)
 {
   WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  PWCHAR servername = NULL;
-  char *d_or_m = dom_or_machine ? dom_or_machine->str : NULL;
-  BOOL with_dom = dom_or_machine ? dom_or_machine->with_dom : FALSE;
   LOCALGROUP_INFO_0 *buffer;
   DWORD entriesread = 0;
   DWORD totalentries = 0;
@@ -295,22 +231,12 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
   WCHAR gname[GNLEN + 1];
   DWORD rc;
 
-  if (domain)
+  int ret = mbstowcs (machine, mach->str, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+  if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
     {
-      servername = get_dcname (d_or_m);
-      if (servername == (PWCHAR) -1)
-	return 1;
-    }
-  else if (d_or_m)
-    {
-      int ret = mbstowcs (machine, d_or_m, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-      if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
-	{
-	  fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
-		   program_invocation_short_name, d_or_m);
-	  return 1;
-	}
-      servername = machine;
+      fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
+	       program_invocation_short_name, mach->str);
+      return 1;
     }
 
   do
@@ -320,7 +246,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
       if (disp_groupname)
 	{
 	  mbstowcs (gname, disp_groupname, GNLEN + 1);
-	  rc = NetLocalGroupGetInfo (servername, gname, 0, (void *) &buffer);
+	  rc = NetLocalGroupGetInfo (machine, gname, 0, (void *) &buffer);
 	  if (rc == ERROR_SUCCESS)
 	    entriesread = 1;
 	  /* Allow further searching for the group and avoid annoying
@@ -330,7 +256,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	    return 0;
 	}
       else
-	rc = NetLocalGroupEnum (servername, 0, (void *) &buffer,
+	rc = NetLocalGroupEnum (machine, 0, (void *) &buffer,
 				MAX_PREFERRED_LENGTH, &entriesread,
 				&totalentries, &resume_handle);
       switch (rc)
@@ -360,7 +286,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	  PDBGSID pdsid;
 	  BOOL is_builtin = FALSE;
 
-	  if (!LookupAccountNameW (servername, buffer[i].lgrpi0_name, psid,
+	  if (!LookupAccountNameW (machine, buffer[i].lgrpi0_name, psid,
 				   &sid_length, domain_name, &domname_len,
 				   &acc_type))
 	    {
@@ -377,7 +303,7 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	      wcscat (domname, buffer[i].lgrpi0_name);
 	      sid_length = MAX_SID_LEN;
 	      domname_len = MAX_DOMAIN_NAME_LEN + 1;
-	      if (!LookupAccountNameW (servername, domname,
+	      if (!LookupAccountNameW (machine, domname,
 				       psid, &sid_length,
 				       domain_name, &domname_len,
 				       &acc_type))
@@ -415,8 +341,8 @@ enum_local_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 	  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
-		  with_dom && !is_builtin ? domain_name : L"",
-		  with_dom && !is_builtin ? sep : "",
+		  mach->with_dom && !is_builtin ? domain_name : L"",
+		  mach->with_dom || is_builtin ? sep : "",
 		  buffer[i].lgrpi0_name,
 		  put_sid (psid),
 		  (unsigned int) (gid + (is_builtin ? 0 : id_offset)));
@@ -436,13 +362,10 @@ skip_group:
 }
 
 static void
-enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
-	     DWORD id_offset, char *disp_groupname, int print_current)
+enum_groups (domlist_t *mach, const char *sep, DWORD id_offset,
+	     char *disp_groupname, int print_current)
 {
   WCHAR machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  PWCHAR servername = NULL;
-  char *d_or_m = dom_or_machine ? dom_or_machine->str : NULL;
-  BOOL with_dom = dom_or_machine ? dom_or_machine->with_dom : FALSE;
   GROUP_INFO_2 *buffer;
   DWORD entriesread = 0;
   DWORD totalentries = 0;
@@ -450,22 +373,12 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
   WCHAR gname[GNLEN + 1];
   DWORD rc;
 
-  if (domain)
+  int ret = mbstowcs (machine, mach->str, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+  if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
     {
-      servername = get_dcname (d_or_m);
-      if (servername == (PWCHAR) -1)
-	return;
-    }
-  else if (d_or_m)
-    {
-      int ret = mbstowcs (machine, d_or_m, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-      if (ret < 1 || ret >= INTERNET_MAX_HOST_NAME_LENGTH + 1)
-	{
-	  fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
-		   program_invocation_short_name, d_or_m);
-	  return;
-	}
-      servername = machine;
+      fprintf (stderr, "%s: Invalid machine name '%s'.  Skipping...\n",
+	       program_invocation_short_name, mach->str);
+      return;
     }
 
   do
@@ -475,8 +388,7 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
       if (disp_groupname != NULL)
 	{
 	  mbstowcs (gname, disp_groupname, GNLEN + 1);
-	  rc = NetGroupGetInfo (servername, (LPWSTR) & gname, 2,
-				(void *) &buffer);
+	  rc = NetGroupGetInfo (machine, (LPWSTR) & gname, 2, (void *) &buffer);
 	  entriesread=1;
 	  /* Avoid annoying error messages just because the group hasn't been
 	     found. */
@@ -484,9 +396,8 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	    return;
 	}
       else
-	rc = NetGroupEnum (servername, 2, (void *) & buffer,
-			   MAX_PREFERRED_LENGTH, &entriesread, &totalentries,
-			   &resume_handle);
+	rc = NetGroupEnum (machine, 2, (void *) & buffer, MAX_PREFERRED_LENGTH,
+			   &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
 	case ERROR_ACCESS_DENIED:
@@ -512,7 +423,7 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	  SID_NAME_USE acc_type;
 
 	  int gid = buffer[i].grpi2_group_id;
-	  if (!LookupAccountNameW (servername, buffer[i].grpi2_name,
+	  if (!LookupAccountNameW (machine, buffer[i].grpi2_name,
 				   psid, &sid_length,
 				   domain_name, &domname_len,
 				   &acc_type))
@@ -525,16 +436,13 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	    {
 	      WCHAR domname[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
 
-	      wcscpy (domname, domain || !servername
-			       ? domain_name : servername);
+	      wcscpy (domname, machine);
 	      wcscat (domname, L"\\");
 	      wcscat (domname, buffer[i].grpi2_name);
 	      sid_length = MAX_SID_LEN;
 	      domname_len = MAX_DOMAIN_NAME_LEN + 1;
-	      if (!LookupAccountNameW (servername, domname,
-				       psid, &sid_length,
-				       domain_name, &domname_len,
-				       &acc_type))
+	      if (!LookupAccountNameW (machine, domname, psid, &sid_length,
+				       domain_name, &domname_len, &acc_type))
 		{
 		  print_win_error (GetLastError ());
 		  fprintf(stderr, " (%ls)\n", domname);
@@ -547,8 +455,8 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
 	    got_curr_pgrp = TRUE;
 
 	  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
-		  with_dom ? domain_name : L"",
-		  with_dom ? sep : "",
+		  mach->with_dom ? domain_name : L"",
+		  mach->with_dom ? sep : "",
 		  buffer[i].grpi2_name,
 		  put_sid (psid),
 		  (unsigned int) (id_offset + gid));
@@ -560,107 +468,42 @@ enum_groups (BOOL domain, domlist_t *dom_or_machine, const char *sep,
   while (rc == ERROR_MORE_DATA);
 }
 
-static void
-print_special_by_sid (PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
-		      DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
-		      DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
-{
-  WCHAR grp[GNLEN + 1], dom[MAX_DOMAIN_NAME_LEN + 1];
-  DWORD glen, dlen, rid;
-  PSID psid;
-  SID_NAME_USE acc_type;
-
-  if (AllocateAndInitializeSid (auth, cnt, sub1, sub2, sub3, sub4,
-				sub5, sub6, sub7, sub8, &psid))
-    {
-      if (LookupAccountSidW (NULL, psid,
-			    grp, (glen = GNLEN + 1, &glen),
-			    dom, (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
-			    &acc_type))
-	{
-	  if (sub8)
-	    rid = sub8;
-	  else if (sub7)
-	    rid = sub7;
-	  else if (sub6)
-	    rid = sub6;
-	  else if (sub5)
-	    rid = sub5;
-	  else if (sub4)
-	    rid = sub4;
-	  else if (sub3)
-	    rid = sub3;
-	  else if (sub2)
-	    rid = sub2;
-	  else
-	    rid = sub1;
-	  printf ("%ls:%s:%" PRIu32 ":\n", grp, put_sid (psid),
-	  	  (unsigned int) rid);
-	}
-      FreeSid (psid);
-    }
-}
-
-static void
-print_special_by_name (PCWSTR name, gid_t gid)
-{
-  DWORD size = 256, dom_size = 256;
-  PSID sid = (PSID) alloca (size);
-  WCHAR dom[dom_size];
-  SID_NAME_USE use;
-
-  PWCHAR name_only = wcschr (name, L'\\');
-  if (name_only)
-    ++name_only;
-
-  if (LookupAccountNameW (NULL, name, sid, &size, dom, &dom_size, &use))
-    printf ("%ls:%s:%lu:\n",
-	    name_only ?: name, put_sid (sid), (unsigned long) gid);
-}
-
 static int
 usage (FILE * stream)
 {
   fprintf (stream,
 "Usage: %s [OPTION]...\n"
 "\n"
-"Print /etc/group file to stdout\n"
+"Write /etc/group-like output to stdout\n"
 "\n"
 "Options:\n"
 "\n"
-"   -l,--local [machine[,offset]]\n"
-"                           print local groups with gid offset offset\n"
+"   -l,--local [machine]    print local groups\n"
 "                           (from local machine if no machine specified)\n"
-"   -L,--Local [machine[,offset]]\n"
-"                           ditto, but generate groupname with machine prefix\n"
-"   -d,--domain [domain[,offset]]\n"
-"                           print domain groups with gid offset offset\n"
+"   -L,--Local machine      ditto, but generate groupname with machine prefix\n"
+"   -d,--domain [domain]    print domain groups\n"
 "                           (from current domain if no domain specified)\n"
-"   -D,--Domain [domain[,offset]]\n"
-"                           ditto, but generate groupname with machine prefix\n"
 "   -c,--current            print current group\n"
-"   -C,--Current            ditto, but generate groupname with machine or\n"
-"                           domain prefix\n"
-"   -S,--separator char     for -L, -D, -C use character char as domain\\group\n"
-"                           separator in groupname instead of the default '\\'\n"
-"   -o,--id-offset offset   change the default offset (10000) added to gids\n"
-"                           in domain or foreign server accounts.\n"
+"   -S,--separator char     for -l use character char as domain\\group\n"
+"                           separator in groupname instead of default '%s'\n"
+"   -o,--id-offset offset   change the default offset (0x10000) added to\n"
+"                           gids of foreign machine accounts.\n"
 "   -g,--group groupname    only return information for the specified group\n"
-"                           one of -l, -L, -d, -D must be specified, too\n"
+"                           one of -l, -d must be specified, too\n"
 "   -b,--no-builtin         don't print BUILTIN groups\n"
-"   -U,--unix grouplist     additionally print UNIX groups when using -l or -L\n"
-"                           on a UNIX Samba server\n"
-"                           grouplist is a comma-separated list of groupnames\n"
-"                           or gid ranges (root,-25,50-100).\n"
+"   -U,--unix grouplist     print UNIX groups when using -l on a UNIX Samba\n"
+"                           server.  grouplist is a comma-separated list of\n"
+"                           groupnames or gid ranges (root,-25,50-100).\n"
 "                           (enumerating large ranges can take a long time!)\n"
-"   -s,--no-sids            (ignored)\n"
-"   -u,--users              (ignored)\n"
 "   -h,--help               print this message\n"
 "   -v,--version            print version information and exit\n"
 "\n"
 "Default is to print local groups on stand-alone machines, plus domain\n"
-"groups on domain controllers and domain member machines.\n"
-"\n", program_invocation_short_name);
+"groups on domain controllers and domain member machines.\n\n"
+"Don't use this command to generate a local /etc/group file, unless you\n"
+"really need one.  See the Cygwin User's Guide for more information.\n"
+"\n", program_invocation_short_name,
+      (const char *) cygwin_internal (CW_GETNSSSEP));
   return 1;
 }
 
@@ -699,44 +542,20 @@ print_version ()
 	  strrchr (__DATE__, ' ') + 1);
 }
 
-static PPOLICY_PRIMARY_DOMAIN_INFO p_dom;
-
-static BOOL
-fetch_primary_domain ()
-{
-  NTSTATUS status;
-  LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
-  LSA_HANDLE lsa;
-
-  if (!p_dom)
-    {
-      status = LsaOpenPolicy (NULL, &oa, POLICY_EXECUTE, &lsa);
-      if (!NT_SUCCESS (status))
-	return FALSE;
-      status = LsaQueryInformationPolicy (lsa, PolicyPrimaryDomainInformation,
-					  (PVOID *) ((void *) &p_dom));
-      LsaClose (lsa);
-      if (!NT_SUCCESS (status))
-	return FALSE;
-    }
-  return !!p_dom->Sid;
-}
-
 int
 main (int argc, char **argv)
 {
   int print_domlist = 0;
   domlist_t domlist[32];
-  char *opt, *p, *ep;
+  char *opt, *p;
   int print_current = 0;
-  int print_system = 0;
   int print_builtin = 1;
   char *print_unix = NULL;
-  const char *sep_char = "\\";
-  DWORD id_offset = 10000, off;
+  const char *sep_char = (const char *) cygwin_internal (CW_GETNSSSEP);
+  DWORD id_offset = 0x10000, off;
   int c, i;
   char *disp_groupname = NULL;
-  BOOL in_domain;
+  //BOOL in_domain;
   int optional_args = 0;
 
   if (!isatty (1))
@@ -746,22 +565,21 @@ main (int argc, char **argv)
   setlocale (LC_CTYPE, "");
   if (!strcmp (setlocale (LC_CTYPE, NULL), "C"))
     setlocale (LC_CTYPE, "en_US.UTF-8");
-  in_domain = fetch_primary_domain ();
   fetch_current_pgrp_sid ();
 
   if (argc == 1)
     {
-      print_special_by_sid (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
-			    0, 0, 0, 0, 0, 0, 0);
-      if (in_domain)
+      int enums = ENUM_PRIMARY | ENUM_LOCAL | ENUM_BUILTIN;
+      uintptr_t ticket = cygwin_internal (CW_SETENT, TRUE, enums, NULL);
+      if (ticket)
 	{
-	  if (!enum_local_groups (TRUE, NULL, sep_char, id_offset,
-				  disp_groupname, print_builtin, 0))
-	    enum_groups (TRUE, NULL, sep_char, id_offset, disp_groupname, 0);
+	  struct group *grp;
+
+	  while ((grp = (struct group *) cygwin_internal (CW_GETENT, TRUE,
+							  ticket)))
+	    printf ("%s:%s:%u:\n", grp->gr_name, grp->gr_passwd, grp->gr_gid);
+	  cygwin_internal (CW_ENDENT, TRUE, ticket);
 	}
-      else if (!enum_local_groups (FALSE, NULL, sep_char, 0, disp_groupname,
-				   print_builtin, 0))
-	enum_groups (FALSE, NULL, sep_char, 0, disp_groupname, 0);
       return 0;
     }
 
@@ -799,15 +617,10 @@ main (int argc, char **argv)
 		       domlist[i].str);
 	      goto skip;
 	    }
-	if (!(domlist[print_domlist].str = opt))
-	  print_system = 1;
-	domlist[print_domlist].id_offset = UINT32_MAX;
+	domlist[print_domlist].str = opt;
 	if (opt && (p = strchr (opt, ',')))
 	  {
-	    if (p == opt
-		|| !isdigit ((unsigned char) p[1])
-		|| (domlist[print_domlist].id_offset = strtol (p + 1, &ep, 10)
-		    , *ep))
+	    if (p == opt)
 	      {
 		fprintf (stderr, "%s: Malformed machine,offset string '%s'.  "
 			 "Skipping...\n", program_invocation_short_name, opt);
@@ -815,15 +628,15 @@ main (int argc, char **argv)
 	      }
 	    *p = '\0';
 	  }
-	domlist[print_domlist++].with_dom = (c == 'D' || c == 'L');
+	domlist[print_domlist++].with_dom = (c == 'L');
 skip:
 	break;
       case 'S':
 	sep_char = optarg;
 	if (strlen (sep_char) > 1)
 	  {
-	    fprintf (stderr, "%s: Only one character allowed as domain\\user "
-			     "separator character.\n",
+	    fprintf (stderr, "%s: Only one ASCII character allowed as "
+			     "domain\\user separator character.\n",
 			     program_invocation_short_name);
 	    return 1;
 	  }
@@ -838,8 +651,6 @@ skip:
 	print_unix = optarg;
 	break;
       case 'c':
-	sep_char = NULL;
-	/*FALLTHRU*/
       case 'C':
 	print_current = 1;
 	break;
@@ -876,34 +687,77 @@ skip:
       exit (1);
     }
 
-  /* Get 'system' group */
-  if (!disp_groupname && print_system && print_builtin && print_domlist)
-    {
-      print_special_by_sid (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
-			    0, 0, 0, 0, 0, 0, 0);
-      print_special_by_name (L"NT SERVICE\\TrustedInstaller", -2);
-    }
+  struct group *pgrp = NULL;
+  if (print_current)
+    pgrp = (struct group *) cygwin_internal (CW_GETGRSID, TRUE, curr_pgrp.psid);
 
-  off = id_offset;
+  int enums = ENUM_NONE;
+  WCHAR tdoms[print_domlist * 258];
+  PWCHAR t = tdoms;
+  if (!disp_groupname && print_builtin && print_domlist)
+    enums |= ENUM_BUILTIN;
   for (i = 0; i < print_domlist; ++i)
     {
-      DWORD my_off = (domlist[i].domain || domlist[i].str)
-		     ? domlist[i].id_offset != UINT_MAX
-		       ? domlist[i].id_offset : off : 0;
-      if (!enum_local_groups (domlist[i].domain, domlist + i, sep_char,
-			      my_off, disp_groupname, print_builtin, print_current))
+      if (domlist[i].domain)
 	{
-	  if (!domlist[i].domain && domlist[i].str && print_unix)
-	    enum_unix_groups (domlist + i, sep_char, my_off, print_unix);
-	  enum_groups (domlist[i].domain, domlist + i, sep_char, my_off,
-		       disp_groupname, print_current);
-	  if (my_off)
-	    off += id_offset;
+	  if (domlist[i].str)
+	    {
+	      enums |= ENUM_TDOMS;
+	      t += mbstowcs (t, domlist[i].str, 257);
+	      *t++ = L'\0';
+	    }
+	  else
+	    enums |= ENUM_PRIMARY;
+	}
+      else if (!domlist[i].str)
+	enums |= ENUM_LOCAL;
+    }
+  if (t > tdoms)
+    *t++ = L'\0';
+  if (enums)
+    {
+      uintptr_t ticket = cygwin_internal (CW_SETENT, TRUE, enums,
+					  t > tdoms ? tdoms : NULL);
+      if (ticket)
+	{
+	  struct group *grp;
+	  const char *nss_sep = (const char *) cygwin_internal (CW_GETNSSSEP);
+
+	  while ((grp = (struct group *)
+			cygwin_internal (CW_GETENT, TRUE, ticket)))
+	    {
+	      if (disp_groupname
+		  && strcasecmp (disp_groupname, grp->gr_name) != 0
+		  && (!(p = strchr (grp->gr_name, nss_sep[0]))
+		      || strcasecmp (disp_groupname, p + 1) != 0))
+		continue;
+	      printf ("%s:%s:%u:\n", grp->gr_name, grp->gr_passwd,
+				     grp->gr_gid);
+	      if (pgrp && !strcmp (grp->gr_passwd, pgrp->gr_passwd))
+		got_curr_pgrp = TRUE;
+	    }
+	  cygwin_internal (CW_ENDENT, TRUE, ticket);
 	}
     }
 
   if (print_current && !got_curr_pgrp)
-    current_group (sep_char, off);
+    printf ("%s:%s:%u:\n", pgrp->gr_name, pgrp->gr_passwd, pgrp->gr_gid);
+
+  off = 0xfd000000;
+  for (i = 0; i < print_domlist; ++i)
+    {
+      if (domlist[i].domain || !domlist[i].str)
+	continue;
+      if (!enum_local_groups (domlist + i, sep_char, off, disp_groupname,
+			      print_builtin, print_current))
+	{
+	  enum_groups (domlist + i, sep_char, off, disp_groupname,
+		       print_current);
+	  if (!domlist[i].domain && domlist[i].str && print_unix)
+	    enum_unix_groups (domlist + i, sep_char, 0xff000000, print_unix);
+	  off += id_offset;
+	}
+    }
 
   return 0;
 }

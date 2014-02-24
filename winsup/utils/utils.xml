@@ -875,89 +875,77 @@ Write minidump from WIN32PID to FILENAME.dmp
     <screen>
 Usage: mkgroup [OPTION]...
 
-Print /etc/group file to stdout
+Write /etc/group-like output to stdout
 
 Options:
 
-   -l,--local [machine[,offset]]
-                           print local groups with gid offset offset
+   -l,--local [machine]    print local groups
                            (from local machine if no machine specified)
-   -L,--Local [machine[,offset]]
-                           ditto, but generate groupname with machine prefix
-   -d,--domain [domain[,offset]]
-                           print domain groups with gid offset offset
+   -L,--Local machine      ditto, but generate groupname with machine prefix
+   -d,--domain [domain]    print domain groups
                            (from current domain if no domain specified)
-   -D,--Domain [domain[,offset]]
-                           ditto, but generate groupname with machine prefix
    -c,--current            print current group
-   -C,--Current            ditto, but generate groupname with machine or
-                           domain prefix
-   -S,--separator char     for -L, -D, -C use character char as domain\group
-                           separator in groupname instead of the default '\'
-   -o,--id-offset offset   change the default offset (10000) added to gids
-                           in domain or foreign server accounts.
+   -S,--separator char     for -l use character char as domain\group
+                           separator in groupname instead of default '+'
+   -o,--id-offset offset   change the default offset (0x10000) added to
+                           gids of foreign machine accounts.
    -g,--group groupname    only return information for the specified group
-                           one of -l, -L, -d, -D must be specified, too
+                           one of -l, -d must be specified, too
    -b,--no-builtin         don't print BUILTIN groups
-   -U,--unix grouplist     additionally print UNIX groups when using -l or -L
-                           on a UNIX Samba server
-                           grouplist is a comma-separated list of groupnames
-                           or gid ranges (root,-25,50-100).
-			   (enumerating large ranges can take a long time!)
-   -s,--no-sids            (ignored)
-   -u,--users              (ignored)
+   -U,--unix grouplist     print UNIX groups when using -l on a UNIX Samba
+                           server.  grouplist is a comma-separated list of
+                           groupnames or gid ranges (root,-25,50-100).
+                           (enumerating large ranges can take a long time!)
    -h,--help               print this message
-   -V,--version            print version information and exit
+   -v,--version            print version information and exit
 
 Default is to print local groups on stand-alone machines, plus domain
 groups on domain controllers and domain member machines.
+
+Don't use this command to generate a local /etc/group file, unless you
+really need one.  See the Cygwin User's Guide for more information.
 </screen>
 
-    <para>The <command>mkgroup</command> program can be used to help configure
-      Cygwin by creating a <filename>/etc/group</filename> file. Its use is
-      essential to include Windows security information.</para>
+    <para>The <command>mkgroup</command> program can be used to create a local
+      <filename>/etc/group</filename> file.  Cygwin doesn't need this file,
+      because it reads group information from the Windows account databases,
+      but you can add an <filename>/etc/group</filename> file for instance, if
+      your machine is often disconnected from its domain controller.
+      </para>
 
-    <para>The command is initially called by <command>setup.exe</command> to
-      create a default <filename>/etc/group</filename>. This should be
-      sufficient in most circumstances. However, especially when working in a
-      multi-domain environment, you can use <command>mkgroup</command> manually
-      to create a more complete <filename>/etc/group</filename> file for all
-      domains. Especially when you have the same group name used on multiple
-      machines or in multiple domains, you can use the <literal>-D</literal>,
-      <literal>-L</literal> and <literal>-C</literal> options to create unique
-      domain\group style groupnames.</para>
+    <para>Note that this information is static, in contrast to the information
+      automatically gathered by Cygwin from the Windows account databases. If
+      you change the group information on your system, you'll need to regenerate
+      the group file for it to have the new information.</para>
 
-    <para>Note that this information is static. If you change the group
-      information in your system, you'll need to regenerate the group file for
-      it to have the new information.</para>
-
-    <para>The <literal>-d/-D</literal> and <literal>-l/-L</literal> options
-      allow you to specify where the information comes from, the local SAM of a
-      machine or from the domain, or both. With the <literal>-d/-D</literal>
-      options the program contacts a Domain Controller, which my be unreachable
-      or have restricted access. Comma-separated from the machine or domain,
-      you can specify an offset which is used as base added to the group's RID
-      to compute the gid (offset + RID = gid). This allows you to create the
-      same gids every time you re-run <command>mkgroup</command>. For very
-      simple needs, an entry for the current user's group can be created by
-      using the option <literal>-c</literal> or <literal>-C</literal>. If you
-      want to use one of the <literal>-D</literal>, <literal>-L</literal> or
-      <literal>-C</literal> options, but you don't like the backslash as
-      domain/group separator, you can specify another separator using the
-      <literal>-S</literal> option, for instance:</para>
+    <para>By default, the information generated by <command>mkgroup</command>
+      is equivalent to the information generated by Cygwin itself.  The
+      <literal>-d</literal> and <literal>-l/-L</literal> options allow you to
+      specify where the information comes from, some domain, or the local SAM
+      of a machine. Note that you can only enumerate accounts from trusted
+      domains.  Any non-trusted domain will be ignored.  Access-restrictions
+      of your current account apply.  The <literal>-l/-L</literal> when used
+      with a machine name, tries to contact that machine to enumerate local
+      groups of other machines, typically outside of domains.  This scenario
+      cannot be covered by Cygwin's account automatism.  If you want to use 
+      the <literal>-L</literal> option, but you don't like the default
+      domain/group separator from <filename>/etc/nsswitch.conf</filename>,
+      you can specify another separator using the <literal>-S</literal> option,
+      for instance:</para>
 
     <example id="utils-mkgroup-ex">
       <title>Setting up group entry for current user with different
         domain/group separator</title>
       <screen>
-<prompt>$</prompt> <userinput>mkgroup -C -S+ &gt; /etc/group</userinput>
-<prompt>$</prompt> <userinput>cat /etc/group</userinput>
-DOMAIN+my_group:S-1-5-21-2913048732-1697188782-3448811101-1144:11144:
+<prompt>$</prompt> <userinput>mkgroup -L server1 -S= &gt; /etc/group</userinput>
 </screen>
     </example>
 
-    <para>The <literal>-o</literal> option allows for special cases (such as
-      multiple domains) where the GIDs might match otherwise. The
+    <para>For very simple needs, an entry for the current user's group can be
+      created by using the option <literal>-c</literal>.</para>
+
+    <para>The <literal>-o</literal> option allows for (unlikely) special cases
+      with multiple machines where the GIDs might match otherwise. The
       <literal>-g</literal> option only prints the information for one group.
       The <literal>-U</literal> option allows you to enumerate the standard
       UNIX groups on a Samba machine. It's used together with <literal>-l
@@ -973,81 +961,69 @@ DOMAIN+my_group:S-1-5-21-2913048732-1697188782-3448811101-1144:11144:
     <screen>
 Usage: mkpasswd [OPTIONS]...
 
-Print /etc/passwd file to stdout
+Write /etc/passwd-like output to stdout
 
 Options:
 
-   -l,--local [machine[,offset]]
-                           print local user accounts with uid offset offset
+   -l,--local [machine]    print local user accounts with uid offset offset
                            (from local machine if no machine specified)
-   -L,--Local [machine[,offset]]
-                           ditto, but generate username with machine prefix
-   -d,--domain [domain[,offset]]
-                           print domain accounts with uid offset offset
+   -L,--Local machine      ditto, but generate username with machine prefix
+   -d,--domain [domain]    print domain accounts with uid offset offset
                            (from current domain if no domain specified)
-   -D,--Domain [domain[,offset]]
-                           ditto, but generate username with domain prefix
    -c,--current            print current user
-   -C,--Current            ditto, but generate username with machine or
-                           domain prefix
-   -S,--separator char     for -L, -D, -C use character char as domain\user
-                           separator in username instead of the default '\'
-   -o,--id-offset offset   change the default offset (10000) added to uids
+   -S,--separator char     for -l use character char as domain\user
+                           separator in username instead of the default '+'
+   -o,--id-offset offset   change the default offset (0x10000) added to uids
                            in domain or foreign server accounts.
    -u,--username username  only return information for the specified user
-                           one of -l, -L, -d, -D must be specified, too
+                           one of -l, -d must be specified, too
+   -b,--no-builtin         don't print BUILTIN users
    -p,--path-to-home path  use specified path instead of user account home dir
                            or /home prefix
-   -U,--unix userlist      additionally print UNIX users when using -l or -L\
-                           on a UNIX Samba server
-                           userlist is a comma-separated list of usernames
-                           or uid ranges (root,-25,50-100).
+   -U,--unix userlist      print UNIX users when using -l on a UNIX Samba
+                           server.  userlist is a comma-separated list of
+                           usernames or uid ranges (root,-25,50-100).
                            (enumerating large ranges can take a long time!)
-   -s,--no-sids            (ignored)
-   -m,--no-mount           (ignored)
-   -g,--local-groups       (ignored)
    -h,--help               displays this message
    -V,--version            version information and exit
 
 Default is to print local accounts on stand-alone machines, domain accounts
 on domain controllers and domain member machines.
+
+Don't use this command to generate a local /etc/passwd file, unless you
+really need one.  See the Cygwin User's Guide for more information.
 </screen>
 
-    <para>The <command>mkpasswd</command> program can be used to help configure
-      Cygwin by creating a <filename>/etc/passwd</filename> from your system
-      information. Its use is essential to include Windows security
-      information. However, the actual passwords are determined by Windows, not
-      by the content of <filename>/etc/passwd</filename>.</para>
+    <para>The <command>mkpasswd</command> program can be used to create a
+      <filename>/etc/passwd</filename> file.  Cygwin doesn't need this file,
+      because it reads user information from the Windows account databases,
+      but you can add an <filename>/etc/group</filename> file for instance, if
+      your machine is often disconnected from its domain controller.</para>
 
-    <para>The command is initially called by <command>setup.exe</command> to
-      create a default <filename>/etc/passwd</filename>. This should be
-      sufficient in most circumstances. However, especially when working in a
-      multi-domain environment, you can use <command>mkpasswd</command>
-      manually to create a more complete <filename>/etc/passwd</filename> file
-      for all domains. Especially when you have the same user name used on
-      multiple machines or in multiple domains, you can use the
-      <literal>-D</literal>, <literal>-L</literal> and <literal>-C</literal>
-      options to create unique domain\user style usernames.</para>
+    <para>Note that this information is static, in contrast to the information
+      automatically gathered by Cygwin from the Windows account databases. If
+      you change the user information on your system, you'll need to regenerate
+      the passwd file for it to have the new information.</para>
 
-    <para>Note that this information is static. If you change the user
-      information in your system, you'll need to regenerate the passwd file for
-      it to have the new information.</para>
+    <para>By default, the information generated by <command>mkpasswd</command>
+      is equivalent to the information generated by Cygwin itself.  The
+      <literal>-d</literal> and <literal>-l/-L</literal> options allow you to
+      specify where the information comes from, some domain, or the local SAM
+      of a machine.  Note that you can only enumerate accounts from trusted
+      domains.  Any non-trusted domain will be ignored.  Access-restrictions
+      of your current account apply.  The <literal>-l/-L</literal> when used
+      with a machine name, tries to contact that machine to enumerate local
+      groups of other machines, typically outside of domains.  This scenario
+      cannot be covered by Cygwin's account automatism.  If you want to use
+      the <literal>-L</literal> option, but you don't like the default
+      domain/group separator from <filename>/etc/nsswitch.conf</filename>,
+      you can specify another separator using the <literal>-S</literal> option,
+      analog to <command>mkgroup</command>.</para>
 
-    <para>The <literal>-d/-D</literal> and <literal>-l/-L</literal> options
-      allow you to specify where the information comes from, the local machine
-      or the domain (default or given), or both. With the
-      <literal>-d/-D</literal> options the program contacts the Domain
-      Controller, which may be unreachable or have restricted access.
-      Comma-separated from the machine or domain, you can specify an offset
-      which is used as base added to the user's RID to compute the uid (offset
-      + RID = uid). This allows to create the same uids every time you re-run
-      <command>mkpasswd</command>. An entry for the current user can be created
-      by using the option <literal>-c</literal> or <literal>-C</literal>. If
-      you want to use one of the <literal>-D</literal>, <literal>-L</literal>
-      or <literal>-C</literal> options, but you don't like the backslash as
-      domain/group separator, you can specify another separator using the
-      <literal>-S</literal> option, similar to the <command>mkgroup</command>.
-      The <literal>-o</literal> option allows for special cases (such as
+    <para>For very simple needs, an entry for the current user can be created
+      by using the option <literal>-c</literal>.</para>
+      
+    <para>The <literal>-o</literal> option allows for special cases (such as
       multiple domains) where the UIDs might match otherwise. The
       <literal>-p</literal> option causes <command>mkpasswd</command> to use
       the specified prefix instead of the account home dir or <literal>/home/
@@ -1062,7 +1038,8 @@ on domain controllers and domain member machines.
       to enumerate the standard UNIX users on a Samba machine. It's used
       together with <literal>-l samba-server</literal> or <literal>-L
       samba-server</literal>. The normal UNIX users are usually not enumerated,
-      but they can show up as file owners in <command>ls -l</command> output. </para>
+      but they can show up as file owners in <command>ls -l</command> output.
+      </para>
 
   </sect2>
 
