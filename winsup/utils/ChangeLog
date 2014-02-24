@@ -1,3 +1,7 @@
+2014-02-23  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* minidumper.cc (minidump): Fix -t option argument handling.
+
 2014-02-07  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* minidumper.cc: New file.
