@@ -1,3 +1,10 @@
+2014-02-25  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler.h (fhandler_console::scroll_buffer_screen): New function.
+	* fhandler_console.cc (fhandler_console::scroll_buffer_screen): New function.
+	(fhandler_console::char_command): Use scroll_buffer_screen as appropriate.
+	(dev_console::scroll_buffer): Remove if 0'ed block.
+
 2014-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (cygwin_internal): Add cases for CW_GETPWSID and
