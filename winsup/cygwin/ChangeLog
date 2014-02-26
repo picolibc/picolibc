@@ -34,7 +34,7 @@
 	(fhandler_console::cursor_get): Ditto.
 	(fhandler_console::write): Fix "reverse index".
 
-014-02-22  Corinna Vinschen  <corinna@vinschen.de>
+2014-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (cygwin_internal): Add cases for CW_GETNSSSEP,
 	CW_GETPWSID and CW_GETGRSID.
