@@ -1360,6 +1360,7 @@ private:
   void set_default_attr ();
 
   void scroll_buffer (int, int, int, int, int, int);
+  void scroll_buffer_screen (int, int, int, int, int, int);
   void __reg3 clear_screen (cltype, cltype, cltype, cltype);
   void __reg3 cursor_set (bool, int, int);
   void __reg3 cursor_get (int *, int *);

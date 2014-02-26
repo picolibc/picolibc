@@ -792,23 +792,23 @@ dev_console::scroll_buffer (HANDLE h, int x1, int y1, int x2, int y2, int xn, in
   dest.X = xn >= 0 ? xn : dwWinSize.X - 1;
   dest.Y = yn >= 0 ? yn : winBottom;
   ScrollConsoleScreenBuffer (h, &sr1, &sr2, dest, &fill);
-
-#if 0 /* CGF: 2014-01-04 Assuming that we don't need this anymore */
-  /* ScrollConsoleScreenBuffer on Windows 95 is buggy - when scroll distance
-   * is more than half of screen, filling doesn't work as expected */
-
-  if (sr1.Top == sr1.Bottom)
-    /* nothing to do */;
-  else if (dest.Y <= sr1.Top)	/* forward scroll */
-    clear_screen (0, 1 + dest.Y + sr1.Bottom - sr1.Top, sr2.Right, sr2.Bottom);
-  else			/* reverse scroll */
-    clear_screen (0, sr1.Top, sr2.Right, dest.Y - 1);
-#endif
 }
 
 inline void
 fhandler_console::scroll_buffer (int x1, int y1, int x2, int y2, int xn, int yn)
 {
+  dev_state.scroll_buffer (get_output_handle (), x1, y1, x2, y2, xn, yn);
+}
+
+inline void
+fhandler_console::scroll_buffer_screen (int x1, int y1, int x2, int y2, int xn, int yn)
+{
+  if (y1 >= 0)
+    y1 += dev_state.winTop;
+  if (y2 >= 0)
+    y1 += dev_state.winTop;
+  if (yn >= 0)
+    yn += dev_state.winTop;
   dev_state.scroll_buffer (get_output_handle (), x1, y1, x2, y2, xn, yn);
 }
 
@@ -1853,12 +1853,12 @@ fhandler_console::char_command (char c)
       break;
     case 'S':				/* SF - Scroll forward */
       n = dev_state.args[0] ?: 1;
-      scroll_buffer (0, n, -1, -1, 0, 0);
+      scroll_buffer_screen (0, n, -1, -1, 0, 0);
       break;
     case 'T':				/* SR - Scroll down */
       dev_state.fillin (get_output_handle ());
       n = dev_state.winTop + dev_state.args[0] ?: 1;
-      scroll_buffer (0, dev_state.winTop, -1, -1, 0, n);
+      scroll_buffer_screen (0, 0, -1, -1, 0, n);
       break;
     case 'X':				/* ec - erase chars */
       n = dev_state.args[0] ?: 1;
@@ -2198,7 +2198,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  else if (*src == 'M')		/* Reverse Index (scroll down) */
 	    {
 	      dev_state.fillin (get_output_handle ());
-	      scroll_buffer (0, 0, -1, -1, 0, 1);
+	      scroll_buffer_screen (0, 0, -1, -1, 0, 1);
 	      dev_state.state = normal;
 	    }
 	  else if (*src == 'c')		/* RIS Full Reset */
