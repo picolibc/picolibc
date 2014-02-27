@@ -380,13 +380,13 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_GET_UID_FROM_SID:
 	{
 	  cygpsid psid = va_arg (arg, PSID);
-	  res = psid.get_id (false, NULL);
+	  res = psid.get_uid (NULL);
 	}
 	break;
       case CW_GET_GID_FROM_SID:
 	{
 	  cygpsid psid = va_arg (arg, PSID);
-	  res = psid.get_id (true, NULL);
+	  res = psid.get_gid (NULL);
 	}
 	break;
       case CW_GET_BINMODE:

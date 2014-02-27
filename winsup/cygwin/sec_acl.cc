@@ -94,6 +94,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
   struct passwd *pw;
   struct group *gr;
   int pos;
+  cyg_ldap cldap;
 
   RtlCreateAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION);
 
@@ -157,7 +158,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	  break;
 	case USER:
 	case DEF_USER:
-	  if (!(pw = internal_getpwuid (aclbufp[i].a_id))
+	  if (!(pw = internal_getpwuid (aclbufp[i].a_id, &cldap))
 	      || !sid.getfrompw (pw))
 	    {
 	      set_errno (EINVAL);
@@ -179,7 +180,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	  break;
 	case GROUP:
 	case DEF_GROUP:
-	  if (!(gr = internal_getgrgid (aclbufp[i].a_id))
+	  if (!(gr = internal_getgrgid (aclbufp[i].a_id, &cldap))
 	      || !sid.getfromgr (gr))
 	    {
 	      set_errno (EINVAL);
@@ -282,6 +283,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
   BOOLEAN dummy;
   uid_t uid;
   gid_t gid;
+  cyg_ldap cldap;
 
   status = RtlGetOwnerSecurityDescriptor (sd, (PSID *) &owner_sid, &dummy);
   if (!NT_SUCCESS (status))
@@ -289,7 +291,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  uid = owner_sid.get_uid ();
+  uid = owner_sid.get_uid (&cldap);
 
   status = RtlGetGroupSecurityDescriptor (sd, (PSID *) &group_sid, &dummy);
   if (!NT_SUCCESS (status))
@@ -297,7 +299,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  gid = group_sid.get_gid ();
+  gid = group_sid.get_gid (&cldap);
 
   aclent_t lacl[MAX_ACL_ENTRIES];
   memset (&lacl, 0, MAX_ACL_ENTRIES * sizeof (aclent_t));
@@ -367,7 +369,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	      id = ILLEGAL_GID;
 	    }
 	  else
-	    id = ace_sid.get_id (true, &type);
+	    id = ace_sid.get_id (TRUE, &type, &cldap);
 
 	  if (!type)
 	    continue;
@@ -836,6 +838,7 @@ aclfromtext32 (char *acltextp, int *)
   int pos = 0;
   strcpy (buf, acltextp);
   char *lasts;
+  cyg_ldap cldap;
   for (char *c = strtok_r (buf, ",", &lasts);
        c;
        c = strtok_r (NULL, ",", &lasts))
@@ -855,7 +858,7 @@ aclfromtext32 (char *acltextp, int *)
 	      c += 5;
 	      if (isalpha (*c))
 		{
-		  struct passwd *pw = internal_getpwnam (c);
+		  struct passwd *pw = internal_getpwnam (c, &cldap);
 		  if (!pw)
 		    {
 		      set_errno (EINVAL);
@@ -883,7 +886,7 @@ aclfromtext32 (char *acltextp, int *)
 	      c += 5;
 	      if (isalpha (*c))
 		{
-		  struct group *gr = internal_getgrnam (c);
+		  struct group *gr = internal_getgrnam (c, &cldap);
 		  if (!gr)
 		    {
 		      set_errno (EINVAL);

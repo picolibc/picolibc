@@ -145,7 +145,10 @@ cyg_ldap::open (PCWSTR domain)
   static LARGE_INTEGER last_rediscover;
   ULONG ret;
 
-  close ();
+  /* Already open? */
+  if (lh)
+    return true;
+
   GetSystemTimeAsFileTime ((LPFILETIME) &start);
   /* FIXME?  connect_ssl can take ages even when failing, so we're trying to
      do everything the non-SSL (but still encrypted) way. */
@@ -512,7 +515,7 @@ cyg_ldap::remap_uid (uid_t uid)
     {
       if (fetch_unix_sid_from_ad (uid, user, false)
 	  && user != NO_SID
-	  && (pw = internal_getpwsid (user)))
+	  && (pw = internal_getpwsid (user, this)))
 	return pw->pw_uid;
     }
   else if ((name = fetch_unix_name_from_rfc2307 (uid, false)))
@@ -536,7 +539,7 @@ cyg_ldap::remap_gid (gid_t gid)
     {
       if (fetch_unix_sid_from_ad (gid, group, true)
 	  && group != NO_SID
-	  && (gr = internal_getgrsid (group)))
+	  && (gr = internal_getgrsid (group, this)))
 	return gr->gr_gid;
     }
   else if ((name = fetch_unix_name_from_rfc2307 (gid, true)))

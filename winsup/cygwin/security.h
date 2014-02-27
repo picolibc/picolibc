@@ -138,6 +138,8 @@ extern "C"
 }
 #endif
 
+class cyg_ldap;
+
 class cygpsid {
 protected:
   PSID psid;
@@ -146,9 +148,9 @@ public:
   cygpsid (PSID nsid) { psid = nsid; }
   operator PSID () const { return psid; }
   const PSID operator= (PSID nsid) { return psid = nsid;}
-  uid_t get_id (BOOL search_grp, int *type = NULL);
-  int get_uid () { return get_id (FALSE); }
-  int get_gid () { return get_id (TRUE); }
+  uid_t get_id (BOOL search_grp, int *type, cyg_ldap *pldap);
+  int get_uid (cyg_ldap *pldap) { return get_id (FALSE, NULL, pldap); }
+  int get_gid (cyg_ldap *pldap) { return get_id (TRUE, NULL, pldap); }
 
   PWCHAR pstring (PWCHAR nsidstr) const;
   PWCHAR string (PWCHAR nsidstr) const;

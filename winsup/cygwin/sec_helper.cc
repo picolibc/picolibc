@@ -93,7 +93,7 @@ cygpsid::operator== (const char *nsidstr) const
 }
 
 uid_t
-cygpsid::get_id (BOOL search_grp, int *type)
+cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
 {
     /* First try to get SID from group, then passwd */
   uid_t id = ILLEGAL_UID;
@@ -103,7 +103,7 @@ cygpsid::get_id (BOOL search_grp, int *type)
       struct group *gr;
       if (cygheap->user.groups.pgsid == psid)
 	id = myself->gid;
-      else if ((gr = internal_getgrsid (*this)))
+      else if ((gr = internal_getgrsid (*this, pldap)))
 	id = gr->gr_gid;
       if (id != ILLEGAL_UID)
 	{
@@ -117,7 +117,7 @@ cygpsid::get_id (BOOL search_grp, int *type)
       struct passwd *pw;
       if (*this == cygheap->user.sid ())
 	id = myself->uid;
-      else if ((pw = internal_getpwsid (*this)))
+      else if ((pw = internal_getpwsid (*this, pldap)))
 	id = pw->pw_uid;
       if (id != ILLEGAL_UID && type)
 	*type = USER;
@@ -297,10 +297,9 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
 {
   struct passwd *pw;
   struct group *gr = NULL;
-  bool ret = false;
+  BOOL ret = false;
   PWCHAR domain;
   cyg_ldap cldap;
-  bool ldap_open = false;
 
   owner_sid.debug_print ("get_sids_info: owner SID =");
   group_sid.debug_print ("get_sids_info: group SID =");
@@ -318,7 +317,7 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
       if (map_gid == ILLEGAL_GID)
 	{
 	  domain = cygheap->dom.get_rfc2307_domain ();
-	  if ((ldap_open = cldap.open (domain)))
+	  if (cldap.open (domain))
 	    map_gid = cldap.remap_gid (gid);
 	  if (map_gid == ILLEGAL_GID)
 	    map_gid = MAP_UNIX_TO_CYGWIN_ID (gid);
@@ -326,7 +325,7 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
 	}
       *gidret = map_gid;
     }
-  else if ((gr = internal_getgrsid (group_sid)))
+  else if ((gr = internal_getgrsid (group_sid, &cldap)))
     *gidret = gr->gr_gid;
   else
     *gidret = ILLEGAL_GID;
@@ -335,9 +334,11 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
     {
       *uidret = myself->uid;
       if (*gidret == myself->gid)
-	ret = true;
+	ret = TRUE;
       else
-	ret = (internal_getgroups (0, NULL, &group_sid) > 0);
+	CheckTokenMembership (cygheap->user.issetuid ()
+			      ? cygheap->user.imp_token () : NULL,
+			      group_sid, &ret);
     }
   else if (sid_id_auth (owner_sid) == 22)
     {
@@ -347,7 +348,7 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
       if (map_uid == ILLEGAL_UID)
 	{
 	  domain = cygheap->dom.get_rfc2307_domain ();
-	  if ((ldap_open || cldap.open (domain)))
+	  if (cldap.open (domain))
 	    map_uid = cldap.remap_uid (uid);
 	  if (map_uid == ILLEGAL_UID)
 	    map_uid = MAP_UNIX_TO_CYGWIN_ID (uid);
@@ -355,11 +356,11 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
 	}
       *uidret = map_uid;
     }
-  else if ((pw = internal_getpwsid (owner_sid)))
+  else if ((pw = internal_getpwsid (owner_sid, &cldap)))
     {
       *uidret = pw->pw_uid;
       if (gr || (*gidret != ILLEGAL_GID
-		 && (gr = internal_getgrgid (*gidret))))
+		 && (gr = internal_getgrgid (*gidret, &cldap))))
 	for (int idx = 0; gr->gr_mem[idx]; ++idx)
 	  if ((ret = strcasematch (pw->pw_name, gr->gr_mem[idx])))
 	    break;
@@ -367,7 +368,7 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
   else
     *uidret = ILLEGAL_UID;
 
-  return ret;
+  return (bool) ret;
 }
 
 PSECURITY_DESCRIPTOR

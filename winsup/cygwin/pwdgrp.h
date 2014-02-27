@@ -12,17 +12,20 @@ details. */
 
 #pragma once
 
+#include "sync.h"
+#include "ldap.h"
+#include "miscfuncs.h"
+
 /* These functions are needed to allow searching and walking through
    the passwd and group lists */
-extern struct passwd *internal_getpwsid (cygpsid &);
+extern struct passwd *internal_getpwsid (cygpsid &, cyg_ldap * = NULL);
 extern struct passwd *internal_getpwsid_from_db (cygpsid &sid);
-extern struct passwd *internal_getpwnam (const char *);
-extern struct passwd *internal_getpwuid (uid_t);
-extern struct group *internal_getgrsid (cygpsid &);
+extern struct passwd *internal_getpwnam (const char *, cyg_ldap * = NULL);
+extern struct passwd *internal_getpwuid (uid_t, cyg_ldap * = NULL);
+extern struct group *internal_getgrsid (cygpsid &, cyg_ldap * = NULL);
 extern struct group *internal_getgrsid_from_db (cygpsid &sid);
-extern struct group *internal_getgrgid (gid_t);
-extern struct group *internal_getgrnam (const char *);
-int internal_getgroups (int, gid_t *, cygpsid * = NULL);
+extern struct group *internal_getgrgid (gid_t, cyg_ldap * = NULL);
+extern struct group *internal_getgrnam (const char *, cyg_ldap * = NULL);
 
 /* These functions are called from mkpasswd/mkgroup via cygwin_internal. */
 void *setpwent_filtered (int enums, PCWSTR enum_tdoms);
@@ -31,10 +34,6 @@ void endpwent_filtered (void *gr);
 void *setgrent_filtered (int enums, PCWSTR enum_tdoms);
 void *getgrent_filtered (void *gr);
 void endgrent_filtered (void *gr);
-
-#include "sync.h"
-#include "ldap.h"
-#include "miscfuncs.h"
 
 enum fetch_user_arg_type_t {
   SID_arg,
@@ -107,13 +106,16 @@ class pwdgrp
   void *add_account_from_file (cygpsid &sid);
   void *add_account_from_file (const char *name);
   void *add_account_from_file (uint32_t id);
-  void *add_account_from_windows (cygpsid &sid, bool group);
-  void *add_account_from_windows (const char *name, bool group);
-  void *add_account_from_windows (uint32_t id, bool group);
+  void *add_account_from_windows (cygpsid &sid, bool group,
+  				  cyg_ldap *pldap = NULL);
+  void *add_account_from_windows (const char *name, bool group,
+				  cyg_ldap *pldap = NULL);
+  void *add_account_from_windows (uint32_t id, bool group,
+				  cyg_ldap *pldap = NULL);
   char *fetch_account_from_line (fetch_user_arg_t &arg, const char *line);
   char *fetch_account_from_file (fetch_user_arg_t &arg);
   char *fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
-				    bool ugid_caching = true);
+				    cyg_ldap *pldap = NULL);
   pwdgrp *prep_tls_pwbuf ();
   pwdgrp *prep_tls_grbuf ();
 
@@ -131,12 +133,13 @@ public:
     { return (struct passwd *) add_account_from_file (name); }
   struct passwd *add_user_from_file (uint32_t id)
     { return (struct passwd *) add_account_from_file (id); }
-  struct passwd *add_user_from_windows (cygpsid &sid)
-    { return (struct passwd *) add_account_from_windows (sid, false); }
-  struct passwd *add_user_from_windows (const char *name)
-    { return (struct passwd *) add_account_from_windows (name, false); }
-  struct passwd *add_user_from_windows (uint32_t id)
-    { return (struct passwd *) add_account_from_windows (id, false); }
+  struct passwd *add_user_from_windows (cygpsid &sid, cyg_ldap *pldap = NULL)
+    { return (struct passwd *) add_account_from_windows (sid, false, pldap); }
+  struct passwd *add_user_from_windows (const char *name,
+  					cyg_ldap* pldap = NULL)
+    { return (struct passwd *) add_account_from_windows (name, false, pldap); }
+  struct passwd *add_user_from_windows (uint32_t id, cyg_ldap *pldap = NULL)
+    { return (struct passwd *) add_account_from_windows (id, false, pldap); }
   struct passwd *find_user (cygpsid &sid);
   struct passwd *find_user (const char *name);
   struct passwd *find_user (uid_t uid);
@@ -149,12 +152,13 @@ public:
     { return (struct group *) add_account_from_file (name); }
   struct group *add_group_from_file (uint32_t id)
     { return (struct group *) add_account_from_file (id); }
-  struct group *add_group_from_windows (cygpsid &sid)
-    { return (struct group *) add_account_from_windows (sid, true); }
-  struct group *add_group_from_windows (const char *name)
-    { return (struct group *) add_account_from_windows (name, true); }
-  struct group *add_group_from_windows (uint32_t id)
-    { return (struct group *) add_account_from_windows (id, true); }
+  struct group *add_group_from_windows (cygpsid &sid, cyg_ldap *pldap = NULL)
+    { return (struct group *) add_account_from_windows (sid, true, pldap); }
+  struct group *add_group_from_windows (const char *name,
+					cyg_ldap *pldap = NULL)
+    { return (struct group *) add_account_from_windows (name, true, pldap); }
+  struct group *add_group_from_windows (uint32_t id, cyg_ldap *pldap = NULL)
+    { return (struct group *) add_account_from_windows (id, true, pldap); }
   struct group *find_group (cygpsid &sid);
   struct group *find_group (const char *name);
   struct group *find_group (gid_t gid);

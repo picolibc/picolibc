@@ -536,6 +536,7 @@ wsock_init ()
 
 LoadDLLprime (ws2_32, _wsock_init, 0)
 
+LoadDLLfunc (CheckTokenMembership, 12, advapi32)
 LoadDLLfunc (CreateProcessAsUserW, 44, advapi32)
 LoadDLLfunc (DeregisterEventSource, 4, advapi32)
 LoadDLLfunc (LogonUserW, 24, advapi32)

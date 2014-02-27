@@ -118,11 +118,12 @@ internal_getlogin (cygheap_user &user)
 {
   struct passwd *pw = NULL;
   struct group *gr, *gr2;
+  cyg_ldap cldap;
 
   cygpsid psid = user.sid ();
-  pw = internal_getpwsid (psid);
+  pw = internal_getpwsid (psid, &cldap);
 
-  if (!pw && !(pw = internal_getpwnam (user.name ())))
+  if (!pw && !(pw = internal_getpwnam (user.name (), &cldap)))
     debug_printf ("user not found in /etc/passwd");
   else
     {
@@ -131,13 +132,13 @@ internal_getlogin (cygheap_user &user)
       myself->uid = pw->pw_uid;
       myself->gid = pw->pw_gid;
       user.set_name (pw->pw_name);
-      if (gsid.getfromgr (gr = internal_getgrgid (pw->pw_gid)))
+      if (gsid.getfromgr (gr = internal_getgrgid (pw->pw_gid, &cldap)))
 	{
 	  /* We might have a group file with a group entry for the current
 	     user's primary group, but the current user has no entry in passwd.
 	     If so, pw_gid is taken from windows and might disagree with the
 	     gr_gid from the group file.  Overwrite it brutally. */
-	  if ((gr2 = internal_getgrsid (gsid)) && gr2 != gr)
+	  if ((gr2 = internal_getgrsid (gsid, &cldap)) && gr2 != gr)
 	    myself->gid = pw->pw_gid = gr2->gr_gid;
 	  /* Set primary group to the group in /etc/passwd. */
 	  if (gsid != user.groups.pgsid)
@@ -975,12 +976,12 @@ pwdgrp::add_account_from_file (uint32_t id)
 }
 
 void *
-pwdgrp::add_account_from_windows (cygpsid &sid, bool group)
+pwdgrp::add_account_from_windows (cygpsid &sid, bool group, cyg_ldap *pldap)
 {
   fetch_user_arg_t arg;
   arg.type = SID_arg;
   arg.sid = &sid;
-  char *line = fetch_account_from_windows (arg, group);
+  char *line = fetch_account_from_windows (arg, group, pldap);
   if (!line)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
@@ -989,12 +990,12 @@ pwdgrp::add_account_from_windows (cygpsid &sid, bool group)
 }
 
 void *
-pwdgrp::add_account_from_windows (const char *name, bool group)
+pwdgrp::add_account_from_windows (const char *name, bool group, cyg_ldap *pldap)
 {
   fetch_user_arg_t arg;
   arg.type = NAME_arg;
   arg.name = name;
-  char *line = fetch_account_from_windows (arg, group);
+  char *line = fetch_account_from_windows (arg, group, pldap);
   if (!line)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
@@ -1003,12 +1004,12 @@ pwdgrp::add_account_from_windows (const char *name, bool group)
 }
 
 void *
-pwdgrp::add_account_from_windows (uint32_t id, bool group)
+pwdgrp::add_account_from_windows (uint32_t id, bool group, cyg_ldap *pldap)
 {
   fetch_user_arg_t arg;
   arg.type = ID_arg;
   arg.id = id;
-  char *line = fetch_account_from_windows (arg, group);
+  char *line = fetch_account_from_windows (arg, group, pldap);
   if (!line)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
@@ -1134,13 +1135,13 @@ pwdgrp::fetch_account_from_file (fetch_user_arg_t &arg)
 }
 
 static ULONG
-fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, bool &ldap_open, cyg_ldap &cldap)
+fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, cyg_ldap *cldap)
 {
   uint32_t id_val;
 
   if (!td->PosixOffset && !(td->Flags & DS_DOMAIN_PRIMARY) && td->DomainSid)
     {
-      if (!ldap_open && !(ldap_open = cldap.open (NULL)))
+      if (!cldap->open (NULL))
 	{
 	  /* We're probably running under a local account, so we're not allowed
 	     to fetch any information from AD beyond the most obvious.  Never
@@ -1149,7 +1150,7 @@ fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, bool &ldap_open, cyg_ldap &cldap)
 		   - 0x01000000;
 	}
       else
-	id_val = cldap.fetch_posix_offset_for_domain (td->DnsDomainName);
+	id_val = cldap->fetch_posix_offset_for_domain (td->DnsDomainName);
       if (id_val)
 	{
 	  td->PosixOffset = id_val;
@@ -1163,7 +1164,7 @@ fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, bool &ldap_open, cyg_ldap &cldap)
 
 char *
 pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
-				    bool ugid_caching)
+				    cyg_ldap *pldap)
 {
   /* Used in LookupAccount calls. */
   WCHAR namebuf[UNLEN + 1], *name = namebuf;
@@ -1172,7 +1173,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
   DWORD nlen = UNLEN + 1;
   DWORD dlen = DNLEN + 1;
   DWORD slen = MAX_SID_LEN;
-  cygpsid sid = NO_SID;
+  cygpsid sid (NO_SID);
   SID_NAME_USE acc_type;
   BOOL ret = false;
   /* Cygwin user name style. */
@@ -1190,13 +1191,13 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
   PWCHAR user = NULL;
   PWCHAR home = NULL;
   PWCHAR gecos = NULL;
+  /* Temporary stuff. */
   PWCHAR p;
   WCHAR sidstr[128];
-  /* Temporary stuff. */
   ULONG posix_offset = 0;
   uint32_t id_val;
-  cyg_ldap cldap;
-  bool ldap_open = false;
+  cyg_ldap loc_ldap;
+  cyg_ldap *cldap = pldap ?: &loc_ldap;
 
   /* Initialize */
   if (!cygheap->dom.init ())
@@ -1219,9 +1220,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	     DC for some weird reason.  Use LDAP instead. */
 	  PWCHAR val;
 
-	  if ((ldap_open = cldap.open (NULL))
-	      && cldap.fetch_ad_account (sid, group)
-	      && (val = cldap.get_group_name ()))
+	  if (cldap->open (NULL)
+	      && cldap->fetch_ad_account (sid, group)
+	      && (val = cldap->get_group_name ()))
 	    {
 	      wcpcpy (name, val);
 	      wcpcpy (dom, L"BUILTIN");
@@ -1355,7 +1356,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 
 	  for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
 	    {
-	      fetch_posix_offset (td, ldap_open, cldap);
+	      fetch_posix_offset (td, cldap);
 	      if (td->PosixOffset > posix_offset && td->PosixOffset <= arg.id)
 		posix_offset = td->PosixOffset;
 	    }
@@ -1452,7 +1453,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 		      {
 			domain = td->DnsDomainName;
 			posix_offset =
-			  fetch_posix_offset (td, ldap_open, cldap);
+			  fetch_posix_offset (td, cldap);
 			break;
 		      }
 
@@ -1474,60 +1475,44 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	  /* Generate values. */
 	  if (uid == ILLEGAL_UID)
 	    uid = posix_offset + sid_sub_auth_rid (sid);
-	  gid = posix_offset + DOMAIN_GROUP_RID_USERS; /* Default. */
 
 	  if (is_domain_account)
 	    {
-	      /* Use LDAP to fetch domain account infos. */
-	      if (!ldap_open && !cldap.open (NULL))
+	      if (acc_type != SidTypeUser)
 		break;
-	      if (cldap.fetch_ad_account (sid, group))
+
+	      gid = posix_offset + DOMAIN_GROUP_RID_USERS; /* Default. */
+	      /* Use LDAP to fetch domain account infos. */
+	      if (!cldap->open (NULL))
+		break;
+	      if (cldap->fetch_ad_account (sid, group))
 		{
 		  PWCHAR val;
-		  if (acc_type == SidTypeUser)
+
+		  if ((id_val = cldap->get_primary_gid ()) != ILLEGAL_GID)
+		    gid = posix_offset + id_val;
+		  if ((val = cldap->get_user_name ())
+		      && wcscmp (name, val))
+		    user = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
+				   * sizeof (WCHAR)), val);
+		  if ((val = cldap->get_gecos ()))
+		    gecos = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
+				    * sizeof (WCHAR)), val);
+		  if ((val = cldap->get_home ()))
+		    home = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
+				   * sizeof (WCHAR)), val);
+		  if ((val = cldap->get_shell ()))
+		    shell = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
+				    * sizeof (WCHAR)), val);
+		  /* Check and, if necessary, add unix<->windows id mapping on
+		     the fly, unless we're called from getpwent. */
+		  if (!pldap)
 		    {
-		      if ((id_val = cldap.get_primary_gid ()) != ILLEGAL_GID)
-			gid = posix_offset + id_val;
-		      if ((val = cldap.get_user_name ())
-			  && wcscmp (name, val))
-			user = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
-				       * sizeof (WCHAR)), val);
-		      if ((val = cldap.get_gecos ()))
-			gecos = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
-					* sizeof (WCHAR)), val);
-		      if ((val = cldap.get_home ()))
-			home = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
-				       * sizeof (WCHAR)), val);
-		      if ((val = cldap.get_shell ()))
-			shell = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
-					* sizeof (WCHAR)), val);
-		      /* Check and, if necessary, add unix<->windows
-			 id mapping on the fly. */
-		      if (ugid_caching)
-			{
-			  id_val = cldap.get_unix_uid ();
-			  if (id_val != ILLEGAL_UID
-			      && cygheap->ugid_cache.get_uid (id_val)
-				 == ILLEGAL_UID)
-			    cygheap->ugid_cache.add_uid (id_val, uid);
-			}
-		    }
-		  else /* SidTypeGroup */
-		    {
-		      if ((val = cldap.get_group_name ())
-			  && wcscmp (name, val))
-			user = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
-				       * sizeof (WCHAR)), val);
-		      /* Check and, if necessary, add unix<->windows
-			 id mapping on the fly. */
-		      if (ugid_caching)
-			{
-			  id_val = cldap.get_unix_gid ();
-			  if (id_val != ILLEGAL_GID
-			      && cygheap->ugid_cache.get_gid (id_val)
-				 == ILLEGAL_GID)
-			    cygheap->ugid_cache.add_gid (id_val, uid);
-			}
+		      id_val = cldap->get_unix_uid ();
+		      if (id_val != ILLEGAL_UID
+			  && cygheap->ugid_cache.get_uid (id_val)
+			     == ILLEGAL_UID)
+			cygheap->ugid_cache.add_uid (id_val, uid);
 		    }
 		}
 	    }
@@ -1629,12 +1614,11 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 
 		  *gname = cygheap->pg.nss_separator ()[0];
 		  sys_wcstombs (gname + 1, 2 * UNLEN + 1, pgrp);
-		  if ((gr = internal_getgrnam (gname))
-		      || (gr = internal_getgrnam (gname + 1)))
+		  if ((gr = internal_getgrnam (gname, cldap))
+		      || (gr = internal_getgrnam (gname + 1, cldap)))
 		    gid = gr->gr_gid;
 		}
-	      if (ugid_caching && uxid
-		  && ((id_val = wcstoul (uxid, &e, 10)), !*e))
+	      if (!pldap && uxid && ((id_val = wcstoul (uxid, &e, 10)), !*e))
 		{
 		  if (acc_type == SidTypeUser)
 		    {
@@ -1744,7 +1728,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	    if (td->DomainSid && RtlEqualSid (sid, td->DomainSid))
 	      {
 		domain = td->NetbiosDomainName;
-		posix_offset = fetch_posix_offset (td, ldap_open, cldap);
+		posix_offset = fetch_posix_offset (td, cldap);
 		break;
 	      }
 	}

@@ -1,5 +1,69 @@
 2014-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (CheckTokenMembership): Import.
+	* external.cc (cygwin_internal): Call get_uid/get_gid instead of get_id.
+	* grp.cc (internal_getgrsid): Take additional cyg_ldap pointer.
+	Forward to pwdgrp::add_group_from_windows.
+	(internal_getgrnam): Ditto.
+	(internal_getgrgid): Ditto.
+	(gr_ent::enumerate_local): Drop ugid_caching bool from call to
+	pwdgrp::fetch_account_from_windows.
+	(getgroups32): Rename from internal_getgroups and drop getgroups32 stub.
+	Drop srchsid parameter and code handling it.  Add local cyg_ldap
+	instance and forward to internal_getgrXXX.
+	(getgroups): Call getgroups32.
+	(get_groups): Add local cyg_ldap instance and forward to
+	internal_getgrXXX.
+	(getgrouplist): Ditto.
+	(setgroups32): Ditto.
+	* ldap.cc (cyg_ldap::open): Don't call close.  Return true if connection
+	is already open.
+	(cyg_ldap::remap_uid): Forward this to internal_getpwsid.
+	(cyg_ldap::remap_gid): Forward this to internal_getgrsid.
+	* passwd.cc (internal_getpwsid): Take additional cyg_ldap pointer.
+	Forward to pwdgrp::add_user_from_windows.
+	(internal_getpwnam): Ditto.
+	(internal_getpwuid): Ditto.
+	(pg_ent::enumerate_builtin): Drop ugid_caching bool from call to
+	pwdgrp::fetch_account_from_windows.
+	(pg_ent::enumerate_sam): Ditto.
+	(pg_ent::enumerate_ad): Ditto.  Forward local cldap instead.
+	* pwdgrp.h (internal_getpwsid): Align declaration to above change.
+	(internal_getpwnam): Ditto.
+	(internal_getpwuid): Ditto.
+	(internal_getgrsid): Ditto.
+	(internal_getgrgid): Ditto.
+	(internal_getgrnam): Ditto.
+	(internal_getgroups): Drop declaration.
+	(pwdgrp::add_account_from_windows): Align declaration to below change.
+	(pwdgrp::add_user_from_windows): Ditto.
+	(pwdgrp::add_group_from_windows): Ditto.
+	* sec_acl.cc (setacl): Add local cyg_ldap instance and forward to
+	internal_getpwuid and internal_getgrgid.
+	(getacl): Add local cyg_ldap instance and forward to cygpsid::get_id.
+	(aclfromtext32): Add local cyg_ldap instance and forward to
+	internal_getpwnam and internal_getgrnam.
+	* sec_helper.cc (cygpsid::get_id): Take additional cyg_ldap pointer.
+	Forward to internal_getgrsid and internal_getpwsid.
+	(get_sids_info): Drop ldap_open.  Forward local cldap to
+	internal_getpwsid and internal_getgrXXX.  Call CheckTokenMembership
+	rather than internal_getgroups.
+	* security.h (cygpsid::get_id): Add cyg_ldap pointer, drop default
+	parameter.
+	(cygpsid::get_uid): Add cyg_ldap pointer.  Call get_id accordingly.
+	(cygpsid::get_gid): Ditto.
+	* uinfo.cc (internal_getlogin): Add local cyg_ldap instance and forward
+	to internal_getpwXXX and internal_getgrXXX calls.
+	(pwdgrp::add_account_from_windows): Take additional cyg_ldap pointer.
+	Forward to pwdgrp::fetch_account_from_windows.
+	(fetch_posix_offset): Drop ldap_open argument and handling.  Get
+	cyg_ldap instance as pointer.
+	(pwdgrp::fetch_account_from_windows): Take additional cyg_ldap pointer.
+	Use it if it's not NULL, local instance otherwise.  Drop ldap_open.
+	Drop fetching extended group arguments from AD for speed.
+
+2014-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (find_fast_cwd_pointer): Fix preceeding comment.
 
 2014-02-25  Christopher Faylor  <me.cygwin2014@cgf.cx>

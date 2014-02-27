@@ -101,7 +101,7 @@ pwdgrp::find_user (uid_t uid)
 }
 
 struct passwd *
-internal_getpwsid (cygpsid &sid)
+internal_getpwsid (cygpsid &sid, cyg_ldap *pldap)
 {
   struct passwd *ret;
 
@@ -118,7 +118,7 @@ internal_getpwsid (cygpsid &sid)
     {
       if ((ret = cygheap->pg.pwd_cache.win.find_user (sid)))
 	return ret;
-      return cygheap->pg.pwd_cache.win.add_user_from_windows (sid);
+      return cygheap->pg.pwd_cache.win.add_user_from_windows (sid, pldap);
     }
   return NULL;
 }
@@ -132,7 +132,7 @@ internal_getpwsid_from_db (cygpsid &sid)
 }
 
 struct passwd *
-internal_getpwnam (const char *name)
+internal_getpwnam (const char *name, cyg_ldap *pldap)
 {
   struct passwd *ret;
 
@@ -149,13 +149,13 @@ internal_getpwnam (const char *name)
     {
       if ((ret = cygheap->pg.pwd_cache.win.find_user (name)))
 	return ret;
-      return cygheap->pg.pwd_cache.win.add_user_from_windows (name);
+      return cygheap->pg.pwd_cache.win.add_user_from_windows (name, pldap);
     }
   return NULL;
 }
 
 struct passwd *
-internal_getpwuid (uid_t uid)
+internal_getpwuid (uid_t uid, cyg_ldap *pldap)
 {
   struct passwd *ret;
 
@@ -172,7 +172,7 @@ internal_getpwuid (uid_t uid)
     {
       if ((ret = cygheap->pg.pwd_cache.win.find_user (uid)))
 	return ret;
-      return cygheap->pg.pwd_cache.win.add_user_from_windows (uid);
+      return cygheap->pg.pwd_cache.win.add_user_from_windows (uid, pldap);
     }
   else if (uid == ILLEGAL_UID)
     return cygheap->pg.pwd_cache.win.add_user_from_windows (uid);
@@ -500,7 +500,7 @@ pg_ent::enumerate_builtin ()
   fetch_user_arg_t arg;
   arg.type = SID_arg;
   arg.sid = &sid;
-  char *line = pg.fetch_account_from_windows (arg, group, false);
+  char *line = pg.fetch_account_from_windows (arg, group);
   return pg.add_account_post_fetch (line, false);
 } 
 
@@ -547,7 +547,7 @@ pg_ent::enumerate_sam ()
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
 	  arg.sid = &sid;
-	  char *line = pg.fetch_account_from_windows (arg, group, false);
+	  char *line = pg.fetch_account_from_windows (arg, group);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);
 	}
@@ -596,7 +596,7 @@ pg_ent::enumerate_ad ()
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
 	  arg.sid = &sid;
-	  char *line = pg.fetch_account_from_windows (arg, group, false);
+	  char *line = pg.fetch_account_from_windows (arg, group, &cldap);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);
 	}

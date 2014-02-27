@@ -117,7 +117,7 @@ pwdgrp::find_group (gid_t gid)
 }
 
 struct group *
-internal_getgrsid (cygpsid &sid)
+internal_getgrsid (cygpsid &sid, cyg_ldap *pldap)
 {
   struct group *ret;
 
@@ -134,7 +134,7 @@ internal_getgrsid (cygpsid &sid)
     {
       if ((ret = cygheap->pg.grp_cache.win.find_group (sid)))
 	return ret;
-      return cygheap->pg.grp_cache.win.add_group_from_windows (sid);
+      return cygheap->pg.grp_cache.win.add_group_from_windows (sid, pldap);
     }
   return NULL;
 }
@@ -148,7 +148,7 @@ internal_getgrsid_from_db (cygpsid &sid)
 }
 
 struct group *
-internal_getgrnam (const char *name)
+internal_getgrnam (const char *name, cyg_ldap *pldap)
 {
   struct group *ret;
 
@@ -165,13 +165,13 @@ internal_getgrnam (const char *name)
     {
       if ((ret = cygheap->pg.grp_cache.win.find_group (name)))
 	return ret;
-      return cygheap->pg.grp_cache.win.add_group_from_windows (name);
+      return cygheap->pg.grp_cache.win.add_group_from_windows (name, pldap);
     }
   return NULL;
 }
 
 struct group *
-internal_getgrgid (gid_t gid)
+internal_getgrgid (gid_t gid, cyg_ldap *pldap)
 {
   struct group *ret;
 
@@ -191,7 +191,7 @@ internal_getgrgid (gid_t gid)
       return cygheap->pg.grp_cache.win.add_group_from_windows (gid);
     }
   else if (gid == ILLEGAL_GID)
-    return cygheap->pg.grp_cache.win.add_group_from_windows (gid);
+    return cygheap->pg.grp_cache.win.add_group_from_windows (gid, pldap);
   return NULL;
 }
 
@@ -389,7 +389,7 @@ gr_ent::enumerate_local ()
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
 	  arg.sid = &sid;
-	  char *line = pg.fetch_account_from_windows (arg, true, false);
+	  char *line = pg.fetch_account_from_windows (arg, true);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);
 	}
@@ -459,19 +459,21 @@ endgrent_filtered (void *gr)
   ((gr_ent *) gr)->endgrent ();
 }
 
-int
-internal_getgroups (int gidsetsize, gid_t *grouplist, cygpsid *srchsid)
+extern "C" int
+getgroups32 (int gidsetsize, gid_t *grouplist)
 {
   NTSTATUS status;
-  HANDLE hToken = NULL;
+  HANDLE tok;
   ULONG size;
   int cnt = 0;
   struct group *grp;
+  cyg_ldap cldap;
 
-  if (!srchsid && cygheap->user.groups.issetgroups ())
+  if (cygheap->user.groups.issetgroups ())
     {
       for (int pg = 0; pg < cygheap->user.groups.sgsids.count (); ++pg)
-	if ((grp = internal_getgrsid (cygheap->user.groups.sgsids.sids[pg])))
+	if ((grp = internal_getgrsid (cygheap->user.groups.sgsids.sids[pg],
+				      &cldap)))
 	  {
 	    if (cnt < gidsetsize)
 	      grouplist[cnt] = grp->gr_gid;
@@ -483,45 +485,32 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cygpsid *srchsid)
     }
 
   /* If impersonated, use impersonation token. */
-  if (cygheap->user.issetuid ())
-    hToken = cygheap->user.primary_token ();
-  else
-    hToken = hProcToken;
+  tok = cygheap->user.issetuid () ? cygheap->user.primary_token () : hProcToken;
 
-  status = NtQueryInformationToken (hToken, TokenGroups, NULL, 0, &size);
+  status = NtQueryInformationToken (tok, TokenGroups, NULL, 0, &size);
   if (NT_SUCCESS (status) || status == STATUS_BUFFER_TOO_SMALL)
     {
       PTOKEN_GROUPS groups = (PTOKEN_GROUPS) alloca (size);
 
-      status = NtQueryInformationToken (hToken, TokenGroups, groups,
-					size, &size);
+      status = NtQueryInformationToken (tok, TokenGroups, groups, size, &size);
       if (NT_SUCCESS (status))
 	{
 	  cygsid sid;
 
-	  if (srchsid)
+	  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 	    {
-	      for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
-		if ((cnt = (*srchsid == groups->Groups[pg].Sid)))
-		  break;
-	    }
-	  else
-	    {
-	      for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+	      cygpsid sid = groups->Groups[pg].Sid;
+	      if ((grp = internal_getgrsid (sid, &cldap)))
 		{
-		  cygpsid sid = groups->Groups[pg].Sid;
-		  if ((grp = internal_getgrsid (sid)))
+		  if ((groups->Groups[pg].Attributes
+		      & (SE_GROUP_ENABLED | SE_GROUP_INTEGRITY_ENABLED))
+		      && sid != well_known_world_sid)
 		    {
-		      if ((groups->Groups[pg].Attributes
-			  & (SE_GROUP_ENABLED | SE_GROUP_INTEGRITY_ENABLED))
-			  && sid != well_known_world_sid)
-			{
-			  if (cnt < gidsetsize)
-			    grouplist[cnt] = grp->gr_gid;
-			  ++cnt;
-			  if (gidsetsize && cnt > gidsetsize)
-			    goto error;
-			}
+		      if (cnt < gidsetsize)
+			grouplist[cnt] = grp->gr_gid;
+		      ++cnt;
+		      if (gidsetsize && cnt > gidsetsize)
+			goto error;
 		    }
 		}
 	    }
@@ -534,12 +523,6 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cygpsid *srchsid)
 error:
   set_errno (EINVAL);
   return -1;
-}
-
-extern "C" int
-getgroups32 (int gidsetsize, gid_t *grouplist)
-{
-  return internal_getgroups (gidsetsize, grouplist);
 }
 
 #ifdef __x86_64__
@@ -558,7 +541,7 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
   if (gidsetsize > 0 && grouplist)
     grouplist32 = (gid_t *) alloca (gidsetsize * sizeof (gid_t));
 
-  int ret = internal_getgroups (gidsetsize, grouplist32);
+  int ret = getgroups32 (gidsetsize, grouplist32);
 
   if (gidsetsize > 0 && grouplist)
     for (int i = 0; i < ret; ++ i)
@@ -572,9 +555,11 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
 static void
 get_groups (const char *user, gid_t gid, cygsidlist &gsids)
 {
+  cyg_ldap cldap;
+
   cygheap->user.deimpersonate ();
-  struct passwd *pw = internal_getpwnam (user);
-  struct group *grp = internal_getgrgid (gid);
+  struct passwd *pw = internal_getpwnam (user, &cldap);
+  struct group *grp = internal_getgrgid (gid, &cldap);
   cygsid usersid, grpsid;
   if (usersid.getfrompw (pw))
     get_server_groups (gsids, usersid, pw);
@@ -614,6 +599,7 @@ getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
   int ret = 0;
   int cnt = 0;
   struct group *grp;
+  cyg_ldap cldap;
 
   /* Note that it's not defined if groups or ngroups may be NULL!
      GLibc does not check the pointers on entry and just uses them.
@@ -626,7 +612,7 @@ getgrouplist (const char *user, gid_t gid, gid_t *groups, int *ngroups)
   cygsidlist tmp_gsids (cygsidlist_auto, 12);
   get_groups (user, gid, tmp_gsids);
   for (int i = 0; i < tmp_gsids.count (); i++)
-    if ((grp = internal_getgrsid (tmp_gsids.sids[i])) != NULL)
+    if ((grp = internal_getgrsid (tmp_gsids.sids[i], &cldap)) != NULL)
       {
 	if (groups && cnt < *ngroups)
 	  groups[cnt] = grp->gr_gid;
@@ -656,13 +642,14 @@ setgroups32 (int ngroups, const gid_t *grouplist)
 
   cygsidlist gsids (cygsidlist_alloc, ngroups);
   struct group *grp;
+  cyg_ldap cldap;
 
   if (ngroups && !gsids.sids)
     return -1;
 
   for (int gidx = 0; gidx < ngroups; ++gidx)
     {
-      if ((grp = internal_getgrgid (grouplist[gidx]))
+      if ((grp = internal_getgrgid (grouplist[gidx], &cldap))
 	  && gsids.addfromgr (grp))
 	continue;
       debug_printf ("No sid found for gid %u", grouplist[gidx]);
