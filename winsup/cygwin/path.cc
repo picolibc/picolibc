@@ -3912,8 +3912,7 @@ fcwd_access_t::SetVersionFromPointer (PBYTE buf_p, bool is_buffer)
 
    This code has been tested on Vista 32/64 bit, Server 2008 32/64 bit,
    Windows 7 32/64 bit, Server 2008 R2 (which is only 64 bit anyway),
-   and W8CP 32/64 bit.  There's some hope this will still work for
-   Windows 8 RTM... */
+   Windows 8 32/64 bit, Windows 8.1 32/64 bit, and Server 2012 R2. */
 
 #ifdef __x86_64__
 

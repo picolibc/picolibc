@@ -1,3 +1,7 @@
+2014-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (find_fast_cwd_pointer): Fix preceeding comment.
+
 2014-02-25  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* fhandler.h (fhandler_console::scroll_buffer_screen): New function.
