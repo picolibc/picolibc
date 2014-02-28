@@ -156,8 +156,8 @@ public:
   }
   void set_sid (PSID new_sid) { effec_cygsid = new_sid;}
   void set_saved_sid () { saved_cygsid = effec_cygsid; }
-  PSID sid () { return effec_cygsid; }
-  PSID saved_sid () { return saved_cygsid; }
+  cygpsid &sid () { return effec_cygsid; }
+  cygpsid &saved_sid () { return saved_cygsid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);
 #define NO_IMPERSONATION NULL
   bool issetuid () const { return curr_imp_token != NO_IMPERSONATION; }
@@ -400,14 +400,19 @@ class cygheap_pwdgrp
     NSS_PRIMARY,
     NSS_ALWAYS
   };
-  bool   nss_inited;
-  int    pwd_src;
-  int    grp_src;
-  pfx_t  prefix;
-  WCHAR  separator[2];
-  bool   caching;
-  int	 enums;
-  PWCHAR enum_tdoms;
+  enum cache_t {
+    NSS_NO_CACHING = 0,
+    NSS_CACHING,
+    NSS_FULL_CACHING
+  };
+  bool    nss_inited;
+  int     pwd_src;
+  int     grp_src;
+  pfx_t   prefix;
+  WCHAR   separator[2];
+  cache_t caching;
+  int	  enums;
+  PWCHAR  enum_tdoms;
 
   void nss_init_line (const char *line);
   void _nss_init ();
@@ -433,7 +438,9 @@ public:
   inline bool nss_prefix_primary () const { return prefix == NSS_PRIMARY; }
   inline bool nss_prefix_always () const { return prefix == NSS_ALWAYS; }
   inline PCWSTR nss_separator () const { return separator; }
-  inline bool nss_db_caching () const { return caching; }
+  inline bool nss_db_caching () const { return caching != NSS_NO_CACHING; }
+  inline bool nss_db_full_caching () const
+				      { return caching == NSS_FULL_CACHING; }
   inline int nss_db_enums () const { return enums; }
   inline PCWSTR nss_db_enum_tdoms () const { return enum_tdoms; }
 };

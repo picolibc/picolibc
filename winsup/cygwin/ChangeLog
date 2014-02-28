@@ -1,3 +1,28 @@
+2014-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (cygheap_user::sid): Return reference to cygpsid rather
+	than PSID.
+	(cygheap_user::saved_sid): Ditto.
+	(cygheap_pwdgrp::cache_t): New type.
+	(cygheap_pwdgrp::caching): Convert to cache_t.
+	(cygheap_pwdgrp::nss_db_caching): Change accordingly.
+	(cygheap_pwdgrp::nss_db_full_caching): New inline method.
+	* grp.cc (internal_getgroups): Reinvent.  Take cyg_ldap pointer as
+	third parameter and use throughout.
+	(getgroups32): Call internal_getgroups.
+	* pwdgrp.h (internal_getgroups): Declare.
+	* uinfo.cc (internal_getlogin): Partial rewrite to accommodate having
+	no connection to the DC.  Give primary group from user token more
+	weight.  Generate group entries for all groups in the user token if
+	caching is set to NSS_FULL_CACHING.
+	(cygheap_pwdgrp::init): Initialize caching to NSS_FULL_CACHING.
+	(cygheap_pwdgrp::nss_init_line): Handle "db_cache: full".
+	(pwdgrp::add_account_from_windows): Fix group handling in non-caching
+	mode.
+	(pwdgrp::fetch_account_from_windows): Default primary group for the
+	current user to primary group from user token.  Check for primary
+	domain first after LookupAccountSid failed.
+
 2014-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (CheckTokenMembership): Import.

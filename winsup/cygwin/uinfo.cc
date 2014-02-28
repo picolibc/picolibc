@@ -116,48 +116,63 @@ cygheap_user::init ()
 void
 internal_getlogin (cygheap_user &user)
 {
-  struct passwd *pw = NULL;
-  struct group *gr, *gr2;
+  struct passwd *pwd;
+  struct group *pgrp, *grp, *grp2;
   cyg_ldap cldap;
 
-  cygpsid psid = user.sid ();
-  pw = internal_getpwsid (psid, &cldap);
-
-  if (!pw && !(pw = internal_getpwnam (user.name (), &cldap)))
-    debug_printf ("user not found in /etc/passwd");
+  /* Fetch (and potentially generate) passwd and group entries for the user
+     and the primary group in the token. */
+  pwd = internal_getpwsid (user.sid (), &cldap);
+  pgrp = internal_getgrsid (user.groups.pgsid, &cldap);
+  if (cygheap->pg.nss_db_full_caching ())
+    internal_getgroups (0, NULL, &cldap);
+  if (!pwd)
+    debug_printf ("user not found in passwd DB");
   else
     {
       cygsid gsid;
 
-      myself->uid = pw->pw_uid;
-      myself->gid = pw->pw_gid;
-      user.set_name (pw->pw_name);
-      if (gsid.getfromgr (gr = internal_getgrgid (pw->pw_gid, &cldap)))
+      user.set_name (pwd->pw_name);
+      myself->uid = pwd->pw_uid;
+      myself->gid = pwd->pw_gid;
+      /* Is the primary group in the passwd DB is different from the primary
+	 group in the user token, we have to find the SID of that group and
+	 try to override the token primary group. */
+      if (!pgrp || myself->gid != pgrp->gr_gid)
 	{
-	  /* We might have a group file with a group entry for the current
-	     user's primary group, but the current user has no entry in passwd.
-	     If so, pw_gid is taken from windows and might disagree with the
-	     gr_gid from the group file.  Overwrite it brutally. */
-	  if ((gr2 = internal_getgrsid (gsid, &cldap)) && gr2 != gr)
-	    myself->gid = pw->pw_gid = gr2->gr_gid;
-	  /* Set primary group to the group in /etc/passwd. */
-	  if (gsid != user.groups.pgsid)
+	  if (gsid.getfromgr (grp = internal_getgrgid (pwd->pw_gid, &cldap)))
 	    {
-	      NTSTATUS status = NtSetInformationToken (hProcToken,
-						       TokenPrimaryGroup,
-						       &gsid, sizeof gsid);
-	      if (!NT_SUCCESS (status))
-		debug_printf ("NtSetInformationToken (TokenPrimaryGroup), %y",
-			      status);
-	      else
-		user.groups.pgsid = gsid;
-	      clear_procimptoken ();
+	      /* We might have a group file with a group entry for the current
+		 user's primary group, but the current user has no entry in
+		 passwd.  If so, pw_gid is taken from windows and might
+		 disagree with gr_gid from the group file.  Overwrite it. */
+	      if ((grp2 = internal_getgrsid (gsid, &cldap)) && grp2 != grp)
+		myself->gid = pwd->pw_gid = grp2->gr_gid;
+	      /* Set primary group to the group in /etc/passwd. */
+	      if (gsid != user.groups.pgsid)
+		{
+		  NTSTATUS status = NtSetInformationToken (hProcToken,
+							   TokenPrimaryGroup,
+							   &gsid, sizeof gsid);
+		  if (!NT_SUCCESS (status))
+		    {
+		      debug_printf ("NtSetInformationToken (TokenPrimaryGroup),"
+				    " %y", status);
+		      /* Revert the primary group setting and override the
+			 setting in the passwd entry. */
+		      if (pgrp)
+			myself->gid = pwd->pw_gid = pgrp->gr_gid;
+		    }
+		  else
+		    user.groups.pgsid = gsid;
+		  clear_procimptoken ();
+		}
 	    }
+	  else
+	    debug_printf ("group not found in group DB");
 	}
-      else
-	debug_printf ("gsid not found in augmented /etc/group");
     }
-  cygheap->user.ontherange (CH_HOME, pw);
+  cygheap->user.ontherange (CH_HOME, pwd);
 }
 
 void
@@ -569,7 +584,7 @@ cygheap_pwdgrp::init ()
   grp_src = (NSS_FILES | NSS_DB);
   prefix = NSS_AUTO;
   separator[0] = L'+';
-  caching = true;
+  caching = NSS_FULL_CACHING;
   enums = (ENUM_CACHE | ENUM_BUILTIN);
   enum_tdoms = NULL;
 }
@@ -659,10 +674,12 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 	{
 	  c += 6;
 	  c += strspn (c, " \t");
-	  if (!strncmp (c, "yes", 3) && strchr (" \t", c[3]))
-	    caching = true;
+	  if (!strncmp (c, "full", 3) && strchr (" \t", c[3]))
+	    caching = NSS_FULL_CACHING;
+	  else if (!strncmp (c, "yes", 3) && strchr (" \t", c[3]))
+	    caching = NSS_CACHING;
 	  else if (!strncmp (c, "no", 2) && strchr (" \t", c[2]))
-	    caching = false;
+	    caching = NSS_NO_CACHING;
 	  else
 	    debug_printf ("Invalid nsswitch.conf content: %s", line);
 	}
@@ -986,6 +1003,8 @@ pwdgrp::add_account_from_windows (cygpsid &sid, bool group, cyg_ldap *pldap)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
     return add_account_post_fetch (line, true);
+  if (group)
+    return (prep_tls_grbuf ())->add_account_post_fetch (line, false);
   return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
 }
 
@@ -1000,6 +1019,8 @@ pwdgrp::add_account_from_windows (const char *name, bool group, cyg_ldap *pldap)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
     return add_account_post_fetch (line, true);
+  if (group)
+    return (prep_tls_grbuf ())->add_account_post_fetch (line, false);
   return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
 }
 
@@ -1014,6 +1035,8 @@ pwdgrp::add_account_from_windows (uint32_t id, bool group, cyg_ldap *pldap)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
     return add_account_post_fetch (line, true);
+  if (group)
+    return (prep_tls_grbuf ())->add_account_post_fetch (line, false);
   return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
 }
 
@@ -1481,7 +1504,16 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	      if (acc_type != SidTypeUser)
 		break;
 
-	      gid = posix_offset + DOMAIN_GROUP_RID_USERS; /* Default. */
+	      /* Default primary group.  If the sid is the current user, fetch
+		 the default group from the current user token, otherwise make
+		 the educated guess that the user is in group "Domain Users"
+		 or "None". */
+	      if (sid == cygheap->user.sid ())
+		gid = posix_offset
+		      + sid_sub_auth_rid (cygheap->user.groups.pgsid);
+	      else
+		gid = posix_offset + DOMAIN_GROUP_RID_USERS;
+
 	      /* Use LDAP to fetch domain account infos. */
 	      if (!cldap->open (NULL))
 		break;
@@ -1724,13 +1756,19 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	  PDS_DOMAIN_TRUSTSW td = NULL;
 
 	  sid_sub_auth_count (sid) = sid_sub_auth_count (sid) - 1;
-	  for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
-	    if (td->DomainSid && RtlEqualSid (sid, td->DomainSid))
-	      {
-		domain = td->NetbiosDomainName;
-		posix_offset = fetch_posix_offset (td, cldap);
-		break;
-	      }
+	  if (RtlEqualSid (sid, cygheap->dom.primary_sid ()))
+	    {
+	      domain = cygheap->dom.primary_flat_name ();
+	      posix_offset = 0x100000;
+	    }
+	  else
+	    for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
+	      if (td->DomainSid && RtlEqualSid (sid, td->DomainSid))
+		{
+		  domain = td->NetbiosDomainName;
+		  posix_offset = fetch_posix_offset (td, cldap);
+		  break;
+		}
 	}
       if (domain)
 	{

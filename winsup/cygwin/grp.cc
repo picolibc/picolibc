@@ -459,21 +459,20 @@ endgrent_filtered (void *gr)
   ((gr_ent *) gr)->endgrent ();
 }
 
-extern "C" int
-getgroups32 (int gidsetsize, gid_t *grouplist)
+int
+internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
 {
   NTSTATUS status;
   HANDLE tok;
   ULONG size;
   int cnt = 0;
   struct group *grp;
-  cyg_ldap cldap;
 
   if (cygheap->user.groups.issetgroups ())
     {
       for (int pg = 0; pg < cygheap->user.groups.sgsids.count (); ++pg)
 	if ((grp = internal_getgrsid (cygheap->user.groups.sgsids.sids[pg],
-				      &cldap)))
+				      pldap)))
 	  {
 	    if (cnt < gidsetsize)
 	      grouplist[cnt] = grp->gr_gid;
@@ -500,7 +499,7 @@ getgroups32 (int gidsetsize, gid_t *grouplist)
 	  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 	    {
 	      cygpsid sid = groups->Groups[pg].Sid;
-	      if ((grp = internal_getgrsid (sid, &cldap)))
+	      if ((grp = internal_getgrsid (sid, pldap)))
 		{
 		  if ((groups->Groups[pg].Attributes
 		      & (SE_GROUP_ENABLED | SE_GROUP_INTEGRITY_ENABLED))
@@ -523,6 +522,14 @@ getgroups32 (int gidsetsize, gid_t *grouplist)
 error:
   set_errno (EINVAL);
   return -1;
+}
+
+extern "C" int
+getgroups32 (int gidsetsize, gid_t *grouplist)
+{
+  cyg_ldap cldap;
+
+  return internal_getgroups (gidsetsize, grouplist, &cldap);
 }
 
 #ifdef __x86_64__

@@ -27,6 +27,8 @@ extern struct group *internal_getgrsid_from_db (cygpsid &sid);
 extern struct group *internal_getgrgid (gid_t, cyg_ldap * = NULL);
 extern struct group *internal_getgrnam (const char *, cyg_ldap * = NULL);
 
+extern int internal_getgroups (int, gid_t *, cyg_ldap *);
+
 /* These functions are called from mkpasswd/mkgroup via cygwin_internal. */
 void *setpwent_filtered (int enums, PCWSTR enum_tdoms);
 void *getpwent_filtered (void *gr);
