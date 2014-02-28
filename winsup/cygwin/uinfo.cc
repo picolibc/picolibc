@@ -1501,7 +1501,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 
 	  if (is_domain_account)
 	    {
-	      if (acc_type != SidTypeUser)
+	      /* We only care for the extended user information if we're
+		 creating a passwd entry and the account is, in fact, a user. */
+	      if (group || acc_type != SidTypeUser)
 		break;
 
 	      /* Default primary group.  If the sid is the current user, fetch

@@ -1,5 +1,10 @@
 2014-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Only fetch extended
+	user info if we're creating a passwd entry.  Add comment.
+
+2014-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.h (cygheap_user::sid): Return reference to cygpsid rather
 	than PSID.
 	(cygheap_user::saved_sid): Ditto.
