@@ -1046,6 +1046,95 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
   return ret;
 }
 
+/* Samba override.  Check security descriptor for Samba UNIX user and group
+   accounts and check if we have an RFC 2307 mapping to a Windows account.
+   Create a new security descriptor with all of the UNIX acocunts with
+   valid mapping replaced with their WIndows counterpart. */
+static void
+convert_samba_sd (security_descriptor &sd_ret)
+{
+  NTSTATUS status;
+  BOOLEAN dummy;
+  PSID sid;
+  cygsid owner;
+  cygsid group;
+  SECURITY_DESCRIPTOR sd;
+  cyg_ldap cldap;
+  tmp_pathbuf tp;
+  PACL acl, oacl;
+  size_t acl_len;
+  PACCESS_ALLOWED_ACE ace;
+
+  if (!NT_SUCCESS (RtlGetOwnerSecurityDescriptor (sd_ret, &sid, &dummy)))
+    return;
+  owner = sid;
+  if (!NT_SUCCESS (RtlGetGroupSecurityDescriptor (sd_ret, &sid, &dummy)))
+    return;
+  group = sid;
+
+  if (sid_id_auth (owner) == 22)
+    {
+      struct passwd *pwd;
+      uid_t uid = owner.get_uid (&cldap);
+      if (uid < UNIX_POSIX_OFFSET && (pwd = internal_getpwuid (uid)))
+      	owner.getfrompw (pwd);
+    }
+  if (sid_id_auth (group) == 22)
+    {
+      struct group *grp;
+      gid_t gid = group.get_gid (&cldap);
+      if (gid < UNIX_POSIX_OFFSET && (grp = internal_getgrgid (gid)))
+      	group.getfromgr (grp);
+    }
+
+  if (!NT_SUCCESS (RtlGetDaclSecurityDescriptor (sd_ret, &dummy,
+						 &oacl, &dummy)))
+    return;
+  acl = (PACL) tp.w_get ();
+  RtlCreateAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION);
+  acl_len = sizeof (ACL);
+
+  for (DWORD i = 0; i < oacl->AceCount; ++i)
+    if (NT_SUCCESS (RtlGetAce (oacl, i, (PVOID *) &ace)))
+      {
+	cygsid ace_sid ((PSID) &ace->SidStart);
+	if (sid_id_auth (ace_sid) == 22)
+	  {
+	    if (sid_sub_auth (ace_sid, 0) == 1) /* user */
+	      {
+		struct passwd *pwd;
+		uid_t uid = ace_sid.get_uid (&cldap);
+		if (uid < UNIX_POSIX_OFFSET && (pwd = internal_getpwuid (uid)))
+		  ace_sid.getfrompw (pwd);
+	      }
+	    else /* group */
+	      {
+		struct group *grp;
+		gid_t gid = ace_sid.get_gid (&cldap);
+		if (gid < UNIX_POSIX_OFFSET && (grp = internal_getgrgid (gid)))
+		  ace_sid.getfromgr (grp);
+	      }
+	    if (!add_access_allowed_ace (acl, i, ace->Mask, ace_sid, acl_len,
+					 ace->Header.AceFlags))
+	      return;
+	  }
+      }
+  acl->AclSize = acl_len;
+
+  RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
+  RtlSetControlSecurityDescriptor (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
+  RtlSetOwnerSecurityDescriptor (&sd, owner, FALSE);
+  RtlSetGroupSecurityDescriptor (&sd, group, FALSE);
+
+  status = RtlSetDaclSecurityDescriptor (&sd, TRUE, acl, FALSE);
+  if (!NT_SUCCESS (status))
+    return;
+  DWORD sd_size = 0;
+  status = RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
+  if (sd_size > 0 && sd_ret.malloc (sd_size))
+    RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
+}
+
 int
 check_file_access (path_conv &pc, int flags, bool effective)
 {
@@ -1059,7 +1148,12 @@ check_file_access (path_conv &pc, int flags, bool effective)
   if (flags & X_OK)
     desired |= FILE_EXECUTE;
   if (!get_file_sd (pc.handle (), pc, sd, false))
-    ret = check_access (sd, file_mapping, desired, flags, effective);
+    {
+      /* Tweak Samba security descriptor as necessary. */
+      if (pc.fs_is_samba ())
+	convert_samba_sd (sd);
+      ret = check_access (sd, file_mapping, desired, flags, effective);
+    }
   debug_printf ("flags %y, ret %d", flags, ret);
   return ret;
 }

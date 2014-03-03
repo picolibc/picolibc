@@ -103,9 +103,27 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
       struct group *gr;
       if (cygheap->user.groups.pgsid == psid)
 	id = myself->gid;
+      else if (sid_id_auth (psid) == 22)
+	{
+	  /* Samba UNIX group.  Try to map to Cygwin gid.  If there's no
+	     mapping in the cache, try to fetch it from the configured
+	     RFC 2307 domain (see last comment in cygheap_domain_info::init()
+	     for more information) and add it to the mapping cache. */
+	  gid_t gid = sid_sub_auth_rid (psid);
+	  gid_t map_gid = cygheap->ugid_cache.get_gid (gid);
+	  if (map_gid == ILLEGAL_GID)
+	    {
+	      if (pldap->open (cygheap->dom.get_rfc2307_domain ()))
+		map_gid = pldap->remap_gid (gid);
+	      if (map_gid == ILLEGAL_GID) 
+		map_gid = MAP_UNIX_TO_CYGWIN_ID (gid);
+	      cygheap->ugid_cache.add_gid (gid, map_gid);
+	    }
+	  id = (uid_t) map_gid;
+	}
       else if ((gr = internal_getgrsid (*this, pldap)))
 	id = gr->gr_gid;
-      if (id != ILLEGAL_UID)
+      if ((gid_t) id != ILLEGAL_GID)
 	{
 	  if (type)
 	    *type = GROUP;
@@ -117,6 +135,21 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
       struct passwd *pw;
       if (*this == cygheap->user.sid ())
 	id = myself->uid;
+      else if (sid_id_auth (psid) == 22)
+	{
+	  /* Samba UNIX user.  See comment above. */
+	  uid_t uid = sid_sub_auth_rid (psid);
+	  uid_t map_uid = cygheap->ugid_cache.get_uid (uid);
+	  if (map_uid == ILLEGAL_UID)
+	    {
+	      if (pldap->open (cygheap->dom.get_rfc2307_domain ()))
+		map_uid = pldap->remap_uid (uid);
+	      if (map_uid == ILLEGAL_UID)
+		map_uid = MAP_UNIX_TO_CYGWIN_ID (uid);
+	      cygheap->ugid_cache.add_uid (uid, map_uid);
+	    }
+	  id = map_uid;
+	}
       else if ((pw = internal_getpwsid (*this, pldap)))
 	id = pw->pw_uid;
       if (id != ILLEGAL_UID && type)
@@ -295,44 +328,16 @@ cygsidlist::add (const PSID nsi, bool well_known)
 bool
 get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gidret)
 {
-  struct passwd *pw;
-  struct group *gr = NULL;
   BOOL ret = false;
-  PWCHAR domain;
   cyg_ldap cldap;
 
   owner_sid.debug_print ("get_sids_info: owner SID =");
   group_sid.debug_print ("get_sids_info: group SID =");
 
-  if (group_sid == cygheap->user.groups.pgsid)
-    *gidret = myself->gid;
-  else if (sid_id_auth (group_sid) == 22)
+  *uidret = owner_sid.get_uid (&cldap);
+  *gidret = group_sid.get_gid (&cldap);
+  if (*uidret == myself->uid)
     {
-      /* Samba UNIX group.  Try to map to Cygwin gid.  If there's no mapping in
-	 the cache, try to fetch it from the configured RFC 2307 domain (see
-	 last comment in cygheap_domain_info::init() for more information) and
-	 add it to the mapping cache. */
-      gid_t gid = sid_sub_auth_rid (group_sid);
-      gid_t map_gid = cygheap->ugid_cache.get_gid (gid);
-      if (map_gid == ILLEGAL_GID)
-	{
-	  domain = cygheap->dom.get_rfc2307_domain ();
-	  if (cldap.open (domain))
-	    map_gid = cldap.remap_gid (gid);
-	  if (map_gid == ILLEGAL_GID)
-	    map_gid = MAP_UNIX_TO_CYGWIN_ID (gid);
-	  cygheap->ugid_cache.add_gid (gid, map_gid);
-	}
-      *gidret = map_gid;
-    }
-  else if ((gr = internal_getgrsid (group_sid, &cldap)))
-    *gidret = gr->gr_gid;
-  else
-    *gidret = ILLEGAL_GID;
-
-  if (owner_sid == cygheap->user.sid ())
-    {
-      *uidret = myself->uid;
       if (*gidret == myself->gid)
 	ret = TRUE;
       else
@@ -340,34 +345,6 @@ get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gid
 			      ? cygheap->user.imp_token () : NULL,
 			      group_sid, &ret);
     }
-  else if (sid_id_auth (owner_sid) == 22)
-    {
-      /* Samba UNIX user.  See comment above. */
-      uid_t uid = sid_sub_auth_rid (owner_sid);
-      uid_t map_uid = cygheap->ugid_cache.get_uid (uid);
-      if (map_uid == ILLEGAL_UID)
-	{
-	  domain = cygheap->dom.get_rfc2307_domain ();
-	  if (cldap.open (domain))
-	    map_uid = cldap.remap_uid (uid);
-	  if (map_uid == ILLEGAL_UID)
-	    map_uid = MAP_UNIX_TO_CYGWIN_ID (uid);
-	  cygheap->ugid_cache.add_uid (uid, map_uid);
-	}
-      *uidret = map_uid;
-    }
-  else if ((pw = internal_getpwsid (owner_sid, &cldap)))
-    {
-      *uidret = pw->pw_uid;
-      if (gr || (*gidret != ILLEGAL_GID
-		 && (gr = internal_getgrgid (*gidret, &cldap))))
-	for (int idx = 0; gr->gr_mem[idx]; ++idx)
-	  if ((ret = strcasematch (pw->pw_name, gr->gr_mem[idx])))
-	    break;
-    }
-  else
-    *uidret = ILLEGAL_UID;
-
   return (bool) ret;
 }
 

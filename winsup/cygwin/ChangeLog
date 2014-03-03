@@ -1,3 +1,14 @@
+2014-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_helper.cc (cygpsid::get_id): Move Samba SID->uid/gid mapping
+	from get_sids_info here.
+	(get_sids_info): Vice versa.
+	* security.cc (convert_samba_sd): New static function to map a Samba
+	security descriptor to a security descriptor with UNIX users and groups
+	converted to Windows SIDs per RFC 2307 mapping.
+	(check_file_access): Call convert_samba_sd on Samba security
+	descriptors.
+
 2014-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Only fetch extended
