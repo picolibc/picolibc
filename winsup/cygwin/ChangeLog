@@ -1,5 +1,10 @@
 2014-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exception.h (exception::exception): Install vectored exception
+	handler rather than vectored continue handler.
+
+2014-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_helper.cc (cygpsid::get_id): Move Samba SID->uid/gid mapping
 	from get_sids_info here.
 	(get_sids_info): Vice versa.
