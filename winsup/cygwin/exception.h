@@ -109,7 +109,6 @@ extern exception_list *_except_list asm ("%fs:0");
 class exception
 {
 #ifdef __x86_64__
-  static bool handler_installed; 
   static int handle (LPEXCEPTION_POINTERS);
 #else
   exception_list el;
@@ -120,16 +119,16 @@ public:
   exception () __attribute__ ((always_inline))
   {
 #ifdef __x86_64__
-    if (!handler_installed)
-      {
-	handler_installed = true;
-	/* The unhandled exception filter goes first.  It won't work if the
-	   executable is debugged, but then the vectored continue handler
-	   kicks in.  For some reason the vectored continue handler doesn't
-	   get called if no unhandled exception filter is installed. */
-	SetUnhandledExceptionFilter (handle);
-	AddVectoredExceptionHandler (1, handle);
-      }
+    /* Manually install SEH handler. */
+    asm (".l_startframe:						\n\
+	      .seh_handler __C_specific_handler, @except		\n\
+	      .seh_handlerdata						\n\
+	      .long 1							\n\
+	      .rva .l_startframe,					  \
+		   .l_endframe,						  \
+		   _ZN9exception6handleEP19_EXCEPTION_POINTERS,		  \
+		   .l_endframe						\n\
+	      .text							\n");
 #else
     save = _except_list;
     el.handler = handle;
@@ -137,7 +136,13 @@ public:
     _except_list = &el;
 #endif /* __x86_64__ */
   };
-#ifndef __x86_64__
+#ifdef __x86_64__
+  ~exception () __attribute__ ((always_inline)) {
+    asm ("    nop							\n\
+	  .l_endframe:							\n\
+	      nop							\n");
+  }
+#else
   ~exception () __attribute__ ((always_inline)) { _except_list = save; }
 #endif /* !__x86_64__ */
 };
