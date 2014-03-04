@@ -1,7 +1,11 @@
+2014-02-27  Joey Ye  <joey.ye@arm.com>
+
+	* libnosys/sbrk.c (_sbrk): Remove TWS
+
 2014-02-11  Joey Ye  <joey.ye@arm.com>
 
-        * arm/syscalls.c (_sbrk): Define as weak symbols.
-        (_read, _write): Ditto.
+	* arm/syscalls.c (_sbrk): Define as weak symbols.
+	(_read, _write): Ditto.
 
 2014-02-03  Richard Earnshaw  <rearnsha@arm.com>
 
