@@ -1,3 +1,8 @@
+2014-03-04  Ed Nelson  <ed@nelson305.com>
+
+	* libc/include/machine/_default_types.h: Define unsigned type using
+	signed type macros in case unsigned type macros are not available.
+
 2014-02-20  Agustin Henze  <tin@sluc.org.ar>
 
 	* libm/complex/complex.tex: Fix wrong syntax in documentation.
