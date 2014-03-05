@@ -28,6 +28,16 @@
 
 _BEGIN_STD_C
 
+#ifdef __CYGWIN__
+# ifdef __BSD_VISIBLE
+#  define __TM_GMTOFF tm_gmtoff
+#  define __TM_ZONE   tm_zone
+# else
+#  define __TM_GMTOFF __tm_gmtoff
+#  define __TM_ZONE   __tm_zone
+# endif
+#endif
+
 struct tm
 {
   int	tm_sec;
@@ -39,6 +49,12 @@ struct tm
   int	tm_wday;
   int	tm_yday;
   int	tm_isdst;
+#ifdef __TM_GMTOFF
+  long	__TM_GMTOFF;
+#endif
+#ifdef __TM_ZONE
+  const char *__TM_ZONE;
+#endif
 };
 
 clock_t	   _EXFUN(clock,    (void));

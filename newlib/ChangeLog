@@ -1,3 +1,9 @@
+2014-03-05  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/time.h (__TM_GMTOFF): Define on Cygwin.
+	(__TM_ZONE): Ditto.
+	(struct tm): Add __TM_GMTOFF and __TM_ZONE members if they are defined.
+
 2014-03-04  Ed Nelson  <ed@nelson305.com>
 
 	* libc/include/machine/_default_types.h: Define unsigned type using
