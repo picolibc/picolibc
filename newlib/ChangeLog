@@ -1,5 +1,10 @@
 2014-03-05  Corinna Vinschen  <vinschen@redhat.com>
 
+	* libc/include/time.h (__TM_GMTOFF): Remove Cygwin-specific definition.
+	(__TM_ZONE): Ditto.
+
+2014-03-05  Corinna Vinschen  <vinschen@redhat.com>
+
 	* libc/include/time.h (__TM_GMTOFF): Define on Cygwin.
 	(__TM_ZONE): Ditto.
 	(struct tm): Add __TM_GMTOFF and __TM_ZONE members if they are defined.
