@@ -1,5 +1,10 @@
 2014-03-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/config.h (__TM_GMTOFF): Define.
+	(__TM_ZONE): Define.
+
+2014-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* localtime.cc: Define TM_GMTOFF and TM_ZONE based on __TM_GMTOFF and
 	__TM_ZONE being defined.  Throughout, write to these struct tm members
 	only if CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS is true.
