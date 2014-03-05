@@ -566,8 +566,6 @@ pg_ent::enumerate_ad ()
 
 	  if (!resume)
 	    {
-	      if (!cldap.open (NULL))
-		return NULL;
 	      ++resume;
 	      if (!nss_db_enum_primary ()
 		  || !cldap.enumerate_ad_accounts (NULL, group))

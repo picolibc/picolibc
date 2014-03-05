@@ -73,19 +73,6 @@ PWCHAR rfc2307_gid_attr[] =
   NULL
 };
 
-DWORD WINAPI
-rediscover_thread (LPVOID domain)
-{
-  PDOMAIN_CONTROLLER_INFOW pdci;
-  DWORD ret = DsGetDcNameW (NULL, (PWCHAR) domain, NULL, NULL,
-			    DS_FORCE_REDISCOVERY | DS_ONLY_LDAP_NEEDED, &pdci);
-  if (ret == ERROR_SUCCESS)
-    NetApiBufferFree (pdci);
-  else
-    debug_printf ("DsGetDcNameW(%W) failed with error %u", domain, ret);
-  return 0;
-}
-
 bool
 cyg_ldap::connect_ssl (PCWSTR domain)
 {
@@ -141,40 +128,16 @@ cyg_ldap::connect_non_ssl (PCWSTR domain)
 bool
 cyg_ldap::open (PCWSTR domain)
 {
-  LARGE_INTEGER start, stop;
-  static LARGE_INTEGER last_rediscover;
   ULONG ret;
 
   /* Already open? */
   if (lh)
     return true;
 
-  GetSystemTimeAsFileTime ((LPFILETIME) &start);
   /* FIXME?  connect_ssl can take ages even when failing, so we're trying to
      do everything the non-SSL (but still encrypted) way. */
   if (/*!connect_ssl (NULL) && */ !connect_non_ssl (domain))
     return false;
-  /* For some obscure reason, there's a chance that the ldap_bind_s call takes
-     a long time, if the current primary DC is... well, burping or something.
-     If so, we rediscover in the background which usually switches to the next
-     fastest DC. */
-  GetSystemTimeAsFileTime ((LPFILETIME) &stop);
-  if ((stop.QuadPart - start.QuadPart) >= 3000000LL		   /* 0.3s */
-      && (stop.QuadPart - last_rediscover.QuadPart) >= 30000000LL) /* 3s */
-    {
-      debug_printf ("ldap_bind_s is laming.  Try to rediscover.");
-      HANDLE thr = CreateThread (&sec_none_nih, 4 * PTHREAD_STACK_MIN,
-				 rediscover_thread, (LPVOID) domain,
-				 STACK_SIZE_PARAM_IS_A_RESERVATION, NULL);
-      if (!thr)
-	debug_printf ("Couldn't start rediscover thread.");
-      else
-	{
-	  last_rediscover = stop;
-	  CloseHandle (thr);
-	}
-    }
-
   if ((ret = ldap_search_stW (lh, NULL, LDAP_SCOPE_BASE,
 			      (PWCHAR) L"(objectclass=*)", rootdse_attr,
 			      0, &tv, &msg))
@@ -285,18 +248,11 @@ cyg_ldap::enumerate_ad_accounts (PCWSTR domain, bool group)
 {
   tmp_pathbuf tp;
   PCWSTR filter;
-  PWCHAR dse;
 
-  if (msg)
-    {
-      ldap_memfreeW ((PWCHAR) msg);
-      msg = entry = NULL;
-    }
-  if (val)
-    {
-      ldap_value_freeW (val);
-      val = NULL;
-    }
+  close ();
+  if (!open (domain))
+    return false;
+
   if (!group)
     filter = L"(&(objectClass=User)"
 	        "(objectCategory=Person)"
@@ -311,31 +267,11 @@ cyg_ldap::enumerate_ad_accounts (PCWSTR domain, bool group)
 		/* 1 == ACCOUNT_GROUP */
 		"(!(groupType:" LDAP_MATCHING_RULE_BIT_AND ":=1))"
 		"(objectSid=*))";
-  if (!domain)
-    dse = rootdse;
-  else
-    {
-      /* create rootdse from domain name. */
-      dse = tp.w_get ();
-      PCWSTR ps, pe;
-      PWCHAR d;
-
-      d = dse;
-      for (ps = domain; (pe = wcschr (ps, L'.')); ps = pe + 1)
-	{
-	  if (d > dse)
-	    d = wcpcpy (d, L",");
-	  d = wcpncpy (wcpcpy (d, L"DC="), ps, pe - ps);
-	}
-      if (d > dse)
-	d = wcpcpy (d, L",");
-      d = wcpcpy (wcpcpy (d, L"DC="), ps);
-    }
-  msg_id = ldap_searchW (lh, dse, LDAP_SCOPE_SUBTREE, (PWCHAR) filter,
+  msg_id = ldap_searchW (lh, rootdse, LDAP_SCOPE_SUBTREE, (PWCHAR) filter,
 			 sid_attr, 0);
   if (msg_id == (ULONG) -1)
     {
-      debug_printf ("ldap_searchW(%W,%W) error 0x%02x", dse, filter,
+      debug_printf ("ldap_searchW(%W,%W) error 0x%02x", rootdse, filter,
 		    LdapGetLastError ());
       return false;
     }

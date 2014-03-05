@@ -1,5 +1,17 @@
 2014-03-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ldap.cc (rediscover_thread): Remove.
+	(cyg_ldap::open): Remove code to rediscover DC.  It just won't do the 
+	right thing.
+	(cyg_ldap::enumerate_ad_accounts): Change to be self-sufficient (no
+	explicit open call required).  Enumerate on a DC of the domain itself
+	instead of relying on delegation.  Remove ill-advised code trying to
+	generate rootdse from domain name.
+	* passwd.cc (pg_ent::enumerate_ad): Drop explicit call to
+	cyg_ldap::open.
+
+2014-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/config.h (__TM_GMTOFF): Define.
 	(__TM_ZONE): Define.
 
