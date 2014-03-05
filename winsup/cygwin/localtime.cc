@@ -344,6 +344,13 @@ struct tzhead {
 
 #include "fcntl.h"
 
+#ifdef __TM_GMTOFF
+# define TM_GMTOFF __TM_GMTOFF
+#endif
+#ifdef __TM_ZONE
+# define TM_ZONE __TM_ZONE
+#endif
+
 /*
 ** SunOS 4.1.1 headers lack O_BINARY.
 */
@@ -1740,7 +1747,8 @@ localsub(const timezone_t sp, const time_t * const timep, const long offset,
 	if (sp == lclptr)
 		tzname[tmp->tm_isdst] = &sp->chars[ttisp->tt_abbrind];
 #ifdef TM_ZONE
-	tmp->TM_ZONE = &sp->chars[ttisp->tt_abbrind];
+	if (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS)
+	  tmp->TM_ZONE = &sp->chars[ttisp->tt_abbrind];
 #endif /* defined TM_ZONE */
 	return result;
 }
@@ -1793,13 +1801,16 @@ gmtsub(const timezone_t sp, const time_t *const timep, const long offset,
 	** "UTC+xxxx" or "UTC-xxxx" if offset is non-zero,
 	** but this is no time for a treasure hunt.
 	*/
-	if (offset != 0)
-		tmp->TM_ZONE = wildabbr;
-	else {
-		if (gmtptr == NULL)
-			tmp->TM_ZONE = gmt;
-		else	tmp->TM_ZONE = gmtptr->chars;
-	}
+	if (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS)
+	  {
+	    if (offset != 0)
+		    tmp->TM_ZONE = wildabbr;
+	    else {
+		    if (gmtptr == NULL)
+			    tmp->TM_ZONE = gmt;
+		    else	tmp->TM_ZONE = gmtptr->chars;
+	    }
+	  }
 #endif /* defined TM_ZONE */
 	return result;
 }
@@ -1978,7 +1989,8 @@ timesub(const timezone_t sp, const time_t *const timep, const long offset,
 	tmp->tm_mday = (int) (idays + 1);
 	tmp->tm_isdst = 0;
 #ifdef TM_GMTOFF
-	tmp->TM_GMTOFF = offset;
+	if (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS)
+	  tmp->TM_GMTOFF = offset;
 #endif /* defined TM_GMTOFF */
 	return tmp;
 }
