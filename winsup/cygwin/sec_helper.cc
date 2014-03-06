@@ -66,6 +66,10 @@ MKSID (well_known_this_org_sid, "S-1-5-15",
        SECURITY_NT_AUTHORITY, 1, 15);
 MKSID (well_known_system_sid, "S-1-5-18",
        SECURITY_NT_AUTHORITY, 1, SECURITY_LOCAL_SYSTEM_RID);
+MKSID (well_known_local_service_sid, "S-1-5-19",
+       SECURITY_NT_AUTHORITY, 1, SECURITY_LOCAL_SERVICE_RID);
+MKSID (well_known_network_service_sid, "S-1-5-20",
+       SECURITY_NT_AUTHORITY, 1, SECURITY_NETWORK_SERVICE_RID);
 MKSID (well_known_builtin_sid, "S-1-5-32",
        SECURITY_NT_AUTHORITY, 1, SECURITY_BUILTIN_DOMAIN_RID);
 MKSID (well_known_admins_sid, "S-1-5-32-544",
@@ -74,6 +78,11 @@ MKSID (well_known_admins_sid, "S-1-5-32-544",
 MKSID (well_known_users_sid, "S-1-5-32-545",
        SECURITY_NT_AUTHORITY, 2, SECURITY_BUILTIN_DOMAIN_RID,
 				 DOMAIN_ALIAS_RID_USERS);
+MKSID (trusted_installer_sid,
+       "S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",
+       SECURITY_NT_AUTHORITY, SECURITY_SERVICE_ID_RID_COUNT,
+       SECURITY_SERVICE_ID_BASE_RID, 956008885U, 3418522649U, 1831038044U,
+       1853292631U, 2271478464U);
 MKSID (mandatory_medium_integrity_sid, "S-1-16-8192",
        SECURITY_MANDATORY_LABEL_AUTHORITY, 1, SECURITY_MANDATORY_MEDIUM_RID);
 MKSID (mandatory_high_integrity_sid, "S-1-16-12288",

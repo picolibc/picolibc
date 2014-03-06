@@ -1721,6 +1721,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	  uid = 0xffe;
 	  wcpcpy (name = namebuf, L"OtherSession");
 	}
+      acc_type = SidTypeUnknown;
     }
   else if (sid_id_auth (sid) == 18)
     {
@@ -1733,6 +1734,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	      ? (PWCHAR) L"Authentication authority asserted identity"
 	      : (PWCHAR) L"Service asserted identity");
       name_style = plus_prepended;
+      acc_type = SidTypeUnknown;
     }
   else if (sid_id_auth (sid) == 22)
     {
@@ -1747,6 +1749,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
       wcpcpy (p, sid_sub_auth (sid, 0) == 1 ? L"User" : L"Group");
       __small_swprintf (name = namebuf, L"%d", uid & UNIX_POSIX_MASK);
       name_style = fully_qualified;
+      acc_type = SidTypeUnknown;
     }
   else
     {
@@ -1787,6 +1790,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	  wcpcpy (name = namebuf, group ? L"Group" : L"User");
 	}
       name_style = fully_qualified;
+      acc_type = SidTypeUnknown;
     }
 
   tmp_pathbuf tp;
@@ -1806,6 +1810,12 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
   if (group)
     __small_swprintf (linebuf, L"%W:%W:%u:",
 		      posix_name, sid.string (sidstr), uid);
+  /* For non-users, create a passwd entry which doesn't allow interactive
+     logon.  Unless it's the SYSTEM account.  This conveniently allows to
+     long interactively as SYSTEM for debugging purposes. */
+  else if (acc_type != SidTypeUser && sid != well_known_system_sid)
+    __small_swprintf (linebuf, L"%W:*:%u:%u:,%W:/:/sbin/nologin",
+		      posix_name, uid, gid, sid.string (sidstr));
   else
     __small_swprintf (linebuf, L"%W:*:%u:%u:%W%WU-%W\\%W,%W:%W%W:%W",
 		      posix_name, uid, gid,

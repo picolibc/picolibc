@@ -1,5 +1,21 @@
 2014-03-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* passwd.cc (pg_ent::enumerate_builtin): Convert pwd_builtins and
+	grp_builtins to array of cygpsid pointers.  Replace SID strings with
+	pointers to well known SIDs.
+	* sec_helper.cc (well_known_local_service_sid): Define.
+	(well_known_network_service_sid): Define.
+	(trusted_installer_sid): Define.
+	* security.h (well_known_local_service_sid): Declare.
+	(well_known_network_service_sid): Declare.
+	(trusted_installer_sid): Declare.
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Throughout set acc_type
+	to SidTypeUnknown if LookupAccountXXX function failed.  Create
+	simplified passwd entry for non-user accounts, except for LocalSystem.
+	Add comment.
+
+2014-03-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* setlsapwd.cc (setlsapwd): Use RtlSecureZeroMemory to delete password
 	from memory.
 

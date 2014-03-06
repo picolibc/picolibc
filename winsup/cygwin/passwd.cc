@@ -467,36 +467,27 @@ pg_ent::enumerate_file ()
 void *
 pg_ent::enumerate_builtin ()
 {
-  static const char *pwd_builtins[] = {
-    /* SYSTEM */
-    "S-1-5-18",
-    /* LocalService */
-    "S-1-5-19",
-    /* NetworkService */
-    "S-1-5-20",
-    /* Administrators */
-    "S-1-5-32-544",
-    /* TrustedInstaller */
-    "S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",
-    /* The end */
+  static cygpsid *pwd_builtins[] = {
+    &well_known_system_sid,
+    &well_known_local_service_sid,
+    &well_known_network_service_sid,
+    &well_known_admins_sid,
+    &trusted_installer_sid,
     NULL
   };
-  static const char *grp_builtins[] = {
-    /* SYSTEM */
-    "S-1-5-18",
-    /* TrustedInstaller */
-    "S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",
-    /* The end */
+  static cygpsid *grp_builtins[] = {
+    &well_known_system_sid,
+    &trusted_installer_sid,
     NULL
   };
 
-  const char **builtins = group ? grp_builtins : pwd_builtins;
+  cygpsid **builtins = group ? grp_builtins : pwd_builtins;
   if (!builtins[cnt])
     {
       cnt = max = resume = 0;
       return NULL;
     }
-  cygsid sid (builtins[cnt++]);
+  cygsid sid (*builtins[cnt++]);
   fetch_user_arg_t arg;
   arg.type = SID_arg;
   arg.sid = &sid;
