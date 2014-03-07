@@ -1,3 +1,11 @@
+2014-03-07  Corinna Vinschen  <vinschen@redhat.com>
+	    Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdlib.h (strtold): Define if _HAVE_LONG_DOUBLE is
+	defined.
+	* libc/stdlib/strtold.c (strtold): Ditto.  Call strtod on systems
+	with long double == double, _strtold otherwise.
+
 2014-03-05  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/time.h (__TM_GMTOFF): Remove Cygwin-specific definition.
