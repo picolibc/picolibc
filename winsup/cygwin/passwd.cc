@@ -108,7 +108,7 @@ internal_getpwsid (cygpsid &sid, cyg_ldap *pldap)
   cygheap->pg.nss_init ();
   if (cygheap->pg.nss_pwd_files ())
     {
-      cygheap->pg.pwd_cache.file.check_file (false);
+      cygheap->pg.pwd_cache.file.check_file ();
       if ((ret = cygheap->pg.pwd_cache.file.find_user (sid)))
 	return ret;
       if ((ret = cygheap->pg.pwd_cache.file.add_user_from_file (sid)))
@@ -139,7 +139,7 @@ internal_getpwnam (const char *name, cyg_ldap *pldap)
   cygheap->pg.nss_init ();
   if (cygheap->pg.nss_pwd_files ())
     {
-      cygheap->pg.pwd_cache.file.check_file (false);
+      cygheap->pg.pwd_cache.file.check_file ();
       if ((ret = cygheap->pg.pwd_cache.file.find_user (name)))
 	return ret;
       if ((ret = cygheap->pg.pwd_cache.file.add_user_from_file (name)))
@@ -162,7 +162,7 @@ internal_getpwuid (uid_t uid, cyg_ldap *pldap)
   cygheap->pg.nss_init ();
   if (cygheap->pg.nss_pwd_files ())
     {
-      cygheap->pg.pwd_cache.file.check_file (false);
+      cygheap->pg.pwd_cache.file.check_file ();
       if ((ret = cygheap->pg.pwd_cache.file.find_user (uid)))
 	return ret;
       if ((ret = cygheap->pg.pwd_cache.file.add_user_from_file (uid)))
@@ -442,7 +442,7 @@ pg_ent::enumerate_file ()
     {
       pwdgrp &prf = group ? cygheap->pg.grp_cache.file
 			  : cygheap->pg.pwd_cache.file;
-      if (prf.check_file (group))
+      if (prf.check_file ())
 	{
 	  if (!buf)
 	    buf = (char *) malloc (NT_MAX_PATH);
@@ -491,7 +491,7 @@ pg_ent::enumerate_builtin ()
   fetch_user_arg_t arg;
   arg.type = SID_arg;
   arg.sid = &sid;
-  char *line = pg.fetch_account_from_windows (arg, group);
+  char *line = pg.fetch_account_from_windows (arg);
   return pg.add_account_post_fetch (line, false);
 } 
 
@@ -538,7 +538,7 @@ pg_ent::enumerate_sam ()
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
 	  arg.sid = &sid;
-	  char *line = pg.fetch_account_from_windows (arg, group);
+	  char *line = pg.fetch_account_from_windows (arg);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);
 	}
@@ -585,7 +585,7 @@ pg_ent::enumerate_ad ()
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
 	  arg.sid = &sid;
-	  char *line = pg.fetch_account_from_windows (arg, group, &cldap);
+	  char *line = pg.fetch_account_from_windows (arg, &cldap);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);
 	}
@@ -599,7 +599,7 @@ pw_ent::enumerate_caches ()
   if (!max && from_files)
     {
       pwdgrp &prf = cygheap->pg.pwd_cache.file;
-      prf.check_file (false);
+      prf.check_file ();
       if (cnt < prf.cached_users ())
         return &prf.passwd ()[cnt++].p;
       cnt = 0;

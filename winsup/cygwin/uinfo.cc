@@ -993,49 +993,49 @@ pwdgrp::add_account_from_file (uint32_t id)
 }
 
 void *
-pwdgrp::add_account_from_windows (cygpsid &sid, bool group, cyg_ldap *pldap)
+pwdgrp::add_account_from_windows (cygpsid &sid, cyg_ldap *pldap)
 {
   fetch_user_arg_t arg;
   arg.type = SID_arg;
   arg.sid = &sid;
-  char *line = fetch_account_from_windows (arg, group, pldap);
+  char *line = fetch_account_from_windows (arg, pldap);
   if (!line)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
     return add_account_post_fetch (line, true);
-  if (group)
+  if (is_group ())
     return (prep_tls_grbuf ())->add_account_post_fetch (line, false);
   return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
 }
 
 void *
-pwdgrp::add_account_from_windows (const char *name, bool group, cyg_ldap *pldap)
+pwdgrp::add_account_from_windows (const char *name, cyg_ldap *pldap)
 {
   fetch_user_arg_t arg;
   arg.type = NAME_arg;
   arg.name = name;
-  char *line = fetch_account_from_windows (arg, group, pldap);
+  char *line = fetch_account_from_windows (arg, pldap);
   if (!line)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
     return add_account_post_fetch (line, true);
-  if (group)
+  if (is_group ())
     return (prep_tls_grbuf ())->add_account_post_fetch (line, false);
   return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
 }
 
 void *
-pwdgrp::add_account_from_windows (uint32_t id, bool group, cyg_ldap *pldap)
+pwdgrp::add_account_from_windows (uint32_t id, cyg_ldap *pldap)
 {
   fetch_user_arg_t arg;
   arg.type = ID_arg;
   arg.id = id;
-  char *line = fetch_account_from_windows (arg, group, pldap);
+  char *line = fetch_account_from_windows (arg, pldap);
   if (!line)
     return NULL;
   if (cygheap->pg.nss_db_caching ())
     return add_account_post_fetch (line, true);
-  if (group)
+  if (is_group ())
     return (prep_tls_grbuf ())->add_account_post_fetch (line, false);
   return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
 }
@@ -1054,14 +1054,14 @@ pwdgrp::add_account_from_windows (uint32_t id, bool group, cyg_ldap *pldap)
    
    The return code indicates to the calling function if the file exists. */
 bool
-pwdgrp::check_file (bool group)
+pwdgrp::check_file ()
 {
   FILE_BASIC_INFORMATION fbi;
   NTSTATUS status;
 
   if (!path.Buffer)
     {
-      PCWSTR rel_path = group ? L"\\etc\\group" : L"\\etc\\passwd";
+      PCWSTR rel_path = is_group () ? L"\\etc\\group" : L"\\etc\\passwd";
       path.Buffer = (PWCHAR) cmalloc_abort (HEAP_BUF,
 					    (wcslen (cygheap->installation_root)
 					     + wcslen (rel_path) + 1)
@@ -1091,7 +1091,7 @@ pwdgrp::check_file (bool group)
 	  int curr = curr_lines;
 	  curr_lines = 0;
 	  for (int i = 0; i < curr; ++i)
-	    cfree (group ? this->group ()[i].g.gr_name
+	    cfree (is_group () ? this->group ()[i].g.gr_name
 			 : this->passwd ()[i].p.pw_name);
 	  pglock.release ();
 	}
@@ -1186,8 +1186,7 @@ fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, cyg_ldap *cldap)
 }
 
 char *
-pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
-				    cyg_ldap *pldap)
+pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 {
   /* Used in LookupAccount calls. */
   WCHAR namebuf[UNLEN + 1], *name = namebuf;
@@ -1244,7 +1243,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	  PWCHAR val;
 
 	  if (cldap->open (NULL)
-	      && cldap->fetch_ad_account (sid, group)
+	      && cldap->fetch_ad_account (sid, is_group ())
 	      && (val = cldap->get_group_name ()))
 	    {
 	      wcpcpy (name, val);
@@ -1367,7 +1366,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	{
 	  /* UNIX (unknown NFS or Samba) user account. */
 	  __small_swprintf (sidstr, L"S-1-22-%u-%u",
-			    group ? 2 : 1,  arg.id & UNIX_POSIX_MASK);
+			    is_group () ? 2 : 1,  arg.id & UNIX_POSIX_MASK);
 	  /* LookupAccountSidW will fail. */
 	  sid = csid = sidstr;
 	  break;
@@ -1503,7 +1502,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	    {
 	      /* We only care for the extended user information if we're
 		 creating a passwd entry and the account is, in fact, a user. */
-	      if (group || acc_type != SidTypeUser)
+	      if (is_group () || acc_type != SidTypeUser)
 		break;
 
 	      /* Default primary group.  If the sid is the current user, fetch
@@ -1519,7 +1518,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	      /* Use LDAP to fetch domain account infos. */
 	      if (!cldap->open (NULL))
 		break;
-	      if (cldap->fetch_ad_account (sid, group))
+	      if (cldap->fetch_ad_account (sid, is_group ()))
 		{
 		  PWCHAR val;
 
@@ -1780,14 +1779,14 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
 	  sid_sub_auth_count (sid) = sid_sub_auth_count (sid) + 1;
 	  wcscpy (dom, domain);
 	  __small_swprintf (name = namebuf, L"%W(%u)",
-			    group ? L"Group" : L"User",
+			    is_group () ? L"Group" : L"User",
 			    sid_sub_auth_rid (sid));
 	  uid = posix_offset + sid_sub_auth_rid (sid);
 	}
       else
 	{
 	  wcpcpy (dom, L"Unknown");
-	  wcpcpy (name = namebuf, group ? L"Group" : L"User");
+	  wcpcpy (name = namebuf, is_group () ? L"Group" : L"User");
 	}
       name_style = fully_qualified;
       acc_type = SidTypeUnknown;
@@ -1802,12 +1801,12 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
   if (gid == ILLEGAL_GID)
     gid = uid;
   if (name_style >= fully_qualified)
-    p = wcpcpy (p, user ? group ? L"Posix_Group" : L"Posix_User" : dom);
+    p = wcpcpy (p, user ? is_group () ? L"Posix_Group" : L"Posix_User" : dom);
   if (name_style >= plus_prepended)
     p = wcpcpy (p, cygheap->pg.nss_separator ());
   wcpcpy (p, user ?: name);
 
-  if (group)
+  if (is_group ())
     __small_swprintf (linebuf, L"%W:%W:%u:",
 		      posix_name, sid.string (sidstr), uid);
   /* For non-users, create a passwd entry which doesn't allow interactive

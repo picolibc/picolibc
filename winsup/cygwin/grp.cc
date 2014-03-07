@@ -124,7 +124,7 @@ internal_getgrsid (cygpsid &sid, cyg_ldap *pldap)
   cygheap->pg.nss_init ();
   if (cygheap->pg.nss_grp_files ())
     {
-      cygheap->pg.grp_cache.file.check_file (true);
+      cygheap->pg.grp_cache.file.check_file ();
       if ((ret = cygheap->pg.grp_cache.file.find_group (sid)))
 	return ret;
       if ((ret = cygheap->pg.grp_cache.file.add_group_from_file (sid)))
@@ -155,7 +155,7 @@ internal_getgrnam (const char *name, cyg_ldap *pldap)
   cygheap->pg.nss_init ();
   if (cygheap->pg.nss_grp_files ())
     {
-      cygheap->pg.grp_cache.file.check_file (true);
+      cygheap->pg.grp_cache.file.check_file ();
       if ((ret = cygheap->pg.grp_cache.file.find_group (name)))
 	return ret;
       if ((ret = cygheap->pg.grp_cache.file.add_group_from_file (name)))
@@ -178,7 +178,7 @@ internal_getgrgid (gid_t gid, cyg_ldap *pldap)
   cygheap->pg.nss_init ();
   if (cygheap->pg.nss_grp_files ())
     {
-      cygheap->pg.grp_cache.file.check_file (true);
+      cygheap->pg.grp_cache.file.check_file ();
       if ((ret = cygheap->pg.grp_cache.file.find_group (gid)))
 	return ret;
       if ((ret = cygheap->pg.grp_cache.file.add_group_from_file (gid)))
@@ -330,7 +330,7 @@ gr_ent::enumerate_caches ()
   if (!max && from_files)
     {
       pwdgrp &grf = cygheap->pg.grp_cache.file;
-      grf.check_file (true);
+      grf.check_file ();
       if (cnt < grf.cached_groups ())
         return &grf.group ()[cnt++].g;
       cnt = 0;
@@ -389,7 +389,7 @@ gr_ent::enumerate_local ()
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
 	  arg.sid = &sid;
-	  char *line = pg.fetch_account_from_windows (arg, true);
+	  char *line = pg.fetch_account_from_windows (arg);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);
 	}

@@ -1,3 +1,19 @@
+2014-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pwdgrp.h (pwdgrp::is_passwd): New inline method.
+	(pwdgrp::is_group): New inline method.
+	(add_account_from_windows): Drop group argument from declaration.
+	(fetch_account_from_windows): Ditto.
+	(check_file): Ditto.
+	(add_user_from_windows): Call add_account_from_windows accordingly.
+	(add_group_from_windows): Ditto.
+	* uinfo.cc (pwdgrp::add_account_from_windows): Drop group argument.
+	Use is_group method instead.
+	(pwdgrp::check_file): Ditto.
+	(pwdgrp::fetch_account_from_windows): Ditto.
+	* grp.cc: Accommodate aforementioned changes.
+	* passwd.cc: Ditto.
+
 2014-03-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* passwd.cc (pg_ent::enumerate_builtin): Convert pwd_builtins and

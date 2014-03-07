@@ -108,15 +108,12 @@ class pwdgrp
   void *add_account_from_file (cygpsid &sid);
   void *add_account_from_file (const char *name);
   void *add_account_from_file (uint32_t id);
-  void *add_account_from_windows (cygpsid &sid, bool group,
-  				  cyg_ldap *pldap = NULL);
-  void *add_account_from_windows (const char *name, bool group,
-				  cyg_ldap *pldap = NULL);
-  void *add_account_from_windows (uint32_t id, bool group,
-				  cyg_ldap *pldap = NULL);
+  void *add_account_from_windows (cygpsid &sid, cyg_ldap *pldap = NULL);
+  void *add_account_from_windows (const char *name, cyg_ldap *pldap = NULL);
+  void *add_account_from_windows (uint32_t id, cyg_ldap *pldap = NULL);
   char *fetch_account_from_line (fetch_user_arg_t &arg, const char *line);
   char *fetch_account_from_file (fetch_user_arg_t &arg);
-  char *fetch_account_from_windows (fetch_user_arg_t &arg, bool group,
+  char *fetch_account_from_windows (fetch_user_arg_t &arg,
 				    cyg_ldap *pldap = NULL);
   pwdgrp *prep_tls_pwbuf ();
   pwdgrp *prep_tls_grbuf ();
@@ -125,9 +122,10 @@ public:
   ULONG cached_users () const { return curr_lines; }
   ULONG cached_groups () const { return curr_lines; }
   POBJECT_ATTRIBUTES file_attr () { return &attr; }
-  bool check_file (bool group);
+  bool check_file ();
 
   void init_pwd ();
+  bool is_passwd () const { return pwdgrp_buf_elem_size == sizeof (pg_pwd); }
   pg_pwd *passwd () const { return (pg_pwd *) pwdgrp_buf; };
   inline struct passwd *add_user_from_file (cygpsid &sid)
     { return (struct passwd *) add_account_from_file (sid); }
@@ -136,17 +134,18 @@ public:
   struct passwd *add_user_from_file (uint32_t id)
     { return (struct passwd *) add_account_from_file (id); }
   struct passwd *add_user_from_windows (cygpsid &sid, cyg_ldap *pldap = NULL)
-    { return (struct passwd *) add_account_from_windows (sid, false, pldap); }
+    { return (struct passwd *) add_account_from_windows (sid, pldap); }
   struct passwd *add_user_from_windows (const char *name,
   					cyg_ldap* pldap = NULL)
-    { return (struct passwd *) add_account_from_windows (name, false, pldap); }
+    { return (struct passwd *) add_account_from_windows (name, pldap); }
   struct passwd *add_user_from_windows (uint32_t id, cyg_ldap *pldap = NULL)
-    { return (struct passwd *) add_account_from_windows (id, false, pldap); }
+    { return (struct passwd *) add_account_from_windows (id, pldap); }
   struct passwd *find_user (cygpsid &sid);
   struct passwd *find_user (const char *name);
   struct passwd *find_user (uid_t uid);
 
   void init_grp ();
+  bool is_group () const { return pwdgrp_buf_elem_size == sizeof (pg_grp); }
   pg_grp *group () const { return (pg_grp *) pwdgrp_buf; };
   struct group *add_group_from_file (cygpsid &sid)
     { return (struct group *) add_account_from_file (sid); }
@@ -155,12 +154,12 @@ public:
   struct group *add_group_from_file (uint32_t id)
     { return (struct group *) add_account_from_file (id); }
   struct group *add_group_from_windows (cygpsid &sid, cyg_ldap *pldap = NULL)
-    { return (struct group *) add_account_from_windows (sid, true, pldap); }
+    { return (struct group *) add_account_from_windows (sid, pldap); }
   struct group *add_group_from_windows (const char *name,
 					cyg_ldap *pldap = NULL)
-    { return (struct group *) add_account_from_windows (name, true, pldap); }
+    { return (struct group *) add_account_from_windows (name, pldap); }
   struct group *add_group_from_windows (uint32_t id, cyg_ldap *pldap = NULL)
-    { return (struct group *) add_account_from_windows (id, true, pldap); }
+    { return (struct group *) add_account_from_windows (id, pldap); }
   struct group *find_group (cygpsid &sid);
   struct group *find_group (const char *name);
   struct group *find_group (gid_t gid);
