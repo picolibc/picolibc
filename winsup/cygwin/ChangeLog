@@ -1,3 +1,7 @@
+2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* dir.cc (opendir): Propagate any errno from build_fh_name.
+
 2014-02-25  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* fhandler.h (fhandler_console::scroll_buffer_screen): New function.
