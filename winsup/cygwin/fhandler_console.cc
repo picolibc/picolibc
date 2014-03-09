@@ -1839,7 +1839,7 @@ fhandler_console::char_command (char c)
     case 'M':				/* DL - delete lines */
       n = dev_state.args[0] ?: 1;
       cursor_get (&x, &y);
-      scroll_buffer (0, y + dev_state.args[0], -1, -1, 0, y);
+      scroll_buffer (0, y + n, -1, -1, 0, y);
       break;
     case '@':				/* IC - insert chars */
       n = dev_state.args[0] ?: 1;
