@@ -7,6 +7,16 @@
 
 	* dir.cc (opendir): Propagate any errno from build_fh_name.
 
+2014-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc: Define TM_GMTOFF and TM_ZONE based on __TM_GMTOFF and
+	__TM_ZONE being defined.  Throughout, write to these struct tm members
+	only if CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS is true.
+	* libc/strptime.cc: Ditto.
+	* include/cygwin/version.h (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS):
+	Define.
+	(CYGWIN_VERSION_API_MINOR): Bump to 272.
+
 2014-03-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exception.h (exception::handler_installed): Remove.

@@ -48,6 +48,13 @@ __RCSID("$NetBSD: strptime.c,v 1.28 2008/04/28 20:23:01 martin Exp $");
 #include <tzfile.h>
 #include "../locale/timelocal.h"
 
+#ifdef __TM_GMTOFF
+# define TM_GMTOFF __TM_GMTOFF
+#endif
+#ifdef __TM_ZONE
+# define TM_ZONE __TM_ZONE
+#endif
+
 #ifdef __weak_alias
 __weak_alias(strptime,_strptime)
 #endif
@@ -653,10 +660,12 @@ literal:
 			if (strncmp((const char *)bp, gmt, 3) == 0) {
 				tm->tm_isdst = 0;
 #ifdef TM_GMTOFF
-				tm->TM_GMTOFF = 0;
+				if (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS)
+				  tm->TM_GMTOFF = 0;
 #endif
 #ifdef TM_ZONE
-				tm->TM_ZONE = gmt;
+				if (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS)
+				  tm->TM_ZONE = gmt;
 #endif
 				bp += 3;
 			} else {
@@ -668,10 +677,12 @@ literal:
 				if (ep != NULL) {
 					tm->tm_isdst = i;
 #ifdef TM_GMTOFF
-					tm->TM_GMTOFF = -(timezone);
+					if (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS)
+					  tm->TM_GMTOFF = -(timezone);
 #endif
 #ifdef TM_ZONE
-					tm->TM_ZONE = tzname[i];
+					if (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS)
+					  tm->TM_ZONE = tzname[i];
 #endif
 				}
 				bp = ep;
