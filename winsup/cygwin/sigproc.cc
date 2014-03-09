@@ -336,6 +336,8 @@ _cygtls::remove_wq (DWORD wait)
       if (exit_state < ES_FINAL && waitq_head.next && sync_proc_subproc
 	  && sync_proc_subproc.acquire (wait))
 	{
+	  ForceCloseHandle1 (wq.thread_ev, wq_ev);
+	  wq.thread_ev = NULL;
 	  for (waitq *w = &waitq_head; w->next != NULL; w = w->next)
 	    if (w->next == &wq)
 	      {
@@ -344,7 +346,6 @@ _cygtls::remove_wq (DWORD wait)
 	      }
 	  sync_proc_subproc.release ();
 	}
-      ForceCloseHandle1 (wq.thread_ev, wq_ev);
     }
 
 }
