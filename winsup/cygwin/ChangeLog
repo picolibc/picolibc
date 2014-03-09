@@ -1,5 +1,10 @@
 2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
+	* sigproc.cc (_cygtls::remove_wq): Reset thread_ev inside of lock.  Set
+	to NULL when done.
+
+2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
 	* fhandler_console.cc (fhandler_console::char_command): Properly use
 	calculated value rather than directly using dev_state.args[0].
 
