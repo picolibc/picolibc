@@ -128,7 +128,7 @@ public:
 	   kicks in.  For some reason the vectored continue handler doesn't
 	   get called if no unhandled exception filter is installed. */
 	SetUnhandledExceptionFilter (handle);
-	AddVectoredContinueHandler (1, handle);
+	AddVectoredExceptionHandler (1, handle);
       }
 #else
     save = _except_list;
