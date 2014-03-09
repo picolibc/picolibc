@@ -7,6 +7,14 @@
 
 	* dir.cc (opendir): Propagate any errno from build_fh_name.
 
+2014-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (exception::handler_installed): Remove.
+	(exception::exception): Remove old code.  Manually install SEH handler
+	instead.
+	(exception::~exception): For x86_64, define frame end label.
+	* exceptions.cc (exception::handler_installed): Remove.
+
 2014-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exception.h (exception::exception): Install vectored exception
