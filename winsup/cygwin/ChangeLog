@@ -1,5 +1,26 @@
 2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
+	* fhandler.h (fhandler_console::dwBufferSize): Delete.
+	(fhandler_console::dwCursorPosition): Ditto.
+	(fhandler_console::wAttributes): Ditto.
+	(fhandler_console::b): New field encompassing previously disparate
+	screen buffer info.
+	(fhandler_console::save_bufsize): Rename from savebufsiz
+	(fhandler_console::save_buf): Rename sfrom savebuf.
+	(fhandler_console::save_cursor): New field.
+	(fhandler_console::save_restore): New function.
+	(fhandler_console::con): Rename from dev_state.
+	(fhandler_console::focus_aware): Accommodate name change.
+	* fhandler_console.cc: Use 'b' field of dev_console throughout instead
+	of disparate names.  Accommodate dev_state -> con rename.
+	(dev_state:save_restore): New function.  Now attempts to save the
+	entire screen buffer rather than just the visible part.  Clear the
+	buffer when saving, like Linux.
+	(fhandler_console::char_command): Use con.save_restore() for
+	Save/restore screen sequence.
+
+2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
 	* sigproc.cc (_cygtls::remove_wq): Reset thread_ev inside of lock.  Set
 	to NULL when done.
 

@@ -1287,22 +1287,21 @@ class dev_console
   /* saved cursor coordinates */
   int savex, savey;
 
-  /* saved screen */
-  COORD savebufsiz;
-  PCHAR_INFO savebuf;
 
   struct
     {
-      short Top, Bottom;
+      short Top;
+      short Bottom;
     } scroll_region;
 
-  SHORT winTop;
-  SHORT winBottom;
+  CONSOLE_SCREEN_BUFFER_INFOEX b;
   COORD dwWinSize;
-  COORD dwBufferSize;
-  COORD dwCursorPosition;
-  WORD wAttributes;
   COORD dwEnd;
+
+  /* saved screen */
+  COORD save_bufsize;
+  PCHAR_INFO save_buf;
+  COORD save_cursor;
 
   COORD dwLastCursorPosition;
   COORD dwMousePosition;	/* scroll-adjusted coord of mouse event */
@@ -1330,6 +1329,7 @@ class dev_console
   bool __reg3 scroll_window (HANDLE, int, int, int, int);
   void __reg3 scroll_buffer (HANDLE, int, int, int, int, int, int);
   void __reg3 clear_screen (HANDLE, int, int, int, int);
+  void __reg3 save_restore (HANDLE, char);
 
   friend class fhandler_console;
 };
@@ -1341,7 +1341,7 @@ public:
   struct console_state
   {
     tty_min tty_min_state;
-    dev_console dev_state;
+    dev_console con;
   };
 private:
   static const unsigned MAX_WRITE_CHARS;
@@ -1413,7 +1413,7 @@ private:
   int ioctl (unsigned int cmd, void *);
   int init (HANDLE, DWORD, mode_t);
   bool mouse_aware (MOUSE_EVENT_RECORD& mouse_event);
-  bool focus_aware () {return shared_console_info->dev_state.use_focus;}
+  bool focus_aware () {return shared_console_info->con.use_focus;}
 
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
