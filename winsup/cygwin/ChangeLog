@@ -13,9 +13,9 @@
 	(fhandler_console::focus_aware): Accommodate name change.
 	* fhandler_console.cc: Use 'b' field of dev_console throughout instead
 	of disparate names.  Accommodate dev_state -> con rename.
-	(dev_state:save_restore): New function.  Now attempts to save the
-	entire screen buffer rather than just the visible part.  Clear the
-	buffer when saving, like Linux.
+	(dev_state:save_restore): New function.  Attempt to save the entire
+	screen buffer rather than just the visible part.  Clear the buffer when
+	saving, like Linux.
 	(fhandler_console::char_command): Use con.save_restore() for
 	Save/restore screen sequence.
 
