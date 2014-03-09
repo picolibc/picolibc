@@ -1,3 +1,7 @@
+2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* dir.cc (opendir): Propagate any errno from build_fh_name.
+
 2014-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pwdgrp.h (pwdgrp::is_passwd): New inline method.
