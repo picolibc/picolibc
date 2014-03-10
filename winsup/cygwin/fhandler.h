@@ -1294,7 +1294,7 @@ class dev_console
       short Bottom;
     } scroll_region;
 
-  CONSOLE_SCREEN_BUFFER_INFOEX b;
+  CONSOLE_SCREEN_BUFFER_INFO b;
   COORD dwWinSize;
   COORD dwEnd;
 

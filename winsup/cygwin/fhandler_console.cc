@@ -733,8 +733,7 @@ dev_console::fillin (HANDLE h)
 {
   bool ret;
 
-  b.cbSize = sizeof (b);
-  if ((ret = GetConsoleScreenBufferInfoEx (h, &b)))
+  if ((ret = GetConsoleScreenBufferInfo (h, &b)))
     {
       dwWinSize.Y = 1 + b.srWindow.Bottom - b.srWindow.Top;
       dwWinSize.X = 1 + b.srWindow.Right - b.srWindow.Left;
