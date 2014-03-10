@@ -1457,8 +1457,9 @@ dev_console::save_restore (HANDLE h, char c)
   if (c == 'h') /* save */
     {
       fillin (h);
-      save_bufsize.Y = dwEnd.Y + 1;		/* Assume starting from 0/0 */
       save_bufsize.X = b.dwSize.X;
+      if ((save_bufsize.Y = dwEnd.Y + 2) > b.dwSize.Y)
+	save_bufsize.X = b.dwSize.Y;
 
       if (save_buf)
 	cfree (save_buf);
