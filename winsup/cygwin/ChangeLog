@@ -1,5 +1,12 @@
 2014-03-10  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
+	* fhandler.h (dev_console::b): Redefine as CONSOLE_SCREEN_BUFFER_INFO
+	for use with older OS.
+	* fhandler_console.cc (dev_console::fillin): Ditto for
+	GetConsoleScreenBufferInfo.
+
+2014-03-10  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
 	* fhandler_console.cc (dev_console::save_restore): Save entire line of
 	current cursor position.
 
