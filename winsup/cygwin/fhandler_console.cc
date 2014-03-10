@@ -1457,7 +1457,8 @@ dev_console::save_restore (HANDLE h, char c)
   if (c == 'h') /* save */
     {
       fillin (h);
-      save_bufsize = b.dwSize;		/* Assume starting from 0/0 */
+      save_bufsize.Y = dwEnd.Y + 1;		/* Assume starting from 0/0 */
+      save_bufsize.X = b.dwSize.X;
 
       if (save_buf)
 	cfree (save_buf);
@@ -1467,8 +1468,8 @@ dev_console::save_restore (HANDLE h, char c)
       save_cursor = b.dwCursorPosition;	/* Remember where we were. */
 
       SMALL_RECT now = {};		/* Read the whole buffer */
-      now.Bottom = b.dwSize.Y - 1;
-      now.Right = b.dwSize.X - 1;
+      now.Bottom = save_bufsize.Y - 1;
+      now.Right = save_bufsize.X - 1;
       if (!ReadConsoleOutputWrapper (h, save_buf, save_bufsize, now))
 	debug_printf ("ReadConsoleOutputWrapper(h, ...) failed during save, %E");
 
@@ -1483,21 +1484,10 @@ dev_console::save_restore (HANDLE h, char c)
     }
   else if (save_buf)
     {
-      /* Restore original buffer size, just in case.  */
-      if (!SetConsoleScreenBufferSize (h, save_bufsize))
-	debug_printf ("SetConsoleScreenBufferSize(h, ...) failed during restore, %E", h);
-
-      /* Position where we were previously */
-      if (!SetConsoleCursorPosition (h, save_cursor))
-	debug_printf ("SetConsoleCursorInfo(%p, ...) failed during restore, %E", h);
-
-      /* Get back correct version of buffer information */
-      dwEnd.X = dwEnd.Y = 0;
-      fillin (h);
       COORD cob = {};
       SMALL_RECT now = {};
-      now.Bottom = b.dwSize.Y - 1;
-      now.Right = b.dwSize.X - 1;
+      now.Bottom = save_bufsize.Y - 1;
+      now.Right = save_bufsize.X - 1;
       /* Restore whole buffer */
       BOOL res = WriteConsoleOutputW (h, save_buf, save_bufsize, cob, &now);
       if (!res)
@@ -1505,6 +1495,13 @@ dev_console::save_restore (HANDLE h, char c)
 
       cfree (save_buf);
       save_buf = NULL;
+
+      /* Position where we were previously */
+      if (!SetConsoleCursorPosition (h, save_cursor))
+	debug_printf ("SetConsoleCursorInfo(%p, ...) failed during restore, %E", h);
+      /* Get back correct version of buffer information */
+      dwEnd.X = dwEnd.Y = 0;
+      fillin (h);
     }
 }
 
@@ -2218,13 +2215,12 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    }
 	  else if (*src == '8')		/* DECRC Restore cursor position */
 	    {
-	      cursor_set (true, con.savex, con.savey);
+	      cursor_set (false, con.savex, con.savey);
 	      con.state = normal;
 	    }
 	  else if (*src == '7')		/* DECSC Save cursor position */
 	    {
 	      cursor_get (&con.savex, &con.savey);
-	      con.savey -= con.b.srWindow.Top;
 	      con.state = normal;
 	    }
 	  else if (*src == 'R')		/* ? */

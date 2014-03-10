@@ -1,5 +1,14 @@
 2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
+	* fhandler_console.cc (fhandler_console::save_restore): Save only until
+	last written row and, because of this, don't bother trying to restore
+	the screen buffer size.  Set cursor position after refilling buffer.
+	(fhandler_console::write): Use absolute paths when saving/restoring
+	cursor position or suffer odd problems after a saved screen is
+	restored.
+
+2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
 	* fhandler.h (fhandler_console::dwBufferSize): Delete.
 	(fhandler_console::dwCursorPosition): Ditto.
 	(fhandler_console::wAttributes): Ditto.
