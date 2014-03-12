@@ -210,8 +210,8 @@ typedef enum
 /* Token type for CW_SET_EXTERNAL_TOKEN */
 enum
 {
-CW_TOKEN_IMPERSONATION = 0,
-CW_TOKEN_RESTRICTED    = 1
+  CW_TOKEN_IMPERSONATION = 0,
+  CW_TOKEN_RESTRICTED    = 1
 };
 
 /* Enumeration source constants for CW_SETENT called from mkpasswd/mkgroup. */

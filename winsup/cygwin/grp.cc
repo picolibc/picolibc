@@ -68,27 +68,6 @@ pwdgrp::init_grp ()
   parse = &pwdgrp::parse_group;
 }
 
-pwdgrp *
-pwdgrp::prep_tls_grbuf ()
-{
-  if (!_my_tls.locals.grbuf)
-    {
-      _my_tls.locals.grbuf = ccalloc_abort (HEAP_BUF, 1,
-					    sizeof (pwdgrp) + sizeof (pg_grp));
-      pwdgrp *gr = (pwdgrp *) _my_tls.locals.grbuf;
-      gr->init_grp ();
-      gr->pwdgrp_buf = (void *) (gr + 1);
-      gr->max_lines = 1;
-    }
-  pwdgrp *gr = (pwdgrp *) _my_tls.locals.grbuf;
-  if (gr->curr_lines)
-    {
-      cfree (gr->group ()[0].g.gr_name);
-      gr->curr_lines = 0;
-    }
-  return gr;
-}         
-
 struct group *
 pwdgrp::find_group (cygpsid &sid)
 {
@@ -122,20 +101,28 @@ internal_getgrsid (cygpsid &sid, cyg_ldap *pldap)
   struct group *ret;
 
   cygheap->pg.nss_init ();
+  /* Check caches first. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.grp_cache.cygserver.find_group (sid)))
+    return ret;
+  if (cygheap->pg.nss_grp_files ()
+      && (ret = cygheap->pg.grp_cache.file.find_group (sid)))
+    return ret;
+  if (cygheap->pg.nss_grp_db ()
+      && (ret = cygheap->pg.grp_cache.win.find_group (sid)))
+    return ret;
+  /* Ask sources afterwards. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.grp_cache.cygserver.add_group_from_cygserver (sid)))
+    return ret;
   if (cygheap->pg.nss_grp_files ())
     {
       cygheap->pg.grp_cache.file.check_file ();
-      if ((ret = cygheap->pg.grp_cache.file.find_group (sid)))
-	return ret;
       if ((ret = cygheap->pg.grp_cache.file.add_group_from_file (sid)))
 	return ret;
     }
   if (cygheap->pg.nss_grp_db ())
-    {
-      if ((ret = cygheap->pg.grp_cache.win.find_group (sid)))
-	return ret;
-      return cygheap->pg.grp_cache.win.add_group_from_windows (sid, pldap);
-    }
+    return cygheap->pg.grp_cache.win.add_group_from_windows (sid, pldap);
   return NULL;
 }
 
@@ -153,20 +140,28 @@ internal_getgrnam (const char *name, cyg_ldap *pldap)
   struct group *ret;
 
   cygheap->pg.nss_init ();
+  /* Check caches first. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.grp_cache.cygserver.find_group (name)))
+    return ret;
+  if (cygheap->pg.nss_grp_files ()
+      && (ret = cygheap->pg.grp_cache.file.find_group (name)))
+    return ret;
+  if (cygheap->pg.nss_grp_db ()
+      && (ret = cygheap->pg.grp_cache.win.find_group (name)))
+    return ret;
+  /* Ask sources afterwards. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.grp_cache.cygserver.add_group_from_cygserver (name)))
+    return ret;
   if (cygheap->pg.nss_grp_files ())
     {
       cygheap->pg.grp_cache.file.check_file ();
-      if ((ret = cygheap->pg.grp_cache.file.find_group (name)))
-	return ret;
       if ((ret = cygheap->pg.grp_cache.file.add_group_from_file (name)))
 	return ret;
     }
   if (cygheap->pg.nss_grp_db ())
-    {
-      if ((ret = cygheap->pg.grp_cache.win.find_group (name)))
-	return ret;
-      return cygheap->pg.grp_cache.win.add_group_from_windows (name, pldap);
-    }
+    return cygheap->pg.grp_cache.win.add_group_from_windows (name, pldap);
   return NULL;
 }
 
@@ -176,21 +171,27 @@ internal_getgrgid (gid_t gid, cyg_ldap *pldap)
   struct group *ret;
 
   cygheap->pg.nss_init ();
+  /* Check caches first. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.grp_cache.cygserver.find_group (gid)))
+    return ret;
+  if (cygheap->pg.nss_grp_files ()
+      && (ret = cygheap->pg.grp_cache.file.find_group (gid)))
+    return ret;
+  if (cygheap->pg.nss_grp_db ()
+      && (ret = cygheap->pg.grp_cache.win.find_group (gid)))
+    return ret;
+  /* Ask sources afterwards. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.grp_cache.cygserver.add_group_from_cygserver (gid)))
+    return ret;
   if (cygheap->pg.nss_grp_files ())
     {
       cygheap->pg.grp_cache.file.check_file ();
-      if ((ret = cygheap->pg.grp_cache.file.find_group (gid)))
-	return ret;
       if ((ret = cygheap->pg.grp_cache.file.add_group_from_file (gid)))
 	return ret;
     }
-  if (cygheap->pg.nss_grp_db ())
-    {
-      if ((ret = cygheap->pg.grp_cache.win.find_group (gid)))
-	return ret;
-      return cygheap->pg.grp_cache.win.add_group_from_windows (gid);
-    }
-  else if (gid == ILLEGAL_GID)
+  if (cygheap->pg.nss_grp_db () || gid == ILLEGAL_GID)
     return cygheap->pg.grp_cache.win.add_group_from_windows (gid, pldap);
   return NULL;
 }
@@ -327,20 +328,37 @@ static gr_ent grent;
 void *
 gr_ent::enumerate_caches ()
 {
-  if (!max && from_files)
+  switch (max)
     {
-      pwdgrp &grf = cygheap->pg.grp_cache.file;
-      grf.check_file ();
-      if (cnt < grf.cached_groups ())
-        return &grf.group ()[cnt++].g;
+    case 0:
+      if (cygheap->pg.nss_cygserver_caching ())
+	{
+	  pwdgrp &grc = cygheap->pg.grp_cache.cygserver;
+	  if (cnt < grc.cached_groups ())
+	    return &grc.group ()[cnt++].g;
+	}
       cnt = 0;
       max = 1;
-    }
-  if (from_db && cygheap->pg.nss_db_caching ())
-    {
-      pwdgrp &grw = cygheap->pg.grp_cache.win;
-      if (cnt < grw.cached_groups ())
-        return &grw.group ()[cnt++].g;
+      /*FALLTHRU*/
+    case 1:
+      if (from_files)
+	{
+	  pwdgrp &grf = cygheap->pg.grp_cache.file;
+	  grf.check_file ();
+	  if (cnt < grf.cached_groups ())
+	    return &grf.group ()[cnt++].g;
+	}
+      cnt = 0;
+      max = 1;
+      /*FALLTHRU*/
+    case 2:
+      if (from_db)
+	{
+	  pwdgrp &grw = cygheap->pg.grp_cache.win;
+	  if (cnt < grw.cached_groups ())
+	    return &grw.group ()[cnt++].g;
+	}
+      break;
     }
   cnt = max = 0;
   return NULL;

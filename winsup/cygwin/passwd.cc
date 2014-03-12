@@ -51,27 +51,6 @@ pwdgrp::init_pwd ()
   parse = &pwdgrp::parse_passwd;
 }
 
-pwdgrp *
-pwdgrp::prep_tls_pwbuf ()
-{
-  if (!_my_tls.locals.pwbuf)
-    {
-      _my_tls.locals.pwbuf = ccalloc_abort (HEAP_BUF, 1,
-					    sizeof (pwdgrp) + sizeof (pg_pwd));
-      pwdgrp *pw = (pwdgrp *) _my_tls.locals.pwbuf;
-      pw->init_pwd ();
-      pw->pwdgrp_buf = (void *) (pw + 1);
-      pw->max_lines = 1;
-    }
-  pwdgrp *pw = (pwdgrp *) _my_tls.locals.pwbuf;
-  if (pw->curr_lines)
-    {
-      cfree (pw->passwd ()[0].p.pw_name);
-      pw->curr_lines = 0;
-    }
-  return pw;
-}
-
 struct passwd *
 pwdgrp::find_user (cygpsid &sid)
 {
@@ -106,20 +85,28 @@ internal_getpwsid (cygpsid &sid, cyg_ldap *pldap)
   struct passwd *ret;
 
   cygheap->pg.nss_init ();
+  /* Check caches first. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.pwd_cache.cygserver.find_user (sid)))
+    return ret;
+  if (cygheap->pg.nss_pwd_files ()
+      && (ret = cygheap->pg.pwd_cache.file.find_user (sid)))
+    return ret;
+  if (cygheap->pg.nss_pwd_db ()
+      && (ret = cygheap->pg.pwd_cache.win.find_user (sid)))
+    return ret;
+  /* Ask sources afterwards. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.pwd_cache.cygserver.add_user_from_cygserver (sid)))
+    return ret;
   if (cygheap->pg.nss_pwd_files ())
     {
       cygheap->pg.pwd_cache.file.check_file ();
-      if ((ret = cygheap->pg.pwd_cache.file.find_user (sid)))
-	return ret;
       if ((ret = cygheap->pg.pwd_cache.file.add_user_from_file (sid)))
 	return ret;
     }
   if (cygheap->pg.nss_pwd_db ())
-    {
-      if ((ret = cygheap->pg.pwd_cache.win.find_user (sid)))
-	return ret;
-      return cygheap->pg.pwd_cache.win.add_user_from_windows (sid, pldap);
-    }
+    return cygheap->pg.pwd_cache.win.add_user_from_windows (sid, pldap);
   return NULL;
 }
 
@@ -137,20 +124,28 @@ internal_getpwnam (const char *name, cyg_ldap *pldap)
   struct passwd *ret;
 
   cygheap->pg.nss_init ();
+  /* Check caches first. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.pwd_cache.cygserver.find_user (name)))
+    return ret;
+  if (cygheap->pg.nss_pwd_files ()
+      && (ret = cygheap->pg.pwd_cache.file.find_user (name)))
+    return ret;
+  if (cygheap->pg.nss_pwd_db ()
+      && (ret = cygheap->pg.pwd_cache.win.find_user (name)))
+    return ret;
+  /* Ask sources afterwards. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.pwd_cache.cygserver.add_user_from_cygserver (name)))
+    return ret;
   if (cygheap->pg.nss_pwd_files ())
     {
       cygheap->pg.pwd_cache.file.check_file ();
-      if ((ret = cygheap->pg.pwd_cache.file.find_user (name)))
-	return ret;
       if ((ret = cygheap->pg.pwd_cache.file.add_user_from_file (name)))
 	return ret;
     }
   if (cygheap->pg.nss_pwd_db ())
-    {
-      if ((ret = cygheap->pg.pwd_cache.win.find_user (name)))
-	return ret;
-      return cygheap->pg.pwd_cache.win.add_user_from_windows (name, pldap);
-    }
+    return cygheap->pg.pwd_cache.win.add_user_from_windows (name, pldap);
   return NULL;
 }
 
@@ -160,22 +155,28 @@ internal_getpwuid (uid_t uid, cyg_ldap *pldap)
   struct passwd *ret;
 
   cygheap->pg.nss_init ();
+  /* Check caches first. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.pwd_cache.cygserver.find_user (uid)))
+    return ret;
+  if (cygheap->pg.nss_pwd_files ()
+      && (ret = cygheap->pg.pwd_cache.file.find_user (uid)))
+    return ret;
+  if (cygheap->pg.nss_pwd_db ()
+      && (ret = cygheap->pg.pwd_cache.win.find_user (uid)))
+    return ret;
+  /* Ask sources afterwards. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.pwd_cache.cygserver.add_user_from_cygserver (uid)))
+    return ret;
   if (cygheap->pg.nss_pwd_files ())
     {
       cygheap->pg.pwd_cache.file.check_file ();
-      if ((ret = cygheap->pg.pwd_cache.file.find_user (uid)))
-	return ret;
       if ((ret = cygheap->pg.pwd_cache.file.add_user_from_file (uid)))
 	return ret;
     }
-  if (cygheap->pg.nss_pwd_db ())
-    {
-      if ((ret = cygheap->pg.pwd_cache.win.find_user (uid)))
-	return ret;
-      return cygheap->pg.pwd_cache.win.add_user_from_windows (uid, pldap);
-    }
-  else if (uid == ILLEGAL_UID)
-    return cygheap->pg.pwd_cache.win.add_user_from_windows (uid);
+  if (cygheap->pg.nss_pwd_db () || uid == ILLEGAL_UID)
+    return cygheap->pg.pwd_cache.win.add_user_from_windows (uid, pldap);
   return NULL;
 }
 
@@ -596,20 +597,37 @@ pg_ent::enumerate_ad ()
 void *
 pw_ent::enumerate_caches ()
 {
-  if (!max && from_files)
+  switch (max)
     {
-      pwdgrp &prf = cygheap->pg.pwd_cache.file;
-      prf.check_file ();
-      if (cnt < prf.cached_users ())
-        return &prf.passwd ()[cnt++].p;
+    case 0:
+      if (cygheap->pg.nss_cygserver_caching ())
+	{
+	  pwdgrp &prc = cygheap->pg.pwd_cache.cygserver;
+	  if (cnt < prc.cached_users ())
+	    return &prc.passwd ()[cnt++].p;
+	}
       cnt = 0;
       max = 1;
-    }
-  if (from_db && cygheap->pg.nss_db_caching ())
-    {
-      pwdgrp &prw = cygheap->pg.pwd_cache.win;
-      if (cnt < prw.cached_users ())
-        return &prw.passwd ()[cnt++].p;
+      /*FALLTHRU*/
+    case 1:
+      if (from_files)
+	{
+	  pwdgrp &prf = cygheap->pg.pwd_cache.file;
+	  prf.check_file ();
+	  if (cnt < prf.cached_users ())
+	    return &prf.passwd ()[cnt++].p;
+	}
+      cnt = 0;
+      max = 2;
+      /*FALLTHRU*/
+    default:
+      if (from_db)
+	{
+	  pwdgrp &prw = cygheap->pg.pwd_cache.win;
+	  if (cnt < prw.cached_users ())
+	    return &prw.passwd ()[cnt++].p;
+	}
+      break;
     }
   cnt = max = 0;
   return NULL;

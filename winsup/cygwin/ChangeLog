@@ -1,5 +1,52 @@
 2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.h (enum cygheap_pwdgrp::cache_t): Remove.
+	(cygheap_pwdgrp::caching): Convert to bool.
+	(cygheap_pwdgrp::pwd_cache): Add cygserver member.
+	(cygheap_pwdgrp::grp_cache): Ditto.
+	(cygheap_pwdgrp::nss_db_caching): Drop.
+	(cygheap_pwdgrp::nss_db_full_caching): Drop.
+	(cygheap_pwdgrp::nss_cygserver_caching): New method.
+	(cygheap_pwdgrp::nss_disable_cygserver_caching): New method.
+	* cygserver.h (client_request::request_code_t): Add
+	CYGSERVER_REQUEST_PWDGRP.
+	* cygserver_pwdgrp.h: New file.
+	* cygtls.h (struct _local_storage): Remove pwbuf and grbuf members.
+	* grp.cc (pwdgrp::prep_tls_grbuf): Drop.
+	(internal_getgrsid): Handle cygserver caching and rearrange to check
+	the caches first.
+	(internal_getgrnam): Ditto.
+	(internal_getgrgid): Ditto.
+	(gr_ent::enumerate_caches): Handle cygserver cache.
+	* passwd.cc (pwdgrp::prep_tls_pwbuf): Drop.
+	(internal_getpwsid): Handle cygserver caching and rearrange to check
+	the caches first.
+	(internal_getpwnam): Ditto.
+	(internal_getpwuid): Ditto.
+	(pw_ent::enumerate_caches): Handle cygserver cache.
+	* pwdgrp.h (pwdgrp::add_account_from_cygserver): New method declaration.
+	(pwdgrp::fetch_account_from_cygserver): New method declaration.
+	(pwdgrp::prep_tls_pwbuf): Drop declaration.
+	(pwdgrp::prep_tls_grbuf): Drop declaration.
+	(pwdgrp::add_user_from_cygserver): New inline methods.
+	(pwdgrp::add_group_from_cygserver): New inline methods.
+	* tlsoffsets.h: Regenerate.
+	* tlsoffsets64.h: Regenerate.
+	* uinfo.cc (internal_getlogin): Call internal_getgroups if cygserver
+	caching is not available.
+	(cygheap_pwdgrp::init): Initialize pwd_cache.cygserver and
+	grp_cache.cygserver.  Set caching to true.
+	(cygheap_pwdgrp::nss_init_line): Drop db_cache handling entirely.
+	(pwdgrp::add_account_from_windows): Drop no caching handling.
+	(client_request_pwdgrp::client_request_pwdgrp): New method.
+	(pwdgrp::fetch_account_from_cygserver): New method.
+	(pwdgrp::add_account_from_cygserver): New method.
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Fix formatting.
+	* include/sys/cygwin.h: Ditto.
+
+2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Avoid crash on
 	non-domain member machines if an unknown SID comes in.
 

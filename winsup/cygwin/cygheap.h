@@ -400,17 +400,12 @@ class cygheap_pwdgrp
     NSS_PRIMARY,
     NSS_ALWAYS
   };
-  enum cache_t {
-    NSS_NO_CACHING = 0,
-    NSS_CACHING,
-    NSS_FULL_CACHING
-  };
   bool    nss_inited;
   int     pwd_src;
   int     grp_src;
   pfx_t   prefix;
   WCHAR   separator[2];
-  cache_t caching;
+  bool    caching;
   int	  enums;
   PWCHAR  enum_tdoms;
 
@@ -419,10 +414,12 @@ class cygheap_pwdgrp
 
 public:
   struct {
+    pwdgrp cygserver;
     pwdgrp file;
     pwdgrp win;
   } pwd_cache;
   struct {
+    pwdgrp cygserver;
     pwdgrp file;
     pwdgrp win;
   } grp_cache;
@@ -438,9 +435,8 @@ public:
   inline bool nss_prefix_primary () const { return prefix == NSS_PRIMARY; }
   inline bool nss_prefix_always () const { return prefix == NSS_ALWAYS; }
   inline PCWSTR nss_separator () const { return separator; }
-  inline bool nss_db_caching () const { return caching != NSS_NO_CACHING; }
-  inline bool nss_db_full_caching () const
-				      { return caching == NSS_FULL_CACHING; }
+  inline bool nss_cygserver_caching () const { return caching; }
+  inline void nss_disable_cygserver_caching () { caching = false; }
   inline int nss_db_enums () const { return enums; }
   inline PCWSTR nss_db_enum_tdoms () const { return enum_tdoms; }
 };

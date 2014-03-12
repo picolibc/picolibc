@@ -80,11 +80,7 @@ public:
 struct _local_storage
 {
   /* passwd.cc */
-  void *pwbuf;
   char pass[_PASSWORD_LEN];
-
-  /* grp.cc */
-  void *grbuf;
 
   /* dlfcn.cc */
   int dl_error;

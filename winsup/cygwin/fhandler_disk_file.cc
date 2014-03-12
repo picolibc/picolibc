@@ -534,8 +534,7 @@ fhandler_base::fstat_fs (struct stat *buf)
 }
 
 int __reg3
-fhandler_base::fstat_helper (struct stat *buf,
-			     DWORD nNumberOfLinks)
+fhandler_base::fstat_helper (struct stat *buf, DWORD nNumberOfLinks)
 {
   IO_STATUS_BLOCK st;
   FILE_COMPRESSION_INFORMATION fci;

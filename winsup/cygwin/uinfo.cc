@@ -32,8 +32,8 @@ details. */
 #include "tls_pbuf.h"
 #include "miscfuncs.h"
 #include "ntdll.h"
-
 #include "ldap.h"
+#include "cygserver_pwdgrp.h"
 
 /* Initialize the part of cygheap_user that does not depend on files.
    The information is used in shared.cc for the user shared.
@@ -124,7 +124,7 @@ internal_getlogin (cygheap_user &user)
      and the primary group in the token. */
   pwd = internal_getpwsid (user.sid (), &cldap);
   pgrp = internal_getgrsid (user.groups.pgsid, &cldap);
-  if (cygheap->pg.nss_db_full_caching ())
+  if (!cygheap->pg.nss_cygserver_caching ())
     internal_getgroups (0, NULL, &cldap);
   if (!pwd)
     debug_printf ("user not found in passwd DB");
@@ -567,8 +567,10 @@ pwdgrp::add_line (char *eptr)
 void
 cygheap_pwdgrp::init ()
 {
+  pwd_cache.cygserver.init_pwd ();
   pwd_cache.file.init_pwd ();
   pwd_cache.win.init_pwd ();
+  grp_cache.cygserver.init_grp ();
   grp_cache.file.init_grp ();
   grp_cache.win.init_grp ();
   /* Default settings:
@@ -584,7 +586,7 @@ cygheap_pwdgrp::init ()
   grp_src = (NSS_FILES | NSS_DB);
   prefix = NSS_AUTO;
   separator[0] = L'+';
-  caching = NSS_FULL_CACHING;
+  caching = true;
   enums = (ENUM_CACHE | ENUM_BUILTIN);
   enum_tdoms = NULL;
 }
@@ -667,19 +669,6 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 	  c += strspn (c, " \t");
 	  if ((unsigned char) *c <= 0x7f && *c != ':' && strchr (" \t", c[1]))
 	    separator[0] = (unsigned char) *c;
-	  else
-	    debug_printf ("Invalid nsswitch.conf content: %s", line);
-	}
-      else if (!strncmp (c, "cache:", 6))
-	{
-	  c += 6;
-	  c += strspn (c, " \t");
-	  if (!strncmp (c, "full", 3) && strchr (" \t", c[3]))
-	    caching = NSS_FULL_CACHING;
-	  else if (!strncmp (c, "yes", 3) && strchr (" \t", c[3]))
-	    caching = NSS_CACHING;
-	  else if (!strncmp (c, "no", 2) && strchr (" \t", c[2]))
-	    caching = NSS_NO_CACHING;
 	  else
 	    debug_printf ("Invalid nsswitch.conf content: %s", line);
 	}
@@ -1001,11 +990,7 @@ pwdgrp::add_account_from_windows (cygpsid &sid, cyg_ldap *pldap)
   char *line = fetch_account_from_windows (arg, pldap);
   if (!line)
     return NULL;
-  if (cygheap->pg.nss_db_caching ())
-    return add_account_post_fetch (line, true);
-  if (is_group ())
-    return (prep_tls_grbuf ())->add_account_post_fetch (line, false);
-  return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
+  return add_account_post_fetch (line, true);
 }
 
 void *
@@ -1017,11 +1002,7 @@ pwdgrp::add_account_from_windows (const char *name, cyg_ldap *pldap)
   char *line = fetch_account_from_windows (arg, pldap);
   if (!line)
     return NULL;
-  if (cygheap->pg.nss_db_caching ())
-    return add_account_post_fetch (line, true);
-  if (is_group ())
-    return (prep_tls_grbuf ())->add_account_post_fetch (line, false);
-  return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
+  return add_account_post_fetch (line, true);
 }
 
 void *
@@ -1033,11 +1014,7 @@ pwdgrp::add_account_from_windows (uint32_t id, cyg_ldap *pldap)
   char *line = fetch_account_from_windows (arg, pldap);
   if (!line)
     return NULL;
-  if (cygheap->pg.nss_db_caching ())
-    return add_account_post_fetch (line, true);
-  if (is_group ())
-    return (prep_tls_grbuf ())->add_account_post_fetch (line, false);
-  return (prep_tls_pwbuf ())->add_account_post_fetch (line, false);
+  return add_account_post_fetch (line, true);
 }
 
 /* Check if file exists and if it has been written to since last checked.
@@ -1827,4 +1804,80 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   sys_wcstombs_alloc (&line, HEAP_BUF, linebuf);
   debug_printf ("line: <%s>", line);
   return line;
+}
+
+client_request_pwdgrp::client_request_pwdgrp (fetch_user_arg_t &arg, bool group)
+  : client_request (CYGSERVER_REQUEST_PWDGRP, &_parameters, sizeof (_parameters))
+{
+  size_t len = 0;
+  char *p;
+
+  _parameters.in.group = group;
+  _parameters.in.type = arg.type;
+  switch (arg.type)
+    {
+    case SID_arg:
+      RtlCopySid (sizeof (DBGSID), (PSID) &_parameters.in.arg.sid, *arg.sid);
+      len = RtlLengthSid (*arg.sid);
+      break;
+    case NAME_arg:
+      p = stpcpy (_parameters.in.arg.name, arg.name);
+      len = p - _parameters.in.arg.name;
+      break;
+    case ID_arg:
+      _parameters.in.arg.id = arg.id;
+      len = sizeof (uint32_t);
+    }
+  msglen (__builtin_offsetof (struct _pwdgrp_param_t::_pwdgrp_in_t, arg) + len);
+}
+
+char *
+pwdgrp::fetch_account_from_cygserver (fetch_user_arg_t &arg)
+{
+  client_request_pwdgrp request (arg, is_group ());
+  if (request.make_request () == -1 || request.error_code ())
+    {
+      /* Cygserver not running?  Don't try again.  This will automatically
+	 avoid an endless loop in cygserver itself. */
+      if (request.error_code () == ENOSYS)
+	cygheap->pg.nss_disable_cygserver_caching ();
+      return NULL;
+    }
+  if (!request.line ())
+    return NULL;
+  return cstrdup (request.line ());
+}
+
+void *
+pwdgrp::add_account_from_cygserver (cygpsid &sid)
+{
+  /* No, Everyone is no group in terms of POSIX. */
+  if (sid_id_auth (sid) == 1 /* SECURITY_WORLD_SID_AUTHORITY */
+      && sid_sub_auth (sid, 0) == SECURITY_WORLD_RID)
+    return NULL;
+  fetch_user_arg_t arg;
+  arg.type = SID_arg;
+  arg.sid = &sid;
+  char *line = fetch_account_from_cygserver (arg);
+  return (struct passwd *) add_account_post_fetch (line, true);
+}
+
+void *
+pwdgrp::add_account_from_cygserver (const char *name)
+{
+  fetch_user_arg_t arg;
+  arg.type = NAME_arg;
+  arg.name = name;
+  char *line = fetch_account_from_cygserver (arg);
+  return (struct passwd *) add_account_post_fetch (line, true);
+}
+
+void *
+pwdgrp::add_account_from_cygserver (uint32_t id)
+{
+  fetch_user_arg_t arg;
+  arg.type = ID_arg;
+  arg.id = id;
+  char *line = fetch_account_from_cygserver (arg);
+  return (struct passwd *) add_account_post_fetch (line, true);
 }

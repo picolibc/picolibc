@@ -111,12 +111,14 @@ class pwdgrp
   void *add_account_from_windows (cygpsid &sid, cyg_ldap *pldap = NULL);
   void *add_account_from_windows (const char *name, cyg_ldap *pldap = NULL);
   void *add_account_from_windows (uint32_t id, cyg_ldap *pldap = NULL);
+  void *add_account_from_cygserver (cygpsid &sid);
+  void *add_account_from_cygserver (const char *name);
+  void *add_account_from_cygserver (uint32_t id);
   char *fetch_account_from_line (fetch_user_arg_t &arg, const char *line);
   char *fetch_account_from_file (fetch_user_arg_t &arg);
   char *fetch_account_from_windows (fetch_user_arg_t &arg,
 				    cyg_ldap *pldap = NULL);
-  pwdgrp *prep_tls_pwbuf ();
-  pwdgrp *prep_tls_grbuf ();
+  char *fetch_account_from_cygserver (fetch_user_arg_t &arg);
 
 public:
   ULONG cached_users () const { return curr_lines; }
@@ -127,7 +129,13 @@ public:
   void init_pwd ();
   bool is_passwd () const { return pwdgrp_buf_elem_size == sizeof (pg_pwd); }
   pg_pwd *passwd () const { return (pg_pwd *) pwdgrp_buf; };
-  inline struct passwd *add_user_from_file (cygpsid &sid)
+  struct passwd *add_user_from_cygserver (cygpsid &sid)
+    { return (struct passwd *) add_account_from_cygserver (sid); }
+  struct passwd *add_user_from_cygserver (const char *name)
+    { return (struct passwd *) add_account_from_cygserver (name); }
+  struct passwd *add_user_from_cygserver (uint32_t id)
+    { return (struct passwd *) add_account_from_cygserver (id); }
+  struct passwd *add_user_from_file (cygpsid &sid)
     { return (struct passwd *) add_account_from_file (sid); }
   struct passwd *add_user_from_file (const char *name)
     { return (struct passwd *) add_account_from_file (name); }
@@ -147,6 +155,12 @@ public:
   void init_grp ();
   bool is_group () const { return pwdgrp_buf_elem_size == sizeof (pg_grp); }
   pg_grp *group () const { return (pg_grp *) pwdgrp_buf; };
+  struct group *add_group_from_cygserver (cygpsid &sid)
+    { return (struct group *) add_account_from_cygserver (sid); }
+  struct group *add_group_from_cygserver (const char *name)
+    { return (struct group *) add_account_from_cygserver (name); }
+  struct group *add_group_from_cygserver (uint32_t id)
+    { return (struct group *) add_account_from_cygserver (id); }
   struct group *add_group_from_file (cygpsid &sid)
     { return (struct group *) add_account_from_file (sid); }
   struct group *add_group_from_file (const char *name)
