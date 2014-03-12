@@ -258,6 +258,8 @@ struct OLD_msghdr
 #define IPV6_MULTICAST_LOOP             11
 #define IPV6_ADD_MEMBERSHIP             12
 #define IPV6_DROP_MEMBERSHIP            13
+#define IPV6_JOIN_GROUP                 IPV6_ADD_MEMBERSHIP
+#define IPV6_LEAVE_GROUP                IPV6_DROP_MEMBERSHIP
 #define IPV6_DONTFRAG                   14
 #define IPV6_PKTINFO                    19
 #define IPV6_HOPLIMIT                   21
