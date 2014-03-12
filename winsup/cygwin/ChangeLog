@@ -1,5 +1,10 @@
 2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Avoid crash on
+	non-domain member machines if an unknown SID comes in.
+
+2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/socket.h (IPV6_JOIN_GROUP): Revert.
 	(IPV6_LEAVE_GROUP): Ditto.
 

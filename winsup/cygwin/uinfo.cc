@@ -1752,7 +1752,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
     }
   else
     {
-      if (sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
+      if (cygheap->dom.member_machine ()
+	  && sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
 	  && sid_sub_auth (sid, 0) == SECURITY_NT_NON_UNIQUE)
 	{
 	  /* Check if we know the domain.  If so, create a passwd/group
