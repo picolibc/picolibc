@@ -1,6 +1,6 @@
 /* bsd_mutex.cc
 
-   Copyright 2003, 2004, 2005, 2007, 2012 Red Hat Inc.
+   Copyright 2003, 2004, 2005, 2007, 2012, 2014 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -34,7 +34,7 @@ mtx_init (mtx *m, const char *name, const void *, int)
      unlockable by the lock owner. */
   m->h = CreateSemaphore (NULL, 1, 1, NULL);
   if (!m->h)
-    panic ("couldn't allocate %s mutex, %lu\n", name, GetLastError ());
+    panic ("couldn't allocate %s mutex, %u\n", name, GetLastError ());
 }
 
 void
@@ -43,7 +43,7 @@ _mtx_lock (mtx *m, DWORD winpid, const char *file, int line)
   _log (file, line, LOG_DEBUG, "Try locking mutex %s (%u) (hold: %u)",
 	m->name, winpid, m->owner);
   if (WaitForSingleObject (m->h, INFINITE) != WAIT_OBJECT_0)
-    _panic (file, line, "wait for %s in %d failed, %lu", m->name, winpid,
+    _panic (file, line, "wait for %s in %d failed, %u", m->name, winpid,
 	    GetLastError ());
   m->owner = winpid;
   _log (file, line, LOG_DEBUG, "Locked      mutex %s/%u (%u)",
@@ -86,7 +86,7 @@ _mtx_unlock (mtx *m, const char *file, int line)
     {
       /* Check if the semaphore was already on it's max value. */
       if (GetLastError () != ERROR_TOO_MANY_POSTS)
-	_panic (file, line, "release of mutex %s failed, %lu", m->name,
+	_panic (file, line, "release of mutex %s failed, %u", m->name,
 		GetLastError ());
     }
   _log (file, line, LOG_DEBUG, "Unlocked    mutex %s/%u (owner: %u)",
@@ -141,7 +141,7 @@ set_priority (int priority)
   int old_prio = GetThreadPriority (GetCurrentThread ());
   if (!SetThreadPriority (GetCurrentThread (), win_priority (priority)))
     log (LOG_WARNING,
-    	  "Warning: Setting thread priority to %d failed with error %lu\n",
+    	  "Warning: Setting thread priority to %d failed with error %u\n",
 	  win_priority (priority), GetLastError ());
   return old_prio;
 }
@@ -201,7 +201,7 @@ class msleep_sync_array
     a[i].ident = ident;
     a[i].wakeup_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
     if (!a[i].wakeup_evt)
-      panic ("CreateEvent failed: %lu", GetLastError ());
+      panic ("CreateEvent failed: %u", GetLastError ());
     debug ("i = %d, CreateEvent: %x", i, a[i].wakeup_evt);
     a[i].threads = 1;
     ++cnt;
@@ -284,7 +284,7 @@ msleep_init (void)
 
   msleep_glob_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
   if (!msleep_glob_evt)
-    panic ("CreateEvent in msleep_init failed: %lu", GetLastError ());
+    panic ("CreateEvent in msleep_init failed: %u", GetLastError ());
   int32_t msgmni = support_msgqueues ? msginfo.msgmni : 0;
   int32_t semmni = support_semaphores ? seminfo.semmni : 0;
   TUNABLE_INT_FETCH ("kern.ipc.msgmni", &msgmni);
@@ -348,8 +348,8 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 	   treat an ERROR_INVALID_HANDLE as a normal process termination and
 	   hope for the best. */
 	if (GetLastError () != ERROR_INVALID_HANDLE)
-	  panic ("wait in msleep (%s) failed, %lu", wmesg, GetLastError ());
-	debug ("wait in msleep (%s) failed for %d, %lu", wmesg,
+	  panic ("wait in msleep (%s) failed, %u", wmesg, GetLastError ());
+	debug ("wait in msleep (%s) failed for %d, %u", wmesg,
 	       td->td_proc->winpid, GetLastError ());
 	ret = EIDRM;
 	break;

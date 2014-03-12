@@ -1,6 +1,6 @@
 /* process.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2005 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2014 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -52,16 +52,16 @@ process::process (const pid_t cygpid, const DWORD winpid, HANDLE signal_arrived)
   _hProcess = OpenProcess (PROCESS_ALL_ACCESS, FALSE, winpid);
   if (!_hProcess)
     {
-      system_printf ("unable to obtain handle for new cache process %d(%lu)",
+      system_printf ("unable to obtain handle for new cache process %d(%u)",
 		     _cygpid, _winpid);
       _hProcess = INVALID_HANDLE_VALUE;
       _exit_status = 0;
     }
   else
-    debug_printf ("got handle %p for new cache process %d(%lu)",
+    debug_printf ("got handle %p for new cache process %d(%u)",
 		  _hProcess, _cygpid, _winpid);
   if (!signal_arrived)
-    system_printf ("signal_arrived NULL for process %d(%lu)",
+    system_printf ("signal_arrived NULL for process %d(%u)",
 		   _cygpid, _winpid);
   else if (signal_arrived != INVALID_HANDLE_VALUE)
     {
@@ -69,18 +69,18 @@ process::process (const pid_t cygpid, const DWORD winpid, HANDLE signal_arrived)
 			    GetCurrentProcess (), &_signal_arrived,
 			    0, FALSE, DUPLICATE_SAME_ACCESS))
 	{
-	  system_printf ("error getting signal_arrived to server (%lu)",
+	  system_printf ("error getting signal_arrived to server (%u)",
 			 GetLastError ());
 	  _signal_arrived = INVALID_HANDLE_VALUE;
 	}
     }
   InitializeCriticalSection (&_access);
-  debug ("initialized (%lu)", _cygpid);
+  debug ("initialized (%u)", _cygpid);
 }
 
 process::~process ()
 {
-  debug ("deleting (%lu)", _cygpid);
+  debug ("deleting (%u)", _cygpid);
   DeleteCriticalSection (&_access);
   if (_signal_arrived && _signal_arrived != INVALID_HANDLE_VALUE)
     CloseHandle (_signal_arrived);
@@ -100,7 +100,7 @@ process::check_exit_code ()
       && _exit_status == STILL_ACTIVE
       && !GetExitCodeProcess (_hProcess, &_exit_status))
     {
-      system_printf ("failed to retrieve exit code for %d(%lu), error = %lu",
+      system_printf ("failed to retrieve exit code for %d(%u), error = %u",
 		     _cygpid, _winpid, GetLastError ());
       _hProcess = INVALID_HANDLE_VALUE;
     }
@@ -218,7 +218,7 @@ process_cache::process_cache (const size_t max_procs,
 
   if (!_cache_add_trigger)
     {
-      system_printf ("failed to create cache add trigger, error = %lu",
+      system_printf ("failed to create cache add trigger, error = %u",
 		     GetLastError ());
       abort ();
     }
@@ -256,7 +256,7 @@ process_cache::process (const pid_t cygpid, const DWORD winpid,
 	{
 	  LeaveCriticalSection (&_cache_write_access);
 	  system_printf (("process limit (%d processes) reached; "
-			  "new connection refused for %d(%lu)"),
+			  "new connection refused for %d(%u)"),
 			 _max_process_count, cygpid, winpid);
 	  return NULL;
 	}
@@ -326,7 +326,7 @@ process_cache::wait_for_processes (const HANDLE interrupt_event)
       rc = WaitForMultipleObjects (count, _wait_array, FALSE, INFINITE);
       if (rc == WAIT_FAILED)
 	{
-	  system_printf ("could not wait on the process handles, error = %lu",
+	  system_printf ("could not wait on the process handles, error = %u",
 			 GetLastError ());
 	  abort ();
 	}
@@ -349,7 +349,7 @@ process_cache::wait_for_processes (const HANDLE interrupt_event)
       rc = WaitForMultipleObjects (mcount, main_wait_array, FALSE, INFINITE);
       if (rc == WAIT_FAILED)
 	{
-	  system_printf ("could not wait on the process handles, error = %lu",
+	  system_printf ("could not wait on the process handles, error = %u",
 			 GetLastError ());
 	  abort ();
 	}
@@ -358,7 +358,7 @@ process_cache::wait_for_processes (const HANDLE interrupt_event)
       GetExitCodeThread (main_wait_array[rc], &rc);
       if (rc == WAIT_FAILED)
 	{
-	  system_printf ("could not wait on the process handles, error = %lu",
+	  system_printf ("could not wait on the process handles, error = %u",
 			 GetLastError ());
 	  abort ();
 	}
@@ -453,7 +453,7 @@ process_cache::check_and_remove_process (const size_t index)
   if (process->check_exit_code () == STILL_ACTIVE)
     return;
 
-  debug_printf ("process %d(%lu) has left the building ($? = %lu)",
+  debug_printf ("process %d(%u) has left the building ($? = %u)",
 		process->_cygpid, process->_winpid, process->_exit_status);
 
   /* Unlink the process object from the process list. */
