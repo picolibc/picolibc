@@ -1,5 +1,5 @@
 # Makefile for Cygwin server
-# Copyright 2003, 2006, 2007, 2008, 2009 Red Hat, Inc.
+# Copyright 2003, 2006, 2007, 2008, 2009, 2014 Red Hat, Inc.
 
 # This file is part of Cygwin.
 
@@ -46,7 +46,7 @@ AR:=@AR@
 OBJS:=	cygserver.o client.o process.o msg.o sem.o shm.o threaded_queue.o \
 	transport.o transport_pipes.o \
 	bsd_helper.o bsd_log.o bsd_mutex.o \
-	sysv_msg.o sysv_sem.o sysv_shm.o setpwd.o
+	sysv_msg.o sysv_sem.o sysv_shm.o setpwd.o pwdgrp.o
 LIBOBJS:=${patsubst %.o,lib%.o,$(OBJS)}
 
 CYGWIN_OBJS:=$(cygwin_build)/version.o

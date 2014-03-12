@@ -1,5 +1,12 @@
 2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (OBJS): Add pwdgrp.o.
+	* client.cc (client_request::handle_request): Handle
+	CYGSERVER_REQUEST_PWDGRP message.
+	* pwdgrp.cc: New file implementing CYGSERVER_REQUEST_PWDGRP.
+
+2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Throughout, fix format specifiers in debug statements to accommodate
 	x86_64.
 
