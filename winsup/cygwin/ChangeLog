@@ -1,3 +1,8 @@
+2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/socket.h (IPV6_JOIN_GROUP): Revert.
+	(IPV6_LEAVE_GROUP): Ditto.
+
 2014-03-10  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* fhandler.h (dev_console::b): Redefine as CONSOLE_SCREEN_BUFFER_INFO
