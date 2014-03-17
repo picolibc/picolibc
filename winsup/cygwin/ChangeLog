@@ -1,3 +1,33 @@
+2014-03-17  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* sigproc.h (no_thread_exit_protect): New class.
+	* sigproc.cc (thread_exit): Use no_thread_exit_protect to determine if
+	we need to coordinate ThreadExit/ExitProcess.
+	* fhandler_dsp.cc (fhandler_dev_dsp::Audio_out::stop): Use
+	no_thread_exit_protect to kludge around waiting for waveOutClose as it
+	waits for a thread that never exits.
+	(fhandler_dev_dsp::Audio_in::stop): Ditto for waveInClose.
+
+2014-03-16  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler.h (fhandler_dev_dsp::base): New method.
+	(fhandler_dev_dsp::_read): Ditto.
+	(fhandler_dev_dsp::_write): Ditto.
+	(fhandler_dev_dsp::_ioctl): Ditto.
+	(fhandler_dev_dsp::_fixup_after_fork): Ditto.
+	(fhandler_dev_dsp::_fixup_after_exec): Ditto.
+	* fhandler_dsp.cc (fhandler_dev_dsp::read): Call real function via
+	base() pointer.
+	(fhandler_dev_dsp::write): Ditto.
+	(fhandler_dev_dsp::ioctl): Ditto.
+	(fhandler_dev_dsp::fixup_after_fork): Ditto.
+	(fhandler_dev_dsp::fixup_after_exec): Ditto.
+	(fhandler_dev_dsp::_read): Rename by adding an leading underscore.
+	(fhandler_dev_dsp::_write): Ditto.
+	(fhandler_dev_dsp::_ioctl): Ditto.
+	(fhandler_dev_dsp::_fixup_after_fork): Ditto.
+	(fhandler_dev_dsp::_fixup_after_exec): Ditto.
+
 2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (enum cygheap_pwdgrp::cache_t): Remove.

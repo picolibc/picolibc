@@ -1790,16 +1790,23 @@ class fhandler_dev_dsp: public fhandler_base
   Audio_in  *audio_in_;
  public:
   fhandler_dev_dsp ();
+  fhandler_dev_dsp *base () const {return (fhandler_dev_dsp *)archetype;}
 
   int open (int flags, mode_t mode = 0);
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
   int ioctl (unsigned int cmd, void *);
-  off_t lseek (off_t, int) { return 0; }
   int close ();
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
+
  private:
+  ssize_t __stdcall _write (const void *ptr, size_t len);
+  void __reg3 _read (void *ptr, size_t& len);
+  int _ioctl (unsigned int cmd, void *);
+  void _fixup_after_fork (HANDLE parent);
+  void _fixup_after_exec ();
+
   void close_audio_in ();
   void close_audio_out (bool immediately = false);
   bool use_archetype () const {return true;}

@@ -39,6 +39,8 @@ struct sigaction *global_sigs;
 const char *__sp_fn ;
 int __sp_ln;
 
+bool no_thread_exit_protect::flag;
+
 char NO_COPY myself_nowait_dummy[1] = {'0'};// Flag to sig_send that signal goes to
 					//  current process but no wait is required
 
@@ -446,6 +448,8 @@ void
 exit_thread (DWORD res)
 {
 # undef ExitThread
+  if (no_thread_exit_protect ())
+    ExitThread (res);
   sigfillset (&_my_tls.sigmask);	/* No signals wanted */
   lock_process for_now;			/* May block indefinitely when exiting. */
   HANDLE h;
@@ -465,7 +469,7 @@ exit_thread (DWORD res)
   siginfo_t si = {__SIGTHREADEXIT, SI_KERNEL};
   si.si_cyg = h;
   sig_send (myself_nowait, si, &_my_tls);
-  ExitThread (0);
+  ExitThread (res);
 }
 
 int __reg3
