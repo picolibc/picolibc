@@ -435,6 +435,7 @@ fhandler_dev_dsp::Audio_out::stop (bool immediately)
 	  debug_printf ("%u = waveOutUnprepareHeader(%p)", rc, pHdr);
 	}
 
+      no_thread_exit_protect for_now (true);
       rc = waveOutClose (dev_);
       debug_printf ("%u = waveOutClose()", rc);
 
@@ -810,6 +811,7 @@ fhandler_dev_dsp::Audio_in::stop ()
 	  debug_printf ("%u = waveInUnprepareHeader(%p)", rc, pHdr);
 	}
 
+      no_thread_exit_protect for_now (true);
       rc = waveInClose (dev_);
       debug_printf ("%u = waveInClose()", rc);
 

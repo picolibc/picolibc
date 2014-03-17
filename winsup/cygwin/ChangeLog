@@ -1,3 +1,13 @@
+2014-03-17  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* sigproc.h (no_thread_exit_protect): New class.
+	* sigproc.cc (thread_exit): Use no_thread_exit_protect to determine if
+	we need to coordinate ThreadExit/ExitProcess.
+	* fhandler_dsp.cc (fhandler_dev_dsp::Audio_out::stop): Use
+	no_thread_exit_protect to kludge around waiting for waveOutClose as it
+	waits for a thread that never exits.
+	(fhandler_dev_dsp::Audio_in::stop): Ditto for waveInClose.
+
 2014-03-16  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* fhandler.h (fhandler_dev_dsp::base): New method.
