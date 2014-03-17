@@ -1003,6 +1003,37 @@ fhandler_dev_dsp::fhandler_dev_dsp ():
   dev ().parse (FH_OSS_DSP);
 }
 
+ssize_t __stdcall
+fhandler_dev_dsp::write (const void *ptr, size_t len)
+{
+  return base ()->_write (ptr, len);
+}
+
+void __reg3
+fhandler_dev_dsp::read (void *ptr, size_t& len)
+{
+  return base ()->_read (ptr, len);
+}
+
+int
+fhandler_dev_dsp::ioctl (unsigned int cmd, void *)
+{
+  return base ()->_ioctl (cmd, NULL);
+}
+
+void
+fhandler_dev_dsp::fixup_after_fork (HANDLE parent)
+{
+  base ()->fixup_after_fork (parent);
+}
+
+void
+fhandler_dev_dsp::fixup_after_exec ()
+{
+  base ()->fixup_after_exec ();
+}
+
+
 int
 fhandler_dev_dsp::open (int flags, mode_t mode)
 {
@@ -1046,7 +1077,7 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
 #define IS_READ() ((get_flags() & O_ACCMODE) != O_WRONLY)
 
 ssize_t __stdcall
-fhandler_dev_dsp::write (const void *ptr, size_t len)
+fhandler_dev_dsp::_write (const void *ptr, size_t len)
 {
   debug_printf ("ptr=%p len=%ld", ptr, len);
   int len_s = len;
@@ -1092,7 +1123,7 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
 }
 
 void __reg3
-fhandler_dev_dsp::read (void *ptr, size_t& len)
+fhandler_dev_dsp::_read (void *ptr, size_t& len)
 {
   debug_printf ("ptr=%p len=%ld", ptr, len);
 
@@ -1159,7 +1190,7 @@ fhandler_dev_dsp::close ()
 }
 
 int
-fhandler_dev_dsp::ioctl (unsigned int cmd, void *buf)
+fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
 {
   debug_printf ("audio_in=%p audio_out=%p", audio_in_, audio_out_);
   int *intbuf = (int *) buf;
@@ -1362,7 +1393,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *buf)
 }
 
 void
-fhandler_dev_dsp::fixup_after_fork (HANDLE parent)
+fhandler_dev_dsp::_fixup_after_fork (HANDLE parent)
 { // called from new child process
   debug_printf ("audio_in=%p audio_out=%p",
 		audio_in_, audio_out_);
@@ -1375,7 +1406,7 @@ fhandler_dev_dsp::fixup_after_fork (HANDLE parent)
 }
 
 void
-fhandler_dev_dsp::fixup_after_exec ()
+fhandler_dev_dsp::_fixup_after_exec ()
 {
   debug_printf ("audio_in=%p audio_out=%p, close_on_exec %d",
 		audio_in_, audio_out_, close_on_exec ());
