@@ -1,3 +1,11 @@
+2014-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	Partially revert patch from 2014-03-04.
+	* exception.h (exception::handler_installed): Declare.
+	(exception::exception): Install vectored exception handler on x86_64.
+	(exception::~exception): Remove for x86_64.
+	* exceptions.cc (exception::handler_installed): Define.
+
 2014-03-17  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* sigproc.h (no_thread_exit_protect): New class.
