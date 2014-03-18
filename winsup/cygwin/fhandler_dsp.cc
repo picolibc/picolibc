@@ -1026,13 +1026,13 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *)
 void
 fhandler_dev_dsp::fixup_after_fork (HANDLE parent)
 {
-  base ()->fixup_after_fork (parent);
+  base ()->_fixup_after_fork (parent);
 }
 
 void
 fhandler_dev_dsp::fixup_after_exec ()
 {
-  base ()->fixup_after_exec ();
+  base ()->_fixup_after_exec ();
 }
 
 
