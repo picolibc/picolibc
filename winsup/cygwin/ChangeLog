@@ -1,3 +1,9 @@
+2014-03-18  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler_dsp.cc (fhandler_dev_dsp::fixup_after_fork): Actually call
+	_fixup_after_fork rather than looping forever.
+	(fhandler_dev_dsp::fixup_after_exec): Ditto.
+
 2014-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	Partially revert patch from 2014-03-04.
