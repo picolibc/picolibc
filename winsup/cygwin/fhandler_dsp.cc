@@ -1160,7 +1160,7 @@ fhandler_dev_dsp::_read (void *ptr, size_t& len)
   audio_in_->read ((char *)ptr, (int&)len);
 }
 
-void
+void __reg1
 fhandler_dev_dsp::close_audio_in ()
 {
   if (audio_in_)
@@ -1171,7 +1171,7 @@ fhandler_dev_dsp::close_audio_in ()
     }
 }
 
-void
+void __reg2
 fhandler_dev_dsp::close_audio_out (bool immediately)
 {
   if (audio_out_)
@@ -1187,7 +1187,7 @@ fhandler_dev_dsp::close ()
 {
   debug_printf ("audio_in=%p audio_out=%p", audio_in_, audio_out_);
   close_audio_in ();
-  close_audio_out (exit_state != ES_NOT_EXITING);
+  close_audio_out ();
   return fhandler_base::close ();
 }
 
