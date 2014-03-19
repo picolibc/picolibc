@@ -111,6 +111,7 @@ class exception
 #ifdef __x86_64__
   static bool handler_installed;
   static int handle (LPEXCEPTION_POINTERS);
+  static int handle_while_being_debugged (LPEXCEPTION_POINTERS);
 #else
   exception_list el;
   exception_list *save;
@@ -123,7 +124,8 @@ public:
     if (!handler_installed)
       {
 	handler_installed = true;
-	AddVectoredExceptionHandler (1, handle);
+	SetUnhandledExceptionFilter (handle);
+	AddVectoredExceptionHandler (1, handle_while_being_debugged);
       }
 #else
     save = _except_list;

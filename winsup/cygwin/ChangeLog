@@ -1,3 +1,9 @@
+2014-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (exception::handle_while_being_debugged): Declare.
+	(exception::exception): Install unhandled exception filter.
+	* exceptions.cc (exception::handle_while_being_debugged): New method.
+
 2014-03-18  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* fhandler_dsp.cc (fhandler_dev_dsp::fixup_after_fork): Actually call

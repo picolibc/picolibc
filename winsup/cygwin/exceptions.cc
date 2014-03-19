@@ -556,6 +556,14 @@ rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 bool exception::handler_installed NO_COPY;
 
 int
+exception::handle_while_being_debugged (LPEXCEPTION_POINTERS ep)
+{
+  if (being_debugged ())
+    return handle (ep);
+  return EXCEPTION_CONTINUE_SEARCH;
+}
+
+int
 exception::handle (LPEXCEPTION_POINTERS ep)
 #else
 #define CYG_EXC_CONTINUE_EXECUTION	ExceptionContinueExecution
