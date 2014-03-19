@@ -566,7 +566,12 @@ pg_ent::enumerate_ad ()
 	  else if ((td = cygheap->dom.trusted_domain (resume - 1)))
 	    {
 	      ++resume;
-	      if ((td->Flags & DS_DOMAIN_PRIMARY)
+	      /* Ignore primary domain in list of trusted domains only if all
+		 trusted domains are enumerated anyway.  This handles an
+		 annoying backward compatibility problem in mkpasswd/mkgroup.
+		 Without this test, `mkpasswd -d PRIMARY_DOMAIN' wouldn't
+		 work as expected. */
+	      if (((enums & ENUM_TDOMS_ALL) && td->Flags & DS_DOMAIN_PRIMARY)
 		  || !td->DomainSid
 		  || (!nss_db_enum_tdom (td->NetbiosDomainName)
 		      && !nss_db_enum_tdom (td->DnsDomainName))

@@ -6,6 +6,12 @@
 
 2014-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* passwd.cc (pg_ent::enumerate_ad): Ignore primary domain in list of
+	trusted domains only if all trusted domains are enumerated anyway.
+	Explain why.
+
+2014-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	Partially revert patch from 2014-03-04.
 	* exception.h (exception::handler_installed): Declare.
 	(exception::exception): Install vectored exception handler on x86_64.
