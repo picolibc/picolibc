@@ -1018,9 +1018,9 @@ fhandler_dev_dsp::read (void *ptr, size_t& len)
 }
 
 int
-fhandler_dev_dsp::ioctl (unsigned int cmd, void *)
+fhandler_dev_dsp::ioctl (unsigned int cmd, void *buf)
 {
-  return base ()->_ioctl (cmd, NULL);
+  return base ()->_ioctl (cmd, buf);
 }
 
 void
