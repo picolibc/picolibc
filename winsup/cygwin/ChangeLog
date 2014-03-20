@@ -1,10 +1,15 @@
 2014-03-19  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
+	* fhandler_dsp.cc (fhandler_dev_dsp::ioctl): Actually pass ioctl
+	argument to _ioctl.
+
+2014-03-19  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
 	* fhandler.h (fhandler_dev_dsp): Remove variable names from
 	declarations.
 	(fhandler_dev_dsp::close_audio_in): Make __reg1.
 	(fhandler_dev_dsp::close_audio_out): Make __reg2.
-	* fhandler_dev_dsp.cc (fhandler_dev_dsp::close_audio_in): Make __reg1.
+	* fhandler_dsp.cc (fhandler_dev_dsp::close_audio_in): Make __reg1.
 	(fhandler_dev_dsp::close_audio_out): Make __reg2.
 	(fhandler_dev_dsp::close): Don't abruptly terminate sound just because
 	we are exiting.
