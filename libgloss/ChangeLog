@@ -1,5 +1,10 @@
 2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
 
+	* nds32/crt0.S: Initialize ITB base.
+	* nds32/crt1.S: Ditto.
+
+2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
+
 	* nds32/Makefile.in: Alter filename.
 	* nds32/syscall_argv.S: Rename to _argv.S
 	* nds32/syscall_argvlen.S: Rename to _argvlen.S

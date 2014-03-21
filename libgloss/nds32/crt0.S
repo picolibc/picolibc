@@ -52,6 +52,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	.type	_start, @function
 	.align	2
 _start:
+.L_hw_config:
+#if __NDS32_EX9_EXT__
+	/*  Initialize the table base of EX9 instruction.  */
+	mfsr    $r0, $MSC_CFG		/* Check if support EIT.  */
+	srli    $r0, $r0, 24
+	andi    $r0, $r0, 0x1
+	beqz    $r0, .L_fp_gp_init
+	la      $r0, $_ITB_BASE_	/* Init ITB.  */
+	mtusr   $r0, $ITB
+#endif
+
 .L_fp_gp_init:
 	/* Initialization for $gp. The _SDA_BASE_ location
 	   stands for Small Data Access.  */
