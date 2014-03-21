@@ -1,3 +1,17 @@
+2014-03-21  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* libc/stdlib/gd_qnan.h (f_QNAN, d_QNAN0, d_QNAN1): Add MIPS
+	versions.
+	(ld_QNAN0, ld_QNAN1, ld_QNAN2, ld_QNAN3): Don't define for MIPS.
+	(ldus_QNAN0, ldus_QNAN1, ldus_QNAN2, ldus_QNAN3, ldus_QNAN4):
+	Likewise.
+	* libc/stdlib/ldtoa.c (nan113, nan64, nan53, nan24): Add MIPS
+	versions.
+	(enan): Handle legacy MIPS payloads.
+	* libm/common/s_nan.c (nan): Use __builtin_nan if supported by
+	the compiler.
+	* libm/common/sf_nan.c (nanf): Likewise.
+
 2014-03-21  Sabrina Ni  <sabrinanitw@gmail.com>
 
 	* libc/machine/nds32/configure: Regenerated.

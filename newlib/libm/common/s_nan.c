@@ -41,7 +41,11 @@ QUICKREF
 {
 	double x;
 
+#if __GNUC_PREREQ (3, 3)
+	x = __builtin_nan("");
+#else
 	INSERT_WORDS(x,0x7ff80000,0);
+#endif
 	return x;
 }
 
