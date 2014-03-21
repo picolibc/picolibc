@@ -27,8 +27,16 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#ifdef __NDS32_VH__
+
+#include "vh.h"
+.extern _impure_ptr
+TYPE0 _isatty, VH_ISATTY
+
+#else	/* not __NDS32_VH__ */
+
 #include "../syscall.h"
 #include "syscall_extra.h"
-
-
 SYS_WRAPPER _isatty, SYS_isatty
+
+#endif	/* not __NDS32_VH__ */
