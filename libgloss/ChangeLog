@@ -1,5 +1,33 @@
 2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
 
+	* nds32/Makefile.in: Alter filename.
+	* nds32/syscall_argv.S: Rename to _argv.S
+	* nds32/syscall_argvlen.S: Rename to _argvlen.S
+	* nds32/syscall_chdir.S: Rename to _chdir.S
+	* nds32/syscall_chmod.S: Rename to _chmod.S
+	* nds32/syscall_close.S: Rename to _close.S
+	* nds32/syscall_exit.S: Rename to _exit.S
+	* nds32/syscall_fstat.S: Rename to _fstat.S
+	* nds32/syscall_getpid.S: Rename to _getpid.S
+	* nds32/syscall_gettimeofday.S: Rename to _gettimeofday.S
+	* nds32/syscall_isatty.S: Rename to _isatty.S
+	* nds32/syscall_kill.S: Rename to _kill.S
+	* nds32/syscall_link.S: Rename to _link.S
+	* nds32/syscall_lseek.S: Rename to _lseek.S
+	* nds32/syscall_open.S: Rename to _open.S
+	* nds32/syscall_read.S: Rename to _read.S
+	* nds32/syscall_rename.S: Rename to _rename.S
+	* nds32/syscall_sbrk.S: Rename to _sbrk.S
+	* nds32/syscall_stat.S: Rename to _stat.S
+	* nds32/syscall_system.S: Rename to _system.S
+	* nds32/syscall_time.S: Rename to _time.S
+	* nds32/syscall_times.S: Rename to _times.S
+	* nds32/syscall_unlink.S: Rename to _unlink.S
+	* nds32/syscall_utime.S: Rename to _utime.S
+	* nds32/syscall_write.S: Rename to _write.S
+
+2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
+
 	* nds32/syscall_argv.S: Correct the method to set errno.
 	* nds32/syscall_argvlen.S: Ditto.
 	* nds32/syscall_chdir.S: Ditto.

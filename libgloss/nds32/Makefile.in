@@ -68,11 +68,11 @@ CRT1 = crt1.o
 
 
 
-SYSCALLS1 = syscall_exit.o syscall_open.o syscall_close.o syscall_read.o syscall_write.o
-SYSCALLS2 = syscall_lseek.o syscall_unlink.o syscall_getpid.o syscall_kill.o syscall_fstat.o
-SYSCALLS3 = syscall_argvlen.o syscall_argv.o syscall_chdir.o syscall_stat.o syscall_chmod.o
-SYSCALLS4 = syscall_utime.o syscall_time.o syscall_gettimeofday.o syscall_times.o syscall_link.o
-SYSCALLS5 = syscall_rename.o syscall_isatty.o syscall_system.o syscall_sbrk.o syscall_error_handler.o
+SYSCALLS1 = _exit.o _open.o _close.o _read.o _write.o
+SYSCALLS2 = _lseek.o _unlink.o _getpid.o _kill.o _fstat.o
+SYSCALLS3 = _argvlen.o _argv.o _chdir.o _stat.o _chmod.o
+SYSCALLS4 = _utime.o _time.o _gettimeofday.o _times.o _link.o
+SYSCALLS5 = _rename.o _isatty.o _system.o _sbrk.o syscall_error_handler.o
 SYSCALLS  = $(SYSCALLS1) $(SYSCALLS2) $(SYSCALLS3) $(SYSCALLS4) $(SYSCALLS5)
 GENERIC_LIBOBJS =
 
@@ -119,27 +119,28 @@ config.status: configure
 # to support SunOS VPATH
 crt0.o: crt0.S
 crt1.o: crt1.S
-syscall_exit.o: syscall_exit.S
-syscall_open.o: syscall_open.S
-syscall_close.o: syscall_close.S
-syscall_read.o: syscall_read.S
-syscall_write.o: syscall_write.S
-syscall_lseek.o: syscall_lseek.S
-syscall_unlink.o: syscall_unlink.S
-syscall_getpid.o: syscall_getpid.S
-syscall_kill.o: syscall_kill.S
-syscall_fstat.o: syscall_fstat.S
-syscall_argvlen.o: syscall_argvlen.S
-syscall_argv.o: syscall_argv.S
-syscall_chdir.o: syscall_chdir.S
-syscall_stat.o: syscall_stat.S
-syscall_chmod.o: syscall_chmod.S
-syscall_utime.o: syscall_utime.S
-syscall_time.o: syscall_time.S
-syscall_gettimeofday.o: syscall_gettimeofday.S
-syscall_times.o: syscall_times.S
-syscall_link.o: syscall_link.S
-syscall_rename.o: syscall_rename.S
-syscall_isatty.o: syscall_isatty.S
-syscall_system.o: syscall_system.S
-syscall_sbrk.o: syscall_sbrk.S
+_exit.o: _exit.S
+_open.o: _open.S
+_close.o: _close.S
+_read.o: _read.S
+_write.o: _write.S
+_lseek.o: _lseek.S
+_unlink.o: _unlink.S
+_getpid.o: _getpid.S
+_kill.o: _kill.S
+_fstat.o: _fstat.S
+_argvlen.o: _argvlen.S
+_argv.o: _argv.S
+_chdir.o: _chdir.S
+_stat.o: _stat.S
+_chmod.o: _chmod.S
+_utime.o: _utime.S
+_time.o: _time.S
+_gettimeofday.o: _gettimeofday.S
+_times.o: _times.S
+_link.o: _link.S
+_rename.o: _rename.S
+_isatty.o: _isatty.S
+_system.o: _system.S
+_sbrk.o: _sbrk.S
+syscall_error_handler.o: syscall_error_handler.S
