@@ -100,8 +100,7 @@ _start:
 	movi	$r1, 0
 	movi	$r2, 0
 	/* Call 'main'.  */
-	la	$r15, main
-	jral	$r15
+	bal	main
 
 .L_terminate_program:
 	/* There are two ways to terminate program:
@@ -112,8 +111,8 @@ _start:
 	    Currently, we use option 2 as a solution to follow C99 5.1.2.2.3,
 	    but aware that general exit() will do some cleanup procedures
 	    which may result in large-memory-footprints.  */
-	la	$r15, exit
-	jral	$r15
+	
+	bal	exit
 
 .L_forever_loop:
 	/* Should never return here.  */

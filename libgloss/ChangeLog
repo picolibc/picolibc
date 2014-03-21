@@ -1,5 +1,11 @@
 2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
 
+	* nds32/crt0.S: Use pseudo-instruction "bal frame" to replace 
+	"la + jral".
+	* nds32/crt1.S: Ditto.
+
+2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
+
 	* nds32/crt0.S: Eliminate initialization for $fp.
 	* nds32/crt1.S: Ditto.
 
