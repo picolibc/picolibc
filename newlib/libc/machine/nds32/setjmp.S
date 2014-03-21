@@ -78,10 +78,9 @@ longjmp:
 	lmw.bim   $r6, [$r0], $r14, 0x0
 	lmw.bim  $r16, [$r0], $r19, 0xf
 #endif
-	/* If the value val is 0, 1 will be returned instead.  */
-	bnez	$r1, 1f
-	movi	$r1, 1
-1:
-	move	$r0, $r1
+	/* Set val as return value.  If the value val is 0, 1 will be returned
+	   instead.  */
+	movi	$r0, 1
+	cmovn	$r0, $r1, $r1	/* r0=(r1!=0)? r1: r0  */
 	ret
 	.size	longjmp, .-longjmp
