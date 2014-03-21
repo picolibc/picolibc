@@ -11,6 +11,7 @@ AC_CONFIG_AUX_DIR(../../../..)
 NEWLIB_CONFIGURE(../../..)
 
 dnl Use builtin macro to detect if this is for "AndeStar ISA V3m".
+AC_NO_EXECUTABLES
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
 [[#ifdef __NDS32_ISA_V3M__
 warning: This is nds32_isa_v3m.

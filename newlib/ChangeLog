@@ -1,5 +1,10 @@
 2014-03-21  Sabrina Ni  <sabrinanitw@gmail.com>
 
+	* libc/machine/nds32/configure: Regenerated.
+	* libc/machine/nds32/configure.in: Add AC_NOEXECUTABLES.
+
+2014-03-21  Sabrina Ni  <sabrinanitw@gmail.com>
+
 	* libc/machine/nds32/Makefile.am: Use C code implemented memcpy,
 	memset for 'ISA V3M'.
 	* libc/machine/nds32/Makefile.in: Generated.
