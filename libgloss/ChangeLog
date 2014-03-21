@@ -1,5 +1,10 @@
 2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
 
+	* nds32/crt0.S: Refine.
+	* nds32/crt1.S: Refine.
+
+2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
+
 	* nds32/crt0.S: Set argc=argv=env=0.
 	* nds32/crt1.S: Ditto.
 

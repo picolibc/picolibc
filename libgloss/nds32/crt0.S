@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ##
 ##==============================================================================
 
-
 ##------------------------------------------------------------------------------
 ## Vector table setup
 ##------------------------------------------------------------------------------
@@ -53,53 +52,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	.type	_start, @function
 	.align	2
 _start:
-.L_fp_gp_lp_init:
-	/* Initialization for $fp, $gp, and $lp. The _SDA_BASE_ location
+.L_fp_gp_init:
+	/* Initialization for $fp and $gp. The _SDA_BASE_ location
 	   stands for Small Data Access.  */
 	la	$fp, _FP_BASE_
 	la	$gp, _SDA_BASE_
-	movi	$lp, #0
 
 .L_stack_init:
 	/* Initialization for $sp and make sure it is 8-byte aligned.  */
 	la	$sp, _stack
+#if __NDS32_ISA_V3__
+	bitci	$sp, $sp, #7
+#else
 	movi	$r0, #-8		/* Set $r0 as 0xFFFFFFF8.  */
 	and	$sp, $sp, $r0
+#endif
 
 .L_bss_clear:
-        /* Clear bss section.  */
-        la      $r3, _end
-        la      $r0, _edata
-	beq	$r0, $r3, .L_call_main	/* Branch if no bss.  */
-        sub     $r1, $r3, $r0           /* Size to be clear.  */
-
-        /* Set $r2 as how many words to be clear.
-           Set $r1 as how many bytes are less than a woard to be clear.  */
-        srli    $r2, $r1, #2
-        andi    $r1, $r1, #3
-        beqz    $r3, .Lbyte_clear
-
-        la      $r4, #0x00000000
+	/* Clear bss section.
+	   Equivalence C code for follow part:
+	   if (_end == _edata) goto .L_call_main
+	   unsinged int *ptr = _edata;
+	   while (ptr != _end)
+	     *ptr++ = 0
+	   $r0 = ptr/_edata
+	   $r1 = _end
+	   $r2 = 0
+	 */
+	la	$r0, _edata
+	la	$r1, _end
+	movi	$r2, #0
+	beq	$r0, $r1, .L_call_main	/* Branch if no bss.  */
 .Lword_clear:
-        swi.bi  $r4, [$r0], #4
-        addi    $r2, $r2, #-1
-        bnez    $r2, .Lword_clear       /* Loop again ?  */
-        beqz    $r1, .Lend_bss
-
-.Lbyte_clear:
-        sbi.bi  $r4, [$r0], #1
-        addi    $r1, $r1, #-1
-        bnez    $r1, .Lbyte_clear
-.Lend_bss:
-
+	swi.bi	$r2, [$r0], #4
+	bne	$r0, $r1, .Lword_clear
 
 .L_call_main:
 	/* Prepare argc/argv/env for main function.
 	   Since there is no operating system so far,
-	   we set $r0, $r1, and $r2 to be zero.  */
+	   we set $r0, $r1, and $r2 to be zero.
+	   Note: $r2 already set to zero in line 84.  */
 	movi	$r0, 0
 	movi	$r1, 0
-	movi	$r2, 0
 	/* Call 'main'.  */
 	la	$r15, main
 	jral	$r15
@@ -118,6 +112,6 @@ _start:
 
 .L_forever_loop:
 	/* Should never return here.  */
-        b       .L_forever_loop
+	b	.L_forever_loop
 
 	.size	_start, .-_start
