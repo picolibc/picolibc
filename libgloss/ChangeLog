@@ -1,5 +1,10 @@
 2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
 
+	* nds32/crt0.S: Set argc=argv=env=0.
+	* nds32/crt1.S: Ditto.
+
+2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
+
 	* nds32/Makefile.in: Add syscall_error_handler.o.
 	* nds32/syscall_error_handler.S: New.
 	* nds32/syscall_extra.h: Reduce code size.

@@ -94,6 +94,13 @@ _start:
 
 
 .L_call_main:
+	/* Prepare argc/argv/env for main function.
+	   Since there is no operating system so far,
+	   we set $r0, $r1, and $r2 to be zero.  */
+	movi	$r0, 0
+	movi	$r1, 0
+	movi	$r2, 0
+	/* Call 'main'.  */
 	la	$r15, main
 	jral	$r15
 
