@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../syscall.h"
 #include "syscall_extra.h"
 
+	.extern	_impure_ptr	/* The first element is _errno.  */
 	.extern	_end
 	.global	_sbrk
 
@@ -66,7 +67,8 @@ _sbrk:
 
 .Lerror:
 	movi	$r0, 12
-	s.w	$r0, errno	/* Set error code: 12 (ENOMEM) to errno.  */
+	l.w     $r15, _impure_ptr
+	swi     $r0, [$r15]     /* Set errno.  */
 	movi	$r0, -1		/* Reture value is -1.  */
 	ret
 

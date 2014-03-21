@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "syscall_extra.h"
 
 
-	.extern	errno
+	.extern	_impure_ptr	/* The first element is _errno.  */
 	.text
 	.global	__syscall_error_handler
 	.type	__syscall_error_handler, @function
@@ -41,7 +41,8 @@ __syscall_error_handler:
 	addi	$r1, $r0, 1
 	bnez	$r1, 1f		/* Branch if success.  */
 	syscall	SYS_geterr	/* There is something wrong.  */
-	s.w	$r0, errno	/* Store error code into errno.  */
+	l.w     $r15, _impure_ptr
+	swi     $r0, [$r15]     /* Set errno.  */
 	move	$r0, -1
 1:
 	ret

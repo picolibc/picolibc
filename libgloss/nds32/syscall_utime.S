@@ -31,5 +31,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "syscall_extra.h"
 
 
-	.extern	errno
 SYS_WRAPPER _utime, SYS_utime

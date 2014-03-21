@@ -1,5 +1,32 @@
 2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
 
+	* nds32/syscall_argv.S: Correct the method to set errno.
+	* nds32/syscall_argvlen.S: Ditto.
+	* nds32/syscall_chdir.S: Ditto.
+	* nds32/syscall_chmod.S: Ditto.
+	* nds32/syscall_close.S: Ditto.
+	* nds32/syscall_error_handler.S: Ditto.
+	* nds32/syscall_fstat.S: Ditto.
+	* nds32/syscall_getpid.S: Ditto.
+	* nds32/syscall_gettimeofday.S: Ditto.
+	* nds32/syscall_isatty.S: Ditto.
+	* nds32/syscall_kill.S: Ditto.
+	* nds32/syscall_link.S: Ditto.
+	* nds32/syscall_lseek.S: Ditto.
+	* nds32/syscall_open.S: Ditto.
+	* nds32/syscall_read.S: Ditto.
+	* nds32/syscall_rename.S: Ditto.
+	* nds32/syscall_sbrk.S: Ditto.
+	* nds32/syscall_stat.S: Ditto.
+	* nds32/syscall_system.S: Ditto.
+	* nds32/syscall_time.S: Ditto.
+	* nds32/syscall_times.S: Ditto.
+	* nds32/syscall_unlink.S: Ditto.
+	* nds32/syscall_utime.S: Ditto.
+	* nds32/syscall_write.S: Ditto.
+
+2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
+
 	* nds32/crt0.S: Use pseudo-instruction "bal frame" to replace 
 	"la + jral".
 	* nds32/crt1.S: Ditto.
