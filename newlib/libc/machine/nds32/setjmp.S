@@ -40,7 +40,9 @@ The usage of thirty-two 32-bit General Purpose Registers (GPR):
   reserved for assembler : $r15
   reserved for other use : $r24, $r25, $r26, $r27
 
-Save all callee-save registers and $fp, $gp, $lp and $sp.
+Save all callee-save registers and $fp, $gp, $lp and $sp is enough in theory.
+For debugging issue, the layout of jum_buf in here should be in sync with GDB.
+The $r16 ~ $r19 are used to store D0/D1, keep them for backward-compatible.
 */
 
 /* int setjmp(jmp_buf env);  */
@@ -50,13 +52,12 @@ Save all callee-save registers and $fp, $gp, $lp and $sp.
 	.type	setjmp, @function
 setjmp:
 #ifdef __NDS32_REDUCED_REGS__
-	/* This case, save 10 words.  */
-	smw.bim   $r6, [$r0], $r10, 0x0
-	smw.bim  $r31, [$r0], $r31, 0xf
+	smw.bim	$r6, [$r0], $r10, #0b0000
+	addi	$r0, $r0, #32	/* Leave room to keep jum_buf all the same.  */
+	smw.bim	$r31, [$r0], $r31, #0b1111
 #else
-	/* This case, save 17 words.  */
-	smw.bim   $r6, [$r0], $r14, 0x0
-	smw.bim  $r16, [$r0], $r19, 0xf
+	smw.bim	$r6, [$r0], $r14, #0b0000
+	smw.bim	$r16, [$r0], $r19, #0b1111
 #endif
 
 	/* Set return value to zero.  */
@@ -72,11 +73,12 @@ setjmp:
 	.type	longjmp, @function
 longjmp:
 #ifdef __NDS32_REDUCED_REGS__
-	lmw.bim   $r6, [$r0], $r10, 0x0
-	lmw.bim  $r31, [$r0], $r31, 0xf
+	lmw.bim	$r6, [$r0], $r10, #0b0000
+	addi    $r0, $r0, #32
+	lmw.bim	$r31, [$r0], $r31, #0b1111
 #else
-	lmw.bim   $r6, [$r0], $r14, 0x0
-	lmw.bim  $r16, [$r0], $r19, 0xf
+	lmw.bim	$r6, [$r0], $r14, #0b0000
+	lmw.bim	$r16, [$r0], $r19, #0b1111
 #endif
 	/* Set val as return value.  If the value val is 0, 1 will be returned
 	   instead.  */

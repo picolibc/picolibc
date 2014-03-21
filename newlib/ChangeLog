@@ -1,5 +1,9 @@
 2014-03-21  Sabrina Ni  <sabrinanitw@gmail.com>
 
+	* libc/machine/nds32/setjmp.S: Keep jmp_buff sync with GDB.
+
+2014-03-21  Sabrina Ni  <sabrinanitw@gmail.com>
+
 	* libc/machine/nds32/setjmp.S: Optimize.
 
 2014-03-07  Corinna Vinschen  <vinschen@redhat.com>
