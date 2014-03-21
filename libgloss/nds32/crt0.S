@@ -53,9 +53,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	.align	2
 _start:
 .L_fp_gp_init:
-	/* Initialization for $fp and $gp. The _SDA_BASE_ location
+	/* Initialization for $gp. The _SDA_BASE_ location
 	   stands for Small Data Access.  */
-	la	$fp, _FP_BASE_
 	la	$gp, _SDA_BASE_
 
 .L_stack_init:
