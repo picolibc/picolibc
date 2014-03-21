@@ -1,5 +1,11 @@
 2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
 
+	* nds32/Makefile.in: Add syscall_error_handler.o.
+	* nds32/syscall_error_handler.S: New.
+	* nds32/syscall_extra.h: Reduce code size.
+
+2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
+
 	* nds32/syscall_extra.h: Define macro.
 	* nds32/syscall_argv.S: Use define macro.
 	* nds32/syscall_argvlen.S: Ditto.

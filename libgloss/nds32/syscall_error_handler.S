@@ -27,32 +27,22 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef _SYSCALL_EXTRA_H
-#define _SYSCALL_EXTRA_H
+#include "../syscall.h"
+#include "syscall_extra.h"
 
 
-/* These are additional syscalls for nds32 target. */
-#define SYS_rename       3001
-#define SYS_isatty       3002
-#define SYS_system       3003
-
-#define SYS_geterr       6001
-
-
-/* Define macros that generate assembly output.  */
-.macro SYS_WRAPPER name num
+	.extern	errno
 	.text
-	.global	\name
-	.type	\name, @function
+	.global	__syscall_error_handler
+	.type	__syscall_error_handler, @function
+	.hidden	__syscall_error_handler
 	.align	2
-\name:
-	/* Make syscall with arg=`\num'.
-	   Reture value `-1' stored in $r0 means there is something wrong.
-	   If there is something wrong, make syscall to get `SYS_geterr' to get
-	   error code to see what exactly happens and store it in errno  .  */
-	syscall	\num		/* Make syscall with arg=`\num'.  */
-	j	__syscall_error_handler
-	.size   \name, .-\name
-.endm
-
-#endif /* _SYSCALL_EXTRA_H */
+__syscall_error_handler:
+	addi	$r1, $r0, 1
+	bnez	$r1, 1f		/* Branch if success.  */
+	syscall	SYS_geterr	/* There is something wrong.  */
+	s.w	$r0, errno	/* Store error code into errno.  */
+	move	$r0, -1
+1:
+	ret
+	.size	__syscall_error_handler, .-__syscall_error_handler
