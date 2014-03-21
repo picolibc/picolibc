@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	.extern	_impure_ptr	/* The first element is _errno.  */
 	.extern	_end
 	.global	_sbrk
+	.type	_sbrk, @function
 
 	.text
 	.align	2
@@ -72,6 +73,7 @@ _sbrk:
 	movi	$r0, -1		/* Reture value is -1.  */
 	ret
 
+	.size	_sbrk, .-_sbrk
 	.section	.bss
 	.align	2
 heap_end:

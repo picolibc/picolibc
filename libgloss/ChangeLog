@@ -1,5 +1,9 @@
 2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
 
+	* nds32/_sbrk.S: Add .size and .type directive.
+
+2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
+
 	* nds32/crt0.S: Tweak initialization sqeuence.
 	* nds32/crt1.S: Ditto.
 
