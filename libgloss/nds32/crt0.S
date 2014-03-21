@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013 Andes Technology Corporation.
+Copyright (c) 2013-2014 Andes Technology Corporation.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -47,29 +47,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ##------------------------------------------------------------------------------
 	.section	.text
 	.weak	_SDA_BASE_
-	.weak	_FP_BASE_
 	.global	_start
 	.type	_start, @function
 	.align	2
 _start:
-.L_hw_config:
-#if __NDS32_EX9_EXT__
-	/*  Initialize the table base of EX9 instruction.  */
-	mfsr    $r0, $MSC_CFG		/* Check if support EIT.  */
-	srli    $r0, $r0, 24
-	andi    $r0, $r0, 0x1
-	beqz    $r0, .L_fp_gp_init
-	la      $r0, $_ITB_BASE_	/* Init ITB.  */
-	mtusr   $r0, $ITB
-#endif
+	/* The initialization sequence really does matter !!!
+	   The global pointer must be
+	   initialized precedence over all others.  */
 
-.L_fp_gp_init:
-	/* Initialization for $gp. The _SDA_BASE_ location
-	   stands for Small Data Access.  */
+.L_init_gp:
+	/* Initialization for global pointer.  The symbol _SDA_BASE_ is
+	   determined by Linker.  SDA stands for Small Data Access.  */
 	la	$gp, _SDA_BASE_
 
-.L_stack_init:
-	/* Initialization for $sp and make sure it is 8-byte aligned.  */
+.L_init_sp:
+	/* Initialization for stack pointe.  The symbol _stack is defined
+	   in linker script.  Make sure $sp is 8-byte aligned.  */
 	la	$sp, _stack
 #if __NDS32_ISA_V3__
 	bitci	$sp, $sp, #7
@@ -78,8 +71,21 @@ _start:
 	and	$sp, $sp, $r0
 #endif
 
-.L_bss_clear:
-	/* Clear bss section.
+#if __NDS32_EX9_EXT__
+.L_init_itb:
+	/* Initialization for Instruction Table Base (ITB).
+	   The symbol $_ITB_BASE_ is determined by Linker.
+	   Set $ITB only if MSC_CFG.EIT (cr4.b'24) is set.  */
+	mfsr    $r0, $MSC_CFG
+	srli    $r0, $r0, 24
+	andi    $r0, $r0, 0x1
+	beqz    $r0, .L_zero_out_bss	/* Fall through ?  */
+	la      $r0, $_ITB_BASE_
+	mtusr   $r0, $ITB
+#endif
+
+.L_zero_out_bss:
+	/* Zero out the bss section.
 	   Equivalence C code for follow part:
 	   if (_end == _edata) goto .L_call_main
 	   unsinged int *ptr = _edata;

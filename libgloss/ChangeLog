@@ -1,5 +1,10 @@
 2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
 
+	* nds32/crt0.S: Tweak initialization sqeuence.
+	* nds32/crt1.S: Ditto.
+
+2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
+
 	* nds32/_argv.S: Replace syscall with break.
 	* nds32/_argvlen.S: Ditto.
 	* nds32/_chdir.S: Ditto.
