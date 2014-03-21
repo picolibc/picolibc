@@ -38,4 +38,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define SYS_geterr       6001
 
+
+/* Define macros that generate assembly output.  */
+.macro SYS_WRAPPER name num
+	.text
+	.global	\name
+	.type	\name, @function
+	.align	2
+\name:
+	/* Make syscall with arg=`\num'.
+	   Reture value `-1' stored in $r0 means there is something wrong.
+	   If there is something wrong, make syscall to get `SYS_geterr' to get
+	   error code to see what exactly happens and store it in errno  .  */
+	syscall	\num		/* Make syscall with arg=`\num'.  */
+	addi	$r1, $r0, 1
+	bnez	$r1, 1f		/* Branch if success.  */
+	syscall	SYS_geterr	/* There is something wrong.  */
+	s.w	$r0, errno	/* Store error code into errno.  */
+	move	$r0, -1
+1:
+	ret
+	.size	\name, .-\name
+.endm
+
 #endif /* _SYSCALL_EXTRA_H */

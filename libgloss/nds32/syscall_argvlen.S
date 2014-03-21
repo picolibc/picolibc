@@ -32,22 +32,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 	.extern	errno
-
-	.section .text
-	.global	_argvlen
-	.type	_argvlen, @function
-	.align 2
-_argvlen:
-	/* Make syscall 'SYS_argvlen'.
-	   Reture value '-1' stored in $r0 means there is something wrong.
-	   If there is something wrong, make syscall 'SYS_geterr' to get
-	   error code to see what exactly happens and store it in errno  .  */
-	syscall	SYS_argvlen
-	addi	$r1, $r0, 1
-	bnez	$r1, .Ldone
-	syscall	SYS_geterr
-	s.w	$r0, errno
-	movi	$r0, -1	
-.Ldone:
-	ret
-	.size	_argvlen, .-_argvlen
+SYS_WRAPPER _argvlen, SYS_argvlen

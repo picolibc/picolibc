@@ -1,3 +1,29 @@
+2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
+
+	* nds32/syscall_extra.h: Define macro.
+	* nds32/syscall_argv.S: Use define macro.
+	* nds32/syscall_argvlen.S: Ditto.
+	* nds32/syscall_chdir.S: Ditto.
+	* nds32/syscall_chmod.S: Ditto.
+	* nds32/syscall_close.S: Ditto.
+	* nds32/syscall_fstat.S: Ditto.
+	* nds32/syscall_getpid.S: Ditto.
+	* nds32/syscall_gettimeofday.S: Ditto.
+	* nds32/syscall_isatty.S: Ditto.
+	* nds32/syscall_kill.S: Ditto.
+	* nds32/syscall_link.S: Ditto.
+	* nds32/syscall_lseek.S: Ditto.
+	* nds32/syscall_open.S: Ditto.
+	* nds32/syscall_read.S: Ditto.
+	* nds32/syscall_rename.S: Ditto.
+	* nds32/syscall_stat.S: Ditto.
+	* nds32/syscall_system.S: Ditto.
+	* nds32/syscall_time.S: Ditto.
+	* nds32/syscall_times.S: Ditto.
+	* nds32/syscall_unlink.S: Ditto.
+	* nds32/syscall_utime.S: Ditto.
+	* nds32/syscall_write.S: Ditto.
+
 2014-02-27  Joey Ye  <joey.ye@arm.com>
 
 	* libnosys/sbrk.c (_sbrk): Remove TWS

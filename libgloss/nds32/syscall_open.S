@@ -32,22 +32,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 	.extern	errno
-
-	.section .text
-	.global	_open
-	.type	_open, @function
-	.align 2
-_open:
-	/* Make syscall 'SYS_open'.
-	   Reture value '-1' stored in $r0 means there is something wrong.
-	   If there is something wrong, make syscall 'SYS_geterr' to get
-	   error code to see what exactly happens and store it in errno  .  */
-	syscall	SYS_open
-	addi	$r1, $r0, 1
-	bnez	$r1, .Ldone
-	syscall	SYS_geterr
-	s.w	$r0, errno
-	movi	$r0, -1	
-.Ldone:
-	ret
-	.size	_open, .-_open
+SYS_WRAPPER _open, SYS_open

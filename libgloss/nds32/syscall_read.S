@@ -32,25 +32,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 	.extern	errno
-
-	.section .text
-	.global	_read
-	.type	_read, @function
-	.align 2
-_read:
-	/* Make syscall 'SYS_read'.
-	   Reture value '-1' stored in $r0 means there is something wrong.
-	   If there is something wrong, make syscall 'SYS_geterr' to get
-	   error code to see what exactly happens and store it in errno  .  */
-	syscall	SYS_read
-	addi	$r1, $r0, 1
-	bnez	$r1, .Ldone
-	syscall	SYS_geterr
-	/* Return value '11' stored in $r0 means we need to try again.  */
-	addi	$r1, $r0, -11
-	beqz	$r1, _read
-	s.w	$r0, errno
-	movi	$r0, -1	
-.Ldone:
-	ret
-	.size	_read, .-_read
+SYS_WRAPPER _read, SYS_read
