@@ -1,3 +1,14 @@
+2014-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (_sigbe/x86_64): Fix typo in .seh_proc pseudo-op.
+	(setjmp/x86_64): Drop storing ExceptionList pointer in jmp_buf->Frame.
+	Drop comment.  Store likely frame in rdx.  Jump to __setjmpex.
+	(__setjmpex): New function providing setjmp functionality.  Fetch
+	jmp_buf->Frame from rdx, like MSVCRT setjmpex.
+	(__sjfault/x86_64): Store rdx content in jmp_buf->Frame.
+	(__ljfault/x86_64): Don't restore ExceptionList pointer.
+	(longjmp/x86_64): Ditto.
+
 2014-03-19  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* fhandler_dsp.cc (fhandler_dev_dsp::ioctl): Actually pass ioctl
