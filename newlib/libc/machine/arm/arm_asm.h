@@ -29,35 +29,35 @@
 #ifndef ARM_ASM__H
 #define ARM_ASM__H
 
-/* First define some macros that keep everything else sane.  */
-#if defined (__ARM_ARCH_7A__) || defined (__ARM_ARCH_7R__)
-#define _ISA_ARM_7
+#include "acle-compat.h"
+
+#if __ARM_ARCH >= 7 && defined (__ARM_ARCH_ISA_ARM)
+# define _ISA_ARM_7
 #endif
 
-#if defined (_ISA_ARM_7) || defined (__ARM_ARCH_6__) || \
-    defined (__ARM_ARCH_6J__) || defined (__ARM_ARCH_6T2__) || \
-    defined (__ARM_ARCH_6K__) || defined (__ARM_ARCH_6ZK__) || \
-    defined (__ARM_ARCH_6Z__)
-#define _ISA_ARM_6
+#if __ARM_ARCH >= 6 && defined (__ARM_ARCH_ISA_ARM)
+# define _ISA_ARM_6
 #endif
 
-#if defined (_ISA_ARM_6) || defined (__ARM_ARCH_5__) || \
-    defined (__ARM_ARCH_5T__) || defined (__ARM_ARCH_5TE__) || \
-    defined (__ARM_ARCH_5TEJ__)
-#define _ISA_ARM_5
+#if __ARM_ARCH >= 5
+# define _ISA_ARM_5
 #endif
 
-#if defined (_ISA_ARM_5) || defined (__ARM_ARCH_4T__)
-#define _ISA_ARM_4T
+#if __ARM_ARCH >= 4 && __ARM_ARCH_ISA_THUMB >= 1
+# define _ISA_ARM_4T
 #endif
 
-#if defined (__ARM_ARCH_7M__) || defined (__ARM_ARCH_7__) || \
-    defined (__ARM_ARCH_7EM__)
-#define _ISA_THUMB_2
+#if __ARM_ARCH >= 4 && __ARM_ARCH_ISA_THUMB == 0
+# define _ISA_ARM_4
 #endif
 
-#if defined (_ISA_THUMB_2) || defined (__ARM_ARCH_6M__)
-#define _ISA_THUMB_1
+
+#if __ARM_ARCH_ISA_THUMB >= 2
+# define _ISA_THUMB_2
+#endif
+
+#if __ARM_ARCH_ISA_THUMB >= 1
+# define _ISA_THUMB_1
 #endif
 
 

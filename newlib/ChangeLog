@@ -1,3 +1,8 @@
+2014-03-27  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/machine/arm/acle-compat.h: New file.
+	* libc/machine/arm/arm_asm.h: Use it.
+
 2014-03-21  Maciej W. Rozycki  <macro@codesourcery.com>
 
 	* libc/stdlib/gd_qnan.h (f_QNAN, d_QNAN0, d_QNAN1): Add MIPS
