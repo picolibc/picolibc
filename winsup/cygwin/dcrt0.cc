@@ -795,6 +795,10 @@ dll_crt0_0 ()
 
   _main_tls = &_my_tls;
 
+#ifdef __x86_64__
+  exception::install_myfault_handler ();
+#endif
+
   /* Initialize signal processing here, early, in the hopes that the creation
      of a thread early in the process will cause more predictability in memory
      layout for the main thread. */
