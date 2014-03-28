@@ -40,7 +40,7 @@ unsigned long
 setlsapwd (const char *passwd, const char *username)
 {
   unsigned long ret = (unsigned long) -1;
-  HANDLE lsa = INVALID_HANDLE_VALUE;
+  HANDLE lsa;
   WCHAR sid[128];
   WCHAR key_name[128 + wcslen (CYGWIN_LSA_KEY_PREFIX)];
   PWCHAR data_buf = NULL;

@@ -1,5 +1,13 @@
 2014-03-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_auth.cc (create_token): Initialize lsa handle to NULL, rather than
+	to INVALID_HANDLE_VALUE.
+	(lsaauth): Ditto.
+	(lsaprivkeyauth): Ditto.
+	* setlsapwd.cc (setlsapwd): Don't initialize lsa handle.
+
+2014-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (_cygtls::signal_debugger): Move memcpy to copy context
 	from incoming siginfo_t to thread_context, too.
 

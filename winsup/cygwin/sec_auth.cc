@@ -768,7 +768,7 @@ HANDLE
 create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
 {
   NTSTATUS status;
-  LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
+  LSA_HANDLE lsa = NULL;
 
   cygsidlist tmp_gsids (cygsidlist_auto, 12);
 
@@ -932,7 +932,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   cygsidlist tmp_gsids (cygsidlist_auto, 12);
   cygpsid pgrpsid;
   LSA_STRING name;
-  HANDLE lsa_hdl = NULL, lsa = INVALID_HANDLE_VALUE;
+  HANDLE lsa_hdl = NULL, lsa = NULL;
   LSA_OPERATIONAL_MODE sec_mode;
   NTSTATUS status, sub_status;
   ULONG package_id, size;
@@ -1173,7 +1173,7 @@ HANDLE
 lsaprivkeyauth (struct passwd *pw)
 {
   NTSTATUS status;
-  HANDLE lsa = INVALID_HANDLE_VALUE;
+  HANDLE lsa = NULL;
   HANDLE token = NULL;
   WCHAR sid[256];
   WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
