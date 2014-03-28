@@ -1,3 +1,8 @@
+2014-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (_cygtls::signal_debugger): Move memcpy to copy context
+	from incoming siginfo_t to thread_context, too.
+
 2014-03-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gendef (_sigbe/x86_64): Fix typo in .seh_proc pseudo-op.
