@@ -1,5 +1,28 @@
 2014-03-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (dll_crt0_0): Install myfault exception handler on x86_64.
+	* exception.h (exception_list): Typedef as void on x86_64.
+	(exception::handler_installed): Remove.
+	(exception::handle_while_being_debugged): Remove.
+	(exception::myfault_handle): Declare for x86_64.
+	(exception::handle): Declare as ordinary exception handler on x86_64
+	as well.
+	(exception::exception): Drop previous code (again).  Install
+	exception::handle as SEH handler.
+	(exception::install_myfault_handler): New x86_64-only method to
+	install exception::myfault_handle as VEH handler.  Explain why.
+	(exception::~exception): For x86_64, define frame end label (again).
+	* exceptions.cc (CYG_EXC_CONTINUE_EXECUTION): Drop definition.
+	(CYG_EXC_CONTINUE_SEARCH): Ditto.
+	(exception::myfault_handle): New x86_64-only method, VEH handler to
+	handle myfault exceptions.
+	(exception::handle): Define as ordinary exception handler on x86_64
+	as well.  Use ExceptionContinueExecution and ExceptionContinueSearch
+	throughout instead of deleted Cygwin macros.  Don't handle myfault
+	exceptions on x86_64.
+
+2014-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (create_token): Initialize lsa handle to NULL, rather than
 	to INVALID_HANDLE_VALUE.
 	(lsaauth): Ditto.

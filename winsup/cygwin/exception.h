@@ -104,29 +104,33 @@ typedef struct _exception_list
 } exception_list;
 
 extern exception_list *_except_list asm ("%fs:0");
+#else
+typedef void exception_list;
 #endif /* !__x86_64 */
 
 class exception
 {
 #ifdef __x86_64__
-  static bool handler_installed;
-  static int handle (LPEXCEPTION_POINTERS);
-  static int handle_while_being_debugged (LPEXCEPTION_POINTERS);
+  static LONG myfault_handle (LPEXCEPTION_POINTERS ep);
 #else
   exception_list el;
   exception_list *save;
-  static int handle (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void *);
 #endif /* __x86_64__ */
+  static int handle (EXCEPTION_RECORD *, exception_list *, CONTEXT *, void *);
 public:
   exception () __attribute__ ((always_inline))
   {
+    /* Install SEH handler. */
 #ifdef __x86_64__
-    if (!handler_installed)
-      {
-	handler_installed = true;
-	SetUnhandledExceptionFilter (handle);
-	AddVectoredExceptionHandler (1, handle_while_being_debugged);
-      }
+    asm volatile ("\n\
+    1:									\n\
+      .seh_handler							  \
+	_ZN9exception6handleEP17_EXCEPTION_RECORDPvP8_CONTEXTS2_,	  \
+	@except								\n\
+      .seh_handlerdata							\n\
+      .long 1								\n\
+      .rva 1b, 2f, 2f, 2f						\n\
+      .seh_code								\n");
 #else
     save = _except_list;
     el.handler = handle;
@@ -134,7 +138,44 @@ public:
     _except_list = &el;
 #endif /* __x86_64__ */
   };
-#ifndef __x86_64__
+#ifdef __x86_64__
+  static void install_myfault_handler () __attribute__ ((always_inline))
+  {
+    /* Install myfault exception handler as VEH.  Here's what happens:
+       Some Windows DLLs (advapi32, for instance) are using SEH to catch
+       exceptions inside its own functions.  If we install a VEH handler
+       to catch all exceptions, our Cygwin VEH handler would illegitimatly
+       handle exceptions inside of Windows DLLs which are usually handled
+       by its own SEH handler.  So, for standard exceptions we use an SEH
+       handler as installed in the constructor above so as not to override
+       the SEH handlers in Windows DLLs.
+       But we have a special case, myfault handling.  The myfault handling
+       catches exceptions inside of the Cygwin DLL, some of them entirely
+       expected as in verifyable_object_isvalid.  The ultimately right thing
+       to do would be to install SEH handlers for each of these cases.
+       But there are two problems with that:
+
+       1. It would be a massive and, partially unreliable change in the
+          calling functions due to the incomplete SEH support in GCC.
+
+       2. It doesn't always work.  Certain DLLs appear to call Cygwin
+	  functions during DLL initialization while the SEH handler is
+	  not installed in the active call frame.  For these cases we
+	  need a more generic approach.
+       
+       So, what we do here is to install a myfault VEH handler.  This
+       function is called from dll_crt0_0, so the myfault handler is
+       available very early. */
+    AddVectoredExceptionHandler (1, myfault_handle);
+  }
+  ~exception () __attribute__ ((always_inline))
+  {
+    asm volatile ("\n\
+      nop								\n\
+    2:									\n\
+      nop								\n");
+  }
+#else
   ~exception () __attribute__ ((always_inline)) { _except_list = save; }
 #endif /* !__x86_64__ */
 };
