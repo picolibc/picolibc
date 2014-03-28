@@ -1487,9 +1487,7 @@ _cygtls::signal_debugger (siginfo_t& si)
 	{
 	  SuspendThread (th);
 	  c.ContextFlags = CONTEXT_FULL;
-	  if (GetThreadContext (th, &c))
-	    pc = &c;
-	  else
+	  if (!GetThreadContext (th, &c))
 	    goto out;
 	  if (incyg)
 #ifdef __x86_64__
@@ -1497,9 +1495,10 @@ _cygtls::signal_debugger (siginfo_t& si)
 #else
 	    c.Eip = retaddr ();
 #endif
-	  memcpy (&thread_context, pc, (&thread_context._internal -
-					(unsigned char *) &thread_context));
+	  pc = &c;
 	}
+      memcpy (&thread_context, pc, (&thread_context._internal -
+				    (unsigned char *) &thread_context));
 #ifdef __x86_64__
       char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffffffffffff")];
 #else
