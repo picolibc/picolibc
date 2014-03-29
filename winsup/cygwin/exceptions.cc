@@ -1461,42 +1461,29 @@ _cygtls::call_signal_handler ()
 void
 _cygtls::signal_debugger (siginfo_t& si)
 {
-  HANDLE th = NULL;
-  if (isinitialized () && being_debugged ())
+  HANDLE th;
+  /* If si.si_cyg is set then the signal was already sent to the debugger. */
+  if (isinitialized () && !si.si_cyg && (th = (HANDLE) *this)
+      && being_debugged () && SuspendThread (th) >= 0)
     {
       CONTEXT c;
-      CONTEXT *pc;
-
-      if (si.si_cyg)
-	pc = ((cygwin_exception *) si.si_cyg)->context ();
-      else if (!(th = (HANDLE) *this))
-	return;
-      else
+      c.ContextFlags = CONTEXT_FULL;
+      if (GetThreadContext (th, &c))
 	{
-	  SuspendThread (th);
-	  c.ContextFlags = CONTEXT_FULL;
-	  if (!GetThreadContext (th, &c))
-	    goto out;
 	  if (incyg)
 #ifdef __x86_64__
 	    c.Rip = retaddr ();
 #else
 	    c.Eip = retaddr ();
 #endif
-	  pc = &c;
+	  memcpy (&thread_context, &c, (&thread_context._internal -
+					(unsigned char *) &thread_context));
+	  /* Enough space for 32/64 bit addresses */
+	  char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffffffffffff")];
+	  __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %y %p", si.si_signo,
+			   thread_id, &thread_context);
+	  OutputDebugString (sigmsg);
 	}
-      memcpy (&thread_context, pc, (&thread_context._internal -
-				    (unsigned char *) &thread_context));
-#ifdef __x86_64__
-      char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffffffffffff")];
-#else
-      char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffff")];
-#endif
-      __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %y %p", si.si_signo,
-		       thread_id, &thread_context);
-      OutputDebugString (sigmsg);
+      ResumeThread (th);
     }
-out:
-  if (th)
-    ResumeThread (th);
 }

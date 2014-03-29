@@ -1,3 +1,11 @@
+2014-03-29  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* DevNotes: Add entry cgf-000025.
+	* exceptions.cc (_cygtls::signal_debugger): Reorganize to avoid
+	contacting the debugger if we have already done so via the exception
+	handler.  Eliminate need for goto.  Remove an ifdef in favor of just
+	allocating a larger buffer.
+
 2014-03-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc (dll_crt0_0): Install myfault exception handler on x86_64.

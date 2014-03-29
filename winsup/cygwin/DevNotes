@@ -1,3 +1,11 @@
+2014-03-29  cgf-000025
+
+Reorganized _cygtls::signal_debugger to avoid sending anything to the
+debugger if we've seen an exception.  I think it used to work that way
+and I changed it without noting why.  It sure seems like, if we don't do
+this, gdb will see two signals and, it really does, when there has been
+a Windows-recognized exception.
+
 2014-02-15  cgf-000024
 
 Wow.  It's hard getting the screen handling stuff working correctly when
