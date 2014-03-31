@@ -28,3 +28,7 @@ Bug Fixes
 
 - Fix initialization of open_memstream which could lead to dropping the
   entire string.
+  Addresses: http://cygwin.com/ml/cygwin/2014-03/threads.html#00413
+
+- Fix problem where ending chunk of audio was missing when accessing /dev/dsp.
+  Addresses: http://cygwin.com/ml/cygwin/2014-03/threads.html#00117
