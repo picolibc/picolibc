@@ -32,3 +32,6 @@ Bug Fixes
 
 - Fix problem where ending chunk of audio was missing when accessing /dev/dsp.
   Addresses: http://cygwin.com/ml/cygwin/2014-03/threads.html#00117
+
+- Fix exception handling on x86_64.
+  Addresses: http://cygwin.com/ml/cygwin/2014-03/threads.html#00026
