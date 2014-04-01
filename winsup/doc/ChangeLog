@@ -1,3 +1,7 @@
+2014-03-31  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* new-features.xml: (ov-new1.7.29): Add new section.
+
 2014-01-29  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* faq-setup.xml: Minor snapshot instruction rewording.  Update
