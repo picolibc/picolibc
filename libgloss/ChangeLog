@@ -1,3 +1,9 @@
+2014-04-04  Ashish Kapania  <akapania@ti.com>
+
+	* arm/configure.in: (*-*-tirtos*) Accept TIRTOS target when setting
+	objtype
+	* arm/configure: Regenerated.
+
 2014-03-21  Sabrini Ni  <sabrinanitw@gmail.com>
 
 	* nds32/_sbrk.S: Add .size and .type directive.
