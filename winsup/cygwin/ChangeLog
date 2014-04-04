@@ -1,3 +1,7 @@
+2014-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntea (EA_BUFSIZ): Reduce to 64K.  Add comment to explain why.
+
 2014-03-29  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* DevNotes: Add entry cgf-000025.

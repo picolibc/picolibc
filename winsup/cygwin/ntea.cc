@@ -1,7 +1,7 @@
 /* ntea.cc: code for manipulating Extended Attributes
 
    Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011 Red Hat, Inc.
+   2010, 2011, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -23,9 +23,19 @@ details. */
 #define MAX_EA_NAME_LEN    256
 #define MAX_EA_VALUE_LEN 65536
 
-/* At least one maximum sized entry fits. */
-#define EA_BUFSIZ (sizeof (FILE_FULL_EA_INFORMATION) + MAX_EA_NAME_LEN \
-		   + MAX_EA_VALUE_LEN)
+/* At least one maximum sized entry fits. 
+   CV 2014-04-04: I'm really puzzled how it should be possible to have 64K EAs,
+		  if the NtQueryEaFile function chokes on buffers bigger than
+		  64K with STATUS_INVALID_PARAMETER, at least on Windows 7 and
+		  later.  In theory, the buffer size should be
+		  
+		    (sizeof (FILE_FULL_EA_INFORMATION) + MAX_EA_NAME_LEN
+		    + MAX_EA_VALUE_LEN
+		  
+		  to read a single 64K EA.  But maybe I just misunderstood and
+		  EAs can't be 64K.  I can't find the source I got this
+		  information from anymore. */
+#define EA_BUFSIZ MAX_EA_VALUE_LEN
 
 #define NEXT_FEA(p) ((PFILE_FULL_EA_INFORMATION) (p->NextEntryOffset \
 		     ? (char *) p + p->NextEntryOffset : NULL))
