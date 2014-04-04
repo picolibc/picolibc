@@ -1,3 +1,14 @@
+2014-04-04  Ashish Kapania  <akapania@ti.com>
+
+	* configure.host (sys_dir, newlib_cflags): Set sys_dir to tirtos and use
+	-D__DYNAMIC_REENT__ and -DMALLOC_PROVIDED compiler options for TIRTOS
+	target.
+	* libc/stdio/local.h (_STDIO_CLOSE_PER_REENT_STD_STREAMS): Change #ifdef
+	to not define this macro when __tirtos__ is defined.
+	* libc/sys/tirtos : Add support for TIRTOS.
+	* libc/sys/tirtos/Makefile.am, libc/sys/tirtos/lock.c: New files.
+	* libc/sys/tirtos/configure.in, libc/sys/tirtos/include/sys/lock.h: Ditto.
+
 2014-03-27  Richard Earnshaw  <rearnsha@arm.com>
 
 	* libc/machine/arm/acle-compat.h: New file.

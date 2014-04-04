@@ -45,6 +45,7 @@ if test -n "${sys_dir}"; then
 	sysvi386) AC_CONFIG_SUBDIRS(sysvi386) ;;
 	sysvnecv70) AC_CONFIG_SUBDIRS(sysvnecv70) ;;
 	tic80) AC_CONFIG_SUBDIRS(tic80) ;;
+	tirtos) AC_CONFIG_SUBDIRS(tirtos) ;;
 	w65) AC_CONFIG_SUBDIRS(w65) ;;
 	z8ksim) AC_CONFIG_SUBDIRS(z8ksim) ;;
   esac;

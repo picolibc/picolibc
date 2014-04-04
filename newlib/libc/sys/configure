@@ -808,6 +808,7 @@ sysnecv850
 sysvi386
 sysvnecv70
 tic80
+tirtos
 w65
 z8ksim'
 
@@ -11454,7 +11455,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11457 "configure"
+#line 11458 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11560,7 +11561,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11563 "configure"
+#line 11564 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11848,6 +11849,8 @@ subdirs="$subdirs a29khif"
 	sysvnecv70) subdirs="$subdirs sysvnecv70"
  ;;
 	tic80) subdirs="$subdirs tic80"
+ ;;
+	tirtos) subdirs="$subdirs tirtos"
  ;;
 	w65) subdirs="$subdirs w65"
  ;;
