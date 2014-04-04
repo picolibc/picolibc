@@ -1,3 +1,8 @@
+2014-04-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Add to current TI license to
+        include tirtos addition.
+
 2014-02-04  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
 
 	PR target/59788

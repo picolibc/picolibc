@@ -820,9 +820,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-(37) Texas Instruments Incorporated (tic6x-* targets)
+(37) Texas Instruments Incorporated (tic6x-*, *-tirtos targets)
 
-Copyright (c) 1996-2010 Texas Instruments Incorporated
+Copyright (c) 1996-2010,2014 Texas Instruments Incorporated
 http://www.ti.com/
 
  Redistribution and  use in source  and binary forms, with  or without
