@@ -35,3 +35,7 @@ Bug Fixes
 
 - Fix exception handling on x86_64.
   Addresses: http://cygwin.com/ml/cygwin/2014-03/threads.html#00026
+
+- Fix reading extended attributes from files on remote shares.
+  Addresses: A personally encountered spurious error message:
+  mv: listing attributes of `//server/share/file': Invalid argument
