@@ -17,6 +17,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
+#include "tls_pbuf.h"
 #include <stdlib.h>
 #include <attr/xattr.h>
 
@@ -24,17 +25,17 @@ details. */
 #define MAX_EA_VALUE_LEN 65536
 
 /* At least one maximum sized entry fits. 
-   CV 2014-04-04: I'm really puzzled how it should be possible to have 64K EAs,
-		  if the NtQueryEaFile function chokes on buffers bigger than
-		  64K with STATUS_INVALID_PARAMETER, at least on Windows 7 and
-		  later.  In theory, the buffer size should be
+   CV 2014-04-04: NtQueryEaFile function chokes on buffers bigger than 64K
+		  with STATUS_INVALID_PARAMETER if the handle points to a file
+		  on a remote share, at least on Windows 7 and later.
+		  In theory the buffer should have a size of
 		  
-		    (sizeof (FILE_FULL_EA_INFORMATION) + MAX_EA_NAME_LEN
+		    sizeof (FILE_FULL_EA_INFORMATION) + MAX_EA_NAME_LEN
 		    + MAX_EA_VALUE_LEN
 		  
-		  to read a single 64K EA.  But maybe I just misunderstood and
-		  EAs can't be 64K.  I can't find the source I got this
-		  information from anymore. */
+		  (65804 bytes), but we're opting for simplicity here, and
+		  a 64K buffer has the advantage that we can use a tmp_pathbuf
+		  buffer, rather than having to alloca 64K from stack. */
 #define EA_BUFSIZ MAX_EA_VALUE_LEN
 
 #define NEXT_FEA(p) ((PFILE_FULL_EA_INFORMATION) (p->NextEntryOffset \
@@ -51,8 +52,9 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
   ULONG glen = 0;
   PFILE_GET_EA_INFORMATION gea = NULL;
   PFILE_FULL_EA_INFORMATION fea;
+  tmp_pathbuf tp;
   /* We have to store the latest EaName to compare with the next one, since
-     ZwQueryEaFile has a bug when accessing files on a remote share.  It
+     NtQueryEaFile has a bug when accessing files on a remote share.  It
      returns the last EA entry of the file infinitely.  Even utilizing the
      optional EaIndex only helps marginally.  If you use that, the last
      EA in the file is returned twice. */
@@ -82,7 +84,7 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
       hdl = NULL;
     }
 
-  fea = (PFILE_FULL_EA_INFORMATION) alloca (EA_BUFSIZ);
+  fea = (PFILE_FULL_EA_INFORMATION) tp.w_get ();
 
   if (name)
     {
@@ -158,10 +160,10 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
     }
   if (name)
     {
-      /* Another weird behaviour of ZwQueryEaFile.  If you ask for a
+      /* Another weird behaviour of NtQueryEaFile.  If you ask for a
 	 specific EA which is not present in the file's EA list, you don't
 	 get a useful error code like STATUS_NONEXISTENT_EA_ENTRY.  Rather
-	 ZwQueryEaFile returns success with the entry's EaValueLength
+	 NtQueryEaFile returns success with the entry's EaValueLength
 	 set to 0. */
       if (!fea->EaValueLength)
 	{
