@@ -1,3 +1,7 @@
+2014-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml: (ov-new1.7.29): Fix incomplete XML tagging.
+
 2014-03-31  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* new-features.xml: (ov-new1.7.29): Add new section.

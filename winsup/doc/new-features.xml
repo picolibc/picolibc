@@ -12,9 +12,13 @@
 Allow quoting of arguments to the CYGWIN environment variable, i.e.,
 set CYGWIN=error_start="c:\bin\someprogram -T"
 </para></listitem>
+
 <listitem><para>
 Console screen clearing works more like xterm or mintty.
 </para></listitem>
+
+</itemizedlist>
+
 </sect2>
 
 <sect2 id="ov-new1.7.28"><title>What's new and what changed from 1.7.27 to 1.7.28</title>
