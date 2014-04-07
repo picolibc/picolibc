@@ -1,6 +1,6 @@
 /* cygserver_ipc.h
 
-   Copyright 2002, 2003, 2004, 2012, 2013 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -34,7 +34,7 @@ struct proc {
 #ifdef __INSIDE_CYGWIN__
 #include "sigproc.h"
 extern inline void
-ipc_set_proc_info (proc &blk)
+ipc_set_proc_info (proc &blk, bool in_fork = false)
 {
   blk.cygpid = getpid ();
   blk.winpid = GetCurrentProcessId ();
@@ -43,7 +43,10 @@ ipc_set_proc_info (proc &blk)
   blk.gidcnt = 0;
   blk.gidlist = NULL;
   blk.is_admin = false;
-  _my_tls.set_signal_arrived (true, blk.signal_arrived);
+  if (in_fork)
+    blk.signal_arrived = NULL;
+  else
+    _my_tls.set_signal_arrived (true, blk.signal_arrived);
 }
 #endif /* __INSIDE_CYGWIN__ */
 

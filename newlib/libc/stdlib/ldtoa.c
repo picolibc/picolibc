@@ -3679,16 +3679,40 @@ emdnorm( num, 0, 0, ln, 0, ldp );
 /* NaN bit patterns
  */
 #ifdef MIEEE
+#if !defined(__mips)
 static _CONST unsigned short nan113[8] = {
   0x7fff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff};
-static _CONST unsigned short nan64[6] = {0x7fff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff};
+static _CONST unsigned short nan64[6] = {
+  0x7fff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff};
 static _CONST unsigned short nan53[4] = {0x7fff, 0xffff, 0xffff, 0xffff};
 static _CONST unsigned short nan24[2] = {0x7fff, 0xffff};
+#elif defined(__mips_nan2008) /* __mips */
+static _CONST unsigned short nan113[8] = {0x7fff, 0x8000, 0, 0, 0, 0, 0, 0};
+static _CONST unsigned short nan64[6] = {0x7fff, 0xc000, 0, 0, 0, 0};
+static _CONST unsigned short nan53[4] = {0x7ff8, 0, 0, 0};
+static _CONST unsigned short nan24[2] = {0x7fc0, 0};
+#else /* __mips && !__mips_nan2008 */
+static _CONST unsigned short nan113[8] = {
+  0x7fff, 0x7fff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff};
+static _CONST unsigned short nan64[6] = {
+  0x7fff, 0xbfff, 0xffff, 0xffff, 0xffff, 0xffff};
+static _CONST unsigned short nan53[4] = {0x7ff7, 0xffff, 0xffff, 0xffff};
+static _CONST unsigned short nan24[2] = {0x7fbf, 0xffff};
+#endif /* __mips && !__mips_nan2008 */
 #else /* !MIEEE */
+#if !defined(__mips) || defined(__mips_nan2008)
 static _CONST unsigned short nan113[8] = {0, 0, 0, 0, 0, 0, 0x8000, 0x7fff};
 static _CONST unsigned short nan64[6] = {0, 0, 0, 0, 0xc000, 0x7fff};
 static _CONST unsigned short nan53[4] = {0, 0, 0, 0x7ff8};
 static _CONST unsigned short nan24[2] = {0, 0x7fc0};
+#else /* __mips && !__mips_nan2008 */
+static _CONST unsigned short nan113[8] = {
+  0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x7fff, 0x7fff};
+static _CONST unsigned short nan64[6] = {
+  0xffff, 0xffff, 0xffff, 0xffff, 0xbfff, 0x7fff};
+static _CONST unsigned short nan53[4] = {0xffff, 0xffff, 0xffff, 0x7ff7};
+static _CONST unsigned short nan24[2] = {0xffff, 0x7fbf};
+#endif /* __mips && !__mips_nan2008 */
 #endif /* !MIEEE */
 
 
@@ -3721,9 +3745,15 @@ switch( size )
 	break;
 
 	case NBITS:
+#if !defined(__mips) || defined(__mips_nan2008)
 	for( i=0; i<NE-2; i++ )
 		*nan++ = 0;
 	*nan++ = 0xc000;
+#else /* __mips && !__mips_nan2008 */
+	for( i=0; i<NE-2; i++ )
+		*nan++ = 0xffff;
+	*nan++ = 0xbfff;
+#endif /* __mips && !__mips_nan2008 */
 	*nan++ = 0x7fff;
 	return;
 
@@ -3731,9 +3761,16 @@ switch( size )
 	*nan++ = 0;
 	*nan++ = 0x7fff;
 	*nan++ = 0;
+#if !defined(__mips) || defined(__mips_nan2008)
 	*nan++ = 0xc000;
-	for( i=4; i<NI; i++ )
+	for( i=4; i<NI-1; i++ )
 		*nan++ = 0;
+#else /* __mips && !__mips_nan2008 */
+	*nan++ = 0xbfff;
+	for( i=4; i<NI-1; i++ )
+		*nan++ = 0xffff;
+#endif /* __mips && !__mips_nan2008 */
+	*nan++ = 0;
 	return;
 #endif
 	default:

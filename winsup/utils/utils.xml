@@ -833,6 +833,42 @@ bash$ locale noexpr
 
   </sect2>
 
+  <sect2 id="minidumper"><title>minidumper</title>
+
+  <screen>
+Usage: minidumper [OPTION] FILENAME WIN32PID
+
+Write minidump from WIN32PID to FILENAME.dmp
+
+-t, --type     minidump type flags
+-n, --nokill   don't terminate the dumped process
+-d, --verbose  be verbose while dumping
+-h, --help     output help information and exit
+-q, --quiet    be quiet while dumping (default)
+-V, --version  output version information and exit
+  </screen>
+
+  <para>
+    The <command>minidumper</command> utility can be used to create a
+    minidump of a running Windows process.  This minidump can be later
+    analysed using breakpad or Windows debugging tools.
+  </para>
+
+  <para>
+    <command>minidumper</command> can be used with cygwin's Just-In-Time
+    debugging facility in exactly the same way as <command>dumper</command>
+    (See <xref linkend="dumper"></xref>).
+  </para>
+
+  <para>
+    <command>minidumper</command> can also be started from the command line to
+    create a minidump of any running process.  For compatibility with
+    <command>dumper</command> the target process is terminated after dumping
+    unless the <literal>-n</literal> option is given.
+  </para>
+
+  </sect2>
+
   <sect2 id="mkgroup">
     <title>mkgroup</title>
 

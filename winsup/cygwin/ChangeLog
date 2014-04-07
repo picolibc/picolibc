@@ -1,3 +1,353 @@
+2014-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver_ipc.h (ipc_set_proc_info): Add bool parameter to specify
+	whether or not to send signal_arrived. 
+	* shm.cc (client_request_shm::client_request_shm): Call
+	ipc_set_proc_info with bool parameter set to true to not send
+	signal_arrived.
+
+2014-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntea.cc (EA_BUFSIZ): Fix comment.
+	(read_ea): Use tmp_pathbuf for local buffer rather than alloca.
+	Throughout change ZwQueryEaFile to NtQueryEaFile in comments.
+
+2014-04-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntea.cc (EA_BUFSIZ): Reduce to 64K.  Add comment to explain why.
+
+2014-03-29  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* DevNotes: Add entry cgf-000025.
+	* exceptions.cc (_cygtls::signal_debugger): Reorganize to avoid
+	contacting the debugger if we have already done so via the exception
+	handler.  Eliminate need for goto.  Remove an ifdef in favor of just
+	allocating a larger buffer.
+
+2014-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (dll_crt0_0): Install myfault exception handler on x86_64.
+	* exception.h (exception_list): Typedef as void on x86_64.
+	(exception::handler_installed): Remove.
+	(exception::handle_while_being_debugged): Remove.
+	(exception::myfault_handle): Declare for x86_64.
+	(exception::handle): Declare as ordinary exception handler on x86_64
+	as well.
+	(exception::exception): Drop previous code (again).  Install
+	exception::handle as SEH handler.
+	(exception::install_myfault_handler): New x86_64-only method to
+	install exception::myfault_handle as VEH handler.  Explain why.
+	(exception::~exception): For x86_64, define frame end label (again).
+	* exceptions.cc (CYG_EXC_CONTINUE_EXECUTION): Drop definition.
+	(CYG_EXC_CONTINUE_SEARCH): Ditto.
+	(exception::myfault_handle): New x86_64-only method, VEH handler to
+	handle myfault exceptions.
+	(exception::handle): Define as ordinary exception handler on x86_64
+	as well.  Use ExceptionContinueExecution and ExceptionContinueSearch
+	throughout instead of deleted Cygwin macros.  Don't handle myfault
+	exceptions on x86_64.
+
+2014-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (create_token): Initialize lsa handle to NULL, rather than
+	to INVALID_HANDLE_VALUE.
+	(lsaauth): Ditto.
+	(lsaprivkeyauth): Ditto.
+	* setlsapwd.cc (setlsapwd): Don't initialize lsa handle.
+
+2014-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (_cygtls::signal_debugger): Move memcpy to copy context
+	from incoming siginfo_t to thread_context, too.
+
+2014-03-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (_sigbe/x86_64): Fix typo in .seh_proc pseudo-op.
+	(setjmp/x86_64): Drop storing ExceptionList pointer in jmp_buf->Frame.
+	Drop comment.  Store likely frame in rdx.  Jump to __setjmpex.
+	(__setjmpex): New function providing setjmp functionality.  Fetch
+	jmp_buf->Frame from rdx, like MSVCRT setjmpex.
+	(__sjfault/x86_64): Store rdx content in jmp_buf->Frame.
+	(__ljfault/x86_64): Don't restore ExceptionList pointer.
+	(longjmp/x86_64): Ditto.
+
+2014-03-19  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler_dsp.cc (fhandler_dev_dsp::ioctl): Actually pass ioctl
+	argument to _ioctl.
+
+2014-03-19  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler.h (fhandler_dev_dsp): Remove variable names from
+	declarations.
+	(fhandler_dev_dsp::close_audio_in): Make __reg1.
+	(fhandler_dev_dsp::close_audio_out): Make __reg2.
+	* fhandler_dsp.cc (fhandler_dev_dsp::close_audio_in): Make __reg1.
+	(fhandler_dev_dsp::close_audio_out): Make __reg2.
+	(fhandler_dev_dsp::close): Don't abruptly terminate sound just because
+	we are exiting.
+
+2014-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (exception::handle_while_being_debugged): Declare.
+	(exception::exception): Install unhandled exception filter.
+	* exceptions.cc (exception::handle_while_being_debugged): New method.
+
+2014-03-18  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler_dsp.cc (fhandler_dev_dsp::fixup_after_fork): Actually call
+	_fixup_after_fork rather than looping forever.
+	(fhandler_dev_dsp::fixup_after_exec): Ditto.
+
+2014-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	Partially revert patch from 2014-03-04.
+	* exception.h (exception::handler_installed): Declare.
+	(exception::exception): Install vectored exception handler on x86_64.
+	(exception::~exception): Remove for x86_64.
+	* exceptions.cc (exception::handler_installed): Define.
+
+2014-03-17  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* sigproc.h (no_thread_exit_protect): New class.
+	* sigproc.cc (thread_exit): Use no_thread_exit_protect to determine if
+	we need to coordinate ThreadExit/ExitProcess.
+	* fhandler_dsp.cc (fhandler_dev_dsp::Audio_out::stop): Use
+	no_thread_exit_protect to kludge around waiting for waveOutClose as it
+	waits for a thread that never exits.
+	(fhandler_dev_dsp::Audio_in::stop): Ditto for waveInClose.
+
+2014-03-16  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler.h (fhandler_dev_dsp::base): New method.
+	(fhandler_dev_dsp::_read): Ditto.
+	(fhandler_dev_dsp::_write): Ditto.
+	(fhandler_dev_dsp::_ioctl): Ditto.
+	(fhandler_dev_dsp::_fixup_after_fork): Ditto.
+	(fhandler_dev_dsp::_fixup_after_exec): Ditto.
+	* fhandler_dsp.cc (fhandler_dev_dsp::read): Call real function via
+	base() pointer.
+	(fhandler_dev_dsp::write): Ditto.
+	(fhandler_dev_dsp::ioctl): Ditto.
+	(fhandler_dev_dsp::fixup_after_fork): Ditto.
+	(fhandler_dev_dsp::fixup_after_exec): Ditto.
+	(fhandler_dev_dsp::_read): Rename by adding an leading underscore.
+	(fhandler_dev_dsp::_write): Ditto.
+	(fhandler_dev_dsp::_ioctl): Ditto.
+	(fhandler_dev_dsp::_fixup_after_fork): Ditto.
+	(fhandler_dev_dsp::_fixup_after_exec): Ditto.
+
+2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/socket.h (IPV6_JOIN_GROUP): Revert.
+	(IPV6_LEAVE_GROUP): Ditto.
+
+2014-03-10  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler.h (dev_console::b): Redefine as CONSOLE_SCREEN_BUFFER_INFO
+	for use with older OS.
+	* fhandler_console.cc (dev_console::fillin): Ditto for
+	GetConsoleScreenBufferInfo.
+
+2014-03-10  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler_console.cc (dev_console::save_restore): Save entire line of
+	current cursor position.
+
+2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler_console.cc (fhandler_console::save_restore): Save only until
+	last written row and, because of this, don't bother trying to restore
+	the screen buffer size.  Set cursor position after refilling buffer.
+	(fhandler_console::write): Use absolute paths when saving/restoring
+	cursor position or suffer odd problems after a saved screen is
+	restored.
+
+2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler.h (fhandler_console::dwBufferSize): Delete.
+	(fhandler_console::dwCursorPosition): Ditto.
+	(fhandler_console::wAttributes): Ditto.
+	(fhandler_console::b): New field encompassing previously disparate
+	screen buffer info.
+	(fhandler_console::save_bufsize): Rename from savebufsiz
+	(fhandler_console::save_buf): Rename sfrom savebuf.
+	(fhandler_console::save_cursor): New field.
+	(fhandler_console::save_restore): New function.
+	(fhandler_console::con): Rename from dev_state.
+	(fhandler_console::focus_aware): Accommodate name change.
+	* fhandler_console.cc: Use 'b' field of dev_console throughout instead
+	of disparate names.  Accommodate dev_state -> con rename.
+	(dev_state:save_restore): New function.  Attempt to save the entire
+	screen buffer rather than just the visible part.  Clear the buffer when
+	saving, like Linux.
+	(fhandler_console::char_command): Use con.save_restore() for
+	Save/restore screen sequence.
+
+2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* sigproc.cc (_cygtls::remove_wq): Reset thread_ev inside of lock.  Set
+	to NULL when done.
+
+2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler_console.cc (fhandler_console::char_command): Properly use
+	calculated value rather than directly using dev_state.args[0].
+
+2014-03-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* dir.cc (opendir): Propagate any errno from build_fh_name.
+
+2014-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/config.h (__TM_GMTOFF): Define.
+	(__TM_ZONE): Define.
+
+2014-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc: Define TM_GMTOFF and TM_ZONE based on __TM_GMTOFF and
+	__TM_ZONE being defined.  Throughout, write to these struct tm members
+	only if CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS is true.
+	* libc/strptime.cc: Ditto.
+	* include/cygwin/version.h (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS):
+	Define.
+	(CYGWIN_VERSION_API_MINOR): Bump to 272.
+
+2014-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (exception::handler_installed): Remove.
+	(exception::exception): Remove old code.  Manually install SEH handler
+	instead.
+	(exception::~exception): For x86_64, define frame end label.
+	* exceptions.cc (exception::handler_installed): Remove.
+
+2014-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (exception::exception): Install vectored exception
+	handler rather than vectored continue handler.
+
+2014-02-25  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler.h (fhandler_console::scroll_buffer_screen): New function.
+	* fhandler_console.cc (fhandler_console::scroll_buffer_screen): New function.
+	(fhandler_console::char_command): Use scroll_buffer_screen as appropriate.
+	(dev_console::scroll_buffer): Remove if 0'ed block.
+
+2014-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): Add cases for CW_GETPWSID and
+	CW_GETGRSID.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_SETENT, CW_GETENT,
+	CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID and CW_GETGRSID.
+
+2014-02-22  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* dev_console::scroll_buffer): Reinstate clipping region.
+
+2014-02-22  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler.h (dev_console::is_fullscreen): Delete.
+	(dev_console::scroll_window): Return bool indicating success.
+	(dev_console::scroll_screen): New function.
+	(dev_console::clear_screen): New function.
+	(fhandler_console::clear_screen): Make __reg3.
+	(fhandler_console::cursor_set): Ditto.
+	(fhandler_console::cursor_get): Ditto.
+	(fhandler_console::cursor_rel): Ditto.
+	* fhandler_console.cc (dev_console::scroll_buffer): Adapt from
+	fhandler_console.
+	(fhandler_console::scroll_buffer): Use dev_console function.
+	(dev_console::is_fullscreen): Delete.
+	(dev_console::scroll_window): Return true if we cleared the screen.
+	Shrink/grow buffer first before scrolling to ensure that there is
+	sufficient space after scrolling.
+	(fhandler_console::clear_screen): Make reg3, use dev_console function.
+	(dev_console::clear_screen): New function adapted from
+	fhandler_console.
+	(fhandler_console::cursor_set): Make __reg3.
+	(fhandler_console::cursor_rel): Ditto.
+	(fhandler_console::cursor_get): Ditto.
+	(fhandler_console::write): Fix "reverse index".
+
+2014-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (getgrouplist): Fix previous fix so ret is only set to ngroups
+	if ngroups isn't too small.
+
+2014-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (get_groups): Don't add gid to list if it's ILLEGAL_GID.
+	(getgrouplist): Return number of groups, just like glibc.
+
+2014-02-15  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* DevNotes: Add entry cgf-000024.
+	* fhandler.h (dev_console::state): Remove trailing underscore.
+	(dev_console::args): Ditto.
+	(dev_console::nargs): Ditto.
+	(dev_console::info): Eliminate subclass.
+	(dev_console::dwEnd): New field.
+	(dev_console::scroll_window): New function.
+	(dev_console::is_fullscreen): Ditto.
+	(dev_console::fillin): Rename from fillin_info.
+	(fhandler_console::scroll_buffer): Rename from scroll_screen.
+	* fhandler_console.cc: Throughout s/dev_state\.info/dev_state/g.
+	Accommodate other name changes.
+	(dev_console::fillin): Accommodate rename.  Notice max x/y written to.
+	Forgo memset if GetConsoleScreenBufferInfo fails.
+	(fhandler_console::scroll_buffer): Accommodate rename.  Don't treat y
+	coordinate of zero as top of screen.
+	(dev_console::is_fullscreen): New function.
+	(dev_console::scroll_window): Ditto.
+	(fhandler_console::clear_screen): Just scroll the screen when clearing
+	the screen in a state where the screen buffer is bigger than the
+	screen.
+	(fhandler_console::char_command): Try harder to get 'S' and 'T' working
+	in the presence of a screen buffer.  Use temporary 'n' variable rather
+	than dev_state.args[0].  Use GNU ?: shortcut method.
+
+2014-02-14  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* pinfo.cc (winpids::add): Always copy pinfo structure when winpid.
+	Fill out dwProcessId explicitly to handle exec from a windows process.
+	(winpids::enum_processes): Reorganize to iterate over known cygwin pids
+	when !winpid.  Simplify logic.  Don't do duplicate detection for
+	winpid.
+
+2014-02-11  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* cygwin.sc.in: More closely emulate default pe/i386 linker script.
+
+2014-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cwcsdup): Change parameter to correct PWCSTR.
+	(cwcsdup1): Ditto.
+	* cygheap_malloc.h: Change declarations accordingly.
+
+2014-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (child_info_spawn::handle_spawn): Call fixup_lockf_after_exec
+	with additional argument to specify if the process has been execed
+	or spawned.
+	* flock.cc (fixup_lockf_after_exec): Take bool parameter to handle
+	exec and spawn differently.  In case of spawn, just give up POSIX
+	locks in favor of the still running parent.  Add comments to explain.
+
+2014-02-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* environ.cc (strbrk): Properly deal with environment variable sans
+	quote.
+
+2014-02-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* environ.cc (strbrk): New function.
+	(parse_options): Use strbrk to parse CYGWIN environment variable.
+
+2014-02-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* sigproc.cc (sig_send): Don't bother with an error message if we are
+	exiting.
+
 2014-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fchown): Fix typo in

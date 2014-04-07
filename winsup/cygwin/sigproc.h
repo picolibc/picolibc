@@ -83,6 +83,22 @@ int kill_pgrp (pid_t, siginfo_t&);
 void __reg1 exit_thread (DWORD) __attribute__ ((noreturn));
 void __reg1 setup_signal_exit (int);
 
+class no_thread_exit_protect
+{
+  static bool flag;
+  bool modify;
+public:
+  no_thread_exit_protect (int) {flag = true; modify = true;}
+  ~no_thread_exit_protect ()
+  {
+    if (modify)
+      flag = false;
+  }
+  no_thread_exit_protect () {modify = false;}
+  operator int () {return flag;}
+};
+
+
 extern "C" void sigdelayed ();
 
 extern char myself_nowait_dummy[];

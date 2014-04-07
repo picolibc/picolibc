@@ -164,7 +164,7 @@ _sigfe:						# stack is aligned on entry!
 	jmp	*%rax				# and jmp to it
 	.seh_endproc
 
-	.seh_proc _sigfe
+	.seh_proc _sigbe
 _sigbe:						# return here after cygwin syscall
 						# stack is aligned on entry!
 	.seh_endprologue
@@ -589,10 +589,17 @@ sub longjmp {
 	.seh_proc setjmp
 setjmp:
 	.seh_endprologue
-	# We use the Windows jmp_buf layout.  Store ExceptionList in Frame.
+	leaq	8(%rsp),%rdx
+	jmp	__setjmpex
+	.seh_endproc
+
+	.globl	__setjmpex
+	.seh_proc __setjmpex
+__setjmpex:
+	.seh_endprologue
+	# We use the Windows jmp_buf layout.
 	# Store alternative stackptr in Spare.
-	movq	%gs:0,%r10
-	movq	%r10,(%rcx)
+	movq	%rdx,(%rcx)
 	movq	%rbx,0x8(%rcx)
 	movq	%rsp,0x10(%rcx)
 	movq	%rbp,0x18(%rcx)
@@ -631,8 +638,7 @@ setjmp:
 __sjfault:
 	.seh_endprologue
 	# Like setjmp, just w/o storing the alternate stackptr.
-	movq	%gs:0,%r10
-	movq	%r10,(%rcx)
+	movq	%rdx,(%rcx)
 	movq	%rbx,0x8(%rcx)
 	movq	%rsp,0x10(%rcx)
 	movq	%rbp,0x18(%rcx)
@@ -662,8 +668,6 @@ __sjfault:
 	.globl  __ljfault
 	.seh_proc __ljfault
 __ljfault:
-	movq	(%rcx),%r10
-	movq	%r10,%gs:0
 	movq	0x8(%rcx),%rbx
 	movq	0x10(%rcx),%rsp
 	movq	0x18(%rcx),%rbp
@@ -708,8 +712,6 @@ longjmp:
 	decl	$tls::stacklock(%r11)		# relinquish lock
 	xorl	%r10d,%r10d
 	movl	%r10d,$tls::incyg(%r11)		# we're definitely not in cygwin anymore
-	movq	(%rcx),%r10
-	movq	%r10,%gs:0
 	movq	0x8(%rcx),%rbx
 	movq	0x10(%rcx),%rsp
 	movq	0x18(%rcx),%rbp

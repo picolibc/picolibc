@@ -69,9 +69,16 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-abort.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
-	lib_a-memset.$(OBJEXT) lib_a-setjmp.$(OBJEXT) \
-	lib_a-strcmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT)
+@IS_NDS32_ISA_V3M_FALSE@am_lib_a_OBJECTS = lib_a-abort.$(OBJEXT) \
+@IS_NDS32_ISA_V3M_FALSE@	lib_a-memcpy.$(OBJEXT) \
+@IS_NDS32_ISA_V3M_FALSE@	lib_a-memset.$(OBJEXT) \
+@IS_NDS32_ISA_V3M_FALSE@	lib_a-setjmp.$(OBJEXT) \
+@IS_NDS32_ISA_V3M_FALSE@	lib_a-strcmp.$(OBJEXT) \
+@IS_NDS32_ISA_V3M_FALSE@	lib_a-strcpy.$(OBJEXT)
+@IS_NDS32_ISA_V3M_TRUE@am_lib_a_OBJECTS = lib_a-abort.$(OBJEXT) \
+@IS_NDS32_ISA_V3M_TRUE@	lib_a-setjmp.$(OBJEXT) \
+@IS_NDS32_ISA_V3M_TRUE@	lib_a-strcmp.$(OBJEXT) \
+@IS_NDS32_ISA_V3M_TRUE@	lib_a-strcpy.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -102,12 +109,15 @@ CC = @CC@
 CCAS = @CCAS@
 CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
+EXEEXT = @EXEEXT@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -141,6 +151,7 @@ abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
+ac_ct_CC = @ac_ct_CC@
 aext = @aext@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
@@ -197,7 +208,8 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = abort.c memcpy.S memset.S setjmp.S strcmp.S strcpy.S
+@IS_NDS32_ISA_V3M_FALSE@lib_a_SOURCES = abort.c memcpy.S memset.S setjmp.S strcmp.S strcpy.S
+@IS_NDS32_ISA_V3M_TRUE@lib_a_SOURCES = abort.c setjmp.S strcmp.S strcpy.S
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..

@@ -39,6 +39,8 @@ struct sigaction *global_sigs;
 const char *__sp_fn ;
 int __sp_ln;
 
+bool no_thread_exit_protect::flag;
+
 char NO_COPY myself_nowait_dummy[1] = {'0'};// Flag to sig_send that signal goes to
 					//  current process but no wait is required
 
@@ -336,6 +338,8 @@ _cygtls::remove_wq (DWORD wait)
       if (exit_state < ES_FINAL && waitq_head.next && sync_proc_subproc
 	  && sync_proc_subproc.acquire (wait))
 	{
+	  ForceCloseHandle1 (wq.thread_ev, wq_ev);
+	  wq.thread_ev = NULL;
 	  for (waitq *w = &waitq_head; w->next != NULL; w = w->next)
 	    if (w->next == &wq)
 	      {
@@ -344,7 +348,6 @@ _cygtls::remove_wq (DWORD wait)
 	      }
 	  sync_proc_subproc.release ();
 	}
-      ForceCloseHandle1 (wq.thread_ev, wq_ev);
     }
 
 }
@@ -445,6 +448,8 @@ void
 exit_thread (DWORD res)
 {
 # undef ExitThread
+  if (no_thread_exit_protect ())
+    ExitThread (res);
   sigfillset (&_my_tls.sigmask);	/* No signals wanted */
   lock_process for_now;			/* May block indefinitely when exiting. */
   HANDLE h;
@@ -464,7 +469,7 @@ exit_thread (DWORD res)
   siginfo_t si = {__SIGTHREADEXIT, SI_KERNEL};
   si.si_cyg = h;
   sig_send (myself_nowait, si, &_my_tls);
-  ExitThread (0);
+  ExitThread (res);
 }
 
 int __reg3
@@ -639,12 +644,9 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  sigproc_printf ("WriteFile for pipe %p failed, %E", sendsig);
 	  ForceCloseHandle (sendsig);
 	}
-      else
-	{
-	  if (!p->exec_sendsig)
-	    system_printf ("error sending signal %d to pid %d, pipe handle %p, %E",
-			   si.si_signo, p->pid, sendsig);
-	}
+      else if (!p->exec_sendsig && !exit_state)
+	system_printf ("error sending signal %d, pipe handle %p, nb %u, packsize %u, %E",
+		       si.si_signo, p->pid, sendsig, nb, packsize);
       if (GetLastError () == ERROR_BROKEN_PIPE)
 	set_errno (ESRCH);
       else

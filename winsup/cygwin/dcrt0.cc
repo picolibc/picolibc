@@ -655,7 +655,7 @@ child_info_spawn::get_parent_handle ()
 void
 child_info_spawn::handle_spawn ()
 {
-  extern void fixup_lockf_after_exec ();
+  extern void fixup_lockf_after_exec (bool);
   HANDLE h;
   if (!dynamically_loaded || get_parent_handle ())
       {
@@ -706,7 +706,7 @@ child_info_spawn::handle_spawn ()
     }
 
   signal_fixup_after_exec ();
-  fixup_lockf_after_exec ();
+  fixup_lockf_after_exec (type == _CH_EXEC);
 }
 
 /* Retrieve and store system directory for later use.  Note that the
@@ -794,6 +794,10 @@ dll_crt0_0 ()
   user_data->threadinterface->Init ();
 
   _main_tls = &_my_tls;
+
+#ifdef __x86_64__
+  exception::install_myfault_handler ();
+#endif
 
   /* Initialize signal processing here, early, in the hopes that the creation
      of a thread early in the process will cause more predictability in memory

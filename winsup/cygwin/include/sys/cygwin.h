@@ -1,7 +1,7 @@
 /* sys/cygwin.h
 
    Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -143,7 +143,13 @@ typedef enum
     CW_CVT_ENV_TO_WINENV,
     CW_ALLOC_DRIVE_MAP,
     CW_MAP_DRIVE_MAP,
-    CW_FREE_DRIVE_MAP
+    CW_FREE_DRIVE_MAP,
+    CW_SETENT,
+    CW_GETENT,
+    CW_ENDENT,
+    CW_GETNSSSEP,
+    CW_GETPWSID,
+    CW_GETGRSID
   } cygwin_getinfo_types;
 
 #define CW_LOCK_PINFO CW_LOCK_PINFO
@@ -194,6 +200,12 @@ typedef enum
 #define CW_ALLOC_DRIVE_MAP CW_ALLOC_DRIVE_MAP
 #define CW_MAP_DRIVE_MAP CW_MAP_DRIVE_MAP
 #define CW_FREE_DRIVE_MAP CW_FREE_DRIVE_MAP
+#define CW_SETENT CW_SETENT
+#define CW_GETENT CW_GETENT
+#define CW_ENDENT CW_ENDENT
+#define CW_GETNSSSEP CW_GETNSSSEP
+#define CW_GETPWSID CW_GETPWSID
+#define CW_GETGRSID CW_GETGRSID
 
 /* Token type for CW_SET_EXTERNAL_TOKEN */
 enum

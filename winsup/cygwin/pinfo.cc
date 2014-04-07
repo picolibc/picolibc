@@ -1174,7 +1174,10 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
 
   /* If we're just looking for winpids then don't do any special cygwin "stuff* */
   if (winpid)
-    goto out;
+    {
+      perform_copy = true;
+      goto out;
+    }
 
   /* !p means that we couldn't find shared memory for this pid.  Probably means
      that it isn't a cygwin process. */
@@ -1239,6 +1242,8 @@ out:
 	      p.release ();
 	      p.procinfo = pnew;
 	      p.destroy = false;
+	      if (winpid)
+		p->dwProcessId = pid;
 	    }
 	}
     }
@@ -1250,70 +1255,51 @@ DWORD
 winpids::enum_processes (bool winpid)
 {
   DWORD nelem = 0;
-  DWORD cygwin_pid_nelem = 0;
-  NTSTATUS status;
-  ULONG context;
-  struct fdbi
-    {
-      DIRECTORY_BASIC_INFORMATION dbi;
-      WCHAR buf[2][NAME_MAX + 1];
-    } f;
-  HANDLE dir = get_shared_parent_dir ();
-  BOOLEAN restart = TRUE;
 
-  while (NT_SUCCESS (NtQueryDirectoryObject (dir, &f, sizeof f, TRUE, restart,
-					     &context, NULL)))
+  if (!winpid)
     {
-      restart = FALSE;
-      f.dbi.ObjectName.Buffer[f.dbi.ObjectName.Length / sizeof (WCHAR)] = L'\0';
-      if (wcsncmp (f.dbi.ObjectName.Buffer, L"cygpid.", 7) == 0)
+      HANDLE dir = get_shared_parent_dir ();
+      BOOLEAN restart = TRUE;
+      ULONG context;
+      struct fdbi
 	{
-	  DWORD pid = wcstoul (f.dbi.ObjectName.Buffer + 7, NULL, 10);
-	  add (nelem, false, pid);
+	  DIRECTORY_BASIC_INFORMATION dbi;
+	  WCHAR buf[2][NAME_MAX + 1];
+	} f;
+      while (NT_SUCCESS (NtQueryDirectoryObject (dir, &f, sizeof f, TRUE,
+						 restart, &context, NULL)))
+	{
+	  restart = FALSE;
+	  f.dbi.ObjectName.Buffer[f.dbi.ObjectName.Length / sizeof (WCHAR)] = L'\0';
+	  if (wcsncmp (f.dbi.ObjectName.Buffer, L"cygpid.", 7) == 0)
+	    {
+	    DWORD pid = wcstoul (f.dbi.ObjectName.Buffer + 7, NULL, 10);
+	    add (nelem, false, pid);
+	  }
 	}
     }
-  cygwin_pid_nelem = nelem;
-
-  if (winpid)
+  else
     {
       static DWORD szprocs;
       static PSYSTEM_PROCESS_INFORMATION procs;
 
-      if (!szprocs)
+      while (1)
 	{
-	  procs = (PSYSTEM_PROCESS_INFORMATION)
-		  malloc (sizeof (*procs) + (szprocs = 200 * sizeof (*procs)));
-	  if (!procs)
+	  PSYSTEM_PROCESS_INFORMATION new_p = (PSYSTEM_PROCESS_INFORMATION)
+	    realloc (procs, szprocs += 200 * sizeof (*procs));
+	  if (!new_p)
 	    {
 	      system_printf ("out of memory reading system process "
 			     "information");
 	      return 0;
 	    }
-	}
-
-      for (;;)
-	{
-	  status =
-		NtQuerySystemInformation (SystemProcessInformation,
-					  procs, szprocs, NULL);
+	  procs = new_p;
+	  NTSTATUS status = NtQuerySystemInformation (SystemProcessInformation,
+						      procs, szprocs, NULL);
 	  if (NT_SUCCESS (status))
 	    break;
 
-	  if (status == STATUS_INFO_LENGTH_MISMATCH)
-	    {
-	      PSYSTEM_PROCESS_INFORMATION new_p;
-
-	      new_p = (PSYSTEM_PROCESS_INFORMATION)
-		      realloc (procs, szprocs += 200 * sizeof (*procs));
-	      if (!new_p)
-		{
-		  system_printf ("out of memory reading system process "
-				 "information");
-		  return 0;
-		}
-	      procs = new_p;
-	    }
-	  else
+	  if (status != STATUS_INFO_LENGTH_MISMATCH)
 	    {
 	      system_printf ("error %y reading system process information",
 			     status);
@@ -1322,23 +1308,14 @@ winpids::enum_processes (bool winpid)
 	}
 
       PSYSTEM_PROCESS_INFORMATION px = procs;
-      for (;;)
+      char *&pxc = (char *&)px;
+      while (1)
 	{
 	  if (px->UniqueProcessId)
-	    {
-	      bool do_add = true;
-	      for (unsigned i = 0; i < cygwin_pid_nelem; ++i)
-		if (pidlist[i] == (uintptr_t) px->UniqueProcessId)
-		  {
-		    do_add = false;
-		    break;
-		  }
-	      if (do_add)
-		add (nelem, true, (DWORD) (uintptr_t) px->UniqueProcessId);
-	    }
+	    add (nelem, true, (DWORD) (uintptr_t) px->UniqueProcessId);
 	  if (!px->NextEntryOffset)
 	    break;
-	  px = (PSYSTEM_PROCESS_INFORMATION) ((char *) px + px->NextEntryOffset);
+	  pxc += px->NextEntryOffset;
 	}
     }
   return nelem;

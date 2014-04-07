@@ -31,12 +31,18 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <stdlib.h>
 #include "local.h"
 
+#ifdef _HAVE_LONG_DOUBLE
+extern long double _strtold (const char *, char **);
+
 /* On platforms where long double is as wide as double.  */
-#ifdef _LDBL_EQ_DBL
 long double
 strtold (const char *__restrict s00, char **__restrict se)
 {
+#ifdef _LDBL_EQ_DBL
   return strtod(s00, se);
+#else
+  return _strtold (s00, se);
+#endif
 }
-#endif /* _LDBL_EQ_DBL */
+#endif /* _HAVE_LONG_DOUBLE */
 

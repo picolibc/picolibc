@@ -1,6 +1,6 @@
 /* bsd_helper.cc
 
-   Copyright 2003, 2004, 2005, 2007, 2012 Red Hat Inc.
+   Copyright 2003, 2004, 2005, 2007, 2012, 2014 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -200,7 +200,7 @@ ipcexit_creat_hookthread (struct thread *td)
 			GetCurrentProcess (), &shs->process_hdl,
 			0, FALSE, DUPLICATE_SAME_ACCESS))
     {
-      log (LOG_CRIT, "failed to duplicate process handle, error = %lu",
+      log (LOG_CRIT, "failed to duplicate process handle, error = %u",
 		      GetLastError ());
       return cygwin_internal (CW_GET_ERRNO_FROM_WINERROR,
 			      GetLastError (), ENOMEM);
@@ -209,7 +209,7 @@ ipcexit_creat_hookthread (struct thread *td)
   HANDLE thread = CreateThread (NULL, 0, ipcexit_hookthread, shs, 0, &tid);
   if (!thread)
     {
-      log (LOG_CRIT, "failed to create thread, error = %lu", GetLastError ());
+      log (LOG_CRIT, "failed to create thread, error = %u", GetLastError ());
       return cygwin_internal (CW_GET_ERRNO_FROM_WINERROR,
 			      GetLastError (), ENOMEM);
     }
@@ -235,7 +235,7 @@ init_admin_sid (void)
   SID_IDENTIFIER_AUTHORITY nt_auth = {SECURITY_NT_AUTHORITY};
   if (! AllocateAndInitializeSid (&nt_auth, 2, 32, 544, 0, 0, 0, 0, 0, 0,
 				  &admininstrator_group_sid))
-    panic ("failed to create well known sids, error = %lu",
+    panic ("failed to create well known sids, error = %u",
 	   GetLastError ());
 }
 
@@ -451,7 +451,7 @@ _vm_pager_allocate (int size, int shmflg)
   vm_object_t object = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_all_nih,
 					  PAGE_READWRITE, 0, size, NULL);
   if (!object)
-    panic ("CreateFileMapping in _vm_pager_allocate failed, %lu", GetLastError ());
+    panic ("CreateFileMapping in _vm_pager_allocate failed, %u", GetLastError ());
   return object;
 }
 
@@ -462,7 +462,7 @@ vm_object_duplicate (struct thread *td, vm_object_t object)
   if (!DuplicateHandle (GetCurrentProcess (), object,
 		        td->client->handle (), &dup_object,
 		        0, TRUE, DUPLICATE_SAME_ACCESS))
-    panic ("!DuplicateHandle in vm_object_duplicate failed, %lu", GetLastError ());
+    panic ("!DuplicateHandle in vm_object_duplicate failed, %u", GetLastError ());
   return dup_object;
 }
 
@@ -668,7 +668,7 @@ tunable_int_fetch (const char *name, int32_t *tunable_target)
   if (!s->value.ival)		/* Not set in config file */
     return;
   *tunable_target = s->value.ival;
-  debug ("\nSet %s to %lu\n", name, *tunable_target);
+  debug ("\nSet %s to %u\n", name, *tunable_target);
 }
 
 void
