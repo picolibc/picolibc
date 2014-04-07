@@ -39,3 +39,6 @@ Bug Fixes
 - Fix reading extended attributes from files on remote shares.
   Addresses: A personally encountered spurious error message:
   mv: listing attributes of `//server/share/file': Invalid argument
+
+- Fix sending an invalid pointer to cygserver during fork.
+  Addresses: http://cygwin.com/ml/cygwin/2014-04/msg00001.html
