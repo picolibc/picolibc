@@ -1,3 +1,11 @@
+2014-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver_ipc.h (ipc_set_proc_info): Add bool parameter to specify
+	whether or not to send signal_arrived. 
+	* shm.cc (client_request_shm::client_request_shm): Call
+	ipc_set_proc_info with bool parameter set to true to not send
+	signal_arrived.
+
 2014-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntea.cc (EA_BUFSIZ): Fix comment.
