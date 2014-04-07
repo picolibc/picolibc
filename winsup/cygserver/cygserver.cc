@@ -1,6 +1,6 @@
 /* cygserver.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2011, 2012 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2011, 2012, 2014 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -180,10 +180,10 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
 
   msglen (0);			// Until we fill in some fields.
 
-  debug ("pid %ld:(%p,%p) -> pid %ld", req.master_pid, req.from_master,
+  debug ("pid %d:(%p,%p) -> pid %d", req.master_pid, req.from_master,
 				       req.to_master, req.pid);
 
-  debug ("opening process %ld", req.master_pid);
+  debug ("opening process %d", req.master_pid);
 
   const HANDLE from_process_handle =
     OpenProcess (PROCESS_DUP_HANDLE, FALSE, req.master_pid);
@@ -195,7 +195,7 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
       return;
     }
 
-  debug ("opening process %ld", req.pid);
+  debug ("opening process %d", req.pid);
 
   const HANDLE to_process_handle =
     OpenProcess (PROCESS_DUP_HANDLE, FALSE, req.pid);
