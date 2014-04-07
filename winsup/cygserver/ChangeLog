@@ -1,3 +1,8 @@
+2014-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* process.cc (process::process): Only notice that signal_arrived is
+	NULL in debug output.
+
 2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (OBJS): Add pwdgrp.o.

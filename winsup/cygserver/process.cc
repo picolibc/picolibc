@@ -61,8 +61,7 @@ process::process (const pid_t cygpid, const DWORD winpid, HANDLE signal_arrived)
     debug_printf ("got handle %p for new cache process %d(%u)",
 		  _hProcess, _cygpid, _winpid);
   if (!signal_arrived)
-    system_printf ("signal_arrived NULL for process %d(%u)",
-		   _cygpid, _winpid);
+    debug_printf ("signal_arrived NULL for process %d(%u)", _cygpid, _winpid);
   else if (signal_arrived != INVALID_HANDLE_VALUE)
     {
       if (!DuplicateHandle (_hProcess, signal_arrived,
