@@ -1,3 +1,9 @@
+2014-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc.in: (Temporarily?) workaround serious ld bug which
+	truncates symbols in certain computations to 32 bit.  See
+	https://sourceware.org/bugzilla/show_bug.cgi?id=16821
+
 2014-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver_ipc.h (ipc_set_proc_info): Add bool parameter to specify
