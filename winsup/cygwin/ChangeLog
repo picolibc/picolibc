@@ -1,3 +1,8 @@
+2014-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (exception::myfault_handle): Only handle the minimum
+	amount of exceptions the myfault handler was designed for.
+
 2014-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.sc.in: (Temporarily?) workaround serious ld bug which
