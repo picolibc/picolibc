@@ -1,3 +1,7 @@
+2014-04-09  DJ Delorie  <dj@redhat.com>
+
+	* libc/machine/rl78/setjmp.S: Add RL78/G10 support.
+
 2014-04-04  Ashish Kapania  <akapania@ti.com>
 
 	* configure.host (sys_dir, newlib_cflags): Set sys_dir to tirtos and use

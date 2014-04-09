@@ -30,6 +30,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifdef __RL78_G10__
+; clobberable
+r8	=	0xffec8
+r9	=	0xffec9
+r10	=	0xffeca
+r11	=	0xffecb
+r12	=	0xffecc
+r13	=	0xffecd
+r14	=	0xffece
+r15	=	0xffecf
+; preserved
+r16	=	0xffed0
+r17	=	0xffed1
+r18	=	0xffed2
+r19	=	0xffed3
+r20	=	0xffed4
+r21	=	0xffed5
+r22	=	0xffed6
+r23	=	0xffed7
+#else
 ; clobberable
 r8	=	0xffef0
 r9	=	0xffef1
@@ -48,6 +68,7 @@ r20	=	0xffeec
 r21	=	0xffeed
 r22	=	0xffeee
 r23	=	0xffeef
+#endif
 
 /* The jump buffer has the following structure:
 	R0 .. R23  3*8 bytes
