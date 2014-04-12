@@ -1475,13 +1475,13 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  if (uid == ILLEGAL_UID)
 	    uid = posix_offset + sid_sub_auth_rid (sid);
 
-	  if (is_domain_account)
-	    {
-	      /* We only care for the extended user information if we're
-		 creating a passwd entry and the account is, in fact, a user. */
-	      if (is_group () || acc_type != SidTypeUser)
-		break;
+	  /* We only care for extended user information if we're creating a
+	     passwd entry and the account is a user or alias. */
+	  if (is_group () || acc_type == SidTypeGroup)
+	    break;
 
+	  if (acc_type == SidTypeUser)
+	    {
 	      /* Default primary group.  If the sid is the current user, fetch
 		 the default group from the current user token, otherwise make
 		 the educated guess that the user is in group "Domain Users"
@@ -1491,7 +1491,10 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		      + sid_sub_auth_rid (cygheap->user.groups.pgsid);
 	      else
 		gid = posix_offset + DOMAIN_GROUP_RID_USERS;
+	    }
 
+	  if (is_domain_account)
+	    {
 	      /* Use LDAP to fetch domain account infos. */
 	      if (!cldap->open (NULL))
 		break;
@@ -1561,7 +1564,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  /* Set comment variable for below attribute loop. */
 		  comment = ui->usri4_comment;
 		}
-	      else if (acc_type == SidTypeAlias)
+	      else /* acc_type == SidTypeAlias */
 		{
 		  nas = NetLocalGroupGetInfo (NULL, name, 1, (PBYTE *) &gi);
 		  if (nas != NERR_Success)
@@ -1572,8 +1575,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  /* Set comment variable for below attribute loop. */
 		  comment = gi->lgrpi1_comment;
 		}
-	      else /* SidTypeGroup.  No way to add a comment to "None" :(  */
-		break;
 	      /* Local SAM accounts have only a handful attributes
 		 available to home users.  Therefore, fetch additional
 		 passwd/group attributes from the "Description" field

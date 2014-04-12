@@ -1,3 +1,8 @@
+2014-04-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Fix gid evaluation
+	for local accounts.
+
 2014-04-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 30.
