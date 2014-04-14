@@ -1,3 +1,8 @@
+2014-04-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/sys/rtems/sys/cpuset.h (CPU_SET_S): Add const qualifier.
+	(CPU_SET): Likewise.
+
 2014-04-09  DJ Delorie  <dj@redhat.com>
 
 	* libc/machine/rl78/setjmp.S: Add RL78/G10 support.

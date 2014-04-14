@@ -153,14 +153,14 @@ static __inline void CPU_CLR(int cpu, cpu_set_t *set)
   CPU_CLR_S(cpu, sizeof(*set), set);
 }
 
-static __inline int CPU_ISSET_S(int cpu, size_t setsize, cpu_set_t *set)
+static __inline int CPU_ISSET_S(int cpu, size_t setsize, const cpu_set_t *set)
 {
   const cpu_set_word_t *w = &set->__bits[0];
 
   return ((w[__cpuset_index(cpu)] & __cpuset_mask(cpu)) != 0);
 }
 
-static __inline int CPU_ISSET(int cpu, cpu_set_t *set)
+static __inline int CPU_ISSET(int cpu, const cpu_set_t *set)
 {
   return CPU_ISSET_S(cpu, sizeof(*set), set);
 }
