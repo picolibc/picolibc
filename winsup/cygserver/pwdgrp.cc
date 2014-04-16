@@ -58,7 +58,7 @@ client_request_pwdgrp::pwd_serve ()
 		      (uint32_t) pwd->pw_gid,
 		      pwd->pw_gecos ?: "",
 		      pwd->pw_dir ?: "",
-		      pwd->pw_shell ?: ""));
+		      pwd->pw_shell ?: "") + 1);
   else
     {
       switch (_parameters.in.type)
@@ -109,7 +109,7 @@ client_request_pwdgrp::grp_serve ()
 		      "%s:%s:%u:",
 		      grp->gr_name ?: "",
 		      grp->gr_passwd ?: "",
-		      (uint32_t) grp->gr_gid));
+		      (uint32_t) grp->gr_gid) + 1);
   else
     {
       switch (_parameters.in.type)
