@@ -1,3 +1,7 @@
+2014-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver-config: Use numeric id 18 instead of "system" in chown.
+
 2014-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* process.cc (process::process): Only notice that signal_arrived is
