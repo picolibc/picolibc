@@ -848,11 +848,20 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	     Sidenote: The reasoning for dropping ToS in Win2K is that ToS
 	     per RFC 1349 is incompatible with DiffServ per RFC 2474/2475.
 
-	     We just ignore the return value of setting IP_TOS entirely. */
+	     We just ignore the return value of setting IP_TOS entirely.
+	     
+	     CV 2014-04-16: Same for IPV6_TCLASS
+	     FIXME:         Same for IPV6_RECVTCLASS? */
 	  if (level == IPPROTO_IP && optname == IP_TOS
 	      && WSAGetLastError () == WSAEINVAL)
 	    {
 	      debug_printf ("Faked IP_TOS success");
+	      res = 0;
+	    }
+	  else if (level == IPPROTO_IPV6 && optname == IPV6_TCLASS
+		   && WSAGetLastError () == WSAENOPROTOOPT)
+	    {
+	      debug_printf ("Faked IPV6_TCLASS success");
 	      res = 0;
 	    }
 	  else

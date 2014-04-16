@@ -1,3 +1,7 @@
+2014-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_setsockopt): Ignore IPV6_TCLASS the same way as IP_TOS.
+
 2014-04-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Fix gid evaluation
