@@ -1,4 +1,8 @@
-2014-04-17  Corinna Vinschen  <corinna@vinschen.de>
+2014-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winf.cc (linebuf::fromargv): Temporarily revert patch from 2014-01-24.
+
+2014-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.h (TP_NUM_C_BUFS): Raise to 50 to allow SYMLOOP_MAX recursions
 	path_conv <-> normalize_posix_path, plus a bit of buffer.
