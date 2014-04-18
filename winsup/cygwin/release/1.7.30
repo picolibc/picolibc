@@ -17,3 +17,5 @@ What changed:
 Bug Fixes
 ---------
 
+- Workaround a problem following native symlinks.
+  Fixes: http://cygwin.com/ml/cygwin/2014-04/msg00384.html

@@ -32,8 +32,8 @@ details. */
 
 #include "cygthread.h"
 
-#define TP_NUM_C_BUFS 10
-#define TP_NUM_W_BUFS 10
+#define TP_NUM_C_BUFS 50
+#define TP_NUM_W_BUFS 50
 
 #ifdef CYGTLS_HANDLE
 #include "thread.h"
@@ -290,8 +290,8 @@ class san
   san *_clemente;
   jmp_buf _context;
   int _errno;
-  int _c_cnt;
-  int _w_cnt;
+  unsigned _c_cnt;
+  unsigned _w_cnt;
 public:
   int setup (int myerrno = 0) __attribute__ ((always_inline))
   {

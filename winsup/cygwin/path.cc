@@ -311,9 +311,31 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
 		      	{
 			  *tail = 0;
 			  debug_printf ("checking %s before '..'", dst);
-			  path_conv head (dst);
+			  /* In conjunction with native and NFS symlinks,
+			     this call can result in a recursion which eats
+			     up our tmp_pathbuf buffers.  This in turn results
+			     in a api_fatal call.  To avoid that, we're
+			     checking our remaining buffers and return an
+			     error code instead.  Note that this only happens
+			     if the path contains 15 or more relative native/NFS
+			     symlinks with a ".." in the target path. */
+			  tmp_pathbuf tp;
+			  if (!tp.check_usage (4, 3))
+			    return ELOOP;
+			  path_conv head (dst, PC_SYM_FOLLOW | PC_POSIX);
 			  if (!head.isdir())
 			    return ENOENT;
+			  /* At this point, dst is a normalized path.  If the
+			     normalized path created by path_conv does not
+			     match the normalized path we're just testing, then
+			     the path in dst contains native symlinks.  If we
+			     just plunge along, removing the previous path
+			     component, we may end up removing a symlink from
+			     the path and the resulting path will be invalid.
+			     So we replace dst with what we found in head
+			     instead.  All the work replacing symlinks has been
+			     done in that path anyway, so why repeat it? */
+			  tail = stpcpy (dst, head.normalized_path);
 			}
 		      check_parent = false;
 		    }
