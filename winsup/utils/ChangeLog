@@ -1,3 +1,8 @@
+2014-04-21  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* minidumper.cc (minidump): Fix copy and paste error in checking
+	result of OpenProcess().
+
 2014-02-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (domlist_t): Drop id_offset.

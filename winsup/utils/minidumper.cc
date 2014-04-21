@@ -79,7 +79,7 @@ minidump(DWORD pid, MINIDUMP_TYPE dump_type, const char *minidump_file)
   process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_TERMINATE,
                         FALSE,
                         pid);
-  if (dump_file == INVALID_HANDLE_VALUE)
+  if (process == NULL)
     {
       fprintf (stderr, "error opening process\n");
       return;
