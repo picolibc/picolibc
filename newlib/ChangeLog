@@ -1,3 +1,17 @@
+2014-04-22  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/machine/arm/strcmp-arm-tiny.S: New file.
+	* libc/machine/arm/strcmp-armv4.S: New file.
+	* libc/machine/arm/strcmp-armv4t.S: New file.
+	* libc/machine/arm/strcmp-armv6.S: New file.
+	* libc/machine/arm/strcmp-armv7.S: New file.
+	* libc/machine/arm/strcmp-armv7m.S: New file.
+	* libc/machine/arm/strcmp.S: Replace with wrapper for various
+	implementations.
+	* libc/machine/arm/Makefile.am (strcmp.o, strcmp.obj): Add
+	dependencies.
+	* libc/machine/arm/Makefile.in: Regenerated.
+
 2014-04-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/sys/rtems/sys/cpuset.h (CPU_SET_S): Add const qualifier.

@@ -26,64 +26,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Wrapper for the various implementations of strcmp.  */
+	/* This version is only used when we want a very basic Thumb1
+	   implementation or for size, otherwise we use the base ARMv4
+	   version.  This is also suitable for ARMv6-M.  */
 
-#include "arm_asm.h"
-
-#ifdef __ARM_BIG_ENDIAN
-#define S2LO lsl
-#define S2LOEQ lsleq
-#define S2HI lsr
-#define MSB 0x000000ff
-#define LSB 0xff000000
-#define BYTE0_OFFSET 24
-#define BYTE1_OFFSET 16
-#define BYTE2_OFFSET 8
-#define BYTE3_OFFSET 0
-#else /* not  __ARM_BIG_ENDIAN */
-#define S2LO lsr
-#define S2LOEQ lsreq
-#define S2HI lsl
-#define BYTE0_OFFSET 0
-#define BYTE1_OFFSET 8
-#define BYTE2_OFFSET 16
-#define BYTE3_OFFSET 24
-#define MSB 0xff000000
-#define LSB 0x000000ff
-#endif /* not  __ARM_BIG_ENDIAN */
-
-	.macro def_fn f p2align=0
-	.text
-	.p2align \p2align
-	.global \f
-	.type \f, %function
-\f:
-	.endm
-
-#if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) \
-	|| (__ARM_ARCH == 6 && __ARM_ARCH_PROFILE == 'M')
-
-# if defined (__thumb__) && !defined (__thumb2__)
-/* Thumb1 only variant.  */
-#  include "strcmp-armv4t.S"
-# else
-#  include "strcmp-arm-tiny.S"
-# endif
-
-#elif __ARM_ARCH >= 7
-
-# ifdef __ARM_FEATURE_SIMD32
-#  include "strcmp-armv7.S"
-# else
-#  include "strcmp-armv7m.S"
-# endif
-
-#elif __ARM_ARCH >= 6
-
-# include "strcmp-armv6.S"
-
-#else
-
-# include "strcmp-armv4.S"
-
-#endif
+	.thumb
+	.syntax unified
+	.arch	armv4t
+	.eabi_attribute Tag_also_compatible_with, "\006\013" /* ARMv6-M.  */
+	.eabi_attribute Tag_ARM_ISA_use, 0
+def_fn strcmp
+	.cfi_startproc
+1:
+	ldrb	r2, [r0]
+	ldrb	r3, [r1]
+	cmp	r2, #0
+	beq	2f
+	adds	r0, r0, #1
+	adds	r1, r1, #1
+	cmp	r2, r3
+	beq	1b
+2:
+	subs	r0, r2, r3
+	bx	lr
+	.cfi_endproc
+	.size	strcmp, . - strcmp
