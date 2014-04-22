@@ -33,7 +33,6 @@ static PWCHAR rootdse_attr[] =
 
 static PWCHAR user_attr[] =
 {
-  (PWCHAR) L"uid",
   (PWCHAR) L"primaryGroupID",
   (PWCHAR) L"gecos",
   (PWCHAR) L"unixHomeDirectory",

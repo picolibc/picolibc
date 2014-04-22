@@ -1,3 +1,13 @@
+2014-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ldap.cc (user_attr): Remove "uid" attribute.
+	* ldap.h (LDAP_USER_NAME_ATTR): Remove.  Change other attribute index
+	values as required.
+	(cyg_ldap::get_user_name): Remove inline function.
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Remove code to handle
+	Cygwin username different from Windows username.
+	(pwdgrp::add_account_from_cygserver): Remove unnecessary cast.
+
 2014-04-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winf.cc (linebuf::fromargv): Temporarily revert patch from 2014-01-24.

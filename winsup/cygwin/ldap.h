@@ -17,12 +17,11 @@ details. */
 #include <ntldap.h>
 #pragma pop_macro ("DECLSPEC_IMPORT")
 
-#define LDAP_USER_NAME_ATTR		0
-#define LDAP_USER_PGRP_ATTR		1
-#define LDAP_USER_GECOS_ATTR		2
-#define LDAP_USER_HOME_ATTR		3
-#define LDAP_USER_SHELL_ATTR		4
-#define LDAP_USER_UID_ATTR		5
+#define LDAP_USER_PGRP_ATTR		0
+#define LDAP_USER_GECOS_ATTR		1
+#define LDAP_USER_HOME_ATTR		2
+#define LDAP_USER_SHELL_ATTR		3
+#define LDAP_USER_UID_ATTR		4
 
 #define LDAP_GROUP_NAME_ATTR		0
 #define LDAP_GROUP_GID_ATTR		1
@@ -58,7 +57,6 @@ public:
   uint32_t fetch_posix_offset_for_domain (PCWSTR domain);
   uid_t remap_uid (uid_t uid);
   gid_t remap_gid (gid_t gid);
-  PWCHAR get_user_name () { return get_string_attribute (LDAP_USER_NAME_ATTR); }
   /* User only */
   gid_t get_primary_gid () { return get_num_attribute (LDAP_USER_PGRP_ATTR); }
   PWCHAR get_gecos () { return get_string_attribute (LDAP_USER_GECOS_ATTR); }

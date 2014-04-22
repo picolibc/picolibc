@@ -1187,7 +1187,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   bool is_domain_account = true;
   PCWSTR domain = NULL;
   PWCHAR shell = NULL;
-  PWCHAR user = NULL;
   PWCHAR home = NULL;
   PWCHAR gecos = NULL;
   /* Temporary stuff. */
@@ -1504,10 +1503,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 
 		  if ((id_val = cldap->get_primary_gid ()) != ILLEGAL_GID)
 		    gid = posix_offset + id_val;
-		  if ((val = cldap->get_user_name ())
-		      && wcscmp (name, val))
-		    user = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
-				   * sizeof (WCHAR)), val);
 		  if ((val = cldap->get_gecos ()))
 		    gecos = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
 				    * sizeof (WCHAR)), val);
@@ -1544,7 +1539,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		PWCHAR *tgt;
 		bool group;
 	      } search[] = {
-		{ L"name=\"", 6, &user, true },
 		{ L"unix=\"", 6, &uxid, true },
 		{ L"home=\"", 6, &home, false },
 		{ L"shell=\"", 7, &shell, false },
@@ -1780,10 +1774,10 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   if (gid == ILLEGAL_GID)
     gid = uid;
   if (name_style >= fully_qualified)
-    p = wcpcpy (p, user ? is_group () ? L"Posix_Group" : L"Posix_User" : dom);
+    p = wcpcpy (p, dom);
   if (name_style >= plus_prepended)
     p = wcpcpy (p, cygheap->pg.nss_separator ());
-  wcpcpy (p, user ?: name);
+  wcpcpy (p, name);
 
   if (is_group ())
     __small_swprintf (linebuf, L"%W:%W:%u:",
@@ -1800,7 +1794,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		      gecos ?: L"", gecos ? L"," : L"",
 		      dom, name,
 		      sid.string (sidstr),
-		      home ? L"" : L"/home/", home ?: user ?: name,
+		      home ? L"" : L"/home/", home ?: name,
 		      shell ?: L"/bin/bash");
   sys_wcstombs_alloc (&line, HEAP_BUF, linebuf);
   debug_printf ("line: <%s>", line);
@@ -1860,7 +1854,7 @@ pwdgrp::add_account_from_cygserver (cygpsid &sid)
   arg.type = SID_arg;
   arg.sid = &sid;
   char *line = fetch_account_from_cygserver (arg);
-  return (struct passwd *) add_account_post_fetch (line, true);
+  return add_account_post_fetch (line, true);
 }
 
 void *
@@ -1870,7 +1864,7 @@ pwdgrp::add_account_from_cygserver (const char *name)
   arg.type = NAME_arg;
   arg.name = name;
   char *line = fetch_account_from_cygserver (arg);
-  return (struct passwd *) add_account_post_fetch (line, true);
+  return add_account_post_fetch (line, true);
 }
 
 void *
@@ -1880,5 +1874,5 @@ pwdgrp::add_account_from_cygserver (uint32_t id)
   arg.type = ID_arg;
   arg.id = id;
   char *line = fetch_account_from_cygserver (arg);
-  return (struct passwd *) add_account_post_fetch (line, true);
+  return add_account_post_fetch (line, true);
 }
