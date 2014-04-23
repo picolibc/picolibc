@@ -196,7 +196,7 @@ dummytest (volatile char *p)
 ssize_t
 check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
 {
-  if (iovcnt <= 0 || iovcnt > IOV_MAX)
+  if (iovcnt < 0 || iovcnt > IOV_MAX)
     {
       set_errno (EINVAL);
       return -1;
