@@ -1,7 +1,7 @@
 /* fhandler_socket.cc. See fhandler.h for a description of the fhandler classes.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013 Red Hat, Inc.
+   2011, 2012, 2013, 2014 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -17,6 +17,15 @@
 #define _BSDTYPES_DEFINED
 #include "winsup.h"
 #undef _BSDTYPES_DEFINED
+#ifdef __x86_64__
+/* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
+   because a redefinition for LP64 systems is missing.  This leads to a wrong
+   definition and size of sockaddr_in6 when building with winsock headers.
+   This definition is also required to use the right u_long type in subsequent
+   function calls. */
+#undef u_long
+#define u_long __ms_u_long
+#endif
 #include <ws2tcpip.h>
 #include <mswsock.h>
 #include <iphlpapi.h>
@@ -89,9 +98,20 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	}
       break;
     case AF_INET:
+      memcpy (out, in, inlen);
+      *outlen = inlen;
+      /* If the peer address given in connect or sendto is the ANY address,
+	 Winsock fails with WSAEADDRNOTAVAIL, while Linux converts that into
+	 a connection/send attempt to LOOPBACK.  We're doing the same here. */
+      if (((struct sockaddr_in *) out)->sin_addr.s_addr == htonl (INADDR_ANY))
+	((struct sockaddr_in *) out)->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+      return 0;
     case AF_INET6:
       memcpy (out, in, inlen);
       *outlen = inlen;
+      /* See comment in AF_INET case. */
+      if (IN6_IS_ADDR_UNSPECIFIED (&((struct sockaddr_in6 *) out)->sin6_addr))
+	((struct sockaddr_in6 *) out)->sin6_addr = in6addr_loopback;
       return 0;
     default:
       set_errno (EAFNOSUPPORT);
@@ -614,6 +634,17 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	  if ((wsa_err = wsock_events->connect_errorcode) != 0)
 	    {
 	      WSASetLastError (wsa_err);
+	      /* CV 2014-04-23: This is really weird.  If you call connect
+		 asynchronously on a socket and then select, an error like
+		 "Connection refused" is set in the event and in the SO_ERROR
+		 socket option.  If you call connect, then dup, then select,
+		 the error is set in the event, but not in the SO_ERROR socket
+		 option, even if the dup'ed socket handle refers to the same
+		 socket.  We're trying to workaround this problem here by
+		 taking the connect errorcode from the event and write it back
+		 into the SO_ERROR socket option. */
+	      setsockopt (get_socket (), SOL_SOCKET, SO_ERROR,
+			  (const char *) &wsa_err, sizeof wsa_err);
 	      ret = SOCKET_ERROR;
 	    }
 	  else
@@ -2073,16 +2104,6 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	WSAEventSelect (get_socket (), wsock_evt, EVENT_MASK);
       break;
     case FIONREAD:
-#ifdef __x86_64__
-/* FIXME: This looks broken in the Mingw64 headers.  If I make sure
-to use the Windows u_long definition, I'd expect that it's defined
-as a 4 byte type on LP64 as well.  But that's not the case right now.
-The *additional* type __ms_u_long is available on LP64, and that's
-used in subsequent function declarations, but that's not available
-on 32 bit or LLP64.  The LP64-ness shouldn't require to use another
-type name in the application code. */
-#define u_long __ms_u_long
-#endif
       res = ioctlsocket (get_socket (), FIONREAD, (u_long *) p);
       if (res == SOCKET_ERROR)
 	set_winsock_errno ();

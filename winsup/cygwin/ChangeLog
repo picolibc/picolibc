@@ -1,3 +1,15 @@
+2014-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc: On x86_64, define u_long as __ms_u_long before
+	including the windows headers.  Explain why.
+	(get_inet_addr): Convert ANY address to LOOPBACK address.  Explain why.
+	(fhandler_socket::evaluate_events): Forcibly set SO_ERROR socket option
+	in case a connection attempt failed.  Explain why.
+	(fhandler_socket::ioctl): Drop x86_64 re-definition of u_long here.
+	* fhandler_procnet.cc: On x86_64, define u_long as __ms_u_long before
+	including the windows headers.  Explain why.
+	* net.cc: Ditto.
+
 2014-04-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (check_iovec): Allow 0 as valid iovcnt value.

@@ -13,6 +13,10 @@ What changed:
   it returns WSAENOPROTOOPT.  Cygwin now ignores this error condition and
   returns a fake success to the application, just as with IP_TOS for years.
 
+- Connect and sendto to the AF_INET and AF_INET6 ANY address is converted to
+  the LOOPBACK address, as on Linux.
+  Addresses: http://cygwin.com/ml/cygwin/2014-04/msg00510.html
+
 
 Bug Fixes
 ---------
@@ -22,3 +26,11 @@ Bug Fixes
 
 - Fix calls to readv/writev/recvmsg/sendmsg with 0 iovlen.
   Fixes: http://cygwin.com/ml/cygwin/2014-04/msg00509.html
+
+- Workaround a problem with Mingw64 Winsock headers which lead to an incorrect
+  definition of struct sockaddr_in6, and which in turn broke /proc/net/if_inet6.
+
+- Workaround a Winsock bug which neglects to set the SO_ERROR socket option
+  when calling select on a dup'ed socket after an asynchronous connection
+  attempt.
+  Fixes: http://cygwin.com/ml/cygwin/2014-04/msg00510.html
