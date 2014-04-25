@@ -1,3 +1,8 @@
+2014-04-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (NT_TRANSACTIONAL_ERROR): Cover all status codes up to
+	STATUS_TRANSACTION_NOT_ENLISTED.
+
 2014-04-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc: On x86_64, define u_long as __ms_u_long before

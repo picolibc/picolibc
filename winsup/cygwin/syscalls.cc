@@ -187,7 +187,7 @@ dup3 (int oldfd, int newfd, int flags)
 /* Define macro to simplify checking for a transactional error code. */
 #define NT_TRANSACTIONAL_ERROR(s)	\
 		(((ULONG)(s) >= (ULONG)STATUS_TRANSACTIONAL_CONFLICT) \
-		 && ((ULONG)(s) <= (ULONG)STATUS_LOG_GROWTH_FAILED))
+		 && ((ULONG)(s) <= (ULONG)STATUS_TRANSACTION_NOT_ENLISTED))
 
 static inline void
 start_transaction (HANDLE &old_trans, HANDLE &trans)
