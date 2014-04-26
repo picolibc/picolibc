@@ -1,3 +1,12 @@
+2014-04-26  cgf-000026
+
+Forgot to clear to the end of screen when restoring a screen buffer.
+That worked, for some reason, with Take Command but not with normal
+consoles.  I don't remember why I didn't resize the screen like a Linux
+X terminal emulator but that might have made things work a little
+better.  Right now, there is a scroll bar for apps like less or vi and
+that doesn't feel right.
+
 2014-03-29  cgf-000025
 
 Reorganized _cygtls::signal_debugger to avoid sending anything to the

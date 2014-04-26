@@ -1466,6 +1466,7 @@ dev_console::save_restore (HANDLE h, char c)
       save_buf = (PCHAR_INFO) cmalloc_abort (HEAP_1_BUF, screen_size);
 
       save_cursor = b.dwCursorPosition;	/* Remember where we were. */
+      save_top = b.srWindow.Top;
 
       SMALL_RECT now = {};		/* Read the whole buffer */
       now.Bottom = save_bufsize.Y - 1;
@@ -1489,6 +1490,7 @@ dev_console::save_restore (HANDLE h, char c)
       now.Bottom = save_bufsize.Y - 1;
       now.Right = save_bufsize.X - 1;
       /* Restore whole buffer */
+      clear_screen (h, 0, 0, b.dwSize.X - 1, b.dwSize.Y - 1);
       BOOL res = WriteConsoleOutputW (h, save_buf, save_bufsize, cob, &now);
       if (!res)
 	debug_printf ("WriteConsoleOutputW failed, %E");
@@ -1496,9 +1498,14 @@ dev_console::save_restore (HANDLE h, char c)
       cfree (save_buf);
       save_buf = NULL;
 
+      cob.X = 0;
+      cob.Y = save_top;
+      /* Temporarily position at top of screen */
+      if (!SetConsoleCursorPosition (h, cob))
+	debug_printf ("SetConsoleCursorInfo(%p, cob) failed during restore, %E", h);
       /* Position where we were previously */
       if (!SetConsoleCursorPosition (h, save_cursor))
-	debug_printf ("SetConsoleCursorInfo(%p, ...) failed during restore, %E", h);
+	debug_printf ("SetConsoleCursorInfo(%p, save_cursor) failed during restore, %E", h);
       /* Get back correct version of buffer information */
       dwEnd.X = dwEnd.Y = 0;
       fillin (h);

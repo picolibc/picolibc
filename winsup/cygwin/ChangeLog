@@ -1,3 +1,12 @@
+2014-04-26  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* DevNotes: Add entry cgf-000026.
+	* fhandler.h (fhandler_console::save_top): Save top of screen
+	coordinates.
+	* fhandler_console.cc (dev::save_restore): Record top of screen
+	coordinates.  Clear entire buffer when restoring saved buffer and try
+	to position the cursor on the save relative place on the screen.
+
 2014-04-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (NT_TRANSACTIONAL_ERROR): Cover all status codes up to
