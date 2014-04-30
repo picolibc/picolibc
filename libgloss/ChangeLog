@@ -1,3 +1,9 @@
+2014-04-30  Nick Clifton  <nickc@redhat.com>
+
+	* msp430/Makefile.in (NOSYS_OBJS): Add unlink.o.
+	(SCRIPTS): Remove msp430F5438A-s.ld and msp430F5438A-s.ld.
+	* unlink.c: New file.
+
 2014-04-04  Ashish Kapania  <akapania@ti.com>
 
 	* arm/configure.in: (*-*-tirtos*) Accept TIRTOS target when setting
