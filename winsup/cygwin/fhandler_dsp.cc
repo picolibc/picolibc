@@ -1303,7 +1303,7 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
       CASE (SNDCTL_DSP_STEREO)
       {
 	int nChannels = *intbuf + 1;
-	int res = ioctl (SNDCTL_DSP_CHANNELS, &nChannels);
+	int res = _ioctl (SNDCTL_DSP_CHANNELS, &nChannels);
 	*intbuf = nChannels - 1;
 	return res;
       }

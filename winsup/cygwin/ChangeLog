@@ -1,3 +1,7 @@
+2014-05-02  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler_dsp.cc (ioctl): Use _ioctl for recursive call.
+
 2014-04-26  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* DevNotes: Add entry cgf-000026.
