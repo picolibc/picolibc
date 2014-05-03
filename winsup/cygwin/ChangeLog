@@ -1,3 +1,7 @@
+2014-05-03  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* spawn.cc (av::setup): Eat trailing whitespace on #! script.
+
 2014-05-02  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* fhandler_dsp.cc (ioctl): Use _ioctl for recursive call.
