@@ -1,3 +1,8 @@
+2014-05-05  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/stdio.h: Declare various C99 printf/scanf functions for
+	C++11, too.
+
 2014-04-22  Richard Earnshaw  <rearnsha@arm.com>
 
 	* libc/machine/arm/strcmp-arm-tiny.S: New file.
