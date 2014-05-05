@@ -1,3 +1,22 @@
+2014-06-27  Ludovic Courtès  <ludo@gnu.org>
+
+	PR external/16327
+	PR external/16328
+	* Makefile.in (MAKEINFO, TEXI2DVI, TEXI2PDF, TEXI2HTML, DVIPS)
+	(TEXIDIR, INFOFILES, DVIFILES, PDFFILES, HTMLFILES): Remove.
+	(all): Remove dependency on 'info'.
+	(install): Remove dependency on 'install-info'.
+	(standards.info, standards.html, standards.dvi, standards.ps)
+	(standards.pdf, configure.info, configure.dvi, configure.ps)
+	(configure.pdf, configure.pdf): Remove.
+	(info, install-info, html, install-html, dvi, pdf, install-pdf)
+	clean, maintainer-clean, realclean): Remove body.
+	* etc/configbuild.ein, etc/configbuild.fig, etc/configbuild.jin,
+	etc/configbuild.tin, etc/configdev.ein, etc/configdev.fig,
+	etc/configdev.jin, etc/configdev.tin, etc/configure.texi,
+	etc/fdl.texi, etc/gnu-oids.texi, etc/make-stds.texi,
+	etc/standards.texi: Remove.
+
 2010-11-20  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	* Makefile.in (install-strip): New target.
