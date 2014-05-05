@@ -1,3 +1,8 @@
+2014-05-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_getsockopt): Rearrange code slightly and handle
+	TCP_NODELAY just like SO_KEEPALIVE and SO_DONTROUTE.
+
 2014-05-03  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* spawn.cc (av::setup): Eat trailing whitespace on #! script.

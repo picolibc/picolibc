@@ -34,3 +34,8 @@ Bug Fixes
   when calling select on a dup'ed socket after an asynchronous connection
   attempt.
   Fixes: http://cygwin.com/ml/cygwin/2014-04/msg00510.html
+
+- Workaround the problem that getsockopt(IPPROTO_TCP,TCP_NODELAY) returns
+  the option value as a 1 byte value, while BSD and Linux expect a 4 byte
+  value.
+  Fixes: http://cygwin.com/ml/cygwin/2014-04/msg00624.html

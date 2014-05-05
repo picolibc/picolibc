@@ -923,32 +923,27 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 			(int *) optlen);
       if (res == SOCKET_ERROR)
 	set_winsock_errno ();
-      else if (level == SOL_SOCKET)
+      else if (level == SOL_SOCKET && optname == SO_ERROR)
 	{
-	  switch (optname)
+	  int *e = (int *) optval;
+	  debug_printf ("WinSock SO_ERROR = %d", *e);
+	  *e = find_winsock_errno (*e);
+	}
+      else if (*optlen == 1)
+      	{
+	  /* Regression in Vista and later:  instead of a 4 byte BOOL value,
+	     a 1 byte BOOLEAN value is returned, in contrast to older systems
+	     and the documentation.  Since an int type is expected by the
+	     calling application, we convert the result here.  For some reason
+	     only three BSD-compatible socket options seem to be affected. */
+	  if ((level == SOL_SOCKET
+	       && (optname == SO_KEEPALIVE || optname == SO_DONTROUTE))
+	      || (level == IPPROTO_TCP && optname == TCP_NODELAY))
 	    {
-	    case SO_ERROR:
-	      {
-		int *e = (int *) optval;
-		debug_printf ("WinSock SO_ERROR = %d", *e);
-		*e = find_winsock_errno (*e);
-	      }
-	      break;
-	    case SO_KEEPALIVE:
-	    case SO_DONTROUTE:
-	      /* Regression in Vista and later:  instead of a 4 byte BOOL
-		 value, a 1 byte BOOLEAN value is returned, in contrast
-		 to older systems and the documentation.  Since an int
-		 type is expected by the calling application, we convert
-		 the result here. */
-	      if (*optlen == 1)
-		{
-		  BOOLEAN *in = (BOOLEAN *) optval;
-		  int *out = (int *) optval;
-		  *out = *in;
-		  *optlen = 4;
-		}
-	      break;
+	      BOOLEAN *in = (BOOLEAN *) optval;
+	      int *out = (int *) optval;
+	      *out = *in;
+	      *optlen = 4;
 	    }
 	}
     }
