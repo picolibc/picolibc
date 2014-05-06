@@ -1,6 +1,6 @@
 /* winlean.h - Standard "lean" windows include
 
-   Copyright 2010, 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -58,11 +58,6 @@ details. */
 #include <lmcons.h>
 #include <ntdef.h>
 
-/* Temporary kludge for missing flag in Mingw64's w32api. */
-#ifndef PIPE_REJECT_REMOTE_CLIENTS
-#define PIPE_REJECT_REMOTE_CLIENTS 8
-#endif
-
 #ifdef __undef_IN
 #undef IN
 #endif
@@ -78,6 +73,13 @@ details. */
 #ifdef __undef_CRITICAL
 #undef CRITICAL
 #endif
+
+/* So-called "Microsoft Account" SIDs have a netbios domain name
+   "MicrosoftAccounts".  The problem is, while DNLEN is 15, that domain
+   name is 16 chars :-P  So we override DNLEN here to be 16, so that calls
+   to LookupAccountSid/Name don't fail if the buffer is based on DNLEN. */
+#undef DNLEN
+#define DNLEN 16
 
 /* When Terminal Services are installed, the GetWindowsDirectory function
    does not return the system installation dir, but a user specific directory

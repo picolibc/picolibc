@@ -1384,8 +1384,13 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   if (ret)
     {
       /* Builtin account?  SYSTEM, for instance, is returned as SidTypeUser,
-	 if a process is running as LocalSystem service. */
-      if (acc_type == SidTypeUser && sid_sub_auth_count (sid) <= 3)
+	 if a process is running as LocalSystem service.
+	 Microsoft Account?  These show up in the user's group list, using the
+	 undocumented security authority 11.  Even though this is officially a
+	 user account, it only matters as part of the group list, so we convert
+	 it to a well-known group here. */
+      if (acc_type == SidTypeUser
+	  && (sid_sub_auth_count (sid) <= 3 || sid_id_auth (sid) == 11))
 	acc_type = SidTypeWellKnownGroup;
       switch (acc_type)
       	{
@@ -1409,7 +1414,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	      is_domain_account = false;
 	    }
 	  /* Account domain account? */
-	  else if (!wcscmp (dom, cygheap->dom.account_flat_name ()))
+	  else if (!wcscasecmp (dom, cygheap->dom.account_flat_name ()))
 	    {
 	      posix_offset = 0x30000;
 	      if (cygheap->dom.member_machine ()
@@ -1422,7 +1427,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  else if (cygheap->dom.member_machine ())
 	    {
 	      /* Primary domain account? */
-	      if (!wcscmp (dom, cygheap->dom.primary_flat_name ()))
+	      if (!wcscasecmp (dom, cygheap->dom.primary_flat_name ()))
 		{
 		  posix_offset = 0x100000;
 		  /* In theory domain should have been set to
@@ -1447,7 +1452,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  for (ULONG idx = 0;
 		       (td = cygheap->dom.trusted_domain (idx));
 		       ++idx)
-		    if (!wcscmp (dom, td->NetbiosDomainName))
+		    if (!wcscasecmp (dom, td->NetbiosDomainName))
 		      {
 			domain = td->DnsDomainName;
 			posix_offset =
@@ -1636,8 +1641,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	    }
 	  break;
 	case SidTypeWellKnownGroup:
-	  name_style = (cygheap->pg.nss_prefix_always ()) ? fully_qualified
-							  : plus_prepended;
+	  name_style = (cygheap->pg.nss_prefix_always ()
+			|| sid_id_auth (sid) == 11) /* Microsoft Account */
+		       ? fully_qualified : plus_prepended;
 #ifdef INTERIX_COMPATIBLE
 	  if (sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
 	      && sid_sub_auth_count (sid) > 1)

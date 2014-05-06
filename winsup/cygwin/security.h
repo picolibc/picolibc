@@ -44,8 +44,10 @@ void uinfo_init ();
 #define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(gid_t)(g16))
 #endif
 
-
-#define MAX_SID_LEN 40
+#define MAX_SUBAUTH_CNT 11
+#define MAX_SID_LEN (2 * sizeof (BYTE) \
+		     + sizeof (SID_IDENTIFIER_AUTHORITY) \
+		     + MAX_SUBAUTH_CNT * sizeof (DWORD))
 #define MAX_DACL_LEN(n) (sizeof (ACL) \
 		   + (n) * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + MAX_SID_LEN))
 #define SD_MIN_SIZE (sizeof (SECURITY_DESCRIPTOR) + MAX_DACL_LEN (1))
@@ -99,7 +101,7 @@ typedef struct {
   BYTE  Revision;
   BYTE  SubAuthorityCount;
   SID_IDENTIFIER_AUTHORITY IdentifierAuthority;
-  DWORD SubAuthority[8];
+  DWORD SubAuthority[MAX_SUBAUTH_CNT];
 } DBGSID, *PDBGSID;
 
 /* Macro to define variable length SID structures */

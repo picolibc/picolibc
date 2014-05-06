@@ -1,3 +1,21 @@
+2014-05-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (internal_getgroups): Drop unused cygsid variable.
+	* sec_helper.cc (cygpsid::pstring): Use sid_sub_auth_count macro.
+	(cygsid::get_sid): Use MAX_SUBAUTH_CNT rather than wrong constant 8.
+	Don't call memcpy to copy subauthorities into SID, use assignment.
+	(cygsid::getfromstr): Use MAX_SUBAUTH_CNT rather than wrong constant 8.
+	* security.h (MAX_SUBAUTH_CNT): New definition.  Set to 11 to cover
+	Microsoft Accounts.
+	(MAX_SID_LEN): Define in terms of SID member sizes and MAX_SUBAUTH_CNT.
+	(DBGSID): Use MAX_SUBAUTH_CNT to define size of SubAuthority array.
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Handle Micosoft
+	Accounts.  Handle them as well known group.  Compare domain names
+	case-insensitive.
+	* winlean.h (PIPE_REJECT_REMOTE_CLIENTS): Drop temporary definition
+	since Mingw64 catched up.
+	(DNLEN): Redefine as 16.  Explain why.
+
 2014-05-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_getsockopt): Rearrange code slightly and handle

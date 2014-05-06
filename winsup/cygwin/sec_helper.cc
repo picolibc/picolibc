@@ -198,7 +198,7 @@ cygpsid::pstring (char *nsidstr) const
   strcpy (nsidstr, "S-1-");
   t = nsidstr + sizeof ("S-1-") - 1;
   t += __small_sprintf (t, "%u", sid_id_auth (psid));
-  for (i = 0; i < *RtlSubAuthorityCountSid (psid); ++i)
+  for (i = 0; i < sid_sub_auth_count (psid); ++i)
     t += __small_sprintf (t, "-%lu", sid_sub_auth (psid, i));
   return t;
 }
@@ -218,7 +218,7 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
   SID_IDENTIFIER_AUTHORITY sid_auth = { SECURITY_NULL_SID_AUTHORITY };
 # define SECURITY_NT_AUTH 5
 
-  if (s > 255 || cnt < 1 || cnt > 8)
+  if (s > 255 || cnt < 1 || cnt > MAX_SUBAUTH_CNT)
     {
       psid = NO_SID;
       return NULL;
@@ -226,8 +226,9 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
   sid_auth.Value[5] = s;
   set ();
   RtlInitializeSid (psid, &sid_auth, cnt);
+  PDBGSID dsid = (PDBGSID) psid;
   for (i = 0; i < cnt; ++i)
-    memcpy ((char *) psid + 8 + sizeof (DWORD) * i, &r[i], sizeof (DWORD));
+    dsid->SubAuthority[i] = r[i];
   /* If the well_known flag isn't set explicitely, we check the SID
      for being a well-known SID ourselves. That's necessary because this
      cygsid is created from a SID string, usually from /etc/passwd or
@@ -247,12 +248,12 @@ cygsid::getfromstr (PCWSTR nsidstr, bool well_known)
 {
   PWCHAR lasts;
   DWORD s, cnt = 0;
-  DWORD r[8];
+  DWORD r[MAX_SUBAUTH_CNT];
 
   if (nsidstr && !wcsncmp (nsidstr, L"S-1-", 4))
     {
       s = wcstoul (nsidstr + 4, &lasts, 10);
-      while (cnt < 8 && *lasts == '-')
+      while (cnt < MAX_SUBAUTH_CNT && *lasts == '-')
 	r[cnt++] = wcstoul (lasts + 1, &lasts, 10);
       if (!*lasts)
 	return get_sid (s, cnt, r, well_known);
@@ -265,12 +266,12 @@ cygsid::getfromstr (const char *nsidstr, bool well_known)
 {
   char *lasts;
   DWORD s, cnt = 0;
-  DWORD r[8];
+  DWORD r[MAX_SUBAUTH_CNT];
 
   if (nsidstr && !strncmp (nsidstr, "S-1-", 4))
     {
       s = strtoul (nsidstr + 4, &lasts, 10);
-      while (cnt < 8 && *lasts == '-')
+      while (cnt < MAX_SUBAUTH_CNT && *lasts == '-')
 	r[cnt++] = strtoul (lasts + 1, &lasts, 10);
       if (!*lasts)
 	return get_sid (s, cnt, r, well_known);

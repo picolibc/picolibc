@@ -512,8 +512,6 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
       status = NtQueryInformationToken (tok, TokenGroups, groups, size, &size);
       if (NT_SUCCESS (status))
 	{
-	  cygsid sid;
-
 	  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 	    {
 	      cygpsid sid = groups->Groups[pg].Sid;
