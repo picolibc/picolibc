@@ -1171,7 +1171,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   cygsid csid;
   DWORD nlen = UNLEN + 1;
   DWORD dlen = DNLEN + 1;
-  DWORD slen = MAX_SID_LEN;
+  DWORD slen = SECURITY_MAX_SID_SIZE;
   cygpsid sid (NO_SID);
   SID_NAME_USE acc_type;
   BOOL ret = false;

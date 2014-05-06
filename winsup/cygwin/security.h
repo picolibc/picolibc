@@ -44,12 +44,9 @@ void uinfo_init ();
 #define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(gid_t)(g16))
 #endif
 
-#define MAX_SUBAUTH_CNT 11
-#define MAX_SID_LEN (2 * sizeof (BYTE) \
-		     + sizeof (SID_IDENTIFIER_AUTHORITY) \
-		     + MAX_SUBAUTH_CNT * sizeof (DWORD))
 #define MAX_DACL_LEN(n) (sizeof (ACL) \
-		   + (n) * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) + MAX_SID_LEN))
+		   + (n) * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD) \
+			    + SECURITY_MAX_SID_SIZE))
 #define SD_MIN_SIZE (sizeof (SECURITY_DESCRIPTOR) + MAX_DACL_LEN (1))
 #define ACL_MAXIMUM_SIZE 65532	/* Yeah, right.  64K - sizeof (DWORD). */
 #define SD_MAXIMUM_SIZE 65536
@@ -101,7 +98,7 @@ typedef struct {
   BYTE  Revision;
   BYTE  SubAuthorityCount;
   SID_IDENTIFIER_AUTHORITY IdentifierAuthority;
-  DWORD SubAuthority[MAX_SUBAUTH_CNT];
+  DWORD SubAuthority[SID_MAX_SUB_AUTHORITIES];
 } DBGSID, *PDBGSID;
 
 /* Macro to define variable length SID structures */
@@ -179,7 +176,7 @@ public:
 };
 
 class cygsid : public cygpsid {
-  char sbuf[MAX_SID_LEN];
+  char sbuf[SECURITY_MAX_SID_SIZE];
   bool well_known_sid;
 
   const PSID getfromstr (PCWSTR nsidstr, bool well_known);
@@ -193,7 +190,7 @@ class cygsid : public cygpsid {
       else
 	{
 	  psid = (PSID) sbuf;
-	  RtlCopySid (MAX_SID_LEN, psid, nsid);
+	  RtlCopySid (SECURITY_MAX_SID_SIZE, psid, nsid);
 	  well_known_sid = well_known;
 	}
       return psid;

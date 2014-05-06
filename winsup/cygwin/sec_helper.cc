@@ -218,7 +218,7 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
   SID_IDENTIFIER_AUTHORITY sid_auth = { SECURITY_NULL_SID_AUTHORITY };
 # define SECURITY_NT_AUTH 5
 
-  if (s > 255 || cnt < 1 || cnt > MAX_SUBAUTH_CNT)
+  if (s > 255 || cnt < 1 || cnt > SID_MAX_SUB_AUTHORITIES)
     {
       psid = NO_SID;
       return NULL;
@@ -226,7 +226,7 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
   sid_auth.Value[5] = s;
   set ();
   RtlInitializeSid (psid, &sid_auth, cnt);
-  PDBGSID dsid = (PDBGSID) psid;
+  PISID dsid = (PISID) psid;
   for (i = 0; i < cnt; ++i)
     dsid->SubAuthority[i] = r[i];
   /* If the well_known flag isn't set explicitely, we check the SID
@@ -248,12 +248,12 @@ cygsid::getfromstr (PCWSTR nsidstr, bool well_known)
 {
   PWCHAR lasts;
   DWORD s, cnt = 0;
-  DWORD r[MAX_SUBAUTH_CNT];
+  DWORD r[SID_MAX_SUB_AUTHORITIES];
 
   if (nsidstr && !wcsncmp (nsidstr, L"S-1-", 4))
     {
       s = wcstoul (nsidstr + 4, &lasts, 10);
-      while (cnt < MAX_SUBAUTH_CNT && *lasts == '-')
+      while (cnt < SID_MAX_SUB_AUTHORITIES && *lasts == '-')
 	r[cnt++] = wcstoul (lasts + 1, &lasts, 10);
       if (!*lasts)
 	return get_sid (s, cnt, r, well_known);
@@ -266,12 +266,12 @@ cygsid::getfromstr (const char *nsidstr, bool well_known)
 {
   char *lasts;
   DWORD s, cnt = 0;
-  DWORD r[MAX_SUBAUTH_CNT];
+  DWORD r[SID_MAX_SUB_AUTHORITIES];
 
   if (nsidstr && !strncmp (nsidstr, "S-1-", 4))
     {
       s = strtoul (nsidstr + 4, &lasts, 10);
-      while (cnt < MAX_SUBAUTH_CNT && *lasts == '-')
+      while (cnt < SID_MAX_SUB_AUTHORITIES && *lasts == '-')
 	r[cnt++] = strtoul (lasts + 1, &lasts, 10);
       if (!*lasts)
 	return get_sid (s, cnt, r, well_known);

@@ -396,7 +396,7 @@ gr_ent::enumerate_local ()
       while (cnt < max)
 	{
 	  cygsid sid;
-	  DWORD slen = MAX_SID_LEN;
+	  DWORD slen = SECURITY_MAX_SID_SIZE;
 	  WCHAR dom[DNLEN + 1];
 	  DWORD dlen = DNLEN + 1;
 	  SID_NAME_USE acc_type;

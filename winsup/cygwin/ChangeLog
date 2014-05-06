@@ -1,5 +1,11 @@
 2014-05-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.h (MAX_SUBAUTH_CNT): Drop.  Use SID_MAX_SUB_AUTHORITIES
+	instead throughout.
+	(MAX_SID_LEN): Drop.  Use SECURITY_MAX_SID_SIZE instead throughout.
+
+2014-05-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (internal_getgroups): Drop unused cygsid variable.
 	* sec_helper.cc (cygpsid::pstring): Use sid_sub_auth_count macro.
 	(cygsid::get_sid): Use MAX_SUBAUTH_CNT rather than wrong constant 8.
