@@ -1271,6 +1271,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	 by mkpasswd/mkgroup. */
       if (arg.id < 0x200)
 	__small_swprintf (sidstr, L"S-1-5-%u", arg.id & 0x1ff);
+      else if (arg.id == 0x3e8) /* Special case "Other Organization" */
+	wcpcpy (sidstr, L"S-1-5-1000");
       else if (arg.id <= 0x7ff)
 	__small_swprintf (sidstr, L"S-1-5-32-%u", arg.id & 0x7ff);
       else
@@ -1659,7 +1661,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  if (sid_id_auth (sid) != 5 /* SECURITY_NT_AUTHORITY */)
 	    uid = 0x10000 + 0x100 * sid_id_auth (sid)
 		  + (sid_sub_auth_rid (sid) & 0xff);
-	  else if (sid_sub_auth (sid, 0) < SECURITY_PACKAGE_BASE_RID)
+	  else if (sid_sub_auth (sid, 0) < SECURITY_PACKAGE_BASE_RID
+		   || sid_sub_auth (sid, 0) > SECURITY_MAX_BASE_RID)
 	    uid = sid_sub_auth_rid (sid) & 0x7ff;
 	  else
 	    {

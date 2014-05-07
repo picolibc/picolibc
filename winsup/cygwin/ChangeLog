@@ -1,5 +1,10 @@
 2014-05-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Tweak SID<->uid
+	conversion to cover S-1-5-113, S-1-5-114, and S-1-5-1000 groups.
+
+2014-05-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (pwdgrp::parse_group): Set grp.len.  Drop generating any
 	gr_mem entries.
 	(getgrgid_r): Don't try to copy gr_mem entries.  Always set gr_mem
