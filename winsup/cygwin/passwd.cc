@@ -41,7 +41,9 @@ pwdgrp::parse_passwd ()
   res.p.pw_dir =  next_str (':');
   res.p.pw_shell = next_str (':');
   res.sid.getfrompw (&res.p);
-  res.len = lptr - res.p.pw_name;
+  /* lptr points to the \0 after pw_shell.  Increment by one to get the correct
+     required buffer len in getpw_cp. */
+  res.len = lptr - res.p.pw_name + 1;
   return true;
 }
 

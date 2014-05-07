@@ -135,7 +135,7 @@ internal_getlogin (cygheap_user &user)
       user.set_name (pwd->pw_name);
       myself->uid = pwd->pw_uid;
       myself->gid = pwd->pw_gid;
-      /* Is the primary group in the passwd DB is different from the primary
+      /* If the primary group in the passwd DB is different from the primary
 	 group in the user token, we have to find the SID of that group and
 	 try to override the token primary group. */
       if (!pgrp || myself->gid != pgrp->gr_gid)
