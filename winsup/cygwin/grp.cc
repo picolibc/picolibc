@@ -38,23 +38,14 @@ pwdgrp::parse_group ()
   if (!*grp.g.gr_name)
     return false;
   grp.g.gr_passwd = next_str (':');
+  /* Note that lptr points to the first byte of the gr_gid field.
+     We deliberately ignore the gr_gid and gr_mem entries when copying
+     the buffer content since they are not referenced anymore. */
+  grp.len = lptr - grp.g.gr_name;
   if (!next_num (grp.g.gr_gid))
     return false;
-  int n;
-  char *dp = raw_ptr ();
-  for (n = 0; *next_str (','); n++)
-    continue;
+  /* Don't generate gr_mem entries. */
   grp.g.gr_mem = &null_ptr;
-  if (n)
-    {
-      char **namearray = (char **) ccalloc (HEAP_BUF, n + 1, sizeof (char *));
-      if (namearray)
-	{
-	  for (int i = 0; i < n; i++, dp = strchr (dp, '\0') + 1)
-	    namearray[i] = dp;
-	  grp.g.gr_mem = namearray;
-	}
-    }
   grp.sid.getfromgr (&grp.g);
   return true;
 }
@@ -228,32 +219,60 @@ getgrgid_r (gid_t gid, struct group *grp, char *buffer, size_t bufsize,
   if (!tempgr)
     return 0;
 
-  /* check needed buffer size. */
-  int i;
+  /* Check needed buffer size.  Deliberately ignore gr_mem. */
   size_t needsize = strlen (tempgr->gr_name) + strlen (tempgr->gr_passwd)
 		    + 2 + sizeof (char *);
-  for (i = 0; tempgr->gr_mem[i]; ++i)
-    needsize += strlen (tempgr->gr_mem[i]) + 1 + sizeof (char *);
   if (needsize > bufsize)
     return ERANGE;
 
-  /* make a copy of tempgr */
+  /* Make a copy of tempgr.  Deliberately ignore gr_mem. */
   *result = grp;
   grp->gr_gid = tempgr->gr_gid;
   buffer = stpcpy (grp->gr_name = buffer, tempgr->gr_name);
   buffer = stpcpy (grp->gr_passwd = buffer + 1, tempgr->gr_passwd);
   grp->gr_mem = (char **) (buffer + 1);
-  buffer = (char *) grp->gr_mem + (i + 1) * sizeof (char *);
-  for (i = 0; tempgr->gr_mem[i]; ++i)
-    buffer = stpcpy (grp->gr_mem[i] = buffer, tempgr->gr_mem[i]) + 1;
-  grp->gr_mem[i] = NULL;
+  grp->gr_mem[0] = NULL;
   return 0;
+}
+
+/* getgrgid/getgrnam are not reentrant. */
+static struct {
+  struct group g;
+  char *buf;
+  size_t bufsiz;
+} app_gr;
+
+static struct group *
+getgr_cp (struct group *tempgr)
+{
+  if (!tempgr)
+    return NULL;
+  pg_grp *gr = (pg_grp *) tempgr;
+  if (app_gr.bufsiz < gr->len)
+    {
+      char *newbuf = (char *) realloc (app_gr.buf, gr->len);
+      if (!newbuf)
+        {
+          set_errno (ENOMEM);
+          return NULL;
+        }
+      app_gr.buf = newbuf;
+      app_gr.bufsiz = gr->len;
+    }
+  memcpy (app_gr.buf, gr->g.gr_name, gr->len);
+  memcpy (&app_gr.g, &gr->g, sizeof gr->g);
+  ptrdiff_t diff = app_gr.buf - gr->g.gr_name;
+  app_gr.g.gr_name += diff;
+  app_gr.g.gr_passwd += diff;
+  return &app_gr.g;
 }
 
 extern "C" struct group *
 getgrgid32 (gid_t gid)
 {
-  return internal_getgrgid (gid);
+  struct group *tempgr = internal_getgrgid (gid);
+  pthread_testcancel ();
+  return getgr_cp (tempgr);
 }
 
 #ifdef __x86_64__
@@ -282,32 +301,28 @@ getgrnam_r (const char *nam, struct group *grp, char *buffer,
   if (!tempgr)
     return 0;
 
-  /* check needed buffer size. */
-  int i;
+  /* Check needed buffer size.  Deliberately ignore gr_mem. */
   size_t needsize = strlen (tempgr->gr_name) + strlen (tempgr->gr_passwd)
 		    + 2 + sizeof (char *);
-  for (i = 0; tempgr->gr_mem[i]; ++i)
-    needsize += strlen (tempgr->gr_mem[i]) + 1 + sizeof (char *);
   if (needsize > bufsize)
     return ERANGE;
 
-  /* make a copy of tempgr */
+  /* Make a copy of tempgr.  Deliberately ignore gr_mem. */
   *result = grp;
   grp->gr_gid = tempgr->gr_gid;
   buffer = stpcpy (grp->gr_name = buffer, tempgr->gr_name);
   buffer = stpcpy (grp->gr_passwd = buffer + 1, tempgr->gr_passwd);
   grp->gr_mem = (char **) (buffer + 1);
-  buffer = (char *) grp->gr_mem + (i + 1) * sizeof (char *);
-  for (i = 0; tempgr->gr_mem[i]; ++i)
-    buffer = stpcpy (grp->gr_mem[i] = buffer, tempgr->gr_mem[i]) + 1;
-  grp->gr_mem[i] = NULL;
+  grp->gr_mem[0] = NULL;
   return 0;
 }
 
 extern "C" struct group *
 getgrnam32 (const char *name)
 {
-  return internal_getgrnam (name);
+  struct group *tempgr = internal_getgrnam (name);
+  pthread_testcancel ();
+  return getgr_cp (tempgr);
 }
 
 #ifdef __x86_64__

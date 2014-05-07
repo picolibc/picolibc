@@ -59,12 +59,14 @@ struct pg_pwd
 {
   struct passwd p;
   cygsid sid;
+  size_t len;
 };
 
 struct pg_grp
 {
   struct group g;
   cygsid sid;
+  size_t len;
 };
 
 class pwdgrp

@@ -1,3 +1,24 @@
+2014-05-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (pwdgrp::parse_group): Set grp.len.  Drop generating any
+	gr_mem entries.
+	(getgrgid_r): Don't try to copy gr_mem entries.  Always set gr_mem
+	to an empty list.
+	(getgrnam_r): Ditto.
+	(app_gr): New static struct to store group data propagated to the
+	calling application via getgrgid/getgrnam.
+	(getgr_cp): Fill app_gr and return pointer to app_gr.g.
+	(getgrgid32): Call getgr_cp.
+	(getgrnam32): Ditto.
+	* passwd.cc (pwdgrp::parse_passwd): Set res.len.
+	(app_pw): New static struct to store passwd data propagated to the
+	calling application via getpwuid/getpwnam.
+	(getpw_cp): Fill app_pw and return pointer to app_pw.p.
+	(getpwuid32): Cal getpw_cp.
+	(getpwnam): Ditto.
+	* pwdgrp.h (struct pg_pwd): Add len member.
+	(struct pg_grp): Ditto.
+
 2014-05-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.h (MAX_SUBAUTH_CNT): Drop.  Use SID_MAX_SUB_AUTHORITIES

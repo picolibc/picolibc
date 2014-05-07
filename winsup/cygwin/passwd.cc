@@ -41,6 +41,7 @@ pwdgrp::parse_passwd ()
   res.p.pw_dir =  next_str (':');
   res.p.pw_shell = next_str (':');
   res.sid.getfrompw (&res.p);
+  res.len = lptr - res.p.pw_name;
   return true;
 }
 
@@ -180,12 +181,47 @@ internal_getpwuid (uid_t uid, cyg_ldap *pldap)
   return NULL;
 }
 
+/* getpwuid/getpwnam are not reentrant. */
+static struct {
+  struct passwd p;
+  char *buf;
+  size_t bufsiz;
+} app_pw;
+
+static struct passwd *
+getpw_cp (struct passwd *temppw)
+{
+  if (!temppw)
+    return NULL;
+  pg_pwd *pw = (pg_pwd *) temppw;
+  if (app_pw.bufsiz < pw->len)
+    {
+      char *newbuf = (char *) realloc (app_pw.buf, pw->len);
+      if (!newbuf)
+	{
+	  set_errno (ENOMEM);
+	  return NULL;
+	}
+      app_pw.buf = newbuf;
+      app_pw.bufsiz = pw->len;
+    }
+  memcpy (app_pw.buf, pw->p.pw_name, pw->len);
+  memcpy (&app_pw.p, &pw->p, sizeof pw->p);
+  ptrdiff_t diff = app_pw.buf - pw->p.pw_name;
+  app_pw.p.pw_name += diff;
+  app_pw.p.pw_passwd += diff;
+  app_pw.p.pw_gecos += diff;
+  app_pw.p.pw_dir += diff;
+  app_pw.p.pw_shell += diff;
+  return &app_pw.p;
+}
+
 extern "C" struct passwd *
 getpwuid32 (uid_t uid)
 {
   struct passwd *temppw = internal_getpwuid (uid);
   pthread_testcancel ();
-  return temppw;
+  return getpw_cp (temppw);
 }
 
 #ifdef __x86_64__
@@ -246,7 +282,7 @@ getpwnam (const char *name)
 {
   struct passwd *temppw = internal_getpwnam (name);
   pthread_testcancel ();
-  return temppw;
+  return getpw_cp (temppw);
 }
 
 
