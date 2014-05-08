@@ -364,7 +364,7 @@ gr_ent::enumerate_caches ()
 	    return &grf.group ()[cnt++].g;
 	}
       cnt = 0;
-      max = 1;
+      max = 2;
       /*FALLTHRU*/
     case 2:
       if (from_db)

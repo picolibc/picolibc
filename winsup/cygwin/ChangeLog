@@ -1,3 +1,8 @@
+2014-05-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (gr_ent::enumerate_caches): Fix copy/paste bug introducing
+	an endless loop.
+
 2014-05-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* passwd.cc (pwdgrp::parse_passwd): Fix an off by one computing the
