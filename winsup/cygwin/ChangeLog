@@ -1,5 +1,14 @@
 2014-05-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (cygheap_user::init): Fix formatting in debug output.
+	(struct cyg_USER_INFO_24): Define temporarily.  Explain why.
+	(pwdgrp::fetch_account_from_windows): Handle sane primary group
+	setting for Microsoft Accounts.  Explain why.
+	* wincap.h (wincaps::has_microsoft_accounts): New element.
+	* wincap.cc: Implement above element throughout.
+
+2014-05-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (gr_ent::enumerate_caches): Fix copy/paste bug introducing
 	an endless loop.
 

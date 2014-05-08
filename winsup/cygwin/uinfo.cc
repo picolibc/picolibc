@@ -85,7 +85,7 @@ cygheap_user::init ()
   status = NtSetInformationToken (hProcToken, TokenOwner, &effec_cygsid,
 				  sizeof (cygsid));
   if (!NT_SUCCESS (status))
-    debug_printf ("NtSetInformationToken(TokenOwner), %y", status);
+    debug_printf ("NtSetInformationToken (TokenOwner), %y", status);
 
   /* Standard way to build a security descriptor with the usual DACL */
   PSECURITY_ATTRIBUTES sa_buf = (PSECURITY_ATTRIBUTES) alloca (1024);
@@ -1162,6 +1162,19 @@ fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, cyg_ldap *cldap)
   return td->PosixOffset;
 }
 
+/* CV 2014-05-08: USER_INFO_24 is not yet defined in Mingw64, but will be in
+   the next release.  For the time being, define the structure here with
+   another name which won't collide with the upcoming correct definition
+   in lmaccess.h. */
+struct cyg_USER_INFO_24
+{
+  BOOL   usri24_internet_identity;
+  DWORD  usri24_flags;
+  LPWSTR usri24_internet_provider_name;
+  LPWSTR usri24_internet_principal_name;
+  PSID   usri24_user_sid;
+};
+
 char *
 pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 {
@@ -1564,6 +1577,25 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		    }
 		  /* Set comment variable for below attribute loop. */
 		  comment = ui->usri4_comment;
+		  /* Logging in with a Microsoft Account, the user's primary
+		     group SID is the user's SID.  Security sensitive tools
+		     expecting tight file permissions choke on that.  We need
+		     an explicit primary group which is not identical to the
+		     user account.  Unfortunately, while the default primary
+		     group of the account in SAM is still "None", "None" is not
+		     in the user token group list.  So, what we do here is to
+		     use "Users" as a sane default primary group instead. */
+		  if (wincap.has_microsoft_accounts ())
+		    {
+		      struct cyg_USER_INFO_24 *ui24;
+		      nas = NetUserGetInfo (NULL, name, 24, (PBYTE *) &ui24);
+		      if (nas == NERR_Success)
+			{
+			  if (ui24->usri24_internet_identity)
+			    gid = DOMAIN_ALIAS_RID_USERS;
+			  NetApiBufferFree (ui24);
+			}
+		    }
 		}
 	      else /* acc_type == SidTypeAlias */
 		{

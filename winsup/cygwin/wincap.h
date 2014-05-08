@@ -1,7 +1,7 @@
 /* wincap.h: Header for OS capability class.
 
    Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-   2012, 2013 Red Hat, Inc.
+   2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -39,6 +39,7 @@ struct wincaps
   unsigned has_pipe_reject_remote_clients		: 1;
   unsigned terminate_thread_frees_stack			: 1;
   unsigned has_precise_system_time			: 1;
+  unsigned has_microsoft_accounts			: 1;
 };
 
 class wincapc
@@ -89,6 +90,7 @@ public:
   bool	IMPLEMENT (has_pipe_reject_remote_clients)
   bool	IMPLEMENT (terminate_thread_frees_stack)
   bool	IMPLEMENT (has_precise_system_time)
+  bool	IMPLEMENT (has_microsoft_accounts)
 
 #undef IMPLEMENT
 };
