@@ -162,6 +162,9 @@ typedef _fpos64_t fpos64_t;
 
 FILE *	_EXFUN(tmpfile, (void));
 char *	_EXFUN(tmpnam, (char *));
+#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
+char *	_EXFUN(tempnam, (const char *, const char *));
+#endif
 int	_EXFUN(fclose, (FILE *));
 int	_EXFUN(fflush, (FILE *));
 FILE *	_EXFUN(freopen, (const char *__restrict, const char *__restrict, FILE *__restrict));
@@ -265,7 +268,6 @@ int	_EXFUN(snprintf, (char *__restrict, size_t, const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(sniprintf, (char *, size_t, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
-char *	_EXFUN(tempnam, (const char *, const char *));
 int	_EXFUN(vasiprintf, (char **, const char *, __VALIST)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
 char *	_EXFUN(vasniprintf, (char *, size_t *, const char *, __VALIST)

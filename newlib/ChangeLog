@@ -1,5 +1,10 @@
 2014-05-09  Corinna Vinschen  <vinschen@redhat.com>
 
+	* libc/include/stdio.h (tempnam): Declare as __BSD_VISIBLE or
+	__XSI_VISIBLE or if __POSIX_VISIBLE >= 200112.
+
+2014-05-09  Corinna Vinschen  <vinschen@redhat.com>
+
 	* libc/include/stdio.h (fcloseall): Declare as __GNU_VISIBLE only.
 	(renameat): Drop explicit __CYGWIN__ dependency.
 
