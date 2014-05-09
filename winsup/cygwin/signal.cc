@@ -183,7 +183,7 @@ sigprocmask (int how, const sigset_t *set, sigset_t *oldset)
       set_errno (res);
       res = -1;
     }
-  syscall_printf ("%R = sigprocmask (%d, %p, %p)", res, set, oldset);
+  syscall_printf ("%R = sigprocmask (%d, %p, %p)", res, how, set, oldset);
   return res;
 }
 

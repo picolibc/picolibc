@@ -1,3 +1,10 @@
+2014-05-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* signal.cc (sigprocmask): Fix strace output to include "how".
+
+	* fhandler_console.cc (dev_console::save_restore): Only current dwEnd
+	line rather than the one after that.
+
 2014-05-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (cygheap_user::init): Fix formatting in debug output.

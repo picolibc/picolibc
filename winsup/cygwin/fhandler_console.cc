@@ -84,6 +84,7 @@ fhandler_console::open_shared_console (HWND hw, HANDLE& h, bool& create)
   create = m != SH_JUSTOPEN;
   return res;
 }
+
 class console_unit
 {
   int n;
@@ -1457,7 +1458,7 @@ dev_console::save_restore (HANDLE h, char c)
     {
       fillin (h);
       save_bufsize.X = b.dwSize.X;
-      if ((save_bufsize.Y = dwEnd.Y + 2) > b.dwSize.Y)
+      if ((save_bufsize.Y = dwEnd.Y + 1) > b.dwSize.Y)
 	save_bufsize.X = b.dwSize.Y;
 
       if (save_buf)
@@ -1500,6 +1501,7 @@ dev_console::save_restore (HANDLE h, char c)
 
       cob.X = 0;
       cob.Y = save_top;
+      /* CGF: NOOP?  Doesn't seem to position screen as expected */
       /* Temporarily position at top of screen */
       if (!SetConsoleCursorPosition (h, cob))
 	debug_printf ("SetConsoleCursorInfo(%p, cob) failed during restore, %E", h);
@@ -1677,23 +1679,23 @@ fhandler_console::char_command (char c)
       if (con.saw_space)
 	{
 	    CONSOLE_CURSOR_INFO console_cursor_info;
-	    GetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
+	    GetConsoleCursorInfo (get_output_handle (), &console_cursor_info);
 	    switch (con.args[0])
 	      {
 		case 0: /* blinking block */
 		case 1: /* blinking block (default) */
 		case 2: /* steady block */
 		  console_cursor_info.dwSize = 100;
-		  SetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
+		  SetConsoleCursorInfo (get_output_handle (), &console_cursor_info);
 		  break;
 		case 3: /* blinking underline */
 		case 4: /* steady underline */
 		  console_cursor_info.dwSize = 10;	/* or Windows default 25? */
-		  SetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
+		  SetConsoleCursorInfo (get_output_handle (), &console_cursor_info);
 		  break;
 		default: /* use value as percentage */
 		  console_cursor_info.dwSize = con.args[0];
-		  SetConsoleCursorInfo (get_output_handle (), & console_cursor_info);
+		  SetConsoleCursorInfo (get_output_handle (), &console_cursor_info);
 		  break;
 	      }
 	}
