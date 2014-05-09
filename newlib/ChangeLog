@@ -1,3 +1,8 @@
+2014-05-09  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/stdio.h (fcloseall): Declare as __GNU_VISIBLE only.
+	(renameat): Drop explicit __CYGWIN__ dependency.
+
 2014-05-05  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/stdio.h: Declare various C99 printf/scanf functions for
