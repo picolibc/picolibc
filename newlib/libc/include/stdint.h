@@ -423,11 +423,26 @@ typedef __uintptr_t uintptr_t;
 #endif
 #define PTRDIFF_MIN (-PTRDIFF_MAX - 1)
 
-#ifdef __WCHAR_MAX__
-#define WCHAR_MAX __WCHAR_MAX__
-#endif
+/* This must match definition in <wchar.h> */
+#ifndef WCHAR_MIN
 #ifdef __WCHAR_MIN__
 #define WCHAR_MIN __WCHAR_MIN__
+#elif defined(__WCHAR_UNSIGNED__) || (L'\0' - 1 > 0)
+#define WCHAR_MIN (0 + L'\0')
+#else
+#define WCHAR_MIN (-0x7fffffff - 1 + L'\0')
+#endif
+#endif
+
+/* This must match definition in <wchar.h> */
+#ifndef WCHAR_MAX
+#ifdef __WCHAR_MAX__
+#define WCHAR_MAX __WCHAR_MAX__
+#elif defined(__WCHAR_UNSIGNED__) || (L'\0' - 1 > 0)
+#define WCHAR_MAX (0xffffffffu + L'\0')
+#else
+#define WCHAR_MAX (0x7fffffff + L'\0')
+#endif
 #endif
 
 /* wint_t is unsigned int on almost all GCC targets.  */
