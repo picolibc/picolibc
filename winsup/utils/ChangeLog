@@ -1,5 +1,10 @@
 2014-04-21  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
+	* Makefile.in (minidumper.exe): Link directly with dbghelp.
+	* minidumper.cc (minidump): Ditto.
+
+2014-04-21  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
 	* minidumper.cc (minidump): Fix copy and paste error in checking
 	result of OpenProcess().
 

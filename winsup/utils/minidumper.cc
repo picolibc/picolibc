@@ -26,42 +26,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <dbghelp.h>
 
 BOOL verbose = FALSE;
 BOOL nokill = FALSE;
-
-typedef DWORD MINIDUMP_TYPE;
-
-typedef BOOL (WINAPI *MiniDumpWriteDump_type)(
-                                              HANDLE hProcess,
-                                              DWORD dwPid,
-                                              HANDLE hFile,
-                                              MINIDUMP_TYPE DumpType,
-                                              CONST void *ExceptionParam,
-                                              CONST void *UserStreamParam,
-                                              CONST void *allbackParam);
 
 static void
 minidump(DWORD pid, MINIDUMP_TYPE dump_type, const char *minidump_file)
 {
   HANDLE dump_file;
   HANDLE process;
-  MiniDumpWriteDump_type MiniDumpWriteDump_fp;
-  HMODULE module;
-
-  module = LoadLibrary("dbghelp.dll");
-  if (!module)
-    {
-      fprintf (stderr, "error loading DbgHelp\n");
-      return;
-    }
-
-  MiniDumpWriteDump_fp = (MiniDumpWriteDump_type)GetProcAddress(module, "MiniDumpWriteDump");
-  if (!MiniDumpWriteDump_fp)
-    {
-      fprintf (stderr, "error getting the address of MiniDumpWriteDump\n");
-      return;
-    }
 
   dump_file = CreateFile(minidump_file,
                          GENERIC_READ | GENERIC_WRITE,
@@ -85,13 +59,13 @@ minidump(DWORD pid, MINIDUMP_TYPE dump_type, const char *minidump_file)
       return;
     }
 
-  BOOL success = (*MiniDumpWriteDump_fp)(process,
-                                         pid,
-                                         dump_file,
-                                         dump_type,
-                                         NULL,
-                                         NULL,
-                                         NULL);
+  BOOL success = MiniDumpWriteDump(process,
+                                   pid,
+                                   dump_file,
+                                   dump_type,
+                                   NULL,
+                                   NULL,
+                                   NULL);
   if (success)
     {
       if (verbose)
@@ -112,7 +86,6 @@ minidump(DWORD pid, MINIDUMP_TYPE dump_type, const char *minidump_file)
 
   CloseHandle(process);
   CloseHandle(dump_file);
-  FreeLibrary(module);
 }
 
 static void
@@ -164,7 +137,7 @@ main (int argc, char **argv)
   int opt;
   const char *p = "";
   DWORD pid;
-  MINIDUMP_TYPE dump_type = 0; // MINIDUMP_NORMAL
+  MINIDUMP_TYPE dump_type = MiniDumpNormal;
 
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL) ) != EOF)
     switch (opt)
@@ -172,7 +145,7 @@ main (int argc, char **argv)
       case 't':
         {
           char *endptr;
-          dump_type = strtoul(optarg, &endptr, 0);
+          dump_type = (MINIDUMP_TYPE)strtoul(optarg, &endptr, 0);
           if (*endptr != '\0')
             {
               fprintf (stderr, "syntax error in minidump type \"%s\" near character #%d.\n", optarg, (int) (endptr - optarg));
