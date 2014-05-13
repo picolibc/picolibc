@@ -1825,7 +1825,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		      posix_name, sid.string (sidstr), uid);
   /* For non-users, create a passwd entry which doesn't allow interactive
      logon.  Unless it's the SYSTEM account.  This conveniently allows to
-     long interactively as SYSTEM for debugging purposes. */
+     logon interactively as SYSTEM for debugging purposes. */
   else if (acc_type != SidTypeUser && sid != well_known_system_sid)
     __small_swprintf (linebuf, L"%W:*:%u:%u:,%W:/:/sbin/nologin",
 		      posix_name, uid, gid, sid.string (sidstr));

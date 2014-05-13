@@ -1,3 +1,9 @@
+2014-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::ioctl): Handle the different
+	ideas of u_long between Winsock and Cygwin applications on x86_64.
+	Add long comment.
+
 2014-05-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* signal.cc (sigprocmask): Fix strace output to include "how".
