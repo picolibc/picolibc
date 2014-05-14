@@ -379,7 +379,9 @@
 #ifdef __RL78__
 #define __IEEE_LITTLE_ENDIAN
 #define __SMALL_BITFIELDS	/* 16 Bit INT */
+#ifndef __RL78_64BIT_DOUBLES__
 #define _DOUBLE_IS_32BITS
+#endif
 #endif
 
 #ifdef __RX__

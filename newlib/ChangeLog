@@ -1,3 +1,8 @@
+2014-05-14  Kaushik Phatak  <Kaushik.Phatak@kpit.com>
+
+	* libc/include/machine/ieeefp.h: Define _DOUBLE_IS_32BITS when double
+	options is not __RL78_64BIT_DOUBLES__.
+
 2014-05-12  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/stdint.h (WCHAR_MIN): Copy definition from wchar.h.
