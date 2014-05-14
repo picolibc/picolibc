@@ -1189,7 +1189,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   SID_NAME_USE acc_type;
   BOOL ret = false;
   /* Cygwin user name style. */
-  enum {
+  enum name_style_t {
     name_only,
     plus_prepended,
     fully_qualified
@@ -1251,19 +1251,24 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	 standalone machine, or the username must be from the primary domain.
 	 In the latter case, prepend the primary domain name so as not to
 	 collide with an account from the account domain with the same name. */
+      name_style_t nstyle;
+
+      nstyle = name_only;
       p = name;
       if (*arg.name == cygheap->pg.nss_separator ()[0])
-	++arg.name;
-      else if (!strchr (arg.name, cygheap->pg.nss_separator ()[0])
-	       && cygheap->dom.member_machine ())
+	nstyle = plus_prepended;
+      else if (strchr (arg.name, cygheap->pg.nss_separator ()[0]))
+	nstyle = fully_qualified;
+      else if (cygheap->dom.member_machine ())
 	p = wcpcpy (wcpcpy (p, cygheap->dom.primary_flat_name ()),
 		    cygheap->pg.nss_separator ());
       /* Now fill up with name to search. */
-      sys_mbstowcs (p, UNLEN + 1, arg.name);
+      sys_mbstowcs (p, UNLEN + 1,
+		    arg.name + (nstyle == plus_prepended ? 1 : 0));
       /* Replace domain separator char with backslash and make sure p is NULL
 	 or points to the backslash, so... */
       if ((p = wcschr (name, cygheap->pg.nss_separator ()[0])))
-      	*p = L'\\';
+	*p = L'\\';
       sid = csid;
       ret = LookupAccountNameW (NULL, name, sid, &slen, dom, &dlen, &acc_type);
       if (!ret)
@@ -1274,6 +1279,77 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       /* ... we can skip the backslash in the rest of this function. */
       if (p)
 	name = p + 1;
+      /* Last but not least, some validity checks on the name style. */
+      switch (nstyle)
+	{
+	case name_only:
+	  /* name_only account must start with S-1-5-21 */
+	  if (sid_id_auth (sid) != 5 /* SECURITY_NT_AUTHORITY */
+	      || sid_sub_auth (sid, 0) != SECURITY_NT_NON_UNIQUE)
+	    {
+	      debug_printf ("Invalid account name <%s> (name only/"
+			    "not NON_UNIQUE)", arg.name);
+	      return NULL;
+	    }
+	  /* name_only only if db_prefix is auto. */
+	  if (!cygheap->pg.nss_prefix_auto ())
+	    {
+	      debug_printf ("Invalid account name <%s> (name only/"
+			    "db_prefix not auto)", arg.name);
+	      return NULL;
+	    }
+	  break;
+	case plus_prepended:
+	  /* plus_prepended account must not start with S-1-5-21. */
+	  if (sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
+	      && sid_sub_auth (sid, 0) == SECURITY_NT_NON_UNIQUE)
+	    {
+	      debug_printf ("Invalid account name <%s> (plus prependend/"
+			    "NON_UNIQUE)", arg.name);
+	      return NULL;
+	    }
+	  /* plus_prepended only if db_prefix is not always. */
+	  if (cygheap->pg.nss_prefix_always ())
+	    {
+	      debug_printf ("Invalid account name <%s> (plus prependend/"
+			    "db_prefix not always)", arg.name);
+	      return NULL;
+	    }
+	  break;
+	case fully_qualified:
+	  /* All is well if db_prefix is always. */
+	  if (cygheap->pg.nss_prefix_always ())
+	    break;
+	  /* Otherwise, no fully_qualified for builtin accounts. */
+	  if (sid_id_auth (sid) != 5 /* SECURITY_NT_AUTHORITY */
+	      || sid_sub_auth (sid, 0) != SECURITY_NT_NON_UNIQUE)
+	    {
+	      debug_printf ("Invalid account name <%s> (fully qualified/"
+			    "not NON_UNIQUE)", arg.name);
+	      return NULL;
+	    }
+	  /* All is well if db_prefix is primary. */
+	  if (cygheap->pg.nss_prefix_primary ())
+	    break;
+	  /* Domain member and domain == primary domain? */
+	  if (cygheap->dom.member_machine ())
+	    {
+	      if (!wcscasecmp (dom, cygheap->dom.primary_flat_name ()))
+		{
+		  debug_printf ("Invalid account name <%s> (fully qualified/"
+				"primary domain account)", arg.name);
+		  return NULL;
+		}
+	    }
+	  /* Not domain member and domain == account domain? */
+	  else if (!wcscasecmp (dom, cygheap->dom.account_flat_name ()))
+	    {
+	      debug_printf ("Invalid account name <%s> (fully qualified/"
+			    "local account)", arg.name);
+	      return NULL;
+	    }
+	  break;
+	}
       break;
     case ID_arg:
       /* Construct SID from ID using the SFU rules, just like the code below
