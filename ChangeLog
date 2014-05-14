@@ -1,3 +1,8 @@
+2014-05-14  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* configure.ac (target_makefile_frag): Set for nios2-*-elf*.
+	* configure: Regenerated.
+
 2014-04-04  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.NEWLIB: Add to current TI license to

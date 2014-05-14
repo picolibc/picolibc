@@ -1,3 +1,7 @@
+2014-05-14  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* mt-nios2-elf: New file.
+
 2013-09-29  Iain Sandoe  <iain@codesourcery.com>
 
 	* mh-darwin (BOOT_CFLAGS): Only add -mdynamic-no-pic for m32 hosts.
