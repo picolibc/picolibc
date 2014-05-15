@@ -1,3 +1,7 @@
+2014-05-15  Daniel Cederman  <cederman@gaisler.com>
+
+	* libc/machine/sparc/setjmp.S (longjmp): Use register g1 instead of g6.
+
 2014-05-14  Kaushik Phatak  <Kaushik.Phatak@kpit.com>
 
 	* libc/include/machine/ieeefp.h: Define _DOUBLE_IS_32BITS when double

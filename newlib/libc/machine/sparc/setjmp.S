@@ -124,9 +124,9 @@ ENTRY(_setjmp)
 ENTRY(longjmp)
 ENTRY(_longjmp)
         ta      0x03            /* flush registers */
-        addcc   %o1, %g0, %g6   ! compute v ? v : 1 in a global register
+        addcc   %o1, %g0, %g1   ! compute v ? v : 1 in a global register
         be,a    0f
-        mov     1, %g6
+        mov     1, %g1
 0:
         ld      [%o0], %sp      /* caller's stack pointer */
 
@@ -143,6 +143,6 @@ ENTRY(_longjmp)
         ld      [%o0+8], %fp    /* caller's frame pointer */
         ld      [%o0+12], %o7 
 
-        jmp     %o7 + 8         ! success, return %g6
-        mov     %g6, %o0
+        jmp     %o7 + 8         ! success, return %g1
+        mov     %g1, %o0
 
