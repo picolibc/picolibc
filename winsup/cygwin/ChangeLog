@@ -1,5 +1,9 @@
 2014-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump to 273.
+
+2014-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* external.cc (cygwin_internal): Implement CW_CYGNAME_FROM_WINNAME.
 	Add lengthy comment to explain what we do and why.
 	* include/sys/cygwin.h (cygwin_getinfo_types): Add
