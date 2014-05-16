@@ -650,9 +650,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  if (!winname || !buffer || !buflen)
 	    break;
 
-	  PWCHAR name;
-	  if (!sys_mbstowcs_alloc (&name, HEAP_BUF, winname))
-	    break;
+	  WCHAR name[UNLEN + 1];
+	  sys_mbstowcs (name, sizeof name, winname);
 
 	  cygsid sid;
 	  DWORD slen = SECURITY_MAX_SID_SIZE;

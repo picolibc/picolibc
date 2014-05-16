@@ -1,5 +1,10 @@
 2014-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* external.cc (cygwin_internal): Use local name buffer instead of
+	allocated one in CW_CYGNAME_FROM_WINNAME.
+
+2014-05-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump to 273.
 
 2014-05-15  Corinna Vinschen  <corinna@vinschen.de>
