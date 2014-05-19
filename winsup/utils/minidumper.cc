@@ -26,42 +26,64 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <dbghelp.h>
+
+DEFINE_ENUM_FLAG_OPERATORS(MINIDUMP_TYPE);
 
 BOOL verbose = FALSE;
 BOOL nokill = FALSE;
 
-typedef DWORD MINIDUMP_TYPE;
+/* Not yet in dbghelp.h */
+#define MiniDumpWithModuleHeaders (static_cast<MINIDUMP_TYPE>(0x00080000))
+#define MiniDumpFilterTriage      (static_cast<MINIDUMP_TYPE>(0x00100000))
 
-typedef BOOL (WINAPI *MiniDumpWriteDump_type)(
-                                              HANDLE hProcess,
-                                              DWORD dwPid,
-                                              HANDLE hFile,
-                                              MINIDUMP_TYPE DumpType,
-                                              CONST void *ExceptionParam,
-                                              CONST void *UserStreamParam,
-                                              CONST void *allbackParam);
+static MINIDUMP_TYPE
+filter_minidump_type(MINIDUMP_TYPE dump_type)
+{
+  API_VERSION build_version = { 6, 0, API_VERSION_NUMBER, 0 };
+  API_VERSION *v = ImagehlpApiVersionEx(&build_version);
+
+  if (verbose)
+    printf ("dbghelp version %d.%d.%d.%d\n", v->MajorVersion,
+            v->MinorVersion, v->Revision, v->Reserved);
+
+  MINIDUMP_TYPE supported_types = MiniDumpNormal | MiniDumpWithDataSegs
+    | MiniDumpWithFullMemory | MiniDumpWithHandleData | MiniDumpFilterMemory
+    | MiniDumpScanMemory;
+
+  /*
+    This mainly trial and error and guesswork, as the MSDN documentation only
+    says what version of "Debugging Tools for Windows" added these flags, but
+    doesn't actually tell us the dbghelp.dll version which was contained in that
+    (and seems to have errors as well)
+  */
+
+  if (v->MajorVersion >= 5)
+    supported_types |= MiniDumpWithUnloadedModules
+      | MiniDumpWithIndirectlyReferencedMemory | MiniDumpFilterModulePaths
+      | MiniDumpWithProcessThreadData | MiniDumpWithPrivateReadWriteMemory;
+
+  if (v->MajorVersion >= 6)
+    supported_types |= MiniDumpWithoutOptionalData | MiniDumpWithFullMemoryInfo
+      | MiniDumpWithThreadInfo | MiniDumpWithCodeSegs
+      | MiniDumpWithoutAuxiliaryState | MiniDumpWithFullAuxiliaryState // seems to be documentation error that these two aren't listed as 'Not supported prior to 6.1'
+      | MiniDumpWithPrivateWriteCopyMemory | MiniDumpIgnoreInaccessibleMemory
+      | MiniDumpWithTokenInformation;
+
+  if ((v->MajorVersion*10 + v->MinorVersion) >= 62)
+    supported_types |= MiniDumpWithModuleHeaders | MiniDumpFilterTriage; // seems to be documentation error that these two are listed as 'Not supported prior to 6.1'
+
+  if (verbose)
+    printf ("supported MINIDUMP_TYPE flags 0x%x\n", supported_types);
+
+  return (dump_type & supported_types);
+}
 
 static void
 minidump(DWORD pid, MINIDUMP_TYPE dump_type, const char *minidump_file)
 {
   HANDLE dump_file;
   HANDLE process;
-  MiniDumpWriteDump_type MiniDumpWriteDump_fp;
-  HMODULE module;
-
-  module = LoadLibrary("dbghelp.dll");
-  if (!module)
-    {
-      fprintf (stderr, "error loading DbgHelp\n");
-      return;
-    }
-
-  MiniDumpWriteDump_fp = (MiniDumpWriteDump_type)GetProcAddress(module, "MiniDumpWriteDump");
-  if (!MiniDumpWriteDump_fp)
-    {
-      fprintf (stderr, "error getting the address of MiniDumpWriteDump\n");
-      return;
-    }
 
   dump_file = CreateFile(minidump_file,
                          GENERIC_READ | GENERIC_WRITE,
@@ -79,19 +101,19 @@ minidump(DWORD pid, MINIDUMP_TYPE dump_type, const char *minidump_file)
   process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_TERMINATE,
                         FALSE,
                         pid);
-  if (dump_file == INVALID_HANDLE_VALUE)
+  if (process == NULL)
     {
       fprintf (stderr, "error opening process\n");
       return;
     }
 
-  BOOL success = (*MiniDumpWriteDump_fp)(process,
-                                         pid,
-                                         dump_file,
-                                         dump_type,
-                                         NULL,
-                                         NULL,
-                                         NULL);
+  BOOL success = MiniDumpWriteDump(process,
+                                   pid,
+                                   dump_file,
+                                   dump_type,
+                                   NULL,
+                                   NULL,
+                                   NULL);
   if (success)
     {
       if (verbose)
@@ -112,7 +134,6 @@ minidump(DWORD pid, MINIDUMP_TYPE dump_type, const char *minidump_file)
 
   CloseHandle(process);
   CloseHandle(dump_file);
-  FreeLibrary(module);
 }
 
 static void
@@ -164,7 +185,8 @@ main (int argc, char **argv)
   int opt;
   const char *p = "";
   DWORD pid;
-  MINIDUMP_TYPE dump_type = 0; // MINIDUMP_NORMAL
+  BOOL default_dump_type = TRUE;
+  MINIDUMP_TYPE dump_type = MiniDumpNormal;
 
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL) ) != EOF)
     switch (opt)
@@ -172,7 +194,8 @@ main (int argc, char **argv)
       case 't':
         {
           char *endptr;
-          dump_type = strtoul(optarg, &endptr, 0);
+          default_dump_type = FALSE;
+          dump_type = (MINIDUMP_TYPE)strtoul(optarg, &endptr, 0);
           if (*endptr != '\0')
             {
               fprintf (stderr, "syntax error in minidump type \"%s\" near character #%d.\n", optarg, (int) (endptr - optarg));
@@ -227,6 +250,21 @@ main (int argc, char **argv)
       return -1;
     }
   sprintf (minidump_file, "%s.dmp", p);
+
+  if (default_dump_type)
+    {
+      dump_type = MiniDumpWithHandleData | MiniDumpWithFullMemoryInfo
+        | MiniDumpWithThreadInfo | MiniDumpWithFullAuxiliaryState
+        | MiniDumpIgnoreInaccessibleMemory | MiniDumpWithTokenInformation
+        | MiniDumpWithIndirectlyReferencedMemory;
+
+      /*
+        Only filter out unsupported dump_type flags if we are using the default
+        dump type, so that future dump_type flags can be explicitly used even if
+        we don't know about them
+      */
+      dump_type = filter_minidump_type(dump_type);
+    }
 
   if (verbose)
     printf ("dumping process %u to %s using dump type flags 0x%x\n", (unsigned int)pid, minidump_file, (unsigned int)dump_type);

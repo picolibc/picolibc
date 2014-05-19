@@ -96,6 +96,7 @@ strace.exe: MINGW_LDFLAGS += -lntdll
 
 ldd.exe:CYGWIN_LDFLAGS += -lpsapi
 pldd.exe: CYGWIN_LDFLAGS += -lpsapi
+minidumper.exe: CYGWIN_LDFLAGS += -ldbghelp
 
 ldh.exe: MINGW_LDFLAGS += -nostdlib -lkernel32
 
