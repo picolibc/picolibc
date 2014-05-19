@@ -71,7 +71,7 @@ setlsapwd (const char *passwd, const char *username)
       if (data_buf)
 	RtlInitUnicodeString (&data, data_buf);
       /* First try it locally.  Works for admin accounts. */
-      if (!(lsa = lsa_open_policy (NULL, POLICY_CREATE_SECRET)))
+      if ((lsa = lsa_open_policy (NULL, POLICY_CREATE_SECRET)))
 	{
 	  NTSTATUS status = LsaStorePrivateData (lsa, &key,
 						 data.Length ? &data : NULL);
