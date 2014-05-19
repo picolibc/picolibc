@@ -1,3 +1,86 @@
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (try_to_debug): Fix size of dbg_cmd (CID 59929).
+
+2014-05-18  David Stacey  <drstacey@tiscali.co.uk>
+
+	* syscalls.cc (getusershell): Fix buffer overrun (Coverity ID 59932).
+
+2014-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::ioctl): Handle the different
+	ideas of u_long between Winsock and Cygwin applications on x86_64.
+	Add long comment.
+
+2014-05-09  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* signal.cc (sigprocmask): Fix strace output to include "how".
+
+	* fhandler_console.cc (dev_console::save_restore): Only save current
+	dwEnd line rather than the one after that.
+
+2014-05-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_getsockopt): Rearrange code slightly and handle
+	TCP_NODELAY just like SO_KEEPALIVE and SO_DONTROUTE.
+
+2014-05-03  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* spawn.cc (av::setup): Eat trailing whitespace on #! script.
+
+2014-05-02  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* fhandler_dsp.cc (ioctl): Use _ioctl for recursive call.
+
+2014-04-26  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* DevNotes: Add entry cgf-000026.
+	* fhandler.h (fhandler_console::save_top): Save top of screen
+	coordinates.
+	* fhandler_console.cc (dev::save_restore): Record top of screen
+	coordinates.  Clear entire buffer when restoring saved buffer and try
+	to position the cursor on the save relative place on the screen.
+
+2014-04-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (NT_TRANSACTIONAL_ERROR): Cover all status codes up to
+	STATUS_TRANSACTION_NOT_ENLISTED.
+
+2014-04-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc: On x86_64, define u_long as __ms_u_long before
+	including the windows headers.  Explain why.
+	(get_inet_addr): Convert ANY address to LOOPBACK address.  Explain why.
+	(fhandler_socket::evaluate_events): Forcibly set SO_ERROR socket option
+	in case a connection attempt failed.  Explain why.
+	(fhandler_socket::ioctl): Drop x86_64 re-definition of u_long here.
+	* fhandler_procnet.cc: On x86_64, define u_long as __ms_u_long before
+	including the windows headers.  Explain why.
+	* net.cc: Ditto.
+
+2014-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (check_iovec): Allow 0 as valid iovcnt value.
+
+2014-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winf.cc (linebuf::fromargv): Temporarily revert patch from 2014-01-24.
+
+2014-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_setsockopt): Ignore IPV6_TCLASS the same way as IP_TOS.
+
+2014-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.sc.in: (Temporarily?) workaround serious ld bug which
+	truncates symbols in certain computations to 32 bit.  See
+	https://sourceware.org/bugzilla/show_bug.cgi?id=16821
+
+2014-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (exception::myfault_handle): Only handle the minimum
+	amount of exceptions the myfault handler was designed for.
+
 2014-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver_ipc.h (ipc_set_proc_info): Add bool parameter to specify

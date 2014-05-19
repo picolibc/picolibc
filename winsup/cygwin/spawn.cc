@@ -1169,6 +1169,8 @@ av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
 	  {
 	    ptr += strspn (ptr, " \t");
 	    size_t len = strcspn (ptr, "\r\n");
+	    while (ptr[len - 1] == ' ' || ptr[len - 1] == '\t')
+	      len--;
 	    if (len)
 	      {
 		char *namebuf = (char *) alloca (len + 1);

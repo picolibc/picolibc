@@ -489,7 +489,7 @@ try_to_debug (bool waitloop)
   console_printf ("*** starting debugger for pid %u, tid %u\n",
 		  cygwin_pid (GetCurrentProcessId ()), GetCurrentThreadId ());
   BOOL dbg;
-  WCHAR dbg_cmd[strlen(debugger_command)];
+  WCHAR dbg_cmd[strlen(debugger_command) + 1];
   sys_mbstowcs (dbg_cmd, strlen(debugger_command) + 1, debugger_command);
   dbg = CreateProcessW (NULL,
 			dbg_cmd,
@@ -555,7 +555,20 @@ exception::myfault_handle (LPEXCEPTION_POINTERS ep)
   _cygtls& me = _my_tls;
 
   if (me.andreas)
-    me.andreas->leave ();	/* Return from a "san" caught fault */
+    {
+      /* Only handle the minimum amount of exceptions the myfault handler
+	 was designed for. */
+      switch (ep->ExceptionRecord->ExceptionCode)
+	{
+	case STATUS_ACCESS_VIOLATION:
+	case STATUS_DATATYPE_MISALIGNMENT:
+	case STATUS_STACK_OVERFLOW:
+	case STATUS_ARRAY_BOUNDS_EXCEEDED:
+	  me.andreas->leave ();	/* Return from a "san" caught fault */
+	default:
+	  break;
+	}
+    }
   return EXCEPTION_CONTINUE_SEARCH;
 }
 #endif /* __x86_64 */

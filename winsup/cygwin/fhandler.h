@@ -1302,6 +1302,7 @@ class dev_console
   COORD save_bufsize;
   PCHAR_INFO save_buf;
   COORD save_cursor;
+  SHORT save_top;
 
   COORD dwLastCursorPosition;
   COORD dwMousePosition;	/* scroll-adjusted coord of mouse event */

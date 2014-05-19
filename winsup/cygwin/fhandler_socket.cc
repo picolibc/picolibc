@@ -1,7 +1,7 @@
 /* fhandler_socket.cc. See fhandler.h for a description of the fhandler classes.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013 Red Hat, Inc.
+   2011, 2012, 2013, 2014 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -17,6 +17,15 @@
 #define _BSDTYPES_DEFINED
 #include "winsup.h"
 #undef _BSDTYPES_DEFINED
+#ifdef __x86_64__
+/* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
+   because a redefinition for LP64 systems is missing.  This leads to a wrong
+   definition and size of sockaddr_in6 when building with winsock headers.
+   This definition is also required to use the right u_long type in subsequent
+   function calls. */
+#undef u_long
+#define u_long __ms_u_long
+#endif
 #include <ws2tcpip.h>
 #include <mswsock.h>
 #include <iphlpapi.h>
@@ -89,9 +98,20 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	}
       break;
     case AF_INET:
+      memcpy (out, in, inlen);
+      *outlen = inlen;
+      /* If the peer address given in connect or sendto is the ANY address,
+	 Winsock fails with WSAEADDRNOTAVAIL, while Linux converts that into
+	 a connection/send attempt to LOOPBACK.  We're doing the same here. */
+      if (((struct sockaddr_in *) out)->sin_addr.s_addr == htonl (INADDR_ANY))
+	((struct sockaddr_in *) out)->sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+      return 0;
     case AF_INET6:
       memcpy (out, in, inlen);
       *outlen = inlen;
+      /* See comment in AF_INET case. */
+      if (IN6_IS_ADDR_UNSPECIFIED (&((struct sockaddr_in6 *) out)->sin6_addr))
+	((struct sockaddr_in6 *) out)->sin6_addr = in6addr_loopback;
       return 0;
     default:
       set_errno (EAFNOSUPPORT);
@@ -614,6 +634,17 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	  if ((wsa_err = wsock_events->connect_errorcode) != 0)
 	    {
 	      WSASetLastError (wsa_err);
+	      /* CV 2014-04-23: This is really weird.  If you call connect
+		 asynchronously on a socket and then select, an error like
+		 "Connection refused" is set in the event and in the SO_ERROR
+		 socket option.  If you call connect, then dup, then select,
+		 the error is set in the event, but not in the SO_ERROR socket
+		 option, even if the dup'ed socket handle refers to the same
+		 socket.  We're trying to workaround this problem here by
+		 taking the connect errorcode from the event and write it back
+		 into the SO_ERROR socket option. */
+	      setsockopt (get_socket (), SOL_SOCKET, SO_ERROR,
+			  (const char *) &wsa_err, sizeof wsa_err);
 	      ret = SOCKET_ERROR;
 	    }
 	  else
@@ -2062,7 +2093,22 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  }
 	break;
       }
+    /* From this point on we handle only ioctl commands which are understood by
+       Winsock.  However, we have a problem, which is, the different size of
+       u_long in Windows and 64 bit Cygwin.  This affects the definitions of
+       FIOASYNC, etc, because they are defined in terms of sizeof(u_long).
+       So we have to use case labels which are independent of the sizeof
+       u_long.  Since we're redefining u_long at the start of this file to
+       matching Winsock's idea of u_long, we can use the real definitions in
+       calls to Windows.  In theory we also have to make sure to convert the
+       different ideas of u_long between the application and Winsock, but
+       fortunately, the parameters defined as u_long pointers are on Linux
+       and BSD systems defined as int pointer, so the applications will
+       use a type of the expected size.  Hopefully. */
     case FIOASYNC:
+#ifdef __x86_64__
+    case _IOW('f', 125, unsigned long):
+#endif
       res = WSAAsyncSelect (get_socket (), winmsg, WM_ASYNCIO,
 	      *(int *) p ? ASYNC_MASK : 0);
       syscall_printf ("Async I/O on socket %s",
@@ -2074,14 +2120,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       break;
     case FIONREAD:
 #ifdef __x86_64__
-/* FIXME: This looks broken in the Mingw64 headers.  If I make sure
-to use the Windows u_long definition, I'd expect that it's defined
-as a 4 byte type on LP64 as well.  But that's not the case right now.
-The *additional* type __ms_u_long is available on LP64, and that's
-used in subsequent function declarations, but that's not available
-on 32 bit or LLP64.  The LP64-ness shouldn't require to use another
-type name in the application code. */
-#define u_long __ms_u_long
+    case _IOR('f', 127, unsigned long):
 #endif
       res = ioctlsocket (get_socket (), FIONREAD, (u_long *) p);
       if (res == SOCKET_ERROR)
@@ -2090,6 +2129,11 @@ type name in the application code. */
     default:
       /* Sockets are always non-blocking internally.  So we just note the
 	 state here. */
+#ifdef __x86_64__
+      /* Convert the different idea of u_long in the definition of cmd. */
+      if (((cmd >> 16) & IOCPARM_MASK) == sizeof (unsigned long))
+      	cmd = (cmd & ~(IOCPARM_MASK << 16)) | (sizeof (u_long) << 16);
+#endif
       if (cmd == FIONBIO)
 	{
 	  syscall_printf ("socket is now %sblocking",
