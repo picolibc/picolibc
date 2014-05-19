@@ -1,7 +1,7 @@
 /* dtable.cc: file descriptor support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -996,7 +996,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
       WCHAR fnbuf[64 * 1024];
       if (wcsncasecmp (w32, DEVICE_PREFIX, DEVICE_PREFIX_LEN) != 0
-	  || !QueryDosDeviceW (NULL, fnbuf, sizeof (fnbuf)))
+	  || !QueryDosDeviceW (NULL, fnbuf, sizeof (fnbuf) / sizeof (WCHAR)))
 	{
 	  sys_wcstombs (posix_fn, NT_MAX_PATH, w32, w32len);
 	  return false;

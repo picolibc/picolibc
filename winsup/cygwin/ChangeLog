@@ -1,5 +1,10 @@
 2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dtable.cc (handle_to_fn): Fix length parameter in call to
+	QueryDosDeviceW (CID 59936).
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* pinfo.cc (pinfo_basic::pinfo_basic): Fix size of progname array in
 	call to GetModuleFileNameW (CID 59935).
 
