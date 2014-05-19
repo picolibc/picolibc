@@ -1,5 +1,10 @@
 2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pinfo.cc (pinfo_basic::pinfo_basic): Fix size of progname array in
+	call to GetModuleFileNameW (CID 59935).
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* smallprintf.cc (__small_vsprintf): Add missing break in 'C' case.
 
 2014-05-19  Corinna Vinschen  <corinna@vinschen.de>

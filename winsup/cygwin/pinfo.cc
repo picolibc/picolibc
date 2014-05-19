@@ -1,7 +1,7 @@
 /* pinfo.cc: process table support
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -38,7 +38,7 @@ public:
 pinfo_basic::pinfo_basic ()
 {
   pid = dwProcessId = GetCurrentProcessId ();
-  GetModuleFileNameW (NULL, progname, sizeof (progname));
+  GetModuleFileNameW (NULL, progname, sizeof (progname) / sizeof (WCHAR));
   /* Default uid/gid are needed very early to initialize shared user info. */
   uid = ILLEGAL_UID;
   gid = ILLEGAL_GID;
