@@ -1,3 +1,10 @@
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (ipcexit_creat_hookthread): Delete shs to make
+	Coverity happy (CID 59993).
+	* transport_pipes.cc (transport_layer_pipes::listen): Make listen_pipe
+	and connect_pipe statics to make Coverity happy (CID 60010/60011).
+
 2014-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pwdgrp.cc (client_request_pwdgrp::pwd_serve): Add 1 to the message
