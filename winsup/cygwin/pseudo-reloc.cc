@@ -85,12 +85,12 @@ __report_error (const char *msg, ...)
    * cygwin ptys.
    */
   char buf[128];
-  WCHAR module[MAX_PATH];
+  WCHAR module[PATH_MAX];
   char * posix_module = NULL;
   static const char UNKNOWN_MODULE[] = "<unknown module>: ";
   static const char CYGWIN_FAILURE_MSG[] = "Cygwin runtime failure: ";
   HANDLE errh = GetStdHandle (STD_ERROR_HANDLE);
-  ssize_t modulelen = GetModuleFileNameW (NULL, module, sizeof (module));
+  ssize_t modulelen = GetModuleFileNameW (NULL, module, PATH_MAX);
   va_list args;
 
   /* FIXME: cleanup further to avoid old use of cygwin_internal */

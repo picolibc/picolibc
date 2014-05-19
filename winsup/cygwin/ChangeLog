@@ -1,5 +1,10 @@
 2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pseudo-reloc.cc (__report_error): Raise size of module name buffer to
+	PATH_MAX.  Fix length in call to GetModuleFileNameW (CID 59947).
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (call_gaa): Fix setting pa_ret pointer in case of an error
 	from GetAdaptersAddresses (CID 60218).
 	(get_ifs): Add missing braces in AF_INET6 case which broke netmask
