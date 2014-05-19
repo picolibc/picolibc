@@ -1,3 +1,7 @@
+2014-05-18  David Stacey  <drstacey@tiscali.co.uk>
+
+	* syscalls.cc (getusershell): Fix buffer overrun (Coverity ID 59932).
+
 2014-05-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (cygwin_internal): Use local name buffer instead of

@@ -4179,7 +4179,7 @@ getusershell ()
   /* Get each non-whitespace character as part of the shell path as long as
      it fits in buf. */
   for (buf_idx = 0;
-       ch != EOF && !isspace (ch) && buf_idx < PATH_MAX;
+       ch != EOF && !isspace (ch) && buf_idx < (PATH_MAX - 1);
        buf_idx++, ch = getc (shell_fp))
     buf[buf_idx] = ch;
   /* Skip any trailing non-whitespace character not fitting in buf.  If the
