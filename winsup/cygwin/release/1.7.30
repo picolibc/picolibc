@@ -1,41 +1,38 @@
-What's new:
------------
-
-- Introduce reading passwd/group entries directly from SAM/AD, thus allowing
-  to do without /etc/passwd and /etc/group files.  Introduce /etc/nsswitch.conf
-  file to configure passwd/group handling.
-
-
-What changed:
--------------
-
-- Windows defines the IPV6_TCLASS option, but when using it in setsockopt
-  it returns WSAENOPROTOOPT.  Cygwin now ignores this error condition and
-  returns a fake success to the application, just as with IP_TOS for years.
-
-- Connect and sendto to the AF_INET and AF_INET6 ANY address is converted to
-  the LOOPBACK address, as on Linux.
-  Addresses: http://cygwin.com/ml/cygwin/2014-04/msg00510.html
-
-
 Bug Fixes
 ---------
 
-- Workaround a problem following native symlinks.
-  Fixes: http://cygwin.com/ml/cygwin/2014-04/msg00384.html
+- Only handle the minimum amount of exceptions required in internal Cygwin
+  SEGV handling.
+  Addresses: https://cygwin.com/ml/cygwin/2014-04/msg00132.html
+	     https://cygwin.com/ml/cygwin/2014-04/msg00464.html
+	     https://cygwin.com/ml/cygwin/2014-05/msg00361.html
+             
+- Ignore setsockopt(IPV6_TCLASS).  It always returns an error code on Windows.
 
-- Fix calls to readv/writev/recvmsg/sendmsg with 0 iovlen.
-  Fixes: http://cygwin.com/ml/cygwin/2014-04/msg00509.html
+- Workaround a problem following native NTFS symlinks.
+  Addresses: https://cygwin.com/ml/cygwin/2014-04/msg00384.html
 
-- Workaround a problem with Mingw64 Winsock headers which lead to an incorrect
-  definition of struct sockaddr_in6, and which in turn broke /proc/net/if_inet6.
+- Fix `passwd -R' broken since 1.7.28.
+  Addresses: https://cygwin.com/ml/cygwin/2014-04/msg00446.html
 
-- Workaround a Winsock bug which neglects to set the SO_ERROR socket option
-  when calling select on a dup'ed socket after an asynchronous connection
-  attempt.
-  Fixes: http://cygwin.com/ml/cygwin/2014-04/msg00510.html
+- Allow 0 length in calls to readv/writev.
+  Addresses: https://cygwin.com/ml/cygwin/2014-04/msg00509.html
 
-- Workaround the problem that getsockopt(IPPROTO_TCP,TCP_NODELAY) returns
-  the option value as a 1 byte value, while BSD and Linux expect a 4 byte
-  value.
-  Fixes: http://cygwin.com/ml/cygwin/2014-04/msg00624.html
+- Workaround Winsock not setting SO_ERROR on dup'ed socket after receiving
+  event on sibling socket.
+  Addresses: https://cygwin.com/ml/cygwin/2014-04/msg00510.html
+
+- Accept INADDR_ANY/in6addr_any to connect to local AF_INET/AF_INET6
+  address, as on Linux.
+  Addresses: https://cygwin.com/ml/cygwin/2014-04/msg00510.html
+
+- Workaround weird status codes returned when trying to run transactions
+  under a Perforce SCCS managed directory.
+  Addresses: https://cygwin.com/ml/cygwin/2014-04/msg00531.html
+
+- Return expected 4 bytes size from getsockopt(TCP_NODELAY), not 1 as
+  Winsock.
+  Addresses: https://cygwin.com/ml/cygwin/2014-04/msg00624.html
+
+- Ignore trailing whitespace on #! scripts.
+  Addresses: https://cygwin.com/ml/cygwin/2014-05/msg00022.html
