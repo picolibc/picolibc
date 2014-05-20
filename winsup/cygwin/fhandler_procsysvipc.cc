@@ -71,7 +71,7 @@ fhandler_procsysvipc::exists ()
   virt_tab_t *entry = virt_tab_search (path + 1, true, procsysvipc_tab,
 				       PROCSYSVIPC_LINK_COUNT);
 
-  cygserver_init();
+  cygserver_init ();
 
   if (entry)
     {
@@ -121,7 +121,7 @@ fhandler_procsysvipc::readdir (DIR *dir, dirent *de)
   if (dir->__d_position >= PROCSYSVIPC_LINK_COUNT)
     goto out;
   {
-    cygserver_init();
+    cygserver_init ();
     if (cygserver_running != CYGSERVER_OK)
       goto out;
   }
@@ -216,131 +216,177 @@ fhandler_procsysvipc::fill_filebuf ()
   return false;
 }
 
+#define MSG_HEADLINE "       key      msqid perms      cbytes       qnum lspid lrpid   uid   gid  cuid  cgid      stime      rtime      ctime\n"
+
 static off_t
 format_procsysvipc_msg (void *, char *&destbuf)
 {
-  tmp_pathbuf tp;
-  char *buf = tp.c_get ();
-  char *bufptr = buf;
+  char *buf;
   struct msginfo msginfo;
   struct msqid_ds *xmsqids;
-  size_t xmsqids_len;
 
   msgctl (0, IPC_INFO, (struct msqid_ds *) &msginfo);
-  xmsqids_len = sizeof (struct msqid_ds) * msginfo.msgmni;
-  xmsqids = (struct msqid_ds *) malloc (xmsqids_len);
-  msgctl (msginfo.msgmni, IPC_INFO, (struct msqid_ds *) xmsqids);
-
-  bufptr += __small_sprintf (bufptr,
-	    "       key      msqid perms      cbytes       qnum lspid lrpid   uid   gid  cuid  cgid      stime      rtime      ctime\n");
-
-  for (int i = 0; i < msginfo.msgmni; i++) {
-    if (xmsqids[i].msg_qbytes != 0) {
-       bufptr += sprintf (bufptr,
-		 "%10llu %10u %5o %11u %10u %5d %5d %5u %5u %5u %5u %10ld %10ld %10ld\n",
-		 xmsqids[i].msg_perm.key,
-		 IXSEQ_TO_IPCID(i, xmsqids[i].msg_perm),
-		 xmsqids[i].msg_perm.mode,
-		 xmsqids[i].msg_cbytes,
-		 xmsqids[i].msg_qnum,
-		 xmsqids[i].msg_lspid,
-		 xmsqids[i].msg_lrpid,
-		 (unsigned) xmsqids[i].msg_perm.uid,
-		 (unsigned) xmsqids[i].msg_perm.gid,
-		 (unsigned) xmsqids[i].msg_perm.cuid,
-		 (unsigned) xmsqids[i].msg_perm.cgid,
-		 xmsqids[i].msg_stime,
-		 xmsqids[i].msg_rtime,
-		 xmsqids[i].msg_ctime);
+  /* Don't use tmp_pathbuf.  The required buffer sizes can be up to 128K! */
+  xmsqids = (struct msqid_ds *) malloc (sizeof (struct msqid_ds)
+					* msginfo.msgmni);
+  if (!xmsqids)
+    return 0;
+  /* buf size = sizeof headline + 128 bytes per msg queue entry. */
+  buf = (char *) malloc (sizeof (MSG_HEADLINE) + msginfo.msgmni * 128);
+  if (!buf)
+    {
+      free (xmsqids);
+      return 0;
     }
-  }
 
-  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
-  memcpy (destbuf, buf, bufptr - buf);
-  return bufptr - buf;
+  char *bufptr = stpcpy (buf, MSG_HEADLINE);
+  msgctl (msginfo.msgmni, IPC_INFO, (struct msqid_ds *) xmsqids);
+  for (int i = 0; i < msginfo.msgmni; i++)
+    {
+      if (xmsqids[i].msg_qbytes != 0)
+	{
+	   bufptr += sprintf (bufptr,
+		     "%10llu %10u %5o %11u %10u %5d %5d %5u %5u %5u %5u "
+		     "%10ld %10ld %10ld\n",
+		     xmsqids[i].msg_perm.key,
+		     IXSEQ_TO_IPCID(i, xmsqids[i].msg_perm),
+		     xmsqids[i].msg_perm.mode,
+		     xmsqids[i].msg_cbytes,
+		     xmsqids[i].msg_qnum,
+		     xmsqids[i].msg_lspid,
+		     xmsqids[i].msg_lrpid,
+		     (unsigned) xmsqids[i].msg_perm.uid,
+		     (unsigned) xmsqids[i].msg_perm.gid,
+		     (unsigned) xmsqids[i].msg_perm.cuid,
+		     (unsigned) xmsqids[i].msg_perm.cgid,
+		     xmsqids[i].msg_stime,
+		     xmsqids[i].msg_rtime,
+		     xmsqids[i].msg_ctime);
+	}
+      }
+
+  off_t size = bufptr - buf;
+  destbuf = (char *) crealloc_abort (destbuf, size);
+  memcpy (destbuf, buf, size);
+  free (buf);
+  free (xmsqids);
+  return size;
 }
+
+#undef MSG_HEADLINE
+
+#define SEM_HEADLINE "       key      semid perms      nsems   uid   gid  cuid  cgid      otime      ctime\n"
 
 static off_t
 format_procsysvipc_sem (void *, char *&destbuf)
 {
-  tmp_pathbuf tp;
-  char *buf = tp.c_get ();
-  char *bufptr = buf;
+  char *buf;
   union semun semun;
   struct seminfo seminfo;
   struct semid_ds *xsemids;
-  size_t xsemids_len;
 
   semun.buf = (struct semid_ds *) &seminfo;
   semctl (0, 0, IPC_INFO, semun);
-  xsemids_len = sizeof (struct semid_ds) * seminfo.semmni;
-  xsemids = (struct semid_ds *) malloc (xsemids_len);
+  /* Don't use tmp_pathbuf.  The required buffer sizes can be up to 96K! */
+  xsemids = (struct semid_ds *) malloc (sizeof (struct semid_ds)
+					* seminfo.semmni);
+  if (!xsemids)
+    return 0;
+  /* buf size = sizeof headline + 96 bytes per semaphore entry. */
+  buf = (char *) malloc (sizeof (SEM_HEADLINE) + seminfo.semmni * 96);
+  if (!buf)
+    {
+      free (xsemids);
+      return 0;
+    }
+
+  char *bufptr = stpcpy (buf, SEM_HEADLINE);
   semun.buf = xsemids;
   semctl (seminfo.semmni, 0, IPC_INFO, semun);
-
-  bufptr += __small_sprintf (bufptr,
-	    "       key      semid perms      nsems   uid   gid  cuid  cgid      otime      ctime\n");
-  for (int i = 0; i < seminfo.semmni; i++) {
-    if ((xsemids[i].sem_perm.mode & SEM_ALLOC) != 0) {
-      bufptr += sprintf (bufptr,
-		"%10llu %10u %5o %10d %5u %5u %5u %5u %10ld %10ld\n",
-		xsemids[i].sem_perm.key,
-		IXSEQ_TO_IPCID(i, xsemids[i].sem_perm),
-		xsemids[i].sem_perm.mode,
-		xsemids[i].sem_nsems,
-		(unsigned) xsemids[i].sem_perm.uid,
-		(unsigned) xsemids[i].sem_perm.gid,
-		(unsigned) xsemids[i].sem_perm.cuid,
-		(unsigned) xsemids[i].sem_perm.cgid,
-		xsemids[i].sem_otime,
-		xsemids[i].sem_ctime);
+  for (int i = 0; i < seminfo.semmni; i++)
+    {
+      if ((xsemids[i].sem_perm.mode & SEM_ALLOC) != 0)
+	{
+	  bufptr += sprintf (bufptr,
+		    "%10llu %10u %5o %10d %5u %5u %5u %5u %10ld %10ld\n",
+		    xsemids[i].sem_perm.key,
+		    IXSEQ_TO_IPCID(i, xsemids[i].sem_perm),
+		    xsemids[i].sem_perm.mode,
+		    xsemids[i].sem_nsems,
+		    (unsigned) xsemids[i].sem_perm.uid,
+		    (unsigned) xsemids[i].sem_perm.gid,
+		    (unsigned) xsemids[i].sem_perm.cuid,
+		    (unsigned) xsemids[i].sem_perm.cgid,
+		    xsemids[i].sem_otime,
+		    xsemids[i].sem_ctime);
+	}
     }
-  }
 
-  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
-  memcpy (destbuf, buf, bufptr - buf);
-  return bufptr - buf;
+  off_t size = bufptr - buf;
+  destbuf = (char *) crealloc_abort (destbuf, size);
+  memcpy (destbuf, buf, size);
+  free (buf);
+  free (xsemids);
+  return size;
 }
+
+#undef SEM_HEADLINE
+
+#define SHM_HEADLINE "       key      shmid perms       size  cpid  lpid nattch   uid   gid  cuid  cgid      atime      dtime      ctime\n"
 
 static off_t
 format_procsysvipc_shm (void *, char *&destbuf)
 {
-  tmp_pathbuf tp;
-  char *buf = tp.c_get ();
-  char *bufptr = buf;
+  char *buf;
   struct shminfo shminfo;
   struct shmid_ds *xshmids;
-  size_t xshmids_len;
 
   shmctl (0, IPC_INFO, (struct shmid_ds *) &shminfo);
-  xshmids_len = sizeof (struct shmid_ds) * shminfo.shmmni;
-  xshmids = (struct shmid_ds *) malloc (xshmids_len);
+  /* Don't use tmp_pathbuf.  The required buffer sizes can be up to 120K! */
+  xshmids = (struct shmid_ds *) malloc (sizeof (struct shmid_ds)
+					* shminfo.shmmni);
+  if (!xshmids)
+    return 0;
+  /* buf size = sizeof headline + 120 bytes per shmem entry. */
+  buf = (char *) malloc (sizeof (SHM_HEADLINE) + shminfo.shmmni * 120);
+  if (!buf)
+    {
+      free (xshmids);
+      return 0;
+    }
+
+  char *bufptr = stpcpy (buf, SHM_HEADLINE);
   shmctl (shminfo.shmmni, IPC_INFO, (struct shmid_ds *) xshmids);
+  for (int i = 0; i < shminfo.shmmni; i++)
+    {
+      if (xshmids[i].shm_perm.mode & 0x0800)
+	{
+	  bufptr += sprintf (bufptr,
+		    "%10llu %10u %5o %10u %5d %5d %6u %5u %5u %5u %5u "
+		    "%10ld %10ld %10ld\n",
+		    xshmids[i].shm_perm.key,
+		    IXSEQ_TO_IPCID(i, xshmids[i].shm_perm),
+		    xshmids[i].shm_perm.mode,
+		    xshmids[i].shm_segsz,
+		    xshmids[i].shm_cpid,
+		    xshmids[i].shm_lpid,
+		    xshmids[i].shm_nattch,
+		    (unsigned) xshmids[i].shm_perm.uid,
+		    (unsigned) xshmids[i].shm_perm.gid,
+		    (unsigned) xshmids[i].shm_perm.cuid,
+		    (unsigned) xshmids[i].shm_perm.cgid,
+		    xshmids[i].shm_atime,
+		    xshmids[i].shm_dtime,
+		    xshmids[i].shm_ctime);
+		    }
+	  }
 
-  bufptr += __small_sprintf (bufptr,
-	    "       key      shmid perms       size  cpid  lpid nattch   uid   gid  cuid  cgid      atime      dtime      ctime\n");
-  for (int i = 0; i < shminfo.shmmni; i++) {
-    if (xshmids[i].shm_perm.mode & 0x0800) {
-      bufptr += sprintf (bufptr,
-		"%10llu %10u %5o %10u %5d %5d %6u %5u %5u %5u %5u %10ld %10ld %10ld\n",
-		xshmids[i].shm_perm.key,
-		IXSEQ_TO_IPCID(i, xshmids[i].shm_perm),
-		xshmids[i].shm_perm.mode,
-		xshmids[i].shm_segsz,
-		xshmids[i].shm_cpid,
-		xshmids[i].shm_lpid,
-		xshmids[i].shm_nattch,
-		(unsigned) xshmids[i].shm_perm.uid,
-		(unsigned) xshmids[i].shm_perm.gid,
-		(unsigned) xshmids[i].shm_perm.cuid,
-		(unsigned) xshmids[i].shm_perm.cgid,
-		xshmids[i].shm_atime,
-		xshmids[i].shm_dtime,
-		xshmids[i].shm_ctime);
-		}
-	}
-
-  destbuf = (char *) crealloc_abort (destbuf, bufptr - buf);
-  memcpy (destbuf, buf, bufptr - buf);
-  return bufptr - buf;
+  off_t size = bufptr - buf;
+  destbuf = (char *) crealloc_abort (destbuf, size);
+  memcpy (destbuf, buf, size);
+  free (buf);
+  free (xshmids);
+  return size;
 }
+
+#undef SHM_HEADLINE

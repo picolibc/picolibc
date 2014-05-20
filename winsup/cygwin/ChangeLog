@@ -1,5 +1,13 @@
 2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_procsysvipc.cc (format_procsysvipc_msg): Rearrange code to
+	avoid resource leakage (CID 60002).  Don't use tmp_pathbuf, explain why.
+	Fix indentation.
+	(format_procsysvipc_sem): Ditto.
+	(format_procsysvipc_shm): Ditto (CID 60003).
+
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_process.cc (get_mem_values): Rearrange code slightly to
 	avoid resource leakage (CID 59973).
 	(format_process_stat): Drop temporary variable wcmd and avoid
