@@ -1,5 +1,10 @@
 2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (delete_lock_in_parent): Use LIST_FOREACH_SAFE to avoid
+	dereferencing freed pointer (CID 60224).
+
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_procsysvipc.cc (format_procsysvipc_msg): Rearrange code to
 	avoid resource leakage (CID 60002).  Don't use tmp_pathbuf, explain why.
 	Fix indentation.
