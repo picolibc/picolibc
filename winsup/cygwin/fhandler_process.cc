@@ -946,7 +946,6 @@ format_process_stat (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
   char cmd[NAME_MAX + 1];
-  WCHAR wcmd[NAME_MAX + 1];
   int state = 'R';
   unsigned long fault_count = 0UL,
 		utime = 0UL, stime = 0UL,
@@ -958,8 +957,8 @@ format_process_stat (void *data, char *&destbuf)
   else
     {
       PWCHAR last_slash = wcsrchr (p->progname, L'\\');
-      wcscpy (wcmd, last_slash ? last_slash + 1 : p->progname);
-      sys_wcstombs (cmd, NAME_MAX + 1, wcmd);
+      sys_wcstombs (cmd, NAME_MAX + 1,
+		    last_slash ? last_slash + 1 : p->progname);
       int len = strlen (cmd);
       if (len > 4)
 	{
@@ -1070,14 +1069,13 @@ format_process_status (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
   char cmd[NAME_MAX + 1];
-  WCHAR wcmd[NAME_MAX + 1];
   int state = 'R';
   const char *state_str = "unknown";
-  unsigned long vmsize = 0UL, vmrss = 0UL, vmdata = 0UL, vmlib = 0UL, vmtext = 0UL,
-		vmshare = 0UL;
+  unsigned long vmsize = 0UL, vmrss = 0UL, vmdata = 0UL, vmlib = 0UL,
+		vmtext = 0UL, vmshare = 0UL;
+
   PWCHAR last_slash = wcsrchr (p->progname, L'\\');
-  wcscpy (wcmd, last_slash ? last_slash + 1 : p->progname);
-  sys_wcstombs (cmd, NAME_MAX + 1, wcmd);
+  sys_wcstombs (cmd, NAME_MAX + 1, last_slash ? last_slash + 1 : p->progname);
   int len = strlen (cmd);
   if (len > 4)
     {
@@ -1345,9 +1343,6 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
   PMEMORY_WORKING_SET_LIST p;
   SIZE_T n = 0x4000, length;
 
-  p = (PMEMORY_WORKING_SET_LIST) malloc (n);
-  if (!p)
-    return false;
   hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
   if (hProcess == NULL)
     {
@@ -1355,6 +1350,9 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
       debug_printf ("OpenProcess, %E");
       return false;
     }
+  p = (PMEMORY_WORKING_SET_LIST) malloc (n);
+  if (!p)
+    goto out;
   while (true)
     {
       status = NtQueryVirtualMemory (hProcess, 0, MemoryWorkingSetList,
