@@ -1,5 +1,10 @@
 2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Fix floppy
+	drive handling broken with 1.7.19.
+
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* scandir.cc (scandir): Assume namelist is always valid, per POSIX.
 	(CID 60021).
 	* sec_auth.cc (cygwin_logon_user): Securely erase password copy.

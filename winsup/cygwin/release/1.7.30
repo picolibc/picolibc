@@ -36,3 +36,6 @@ Bug Fixes
 
 - Ignore trailing whitespace on #! scripts.
   Addresses: https://cygwin.com/ml/cygwin/2014-05/msg00022.html
+
+- Fix raw floppy drive handling broken since 1.7.19.
+  Addresses: https://cygwin.com/ml/cygwin/2014-05/msg00401.html
