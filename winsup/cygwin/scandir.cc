@@ -1,6 +1,6 @@
 /* scandir.cc
 
-   Copyright 1998, 1999, 2000, 2001, 2003, 2005 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2003, 2005, 2014 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 
@@ -87,7 +87,6 @@ scandir (const char *dir,
   closedir (dirp);
 
   qsort (nl, count, sizeof *nl, (int (*)(const void *, const void *)) compar);
-  if (namelist)
-    *namelist = nl;
+  *namelist = nl;
   return count;
 }

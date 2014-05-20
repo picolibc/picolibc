@@ -1,3 +1,11 @@
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* scandir.cc (scandir): Assume namelist is always valid, per POSIX.
+	(CID 60021).
+	* sec_auth.cc (cygwin_logon_user): Securely erase password copy.
+	(lsaprivkeyauth): Avoid trying to dereference data if no key is stored
+	in the registry (CID 60122).  Securely erase passwords after usage.
+
 2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pseudo-reloc.cc (__report_error): Raise size of module name buffer to
