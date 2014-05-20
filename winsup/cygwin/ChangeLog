@@ -1,5 +1,10 @@
 2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (format_proc_swaps): Use tmp_pathbuf for filename,
+	rather than allocating and forgetting to free (CID 59982).
+
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Fix floppy
 	drive handling broken with 1.7.19.
 

@@ -1,7 +1,7 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
    Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
-   2013 Red Hat, Inc.
+   2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1270,8 +1270,6 @@ static off_t
 format_proc_swaps (void *, char *&destbuf)
 {
   unsigned long long total = 0ULL, used = 0ULL;
-  char *filename = NULL;
-  ssize_t filename_len;
   PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
   ULONG size = 512;
   NTSTATUS status = STATUS_SUCCESS;
@@ -1301,17 +1299,13 @@ format_proc_swaps (void *, char *&destbuf)
   if (spi && NT_SUCCESS (status))
     {
       PSYSTEM_PAGEFILE_INFORMATION spp = spi;
+      char *filename = tp.c_get ();
       do
 	{
 	  total = (unsigned long long) spp->CurrentSize * wincap.page_size ();
 	  used = (unsigned long long) spp->TotalUsed * wincap.page_size ();
-
-	  filename_len = cygwin_conv_path (CCP_WIN_W_TO_POSIX,
-					   spp->FileName.Buffer, filename, 0);
-	  filename = (char *) malloc (filename_len);
 	  cygwin_conv_path (CCP_WIN_W_TO_POSIX, spp->FileName.Buffer,
-			    filename, filename_len);
-
+			    filename, NT_MAX_PATH);
 	  bufptr += sprintf (bufptr, "%-40s%-16s%-8llu%-8llu%-8d\n",
 			     filename, "file", total >> 10, used >> 10, 0);
 	}
