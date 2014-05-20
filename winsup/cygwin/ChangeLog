@@ -1,3 +1,9 @@
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (cygwin_logon_user): Securely erase password copy.
+	(lsaprivkeyauth): Avoid trying to dereference data if no key is stored
+	in the registry (CID 60122).  Securely erase passwords after usage.
+
 2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (try_to_debug): Fix size of dbg_cmd (CID 59929).

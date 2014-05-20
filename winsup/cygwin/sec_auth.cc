@@ -168,6 +168,7 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
       if (!hToken)
 	hToken = INVALID_HANDLE_VALUE;
     }
+  RtlSecureZeroMemory (passwd, NT_MAX_PATH);
   cygheap->user.reimpersonate ();
   debug_printf ("%R = logon_user(%s,...)", hToken, pw->pw_name);
   return hToken;
@@ -1218,8 +1219,9 @@ lsaprivkeyauth (struct passwd *pw)
   WCHAR user[UNLEN + 1];
   WCHAR key_name[MAX_DOMAIN_NAME_LEN + UNLEN + wcslen (SFU_LSA_KEY_SUFFIX) + 2];
   UNICODE_STRING key;
-  PUNICODE_STRING data;
+  PUNICODE_STRING data = NULL;
   cygsid psid;
+  BOOL ret;
 
   push_self_privilege (SE_TCB_PRIVILEGE, true);
 
@@ -1237,36 +1239,46 @@ lsaprivkeyauth (struct passwd *pw)
       RtlInitUnicodeString (&key, key_name);
       status = LsaRetrievePrivateData (lsa, &key, &data);
       if (!NT_SUCCESS (status))
-	{
-	  /* No Cygwin key, try Interix key. */
-	  if (!*domain)
-	    goto out;
-	  __small_swprintf (key_name, L"%W_%W%W",
-			    domain, user, SFU_LSA_KEY_SUFFIX);
-	  RtlInitUnicodeString (&key, key_name);
-	  status = LsaRetrievePrivateData (lsa, &key, &data);
-	  if (!NT_SUCCESS (status))
-	    goto out;
-	}
+	data = NULL;
     }
-
-  /* The key is not 0-terminated. */
-  PWCHAR passwd;
-  passwd = (PWCHAR) alloca (data->Length + sizeof (WCHAR));
-  *wcpncpy (passwd, data->Buffer, data->Length / sizeof (WCHAR)) = L'\0';
-  LsaFreeMemory (data);
-  debug_printf ("Try logon for %W\\%W", domain, user);
-  if (!LogonUserW (user, domain, passwd, LOGON32_LOGON_INTERACTIVE,
-		   LOGON32_PROVIDER_DEFAULT, &token))
+  /* No Cygwin key, try Interix key. */
+  if (!data && *domain)
     {
-      __seterrno ();
-      token = NULL;
+      __small_swprintf (key_name, L"%W_%W%W",
+			domain, user, SFU_LSA_KEY_SUFFIX);
+      RtlInitUnicodeString (&key, key_name);
+      status = LsaRetrievePrivateData (lsa, &key, &data);
+      if (!NT_SUCCESS (status))
+	data = NULL;
     }
-  else
-    token = get_full_privileged_inheritable_token (token);
+  /* Found an entry?  Try to logon. */
+  if (data)
+    {
+      /* The key is not 0-terminated. */
+      PWCHAR passwd;
+      size_t pwdsize = data->Length + sizeof (WCHAR);
+
+      passwd = (PWCHAR) alloca (pwdsize);
+      *wcpncpy (passwd, data->Buffer, data->Length / sizeof (WCHAR)) = L'\0';
+      /* Weird:  LsaFreeMemory invalidates the content of the UNICODE_STRING
+	 structure, but it does not invalidate the Buffer content. */
+      RtlSecureZeroMemory (data->Buffer, data->Length);
+      LsaFreeMemory (data);
+      debug_printf ("Try logon for %W\\%W", domain, user);
+      ret = LogonUserW (user, domain, passwd, LOGON32_LOGON_INTERACTIVE,
+			LOGON32_PROVIDER_DEFAULT, &token);
+      RtlSecureZeroMemory (passwd, pwdsize);
+      if (!ret)
+	{
+	  __seterrno ();
+	  token = NULL;
+	}
+      else
+	token = get_full_privileged_inheritable_token (token);
+    }
+  lsa_close_policy (lsa);
 
 out:
-  lsa_close_policy (lsa);
   pop_self_privilege ();
   return token;
 }
