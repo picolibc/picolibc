@@ -20,6 +20,15 @@ details. */
 	  system functions on Vista and later. */
 #define _INC_NETIOAPI
 #include "winsup.h"
+#ifdef __x86_64__
+/* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
+   because a redefinition for LP64 systems is missing.  This leads to a wrong
+   definition and size of sockaddr_in6 when building with winsock headers.
+   This definition is also required to use the right u_long type in subsequent
+   function calls. */
+#undef u_long
+#define u_long __ms_u_long
+#endif
 #include <ws2tcpip.h>
 #include <mswsock.h>
 #include <iphlpapi.h>
@@ -848,11 +857,20 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	     Sidenote: The reasoning for dropping ToS in Win2K is that ToS
 	     per RFC 1349 is incompatible with DiffServ per RFC 2474/2475.
 
-	     We just ignore the return value of setting IP_TOS entirely. */
+	     We just ignore the return value of setting IP_TOS entirely.
+	     
+	     CV 2014-04-16: Same for IPV6_TCLASS
+	     FIXME:         Same for IPV6_RECVTCLASS? */
 	  if (level == IPPROTO_IP && optname == IP_TOS
 	      && WSAGetLastError () == WSAEINVAL)
 	    {
 	      debug_printf ("Faked IP_TOS success");
+	      res = 0;
+	    }
+	  else if (level == IPPROTO_IPV6 && optname == IPV6_TCLASS
+		   && WSAGetLastError () == WSAENOPROTOOPT)
+	    {
+	      debug_printf ("Faked IPV6_TCLASS success");
 	      res = 0;
 	    }
 	  else
@@ -905,32 +923,27 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 			(int *) optlen);
       if (res == SOCKET_ERROR)
 	set_winsock_errno ();
-      else if (level == SOL_SOCKET)
+      else if (level == SOL_SOCKET && optname == SO_ERROR)
 	{
-	  switch (optname)
+	  int *e = (int *) optval;
+	  debug_printf ("WinSock SO_ERROR = %d", *e);
+	  *e = find_winsock_errno (*e);
+	}
+      else if (*optlen == 1)
+      	{
+	  /* Regression in Vista and later:  instead of a 4 byte BOOL value,
+	     a 1 byte BOOLEAN value is returned, in contrast to older systems
+	     and the documentation.  Since an int type is expected by the
+	     calling application, we convert the result here.  For some reason
+	     only three BSD-compatible socket options seem to be affected. */
+	  if ((level == SOL_SOCKET
+	       && (optname == SO_KEEPALIVE || optname == SO_DONTROUTE))
+	      || (level == IPPROTO_TCP && optname == TCP_NODELAY))
 	    {
-	    case SO_ERROR:
-	      {
-		int *e = (int *) optval;
-		debug_printf ("WinSock SO_ERROR = %d", *e);
-		*e = find_winsock_errno (*e);
-	      }
-	      break;
-	    case SO_KEEPALIVE:
-	    case SO_DONTROUTE:
-	      /* Regression in Vista and later:  instead of a 4 byte BOOL
-		 value, a 1 byte BOOLEAN value is returned, in contrast
-		 to older systems and the documentation.  Since an int
-		 type is expected by the calling application, we convert
-		 the result here. */
-	      if (*optlen == 1)
-		{
-		  BOOLEAN *in = (BOOLEAN *) optval;
-		  int *out = (int *) optval;
-		  *out = *in;
-		  *optlen = 4;
-		}
-	      break;
+	      BOOLEAN *in = (BOOLEAN *) optval;
+	      int *out = (int *) optval;
+	      *out = *in;
+	      *optlen = 4;
 	    }
 	}
     }

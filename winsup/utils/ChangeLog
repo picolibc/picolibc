@@ -1,3 +1,31 @@
+2014-04-21  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* minidumper.cc (filter_minidump_type): New function.
+	(minidump): Change default dump type from MiniDumpNormal to
+	something with more useful information without getting too
+	big. Use filter_minidump_type() to filter out unsupported dump
+	types.
+
+2014-04-21  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* Makefile.in (minidumper.exe): Link directly with dbghelp.
+	* minidumper.cc (minidump): Ditto.
+
+2014-04-21  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* minidumper.cc (minidump): Fix copy and paste error in checking
+	result of OpenProcess().
+
+2014-02-23  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* minidumper.cc (minidump): Fix -t option argument handling.
+
+2014-02-07  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* minidumper.cc: New file.
+	* Makefile.in (CYGWIN_BINS): Add minidumper.
+	* utils.xml (minidumper): New section.
+
 2013-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (RtlGetVersion): Declare.

@@ -1,6 +1,6 @@
 /* client.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2008, 2009, 2012, 2013 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2008, 2009, 2012, 2013, 2014 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -60,7 +60,7 @@ client_request_get_version::check_version () const
   if (!ok)
     syscall_printf (("incompatible version of cygwin server: "
 		     "client version %d.%d.%d.%d, "
-		     "server version %ld.%ld.%ld.%ld"),
+		     "server version %d.%d.%d.%d"),
 		    CYGWIN_SERVER_VERSION_MAJOR,
 		    CYGWIN_SERVER_VERSION_API,
 		    CYGWIN_SERVER_VERSION_MINOR,
@@ -83,8 +83,8 @@ client_request_attach_tty::client_request_attach_tty (DWORD nmaster_pid,
   req.from_master = nfrom_master;
   req.to_master = nto_master;
 
-  syscall_printf (("created: pid = %lu, master_pid = %lu, "
-		   "from_master = %lu, to_master = %lu"),
+  syscall_printf (("created: pid = %u, master_pid = %u, "
+		   "from_master = %p, to_master = %p"),
 		  req.pid, req.master_pid, req.from_master, req.to_master);
 }
 #endif /* __INSIDE_CYGWIN__ */
@@ -139,8 +139,8 @@ client_request::send (transport_layer_base * const conn)
 	assert (errno);
 	error_code (errno);
 	syscall_printf (("request header write failure: "
-			 "only %ld bytes sent of %ld, "
-			 "error = %d(%lu)"),
+			 "only %lu bytes sent of %lu, "
+			 "error = %d(%u)"),
 			count, sizeof (_header),
 			errno, GetLastError ());
 	return;
@@ -156,16 +156,13 @@ client_request::send (transport_layer_base * const conn)
 	  assert (errno);
 	  error_code (errno);
 	  syscall_printf (("request body write failure: "
-			   "only %ld bytes sent of %ld, "
-			   "error = %d(%lu)"),
+			   "only %lu bytes sent of %lu, "
+			   "error = %d(%u)"),
 			  count, msglen (),
 			  errno, GetLastError ());
 	  return;
 	}
     }
-
-  // verbose: syscall_printf ("request sent (%ld + %ld bytes)",
-  //			      sizeof (_header), msglen ());
 
   {
     const ssize_t count = conn->read (&_header, sizeof (_header));
@@ -175,8 +172,8 @@ client_request::send (transport_layer_base * const conn)
 	assert (errno);
 	error_code (errno);
 	syscall_printf (("reply header read failure: "
-			 "only %ld bytes received of %ld, "
-			 "error = %d(%lu)"),
+			 "only %lu bytes received of %lu, "
+			 "error = %d(%u)"),
 			count, sizeof (_header),
 			errno, GetLastError ());
 	return;
@@ -185,7 +182,7 @@ client_request::send (transport_layer_base * const conn)
 
   if (msglen () && !_buf)
     {
-      system_printf ("no client buffer for reply body: %ld bytes needed",
+      system_printf ("no client buffer for reply body: %lu bytes needed",
 		     msglen ());
       error_code (EINVAL);
       return;
@@ -194,7 +191,7 @@ client_request::send (transport_layer_base * const conn)
   if (msglen () > _buflen)
     {
       system_printf (("client buffer too small for reply body: "
-		      "have %ld bytes and need %ld"),
+		      "have %lu bytes and need %lu"),
 		     _buflen, msglen ());
       error_code (EINVAL);
       return;
@@ -209,16 +206,13 @@ client_request::send (transport_layer_base * const conn)
 	  assert (errno);
 	  error_code (errno);
 	  syscall_printf (("reply body read failure: "
-			   "only %ld bytes received of %ld, "
-			   "error = %d(%lu)"),
+			   "only %lu bytes received of %lu, "
+			   "error = %d(%u)"),
 			  count, msglen (),
 			  errno, GetLastError ());
 	  return;
 	}
     }
-
-  // verbose: syscall_printf ("reply received (%ld + %ld bytes)",
-  //			      sizeof (_header), msglen ());
 }
 
 #ifdef __OUTSIDE_CYGWIN__
@@ -258,14 +252,12 @@ client_request::handle_request (transport_layer_base *const conn,
     if (count != sizeof (header))
       {
 	syscall_printf (("request header read failure: "
-			 "only %ld bytes received of %ld, "
-			 "error = %d(%lu)"),
+			 "only %lu bytes received of %lu, "
+			 "error = %d(%u)"),
 			count, sizeof (header),
 			errno, GetLastError ());
 	return;
       }
-
-      // verbose: debug_printf ("got header (%ld)", count);
   }
 
   client_request *req = NULL;
@@ -330,7 +322,7 @@ client_request::handle (transport_layer_base *const conn,
 {
   if (msglen () && !_buf)
     {
-      system_printf ("no buffer for request body: %ld bytes needed",
+      system_printf ("no buffer for request body: %lu bytes needed",
 		     msglen ());
       error_code (EINVAL);
       return;
@@ -339,7 +331,7 @@ client_request::handle (transport_layer_base *const conn,
   if (msglen () > _buflen)
     {
       system_printf (("buffer too small for request body: "
-		      "have %ld bytes and need %ld"),
+		      "have %lu bytes and need %lu"),
 		     _buflen, msglen ());
       error_code (EINVAL);
       return;
@@ -354,16 +346,13 @@ client_request::handle (transport_layer_base *const conn,
 	  assert (errno);
 	  error_code (errno);
 	  syscall_printf (("request body read failure: "
-			   "only %ld bytes received of %ld, "
-			   "error = %d(%lu)"),
+			   "only %lu bytes received of %lu, "
+			   "error = %d(%u)"),
 			  count, msglen (),
 			  errno, GetLastError ());
 	  return;
 	}
     }
-
-  // verbose: syscall_printf ("request received (%ld + %ld bytes)",
-  //			      sizeof (_header), msglen ());
 
   error_code (0);		// Overwrites the _header.request_code field.
 
@@ -381,8 +370,8 @@ client_request::handle (transport_layer_base *const conn,
 	assert (errno);
 	error_code (errno);
 	syscall_printf (("reply header write failure: "
-			 "only %ld bytes sent of %ld, "
-			 "error = %d(%lu)"),
+			 "only %lu bytes sent of %lu, "
+			 "error = %d(%u)"),
 			count, sizeof (_header),
 			errno, GetLastError ());
 	return;
@@ -398,16 +387,13 @@ client_request::handle (transport_layer_base *const conn,
 	  assert (errno);
 	  error_code (errno);
 	  syscall_printf (("reply body write failure: "
-			   "only %ld bytes sent of %ld, "
-			   "error = %d(%lu)"),
+			   "only %lu bytes sent of %lu, "
+			   "error = %d(%u)"),
 			  count, msglen (),
 			  errno, GetLastError ());
 	  return;
 	}
     }
-
-  // verbose: syscall_printf ("reply sent (%ld + %ld bytes)",
-  //			      sizeof (_header), msglen ());
 }
 
 /* The server side implementation of make_request.  Very simple. */

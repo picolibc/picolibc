@@ -162,6 +162,9 @@ typedef _fpos64_t fpos64_t;
 
 FILE *	_EXFUN(tmpfile, (void));
 char *	_EXFUN(tmpnam, (char *));
+#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
+char *	_EXFUN(tempnam, (const char *, const char *));
+#endif
 int	_EXFUN(fclose, (FILE *));
 int	_EXFUN(fflush, (FILE *));
 FILE *	_EXFUN(freopen, (const char *__restrict, const char *__restrict, FILE *__restrict));
@@ -232,7 +235,10 @@ int	_EXFUN(fseeko, (FILE *, off_t, int));
 off_t	_EXFUN(ftello, ( FILE *));
 #endif
 #endif
-#if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L)
+#if __GNU_VISIBLE
+int	_EXFUN(fcloseall, (_VOID));
+#endif
+#if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L) || (__cplusplus >= 201103L)
 #ifndef _REENT_ONLY
 int	_EXFUN(asiprintf, (char **, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
@@ -246,7 +252,6 @@ int	_EXFUN(asprintf, (char **__restrict, const char *__restrict, ...)
 int	_EXFUN(diprintf, (int, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
 #endif
-int	_EXFUN(fcloseall, (_VOID));
 int	_EXFUN(fiprintf, (FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3))));
 int	_EXFUN(fiscanf, (FILE *, const char *, ...)
@@ -263,7 +268,6 @@ int	_EXFUN(snprintf, (char *__restrict, size_t, const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(sniprintf, (char *, size_t, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
-char *	_EXFUN(tempnam, (const char *, const char *));
 int	_EXFUN(vasiprintf, (char **, const char *, __VALIST)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0))));
 char *	_EXFUN(vasniprintf, (char *, size_t *, const char *, __VALIST)
@@ -337,7 +341,7 @@ FILE *	_EXFUN(fmemopen, (void *__restrict, size_t, const char *__restrict));
 /* getdelim - see __getdelim for now */
 /* getline - see __getline for now */
 FILE *	_EXFUN(open_memstream, (char **, size_t *));
-#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || defined(__CYGWIN__)
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809
 int	_EXFUN(renameat, (int, const char *, int, const char *));
 #endif
 int	_EXFUN(vdprintf, (int, const char *__restrict, __VALIST)

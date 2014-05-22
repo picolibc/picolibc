@@ -9,7 +9,11 @@
 {
 	float x;
 
+#if __GNUC_PREREQ (3, 3)
+	x = __builtin_nanf("");
+#else
 	SET_FLOAT_WORD(x,0x7fc00000);
+#endif
 	return x;
 }
 

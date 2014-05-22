@@ -58,6 +58,11 @@ opendir (const char *name)
   fh = build_fh_name (name, PC_SYM_FOLLOW);
   if (!fh)
     res = NULL;
+  else if (fh->error ())
+    {
+      set_errno (fh->error ());
+      res = NULL;
+    }
   else if (fh->exists ())
     res = fh->opendir (-1);
   else

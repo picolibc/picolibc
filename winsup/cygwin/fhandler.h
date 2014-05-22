@@ -1263,9 +1263,9 @@ class dev_console
   int meta_mask;
 
 /* Output state */
-  int state_;
-  int args_[MAXARGS];
-  int nargs_;
+  int state;
+  int args[MAXARGS];
+  int nargs;
   unsigned rarg;
   bool saw_question_mark;
   bool saw_greater_than_sign;
@@ -1287,25 +1287,22 @@ class dev_console
   /* saved cursor coordinates */
   int savex, savey;
 
-  /* saved screen */
-  COORD savebufsiz;
-  PCHAR_INFO savebuf;
 
   struct
     {
-      short Top, Bottom;
+      short Top;
+      short Bottom;
     } scroll_region;
-  struct console_attrs
-    {
-      SHORT winTop;
-      SHORT winBottom;
-      COORD dwWinSize;
-      COORD dwBufferSize;
-      COORD dwCursorPosition;
-      WORD wAttributes;
-      int set_cl_x (cltype);
-      int set_cl_y (cltype);
-    } info;
+
+  CONSOLE_SCREEN_BUFFER_INFO b;
+  COORD dwWinSize;
+  COORD dwEnd;
+
+  /* saved screen */
+  COORD save_bufsize;
+  PCHAR_INFO save_buf;
+  COORD save_cursor;
+  SHORT save_top;
 
   COORD dwLastCursorPosition;
   COORD dwMousePosition;	/* scroll-adjusted coord of mouse event */
@@ -1326,8 +1323,14 @@ class dev_console
   DWORD con_to_str (char *d, int dlen, WCHAR w);
   DWORD str_to_con (mbtowc_p, const char *, PWCHAR d, const char *s, DWORD sz);
   void set_color (HANDLE);
-  bool fillin_info (HANDLE);
   void set_default_attr ();
+  int set_cl_x (cltype);
+  int set_cl_y (cltype);
+  bool fillin (HANDLE);
+  bool __reg3 scroll_window (HANDLE, int, int, int, int);
+  void __reg3 scroll_buffer (HANDLE, int, int, int, int, int, int);
+  void __reg3 clear_screen (HANDLE, int, int, int, int);
+  void __reg3 save_restore (HANDLE, char);
 
   friend class fhandler_console;
 };
@@ -1339,7 +1342,7 @@ public:
   struct console_state
   {
     tty_min tty_min_state;
-    dev_console dev_state;
+    dev_console con;
   };
 private:
   static const unsigned MAX_WRITE_CHARS;
@@ -1357,11 +1360,12 @@ private:
 /* Output calls */
   void set_default_attr ();
 
-  void clear_screen (cltype, cltype, cltype, cltype);
-  void scroll_screen (int, int, int, int, int, int);
-  void cursor_set (bool, int, int);
-  void cursor_get (int *, int *);
-  void cursor_rel (int, int);
+  void scroll_buffer (int, int, int, int, int, int);
+  void scroll_buffer_screen (int, int, int, int, int, int);
+  void __reg3 clear_screen (cltype, cltype, cltype, cltype);
+  void __reg3 cursor_set (bool, int, int);
+  void __reg3 cursor_get (int *, int *);
+  void __reg3 cursor_rel (int, int);
   inline void write_replacement_char ();
   inline bool write_console (PWCHAR, DWORD, DWORD&);
   const unsigned char *write_normal (unsigned const char*, unsigned const char *);
@@ -1410,7 +1414,7 @@ private:
   int ioctl (unsigned int cmd, void *);
   int init (HANDLE, DWORD, mode_t);
   bool mouse_aware (MOUSE_EVENT_RECORD& mouse_event);
-  bool focus_aware () {return shared_console_info->dev_state.use_focus;}
+  bool focus_aware () {return shared_console_info->con.use_focus;}
 
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
@@ -1787,18 +1791,25 @@ class fhandler_dev_dsp: public fhandler_base
   Audio_in  *audio_in_;
  public:
   fhandler_dev_dsp ();
+  fhandler_dev_dsp *base () const {return (fhandler_dev_dsp *)archetype;}
 
-  int open (int flags, mode_t mode = 0);
-  ssize_t __stdcall write (const void *ptr, size_t len);
-  void __reg3 read (void *ptr, size_t& len);
-  int ioctl (unsigned int cmd, void *);
-  off_t lseek (off_t, int) { return 0; }
+  int open (int, mode_t mode = 0);
+  ssize_t __stdcall write (const void *, size_t);
+  void __reg3 read (void *, size_t&);
+  int ioctl (unsigned int, void *);
   int close ();
-  void fixup_after_fork (HANDLE parent);
+  void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
+
  private:
-  void close_audio_in ();
-  void close_audio_out (bool immediately = false);
+  ssize_t __stdcall _write (const void *, size_t);
+  void __reg3 _read (void *, size_t&);
+  int _ioctl (unsigned int, void *);
+  void _fixup_after_fork (HANDLE);
+  void _fixup_after_exec ();
+
+  void __reg1 close_audio_in ();
+  void __reg2 close_audio_out (bool = false);
   bool use_archetype () const {return true;}
 
   fhandler_dev_dsp (void *) {}

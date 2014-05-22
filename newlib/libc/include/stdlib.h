@@ -231,11 +231,11 @@ int	_EXFUN(_system_r,(struct _reent *, const char *));
 _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *));
 
 /* On platforms where long double equals double.  */
-#ifdef _LDBL_EQ_DBL
+#ifdef _HAVE_LONG_DOUBLE
 #if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L) || (__cplusplus >= 201103L)
 extern long double strtold (const char *__restrict, char **__restrict);
 #endif
-#endif /* _LDBL_EQ_DBL */
+#endif /* _HAVE_LONG_DOUBLE */
 
 _END_STD_C
 

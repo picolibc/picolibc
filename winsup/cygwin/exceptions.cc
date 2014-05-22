@@ -489,7 +489,7 @@ try_to_debug (bool waitloop)
   console_printf ("*** starting debugger for pid %u, tid %u\n",
 		  cygwin_pid (GetCurrentProcessId ()), GetCurrentThreadId ());
   BOOL dbg;
-  WCHAR dbg_cmd[strlen(debugger_command)];
+  WCHAR dbg_cmd[strlen(debugger_command) + 1];
   sys_mbstowcs (dbg_cmd, strlen(debugger_command) + 1, debugger_command);
   dbg = CreateProcessW (NULL,
 			dbg_cmd,
@@ -545,47 +545,56 @@ rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
   popl		%%ebx					\n\
 ": : "r" (frame), "r" (e));
 }
-#endif
-
-/* Main exception handler. */
+#endif /* __x86_64 */
 
 #ifdef __x86_64__
-#define CYG_EXC_CONTINUE_EXECUTION	EXCEPTION_CONTINUE_EXECUTION
-#define CYG_EXC_CONTINUE_SEARCH		EXCEPTION_CONTINUE_SEARCH
+/* myfault vectored exception handler */
+LONG
+exception::myfault_handle (LPEXCEPTION_POINTERS ep)
+{
+  _cygtls& me = _my_tls;
 
-bool exception::handler_installed NO_COPY; 
+  if (me.andreas)
+    {
+      /* Only handle the minimum amount of exceptions the myfault handler
+	 was designed for. */
+      switch (ep->ExceptionRecord->ExceptionCode)
+	{
+	case STATUS_ACCESS_VIOLATION:
+	case STATUS_DATATYPE_MISALIGNMENT:
+	case STATUS_STACK_OVERFLOW:
+	case STATUS_ARRAY_BOUNDS_EXCEEDED:
+	  me.andreas->leave ();	/* Return from a "san" caught fault */
+	default:
+	  break;
+	}
+    }
+  return EXCEPTION_CONTINUE_SEARCH;
+}
+#endif /* __x86_64 */
 
-int
-exception::handle (LPEXCEPTION_POINTERS ep)
-#else
-#define CYG_EXC_CONTINUE_EXECUTION	ExceptionContinueExecution
-#define CYG_EXC_CONTINUE_SEARCH		ExceptionContinueSearch
-
+/* Main exception handler. */
 int
 exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
-#endif
 {
   static bool NO_COPY debugging;
   _cygtls& me = _my_tls;
 
+#ifndef __x86_64__
   if (me.andreas)
     me.andreas->leave ();	/* Return from a "san" caught fault */
-
-#ifdef __x86_64__
-  EXCEPTION_RECORD *e = ep->ExceptionRecord;
-  CONTEXT *in = ep->ContextRecord;
 #endif
 
   if (debugging && ++debugging < 500000)
     {
       SetThreadPriority (hMainThread, THREAD_PRIORITY_NORMAL);
-      return CYG_EXC_CONTINUE_EXECUTION;
+      return ExceptionContinueExecution;
     }
 
   /* If we're exiting, tell Windows to keep looking for an
      exception handler.  */
   if (exit_state || e->ExceptionFlags)
-    return CYG_EXC_CONTINUE_SEARCH;
+    return ExceptionContinueSearch;
 
   siginfo_t si = {};
   si.si_code = SI_KERNEL;
@@ -654,7 +663,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 					     1))
 	{
 	case MMAP_NORESERVE_COMMITED:
-	  return CYG_EXC_CONTINUE_EXECUTION;
+	  return ExceptionContinueExecution;
 	case MMAP_RAISE_SIGBUS:	/* MAP_NORESERVE page, commit failed, or
 				   access to mmap page beyond EOF. */
 	  si.si_signo = SIGBUS;
@@ -688,13 +697,13 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
 	 want CloseHandle to return an error.  This can be revisited
 	 if gcc ever supports Windows style structured exception
 	 handling.  */
-      return CYG_EXC_CONTINUE_EXECUTION;
+      return ExceptionContinueExecution;
 
     default:
       /* If we don't recognize the exception, we have to assume that
 	 we are doing structured exception handling, and we let
 	 something else handle it.  */
-      return CYG_EXC_CONTINUE_SEARCH;
+      return ExceptionContinueSearch;
     }
 
   debug_printf ("In cygwin_except_handler exception %y at %p sp %p", e->ExceptionCode, in->_GR(ip), in->_GR(sp));
@@ -730,7 +739,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
   else
     {
       debugging = true;
-      return CYG_EXC_CONTINUE_EXECUTION;
+      return ExceptionContinueExecution;
     }
 
   /* FIXME: Probably should be handled in signal processing code */
@@ -765,7 +774,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void
   sig_send (NULL, si, &me);	/* Signal myself */
   me.incyg--;
   e->ExceptionFlags = 0;
-  return CYG_EXC_CONTINUE_EXECUTION;
+  return ExceptionContinueExecution;
 }
 
 /* Utilities to call a user supplied exception handler.  */
@@ -1465,43 +1474,29 @@ _cygtls::call_signal_handler ()
 void
 _cygtls::signal_debugger (siginfo_t& si)
 {
-  HANDLE th = NULL;
-  if (isinitialized () && being_debugged ())
+  HANDLE th;
+  /* If si.si_cyg is set then the signal was already sent to the debugger. */
+  if (isinitialized () && !si.si_cyg && (th = (HANDLE) *this)
+      && being_debugged () && SuspendThread (th) >= 0)
     {
       CONTEXT c;
-      CONTEXT *pc;
-
-      if (si.si_cyg)
-	pc = ((cygwin_exception *) si.si_cyg)->context ();
-      else if (!(th = (HANDLE) *this))
-	return;
-      else
+      c.ContextFlags = CONTEXT_FULL;
+      if (GetThreadContext (th, &c))
 	{
-	  SuspendThread (th);
-	  c.ContextFlags = CONTEXT_FULL;
-	  if (GetThreadContext (th, &c))
-	    pc = &c;
-	  else
-	    goto out;
 	  if (incyg)
 #ifdef __x86_64__
 	    c.Rip = retaddr ();
 #else
 	    c.Eip = retaddr ();
 #endif
-	  memcpy (&thread_context, pc, (&thread_context._internal -
+	  memcpy (&thread_context, &c, (&thread_context._internal -
 					(unsigned char *) &thread_context));
+	  /* Enough space for 32/64 bit addresses */
+	  char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffffffffffff")];
+	  __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %y %p", si.si_signo,
+			   thread_id, &thread_context);
+	  OutputDebugString (sigmsg);
 	}
-#ifdef __x86_64__
-      char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffffffffffff")];
-#else
-      char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffff")];
-#endif
-      __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %y %p", si.si_signo,
-		       thread_id, &thread_context);
-      OutputDebugString (sigmsg);
+      ResumeThread (th);
     }
-out:
-  if (th)
-    ResumeThread (th);
 }

@@ -2,7 +2,7 @@
    fhandler classes.
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2011, 2012, 2013 Red Hat, Inc.
+   2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -63,12 +63,6 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
 	{
 	  dix = (DISK_GEOMETRY_EX *) dbuf;
 	  di = &dix->Geometry;
-	  if (!DeviceIoControl (get_handle (),
-				IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
-				pbuf, 256, &bytes_read, NULL))
-	    __seterrno ();
-	  else
-	    pix = (PARTITION_INFORMATION_EX *) pbuf;
 	}
     }
   if (!di)
@@ -81,6 +75,23 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
 	  return -1;
 	}
       di = (DISK_GEOMETRY *) dbuf;
+    }
+  if (dix) /* Don't try IOCTL_DISK_GET_PARTITION_INFO_EX if
+	      IOCTL_DISK_GET_DRIVE_GEOMETRY_EX didn't work. 
+	      Probably a floppy.*/
+    {
+      if (!DeviceIoControl (get_handle (),
+			    IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0,
+			    pbuf, 256, &bytes_read, NULL))
+	__seterrno ();
+      else
+	pix = (PARTITION_INFORMATION_EX *) pbuf;
+    }
+  if (!pix && get_major () != DEV_FLOPPY_MAJOR)
+    {
+      /* It's unlikely that this code path will be used at all.  Either the
+	 _EX call already worked, or it's a floppy.  But it doesn't hurt to
+	 keep the code in. */
       if (!DeviceIoControl (get_handle (),
 			    IOCTL_DISK_GET_PARTITION_INFO, NULL, 0,
 			    pbuf, 256, &bytes_read, NULL))
@@ -101,13 +112,16 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
 		    pix->PartitionLength.QuadPart);
       drive_size = pix->PartitionLength.QuadPart;
     }
-  else
+  else if (pi)
     {
       debug_printf ("partition info: offset %D  length %D",
 		    pi->StartingOffset.QuadPart,
 		    pi->PartitionLength.QuadPart);
       drive_size = pi->PartitionLength.QuadPart;
     }
+  else	/* Floppy drive. */
+    drive_size = di->Cylinders.QuadPart * di->TracksPerCylinder
+		 * di->SectorsPerTrack * di->BytesPerSector;
   if (geo)
     {
       geo->heads = di->TracksPerCylinder;

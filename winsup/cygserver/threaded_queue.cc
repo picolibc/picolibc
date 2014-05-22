@@ -1,6 +1,6 @@
 /* threaded_queue.cc
 
-   Copyright 2001, 2002, 2003 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2014 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -55,7 +55,7 @@ threaded_queue::threaded_queue (const size_t initial_workers)
   if (!_requests_sem)
     {
       system_printf (("failed to create the request queue semaphore, "
-		      "error = %lu"),
+		      "error = %u"),
 		     GetLastError ());
       abort ();
     }
@@ -145,7 +145,7 @@ threaded_queue::stop ()
       while (_workers_count)
 	{
 	  debug_printf (("waiting for worker threads to terminate: "
-			 "%lu still running"),
+			 "%u still running"),
 			_workers_count);
 	  Sleep (1000);
 	}
@@ -228,7 +228,7 @@ threaded_queue::create_workers (const size_t initial_workers)
 
       if (!hThread)
 	{
-	  system_printf ("failed to create thread, error = %lu",
+	  system_printf ("failed to create thread, error = %u",
 			 GetLastError ());
 	  abort ();
 	}
@@ -245,7 +245,7 @@ threaded_queue::worker_loop ()
       const DWORD rc = WaitForSingleObject (_requests_sem, INFINITE);
       if (rc == WAIT_FAILED)
 	{
-	  system_printf ("wait for request semaphore failed, error = %lu",
+	  system_printf ("wait for request semaphore failed, error = %u",
 			 GetLastError ());
 	  return;
 	}
@@ -297,7 +297,7 @@ queue_submission_loop::queue_submission_loop (threaded_queue *const queue,
 
       if (!_interrupt_event)
 	{
-	  system_printf ("failed to create interrupt event, error = %lu",
+	  system_printf ("failed to create interrupt event, error = %u",
 			 GetLastError ());
 	  abort ();
 	}
@@ -329,7 +329,7 @@ queue_submission_loop::start ()
       _hThread = CreateThread (NULL, 0, start_routine, this, 0, &_tid);
       if (!_hThread)
 	{
-	  system_printf ("failed to create thread, error = %lu",
+	  system_printf ("failed to create thread, error = %u",
 			 GetLastError ());
 	  abort ();
 	}
@@ -359,14 +359,14 @@ queue_submission_loop::stop ()
 
 	  if (WaitForSingleObject (_hThread, 1000) == WAIT_TIMEOUT)
 	    {
-	      system_printf (("request loop thread %lu failed to shutdown "
+	      system_printf (("request loop thread %u failed to shutdown "
 			      "when asked politely: about to get heavy"),
 			     _tid);
 
 	      if (!TerminateThread (_hThread, 0))
 		{
-		  system_printf (("failed to kill request loop thread %lu"
-				  ", error = %lu"),
+		  system_printf (("failed to kill request loop thread %u"
+				  ", error = %u"),
 				 _tid, GetLastError ());
 		  abort ();
 		}
@@ -378,11 +378,11 @@ queue_submission_loop::stop ()
 	  // the submission loop is no longer running and shuts down
 	  // voluntarily.
 
-	  debug_printf ("killing request loop thread %lu", _tid);
+	  debug_printf ("killing request loop thread %u", _tid);
 
 	  if (!TerminateThread (_hThread, 0))
-	    system_printf (("failed to kill request loop thread %lu"
-			    ", error = %lu"),
+	    system_printf (("failed to kill request loop thread %u"
+			    ", error = %u"),
 			   _tid, GetLastError ());
 	}
     }

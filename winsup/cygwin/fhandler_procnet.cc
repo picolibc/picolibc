@@ -11,6 +11,13 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 #define USE_SYS_TYPES_FD_SET
 #include "winsup.h"
+#ifdef __x86_64__
+/* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
+   because a redefinition for LP64 systems is missing.  This leads to a wrong
+   definition and size of sockaddr_in6 when building with winsock headers. */
+#undef u_long
+#define u_long __ms_u_long
+#endif
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
 #include "cygerrno.h"

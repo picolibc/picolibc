@@ -59,8 +59,12 @@ SECTIONS
   {
     *(.rdata)
     *(SORT(.rdata$*))
-    *(.eh_frame)
     *(.rdata_cygwin_nocopy)
+    ___RUNTIME_PSEUDO_RELOC_LIST__ = .;
+    __RUNTIME_PSEUDO_RELOC_LIST__ = .;
+    *(.rdata_runtime_pseudo_reloc)
+    ___RUNTIME_PSEUDO_RELOC_LIST_END__ = .;
+    __RUNTIME_PSEUDO_RELOC_LIST_END__ = .;
   }
   .eh_frame ALIGN(__section_alignment__) :
   {
@@ -87,11 +91,6 @@ SECTIONS
   {
     *(.edata)
   }
-  .rsrc BLOCK(__section_alignment__) :
-  {
-    *(.rsrc)
-    *(SORT(.rsrc$*))
-  }
   .reloc BLOCK(__section_alignment__) :
   {
     *(.reloc)
@@ -99,6 +98,20 @@ SECTIONS
   .cygwin_dll_common ALIGN(__section_alignment__):
   {
     *(.cygwin_dll_common)
+  }
+  .idata ALIGN(__section_alignment__) :
+  {
+    /* This cannot currently be handled with grouped sections.
+	See pe.em:sort_sections.  */
+    SORT(*)(.idata$2)
+    SORT(*)(.idata$3)
+    /* These zeroes mark the end of the import list.  */
+    LONG (0); LONG (0); LONG (0); LONG (0); LONG (0);
+    SORT(*)(.idata$4)
+    SORT(*)(.idata$5)
+    SORT(*)(.idata$6)
+    SORT(*)(.idata$7)
+    . = ALIGN(16);
   }
   .gnu_debuglink_overlay ALIGN(__section_alignment__) (NOLOAD):
   {
@@ -116,20 +129,11 @@ SECTIONS
     BYTE(0)	/* \0 */
     LONG(0)	/* checksum */
   }
-  .idata ALIGN(__section_alignment__) :
+  .rsrc BLOCK(__section_alignment__) :
   {
-    /* This cannot currently be handled with grouped sections.
-	See pe.em:sort_sections.  */
-    SORT(*)(.idata$2)
-    SORT(*)(.idata$3)
-    /* These zeroes mark the end of the import list.  */
-    LONG (0); LONG (0); LONG (0); LONG (0); LONG (0);
-    SORT(*)(.idata$4)
-    SORT(*)(.idata$5)
-    SORT(*)(.idata$6)
-    SORT(*)(.idata$7)
-    . = ALIGN(16);
-    _SYM (_cygheap_start) = ABSOLUTE(.);
+    *(.rsrc)
+    *(SORT(.rsrc$*))
+    _SYM (_cygheap_start) = .;
   }
   .cygheap ALIGN(__section_alignment__) :
   {
@@ -139,7 +143,7 @@ SECTIONS
     . = . + (2048 * 1024);
 #endif
     . = ALIGN(0x10000);
-    _SYM (_cygheap_end) = ABSOLUTE(.);
+    _SYM (_cygheap_end) = .;
   }
   /DISCARD/ :
   {

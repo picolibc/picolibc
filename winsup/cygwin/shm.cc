@@ -1,6 +1,6 @@
 /* shm.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2012, 2013
+   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2012, 2013, 2014
    Red Hat, Inc.
 
 This file is part of Cygwin.
@@ -85,7 +85,7 @@ client_request_shm::client_request_shm (proc *p1)
   : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
 {
   _parameters.in.shmop = SHMOP_shmfork;
-  ipc_set_proc_info (_parameters.in.ipcblk);
+  ipc_set_proc_info (_parameters.in.ipcblk, true);
 
   _parameters.in.forkargs = *p1;
 }

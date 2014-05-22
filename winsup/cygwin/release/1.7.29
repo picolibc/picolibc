@@ -1,0 +1,44 @@
+What's new:
+-----------
+
+- Allow quoting of arguments to the CYGWIN environment variable, i.e.,
+  set CYGWIN=error_start="c:\bin\someprogram -T"
+
+
+What changed:
+-------------
+
+
+Bug Fixes
+---------
+
+- Try harder to do the right thing in the presence of console screen buffers,
+  i.e., never clear the screen buffer unless the user asked for it.  Also
+  fix screen escape sequences which attempted to scroll the screen.
+  Addresses: http://cygwin.com/ml/cygwin/2014-02/threads.html#00274
+
+- Make "ps -W" report different WINPIDs for processes that have been execed
+  from, e.g., cmd.
+  Addresses: http://cygwin.com/ml/cygwin/2014-02/threads.html#00382
+
+- Avoid error messages from the signal handler if we're exiting.
+  Addresses: A random irc #cygwin complaint.
+
+- Fix return value from getgrouplist function to behave like glibc.
+
+- Fix initialization of open_memstream which could lead to dropping the
+  entire string.
+  Addresses: http://cygwin.com/ml/cygwin/2014-03/threads.html#00413
+
+- Fix problem where ending chunk of audio was missing when accessing /dev/dsp.
+  Addresses: http://cygwin.com/ml/cygwin/2014-03/threads.html#00117
+
+- Fix exception handling on x86_64.
+  Addresses: http://cygwin.com/ml/cygwin/2014-03/threads.html#00026
+
+- Fix reading extended attributes from files on remote shares.
+  Addresses: A personally encountered spurious error message:
+  mv: listing attributes of `//server/share/file': Invalid argument
+
+- Fix sending an invalid pointer to cygserver during fork.
+  Addresses: http://cygwin.com/ml/cygwin/2014-04/msg00001.html

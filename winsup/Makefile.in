@@ -82,7 +82,7 @@ $(SUBDIRS):
 	@${MAKE} -C $@ all || ([ "$@" == doc ] && echo "*** error ignored")
 
 $(INSTALL_SUBDIRS):
-	@${MAKE} -C $(patsubst install_%,%,$@) install
+	@${MAKE} -C $(patsubst install_%,%,$@) install || ([ "$@" == install_doc ] && echo "*** error ignored")
 
 $(CLEAN_SUBDIRS):
 	@if cd $(patsubst clean_%,%,$@) 2>/dev/null; then \

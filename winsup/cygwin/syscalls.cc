@@ -188,7 +188,7 @@ dup3 (int oldfd, int newfd, int flags)
 /* Define macro to simplify checking for a transactional error code. */
 #define NT_TRANSACTIONAL_ERROR(s)	\
 		(((ULONG)(s) >= (ULONG)STATUS_TRANSACTIONAL_CONFLICT) \
-		 && ((ULONG)(s) <= (ULONG)STATUS_LOG_GROWTH_FAILED))
+		 && ((ULONG)(s) <= (ULONG)STATUS_TRANSACTION_NOT_ENLISTED))
 
 static inline void
 start_transaction (HANDLE &old_trans, HANDLE &trans)
@@ -4180,7 +4180,7 @@ getusershell ()
   /* Get each non-whitespace character as part of the shell path as long as
      it fits in buf. */
   for (buf_idx = 0;
-       ch != EOF && !isspace (ch) && buf_idx < PATH_MAX;
+       ch != EOF && !isspace (ch) && buf_idx < (PATH_MAX - 1);
        buf_idx++, ch = getc (shell_fp))
     buf[buf_idx] = ch;
   /* Skip any trailing non-whitespace character not fitting in buf.  If the

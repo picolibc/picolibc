@@ -1,6 +1,6 @@
 /* transport_pipes.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2009, 2012 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2009, 2012, 2014 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -137,7 +137,7 @@ transport_layer_pipes::accept (bool *const recoverable)
 
   if (accept_pipe == INVALID_HANDLE_VALUE)
     {
-      debug_printf ("error creating pipe (%lu).", GetLastError ());
+      debug_printf ("error creating pipe (%u).", GetLastError ());
       *recoverable = true;	// FIXME: case analysis?
       return NULL;
     }
@@ -145,7 +145,7 @@ transport_layer_pipes::accept (bool *const recoverable)
   if (!ConnectNamedPipe (accept_pipe, NULL)
       && GetLastError () != ERROR_PIPE_CONNECTED)
     {
-      debug_printf ("error connecting to pipe (%lu)", GetLastError ());
+      debug_printf ("error connecting to pipe (%u)", GetLastError ());
       (void) CloseHandle (accept_pipe);
       *recoverable = true;	// FIXME: case analysis?
       return NULL;
@@ -199,7 +199,7 @@ transport_layer_pipes::read (void *const buf, const size_t len)
   DWORD count;
   if (!ReadFile (_hPipe, buf, len, &count, NULL))
     {
-      debug_printf ("error reading from pipe (%lu)", GetLastError ());
+      debug_printf ("error reading from pipe (%u)", GetLastError ());
       SET_ERRNO (EINVAL);	// FIXME?
       return -1;
     }
@@ -219,7 +219,7 @@ transport_layer_pipes::write (void *const buf, const size_t len)
   DWORD count;
   if (!WriteFile (_hPipe, buf, len, &count, NULL))
     {
-      debug_printf ("error writing to pipe, error = %lu", GetLastError ());
+      debug_printf ("error writing to pipe, error = %u", GetLastError ());
       SET_ERRNO (EINVAL);	// FIXME?
       return -1;
     }
@@ -273,7 +273,7 @@ transport_layer_pipes::connect ()
 
       if (!assume_cygserver && GetLastError () != ERROR_PIPE_BUSY)
 	{
-	  debug_printf ("Error opening the pipe (%lu)", GetLastError ());
+	  debug_printf ("Error opening the pipe (%u)", GetLastError ());
 	  return -1;
 	}
 
@@ -294,7 +294,7 @@ transport_layer_pipes::connect ()
 
   assert (retries == MAX_WAIT_NAMED_PIPE_RETRY);
 
-  system_printf ("lost connection to cygserver, error = %lu",
+  system_printf ("lost connection to cygserver, error = %u",
 		 GetLastError ());
 
   assume_cygserver = false;
@@ -313,7 +313,7 @@ transport_layer_pipes::impersonate_client ()
 
   if (_hPipe && !ImpersonateNamedPipeClient (_hPipe))
     {
-      debug_printf ("Failed to Impersonate client, (%lu)", GetLastError ());
+      debug_printf ("Failed to Impersonate client, (%u)", GetLastError ());
       return false;
     }
 
@@ -327,7 +327,7 @@ transport_layer_pipes::revert_to_self ()
 
   if (!RevertToSelf ())
     {
-      debug_printf ("Failed to RevertToSelf, (%lu)", GetLastError ());
+      debug_printf ("Failed to RevertToSelf, (%u)", GetLastError ());
       return false;
     }
   return true;

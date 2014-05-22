@@ -1,3 +1,82 @@
+2014-03-21  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* libc/stdlib/gd_qnan.h (f_QNAN, d_QNAN0, d_QNAN1): Add MIPS
+	versions.
+	(ld_QNAN0, ld_QNAN1, ld_QNAN2, ld_QNAN3): Don't define for MIPS.
+	(ldus_QNAN0, ldus_QNAN1, ldus_QNAN2, ldus_QNAN3, ldus_QNAN4):
+	Likewise.
+	* libc/stdlib/ldtoa.c (nan113, nan64, nan53, nan24): Add MIPS
+	versions.
+	(enan): Handle legacy MIPS payloads.
+	* libm/common/s_nan.c (nan): Use __builtin_nan if supported by
+	the compiler.
+	* libm/common/sf_nan.c (nanf): Likewise.
+
+2014-03-21  Sabrina Ni  <sabrinanitw@gmail.com>
+
+	* libc/machine/nds32/configure: Regenerated.
+	* libc/machine/nds32/configure.in: Add AC_NOEXECUTABLES.
+
+2014-03-21  Sabrina Ni  <sabrinanitw@gmail.com>
+
+	* libc/machine/nds32/Makefile.am: Use C code implemented memcpy,
+	memset for 'ISA V3M'.
+	* libc/machine/nds32/Makefile.in: Generated.
+	* libc/machine/nds32/configure: Generated.
+	* libc/machine/nds32/configure.in: Detect IS_NDS32_ISA_V3M.
+
+2014-03-21  Sabrina Ni  <sabrinanitw@gmail.com>
+
+	* libc/machine/nds32/setjmp.S: Keep jmp_buff sync with GDB.
+
+2014-03-21  Sabrina Ni  <sabrinanitw@gmail.com>
+
+	* libc/machine/nds32/setjmp.S: Optimize.
+
+2014-03-07  Corinna Vinschen  <vinschen@redhat.com>
+	    Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdlib.h (strtold): Define if _HAVE_LONG_DOUBLE is
+	defined.
+	* libc/stdlib/strtold.c (strtold): Ditto.  Call strtod on systems
+	with long double == double, _strtold otherwise.
+
+2014-03-05  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/time.h (__TM_GMTOFF): Remove Cygwin-specific definition.
+	(__TM_ZONE): Ditto.
+
+2014-03-05  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/time.h (__TM_GMTOFF): Define on Cygwin.
+	(__TM_ZONE): Ditto.
+	(struct tm): Add __TM_GMTOFF and __TM_ZONE members if they are defined.
+
+2014-03-04  Ed Nelson  <ed@nelson305.com>
+
+	* libc/include/machine/_default_types.h: Define unsigned type using
+	signed type macros in case unsigned type macros are not available.
+
+2014-02-20  Agustin Henze  <tin@sluc.org.ar>
+
+	* libm/complex/complex.tex: Fix wrong syntax in documentation.
+	* libm/math/math.tex: Ditto.
+
+2014-02-20  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdio/open_memstream.c (internal_open_memstream_r): Initialize
+	c->pos to 0.
+
+2014-02-11  Joey Ye  <joey.ye@arm.com>
+
+	* libc/sys/arm/syscalls.c (_sbrk): Define as weak symbols.
+	(_read, _write): Ditto.
+
+2014-02-09  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/pwd.h: Include <sys/cdefs.h>.
+	* libc/include/grp.h: Ditto.
+
 2014-02-04  Matthias Braun  <matze@braunis.de>
 
 	* libm/mathfp/sf_numtest.c: Fix NaN/Inf detection logic.

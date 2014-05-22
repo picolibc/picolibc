@@ -43,6 +43,7 @@
 #ifndef _GRP_H_
 #define	_GRP_H_
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #ifdef __CYGWIN__
 #include <cygwin/grp.h>

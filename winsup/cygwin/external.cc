@@ -1,7 +1,7 @@
 /* external.cc: Interface to Cygwin internals from external programs.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2014 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -26,6 +26,7 @@ details. */
 #include "child_info.h"
 #include "environ.h"
 #include "cygserver_setpwd.h"
+#include "pwdgrp.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <wchar.h>
@@ -551,6 +552,24 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	    delete ddm;
 	  res = 0;
 	}
+	break;
+
+      case CW_GETPWSID:
+        {
+          va_arg (arg, int);
+          PSID psid = va_arg (arg, PSID);
+          cygpsid sid (psid);
+          res = (uintptr_t) internal_getpwsid (sid);
+        }
+        break;
+
+      case CW_GETGRSID:
+        {
+          va_arg (arg, int);
+          PSID psid = va_arg (arg, PSID);
+          cygpsid sid (psid);
+          res = (uintptr_t) internal_getgrsid (sid);
+        }
 	break;
 
       default:

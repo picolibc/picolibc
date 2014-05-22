@@ -41,7 +41,7 @@ unsigned long
 setlsapwd (const char *passwd, const char *username)
 {
   unsigned long ret = (unsigned long) -1;
-  HANDLE lsa = INVALID_HANDLE_VALUE;
+  HANDLE lsa;
   WCHAR sid[128];
   WCHAR key_name[128 + wcslen (CYGWIN_LSA_KEY_PREFIX)];
   PWCHAR data_buf = NULL;
@@ -71,7 +71,7 @@ setlsapwd (const char *passwd, const char *username)
       if (data_buf)
 	RtlInitUnicodeString (&data, data_buf);
       /* First try it locally.  Works for admin accounts. */
-      if (!(lsa = lsa_open_policy (NULL, POLICY_CREATE_SECRET)))
+      if ((lsa = lsa_open_policy (NULL, POLICY_CREATE_SECRET)))
 	{
 	  NTSTATUS status = LsaStorePrivateData (lsa, &key,
 						 data.Length ? &data : NULL);

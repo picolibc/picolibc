@@ -439,7 +439,7 @@ fhandler_base::del_my_locks (del_lock_called_from from)
    wait on.  If the node has been abandoned due to close_on_exec on the
    referencing fhandlers, remove the inode entirely. */
 void
-fixup_lockf_after_exec ()
+fixup_lockf_after_exec (bool exec)
 {
   inode_t *node, *next_node;
 
@@ -464,13 +464,29 @@ fixup_lockf_after_exec ()
       else
 	{
 	  node->LOCK ();
-	  for (lockf_t *lock = node->i_lockf; lock; lock = lock->lf_next)
+	  lockf_t *lock, *n_lock;
+	  lockf_t **prev = &node->i_lockf;
+	  for (lock = *prev; lock && (n_lock = lock->lf_next, 1); lock = n_lock)
 	    if (lock->lf_flags & F_POSIX)
 	      {
-		lock->del_lock_obj (NULL);
-		lock->lf_wid = myself->dwProcessId;
-		lock->lf_ver = 0;
-		lock->create_lock_obj ();
+		if (exec)
+		  {
+		    /* The parent called exec.  The lock is passed to the child.
+		       Recreate lock object with changed ownership. */
+		    lock->del_lock_obj (NULL);
+		    lock->lf_wid = myself->dwProcessId;
+		    lock->lf_ver = 0;
+		    lock->create_lock_obj ();
+		  }
+		else
+		  {
+		    /* The parent called spawn.  The parent continues to hold
+		       the POSIX lock, ownership is not passed to the child.
+		       Give up the lock in the child. */
+		    *prev = n_lock;
+		    lock->close_lock_obj ();
+		    delete lock;
+		  }
 	      }
 	  node->UNLOCK ();
 	}

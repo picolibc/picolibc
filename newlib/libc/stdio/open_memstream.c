@@ -355,6 +355,7 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
   c->storage = c;
   c->pbuf = buf;
   c->psize = size;
+  c->pos = 0;
   c->eof = 0;
   c->saved.w = L'\0';
   c->wide = (int8_t) wide;
