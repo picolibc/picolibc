@@ -1,5 +1,9 @@
 2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* gmon.h: Pull in profile.h.  Explain why.
+
+2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Fix potential SEGV
 	referencing NULL pointer.
 
