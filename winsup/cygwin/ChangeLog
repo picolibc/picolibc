@@ -1,5 +1,10 @@
 2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_auth.cc (get_server_groups): Call get_user_local_groups only if
+	get_logon_server succeeded.
+
+2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ldap.cc (cyg_ldap::fetch_ad_account): Take additional domain string
 	parameter.  Convert into likely rootDSE string if not NULL, and use in
 	subsequent call to ldap_search_stW.  Add comment to explain that this

@@ -467,12 +467,15 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
       return false;
     }
   /* If the SID does NOT start with S-1-5-21, the domain is some builtin
-     domain.  The search for a logon server is moot. */
+     domain.  The search for a logon server and fetching group accounts
+     is moot. */
   if (sid_id_auth (usersid) == 5 /* SECURITY_NT_AUTHORITY */
       && sid_sub_auth (usersid, 0) == SECURITY_NT_NON_UNIQUE
       && get_logon_server (domain, server, DS_IS_FLAT_NAME))
-    get_user_groups (server, grp_list, user, domain);
-  get_user_local_groups (server, domain, grp_list, user);
+    {
+      get_user_groups (server, grp_list, user, domain);
+      get_user_local_groups (server, domain, grp_list, user);
+    }
   return true;
 }
 
