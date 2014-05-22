@@ -44,7 +44,23 @@
 #define __P(x) x
 #endif
 
+/* On POSIX systems, profile.h is a KRB5 header.  To avoid collisions, just
+   pull in profile.h's content here.  The profile.h header won't be provided
+   by Mingw-w64 anymore at one point. */
+#if 0
 #include <profile.h>
+#else
+#ifndef _WIN64
+#define _MCOUNT_CALL __attribute__ ((regparm (2)))
+extern void _mcount(void);
+#else
+#define _MCOUNT_CALL
+extern void mcount(void);
+#endif
+#define _MCOUNT_DECL __attribute__((gnu_inline)) __inline__ \
+   void _MCOUNT_CALL _mcount_private
+#define MCOUNT
+#endif
 
 #ifdef __MINGW32__
 #include <_bsd_types.h>
