@@ -1445,7 +1445,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 
 	  for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
 	    {
-	      fetch_posix_offset (td, cldap);
+	      fetch_posix_offset (td, &loc_ldap);
 	      if (td->PosixOffset > posix_offset && td->PosixOffset <= arg.id)
 		posix_offset = (this_td = td)->PosixOffset;
 	    }
@@ -1501,7 +1501,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 #endif
 	      name_style = (cygheap->pg.nss_prefix_always ()) ? fully_qualified
 							      : plus_prepended;
-	      domain = cygheap->dom.account_flat_name ();
 	      is_domain_account = false;
 	    }
 	  /* Account domain account? */
@@ -1511,7 +1510,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	      if (cygheap->dom.member_machine ()
 		  || !cygheap->pg.nss_prefix_auto ())
 		name_style = fully_qualified;
-	      domain = cygheap->dom.account_flat_name ();
 	      is_domain_account = false;
 	    }
 	  /* Domain member machine? */
@@ -1530,7 +1528,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		     later on.  So, don't set domain here to non-NULL, unless
 		     you're sure you have also changed subsequent assumptions
 		     that domain is NULL if it's a primary domain account. */
-		  domain = NULL;
 		  if (!cygheap->pg.nss_prefix_auto ())
 		    name_style = fully_qualified;
 		}
@@ -1547,7 +1544,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		      {
 			domain = td->DnsDomainName;
 			posix_offset =
-			  fetch_posix_offset (td, cldap);
+			  fetch_posix_offset (td, &loc_ldap);
 			break;
 		      }
 
@@ -1593,7 +1590,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	      /* Use LDAP to fetch domain account infos. */
 	      if (!cldap->open (NULL))
 		break;
-	      if (cldap->fetch_ad_account (sid, is_group ()))
+	      if (cldap->fetch_ad_account (sid, is_group (), domain))
 		{
 		  PWCHAR val;
 
@@ -1860,7 +1857,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	      if (td->DomainSid && RtlEqualSid (sid, td->DomainSid))
 		{
 		  domain = td->NetbiosDomainName;
-		  posix_offset = fetch_posix_offset (td, cldap);
+		  posix_offset = fetch_posix_offset (td, &loc_ldap);
 		  break;
 		}
 	}

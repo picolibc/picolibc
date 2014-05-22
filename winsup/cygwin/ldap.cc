@@ -200,13 +200,14 @@ cyg_ldap::close ()
 }
 
 bool
-cyg_ldap::fetch_ad_account (PSID sid, bool group)
+cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
 {
-  WCHAR filter[140], *f;
+  WCHAR filter[140], *f, *rdse = rootdse;
   LONG len = (LONG) RtlLengthSid (sid);
   PBYTE s = (PBYTE) sid;
   static WCHAR hex_wchars[] = L"0123456789abcdef";
   ULONG ret;
+  tmp_pathbuf tp;
 
   if (msg)
     {
@@ -226,17 +227,36 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group)
       *f++ = hex_wchars[*s++ & 0xf];
     }
   wcpcpy (f, L")");
+  if (domain)
+    {
+      /* FIXME:  This is a hack.  The most correct solution is probably to
+         open a connection to the DC of the trusted domain.  But this always
+	 takes extra time, so we're trying to avoid it.  If this results in
+	 problems, we know what to do. */
+      rdse = tp.w_get ();
+      PWCHAR r = rdse;
+      for (PWCHAR dotp = (PWCHAR) domain; dotp && *dotp; domain = dotp)
+	{
+	  dotp = wcschr (domain, L'.');
+	  if (dotp)
+	    *dotp++ = L'\0';
+	  if (r > rdse)
+	    *r++ = L',';
+	  r = wcpcpy (r, L"DC=");
+	  r = wcpcpy (r, domain);
+	}
+    }
   attr = group ? group_attr : user_attr;
-  if ((ret = ldap_search_stW (lh, rootdse, LDAP_SCOPE_SUBTREE, filter,
+  if ((ret = ldap_search_stW (lh, rdse, LDAP_SCOPE_SUBTREE, filter,
 			      attr, 0, &tv, &msg)) != LDAP_SUCCESS)
     {
       debug_printf ("ldap_search_stW(%W,%W) error 0x%02x",
-		    rootdse, filter, ret);
+		    rdse, filter, ret);
       return false;
     }
   if (!(entry = ldap_first_entry (lh, msg)))
     {
-      debug_printf ("No entry for %W in rootdse %W", filter, rootdse);
+      debug_printf ("No entry for %W in rootdse %W", filter, rdse);
       return false;
     }
   return true;

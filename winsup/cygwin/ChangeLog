@@ -1,5 +1,18 @@
 2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ldap.cc (cyg_ldap::fetch_ad_account): Take additional domain string
+	parameter.  Convert into likely rootDSE string if not NULL, and use in
+	subsequent call to ldap_search_stW.  Add comment to explain that this
+	is not the exactly correct solution.
+	* ldap.h (cyg_ldap::fetch_ad_account): Change prototype accordingly.
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Always use loc_ldap
+	in call to fetch_posix_offset to make sure we're fetchoinmg the posix
+	offsets from *our* domain controller.  Only set domain variable to
+	non-NULL if the account is from a trusted domain.  Use domain in call
+	to cyg_ldap::fetch_ad_account.
+
+2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* gmon.h: Pull in profile.h.  Explain why.
 
 2014-05-22  Corinna Vinschen  <corinna@vinschen.de>

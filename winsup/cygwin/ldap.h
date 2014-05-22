@@ -51,7 +51,7 @@ public:
   operator PLDAP () const { return lh; }
   bool open (PCWSTR in_domain);
   void close ();
-  bool fetch_ad_account (PSID sid, bool group);
+  bool fetch_ad_account (PSID sid, bool group, PCWSTR domain = NULL);
   bool enumerate_ad_accounts (PCWSTR domain, bool group);
   bool next_account (cygsid &sid);
   uint32_t fetch_posix_offset_for_domain (PCWSTR domain);
