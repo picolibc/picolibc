@@ -1441,17 +1441,17 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       else
 	{
 	  /* Some trusted domain? */
-	  PDS_DOMAIN_TRUSTSW td = NULL;
+	  PDS_DOMAIN_TRUSTSW td = NULL, this_td = NULL;
 
 	  for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
 	    {
 	      fetch_posix_offset (td, cldap);
 	      if (td->PosixOffset > posix_offset && td->PosixOffset <= arg.id)
-		posix_offset = td->PosixOffset;
+		posix_offset = (this_td = td)->PosixOffset;
 	    }
-	  if (posix_offset)
+	  if (this_td)
 	    {
-	      cygpsid tsid (td->DomainSid);
+	      cygpsid tsid (this_td->DomainSid);
 	      PWCHAR s = tsid.pstring (sidstr);
 	      __small_swprintf (s, L"-%u", arg.id - posix_offset);
 	    }

@@ -1,4 +1,9 @@
-2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Fix potential SEGV
+	referencing NULL pointer.
+
+2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/bsdlib.cc (forkpty): Close master and slave if fork fails to
 	avoid resource leak (CID 59997).
