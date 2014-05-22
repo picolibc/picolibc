@@ -182,10 +182,12 @@ err:
 void
 cyg_ldap::close ()
 {
-  if (msg_id != (ULONG) -1)
-    ldap_abandon (lh, msg_id);
+  if (srch_id != NULL)
+    ldap_search_abandon_page (lh, srch_id);
   if (lh)
     ldap_unbind (lh);
+  if (srch_msg)
+    ldap_memfreeW ((PWCHAR) srch_msg);
   if (msg)
     ldap_memfreeW ((PWCHAR) msg);
   if (val)
@@ -196,7 +198,8 @@ cyg_ldap::close ()
   msg = entry = NULL;
   val = NULL;
   rootdse = NULL;
-  msg_id = (ULONG) -1;
+  srch_id = NULL;
+  srch_msg = srch_entry = NULL;
 }
 
 bool
@@ -286,12 +289,13 @@ cyg_ldap::enumerate_ad_accounts (PCWSTR domain, bool group)
 		/* 1 == ACCOUNT_GROUP */
 		"(!(groupType:" LDAP_MATCHING_RULE_BIT_AND ":=1))"
 		"(objectSid=*))";
-  msg_id = ldap_searchW (lh, rootdse, LDAP_SCOPE_SUBTREE, (PWCHAR) filter,
-			 sid_attr, 0);
-  if (msg_id == (ULONG) -1)
+  srch_id = ldap_search_init_pageW (lh, rootdse, LDAP_SCOPE_SUBTREE,
+				    (PWCHAR) filter, sid_attr, 0,
+				    NULL, NULL, 3, 100, NULL);
+  if (srch_id == NULL)
     {
-      debug_printf ("ldap_searchW(%W,%W) error 0x%02x", rootdse, filter,
-		    LdapGetLastError ());
+      debug_printf ("ldap_search_init_pageW(%W,%W) error 0x%02x",
+		    rootdse, filter, LdapGetLastError ());
       return false;
     }
   return true;
@@ -303,29 +307,34 @@ cyg_ldap::next_account (cygsid &sid)
   ULONG ret;
   PLDAP_BERVAL *bval;
 
-  if (msg)
+  ULONG total;
+
+  if (srch_entry)
     {
-      ldap_memfreeW ((PWCHAR) msg);
-      msg = entry = NULL;
+      if ((srch_entry = ldap_next_entry (lh, srch_entry))
+	  && (bval = ldap_get_values_lenW (lh, srch_entry, sid_attr[0])))
+	{
+	  sid = (PSID) bval[0]->bv_val;
+	  ldap_value_free_len (bval);
+	  return true;
+	}
+      ldap_memfreeW ((PWCHAR) srch_msg);
+      srch_msg = srch_entry = NULL;
     }
-  if (val)
+  do
     {
-      ldap_value_freeW (val);
-      val = NULL;
+      ret = ldap_get_next_page_s (lh, srch_id, &tv, 100, &total, &srch_msg);
     }
-  ret = ldap_result (lh, msg_id, LDAP_MSG_ONE, &tv, &msg);
-  if (ret == 0)
+  while (ret == LDAP_SUCCESS && ldap_count_entries (lh, srch_msg) == 0);
+  if (ret == LDAP_NO_RESULTS_RETURNED)
+    return false;
+  if (ret != LDAP_SUCCESS)
     {
-      debug_printf ("ldap_result() timeout!");
+      debug_printf ("ldap_result() error 0x%02x", ret);
       return false;
     }
-  if (ret == (ULONG) -1)
-    {
-      debug_printf ("ldap_result() error 0x%02x", LdapGetLastError ());
-      return false;
-    }
-  if ((entry = ldap_first_entry (lh, msg))
-      && (bval = ldap_get_values_lenW (lh, entry, sid_attr[0])))
+  if ((srch_entry = ldap_first_entry (lh, srch_msg))
+      && (bval = ldap_get_values_lenW (lh, srch_entry, sid_attr[0])))
     {
       sid = (PSID) bval[0]->bv_val;
       ldap_value_free_len (bval);

@@ -1,5 +1,23 @@
 2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (ldap_abandon): Remove.
+	(ldap_count_entries): Import.
+	(ldap_get_next_page_s): Import.
+	(ldap_result): Remove.
+	(ldap_searchW): Remove.
+	(ldap_search_abandon_page): Import.
+	(ldap_search_init_pageW): Import.
+	* ldap.cc (cyg_ldap::close): Use ldap_search_abandon_page to abandon
+	search.  Reset srch_id, srch_msg and srch_entry.
+	(cyg_ldap::enumerate_ad_accounts): Use paged search to overcome server
+	side search result set restriction.
+	(cyg_ldap::next_account): Ditto.
+	* ldap.h (class cyg_ldap): Add members srch_id, srch_msg and srch_entry.
+	Remove member msg_id.
+	(cyg_ldap::cyg_ldap): Change initialization accordingly.
+
+2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (get_server_groups): Call get_user_local_groups only if
 	get_logon_server succeeded.
 

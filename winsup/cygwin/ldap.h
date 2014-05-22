@@ -33,7 +33,8 @@ class cyg_ldap {
   PWCHAR *val;
   PWCHAR *attr;
   bool isAD;
-  ULONG msg_id;
+  PLDAPSearch srch_id;
+  PLDAPMessage srch_msg, srch_entry;
 
   bool connect_ssl (PCWSTR domain);
   bool connect_non_ssl (PCWSTR domain);
@@ -43,8 +44,8 @@ class cyg_ldap {
   uint32_t get_num_attribute (int idx);
 
 public:
-  cyg_ldap () : lh (NULL), rootdse (NULL), msg (NULL), entry (NULL),
-		val (NULL), isAD (false), msg_id ((ULONG) -1)
+  cyg_ldap () : lh (NULL), rootdse (NULL), msg (NULL), entry (NULL), val (NULL),
+		isAD (false), srch_id (NULL), srch_msg (NULL), srch_entry (NULL)
   {}
   ~cyg_ldap () { close (); }
 
