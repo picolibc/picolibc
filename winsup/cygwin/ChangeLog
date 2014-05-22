@@ -1,5 +1,13 @@
 2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/bsdlib.cc (forkpty): Close master and slave if fork fails to
+	avoid resource leak (CID 59997).
+	* libc/fts.c: Update to FreeBSD version 1.39 (CID 59947).
+	* libc/minires.c (minires_get_search): Fix out-of-bounds read from
+	words array (CID 59937).
+
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* flock.cc (delete_lock_in_parent): Use LIST_FOREACH_SAFE to avoid
 	dereferencing freed pointer (CID 60224).
 
