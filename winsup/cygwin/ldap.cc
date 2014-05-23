@@ -172,7 +172,7 @@ cyg_ldap::open (PCWSTR domain)
     }
   ldap_value_freeW (val);
   val = NULL;
-  ldap_memfreeW ((PWCHAR) msg);
+  ldap_msgfree (msg);
   msg = entry = NULL; return true;
 err:
   close ();
@@ -187,9 +187,9 @@ cyg_ldap::close ()
   if (lh)
     ldap_unbind (lh);
   if (srch_msg)
-    ldap_memfreeW ((PWCHAR) srch_msg);
+    ldap_msgfree (srch_msg);
   if (msg)
-    ldap_memfreeW ((PWCHAR) msg);
+    ldap_msgfree (msg);
   if (val)
     ldap_value_freeW (val);
   if (rootdse)
@@ -214,7 +214,7 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
 
   if (msg)
     {
-      ldap_memfreeW ((PWCHAR) msg);
+      ldap_msgfree (msg);
       msg = entry = NULL;
     }
   if (val)
@@ -318,7 +318,7 @@ cyg_ldap::next_account (cygsid &sid)
 	  ldap_value_free_len (bval);
 	  return true;
 	}
-      ldap_memfreeW ((PWCHAR) srch_msg);
+      ldap_msgfree (srch_msg);
       srch_msg = srch_entry = NULL;
     }
   do
@@ -327,19 +327,18 @@ cyg_ldap::next_account (cygsid &sid)
     }
   while (ret == LDAP_SUCCESS && ldap_count_entries (lh, srch_msg) == 0);
   if (ret == LDAP_NO_RESULTS_RETURNED)
-    return false;
-  if (ret != LDAP_SUCCESS)
-    {
-      debug_printf ("ldap_result() error 0x%02x", ret);
-      return false;
-    }
-  if ((srch_entry = ldap_first_entry (lh, srch_msg))
-      && (bval = ldap_get_values_lenW (lh, srch_entry, sid_attr[0])))
+    ;
+  else if (ret != LDAP_SUCCESS)
+    debug_printf ("ldap_result() error 0x%02x", ret);
+  else if ((srch_entry = ldap_first_entry (lh, srch_msg))
+	   && (bval = ldap_get_values_lenW (lh, srch_entry, sid_attr[0])))
     {
       sid = (PSID) bval[0]->bv_val;
       ldap_value_free_len (bval);
       return true;
     }
+  ldap_search_abandon_page (lh, srch_id);
+  srch_id = NULL;
   return false;
 }
 
@@ -351,7 +350,7 @@ cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
 
   if (msg)
     {
-      ldap_memfreeW ((PWCHAR) msg);
+      ldap_msgfree (msg);
       msg = entry = NULL;
     }
   if (val)
@@ -407,7 +406,7 @@ cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
 
   if (msg)
     {
-      ldap_memfreeW ((PWCHAR) msg);
+      ldap_msgfree (msg);
       msg = entry = NULL;
     }
   if (group)
@@ -439,7 +438,7 @@ cyg_ldap::fetch_unix_name_from_rfc2307 (uint32_t id, bool group)
 
   if (msg)
     {
-      ldap_memfreeW ((PWCHAR) msg);
+      ldap_msgfree (msg);
       msg = entry = NULL;
     }
   if (val)
