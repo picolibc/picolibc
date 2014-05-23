@@ -39,3 +39,5 @@ Bug Fixes
 
 - Fix raw floppy drive handling broken since 1.7.19.
   Addresses: https://cygwin.com/ml/cygwin/2014-05/msg00401.html
+
+- Fix handling of ioctl for /dev/dsp.
