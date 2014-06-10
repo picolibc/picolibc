@@ -673,6 +673,8 @@ LIBTOOL
 OBJDUMP
 DLLTOOL
 SED
+NEWLIB_NANO_MALLOC_FALSE
+NEWLIB_NANO_MALLOC_TRUE
 sys_dir
 machine_dir
 libm_machine_dir
@@ -749,8 +751,6 @@ build
 newlib_basedir
 MAY_SUPPLY_SYSCALLS_FALSE
 MAY_SUPPLY_SYSCALLS_TRUE
-NEWLIB_NANO_MALLOC_FALSE
-NEWLIB_NANO_MALLOC_TRUE
 target_alias
 host_alias
 build_alias
@@ -2224,15 +2224,7 @@ if test "${enable_newlib_nano_malloc+set}" = set; then :
    *) as_fn_error $? "bad value ${enableval} for newlib-nano-malloc" "$LINENO" 5 ;;
  esac
 else
-  newlib_nano_malloc=no
-fi
-
- if test x$newlib_nano_malloc = xyes; then
-  NEWLIB_NANO_MALLOC_TRUE=
-  NEWLIB_NANO_MALLOC_FALSE='#'
-else
-  NEWLIB_NANO_MALLOC_TRUE='#'
-  NEWLIB_NANO_MALLOC_FALSE=
+  newlib_nano_malloc=
 fi
 
 
@@ -3809,6 +3801,15 @@ OBJEXT=${oext}
 
 
 
+
+
+ if test x$newlib_nano_malloc = xyes; then
+  NEWLIB_NANO_MALLOC_TRUE=
+  NEWLIB_NANO_MALLOC_FALSE='#'
+else
+  NEWLIB_NANO_MALLOC_TRUE='#'
+  NEWLIB_NANO_MALLOC_FALSE=
+fi
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for a sed that does not truncate output" >&5
@@ -11500,7 +11501,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11503 "configure"
+#line 11504 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11606,7 +11607,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11609 "configure"
+#line 11610 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12219,10 +12220,6 @@ LIBOBJS=$ac_libobjs
 LTLIBOBJS=$ac_ltlibobjs
 
 
-if test -z "${NEWLIB_NANO_MALLOC_TRUE}" && test -z "${NEWLIB_NANO_MALLOC_FALSE}"; then
-  as_fn_error $? "conditional \"NEWLIB_NANO_MALLOC\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
 if test -z "${MAY_SUPPLY_SYSCALLS_TRUE}" && test -z "${MAY_SUPPLY_SYSCALLS_FALSE}"; then
   as_fn_error $? "conditional \"MAY_SUPPLY_SYSCALLS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -12269,6 +12266,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_LIBTOOL_TRUE}" && test -z "${USE_LIBTOOL_FALSE}"; then
   as_fn_error $? "conditional \"USE_LIBTOOL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${NEWLIB_NANO_MALLOC_TRUE}" && test -z "${NEWLIB_NANO_MALLOC_FALSE}"; then
+  as_fn_error $? "conditional \"NEWLIB_NANO_MALLOC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then

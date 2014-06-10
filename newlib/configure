@@ -2445,7 +2445,7 @@ if test "${enable_newlib_nano_malloc+set}" = set; then :
   esac
  fi
 else
-  newlib_nano_malloc=no
+  newlib_nano_malloc=
 fi
 
 # Check whether --enable-newlib-unbuf-stream-opt was given.

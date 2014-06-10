@@ -71,6 +71,7 @@ default_newlib_io_long_long=no
 default_newlib_io_long_double=no
 default_newlib_io_pos_args=no
 default_newlib_atexit_dynamic_alloc=yes
+default_newlib_nano_malloc=no
 aext=a
 oext=o
 lpfx="lib_a-"
@@ -229,6 +230,7 @@ case "${host_cpu}" in
 	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections "
 	newlib_cflags="${newlib_cflags} -mOs "
 	machine_dir=msp430
+	default_newlib_nano_malloc="yes"
 	;;
   mt*)
 	machine_dir=mt
@@ -840,6 +842,13 @@ fi
 if [ "x${newlib_atexit_dynamic_alloc}" = "x" ]; then
 	if [ ${default_newlib_atexit_dynamic_alloc} = "yes" ]; then
 		newlib_atexit_dynamic_alloc="yes"; 
+	fi
+fi
+
+# Enable nano-malloc if requested.
+if [ "x${newlib_nano_malloc}" = "x" ]; then
+	if [ ${default_newlib_nano_malloc} = "yes" ]; then
+		newlib_nano_malloc="yes";
 	fi
 fi
 

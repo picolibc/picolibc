@@ -181,7 +181,7 @@ AC_ARG_ENABLE(newlib-nano-malloc,
     no)  newlib_nano_malloc=no  ;;
     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-nano-malloc option) ;;
   esac
- fi], [newlib_nano_malloc=no])dnl
+ fi], [newlib_nano_malloc=])dnl
 
 dnl Support --disable-newlib-unbuf-stream-opt
 AC_ARG_ENABLE(newlib-unbuf-stream-opt,
