@@ -74,7 +74,8 @@ am_lib_a_OBJECTS = lib_a-memcmp-stub.$(OBJEXT) lib_a-memcmp.$(OBJEXT) \
 	lib_a-memmove-stub.$(OBJEXT) lib_a-memmove.$(OBJEXT) \
 	lib_a-memset-stub.$(OBJEXT) lib_a-memset.$(OBJEXT) \
 	lib_a-setjmp.$(OBJEXT) lib_a-strchr-stub.$(OBJEXT) \
-	lib_a-strchr.$(OBJEXT) lib_a-strcmp-stub.$(OBJEXT) \
+	lib_a-strchr.$(OBJEXT) lib_a-strchrnul-stub.$(OBJEXT) \
+	lib_a-strchrnul.$(OBJEXT) lib_a-strcmp-stub.$(OBJEXT) \
 	lib_a-strcmp.$(OBJEXT) lib_a-strlen-stub.$(OBJEXT) \
 	lib_a-strlen.$(OBJEXT) lib_a-strncmp-stub.$(OBJEXT) \
 	lib_a-strncmp.$(OBJEXT) lib_a-strnlen-stub.$(OBJEXT) \
@@ -206,8 +207,9 @@ AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = memcmp-stub.c memcmp.S memcpy-stub.c memcpy.S \
 	memmove-stub.c memmove.S memset-stub.c memset.S setjmp.S \
-	strchr-stub.c strchr.S strcmp-stub.c strcmp.S strlen-stub.c \
-	strlen.S strncmp-stub.c strncmp.S strnlen-stub.c strnlen.S
+	strchr-stub.c strchr.S strchrnul-stub.c strchrnul.S \
+	strcmp-stub.c strcmp.S strlen-stub.c strlen.S strncmp-stub.c \
+	strncmp.S strnlen-stub.c strnlen.S
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -306,6 +308,12 @@ lib_a-strchr.o: strchr.S
 lib_a-strchr.obj: strchr.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strchr.obj `if test -f 'strchr.S'; then $(CYGPATH_W) 'strchr.S'; else $(CYGPATH_W) '$(srcdir)/strchr.S'; fi`
 
+lib_a-strchrnul.o: strchrnul.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strchrnul.o `test -f 'strchrnul.S' || echo '$(srcdir)/'`strchrnul.S
+
+lib_a-strchrnul.obj: strchrnul.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strchrnul.obj `if test -f 'strchrnul.S'; then $(CYGPATH_W) 'strchrnul.S'; else $(CYGPATH_W) '$(srcdir)/strchrnul.S'; fi`
+
 lib_a-strcmp.o: strcmp.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.o `test -f 'strcmp.S' || echo '$(srcdir)/'`strcmp.S
 
@@ -365,6 +373,12 @@ lib_a-strchr-stub.o: strchr-stub.c
 
 lib_a-strchr-stub.obj: strchr-stub.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strchr-stub.obj `if test -f 'strchr-stub.c'; then $(CYGPATH_W) 'strchr-stub.c'; else $(CYGPATH_W) '$(srcdir)/strchr-stub.c'; fi`
+
+lib_a-strchrnul-stub.o: strchrnul-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strchrnul-stub.o `test -f 'strchrnul-stub.c' || echo '$(srcdir)/'`strchrnul-stub.c
+
+lib_a-strchrnul-stub.obj: strchrnul-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strchrnul-stub.obj `if test -f 'strchrnul-stub.c'; then $(CYGPATH_W) 'strchrnul-stub.c'; else $(CYGPATH_W) '$(srcdir)/strchrnul-stub.c'; fi`
 
 lib_a-strcmp-stub.o: strcmp-stub.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcmp-stub.o `test -f 'strcmp-stub.c' || echo '$(srcdir)/'`strcmp-stub.c

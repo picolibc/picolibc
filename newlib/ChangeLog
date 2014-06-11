@@ -1,7 +1,14 @@
+2014-06-11  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/machine/aarch64/strchrnul.S: New file.
+	* libc/machine/aarch64/strchrnul-stub.c: New file.
+	* libc/machine/aarch64/Makefile.am: Add them to build list.
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+
 2014-06-10  Richard Earnshaw  <rearnsha@arm.com>
 
-	* libc/machine/aarch64/strchr.S: New file
-	* libc/machine/aarch64/strchr-stub.c: New file
+	* libc/machine/aarch64/strchr.S: New file.
+	* libc/machine/aarch64/strchr-stub.c: New file.
 	* libc/machine/aarch64/Makefile.am: Add them to build list.
 	* libc/machine/aarch64/Makefile.in: Regenerated.
 
