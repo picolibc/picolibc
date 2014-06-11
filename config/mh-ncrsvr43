@@ -1,0 +1,3 @@
+# Host configuration file for an NCR 3000 (i486/SVR43) system.
+
+RANLIB = true

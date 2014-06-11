@@ -1,0 +1,2 @@
+# Makefile changes for SGI's running IRIX-4.x.
+SYSV = -DSYSV

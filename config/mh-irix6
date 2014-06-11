@@ -1,0 +1,2 @@
+# Makefile changes for SGI's running IRIX-6.x.
+RANLIB = true
