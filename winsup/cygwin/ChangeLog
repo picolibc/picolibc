@@ -1,3 +1,8 @@
+2014-06-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::evaluate_events): Call
+	WSASetLastError after setsockopt.  Explain why.
+
 2014-06-16  Denis Excoffier  <cygwin@Denis-Excoffier.org>
 
 	* grp.cc (getgrouplist): Fix setting ngroups to make sure to return
