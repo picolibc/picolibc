@@ -537,7 +537,8 @@ main (int argc, char **argv)
 	  if (!strcmp (username, getlogin ()))
 	    username = NULL;
 	  else if (!caller_is_admin ())
-	    return eprint (0, "You may not change the password for %s.", user);
+	    return eprint (0, "You may not change the password for %s.",
+			   username);
 
 	  if (optind < argc)
 	    usage (stderr, 1);
