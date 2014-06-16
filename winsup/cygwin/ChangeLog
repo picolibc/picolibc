@@ -1,3 +1,8 @@
+2014-06-16  Denis Excoffier  <cygwin@Denis-Excoffier.org>
+
+	* grp.cc (getgrouplist): Fix setting ngroups to make sure to return
+	the right value.
+
 2014-06-05  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* timer.cc (timer_tracker::cancel): Demote api_fatal to system_printf,
