@@ -633,7 +633,6 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	  int wsa_err = 0;
 	  if ((wsa_err = wsock_events->connect_errorcode) != 0)
 	    {
-	      WSASetLastError (wsa_err);
 	      /* CV 2014-04-23: This is really weird.  If you call connect
 		 asynchronously on a socket and then select, an error like
 		 "Connection refused" is set in the event and in the SO_ERROR
@@ -642,9 +641,14 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 		 option, even if the dup'ed socket handle refers to the same
 		 socket.  We're trying to workaround this problem here by
 		 taking the connect errorcode from the event and write it back
-		 into the SO_ERROR socket option. */
+		 into the SO_ERROR socket option.
+	         
+		 CV 2014-06-16: Call WSASetLastError *after* setsockopt since,
+		 apparently, setsockopt sets the last WSA error code to 0 on
+		 success. */
 	      setsockopt (get_socket (), SOL_SOCKET, SO_ERROR,
 			  (const char *) &wsa_err, sizeof wsa_err);
+	      WSASetLastError (wsa_err);
 	      ret = SOCKET_ERROR;
 	    }
 	  else
