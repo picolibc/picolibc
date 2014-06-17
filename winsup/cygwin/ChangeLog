@@ -1,3 +1,8 @@
+2014-05-24  David Stacey  <drstacey@tiscali.co.uk>
+
+	* libc/rexec.cc (cygwin_rexec): Make ahostbuf static to avoid returning
+	an out-of-scope address.
+
 2014-06-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::evaluate_events): Call
