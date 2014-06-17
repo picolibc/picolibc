@@ -317,7 +317,7 @@ cygwin_rexec (char **ahost, unsigned short rport, char *name, char *pass,
 	u_short port = 0;
 	int s, timo = 1, s3;
 	char c;
-	char ahostbuf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+	static char ahostbuf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
 
 	myfault efault;
 	if (efault.faulted (EFAULT))
