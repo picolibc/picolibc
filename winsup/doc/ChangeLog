@@ -1,3 +1,8 @@
+2014-06-17  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* faq-programming.xml: Add gettext-devel to list of packages needed to
+	build Cygwin.
+
 2014-04-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml: (ov-new1.7.29): Fix incomplete XML tagging.
