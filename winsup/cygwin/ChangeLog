@@ -1,4 +1,4 @@
-2014-05-24  David Stacey  <drstacey@tiscali.co.uk>
+2014-06-17  David Stacey  <drstacey@tiscali.co.uk>
 
 	* libc/rexec.cc (cygwin_rexec): Make ahostbuf static to avoid returning
 	an out-of-scope address.
