@@ -22,7 +22,9 @@ details. */
 #include "dsgetdc.h"
 #include "tls_pbuf.h"
 
-static LDAP_TIMEVAL tv = { 3, 0 };
+#define CYG_LDAP_TIMEOUT	30	/* seconds */
+
+static LDAP_TIMEVAL tv = { CYG_LDAP_TIMEOUT, 0 };
 
 static PWCHAR rootdse_attr[] =
 {
@@ -75,7 +77,7 @@ PWCHAR rfc2307_gid_attr[] =
 bool
 cyg_ldap::connect_ssl (PCWSTR domain)
 {
-  ULONG ret, timelimit = 3; /* secs */
+  ULONG ret, timelimit = CYG_LDAP_TIMEOUT;
 
   if (!(lh = ldap_sslinitW ((PWCHAR) domain, LDAP_SSL_PORT, 1)))
     {
@@ -98,7 +100,7 @@ cyg_ldap::connect_ssl (PCWSTR domain)
 bool
 cyg_ldap::connect_non_ssl (PCWSTR domain)
 {
-  ULONG ret, timelimit = 3; /* secs */
+  ULONG ret, timelimit = CYG_LDAP_TIMEOUT;
 
   if (!(lh = ldap_initW ((PWCHAR) domain, LDAP_PORT)))
     {
@@ -291,7 +293,7 @@ cyg_ldap::enumerate_ad_accounts (PCWSTR domain, bool group)
 		"(objectSid=*))";
   srch_id = ldap_search_init_pageW (lh, rootdse, LDAP_SCOPE_SUBTREE,
 				    (PWCHAR) filter, sid_attr, 0,
-				    NULL, NULL, 3, 100, NULL);
+				    NULL, NULL, CYG_LDAP_TIMEOUT, 100, NULL);
   if (srch_id == NULL)
     {
       debug_printf ("ldap_search_init_pageW(%W,%W) error 0x%02x",

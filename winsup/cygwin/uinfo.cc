@@ -1162,6 +1162,16 @@ fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, cyg_ldap *cldap)
   return td->PosixOffset;
 }
 
+/* Helper function to replace colons with commas in pw_gecos field. */
+static PWCHAR
+colon_to_semicolon (PWCHAR str)
+{
+  PWCHAR cp = str;
+  while ((cp = wcschr (cp, L':')) != NULL)
+    *cp++ = L';';
+  return str;
+}
+
 /* CV 2014-05-08: USER_INFO_24 is not yet defined in Mingw64, but will be in
    the next release.  For the time being, define the structure here with
    another name which won't collide with the upcoming correct definition
@@ -1597,8 +1607,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  if ((id_val = cldap->get_primary_gid ()) != ILLEGAL_GID)
 		    gid = posix_offset + id_val;
 		  if ((val = cldap->get_gecos ()))
-		    gecos = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
-				    * sizeof (WCHAR)), val);
+		    gecos = colon_to_semicolon (
+			      wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
+				      * sizeof (WCHAR)), val));
 		  if ((val = cldap->get_home ()))
 		    home = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
 				   * sizeof (WCHAR)), val);
