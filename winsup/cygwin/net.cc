@@ -3366,6 +3366,11 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
       /* sizeof addrinfo == sizeof addrinfoW */
       memcpy (&whints, hints, sizeof whints);
       whints.ai_flags &= ~AI_IDN_MASK;
+#ifdef __x86_64__
+      /* ai_addrlen is socklen_t (4 bytes) in POSIX but size_t (8 bytes) in
+         Winsock.  Sert upper 4 bytes explicitely to 0 to avoid EAI_FAIL. */
+      whints.ai_addrlen &= UINT32_MAX;
+#endif
       /* AI_ADDRCONFIG is not supported prior to Vista.  Rather it's
 	 the default and only possible setting.
 	 On Vista, the default behaviour is as if AI_ADDRCONFIG is set,
@@ -3402,6 +3407,11 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
       /* sizeof addrinfo == sizeof addrinfoW */
       memcpy (&whints, hints, sizeof whints);
       whints.ai_family = AF_INET;
+#ifdef __x86_64__
+      /* ai_addrlen is socklen_t (4 bytes) in POSIX but size_t (8 bytes) in
+         Winsock.  Sert upper 4 bytes explicitely to 0 to avoid EAI_FAIL. */
+      whints.ai_addrlen &= UINT32_MAX;
+#endif
       int ret2 = w32_to_gai_err (GetAddrInfoW (whost, wserv, &whints, &wres));
       if (!ret2)
 	{

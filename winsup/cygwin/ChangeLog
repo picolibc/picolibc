@@ -1,5 +1,10 @@
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (cygwin_getaddrinfo): Fix value of hint->ai_addrlen on 64 bit.
+	Explain why.
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (regopt): Allocate small local buffer to avoid copying
 	twice.  Fixes resource leak (CID 60012).  Add comment.
 
