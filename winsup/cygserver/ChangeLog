@@ -1,3 +1,7 @@
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* client.cc: Throughout, fix debug output of signed byte count value.
+
 2014-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* process.cc (process::process): Only notice that signal_arrived is

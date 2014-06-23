@@ -139,7 +139,7 @@ client_request::send (transport_layer_base * const conn)
 	assert (errno);
 	error_code (errno);
 	syscall_printf (("request header write failure: "
-			 "only %lu bytes sent of %lu, "
+			 "only %ld bytes sent of %lu, "
 			 "error = %d(%u)"),
 			count, sizeof (_header),
 			errno, GetLastError ());
@@ -156,7 +156,7 @@ client_request::send (transport_layer_base * const conn)
 	  assert (errno);
 	  error_code (errno);
 	  syscall_printf (("request body write failure: "
-			   "only %lu bytes sent of %lu, "
+			   "only %ld bytes sent of %lu, "
 			   "error = %d(%u)"),
 			  count, msglen (),
 			  errno, GetLastError ());
@@ -172,7 +172,7 @@ client_request::send (transport_layer_base * const conn)
 	assert (errno);
 	error_code (errno);
 	syscall_printf (("reply header read failure: "
-			 "only %lu bytes received of %lu, "
+			 "only %ld bytes received of %lu, "
 			 "error = %d(%u)"),
 			count, sizeof (_header),
 			errno, GetLastError ());
@@ -206,7 +206,7 @@ client_request::send (transport_layer_base * const conn)
 	  assert (errno);
 	  error_code (errno);
 	  syscall_printf (("reply body read failure: "
-			   "only %lu bytes received of %lu, "
+			   "only %ld bytes received of %lu, "
 			   "error = %d(%u)"),
 			  count, msglen (),
 			  errno, GetLastError ());
@@ -252,7 +252,7 @@ client_request::handle_request (transport_layer_base *const conn,
     if (count != sizeof (header))
       {
 	syscall_printf (("request header read failure: "
-			 "only %lu bytes received of %lu, "
+			 "only %ld bytes received of %lu, "
 			 "error = %d(%u)"),
 			count, sizeof (header),
 			errno, GetLastError ());
@@ -346,7 +346,7 @@ client_request::handle (transport_layer_base *const conn,
 	  assert (errno);
 	  error_code (errno);
 	  syscall_printf (("request body read failure: "
-			   "only %lu bytes received of %lu, "
+			   "only %ld bytes received of %lu, "
 			   "error = %d(%u)"),
 			  count, msglen (),
 			  errno, GetLastError ());
@@ -370,7 +370,7 @@ client_request::handle (transport_layer_base *const conn,
 	assert (errno);
 	error_code (errno);
 	syscall_printf (("reply header write failure: "
-			 "only %lu bytes sent of %lu, "
+			 "only %ld bytes sent of %lu, "
 			 "error = %d(%u)"),
 			count, sizeof (_header),
 			errno, GetLastError ());
@@ -387,7 +387,7 @@ client_request::handle (transport_layer_base *const conn,
 	  assert (errno);
 	  error_code (errno);
 	  syscall_printf (("reply body write failure: "
-			   "only %lu bytes sent of %lu, "
+			   "only %ld bytes sent of %lu, "
 			   "error = %d(%u)"),
 			  count, msglen (),
 			  errno, GetLastError ());
