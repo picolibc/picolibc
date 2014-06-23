@@ -780,11 +780,15 @@ ucenv (char *p, const char *eq)
 
 /* Set options from the registry. */
 static bool __stdcall
-regopt (const WCHAR *name, char *buf)
+regopt (PCWSTR name, char *buf)
 {
   bool parsed_something = false;
   UNICODE_STRING lname;
   size_t len = (wcslen(name) + 1) * sizeof (WCHAR);
+  WCHAR lbuf[1024];	/* Use reasonable size to lower stack pressure.
+			   get_string alloca's this additionally and 1024
+			   is more than enough for CYGWIN env var values. */
+
   RtlInitEmptyUnicodeString(&lname, (PWCHAR) alloca (len), len);
   wcscpy(lname.Buffer, name);
   RtlDowncaseUnicodeString(&lname, &lname, FALSE);
@@ -792,13 +796,9 @@ regopt (const WCHAR *name, char *buf)
   for (int i = 0; i < 2; i++)
     {
       reg_key r (i, KEY_READ, _WIDE (CYGWIN_INFO_PROGRAM_OPTIONS_NAME), NULL);
-
-      if (NT_SUCCESS (r.get_string (lname.Buffer, (PWCHAR) buf,
-				    NT_MAX_PATH, L"")))
+      if (NT_SUCCESS (r.get_string (lname.Buffer, lbuf, 1024, L"")))
 	{
-	  char *newp;
-	  sys_wcstombs_alloc(&newp, HEAP_NOTHEAP, (PWCHAR) buf);
-	  strcpy(buf, newp);
+	  sys_wcstombs (buf, NT_MAX_PATH, lbuf);
 	  parse_options (buf);
 	  parsed_something = true;
 	  break;
