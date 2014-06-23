@@ -22,9 +22,13 @@ details. */
 #include "dsgetdc.h"
 #include "tls_pbuf.h"
 
-#define CYG_LDAP_TIMEOUT	30	/* seconds */
+#define CYG_LDAP_TIMEOUT	  5	/* seconds */
+#define CYG_LDAP_ENUM_TIMEOUT	 60	/* seconds */
 
-static LDAP_TIMEVAL tv = { CYG_LDAP_TIMEOUT, 0 };
+#define CYG_LDAP_ENUM_PAGESIZE	100	/* entries per page */
+
+static LDAP_TIMEVAL def_tv = { CYG_LDAP_TIMEOUT, 0 };
+static LDAP_TIMEVAL enum_tv = { CYG_LDAP_ENUM_TIMEOUT, 0 };
 
 static PWCHAR rootdse_attr[] =
 {
@@ -141,7 +145,7 @@ cyg_ldap::open (PCWSTR domain)
     return false;
   if ((ret = ldap_search_stW (lh, NULL, LDAP_SCOPE_BASE,
 			      (PWCHAR) L"(objectclass=*)", rootdse_attr,
-			      0, &tv, &msg))
+			      0, &def_tv, &msg))
       != LDAP_SUCCESS)
     {
       debug_printf ("ldap_search(%W, ROOTDSE) error 0x%02x", domain, ret);
@@ -253,7 +257,7 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
     }
   attr = group ? group_attr : user_attr;
   if ((ret = ldap_search_stW (lh, rdse, LDAP_SCOPE_SUBTREE, filter,
-			      attr, 0, &tv, &msg)) != LDAP_SUCCESS)
+			      attr, 0, &def_tv, &msg)) != LDAP_SUCCESS)
     {
       debug_printf ("ldap_search_stW(%W,%W) error 0x%02x",
 		    rdse, filter, ret);
@@ -293,7 +297,8 @@ cyg_ldap::enumerate_ad_accounts (PCWSTR domain, bool group)
 		"(objectSid=*))";
   srch_id = ldap_search_init_pageW (lh, rootdse, LDAP_SCOPE_SUBTREE,
 				    (PWCHAR) filter, sid_attr, 0,
-				    NULL, NULL, CYG_LDAP_TIMEOUT, 100, NULL);
+				    NULL, NULL, CYG_LDAP_ENUM_TIMEOUT,
+				    CYG_LDAP_ENUM_PAGESIZE, NULL);
   if (srch_id == NULL)
     {
       debug_printf ("ldap_search_init_pageW(%W,%W) error 0x%02x",
@@ -325,7 +330,8 @@ cyg_ldap::next_account (cygsid &sid)
     }
   do
     {
-      ret = ldap_get_next_page_s (lh, srch_id, &tv, 100, &total, &srch_msg);
+      ret = ldap_get_next_page_s (lh, srch_id, &enum_tv, CYG_LDAP_ENUM_PAGESIZE,
+				  &total, &srch_msg);
     }
   while (ret == LDAP_SUCCESS && ldap_count_entries (lh, srch_msg) == 0);
   if (ret == LDAP_NO_RESULTS_RETURNED)
@@ -365,7 +371,8 @@ cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
   __small_swprintf (filter, L"(&(objectClass=trustedDomain)(%W=%W))",
 		    wcschr (domain, L'.') ? L"name" : L"flatName", domain);
   if ((ret = ldap_search_stW (lh, rootdse, LDAP_SCOPE_SUBTREE, filter,
-			      attr = tdom_attr, 0, &tv, &msg)) != LDAP_SUCCESS)
+			      attr = tdom_attr, 0, &def_tv, &msg))
+      != LDAP_SUCCESS)
     {
       debug_printf ("ldap_search_stW(%W,%W) error 0x%02x",
 		    rootdse, filter, ret);
@@ -416,7 +423,7 @@ cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
   else
     __small_swprintf (filter, L"(&(objectClass=User)(uidNumber=%u))", id);
   if ((ret = ldap_search_stW (lh, rootdse, LDAP_SCOPE_SUBTREE, filter,
-			      sid_attr, 0, &tv, &msg)) != LDAP_SUCCESS)
+			      sid_attr, 0, &def_tv, &msg)) != LDAP_SUCCESS)
     {
       debug_printf ("ldap_search_stW(%W,%W) error 0x%02x",
 		    rootdse, filter, ret);
@@ -455,7 +462,7 @@ cyg_ldap::fetch_unix_name_from_rfc2307 (uint32_t id, bool group)
     __small_swprintf (filter, L"(&(objectClass=posixAccount)(uidNumber=%u))",
 		      id);
   if ((ret = ldap_search_stW (lh, rootdse, LDAP_SCOPE_SUBTREE, filter, attr,
-			      0, &tv, &msg)) != LDAP_SUCCESS)
+			      0, &def_tv, &msg)) != LDAP_SUCCESS)
     {
       debug_printf ("ldap_search_stW(%W,%W) error 0x%02x",
 		    rootdse, filter, ret);

@@ -1,10 +1,20 @@
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ldap.cc (CYG_LDAP_TIMEOUT): Set to 5 secs.
+	(CYG_LDAP_ENUM_TIMEOUT): New timeout value for enumeration only.  Set
+	to 60 secs.
+	(CYG_LDAP_ENUM_PAGESIZE): Define as number of entries per single
+	search page.  Set to 100.  Use throughout.
+	(def_tv): Rename from tv.  Use throughout.
+	(enum_tv): New variable.  Use in call to ldap_get_next_page_s.
+
 2014-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ldap.cc (CYG_LDAP_TIMEOUT): Define as timeout value.  Set to 30 secs
 	for now.  Use throughout.
 	* uinfo.cc (colon_to_semicolon): New local function.
 	(pwdgrp::fetch_account_from_windows): Convert all colons in AD gecos 
-	entry to commas.
+	entry to semicolons.
 
 2014-06-17  David Stacey  <drstacey@tiscali.co.uk>
 
