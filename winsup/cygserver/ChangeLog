@@ -1,3 +1,7 @@
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* client.cc: Throughout, fix debug output of signed byte count value.
+
 2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_mutex.cc (msleep_sync_array::~msleep_sync_array): New destructor
