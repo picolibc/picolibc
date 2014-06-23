@@ -1414,7 +1414,10 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   si = new select_socket_info;
 
   if (!init_tls_select_info ())
-    return 0;
+    {
+      delete si;
+      return 0;
+    }
 
   si->ser_num = _my_tls.locals.select.ser_num;
   si->w4 = _my_tls.locals.select.w4;
@@ -1440,14 +1443,20 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 					    + MAXIMUM_WAIT_OBJECTS)
 					   * sizeof (LONG));
 	    if (!nser)
-	      return 0;
+	      {
+		delete si;
+		return 0;
+	      }
 	    _my_tls.locals.select.ser_num = si->ser_num = nser;
 	    HANDLE *nw4 = (HANDLE *) realloc (si->w4,
 					   (_my_tls.locals.select.max_w4
 					    + MAXIMUM_WAIT_OBJECTS)
 					   * sizeof (HANDLE));
 	    if (!nw4)
-	      return 0;
+	      {
+		delete si;
+		return 0;
+	      }
 	    _my_tls.locals.select.w4 = si->w4 = nw4;
 	    _my_tls.locals.select.max_w4 += MAXIMUM_WAIT_OBJECTS;
 	  }

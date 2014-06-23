@@ -1,5 +1,10 @@
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* select.cc (start_thread_socket): Delete si on early return in case of
+	an error (CID 59967).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* regex/regcomp.c (computematchjumps): Free local memory in case of
 	error (CID 59975).
 
