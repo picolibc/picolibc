@@ -1,5 +1,10 @@
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* regex/regcomp.c (computematchjumps): Free local memory in case of
+	error (CID 59975).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.cc (fs_info::update): Define dir in the outermost scope to avoid
 	accessing out-of-scope value (CID 60027).  Always initialize attr to
 	upath (CID 60113).
