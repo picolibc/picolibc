@@ -415,7 +415,7 @@ _DEFUN(iswalpha,(c), wint_t c)
       /* otherwise c > *ptr */
       /* look for 0x0 as next element which indicates a range */
       ++ptr;
-      if (*ptr == 0x0)
+      if (ptr < table + size - 1 && *ptr == 0x0)
 	{
 	  /* we have a range..see if c falls within range */
 	  ++ptr;

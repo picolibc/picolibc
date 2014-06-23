@@ -110,7 +110,7 @@ __part_load_locale(const char *name,
 		goto bad_locale;
 	if (st.st_size <= 0)
 		goto bad_locale;
-	bufsize = namesize + st.st_size;
+	bufsize = namesize + st.st_size + 1;
 	locale_buf = NULL;
 
         if (lbuf == NULL || lbuf == locale_buf_C)
@@ -137,6 +137,7 @@ __part_load_locale(const char *name,
 	/*
 	 * Parse the locale file into localebuf.
 	 */
+	p[st.st_size] = '\0';
 	if (plim[-1] != '\n')
 		goto bad_lbuf;
 	num_lines = split_lines(p, plim);

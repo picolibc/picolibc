@@ -55,6 +55,7 @@ _DEFUN (envz_merge, (envz, envz_len, envz2, envz2_len, override),
             }
 
           retval = envz_add(envz, envz_len, name_str, val_str);
+          free(name_str);
         }
     }
   return retval;
