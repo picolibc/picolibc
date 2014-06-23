@@ -1,5 +1,11 @@
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (fs_info::update): Define dir in the outermost scope to avoid
+	accessing out-of-scope value (CID 60027).  Always initialize attr to
+	upath (CID 60113).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* malloc_wrapper.cc (mallinfo): Initialize m if external malloc is used,
 	too (CID 60120).
 
