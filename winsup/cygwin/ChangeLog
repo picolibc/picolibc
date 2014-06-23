@@ -1,5 +1,10 @@
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* malloc_wrapper.cc (mallinfo): Initialize m if external malloc is used,
+	too (CID 60120).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* localtime.cc (tzload): Fix leaking memory (CID 60001).
 
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>

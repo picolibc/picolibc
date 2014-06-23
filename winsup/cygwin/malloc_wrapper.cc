@@ -241,7 +241,10 @@ mallinfo ()
 {
   struct mallinfo m;
   if (!use_internal)
-    set_errno (ENOSYS);
+    {
+      memset (&m, 0, sizeof m);
+      set_errno (ENOSYS);
+    }
   else
     {
       __malloc_lock ();
