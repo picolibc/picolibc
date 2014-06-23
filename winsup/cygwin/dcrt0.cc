@@ -115,6 +115,7 @@ insert_file (char *name, char *&cmd)
   size = GetFileSize (f, NULL);
   if (size == 0xFFFFFFFF)
     {
+      CloseHandle (f);
       debug_printf ("couldn't get file size for '%s', %E", name);
       return false;
     }
@@ -123,6 +124,7 @@ insert_file (char *name, char *&cmd)
   char *tmp = (char *) malloc (new_size);
   if (!tmp)
     {
+      CloseHandle (f);
       debug_printf ("malloc failed, %E");
       return false;
     }
@@ -134,6 +136,7 @@ insert_file (char *name, char *&cmd)
   CloseHandle (f);
   if (!rf_result || (rf_read != size))
     {
+      free (tmp);
       debug_printf ("ReadFile failed, %E");
       return false;
     }
