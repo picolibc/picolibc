@@ -482,9 +482,10 @@ try_to_debug (bool waitloop)
 	      *q = L'_' ;
 	      SetEnvironmentVariableW (L"CYGWIN", p + wcslen (L"CYGWIN=")) ;
 	    }
-	  break ;
+	  break;
 	}
     }
+  FreeEnvironmentStringsW (rawenv);
 
   console_printf ("*** starting debugger for pid %u, tid %u\n",
 		  cygwin_pid (GetCurrentProcessId ()), GetCurrentThreadId ());

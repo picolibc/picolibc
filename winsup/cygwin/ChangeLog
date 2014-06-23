@@ -1,5 +1,10 @@
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (try_to_debug): Free environment pointer when not used
+	anymore (CID 59968).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (cygwin_getaddrinfo): Fix value of hint->ai_addrlen on 64 bit.
 	Explain why.
 
