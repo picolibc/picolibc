@@ -4355,8 +4355,17 @@ popen (const char *command, const char *in_type)
   /* If we reach here we've seen an error but the pipe handles are open.
      Close them and return NULL. */
   int save_errno = get_errno ();
-  close (fds[0]);
-  close (fds[1]);
+  if (fp)
+    {
+      /* Must fclose fp to avoid memory leak. */
+      fclose (fp);
+      close (fds[myix ^ 1]);
+    }
+  else
+    {
+      close (fds[0]);
+      close (fds[1]);
+    }
   set_errno (save_errno);
 
 #undef rw

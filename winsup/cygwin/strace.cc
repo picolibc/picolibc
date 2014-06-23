@@ -50,7 +50,8 @@ strace::activate (bool isfork)
 	    }
 	  else
 	    {
-	      GetModuleFileNameW (NULL, progname_buf, sizeof (myself->progname));
+	      GetModuleFileNameW (NULL, progname_buf,
+	      			  sizeof progname_buf / sizeof (WCHAR));
 	      __small_sprintf (pidbuf, "(windows pid %u)", GetCurrentProcessId ());
 	      progname = progname_buf;
 	    }

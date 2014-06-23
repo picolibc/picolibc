@@ -1,5 +1,14 @@
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (find_exec): Initialize err (CID 60111).
+	* strace.cc (strace::activate): Fix potential buffer overrun (CID 59938)
+	* syscalls.cc (popen): Close parent pipe descriptor via fclosing fp on
+	error to avoid resource leak (CID 59981).
+	* thread.cc (pthread::exit): Avoid accessing cygtls member after
+	deleting "this" (CID 60217).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* select.cc (start_thread_socket): Delete si on early return in case of
 	an error (CID 59967).
 

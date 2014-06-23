@@ -511,6 +511,7 @@ void
 pthread::exit (void *value_ptr)
 {
   class pthread *thread = this;
+  bool is_main_tls = (cygtls == _main_tls); // Check cygtls before deleting this
 
   // run cleanup handlers
   pop_all_cleanup_handlers ();
@@ -536,7 +537,7 @@ pthread::exit (void *value_ptr)
     ::exit (0);
   else
     {
-      if (cygtls == _main_tls)
+      if (is_main_tls)
 	{
 	  _cygtls *dummy = (_cygtls *) malloc (sizeof (_cygtls));
 	  *dummy = *_main_tls;
