@@ -354,7 +354,7 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
       uid_t map_uid = ILLEGAL_UID;
 
       domain = cygheap->dom.get_rfc2307_domain ();
-      if ((ldap_open = cldap.open (domain)))
+      if ((ldap_open = (cldap.open (domain) == NO_ERROR)))
 	map_uid = cldap.remap_uid (nfs_attr->uid);
       if (map_uid == ILLEGAL_UID)
 	map_uid = MAP_UNIX_TO_CYGWIN_ID (nfs_attr->uid);
@@ -366,7 +366,7 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
       gid_t map_gid = ILLEGAL_GID;
 
       domain = cygheap->dom.get_rfc2307_domain ();
-      if ((ldap_open || cldap.open (domain)))
+      if ((ldap_open || cldap.open (domain) == NO_ERROR))
 	map_gid = cldap.remap_gid (nfs_attr->gid);
       if (map_gid == ILLEGAL_GID)
 	map_gid = MAP_UNIX_TO_CYGWIN_ID (nfs_attr->gid);

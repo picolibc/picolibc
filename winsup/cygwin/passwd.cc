@@ -593,13 +593,19 @@ pg_ent::enumerate_ad ()
       if (!cnt)
 	{
 	  PDS_DOMAIN_TRUSTSW td;
+	  int ret;
 
 	  if (!resume)
 	    {
 	      ++resume;
-	      if (!nss_db_enum_primary ()
-		  || !cldap.enumerate_ad_accounts (NULL, group))
+	      if (!nss_db_enum_primary ())
 		continue;
+	      if ((ret = cldap.enumerate_ad_accounts (NULL, group)) != NO_ERROR)
+		{
+		  cldap.close ();
+		  set_errno (ret);
+		  return NULL;
+		}
 	    }
 	  else if ((td = cygheap->dom.trusted_domain (resume - 1)))
 	    {
@@ -612,9 +618,15 @@ pg_ent::enumerate_ad ()
 	      if (((enums & ENUM_TDOMS_ALL) && td->Flags & DS_DOMAIN_PRIMARY)
 		  || !td->DomainSid
 		  || (!nss_db_enum_tdom (td->NetbiosDomainName)
-		      && !nss_db_enum_tdom (td->DnsDomainName))
-		  || !cldap.enumerate_ad_accounts (td->DnsDomainName, group))
+		      && !nss_db_enum_tdom (td->DnsDomainName)))
 		continue;
+	      if ((ret = cldap.enumerate_ad_accounts (td->DnsDomainName, group))
+		  != NO_ERROR)
+		{
+		  cldap.close ();
+		  set_errno (ret);
+		  return NULL;
+		}
 	    }
 	  else
 	    {
@@ -624,7 +636,8 @@ pg_ent::enumerate_ad ()
 	}
       ++cnt;
       cygsid sid;
-      if (cldap.next_account (sid))
+      int ret = cldap.next_account (sid);
+      if (ret == NO_ERROR)
 	{
 	  fetch_user_arg_t arg;
 	  arg.type = SID_arg;
@@ -632,6 +645,13 @@ pg_ent::enumerate_ad ()
 	  char *line = pg.fetch_account_from_windows (arg, &cldap);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);
+	  ret = EIO;
+	}
+      if (ret != ENMFILE)
+	{
+	  cldap.close ();
+	  set_errno (ret);
+	  return NULL;
 	}
       cnt = 0;
     }

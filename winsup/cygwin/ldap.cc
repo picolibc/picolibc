@@ -22,13 +22,7 @@ details. */
 #include "dsgetdc.h"
 #include "tls_pbuf.h"
 
-#define CYG_LDAP_TIMEOUT	  5	/* seconds */
-#define CYG_LDAP_ENUM_TIMEOUT	 60	/* seconds */
-
 #define CYG_LDAP_ENUM_PAGESIZE	100	/* entries per page */
-
-static LDAP_TIMEVAL def_tv = { CYG_LDAP_TIMEOUT, 0 };
-static LDAP_TIMEVAL enum_tv = { CYG_LDAP_ENUM_TIMEOUT, 0 };
 
 static PWCHAR rootdse_attr[] =
 {
@@ -78,38 +72,84 @@ PWCHAR rfc2307_gid_attr[] =
   NULL
 };
 
-bool
+/* ================================================================= */
+/* Helper methods.						     */
+/* ================================================================= */
+
+inline int
+cyg_ldap::map_ldaperr_to_errno (ULONG lerr)
+{
+  switch (lerr)
+    {
+    case LDAP_SUCCESS:
+      return NO_ERROR;
+    case LDAP_NO_RESULTS_RETURNED:
+      /* LdapMapErrorToWin32 maps LDAP_NO_RESULTS_RETURNED to ERROR_MORE_DATA,
+	 which in turn is mapped to EMSGSIZE by geterrno_from_win_error.  This
+	 is SO wrong, especially considering that LDAP_MORE_RESULTS_TO_RETURN
+	 is mapped to ERROR_MORE_DATA as well :-P */
+      return ENMFILE;
+    default:
+      break;
+    }
+  return geterrno_from_win_error (LdapMapErrorToWin32 (lerr));
+}
+
+inline int
+cyg_ldap::wait (cygthread *thr)
+{
+  if (!thr)
+    return EIO;
+  if (cygwait (*thr, INFINITE, cw_sig | cw_sig_eintr) != WAIT_OBJECT_0)
+    {
+      thr->terminate_thread ();
+      _my_tls.call_signal_handler ();
+      return EINTR;
+    }
+  thr->detach ();
+  return 0;
+}
+
+/* ================================================================= */
+/* Helper struct and functions for interruptible LDAP initalization. */
+/* ================================================================= */
+
+struct cyg_ldap_init {
+  cyg_ldap *that;
+  PCWSTR domain;
+  bool ssl;
+  ULONG ret;
+};
+
+ULONG
 cyg_ldap::connect_ssl (PCWSTR domain)
 {
-  ULONG ret, timelimit = CYG_LDAP_TIMEOUT;
+  ULONG ret;
 
   if (!(lh = ldap_sslinitW ((PWCHAR) domain, LDAP_SSL_PORT, 1)))
     {
       debug_printf ("ldap_init(%W) error 0x%02x", domain, LdapGetLastError ());
-      return false;
+      return LdapGetLastError ();
     }
-  if ((ret = ldap_set_option (lh, LDAP_OPT_TIMELIMIT, &timelimit))
-      != LDAP_SUCCESS)
-    debug_printf ("ldap_set_option(LDAP_OPT_TIMELIMIT) error 0x%02x", ret);
   if ((ret = ldap_bind_s (lh, NULL, NULL, LDAP_AUTH_NEGOTIATE)) != LDAP_SUCCESS)
-    {
-      debug_printf ("ldap_bind(%W) 0x%02x", domain, ret);
-      ldap_unbind (lh);
-      lh = NULL;
-      return false;
-    }
-  return true;
+    debug_printf ("ldap_bind(%W) 0x%02x", domain, ret);
+  else if ((ret = ldap_search_sW (lh, NULL, LDAP_SCOPE_BASE,
+				  (PWCHAR) L"(objectclass=*)", rootdse_attr,
+				  0, &msg))
+      != LDAP_SUCCESS)
+    debug_printf ("ldap_search(%W, ROOTDSE) error 0x%02x", domain, ret);
+  return ret;
 }
 
-bool
+ULONG
 cyg_ldap::connect_non_ssl (PCWSTR domain)
 {
-  ULONG ret, timelimit = CYG_LDAP_TIMEOUT;
+  ULONG ret;
 
   if (!(lh = ldap_initW ((PWCHAR) domain, LDAP_PORT)))
     {
       debug_printf ("ldap_init(%W) error 0x%02x", domain, LdapGetLastError ());
-      return false;
+      return LdapGetLastError ();
     }
   if ((ret = ldap_set_option (lh, LDAP_OPT_SIGN, LDAP_OPT_ON))
       != LDAP_SUCCESS)
@@ -117,40 +157,133 @@ cyg_ldap::connect_non_ssl (PCWSTR domain)
   if ((ret = ldap_set_option (lh, LDAP_OPT_ENCRYPT, LDAP_OPT_ON))
       != LDAP_SUCCESS)
     debug_printf ("ldap_set_option(LDAP_OPT_ENCRYPT) error 0x%02x", ret);
-  if ((ret = ldap_set_option (lh, LDAP_OPT_TIMELIMIT, &timelimit))
-      != LDAP_SUCCESS)
-    debug_printf ("ldap_set_option(LDAP_OPT_TIMELIMIT) error 0x%02x", ret);
   if ((ret = ldap_bind_s (lh, NULL, NULL, LDAP_AUTH_NEGOTIATE)) != LDAP_SUCCESS)
-    {
-      debug_printf ("ldap_bind(%W) 0x%02x", domain, ret);
-      ldap_unbind (lh);
-      lh = NULL;
-      return false;
-    }
-  return true;
+    debug_printf ("ldap_bind(%W) 0x%02x", domain, ret);
+  else if ((ret = ldap_search_sW (lh, NULL, LDAP_SCOPE_BASE,
+				  (PWCHAR) L"(objectclass=*)", rootdse_attr,
+				  0, &msg))
+      != LDAP_SUCCESS)
+    debug_printf ("ldap_search(%W, ROOTDSE) error 0x%02x", domain, ret);
+  return ret;
 }
 
-bool
-cyg_ldap::open (PCWSTR domain)
+static DWORD WINAPI
+ldap_init_thr (LPVOID param)
+{
+  cyg_ldap_init *cl = (cyg_ldap_init *) param;
+  cl->ret = cl->ssl ? cl->that->connect_ssl (cl->domain)
+		    : cl->that->connect_non_ssl (cl->domain);
+  return 0;
+}
+
+inline int
+cyg_ldap::connect (PCWSTR domain)
+{
+  /* FIXME?  connect_ssl can take ages even when failing, so we're trying to
+     do everything the non-SSL (but still encrypted) way. */
+  cyg_ldap_init cl = { this, domain, false, NO_ERROR };
+  cygthread *thr = new cygthread (ldap_init_thr, &cl, "ldap_init");
+  return wait (thr) ?: map_ldaperr_to_errno (cl.ret);
+}
+
+/* ================================================================= */
+/* Helper struct and functions for interruptible LDAP search.        */
+/* ================================================================= */
+
+struct cyg_ldap_search {
+  cyg_ldap *that;
+  PWCHAR base;
+  PWCHAR filter;
+  PWCHAR *attrs;
+  ULONG ret;
+};
+
+ULONG
+cyg_ldap::search_s (PWCHAR base, PWCHAR filter, PWCHAR *attrs)
 {
   ULONG ret;
+  
+  if ((ret = ldap_search_sW (lh, base, LDAP_SCOPE_SUBTREE, filter,
+			     attrs, 0, &msg)) != LDAP_SUCCESS)
+    debug_printf ("ldap_search_sW(%W,%W) error 0x%02x", base, filter, ret);
+  return ret;
+}
+
+static DWORD WINAPI
+ldap_search_thr (LPVOID param)
+{
+  cyg_ldap_search *cl = (cyg_ldap_search *) param;
+  cl->ret = cl->that->search_s (cl->base, cl->filter, cl->attrs);
+  return 0;
+}
+
+inline int
+cyg_ldap::search (PWCHAR base, PWCHAR filter, PWCHAR *attrs)
+{
+  cyg_ldap_search cl = { this, base, filter, attrs, NO_ERROR };
+  cygthread *thr = new cygthread (ldap_search_thr, &cl, "ldap_search");
+  return wait (thr) ?: map_ldaperr_to_errno (cl.ret);
+}
+
+/* ================================================================= */
+/* Helper struct and functions for interruptible LDAP page search.        */
+/* ================================================================= */
+
+struct cyg_ldap_next_page {
+  cyg_ldap *that;
+  ULONG ret;
+};
+
+ULONG
+cyg_ldap::next_page_s ()
+{
+  ULONG total;
+  ULONG ret;
+  
+  do
+    {
+      ret = ldap_get_next_page_s (lh, srch_id, NULL, CYG_LDAP_ENUM_PAGESIZE,
+				  &total, &srch_msg);
+    }
+  while (ret == LDAP_SUCCESS && ldap_count_entries (lh, srch_msg) == 0);
+  if (ret && ret != LDAP_NO_RESULTS_RETURNED)
+    debug_printf ("ldap_result() error 0x%02x", ret);
+  return ret;
+}
+
+static DWORD WINAPI
+ldap_next_page_thr (LPVOID param)
+{
+  cyg_ldap_next_page *cl = (cyg_ldap_next_page *) param;
+  cl->ret = cl->that->next_page_s ();
+  return 0;
+}
+
+inline int
+cyg_ldap::next_page ()
+{
+  cyg_ldap_next_page cl = { this, NO_ERROR };
+  cygthread *thr = new cygthread (ldap_next_page_thr, &cl, "ldap_next_page");
+  return wait (thr) ?: map_ldaperr_to_errno (cl.ret);
+}
+
+/* ================================================================= */
+/* Public methods.						     */
+/* ================================================================= */
+
+int
+cyg_ldap::open (PCWSTR domain)
+{
+  int ret = 0;
 
   /* Already open? */
   if (lh)
-    return true;
+    return 0;
 
-  /* FIXME?  connect_ssl can take ages even when failing, so we're trying to
-     do everything the non-SSL (but still encrypted) way. */
-  if (/*!connect_ssl (NULL) && */ !connect_non_ssl (domain))
-    return false;
-  if ((ret = ldap_search_stW (lh, NULL, LDAP_SCOPE_BASE,
-			      (PWCHAR) L"(objectclass=*)", rootdse_attr,
-			      0, &def_tv, &msg))
-      != LDAP_SUCCESS)
-    {
-      debug_printf ("ldap_search(%W, ROOTDSE) error 0x%02x", domain, ret);
-      goto err;
-    }
+  if ((ret = connect (domain)) != NO_ERROR)
+    goto err;
+  /* Prime `ret' and fetch ROOTDSE search result. */
+  ret = EIO;
   if (!(entry = ldap_first_entry (lh, msg)))
     {
       debug_printf ("No ROOTDSE entry for %W", domain);
@@ -179,10 +312,11 @@ cyg_ldap::open (PCWSTR domain)
   ldap_value_freeW (val);
   val = NULL;
   ldap_msgfree (msg);
-  msg = entry = NULL; return true;
+  msg = entry = NULL;
+  return 0;
 err:
   close ();
-  return false;
+  return ret;
 }
 
 void
@@ -215,7 +349,6 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
   LONG len = (LONG) RtlLengthSid (sid);
   PBYTE s = (PBYTE) sid;
   static WCHAR hex_wchars[] = L"0123456789abcdef";
-  ULONG ret;
   tmp_pathbuf tp;
 
   if (msg)
@@ -256,13 +389,8 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
 	}
     }
   attr = group ? group_attr : user_attr;
-  if ((ret = ldap_search_stW (lh, rdse, LDAP_SCOPE_SUBTREE, filter,
-			      attr, 0, &def_tv, &msg)) != LDAP_SUCCESS)
-    {
-      debug_printf ("ldap_search_stW(%W,%W) error 0x%02x",
-		    rdse, filter, ret);
+  if (search (rdse, filter, attr) != 0)
       return false;
-    }
   if (!(entry = ldap_first_entry (lh, msg)))
     {
       debug_printf ("No entry for %W in rootdse %W", filter, rdse);
@@ -271,15 +399,16 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
   return true;
 }
 
-bool
+int
 cyg_ldap::enumerate_ad_accounts (PCWSTR domain, bool group)
 {
+  int ret;
   tmp_pathbuf tp;
   PCWSTR filter;
 
   close ();
-  if (!open (domain))
-    return false;
+  if ((ret = open (domain)) != NO_ERROR)
+    return ret;
 
   if (!group)
     filter = L"(&(objectClass=User)"
@@ -296,25 +425,22 @@ cyg_ldap::enumerate_ad_accounts (PCWSTR domain, bool group)
 		"(!(groupType:" LDAP_MATCHING_RULE_BIT_AND ":=1))"
 		"(objectSid=*))";
   srch_id = ldap_search_init_pageW (lh, rootdse, LDAP_SCOPE_SUBTREE,
-				    (PWCHAR) filter, sid_attr, 0,
-				    NULL, NULL, CYG_LDAP_ENUM_TIMEOUT,
-				    CYG_LDAP_ENUM_PAGESIZE, NULL);
+				    (PWCHAR) filter, sid_attr, 0, NULL, NULL,
+				    INFINITE, CYG_LDAP_ENUM_PAGESIZE, NULL);
   if (srch_id == NULL)
     {
       debug_printf ("ldap_search_init_pageW(%W,%W) error 0x%02x",
 		    rootdse, filter, LdapGetLastError ());
-      return false;
+      return map_ldaperr_to_errno (LdapGetLastError ());
     }
-  return true;
+  return NO_ERROR;
 }
 
-bool
+int
 cyg_ldap::next_account (cygsid &sid)
 {
   ULONG ret;
   PLDAP_BERVAL *bval;
-
-  ULONG total;
 
   if (srch_entry)
     {
@@ -323,38 +449,32 @@ cyg_ldap::next_account (cygsid &sid)
 	{
 	  sid = (PSID) bval[0]->bv_val;
 	  ldap_value_free_len (bval);
-	  return true;
+	  return NO_ERROR;
 	}
       ldap_msgfree (srch_msg);
       srch_msg = srch_entry = NULL;
     }
-  do
+  ret = next_page ();
+  if (ret == NO_ERROR)
     {
-      ret = ldap_get_next_page_s (lh, srch_id, &enum_tv, CYG_LDAP_ENUM_PAGESIZE,
-				  &total, &srch_msg);
-    }
-  while (ret == LDAP_SUCCESS && ldap_count_entries (lh, srch_msg) == 0);
-  if (ret == LDAP_NO_RESULTS_RETURNED)
-    ;
-  else if (ret != LDAP_SUCCESS)
-    debug_printf ("ldap_result() error 0x%02x", ret);
-  else if ((srch_entry = ldap_first_entry (lh, srch_msg))
-	   && (bval = ldap_get_values_lenW (lh, srch_entry, sid_attr[0])))
-    {
-      sid = (PSID) bval[0]->bv_val;
-      ldap_value_free_len (bval);
-      return true;
+      if ((srch_entry = ldap_first_entry (lh, srch_msg))
+	  && (bval = ldap_get_values_lenW (lh, srch_entry, sid_attr[0])))
+	{
+	  sid = (PSID) bval[0]->bv_val;
+	  ldap_value_free_len (bval);
+	  return NO_ERROR;
+	}
+      ret = EIO;
     }
   ldap_search_abandon_page (lh, srch_id);
   srch_id = NULL;
-  return false;
+  return ret;
 }
 
 uint32_t
 cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
 {
   WCHAR filter[300];
-  ULONG ret;
 
   if (msg)
     {
@@ -370,14 +490,8 @@ cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
      by flatName rather than by name. */
   __small_swprintf (filter, L"(&(objectClass=trustedDomain)(%W=%W))",
 		    wcschr (domain, L'.') ? L"name" : L"flatName", domain);
-  if ((ret = ldap_search_stW (lh, rootdse, LDAP_SCOPE_SUBTREE, filter,
-			      attr = tdom_attr, 0, &def_tv, &msg))
-      != LDAP_SUCCESS)
-    {
-      debug_printf ("ldap_search_stW(%W,%W) error 0x%02x",
-		    rootdse, filter, ret);
-      return 0;
-    }
+  if (search (rootdse, filter, attr = tdom_attr) != 0)
+    return 0;
   if (!(entry = ldap_first_entry (lh, msg)))
     {
       debug_printf ("No entry for %W in rootdse %W", filter, rootdse);
@@ -410,7 +524,6 @@ bool
 cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
 {
   WCHAR filter[48];
-  ULONG ret;
   PLDAP_BERVAL *bval;
 
   if (msg)
@@ -422,13 +535,8 @@ cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
     __small_swprintf (filter, L"(&(objectClass=Group)(gidNumber=%u))", id);
   else
     __small_swprintf (filter, L"(&(objectClass=User)(uidNumber=%u))", id);
-  if ((ret = ldap_search_stW (lh, rootdse, LDAP_SCOPE_SUBTREE, filter,
-			      sid_attr, 0, &def_tv, &msg)) != LDAP_SUCCESS)
-    {
-      debug_printf ("ldap_search_stW(%W,%W) error 0x%02x",
-		    rootdse, filter, ret);
-      return false;
-    }
+  if (search (rootdse, filter, sid_attr) != 0)
+    return false;
   if ((entry = ldap_first_entry (lh, msg))
       && (bval = ldap_get_values_lenW (lh, entry, sid_attr[0])))
     {
@@ -443,7 +551,6 @@ PWCHAR
 cyg_ldap::fetch_unix_name_from_rfc2307 (uint32_t id, bool group)
 {
   WCHAR filter[52];
-  ULONG ret;
 
   if (msg)
     {
@@ -461,13 +568,8 @@ cyg_ldap::fetch_unix_name_from_rfc2307 (uint32_t id, bool group)
   else
     __small_swprintf (filter, L"(&(objectClass=posixAccount)(uidNumber=%u))",
 		      id);
-  if ((ret = ldap_search_stW (lh, rootdse, LDAP_SCOPE_SUBTREE, filter, attr,
-			      0, &def_tv, &msg)) != LDAP_SUCCESS)
-    {
-      debug_printf ("ldap_search_stW(%W,%W) error 0x%02x",
-		    rootdse, filter, ret);
-      return NULL;
-    }
+  if (search (rootdse, filter, attr) != 0)
+    return NULL;
   if (!(entry = ldap_first_entry (lh, msg)))
     {
       debug_printf ("No entry for %W in rootdse %W", filter, rootdse);

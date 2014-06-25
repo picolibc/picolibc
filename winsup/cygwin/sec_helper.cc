@@ -122,7 +122,7 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
 	  gid_t map_gid = cygheap->ugid_cache.get_gid (gid);
 	  if (map_gid == ILLEGAL_GID)
 	    {
-	      if (pldap->open (cygheap->dom.get_rfc2307_domain ()))
+	      if (pldap->open (cygheap->dom.get_rfc2307_domain ()) == NO_ERROR)
 		map_gid = pldap->remap_gid (gid);
 	      if (map_gid == ILLEGAL_GID) 
 		map_gid = MAP_UNIX_TO_CYGWIN_ID (gid);
@@ -151,7 +151,7 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
 	  uid_t map_uid = cygheap->ugid_cache.get_uid (uid);
 	  if (map_uid == ILLEGAL_UID)
 	    {
-	      if (pldap->open (cygheap->dom.get_rfc2307_domain ()))
+	      if (pldap->open (cygheap->dom.get_rfc2307_domain ()) == NO_ERROR)
 		map_uid = pldap->remap_uid (uid);
 	      if (map_uid == ILLEGAL_UID)
 		map_uid = MAP_UNIX_TO_CYGWIN_ID (uid);

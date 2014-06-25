@@ -36,8 +36,11 @@ class cyg_ldap {
   PLDAPSearch srch_id;
   PLDAPMessage srch_msg, srch_entry;
 
-  bool connect_ssl (PCWSTR domain);
-  bool connect_non_ssl (PCWSTR domain);
+  inline int map_ldaperr_to_errno (ULONG lerr);
+  inline int wait (cygthread *thr);
+  inline int connect (PCWSTR domain);
+  inline int search (PWCHAR base, PWCHAR filter, PWCHAR *attrs);
+  inline int next_page ();
   bool fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group);
   PWCHAR fetch_unix_name_from_rfc2307 (uint32_t id, bool group);
   PWCHAR get_string_attribute (int idx);
@@ -49,12 +52,17 @@ public:
   {}
   ~cyg_ldap () { close (); }
 
+  ULONG connect_ssl (PCWSTR domain);
+  ULONG connect_non_ssl (PCWSTR domain);
+  ULONG search_s (PWCHAR base, PWCHAR filter, PWCHAR *attrs);
+  ULONG next_page_s ();
+
   operator PLDAP () const { return lh; }
-  bool open (PCWSTR in_domain);
+  int open (PCWSTR in_domain);
   void close ();
   bool fetch_ad_account (PSID sid, bool group, PCWSTR domain = NULL);
-  bool enumerate_ad_accounts (PCWSTR domain, bool group);
-  bool next_account (cygsid &sid);
+  int enumerate_ad_accounts (PCWSTR domain, bool group);
+  int next_account (cygsid &sid);
   uint32_t fetch_posix_offset_for_domain (PCWSTR domain);
   uid_t remap_uid (uid_t uid);
   gid_t remap_gid (gid_t gid);

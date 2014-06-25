@@ -1,3 +1,52 @@
+2014-06-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (ldap_search_sW): Replace ldap_search_stW.
+	(LdapMapErrorToWin32): Import.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Accommodate
+	change to cyg_ldap::open.
+	* ldap.cc (CYG_LDAP_TIMEOUT): Remove.
+	(CYG_LDAP_ENUM_TIMEOUT): Remove.
+	(def_tv): Remove.
+	(enum_tv): Remove.
+	(cyg_ldap::map_ldaperr_to_errno): New method to map LDAP error codes to
+	POSIX errno codes.  Explicitly map LDAP_NO_RESULTS_RETURNED to ENMFILE.
+	(cyg_ldap::wait): Ditto.
+	(struct cyg_ldap_init): New struct.
+	(cyg_ldap::connect_ssl): Return ULONG.  Drop setting LDAP_OPT_TIMELIMIT.
+	Add call to ldap_search_sW to fetch root DSE.
+	(cyg_ldap::connect_non_ssl): Ditto.
+	(ldap_init_thr): New static thread function.
+	(cyg_ldap::connect): New method to call connect_ssl/connect_non_ssl in
+	an interruptible cygthread.
+	(struct cyg_ldap_search): New struct.
+	(cyg_ldap::search_s): New method to perform generic synchronous search.
+	(ldap_search_thr): New static thread function.
+	(cyg_ldap::search): New method to call search_s in an interruptible
+	cygthread.
+	(struct cyg_ldap_next_page): New struct.
+	(cyg_ldap::next_page_s): New method to perform generic synchronous
+	paged search.
+	(ldap_next_page_thr): New static thread function.
+	(cyg_ldap::next_page): New method to call next_page_s in an
+	interruptible cygthread.
+	(cyg_ldap::open): Return POSIX errno.  Call connect method.
+	(cyg_ldap::fetch_ad_account): Call search method rather than
+	ldap_search_stW.
+	(cyg_ldap::enumerate_ad_accounts): Return POSIX errno.  Use infinite
+	timeout in call to ldap_search_init_pageW.
+	(cyg_ldap::next_account): Return POSIX errno.  Call next_page method
+	rather than ldap_get_next_page_s.
+	(cyg_ldap::fetch_posix_offset_for_domain): Call search method rather
+	than ldap_search_stW.
+	(cyg_ldap::fetch_unix_sid_from_ad): Ditto.
+	(cyg_ldap::fetch_unix_name_from_rfc2307): Ditto.
+	* ldap.h (class cyg_ldap): Accommodate aforementioned changes.
+	* passwd.cc (pg_ent::enumerate_ad): Ditto.  Break search if one of
+	cyg_ldap::enumerate_ad_accounts or cldap.next_account returns with
+	an error code other than ENMFILE.
+	* sec_helper.cc (cygpsid::get_id): Accommodate change to cyg_ldap::open.
+	* uinfo.cc (fetch_posix_offset): Ditto.
+
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (find_exec): Initialize err (CID 60111).

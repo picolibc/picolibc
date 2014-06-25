@@ -1141,7 +1141,7 @@ fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, cyg_ldap *cldap)
 
   if (!td->PosixOffset && !(td->Flags & DS_DOMAIN_PRIMARY) && td->DomainSid)
     {
-      if (!cldap->open (NULL))
+      if (cldap->open (NULL) != NO_ERROR)
 	{
 	  /* We're probably running under a local account, so we're not allowed
 	     to fetch any information from AD beyond the most obvious.  Never
@@ -1241,7 +1241,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	     DC for some weird reason.  Use LDAP instead. */
 	  PWCHAR val;
 
-	  if (cldap->open (NULL)
+	  if (cldap->open (NULL) == NO_ERROR
 	      && cldap->fetch_ad_account (sid, is_group ())
 	      && (val = cldap->get_group_name ()))
 	    {
@@ -1598,7 +1598,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  if (is_domain_account)
 	    {
 	      /* Use LDAP to fetch domain account infos. */
-	      if (!cldap->open (NULL))
+	      if (cldap->open (NULL) != NO_ERROR)
 		break;
 	      if (cldap->fetch_ad_account (sid, is_group (), domain))
 		{
