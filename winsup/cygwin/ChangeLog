@@ -1,5 +1,10 @@
 2014-06-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ldap.cc (cyg_ldap::map_ldaperr_to_errno): Explicitely map LDAP_TIMEOUT
+	to EIO.
+
+2014-06-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (ldap_search_sW): Replace ldap_search_stW.
 	(LdapMapErrorToWin32): Import.
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Accommodate

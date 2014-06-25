@@ -89,6 +89,8 @@ cyg_ldap::map_ldaperr_to_errno (ULONG lerr)
 	 is SO wrong, especially considering that LDAP_MORE_RESULTS_TO_RETURN
 	 is mapped to ERROR_MORE_DATA as well :-P */
       return ENMFILE;
+    case LDAP_TIMEOUT:
+      return EIO;
     default:
       break;
     }
