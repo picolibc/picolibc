@@ -1,5 +1,14 @@
 2014-06-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* errno.cc (errmap): Handle Windows error codes ERROR_CANCELLED,
+	ERROR_CONNECTION_REFUSED, ERROR_DEV_NOT_EXIST, ERROR_DS_GENERIC_ERROR,
+	ERROR_NOT_ENOUGH_QUOTA, ERROR_SERVICE_REQUEST_TIMEOUT, ERROR_TIMEOUT,
+	ERROR_UNEXP_NET_ERR.
+	* ldap.cc (cyg_ldap::map_ldaperr_to_errno): Drop explicit LDAP_TIMEOUT
+	handling.
+
+2014-06-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ldap.cc (cyg_ldap::map_ldaperr_to_errno): Explicitely map LDAP_TIMEOUT
 	to EIO.
 
