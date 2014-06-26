@@ -1,3 +1,7 @@
+2014-06-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* legal.xml: Fix copyright.
+
 2014-06-17  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* faq-programming.xml: Add gettext-devel to list of packages needed to
