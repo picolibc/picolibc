@@ -800,6 +800,10 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 	}
       ret = 0;
     }
+  else
+    debug_printf ("%y = NtQueryVolumeInformationFile"
+		  "(%S, FileFsFullSizeInformation)", 
+		  status, pc.get_nt_native_path ());
 out:
   if (opened)
     NtClose (fh);

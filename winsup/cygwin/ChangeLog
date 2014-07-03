@@ -1,3 +1,8 @@
+2014-07-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstatvfs): Add debug
+	output.
+
 2014-06-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (errmap): Fix order of SERVICE_REQUEST_TIMEOUT.
