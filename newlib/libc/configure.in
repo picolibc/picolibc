@@ -26,6 +26,16 @@ AC_ARG_ENABLE(newlib_nano_malloc,
    *) AC_MSG_ERROR(bad value ${enableval} for newlib-nano-malloc) ;;
  esac],[newlib_nano_malloc=])
 
+dnl Support --enable-newlib-nano-formatted-io used by libc/stdio
+AC_ARG_ENABLE(newlib_nano_formatted_io,
+[  --enable-newlib-nano-formatted-io    Use small-footprint nano-formatted-IO implementation],
+[case "${enableval}" in
+   yes) newlib_nano_formatted_io=yes ;;
+   no)  newlib_nano_formatted_io=no ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for newlib-nano-formatted-io) ;;
+ esac],[newlib_nano_formatted_io=no])
+AM_CONDITIONAL(NEWLIB_NANO_FORMATTED_IO, test x$newlib_nano_formatted_io = xyes)
+
 NEWLIB_CONFIGURE(..)
 
 AM_CONDITIONAL(NEWLIB_NANO_MALLOC, test x$newlib_nano_malloc = xyes)

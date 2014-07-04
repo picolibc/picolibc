@@ -39,6 +39,12 @@ _DEFUN(vasprintf, (strp, fmt, ap),
   return _vasprintf_r (_REENT, strp, fmt, ap);
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(vasiprintf, (char **, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("vasprintf"))));
+#endif
+
 #endif /* !_REENT_ONLY */
 
 int
@@ -63,3 +69,9 @@ _DEFUN(_vasprintf_r, (ptr, strp, fmt, ap),
     }
   return ret;
 }
+
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(_vasiprintf_r, (struct _reent *, char **, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("_vasprintf_r"))));
+#endif

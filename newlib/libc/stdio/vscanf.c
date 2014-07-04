@@ -40,6 +40,11 @@ _DEFUN(vscanf, (fmt, ap),
   return __svfscanf_r (reent, _stdin_r (reent), fmt, ap);
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(viscanf, (const char *, __VALIST) _ATTRIBUTE ((__alias__("vscanf"))));
+#endif
+
 #endif /* !_REENT_ONLY */
 
 int
@@ -52,3 +57,8 @@ _DEFUN(_vscanf_r, (ptr, fmt, ap),
   return __svfscanf_r (ptr, _stdin_r (ptr), fmt, ap);
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(_viscanf_r, (struct _reent *, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("_vscanf_r"))));
+#endif

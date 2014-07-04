@@ -79,6 +79,9 @@
 /* Define if declare atexit data as global.  */
 #undef _REENT_GLOBAL_ATEXIT
 
+/* Define if small footprint nano-formatted-IO implementation used.  */
+#undef _NANO_FORMATTED_IO
+
 /*
  * Iconv encodings enabled ("to" direction)
  */

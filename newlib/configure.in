@@ -207,6 +207,17 @@ AC_ARG_ENABLE(lite-exit,
   esac
  fi], [lite_exit=no])dnl
 
+dnl Support --enable-newlib-nano-formatted-io
+dnl This option is also read in libc/configure.in.  It is repeated
+dnl here so that it shows up in the help text.
+AC_ARG_ENABLE(newlib_nano_formatted_io,
+[  --enable-newlib-nano-formatted-io    Use nano version formatted IO],
+[case "${enableval}" in
+   yes) newlib_nano_formatted_io=yes ;;
+   no)  newlib_nano_formatted_io=no ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for newlib-nano-formatted-io) ;;
+ esac],[newlib_nano_formatted_io=yes])
+
 NEWLIB_CONFIGURE(.)
 
 dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
@@ -422,6 +433,10 @@ fi
 
 if test "${lite_exit}" = "yes"; then
 AC_DEFINE_UNQUOTED(_LITE_EXIT)
+fi
+
+if test "${newlib_nano_formatted_io}" = "yes"; then
+AC_DEFINE_UNQUOTED(_NANO_FORMATTED_IO)
 fi
 
 dnl

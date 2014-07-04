@@ -56,6 +56,13 @@ _DEFUN(_vasnprintf_r, (ptr, buf, lenp, fmt, ap),
   return (char *) f._bf._base;
 }
 
+#ifdef _NANO_FORMATTED_IO
+char *
+_EXFUN(_vasniprintf_r, (struct _reent*, char *, size_t *,
+			const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("_vasnprintf_r"))));
+#endif
+
 #ifndef _REENT_ONLY
 
 char *
@@ -68,4 +75,9 @@ _DEFUN(vasnprintf, (buf, lenp, fmt, ap),
   return _vasnprintf_r (_REENT, buf, lenp, fmt, ap);
 }
 
+#ifdef _NANO_FORMATTED_IO
+char *
+_EXFUN(vasniprintf, (char *, size_t *, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("vasnprintf"))));
+#endif
 #endif /* ! _REENT_ONLY */

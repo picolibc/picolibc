@@ -1,3 +1,43 @@
+2014-07-04  Bin Cheng  <bin.cheng@arm.com>
+
+	* README (--enable-newlib-nano-formatted-io): Describe.
+	* acconfig.h (_NANO_FORMATTED_IO): Undef.
+	* newlib.hin (_NANO_FORMATTED_IO): Undef.
+	* configure.in (--enable-newlib-nano-formatted-io): New option.
+	* configure: Regenerated.
+	* libc/configure.in (--enable-newlib-nano-formatted-io): New option.
+	* libc/configure: Regenerated.
+	* libc/stdio/Makefile.am (NEWLIB_NANO_FORMATTED_IO): Support new
+	configuration option.
+	* libc/stdio/Makefile.in: Regenerated.
+	* libc/stdio/asnprintf.c (_asniprintf_r, asniprintf): Use
+	_NANO_FORMATTED_IO to declare alias prototypes.
+	* libc/stdio/asprintf.c (_asiprintf_r, asiprintf): Ditto.
+	* libc/stdio/dprintf.c (_diprintf_r, diprintf): Ditto.
+	* libc/stdio/fprintf.c (_fiprintf_r, fiprintf): Ditto.
+	* libc/stdio/fscanf.c (fiscanf, _fiscanf_r): Ditto.
+	* libc/stdio/printf.c (_iprintf_r, iprintf): Ditto.
+	* libc/stdio/scanf.c (iscanf, _iscanf_r): Ditto.
+	* libc/stdio/snprintf.c (_sniprintf_r, sniprintf): Ditto.
+	* libc/stdio/sprintf.c (_siprintf_r, siprintf): Ditto.
+	* libc/stdio/sscanf.c (siscanf, _siscanf_r): Ditto.
+	* libc/stdio/vasnprintf.c (_vasniprintf_r, vasniprintf): Ditto.
+	* libc/stdio/vasprintf.c (vasiprintf, _vasiprintf_r): Ditto.
+	* libc/stdio/vdprintf.c (_vdiprintf_r, vdiprintf): Ditto.
+	* libc/stdio/vprintf.c (viprintf, _viprintf_r): Ditto.
+	* libc/stdio/vscanf.c (viscanf, _viscanf_r): Ditto.
+	* libc/stdio/vsnprintf.c (vsniprintf, _vsniprintf_r): Ditto.
+	* libc/stdio/vsprintf.c (vsiprintf, _vsiprintf_r): Ditto.
+	* libc/stdio/vsscanf.c (vsiscanf, _vsiscanf_r): Ditto.
+	* libc/stdio/nano-vfprintf.c: New file.
+	* libc/stdio/nano-vfprintf_float.c: New file.
+	* libc/stdio/nano-vfprintf_i.c: New file.
+	* libc/stdio/nano-vfprintf_local.h: New file.
+	* libc/stdio/nano-vfscanf.c: New file.
+	* libc/stdio/nano-vfscanf_float.c: New file.
+	* libc/stdio/nano-vfscanf_i.c: New file.
+	* libc/stdio/nano-vfscanf_local.h: New file.
+
 2014-06-23  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/argz/envz_merge.c (envz_merge): Fix memory leak (Cygwin Coverity

@@ -372,6 +372,73 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      invoke clean-up functions such as _fini or global destructors.
      Disabled by default.
 
+`--enable-newlib-nano-formatted-io'
+     This builds NEWLIB with a special implementation of formatted I/O
+     functions, designed to lower the size of application on small systems
+     with size constraint issues.  This option does not affect wide-char
+     formatted I/O functions.  Some notes about the feature:
+      1) The non-wide-char formatted I/O functions only support the C89
+	 standard.  The only exception is the configuration option provides
+	 limited support for long double.  Internally, the nano formatted I/O
+	 functions use double so accuracy is only guaranteed to double
+	 precision.
+      2) Floating-point support is split out of the formatted I/O code into
+	 weak functions which are not linked by default.  Programs that need
+	 floating-point I/O support must explicitly request linking of one or
+	 both of the floating-point functions: _printf_float or _scanf_float.
+	 This can be done at link time using the -u option which can be passed
+	 to either gcc or ld.  The -u option forces the link to resolve those
+	 function references.  Floating-point format specifiers are recognized
+	 by default, but if the floating-point functions are not explicitly
+	 linked in, this may result in undefined behavior for programs that
+	 need floating-point I/O support.
+      3) Integer-only versions of the formatted I/O functions (the iprintf/
+	 iscanf family) simply alias their regular counter-parts.
+	 The affected functions are:
+
+	  diprintf vdiprintf
+
+	  siprintf fiprintf iprintf sniprintf asiprintf asniprintf
+
+	  siscanf fiscanf iscanf
+
+	  viprintf vfiprintf vsiprintf vsniprintf vasiprintf vasniprintf
+
+	  viscanf vfiscanf vsiscanf
+
+	  _diprintf_r _vdiprintf_r
+
+	  _siprintf_r _fiprintf_r _iprintf_r _sniprintf_r _asiprintf_r
+	  _asniprintf_r
+
+	  _siscanf_r _fiscanf_r _iscanf_r
+
+	  _viprintf_r _vfiprintf_r _vsiprintf_r _asniprintf_r _vasiprintf_r
+	  _vasniprintf_r
+
+	  _viscanf_r _vfiscanf_r _vsiscanf_r
+
+      4) As mentioned, the option does not affect wide-char formatted I/O.
+	 The following configuration options are ignored for non-wide-char
+	 formatted I/O functions, and can be thought of as disabled.
+
+	  enable-newlib-io-pos-args
+	  enable-newlib-io-c99-formats
+	  enable-newlib-io-long-long
+	  enable-newlib-io-long-double
+	  enable-newlib-mb
+
+	 Additionally, "enable/disable-newlib-io-float" is supported in
+	 this specific implementation, one can use "disable-newlib-io-float"
+	 to further reduce code size.  In this case, the floating-point
+	 specifiers will not be recognized or handled, and the -u option
+	 will not work either.
+
+      5) As a rule, no features from outside of C89 standard will be
+	 considered in this implementation.
+
+     Disabled by default.
+
 Running the Testsuite
 =====================
 

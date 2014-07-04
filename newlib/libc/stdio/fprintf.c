@@ -36,6 +36,12 @@ _DEFUN(_fprintf_r, (ptr, fp, fmt),
   return ret;
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(_fiprintf_r, (struct _reent *, FILE *, const char *, ...)
+       _ATTRIBUTE ((__alias__("_fprintf_r"))));
+#endif
+
 #ifndef _REENT_ONLY
 
 int
@@ -52,4 +58,9 @@ _DEFUN(fprintf, (fp, fmt),
   return ret;
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(fiprintf, (FILE *, const char *, ...)
+       _ATTRIBUTE ((__alias__("fprintf"))));
+#endif
 #endif /* ! _REENT_ONLY */

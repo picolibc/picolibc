@@ -39,6 +39,11 @@ _DEFUN(vprintf, (fmt, ap),
   return _vfprintf_r (reent, _stdout_r (reent), fmt, ap);
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(viprintf, (const char *, __VALIST) _ATTRIBUTE ((__alias__("vprintf"))));
+#endif
+
 #endif /* !_REENT_ONLY */
 
 int
@@ -50,3 +55,9 @@ _DEFUN(_vprintf_r, (ptr, fmt, ap),
   _REENT_SMALL_CHECK_INIT (ptr);
   return _vfprintf_r (ptr, _stdout_r (ptr), fmt, ap);
 }
+
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(_viprintf_r, (struct _reent *, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("_vprintf_r"))));
+#endif

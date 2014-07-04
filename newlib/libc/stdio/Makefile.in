@@ -71,47 +71,57 @@ CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
-	lib_a-fdopen.$(OBJEXT) lib_a-feof.$(OBJEXT) \
-	lib_a-ferror.$(OBJEXT) lib_a-fflush.$(OBJEXT) \
-	lib_a-fgetc.$(OBJEXT) lib_a-fgetpos.$(OBJEXT) \
-	lib_a-fgets.$(OBJEXT) lib_a-fileno.$(OBJEXT) \
-	lib_a-findfp.$(OBJEXT) lib_a-fiprintf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@am__objects_1 =  \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-fiprintf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-fiscanf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-iprintf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-iscanf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-siprintf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-siscanf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-sniprintf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-vdiprintf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-viprintf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-viscanf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-vsiprintf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-vsiscanf.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-vsniprintf.$(OBJEXT)
+am__objects_2 = $(am__objects_1) lib_a-clearerr.$(OBJEXT) \
+	lib_a-fclose.$(OBJEXT) lib_a-fdopen.$(OBJEXT) \
+	lib_a-feof.$(OBJEXT) lib_a-ferror.$(OBJEXT) \
+	lib_a-fflush.$(OBJEXT) lib_a-fgetc.$(OBJEXT) \
+	lib_a-fgetpos.$(OBJEXT) lib_a-fgets.$(OBJEXT) \
+	lib_a-fileno.$(OBJEXT) lib_a-findfp.$(OBJEXT) \
 	lib_a-flags.$(OBJEXT) lib_a-fopen.$(OBJEXT) \
 	lib_a-fprintf.$(OBJEXT) lib_a-fputc.$(OBJEXT) \
 	lib_a-fputs.$(OBJEXT) lib_a-fread.$(OBJEXT) \
 	lib_a-freopen.$(OBJEXT) lib_a-fscanf.$(OBJEXT) \
-	lib_a-fiscanf.$(OBJEXT) lib_a-fseek.$(OBJEXT) \
-	lib_a-fsetpos.$(OBJEXT) lib_a-ftell.$(OBJEXT) \
-	lib_a-fvwrite.$(OBJEXT) lib_a-fwalk.$(OBJEXT) \
-	lib_a-fwrite.$(OBJEXT) lib_a-getc.$(OBJEXT) \
-	lib_a-getchar.$(OBJEXT) lib_a-getc_u.$(OBJEXT) \
-	lib_a-getchar_u.$(OBJEXT) lib_a-getdelim.$(OBJEXT) \
-	lib_a-getline.$(OBJEXT) lib_a-gets.$(OBJEXT) \
-	lib_a-iprintf.$(OBJEXT) lib_a-iscanf.$(OBJEXT) \
-	lib_a-makebuf.$(OBJEXT) lib_a-perror.$(OBJEXT) \
-	lib_a-printf.$(OBJEXT) lib_a-putc.$(OBJEXT) \
-	lib_a-putchar.$(OBJEXT) lib_a-putc_u.$(OBJEXT) \
-	lib_a-putchar_u.$(OBJEXT) lib_a-puts.$(OBJEXT) \
-	lib_a-refill.$(OBJEXT) lib_a-remove.$(OBJEXT) \
-	lib_a-rename.$(OBJEXT) lib_a-rewind.$(OBJEXT) \
-	lib_a-rget.$(OBJEXT) lib_a-scanf.$(OBJEXT) \
-	lib_a-sccl.$(OBJEXT) lib_a-setbuf.$(OBJEXT) \
-	lib_a-setbuffer.$(OBJEXT) lib_a-setlinebuf.$(OBJEXT) \
-	lib_a-setvbuf.$(OBJEXT) lib_a-siprintf.$(OBJEXT) \
-	lib_a-siscanf.$(OBJEXT) lib_a-sniprintf.$(OBJEXT) \
+	lib_a-fseek.$(OBJEXT) lib_a-fsetpos.$(OBJEXT) \
+	lib_a-ftell.$(OBJEXT) lib_a-fvwrite.$(OBJEXT) \
+	lib_a-fwalk.$(OBJEXT) lib_a-fwrite.$(OBJEXT) \
+	lib_a-getc.$(OBJEXT) lib_a-getchar.$(OBJEXT) \
+	lib_a-getc_u.$(OBJEXT) lib_a-getchar_u.$(OBJEXT) \
+	lib_a-getdelim.$(OBJEXT) lib_a-getline.$(OBJEXT) \
+	lib_a-gets.$(OBJEXT) lib_a-makebuf.$(OBJEXT) \
+	lib_a-perror.$(OBJEXT) lib_a-printf.$(OBJEXT) \
+	lib_a-putc.$(OBJEXT) lib_a-putchar.$(OBJEXT) \
+	lib_a-putc_u.$(OBJEXT) lib_a-putchar_u.$(OBJEXT) \
+	lib_a-puts.$(OBJEXT) lib_a-refill.$(OBJEXT) \
+	lib_a-remove.$(OBJEXT) lib_a-rename.$(OBJEXT) \
+	lib_a-rewind.$(OBJEXT) lib_a-rget.$(OBJEXT) \
+	lib_a-scanf.$(OBJEXT) lib_a-sccl.$(OBJEXT) \
+	lib_a-setbuf.$(OBJEXT) lib_a-setbuffer.$(OBJEXT) \
+	lib_a-setlinebuf.$(OBJEXT) lib_a-setvbuf.$(OBJEXT) \
 	lib_a-snprintf.$(OBJEXT) lib_a-sprintf.$(OBJEXT) \
 	lib_a-sscanf.$(OBJEXT) lib_a-stdio.$(OBJEXT) \
 	lib_a-tmpfile.$(OBJEXT) lib_a-tmpnam.$(OBJEXT) \
-	lib_a-ungetc.$(OBJEXT) lib_a-vdiprintf.$(OBJEXT) \
-	lib_a-vdprintf.$(OBJEXT) lib_a-viprintf.$(OBJEXT) \
-	lib_a-viscanf.$(OBJEXT) lib_a-vprintf.$(OBJEXT) \
-	lib_a-vscanf.$(OBJEXT) lib_a-vsiprintf.$(OBJEXT) \
-	lib_a-vsiscanf.$(OBJEXT) lib_a-vsnprintf.$(OBJEXT) \
-	lib_a-vsniprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT) \
+	lib_a-ungetc.$(OBJEXT) lib_a-vdprintf.$(OBJEXT) \
+	lib_a-vprintf.$(OBJEXT) lib_a-vscanf.$(OBJEXT) \
+	lib_a-vsnprintf.$(OBJEXT) lib_a-vsprintf.$(OBJEXT) \
 	lib_a-vsscanf.$(OBJEXT) lib_a-wbuf.$(OBJEXT) \
 	lib_a-wsetup.$(OBJEXT)
-@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-asiprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@am__objects_3 = lib_a-asiprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-vasiprintf.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@am__objects_4 = $(am__objects_3) \
 @ELIX_LEVEL_1_FALSE@	lib_a-asprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-fcloseall.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-fseeko.$(OBJEXT) \
@@ -119,11 +129,12 @@ am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-getw.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-mktemp.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-putw.$(OBJEXT) \
-@ELIX_LEVEL_1_FALSE@	lib_a-vasiprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-vasprintf.$(OBJEXT)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_3 = lib_a-asniprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@am__objects_5 = lib_a-asniprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-diprintf.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	lib_a-vasniprintf.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = $(am__objects_5) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-asnprintf.$(OBJEXT) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-diprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-dprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fgetwc.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fgetws.$(OBJEXT) \
@@ -144,7 +155,6 @@ am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-swprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-swscanf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-ungetwc.$(OBJEXT) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vasniprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vasnprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vfwscanf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vswprintf.$(OBJEXT) \
@@ -153,32 +163,40 @@ am__objects_1 = lib_a-clearerr.$(OBJEXT) lib_a-fclose.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-vwscanf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-wprintf.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-wscanf.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2) $(am__objects_3)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_2) \
+@USE_LIBTOOL_FALSE@	$(am__objects_4) $(am__objects_6)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-am__objects_4 = clearerr.lo fclose.lo fdopen.lo feof.lo ferror.lo \
-	fflush.lo fgetc.lo fgetpos.lo fgets.lo fileno.lo findfp.lo \
-	fiprintf.lo flags.lo fopen.lo fprintf.lo fputc.lo fputs.lo \
-	fread.lo freopen.lo fscanf.lo fiscanf.lo fseek.lo fsetpos.lo \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@am__objects_7 = fiprintf.lo fiscanf.lo \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	iprintf.lo iscanf.lo \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	siprintf.lo siscanf.lo \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	sniprintf.lo vdiprintf.lo \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	viprintf.lo viscanf.lo \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	vsiprintf.lo vsiscanf.lo \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	vsniprintf.lo
+am__objects_8 = $(am__objects_7) clearerr.lo fclose.lo fdopen.lo \
+	feof.lo ferror.lo fflush.lo fgetc.lo fgetpos.lo fgets.lo \
+	fileno.lo findfp.lo flags.lo fopen.lo fprintf.lo fputc.lo \
+	fputs.lo fread.lo freopen.lo fscanf.lo fseek.lo fsetpos.lo \
 	ftell.lo fvwrite.lo fwalk.lo fwrite.lo getc.lo getchar.lo \
 	getc_u.lo getchar_u.lo getdelim.lo getline.lo gets.lo \
-	iprintf.lo iscanf.lo makebuf.lo perror.lo printf.lo putc.lo \
-	putchar.lo putc_u.lo putchar_u.lo puts.lo refill.lo remove.lo \
-	rename.lo rewind.lo rget.lo scanf.lo sccl.lo setbuf.lo \
-	setbuffer.lo setlinebuf.lo setvbuf.lo siprintf.lo siscanf.lo \
-	sniprintf.lo snprintf.lo sprintf.lo sscanf.lo stdio.lo \
-	tmpfile.lo tmpnam.lo ungetc.lo vdiprintf.lo vdprintf.lo \
-	viprintf.lo viscanf.lo vprintf.lo vscanf.lo vsiprintf.lo \
-	vsiscanf.lo vsnprintf.lo vsniprintf.lo vsprintf.lo vsscanf.lo \
-	wbuf.lo wsetup.lo
-@ELIX_LEVEL_1_FALSE@am__objects_5 = asiprintf.lo asprintf.lo \
+	makebuf.lo perror.lo printf.lo putc.lo putchar.lo putc_u.lo \
+	putchar_u.lo puts.lo refill.lo remove.lo rename.lo rewind.lo \
+	rget.lo scanf.lo sccl.lo setbuf.lo setbuffer.lo setlinebuf.lo \
+	setvbuf.lo snprintf.lo sprintf.lo sscanf.lo stdio.lo \
+	tmpfile.lo tmpnam.lo ungetc.lo vdprintf.lo vprintf.lo \
+	vscanf.lo vsnprintf.lo vsprintf.lo vsscanf.lo wbuf.lo \
+	wsetup.lo
+@ELIX_LEVEL_1_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@am__objects_9 = asiprintf.lo \
+@ELIX_LEVEL_1_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	vasiprintf.lo
+@ELIX_LEVEL_1_FALSE@am__objects_10 = $(am__objects_9) asprintf.lo \
 @ELIX_LEVEL_1_FALSE@	fcloseall.lo fseeko.lo ftello.lo getw.lo \
-@ELIX_LEVEL_1_FALSE@	mktemp.lo putw.lo vasiprintf.lo \
-@ELIX_LEVEL_1_FALSE@	vasprintf.lo
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = asniprintf.lo \
+@ELIX_LEVEL_1_FALSE@	mktemp.lo putw.lo vasprintf.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@am__objects_11 = asniprintf.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	diprintf.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	vasniprintf.lo
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_12 = $(am__objects_11) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	asnprintf.lo \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	diprintf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	dprintf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fgetwc.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fgetws.lo \
@@ -199,7 +217,6 @@ am__objects_4 = clearerr.lo fclose.lo fdopen.lo feof.lo ferror.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	swprintf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	swscanf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	ungetwc.lo \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasniprintf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasnprintf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vfwscanf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vswprintf.lo \
@@ -208,8 +225,8 @@ am__objects_4 = clearerr.lo fclose.lo fdopen.lo feof.lo ferror.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vwscanf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wprintf.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wscanf.lo
-@USE_LIBTOOL_TRUE@am_libstdio_la_OBJECTS = $(am__objects_4) \
-@USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
+@USE_LIBTOOL_TRUE@am_libstdio_la_OBJECTS = $(am__objects_8) \
+@USE_LIBTOOL_TRUE@	$(am__objects_10) $(am__objects_12)
 libstdio_la_OBJECTS = $(am_libstdio_la_OBJECTS)
 libstdio_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -382,7 +399,24 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+@NEWLIB_NANO_FORMATTED_IO_FALSE@GENERAL_INT_FORMATTED_IO_SOURCES = \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	fiprintf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	fiscanf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	iprintf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	iscanf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	siprintf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	siscanf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	sniprintf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	vdiprintf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	viprintf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	viscanf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	vsiprintf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	vsiscanf.c			\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	vsniprintf.c
+
+@NEWLIB_NANO_FORMATTED_IO_TRUE@GENERAL_INT_FORMATTED_IO_SOURCES = 
 GENERAL_SOURCES = \
+	$(GENERAL_INT_FORMATTED_IO_SOURCES) \
 	clearerr.c			\
 	fclose.c			\
 	fdopen.c			\
@@ -394,7 +428,6 @@ GENERAL_SOURCES = \
 	fgets.c			\
 	fileno.c			\
 	findfp.c			\
-	fiprintf.c			\
 	flags.c			\
 	fopen.c			\
 	fprintf.c			\
@@ -403,7 +436,6 @@ GENERAL_SOURCES = \
 	fread.c			\
 	freopen.c			\
 	fscanf.c			\
-	fiscanf.c			\
 	fseek.c			\
 	fsetpos.c			\
 	ftell.c			\
@@ -417,8 +449,6 @@ GENERAL_SOURCES = \
 	getdelim.c			\
 	getline.c			\
 	gets.c				\
-	iprintf.c			\
-	iscanf.c			\
 	makebuf.c			\
 	perror.c			\
 	printf.c			\
@@ -438,9 +468,6 @@ GENERAL_SOURCES = \
 	setbuffer.c			\
 	setlinebuf.c			\
 	setvbuf.c			\
-	siprintf.c			\
-	siscanf.c			\
-	sniprintf.c			\
 	snprintf.c			\
 	sprintf.c			\
 	sscanf.c			\
@@ -448,23 +475,17 @@ GENERAL_SOURCES = \
 	tmpfile.c			\
 	tmpnam.c			\
 	ungetc.c			\
-	vdiprintf.c			\
 	vdprintf.c			\
-	viprintf.c			\
-	viscanf.c			\
 	vprintf.c			\
 	vscanf.c			\
-	vsiprintf.c			\
-	vsiscanf.c			\
 	vsnprintf.c			\
-	vsniprintf.c			\
 	vsprintf.c			\
 	vsscanf.c			\
 	wbuf.c				\
 	wsetup.c
 
 @ELIX_LEVEL_1_FALSE@ELIX_2_SOURCES = \
-@ELIX_LEVEL_1_FALSE@	asiprintf.c		\
+@ELIX_LEVEL_1_FALSE@	$(ELIX_2_INT_FORMATTED_IO_SOURCES) \
 @ELIX_LEVEL_1_FALSE@	asprintf.c		\
 @ELIX_LEVEL_1_FALSE@	fcloseall.c		\
 @ELIX_LEVEL_1_FALSE@	fseeko.c		\
@@ -472,14 +493,17 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	getw.c			\
 @ELIX_LEVEL_1_FALSE@	mktemp.c		\
 @ELIX_LEVEL_1_FALSE@	putw.c			\
-@ELIX_LEVEL_1_FALSE@	vasiprintf.c		\
 @ELIX_LEVEL_1_FALSE@	vasprintf.c
 
 @ELIX_LEVEL_1_TRUE@ELIX_2_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@ELIX_2_INT_FORMATTED_IO_SOURCES = \
+@ELIX_LEVEL_1_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	asiprintf.c		\
+@ELIX_LEVEL_1_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	vasiprintf.c
+
+@ELIX_LEVEL_1_FALSE@@NEWLIB_NANO_FORMATTED_IO_TRUE@ELIX_2_INT_FORMATTED_IO_SOURCES = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_4_SOURCES = \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	asniprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(ELIX_4_INT_FORMATTED_IO_SOURCES) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	asnprintf.c		\
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	diprintf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	dprintf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fgetwc.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fgetws.c		\
@@ -500,7 +524,6 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	swprintf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	swscanf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	ungetwc.c		\
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasniprintf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vasnprintf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vfwscanf.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	vswprintf.c		\
@@ -513,15 +536,39 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_4_SOURCES = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_4_SOURCES = 
 @ELIX_LEVEL_1_TRUE@ELIX_4_SOURCES = 
-LIBADD_OBJS = \
-	$(lpfx)svfiprintf.$(oext) $(lpfx)svfprintf.$(oext) \
-	$(lpfx)svfiscanf.$(oext) $(lpfx)svfscanf.$(oext) \
-	$(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
-	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext) \
-	$(lpfx)svfiwprintf.$(oext) $(lpfx)svfwprintf.$(oext) \
-	$(lpfx)vfiwprintf.$(oext) $(lpfx)vfwprintf.$(oext) \
-	$(lpfx)svfiwscanf.$(oext) $(lpfx)svfwscanf.$(oext) \
-	$(lpfx)vfiwscanf.$(oext) $(lpfx)vfwscanf.$(oext)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@ELIX_4_INT_FORMATTED_IO_SOURCES = \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	asniprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	diprintf.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_FALSE@	vasniprintf.c
+
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@@NEWLIB_NANO_FORMATTED_IO_TRUE@ELIX_4_INT_FORMATTED_IO_SOURCES = 
+@NEWLIB_NANO_FORMATTED_IO_FALSE@LIBADD_OBJS = \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiprintf.$(oext) $(lpfx)svfprintf.$(oext) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiscanf.$(oext) $(lpfx)svfscanf.$(oext) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfiprintf.$(oext) $(lpfx)vfprintf.$(oext) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfscanf.$(oext) $(lpfx)vfiscanf.$(oext) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiwprintf.$(oext) $(lpfx)svfwprintf.$(oext) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfiwprintf.$(oext) $(lpfx)vfwprintf.$(oext) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)svfiwscanf.$(oext) $(lpfx)svfwscanf.$(oext) \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	$(lpfx)vfiwscanf.$(oext) $(lpfx)vfwscanf.$(oext)
+
+@NEWLIB_NANO_FORMATTED_IO_TRUE@LIBADD_OBJS = \
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfprintf_float.$(oext)	\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-svfprintf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-svfscanf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfprintf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfprintf_i.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfscanf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfscanf_i.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)nano-vfscanf_float.$(oext)	\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfiwprintf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfwprintf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)vfiwprintf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)vfwprintf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfiwscanf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)svfwscanf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)vfiwscanf.$(oext)		\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(lpfx)vfwscanf.$(oext)
 
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdio.la
@@ -537,9 +584,26 @@ libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIBADD_OBJS)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 @USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIBADD_OBJS)
+@NEWLIB_NANO_FORMATTED_IO_FALSE@CHEWOUT_INT_FORMATTED_IO_FILES = \
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	diprintf.def		\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	siprintf.def		\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	siscanf.def		\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	vfprintf.def		\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	vfscanf.def		\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	viprintf.def		\
+@NEWLIB_NANO_FORMATTED_IO_FALSE@	viscanf.def
+
+@NEWLIB_NANO_FORMATTED_IO_TRUE@CHEWOUT_INT_FORMATTED_IO_FILES = \
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfprintf.def	\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfprintf_i.def	\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfprintf_float.def	\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfscanf.def	\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfscanf_i.def	\
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	nano-vfscanf_float.def
+
 CHEWOUT_FILES = \
+	$(CHEWOUT_INT_FORMATTED_IO_FILES)	\
 	clearerr.def		\
-	diprintf.def		\
 	dprintf.def		\
 	fclose.def		\
 	fcloseall.def		\
@@ -597,8 +661,6 @@ CHEWOUT_FILES = \
 	setbuffer.def		\
 	setlinebuf.def		\
 	setvbuf.def		\
-	siprintf.def		\
-	siscanf.def		\
 	sprintf.def		\
 	sscanf.def		\
 	swprintf.def		\
@@ -607,12 +669,8 @@ CHEWOUT_FILES = \
 	tmpnam.def		\
 	ungetc.def		\
 	ungetwc.def		\
-	vfprintf.def		\
-	vfscanf.def		\
 	vfwprintf.def		\
-	vfwscanf.def		\
-	viprintf.def		\
-	viscanf.def
+	vfwscanf.def
 
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
@@ -687,6 +745,84 @@ distclean-compile:
 .c.lo:
 	$(LTCOMPILE) -c -o $@ $<
 
+lib_a-fiprintf.o: fiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiprintf.o `test -f 'fiprintf.c' || echo '$(srcdir)/'`fiprintf.c
+
+lib_a-fiprintf.obj: fiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiprintf.obj `if test -f 'fiprintf.c'; then $(CYGPATH_W) 'fiprintf.c'; else $(CYGPATH_W) '$(srcdir)/fiprintf.c'; fi`
+
+lib_a-fiscanf.o: fiscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiscanf.o `test -f 'fiscanf.c' || echo '$(srcdir)/'`fiscanf.c
+
+lib_a-fiscanf.obj: fiscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiscanf.obj `if test -f 'fiscanf.c'; then $(CYGPATH_W) 'fiscanf.c'; else $(CYGPATH_W) '$(srcdir)/fiscanf.c'; fi`
+
+lib_a-iprintf.o: iprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iprintf.o `test -f 'iprintf.c' || echo '$(srcdir)/'`iprintf.c
+
+lib_a-iprintf.obj: iprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iprintf.obj `if test -f 'iprintf.c'; then $(CYGPATH_W) 'iprintf.c'; else $(CYGPATH_W) '$(srcdir)/iprintf.c'; fi`
+
+lib_a-iscanf.o: iscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iscanf.o `test -f 'iscanf.c' || echo '$(srcdir)/'`iscanf.c
+
+lib_a-iscanf.obj: iscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iscanf.obj `if test -f 'iscanf.c'; then $(CYGPATH_W) 'iscanf.c'; else $(CYGPATH_W) '$(srcdir)/iscanf.c'; fi`
+
+lib_a-siprintf.o: siprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siprintf.o `test -f 'siprintf.c' || echo '$(srcdir)/'`siprintf.c
+
+lib_a-siprintf.obj: siprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siprintf.obj `if test -f 'siprintf.c'; then $(CYGPATH_W) 'siprintf.c'; else $(CYGPATH_W) '$(srcdir)/siprintf.c'; fi`
+
+lib_a-siscanf.o: siscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siscanf.o `test -f 'siscanf.c' || echo '$(srcdir)/'`siscanf.c
+
+lib_a-siscanf.obj: siscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siscanf.obj `if test -f 'siscanf.c'; then $(CYGPATH_W) 'siscanf.c'; else $(CYGPATH_W) '$(srcdir)/siscanf.c'; fi`
+
+lib_a-sniprintf.o: sniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sniprintf.o `test -f 'sniprintf.c' || echo '$(srcdir)/'`sniprintf.c
+
+lib_a-sniprintf.obj: sniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sniprintf.obj `if test -f 'sniprintf.c'; then $(CYGPATH_W) 'sniprintf.c'; else $(CYGPATH_W) '$(srcdir)/sniprintf.c'; fi`
+
+lib_a-vdiprintf.o: vdiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vdiprintf.o `test -f 'vdiprintf.c' || echo '$(srcdir)/'`vdiprintf.c
+
+lib_a-vdiprintf.obj: vdiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vdiprintf.obj `if test -f 'vdiprintf.c'; then $(CYGPATH_W) 'vdiprintf.c'; else $(CYGPATH_W) '$(srcdir)/vdiprintf.c'; fi`
+
+lib_a-viprintf.o: viprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viprintf.o `test -f 'viprintf.c' || echo '$(srcdir)/'`viprintf.c
+
+lib_a-viprintf.obj: viprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viprintf.obj `if test -f 'viprintf.c'; then $(CYGPATH_W) 'viprintf.c'; else $(CYGPATH_W) '$(srcdir)/viprintf.c'; fi`
+
+lib_a-viscanf.o: viscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viscanf.o `test -f 'viscanf.c' || echo '$(srcdir)/'`viscanf.c
+
+lib_a-viscanf.obj: viscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viscanf.obj `if test -f 'viscanf.c'; then $(CYGPATH_W) 'viscanf.c'; else $(CYGPATH_W) '$(srcdir)/viscanf.c'; fi`
+
+lib_a-vsiprintf.o: vsiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiprintf.o `test -f 'vsiprintf.c' || echo '$(srcdir)/'`vsiprintf.c
+
+lib_a-vsiprintf.obj: vsiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiprintf.obj `if test -f 'vsiprintf.c'; then $(CYGPATH_W) 'vsiprintf.c'; else $(CYGPATH_W) '$(srcdir)/vsiprintf.c'; fi`
+
+lib_a-vsiscanf.o: vsiscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiscanf.o `test -f 'vsiscanf.c' || echo '$(srcdir)/'`vsiscanf.c
+
+lib_a-vsiscanf.obj: vsiscanf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiscanf.obj `if test -f 'vsiscanf.c'; then $(CYGPATH_W) 'vsiscanf.c'; else $(CYGPATH_W) '$(srcdir)/vsiscanf.c'; fi`
+
+lib_a-vsniprintf.o: vsniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsniprintf.o `test -f 'vsniprintf.c' || echo '$(srcdir)/'`vsniprintf.c
+
+lib_a-vsniprintf.obj: vsniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsniprintf.obj `if test -f 'vsniprintf.c'; then $(CYGPATH_W) 'vsniprintf.c'; else $(CYGPATH_W) '$(srcdir)/vsniprintf.c'; fi`
+
 lib_a-clearerr.o: clearerr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clearerr.o `test -f 'clearerr.c' || echo '$(srcdir)/'`clearerr.c
 
@@ -753,12 +889,6 @@ lib_a-findfp.o: findfp.c
 lib_a-findfp.obj: findfp.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-findfp.obj `if test -f 'findfp.c'; then $(CYGPATH_W) 'findfp.c'; else $(CYGPATH_W) '$(srcdir)/findfp.c'; fi`
 
-lib_a-fiprintf.o: fiprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiprintf.o `test -f 'fiprintf.c' || echo '$(srcdir)/'`fiprintf.c
-
-lib_a-fiprintf.obj: fiprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiprintf.obj `if test -f 'fiprintf.c'; then $(CYGPATH_W) 'fiprintf.c'; else $(CYGPATH_W) '$(srcdir)/fiprintf.c'; fi`
-
 lib_a-flags.o: flags.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-flags.o `test -f 'flags.c' || echo '$(srcdir)/'`flags.c
 
@@ -806,12 +936,6 @@ lib_a-fscanf.o: fscanf.c
 
 lib_a-fscanf.obj: fscanf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fscanf.obj `if test -f 'fscanf.c'; then $(CYGPATH_W) 'fscanf.c'; else $(CYGPATH_W) '$(srcdir)/fscanf.c'; fi`
-
-lib_a-fiscanf.o: fiscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiscanf.o `test -f 'fiscanf.c' || echo '$(srcdir)/'`fiscanf.c
-
-lib_a-fiscanf.obj: fiscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fiscanf.obj `if test -f 'fiscanf.c'; then $(CYGPATH_W) 'fiscanf.c'; else $(CYGPATH_W) '$(srcdir)/fiscanf.c'; fi`
 
 lib_a-fseek.o: fseek.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fseek.o `test -f 'fseek.c' || echo '$(srcdir)/'`fseek.c
@@ -890,18 +1014,6 @@ lib_a-gets.o: gets.c
 
 lib_a-gets.obj: gets.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gets.obj `if test -f 'gets.c'; then $(CYGPATH_W) 'gets.c'; else $(CYGPATH_W) '$(srcdir)/gets.c'; fi`
-
-lib_a-iprintf.o: iprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iprintf.o `test -f 'iprintf.c' || echo '$(srcdir)/'`iprintf.c
-
-lib_a-iprintf.obj: iprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iprintf.obj `if test -f 'iprintf.c'; then $(CYGPATH_W) 'iprintf.c'; else $(CYGPATH_W) '$(srcdir)/iprintf.c'; fi`
-
-lib_a-iscanf.o: iscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iscanf.o `test -f 'iscanf.c' || echo '$(srcdir)/'`iscanf.c
-
-lib_a-iscanf.obj: iscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-iscanf.obj `if test -f 'iscanf.c'; then $(CYGPATH_W) 'iscanf.c'; else $(CYGPATH_W) '$(srcdir)/iscanf.c'; fi`
 
 lib_a-makebuf.o: makebuf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-makebuf.o `test -f 'makebuf.c' || echo '$(srcdir)/'`makebuf.c
@@ -1017,24 +1129,6 @@ lib_a-setvbuf.o: setvbuf.c
 lib_a-setvbuf.obj: setvbuf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-setvbuf.obj `if test -f 'setvbuf.c'; then $(CYGPATH_W) 'setvbuf.c'; else $(CYGPATH_W) '$(srcdir)/setvbuf.c'; fi`
 
-lib_a-siprintf.o: siprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siprintf.o `test -f 'siprintf.c' || echo '$(srcdir)/'`siprintf.c
-
-lib_a-siprintf.obj: siprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siprintf.obj `if test -f 'siprintf.c'; then $(CYGPATH_W) 'siprintf.c'; else $(CYGPATH_W) '$(srcdir)/siprintf.c'; fi`
-
-lib_a-siscanf.o: siscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siscanf.o `test -f 'siscanf.c' || echo '$(srcdir)/'`siscanf.c
-
-lib_a-siscanf.obj: siscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-siscanf.obj `if test -f 'siscanf.c'; then $(CYGPATH_W) 'siscanf.c'; else $(CYGPATH_W) '$(srcdir)/siscanf.c'; fi`
-
-lib_a-sniprintf.o: sniprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sniprintf.o `test -f 'sniprintf.c' || echo '$(srcdir)/'`sniprintf.c
-
-lib_a-sniprintf.obj: sniprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sniprintf.obj `if test -f 'sniprintf.c'; then $(CYGPATH_W) 'sniprintf.c'; else $(CYGPATH_W) '$(srcdir)/sniprintf.c'; fi`
-
 lib_a-snprintf.o: snprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-snprintf.o `test -f 'snprintf.c' || echo '$(srcdir)/'`snprintf.c
 
@@ -1077,29 +1171,11 @@ lib_a-ungetc.o: ungetc.c
 lib_a-ungetc.obj: ungetc.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ungetc.obj `if test -f 'ungetc.c'; then $(CYGPATH_W) 'ungetc.c'; else $(CYGPATH_W) '$(srcdir)/ungetc.c'; fi`
 
-lib_a-vdiprintf.o: vdiprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vdiprintf.o `test -f 'vdiprintf.c' || echo '$(srcdir)/'`vdiprintf.c
-
-lib_a-vdiprintf.obj: vdiprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vdiprintf.obj `if test -f 'vdiprintf.c'; then $(CYGPATH_W) 'vdiprintf.c'; else $(CYGPATH_W) '$(srcdir)/vdiprintf.c'; fi`
-
 lib_a-vdprintf.o: vdprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vdprintf.o `test -f 'vdprintf.c' || echo '$(srcdir)/'`vdprintf.c
 
 lib_a-vdprintf.obj: vdprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vdprintf.obj `if test -f 'vdprintf.c'; then $(CYGPATH_W) 'vdprintf.c'; else $(CYGPATH_W) '$(srcdir)/vdprintf.c'; fi`
-
-lib_a-viprintf.o: viprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viprintf.o `test -f 'viprintf.c' || echo '$(srcdir)/'`viprintf.c
-
-lib_a-viprintf.obj: viprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viprintf.obj `if test -f 'viprintf.c'; then $(CYGPATH_W) 'viprintf.c'; else $(CYGPATH_W) '$(srcdir)/viprintf.c'; fi`
-
-lib_a-viscanf.o: viscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viscanf.o `test -f 'viscanf.c' || echo '$(srcdir)/'`viscanf.c
-
-lib_a-viscanf.obj: viscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-viscanf.obj `if test -f 'viscanf.c'; then $(CYGPATH_W) 'viscanf.c'; else $(CYGPATH_W) '$(srcdir)/viscanf.c'; fi`
 
 lib_a-vprintf.o: vprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vprintf.o `test -f 'vprintf.c' || echo '$(srcdir)/'`vprintf.c
@@ -1113,29 +1189,11 @@ lib_a-vscanf.o: vscanf.c
 lib_a-vscanf.obj: vscanf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vscanf.obj `if test -f 'vscanf.c'; then $(CYGPATH_W) 'vscanf.c'; else $(CYGPATH_W) '$(srcdir)/vscanf.c'; fi`
 
-lib_a-vsiprintf.o: vsiprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiprintf.o `test -f 'vsiprintf.c' || echo '$(srcdir)/'`vsiprintf.c
-
-lib_a-vsiprintf.obj: vsiprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiprintf.obj `if test -f 'vsiprintf.c'; then $(CYGPATH_W) 'vsiprintf.c'; else $(CYGPATH_W) '$(srcdir)/vsiprintf.c'; fi`
-
-lib_a-vsiscanf.o: vsiscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiscanf.o `test -f 'vsiscanf.c' || echo '$(srcdir)/'`vsiscanf.c
-
-lib_a-vsiscanf.obj: vsiscanf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsiscanf.obj `if test -f 'vsiscanf.c'; then $(CYGPATH_W) 'vsiscanf.c'; else $(CYGPATH_W) '$(srcdir)/vsiscanf.c'; fi`
-
 lib_a-vsnprintf.o: vsnprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsnprintf.o `test -f 'vsnprintf.c' || echo '$(srcdir)/'`vsnprintf.c
 
 lib_a-vsnprintf.obj: vsnprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsnprintf.obj `if test -f 'vsnprintf.c'; then $(CYGPATH_W) 'vsnprintf.c'; else $(CYGPATH_W) '$(srcdir)/vsnprintf.c'; fi`
-
-lib_a-vsniprintf.o: vsniprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsniprintf.o `test -f 'vsniprintf.c' || echo '$(srcdir)/'`vsniprintf.c
-
-lib_a-vsniprintf.obj: vsniprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsniprintf.obj `if test -f 'vsniprintf.c'; then $(CYGPATH_W) 'vsniprintf.c'; else $(CYGPATH_W) '$(srcdir)/vsniprintf.c'; fi`
 
 lib_a-vsprintf.o: vsprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vsprintf.o `test -f 'vsprintf.c' || echo '$(srcdir)/'`vsprintf.c
@@ -1166,6 +1224,12 @@ lib_a-asiprintf.o: asiprintf.c
 
 lib_a-asiprintf.obj: asiprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asiprintf.obj `if test -f 'asiprintf.c'; then $(CYGPATH_W) 'asiprintf.c'; else $(CYGPATH_W) '$(srcdir)/asiprintf.c'; fi`
+
+lib_a-vasiprintf.o: vasiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasiprintf.o `test -f 'vasiprintf.c' || echo '$(srcdir)/'`vasiprintf.c
+
+lib_a-vasiprintf.obj: vasiprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasiprintf.obj `if test -f 'vasiprintf.c'; then $(CYGPATH_W) 'vasiprintf.c'; else $(CYGPATH_W) '$(srcdir)/vasiprintf.c'; fi`
 
 lib_a-asprintf.o: asprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asprintf.o `test -f 'asprintf.c' || echo '$(srcdir)/'`asprintf.c
@@ -1209,12 +1273,6 @@ lib_a-putw.o: putw.c
 lib_a-putw.obj: putw.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-putw.obj `if test -f 'putw.c'; then $(CYGPATH_W) 'putw.c'; else $(CYGPATH_W) '$(srcdir)/putw.c'; fi`
 
-lib_a-vasiprintf.o: vasiprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasiprintf.o `test -f 'vasiprintf.c' || echo '$(srcdir)/'`vasiprintf.c
-
-lib_a-vasiprintf.obj: vasiprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasiprintf.obj `if test -f 'vasiprintf.c'; then $(CYGPATH_W) 'vasiprintf.c'; else $(CYGPATH_W) '$(srcdir)/vasiprintf.c'; fi`
-
 lib_a-vasprintf.o: vasprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasprintf.o `test -f 'vasprintf.c' || echo '$(srcdir)/'`vasprintf.c
 
@@ -1227,17 +1285,23 @@ lib_a-asniprintf.o: asniprintf.c
 lib_a-asniprintf.obj: asniprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asniprintf.obj `if test -f 'asniprintf.c'; then $(CYGPATH_W) 'asniprintf.c'; else $(CYGPATH_W) '$(srcdir)/asniprintf.c'; fi`
 
-lib_a-asnprintf.o: asnprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asnprintf.o `test -f 'asnprintf.c' || echo '$(srcdir)/'`asnprintf.c
-
-lib_a-asnprintf.obj: asnprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asnprintf.obj `if test -f 'asnprintf.c'; then $(CYGPATH_W) 'asnprintf.c'; else $(CYGPATH_W) '$(srcdir)/asnprintf.c'; fi`
-
 lib_a-diprintf.o: diprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-diprintf.o `test -f 'diprintf.c' || echo '$(srcdir)/'`diprintf.c
 
 lib_a-diprintf.obj: diprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-diprintf.obj `if test -f 'diprintf.c'; then $(CYGPATH_W) 'diprintf.c'; else $(CYGPATH_W) '$(srcdir)/diprintf.c'; fi`
+
+lib_a-vasniprintf.o: vasniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasniprintf.o `test -f 'vasniprintf.c' || echo '$(srcdir)/'`vasniprintf.c
+
+lib_a-vasniprintf.obj: vasniprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasniprintf.obj `if test -f 'vasniprintf.c'; then $(CYGPATH_W) 'vasniprintf.c'; else $(CYGPATH_W) '$(srcdir)/vasniprintf.c'; fi`
+
+lib_a-asnprintf.o: asnprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asnprintf.o `test -f 'asnprintf.c' || echo '$(srcdir)/'`asnprintf.c
+
+lib_a-asnprintf.obj: asnprintf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-asnprintf.obj `if test -f 'asnprintf.c'; then $(CYGPATH_W) 'asnprintf.c'; else $(CYGPATH_W) '$(srcdir)/asnprintf.c'; fi`
 
 lib_a-dprintf.o: dprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dprintf.o `test -f 'dprintf.c' || echo '$(srcdir)/'`dprintf.c
@@ -1358,12 +1422,6 @@ lib_a-ungetwc.o: ungetwc.c
 
 lib_a-ungetwc.obj: ungetwc.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ungetwc.obj `if test -f 'ungetwc.c'; then $(CYGPATH_W) 'ungetwc.c'; else $(CYGPATH_W) '$(srcdir)/ungetwc.c'; fi`
-
-lib_a-vasniprintf.o: vasniprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasniprintf.o `test -f 'vasniprintf.c' || echo '$(srcdir)/'`vasniprintf.c
-
-lib_a-vasniprintf.obj: vasniprintf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasniprintf.obj `if test -f 'vasniprintf.c'; then $(CYGPATH_W) 'vasniprintf.c'; else $(CYGPATH_W) '$(srcdir)/vasniprintf.c'; fi`
 
 lib_a-vasnprintf.o: vasnprintf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-vasnprintf.o `test -f 'vasnprintf.c' || echo '$(srcdir)/'`vasnprintf.c
@@ -1597,8 +1655,28 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
 	done
 
-# This rule is needed so that libtool compiles vfiprintf before vfprintf. Otherwise
-# libtool moves vfprintf.o and subsequently can't find it.
+# Though small footprint nano-formatted-IO implementation is used
+# when NEWLIB_NANO_FORMATTED_IO is enabled, we keep all rules for
+# the other implementation of formatted IO including all i-family
+# functions.  The object files in !NEWLIB_NANO_FORMATTED_IO version
+# implementation will be neither compiled nor archived into final
+# library, because they are not depended on by final makefile target.
+
+# Rules compiling small-footprint nano-formatted-io implementation.
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf.$(oext): nano-vfprintf.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/nano-vfprintf.c -o $@
+
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_i.$(oext): nano-vfprintf_i.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/nano-vfprintf_i.c -o $@
+
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_float.$(oext): nano-vfprintf_float.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/nano-vfprintf_float.c -o $@
+
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfprintf.$(oext): nano-vfprintf.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -fshort-enums -DSTRING_ONLY -c $(srcdir)/nano-vfprintf.c -o $@
+
+# This rule is needed so that libtool compiles vfiprintf before vfprintf.
+# Otherwise libtool moves vfprintf.o and subsequently can't find it.
 
 $(lpfx)vfprintf.$(oext): vfprintf.c
 	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/vfprintf.c -o $@
@@ -1623,6 +1701,19 @@ $(lpfx)svfwprintf.$(oext): vfwprintf.c
 
 $(lpfx)svfiwprintf.$(oext): vfwprintf.c
 	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -DSTRING_ONLY -c $(srcdir)/vfwprintf.c -o $@
+
+# Rules compiling small-footprint nano-formatted-io implementation.
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf.$(oext): nano-vfscanf.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -c $(srcdir)/nano-vfscanf.c -o $@
+
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_i.$(oext): nano-vfscanf_i.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -c $(srcdir)/nano-vfscanf_i.c -o $@
+
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_float.$(oext): nano-vfscanf_float.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -c $(srcdir)/nano-vfscanf_float.c -o $@
+
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfscanf.$(oext): nano-vfscanf.c
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	$(LIB_COMPILE) -DSTRING_ONLY -c $(srcdir)/nano-vfscanf.c -o $@
 
 $(lpfx)vfscanf.$(oext): vfscanf.c
 	$(LIB_COMPILE) -c $(srcdir)/vfscanf.c -o $@
@@ -1697,6 +1788,8 @@ $(lpfx)sniprintf.$(oext): local.h
 $(lpfx)sprintf.$(oext): local.h
 $(lpfx)sscanf.$(oext): local.h
 $(lpfx)stdio.$(oext): local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfprintf.$(oext): local.h nano-vfprintf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-svfscanf.$(oext): local.h nano-vfscanf_local.h
 $(lpfx)svfiprintf.$(oext): local.h
 $(lpfx)svfiscanf.$(oext): local.h floatio.h
 $(lpfx)svfprintf.$(oext): local.h
@@ -1705,6 +1798,12 @@ $(lpfx)swprintf.$(oext): local.h
 $(lpfx)swscanf.$(oext): local.h
 $(lpfx)ungetc.$(oext): local.h
 $(lpfx)ungetwc.$(oext): local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf.$(oext): local.h nano-vfprintf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_i.$(oext): local.h nano-vfprintf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfprintf_float.$(oext): local.h floatio.h nano-vfprintf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf.$(oext): local.h nano-vfscanf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_i.$(oext): local.h nano-vfscanf_local.h
+@NEWLIB_NANO_FORMATTED_IO_TRUE@$(lpfx)nano-vfscanf_float.$(oext): local.h floatio.h nano-vfscanf_local.h
 $(lpfx)vfiprintf.$(oext): local.h
 $(lpfx)vfiscanf.$(oext): local.h floatio.h
 $(lpfx)vfprintf.$(oext): local.h

@@ -51,6 +51,12 @@ scanf(fmt, va_alist)
   return ret;
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(iscanf, (const char *, ...)
+       _ATTRIBUTE ((__alias__("scanf"))));
+#endif
+
 #endif /* !_REENT_ONLY */
 
 int
@@ -77,3 +83,8 @@ _scanf_r(ptr, fmt, va_alist)
   return (ret);
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(_iscanf_r, (struct _reent *, const char *, ...)
+       _ATTRIBUTE ((__alias__("_scanf_r"))));
+#endif

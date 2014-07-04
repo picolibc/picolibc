@@ -72,6 +72,12 @@ _snprintf_r(ptr, str, size, fmt, va_alist)
   return (ret);
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(_sniprintf_r, (struct _reent *, char *, size_t, const char *, ...)
+       _ATTRIBUTE ((__alias__("_snprintf_r"))));
+#endif
+
 #ifndef _REENT_ONLY
 
 int
@@ -116,4 +122,9 @@ snprintf(str, size, fmt, va_alist)
   return (ret);
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(sniprintf, (char *, size_t, const char *, ...)
+       _ATTRIBUTE ((__alias__("snprintf"))));
+#endif
 #endif

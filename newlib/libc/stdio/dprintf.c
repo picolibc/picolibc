@@ -67,6 +67,12 @@ _DEFUN(_dprintf_r, (ptr, fd, format),
 	return n;
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(_diprintf_r, (struct _reent *, int, const char *, ...)
+       _ATTRIBUTE ((__alias__("_dprintf_r"))));
+#endif
+
 #ifndef _REENT_ONLY
 
 int
@@ -85,4 +91,9 @@ _DEFUN(dprintf, (fd, format),
   return n;
 }
 
+#ifdef _NANO_FORMATTED_IO
+int
+_EXFUN(diprintf, (int, const char *, ...)
+       _ATTRIBUTE ((__alias__("dprintf"))));
+#endif
 #endif /* ! _REENT_ONLY */
