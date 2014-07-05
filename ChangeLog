@@ -1,3 +1,8 @@
+2014-07-05  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* configure.ac: Don't accept isl 0.10.
+	* configure: Regenerate.
+
 2014-05-14  Sandra Loosemore  <sandra@codesourcery.com>
 
 	* configure.ac (target_makefile_frag): Set for nios2-*-elf*.
