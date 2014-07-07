@@ -1,3 +1,8 @@
+2014-07-07  Pavel Pisa  <pisa@cmp.felk.cvut.cz>
+	    Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/machine/arm/memchr.S (.arch): Require revision ARMv6t2.
+
 2014-07-07  Corinna Vinschen  <vinschen@redhat.com>
 
 	* configure.in (--enable-newlib-nano-formatted-io): Set to "no"

@@ -45,8 +45,10 @@
 @    Make conditional on CPU type
 @    tidy
 
+@ This code requires armv6t2 or later.  Uses Thumb2.
+
 	.syntax unified
-	.arch armv7-a
+	.arch armv6t2
 
 #include "arm_asm.h"
 
