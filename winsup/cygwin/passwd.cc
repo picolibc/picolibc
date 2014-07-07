@@ -593,19 +593,13 @@ pg_ent::enumerate_ad ()
       if (!cnt)
 	{
 	  PDS_DOMAIN_TRUSTSW td;
-	  int ret;
 
 	  if (!resume)
 	    {
 	      ++resume;
-	      if (!nss_db_enum_primary ())
+	      if (!nss_db_enum_primary ()
+		  || cldap.enumerate_ad_accounts (NULL, group) != NO_ERROR)
 		continue;
-	      if ((ret = cldap.enumerate_ad_accounts (NULL, group)) != NO_ERROR)
-		{
-		  cldap.close ();
-		  set_errno (ret);
-		  return NULL;
-		}
 	    }
 	  else if ((td = cygheap->dom.trusted_domain (resume - 1)))
 	    {
@@ -618,15 +612,10 @@ pg_ent::enumerate_ad ()
 	      if (((enums & ENUM_TDOMS_ALL) && td->Flags & DS_DOMAIN_PRIMARY)
 		  || !td->DomainSid
 		  || (!nss_db_enum_tdom (td->NetbiosDomainName)
-		      && !nss_db_enum_tdom (td->DnsDomainName)))
+		      && !nss_db_enum_tdom (td->DnsDomainName))
+		      || cldap.enumerate_ad_accounts (td->DnsDomainName, group)
+			 != NO_ERROR)
 		continue;
-	      if ((ret = cldap.enumerate_ad_accounts (td->DnsDomainName, group))
-		  != NO_ERROR)
-		{
-		  cldap.close ();
-		  set_errno (ret);
-		  return NULL;
-		}
 	    }
 	  else
 	    {
