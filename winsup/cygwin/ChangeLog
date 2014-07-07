@@ -1,5 +1,12 @@
 2014-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::send_internal): Improve loop to
+	write streams in chunks of wmem() bytes to raise performance when
+	writing small buffers.  Rename variables and add comments to help
+	understanding the code in years to come.
+
+2014-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* passwd.cc (pg_ent::enumerate_ad): Revert to simply skipping a domain
 	if opening the connection to the domain fails.
 

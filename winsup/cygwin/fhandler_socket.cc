@@ -1664,8 +1664,8 @@ inline ssize_t
 fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 {
   ssize_t res = 0;
-  DWORD ret = 0, err = 0, sum = 0, off = 0;
-  WSABUF buf;
+  DWORD ret = 0, err = 0, sum = 0;
+  WSABUF out_buf[wsamsg->dwBufferCount];
   bool use_sendmsg = false;
   DWORD wait_flags = flags & MSG_DONTWAIT;
   bool nosignal = !!(flags & MSG_NOSIGNAL);
@@ -1673,19 +1673,41 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
   flags &= (MSG_OOB | MSG_DONTROUTE);
   if (wsamsg->Control.len > 0)
     use_sendmsg = true;
-  for (DWORD i = 0; i < wsamsg->dwBufferCount;
-       off >= wsamsg->lpBuffers[i].len && (++i, off = 0))
+  /* Workaround for MSDN KB 823764: Split a message into chunks <= SO_SNDBUF.
+     in_idx is the index of the current lpBuffers from the input wsamsg buffer.
+     in_off is used to keep track of the next byte to write from a wsamsg
+     buffer which only gets partially written. */
+  for (DWORD in_idx = 0, in_off = 0;
+       in_idx < wsamsg->dwBufferCount;
+       in_off >= wsamsg->lpBuffers[in_idx].len && (++in_idx, in_off = 0))
     {
-      /* CV 2009-12-02: Don't split datagram messages. */
-      /* FIXME: Look for a way to split a message into the least number of
-		pieces to minimize the number of WsaSendTo calls. */
+      /* Split a message into the least number of pieces to minimize the
+	 number of WsaSendTo calls.  Don't split datagram messages (bad idea).
+	 out_idx is the index of the next buffer in the out_buf WSABUF,
+	 also the number of buffers given to WSASendTo.
+	 out_len is the number of bytes in the buffers given to WSASendTo.
+	 Don't split datagram messages (very bad idea). */
+      DWORD out_idx = 0;
+      DWORD out_len = 0;
       if (get_socket_type () == SOCK_STREAM)
 	{
-	  buf.buf = wsamsg->lpBuffers[i].buf + off;
-	  buf.len = wsamsg->lpBuffers[i].len - off;
-	  /* See net.cc:fdsock() and MSDN KB 823764 */
-	  if (buf.len >= (unsigned) wmem ())
-	    buf.len = (unsigned) wmem ();
+	  do
+	    {
+	      out_buf[out_idx].buf = wsamsg->lpBuffers[in_idx].buf + in_off;
+	      out_buf[out_idx].len = wsamsg->lpBuffers[in_idx].len - in_off;
+	      out_len += out_buf[out_idx].len;
+	      out_idx++;
+	    }
+	  while (out_len < (unsigned) wmem ()
+		 && (in_off = 0, ++in_idx < wsamsg->dwBufferCount));
+	  /* Tweak len of the last out_buf buffer so the entire number of bytes
+	     is less than wmem (). */
+	  if (out_len > (unsigned) wmem ())
+	    out_buf[out_idx - 1].len -= out_len - (unsigned) wmem ();
+	  /* Add the bytes written from the current last buffer to in_off,
+	     so in_off points to the next byte to be written from that buffer,
+	     or beyond which lets the outper loop skip to the next buffer. */
+	  in_off += out_buf[out_idx - 1].len;
 	}
 
       do
@@ -1693,7 +1715,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	  if (use_sendmsg)
 	    res = WSASendMsg (get_socket (), wsamsg, flags, &ret, NULL, NULL);
 	  else if (get_socket_type () == SOCK_STREAM)
-	    res = WSASendTo (get_socket (), &buf, 1, &ret, flags,
+	    res = WSASendTo (get_socket (), out_buf, out_idx, &ret, flags,
 			     wsamsg->name, wsamsg->namelen, NULL, NULL);
 	  else
 	    res = WSASendTo (get_socket (), wsamsg->lpBuffers,
@@ -1711,9 +1733,13 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 
       if (!res)
 	{
-	  off += ret;
 	  sum += ret;
-	  if (get_socket_type () != SOCK_STREAM)
+	  /* For streams, return to application if the number of bytes written
+	     is less than the number of bytes we intended to write in a single
+	     call to WSASendTo.  Otherwise we would have to add code to
+	     backtrack in the input buffers, which is questionable.  There was
+	     probably a good reason we couldn't write more. */
+	  if (get_socket_type () != SOCK_STREAM || ret < out_len)
 	    break;
 	}
       else if (is_nonblocking () || err != WSAEWOULDBLOCK)
