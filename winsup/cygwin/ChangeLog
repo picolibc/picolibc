@@ -1,3 +1,11 @@
+2014-07-07  Pierre Humblet  <Pierre.Humblet@ieee.org>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/minires.c (minires_dprintf): Change "Minires" to "Resolv" to
+	differ from external minres lib.
+	(res_nquerydomain): Fix off-by-one in domain concatenation.  Add debug
+	output.
+
 2014-07-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fstatvfs): Add debug
