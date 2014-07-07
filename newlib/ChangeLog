@@ -1,3 +1,9 @@
+2014-07-07  Corinna Vinschen  <vinschen@redhat.com>
+
+	* configure.in (--enable-newlib-nano-formatted-io): Set to "no"
+	by default.
+	* configure: Regenerated.
+
 2014-07-04  Bin Cheng  <bin.cheng@arm.com>
 
 	* README (--enable-newlib-nano-formatted-io): Describe.

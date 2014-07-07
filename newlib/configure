@@ -2484,7 +2484,7 @@ if test "${enable_newlib_nano_formatted_io+set}" = set; then :
    *) as_fn_error $? "bad value ${enableval} for newlib-nano-formatted-io" "$LINENO" 5 ;;
  esac
 else
-  newlib_nano_formatted_io=yes
+  newlib_nano_formatted_io=no
 fi
 
 

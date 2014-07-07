@@ -216,7 +216,7 @@ AC_ARG_ENABLE(newlib_nano_formatted_io,
    yes) newlib_nano_formatted_io=yes ;;
    no)  newlib_nano_formatted_io=no ;;
    *) AC_MSG_ERROR(bad value ${enableval} for newlib-nano-formatted-io) ;;
- esac],[newlib_nano_formatted_io=yes])
+ esac],[newlib_nano_formatted_io=no])
 
 NEWLIB_CONFIGURE(.)
 
