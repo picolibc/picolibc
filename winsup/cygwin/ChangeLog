@@ -1,5 +1,10 @@
 2014-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (exception::myfault_handle): Disable handling
+	STATUS_STACK_OVERFLOW.  Explain why.
+
+2014-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::send_internal): Improve loop to
 	write streams in chunks of wmem() bytes to raise performance when
 	writing small buffers.  Rename variables and add comments to help

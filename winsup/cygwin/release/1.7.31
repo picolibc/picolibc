@@ -13,3 +13,5 @@ What changed:
 Bug Fixes
 ---------
 
+- Don't catch STATUS_STACK_OVERFLOW preliminary on 64 bit.
+  Fixes: https://cygwin.com/ml/cygwin/2014-07/msg00046.html

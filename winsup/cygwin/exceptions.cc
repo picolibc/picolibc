@@ -563,7 +563,10 @@ exception::myfault_handle (LPEXCEPTION_POINTERS ep)
 	{
 	case STATUS_ACCESS_VIOLATION:
 	case STATUS_DATATYPE_MISALIGNMENT:
+#if 0
+	/* Short-circuting STATUS_STACK_OVERFLOW disables stack commits. */
 	case STATUS_STACK_OVERFLOW:
+#endif
 	case STATUS_ARRAY_BOUNDS_EXCEEDED:
 	  me.andreas->leave ();	/* Return from a "san" caught fault */
 	default:
