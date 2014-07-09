@@ -564,7 +564,10 @@ exception::myfault_handle (LPEXCEPTION_POINTERS ep)
 	case STATUS_ACCESS_VIOLATION:
 	case STATUS_DATATYPE_MISALIGNMENT:
 #if 0
-	/* Short-circuiting STATUS_STACK_OVERFLOW disables stack commits. */
+	/* PAGE_GUARD-based stack commits are based on structured exception
+	   handling.  Short-circuiting STATUS_STACK_OVERFLOW in a vectored
+	   exception handler disables that, which can ultimately result in
+	   a spurious SEGV. */
 	case STATUS_STACK_OVERFLOW:
 #endif
 	case STATUS_ARRAY_BOUNDS_EXCEEDED:

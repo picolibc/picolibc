@@ -1,5 +1,9 @@
 2014-07-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (exception::myfault_handle): Rephrase comment.
+
+2014-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (exception::myfault_handle): Fix typo in comment.
 
 2014-07-07  Corinna Vinschen  <corinna@vinschen.de>
