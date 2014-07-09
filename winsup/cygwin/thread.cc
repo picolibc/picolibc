@@ -473,9 +473,9 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   arg = threadarg;
 
   mutex.lock ();
-  win32_obj_id = CygwinCreateThread (thread_init_wrapper, this,
-				     attr.stackaddr, attr.stacksize,
-				     attr.guardsize, 0, &thread_id);
+  win32_obj_id = CygwinCreateThread (thread_init_wrapper, this, attr.stackaddr,
+				   attr.stacksize ?: PTHREAD_DEFAULT_STACKSIZE,
+				   attr.guardsize, 0, &thread_id);
 
   if (!win32_obj_id)
     {
@@ -1083,8 +1083,8 @@ pthread::resume ()
 
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
 joinable (PTHREAD_CREATE_JOINABLE), contentionscope (PTHREAD_SCOPE_PROCESS),
-inheritsched (PTHREAD_INHERIT_SCHED), stackaddr (NULL),
-stacksize (PTHREAD_DEFAULT_STACKSIZE), guardsize (PTHREAD_DEFAULT_GUARDSIZE)
+inheritsched (PTHREAD_INHERIT_SCHED), stackaddr (NULL), stacksize (0),
+guardsize (PTHREAD_DEFAULT_GUARDSIZE)
 {
   schedparam.sched_priority = 0;
 }
@@ -2263,8 +2263,7 @@ pthread_attr_getstack (const pthread_attr_t *attr, void **addr, size_t *size)
 {
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
-  /* uses lowest address of stack on all platforms */
-  *addr = (void *)((ptrdiff_t)(*attr)->stackaddr - (*attr)->stacksize);
+  *addr = (*attr)->stackaddr;
   *size = (*attr)->stacksize;
   return 0;
 }
@@ -2285,8 +2284,6 @@ pthread_attr_getstackaddr (const pthread_attr_t *attr, void **addr)
 {
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
-  /* uses stack address, which is the higher address on platforms
-     where the stack grows downwards, such as x86 */
   *addr = (*attr)->stackaddr;
   return 0;
 }
@@ -2488,11 +2485,11 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
 				     tbi, sizeof_tbi, NULL);
   if (NT_SUCCESS (status))
     {
-      PNT_TIB tib = tbi->TebBaseAddress;
-      (*attr)->stackaddr = tib->StackBase;
+      PTEB teb = (PTEB) tbi->TebBaseAddress;
+      (*attr)->stackaddr = teb->DeallocationStack ?: teb->Tib.StackLimit;
       /* stack grows downwards on x86 systems */
-      (*attr)->stacksize = (uintptr_t) tib->StackBase
-			   - (uintptr_t) tib->StackLimit;
+      (*attr)->stacksize = (uintptr_t) teb->Tib.StackBase
+			   - (uintptr_t) (*attr)->stackaddr;
     }
   else
     {

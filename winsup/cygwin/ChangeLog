@@ -1,5 +1,18 @@
 2014-07-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc (pthread::create): Use PTHREAD_DEFAULT_STACKSIZE stacksize
+	if attr.stacksize is 0.
+	(pthread_attr::pthread_attr): Initialize stacksize to 0 to align more
+	closely to Linux.
+	(pthread_attr_getstack): Fix incorrect stackaddr computation.  Return
+	stackaddr just like pthread_attr_getstackaddr.  Remove slightly off
+	comment.
+	(pthread_attr_getstackaddr): Remove slightly off comment.
+	(pthread_getattr_np): Return stackaddr and stacksize based on the full
+	allocated stackarea.
+
+2014-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (exception::myfault_handle): Rephrase comment.
 
 2014-07-09  Corinna Vinschen  <corinna@vinschen.de>
