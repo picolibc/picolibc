@@ -1,3 +1,10 @@
+2014-07-11  Kévin Petit  <kevin.petit@arm.com>
+
+	* libc/machine/aarch64/memchr.S: New file.
+	* libc/machine/aarch64/memchr-stub.c: New file.
+	* libc/machine/aarch64/Makefile.am: Add the new files.
+	* libc/machine/aarch64/Makefile.in: Regenerated.
+
 2014-07-07  Pavel Pisa  <pisa@cmp.felk.cvut.cz>
 	    Richard Earnshaw  <rearnsha@arm.com>
 

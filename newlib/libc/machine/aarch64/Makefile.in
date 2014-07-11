@@ -69,7 +69,8 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-memcmp-stub.$(OBJEXT) lib_a-memcmp.$(OBJEXT) \
+am_lib_a_OBJECTS = lib_a-memchr-stub.$(OBJEXT) lib_a-memchr.$(OBJEXT) \
+	lib_a-memcmp-stub.$(OBJEXT) lib_a-memcmp.$(OBJEXT) \
 	lib_a-memcpy-stub.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
 	lib_a-memmove-stub.$(OBJEXT) lib_a-memmove.$(OBJEXT) \
 	lib_a-memset-stub.$(OBJEXT) lib_a-memset.$(OBJEXT) \
@@ -205,11 +206,11 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = memcmp-stub.c memcmp.S memcpy-stub.c memcpy.S \
-	memmove-stub.c memmove.S memset-stub.c memset.S setjmp.S \
-	strchr-stub.c strchr.S strchrnul-stub.c strchrnul.S \
-	strcmp-stub.c strcmp.S strlen-stub.c strlen.S strncmp-stub.c \
-	strncmp.S strnlen-stub.c strnlen.S
+lib_a_SOURCES = memchr-stub.c memchr.S memcmp-stub.c memcmp.S \
+	memcpy-stub.c memcpy.S memmove-stub.c memmove.S memset-stub.c \
+	memset.S setjmp.S strchr-stub.c strchr.S strchrnul-stub.c \
+	strchrnul.S strcmp-stub.c strcmp.S strlen-stub.c strlen.S \
+	strncmp-stub.c strncmp.S strnlen-stub.c strnlen.S
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -271,6 +272,12 @@ distclean-compile:
 
 .S.obj:
 	$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+lib_a-memchr.o: memchr.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memchr.o `test -f 'memchr.S' || echo '$(srcdir)/'`memchr.S
+
+lib_a-memchr.obj: memchr.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memchr.obj `if test -f 'memchr.S'; then $(CYGPATH_W) 'memchr.S'; else $(CYGPATH_W) '$(srcdir)/memchr.S'; fi`
 
 lib_a-memcmp.o: memcmp.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcmp.o `test -f 'memcmp.S' || echo '$(srcdir)/'`memcmp.S
@@ -343,6 +350,12 @@ lib_a-strnlen.obj: strnlen.S
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-memchr-stub.o: memchr-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memchr-stub.o `test -f 'memchr-stub.c' || echo '$(srcdir)/'`memchr-stub.c
+
+lib_a-memchr-stub.obj: memchr-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memchr-stub.obj `if test -f 'memchr-stub.c'; then $(CYGPATH_W) 'memchr-stub.c'; else $(CYGPATH_W) '$(srcdir)/memchr-stub.c'; fi`
 
 lib_a-memcmp-stub.o: memcmp-stub.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcmp-stub.o `test -f 'memcmp-stub.c' || echo '$(srcdir)/'`memcmp-stub.c
