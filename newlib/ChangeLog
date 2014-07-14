@@ -1,3 +1,10 @@
+2014-07-14  Nick Withers  <nick.withers@anu.edu.au>
+
+	* libc/include/sys/errno.h: Fix comments.
+	* libc/string/strerror.c: Fix documentation.
+	(_strerror_r): Handle ENETRESET, EILSEQ, ENODATA, ECONNRESET,
+	EADDRNOTAVAIL, EOVERFLOW.  Fix strings for EMFILE and EDOM.
+
 2014-07-11  Kévin Petit  <kevin.petit@arm.com>
 
 	* libc/machine/aarch64/memchr.S: New file.
