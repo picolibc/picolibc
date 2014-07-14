@@ -1,3 +1,7 @@
+2014-07-14  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* sigproc.cc (send_sig): Fix bad format in diagnostic output.
+
 2014-07-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (cygheap_domain_info::init): Correctly set
