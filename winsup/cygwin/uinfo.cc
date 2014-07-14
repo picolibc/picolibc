@@ -815,8 +815,9 @@ cygheap_domain_info::init ()
   lsa_close_policy (lsa);
   if (cygheap->dom.member_machine ())
     {
-      /* For a domain member machine fetch all trusted domain info. */
-      lowest_tdo_posix_offset = UNIX_POSIX_OFFSET - 1;
+      /* For a domain member machine fetch all trusted domain info.
+	 Start out with UNIX_POSIX_OFFSET. */
+      lowest_tdo_posix_offset = UNIX_POSIX_OFFSET;
       ret = DsEnumerateDomainTrustsW (NULL, DS_DOMAIN_DIRECT_INBOUND
 					    | DS_DOMAIN_DIRECT_OUTBOUND
 					    | DS_DOMAIN_IN_FOREST,
@@ -1137,27 +1138,24 @@ pwdgrp::fetch_account_from_file (fetch_user_arg_t &arg)
 static ULONG
 fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, cyg_ldap *cldap)
 {
-  uint32_t id_val;
+  uint32_t id_val = 0;
 
   if (!td->PosixOffset && !(td->Flags & DS_DOMAIN_PRIMARY) && td->DomainSid)
     {
-      if (cldap->open (NULL) != NO_ERROR)
+      if (cldap->open (NULL) == NO_ERROR)
+	id_val = cldap->fetch_posix_offset_for_domain (td->DnsDomainName);
+      if (!id_val)
 	{
 	  /* We're probably running under a local account, so we're not allowed
-	     to fetch any information from AD beyond the most obvious.  Never
-	     mind, just fake a reasonable posix offset. */
-	  id_val = cygheap->dom.lowest_tdo_posix_offset
-		   - 0x01000000;
+	     to fetch any information from AD beyond the most obvious.
+	     Alternatively we're suffering IT madness and some admin has
+	     actually set the POSIX offset to 0.  Either way, fake a reasonable
+	     posix offset and hope for the best. */
+	  id_val = cygheap->dom.lowest_tdo_posix_offset - 0x00800000;
 	}
-      else
-	id_val = cldap->fetch_posix_offset_for_domain (td->DnsDomainName);
-      if (id_val)
-	{
-	  td->PosixOffset = id_val;
-	  if (id_val < cygheap->dom.lowest_tdo_posix_offset)
-	    cygheap->dom.lowest_tdo_posix_offset = id_val;
-
-	}
+      td->PosixOffset = id_val;
+      if (id_val < cygheap->dom.lowest_tdo_posix_offset)
+	cygheap->dom.lowest_tdo_posix_offset = id_val;
     }
   return td->PosixOffset;
 }

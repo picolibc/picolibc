@@ -1,3 +1,10 @@
+2014-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (cygheap_domain_info::init): Correctly set
+	lowest_tdo_posix_offset to UNIX_POSIX_OFFSET.
+	(fetch_posix_offset): Redesign to fake a POSIX offset in all cases
+	where we can't fetch a non-0 POSIX offset from our primary domain.
+
 2014-07-14  Yaakov Selkowitz  <yselkowitz@cygwin.com>
 
 	* thread.cc (pthread_mutex::pthread_mutex): Change default type
