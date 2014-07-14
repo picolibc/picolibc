@@ -1,3 +1,15 @@
+2014-07-14  Yaakov Selkowitz  <yselkowitz@cygwin.com>
+
+	* thread.cc (pthread_mutex::pthread_mutex): Change default type
+	to PTHREAD_MUTEX_NORMAL.
+	(pthread_mutex::unlock): Return EPERM if the mutex has no owner and
+	the mutex type is PTHREAD_MUTEX_ERRORCHECK, as on Linux.
+	(pthread_mutexattr::pthread_mutexattr): Ditto.
+	(pthread_mutex_unlock): Do not fail if mutex is a normal mutex
+	initializer.
+	* include/pthread.h (PTHREAD_MUTEX_INITIALIZER): Redefine as
+	PTHREAD_NORMAL_MUTEX_INITIALIZER_NP.
+
 2014-07-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (pthread::create): Use PTHREAD_DEFAULT_STACKSIZE stacksize

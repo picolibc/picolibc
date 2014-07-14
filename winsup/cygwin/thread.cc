@@ -1709,7 +1709,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
   tid (0),
 #endif
   recursion_counter (0), condwaits (0),
-  type (PTHREAD_MUTEX_ERRORCHECK),
+  type (PTHREAD_MUTEX_NORMAL),
   pshared (PTHREAD_PROCESS_PRIVATE)
 {
   win32_obj_id = ::CreateEvent (&sec_none_nih, false, false, NULL);
@@ -1777,7 +1777,7 @@ pthread_mutex::unlock ()
   if (type == PTHREAD_MUTEX_NORMAL)
     /* no error checking */;
   else if (no_owner ())
-    res = type == PTHREAD_MUTEX_ERRORCHECK ? EINVAL : 0;
+    res = type == PTHREAD_MUTEX_ERRORCHECK ? EPERM : 0;
   else if (!pthread::equal (owner, self))
     res = EPERM;
   if (!res && recursion_counter > 0 && --recursion_counter == 0)
@@ -1851,7 +1851,7 @@ pthread_mutex::_fixup_after_fork ()
 }
 
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),
-pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_ERRORCHECK)
+pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_NORMAL)
 {
 }
 
@@ -3159,7 +3159,7 @@ extern "C" int
 pthread_mutex_unlock (pthread_mutex_t *mutex)
 {
   if (pthread_mutex::is_initializer (mutex))
-    return EPERM;
+    pthread_mutex::init (mutex, NULL, *mutex);
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
   return (*mutex)->unlock ();
