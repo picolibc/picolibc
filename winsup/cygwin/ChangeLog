@@ -1,3 +1,106 @@
+2014-07-14  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* sigproc.cc (send_sig): Fix bad format in diagnostic output.
+
+2014-07-14  Yaakov Selkowitz  <yselkowitz@cygwin.com>
+
+	* thread.cc (pthread_mutex::pthread_mutex): Change default type
+	to PTHREAD_MUTEX_NORMAL.
+	(pthread_mutex::unlock): Return EPERM if the mutex has no owner and
+	the mutex type is PTHREAD_MUTEX_ERRORCHECK, as on Linux.
+	(pthread_mutexattr::pthread_mutexattr): Ditto.
+	(pthread_mutex_unlock): Do not fail if mutex is a normal mutex
+	initializer.
+	* include/pthread.h (PTHREAD_MUTEX_INITIALIZER): Redefine as
+	PTHREAD_NORMAL_MUTEX_INITIALIZER_NP.
+
+2014-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (pthread::create): Use PTHREAD_DEFAULT_STACKSIZE stacksize
+	if attr.stacksize is 0.
+	(pthread_attr::pthread_attr): Initialize stacksize to 0 to align more
+	closely to Linux.
+	(pthread_attr_getstack): Fix incorrect stackaddr computation.  Return
+	stackaddr just like pthread_attr_getstackaddr.  Remove slightly off
+	comment.
+	(pthread_attr_getstackaddr): Remove slightly off comment.
+	(pthread_getattr_np): Return stackaddr and stacksize based on the full
+	allocated stackarea.
+
+2014-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (exception::myfault_handle): Rephrase comment.
+
+2014-07-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (exception::myfault_handle): Fix typo in comment.
+
+2014-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (exception::myfault_handle): Disable handling
+	STATUS_STACK_OVERFLOW.  Explain why.
+
+2014-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::send_internal): Improve loop to
+	write streams in chunks of wmem() bytes to raise performance when
+	writing small buffers.  Rename variables and add comments to help
+	understanding the code in years to come.
+
+2014-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/minires.c (minires_dprintf): Change "Minires" to "Resolv" to
+	differ from external minres lib.
+	(res_nquerydomain): Fix off-by-one in domain concatenation.  Add debug
+	output.
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spawn.cc (find_exec): Initialize err (CID 60111).
+	* strace.cc (strace::activate): Fix potential buffer overrun (CID 59938)
+	* syscalls.cc (popen): Close parent pipe descriptor via fclosing fp on
+	error to avoid resource leak (CID 59981).
+	* thread.cc (pthread::exit): Avoid accessing cygtls member after
+	deleting "this" (CID 60217).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* select.cc (start_thread_socket): Delete si on early return in case of
+	an error (CID 59967).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regex/regcomp.c (computematchjumps): Free local memory in case of
+	error (CID 59975).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.cc (fs_info::update): Define dir in the outermost scope to avoid
+	accessing out-of-scope value (CID 60027).  Always initialize attr to
+	upath (CID 60113).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* malloc_wrapper.cc (mallinfo): Initialize m if external malloc is used,
+	too (CID 60120).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc (tzload): Fix leaking memory (CID 60001).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (regopt): Allocate small local buffer to avoid copying
+	twice.  Fixes resource leak (CID 60012).  Add comment.
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dll_init.cc (dll_list::alloc): Fix buffer overrun (CID 59940).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (insert_file): Fix resource leaks (CIDs 59987, 59988).
+
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_getaddrinfo): Fix value of hint->ai_addrlen on 64 bit.

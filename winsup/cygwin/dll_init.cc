@@ -179,7 +179,7 @@ dll *
 dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 {
   WCHAR buf[NT_MAX_PATH];
-  GetModuleFileNameW (h, buf, sizeof (buf));
+  GetModuleFileNameW (h, buf, NT_MAX_PATH);
   PWCHAR name = buf;
   if (!wcsncmp (name, L"\\\\?\\", 4))
     {

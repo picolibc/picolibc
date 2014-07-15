@@ -627,11 +627,11 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   else
     {
       size_t n = strlen (si._si_commune._si_str);
-      char *p = leader = (char *) alloca (sizeof (pack) + sizeof (n) + n);
+      packsize = sizeof (pack) + sizeof (n) + n;
+      char *p = leader = (char *) alloca (packsize);
       memcpy (p, &pack, sizeof (pack)); p += sizeof (pack);
       memcpy (p, &n, sizeof (n)); p += sizeof (n);
       memcpy (p, si._si_commune._si_str, n); p += n;
-      packsize = p - leader;
     }
 
   DWORD nb;
@@ -645,7 +645,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  ForceCloseHandle (sendsig);
 	}
       else if (!p->exec_sendsig && !exit_state)
-	system_printf ("error sending signal %d, pipe handle %p, nb %u, packsize %u, %E",
+	system_printf ("error sending signal %d, pid %u, pipe handle %p, nb %u, packsize %u, %E",
 		       si.si_signo, p->pid, sendsig, nb, packsize);
       if (GetLastError () == ERROR_BROKEN_PIPE)
 	set_errno (ESRCH);

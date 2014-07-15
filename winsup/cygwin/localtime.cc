@@ -698,7 +698,7 @@ tzload(timezone_t sp, const char *name, const int doextend)
 		    else
 		      base = name;
 		    if (strcmp(base, "posixrules"))
-		      return -1;
+		      goto oops;
 
 		    /* We've got a built-in copy of posixrules just in case */
 		    fid = -2;

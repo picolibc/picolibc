@@ -94,7 +94,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
   char *tmp = tp.c_get ();
   const char *posix = (opt & FE_NATIVE) ? NULL : name;
   bool has_slash = !!strpbrk (name, "/\\");
-  int err;
+  int err = 0;
 
   /* Check to see if file can be opened as is first.
      Win32 systems always check . first, but PATH may not be set up to

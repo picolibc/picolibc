@@ -26,7 +26,7 @@ void minires_dprintf(const char * format, ...)
   va_list args;
 
   va_start(args, format);
-  fprintf(stderr, "Minires: ");
+  fprintf(stderr, "Resolv: ");
   vfprintf(stderr, format, args);
   va_end(args);
 }
@@ -726,6 +726,9 @@ int res_nquerydomain( res_state statp, const char * Name, const char * DomName,
   char fqdn[MAXDNAME], *ptr;
   size_t nlen;
 
+  DPRINTF(statp->options & RES_DEBUG, "querydomain \"%s\"  \"%s\" type %d\n",
+	  Name, DomName, Type);
+
   if (!DomName)
     ptr = (char *) Name;
   else if ((nlen = strlen(Name)) >= sizeof(fqdn) - 1)
@@ -734,7 +737,7 @@ int res_nquerydomain( res_state statp, const char * Name, const char * DomName,
     strcpy(fqdn, Name);
     ptr = &fqdn[nlen];
     if (nlen && *(ptr - 1) != '.')
-      *(ptr++ - 1) = '.';
+      *ptr++ = '.';
     fqdn[sizeof(fqdn) - 1] = 0;
     strncpy(ptr, DomName, sizeof(fqdn) - (ptr - fqdn));
     if (fqdn[sizeof(fqdn) - 1])

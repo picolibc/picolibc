@@ -473,9 +473,9 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   arg = threadarg;
 
   mutex.lock ();
-  win32_obj_id = CygwinCreateThread (thread_init_wrapper, this,
-				     attr.stackaddr, attr.stacksize,
-				     attr.guardsize, 0, &thread_id);
+  win32_obj_id = CygwinCreateThread (thread_init_wrapper, this, attr.stackaddr,
+				   attr.stacksize ?: PTHREAD_DEFAULT_STACKSIZE,
+				   attr.guardsize, 0, &thread_id);
 
   if (!win32_obj_id)
     {
@@ -511,6 +511,7 @@ void
 pthread::exit (void *value_ptr)
 {
   class pthread *thread = this;
+  bool is_main_tls = (cygtls == _main_tls); // Check cygtls before deleting this
 
   // run cleanup handlers
   pop_all_cleanup_handlers ();
@@ -536,7 +537,7 @@ pthread::exit (void *value_ptr)
     ::exit (0);
   else
     {
-      if (cygtls == _main_tls)
+      if (is_main_tls)
 	{
 	  _cygtls *dummy = (_cygtls *) malloc (sizeof (_cygtls));
 	  *dummy = *_main_tls;
@@ -1082,8 +1083,8 @@ pthread::resume ()
 
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
 joinable (PTHREAD_CREATE_JOINABLE), contentionscope (PTHREAD_SCOPE_PROCESS),
-inheritsched (PTHREAD_INHERIT_SCHED), stackaddr (NULL),
-stacksize (PTHREAD_DEFAULT_STACKSIZE), guardsize (PTHREAD_DEFAULT_GUARDSIZE)
+inheritsched (PTHREAD_INHERIT_SCHED), stackaddr (NULL), stacksize (0),
+guardsize (PTHREAD_DEFAULT_GUARDSIZE)
 {
   schedparam.sched_priority = 0;
 }
@@ -1708,7 +1709,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
   tid (0),
 #endif
   recursion_counter (0), condwaits (0),
-  type (PTHREAD_MUTEX_ERRORCHECK),
+  type (PTHREAD_MUTEX_NORMAL),
   pshared (PTHREAD_PROCESS_PRIVATE)
 {
   win32_obj_id = ::CreateEvent (&sec_none_nih, false, false, NULL);
@@ -1776,7 +1777,7 @@ pthread_mutex::unlock ()
   if (type == PTHREAD_MUTEX_NORMAL)
     /* no error checking */;
   else if (no_owner ())
-    res = type == PTHREAD_MUTEX_ERRORCHECK ? EINVAL : 0;
+    res = type == PTHREAD_MUTEX_ERRORCHECK ? EPERM : 0;
   else if (!pthread::equal (owner, self))
     res = EPERM;
   if (!res && recursion_counter > 0 && --recursion_counter == 0)
@@ -1850,7 +1851,7 @@ pthread_mutex::_fixup_after_fork ()
 }
 
 pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),
-pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_ERRORCHECK)
+pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_NORMAL)
 {
 }
 
@@ -2262,8 +2263,7 @@ pthread_attr_getstack (const pthread_attr_t *attr, void **addr, size_t *size)
 {
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
-  /* uses lowest address of stack on all platforms */
-  *addr = (void *)((ptrdiff_t)(*attr)->stackaddr - (*attr)->stacksize);
+  *addr = (*attr)->stackaddr;
   *size = (*attr)->stacksize;
   return 0;
 }
@@ -2284,8 +2284,6 @@ pthread_attr_getstackaddr (const pthread_attr_t *attr, void **addr)
 {
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
-  /* uses stack address, which is the higher address on platforms
-     where the stack grows downwards, such as x86 */
   *addr = (*attr)->stackaddr;
   return 0;
 }
@@ -2487,11 +2485,11 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
 				     tbi, sizeof_tbi, NULL);
   if (NT_SUCCESS (status))
     {
-      PNT_TIB tib = tbi->TebBaseAddress;
-      (*attr)->stackaddr = tib->StackBase;
+      PTEB teb = (PTEB) tbi->TebBaseAddress;
+      (*attr)->stackaddr = teb->DeallocationStack ?: teb->Tib.StackLimit;
       /* stack grows downwards on x86 systems */
-      (*attr)->stacksize = (uintptr_t) tib->StackBase
-			   - (uintptr_t) tib->StackLimit;
+      (*attr)->stacksize = (uintptr_t) teb->Tib.StackBase
+			   - (uintptr_t) (*attr)->stackaddr;
     }
   else
     {
@@ -3161,7 +3159,7 @@ extern "C" int
 pthread_mutex_unlock (pthread_mutex_t *mutex)
 {
   if (pthread_mutex::is_initializer (mutex))
-    return EPERM;
+    pthread_mutex::init (mutex, NULL, *mutex);
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
   return (*mutex)->unlock ();

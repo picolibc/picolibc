@@ -177,17 +177,18 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
     FILE_FS_VOLUME_INFORMATION ffvi;
     WCHAR buf[NAME_MAX + 1];
   } ffvi_buf;
+  UNICODE_STRING dir;
   UNICODE_STRING fsname;
 
   clear ();
+  /* Always caseinsensitive.  We really just need access to the drive. */
+  InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL,
+			      NULL);
   if (in_vol)
     vol = in_vol;
   else
     {
       ULONG access = READ_CONTROL;
-      /* Always caseinsensitive.  We really just need access to the drive. */
-      InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL,
-				  NULL);
       /* Note: Don't use the FILE_OPEN_REPARSE_POINT flag here.  The reason
 	 is that symlink_info::check relies on being able to open a handle
 	 to the target of a volume mount point. */
@@ -205,7 +206,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     && (attr.ObjectName->Length > 7 * sizeof (WCHAR)
 		 || status == STATUS_NO_MEDIA_IN_DEVICE))
 	{
-	  UNICODE_STRING dir;
 	  RtlSplitUnicodePath (attr.ObjectName, &dir, NULL);
 	  attr.ObjectName = &dir;
 	  if (status == STATUS_NO_MEDIA_IN_DEVICE)
