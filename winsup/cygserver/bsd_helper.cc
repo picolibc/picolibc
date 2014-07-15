@@ -200,6 +200,7 @@ ipcexit_creat_hookthread (struct thread *td)
 			GetCurrentProcess (), &shs->process_hdl,
 			0, FALSE, DUPLICATE_SAME_ACCESS))
     {
+      delete shs;
       log (LOG_CRIT, "failed to duplicate process handle, error = %u",
 		      GetLastError ());
       return cygwin_internal (CW_GET_ERRNO_FROM_WINERROR,
