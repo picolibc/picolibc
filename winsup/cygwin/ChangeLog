@@ -1,5 +1,12 @@
 2014-07-15  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
+	* sigproc.cc (sigproc_init): Set aside more buffer space for signal
+	pipes.
+	(sig_send): Retry WriteFiles which fail when there is no error but
+	packbytes have not been sent.
+
+2014-07-15  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
 	* sigproc.cc (send_sig): Don't report an error if WriteFile succeeds.
 
 2014-07-14  Christopher Faylor  <me.cygwin2014@cgf.cx>
