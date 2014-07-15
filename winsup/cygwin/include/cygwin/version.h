@@ -446,7 +446,7 @@ details. */
            as number of partitions on tape.
       271: Export posix_spawn, posix_spawnp, and helper functions.
       272: Export tm_gmtoff and tm_zone members.
-      273: Introduce account mapping from WIndows account DBs.  Add CW_SETENT,
+      273: Introduce account mapping from Windows account DBs.  Add CW_SETENT,
 	   CW_GETENT, CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID, CW_GETGRSID,
 	   CW_CYGNAME_FROM_WINNAME.
      */
