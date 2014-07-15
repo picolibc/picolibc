@@ -635,7 +635,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     }
 
   DWORD nb;
-  if (!WriteFile (sendsig, leader, packsize, &nb, NULL) || nb != packsize)
+  if (!WriteFile (sendsig, leader, packsize, &nb, NULL))
     {
       /* Couldn't send to the pipe.  This probably means that the
 	 process is exiting.  */
