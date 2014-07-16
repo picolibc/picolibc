@@ -1673,7 +1673,7 @@ call_gaa (LPVOID param)
       if (ret != ERROR_SUCCESS)
 	{
 	  free (pa0);
-	  *p->pa_ret = pa0;
+	  *p->pa_ret = NULL;
 	}
       else
 	*p->pa_ret = pa0;
@@ -1685,7 +1685,7 @@ bool
 get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
 {
   DWORD ret;
-  gaa_wa param = { family, pa_ret ?: NULL };
+  gaa_wa param = { family, pa_ret };
 
   if ((uintptr_t) &param >= (uintptr_t) 0x80000000L
       && wincap.has_gaa_largeaddress_bug ())
@@ -2080,10 +2080,12 @@ get_ifs (ULONG family)
 		break;
 	      case AF_INET6:
 		if_sin6 = (struct sockaddr_in6 *) &ifp->ifa_netmask;
-		for (cnt = 0; cnt < 4 && prefix; ++cnt, prefix -= 32)
-		  if_sin6->sin6_addr.s6_addr32[cnt] = UINT32_MAX;
-		  if (prefix < 32)
-		    if_sin6->sin6_addr.s6_addr32[cnt] <<= 32 - prefix;
+		for (cnt = 0; cnt < 4 && prefix > 0; ++cnt, prefix -= 32)
+		  {
+		    if_sin6->sin6_addr.s6_addr32[cnt] = UINT32_MAX;
+		    if (prefix < 32)
+		      if_sin6->sin6_addr.s6_addr32[cnt] <<= 32 - prefix;
+		  }
 		break;
 	      }
 	    ifp->ifa_ifa.ifa_netmask = (struct sockaddr *) &ifp->ifa_netmask;

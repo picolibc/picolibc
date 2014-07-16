@@ -1,6 +1,6 @@
 /* flock.cc.  NT specific implementation of advisory file locking.
 
-   Copyright 2003, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 2003, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -724,13 +724,13 @@ err:
 DWORD WINAPI
 delete_lock_in_parent (PVOID param)
 {
-  inode_t *node;
+  inode_t *node, *next_node;
   lockf_t *lock, **prev;
 
   /* Scan list of all inodes, and reap stale BSD lock if lf_id matches.
      Remove inode if empty. */
   INODE_LIST_LOCK ();
-  LIST_FOREACH (node, &cygheap->inode_list, i_next)
+  LIST_FOREACH_SAFE (node, &cygheap->inode_list, i_next, next_node)
     if (!node->inuse ())
       {
 	for (prev = &node->i_lockf, lock = *prev; lock; lock = *prev)

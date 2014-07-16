@@ -77,7 +77,7 @@ void minires_get_search(char * string, res_state statp)
       ptr += sizes[j];
       DPRINTF(debug, "search \"%s\"\n", words[j]);
     }
-    else
+    else if (j < MAXDNSRCH + 1)
       DPRINTF(debug, "no space for \"%s\"\n", words[j]);
   }
 }

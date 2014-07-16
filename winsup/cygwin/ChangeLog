@@ -58,6 +58,11 @@
 	(res_nquerydomain): Fix off-by-one in domain concatenation.  Add debug
 	output.
 
+2014-07-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstatvfs): Add debug
+	output.
+
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (find_exec): Initialize err (CID 60111).
@@ -94,6 +99,16 @@
 
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (try_to_debug): Free environment pointer when not used
+	anymore (CID 59968).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_getaddrinfo): Fix value of hint->ai_addrlen on 64 bit.
+	Explain why.
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (regopt): Allocate small local buffer to avoid copying
 	twice.  Fixes resource leak (CID 60012).  Add comment.
 
@@ -105,11 +120,6 @@
 
 	* dcrt0.cc (insert_file): Fix resource leaks (CIDs 59987, 59988).
 
-2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
-
-	* net.cc (cygwin_getaddrinfo): Fix value of hint->ai_addrlen on 64 bit.
-	Explain why.
-
 2014-06-17  David Stacey  <drstacey@tiscali.co.uk>
 
 	* libc/rexec.cc (cygwin_rexec): Make ahostbuf static to avoid returning
@@ -120,9 +130,53 @@
 	* fhandler_socket.cc (fhandler_socket::evaluate_events): Call
 	WSASetLastError after setsockopt.  Explain why.
 
+2014-06-16  Denis Excoffier  <cygwin@Denis-Excoffier.org>
+
+	* grp.cc (getgrouplist): Fix setting ngroups to make sure to return
+	the right value.
+
+2014-06-05  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* timer.cc (timer_tracker::cancel): Demote api_fatal to system_printf,
+	printing more details about odd failure condition.
+
 2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gmon.h: Pull in profile.h.  Explain why.
+
+2014-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/bsdlib.cc (forkpty): Close master and slave if fork fails to
+	avoid resource leak (CID 59997).
+	* libc/fts.c: Update to FreeBSD version 1.39 (CID 59947).
+	* libc/minires.c (minires_get_search): Fix out-of-bounds read from
+	words array (CID 59937).
+
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (delete_lock_in_parent): Use LIST_FOREACH_SAFE to avoid
+	dereferencing freed pointer (CID 60224).
+
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_procsysvipc.cc (format_procsysvipc_msg): Rearrange code to
+	avoid resource leakage (CID 60002).  Don't use tmp_pathbuf, explain why.
+	Fix indentation.
+	(format_procsysvipc_sem): Ditto.
+	(format_procsysvipc_shm): Ditto (CID 60003).
+
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (get_mem_values): Rearrange code slightly to
+	avoid resource leakage (CID 59973).
+	(format_process_stat): Drop temporary variable wcmd and avoid
+	string copy without length check (CID 60050).
+	(format_process_status): Ditto (CID 60051).
+
+2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_swaps): Use tmp_pathbuf for filename,
+	rather than allocating and forgetting to free (CID 59982).
 
 2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -131,9 +185,41 @@
 
 2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* scandir.cc (scandir): Assume namelist is always valid, per POSIX.
+	(CID 60021).
 	* sec_auth.cc (cygwin_logon_user): Securely erase password copy.
 	(lsaprivkeyauth): Avoid trying to dereference data if no key is stored
 	in the registry (CID 60122).  Securely erase passwords after usage.
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pseudo-reloc.cc (__report_error): Raise size of module name buffer to
+	PATH_MAX.  Fix length in call to GetModuleFileNameW (CID 59947).
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (call_gaa): Fix setting pa_ret pointer in case of an error
+	from GetAdaptersAddresses (CID 60218).
+	(get_ifs): Add missing braces in AF_INET6 case which broke netmask
+	computation.  Break out of loop if prefix gets <= 0 (CID 59939).
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 31.
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (handle_to_fn): Fix length parameter in call to
+	QueryDosDeviceW (CID 59936).
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pinfo.cc (pinfo_basic::pinfo_basic): Fix size of progname array in
+	call to GetModuleFileNameW (CID 59935).
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprintf.cc (__small_vsprintf): Add missing break in 'C' case.
 
 2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
 

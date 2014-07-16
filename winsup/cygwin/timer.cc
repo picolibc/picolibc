@@ -66,8 +66,9 @@ timer_tracker::cancel ()
     return false;
 
   SetEvent (hcancel);
-  if (WaitForSingleObject (syncthread, INFINITE) != WAIT_OBJECT_0)
-    api_fatal ("WFSO failed waiting for timer thread, %E");
+  DWORD res = WaitForSingleObject (syncthread, INFINITE);
+  if (res != WAIT_OBJECT_0)
+    system_printf ("WFSO returned unexpected value %u, %E", res);
   return true;
 }
 

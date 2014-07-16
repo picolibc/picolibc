@@ -150,6 +150,8 @@ forkpty (int *amaster, char *name, const struct termios *termp,
   switch (pid = fork ())
     {
       case -1:
+	close (master);
+	close (slave);
 	return -1;
       case 0:
 	close (master);
