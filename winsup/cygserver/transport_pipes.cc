@@ -83,6 +83,9 @@ transport_layer_pipes::~transport_layer_pipes ()
 
 #ifndef __INSIDE_CYGWIN__
 
+static HANDLE listen_pipe;
+static HANDLE connect_pipe;
+
 int
 transport_layer_pipes::listen ()
 {
@@ -94,16 +97,19 @@ transport_layer_pipes::listen ()
 
   debug ("Try to create named pipe: %ls", _pipe_name);
 
-  HANDLE listen_pipe =
+  /* We have to create the first instance of the listening pipe here, and
+     we also have to create at least one instance of the client side to avoid
+     a race condition.
+     See https://cygwin.com/ml/cygwin/2012-11/threads.html#00144 */
+  listen_pipe =
     CreateNamedPipeW (_pipe_name,
 		      PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE,
 		      PIPE_TYPE_BYTE | PIPE_WAIT, PIPE_UNLIMITED_INSTANCES,
 		      0, 0, 1000, &sec_all_nih);
   if (listen_pipe != INVALID_HANDLE_VALUE)
     {
-      HANDLE connect_pipe =
-	CreateFileW (_pipe_name, GENERIC_READ | GENERIC_WRITE, 0, &sec_all_nih,
-		     OPEN_EXISTING, 0, NULL);
+      connect_pipe = CreateFileW (_pipe_name, GENERIC_READ | GENERIC_WRITE, 0,
+				  &sec_all_nih, OPEN_EXISTING, 0, NULL);
       if (connect_pipe == INVALID_HANDLE_VALUE)
 	{
 	  CloseHandle (listen_pipe);

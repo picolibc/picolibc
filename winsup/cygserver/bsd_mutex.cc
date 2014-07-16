@@ -227,6 +227,8 @@ public:
       panic ("Allocating msleep records failed: %d", errno);
   }
 
+  ~msleep_sync_array () { delete a; }
+
   HANDLE enter (void *ident)
   {
     HANDLE evt = NULL;

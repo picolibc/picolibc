@@ -210,6 +210,7 @@ ipcexit_creat_hookthread (struct thread *td)
   HANDLE thread = CreateThread (NULL, 0, ipcexit_hookthread, shs, 0, &tid);
   if (!thread)
     {
+      delete shs;
       log (LOG_CRIT, "failed to create thread, error = %u", GetLastError ());
       return cygwin_internal (CW_GET_ERRNO_FROM_WINERROR,
 			      GetLastError (), ENOMEM);
