@@ -203,6 +203,28 @@
 
 	* winf.cc (linebuf::fromargv): Temporarily revert patch from 2014-01-24.
 
+2014-04-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (TP_NUM_C_BUFS): Raise to 50 to allow SYMLOOP_MAX recursions
+	path_conv <-> normalize_posix_path, plus a bit of buffer.
+	(TP_NUM_W_BUFS): Ditto.
+	(class san): Change type of _c_cnt and _w_cnt to unsigned.
+	* path.cc (normalize_posix_path): Guard recursion into path_conv
+	against tmp_pathbuf overflow.  Generate normalized path in call to
+	path_conv.  If the path is valid, replace dst with the normalized_path
+	from path_conv call.  Add comment to explain why we're doing this.
+	* tls_pbuf.cc (tls_pathbuf::destroy): Only free buffers until the
+	first buffer pointer is NULL.
+	(tmp_pathbuf::c_get): Simplify error message.
+	(tmp_pathbuf::w_get): Ditto.
+	* tls_pbuf.h (class tmp_pathbuf): Change type of c_buf_old and w_buf_old
+	to unsigned.
+	(tmp_pathbuf::check_usage): New inline method to check if we have
+	enough tmp_pathbuf buffers left to call a function using tmp_pathbuf
+	buffers.
+	* tlsoffsets.h: Regenerate.
+	* tlsoffsets64.h: Regenerate.
+
 2014-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_setsockopt): Ignore IPV6_TCLASS the same way as IP_TOS.

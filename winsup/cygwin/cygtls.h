@@ -1,7 +1,7 @@
 /* cygtls.h
 
-   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-   Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
+   2014 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -32,8 +32,8 @@ details. */
 
 #include "cygthread.h"
 
-#define TP_NUM_C_BUFS 10
-#define TP_NUM_W_BUFS 10
+#define TP_NUM_C_BUFS 50
+#define TP_NUM_W_BUFS 50
 
 #ifdef CYGTLS_HANDLE
 #include "thread.h"
@@ -297,8 +297,8 @@ class san
   san *_clemente;
   jmp_buf _context;
   int _errno;
-  int _c_cnt;
-  int _w_cnt;
+  unsigned _c_cnt;
+  unsigned _w_cnt;
 public:
   int setup (int myerrno = 0) __attribute__ ((always_inline))
   {
