@@ -36,3 +36,7 @@ Bug Fixes
 
 - Don't catch STATUS_STACK_OVERFLOW preliminary on 64 bit.
   Fixes: https://cygwin.com/ml/cygwin/2014-07/msg00046.html
+
+- Make sure that signals are properly delivered when sending lots of signals
+  in succession.
+  Fixes: https://cygwin.com/ml/cygwin/2014-07/threads.html#00149
