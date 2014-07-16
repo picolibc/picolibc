@@ -426,7 +426,7 @@ sigproc_init ()
   char char_sa_buf[1024];
   PSECURITY_ATTRIBUTES sa = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
   DWORD err = fhandler_pipe::create (sa, &my_readsig, &my_sendsig,
-				     sizeof (sigpacket), "sigwait",
+				     NSIG * sizeof (sigpacket), "sigwait",
 				     PIPE_ADD_PID);
   if (err)
     {
@@ -635,7 +635,19 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
     }
 
   DWORD nb;
-  if (!WriteFile (sendsig, leader, packsize, &nb, NULL))
+  BOOL res;
+  /* Try multiple times to send if packsize != nb since that probably
+     means that the pipe buffer is full.  */
+  for (int i = 0; i < 100; i++)
+    {
+      res = WriteFile (sendsig, leader, packsize, &nb, NULL);
+      if (!res || packsize == nb)
+	break;
+      Sleep (10);
+      res = 0;
+    }
+
+  if (!res)
     {
       /* Couldn't send to the pipe.  This probably means that the
 	 process is exiting.  */

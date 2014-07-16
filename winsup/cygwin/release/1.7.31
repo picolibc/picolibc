@@ -8,6 +8,11 @@ What changed:
 - The default pthread_mutex type is now PTHREAD_MUTEX_NORMAL, rather than
   PTHREAD_MUTEX_ERRORCHECK, just as on Linux.
 
+- Align pthread_attr stack functions more closely to Linux.
+
+- Mark pthread_attr_getstackaddr and pthread_attr_setstackaddr as deprecated,
+  as on Linux.
+
 
 Bug Fixes
 ---------
