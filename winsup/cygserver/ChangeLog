@@ -1,4 +1,4 @@
-2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.cc (ipcexit_creat_hookthread): Delete shs in another error
 	case to make Coverity really happy (CID 59993).
