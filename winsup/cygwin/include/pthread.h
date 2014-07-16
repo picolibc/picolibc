@@ -1,7 +1,7 @@
 /* pthread.h: POSIX pthread interface
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
    Written by Marco Fuykschot <marco@ddi.nl>
 
@@ -75,7 +75,8 @@ int pthread_attr_getschedparam (const pthread_attr_t *, struct sched_param *);
 int pthread_attr_getschedpolicy (const pthread_attr_t *, int *);
 int pthread_attr_getscope (const pthread_attr_t *, int *);
 int pthread_attr_getstack (const pthread_attr_t *, void **, size_t *);
-int pthread_attr_getstackaddr (const pthread_attr_t *, void **);
+int pthread_attr_getstackaddr (const pthread_attr_t *, void **)
+    __attribute__ ((deprecated));
 int pthread_attr_init (pthread_attr_t *);
 int pthread_attr_setdetachstate (pthread_attr_t *, int);
 int pthread_attr_setguardsize (pthread_attr_t *, size_t);
@@ -85,12 +86,9 @@ int pthread_attr_setschedpolicy (pthread_attr_t *, int);
 int pthread_attr_setscope (pthread_attr_t *, int);
 
 #ifdef _POSIX_THREAD_ATTR_STACKADDR
-/* These functions may be implementable via some low level trickery. For now they are
- * Not supported or implemented. The prototypes are here so if someone greps the
- * source they will see these comments
- */
 int pthread_attr_setstack (pthread_attr_t *, void *, size_t);
-int pthread_attr_setstackaddr (pthread_attr_t *, void *);
+int pthread_attr_setstackaddr (pthread_attr_t *, void *)
+    __attribute__ ((deprecated));
 #endif
 
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE

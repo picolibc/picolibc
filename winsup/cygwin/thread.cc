@@ -473,9 +473,13 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   arg = threadarg;
 
   mutex.lock ();
-  win32_obj_id = CygwinCreateThread (thread_init_wrapper, this, attr.stackaddr,
-				   attr.stacksize ?: PTHREAD_DEFAULT_STACKSIZE,
-				   attr.guardsize, 0, &thread_id);
+  /* stackaddr holds the uppermost stack address.  See the comments in
+     pthread_attr_setstack and pthread_attr_setstackaddr for a description. */
+  ULONG stacksize = attr.stacksize ?: PTHREAD_DEFAULT_STACKSIZE;
+  PVOID stackaddr = attr.stackaddr ? ((caddr_t) attr.stackaddr - stacksize)
+				   : NULL;
+  win32_obj_id = CygwinCreateThread (thread_init_wrapper, this, stackaddr,
+				     stacksize, attr.guardsize, 0, &thread_id);
 
   if (!win32_obj_id)
     {
@@ -2253,7 +2257,13 @@ pthread_attr_setstack (pthread_attr_t *attr, void *addr, size_t size)
     return EINVAL;
   if (size < PTHREAD_STACK_MIN)
     return EINVAL;
-  (*attr)->stackaddr = addr;
+  /* The incoming address addr points to the lowest addressable byte of a
+     buffer of size bytes.  Due to the way pthread_attr_setstackaddr is defined
+     on Linux, the lowest address ot the stack can't be reliably computed when
+     using pthread_attr_setstackaddr/pthread_attr_setstacksize.  Therefore we
+     store the uppermost address of the stack in stackaddr.  See also the
+     comment in pthread_attr_setstackaddr. */
+  (*attr)->stackaddr = (caddr_t) addr + size;
   (*attr)->stacksize = size;
   return 0;
 }
@@ -2263,7 +2273,9 @@ pthread_attr_getstack (const pthread_attr_t *attr, void **addr, size_t *size)
 {
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
-  *addr = (*attr)->stackaddr;
+  /* stackaddr holds the uppermost stack address.  See the comment in
+     pthread_attr_setstack. */
+  *addr = (caddr_t) (*attr)->stackaddr - (*attr)->stacksize;
   *size = (*attr)->stacksize;
   return 0;
 }
@@ -2275,6 +2287,12 @@ pthread_attr_setstackaddr (pthread_attr_t *attr, void *addr)
     return EINVAL;
   if (addr == NULL)
     return EINVAL;
+  /* This function is deprecated in SUSv4, but SUSv3 didn't define
+     if the incoming stack address is the lowest address of the memory
+     area defined as stack, or if it's the start address of the stack
+     at which it begins its growth.  On Linux it's the latter which
+     means the uppermost stack address on x86 based systems.  See comment
+     in pthread_attr_setstack as well. */
   (*attr)->stackaddr = addr;
   return 0;
 }
@@ -2284,6 +2302,7 @@ pthread_attr_getstackaddr (const pthread_attr_t *attr, void **addr)
 {
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
+  /* See comment in pthread_attr_setstackaddr. */
   *addr = (*attr)->stackaddr;
   return 0;
 }
@@ -2304,7 +2323,10 @@ pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *size)
 {
   if (!pthread_attr::is_good_object (attr))
     return EINVAL;
-  *size = (*attr)->stacksize;
+  /* If the stacksize has not been set by the application, return the
+     default stacksize.  Note that this is different from what
+     pthread_attr_getstack returns. */
+  *size = (*attr)->stacksize ?: PTHREAD_DEFAULT_STACKSIZE;
   return 0;
 }
 
@@ -2486,10 +2508,12 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
   if (NT_SUCCESS (status))
     {
       PTEB teb = (PTEB) tbi->TebBaseAddress;
-      (*attr)->stackaddr = teb->DeallocationStack ?: teb->Tib.StackLimit;
-      /* stack grows downwards on x86 systems */
+      /* stackaddr holds the uppermost stack address.  See the comments
+	 in pthread_attr_setstack and pthread_attr_setstackaddr for a
+	 description. */
+      (*attr)->stackaddr = teb->Tib.StackBase;
       (*attr)->stacksize = (uintptr_t) teb->Tib.StackBase
-			   - (uintptr_t) (*attr)->stackaddr;
+	       - (uintptr_t) (teb->DeallocationStack ?: teb->Tib.StackLimit);
     }
   else
     {

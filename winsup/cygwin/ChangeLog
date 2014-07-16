@@ -1,3 +1,21 @@
+2014-07-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* thread.cc (pthread::create): Handle stackaddr as upper bound address.
+	Add comment.
+	(pthread_attr_setstack): Store upper bound address in stackaddr.
+	Explain why.
+	(pthread_attr_getstack): Handle stackaddr as upper bound address.
+	Add comment.
+	(pthread_attr_setstackaddr): Add comment.
+	(pthread_attr_getstackaddr): Add comment.
+	(pthread_attr_getstacksize): Return default stacksize if stacksize has
+	not been set by the application, just as on Linux.  Add comment.
+	(pthread_getattr_np): Store upper bound address in stackaddr.  Explain
+	why.
+	* include/pthread.h: Remove outdated comment.
+	(pthread_attr_getstackaddr): Mark as deprecated, as on Linux.
+	(pthread_attr_setstackaddr): Ditto.
+
 2014-07-15  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* sigproc.cc (sigproc_init): Set aside more buffer space for signal
