@@ -1,3 +1,9 @@
+2014-07-16  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* arm/elf-aprofile-validation.specs (*link): Make text segment
+	64k-aligned.
+	* arm/elf-aprofile-ve.specs (*link): Likewise.
+
 2014-04-30  Nick Clifton  <nickc@redhat.com>
 
 	* msp430/Makefile.in (NOSYS_OBJS): Add unlink.o.

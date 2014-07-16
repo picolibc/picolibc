@@ -8,7 +8,7 @@
 %rename link old_link
 
 *link:
---defsym=_rdimon_vector_base=0x00000000 -Ttext-segment=0x00008000 %(old_link)
+--defsym=_rdimon_vector_base=0x00000000 -Ttext-segment=0x00010000 %(old_link)
 
 %rename lib libc
 
