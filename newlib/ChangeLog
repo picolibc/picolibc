@@ -1,3 +1,12 @@
+2014-07-17  Hesham ALMatary <heshamelmatary@gmail.com>
+
+	* configure.host: Remove or16 and or32 targets and add or1k.
+	* libc/include/machine/ieeefp.h: Replace or32 with or1k.
+	* libc/machine/configure.in: Add or1k subdirectory.
+	* libc/machine/or1k/configure.in: New file.
+	* libc/machine/or1k/Makefile.am: New file.
+	* libc/machine/or1k/setjmp.S: New file.
+
 2014-07-14  Nick Withers  <nick.withers@anu.edu.au>
 
 	* libc/include/sys/errno.h: Fix comments.

@@ -819,6 +819,7 @@ mt
 nds32
 necv70
 nios2
+or1k
 powerpc
 rl78
 rx
@@ -11478,7 +11479,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11481 "configure"
+#line 11482 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11584,7 +11585,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11587 "configure"
+#line 11588 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11896,6 +11897,8 @@ subdirs="$subdirs a29k"
 	necv70) subdirs="$subdirs necv70"
  ;;
 	nios2) subdirs="$subdirs nios2"
+ ;;
+	or1k) subdirs="$subdirs or1k"
  ;;
 	powerpc) subdirs="$subdirs powerpc"
  ;;

@@ -244,9 +244,8 @@ case "${host_cpu}" in
   nios2*)
 	machine_dir=nios2
 	;;
-  or16)
-	;;
-  or32)
+  or1k*)
+	machine_dir=or1k
 	;;
   powerpc*)
 	machine_dir=powerpc
@@ -501,6 +500,9 @@ case "${host}" in
         ;;
   nios2*)
 	sys_dir=
+	;;
+  or1k-*-* | or1knd-*-*)
+        syscall_dir=syscalls
 	;;
   powerpcle-*-pe)
 	posix_dir=posix

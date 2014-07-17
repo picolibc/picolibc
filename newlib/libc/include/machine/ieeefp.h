@@ -316,7 +316,7 @@
 #define _DOUBLE_IS_32BITS
 #endif
 
-#if defined(__or32__) || defined(__or1k__) || defined(__or16__)
+#if defined(__or1k__) || defined(__OR1K__) || defined(__OR1KND__)
 #define __IEEE_BIG_ENDIAN
 #endif
 
