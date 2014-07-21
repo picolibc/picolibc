@@ -358,6 +358,10 @@ pthread::init_mainthread ()
   if (!thread->create_cancel_event ())
     api_fatal ("couldn't create cancel event for main thread");
   VerifyHandle (thread->win32_obj_id);
+  /* Make sure the pthread mutex is recursive.  See comment in
+     pthread::precreate (called only for subsequent pthreads)
+     for a description. */
+  thread->mutex.set_type (PTHREAD_MUTEX_RECURSIVE);
   thread->postcreate ();
 }
 
