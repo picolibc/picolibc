@@ -1160,7 +1160,7 @@ fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, cyg_ldap *cldap)
   return td->PosixOffset;
 }
 
-/* Helper function to replace colons with commas in pw_gecos field. */
+/* Helper function to replace colons with semicolons in pw_gecos field. */
 static PWCHAR
 colon_to_semicolon (PWCHAR str)
 {

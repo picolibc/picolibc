@@ -1,3 +1,7 @@
+2014-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc: Fix typo in comment.
+
 2014-07-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (pthread::create): Handle stackaddr as upper bound address.
