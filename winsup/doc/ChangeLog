@@ -1,6 +1,15 @@
+2014-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml: (ov-new1.7.31): Add new section.
+
 2014-06-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* legal.xml: Fix copyright.
+
+2014-06-17  Christopher Faylor  <me.cygwin2014@cgf.cx>
+
+	* faq-programming.xml: Add gettext-devel to list of packages needed to
+	build Cygwin.
 
 2014-04-04  Corinna Vinschen  <corinna@vinschen.de>
 

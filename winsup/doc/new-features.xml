@@ -4,6 +4,33 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.31"><title>What's new and what changed from 1.7.30 to 1.7.31</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Improve performance of send(2), sendto(2), sendmsg(2) when using small
+input buffers.
+</para></listitem>
+
+<listitem><para>
+The default pthread_mutex type is now PTHREAD_MUTEX_NORMAL, rather than
+PTHREAD_MUTEX_ERRORCHECK, just as on Linux.
+</para></listitem>
+
+<listitem><para>
+Align pthread_attr stack functions more closely to Linux.
+</para></listitem>
+
+<listitem><para>
+Mark pthread_attr_getstackaddr and pthread_attr_setstackaddr as deprecated,
+as on Linux.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.29"><title>What's new and what changed from 1.7.28 to 1.7.29</title>
 
 <itemizedlist mark="bullet">

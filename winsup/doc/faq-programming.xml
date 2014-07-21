@@ -694,7 +694,7 @@ rewriting the runtime library in question from specs...
 
 <para>First, you need to make sure you have the necessary build tools
 installed; you at least need <literal>gcc-g++</literal>, <literal>make</literal>,
-<literal>perl</literal>, <literal>cocom</literal>, <literal>gettext</literal>,
+<literal>perl</literal>, <literal>cocom</literal>, <literal>gettext</literal>, <literal>gettext-devel</literal>,
 and <literal>zlib-devel</literal>.
 Building for 32-bit Cygwin also requires <literal>libiconv</literal>,
 <literal>mingw64-i686-gcc-g++</literal>, <literal>mingw64-i686-zlib</literal>,
