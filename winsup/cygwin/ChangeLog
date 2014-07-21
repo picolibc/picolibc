@@ -1,5 +1,9 @@
 2014-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 32.
+
+2014-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc: Fix typo in comment.
 
 2014-07-16  Corinna Vinschen  <corinna@vinschen.de>
