@@ -76,7 +76,10 @@ int _EXFUN(_gettimeofday, (struct timeval *__p, void *__tz));
 
 int _EXFUN(gettimeofday, (struct timeval *__restrict __p,
 			  void *__restrict __tz));
+#if __BSD_VISIBLE
 int _EXFUN(settimeofday, (const struct timeval *, const struct timezone *));
+int _EXFUN(adjtime, (const struct timeval *, struct timeval *));
+#endif
 int _EXFUN(utimes, (const char *__path, const struct timeval *__tvp));
 int _EXFUN(getitimer, (int __which, struct itimerval *__value));
 int _EXFUN(setitimer, (int __which, const struct itimerval *__restrict __value,
