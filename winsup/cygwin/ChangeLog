@@ -1,3 +1,9 @@
+2014-07-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::send_internal): Fix value of
+	out_len when tweaking the last buffer so out_len is correct in a
+	subsequent if expression.
+
 2014-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (pthread::init_mainthread): Initialize thread mutex to

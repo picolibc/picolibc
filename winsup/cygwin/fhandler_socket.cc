@@ -1701,9 +1701,13 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	  while (out_len < (unsigned) wmem ()
 		 && (in_off = 0, ++in_idx < wsamsg->dwBufferCount));
 	  /* Tweak len of the last out_buf buffer so the entire number of bytes
-	     is less than wmem (). */
+	     is (less than or) equal to wmem ().  Fix out_len as well since it's
+	     used in a subsequent test expression. */
 	  if (out_len > (unsigned) wmem ())
-	    out_buf[out_idx - 1].len -= out_len - (unsigned) wmem ();
+	    {
+	      out_buf[out_idx - 1].len -= out_len - (unsigned) wmem ();
+	      out_len = (unsigned) wmem ();
+	    }
 	  /* Add the bytes written from the current last buffer to in_off,
 	     so in_off points to the next byte to be written from that buffer,
 	     or beyond which lets the outper loop skip to the next buffer. */
