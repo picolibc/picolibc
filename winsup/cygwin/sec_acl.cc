@@ -1,7 +1,7 @@
 /* sec_acl.cc: Sun compatible ACL functions.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2014 Red Hat, Inc.
+   2011, 2012 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -22,6 +22,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
+#include "pwdgrp.h"
 #include "tls_pbuf.h"
 
 static int
@@ -94,7 +95,6 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
   struct passwd *pw;
   struct group *gr;
   int pos;
-  cyg_ldap cldap;
 
   RtlCreateAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION);
 
@@ -158,7 +158,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	  break;
 	case USER:
 	case DEF_USER:
-	  if (!(pw = internal_getpwuid (aclbufp[i].a_id, &cldap))
+	  if (!(pw = internal_getpwuid (aclbufp[i].a_id))
 	      || !sid.getfrompw (pw))
 	    {
 	      set_errno (EINVAL);
@@ -180,7 +180,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	  break;
 	case GROUP:
 	case DEF_GROUP:
-	  if (!(gr = internal_getgrgid (aclbufp[i].a_id, &cldap))
+	  if (!(gr = internal_getgrgid (aclbufp[i].a_id))
 	      || !sid.getfromgr (gr))
 	    {
 	      set_errno (EINVAL);
@@ -283,7 +283,6 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
   BOOLEAN dummy;
   uid_t uid;
   gid_t gid;
-  cyg_ldap cldap;
 
   status = RtlGetOwnerSecurityDescriptor (sd, (PSID *) &owner_sid, &dummy);
   if (!NT_SUCCESS (status))
@@ -291,7 +290,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  uid = owner_sid.get_uid (&cldap);
+  uid = owner_sid.get_uid ();
 
   status = RtlGetGroupSecurityDescriptor (sd, (PSID *) &group_sid, &dummy);
   if (!NT_SUCCESS (status))
@@ -299,7 +298,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  gid = group_sid.get_gid (&cldap);
+  gid = group_sid.get_gid ();
 
   aclent_t lacl[MAX_ACL_ENTRIES];
   memset (&lacl, 0, MAX_ACL_ENTRIES * sizeof (aclent_t));
@@ -369,7 +368,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	      id = ILLEGAL_GID;
 	    }
 	  else
-	    id = ace_sid.get_id (TRUE, &type, &cldap);
+	    id = ace_sid.get_id (true, &type);
 
 	  if (!type)
 	    continue;
@@ -838,7 +837,6 @@ aclfromtext32 (char *acltextp, int *)
   int pos = 0;
   strcpy (buf, acltextp);
   char *lasts;
-  cyg_ldap cldap;
   for (char *c = strtok_r (buf, ",", &lasts);
        c;
        c = strtok_r (NULL, ",", &lasts))
@@ -858,7 +856,7 @@ aclfromtext32 (char *acltextp, int *)
 	      c += 5;
 	      if (isalpha (*c))
 		{
-		  struct passwd *pw = internal_getpwnam (c, &cldap);
+		  struct passwd *pw = internal_getpwnam (c);
 		  if (!pw)
 		    {
 		      set_errno (EINVAL);
@@ -886,7 +884,7 @@ aclfromtext32 (char *acltextp, int *)
 	      c += 5;
 	      if (isalpha (*c))
 		{
-		  struct group *gr = internal_getgrnam (c, &cldap);
+		  struct group *gr = internal_getgrnam (c);
 		  if (!gr)
 		    {
 		      set_errno (EINVAL);

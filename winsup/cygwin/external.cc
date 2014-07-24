@@ -380,13 +380,13 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_GET_UID_FROM_SID:
 	{
 	  cygpsid psid = va_arg (arg, PSID);
-	  res = psid.get_uid (NULL);
+	  res = psid.get_id (false, NULL);
 	}
 	break;
       case CW_GET_GID_FROM_SID:
 	{
 	  cygpsid psid = va_arg (arg, PSID);
-	  res = psid.get_gid (NULL);
+	  res = psid.get_id (true, NULL);
 	}
 	break;
       case CW_GET_BINMODE:
@@ -554,123 +554,22 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
 	break;
 
-      case CW_SETENT:
-	{
-	  int group = va_arg (arg, int);
-	  int enums = va_arg (arg, int);
-	  PCWSTR enum_tdoms = va_arg (arg, PCWSTR);
-	  if (group)
-	    res = (uintptr_t) setgrent_filtered (enums, enum_tdoms);
-	  else
-	    res = (uintptr_t) setpwent_filtered (enums, enum_tdoms);
-	}
-	break;
-
-      case CW_GETENT:
-	{
-	  int group = va_arg (arg, int);
-	  void *obj = va_arg (arg, void *);
-	  if (obj)
-	    {
-	      if (group)
-		res = (uintptr_t) getgrent_filtered (obj);
-	      else
-		res = (uintptr_t) getpwent_filtered (obj);
-	    }
-	}
-	break;
-
-      case CW_ENDENT:
-	{
-	  int group = va_arg (arg, int);
-	  void *obj = va_arg (arg, void *);
-	  if (obj)
-	    {
-	      if (group)
-		endgrent_filtered (obj);
-	      else
-		endpwent_filtered (obj);
-	      res = 0;
-	    }
-	}
-	break;
-
-      case CW_GETNSSSEP:
-	res = (uintptr_t) cygheap->pg.nss_separator ();
-	break;
-
       case CW_GETPWSID:
-	{
-	  int db_only = va_arg (arg, int);
-	  PSID psid = va_arg (arg, PSID);
-	  cygpsid sid (psid);
-	  res = (uintptr_t) (db_only ? internal_getpwsid_from_db (sid)
-				     : internal_getpwsid (sid));
-	}
-	break;
+        {
+          va_arg (arg, int);
+          PSID psid = va_arg (arg, PSID);
+          cygpsid sid (psid);
+          res = (uintptr_t) internal_getpwsid (sid);
+        }
+        break;
 
       case CW_GETGRSID:
-	{
-	  int db_only = va_arg (arg, int);
-	  PSID psid = va_arg (arg, PSID);
-	  cygpsid sid (psid);
-	  res = (uintptr_t) (db_only ? internal_getgrsid_from_db (sid)
-				     : internal_getgrsid (sid));
-	}
-	break;
-
-      case CW_CYGNAME_FROM_WINNAME:
-	{
-	  /* This functionality has been added mainly for sshd.  Sshd
-	     calls getpwnam() with the username of the non-privileged
-	     user used for privilege separation.  This is usually a
-	     fixed string "sshd".  However, when using usernames from
-	     the Windows DBs, it's no safe bet anymore if the username
-	     is "sshd", it could also be "DOMAIN+sshd".  So what we do
-	     here is this:
-
-	     Sshd calls cygwin_internal (CW_CYGNAME_FROM_WINNAME,
-					 "sshd",
-					 username_buffer,
-					 sizeof username_buffer);
-	     
-	     If this call succeeds, sshd expects the correct Cygwin
-	     username of the unprivileged sshd account in username_buffer.
-
-	     The below code checks for a Windows username matching the
-	     incoming username, and then fetches the Cygwin username with
-	     the matching SID.  This is our username used for privsep then.
-
-	     Of course, other applications with similar needs can use the
-	     same method. */
-	  const char *winname = va_arg (arg, const char *);
-	  char *buffer = va_arg (arg, char *);
-	  size_t buflen = va_arg (arg, size_t);
-
-	  if (!winname || !buffer || !buflen)
-	    break;
-
-	  WCHAR name[UNLEN + 1];
-	  sys_mbstowcs (name, sizeof name, winname);
-
-	  cygsid sid;
-	  DWORD slen = SECURITY_MAX_SID_SIZE;
-	  WCHAR dom[DNLEN + 1];
-	  DWORD dlen = DNLEN + 1;
-	  SID_NAME_USE acc_type;
-
-	  if (!LookupAccountNameW (NULL, name, sid, &slen, dom, &dlen,
-				   &acc_type))
-	    break;
-
-	  struct passwd *pw = internal_getpwsid (sid);
-	  if (!pw)
-	    break;
-
-	  buffer[0] = '\0';
-	  strncat (buffer, pw->pw_name, buflen - 1);
-	  res = 0;
-	}
+        {
+          va_arg (arg, int);
+          PSID psid = va_arg (arg, PSID);
+          cygpsid sid (psid);
+          res = (uintptr_t) internal_getgrsid (sid);
+        }
 	break;
 
       default:

@@ -18,7 +18,7 @@ Bug Fixes
 ---------
 
 - Fix various assorted bugs (potential buffer overruns, resource leaks, you
-  name it) catched by Coverity.
+  name it) caught by Coverity.
 
 - Fix return value of getgrouplist if the number of groups is bigger than the
   application-provided buffer can hold.

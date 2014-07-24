@@ -446,15 +446,12 @@ details. */
            as number of partitions on tape.
       271: Export posix_spawn, posix_spawnp, and helper functions.
       272: Export tm_gmtoff and tm_zone members.
-      273: Introduce account mapping from Windows account DBs.  Add CW_SETENT,
-	   CW_GETENT, CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID, CW_GETGRSID,
-	   CW_CYGNAME_FROM_WINNAME.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 273
+#define CYGWIN_VERSION_API_MINOR 272
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

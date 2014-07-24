@@ -22,6 +22,7 @@ details. */
 #include "shared_info_magic.h"
 #include "registry.h"
 #include "cygwin_version.h"
+#include "pwdgrp.h"
 #include "spinlock.h"
 #include <alloca.h>
 #include <wchar.h>
@@ -351,7 +352,6 @@ memory_init (bool init_cygheap)
       cygheap_init ();
       cygheap->user.init ();
       cygheap->init_installation_root (); /* Requires user.init! */
-      cygheap->pg.init ();
     }
 
   shared_info::create ();	/* Initialize global shared memory */

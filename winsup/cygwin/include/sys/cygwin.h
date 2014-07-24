@@ -149,8 +149,7 @@ typedef enum
     CW_ENDENT,
     CW_GETNSSSEP,
     CW_GETPWSID,
-    CW_GETGRSID,
-    CW_CYGNAME_FROM_WINNAME
+    CW_GETGRSID
   } cygwin_getinfo_types;
 
 #define CW_LOCK_PINFO CW_LOCK_PINFO
@@ -207,27 +206,12 @@ typedef enum
 #define CW_GETNSSSEP CW_GETNSSSEP
 #define CW_GETPWSID CW_GETPWSID
 #define CW_GETGRSID CW_GETGRSID
-#define CW_CYGNAME_FROM_WINNAME CW_CYGNAME_FROM_WINNAME
 
 /* Token type for CW_SET_EXTERNAL_TOKEN */
 enum
 {
-  CW_TOKEN_IMPERSONATION = 0,
-  CW_TOKEN_RESTRICTED    = 1
-};
-
-/* Enumeration source constants for CW_SETENT called from mkpasswd/mkgroup. */
-enum nss_enum_t
-{
-  ENUM_NONE = 0x00,
-  ENUM_CACHE = 0x01,
-  ENUM_FILES = 0x02,
-  ENUM_BUILTIN = 0x04,
-  ENUM_LOCAL = 0x08,
-  ENUM_PRIMARY = 0x10,
-  ENUM_TDOMS = 0x20,
-  ENUM_TDOMS_ALL = 0x40,
-  ENUM_ALL = 0x7f
+CW_TOKEN_IMPERSONATION = 0,
+CW_TOKEN_RESTRICTED    = 1
 };
 
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */

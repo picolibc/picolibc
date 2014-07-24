@@ -24,6 +24,7 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include "cygtls.h"
+#include "pwdgrp.h"
 #include "mount.h"
 #include "tls_pbuf.h"
 #include <sys/sysmacros.h>
