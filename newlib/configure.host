@@ -176,7 +176,7 @@ case "${host_cpu}" in
 	machine_dir=lm32
 	;;
   m32c)
-	machine_dir=m32c
+	machine_dir=m32c	
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
 	;;
 
@@ -731,9 +731,14 @@ case "${host}" in
   mn10?00-*-*)
 	syscall_dir=syscalls
 	;;
-  moxie-*-*)
+  moxie-*-elf* | moxie-*-rtems*)
         syscall_dir=syscalls
 	default_newlib_io_long_long="yes"
+        ;;
+  moxie-*-moxiebox)
+        syscall_dir=syscalls
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -Os -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
         ;;
   nios2*)
 	syscall_dir=

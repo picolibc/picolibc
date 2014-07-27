@@ -1,3 +1,10 @@
+2014-07-27  Anthony Green  <green@moxielogic.com>
+
+	* moxie/Makefile.in (LD_SCRIPTS): Add moxiebox.ld
+	Conditionally build and install crt0.o.
+	* moxie/configure.in: Don't build crt0.o for moxiebox.
+	* moxie/moxiebox.ld: New file.
+
 2014-07-16  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* arm/elf-aprofile-validation.specs (*link): Make text segment

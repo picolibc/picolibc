@@ -58,9 +58,13 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-LD_SCRIPTS = moxie-elf-common.ld qemu.ld sim.ld
+LD_SCRIPTS = moxie-elf-common.ld qemu.ld sim.ld moxiebox.ld
 
-CRT0 = crt0.o
+@BUILD_CRT0_TRUE@CRT0		= crt0.o
+@BUILD_CRT0_TRUE@CRT0_INSTALL	= install-crt0
+@BUILD_CRT0_FALSE@CRT0		= 
+@BUILD_CRT0_FALSE@CRT0_INSTALL	= 
+
 SIM_BSP = libsim.a
 SIM_OBJS = fstat.o \
 	   getpid.o \
@@ -96,7 +100,7 @@ QEMU_OBJS = qemu-write.o \
 #### Host specific Makefile fragment comes in here.
 @host_makefile_frag@
 
-all: $(CRT0) $(SIM_BSP) $(QEMU_BSP)
+all: ${CRT0} $(SIM_BSP) $(QEMU_BSP)
 
 $(SIM_BSP): $(SIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
@@ -124,13 +128,15 @@ sim-write.o: $(srcdir)/sim-write.S
 stat.o: $(srcdir)/stat.c
 qemu-write.o: $(srcdir)/qemu-write.c
 
-install: $($(CPU)_INSTALL)
-	$(INSTALL_DATA) $(CRT0) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(CRT0)
+install: ${CRT0_INSTALL} $($(CPU)_INSTALL)
 	$(INSTALL_DATA) $(SIM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
 	$(INSTALL_DATA) $(QEMU_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(QEMU_BSP)
 	for x in ${LD_SCRIPTS}; do \
 	  ${INSTALL_DATA} ${srcdir}/$$x $(DESTDIR)${tooldir}/lib/$$x; \
 	done;
+
+install-crt0:
+	${INSTALL_DATA} ${CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x
 
 clean mostlyclean:
 	rm -f *.o *.a

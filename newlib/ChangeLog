@@ -1,3 +1,7 @@
+2014-07-27  Anthony Green  <green@moxielogic.com>
+
+	* configure.host: Add moxie-*-moxiebox target.
+
 2014-07-22  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/include/sys/time.h: Add prototype for adjtime() and

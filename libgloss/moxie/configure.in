@@ -33,6 +33,21 @@ AC_SUBST(LD)
 AC_PROG_RANLIB
 LIB_AM_PROG_AS
 
+dnl Don't build crt0 for moxiebox, which provides crt0 for us.
+case "${target}" in
+  moxie-*-moxiebox*)
+    BUILD_CRT0_TRUE='#'
+    BUILD_CRT0_FALSE=
+    ;;
+  *)
+    BUILD_CRT0_TRUE=
+    BUILD_CRT0_FALSE='#'
+    ;;
+esac
+
+AC_SUBST(BUILD_CRT0_TRUE)
+AC_SUBST(BUILD_CRT0_FALSE)
+
 host_makefile_frag=${srcdir}/../config/default.mh
 
 dnl We have to assign the same value to other variables because autoconf
