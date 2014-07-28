@@ -14,7 +14,7 @@
  * clearly indicated on the first page of each file where they apply.
  */
 
-OUTPUT_FORMAT("moxiebox")
+OUTPUT_FORMAT("elf32-littlemoxie")
 OUTPUT_ARCH(moxie)
 ENTRY(_start)
 SECTIONS
