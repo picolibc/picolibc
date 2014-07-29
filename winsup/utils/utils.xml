@@ -877,6 +877,9 @@ Usage: mkgroup [OPTION]...
 
 Write /etc/group-like output to stdout
 
+Don't use this command to generate a local /etc/group file, unless you
+really need one.  See the Cygwin User's Guide for more information.
+
 Options:
 
    -l,--local [machine]    print local groups
@@ -901,9 +904,6 @@ Options:
 
 Default is to print local groups on stand-alone machines, plus domain
 groups on domain controllers and domain member machines.
-
-Don't use this command to generate a local /etc/group file, unless you
-really need one.  See the Cygwin User's Guide for more information.
 </screen>
 
     <para>The <command>mkgroup</command> program can be used to create a local
@@ -963,12 +963,15 @@ Usage: mkpasswd [OPTIONS]...
 
 Write /etc/passwd-like output to stdout
 
+Don't use this command to generate a local /etc/passwd file, unless you
+really need one.  See the Cygwin User's Guide for more information.
+
 Options:
 
-   -l,--local [machine]    print local user accounts with uid offset offset
+   -l,--local [machine]    print local user accounts
                            (from local machine if no machine specified)
    -L,--Local machine      ditto, but generate username with machine prefix
-   -d,--domain [domain]    print domain accounts with uid offset offset
+   -d,--domain [domain]    print domain accounts
                            (from current domain if no domain specified)
    -c,--current            print current user
    -S,--separator char     for -l use character char as domain\user
@@ -989,9 +992,6 @@ Options:
 
 Default is to print local accounts on stand-alone machines, domain accounts
 on domain controllers and domain member machines.
-
-Don't use this command to generate a local /etc/passwd file, unless you
-really need one.  See the Cygwin User's Guide for more information.
 </screen>
 
     <para>The <command>mkpasswd</command> program can be used to create a

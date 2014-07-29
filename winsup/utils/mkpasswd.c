@@ -365,12 +365,15 @@ usage (FILE * stream)
 "\n"
 "Write /etc/passwd-like output to stdout\n"
 "\n"
+"Don't use this command to generate a local /etc/passwd file, unless you\n"
+"really need one.  See the Cygwin User's Guide for more information.\n"
+"\n"
 "Options:\n"
 "\n"
-"   -l,--local [machine]    print local user accounts with uid offset offset\n"
+"   -l,--local [machine]    print local user accounts\n"
 "                           (from local machine if no machine specified)\n"
 "   -L,--Local machine      ditto, but generate username with machine prefix\n"
-"   -d,--domain [domain]    print domain accounts with uid offset offset\n"
+"   -d,--domain [domain]    print domain accounts\n"
 "                           (from current domain if no domain specified)\n"
 "   -c,--current            print current user\n"
 "   -S,--separator char     for -l use character char as domain\\user\n"
@@ -390,9 +393,7 @@ usage (FILE * stream)
 "   -V,--version            version information and exit\n"
 "\n"
 "Default is to print local accounts on stand-alone machines, domain accounts\n"
-"on domain controllers and domain member machines.\n\n"
-"Don't use this command to generate a local /etc/passwd file, unless you\n"
-"really need one.  See the Cygwin User's Guide for more information.\n"
+"on domain controllers and domain member machines.\n"
 "\n", program_invocation_short_name,
       (const char *) cygwin_internal (CW_GETNSSSEP));
   return 1;

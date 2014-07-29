@@ -476,6 +476,9 @@ usage (FILE * stream)
 "\n"
 "Write /etc/group-like output to stdout\n"
 "\n"
+"Don't use this command to generate a local /etc/group file, unless you\n"
+"really need one.  See the Cygwin User's Guide for more information.\n"
+"\n"
 "Options:\n"
 "\n"
 "   -l,--local [machine]    print local groups\n"
@@ -499,9 +502,7 @@ usage (FILE * stream)
 "   -v,--version            print version information and exit\n"
 "\n"
 "Default is to print local groups on stand-alone machines, plus domain\n"
-"groups on domain controllers and domain member machines.\n\n"
-"Don't use this command to generate a local /etc/group file, unless you\n"
-"really need one.  See the Cygwin User's Guide for more information.\n"
+"groups on domain controllers and domain member machines.\n"
 "\n", program_invocation_short_name,
       (const char *) cygwin_internal (CW_GETNSSSEP));
   return 1;
