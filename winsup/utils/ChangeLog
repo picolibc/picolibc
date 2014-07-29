@@ -3,6 +3,7 @@
 	* mkgroup.c (usage): Move info message that this /etc/group isn't really
 	required anymore more to the top of the usage output.
 	* mkpasswd.c (usage): Ditto for /etc/passwd.  Drop old text from output.
+	* utils.xml: Fix accordingly.
 
 2014-06-16  Corinna Vinschen  <corinna@vinschen.de>
 
