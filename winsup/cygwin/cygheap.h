@@ -371,8 +371,6 @@ class cygheap_domain_info
   PWCHAR rfc2307_domain_buf;
 
 public:
-  ULONG lowest_tdo_posix_offset;
-
   bool init ();
 
   inline PCWSTR primary_flat_name () const { return pdom_name; }

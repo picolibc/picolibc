@@ -815,9 +815,6 @@ cygheap_domain_info::init ()
   lsa_close_policy (lsa);
   if (cygheap->dom.member_machine ())
     {
-      /* For a domain member machine fetch all trusted domain info.
-	 Start out with UNIX_POSIX_OFFSET. */
-      lowest_tdo_posix_offset = UNIX_POSIX_OFFSET;
       ret = DsEnumerateDomainTrustsW (NULL, DS_DOMAIN_DIRECT_INBOUND
 					    | DS_DOMAIN_DIRECT_OUTBOUND
 					    | DS_DOMAIN_IN_FOREST,
@@ -1138,24 +1135,29 @@ pwdgrp::fetch_account_from_file (fetch_user_arg_t &arg)
 static ULONG
 fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, cyg_ldap *cldap)
 {
-  uint32_t id_val = 0;
+  uint32_t id_val = UINT32_MAX;
 
   if (!td->PosixOffset && !(td->Flags & DS_DOMAIN_PRIMARY) && td->DomainSid)
     {
       if (cldap->open (NULL) == NO_ERROR)
 	id_val = cldap->fetch_posix_offset_for_domain (td->DnsDomainName);
-      if (!id_val)
+      if (id_val < PRIMARY_POSIX_OFFSET)
+	{
+	  /* If the offset is less than the primay domain offset, we're bound
+	     to suffer collisions with system and local accounts.  Move offset
+	     to a fixed replacement fake offset.  This may result in collisions
+	     between other domains all of which were moved to this replacement
+	     offset, but we can't fix all problems caused by careless admins. */
+	  id_val = UNUSABLE_POSIX_OFFSET;
+	}
+      else if (id_val == UINT32_MAX)
 	{
 	  /* We're probably running under a local account, so we're not allowed
-	     to fetch any information from AD beyond the most obvious.
-	     Alternatively we're suffering IT madness and some admin has
-	     actually set the POSIX offset to 0.  Either way, fake a reasonable
-	     posix offset and hope for the best. */
-	  id_val = cygheap->dom.lowest_tdo_posix_offset - 0x00800000;
+	     to fetch any information from AD beyond the most obvious.  Fake a
+	     reasonable posix offset as above and hope for the best. */
+	  id_val = NOACCESS_POSIX_OFFSET;
 	}
       td->PosixOffset = id_val;
-      if (id_val < cygheap->dom.lowest_tdo_posix_offset)
-	cygheap->dom.lowest_tdo_posix_offset = id_val;
     }
   return td->PosixOffset;
 }
@@ -1425,7 +1427,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  /* Identity assertion SIDs. */
 	  __small_swprintf (sidstr, L"S-1-18-%u", arg.id & 0xffff);
 	}
-      else if (arg.id < 0x100000)
+      else if (arg.id < PRIMARY_POSIX_OFFSET)
 	{
 	  /* Nothing. */
 	  debug_printf ("Invalid POSIX id %u", arg.id);
@@ -1467,7 +1469,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	    {
 	      /* Primary domain */
 	      PWCHAR s = cygheap->dom.primary_sid ().pstring (sidstr);
-	      __small_swprintf (s, L"-%u", arg.id - 0x100000);
+	      __small_swprintf (s, L"-%u", arg.id - PRIMARY_POSIX_OFFSET);
 	    }
 	  posix_offset = 0;
 	}
@@ -1526,7 +1528,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	      /* Primary domain account? */
 	      if (!wcscasecmp (dom, cygheap->dom.primary_flat_name ()))
 		{
-		  posix_offset = 0x100000;
+		  posix_offset = PRIMARY_POSIX_OFFSET;
 		  /* In theory domain should have been set to
 		     cygheap->dom.primary_dns_name (), but it turns out
 		     that not setting the domain here has advantages.
@@ -1859,7 +1861,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  if (RtlEqualSid (sid, cygheap->dom.primary_sid ()))
 	    {
 	      domain = cygheap->dom.primary_flat_name ();
-	      posix_offset = 0x100000;
+	      posix_offset = PRIMARY_POSIX_OFFSET;
 	    }
 	  else
 	    for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)

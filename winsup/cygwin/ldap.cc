@@ -471,6 +471,8 @@ cyg_ldap::next_account (cygsid &sid)
   return ret;
 }
 
+/* Return UINT32_MAX on error to allow differing between not being able
+   to fetch a value and a real 0 offset. */
 uint32_t
 cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
 {
@@ -491,11 +493,11 @@ cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
   __small_swprintf (filter, L"(&(objectClass=trustedDomain)(%W=%W))",
 		    wcschr (domain, L'.') ? L"name" : L"flatName", domain);
   if (search (rootdse, filter, attr = tdom_attr) != 0)
-    return 0;
+    return UINT32_MAX;
   if (!(entry = ldap_first_entry (lh, msg)))
     {
       debug_printf ("No entry for %W in rootdse %W", filter, rootdse);
-      return 0;
+      return UINT32_MAX;
     }
   return get_num_attribute (0);
 }

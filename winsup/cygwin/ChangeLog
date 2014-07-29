@@ -1,3 +1,20 @@
+2014-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (class cygheap_domain_info): Remove lowest_tdo_posix_offset.
+	* ldap.cc (cyg_ldap::fetch_posix_offset_for_domain): Return UINT32_MAX
+	in case of error.
+	* security.h (PRIMARY_POSIX_OFFSET): Define.
+	(NOACCESS_POSIX_OFFSET): Define.
+	(UNUSABLE_POSIX_OFFSET): Define.
+	* uinfo.cc (cygheap_domain_info::init): Drop initializing
+	lowest_tdo_posix_offset.
+	(pwdgrp::fetch_account_from_file): Set PosixOffset to either
+	UNUSABLE_POSIX_OFFSET or NOACCESS_POSIX_OFFSET in case we don't get a
+	sensible offset from AD.  Explain why.  Drop setting ch
+	lowest_tdo_posix_offset.
+	(pwdgrp::fetch_account_from_windows): Replace constant 0x100000 with
+	PRIMARY_POSIX_OFFSET throughout.
+
 2014-07-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::send_internal): Fix value of

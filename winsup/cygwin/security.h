@@ -24,6 +24,16 @@ void uinfo_init ();
 #define ILLEGAL_UID ((uid_t)-1)
 #define ILLEGAL_GID ((gid_t)-1)
 
+/* Offset for accounts in the primary domain of the machine. */
+#define PRIMARY_POSIX_OFFSET		(0x00100000)
+
+/* Fake POSIX offsets used in scenarios in which the account has no permission
+   to fetch the POSIX offset, or when the admins have set the offset to an
+   unreasonable low value.  The values are chosen in the hope that they won't
+   collide with "real" offsets. */
+#define NOACCESS_POSIX_OFFSET		(0xfe500000)
+#define UNUSABLE_POSIX_OFFSET		(0xfea00000)
+
 /* For UNIX accounts not mapped to Windows accounts via winbind, Samba returns
    SIDs of the form S-1-22-x-y, with x == 1 for users and x == 2 for groups,
    and y == UNIX uid/gid.  NFS returns no SIDs at all, but the plain UNIX
