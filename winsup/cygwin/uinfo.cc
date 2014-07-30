@@ -1530,14 +1530,13 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		{
 		  posix_offset = PRIMARY_POSIX_OFFSET;
 		  /* In theory domain should have been set to
-		     cygheap->dom.primary_dns_name (), but it turns out
-		     that not setting the domain here has advantages.
-		     We open the ldap connection to NULL (== some domain
-		     control of our primary domain) anyway.  So the domain
-		     is only used 
-		     later on.  So, don't set domain here to non-NULL, unless
-		     you're sure you have also changed subsequent assumptions
-		     that domain is NULL if it's a primary domain account. */
+		     cygheap->dom.primary_dns_name (), but it turns out that
+		     not setting the domain here has advantages.  We open the
+		     ldap connection to NULL (== some DC of our primary domain)
+		     anyway.  So the domain is only used later on.  So, don't
+		     set domain here to non-NULL, unless you're sure you have
+		     also changed subsequent assumptions that domain is NULL
+		     if it's a primary domain account. */
 		  if (!cygheap->pg.nss_prefix_auto ())
 		    name_style = fully_qualified;
 		}
