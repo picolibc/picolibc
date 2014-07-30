@@ -537,11 +537,13 @@ and
 <ulink url="http://msdn.microsoft.com/en-us/library/windows/desktop/aa379159%28v=vs.85%29.aspx">LookupAccountName</ulink>
 functions cannnot resolve the SIDs, unless they know the name of the machine
 this SID comes from.  And even then it will probably suffer a
-"Permission denied" when trying to ask the machine for its local account.
+<literal>Permission denied</literal> error when trying to ask the machine
+for its local account.
 </para>
 
 <para>
-Cygwin will map the account to the fake accounts "Unknown+User"/"Unknown+Group"
+Cygwin will map the account to the fake accounts
+<literal>Unknown+User</literal>/<literal>Unknown+Group</literal>
 with uid/gid -1.
 </para>
 </listitem>
@@ -590,7 +592,7 @@ of the machine are mapped to Cygwin names without domain prefix:
 </para>
 
 <screen>
-"corinna", "bigfoot", "Domain Users", ...
+  "corinna", "bigfoot", "Domain Users", ...
 </screen>
 
 <para>
@@ -628,7 +630,8 @@ created from the account RID:
 
 <para>
 Otherwise we know nothing about this SID, so it will be mapped to the
-fake accounts "Unknown+User"/"Unknown+Group" with uid/gid -1.
+fake accounts <literal>Unknown+User</literal>/<literal>Unknown+Group</literal>
+with uid/gid -1.
 </para>
 </listitem>
 
@@ -676,8 +679,9 @@ You want to specify a different login shell than <filename>/bin/bash</filename>.
 <para>
 How this is done depends on your account being a domain account or a
 local account.  Let's start with the default.  Assuming your Windows
-account name is "bigfoot" and your domain is "MY_DOM".  Your default
-passwd entry in absence of anything I'll describe below looks like this:
+account name is <literal>bigfoot</literal> and your domain is
+<literal>MY_DOM</literal>.  Your default passwd entry in absence of
+anything I'll describe below looks like this:
 </para>
 
 <screen>
@@ -717,9 +721,9 @@ or Cygwin will utilize the
 <literal>posixAccount</literal>/<literal>posixGroup</literal> attributes per
 <ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>.  These
 attributes are by default available in Active Directory since Windows Server
-2003 R2.  They are "not set", unless utilized by the (deprecated since Server
-2012 R2) Active Directory "Server for NIS" feature.  The user attributes
-utilized by Cygwin are:
+2003 R2.  They are <literal>not set</literal>, unless utilized by the
+(deprecated since Server 2012 R2) Active Directory "Server for NIS" feature.
+The user attributes utilized by Cygwin are:
 </para>
 
 <segmentedlist><?dbhtml list-presentation="table"?>
@@ -784,7 +788,7 @@ that,
 
 <listitem>
 <para>
-or enter the information into the "Comment" field of your local user entry.
+or enter the information into the comment field of your local user entry.
 In the <literal>Local Users and Groups</literal> MMC snap-in it's called
 <literal>Description</literal>.
 </para>
