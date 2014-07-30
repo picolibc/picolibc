@@ -1,3 +1,8 @@
+2014-07-30  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/string/strerror.c: Fix documentation so makedoc doesn't
+	stumble over a sole EAGAIN.
+
 2014-07-27  Anthony Green  <green@moxielogic.com>
 
 	* configure.host: Add moxie-*-moxiebox target.

@@ -313,7 +313,7 @@ o ETXTBSY
 Text file busy
 
 o EWOULDBLOCK
-EAGAIN
+Operation would block (usually same as EAGAIN)
 
 o EXDEV
 Cross-device link
