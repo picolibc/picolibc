@@ -4,7 +4,7 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
-<sect2 id="ov-new1.7.32"><title>What's new and what changed from 1.7.31 to 1.7.32</title>
+<sect2 id="ov-new1.7.32"><title>What's new and what changed in 1.7.32</title>
 
 <itemizedlist mark="bullet">
 
@@ -18,7 +18,7 @@ file to configure passwd/group handling.
 
 </sect2>
 
-<sect2 id="ov-new1.7.31"><title>What's new and what changed from 1.7.30 to 1.7.31</title>
+<sect2 id="ov-new1.7.31"><title>What's new and what changed in 1.7.31</title>
 
 <itemizedlist mark="bullet">
 
@@ -45,7 +45,7 @@ as on Linux.
 
 </sect2>
 
-<sect2 id="ov-new1.7.29"><title>What's new and what changed from 1.7.28 to 1.7.29</title>
+<sect2 id="ov-new1.7.29"><title>What's new and what changed in 1.7.29</title>
 
 <itemizedlist mark="bullet">
 
@@ -62,7 +62,7 @@ Console screen clearing works more like xterm or mintty.
 
 </sect2>
 
-<sect2 id="ov-new1.7.28"><title>What's new and what changed from 1.7.27 to 1.7.28</title>
+<sect2 id="ov-new1.7.28"><title>What's new and what changed in 1.7.28</title>
 
 <itemizedlist mark="bullet">
 
@@ -85,7 +85,7 @@ if it only has been read from.
 
 </sect2>
 
-<sect2 id="ov-new1.7.27"><title>What's new and what changed from 1.7.26 to 1.7.27</title>
+<sect2 id="ov-new1.7.27"><title>What's new and what changed in 1.7.27</title>
 
 <itemizedlist mark="bullet">
 
@@ -100,7 +100,7 @@ points to a native NTFS symlink with a target path prefixed with "\\?\".
 
 </sect2>
 
-<sect2 id="ov-new1.7.26"><title>What's new and what changed from 1.7.25 to 1.7.26</title>
+<sect2 id="ov-new1.7.26"><title>What's new and what changed in 1.7.26</title>
 
 <itemizedlist mark="bullet">
 
@@ -140,7 +140,7 @@ New associated header /usr/include/spawn.h.
 
 </sect2>
 
-<sect2 id="ov-new1.7.25"><title>What's new and what changed from 1.7.24 to 1.7.25</title>
+<sect2 id="ov-new1.7.25"><title>What's new and what changed in 1.7.25</title>
 
 <itemizedlist mark="bullet">
 
@@ -158,7 +158,7 @@ partitions on a tape.
 
 </sect2>
 
-<sect2 id="ov-new1.7.24"><title>What's new and what changed from 1.7.23 to 1.7.24</title>
+<sect2 id="ov-new1.7.24"><title>What's new and what changed in 1.7.24</title>
 
 <itemizedlist mark="bullet">
 
@@ -170,7 +170,7 @@ Allow application override of posix_memalign.
 
 </sect2>
 
-<sect2 id="ov-new1.7.23"><title>What's new and what changed from 1.7.22 to 1.7.23</title>
+<sect2 id="ov-new1.7.23"><title>What's new and what changed in 1.7.23</title>
 
 <itemizedlist mark="bullet">
 
@@ -183,7 +183,7 @@ send the full windows command line to any subprocesses.
 
 </sect2>
 
-<sect2 id="ov-new1.7.22"><title>What's new and what changed from 1.7.21 to 1.7.22</title>
+<sect2 id="ov-new1.7.22"><title>What's new and what changed in 1.7.22</title>
 
 <itemizedlist mark="bullet">
 
@@ -207,7 +207,7 @@ containing arbitrary byte values as GLibc's regcomp.
 
 </sect2>
 
-<sect2 id="ov-new1.7.21"><title>What's new and what changed from 1.7.20 to 1.7.21</title>
+<sect2 id="ov-new1.7.21"><title>What's new and what changed in 1.7.21</title>
 
 <itemizedlist mark="bullet">
 
@@ -219,7 +219,7 @@ New API: rawmemchr.
 
 </sect2>
 
-<sect2 id="ov-new1.7.19"><title>What's new and what changed from 1.7.18 to 1.7.19</title>
+<sect2 id="ov-new1.7.19"><title>What's new and what changed in 1.7.19</title>
 
 <itemizedlist mark="bullet">
 
@@ -255,7 +255,7 @@ arc4random_buf, arc4random_stir, arc4random_uniform.
 
 </sect2>
 
-<sect2 id="ov-new1.7.18"><title>What's new and what changed from 1.7.17 to 1.7.18</title>
+<sect2 id="ov-new1.7.18"><title>What's new and what changed in 1.7.18</title>
 
 <itemizedlist mark="bullet">
 
@@ -291,7 +291,7 @@ New API: cfsetspeed.
 
 </sect2>
 
-<sect2 id="ov-new1.7.17"><title>What's new and what changed from 1.7.16 to 1.7.17</title>
+<sect2 id="ov-new1.7.17"><title>What's new and what changed in 1.7.17</title>
 
 <itemizedlist mark="bullet">
 
@@ -309,7 +309,7 @@ allows to open the file with the O_EXCL flag set.
 
 </sect2>
 
-<sect2 id="ov-new1.7.16"><title>What's new and what changed from 1.7.15 to 1.7.16</title>
+<sect2 id="ov-new1.7.16"><title>What's new and what changed in 1.7.16</title>
 
 <itemizedlist mark="bullet">
 
@@ -325,7 +325,7 @@ Recognize ReFS filesystem.
 
 </sect2>
 
-<sect2 id="ov-new1.7.15"><title>What's new and what changed from 1.7.14 to 1.7.15</title>
+<sect2 id="ov-new1.7.15"><title>What's new and what changed in 1.7.15</title>
 
 <itemizedlist mark="bullet">
 
@@ -337,7 +337,7 @@ CYGWIN=pipe_byte option now forces the opening of pipes in byte mode rather than
 
 </sect2>
 
-<sect2 id="ov-new1.7.14"><title>What's new and what changed from 1.7.13 to 1.7.14</title>
+<sect2 id="ov-new1.7.14"><title>What's new and what changed in 1.7.14</title>
 
 <itemizedlist mark="bullet">
 
@@ -349,7 +349,7 @@ Add mouse reporting modes 1005, 1006 and 1015 to console window.
 
 </sect2>
 
-<sect2 id="ov-new1.7.13"><title>What's new and what changed from 1.7.12 to 1.7.13</title>
+<sect2 id="ov-new1.7.13"><title>What's new and what changed in 1.7.13</title>
 
 <itemizedlist mark="bullet">
 
@@ -367,7 +367,7 @@ is now properly flushed.
 
 </sect2>
 
-<sect2 id="ov-new1.7.12"><title>What's new and what changed from 1.7.11 to 1.7.12</title>
+<sect2 id="ov-new1.7.12"><title>What's new and what changed in 1.7.12</title>
 
 <itemizedlist mark="bullet">
 
@@ -402,7 +402,7 @@ finding potential BLODAs.
 
 </sect2>
 
-<sect2 id="ov-new1.7.11"><title>What's new and what changed from 1.7.10 to 1.7.11</title>
+<sect2 id="ov-new1.7.11"><title>What's new and what changed in 1.7.11</title>
 
 <itemizedlist mark="bullet">
 
@@ -429,7 +429,7 @@ changed using the pthread_attr_setstacksize call.
 
 </sect2>
 
-<sect2 id="ov-new1.7.10"><title>What's new and what changed from 1.7.9 to 1.7.10</title>
+<sect2 id="ov-new1.7.10"><title>What's new and what changed in 1.7.10</title>
 
 <itemizedlist mark="bullet">
 
@@ -553,7 +553,7 @@ pthread_sigqueue, sysinfo.
 
 </sect2>
 
-<sect2 id="ov-new1.7.9"><title>What's new and what changed from 1.7.8 to 1.7.9</title>
+<sect2 id="ov-new1.7.9"><title>What's new and what changed in 1.7.9</title>
 
 <itemizedlist mark="bullet">
 
@@ -565,7 +565,7 @@ New API: strchrnul.
 
 </sect2>
 
-<sect2 id="ov-new1.7.8"><title>What's new and what changed from 1.7.7 to 1.7.8</title>
+<sect2 id="ov-new1.7.8"><title>What's new and what changed in 1.7.8</title>
 
 <itemizedlist mark="bullet">
 
@@ -633,7 +633,7 @@ Support TIOCGPGRP, TIOCSPGRP ioctls.
 
 </sect2>
 
-<sect2 id="ov-new1.7.7"><title>What's new and what changed from 1.7.6 to 1.7.7</title>
+<sect2 id="ov-new1.7.7"><title>What's new and what changed in 1.7.7</title>
 
 <itemizedlist mark="bullet">
 
@@ -660,7 +660,7 @@ See <xref linkend="textbin-devel"></xref> for details.
 
 </sect2>
 
-<sect2 id="ov-new1.7.6"><title>What's new and what changed from 1.7.5 to 1.7.6</title>
+<sect2 id="ov-new1.7.6"><title>What's new and what changed in 1.7.6</title>
 
 <itemizedlist mark="bullet">
 
@@ -717,7 +717,7 @@ be out of the way.  [...]
 
 </sect2>
 
-<sect2 id="ov-new1.7.5"><title>What's new and what changed from 1.7.3 to 1.7.5</title>
+<sect2 id="ov-new1.7.5"><title>What's new and what changed in 1.7.5</title>
 
 <itemizedlist mark="bullet">
 
@@ -730,7 +730,7 @@ in Windows console.
 
 </sect2>
 
-<sect2 id="ov-new1.7.3"><title>What's new and what changed from 1.7.2 to 1.7.3</title>
+<sect2 id="ov-new1.7.3"><title>What's new and what changed in 1.7.3</title>
 
 <itemizedlist mark="bullet">
 
@@ -748,7 +748,7 @@ Modification and access timestamps of devices reflect the current time.
 
 </sect2>
 
-<sect2 id="ov-new1.7.2"><title>What's new and what changed from 1.7.1 to 1.7.2</title>
+<sect2 id="ov-new1.7.2"><title>What's new and what changed in 1.7.2</title>
 
 <itemizedlist mark="bullet">
 
@@ -900,7 +900,9 @@ Procedure Call (RPC) and NFS.
 
 </sect2>
 
-<sect2 id="ov-new1.7-os"><title>OS related changes</title>
+<sect2 id="ov-new1.7.1"><title>What's new and what changed from 1.5 to 1.7</title>
+
+<sect3 id="ov-new1.7-os"><title>OS related changes</title>
 
 <itemizedlist mark="bullet">
 
@@ -915,9 +917,9 @@ Add support for Windows 7 and Windows Server 2008 R2.
 
 </itemizedlist>
 
-</sect2>
+</sect3>
 
-<sect2 id="ov-new1.7-file"><title>File Access related changes</title>
+<sect3 id="ov-new1.7-file"><title>File Access related changes</title>
 
 <itemizedlist mark="bullet">
 
@@ -1103,9 +1105,9 @@ eaccess, euidaccess, canonicalize_file_name, fexecve, execvpe.
 
 </itemizedlist>
 
-</sect2>
+</sect3>
 
-<sect2 id="ov-new1.7-net"><title>Network related changes</title>
+<sect3 id="ov-new1.7-net"><title>Network related changes</title>
 
 <itemizedlist mark="bullet">
 
@@ -1171,9 +1173,9 @@ Add /proc/net/if_inet6.
 
 </itemizedlist>
 
-</sect2>
+</sect3>
 
-<sect2 id="ov-new1.7-device"><title>Device related changes</title>
+<sect3 id="ov-new1.7-device"><title>Device related changes</title>
 
 <itemizedlist mark="bullet">
 
@@ -1222,9 +1224,9 @@ get_phys_pages, posix_openpt.
 
 </itemizedlist>
 
-</sect2>
+</sect3>
 
-<sect2 id="ov-new1.7-posix"><title>Other POSIX related changes</title>
+<sect3 id="ov-new1.7-posix"><title>Other POSIX related changes</title>
 
 <itemizedlist mark="bullet">
 
@@ -1286,9 +1288,9 @@ vfwscanf, vswscanf.
 
 </itemizedlist>
 
-</sect2>
+</sect3>
 
-<sect2 id="ov-new1.7-sec"><title>Security related changes</title>
+<sect3 id="ov-new1.7-sec"><title>Security related changes</title>
 
 <itemizedlist mark="bullet">
 
@@ -1319,9 +1321,9 @@ options have a slightly changed behaviour.
 
 </itemizedlist>
 
-</sect2>
+</sect3>
 
-<sect2 id="ov-new1.7-misc"><title>Miscellaneous</title>
+<sect3 id="ov-new1.7-misc"><title>Miscellaneous</title>
 
 <itemizedlist mark="bullet">
 
@@ -1415,6 +1417,8 @@ having multiple concurrent Cygwin installations.
 </para></listitem>
 
 </itemizedlist>
+
+</sect3>
 
 </sect2>
 
