@@ -44,7 +44,9 @@ all users.  Sometimes there's a requirement to have user specific
 mount points.  The Cygwin DLL supports user specific fstab files.
 These are stored in the directory <filename>/etc/fstab.d</filename>
 and the name of the file is the Cygwin username of the user, as it's
-stored in the <filename>/etc/passwd</filename> file.  The structure of the
+created from the Windows account database or stored in the
+<filename>/etc/passwd</filename> file (see
+<xref linkend="ntsec-mapping"></xref>).  The structure of the
 user specific file is identical to the system-wide
 <filename>fstab</filename> file.</para>
 

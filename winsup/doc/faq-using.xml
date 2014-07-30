@@ -137,7 +137,7 @@ as such.
 
 <para>Your .bashrc is read from your home directory specified by the HOME
 environment variable.  It uses /.bashrc if HOME is not set.  So you need
-to set HOME (and the home dir in your /etc/passwd entry) correctly.
+to set HOME (and the home dir in your passwd account information) correctly.
 </para>
 </answer></qandaentry>
 
@@ -265,12 +265,6 @@ must create the whatis database.  Just run the command
 <question><para>Why doesn't <literal>chmod</literal> work?</para></question>
 <answer>
 
-<para>The most common case is that your <literal>/etc/passwd</literal>
-or <literal>/etc/group</literal> files are not properly set up. If 
-<literal>ls -l</literal> shows a group of <literal>mkpasswd</literal> 
-or <literal>mkgroup</literal>, you need to run one or both of those
-commands.
-</para>
 <para>If you're using FAT32 instead of NTFS, <literal>chmod</literal> 
 will fail since FAT32 does not provide any permission information.
 You should really consider converting the drive to NTFS with
@@ -1030,19 +1024,6 @@ necessary, call gpupdate.
 If everything looks ok, run bash.  Starting with Windows Vista, make
 sure you're running bash elevated.
 </para>
-
-<para>
-If "cyg_server" is not already in <literal>/etc/passwd</literal>, add it
-using <literal>mkpasswd</literal>.  Make sure all domain accounts which are
-supposed to be able to logon via ssh are in <literal>/etc/passwd</literal>.
-Also make sure that all important domain groups are in
-<literal>/etc/group</literal>.  If in doubt, call
-</para>
-
-<screen>
-  $ mkpasswd -l -d your_domain > /etc/passwd
-  $ mkgroup -l -d your_domain > /etc/group
-</screen>
 
 <para>
 Then run ssh-host-config.  Answer all questions so that "cyg_server" is

@@ -4,6 +4,20 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.32"><title>What's new and what changed from 1.7.31 to 1.7.32</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Introduce reading passwd/group entries directly from SAM/AD, thus allowing
+to do without /etc/passwd and /etc/group files.  Introduce /etc/nsswitch.conf
+file to configure passwd/group handling.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.31"><title>What's new and what changed from 1.7.30 to 1.7.31</title>
 
 <itemizedlist mark="bullet">
