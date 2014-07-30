@@ -1,5 +1,9 @@
 2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* new-features.xml: (ov-new1.7): Change section title.
+
+2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.xml: (ov-new1.7.1): Add new section.  Move old 1.7
 	sections into section level 3.
 
