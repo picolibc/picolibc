@@ -63,7 +63,7 @@ int	_EXFUN(__locale_mb_cur_max,(_VOID));
 
 #define MB_CUR_MAX __locale_mb_cur_max()
 
-_VOID	_EXFUN(abort,(_VOID) _ATTRIBUTE ((noreturn)));
+_VOID	_EXFUN(abort,(_VOID) _ATTRIBUTE ((__noreturn__)));
 int	_EXFUN(abs,(int));
 int	_EXFUN(atexit,(_VOID (*__func)(_VOID)));
 double	_EXFUN(atof,(const char *__nptr));
@@ -81,7 +81,7 @@ _PTR	_EXFUN(bsearch,(const _PTR __key,
 		       __compar_fn_t _compar));
 _PTR	_EXFUN_NOTHROW(calloc,(size_t __nmemb, size_t __size));
 div_t	_EXFUN(div,(int __numer, int __denom));
-_VOID	_EXFUN(exit,(int __status) _ATTRIBUTE ((noreturn)));
+_VOID	_EXFUN(exit,(int __status) _ATTRIBUTE ((__noreturn__)));
 _VOID	_EXFUN_NOTHROW(free,(_PTR));
 char *  _EXFUN(getenv,(const char *__string));
 char *	_EXFUN(_getenv_r,(struct _reent *, const char *__string));
@@ -151,7 +151,7 @@ long    _EXFUN(a64l,(const char *__input));
 char *  _EXFUN(l64a,(long __input));
 char *  _EXFUN(_l64a_r,(struct _reent *,long __input));
 int	_EXFUN(on_exit,(_VOID (*__func)(int, _PTR),_PTR __arg));
-_VOID	_EXFUN(_Exit,(int __status) _ATTRIBUTE ((noreturn)));
+_VOID	_EXFUN(_Exit,(int __status) _ATTRIBUTE ((__noreturn__)));
 int	_EXFUN(putenv,(char *__string));
 int	_EXFUN(_putenv_r,(struct _reent *, char *__string));
 _PTR	_EXFUN(_reallocf_r,(struct _reent *, _PTR, size_t));

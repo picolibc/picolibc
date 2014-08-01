@@ -31,12 +31,12 @@
 
 /* Global read-only variable defined in rtld.c which is nonzero if we
    shall give more warning messages.  */
-extern int _dl_verbose __attribute__ ((unused));
+extern int _dl_verbose __attribute__ ((__unused__));
 
 
 /* Read the dynamic section at DYN and fill in INFO with indices DT_*.  */
 
-static void __attribute__ ((unused))
+static void __attribute__ ((__unused__))
 elf_get_dynamic_info (struct link_map *l)
 {
   ElfW(Dyn) *dyn = l->l_ld;

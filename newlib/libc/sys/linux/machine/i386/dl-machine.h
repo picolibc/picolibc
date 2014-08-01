@@ -26,7 +26,7 @@
 #include <machine/weakalias.h>
 
 /* Return nonzero iff ELF header is compatible with the running host.  */
-static inline int __attribute__ ((unused))
+static inline int __attribute__ ((__unused__))
 elf_machine_matches_host (const Elf32_Ehdr *ehdr)
 {
   return ehdr->e_machine == EM_386;
@@ -36,7 +36,7 @@ elf_machine_matches_host (const Elf32_Ehdr *ehdr)
 /* Return the link-time address of _DYNAMIC.  Conveniently, this is the
    first element of the GOT.  This must be inlined in a function which
    uses global data.  */
-static inline Elf32_Addr __attribute__ ((unused))
+static inline Elf32_Addr __attribute__ ((__unused__))
 elf_machine_dynamic (void)
 {
   register Elf32_Addr *got asm ("%ebx");
@@ -45,7 +45,7 @@ elf_machine_dynamic (void)
 
 
 /* Return the run-time load address of the shared object.  */
-static inline Elf32_Addr __attribute__ ((unused))
+static inline Elf32_Addr __attribute__ ((__unused__))
 elf_machine_load_address (void)
 {
   Elf32_Addr addr;
@@ -65,16 +65,16 @@ elf_machine_load_address (void)
 /* GKM FIXME: Fix trampoline to pass bounds so we can do
    without the `__unbounded' qualifier.  */
 static ElfW(Addr) fixup (struct link_map *__unbounded l, ElfW(Word) reloc_offset)
-     __attribute__ ((regparm (2), unused));
+     __attribute__ ((__regparm__ (2), __unused__));
 static ElfW(Addr) profile_fixup (struct link_map *l, ElfW(Word) reloc_offset,
 				 ElfW(Addr) retaddr)
-     __attribute__ ((regparm (3), unused));
+     __attribute__ ((__regparm__ (3), __unused__));
 #endif
 
 /* Set up the loaded object described by L so its unrelocated PLT
    entries will jump to the on-demand fixup code in dl-runtime.c.  */
 
-static inline int __attribute__ ((unused))
+static inline int __attribute__ ((__unused__))
 elf_machine_runtime_setup (struct link_map *l, int lazy, int profile)
 {
   Elf32_Addr *got;
@@ -268,7 +268,7 @@ _dl_start_user:\n\
 
 extern const char *_dl_platform;
 
-static inline void __attribute__ ((unused))
+static inline void __attribute__ ((__unused__))
 dl_platform_init (void)
 {
   if (_dl_platform != NULL && *_dl_platform == '\0')
@@ -292,13 +292,13 @@ elf_machine_plt_value (struct link_map *map, const Elf32_Rel *reloc,
   return value;
 }
 
-static inline void __attribute__ ((unused))
+static inline void __attribute__ ((__unused__))
 elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,
 		 const Elf32_Sym *sym, const struct r_found_version *version,
 		 Elf32_Addr *const reloc_addr,
 		 struct r_scope_elem *scope[]);
 
-static inline void __attribute__ ((unused))
+static inline void __attribute__ ((__unused__))
 elf_machine_rel_relative (Elf32_Addr l_addr, const Elf32_Rel *reloc,
 			  Elf32_Addr *const reloc_addr);
 
@@ -313,7 +313,7 @@ elf_machine_lazy_rel (struct link_map *map,
 /* Perform the relocation specified by RELOC and SYM (which is fully resolved).
    MAP is the object containing the reloc.  */
 
-static inline void __attribute__ ((unused))
+static inline void __attribute__ ((__unused__))
 elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,
 		 const Elf32_Sym *sym, const struct r_found_version *version,
 		 Elf32_Addr *const reloc_addr,
@@ -396,7 +396,7 @@ elf_machine_rel (struct link_map *map, const Elf32_Rel *reloc,
     }
 }
 
-static inline void __attribute__ ((unused))
+static inline void __attribute__ ((__unused__))
 elf_machine_rel_relative (Elf32_Addr l_addr, const Elf32_Rel *reloc,
 			  Elf32_Addr *const reloc_addr)
 {

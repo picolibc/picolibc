@@ -150,7 +150,7 @@ struct __res_state {
                         u_int16_t               nsinit;
                         struct sockaddr_in6     *nsaddrs[MAXNS];
                         unsigned long long int  initstamp
-                          __attribute__((packed));
+                          __attribute__((__packed__));
 #if 0
                         unsigned int            _initstamp[2];
 #endif

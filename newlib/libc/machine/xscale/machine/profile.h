@@ -33,7 +33,7 @@
 #endif
 
 #define _MCOUNT_DECL(frompc, selfpc) \
-void __attribute__ ((no_instrument_function)) \
+void __attribute__ ((__no_instrument_function__)) \
 mcount_internal (frompc, selfpc)
 
 /* mcount_internal expects two arguments
@@ -53,8 +53,8 @@ mcount_internal (frompc, selfpc)
 
 #ifdef __thumb__
 #define MCOUNT					\
-void __attribute__ ((naked))			\
-     __attribute__ ((no_instrument_function))	\
+void __attribute__ ((__naked__))			\
+     __attribute__ ((__no_instrument_function__))	\
 mcount (void)					\
 {						\
   __asm__("push {r0, r1, r2, r3, lr};"		\
@@ -69,8 +69,8 @@ mcount (void)					\
 }
 #else
 #define MCOUNT					\
-void __attribute__ ((naked))			\
-     __attribute__ ((no_instrument_function))	\
+void __attribute__ ((__naked__))			\
+     __attribute__ ((__no_instrument_function__))	\
 mcount (void)					\
 {						\
   __asm__("stmdb sp!, {r0, r1, r2, r3, lr};"	\

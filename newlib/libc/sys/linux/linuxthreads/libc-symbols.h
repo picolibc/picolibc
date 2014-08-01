@@ -91,12 +91,12 @@
 /* Define ALIASNAME as a strong alias for NAME.  */
 # define strong_alias(name, aliasname) _strong_alias(name, aliasname)
 # define _strong_alias(name, aliasname) \
-  extern __typeof (name) aliasname __attribute__ ((alias (#name)));
+  extern __typeof (name) aliasname __attribute__ ((__alias__ (#name)));
 
 /* This comes between the return type and function name in
    a function definition to make that definition weak.  */
-# define weak_function __attribute__ ((weak))
-# define weak_const_function __attribute__ ((weak, __const__))
+# define weak_function __attribute__ ((__weak__))
+# define weak_const_function __attribute__ ((__weak__, __const__))
 
 # ifdef HAVE_WEAK_SYMBOLS
 
@@ -104,7 +104,7 @@
    If weak aliases are not available, this defines a strong alias.  */
 #  define weak_alias(name, aliasname) _weak_alias (name, aliasname)
 #  define _weak_alias(name, aliasname) \
-  extern __typeof (name) aliasname __attribute__ ((weak, alias (#name)));
+  extern __typeof (name) aliasname __attribute__ ((__weak__, __alias__ (#name)));
 
 /* Declare SYMBOL as weak undefined symbol (resolved to 0 if not defined).  */
 #  define weak_extern(symbol) _weak_extern (symbol)
@@ -213,12 +213,12 @@
 #   define link_warning(symbol, msg) \
   __make_section_unallocated (".gnu.warning." #symbol) \
   static const char __evoke_link_warning_##symbol[]	\
-    __attribute__ ((section (".gnu.warning." #symbol "\"\n\t#\""))) = msg;
+    __attribute__ ((__section__ (".gnu.warning." #symbol "\"\n\t#\""))) = msg;
 #  else
 #   define link_warning(symbol, msg) \
   __make_section_unallocated (".gnu.warning." #symbol) \
   static const char __evoke_link_warning_##symbol[]	\
-    __attribute__ ((section (".gnu.warning." #symbol "\n\t#"))) = msg;
+    __attribute__ ((__section__ (".gnu.warning." #symbol "\n\t#"))) = msg;
 #  endif
 # else /* Not ELF: a.out */
 #  ifdef HAVE_XCOFF
@@ -267,11 +267,11 @@
    because it will need to be relocated at run time anyway.  */
 #   define _elf_set_element(set, symbol) \
   static const void *__elf_set_##set##_element_##symbol##__ \
-    __attribute__ ((unused, section (#set))) = &(symbol)
+    __attribute__ ((__unused__, __section__ (#set))) = &(symbol)
 #  else
 #   define _elf_set_element(set, symbol) \
   static const void *const __elf_set_##set##_element_##symbol##__ \
-    __attribute__ ((unused, section (#set))) = &(symbol)
+    __attribute__ ((__unused__, __section__ (#set))) = &(symbol)
 #  endif
 
 /* Define SET as a symbol set.  This may be required (it is in a.out) to

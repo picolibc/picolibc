@@ -187,7 +187,7 @@ struct _pthread_descr_struct {
   hp_timing_t p_cpuclock_offset; /* Initial CPU clock for thread.  */
 #endif
   /* New elements must be added at the end.  */
-} __attribute__ ((aligned(32))); /* We need to align the structure so that
+} __attribute__ ((__aligned__(32))); /* We need to align the structure so that
 				    doubles are aligned properly.  This is 8
 				    bytes on MIPS and 16 bytes on MIPS64.
 				    32 bytes might give better cache
@@ -374,9 +374,9 @@ static inline int nonexisting_handle(pthread_handle h, pthread_t id)
 
 /* Recover thread descriptor for the current thread */
 
-extern pthread_descr __pthread_find_self (void) __attribute__ ((const));
+extern pthread_descr __pthread_find_self (void) __attribute__ ((__const__));
 
-static inline pthread_descr thread_self (void) __attribute__ ((const));
+static inline pthread_descr thread_self (void) __attribute__ ((__const__));
 static inline pthread_descr thread_self (void)
 {
 #ifdef THREAD_SELF

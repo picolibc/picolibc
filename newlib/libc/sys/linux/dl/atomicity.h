@@ -23,7 +23,7 @@
 
 
 static inline uint32_t
-__attribute__ ((unused))
+__attribute__ ((__unused__))
 exchange_and_add (volatile uint32_t *mem, uint32_t val)
 {
   register uint32_t result;
@@ -33,7 +33,7 @@ exchange_and_add (volatile uint32_t *mem, uint32_t val)
 }
 
 static inline void
-__attribute__ ((unused))
+__attribute__ ((__unused__))
 atomic_add (volatile uint32_t *mem, int val)
 {
   __asm__ __volatile__ ("lock; addl %1,%0"
@@ -41,7 +41,7 @@ atomic_add (volatile uint32_t *mem, int val)
 }
 
 static inline char
-__attribute__ ((unused))
+__attribute__ ((__unused__))
 compare_and_swap (volatile long int *p, long int oldval, long int newval)
 {
   char ret;

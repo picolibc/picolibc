@@ -162,7 +162,7 @@ struct libname_list
 
 /* Test whether given NAME matches any of the names of the given object.  */
 static __inline int
-__attribute__ ((unused))
+__attribute__ ((__unused__))
 _dl_name_match_p (const char *__name, struct link_map *__map)
 {
   int __found = strcmp (__name, __map->l_name) == 0;

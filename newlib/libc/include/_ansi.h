@@ -35,7 +35,7 @@
 #define _END_STD_C  }
 #endif
 #if __GNUC_PREREQ (3, 3)
-#define _NOTHROW __attribute__ ((nothrow))
+#define _NOTHROW __attribute__ ((__nothrow__))
 #else
 #define _NOTHROW throw()
 #endif

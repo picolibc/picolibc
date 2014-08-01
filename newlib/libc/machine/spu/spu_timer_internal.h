@@ -53,12 +53,12 @@ typedef enum spu_timer_state
 
 typedef struct spu_timer
 {
-  int tmout __attribute__ ((aligned (16)));	/* Time until expiration (tb).  */
-  int intvl __attribute__ ((aligned (16)));	/* Interval.  */
-  int id __attribute__ ((aligned (16)));
-  spu_timer_state_t state __attribute__ ((aligned (16)));
-  void (*func) (int) __attribute__ ((aligned (16)));	/* Handler.  */
-  struct spu_timer *next __attribute__ ((aligned (16)));
+  int tmout __attribute__ ((__aligned__ (16)));	/* Time until expiration (tb).  */
+  int intvl __attribute__ ((__aligned__ (16)));	/* Interval.  */
+  int id __attribute__ ((__aligned__ (16)));
+  spu_timer_state_t state __attribute__ ((__aligned__ (16)));
+  void (*func) (int) __attribute__ ((__aligned__ (16)));	/* Handler.  */
+  struct spu_timer *next __attribute__ ((__aligned__ (16)));
 } spu_timer_t;
 
 

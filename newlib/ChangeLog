@@ -1,3 +1,24 @@
+2014-08-01  Eric Blake  <eblake@redhat.com>
+
+	* libc/machine/spu/spu_timer_internal.h: Decorate attribute names
+	with __, for namespace safety.
+	* libc/machine/xscale/machine/profile.h: Likewise.
+	* libc/include/stdlib.h: Likewise.
+	* libc/include/_ansi.h: Likewise.
+	* libc/include/sys/unistd.h: Likewise.
+	* libc/sys/linux/linuxthreads/libc-symbols.h: Likewise.
+	* libc/sys/linux/linuxthreads/internals.h: Likewise.
+	* libc/sys/linux/machine/i386/weakalias.h: Likewise.
+	* libc/sys/linux/machine/i386/dl-procinfo.h: Likewise.
+	* libc/sys/linux/machine/i386/dl-machine.h: Likewise.
+	* libc/sys/linux/libc-symbols.h: Likewise.
+	* libc/sys/linux/iconv/gconv_charset.h: Likewise.
+	* libc/sys/linux/include/resolv.h: Likewise.
+	* libc/sys/linux/sys/unistd.h: Likewise.
+	* libc/sys/linux/dl/atomicity.h: Likewise.
+	* libc/sys/linux/dl/dynamic-link.h: Likewise.
+	* libc/sys/linux/dl/ldsodefs.h: Likewise.
+
 2014-07-30  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/string/strerror.c: Fix documentation so makedoc doesn't

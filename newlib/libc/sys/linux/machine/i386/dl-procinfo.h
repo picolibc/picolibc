@@ -38,7 +38,7 @@ extern const char _dl_x86_platforms[][5];
 
 
 static inline int
-__attribute__ ((unused))
+__attribute__ ((__unused__))
 _dl_procinfo (int word)
 {
   /* This table should match the information from arch/i386/kernel/setup.c
@@ -57,14 +57,14 @@ _dl_procinfo (int word)
 }
 
 static inline const char *
-__attribute__ ((unused))
+__attribute__ ((__unused__))
 _dl_hwcap_string (int idx)
 {
   return _dl_x86_cap_flags[idx];
 };
 
 static inline const char *
-__attribute__ ((unused))
+__attribute__ ((__unused__))
 _dl_platform_string (int idx)
 {
   return _dl_x86_platforms [idx - _DL_FIRST_PLATFORM];
@@ -100,7 +100,7 @@ enum
 };
 
 static inline int
-__attribute__ ((unused))
+__attribute__ ((__unused__))
 _dl_string_hwcap (const char *str)
 {
   int i;
@@ -115,7 +115,7 @@ _dl_string_hwcap (const char *str)
 
 
 static inline int
-__attribute__ ((unused))
+__attribute__ ((__unused__))
 _dl_string_platform (const char *str)
 {
   int i;
