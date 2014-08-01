@@ -1,3 +1,7 @@
+2014-07-31  Yaakov Selkowitz  <yselkowitz@cygwin.com>
+
+	* faq-what.xml (faq.what.who): CGF has retired.
+
 2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntsec.xml: Small improvments.

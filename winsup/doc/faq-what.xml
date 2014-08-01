@@ -129,14 +129,7 @@ questions, all of these people will appreciate it if you use the cygwin
 mailing lists rather than sending personal email.)</emphasis>
 </para>
 <para>
-Christopher Faylor (cgf) is one of the project leads. Chris works for
-Netapp but all of his Cygwin activities occur on his own time. He is
-most notably responsible for the support of signal handling and
-fork/exec in Cygwin. He also administers the site which hosts the
-Cygwin project.
-</para>
-<para>
-Corinna Vinschen (corinna) is the other project lead. Corinna is a
+Corinna Vinschen (corinna) is the current project lead. Corinna is a
 senior Red Hat engineer. Corinna is responsible for such important
 subsystems as security and networking and has recently added support to
 Cygwin for wide characters, increased path length, IPv6, advisory
