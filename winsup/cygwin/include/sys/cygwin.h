@@ -26,21 +26,21 @@ extern "C" {
 /* DEPRECATED INTERFACES.  These are restricted to MAX_PATH length.
    Don't use in modern applications.  They don't exist on x86_64. */
 extern int cygwin_win32_to_posix_path_list (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_win32_to_posix_path_list_buf_size (const char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_posix_to_win32_path_list (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_posix_to_win32_path_list_buf_size (const char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_conv_to_win32_path (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_conv_to_full_win32_path (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_conv_to_posix_path (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_conv_to_full_posix_path (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 #endif /* !__x86_64__ */
 
 /* Use these interfaces in favor of the above. */
