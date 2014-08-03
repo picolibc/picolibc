@@ -140,7 +140,8 @@ Yaakov Selkowitz is the Cygwin/X coordinator. Jon Turney serves on the
 Cygwin/X team as a developer.
 </para>
 <para>
-The Cygwin setup project is currently maintained by a group of people, most notably, Brian Dessent (brian) and Dave Korn (dave.korn).
+The packages in the Net release are maintained by a large group of people;
+a complete list can be found <ulink url='http://cygwin.com/cygwin-pkg-maint'>here</ulink>.
 </para>
 <para>Please note that all of us working on Cygwin try to
 be as responsive as possible and deal with patches and questions as we
