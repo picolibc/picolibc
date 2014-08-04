@@ -449,12 +449,13 @@ details. */
       273: Introduce account mapping from Windows account DBs.  Add CW_SETENT,
 	   CW_GETENT, CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID, CW_GETGRSID,
 	   CW_CYGNAME_FROM_WINNAME.
+      274: Export __cxa_atexit.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 273
+#define CYGWIN_VERSION_API_MINOR 274
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

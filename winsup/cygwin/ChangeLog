@@ -1,5 +1,10 @@
 2014-08-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* common.din (__cxa_atexit): Export.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump to 274.
+
+2014-08-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Drop "plus_prepended"
 	as naming style.  Drop enum name_style_t, use a boolean
 	"fully_qualified_name" value instead.  Rework function to drop
