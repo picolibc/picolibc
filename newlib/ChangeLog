@@ -1,3 +1,8 @@
+2014-08-04  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* libc/include/math.h: Also define M_PI etc. if _XOPEN_SOURCE is
+	defined appropriately.
+
 2014-08-01  Eric Blake  <eblake@redhat.com>
 
 	* libc/machine/spu/spu_timer_internal.h: Decorate attribute names
