@@ -1,7 +1,7 @@
 /* passwd.c: Changing passwords and managing account information
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2011, 2012,
-   2013 Red Hat, Inc.
+   2013, 2014 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 
@@ -84,7 +84,7 @@ EvalRet (int ret, const char *user)
       return 0;
 
     case ERROR_ACCESS_DENIED:
-      if (! user)
+      if (!user)
 	eprint (0, "You may not change password expiry information.");
       else
 	eprint (0, "You may not change the password for %s.", user);
@@ -153,7 +153,7 @@ ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck,
 
   mbstowcs (name, user, UNLEN + 1);
   mbstowcs (pass, pwd, 512);
-  if (! oldpwd)
+  if (!oldpwd)
     {
       USER_INFO_1003 ui;
 
@@ -167,10 +167,8 @@ ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck,
     }
   if (justcheck && ret != ERROR_INVALID_PASSWORD)
     return 0;
-  if (! EvalRet (ret, user) && ! justcheck)
-    {
-      eprint (0, "Password changed.");
-    }
+  if (!EvalRet (ret, user) && !justcheck)
+    eprint (0, "Password changed.");
   return ret;
 }
 
@@ -193,7 +191,7 @@ PrintPW (PUSER_INFO_3 ui, LPCWSTR server)
 	(ui->usri3_password_expired) ? "yes\n" : "no\n");
   printf ("Latest password change     : %s", ctime(&t));
   ret = NetUserModalsGet (server, 0, (void *) &mi);
-  if (! ret)
+  if (!ret)
     {
       if (mi->usrmod0_max_passwd_age == TIMEQ_FOREVER)
 	mi->usrmod0_max_passwd_age = 0;
@@ -222,7 +220,7 @@ SetModals (int xarg, int narg, int iarg, int Larg, LPCWSTR server)
   PUSER_MODALS_INFO_0 mi;
 
   ret = NetUserModalsGet (server, 0, (void *) &mi);
-  if (! ret)
+  if (!ret)
     {
       if (xarg == 0)
 	mi->usrmod0_max_passwd_age = TIMEQ_FOREVER;
@@ -277,8 +275,8 @@ usage (FILE * stream, int status)
   "System operations:\n"
   "  -i, --inactive NUM       set NUM of days before inactive accounts are disabled\n"
   "                           (inactive accounts are those with expired passwords).\n"
-  "  -n, --minage DAYS        set system minimum password age to DAYS days.\n"
-  "  -x, --maxage DAYS        set system maximum password age to DAYS days.\n"
+  "  -n, --minage MINDAYS     set system minimum password age to MINDAYS days.\n"
+  "  -x, --maxage MAXDAYS     set system maximum password age to MAXDAYS days.\n"
   "  -L, --length LEN         set system minimum password length to LEN.\n"
   "\n"
   "Other options:\n"
@@ -593,7 +591,7 @@ main (int argc, char **argv)
     }
 
   ui = GetPW (user, 1, server);
-  if (! ui)
+  if (!ui)
     return 1;
 
   if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
@@ -636,9 +634,6 @@ main (int argc, char **argv)
   if (!caller_is_admin () && !myself)
     return eprint (0, "You may not change the password for %s.", user);
 
-  eprint (0, "Enter the new password (minimum of 5, maximum of 8 characters).");
-  eprint (0, "Please use a combination of upper and lower case letters and numbers.");
-
   oldpwd[0] = '\0';
   if (!caller_is_admin ())
     {
@@ -652,11 +647,11 @@ main (int argc, char **argv)
       strcpy (newpwd, getpass ("New password: "));
       if (strcmp (newpwd, getpass ("Re-enter new password: ")))
 	eprint (0, "Password is not identical.");
-      else if (! ChangePW (user, *oldpwd ? oldpwd : NULL, newpwd, 0, server))
+      else if (!ChangePW (user, *oldpwd ? oldpwd : NULL, newpwd, 0, server))
 	ret = 1;
-      if (! ret && cnt < 2)
+      if (!ret && cnt < 2)
 	eprint (0, "Try again.");
     }
-  while (! ret && ++cnt < 3);
-  return ! ret;
+  while (!ret && ++cnt < 3);
+  return !ret;
 }

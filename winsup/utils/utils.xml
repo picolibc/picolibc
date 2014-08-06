@@ -1319,8 +1319,8 @@ User operations:
 System operations:
   -i, --inactive NUM       set NUM of days before inactive accounts are disabled
                            (inactive accounts are those with expired passwords).
-  -n, --minage DAYS        set system minimum password age to DAYS days.
-  -x, --maxage DAYS        set system maximum password age to DAYS days.
+  -n, --minage MINDAYS     set system minimum password age to MINDAYS days.
+  -x, --maxage MAXDAYS     set system maximum password age to MAXDAYS days.
   -L, --length LEN         set system minimum password length to LEN.
 
 Other options:
