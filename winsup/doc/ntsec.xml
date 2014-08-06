@@ -540,12 +540,6 @@ this SID comes from.  And even then it will probably suffer a
 <literal>Permission denied</literal> error when trying to ask the machine
 for its local account.
 </para>
-
-<para>
-Cygwin will map the account to the fake accounts
-<literal>Unknown+User</literal>/<literal>Unknown+Group</literal>
-with uid/gid -1.
-</para>
 </listitem>
 
 </itemizedlist>
@@ -565,11 +559,11 @@ separator character is the plus sign, <literal>+</literal>.
 
 <listitem>
 <para>
-Well-known SIDs will have the separator character prepended:
+Well-known and builtin accounts will be named as in Windows:
 </para>
 
 <screen>
-  "+SYSTEM", "+LOCAL", "+Medium Mandatory Level", ...
+  "SYSTEM", "LOCAL", "Medium Mandatory Level", ...
 </screen>
 </listitem>
 
@@ -794,7 +788,7 @@ In the <literal>Local Users and Groups</literal> MMC snap-in it's called
 </para>
 
 <para>
-You can utilze this field even if you're running a "home edition" of
+You can utilize this field even if you're running a "home edition" of
 Windows, using the command line.  The <command>net user</command> command
 allows to set all values in the SAM, even if the GUI is crippled.
 </para>
@@ -1302,15 +1296,15 @@ is created.  The recognized values are:
       </segmentedlist>
 
       <para>
-      Builtin accounts have just the separator char prepended:
+      Builtin accounts are simply used as is:
       </para>
 
       <segmentedlist><?dbhtml list-presentation="table"?>
 	<seglistitem>
-	  <seg><literal>+LOCAL</literal></seg>
+	  <seg><literal>LOCAL</literal></seg>
 	</seglistitem>
 	<seglistitem>
-	  <seg><literal>+Users</literal></seg>
+	  <seg><literal>Users</literal></seg>
 	</seglistitem>
       </segmentedlist>
 
@@ -1357,6 +1351,18 @@ is created.  The recognized values are:
       <segmentedlist><?dbhtml list-presentation="table"?>
 	<seglistitem>
 	  <seg><literal>BUILTIN+Users</literal></seg>
+	</seglistitem>
+      </segmentedlist>
+
+      <para>
+      A special case are builtin accounts which have an emtpy domain name.
+      These will be prependend by just the separator character in
+      <literal>always</literal> mode:
+      </para>
+
+      <segmentedlist><?dbhtml list-presentation="table"?>
+	<seglistitem>
+	  <seg><literal>+LOCAL</literal></seg>
 	</seglistitem>
       </segmentedlist>
     </listitem>
