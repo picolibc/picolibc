@@ -1,3 +1,11 @@
+2014-08-07  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* common.din (__cxa_finalize): Export.
+	* dcrt0.cc (cygwin_atexit): Use d->handle with __cxa_atexit.
+	* dll_init.cc (dll_list::detach): Use d->handle with __cxa_finalize.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Use 274 for
+	__cxa_finalize as well.
+
 2014-08-04  Anthony Heading  <anthony@ajrh.net>
 
 	* include/sys/file.h: Add extern "C".

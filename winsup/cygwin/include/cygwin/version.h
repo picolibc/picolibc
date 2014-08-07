@@ -449,7 +449,7 @@ details. */
       273: Introduce account mapping from Windows account DBs.  Add CW_SETENT,
 	   CW_GETENT, CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID, CW_GETGRSID,
 	   CW_CYGNAME_FROM_WINNAME.
-      274: Export __cxa_atexit.
+      274: Export __cxa_atexit and __cxa_finalize.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
