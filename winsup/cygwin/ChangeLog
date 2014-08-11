@@ -1,3 +1,17 @@
+2014-08-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cpuid.h: Add missing copyright header.  Fix formatting.  Use uint32_t
+	instead of unsigned throughout.  Change functions to static inline and
+	always inline.
+	(cpuid): Add parameter to set ecx, allowing to request extended CPUID
+	info.
+	* fhandler_proc.cc (format_proc_cpuinfo): Use uint32_t instead of
+	unsigned throughout.  Add fake decimal places to MHz info.  Handle more
+	feature flags.
+	* fhandler_random.cc (fhandler_dev_random::write): Allow up to 4K
+	input to add entropy.
+	* syscalls.cc: Drop including cpuid.h.
+
 2014-08-07  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* common.din (__cxa_finalize): Export.

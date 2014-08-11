@@ -11,6 +11,7 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
+#include <sys/param.h>
 #include "cygerrno.h"
 #include "path.h"
 #include "fhandler.h"
@@ -65,10 +66,10 @@ fhandler_dev_random::write (const void *ptr, size_t len)
       return -1;
     }
 
-  /* Limit len to a value <= 512 since we don't want to overact.
+  /* Limit len to a value <= 4096 since we don't want to overact.
      Copy to local buffer because CryptGenRandom violates const. */
-  unsigned char buf[512];
-  size_t limited_len = len <= 512 ? len : 512;
+  size_t limited_len = MIN (len, 4096);
+  unsigned char buf[limited_len];
   memcpy (buf, ptr, limited_len);
 
   /* Mess up system entropy source. Return error if device is /dev/random. */
