@@ -1,3 +1,12 @@
+2014-08-03  Yaakov Selkowitz  <yselkowitz@cygwin.com>
+
+	* faq-what.xml (faq.what.who): Remove mention of retired setup
+	maintainers.  Add link to cygwin-pkg-maint.
+
+2014-07-31  Yaakov Selkowitz  <yselkowitz@cygwin.com>
+
+	* faq-what.xml (faq.what.who): CGF has retired.
+
 2014-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml: (ov-new1.7.31): Add new section.
