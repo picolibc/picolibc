@@ -1,7 +1,7 @@
 /* miscfuncs.h: main Cygwin header file.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -22,25 +22,6 @@ BOOL WINAPI ReadPipeOverlapped (HANDLE h, PVOID buf, DWORD len,
 				LPDWORD ret_len, DWORD timeout);
 BOOL WINAPI WritePipeOverlapped (HANDLE h, LPCVOID buf, DWORD len,
 				 LPDWORD ret_len, DWORD timeout);
-
-/* class for per-line reading using native functions.  The caller provides
-   the file as an POBJECT_ATTRIBUTES, and the buffer space. */
-class NT_readline
-{
-  HANDLE fh;
-  PCHAR buf;
-  PCHAR got;
-  PCHAR end;
-  ULONG buflen;
-  ULONG len;
-  ULONG line;
-public:
-  NT_readline () : fh (NULL) {}
-  bool init (POBJECT_ATTRIBUTES attr, char *buf, ULONG buflen);
-  PCHAR gets ();
-  void close () { if (fh) NtClose (fh); fh = NULL; }
-  ~NT_readline () { close (); }
-};
 
 extern "C" void yield ();
 

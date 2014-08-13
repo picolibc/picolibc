@@ -216,20 +216,6 @@ enum
   CW_TOKEN_RESTRICTED    = 1
 };
 
-/* Enumeration source constants for CW_SETENT called from mkpasswd/mkgroup. */
-enum nss_enum_t
-{
-  ENUM_NONE = 0x00,
-  ENUM_CACHE = 0x01,
-  ENUM_FILES = 0x02,
-  ENUM_BUILTIN = 0x04,
-  ENUM_LOCAL = 0x08,
-  ENUM_PRIMARY = 0x10,
-  ENUM_TDOMS = 0x20,
-  ENUM_TDOMS_ALL = 0x40,
-  ENUM_ALL = 0x7f
-};
-
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */
 uintptr_t cygwin_internal (cygwin_getinfo_types, ...);
 

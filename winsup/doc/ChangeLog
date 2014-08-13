@@ -7,32 +7,6 @@
 
 	* faq-what.xml (faq.what.who): CGF has retired.
 
-2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
-
-	* ntsec.xml: Small improvments.
-
-2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
-
-	* new-features.xml: (ov-new1.7): Change section title.
-
-2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
-
-	* new-features.xml: (ov-new1.7.1): Add new section.  Move old 1.7
-	sections into section level 3.
-
-2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
-
-	* cygwin.xsl: Allow 3 section levels in TOC.
-	* new-features.xml: (ov-new1.7.32): Add new section.
-	* ntsec.xml: Rename top-level section to reflect extension of topics.
-	Remove old /etc/passwd, /etc/group considerations.  Add new sections
-	explaining Windows to POSIX account mapping.  Make setuid sections
-	third level sections.
-	* pathnames.xml: Note new method of account mapping for fstab.d/$USER.
-	* faq-setup.xml: Rework references to /etc/passwd and /etc/group to
-	reflect changes to account handling.
-	* faq-using.xml: Ditto.
-
 2014-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml: (ov-new1.7.31): Add new section.

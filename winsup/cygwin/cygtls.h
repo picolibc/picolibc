@@ -79,12 +79,19 @@ public:
 
 struct _local_storage
 {
-  /* passwd.cc */
-  char pass[_PASSWORD_LEN];
+  /*
+     Needed for the group functions
+   */
+  int grp_pos;
 
   /* dlfcn.cc */
   int dl_error;
   char dl_buffer[256];
+
+  /* passwd.cc */
+  struct passwd res;
+  char pass[_PASSWORD_LEN];
+  int pw_pos;
 
   /* path.cc */
   struct mntent mntbuf;

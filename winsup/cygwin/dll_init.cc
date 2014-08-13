@@ -1,7 +1,7 @@
 /* dll_init.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -401,7 +401,7 @@ dll_list::detach (void *retaddr)
 	  exception protect;
 	  /* Call finalize function if we are not already exiting */
 	  if (!exit_state)
-	    __cxa_finalize (d);
+	    __cxa_finalize (d->handle);
 	  d->run_dtors ();
 	  d->prev->next = d->next;
 	  if (d->next)
