@@ -39,7 +39,16 @@
 #define LOCK_NB		0x04		/* don't block when locking */
 #define LOCK_UN		0x08		/* unlock file */
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 extern int flock _PARAMS ((int, int));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -601,7 +601,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
     char s[BUFSIZE];
     WCHAR w[BUFSIZE / sizeof (WCHAR)];
     DWORD d;
-    unsigned m[13];
+    uint32_t m[13];
   } in_buf;
   tmp_pathbuf tp;
 
@@ -698,7 +698,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  RtlQueryRegistryValues (RTL_REGISTRY_ABSOLUTE, cpu_key, tab,
 				  NULL, NULL);
 	  bufptr += __small_sprintf (bufptr, "processor\t: %d\n", cpu_number);
-	  unsigned maxf, vendor_id[4], unused;
+	  uint32_t maxf, vendor_id[4], unused;
 	  cpuid (&maxf, &vendor_id[0], &vendor_id[2], &vendor_id[1], 0);
 	  maxf &= 0xffff;
 	  vendor_id[3] = 0;
@@ -714,23 +714,23 @@ format_proc_cpuinfo (void *, char *&destbuf)
 				     (char *)vendor_id);
 	  if (maxf >= 1)
 	    {
-	      unsigned features2, features1, extra_info, cpuid_sig;
+	      uint32_t features2, features1, extra_info, cpuid_sig;
 	      cpuid (&cpuid_sig, &extra_info, &features2, &features1, 1);
-	      /* unsigned extended_family = (cpuid_sig & 0x0ff00000) >> 20,
+	      /* uint32_t extended_family = (cpuid_sig & 0x0ff00000) >> 20,
 			  extended_model  = (cpuid_sig & 0x000f0000) >> 16,
 			  type		  = (cpuid_sig & 0x00003000) >> 12; */
-	      unsigned family		= (cpuid_sig & 0x00000f00) >> 8,
+	      uint32_t family		= (cpuid_sig & 0x00000f00) >> 8,
 		       model		= (cpuid_sig & 0x000000f0) >> 4,
 		       stepping		= cpuid_sig & 0x0000000f;
 	      /* Not printed on Linux */
-	      //unsigned brand_id		= extra_info & 0x0000000f;
-	      //unsigned cpu_count	= (extra_info & 0x00ff0000) >> 16;
-	      unsigned apic_id		= (extra_info & 0xff000000) >> 24;
+	      //uint32_t brand_id		= extra_info & 0x0000000f;
+	      //uint32_t cpu_count	= (extra_info & 0x00ff0000) >> 16;
+	      uint32_t apic_id		= (extra_info & 0xff000000) >> 24;
 	      if (family == 15)
 		family += (cpuid_sig >> 20) & 0xff;
 	      if (family >= 6)
 		model += ((cpuid_sig >> 16) & 0x0f) << 4;
-	      unsigned maxe = 0;
+	      uint32_t maxe = 0;
 	      cpuid (&maxe, &unused, &unused, &unused, 0x80000000);
 	      if (maxe >= 0x80000004)
 		{
@@ -757,7 +757,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		cache_alignment = clflush * 2;
 	      if (maxe >= 0x80000005) /* L1 Cache and TLB Identifiers. */
 		{
-		  unsigned data_cache, inst_cache;
+		  uint32_t data_cache, inst_cache;
 		  cpuid (&unused, &unused, &data_cache, &inst_cache,
 			 0x80000005);
 
@@ -766,7 +766,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		}
 	      if (maxe >= 0x80000006) /* L2 Cache and L2 TLB Identifiers. */
 		{
-		  unsigned tlb, l2;
+		  uint32_t tlb, l2;
 		  cpuid (&unused, &tlb, &l2, &unused, 0x80000006);
 
 		  cache_size = l2 >> 16;
@@ -776,7 +776,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 						 "model\t\t: %d\n"
 						 "model name\t: %s\n"
 						 "stepping\t: %d\n"
-						 "cpu MHz\t\t: %d\n",
+						 "cpu MHz\t\t: %d.000\n",
 					 family,
 					 model,
 					 in_buf.s + strspn (in_buf.s, " 	"),
@@ -789,7 +789,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	      /* Recognize multi-core CPUs. */
 	      if (is_amd && maxe >= 0x80000008)
 		{
-		  unsigned core_info;
+		  uint32_t core_info;
 		  cpuid (&unused, &unused, &core_info, &unused, 0x80000008);
 
 		  int max_cores = 1 + (core_info & 0xff);
@@ -888,28 +888,27 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 	      if (is_amd && maxe >= 0x80000001)
 		{
-		  unsigned features;
-		  cpuid (&unused, &unused, &unused, &features, 0x80000001);
+		  cpuid (&unused, &unused, &unused, &features1, 0x80000001);
 
-		  if (features & (1 << 11))
+		  if (features1 & (1 << 11))
 		    print (" syscall");
-		  if (features & (1 << 19)) /* Huh?  Not in AMD64 specs. */
+		  if (features1 & (1 << 19)) /* Huh?  Not in AMD64 specs. */
 		    print (" mp");
-		  if (features & (1 << 20))
+		  if (features1 & (1 << 20))
 		    print (" nx");
-		  if (features & (1 << 22))
+		  if (features1 & (1 << 22))
 		    print (" mmxext");
-		  if (features & (1 << 25))
+		  if (features1 & (1 << 25))
 		    print (" fxsr_opt");
-		  if (features & (1 << 26))
+		  if (features1 & (1 << 26))
 		    print (" pdpe1gb");
-		  if (features & (1 << 27))
+		  if (features1 & (1 << 27))
 		    print (" rdtscp");
-		  if (features & (1 << 29))
+		  if (features1 & (1 << 29))
 		    print (" lm");
-		  if (features & (1 << 30)) /* 31th bit is on. */
+		  if (features1 & (1 << 30)) /* 31th bit is on. */
 		    print (" 3dnowext");
-		  if (features & (1 << 31)) /* 32th bit (highest) is on. */
+		  if (features1 & (1 << 31)) /* 32th bit (highest) is on. */
 		    print (" 3dnow");
 		}
 
@@ -966,47 +965,135 @@ format_proc_cpuinfo (void *, char *&destbuf)
 		    print (" osxsave");
 		  if (features2 & (1 << 28))
 		    print (" avx");
+		  if (features2 & (1 << 29))
+		    print (" f16c");
+		  if (features2 & (1 << 30))
+		    print (" rdrand");
+		  if (features2 & (1 << 31))
+		    print (" hypervisor");
 		}
 
 	      if (maxe >= 0x80000001)
 		{
-		  unsigned features;
-		  cpuid (&unused, &unused, &features, &unused, 0x80000001);
+		  cpuid (&unused, &unused, &features1, &unused, 0x80000001);
 
-		  if (features & (1 << 0))
+		  if (features1 & (1 << 0))
 		    print (" lahf_lm");
-		  if (features & (1 << 1))
+		  if (features1 & (1 << 1))
 		    print (" cmp_legacy");
 		  if (is_amd)
 		    {
-		      if (features & (1 << 2))
+		      if (features1 & (1 << 2))
 			print (" svm");
-		      if (features & (1 << 3))
+		      if (features1 & (1 << 3))
 			print (" extapic");
-		      if (features & (1 << 4))
+		      if (features1 & (1 << 4))
 			print (" cr8_legacy");
-		      if (features & (1 << 5))
+		      if (features1 & (1 << 5))
 			print (" abm");
-		      if (features & (1 << 6))
+		      if (features1 & (1 << 6))
 			print (" sse4a");
-		      if (features & (1 << 7))
+		      if (features1 & (1 << 7))
 			print (" misalignsse");
-		      if (features & (1 << 8))
+		      if (features1 & (1 << 8))
 			print (" 3dnowprefetch");
-		      if (features & (1 << 9))
+		      if (features1 & (1 << 9))
 			print (" osvw");
 		    }
-		  if (features & (1 << 10))
+		  if (features1 & (1 << 10))
 		    print (" ibs");
 		  if (is_amd)
 		    {
-		      if (features & (1 << 11))
+		      if (features1 & (1 << 11))
 			print (" sse5");
-		      if (features & (1 << 12))
+		      if (features1 & (1 << 12))
 			print (" skinit");
-		      if (features & (1 << 13))
+		      if (features1 & (1 << 13))
 			print (" wdt");
+		      if (features1 & (1 << 15))
+			print (" lwp");
+		      if (features1 & (1 << 16))
+			print (" fma4");
+		      if (features1 & (1 << 17))
+			print (" tce");
+		      if (features1 & (1 << 19))
+			print (" nodeid_msr");
+		      if (features1 & (1 << 21))
+			print (" tbm");
+		      if (features1 & (1 << 22))
+			print (" topoext");
+		      if (features1 & (1 << 23))
+			print (" perfctr_core");
+		      if (features1 & (1 << 24))
+			print (" perfctr_nb");
+		      if (features1 & (1 << 28))
+			print (" perfctr_l2");
 		    }
+		}
+	      if (is_intel) /* features scattered in various CPUID levels. */
+		{
+		  cpuid (&features1, &unused, &features2, &unused, 0x06);
+
+		  if (features1 & (1 << 1))
+		    print (" ida");
+		  if (features1 & (1 << 2))
+		    print (" arat");
+		  if (features2 & (1 << 3))
+		    print (" epb");
+
+		  cpuid (&features2, &unused, &unused, &unused, 0x0d, 1);
+		  if (features2 & (1 << 0))
+		    print (" xsaveopt");
+
+		  if (features1 & (1 << 4))
+		    print (" pln");
+		  if (features1 & (1 << 6))
+		    print (" pts");
+		  if (features1 & (1 << 0))
+		    print (" dtherm");
+		}
+	      if (is_intel) /* Extended feature flags */
+		{
+		  cpuid (&unused, &features1, &unused, &unused, 0x07, 0);
+
+		  if (features1 & (1 << 0))
+		    print (" fsgsbase");
+		  if (features1 & (1 << 1))
+		    print (" tsc_adjust");
+		  if (features1 & (1 << 3))
+		    print (" bmi1");
+		  if (features1 & (1 << 4))
+		    print (" hle");
+		  if (features1 & (1 << 5))
+		    print (" avx2");
+		  if (features1 & (1 << 7))
+		    print (" smep");
+		  if (features1 & (1 << 8))
+		    print (" bmi2");
+		  if (features1 & (1 << 9))
+		    print (" erms");
+		  if (features1 & (1 << 10))
+		    print (" invpcid");
+		  if (features1 & (1 << 11))
+		    print (" rtm");
+		  if (features1 & (1 << 14))
+		    print (" mpx");
+		  if (features1 & (1 << 16))
+		    print (" avx512f");
+		  if (features1 & (1 << 18))
+		    print (" rdseed");
+		  if (features1 & (1 << 19))
+		    print (" adx");
+		  if (features1 & (1 << 20))
+		    print (" smap");
+		  if (features1 & (1 << 23))
+		    print (" clflushopt");
+		  if (features1 & (1 << 26))
+		    print (" avx512pf");
+		  if (features1 & (1 << 27))
+		    print (" avx512er");
+		  if (features1 & (1 << 28))
+		    print (" avx512cd");
 		}
 
 	      print ("\n");
@@ -1024,7 +1111,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 	      if (maxe >= 0x80000008) /* Address size. */
 		{
-		  unsigned addr_size, phys, virt;
+		  uint32_t addr_size, phys, virt;
 		  cpuid (&addr_size, &unused, &unused, &unused, 0x80000008);
 
 		  phys = addr_size & 0xff;
@@ -1040,24 +1127,24 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 	      if (maxe >= 0x80000007) /* Advanced power management. */
 		{
-		  cpuid (&unused, &unused, &unused, &features2, 0x80000007);
+		  cpuid (&unused, &unused, &unused, &features1, 0x80000007);
 
 		  print ("power management:");
-		  if (features2 & (1 << 0))
+		  if (features1 & (1 << 0))
 		    print (" ts");
-		  if (features2 & (1 << 1))
+		  if (features1 & (1 << 1))
 		    print (" fid");
-		  if (features2 & (1 << 2))
+		  if (features1 & (1 << 2))
 		    print (" vid");
-		  if (features2 & (1 << 3))
+		  if (features1 & (1 << 3))
 		    print (" ttp");
-		  if (features2 & (1 << 4))
+		  if (features1 & (1 << 4))
 		    print (" tm");
-		  if (features2 & (1 << 5))
+		  if (features1 & (1 << 5))
 		    print (" stc");
-		  if (features2 & (1 << 6))
+		  if (features1 & (1 << 6))
 		    print (" 100mhzsteps");
-		  if (features2 & (1 << 7))
+		  if (features1 & (1 << 7))
 		    print (" hwpstate");
 		}
 	    }

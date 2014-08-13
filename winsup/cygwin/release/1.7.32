@@ -1,0 +1,23 @@
+What's new:
+-----------
+
+- Export __cxa_atexit and __cxa_finalize to allow C++ standards-compliant
+  destructor handling in libstdc++ and g++ compiled code.
+
+  Please note that, in order to benefit from this new feature, C++ code
+  must be recompiled with the upcoming gcc 4.8.3-3 release which will
+  enable the -fuse-cxa-atexit flag by default, and that C++ applications
+  using this feature will not run on older Cygwin releases.
+
+- Support more recent CPU flags in /proc/cpuinfo.
+
+
+Bug Fixes
+---------
+
+- Decorate attribute names with __, for namespace safety in various header
+  files.
+  Addresses: https://cygwin.com/ml/cygwin/2014-07/msg00371.html
+
+- Fix sys/file.h for using in C++ code.
+  Addresses: https://cygwin.com/ml/cygwin/2014-08/msg00122.html

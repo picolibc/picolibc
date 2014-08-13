@@ -1,7 +1,7 @@
 /* sys/strace.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2008,
-   2010, 2011, 2012 Red Hat, Inc.
+   2010, 2011, 2012, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -40,17 +40,17 @@ class strace
   void write (unsigned category, const char *buf, int count);
   unsigned char _active;
 public:
-  void activate (bool) __attribute__ ((regparm (2)));;
+  void activate (bool) __attribute__ ((__regparm__ (2)));;
   strace () {}
   int microseconds ();
   int version;
   int lmicrosec;
   bool execing;
-  void dll_info () __attribute__ ((regparm (1)));
-  void prntf (unsigned, const char *func, const char *, ...) /*__attribute__ ((regparm(3)))*/;
-  void vprntf (unsigned, const char *func, const char *, va_list ap) /*__attribute__ ((regparm(3)))*/;
-  void wm (int message, int word, int lon) __attribute__ ((regparm(3)));
-  void write_childpid (pid_t) __attribute__ ((regparm (3)));
+  void dll_info () __attribute__ ((__regparm__ (1)));
+  void prntf (unsigned, const char *func, const char *, ...) /*__attribute__ ((__regparm__(3)))*/;
+  void vprntf (unsigned, const char *func, const char *, va_list ap) /*__attribute__ ((__regparm__(3)))*/;
+  void wm (int message, int word, int lon) __attribute__ ((__regparm__(3)));
+  void write_childpid (pid_t) __attribute__ ((__regparm__ (3)));
   bool attached () const {return _active == 3;}
   bool active () const {return _active & 1;}
   unsigned char& active_val () {return _active;}

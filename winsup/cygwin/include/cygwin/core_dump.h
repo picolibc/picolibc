@@ -1,6 +1,6 @@
 /* core_dump.h
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2014 Red Hat, Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -27,7 +27,7 @@ struct win32_core_process_info
   char command_line[1];
 }
 #ifdef __GNUC__
-  __attribute__ ((packed))
+  __attribute__ ((__packed__))
 #endif
 ;
 
@@ -38,7 +38,7 @@ struct win32_core_thread_info
   CONTEXT thread_context;
 }
 #ifdef __GNUC__
-  __attribute__ ((packed))
+  __attribute__ ((__packed__))
 #endif
 ;
 
@@ -49,7 +49,7 @@ struct win32_core_module_info
   char module_name[1];
 }
 #ifdef __GNUC__
-  __attribute__ ((packed))
+  __attribute__ ((__packed__))
 #endif
 ;
 
@@ -64,7 +64,7 @@ struct win32_pstatus
     } data ;
 }
 #ifdef __GNUC__
-  __attribute__ ((packed))
+  __attribute__ ((__packed__))
 #endif
 ;
 

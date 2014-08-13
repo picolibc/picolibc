@@ -26,21 +26,21 @@ extern "C" {
 /* DEPRECATED INTERFACES.  These are restricted to MAX_PATH length.
    Don't use in modern applications.  They don't exist on x86_64. */
 extern int cygwin_win32_to_posix_path_list (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_win32_to_posix_path_list_buf_size (const char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_posix_to_win32_path_list (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_posix_to_win32_path_list_buf_size (const char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_conv_to_win32_path (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_conv_to_full_win32_path (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_conv_to_posix_path (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 extern int cygwin_conv_to_full_posix_path (const char *, char *)
-  __attribute__ ((deprecated));
+  __attribute__ ((__deprecated__));
 #endif /* !__x86_64__ */
 
 /* Use these interfaces in favor of the above. */
@@ -149,7 +149,8 @@ typedef enum
     CW_ENDENT,
     CW_GETNSSSEP,
     CW_GETPWSID,
-    CW_GETGRSID
+    CW_GETGRSID,
+    CW_CYGNAME_FROM_WINNAME
   } cygwin_getinfo_types;
 
 #define CW_LOCK_PINFO CW_LOCK_PINFO
@@ -206,12 +207,13 @@ typedef enum
 #define CW_GETNSSSEP CW_GETNSSSEP
 #define CW_GETPWSID CW_GETPWSID
 #define CW_GETGRSID CW_GETGRSID
+#define CW_CYGNAME_FROM_WINNAME CW_CYGNAME_FROM_WINNAME
 
 /* Token type for CW_SET_EXTERNAL_TOKEN */
 enum
 {
-CW_TOKEN_IMPERSONATION = 0,
-CW_TOKEN_RESTRICTED    = 1
+  CW_TOKEN_IMPERSONATION = 0,
+  CW_TOKEN_RESTRICTED    = 1
 };
 
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */

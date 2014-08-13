@@ -76,7 +76,7 @@ int pthread_attr_getschedpolicy (const pthread_attr_t *, int *);
 int pthread_attr_getscope (const pthread_attr_t *, int *);
 int pthread_attr_getstack (const pthread_attr_t *, void **, size_t *);
 int pthread_attr_getstackaddr (const pthread_attr_t *, void **)
-    __attribute__ ((deprecated));
+    __attribute__ ((__deprecated__));
 int pthread_attr_init (pthread_attr_t *);
 int pthread_attr_setdetachstate (pthread_attr_t *, int);
 int pthread_attr_setguardsize (pthread_attr_t *, size_t);
@@ -88,7 +88,7 @@ int pthread_attr_setscope (pthread_attr_t *, int);
 #ifdef _POSIX_THREAD_ATTR_STACKADDR
 int pthread_attr_setstack (pthread_attr_t *, void *, size_t);
 int pthread_attr_setstackaddr (pthread_attr_t *, void *)
-    __attribute__ ((deprecated));
+    __attribute__ ((__deprecated__));
 #endif
 
 #ifdef _POSIX_THREAD_ATTR_STACKSIZE
@@ -137,7 +137,7 @@ int pthread_create (pthread_t *, const pthread_attr_t *,
 		    void *(*)(void *), void *);
 int pthread_detach (pthread_t);
 int pthread_equal (pthread_t, pthread_t);
-void pthread_exit (void *) __attribute__ ((noreturn));
+void pthread_exit (void *) __attribute__ ((__noreturn__));
 int pthread_getcpuclockid (pthread_t, clockid_t *);
 int pthread_getschedparam (pthread_t, int *, struct sched_param *);
 void *pthread_getspecific (pthread_key_t);
