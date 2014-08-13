@@ -1,3 +1,7 @@
+2014-08-07  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* Makefile.common (COMPILE.cc): Add -fno-use-cxa-atexit.
+
 2014-02-18  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* Makefile.in: Ignore errors on doc install.
