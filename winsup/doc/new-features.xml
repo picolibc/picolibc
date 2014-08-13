@@ -4,6 +4,28 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin 1.7</title>
 
+<sect2 id="ov-new1.7.32"><title>What's new and what changed in 1.7.32</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Export __cxa_atexit and __cxa_finalize to allow C++ standards-compliant
+destructor handling in libstdc++ and g++ compiled code.
+
+Please note that, in order to benefit from this new feature, C++ code
+must be recompiled with the upcoming gcc 4.8.3-3 release which will
+enable the -fuse-cxa-atexit flag by default, and that C++ applications
+using this feature will not run on older Cygwin releases.
+</para></listitem>
+
+<listitem><para>
+Support more recent CPU flags in /proc/cpuinfo.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.31"><title>What's new and what changed from 1.7.30 to 1.7.31</title>
 
 <itemizedlist mark="bullet">
