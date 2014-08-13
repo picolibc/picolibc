@@ -1,0 +1,15 @@
+What's new:
+-----------
+
+- Introduce reading passwd/group entries directly from SAM/AD, thus allowing
+  to do without /etc/passwd and /etc/group files.  Introduce /etc/nsswitch.conf
+  file to configure passwd/group handling.
+
+
+What changed:
+-------------
+
+
+Bug Fixes
+---------
+

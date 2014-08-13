@@ -1,3 +1,8 @@
+2014-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 33.
+	(CYGWIN_VERSION_API_MINOR): Bump to reflect intermediate 1.7.32 release.
+
 2014-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cpuid.h: Add missing copyright header.  Fix formatting.  Use uint32_t

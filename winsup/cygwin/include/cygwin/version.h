@@ -43,7 +43,7 @@ details. */
 	 changes to the DLL and is mainly informative in nature. */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1007
-#define CYGWIN_VERSION_DLL_MINOR 32
+#define CYGWIN_VERSION_DLL_MINOR 33
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -446,16 +446,17 @@ details. */
            as number of partitions on tape.
       271: Export posix_spawn, posix_spawnp, and helper functions.
       272: Export tm_gmtoff and tm_zone members.
-      273: Introduce account mapping from Windows account DBs.  Add CW_SETENT,
+      273: Skipped.
+      274: Export __cxa_atexit and __cxa_finalize.
+      275: Introduce account mapping from Windows account DBs.  Add CW_SETENT,
 	   CW_GETENT, CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID, CW_GETGRSID,
 	   CW_CYGNAME_FROM_WINNAME.
-      274: Export __cxa_atexit and __cxa_finalize.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 274
+#define CYGWIN_VERSION_API_MINOR 275
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
