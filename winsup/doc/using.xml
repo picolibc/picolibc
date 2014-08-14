@@ -16,6 +16,6 @@ knowledge of standard UNIX commands.</para>
 	<xi:include href="cygwinenv.xml"/>
 	<xi:include href="ntsec.xml"/>
 	<xi:include href="cygserver.xml"/>
-	<xi:include href="../utils/utils.xml"/>
+	<xi:include href="utils.xml"/>
 	<xi:include href="effectively.xml"/>
 </chapter>

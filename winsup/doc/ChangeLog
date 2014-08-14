@@ -1,3 +1,23 @@
+2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Throughout use parenthesis instead of braces where
+	appropriate.
+	(DBXDIRS): Remove.
+	(XSLTPROC): Define for symmetry.  Use throughout.
+	(clean): Drop removing cygwin-api.xml and doctool.*.
+	(cygwin-api.xml): Drop rule.
+	(doctool): Drop rule.
+	(Makefile.dep): Add dependency to cygwin-api.xml.
+	* cygwin-api.in.xml: Rename to cygwin-api.xml.  Convert includes to
+	XML XInclude style.
+	* doctool.c: Remove.
+	* doctool.txt: Remove.
+	* faq-programming.xml: Drop reference to local utils.xml file.
+	* path.xml: Moved from ../cygwin and converted to XML.
+	* posix.xml: Ditto.
+	* using.xml: Drop relative path from utils.xml include.
+	* utils.xml: Moved from ../utils.
+
 2014-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml: (ov-new1.7.33): Add new section.

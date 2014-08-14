@@ -937,8 +937,7 @@ info would not be compatible with gdb).
 
 <para>Yes.  You can use the <literal>strace.exe</literal> utility to run other cygwin
 programs with various debug and trace messages enabled.  For information
-on using <literal>strace</literal>, see the Cygwin User's Guide or the file
-<literal>winsup/utils/utils.sgml</literal> in the Cygwin sources.
+on using <literal>strace</literal>, see the Cygwin User's Guide.
 </para>
 </answer></qandaentry>
 

@@ -12,16 +12,15 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-DBXDIRS =  -d $(srcdir) -d $(srcdir)/../utils -d $(srcdir)/../cygwin
-
 CC:=@CC@
 CC_FOR_TARGET:=@CC@
 
+XSLTPROC:=xsltproc --xinclude
 XMLTO:=xmlto --skip-validation --with-dblatex
 
 include $(srcdir)/../Makefile.common
 
-FAQ_SOURCES:= $(wildcard ${srcdir}/faq*.xml)
+FAQ_SOURCES:= $(wildcard $(srcdir)/faq*.xml)
 
 .SUFFIXES: .html .body
 
@@ -36,45 +35,37 @@ all: Makefile Makefile.dep \
 	cygwin-ug-net/cygwin-ug-net.pdf \
 	cygwin-api/cygwin-api.pdf
 
-Makefile: ${srcdir}/Makefile.in
+Makefile: $(srcdir)/Makefile.in
 	/bin/sh ./config.status
 
 clean:
 	rm -f Makefile.dep
-	rm -f doctool.exe doctool.o
-	rm -f cygwin-api.xml
 	rm -f *.html *.html.gz
 	rm -Rf cygwin-api cygwin-ug cygwin-ug-net faq
 
 install: all
 
 cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : cygwin-ug-net.xml
-	-${XMLTO} html-nochunks -m $(srcdir)/cygwin.xsl $<
+	-$(XMLTO) html-nochunks -m $(srcdir)/cygwin.xsl $<
 	-cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
 	-rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
 	-gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
 cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.xml cygwin.xsl
-	-${XMLTO} html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
+	-$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
 
 cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.xml fo.xsl
-	-xsltproc --xinclude $(srcdir)/fo.xsl $< | fop -q -fo - $@
+	-$(XSLTPROC) $(srcdir)/fo.xsl $< | fop -q -fo - $@
 
 cygwin-api/cygwin-api.html : cygwin-api.xml cygwin.xsl
-	-${XMLTO} html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
+	-$(XMLTO) html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
 
 cygwin-api/cygwin-api.pdf : cygwin-api.xml fo.xsl
-	-xsltproc --xinclude $(srcdir)/fo.xsl $< | fop -q -fo - $@
-
-cygwin-api.xml : cygwin-api.in.xml doctool Makefile.in
-	-./doctool -m $(DBXDIRS) -s $(srcdir) -o $@ $<
+	-$(XSLTPROC) $(srcdir)/fo.xsl $< | fop -q -fo - $@
 
 faq/faq.html : $(FAQ_SOURCES)
-	-${XMLTO} html -o faq -m $(srcdir)/cygwin.xsl $(srcdir)/faq.xml
+	-$(XMLTO) html -o faq -m $(srcdir)/cygwin.xsl $(srcdir)/faq.xml
 	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq.html
-
-doctool : doctool.c
-	gcc -g $< -o $@
 
 TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
 	  cygwin-ug-net.pdf cygwin-ug-net.xml \
@@ -87,7 +78,7 @@ tarball : cygwin-docs.tar.bz2
 cygwin-docs.tar.bz2 : $(TBFILES) $(TBDEPS)
 	find $(TBFILES) $(TBDIRS) \! -type d | sort | tar -T - -cf -  | bzip2 > cygwin-docs.tar.bz2
 
-Makefile.dep: cygwin-ug-net.xml
+Makefile.dep: cygwin-ug-net.xml cygwin-api.xml
 	cd $(srcdir) && ./xidepend $^ > "${CURDIR}/$@"
 
 -include Makefile.dep
