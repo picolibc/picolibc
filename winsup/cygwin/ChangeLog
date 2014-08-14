@@ -1,4 +1,9 @@
-2014-08-13  Corinna Vinschen  <corinna@vinschen.de>
+2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.sgml: Move to ../doc dir and rename to path.xml.
+	* posix.sgml: Move to ../doc dir and rename to posix.xml.
+
+2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dlmalloc.c: Remove unused file.
 	* dlmalloc.h: Ditto.
