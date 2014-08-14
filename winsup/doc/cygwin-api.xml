@@ -19,6 +19,7 @@
 
     <xi:include href="path.xml"/>
     <xi:include href="logon-funcs.xml"/>
+    <xi:include href="misc-funcs.xml"/>
 
   </chapter>
 

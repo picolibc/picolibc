@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+    "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="func-cygwin-misc">
+<title>Miscellaneous functions</title>
+
+<sect2 id="func-cygwin-attach-handle-to-fd">
+<title>cygwin_attach_handle_to_fd</title>
+
+<funcsynopsis><funcprototype>
+<funcdef>extern "C" int
+<function>cygwin_attach_handle_to_fd</function></funcdef>
+<paramdef>char *<parameter>name</parameter></paramdef>
+<paramdef>int <parameter>fd</parameter></paramdef>
+<paramdef>HANDLE <parameter>handle</parameter></paramdef>
+<paramdef>int <parameter>bin</parameter></paramdef>
+<paramdef>int <parameter>access</parameter></paramdef>
+</funcprototype></funcsynopsis>
+
+<para>This function can be used to turn a Win32 "handle" into a
+posix-style file handle. <parameter>fd</parameter> may be -1 to
+make cygwin allocate a handle; the actual handle is returned
+in all cases.</para>
+
+<para>Even after using function, Cygwin doesn't know anything about the
+underlying file or device.  It just tries to supply the typical file
+functions on a "best-effort" basis.  Use with care.  Don't expect too
+much.</para>
+
+</sect2>
+
+<sect2 id="func-cygwin-internal">
+<title>cygwin_internal</title>
+
+<funcsynopsis><funcprototype>
+<funcdef>extern "C" DWORD
+<function>cygwin_internal</function></funcdef>
+<paramdef>cygwin_getinfo_types <parameter>t</parameter></paramdef>
+<paramdef><parameter>...</parameter></paramdef>
+</funcprototype></funcsynopsis>
+
+<para>This function gives you access to various internal data and functions.
+It takes two arguments.  The first argument is a type from the 'cygwin_getinfo_types'
+enum.  The second is an optional pointer.</para>
+<para>Stay away unless you know what you're doing.</para>
+
+</sect2>
+
+<sect2 id="func-cygwin-stackdump">
+<title>cygwin_stackdump</title>
+
+<funcsynopsis><funcprototype>
+<funcdef>extern "C" void
+<function>cygwin_stackdump</function></funcdef>
+<void />
+</funcprototype></funcsynopsis>
+
+<para> Outputs a stackdump to stderr from the called location.
+</para>
+
+</sect2>
+
+</sect1>

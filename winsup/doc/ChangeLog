@@ -1,5 +1,10 @@
 2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin-api.xml: Include misc-funcs.xml.
+	* misc-funcs.xml: New file.
+
+2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin-api.xml: Move chapter tags from path.xml back here.
 	Include logon-funcs.xml.
 	* logon-funcs.xml: Moved from ../cygwin here and converted to XML.
