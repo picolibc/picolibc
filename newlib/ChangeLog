@@ -1,3 +1,7 @@
+2014-08-14  Bin Cheng  <bin.cheng@arm.com>
+
+	* libc/stdio/findfp.c (std): Don't inline when optimizing for code size.
+
 2014-08-04  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* libc/include/math.h: Also define M_PI etc. if _XOPEN_SOURCE is

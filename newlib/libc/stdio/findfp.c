@@ -35,7 +35,11 @@ const struct __sFILE_fake __sf_fake_stderr =
     {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
 #endif
 
+#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
+_NOINLINE_STATIC _VOID
+#else
 static _VOID
+#endif
 _DEFUN(std, (ptr, flags, file, data),
             FILE *ptr _AND
             int flags _AND
