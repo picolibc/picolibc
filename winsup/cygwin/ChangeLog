@@ -1,5 +1,11 @@
 2014-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dlmalloc.c: Remove unused file.
+	* dlmalloc.h: Ditto.
+	* malloc.cc: Update to Doug Lea's malloc version 2.8.6.
+
+2014-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 33.
 	(CYGWIN_VERSION_API_MINOR): Bump to reflect intermediate 1.7.32 release.
 
