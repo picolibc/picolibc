@@ -1,5 +1,9 @@
 2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.sgml: Move to ../doc dir and rename to logon-funcs.xml.
+
+2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.sgml: Move to ../doc dir and rename to path.xml.
 	* posix.sgml: Move to ../doc dir and rename to posix.xml.
 
