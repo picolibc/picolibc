@@ -1,5 +1,12 @@
 2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dll_init.sgml: Remove.
+	* dtable.sgml: Move into ../doc/misc-funcs.xml.
+	* external.sgml: Ditto.
+	* stackdump.sgml: Ditto.
+
+2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.sgml: Move to ../doc dir and rename to logon-funcs.xml.
 
 2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
