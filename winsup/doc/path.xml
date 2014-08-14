@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding='UTF-8'?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
     "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 
-<chapter id="cygwin-functions" xmlns:xi="http://www.w3.org/2001/XInclude">
-<title>Cygwin Functions</title>
+<sect1 id="func-cygwin-path">
+<title>Path conversion functions</title>
 
 <para>These functions are specific to Cygwin itself, and probably
 won't be found anywhere else.  </para>
 
-<sect1 id="func-cygwin-conv-path">
+<sect2 id="func-cygwin-conv-path">
 <title>cygwin_conv_path</title>
 
 <funcsynopsis><funcprototype>
@@ -84,9 +84,9 @@ else
 </programlisting>
 </example>
 
-</sect1>
+</sect2>
 
-<sect1 id="func-cygwin-conv-path-list">
+<sect2 id="func-cygwin-conv-path-list">
 <title>cygwin_conv_path_list</title>
 
 <funcsynopsis><funcprototype>
@@ -111,9 +111,9 @@ convert it to the equivalent POSIX $PATH-style string (i.e. /foo:/bar).</para>
 
 <para>See also <link linkend="func-cygwin-conv-path">cygwin_conv_path</link></para>
 
-</sect1>
+</sect2>
 
-<sect1 id="func-cygwin-create-path">
+<sect2 id="func-cygwin-create-path">
 <title>cygwin_create_path</title>
 
 <funcsynopsis><funcprototype>
@@ -140,9 +140,9 @@ errno can be set to the below value.</para>
 
 <para>See also <link linkend="func-cygwin-conv-path">cygwin_conv_path</link></para>
 
-</sect1>
+</sect2>
 
-<sect1 id="func-cygwin-posix-path-list-p">
+<sect2 id="func-cygwin-posix-path-list-p">
 <title>cygwin_posix_path_list_p</title>
 
 <funcsynopsis><funcprototype>
@@ -159,9 +159,9 @@ true if the path is a POSIX path.  Note that "_p" means "predicate", a
 lisp term meaning that the function tells you something about the
 parameter.</para>
 
-</sect1>
+</sect2>
 
-<sect1 id="func-cygwin-split-path">
+<sect2 id="func-cygwin-split-path">
 <title>cygwin_split_path</title>
 
 <funcsynopsis><funcprototype>
@@ -185,6 +185,6 @@ cygwin_split_path("c:/foo/bar.c", dir, file);
 printf("dir=%s, file=%s\n", dir, file);
 </programlisting>
 </example>
-</sect1>
+</sect2>
 
-</chapter>
+</sect1>

@@ -13,6 +13,13 @@
   <toc></toc>
 
   <xi:include href="posix.xml"/>
-  <xi:include href="path.xml"/>
+
+  <chapter id="cygwin-functions" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <title>Cygwin Functions</title>
+
+    <xi:include href="path.xml"/>
+    <xi:include href="logon-funcs.xml"/>
+
+  </chapter>
 
 </book>

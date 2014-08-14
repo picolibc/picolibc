@@ -1,5 +1,12 @@
 2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin-api.xml: Move chapter tags from path.xml back here.
+	Include logon-funcs.xml.
+	* logon-funcs.xml: Moved from ../cygwin here and converted to XML.
+	* path.xml: Drop chapter tags.  Create subsections.
+
+2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in: Throughout use parenthesis instead of braces where
 	appropriate.
 	(DBXDIRS): Remove.
