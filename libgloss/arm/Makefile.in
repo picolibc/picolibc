@@ -52,8 +52,11 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 
 @BUILD_CRT0_TRUE@CRT0		= crt0.o
 @BUILD_CRT0_TRUE@CRT0_INSTALL	= install-crt0
-@BUILD_CRT0_FALSE@CRT0		= 
-@BUILD_CRT0_FALSE@CRT0_INSTALL	= 
+@BUILD_CRT0_FALSE@CRT0		=
+@BUILD_CRT0_FALSE@CRT0_INSTALL	=
+
+NANO_SCRIPTS=nano.specs
+NANO_INSTALL=install-nano
 
 LINUX_CRT0    = linux-crt0.o
 LINUX_BSP     = libgloss-linux.a
@@ -172,7 +175,7 @@ distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~
 
 .PHONY: install info install-info clean-info
-install: ${CRT0_INSTALL} ${LINUX_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL}
+install: ${CRT0_INSTALL} ${LINUX_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL} ${NANO_INSTALL}
 	@rootpre=`pwd`/; export rootpre; \
 	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
 	for dir in .. ${SUBDIRS}; do \
@@ -182,6 +185,9 @@ install: ${CRT0_INSTALL} ${LINUX_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} $
 	    else true; fi; \
 	  else true; fi; \
 	done
+
+install-nano:
+	set -e; for x in ${NANO_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-crt0:
 	${INSTALL_DATA} ${CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x

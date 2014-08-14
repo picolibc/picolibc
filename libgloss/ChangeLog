@@ -1,3 +1,10 @@
+2014-08-14  Bin Cheng  <bin.cheng@arm.com>
+
+	* arm/elf-nano.specs: New file.
+	* arm/elf-rdimon.specs: Support nano.specs.
+	* arm/Makefile.in: Support nano.specs.
+	* libnosys/nosys.specs: Support nano.specs.
+
 2014-07-27  Anthony Green  <green@moxielogic.com>
 
 	* moxie/Makefile.in (LD_SCRIPTS): Add moxiebox.ld
