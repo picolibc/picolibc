@@ -1,3 +1,8 @@
+2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.ac: Convert to new AC_INIT style.
+	* configure: Regenerate.
+
 2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.cc (ipcexit_creat_hookthread): Delete shs in another error

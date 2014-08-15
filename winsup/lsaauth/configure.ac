@@ -1,22 +1,21 @@
-dnl Copyright (c) 2006, Red Hat, Inc.
+dnl Autoconf configure script for Cygwin utilities.
+dnl Copyright 2006, 2008, 2012, 2013, 2014 Red Hat, Inc.
 dnl
-dnl     This program is free software; you can redistribute it and/or modify
-dnl     it under the terms of the GNU General Public License as published by
-dnl     the Free Software Foundation; either version 2 of the License, or
-dnl     (at your option) any later version.
-dnl
-dnl     A copy of the GNU General Public License can be found at
-dnl     http://www.gnu.org/
+dnl This file is part of Cygwin.
+dnl 
+dnl This software is a copyrighted work licensed under the terms of the
+dnl Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+dnl details.
 dnl
 dnl Written by Christopher Faylor <cgf@redhat.com>
 dnl Changed for lsa subdir by Corinna Vinschen <corinna@vinschen.de>
 
-dnl Autoconf configure script for Cygwin utilities.
-dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(Makefile.in)
+AC_INIT([Cygwin Lsaauth], 0,
+	cygwin@cygwin.com, cygwin, https://cygwin.com)
+AC_CONFIG_SRCDIR(Makefile.in)
 
 AC_CONFIG_AUX_DIR(../..)
 

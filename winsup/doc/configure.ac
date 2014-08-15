@@ -1,5 +1,5 @@
-dnl Autoconf configure script for winsup/regexp
-dnl Copyright 1997,1998,1999,2000,2001 Red Hat, Inc.
+dnl Autoconf configure script for winsup/doc
+dnl Copyright 1997, 1998, 1999, 2000, 2001, 2006, 2012, 2013, 2014 Red Hat, Inc.
 dnl
 dnl This file is part of Cygwin.
 dnl 
@@ -9,8 +9,10 @@ dnl details.
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
-AC_INIT(cygwin-api.in.xml)
+AC_PREREQ([2.59])
+AC_INIT([Cygwin Documentation], 0,
+	cygwin@cygwin.com, cygwin, https://cygwin.com)
+AC_CONFIG_SRCDIR(cygwin-api.xml)
 AC_CONFIG_AUX_DIR(../..)
 
 AC_NO_EXECUTABLES

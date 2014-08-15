@@ -1,3 +1,8 @@
+2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.ac: Convert to new AC_INIT style.
+	* configure: Regenerate.
+
 2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin-api.xml: Include misc-funcs.xml.

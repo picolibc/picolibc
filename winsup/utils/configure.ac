@@ -1,5 +1,6 @@
 dnl Autoconf configure script for Cygwin utilities.
-dnl Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+dnl Copyright 1996, 1997, 1998, 1999, 2000, 2002, 2003, 2006, 2008, 2012, 2013,
+dnl 2014 Red Hat, Inc.
 dnl
 dnl This file is part of Cygwin.
 dnl
@@ -10,7 +11,9 @@ dnl details.
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(mount.cc)
+AC_INIT([Cygwin Utils], 0,
+	cygwin@cygwin.com, cygwin, https://cygwin.com)
+AC_CONFIG_SRCDIR(mount.cc)
 AC_CONFIG_AUX_DIR(../..)
 
 AC_NO_EXECUTABLES

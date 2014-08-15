@@ -1,3 +1,8 @@
+2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.ac: Convert to new AC_INIT style.
+	* configure: Regenerate.
+
 2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
 
 	* configure.ac: Rename from configure.in.
