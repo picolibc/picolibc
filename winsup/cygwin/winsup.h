@@ -26,6 +26,11 @@ details. */
 
 #define _NO_W32_PSEUDO_MODIFIERS
 
+/* Newlib's guarding functions more diligently based on their origin, starting
+   since 2013.  To be sure to get everything and the kitchen sink, we have to
+   define _GNU_SOURCE. */
+#define _GNU_SOURCE 1
+
 #include <sys/types.h>
 #include <sys/strace.h>
 

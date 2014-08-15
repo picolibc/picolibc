@@ -1,5 +1,11 @@
 2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* winsup.h (_GNU_SOURCE): Define.  Explain why.
+	* configure.ac: Convert to new AC_INIT style.
+	* configure: Regenerate.
+
+2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygerrno.h (seterrno): Define as (always) inline function.
 	* errno.cc (seterrno): Remove.
 

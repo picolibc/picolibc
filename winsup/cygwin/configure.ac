@@ -1,5 +1,19 @@
+dnl Autoconf configure script for Cygwin.
+dnl Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005,
+dnl 2006, 2008, 2009, 2011, 2012, 2013, 2014 Red Hat, Inc.
+dnl
+dnl This file is part of Cygwin.
+dnl
+dnl This software is a copyrighted work licensed under the terms of the
+dnl Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+dnl details.
+dnl
+dnl Process this file with autoconf to produce a configure script.
+
 AC_PREREQ(2.59)dnl
-AC_INIT(Makefile.in)
+AC_INIT([Cygwin DLL], 0,
+	cygwin@cygwin.com, cygwin, https://cygwin.com)
+AC_CONFIG_SRCDIR(Makefile.in)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(..)
 
