@@ -1,7 +1,7 @@
 /* errno.cc: errno-related functions
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -361,13 +361,6 @@ seterrno_from_nt_status (const char *file, int line, NTSTATUS status)
   syscall_printf ("%s:%d status %y -> windows error %u",
 		  file, line, status, code);
   errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
-}
-
-/* seterrno: Set `errno' based on GetLastError (). */
-void __reg2
-seterrno (const char *file, int line)
-{
-  seterrno_from_win_error (file, line, GetLastError ());
 }
 
 static char *

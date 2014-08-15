@@ -1,3 +1,8 @@
+2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygerrno.h (seterrno): Define as (always) inline function.
+	* errno.cc (seterrno): Remove.
+
 2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dll_init.sgml: Remove.

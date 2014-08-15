@@ -1,7 +1,7 @@
 /* cygerrno.h: main Cygwin header file.
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2009, 2010, 2011, 2012, 2013
-   Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2009, 2010, 2011, 2012, 2013,
+   2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -16,9 +16,14 @@ details. */
 
 void __reg3 seterrno_from_win_error (const char *file, int line, DWORD code);
 void __reg3 seterrno_from_nt_status (const char *file, int line, NTSTATUS status);
-void __reg2 seterrno (const char *, int line);
 int __reg2 geterrno_from_win_error (DWORD code = GetLastError (), int deferrno = 13 /*EACCESS*/);
 int __reg2 geterrno_from_nt_status (NTSTATUS status, int deferrno = 13 /*EACCESS*/);
+
+inline void __attribute__ ((always_inline))
+seterrno (const char *file, int line)
+{
+  seterrno_from_win_error (file, line, GetLastError ());
+}
 
 #define __seterrno() seterrno (__FILE__, __LINE__)
 #define __seterrno_from_win_error(val) seterrno_from_win_error (__FILE__, __LINE__, val)
