@@ -71,9 +71,12 @@ typedef struct {
 
 /*  3.3.8 Synchronously Accept a Signal, P1003.1b-1993, p. 76 */
 
-#define SA_NOCLDSTOP 1   /* Do not generate SIGCHLD when children stop */
-#define SA_SIGINFO   2   /* Invoke the signal catching function with */
-                         /*   three arguments instead of one. */
+#define SA_NOCLDSTOP 0x1   /* Do not generate SIGCHLD when children stop */
+#define SA_SIGINFO   0x2   /* Invoke the signal catching function with */
+                           /*   three arguments instead of one. */
+#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
+#define SA_ONSTACK   0x4   /* Signal delivery will be on a separate stack. */
+#endif
 
 /* struct sigaction notes from POSIX:
  *
@@ -102,6 +105,34 @@ struct sigaction {
 #define sa_handler    _signal_handlers._handler
 #if defined(_POSIX_REALTIME_SIGNALS)
 #define sa_sigaction  _signal_handlers._sigaction
+#endif
+
+#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
+/*
+ * Minimum and default signal stack constants. Allow for target overrides
+ * from <sys/features.h>.
+ */
+#ifndef	MINSIGSTKSZ
+#define	MINSIGSTKSZ	2048
+#endif
+#ifndef	SIGSTKSZ
+#define	SIGSTKSZ	8192
+#endif
+
+/*
+ * Possible values for ss_flags in stack_t below.
+ */
+#define	SS_ONSTACK	0x1
+#define	SS_DISABLE	0x2
+
+/*
+ * Structure used in sigaltstack call.
+ */
+typedef struct sigaltstack {
+  void     *ss_sp;    /* Stack base or pointer.  */
+  int       ss_flags; /* Flags.  */
+  size_t    ss_size;  /* Stack size.  */
+} stack_t;
 #endif
 
 #elif defined(__CYGWIN__)
@@ -160,6 +191,11 @@ int _EXFUN(sigemptyset, (sigset_t *));
 int _EXFUN(sigpending, (sigset_t *));
 int _EXFUN(sigsuspend, (const sigset_t *));
 int _EXFUN(sigpause, (int));
+
+
+#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
+int _EXFUN(sigaltstack, (const stack_t *__restrict, stack_t *__restrict));
+#endif
 
 #if defined(_POSIX_THREADS)
 #ifdef __CYGWIN__
