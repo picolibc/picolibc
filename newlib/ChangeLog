@@ -1,5 +1,9 @@
 2014-08-18 Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* libc/include/string.h: Improve language and OS standard guards.
+
+2014-08-18 Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* libc/include/sys/signal.h: Add sigaltstack() support.
 
 2014-08-14  Bin Cheng  <bin.cheng@arm.com>

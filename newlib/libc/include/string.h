@@ -38,74 +38,107 @@ char 	*_EXFUN(strpbrk,(const char *, const char *));
 char 	*_EXFUN(strrchr,(const char *, int));
 size_t	 _EXFUN(strspn,(const char *, const char *));
 char 	*_EXFUN(strstr,(const char *, const char *));
-
 #ifndef _REENT_ONLY
 char 	*_EXFUN(strtok,(char *__restrict, const char *__restrict));
 #endif
-
 size_t	 _EXFUN(strxfrm,(char *__restrict, const char *__restrict, size_t));
 
-#ifndef __STRICT_ANSI__
+#if __POSIX_VISIBLE
 char 	*_EXFUN(strtok_r,(char *__restrict, const char *__restrict, char **__restrict));
-
+#endif
+#if __BSD_VISIBLE
 int	 _EXFUN(bcmp,(const void *, const void *, size_t));
 void	 _EXFUN(bcopy,(const void *, void *, size_t));
 void	 _EXFUN(bzero,(void *, size_t));
 int	 _EXFUN(ffs,(int));
 char 	*_EXFUN(index,(const char *, int));
+#endif
+#if __BSD_VISIBLE || __XSI_VISIBLE
 _PTR	 _EXFUN(memccpy,(_PTR __restrict, const _PTR __restrict, int, size_t));
+#endif
+#if __GNU_VISIBLE
 _PTR	 _EXFUN(mempcpy,(_PTR, const _PTR, size_t));
 _PTR	 _EXFUN(memmem, (const _PTR, size_t, const _PTR, size_t));
+#endif
 _PTR 	 _EXFUN(memrchr,(const _PTR, int, size_t));
+#if __GNU_VISIBLE
 _PTR 	 _EXFUN(rawmemchr,(const _PTR, int));
+#endif
+#if __BSD_VISIBLE
 char 	*_EXFUN(rindex,(const char *, int));
+#endif
 char 	*_EXFUN(stpcpy,(char *__restrict, const char *__restrict));
 char 	*_EXFUN(stpncpy,(char *__restrict, const char *__restrict, size_t));
+#if __BSD_VISIBLE
 int	 _EXFUN(strcasecmp,(const char *, const char *));
+#endif
+#if __GNU_VISIBLE
 char	*_EXFUN(strcasestr,(const char *, const char *));
 char 	*_EXFUN(strchrnul,(const char *, int));
 #endif
-#if !defined(__STRICT_ANSI__) || (_XOPEN_SOURCE - 0) >= 500
+#if __XSI_VISIBLE >= 500
 char 	*_EXFUN(strdup,(const char *));
 #endif
 #ifndef __STRICT_ANSI__
 char 	*_EXFUN(_strdup_r,(struct _reent *, const char *));
 #endif
-#if !defined(__STRICT_ANSI__) || (_XOPEN_SOURCE - 0) >= 700
+#if __XSI_VISIBLE >= 700
 char 	*_EXFUN(strndup,(const char *, size_t));
 #endif
+
 #ifndef __STRICT_ANSI__
 char 	*_EXFUN(_strndup_r,(struct _reent *, const char *, size_t));
+#endif
+
 /* There are two common strerror_r variants.  If you request
    _GNU_SOURCE, you get the GNU version; otherwise you get the POSIX
    version.  POSIX requires that #undef strerror_r will still let you
    invoke the underlying function, but that requires gcc support.  */
-#ifdef _GNU_SOURCE
-char    *_EXFUN(strerror_r,(int, char *, size_t));
+#if __GNU_VISIBLE
+char	*_EXFUN(strerror_r,(int, char *, size_t));
 #else
 # ifdef __GNUC__
-int      _EXFUN(strerror_r,(int, char *, size_t)) __asm__ (__ASMNAME ("__xpg_strerror_r"));
+int	_EXFUN(strerror_r,(int, char *, size_t))
+             __asm__ (__ASMNAME ("__xpg_strerror_r"));
 # else
-int      _EXFUN(__xpg_strerror_r,(int, char *, size_t));
+int	_EXFUN(__xpg_strerror_r,(int, char *, size_t));
 #  define strerror_r __xpg_strerror_r
 # endif
 #endif
-size_t	 _EXFUN(strlcat,(char *, const char *, size_t));
-size_t	 _EXFUN(strlcpy,(char *, const char *, size_t));
-int	 _EXFUN(strncasecmp,(const char *, const char *, size_t));
-size_t	 _EXFUN(strnlen,(const char *, size_t));
-char 	*_EXFUN(strsep,(char **, const char *));
-char	*_EXFUN(strlwr,(char *));
-char	*_EXFUN(strupr,(char *));
-#ifndef DEFS_H	/* Kludge to work around problem compiling in gdb */
-char  *_EXFUN(strsignal, (int __signo));
+
+/* Reentrant version of strerror.  */
+char *	_EXFUN(_strerror_r, (struct _reent *, int, int, int *));
+
+#if __BSD_VISIBLE
+size_t	_EXFUN(strlcat,(char *, const char *, size_t));
+size_t	_EXFUN(strlcpy,(char *, const char *, size_t));
 #endif
-#ifdef __CYGWIN__
-int     _EXFUN(strtosigno, (const char *__name));
+#if __BSD_VISIBLE || __POSIX_VISIBLE
+int	_EXFUN(strncasecmp,(const char *, const char *, size_t));
+#endif
+#if !defined(__STRICT_ANSI__) || __XSI_VISIBLE >= 500
+size_t	 _EXFUN(strnlen,(const char *, size_t));
+#endif
+#if __BSD_VISIBLE
+char 	*_EXFUN(strsep,(char **, const char *));
 #endif
 
-/* Recursive version of strerror.  */
-char *	_EXFUN(_strerror_r, (struct _reent *, int, int, int *));
+/*
+ * The origin of these is unknown to me so I am conditionalizing them
+ * on __STRICT_ANSI__. Finetuning this is definitely needed. --joel
+ */
+#if !defined(__STRICT_ANSI__)
+char	*_EXFUN(strlwr,(char *));
+char	*_EXFUN(strupr,(char *));
+#endif
+
+#ifndef DEFS_H	/* Kludge to work around problem compiling in gdb */
+char	*_EXFUN(strsignal, (int __signo));
+#endif
+
+#ifdef __CYGWIN__
+int	_EXFUN(strtosigno, (const char *__name));
+#endif
 
 #if defined _GNU_SOURCE && defined __GNUC__
 #define strdupa(__s) \
@@ -120,22 +153,6 @@ char *	_EXFUN(_strerror_r, (struct _reent *, int, int, int *));
 			 __out[__len-1] = '\0'; \
 			 (char *) memcpy (__out, __in, __len-1);}))
 #endif /* _GNU_SOURCE && __GNUC__ */
-
-/* These function names are used on Windows and perhaps other systems.  */
-#ifndef strcmpi
-#define strcmpi strcasecmp
-#endif
-#ifndef stricmp
-#define stricmp strcasecmp
-#endif
-#ifndef strncmpi
-#define strncmpi strncasecmp
-#endif
-#ifndef strnicmp
-#define strnicmp strncasecmp
-#endif
-
-#endif /* ! __STRICT_ANSI__ */
 
 #include <sys/string.h>
 
