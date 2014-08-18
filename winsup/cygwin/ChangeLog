@@ -1,3 +1,19 @@
+2014-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Mention that console
+	handles are kernel objects since Windows 8.
+	* fhandler.h (enum conn_state): Add "listener" state.
+	(class fhandler_socket): Drop listener status flag.
+	(fhandler_socket::lseek): Return -1 and errno ESPIPE.
+	(fhandler_serial::lseek): Ditto.
+	* fhandler_socket.cc (fhandler_socket::listen): Set connect_state to
+	listener.  Add comment.
+	(fhandler_socket::accept4): Explicitely check if the socket is listening
+	and fail with EINVAL, if not.  Explain why we have to do that.
+	(fhandler_socket::recv_internal): Explicitely check if the socket is
+	connected if it's a stream socket.  Explain why we have to do that.
+	(fhandler_socket::getpeereid): Drop now redundant test.
+
 2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.h (_GNU_SOURCE): Define.  Explain why.

@@ -53,7 +53,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 		ulen, vmin_, vtime_, io_status.hEvent);
   if (!overlapped_armed)
     {
-      SetCommMask (get_handle (), EV_RXCHAR);
+      SetCommMask (get_handle (), EV_RXCHAR| EV_ERR | EV_BREAK | EV_CTS | EV_DSR | EV_RING | EV_RLSD | EV_RXFLAG);
       ResetEvent (io_status.hEvent);
     }
 
