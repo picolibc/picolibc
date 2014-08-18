@@ -146,8 +146,8 @@ cygwin_strncasecmp (const char *cs, const char *ct, size_t n)
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
-extern "C" char * __stdcall
-cygwin_strlwr (char *string)
+extern "C" char *
+strlwr (char *string)
 {
   UNICODE_STRING us;
   size_t len = (strlen (string) + 1) * sizeof (WCHAR);
@@ -160,8 +160,8 @@ cygwin_strlwr (char *string)
   return string;
 }
 
-extern "C" char * __stdcall
-cygwin_strupr (char *string)
+extern "C" char *
+strupr (char *string)
 {
   UNICODE_STRING us;
   size_t len = (strlen (string) + 1) * sizeof (WCHAR);

@@ -1,5 +1,13 @@
 2014-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc (strlwr): Rename from cygwin_strlwr.  Drop __stdcall
+	decoration.
+	(strupr): Rename from cygwin_strupr.  Drop __stdcall decoration.
+	* string.h (strlwr): Remove override macro.  Simply declare.
+	(strupr): Ditto.
+
+2014-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::init_std_file_from_handle): Mention that console
 	handles are kernel objects since Windows 8.
 	* fhandler.h (enum conn_state): Add "listener" state.
