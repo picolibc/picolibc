@@ -75,6 +75,10 @@
 #define _POINTER_INT short
 #endif
 
+#if defined(__m68k__) || defined(__mc68000__)
+#define _READ_WRITE_RETURN_TYPE _ssize_t
+#endif
+
 #ifdef ___AM29K__
 #define _FLOAT_RET double
 #endif

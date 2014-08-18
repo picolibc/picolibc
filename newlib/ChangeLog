@@ -1,3 +1,8 @@
+2014-08-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/config.h[__m68k__]: Set _READ_WRITE_RETURN_TYPE
+	to _ssize_t to match underlying code in libgloss.
+
 2014-08-18 Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/include/string.h: Improve language and OS standard guards.
