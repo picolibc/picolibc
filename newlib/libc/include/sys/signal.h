@@ -192,9 +192,10 @@ int _EXFUN(sigpending, (sigset_t *));
 int _EXFUN(sigsuspend, (const sigset_t *));
 int _EXFUN(sigpause, (int));
 
-
+#ifdef __rtems__
 #if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
 int _EXFUN(sigaltstack, (const stack_t *__restrict, stack_t *__restrict));
+#endif
 #endif
 
 #if defined(_POSIX_THREADS)

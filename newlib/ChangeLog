@@ -1,3 +1,7 @@
+2014-08-18 Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/signal.h: Declare sigaltstack for RTEMS only.
+
 2014-08-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/config.h[__m68k__]: Set _READ_WRITE_RETURN_TYPE
