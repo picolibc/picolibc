@@ -1144,6 +1144,7 @@ class fhandler_serial: public fhandler_base
     return -1;
   }
   int tcflush (int);
+  bool is_tty () const { return true; }
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
 

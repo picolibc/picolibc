@@ -1,3 +1,7 @@
+2014-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_serial::is_tty): Reinstantiate.
+
 2014-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* miscfuncs.cc (strlwr): Rename from cygwin_strlwr.  Drop __stdcall
@@ -14,6 +18,7 @@
 	(class fhandler_socket): Drop listener status flag.
 	(fhandler_socket::lseek): Return -1 and errno ESPIPE.
 	(fhandler_serial::lseek): Ditto.
+	(fhandler_serial::is_tty): Remove.
 	* fhandler_socket.cc (fhandler_socket::listen): Set connect_state to
 	listener.  Add comment.
 	(fhandler_socket::accept4): Explicitely check if the socket is listening
