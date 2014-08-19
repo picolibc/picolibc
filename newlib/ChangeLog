@@ -1,3 +1,7 @@
+2014-08-19  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/machine/aarch64/memchr.S: Add check for zero-sized buffer.
+
 2014-08-18 Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/signal.h: Declare sigaltstack for RTEMS only.
