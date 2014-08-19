@@ -75,10 +75,11 @@ enum dirent_states
 enum conn_state
 {
   unconnected = 0,
-  connect_pending = 1,
-  connected = 2,
-  listener = 3,
-  connect_failed = 4
+  connect_credxchg = 1,
+  connect_pending = 2,
+  connected = 3,
+  listener = 4,
+  connect_failed = 5
 };
 
 enum line_edit_status
@@ -529,7 +530,7 @@ class fhandler_socket: public fhandler_base
     unsigned saw_shutdown_read     : 1; /* Socket saw a SHUT_RD */
     unsigned saw_shutdown_write    : 1; /* Socket saw a SHUT_WR */
     unsigned saw_reuseaddr	   : 1; /* Socket saw SO_REUSEADDR call */
-    unsigned connect_state	   : 2;
+    unsigned connect_state	   : 3;
    public:
     status_flags () :
       async_io (0), saw_shutdown_read (0), saw_shutdown_write (0),

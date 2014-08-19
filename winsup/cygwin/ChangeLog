@@ -1,5 +1,16 @@
 2014-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (enum conn_state): Add "connect_credxchg" state.
+	(class fhandler_socket): Grant another bit to connect_state flag.
+	* fhandler_socket.cc (fhandler_socket::af_local_connect): Rearrange
+	variable definition.  Set connect_state to connect_credxchg.
+	(fhandler_socket::af_local_accept): Ditto.
+	(fhandler_socket::recv_internal): Accept connect_credxchg on connection
+	oriented AF_LOCAL sockets as well to allow the credential exchange.
+	Extend comment to explain.
+
+2014-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc: Replace WNet[...]A with WNet[...]W imports.
 	* dcrt0.cc (initial_env): Drop strlwr calls.  Call strcasestr instead.
 	* fhandler_netdrive.cc: Throughout, convert to calling WNet UNICODE
