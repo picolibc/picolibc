@@ -1,5 +1,12 @@
 2014-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dir.cc (dirfd): Per POSIX, return EINVAL on invalid directory stream.
+	(telldir): Per POSIX, return -1 and set errno to EBADF, rather than
+	just returning 0, on invalid directory stream.
+	* signal.cc (sigwaitinfo): Return -1, not EFAULT, when SEGV was catched.
+
+2014-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (enum conn_state): Add "connect_credxchg" state.
 	(class fhandler_socket): Grant another bit to connect_state flag.
 	* fhandler_socket.cc (fhandler_socket::af_local_connect): Rearrange

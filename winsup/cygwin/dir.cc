@@ -33,7 +33,7 @@ dirfd (DIR *dir)
     return -1;
   if (dir->__d_cookie != __DIRENT_COOKIE)
     {
-      set_errno (EBADF);
+      set_errno (EINVAL);
       syscall_printf ("-1 = dirfd (%p)", dir);
       return -1;
     }
@@ -205,7 +205,10 @@ telldir (DIR *dir)
     return -1;
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
-    return 0;
+    {
+      set_errno (EBADF);
+      return -1;
+    }
   return ((fhandler_base *) dir->__fh)->telldir (dir);
 }
 

@@ -564,7 +564,7 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
 
   myfault efault;
   if (efault.faulted (EFAULT))
-    return EFAULT;
+    return -1;
 
   set_signal_mask (_my_tls.sigwait_mask, *set);
   sig_dispatch_pending (true);
