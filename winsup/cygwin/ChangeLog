@@ -1,5 +1,13 @@
 2014-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc: Replace WNet[...]A with WNet[...]W imports.
+	* dcrt0.cc (initial_env): Drop strlwr calls.  Call strcasestr instead.
+	* fhandler_netdrive.cc: Throughout, convert to calling WNet UNICODE
+	functions.  Use tmp_pathbuf rather than alloca.  Replace call to
+	strlwr with call to RtlDowncaseUnicodeString.
+
+2014-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_serial::is_tty): Reinstantiate.
 
 2014-08-18  Corinna Vinschen  <corinna@vinschen.de>

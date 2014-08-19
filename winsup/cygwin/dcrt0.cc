@@ -517,14 +517,12 @@ initial_env ()
     {
       char buf1[NT_MAX_PATH];
       GetModuleFileName (NULL, buf1, NT_MAX_PATH);
-      strlwr (buf1);
-      strlwr (buf);
       char *p = strpbrk (buf, ":=");
       if (!p)
 	p = (char *) "gdb.exe -nw";
       else
 	*p++ = '\0';
-      if (strstr (buf1, buf))
+      if (strcasestr (buf1, buf))
 	{
 	  error_start_init (p);
 	  jit_debug = true;
