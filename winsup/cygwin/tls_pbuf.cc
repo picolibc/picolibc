@@ -22,17 +22,6 @@ tls_pathbuf::destroy ()
     free (w_buf[i]);
 }
 
-tmp_pathbuf::tmp_pathbuf ()
-: c_buf_old (tls_pbuf.c_cnt),
-  w_buf_old (tls_pbuf.w_cnt)
-{}
-
-tmp_pathbuf::~tmp_pathbuf ()
-{
-  tls_pbuf.c_cnt = c_buf_old;
-  tls_pbuf.w_cnt = w_buf_old;
-}
-
 char *
 tmp_pathbuf::c_get ()
 {
