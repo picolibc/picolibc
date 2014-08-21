@@ -512,10 +512,10 @@ slashify (const char *src, char *dst, bool trailing_slash_p)
 void * __reg1
 __import_address (void *imp)
 {
-  if (*((uint16_t *) imp) != 0x25ff)
-    return NULL;
   myfault efault;
   if (efault.faulted ())
+    return NULL;
+  if (*((uint16_t *) imp) != 0x25ff)
     return NULL;
   const char *ptr = (const char *) imp;
 #ifdef __x86_64__

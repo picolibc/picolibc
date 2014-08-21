@@ -1,5 +1,10 @@
 2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc (__import_address): Cover the first dereference to imp
+	under the fault handler.
+
+2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (if_freenameindex): Don't catch a SEGV from free to fail
 	loudly on double free.
 
