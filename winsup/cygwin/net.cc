@@ -2380,9 +2380,6 @@ if_nameindex (void)
 extern "C" void
 if_freenameindex (struct if_nameindex *ptr)
 {
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return;
   free (ptr);
 }
 

@@ -1,5 +1,10 @@
 2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (if_freenameindex): Don't catch a SEGV from free to fail
+	loudly on double free.
+
+2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dir.cc (rmdir): Don't skip deleting fh in the ENOTEMPTY case.
 
 2014-08-20  Corinna Vinschen  <corinna@vinschen.de>
