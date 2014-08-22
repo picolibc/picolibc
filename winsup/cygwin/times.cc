@@ -1,7 +1,7 @@
 /* times.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -59,35 +59,39 @@ __to_clock_t (PLARGE_INTEGER src, int flag)
 extern "C" clock_t
 times (struct tms *buf)
 {
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return ((clock_t) -1);
-
   static SYSTEM_TIMEOFDAY_INFORMATION stodi;
   KERNEL_USER_TIMES kut;
   LARGE_INTEGER ticks;
+  clock_t tc = (clock_t) -1;
 
-  /* Fetch boot time if we haven't already. */
-  if (!stodi.BootTime.QuadPart)
-    NtQuerySystemInformation (SystemTimeOfDayInformation,
-			      &stodi, sizeof stodi, NULL);
+  __try
+    {
+      /* Fetch boot time if we haven't already. */
+      if (!stodi.BootTime.QuadPart)
+	NtQuerySystemInformation (SystemTimeOfDayInformation,
+				  &stodi, sizeof stodi, NULL);
 
-  NtQueryInformationProcess (NtCurrentProcess (), ProcessTimes,
-			     &kut, sizeof kut, NULL);
-  get_system_time (&ticks);
+      NtQueryInformationProcess (NtCurrentProcess (), ProcessTimes,
+				 &kut, sizeof kut, NULL);
+      get_system_time (&ticks);
 
-  /* uptime */
-  ticks.QuadPart -= stodi.BootTime.QuadPart;
-  /* ticks is in in 100ns, convert to clock ticks. */
-  clock_t tc = (clock_t) (ticks.QuadPart * CLOCKS_PER_SEC / NSPERSEC);
+      /* uptime */
+      ticks.QuadPart -= stodi.BootTime.QuadPart;
+      /* ticks is in in 100ns, convert to clock ticks. */
+      tc = (clock_t) (ticks.QuadPart * CLOCKS_PER_SEC / NSPERSEC);
 
-  buf->tms_stime = __to_clock_t (&kut.KernelTime, 0);
-  buf->tms_utime = __to_clock_t (&kut.UserTime, 0);
-  timeval_to_filetime (&myself->rusage_children.ru_stime, &kut.KernelTime);
-  buf->tms_cstime = __to_clock_t (&kut.KernelTime, 1);
-  timeval_to_filetime (&myself->rusage_children.ru_utime, &kut.UserTime);
-  buf->tms_cutime = __to_clock_t (&kut.UserTime, 1);
-
+      buf->tms_stime = __to_clock_t (&kut.KernelTime, 0);
+      buf->tms_utime = __to_clock_t (&kut.UserTime, 0);
+      timeval_to_filetime (&myself->rusage_children.ru_stime, &kut.KernelTime);
+      buf->tms_cstime = __to_clock_t (&kut.KernelTime, 1);
+      timeval_to_filetime (&myself->rusage_children.ru_utime, &kut.UserTime);
+      buf->tms_cutime = __to_clock_t (&kut.UserTime, 1);
+    }
+  __except (EFAULT)
+    {
+      tc = (clock_t) -1;
+    }
+  __endtry
   syscall_printf ("%D = times(%p)", tc, buf);
   return tc;
 }
@@ -100,34 +104,37 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
 {
   SYSTEMTIME st;
   struct tm *ptm;
-  int res;
+  int res = -1;
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-
-  if (tv->tv_usec < 0 || tv->tv_usec >= 1000000)
+  __try
     {
-      set_errno (EINVAL);
-      return -1;
+      if (tv->tv_usec < 0 || tv->tv_usec >= 1000000)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+
+      ptm = gmtime (&tv->tv_sec);
+      st.wYear	   = ptm->tm_year + 1900;
+      st.wMonth	   = ptm->tm_mon + 1;
+      st.wDayOfWeek    = ptm->tm_wday;
+      st.wDay	   = ptm->tm_mday;
+      st.wHour	   = ptm->tm_hour;
+      st.wMinute       = ptm->tm_min;
+      st.wSecond       = ptm->tm_sec;
+      st.wMilliseconds = tv->tv_usec / 1000;
+
+      res = -!SetSystemTime (&st);
+      gtod.reset ();
+
+      if (res)
+	set_errno (EPERM);
     }
-
-  ptm = gmtime (&tv->tv_sec);
-  st.wYear	   = ptm->tm_year + 1900;
-  st.wMonth	   = ptm->tm_mon + 1;
-  st.wDayOfWeek    = ptm->tm_wday;
-  st.wDay	   = ptm->tm_mday;
-  st.wHour	   = ptm->tm_hour;
-  st.wMinute       = ptm->tm_min;
-  st.wSecond       = ptm->tm_sec;
-  st.wMilliseconds = tv->tv_usec / 1000;
-
-  res = -!SetSystemTime (&st);
-  gtod.reset ();
-
-  if (res)
-    set_errno (EPERM);
-
+  __except (EFAULT)
+    {
+      res = -1;
+    }
+  __endtry
   syscall_printf ("%R = settimeofday(%p, %p)", res, tv, tz);
   return res;
 }

@@ -1,7 +1,7 @@
 /* resource.cc: getrusage () and friends.
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2010,
-   2011, 2012, 2013 Red Hat, Inc.
+   2011, 2012, 2013, 2014 Red Hat, Inc.
 
    Written by Steve Chamberlain (sac@cygnus.com), Doug Evans (dje@cygnus.com),
    Geoffrey Noer (noer@cygnus.com) of Cygnus Support.
@@ -116,53 +116,51 @@ getrlimit (int resource, struct rlimit *rlp)
 {
   MEMORY_BASIC_INFORMATION m;
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-
-  rlp->rlim_cur = RLIM_INFINITY;
-  rlp->rlim_max = RLIM_INFINITY;
-
-  switch (resource)
+  __try
     {
-    case RLIMIT_CPU:
-    case RLIMIT_FSIZE:
-    case RLIMIT_DATA:
-    case RLIMIT_AS:
-      break;
-    case RLIMIT_STACK:
-      if (!VirtualQuery ((LPCVOID) &m, &m, sizeof m))
-	debug_printf ("couldn't get stack info, returning def.values. %E");
-      else
+      rlp->rlim_cur = RLIM_INFINITY;
+      rlp->rlim_max = RLIM_INFINITY;
+
+      switch (resource)
 	{
-	  rlp->rlim_cur = (rlim_t) &m - (rlim_t) m.AllocationBase;
-	  rlp->rlim_max = (rlim_t) m.BaseAddress + m.RegionSize
-			  - (rlim_t) m.AllocationBase;
+	case RLIMIT_CPU:
+	case RLIMIT_FSIZE:
+	case RLIMIT_DATA:
+	case RLIMIT_AS:
+	  break;
+	case RLIMIT_STACK:
+	  if (!VirtualQuery ((LPCVOID) &m, &m, sizeof m))
+	    debug_printf ("couldn't get stack info, returning def.values. %E");
+	  else
+	    {
+	      rlp->rlim_cur = (rlim_t) &m - (rlim_t) m.AllocationBase;
+	      rlp->rlim_max = (rlim_t) m.BaseAddress + m.RegionSize
+			      - (rlim_t) m.AllocationBase;
+	    }
+	  break;
+	case RLIMIT_NOFILE:
+	  rlp->rlim_cur = getdtablesize ();
+	  if (rlp->rlim_cur < OPEN_MAX)
+	    rlp->rlim_cur = OPEN_MAX;
+	  rlp->rlim_max = OPEN_MAX_MAX;
+	  break;
+	case RLIMIT_CORE:
+	  rlp->rlim_cur = cygheap->rlim_core;
+	  break;
+	default:
+	  set_errno (EINVAL);
+	  __leave;
 	}
-      break;
-    case RLIMIT_NOFILE:
-      rlp->rlim_cur = getdtablesize ();
-      if (rlp->rlim_cur < OPEN_MAX)
-	rlp->rlim_cur = OPEN_MAX;
-      rlp->rlim_max = OPEN_MAX_MAX;
-      break;
-    case RLIMIT_CORE:
-      rlp->rlim_cur = cygheap->rlim_core;
-      break;
-    default:
-      set_errno (EINVAL);
-      return -1;
+      return 0;
     }
-  return 0;
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }
 
 extern "C" int
 setrlimit (int resource, const struct rlimit *rlp)
 {
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-
   struct rlimit oldlimits;
 
   /* Check if the request is to actually change the resource settings.
@@ -170,29 +168,35 @@ setrlimit (int resource, const struct rlimit *rlp)
   if (getrlimit (resource, &oldlimits) < 0)
     return -1;
 
-  if (oldlimits.rlim_cur == rlp->rlim_cur &&
-      oldlimits.rlim_max == rlp->rlim_max)
-    /* No change in resource requirements, succeed immediately */
-    return 0;
-
-  if (rlp->rlim_cur > rlp->rlim_max)
+  __try
     {
-      set_errno (EINVAL);
-      return -1;
-    }
+      if (oldlimits.rlim_cur == rlp->rlim_cur &&
+	  oldlimits.rlim_max == rlp->rlim_max)
+	/* No change in resource requirements, succeed immediately */
+	return 0;
 
-  switch (resource)
-    {
-    case RLIMIT_CORE:
-      cygheap->rlim_core = rlp->rlim_cur;
-      break;
-    case RLIMIT_NOFILE:
-      if (rlp->rlim_cur != RLIM_INFINITY)
-	return setdtablesize (rlp->rlim_cur);
-      break;
-    default:
-      set_errno (EINVAL);
-      return -1;
+      if (rlp->rlim_cur > rlp->rlim_max)
+	{
+	  set_errno (EINVAL);
+	  __leave;
+	}
+
+      switch (resource)
+	{
+	case RLIMIT_CORE:
+	  cygheap->rlim_core = rlp->rlim_cur;
+	  break;
+	case RLIMIT_NOFILE:
+	  if (rlp->rlim_cur != RLIM_INFINITY)
+	    return setdtablesize (rlp->rlim_cur);
+	  break;
+	default:
+	  set_errno (EINVAL);
+	  __leave;
+	}
+      return 0;
     }
-  return 0;
+  __except (EFAULT)
+  __endtry
+  return -1;
 }

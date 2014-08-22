@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013
+# Copyright 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013, 2014
 # Red Hat, Inc.
 #
 # This file is part of Cygwin.
@@ -181,6 +181,8 @@ _sigbe:						# return here after cygwin syscall
 	movq	-8(%r11),%r11			# get return address from signal stack
 	decl	$tls::incyg(%r10)
 	decl	$tls::stacklock(%r10)		# release lock
+	leaq	$tls::pathbufs(%r10),%r10	# Address of tls_pathbufs
+	movq	\$0,(%r10)			# Set c_cnt and w_cnt to 0
 	jmp	*%r11				# "return" to caller
 	.seh_endproc
 
@@ -366,7 +368,7 @@ stabilize_sig_stack:
 	movq	%gs:8,%r12
 1:	movl	\$1,%r10d
 	xchgl	%r10d,$tls::stacklock(%r12)
-	movl	%r10d,$tls::spinning(%r12)		# flag if we are waiting for lock
+	movl	%r10d,$tls::spinning(%r12)	# flag if we are waiting for lock
 	testl	%r10d,%r10d
 	jz	2f
 	pause
@@ -374,14 +376,14 @@ stabilize_sig_stack:
 2:	incl	$tls::incyg(%r12)
 	cmpl	\$0,$tls::sig(%r12)
 	jz	3f
-	decl	$tls::stacklock(%r12)			# unlock
-	movq	\$$tls::start_offset,%rcx		# point to beginning
-	addq	%r12,%rcx				#  of tls block
+	decl	$tls::stacklock(%r12)		# unlock
+	movq	\$$tls::start_offset,%rcx	# point to beginning
+	addq	%r12,%rcx			#  of tls block
 	call	_ZN7_cygtls19call_signal_handlerEv
 	jmp	1b
 3:	decl	$tls::incyg(%r12)
 	addq	\$0x20,%rsp
-	movq	%r12,%r11				# return tls addr in r11
+	movq	%r12,%r11			# return tls addr in r11
 	popq	%r12
 	ret
 	.seh_endproc
@@ -393,13 +395,13 @@ EOF
 __sigfe_maybe:
 	pushl	%ebx
 	pushl	%edx
-	movl	%fs:4,%ebx				# location of bottom of stack
-	addl	\$$tls::initialized,%ebx		# where we will be looking
-	cmpl	%ebx,%esp				# stack loc > than tls
-	jge	0f					# yep.  we don't have a tls.
-	subl	\$$tls::initialized,%ebx		# where we will be looking
+	movl	%fs:4,%ebx			# location of bottom of stack
+	addl	\$$tls::initialized,%ebx	# where we will be looking
+	cmpl	%ebx,%esp			# stack loc > than tls
+	jge	0f				# yep.  we don't have a tls.
+	subl	\$$tls::initialized,%ebx	# where we will be looking
 	movl	$tls::initialized(%ebx),%eax
-	cmpl	\$0xc763173f,%eax			# initialized?
+	cmpl	\$0xc763173f,%eax		# initialized?
 	je	1f
 0:	popl	%edx
 	popl	%ebx
@@ -408,43 +410,46 @@ __sigfe_maybe:
 __sigfe:
 	pushl	%ebx
 	pushl	%edx
-	movl	%fs:4,%ebx				# location of bottom of stack
-1:	movl	\$1,%eax				# potential lock value
-	xchgl	%eax,$tls::stacklock(%ebx)		# see if we can grab it
-	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
-	testl	%eax,%eax				# it will be zero
-	jz	2f					#  if so
-	call	_yield					# should be a short-time thing, so
-	jmp	1b					# sleep and loop
-2:	movl	\$4,%eax				# have the lock, now increment the
-	xadd	%eax,$tls::stackptr(%ebx)		#  stack pointer and get pointer
-	leal	__sigbe,%edx				# new place to return to
-	xchgl	%edx,12(%esp)				# exchange with real return value
-	movl	%edx,(%eax)				# store real return value on alt stack
+	movl	%fs:4,%ebx			# location of bottom of stack
+1:	movl	\$1,%eax			# potential lock value
+	xchgl	%eax,$tls::stacklock(%ebx)	# see if we can grab it
+	movl	%eax,$tls::spinning(%ebx)	# flag if we are waiting for lock
+	testl	%eax,%eax			# it will be zero
+	jz	2f				#  if so
+	call	_yield				# should be a short-time thing, so
+	jmp	1b				# sleep and loop
+2:	movl	\$4,%eax			# have the lock, now increment the
+	xadd	%eax,$tls::stackptr(%ebx)	#  stack pointer and get pointer
+	leal	__sigbe,%edx			# new place to return to
+	xchgl	%edx,12(%esp)			# exchange with real return value
+	movl	%edx,(%eax)			# store real return value on alt stack
 	incl	$tls::incyg(%ebx)
-	decl	$tls::stacklock(%ebx)			# remove lock
-	popl	%edx					# restore saved value
+	decl	$tls::stacklock(%ebx)		# remove lock
+	popl	%edx				# restore saved value
 	popl	%ebx
 	ret
 
 	.global	__sigbe
-__sigbe:						# return here after cygwin syscall
-	pushl	%eax					# don't clobber
-	pushl	%ebx					# tls pointer
-1:	movl	%fs:4,%ebx				# address of bottom of tls
-	movl	\$1,%eax				# potential lock value
-	xchgl	%eax,$tls::stacklock(%ebx)		# see if we can grab it
-	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
-	testl	%eax,%eax				# it will be zero
-	jz	2f					#  if so
-	call	_yield					# sleep
-	jmp	1b					#  and loop
-2:	movl	\$-4,%eax				# now decrement aux stack
-	xadd	%eax,$tls::stackptr(%ebx)		#  and get pointer
-	movl	-4(%eax),%eax				# get return address from signal stack
-	xchgl	%eax,4(%esp)				# swap return address with saved eax
+__sigbe:					# return here after cygwin syscall
+	pushl	%eax				# don't clobber
+	pushl	%ebx				# tls pointer
+1:	movl	%fs:4,%ebx			# address of bottom of tls
+	movl	\$1,%eax			# potential lock value
+	xchgl	%eax,$tls::stacklock(%ebx)	# see if we can grab it
+	movl	%eax,$tls::spinning(%ebx)	# flag if we are waiting for lock
+	testl	%eax,%eax			# it will be zero
+	jz	2f				#  if so
+	call	_yield				# sleep
+	jmp	1b				#  and loop
+2:	movl	\$-4,%eax			# now decrement aux stack
+	xadd	%eax,$tls::stackptr(%ebx)	#  and get pointer
+	movl	-4(%eax),%eax			# get return address from signal stack
+	xchgl	%eax,4(%esp)			# swap return address with saved eax
 	decl	$tls::incyg(%ebx)
-	decl	$tls::stacklock(%ebx)			# release lock
+	decl	$tls::stacklock(%ebx)		# release lock
+	leal	$tls::pathbufs(%ebx),%ebx	# Address of tls_pathbufs
+	movl	\$0,(%ebx)			# Set c_cnt to 0
+	movl	\$0,4(%ebx)			# Set w_cnt to 0
 	popl	%ebx
 	ret
 

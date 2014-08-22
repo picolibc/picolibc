@@ -2,7 +2,7 @@
    classes.
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011, 2012, 2013 Red Hat, Inc.
+   2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -977,159 +977,163 @@ mtinfo_drive::set_options (HANDLE mt, int32_t options)
 int
 mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
 {
-  myfault efault;
-  if (efault.faulted ())
-    return ERROR_NOACCESS;
-  if (cmd == MTIOCTOP)
+  __try
     {
-      struct mtop *op = (struct mtop *) buf;
-      if (lasterr == ERROR_BUS_RESET)
+      if (cmd == MTIOCTOP)
 	{
-	  /* If a bus reset occurs, block further access to this device
-	     until the user rewinds, unloads or in any other way tries
-	     to maintain a well-known tape position. */
-	  if (op->mt_op != MTREW && op->mt_op != MTOFFL
-	      && op->mt_op != MTRETEN && op->mt_op != MTERASE
-	      && op->mt_op != MTSEEK && op->mt_op != MTEOM)
-	    return ERROR_BUS_RESET;
-	  /* Try to maintain last lock state after bus reset. */
-	  if (lock >= auto_locked && PrepareTape (mt, TAPE_LOCK, FALSE))
+	  struct mtop *op = (struct mtop *) buf;
+	  if (lasterr == ERROR_BUS_RESET)
 	    {
-	      debug_printf ("Couldn't relock drive after bus reset.");
-	      lock = unlocked;
+	      /* If a bus reset occurs, block further access to this device
+		 until the user rewinds, unloads or in any other way tries
+		 to maintain a well-known tape position. */
+	      if (op->mt_op != MTREW && op->mt_op != MTOFFL
+		  && op->mt_op != MTRETEN && op->mt_op != MTERASE
+		  && op->mt_op != MTSEEK && op->mt_op != MTEOM)
+		return ERROR_BUS_RESET;
+	      /* Try to maintain last lock state after bus reset. */
+	      if (lock >= auto_locked && PrepareTape (mt, TAPE_LOCK, FALSE))
+		{
+		  debug_printf ("Couldn't relock drive after bus reset.");
+		  lock = unlocked;
+		}
 	    }
-	}
-      switch (op->mt_op)
-	{
-	  case MTRESET:
-	    break;
-	  case MTFSF:
-	    set_pos (mt, TAPE_SPACE_FILEMARKS, op->mt_count, false);
-	    break;
-	  case MTBSF:
-	    set_pos (mt, TAPE_SPACE_FILEMARKS, -op->mt_count, false);
-	    break;
-	  case MTFSR:
-	    set_pos (mt, TAPE_SPACE_RELATIVE_BLOCKS, op->mt_count, false);
-	    break;
-	  case MTBSR:
-	    set_pos (mt, TAPE_SPACE_RELATIVE_BLOCKS, -op->mt_count, false);
-	    break;
-	  case MTWEOF:
-	    write_marks (mt, TAPE_FILEMARKS, op->mt_count);
-	    break;
-	  case MTREW:
-	    set_pos (mt, TAPE_REWIND, 0, false);
-	    break;
-	  case MTOFFL:
-	  case MTUNLOAD:
-	    prepare (mt, TAPE_UNLOAD);
-	    break;
-	  case MTNOP:
-	    lasterr = 0;
-	    break;
-	  case MTRETEN:
-	    if (!get_feature (TAPE_DRIVE_TENSION))
-	      lasterr = ERROR_INVALID_PARAMETER;
-	    else if (!set_pos (mt, TAPE_REWIND, 0, false))
-	      prepare (mt, TAPE_TENSION);
-	    break;
-	  case MTBSFM:
-	    set_pos (mt, TAPE_SPACE_FILEMARKS, -op->mt_count, true);
-	    break;
-	  case MTFSFM:
-	    set_pos (mt, TAPE_SPACE_FILEMARKS, op->mt_count, true);
-	    break;
-	  case MTEOM:
-	    if (fast_eom () && get_feature (TAPE_DRIVE_END_OF_DATA))
-	      set_pos (mt, TAPE_SPACE_END_OF_DATA, 0, false);
-	    else
-	      set_pos (mt, TAPE_SPACE_FILEMARKS, 32767, false);
-	    break;
-	  case MTERASE:
-	    erase (mt, TAPE_ERASE_LONG);
-	    break;
-	  case MTRAS1:
-	  case MTRAS2:
-	  case MTRAS3:
-	    lasterr = ERROR_INVALID_PARAMETER;
-	    break;
-	  case MTSETBLK:
-	    if (!get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
-	      {
-		lasterr = ERROR_INVALID_PARAMETER;
+	  switch (op->mt_op)
+	    {
+	      case MTRESET:
 		break;
-	      }
-	    if ((DWORD) op->mt_count == mp ()->BlockSize)
-	      {
-		/* Nothing has changed. */
+	      case MTFSF:
+		set_pos (mt, TAPE_SPACE_FILEMARKS, op->mt_count, false);
+		break;
+	      case MTBSF:
+		set_pos (mt, TAPE_SPACE_FILEMARKS, -op->mt_count, false);
+		break;
+	      case MTFSR:
+		set_pos (mt, TAPE_SPACE_RELATIVE_BLOCKS, op->mt_count, false);
+		break;
+	      case MTBSR:
+		set_pos (mt, TAPE_SPACE_RELATIVE_BLOCKS, -op->mt_count, false);
+		break;
+	      case MTWEOF:
+		write_marks (mt, TAPE_FILEMARKS, op->mt_count);
+		break;
+	      case MTREW:
+		set_pos (mt, TAPE_REWIND, 0, false);
+		break;
+	      case MTOFFL:
+	      case MTUNLOAD:
+		prepare (mt, TAPE_UNLOAD);
+		break;
+	      case MTNOP:
 		lasterr = 0;
 		break;
-	      }
-	    if ((op->mt_count == 0 && !get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
-		|| (op->mt_count > 0
-		    && ((DWORD) op->mt_count < dp ()->MinimumBlockSize
-			|| (DWORD) op->mt_count > dp ()->MaximumBlockSize)))
-	      {
+	      case MTRETEN:
+		if (!get_feature (TAPE_DRIVE_TENSION))
+		  lasterr = ERROR_INVALID_PARAMETER;
+		else if (!set_pos (mt, TAPE_REWIND, 0, false))
+		  prepare (mt, TAPE_TENSION);
+		break;
+	      case MTBSFM:
+		set_pos (mt, TAPE_SPACE_FILEMARKS, -op->mt_count, true);
+		break;
+	      case MTFSFM:
+		set_pos (mt, TAPE_SPACE_FILEMARKS, op->mt_count, true);
+		break;
+	      case MTEOM:
+		if (fast_eom () && get_feature (TAPE_DRIVE_END_OF_DATA))
+		  set_pos (mt, TAPE_SPACE_END_OF_DATA, 0, false);
+		else
+		  set_pos (mt, TAPE_SPACE_FILEMARKS, 32767, false);
+		break;
+	      case MTERASE:
+		erase (mt, TAPE_ERASE_LONG);
+		break;
+	      case MTRAS1:
+	      case MTRAS2:
+	      case MTRAS3:
 		lasterr = ERROR_INVALID_PARAMETER;
 		break;
-	      }
-	    if (set_blocksize (mt, op->mt_count)
-		&& lasterr == ERROR_INVALID_FUNCTION)
-	      lasterr = ERROR_INVALID_BLOCK_LENGTH;
-	    break;
-	  case MTSEEK:
-	    if (get_feature (TAPE_DRIVE_LOGICAL_BLK))
-	      set_pos (mt, TAPE_LOGICAL_BLOCK, op->mt_count, false);
-	    else if (!get_pos (mt))
-	      set_pos (mt, TAPE_SPACE_RELATIVE_BLOCKS,
-		       op->mt_count - block, false);
-	    break;
-	  case MTTELL:
-	    if (!get_pos (mt))
-	      op->mt_count = (int) block;
-	    break;
-	  case MTFSS:
-	    set_pos (mt, TAPE_SPACE_SETMARKS, op->mt_count, false);
-	    break;
-	  case MTBSS:
-	    set_pos (mt, TAPE_SPACE_SETMARKS, -op->mt_count, false);
-	    break;
-	  case MTWSM:
-	    write_marks (mt, TAPE_SETMARKS, op->mt_count);
-	    break;
-	  case MTLOCK:
-	    prepare (mt, TAPE_LOCK);
-	    break;
-	  case MTUNLOCK:
-	    prepare (mt, TAPE_UNLOCK);
-	    break;
-	  case MTLOAD:
-	    prepare (mt, TAPE_LOAD);
-	    break;
-	  case MTCOMPRESSION:
-	    set_compression (mt, op->mt_count);
-	    break;
-	  case MTSETPART:
-	    set_partition (mt, op->mt_count);
-	    break;
-	  case MTMKPART:
-	    create_partitions (mt, op->mt_count);
-	    break;
-	  case MTSETDRVBUFFER:
-	    set_options (mt, op->mt_count);
-	    break;
-	  case MTSETDENSITY:
-	  default:
-	    lasterr = ERROR_INVALID_PARAMETER;
-	    break;
+	      case MTSETBLK:
+		if (!get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
+		  {
+		    lasterr = ERROR_INVALID_PARAMETER;
+		    break;
+		  }
+		if ((DWORD) op->mt_count == mp ()->BlockSize)
+		  {
+		    /* Nothing has changed. */
+		    lasterr = 0;
+		    break;
+		  }
+		if ((op->mt_count == 0 && !get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
+		    || (op->mt_count > 0
+			&& ((DWORD) op->mt_count < dp ()->MinimumBlockSize
+			    || (DWORD) op->mt_count > dp ()->MaximumBlockSize)))
+		  {
+		    lasterr = ERROR_INVALID_PARAMETER;
+		    break;
+		  }
+		if (set_blocksize (mt, op->mt_count)
+		    && lasterr == ERROR_INVALID_FUNCTION)
+		  lasterr = ERROR_INVALID_BLOCK_LENGTH;
+		break;
+	      case MTSEEK:
+		if (get_feature (TAPE_DRIVE_LOGICAL_BLK))
+		  set_pos (mt, TAPE_LOGICAL_BLOCK, op->mt_count, false);
+		else if (!get_pos (mt))
+		  set_pos (mt, TAPE_SPACE_RELATIVE_BLOCKS,
+			   op->mt_count - block, false);
+		break;
+	      case MTTELL:
+		if (!get_pos (mt))
+		  op->mt_count = (int) block;
+		break;
+	      case MTFSS:
+		set_pos (mt, TAPE_SPACE_SETMARKS, op->mt_count, false);
+		break;
+	      case MTBSS:
+		set_pos (mt, TAPE_SPACE_SETMARKS, -op->mt_count, false);
+		break;
+	      case MTWSM:
+		write_marks (mt, TAPE_SETMARKS, op->mt_count);
+		break;
+	      case MTLOCK:
+		prepare (mt, TAPE_LOCK);
+		break;
+	      case MTUNLOCK:
+		prepare (mt, TAPE_UNLOCK);
+		break;
+	      case MTLOAD:
+		prepare (mt, TAPE_LOAD);
+		break;
+	      case MTCOMPRESSION:
+		set_compression (mt, op->mt_count);
+		break;
+	      case MTSETPART:
+		set_partition (mt, op->mt_count);
+		break;
+	      case MTMKPART:
+		create_partitions (mt, op->mt_count);
+		break;
+	      case MTSETDRVBUFFER:
+		set_options (mt, op->mt_count);
+		break;
+	      case MTSETDENSITY:
+	      default:
+		lasterr = ERROR_INVALID_PARAMETER;
+		break;
+	    }
 	}
+      else if (cmd == MTIOCGET)
+	get_status (mt, (struct mtget *) buf);
+      else if (cmd == MTIOCPOS && !get_pos (mt))
+	((struct mtpos *) buf)->mt_blkno = (long) block;
     }
-  else if (cmd == MTIOCGET)
-    get_status (mt, (struct mtget *) buf);
-  else if (cmd == MTIOCPOS && !get_pos (mt))
-    ((struct mtpos *) buf)->mt_blkno = (long) block;
-
+  __except (NO_ERROR)
+    {
+      lasterr = ERROR_NOACCESS;
+    }
+  __endtry
   return lasterr;
 }
 

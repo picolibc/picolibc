@@ -312,100 +312,101 @@ extern "C" int
 cygwin_rexec (char **ahost, unsigned short rport, char *name, char *pass,
 	      char *cmd, int *fd2p)
 {
-	struct sockaddr_in sin, sin2, from;
-	struct hostent *hp;
-	u_short port = 0;
-	int s, timo = 1, s3;
-	char c;
-	static char ahostbuf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+  struct sockaddr_in sin, sin2, from;
+  struct hostent *hp;
+  u_short port = 0;
+  int s, timo = 1, s3;
+  char c;
+  static char ahostbuf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
 
-	myfault efault;
-	if (efault.faulted (EFAULT))
-		return -1;
-
-	hp = cygwin_gethostbyname(*ahost);
-	if (hp == 0) {
-		cygwin_herror(*ahost);
-		return (-1);
-	}
-	*ahost = strcpy (ahostbuf, hp->h_name);
-	ruserpass(hp->h_name, &name, &pass, NULL);
-	if (!name)
-		name = getlogin ();
-	if (!pass)
-		pass = almost_null;
+  __try
+    {
+      hp = cygwin_gethostbyname(*ahost);
+      if (hp == 0) {
+	      cygwin_herror(*ahost);
+	      return (-1);
+      }
+      *ahost = strcpy (ahostbuf, hp->h_name);
+      ruserpass(hp->h_name, &name, &pass, NULL);
+      if (!name)
+	      name = getlogin ();
+      if (!pass)
+	      pass = almost_null;
 retry:
-	s = cygwin_socket(AF_INET, SOCK_STREAM, 0);
-	if (s < 0) {
-		perror("rexec: socket");
-		return (-1);
-	}
-	sin.sin_family = hp->h_addrtype;
-	sin.sin_port = rport;
-	bcopy(hp->h_addr, (caddr_t)&sin.sin_addr, hp->h_length);
-	if (cygwin_connect(s, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
-		if (errno == ECONNREFUSED && timo <= 16) {
-			(void) close(s);
-			sleep(timo);
-			timo *= 2;
-			goto retry;
-		}
-		perror(hp->h_name);
-		return (-1);
-	}
-	if (fd2p == 0) {
-		(void) write(s, "", 1);
-	} else {
-		char num[8];
-		int s2, sin2len;
+      s = cygwin_socket(AF_INET, SOCK_STREAM, 0);
+      if (s < 0) {
+	      perror("rexec: socket");
+	      return (-1);
+      }
+      sin.sin_family = hp->h_addrtype;
+      sin.sin_port = rport;
+      bcopy(hp->h_addr, (caddr_t)&sin.sin_addr, hp->h_length);
+      if (cygwin_connect(s, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
+	      if (errno == ECONNREFUSED && timo <= 16) {
+		      (void) close(s);
+		      sleep(timo);
+		      timo *= 2;
+		      goto retry;
+	      }
+	      perror(hp->h_name);
+	      return (-1);
+      }
+      if (fd2p == 0) {
+	      (void) write(s, "", 1);
+      } else {
+	      char num[8];
+	      int s2, sin2len;
 
-		s2 = cygwin_socket(AF_INET, SOCK_STREAM, 0);
-		if (s2 < 0) {
-			(void) close(s);
-			return (-1);
+	      s2 = cygwin_socket(AF_INET, SOCK_STREAM, 0);
+	      if (s2 < 0) {
+		      (void) close(s);
+		      return (-1);
+	      }
+	      cygwin_listen(s2, 1);
+	      sin2len = sizeof (sin2);
+	      if (cygwin_getsockname(s2, (struct sockaddr *)&sin2, &sin2len) < 0 ||
+		sin2len != sizeof (sin2)) {
+		      perror("getsockname");
+		      (void) close(s2);
+		      goto bad;
+	      }
+	      port = ntohs((u_short)sin2.sin_port);
+	      (void) sprintf(num, "%u", port);
+	      (void) write(s, num, strlen(num)+1);
+	      { int len = sizeof (from);
+		s3 = cygwin_accept(s2, (struct sockaddr *)&from, &len);
+		close(s2);
+		if (s3 < 0) {
+		      perror("accept");
+		      port = 0;
+		      goto bad;
 		}
-		cygwin_listen(s2, 1);
-		sin2len = sizeof (sin2);
-		if (cygwin_getsockname(s2, (struct sockaddr *)&sin2, &sin2len) < 0 ||
-		  sin2len != sizeof (sin2)) {
-			perror("getsockname");
-			(void) close(s2);
-			goto bad;
-		}
-		port = ntohs((u_short)sin2.sin_port);
-		(void) sprintf(num, "%u", port);
-		(void) write(s, num, strlen(num)+1);
-		{ int len = sizeof (from);
-		  s3 = cygwin_accept(s2, (struct sockaddr *)&from, &len);
-		  close(s2);
-		  if (s3 < 0) {
-			perror("accept");
-			port = 0;
-			goto bad;
-		  }
-		}
-		*fd2p = s3;
-	}
-	(void) write(s, name, strlen(name) + 1);
-	/* should public key encypt the password here */
-	(void) write(s, pass, strlen(pass) + 1);
-	(void) write(s, cmd, strlen(cmd) + 1);
-	if (read(s, &c, 1) != 1) {
-		perror(*ahost);
-		goto bad;
-	}
-	if (c != 0) {
-		while (read(s, &c, 1) == 1) {
-			(void) write(2, &c, 1);
-			if (c == '\n')
-				break;
-		}
-		goto bad;
-	}
-	return (s);
+	      }
+	      *fd2p = s3;
+      }
+      (void) write(s, name, strlen(name) + 1);
+      /* should public key encypt the password here */
+      (void) write(s, pass, strlen(pass) + 1);
+      (void) write(s, cmd, strlen(cmd) + 1);
+      if (read(s, &c, 1) != 1) {
+	      perror(*ahost);
+	      goto bad;
+      }
+      if (c != 0) {
+	      while (read(s, &c, 1) == 1) {
+		      (void) write(2, &c, 1);
+		      if (c == '\n')
+			      break;
+	      }
+	      goto bad;
+      }
+      return (s);
 bad:
-	if (port)
-		(void) close(*fd2p);
-	(void) close(s);
-	return (-1);
+      if (port)
+	      (void) close(*fd2p);
+      (void) close(s);
+    }
+  __except (EFAULT) {}
+  __endtry
+  return (-1);
 }

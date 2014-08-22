@@ -2293,14 +2293,17 @@ fhandler_socket::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
       return -1;
     }
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  if (pid)
-    *pid = sec_peer_pid;
-  if (euid)
-    *euid = sec_peer_uid;
-  if (egid)
-    *egid = sec_peer_gid;
-  return 0;
+  __try
+    {
+      if (pid)
+	*pid = sec_peer_pid;
+      if (euid)
+	*euid = sec_peer_uid;
+      if (egid)
+	*egid = sec_peer_gid;
+      return 0;
+    }
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }

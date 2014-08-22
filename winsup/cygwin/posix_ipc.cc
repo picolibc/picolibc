@@ -1,6 +1,6 @@
 /* posix_ipc.cc: POSIX IPC API for Cygwin.
 
-   Copyright 2007, 2008, 2009, 2010, 2011, 2012 Red Hat, Inc.
+   Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -414,17 +414,17 @@ extern "C" void *mmap64 (void *, size_t, int, int, int, off_t);
 extern "C" mqd_t
 mq_open (const char *name, int oflag, ...)
 {
-  int i, fd = -1, nonblock, created;
+  int i, fd = -1, nonblock, created = 0;
   long msgsize, index;
   off_t filesize = 0;
   va_list ap;
   mode_t mode;
-  int8_t *mptr;
+  int8_t *mptr = (int8_t *) MAP_FAILED;
   struct stat statbuff;
   struct mq_hdr *mqhdr;
   struct msg_hdr *msghdr;
   struct mq_attr *attr;
-  struct mq_info *mqinfo;
+  struct mq_info *mqinfo = NULL;
   LUID luid;
 
   size_t len = strlen (name);
@@ -433,190 +433,198 @@ mq_open (const char *name, int oflag, ...)
   if (!check_path (mqname, mqueue, name, len))
     return (mqd_t) -1;
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return (mqd_t) -1;
-
-  oflag &= (O_CREAT | O_EXCL | O_NONBLOCK);
-  created = 0;
-  nonblock = oflag & O_NONBLOCK;
-  oflag &= ~O_NONBLOCK;
-  mptr = (int8_t *) MAP_FAILED;
-  mqinfo = NULL;
-
-again:
-  if (oflag & O_CREAT)
+  __try
     {
-      va_start (ap, oflag);		/* init ap to final named argument */
-      mode = va_arg (ap, mode_t) & ~S_IXUSR;
-      attr = va_arg (ap, struct mq_attr *);
-      va_end (ap);
+      oflag &= (O_CREAT | O_EXCL | O_NONBLOCK);
+      nonblock = oflag & O_NONBLOCK;
+      oflag &= ~O_NONBLOCK;
 
-      /* Open and specify O_EXCL and user-execute */
-      fd = open (mqname, oflag | O_EXCL | O_RDWR | O_CLOEXEC, mode | S_IXUSR);
-      if (fd < 0)
+    again:
+      if (oflag & O_CREAT)
 	{
-	  if (errno == EEXIST && (oflag & O_EXCL) == 0)
-	    goto exists;		/* already exists, OK */
-	  return (mqd_t) -1;
-	}
-      created = 1;
-      /* First one to create the file initializes it */
-      if (attr == NULL)
-	attr = &defattr;
-      /* Check minimum and maximum values.  The max values are pretty much
-         arbitrary, taken from the linux mq_overview man page.  However,
-	 these max values make sure that the internal mq_fattr structure
-	 can use 32 bit types. */
-      else if (attr->mq_maxmsg <= 0 || attr->mq_maxmsg > 32768
-	       || attr->mq_msgsize <= 0 || attr->mq_msgsize > 1048576)
-	{
-	  set_errno (EINVAL);
-	  goto err;
-	}
-      /* Calculate and set the file size */
-      msgsize = MSGSIZE (attr->mq_msgsize);
-      filesize = sizeof (struct mq_hdr)
-		 + (attr->mq_maxmsg * (sizeof (struct msg_hdr) + msgsize));
-      if (lseek64 (fd, filesize - 1, SEEK_SET) == -1)
-	goto err;
-      if (write (fd, "", 1) == -1)
-	goto err;
+	  va_start (ap, oflag);		/* init ap to final named argument */
+	  mode = va_arg (ap, mode_t) & ~S_IXUSR;
+	  attr = va_arg (ap, struct mq_attr *);
+	  va_end (ap);
 
-      /* Memory map the file */
+	  /* Open and specify O_EXCL and user-execute */
+	  fd = open (mqname, oflag | O_EXCL | O_RDWR | O_CLOEXEC,
+		     mode | S_IXUSR);
+	  if (fd < 0)
+	    {
+	      if (errno == EEXIST && (oflag & O_EXCL) == 0)
+		goto exists;		/* already exists, OK */
+	      return (mqd_t) -1;
+	    }
+	  created = 1;
+	  /* First one to create the file initializes it */
+	  if (attr == NULL)
+	    attr = &defattr;
+	  /* Check minimum and maximum values.  The max values are pretty much
+	     arbitrary, taken from the linux mq_overview man page.  However,
+	     these max values make sure that the internal mq_fattr structure
+	     can use 32 bit types. */
+	  else if (attr->mq_maxmsg <= 0 || attr->mq_maxmsg > 32768
+		   || attr->mq_msgsize <= 0 || attr->mq_msgsize > 1048576)
+	    {
+	      set_errno (EINVAL);
+	      __leave;
+	    }
+	  /* Calculate and set the file size */
+	  msgsize = MSGSIZE (attr->mq_msgsize);
+	  filesize = sizeof (struct mq_hdr)
+		     + (attr->mq_maxmsg * (sizeof (struct msg_hdr) + msgsize));
+	  if (lseek64 (fd, filesize - 1, SEEK_SET) == -1)
+	    __leave;
+	  if (write (fd, "", 1) == -1)
+	    __leave;
+
+	  /* Memory map the file */
+	  mptr = (int8_t *) mmap64 (NULL, (size_t) filesize,
+				    PROT_READ | PROT_WRITE,
+				    MAP_SHARED, fd, 0);
+	  if (mptr == (int8_t *) MAP_FAILED)
+	    __leave;
+
+	  /* Allocate one mq_info{} for the queue */
+	  if (!(mqinfo = (struct mq_info *)
+			 calloc (1, sizeof (struct mq_info))))
+	    __leave;
+	  mqinfo->mqi_hdr = mqhdr = (struct mq_hdr *) mptr;
+	  mqinfo->mqi_magic = MQI_MAGIC;
+	  mqinfo->mqi_flags = nonblock;
+
+	  /* Initialize header at beginning of file */
+	  /* Create free list with all messages on it */
+	  mqhdr->mqh_attr.mq_flags = 0;
+	  mqhdr->mqh_attr.mq_maxmsg = attr->mq_maxmsg;
+	  mqhdr->mqh_attr.mq_msgsize = attr->mq_msgsize;
+	  mqhdr->mqh_attr.mq_curmsgs = 0;
+	  mqhdr->mqh_nwait = 0;
+	  mqhdr->mqh_pid = 0;
+	  NtAllocateLocallyUniqueId (&luid);
+	  __small_sprintf (mqhdr->mqh_uname, "%016X%08x%08x",
+			   hash_path_name (0,mqname),
+			   luid.HighPart, luid.LowPart);
+	  mqhdr->mqh_head = 0;
+	  mqhdr->mqh_magic = MQI_MAGIC;
+	  index = sizeof (struct mq_hdr);
+	  mqhdr->mqh_free = index;
+	  for (i = 0; i < attr->mq_maxmsg - 1; i++)
+	    {
+	      msghdr = (struct msg_hdr *) &mptr[index];
+	      index += sizeof (struct msg_hdr) + msgsize;
+	      msghdr->msg_next = index;
+	    }
+	  msghdr = (struct msg_hdr *) &mptr[index];
+	  msghdr->msg_next = 0;		/* end of free list */
+
+	  /* Initialize mutex & condition variables */
+	  i = ipc_mutex_init (&mqinfo->mqi_lock, mqhdr->mqh_uname);
+	  if (i != 0)
+	    {
+	      set_errno (i);
+	      __leave;
+	    }
+	  i = ipc_cond_init (&mqinfo->mqi_waitsend, mqhdr->mqh_uname, 'S');
+	  if (i != 0)
+	    {
+	      set_errno (i);
+	      __leave;
+	    }
+	  i = ipc_cond_init (&mqinfo->mqi_waitrecv, mqhdr->mqh_uname, 'R');
+	  if (i != 0)
+	    {
+	      set_errno (i);
+	      __leave;
+	    }
+	  /* Initialization complete, turn off user-execute bit */
+	  if (fchmod (fd, mode) == -1)
+	    __leave;
+	  close (fd);
+	  return ((mqd_t) mqinfo);
+	}
+
+    exists:
+      /* Open the file then memory map */
+      if ((fd = open (mqname, O_RDWR | O_CLOEXEC)) < 0)
+	{
+	  if (errno == ENOENT && (oflag & O_CREAT))
+	    goto again;
+	  __leave;
+	}
+      /* Make certain initialization is complete */
+      for (i = 0; i < MAX_TRIES; i++)
+	{
+	  if (stat64 (mqname, &statbuff) == -1)
+	    {
+	      if (errno == ENOENT && (oflag & O_CREAT))
+		{
+		  close (fd);
+		  fd = -1;
+		  goto again;
+		}
+	      __leave;
+	    }
+	  if ((statbuff.st_mode & S_IXUSR) == 0)
+	    break;
+	  sleep (1);
+	}
+      if (i == MAX_TRIES)
+	{
+	  set_errno (ETIMEDOUT);
+	  __leave;
+	}
+
+      filesize = statbuff.st_size;
       mptr = (int8_t *) mmap64 (NULL, (size_t) filesize, PROT_READ | PROT_WRITE,
 				MAP_SHARED, fd, 0);
       if (mptr == (int8_t *) MAP_FAILED)
-	goto err;
+	__leave;
+      close (fd);
+      fd = -1;
 
-      /* Allocate one mq_info{} for the queue */
+      /* Allocate one mq_info{} for each open */
       if (!(mqinfo = (struct mq_info *) calloc (1, sizeof (struct mq_info))))
-	goto err;
+	__leave;
       mqinfo->mqi_hdr = mqhdr = (struct mq_hdr *) mptr;
+      if (mqhdr->mqh_magic != MQI_MAGIC)
+	{
+	  system_printf (
+    "Old message queue \"%s\" detected!\n"
+    "This file is not usable as message queue anymore due to changes in the "
+    "internal file layout.  Please remove the file and try again.", mqname);
+	  set_errno (EACCES);
+	  __leave;
+	}
       mqinfo->mqi_magic = MQI_MAGIC;
       mqinfo->mqi_flags = nonblock;
 
-      /* Initialize header at beginning of file */
-      /* Create free list with all messages on it */
-      mqhdr->mqh_attr.mq_flags = 0;
-      mqhdr->mqh_attr.mq_maxmsg = attr->mq_maxmsg;
-      mqhdr->mqh_attr.mq_msgsize = attr->mq_msgsize;
-      mqhdr->mqh_attr.mq_curmsgs = 0;
-      mqhdr->mqh_nwait = 0;
-      mqhdr->mqh_pid = 0;
-      NtAllocateLocallyUniqueId (&luid);
-      __small_sprintf (mqhdr->mqh_uname, "%016X%08x%08x",
-		       hash_path_name (0,mqname),
-		       luid.HighPart, luid.LowPart);
-      mqhdr->mqh_head = 0;
-      mqhdr->mqh_magic = MQI_MAGIC;
-      index = sizeof (struct mq_hdr);
-      mqhdr->mqh_free = index;
-      for (i = 0; i < attr->mq_maxmsg - 1; i++)
-	{
-	  msghdr = (struct msg_hdr *) &mptr[index];
-	  index += sizeof (struct msg_hdr) + msgsize;
-	  msghdr->msg_next = index;
-	}
-      msghdr = (struct msg_hdr *) &mptr[index];
-      msghdr->msg_next = 0;		/* end of free list */
-
-      /* Initialize mutex & condition variables */
+      /* Initialize mutex & condition variable */
       i = ipc_mutex_init (&mqinfo->mqi_lock, mqhdr->mqh_uname);
       if (i != 0)
-	goto pthreaderr;
-
+	{
+	  set_errno (i);
+	  __leave;
+	}
       i = ipc_cond_init (&mqinfo->mqi_waitsend, mqhdr->mqh_uname, 'S');
       if (i != 0)
-	goto pthreaderr;
-
+	{
+	  set_errno (i);
+	  __leave;
+	}
       i = ipc_cond_init (&mqinfo->mqi_waitrecv, mqhdr->mqh_uname, 'R');
       if (i != 0)
-	goto pthreaderr;
-
-      /* Initialization complete, turn off user-execute bit */
-      if (fchmod (fd, mode) == -1)
-	goto err;
-      close (fd);
-      return ((mqd_t) mqinfo);
-    }
-
-exists:
-  /* Open the file then memory map */
-  if ((fd = open (mqname, O_RDWR | O_CLOEXEC)) < 0)
-    {
-      if (errno == ENOENT && (oflag & O_CREAT))
-	goto again;
-      goto err;
-    }
-  /* Make certain initialization is complete */
-  for (i = 0; i < MAX_TRIES; i++)
-    {
-      if (stat64 (mqname, &statbuff) == -1)
 	{
-	  if (errno == ENOENT && (oflag & O_CREAT))
-	    {
-	      close (fd);
-	      fd = -1;
-	      goto again;
-	    }
-	  goto err;
+	  set_errno (i);
+	  __leave;
 	}
-      if ((statbuff.st_mode & S_IXUSR) == 0)
-	break;
-      sleep (1);
+      return (mqd_t) mqinfo;
     }
-  if (i == MAX_TRIES)
-    {
-      set_errno (ETIMEDOUT);
-      goto err;
-    }
-
-  filesize = statbuff.st_size;
-  mptr = (int8_t *) mmap64 (NULL, (size_t) filesize, PROT_READ | PROT_WRITE,
-			    MAP_SHARED, fd, 0);
-  if (mptr == (int8_t *) MAP_FAILED)
-    goto err;
-  close (fd);
-  fd = -1;
-
-  /* Allocate one mq_info{} for each open */
-  if (!(mqinfo = (struct mq_info *) calloc (1, sizeof (struct mq_info))))
-    goto err;
-  mqinfo->mqi_hdr = mqhdr = (struct mq_hdr *) mptr;
-  if (mqhdr->mqh_magic != MQI_MAGIC)
-    {
-      system_printf (
-"Old message queue \"%s\" detected!\n"
-"This file is not usable as message queue anymore due to changes in the "
-"internal file layout.  Please remove the file and try again.", mqname);
-      set_errno (EACCES);
-      goto err;
-    }
-  mqinfo->mqi_magic = MQI_MAGIC;
-  mqinfo->mqi_flags = nonblock;
-
-  /* Initialize mutex & condition variable */
-  i = ipc_mutex_init (&mqinfo->mqi_lock, mqhdr->mqh_uname);
-  if (i != 0)
-    goto pthreaderr;
-
-  i = ipc_cond_init (&mqinfo->mqi_waitsend, mqhdr->mqh_uname, 'S');
-  if (i != 0)
-    goto pthreaderr;
-
-  i = ipc_cond_init (&mqinfo->mqi_waitrecv, mqhdr->mqh_uname, 'R');
-  if (i != 0)
-    goto pthreaderr;
-
-  return (mqd_t) mqinfo;
-
-pthreaderr:
-  errno = i;
-err:
+  __except (EFAULT) {}
+  __endtry
   /* Don't let following function calls change errno */
   save_errno save;
-
   if (created)
     unlink (mqname);
   if (mptr != (int8_t *) MAP_FAILED)
@@ -644,30 +652,32 @@ mq_getattr (mqd_t mqd, struct mq_attr *mqstat)
   struct mq_fattr *attr;
   struct mq_info *mqinfo;
 
-  myfault efault;
-  if (efault.faulted (EBADF))
-      return -1;
-
-  mqinfo = (struct mq_info *) mqd;
-  if (mqinfo->mqi_magic != MQI_MAGIC)
+  __try
     {
-      set_errno (EBADF);
-      return -1;
-    }
-  mqhdr = mqinfo->mqi_hdr;
-  attr = &mqhdr->mqh_attr;
-  if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
-    {
-      errno = n;
-      return -1;
-    }
-  mqstat->mq_flags = mqinfo->mqi_flags;   /* per-open */
-  mqstat->mq_maxmsg = attr->mq_maxmsg;    /* remaining three per-queue */
-  mqstat->mq_msgsize = attr->mq_msgsize;
-  mqstat->mq_curmsgs = attr->mq_curmsgs;
+      mqinfo = (struct mq_info *) mqd;
+      if (mqinfo->mqi_magic != MQI_MAGIC)
+	{
+	  set_errno (EBADF);
+	  __leave;
+	}
+      mqhdr = mqinfo->mqi_hdr;
+      attr = &mqhdr->mqh_attr;
+      if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
+	{
+	  errno = n;
+	  __leave;
+	}
+      mqstat->mq_flags = mqinfo->mqi_flags;   /* per-open */
+      mqstat->mq_maxmsg = attr->mq_maxmsg;    /* remaining three per-queue */
+      mqstat->mq_msgsize = attr->mq_msgsize;
+      mqstat->mq_curmsgs = attr->mq_curmsgs;
 
-  ipc_mutex_unlock (mqinfo->mqi_lock);
-  return 0;
+      ipc_mutex_unlock (mqinfo->mqi_lock);
+      return 0;
+    }
+  __except (EBADF) {}
+  __endtry
+  return -1;
 }
 
 extern "C" int
@@ -678,39 +688,41 @@ mq_setattr (mqd_t mqd, const struct mq_attr *mqstat, struct mq_attr *omqstat)
   struct mq_fattr *attr;
   struct mq_info *mqinfo;
 
-  myfault efault;
-  if (efault.faulted (EBADF))
-      return -1;
-
-  mqinfo = (struct mq_info *) mqd;
-  if (mqinfo->mqi_magic != MQI_MAGIC)
+  __try
     {
-      set_errno (EBADF);
-      return -1;
-    }
-  mqhdr = mqinfo->mqi_hdr;
-  attr = &mqhdr->mqh_attr;
-  if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
-    {
-      errno = n;
-      return -1;
-    }
+      mqinfo = (struct mq_info *) mqd;
+      if (mqinfo->mqi_magic != MQI_MAGIC)
+	{
+	  set_errno (EBADF);
+	  __leave;
+	}
+      mqhdr = mqinfo->mqi_hdr;
+      attr = &mqhdr->mqh_attr;
+      if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
+	{
+	  errno = n;
+	  __leave;
+	}
 
-  if (omqstat != NULL)
-    {
-      omqstat->mq_flags = mqinfo->mqi_flags;  /* previous attributes */
-      omqstat->mq_maxmsg = attr->mq_maxmsg;
-      omqstat->mq_msgsize = attr->mq_msgsize;
-      omqstat->mq_curmsgs = attr->mq_curmsgs; /* and current status */
+      if (omqstat != NULL)
+	{
+	  omqstat->mq_flags = mqinfo->mqi_flags;  /* previous attributes */
+	  omqstat->mq_maxmsg = attr->mq_maxmsg;
+	  omqstat->mq_msgsize = attr->mq_msgsize;
+	  omqstat->mq_curmsgs = attr->mq_curmsgs; /* and current status */
+	}
+
+      if (mqstat->mq_flags & O_NONBLOCK)
+	mqinfo->mqi_flags |= O_NONBLOCK;
+      else
+	mqinfo->mqi_flags &= ~O_NONBLOCK;
+
+      ipc_mutex_unlock (mqinfo->mqi_lock);
+      return 0;
     }
-
-  if (mqstat->mq_flags & O_NONBLOCK)
-    mqinfo->mqi_flags |= O_NONBLOCK;
-  else
-    mqinfo->mqi_flags &= ~O_NONBLOCK;
-
-  ipc_mutex_unlock (mqinfo->mqi_lock);
-  return 0;
+  __except (EBADF) {}
+  __endtry
+  return -1;
 }
 
 extern "C" int
@@ -721,45 +733,47 @@ mq_notify (mqd_t mqd, const struct sigevent *notification)
   struct mq_hdr *mqhdr;
   struct mq_info *mqinfo;
 
-  myfault efault;
-  if (efault.faulted (EBADF))
-      return -1;
-
-  mqinfo = (struct mq_info *) mqd;
-  if (mqinfo->mqi_magic != MQI_MAGIC)
+  __try
     {
-      set_errno (EBADF);
-      return -1;
-    }
-  mqhdr = mqinfo->mqi_hdr;
-  if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
-    {
-      errno = n;
-      return -1;
-    }
-
-  pid = getpid ();
-  if (!notification)
-    {
-      if (mqhdr->mqh_pid == pid)
-	  mqhdr->mqh_pid = 0;     /* unregister calling process */
-    }
-  else
-    {
-      if (mqhdr->mqh_pid != 0)
+      mqinfo = (struct mq_info *) mqd;
+      if (mqinfo->mqi_magic != MQI_MAGIC)
 	{
-	  if (kill (mqhdr->mqh_pid, 0) != -1 || errno != ESRCH)
-	    {
-	      set_errno (EBUSY);
-	      ipc_mutex_unlock (mqinfo->mqi_lock);
-	      return -1;
-	    }
+	  set_errno (EBADF);
+	  __leave;
 	}
-      mqhdr->mqh_pid = pid;
-      mqhdr->mqh_event = *notification;
+      mqhdr = mqinfo->mqi_hdr;
+      if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
+	{
+	  errno = n;
+	  __leave;
+	}
+
+      pid = getpid ();
+      if (!notification)
+	{
+	  if (mqhdr->mqh_pid == pid)
+	      mqhdr->mqh_pid = 0;     /* unregister calling process */
+	}
+      else
+	{
+	  if (mqhdr->mqh_pid != 0)
+	    {
+	      if (kill (mqhdr->mqh_pid, 0) != -1 || errno != ESRCH)
+		{
+		  set_errno (EBUSY);
+		  ipc_mutex_unlock (mqinfo->mqi_lock);
+		  __leave;
+		}
+	    }
+	  mqhdr->mqh_pid = pid;
+	  mqhdr->mqh_event = *notification;
+	}
+      ipc_mutex_unlock (mqinfo->mqi_lock);
+      return 0;
     }
-  ipc_mutex_unlock (mqinfo->mqi_lock);
-  return 0;
+  __except (EBADF) {}
+  __endtry
+  return -1;
 }
 
 static int
@@ -773,113 +787,116 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
   struct mq_hdr *mqhdr;
   struct mq_fattr *attr;
   struct msg_hdr *msghdr, *nmsghdr, *pmsghdr;
-  struct mq_info *mqinfo;
+  struct mq_info *mqinfo = NULL;
+  bool ipc_mutex_locked = false;
+  int ret = -1;
 
   pthread_testcancel ();
 
-  myfault efault;
-  if (efault.faulted (EBADF))
-      return -1;
-
-  mqinfo = (struct mq_info *) mqd;
-  if (mqinfo->mqi_magic != MQI_MAGIC)
+  __try
     {
-      set_errno (EBADF);
-      return -1;
-    }
-  if (prio > MQ_PRIO_MAX)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  mqhdr = mqinfo->mqi_hdr;        /* struct pointer */
-  mptr = (int8_t *) mqhdr;        /* byte pointer */
-  attr = &mqhdr->mqh_attr;
-  if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
-    {
-      errno = n;
-      return -1;
-    }
-
-  if (len > (size_t) attr->mq_msgsize)
-    {
-      set_errno (EMSGSIZE);
-      goto err;
-    }
-  if (attr->mq_curmsgs == 0)
-    {
-      if (mqhdr->mqh_pid != 0 && mqhdr->mqh_nwait == 0)
+      mqinfo = (struct mq_info *) mqd;
+      if (mqinfo->mqi_magic != MQI_MAGIC)
 	{
-	  sigev = &mqhdr->mqh_event;
-	  if (sigev->sigev_notify == SIGEV_SIGNAL)
-	    sigqueue (mqhdr->mqh_pid, sigev->sigev_signo, sigev->sigev_value);
-	  mqhdr->mqh_pid = 0;             /* unregister */
+	  set_errno (EBADF);
+	  __leave;
 	}
-    }
-  else if (attr->mq_curmsgs >= attr->mq_maxmsg)
-    {
-      /* Queue is full */
-      if (mqinfo->mqi_flags & O_NONBLOCK)
+      if (prio > MQ_PRIO_MAX)
 	{
-	  set_errno (EAGAIN);
-	  goto err;
+	  set_errno (EINVAL);
+	  __leave;
 	}
-      /* Wait for room for one message on the queue */
-      while (attr->mq_curmsgs >= attr->mq_maxmsg)
+
+      mqhdr = mqinfo->mqi_hdr;        /* struct pointer */
+      mptr = (int8_t *) mqhdr;        /* byte pointer */
+      attr = &mqhdr->mqh_attr;
+      if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
 	{
-	  int ret = ipc_cond_timedwait (mqinfo->mqi_waitsend, mqinfo->mqi_lock,
-					abstime);
-	  if (ret != 0)
+	  errno = n;
+	  __leave;
+	}
+      ipc_mutex_locked = true;
+      if (len > (size_t) attr->mq_msgsize)
+	{
+	  set_errno (EMSGSIZE);
+	  __leave;
+	}
+      if (attr->mq_curmsgs == 0)
+	{
+	  if (mqhdr->mqh_pid != 0 && mqhdr->mqh_nwait == 0)
 	    {
-	      set_errno (ret);
-	      return -1;
+	      sigev = &mqhdr->mqh_event;
+	      if (sigev->sigev_notify == SIGEV_SIGNAL)
+		sigqueue (mqhdr->mqh_pid, sigev->sigev_signo,
+			  sigev->sigev_value);
+	      mqhdr->mqh_pid = 0;             /* unregister */
 	    }
 	}
-    }
-
-  /* nmsghdr will point to new message */
-  if ((freeindex = mqhdr->mqh_free) == 0)
-    api_fatal ("mq_send: curmsgs = %ld; free = 0", attr->mq_curmsgs);
-
-  nmsghdr = (struct msg_hdr *) &mptr[freeindex];
-  nmsghdr->msg_prio = prio;
-  nmsghdr->msg_len = len;
-  memcpy (nmsghdr + 1, ptr, len);          /* copy message from caller */
-  mqhdr->mqh_free = nmsghdr->msg_next;    /* new freelist head */
-
-  /* Find right place for message in linked list */
-  index = mqhdr->mqh_head;
-  pmsghdr = (struct msg_hdr *) &(mqhdr->mqh_head);
-  while (index)
-    {
-      msghdr = (struct msg_hdr *) &mptr[index];
-      if (prio > msghdr->msg_prio)
+      else if (attr->mq_curmsgs >= attr->mq_maxmsg)
 	{
-	  nmsghdr->msg_next = index;
-	  pmsghdr->msg_next = freeindex;
-	  break;
+	  /* Queue is full */
+	  if (mqinfo->mqi_flags & O_NONBLOCK)
+	    {
+	      set_errno (EAGAIN);
+	      __leave;
+	    }
+	  /* Wait for room for one message on the queue */
+	  while (attr->mq_curmsgs >= attr->mq_maxmsg)
+	    {
+	      int ret = ipc_cond_timedwait (mqinfo->mqi_waitsend,
+					    mqinfo->mqi_lock, abstime);
+	      if (ret != 0)
+		{
+		  set_errno (ret);
+		  __leave;
+		}
+	    }
 	}
-      index = msghdr->msg_next;
-      pmsghdr = msghdr;
-    }
-  if (index == 0)
-    {
-      /* Queue was empty or new goes at end of list */
-      pmsghdr->msg_next = freeindex;
-      nmsghdr->msg_next = 0;
-    }
-  /* Wake up anyone blocked in mq_receive waiting for a message */
-  if (attr->mq_curmsgs == 0)
-    ipc_cond_signal (mqinfo->mqi_waitrecv);
-  attr->mq_curmsgs++;
 
-  ipc_mutex_unlock (mqinfo->mqi_lock);
-  return 0;
+      /* nmsghdr will point to new message */
+      if ((freeindex = mqhdr->mqh_free) == 0)
+	api_fatal ("mq_send: curmsgs = %ld; free = 0", attr->mq_curmsgs);
 
-err:
-  ipc_mutex_unlock (mqinfo->mqi_lock);
-  return -1;
+      nmsghdr = (struct msg_hdr *) &mptr[freeindex];
+      nmsghdr->msg_prio = prio;
+      nmsghdr->msg_len = len;
+      memcpy (nmsghdr + 1, ptr, len);         /* copy message from caller */
+      mqhdr->mqh_free = nmsghdr->msg_next;    /* new freelist head */
+
+      /* Find right place for message in linked list */
+      index = mqhdr->mqh_head;
+      pmsghdr = (struct msg_hdr *) &(mqhdr->mqh_head);
+      while (index)
+	{
+	  msghdr = (struct msg_hdr *) &mptr[index];
+	  if (prio > msghdr->msg_prio)
+	    {
+	      nmsghdr->msg_next = index;
+	      pmsghdr->msg_next = freeindex;
+	      break;
+	    }
+	  index = msghdr->msg_next;
+	  pmsghdr = msghdr;
+	}
+      if (index == 0)
+	{
+	  /* Queue was empty or new goes at end of list */
+	  pmsghdr->msg_next = freeindex;
+	  nmsghdr->msg_next = 0;
+	}
+      /* Wake up anyone blocked in mq_receive waiting for a message */
+      if (attr->mq_curmsgs == 0)
+	ipc_cond_signal (mqinfo->mqi_waitrecv);
+      attr->mq_curmsgs++;
+
+      ipc_mutex_unlock (mqinfo->mqi_lock);
+      ret = 0;
+    }
+  __except (EBADF) {}
+  __endtry
+  if (ipc_mutex_locked)
+    ipc_mutex_unlock (mqinfo->mqi_lock);
+  return ret;
 }
 
 extern "C" int
@@ -902,85 +919,84 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
   int n;
   long index;
   int8_t *mptr;
-  ssize_t len;
+  ssize_t len = -1;
   struct mq_hdr *mqhdr;
   struct mq_fattr *attr;
   struct msg_hdr *msghdr;
-  struct mq_info *mqinfo;
+  struct mq_info *mqinfo = (struct mq_info *) mqd;
+  bool ipc_mutex_locked = false;
 
   pthread_testcancel ();
 
-  myfault efault;
-  if (efault.faulted (EBADF))
-      return -1;
-
-  mqinfo = (struct mq_info *) mqd;
-  if (mqinfo->mqi_magic != MQI_MAGIC)
+  __try
     {
-      set_errno (EBADF);
-      return -1;
-    }
-  mqhdr = mqinfo->mqi_hdr;        /* struct pointer */
-  mptr = (int8_t *) mqhdr;        /* byte pointer */
-  attr = &mqhdr->mqh_attr;
-  if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
-    {
-      errno = n;
-      return -1;
-    }
-
-  if (maxlen < (size_t) attr->mq_msgsize)
-    {
-      set_errno (EMSGSIZE);
-      goto err;
-    }
-  if (attr->mq_curmsgs == 0)	/* queue is empty */
-    {
-      if (mqinfo->mqi_flags & O_NONBLOCK)
+      if (mqinfo->mqi_magic != MQI_MAGIC)
 	{
-	  set_errno (EAGAIN);
-	  goto err;
+	  set_errno (EBADF);
+	  __leave;
 	}
-      /* Wait for a message to be placed onto queue */
-      mqhdr->mqh_nwait++;
-      while (attr->mq_curmsgs == 0)
+      mqhdr = mqinfo->mqi_hdr;        /* struct pointer */
+      mptr = (int8_t *) mqhdr;        /* byte pointer */
+      attr = &mqhdr->mqh_attr;
+      if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
 	{
-	  int ret = ipc_cond_timedwait (mqinfo->mqi_waitrecv, mqinfo->mqi_lock,
-					abstime);
-	  if (ret != 0)
+	  errno = n;
+	  __leave;
+	}
+      ipc_mutex_locked = true;
+      if (maxlen < (size_t) attr->mq_msgsize)
+	{
+	  set_errno (EMSGSIZE);
+	  __leave;
+	}
+      if (attr->mq_curmsgs == 0)	/* queue is empty */
+	{
+	  if (mqinfo->mqi_flags & O_NONBLOCK)
 	    {
-	      set_errno (ret);
-	      return -1;
+	      set_errno (EAGAIN);
+	      __leave;
 	    }
+	  /* Wait for a message to be placed onto queue */
+	  mqhdr->mqh_nwait++;
+	  while (attr->mq_curmsgs == 0)
+	    {
+	      int ret = ipc_cond_timedwait (mqinfo->mqi_waitrecv,
+					    mqinfo->mqi_lock, abstime);
+	      if (ret != 0)
+		{
+		  set_errno (ret);
+		  __leave;
+		}
+	    }
+	  mqhdr->mqh_nwait--;
 	}
-      mqhdr->mqh_nwait--;
+
+      if ((index = mqhdr->mqh_head) == 0)
+	api_fatal ("mq_receive: curmsgs = %ld; head = 0", attr->mq_curmsgs);
+
+      msghdr = (struct msg_hdr *) &mptr[index];
+      mqhdr->mqh_head = msghdr->msg_next;     /* new head of list */
+      len = msghdr->msg_len;
+      memcpy(ptr, msghdr + 1, len);           /* copy the message itself */
+      if (priop != NULL)
+	*priop = msghdr->msg_prio;
+
+      /* Just-read message goes to front of free list */
+      msghdr->msg_next = mqhdr->mqh_free;
+      mqhdr->mqh_free = index;
+
+      /* Wake up anyone blocked in mq_send waiting for room */
+      if (attr->mq_curmsgs == attr->mq_maxmsg)
+	ipc_cond_signal (mqinfo->mqi_waitsend);
+      attr->mq_curmsgs--;
+
+      ipc_mutex_unlock (mqinfo->mqi_lock);
     }
-
-  if ((index = mqhdr->mqh_head) == 0)
-    api_fatal ("mq_receive: curmsgs = %ld; head = 0", attr->mq_curmsgs);
-
-  msghdr = (struct msg_hdr *) &mptr[index];
-  mqhdr->mqh_head = msghdr->msg_next;     /* new head of list */
-  len = msghdr->msg_len;
-  memcpy(ptr, msghdr + 1, len);           /* copy the message itself */
-  if (priop != NULL)
-    *priop = msghdr->msg_prio;
-
-  /* Just-read message goes to front of free list */
-  msghdr->msg_next = mqhdr->mqh_free;
-  mqhdr->mqh_free = index;
-
-  /* Wake up anyone blocked in mq_send waiting for room */
-  if (attr->mq_curmsgs == attr->mq_maxmsg)
-    ipc_cond_signal (mqinfo->mqi_waitsend);
-  attr->mq_curmsgs--;
-
-  ipc_mutex_unlock (mqinfo->mqi_lock);
+  __except (EBADF) {}
+  __endtry
+  if (ipc_mutex_locked)
+    ipc_mutex_unlock (mqinfo->mqi_lock);
   return len;
-
-err:
-  ipc_mutex_unlock (mqinfo->mqi_lock);
-  return -1;
 }
 
 extern "C" ssize_t
@@ -1004,34 +1020,36 @@ mq_close (mqd_t mqd)
   struct mq_fattr *attr;
   struct mq_info *mqinfo;
 
-  myfault efault;
-  if (efault.faulted (EBADF))
-      return -1;
-
-  mqinfo = (struct mq_info *) mqd;
-  if (mqinfo->mqi_magic != MQI_MAGIC)
+  __try
     {
-      set_errno (EBADF);
-      return -1;
+      mqinfo = (struct mq_info *) mqd;
+      if (mqinfo->mqi_magic != MQI_MAGIC)
+	{
+	  set_errno (EBADF);
+	  __leave;
+	}
+      mqhdr = mqinfo->mqi_hdr;
+      attr = &mqhdr->mqh_attr;
+
+      if (mq_notify (mqd, NULL))	/* unregister calling process */
+	__leave;
+
+      msgsize = MSGSIZE (attr->mq_msgsize);
+      filesize = sizeof (struct mq_hdr)
+		 + (attr->mq_maxmsg * (sizeof (struct msg_hdr) + msgsize));
+      if (munmap (mqinfo->mqi_hdr, filesize) == -1)
+	__leave;
+
+      mqinfo->mqi_magic = 0;          /* just in case */
+      ipc_cond_close (mqinfo->mqi_waitsend);
+      ipc_cond_close (mqinfo->mqi_waitrecv);
+      ipc_mutex_close (mqinfo->mqi_lock);
+      free (mqinfo);
+      return 0;
     }
-  mqhdr = mqinfo->mqi_hdr;
-  attr = &mqhdr->mqh_attr;
-
-  if (mq_notify (mqd, NULL))	/* unregister calling process */
-    return -1;
-
-  msgsize = MSGSIZE (attr->mq_msgsize);
-  filesize = sizeof (struct mq_hdr)
-	     + (attr->mq_maxmsg * (sizeof (struct msg_hdr) + msgsize));
-  if (munmap (mqinfo->mqi_hdr, filesize) == -1)
-    return -1;
-
-  mqinfo->mqi_magic = 0;          /* just in case */
-  ipc_cond_close (mqinfo->mqi_waitsend);
-  ipc_cond_close (mqinfo->mqi_waitrecv);
-  ipc_mutex_close (mqinfo->mqi_lock);
-  free (mqinfo);
-  return 0;
+  __except (EBADF) {}
+  __endtry
+  return -1;
 }
 
 extern "C" int
@@ -1062,7 +1080,7 @@ struct sem_finfo
 extern "C" sem_t *
 sem_open (const char *name, int oflag, ...)
 {
-  int i, fd = -1, created;
+  int i, fd = -1, created = 0;
   va_list ap;
   mode_t mode = 0;
   unsigned int value = 0;
@@ -1078,97 +1096,99 @@ sem_open (const char *name, int oflag, ...)
   if (!check_path (semname, semaphore, name, len))
     return SEM_FAILED;
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return SEM_FAILED;
-
-  created = 0;
-  oflag &= (O_CREAT | O_EXCL);
-
-again:
-  if (oflag & O_CREAT)
+  __try
     {
-      va_start (ap, oflag);		/* init ap to final named argument */
-      mode = va_arg (ap, mode_t) & ~S_IXUSR;
-      value = va_arg (ap, unsigned int);
-      va_end (ap);
+      oflag &= (O_CREAT | O_EXCL);
 
-      /* Open and specify O_EXCL and user-execute */
-      fd = open (semname, oflag | O_EXCL | O_RDWR | O_CLOEXEC, mode | S_IXUSR);
-      if (fd < 0)
+    again:
+      if (oflag & O_CREAT)
 	{
-	  if (errno == EEXIST && (oflag & O_EXCL) == 0)
-	    goto exists;		/* already exists, OK */
-	  return SEM_FAILED;
-	}
-      created = 1;
-      /* First one to create the file initializes it. */
-      NtAllocateLocallyUniqueId (&sf.luid);
-      sf.value = value;
-      sf.hash = hash_path_name (0, semname);
-      if (write (fd, &sf, sizeof sf) != sizeof sf)
-	goto err;
-      sem = semaphore::open (sf.hash, sf.luid, fd, oflag, mode, value, wasopen);
-      if (sem == SEM_FAILED)
-	goto err;
-      /* Initialization complete, turn off user-execute bit */
-      if (fchmod (fd, mode) == -1)
-	goto err;
-      /* Don't close (fd); */
-      return sem;
-    }
+	  va_start (ap, oflag);		/* init ap to final named argument */
+	  mode = va_arg (ap, mode_t) & ~S_IXUSR;
+	  value = va_arg (ap, unsigned int);
+	  va_end (ap);
 
-exists:
-  /* Open the file and fetch the semaphore name. */
-  if ((fd = open (semname, O_RDWR | O_CLOEXEC)) < 0)
-    {
-      if (errno == ENOENT && (oflag & O_CREAT))
-	goto again;
-      goto err;
-    }
-  /* Make certain initialization is complete */
-  for (i = 0; i < MAX_TRIES; i++)
-    {
-      if (stat64 (semname, &statbuff) == -1)
+	  /* Open and specify O_EXCL and user-execute */
+	  fd = open (semname, oflag | O_EXCL | O_RDWR | O_CLOEXEC,
+		     mode | S_IXUSR);
+	  if (fd < 0)
+	    {
+	      if (errno == EEXIST && (oflag & O_EXCL) == 0)
+		goto exists;		/* already exists, OK */
+	      return SEM_FAILED;
+	    }
+	  created = 1;
+	  /* First one to create the file initializes it. */
+	  NtAllocateLocallyUniqueId (&sf.luid);
+	  sf.value = value;
+	  sf.hash = hash_path_name (0, semname);
+	  if (write (fd, &sf, sizeof sf) != sizeof sf)
+	    __leave;
+	  sem = semaphore::open (sf.hash, sf.luid, fd, oflag, mode, value,
+				 wasopen);
+	  if (sem == SEM_FAILED)
+	    __leave;
+	  /* Initialization complete, turn off user-execute bit */
+	  if (fchmod (fd, mode) == -1)
+	    __leave;
+	  /* Don't close (fd); */
+	  return sem;
+	}
+
+    exists:
+      /* Open the file and fetch the semaphore name. */
+      if ((fd = open (semname, O_RDWR | O_CLOEXEC)) < 0)
 	{
 	  if (errno == ENOENT && (oflag & O_CREAT))
-	    {
-	      close (fd);
-	      fd = -1;
-	      goto again;
-	    }
-	  goto err;
+	    goto again;
+	  __leave;
 	}
-      if ((statbuff.st_mode & S_IXUSR) == 0)
-	break;
-      sleep (1);
+      /* Make certain initialization is complete */
+      for (i = 0; i < MAX_TRIES; i++)
+	{
+	  if (stat64 (semname, &statbuff) == -1)
+	    {
+	      if (errno == ENOENT && (oflag & O_CREAT))
+		{
+		  close (fd);
+		  fd = -1;
+		  goto again;
+		}
+	      __leave;
+	    }
+	  if ((statbuff.st_mode & S_IXUSR) == 0)
+	    break;
+	  sleep (1);
+	}
+      if (i == MAX_TRIES)
+	{
+	  set_errno (ETIMEDOUT);
+	  __leave;
+	}
+      if (file.lock (fd, sizeof sf))
+	__leave;
+      if (read (fd, &sf, sizeof sf) != sizeof sf)
+	__leave;
+      sem = semaphore::open (sf.hash, sf.luid, fd, oflag, mode, sf.value,
+			     wasopen);
+      file.unlock (fd);
+      if (sem == SEM_FAILED)
+	__leave;
+      /* If wasopen is set, the semaphore was already opened and we already have
+	 an open file descriptor pointing to the file.  This means, we have to
+	 close the file descriptor created in this call.  It won't be stored
+	 anywhere anyway. */
+      if (wasopen)
+	close (fd);
+      return sem;
     }
-  if (i == MAX_TRIES)
-    {
-      set_errno (ETIMEDOUT);
-      goto err;
-    }
-  if (file.lock (fd, sizeof sf))
-    goto err;
-  if (read (fd, &sf, sizeof sf) != sizeof sf)
-    goto err;
-  sem = semaphore::open (sf.hash, sf.luid, fd, oflag, mode, sf.value, wasopen);
-  file.unlock (fd);
-  if (sem == SEM_FAILED)
-    goto err;
-  /* If wasopen is set, the semaphore was already opened and we already have
-     an open file descriptor pointing to the file.  This means, we have to
-     close the file descriptor created in this call.  It won't be stored
-     anywhere anyway. */
-  if (wasopen)
-    close (fd);
-  return sem;
-
-err:
+  __except (EFAULT) {}
+  __endtry
   /* Don't let following function calls change errno */
   save_errno save;
 
-  file.unlock (fd);
+  if (fd >= 0)
+    file.unlock (fd);
   if (created)
     unlink (semname);
   if (sem != SEM_FAILED)

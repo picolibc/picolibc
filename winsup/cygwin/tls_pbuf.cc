@@ -8,17 +8,16 @@ details. */
 
 #include <winsup.h>
 #include <malloc.h>
-#include "cygtls.h"
 #include "tls_pbuf.h"
 
-#define tls_pbuf	_my_tls.locals.pathbufs
+#define tls_pbuf	_my_tls.pathbufs
 
 void
 tls_pathbuf::destroy ()
 {
-  for (unsigned i = 0; i < TP_NUM_C_BUFS && c_buf[i]; ++i)
+  for (uint32_t i = 0; i < TP_NUM_C_BUFS && c_buf[i]; ++i)
     free (c_buf[i]);
-  for (unsigned i = 0; i < TP_NUM_W_BUFS && w_buf[i]; ++i)
+  for (uint32_t i = 0; i < TP_NUM_W_BUFS && w_buf[i]; ++i)
     free (w_buf[i]);
 }
 

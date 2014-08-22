@@ -1,7 +1,7 @@
 /* signal.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
    Written by Steve Chamberlain of Cygnus Support, sac@cygnus.com
    Significant changes by Sergey Okhapkin <sos@prospect.com.ru>
@@ -197,33 +197,37 @@ handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& op
       return EINVAL;
     }
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return EFAULT;
-
-  if (oldset)
-    *oldset = opmask;
-
-  if (set)
-    {
-      sigset_t newmask = opmask;
-      switch (how)
+  __try
 	{
-	case SIG_BLOCK:
-	  /* add set to current mask */
-	  newmask |= *set;
-	  break;
-	case SIG_UNBLOCK:
-	  /* remove set from current mask */
-	  newmask &= ~*set;
-	  break;
-	case SIG_SETMASK:
-	  /* just set it */
-	  newmask = *set;
-	  break;
+      if (oldset)
+	*oldset = opmask;
+
+      if (set)
+	{
+	  sigset_t newmask = opmask;
+	  switch (how)
+	    {
+	    case SIG_BLOCK:
+	      /* add set to current mask */
+	      newmask |= *set;
+	      break;
+	    case SIG_UNBLOCK:
+	      /* remove set from current mask */
+	      newmask &= ~*set;
+	      break;
+	    case SIG_SETMASK:
+	      /* just set it */
+	      newmask = *set;
+	      break;
+	    }
+	  set_signal_mask (opmask, newmask);
 	}
-      set_signal_mask (opmask, newmask);
     }
+  __except (EFAULT)
+    {
+      return EFAULT;
+    }
+  __endtry
   return 0;
 }
 
@@ -382,8 +386,7 @@ sigaction_worker (int sig, const struct sigaction *newact,
 		  struct sigaction *oldact, bool isinternal)
 {
   int res = -1;
-  myfault efault;
-  if (!efault.faulted (EFAULT))
+  __try
     {
       sig_dispatch_pending ();
       /* check that sig is in right range */
@@ -394,14 +397,17 @@ sigaction_worker (int sig, const struct sigaction *newact,
 	  struct sigaction oa = global_sigs[sig];
 
 	  if (!newact)
-	    sigproc_printf ("signal %d, newact %p, oa %p", sig, newact, oa, oa.sa_handler);
+	    sigproc_printf ("signal %d, newact %p, oa %p",
+			    sig, newact, oa, oa.sa_handler);
 	  else
 	    {
-	      sigproc_printf ("signal %d, newact %p (handler %p), oa %p", sig, newact, newact->sa_handler, oa, oa.sa_handler);
+	      sigproc_printf ("signal %d, newact %p (handler %p), oa %p",
+			      sig, newact, newact->sa_handler, oa,
+			      oa.sa_handler);
 	      if (sig == SIGKILL || sig == SIGSTOP)
 		{
 		  set_errno (EINVAL);
-		  goto out;
+		  __leave;
 		}
 	      struct sigaction na = *newact;
 	      struct sigaction& gs = global_sigs[sig];
@@ -430,8 +436,8 @@ sigaction_worker (int sig, const struct sigaction *newact,
 	    res = 0;
 	}
     }
-
-out:
+  __except (EFAULT) {}
+  __endtry
   return res;
 }
 
@@ -560,41 +566,41 @@ sigwait (const sigset_t *set, int *sig_ptr)
 extern "C" int
 sigwaitinfo (const sigset_t *set, siginfo_t *info)
 {
+  int res = -1;
+
   pthread_testcancel ();
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-
-  set_signal_mask (_my_tls.sigwait_mask, *set);
-  sig_dispatch_pending (true);
-
-  int res;
-  switch (cygwait (NULL, cw_infinite, cw_sig_eintr | cw_cancel | cw_cancel_self))
+  __try
     {
-    case WAIT_SIGNALED:
-      if (!sigismember (set, _my_tls.infodata.si_signo))
-	{
-	  set_errno (EINTR);
-	  res = -1;
-	}
-      else
-	{
-	  _my_tls.lock ();
-	  if (info)
-	    *info = _my_tls.infodata;
-	  res = _my_tls.infodata.si_signo;
-	  _my_tls.sig = 0;
-	  if (_my_tls.retaddr () == (__stack_t) sigdelayed)
-	    _my_tls.pop ();
-	  _my_tls.unlock ();
-	}
-      break;
-    default:
-      __seterrno ();
-      res = -1;
-    }
+      set_signal_mask (_my_tls.sigwait_mask, *set);
+      sig_dispatch_pending (true);
 
+      switch (cygwait (NULL, cw_infinite, cw_sig_eintr | cw_cancel | cw_cancel_self))
+	{
+	case WAIT_SIGNALED:
+	  if (!sigismember (set, _my_tls.infodata.si_signo))
+	    set_errno (EINTR);
+	  else
+	    {
+	      _my_tls.lock ();
+	      if (info)
+		*info = _my_tls.infodata;
+	      res = _my_tls.infodata.si_signo;
+	      _my_tls.sig = 0;
+	      if (_my_tls.retaddr () == (__stack_t) sigdelayed)
+		_my_tls.pop ();
+	      _my_tls.unlock ();
+	    }
+	  break;
+	default:
+	  __seterrno ();
+	  break;
+	}
+    }
+  __except (EFAULT) {
+    res = -1;
+  }
+  __endtry
   sigproc_printf ("returning signal %d", res);
   return res;
 }

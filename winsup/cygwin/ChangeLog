@@ -1,5 +1,50 @@
 2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Throughout, use __try/__except/__endtry blocks, rather than myfault
+	handler.
+	* cygtls.cc (_cygtls::remove): Accommodate the fact that pathbufs
+	has been moved from _local_storage to _cygtls.
+	* cygtls.h (class tls_pathbuf): Add comment to hint to gendef usage
+	of counters.  Change type of counters to uint32_t for clarity.
+	Remove _cygtls as friend class.
+	(struct _local_storage): Move pathbufs from here...
+	(struct _cygtls): ...to here, allowing to access it from _sigbe.
+	(class san): Only define on 32 bit.  Remove errno, _c_cnt and _w_cnt
+	members.
+	(san::setup): Drop parameter.  Don't initialize removed members.
+	(san::leave): Don't set removed members.
+	(class myfault): Only define on 32 bit.
+	(myfault::faulted): Only keep implementation not taking any parameter.
+	Drop argument in call to sebastian.setup.
+	(__try/__leave/__except/__endtry): Implement to support real SEH.  For
+	now stick to SJLJ on 32 bit.
+	* dcrt0.cc (dll_crt0_0): Drop 64 bit call to
+	exception::install_myfault_handler.
+	* exception.h (exception_handler): Define with EXCEPTION_DISPOSITION
+	as return type.
+	(PDISPATCHER_CONTEXT): Define as void * on 32 bit.  Define as pointer
+	to _DISPATCHER_CONTEXT on 64 bit.
+	(class exception): Define separately for 32 and 64 bit.
+	(exception::myfault): Add handler for myfault SEH handling on 64 bit.
+	(exception::exception): Fix mangled method name to account for change
+	in type of last parameter.
+	(exception::install_myfault_handler): Remove.
+	* exceptions.cc (exception::myfault_handle): Remove.
+	(exception::myfault): New SEH handler for 64 bit.
+	* gendef (_sigbe): Set tls_pathbuf counters to 0 explicitely when
+	returning to the caller.
+	* ntdll.h: Move a comment to a better place.
+	(struct _SCOPE_TABLE): Define on 64 bit.
+	* thread.cc (verifyable_object_isvalid): Remove gcc 4.7 workaround.
+	* tls_pbuf.cc (tls_pbuf): Fix to accommodate new place of pathbufs.
+	(tls_pathbuf::destroy): Change type of loop variables to uint32_t.
+	* tls_pbuf.h (class tmp_pathbuf): Change type of buffer counters to
+	uint32_t.  Accommodate new place of pathbufs.
+	* tlsoffsets.h: Regenerate.
+	* tlsoffsets64.h: Regenerate.
+
+2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* miscfuncs.cc (__import_address): Cover the first dereference to imp
 	under the fault handler.
 

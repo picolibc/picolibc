@@ -1,7 +1,7 @@
 /* ntdll.h.  Contains ntdll specific stuff not defined elsewhere.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013 Red Hat, Inc.
+   2011, 2012, 2013, 2014 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -1180,8 +1180,19 @@ typedef enum _SECTION_INHERIT
 
 typedef VOID (APIENTRY *PTIMER_APC_ROUTINE)(PVOID, ULONG, ULONG);
 
-/* Function declarations for ntdll.dll.  These don't appear in any
-   standard Win32 header.  */
+#ifdef __x86_64__
+typedef struct _SCOPE_TABLE
+{
+  ULONG Count;
+  struct
+  {
+    ULONG BeginAddress;
+    ULONG EndAddress;
+    ULONG HandlerAddress;
+    ULONG JumpTarget;
+  } ScopeRecord[1];
+} SCOPE_TABLE, *PSCOPE_TABLE;
+#endif
 
 #ifdef __cplusplus
 /* This is the mapping of the KUSER_SHARED_DATA structure into the user
@@ -1189,6 +1200,9 @@ typedef VOID (APIENTRY *PTIMER_APC_ROUTINE)(PVOID, ULONG, ULONG);
    We need it here to access the current DismountCount and InterruptTime.  */
 static volatile KUSER_SHARED_DATA &SharedUserData
 	= *(volatile KUSER_SHARED_DATA *) 0x7ffe0000;
+
+/* Function declarations for ntdll.dll.  These don't appear in any
+   standard Win32 header.  */
 
 extern "C"
 {

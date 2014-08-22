@@ -217,10 +217,15 @@ getlogin_r (char *name, size_t namesize)
   size_t len = strlen (login) + 1;
   if (len > namesize)
     return ERANGE;
-  myfault efault;
-  if (efault.faulted ())
-    return EFAULT;
-  strncpy (name, login, len);
+  __try
+    {
+      strncpy (name, login, len);
+    }
+  __except (NO_ERROR)
+    {
+      return EFAULT;
+    }
+  __endtry
   return 0;
 }
 

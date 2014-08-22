@@ -638,10 +638,7 @@ init_cygheap::find_tls (int sig, bool& issig_wait)
   _cygtls *t = NULL;
   issig_wait = false;
 
-  myfault efault;
-  if (efault.faulted ())
-    threadlist[ix]->remove (INFINITE);
-  else
+  __try
     {
       ix = -1;
       /* Scan thread list looking for valid signal-delivery candidates */
@@ -652,11 +649,15 @@ init_cygheap::find_tls (int sig, bool& issig_wait)
 	  {
 	    t = cygheap->threadlist[ix];
 	    issig_wait = true;
-	    goto out;
+	    __leave;
 	  }
 	else if (!t && !sigismember (&(threadlist[ix]->sigmask), sig))
 	  t = cygheap->threadlist[ix];
     }
-out:
+  __except (NO_ERROR)
+    {
+      threadlist[ix]->remove (INFINITE);
+    }
+  __endtry
   return t;
 }

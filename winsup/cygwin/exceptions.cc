@@ -341,38 +341,41 @@ void
 cygwin_exception::dumpstack ()
 {
   static bool already_dumped;
-  myfault efault;
-  if (efault.faulted ())
-    return;
 
-  if (already_dumped || cygheap->rlim_core == 0Ul)
-    return;
-  already_dumped = true;
-  open_stackdumpfile ();
-
-  if (e)
-    dump_exception ();
-
-  int i;
-
-  thestack.init (framep, 1, ctx);	/* Initialize from the input CONTEXT */
-#ifdef __x86_64__
-  small_printf ("Stack trace:\r\nFrame        Function    Args\r\n");
-#else
-  small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
-#endif
-  for (i = 0; i < 16 && thestack++; i++)
+  __try
     {
-      small_printf (_AFMT "  " _AFMT, thestack.sf.AddrFrame.Offset,
-		    thestack.sf.AddrPC.Offset);
-      for (unsigned j = 0; j < NPARAMS; j++)
-	small_printf ("%s" _AFMT, j == 0 ? " (" : ", ", thestack.sf.Params[j]);
-      small_printf (")\r\n");
+      if (already_dumped || cygheap->rlim_core == 0Ul)
+	return;
+      already_dumped = true;
+      open_stackdumpfile ();
+
+      if (e)
+	dump_exception ();
+
+      int i;
+
+      thestack.init (framep, 1, ctx);	/* Initialize from the input CONTEXT */
+#ifdef __x86_64__
+      small_printf ("Stack trace:\r\nFrame        Function    Args\r\n");
+#else
+      small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
+#endif
+      for (i = 0; i < 16 && thestack++; i++)
+	{
+	  small_printf (_AFMT "  " _AFMT, thestack.sf.AddrFrame.Offset,
+			thestack.sf.AddrPC.Offset);
+	  for (unsigned j = 0; j < NPARAMS; j++)
+	    small_printf ("%s" _AFMT, j == 0 ? " (" : ", ",
+			  thestack.sf.Params[j]);
+	  small_printf (")\r\n");
+	}
+      small_printf ("End of stack trace%s\n",
+		    i == 16 ? " (more stack frames may be present)" : "");
+      if (h)
+	NtClose (h);
     }
-  small_printf ("End of stack trace%s\n",
-	      i == 16 ? " (more stack frames may be present)" : "");
-  if (h)
-    NtClose (h);
+  __except (NO_ERROR) {}
+  __endtry
 }
 
 bool
@@ -549,40 +552,24 @@ rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 #endif /* __x86_64 */
 
 #ifdef __x86_64__
-/* myfault vectored exception handler */
-LONG
-exception::myfault_handle (LPEXCEPTION_POINTERS ep)
+/* myfault exception handler. */
+EXCEPTION_DISPOSITION
+exception::myfault (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
+		    PDISPATCHER_CONTEXT dispatch)
 {
-  _cygtls& me = _my_tls;
-
-  if (me.andreas)
-    {
-      /* Only handle the minimum amount of exceptions the myfault handler
-	 was designed for. */
-      switch (ep->ExceptionRecord->ExceptionCode)
-	{
-	case STATUS_ACCESS_VIOLATION:
-	case STATUS_DATATYPE_MISALIGNMENT:
-#if 0
-	/* PAGE_GUARD-based stack commits are based on structured exception
-	   handling.  Short-circuiting STATUS_STACK_OVERFLOW in a vectored
-	   exception handler disables that, which can ultimately result in
-	   a spurious SEGV. */
-	case STATUS_STACK_OVERFLOW:
-#endif
-	case STATUS_ARRAY_BOUNDS_EXCEEDED:
-	  me.andreas->leave ();	/* Return from a "san" caught fault */
-	default:
-	  break;
-	}
-    }
-  return EXCEPTION_CONTINUE_SEARCH;
+  PSCOPE_TABLE table = (PSCOPE_TABLE) dispatch->HandlerData;
+  RtlUnwindEx (frame,
+	       (char *) dispatch->ImageBase + table->ScopeRecord[0].JumpTarget,
+	       e, 0, in, dispatch->HistoryTable);
+  /* NOTREACHED, make gcc happy. */
+  return ExceptionContinueSearch;
 }
-#endif /* __x86_64 */
+#endif
 
 /* Main exception handler. */
-int
-exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in, void *)
+EXCEPTION_DISPOSITION
+exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
+		   PDISPATCHER_CONTEXT dispatch)
 {
   static bool NO_COPY debugging;
   _cygtls& me = _my_tls;
