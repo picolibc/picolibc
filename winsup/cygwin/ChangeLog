@@ -1,5 +1,19 @@
 2014-08-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygtls.cc (san::leave/x86_64): Implement.
+	* cygtls.h (class tls_pathbuf): Move counter variables into a union.
+	Add 64 bit element _counters covering both counter variables to
+	optimize save and restore operations.
+	(class san/x86_64): Only store single 64 bit value.
+	(san::san/x86_64): Implement.
+	(san::leave/x86_64): Only declare here, as returns_twice function.
+	Explain why.
+	(class san/i686): Change type of _c_cnt and _w_cnt to uint32_t.
+	(__try/x86_64): Move definition of __sebastian after the first memory
+	barrier.  Drop __sebastian.setup call.
+
+2014-08-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.cc (_cygtls::remove): Revert previous patch.
 	*  cygtls.h (struct _local_storage): Move pathbufs back here.
 	(class san/x86_64): Revert class.  Save and restore pathbufs counters
