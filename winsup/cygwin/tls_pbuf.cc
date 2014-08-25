@@ -10,7 +10,7 @@ details. */
 #include <malloc.h>
 #include "tls_pbuf.h"
 
-#define tls_pbuf	_my_tls.pathbufs
+#define tls_pbuf	_my_tls.locals.pathbufs
 
 void
 tls_pathbuf::destroy ()

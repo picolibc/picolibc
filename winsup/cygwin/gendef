@@ -181,8 +181,6 @@ _sigbe:						# return here after cygwin syscall
 	movq	-8(%r11),%r11			# get return address from signal stack
 	decl	$tls::incyg(%r10)
 	decl	$tls::stacklock(%r10)		# release lock
-	leaq	$tls::pathbufs(%r10),%r10	# Address of tls_pathbufs
-	movq	\$0,(%r10)			# Set c_cnt and w_cnt to 0
 	jmp	*%r11				# "return" to caller
 	.seh_endproc
 
@@ -447,9 +445,6 @@ __sigbe:					# return here after cygwin syscall
 	xchgl	%eax,4(%esp)			# swap return address with saved eax
 	decl	$tls::incyg(%ebx)
 	decl	$tls::stacklock(%ebx)		# release lock
-	leal	$tls::pathbufs(%ebx),%ebx	# Address of tls_pathbufs
-	movl	\$0,(%ebx)			# Set c_cnt to 0
-	movl	\$0,4(%ebx)			# Set w_cnt to 0
 	popl	%ebx
 	ret
 

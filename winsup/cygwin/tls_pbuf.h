@@ -14,13 +14,13 @@ class tmp_pathbuf
   uint32_t w_buf_old;
 public:
   tmp_pathbuf () __attribute__ ((always_inline))
-  : c_buf_old (_my_tls.pathbufs.c_cnt),
-    w_buf_old (_my_tls.pathbufs.w_cnt)
+  : c_buf_old (_my_tls.locals.pathbufs.c_cnt),
+    w_buf_old (_my_tls.locals.pathbufs.w_cnt)
   {}
   ~tmp_pathbuf () __attribute__ ((always_inline))
   {
-    _my_tls.pathbufs.c_cnt = c_buf_old;
-    _my_tls.pathbufs.w_cnt = w_buf_old;
+    _my_tls.locals.pathbufs.c_cnt = c_buf_old;
+    _my_tls.locals.pathbufs.w_cnt = w_buf_old;
   }
 
   inline bool check_usage (uint32_t c_need, uint32_t w_need)

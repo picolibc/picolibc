@@ -38,12 +38,7 @@ extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
 extern "C" int valid_sched_parameters(const struct sched_param *);
 extern "C" int sched_set_thread_priority(HANDLE thread, int priority);
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 7
-/* FIXME: Temporarily workaround gcc 4.7+ bug. */
-static verifyable_object_state
-#else
 static inline verifyable_object_state
-#endif
   verifyable_object_isvalid (void const * objectptr, thread_magic_t magic,
 			     void *static_ptr1 = NULL,
 			     void *static_ptr2 = NULL,

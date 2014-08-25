@@ -1,3 +1,21 @@
+2014-08-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (_cygtls::remove): Revert previous patch.
+	*  cygtls.h (struct _local_storage): Move pathbufs back here.
+	(class san/x86_64): Revert class.  Save and restore pathbufs counters
+	only.
+	(class san/i686): Revert saving and restoring pathbufs counters.
+	(__try/x86_64): Add a san variable and call it's setup method.
+	(__except/x86_64): Call san::leave to restore pathbufs counters.
+	* gendef (_sigbe): Revert previous change.
+	* thread.cc (verifyable_object_state): Remove gcc 4.7 workaround in
+	forward declaration as well.
+	* tls_pbuf.cc (tls_pbuf): Revert previous change.
+	* tls_pbuf.h (class tmp_pathbuf): Accommodate reverting pathbufs to
+	locals structure.
+	* tlsoffsets.h: Regenerate.
+	* tlsoffsets64.h: Regenerate.
+
 2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Throughout, use __try/__except/__endtry blocks, rather than myfault

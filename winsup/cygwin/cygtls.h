@@ -132,6 +132,7 @@ struct _local_storage
   /* thread.cc */
   HANDLE cw_timer;
 
+  tls_pathbuf pathbufs;
   char ttybuf[32];
 };
 
@@ -189,7 +190,6 @@ public:
   struct pthread *tid;
   class cygthread *_ctinfo;
   class san *andreas;
-  tls_pathbuf pathbufs;
   waitq wq;
   int sig;
   unsigned incyg;
@@ -288,20 +288,45 @@ extern PVOID _tlstop __asm__ ("%fs:8");
 extern _cygtls *_main_tls;
 extern _cygtls *_sig_tls;
 
-#ifndef __x86_64__
+#ifdef __x86_64__
+class san
+{
+  unsigned _c_cnt;
+  unsigned _w_cnt;
+public:
+  void setup () __attribute__ ((always_inline))
+  {
+    _c_cnt = _my_tls.locals.pathbufs.c_cnt;
+    _w_cnt = _my_tls.locals.pathbufs.w_cnt;
+  }
+  void leave () __attribute__ ((always_inline))
+  {
+    /* Restore tls_pathbuf counters in case of error. */
+    _my_tls.locals.pathbufs.c_cnt = _c_cnt;
+    _my_tls.locals.pathbufs.w_cnt = _w_cnt;
+  }
+};
+#else
 class san
 {
   san *_clemente;
   jmp_buf _context;
+  unsigned _c_cnt;
+  unsigned _w_cnt;
 public:
   int setup () __attribute__ ((always_inline))
   {
     _clemente = _my_tls.andreas;
     _my_tls.andreas = this;
+    _c_cnt = _my_tls.locals.pathbufs.c_cnt;
+    _w_cnt = _my_tls.locals.pathbufs.w_cnt;
     return __sjfault (_context);
   }
   void leave () __attribute__ ((always_inline))
   {
+    /* Restore tls_pathbuf counters in case of error. */
+    _my_tls.locals.pathbufs.c_cnt = _c_cnt;
+    _my_tls.locals.pathbufs.w_cnt = _w_cnt;
     __ljfault (_context, 1);
   }
   void reset () __attribute__ ((always_inline))
@@ -331,6 +356,7 @@ public:
 #define __try \
   { \
     __label__ __l_try, __l_except, __l_endtry; \
+    san __sebastian; \
     __mem_barrier; \
     __asm__ goto ("\n" \
       "  .seh_handler _ZN9exception7myfaultEP17_EXCEPTION_RECORDPvP8_CONTEXTP19_DISPATCHER_CONTEXT, @except						\n" \
@@ -339,6 +365,7 @@ public:
       "  .rva %l[__l_try],%l[__l_endtry],%l[__l_except],%l[__l_except]	\n" \
       "  .seh_code							\n" \
       : : : : __l_try, __l_endtry, __l_except); \
+    __sebastian.setup (); \
     { \
       __l_try: \
 	__mem_barrier;
@@ -352,6 +379,7 @@ public:
     { \
       __l_except: \
 	__mem_barrier; \
+	__sebastian.leave (); \
 	if (__errno) \
 	  set_errno (__errno);
 

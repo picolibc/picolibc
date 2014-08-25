@@ -193,7 +193,7 @@ _cygtls::remove (DWORD wait)
   free_local (servent_buf);
   free_local (hostent_buf);
   /* Free temporary TLS path buffers. */
-  pathbufs.destroy ();
+  locals.pathbufs.destroy ();
   /* Close timer handle. */
   if (locals.cw_timer)
     NtClose (locals.cw_timer);
