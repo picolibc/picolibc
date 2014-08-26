@@ -281,14 +281,15 @@ class path_conv
 				NULL, sa.lpSecurityDescriptor);
     return &attr;
   }
-  inline void init_reopen_attr (POBJECT_ATTRIBUTES attr, HANDLE h)
+  inline POBJECT_ATTRIBUTES init_reopen_attr (OBJECT_ATTRIBUTES &attr, HANDLE h)
   {
     if (has_buggy_reopen ())
-      InitializeObjectAttributes (attr, get_nt_native_path (),
+      InitializeObjectAttributes (&attr, get_nt_native_path (),
 				  objcaseinsensitive (), NULL, NULL)
     else
-      InitializeObjectAttributes (attr, &ro_u_empty, objcaseinsensitive (),
+      InitializeObjectAttributes (&attr, &ro_u_empty, objcaseinsensitive (),
 				  h, NULL);
+    return &attr;
   }
   inline size_t get_wide_win32_path_len ()
   {

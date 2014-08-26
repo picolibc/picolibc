@@ -719,7 +719,7 @@ retry_open:
 	  if (!NT_SUCCESS (status2))
 	    debug_printf ("Removing R/O on %S failed, status = %y",
 			  pc.get_nt_native_path (), status2);
-	  pc.init_reopen_attr (&attr, fh_ro);
+	  pc.init_reopen_attr (attr, fh_ro);
 	}
       else
 	{
@@ -947,8 +947,8 @@ try_again:
 			pc.get_nt_native_path ());
 	  /* Re-open from handle so we open the correct file no matter if it
 	     has been moved to the bin or not. */
-	  pc.init_reopen_attr (&attr, fh);
-	  status = NtOpenFile (&fh2, DELETE, &attr, &io,
+	  status = NtOpenFile (&fh2, DELETE,
+			       pc.init_reopen_attr (attr, fh), &io,
 			       bin_stat == move_to_bin ? FILE_SHARE_VALID_FLAGS
 						       : FILE_SHARE_DELETE,
 			       flags | FILE_DELETE_ON_CLOSE);

@@ -1,3 +1,17 @@
+2014-08-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.h (path_conv::init_reopen_attr): Change from void to returning
+	POBJECT_ATTRIBUTES.  Take OBJECT_ATTRIBUTES reference as argument, not
+	pointer.
+	* fhandler_disk_file.cc: Throughout accommodate above change.
+	* syscalls.cc: Ditto.
+	* ntea.cc (read_ea): Don't set hdl to NULL if it's already NULL.  Set
+	attr with pc.init_reopen_attr before trying to reopen file.
+	(write_ea): Ditto.
+	* security.cc (get_file_sd): Use pc.init_reopen_attr rather than
+	pc.get_object_attr when trying to reopen file.
+	(set_file_sd): Ditto.
+
 2014-08-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.cc (san::leave/x86_64): Implement.

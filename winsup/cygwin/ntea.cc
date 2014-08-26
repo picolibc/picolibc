@@ -80,7 +80,6 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
 	      __seterrno_from_nt_status (status);
 	      __leave;
 	    }
-	  hdl = NULL;
 	}
 
       fea = (PFILE_FULL_EA_INFORMATION) tp.w_get ();
@@ -120,6 +119,7 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
 				      NULL, TRUE);
 	      if (status != STATUS_ACCESS_DENIED || !hdl)
 		break;
+	      pc.init_reopen_attr (attr, h);
 	    }
 	  status = NtOpenFile (&h, READ_CONTROL | FILE_READ_EA, &attr, &io,
 			       FILE_SHARE_VALID_FLAGS,
@@ -265,7 +265,6 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
 	      __seterrno_from_nt_status (status);
 	      __leave;
 	    }
-	  hdl = NULL;
 	}
 
       /* For compatibility with Linux, we only allow user xattrs and
@@ -323,6 +322,7 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
 	      status = NtSetEaFile (h, &io, fea, flen);
 	      if (status != STATUS_ACCESS_DENIED || !hdl)
 		break;
+	      pc.init_reopen_attr (attr, h);
 	    }
 	  status = NtOpenFile (&h, READ_CONTROL | FILE_WRITE_EA, &attr, &io,
 			       FILE_SHARE_VALID_FLAGS,

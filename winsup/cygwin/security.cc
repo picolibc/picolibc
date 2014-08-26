@@ -68,7 +68,7 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
   if (!fh)
     {
       status = NtOpenFile (&fh, READ_CONTROL,
-			   pc.get_object_attr (attr, sec_none_nih), &io,
+			   pc.init_reopen_attr (attr, fh), &io,
 			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
       if (!NT_SUCCESS (status))
 	{
@@ -216,8 +216,8 @@ set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd, bool is_chown)
 	  OBJECT_ATTRIBUTES attr;
 	  IO_STATUS_BLOCK io;
 	  status = NtOpenFile (&fh, (is_chown ? WRITE_OWNER  : 0) | WRITE_DAC,
-			       pc.get_object_attr (attr, sec_none_nih),
-			       &io, FILE_SHARE_VALID_FLAGS,
+			       pc.init_reopen_attr (attr, fh), &io,
+			       FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_FOR_BACKUP_INTENT);
 	  if (!NT_SUCCESS (status))
 	    {
