@@ -1,5 +1,11 @@
 2014-08-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* kernel32.cc (CreateFileMappingW): Fix default standard rights for
+	file mappings from READ_CONTROL to STANDARD_RIGHTS_REQUIRED to allow
+	changing the DACL (fixes "access denied" error in pinfo::set_acl).
+
+2014-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntea.cc (read_ea): Change left-over return to __leave.  Fix
 	condition to close handle.  Call NtClose rather than CloseHandle.
 	(write_ea): Fix condition to close handle.  Call NtClose rather than
