@@ -390,7 +390,7 @@ extern long double cosl _PARAMS((long double));
 extern long double sinl _PARAMS((long double));
 extern long double tanl _PARAMS((long double));
 extern long double tanhl _PARAMS((long double));
-extern long double frexpl _PARAMS((long double value, int *));
+extern long double frexpl _PARAMS((long double, int *));
 extern long double modfl _PARAMS((long double, long double *));
 extern long double ceill _PARAMS((long double));
 extern long double fabsl _PARAMS((long double));
