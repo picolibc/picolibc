@@ -101,7 +101,7 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
 	  if ((nlen = strlen (name)) >= MAX_EA_NAME_LEN)
 	    {
 	      set_errno (EINVAL);
-	      return -1;
+	      __leave;
 	    }
 	  glen = sizeof (FILE_GET_EA_INFORMATION) + nlen;
 	  gea = (PFILE_GET_EA_INFORMATION) alloca (glen);
@@ -225,8 +225,8 @@ read_ea (HANDLE hdl, path_conv &pc, const char *name, char *value, size_t size)
     }
   __except (EFAULT) {}
   __endtry
-  if (!hdl)
-    CloseHandle (h);
+  if (!hdl && h)
+    NtClose (h);
   debug_printf ("%d = read_ea(%S, %s, %p, %lu)",
 		ret, attr.ObjectName, name, value, size);
   return ret;
@@ -360,8 +360,8 @@ write_ea (HANDLE hdl, path_conv &pc, const char *name, const char *value,
     }
   __except (EFAULT) {}
   __endtry
-  if (!hdl)
-    CloseHandle (h);
+  if (!hdl && h)
+    NtClose (h);
   debug_printf ("%d = write_ea(%S, %s, %p, %lu, %d)",
 		ret, attr.ObjectName, name, value, size, flags);
   return ret;

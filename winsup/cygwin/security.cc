@@ -39,7 +39,7 @@ LONG
 get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 	     bool justcreated)
 {
-  NTSTATUS status;
+  NTSTATUS status = STATUS_SUCCESS;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   ULONG len = SD_MAXIMUM_SIZE, rlen;
@@ -56,20 +56,19 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
       status = NtQuerySecurityObject (fh, ALL_SECURITY_INFORMATION,
 				      sd, len, &rlen);
       if (!NT_SUCCESS (status))
-	{
-	  debug_printf ("NtQuerySecurityObject (%S), status %y",
-			pc.get_nt_native_path (), status);
-	  fh = NULL;
-	}
+	debug_printf ("NtQuerySecurityObject (%S), status %y",
+		      pc.get_nt_native_path (), status);
     }
   /* If the handle was NULL, or fetching with the original handle didn't work,
      try to reopen the file with READ_CONTROL and fetch the security descriptor
      using that handle. */
-  if (!fh)
+  if (!fh || !NT_SUCCESS (status))
     {
       status = NtOpenFile (&fh, READ_CONTROL,
-			   pc.init_reopen_attr (attr, fh), &io,
-			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+			   fh ? pc.init_reopen_attr (attr, fh)
+			      : pc.get_object_attr (attr, sec_none_nih),
+			   &io, FILE_SHARE_VALID_FLAGS,
+			   FILE_OPEN_FOR_BACKUP_INTENT);
       if (!NT_SUCCESS (status))
 	{
 	  sd.free ();
@@ -216,7 +215,9 @@ set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd, bool is_chown)
 	  OBJECT_ATTRIBUTES attr;
 	  IO_STATUS_BLOCK io;
 	  status = NtOpenFile (&fh, (is_chown ? WRITE_OWNER  : 0) | WRITE_DAC,
-			       pc.init_reopen_attr (attr, fh), &io,
+			       fh ? pc.init_reopen_attr (attr, fh)
+				  : pc.get_object_attr (attr, sec_none_nih),
+			       &io,
 			       FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_FOR_BACKUP_INTENT);
 	  if (!NT_SUCCESS (status))
