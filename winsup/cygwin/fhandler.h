@@ -1506,7 +1506,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   HANDLE inuse;			// used to indicate that a tty is in use
 
   /* Helper functions for fchmod and fchown. */
-  bool fch_open_handles ();
+  bool fch_open_handles (bool chown);
   int fch_set_sd (security_descriptor &sd, bool chown);
   void fch_close_handles ();
 

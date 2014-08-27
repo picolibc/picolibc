@@ -506,7 +506,7 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
   /* NOTE: If the high bit of attribute is set, we have just created
      a file or directory.  See below for an explanation. */
 
-  debug_printf("uid %u, gid %u, attribute %y", uid, gid, attribute);
+  debug_printf("uid %u, gid %u, attribute 0%o", uid, gid, attribute);
 
   /* Get owner and group from current security descriptor. */
   PSID cur_owner_sid = NULL;
@@ -964,7 +964,7 @@ set_file_attribute (HANDLE handle, path_conv &pc,
     }
   else
     ret = 0;
-  syscall_printf ("%d = set_file_attribute(%S, %d, %d, %y)",
+  syscall_printf ("%d = set_file_attribute(%S, %d, %d, 0%o)",
 		  ret, pc.get_nt_native_path (), uid, gid, attribute);
   return ret;
 }

@@ -1,8 +1,22 @@
 2014-08-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_pty_slave::fch_open_handles): Add bool parameter
+	to declaration.
+	* fhandler_tty.cc (fhandler_pty_slave::fch_open_handles): Add bool
+	parameter "chown".  Only request WRITE_OWNER access when opening pty
+	synchronization objects if "chown" is set.
+	(fhandler_pty_slave::fchmod): Call fch_open_handles with new bool
+	parameter set to false.
+	(fhandler_pty_slave::fchown): Call fch_open_handles with new bool
+	parameter set to true.
 	* kernel32.cc (CreateFileMappingW): Fix default standard rights for
 	file mappings from READ_CONTROL to STANDARD_RIGHTS_REQUIRED to allow
 	changing the DACL (fixes "access denied" error in pinfo::set_acl).
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Change debug
+	output to print mode bits in octal.
+	* security.cc (alloc_sd): Ditto.
+	(set_file_attribute): Ditto.
 
 2014-08-27  Corinna Vinschen  <corinna@vinschen.de>
 

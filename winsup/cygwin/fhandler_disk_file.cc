@@ -714,7 +714,7 @@ fhandler_base::fstat_helper (struct stat *buf, DWORD nNumberOfLinks)
     }
 
  done:
-  syscall_printf ("0 = fstat (%S, %p) st_size=%D, st_mode=%y, st_ino=%D"
+  syscall_printf ("0 = fstat (%S, %p) st_size=%D, st_mode=0%o, st_ino=%D"
 		  "st_atim=%lx.%lx st_ctim=%lx.%lx "
 		  "st_mtim=%lx.%lx st_birthtim=%lx.%lx",
 		  pc.get_nt_native_path (), buf,
