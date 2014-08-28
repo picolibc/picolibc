@@ -1045,9 +1045,6 @@ cant_access_acl:
 		    aclbufp[2].a_type = OTHER_OBJ;
 		    aclbufp[2].a_id = ILLEGAL_GID;
 		    aclbufp[2].a_perm = st.st_mode & S_IRWXO;
-		    aclbufp[3].a_type = CLASS_OBJ;
-		    aclbufp[3].a_id = ILLEGAL_GID;
-		    aclbufp[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
 		    res = MIN_ACL_ENTRIES;
 		  }
 	      }

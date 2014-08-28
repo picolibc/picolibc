@@ -1737,9 +1737,6 @@ fhandler_base::facl (int cmd, int nentries, aclent_t *aclbufp)
 	    aclbufp[2].a_type = OTHER_OBJ;
 	    aclbufp[2].a_id = ILLEGAL_GID;
 	    aclbufp[2].a_perm = S_IROTH | S_IWOTH;
-	    aclbufp[3].a_type = CLASS_OBJ;
-	    aclbufp[3].a_id = ILLEGAL_GID;
-	    aclbufp[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
 	    res = MIN_ACL_ENTRIES;
 	  }
 	break;

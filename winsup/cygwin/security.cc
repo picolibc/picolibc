@@ -314,6 +314,21 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 	    *flags |= ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
 		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	}
+      else if (flags == &allow)
+	{
+	  /* Simplified computation of additional group permissions based on
+	     the CLASS_OBJ value.  CLASS_OBJ represents the or'ed value of
+	     the primary group permissions and all secondary user and group
+	     permissions.  FIXME: This only takes ACCESS_ALLOWED_ACEs into
+	     account.  The computation with additional ACCESS_DENIED_ACE
+	     handling is much more complicated. */
+	  if (ace->Mask & FILE_READ_BITS)
+	    *flags |= S_IRGRP;
+	  if (ace->Mask & FILE_WRITE_BITS)
+	    *flags |= S_IWGRP;
+	  if (ace->Mask & FILE_EXEC_BITS)
+	    *flags |= S_IXGRP;
+	}
     }
   *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
   if (owner_sid && group_sid && RtlEqualSid (owner_sid, group_sid)
@@ -1049,8 +1064,8 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
 
 /* Samba override.  Check security descriptor for Samba UNIX user and group
    accounts and check if we have an RFC 2307 mapping to a Windows account.
-   Create a new security descriptor with all of the UNIX acocunts with
-   valid mapping replaced with their WIndows counterpart. */
+   Create a new security descriptor with all of the UNIX accounts with
+   valid mapping replaced with their Windows counterpart. */
 static void
 convert_samba_sd (security_descriptor &sd_ret)
 {

@@ -309,9 +309,6 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
   lacl[1].a_id = gid;
   lacl[2].a_type = OTHER_OBJ;
   lacl[2].a_id = ILLEGAL_GID;
-  lacl[3].a_type = CLASS_OBJ;
-  lacl[3].a_id = ILLEGAL_GID;
-  lacl[3].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
 
   PACL acl;
   BOOLEAN acl_exists;
@@ -324,9 +321,11 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
     }
 
   int pos, i, types_def = 0;
+  int pgrp_pos = 1, def_pgrp_pos = -1;
+  mode_t class_perm = 0, def_class_perm = 0;
 
   if (!acl_exists || !acl)
-    for (pos = 0; pos < 3; ++pos) /* Don't change CLASS_OBJ entry */
+    for (pos = 0; pos < 3; ++pos)
       lacl[pos].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
   else
     {
@@ -358,13 +357,13 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	    }
 	  else if (ace_sid == well_known_creator_group_sid)
 	    {
-	      type = GROUP_OBJ | ACL_DEFAULT;
+	      type = DEF_GROUP_OBJ;
 	      types_def |= type;
 	      id = ILLEGAL_GID;
 	    }
 	  else if (ace_sid == well_known_creator_owner_sid)
 	    {
-	      type = USER_OBJ | ACL_DEFAULT;
+	      type = DEF_USER_OBJ;
 	      types_def |= type;
 	      id = ILLEGAL_GID;
 	    }
@@ -376,7 +375,12 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	  if (!(ace->Header.AceFlags & INHERIT_ONLY_ACE || type & ACL_DEFAULT))
 	    {
 	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
-		getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
+		{
+		  getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
+		  /* Fix up CLASS_OBJ value. */
+		  if (type == USER || type == GROUP)
+		    class_perm |= lacl[pos].a_perm;
+		}
 	    }
 	  if ((ace->Header.AceFlags
 	      & (CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE))
@@ -389,13 +393,31 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	      type |= ACL_DEFAULT;
 	      types_def |= type;
 	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
-		getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
+		{
+		  getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
+		  /* Fix up DEF_CLASS_OBJ value. */
+		  if (type == DEF_USER || type == DEF_GROUP)
+		    def_class_perm |= lacl[pos].a_perm;
+		  /* And note the position of the DEF_GROUP_OBJ entry. */
+		  else if (type == DEF_GROUP_OBJ)
+		    def_pgrp_pos = pos;
+		}
 	    }
 	}
+      /* If secondary user and group entries exist in the ACL, fake a matching
+	 CLASS_OBJ entry. The CLASS_OBJ permissions are the or'ed permissions
+	 of the primary group permissions and all secondary user and group
+	 permissions. */
+      if (class_perm && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
+	{
+	  lacl[pos].a_type = CLASS_OBJ;
+	  lacl[pos].a_id = ILLEGAL_GID;
+	  lacl[pos].a_perm = class_perm | lacl[pgrp_pos].a_perm;
+	}
+      /* Ensure that the default acl contains at least
+      	 DEF_(USER|GROUP|OTHER)_OBJ entries.  */
       if (types_def && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
 	{
-	  /* Ensure that the default acl contains at
-	     least DEF_(USER|GROUP|OTHER)_OBJ entries.  */
 	  if (!(types_def & USER_OBJ))
 	    {
 	      lacl[pos].a_type = DEF_USER_OBJ;
@@ -408,6 +430,8 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	      lacl[pos].a_type = DEF_GROUP_OBJ;
 	      lacl[pos].a_id = gid;
 	      lacl[pos].a_perm = lacl[1].a_perm;
+	      /* Note the position of the DEF_GROUP_OBJ entry. */
+	      def_pgrp_pos = pos;
 	      pos++;
 	    }
 	  if (!(types_def & OTHER_OBJ) && pos < MAX_ACL_ENTRIES)
@@ -417,13 +441,18 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	      lacl[pos].a_perm = lacl[2].a_perm;
 	      pos++;
 	    }
-	  /* Include DEF_CLASS_OBJ if any named default ace exists.  */
-	  if ((types_def & (USER|GROUP)) && pos < MAX_ACL_ENTRIES)
-	    {
-	      lacl[pos].a_type = DEF_CLASS_OBJ;
-	      lacl[pos].a_id = ILLEGAL_GID;
-	      lacl[pos].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
-	    }
+	}
+      /* If secondary user default and group default entries exist in the ACL,
+	 fake a matching DEF_CLASS_OBJ entry. The DEF_CLASS_OBJ permissions are
+	 the or'ed permissions of the primary group default permissions and all
+	 secondary user and group default permissions. */
+      if (def_class_perm && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
+	{
+	  lacl[pos].a_type = DEF_CLASS_OBJ;
+	  lacl[pos].a_id = ILLEGAL_GID;
+	  lacl[pos].a_perm = def_class_perm;
+	  if (def_pgrp_pos >= 0)
+	    lacl[pos].a_perm |= lacl[def_pgrp_pos].a_perm;
 	}
     }
   if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)

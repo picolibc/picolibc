@@ -1,6 +1,6 @@
 /* cygwin/acl.h header file for Cygwin.
 
-   Copyright 1999, 2000, 2001, 2002, 2010 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2010, 2014 Red Hat, Inc.
    Written by C. Vinschen.
 
 This file is part of Cygwin.
@@ -25,7 +25,7 @@ extern "C" {
 #define GETACL          (0x1)
 #define GETACLCNT       (0x2)
 
-#define	MIN_ACL_ENTRIES (4)    // minimal acl entries from GETACLCNT
+#define	MIN_ACL_ENTRIES (3)    // minimal acl entries from GETACLCNT
 #define	MAX_ACL_ENTRIES	(256)  // max entries of each type
 
 // Return values of aclcheck(3) in case of error */

@@ -1,5 +1,18 @@
 2014-08-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::facl): Drop CLASS_OBJ entry.
+	* fhandler_disk_file.cc (fhandler_disk_file::facl): Ditto in noacl case.
+	* sec_acl.cc (getacl): Compute useful fake CLASS_OBJ and DEF_CLASS_OBJ
+	permission bits based on how these values are generated on Linux.
+	Add commants to explain what the code is doing.
+	* security.cc (get_attribute_from_acl): Compute group permission based
+	on the actual primary group permissions and all secondary user and group
+	ACCESS_ALLOWED_ACEs to emulate Linux' behaviour more closely.
+	(check_access): Fix typos im comment.
+	* include/cygwin/acl.h (MIN_ACL_ENTRIES): Redefine as 3.
+
+2014-08-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::fstatvfs): Try the
 	FileFsSizeInformation information class on filesystems choking on
 	FileFsFullSizeInformation (I see you Netapp!)
