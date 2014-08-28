@@ -800,6 +800,26 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 	}
       ret = 0;
     }
+  else if (status == STATUS_INVALID_PARAMETER /* Netapp */
+	   || status == STATUS_INVALID_INFO_CLASS)
+    {
+      FILE_FS_SIZE_INFORMATION fsi;
+      status = NtQueryVolumeInformationFile (fh, &io, &fsi, sizeof fsi,
+					     FileFsSizeInformation);
+      if (NT_SUCCESS (status))
+	{
+	  sfs->f_bsize = fsi.BytesPerSector * fsi.SectorsPerAllocationUnit;
+	  sfs->f_frsize = sfs->f_bsize;
+	  sfs->f_blocks = (fsblkcnt_t) fsi.TotalAllocationUnits.QuadPart;
+	  sfs->f_bfree = sfs->f_bavail =
+	    (fsblkcnt_t) fsi.AvailableAllocationUnits.QuadPart;
+	  ret = 0;
+	}
+      else
+	debug_printf ("%y = NtQueryVolumeInformationFile"
+		      "(%S, FileFsSizeInformation)", 
+		      status, pc.get_nt_native_path ());
+    }
   else
     debug_printf ("%y = NtQueryVolumeInformationFile"
 		  "(%S, FileFsFullSizeInformation)", 

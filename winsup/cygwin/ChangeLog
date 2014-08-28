@@ -1,3 +1,9 @@
+2014-08-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstatvfs): Try the
+	FileFsSizeInformation information class on filesystems choking on
+	FileFsFullSizeInformation (I see you Netapp!)
+
 2014-08-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_pty_slave::fch_open_handles): Add bool parameter
