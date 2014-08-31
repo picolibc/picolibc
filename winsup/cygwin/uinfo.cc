@@ -1795,9 +1795,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		    + (sid_sub_auth_rid (sid) & 0xffff);
 	    }
 #endif
-	  /* Special case for "Everyone".  We don't want to return Everyone
-	     as user or group.  Ever. */
-	  if (uid == 0x10100)	/* Computed from S-1-1-0. */
+	  /* Special case for "NULL SID", S-1-0-0 and "Everyone", S-1-1-0.
+	     Never return "NULL SID" or Everyone as user or group. */
+	  if (uid == 0x10000 || uid == 0x10100)
 	    return NULL;
 	  break;
 	case SidTypeLabel:
