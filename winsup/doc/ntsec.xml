@@ -117,12 +117,12 @@ treat these SIDs as identifying two separate accounts.  One is
 "FOO\johndoe", the other one is "BAR\johndoe" or "johndoe@bar.local".
 Different SID, different account.  Full stop.  </para>
 
-<para>Starting with Cygwin 1.7.32, Cygwin uses an automatic, internal
+<para>Starting with Cygwin 1.7.33, Cygwin uses an automatic, internal
 translation from Windows SID to POSIX UID/GID.  This mechanism, which is
 the preferred method for the SID&lt;=&gt;UID/GID mapping, is described in
 detail in <xref linkend="ntsec-mapping"></xref>.</para>
 
-<para>Up to Cygwin 1.7.31, the last part of the SID, the so called
+<para>Prior to Cygwin 1.7.33, the last part of the SID, the so called
 "Relative IDentifier" (RID), was by default used as UID and/or GID
 when you created the <filename>/etc/passwd</filename> and
 <filename>/etc/group</filename> files using the
@@ -267,7 +267,7 @@ documented, albeit in a confusing way and spread over multiple MSDN articles.
 </para>
 
 <para>
-Starting with Cygwin 1.7.32, Cygwin utilizes an approach inspired by the
+Starting with Cygwin 1.7.33, Cygwin utilizes an approach inspired by the
 mapping method as implemented by SFU, with a few differences for backward
 compatibility and to handle some border cases differently.
 </para>
@@ -551,7 +551,7 @@ the same name, how do we uniquely differ between them by name?  Well, we can do
 that by making their names unique in a per-machine way.  Dependent on the
 domain membership of the account, and dependent of the machine being a domain
 member or not, the user and group names will be generated using a domain prefix
-and a separator character between domain and account name.  The default
+and a separator character between domain and account name.  The <!-- default -->
 separator character is the plus sign, <literal>+</literal>.
 </para>
 
@@ -674,8 +674,8 @@ You want to specify a different login shell than <filename>/bin/bash</filename>.
 How this is done depends on your account being a domain account or a
 local account.  Let's start with the default.  Assuming your Windows
 account name is <literal>bigfoot</literal> and your domain is
-<literal>MY_DOM</literal>.  Your default passwd entry in absence of
-anything I'll describe below looks like this:
+<literal>MY_DOM</literal>.  Your default passwd entry <!-- in absence of
+anything I'll describe below -->looks like this:
 </para>
 
 <screen>
@@ -1153,9 +1153,9 @@ file set up to all default values:
   # /etc/nsswitch.conf
   passwd: files db
   group:  files db
-
+<!--
   db_prefix:    auto
-  db_separator: +
+  db_separator: + -->
   db_enum:      cache builtin
 </screen>
 
@@ -1256,11 +1256,12 @@ always try the files first, then the db.
 
 <para>
 The remaining entries define certain aspects of the Windows account
-database search.
+database search.  Right now, only one entry is valid:
 </para>
 
 <itemizedlist spacing="compact">
 
+<!--
 <listitem>
 <para>
 <literal>db_prefix:</literal> determines how the Cygwin user or group name
@@ -1401,7 +1402,7 @@ This results in usernames with the backslash as separator:
 </screen>
 
 </listitem>
-
+-->
 <listitem>
 <para>
 <literal>db_enum:</literal> defines the depth of a database search, if an
