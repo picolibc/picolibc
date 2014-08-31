@@ -1,5 +1,10 @@
 2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Disallow user accounts
+	as groups.  Add comment.
+
+2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (cygheap_pwdgrp::init): Fix comment.  Rearrange code for
 	style.
 	(cygheap_pwdgrp::nss_init_line): Disable db_prefix and db_separator

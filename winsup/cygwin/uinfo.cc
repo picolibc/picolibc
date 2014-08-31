@@ -1504,6 +1504,13 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       switch (acc_type)
       	{
 	case SidTypeUser:
+	  /* Don't allow users as group.  While this is technically possible,
+	     it doesn't make sense in a POSIX scenario.  It *is* used for
+	     Microsoft Accounts, but those are converted to well-known groups
+	     above. */
+	  if (is_group ())
+	    return NULL;
+	  /*FALLTHRU*/
 	case SidTypeGroup:
 	case SidTypeAlias:
 	  /* Predefined alias? */
