@@ -222,11 +222,9 @@ which disallows mapping of certain POSIX permissions cleanly.  See
 Newer operating systems and file systems on POSIX systems also provide
 access control lists.  Two different APIs exist for accessing these
 ACLs, the Solaris API and the POSIX API.  Cygwin implements the Solaris
-API to access Windows ACLs in a Unixy way.  At the time of writing this
-document, the Cygwin implementation of the Solaris API isn't quite up
-to speed.  For instance, it doesn't handle access denied ACEs gracefully.
-So, use with care.  Online man pages for the Solaris ACL API can be
-found on <ulink url="http://docs.sun.com">http://docs.sun.com</ulink>.</para>
+API to access Windows ACLs in a Unixy way.  Online man pages for the
+Solaris ACL API can be found on
+<ulink url="http://docs.sun.com">http://docs.sun.com</ulink>.</para>
 
 </sect2>
 
