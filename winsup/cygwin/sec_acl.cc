@@ -36,6 +36,7 @@ searchace (aclent_t *aclp, int nentries, int type, uid_t id = ILLEGAL_UID)
   return -1;
 }
 
+/* This function *requires* an acl list sorted with aclsort{32}. */
 int
 setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	bool &writable)
@@ -47,7 +48,8 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
     return -1;
 
   NTSTATUS status;
-  BOOLEAN dummy;
+  PACL acl;
+  BOOLEAN acl_exists, dummy;
 
   /* Get owner SID. */
   PSID owner_sid;
@@ -69,9 +71,32 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
     }
   cygsid group (group_sid);
 
+  /* Search for NULL ACE and store state of SUID, SGID and VTX bits. */
+  DWORD null_mask = 0;
+  if (NT_SUCCESS (RtlGetDaclSecurityDescriptor (sd_ret, &acl_exists, &acl,
+						&dummy)))
+    for (USHORT i = 0; i < acl->AceCount; ++i)
+      {
+	ACCESS_ALLOWED_ACE *ace;
+	if (NT_SUCCESS (RtlGetAce (acl, i, (PVOID *) &ace)))
+	  {
+	    cygpsid ace_sid ((PSID) &ace->SidStart);
+	    if (ace_sid == well_known_null_sid)
+	      {
+		null_mask = ace->Mask;
+		break;
+	      }
+	  }
+      }
+
   /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;
   RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
+
+  /* As in alloc_sd, set SE_DACL_PROTECTED to prevent the DACL from being
+     modified by inheritable ACEs. */
+  RtlSetControlSecurityDescriptor (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
+
   status = RtlSetOwnerSecurityDescriptor (&sd, owner, FALSE);
   if (!NT_SUCCESS (status))
     {
@@ -86,7 +111,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
     }
 
   /* Fill access control list. */
-  PACL acl = (PACL) tp.w_get ();
+  acl = (PACL) tp.w_get ();
   size_t acl_len = sizeof (ACL);
   int ace_off = 0;
 
@@ -100,17 +125,96 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 
   writable = false;
 
+  /* Pre-compute owner, group, and other permissions to allow creating
+     matching deny ACEs as in alloc_sd. */
+  DWORD owner_allow = 0, group_allow = 0, other_allow = 0;
+  PDWORD allow;
+  for (int i = 0; i < nentries; ++i)
+    {
+      switch (aclbufp[i].a_type)
+	{
+	case USER_OBJ:
+	  allow = &owner_allow;
+	  *allow = STANDARD_RIGHTS_ALL;
+	  break;
+	case GROUP_OBJ:
+	  allow = &group_allow;
+	  break;
+	case OTHER_OBJ:
+	  allow = &other_allow;
+	  break;
+	default:
+	  continue;
+	}
+      *allow |= STANDARD_RIGHTS_READ | SYNCHRONIZE
+		| (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
+      if (aclbufp[i].a_perm & S_IROTH)
+	*allow |= FILE_GENERIC_READ;
+      if (aclbufp[i].a_perm & S_IWOTH)
+	{
+	  *allow |= FILE_GENERIC_WRITE;
+	  writable = true;
+	}
+      if (aclbufp[i].a_perm & S_IXOTH)
+	*allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
+      /* Keep S_ISVTX rule in sync with alloc_sd. */
+      if (pc.isdir ()
+	  && (aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH)
+	  && (aclbufp[i].a_type == USER_OBJ
+	      || !(null_mask & FILE_READ_DATA)))
+	*allow |= FILE_DELETE_CHILD;
+      aclbufp[i].a_type = 0;
+    }
+  bool isownergroup = (owner_sid == group_sid);
+  DWORD owner_deny = ~owner_allow & (group_allow | other_allow);
+  owner_deny &= ~(STANDARD_RIGHTS_READ
+		  | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES);
+  DWORD group_deny = ~group_allow & other_allow;
+  group_deny &= ~(STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES);
+
+  /* Set deny ACE for owner. */
+  if (owner_deny
+      && !add_access_denied_ace (acl, ace_off++, owner_deny,
+				 owner_sid, acl_len, NO_INHERITANCE))
+    return -1;
+  /* Set deny ACE for group here to respect the canonical order,
+     if this does not impact owner */
+  if (group_deny && !(group_deny & owner_allow) && !isownergroup
+      && !add_access_denied_ace (acl, ace_off++, group_deny,
+				 group_sid, acl_len, NO_INHERITANCE))
+    return -1;
+  /* Set allow ACE for owner. */
+  if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
+			       owner_sid, acl_len, NO_INHERITANCE))
+    return -1;
+  /* Set deny ACE for group, if still needed. */
+  if (group_deny & owner_allow && !isownergroup
+      && !add_access_denied_ace (acl, ace_off++, group_deny,
+				 group_sid, acl_len, NO_INHERITANCE))
+    return -1;
+  /* Set allow ACE for group. */
+  if (!isownergroup
+      && !add_access_allowed_ace (acl, ace_off++, group_allow,
+                                  group_sid, acl_len, NO_INHERITANCE))
+    return -1;
+  /* Set allow ACE for everyone. */
+  if (!add_access_allowed_ace (acl, ace_off++, other_allow,
+			       well_known_world_sid, acl_len, NO_INHERITANCE))
+    return -1;
+  /* If a NULL ACE exists, copy it verbatim. */
+  if (null_mask)
+    if (!add_access_allowed_ace (acl, ace_off++, null_mask, well_known_null_sid,
+				 acl_len, NO_INHERITANCE))
+      return -1;
   for (int i = 0; i < nentries; ++i)
     {
       DWORD allow;
-      /* Owner has more standard rights set. */
-      if ((aclbufp[i].a_type & ~ACL_DEFAULT) == USER_OBJ)
-	allow = STANDARD_RIGHTS_ALL
-		| (pc.fs_is_samba ()
-		   ? 0 : (FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES));
-      else
-	allow = STANDARD_RIGHTS_READ
-		| (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
+      /* Skip invalidated entries. */
+      if (!aclbufp[i].a_type)
+	continue;
+
+      allow = STANDARD_RIGHTS_READ
+	      | (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
       if (aclbufp[i].a_perm & S_IROTH)
 	allow |= FILE_GENERIC_READ;
       if (aclbufp[i].a_perm & S_IWOTH)
@@ -120,7 +224,10 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	}
       if (aclbufp[i].a_perm & S_IXOTH)
 	allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
-      if ((aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH))
+      /* Keep S_ISVTX rule in sync with alloc_sd. */
+      if (pc.isdir ()
+	  && (aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH)
+	  && !(null_mask & FILE_READ_DATA))
 	allow |= FILE_DELETE_CHILD;
       /* Set inherit property. */
       DWORD inheritance = (aclbufp[i].a_type & ACL_DEFAULT)
@@ -133,7 +240,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
        * inheritance bits is created.
        */
       if (!(aclbufp[i].a_type & ACL_DEFAULT)
-	  && aclbufp[i].a_type & (USER|GROUP|OTHER_OBJ)
+	  && aclbufp[i].a_type & (USER|GROUP)
 	  && (pos = searchace (aclbufp + i + 1, nentries - i - 1,
 			       aclbufp[i].a_type | ACL_DEFAULT,
 			       (aclbufp[i].a_type & (USER|GROUP))
@@ -141,16 +248,11 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	  && aclbufp[i].a_perm == aclbufp[i + 1 + pos].a_perm)
 	{
 	  inheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
-	  /* This invalidates the corresponding default entry. */
-	  aclbufp[i + 1 + pos].a_type = USER|GROUP|ACL_DEFAULT;
+	  /* invalidate the corresponding default entry. */
+	  aclbufp[i + 1 + pos].a_type = 0;
 	}
       switch (aclbufp[i].a_type)
 	{
-	case USER_OBJ:
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-					owner, acl_len, inheritance))
-	    return -1;
-	  break;
 	case DEF_USER_OBJ:
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
 				       well_known_creator_owner_sid, acl_len, inheritance))
@@ -166,11 +268,6 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	    }
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
 				       sid, acl_len, inheritance))
-	    return -1;
-	  break;
-	case GROUP_OBJ:
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       group, acl_len, inheritance))
 	    return -1;
 	  break;
 	case DEF_GROUP_OBJ:
@@ -190,13 +287,11 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 				       sid, acl_len, inheritance))
 	    return -1;
 	  break;
-	case OTHER_OBJ:
 	case DEF_OTHER_OBJ:
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
 				       well_known_world_sid,
 				       acl_len, inheritance))
 	    return -1;
-	  break;
 	}
     }
   /* Set AclSize to computed value. */
@@ -340,6 +435,11 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	  int id;
 	  int type = 0;
 
+	  if (ace_sid == well_known_null_sid)
+	    {
+	      /* Simply ignore. */
+	      continue;
+	    }
 	  if (ace_sid == well_known_world_sid)
 	    {
 	      type = OTHER_OBJ;
