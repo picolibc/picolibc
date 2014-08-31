@@ -1786,10 +1786,6 @@ $ getfacl source_file | setfacl -f - target_file
       directory that contains default ACL entries will have permissions
       according to the combination of the current umask, the explicit
       permissions requested and the default ACL entries </para>
-
-    <para> Limitations: Under Cygwin, the default ACL entries are not taken
-      into account currently. </para>
-
   </sect2>
 
   <sect2 id="setmetamode">

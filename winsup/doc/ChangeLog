@@ -1,5 +1,10 @@
 2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* utils.xml (setfacl): Drop outdated note that default ACEs are not
+	taken into account.
+
+2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntsec.xml: Disable description of db_prefix and db_separator settings.
 
 2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
