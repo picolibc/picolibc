@@ -582,18 +582,17 @@ cygheap_pwdgrp::init ()
 
      passwd: files db
      group:  files db
-     db_prefix: auto
-     db_cache: yes
-     db_separator: +
+     db_prefix: auto		DISABLED
+     db_separator: +		DISABLED
      db_enum: cache builtin
   */
   pwd_src = (NSS_FILES | NSS_DB);
   grp_src = (NSS_FILES | NSS_DB);
   prefix = NSS_AUTO;
   separator[0] = L'+';
-  caching = true;
   enums = (ENUM_CACHE | ENUM_BUILTIN);
   enum_tdoms = NULL;
+  caching = true;	/* INTERNAL ONLY */
 }
 
 /* The /etc/nsswitch.conf file is read exactly once by the root process of a
@@ -655,6 +654,8 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 	  break;
 	}
       c += 3;
+#if 0 /* Disable setting prefix and separator from nsswitch.conf for now.
+	 Remove if nobody complains too loudly. */
       if (!strncmp (c, "prefix:", 7))
 	{
 	  c += 7;
@@ -677,7 +678,9 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 	  else
 	    debug_printf ("Invalid nsswitch.conf content: %s", line);
 	}
-      else if (!strncmp (c, "enum:", 5))
+      else
+#endif
+      if (!strncmp (c, "enum:", 5))
 	{
 	  tmp_pathbuf tp;
 	  char *tdoms = tp.c_get ();
@@ -1256,19 +1259,13 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	debug_printf ("LookupAccountSid(%W), %E", sid.string (sidstr));
       break;
     case NAME_arg:
-      /* Skip leading domain separator.  This denotes an alias or well-known
-         group, which will be found first by LookupAccountNameW anyway.
-	 Otherwise, if the name has no leading domain name, it's either a
-	 standalone machine, or the username must be from the primary domain.
-	 In the latter case, prepend the primary domain name so as not to
-	 collide with an account from the account domain with the same name. */
       bool fq_name;
 
       fq_name = false;
       /* Copy over to wchar for search. */
       sys_mbstowcs (name, UNLEN + 1, arg.name);
       /* Replace domain separator char with backslash and make sure p is NULL
-	 or points to the backslash, so... */
+	 or points to the backslash. */
       if ((p = wcschr (name, cygheap->pg.nss_separator ()[0])))
 	{
 	  fq_name = true;
@@ -1744,15 +1741,22 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		NetApiBufferFree (gi);
 	      if (pgrp)
 		{
-		  /* For setting the primary group, we have to test 
-		     with and without prepended separator. */
-		  char gname[2 * UNLEN + 2];
+		  /* Set primary group from the "Description" field.  Prepend
+		     account domain if this is a domain member machine or the
+		     db_prefix setting requires it. */
+		  char gname[2 * (DNLEN + UNLEN) + 2], *gp = gname;
 		  struct group *gr;
 
-		  *gname = cygheap->pg.nss_separator ()[0];
-		  sys_wcstombs (gname + 1, 2 * UNLEN + 1, pgrp);
-		  if ((gr = internal_getgrnam (gname, cldap))
-		      || (gr = internal_getgrnam (gname + 1, cldap)))
+		  if (cygheap->dom.member_machine ()
+		      || !cygheap->pg.nss_prefix_auto ())
+		    {
+		      gp = gname
+			   + sys_wcstombs (gname, sizeof gname,
+					   cygheap->dom.account_flat_name ());
+		      *gp++ = cygheap->pg.nss_separator ()[0];
+		    }
+		  sys_wcstombs (gp, sizeof gname - (gp - gname), pgrp);
+		  if ((gr = internal_getgrnam (gname, cldap)))
 		    gid = gr->gr_gid;
 		}
 	      if (!pldap && uxid && ((id_val = wcstoul (uxid, &e, 10)), !*e))
