@@ -1,6 +1,7 @@
 /* setfacl.c
 
-   Copyright 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010, 2011 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010, 2011, 2014
+   Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -387,8 +388,7 @@ usage (FILE * stream)
 	    "in a directory that contains default ACL entries will have\n"
 	    "permissions according to the combination of the current umask,\n"
 	    "the explicit permissions requested and the default ACL entries\n"
-	    "Note: Under Cygwin, the default ACL entries are not taken into\n"
-	    "account currently.\n\n", prog_name);
+	    "\n", prog_name);
   }
   else
     fprintf(stream, "Try '%s --help' for more information.\n", prog_name);

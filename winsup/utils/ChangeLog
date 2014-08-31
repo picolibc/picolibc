@@ -1,5 +1,10 @@
 2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setfacl.c (usage): Drop outdated note that default ACEs are not
+	taken into account.
+
+2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* getfacl.c (usage): Add flags description.
 	(main): Print suid/sgid/vtx flags if available.
 
