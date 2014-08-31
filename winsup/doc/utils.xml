@@ -535,14 +535,16 @@ line separates the ACLs for each file.
       <command>getfacl</command> displays the owner, the group, and the ACL.
       For directories <command>getfacl</command> displays additionally the
       default ACL. With no options specified, <command>getfacl</command>
-      displays the filename, the owner, the group, and both the ACL and the
-      default ACL, if it exists. For more information on Cygwin and Windows
-      ACLs, see <xref linkend="ntsec"/> in the Cygwin User's Guide. The format
+      displays the filename, the owner, the group, the setuid (s), setgid (s),
+      and sticky (t) bits if available, and both the ACL and the default ACL,
+      if it exists. For more information on Cygwin and Windows ACLs, see
+      <xref linkend="ntsec"/> in the Cygwin User's Guide. The format
       for ACL output is as follows:
       <screen>
      # file: filename
      # owner: name or uid
      # group: name or uid
+     # flags: sst
      user::perm
      user:name or uid:perm
      group::perm

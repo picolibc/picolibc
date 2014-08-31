@@ -1,3 +1,7 @@
+2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* utils.xml (getfacl): Document additional suid/sgid/vtx flag printing.
+
 2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.ac: Convert to new AC_INIT style.
