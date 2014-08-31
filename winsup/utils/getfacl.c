@@ -1,6 +1,6 @@
 /* getfacl.c
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2009, 2011 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2009, 2011, 2014 Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -87,13 +87,15 @@ usage (FILE * stream)
 	    "For directories getfacl displays additionally the default ACL.\n"
 	    "\n"
 	    "With no options specified, getfacl displays the filename, the\n"
-	    "owner, the group, and both the ACL and the default ACL, if it\n"
+	    "owner, the group, the setuid (s), setgid (s), and sticky (t)\n"
+	    "bits if available, and both the ACL and the default ACL, if it\n"
 	    "exists.\n"
 	    "\n"
 	    "The format for ACL output is as follows:\n"
 	    "     # file: filename\n"
 	    "     # owner: name or uid\n"
 	    "     # group: name or uid\n"
+	    "     # flags: sst\n"
 	    "     user::perm\n"
 	    "     user:name or uid:perm\n"
 	    "     group::perm\n"
@@ -196,6 +198,10 @@ main (int argc, char **argv)
 	  printf ("# owner: %s\n", username (st.st_uid));
 	  printf ("# group: %s\n", groupname (st.st_gid));
 	}
+      if (st.st_mode & (S_ISUID | S_ISGID | S_ISVTX))
+	printf ("# flags: %c%c%c\n", (st.st_mode & S_ISUID) ? 's' : '-',
+				     (st.st_mode & S_ISGID) ? 's' : '-',
+				     (st.st_mode & S_ISVTX) ? 't' : '-');
       for (i = 0; i < num_acls; ++i)
 	{
 	  if (acls[i].a_type & ACL_DEFAULT)
