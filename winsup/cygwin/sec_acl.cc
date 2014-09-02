@@ -767,7 +767,10 @@ extern "C" int
 aclsort32 (int nentries, int, aclent_t *aclbufp)
 {
   if (aclcheck32 (aclbufp, nentries, NULL))
-    return -1;
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   if (!aclbufp || nentries < 1)
     {
       set_errno (EINVAL);
