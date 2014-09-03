@@ -1,3 +1,7 @@
+2014-09-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* utils.xml (setfacl): Align documentation to help text in setfacl.
+
 2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntsec.xml (ntsec-common): Drop outdated comment about underdeveloped

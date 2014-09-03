@@ -1738,12 +1738,13 @@ At least one of (-d, -f, -m, -s) must be specified
       Acl_entries to be deleted should be specified without permissions, as in
       the following list:
       <screen>
-         u[ser]:uid
-         g[roup]:gid
-         d[efault]:u[ser]:uid
-         d[efault]:g[roup]:gid
-         d[efault]:m[ask]:
-         d[efault]:o[ther]:
+         u[ser]:uid[:]
+         g[roup]:gid[:]
+	 m[ask][:]
+         d[efault]:u[ser][:uid]
+         d[efault]:g[roup][:gid]
+         d[efault]:m[ask][:]
+         d[efault]:o[ther][:]
 </screen> </para>
 
     <para> <literal>-f</literal> Take the Acl_entries from ACL_FILE one per
