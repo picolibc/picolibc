@@ -1,3 +1,9 @@
+2014-09-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setfacl.c (getaclentry): Fix return value in case of a lone 'm' if
+	action is Delete.  Drop requirement for a trailing colon if action is
+	Delete.
+
 2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (usage): Drop outdated note that default ACEs are not

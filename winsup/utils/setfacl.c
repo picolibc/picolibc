@@ -108,8 +108,8 @@ getaclentry (action_t action, char *c, aclent_t *ace)
     return FALSE;
   /* Skip to next field. */
   c = c2;
-  if (!*c && action != Delete)
-    return FALSE;
+  if (!*c)
+    return action == Delete && (ace->a_type & CLASS_OBJ);
   /* If this is a user or group entry, check if next char is a colon char.
      If so, skip it, otherwise it's the name of a user or group. */
   if (!(ace->a_type & (USER_OBJ | GROUP_OBJ)))
@@ -130,8 +130,6 @@ getaclentry (action_t action, char *c, aclent_t *ace)
       if (*c2 == ':')
 	*c2++ = '\0';
       else if (action != Delete)
-	return FALSE;
-      else if (!(ace->a_type & ACL_DEFAULT))
 	return FALSE;
       /* Fetch user/group id. */
       if (isdigit ((unsigned char) *c))
