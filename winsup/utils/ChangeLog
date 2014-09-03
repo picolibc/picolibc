@@ -1,5 +1,11 @@
 2014-09-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setfacl.c (addmissing): New function to add missing acl entries to
+	a modified acl per the rules set by aclcheck.
+	(setfacl): Call addmissing unless action is Delete.
+
+2014-09-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* setfacl.c (getaclentry): Fix previous fix again.  Allow lone 'm' as
 	well as any lone default entry if action is Delete.  Fix comments.
 	(usage): Align usage text.
