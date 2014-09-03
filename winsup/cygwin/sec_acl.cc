@@ -628,6 +628,7 @@ aclcheck32 (aclent_t *aclbufp, int nentries, int *which)
   bool has_other_obj = false;
   bool has_class_obj = false;
   bool has_ug_objs __attribute__ ((unused)) = false;
+  bool has_def_objs __attribute__ ((unused)) = false;
   bool has_def_user_obj __attribute__ ((unused)) = false;
   bool has_def_group_obj = false;
   bool has_def_other_obj = false;
@@ -692,7 +693,7 @@ aclcheck32 (aclent_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return USER_ERROR;
 	  }
-	has_def_user_obj = true;
+	has_def_objs = has_def_user_obj = true;
 	break;
       case DEF_GROUP_OBJ:
 	if (has_def_group_obj)
@@ -701,7 +702,7 @@ aclcheck32 (aclent_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return GRP_ERROR;
 	  }
-	has_def_group_obj = true;
+	has_def_objs = has_def_group_obj = true;
 	break;
       case DEF_OTHER_OBJ:
 	if (has_def_other_obj)
@@ -710,7 +711,7 @@ aclcheck32 (aclent_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return OTHER_ERROR;
 	  }
-	has_def_other_obj = true;
+	has_def_objs = has_def_other_obj = true;
 	break;
       case DEF_CLASS_OBJ:
 	if (has_def_class_obj)
@@ -719,7 +720,7 @@ aclcheck32 (aclent_t *aclbufp, int nentries, int *which)
 	      *which = pos;
 	    return CLASS_ERROR;
 	  }
-	has_def_class_obj = true;
+	has_def_objs = has_def_class_obj = true;
 	break;
       case DEF_USER:
       case DEF_GROUP:
@@ -730,7 +731,7 @@ aclcheck32 (aclent_t *aclbufp, int nentries, int *which)
 	      *which = pos2;
 	    return DUPLICATE_ERROR;
 	  }
-	has_def_ug_objs = true;
+	has_def_objs = has_def_ug_objs = true;
 	break;
       default:
 	return ENTRY_ERROR;
@@ -738,11 +739,10 @@ aclcheck32 (aclent_t *aclbufp, int nentries, int *which)
   if (!has_user_obj
       || !has_group_obj
       || !has_other_obj
-#if 0
-      /* These checks are not ok yet since CLASS_OBJ isn't fully implemented. */
+      || (has_def_objs
+	  && (!has_def_user_obj || !has_def_group_obj || !has_def_other_obj))
       || (has_ug_objs && !has_class_obj)
       || (has_def_ug_objs && !has_def_class_obj)
-#endif
      )
     {
       if (which)

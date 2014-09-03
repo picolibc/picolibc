@@ -1,3 +1,9 @@
+2014-09-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (aclcheck32): Check for required default entries as well.
+	Enable check for missing CLASS_OBJ entries, now that setfacl creates
+	them.
+
 2014-09-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (aclsort32): Set errno to EINVAL if aclcheck32 failed.
