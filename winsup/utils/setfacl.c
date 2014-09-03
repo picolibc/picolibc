@@ -109,15 +109,21 @@ getaclentry (action_t action, char *c, aclent_t *ace)
   /* Skip to next field. */
   c = c2;
   if (!*c)
-    return action == Delete && (ace->a_type & CLASS_OBJ);
-  /* If this is a user or group entry, check if next char is a colon char.
-     If so, skip it, otherwise it's the name of a user or group. */
-  if (!(ace->a_type & (USER_OBJ | GROUP_OBJ)))
+    {
+      /* Nothing follows.  This is only valid if action is Delete and the
+	 type is CLASS_OBJ, or if ACL_DEFAULT is set. */
+      if (action != Delete
+	  || (!(ace->a_type & (CLASS_OBJ | ACL_DEFAULT))))
+	return FALSE;
+    }
+  else if (!(ace->a_type & (USER_OBJ | GROUP_OBJ)))
     {
       /* Mask and other entries may contain an extra colon. */
       if (*c == ':')
 	++c;
     }
+  /* If this is a user or group entry, check if next char is a colon char.
+     If so, skip it, otherwise it's the name of a user or group. */
   else if (*c == ':')
     ++c;
   else if (*c)
@@ -344,12 +350,13 @@ usage (FILE * stream)
 	    "     Acl_entries to be deleted should be specified without\n"
 	    "     permissions, as in the following list:\n"
 	    "\n"
-	    "         u[ser]:uid\n"
-	    "         g[roup]:gid\n"
-	    "         d[efault]:u[ser]:uid\n"
-	    "         d[efault]:g[roup]:gid\n"
-	    "         d[efault]:m[ask]:\n"
-	    "         d[efault]:o[ther]:\n"
+	    "         u[ser]:uid[:]\n"
+	    "         g[roup]:gid[:]\n"
+	    "         m[ask][:]\n"
+	    "         d[efault]:u[ser][:uid]\n"
+	    "         d[efault]:g[roup][:gid]\n"
+	    "         d[efault]:m[ask][:]\n"
+	    "         d[efault]:o[ther][:]\n"
 	    "\n"
 	    "-f   Take the Acl_entries from ACL_FILE one per line. Whitespace\n"
 	    "     characters are ignored, and the character \"#\" may be used\n"
