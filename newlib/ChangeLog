@@ -1,3 +1,11 @@
+2014-09-04  Freddie Chopin  <freddie_chopin@op.pl>
+
+	* libc/time/clock.c (clock): Fix warnings about signed-unsigned
+	comparisons.
+	* libc/time/strftime.c (strftime): Likewise.
+	* libc/time/strptime.c (match_string): Fix warning about discarding
+	'restrict' qualifier from pointer target type.
+
 2014-09-04  Hale Wang  <hale.wang@arm.com>
 
 	* libc/machine/arm/aeabi_memcpy.c: New file.

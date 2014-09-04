@@ -59,7 +59,7 @@ clock ()
   struct tms tim_s;
   clock_t res;
 
-  if ((res = (clock_t) _times_r (_REENT, &tim_s)) != -1)
+  if ((res = (clock_t) _times_r (_REENT, &tim_s)) != (clock_t) -1)
     res = (clock_t) (tim_s.tms_utime + tim_s.tms_stime +
 		     tim_s.tms_cutime + tim_s.tms_cstime);
 
