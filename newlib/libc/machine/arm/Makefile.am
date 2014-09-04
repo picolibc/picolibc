@@ -10,7 +10,8 @@ noinst_LIBRARIES = lib.a
 
 lib_a_SOURCES = setjmp.S access.c strlen.c strcmp.S strcpy.c \
 	        memcpy.S memcpy-stub.c memchr-stub.c memchr.S \
-		strlen.c strlen-armv7.S
+		strlen.c strlen-armv7.S aeabi_memcpy.c \
+		aeabi_memcpy-armv7a.S
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 

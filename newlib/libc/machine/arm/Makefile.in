@@ -74,7 +74,8 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-access.$(OBJEXT) \
 	lib_a-strcpy.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
 	lib_a-memcpy-stub.$(OBJEXT) lib_a-memchr-stub.$(OBJEXT) \
 	lib_a-memchr.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
-	lib_a-strlen-armv7.$(OBJEXT)
+	lib_a-strlen-armv7.$(OBJEXT) lib_a-aeabi_memcpy.$(OBJEXT) \
+	lib_a-aeabi_memcpy-armv7a.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -202,7 +203,8 @@ AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = setjmp.S access.c strlen.c strcmp.S strcpy.c \
 	        memcpy.S memcpy-stub.c memchr-stub.c memchr.S \
-		strlen.c strlen-armv7.S
+		strlen.c strlen-armv7.S aeabi_memcpy.c \
+		aeabi_memcpy-armv7a.S
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -300,6 +302,12 @@ lib_a-strlen-armv7.o: strlen-armv7.S
 lib_a-strlen-armv7.obj: strlen-armv7.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strlen-armv7.obj `if test -f 'strlen-armv7.S'; then $(CYGPATH_W) 'strlen-armv7.S'; else $(CYGPATH_W) '$(srcdir)/strlen-armv7.S'; fi`
 
+lib_a-aeabi_memcpy-armv7a.o: aeabi_memcpy-armv7a.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memcpy-armv7a.o `test -f 'aeabi_memcpy-armv7a.S' || echo '$(srcdir)/'`aeabi_memcpy-armv7a.S
+
+lib_a-aeabi_memcpy-armv7a.obj: aeabi_memcpy-armv7a.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memcpy-armv7a.obj `if test -f 'aeabi_memcpy-armv7a.S'; then $(CYGPATH_W) 'aeabi_memcpy-armv7a.S'; else $(CYGPATH_W) '$(srcdir)/aeabi_memcpy-armv7a.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
@@ -335,6 +343,12 @@ lib_a-memchr-stub.o: memchr-stub.c
 
 lib_a-memchr-stub.obj: memchr-stub.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memchr-stub.obj `if test -f 'memchr-stub.c'; then $(CYGPATH_W) 'memchr-stub.c'; else $(CYGPATH_W) '$(srcdir)/memchr-stub.c'; fi`
+
+lib_a-aeabi_memcpy.o: aeabi_memcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memcpy.o `test -f 'aeabi_memcpy.c' || echo '$(srcdir)/'`aeabi_memcpy.c
+
+lib_a-aeabi_memcpy.obj: aeabi_memcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memcpy.obj `if test -f 'aeabi_memcpy.c'; then $(CYGPATH_W) 'aeabi_memcpy.c'; else $(CYGPATH_W) '$(srcdir)/aeabi_memcpy.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

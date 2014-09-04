@@ -1,3 +1,10 @@
+2014-09-04  Hale Wang  <hale.wang@arm.com>
+
+	* libc/machine/arm/aeabi_memcpy.c: New file.
+	* libc/machine/arm/aeabi_memcpy-armv7a.S: New file.
+	* libc/machine/arm/Makefile.am: Add dependencies.
+	* libc/machine/arm/Makefile.in: Regenerated.
+
 2014-08-27  DJ Delorie  <dj@redhat.com>
 
 	* libc/include/math.h (frexpl): Remove parameter name.
