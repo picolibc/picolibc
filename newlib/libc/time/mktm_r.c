@@ -14,14 +14,23 @@
 #include <time.h>
 #include "local.h"
 
+/* there are 97 leap years in 400-year periods */
+#define DAYS_PER_400_YEARS	((400 - 97) * 365 + 97 * 366)
+/* there are 24 leap years in 100-year periods */
+#define DAYS_PER_100_YEARS	((100 - 24) * 365 + 24 * 366)
+/* there is one leap year every 4 years */
+#define DAYS_PER_4_YEARS	(3 * 365 + 366)
+
 static _CONST int mon_lengths[2][MONSPERYEAR] = {
   {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
   {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 } ;
 
-static _CONST int year_lengths[2] = {
-  365,
-  366
+static _CONST int days_per_year[4] = {
+  365,  /* 1970 or 1966 */
+  365,  /* 1971 or 1967 */
+  366,  /* 1972 or 1968 */
+  365   /* 1973 or 1969 */
 } ;
 
 struct tm *
@@ -33,6 +42,7 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
   long days, rem;
   time_t lcltime;
   int y;
+  int years400, years100, years4;
   int yleap;
   _CONST int *ip;
    __tzinfo_type *tz = __gettzinfo ();
@@ -64,30 +74,38 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
     res->tm_wday += DAYSPERWEEK;
 
   /* compute year & day of year */
-  y = EPOCH_YEAR;
-  if (days >= 0)
+  years400 = days / DAYS_PER_400_YEARS;
+  days -= years400 * DAYS_PER_400_YEARS;
+  years100 = days / DAYS_PER_100_YEARS;
+  days -= years100 * DAYS_PER_100_YEARS;
+  years4 = days / DAYS_PER_4_YEARS;
+  days -= years4 * DAYS_PER_4_YEARS;
+
+  y = EPOCH_YEAR + years400 * 400 + years100 * 100 + years4 * 4;
+
+  /* the value left in days is based in 1970 */
+  if (days < 0)
     {
-      for (;;)
+      ip = &days_per_year[3];
+      while (days < 0)
 	{
-	  yleap = isleap(y);
-	  if (days < year_lengths[yleap])
-	    break;
-	  y++;
-	  days -= year_lengths[yleap];
+	  days += *ip--;
+	  --y;
 	}
     }
   else
     {
-      do
+      ip = &days_per_year[0];
+      while (days >= *ip)
 	{
-	  --y;
-	  yleap = isleap(y);
-	  days += year_lengths[yleap];
-	} while (days < 0);
+	  days -= *ip++;
+	  ++y;
+	}
     }
 
   res->tm_year = y - YEAR_BASE;
   res->tm_yday = days;
+  yleap = isleap(y);
   ip = mon_lengths[yleap];
   for (res->tm_mon = 0; days >= ip[res->tm_mon]; ++res->tm_mon)
     days -= ip[res->tm_mon];

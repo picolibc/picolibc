@@ -1,5 +1,9 @@
 2014-09-04  Freddie Chopin  <freddie_chopin@op.pl>
 
+	* libc/time/mktm_r.c (_mktm_r): Optimize speed.
+
+2014-09-04  Freddie Chopin  <freddie_chopin@op.pl>
+
 	* libc/time/clock.c (clock): Fix warnings about signed-unsigned
 	comparisons.
 	* libc/time/strftime.c (strftime): Likewise.
