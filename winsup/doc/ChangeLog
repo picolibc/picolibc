@@ -1,3 +1,7 @@
+2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.xml (cygdrive): Add /proc/cygdrive description.
+
 2014-09-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* utils.xml (setfacl): Align documentation to help text in setfacl.

@@ -355,6 +355,25 @@ the cygdrive prefix, use a distinct path prefix:</para>
   D:   /mnt/d somefs text 0 0
 </screen>
 
+<para>To simplify scripting, Cygwin also provides a
+<filename>/proc/cygdrive</filename> symlink, which allows to use a fixed path
+in scripts, even if the actual cygdrive prefix has been changed, or is different
+between different users.  So, in scripts, conveniently use the
+<filename>/proc/cygdrive</filename> symlink to successfully access files
+independently from the current cygdrive prefix:</para>
+
+<screen>
+  $ mount -p
+  Prefix              Type         Flags
+  /mnt                user         binmode
+  $ cat &gt; x.sh &lt;&lt;EOF
+  cd /proc/cygdrive/c/Windows/System32/Drivers/etc
+  ls -l hosts
+  EOF
+  $ sh -c ./x.sh
+  -rwxrwx---+ 1 SYSTEM SYSTEM 826 Sep  4 22:43 hosts
+</screen>
+
 </sect2>
 
 <sect2 id="pathnames-symlinks"><title>Symbolic links</title>
