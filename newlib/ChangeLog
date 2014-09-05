@@ -1,3 +1,7 @@
+2014-09-05  Bin Cheng  <bin.cheng@arm.com>
+
+	* libc/stdio/fwalk.c (_fwalk_reent): Remove redundant test.
+
 2014-09-04  Freddie Chopin  <freddie_chopin@op.pl>
 
 	* libc/time/mktm_r.c (_mktm_r): Optimize speed.

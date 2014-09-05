@@ -73,11 +73,8 @@ _DEFUN(_fwalk_reent, (ptr, reent_function),
    */
   for (g = &ptr->__sglue; g != NULL; g = g->_next)
     for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
-      if (fp->_flags != 0)
-        {
-          if (fp->_flags != 0 && fp->_flags != 1 && fp->_file != -1)
-            ret |= (*reent_function) (ptr, fp);
-        }
+      if (fp->_flags != 0 && fp->_flags != 1 && fp->_file != -1)
+	ret |= (*reent_function) (ptr, fp);
 
   return ret;
 }
