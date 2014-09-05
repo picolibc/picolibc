@@ -1,5 +1,10 @@
 2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_proc.cc (proc_tab): Add entry for cygdrive symlink.
+	(format_proc_cygdrive): New function to implement /proc/cygdrive.
+
+2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exception.h (class exception): Remove unnecessary #ifdef.
 	* uinfo.cc (client_request_pwdgrp::client_request_pwdgrp): Fix length
 	counter to include trailing NUL.

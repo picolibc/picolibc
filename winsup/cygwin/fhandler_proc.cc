@@ -17,6 +17,7 @@ details. */
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
+#include "shared_info.h"
 #include "fhandler.h"
 #include "fhandler_virtual.h"
 #include "pinfo.h"
@@ -44,6 +45,7 @@ static off_t format_proc_uptime (void *, char *&);
 static off_t format_proc_cpuinfo (void *, char *&);
 static off_t format_proc_partitions (void *, char *&);
 static off_t format_proc_self (void *, char *&);
+static off_t format_proc_cygdrive (void *, char *&);
 static off_t format_proc_mounts (void *, char *&);
 static off_t format_proc_filesystems (void *, char *&);
 static off_t format_proc_swaps (void *, char *&);
@@ -55,6 +57,7 @@ static const virt_tab_t proc_tab[] = {
   { _VN ("."),		 FH_PROC,	virt_directory,	NULL },
   { _VN (".."),		 FH_PROC,	virt_directory,	NULL },
   { _VN ("cpuinfo"),	 FH_PROC,	virt_file,	format_proc_cpuinfo },
+  { _VN ("cygdrive"),	 FH_PROC,	virt_symlink,	format_proc_cygdrive },
   { _VN ("devices"),	 FH_PROC,	virt_file,	format_proc_devices },
   { _VN ("filesystems"), FH_PROC,	virt_file,	format_proc_filesystems },
   { _VN ("loadavg"),	 FH_PROC,	virt_file,	format_proc_loadavg },
@@ -1326,6 +1329,15 @@ format_proc_self (void *, char *&destbuf)
 {
   destbuf = (char *) crealloc_abort (destbuf, 16);
   return __small_sprintf (destbuf, "%d", getpid ());
+}
+
+static off_t
+format_proc_cygdrive (void *, char *&destbuf)
+{
+  destbuf = (char *) crealloc_abort (destbuf, mount_table->cygdrive_len + 1);
+  char *dend = stpcpy (destbuf, mount_table->cygdrive);
+  *--dend = '\0';
+  return dend - destbuf;
 }
 
 static off_t

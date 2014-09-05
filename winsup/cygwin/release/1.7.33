@@ -5,6 +5,10 @@ What's new:
   to do without /etc/passwd and /etc/group files.  Introduce /etc/nsswitch.conf
   file to configure passwd/group handling.
 
+- /proc/cygdrive as a symlink pointing to the current cygdrive prefix.  This
+  can be utilized in scripts to access paths via cygdrive prefix, even if the
+  cygdrive prefix has been changed by the user.
+
 
 What changed:
 -------------
