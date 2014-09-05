@@ -1,3 +1,9 @@
+2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Handle APPLICATION
+	PACKAGE AUTHORITY SIDs.
+	* winlean.h (DNLEN): Raise to 31.  Explain why.
+
 2014-09-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (aclcheck32): Check for required default entries as well.

@@ -1411,7 +1411,12 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	{
 	  /* Well-Known Group */
 	  arg.id -= 0x10000;
-	  __small_swprintf (sidstr, L"S-1-%u-%u", arg.id >> 8, arg.id & 0xff);
+	  /* SECURITY_APP_PACKAGE_AUTHORITY */
+	  if (arg.id >= 0xf20 && arg.id <= 0xf3f)
+	    __small_swprintf (sidstr, L"S-1-15-%u-%u", (arg.id >> 4) & 0xf,
+						       arg.id & 0xf);
+	  else
+	    __small_swprintf (sidstr, L"S-1-%u-%u", arg.id >> 8, arg.id & 0xff);
 	}
       else if (arg.id >= 0x30000 && arg.id < 0x40000)
 	{
@@ -1794,7 +1799,11 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	    uid = 0x10000 + 0x100 * sid_id_auth (sid)
 		  + (sid_sub_auth_rid (sid) & 0xff);
 #else
-	  if (sid_id_auth (sid) != 5 /* SECURITY_NT_AUTHORITY */)
+	  if (sid_id_auth (sid) == 15 /* SECURITY_APP_PACKAGE_AUTHORITY */)
+	    uid = 0x10000 + 0x100 * sid_id_auth (sid)
+		  + 0x10 * sid_sub_auth (sid, 0)
+		  + (sid_sub_auth_rid (sid) & 0xf);
+	  else if (sid_id_auth (sid) != 5 /* SECURITY_NT_AUTHORITY */)
 	    uid = 0x10000 + 0x100 * sid_id_auth (sid)
 		  + (sid_sub_auth_rid (sid) & 0xff);
 	  else if (sid_sub_auth (sid, 0) < SECURITY_PACKAGE_BASE_RID
