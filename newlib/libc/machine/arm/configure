@@ -564,6 +564,17 @@ PACKAGE_URL=''
 ac_unique_file="Makefile.am"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+CFLAGS
+HAVE_ARMV7M_FALSE
+HAVE_ARMV7M_TRUE
+HAVE_ARMV7A_FALSE
+HAVE_ARMV7A_TRUE
+HAVE_ARMV7_FALSE
+HAVE_ARMV7_TRUE
+OPT_SIZE_FALSE
+OPT_SIZE_TRUE
+HAVE_THUMB1_FALSE
+HAVE_THUMB1_TRUE
 sys_dir
 machine_dir
 libm_machine_dir
@@ -3410,6 +3421,218 @@ OBJEXT=${oext}
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using thumb1" >&5
+$as_echo_n "checking whether we are using thumb1... " >&6; }
+if ${acnewlib_cv_thumb1_processor+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat > conftest.c <<EOF
+
+#if defined (__thumb__) && !defined (__thumb2__)
+  #define _THUMB1
+ #else
+  #error "not thumb1"
+#endif
+int main () {
+  return 0;
+}
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&5'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+then
+  acnewlib_cv_thumb1_processor=yes;
+else
+  acnewlib_cv_thumb1_processor=no;
+fi
+rm -f conftest*
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acnewlib_cv_thumb1_processor" >&5
+$as_echo "$acnewlib_cv_thumb1_processor" >&6; }
+
+ if test x"$acnewlib_cv_thumb1_processor" = x"yes"; then
+  HAVE_THUMB1_TRUE=
+  HAVE_THUMB1_FALSE='#'
+else
+  HAVE_THUMB1_TRUE='#'
+  HAVE_THUMB1_FALSE=
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the size is preferred" >&5
+$as_echo_n "checking whether the size is preferred... " >&6; }
+if ${acnewlib_cv_opt_size+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat > conftest.c <<EOF
+
+#if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)
+  #define OPT_SIZE
+ #else
+  #error "not need for size optimization."
+#endif
+int main () {
+  return 0;
+}
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&5'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+then
+  acnewlib_cv_opt_size=yes;
+else
+  acnewlib_cv_opt_size=no;
+fi
+rm -f conftest*
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acnewlib_cv_opt_size" >&5
+$as_echo "$acnewlib_cv_opt_size" >&6; }
+
+ if test x"$acnewlib_cv_opt_size" = x"yes"; then
+  OPT_SIZE_TRUE=
+  OPT_SIZE_FALSE='#'
+else
+  OPT_SIZE_TRUE='#'
+  OPT_SIZE_FALSE=
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether armv7 processor is supported" >&5
+$as_echo_n "checking whether armv7 processor is supported... " >&6; }
+if ${acnewlib_cv_armv7_processor+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat > conftest.c <<EOF
+
+#if defined (_ISA_ARM_7) || defined (__ARM_ARCH_6T2__)
+  #define HAVE_ARMV7
+ #else
+  #error "ARMV7 is not supported."
+#endif
+int main () {
+  return 0;
+}
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&5'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+then
+  acnewlib_cv_armv7_processor=yes;
+else
+  acnewlib_cv_armv7_processor=no;
+fi
+rm -f conftest*
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acnewlib_cv_armv7_processor" >&5
+$as_echo "$acnewlib_cv_armv7_processor" >&6; }
+
+ if test x"$acnewlib_cv_armv7_processor" = x"yes"; then
+  HAVE_ARMV7_TRUE=
+  HAVE_ARMV7_FALSE='#'
+else
+  HAVE_ARMV7_TRUE='#'
+  HAVE_ARMV7_FALSE=
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether armv7a processor is supported" >&5
+$as_echo_n "checking whether armv7a processor is supported... " >&6; }
+if ${acnewlib_cv_armv7a_processor+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat > conftest.c <<EOF
+
+#if defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED)
+  #define HAVE_ARMV7A
+ #else
+  #error "ARMV7A is not supported."
+#endif
+int main () {
+  return 0;
+}
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&5'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+then
+  acnewlib_cv_armv7a_processor=yes;
+else
+  acnewlib_cv_armv7a_processor=no;
+fi
+rm -f conftest*
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acnewlib_cv_armv7a_processor" >&5
+$as_echo "$acnewlib_cv_armv7a_processor" >&6; }
+
+ if test x"$acnewlib_cv_armv7a_processor" = x"yes"; then
+  HAVE_ARMV7A_TRUE=
+  HAVE_ARMV7A_FALSE='#'
+else
+  HAVE_ARMV7A_TRUE='#'
+  HAVE_ARMV7A_FALSE=
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether armv7m processor is supported" >&5
+$as_echo_n "checking whether armv7m processor is supported... " >&6; }
+if ${acnewlib_cv_armv7m_processor+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat > conftest.c <<EOF
+
+#if defined (__ARM_ARCH_7M__) || defined (__ARM_ARCH_7EM__)
+  #define HAVE_ARMV7M
+ #else
+  #error "ARMV7M is not supported."
+#endif
+int main () {
+  return 0;
+}
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&5'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+then
+  acnewlib_cv_armv7m_processor=yes;
+else
+  acnewlib_cv_armv7m_processor=no;
+fi
+rm -f conftest*
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acnewlib_cv_armv7m_processor" >&5
+$as_echo "$acnewlib_cv_armv7m_processor" >&6; }
+
+ if test x"$acnewlib_cv_armv7m_processor" = x"yes"; then
+  HAVE_ARMV7M_TRUE=
+  HAVE_ARMV7M_FALSE='#'
+else
+  HAVE_ARMV7M_TRUE='#'
+  HAVE_ARMV7M_FALSE=
+fi
+
+
+
+
 ac_config_files="$ac_config_files Makefile"
 
 cat >confcache <<\_ACEOF
@@ -3596,6 +3819,26 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${USE_LIBTOOL_TRUE}" && test -z "${USE_LIBTOOL_FALSE}"; then
   as_fn_error $? "conditional \"USE_LIBTOOL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_THUMB1_TRUE}" && test -z "${HAVE_THUMB1_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_THUMB1\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${OPT_SIZE_TRUE}" && test -z "${OPT_SIZE_FALSE}"; then
+  as_fn_error $? "conditional \"OPT_SIZE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_ARMV7_TRUE}" && test -z "${HAVE_ARMV7_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_ARMV7\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_ARMV7A_TRUE}" && test -z "${HAVE_ARMV7A_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_ARMV7A\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_ARMV7M_TRUE}" && test -z "${HAVE_ARMV7M_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_ARMV7M\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

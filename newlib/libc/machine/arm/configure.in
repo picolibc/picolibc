@@ -10,5 +10,133 @@ AC_CONFIG_AUX_DIR(../../../..)
 
 NEWLIB_CONFIGURE(../../..)
 
+dnl Check for Thumb1 supported.
+AC_CACHE_CHECK(whether we are using thumb1,
+	       acnewlib_cv_thumb1_processor, [dnl
+cat > conftest.c <<EOF
+
+#if defined (__thumb__) && !defined (__thumb2__)
+  #define _THUMB1
+ #else
+  #error "not thumb1"
+#endif
+int main () {
+  return 0;
+}
+EOF
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&AS_MESSAGE_LOG_FD])
+then
+  acnewlib_cv_thumb1_processor=yes;
+else
+  acnewlib_cv_thumb1_processor=no;
+fi
+rm -f conftest*])
+
+AM_CONDITIONAL(HAVE_THUMB1, test x"$acnewlib_cv_thumb1_processor" = x"yes")
+
+dnl Check for whether the size is preferred.
+AC_CACHE_CHECK(whether the size is preferred,
+	       acnewlib_cv_opt_size, [dnl
+cat > conftest.c <<EOF
+
+#if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)
+  #define OPT_SIZE
+ #else
+  #error "not need for size optimization."
+#endif
+int main () {
+  return 0;
+}
+EOF
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&AS_MESSAGE_LOG_FD])
+then
+  acnewlib_cv_opt_size=yes;
+else
+  acnewlib_cv_opt_size=no;
+fi
+rm -f conftest*])
+
+AM_CONDITIONAL(OPT_SIZE, test x"$acnewlib_cv_opt_size" = x"yes")
+
+dnl Check for whether ARM_7 or ARM_ARCH_6T2 is defined.
+dnl This macro is used to support memchr() for old CPU.
+AC_CACHE_CHECK(whether armv7 processor is supported,
+	       acnewlib_cv_armv7_processor, [dnl
+cat > conftest.c <<EOF
+
+#if defined (_ISA_ARM_7) || defined (__ARM_ARCH_6T2__)
+  #define HAVE_ARMV7
+ #else
+  #error "ARMV7 is not supported."
+#endif
+int main () {
+  return 0;
+}
+EOF
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&AS_MESSAGE_LOG_FD])
+then
+  acnewlib_cv_armv7_processor=yes;
+else
+  acnewlib_cv_armv7_processor=no;
+fi
+rm -f conftest*])
+
+AM_CONDITIONAL(HAVE_ARMV7, test x"$acnewlib_cv_armv7_processor" = x"yes")
+
+dnl Check for whether ARM_ARCH_7A is defined.
+AC_CACHE_CHECK(whether armv7a processor is supported,
+	       acnewlib_cv_armv7a_processor, [dnl
+cat > conftest.c <<EOF
+
+#if defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED)
+  #define HAVE_ARMV7A
+ #else
+  #error "ARMV7A is not supported."
+#endif
+int main () {
+  return 0;
+}
+EOF
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&AS_MESSAGE_LOG_FD])
+then
+  acnewlib_cv_armv7a_processor=yes;
+else
+  acnewlib_cv_armv7a_processor=no;
+fi
+rm -f conftest*])
+
+AM_CONDITIONAL(HAVE_ARMV7A, test x"$acnewlib_cv_armv7a_processor" = x"yes")
+
+dnl Check for whether ARM_ARCH_7M is defined.
+AC_CACHE_CHECK(whether armv7m processor is supported,
+	       acnewlib_cv_armv7m_processor, [dnl
+cat > conftest.c <<EOF
+
+#if defined (__ARM_ARCH_7M__) || defined (__ARM_ARCH_7EM__)
+  #define HAVE_ARMV7M
+ #else
+  #error "ARMV7M is not supported."
+#endif
+int main () {
+  return 0;
+}
+EOF
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&AS_MESSAGE_LOG_FD])
+then
+  acnewlib_cv_armv7m_processor=yes;
+else
+  acnewlib_cv_armv7m_processor=no;
+fi
+rm -f conftest*])
+
+AM_CONDITIONAL(HAVE_ARMV7M, test x"$acnewlib_cv_armv7m_processor" = x"yes")
+
+AC_SUBST(CFLAGS)
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

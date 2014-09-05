@@ -1,3 +1,16 @@
+2014-09-05  Hale Wang  <hale.wang@arm.com>
+
+	* libc/machine/arm/memchr.S: Clean up the wrapper.
+	* libc/machine/arm/memcpy.S: Likewise.
+	* libc/machine/arm/memchr-stub.c: Delete this redundant file.
+	* libc/machine/arm/memcpy-stub.c: Likewise.
+	* libc/machine/arm/strcmp.S: Add speed-preferred wrapper.
+	* libc/machine/arm/strlen.S: Likewise.
+	* libc/machine/arm/Makefile.am: Add dependencies.
+	* libc/machine/arm/Makefile.in: Regenerated.
+	* libc/machine/arm/configure.in: Add dependencies.
+	* libc/machine/arm/configure: Regenerated.
+
 2014-09-05  Bin Cheng  <bin.cheng@arm.com>
 
 	* libc/stdio/findfp.c (_cleanup_r): Call _fflush_r when configuration

@@ -8,12 +8,59 @@ AM_CCASFLAGS = $(INCLUDES)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = setjmp.S access.c strlen.c strcmp.S strcpy.c \
-	        memcpy.S memcpy-stub.c memchr-stub.c memchr.S \
-		strlen.c strlen-armv7.S aeabi_memcpy.c \
-		aeabi_memcpy-armv7a.S
+if HAVE_THUMB1
+if OPT_SIZE
+STRCMP_SRC=strcmp.S
+STRCMP_OBJ=$(lpfx)strcmp.o
+STRLEN_SRC=strlen.c
+STRLEN_OBJ=$(lpfx)strlen.o
+else
+STRCMP_SRC=
+STRCMP_OBJ=
+STRLEN_SRC=
+STRLEN_OBJ=
+endif
+else
+STRCMP_SRC=strcmp.S
+STRCMP_OBJ=$(lpfx)strcmp.o
+STRLEN_SRC=strlen.c
+STRLEN_OBJ=$(lpfx)strlen.o
+endif
+
+if HAVE_ARMV7
+MEMCHR_SRC=memchr.S
+MEMCHR_OBJ=$(lpfx)memchr.o
+else
+MEMCHR_SRC=
+MEMCHR_OBJ=
+endif
+
+if OPT_SIZE
+MEMCPY_SRC=
+MEMCPY_OBJ=
+else
+if HAVE_ARMV7A
+MEMCPY_SRC=memcpy.S
+MEMCPY_OBJ=$(lpfx)memcpy.o
+else
+if HAVE_ARMV7M
+MEMCPY_SRC=memcpy.S
+MEMCPY_OBJ=$(lpfx)memcpy.o
+else
+MEMCPY_SRC=
+MEMCPY_OBJ=
+endif !HAVE_ARMV7M
+endif !HAVE_ARMV7A
+endif !OPT_SIZE
+
+lib_a_SOURCES = setjmp.S access.c $(STRCMP_SRC) strcpy.c \
+	        $(MEMCPY_SRC) $(MEMCHR_SRC) $(STRLEN_SRC) \
+		strlen-armv7.S aebi_memcpy.c aeabi_memcpy-armv7a.S
+
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
+lib_a_LIBADD = $(STRCMP_OBJ) $(STRLEN_OBJ) $(MEMCHR_OBJ) $(MEMCPY_OBJ)
+lib_a_DEPENDENCIES = $(STRCMP_OBJ) $(STRLEN_OBJ) $(MEMCHR_OBJ) $(MEMCPY_OBJ)
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
