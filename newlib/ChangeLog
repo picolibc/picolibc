@@ -1,5 +1,10 @@
 2014-09-05  Bin Cheng  <bin.cheng@arm.com>
 
+	* libc/stdio/findfp.c (_cleanup_r): Call _fflush_r when configuration
+	option "--enable-lite-exit" is in effect.  Refactor the code.
+
+2014-09-05  Bin Cheng  <bin.cheng@arm.com>
+
 	* libc/stdio/fwalk.c (_fwalk_reent): Remove redundant test.
 
 2014-09-04  Freddie Chopin  <freddie_chopin@op.pl>

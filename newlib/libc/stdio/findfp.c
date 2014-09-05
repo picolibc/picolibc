@@ -174,17 +174,22 @@ _VOID
 _DEFUN(_cleanup_r, (ptr),
        struct _reent *ptr)
 {
+  int (*cleanup_func) (struct _reent *, FILE *);
 #ifdef _STDIO_BSD_SEMANTICS
   /* BSD and Glibc systems only flush streams which have been written to
      at exit time.  Calling flush rather than close for speed, as on
      the aforementioned systems. */
-  _CAST_VOID _fwalk_reent (ptr, __sflushw_r);
+  cleanup_func = __sflushw_r;
 #else
   /* Otherwise close files and flush read streams, too.
-     FIXME: Do we really have to call fclose rather than fflush for
-     RTOS compatibility? */
-  _CAST_VOID _fwalk_reent (ptr, _fclose_r);
+     Note we call flush directly if "--enable-lite-exit" is in effect.  */
+#ifdef _LITE_EXIT
+  cleanup_func = _fflush_r;
+#else
+  cleanup_func = _fclose_r;
 #endif
+#endif
+  _CAST_VOID _fwalk_reent (ptr, cleanup_func);
 }
 
 #ifndef _REENT_ONLY
