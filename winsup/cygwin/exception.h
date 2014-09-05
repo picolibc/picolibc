@@ -126,17 +126,15 @@ public:
   ~exception () __attribute__ ((always_inline)) { _except_list = save; }
 };
 
-#else
+#else /* __x86_64__ */
 
 #define exception_list void
 typedef struct _DISPATCHER_CONTEXT *PDISPATCHER_CONTEXT;
 
 class exception
 {
-#ifdef __x86_64__
   static EXCEPTION_DISPOSITION myfault (EXCEPTION_RECORD *, exception_list *,
 					CONTEXT *, PDISPATCHER_CONTEXT);
-#endif
   static EXCEPTION_DISPOSITION handle (EXCEPTION_RECORD *, exception_list *,
 				       CONTEXT *, PDISPATCHER_CONTEXT);
 public:
@@ -162,7 +160,7 @@ public:
   }
 };
 
-#endif /* !__x86_64 */
+#endif /* !__x86_64__ */
 
 class cygwin_exception
 {

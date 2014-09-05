@@ -1968,7 +1968,7 @@ client_request_pwdgrp::client_request_pwdgrp (fetch_user_arg_t &arg, bool group)
       break;
     case NAME_arg:
       p = stpcpy (_parameters.in.arg.name, arg.name);
-      len = p - _parameters.in.arg.name;
+      len = p - _parameters.in.arg.name + 1;
       break;
     case ID_arg:
       _parameters.in.arg.id = arg.id;

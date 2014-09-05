@@ -20,6 +20,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "exception.h"
 #include "ntdll.h"
 #include "tls_pbuf.h"
 #include <lm.h>
@@ -255,9 +256,13 @@ get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
   DWORD cnt, tot, len;
   NET_API_STATUS ret;
 
-  /* Look only on logonserver */
-  ret = NetUserGetGroups (logonserver, user, 0, (LPBYTE *) &buf,
-			  MAX_PREFERRED_LENGTH, &cnt, &tot);
+  {
+    /* Experimental SEH */
+    exception protect;
+    /* Look only on logonserver */
+    ret = NetUserGetGroups (logonserver, user, 0, (LPBYTE *) &buf,
+			    MAX_PREFERRED_LENGTH, &cnt, &tot);
+  }
   if (ret)
     {
       __seterrno_from_win_error (ret);
@@ -306,9 +311,14 @@ get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
   DWORD cnt, tot;
   NET_API_STATUS ret;
 
-  ret = NetUserGetLocalGroups (logonserver, user, 0, LG_INCLUDE_INDIRECT,
-			       (LPBYTE *) &buf, MAX_PREFERRED_LENGTH,
-			       &cnt, &tot);
+  {
+    /* Experimental SEH */
+    exception protect;
+
+    ret = NetUserGetLocalGroups (logonserver, user, 0, LG_INCLUDE_INDIRECT,
+				 (LPBYTE *) &buf, MAX_PREFERRED_LENGTH,
+				 &cnt, &tot);
+  }
   if (ret)
     {
       __seterrno_from_win_error (ret);

@@ -1,5 +1,14 @@
 2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exception.h (class exception): Remove unnecessary #ifdef.
+	* uinfo.cc (client_request_pwdgrp::client_request_pwdgrp): Fix length
+	counter to include trailing NUL.
+
+	* sec_auth.cc (get_user_groups): Add experimental exception handler.
+	(get_user_local_groups): Ditto.
+
+2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Handle APPLICATION
 	PACKAGE AUTHORITY SIDs.
 	* winlean.h (DNLEN): Raise to 31.  Explain why.
