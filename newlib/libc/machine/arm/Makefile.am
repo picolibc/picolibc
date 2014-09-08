@@ -55,7 +55,7 @@ endif !OPT_SIZE
 
 lib_a_SOURCES = setjmp.S access.c $(STRCMP_SRC) strcpy.c \
 	        $(MEMCPY_SRC) $(MEMCHR_SRC) $(STRLEN_SRC) \
-		strlen-armv7.S aebi_memcpy.c aeabi_memcpy-armv7a.S
+		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)

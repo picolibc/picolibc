@@ -89,7 +89,7 @@ lib_a_AR = $(AR) $(ARFLAGS)
 am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-access.$(OBJEXT) \
 	$(am__objects_1) lib_a-strcpy.$(OBJEXT) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) lib_a-strlen-armv7.$(OBJEXT) \
-	lib_a-aebi_memcpy.$(OBJEXT) \
+	lib_a-aeabi_memcpy.$(OBJEXT) \
 	lib_a-aeabi_memcpy-armv7a.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -242,7 +242,7 @@ noinst_LIBRARIES = lib.a
 @OPT_SIZE_TRUE@MEMCPY_OBJ = 
 lib_a_SOURCES = setjmp.S access.c $(STRCMP_SRC) strcpy.c \
 	        $(MEMCPY_SRC) $(MEMCHR_SRC) $(STRLEN_SRC) \
-		strlen-armv7.S aebi_memcpy.c aeabi_memcpy-armv7a.S
+		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -372,11 +372,11 @@ lib_a-strlen.o: strlen.c
 lib_a-strlen.obj: strlen.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strlen.obj `if test -f 'strlen.c'; then $(CYGPATH_W) 'strlen.c'; else $(CYGPATH_W) '$(srcdir)/strlen.c'; fi`
 
-lib_a-aebi_memcpy.o: aebi_memcpy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aebi_memcpy.o `test -f 'aebi_memcpy.c' || echo '$(srcdir)/'`aebi_memcpy.c
+lib_a-aeabi_memcpy.o: aeabi_memcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memcpy.o `test -f 'aeabi_memcpy.c' || echo '$(srcdir)/'`aeabi_memcpy.c
 
-lib_a-aebi_memcpy.obj: aebi_memcpy.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aebi_memcpy.obj `if test -f 'aebi_memcpy.c'; then $(CYGPATH_W) 'aebi_memcpy.c'; else $(CYGPATH_W) '$(srcdir)/aebi_memcpy.c'; fi`
+lib_a-aeabi_memcpy.obj: aeabi_memcpy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memcpy.obj `if test -f 'aeabi_memcpy.c'; then $(CYGPATH_W) 'aeabi_memcpy.c'; else $(CYGPATH_W) '$(srcdir)/aeabi_memcpy.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

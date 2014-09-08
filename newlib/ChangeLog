@@ -1,3 +1,8 @@
+2014-09-08  Freddie Chopin  <freddie_chopin@op.pl>
+
+	* libc/machine/arm/Makefile.am: Fix typo.
+	* libc/machine/arm/Makefile.in: Regenerated.
+
 2014-09-05  Hale Wang  <hale.wang@arm.com>
 
 	* libc/machine/arm/memchr.S: Clean up the wrapper.
