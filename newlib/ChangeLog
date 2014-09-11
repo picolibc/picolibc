@@ -1,3 +1,21 @@
+2014-09-11  Freddie Chopin  <freddie_chopin@op.pl>
+
+	* libc/time/month_lengths.c: New file with __month_lengths array
+	(previously mon_lengths array in mktm_r.c)
+	* libc/time/tzcalc_limits.c: New file with __tzcalc_limits() from
+	mktm_r.c
+	* libc/time/lcltime_r.c (localtime_r): Simplify by changing call to
+	_mktm_r() with call to gmtime_r() and code moved from _mktm_r() which
+	was used to do time zone adjustments
+	* libc/time/gmtime_r.c (gmtime_r): Simplify by moving all relevant
+	code from _mktm_r(), breaking all dependencies on time zone related
+	functions
+	* libc/time/mktm_r.c: Delete file
+	* libc/time/local.h: Update accordingly - remove declaration of
+	_mktm_r(), add declaration of __month_lengths[]
+	* libc/time/Makefile.am: Modify accordingly.
+	* libc/time/Makefile.in: Regenerate.
+
 2014-09-08  Freddie Chopin  <freddie_chopin@op.pl>
 
 	* libc/machine/arm/Makefile.am: Fix typo.

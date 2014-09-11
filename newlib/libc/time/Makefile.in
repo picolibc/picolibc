@@ -78,19 +78,20 @@ am__objects_1 = lib_a-asctime.$(OBJEXT) lib_a-asctime_r.$(OBJEXT) \
 	lib_a-gettzinfo.$(OBJEXT) lib_a-gmtime.$(OBJEXT) \
 	lib_a-gmtime_r.$(OBJEXT) lib_a-lcltime.$(OBJEXT) \
 	lib_a-lcltime_r.$(OBJEXT) lib_a-mktime.$(OBJEXT) \
-	lib_a-mktm_r.$(OBJEXT) lib_a-strftime.$(OBJEXT) \
+	lib_a-month_lengths.$(OBJEXT) lib_a-strftime.$(OBJEXT) \
 	lib_a-strptime.$(OBJEXT) lib_a-time.$(OBJEXT) \
-	lib_a-tzlock.$(OBJEXT) lib_a-tzset.$(OBJEXT) \
-	lib_a-tzset_r.$(OBJEXT) lib_a-tzvars.$(OBJEXT) \
-	lib_a-wcsftime.$(OBJEXT)
+	lib_a-tzcalc_limits.$(OBJEXT) lib_a-tzlock.$(OBJEXT) \
+	lib_a-tzset.$(OBJEXT) lib_a-tzset_r.$(OBJEXT) \
+	lib_a-tzvars.$(OBJEXT) lib_a-wcsftime.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libtime_la_LIBADD =
 am__objects_2 = asctime.lo asctime_r.lo clock.lo ctime.lo ctime_r.lo \
 	difftime.lo gettzinfo.lo gmtime.lo gmtime_r.lo lcltime.lo \
-	lcltime_r.lo mktime.lo mktm_r.lo strftime.lo strptime.lo \
-	time.lo tzlock.lo tzset.lo tzset_r.lo tzvars.lo wcsftime.lo
+	lcltime_r.lo mktime.lo month_lengths.lo strftime.lo \
+	strptime.lo time.lo tzcalc_limits.lo tzlock.lo tzset.lo \
+	tzset_r.lo tzvars.lo wcsftime.lo
 @USE_LIBTOOL_TRUE@am_libtime_la_OBJECTS = $(am__objects_2)
 libtime_la_OBJECTS = $(am_libtime_la_OBJECTS)
 libtime_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -277,10 +278,11 @@ LIB_SOURCES = \
 	lcltime.c	\
 	lcltime_r.c	\
 	mktime.c	\
-	mktm_r.c	\
+	month_lengths.c \
 	strftime.c  	\
 	strptime.c	\
 	time.c		\
+	tzcalc_limits.c \
 	tzlock.c	\
 	tzset.c		\
 	tzset_r.c	\
@@ -454,11 +456,11 @@ lib_a-mktime.o: mktime.c
 lib_a-mktime.obj: mktime.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktime.obj `if test -f 'mktime.c'; then $(CYGPATH_W) 'mktime.c'; else $(CYGPATH_W) '$(srcdir)/mktime.c'; fi`
 
-lib_a-mktm_r.o: mktm_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktm_r.o `test -f 'mktm_r.c' || echo '$(srcdir)/'`mktm_r.c
+lib_a-month_lengths.o: month_lengths.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-month_lengths.o `test -f 'month_lengths.c' || echo '$(srcdir)/'`month_lengths.c
 
-lib_a-mktm_r.obj: mktm_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-mktm_r.obj `if test -f 'mktm_r.c'; then $(CYGPATH_W) 'mktm_r.c'; else $(CYGPATH_W) '$(srcdir)/mktm_r.c'; fi`
+lib_a-month_lengths.obj: month_lengths.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-month_lengths.obj `if test -f 'month_lengths.c'; then $(CYGPATH_W) 'month_lengths.c'; else $(CYGPATH_W) '$(srcdir)/month_lengths.c'; fi`
 
 lib_a-strftime.o: strftime.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strftime.o `test -f 'strftime.c' || echo '$(srcdir)/'`strftime.c
@@ -477,6 +479,12 @@ lib_a-time.o: time.c
 
 lib_a-time.obj: time.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-time.obj `if test -f 'time.c'; then $(CYGPATH_W) 'time.c'; else $(CYGPATH_W) '$(srcdir)/time.c'; fi`
+
+lib_a-tzcalc_limits.o: tzcalc_limits.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzcalc_limits.o `test -f 'tzcalc_limits.c' || echo '$(srcdir)/'`tzcalc_limits.c
+
+lib_a-tzcalc_limits.obj: tzcalc_limits.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzcalc_limits.obj `if test -f 'tzcalc_limits.c'; then $(CYGPATH_W) 'tzcalc_limits.c'; else $(CYGPATH_W) '$(srcdir)/tzcalc_limits.c'; fi`
 
 lib_a-tzlock.o: tzlock.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tzlock.o `test -f 'tzlock.c' || echo '$(srcdir)/'`tzlock.c

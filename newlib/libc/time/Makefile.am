@@ -17,10 +17,11 @@ LIB_SOURCES = \
 	lcltime.c	\
 	lcltime_r.c	\
 	mktime.c	\
-	mktm_r.c	\
+	month_lengths.c \
 	strftime.c  	\
 	strptime.c	\
 	time.c		\
+	tzcalc_limits.c \
 	tzlock.c	\
 	tzset.c		\
 	tzset_r.c	\
