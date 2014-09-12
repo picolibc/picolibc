@@ -46,7 +46,7 @@ _DEFUN (__tzcalc_limits, (year),
 	{
 	  _CONST int yleap = isleap(year);
 	  int m_day, m_wday, wday_diff;
-	  _CONST int *_CONST ip = month_lengths[yleap];
+	  _CONST int *_CONST ip = __month_lengths[yleap];
 
 	  days = year_days;
 
