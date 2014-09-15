@@ -1,6 +1,10 @@
+2014-09-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/time/month_lengths.c: Fix to define __month_lengths.
+
 2014-09-12  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* libc/time/tzcalc_limits.c: Fix __months_lengths reference.
+	* libc/time/tzcalc_limits.c: Fix __month_lengths reference.
 
 2014-09-12  Jeff Johnston  <jjohnstn@redhat.com>
 
