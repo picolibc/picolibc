@@ -1,3 +1,8 @@
+2014-09-17  Joel Sherrill <joel.sherrill@oarcorp.com>
+	    Thomas Uhle <thomas.uhle@eas.iis.fraunhofer.de>
+
+	* libc/include/string.h: Correct guard for strnlen().
+
 2014-09-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/time/month_lengths.c: Fix to define __month_lengths.
