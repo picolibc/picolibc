@@ -1,3 +1,8 @@
+2014-09-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/features.h: Add __NEWLIB__ and
+	__NEWLIB_MINOR__ macros.
+
 2014-09-17  Joel Sherrill <joel.sherrill@oarcorp.com>
 	    Thomas Uhle <thomas.uhle@eas.iis.fraunhofer.de>
 
