@@ -1,3 +1,10 @@
+2014-09-22  Peter A. Bigot  <pab@pabigot.com>
+
+	* configure.in: Remove config_libnosys=false
+	* configure: Regenerated.
+	* msp430/nosyscalls.S: Rename to ciosyscalls.S
+	* msp430/Makefile.in: Change LIBNOSYS to LIB_CIO.
+
 2014-08-14  Bin Cheng  <bin.cheng@arm.com>
 
 	* arm/elf-nano.specs: New file.

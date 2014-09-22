@@ -137,7 +137,6 @@ case "${target}" in
 	;;
   msp430*-*-elf)
 	AC_CONFIG_SUBDIRS([msp430])
-	config_libnosys=false
 	;;
   rl78*-*-elf)
 	AC_CONFIG_SUBDIRS([rl78])

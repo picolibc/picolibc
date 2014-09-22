@@ -2531,7 +2531,6 @@ case "${target}" in
   msp430*-*-elf)
 	subdirs="$subdirs msp430"
 
-	config_libnosys=false
 	;;
   rl78*-*-elf)
 	subdirs="$subdirs rl78"
