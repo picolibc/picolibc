@@ -374,6 +374,8 @@ feupdateenv SIGFE
 fexecve SIGFE
 fflush SIGFE
 ffs NOSIGFE
+ffsl NOSIGFE
+ffsll NOSIGFE
 fgetc SIGFE
 fgetpos SIGFE
 fgets SIGFE
