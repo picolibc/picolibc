@@ -1,3 +1,8 @@
+2014-10-08 Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/string.h (ffsl): Declare as GNU function.
+	(ffsll): Ditto.
+
 2014-09-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/features.h: Add __NEWLIB__ and

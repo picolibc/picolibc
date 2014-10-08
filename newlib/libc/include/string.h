@@ -90,6 +90,11 @@ char 	*_EXFUN(strndup,(const char *, size_t));
 char 	*_EXFUN(_strndup_r,(struct _reent *, const char *, size_t));
 #endif
 
+#if __GNU_VISIBLE
+int	 _EXFUN(ffsl,(long));
+int	 _EXFUN(ffsll, (long long));
+#endif
+
 /* There are two common strerror_r variants.  If you request
    _GNU_SOURCE, you get the GNU version; otherwise you get the POSIX
    version.  POSIX requires that #undef strerror_r will still let you
