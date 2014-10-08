@@ -1,3 +1,8 @@
+2014-10-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (format_process_statm): Fix output of dirty
+	pages.  Add linefeed.
+
 2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (proc_tab): Add entry for cygdrive symlink.
