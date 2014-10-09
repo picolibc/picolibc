@@ -13,19 +13,10 @@
 #ifndef _INTTYPES_H
 #define _INTTYPES_H
 
-#include <sys/features.h>
+#include <sys/_intsup.h>
 #include <stdint.h>
 #define __need_wchar_t
 #include <stddef.h>
-
-/* Don't use __STDINT_EXP test since GCC's stdint.h provides different
-   macros than newlib's stdint.h. */
-#if __GNUC_PREREQ(3, 2)
-  #define __INTTYPES_EXP(x) __##x##__
-#else
-  #define __INTTYPES_EXP(x) x
-  #include <limits.h>
-#endif
 
 #define __STRINGIFY(a) #a
 
@@ -252,10 +243,10 @@
 #define SCNxMAX		__SCNMAX(x)
 
 /* ptr types */
-#if PTRDIFF_MAX <= __INTTYPES_EXP(INT_MAX)
+#if PTRDIFF_MAX <= __STDINT_EXP(INT_MAX)
 # define __PRIPTR(x) __STRINGIFY(x)
 # define __SCNPTR(x) __STRINGIFY(x)
-#elif PTRDIFF_MAX <= __INTTYPES_EXP(LONG_MAX) || !defined(__have_longlong64)
+#elif PTRDIFF_MAX <= __STDINT_EXP(LONG_MAX) || !defined(__have_longlong64)
 # define __PRIPTR(x) __STRINGIFY(l##x)
 # define __SCNPTR(x) __STRINGIFY(l##x)
 #else

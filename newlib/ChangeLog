@@ -1,3 +1,18 @@
+2014-10-09  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+        * libc/include/stdint.h: Include <sys/_intsup.h>.
+        (__STDINT_EXP): Delete.
+        (__have_long32): Likewise.
+        (__have_long64): Likewise.
+        (__have_longlong64): Likewise.
+        * libc/include/sys/_intsup.h: New file.
+        (__STDINT_EXP): Move from libc/include/stdint.h.
+        (__have_long32): Likewise.
+        (__have_long64): Likewise.
+        (__have_longlong64): Likewise.
+        * libc/include/inttypes.h: Include <sys/_intsup.h>.
+        (__INTTYPES_EXP): Delete and use __STDINT_EXP() instead.
+
 2014-10-09  Freddie Chopin  <freddie_chopin@op.pl>
 
 	* libc/string/memccpy.c (memccpy): Fix warning about signed-unsigned
