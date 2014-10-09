@@ -50,7 +50,7 @@ _DEFUN (memset, (m, c, n),
   char *s = (char *) m;
 
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
-  int i;
+  unsigned int i;
   unsigned long buffer;
   unsigned long *aligned_addr;
   unsigned int d = c & 0xff;	/* To avoid sign extension, copy C to an

@@ -1,3 +1,19 @@
+2014-10-09  Freddie Chopin  <freddie_chopin@op.pl>
+
+	* libc/string/memccpy.c (memccpy): Fix warning about signed-unsigned
+	comparison
+	* libc/string/memchr.c (memchr): Ditto.
+	* libc/string/memrchr.c (memrchr): Ditto.
+	* libc/string/memset.c: (memset): Ditto.
+	* libc/string/rawmemchr.c (rawmemchr): Ditto.
+	* libc/string/local.h (__locale_cjk_lang): Fix "function declaration
+	isn't a prototype" warning.
+	* libc/string/strcasestr.c (strcasestr): Ditto.
+	* libc/string/u_strerr.c (_user_strerror): Fix "unused parameter"
+	warnings.
+	* libc/string/rawmemchr.c (rawmemchr): Fix comment type
+	"// ..." -> "/* ... */".
+
 2014-10-08  Steve Ellcey  <sellcey@mips.com>
 
 	* newlib/libc/machine/mips/strcmp.c: Remove.

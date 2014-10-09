@@ -77,7 +77,7 @@ _DEFUN (rawmemchr, (src_void, c),
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   unsigned long *asrc;
   unsigned long  mask;
-  int i;
+  unsigned int i;
 
   while (UNALIGNED (src))
     {
@@ -110,7 +110,7 @@ _DEFUN (rawmemchr, (src_void, c),
 
   src = (unsigned char *) asrc;
 
-#endif // !PREFER_SIZE_OVER_SPEED && !__OPTIMIZE_SIZE__
+#endif /* !PREFER_SIZE_OVER_SPEED && !__OPTIMIZE_SIZE__ */
 
   while (1)
     {

@@ -6,7 +6,7 @@ int _EXFUN (__wcwidth, (wint_t));
 
 /* Defined in locale/locale.c.  Returns a value != 0 if the current
    language is assumed to use CJK fonts. */
-int __locale_cjk_lang ();
+int _EXFUN (__locale_cjk_lang, (void));
 
 /*
    Taken from glibc:
