@@ -1,3 +1,12 @@
+2014-10-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* common.din (ffsl): Export.
+	(ffsll): Export.
+	* syscalls.cc (ffs): Implement using GCC intrinsic.
+	(ffsl): Ditto.
+	(ffsll): Ditto.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2014-10-08  Christian Franke  <franke@computer.org>
 
 	* syscall.cc (ffs): Fix crash of ffs (0x80000000) on 64 bit.
