@@ -1,5 +1,14 @@
 2014-10-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_procsys.cc (fhandler_procsys::readdir): Just test
+	ObjectTypeName for object types rather than calling lstat to avoid
+	performance hit.
+	* globals.cc (ro_u_natdir): Define.
+	(ro_u_natsyml): Define.
+	(ro_u_natdev): Define.
+
+2014-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Set d_type
 	for virtual directories.
 
