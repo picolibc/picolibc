@@ -2046,7 +2046,8 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	  fname->Length = 0;
 	  return geterrno_from_win_error (w32_err);
 	}
-
+      if (de->d_ino == 2)	/* Inode number for virtual dirs. */
+	de->d_type = DT_DIR;
       attr = 0;
       dir->__flags &= ~dirent_set_d_ino;
     }

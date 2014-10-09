@@ -1,5 +1,10 @@
 2014-10-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir_helper): Set d_type
+	for virtual directories.
+
+2014-10-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_proc.cc (fhandler_proc::readdir): Set dirent d_type.
 	* fhandler_process.cc (fhandler_process::readdir): Ditto.
 	* fhandler_procnet.cc (fhandler_procnet::readdir): Ditto.
