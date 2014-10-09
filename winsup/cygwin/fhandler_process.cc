@@ -230,9 +230,14 @@ fhandler_process::readdir (DIR *dir, dirent *de)
     {
       int *p = (int *) filebuf;
       __small_sprintf (de->d_name, "%d", p[dir->__d_position++ - 2]);
+      de->d_type = DT_LNK;
     }
   else
-    strcpy (de->d_name, process_tab[dir->__d_position++].name);
+    {
+      strcpy (de->d_name, process_tab[dir->__d_position].name);
+      de->d_type = virt_ftype_to_dtype (process_tab[dir->__d_position].type);
+      dir->__d_position++;
+    }
   dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
   res = 0;
 out:

@@ -1,6 +1,6 @@
 /* fhandler_procsys.cc: fhandler for native NT namespace.
 
-   Copyright 2010, 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -346,6 +346,7 @@ fhandler_procsys::readdir (DIR *dir, dirent *de)
     WCHAR buf[2][NAME_MAX + 1];
   } f;
   int res = EBADF;
+  tmp_pathbuf tp;
 
   if (dir->__handle != INVALID_HANDLE_VALUE)
     {
@@ -357,10 +358,17 @@ fhandler_procsys::readdir (DIR *dir, dirent *de)
 	res = ENMFILE;
       else
 	{
+	  struct stat st;
+	  char *file = tp.c_get ();
+
 	  sys_wcstombs (de->d_name, NAME_MAX + 1, f.dbi.ObjectName.Buffer,
 			f.dbi.ObjectName.Length / sizeof (WCHAR));
 	  de->d_ino = hash_path_name (get_ino (), de->d_name);
-	  de->d_type = 0;
+	  stpcpy (stpcpy (stpcpy (file, get_name ()), "/"), de->d_name);
+	  if (!lstat64 (file, &st))
+	    de->d_type = IFTODT (st.st_mode);
+	  else
+	    de->d_type = DT_UNKNOWN;
 	  res = 0;
 	}
     }

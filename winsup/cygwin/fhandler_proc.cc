@@ -254,7 +254,9 @@ fhandler_proc::readdir (DIR *dir, dirent *de)
   int res;
   if (dir->__d_position < PROC_LINK_COUNT)
     {
-      strcpy (de->d_name, proc_tab[dir->__d_position++].name);
+      strcpy (de->d_name, proc_tab[dir->__d_position].name);
+      de->d_type = virt_ftype_to_dtype (proc_tab[dir->__d_position].type);
+      dir->__d_position++;
       dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
       res = 0;
     }
@@ -267,6 +269,7 @@ fhandler_proc::readdir (DIR *dir, dirent *de)
 	if (found++ == dir->__d_position - PROC_LINK_COUNT)
 	  {
 	    __small_sprintf (de->d_name, "%d", pids[i]->pid);
+	    de->d_type = DT_DIR;
 	    dir->__d_position++;
 	    res = 0;
 	    break;
