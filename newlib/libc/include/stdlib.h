@@ -130,7 +130,9 @@ char *	_EXFUN(realpath, (const char *__restrict path, char *__restrict resolved_
 _VOID	_EXFUN(srand,(unsigned __seed));
 double	_EXFUN(strtod,(const char *__restrict __n, char **__restrict __end_PTR));
 double	_EXFUN(_strtod_r,(struct _reent *,const char *__restrict __n, char **__restrict __end_PTR));
-#if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L) || (__cplusplus >= 201103L)
+#if !defined(__STRICT_ANSI__) || \
+  (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+  (defined(__cplusplus) && __cplusplus >= 201103L)
 float	_EXFUN(strtof,(const char *__restrict __n, char **__restrict __end_PTR));
 #endif
 #ifndef __STRICT_ANSI__
@@ -151,7 +153,13 @@ long    _EXFUN(a64l,(const char *__input));
 char *  _EXFUN(l64a,(long __input));
 char *  _EXFUN(_l64a_r,(struct _reent *,long __input));
 int	_EXFUN(on_exit,(_VOID (*__func)(int, _PTR),_PTR __arg));
+#endif /* ! __STRICT_ANSI__ */
+#if !defined(__STRICT_ANSI__) || \
+  (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+  (defined(__cplusplus) && __cplusplus >= 201103L)
 _VOID	_EXFUN(_Exit,(int __status) _ATTRIBUTE ((__noreturn__)));
+#endif
+#ifndef __STRICT_ANSI__
 int	_EXFUN(putenv,(char *__string));
 int	_EXFUN(_putenv_r,(struct _reent *, char *__string));
 _PTR	_EXFUN(_reallocf_r,(struct _reent *, _PTR, size_t));
@@ -189,18 +197,28 @@ unsigned short *
        _EXFUN(_seed48_r,(struct _reent *, unsigned short [3]));
 _VOID  _EXFUN(srand48,(long));
 _VOID  _EXFUN(_srand48_r,(struct _reent *, long));
+#endif /* ! __STRICT_ANSI__ */
+#if !defined(__STRICT_ANSI__) || \
+  (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+  (defined(__cplusplus) && __cplusplus >= 201103L)
 long long _EXFUN(atoll,(const char *__nptr));
+#endif
+#ifndef __STRICT_ANSI__
 long long _EXFUN(_atoll_r,(struct _reent *, const char *__nptr));
+#endif /* ! __STRICT_ANSI__ */
+#if !defined(__STRICT_ANSI__) || \
+  (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+  (defined(__cplusplus) && __cplusplus >= 201103L)
 long long _EXFUN(llabs,(long long));
 lldiv_t	_EXFUN(lldiv,(long long __numer, long long __denom));
-#endif /* ! __STRICT_ANSI__ */
-#if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L) || (__cplusplus >= 201103L)
 long long _EXFUN(strtoll,(const char *__restrict __n, char **__restrict __end_PTR, int __base));
 #endif
 #ifndef __STRICT_ANSI__
 long long _EXFUN(_strtoll_r,(struct _reent *, const char *__restrict __n, char **__restrict __end_PTR, int __base));
 #endif /* ! __STRICT_ANSI__ */
-#if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L) || (__cplusplus >= 201103L)
+#if !defined(__STRICT_ANSI__) || \
+  (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+  (defined(__cplusplus) && __cplusplus >= 201103L)
 unsigned long long _EXFUN(strtoull,(const char *__restrict __n, char **__restrict __end_PTR, int __base));
 #endif
 #ifndef __STRICT_ANSI__
@@ -232,7 +250,9 @@ _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *))
 
 /* On platforms where long double equals double.  */
 #ifdef _HAVE_LONG_DOUBLE
-#if !defined(__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L) || (__cplusplus >= 201103L)
+#if !defined(__STRICT_ANSI__) || \
+  (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
+  (defined(__cplusplus) && __cplusplus >= 201103L)
 extern long double strtold (const char *__restrict, char **__restrict);
 #endif
 #endif /* _HAVE_LONG_DOUBLE */
