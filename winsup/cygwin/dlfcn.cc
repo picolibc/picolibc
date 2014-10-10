@@ -135,6 +135,7 @@ dlopen (const char *name, int flags)
 	  if (last_bs && !wcschr (last_bs, L'.'))
 	    wcscat (last_bs, L".");
 
+#ifndef __x86_64__
 	  /* Workaround for broken DLLs built against Cygwin versions 1.7.0-49
 	     up to 1.7.0-57.  They override the cxx_malloc pointer in their
 	     DLL initialization code even if loaded dynamically.  This is a
@@ -150,6 +151,7 @@ dlopen (const char *name, int flags)
 	  /* Store original cxx_malloc pointer. */
 	  struct per_process_cxx_malloc *tmp_malloc;
 	  tmp_malloc = __cygwin_user_data.cxx_malloc;
+#endif
 
 	  if (!(flags & RTLD_NOLOAD)
 	      || (ret = GetModuleHandleW (path)) != NULL)
@@ -160,8 +162,10 @@ dlopen (const char *name, int flags)
 				    (HMODULE *) &ret);
 	    }
 
+#ifndef __x86_64__
 	  /* Restore original cxx_malloc pointer. */
 	  __cygwin_user_data.cxx_malloc = tmp_malloc;
+#endif
 
 	  if (!ret)
 	    __seterrno ();

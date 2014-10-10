@@ -1,3 +1,9 @@
+2014-10-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dlfcn.cc (dlopen): Disable old 32 bit code on 64 bit.
+	* dcrt0.cc (check_sanity_and_sync): Ditto.
+	* dll_init.cc (dll_dllcrt0_1): Fix typo in comment.
+
 2014-10-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_procsys.cc (fhandler_procsys::readdir): Just test

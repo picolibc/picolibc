@@ -393,11 +393,13 @@ check_sanity_and_sync (per_process *p)
     api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %u > %u",
 	       p->api_major, cygwin_version.api_major);
 
+#ifndef __x86_64__
   /* This is a kludge to work around a version of _cygwin_common_crt0
      which overwrote the cxx_malloc field with the local DLL copy.
      Hilarity ensues if the DLL is not loaded while the process
      is forking. */
   __cygwin_user_data.cxx_malloc = &default_cygwin_cxx_malloc;
+#endif
 }
 
 child_info NO_COPY *child_proc_info;
