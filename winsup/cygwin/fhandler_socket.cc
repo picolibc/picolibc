@@ -398,7 +398,6 @@ fhandler_socket::af_local_connect ()
 {
   bool orig_async_io, orig_is_nonblocking;
 
-  /* This keeps the test out of select. */
   if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
     return 0;
 
@@ -623,23 +622,32 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	  if (evts.lNetworkEvents & FD_CONNECT)
 	    {
 	      wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
+
 	      /* Setting the connect_state and calling the AF_LOCAL handshake 
 		 here allows to handle this stuff from a single point.  This
 		 is independent of FD_CONNECT being requested.  Consider a
 		 server calling connect(2) and then immediately poll(2) with
 		 only polling for POLLIN (example: postfix), or select(2) just
-		 asking for descriptors ready to read). */
-	      if (wsock_events->connect_errorcode)
-		connect_state (connect_failed);
-	      else if (get_addr_family () == AF_LOCAL
-		       && get_socket_type () == SOCK_STREAM
-		       && af_local_connect ())
+		 asking for descriptors ready to read.
+
+		 Something weird occurs in Winsock: If you fork off and call
+		 recv/send on the duplicated, already connected socket, another
+		 FD_CONNECT event is generated in the child process.  This
+		 would trigger a call to af_local_connect which obviously fail. 
+		 Avoid this by calling set_connect_state only if connect_state
+		 is connect_pending. */
+	      if (connect_state () == connect_pending)
 		{
-		  wsock_events->connect_errorcode = WSAGetLastError ();
-		  connect_state (connect_failed);
+		  if (wsock_events->connect_errorcode)
+		    connect_state (connect_failed);
+		  else if (af_local_connect ())
+		    {
+		      wsock_events->connect_errorcode = WSAGetLastError ();
+		      connect_state (connect_failed);
+		    }
+		  else
+		    connect_state (connected);
 		}
-	      else
-		connect_state (connected);
 	    }
 	  UNLOCK_EVENTS;
 	  if ((evts.lNetworkEvents & FD_OOB) && wsock_events->owner)
@@ -1130,7 +1138,9 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   
   /* Initialize connect state to "connect_pending".  State is ultimately set
      to "connected" or "connect_failed" in wait_for_events when the FD_CONNECT
-     event occurs. */
+     event occurs.  Note that the underlying OS sockets are always non-blocking
+     and a successfully initiated non-blocking Winsock connect always returns
+     WSAEWOULDBLOCK.  Thus it's safe to rely on event handling. */
   connect_state (connect_pending);
 
   int res = ::connect (get_socket (), (struct sockaddr *) &sst, namelen);

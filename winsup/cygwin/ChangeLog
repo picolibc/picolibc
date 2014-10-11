@@ -1,5 +1,14 @@
 2014-10-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::af_local_connect): Drop outdated
+	comment.
+	(fhandler_socket::evaluate_events): Only set connect_state and call
+	af_local_connect if connect_state is connect_pending.  Explain why.
+	Drop redundant test for socket family and type.
+	(fhandler_socket::connect): Extend comment.
+
+2014-10-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::evaluate_events): Handle
 	connect_state and af_local_connect connect call here, once, independent
 	of FD_CONNECT being requested.  Add comment to explain why.
