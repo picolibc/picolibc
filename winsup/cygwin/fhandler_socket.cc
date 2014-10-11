@@ -634,15 +634,15 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
     {
       if (events & FD_CONNECT)
 	{
-	  int wsa_err = 0;
-	  if ((wsa_err = wsock_events->connect_errorcode) != 0)
+	  int wsa_err = wsock_events->connect_errorcode;
+	  if (wsa_err)
 	    {
 	      /* CV 2014-04-23: This is really weird.  If you call connect
 		 asynchronously on a socket and then select, an error like
 		 "Connection refused" is set in the event and in the SO_ERROR
 		 socket option.  If you call connect, then dup, then select,
 		 the error is set in the event, but not in the SO_ERROR socket
-		 option, even if the dup'ed socket handle refers to the same
+		 option, despite the dup'ed socket handle referring to the same
 		 socket.  We're trying to workaround this problem here by
 		 taking the connect errorcode from the event and write it back
 		 into the SO_ERROR socket option.
