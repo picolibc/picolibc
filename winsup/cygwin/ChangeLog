@@ -1,3 +1,19 @@
+2014-10-11  Christian Franke  <franke@computer.org>
+
+	Add setsockopt(sd, SOL_SOCKET, SO_PEERCRED, NULL, 0) to disable
+	initial handshake on AF_LOCAL sockets.
+	* fhandler.h (class fhandler_socket): Add no_getpeereid status flag.
+	(fhandler_socket::af_local_set_no_getpeereid): New prototype.
+	* fhandler_socket.cc (fhandler_socket::af_local_connect): Skip handshake
+	if no_getpeereid is set.  Add debug output.
+	(fhandler_socket::af_local_accept): Likewise.
+	(fhandler_socket::af_local_set_no_getpeereid): New function.
+	(fhandler_socket::af_local_copy): Copy no_getpeereid.
+	(fhandler_socket::getpeereid): Fail if no_getpeereid is set.
+	* net.cc (cygwin_setsockopt): Add SO_PEERCRED for AF_LOCAL/SOCK_STREAM
+	sockets.  Add comment to explain why we need it.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2014-10-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::af_local_connect): Drop outdated

@@ -401,7 +401,10 @@ fhandler_socket::af_local_connect ()
   if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
     return 0;
 
-  debug_printf ("af_local_connect called");
+  debug_printf ("af_local_connect called, no_getpeereid=%d", no_getpeereid ());
+  if (no_getpeereid ())
+    return 0;
+
   connect_state (connect_credxchg);
   af_local_setblocking (orig_async_io, orig_is_nonblocking);
   if (!af_local_send_secret () || !af_local_recv_secret ()
@@ -421,7 +424,10 @@ fhandler_socket::af_local_accept ()
 {
   bool orig_async_io, orig_is_nonblocking;
 
-  debug_printf ("af_local_accept called");
+  debug_printf ("af_local_accept called, no_getpeereid=%d", no_getpeereid ());
+  if (no_getpeereid ())
+    return 0;
+
   connect_state (connect_credxchg);
   af_local_setblocking (orig_async_io, orig_is_nonblocking);
   if (!af_local_recv_secret () || !af_local_send_secret ()
@@ -434,6 +440,25 @@ fhandler_socket::af_local_accept ()
       return -1;
     }
   af_local_unsetblocking (orig_async_io, orig_is_nonblocking);
+  return 0;
+}
+
+int
+fhandler_socket::af_local_set_no_getpeereid ()
+{
+  if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  if (connect_state () != unconnected)
+    {
+      set_errno (EALREADY);
+      return -1;
+    }
+
+  debug_printf ("no_getpeereid set");
+  no_getpeereid (true);
   return 0;
 }
 
@@ -461,6 +486,7 @@ fhandler_socket::af_local_copy (fhandler_socket *sock)
   sock->sec_peer_pid = sec_peer_pid;
   sock->sec_peer_uid = sec_peer_uid;
   sock->sec_peer_gid = sec_peer_gid;
+  sock->no_getpeereid (no_getpeereid ());
 }
 
 void
@@ -2301,6 +2327,11 @@ fhandler_socket::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
   if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
     {
       set_errno (EINVAL);
+      return -1;
+    }
+  if (no_getpeereid ())
+    {
+      set_errno (ENOTSUP);
       return -1;
     }
   if (connect_state () != connected)

@@ -504,6 +504,7 @@ class fhandler_socket: public fhandler_base
   int af_local_accept ();
  public:
   int af_local_connect ();
+  int af_local_set_no_getpeereid ();
   void af_local_set_sockpair_cred ();
 
  private:
@@ -531,10 +532,11 @@ class fhandler_socket: public fhandler_base
     unsigned saw_shutdown_write    : 1; /* Socket saw a SHUT_WR */
     unsigned saw_reuseaddr	   : 1; /* Socket saw SO_REUSEADDR call */
     unsigned connect_state	   : 3;
+    unsigned no_getpeereid	   : 1;
    public:
     status_flags () :
       async_io (0), saw_shutdown_read (0), saw_shutdown_write (0),
-      connect_state (unconnected)
+      connect_state (unconnected), no_getpeereid (0)
       {}
   } status;
 
@@ -556,6 +558,7 @@ class fhandler_socket: public fhandler_base
   IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_write)
   IMPLEMENT_STATUS_FLAG (bool, saw_reuseaddr)
   IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
+  IMPLEMENT_STATUS_FLAG (bool, no_getpeereid)
 
   int bind (const struct sockaddr *name, int namelen);
   int connect (const struct sockaddr *name, int namelen);

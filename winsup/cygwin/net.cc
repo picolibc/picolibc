@@ -810,6 +810,25 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
       fhandler_socket *fh = get (fd);
       if (!fh)
 	__leave;
+
+      /* Switch off the AF_LOCAL handshake and thus SO_PEERCRED handling
+	 for AF_LOCAL/SOCK_STREAM sockets.  This allows to handle special
+	 situations in which connect is called before a listening socket
+	 accepts connections.
+	 FIXME: In the long run we should find a more generic solution which
+	 doesn't require a blocking handshake in accept/connect to exchange
+	 SO_PEERCRED credentials. */
+      if (level == SOL_SOCKET && optname == SO_PEERCRED)
+	{
+	  if (optval || optlen
+	      || fh->get_addr_family () != AF_LOCAL
+	      || fh->get_socket_type () != SOCK_STREAM)
+	    set_errno (EINVAL);
+	  else
+	    res = fh->af_local_set_no_getpeereid ();
+	  __leave;
+	}
+
       /* Old applications still use the old WinSock1 IPPROTO_IP values. */
       if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
 	optname = convert_ws1_ip_optname (optname);
