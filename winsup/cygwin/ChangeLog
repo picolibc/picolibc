@@ -1,5 +1,18 @@
 2014-10-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::evaluate_events): Handle
+	connect_state and af_local_connect connect call here, once, independent
+	of FD_CONNECT being requested.  Add comment to explain why.
+	(fhandler_socket::connect): Drop connect_state handling and calling
+	af_local_connect.  Move remaining AF_LOCAL stuff prior  to calling
+	::connect and explain why.  Simplify error case.
+	* poll.cc (poll): Handle connect state independently of POLLOUT being
+	requested for the descriptor to allow setting POLLIN if connect failed.
+	Add comment.
+	* select.cc (set_bits): Drop connect_state and AF_LOCAL handling here.
+
+2014-10-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::evaluate_events): Slightly
 	rearrange code.  Rephrase a comment.
 

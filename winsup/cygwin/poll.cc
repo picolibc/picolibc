@@ -115,8 +115,9 @@ poll (struct pollfd *fds, nfds_t nfds, int timeout)
 		   So it looks like there's actually no good reason to
 		   return POLLERR. */
 		fds[i].revents |= POLLIN;
-	      /* Handle failed connect. */
-	      if (FD_ISSET(fds[i].fd, write_fds)
+	      /* Handle failed connect.  A failed connect implicitly sets
+	         POLLOUT, if requested, but it doesn't set POLLIN. */
+	      if ((fds[i].events & POLLIN)
 		  && (sock = cygheap->fdtab[fds[i].fd]->is_socket ())
 		  && sock->connect_state () == connect_failed)
 		fds[i].revents |= (POLLIN | POLLERR);

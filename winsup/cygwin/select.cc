@@ -480,16 +480,10 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
       UNIX_FD_SET (me->fd, writefds);
       if (me->except_on_write && (sock = me->fh->is_socket ()))
 	{
-	  /* Special AF_LOCAL handling. */
-	  if (!me->read_ready && sock->connect_state () == connect_pending
-	      && sock->af_local_connect ())
-	    {
-	      if (me->read_selected)
-		UNIX_FD_SET (me->fd, readfds);
-	      sock->connect_state (connect_failed);
-	    }
-	  else
-	    sock->connect_state (connected);
+	  /* Set readfds entry in case of a failed connect. */
+	  if (!me->read_ready && me->read_selected
+	      && sock->connect_state () == connect_failed)
+	    UNIX_FD_SET (me->fd, readfds);
 	}
       ready++;
     }

@@ -621,7 +621,26 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	  wsock_events->events |= evts.lNetworkEvents;
 	  events_now = (wsock_events->events & event_mask);
 	  if (evts.lNetworkEvents & FD_CONNECT)
-	    wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
+	    {
+	      wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
+	      /* Setting the connect_state and calling the AF_LOCAL handshake 
+		 here allows to handle this stuff from a single point.  This
+		 is independent of FD_CONNECT being requested.  Consider a
+		 server calling connect(2) and then immediately poll(2) with
+		 only polling for POLLIN (example: postfix), or select(2) just
+		 asking for descriptors ready to read). */
+	      if (wsock_events->connect_errorcode)
+		connect_state (connect_failed);
+	      else if (get_addr_family () == AF_LOCAL
+		       && get_socket_type () == SOCK_STREAM
+		       && af_local_connect ())
+		{
+		  wsock_events->connect_errorcode = WSAGetLastError ();
+		  connect_state (connect_failed);
+		}
+	      else
+		connect_state (connected);
+	    }
 	  UNLOCK_EVENTS;
 	  if ((evts.lNetworkEvents & FD_OOB) && wsock_events->owner)
 	    kill (wsock_events->owner, SIGURG);
@@ -1084,21 +1103,35 @@ out:
 int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
-  bool in_progress = false;
   struct sockaddr_storage sst;
-  DWORD err;
   int type;
 
   if (get_inet_addr (name, namelen, &sst, &namelen, &type, connect_secret)
       == SOCKET_ERROR)
     return SOCKET_ERROR;
 
-  if (get_addr_family () == AF_LOCAL && get_socket_type () != type)
+  if (get_addr_family () == AF_LOCAL)
     {
-      WSASetLastError (WSAEPROTOTYPE);
-      set_winsock_errno ();
-      return SOCKET_ERROR;
+      if (get_socket_type () != type)
+	{
+	  WSASetLastError (WSAEPROTOTYPE);
+	  set_winsock_errno ();
+	  return SOCKET_ERROR;
+	}
+
+      set_peer_sun_path (name->sa_data);
+
+      /* Don't move af_local_set_cred into af_local_connect which may be called
+	 via select, possibly running under another identity.  Call early here,
+	 because af_local_connect is called in wait_for_events. */
+      if (get_socket_type () == SOCK_STREAM)
+	af_local_set_cred ();
     }
+  
+  /* Initialize connect state to "connect_pending".  State is ultimately set
+     to "connected" or "connect_failed" in wait_for_events when the FD_CONNECT
+     event occurs. */
+  connect_state (connect_pending);
 
   int res = ::connect (get_socket (), (struct sockaddr *) &sst, namelen);
   if (!is_nonblocking ()
@@ -1106,47 +1139,20 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
       && WSAGetLastError () == WSAEWOULDBLOCK)
     res = wait_for_events (FD_CONNECT | FD_CLOSE, 0);
 
-  if (!res)
-    err = 0;
-  else
+  if (res)
     {
-      err = WSAGetLastError ();
-      /* Special handling for connect to return the correct error code
-	 when called on a non-blocking socket. */
-      if (is_nonblocking ())
-	{
-	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
-	    in_progress = true;
-
-	  if (err == WSAEWOULDBLOCK)
-	    WSASetLastError (err = WSAEINPROGRESS);
-	}
-      if (err == WSAEINVAL)
-	WSASetLastError (err = WSAEISCONN);
+      DWORD err = WSAGetLastError ();
+      
+      /* Winsock returns WSAEWOULDBLOCK if the non-blocking socket cannot be
+         conected immediately.  Convert to POSIX/Linux compliant EINPROGRESS. */
+      if (is_nonblocking () && err == WSAEWOULDBLOCK)
+	WSASetLastError (WSAEINPROGRESS);
+      /* Winsock returns WSAEINVAL if the socket is already a listener.
+      	 Convert to POSIX/Linux compliant EISCONN. */
+      else if (err == WSAEINVAL)
+	WSASetLastError (WSAEISCONN);
       set_winsock_errno ();
     }
-
-  if (get_addr_family () == AF_LOCAL && (!res || in_progress))
-    set_peer_sun_path (name->sa_data);
-
-  if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
-    {
-      af_local_set_cred (); /* Don't move into af_local_connect since
-			       af_local_connect is called from select,
-			       possibly running under another identity. */
-      if (!res && af_local_connect ())
-	{
-	  set_winsock_errno ();
-	  return SOCKET_ERROR;
-	}
-    }
-
-  if (err == WSAEINPROGRESS || err == WSAEALREADY)
-    connect_state (connect_pending);
-  else if (err)
-    connect_state (connect_failed);
-  else
-    connect_state (connected);
 
   return res;
 }
