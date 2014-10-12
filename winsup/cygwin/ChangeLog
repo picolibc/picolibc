@@ -1,5 +1,10 @@
 2014-10-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dlfcn.cc (gfpod_helper): Only check for POSIX dir separator, same as
+	in get_full_path_of_dll.
+
+2014-10-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dlfcn.cc (set_dl_error): Drop useless __stdcall.
 	(check_path_access): Ditto.  Drop FE_CWD from call to find_exec.
 	(gfpod_helper): Call path_conv::check for all paths containing a dir

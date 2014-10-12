@@ -41,7 +41,7 @@ check_path_access (const char *mywinenv, const char *name, path_conv& buf)
 static inline bool
 gfpod_helper (const char *name, path_conv &real_filename)
 {
-  if (strpbrk (name, "/\\"))
+  if (strchr (name, '/'))
     real_filename.check (name, PC_SYM_FOLLOW | PC_NULLEMPTY);
   else if (!check_path_access ("LD_LIBRARY_PATH=", name, real_filename))
     check_path_access ("/usr/bin:/usr/lib", name, real_filename);
