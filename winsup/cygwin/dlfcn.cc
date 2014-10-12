@@ -1,7 +1,7 @@
 /* dlfcn.cc
 
    Copyright 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011, 2013 Red Hat, Inc.
+   2010, 2011, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -20,7 +20,7 @@ details. */
 #include "tls_pbuf.h"
 #include "ntdll.h"
 
-static void __stdcall
+static void
 set_dl_error (const char *str)
 {
   strcpy (_my_tls.locals.dl_buffer, strerror (get_errno ()));
@@ -30,10 +30,10 @@ set_dl_error (const char *str)
 /* Look for an executable file given the name and the environment
    variable to use for searching (eg., PATH); returns the full
    pathname (static buffer) if found or NULL if not. */
-inline const char * __stdcall
+inline const char *
 check_path_access (const char *mywinenv, const char *name, path_conv& buf)
 {
-  return find_exec (name, buf, mywinenv, FE_NNF | FE_NATIVE | FE_CWD | FE_DLL);
+  return find_exec (name, buf, mywinenv, FE_NNF | FE_NATIVE | FE_DLL);
 }
 
 /* Search LD_LIBRARY_PATH for dll, if it exists.  Search /usr/bin and /usr/lib
@@ -41,7 +41,7 @@ check_path_access (const char *mywinenv, const char *name, path_conv& buf)
 static inline bool
 gfpod_helper (const char *name, path_conv &real_filename)
 {
-  if (isabspath (name))
+  if (strpbrk (name, "/\\"))
     real_filename.check (name, PC_SYM_FOLLOW | PC_NULLEMPTY);
   else if (!check_path_access ("LD_LIBRARY_PATH=", name, real_filename))
     check_path_access ("/usr/bin:/usr/lib", name, real_filename);
@@ -50,7 +50,7 @@ gfpod_helper (const char *name, path_conv &real_filename)
   return !real_filename.error;
 }
 
-static bool __stdcall
+static bool
 get_full_path_of_dll (const char* str, path_conv &real_filename)
 {
   int len = strlen (str);
@@ -153,14 +153,13 @@ dlopen (const char *name, int flags)
 	  tmp_malloc = __cygwin_user_data.cxx_malloc;
 #endif
 
-	  if (!(flags & RTLD_NOLOAD)
-	      || (ret = GetModuleHandleW (path)) != NULL)
-	    {
-	      ret = (void *) LoadLibraryW (path);
-	      if (ret && (flags & RTLD_NODELETE))
-		GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_PIN, path,
-				    (HMODULE *) &ret);
-	    }
+	  if (flags & RTLD_NOLOAD)
+	    GetModuleHandleExW (0, path, (HMODULE *) &ret);
+	  else
+	    ret = (void *) LoadLibraryW (path);
+	  if (ret && (flags & RTLD_NODELETE))
+	    GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_PIN, path,
+				(HMODULE *) &ret);
 
 #ifndef __x86_64__
 	  /* Restore original cxx_malloc pointer. */
