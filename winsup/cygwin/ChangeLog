@@ -1,3 +1,8 @@
+2014-10-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_setsockopt): Drop redundant test for AF_LOCAL and
+	SOCK_STREAM in SO_PEERCRED case, as in the original patch.
+
 2014-10-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dlfcn.cc (gfpod_helper): Only check for POSIX dir separator, same as

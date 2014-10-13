@@ -820,9 +820,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	 SO_PEERCRED credentials. */
       if (level == SOL_SOCKET && optname == SO_PEERCRED)
 	{
-	  if (optval || optlen
-	      || fh->get_addr_family () != AF_LOCAL
-	      || fh->get_socket_type () != SOCK_STREAM)
+	  if (optval || optlen)
 	    set_errno (EINVAL);
 	  else
 	    res = fh->af_local_set_no_getpeereid ();
