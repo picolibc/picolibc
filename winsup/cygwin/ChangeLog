@@ -1,5 +1,10 @@
 2014-10-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::connect): Don't change state
+	on WSAEALREADY error.  Change comment accordingly.
+
+2014-10-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (init_cygheap::init_installation_root): Install Cygwin's
 	installation dir as DLL search path, instead of ".".
 	* cygheap.h (class cwdstuff): Add parameter names in function

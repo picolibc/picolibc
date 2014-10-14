@@ -1201,8 +1201,9 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
       	 Convert to POSIX/Linux compliant EISCONN. */
       else if (err == WSAEINVAL && connect_state () == listener)
 	WSASetLastError (WSAEISCONN);
-      /* Any other error means the connmect failed. */
-      else if (connect_state () == connect_pending)
+      /* Any other error except WSAEALREADY during connect_pending means the
+         connect failed. */
+      else if (connect_state () == connect_pending && err != WSAEALREADY)
       	connect_state (connect_failed);
       set_winsock_errno ();
     }
