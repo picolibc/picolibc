@@ -1,3 +1,11 @@
+2014-10-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::connect): Init connect_state to
+	connect_pending only on unconnected socket.  Set connect_state to
+	connected on WSAEISCONN error.  Set connect_state to connect_failed
+	on any other error except WSAEWOULDBLOCK if connect is still pending.
+	Add lots of comment to explain why all of the above.
+
 2014-10-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_setsockopt): Drop redundant test for AF_LOCAL and

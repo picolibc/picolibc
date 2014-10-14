@@ -1166,8 +1166,16 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
      to "connected" or "connect_failed" in wait_for_events when the FD_CONNECT
      event occurs.  Note that the underlying OS sockets are always non-blocking
      and a successfully initiated non-blocking Winsock connect always returns
-     WSAEWOULDBLOCK.  Thus it's safe to rely on event handling. */
-  connect_state (connect_pending);
+     WSAEWOULDBLOCK.  Thus it's safe to rely on event handling.
+
+     Check for either unconnected or connect_failed since in both cases it's
+     allowed to retry connecting the socket.  It's also ok (albeit ugly) to
+     call connect to check if a previous non-blocking connect finished.
+
+     Set connect_state before calling connect, otherwise a race condition with
+     an already running select or poll might occur. */
+  if (connect_state () == unconnected || connect_state () == connect_failed)
+    connect_state (connect_pending);
 
   int res = ::connect (get_socket (), (struct sockaddr *) &sst, namelen);
   if (!is_nonblocking ()
@@ -1179,14 +1187,23 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
     {
       DWORD err = WSAGetLastError ();
       
+      /* Some applications use the ugly technique to check if a non-blocking
+         connect succeeded by calling connect again, until it returns EISCONN.
+	 This circumvents the event handling and connect_state is never set.
+	 Thus we check for this situation here. */
+      if (err == WSAEISCONN)
+	connect_state (connected);
       /* Winsock returns WSAEWOULDBLOCK if the non-blocking socket cannot be
          conected immediately.  Convert to POSIX/Linux compliant EINPROGRESS. */
-      if (is_nonblocking () && err == WSAEWOULDBLOCK)
+      else if (is_nonblocking () && err == WSAEWOULDBLOCK)
 	WSASetLastError (WSAEINPROGRESS);
       /* Winsock returns WSAEINVAL if the socket is already a listener.
       	 Convert to POSIX/Linux compliant EISCONN. */
-      else if (err == WSAEINVAL)
+      else if (err == WSAEINVAL && connect_state () == listener)
 	WSASetLastError (WSAEISCONN);
+      /* Any other error means the connmect failed. */
+      else if (connect_state () == connect_pending)
+      	connect_state (connect_failed);
       set_winsock_errno ();
     }
 
