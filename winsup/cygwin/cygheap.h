@@ -308,14 +308,23 @@ private:
      available in shared memory avoids to test for the version every time
      around.  Default to new version. */
   fcwd_version_t fast_cwd_version;
-  void override_win32_cwd (bool, ULONG);
+  void override_win32_cwd (bool init, ULONG old_dismount_count);
 
 public:
   UNICODE_STRING win32;
   static muto cwd_lock;
   const char *get_posix () const { return posix; };
-  void reset_posix (wchar_t *);
-  char *get (char *, int = 1, int = 0, unsigned = NT_MAX_PATH);
+  void reset_posix (wchar_t *w_cwd);
+  char *get (char *buf, int need_posix = 1, int with_chroot = 0,
+	     unsigned ulen = NT_MAX_PATH);
+  PWCHAR get (PWCHAR buf, unsigned buflen = NT_MAX_PATH)
+  {
+    cwd_lock.acquire ();
+    buf[0] = L'\0';
+    wcsncat (buf, win32.Buffer, buflen - 1);
+    cwd_lock.release ();
+    return buf;
+  }
   HANDLE get_handle () { return dir; }
   DWORD get_drive (char * dst)
   {

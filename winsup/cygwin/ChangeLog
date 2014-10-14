@@ -1,5 +1,17 @@
 2014-10-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.cc (init_cygheap::init_installation_root): Install Cygwin's
+	installation dir as DLL search path, instead of ".".
+	* cygheap.h (class cwdstuff): Add parameter names in function
+	declarations for readability.
+	(cwdstuff::get): Ad inline implementation fetching the CWD as wide char
+	string.
+	* dlfcn.cc (dlopen): Add searching for dependent DLLs in DLL
+	installation dir or CWD, if all else failed.
+	Add comment to explain scenarios this is accommodating.
+
+2014-10-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::connect): Init connect_state to
 	connect_pending only on unconnected socket.  Set connect_state to
 	connected on WSAEISCONN error.  Set connect_state to connect_failed
