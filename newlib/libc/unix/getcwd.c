@@ -57,7 +57,7 @@ getcwd (pt, size)
      size_t size;
 {
   register struct dirent *dp;
-  register DIR *dir;
+  register DIR *dir = NULL;
   register dev_t dev;
   register ino_t ino;
   register int first;
@@ -237,6 +237,7 @@ getcwd (pt, size)
       bpt -= strlen (dp->d_name);
       bcopy (dp->d_name, bpt, strlen (dp->d_name));
       (void) closedir (dir);
+      dir = NULL;
 
       /* Truncate any file name. */
       *bup = '\0';
@@ -256,6 +257,8 @@ notfound:
 err:
   if (ptsize)
     free (pt);
+  if (dir)
+    (void) closedir (dir);
   free (up);
   return (char *) NULL;
 }

@@ -1,3 +1,7 @@
+2014-10-16  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/unix/getcwd.c (getcwd): Close directory also in case of an error.
+
 2014-10-10  Thomas Uhle <thomas.uhle@eas.iis.fraunhofer.de>
 
 	* libc/include/_ansi.h: _LONG_LONG_TYPE definition removed.
