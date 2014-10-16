@@ -1,5 +1,9 @@
 2014-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_OFILES): Rearrange with one file per line.
+
+2014-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_proc.cc (format_proc_partitions): Extend output to print
 	the windows mount points the device is mounted on.
 

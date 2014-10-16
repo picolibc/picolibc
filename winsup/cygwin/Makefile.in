@@ -153,31 +153,157 @@ DLL_IMPORTS:=${shell $(CC) -print-file-name=w32api/libkernel32.a} ${shell $(CC) 
 
 MT_SAFE_OBJECTS:=
 #
-DLL_OFILES:=advapi32.o arc4random.o assert.o autoload.o base64.o bsdlib.o ctype.o \
-	cxx.o cygheap.o cygthread.o cygtls.o cygwait.o cygxdr.o dcrt0.o debug.o \
-	devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o exceptions.o \
-	exec.o external.o fcntl.o fenv.o fhandler.o fhandler_clipboard.o \
-	fhandler_console.o fhandler_dev.o fhandler_disk_file.o fhandler_dsp.o \
-	fhandler_fifo.o fhandler_floppy.o fhandler_mailslot.o \
-	fhandler_netdrive.o fhandler_nodevice.o fhandler_proc.o \
-	fhandler_process.o fhandler_procnet.o fhandler_procsys.o \
-	fhandler_procsysvipc.o fhandler_random.o fhandler_raw.o \
-	fhandler_registry.o fhandler_serial.o fhandler_socket.o fhandler_tape.o \
-	fhandler_termios.o fhandler_tty.o fhandler_virtual.o fhandler_windows.o \
-	fhandler_zero.o flock.o fnmatch.o fork.o fts.o ftw.o getopt.o glob.o \
-	glob_pattern_p.o globals.o grp.o heap.o hookapi.o inet_addr.o \
-	inet_network.o init.o ioctl.o ipc.o kernel32.o ldap.o libstdcxx_wrapper.o \
-	localtime.o lsearch.o malloc_wrapper.o minires-os-if.o minires.o \
-	miscfuncs.o mktemp.o mmap.o msg.o mount.o net.o netdb.o nfs.o nftw.o \
-	nlsfuncs.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o posix_ipc.o \
-	pseudo-reloc.o pthread.o random.o regcomp.o regerror.o regexec.o regfree.o \
-	registry.o resource.o rexec.o rcmd.o scandir.o sched.o sec_acl.o \
-	sec_auth.o sec_helper.o security.o select.o sem.o setlsapwd.o shared.o \
-	shm.o sigfe.o signal.o sigproc.o smallprint.o spawn.o strace.o strfmon.o \
-	strfuncs.o strptime.o strsep.o strsig.o sync.o syscalls.o sysconf.o \
-	syslog.o termios.o thread.o timer.o times.o tls_pbuf.o tty.o uinfo.o \
-	uname.o wait.o wincap.o window.o winf.o wow64.o xsique.o \
-	$(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
+DLL_OFILES:= \
+	advapi32.o \
+	arc4random.o \
+	assert.o \
+	autoload.o \
+	base64.o \
+	bsdlib.o \
+	ctype.o \
+	cxx.o \
+	cygheap.o \
+	cygthread.o \
+	cygtls.o \
+	cygwait.o \
+	cygxdr.o \
+	dcrt0.o \
+	debug.o \
+	devices.o \
+	dir.o \
+	dlfcn.o \
+	dll_init.o \
+	dtable.o \
+	environ.o \
+	errno.o \
+	exceptions.o \
+	exec.o \
+	external.o \
+	fcntl.o \
+	fenv.o \
+	fhandler.o \
+	fhandler_clipboard.o \
+	fhandler_console.o \
+	fhandler_dev.o \
+	fhandler_disk_file.o \
+	fhandler_dsp.o \
+	fhandler_fifo.o \
+	fhandler_floppy.o \
+	fhandler_mailslot.o \
+	fhandler_netdrive.o \
+	fhandler_nodevice.o \
+	fhandler_proc.o \
+	fhandler_process.o \
+	fhandler_procnet.o \
+	fhandler_procsys.o \
+	fhandler_procsysvipc.o \
+	fhandler_random.o \
+	fhandler_raw.o \
+	fhandler_registry.o \
+	fhandler_serial.o \
+	fhandler_socket.o \
+	fhandler_tape.o \
+	fhandler_termios.o \
+	fhandler_tty.o \
+	fhandler_virtual.o \
+	fhandler_windows.o \
+	fhandler_zero.o \
+	flock.o \
+	fnmatch.o \
+	fork.o \
+	fts.o \
+	ftw.o \
+	getopt.o \
+	glob.o \
+	glob_pattern_p.o \
+	globals.o \
+	grp.o \
+	heap.o \
+	hookapi.o \
+	inet_addr.o \
+	inet_network.o \
+	init.o \
+	ioctl.o \
+	ipc.o \
+	kernel32.o \
+	ldap.o \
+	libstdcxx_wrapper.o \
+	localtime.o \
+	lsearch.o \
+	malloc_wrapper.o \
+	minires-os-if.o \
+	minires.o \
+	miscfuncs.o \
+	mktemp.o \
+	mmap.o \
+	msg.o \
+	mount.o \
+	net.o \
+	netdb.o \
+	nfs.o \
+	nftw.o \
+	nlsfuncs.o \
+	ntea.o \
+	passwd.o \
+	path.o \
+	pinfo.o \
+	pipe.o \
+	poll.o \
+	posix_ipc.o \
+	pseudo-reloc.o \
+	pthread.o \
+	random.o \
+	regcomp.o \
+	regerror.o \
+	regexec.o \
+	regfree.o \
+	registry.o \
+	resource.o \
+	rexec.o \
+	rcmd.o \
+	scandir.o \
+	sched.o \
+	sec_acl.o \
+	sec_auth.o \
+	sec_helper.o \
+	security.o \
+	select.o \
+	sem.o \
+	setlsapwd.o \
+	shared.o \
+	shm.o \
+	sigfe.o \
+	signal.o \
+	sigproc.o \
+	smallprint.o \
+	spawn.o \
+	strace.o \
+	strfmon.o \
+	strfuncs.o \
+	strptime.o \
+	strsep.o \
+	strsig.o \
+	sync.o \
+	syscalls.o \
+	sysconf.o \
+	syslog.o \
+	termios.o \
+	thread.o \
+	timer.o \
+	times.o \
+	tls_pbuf.o \
+	tty.o \
+	uinfo.o \
+	uname.o \
+	wait.o \
+	wincap.o \
+	window.o \
+	winf.o \
+	wow64.o \
+	xsique.o \
+	$(EXTRA_OFILES) \
+	$(MALLOC_OFILES) \
+	$(MT_SAFE_OBJECTS)
 
 EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
 	cygtls.o \
