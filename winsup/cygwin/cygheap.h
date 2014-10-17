@@ -505,6 +505,7 @@ struct init_cygheap: public mini_cygheap
   unsigned bucket_val[NBUCKETS];
   char *buckets[NBUCKETS];
   WCHAR installation_root[PATH_MAX];
+  WCHAR installation_dir[PATH_MAX];
   UNICODE_STRING installation_key;
   WCHAR installation_key_buf[18];
   cygheap_root root;
@@ -533,6 +534,15 @@ struct init_cygheap: public mini_cygheap
   hook_chain hooks;
   void close_ctty ();
   void init_installation_root ();
+  void set_dll_dir ()
+  {
+    /* Call SetDllDirectory on installation_dir.  This removes "." from the
+       DLL search path and installs our /bin dir instead.
+       Amazing but true:  This setting is propagated to child processes :-)
+			  but only starting with Windows 8 :-( */
+    if (!SetDllDirectoryW (installation_dir))
+      debug_printf ("SetDllDirectoryW (%W), %E", installation_dir);
+  }
   void __reg1 init_tls_list ();;
   void __reg2 add_tls (_cygtls *);
   void __reg3 remove_tls (_cygtls *, DWORD);
@@ -666,4 +676,5 @@ class cygheap_fdenum : public cygheap_fdmanip
 
 void __stdcall cygheap_fixup_in_child (bool);
 void __stdcall cygheap_init ();
+void setup_cygheap ();
 extern char _cygheap_start[] __attribute__((section(".idata")));

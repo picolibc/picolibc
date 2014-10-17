@@ -609,7 +609,7 @@ void
 child_info_fork::handle_fork ()
 {
   cygheap_fixup_in_child (false);
-  memory_init (false);
+  memory_init ();
   myself.thisproc (NULL);
   myself->uid = cygheap->user.real_uid;
   myself->gid = cygheap->user.real_gid;
@@ -663,7 +663,7 @@ child_info_spawn::handle_spawn ()
   if (!dynamically_loaded || get_parent_handle ())
       {
 	cygheap_fixup_in_child (true);
-	memory_init (false);
+	memory_init ();
       }
   if (!moreinfo->myself_pinfo ||
       !DuplicateHandle (GetCurrentProcess (), moreinfo->myself_pinfo,
@@ -769,7 +769,8 @@ dll_crt0_0 ()
 
   if (!child_proc_info)
     {
-      memory_init (true);
+      setup_cygheap ();
+      memory_init ();
 #ifndef __x86_64__
       /* WOW64 process on XP/64 or Server 2003/64?  Check if we have been
 	 started from 64 bit process and if our stack is at an unusual

@@ -1,5 +1,23 @@
 2014-10-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.cc (cygheap_fixup_in_child): Call set_dll_dir.
+	(init_cygheap::init_installation_root): Just memmove contents of
+	installation_root instead of calling GetModuleFileNameW again.
+	Copy installation_root to installation_dir before stripping of
+	"bin" dir.  Don't call SetDllDirectory here.  Explain what we do.
+	(setup_cygheap): New function taking over initial cygheap setup
+	from memory_init.  Additionally call set_dll_dir.
+	* cygheap.h (struct init_cygheap): Add installation_dir member.
+	(init_cygheap::set_dll_dir): Define.
+	(setup_cygheap): Declare.
+	* dcrt0.cc: Throughout drop parameter from memory_init call.
+	(dll_crt0_0): Call setup_cygheap prior to memory_init.
+	* dlfcn.cc (dlopen): Change comment to point to the right function.
+	* shared.cc (memory_init): Drop parameter.  Drop cygheap setup.
+	* shared_info.h (memory_init): Change declaration accordingly.
+
+2014-10-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.h (__try): Define __l_endtry as block-local label in 32 bit
 	case as well.
 

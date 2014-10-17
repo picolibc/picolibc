@@ -343,17 +343,8 @@ shared_info::initialize ()
 }
 
 void
-memory_init (bool init_cygheap)
+memory_init ()
 {
-  /* Initialize the Cygwin heap, if necessary */
-  if (init_cygheap)
-    {
-      cygheap_init ();
-      cygheap->user.init ();
-      cygheap->init_installation_root (); /* Requires user.init! */
-      cygheap->pg.init ();
-    }
-
   shared_info::create ();	/* Initialize global shared memory */
   user_info::create (false);	/* Initialize per-user shared memory */
   /* Initialize tty list session stuff.  Doesn't really belong here but

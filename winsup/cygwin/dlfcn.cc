@@ -166,10 +166,10 @@ dlopen (const char *name, int flags)
 		{
 		  /* This may indicate that a dependent DLL could not be loaded.
 		     Typically this occurs because we removed the CWD from the
-		     DLL search path via SetDllDirectory
-		     (see init_cygheap::init_installation_root), and the load
-		     mechanism expects that dlopening a DLL from the CWD allows
-		     to load dependent DLLs from the same dir.
+		     DLL search path via SetDllDirectory (see inline function
+		     init_cygheap::set_dll_dir), and the load mechanism expects
+		     that dlopening a DLL from the CWD allows to load dependent
+		     DLLs from the same dir.
  
 		     To continue supporting this scenario, call LoadLibraryEx
 		     with the LOAD_WITH_ALTERED_SEARCH_PATH flag.  This flag
