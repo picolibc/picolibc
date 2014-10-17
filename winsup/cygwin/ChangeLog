@@ -1,5 +1,25 @@
 2014-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_OFILES): Add quotactl.o.
+	* common.din (quotactl): Export.
+	* ntdll.h: Define FILE_FS_CONTROL_INFORMATION::FileSystemControlFlags
+	flag values.
+	(struct _FILE_FS_CONTROL_INFORMATION): Define.
+	(struct _FILE_GET_QUOTA_INFORMATION): Define.
+	(typedef struct _FILE_QUOTA_INFORMATION): Define.
+	(NtQueryObject): Use PVOID rather than VOID*.
+	(NtQueryVolumeInformationFile): Ditto.
+	(NtQueryQuotaInformationFile): Declare.
+	(NtSetQuotaInformationFile): Declare.
+	(NtSetVolumeInformationFile): Declare.
+	* quotactl.cc: New file implementing quotactl().
+	* include/sys/mount.h (BLOCK_SIZE): Define.
+	(BLOCK_SIZE_BITS): Define.
+	* include/sys/quota.h: New header.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2014-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (DLL_OFILES): Rearrange with one file per line.
 
 2014-10-16  Corinna Vinschen  <corinna@vinschen.de>

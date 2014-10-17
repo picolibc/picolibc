@@ -920,6 +920,7 @@ putwc SIGFE
 putwchar SIGFE
 pwrite SIGFE
 qsort NOSIGFE
+quotactl SIGFE
 raise SIGFE
 rand NOSIGFE
 rand_r NOSIGFE

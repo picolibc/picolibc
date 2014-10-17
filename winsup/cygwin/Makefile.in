@@ -252,6 +252,7 @@ DLL_OFILES:= \
 	posix_ipc.o \
 	pseudo-reloc.o \
 	pthread.o \
+	quotactl.o \
 	random.o \
 	regcomp.o \
 	regerror.o \
