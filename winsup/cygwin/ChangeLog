@@ -43,7 +43,7 @@
 	installation dir as DLL search path, instead of ".".
 	* cygheap.h (class cwdstuff): Add parameter names in function
 	declarations for readability.
-	(cwdstuff::get): Ad inline implementation fetching the CWD as wide char
+	(cwdstuff::get): Add inline implementation fetching the CWD as wide char
 	string.
 	* dlfcn.cc (dlopen): Add searching for dependent DLLs in DLL
 	installation dir or CWD, if all else failed.
