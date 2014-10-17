@@ -1,4 +1,9 @@
-2014-10-16  Corinna Vinschen  <corinna@vinschen.de>
+2014-10-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (__try): Define __l_endtry as block-local label in 32 bit
+	case as well.
+
+2014-10-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add quotactl.o.
 	* common.din (quotactl): Export.

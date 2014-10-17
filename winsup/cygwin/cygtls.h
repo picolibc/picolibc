@@ -394,6 +394,7 @@ public:
 #else /* !__x86_64__ */
 #define __try \
   { \
+    __label__ __l_endtry; \
     myfault efault; \
     if (!efault.faulted ()) \
       {
