@@ -1,3 +1,8 @@
+2014-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Set error from status code if opening
+	the parent directory failed, but keep special case for root dirs.
+
 2014-10-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc (cygheap_fixup_in_child): Call set_dll_dir.

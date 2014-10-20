@@ -2834,7 +2834,13 @@ restart:
 		     This case is only recognized by the length of the
 		     basename part.  If it's 0, the incoming file is the
 		     root of a drive.  So we at least know it's a directory. */
-		  fileattr = basename.Length ? 0 : FILE_ATTRIBUTE_DIRECTORY;
+		  if (basename.Length)
+		    fileattr = FILE_ATTRIBUTE_DIRECTORY;
+		  else
+		    {
+		      fileattr = 0;
+		      set_error (geterrno_from_nt_status (status));
+		    }
 		}
 	      else
 		{
