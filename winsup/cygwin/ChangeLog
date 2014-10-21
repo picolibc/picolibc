@@ -1,3 +1,9 @@
+2014-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (get_user_groups): Remove experimental exception handler
+	added 2014-09-05.
+	(get_user_local_groups): Ditto.
+
 2014-10-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_serial.cc: Revert debug code accidentally checked in on
