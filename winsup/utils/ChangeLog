@@ -1,3 +1,9 @@
+2014-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (CYGLSA64_DLL): Remove unused macro.
+	(dump_sysinfo): If COMSPEC isn't set in the MSVCRT environment, set it.
+	Explain why.
+
 2014-09-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (addmissing): New function to add missing acl entries to

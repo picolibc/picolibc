@@ -1,7 +1,7 @@
 /* cygcheck.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -586,9 +586,6 @@ cygwin_info (HANDLE h)
   free (buf_start);
   return;
 }
-
-/* Special case.  Don't complain about this one.  */
-#define CYGLSA64_DLL "\\cyglsa64.dll"
 
 static void
 dll_info (const char *path, HANDLE fh, int lvl, int recurse)
@@ -1435,6 +1432,20 @@ dump_sysinfo ()
   char osname[128];
   DWORD obcaseinsensitive = 1;
   HKEY key;
+
+  /* MSVCRT popen (called by pretty_id and dump_sysinfo_services) SEGVs if
+     COMSPEC isn't set correctly.  Simply enforce it here.  Using
+     Get/SetEnvironmentVariable to set the dir does *not* help, btw.
+     Apparently MSVCRT keeps its own copy of the environment and changing
+     that requires to use _wputenv. */
+  if (!_wgetenv (L"COMSPEC"))
+    {
+      WCHAR comspec[MAX_PATH + 17];
+      wcscpy (comspec, L"COMSPEC=");
+      GetSystemDirectoryW (comspec + 8, MAX_PATH);
+      wcsncat (comspec, L"\\cmd.exe", sizeof comspec);
+      _wputenv (comspec);
+    }
 
   printf ("\nCygwin Configuration Diagnostics\n");
   time (&now);
