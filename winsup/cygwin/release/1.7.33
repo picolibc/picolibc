@@ -22,7 +22,7 @@ What's new:
   restricted:  Windows only supports user block quotas on NTFS, no group
   quotas, no inode quotas, no time constraints.
 
-- New APIs: ffsl, ffsll (Linux extensions).
+- New APIs: ffsl, ffsll (glibc extensions).
 
 
 What changed:
