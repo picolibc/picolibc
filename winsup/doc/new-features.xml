@@ -48,6 +48,10 @@ New APIs: ffsl, ffsll (glibc extensions).
 </para></listitem>
 
 <listitem><para>
+New API: stime (SVr4).
+</para></listitem>
+
+<listitem><para>
 New internal exception handling based on SEH on 64 bit Cygwin.
 </para></listitem>
 

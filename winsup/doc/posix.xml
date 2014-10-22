@@ -1303,6 +1303,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     rindex			(SUSv3)
     scalb			(SUSv3)
     setutent			(XPG2)
+    stime			(SVID)
     sys_errlist			(BSD)
     sys_nerr			(BSD)
     sys_siglist			(BSD)
