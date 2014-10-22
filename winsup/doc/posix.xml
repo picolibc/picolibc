@@ -1141,6 +1141,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     feenableexcept
     fedisableexcept
     fegetexcept
+    ffsl
+    ffsll
     fgetxattr
     flistxattr
     fopencookie
@@ -1173,6 +1175,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_getattr_np
     pthread_sigqueue
     ptsname_r
+    quotactl
     rawmemchr
     removexattr
     scandirat
@@ -1560,6 +1563,10 @@ return -1 and set errno to ENOSYS.  <function>grantpt</function> and
 <function>msgctl</function>, <function>msgget</function>,
 <function>msgrcv</function> and <function>msgsnd</function> are only
 available when cygserver is running.</para>
+
+<para>The Linux-specific function <function>quotactl</function> only implements
+what works on Windows:  Windows only supports user block quotas on NTFS, no
+group quotas, no inode quotas, no time constraints.</para>
 
 </sect1>
 

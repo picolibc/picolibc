@@ -1,3 +1,8 @@
+2014-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix.xml (std-gnu): Add ffsl, ffsll, quotactl.
+	(std-notes): Add restrictions of quotactl.
+
 2014-10-22  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* new-features.xml (ov-new1.7.33): Document stime.
