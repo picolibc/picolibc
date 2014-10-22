@@ -5,32 +5,68 @@ What's new:
   to do without /etc/passwd and /etc/group files.  Introduce /etc/nsswitch.conf
   file to configure passwd/group handling.
 
-- /proc/cygdrive as a symlink pointing to the current cygdrive prefix.  This
-  can be utilized in scripts to access paths via cygdrive prefix, even if the
-  cygdrive prefix has been changed by the user.
+- /proc/cygdrive is a new symlink pointing to the current cygdrive prefix.
+  This can be utilized in scripts to access paths via cygdrive prefix, even
+  if the cygdrive prefix has been changed by the user.
 
-- Extend /proc/partitions to print the windows mount points the device is
-  mounted on.  This allows to recognize the underlying Windows devices of the
-  Cygwin raw device names.
+- /proc/partitions now prints the windows mount points the device is mounted
+  on.  This allows to recognize the underlying Windows devices of the Cygwin
+  raw device names.
 
 - New API: quotactl, designed after the Linux/BSD function, but severly
   restricted:  Windows only supports user block quotas on NTFS, no group
   quotas, no inode quotas, no time constraints.
 
-- New APIs: ffsl, ffsll.
+- New APIs: ffsl, ffsll (Linux extensions).
 
 
 What changed:
 -------------
 
+- New internal exception handling based on SEH on 64 bit Cygwin.
+
+- Revamp Solaris ACL implementation to more closely work like POSIX ACLs
+  are supposed to work.  Finally implement a CLASS_OBJ emulation.  Update
+  getfacl(1)/setfacl(1) accordingly.
+
+- Drop the current working directory from the default DLL search path in
+  favor of Cygwin's /bin dir.
+
+- Improve various header files for C++- and standards-compliance.
+
+- Doug Lea malloc implementation update from 2.8.3 to the latest 2.8.6.
+
 
 Bug Fixes
 ---------
+
+- Per POSIX, dirfd(3) now returns EINVAL rather than EBADF on invalid
+  directory stream.
+
+- Fix a resource leak in rmdir(2).
+
+- Fix fchmod(2)/fchown(2)/fsetxattr(2) in case the file got renamed after
+  open and before calling one of the affected functions.
+  Addresses: https://cygwin.com/ml/cygwin/2014-08/msg00517.html
+
+- Handle Netapp-specific problem in statvfs(2)/fstatvfs(2).
+  Addresses: https://cygwin.com/ml/cygwin/2014-06/msg00425.html
+
+- Fix chown(2) on ptys in a corner case.
+
+- Generate correct error when a path is inaccessible due to missing permissions.
+  Addresses: https://cygwin.com/ml/cygwin-developers/2014-10/msg00010.html
 
 - Don't hang in accept calls if socket is no listener.  Set errno to EINVAL
   instead.  Don't hang in read/recv/recvfrom/recvmsg calls if socket is
   connection oriented and not connected.  Set errno to ENOTCONN instead.
 
-- Don't claim serial line is a tty.  Don't allow seeking on serial lines and
-  sockets.  Set errno to ESPIPE instead.
+- Don't allow seeking on serial lines and sockets.  Set errno to ESPIPE
+  instead.
   Addresses: https://cygwin.com/ml/cygwin/2014-08/msg00319.html
+
+- Fix output of /proc/<PID>/statm.
+
+- Fix a SEGV in cygcheck if the environment variable COMSPEC is not, or
+  incorrectly set.
+  Addresses: https://cygwin.com/ml/cygwin/2014-10/msg00292.html
