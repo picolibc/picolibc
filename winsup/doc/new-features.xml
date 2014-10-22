@@ -52,6 +52,11 @@ New API: stime (SVr4).
 </para></listitem>
 
 <listitem><para>
+Provide Cygwin documentation (PDFs and HTML) for offline usage in
+<filename>/usr/share/doc/cygwin-${version}</filename>.
+</para></listitem>
+
+<listitem><para>
 New internal exception handling based on SEH on 64 bit Cygwin.
 </para></listitem>
 

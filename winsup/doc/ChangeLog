@@ -1,5 +1,15 @@
 2014-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in: Create install targets.
+	(cygwin-ug-net/cygwin-ug-net.pdf): Create subdir to allow building PDF
+	even if subdir is missing.
+	(cygwin-api/cygwin-api.pdf): Ditto.
+	* configure.ac: Add AC_PROG_INSTALL rule.
+	* configure: Regenerate.
+	* new-features.xml (ov-new1.7.33): Add installation of docs.
+
+2014-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix.xml (std-gnu): Add ffsl, ffsll, quotactl.
 	(std-notes): Add restrictions of quotactl.
 
