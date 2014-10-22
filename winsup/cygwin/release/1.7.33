@@ -26,6 +26,9 @@ What's new:
 
 - New API: stime (SVr4).
 
+- Provide Cygwin documentation (PDFs and HTML) for offline usage in
+  /usr/share/doc/cygwin-${version}.
+
 
 What changed:
 -------------
