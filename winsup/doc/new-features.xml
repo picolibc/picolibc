@@ -9,9 +9,65 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
-Introduce reading passwd/group entries directly from SAM/AD, thus allowing
-to do without /etc/passwd and /etc/group files.  Introduce /etc/nsswitch.conf
-file to configure passwd/group handling.
+Cygwin can now generate passwd/group entries directly from Windows user
+databases (local SAM or Active Directory), thus allowing to run Cygwin
+without having to create /etc/passwd and /etc/group files.  Introduce
+/etc/nsswitch.conf file to configure passwd/group handling.
+</para>
+
+<para>
+For bordercase which require to use /etc/passwd and /etc/group files,
+change mkpasswd/mkgroup to generate passwd/group entries compatible with
+the entries read from SAM/AD.
+</para>
+
+<para>For a description of this exciting new feature see
+<xref linkend="ntsec"></xref>.
+</para></listitem>
+
+<listitem><para>
+/proc/cygdrive is a new symlink pointing to the current cygdrive prefix.
+This can be utilized in scripts to access paths via cygdrive prefix,
+even if the cygdrive prefix has been changed by the user.
+</para></listitem>
+
+<listitem><para>
+/proc/partitions now prints the windows mount points the device is
+mounted on.  This allows to recognize the underlying Windows devices of
+the Cygwin raw device names.
+</para></listitem>
+
+<listitem><para>
+New API: quotactl, designed after the Linux/BSD function, but severly
+restricted:  Windows only supports user block quotas on NTFS, no group
+quotas, no inode quotas, no time constraints.
+</para></listitem>
+
+<listitem><para>
+New APIs: ffsl, ffsll (Linux extensions).
+</para></listitem>
+
+<listitem><para>
+New internal exception handling based on SEH on 64 bit Cygwin.
+</para></listitem>
+
+<listitem><para>
+Revamp Solaris ACL implementation to more closely work like POSIX ACLs
+are supposed to work.  Finally implement a CLASS_OBJ emulation.  Update
+getfacl(1)/setfacl(1) accordingly.
+</para></listitem>
+
+<listitem><para>
+Drop the current working directory from the default DLL search path in
+favor of Cygwin's /bin dir.
+</para></listitem>
+
+<listitem><para>
+Improve various header files for C++- and standards-compliance.
+</para></listitem>
+
+<listitem><para>
+Doug Lea malloc implementation update from 2.8.3 to the latest 2.8.6.
 </para></listitem>
 
 </itemizedlist>
