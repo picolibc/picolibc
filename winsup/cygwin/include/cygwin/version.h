@@ -454,12 +454,13 @@ details. */
       276: Export ffsl, ffsll.
       277: Add setsockopt(SO_PEERCRED).
       278: Add quotactl.
+      279: Export stime.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 278
+#define CYGWIN_VERSION_API_MINOR 279
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

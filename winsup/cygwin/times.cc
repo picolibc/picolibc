@@ -139,6 +139,14 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
   return res;
 }
 
+/* stime: SVr4 */
+extern "C" int
+stime (const time_t *t)
+{
+  struct timeval tv = { *t, 0 };
+  return settimeofday(&tv, NULL);
+}
+
 /* timezone: standards? */
 extern "C" char *
 timezone (void)

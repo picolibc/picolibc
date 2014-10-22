@@ -24,6 +24,8 @@ What's new:
 
 - New APIs: ffsl, ffsll (glibc extensions).
 
+- New API: stime (SVr4).
+
 
 What changed:
 -------------

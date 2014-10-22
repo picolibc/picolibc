@@ -1109,6 +1109,7 @@ sscanf SIGFE
 stat SIGFE
 statfs SIGFE
 statvfs SIGFE
+stime SIGFE
 stpcpy NOSIGFE
 stpncpy NOSIGFE
 strcasecmp NOSIGFE
