@@ -1,9 +1,14 @@
 What's new:
 -----------
 
-- Introduce reading passwd/group entries directly from SAM/AD, thus allowing
-  to do without /etc/passwd and /etc/group files.  Introduce /etc/nsswitch.conf
-  file to configure passwd/group handling.
+- Cygwin can now generate passwd/group entries directly from Windows
+  user databases (local SAM or Active Directory), thus allowing to run
+  Cygwin without having to create /etc/passwd and /etc/group files.
+  Introduce /etc/nsswitch.conf file to configure passwd/group handling.
+
+  For bordercase which require to use /etc/passwd and /etc/group files,
+  change mkpasswd/mkgroup to generate passwd/group entries compatible
+  with the entries read from SAM/AD.
 
 - /proc/cygdrive is a new symlink pointing to the current cygdrive prefix.
   This can be utilized in scripts to access paths via cygdrive prefix, even
