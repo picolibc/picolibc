@@ -1,3 +1,7 @@
+2014-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntsec.xml: Fix language.
+
 2014-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Create install targets.
