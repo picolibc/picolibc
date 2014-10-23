@@ -12,6 +12,7 @@
 
 # Makefile for libgloss/msp430.
 
+DESTDIR =
 VPATH = @srcdir@
 srcdir = @srcdir@
 objdir = .
@@ -152,12 +153,13 @@ utime.o : $(SDEPS)
 write.o : $(SDEPS)
 
 install: $(CRT) $(SIM_BSP) $(LIB_CIO) $(LIB_CRT) $(SCRIPTS)
+	mkdir -p $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
 	for c in $(CRT) $(SIM_BSP) $(LIB_CIO) $(LIB_CRT); do \
-	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$c ;\
+	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ;\
 	done
 	for c in $(SCRIPTS); do \
 	  b=`basename $$c`; \
-	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$b ;\
+	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$b ;\
 	done
 
 clean mostlyclean:

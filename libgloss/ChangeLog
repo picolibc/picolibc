@@ -1,3 +1,7 @@
+2014-10-22  Tim Harder  <radhermit@gmail.com>
+
+	* msp430/Makefile.in: respect DESTDIR during install
+
 2014-09-22  Peter A. Bigot  <pab@pabigot.com>
 
 	* configure.in: Remove config_libnosys=false
