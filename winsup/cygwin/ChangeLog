@@ -1,3 +1,9 @@
+2014-10-24  Kai Tietz  <corinna@vinschen.de>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (sigdelayed): 64 bit only: Push CPU flags before aligning
+	stack to avoid changing flag values.
+
 2014-10-22  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* common.din (stime): Export.

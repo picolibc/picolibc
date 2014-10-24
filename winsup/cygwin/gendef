@@ -187,11 +187,14 @@ _sigbe:						# return here after cygwin syscall
 	.global	sigdelayed
 	.seh_proc sigdelayed
 sigdelayed:
+	.seh_pushreg %rbp
 	pushq	%r10				# used for return address injection
 	.seh_pushreg %rbp
 	pushq	%rbp
 	.seh_pushreg %rbp
 	movq	%rsp,%rbp
+	.seh_pushreg %rax			# fake, there's no .seh_pushreg for the flags
+	pushf
 	# stack is aligned or unaligned on entry!
 	# make sure it is aligned from here on
 	# We could be called from an interrupted thread which doesn't know
@@ -224,9 +227,8 @@ sigdelayed:
 	.seh_pushreg %rbx
 	pushq	%rax
 	.seh_pushreg %rax
-	pushf
-	subq	\$0x130,%rsp
-	.seh_stackalloc 0x130
+	subq	\$0x128,%rsp
+	.seh_stackalloc 0x128
 	fnstcw	0x120(%rsp)
 	movdqa	%xmm15,0x110(%rsp)
 	movdqa	%xmm14,0x100(%rsp)
@@ -288,8 +290,7 @@ sigdelayed:
 	movdqa	0x110(%rsp),%xmm15
 	fninit
 	fldcw	0x120(%rsp)
-	addq	\$0x130,%rsp
-	popf
+	addq	\$0x128,%rsp
 	popq	%rax
 	popq	%rbx
 	popq	%rcx
@@ -304,6 +305,8 @@ sigdelayed:
 	popq	%r14
 	popq	%r15
 	movq	%rbp,%rsp
+	subq	\$8, %rsp
+	popf
 	popq	%rbp
 	xchgq	%r10,(%rsp)
 	ret
