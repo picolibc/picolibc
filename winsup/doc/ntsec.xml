@@ -933,7 +933,7 @@ be cached inside the process itself and, again, propagated to child processes.
 <para>
 Microsoft's NFS client does not map the uid/gid values on the NFS shares
 to SIDs.  There's no such thing as a (fake) security descriptor returned
-to the application.  Rather, via an undocumented APIr an application can
+to the application.  Rather, via an undocumented API an application can
 fetch <ulink url="https://tools.ietf.org/html/rfc1813">RFC 1813</ulink>
 compatible NFSv3 stat information from the share.  This is what Cygwin is
 using to show stat information for files on NFS shares.
