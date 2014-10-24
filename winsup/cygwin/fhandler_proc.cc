@@ -1360,7 +1360,8 @@ format_proc_cygdrive (void *, char *&destbuf)
 {
   destbuf = (char *) crealloc_abort (destbuf, mount_table->cygdrive_len + 1);
   char *dend = stpcpy (destbuf, mount_table->cygdrive);
-  *--dend = '\0';
+  if (dend > destbuf + 1)	/* cygdrive != "/"? */
+    *--dend = '\0';
   return dend - destbuf;
 }
 
