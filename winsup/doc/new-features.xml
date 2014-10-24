@@ -38,7 +38,7 @@ the Cygwin raw device names.
 </para></listitem>
 
 <listitem><para>
-New API: quotactl, designed after the Linux/BSD function, but severly
+New API: quotactl, designed after the Linux/BSD function, but severely
 restricted:  Windows only supports user block quotas on NTFS, no group
 quotas, no inode quotas, no time constraints.
 </para></listitem>
