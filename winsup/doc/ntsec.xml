@@ -216,7 +216,7 @@ from the permission to change object data, and even changing object data
 can be separated into different permission bits for different kind of
 data.  But there's a problem with the definition of a "correct" ACL
 which disallows mapping of certain POSIX permissions cleanly.  See
-<xref linkend="ntsec-mapping"></xref>.</para>
+<xref linkend="ntsec-files"></xref>.</para>
 
 <para>POSIX is able to create only three different permissions?  Not quite.
 Newer operating systems and file systems on POSIX systems also provide
@@ -241,8 +241,8 @@ contain an expanded copy of the full information from
 </para>
 
 <para>
-This approach has a few downsides.  One of them is that the idea to have
-always small files is flawed.  Another one is that reading the entire
+This approach has a few downsides.  One of them is that the idea that these
+files will always be small, is flawed.  Another one is that reading the entire
 file is most of the time entirely useless, since most processes only
 need information on their own user and the primary group.  Last but not
 least, the passwd and group files have to be maintained separately from
@@ -252,7 +252,7 @@ Directory.
 
 <para>
 On the other hand, we have to have this mapping between Windows SIDs and
-POSIX uid/gid values, so we rely on some mechanism to convert SIDs to uid/gid
+POSIX uid/gid values, so we need a mechanism to convert SIDs to uid/gid
 values and vice versa.
 </para>
 
@@ -260,7 +260,7 @@ values and vice versa.
 Microsoft "Services for UNIX" (SFU) (deprecated since Windows 8/Server 2012)
 never used passwd/group files.  Rather, SFU used a fixed, computational mapping
 between SIDs and POSIX uid/gid which even has Active Directory support.  It
-allows to generate uid/gid values from SIDs and vice versa.  The mechanism is
+allows us to generate uid/gid values from SIDs and vice versa.  The mechanism is
 documented, albeit in a confusing way and spread over multiple MSDN articles.
 </para>
 
@@ -284,8 +284,8 @@ Cygwin's mapping between SIDs and uid/gid values works in two ways.
 
 <itemizedlist spacing="compact">
 <listitem><para>Read <filename>/etc/passwd<filename> and
-</filename>/etc/group</filename> files, just as in the olden days, mainly for
-backward compatibility.</para></listitem>
+</filename>/etc/group</filename> files if they exist, just as in the olden
+days, mainly for backward compatibility.</para></listitem>
 <listitem><para>If no files are present, or if an entry is missing in the files,
 ask Windows.</para></listitem>
 </itemizedlist>
@@ -298,8 +298,8 @@ for now.
 </para>
 
 <para>
-If files are present, they will be scanned on demand as soon as a
-mapping from SIDs to uid/gid or account names is required.  The new
+If the passwd or group files are present, they will be scanned on demand as
+soon as a mapping from SIDs to uid/gid or account names is required.  The new
 mechanism will never read the entire file into memory, but only scan for
 the requested entry and cache this one in memory.
 </para>
@@ -406,9 +406,9 @@ Other well-known SIDs:
 
 <listitem>
 <para>
-Logon SIDs: The own LogonSid is converted to the fixed uid 0xfff == 4095 and
-named "CurrentSession".  Any other LogonSid is converted to the fixed uid
-0xffe == 4094 and named "OtherSession".
+Logon SIDs: The LogonSid of the current user's session is converted to the
+fixed uid 0xfff == 4095 and named "CurrentSession".  Any other LogonSid is
+converted to the fixed uid 0xffe == 4094 and named "OtherSession".
 </para>
 </listitem>
 
@@ -509,7 +509,7 @@ permission denied.  In this case Cygwin will fake a sensible
 </para>
 
 <para>
-Another problem is if the AD administrators chose an unreasonable small
+Another problem is if the AD administrators chose an unreasonably small
 <literal>trustPosixOffset</literal> value.  Anything below the hexadecimal
 value 0x100000 (the POSIX offset of the primary domain) is bound to produce
 collisions with system accounts as well as local accounts.  The right thing
@@ -545,12 +545,12 @@ for its local account.
 <para>
 Now we have a semi-bijective mapping between SIDs and POSIX uid/gid values,
 but given that we have potentially users and groups in different domains having
-the same name, how do we uniquely differ between them by name?  Well, we can do
-that by making their names unique in a per-machine way.  Dependent on the
-domain membership of the account, and dependent of the machine being a domain
-member or not, the user and group names will be generated using a domain prefix
-and a separator character between domain and account name.  The <!-- default -->
-separator character is the plus sign, <literal>+</literal>.
+the same name, how do we uniquely distinguish between them by name?  Well, we
+can do that by making their names unique in a per-machine way.  Dependent on
+the domain membership of the account, and dependent of the machine being a
+domain member or not, the user and group names will be generated using a domain
+prefix and a separator character between domain and account name.
+The <!-- default --> separator character is the plus sign, <literal>+</literal>.
 </para>
 
 <itemizedlist spacing="compact">
@@ -649,7 +649,7 @@ You want to use a Cygwin username different from your Windows username.
 <note><para>
 Note: This is only supported via <filename>/etc/passwd</filename> and
 <filename>/etc/group</filename> files.  A Cygwin username maintained in
-the Windows user databases would require very costly (read: slow) seach
+the Windows user databases would require very costly (read: slow) search
 operations.
 </para></note>
 </listitem>
@@ -909,7 +909,7 @@ at the time, <command>mintty</command>, the shell, and all child processes will
 use <command><link linkend="using-cygserver">cygserver</link></command> caching.
 If you start a Cygwin Terminal and
 <command><link linkend="using-cygserver">cygserver</link></command> is not
-running a the time, none of the processes started inside this terminal window
+running at the time, none of the processes started inside this terminal window
 will use <command><link linkend="using-cygserver">cygserver</link></command>
 caching.
 </para>
@@ -933,7 +933,7 @@ be cached inside the process itself and, again, propagated to child processes.
 <para>
 Microsoft's NFS client does not map the uid/gid values on the NFS shares
 to SIDs.  There's no such thing as a (fake) security descriptor returned
-to the application.  Rather, via an undocumented API an applications can
+to the application.  Rather, via an undocumented APIr an application can
 fetch <ulink url="https://tools.ietf.org/html/rfc1813">RFC 1813</ulink>
 compatible NFSv3 stat information from the share.  This is what Cygwin is
 using to show stat information for files on NFS shares.
@@ -965,7 +965,7 @@ in the attribute <literal>uidNumber</literal>.  For groups, the gid is in the
 </para>
 
 <para>
-When Cygwin stat's files on an NFS share, it asks the mapping server via
+When Cygwin stat()s files on an NFS share, it asks the mapping server via
 LDAP in two different ways, depending on the role of the mapping server.
 </para>
 
