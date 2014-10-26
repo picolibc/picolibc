@@ -978,7 +978,7 @@ the stat record returned by NFS.  If an account matches, AD returns the
 Windows SID, so we have an immediate mapping from UNIX uid to a Windows SID,
 if the user account has a valid <literal>uidNumber</literal> attribute.  For
 groups, the method is the same, just that Cygwin asks for a group with
-<literal>gidNumbe</literal> attribute == <literal>st_gid</literal> field of the
+<literal>gidNumber</literal> attribute == <literal>st_gid</literal> field of the
 stat record.
 </listitem>
 
