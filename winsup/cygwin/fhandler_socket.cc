@@ -405,7 +405,6 @@ fhandler_socket::af_local_connect ()
   if (no_getpeereid ())
     return 0;
 
-  connect_state (connect_credxchg);
   af_local_setblocking (orig_async_io, orig_is_nonblocking);
   if (!af_local_send_secret () || !af_local_recv_secret ()
       || !af_local_send_cred () || !af_local_recv_cred ())
@@ -428,7 +427,6 @@ fhandler_socket::af_local_accept ()
   if (no_getpeereid ())
     return 0;
 
-  connect_state (connect_credxchg);
   af_local_setblocking (orig_async_io, orig_is_nonblocking);
   if (!af_local_recv_secret () || !af_local_send_secret ()
       || !af_local_recv_cred () || !af_local_send_cred ())
@@ -1465,20 +1463,12 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
   static NO_COPY LPFN_WSARECVMSG WSARecvMsg;
   int orig_namelen = wsamsg->namelen;
 
-  /* Windows event handling does not check for the validity of the desired
-     flags so we have to do it here.
-     The check goes like this:
-       STREAM sockets must be either connected, or they are AF_LOCAL
-       sockets in the pre-connected credential exchange phase.
-     All other states are disallowed.  */
-  if (get_socket_type () == SOCK_STREAM && connect_state () != connected
-      && (get_addr_family () != AF_LOCAL
-	  || connect_state () != connect_credxchg))
-    {
-      WSASetLastError (WSAENOTCONN);
-      set_winsock_errno ();
-      return SOCKET_ERROR;
-    }
+  /* CV 2014-10-26: Do not check for the connect_state at this point.  In
+     certain scenarios there's no way to check the connect state reliably.
+     Example (hexchat): Parent process creates socket, forks, child process
+     calls connect, parent process calls read.  Even if the event handling
+     allows to check for FD_CONNECT in the parent, there is always yet another
+     scenario we can easily break. */
 
   DWORD wait_flags = wsamsg->dwFlags;
   bool waitall = !!(wait_flags & MSG_WAITALL);

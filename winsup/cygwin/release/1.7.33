@@ -68,8 +68,7 @@ Bug Fixes
   Addresses: https://cygwin.com/ml/cygwin-developers/2014-10/msg00010.html
 
 - Don't hang in accept calls if socket is no listener.  Set errno to EINVAL
-  instead.  Don't hang in read/recv/recvfrom/recvmsg calls if socket is
-  connection oriented and not connected.  Set errno to ENOTCONN instead.
+  instead.
 
 - Don't allow seeking on serial lines and sockets.  Set errno to ESPIPE
   instead.

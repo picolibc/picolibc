@@ -75,11 +75,10 @@ enum dirent_states
 enum conn_state
 {
   unconnected = 0,
-  connect_credxchg = 1,
-  connect_pending = 2,
-  connected = 3,
-  listener = 4,
-  connect_failed = 5
+  connect_pending = 1,
+  connected = 2,
+  listener = 3,
+  connect_failed = 4
 };
 
 enum line_edit_status

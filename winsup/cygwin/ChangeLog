@@ -1,3 +1,13 @@
+2014-10-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::af_local_connect): Drop
+	setting connect_state to connect_credxchg.
+	(fhandler_socket::af_local_accept): Ditto.
+	(fhandler_socket::recv_internal): Drop ill-advised connect_state check.
+	Add comment so as not to repeat the exercise.
+	* fhandler.h (enum conn_state): Drop now unneeded connect_credxchg
+	state.
+
 2014-10-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_cygdrive): Fix symlink path if cygdrive
