@@ -396,18 +396,15 @@ win_env::add_cache (const char *in_posix, const char *in_native)
   if (in_native)
     {
       native = (char *) realloc (native, namelen + 1 + strlen (in_native));
-      strcpy (native, name);
-      strcpy (native + namelen, in_native);
+      stpcpy (stpcpy (native, name), in_native);
     }
   else
     {
       tmp_pathbuf tp;
       char *buf = tp.c_get ();
-      strcpy (buf, name + namelen);
       towin32 (in_posix, buf, NT_MAX_PATH);
       native = (char *) realloc (native, namelen + 1 + strlen (buf));
-      strcpy (native, name);
-      strcpy (native + namelen, buf);
+      stpcpy (stpcpy (native, name), buf);
     }
   MALLOC_CHECK;
   if (immediate && cygwin_finished_initializing)
@@ -480,8 +477,9 @@ posify_maybe (char **here, const char *value, char *outenv)
     {
       /* The conversion routine removed elements from a path list so we have
 	 to recalculate the windows path to remove elements there, too. */
-      char cleanvalue[strlen (value) + 1];
-      conv->towin32 (newvalue, cleanvalue, sizeof cleanvalue);
+      tmp_pathbuf tp;
+      char *cleanvalue = tp.c_get ();
+      conv->towin32 (newvalue, cleanvalue, NT_MAX_PATH);
       conv->add_cache (newvalue, cleanvalue);
     }
 
@@ -1032,6 +1030,21 @@ spenv::retrieve (bool no_envblock, const char *const env)
   return getwinenveq (name, namelen, HEAP_1_STR);
 }
 
+static inline int
+raise_envblock (int new_tl, PWCHAR &envblock, PWCHAR &s)
+{
+  int tl = new_tl + 100;
+  PWCHAR new_envblock =
+	    (PWCHAR) realloc (envblock, (2 + tl) * sizeof (WCHAR));
+  /* If realloc moves the block, move `s' with it. */
+  if (new_envblock != envblock)
+    {
+      s += new_envblock - envblock;
+      envblock = new_envblock;
+    }
+  return tl;
+}
+
 #define SPENVS_SIZE (sizeof (spenvs) / sizeof (spenvs[0]))
 
 /* Create a Windows-style environment block, i.e. a typical character buffer
@@ -1096,14 +1109,14 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
   for (unsigned i = 0; i < SPENVS_SIZE; i++)
     if (!saw_spenv[i] && (spenvs[i].force_into_environment || cygheap->user.issetuid ()))
       {
-	  *dstp = spenvs[i].retrieve (false);
-	  if (*dstp && *dstp != env_dontadd)
-	    {
-	      *pass_dstp++ = *dstp;
-	      tl += strlen (*dstp) + 1;
-	      dstp++;
-	    }
-	}
+	*dstp = spenvs[i].retrieve (false);
+	if (*dstp && *dstp != env_dontadd)
+	  {
+	    *pass_dstp++ = *dstp;
+	    tl += strlen (*dstp) + 1;
+	    dstp++;
+	  }
+      }
 
   envc = dstp - newenv;		/* Number of entries in newenv */
   assert ((size_t) envc <= (n + SPENVS_SIZE));
@@ -1126,6 +1139,7 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
       PWCHAR s;
       envblock = (PWCHAR) malloc ((2 + tl) * sizeof (WCHAR));
       int new_tl = 0;
+      bool saw_PATH = false;
       for (srcp = pass_env, s = envblock; *srcp; srcp++)
 	{
 	  const char *p;
@@ -1144,7 +1158,17 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 	  /* See if this entry requires posix->win32 conversion. */
 	  conv = getwinenv (*srcp, rest, &temp);
 	  if (conv)
-	    p = conv->native;	/* Use win32 path */
+	    {
+	      p = conv->native;	/* Use win32 path */
+	      /* Does PATH exist in the environment? */
+	      if (**srcp == 'P')
+		{
+		  /* And is it non-empty? */
+		  if (!conv->native || !conv->native[0])
+		    continue;
+		  saw_PATH = true;
+		}
+	    }
 	  else
 	    p = *srcp;		/* Don't worry about it */
 
@@ -1153,19 +1177,9 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 
 	  /* See if we need to increase the size of the block. */
 	  if (new_tl > tl)
-	    {
-	      tl = new_tl + 100;
-	      PWCHAR new_envblock =
-			(PWCHAR) realloc (envblock, (2 + tl) * sizeof (WCHAR));
-	      /* If realloc moves the block, move `s' with it. */
-	      if (new_envblock != envblock)
-		{
-		  s += new_envblock - envblock;
-		  envblock = new_envblock;
-		}
-	    }
+	    tl = raise_envblock (new_tl, envblock, s);
 
-	  int slen = sys_mbstowcs (s, len, p);
+	  len = sys_mbstowcs (s, len, p);
 
 	  /* See if environment variable is "special" in a Windows sense.
 	     Under NT, the current directories for visited drives are stored
@@ -1174,7 +1188,17 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 	  if (s[0] == L'!' && (iswdrive (s + 1) || (s[1] == L':' && s[2] == L':'))
 	      && s[3] == L'=')
 	    *s = L'=';
-	  s += slen + 1;
+	  s += len + 1;
+	}
+      /* If PATH doesn't exist in the environment, add a PATH with just
+	 Cygwin's bin dir to the Windows env to allow loading system DLLs
+	 during execve. */
+      if (!saw_PATH)
+	{
+	  new_tl += cygheap->installation_dir_len + 5;
+	  if (new_tl > tl)
+	    tl = raise_envblock (new_tl, envblock, s);
+	  s = wcpcpy (wcpcpy (s, L"PATH="), cygheap->installation_dir) + 1;
 	}
       *s = L'\0';			/* Two null bytes at the end */
       assert ((s - envblock) <= tl);	/* Detect if we somehow ran over end

@@ -83,7 +83,6 @@ cygheap_fixup_in_child (bool execed)
   _csbrk ((char *) child_proc_info->cygheap_max - (char *) cygheap);
   child_copy (child_proc_info->parent, false, "cygheap", cygheap, cygheap_max, NULL);
   cygheap_init ();
-  cygheap->set_dll_dir ();
   debug_fixup_after_fork_exec ();
   if (execed)
     {
@@ -188,9 +187,10 @@ init_cygheap::init_installation_root ()
 	       "Invalid DLL path");
 
   /* Copy result into installation_dir before stripping off "bin" dir and
-     revert to Win32 path.  This path is used in cygheap_init to call
-     SetDllDirectory. */
-  wcpncpy (installation_dir, installation_root, PATH_MAX);
+     revert to Win32 path.  This path is added to the Windows environment
+     in buildenv.  See there for a description. */
+  installation_dir_len = wcpncpy (installation_dir, installation_root, PATH_MAX)
+			 - installation_dir;
   installation_dir[1] = L'\\';
 
   /* If w < p, the Cygwin DLL resides in the root dir of a drive or network
@@ -264,7 +264,6 @@ setup_cygheap ()
   cygheap_init ();
   cygheap->user.init ();
   cygheap->init_installation_root (); /* Requires user.init! */
-  cygheap->set_dll_dir ();
   cygheap->pg.init ();
 }
 

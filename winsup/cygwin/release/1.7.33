@@ -42,8 +42,9 @@ What changed:
   are supposed to work.  Finally implement a CLASS_OBJ emulation.  Update
   getfacl(1)/setfacl(1) accordingly.
 
-- Drop the current working directory from the default DLL search path in
-  favor of Cygwin's /bin dir.
+- When exec'ing applications, check if $PATH exists and is non-empty.  If not,
+  add PATH variable with Cygwin installation directory as content to Windows
+  environment to allow loading of Cygwin system DLLs.
 
 - Improve various header files for C++- and standards-compliance.
 

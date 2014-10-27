@@ -1,3 +1,21 @@
+2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_fixup_in_child): Drop call to set_dll_dir.
+	(init_cygheap::init_installation_root): Set installation_dir_len.
+	(setup_cygheap): Drop call to set_dll_dir.
+	* cygheap.h (struct init_cygheap): Add installation_dir_len member.
+	(init_cygheap::set_dll_dir): Remove.
+	* environ.cc (win_env::add_cache): Use stpcpy for speed.
+	(posify_maybe): Use tmp_pathbuf buffer instead of stack.
+	(raise_envblock): New function to resize Windows environment block.
+	(build_env): Fix indentation.  Call raise_envblock function.  Check if
+	$PATH exists and is non-empty.  If not, add PATH variable with Cygwin
+	installation directory as content to Windows environment.  Explain why.
+
+	* uinfo.cc (cygheap_pwdgrp::_nss_init): Fill UNICODE_STRING members
+	on the fly.  Drop call to RtlInitUnicodeString.
+	(pwdgrp::check_file): Ditto.
+
 2014-10-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::af_local_connect): Drop
