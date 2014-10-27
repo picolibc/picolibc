@@ -1,5 +1,10 @@
 2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dlfcn.cc (dlopen): Drop patch accommodating SetDllDiretory from
+	2014-10-14.
+
+2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (cygheap_fixup_in_child): Drop call to set_dll_dir.
 	(init_cygheap::init_installation_root): Set installation_dir_len.
 	(setup_cygheap): Drop call to set_dll_dir.

@@ -160,34 +160,7 @@ dlopen (const char *name, int flags)
 	  if (flags & RTLD_NOLOAD)
 	    GetModuleHandleExW (0, path, (HMODULE *) &ret);
 	  else
-	    {
-	      ret = (void *) LoadLibraryW (path);
-	      if (!ret && GetLastError () == ERROR_MOD_NOT_FOUND)
-		{
-		  /* This may indicate that a dependent DLL could not be loaded.
-		     Typically this occurs because we removed the CWD from the
-		     DLL search path via SetDllDirectory (see inline function
-		     init_cygheap::set_dll_dir), and the load mechanism expects
-		     that dlopening a DLL from the CWD allows to load dependent
-		     DLLs from the same dir.
- 
-		     To continue supporting this scenario, call LoadLibraryEx
-		     with the LOAD_WITH_ALTERED_SEARCH_PATH flag.  This flag
-		     replaces the application path with the DLL path in the DLL
-		     search order.  This functionality needs the full path to
-		     the loaded DLL. */
-		  if (!strchr (name, '/'))
-		    {
-		      wchar_t *path_full = tp.w_get ();
-		      cygheap->cwd.get (path_full);
-		      wcscat (path_full, L"\\");
-		      wcscat (path_full, path);
-		      path = path_full;
-		    }
-		  ret = (void *) LoadLibraryExW (path, NULL,
-						 LOAD_WITH_ALTERED_SEARCH_PATH);
-		}
-	    }
+	    ret = (void *) LoadLibraryW (path);
 	  if (ret && (flags & RTLD_NODELETE))
 	    GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_PIN, path,
 				(HMODULE *) &ret);
