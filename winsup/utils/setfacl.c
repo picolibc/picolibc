@@ -417,7 +417,7 @@ usage (FILE * stream)
 	    "  -h, --help       output usage information and exit\n"
 	    "  -V, --version    output version information and exit\n"
 	    "\n"
-	    "At least one of (-d, -f, -m, -s) must be specified\n"
+	    "At least one of (-b, -d, -f, -m, -s) must be specified\n"
 	    "\n", prog_name, prog_name);
   if (stream == stdout)
   {

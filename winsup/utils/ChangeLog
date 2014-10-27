@@ -1,5 +1,9 @@
 2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setfacl.c (usage): Add -b to require options.
+
+2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* setfacl.c (action_t): Add DeleteAll value.
 	(delacl): New function to remove all ACL entries not representing POSIX
 	permissions.
