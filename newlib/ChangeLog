@@ -1,3 +1,8 @@
+2014-10-27  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/unistd.h (sethostname): Declare if
+	requested.
+
 2014-10-20  Freddie Chopin  <freddie_chopin@op.pl>
 
 	* libc/time/gmtime_r.c (gmtime_r): Remove dead code.

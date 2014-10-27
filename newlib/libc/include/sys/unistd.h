@@ -166,6 +166,9 @@ int     _EXFUN(setgid, (gid_t __gid ));
 #if defined(__CYGWIN__)
 int	_EXFUN(setgroups, (int ngroups, const gid_t *grouplist ));
 #endif
+#if __BSD_VISIBLE || (defined(_XOPEN_SOURCE) && __XSI_VISIBLE < 500)
+int	_EXFUN(sethostname, (const char *, size_t));
+#endif
 int     _EXFUN(setpgid, (pid_t __pid, pid_t __pgid ));
 int     _EXFUN(setpgrp, (void ));
 #if defined(__CYGWIN__) && !defined(__INSIDE_CYGWIN__)
