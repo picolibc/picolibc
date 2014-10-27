@@ -15,11 +15,6 @@ without having to create /etc/passwd and /etc/group files.  Introduce
 /etc/nsswitch.conf file to configure passwd/group handling.
 </para>
 
-<listitem><para>
-Add -b/--remove-all option to setfacl to reduce the ACL to only the entries
-representing POSIX permission bits.
-</para></listitem>
-
 <para>
 For bordercase which require to use /etc/passwd and /etc/group files,
 change mkpasswd/mkgroup to generate passwd/group entries compatible with
@@ -28,6 +23,11 @@ the entries read from SAM/AD.
 
 <para>For a description of this exciting new feature see
 <xref linkend="ntsec"></xref>.
+</para></listitem>
+
+<listitem><para>
+Add -b/--remove-all option to setfacl to reduce the ACL to only the entries
+representing POSIX permission bits.
 </para></listitem>
 
 <listitem><para>
