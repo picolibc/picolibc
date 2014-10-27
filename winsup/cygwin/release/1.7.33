@@ -83,3 +83,6 @@ Bug Fixes
 - Fix a SEGV in cygcheck if the environment variable COMSPEC is not, or
   incorrectly set.
   Addresses: https://cygwin.com/ml/cygwin/2014-10/msg00292.html
+
+- Fix a SEGV in some 64 bit applications explicitely dlclosing DLLs.
+  Addresses: https://cygwin.com/ml/cygwin/2014-10/msg00402.html

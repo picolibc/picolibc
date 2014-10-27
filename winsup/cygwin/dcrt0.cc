@@ -1236,7 +1236,37 @@ extern "C" int
 cygwin_atexit (void (*fn) (void))
 {
   int res;
+
   dll *d = dlls.find ((void *) _my_tls.retaddr ());
+#ifdef __x86_64__
+  /* x86_64 DLLs created with GCC 4.8.3-3 register __gcc_deregister_frame
+     as atexit function using a call to atexit, rather than __cxa_atexit.
+     Due to GCC's aggressive optimizing, cygwin_atexit doesn't get the correct
+     return address on the stack.  As a result it fails to get the HMODULE of
+     the caller and thus calls atexit rather than __cxa_atexit.  Then, if the
+     module gets dlclosed, __cxa_finalize (called from dll_list::detach) can't
+     remove __gcc_deregister_frame from the atexit function chain.  So at
+     process exit, __call_exitprocs calls __gcc_deregister_frame while the
+     module is already unloaded and the __gcc_deregister_frame function not
+     available ==> SEGV.
+
+     Workaround: If dlls.find fails, and _my_tls.retaddr is a Cygwin function
+     address, and fn is a function address in another DLL, try to find the
+     dll entry of the DLL containing fn.  Then check if fn is the address of
+     the DLLs __gcc_deregister_frame function.  If so, proceed by calling
+     __cxa_atexit, otherwise call atexit. */
+  extern void *__image_base__;
+  if (!d
+      && (uintptr_t) _my_tls.retaddr () >= (uintptr_t) &__image_base__
+      && (uintptr_t) _my_tls.retaddr () <= (uintptr_t) &_cygheap_start
+      && (uintptr_t) fn > (uintptr_t) &_cygheap_start)
+    {
+      d = dlls.find ((void *) fn);
+      if (d && (void *) GetProcAddress (d->handle, "__gcc_deregister_frame")
+	       != fn)
+	d = NULL;
+    }
+#endif
   res = d ? __cxa_atexit ((void (*) (void *)) fn, NULL, d->handle) : atexit (fn);
   return res;
 }

@@ -1,5 +1,10 @@
 2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (cygwin_atexit): Add workaround for broken atexit calls
+	in __gcc_register_frame of DLLs built with gcc-4.8.3-3.
+
+2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dlfcn.cc (dlopen): Drop patch accommodating SetDllDiretory from
 	2014-10-14.
 
