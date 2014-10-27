@@ -245,8 +245,9 @@ support for cloning address space between processes and several
 features actively undermine a reliable <literal>fork</literal>
 implementation. Three issues are especially prevalent:</para>
 
-<para><itemizedlist>
-<listitem>DLL base address collisions. Unlike *nix shared
+<itemizedlist mark="bullet">
+
+<listitem><para>DLL base address collisions. Unlike *nix shared
 libraries, which use "position-independent code", Windows shared
 libraries assume a fixed base address. Whenever the hard-wired
 address ranges of two DLLs collide (which occurs quite often), the
@@ -259,18 +260,18 @@ statically-linked dlls (dependencies known at compile time) are
 resolved before <literal>cygwin1.dll</literal> initializes and
 cannot be fixed afterward. This problem can only be solved by
 removing the base address conflicts which cause the problem,
-usually using the <literal>rebaseall</literal> tool.</listitem>
+usually using the <literal>rebaseall</literal> tool.</para></listitem>
 
-<listitem>Address space layout randomization (ASLR). Starting with
+<listitem><para>Address space layout randomization (ASLR). Starting with
 Vista, Windows implements ASLR, which means that thread stacks,
 heap, memory-mapped files, and statically-linked dlls are placed
 at different (random) locations in each process. This behaviour
 interferes with a proper <literal>fork</literal>, and if an
 unmovable object (process heap or system dll) ends up at the wrong
 location, Cygwin can do nothing to compensate (though it will
-retry a few times automatically).</listitem>
+retry a few times automatically).</para></listitem>
 
-<listitem>DLL injection by
+<listitem><para>DLL injection by
 <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda">
 BLODA</ulink>. Badly-behaved applications which
 inject dlls into other processes often manage to clobber important
@@ -279,7 +280,9 @@ collisions which rebasing cannot fix. The only way to resolve this
 problem is to remove (usually uninstall) the offending app.  See
 <xref linkend="cygwinenv-implemented-options"></xref> for the
 <literal>detect_bloda</literal> option, which may be able to identify the
-BLODA.</listitem></itemizedlist></para>
+BLODA.</para></listitem>
+
+</itemizedlist>
 
 <para>In summary, current Windows implementations make it
 impossible to implement a perfectly reliable fork, and occasional

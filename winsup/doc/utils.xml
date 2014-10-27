@@ -1683,11 +1683,13 @@ Example: regtool.exe get '\user\software\Microsoft\Clock\iFormat'
     <title>setfacl</title>
 
     <screen>
-Usage: setfacl [-r] (-f ACL_FILE | -s acl_entries) FILE...
-       setfacl [-r] ([-d acl_entries] [-m acl_entries]) FILE...
+Usage: setfacl [-r] {-f ACL_FILE | -s acl_entries} FILE...
+       setfacl [-r] {-b|[-d acl_entries] [-m acl_entries]} FILE...
+
 
 Modify file and directory access control lists (ACLs)
 
+  -b, --remove-all remove all extended ACL entries
   -d, --delete     delete one or more specified ACL entries
   -f, --file       set ACL entries for FILE to ACL entries read
                    from a ACL_FILE
@@ -1699,7 +1701,7 @@ Modify file and directory access control lists (ACLs)
   -h, --help       output usage information and exit
   -V, --version    output version information and exit
 
-At least one of (-d, -f, -m, -s) must be specified
+At least one of (-b, -d, -f, -m, -s) must be specified
 </screen>
 
     <para> For each file given as parameter, <command>setfacl</command> will
@@ -1732,6 +1734,9 @@ At least one of (-d, -f, -m, -s) must be specified
       a numerical gid. </para>
 
     <para> The following options are supported: </para>
+
+    <para> <literal>-b</literal> Remove all extended ACL entries.  The base
+      ACL entries of the owner, group and others are retained.</para>
 
     <para> <literal>-d</literal> Delete one or more specified entries from the
       file's ACL. The owner, group and others entries must not be deleted.

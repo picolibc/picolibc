@@ -1,3 +1,9 @@
+2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* highlights.xml: Rearrange itemizedlist markup slightly.
+	* new-features.xml (ov-new1.7.33): Add setfacl -b option.
+	* utils.xml (setfacl): Ditto.
+
 2014-10-24  Luke Kendall  <luke.kendall@cisra.canon.com.au>
 
 	* ntsec.xml: More language and typo fixes.
