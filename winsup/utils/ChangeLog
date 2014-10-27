@@ -1,3 +1,15 @@
+2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setfacl.c (action_t): Add DeleteAll value.
+	(delacl): New function to remove all ACL entries not representing POSIX
+	permissions.
+	(setfacl): Rearrange conditional expression into switch statement.
+	Add DeleteAll case.
+	(usage): Add and describe -b option.
+	(longopts): Add --remove-all option.
+	(opts): Add -b option.
+	(main): Handle -b option.
+
 2014-10-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (CYGLSA64_DLL): Remove unused macro.

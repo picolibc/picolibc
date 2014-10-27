@@ -48,6 +48,7 @@ typedef enum {
   Modify,
   Delete,
   ModNDel,
+  DeleteAll,
   SetFromFile
 } action_t;
 
@@ -331,27 +332,66 @@ addmissing (aclent_t *tgt, int tcnt)
 }
 
 int
-setfacl (action_t action, char *path, aclent_t *acls, int cnt)
+delacl (aclent_t *tgt, int tcnt)
+{
+  int t;
+
+  /* Remove all extended ACL entries. */
+  for (t = 0; t < tcnt; ++t)
+    if (tgt[t].a_type & (USER | GROUP | CLASS_OBJ))
+      {
+	--tcnt;
+	if (t < tcnt)
+	  memmove (&tgt[t], &tgt[t + 1], (tcnt - t) * sizeof (aclent_t));
+	--t;
+      }
+  return tcnt;
+}
+
+int
+setfacl (action_t action, const char *path, aclent_t *acls, int cnt)
 {
   aclent_t lacl[MAX_ACL_ENTRIES];
   int lcnt;
 
   memset (lacl, 0, sizeof lacl);
-  if (action == Set)
+  switch (action)
     {
+    case Set:
       if (acl (path, SETACL, cnt, acls))
 	{
 	  perror (prog_name);
 	  return 2;
 	}
-    }
-  else if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
-      || (lcnt = modacl (lacl, lcnt, acls, cnt)) < 0
-      || (action != Delete && (lcnt = addmissing (lacl, lcnt)) < 0)
-      || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
-    {
-      perror (prog_name);
-      return 2;
+      break;
+    case Delete:
+      if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
+	  || (lcnt = modacl (lacl, lcnt, acls, cnt)) < 0
+	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
+	{
+	  perror (prog_name);
+	  return 2;
+	}
+      break;
+    case DeleteAll:
+      if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
+	  || (lcnt = delacl (lacl, lcnt)) < 0
+	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
+	{
+	  perror (prog_name);
+	  return 2;
+	}
+      break;
+    default:
+      if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
+	  || (lcnt = modacl (lacl, lcnt, acls, cnt)) < 0
+	  || (lcnt = addmissing (lacl, lcnt) < 0)
+	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
+	{
+	  perror (prog_name);
+	  return 2;
+	}
+      break;
     }
   return 0;
 }
@@ -360,11 +400,12 @@ static void
 usage (FILE * stream)
 {
   fprintf (stream, ""
-	    "Usage: %s [-r] (-f ACL_FILE | -s acl_entries) FILE...\n"
-	    "       %s [-r] ([-d acl_entries] [-m acl_entries]) FILE...\n"
+	    "Usage: %s [-r] {-f ACL_FILE | -s acl_entries} FILE...\n"
+	    "       %s [-r] {-b|[-d acl_entries] [-m acl_entries]} FILE...\n"
 	    "\n"
 	    "Modify file and directory access control lists (ACLs)\n"
 	    "\n"
+	    "  -b, --remove-all remove all extended ACL entries\n"
 	    "  -d, --delete     delete one or more specified ACL entries\n"
 	    "  -f, --file       set ACL entries for FILE to ACL entries read\n"
 	    "                   from a ACL_FILE\n"
@@ -409,6 +450,9 @@ usage (FILE * stream)
 	    "entries.\n"
 	    "\n"
 	    "The following options are supported:\n"
+	    "\n"
+	    "-b   Remove all extended ACL entries.  The base ACL entries of the\n"
+	    "     owner, group and others are retained.\n"
 	    "\n"
 	    "-d   Delete one or more specified entries from the file's ACL.\n"
 	    "     The owner, group and others entries must not be deleted.\n"
@@ -465,6 +509,7 @@ usage (FILE * stream)
 }
 
 struct option longopts[] = {
+  {"remove-all", no_argument, NULL, 'b'},
   {"delete", required_argument, NULL, 'd'},
   {"file", required_argument, NULL, 'f'},
   {"modify", required_argument, NULL, 'm'},
@@ -474,7 +519,7 @@ struct option longopts[] = {
   {"version", no_argument, NULL, 'V'},
   {0, no_argument, NULL, 0}
 };
-const char *opts = "d:f:hm:rs:V";
+const char *opts = "bd:f:hm:rs:V";
 
 static void
 print_version ()
@@ -506,6 +551,15 @@ main (int argc, char **argv)
   while ((c = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (c)
       {
+      case 'b':
+	if (action == NoAction)
+	  action = DeleteAll;
+	else
+	  {
+	    usage (stderr);
+	    return 1;
+	  }
+	break;
       case 'd':
 	if (action == NoAction)
 	  action = Delete;
