@@ -1,5 +1,9 @@
 2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* new-features.xml (ov-new1.7.33): Document empty $PATH handling.
+
+2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.xml (ov-new1.7.33): Fix paragraph order.
 
 2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
