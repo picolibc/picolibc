@@ -528,8 +528,8 @@ Local accounts from another machine in the network:
 <para>
 There's no SID&lt;=&gt;uid/gid mapping implemented for this case.  The problem
 is, there's no way to generate a bijective mapping.  There's no central place
-which keeps an analogue value of the <literal>trustPosixOffset</literal>, and
-there's the additional problem that the
+which keeps an analogue of the <literal>trustPosixOffset</literal>, and there's
+the additional problem that the
 <ulink url="http://msdn.microsoft.com/en-us/library/windows/desktop/aa379166%28v=vs.85%29.aspx">LookupAccountSid</ulink>
 and
 <ulink url="http://msdn.microsoft.com/en-us/library/windows/desktop/aa379159%28v=vs.85%29.aspx">LookupAccountName</ulink>
@@ -885,8 +885,13 @@ key/value pair for groups are:
 <sect3 id="ntsec-mapping-caching"><title id="ntsec-mapping-caching.title">Caching account information</title>
 
 <para>
-The information fetched from file or the Windows account database is cached
-by the process.  The cached information is inherited by child processes.
+The information fetched from the Windows account database or the
+<filename>/etc/passwd</filename> and <filename>/etc/group</filename> files is
+cached by the process.  The cached information is inherited by Cygwin child
+processes.  A Cygwin process invoked from a Windows command, such as CMD.exe,
+will start a new Cygwin process tree and the caching starts from scratch
+(unless <command><link linkend="using-cygserver">cygserver</link></command> is
+running, but read on).
 </para>
 
 <para>
@@ -900,8 +905,8 @@ doesn't start any child processes, so the information is lost as soon as
 <para>
 But there's another caching mechanism available.  If
 <command><link linkend="using-cygserver">cygserver</link></command> is running
-it will provide passwd and group entry caching for all processes in a Cygwin
-process tree, which first process has been started after
+it will provide passwd and group entry caching for all processes in every Cygwin
+process tree started after
 <command><link linkend="using-cygserver">cygserver</link></command>.  So, if
 you start a Cygwin Terminal and
 <command><link linkend="using-cygserver">cygserver</link></command> is running
