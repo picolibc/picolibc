@@ -1,3 +1,10 @@
+2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* globals.cc (dos_file_warning): Set to false by default.
+	* path.cc (warn_msdos): Make static.  Drop test for dos_file_warning.
+	(path_conv::check): Check for dos_file_warning here to avoid a function
+	call in the default case.
+
 2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc (cygwin_atexit): Add workaround for broken atexit calls

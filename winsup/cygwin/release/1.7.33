@@ -46,6 +46,8 @@ What changed:
   add PATH variable with Cygwin installation directory as content to Windows
   environment to allow loading of Cygwin system DLLs.
 
+- Disable CYGWIN "dosfilewarning" option by default.
+
 - Improve various header files for C++- and standards-compliance.
 
 - Doug Lea malloc implementation update from 2.8.3 to the latest 2.8.6.
