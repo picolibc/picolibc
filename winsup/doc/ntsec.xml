@@ -221,10 +221,11 @@ which disallows mapping of certain POSIX permissions cleanly.  See
 <para>POSIX is able to create only three different permissions?  Not quite.
 Newer operating systems and file systems on POSIX systems also provide
 access control lists.  Two different APIs exist for accessing these
-ACLs, the Solaris API and the POSIX API.  Cygwin implements the Solaris
-API to access Windows ACLs in a Unixy way.  Online man pages for the
+ACLs, the Solaris API and the POSIX API.  Cygwin implements the original
+Solaris API to access Windows ACLs in a Unixy way.  Online man pages for the
 Solaris ACL API can be found on
-<ulink url="http://docs.sun.com">http://docs.sun.com</ulink>.</para>
+<ulink url="http://docs.oracle.com">http://docs.oracle.com</ulink>.
+For an overview see <ulink url="http://docs.oracle.com/cd/E23824_01/html/821-1474/acl-5.html#scrolltoc">acl(5)</ulink>.</para>
 
 </sect2>
 

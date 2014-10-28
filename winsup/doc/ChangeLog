@@ -1,5 +1,9 @@
 2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntsec.xml: Fix Solaris doc URLs.
+
+2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntsec.xml: Try to make an expression less ambiguous.
 
 2014-10-27  Luke Kendall  <luke.kendall@cisra.canon.com.au>
