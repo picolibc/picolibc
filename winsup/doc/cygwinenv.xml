@@ -28,7 +28,7 @@ down every thread and socket creation!</para>
 <listitem>
 <para><envar>(no)dosfilewarning</envar> - If set, Cygwin will warn the
 first time a user uses an "MS-DOS" style path name rather than a POSIX-style
-path name.  Defaults to set.</para>
+path name.  Defaults to off.</para>
 </listitem>
 
 <listitem>

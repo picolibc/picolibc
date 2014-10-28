@@ -78,6 +78,10 @@ Windows environment to allow loading of Cygwin system DLLs.
 </para></listitem>
 
 <listitem><para>
+Disable CYGWIN "dosfilewarning" option by default.
+</para></listitem>
+
+<listitem><para>
 Improve various header files for C++- and standards-compliance.
 </para></listitem>
 

@@ -1,5 +1,10 @@
 2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwinenv.xml: Change default setting of dosfilewarning.
+	* new-features.xml (ov-new1.7.33): Document aforementioned change.
+
+2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntsec.xml: Fix Solaris doc URLs.
 
 2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
