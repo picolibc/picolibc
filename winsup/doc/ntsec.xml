@@ -1252,9 +1252,9 @@ passwd and group information.
 </screen>
 
 <para>
-This is a valid entry, but the order will be ignored by Cygwin.  If both,
-<literal>files</literal> and <literal>db</literal> are specified, Cygwin will
-always try the files first, then the db.
+This is a valid entry, but the order will be ignored by Cygwin.  If both
+settings, <literal>files</literal> and <literal>db</literal> are specified,
+Cygwin will always try the files first, then the db.
 </para>
 
 <para>
