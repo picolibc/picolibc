@@ -15,7 +15,7 @@ do
 	then
 		# This file uses XIncludes.  Let's chase its deps recursively.
 		base=`basename "$f" .xml`
-		if [ $subproc -eq 0 ] ; then echo -n "$base/$base.html:" ; fi
+		if [ $subproc -eq 0 ] ; then echo -n "$base/$base.html $base/$base.pdf:" ; fi
 
 		deps=`grep 'xi:include.*href' "$f" | cut -f2 -d\" | tr '\n' ' '`
 		echo -n " $deps"

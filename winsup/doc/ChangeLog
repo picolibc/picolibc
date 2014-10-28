@@ -1,5 +1,11 @@
 2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* xidepend: Make PDF file dependent on the same input files as the
+	HTML file of the same name to trigger automatic rebuild of PDFs on
+	source file changes as well.
+
+2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwinenv.xml: Change default setting of dosfilewarning.
 	* new-features.xml (ov-new1.7.33): Document aforementioned change.
 
