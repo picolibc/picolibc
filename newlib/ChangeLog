@@ -1,3 +1,12 @@
+2014-10-29  Terry Guo  <terry.guo@arm.com>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Remove unnecessary comparison.
+
+2014-10-27  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/stdlib/__call_atexit.c (__deregister_exitproc): Add Cygwin-only
+	function to deregister functions from the atexit function chain.
+
 2014-10-27  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/unistd.h (sethostname): Declare if

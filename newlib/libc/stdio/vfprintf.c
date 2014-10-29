@@ -1521,11 +1521,9 @@ string:
 				 */
 				char *p = memchr (cp, 0, prec);
 
-				if (p != NULL) {
+				if (p != NULL)
 					size = p - cp;
-					if (size > prec)
-						size = prec;
-				} else
+				else
 					size = prec;
 			} else
 				size = strlen (cp);
