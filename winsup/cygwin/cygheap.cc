@@ -130,7 +130,7 @@ init_cygheap::close_ctty ()
    cygcheck can print the paths into which the Cygwin DLL has been
    installed for debugging purposes.
 
-   Last but not least, the new cygwin properties datastrcuture is checked
+   Last but not least, the new cygwin properties datastructure is checked
    for the "disabled_key" value, which is used to determine whether the
    installation key is actually added to all object names or not.  This is
    used as a last resort for debugging purposes, usually.  However, there
@@ -140,6 +140,8 @@ init_cygheap::close_ctty ()
 void
 init_cygheap::init_installation_root ()
 {
+  ptrdiff_t len = 0;
+
   if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
     api_fatal ("Can't initialize Cygwin installation root dir.\n"
 	       "GetModuleFileNameW(%p, %p, %u), %E",
@@ -147,6 +149,7 @@ init_cygheap::init_installation_root ()
   PWCHAR p = installation_root;
   if (wcsncasecmp (p, L"\\\\", 2))	/* Normal drive letter path */
     {
+      len = 4;
       memmove (p + 4, p, PATH_MAX - 4);
       p = wcpncpy (p, L"\\\\?\\", 4);
     }
@@ -155,6 +158,7 @@ init_cygheap::init_installation_root ()
       bool unc = false;
       if (wcsncmp (p + 2, L"?\\", 2))	/* No long path prefix, so UNC path. */
 	{
+	  len = 6;
 	  memmove (p + 6, p, PATH_MAX - 6);
 	  p = wcpncpy (p, L"\\??\\UN", 6);
 	  *p = L'C';
@@ -189,9 +193,15 @@ init_cygheap::init_installation_root ()
   /* Copy result into installation_dir before stripping off "bin" dir and
      revert to Win32 path.  This path is added to the Windows environment
      in buildenv.  See there for a description. */
-  installation_dir_len = wcpncpy (installation_dir, installation_root, PATH_MAX)
+  installation_dir_len = wcpncpy (installation_dir, installation_root + len,
+  				  PATH_MAX)
 			 - installation_dir;
-  installation_dir[1] = L'\\';
+  if (len == 4)		/* Local path */
+    ;
+  else if (len == 6)	/* UNC path */
+    installation_dir[0] = L'\\';
+  else			/* Long, prefixed path */
+    installation_dir[1] = L'\\';
 
   /* If w < p, the Cygwin DLL resides in the root dir of a drive or network
      path.  In that case, if we strip off yet another backslash, the path

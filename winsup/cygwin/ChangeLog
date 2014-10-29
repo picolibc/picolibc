@@ -1,5 +1,10 @@
 2014-10-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.cc (init_cygheap::init_installation_root): Create content of
+	installation_dir as non-prefixed path, if possible.
+
+2014-10-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* common.din (__cxa_atexit): Define as cygwin__cxa_atexit.
 	* dcrt0.cc (cygwin__cxa_atexit): New function.  Explain what we do.
 
