@@ -1,3 +1,7 @@
+2014-10-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setfacl.c (setfacl): Fix bracketing in expression.
+
 2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (usage): Add -b to require options.

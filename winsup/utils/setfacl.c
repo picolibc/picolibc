@@ -385,7 +385,7 @@ setfacl (action_t action, const char *path, aclent_t *acls, int cnt)
     default:
       if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
 	  || (lcnt = modacl (lacl, lcnt, acls, cnt)) < 0
-	  || (lcnt = addmissing (lacl, lcnt) < 0)
+	  || (lcnt = addmissing (lacl, lcnt)) < 0
 	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
 	{
 	  perror (prog_name);
