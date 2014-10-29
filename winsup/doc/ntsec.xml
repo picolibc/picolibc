@@ -932,6 +932,51 @@ its service.  Additionally, all information requested from
 be cached inside the process itself and, again, propagated to child processes.
 </para>
 
+<para>
+If you automatically start Cygwin processes as Windows services at system
+startup, you may wish to consider starting
+<command><link linkend="using-cygserver">cygserver</link></command> first in
+order to take advantage of this system-wide caching.  To assure that
+<command><link linkend="using-cygserver">cygserver</link></command> has started
+prior to starting <command>sshd</command> or other Cygwin processes, you may
+wish to create service startup dependencies.
+<command><link linkend="using-cygserver">Cygserver</link></command> should
+probably wait for Windows TCPIP and AFD services before it starts, and then
+other Cygwin process should start after
+<command><link linkend="using-cygserver">cygserver</link></command>.  Example
+Windows commands to accomplish this (after the services already exist) are
+shown below.  You will need an administrative prompt to run the
+<command>sc config</command> commands.
+</para>
+
+<screen>
+  # Delay Cygserver until TCPIP and AFD have started
+  # Note the (odd) required space character after "depend="
+
+  sc config cygserver depend= tcp/afd
+
+  # Delay sshd until after Cygserver has started
+  # Again note the (odd) required space character after "depend="
+
+  sc config sshd depend= cygserver
+
+  # View the Cygserver service details
+
+  sc qc cygserver
+</screen>
+
+<para>
+Note that this <command>sc config</command> command
+<emphasis>replaces</emphasis> any existing dependencies.  The above changes
+will not impact the running instance, only future instances.
+</para>
+
+<screen>
+  # To remove all dependencies from the cygserver service
+
+  sc config cygserver depend= /
+</screen>
+
 </sect3>
 
 <sect3 id="ntsec-mapping-nfs"><title id="ntsec-mapping-nfs.title">NFS account mapping</title>
