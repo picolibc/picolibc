@@ -1,3 +1,8 @@
+2014-10-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* common.din (__cxa_atexit): Define as cygwin__cxa_atexit.
+	* dcrt0.cc (cygwin__cxa_atexit): New function.  Explain what we do.
+
 2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* globals.cc (dos_file_warning): Set to false by default.

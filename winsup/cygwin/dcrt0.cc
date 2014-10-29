@@ -1232,6 +1232,24 @@ do_exit (int status)
   myself.exit (n);
 }
 
+/* When introducing support for -fuse-cxa-atexit with Cygwin 1.7.32 and
+   GCC 4.8.3-3, we defined __dso_value as &ImageBase.  This supposedly allowed
+   a reproducible value which could also be easily evaluated in cygwin_atexit.
+   However, when building C++ applications with -fuse-cxa-atexit, G++ creates
+   calls to __cxa_atexit using the *address* of __dso_handle as DSO handle.
+   
+   So what we do here is this:  A call to __cxa_atexit from the application
+   actually calls cygwin__cxa_atexit.  From the dso_handle value we fetch the
+   ImageBase address, which is then used as the actual DSO handle value in
+   calls to __cxa_atexit and __cxa_finalize. */
+extern "C" int
+cygwin__cxa_atexit (void (*fn)(void *), void *obj, void *dso_handle)
+{
+  if (dso_handle)
+    dso_handle = *(void **) dso_handle;
+  return __cxa_atexit (fn, obj, dso_handle);
+}
+
 extern "C" int
 cygwin_atexit (void (*fn) (void))
 {

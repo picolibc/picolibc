@@ -88,3 +88,7 @@ Bug Fixes
 
 - Fix a SEGV in some 64 bit applications explicitely dlclosing DLLs.
   Addresses: https://cygwin.com/ml/cygwin/2014-10/msg00402.html
+
+- Fix -fuse-cxa-atexit handling where dlclose fails to trigger calling
+  global dtors in dynamically loaded modules in C++ applications (and
+  thus another potential SEGV).
