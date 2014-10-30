@@ -69,7 +69,7 @@ char 	*_EXFUN(rindex,(const char *, int));
 #endif
 char 	*_EXFUN(stpcpy,(char *__restrict, const char *__restrict));
 char 	*_EXFUN(stpncpy,(char *__restrict, const char *__restrict, size_t));
-#if __BSD_VISIBLE
+#if __BSD_VISIBLE || __POSIX_VISIBLE
 int	 _EXFUN(strcasecmp,(const char *, const char *));
 #endif
 #if __GNU_VISIBLE
