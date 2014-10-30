@@ -953,7 +953,7 @@ shown below.  You will need an administrative prompt to run the
   # Delay Cygserver until TCPIP and AFD have started
   # Note the (odd) required space character after "depend="
 
-  sc config cygserver depend= tcp/afd
+  sc config cygserver depend= tcpip/afd
 
   # Delay sshd until after Cygserver has started
   # Again note the (odd) required space character after "depend="

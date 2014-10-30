@@ -1,3 +1,7 @@
+2014-10-30  David Rothenberger  <daveroth@acm.org>
+
+	* ntsec.xml: Fix typo.
+
 2014-10-29  Dave Habermann  <dahabermann@dow.com>
 
 	* ntsec.xml (ntsec-mapping-caching): Describe service dependencies
