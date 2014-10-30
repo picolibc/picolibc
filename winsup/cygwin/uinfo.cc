@@ -339,7 +339,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	{
 	  if (pw && pw->pw_dir && *pw->pw_dir)
 	    {
-	      debug_printf ("Set HOME (from /etc/passwd) to %s", pw->pw_dir);
+	      debug_printf ("Set HOME (from account db) to %s", pw->pw_dir);
 	      setenv ("HOME", pw->pw_dir, 1);
 	    }
 	  else
