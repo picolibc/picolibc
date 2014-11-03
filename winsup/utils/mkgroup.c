@@ -342,7 +342,7 @@ enum_local_groups (domlist_t *mach, const char *sep,
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 	  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
 		  mach->with_dom && !is_builtin ? domain_name : L"",
-		  mach->with_dom || is_builtin ? sep : "",
+		  mach->with_dom && !is_builtin ? sep : "",
 		  buffer[i].lgrpi0_name,
 		  put_sid (psid),
 		  (unsigned int) (gid + (is_builtin ? 0 : id_offset)));
