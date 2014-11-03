@@ -194,7 +194,7 @@ init_cygheap::init_installation_root ()
      revert to Win32 path.  This path is added to the Windows environment
      in buildenv.  See there for a description. */
   installation_dir_len = wcpncpy (installation_dir, installation_root + len,
-  				  PATH_MAX)
+				  PATH_MAX)
 			 - installation_dir;
   if (len == 4)		/* Local path */
     ;
@@ -223,7 +223,8 @@ init_cygheap::init_installation_root ()
   if (cygwin_props.disable_key)
     {
       installation_key.Length = 0;
-      installation_key.Buffer[0] = L'\0'; }
+      installation_key.Buffer[0] = L'\0';
+    }
 }
 
 void __stdcall

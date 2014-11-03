@@ -1,3 +1,7 @@
+2014-11-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc: Fix formatting.
+
 2014-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (cygheap_user::ontherange): Don't mention /etc/passwd.
