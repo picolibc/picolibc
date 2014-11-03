@@ -1,3 +1,8 @@
+2014-11-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (enum_local_groups): Don't generate leading separator char
+	for builtin accounts.
+
 2014-10-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (setfacl): Fix bracketing in expression.
