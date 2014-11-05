@@ -1,5 +1,11 @@
 2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* lib/atexit.c (atexit): Check for being linked into the executable.
+	If so, call __cxa_atexit with NULL DSO handle.  Explain why.
+	* lib/dso_handle.c: New file providing fallback __dso_handle.
+
+2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (NEW_FUNCTIONS): Add atexit to be not exported.
 	* lib/atexit.c (atexit): New, statically linkable version of atexit.
 	* dcrt0.cc (cygwin_atexit): Add comment to mark this function as old
