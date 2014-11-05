@@ -1250,6 +1250,13 @@ cygwin__cxa_atexit (void (*fn)(void *), void *obj, void *dso_handle)
   return __cxa_atexit (fn, obj, dso_handle);
 }
 
+/* This function is only called for applications built with Cygwin versions
+   up to 1.7.32.  Starting with 1.7.33, atexit is a statically linked function
+   inside of libcygwin.a.  The reason is that the old method to fetch the
+   caller return address is unreliable given GCCs ability to perform tail call
+   elimination.  For the details, see the below comment.
+   The atexit replacement is defined in libcygwin.a to allow reliable access
+   to the correct DSO handle. */
 extern "C" int
 cygwin_atexit (void (*fn) (void))
 {
@@ -1259,7 +1266,7 @@ cygwin_atexit (void (*fn) (void))
 #ifdef __x86_64__
   /* x86_64 DLLs created with GCC 4.8.3-3 register __gcc_deregister_frame
      as atexit function using a call to atexit, rather than __cxa_atexit.
-     Due to GCC's aggressive optimizing, cygwin_atexit doesn't get the correct
+     Due to GCC's tail call optimizing, cygwin_atexit doesn't get the correct
      return address on the stack.  As a result it fails to get the HMODULE of
      the caller and thus calls atexit rather than __cxa_atexit.  Then, if the
      module gets dlclosed, __cxa_finalize (called from dll_list::detach) can't
@@ -1268,22 +1275,16 @@ cygwin_atexit (void (*fn) (void))
      module is already unloaded and the __gcc_deregister_frame function not
      available ==> SEGV.
 
-     Workaround: If dlls.find fails, and _my_tls.retaddr is a Cygwin function
-     address, and fn is a function address in another DLL, try to find the
-     dll entry of the DLL containing fn.  Then check if fn is the address of
-     the DLLs __gcc_deregister_frame function.  If so, proceed by calling
-     __cxa_atexit, otherwise call atexit. */
-  extern void *__image_base__;
-  if (!d
-      && (uintptr_t) _my_tls.retaddr () >= (uintptr_t) &__image_base__
-      && (uintptr_t) _my_tls.retaddr () <= (uintptr_t) &_cygheap_start
-      && (uintptr_t) fn > (uintptr_t) &_cygheap_start)
-    {
-      d = dlls.find ((void *) fn);
-      if (d && (void *) GetProcAddress (d->handle, "__gcc_deregister_frame")
-	       != fn)
-	d = NULL;
-    }
+     This also occurs for other functions.
+
+     Workaround: If dlls.find fails, try to find the dll entry of the DLL
+     containing fn.  If that works, proceed by calling __cxa_atexit, otherwise
+     call atexit.
+     
+     This *should* be sufficiently safe.  Ultimately, new applications will
+     use the statically linked atexit function though, as outlined above. */
+  if (!d)
+    d = dlls.find ((void *) fn);
 #endif
   res = d ? __cxa_atexit ((void (*) (void *)) fn, NULL, d->handle) : atexit (fn);
   return res;

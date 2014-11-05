@@ -330,6 +330,7 @@ endif
 GMON_OFILES:=gmon.o mcount.o profil.o mcountFunc.o
 
 NEW_FUNCTIONS:=$(addprefix --replace=,\
+	atexit= \
 	timezone= \
 	__xdrrec_getrec= \
 	__xdrrec_setnonblock= \

@@ -1,5 +1,14 @@
 2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (NEW_FUNCTIONS): Add atexit to be not exported.
+	* lib/atexit.c (atexit): New, statically linkable version of atexit.
+	* dcrt0.cc (cygwin_atexit): Add comment to mark this function as old
+	entry point.  Indiscriminately check for DSO of function pointer for
+	all functions, if checking for DSO of return address fails on x86_64.
+	Change comment accordingly.
+
+2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in (NEW_FUNCTIONS): Define target-independent.  Add target
 	dependent stuff afterwards.  Globally define timezone and all xdr
 	symbols as non-exported from libcygwin.a.
