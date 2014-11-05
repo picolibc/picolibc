@@ -52,6 +52,14 @@ What changed:
 
 - Doug Lea malloc implementation update from 2.8.3 to the latest 2.8.6.
 
+- The xdr functions are no longer exported for newly built executables.
+  Use libtirpc-devel instead.
+
+- atexit is now exported as statically linked function from libcygwin.a.
+  This allows reliable access to the DSO handle of the caller for newly
+  built executables.  The former atexit entry point into the DLL remains
+  for backward compatibility only.
+
 
 Bug Fixes
 ---------
