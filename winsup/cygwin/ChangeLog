@@ -1,3 +1,9 @@
+2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (NEW_FUNCTIONS): Define target-independent.  Add target
+	dependent stuff afterwards.  Globally define timezone and all xdr
+	symbols as non-exported from libcygwin.a.
+
 2014-11-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc: Fix formatting.

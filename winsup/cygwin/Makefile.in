@@ -329,10 +329,62 @@ endif
 
 GMON_OFILES:=gmon.o mcount.o profil.o mcountFunc.o
 
-ifeq ($(target_cpu),x86_64)
-NEW_FUNCTIONS:=
-else
 NEW_FUNCTIONS:=$(addprefix --replace=,\
+	timezone= \
+	__xdrrec_getrec= \
+	__xdrrec_setnonblock= \
+	xdr_array= \
+	xdr_bool= \
+	xdr_bytes= \
+	xdr_char= \
+	xdr_double= \
+	xdr_enum= \
+	xdr_float= \
+	xdr_free= \
+	xdr_hyper= \
+	xdr_int= \
+	xdr_int16_t= \
+	xdr_int32_t= \
+	xdr_int64_t= \
+	xdr_int8_t= \
+	xdr_long= \
+	xdr_longlong_t= \
+	xdr_netobj= \
+	xdr_opaque= \
+	xdr_pointer= \
+	xdr_reference= \
+	xdr_short= \
+	xdr_sizeof= \
+	xdr_string= \
+	xdr_u_char= \
+	xdr_u_hyper= \
+	xdr_u_int= \
+	xdr_u_int16_t= \
+	xdr_u_int32_t= \
+	xdr_u_int64_t= \
+	xdr_u_int8_t= \
+	xdr_u_long= \
+	xdr_u_longlong_t= \
+	xdr_u_short= \
+	xdr_uint16_t= \
+	xdr_uint32_t= \
+	xdr_uint64_t= \
+	xdr_uint8_t= \
+	xdr_union= \
+	xdr_vector= \
+	xdr_void= \
+	xdr_wrapstring= \
+	xdrmem_create= \
+	xdrrec_create= \
+	xdrrec_endofrecord= \
+	xdrrec_eof= \
+	xdrrec_skiprecord= \
+	xdrstdio_create= \
+)
+ifeq ($(target_cpu),x86_64)
+NEW_FUNCTIONS+=
+else
+NEW_FUNCTIONS+=$(addprefix --replace=,\
 	acl=_acl32 \
 	aclcheck=_aclcheck32 \
 	aclfrommode=_aclfrommode32 \
@@ -380,7 +432,6 @@ NEW_FUNCTIONS:=$(addprefix --replace=,\
 	setreuid=_setreuid32 \
 	setuid=_setuid32 \
 	stat=_stat64 \
-	timezone= \
 	tmpfile=_tmpfile64 \
 	truncate=_truncate64 \
 )
