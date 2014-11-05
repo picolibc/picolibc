@@ -89,6 +89,18 @@ Improve various header files for C++- and standards-compliance.
 Doug Lea malloc implementation update from 2.8.3 to the latest 2.8.6.
 </para></listitem>
 
+<listitem><para>
+The xdr functions are no longer exported for newly built executables.
+Use libtirpc-devel instead.
+</para></listitem>
+
+<listitem><para>
+atexit(3) is now exported as statically linked function from libcygwin.a.
+This allows reliable access to the DSO handle of the caller for newly
+built executables.  The former atexit entry point into the DLL remains
+for backward compatibility only.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

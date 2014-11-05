@@ -1,3 +1,7 @@
+2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.33): Document xdr and atexit.
+
 2014-10-30  David Rothenberger  <daveroth@acm.org>
 
 	* ntsec.xml: Fix typo.
