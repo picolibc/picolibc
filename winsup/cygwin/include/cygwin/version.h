@@ -455,12 +455,13 @@ details. */
       277: Add setsockopt(SO_PEERCRED).
       278: Add quotactl.
       279: Export stime.
+      280: Static atexit in libcygwin.a, CW_FIXED_ATEXIT.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 279
+#define CYGWIN_VERSION_API_MINOR 280
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

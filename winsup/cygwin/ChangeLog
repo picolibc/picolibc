@@ -1,3 +1,14 @@
+2014-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (cygwin_atexit): Change preceeding comment to reflect
+	API version numbers.
+	* external.cc (cygwin_internal): disable setting cxx_malloc on 64 bit.
+	Add CW_FIXED_ATEXIT case.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_FIXED_ATEXIT.
+	* lib/atexit.c (atexit): Test running Cygwin version by checking
+	return value of cygwin_internal (CW_FIXED_ATEXIT).
+
 2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lib/atexit.c (atexit): Check for being linked into the executable.

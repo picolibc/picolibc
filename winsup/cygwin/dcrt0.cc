@@ -1251,12 +1251,12 @@ cygwin__cxa_atexit (void (*fn)(void *), void *obj, void *dso_handle)
 }
 
 /* This function is only called for applications built with Cygwin versions
-   up to 1.7.32.  Starting with 1.7.33, atexit is a statically linked function
-   inside of libcygwin.a.  The reason is that the old method to fetch the
-   caller return address is unreliable given GCCs ability to perform tail call
-   elimination.  For the details, see the below comment.
-   The atexit replacement is defined in libcygwin.a to allow reliable access
-   to the correct DSO handle. */
+   up to API 0.279.  Starting with API 0.280 (Cygwin 1.7.33/1.8.6-2), atexit
+   is a statically linked function inside of libcygwin.a.  The reason is that
+   the old method to fetch the caller return address is unreliable given GCCs
+   ability to perform tail call elimination.  For the details, see the below
+   comment.  The atexit replacement is defined in libcygwin.a to allow reliable
+   access to the correct DSO handle. */
 extern "C" int
 cygwin_atexit (void (*fn) (void))
 {
