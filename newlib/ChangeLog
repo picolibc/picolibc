@@ -1,3 +1,9 @@
+2014-11-06  Terry Guo  <terry.guo@arm.com>
+
+	* libc/stdio/nano-vfprintf_i.c (_printf_i): Use Newlib approach to
+	handle string that might be not nul-terminated.
+	* testsuite/newlib.stdio/nulprintf.c: New test.
+
 2014-10-29  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* libc/include/string.h: Correct guard for strcasecmp().

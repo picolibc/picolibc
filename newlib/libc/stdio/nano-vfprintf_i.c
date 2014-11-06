@@ -211,15 +211,15 @@ number:
     case 's':
       cp = GET_ARG (N, *ap, char_ptr_t);
       /* Precision gives the maximum number of chars to be written from a
-	 string, and take prec == -1 into consideration.  */
-      if ((u_int)(pdata->size = strlen (cp)) > (u_int)(pdata->prec))
-	pdata->size = pdata->prec;
-      /* Below code is kept for reading.  The check is redundant because
-	 pdata->prec will be set to pdata->size if it is -1 previously.  */
-#if 0
-      if (pdata->prec > pdata->size)
-#endif
-      pdata->prec = pdata->size;
+	 string, and take prec == -1 into consideration.
+	 Use normal Newlib approach here to support case where cp is not
+	 nul-terminated.  */
+      char *p = memchr (cp, 0, pdata->prec);
+
+      if (p != NULL)
+	pdata->prec = p - cp;
+
+      pdata->size = pdata->prec;
       goto non_number_nosign;
     default:
       /* "%?" prints ?, unless ? is NUL.  */
