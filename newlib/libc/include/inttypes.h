@@ -243,15 +243,15 @@
 #define SCNxMAX		__SCNMAX(x)
 
 /* ptr types */
-#if PTRDIFF_MAX <= __STDINT_EXP(INT_MAX)
-# define __PRIPTR(x) __STRINGIFY(x)
-# define __SCNPTR(x) __STRINGIFY(x)
-#elif PTRDIFF_MAX <= __STDINT_EXP(LONG_MAX) || !defined(__have_longlong64)
+#if defined(_UINTPTR_EQ_ULONGLONG)
+# define __PRIPTR(x) __STRINGIFY(ll##x)
+# define __SCNPTR(x) __STRINGIFY(ll##x)
+#elif defined(_UINTPTR_EQ_ULONG)
 # define __PRIPTR(x) __STRINGIFY(l##x)
 # define __SCNPTR(x) __STRINGIFY(l##x)
 #else
-# define __PRIPTR(x) __STRINGIFY(ll##x)
-# define __SCNPTR(x) __STRINGIFY(ll##x)
+# define __PRIPTR(x) __STRINGIFY(x)
+# define __SCNPTR(x) __STRINGIFY(x)
 #endif
 
 #define PRIdPTR		__PRIPTR(d)

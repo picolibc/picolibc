@@ -1,3 +1,10 @@
+2014-11-06  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* configure.in: Add autoconf test to determine size of uintptr_t.
+	* newlib.hin: Add new autoconf feature variables.
+	* libc/include/inttypes.h: Use new feature variables.
+	* configure: Regenerate.
+
 2014-11-06  Terry Guo  <terry.guo@arm.com>
 
 	* libc/stdio/nano-vfprintf_i.c (_printf_i): Use Newlib approach to

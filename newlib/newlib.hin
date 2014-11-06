@@ -61,6 +61,12 @@
 /* True if long double supported and it is equal to double.  */
 #undef  _LDBL_EQ_DBL
  
+/* Define if uintptr_t is unsigned long on this architecture */
+#undef  _UINTPTR_EQ_ULONG
+
+/* Define if uintptr_t is unsigned long long on this architecture */
+#undef  _UINTPTR_EQ_ULONGLONG
+
 /* Define if ivo supported in streamio.  */
 #undef _FVWRITE_IN_STREAMIO
 
