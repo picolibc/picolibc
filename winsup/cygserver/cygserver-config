@@ -10,6 +10,7 @@ LOCALSTATEDIR=/var
 
 progname=$0
 auto_answer=""
+service_name=cygserver
 
 request()
 {
@@ -63,6 +64,11 @@ do
     auto_answer=no
     ;;
 
+  -N | --name )
+    service_name=$1
+    shift
+    ;;
+
   *)
     echo "usage: ${progname} [OPTION]..."
     echo
@@ -72,6 +78,7 @@ do
     echo "  --debug  -d            Enable shell's debug output."
     echo "  --yes    -y            Answer all questions with \"yes\" automatically."
     echo "  --no     -n            Answer all questions with \"no\" automatically."
+    echo "  --name   -N <name>     cygserver windows service name."
     echo
     exit 1
     ;;
@@ -84,10 +91,10 @@ _sys="`uname`"
 _nt=`expr "${_sys}" : "CYGWIN_NT"`
 
 # Check for running cygserver processes first.
-if ps -ef | grep -v grep | grep -q cygserver
+if ps -ef | grep -v grep | grep -q ${service_name}
 then
   echo
-  echo "There is a cygserver already running. Nothing to do, apparently."
+  echo "There is a cygserver (${service_name}) already running. Nothing to do, apparently."
   echo
   exit 1
 fi
@@ -164,7 +171,7 @@ fi
 if [ ${_nt} -gt 0 ]
 then
   # But only if it is not already installed
-  if ! cygrunsrv -Q cygserver > /dev/null 2>&1
+  if ! cygrunsrv -Q ${service_name} > /dev/null 2>&1
   then
     echo
     echo
@@ -173,7 +180,7 @@ then
     echo "Do you want to install cygserver as service?"
     if request "(Say \"no\" if it's already installed as service)"
     then
-      if ! cygrunsrv -I cygserver -d "CYGWIN cygserver" -p /usr/sbin/cygserver
+      if ! cygrunsrv -I ${service_name} -d "CYGWIN cygserver" -p /usr/sbin/cygserver
       then
         echo
 	echo "Installation of cygserver as service failed.  Please check the"
@@ -186,7 +193,7 @@ then
       fi
       echo
       echo "The service has been installed under LocalSystem account."
-      echo "To start it, call \`net start cygserver' or \`cygrunsrv -S cygserver'."
+      echo "To start it, call \`net start ${service_name}' or \`cygrunsrv -S ${service_name}'."
     fi
     touch "${LOCALSTATEDIR}/log/cygserver.log"
     chown 18.544 "${LOCALSTATEDIR}/log/cygserver.log"

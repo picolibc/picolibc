@@ -1,3 +1,7 @@
+2014-11-06  Florian Friesdorf  <flo@chaoflow.net>
+
+	* cygserver-config: Add -N option to allow different service name.
+
 2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.ac: Convert to new AC_INIT style.
