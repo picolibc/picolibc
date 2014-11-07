@@ -999,8 +999,8 @@ on domain controllers and domain member machines.
     <para>The <command>mkpasswd</command> program can be used to create a
       <filename>/etc/passwd</filename> file.  Cygwin doesn't need this file,
       because it reads user information from the Windows account databases,
-      but you can add an <filename>/etc/group</filename> file for instance, if
-      your machine is often disconnected from its domain controller.</para>
+      but you can add an <filename>/etc/passwd</filename> file, for instance
+      if your machine is often disconnected from its domain controller.</para>
 
     <para>Note that this information is static, in contrast to the information
       automatically gathered by Cygwin from the Windows account databases. If

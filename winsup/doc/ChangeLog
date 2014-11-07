@@ -1,3 +1,7 @@
+2014-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* utils.xml (mkpasswd): Change /etc/group to /etc/passwd.
+
 2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new1.7.33): Document xdr and atexit.
