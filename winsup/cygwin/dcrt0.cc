@@ -1239,15 +1239,17 @@ do_exit (int status)
    calls to __cxa_atexit using the *address* of __dso_handle as DSO handle.
    
    So what we do here is this:  A call to __cxa_atexit from the application
-   actually calls cygwin__cxa_atexit.  From the dso_handle value we fetch the
-   ImageBase address, which is then used as the actual DSO handle value in
-   calls to __cxa_atexit and __cxa_finalize. */
+   actually calls cygwin__cxa_atexit.  From dso_handle (which is either
+   &__dso_handle, or __dso_handle == ImageBase or NULL) we fetch the dll
+   structure of the DLL.  Then use dll::handle == ImageBase as the actual DSO
+   handle value in calls to __cxa_atexit and __cxa_finalize.
+   Thus, __cxa_atexit becomes entirely independent of the incoming value of
+   dso_handle, as long as it's *some* pointer into the DSO's address space. */
 extern "C" int
 cygwin__cxa_atexit (void (*fn)(void *), void *obj, void *dso_handle)
 {
-  if (dso_handle)
-    dso_handle = *(void **) dso_handle;
-  return __cxa_atexit (fn, obj, dso_handle);
+  dll *d = dso_handle ? dlls.find (dso_handle) : NULL;
+  return __cxa_atexit (fn, obj, d ? d->handle : NULL);
 }
 
 /* This function is only called for applications built with Cygwin versions
