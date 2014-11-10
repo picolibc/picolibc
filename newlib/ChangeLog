@@ -1,3 +1,10 @@
+2014-11-10  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/machine/aarch64/strcpy.S: New file.
+	* libc/machine/aarch64/strcpy-stub.S: New file.
+	* libc/machine/aarch64/Makefile.am (lib_a_SOURCES): Add new files.
+	* libc/machine/aarch64/Makefile.in: Regenerate.
+
 2014-11-06  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* configure.in: Add autoconf test to determine size of uintptr_t.
