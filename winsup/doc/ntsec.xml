@@ -853,7 +853,7 @@ CMD example:
 </para>
 
 <screen>
-net user corinna /comment:"&lt;cygwin home=\"/home/foo\"/&lt;"
+net user corinna /comment:"&lt;cygwin home=\"/home/foo\"/&gt;"
 </screen>
 
 <para>
