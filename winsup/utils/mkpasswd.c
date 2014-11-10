@@ -48,7 +48,6 @@ typedef struct
 {
   char *str;
   BOOL domain;
-  BOOL with_dom;
 } domlist_t;
 
 static void
@@ -170,8 +169,8 @@ enum_unix_users (domlist_t *mach, const char *sep, DWORD id_offset,
 				       (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
 				       &acc_type))
 	    printf ("%s%s%ls:unused:%" PRIu32 ":99999:,%s::\n",
-		    mach->with_dom ? "Unix_User" : "",
-		    mach->with_dom ? sep : "",
+		    "Unix_User",
+		    sep,
 		    user + 10,
 		    (unsigned int) (id_offset +
 		    *GetSidSubAuthority (psid,
@@ -207,8 +206,8 @@ enum_unix_users (domlist_t *mach, const char *sep, DWORD id_offset,
 				     &acc_type)
 		  && !iswdigit (user[0]))
 		printf ("%s%s%ls:unused:%" PRIu32 ":99999:,%s::\n",
-			mach->with_dom ? "Unix_User" : "",
-			mach->with_dom ? sep : "",
+			"Unix_User",
+			sep,
 			user,
 			(unsigned int) (id_offset + start),
 			put_sid (psid));
@@ -335,8 +334,8 @@ enum_users (domlist_t *mach, const char *sep, const char *passed_home_path,
 
 	  printf ("%ls%s%ls:unused:%" PRIu32 ":%" PRIu32
 		  ":%ls%sU-%ls\\%ls,%s:%s:/bin/bash\n",
-		  mach->with_dom ? domain_name : L"",
-		  mach->with_dom ? sep : "",
+		  domain_name,
+		  sep,
 		  buffer[i].usri3_name,
 		  (unsigned int) (id_offset + uid),
 		  (unsigned int) (id_offset + gid),
@@ -370,16 +369,15 @@ usage (FILE * stream)
 "\n"
 "Options:\n"
 "\n"
-"   -l,--local [machine]    print local user accounts\n"
+"   -l,--local [machine]    print local user accounts of \"machine\"\n"
 "                           (from local machine if no machine specified)\n"
-"   -L,--Local machine      ditto, but generate username with machine prefix\n"
 "   -d,--domain [domain]    print domain accounts\n"
 "                           (from current domain if no domain specified)\n"
 "   -c,--current            print current user\n"
 "   -S,--separator char     for -l use character char as domain\\user\n"
 "                           separator in username instead of the default '%s'\n"
 "   -o,--id-offset offset   change the default offset (0x10000) added to uids\n"
-"                           in domain or foreign server accounts.\n"
+"                           of foreign local machine accounts.  Use with -l.\n"
 "   -u,--username username  only return information for the specified user\n"
 "                           one of -l, -d must be specified, too\n"
 "   -b,--no-builtin         don't print BUILTIN users\n"
@@ -513,21 +511,33 @@ main (int argc, char **argv)
 		       program_invocation_short_name,
 		       domlist[i].domain ? "domain" : "machine",
 		       domlist[i].str);
-	      goto skip;
+	      break;
 	    }
 	domlist[print_domlist].str = opt;
 	if (opt && (p = strchr (opt, ',')))
 	  {
 	    if (p == opt)
 	      {
-		fprintf (stderr, "%s: Malformed domain,offset string '%s'.  "
+		fprintf (stderr, "%s: Malformed domain string '%s'.  "
 			 "Skipping...\n", program_invocation_short_name, opt);
 		break;
 	      }
 	    *p = '\0';
 	  }
-	domlist[print_domlist++].with_dom = (c == 'L');
-skip:
+	if ((c == 'l' || c == 'L') && opt)
+	  {
+	    char cname[1024];
+	    DWORD csize = sizeof cname;
+
+	    /* Check if machine name is local machine.  Keep it simple. */
+	    if (GetComputerNameExA (strchr (opt, '.')
+				    ? ComputerNameDnsFullyQualified
+				    : ComputerNameNetBIOS,
+				    cname, &csize)
+		&& strcasecmp (opt, cname) == 0)
+	      domlist[print_domlist].str = NULL;
+	  }
+	++print_domlist;
 	break;
       case 'S':
 	sep_char = optarg;

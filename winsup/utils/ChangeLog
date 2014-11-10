@@ -1,3 +1,7 @@
+2014-11-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (dump_sysinfo): Handle Windows 10/Server 2014(?).
+
 2014-11-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (enum_local_groups): Don't generate leading separator char

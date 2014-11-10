@@ -1480,10 +1480,13 @@ dump_sysinfo ()
 			      ? "8" : "2012");
 	      break;
 	    case 3:
-	    default:
-	      osversion.dwMinorVersion = 3;
 	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
 			      ? "8.1" : "2012 R2");
+	      break;
+	    case 4:
+	    default:
+	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+			      ? "10" : "2014");
 	      break;
 	    }
 	  DWORD prod;

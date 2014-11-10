@@ -47,7 +47,6 @@ typedef struct
 {
   char *str;
   BOOL domain;
-  BOOL with_dom;
 } domlist_t;
 
 static void
@@ -168,8 +167,8 @@ enum_unix_groups (domlist_t *mach, const char *sep, DWORD id_offset,
 				       (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
 				       &acc_type))
 	    printf ("%s%s%ls:%s:%" PRIu32 ":\n",
-		    mach->with_dom ? "Unix_Group" : "",
-		    mach->with_dom ? sep : "",
+		    "Unix_Group",
+		    sep,
 		    p,
 		    put_sid (psid),
 		    (unsigned int) (id_offset +
@@ -205,8 +204,8 @@ enum_unix_groups (domlist_t *mach, const char *sep, DWORD id_offset,
 				     &acc_type)
 		  && !iswdigit (grp[0]))
 		printf ("%s%s%ls:%s:%" PRIu32 ":\n",
-			mach->with_dom ? "Unix_Group" : "",
-			mach->with_dom ? sep : "",
+			"Unix_Group",
+			sep,
 			grp,
 			put_sid (psid),
 			(unsigned int) (id_offset + start));
@@ -341,8 +340,8 @@ enum_local_groups (domlist_t *mach, const char *sep,
 
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 	  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
-		  mach->with_dom && !is_builtin ? domain_name : L"",
-		  mach->with_dom && !is_builtin ? sep : "",
+		  !is_builtin ? domain_name : L"",
+		  !is_builtin ? sep : "",
 		  buffer[i].lgrpi0_name,
 		  put_sid (psid),
 		  (unsigned int) (gid + (is_builtin ? 0 : id_offset)));
@@ -455,8 +454,8 @@ enum_groups (domlist_t *mach, const char *sep, DWORD id_offset,
 	    got_curr_pgrp = TRUE;
 
 	  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
-		  mach->with_dom ? domain_name : L"",
-		  mach->with_dom ? sep : "",
+		  domain_name,
+		  sep,
 		  buffer[i].grpi2_name,
 		  put_sid (psid),
 		  (unsigned int) (id_offset + gid));
@@ -481,9 +480,8 @@ usage (FILE * stream)
 "\n"
 "Options:\n"
 "\n"
-"   -l,--local [machine]    print local groups\n"
+"   -l,--local [machine]    print local groups of \"machine\"\n"
 "                           (from local machine if no machine specified)\n"
-"   -L,--Local machine      ditto, but generate groupname with machine prefix\n"
 "   -d,--domain [domain]    print domain groups\n"
 "                           (from current domain if no domain specified)\n"
 "   -c,--current            print current group\n"
@@ -616,7 +614,7 @@ main (int argc, char **argv)
 		       program_invocation_short_name,
 		       domlist[i].domain ? "domain" : "machine",
 		       domlist[i].str);
-	      goto skip;
+	      break;
 	    }
 	domlist[print_domlist].str = opt;
 	if (opt && (p = strchr (opt, ',')))
@@ -629,8 +627,20 @@ main (int argc, char **argv)
 	      }
 	    *p = '\0';
 	  }
-	domlist[print_domlist++].with_dom = (c == 'L');
-skip:
+	if ((c == 'l' || c == 'L') && opt)
+	  {
+	    char cname[1024];
+	    DWORD csize = sizeof cname;
+
+	    /* Check if machine name is local machine.  Keep it simple. */
+	    if (GetComputerNameExA (strchr (opt, '.')
+				    ? ComputerNameDnsFullyQualified
+				    : ComputerNameNetBIOS,
+				    cname, &csize)
+		&& strcasecmp (opt, cname) == 0)
+	      domlist[print_domlist].str = NULL;
+	  }
+	++print_domlist;
 	break;
       case 'S':
 	sep_char = optarg;
