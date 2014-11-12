@@ -884,25 +884,26 @@ really need one.  See the Cygwin User's Guide for more information.
 
 Options:
 
-   -l,--local [machine]    print local groups
-                           (from local machine if no machine specified)
-   -L,--Local machine      ditto, but generate groupname with machine prefix
-   -d,--domain [domain]    print domain groups
-                           (from current domain if no domain specified)
-   -c,--current            print current group
-   -S,--separator char     for -l use character char as domain\group
-                           separator in groupname instead of default '+'
-   -o,--id-offset offset   change the default offset (0x10000) added to
-                           gids of foreign machine accounts.
-   -g,--group groupname    only return information for the specified group
-                           one of -l, -d must be specified, too
-   -b,--no-builtin         don't print BUILTIN groups
-   -U,--unix grouplist     print UNIX groups when using -l on a UNIX Samba
-                           server.  grouplist is a comma-separated list of
+   -l,--local [machine]    Print local group accounts of \"machine\",
+                           from local machine if no machine specified.
+                           Automatically adding machine prefix for local
+                           machine depends on settings in /etc/nsswitch.conf.
+   -L,--Local machine      Ditto, but generate groupname with machine prefix.
+   -d,--domain [domain]    Print domain groups,
+                           from current domain if no domain specified.
+   -c,--current            Print current group.
+   -S,--separator char     For -L use character char as domain\\group
+                           separator in groupname instead of default '+'.
+   -o,--id-offset offset   Change the default offset (0x10000) added to gids
+   -g,--group groupname    Only return information for the specified group.
+                           One of -l, -d must be specified, too.
+   -b,--no-builtin         Don't print BUILTIN groups.
+   -U,--unix grouplist     Print UNIX groups when using -l on a UNIX Samba
+                           server.  Grouplist is a comma-separated list of
                            groupnames or gid ranges (root,-25,50-100).
-                           (enumerating large ranges can take a long time!)
-   -h,--help               print this message
-   -v,--version            print version information and exit
+                           Enumerating large ranges can take a long time!
+   -h,--help               Print this message.
+   -v,--version            Print version information and exit.
 
 Default is to print local groups on stand-alone machines, plus domain
 groups on domain controllers and domain member machines.
@@ -970,27 +971,29 @@ really need one.  See the Cygwin User's Guide for more information.
 
 Options:
 
-   -l,--local [machine]    print local user accounts
-                           (from local machine if no machine specified)
-   -L,--Local machine      ditto, but generate username with machine prefix
-   -d,--domain [domain]    print domain accounts
-                           (from current domain if no domain specified)
-   -c,--current            print current user
-   -S,--separator char     for -l use character char as domain\user
-                           separator in username instead of the default '+'
-   -o,--id-offset offset   change the default offset (0x10000) added to uids
-                           in domain or foreign server accounts.
-   -u,--username username  only return information for the specified user
-                           one of -l, -d must be specified, too
-   -b,--no-builtin         don't print BUILTIN users
-   -p,--path-to-home path  use specified path instead of user account home dir
-                           or /home prefix
-   -U,--unix userlist      print UNIX users when using -l on a UNIX Samba
-                           server.  userlist is a comma-separated list of
+   -l,--local [machine]    Print local user accounts of \"machine\",
+                           from local machine if no machine specified.
+                           Automatically adding machine prefix for local
+                           machine depends on settings in /etc/nsswitch.conf.
+   -L,--Local machine      Ditto, but generate username with machine prefix.
+   -d,--domain [domain]    Print domain accounts,
+                           from current domain if no domain specified.
+   -c,--current            Print current user.
+   -S,--separator char     For -L use character char as domain\\user
+                           separator in username instead of the default '+'.
+   -o,--id-offset offset   Change the default offset (0x10000) added to uids
+                           of foreign local machine accounts.  Use with -l/-L.
+   -u,--username username  Only return information for the specified user.
+                           One of -l, -d must be specified, too
+   -b,--no-builtin         Don't print BUILTIN users.
+   -p,--path-to-home path  Use specified path instead of user account home dir
+                           or /home prefix.
+   -U,--unix userlist      Print UNIX users when using -l on a UNIX Samba
+                           server.  Userlist is a comma-separated list of
                            usernames or uid ranges (root,-25,50-100).
-                           (enumerating large ranges can take a long time!)
-   -h,--help               displays this message
-   -V,--version            version information and exit
+                           Enumerating large ranges can take a long time!
+   -h,--help               Displays this message.
+   -V,--version            Version information and exit.
 
 Default is to print local accounts on stand-alone machines, domain accounts
 on domain controllers and domain member machines.

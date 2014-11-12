@@ -1,5 +1,10 @@
 2014-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* utils.xml (mkgroup): Align to changed usage.
+	(mkpasswd): Ditto.
+
+2014-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* utils.xml (mkpasswd): Change /etc/group to /etc/passwd.
 
 2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
