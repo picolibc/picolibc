@@ -586,8 +586,8 @@ cygheap_pwdgrp::init ()
      db_separator: +		DISABLED
      db_enum: cache builtin
   */
-  pwd_src = (NSS_FILES | NSS_DB);
-  grp_src = (NSS_FILES | NSS_DB);
+  pwd_src = (NSS_SRC_FILES | NSS_SRC_DB);
+  grp_src = (NSS_SRC_FILES | NSS_SRC_DB);
   prefix = NSS_AUTO;
   separator[0] = L'+';
   enums = (ENUM_CACHE | ENUM_BUILTIN);
@@ -628,12 +628,12 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 		  break;
 		if (!strncmp (c, "files", 5) && strchr (" \t", c[5]))
 		  {
-		    *src |= NSS_FILES;
+		    *src |= NSS_SRC_FILES;
 		    c += 5;
 		  }
 		else if (!strncmp (c, "db", 2) && strchr (" \t", c[2]))
 		  {
-		    *src |= NSS_DB;
+		    *src |= NSS_SRC_DB;
 		    c += 2;
 		  }
 		else
@@ -643,7 +643,7 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 		  }
 	      }
 	    if (*src == 0)
-	      *src = (NSS_FILES | NSS_DB);
+	      *src = (NSS_SRC_FILES | NSS_SRC_DB);
 	  }
       }
       break;

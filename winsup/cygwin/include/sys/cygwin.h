@@ -151,7 +151,9 @@ typedef enum
     CW_GETPWSID,
     CW_GETGRSID,
     CW_CYGNAME_FROM_WINNAME,
-    CW_FIXED_ATEXIT
+    CW_FIXED_ATEXIT,
+    CW_GETNSS_PWD_SRC,
+    CW_GETNSS_GRP_SRC
   } cygwin_getinfo_types;
 
 #define CW_LOCK_PINFO CW_LOCK_PINFO
@@ -210,12 +212,21 @@ typedef enum
 #define CW_GETGRSID CW_GETGRSID
 #define CW_CYGNAME_FROM_WINNAME CW_CYGNAME_FROM_WINNAME
 #define CW_FIXED_ATEXIT CW_FIXED_ATEXIT
+#define CW_GETNSS_PWD_SRC CW_GETNSS_PWD_SRC
+#define CW_GETNSS_GRP_SRC CW_GETNSS_GRP_SRC
 
 /* Token type for CW_SET_EXTERNAL_TOKEN */
 enum
 {
   CW_TOKEN_IMPERSONATION = 0,
   CW_TOKEN_RESTRICTED    = 1
+};
+
+/* Source type for CW_GETNSS_PWD_SRC and CW_GETNSS_GRP_SRC. */
+enum
+{
+  NSS_SRC_FILES = 1,
+  NSS_SRC_DB = 2
 };
 
 /* Enumeration source constants for CW_SETENT called from mkpasswd/mkgroup. */

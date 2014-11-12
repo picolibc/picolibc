@@ -601,6 +601,14 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	res = (uintptr_t) cygheap->pg.nss_separator ();
 	break;
 
+      case CW_GETNSS_PWD_SRC:
+	res = (uintptr_t) cygheap->pg.nss_pwd_src ();
+	break;
+
+      case CW_GETNSS_GRP_SRC:
+	res = (uintptr_t) cygheap->pg.nss_grp_src ();
+	break;
+
       case CW_GETPWSID:
 	{
 	  int db_only = va_arg (arg, int);

@@ -400,8 +400,6 @@ public:
 
 class cygheap_pwdgrp
 {
-  static const int NSS_FILES = 1;
-  static const int NSS_DB = 2;
   enum pfx_t {
     NSS_AUTO = 0,
     NSS_PRIMARY,
@@ -434,10 +432,12 @@ public:
   void init ();
 
   inline void nss_init () { if (!nss_inited) _nss_init (); }
-  inline bool nss_pwd_files () const { return !!(pwd_src & NSS_FILES); }
-  inline bool nss_pwd_db () const { return !!(pwd_src & NSS_DB); }
-  inline bool nss_grp_files () const { return !!(grp_src & NSS_FILES); }
-  inline bool nss_grp_db () const { return !!(grp_src & NSS_DB); }
+  inline bool nss_pwd_files () const { return !!(pwd_src & NSS_SRC_FILES); }
+  inline bool nss_pwd_db () const { return !!(pwd_src & NSS_SRC_DB); }
+  inline int  nss_pwd_src () const { return pwd_src; } /* CW_GETNSS_PWD_SRC */
+  inline bool nss_grp_files () const { return !!(grp_src & NSS_SRC_FILES); }
+  inline bool nss_grp_db () const { return !!(grp_src & NSS_SRC_DB); }
+  inline int  nss_grp_src () const { return grp_src; } /* CW_GETNSS_GRP_SRC */
   inline bool nss_prefix_auto () const { return prefix == NSS_AUTO; }
   inline bool nss_prefix_primary () const { return prefix == NSS_PRIMARY; }
   inline bool nss_prefix_always () const { return prefix == NSS_ALWAYS; }
