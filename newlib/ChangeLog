@@ -1,3 +1,9 @@
+2014-11-12  Jon Beniston  <jon@beniston.com>
+
+	* libc/stdlib/strtod.c (sulp): Cast to int32_t to avoid overflow.
+	* libc/time/gmtime_r.c (DAYS_PER_*_YEARS): Convert to long constants
+	to avoid overflow.
+
 2014-11-10  Richard Earnshaw  <rearnsha@arm.com>
 
 	* libc/machine/aarch64/strcpy.S: New file.

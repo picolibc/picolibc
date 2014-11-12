@@ -163,7 +163,7 @@ _DEFUN (sulp, (x, scale),
         rv = ulp(dval(x));
         if (!scale || (i = 2*P + 1 - ((dword0(x) & Exp_mask) >> Exp_shift)) <= 0)
                 return rv; /* Is there an example where i <= 0 ? */
-        dword0(u) = Exp_1 + (i << Exp_shift);
+        dword0(u) = Exp_1 + ((__int32_t)i << Exp_shift);
 #ifndef _DOUBLE_IS_32BITS
         dword1(u) = 0;
 #endif

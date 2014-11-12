@@ -14,10 +14,10 @@
 
 #include "local.h"
 
-/* there are 97 leap years in 400-year periods */
-#define DAYS_PER_400_YEARS	((400 - 97) * 365 + 97 * 366)
-/* there are 24 leap years in 100-year periods */
-#define DAYS_PER_100_YEARS	((100 - 24) * 365 + 24 * 366)
+/* there are 97 leap years in 400-year periods. ((400 - 97) * 365 + 97 * 366) */
+#define DAYS_PER_400_YEARS	146097L
+/* there are 24 leap years in 100-year periods. ((100 - 24) * 365 + 24 * 366) */
+#define DAYS_PER_100_YEARS	36524L
 /* there is one leap year every 4 years */
 #define DAYS_PER_4_YEARS	(3 * 365 + 366)
 
