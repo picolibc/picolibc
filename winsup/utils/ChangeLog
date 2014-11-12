@@ -1,3 +1,13 @@
+2014-11-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (enum_unix_groups): Always print groupname with machine
+	prefix.
+	(usage): Extend help output for -l option.
+	(main): Drop superfluous goto and label.  Make machine prefixing for
+	local machine when using -l option dependend on options in
+	/etc/nsswitch.conf.
+	* mkpasswd.c: Ditto.
+
 2014-11-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Handle Windows 10/Server 2014(?).

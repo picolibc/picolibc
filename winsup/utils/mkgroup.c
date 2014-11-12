@@ -47,6 +47,7 @@ typedef struct
 {
   char *str;
   BOOL domain;
+  BOOL with_dom;
 } domlist_t;
 
 static void
@@ -340,8 +341,8 @@ enum_local_groups (domlist_t *mach, const char *sep,
 
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 	  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
-		  !is_builtin ? domain_name : L"",
-		  !is_builtin ? sep : "",
+		  mach->with_dom && !is_builtin ? domain_name : L"",
+		  mach->with_dom && !is_builtin ? sep : "",
 		  buffer[i].lgrpi0_name,
 		  put_sid (psid),
 		  (unsigned int) (gid + (is_builtin ? 0 : id_offset)));
@@ -454,8 +455,8 @@ enum_groups (domlist_t *mach, const char *sep, DWORD id_offset,
 	    got_curr_pgrp = TRUE;
 
 	  printf ("%ls%s%ls:%s:%" PRIu32 ":\n",
-		  domain_name,
-		  sep,
+		  mach->with_dom ? domain_name : L"",
+		  mach->with_dom ? sep : "",
 		  buffer[i].grpi2_name,
 		  put_sid (psid),
 		  (unsigned int) (id_offset + gid));
@@ -480,8 +481,11 @@ usage (FILE * stream)
 "\n"
 "Options:\n"
 "\n"
-"   -l,--local [machine]    print local groups of \"machine\"\n"
-"                           (from local machine if no machine specified)\n"
+"   -l,--local [machine]    print local groups of \"machine\",\n"
+"                           from local machine if no machine specified.\n"
+"                           automatically adding machine prefix for local\n"
+"                           machine depends on settings in /etc/nsswitch.conf)\n"
+"   -L,--Local machine      ditto, but generate groupname with machine prefix\n"
 "   -d,--domain [domain]    print domain groups\n"
 "                           (from current domain if no domain specified)\n"
 "   -c,--current            print current group\n"
@@ -546,6 +550,7 @@ main (int argc, char **argv)
 {
   int print_domlist = 0;
   domlist_t domlist[32];
+  char cname[1024];
   char *opt, *p;
   int print_current = 0;
   int print_builtin = 1;
@@ -621,24 +626,39 @@ main (int argc, char **argv)
 	  {
 	    if (p == opt)
 	      {
-		fprintf (stderr, "%s: Malformed machine,offset string '%s'.  "
+		fprintf (stderr, "%s: Malformed machine string '%s'.  "
 			 "Skipping...\n", program_invocation_short_name, opt);
 		break;
 	      }
 	    *p = '\0';
 	  }
-	if ((c == 'l' || c == 'L') && opt)
+	if (c == 'l' || c == 'L')
 	  {
-	    char cname[1024];
 	    DWORD csize = sizeof cname;
 
-	    /* Check if machine name is local machine.  Keep it simple. */
-	    if (GetComputerNameExA (strchr (opt, '.')
-				    ? ComputerNameDnsFullyQualified
-				    : ComputerNameNetBIOS,
-				    cname, &csize)
-		&& strcasecmp (opt, cname) == 0)
-	      domlist[print_domlist].str = NULL;
+	    domlist[print_domlist].with_dom = (c == 'L');
+	    if (!opt)
+	      {
+		/* If the system uses /etc/group exclusively as account DB,
+		   create local group names the old fashioned way. */
+		if (cygwin_internal (CW_GETNSS_GRP_SRC) == NSS_SRC_FILES)
+		  {
+		    GetComputerNameExA (ComputerNameNetBIOS, cname, &csize);
+		    domlist[print_domlist].str = cname;
+		  }
+	      }
+	    else if (cygwin_internal (CW_GETNSS_GRP_SRC) != NSS_SRC_FILES)
+	      {
+		/* If the system uses Windows account DBs, check if machine
+		   name is local machine.  If so, remove the domain name to
+		   enforce system naming convention. */
+		if (GetComputerNameExA (strchr (opt, '.')
+					? ComputerNameDnsFullyQualified
+					: ComputerNameNetBIOS,
+					cname, &csize)
+		    && strcasecmp (opt, cname) == 0)
+		  domlist[print_domlist].str = NULL;
+	      }
 	  }
 	++print_domlist;
 	break;

@@ -48,6 +48,7 @@ typedef struct
 {
   char *str;
   BOOL domain;
+  BOOL with_dom;
 } domlist_t;
 
 static void
@@ -334,8 +335,8 @@ enum_users (domlist_t *mach, const char *sep, const char *passed_home_path,
 
 	  printf ("%ls%s%ls:unused:%" PRIu32 ":%" PRIu32
 		  ":%ls%sU-%ls\\%ls,%s:%s:/bin/bash\n",
-		  domain_name,
-		  sep,
+		  mach->with_dom ? domain_name : L"",
+		  mach->with_dom ? sep : "",
 		  buffer[i].usri3_name,
 		  (unsigned int) (id_offset + uid),
 		  (unsigned int) (id_offset + gid),
@@ -369,8 +370,11 @@ usage (FILE * stream)
 "\n"
 "Options:\n"
 "\n"
-"   -l,--local [machine]    print local user accounts of \"machine\"\n"
-"                           (from local machine if no machine specified)\n"
+"   -l,--local [machine]    print local user accounts of \"machine\",\n"
+"                           from local machine if no machine specified.\n"
+"                           automatically adding machine prefix for local\n"
+"                           machine depends on settings in /etc/nsswitch.conf)\n"
+"   -L,--Local machine      ditto, but generate username with machine prefix\n"
 "   -d,--domain [domain]    print domain accounts\n"
 "                           (from current domain if no domain specified)\n"
 "   -c,--current            print current user\n"
@@ -439,6 +443,7 @@ main (int argc, char **argv)
 {
   int print_domlist = 0;
   domlist_t domlist[32];
+  char cname[1024];
   char *opt, *p, *ep;
   int print_current = 0;
   int print_builtin = 1;
@@ -524,18 +529,33 @@ main (int argc, char **argv)
 	      }
 	    *p = '\0';
 	  }
-	if ((c == 'l' || c == 'L') && opt)
+	if (c == 'l' || c == 'L')
 	  {
-	    char cname[1024];
 	    DWORD csize = sizeof cname;
 
-	    /* Check if machine name is local machine.  Keep it simple. */
-	    if (GetComputerNameExA (strchr (opt, '.')
-				    ? ComputerNameDnsFullyQualified
-				    : ComputerNameNetBIOS,
-				    cname, &csize)
-		&& strcasecmp (opt, cname) == 0)
-	      domlist[print_domlist].str = NULL;
+	    domlist[print_domlist].with_dom = (c == 'L');
+	    if (!opt)
+	      {
+		/* If the system uses /etc/passwd exclusively as account DB,
+		   create local group names the old fashioned way. */
+		if (cygwin_internal (CW_GETNSS_PWD_SRC) == NSS_SRC_FILES)
+		  {
+		    GetComputerNameExA (ComputerNameNetBIOS, cname, &csize);
+		    domlist[print_domlist].str = cname;
+		  }
+	      }
+	    else if (cygwin_internal (CW_GETNSS_PWD_SRC) != NSS_SRC_FILES)
+	      {
+		/* If the system uses Windows account DBs, check if machine
+		   name is local machine.  If so, remove the domain name to
+		   enforce system naming convention. */
+		if (GetComputerNameExA (strchr (opt, '.')
+					? ComputerNameDnsFullyQualified
+					: ComputerNameNetBIOS,
+					cname, &csize)
+		    && strcasecmp (opt, cname) == 0)
+		  domlist[print_domlist].str = NULL;
+	      }
 	  }
 	++print_domlist;
 	break;
