@@ -1,6 +1,6 @@
 dnl Autoconf configure script for Cygwin.
 dnl Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2009, 2010,
-dnl 2011, 2012 Red Hat, Inc.
+dnl 2011, 2012, 2013, 2014 Red Hat, Inc.
 dnl
 dnl This file is part of Cygwin.
 dnl
@@ -11,7 +11,9 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)dnl
-AC_INIT(Makefile.in)
+AC_INIT([Cygwin toplevel], 0,
+	cygwin@cygwin.com, cygwin, https://cygwin.com)
+AC_CONFIG_SRCDIR(Makefile.in)
 AC_CONFIG_AUX_DIR(..)
 
 . ${srcdir}/configure.cygwin

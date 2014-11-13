@@ -1,3 +1,8 @@
+2014-11-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.ac: Convert to new AC_INIT style.
+	* configure: Regenerate.
+
 2014-08-07  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* Makefile.common (COMPILE.cc): Add -fno-use-cxa-atexit.
