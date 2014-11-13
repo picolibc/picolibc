@@ -45,12 +45,7 @@ uname (struct utsname *name)
 		       cygwin_version.dll_major / 1000,
 		       cygwin_version.dll_major % 1000,
 		       cygwin_version.dll_minor,
-#if 0
 		       snp ? "s" : "",
-#else
-		       /* Add a hint to allow to recognize updates */
-		       "-2",
-#endif
 		       cygwin_version.api_major,
 		       cygwin_version.api_minor,
 		       cygwin_version.shared_data,
