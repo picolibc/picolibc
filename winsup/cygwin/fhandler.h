@@ -1204,7 +1204,8 @@ class fhandler_termios: public fhandler_base
     need_fork_fixup (true);
   }
   HANDLE& get_output_handle () { return output_handle; }
-  line_edit_status line_edit (const char *rptr, int nread, termios&);
+  line_edit_status line_edit (const char *rptr, size_t nread, termios&,
+			      ssize_t *bytes_read = NULL);
   void set_output_handle (HANDLE h) { output_handle = h; }
   void tcinit (bool force);
   bool is_tty () const { return true; }

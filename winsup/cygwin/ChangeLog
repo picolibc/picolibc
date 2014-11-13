@@ -1,5 +1,20 @@
 2014-11-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_termios::line_edit): Add parameter to return
+	written bytes.
+	* fhandler_termios.cc (fhandler_termios::tcinit): Fix formatting.
+	(fhandler_termios::line_edit): Return bytes actually written.  Write
+	in 32 byte chunks in non-canonical mode to reduce number of WriteFile
+	calls.  Don't just eat unwritten bytes in case of an error condition.
+	Especially, don't report them back to the caller as written.
+	* fhandler_tty.cc (fhandler_pty_slave::read): Disable code reducing
+	the number of bytes read from the pipe to vmin.  Add comment.
+	(fhandler_pty_master::write): Convert ret to ssize_t type.  Just call
+	line_edit once, not in a loop once for each byte.  Return bytes written
+	as returned by line_edit.
+
+2014-11-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 34.
 
 2014-11-12  Corinna Vinschen  <corinna@vinschen.de>

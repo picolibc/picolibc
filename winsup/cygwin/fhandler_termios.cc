@@ -1,7 +1,7 @@
 /* fhandler_termios.cc
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010,
-   2011, 2012 Red Hat, Inc.
+   2011, 2012, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -39,14 +39,14 @@ fhandler_termios::tcinit (bool is_pty_master)
       tc ()->ti.c_lflag = ISIG | ICANON | ECHO | IEXTEN;
 
       tc ()->ti.c_cc[VDISCARD]	= CFLUSH;
-      tc ()->ti.c_cc[VEOL]		= CEOL;
+      tc ()->ti.c_cc[VEOL]	= CEOL;
       tc ()->ti.c_cc[VEOL2]	= CEOL2;
-      tc ()->ti.c_cc[VEOF]		= CEOF;
+      tc ()->ti.c_cc[VEOF]	= CEOF;
       tc ()->ti.c_cc[VERASE]	= CERASE;
       tc ()->ti.c_cc[VINTR]	= CINTR;
       tc ()->ti.c_cc[VKILL]	= CKILL;
       tc ()->ti.c_cc[VLNEXT]	= CLNEXT;
-      tc ()->ti.c_cc[VMIN]		= 1;
+      tc ()->ti.c_cc[VMIN]	= 1;
       tc ()->ti.c_cc[VQUIT]	= CQUIT;
       tc ()->ti.c_cc[VREPRINT]	= CRPRNT;
       tc ()->ti.c_cc[VSTART]	= CSTART;
@@ -234,7 +234,8 @@ fhandler_termios::echo_erase (int force)
 }
 
 line_edit_status
-fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
+fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
+			     ssize_t *bytes_read)
 {
   line_edit_status ret = line_edit_ok;
   char c;
@@ -242,11 +243,13 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
   bool sawsig = false;
   int iscanon = ti.c_lflag & ICANON;
 
+  if (*bytes_read)
+    *bytes_read = nread;
   while (nread-- > 0)
     {
       c = *rptr++;
 
-      paranoid_printf ("char %0c", c);
+      paranoid_printf ("char %0o", c);
 
       if (ti.c_iflag & ISTRIP)
 	c &= 0x7f;
@@ -370,13 +373,15 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
       put_readahead (c);
       if (ti.c_lflag & ECHO)
 	doecho (&c, 1);
-      if (!iscanon || input_done)
+      /* Write in chunks of 32 bytes to reduce the number of WriteFile calls
+      	in non-canonical mode. */
+      if ((!iscanon && ralen >= 32) || input_done)
 	{
 	  int status = accept_input ();
 	  if (status != 1)
 	    {
 	      ret = status ? line_edit_error : line_edit_pipe_full;
-	      eat_readahead (1);
+	      nread += ralen;
 	      break;
 	    }
 	  ret = line_edit_input_done;
@@ -384,8 +389,21 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
 	}
     }
 
+  /* If we didn't write all bytes in non-canonical mode, write them now. */
   if (!iscanon && ralen > 0)
-    ret = line_edit_input_done;
+    {
+      if (ret == line_edit_ok)
+      	{
+	  int status = accept_input ();
+	  if (status != 1)
+	    nread += ralen;
+	}
+      ret = line_edit_input_done;
+    }
+
+  /* Adding one compensates for the postdecrement in the above loop. */
+  if (*bytes_read)
+    *bytes_read -= (nread + 1);
 
   if (sawsig)
     ret = line_edit_signalled;

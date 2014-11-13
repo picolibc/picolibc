@@ -829,8 +829,13 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 
       readlen = MIN (bytes_in_pipe, MIN (len, sizeof (buf)));
 
+#if 0
+      /* Why on earth is the read length reduced to vmin, even if more bytes
+	 are available *and* len is bigger *and* the local buf is big enough?
+	 Disable this code for now, it looks like a remnant of old. */
       if (ptr && vmin && readlen > (unsigned) vmin)
 	readlen = vmin;
+#endif
 
       DWORD n = 0;
       if (readlen)
@@ -1330,7 +1335,7 @@ fhandler_pty_master::close ()
 ssize_t __stdcall
 fhandler_pty_master::write (const void *ptr, size_t len)
 {
-  int i;
+  ssize_t ret;
   char *p = (char *) ptr;
   termios ti = tc ()->ti;
 
@@ -1339,18 +1344,10 @@ fhandler_pty_master::write (const void *ptr, size_t len)
     return (ssize_t) bg;
 
   push_process_state process_state (PID_TTYOU);
-
-  for (i = 0; i < (int) len; i++)
-    {
-      line_edit_status status = line_edit (p++, 1, ti);
-      if (status > line_edit_signalled)
-	{
-	  if (status != line_edit_pipe_full)
-	    i = -1;
-	  break;
-	}
-    }
-  return i;
+  line_edit_status status = line_edit (p++, len, ti, &ret);
+  if (status > line_edit_signalled && status != line_edit_pipe_full)
+    ret = -1;
+  return ret;
 }
 
 void __reg3
