@@ -82,6 +82,7 @@ CIO_OBJS = ciosyscalls.o \
 # crt0.s with -DL0 via the default rule below.
 CRT_OBJS = \
 	crt_bss.o \
+	crt_high_bss.o \
 	crt_movedata.o \
 	crt_main.o \
 	crt_main_minrt.o \

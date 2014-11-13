@@ -1,6 +1,15 @@
+2014-11-13  Nick Clifton  <nickc@redhat.com>
+
+	* msp430/Makefile.in (CRT_OBJS): Add crt_high_bss.o.
+	* msp430/crt0.S (high_bss): Add.
+	* msp430/msp430-sim.ld: Add error message if .upper sections are
+	detected.
+	* msp430/msp430xl-sim.ld (MEMORY): Adjust to better mimic real
+	life MCUs.  Add support for upper and lower sections.
+
 2014-10-22  Tim Harder  <radhermit@gmail.com>
 
-	* msp430/Makefile.in: respect DESTDIR during install
+	* msp430/Makefile.in: Respect DESTDIR during install.
 
 2014-09-22  Peter A. Bigot  <pab@pabigot.com>
 

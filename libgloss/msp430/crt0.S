@@ -54,6 +54,24 @@ __crt0_init_bss:
 	call_	#memset
 #endif
 
+#ifdef __MSP430X_LARGE__
+#if Lhigh_bss
+;;  Note - this section is only included in the
+;;  startup code of the application if it is needed.
+
+	.section ".crt_0150high_bss", "ax", @progbits
+	
+	.global __crt0_init_high_bss
+__crt0_init_high_bss:
+	
+	mov_	#llo(__high_bssstart), R12
+	mov_	#lhi(__high_bssstart), R13
+	mov.w	#llo(__high_bsssize), R14
+	mov.w	#lhi(__high_bsssize), R15	
+	call_	#memset
+#endif /* Lhigh_bss */
+#endif /* __MSP430X_LARGE__ */
+
 #if Lmovedata
 	.section ".crt_0200movedata", "ax", @progbits
 

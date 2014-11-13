@@ -1,4 +1,4 @@
-/*  Copyright (c) 2013 Red Hat, Inc. All rights reserved.
+/*  Copyright (c) 2013-2014 Red Hat, Inc. All rights reserved.
 
    This copyrighted material is made available to anyone wishing to use, modify,
    copy, or redistribute it subject to the terms and conditions of the BSD
@@ -8,24 +8,20 @@
    is available at http://www.opensource.org/licenses. Any Red Hat trademarks that
    are incorporated in the source code or documentation are not subject to the BSD
    License and may only be used or replicated with the express permission of
-   Red Hat, Inc.
+   Red Hat, Inc.  */
 
-*/
+/* Default linker script, for large MSP430X executables.  */
 
-/* Default linker script, for normal executables */
 OUTPUT_ARCH(msp430)
 ENTRY(_start)
 
-/* Do we need any of these for elf?
-   __DYNAMIC = 0;    */
-
 INCLUDE intr_vectors.ld
 
-MEMORY {
-	RAM (rx)     : ORIGIN = 0x00200, LENGTH = 0x0ee00
-	LOWROM (w)    : ORIGIN = 0x0f000, LENGTH = 0x00800
-	ROM (w)      : ORIGIN = 0x10000, LENGTH = 0x80000
-	RESETVEC (w) : ORIGIN = 0x0fffe, LENGTH = 0x00002
+MEMORY
+{
+  RAM (w)      : ORIGIN = 0x00200, LENGTH = 0x01e00
+  ROM (rx)     : ORIGIN = 0x02000, LENGTH = 0x0df00
+  HIFRAM (rxw) : ORIGIN = 0x10000, LENGTH = 0x80000
 }
 
 SECTIONS
@@ -33,13 +29,22 @@ SECTIONS
   .resetvec :
   {
     *(.resetvec)
-  } > RESETVEC
+  } > VECT31
 
-  .rodata : {
+  .upper.rodata :
+  {
+    . = ALIGN(2);
+    *(.upper.rodata.* .upper.rodata)
+  } > HIFRAM
+
+  .rodata :
+  {
     . = ALIGN(2);
     *(.plt)
+    *(.lower.rodata.* .lower.rodata)
     *(.rodata .rodata.* .gnu.linkonce.r.* .const .const:*)
     *(.rodata1)
+
     *(.eh_frame_hdr)
     KEEP (*(.eh_frame))
     KEEP (*(.gcc_except_table)) *(.gcc_except_table.*)
@@ -78,10 +83,19 @@ SECTIONS
     KEEP (*(.dtors))
   } > ROM
 
-  .data : {
+  .upper.data :
+  {
+    . = ALIGN(2);
+    *(.upper.data.* .upper.data)
+  } > HIFRAM
+
+  .data :
+  {
     . = ALIGN(2);
     PROVIDE (__datastart = .);
+    *(.lower.data.* .lower.data)
 
+    . = ALIGN(2);
     KEEP (*(.jcr))
     *(.data.rel.ro.local) *(.data.rel.ro*)
     *(.dynamic)
@@ -99,19 +113,30 @@ SECTIONS
     *(.sdata .sdata.* .gnu.linkonce.s.* D_2 D_1)
 
     . = ALIGN(2);
+
     _edata = .;
     PROVIDE (edata = .);
     PROVIDE (__dataend = .);
-  } > RAM AT>ROM
+  } > RAM
 
   /* Note that crt0 assumes this is a multiple of two; all the
      start/stop symbols are also assumed word-aligned.  */
   PROVIDE(__romdatastart = LOADADDR(.data));
   PROVIDE (__romdatacopysize = SIZEOF(.data));
 
-  .bss : {
+  .upper.bss :
+  {
+    . = ALIGN(2);
+    PROVIDE (__high_bssstart = .);
+    *(.upper.bss.* .upper.bss)
+    PROVIDE (__high_bssend = .);
+  } > HIFRAM
+
+  .bss :
+  {
     . = ALIGN(2);
     PROVIDE (__bssstart = .);
+    *(.lower.bss.* .lower.bss)
     *(.dynbss)
     *(.sbss .sbss.*)
     *(.bss .bss.* .gnu.linkonce.b.*)
@@ -121,7 +146,8 @@ SECTIONS
   PROVIDE (__bsssize = SIZEOF(.bss));
 
   /* This section contains data that is not initialised at startup.  */
-  .noinit : {
+  .noinit (NOLOAD) :
+  {
     . = ALIGN(2);
     PROVIDE (__noinit_start = .);
     *(.noinit)
@@ -133,25 +159,34 @@ SECTIONS
   _end = .;
   PROVIDE (end = .);
 
-  .stack (ORIGIN (RAM) + LENGTH(RAM)) :
+  .stack (ORIGIN (HIFRAM) + LENGTH(HIFRAM)) :
   {
     PROVIDE (__stack = .);
     *(.stack)
   }
 
-  /* This is just for crt0.S */
-  .lowtext           :
+  /* This is just for crt0.S and interrupt handlers.  */
+  .lowtext :
   {
     PROVIDE (_start = .);
     . = ALIGN(2);
     KEEP (*(SORT(.crt_*)))
     KEEP (*(.lowtext))
-  } > LOWROM
+  } > ROM
 
-  .text           :
+  .upper.text :
   {
     . = ALIGN(2);
+    *(.upper.text.* .upper.text)
+  } > HIFRAM
+
+  .text :
+  {
+    . = ALIGN(2);
+    *(.lower.text.* .lower.text)
+    . = ALIGN(2);
     *(.text .stub .text.* .gnu.linkonce.t.* .text:*)
+
     KEEP (*(.text.*personality*))
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
@@ -185,16 +220,16 @@ SECTIONS
   /* DWARF debug sections.
      Symbols in the DWARF debugging sections are relative to the beginning
      of the section so we begin them at 0.  */
-  /* DWARF 1 */
+  /* DWARF 1.  */
   .debug          0 : { *(.debug) }
   .line           0 : { *(.line) }
-  /* GNU DWARF 1 extensions */
+  /* GNU DWARF 1 extensions.  */
   .debug_srcinfo  0 : { *(.debug_srcinfo) }
   .debug_sfnames  0 : { *(.debug_sfnames) }
-  /* DWARF 1.1 and DWARF 2 */
+  /* DWARF 1.1 and DWARF 2.  */
   .debug_aranges  0 : { *(.debug_aranges) }
   .debug_pubnames 0 : { *(.debug_pubnames) }
-  /* DWARF 2 */
+  /* DWARF 2.  */
   .debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
   .debug_abbrev   0 : { *(.debug_abbrev) }
   .debug_line     0 : { *(.debug_line .debug_line.* .debug_line_end ) }
@@ -202,7 +237,7 @@ SECTIONS
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }
   .debug_macinfo  0 : { *(.debug_macinfo) }
-  /* SGI/MIPS DWARF 2 extensions */
+  /* SGI/MIPS DWARF 2 extensions.  */
   .debug_weaknames 0 : { *(.debug_weaknames) }
   .debug_funcnames 0 : { *(.debug_funcnames) }
   .debug_typenames 0 : { *(.debug_typenames) }
