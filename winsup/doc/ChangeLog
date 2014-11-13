@@ -1,3 +1,8 @@
+2014-11-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.34): Add new section.
+	(ov-new1.7.33): Reflect intermediate 1.7.33 release.
+
 2014-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* utils.xml (mkgroup): Align to changed usage.

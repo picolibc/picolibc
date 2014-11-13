@@ -1,18 +1,6 @@
 What's new:
 -----------
 
-- Cygwin can now generate passwd/group entries directly from Windows
-  user databases (local SAM or Active Directory), thus allowing to run
-  Cygwin without having to create /etc/passwd and /etc/group files.
-  Introduce /etc/nsswitch.conf file to configure passwd/group handling.
-
-  For bordercase which require to use /etc/passwd and /etc/group files,
-  change mkpasswd/mkgroup to generate passwd/group entries compatible
-  with the entries read from SAM/AD.
-
-- Add -b/--remove-all option to setfacl to reduce the ACL to only the
-  entries representing POSIX permission bits.
-
 - /proc/cygdrive is a new symlink pointing to the current cygdrive prefix.
   This can be utilized in scripts to access paths via cygdrive prefix, even
   if the cygdrive prefix has been changed by the user.
@@ -29,18 +17,11 @@ What's new:
 
 - New API: stime (SVr4).
 
-- Provide Cygwin documentation (PDFs and HTML) for offline usage in
-  /usr/share/doc/cygwin-${version}.
-
 
 What changed:
 -------------
 
 - New internal exception handling based on SEH on 64 bit Cygwin.
-
-- Revamp Solaris ACL implementation to more closely work like POSIX ACLs
-  are supposed to work.  Finally implement a CLASS_OBJ emulation.  Update
-  getfacl(1)/setfacl(1) accordingly.
 
 - When exec'ing applications, check if $PATH exists and is non-empty.  If not,
   add PATH variable with Cygwin installation directory as content to Windows
@@ -51,9 +32,6 @@ What changed:
 - Improve various header files for C++- and standards-compliance.
 
 - Doug Lea malloc implementation update from 2.8.3 to the latest 2.8.6.
-
-- The xdr functions are no longer exported for newly built executables.
-  Use libtirpc-devel instead.
 
 - atexit is now exported as statically linked function from libcygwin.a.
   This allows reliable access to the DSO handle of the caller for newly

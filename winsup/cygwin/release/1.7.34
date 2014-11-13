@@ -1,0 +1,32 @@
+What's new:
+-----------
+
+- Cygwin can now generate passwd/group entries directly from Windows
+  user databases (local SAM or Active Directory), thus allowing to run
+  Cygwin without having to create /etc/passwd and /etc/group files.
+  Introduce /etc/nsswitch.conf file to configure passwd/group handling.
+
+  For bordercase which require to use /etc/passwd and /etc/group files,
+  change mkpasswd/mkgroup to generate passwd/group entries compatible
+  with the entries read from SAM/AD.
+
+- Add -b/--remove-all option to setfacl to reduce the ACL to only the
+  entries representing POSIX permission bits.
+
+- Provide Cygwin documentation (PDFs and HTML) for offline usage in
+  /usr/share/doc/cygwin-${version}.
+
+
+What changed:
+-------------
+
+- Revamp Solaris ACL implementation to more closely work like POSIX ACLs
+  are supposed to work.  Finally implement a CLASS_OBJ emulation.  Update
+  getfacl(1)/setfacl(1) accordingly.
+
+- The xdr functions are no longer exported for newly built executables.
+  Use libtirpc-devel instead.
+
+
+Bug Fixes
+---------

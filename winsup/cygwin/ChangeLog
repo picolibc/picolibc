@@ -1,3 +1,7 @@
+2014-11-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 34.
+
 2014-11-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (cygheap_pwdgrp): Remove constants NSS_FILES and NSS_DB.

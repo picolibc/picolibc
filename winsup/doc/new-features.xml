@@ -4,7 +4,7 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin</title>
 
-<sect2 id="ov-new1.7.33"><title>What's new and what changed in 1.7.33</title>
+<sect2 id="ov-new1.7.34"><title>What's new and what changed in 1.7.34</title>
 
 <itemizedlist mark="bullet">
 
@@ -29,6 +29,20 @@ the entries read from SAM/AD.
 Add -b/--remove-all option to setfacl to reduce the ACL to only the entries
 representing POSIX permission bits.
 </para></listitem>
+
+<listitem><para>
+Revamp Solaris ACL implementation to more closely work like POSIX ACLs
+are supposed to work.  Finally implement a CLASS_OBJ emulation.  Update
+getfacl(1)/setfacl(1) accordingly.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
+<sect2 id="ov-new1.7.33"><title>What's new and what changed in 1.7.33</title>
+
+<itemizedlist mark="bullet">
 
 <listitem><para>
 /proc/cygdrive is a new symlink pointing to the current cygdrive prefix.
@@ -66,12 +80,6 @@ New internal exception handling based on SEH on 64 bit Cygwin.
 </para></listitem>
 
 <listitem><para>
-Revamp Solaris ACL implementation to more closely work like POSIX ACLs
-are supposed to work.  Finally implement a CLASS_OBJ emulation.  Update
-getfacl(1)/setfacl(1) accordingly.
-</para></listitem>
-
-<listitem><para>
 When exec'ing applications, check if $PATH exists and is non-empty.  If
 not, add PATH variable with Cygwin installation directory as content to
 Windows environment to allow loading of Cygwin system DLLs.
@@ -87,11 +95,6 @@ Improve various header files for C++- and standards-compliance.
 
 <listitem><para>
 Doug Lea malloc implementation update from 2.8.3 to the latest 2.8.6.
-</para></listitem>
-
-<listitem><para>
-The xdr functions are no longer exported for newly built executables.
-Use libtirpc-devel instead.
 </para></listitem>
 
 <listitem><para>
