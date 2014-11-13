@@ -22,6 +22,7 @@ details. */
 #include "shared_info_magic.h"
 #include "registry.h"
 #include "cygwin_version.h"
+#include "pwdgrp.h"
 #include "spinlock.h"
 #include <alloca.h>
 #include <wchar.h>
@@ -343,8 +344,16 @@ shared_info::initialize ()
 }
 
 void
-memory_init ()
+memory_init (bool init_cygheap)
 {
+  /* Initialize the Cygwin heap, if necessary */
+  if (init_cygheap)
+    {
+      cygheap_init ();
+      cygheap->user.init ();
+      cygheap->init_installation_root (); /* Requires user.init! */
+    }
+
   shared_info::create ();	/* Initialize global shared memory */
   user_info::create (false);	/* Initialize per-user shared memory */
   /* Initialize tty list session stuff.  Doesn't really belong here but

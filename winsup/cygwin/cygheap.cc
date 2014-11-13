@@ -130,7 +130,7 @@ init_cygheap::close_ctty ()
    cygcheck can print the paths into which the Cygwin DLL has been
    installed for debugging purposes.
 
-   Last but not least, the new cygwin properties datastructure is checked
+   Last but not least, the new cygwin properties datastrcuture is checked
    for the "disabled_key" value, which is used to determine whether the
    installation key is actually added to all object names or not.  This is
    used as a last resort for debugging purposes, usually.  However, there
@@ -265,17 +265,6 @@ cygheap_init ()
   if (!cygheap->sigs)
     sigalloc ();
   cygheap->init_tls_list ();
-}
-
-/* Initial Cygwin heap setup.
-   Called by root process of a Cygwin process tree. */
-void
-setup_cygheap ()
-{
-  cygheap_init ();
-  cygheap->user.init ();
-  cygheap->init_installation_root (); /* Requires user.init! */
-  cygheap->pg.init ();
 }
 
 #define nextpage(x) ((char *) roundup2 ((uintptr_t) (x), \

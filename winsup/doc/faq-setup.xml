@@ -377,9 +377,8 @@ you are much better off if you can avoid the problem entirely.
 run mkpasswd.
 </para>
 </listitem>
-<listitem><para>If you already have an /etc/passwd file, you can simply edit
-your Cygwin user name (first field). It's also a good idea to avoid spaces in
-the home directory.
+<listitem><para>You can simply edit the /etc/passwd file and change the Cygwin user name 
+(first field). It's also a good idea to avoid spaces in the home directory.
 </para>
 </listitem>
 </orderedlist>
@@ -397,7 +396,7 @@ in order of decreasing priority:
 <listitem><para><literal>HOME</literal> from the Windows environment, translated to POSIX form.
 </para>
 </listitem>
-<listitem><para>The pw_home field from the passwd entry as returned by <command>getent passwd</command>.
+<listitem><para>The entry in /etc/passwd
 </para>
 </listitem>
 <listitem><para>/home/USERNAME
@@ -405,7 +404,8 @@ in order of decreasing priority:
 </listitem>
 </orderedlist>
 
-<para>When using Cygwin from the network (telnet, ssh,...), <literal>HOME</literal> is taken from the passwd entry.
+<para>When using Cygwin from the network (telnet, ssh,...), <literal>HOME</literal> is set 
+from /etc/passwd.
 </para>
 <para>If your <literal>HOME</literal> is set to a value such as /cygdrive/c, it is likely 
 that it was set in Windows. Start a DOS Command Window and type 
@@ -413,9 +413,8 @@ that it was set in Windows. Start a DOS Command Window and type
 </para>
 <para>Access to shared drives is often restricted when starting from the network,
 thus Domain users may wish to have a different <literal>HOME</literal> in the 
-Windows environment (on shared drive) than in Cygwin (on local drive).
-Note that ssh only considers the account information as retrieved by
-getpwnam(3), disregarding <literal>HOME</literal>. 
+Windows environment (on shared drive) than in /etc/passwd (on local drive).
+Note that ssh only considers /etc/passwd, disregarding <literal>HOME</literal>. 
 </para>
 </answer></qandaentry>
 

@@ -396,8 +396,7 @@ fhandler_socket::af_local_send_cred ()
 int
 fhandler_socket::af_local_connect ()
 {
-  bool orig_async_io, orig_is_nonblocking;
-
+  /* This keeps the test out of select. */
   if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
     return 0;
 
@@ -405,6 +404,7 @@ fhandler_socket::af_local_connect ()
   if (no_getpeereid ())
     return 0;
 
+  bool orig_async_io, orig_is_nonblocking;
   af_local_setblocking (orig_async_io, orig_is_nonblocking);
   if (!af_local_send_secret () || !af_local_recv_secret ()
       || !af_local_send_cred () || !af_local_recv_cred ())
@@ -421,12 +421,11 @@ fhandler_socket::af_local_connect ()
 int
 fhandler_socket::af_local_accept ()
 {
-  bool orig_async_io, orig_is_nonblocking;
-
   debug_printf ("af_local_accept called, no_getpeereid=%d", no_getpeereid ());
   if (no_getpeereid ())
     return 0;
 
+  bool orig_async_io, orig_is_nonblocking;
   af_local_setblocking (orig_async_io, orig_is_nonblocking);
   if (!af_local_recv_secret () || !af_local_send_secret ()
       || !af_local_recv_cred () || !af_local_send_cred ())
@@ -644,35 +643,7 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	  wsock_events->events |= evts.lNetworkEvents;
 	  events_now = (wsock_events->events & event_mask);
 	  if (evts.lNetworkEvents & FD_CONNECT)
-	    {
-	      wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
-
-	      /* Setting the connect_state and calling the AF_LOCAL handshake 
-		 here allows to handle this stuff from a single point.  This
-		 is independent of FD_CONNECT being requested.  Consider a
-		 server calling connect(2) and then immediately poll(2) with
-		 only polling for POLLIN (example: postfix), or select(2) just
-		 asking for descriptors ready to read.
-
-		 Something weird occurs in Winsock: If you fork off and call
-		 recv/send on the duplicated, already connected socket, another
-		 FD_CONNECT event is generated in the child process.  This
-		 would trigger a call to af_local_connect which obviously fail. 
-		 Avoid this by calling set_connect_state only if connect_state
-		 is connect_pending. */
-	      if (connect_state () == connect_pending)
-		{
-		  if (wsock_events->connect_errorcode)
-		    connect_state (connect_failed);
-		  else if (af_local_connect ())
-		    {
-		      wsock_events->connect_errorcode = WSAGetLastError ();
-		      connect_state (connect_failed);
-		    }
-		  else
-		    connect_state (connected);
-		}
-	    }
+	    wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
 	  UNLOCK_EVENTS;
 	  if ((evts.lNetworkEvents & FD_OOB) && wsock_events->owner)
 	    kill (wsock_events->owner, SIGURG);
@@ -685,15 +656,15 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
     {
       if (events & FD_CONNECT)
 	{
-	  int wsa_err = wsock_events->connect_errorcode;
-	  if (wsa_err)
+	  int wsa_err = 0;
+	  if ((wsa_err = wsock_events->connect_errorcode) != 0)
 	    {
 	      /* CV 2014-04-23: This is really weird.  If you call connect
 		 asynchronously on a socket and then select, an error like
 		 "Connection refused" is set in the event and in the SO_ERROR
 		 socket option.  If you call connect, then dup, then select,
 		 the error is set in the event, but not in the SO_ERROR socket
-		 option, despite the dup'ed socket handle referring to the same
+		 option, even if the dup'ed socket handle refers to the same
 		 socket.  We're trying to workaround this problem here by
 		 taking the connect errorcode from the event and write it back
 		 into the SO_ERROR socket option.
@@ -1135,45 +1106,21 @@ out:
 int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
+  bool in_progress = false;
   struct sockaddr_storage sst;
+  DWORD err;
   int type;
 
   if (get_inet_addr (name, namelen, &sst, &namelen, &type, connect_secret)
       == SOCKET_ERROR)
     return SOCKET_ERROR;
 
-  if (get_addr_family () == AF_LOCAL)
+  if (get_addr_family () == AF_LOCAL && get_socket_type () != type)
     {
-      if (get_socket_type () != type)
-	{
-	  WSASetLastError (WSAEPROTOTYPE);
-	  set_winsock_errno ();
-	  return SOCKET_ERROR;
-	}
-
-      set_peer_sun_path (name->sa_data);
-
-      /* Don't move af_local_set_cred into af_local_connect which may be called
-	 via select, possibly running under another identity.  Call early here,
-	 because af_local_connect is called in wait_for_events. */
-      if (get_socket_type () == SOCK_STREAM)
-	af_local_set_cred ();
+      WSASetLastError (WSAEPROTOTYPE);
+      set_winsock_errno ();
+      return SOCKET_ERROR;
     }
-  
-  /* Initialize connect state to "connect_pending".  State is ultimately set
-     to "connected" or "connect_failed" in wait_for_events when the FD_CONNECT
-     event occurs.  Note that the underlying OS sockets are always non-blocking
-     and a successfully initiated non-blocking Winsock connect always returns
-     WSAEWOULDBLOCK.  Thus it's safe to rely on event handling.
-
-     Check for either unconnected or connect_failed since in both cases it's
-     allowed to retry connecting the socket.  It's also ok (albeit ugly) to
-     call connect to check if a previous non-blocking connect finished.
-
-     Set connect_state before calling connect, otherwise a race condition with
-     an already running select or poll might occur. */
-  if (connect_state () == unconnected || connect_state () == connect_failed)
-    connect_state (connect_pending);
 
   int res = ::connect (get_socket (), (struct sockaddr *) &sst, namelen);
   if (!is_nonblocking ()
@@ -1181,30 +1128,47 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
       && WSAGetLastError () == WSAEWOULDBLOCK)
     res = wait_for_events (FD_CONNECT | FD_CLOSE, 0);
 
-  if (res)
+  if (!res)
+    err = 0;
+  else
     {
-      DWORD err = WSAGetLastError ();
-      
-      /* Some applications use the ugly technique to check if a non-blocking
-         connect succeeded by calling connect again, until it returns EISCONN.
-	 This circumvents the event handling and connect_state is never set.
-	 Thus we check for this situation here. */
-      if (err == WSAEISCONN)
-	connect_state (connected);
-      /* Winsock returns WSAEWOULDBLOCK if the non-blocking socket cannot be
-         conected immediately.  Convert to POSIX/Linux compliant EINPROGRESS. */
-      else if (is_nonblocking () && err == WSAEWOULDBLOCK)
-	WSASetLastError (WSAEINPROGRESS);
-      /* Winsock returns WSAEINVAL if the socket is already a listener.
-      	 Convert to POSIX/Linux compliant EISCONN. */
-      else if (err == WSAEINVAL && connect_state () == listener)
-	WSASetLastError (WSAEISCONN);
-      /* Any other error except WSAEALREADY during connect_pending means the
-         connect failed. */
-      else if (connect_state () == connect_pending && err != WSAEALREADY)
-      	connect_state (connect_failed);
+      err = WSAGetLastError ();
+      /* Special handling for connect to return the correct error code
+	 when called on a non-blocking socket. */
+      if (is_nonblocking ())
+	{
+	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
+	    in_progress = true;
+
+	  if (err == WSAEWOULDBLOCK)
+	    WSASetLastError (err = WSAEINPROGRESS);
+	}
+      if (err == WSAEINVAL)
+	WSASetLastError (err = WSAEISCONN);
       set_winsock_errno ();
     }
+
+  if (get_addr_family () == AF_LOCAL && (!res || in_progress))
+    set_peer_sun_path (name->sa_data);
+
+  if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
+    {
+      af_local_set_cred (); /* Don't move into af_local_connect since
+			       af_local_connect is called from select,
+			       possibly running under another identity. */
+      if (!res && af_local_connect ())
+	{
+	  set_winsock_errno ();
+	  return SOCKET_ERROR;
+	}
+    }
+
+  if (err == WSAEINPROGRESS || err == WSAEALREADY)
+    connect_state (connect_pending);
+  else if (err)
+    connect_state (connect_failed);
+  else
+    connect_state (connected);
 
   return res;
 }
@@ -1462,13 +1426,6 @@ fhandler_socket::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
   ULONG &wsacnt = wsamsg->dwBufferCount;
   static NO_COPY LPFN_WSARECVMSG WSARecvMsg;
   int orig_namelen = wsamsg->namelen;
-
-  /* CV 2014-10-26: Do not check for the connect_state at this point.  In
-     certain scenarios there's no way to check the connect state reliably.
-     Example (hexchat): Parent process creates socket, forks, child process
-     calls connect, parent process calls read.  Even if the event handling
-     allows to check for FD_CONNECT in the parent, there is always yet another
-     scenario we can easily break. */
 
   DWORD wait_flags = wsamsg->dwFlags;
   bool waitall = !!(wait_flags & MSG_WAITALL);

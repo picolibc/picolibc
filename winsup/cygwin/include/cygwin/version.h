@@ -448,9 +448,8 @@ details. */
       272: Export tm_gmtoff and tm_zone members.
       273: Skipped.
       274: Export __cxa_atexit and __cxa_finalize.
-      275: Introduce account mapping from Windows account DBs.  Add CW_SETENT,
-	   CW_GETENT, CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID, CW_GETGRSID,
-	   CW_CYGNAME_FROM_WINNAME.
+      275: Add CW_SETENT, CW_GETENT, CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID,
+      	   CW_GETGRSID, CW_CYGNAME_FROM_WINNAME as no-ops for forward compat.
       276: Export ffsl, ffsll.
       277: Add setsockopt(SO_PEERCRED).
       278: Add quotactl.

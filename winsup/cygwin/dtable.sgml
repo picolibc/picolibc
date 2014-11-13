@@ -1,0 +1,20 @@
+
+<sect1 id="func-cygwin-attach-handle-to-fd">
+<title>cygwin_attach_handle_to_fd</title>
+
+<funcsynopsis><funcprototype>
+<funcdef>extern "C" int
+<function>cygwin_attach_handle_to_fd</function></funcdef>
+<paramdef>char *<parameter>name</parameter></paramdef>
+<paramdef>int <parameter>fd</parameter></paramdef>
+<paramdef>HANDLE <parameter>handle</parameter></paramdef>
+<paramdef>int <parameter>bin</parameter></paramdef>
+<paramdef>int <parameter>access</parameter></paramdef>
+</funcprototype></funcsynopsis>
+
+<para>This function can be used to turn a Win32 "handle" into a
+posix-style file handle. <parameter>fd</parameter> may be -1 to
+make cygwin allocate a handle; the actual handle is returned
+in all cases.</para>
+
+</sect1>

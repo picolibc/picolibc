@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<book id="cygwin-api" xmlns:xi="http://www.w3.org/2001/XInclude">
+
+  <bookinfo>
+    <date>1998-08-31</date>
+    <title>Cygwin API Reference</title>
+DOCTOOL-INSERT-legal
+  </bookinfo>
+
+  <toc></toc>
+
+<chapter id="compatibility"><title>Compatibility</title>
+DOCTOOL-INSERT-std-susv4
+DOCTOOL-INSERT-std-bsd
+DOCTOOL-INSERT-std-gnu
+DOCTOOL-INSERT-std-solaris
+DOCTOOL-INSERT-std-deprec
+DOCTOOL-INSERT-std-notimpl
+DOCTOOL-INSERT-std-notes
+</chapter>
+
+<chapter id="cygwin-functions"><title>Cygwin Functions</title>
+
+<para>These functions are specific to Cygwin itself, and probably
+won't be found anywhere else.  </para>
+
+DOCTOOL-INSERT-func-
+
+</chapter>
+
+</book>

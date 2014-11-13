@@ -1,7 +1,6 @@
 /* setfacl.c
 
-   Copyright 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010, 2011, 2014
-   Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2010, 2011 Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -48,7 +47,6 @@ typedef enum {
   Modify,
   Delete,
   ModNDel,
-  DeleteAll,
   SetFromFile
 } action_t;
 
@@ -109,22 +107,16 @@ getaclentry (action_t action, char *c, aclent_t *ace)
     return FALSE;
   /* Skip to next field. */
   c = c2;
-  if (!*c)
-    {
-      /* Nothing follows.  This is only valid if action is Delete and the
-	 type is CLASS_OBJ, or if ACL_DEFAULT is set. */
-      if (action != Delete
-	  || (!(ace->a_type & (CLASS_OBJ | ACL_DEFAULT))))
-	return FALSE;
-    }
-  else if (!(ace->a_type & (USER_OBJ | GROUP_OBJ)))
+  if (!*c && action != Delete)
+    return FALSE;
+  /* If this is a user or group entry, check if next char is a colon char.
+     If so, skip it, otherwise it's the name of a user or group. */
+  if (!(ace->a_type & (USER_OBJ | GROUP_OBJ)))
     {
       /* Mask and other entries may contain an extra colon. */
       if (*c == ':')
 	++c;
     }
-  /* If this is a user or group entry, check if next char is a colon char.
-     If so, skip it, otherwise it's the name of a user or group. */
   else if (*c == ':')
     ++c;
   else if (*c)
@@ -137,6 +129,8 @@ getaclentry (action_t action, char *c, aclent_t *ace)
       if (*c2 == ':')
 	*c2++ = '\0';
       else if (action != Delete)
+	return FALSE;
+      else if (!(ace->a_type & ACL_DEFAULT))
 	return FALSE;
       /* Fetch user/group id. */
       if (isdigit ((unsigned char) *c))
@@ -268,130 +262,26 @@ modacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
 }
 
 int
-addmissing (aclent_t *tgt, int tcnt)
-{
-  int t;
-  int types = 0, def_types = 0;
-  int perm = 0, def_perm = 0;
-
-  /* Check if we have all the required entries now. */
-  for (t = 0; t < tcnt; ++t)
-    if (tgt[t].a_type & ACL_DEFAULT)
-      {
-	def_types |= tgt[t].a_type;
-	if (tgt[t].a_type & (USER | GROUP | GROUP_OBJ))
-	  def_perm |= tgt[t].a_perm;
-      }
-    else
-      {
-	types |= tgt[t].a_type;
-	if (tgt[t].a_type & (USER | GROUP | GROUP_OBJ))
-	  perm |= tgt[t].a_perm;
-      }
-  /* Add missing CLASS_OBJ */
-  if ((types & (USER | GROUP)) && !(types & CLASS_OBJ))
-    {
-      tgt[tcnt].a_type = CLASS_OBJ;
-      tgt[tcnt].a_id = (uid_t) -1;
-      tgt[tcnt++].a_perm = perm;
-    }
-  if (def_types)
-    {
-      /* Add missing default entries. */
-      if (!(def_types & USER_OBJ) && tcnt < MAX_ACL_ENTRIES)
-	{
-	  t = searchace (tgt, tcnt, USER_OBJ, -1);
-	  tgt[tcnt].a_type = DEF_USER_OBJ;
-	  tgt[tcnt].a_id = (uid_t) -1;
-	  tgt[tcnt++].a_perm = t >= 0 ? tgt[t].a_perm : S_IRWXO;
-	}
-      if (!(def_types & GROUP_OBJ) && tcnt < MAX_ACL_ENTRIES)
-	{
-	  t = searchace (tgt, tcnt, GROUP_OBJ, -1);
-	  tgt[tcnt].a_type = DEF_GROUP_OBJ;
-	  tgt[tcnt].a_id = (uid_t) -1;
-	  tgt[tcnt].a_perm = t >= 0 ? tgt[t].a_perm : (S_IROTH | S_IXOTH);
-	  def_perm |= tgt[tcnt++].a_perm;
-	}
-      if (!(def_types & OTHER_OBJ) && tcnt < MAX_ACL_ENTRIES)
-	{
-	  t = searchace (tgt, tcnt, OTHER_OBJ, -1);
-	  tgt[tcnt].a_type = DEF_OTHER_OBJ;
-	  tgt[tcnt].a_id = (uid_t) -1;
-	  tgt[tcnt++].a_perm = t >= 0 ? tgt[t].a_perm : (S_IROTH | S_IXOTH);
-	}
-      /* Add missing DEF_CLASS_OBJ */
-      if ((def_types & (USER | GROUP)) && !(def_types & CLASS_OBJ))
-	{
-	  tgt[tcnt].a_type = DEF_CLASS_OBJ;
-	  tgt[tcnt].a_id = (uid_t) -1;
-	  tgt[tcnt++].a_perm = def_perm;
-	}
-    }
-  return tcnt;
-}
-
-int
-delacl (aclent_t *tgt, int tcnt)
-{
-  int t;
-
-  /* Remove all extended ACL entries. */
-  for (t = 0; t < tcnt; ++t)
-    if (tgt[t].a_type & (USER | GROUP | CLASS_OBJ))
-      {
-	--tcnt;
-	if (t < tcnt)
-	  memmove (&tgt[t], &tgt[t + 1], (tcnt - t) * sizeof (aclent_t));
-	--t;
-      }
-  return tcnt;
-}
-
-int
-setfacl (action_t action, const char *path, aclent_t *acls, int cnt)
+setfacl (action_t action, char *path, aclent_t *acls, int cnt)
 {
   aclent_t lacl[MAX_ACL_ENTRIES];
   int lcnt;
 
   memset (lacl, 0, sizeof lacl);
-  switch (action)
+  if (action == Set)
     {
-    case Set:
       if (acl (path, SETACL, cnt, acls))
 	{
 	  perror (prog_name);
 	  return 2;
 	}
-      break;
-    case Delete:
-      if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
-	  || (lcnt = modacl (lacl, lcnt, acls, cnt)) < 0
-	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
-	{
-	  perror (prog_name);
-	  return 2;
-	}
-      break;
-    case DeleteAll:
-      if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
-	  || (lcnt = delacl (lacl, lcnt)) < 0
-	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
-	{
-	  perror (prog_name);
-	  return 2;
-	}
-      break;
-    default:
-      if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
-	  || (lcnt = modacl (lacl, lcnt, acls, cnt)) < 0
-	  || (lcnt = addmissing (lacl, lcnt)) < 0
-	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
-	{
-	  perror (prog_name);
-	  return 2;
-	}
-      break;
+    }
+  else if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
+      || (lcnt = modacl (lacl, lcnt, acls, cnt)) < 0
+      || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
+    {
+      perror (prog_name);
+      return 2;
     }
   return 0;
 }
@@ -400,12 +290,11 @@ static void
 usage (FILE * stream)
 {
   fprintf (stream, ""
-	    "Usage: %s [-r] {-f ACL_FILE | -s acl_entries} FILE...\n"
-	    "       %s [-r] {-b|[-d acl_entries] [-m acl_entries]} FILE...\n"
+	    "Usage: %s [-r] (-f ACL_FILE | -s acl_entries) FILE...\n"
+	    "       %s [-r] ([-d acl_entries] [-m acl_entries]) FILE...\n"
 	    "\n"
 	    "Modify file and directory access control lists (ACLs)\n"
 	    "\n"
-	    "  -b, --remove-all remove all extended ACL entries\n"
 	    "  -d, --delete     delete one or more specified ACL entries\n"
 	    "  -f, --file       set ACL entries for FILE to ACL entries read\n"
 	    "                   from a ACL_FILE\n"
@@ -417,7 +306,7 @@ usage (FILE * stream)
 	    "  -h, --help       output usage information and exit\n"
 	    "  -V, --version    output version information and exit\n"
 	    "\n"
-	    "At least one of (-b, -d, -f, -m, -s) must be specified\n"
+	    "At least one of (-d, -f, -m, -s) must be specified\n"
 	    "\n", prog_name, prog_name);
   if (stream == stdout)
   {
@@ -451,21 +340,17 @@ usage (FILE * stream)
 	    "\n"
 	    "The following options are supported:\n"
 	    "\n"
-	    "-b   Remove all extended ACL entries.  The base ACL entries of the\n"
-	    "     owner, group and others are retained.\n"
-	    "\n"
 	    "-d   Delete one or more specified entries from the file's ACL.\n"
 	    "     The owner, group and others entries must not be deleted.\n"
 	    "     Acl_entries to be deleted should be specified without\n"
 	    "     permissions, as in the following list:\n"
 	    "\n"
-	    "         u[ser]:uid[:]\n"
-	    "         g[roup]:gid[:]\n"
-	    "         m[ask][:]\n"
-	    "         d[efault]:u[ser][:uid]\n"
-	    "         d[efault]:g[roup][:gid]\n"
-	    "         d[efault]:m[ask][:]\n"
-	    "         d[efault]:o[ther][:]\n"
+	    "         u[ser]:uid\n"
+	    "         g[roup]:gid\n"
+	    "         d[efault]:u[ser]:uid\n"
+	    "         d[efault]:g[roup]:gid\n"
+	    "         d[efault]:m[ask]:\n"
+	    "         d[efault]:o[ther]:\n"
 	    "\n"
 	    "-f   Take the Acl_entries from ACL_FILE one per line. Whitespace\n"
 	    "     characters are ignored, and the character \"#\" may be used\n"
@@ -502,14 +387,14 @@ usage (FILE * stream)
 	    "in a directory that contains default ACL entries will have\n"
 	    "permissions according to the combination of the current umask,\n"
 	    "the explicit permissions requested and the default ACL entries\n"
-	    "\n", prog_name);
+	    "Note: Under Cygwin, the default ACL entries are not taken into\n"
+	    "account currently.\n\n", prog_name);
   }
   else
     fprintf(stream, "Try '%s --help' for more information.\n", prog_name);
 }
 
 struct option longopts[] = {
-  {"remove-all", no_argument, NULL, 'b'},
   {"delete", required_argument, NULL, 'd'},
   {"file", required_argument, NULL, 'f'},
   {"modify", required_argument, NULL, 'm'},
@@ -519,7 +404,7 @@ struct option longopts[] = {
   {"version", no_argument, NULL, 'V'},
   {0, no_argument, NULL, 0}
 };
-const char *opts = "bd:f:hm:rs:V";
+const char *opts = "d:f:hm:rs:V";
 
 static void
 print_version ()
@@ -551,15 +436,6 @@ main (int argc, char **argv)
   while ((c = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (c)
       {
-      case 'b':
-	if (action == NoAction)
-	  action = DeleteAll;
-	else
-	  {
-	    usage (stderr);
-	    return 1;
-	  }
-	break;
       case 'd':
 	if (action == NoAction)
 	  action = Delete;

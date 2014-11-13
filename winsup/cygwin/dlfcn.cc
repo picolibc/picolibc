@@ -13,11 +13,7 @@ details. */
 #include <psapi.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <wctype.h>
 #include "path.h"
-#include "fhandler.h"
-#include "dtable.h"
-#include "cygheap.h"
 #include "perprocess.h"
 #include "dlfcn.h"
 #include "cygtls.h"

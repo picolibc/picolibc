@@ -1,6 +1,6 @@
 /* fhandler_procsys.cc: fhandler for native NT namespace.
 
-   Copyright 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   Copyright 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -177,28 +177,30 @@ fhandler_procsys::exists (struct stat *buf)
       /* Don't call NtQueryInformationFile unless we know it's a safe type.
 	 The call is known to crash machines, if the underlying driver is
 	 badly written. */
-      if (NT_SUCCESS (status))
+      if (!NT_SUCCESS (status))
 	{
-	  if (ffdi.DeviceType == FILE_DEVICE_NETWORK_FILE_SYSTEM)
+	  NtClose (h);
+	  return file_type;
+	}
+      if (ffdi.DeviceType == FILE_DEVICE_NETWORK_FILE_SYSTEM)
+	file_type = virt_blk;
+      else if (ffdi.DeviceType == FILE_DEVICE_NAMED_PIPE)
+	file_type = internal ? virt_blk : virt_pipe;
+      else if (ffdi.DeviceType == FILE_DEVICE_DISK
+	       || ffdi.DeviceType == FILE_DEVICE_CD_ROM
+	       || ffdi.DeviceType == FILE_DEVICE_DFS
+	       || ffdi.DeviceType == FILE_DEVICE_VIRTUAL_DISK)
+	{
+	  /* Check for file attributes.  If we get them, we peeked
+	     into a real FS through /proc/sys. */
+	  status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
+					   FileBasicInformation);
+	  debug_printf ("NtQueryInformationFile: %y", status);
+	  if (!NT_SUCCESS (status))
 	    file_type = virt_blk;
-	  else if (ffdi.DeviceType == FILE_DEVICE_NAMED_PIPE)
-	    file_type = internal ? virt_blk : virt_pipe;
-	  else if (ffdi.DeviceType == FILE_DEVICE_DISK
-		   || ffdi.DeviceType == FILE_DEVICE_CD_ROM
-		   || ffdi.DeviceType == FILE_DEVICE_DFS
-		   || ffdi.DeviceType == FILE_DEVICE_VIRTUAL_DISK)
-	    {
-	      /* Check for file attributes.  If we get them, we peeked
-		 into a real FS through /proc/sys. */
-	      status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
-					       FileBasicInformation);
-	      debug_printf ("NtQueryInformationFile: %y", status);
-	      if (!NT_SUCCESS (status))
-		file_type = virt_blk;
-	      else
-		file_type = (fbi.FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			    ? virt_fsdir : virt_fsfile;
-	    }
+	  else
+	    file_type = (fbi.FileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			? virt_fsdir : virt_fsfile;
 	}
       NtClose (h);
     }
@@ -358,17 +360,7 @@ fhandler_procsys::readdir (DIR *dir, dirent *de)
 	  sys_wcstombs (de->d_name, NAME_MAX + 1, f.dbi.ObjectName.Buffer,
 			f.dbi.ObjectName.Length / sizeof (WCHAR));
 	  de->d_ino = hash_path_name (get_ino (), de->d_name);
-	  if (RtlEqualUnicodeString (&f.dbi.ObjectTypeName, &ro_u_natdir,
-				     FALSE))
-	    de->d_type = DT_DIR;
-	  else if (RtlEqualUnicodeString (&f.dbi.ObjectTypeName, &ro_u_natsyml,
-					  FALSE))
-	    de->d_type = DT_LNK;
-	  else if (!RtlEqualUnicodeString (&f.dbi.ObjectTypeName, &ro_u_natdev,
-					   FALSE))
-	    de->d_type = DT_CHR;
-	  else /* Can't nail down "Device" objects without further testing. */
-	    de->d_type = DT_UNKNOWN;
+	  de->d_type = 0;
 	  res = 0;
 	}
     }

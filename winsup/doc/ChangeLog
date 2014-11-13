@@ -1,75 +1,15 @@
-2014-11-07  Corinna Vinschen  <corinna@vinschen.de>
-
-	* utils.xml (mkpasswd): Change /etc/group to /etc/passwd.
-
 2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
-	* new-features.xml (ov-new1.7.33): Document xdr and atexit.
-
-2014-10-30  David Rothenberger  <daveroth@acm.org>
-
-	* ntsec.xml: Fix typo.
-
-2014-10-29  Dave Habermann  <dahabermann@dow.com>
-
-	* ntsec.xml (ntsec-mapping-caching): Describe service dependencies
-	in terms of cygserver.
-
-2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
-
-	* xidepend: Make PDF file dependent on the same input files as the
-	HTML file of the same name to trigger automatic rebuild of PDFs on
-	source file changes as well.
+	* new-features.xml (ov-new1.7.33): Document atexit.
 
 2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwinenv.xml: Change default setting of dosfilewarning.
 	* new-features.xml (ov-new1.7.33): Document aforementioned change.
 
-2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
-
-	* ntsec.xml: Fix Solaris doc URLs.
-
-2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
-
-	* ntsec.xml: Try to make an expression less ambiguous.
-
-2014-10-27  Luke Kendall  <luke.kendall@cisra.canon.com.au>
-	    Corinna Vinschen  <corinna@vinschen.de>
-
-	* ntsec.xml: More language fixes.
-
 2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new1.7.33): Document empty $PATH handling.
-
-2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
-
-	* new-features.xml (ov-new1.7.33): Fix paragraph order.
-
-2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
-
-	* highlights.xml: Rearrange itemizedlist markup slightly.
-	* new-features.xml (ov-new1.7.33): Add setfacl -b option.
-	* utils.xml (setfacl): Ditto.
-
-2014-10-24  Luke Kendall  <luke.kendall@cisra.canon.com.au>
-
-	* ntsec.xml: More language and typo fixes.
-
-2014-10-23  Corinna Vinschen  <corinna@vinschen.de>
-
-	* ntsec.xml: Fix language.
-
-2014-10-22  Corinna Vinschen  <corinna@vinschen.de>
-
-	* Makefile.in: Create install targets.
-	(cygwin-ug-net/cygwin-ug-net.pdf): Create subdir to allow building PDF
-	even if subdir is missing.
-	(cygwin-api/cygwin-api.pdf): Ditto.
-	* configure.ac: Add AC_PROG_INSTALL rule.
-	* configure: Regenerate.
-	* new-features.xml (ov-new1.7.33): Add installation of docs.
 
 2014-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -89,79 +29,10 @@
 
 	* new-features.xml (ov-new1.7.33): Update to current state.
 
-2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
-
-	* pathnames.xml (cygdrive): Add /proc/cygdrive description.
-
-2014-09-03  Corinna Vinschen  <corinna@vinschen.de>
-
-	* utils.xml (setfacl): Align documentation to help text in setfacl.
-
-2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
-
-	* ntsec.xml (ntsec-common): Drop outdated comment about underdeveloped
-	Solaris ACL API support.
-
-2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
-
-	* utils.xml (setfacl): Drop outdated note that default ACEs are not
-	taken into account.
-
-2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
-
-	* ntsec.xml: Disable description of db_prefix and db_separator settings.
-
-2014-08-31  Corinna Vinschen  <corinna@vinschen.de>
-
-	* utils.xml (getfacl): Document additional suid/sgid/vtx flag printing.
-
-2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
-
-	* configure.ac: Convert to new AC_INIT style.
-	* configure: Regenerate.
-
-2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
-
-	* cygwin-api.xml: Include misc-funcs.xml.
-	* misc-funcs.xml: New file.
-
-2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
-
-	* cygwin-api.xml: Move chapter tags from path.xml back here.
-	Include logon-funcs.xml.
-	* logon-funcs.xml: Moved from ../cygwin here and converted to XML.
-	* path.xml: Drop chapter tags.  Create subsections.
-
-2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
-
-	* Makefile.in: Throughout use parenthesis instead of braces where
-	appropriate.
-	(DBXDIRS): Remove.
-	(XSLTPROC): Define for symmetry.  Use throughout.
-	(clean): Drop removing cygwin-api.xml and doctool.*.
-	(cygwin-api.xml): Drop rule.
-	(doctool): Drop rule.
-	(Makefile.dep): Add dependency to cygwin-api.xml.
-	* cygwin-api.in.xml: Rename to cygwin-api.xml.  Convert includes to
-	XML XInclude style.
-	* doctool.c: Remove.
-	* doctool.txt: Remove.
-	* faq-programming.xml: Drop reference to local utils.xml file.
-	* path.xml: Moved from ../cygwin and converted to XML.
-	* posix.xml: Ditto.
-	* using.xml: Drop relative path from utils.xml include.
-	* utils.xml: Moved from ../utils.
-
 2014-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new1.7.33): Add new section.
 	(ov-new1.7.32): Reflect intermediate 1.7.32 release.
-
-2014-08-06  Corinna Vinschen  <corinna@vinschen.de>
-
-	* ntsec.xml (ntsec-mapping): Drop plus-prepended builtin accounts as
-	default setting.  Add short explanation in db_prefix: always mode.
-	Fix a type.  Drop a paragraph with redundant information.
 
 2014-08-03  Yaakov Selkowitz  <yselkowitz@cygwin.com>
 
@@ -171,32 +42,6 @@
 2014-07-31  Yaakov Selkowitz  <yselkowitz@cygwin.com>
 
 	* faq-what.xml (faq.what.who): CGF has retired.
-
-2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
-
-	* ntsec.xml: Small improvments.
-
-2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
-
-	* new-features.xml: (ov-new1.7): Change section title.
-
-2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
-
-	* new-features.xml: (ov-new1.7.1): Add new section.  Move old 1.7
-	sections into section level 3.
-
-2014-07-30  Corinna Vinschen  <corinna@vinschen.de>
-
-	* cygwin.xsl: Allow 3 section levels in TOC.
-	* new-features.xml: (ov-new1.7.32): Add new section.
-	* ntsec.xml: Rename top-level section to reflect extension of topics.
-	Remove old /etc/passwd, /etc/group considerations.  Add new sections
-	explaining Windows to POSIX account mapping.  Make setuid sections
-	third level sections.
-	* pathnames.xml: Note new method of account mapping for fstab.d/$USER.
-	* faq-setup.xml: Rework references to /etc/passwd and /etc/group to
-	reflect changes to account handling.
-	* faq-using.xml: Ditto.
 
 2014-07-21  Corinna Vinschen  <corinna@vinschen.de>
 

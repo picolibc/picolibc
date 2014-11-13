@@ -177,7 +177,19 @@ void __reg1 do_exit (int) __attribute__ ((noreturn));
 /* libstdc++ malloc operator wrapper support.  */
 extern struct per_process_cxx_malloc default_cygwin_cxx_malloc;
 
+/* UID/GID */
+void uinfo_init ();
+
+#define ILLEGAL_UID ((uid_t)-1)
+#define ILLEGAL_GID ((gid_t)-1)
 #define ILLEGAL_SEEK ((off_t)-1)
+
+#ifndef __x86_64__
+#define ILLEGAL_UID16 ((__uid16_t)-1)
+#define ILLEGAL_GID16 ((__gid16_t)-1)
+#define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(uid_t)(u16))
+#define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(gid_t)(g16))
+#endif
 
 /* Convert LARGE_INTEGER into long long */
 #define get_ll(pl)  (((long long) (pl).HighPart << 32) | (pl).LowPart)
@@ -289,17 +301,6 @@ extern "C" char _data_start__, _data_end__, _bss_start__, _bss_end__;
 #endif
 extern "C" void (*__CTOR_LIST__) (void);
 extern "C" void (*__DTOR_LIST__) (void);
-
-#ifdef NEEDED
-/* This was inexplicably needed after updating a toolchain.
-   The need disappeared when updating further but I'm keeping
-   it around temporarily in case the issue crops up again.
-   This manifests as SEGVs in one of the Interlocked functions below
-   in kernel32.dll.  */
-#define InterlockedDecrement _InterlockedDecrement
-#define InterlockedExchange _InterlockedExchange
-#define InterlockedIncrement _InterlockedIncrement
-#endif /*NEEDED*/
 
 #ifndef NO_GLOBALS_H
 #define _RDATA	/* See globals.h */

@@ -226,7 +226,6 @@ DLL_OFILES:= \
 	ioctl.o \
 	ipc.o \
 	kernel32.o \
-	ldap.o \
 	libstdcxx_wrapper.o \
 	localtime.o \
 	lsearch.o \

@@ -17,6 +17,7 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include "tls_pbuf.h"
+#include "pwdgrp.h"
 #include <sys/mount.h>
 #include <sys/quota.h>
 

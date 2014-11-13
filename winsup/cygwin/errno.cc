@@ -1,7 +1,7 @@
 /* errno.cc: errno-related functions
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -59,21 +59,17 @@ static const struct
   X (BUSY,			EBUSY),
   X (BUS_RESET,			EIO),
   X (CALL_NOT_IMPLEMENTED,	ENOSYS),
-  X (CANCELLED,			EINTR),
   X (CANNOT_MAKE,		EPERM),
   X (CHILD_NOT_COMPLETE,	EBUSY),
   X (COMMITMENT_LIMIT,		EAGAIN),
-  X (CONNECTION_REFUSED,	ECONNREFUSED),
   X (CRC,			EIO),
   X (DEVICE_DOOR_OPEN,		EIO),
   X (DEVICE_IN_USE,		EAGAIN),
   X (DEVICE_REQUIRES_CLEANING,	EIO),
-  X (DEV_NOT_EXIST,		ENOENT),
   X (DIRECTORY,			ENOTDIR),
   X (DIR_NOT_EMPTY,		ENOTEMPTY),
   X (DISK_CORRUPT,		EIO),
   X (DISK_FULL,			ENOSPC),
-  X (DS_GENERIC_ERROR,		EIO),
   X (DUP_NAME,			ENOTUNIQ),
   X (EAS_DIDNT_FIT,		ENOSPC),
   X (EAS_NOT_SUPPORTED,		ENOTSUP),
@@ -119,7 +115,6 @@ static const struct
   X (NONPAGED_SYSTEM_RESOURCES,	EAGAIN),
   X (NOT_CONNECTED,		ENOLINK),
   X (NOT_ENOUGH_MEMORY,		ENOMEM),
-  X (NOT_ENOUGH_QUOTA,		EIO),
   X (NOT_OWNER,			EPERM),
   X (NOT_READY,			ENOMEDIUM),
   X (NOT_SAME_DEVICE,		EXDEV),
@@ -151,7 +146,6 @@ static const struct
   X (REM_NOT_LIST,		ENONET),
   X (SECTOR_NOT_FOUND,		EINVAL),
   X (SEEK,			EINVAL),
-  X (SERVICE_REQUEST_TIMEOUT,	EBUSY),
   X (SETMARK_DETECTED,		EIO),
   X (SHARING_BUFFER_EXCEEDED,	ENOLCK),
   X (SHARING_VIOLATION,		EBUSY),
@@ -159,10 +153,8 @@ static const struct
   X (SIGNAL_REFUSED,		EIO),
   X (SXS_CANT_GEN_ACTCTX,	ELIBBAD),
   X (THREAD_1_INACTIVE,		EINVAL),
-  X (TIMEOUT,			EBUSY),
   X (TOO_MANY_LINKS,		EMLINK),
   X (TOO_MANY_OPEN_FILES,	EMFILE),
-  X (UNEXP_NET_ERR,		EIO),
   X (WAIT_NO_CHILDREN,		ECHILD),
   X (WORKING_SET_QUOTA,		EAGAIN),
   X (WRITE_PROTECT,		EROFS),
@@ -361,6 +353,13 @@ seterrno_from_nt_status (const char *file, int line, NTSTATUS status)
   syscall_printf ("%s:%d status %y -> windows error %u",
 		  file, line, status, code);
   errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
+}
+
+/* seterrno: Set `errno' based on GetLastError (). */
+void __reg2
+seterrno (const char *file, int line)
+{
+  seterrno_from_win_error (file, line, GetLastError ());
 }
 
 static char *

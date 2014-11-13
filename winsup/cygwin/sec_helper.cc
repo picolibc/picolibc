@@ -1,7 +1,7 @@
 /* sec_helper.cc: NT security helper functions
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013, 2014 Red Hat, Inc.
+   2011, 2012, 2013 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -22,8 +22,8 @@ details. */
 #include "dtable.h"
 #include "pinfo.h"
 #include "cygheap.h"
+#include "pwdgrp.h"
 #include "ntdll.h"
-#include "ldap.h"
 
 /* General purpose security attribute objects for global use. */
 static NO_COPY_RO SECURITY_DESCRIPTOR null_sdp =
@@ -66,10 +66,6 @@ MKSID (well_known_this_org_sid, "S-1-5-15",
        SECURITY_NT_AUTHORITY, 1, 15);
 MKSID (well_known_system_sid, "S-1-5-18",
        SECURITY_NT_AUTHORITY, 1, SECURITY_LOCAL_SYSTEM_RID);
-MKSID (well_known_local_service_sid, "S-1-5-19",
-       SECURITY_NT_AUTHORITY, 1, SECURITY_LOCAL_SERVICE_RID);
-MKSID (well_known_network_service_sid, "S-1-5-20",
-       SECURITY_NT_AUTHORITY, 1, SECURITY_NETWORK_SERVICE_RID);
 MKSID (well_known_builtin_sid, "S-1-5-32",
        SECURITY_NT_AUTHORITY, 1, SECURITY_BUILTIN_DOMAIN_RID);
 MKSID (well_known_admins_sid, "S-1-5-32-544",
@@ -78,11 +74,6 @@ MKSID (well_known_admins_sid, "S-1-5-32-544",
 MKSID (well_known_users_sid, "S-1-5-32-545",
        SECURITY_NT_AUTHORITY, 2, SECURITY_BUILTIN_DOMAIN_RID,
 				 DOMAIN_ALIAS_RID_USERS);
-MKSID (trusted_installer_sid,
-       "S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464",
-       SECURITY_NT_AUTHORITY, SECURITY_SERVICE_ID_RID_COUNT,
-       SECURITY_SERVICE_ID_BASE_RID, 956008885U, 3418522649U, 1831038044U,
-       1853292631U, 2271478464U);
 MKSID (mandatory_medium_integrity_sid, "S-1-16-8192",
        SECURITY_MANDATORY_LABEL_AUTHORITY, 1, SECURITY_MANDATORY_MEDIUM_RID);
 MKSID (mandatory_high_integrity_sid, "S-1-16-12288",
@@ -102,7 +93,7 @@ cygpsid::operator== (const char *nsidstr) const
 }
 
 uid_t
-cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
+cygpsid::get_id (BOOL search_grp, int *type)
 {
     /* First try to get SID from group, then passwd */
   uid_t id = ILLEGAL_UID;
@@ -112,27 +103,9 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
       struct group *gr;
       if (cygheap->user.groups.pgsid == psid)
 	id = myself->gid;
-      else if (sid_id_auth (psid) == 22)
-	{
-	  /* Samba UNIX group.  Try to map to Cygwin gid.  If there's no
-	     mapping in the cache, try to fetch it from the configured
-	     RFC 2307 domain (see last comment in cygheap_domain_info::init()
-	     for more information) and add it to the mapping cache. */
-	  gid_t gid = sid_sub_auth_rid (psid);
-	  gid_t map_gid = cygheap->ugid_cache.get_gid (gid);
-	  if (map_gid == ILLEGAL_GID)
-	    {
-	      if (pldap->open (cygheap->dom.get_rfc2307_domain ()) == NO_ERROR)
-		map_gid = pldap->remap_gid (gid);
-	      if (map_gid == ILLEGAL_GID) 
-		map_gid = MAP_UNIX_TO_CYGWIN_ID (gid);
-	      cygheap->ugid_cache.add_gid (gid, map_gid);
-	    }
-	  id = (uid_t) map_gid;
-	}
-      else if ((gr = internal_getgrsid (*this, pldap)))
+      else if ((gr = internal_getgrsid (*this)))
 	id = gr->gr_gid;
-      if ((gid_t) id != ILLEGAL_GID)
+      if (id != ILLEGAL_UID)
 	{
 	  if (type)
 	    *type = GROUP;
@@ -144,22 +117,7 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
       struct passwd *pw;
       if (*this == cygheap->user.sid ())
 	id = myself->uid;
-      else if (sid_id_auth (psid) == 22)
-	{
-	  /* Samba UNIX user.  See comment above. */
-	  uid_t uid = sid_sub_auth_rid (psid);
-	  uid_t map_uid = cygheap->ugid_cache.get_uid (uid);
-	  if (map_uid == ILLEGAL_UID)
-	    {
-	      if (pldap->open (cygheap->dom.get_rfc2307_domain ()) == NO_ERROR)
-		map_uid = pldap->remap_uid (uid);
-	      if (map_uid == ILLEGAL_UID)
-		map_uid = MAP_UNIX_TO_CYGWIN_ID (uid);
-	      cygheap->ugid_cache.add_uid (uid, map_uid);
-	    }
-	  id = map_uid;
-	}
-      else if ((pw = internal_getpwsid (*this, pldap)))
+      else if ((pw = internal_getpwsid (*this)))
 	id = pw->pw_uid;
       if (id != ILLEGAL_UID && type)
 	*type = USER;
@@ -168,7 +126,7 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
 }
 
 PWCHAR
-cygpsid::pstring (PWCHAR nsidstr) const
+cygpsid::string (PWCHAR nsidstr) const
 {
   UNICODE_STRING sid;
 
@@ -176,19 +134,11 @@ cygpsid::pstring (PWCHAR nsidstr) const
     return NULL;
   RtlInitEmptyUnicodeString (&sid, nsidstr, 256);
   RtlConvertSidToUnicodeString (&sid, psid, FALSE);
-  return nsidstr + sid.Length / sizeof (WCHAR);
-}
-
-PWCHAR
-cygpsid::string (PWCHAR nsidstr) const
-{
-  if (pstring (nsidstr))
-    return nsidstr;
-  return NULL;
+  return nsidstr;
 }
 
 char *
-cygpsid::pstring (char *nsidstr) const
+cygpsid::string (char *nsidstr) const
 {
   char *t;
   DWORD i;
@@ -197,18 +147,10 @@ cygpsid::pstring (char *nsidstr) const
     return NULL;
   strcpy (nsidstr, "S-1-");
   t = nsidstr + sizeof ("S-1-") - 1;
-  t += __small_sprintf (t, "%u", sid_id_auth (psid));
-  for (i = 0; i < sid_sub_auth_count (psid); ++i)
-    t += __small_sprintf (t, "-%lu", sid_sub_auth (psid, i));
-  return t;
-}
-
-char *
-cygpsid::string (char *nsidstr) const
-{
-  if (pstring (nsidstr))
-    return nsidstr;
-  return NULL;
+  t += __small_sprintf (t, "%u", RtlIdentifierAuthoritySid (psid)->Value[5]);
+  for (i = 0; i < *RtlSubAuthorityCountSid (psid); ++i)
+    t += __small_sprintf (t, "-%lu", *RtlSubAuthoritySid (psid, i));
+  return nsidstr;
 }
 
 PSID
@@ -218,7 +160,7 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
   SID_IDENTIFIER_AUTHORITY sid_auth = { SECURITY_NULL_SID_AUTHORITY };
 # define SECURITY_NT_AUTH 5
 
-  if (s > 255 || cnt < 1 || cnt > SID_MAX_SUB_AUTHORITIES)
+  if (s > 255 || cnt < 1 || cnt > 8)
     {
       psid = NO_SID;
       return NULL;
@@ -226,9 +168,8 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
   sid_auth.Value[5] = s;
   set ();
   RtlInitializeSid (psid, &sid_auth, cnt);
-  PISID dsid = (PISID) psid;
   for (i = 0; i < cnt; ++i)
-    dsid->SubAuthority[i] = r[i];
+    memcpy ((char *) psid + 8 + sizeof (DWORD) * i, &r[i], sizeof (DWORD));
   /* If the well_known flag isn't set explicitely, we check the SID
      for being a well-known SID ourselves. That's necessary because this
      cygsid is created from a SID string, usually from /etc/passwd or
@@ -244,34 +185,16 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
 }
 
 const PSID
-cygsid::getfromstr (PCWSTR nsidstr, bool well_known)
-{
-  PWCHAR lasts;
-  DWORD s, cnt = 0;
-  DWORD r[SID_MAX_SUB_AUTHORITIES];
-
-  if (nsidstr && !wcsncmp (nsidstr, L"S-1-", 4))
-    {
-      s = wcstoul (nsidstr + 4, &lasts, 10);
-      while (cnt < SID_MAX_SUB_AUTHORITIES && *lasts == '-')
-	r[cnt++] = wcstoul (lasts + 1, &lasts, 10);
-      if (!*lasts)
-	return get_sid (s, cnt, r, well_known);
-    }
-  return psid = NO_SID;
-}
-
-const PSID
 cygsid::getfromstr (const char *nsidstr, bool well_known)
 {
   char *lasts;
   DWORD s, cnt = 0;
-  DWORD r[SID_MAX_SUB_AUTHORITIES];
+  DWORD r[8];
 
   if (nsidstr && !strncmp (nsidstr, "S-1-", 4))
     {
       s = strtoul (nsidstr + 4, &lasts, 10);
-      while (cnt < SID_MAX_SUB_AUTHORITIES && *lasts == '-')
+      while (cnt < 8 && *lasts == '-')
 	r[cnt++] = strtoul (lasts + 1, &lasts, 10);
       if (!*lasts)
 	return get_sid (s, cnt, r, well_known);
@@ -338,24 +261,41 @@ cygsidlist::add (const PSID nsi, bool well_known)
 bool
 get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gidret)
 {
-  BOOL ret = false;
-  cyg_ldap cldap;
+  struct passwd *pw;
+  struct group *gr = NULL;
+  bool ret = false;
 
   owner_sid.debug_print ("get_sids_info: owner SID =");
   group_sid.debug_print ("get_sids_info: group SID =");
 
-  *uidret = owner_sid.get_uid (&cldap);
-  *gidret = group_sid.get_gid (&cldap);
-  if (*uidret == myself->uid)
+  if (group_sid == cygheap->user.groups.pgsid)
+    *gidret = myself->gid;
+  else if ((gr = internal_getgrsid (group_sid)))
+    *gidret = gr->gr_gid;
+  else
+    *gidret = ILLEGAL_GID;
+
+  if (owner_sid == cygheap->user.sid ())
     {
+      *uidret = myself->uid;
       if (*gidret == myself->gid)
-	ret = TRUE;
+	ret = true;
       else
-	CheckTokenMembership (cygheap->user.issetuid ()
-			      ? cygheap->user.imp_token () : NULL,
-			      group_sid, &ret);
+	ret = (internal_getgroups (0, NULL, &group_sid) > 0);
     }
-  return (bool) ret;
+  else if ((pw = internal_getpwsid (owner_sid)))
+    {
+      *uidret = pw->pw_uid;
+      if (gr || (*gidret != ILLEGAL_GID
+		 && (gr = internal_getgrgid (*gidret))))
+	for (int idx = 0; gr->gr_mem[idx]; ++idx)
+	  if ((ret = strcasematch (pw->pw_name, gr->gr_mem[idx])))
+	    break;
+    }
+  else
+    *uidret = ILLEGAL_UID;
+
+  return ret;
 }
 
 PSECURITY_DESCRIPTOR

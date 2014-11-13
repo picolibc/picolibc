@@ -125,9 +125,7 @@ fhandler_procsysvipc::readdir (DIR *dir, dirent *de)
     if (cygserver_running != CYGSERVER_OK)
       goto out;
   }
-  strcpy (de->d_name, procsysvipc_tab[dir->__d_position].name);
-  de->d_type = virt_ftype_to_dtype (procsysvipc_tab[dir->__d_position].type);
-  dir->__d_position++;
+  strcpy (de->d_name, procsysvipc_tab[dir->__d_position++].name);
   dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
   res = 0;
 out:

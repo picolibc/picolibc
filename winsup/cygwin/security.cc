@@ -1,7 +1,7 @@
 /* security.cc: NT file access control functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
    Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
@@ -23,6 +23,7 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "ntdll.h"
+#include "pwdgrp.h"
 #include "tls_pbuf.h"
 #include <aclapi.h>
 
@@ -313,21 +314,6 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 	  if (ace->Mask & FILE_EXEC_BITS)
 	    *flags |= ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
 		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	}
-      else if (flags == &allow)
-	{
-	  /* Simplified computation of additional group permissions based on
-	     the CLASS_OBJ value.  CLASS_OBJ represents the or'ed value of
-	     the primary group permissions and all secondary user and group
-	     permissions.  FIXME: This only takes ACCESS_ALLOWED_ACEs into
-	     account.  The computation with additional ACCESS_DENIED_ACE
-	     handling is much more complicated. */
-	  if (ace->Mask & FILE_READ_BITS)
-	    *flags |= S_IRGRP;
-	  if (ace->Mask & FILE_WRITE_BITS)
-	    *flags |= S_IWGRP;
-	  if (ace->Mask & FILE_EXEC_BITS)
-	    *flags |= S_IXGRP;
 	}
     }
   *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
@@ -1062,95 +1048,6 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
   return ret;
 }
 
-/* Samba override.  Check security descriptor for Samba UNIX user and group
-   accounts and check if we have an RFC 2307 mapping to a Windows account.
-   Create a new security descriptor with all of the UNIX accounts with
-   valid mapping replaced with their Windows counterpart. */
-static void
-convert_samba_sd (security_descriptor &sd_ret)
-{
-  NTSTATUS status;
-  BOOLEAN dummy;
-  PSID sid;
-  cygsid owner;
-  cygsid group;
-  SECURITY_DESCRIPTOR sd;
-  cyg_ldap cldap;
-  tmp_pathbuf tp;
-  PACL acl, oacl;
-  size_t acl_len;
-  PACCESS_ALLOWED_ACE ace;
-
-  if (!NT_SUCCESS (RtlGetOwnerSecurityDescriptor (sd_ret, &sid, &dummy)))
-    return;
-  owner = sid;
-  if (!NT_SUCCESS (RtlGetGroupSecurityDescriptor (sd_ret, &sid, &dummy)))
-    return;
-  group = sid;
-
-  if (sid_id_auth (owner) == 22)
-    {
-      struct passwd *pwd;
-      uid_t uid = owner.get_uid (&cldap);
-      if (uid < UNIX_POSIX_OFFSET && (pwd = internal_getpwuid (uid)))
-      	owner.getfrompw (pwd);
-    }
-  if (sid_id_auth (group) == 22)
-    {
-      struct group *grp;
-      gid_t gid = group.get_gid (&cldap);
-      if (gid < UNIX_POSIX_OFFSET && (grp = internal_getgrgid (gid)))
-      	group.getfromgr (grp);
-    }
-
-  if (!NT_SUCCESS (RtlGetDaclSecurityDescriptor (sd_ret, &dummy,
-						 &oacl, &dummy)))
-    return;
-  acl = (PACL) tp.w_get ();
-  RtlCreateAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION);
-  acl_len = sizeof (ACL);
-
-  for (DWORD i = 0; i < oacl->AceCount; ++i)
-    if (NT_SUCCESS (RtlGetAce (oacl, i, (PVOID *) &ace)))
-      {
-	cygsid ace_sid ((PSID) &ace->SidStart);
-	if (sid_id_auth (ace_sid) == 22)
-	  {
-	    if (sid_sub_auth (ace_sid, 0) == 1) /* user */
-	      {
-		struct passwd *pwd;
-		uid_t uid = ace_sid.get_uid (&cldap);
-		if (uid < UNIX_POSIX_OFFSET && (pwd = internal_getpwuid (uid)))
-		  ace_sid.getfrompw (pwd);
-	      }
-	    else /* group */
-	      {
-		struct group *grp;
-		gid_t gid = ace_sid.get_gid (&cldap);
-		if (gid < UNIX_POSIX_OFFSET && (grp = internal_getgrgid (gid)))
-		  ace_sid.getfromgr (grp);
-	      }
-	    if (!add_access_allowed_ace (acl, i, ace->Mask, ace_sid, acl_len,
-					 ace->Header.AceFlags))
-	      return;
-	  }
-      }
-  acl->AclSize = acl_len;
-
-  RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-  RtlSetControlSecurityDescriptor (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
-  RtlSetOwnerSecurityDescriptor (&sd, owner, FALSE);
-  RtlSetGroupSecurityDescriptor (&sd, group, FALSE);
-
-  status = RtlSetDaclSecurityDescriptor (&sd, TRUE, acl, FALSE);
-  if (!NT_SUCCESS (status))
-    return;
-  DWORD sd_size = 0;
-  status = RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
-  if (sd_size > 0 && sd_ret.malloc (sd_size))
-    RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
-}
-
 int
 check_file_access (path_conv &pc, int flags, bool effective)
 {
@@ -1164,12 +1061,7 @@ check_file_access (path_conv &pc, int flags, bool effective)
   if (flags & X_OK)
     desired |= FILE_EXECUTE;
   if (!get_file_sd (pc.handle (), pc, sd, false))
-    {
-      /* Tweak Samba security descriptor as necessary. */
-      if (pc.fs_is_samba ())
-	convert_samba_sd (sd);
-      ret = check_access (sd, file_mapping, desired, flags, effective);
-    }
+    ret = check_access (sd, file_mapping, desired, flags, effective);
   debug_printf ("flags %y, ret %d", flags, ret);
   return ret;
 }

@@ -58,6 +58,7 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 #include "cygheap.h"
+#include "pwdgrp.h"
 #include "registry.h"
 #include "environ.h"
 #include "tls_pbuf.h"

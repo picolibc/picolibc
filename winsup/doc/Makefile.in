@@ -1,6 +1,6 @@
 # -*- Makefile -*- for winsup/doc
 # Copyright (c) 1998-2000, 2001, 2002, 2004, 2005, 2006, 2008, 2009, 2010,
-# 2013, 2014 Red Hat, Inc.
+# 2013 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -12,31 +12,21 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
-datarootdir:=@datarootdir@
-docdir = @docdir@
-htmldir = @htmldir@
-
-override INSTALL:=@INSTALL@
-override INSTALL_DATA:=@INSTALL_DATA@
-
-MKDIRP:=$(INSTALL) -m 755 -d
+DBXDIRS =  -d $(srcdir) -d $(srcdir)/../utils -d $(srcdir)/../cygwin
 
 CC:=@CC@
 CC_FOR_TARGET:=@CC@
 
-XSLTPROC:=xsltproc --xinclude
 XMLTO:=xmlto --skip-validation --with-dblatex
 
 include $(srcdir)/../Makefile.common
 
-FAQ_SOURCES:= $(wildcard $(srcdir)/faq*.xml)
+FAQ_SOURCES:= $(wildcard ${srcdir}/faq*.xml)
 
 .SUFFIXES: .html .body
 
 .html.body:
 	$(srcdir)/bodysnatcher.pl $<
-
-.PHONY: all clean install install-all install-pdf install-html tarball
 
 all: Makefile Makefile.dep \
 	cygwin-ug-net/cygwin-ug-net.html \
@@ -46,53 +36,45 @@ all: Makefile Makefile.dep \
 	cygwin-ug-net/cygwin-ug-net.pdf \
 	cygwin-api/cygwin-api.pdf
 
-Makefile: $(srcdir)/Makefile.in
+Makefile: ${srcdir}/Makefile.in
 	/bin/sh ./config.status
 
 clean:
 	rm -f Makefile.dep
+	rm -f doctool.exe doctool.o
+	rm -f cygwin-api.xml
 	rm -f *.html *.html.gz
 	rm -Rf cygwin-api cygwin-ug cygwin-ug-net faq
 
-install: install-all
-
-install-all: install-pdf install-html
-
-install-pdf: cygwin-ug-net/cygwin-ug-net.pdf cygwin-api/cygwin-api.pdf
-	@$(MKDIRP) $(DESTDIR)$(docdir)
-	$(INSTALL_DATA) $^ $(DESTDIR)$(docdir)
-	
-install-html: cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
-	@$(MKDIRP) $(DESTDIR)$(htmldir)/cygwin-ug-net
-	$(INSTALL_DATA) cygwin-ug-net/*.html $(DESTDIR)$(htmldir)/cygwin-ug-net
-	$(INSTALL_DATA) cygwin-ug-net/cygwin-ug-net.html $(DESTDIR)$(htmldir)/cygwin-ug-net/index.html
-	@$(MKDIRP) $(DESTDIR)$(htmldir)/cygwin-api
-	$(INSTALL_DATA) cygwin-api/*.html $(DESTDIR)$(htmldir)/cygwin-api
-	$(INSTALL_DATA) cygwin-api/cygwin-api.html $(DESTDIR)$(htmldir)/cygwin-api/index.html
+install: all
 
 cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : cygwin-ug-net.xml
-	-$(XMLTO) html-nochunks -m $(srcdir)/cygwin.xsl $<
+	-${XMLTO} html-nochunks -m $(srcdir)/cygwin.xsl $<
 	-cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
 	-rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
 	-gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
 cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.xml cygwin.xsl
-	-$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
+	-${XMLTO} html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
 
 cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.xml fo.xsl
-	@$(MKDIRP) cygwin-ug-net
-	-$(XSLTPROC) $(srcdir)/fo.xsl $< | fop -q -fo - $@
+	-xsltproc --xinclude $(srcdir)/fo.xsl $< | fop -q -fo - $@
 
 cygwin-api/cygwin-api.html : cygwin-api.xml cygwin.xsl
-	-$(XMLTO) html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
+	-${XMLTO} html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
 
 cygwin-api/cygwin-api.pdf : cygwin-api.xml fo.xsl
-	@$(MKDIRP) cygwin-api
-	-$(XSLTPROC) $(srcdir)/fo.xsl $< | fop -q -fo - $@
+	-xsltproc --xinclude $(srcdir)/fo.xsl $< | fop -q -fo - $@
+
+cygwin-api.xml : cygwin-api.in.xml doctool Makefile.in
+	-./doctool -m $(DBXDIRS) -s $(srcdir) -o $@ $<
 
 faq/faq.html : $(FAQ_SOURCES)
-	-$(XMLTO) html -o faq -m $(srcdir)/cygwin.xsl $(srcdir)/faq.xml
+	-${XMLTO} html -o faq -m $(srcdir)/cygwin.xsl $(srcdir)/faq.xml
 	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq.html
+
+doctool : doctool.c
+	gcc -g $< -o $@
 
 TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
 	  cygwin-ug-net.pdf cygwin-ug-net.xml \
@@ -105,7 +87,7 @@ tarball : cygwin-docs.tar.bz2
 cygwin-docs.tar.bz2 : $(TBFILES) $(TBDEPS)
 	find $(TBFILES) $(TBDIRS) \! -type d | sort | tar -T - -cf -  | bzip2 > cygwin-docs.tar.bz2
 
-Makefile.dep: cygwin-ug-net.xml cygwin-api.xml
+Makefile.dep: cygwin-ug-net.xml
 	cd $(srcdir) && ./xidepend $^ > "${CURDIR}/$@"
 
 -include Makefile.dep

@@ -11,7 +11,6 @@ details. */
 
 #include "hires.h"
 #include "cygheap_malloc.h"
-#include "pwdgrp.h"
 
 #define incygheap(s) (cygheap && ((char *) (s) >= (char *) cygheap) && ((char *) (s) <= ((char *) cygheap_max)))
 
@@ -156,8 +155,8 @@ public:
   }
   void set_sid (PSID new_sid) { effec_cygsid = new_sid;}
   void set_saved_sid () { saved_cygsid = effec_cygsid; }
-  cygpsid &sid () { return effec_cygsid; }
-  cygpsid &saved_sid () { return saved_cygsid; }
+  PSID sid () { return effec_cygsid; }
+  PSID saved_sid () { return saved_cygsid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);
 #define NO_IMPERSONATION NULL
   bool issetuid () const { return curr_imp_token != NO_IMPERSONATION; }
@@ -308,23 +307,14 @@ private:
      available in shared memory avoids to test for the version every time
      around.  Default to new version. */
   fcwd_version_t fast_cwd_version;
-  void override_win32_cwd (bool init, ULONG old_dismount_count);
+  void override_win32_cwd (bool, ULONG);
 
 public:
   UNICODE_STRING win32;
   static muto cwd_lock;
   const char *get_posix () const { return posix; };
-  void reset_posix (wchar_t *w_cwd);
-  char *get (char *buf, int need_posix = 1, int with_chroot = 0,
-	     unsigned ulen = NT_MAX_PATH);
-  PWCHAR get (PWCHAR buf, unsigned buflen = NT_MAX_PATH)
-  {
-    cwd_lock.acquire ();
-    buf[0] = L'\0';
-    wcsncat (buf, win32.Buffer, buflen - 1);
-    cwd_lock.release ();
-    return buf;
-  }
+  void reset_posix (wchar_t *);
+  char *get (char *, int = 1, int = 0, unsigned = NT_MAX_PATH);
   HANDLE get_handle () { return dir; }
   DWORD get_drive (char * dst)
   {
@@ -365,126 +355,6 @@ struct user_heap_info
   void __reg1 init ();
 };
 
-class cygheap_domain_info
-{
-  PWCHAR pdom_name;
-  PWCHAR pdom_dns_name;
-  cygsid pdom_sid;
-
-  PWCHAR adom_name;
-  cygsid adom_sid;
-
-  PDS_DOMAIN_TRUSTSW tdom;
-  ULONG tdom_count;
-
-  PWCHAR rfc2307_domain_buf;
-
-public:
-  bool init ();
-
-  inline PCWSTR primary_flat_name () const { return pdom_name; }
-  inline PCWSTR primary_dns_name () const { return pdom_dns_name; }
-  inline cygsid &primary_sid () { return pdom_sid; }
-
-  inline bool member_machine () const { return pdom_sid != NO_SID; }
-
-  inline PCWSTR account_flat_name () const { return adom_name; }
-  inline cygsid &account_sid () { return adom_sid; }
-
-  inline PDS_DOMAIN_TRUSTSW trusted_domain (ULONG idx) const
-    { return (idx < tdom_count) ? tdom + idx : NULL; }
-
-  inline PWCHAR get_rfc2307_domain () const
-    { return rfc2307_domain_buf ?: NULL; }
-};
-
-class cygheap_pwdgrp
-{
-  static const int NSS_FILES = 1;
-  static const int NSS_DB = 2;
-  enum pfx_t {
-    NSS_AUTO = 0,
-    NSS_PRIMARY,
-    NSS_ALWAYS
-  };
-  bool    nss_inited;
-  int     pwd_src;
-  int     grp_src;
-  pfx_t   prefix;
-  WCHAR   separator[2];
-  bool    caching;
-  int	  enums;
-  PWCHAR  enum_tdoms;
-
-  void nss_init_line (const char *line);
-  void _nss_init ();
-
-public:
-  struct {
-    pwdgrp cygserver;
-    pwdgrp file;
-    pwdgrp win;
-  } pwd_cache;
-  struct {
-    pwdgrp cygserver;
-    pwdgrp file;
-    pwdgrp win;
-  } grp_cache;
-
-  void init ();
-
-  inline void nss_init () { if (!nss_inited) _nss_init (); }
-  inline bool nss_pwd_files () const { return !!(pwd_src & NSS_FILES); }
-  inline bool nss_pwd_db () const { return !!(pwd_src & NSS_DB); }
-  inline bool nss_grp_files () const { return !!(grp_src & NSS_FILES); }
-  inline bool nss_grp_db () const { return !!(grp_src & NSS_DB); }
-  inline bool nss_prefix_auto () const { return prefix == NSS_AUTO; }
-  inline bool nss_prefix_primary () const { return prefix == NSS_PRIMARY; }
-  inline bool nss_prefix_always () const { return prefix == NSS_ALWAYS; }
-  inline PCWSTR nss_separator () const { return separator; }
-  inline bool nss_cygserver_caching () const { return caching; }
-  inline void nss_disable_cygserver_caching () { caching = false; }
-  inline int nss_db_enums () const { return enums; }
-  inline PCWSTR nss_db_enum_tdoms () const { return enum_tdoms; }
-};
-
-class cygheap_ugid_cache
-{
-  struct idmap {
-    uint32_t nfs_id;
-    uint32_t cyg_id;
-  };
-  class idmaps {
-    uint32_t _cnt;
-    uint32_t _max;
-    idmap *_map;
-  public:
-    uint32_t get (uint32_t id) const
-    {
-      for (uint32_t i = 0; i < _cnt; ++i)
-	if (_map[i].nfs_id == id)
-	  return _map[i].cyg_id;
-      return (uint32_t) -1;
-    }
-    void add (uint32_t nfs_id, uint32_t cyg_id)
-    {
-      if (_cnt >= _max)
-	_map = (idmap *) crealloc (_map, (_max += 10) * sizeof (*_map));
-      _map[_cnt].nfs_id = nfs_id;
-      _map[_cnt].cyg_id = cyg_id;
-      ++_cnt;
-    }
-  };
-  idmaps uids;
-  idmaps gids;
-
-public:
-  uid_t get_uid (uid_t uid) const { return uids.get (uid); }
-  gid_t get_gid (gid_t gid) const { return gids.get (gid); }
-  void add_uid (uid_t nfs_uid, uid_t cyg_uid) { uids.add (nfs_uid, cyg_uid); }
-  void add_gid (gid_t nfs_gid, gid_t cyg_gid) { gids.add (nfs_gid, cyg_gid); }
-};
-
 struct hook_chain
 {
   void **loc;
@@ -510,9 +380,6 @@ struct init_cygheap: public mini_cygheap
   UNICODE_STRING installation_key;
   WCHAR installation_key_buf[18];
   cygheap_root root;
-  cygheap_domain_info dom;
-  cygheap_pwdgrp pg;
-  cygheap_ugid_cache ugid_cache;
   cygheap_user user;
   user_heap_info user_heap;
   mode_t umask;
@@ -668,5 +535,4 @@ class cygheap_fdenum : public cygheap_fdmanip
 
 void __stdcall cygheap_fixup_in_child (bool);
 void __stdcall cygheap_init ();
-void setup_cygheap ();
 extern char _cygheap_start[] __attribute__((section(".idata")));

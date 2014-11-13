@@ -8,6 +8,5 @@
 <xsl:param name="html.stylesheet" select="'docbook.css'"/>
 <xsl:param name="use.id.as.filename" select="1" />
 <xsl:param name="root.filename" select="@id" />
-<xsl:param name="toc.section.depth" select="3" />
 
 </xsl:stylesheet>
