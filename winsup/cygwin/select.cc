@@ -1,7 +1,7 @@
 /* select.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -230,21 +230,24 @@ pselect(int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   struct timeval tv;
   sigset_t oldset = _my_tls.sigmask;
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  if (ts)
+  __try
     {
-      tv.tv_sec = ts->tv_sec;
-      tv.tv_usec = ts->tv_nsec / 1000;
+      if (ts)
+	{
+	  tv.tv_sec = ts->tv_sec;
+	  tv.tv_usec = ts->tv_nsec / 1000;
+	}
+      if (set)
+	set_signal_mask (_my_tls.sigmask, *set);
+      int ret = cygwin_select (maxfds, readfds, writefds, exceptfds,
+			       ts ? &tv : NULL);
+      if (set)
+	set_signal_mask (_my_tls.sigmask, oldset);
+      return ret;
     }
-  if (set)
-    set_signal_mask (_my_tls.sigmask, *set);
-  int ret = cygwin_select (maxfds, readfds, writefds, exceptfds,
-			   ts ? &tv : NULL);
-  if (set)
-    set_signal_mask (_my_tls.sigmask, oldset);
-  return ret;
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }
 
 /* Call cleanup functions for all inspected fds.  Gets rid of any
@@ -470,6 +473,9 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
   if (me->read_selected && me->read_ready)
     {
       UNIX_FD_SET (me->fd, readfds);
+      /* Special AF_LOCAL handling. */
+      if ((sock = me->fh->is_socket ()) && sock->connect_state () == connect_pending)
+	sock->connect_state (connected);
       ready++;
     }
   if (me->write_selected && me->write_ready)

@@ -6,15 +6,24 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#pragma once 
+
 class tmp_pathbuf
 {
-  unsigned c_buf_old;
-  unsigned w_buf_old;
+  uint32_t c_buf_old;
+  uint32_t w_buf_old;
 public:
-  tmp_pathbuf ();
-  ~tmp_pathbuf ();
+  tmp_pathbuf () __attribute__ ((always_inline))
+  : c_buf_old (_my_tls.locals.pathbufs.c_cnt),
+    w_buf_old (_my_tls.locals.pathbufs.w_cnt)
+  {}
+  ~tmp_pathbuf () __attribute__ ((always_inline))
+  {
+    _my_tls.locals.pathbufs.c_cnt = c_buf_old;
+    _my_tls.locals.pathbufs.w_cnt = w_buf_old;
+  }
 
-  inline bool check_usage (unsigned c_need, unsigned w_need)
+  inline bool check_usage (uint32_t c_need, uint32_t w_need)
     {
       return c_need + c_buf_old < TP_NUM_C_BUFS
 	     && w_need + w_buf_old < TP_NUM_W_BUFS;

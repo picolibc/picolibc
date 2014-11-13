@@ -1,7 +1,7 @@
 /* spawn.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -330,552 +330,552 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   STARTUPINFOW si = {};
   int looped = 0;
 
-  myfault efault;
   system_call_handle system_call (mode == _P_SYSTEM);
-  if (efault.faulted ())
+
+  __try
+    {
+      child_info_types chtype;
+      if (mode == _P_OVERLAY)
+	chtype = _CH_EXEC;
+      else
+	chtype = _CH_SPAWN;
+
+      moreinfo = cygheap_exec_info::alloc ();
+
+      /* CreateProcess takes one long string that is the command line (sigh).
+	 We need to quote any argument that has whitespace or embedded "'s.  */
+
+      int ac;
+      for (ac = 0; argv[ac]; ac++)
+	/* nothing */;
+
+      int err;
+      const char *ext;
+      if ((ext = perhaps_suffix (prog_arg, real_path, err, FE_NADA)) == NULL)
+	{
+	  set_errno (err);
+	  res = -1;
+	  __leave;
+	}
+
+      res = newargv.setup (prog_arg, real_path, ext, ac, argv, p_type_exec);
+
+      if (res)
+	__leave;
+
+      if (!real_path.iscygexec () && ::cygheap->cwd.get_error ())
+	{
+	  small_printf ("Error: Current working directory %s.\n"
+			"Can't start native Windows application from here.\n\n",
+			::cygheap->cwd.get_error_desc ());
+	  set_errno (::cygheap->cwd.get_error ());
+	  res = -1;
+	  __leave;
+	}
+
+      if (ac == 3 && argv[1][0] == '/' && tolower (argv[1][1]) == 'c' &&
+	  (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
+	{
+	  real_path.check (prog_arg);
+	  cmd.add ("\"");
+	  if (!real_path.error)
+	    cmd.add (real_path.get_win32 ());
+	  else
+	    cmd.add (argv[0]);
+	  cmd.add ("\"");
+	  cmd.add (" ");
+	  cmd.add (argv[1]);
+	  cmd.add (" ");
+	  cmd.add (argv[2]);
+	  real_path.set_path (argv[0]);
+	  null_app_name = true;
+	}
+      else
+	{
+	  if (real_path.iscygexec ())
+	    {
+	      moreinfo->argc = newargv.argc;
+	      moreinfo->argv = newargv;
+	    }
+	  if ((wincmdln || !real_path.iscygexec ())
+	       && !cmd.fromargv (newargv, real_path.get_win32 (),
+				 real_path.iscygexec ()))
+	    {
+	      res = -1;
+	      __leave;
+	    }
+
+
+	  if (mode != _P_OVERLAY || !real_path.iscygexec ()
+	      || !DuplicateHandle (GetCurrentProcess (), myself.shared_handle (),
+				   GetCurrentProcess (), &moreinfo->myself_pinfo,
+				   0, TRUE, DUPLICATE_SAME_ACCESS))
+	    moreinfo->myself_pinfo = NULL;
+	  else
+	    VerifyHandle (moreinfo->myself_pinfo);
+	}
+
+      PROCESS_INFORMATION pi;
+      pi.hProcess = pi.hThread = NULL;
+      pi.dwProcessId = pi.dwThreadId = 0;
+
+      /* Set up needed handles for stdio */
+      si.dwFlags = STARTF_USESTDHANDLES;
+      si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false);
+      si.hStdOutput = handle ((in__stdout < 0 ? 1 : in__stdout), true);
+      si.hStdError = handle (2, true);
+
+      si.cb = sizeof (si);
+
+      c_flags = GetPriorityClass (GetCurrentProcess ());
+      sigproc_printf ("priority class %d", c_flags);
+
+      c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT;
+
+      if (wincap.has_program_compatibility_assistant ())
+	{
+	  /* We're adding the CREATE_BREAKAWAY_FROM_JOB flag here to workaround
+	     issues with the "Program Compatibility Assistant (PCA) Service"
+	     starting with Windows Vista.  For some reason, when starting long
+	     running sessions from mintty(*), the affected svchost.exe process
+	     takes more and more memory and at one point takes over the CPU.  At
+	     this point the machine becomes unresponsive.  The only way to get
+	     back to normal is to stop the entire mintty session, or to stop the
+	     PCA service.  However, a process which is controlled by PCA is part
+	     of a compatibility job, which allows child processes to break away
+	     from the job.  This helps to avoid this issue.
+
+	     First we call IsProcessInJob.  It fetches the information whether or
+	     not we're part of a job 20 times faster than QueryInformationJobObject.
+
+	     (*) Note that this is not mintty's fault.  It has just been observed
+	     with mintty in the first place.  See the archives for more info:
+	     http://cygwin.com/ml/cygwin-developers/2012-02/msg00018.html */
+
+	  JOBOBJECT_BASIC_LIMIT_INFORMATION jobinfo;
+	  BOOL is_in_job;
+
+	  if (IsProcessInJob (GetCurrentProcess (), NULL, &is_in_job)
+	      && is_in_job
+	      && QueryInformationJobObject (NULL, JobObjectBasicLimitInformation,
+					 &jobinfo, sizeof jobinfo, NULL)
+	      && (jobinfo.LimitFlags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK
+					| JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)))
+	    {
+	      debug_printf ("Add CREATE_BREAKAWAY_FROM_JOB");
+	      c_flags |= CREATE_BREAKAWAY_FROM_JOB;
+	    }
+	}
+
+      if (mode == _P_DETACH)
+	c_flags |= DETACHED_PROCESS;
+      else
+	fhandler_console::need_invisible ();
+
+      if (mode != _P_OVERLAY)
+	myself->exec_sendsig = NULL;
+      else
+	{
+	  /* Reset sendsig so that any process which wants to send a signal
+	     to this pid will wait for the new process to become active.
+	     Save the old value in case the exec fails.  */
+	  if (!myself->exec_sendsig)
+	    {
+	      myself->exec_sendsig = myself->sendsig;
+	      myself->exec_dwProcessId = myself->dwProcessId;
+	      myself->sendsig = NULL;
+	      reset_sendsig = true;
+	    }
+	}
+
+      if (null_app_name)
+	runpath = NULL;
+      else
+	{
+	  USHORT len = real_path.get_nt_native_path ()->Length / sizeof (WCHAR);
+	  if (RtlEqualUnicodePathPrefix (real_path.get_nt_native_path (),
+					 &ro_u_natp, FALSE))
+	    {
+	      runpath = real_path.get_wide_win32_path (runpath);
+	      /* If the executable path length is < MAX_PATH, make sure the long
+		 path win32 prefix is removed from the path to make subsequent
+		 not long path aware native Win32 child processes happy. */
+	      if (len < MAX_PATH + 4)
+		{
+		  if (runpath[5] == ':')
+		    runpath += 4;
+		  else if (len < MAX_PATH + 6)
+		    *(runpath += 6) = L'\\';
+		}
+	    }
+	  else if (len < NT_MAX_PATH - ro_u_globalroot.Length / sizeof (WCHAR))
+	    {
+	      UNICODE_STRING rpath;
+
+	      RtlInitEmptyUnicodeString (&rpath, runpath,
+					 (NT_MAX_PATH - 1) * sizeof (WCHAR));
+	      RtlCopyUnicodeString (&rpath, &ro_u_globalroot);
+	      RtlAppendUnicodeStringToString (&rpath,
+					      real_path.get_nt_native_path ());
+	    }
+	  else
+	    {
+	      set_errno (ENAMETOOLONG);
+	      res = -1;
+	      __leave;
+	    }
+	}
+
+      cygbench ("spawn-worker");
+
+      if (!real_path.iscygexec())
+	::cygheap->fdtab.set_file_pointers_for_exec ();
+
+      moreinfo->envp = build_env (envp, envblock, moreinfo->envc,
+				  real_path.iscygexec ());
+      if (!moreinfo->envp || !envblock)
+	{
+	  set_errno (E2BIG);
+	  res = -1;
+	  __leave;
+	}
+      set (chtype, real_path.iscygexec ());
+      __stdin = in__stdin;
+      __stdout = in__stdout;
+      record_children ();
+
+      si.lpReserved2 = (LPBYTE) this;
+      si.cbReserved2 = sizeof (*this);
+
+      /* Depends on set call above.
+	 Some file types might need extra effort in the parent after CreateProcess
+	 and before copying the datastructures to the child.  So we have to start
+	 the child in suspend state, unfortunately, to avoid a race condition. */
+      if (!newargv.win16_exe
+	  && (!iscygwin () || mode != _P_OVERLAY
+	      || ::cygheap->fdtab.need_fixup_before ()))
+	c_flags |= CREATE_SUSPENDED;
+      /* If a native application should be spawned, we test here if the spawning
+	 process is running in a console and, if so, if it's a foreground or
+	 background process.  If it's a background process, we start the native
+	 process with the CREATE_NEW_PROCESS_GROUP flag set.  This lets the native
+	 process ignore Ctrl-C by default.  If we don't do that, pressing Ctrl-C
+	 in a console will break native processes running in the background,
+	 because the Ctrl-C event is sent to all processes in the console, unless
+	 they ignore it explicitely.  CREATE_NEW_PROCESS_GROUP does that for us. */
+      if (!iscygwin () && fhandler_console::exists ()
+	  && fhandler_console::tc_getpgid () != myself->pgid)
+	c_flags |= CREATE_NEW_PROCESS_GROUP;
+      refresh_cygheap ();
+
+      if (mode == _P_DETACH)
+	/* all set */;
+      else if (mode != _P_OVERLAY || !my_wr_proc_pipe)
+	prefork ();
+      else
+	wr_proc_pipe = my_wr_proc_pipe;
+
+      /* Don't allow child to inherit these handles if it's not a Cygwin program.
+	 wr_proc_pipe will be injected later.  parent won't be used by the child
+	 so there is no reason for the child to have it open as it can confuse
+	 ps into thinking that children of windows processes are all part of
+	 the same "execed" process.
+	 FIXME: Someday, make it so that parent is never created when starting
+	 non-Cygwin processes. */
+      if (!iscygwin ())
+	{
+	  SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
+	  SetHandleInformation (parent, HANDLE_FLAG_INHERIT, 0);
+	}
+      /* FIXME: racy */
+      if (mode != _P_OVERLAY)
+	SetHandleInformation (my_wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
+      parent_winpid = GetCurrentProcessId ();
+
+    loop:
+      /* When ruid != euid we create the new process under the current original
+	 account and impersonate in child, this way maintaining the different
+	 effective vs. real ids.
+	 FIXME: If ruid != euid and ruid != saved_uid we currently give
+	 up on ruid. The new process will have ruid == euid. */
+      ::cygheap->user.deimpersonate ();
+
+      if (!real_path.iscygexec () && mode == _P_OVERLAY)
+	myself->process_state |= PID_NOTCYGWIN;
+
+      wchar_t wcmd[(size_t) cmd];
+      if (!::cygheap->user.issetuid ()
+	  || (::cygheap->user.saved_uid == ::cygheap->user.real_uid
+	      && ::cygheap->user.saved_gid == ::cygheap->user.real_gid
+	      && !::cygheap->user.groups.issetgroups ()
+	      && !::cygheap->user.setuid_to_restricted))
+	{
+	  rc = CreateProcessW (runpath,	  /* image name - with full path */
+			       cmd.wcs (wcmd),/* what was passed to exec */
+			       &sec_none_nih, /* process security attrs */
+			       &sec_none_nih, /* thread security attrs */
+			       TRUE,	  /* inherit handles from parent */
+			       c_flags,
+			       envblock,	  /* environment */
+			       NULL,
+			       &si,
+			       &pi);
+	}
+      else
+	{
+	  /* Give access to myself */
+	  if (mode == _P_OVERLAY)
+	    myself.set_acl();
+
+	  WCHAR wstname[1024] = { L'\0' };
+	  HWINSTA hwst_orig = NULL, hwst = NULL;
+	  HDESK hdsk_orig = NULL, hdsk = NULL;
+	  PSECURITY_ATTRIBUTES sa;
+	  DWORD n;
+
+	  hwst_orig = GetProcessWindowStation ();
+	  hdsk_orig = GetThreadDesktop (GetCurrentThreadId ());
+	  GetUserObjectInformationW (hwst_orig, UOI_NAME, wstname, 1024, &n);
+	  /* Prior to Vista it was possible to start a service with the
+	     "Interact with desktop" flag.  This started the service in the
+	     interactive window station of the console.  A big security
+	     risk, but we don't want to disable this behaviour for older
+	     OSes because it's still heavily used by some users.  They have
+	     been warned. */
+	  if (!::cygheap->user.setuid_to_restricted
+	      && wcscasecmp (wstname, L"WinSta0") != 0)
+	    {
+	      WCHAR sid[128];
+
+	      sa = sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
+			     ::cygheap->user.sid ());
+	      /* We're creating a window station per user, not per logon session.
+		 First of all we might not have a valid logon session for
+		 the user (logon by create_token), and second, it doesn't
+		 make sense in terms of security to create a new window
+		 station for every logon of the same user.  It just fills up
+		 the system with window stations for no good reason. */
+	      hwst = CreateWindowStationW (::cygheap->user.get_windows_id (sid), 0,
+					   GENERIC_READ | GENERIC_WRITE, sa);
+	      if (!hwst)
+		system_printf ("CreateWindowStation failed, %E");
+	      else if (!SetProcessWindowStation (hwst))
+		system_printf ("SetProcessWindowStation failed, %E");
+	      else if (!(hdsk = CreateDesktopW (L"Default", NULL, NULL, 0,
+						GENERIC_ALL, sa)))
+		system_printf ("CreateDesktop failed, %E");
+	      else
+		{
+		  wcpcpy (wcpcpy (wstname, sid), L"\\Default");
+		  si.lpDesktop = wstname;
+		  debug_printf ("Desktop: %W", si.lpDesktop);
+		}
+	    }
+
+	  rc = CreateProcessAsUserW (::cygheap->user.primary_token (),
+			       runpath,	  /* image name - with full path */
+			       cmd.wcs (wcmd),/* what was passed to exec */
+			       &sec_none_nih, /* process security attrs */
+			       &sec_none_nih, /* thread security attrs */
+			       TRUE,	  /* inherit handles from parent */
+			       c_flags,
+			       envblock,	  /* environment */
+			       NULL,
+			       &si,
+			       &pi);
+	  if (hwst)
+	    {
+	      SetProcessWindowStation (hwst_orig);
+	      CloseWindowStation (hwst);
+	    }
+	  if (hdsk)
+	    {
+	      SetThreadDesktop (hdsk_orig);
+	      CloseDesktop (hdsk);
+	    }
+	}
+
+      if (mode != _P_OVERLAY)
+	SetHandleInformation (my_wr_proc_pipe, HANDLE_FLAG_INHERIT,
+			      HANDLE_FLAG_INHERIT);
+
+      /* Set errno now so that debugging messages from it appear before our
+	 final debugging message [this is a general rule for debugging
+	 messages].  */
+      if (!rc)
+	{
+	  __seterrno ();
+	  syscall_printf ("CreateProcess failed, %E");
+	  /* If this was a failed exec, restore the saved sendsig. */
+	  if (reset_sendsig)
+	    {
+	      myself->sendsig = myself->exec_sendsig;
+	      myself->exec_sendsig = NULL;
+	    }
+	  myself->process_state &= ~PID_NOTCYGWIN;
+	  /* Reset handle inheritance to default when the execution of a non-Cygwin
+	     process fails.  Only need to do this for _P_OVERLAY since the handle will
+	     be closed otherwise.  Don't need to do this for 'parent' since it will
+	     be closed in every case.  See FIXME above. */
+	  if (!iscygwin () && mode == _P_OVERLAY)
+	    SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT,
+				  HANDLE_FLAG_INHERIT);
+	  if (wr_proc_pipe == my_wr_proc_pipe)
+	    wr_proc_pipe = NULL;	/* We still own it: don't nuke in destructor */
+
+	  /* Restore impersonation. In case of _P_OVERLAY this isn't
+	     allowed since it would overwrite child data. */
+	  if (mode != _P_OVERLAY)
+	    ::cygheap->user.reimpersonate ();
+
+	  res = -1;
+	  __leave;
+	}
+
+      /* The CREATE_SUSPENDED case is handled below */
+      if (iscygwin () && !(c_flags & CREATE_SUSPENDED))
+	strace.write_childpid (pi.dwProcessId);
+
+      /* Fixup the parent data structures if needed and resume the child's
+	 main thread. */
+      if (::cygheap->fdtab.need_fixup_before ())
+	::cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
+
+      if (mode != _P_OVERLAY)
+	cygpid = cygwin_pid (pi.dwProcessId);
+      else
+	cygpid = myself->pid;
+
+      /* We print the original program name here so the user can see that too.  */
+      syscall_printf ("pid %d, prog_arg %s, cmd line %.9500s)",
+		      rc ? cygpid : (unsigned int) -1, prog_arg, (const char *) cmd);
+
+      /* Name the handle similarly to proc_subproc. */
+      ProtectHandle1 (pi.hProcess, childhProc);
+
+      if (mode == _P_OVERLAY)
+	{
+	  myself->dwProcessId = pi.dwProcessId;
+	  strace.execing = 1;
+	  myself.hProcess = hExeced = pi.hProcess;
+	  real_path.get_wide_win32_path (myself->progname); // FIXME: race?
+	  sigproc_printf ("new process name %W", myself->progname);
+	  if (!iscygwin ())
+	    close_all_files ();
+	}
+      else
+	{
+	  myself->set_has_pgid_children ();
+	  ProtectHandle (pi.hThread);
+	  pinfo child (cygpid,
+		       PID_IN_USE | (real_path.iscygexec () ? 0 : PID_NOTCYGWIN));
+	  if (!child)
+	    {
+	      syscall_printf ("pinfo failed");
+	      if (get_errno () != ENOMEM)
+		set_errno (EAGAIN);
+	      res = -1;
+	      __leave;
+	    }
+	  child->dwProcessId = pi.dwProcessId;
+	  child.hProcess = pi.hProcess;
+
+	  real_path.get_wide_win32_path (child->progname);
+	  /* FIXME: This introduces an unreferenced, open handle into the child.
+	     The purpose is to keep the pid shared memory open so that all of
+	     the fields filled out by child.remember do not disappear and so there
+	     is not a brief period during which the pid is not available.
+	     However, we should try to find another way to do this eventually. */
+	  DuplicateHandle (GetCurrentProcess (), child.shared_handle (),
+			   pi.hProcess, NULL, 0, 0, DUPLICATE_SAME_ACCESS);
+	  child->start_time = time (NULL); /* Register child's starting time. */
+	  child->nice = myself->nice;
+	  postfork (child);
+	  if (!child.remember (mode == _P_DETACH))
+	    {
+	      /* FIXME: Child in strange state now */
+	      CloseHandle (pi.hProcess);
+	      ForceCloseHandle (pi.hThread);
+	      res = -1;
+	      __leave;
+	    }
+	}
+
+      /* Start the child running */
+      if (c_flags & CREATE_SUSPENDED)
+	{
+	  /* Inject a non-inheritable wr_proc_pipe handle into child so that we
+	     can accurately track when the child exits without keeping this
+	     process waiting around for it to exit.  */
+	  if (!iscygwin ())
+	    DuplicateHandle (GetCurrentProcess (), wr_proc_pipe, pi.hProcess, NULL,
+			     0, false, DUPLICATE_SAME_ACCESS);
+	  ResumeThread (pi.hThread);
+	  if (iscygwin ())
+	    strace.write_childpid (pi.dwProcessId);
+	}
+      ForceCloseHandle (pi.hThread);
+
+      sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
+
+      bool synced;
+      if ((mode == _P_DETACH || mode == _P_NOWAIT) && !iscygwin ())
+	synced = false;
+      else
+	/* Just mark a non-cygwin process as 'synced'.  We will still eventually
+	   wait for it to exit in maybe_set_exit_code_from_windows(). */
+	synced = iscygwin () ? sync (pi.dwProcessId, pi.hProcess, INFINITE) : true;
+
+      switch (mode)
+	{
+	case _P_OVERLAY:
+	  myself.hProcess = pi.hProcess;
+	  if (!synced)
+	    {
+	      if (!proc_retry (pi.hProcess))
+		{
+		  looped++;
+		  goto loop;
+		}
+	      close_all_files (true);
+	    }
+	  else
+	    {
+	      if (iscygwin ())
+		close_all_files (true);
+	      if (!my_wr_proc_pipe
+		  && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
+		wait_for_myself ();
+	    }
+	  myself.exit (EXITCODE_NOSET);
+	  break;
+	case _P_WAIT:
+	case _P_SYSTEM:
+	  system_call.arm ();
+	  if (waitpid (cygpid, &res, 0) != cygpid)
+	    res = -1;
+	  break;
+	case _P_DETACH:
+	  res = 0;	/* Lost all memory of this child. */
+	  break;
+	case _P_NOWAIT:
+	case _P_NOWAITO:
+	case _P_VFORK:
+	  res = cygpid;
+	  break;
+	default:
+	  break;
+	}
+    }
+  __except (NO_ERROR)
     {
       if (get_errno () == ENOMEM)
 	set_errno (E2BIG);
       else
 	set_errno (EFAULT);
       res = -1;
-      goto out;
     }
-
-  child_info_types chtype;
-  if (mode == _P_OVERLAY)
-    chtype = _CH_EXEC;
-  else
-    chtype = _CH_SPAWN;
-
-  moreinfo = cygheap_exec_info::alloc ();
-
-  /* CreateProcess takes one long string that is the command line (sigh).
-     We need to quote any argument that has whitespace or embedded "'s.  */
-
-  int ac;
-  for (ac = 0; argv[ac]; ac++)
-    /* nothing */;
-
-  int err;
-  const char *ext;
-  if ((ext = perhaps_suffix (prog_arg, real_path, err, FE_NADA)) == NULL)
-    {
-      set_errno (err);
-      res = -1;
-      goto out;
-    }
-
-  res = newargv.setup (prog_arg, real_path, ext, ac, argv, p_type_exec);
-
-  if (res)
-    goto out;
-
-  if (!real_path.iscygexec () && ::cygheap->cwd.get_error ())
-    {
-      small_printf ("Error: Current working directory %s.\n"
-		    "Can't start native Windows application from here.\n\n",
-		    ::cygheap->cwd.get_error_desc ());
-      set_errno (::cygheap->cwd.get_error ());
-      res = -1;
-      goto out;
-    }
-
-  if (ac == 3 && argv[1][0] == '/' && tolower (argv[1][1]) == 'c' &&
-      (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
-    {
-      real_path.check (prog_arg);
-      cmd.add ("\"");
-      if (!real_path.error)
-	cmd.add (real_path.get_win32 ());
-      else
-	cmd.add (argv[0]);
-      cmd.add ("\"");
-      cmd.add (" ");
-      cmd.add (argv[1]);
-      cmd.add (" ");
-      cmd.add (argv[2]);
-      real_path.set_path (argv[0]);
-      null_app_name = true;
-    }
-  else
-    {
-      if (real_path.iscygexec ())
-	{
-	  moreinfo->argc = newargv.argc;
-	  moreinfo->argv = newargv;
-	}
-      if ((wincmdln || !real_path.iscygexec ())
-	   && !cmd.fromargv (newargv, real_path.get_win32 (),
-			     real_path.iscygexec ()))
-	{
-	  res = -1;
-	  goto out;
-	}
-
-
-      if (mode != _P_OVERLAY || !real_path.iscygexec ()
-	  || !DuplicateHandle (GetCurrentProcess (), myself.shared_handle (),
-			       GetCurrentProcess (), &moreinfo->myself_pinfo,
-			       0, TRUE, DUPLICATE_SAME_ACCESS))
-	moreinfo->myself_pinfo = NULL;
-      else
-	VerifyHandle (moreinfo->myself_pinfo);
-    }
-
-  PROCESS_INFORMATION pi;
-  pi.hProcess = pi.hThread = NULL;
-  pi.dwProcessId = pi.dwThreadId = 0;
-
-  /* Set up needed handles for stdio */
-  si.dwFlags = STARTF_USESTDHANDLES;
-  si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false);
-  si.hStdOutput = handle ((in__stdout < 0 ? 1 : in__stdout), true);
-  si.hStdError = handle (2, true);
-
-  si.cb = sizeof (si);
-
-  c_flags = GetPriorityClass (GetCurrentProcess ());
-  sigproc_printf ("priority class %d", c_flags);
-
-  c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT;
-
-  if (wincap.has_program_compatibility_assistant ())
-    {
-      /* We're adding the CREATE_BREAKAWAY_FROM_JOB flag here to workaround
-	 issues with the "Program Compatibility Assistant (PCA) Service"
-	 starting with Windows Vista.  For some reason, when starting long
-	 running sessions from mintty(*), the affected svchost.exe process
-	 takes more and more memory and at one point takes over the CPU.  At
-	 this point the machine becomes unresponsive.  The only way to get
-	 back to normal is to stop the entire mintty session, or to stop the
-	 PCA service.  However, a process which is controlled by PCA is part
-	 of a compatibility job, which allows child processes to break away
-	 from the job.  This helps to avoid this issue.
-
-	 First we call IsProcessInJob.  It fetches the information whether or
-	 not we're part of a job 20 times faster than QueryInformationJobObject.
-
-	 (*) Note that this is not mintty's fault.  It has just been observed
-	 with mintty in the first place.  See the archives for more info:
-	 http://cygwin.com/ml/cygwin-developers/2012-02/msg00018.html */
-
-      JOBOBJECT_BASIC_LIMIT_INFORMATION jobinfo;
-      BOOL is_in_job;
-
-      if (IsProcessInJob (GetCurrentProcess (), NULL, &is_in_job)
-	  && is_in_job
-	  && QueryInformationJobObject (NULL, JobObjectBasicLimitInformation,
-				     &jobinfo, sizeof jobinfo, NULL)
-	  && (jobinfo.LimitFlags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK
-				    | JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)))
-	{
-	  debug_printf ("Add CREATE_BREAKAWAY_FROM_JOB");
-	  c_flags |= CREATE_BREAKAWAY_FROM_JOB;
-	}
-    }
-
-  if (mode == _P_DETACH)
-    c_flags |= DETACHED_PROCESS;
-  else
-    fhandler_console::need_invisible ();
-
-  if (mode != _P_OVERLAY)
-    myself->exec_sendsig = NULL;
-  else
-    {
-      /* Reset sendsig so that any process which wants to send a signal
-	 to this pid will wait for the new process to become active.
-	 Save the old value in case the exec fails.  */
-      if (!myself->exec_sendsig)
-	{
-	  myself->exec_sendsig = myself->sendsig;
-	  myself->exec_dwProcessId = myself->dwProcessId;
-	  myself->sendsig = NULL;
-	  reset_sendsig = true;
-	}
-    }
-
-  if (null_app_name)
-    runpath = NULL;
-  else
-    {
-      USHORT len = real_path.get_nt_native_path ()->Length / sizeof (WCHAR);
-      if (RtlEqualUnicodePathPrefix (real_path.get_nt_native_path (),
-				     &ro_u_natp, FALSE))
-	{
-	  runpath = real_path.get_wide_win32_path (runpath);
-	  /* If the executable path length is < MAX_PATH, make sure the long
-	     path win32 prefix is removed from the path to make subsequent
-	     not long path aware native Win32 child processes happy. */
-	  if (len < MAX_PATH + 4)
-	    {
-	      if (runpath[5] == ':')
-		runpath += 4;
-	      else if (len < MAX_PATH + 6)
-		*(runpath += 6) = L'\\';
-	    }
-	}
-      else if (len < NT_MAX_PATH - ro_u_globalroot.Length / sizeof (WCHAR))
-	{
-	  UNICODE_STRING rpath;
-
-	  RtlInitEmptyUnicodeString (&rpath, runpath,
-				     (NT_MAX_PATH - 1) * sizeof (WCHAR));
-	  RtlCopyUnicodeString (&rpath, &ro_u_globalroot);
-	  RtlAppendUnicodeStringToString (&rpath,
-					  real_path.get_nt_native_path ());
-	}
-      else
-	{
-	  set_errno (ENAMETOOLONG);
-	  res = -1;
-	  goto out;
-	}
-    }
-
-  cygbench ("spawn-worker");
-
-  if (!real_path.iscygexec())
-    ::cygheap->fdtab.set_file_pointers_for_exec ();
-
-  moreinfo->envp = build_env (envp, envblock, moreinfo->envc,
-			      real_path.iscygexec ());
-  if (!moreinfo->envp || !envblock)
-    {
-      set_errno (E2BIG);
-      res = -1;
-      goto out;
-    }
-  set (chtype, real_path.iscygexec ());
-  __stdin = in__stdin;
-  __stdout = in__stdout;
-  record_children ();
-
-  si.lpReserved2 = (LPBYTE) this;
-  si.cbReserved2 = sizeof (*this);
-
-  /* Depends on set call above.
-     Some file types might need extra effort in the parent after CreateProcess
-     and before copying the datastructures to the child.  So we have to start
-     the child in suspend state, unfortunately, to avoid a race condition. */
-  if (!newargv.win16_exe
-      && (!iscygwin () || mode != _P_OVERLAY
-	  || ::cygheap->fdtab.need_fixup_before ()))
-    c_flags |= CREATE_SUSPENDED;
-  /* If a native application should be spawned, we test here if the spawning
-     process is running in a console and, if so, if it's a foreground or
-     background process.  If it's a background process, we start the native
-     process with the CREATE_NEW_PROCESS_GROUP flag set.  This lets the native
-     process ignore Ctrl-C by default.  If we don't do that, pressing Ctrl-C
-     in a console will break native processes running in the background,
-     because the Ctrl-C event is sent to all processes in the console, unless
-     they ignore it explicitely.  CREATE_NEW_PROCESS_GROUP does that for us. */
-  if (!iscygwin () && fhandler_console::exists ()
-      && fhandler_console::tc_getpgid () != myself->pgid)
-    c_flags |= CREATE_NEW_PROCESS_GROUP;
-  refresh_cygheap ();
-
-  if (mode == _P_DETACH)
-    /* all set */;
-  else if (mode != _P_OVERLAY || !my_wr_proc_pipe)
-    prefork ();
-  else
-    wr_proc_pipe = my_wr_proc_pipe;
-
-  /* Don't allow child to inherit these handles if it's not a Cygwin program.
-     wr_proc_pipe will be injected later.  parent won't be used by the child
-     so there is no reason for the child to have it open as it can confuse
-     ps into thinking that children of windows processes are all part of
-     the same "execed" process.
-     FIXME: Someday, make it so that parent is never created when starting
-     non-Cygwin processes. */
-  if (!iscygwin ())
-    {
-      SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
-      SetHandleInformation (parent, HANDLE_FLAG_INHERIT, 0);
-    }
-  /* FIXME: racy */
-  if (mode != _P_OVERLAY)
-    SetHandleInformation (my_wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
-  parent_winpid = GetCurrentProcessId ();
-
-loop:
-  /* When ruid != euid we create the new process under the current original
-     account and impersonate in child, this way maintaining the different
-     effective vs. real ids.
-     FIXME: If ruid != euid and ruid != saved_uid we currently give
-     up on ruid. The new process will have ruid == euid. */
-  ::cygheap->user.deimpersonate ();
-
-  if (!real_path.iscygexec () && mode == _P_OVERLAY)
-    myself->process_state |= PID_NOTCYGWIN;
-
-  wchar_t wcmd[(size_t) cmd];
-  if (!::cygheap->user.issetuid ()
-      || (::cygheap->user.saved_uid == ::cygheap->user.real_uid
-	  && ::cygheap->user.saved_gid == ::cygheap->user.real_gid
-	  && !::cygheap->user.groups.issetgroups ()
-	  && !::cygheap->user.setuid_to_restricted))
-    {
-      rc = CreateProcessW (runpath,	  /* image name - with full path */
-			   cmd.wcs (wcmd),/* what was passed to exec */
-			   &sec_none_nih, /* process security attrs */
-			   &sec_none_nih, /* thread security attrs */
-			   TRUE,	  /* inherit handles from parent */
-			   c_flags,
-			   envblock,	  /* environment */
-			   NULL,
-			   &si,
-			   &pi);
-    }
-  else
-    {
-      /* Give access to myself */
-      if (mode == _P_OVERLAY)
-	myself.set_acl();
-
-      WCHAR wstname[1024] = { L'\0' };
-      HWINSTA hwst_orig = NULL, hwst = NULL;
-      HDESK hdsk_orig = NULL, hdsk = NULL;
-      PSECURITY_ATTRIBUTES sa;
-      DWORD n;
-
-      hwst_orig = GetProcessWindowStation ();
-      hdsk_orig = GetThreadDesktop (GetCurrentThreadId ());
-      GetUserObjectInformationW (hwst_orig, UOI_NAME, wstname, 1024, &n);
-      /* Prior to Vista it was possible to start a service with the
-	 "Interact with desktop" flag.  This started the service in the
-	 interactive window station of the console.  A big security
-	 risk, but we don't want to disable this behaviour for older
-	 OSes because it's still heavily used by some users.  They have
-	 been warned. */
-      if (!::cygheap->user.setuid_to_restricted
-	  && wcscasecmp (wstname, L"WinSta0") != 0)
-	{
-	  WCHAR sid[128];
-
-	  sa = sec_user ((PSECURITY_ATTRIBUTES) alloca (1024),
-			 ::cygheap->user.sid ());
-	  /* We're creating a window station per user, not per logon session.
-	     First of all we might not have a valid logon session for
-	     the user (logon by create_token), and second, it doesn't
-	     make sense in terms of security to create a new window
-	     station for every logon of the same user.  It just fills up
-	     the system with window stations for no good reason. */
-	  hwst = CreateWindowStationW (::cygheap->user.get_windows_id (sid), 0,
-				       GENERIC_READ | GENERIC_WRITE, sa);
-	  if (!hwst)
-	    system_printf ("CreateWindowStation failed, %E");
-	  else if (!SetProcessWindowStation (hwst))
-	    system_printf ("SetProcessWindowStation failed, %E");
-	  else if (!(hdsk = CreateDesktopW (L"Default", NULL, NULL, 0,
-					    GENERIC_ALL, sa)))
-	    system_printf ("CreateDesktop failed, %E");
-	  else
-	    {
-	      wcpcpy (wcpcpy (wstname, sid), L"\\Default");
-	      si.lpDesktop = wstname;
-	      debug_printf ("Desktop: %W", si.lpDesktop);
-	    }
-	}
-
-      rc = CreateProcessAsUserW (::cygheap->user.primary_token (),
-			   runpath,	  /* image name - with full path */
-			   cmd.wcs (wcmd),/* what was passed to exec */
-			   &sec_none_nih, /* process security attrs */
-			   &sec_none_nih, /* thread security attrs */
-			   TRUE,	  /* inherit handles from parent */
-			   c_flags,
-			   envblock,	  /* environment */
-			   NULL,
-			   &si,
-			   &pi);
-      if (hwst)
-	{
-	  SetProcessWindowStation (hwst_orig);
-	  CloseWindowStation (hwst);
-	}
-      if (hdsk)
-	{
-	  SetThreadDesktop (hdsk_orig);
-	  CloseDesktop (hdsk);
-	}
-    }
-
-  if (mode != _P_OVERLAY)
-    SetHandleInformation (my_wr_proc_pipe, HANDLE_FLAG_INHERIT,
-			  HANDLE_FLAG_INHERIT);
-
-  /* Set errno now so that debugging messages from it appear before our
-     final debugging message [this is a general rule for debugging
-     messages].  */
-  if (!rc)
-    {
-      __seterrno ();
-      syscall_printf ("CreateProcess failed, %E");
-      /* If this was a failed exec, restore the saved sendsig. */
-      if (reset_sendsig)
-	{
-	  myself->sendsig = myself->exec_sendsig;
-	  myself->exec_sendsig = NULL;
-	}
-      myself->process_state &= ~PID_NOTCYGWIN;
-      /* Reset handle inheritance to default when the execution of a non-Cygwin
-	 process fails.  Only need to do this for _P_OVERLAY since the handle will
-	 be closed otherwise.  Don't need to do this for 'parent' since it will
-	 be closed in every case.  See FIXME above. */
-      if (!iscygwin () && mode == _P_OVERLAY)
-	SetHandleInformation (wr_proc_pipe, HANDLE_FLAG_INHERIT,
-			      HANDLE_FLAG_INHERIT);
-      if (wr_proc_pipe == my_wr_proc_pipe)
-	wr_proc_pipe = NULL;	/* We still own it: don't nuke in destructor */
-
-      /* Restore impersonation. In case of _P_OVERLAY this isn't
-	 allowed since it would overwrite child data. */
-      if (mode != _P_OVERLAY)
-	::cygheap->user.reimpersonate ();
-
-      res = -1;
-      goto out;
-    }
-
-  /* The CREATE_SUSPENDED case is handled below */
-  if (iscygwin () && !(c_flags & CREATE_SUSPENDED))
-    strace.write_childpid (pi.dwProcessId);
-
-  /* Fixup the parent data structures if needed and resume the child's
-     main thread. */
-  if (::cygheap->fdtab.need_fixup_before ())
-    ::cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
-
-  if (mode != _P_OVERLAY)
-    cygpid = cygwin_pid (pi.dwProcessId);
-  else
-    cygpid = myself->pid;
-
-  /* We print the original program name here so the user can see that too.  */
-  syscall_printf ("pid %d, prog_arg %s, cmd line %.9500s)",
-		  rc ? cygpid : (unsigned int) -1, prog_arg, (const char *) cmd);
-
-  /* Name the handle similarly to proc_subproc. */
-  ProtectHandle1 (pi.hProcess, childhProc);
-
-  if (mode == _P_OVERLAY)
-    {
-      myself->dwProcessId = pi.dwProcessId;
-      strace.execing = 1;
-      myself.hProcess = hExeced = pi.hProcess;
-      real_path.get_wide_win32_path (myself->progname); // FIXME: race?
-      sigproc_printf ("new process name %W", myself->progname);
-      if (!iscygwin ())
-	close_all_files ();
-    }
-  else
-    {
-      myself->set_has_pgid_children ();
-      ProtectHandle (pi.hThread);
-      pinfo child (cygpid,
-		   PID_IN_USE | (real_path.iscygexec () ? 0 : PID_NOTCYGWIN));
-      if (!child)
-	{
-	  syscall_printf ("pinfo failed");
-	  if (get_errno () != ENOMEM)
-	    set_errno (EAGAIN);
-	  res = -1;
-	  goto out;
-	}
-      child->dwProcessId = pi.dwProcessId;
-      child.hProcess = pi.hProcess;
-
-      real_path.get_wide_win32_path (child->progname);
-      /* FIXME: This introduces an unreferenced, open handle into the child.
-	 The purpose is to keep the pid shared memory open so that all of
-	 the fields filled out by child.remember do not disappear and so there
-	 is not a brief period during which the pid is not available.
-	 However, we should try to find another way to do this eventually. */
-      DuplicateHandle (GetCurrentProcess (), child.shared_handle (),
-		       pi.hProcess, NULL, 0, 0, DUPLICATE_SAME_ACCESS);
-      child->start_time = time (NULL); /* Register child's starting time. */
-      child->nice = myself->nice;
-      postfork (child);
-      if (!child.remember (mode == _P_DETACH))
-	{
-	  /* FIXME: Child in strange state now */
-	  CloseHandle (pi.hProcess);
-	  ForceCloseHandle (pi.hThread);
-	  res = -1;
-	  goto out;
-	}
-    }
-
-  /* Start the child running */
-  if (c_flags & CREATE_SUSPENDED)
-    {
-      /* Inject a non-inheritable wr_proc_pipe handle into child so that we
-	 can accurately track when the child exits without keeping this
-	 process waiting around for it to exit.  */
-      if (!iscygwin ())
-	DuplicateHandle (GetCurrentProcess (), wr_proc_pipe, pi.hProcess, NULL,
-			 0, false, DUPLICATE_SAME_ACCESS);
-      ResumeThread (pi.hThread);
-      if (iscygwin ())
-	strace.write_childpid (pi.dwProcessId);
-    }
-  ForceCloseHandle (pi.hThread);
-
-  sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
-
-  bool synced;
-  if ((mode == _P_DETACH || mode == _P_NOWAIT) && !iscygwin ())
-    synced = false;
-  else
-    /* Just mark a non-cygwin process as 'synced'.  We will still eventually
-       wait for it to exit in maybe_set_exit_code_from_windows(). */
-    synced = iscygwin () ? sync (pi.dwProcessId, pi.hProcess, INFINITE) : true;
-
-  switch (mode)
-    {
-    case _P_OVERLAY:
-      myself.hProcess = pi.hProcess;
-      if (!synced)
-	{
-	  if (!proc_retry (pi.hProcess))
-	    {
-	      looped++;
-	      goto loop;
-	    }
-	  close_all_files (true);
-	}
-      else
-	{
-	  if (iscygwin ())
-	    close_all_files (true);
-	  if (!my_wr_proc_pipe
-	      && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
-	    wait_for_myself ();
-	}
-      myself.exit (EXITCODE_NOSET);
-      break;
-    case _P_WAIT:
-    case _P_SYSTEM:
-      system_call.arm ();
-      if (waitpid (cygpid, &res, 0) != cygpid)
-	res = -1;
-      break;
-    case _P_DETACH:
-      res = 0;	/* Lost all memory of this child. */
-      break;
-    case _P_NOWAIT:
-    case _P_NOWAITO:
-    case _P_VFORK:
-      res = cygpid;
-      break;
-    default:
-      break;
-    }
-
-out:
+  __endtry
   this->cleanup ();
   if (envblock)
     free (envblock);
@@ -1137,28 +1137,31 @@ av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
 	  }
 
 	{
-	  myfault efault;
-	  if (efault.faulted ())
+	  __try
+	    {
+	      if (buf[0] == 'M' && buf[1] == 'Z')
+		{
+		  WORD subsys;
+		  unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
+		  win16_exe = off < sizeof (IMAGE_DOS_HEADER);
+		  if (!win16_exe)
+		    real_path.set_cygexec (hook_or_detect_cygwin (buf, NULL,
+								  subsys, hm));
+		  else
+		    real_path.set_cygexec (false);
+		  UnmapViewOfFile (buf);
+		  CloseHandle (hm);
+		  break;
+		}
+	    }
+	  __except (NO_ERROR)
 	    {
 	      UnmapViewOfFile (buf);
 	      CloseHandle (hm);
 	      real_path.set_cygexec (false);
 	      break;
 	    }
-	  if (buf[0] == 'M' && buf[1] == 'Z')
-	    {
-	      WORD subsys;
-	      unsigned off = (unsigned char) buf[0x18] | (((unsigned char) buf[0x19]) << 8);
-	      win16_exe = off < sizeof (IMAGE_DOS_HEADER);
-	      if (!win16_exe)
-		real_path.set_cygexec (hook_or_detect_cygwin (buf, NULL,
-							      subsys, hm));
-	      else
-		real_path.set_cygexec (false);
-	      UnmapViewOfFile (buf);
-	      CloseHandle (hm);
-	      break;
-	    }
+	  __endtry
 	}
 	CloseHandle (hm);
 

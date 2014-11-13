@@ -393,11 +393,13 @@ check_sanity_and_sync (per_process *p)
     api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %u > %u",
 	       p->api_major, cygwin_version.api_major);
 
+#ifndef __x86_64__
   /* This is a kludge to work around a version of _cygwin_common_crt0
      which overwrote the cxx_malloc field with the local DLL copy.
      Hilarity ensues if the DLL is not loaded while the process
      is forking. */
   __cygwin_user_data.cxx_malloc = &default_cygwin_cxx_malloc;
+#endif
 }
 
 child_info NO_COPY *child_proc_info;
@@ -517,14 +519,12 @@ initial_env ()
     {
       char buf1[NT_MAX_PATH];
       GetModuleFileName (NULL, buf1, NT_MAX_PATH);
-      strlwr (buf1);
-      strlwr (buf);
       char *p = strpbrk (buf, ":=");
       if (!p)
 	p = (char *) "gdb.exe -nw";
       else
 	*p++ = '\0';
-      if (strstr (buf1, buf))
+      if (strcasestr (buf1, buf))
 	{
 	  error_start_init (p);
 	  jit_debug = true;
@@ -798,10 +798,6 @@ dll_crt0_0 ()
 
   _main_tls = &_my_tls;
 
-#ifdef __x86_64__
-  exception::install_myfault_handler ();
-#endif
-
   /* Initialize signal processing here, early, in the hopes that the creation
      of a thread early in the process will cause more predictability in memory
      layout for the main thread. */
@@ -936,13 +932,13 @@ dll_crt0_1 (void *)
   /* Allocate cygheap->fdtab */
   dtable_init ();
 
+  /* Set internal locale to the environment settings. */
+  initial_setlocale ();
+
   uinfo_init ();	/* initialize user info */
 
   /* Connect to tty. */
   tty::init_session ();
-
-  /* Set internal locale to the environment settings. */
-  initial_setlocale ();
 
   if (!__argc)
     {
@@ -1235,11 +1231,62 @@ do_exit (int status)
   myself.exit (n);
 }
 
+/* When introducing support for -fuse-cxa-atexit with Cygwin 1.7.32 and
+   GCC 4.8.3-3, we defined __dso_value as &ImageBase.  This supposedly allowed
+   a reproducible value which could also be easily evaluated in cygwin_atexit.
+   However, when building C++ applications with -fuse-cxa-atexit, G++ creates
+   calls to __cxa_atexit using the *address* of __dso_handle as DSO handle.
+   
+   So what we do here is this:  A call to __cxa_atexit from the application
+   actually calls cygwin__cxa_atexit.  From dso_handle (which is either
+   &__dso_handle, or __dso_handle == ImageBase or NULL) we fetch the dll
+   structure of the DLL.  Then use dll::handle == ImageBase as the actual DSO
+   handle value in calls to __cxa_atexit and __cxa_finalize.
+   Thus, __cxa_atexit becomes entirely independent of the incoming value of
+   dso_handle, as long as it's *some* pointer into the DSO's address space. */
+extern "C" int
+cygwin__cxa_atexit (void (*fn)(void *), void *obj, void *dso_handle)
+{
+  dll *d = dso_handle ? dlls.find (dso_handle) : NULL;
+  return __cxa_atexit (fn, obj, d ? d->handle : NULL);
+}
+
+/* This function is only called for applications built with Cygwin versions
+   up to API 0.279.  Starting with API 0.280 (Cygwin 1.7.33/1.8.6-2), atexit
+   is a statically linked function inside of libcygwin.a.  The reason is that
+   the old method to fetch the caller return address is unreliable given GCCs
+   ability to perform tail call elimination.  For the details, see the below
+   comment.  The atexit replacement is defined in libcygwin.a to allow reliable
+   access to the correct DSO handle. */
 extern "C" int
 cygwin_atexit (void (*fn) (void))
 {
   int res;
+
   dll *d = dlls.find ((void *) _my_tls.retaddr ());
+#ifdef __x86_64__
+  /* x86_64 DLLs created with GCC 4.8.3-3 register __gcc_deregister_frame
+     as atexit function using a call to atexit, rather than __cxa_atexit.
+     Due to GCC's tail call optimizing, cygwin_atexit doesn't get the correct
+     return address on the stack.  As a result it fails to get the HMODULE of
+     the caller and thus calls atexit rather than __cxa_atexit.  Then, if the
+     module gets dlclosed, __cxa_finalize (called from dll_list::detach) can't
+     remove __gcc_deregister_frame from the atexit function chain.  So at
+     process exit, __call_exitprocs calls __gcc_deregister_frame while the
+     module is already unloaded and the __gcc_deregister_frame function not
+     available ==> SEGV.
+
+     This also occurs for other functions.
+
+     Workaround: If dlls.find fails, try to find the dll entry of the DLL
+     containing fn.  If that works, proceed by calling __cxa_atexit, otherwise
+     call atexit.
+     
+     This *should* be sufficiently safe.  Ultimately, new applications will
+     use the statically linked atexit function though, as outlined above. */
+  if (!d)
+    d = dlls.find ((void *) fn);
+#endif
   res = d ? __cxa_atexit ((void (*) (void *)) fn, NULL, d->handle) : atexit (fn);
   return res;
 }

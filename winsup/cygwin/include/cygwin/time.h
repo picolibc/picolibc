@@ -26,6 +26,8 @@ time_t __cdecl timegm (struct tm *);
 
 #ifndef __STRICT_ANSI__
 
+extern int stime (const time_t *);
+
 extern int daylight __asm__ (_SYMSTR (_daylight));
 
 #ifndef __timezonefunc__

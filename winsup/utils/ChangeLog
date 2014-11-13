@@ -1,3 +1,9 @@
+2014-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (CYGLSA64_DLL): Remove unused macro.
+	(dump_sysinfo): If COMSPEC isn't set in the MSVCRT environment, set it.
+	Explain why.
+
 2014-06-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* passwd.c (main): Fix typo in error output.

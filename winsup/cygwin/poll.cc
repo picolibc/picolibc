@@ -1,7 +1,7 @@
 /* poll.cc. Implements poll(2) via usage of select(2) call.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011,
-   2012 Red Hat, Inc.
+   2012, 2014 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -143,16 +143,19 @@ ppoll (struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts,
   int timeout;
   sigset_t oldset = _my_tls.sigmask;
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  timeout = (timeout_ts == NULL)
-	    ? -1
-	    : (timeout_ts->tv_sec * 1000 + timeout_ts->tv_nsec / 1000000);
-  if (sigmask)
-    set_signal_mask (_my_tls.sigmask, *sigmask);
-  int ret = poll (fds, nfds, timeout);
-  if (sigmask)
-    set_signal_mask (_my_tls.sigmask, oldset);
-  return ret;
+  __try
+    {
+      timeout = (timeout_ts == NULL)
+		? -1
+		: (timeout_ts->tv_sec * 1000 + timeout_ts->tv_nsec / 1000000);
+      if (sigmask)
+	set_signal_mask (_my_tls.sigmask, *sigmask);
+      int ret = poll (fds, nfds, timeout);
+      if (sigmask)
+	set_signal_mask (_my_tls.sigmask, oldset);
+      return ret;
+    }
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }

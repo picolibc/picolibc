@@ -400,7 +400,10 @@ fhandler_socket::af_local_connect ()
   if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
     return 0;
 
-  debug_printf ("af_local_connect called");
+  debug_printf ("af_local_connect called, no_getpeereid=%d", no_getpeereid ());
+  if (no_getpeereid ())
+    return 0;
+
   bool orig_async_io, orig_is_nonblocking;
   af_local_setblocking (orig_async_io, orig_is_nonblocking);
   if (!af_local_send_secret () || !af_local_recv_secret ()
@@ -418,7 +421,10 @@ fhandler_socket::af_local_connect ()
 int
 fhandler_socket::af_local_accept ()
 {
-  debug_printf ("af_local_accept called");
+  debug_printf ("af_local_accept called, no_getpeereid=%d", no_getpeereid ());
+  if (no_getpeereid ())
+    return 0;
+
   bool orig_async_io, orig_is_nonblocking;
   af_local_setblocking (orig_async_io, orig_is_nonblocking);
   if (!af_local_recv_secret () || !af_local_send_secret ()
@@ -431,6 +437,25 @@ fhandler_socket::af_local_accept ()
       return -1;
     }
   af_local_unsetblocking (orig_async_io, orig_is_nonblocking);
+  return 0;
+}
+
+int
+fhandler_socket::af_local_set_no_getpeereid ()
+{
+  if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  if (connect_state () != unconnected)
+    {
+      set_errno (EALREADY);
+      return -1;
+    }
+
+  debug_printf ("no_getpeereid set");
+  no_getpeereid (true);
   return 0;
 }
 
@@ -458,6 +483,7 @@ fhandler_socket::af_local_copy (fhandler_socket *sock)
   sock->sec_peer_pid = sec_peer_pid;
   sock->sec_peer_uid = sec_peer_uid;
   sock->sec_peer_gid = sec_peer_gid;
+  sock->no_getpeereid (no_getpeereid ());
 }
 
 void
@@ -1180,8 +1206,7 @@ fhandler_socket::listen (int backlog)
     {
       if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
 	af_local_set_cred ();
-      connect_state (connected);
-      listener (true);
+      connect_state (listener);	/* gets set to connected on accepted socket. */
     }
   else
     set_winsock_errno ();
@@ -1195,7 +1220,17 @@ fhandler_socket::accept4 (struct sockaddr *peer, int *len, int flags)
   struct sockaddr_storage lpeer;
   int llen = sizeof (struct sockaddr_storage);
 
-  int res = 0;
+  int res = (int) INVALID_SOCKET;
+
+  /* Windows event handling does not check for the validity of the desired
+     flags so we have to do it here. */
+  if (connect_state () != listener)
+    {
+      WSASetLastError (WSAEINVAL);
+      set_winsock_errno ();
+      goto out;
+    }
+
   while (!(res = wait_for_events (FD_ACCEPT | FD_CLOSE, 0))
 	 && (res = ::accept (get_socket (), (struct sockaddr *) &lpeer, &llen))
 	    == SOCKET_ERROR
@@ -2259,26 +2294,28 @@ fhandler_socket::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
       set_errno (EINVAL);
       return -1;
     }
+  if (no_getpeereid ())
+    {
+      set_errno (ENOTSUP);
+      return -1;
+    }
   if (connect_state () != connected)
     {
       set_errno (ENOTCONN);
       return -1;
     }
-  if (sec_peer_pid == (pid_t) 0)
-    {
-      set_errno (ENOTCONN);	/* Usually when calling getpeereid on
-				   accepting (instead of accepted) socket. */
-      return -1;
-    }
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  if (pid)
-    *pid = sec_peer_pid;
-  if (euid)
-    *euid = sec_peer_uid;
-  if (egid)
-    *egid = sec_peer_gid;
-  return 0;
+  __try
+    {
+      if (pid)
+	*pid = sec_peer_pid;
+      if (euid)
+	*euid = sec_peer_uid;
+      if (egid)
+	*egid = sec_peer_gid;
+      return 0;
+    }
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }

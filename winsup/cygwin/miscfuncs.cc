@@ -146,8 +146,8 @@ cygwin_strncasecmp (const char *cs, const char *ct, size_t n)
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
-extern "C" char * __stdcall
-cygwin_strlwr (char *string)
+extern "C" char *
+strlwr (char *string)
 {
   UNICODE_STRING us;
   size_t len = (strlen (string) + 1) * sizeof (WCHAR);
@@ -160,8 +160,8 @@ cygwin_strlwr (char *string)
   return string;
 }
 
-extern "C" char * __stdcall
-cygwin_strupr (char *string)
+extern "C" char *
+strupr (char *string)
 {
   UNICODE_STRING us;
   size_t len = (strlen (string) + 1) * sizeof (WCHAR);
@@ -202,35 +202,38 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
       return -1;
     }
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-
-  size_t tot = 0;
-
-  while (iovcnt != 0)
+  __try
     {
-      if (iov->iov_len > SSIZE_MAX || (tot += iov->iov_len) > SSIZE_MAX)
+
+      size_t tot = 0;
+
+      while (iovcnt != 0)
 	{
-	  set_errno (EINVAL);
-	  return -1;
+	  if (iov->iov_len > SSIZE_MAX || (tot += iov->iov_len) > SSIZE_MAX)
+	    {
+	      set_errno (EINVAL);
+	      __leave;
+	    }
+
+	  volatile char *p = ((char *) iov->iov_base) + iov->iov_len - 1;
+	  if (!iov->iov_len)
+	    /* nothing to do */;
+	  else if (!forwrite)
+	    *p  = dummytest (p);
+	  else
+	    dummytest (p);
+
+	  iov++;
+	  iovcnt--;
 	}
 
-      volatile char *p = ((char *) iov->iov_base) + iov->iov_len - 1;
-      if (!iov->iov_len)
-	/* nothing to do */;
-      else if (!forwrite)
-	*p  = dummytest (p);
-      else
-	dummytest (p);
+      assert (tot <= SSIZE_MAX);
 
-      iov++;
-      iovcnt--;
+      return (ssize_t) tot;
     }
-
-  assert (tot <= SSIZE_MAX);
-
-  return (ssize_t) tot;
+  __except (EFAULT)
+  __endtry
+  return -1;
 }
 
 /* Try hard to schedule another thread.  
@@ -436,18 +439,23 @@ slashify (const char *src, char *dst, bool trailing_slash_p)
 void * __reg1
 __import_address (void *imp)
 {
-  if (*((uint16_t *) imp) != 0x25ff)
-    return NULL;
-  myfault efault;
-  if (efault.faulted ())
-    return NULL;
-  const char *ptr = (const char *) imp;
+  __try
+    {
+      if (*((uint16_t *) imp) == 0x25ff)
+	{
+	  const char *ptr = (const char *) imp;
 #ifdef __x86_64__
-  const uintptr_t *jmpto = (uintptr_t *) (ptr + 6 + *(int32_t *)(ptr + 2));
+	  const uintptr_t *jmpto = (uintptr_t *)
+				   (ptr + 6 + *(int32_t *)(ptr + 2));
 #else
-  const uintptr_t *jmpto = (uintptr_t *) *((uintptr_t *) (ptr + 2));
+	  const uintptr_t *jmpto = (uintptr_t *) *((uintptr_t *) (ptr + 2));
 #endif
-  return (void *) *jmpto;
+	  return (void *) *jmpto;
+	}
+    }
+  __except (NO_ERROR) {}
+  __endtry
+  return NULL;
 }
 
 /* CygwinCreateThread.

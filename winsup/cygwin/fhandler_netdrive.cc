@@ -1,6 +1,7 @@
 /* fhandler_netdrive.cc: fhandler for // and //MACHINE handling
 
-   Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014
+   Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -17,6 +18,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "cygthread.h"
+#include "tls_pbuf.h"
 
 #include <dirent.h>
 
@@ -47,19 +49,20 @@ static DWORD WINAPI
 thread_netdrive (void *arg)
 {
   netdriveinf *ndi = (netdriveinf *) arg;
-  char provider[256], *dummy = NULL;
-  LPNETRESOURCE nro;
+  WCHAR provider[256], *dummy = NULL;
+  LPNETRESOURCEW nro;
   DWORD cnt, size;
   struct net_hdls *nh;
+  tmp_pathbuf tp;
 
   ReleaseSemaphore (ndi->sem, 1, NULL);
   switch (ndi->what)
     {
     case GET_RESOURCE_OPENENUMTOP:
-      nro = (LPNETRESOURCE) alloca (size = 4096);
+      nro = (LPNETRESOURCEW) tp.c_get ();
       nh = (struct net_hdls *) ndi->out;
-      ndi->ret = WNetGetProviderName (WNNC_NET_LANMAN, provider,
-				      (size = 256, &size));
+      ndi->ret = WNetGetProviderNameW (WNNC_NET_LANMAN, provider,
+				       (size = 256, &size));
       if (ndi->ret != NO_ERROR)
 	break;
       memset (nro, 0, sizeof *nro);
@@ -69,33 +72,35 @@ thread_netdrive (void *arg)
       nro->dwUsage = RESOURCEUSAGE_RESERVED | RESOURCEUSAGE_CONTAINER;
       nro->lpRemoteName = provider;
       nro->lpProvider = provider;
-      ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
-			       RESOURCEUSAGE_ALL, nro, &nh->net);
+      ndi->ret = WNetOpenEnumW (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
+				RESOURCEUSAGE_ALL, nro, &nh->net);
       if (ndi->ret != NO_ERROR)
 	break;
-      while ((ndi->ret = WNetEnumResource (nh->net, (cnt = 1, &cnt), nro,
-				(size = 4096, &size))) == NO_ERROR)
+      while ((ndi->ret = WNetEnumResourceW (nh->net, (cnt = 1, &cnt), nro,
+					    (size = NT_MAX_PATH, &size)))
+	     == NO_ERROR)
 	{
-	  ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
-				   RESOURCEUSAGE_ALL, nro, &nh->dom);
+	  ndi->ret = WNetOpenEnumW (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
+				    RESOURCEUSAGE_ALL, nro, &nh->dom);
 	  if (ndi->ret == NO_ERROR)
 	    break;
 	}
       break;
     case GET_RESOURCE_OPENENUM:
-      nro = (LPNETRESOURCE) alloca (size = 4096);
+      nro = (LPNETRESOURCEW) tp.c_get ();
       nh = (struct net_hdls *) ndi->out;
-      ndi->ret = WNetGetProviderName (WNNC_NET_LANMAN, provider,
+      ndi->ret = WNetGetProviderNameW (WNNC_NET_LANMAN, provider,
 				      (size = 256, &size));
       if (ndi->ret != NO_ERROR)
 	break;
-      ((LPNETRESOURCE) ndi->in)->lpProvider = provider;
-      ndi->ret = WNetGetResourceInformation ((LPNETRESOURCE) ndi->in,
-					     nro, &size, &dummy);
+      ((LPNETRESOURCEW) ndi->in)->lpProvider = provider;
+      ndi->ret = WNetGetResourceInformationW ((LPNETRESOURCEW) ndi->in, nro,
+					      (size = NT_MAX_PATH, &size),
+					      &dummy);
       if (ndi->ret != NO_ERROR)
 	break;
-      ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
-			       RESOURCEUSAGE_ALL, nro, &nh->dom);
+      ndi->ret = WNetOpenEnumW (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
+				RESOURCEUSAGE_ALL, nro, &nh->dom);
       break;
     case GET_RESOURCE_ENUM:
       nh = (struct net_hdls *) ndi->in;
@@ -104,19 +109,20 @@ thread_netdrive (void *arg)
 	  ndi->ret = ERROR_NO_MORE_ITEMS;
 	  break;
 	}
-      while ((ndi->ret = WNetEnumResource (nh->dom, (cnt = 1, &cnt),
-					   (LPNETRESOURCE) ndi->out,
-					   &ndi->outsize)) != NO_ERROR
+      nro = (LPNETRESOURCEW) tp.c_get ();
+      while ((ndi->ret = WNetEnumResourceW (nh->dom, (cnt = 1, &cnt),
+					    (LPNETRESOURCEW) ndi->out,
+					    &ndi->outsize)) != NO_ERROR
 	     && nh->net)
 	{
 	  WNetCloseEnum (nh->dom);
 	  nh->dom = NULL;
-	  nro = (LPNETRESOURCE) alloca (size = 4096);
-	  while ((ndi->ret = WNetEnumResource (nh->net, (cnt = 1, &cnt), nro,
-					     (size = 4096, &size))) == NO_ERROR)
+	  while ((ndi->ret = WNetEnumResourceW (nh->net, (cnt = 1, &cnt), nro,
+						(size = NT_MAX_PATH, &size)))
+		 == NO_ERROR)
 	    {
-	      ndi->ret = WNetOpenEnum (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
-				       RESOURCEUSAGE_ALL, nro, &nh->dom);
+	      ndi->ret = WNetOpenEnumW (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
+					RESOURCEUSAGE_ALL, nro, &nh->dom);
 	      if (ndi->ret == NO_ERROR)
 		break;
 	    }
@@ -152,15 +158,20 @@ fhandler_netdrive::exists ()
   size_t len = strlen (get_name ());
   if (len == 2)
     return virt_rootdir;
+
   char namebuf[len + 1];
+  tmp_pathbuf tp;
+  PWCHAR name = tp.w_get ();
+
   for (to = namebuf, from = get_name (); *from; to++, from++)
     *to = (*from == '/') ? '\\' : *from;
   *to = '\0';
 
   struct net_hdls nh =  { NULL, NULL };
-  NETRESOURCE nr = {0};
+  NETRESOURCEW nr = {0};
   nr.dwType = RESOURCETYPE_DISK;
-  nr.lpRemoteName = namebuf;
+  sys_mbstowcs (name, NT_MAX_PATH, namebuf);
+  nr.lpRemoteName = name;
   DWORD ret = create_thread_and_wait (GET_RESOURCE_OPENENUM,
 				      &nr, &nh, 0, "WNetOpenEnum");
   if (nh.dom)
@@ -190,28 +201,30 @@ fhandler_netdrive::fstat (struct stat *buf)
 int
 fhandler_netdrive::readdir (DIR *dir, dirent *de)
 {
-  NETRESOURCE *nro;
+  NETRESOURCEW *nro;
   DWORD ret;
   int res;
+  tmp_pathbuf tp;
 
   if (!dir->__d_position)
     {
       size_t len = strlen (get_name ());
-      char *namebuf = NULL;
-      NETRESOURCE nr = { 0 };
+      PWCHAR name = NULL;
+      NETRESOURCEW nr = { 0 };
       struct net_hdls *nh;
 
       if (len != 2)	/* // */
 	{
 	  const char *from;
 	  char *to;
-	  namebuf = (char *) alloca (len + 1);
+	  char *namebuf = (char *) alloca (len + 1);
 	  for (to = namebuf, from = get_name (); *from; to++, from++)
 	    *to = (*from == '/') ? '\\' : *from;
 	  *to = '\0';
+	  name = tp.w_get ();
+	  sys_mbstowcs (name, NT_MAX_PATH, namebuf);
 	}
-
-      nr.lpRemoteName = namebuf;
+      nr.lpRemoteName = name;
       nr.dwType = RESOURCETYPE_DISK;
       nh = (struct net_hdls *) ccalloc (HEAP_FHANDLER, 1, sizeof *nh);
       ret = create_thread_and_wait (len == 2 ? GET_RESOURCE_OPENENUMTOP
@@ -225,28 +238,37 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
 	}
       dir->__handle = (HANDLE) nh;
     }
-  ret = create_thread_and_wait (GET_RESOURCE_ENUM, dir->__handle,
-				nro = (LPNETRESOURCE) alloca (16384),
-				16384, "WnetEnumResource");
+  nro = (LPNETRESOURCEW) tp.c_get ();
+  ret = create_thread_and_wait (GET_RESOURCE_ENUM, dir->__handle, nro,
+				NT_MAX_PATH, "WnetEnumResource");
   if (ret != NO_ERROR)
     res = geterrno_from_win_error (ret);
   else
     {
       dir->__d_position++;
-      char *bs = strrchr (nro->lpRemoteName, '\\');
-      strcpy (de->d_name, bs ? bs + 1 : nro->lpRemoteName);
+      PWCHAR bs = wcsrchr (nro->lpRemoteName, L'\\');
+      bs = bs ? bs + 1 : nro->lpRemoteName;
       if (strlen (get_name ()) == 2)
 	{
-	  strlwr (de->d_name);
+	  UNICODE_STRING ss, ds;
+	  
+	  tp.u_get (&ds);
+	  RtlInitUnicodeString (&ss, bs);
+	  RtlDowncaseUnicodeString (&ds, &ss, FALSE);
+	  sys_wcstombs (de->d_name, sizeof de->d_name,
+			ds.Buffer, ds.Length / sizeof (WCHAR));
 	  de->d_ino = hash_path_name (get_ino (), de->d_name);
 	}
       else
 	{
-	  de->d_ino = readdir_get_ino (nro->lpRemoteName, false);
+	  sys_wcstombs (de->d_name, sizeof de->d_name, bs);
+	  char *rpath = tp.c_get ();
+	  sys_wcstombs (rpath, NT_MAX_PATH, nro->lpRemoteName);
+	  de->d_ino = readdir_get_ino (rpath, false);
 	  /* We can't trust remote inode numbers of only 32 bit.  That means,
 	     remote NT4 NTFS, as well as shares of Samba version < 3.0. */
 	  if (de->d_ino <= UINT32_MAX)
-	    de->d_ino = hash_path_name (0, nro->lpRemoteName);
+	    de->d_ino = hash_path_name (0, rpath);
 	}
       de->d_type = DT_DIR;
 

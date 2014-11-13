@@ -1,7 +1,7 @@
 /* cygheap.h: Cygwin heap manager.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013 Red Hat, Inc.
+   2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -375,6 +375,8 @@ struct init_cygheap: public mini_cygheap
   unsigned bucket_val[NBUCKETS];
   char *buckets[NBUCKETS];
   WCHAR installation_root[PATH_MAX];
+  WCHAR installation_dir[PATH_MAX];
+  size_t installation_dir_len;
   UNICODE_STRING installation_key;
   WCHAR installation_key_buf[18];
   cygheap_root root;

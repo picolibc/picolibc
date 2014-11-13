@@ -1,0 +1,80 @@
+What's new:
+-----------
+
+- /proc/cygdrive is a new symlink pointing to the current cygdrive prefix.
+  This can be utilized in scripts to access paths via cygdrive prefix, even
+  if the cygdrive prefix has been changed by the user.
+
+- /proc/partitions now prints the windows mount points the device is mounted
+  on.  This allows to recognize the underlying Windows devices of the Cygwin
+  raw device names.
+
+- New API: quotactl, designed after the Linux/BSD function, but severely
+  restricted:  Windows only supports user block quotas on NTFS, no group
+  quotas, no inode quotas, no time constraints.
+
+- New APIs: ffsl, ffsll (glibc extensions).
+
+- New API: stime (SVr4).
+
+
+What changed:
+-------------
+
+- New internal exception handling based on SEH on 64 bit Cygwin.
+
+- When exec'ing applications, check if $PATH exists and is non-empty.  If not,
+  add PATH variable with Cygwin installation directory as content to Windows
+  environment to allow loading of Cygwin system DLLs.
+
+- Disable CYGWIN "dosfilewarning" option by default.
+
+- Improve various header files for C++- and standards-compliance.
+
+- Doug Lea malloc implementation update from 2.8.3 to the latest 2.8.6.
+
+- atexit is now exported as statically linked function from libcygwin.a.
+  This allows reliable access to the DSO handle of the caller for newly
+  built executables.  The former atexit entry point into the DLL remains
+  for backward compatibility only.
+
+
+Bug Fixes
+---------
+
+- Per POSIX, dirfd(3) now returns EINVAL rather than EBADF on invalid
+  directory stream.
+
+- Fix a resource leak in rmdir(2).
+
+- Fix fchmod(2)/fchown(2)/fsetxattr(2) in case the file got renamed after
+  open and before calling one of the affected functions.
+  Addresses: https://cygwin.com/ml/cygwin/2014-08/msg00517.html
+
+- Handle Netapp-specific problem in statvfs(2)/fstatvfs(2).
+  Addresses: https://cygwin.com/ml/cygwin/2014-06/msg00425.html
+
+- Fix chown(2) on ptys in a corner case.
+
+- Generate correct error when a path is inaccessible due to missing permissions.
+  Addresses: https://cygwin.com/ml/cygwin-developers/2014-10/msg00010.html
+
+- Don't hang in accept calls if socket is no listener.  Set errno to EINVAL
+  instead.
+
+- Don't allow seeking on serial lines and sockets.  Set errno to ESPIPE
+  instead.
+  Addresses: https://cygwin.com/ml/cygwin/2014-08/msg00319.html
+
+- Fix output of /proc/<PID>/statm.
+
+- Fix a SEGV in cygcheck if the environment variable COMSPEC is not, or
+  incorrectly set.
+  Addresses: https://cygwin.com/ml/cygwin/2014-10/msg00292.html
+
+- Fix a SEGV in some 64 bit applications explicitely dlclosing DLLs.
+  Addresses: https://cygwin.com/ml/cygwin/2014-10/msg00402.html
+
+- Fix -fuse-cxa-atexit handling where dlclose fails to trigger calling
+  global dtors in dynamically loaded modules in C++ applications (and
+  thus another potential SEGV).

@@ -1,3 +1,425 @@
+2014-11-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (cygwin__cxa_atexit): Fetch correct DSO handle value
+	by searching dll list.  Explain why.
+
+2014-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (cygwin_atexit): Change preceeding comment to reflect
+	API version numbers.
+	* external.cc (cygwin_internal): disable setting cxx_malloc on 64 bit.
+	Add CW_FIXED_ATEXIT case.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_FIXED_ATEXIT.
+	* lib/atexit.c (atexit): Test running Cygwin version by checking
+	return value of cygwin_internal (CW_FIXED_ATEXIT).
+
+2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* lib/atexit.c (atexit): Check for being linked into the executable.
+	If so, call __cxa_atexit with NULL DSO handle.  Explain why.
+	* lib/dso_handle.c: New file providing fallback __dso_handle.
+
+2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (NEW_FUNCTIONS): Add atexit to be not exported.
+	* lib/atexit.c (atexit): New, statically linkable version of atexit.
+	* dcrt0.cc (cygwin_atexit): Add comment to mark this function as old
+	entry point.  Indiscriminately check for DSO of function pointer for
+	all functions, if checking for DSO of return address fails on x86_64.
+	Change comment accordingly.
+
+2014-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (NEW_FUNCTIONS): Define target-independent.  Add target
+	dependent stuff afterwards.  Globally define timezone and all xdr
+	symbols as non-exported from libcygwin.a.
+
+2014-11-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc: Fix formatting.
+
+2014-10-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (init_cygheap::init_installation_root): Create content of
+	installation_dir as non-prefixed path, if possible.
+
+2014-10-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* common.din (__cxa_atexit): Define as cygwin__cxa_atexit.
+	* dcrt0.cc (cygwin__cxa_atexit): New function.  Explain what we do.
+
+2014-10-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* globals.cc (dos_file_warning): Set to false by default.
+	* path.cc (warn_msdos): Make static.  Drop test for dos_file_warning.
+	(path_conv::check): Check for dos_file_warning here to avoid a function
+	call in the default case.
+
+2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (cygwin_atexit): Add workaround for broken atexit calls
+	in __gcc_register_frame of DLLs built with gcc-4.8.3-3.
+
+2014-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (init_cygheap::init_installation_root): Set
+	installation_dir_len.
+	* cygheap.h (struct init_cygheap): Add installation_dir_len member.
+	* environ.cc (win_env::add_cache): Use stpcpy for speed.
+	(posify_maybe): Use tmp_pathbuf buffer instead of stack.
+	(raise_envblock): New function to resize Windows environment block.
+	(build_env): Fix indentation.  Call raise_envblock function.  Check if
+	$PATH exists and is non-empty.  If not, add PATH variable with Cygwin
+	installation directory as content to Windows environment.  Explain why.
+
+2014-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_cygdrive): Fix symlink path if cygdrive
+	is "/".
+
+2014-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (sigdelayed): 64 bit only: Fix seh_pushreg statements in
+	prologue.
+
+2014-10-22  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* common.din (stime): Export.
+	* times.cc (stime): New function.
+	* include/cygwin/time.h (stime): Declare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2014-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_serial.cc: Revert debug code accidentally checked in on
+	2014-08-18.
+
+2014-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check): Set error from status code if opening
+	the parent directory failed, but keep special case for root dirs.
+
+2014-10-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (init_cygheap::init_installation_root): Just memmove
+	contents of installation_root instead of calling GetModuleFileNameW
+	again.  Copy installation_root to installation_dir before stripping of
+	"bin" dir.  Explain what we do.
+	* cygheap.h (struct init_cygheap): Add installation_dir member.
+
+2014-10-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (__try): Define __l_endtry as block-local label in 32 bit
+	case as well.
+
+2014-10-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add quotactl.o.
+	* common.din (quotactl): Export.
+	* ntdll.h: Define FILE_FS_CONTROL_INFORMATION::FileSystemControlFlags
+	flag values.
+	(struct _FILE_FS_CONTROL_INFORMATION): Define.
+	(struct _FILE_GET_QUOTA_INFORMATION): Define.
+	(typedef struct _FILE_QUOTA_INFORMATION): Define.
+	(NtQueryObject): Use PVOID rather than VOID*.
+	(NtQueryVolumeInformationFile): Ditto.
+	(NtQueryQuotaInformationFile): Declare.
+	(NtSetQuotaInformationFile): Declare.
+	(NtSetVolumeInformationFile): Declare.
+	* quotactl.cc: New file implementing quotactl().
+	* include/sys/mount.h (BLOCK_SIZE): Define.
+	(BLOCK_SIZE_BITS): Define.
+	* include/sys/quota.h: New header.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2014-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Rearrange with one file per line.
+
+2014-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_partitions): Extend output to print
+	the windows mount points the device is mounted on.
+
+2014-10-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_setsockopt): Drop redundant test for AF_LOCAL and
+	SOCK_STREAM in SO_PEERCRED case, as in the original patch.
+
+2014-10-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dlfcn.cc (gfpod_helper): Only check for POSIX dir separator, same as
+	in get_full_path_of_dll.
+
+2014-10-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dlfcn.cc (set_dl_error): Drop useless __stdcall.
+	(check_path_access): Ditto.  Drop FE_CWD from call to find_exec.
+	(gfpod_helper): Call path_conv::check for all paths containing a dir
+	separator to more closely follow the Linux search algorithm.
+	(get_full_path_of_dll): Drop useless __stdcall.
+	(dlopen): Simplify RTLD_NOLOAD case by calling GetModuleHandleEx
+	instead of GetModuleHandle/LoadLibrary.
+
+2014-10-11  Christian Franke  <franke@computer.org>
+
+	Add setsockopt(sd, SOL_SOCKET, SO_PEERCRED, NULL, 0) to disable
+	initial handshake on AF_LOCAL sockets.
+	* fhandler.h (class fhandler_socket): Add no_getpeereid status flag.
+	(fhandler_socket::af_local_set_no_getpeereid): New prototype.
+	* fhandler_socket.cc (fhandler_socket::af_local_connect): Skip handshake
+	if no_getpeereid is set.  Add debug output.
+	(fhandler_socket::af_local_accept): Likewise.
+	(fhandler_socket::af_local_set_no_getpeereid): New function.
+	(fhandler_socket::af_local_copy): Copy no_getpeereid.
+	(fhandler_socket::getpeereid): Fail if no_getpeereid is set.
+	* net.cc (cygwin_setsockopt): Add SO_PEERCRED for AF_LOCAL/SOCK_STREAM
+	sockets.  Add comment to explain why we need it.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2014-10-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dlfcn.cc (dlopen): Disable old 32 bit code on 64 bit.
+	* dcrt0.cc (check_sanity_and_sync): Ditto.
+	* dll_init.cc (dll_dllcrt0_1): Fix typo in comment.
+
+2014-10-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* common.din (ffsl): Export.
+	(ffsll): Export.
+	* syscalls.cc (ffs): Implement using GCC intrinsic.
+	(ffsl): Ditto.
+	(ffsll): Ditto.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2014-10-08  Christian Franke  <franke@computer.org>
+
+	* syscalls.cc (ffs): Fix crash of ffs (0x80000000) on 64 bit.
+
+2014-10-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (format_process_statm): Fix output of dirty
+	pages.  Add linefeed.
+
+2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (proc_tab): Add entry for cygdrive symlink.
+	(format_proc_cygdrive): New function to implement /proc/cygdrive.
+
+2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exception.h (class exception): Remove unnecessary #ifdef.
+
+2014-09-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winlean.h (DNLEN): Raise to 31.  Explain why.
+
+2014-08-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstatvfs): Try the
+	FileFsSizeInformation information class on filesystems choking on
+	FileFsFullSizeInformation (I see you Netapp!)
+
+2014-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_pty_slave::fch_open_handles): Add bool parameter
+	to declaration.
+	* fhandler_tty.cc (fhandler_pty_slave::fch_open_handles): Add bool
+	parameter "chown".  Only request WRITE_OWNER access when opening pty
+	synchronization objects if "chown" is set.
+	(fhandler_pty_slave::fchmod): Call fch_open_handles with new bool
+	parameter set to false.
+	(fhandler_pty_slave::fchown): Call fch_open_handles with new bool
+	parameter set to true.
+	* kernel32.cc (CreateFileMappingW): Fix default standard rights for
+	file mappings from READ_CONTROL to STANDARD_RIGHTS_REQUIRED to allow
+	changing the DACL (fixes "access denied" error in pinfo::set_acl).
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Change debug
+	output to print mode bits in octal.
+	* security.cc (alloc_sd): Ditto.
+	(set_file_attribute): Ditto.
+
+2014-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntea.cc (read_ea): Change left-over return to __leave.  Fix
+	condition to close handle.  Call NtClose rather than CloseHandle.
+	(write_ea): Fix condition to close handle.  Call NtClose rather than
+	CloseHandle.
+	* security.cc (get_file_sd): Call pc.init_reopen_attr if a valid
+	incoming handle was given, pc.get_object_attr otherwise.
+	(set_file_sd): Ditto.
+
+2014-08-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.h (path_conv::init_reopen_attr): Change from void to returning
+	POBJECT_ATTRIBUTES.  Take OBJECT_ATTRIBUTES reference as argument, not
+	pointer.
+	* fhandler_disk_file.cc: Throughout accommodate above change.
+	* syscalls.cc: Ditto.
+	* ntea.cc (read_ea): Don't set hdl to NULL if it's already NULL.  Set
+	attr with pc.init_reopen_attr before trying to reopen file.
+	(write_ea): Ditto.
+	* security.cc (get_file_sd): Use pc.init_reopen_attr rather than
+	pc.get_object_attr when trying to reopen file.
+	(set_file_sd): Ditto.
+
+2014-08-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (san::leave/x86_64): Implement.
+	* cygtls.h (class tls_pathbuf): Move counter variables into a union.
+	Add 64 bit element _counters covering both counter variables to
+	optimize save and restore operations.
+	(class san/x86_64): Only store single 64 bit value.
+	(san::san/x86_64): Implement.
+	(san::leave/x86_64): Only declare here, as returns_twice function.
+	Explain why.
+	(class san/i686): Change type of _c_cnt and _w_cnt to uint32_t.
+	(__try/x86_64): Move definition of __sebastian after the first memory
+	barrier.  Drop __sebastian.setup call.
+
+2014-08-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (_cygtls::remove): Revert previous patch.
+	*  cygtls.h (struct _local_storage): Move pathbufs back here.
+	(class san/x86_64): Revert class.  Save and restore pathbufs counters
+	only.
+	(class san/i686): Revert saving and restoring pathbufs counters.
+	(__try/x86_64): Add a san variable and call it's setup method.
+	(__except/x86_64): Call san::leave to restore pathbufs counters.
+	* gendef (_sigbe): Revert previous change.
+	* thread.cc (verifyable_object_state): Remove gcc 4.7 workaround in
+	forward declaration as well.
+	* tls_pbuf.cc (tls_pbuf): Revert previous change.
+	* tls_pbuf.h (class tmp_pathbuf): Accommodate reverting pathbufs to
+	locals structure.
+	* tlsoffsets.h: Regenerate.
+	* tlsoffsets64.h: Regenerate.
+
+2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Throughout, use __try/__except/__endtry blocks, rather than myfault
+	handler.
+	* cygtls.cc (_cygtls::remove): Accommodate the fact that pathbufs
+	has been moved from _local_storage to _cygtls.
+	* cygtls.h (class tls_pathbuf): Add comment to hint to gendef usage
+	of counters.  Change type of counters to uint32_t for clarity.
+	Remove _cygtls as friend class.
+	(struct _local_storage): Move pathbufs from here...
+	(struct _cygtls): ...to here, allowing to access it from _sigbe.
+	(class san): Only define on 32 bit.  Remove errno, _c_cnt and _w_cnt
+	members.
+	(san::setup): Drop parameter.  Don't initialize removed members.
+	(san::leave): Don't set removed members.
+	(class myfault): Only define on 32 bit.
+	(myfault::faulted): Only keep implementation not taking any parameter.
+	Drop argument in call to sebastian.setup.
+	(__try/__leave/__except/__endtry): Implement to support real SEH.  For
+	now stick to SJLJ on 32 bit.
+	* dcrt0.cc (dll_crt0_0): Drop 64 bit call to
+	exception::install_myfault_handler.
+	* exception.h (exception_handler): Define with EXCEPTION_DISPOSITION
+	as return type.
+	(PDISPATCHER_CONTEXT): Define as void * on 32 bit.  Define as pointer
+	to _DISPATCHER_CONTEXT on 64 bit.
+	(class exception): Define separately for 32 and 64 bit.
+	(exception::myfault): Add handler for myfault SEH handling on 64 bit.
+	(exception::exception): Fix mangled method name to account for change
+	in type of last parameter.
+	(exception::install_myfault_handler): Remove.
+	* exceptions.cc (exception::myfault_handle): Remove.
+	(exception::myfault): New SEH handler for 64 bit.
+	* gendef (_sigbe): Set tls_pathbuf counters to 0 explicitely when
+	returning to the caller.
+	* ntdll.h: Move a comment to a better place.
+	(struct _SCOPE_TABLE): Define on 64 bit.
+	* thread.cc (verifyable_object_isvalid): Remove gcc 4.7 workaround.
+	* tls_pbuf.cc (tls_pbuf): Fix to accommodate new place of pathbufs.
+	(tls_pathbuf::destroy): Change type of loop variables to uint32_t.
+	* tls_pbuf.h (class tmp_pathbuf): Change type of buffer counters to
+	uint32_t.  Accommodate new place of pathbufs.
+	* tlsoffsets.h: Regenerate.
+	* tlsoffsets64.h: Regenerate.
+
+2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (__import_address): Cover the first dereference to imp
+	under the fault handler.
+
+2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (if_freenameindex): Don't catch a SEGV from free to fail
+	loudly on double free.
+
+2014-08-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (rmdir): Don't skip deleting fh in the ENOTEMPTY case.
+
+2014-08-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* tls_pbuf.h (tmp_pathbuf::tmp_pathbuf): Convert to inline method.
+	(tmp_pathbuf::~tmp_pathbuf): Ditto.
+	* tls_pbuf.cc (tmp_pathbuf::tmp_pathbuf): Remove here.
+	(tmp_pathbuf::~tmp_pathbuf): Ditto.
+
+2014-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (dirfd): Per POSIX, return EINVAL on invalid directory stream.
+	(telldir): Per POSIX, return -1 and set errno to EBADF, rather than
+	just returning 0, on invalid directory stream.
+	* signal.cc (sigwaitinfo): Return -1, not EFAULT, when SEGV was catched.
+
+2014-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Replace WNet[...]A with WNet[...]W imports.
+	* dcrt0.cc (initial_env): Drop strlwr calls.  Call strcasestr instead.
+	* fhandler_netdrive.cc: Throughout, convert to calling WNet UNICODE
+	functions.  Use tmp_pathbuf rather than alloca.  Replace call to
+	strlwr with call to RtlDowncaseUnicodeString.
+
+2014-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_serial::is_tty): Reinstantiate.
+
+2014-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfuncs.cc (strlwr): Rename from cygwin_strlwr.  Drop __stdcall
+	decoration.
+	(strupr): Rename from cygwin_strupr.  Drop __stdcall decoration.
+	* string.h (strlwr): Remove override macro.  Simply declare.
+	(strupr): Ditto.
+
+2014-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Mention that console
+	handles are kernel objects since Windows 8.
+	* fhandler.h (enum conn_state): Add "listener" state.
+	(class fhandler_socket): Drop listener status flag.
+	(fhandler_socket::lseek): Return -1 and errno ESPIPE.
+	(fhandler_serial::lseek): Ditto.
+	(fhandler_serial::is_tty): Remove.
+	* fhandler_socket.cc (fhandler_socket::listen): Set connect_state to
+	listener.  Add comment.
+	(fhandler_socket::accept4): Explicitely check if the socket is listening
+	and fail with EINVAL, if not.  Explain why we have to do that.
+	(fhandler_socket::getpeereid): Drop now redundant test.
+
+2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.h (_GNU_SOURCE): Define.  Explain why.
+
+2014-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dlmalloc.c: Remove unused file.
+	* dlmalloc.h: Ditto.
+	* malloc.cc: Update to Doug Lea's malloc version 2.8.6.
+
+2014-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 33.
+	(CYGWIN_VERSION_API_MINOR): Bump to reflect intermediate 1.7.32 release.
+
 2014-08-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cpuid.h: Add missing copyright header.  Fix formatting.  Use uint32_t
@@ -48,6 +470,10 @@
 
 	* thread.cc (pthread::init_mainthread): Initialize thread mutex to
 	type PTHREAD_MUTEX_RECURSIVE, just as for any other thread.
+
+2014-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 32.
 
 2014-07-16  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -127,7 +553,8 @@
 	writing small buffers.  Rename variables and add comments to help
 	understanding the code in years to come.
 
-2014-07-07  Corinna Vinschen  <corinna@vinschen.de>
+2014-07-07  Pierre Humblet  <Pierre.Humblet@ieee.org>
+	    Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/minires.c (minires_dprintf): Change "Minires" to "Resolv" to
 	differ from external minres lib.
@@ -257,7 +684,7 @@
 2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_floppy.cc (fhandler_dev_floppy::get_drive_info): Fix floppy
-	drive handling broken with 1.7.19.  
+	drive handling broken with 1.7.19.
 
 2014-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -317,6 +744,12 @@
 
 	* fhandler_console.cc (dev_console::save_restore): Only save current
 	dwEnd line rather than the one after that.
+
+2014-05-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winlean.h (PIPE_REJECT_REMOTE_CLIENTS): Drop temporary definition
+	since Mingw64 catched up.
+	(DNLEN): Redefine as 16.  Explain why.
 
 2014-05-05  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -381,7 +814,7 @@
 	(tmp_pathbuf::w_get): Ditto.
 	* tls_pbuf.h (class tmp_pathbuf): Change type of c_buf_old and w_buf_old
 	to unsigned.
-	(tmp_pathbuf::check_usage): New inline method to check if we have
+	(tmp_pathbuf::check_usage): New inline method to check if we have 
 	enough tmp_pathbuf buffers left to call a function using tmp_pathbuf
 	buffers.
 	* tlsoffsets.h: Regenerate.
@@ -395,21 +828,21 @@
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 30.
 
+2014-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (exception::myfault_handle): Only handle the minimum
+	amount of exceptions the myfault handler was designed for.
+
 2014-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.sc.in: (Temporarily?) workaround serious ld bug which
 	truncates symbols in certain computations to 32 bit.  See
 	https://sourceware.org/bugzilla/show_bug.cgi?id=16821
 
-2014-04-09  Corinna Vinschen  <corinna@vinschen.de>
-
-	* exceptions.cc (exception::myfault_handle): Only handle the minimum
-	amount of exceptions the myfault handler was designed for.
-
 2014-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver_ipc.h (ipc_set_proc_info): Add bool parameter to specify
-	whether or not to send signal_arrived. 
+	whether or not to send signal_arrived.
 	* shm.cc (client_request_shm::client_request_shm): Call
 	ipc_set_proc_info with bool parameter set to true to not send
 	signal_arrived.
@@ -606,6 +1039,11 @@
 
 	* dir.cc (opendir): Propagate any errno from build_fh_name.
 
+2014-03-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setlsapwd.cc (setlsapwd): Use RtlSecureZeroMemory to delete password
+	from memory.
+
 2014-03-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/config.h (__TM_GMTOFF): Define.
@@ -641,13 +1079,6 @@
 	(fhandler_console::char_command): Use scroll_buffer_screen as appropriate.
 	(dev_console::scroll_buffer): Remove if 0'ed block.
 
-2014-02-22  Corinna Vinschen  <corinna@vinschen.de>
-
-	* external.cc (cygwin_internal): Add cases for CW_GETPWSID and
-	CW_GETGRSID.
-	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_SETENT, CW_GETENT,
-	CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID and CW_GETGRSID.
-
 2014-02-22  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
 	* dev_console::scroll_buffer): Reinstate clipping region.
@@ -677,6 +1108,13 @@
 	(fhandler_console::cursor_get): Ditto.
 	(fhandler_console::write): Fix "reverse index".
 
+2014-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): Add cases for CW_GETPWSID and
+	CW_GETGRSID.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_SETENT, CW_GETENT,
+	CW_ENDENT, CW_GETNSSSEP, CW_GETPWSID and CW_GETGRSID.
+
 2014-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (getgrouplist): Fix previous fix so ret is only set to ngroups
@@ -686,6 +1124,16 @@
 
 	* grp.cc (get_groups): Don't add gid to list if it's ILLEGAL_GID.
 	(getgrouplist): Return number of groups, just like glibc.
+
+2014-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setlsapwd.cc (setlsapwd): Fix conditional expression after breaking
+	it on 2014-01-23.
+
+2014-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (dll_crt0_1): Call initial_setlocale before fetching
+	current user information.
 
 2014-02-15  Christopher Faylor  <me.cygwin2014@cgf.cx>
 
@@ -765,6 +1213,9 @@
 	* net.cc (cygwin_gethostname): Call GetComputerNameExA rather than
 	GetComputerNameA if gethostname failed.
 	* shared.cc (user_info::initialize): Fix formatting.
+
+2014-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/sys/file.h: Define flock and accompanying macros if not
 	already defined in sys/_default_fcntl.h.
 

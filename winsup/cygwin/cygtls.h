@@ -44,18 +44,28 @@ details. */
 #else
 #pragma pack(push,4)
 #endif
+
 /* Defined here to support auto rebuild of tlsoffsets.h. */
 class tls_pathbuf
 {
-  int c_cnt;
-  int w_cnt;
+  /* Make sure that c_cnt and w_cnt are always the first two members of this
+     class, and never change the size (32 bit), unless you also change the
+     mov statements in sigbe! */
+  union
+    {
+      struct
+	{
+	  uint32_t c_cnt;
+	  uint32_t w_cnt;
+	};
+      uint64_t _counters;
+    };
   char  *c_buf[TP_NUM_C_BUFS];
   WCHAR *w_buf[TP_NUM_W_BUFS];
 
 public:
   void destroy ();
   friend class tmp_pathbuf;
-  friend class _cygtls;
   friend class san;
 };
 
@@ -136,7 +146,6 @@ struct _local_storage
   /* thread.cc */
   HANDLE cw_timer;
 
-  /* All functions requiring temporary path buffers. */
   tls_pathbuf pathbufs;
   char ttybuf[32];
 };
@@ -288,31 +297,43 @@ const int CYGTLS_PADSIZE = 12700;
 extern PVOID _tlsbase __asm__ ("%fs:4");
 extern PVOID _tlstop __asm__ ("%fs:8");
 #endif
+
 #define _my_tls (*((_cygtls *) ((char *)_tlsbase - CYGTLS_PADSIZE)))
 extern _cygtls *_main_tls;
 extern _cygtls *_sig_tls;
 
+#ifdef __x86_64__
+class san
+{
+  uint64_t _cnt;
+public:
+  san () __attribute__ ((always_inline))
+  {
+    _cnt = _my_tls.locals.pathbufs._counters;
+  }
+  /* This is the first thing called in the __except handler.  The attribute
+     "returns_twice" makes sure that GCC disregards any register value set
+     earlier in the function, so this call serves as a register barrier. */
+  void leave () __attribute__ ((returns_twice));
+};
+#else
 class san
 {
   san *_clemente;
   jmp_buf _context;
-  int _errno;
-  unsigned _c_cnt;
-  unsigned _w_cnt;
+  uint32_t _c_cnt;
+  uint32_t _w_cnt;
 public:
-  int setup (int myerrno = 0) __attribute__ ((always_inline))
+  int setup () __attribute__ ((always_inline))
   {
     _clemente = _my_tls.andreas;
     _my_tls.andreas = this;
-    _errno = myerrno;
     _c_cnt = _my_tls.locals.pathbufs.c_cnt;
     _w_cnt = _my_tls.locals.pathbufs.w_cnt;
     return __sjfault (_context);
   }
   void leave () __attribute__ ((always_inline))
   {
-    if (_errno)
-      set_errno (_errno);
     /* Restore tls_pathbuf counters in case of error. */
     _my_tls.locals.pathbufs.c_cnt = _c_cnt;
     _my_tls.locals.pathbufs.w_cnt = _w_cnt;
@@ -331,17 +352,76 @@ public:
   ~myfault () __attribute__ ((always_inline)) { sebastian.reset (); }
   inline int faulted () __attribute__ ((always_inline))
   {
-    return sebastian.setup (0);
-  }
-  inline int faulted (void const *obj, int myerrno = 0) __attribute__ ((always_inline))
-  {
-    return !obj || !(*(const char **) obj) || sebastian.setup (myerrno);
-  }
-  inline int faulted (int myerrno) __attribute__ ((always_inline))
-  {
-    return sebastian.setup (myerrno);
+    return sebastian.setup ();
   }
 };
+#endif
+
+/* Exception handling macros.  These are required because SEH differs a lot
+   between 32 and 64 bit.  Essentially, on 64 bit, we have to create compile
+   time SEH tables which define the handler and try/except labels, while on
+   32 bit we can simply set up an SJLJ handler within the myfault class. */
+#define __mem_barrier	__asm__ __volatile__ ("" ::: "memory")
+#ifdef __x86_64__
+#define __try \
+  { \
+    __label__ __l_try, __l_except, __l_endtry; \
+    __mem_barrier; \
+    san __sebastian; \
+    __asm__ goto ("\n" \
+      "  .seh_handler _ZN9exception7myfaultEP17_EXCEPTION_RECORDPvP8_CONTEXTP19_DISPATCHER_CONTEXT, @except						\n" \
+      "  .seh_handlerdata						\n" \
+      "  .long 1							\n" \
+      "  .rva %l[__l_try],%l[__l_endtry],%l[__l_except],%l[__l_except]	\n" \
+      "  .seh_code							\n" \
+      : : : : __l_try, __l_endtry, __l_except); \
+    { \
+      __l_try: \
+	__mem_barrier;
+
+#define __leave	\
+      goto __l_endtry
+
+#define __except(__errno) \
+      goto __l_endtry; \
+    } \
+    { \
+      __l_except: \
+	__mem_barrier; \
+	__sebastian.leave (); \
+	if (__errno) \
+	  set_errno (__errno);
+
+#define __endtry \
+    } \
+    __l_endtry: \
+      __mem_barrier; \
+  }
+
+#else /* !__x86_64__ */
+#define __try \
+  { \
+    __label__ __l_endtry; \
+    myfault efault; \
+    if (!efault.faulted ()) \
+      {
+
+#define __leave	\
+	goto __l_endtry
+
+#define __except(__errno) \
+	  goto __l_endtry; \
+      } \
+      { \
+	if (__errno) \
+	  set_errno (__errno);
+
+#define __endtry \
+      } \
+    __l_endtry: \
+      __mem_barrier; \
+  }
+#endif /* __x86_64__ */
 
 class set_signal_arrived
 {

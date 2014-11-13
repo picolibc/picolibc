@@ -17,6 +17,7 @@ details. */
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
+#include "shared_info.h"
 #include "fhandler.h"
 #include "fhandler_virtual.h"
 #include "pinfo.h"
@@ -44,6 +45,7 @@ static off_t format_proc_uptime (void *, char *&);
 static off_t format_proc_cpuinfo (void *, char *&);
 static off_t format_proc_partitions (void *, char *&);
 static off_t format_proc_self (void *, char *&);
+static off_t format_proc_cygdrive (void *, char *&);
 static off_t format_proc_mounts (void *, char *&);
 static off_t format_proc_filesystems (void *, char *&);
 static off_t format_proc_swaps (void *, char *&);
@@ -55,6 +57,7 @@ static const virt_tab_t proc_tab[] = {
   { _VN ("."),		 FH_PROC,	virt_directory,	NULL },
   { _VN (".."),		 FH_PROC,	virt_directory,	NULL },
   { _VN ("cpuinfo"),	 FH_PROC,	virt_file,	format_proc_cpuinfo },
+  { _VN ("cygdrive"),	 FH_PROC,	virt_symlink,	format_proc_cygdrive },
   { _VN ("devices"),	 FH_PROC,	virt_file,	format_proc_devices },
   { _VN ("filesystems"), FH_PROC,	virt_file,	format_proc_filesystems },
   { _VN ("loadavg"),	 FH_PROC,	virt_file,	format_proc_loadavg },
@@ -1178,6 +1181,10 @@ format_proc_partitions (void *, char *&destbuf)
   char *buf = tp.c_get ();
   char *bufptr = buf;
   char *ioctl_buf = tp.c_get ();
+  PWCHAR mp_buf = tp.w_get ();
+  WCHAR fpath[MAX_PATH];
+  WCHAR gpath[MAX_PATH];
+  DWORD len;
 
   /* Open \Device object directory. */
   wchar_t wpath[MAX_PATH] = L"\\Device";
@@ -1216,13 +1223,12 @@ format_proc_partitions (void *, char *&destbuf)
 	continue;
       /* Got it.  Now construct the path to the entire disk, which is
 	 "\\Device\\HarddiskX\\Partition0", and open the disk with
-	 minimum permssions. */
+	 minimum permissions. */
       unsigned long drive_num = wcstoul (dbi->ObjectName.Buffer + 8, NULL, 10);
       wcscpy (wpath, dbi->ObjectName.Buffer);
       PWCHAR wpart = wpath + dbi->ObjectName.Length / sizeof (WCHAR);
-      __small_swprintf (wpart, L"\\Partition0");
-      upath.Length = dbi->ObjectName.Length
-		     + wcslen (wpart) * sizeof (WCHAR);
+      wcpcpy (wpart, L"\\Partition0");
+      upath.Length = dbi->ObjectName.Length + 22;
       upath.MaximumLength = upath.Length + sizeof (WCHAR);
       InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
 				  dirhdl, NULL);
@@ -1236,7 +1242,7 @@ format_proc_partitions (void *, char *&destbuf)
 	}
       if (!got_one)
 	{
-	  print ("major minor  #blocks  name\n\n");
+	  print ("major minor  #blocks  name   win-mounts\n\n");
 	  got_one = true;
 	}
       /* Fetch partition info for the entire disk to get its size. */
@@ -1305,9 +1311,27 @@ format_proc_partitions (void *, char *&destbuf)
 	    if (part_num == 0)
 	      continue;
 	    dev.parsedisk (drive_num, part_num);
-	    bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
+
+	    bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s",
 				       dev.get_major (), dev.get_minor (),
 				       size >> 10, dev.name + 5);
+	    /* Check if the partition is mounted in Windows and, if so,
+	       print the mount point list. */
+	    __small_swprintf (fpath,
+			      L"\\\\?\\GLOBALROOT\\Device\\%S\\Partition%u\\",
+			      &dbi->ObjectName, part_num);
+	    if (GetVolumeNameForVolumeMountPointW (fpath, gpath, MAX_PATH)
+		&& GetVolumePathNamesForVolumeNameW (gpath, mp_buf,
+						     NT_MAX_PATH, &len))
+	      {
+		len = strlen (dev.name + 5);
+		while (len++ < 6)
+		  *bufptr++ = ' ';
+		for (PWCHAR p = mp_buf; *p; p = wcschr (p, L'\0') + 1)
+		  bufptr += __small_sprintf (bufptr, " %W", p);
+	      }
+
+	    *bufptr++ = '\n';
 	  }
       NtClose (devhdl);
     }
@@ -1326,6 +1350,16 @@ format_proc_self (void *, char *&destbuf)
 {
   destbuf = (char *) crealloc_abort (destbuf, 16);
   return __small_sprintf (destbuf, "%d", getpid ());
+}
+
+static off_t
+format_proc_cygdrive (void *, char *&destbuf)
+{
+  destbuf = (char *) crealloc_abort (destbuf, mount_table->cygdrive_len + 1);
+  char *dend = stpcpy (destbuf, mount_table->cygdrive);
+  if (dend > destbuf + 1)	/* cygdrive != "/"? */
+    *--dend = '\0';
+  return dend - destbuf;
 }
 
 static off_t

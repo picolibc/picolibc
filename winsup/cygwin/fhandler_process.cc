@@ -1161,8 +1161,8 @@ format_process_statm (void *data, char *&destbuf)
 		       &vmlib, &vmshare))
     return 0;
   destbuf = (char *) crealloc_abort (destbuf, 96);
-  return __small_sprintf (destbuf, "%ld %ld %ld %ld %ld %ld %ld",
-			  vmsize, vmrss, vmshare, vmtext, vmlib, vmdata, 0);
+  return __small_sprintf (destbuf, "%ld %ld %ld %ld %ld %ld 0\n",
+			  vmsize, vmrss, vmshare, vmtext, vmlib, vmdata);
 }
 
 extern "C" {

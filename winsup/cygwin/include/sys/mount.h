@@ -1,7 +1,7 @@
 /* sys/mount.h
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2010, 2012
-   Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2010, 2012,
+   2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,6 +11,9 @@ details. */
 
 #ifndef _SYS_MOUNT_H
 #define _SYS_MOUNT_H
+
+#define BLOCK_SIZE 1024
+#define BLOCK_SIZE_BITS	10
 
 #ifdef __cplusplus
 extern "C" {

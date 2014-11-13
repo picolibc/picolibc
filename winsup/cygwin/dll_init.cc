@@ -640,7 +640,7 @@ dll_dllcrt0_1 (VOID *x)
      when loaded either statically or dynamically.  Because this leaves
      a stale pointer into demapped memory space if the DLL is unloaded
      by a call to dlclose, we prevent this happening for dynamically
-     loaded DLLS in dlopen by saving and restoring cxx_malloc around
+     loaded DLLs in dlopen by saving and restoring cxx_malloc around
      the call to LoadLibrary, which invokes the DLL's startup sequence.
      Modern DLLs won't even attempt to override the pointer when loaded
      statically, but will write their overrides directly into the

@@ -1,6 +1,6 @@
 # Makefile.in for Cygwin.
 # Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-# 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+# 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -153,31 +153,157 @@ DLL_IMPORTS:=${shell $(CC) -print-file-name=w32api/libkernel32.a} ${shell $(CC) 
 
 MT_SAFE_OBJECTS:=
 #
-DLL_OFILES:=advapi32.o arc4random.o assert.o autoload.o base64.o bsdlib.o ctype.o \
-	cxx.o cygheap.o cygthread.o cygtls.o cygwait.o cygxdr.o dcrt0.o debug.o \
-	devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o exceptions.o \
-	exec.o external.o fcntl.o fenv.o fhandler.o fhandler_clipboard.o \
-	fhandler_console.o fhandler_dev.o fhandler_disk_file.o fhandler_dsp.o \
-	fhandler_fifo.o fhandler_floppy.o fhandler_mailslot.o \
-	fhandler_netdrive.o fhandler_nodevice.o fhandler_proc.o \
-	fhandler_process.o fhandler_procnet.o fhandler_procsys.o \
-	fhandler_procsysvipc.o fhandler_random.o fhandler_raw.o \
-	fhandler_registry.o fhandler_serial.o fhandler_socket.o fhandler_tape.o \
-	fhandler_termios.o fhandler_tty.o fhandler_virtual.o fhandler_windows.o \
-	fhandler_zero.o flock.o fnmatch.o fork.o fts.o ftw.o getopt.o glob.o \
-	glob_pattern_p.o globals.o grp.o heap.o hookapi.o inet_addr.o \
-	inet_network.o init.o ioctl.o ipc.o kernel32.o libstdcxx_wrapper.o \
-	localtime.o lsearch.o malloc_wrapper.o minires-os-if.o minires.o \
-	miscfuncs.o mktemp.o mmap.o msg.o mount.o net.o netdb.o nfs.o nftw.o \
-	nlsfuncs.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o posix_ipc.o \
-	pseudo-reloc.o pthread.o random.o regcomp.o regerror.o regexec.o regfree.o \
-	registry.o resource.o rexec.o rcmd.o scandir.o sched.o sec_acl.o \
-	sec_auth.o sec_helper.o security.o select.o sem.o setlsapwd.o shared.o \
-	shm.o sigfe.o signal.o sigproc.o smallprint.o spawn.o strace.o strfmon.o \
-	strfuncs.o strptime.o strsep.o strsig.o sync.o syscalls.o sysconf.o \
-	syslog.o termios.o thread.o timer.o times.o tls_pbuf.o tty.o uinfo.o \
-	uname.o wait.o wincap.o window.o winf.o wow64.o xsique.o \
-	$(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
+DLL_OFILES:= \
+	advapi32.o \
+	arc4random.o \
+	assert.o \
+	autoload.o \
+	base64.o \
+	bsdlib.o \
+	ctype.o \
+	cxx.o \
+	cygheap.o \
+	cygthread.o \
+	cygtls.o \
+	cygwait.o \
+	cygxdr.o \
+	dcrt0.o \
+	debug.o \
+	devices.o \
+	dir.o \
+	dlfcn.o \
+	dll_init.o \
+	dtable.o \
+	environ.o \
+	errno.o \
+	exceptions.o \
+	exec.o \
+	external.o \
+	fcntl.o \
+	fenv.o \
+	fhandler.o \
+	fhandler_clipboard.o \
+	fhandler_console.o \
+	fhandler_dev.o \
+	fhandler_disk_file.o \
+	fhandler_dsp.o \
+	fhandler_fifo.o \
+	fhandler_floppy.o \
+	fhandler_mailslot.o \
+	fhandler_netdrive.o \
+	fhandler_nodevice.o \
+	fhandler_proc.o \
+	fhandler_process.o \
+	fhandler_procnet.o \
+	fhandler_procsys.o \
+	fhandler_procsysvipc.o \
+	fhandler_random.o \
+	fhandler_raw.o \
+	fhandler_registry.o \
+	fhandler_serial.o \
+	fhandler_socket.o \
+	fhandler_tape.o \
+	fhandler_termios.o \
+	fhandler_tty.o \
+	fhandler_virtual.o \
+	fhandler_windows.o \
+	fhandler_zero.o \
+	flock.o \
+	fnmatch.o \
+	fork.o \
+	fts.o \
+	ftw.o \
+	getopt.o \
+	glob.o \
+	glob_pattern_p.o \
+	globals.o \
+	grp.o \
+	heap.o \
+	hookapi.o \
+	inet_addr.o \
+	inet_network.o \
+	init.o \
+	ioctl.o \
+	ipc.o \
+	kernel32.o \
+	libstdcxx_wrapper.o \
+	localtime.o \
+	lsearch.o \
+	malloc_wrapper.o \
+	minires-os-if.o \
+	minires.o \
+	miscfuncs.o \
+	mktemp.o \
+	mmap.o \
+	msg.o \
+	mount.o \
+	net.o \
+	netdb.o \
+	nfs.o \
+	nftw.o \
+	nlsfuncs.o \
+	ntea.o \
+	passwd.o \
+	path.o \
+	pinfo.o \
+	pipe.o \
+	poll.o \
+	posix_ipc.o \
+	pseudo-reloc.o \
+	pthread.o \
+	quotactl.o \
+	random.o \
+	regcomp.o \
+	regerror.o \
+	regexec.o \
+	regfree.o \
+	registry.o \
+	resource.o \
+	rexec.o \
+	rcmd.o \
+	scandir.o \
+	sched.o \
+	sec_acl.o \
+	sec_auth.o \
+	sec_helper.o \
+	security.o \
+	select.o \
+	sem.o \
+	setlsapwd.o \
+	shared.o \
+	shm.o \
+	sigfe.o \
+	signal.o \
+	sigproc.o \
+	smallprint.o \
+	spawn.o \
+	strace.o \
+	strfmon.o \
+	strfuncs.o \
+	strptime.o \
+	strsep.o \
+	strsig.o \
+	sync.o \
+	syscalls.o \
+	sysconf.o \
+	syslog.o \
+	termios.o \
+	thread.o \
+	timer.o \
+	times.o \
+	tls_pbuf.o \
+	tty.o \
+	uinfo.o \
+	uname.o \
+	wait.o \
+	wincap.o \
+	window.o \
+	winf.o \
+	wow64.o \
+	xsique.o \
+	$(EXTRA_OFILES) \
+	$(MALLOC_OFILES) \
+	$(MT_SAFE_OBJECTS)
 
 EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
 	cygtls.o \
@@ -202,10 +328,63 @@ endif
 
 GMON_OFILES:=gmon.o mcount.o profil.o mcountFunc.o
 
-ifeq ($(target_cpu),x86_64)
-NEW_FUNCTIONS:=
-else
 NEW_FUNCTIONS:=$(addprefix --replace=,\
+	atexit= \
+	timezone= \
+	__xdrrec_getrec= \
+	__xdrrec_setnonblock= \
+	xdr_array= \
+	xdr_bool= \
+	xdr_bytes= \
+	xdr_char= \
+	xdr_double= \
+	xdr_enum= \
+	xdr_float= \
+	xdr_free= \
+	xdr_hyper= \
+	xdr_int= \
+	xdr_int16_t= \
+	xdr_int32_t= \
+	xdr_int64_t= \
+	xdr_int8_t= \
+	xdr_long= \
+	xdr_longlong_t= \
+	xdr_netobj= \
+	xdr_opaque= \
+	xdr_pointer= \
+	xdr_reference= \
+	xdr_short= \
+	xdr_sizeof= \
+	xdr_string= \
+	xdr_u_char= \
+	xdr_u_hyper= \
+	xdr_u_int= \
+	xdr_u_int16_t= \
+	xdr_u_int32_t= \
+	xdr_u_int64_t= \
+	xdr_u_int8_t= \
+	xdr_u_long= \
+	xdr_u_longlong_t= \
+	xdr_u_short= \
+	xdr_uint16_t= \
+	xdr_uint32_t= \
+	xdr_uint64_t= \
+	xdr_uint8_t= \
+	xdr_union= \
+	xdr_vector= \
+	xdr_void= \
+	xdr_wrapstring= \
+	xdrmem_create= \
+	xdrrec_create= \
+	xdrrec_endofrecord= \
+	xdrrec_eof= \
+	xdrrec_skiprecord= \
+	xdrstdio_create= \
+)
+ifeq ($(target_cpu),x86_64)
+NEW_FUNCTIONS+=
+else
+NEW_FUNCTIONS+=$(addprefix --replace=,\
 	acl=_acl32 \
 	aclcheck=_aclcheck32 \
 	aclfrommode=_aclfrommode32 \
@@ -253,7 +432,6 @@ NEW_FUNCTIONS:=$(addprefix --replace=,\
 	setreuid=_setreuid32 \
 	setuid=_setuid32 \
 	stat=_stat64 \
-	timezone= \
 	tmpfile=_tmpfile64 \
 	truncate=_truncate64 \
 )

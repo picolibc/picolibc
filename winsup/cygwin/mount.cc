@@ -1772,50 +1772,54 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
      isn't really supported except from fstab? */
   int res = -1;
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    /* errno set */;
-  else if (!*posix_path)
-    set_errno (EINVAL);
-  else if (strpbrk (posix_path, "\\:"))
-    set_errno (EINVAL);
-  else if (flags & MOUNT_CYGDRIVE) /* normal mount */
+  __try
     {
-      /* When flags include MOUNT_CYGDRIVE, take this to mean that
-	we actually want to change the cygdrive prefix and flags
-	without actually mounting anything. */
-      res = mount_table->write_cygdrive_info (posix_path, flags);
-      win32_path = NULL;
-    }
-  else if (!*win32_path)
-    set_errno (EINVAL);
-  else
-    {
-      char *w32_path = (char *) win32_path;
-      if (flags & MOUNT_BIND)
+      if (!*posix_path)
+	set_errno (EINVAL);
+      else if (strpbrk (posix_path, "\\:"))
+	set_errno (EINVAL);
+      else if (flags & MOUNT_CYGDRIVE) /* normal mount */
 	{
-	  /* Prepend root path to bound path. */
-	  tmp_pathbuf tp;
-	  device dev;
-
-	  unsigned conv_flags = 0;
-	  const char *bound_path = w32_path;
-
-	  w32_path = tp.c_get ();
-	  int error = mount_table->conv_to_win32_path (bound_path, w32_path,
-						       dev, &conv_flags);
-	  if (error || strlen (w32_path) >= MAX_PATH)
-	    return true;
-	  if ((flags & ~MOUNT_SYSTEM) == (MOUNT_BIND | MOUNT_BINARY))
-	    flags = (MOUNT_BIND | conv_flags)
-		    & ~(MOUNT_IMMUTABLE | MOUNT_AUTOMATIC);
+	  /* When flags include MOUNT_CYGDRIVE, take this to mean that
+	    we actually want to change the cygdrive prefix and flags
+	    without actually mounting anything. */
+	  res = mount_table->write_cygdrive_info (posix_path, flags);
+	  win32_path = NULL;
 	}
-      /* Make sure all mounts are user mounts, even those added via mount -a. */
-      flags &= ~MOUNT_SYSTEM;
-      res = mount_table->add_item (w32_path, posix_path, flags);
-    }
+      else if (!*win32_path)
+	set_errno (EINVAL);
+      else
+	{
+	  char *w32_path = (char *) win32_path;
+	  if (flags & MOUNT_BIND)
+	    {
+	      /* Prepend root path to bound path. */
+	      tmp_pathbuf tp;
+	      device dev;
 
-  syscall_printf ("%R = mount(%s, %s, %y)", res, win32_path, posix_path, flags);
+	      unsigned conv_flags = 0;
+	      const char *bound_path = w32_path;
+
+	      w32_path = tp.c_get ();
+	      int error = mount_table->conv_to_win32_path (bound_path, w32_path,
+							   dev, &conv_flags);
+	      if (error || strlen (w32_path) >= MAX_PATH)
+		return true;
+	      if ((flags & ~MOUNT_SYSTEM) == (MOUNT_BIND | MOUNT_BINARY))
+		flags = (MOUNT_BIND | conv_flags)
+			& ~(MOUNT_IMMUTABLE | MOUNT_AUTOMATIC);
+	    }
+	  /* Make sure all mounts are user mounts, even those added via
+	     mount -a. */
+	  flags &= ~MOUNT_SYSTEM;
+	  res = mount_table->add_item (w32_path, posix_path, flags);
+	}
+
+      syscall_printf ("%R = mount(%s, %s, %y)",
+		      res, win32_path, posix_path, flags);
+    }
+  __except (EFAULT) {}
+  __endtry
   return res;
 }
 
@@ -1827,15 +1831,18 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 extern "C" int
 umount (const char *path)
 {
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  if (!*path)
+  __try
     {
-      set_errno (EINVAL);
-      return -1;
+      if (!*path)
+	{
+	  set_errno (EINVAL);
+	  __leave;
+	}
+      return cygwin_umount (path, 0);
     }
-  return cygwin_umount (path, 0);
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }
 
 /* cygwin_umount: This is like umount but takes an additional flags

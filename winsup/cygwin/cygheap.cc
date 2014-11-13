@@ -140,6 +140,8 @@ init_cygheap::close_ctty ()
 void
 init_cygheap::init_installation_root ()
 {
+  ptrdiff_t len = 0;
+
   if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
     api_fatal ("Can't initialize Cygwin installation root dir.\n"
 	       "GetModuleFileNameW(%p, %p, %u), %E",
@@ -147,16 +149,18 @@ init_cygheap::init_installation_root ()
   PWCHAR p = installation_root;
   if (wcsncasecmp (p, L"\\\\", 2))	/* Normal drive letter path */
     {
-      p = wcpcpy (p, L"\\??\\");
-      GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 4);
+      len = 4;
+      memmove (p + 4, p, PATH_MAX - 4);
+      p = wcpncpy (p, L"\\\\?\\", 4);
     }
   else
     {
       bool unc = false;
       if (wcsncmp (p + 2, L"?\\", 2))	/* No long path prefix, so UNC path. */
 	{
-	  p = wcpcpy (p, L"\\??\\UN");
-	  GetModuleFileNameW (cygwin_hmodule, p, PATH_MAX - 6);
+	  len = 6;
+	  memmove (p + 6, p, PATH_MAX - 6);
+	  p = wcpncpy (p, L"\\??\\UN", 6);
 	  *p = L'C';
 	  unc = true;
 	}
@@ -170,12 +174,12 @@ init_cygheap::init_installation_root ()
 	}
     }
   installation_root[1] = L'?';
-
   RtlInitEmptyUnicodeString (&installation_key, installation_key_buf,
 			     sizeof installation_key_buf);
   RtlInt64ToHexUnicodeString (hash_path_name (0, installation_root),
 			      &installation_key, FALSE);
 
+  /* Strip off last path component ("\\cygwin1.dll") */
   PWCHAR w = wcsrchr (installation_root, L'\\');
   if (w)
     {
@@ -185,6 +189,20 @@ init_cygheap::init_installation_root ()
   if (!w)
     api_fatal ("Can't initialize Cygwin installation root dir.\n"
 	       "Invalid DLL path");
+
+  /* Copy result into installation_dir before stripping off "bin" dir and
+     revert to Win32 path.  This path is added to the Windows environment
+     in buildenv.  See there for a description. */
+  installation_dir_len = wcpncpy (installation_dir, installation_root + len,
+				  PATH_MAX)
+			 - installation_dir;
+  if (len == 4)		/* Local path */
+    ;
+  else if (len == 6)	/* UNC path */
+    installation_dir[0] = L'\\';
+  else			/* Long, prefixed path */
+    installation_dir[1] = L'\\';
+
   /* If w < p, the Cygwin DLL resides in the root dir of a drive or network
      path.  In that case, if we strip off yet another backslash, the path
      becomes invalid.  We avoid that here so that the DLL also works in this
@@ -638,10 +656,7 @@ init_cygheap::find_tls (int sig, bool& issig_wait)
   _cygtls *t = NULL;
   issig_wait = false;
 
-  myfault efault;
-  if (efault.faulted ())
-    threadlist[ix]->remove (INFINITE);
-  else
+  __try
     {
       ix = -1;
       /* Scan thread list looking for valid signal-delivery candidates */
@@ -652,11 +667,15 @@ init_cygheap::find_tls (int sig, bool& issig_wait)
 	  {
 	    t = cygheap->threadlist[ix];
 	    issig_wait = true;
-	    goto out;
+	    __leave;
 	  }
 	else if (!t && !sigismember (&(threadlist[ix]->sigmask), sig))
 	  t = cygheap->threadlist[ix];
     }
-out:
+  __except (NO_ERROR)
+    {
+      threadlist[ix]->remove (INFINITE);
+    }
+  __endtry
   return t;
 }

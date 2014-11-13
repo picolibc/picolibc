@@ -1761,37 +1761,37 @@ flock (int fd, int operation)
   int cmd;
   struct flock fl = { 0, SEEK_SET, 0, 0, 0 };
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-
-  cygheap_fdget cfd (fd, true);
-  if (cfd < 0)
-    goto done;
-
-  cmd = (operation & LOCK_NB) ? F_SETLK : F_SETLKW;
-  switch (operation & (~LOCK_NB))
+  __try
     {
-    case LOCK_EX:
-      fl.l_type = F_WRLCK;
-      break;
-    case LOCK_SH:
-      fl.l_type = F_RDLCK;
-      break;
-    case LOCK_UN:
-      fl.l_type = F_UNLCK;
-      break;
-    default:
-      set_errno (EINVAL);
-      goto done;
+      cygheap_fdget cfd (fd, true);
+      if (cfd < 0)
+	__leave;
+
+      cmd = (operation & LOCK_NB) ? F_SETLK : F_SETLKW;
+      switch (operation & (~LOCK_NB))
+	{
+	case LOCK_EX:
+	  fl.l_type = F_WRLCK;
+	  break;
+	case LOCK_SH:
+	  fl.l_type = F_RDLCK;
+	  break;
+	case LOCK_UN:
+	  fl.l_type = F_UNLCK;
+	  break;
+	default:
+	  set_errno (EINVAL);
+	  __leave;
+	}
+      if (!cfd->mandatory_locking ())
+	fl.l_type |= F_FLOCK;
+      res = cfd->mandatory_locking () ? cfd->mand_lock (cmd, &fl)
+				      : cfd->lock (cmd, &fl);
+      if ((res == -1) && ((get_errno () == EAGAIN) || (get_errno () == EACCES)))
+	set_errno (EWOULDBLOCK);
     }
-  if (!cfd->mandatory_locking ())
-    fl.l_type |= F_FLOCK;
-  res = cfd->mandatory_locking () ? cfd->mand_lock (cmd, &fl)
-				  : cfd->lock (cmd, &fl);
-  if ((res == -1) && ((get_errno () == EAGAIN) || (get_errno () == EACCES)))
-    set_errno (EWOULDBLOCK);
-done:
+  __except (EFAULT) {}
+  __endtry
   syscall_printf ("%R = flock(%d, %d)", res, fd, operation);
   return res;
 }
@@ -1805,50 +1805,50 @@ lockf (int filedes, int function, off_t size)
 
   pthread_testcancel ();
 
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-
-  cygheap_fdget cfd (filedes, true);
-  if (cfd < 0)
-    goto done;
-
-  fl.l_start = 0;
-  fl.l_len = size;
-  fl.l_whence = SEEK_CUR;
-
-  switch (function)
+  __try
     {
-    case F_ULOCK:
-      cmd = F_SETLK;
-      fl.l_type = F_UNLCK;
-      break;
-    case F_LOCK:
-      cmd = F_SETLKW;
-      fl.l_type = F_WRLCK;
-      break;
-    case F_TLOCK:
-      cmd = F_SETLK;
-      fl.l_type = F_WRLCK;
-      break;
-    case F_TEST:
-      fl.l_type = F_WRLCK;
-      if (cfd->lock (F_GETLK, &fl) == -1)
-	goto done;
-      if (fl.l_type == F_UNLCK || fl.l_pid == getpid ())
-	res = 0;
-      else
-	errno = EAGAIN;
-      goto done;
-      /* NOTREACHED */
-    default:
-      errno = EINVAL;
-      goto done;
-      /* NOTREACHED */
+      cygheap_fdget cfd (filedes, true);
+      if (cfd < 0)
+	__leave;
+
+      fl.l_start = 0;
+      fl.l_len = size;
+      fl.l_whence = SEEK_CUR;
+
+      switch (function)
+	{
+	case F_ULOCK:
+	  cmd = F_SETLK;
+	  fl.l_type = F_UNLCK;
+	  break;
+	case F_LOCK:
+	  cmd = F_SETLKW;
+	  fl.l_type = F_WRLCK;
+	  break;
+	case F_TLOCK:
+	  cmd = F_SETLK;
+	  fl.l_type = F_WRLCK;
+	  break;
+	case F_TEST:
+	  fl.l_type = F_WRLCK;
+	  if (cfd->lock (F_GETLK, &fl) == -1)
+	    __leave;
+	  if (fl.l_type == F_UNLCK || fl.l_pid == getpid ())
+	    res = 0;
+	  else
+	    errno = EAGAIN;
+	  __leave;
+	  /* NOTREACHED */
+	default:
+	  errno = EINVAL;
+	  __leave;
+	  /* NOTREACHED */
+	}
+      res = cfd->mandatory_locking () ? cfd->mand_lock (cmd, &fl)
+				      : cfd->lock (cmd, &fl);
     }
-  res = cfd->mandatory_locking () ? cfd->mand_lock (cmd, &fl)
-				  : cfd->lock (cmd, &fl);
-done:
+  __except (EFAULT) {}
+  __endtry
   syscall_printf ("%R = lockf(%d, %d, %D)", res, filedes, function, size);
   return res;
 }

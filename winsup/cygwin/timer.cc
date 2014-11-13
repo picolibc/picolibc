@@ -1,6 +1,6 @@
 /* timer.cc
 
-   Copyright 2004, 2005, 2006, 2008, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 2004, 2005, 2006, 2008, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -219,45 +219,49 @@ it_bad (const timespec& t)
 int
 timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalue)
 {
-  if (!value)
+  int ret = -1;
+
+  __try
     {
-      set_errno (EINVAL);
-      return -1;
-    }
+      if (!value)
+	{
+	  set_errno (EINVAL);
+	  __leave;
+	}
 
-  myfault efault;
-  if (efault.faulted (EFAULT)
-      || it_bad (value->it_value)
-      || it_bad (value->it_interval))
-    return -1;
+      if (it_bad (value->it_value) || it_bad (value->it_interval))
+	__leave;
 
-  long long now = in_flags & TIMER_ABSTIME ? 0 : gtod.usecs ();
+      long long now = in_flags & TIMER_ABSTIME ? 0 : gtod.usecs ();
 
-  lock_timer_tracker here;
-  cancel ();
+      lock_timer_tracker here;
+      cancel ();
 
-  if (ovalue)
-    gettime (ovalue);
+      if (ovalue)
+	gettime (ovalue);
 
-  if (!value->it_value.tv_sec && !value->it_value.tv_nsec)
-    interval_us = sleepto_us = 0;
-  else
-    {
-      sleepto_us = now + to_us (value->it_value);
-      interval_us = to_us (value->it_interval);
-      it_interval = value->it_interval;
-      if (!hcancel)
-	hcancel = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+      if (!value->it_value.tv_sec && !value->it_value.tv_nsec)
+	interval_us = sleepto_us = 0;
       else
-	ResetEvent (hcancel);
-      if (!syncthread)
-	syncthread = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-      else
-	ResetEvent (syncthread);
-      new cygthread (timer_thread, this, "itimer", syncthread);
+	{
+	  sleepto_us = now + to_us (value->it_value);
+	  interval_us = to_us (value->it_interval);
+	  it_interval = value->it_interval;
+	  if (!hcancel)
+	    hcancel = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+	  else
+	    ResetEvent (hcancel);
+	  if (!syncthread)
+	    syncthread = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+	  else
+	    ResetEvent (syncthread);
+	  new cygthread (timer_thread, this, "itimer", syncthread);
+	}
+      ret = 0;
     }
-
-  return 0;
+  __except (EFAULT) {}
+  __endtry
+  return ret;
 }
 
 void
@@ -280,43 +284,51 @@ timer_tracker::gettime (itimerspec *ovalue)
 extern "C" int
 timer_gettime (timer_t timerid, struct itimerspec *ovalue)
 {
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
+  int ret = -1;
 
-  timer_tracker *tt = (timer_tracker *) timerid;
-  if (tt->magic != TT_MAGIC)
+  __try
     {
-      set_errno (EINVAL);
-      return -1;
-    }
+      timer_tracker *tt = (timer_tracker *) timerid;
+      if (tt->magic != TT_MAGIC)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
 
-  tt->gettime (ovalue);
-  return 0;
+      tt->gettime (ovalue);
+      ret = 0;
+    }
+  __except (EFAULT) {}
+  __endtry
+  return ret;
 }
 
 extern "C" int
 timer_create (clockid_t clock_id, struct sigevent *__restrict evp,
 	      timer_t *__restrict timerid)
 {
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
+  int ret = -1;
 
-  if (CLOCKID_IS_PROCESS (clock_id) || CLOCKID_IS_THREAD (clock_id))
+  __try
     {
-      set_errno (ENOTSUP);
-      return -1;
-    }
+      if (CLOCKID_IS_PROCESS (clock_id) || CLOCKID_IS_THREAD (clock_id))
+	{
+	  set_errno (ENOTSUP);
+	  return -1;
+	}
 
-  if (clock_id != CLOCK_REALTIME)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
+      if (clock_id != CLOCK_REALTIME)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
 
-  *timerid = (timer_t) new timer_tracker (clock_id, evp);
-  return 0;
+      *timerid = (timer_t) new timer_tracker (clock_id, evp);
+      ret = 0;
+    }
+  __except (EFAULT) {}
+  __endtry
+  return ret;
 }
 
 extern "C" int
@@ -324,42 +336,52 @@ timer_settime (timer_t timerid, int flags,
 	       const struct itimerspec *__restrict value,
 	       struct itimerspec *__restrict ovalue)
 {
-  timer_tracker *tt = (timer_tracker *) timerid;
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  if (tt->magic != TT_MAGIC)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
+  int ret = -1;
 
-  return tt->settime (flags, value, ovalue);
+  __try
+    {
+      timer_tracker *tt = (timer_tracker *) timerid;
+      if (tt->magic != TT_MAGIC)
+	{
+	  set_errno (EINVAL);
+	  __leave;
+	}
+      ret = tt->settime (flags, value, ovalue);
+    }
+  __except (EFAULT) {}
+  __endtry
+  return ret;
 }
 
 extern "C" int
 timer_delete (timer_t timerid)
 {
-  timer_tracker *in_tt = (timer_tracker *) timerid;
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  if (in_tt->magic != TT_MAGIC)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
+  int ret = -1;
 
-  lock_timer_tracker here;
-  for (timer_tracker *tt = &ttstart; tt->next != NULL; tt = tt->next)
-    if (tt->next == in_tt)
-      {
-	tt->next = in_tt->next;
-	delete in_tt;
-	return 0;
-      }
-  set_errno (EINVAL);
-  return 0;
+  __try
+    {
+      timer_tracker *in_tt = (timer_tracker *) timerid;
+      if (in_tt->magic != TT_MAGIC)
+	{
+	  set_errno (EINVAL);
+	  __leave;
+	}
+
+      lock_timer_tracker here;
+      for (timer_tracker *tt = &ttstart; tt->next != NULL; tt = tt->next)
+	if (tt->next == in_tt)
+	  {
+	    tt->next = in_tt->next;
+	    delete in_tt;
+	    ret = 0;
+	    __leave;
+	  }
+      set_errno (EINVAL);
+      ret = 0;
+    }
+  __except (EFAULT) {}
+  __endtry
+  return ret;
 }
 
 void
@@ -412,18 +434,13 @@ setitimer (int which, const struct itimerval *__restrict value,
 extern "C" int
 getitimer (int which, struct itimerval *ovalue)
 {
-  int ret;
+  int ret = -1;
+
   if (which != ITIMER_REAL)
-    {
-      set_errno (EINVAL);
-      ret = -1;
-    }
+    set_errno (EINVAL);
   else
     {
-      myfault efault;
-      if (efault.faulted (EFAULT))
-	ret = -1;
-      else
+      __try
 	{
 	  struct itimerspec spec_ovalue;
 	  ret = timer_gettime ((timer_t) &ttstart, &spec_ovalue);
@@ -435,6 +452,8 @@ getitimer (int which, struct itimerval *ovalue)
 	      ovalue->it_value.tv_usec = spec_ovalue.it_value.tv_nsec / 1000;
 	    }
 	}
+      __except (EFAULT) {}
+      __endtry
     }
   syscall_printf ("%R = getitimer()", ret);
   return ret;

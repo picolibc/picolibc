@@ -1,6 +1,6 @@
 /* msg.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2002, 2003, 2004, 2005, 2008, 2009 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2008, 2009, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -91,38 +91,40 @@ client_request_msg::client_request_msg (int msqid,
 extern "C" int
 msgctl (int msqid, int cmd, struct msqid_ds *buf)
 {
-  syscall_printf ("msgctl (msqid = %d, cmd = %y, buf = %p)",
-		  msqid, cmd, buf);
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  switch (cmd)
+  syscall_printf ("msgctl (msqid = %d, cmd = %y, buf = %p)", msqid, cmd, buf);
+  __try
     {
-      case IPC_STAT:
-	break;
-      case IPC_SET:
-	break;
-      case IPC_RMID:
-	break;
-      case IPC_INFO:
-	break;
-      case MSG_INFO:
-	break;
-      default:
-	syscall_printf ("-1 [%d] = msgctl ()", EINVAL);
-	set_errno (EINVAL);
-	return -1;
+      switch (cmd)
+	{
+	  case IPC_STAT:
+	    break;
+	  case IPC_SET:
+	    break;
+	  case IPC_RMID:
+	    break;
+	  case IPC_INFO:
+	    break;
+	  case MSG_INFO:
+	    break;
+	  default:
+	    syscall_printf ("-1 [%d] = msgctl ()", EINVAL);
+	    set_errno (EINVAL);
+	    __leave;
+	}
+      client_request_msg request (msqid, cmd, buf);
+      if (request.make_request () == -1 || request.retval () == -1)
+	{
+	  syscall_printf ("-1 [%d] = msgctl ()", request.error_code ());
+	  set_errno (request.error_code ());
+	  if (request.error_code () == ENOSYS)
+	    raise (SIGSYS);
+	  __leave;
+	}
+      return request.retval ();
     }
-  client_request_msg request (msqid, cmd, buf);
-  if (request.make_request () == -1 || request.retval () == -1)
-    {
-      syscall_printf ("-1 [%d] = msgctl ()", request.error_code ());
-      set_errno (request.error_code ());
-      if (request.error_code () == ENOSYS)
-	raise (SIGSYS);
-      return -1;
-    }
-  return request.retval ();
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }
 
 extern "C" int
@@ -147,19 +149,22 @@ msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
   syscall_printf ("msgrcv (msqid = %d, msgp = %p, msgsz = %ld, "
 		  "msgtyp = %d, msgflg = %y)",
 		  msqid, msgp, msgsz, msgtyp, msgflg);
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  client_request_msg request (msqid, msgp, msgsz, msgtyp, msgflg);
-  if (request.make_request () == -1 || request.rcvval () == -1)
+  __try
     {
-      syscall_printf ("-1 [%d] = msgrcv ()", request.error_code ());
-      set_errno (request.error_code ());
-      if (request.error_code () == ENOSYS)
-	raise (SIGSYS);
-      return -1;
+      client_request_msg request (msqid, msgp, msgsz, msgtyp, msgflg);
+      if (request.make_request () == -1 || request.rcvval () == -1)
+	{
+	  syscall_printf ("-1 [%d] = msgrcv ()", request.error_code ());
+	  set_errno (request.error_code ());
+	  if (request.error_code () == ENOSYS)
+	    raise (SIGSYS);
+	  __leave;
+	}
+      return request.rcvval ();
     }
-  return request.rcvval ();
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }
 
 extern "C" int
@@ -167,17 +172,20 @@ msgsnd (int msqid, const void *msgp, size_t msgsz, int msgflg)
 {
   syscall_printf ("msgsnd (msqid = %d, msgp = %p, msgsz = %ld, msgflg = %y)",
 		  msqid, msgp, msgsz, msgflg);
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  client_request_msg request (msqid, msgp, msgsz, msgflg);
-  if (request.make_request () == -1 || request.retval () == -1)
+  __try
     {
-      syscall_printf ("-1 [%d] = msgsnd ()", request.error_code ());
-      set_errno (request.error_code ());
-      if (request.error_code () == ENOSYS)
-	raise (SIGSYS);
-      return -1;
+      client_request_msg request (msqid, msgp, msgsz, msgflg);
+      if (request.make_request () == -1 || request.retval () == -1)
+	{
+	  syscall_printf ("-1 [%d] = msgsnd ()", request.error_code ());
+	  set_errno (request.error_code ());
+	  if (request.error_code () == ENOSYS)
+	    raise (SIGSYS);
+	  __leave;
+	}
+      return request.retval ();
     }
-  return request.retval ();
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }

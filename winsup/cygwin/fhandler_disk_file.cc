@@ -648,9 +648,9 @@ fhandler_base::fstat_helper (struct stat *buf,
 	      /* We have to re-open the file.  Either the file is not opened
 		 for reading, or the read will change the file position of the
 		 original handle. */
-	      pc.init_reopen_attr (&attr, h);
 	      status = NtOpenFile (&h, SYNCHRONIZE | FILE_READ_DATA,
-				   &attr, &io, FILE_SHARE_VALID_FLAGS,
+				   pc.init_reopen_attr (attr, h), &io,
+				   FILE_SHARE_VALID_FLAGS,
 				   FILE_OPEN_FOR_BACKUP_INTENT
 				   | FILE_SYNCHRONOUS_IO_NONALERT);
 	      if (!NT_SUCCESS (status))
@@ -690,7 +690,7 @@ fhandler_base::fstat_helper (struct stat *buf,
     }
 
  done:
-  syscall_printf ("0 = fstat (%S, %p) st_size=%D, st_mode=%y, st_ino=%D"
+  syscall_printf ("0 = fstat (%S, %p) st_size=%D, st_mode=0%o, st_ino=%D"
 		  "st_atim=%lx.%lx st_ctim=%lx.%lx "
 		  "st_mtim=%lx.%lx st_birthtim=%lx.%lx",
 		  pc.get_nt_native_path (), buf,
@@ -775,6 +775,26 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 	    sfs->f_blocks = (fsblkcnt_t) nvdb.TotalClusters.QuadPart;
 	}
       ret = 0;
+    }
+  else if (status == STATUS_INVALID_PARAMETER /* Netapp */
+	   || status == STATUS_INVALID_INFO_CLASS)
+    {
+      FILE_FS_SIZE_INFORMATION fsi;
+      status = NtQueryVolumeInformationFile (fh, &io, &fsi, sizeof fsi,
+					     FileFsSizeInformation);
+      if (NT_SUCCESS (status))
+	{
+	  sfs->f_bsize = fsi.BytesPerSector * fsi.SectorsPerAllocationUnit;
+	  sfs->f_frsize = sfs->f_bsize;
+	  sfs->f_blocks = (fsblkcnt_t) fsi.TotalAllocationUnits.QuadPart;
+	  sfs->f_bfree = sfs->f_bavail =
+	    (fsblkcnt_t) fsi.AvailableAllocationUnits.QuadPart;
+	  ret = 0;
+	}
+      else
+	debug_printf ("%y = NtQueryVolumeInformationFile"
+		      "(%S, FileFsSizeInformation)", 
+		      status, pc.get_nt_native_path ());
     }
   else
     debug_printf ("%y = NtQueryVolumeInformationFile"
@@ -870,9 +890,9 @@ fhandler_disk_file::fchmod (mode_t mode)
       OBJECT_ATTRIBUTES attr;
       HANDLE fh;
 
-      pc.init_reopen_attr (&attr, get_handle ());
-      if (NT_SUCCESS (NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES, &attr, &io,
-				  FILE_SHARE_VALID_FLAGS,
+      if (NT_SUCCESS (NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES,
+      				  pc.init_reopen_attr (attr, get_handle ()),
+				  &io, FILE_SHARE_VALID_FLAGS,
 				  FILE_OPEN_FOR_BACKUP_INTENT)))
 	{
 	  NtSetAttributesFile (fh, pc.file_attributes ());
@@ -1360,9 +1380,9 @@ fhandler_base::utimens_fs (const struct timespec *tvp)
       OBJECT_ATTRIBUTES attr;
       HANDLE fh;
 
-      pc.init_reopen_attr (&attr, get_handle ());
-      if (NT_SUCCESS (NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES, &attr, &io,
-				  FILE_SHARE_VALID_FLAGS,
+      if (NT_SUCCESS (NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES,
+				  pc.init_reopen_attr (attr, get_handle ()),
+				  &io, FILE_SHARE_VALID_FLAGS,
 				  FILE_OPEN_FOR_BACKUP_INTENT)))
 	{
 	  NtSetInformationFile (fh, &io, &fbi, sizeof fbi,
@@ -1531,8 +1551,8 @@ fhandler_disk_file::prw_open (bool write)
 
   /* First try to open with the original access mask */
   ACCESS_MASK access = get_access ();
-  pc.init_reopen_attr (&attr, get_handle ());
-  status = NtOpenFile (&prw_handle, access, &attr, &io,
+  status = NtOpenFile (&prw_handle, access,
+		       pc.init_reopen_attr (attr, get_handle ()), &io,
 		       FILE_SHARE_VALID_FLAGS, get_options ());
   if (status == STATUS_ACCESS_DENIED)
     {

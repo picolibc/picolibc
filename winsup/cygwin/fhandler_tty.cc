@@ -1102,17 +1102,18 @@ fhandler_pty_slave::fstat (struct stat *st)
 /* Helper function for fchmod and fchown, which just opens all handles
    and signals success via bool return. */
 bool
-fhandler_pty_slave::fch_open_handles ()
+fhandler_pty_slave::fch_open_handles (bool chown)
 {
   char buf[MAX_PATH];
+  DWORD write_access = WRITE_DAC | (chown ? WRITE_OWNER : 0);
 
   _tc = cygwin_shared->tty[get_minor ()];
   shared_name (buf, INPUT_AVAILABLE_EVENT, get_minor ());
-  input_available_event = OpenEvent (READ_CONTROL | WRITE_DAC | WRITE_OWNER,
+  input_available_event = OpenEvent (READ_CONTROL | write_access,
 				     TRUE, buf);
-  output_mutex = get_ttyp ()->open_output_mutex (WRITE_DAC | WRITE_OWNER);
-  input_mutex = get_ttyp ()->open_input_mutex (WRITE_DAC | WRITE_OWNER);
-  inuse = get_ttyp ()->open_inuse (WRITE_DAC | WRITE_OWNER);
+  output_mutex = get_ttyp ()->open_output_mutex (write_access);
+  input_mutex = get_ttyp ()->open_input_mutex (write_access);
+  inuse = get_ttyp ()->open_inuse (write_access);
   if (!input_available_event || !output_mutex || !input_mutex || !inuse)
     {
       __seterrno ();
@@ -1166,7 +1167,7 @@ fhandler_pty_slave::fchmod (mode_t mode)
   if (!input_available_event)
     {
       to_close = true;
-      if (!fch_open_handles ())
+      if (!fch_open_handles (false))
 	goto errout;
     }
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
@@ -1195,7 +1196,7 @@ fhandler_pty_slave::fchown (uid_t uid, gid_t gid)
   if (!input_available_event)
     {
       to_close = true;
-      if (!fch_open_handles ())
+      if (!fch_open_handles (true))
 	goto errout;
     }
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));

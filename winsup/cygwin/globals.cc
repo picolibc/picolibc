@@ -1,7 +1,7 @@
 /* globals.cc - Define global variables here.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -69,7 +69,7 @@ int NO_COPY dynamically_loaded;
 /* Some CYGWIN environment variable variables. */
 bool allow_glob = true;
 bool detect_bloda;
-bool dos_file_warning = true;
+bool dos_file_warning;
 bool ignore_case_with_glob;
 bool pipe_byte;
 bool reset_com;

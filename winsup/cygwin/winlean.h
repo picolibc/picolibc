@@ -58,11 +58,6 @@ details. */
 #include <lmcons.h>
 #include <ntdef.h>
 
-/* Temporary kludge for missing flag in Mingw64's w32api. */
-#ifndef PIPE_REJECT_REMOTE_CLIENTS
-#define PIPE_REJECT_REMOTE_CLIENTS 8
-#endif
-
 #ifdef __undef_IN
 #undef IN
 #endif
@@ -78,6 +73,17 @@ details. */
 #ifdef __undef_CRITICAL
 #undef CRITICAL
 #endif
+
+/* So-called "Microsoft Account" SIDs (S-1-11-...) have a netbios domain name
+   "MicrosoftAccounts".  The new "Application Container SIDs" (S-1-15-...)
+   have a netbios domain name "APPLICATION PACKAGE AUTHORITY"
+   
+   The problem is, DNLEN is 15, but these domain names have a length of 16
+   resp. 29 chars :-P  So we override DNLEN here to be 31, so that calls
+   to LookupAccountSid/Name don't fail if the buffer is based on DNLEN.
+   Hope that's enough for a while... */
+#undef DNLEN
+#define DNLEN 31
 
 /* When Terminal Services are installed, the GetWindowsDirectory function
    does not return the system installation dir, but a user specific directory

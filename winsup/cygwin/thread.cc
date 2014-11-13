@@ -1,7 +1,7 @@
 /* thread.cc: Locking and threading module functions
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -38,12 +38,7 @@ extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
 extern "C" int valid_sched_parameters(const struct sched_param *);
 extern "C" int sched_set_thread_priority(HANDLE thread, int priority);
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 7
-/* FIXME: Temporarily workaround gcc 4.7+ bug. */
-static verifyable_object_state
-#else
 static inline verifyable_object_state
-#endif
   verifyable_object_isvalid (void const * objectptr, thread_magic_t magic,
 			     void *static_ptr1 = NULL,
 			     void *static_ptr2 = NULL,
@@ -122,28 +117,29 @@ __cygwin_lock_unlock (_LOCK_T *lock)
   paranoid_printf ("threadcount %d.  unlocked", MT_INTERFACE->threadcount);
 }
 
-#if __GNUC__ == 4 && __GNUC_MINOR__ >= 7
-/* FIXME: Temporarily workaround gcc 4.7+ bug. */
-static verifyable_object_state
-#else
 static inline verifyable_object_state
-#endif
 verifyable_object_isvalid (void const *objectptr, thread_magic_t magic, void *static_ptr1,
 			   void *static_ptr2, void *static_ptr3)
 {
-  myfault efault;
-  if (efault.faulted (objectptr))
-    return INVALID_OBJECT;
+  verifyable_object_state state = INVALID_OBJECT;
 
-  verifyable_object **object = (verifyable_object **) objectptr;
+  __try
+    {
+      if (!objectptr || !(*(const char **) objectptr))
+	__leave;
 
-  if ((static_ptr1 && *object == static_ptr1) ||
-      (static_ptr2 && *object == static_ptr2) ||
-      (static_ptr3 && *object == static_ptr3))
-    return VALID_STATIC_OBJECT;
-  if ((*object)->magic != magic)
-    return INVALID_OBJECT;
-  return VALID_OBJECT;
+      verifyable_object **object = (verifyable_object **) objectptr;
+
+      if ((static_ptr1 && *object == static_ptr1) ||
+	  (static_ptr2 && *object == static_ptr2) ||
+	  (static_ptr3 && *object == static_ptr3))
+	state = VALID_STATIC_OBJECT;
+      else if ((*object)->magic == magic)
+	state = VALID_OBJECT;
+    }
+  __except (NO_ERROR) {}
+  __endtry
+  return state;
 }
 
 /* static members */
@@ -2684,18 +2680,20 @@ pthread_cond::init (pthread_cond_t *cond, const pthread_condattr_t *attr)
       return EAGAIN;
     }
 
-  myfault efault;
-  if (efault.faulted ())
+  int ret = 0;
+
+  __try
+    {
+      *cond = new_cond;
+    }
+  __except (NO_ERROR)
     {
       delete new_cond;
-      cond_initialization_lock.unlock ();
-      return EINVAL;
+      ret = EINVAL;
     }
-
-  *cond = new_cond;
+  __endtry
   cond_initialization_lock.unlock ();
-
-  return 0;
+  return ret;
 }
 
 extern "C" int
@@ -2747,45 +2745,47 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   struct timespec tp;
   LARGE_INTEGER timeout;
 
-  myfault efault;
-  if (efault.faulted ())
-    return EINVAL;
-
   pthread_testcancel ();
 
-  int err = __pthread_cond_wait_init (cond, mutex);
-  if (err)
-    return err;
-
-  /* According to SUSv3, the abstime value must be checked for validity. */
-  if (abstime->tv_sec < 0
-      || abstime->tv_nsec < 0
-      || abstime->tv_nsec > 999999999)
-    return EINVAL;
-
-  clock_gettime ((*cond)->clock_id, &tp);
-
-  /* Check for immediate timeout before converting */
-  if (tp.tv_sec > abstime->tv_sec
-      || (tp.tv_sec == abstime->tv_sec
-	  && tp.tv_nsec > abstime->tv_nsec))
-    return ETIMEDOUT;
-
-  timeout.QuadPart = abstime->tv_sec * NSPERSEC
-		      + (abstime->tv_nsec + 99LL) / 100LL;
-
-  switch ((*cond)->clock_id)
+  __try
     {
-    case CLOCK_REALTIME:
-      timeout.QuadPart += FACTOR;
-      break;
-    default:
-      /* other clocks must be handled as relative timeout */
-      timeout.QuadPart -= tp.tv_sec * NSPERSEC + tp.tv_nsec / 100LL;
-      timeout.QuadPart *= -1LL;
-      break;
+      int err = __pthread_cond_wait_init (cond, mutex);
+      if (err)
+	return err;
+
+      /* According to SUSv3, the abstime value must be checked for validity. */
+      if (abstime->tv_sec < 0
+	  || abstime->tv_nsec < 0
+	  || abstime->tv_nsec > 999999999)
+	__leave;
+
+      clock_gettime ((*cond)->clock_id, &tp);
+
+      /* Check for immediate timeout before converting */
+      if (tp.tv_sec > abstime->tv_sec
+	  || (tp.tv_sec == abstime->tv_sec
+	      && tp.tv_nsec > abstime->tv_nsec))
+	return ETIMEDOUT;
+
+      timeout.QuadPart = abstime->tv_sec * NSPERSEC
+			  + (abstime->tv_nsec + 99LL) / 100LL;
+
+      switch ((*cond)->clock_id)
+	{
+	case CLOCK_REALTIME:
+	  timeout.QuadPart += FACTOR;
+	  break;
+	default:
+	  /* other clocks must be handled as relative timeout */
+	  timeout.QuadPart -= tp.tv_sec * NSPERSEC + tp.tv_nsec / 100LL;
+	  timeout.QuadPart *= -1LL;
+	  break;
+	}
+      return (*cond)->wait (*mutex, &timeout);
     }
-  return (*cond)->wait (*mutex, &timeout);
+  __except (NO_ERROR) {}
+  __endtry
+  return EINVAL;
 }
 
 extern "C" int
@@ -2910,18 +2910,20 @@ pthread_rwlock::init (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr
       return EAGAIN;
     }
 
-  myfault efault;
-  if (efault.faulted ())
+  int ret = 0;
+
+  __try
+    {
+      *rwlock = new_rwlock;
+    }
+  __except (NO_ERROR)
     {
       delete new_rwlock;
-      rwlock_initialization_lock.unlock ();
-      return EINVAL;
+      ret = EINVAL;
     }
-
-  *rwlock = new_rwlock;
+  __endtry
   rwlock_initialization_lock.unlock ();
-
-  return 0;
+  return ret;
 }
 
 extern "C" int
@@ -3133,15 +3135,17 @@ pthread_mutex::init (pthread_mutex_t *mutex,
 	    new_mutex->type = PTHREAD_MUTEX_ERRORCHECK;
 	}
 
-      myfault efault;
-      if (efault.faulted ())
+      __try
+	{
+	  *mutex = new_mutex;
+	}
+      __except (NO_ERROR)
 	{
 	  delete new_mutex;
 	  mutex_initialization_lock.unlock ();
 	  return EINVAL;
 	}
-
-      *mutex = new_mutex;
+      __endtry
     }
   mutex_initialization_lock.unlock ();
   pthread_printf ("*mutex %p, attr %p, initializer %p", *mutex, attr, initializer);
@@ -3230,16 +3234,17 @@ pthread_spinlock::init (pthread_spinlock_t *spinlock, int pshared)
       return EAGAIN;
     }
 
-  myfault efault;
-  if (efault.faulted ())
+  __try
+    {
+      *spinlock = new_spinlock;
+    }
+  __except (NO_ERROR)
     {
       delete new_spinlock;
       return EINVAL;
     }
-
-  *spinlock = new_spinlock;
+  __endtry
   pthread_printf ("*spinlock %p, pshared %d", *spinlock, pshared);
-
   return 0;
 }
 
@@ -3502,35 +3507,38 @@ semaphore::_timedwait (const struct timespec *abstime)
 {
   LARGE_INTEGER timeout;
 
-  myfault efault;
-  if (efault.faulted ())
+  __try
+    {
+      timeout.QuadPart = abstime->tv_sec * NSPERSEC
+			 + (abstime->tv_nsec + 99) / 100 + FACTOR;
+
+      switch (cygwait (win32_obj_id, &timeout, cw_cancel | cw_cancel_self | cw_sig_eintr))
+	{
+	case WAIT_OBJECT_0:
+	  break;
+	case WAIT_SIGNALED:
+	  set_errno (EINTR);
+	  return -1;
+	case WAIT_TIMEOUT:
+	  set_errno (ETIMEDOUT);
+	  return -1;
+	default:
+	  pthread_printf ("cygwait failed. %E");
+	  __seterrno ();
+	  return -1;
+	}
+    }
+  __except (NO_ERROR)
     {
       /* According to SUSv3, abstime need not be checked for validity,
 	 if the semaphore can be locked immediately. */
-      if (!_trywait ())
-	return 0;
-      set_errno (EINVAL);
-      return -1;
+      if (_trywait ())
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
     }
-
-  timeout.QuadPart = abstime->tv_sec * NSPERSEC
-		     + (abstime->tv_nsec + 99) / 100 + FACTOR;
-
-  switch (cygwait (win32_obj_id, &timeout, cw_cancel | cw_cancel_self | cw_sig_eintr))
-    {
-    case WAIT_OBJECT_0:
-      break;
-    case WAIT_SIGNALED:
-      set_errno (EINTR);
-      return -1;
-    case WAIT_TIMEOUT:
-      set_errno (ETIMEDOUT);
-      return -1;
-    default:
-      pthread_printf ("cygwait failed. %E");
-      __seterrno ();
-      return -1;
-    }
+  __endtry
   return 0;
 }
 
@@ -3761,36 +3769,38 @@ semaphore::post (sem_t *sem)
 int
 semaphore::getvalue (sem_t *sem, int *sval)
 {
-  myfault efault;
-  if (efault.faulted () || !is_good_object (sem))
+  __try
     {
-      set_errno (EINVAL);
-      return -1;
+      if (is_good_object (sem))
+	return (*sem)->_getvalue (sval);
     }
-
-  return (*sem)->_getvalue (sval);
+  __except (NO_ERROR) {}
+  __endtry
+  set_errno (EINVAL);
+  return -1;
 }
 
 int
 semaphore::getinternal (sem_t *sem, int *sfd, unsigned long long *shash,
 			LUID *sluid, unsigned int *sval)
 {
-  myfault efault;
-  if (efault.faulted () || !is_good_object (sem))
+  __try
     {
-      set_errno (EINVAL);
-      return -1;
+      if (!is_good_object (sem))
+	__leave;
+      if ((*sfd = (*sem)->fd) < 0)
+	__leave;
+      *shash = (*sem)->hash;
+      *sluid = (*sem)->luid;
+      /* POSIX defines the value in calls to sem_init/sem_open as unsigned,
+	 but the sem_getvalue gets a pointer to int to return the value.
+	 Go figure! */
+      return (*sem)->_getvalue ((int *)sval);
     }
-  if ((*sfd = (*sem)->fd) < 0)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-  *shash = (*sem)->hash;
-  *sluid = (*sem)->luid;
-  /* POSIX defines the value in calls to sem_init/sem_open as unsigned, but
-     the sem_getvalue gets a pointer to int to return the value.  Go figure! */
-  return (*sem)->_getvalue ((int *)sval);
+  __except (NO_ERROR) {}
+  __endtry
+  set_errno (EINVAL);
+  return -1;
 }
 
 /* pthread_null */

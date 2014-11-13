@@ -260,41 +260,45 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 {
   syscall_printf ("shmctl (shmid = %d, cmd = %d, buf = %p)",
 		  shmid, cmd, buf);
-  myfault efault;
-  if (efault.faulted (EFAULT))
-    return -1;
-  client_request_shm request (shmid, cmd, buf);
-  if (request.make_request () == -1 || request.retval () == -1)
+  __try
     {
-      syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
-      set_errno (request.error_code ());
-      if (request.error_code () == ENOSYS)
-	raise (SIGSYS);
-      return -1;
-    }
-  if (cmd == IPC_RMID)
-    {
-      /* Cleanup */
-      shm_shmid_list *ssh_entry, *ssh_next_entry;
-      SLIST_LOCK ();
-      SLIST_FOREACH_SAFE (ssh_entry, &ssh_list, ssh_next, ssh_next_entry)
+      client_request_shm request (shmid, cmd, buf);
+      if (request.make_request () == -1 || request.retval () == -1)
 	{
-	  if (ssh_entry->shmid == shmid)
-	    {
-	      /* Remove this entry from the list and close the handle
-		 only if it's not in use anymore. */
-	      if (ssh_entry->ref_count <= 0)
-		{
-		  SLIST_REMOVE (&ssh_list, ssh_entry, shm_shmid_list, ssh_next);
-		  CloseHandle (ssh_entry->hdl);
-		  delete ssh_entry;
-		}
-	      break;
-	    }
+	  syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
+	  set_errno (request.error_code ());
+	  if (request.error_code () == ENOSYS)
+	    raise (SIGSYS);
+	  __leave;
 	}
-      SLIST_UNLOCK ();
+      if (cmd == IPC_RMID)
+	{
+	  /* Cleanup */
+	  shm_shmid_list *ssh_entry, *ssh_next_entry;
+	  SLIST_LOCK ();
+	  SLIST_FOREACH_SAFE (ssh_entry, &ssh_list, ssh_next, ssh_next_entry)
+	    {
+	      if (ssh_entry->shmid == shmid)
+		{
+		  /* Remove this entry from the list and close the handle
+		     only if it's not in use anymore. */
+		  if (ssh_entry->ref_count <= 0)
+		    {
+		      SLIST_REMOVE (&ssh_list, ssh_entry, shm_shmid_list,
+				    ssh_next);
+		      CloseHandle (ssh_entry->hdl);
+		      delete ssh_entry;
+		    }
+		  break;
+		}
+	    }
+	  SLIST_UNLOCK ();
+	}
+      return request.retval ();
     }
-  return request.retval ();
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }
 
 extern "C" int

@@ -94,7 +94,7 @@ setlsapwd (const char *passwd, const char *username)
 	}
       if (data_buf)
 	{
-	  memset (data.Buffer, 0, data.Length);
+	  RtlSecureZeroMemory (data.Buffer, data.Length);
 	  free (data_buf);
 	}
     }
