@@ -243,7 +243,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
   bool sawsig = false;
   int iscanon = ti.c_lflag & ICANON;
 
-  if (*bytes_read)
+  if (bytes_read)
     *bytes_read = nread;
   while (nread-- > 0)
     {
@@ -402,7 +402,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
     }
 
   /* Adding one compensates for the postdecrement in the above loop. */
-  if (*bytes_read)
+  if (bytes_read)
     *bytes_read -= (nread + 1);
 
   if (sawsig)
