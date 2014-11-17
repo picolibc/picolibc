@@ -1,3 +1,10 @@
+2014-11-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Allow fetching of
+	NT SERVICE accounts by name.  Always prepend domain to NT SERVICE
+	accounts.  Add U-domain\username string to pw_gecos for predefined
+	builtin accounts as well.
+
 2014-11-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_termios.cc (fhandler_termios::line_edit): Fix fatal typo in

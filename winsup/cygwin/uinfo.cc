@@ -1294,6 +1294,19 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  ret = LookupAccountNameW (NULL, name, sid, &slen, dom, &dlen,
 				    &acc_type);
 	}
+      /* LookupAccountName doesn't find NT SERVICE accounts.  Try just for
+      	 kicks (and to make TrustedInstaller work here :-P */
+      else if (!ret)
+	{
+	  p = wcpcpy (name, L"NT SERVICE");
+	  *p = L'\\';
+	  sys_mbstowcs (p + 1, UNLEN + 1, arg.name);
+	  slen = SECURITY_MAX_SID_SIZE;
+	  dlen = DNLEN + 1;
+	  sid = csid;
+	  ret = LookupAccountNameW (NULL, name, sid, &slen, dom, &dlen,
+				    &acc_type);
+	}
       if (!ret)
 	{
 	  debug_printf ("LookupAccountNameW (%W), %E", name);
@@ -1785,8 +1798,11 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  break;
 	case SidTypeWellKnownGroup:
 	  fully_qualified_name = (cygheap->pg.nss_prefix_always ()
-				  /* Microsoft Account */
-				  || sid_id_auth (sid) == 11);
+		  /* NT SERVICE Account */
+		  || (sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
+		      && sid_sub_auth (sid, 0) == SECURITY_SERVICE_ID_BASE_RID)
+		  /* Microsoft Account */
+		  || sid_id_auth (sid) == 11);
 #ifdef INTERIX_COMPATIBLE
 	  if (sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
 	      && sid_sub_auth_count (sid) > 1)
@@ -1937,8 +1953,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
      logon.  Unless it's the SYSTEM account.  This conveniently allows to
      logon interactively as SYSTEM for debugging purposes. */
   else if (acc_type != SidTypeUser && sid != well_known_system_sid)
-    __small_swprintf (linebuf, L"%W:*:%u:%u:,%W:/:/sbin/nologin",
-		      posix_name, uid, gid, sid.string (sidstr));
+    __small_swprintf (linebuf, L"%W:*:%u:%u:U-%W\\%W,%W:/:/sbin/nologin",
+		      posix_name, uid, gid, dom, name, sid.string (sidstr));
   else
     __small_swprintf (linebuf, L"%W:*:%u:%u:%W%WU-%W\\%W,%W:%W%W:%W",
 		      posix_name, uid, gid,
