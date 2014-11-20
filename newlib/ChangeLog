@@ -1,3 +1,8 @@
+2014-11-20  Peter A. Bigot  <pab@pabigot.com>
+
+	* libc/stdio/nano-vfprintf_i.c (_printf_i): Use LONGINT when void* is
+	larger than an int.
+
 2014-11-20  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/sys/rtems/sys/syslimits.h (NGROUPS_MAX): Adjust value so

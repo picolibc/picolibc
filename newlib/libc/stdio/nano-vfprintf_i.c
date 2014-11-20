@@ -150,8 +150,10 @@ _printf_i (struct _reent *data, struct _prt_data_t *pdata, FILE *fp,
        * defined manner.''
        *	-- ANSI X3J11
        */
-      /* NOSTRICT.  */
       pdata->flags |= HEXPREFIX;
+      if (sizeof (void*) > sizeof (int))
+	pdata->flags |= LONGINT;
+      /* NOSTRICT.  */
     case 'x':
       pdata->l_buf[2] = 'x';
       xdigs = "0123456789abcdef";
