@@ -1,3 +1,8 @@
+2014-11-20  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/sys/rtems/sys/syslimits.h (NGROUPS_MAX): Adjust value so
+	that NGROUPS is even.
+
 2014-11-12  Jon Beniston  <jon@beniston.com>
 
 	* libc/stdlib/strtod.c (sulp): Cast to int32_t to avoid overflow.
