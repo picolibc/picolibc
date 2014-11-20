@@ -564,7 +564,7 @@ thread_wrapper (PVOID arg)
   cfree (arg);
 
   /* Remove _cygtls from this stack since it won't be used anymore. */
-  _my_tls.remove (0);
+  _my_tls.remove (INFINITE);
 
   /* Set stack values in TEB */
   PTEB teb = NtCurrentTeb ();

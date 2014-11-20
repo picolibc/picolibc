@@ -1,3 +1,9 @@
+2014-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* init.cc (dll_entry): Call _my_tls.remove with INFINITE wait period
+	to avoid SEGVs and subsequent hangs in _cygtls::find_tls.
+	* miscfuncs.cc (thread_wrapper): Ditto.
+
 2014-11-20  Iuliu Rus  <rus.iuliu@gmail.com>
 
 	* net.cc (fdsock): Change default values for socket buffers on 32 bit
