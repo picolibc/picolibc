@@ -1,3 +1,8 @@
+2014-11-20  Iuliu Rus  <rus.iuliu@gmail.com>
+
+	* net.cc (fdsock): Change default values for socket buffers on 32 bit
+	to fix performance on 10Gb networks.
+
 2014-11-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Allow fetching of

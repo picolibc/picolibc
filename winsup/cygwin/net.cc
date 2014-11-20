@@ -621,13 +621,20 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
      this is no problem on 64 bit.  So we set the default buffer size to
      the default values in current 3.x Linux versions.
 
+     NOTE 3. Setting the window size to 65535 results in extremely bad
+     performance for apps that send data in multiples of Kb, as they
+     eventually end up sending 1 byte on the network and naggle + delay
+     ack kicks in. For example, iperf on a 10Gb network gives only 10
+     Mbits/sec with a 65535 send buffer. We want this to be a multiple
+     of 1k, but since 64k breaks WSADuplicateSocket we use 63Kb.
+
      (*) Maximum normal TCP window size.  Coincidence?  */
 #ifdef __x86_64__
   ((fhandler_socket *) fd)->rmem () = 212992;
   ((fhandler_socket *) fd)->wmem () = 212992;
 #else
-  ((fhandler_socket *) fd)->rmem () = 65535;
-  ((fhandler_socket *) fd)->wmem () = 65535;
+  ((fhandler_socket *) fd)->rmem () = 64512;
+  ((fhandler_socket *) fd)->wmem () = 64512;
 #endif
   if (::setsockopt (soc, SOL_SOCKET, SO_RCVBUF,
 		    (char *) &((fhandler_socket *) fd)->rmem (), sizeof (int)))
