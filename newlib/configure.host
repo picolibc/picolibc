@@ -229,6 +229,7 @@ case "${host_cpu}" in
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
 	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections "
 	newlib_cflags="${newlib_cflags} -mOs "
+	newlib_cflags="${newlib_cflags} -mhwmult=none "
 	machine_dir=msp430
 	default_newlib_nano_malloc="yes"
 	;;

@@ -1,3 +1,8 @@
+2014-11-21  Nick Clifton  <nickc@redhat.com>
+
+	PR target/63901
+	* configure.host (msp430): Add -mhwmult=none to newlib_cflags.
+
 2014-11-20  Peter A. Bigot  <pab@pabigot.com>
 
 	* libc/stdio/nano-vfprintf_i.c (_printf_i): Use LONGINT when void* is
