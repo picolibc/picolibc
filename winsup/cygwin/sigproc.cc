@@ -451,6 +451,14 @@ exit_thread (DWORD res)
   if (no_thread_exit_protect ())
     ExitThread (res);
   sigfillset (&_my_tls.sigmask);	/* No signals wanted */
+
+  /* CV 2014-11-21: Disable the code sending a signal.  The problem with
+     this code is that it allows deadlocks under signal-rich multithreading
+     conditions.
+     The original problem reported in 2012 couldn't be reproduced anymore,
+     even disabling this code.  Tested on XP 32, Vista 32, W7 32, WOW64, 64,
+     W8.1 WOW64, 64. */
+#if 0
   lock_process for_now;			/* May block indefinitely when exiting. */
   HANDLE h;
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
@@ -469,16 +477,17 @@ exit_thread (DWORD res)
   siginfo_t si = {__SIGTHREADEXIT, SI_KERNEL};
   si.si_cyg = h;
   sig_send (myself_nowait, si, &_my_tls);
+#endif
   ExitThread (res);
 }
 
 int __reg3
-sig_send (_pinfo *p, int sig, _cygtls *tid)
+sig_send (_pinfo *p, int sig, _cygtls *tls)
 {
   siginfo_t si = {};
   si.si_signo = sig;
   si.si_code = SI_KERNEL;
-  return sig_send (p, si, tid);
+  return sig_send (p, si, tls);
 }
 
 /* Send a signal to another process by raising its signal semaphore.

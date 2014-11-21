@@ -95,7 +95,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       if (dll_finished_loading
 	  && (PVOID) &_my_tls > (PVOID) &test_stack_marker
 	  && _my_tls.isinitialized ())
-	_my_tls.remove (INFINITE);
+	_my_tls.remove (0);
       break;
     }
 

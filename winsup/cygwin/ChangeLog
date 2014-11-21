@@ -1,3 +1,13 @@
+2014-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* init.cc (dll_entry): Revert previous patch.  This requires another
+	solution.
+	* miscfuncs.cc (thread_wrapper): Ditto.
+	* sigproc.cc (exit_thread): Disable sending a signal for synchronization
+	with process exit.  Explain why.  Keep code in for later inspection,
+	should the problem show up again.
+	(sig_send): Use "tls", rather than "tid" as name for _cygtls arg.
+
 2014-11-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* init.cc (dll_entry): Call _my_tls.remove with INFINITE wait period
