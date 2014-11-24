@@ -1,3 +1,7 @@
+2014-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* utils.xml (passwd): Align to latest changes.
+
 2014-11-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new1.7.34): Add new section.

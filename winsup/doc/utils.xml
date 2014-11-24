@@ -1330,9 +1330,7 @@ System operations:
 
 Other options:
   -d, --logonserver SERVER connect to SERVER (e.g. domain controller).
-                           Default server is the local system, unless
-                           changing the current user, in which case the
-                           default is the content of $LOGONSERVER.
+                           Usually not required.
   -S, --status             display password status for USER (locked, expired,
                            etc.) plus global system password settings.
   -h, --help               output usage information and exit.
@@ -1410,11 +1408,12 @@ specifying an empty password.
     <para> All operations affecting the current user are by default run against
       the logon server of the current user (taken from the environment variable
       <envar>LOGONSERVER</envar>. When password or account information of other
-      users should be changed, the default server is the local system. To
-      change a user account on a remote machine, use the <literal>-d</literal>
-      option to specify the machine to run the command against. Note that the
-      current user must be a valid member of the administrators group on the
-      remote machine to perform such actions. </para>
+      users should be changed, the logon server is evaluated automatically.
+      In rare cases, it might be necessary to switch to another domain
+      controller to perform the action.  In this case, use the
+      <literal>-d</literal> option to specify the machine to run the command
+      against. Note that the current user must have account operator permissions
+      to perform user account changes in a domain. </para>
 
     <para>Users can use the <command>passwd -R</command> to enter a password
       which then gets stored in a special area of the registry on the local
