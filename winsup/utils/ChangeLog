@@ -1,3 +1,12 @@
+2014-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.c (GetPW): If server is NULL, and the user is not a local
+	user, try to fetch the DC to use as server.
+	(ChangePW): Get Windows username via extra parameter.
+	(usage): Reduce -d help text to reflect above change.
+	(main): Fix typo in comment.  Call GetPW and ChangePW as per the
+	changes above.
+
 2014-11-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (usage): Fix language.

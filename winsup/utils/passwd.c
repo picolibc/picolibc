@@ -17,6 +17,7 @@ details. */
 #include <lmerr.h>
 #include <lmcons.h>
 #include <lmapibuf.h>
+#include <dsgetdc.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,7 +116,7 @@ EvalRet (int ret, const char *user)
 }
 
 PUSER_INFO_3
-GetPW (char *user, int print_win_name, LPCWSTR server)
+GetPW (char *user, int print_win_name, LPWSTR *server)
 {
   char usr_buf[UNLEN + 1];
   WCHAR name[UNLEN + 1];
@@ -124,7 +125,7 @@ GetPW (char *user, int print_win_name, LPCWSTR server)
   struct passwd *pw;
   char *domain = (char *) alloca (INTERNET_MAX_HOST_NAME_LENGTH + 1);
 
-  /* Try getting a Win32 username in case the user edited /etc/passwd */
+  /* Get the Win32 username and a suitable server. */
   if ((pw = getpwnam (user)))
     {
       cygwin_internal (CW_EXTRACT_DOMAIN_AND_USER, pw, domain, usr_buf);
@@ -138,20 +139,38 @@ GetPW (char *user, int print_win_name, LPCWSTR server)
 		printf ("Windows username : %s\n", user);
 	    }
 	}
+      if (!*server)
+	{
+	  PDOMAIN_CONTROLLER_INFOW dci;
+	  char machine[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+	  DWORD mlen = sizeof machine;
+	  WCHAR wdom[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+
+	  /* If we can't fetch the local machine name, or if the machine name
+	     is not the same as the user's domain name, try to fetch the DC via
+	     DsGetDcName.  Otherwise, just stick to a NULL servername, since
+	     that's the same as using the local machine. */
+	  if (!GetComputerNameExA (ComputerNameNetBIOS, machine, &mlen)
+	      || strcasecmp (domain, machine) != 0)
+	    {
+	      mbstowcs (wdom, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+	      if (!DsGetDcNameW (NULL, wdom, NULL, NULL, DS_IS_FLAT_NAME, &dci))
+		*server = dci->DomainControllerName;
+	    }
+	}
     }
   mbstowcs (name, user, UNLEN + 1);
-  ret = NetUserGetInfo (server, name, 3, (void *) &ui);
+  ret = NetUserGetInfo (*server, name, 3, (void *) &ui);
   return EvalRet (ret, user) ? NULL : ui;
 }
 
 int
-ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck,
-	  LPCWSTR server)
+ChangePW (const char *user, PCWSTR name, const char *oldpwd, const char *pwd,
+	  int justcheck, LPCWSTR server)
 {
-  WCHAR name[UNLEN + 1], oldpass[512], pass[512];
+  WCHAR oldpass[512], pass[512];
   DWORD ret;
 
-  mbstowcs (name, user, UNLEN + 1);
   mbstowcs (pass, pwd, 512);
   if (!oldpwd)
     {
@@ -281,9 +300,7 @@ usage (FILE * stream, int status)
   "\n"
   "Other options:\n"
   "  -d, --logonserver SERVER connect to SERVER (e.g. domain controller).\n"
-  "                           Default server is the local system, unless\n"
-  "                           changing the current user, in which case the\n"
-  "                           default is the content of $LOGONSERVER.\n"
+  "                           Usually not required.\n"
   "  -S, --status             display password status for USER (locked, expired,\n"
   "                           etc.) plus global system password settings.\n"
   "  -h, --help               output usage information and exit.\n"
@@ -482,7 +499,7 @@ main (int argc, char **argv)
 	break;
 
       case 'V':
-      case 'v':		/* Keep this option for historrical reasons,
+      case 'v':		/* Keep this option for historical reasons,
 			   but don't advertize it. */
 	print_version ();
 	exit (0);
@@ -590,7 +607,7 @@ main (int argc, char **argv)
 	}
     }
 
-  ui = GetPW (user, 1, server);
+  ui = GetPW (user, 1, &server);
   if (!ui)
     return 1;
 
@@ -638,7 +655,7 @@ main (int argc, char **argv)
   if (!caller_is_admin ())
     {
       strcpy (oldpwd, getpass ("Old password: "));
-      if (ChangePW (user, oldpwd, oldpwd, 1, server))
+      if (ChangePW (user, ui->usri3_name, oldpwd, oldpwd, 1, server))
 	return 1;
     }
 
@@ -647,7 +664,8 @@ main (int argc, char **argv)
       strcpy (newpwd, getpass ("New password: "));
       if (strcmp (newpwd, getpass ("Re-enter new password: ")))
 	eprint (0, "Password is not identical.");
-      else if (!ChangePW (user, *oldpwd ? oldpwd : NULL, newpwd, 0, server))
+      else if (!ChangePW (user, ui->usri3_name, *oldpwd ? oldpwd : NULL,
+      			  newpwd, 0, server))
 	ret = 1;
       if (!ret && cnt < 2)
 	eprint (0, "Try again.");
