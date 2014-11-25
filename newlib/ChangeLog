@@ -1,3 +1,9 @@
+2014-11-25  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/_default_fcntl.h: Move all Cygwin-specific open
+	flags from Cygwin's fcntl.h here.  Remove check for WIN32.  Remove
+	Windows-specific macros.
+
 2014-11-23  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* libc/include/sys/resource.h: Add prototype for getrusage()
