@@ -1,5 +1,10 @@
 2014-11-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/fcntl.h: Move all open flags (except O_NDELAY) to newlib's
+	sys/_default_fcntl.h.
+
+2014-11-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* binmode.c (cygwin_premain0): Don't use underscore'd variants of the
 	open flags.
 	* textmode.c (cygwin_premain0): Ditto.
