@@ -1,3 +1,9 @@
+2014-11-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* binmode.c (cygwin_premain0): Don't use underscore'd variants of the
+	open flags.
+	* textmode.c (cygwin_premain0): Ditto.
+
 2014-11-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* init.cc (dll_entry): Revert previous patch.  This requires another

@@ -1,6 +1,6 @@
 /* binmode.c
 
-   Copyright 2000, 2001, 2010, 2013 Red Hat, Inc.
+   Copyright 2000, 2001, 2010, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -18,6 +18,6 @@ cygwin_premain0 (int argc __attribute__ ((unused)),
 		 char **argv __attribute__ ((unused)),
 		 struct per_process *myself __attribute__ ((unused)))
 {
-  _fmode &= ~_O_BINARY;
-  _fmode |= _O_TEXT;
+  _fmode &= ~O_BINARY;
+  _fmode |= O_TEXT;
 }
