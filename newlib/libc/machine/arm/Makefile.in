@@ -68,27 +68,22 @@ CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@HAVE_THUMB1_FALSE@am__DEPENDENCIES_1 = $(lpfx)strcmp.o
-@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@am__DEPENDENCIES_1 = $(lpfx)strcmp.o
-@HAVE_THUMB1_FALSE@am__DEPENDENCIES_2 = $(lpfx)strlen.o
-@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@am__DEPENDENCIES_2 = $(lpfx)strlen.o
-@HAVE_ARMV7_TRUE@am__DEPENDENCIES_3 = $(lpfx)memchr.o
-@HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_TRUE@@OPT_SIZE_FALSE@am__DEPENDENCIES_4 = $(lpfx)memcpy.o
-@HAVE_ARMV7A_TRUE@@OPT_SIZE_FALSE@am__DEPENDENCIES_4 =  \
+@HAVE_THUMB1_FALSE@am__DEPENDENCIES_1 = $(lpfx)strlen.o
+@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@am__DEPENDENCIES_1 = $(lpfx)strlen.o
+@HAVE_ARMV7_TRUE@am__DEPENDENCIES_2 = $(lpfx)memchr.o
+@HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_TRUE@@OPT_SIZE_FALSE@am__DEPENDENCIES_3 = $(lpfx)memcpy.o
+@HAVE_ARMV7A_TRUE@@OPT_SIZE_FALSE@am__DEPENDENCIES_3 =  \
 @HAVE_ARMV7A_TRUE@@OPT_SIZE_FALSE@	$(lpfx)memcpy.o
-@HAVE_THUMB1_FALSE@am__objects_1 = lib_a-strcmp.$(OBJEXT)
-@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@am__objects_1 =  \
-@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@	lib_a-strcmp.$(OBJEXT)
-@HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_TRUE@@OPT_SIZE_FALSE@am__objects_2 = lib_a-memcpy.$(OBJEXT)
-@HAVE_ARMV7A_TRUE@@OPT_SIZE_FALSE@am__objects_2 =  \
+@HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_TRUE@@OPT_SIZE_FALSE@am__objects_1 = lib_a-memcpy.$(OBJEXT)
+@HAVE_ARMV7A_TRUE@@OPT_SIZE_FALSE@am__objects_1 =  \
 @HAVE_ARMV7A_TRUE@@OPT_SIZE_FALSE@	lib_a-memcpy.$(OBJEXT)
-@HAVE_ARMV7_TRUE@am__objects_3 = lib_a-memchr.$(OBJEXT)
-@HAVE_THUMB1_FALSE@am__objects_4 = lib_a-strlen.$(OBJEXT)
-@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@am__objects_4 =  \
+@HAVE_ARMV7_TRUE@am__objects_2 = lib_a-memchr.$(OBJEXT)
+@HAVE_THUMB1_FALSE@am__objects_3 = lib_a-strlen.$(OBJEXT)
+@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@am__objects_3 =  \
 @HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@	lib_a-strlen.$(OBJEXT)
 am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-access.$(OBJEXT) \
-	$(am__objects_1) lib_a-strcpy.$(OBJEXT) $(am__objects_2) \
-	$(am__objects_3) $(am__objects_4) lib_a-strlen-armv7.$(OBJEXT) \
+	lib_a-strcmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3) lib_a-strlen-armv7.$(OBJEXT) \
 	lib_a-aeabi_memcpy.$(OBJEXT) \
 	lib_a-aeabi_memcpy-armv7a.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
@@ -148,6 +143,7 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
@@ -216,12 +212,6 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-@HAVE_THUMB1_FALSE@STRCMP_SRC = strcmp.S
-@HAVE_THUMB1_TRUE@@OPT_SIZE_FALSE@STRCMP_SRC = 
-@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@STRCMP_SRC = strcmp.S
-@HAVE_THUMB1_FALSE@STRCMP_OBJ = $(lpfx)strcmp.o
-@HAVE_THUMB1_TRUE@@OPT_SIZE_FALSE@STRCMP_OBJ = 
-@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@STRCMP_OBJ = $(lpfx)strcmp.o
 @HAVE_THUMB1_FALSE@STRLEN_SRC = strlen.c
 @HAVE_THUMB1_TRUE@@OPT_SIZE_FALSE@STRLEN_SRC = 
 @HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@STRLEN_SRC = strlen.c
@@ -240,19 +230,19 @@ noinst_LIBRARIES = lib.a
 @HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_TRUE@@OPT_SIZE_FALSE@MEMCPY_OBJ = $(lpfx)memcpy.o
 @HAVE_ARMV7A_TRUE@@OPT_SIZE_FALSE@MEMCPY_OBJ = $(lpfx)memcpy.o
 @OPT_SIZE_TRUE@MEMCPY_OBJ = 
-lib_a_SOURCES = setjmp.S access.c $(STRCMP_SRC) strcpy.c \
+lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c \
 	        $(MEMCPY_SRC) $(MEMCHR_SRC) $(STRLEN_SRC) \
 		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_LIBADD = $(STRCMP_OBJ) $(STRLEN_OBJ) $(MEMCHR_OBJ) $(MEMCPY_OBJ)
-lib_a_DEPENDENCIES = $(STRCMP_OBJ) $(STRLEN_OBJ) $(MEMCHR_OBJ) $(MEMCPY_OBJ)
+lib_a_LIBADD = $(STRLEN_OBJ) $(MEMCHR_OBJ) $(MEMCPY_OBJ)
+lib_a_DEPENDENCIES = $(STRLEN_OBJ) $(MEMCHR_OBJ) $(MEMCPY_OBJ)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 MEMCPY_DEP = memcpy-armv7a.S memcpy-armv7m.S
 STRCMP_DEP = strcmp-arm-tiny.S strcmp-armv4.S strcmp-armv4t.S strcmp-armv6.S \
-	strcmp-armv7.S strcmp-armv7m.S
+	strcmp-armv6m.S strcmp-armv7.S strcmp-armv7m.S
 
 all: all-am
 

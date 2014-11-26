@@ -1,3 +1,10 @@
+2014-11-26  Hale Wang  <hale.wang@arm.com>
+
+	* libc/machine/arm/strcmp-armv6m.S: New file.
+	* libc/machine/arm/strcmp.S: Add new wrapper.
+	* libc/machine/arm/Makefile.am: Add dependencies.
+	* libc/machine/arm/Makefile.in: Regenerated.
+
 2014-11-25  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/_default_fcntl.h: Move all Cygwin-specific open
