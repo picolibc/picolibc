@@ -17,14 +17,11 @@ details. */
 #include <ntldap.h>
 #pragma pop_macro ("DECLSPEC_IMPORT")
 
-#define LDAP_USER_PGRP_ATTR		0
-#define LDAP_USER_GECOS_ATTR		1
-#define LDAP_USER_HOME_ATTR		2
-#define LDAP_USER_SHELL_ATTR		3
-#define LDAP_USER_UID_ATTR		4
+#define LDAP_USER_PGRP_ATTR		 0
+#define LDAP_USER_UID_ATTR		 1
 
-#define LDAP_GROUP_NAME_ATTR		0
-#define LDAP_GROUP_GID_ATTR		1
+#define LDAP_GROUP_NAME_ATTR		 0
+#define LDAP_GROUP_GID_ATTR		 1
 
 class cyg_ldap {
   PLDAP lh;
@@ -68,13 +65,10 @@ public:
   gid_t remap_gid (gid_t gid);
   /* User only */
   gid_t get_primary_gid () { return get_num_attribute (LDAP_USER_PGRP_ATTR); }
-  PWCHAR get_gecos () { return get_string_attribute (LDAP_USER_GECOS_ATTR); }
-  PWCHAR get_home ()
-	    { return get_string_attribute (LDAP_USER_HOME_ATTR); }
-  PWCHAR get_shell () { return get_string_attribute (LDAP_USER_SHELL_ATTR); }
   gid_t get_unix_uid () { return get_num_attribute (LDAP_USER_UID_ATTR); }
   /* group only */
   PWCHAR get_group_name ()
 	    { return get_string_attribute (LDAP_GROUP_NAME_ATTR); }
   gid_t get_unix_gid () { return get_num_attribute (LDAP_GROUP_GID_ATTR); }
+  PWCHAR get_string_attribute (PCWSTR name);
 };

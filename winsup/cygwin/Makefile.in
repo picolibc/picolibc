@@ -523,7 +523,7 @@ all_host: $(TEST_LIB_NAME)
 
 force:
 
-install: install-libs install-headers install-man install_target \
+install: install-libs install-headers install-man install-ldif install_target \
 	$(install_host) $(install_target)
 
 uninstall: uninstall-libs uninstall-headers uninstall-man
@@ -560,6 +560,10 @@ install-man:
 	for i in `find . -type f -name '*.7'`; do \
 	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/man7/`basename $$i` ; \
 	done
+
+install-ldif:
+	@$(MKDIRP) $(DESTDIR)$(datarootdir)/cygwin
+	$(INSTALL_DATA) $(srcdir)/cygwin.ldif $(DESTDIR)$(datarootdir)/cygwin
 
 install_target:
 

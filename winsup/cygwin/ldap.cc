@@ -31,20 +31,32 @@ static PWCHAR rootdse_attr[] =
   NULL
 };
 
-static PWCHAR user_attr[] =
+static const PCWSTR std_user_attr[] =
 {
-  (PWCHAR) L"primaryGroupID",
-  (PWCHAR) L"gecos",
-  (PWCHAR) L"unixHomeDirectory",
-  (PWCHAR) L"loginShell",
-  (PWCHAR) L"uidNumber",
-  NULL
+  L"primaryGroupID",
+  L"uidNumber",
+  L"cygwinUnixUid",		/* TODO */
+  /* windows scheme */
+  L"displayName",
+  L"homeDrive",
+  L"homeDirectory",
+  /* cygwin scheme */
+  L"cygwinGecos",
+  L"cygwinHome",
+  L"cygwinShell",
+  /* unix scheme */
+  L"gecos",
+  L"unixHomeDirectory",
+  L"loginShell",
+  /* desc scheme */
+  L"description"
 };
 
 static PWCHAR group_attr[] =
 {
   (PWCHAR) L"cn",
   (PWCHAR) L"gidNumber",
+  (PWCHAR) L"cygwinUnixGid",	/* TODO */
   NULL
 };
 
@@ -71,6 +83,32 @@ PWCHAR rfc2307_gid_attr[] =
   (PWCHAR) L"cn",
   NULL
 };
+
+/* ================================================================= */
+/* Helper method of cygheap_pwdgrp class.  It sets the user attribs  */
+/* from the settings in nsswitch.conf.				     */
+/* ================================================================= */
+
+#define user_attr	(cygheap->pg.ldap_user_attr)
+
+void
+cygheap_pwdgrp::init_ldap_user_attr ()
+{
+  ldap_user_attr = (PWCHAR *)
+    ccalloc_abort (HEAP_BUF, sizeof (std_user_attr) / sizeof (*std_user_attr)
+			     + 3 * NSS_SCHEME_MAX + 1, sizeof (PWCHAR));
+  memcpy (ldap_user_attr, std_user_attr, sizeof (std_user_attr));
+  uint16_t freeattr_idx = sizeof (std_user_attr) / sizeof (*std_user_attr);
+  for (uint16_t idx = 0; idx < NSS_SCHEME_MAX; ++idx)
+    {
+      if (home_scheme[idx].method == NSS_SCHEME_FREEATTR)
+	ldap_user_attr[freeattr_idx++] = home_scheme[idx].attrib;
+      if (shell_scheme[idx].method == NSS_SCHEME_FREEATTR)
+	ldap_user_attr[freeattr_idx++] = shell_scheme[idx].attrib;
+      if (gecos_scheme[idx].method == NSS_SCHEME_FREEATTR)
+	ldap_user_attr[freeattr_idx++] = gecos_scheme[idx].attrib;
+    }
+}
 
 /* ================================================================= */
 /* Helper methods.						     */
@@ -388,6 +426,8 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
 	  r = wcpcpy (r, domain);
 	}
     }
+  if (!user_attr)
+    cygheap->pg.init_ldap_user_attr ();
   attr = group ? group_attr : user_attr;
   if (search (rdse, filter, attr) != 0)
       return false;
@@ -421,7 +461,7 @@ cyg_ldap::enumerate_ad_accounts (PCWSTR domain, bool group)
 		"(objectSid=*))";
   else
     filter = L"(&(objectClass=Group)"
-		/* 1 == ACCOUNT_GROUP */
+		/* 1 == BUILTIN_LOCAL_GROUP */
 		"(!(groupType:" LDAP_MATCHING_RULE_BIT_AND ":=1))"
 		"(objectSid=*))";
   srch_id = ldap_search_init_pageW (lh, rootdse, LDAP_SCOPE_SUBTREE,
@@ -503,20 +543,26 @@ cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
 }
 
 PWCHAR
-cyg_ldap::get_string_attribute (int idx)
+cyg_ldap::get_string_attribute (PCWSTR name)
 {
   if (val)
     ldap_value_freeW (val);
-  val = ldap_get_valuesW (lh, entry, attr[idx]);
+  val = ldap_get_valuesW (lh, entry, (PWCHAR) name);
   if (val)
     return val[0];
   return NULL;
 }
 
+PWCHAR
+cyg_ldap::get_string_attribute (int idx)
+{
+  return get_string_attribute (attr[idx]);
+}
+
 uint32_t
 cyg_ldap::get_num_attribute (int idx)
 {
-  PWCHAR ret = get_string_attribute (idx);
+  PWCHAR ret = get_string_attribute (attr[idx]);
   if (ret)
     return (uint32_t) wcstoul (ret, NULL, 10);
   return (uint32_t) -1;

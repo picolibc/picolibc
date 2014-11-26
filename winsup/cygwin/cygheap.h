@@ -400,19 +400,40 @@ public:
 
 class cygheap_pwdgrp
 {
-  enum pfx_t {
-    NSS_AUTO = 0,
-    NSS_PRIMARY,
-    NSS_ALWAYS
+  enum nss_pfx_t {
+    NSS_PFX_AUTO = 0,
+    NSS_PFX_PRIMARY,
+    NSS_PFX_ALWAYS
   };
-  bool    nss_inited;
-  int     pwd_src;
-  int     grp_src;
-  pfx_t   prefix;
-  WCHAR   separator[2];
-  bool    caching;
-  int	  enums;
-  PWCHAR  enum_tdoms;
+public:
+  enum nss_scheme_method {
+    NSS_SCHEME_FALLBACK = 0,
+    NSS_SCHEME_WINDOWS,
+    NSS_SCHEME_CYGWIN,
+    NSS_SCHEME_UNIX,
+    NSS_SCHEME_DESC,
+    NSS_SCHEME_PATH,
+    NSS_SCHEME_FREEATTR
+  };
+  struct nss_scheme_t {
+    nss_scheme_method	method;
+    PWCHAR		attrib;
+  };
+private:
+  bool		nss_inited;
+  uint32_t	pwd_src;
+  uint32_t	grp_src;
+  nss_pfx_t	prefix;
+  WCHAR		separator[2];
+  bool		caching;
+
+#define NSS_SCHEME_MAX	4
+  nss_scheme_t	home_scheme[NSS_SCHEME_MAX];
+  nss_scheme_t	shell_scheme[NSS_SCHEME_MAX];
+  nss_scheme_t	gecos_scheme[NSS_SCHEME_MAX];
+
+  uint32_t	enums;
+  PWCHAR	enum_tdoms;
 
   void nss_init_line (const char *line);
   void _nss_init ();
@@ -431,6 +452,10 @@ public:
 
   void init ();
 
+  /* Implemented in ldap.cc */
+  PWCHAR *ldap_user_attr;
+  void init_ldap_user_attr ();
+
   inline void nss_init () { if (!nss_inited) _nss_init (); }
   inline bool nss_pwd_files () const { return !!(pwd_src & NSS_SRC_FILES); }
   inline bool nss_pwd_db () const { return !!(pwd_src & NSS_SRC_DB); }
@@ -438,12 +463,22 @@ public:
   inline bool nss_grp_files () const { return !!(grp_src & NSS_SRC_FILES); }
   inline bool nss_grp_db () const { return !!(grp_src & NSS_SRC_DB); }
   inline int  nss_grp_src () const { return grp_src; } /* CW_GETNSS_GRP_SRC */
-  inline bool nss_prefix_auto () const { return prefix == NSS_AUTO; }
-  inline bool nss_prefix_primary () const { return prefix == NSS_PRIMARY; }
-  inline bool nss_prefix_always () const { return prefix == NSS_ALWAYS; }
+  inline bool nss_prefix_auto () const { return prefix == NSS_PFX_AUTO; }
+  inline bool nss_prefix_primary () const { return prefix == NSS_PFX_PRIMARY; }
+  inline bool nss_prefix_always () const { return prefix == NSS_PFX_ALWAYS; }
   inline PCWSTR nss_separator () const { return separator; }
   inline bool nss_cygserver_caching () const { return caching; }
   inline void nss_disable_cygserver_caching () { caching = false; }
+
+  char *get_home (cyg_ldap *pldap, PCWSTR dom, PCWSTR name, bool fq);
+  char *get_home (struct _USER_INFO_3 *ui, PCWSTR dom, PCWSTR name, bool fq);
+
+  char *get_shell (cyg_ldap *pldap, PCWSTR dom, PCWSTR name, bool fq);
+  char *get_shell (struct _USER_INFO_3 *ui, PCWSTR dom, PCWSTR name, bool fq);
+
+  char *get_gecos (cyg_ldap *pldap, PCWSTR dom, PCWSTR name, bool fq);
+  char *get_gecos (struct _USER_INFO_3 *ui, PCWSTR dom, PCWSTR name, bool fq);
+
   inline int nss_db_enums () const { return enums; }
   inline PCWSTR nss_db_enum_tdoms () const { return enum_tdoms; }
 };

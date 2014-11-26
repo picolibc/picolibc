@@ -1,3 +1,52 @@
+2014-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (install): Add install-ldif target.
+	(install-ldif): New target to install cygwin.ldif.
+	* cygheap.h (class cygheap_pwdgrp): Rename pfx_t to nss_pfx_t.  Add
+	PFX to enum value.  Add nss_scheme_method enum and nss_scheme_t
+	structure.  Add home_scheme, shell_scheme and gecos_scheme members.
+	(NSS_SCHEME_MAX): Define.
+	(cygheap_pwdgrp::get_home): Declare.
+	(cygheap_pwdgrp::get_shell): Declare.
+	(cygheap_pwdgrp::get_gecos): Declare.
+	* cygwin.ldif: New file.
+	* ldap.cc (std_user_attr): New array, just defining the standard
+	attributes.
+	(group_attr): Add cygwinUnixGid.
+	(user_attr): Convert to macro pointing to cygheap->pg.ldap_user_attr.
+	(cygheap_pwdgrp::init_ldap_user_attr): New method.
+	(cyg_ldap::fetch_ad_account): Call cygheap_pwdgrp::init_ldap_user_attr
+	if user_attr initialization is required.  Fix comment.
+	(cyg_ldap::get_string_attribute): Implement taking attribute name
+	as argument.
+	* ldap.h: Drop unused macros.
+	(cyg_ldap::get_gecos): Remove.
+	(cyg_ldap::get_home): Remove.
+	(cyg_ldap::get_shell): Remove.
+	(cyg_ldap::get_string_attribute): Declare name argument variant public.
+	* uinfo.cc (cygheap_user::ontherange): Fix indentation.
+	(cygheap_pwdgrp::init): Initialize new home_scheme, shell_scheme and
+	gecos_scheme members.  Align comment.
+	(NSS_NCMP): Define comparison macro.
+	(NSS_CMP): Ditto.
+	(cygheap_pwdgrp::nss_init_line): Use aforementioned macros throughout.
+	Fix comment handling.  Add db_home, db_shell and db_gecos handling.
+	(fetch_from_description): New function to fetch XML-style attributes
+	from (description) string.
+	(fetch_from_path): New function to evaluate path string with wildcards.
+	(cygheap_pwdgrp::get_home): New methods to fetch pw_dir value.
+	(cygheap_pwdgrp::get_shell): Ditto for pw_shell.
+	(cygheap_pwdgrp::get_gecos): Ditto for pw_gecos.
+	(colon_to_semicolon): Move up.
+	(pwdgrp::fetch_account_from_windows): Convert home, shell, gecos
+	variables to char*.  Drop statement breaking extended group info.
+	Fetch home, shell and gecos values using new methods.  Use
+	fetch_from_description calls to fetch UNIX id and primary groups from
+	SAM comment field.  Accommodate uxid being a char* now.  Accommodate
+	the fact that extended info is malloc'ed, rather then alloca'ed.
+	Create linebuf content as multibyte string.  Create line buffer by
+	just calling cstrdup.
+
 2014-11-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/fcntl.h: Move all open flags (except O_NDELAY) to newlib's

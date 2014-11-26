@@ -320,7 +320,7 @@ cuserid (char *src)
 const char *
 cygheap_user::ontherange (homebodies what, struct passwd *pw)
 {
-  LPUSER_INFO_3 ui = NULL;
+  PUSER_INFO_3 ui = NULL;
   WCHAR wuser[UNLEN + 1];
   NET_API_STATUS ret;
   char homedrive_env_buf[3];
@@ -369,7 +369,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
 	      sys_mbstowcs (wlogsrv, sizeof (wlogsrv) / sizeof (*wlogsrv),
 			    logsrv ());
-	     sys_mbstowcs (wuser, sizeof (wuser) / sizeof (*wuser), winname ());
+	      sys_mbstowcs (wuser, sizeof wuser / sizeof *wuser, winname ());
 	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3, (LPBYTE *) &ui)))
 		{
 		  sys_wcstombs (homepath_env_buf, NT_MAX_PATH,
@@ -584,16 +584,29 @@ cygheap_pwdgrp::init ()
      group:  files db
      db_prefix: auto		DISABLED
      db_separator: +		DISABLED
+     db_home: cygwin desc
+     db_shell: cygwin desc
+     db_gecos: cygwin desc
      db_enum: cache builtin
   */
   pwd_src = (NSS_SRC_FILES | NSS_SRC_DB);
   grp_src = (NSS_SRC_FILES | NSS_SRC_DB);
-  prefix = NSS_AUTO;
+  prefix = NSS_PFX_AUTO;
   separator[0] = L'+';
+  home_scheme[0].method = NSS_SCHEME_CYGWIN;
+  home_scheme[1].method = NSS_SCHEME_DESC;
+  shell_scheme[0].method = NSS_SCHEME_CYGWIN;
+  shell_scheme[1].method = NSS_SCHEME_DESC;
+  gecos_scheme[0].method = NSS_SCHEME_CYGWIN;
+  gecos_scheme[1].method = NSS_SCHEME_DESC;
   enums = (ENUM_CACHE | ENUM_BUILTIN);
   enum_tdoms = NULL;
   caching = true;	/* INTERNAL ONLY */
 }
+
+#define NSS_NCMP(s) (!strncmp(c, (s), sizeof(s)-1))
+#define NSS_CMP(s) (!strncmp(c, (s), sizeof(s)-1) \
+		    && strchr (" \t", c[sizeof(s)-1]))
 
 /* The /etc/nsswitch.conf file is read exactly once by the root process of a
    process tree.  We can't afford methodical changes during the lifetime of a 
@@ -602,36 +615,31 @@ void
 cygheap_pwdgrp::nss_init_line (const char *line)
 {
   const char *c = line + strspn (line, " \t");
+  char *comment = strchr (c, '#');
+  if (comment)
+    *comment = '\0';
   switch (*c)
     {
     case 'p':
     case 'g':
       {
-	int *src = NULL;
-	if (!strncmp (c, "passwd:", 7))
-	  {
-	    src = &pwd_src;
-	    c += 7;
-	  }
-	else if (!strncmp (c, "group:", 6))
-	  {
-	    src = &grp_src;
-	    c += 6;
-	  }
+	uint32_t *src = NULL;
+	if (NSS_NCMP ("passwd:"))
+	  src = &pwd_src;
+	else if (NSS_NCMP ("group:"))
+	  src = &grp_src;
+	c = strchr (c, ':') + 1;
 	if (src)
 	  {
 	    *src = 0;
-	    while (*c)
+	    while (*(c += strspn (c, " \t")))
 	      {
-		c += strspn (c, " \t");
-		if (!*c || *c == '#')
-		  break;
-		if (!strncmp (c, "files", 5) && strchr (" \t", c[5]))
+		if (NSS_CMP ("files"))
 		  {
 		    *src |= NSS_SRC_FILES;
 		    c += 5;
 		  }
-		else if (!strncmp (c, "db", 2) && strchr (" \t", c[2]))
+		else if (NSS_CMP ("db"))
 		  {
 		    *src |= NSS_SRC_DB;
 		    c += 2;
@@ -648,7 +656,7 @@ cygheap_pwdgrp::nss_init_line (const char *line)
       }
       break;
     case 'd':
-      if (strncmp (c, "db_", 3))
+      if (!NSS_NCMP ("db_"))
 	{
 	  debug_printf ("Invalid nsswitch.conf content: %s", line);
 	  break;
@@ -656,22 +664,22 @@ cygheap_pwdgrp::nss_init_line (const char *line)
       c += 3;
 #if 0 /* Disable setting prefix and separator from nsswitch.conf for now.
 	 Remove if nobody complains too loudly. */
-      if (!strncmp (c, "prefix:", 7))
+      if (NSS_NCMP ("prefix:"))
 	{
-	  c += 7;
+	  c = strchr (c, ':') + 1;
 	  c += strspn (c, " \t");
-	  if (!strncmp (c, "auto", 4) && strchr (" \t", c[4]))
+	  if (NSS_CMP ("auto"))
 	    prefix = NSS_AUTO;
-	  else if (!strncmp (c, "primary", 7) && strchr (" \t", c[7]))
+	  else if (NSS_CMP ("primary"))
 	    prefix = NSS_PRIMARY;
-	  else if (!strncmp (c, "always", 6) && strchr (" \t", c[6]))
+	  else if (NSS_CMP ("always"))
 	    prefix = NSS_ALWAYS;
 	  else
 	    debug_printf ("Invalid nsswitch.conf content: %s", line);
 	}
-      else if (!strncmp (c, "separator:", 10))
+      else if (NSS_NCMP ("separator:"))
 	{
-	  c += 10;
+	  c = strchr (c, ':') + 1;
 	  c += strspn (c, " \t");
 	  if ((unsigned char) *c <= 0x7f && *c != ':' && strchr (" \t", c[1]))
 	    separator[0] = (unsigned char) *c;
@@ -680,7 +688,7 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 	}
       else
 #endif
-      if (!strncmp (c, "enum:", 5))
+      if (NSS_NCMP ("enum:"))
 	{
 	  tmp_pathbuf tp;
 	  char *tdoms = tp.c_get ();
@@ -688,26 +696,26 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 	  int new_enums = ENUM_NONE;
 
 	  td[0] = '\0';
-	  c += 5;
+	  c = strchr (c, ':') + 1;
 	  c += strspn (c, " \t");
 	  while (!strchr (" \t", *c))
 	    {
 	      const char *e = c + strcspn (c, " \t");
-	      if (!strncmp (c, "none", 4) && strchr (" \t", c[4]))
+	      if (NSS_CMP ("none"))
 		new_enums = ENUM_NONE;
-	      else if (!strncmp (c, "builtin", 7) && strchr (" \t", c[7]))
+	      else if (NSS_CMP ("builtin"))
 		new_enums |= ENUM_BUILTIN;
-	      else if (!strncmp (c, "cache", 5) && strchr (" \t", c[5]))
+	      else if (NSS_CMP ("cache"))
 		new_enums |= ENUM_CACHE;
-	      else if (!strncmp (c, "files", 5) && strchr (" \t", c[5]))
+	      else if (NSS_CMP ("files"))
 		new_enums |= ENUM_FILES;
-	      else if (!strncmp (c, "local", 5) && strchr (" \t", c[5]))
+	      else if (NSS_CMP ("local"))
 		new_enums |= ENUM_LOCAL;
-	      else if (!strncmp (c, "primary", 7) && strchr (" \t", c[7]))
+	      else if (NSS_CMP ("primary"))
 		new_enums |= ENUM_PRIMARY;
-	      else if (!strncmp (c, "alltrusted", 10) && strchr (" \t", c[10]))
+	      else if (NSS_CMP ("alltrusted"))
 		new_enums |= ENUM_TDOMS | ENUM_TDOMS_ALL;
-	      else if (!strncmp (c, "all", 3) && strchr (" \t", c[3]))
+	      else if (NSS_CMP ("all"))
 		new_enums |= ENUM_ALL;
 	      else
 		{
@@ -732,14 +740,399 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 	    }
 	  enums = new_enums;
 	}
+      else
+	{
+	  nss_scheme_t *scheme = NULL;
+	  if (NSS_NCMP ("home:"))
+	    scheme = home_scheme;
+	  else if (NSS_NCMP ("shell:"))
+	    scheme = shell_scheme;
+	  else if (NSS_NCMP ("gecos:"))
+	    scheme = gecos_scheme;
+	  if (scheme)
+	    {
+	      uint16_t idx = 0;
+
+	      scheme[0].method = scheme[1].method = NSS_SCHEME_FALLBACK;
+	      c = strchr (c, ':') + 1;
+	      c += strspn (c, " \t");
+	      while (*c && idx < NSS_SCHEME_MAX)
+		{
+		  if (NSS_CMP ("windows"))
+		    scheme[idx].method = NSS_SCHEME_WINDOWS;
+		  else if (NSS_CMP ("cygwin"))
+		    scheme[idx].method = NSS_SCHEME_CYGWIN;
+		  else if (NSS_CMP ("unix"))
+		    scheme[idx].method = NSS_SCHEME_UNIX;
+		  else if (NSS_CMP ("desc"))
+		    scheme[idx].method = NSS_SCHEME_DESC;
+		  else if (NSS_NCMP ("/"))
+		    {
+		      const char *e = c + strcspn (c, " \t");
+		      scheme[idx].method = NSS_SCHEME_PATH;
+		      sys_mbstowcs_alloc (&scheme[idx].attrib, HEAP_STR,
+					  c, e - c);
+		    }
+		  else if (NSS_NCMP ("@") && isalnum ((unsigned) *++c))
+		    {
+		      const char *e = c + strcspn (c, " \t");
+		      scheme[idx].method = NSS_SCHEME_FREEATTR;
+		      sys_mbstowcs_alloc (&scheme[idx].attrib, HEAP_STR,
+					  c, e - c);
+		    }
+		  else
+		    debug_printf ("Invalid nsswitch.conf content: %s", line);
+		  c += strcspn (c, " \t");
+		  c += strspn (c, " \t");
+		  ++idx;
+		}
+	      /* If nothing has been set, revert to default. */
+	      if (scheme[0].method == NSS_SCHEME_FALLBACK)
+		{
+		  scheme[0].method = NSS_SCHEME_CYGWIN;
+		  scheme[1].method = NSS_SCHEME_DESC;
+		}
+	    }
+	}
       break;
     case '\0':
-    case '#':
       break;
     default:
       debug_printf ("Invalid nsswitch.conf content: %s", line);
       break;
     }
+}
+
+/* Local SAM accounts have only a handful attributes available to home users.
+   Therefore, allow to fetch additional passwd/group attributes from the
+   "Comment" field in XML short style.  For symmetry, this is also allowed
+   from the equivalent "description" AD attribute. */
+char *
+fetch_from_description (PCWSTR desc, PCWSTR search, size_t len)
+{
+  PWCHAR s, e;
+  char *ret = NULL;
+
+  if ((s = wcsstr (desc, L"<cygwin ")) && (e = wcsstr (s + 8, L"/>")))
+    {
+      s += 8;
+      while (s && s < e)
+	{
+	  while (*s == L' ')
+	    ++s;
+	  if (!wcsncmp (s, search, len)) /* Found what we're searching? */
+	    {
+	      s += len;
+	      if ((e = wcschr (s, L'"')))
+		{
+		  sys_wcstombs_alloc (&ret, HEAP_NOTHEAP, s, e - s);
+		  s = e + 1;
+		}
+	      break;
+	    }
+	  else /* Skip the current foo="bar" string. */
+	    if ((s = wcschr (s, L'"')) && (s = wcschr (s + 1, L'"')))
+	      ++s;
+	}
+    }
+  return ret;
+}
+
+char *
+fetch_from_path (PCWSTR str, PCWSTR dom, PCWSTR name, bool full_qualified)
+{
+  tmp_pathbuf tp;
+  PWCHAR wpath = tp.w_get ();
+  PWCHAR w = wpath;
+  PWCHAR we = wpath + NT_MAX_PATH - 1;
+  char *ret = NULL;
+
+  while (*str && w < we)
+    {
+      if (*str != L'%')
+      	*w++ = *str++;
+      else
+      	{
+	  switch (*++str)
+	    {
+	    case L'u':
+	      if (full_qualified)
+		{
+		  w = wcpncpy (w, dom, we - w);
+		  if (w < we)
+		    *w++ = cygheap->pg.nss_separator ()[0];
+		}
+	      w = wcpncpy (w, name, we - w);
+	      break;
+	    case L'U':
+	      w = wcpncpy (w, name, we - w);
+	      break;
+	    case L'D':
+	      w = wcpncpy (w, dom, we - w);
+	      break;
+	    case L'_':
+	      *w++ = L' ';
+	      break;
+	    default:
+	      *w++ = *str;
+	      break;
+	    }
+	  ++str;
+	}
+    }
+  *w = L'\0';
+  sys_wcstombs_alloc (&ret, HEAP_NOTHEAP, wpath);
+  return ret;
+}
+
+char *
+cygheap_pwdgrp::get_home (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
+			  bool full_qualified)
+{
+  PWCHAR val;
+  char *home = NULL;
+
+  for (uint16_t idx = 0; !home && idx < NSS_SCHEME_MAX; ++idx)
+    {
+      switch (home_scheme[idx].method)
+	{
+	case NSS_SCHEME_FALLBACK:
+	  return NULL;
+	case NSS_SCHEME_WINDOWS:
+	  val = pldap->get_string_attribute (L"homeDrive");
+	  if (!val || !*val)
+	    val = pldap->get_string_attribute (L"homeDirectory");
+	  if (val && *val)
+	    home = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX, val);
+	  break;
+	case NSS_SCHEME_CYGWIN:
+	  val = pldap->get_string_attribute (L"cygwinHome");
+	  if (val && *val)
+	    sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+	  break;
+	case NSS_SCHEME_UNIX:
+	  val = pldap->get_string_attribute (L"unixHomeDirectory");
+	  if (val && *val)
+	    sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+	  break;
+	case NSS_SCHEME_DESC:
+	  val = pldap->get_string_attribute (L"description");
+	  if (val && *val)
+	    home = fetch_from_description (val, L"home=\"", 6);
+	  break;
+	case NSS_SCHEME_PATH:
+	  home = fetch_from_path (home_scheme[idx].attrib, dom, name,
+				  full_qualified);
+	  break;
+	case NSS_SCHEME_FREEATTR:
+	  val = pldap->get_string_attribute (home_scheme[idx].attrib);
+	  if (val && *val)
+	    sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+	  break;
+	}
+    }
+  return home;
+}
+
+char *
+cygheap_pwdgrp::get_home (PUSER_INFO_3 ui, PCWSTR dom, PCWSTR name,
+			  bool full_qualified)
+{
+  char *home = NULL;
+
+  for (uint16_t idx = 0; !home && idx < NSS_SCHEME_MAX; ++idx)
+    {
+      switch (home_scheme[idx].method)
+	{
+	case NSS_SCHEME_FALLBACK:
+	  return NULL;
+	case NSS_SCHEME_WINDOWS:
+	  if (ui->usri3_home_dir_drive && *ui->usri3_home_dir_drive)
+	    home = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX,
+						ui->usri3_home_dir_drive);
+	  else if (ui->usri3_home_dir && *ui->usri3_home_dir)
+	    home = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX,
+						ui->usri3_home_dir);
+	  break;
+	case NSS_SCHEME_CYGWIN:
+	case NSS_SCHEME_UNIX:
+	case NSS_SCHEME_FREEATTR:
+	  break;
+	case NSS_SCHEME_DESC:
+	  home = fetch_from_description (ui->usri3_comment, L"home=\"", 6);
+	  break;
+	case NSS_SCHEME_PATH:
+	  home = fetch_from_path (home_scheme[idx].attrib, dom, name,
+				  full_qualified);
+	  break;
+	}
+    }
+  return home;
+}
+
+char *
+cygheap_pwdgrp::get_shell (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
+			   bool full_qualified)
+{
+  PWCHAR val;
+  char *shell = NULL;
+
+  for (uint16_t idx = 0; !shell && idx < NSS_SCHEME_MAX; ++idx)
+    {
+      switch (shell_scheme[idx].method)
+	{
+	case NSS_SCHEME_FALLBACK:
+	  return NULL;
+	case NSS_SCHEME_WINDOWS:
+	  break;
+	case NSS_SCHEME_CYGWIN:
+	  val = pldap->get_string_attribute (L"cygwinShell");
+	  if (val && *val)
+	    sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+	  break;
+	case NSS_SCHEME_UNIX:
+	  val = pldap->get_string_attribute (L"loginShell");
+	  if (val && *val)
+	    sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+	  break;
+	case NSS_SCHEME_DESC:
+	  val = pldap->get_string_attribute (L"description");
+	  if (val && *val)
+	    shell = fetch_from_description (val, L"shell=\"", 7);
+	  break;
+	case NSS_SCHEME_PATH:
+	  shell = fetch_from_path (shell_scheme[idx].attrib, dom, name,
+				   full_qualified);
+	  break;
+	case NSS_SCHEME_FREEATTR:
+	  val = pldap->get_string_attribute (shell_scheme[idx].attrib);
+	  if (val && *val)
+	    sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+	  break;
+	}
+    }
+  return shell;
+}
+
+char *
+cygheap_pwdgrp::get_shell (PUSER_INFO_3 ui, PCWSTR dom, PCWSTR name,
+			   bool full_qualified)
+{
+  char *shell = NULL;
+
+  for (uint16_t idx = 0; !shell && idx < NSS_SCHEME_MAX; ++idx)
+    {
+      switch (shell_scheme[idx].method)
+	{
+	case NSS_SCHEME_FALLBACK:
+	  return NULL;
+	case NSS_SCHEME_WINDOWS:
+	case NSS_SCHEME_CYGWIN:
+	case NSS_SCHEME_UNIX:
+	case NSS_SCHEME_FREEATTR:
+	  break;
+	case NSS_SCHEME_DESC:
+	  shell = fetch_from_description (ui->usri3_comment, L"shell=\"", 7);
+	  break;
+	case NSS_SCHEME_PATH:
+	  shell = fetch_from_path (shell_scheme[idx].attrib, dom, name,
+				   full_qualified);
+	  break;
+	}
+    }
+  return shell;
+}
+
+/* Helper function to replace colons with semicolons in pw_gecos field. */
+static inline void
+colon_to_semicolon (char *str)
+{
+  char *cp = str;
+  while ((cp = strchr (cp, L':')) != NULL)
+    *cp++ = L';';
+}
+
+char *
+cygheap_pwdgrp::get_gecos (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
+			   bool full_qualified)
+{
+  PWCHAR val;
+  char *gecos = NULL;
+
+  for (uint16_t idx = 0; !gecos && idx < NSS_SCHEME_MAX; ++idx)
+    {
+      switch (gecos_scheme[idx].method)
+	{
+	case NSS_SCHEME_FALLBACK:
+	  return NULL;
+	case NSS_SCHEME_WINDOWS:
+	  val = pldap->get_string_attribute (L"displayName");
+	  if (val && *val)
+	    sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	  break;
+	case NSS_SCHEME_CYGWIN:
+	  val = pldap->get_string_attribute (L"cygwinGecos");
+	  if (val && *val)
+	    sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	  break;
+	case NSS_SCHEME_UNIX:
+	  val = pldap->get_string_attribute (L"gecos");
+	  if (val && *val)
+	    sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	  break;
+	case NSS_SCHEME_DESC:
+	  val = pldap->get_string_attribute (L"description");
+	  if (val && *val)
+	    gecos = fetch_from_description (val, L"gecos=\"", 7);
+	  break;
+	case NSS_SCHEME_PATH:
+	  gecos = fetch_from_path (gecos_scheme[idx].attrib + 1, dom, name,
+				   full_qualified);
+	  break;
+	case NSS_SCHEME_FREEATTR:
+	  val = pldap->get_string_attribute (gecos_scheme[idx].attrib);
+	  if (val && *val)
+	    sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	  break;
+	}
+    }
+  if (gecos)
+    colon_to_semicolon (gecos);
+  return gecos;
+}
+
+char *
+cygheap_pwdgrp::get_gecos (PUSER_INFO_3 ui, PCWSTR dom, PCWSTR name,
+			   bool full_qualified)
+{
+  char *gecos = NULL;
+
+  for (uint16_t idx = 0; !gecos && idx < NSS_SCHEME_MAX; ++idx)
+    {
+      switch (gecos_scheme[idx].method)
+	{
+	case NSS_SCHEME_FALLBACK:
+	  return NULL;
+	case NSS_SCHEME_WINDOWS:
+	  if (ui->usri3_full_name && *ui->usri3_full_name)
+	    sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, ui->usri3_full_name);
+	  break;
+	case NSS_SCHEME_CYGWIN:
+	case NSS_SCHEME_UNIX:
+	case NSS_SCHEME_FREEATTR:
+	  break;
+	case NSS_SCHEME_DESC:
+	  gecos = fetch_from_description (ui->usri3_comment, L"gecos=\"", 7);
+	  break;
+	case NSS_SCHEME_PATH:
+	  gecos = fetch_from_path (gecos_scheme[idx].attrib + 1, dom, name,
+				   full_qualified);
+	  break;
+	}
+    }
+  if (gecos)
+    colon_to_semicolon (gecos);
+  return gecos;
 }
 
 void
@@ -1170,16 +1563,6 @@ fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, cyg_ldap *cldap)
   return td->PosixOffset;
 }
 
-/* Helper function to replace colons with semicolons in pw_gecos field. */
-static PWCHAR
-colon_to_semicolon (PWCHAR str)
-{
-  PWCHAR cp = str;
-  while ((cp = wcschr (cp, L':')) != NULL)
-    *cp++ = L';';
-  return str;
-}
-
 /* CV 2014-05-08: USER_INFO_24 is not yet defined in Mingw64, but will be in
    the next release.  For the time being, define the structure here with
    another name which won't collide with the upcoming correct definition
@@ -1213,9 +1596,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   gid_t gid = ILLEGAL_GID;
   bool is_domain_account = true;
   PCWSTR domain = NULL;
-  PWCHAR shell = NULL;
-  PWCHAR home = NULL;
-  PWCHAR gecos = NULL;
+  char *shell = NULL;
+  char *home = NULL;
+  char *gecos = NULL;
   /* Temporary stuff. */
   PWCHAR p;
   WCHAR sidstr[128];
@@ -1604,16 +1987,10 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	      debug_printf ("Unknown domain %W", dom);
 	      return NULL;
 	    }
-	  /* Generate values. */
+	  /* Generate uid/gid values. */
 	  if (uid == ILLEGAL_UID)
 	    uid = posix_offset + sid_sub_auth_rid (sid);
-
-	  /* We only care for extended user information if we're creating a
-	     passwd entry and the account is a user or alias. */
-	  if (is_group () || acc_type == SidTypeGroup)
-	    break;
-
-	  if (acc_type == SidTypeUser)
+	  if (!is_group () && acc_type == SidTypeUser)
 	    {
 	      /* Default primary group.  If the sid is the current user, fetch
 		 the default group from the current user token, otherwise make
@@ -1633,20 +2010,17 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		break;
 	      if (cldap->fetch_ad_account (sid, is_group (), domain))
 		{
-		  PWCHAR val;
-
 		  if ((id_val = cldap->get_primary_gid ()) != ILLEGAL_GID)
 		    gid = posix_offset + id_val;
-		  if ((val = cldap->get_gecos ()))
-		    gecos = colon_to_semicolon (
-			      wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
-				      * sizeof (WCHAR)), val));
-		  if ((val = cldap->get_home ()))
-		    home = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
-				   * sizeof (WCHAR)), val);
-		  if ((val = cldap->get_shell ()))
-		    shell = wcscpy ((PWCHAR) alloca ((wcslen (val) + 1)
-				    * sizeof (WCHAR)), val);
+		  if (!is_group ())
+		    {
+		      home = cygheap->pg.get_home (cldap, dom, name,
+						   fully_qualified_name);
+		      shell = cygheap->pg.get_shell (cldap, dom, name,
+						     fully_qualified_name);
+		      gecos = cygheap->pg.get_gecos (cldap, dom, name,
+						     fully_qualified_name);
+		    }
 		  /* Check and, if necessary, add unix<->windows id mapping on
 		     the fly, unless we're called from getpwent. */
 		  if (!pldap)
@@ -1663,35 +2037,19 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  else
 	    {
 	      NET_API_STATUS nas;
-	      PUSER_INFO_4 ui;
+	      PUSER_INFO_3 ui;
 	      PLOCALGROUP_INFO_1 gi;
-	      PCWSTR comment;
-	      PWCHAR pgrp = NULL;
-	      PWCHAR uxid = NULL;
-	      struct {
-		PCWSTR str;
-		size_t len;
-		PWCHAR *tgt;
-		bool group;
-	      } search[] = {
-		{ L"unix=\"", 6, &uxid, true },
-		{ L"home=\"", 6, &home, false },
-		{ L"shell=\"", 7, &shell, false },
-		{ L"group=\"", 7, &pgrp, false },
-		{ NULL, 0, NULL }
-	      };
-	      PWCHAR s, e;
+	      char *pgrp = NULL;
+	      char *uxid = NULL;
 
 	      if (acc_type == SidTypeUser)
 		{
-		  nas = NetUserGetInfo (NULL, name, 4, (PBYTE *) &ui);
+		  nas = NetUserGetInfo (NULL, name, 3, (PBYTE *) &ui);
 		  if (nas != NERR_Success)
 		    {
 		      debug_printf ("NetUserGetInfo(%W) %u", name, nas);
 		      break;
 		    }
-		  /* Set comment variable for below attribute loop. */
-		  comment = ui->usri4_comment;
 		  /* Logging in with a Microsoft Account, the user's primary
 		     group SID is the user's SID.  Security sensitive tools
 		     expecting tight file permissions choke on that.  We need
@@ -1711,6 +2069,17 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 			  NetApiBufferFree (ui24);
 			}
 		    }
+		  /* Fetch user attributes. */
+		  home = cygheap->pg.get_home (ui, dom, name,
+					       fully_qualified_name);
+		  shell = cygheap->pg.get_shell (ui, dom, name,
+						 fully_qualified_name);
+		  gecos = cygheap->pg.get_gecos (ui, dom, name,
+						 fully_qualified_name);
+		  uxid = fetch_from_description (ui->usri3_comment,
+						 L"unix=\"", 6);
+		  pgrp = fetch_from_description (ui->usri3_comment,
+						 L"group=\"", 7);
 		}
 	      else /* acc_type == SidTypeAlias */
 		{
@@ -1720,46 +2089,11 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		      debug_printf ("NetLocalGroupGetInfo(%W) %u", name, nas);
 		      break;
 		    }
-		  /* Set comment variable for below attribute loop. */
-		  comment = gi->lgrpi1_comment;
+		  /* Fetch unix gid from comment field. */
+		  uxid = fetch_from_description (gi->lgrpi1_comment,
+						 L"unix=\"", 6);
 		}
-	      /* Local SAM accounts have only a handful attributes
-		 available to home users.  Therefore, fetch additional
-		 passwd/group attributes from the "Description" field
-		 in XML short style. */
-	      if ((s = wcsstr (comment, L"<cygwin "))
-		  && (e = wcsstr (s + 8, L"/>")))
-		{
-		  s += 8;
-		  *e = L'\0';
-		  while (*s)
-		    {
-		      bool found = false;
 
-		      while (*s == L' ')
-			++s;
-		      for (size_t i = 0; search[i].str; ++i)
-			if ((acc_type == SidTypeUser || search[i].group)
-			    && !wcsncmp (s, search[i].str, search[i].len))
-			  {
-			    s += search[i].len;
-			    if ((e = wcschr (s, L'"'))
-				&& (i > 0 || wcsncmp (name, s, e - s)))
-			      {
-				*search[i].tgt =
-				    (PWCHAR) alloca ((e - s + 1)
-						     * sizeof (WCHAR));
-				*wcpncpy (*search[i].tgt, s, e - s) = L'\0';
-				s = e + 1;
-				found = true;
-			      }
-			    else
-			      break;
-			  }
-		      if (!found)
-			break;
-		    }
-		}
 	      if (acc_type == SidTypeUser)
 		NetApiBufferFree (ui);
 	      else
@@ -1769,7 +2103,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  /* Set primary group from the "Description" field.  Prepend
 		     account domain if this is a domain member machine or the
 		     db_prefix setting requires it. */
-		  char gname[2 * (DNLEN + UNLEN) + 2], *gp = gname;
+		  char gname[2 * DNLEN + strlen (pgrp) + 1], *gp = gname;
 		  struct group *gr;
 
 		  if (cygheap->dom.member_machine ()
@@ -1780,11 +2114,12 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 					   cygheap->dom.account_flat_name ());
 		      *gp++ = cygheap->pg.nss_separator ()[0];
 		    }
-		  sys_wcstombs (gp, sizeof gname - (gp - gname), pgrp);
+		  stpcpy (gp, pgrp);
 		  if ((gr = internal_getgrnam (gname, cldap)))
 		    gid = gr->gr_gid;
 		}
-	      if (!pldap && uxid && ((id_val = wcstoul (uxid, &e, 10)), !*e))
+	      char *e;
+	      if (!pldap && uxid && ((id_val = strtoul (uxid, &e, 10)), !*e))
 		{
 		  if (acc_type == SidTypeUser)
 		    {
@@ -1794,6 +2129,10 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  else if (cygheap->ugid_cache.get_gid (id_val) == ILLEGAL_GID)
 		    cygheap->ugid_cache.add_gid (id_val, uid);
 		}
+	      if (pgrp)
+		free (pgrp);
+	      if (uxid)
+		free (uxid);
 	    }
 	  break;
 	case SidTypeWellKnownGroup:
@@ -1935,7 +2274,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
     }
 
   tmp_pathbuf tp;
-  PWCHAR linebuf = tp.w_get ();
+  char *linebuf = tp.c_get ();
   char *line = NULL;
 
   WCHAR posix_name[UNLEN + 1 + DNLEN + 1];
@@ -1947,23 +2286,31 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   wcpcpy (p, name);
 
   if (is_group ())
-    __small_swprintf (linebuf, L"%W:%W:%u:",
-		      posix_name, sid.string (sidstr), uid);
+    __small_sprintf (linebuf, "%W:%s:%u:",
+		     posix_name, sid.string ((char *) sidstr), uid);
   /* For non-users, create a passwd entry which doesn't allow interactive
      logon.  Unless it's the SYSTEM account.  This conveniently allows to
      logon interactively as SYSTEM for debugging purposes. */
   else if (acc_type != SidTypeUser && sid != well_known_system_sid)
-    __small_swprintf (linebuf, L"%W:*:%u:%u:U-%W\\%W,%W:/:/sbin/nologin",
-		      posix_name, uid, gid, dom, name, sid.string (sidstr));
+    __small_sprintf (linebuf, "%W:*:%u:%u:U-%W\\%W,%s:/:/sbin/nologin",
+		     posix_name, uid, gid,
+		     dom, name,
+		     sid.string ((char *) sidstr));
   else
-    __small_swprintf (linebuf, L"%W:*:%u:%u:%W%WU-%W\\%W,%W:%W%W:%W",
-		      posix_name, uid, gid,
-		      gecos ?: L"", gecos ? L"," : L"",
-		      dom, name,
-		      sid.string (sidstr),
-		      home ? L"" : L"/home/", home ?: name,
-		      shell ?: L"/bin/bash");
-  sys_wcstombs_alloc (&line, HEAP_BUF, linebuf);
+    __small_sprintf (linebuf, "%W:*:%u:%u:%s%sU-%W\\%W,%s:%s%W:%s",
+		     posix_name, uid, gid,
+		     gecos ?: "", gecos ? "," : "",
+		     dom, name,
+		     sid.string ((char *) sidstr),
+		     home ?: "/home/", home ? L"" : name,
+		     shell ?: "/bin/bash");
+  if (gecos)
+    free (gecos);
+  if (home)
+    free (home);
+  if (shell)
+    free (shell);
+  line = cstrdup (linebuf);
   debug_printf ("line: <%s>", line);
   return line;
 }
