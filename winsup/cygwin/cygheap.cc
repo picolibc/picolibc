@@ -667,26 +667,34 @@ init_cygheap::find_tls (int sig, bool& issig_wait)
   _cygtls *t = NULL;
   issig_wait = false;
 
-  __try
+  ix = -1;
+  /* Scan thread list looking for valid signal-delivery candidates */
+  while (++ix < (int) nthreads)
     {
-      ix = -1;
-      /* Scan thread list looking for valid signal-delivery candidates */
-      while (++ix < (int) nthreads)
-	if (!threadlist[ix]->tid)
-	  continue;
-	else if (sigismember (&(threadlist[ix]->sigwait_mask), sig))
-	  {
-	    t = cygheap->threadlist[ix];
-	    issig_wait = true;
-	    __leave;
-	  }
-	else if (!t && !sigismember (&(threadlist[ix]->sigmask), sig))
-	  t = cygheap->threadlist[ix];
+      __try
+	{
+	    if (!threadlist[ix]->tid)
+	      continue;
+	    else if (sigismember (&(threadlist[ix]->sigwait_mask), sig))
+	      {
+		t = cygheap->threadlist[ix];
+		issig_wait = true;
+		__leave;
+	      }
+	    else if (!t && !sigismember (&(threadlist[ix]->sigmask), sig))
+	      t = cygheap->threadlist[ix];
+	}
+      __except (NO_ERROR)
+	{
+	  /* We're here because threadlist[ix] became NULL or invalid.  In
+	     theory this should be impossible due to correct synchronization.
+	     But *if* it happens, just remove threadlist[ix] from threadlist.
+	     TODO: This should be totally unnecessary. */
+	  debug_printf ("cygtls synchronization is leaking...");
+	  remove_tls (threadlist[ix], 0);
+	  --ix;
+	}
+      __endtry
     }
-  __except (NO_ERROR)
-    {
-      threadlist[ix]->remove (INFINITE);
-    }
-  __endtry
   return t;
 }

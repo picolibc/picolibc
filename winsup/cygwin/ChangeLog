@@ -1,3 +1,9 @@
+2014-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (init_cygheap::find_tls): Allow to keep loop going after
+	access to threadlist[ix] faulted.  In case of an exception, remove
+	threadlist[ix] from threadlist only.  Add comment.
+
 2014-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (install): Add install-ldif target.
