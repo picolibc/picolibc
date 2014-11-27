@@ -57,13 +57,14 @@
 	.globl	_start
 	.ent	_start
 _start:
-	.set	noreorder
 #ifdef __mips_embedded_pic
 #define PICBASE start_PICBASE
+	.set	noreorder
 	PICBASE = .+8
         bal	PICBASE
 	nop
 	move	s0,$31
+	.set	reorder
 #endif
 #if __mips<3
 #  define STATUS_MASK (SR_CU1|SR_PE)
@@ -89,9 +90,7 @@ _start:
 	/* Avoid hazard from FPU enable and other SR changes.  */
 	LA (t0, hardware_hazard_hook)
 	beq	t0,zero,1f
-	nop
-	jal	t0
-	nop
+	jalr	t0
 1:
 
 /* Check for FPU presence.  Don't check if we know that soft_float is
@@ -105,11 +104,8 @@ _start:
 	mfc1	t1,fp1
 	nop
 	bne	t0,t2,1f	/* check for match */
-	nop
 	bne	t1,zero,1f	/* double check */
-	nop
 	j	2f		/* FPU is present. */
-	nop
 #endif
 1:
 	/* FPU is not present.  Set status register to say that. */
@@ -119,9 +115,7 @@ _start:
 	/* Avoid hazard from FPU disable.  */
 	LA (t0, hardware_hazard_hook)
 	beq	t0,zero,2f
-	nop
-	jal	t0
-	nop
+	jalr	t0
 2:
 
 
@@ -129,7 +123,6 @@ _start:
    doesn't get confused.  */
 	LA (v0, 3f)
 	jr	v0
-	nop
 3:
 	LA (gp, _gp)				# set the global data pointer
 	.end _start
@@ -145,21 +138,20 @@ _start:
 zerobss:
 	LA (v0, _fbss)
 	LA (v1, _end)
-3:
-	sw	zero,0(v0)
-	bltu	v0,v1,3b
-	addiu	v0,v0,4				# executed in delay slot
-
+	beq	v0,v1,2f
+1:
+	addiu	v0,v0,4
+	sw	zero,-4(v0)
+	bne	v0,v1,1b
+2:
 	la	t0, __lstack			# make a small stack so we
 	addiu	sp, t0, STARTUP_STACK_SIZE	# can run some C code
 	la	a0, __memsize			# get the usable memory size
 	jal	get_mem_info
-	nop
 
 	/* setup the stack pointer */
 	LA (t0, __stack)			# is __stack set ?
 	bne	t0,zero,4f
-	nop
 
 	/* NOTE: a0[0] contains the amount of memory available, and
 	         not the last memory address. */
@@ -189,19 +181,14 @@ zerobss:
 init:
 	LA (t9, hardware_init_hook)		# init the hardware if needed
 	beq	t9,zero,6f
-	nop
-	jal	t9
-	nop
+	jalr	t9
 6:
 	LA (t9, software_init_hook)		# init the hardware if needed
 	beq	t9,zero,7f
-	nop
-	jal	t9
-	nop
+	jalr	t9
 7:
 	LA (a0, _fini)
 	jal	atexit
-	nop
 
 #ifdef GCRT0
 	.globl	_ftext
@@ -209,12 +196,10 @@ init:
 	LA (a0, _ftext)
 	LA (a1, _etext)
 	jal	monstartup
-	nop
 #endif
 
 
 	jal	_init				# run global constructors
-	nop
 
 	addiu	a1,sp,32			# argv = sp + 32
 	addiu	a2,sp,40			# envp = sp + 40
@@ -225,13 +210,13 @@ init:
 	sw	zero,(a1)
 	sw	zero,(a2)
 #endif
-	jal	main				# call the program start function
 	move	a0,zero				# set argc to 0
+	jal	main				# call the program start function
 
 	# fall through to the "exit" routine
+	move	a0,v0				# pass through the exit code
 	jal	exit				# call libc exit to run the G++
 						# destructors
-	move	a0,v0				# pass through the exit code
 	.end	init
 
  
@@ -257,27 +242,25 @@ _exit:
 	/* Need to reinit PICBASE, since we might be called via exit()
 	   rather than via a return path which would restore old s0.  */
 #define PICBASE exit_PICBASE
+	.set	noreorder
 	PICBASE = .+8
 	bal	PICBASE
 	nop
 	move	s0,$31
+	.set	reorder
 #endif
 #ifdef GCRT0
 	LA (t0, _mcleanup)
-	jal	t0
-	nop
+	jalr	t0
 #endif
 	LA (t0, hardware_exit_hook)
 	beq	t0,zero,1f
-	nop
-	jal	t0
-	nop
+	jalr	t0
 1:
 
 	# break instruction can cope with 0xfffff, but GAS limits the range:
 	break	1023
 	b	7b				# but loop back just in-case
-	nop
 	.end _exit
  
 /* Assume the PICBASE set up above is no longer valid below here.  */

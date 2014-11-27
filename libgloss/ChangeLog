@@ -1,3 +1,9 @@
+2014-11-26  Matthew Fortune  <Matthew.Fortune@imgtec.com>
+
+	* mips/crt0.S: Remove .set noreorder throughout.
+	(zerobss): Open code the bltu macro instruction so that the
+	zero-loop does not have a NOP in the branch delay slot.
+
 2014-11-13  Nick Clifton  <nickc@redhat.com>
 
 	* msp430/Makefile.in (CRT_OBJS): Add crt_high_bss.o.
