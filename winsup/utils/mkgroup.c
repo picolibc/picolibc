@@ -559,8 +559,8 @@ main (int argc, char **argv)
   DWORD id_offset = 0x10000, off;
   int c, i;
   char *disp_groupname = NULL;
-  //BOOL in_domain;
   int optional_args = 0;
+  uintptr_t nss_src = cygwin_internal (CW_GETNSS_GRP_SRC);
 
   if (!isatty (1))
     setmode (1, O_BINARY);
@@ -641,13 +641,13 @@ main (int argc, char **argv)
 	      {
 		/* If the system uses /etc/group exclusively as account DB,
 		   create local group names the old fashioned way. */
-		if (cygwin_internal (CW_GETNSS_GRP_SRC) == NSS_SRC_FILES)
+		if (nss_src == NSS_SRC_FILES)
 		  {
 		    GetComputerNameExA (ComputerNameNetBIOS, cname, &csize);
 		    domlist[print_domlist].str = cname;
 		  }
 	      }
-	    else if (cygwin_internal (CW_GETNSS_GRP_SRC) != NSS_SRC_FILES)
+	    else if (nss_src != NSS_SRC_FILES)
 	      {
 		/* If the system uses Windows account DBs, check if machine
 		   name is local machine.  If so, remove the domain name to
@@ -782,8 +782,9 @@ main (int argc, char **argv)
       if (!enum_local_groups (domlist + i, sep_char, off, disp_groupname,
 			      print_builtin, print_current))
 	{
-	  enum_groups (domlist + i, sep_char, off, disp_groupname,
-		       print_current);
+	  enum_groups (domlist + i, sep_char,
+		       (nss_src == NSS_SRC_FILES) ? 0x30000 : off,
+		       disp_groupname, print_current);
 	  if (!domlist[i].domain && domlist[i].str && print_unix)
 	    enum_unix_groups (domlist + i, sep_char, 0xff000000, print_unix);
 	  off += id_offset;

@@ -169,7 +169,7 @@ enum_unix_users (domlist_t *mach, const char *sep, DWORD id_offset,
 				       dom,
 				       (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
 				       &acc_type))
-	    printf ("%s%s%ls:unused:%" PRIu32 ":99999:,%s::\n",
+	    printf ("%s%s%ls:*:%" PRIu32 ":99999:,%s::\n",
 		    "Unix_User",
 		    sep,
 		    user + 10,
@@ -206,7 +206,7 @@ enum_unix_users (domlist_t *mach, const char *sep, DWORD id_offset,
 				     (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
 				     &acc_type)
 		  && !iswdigit (user[0]))
-		printf ("%s%s%ls:unused:%" PRIu32 ":99999:,%s::\n",
+		printf ("%s%s%ls:*:%" PRIu32 ":99999:,%s::\n",
 			"Unix_User",
 			sep,
 			user,
@@ -333,7 +333,7 @@ enum_users (domlist_t *mach, const char *sep, const char *passed_home_path,
 	  else if (EqualSid (curr_user.psid, psid))
 	    got_curr_user = TRUE;
 
-	  printf ("%ls%s%ls:unused:%" PRIu32 ":%" PRIu32
+	  printf ("%ls%s%ls:*:%" PRIu32 ":%" PRIu32
 		  ":%ls%sU-%ls\\%ls,%s:%s:/bin/bash\n",
 		  mach->with_dom ? domain_name : L"",
 		  mach->with_dom ? sep : "",
@@ -455,6 +455,7 @@ main (int argc, char **argv)
   char *disp_username = NULL;
   char passed_home_path[PATH_MAX];
   int optional_args = 0;
+  uintptr_t nss_src = cygwin_internal (CW_GETNSS_PWD_SRC);
 
   passed_home_path[0] = '\0';
   if (!isatty (1))
@@ -538,13 +539,13 @@ main (int argc, char **argv)
 	      {
 		/* If the system uses /etc/passwd exclusively as account DB,
 		   create local group names the old fashioned way. */
-		if (cygwin_internal (CW_GETNSS_PWD_SRC) == NSS_SRC_FILES)
+		if (nss_src == NSS_SRC_FILES)
 		  {
 		    GetComputerNameExA (ComputerNameNetBIOS, cname, &csize);
 		    domlist[print_domlist].str = cname;
 		  }
 	      }
-	    else if (cygwin_internal (CW_GETNSS_PWD_SRC) != NSS_SRC_FILES)
+	    else if (nss_src != NSS_SRC_FILES)
 	      {
 		/* If the system uses Windows account DBs, check if machine
 		   name is local machine.  If so, remove the domain name to
@@ -706,8 +707,9 @@ main (int argc, char **argv)
     {
       if (domlist[i].domain || !domlist[i].str)
 	continue;
-      enum_users (domlist + i, sep_char, passed_home_path, off, disp_username,
-		  print_current);
+      enum_users (domlist + i, sep_char, passed_home_path,
+		  (nss_src == NSS_SRC_FILES) ? 0x30000 : off,
+		  disp_username, print_current);
       if (!domlist[i].domain && domlist[i].str && print_unix)
 	enum_unix_users (domlist + i, sep_char, 0xff000000, print_unix);
       off += id_offset;
