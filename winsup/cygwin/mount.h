@@ -1,7 +1,7 @@
 /* mount.h: mount definitions.
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -184,7 +184,7 @@ class mount_info
   int native_sorted[MAX_MOUNTS];
 
  public:
-  void init ();
+  void init (bool);
   int add_item (const char *dev, const char *path, unsigned flags);
   int del_item (const char *path, unsigned flags);
 

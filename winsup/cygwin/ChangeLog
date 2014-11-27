@@ -1,5 +1,19 @@
 2014-11-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mount.cc (mount_info::init): Take bool argument and allow to
+	initialize mount table in two steps, system and user, depending on
+	bool value.
+	* mount.h (class mount_info): Align declaration of init function to
+	above change.
+	* shared.cc (user_info::initialize): Initialize mount table in two
+	steps to allow internal_getpwsid to create valid POSIX paths from
+	DOS paths given in AD.  Add comments.
+	* uinfo.cc (cygheap_pwdgrp::get_home): Allow DOS paths in
+	NSS_SCHEME_FREEATTR attributes.
+	(cygheap_pwdgrp::get_shell): Ditto.
+
+2014-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (init_cygheap::find_tls): Allow to keep loop going after
 	access to threadlist[ix] faulted.  In case of an exception, remove
 	threadlist[ix] from threadlist only.  Add comment.

@@ -927,7 +927,12 @@ cygheap_pwdgrp::get_home (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
 	case NSS_SCHEME_FREEATTR:
 	  val = pldap->get_string_attribute (home_scheme[idx].attrib);
 	  if (val && *val)
-	    sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+	    {
+	      if (isdrive (val) || *val == '\\')
+		home = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX, val);
+	      else
+		sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+	    }
 	  break;
 	}
     }
@@ -1007,7 +1012,12 @@ cygheap_pwdgrp::get_shell (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
 	case NSS_SCHEME_FREEATTR:
 	  val = pldap->get_string_attribute (shell_scheme[idx].attrib);
 	  if (val && *val)
-	    sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+	    {
+	      if (isdrive (val) || *val == '\\')
+		shell = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX, val);
+	      else
+		sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+	    }
 	  break;
 	}
     }

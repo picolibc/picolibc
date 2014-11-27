@@ -230,13 +230,18 @@ user_info::initialize ()
   if (!sversion)
     {
       cb = sizeof (*user_shared);
+      /* Initialize mount table from system fstab prior to calling
+         internal_getpwsid.  This allows to convert pw_dir and pw_shell
+	 paths given in DOS notation to valid POSIX paths.  */
+      mountinfo.init (false);
       cygpsid sid (cygheap->user.sid ());
       struct passwd *pw = internal_getpwsid (sid);
       /* Correct the user name with what's defined in /etc/passwd before
 	 loading the user fstab file. */
       if (pw)
 	cygheap->user.set_name (pw->pw_name);
-      mountinfo.init ();	/* Initialize the mount table.  */
+      /* After fetching the user infos, add mount entries from user's fstab. */
+      mountinfo.init (true);
     }
   else if (sversion != CURR_USER_MAGIC)
     sversion.multiple_cygwin_problem ("user shared memory version", version,
