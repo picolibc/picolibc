@@ -1,3 +1,16 @@
+2014-11-28  Jaydeep Patil  <jaydeep.patil@imgtec.com>
+	    Matthew Fortune  <Matthew.Fortune@imgtec.com>
+
+	* mips/crt0.S: Configure processor based on .MIPS.abiflags.
+	Remove FPU availability check, just use the pre-processor flags
+	to indicicate what the user wanted.
+	* mips/abiflags.S: New file.
+	* mips/regs.S (SR_MSA): Define macro.
+	* mips/mti32.ld: Place .MIPS.abiflags and wrap in marker symbols.
+	* mips/mti64.ld: Likewise.
+	* mips/mti64_64.ld: Likewise.
+	* mips/mti64_n32.ld: Likewise.
+
 2014-11-26  Matthew Fortune  <Matthew.Fortune@imgtec.com>
 
 	* mips/crt0.S: Remove .set noreorder throughout.
