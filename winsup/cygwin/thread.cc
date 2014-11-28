@@ -543,11 +543,13 @@ pthread::exit (void *value_ptr)
     {
       if (is_main_tls)
 	{
+	  /* FIXME: Needs locking. */
 	  _cygtls *dummy = (_cygtls *) malloc (sizeof (_cygtls));
 	  *dummy = *_main_tls;
 	  _main_tls = dummy;
-	  _main_tls->initialized = false;
+	  _main_tls->initialized = 0;
 	}
+      cygtls->remove (INFINITE);
       ExitThread (0);
     }
 }

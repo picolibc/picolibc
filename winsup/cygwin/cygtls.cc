@@ -1,7 +1,7 @@
 /* cygtls.cc
 
    Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
-   2013 Red Hat, Inc.
+   2013, 2014 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -38,10 +38,9 @@ dll_cmp (const void *a, const void *b)
 
 /* Keep sorted!
    This is a list of well-known core system DLLs which contain code
-   whiuch is started in its own thread by the system.  Kernel32.dll,
-   for instance, contains the thread called on every Ctrl-C keypress
-   in a console window.  The DLLs in this list are not recognized as
-   BLODAs. */
+   started in its own thread by the system.  Kernel32.dll, for instance,
+   contains the thread called on every Ctrl-C keypress in a console window.
+   The DLLs in this list are not recognized as BLODAs. */
 const wchar_t *well_known_dlls[] =
 {
   L"advapi32.dll",
@@ -55,46 +54,58 @@ const wchar_t *well_known_dlls[] =
   L"ws2_32.dll",
 };
 
+/* Optional BLODA detection.  The idea is that the function address is supposed
+   to be within Cygwin itself.  This is also true for pthreads, since pthreads
+   are always calling pthread::thread_init_wrapper() in thread.cc.  Therefore,
+   every function call to a function outside of the Cygwin DLL is potentially
+   a thread injected into the Cygwin process by some BLODA.
+
+   But that's too simple.  Assuming the application itself calls CreateThread,
+   then this is a bad idea, but not really invalid.  So we shouldn't print a
+   BLODA message if the address is within the loaded image of the application.
+   Also, ntdll.dll starts threads into the application which */
+static void
+bloda_detect (DWORD (*func) (void *, void *))
+{
+  PIMAGE_DOS_HEADER img_start = (PIMAGE_DOS_HEADER)
+				GetModuleHandle (NULL);
+  PIMAGE_NT_HEADERS32 ntheader = (PIMAGE_NT_HEADERS32)
+			   ((PBYTE) img_start + img_start->e_lfanew);
+  void *img_end = (void *) ((PBYTE) img_start
+			    + ntheader->OptionalHeader.SizeOfImage);
+  if (((void *) func < (void *) cygwin_hmodule
+       || (void *) func > (void *) cygheap)
+      && ((void *) func < (void *) img_start || (void *) func >= img_end))
+    {
+      MEMORY_BASIC_INFORMATION mbi;
+      wchar_t modname[PATH_MAX];
+
+      VirtualQuery ((PVOID) func, &mbi, sizeof mbi);
+      GetModuleFileNameW ((HMODULE) mbi.AllocationBase, modname,
+			  PATH_MAX);
+      /* Fetch basename and check against list of above system DLLs. */
+      const wchar_t *modbasename = wcsrchr (modname, L'\\') + 1;
+      if (!bsearch (modbasename, well_known_dlls,
+		    sizeof well_known_dlls / sizeof well_known_dlls[0],
+		    sizeof well_known_dlls[0], dll_cmp))
+	small_printf ("\n\nPotential BLODA detected!  Thread function "
+		      "called outside of Cygwin DLL:\n  %W\n\n",
+		      modname);
+    }
+}
+
 void
 _cygtls::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
 {
-  init_thread (buf, func);
-
-  /* Optional BLODA detection.  The idea is that the function address is
-     supposed to be within Cygwin itself.  This is also true for pthreads,
-     since pthreads are always calling thread_wrapper in miscfuncs.cc.
-     Therefore, every function call to a function outside of the Cygwin DLL
-     is potentially a thread injected into the Cygwin process by some BLODA.
-
-     But that's a bit too simple.  Assuming the application itself calls
-     CreateThread, then this is a bad idea, but not really invalid.  So we
-     shouldn't print a BLODA message if the address is within the loaded
-     image of the application.  Also, ntdll.dll starts threads into the
-     application which */
-  if (detect_bloda)
+  /* If func is pthread_wrapper, the final stack hasn't been set up yet.
+     This only happens in pthread_wrapper itself.  Thus it doesn't make
+     sense to call init_thread or perform BLODA detection.  pthread_wrapper
+     eventually calls init_thread by itself. */
+  if ((void *) func != (void *) pthread_wrapper)
     {
-      PIMAGE_DOS_HEADER img_start = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
-      PIMAGE_NT_HEADERS32 ntheader = (PIMAGE_NT_HEADERS32)
-			       ((PBYTE) img_start + img_start->e_lfanew);
-      void *img_end = (void *) ((PBYTE) img_start
-				+ ntheader->OptionalHeader.SizeOfImage);
-      if (((void *) func < (void *) cygwin_hmodule
-	   || (void *) func > (void *) cygheap)
-	  && ((void *) func < (void *) img_start || (void *) func >= img_end))
-	{
-	  MEMORY_BASIC_INFORMATION mbi;
-	  wchar_t modname[PATH_MAX];
-
-	  VirtualQuery ((PVOID) func, &mbi, sizeof mbi);
-	  GetModuleFileNameW ((HMODULE) mbi.AllocationBase, modname, PATH_MAX);
-	  /* Fetch basename and check against list of above system DLLs. */
-	  const wchar_t *modbasename = wcsrchr (modname, L'\\') + 1;
-	  if (!bsearch (modbasename, well_known_dlls,
-			sizeof well_known_dlls / sizeof well_known_dlls[0],
-			sizeof well_known_dlls[0], dll_cmp))
-	    small_printf ("\n\nPotential BLODA detected!  Thread function "
-			  "called outside of Cygwin DLL:\n  %W\n\n", modname);
-	}
+      init_thread (buf, func);
+      if (detect_bloda)
+	bloda_detect (func);
     }
 
   DWORD res = func (arg, buf);
@@ -169,6 +180,9 @@ _cygtls::remove (DWORD wait)
 
   debug_printf ("wait %u", wait);
 
+  cygheap->remove_tls (this, INFINITE);
+  remove_wq (wait);
+
   /* FIXME: Need some sort of atthreadexit function to allow things like
      select to control this themselves. */
 
@@ -197,8 +211,6 @@ _cygtls::remove (DWORD wait)
   /* Close timer handle. */
   if (locals.cw_timer)
     NtClose (locals.cw_timer);
-  cygheap->remove_tls (this, wait);
-  remove_wq (wait);
 }
 
 #ifdef __x86_64__

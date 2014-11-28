@@ -66,6 +66,7 @@ ssize_t __reg3 check_iovec (const struct iovec *, int, bool);
 #define check_iovec_for_read(a, b) check_iovec ((a), (b), false)
 #define check_iovec_for_write(a, b) check_iovec ((a), (b), true)
 
+extern "C" DWORD WINAPI pthread_wrapper (PVOID arg);
 extern "C" HANDLE WINAPI CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func,
 					     PVOID thread_arg, PVOID stackaddr,
 					     ULONG stacksize, ULONG guardsize,

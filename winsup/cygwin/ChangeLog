@@ -1,3 +1,20 @@
+2014-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (init_cygheap::find_tls): Add comment.
+	* cygtls.cc (well_known_dlls): Rephrase comment.
+	(bloda_detect): New function.
+	(_cygtls::call2): Call init_thread and bloda_detect for non-pthread
+	threads only.
+	(_cygtls::remove): Move remove_tls and remove_wq calls up to run first.
+	* miscfuncs.cc (struct pthread_wrapper_arg): Rename from struct
+	thread_wrapper_arg.
+	(pthread_wrapper): Rename from thread_wrapper and drop "static".  Fix
+	comment.  Drop call to _cygtls::remove.  Call api_fatal rather than
+	ExitThread.  Explain why.
+	* miscfuncs.h (pthread_wrapper): Declare pthread_wrapper.
+	* thread.cc (pthread::exit): Add a FIXME comment.  Call _cygtls::remove
+	before calling ExitThread.
+
 2014-11-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mount.cc (mount_info::init): Take bool argument and allow to

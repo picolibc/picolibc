@@ -673,6 +673,7 @@ init_cygheap::find_tls (int sig, bool& issig_wait)
     {
       __try
 	{
+	    /* Only pthreads have tid set to non-0. */
 	    if (!threadlist[ix]->tid)
 	      continue;
 	    else if (sigismember (&(threadlist[ix]->sigwait_mask), sig))

@@ -540,7 +540,7 @@ __import_address (void *imp)
    parameters we don't use and instead to add parameters we need to make
    the function pthreads compatible. */
 
-struct thread_wrapper_arg
+struct pthread_wrapper_arg
 {
   LPTHREAD_START_ROUTINE func;
   PVOID arg;
@@ -549,22 +549,19 @@ struct thread_wrapper_arg
   PBYTE stacklimit;
 };
 
-static DWORD WINAPI
-thread_wrapper (PVOID arg)
+DWORD WINAPI
+pthread_wrapper (PVOID arg)
 {
   /* Just plain paranoia. */
   if (!arg)
     return ERROR_INVALID_PARAMETER;
 
-  /* The process is now threaded.  Note the fact for later usage. */
+  /* The process is now threaded.  Note for later usage by arc4random. */
   __isthreaded = 1;
 
   /* Fetch thread wrapper info and free from cygheap. */
-  thread_wrapper_arg wrapper_arg = *(thread_wrapper_arg *) arg;
+  pthread_wrapper_arg wrapper_arg = *(pthread_wrapper_arg *) arg;
   cfree (arg);
-
-  /* Remove _cygtls from this stack since it won't be used anymore. */
-  _my_tls.remove (0);
 
   /* Set stack values in TEB */
   PTEB teb = NtCurrentTeb ();
@@ -676,8 +673,9 @@ thread_wrapper (PVOID arg)
 	   : : [WRAPPER_ARG] "r" (&wrapper_arg),
 	       [CYGTLS] "i" (CYGTLS_PADSIZE));
 #endif
-  /* Never return from here. */
-  ExitThread (0);
+  /* pthread::thread_init_wrapper calls pthread::exit, which
+     in turn calls ExitThread, so we should never arrive here. */
+  api_fatal ("Dumb thinko in pthread handling.  Whip the developer.");
 }
 
 #ifdef __x86_64__
@@ -751,10 +749,10 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
   PVOID real_stackaddr = NULL;
   ULONG real_stacksize = 0;
   ULONG real_guardsize = 0;
-  thread_wrapper_arg *wrapper_arg;
+  pthread_wrapper_arg *wrapper_arg;
   HANDLE thread = NULL;
 
-  wrapper_arg = (thread_wrapper_arg *) ccalloc (HEAP_STR, 1,
+  wrapper_arg = (pthread_wrapper_arg *) ccalloc (HEAP_STR, 1,
 						sizeof *wrapper_arg);
   if (!wrapper_arg)
     {
@@ -846,7 +844,7 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
      reserve a 256K stack, not 64K, otherwise the thread creation might
      crash the process due to a stack overflow. */
   thread = CreateThread (&sec_none_nih, 4 * PTHREAD_STACK_MIN,
-			 thread_wrapper, wrapper_arg,
+			 pthread_wrapper, wrapper_arg,
 			 creation_flags | STACK_SIZE_PARAM_IS_A_RESERVATION,
 			 thread_id);
 
