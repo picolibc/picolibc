@@ -1,3 +1,10 @@
+2014-11-28  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* Makefile.in (XSLTPROC): Remove.
+	(cygwin-ug-net/cygwin-ug-net.pdf): Build with xmlto pdf.
+	(cygwin-api/cygwin-api.pdf): Ditto.
+	(faq/faq.html): Fix extraneous anchor removal.
+
 2014-11-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* utils.xml (passwd): Align to latest changes.

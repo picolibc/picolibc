@@ -24,7 +24,6 @@ MKDIRP:=$(INSTALL) -m 755 -d
 CC:=@CC@
 CC_FOR_TARGET:=@CC@
 
-XSLTPROC:=xsltproc --xinclude
 XMLTO:=xmlto --skip-validation --with-dblatex
 
 include $(srcdir)/../Makefile.common
@@ -80,19 +79,17 @@ cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.xml cygwin.xsl
 	-$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
 
 cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.xml fo.xsl
-	@$(MKDIRP) cygwin-ug-net
-	-$(XSLTPROC) $(srcdir)/fo.xsl $< | fop -q -fo - $@
+	-$(XMLTO) pdf -o cygwin-ug-net/ $<
 
 cygwin-api/cygwin-api.html : cygwin-api.xml cygwin.xsl
 	-$(XMLTO) html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
 
 cygwin-api/cygwin-api.pdf : cygwin-api.xml fo.xsl
-	@$(MKDIRP) cygwin-api
-	-$(XSLTPROC) $(srcdir)/fo.xsl $< | fop -q -fo - $@
+	-$(XMLTO) pdf -o cygwin-api/ $<
 
 faq/faq.html : $(FAQ_SOURCES)
 	-$(XMLTO) html -o faq -m $(srcdir)/cygwin.xsl $(srcdir)/faq.xml
-	-sed -i 's;</a><a name="id[0-9]*"></a>;</a>;g' faq/faq.html
+	-sed -i 's;<a name="id[mp][0-9]*"></a>;;g' faq/faq.html
 
 TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
 	  cygwin-ug-net.pdf cygwin-ug-net.xml \
