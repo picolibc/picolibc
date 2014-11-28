@@ -534,6 +534,14 @@ struct mini_cygheap
 
 #define NBUCKETS 40
 
+struct threadlist_t
+{
+  struct _cygtls *thread;
+  HANDLE mutex;			/* Used to avoid accessing tls area of
+				   deleted thread.  See comment in
+				   cygheap::remove_tls for a description. */
+};
+
 struct init_cygheap: public mini_cygheap
 {
   _cmalloc_entry *chain;
@@ -561,7 +569,7 @@ struct init_cygheap: public mini_cygheap
   struct sigaction *sigs;
 
   fhandler_termios *ctty;	/* Current tty */
-  struct _cygtls **threadlist;
+  threadlist_t *threadlist;
   uint32_t sthreads;
   pid_t pid;			/* my pid */
   struct {			/* Equivalent to using LIST_HEAD. */
@@ -572,8 +580,10 @@ struct init_cygheap: public mini_cygheap
   void init_installation_root ();
   void __reg1 init_tls_list ();;
   void __reg2 add_tls (_cygtls *);
-  void __reg3 remove_tls (_cygtls *, DWORD);
-  _cygtls __reg3 *find_tls (int, bool&);
+  HANDLE __reg3 remove_tls (_cygtls *);
+  threadlist_t __reg2 *find_tls (_cygtls *);
+  threadlist_t __reg3 *find_tls (int, bool&);
+  void unlock_tls (threadlist_t *t) { if (t) ReleaseMutex (t->mutex); }
 };
 
 

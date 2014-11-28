@@ -180,7 +180,7 @@ _cygtls::remove (DWORD wait)
 
   debug_printf ("wait %u", wait);
 
-  cygheap->remove_tls (this, INFINITE);
+  HANDLE mutex = cygheap->remove_tls (this);
   remove_wq (wait);
 
   /* FIXME: Need some sort of atthreadexit function to allow things like
@@ -211,6 +211,11 @@ _cygtls::remove (DWORD wait)
   /* Close timer handle. */
   if (locals.cw_timer)
     NtClose (locals.cw_timer);
+  if (mutex)
+    {
+      ReleaseMutex (mutex);
+      CloseHandle (mutex);
+    }
 }
 
 #ifdef __x86_64__

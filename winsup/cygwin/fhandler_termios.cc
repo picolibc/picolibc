@@ -193,9 +193,12 @@ fhandler_termios::bg_check (int sig)
       return bg_eof;
     }
 
+  threadlist_t *tl_entry;
+  tl_entry = cygheap->find_tls (_main_tls);
   int sigs_ignored =
     ((void *) global_sigs[sig].sa_handler == (void *) SIG_IGN) ||
     (_main_tls->sigmask & SIGTOMASK (sig));
+  cygheap->unlock_tls (tl_entry);
 
   /* If the process is ignoring SIGTT*, then background IO is OK.  If
      the process is not ignoring SIGTT*, then the sig is to be sent to

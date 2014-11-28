@@ -515,7 +515,7 @@ void
 pthread::exit (void *value_ptr)
 {
   class pthread *thread = this;
-  bool is_main_tls = (cygtls == _main_tls); // Check cygtls before deleting this
+  _cygtls *tls = cygtls;	/* Save cygtls before deleting this. */
 
   // run cleanup handlers
   pop_all_cleanup_handlers ();
@@ -541,15 +541,16 @@ pthread::exit (void *value_ptr)
     ::exit (0);
   else
     {
-      if (is_main_tls)
+      if (tls == _main_tls)
 	{
-	  /* FIXME: Needs locking. */
+	  cygheap->find_tls (tls); /* Lock _main_tls mutex. */
 	  _cygtls *dummy = (_cygtls *) malloc (sizeof (_cygtls));
 	  *dummy = *_main_tls;
 	  _main_tls = dummy;
 	  _main_tls->initialized = 0;
 	}
-      cygtls->remove (INFINITE);
+      /* This also unlocks and closes the _main_tls mutex. */
+      tls->remove (INFINITE);
       ExitThread (0);
     }
 }
@@ -595,6 +596,7 @@ pthread::cancel ()
 	 and tends to hang infinitely if we change the instruction pointer.
 	 So just don't cancel asynchronously if the thread is currently
 	 executing Windows code.  Rely on deferred cancellation in this case. */
+      threadlist_t *tl_entry = cygheap->find_tls (cygtls);
       if (!cygtls->inside_kernel (&context))
 	{
 #ifdef __x86_64__
@@ -604,6 +606,7 @@ pthread::cancel ()
 #endif
 	  SetThreadContext (win32_obj_id, &context);
 	}
+      cygheap->unlock_tls (tl_entry);
     }
   mutex.unlock ();
   /* See above.  For instance, a thread which waits for a semaphore in sem_wait

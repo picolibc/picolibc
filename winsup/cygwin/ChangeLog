@@ -1,5 +1,30 @@
 2014-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.cc (init_cygheap::init_tls_list): Accommodate threadlist
+	having a new type threadlist_t *.  Convert commented out code into an
+	#if 0.  Create thread mutex.  Explain why.
+	(init_cygheap::remove_tls): Drop timeout value.  Always wait infinitely
+	for tls_sentry.  Return mutex HANDLE of just deleted threadlist entry.
+	(init_cygheap::find_tls): New implementation taking tls pointer as
+	search parameter.  Return threadlist_t *.
+	(init_cygheap::find_tls): Return threadlist_t *.  Define ix as auto
+	variable.  Drop exception handling since crash must be made impossible
+	due to correct synchronization.  Return with locked mutex.
+	* cygheap.h (struct threadlist_t): Define.
+	(struct init_cygheap): Convert threadlist to threadlist_t type.
+	(init_cygheap::remove_tls): Align declaration to above change.
+	(init_cygheap::find_tls): Ditto.
+	(init_cygheap::unlock_tls): Define.
+	* cygtls.cc (_cygtls::remove): Unlock and close mutex when finishing.
+	* exceptions.cc (sigpacket::process): Lock _cygtls area of thread before
+	accessing it.
+	* fhandler_termios.cc (fhandler_termios::bg_check): Ditto.
+	* sigproc.cc (sig_send): Ditto.
+	* thread.cc (pthread::exit): Ditto.  Add comment.
+	(pthread::cancel): Ditto.
+
+2014-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (init_cygheap::find_tls): Add comment.
 	* cygtls.cc (well_known_dlls): Rephrase comment.
 	(bloda_detect): New function.

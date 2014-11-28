@@ -617,8 +617,9 @@ init_cygheap::init_tls_list ()
   else
     {
       sthreads = THREADLIST_CHUNK;
-      threadlist = (_cygtls **) ccalloc_abort (HEAP_TLS, cygheap->sthreads,
-					       sizeof (cygheap->threadlist[0]));
+      threadlist = (threadlist_t *)
+		   ccalloc_abort (HEAP_TLS, cygheap->sthreads,
+				  sizeof (cygheap->threadlist[0]));
     }
   tls_sentry::lock.init ("thread_tls_sentry");
 }
@@ -630,72 +631,116 @@ init_cygheap::add_tls (_cygtls *t)
   tls_sentry here (INFINITE);
   if (nthreads >= cygheap->sthreads)
     {
-      threadlist = (_cygtls **)
+      threadlist = (threadlist_t *)
 	crealloc_abort (threadlist, (sthreads += THREADLIST_CHUNK)
 			* sizeof (threadlist[0]));
-      // memset (threadlist + nthreads, 0, THREADLIST_CHUNK * sizeof (threadlist[0]));
+#if 0
+      memset (threadlist + nthreads, 0,
+	      THREADLIST_CHUNK * sizeof (threadlist[0]));
+#endif
     }
 
-  threadlist[nthreads++] = t;
+  /* Create a mutex to lock the thread's _cygtls area.  This is required for
+     the following reason:  The thread's _cygtls area is on the thread's
+     own stack.  Thus, when the thread exits, its _cygtls area is automatically
+     destroyed by the OS.  Thus, when this happens while the signal thread
+     still utilizes the thread's _cygtls area, things go awry.
+
+     The following methods take this into account:
+     
+     - The thread mutex is generally only locked under tls_sentry locking.
+     - remove_tls, called from _cygtls::remove, locks the mutex before
+       removing the threadlist entry and _cygtls::remove then unlocks and
+       destroyes the mutex.
+     - find_tls, called from several places but especially from the signal
+       thread, will lock the mutex on exit and the caller can access the
+       _cygtls area locked.  Always make sure to unlock the mutex when the
+       _cygtls area isn't needed anymore. */
+  threadlist[nthreads].thread = t;
+  threadlist[nthreads].mutex = CreateMutexW (&sec_none_nih, FALSE, NULL);
+  if (!threadlist[nthreads].mutex)
+    api_fatal ("Can't create per-thread mutex, %E");
+  ++nthreads;
 }
 
-void
-init_cygheap::remove_tls (_cygtls *t, DWORD wait)
+HANDLE __reg3
+init_cygheap::remove_tls (_cygtls *t)
 {
-  tls_sentry here (wait);
+  HANDLE mutex = NULL;
+
+  tls_sentry here (INFINITE);
   if (here.acquired ())
     {
       for (uint32_t i = 0; i < nthreads; i++)
-	if (t == threadlist[i])
+	if (t == threadlist[i].thread)
 	  {
+	    mutex = threadlist[i].mutex;
+	    WaitForSingleObject (mutex, INFINITE);
 	    if (i < --nthreads)
 	      threadlist[i] = threadlist[nthreads];
 	    debug_only_printf ("removed %p element %u", this, i);
 	    break;
 	  }
     }
+  /* Leave with locked mutex.  The calling function is responsible for
+     unlocking the mutex. */
+  return mutex;
 }
 
-_cygtls __reg3 *
+threadlist_t __reg2 *
+init_cygheap::find_tls (_cygtls *tls)
+{
+  tls_sentry here (INFINITE);
+
+  threadlist_t *t = NULL;
+  int ix = -1;
+  while (++ix < (int) nthreads)
+    {
+      if (!threadlist[ix].thread->tid
+	  || !threadlist[ix].thread->initialized)
+	;
+      if (threadlist[ix].thread == tls)
+	{
+	  t = &threadlist[ix];
+	  break;
+	}
+    }
+  /* Leave with locked mutex.  The calling function is responsible for
+     unlocking the mutex. */
+  if (t)
+    WaitForSingleObject (t->mutex, INFINITE);
+  return t;
+}
+
+threadlist_t __reg3 *
 init_cygheap::find_tls (int sig, bool& issig_wait)
 {
   debug_printf ("sig %d\n", sig);
   tls_sentry here (INFINITE);
 
-  static int NO_COPY ix;
-
-  _cygtls *t = NULL;
+  threadlist_t *t = NULL;
   issig_wait = false;
 
-  ix = -1;
+  int ix = -1;
   /* Scan thread list looking for valid signal-delivery candidates */
   while (++ix < (int) nthreads)
     {
-      __try
+      /* Only pthreads have tid set to non-0. */
+      if (!threadlist[ix].thread->tid
+	  || !threadlist[ix].thread->initialized)
+	;
+      else if (sigismember (&(threadlist[ix].thread->sigwait_mask), sig))
 	{
-	    /* Only pthreads have tid set to non-0. */
-	    if (!threadlist[ix]->tid)
-	      continue;
-	    else if (sigismember (&(threadlist[ix]->sigwait_mask), sig))
-	      {
-		t = cygheap->threadlist[ix];
-		issig_wait = true;
-		__leave;
-	      }
-	    else if (!t && !sigismember (&(threadlist[ix]->sigmask), sig))
-	      t = cygheap->threadlist[ix];
+	  t = &cygheap->threadlist[ix];
+	  issig_wait = true;
+	  break;
 	}
-      __except (NO_ERROR)
-	{
-	  /* We're here because threadlist[ix] became NULL or invalid.  In
-	     theory this should be impossible due to correct synchronization.
-	     But *if* it happens, just remove threadlist[ix] from threadlist.
-	     TODO: This should be totally unnecessary. */
-	  debug_printf ("cygtls synchronization is leaking...");
-	  remove_tls (threadlist[ix], 0);
-	  --ix;
-	}
-      __endtry
+      else if (!t && !sigismember (&(threadlist[ix].thread->sigmask), sig))
+	  t = &cygheap->threadlist[ix];
     }
+  /* Leave with locked mutex.  The calling function is responsible for
+     unlocking the mutex. */
+  if (t)
+    WaitForSingleObject (t->mutex, INFINITE);
   return t;
 }

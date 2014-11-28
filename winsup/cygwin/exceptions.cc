@@ -1299,6 +1299,9 @@ sigpacket::process ()
   struct sigaction& thissig = global_sigs[si.si_signo];
   void *handler = have_execed ? NULL : (void *) thissig.sa_handler;
 
+  threadlist_t *tl_entry = NULL;
+  _cygtls *tls = NULL;
+
   /* Don't try to send signals if we're just starting up since signal masks
      may not be available.  */
   if (!cygwin_finished_initializing)
@@ -1311,12 +1314,19 @@ sigpacket::process ()
 
   myself->rusage_self.ru_nsignals++;
 
-  _cygtls *tls;
   if (si.si_signo == SIGCONT)
-    _main_tls->handle_SIGCONT ();
+    {
+      tl_entry = cygheap->find_tls (_main_tls);
+      _main_tls->handle_SIGCONT ();
+      cygheap->unlock_tls (tl_entry);
+    }
 
+  /* SIGKILL is special.  It always goes through.  */
   if (si.si_signo == SIGKILL)
-    tls = _main_tls;	/* SIGKILL is special.  It always goes through.  */
+    {
+      tl_entry = cygheap->find_tls (_main_tls);
+      tls = _main_tls;
+    }
   else if (ISSTATE (myself, PID_STOPPED))
     {
       rc = -1;		/* Don't send signals when stopped */
@@ -1324,18 +1334,29 @@ sigpacket::process ()
     }
   else if (!sigtls)
     {
-      tls = cygheap->find_tls (si.si_signo, issig_wait);
-      sigproc_printf ("using tls %p", tls);
+      tl_entry = cygheap->find_tls (si.si_signo, issig_wait);
+      if (tl_entry)
+	{
+	  tls = tl_entry->thread;
+	  sigproc_printf ("using tls %p", tls);
+	}
     }
   else
     {
-      tls = sigtls;
-      if (sigismember (&tls->sigwait_mask, si.si_signo))
-	issig_wait = true;
-      else if (!sigismember (&tls->sigmask, si.si_signo))
-	issig_wait = false;
-      else
-	tls = NULL;
+      tl_entry = cygheap->find_tls (sigtls);
+      if (tl_entry)
+	{
+	  tls = tl_entry->thread;
+	  if (sigismember (&tls->sigwait_mask, si.si_signo))
+	    issig_wait = true;
+	  else if (!sigismember (&tls->sigmask, si.si_signo))
+	    issig_wait = false;
+	  else
+	    {
+	      cygheap->unlock_tls (tl_entry);
+	      tls = NULL;
+	    }
+	}
     }
       
   /* !tls means no threads available to catch a signal. */
@@ -1371,19 +1392,22 @@ sigpacket::process ()
     }
 
   /* Clear pending SIGCONT on stop signals */
-  if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU)
+  if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN
+      || si.si_signo == SIGTTOU)
     sig_clear (SIGCONT);
 
   if (handler == (void *) SIG_DFL)
     {
-      if (si.si_signo == SIGCHLD || si.si_signo == SIGIO || si.si_signo == SIGCONT || si.si_signo == SIGWINCH
+      if (si.si_signo == SIGCHLD || si.si_signo == SIGIO
+	  || si.si_signo == SIGCONT || si.si_signo == SIGWINCH
 	  || si.si_signo == SIGURG)
 	{
 	  sigproc_printf ("signal %d default is currently ignore", si.si_signo);
 	  goto done;
 	}
 
-      if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU)
+      if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN
+	  || si.si_signo == SIGTTOU)
 	goto stop;
 
       goto exit_sig;
@@ -1395,7 +1419,12 @@ sigpacket::process ()
   goto dosig;
 
 stop:
-  tls = _main_tls;
+  if (tls != _main_tls)
+    {
+      cygheap->unlock_tls (tl_entry);
+      tl_entry = cygheap->find_tls (_main_tls);
+      tls = _main_tls;
+    }
   handler = (void *) sig_handle_tty_stop;
   thissig = global_sigs[SIGSTOP];
   goto dosig;
@@ -1415,6 +1444,7 @@ dosig:
   rc = setup_handler (handler, thissig, tls);
 
 done:
+  cygheap->unlock_tls (tl_entry);
   sigproc_printf ("returning %d", rc);
   return rc;
 

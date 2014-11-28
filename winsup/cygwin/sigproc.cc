@@ -608,7 +608,11 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   else if (si.si_signo == __SIGPENDING)
     pack.mask = &pending;
   else if (si.si_signo == __SIGFLUSH || si.si_signo > 0)
-    pack.mask = tls ? &tls->sigmask : &_main_tls->sigmask;
+    {
+      threadlist_t *tl_entry = cygheap->find_tls (tls ? tls : _main_tls);
+      pack.mask = tls ? &tls->sigmask : &_main_tls->sigmask;
+      cygheap->unlock_tls (tl_entry);
+    }
   else
     pack.mask = NULL;
 
@@ -1259,9 +1263,12 @@ wait_sig (VOID *)
 	continue;
 
       sigset_t dummy_mask;
+      threadlist_t *tl_entry;
       if (!pack.mask)
 	{
+	  tl_entry = cygheap->find_tls (_main_tls);
 	  dummy_mask = _main_tls->sigmask;
+	  cygheap->unlock_tls (tl_entry);
 	  pack.mask = &dummy_mask;
 	}
 
@@ -1276,11 +1283,16 @@ wait_sig (VOID *)
 	  strace.activate (false);
 	  break;
 	case __SIGPENDING:
-	  *pack.mask = 0;
-	  unsigned bit;
-	  while ((q = q->next))
-	    if (pack.sigtls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
-	      *pack.mask |= bit;
+	  {
+	    unsigned bit;
+
+	    *pack.mask = 0;
+	    tl_entry = cygheap->find_tls (pack.sigtls);
+	    while ((q = q->next))
+	      if (pack.sigtls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
+		*pack.mask |= bit;
+	    cygheap->unlock_tls (tl_entry);
+	  }
 	  break;
 	case __SIGHOLD:
 	  sig_held = true;
