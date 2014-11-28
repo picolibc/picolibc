@@ -779,8 +779,9 @@ main (int argc, char **argv)
     {
       if (domlist[i].domain || !domlist[i].str)
 	continue;
-      if (!enum_local_groups (domlist + i, sep_char, off, disp_groupname,
-			      print_builtin, print_current))
+      if (!enum_local_groups (domlist + i, sep_char,
+			      (nss_src == NSS_SRC_FILES) ? 0x30000 : off,
+			      disp_groupname, print_builtin, print_current))
 	{
 	  enum_groups (domlist + i, sep_char,
 		       (nss_src == NSS_SRC_FILES) ? 0x30000 : off,
