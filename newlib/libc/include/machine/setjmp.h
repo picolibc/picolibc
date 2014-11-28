@@ -111,7 +111,7 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __mips__
-# if defined(__mips64) || (__mips_fpr == 64)
+# if defined(__mips64)
 #  define _JBTYPE long long
 # endif
 # ifdef __mips_soft_float

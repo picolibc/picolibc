@@ -41,6 +41,43 @@
 	FPR_OFFSET ($f29, 5);	\
 	FPR_OFFSET ($f30, 6);	\
 	FPR_OFFSET ($f31, 7);
+#elif __mips_fpr == 0 || __mips_fpr == 64
+
+/* This deals with the o32 FPXX and FP64 cases.  Here we must use
+   SDC1 and LDC1 to access the FPRs.  These instructions require
+   8-byte aligned addresses.
+   Unfortunately, the MIPS jmp_buf only guarantees 4-byte alignment
+   and this cannot be increased without breaking compatibility with
+   pre-existing objects built against newlib.  There are 11 GPRS
+   saved in the jmp_buf so a buffer that happens to be 8-byte aligned
+   ends up leaving the FPR slots 4-byte aligned and an (only) 4-byte
+   aligned buffer leads to the FPR slots being 8-byte aligned!
+   
+   To resolve this, we move the location of $31 to the last slot
+   in the jmp_buf when the overall buffer is 8-byte aligned.  $31
+   is simply loaded/stored twice to avoid adding complexity to the
+   GPR_LAYOUT macro above as well as FPR_LAYOUT.
+
+   The location of the last slot is index 22 which is calculated
+   from there being 11 GPRs saved and then 12 FPRs saved so the
+   index of the last FPR is 11+11.
+   
+   The base of the jmp_buf is modified in $4 to allow the
+   FPR_OFFSET macros to just use the usual constant slot numbers
+   regardless of whether the realignment happened or not.  */
+
+#define FPR_LAYOUT		\
+	and $8, $4, 4;	 	\
+	bne $8, $0, 1f;		\
+	GPR_OFFSET ($31, 22);	\
+	addiu $4, $4, -4;	\
+1:				\
+	FPR_OFFSET ($f20, 0);  	\
+	FPR_OFFSET ($f22, 2);	\
+	FPR_OFFSET ($f24, 4);	\
+	FPR_OFFSET ($f26, 6);	\
+	FPR_OFFSET ($f28, 8);	\
+	FPR_OFFSET ($f30, 10);
 #else /* Assuming _MIPS_SIM == _ABIO32 */
 #define FPR_LAYOUT		\
 	FPR_OFFSET ($f20, 0);	\
@@ -69,12 +106,11 @@
 #else
 #define LOAD_GPR lw
 #define STORE_GPR sw
-#if __mips_fpr == 64
-#define BYTES_PER_WORD 8
-#define LOAD_FPR l.d
-#define STORE_FPR s.d
-#else
 #define BYTES_PER_WORD 4
+#if __mips_fpr == 0 || __mips_fpr == 64
+#define LOAD_FPR ldc1
+#define STORE_FPR sdc1
+#else
 #define LOAD_FPR lwc1
 #define STORE_FPR swc1
 #endif

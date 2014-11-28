@@ -1,3 +1,11 @@
+2014-11-28  Matthew Fortune  <matthew.fortune@imgtec.com>
+
+	* libc/include/machine/setjmp.h [__mips__]: Remove __mips_fpr == 64
+	from the 64-bit _JBTYPE definition.
+	* libc/machine/mips/setjmp.S: Re-work the o32 FP64 support to match
+	the now one-and-only supported o32 FP64 ABI extension.  Also
+	support o32 FPXX.
+
 2014-11-26  Hale Wang  <hale.wang@arm.com>
 
 	* libc/machine/arm/strcmp-armv6m.S: New file.
