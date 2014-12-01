@@ -20,13 +20,9 @@ details. */
    in the same session.  I'm only writing this longish comment because I'm
    puzzled that this has never been noticed before... */
 
-/* Minimal set of capabilities required to run Cygwin. */
-#define wincap_minimal wincap_xpsp2
-
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
-  has_physical_mem_access:true,
   has_mandatory_integrity_control:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
@@ -55,7 +51,6 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
-  has_physical_mem_access:false,
   has_mandatory_integrity_control:false,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:false,
@@ -84,7 +79,6 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
-  has_physical_mem_access:false,
   has_mandatory_integrity_control:true,
   needs_count_in_si_lpres2:true,
   has_recycle_dot_bin:true,
@@ -113,7 +107,6 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
-  has_physical_mem_access:false,
   has_mandatory_integrity_control:true,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:true,
@@ -142,7 +135,34 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
-  has_physical_mem_access:false,
+  has_mandatory_integrity_control:true,
+  needs_count_in_si_lpres2:false,
+  has_recycle_dot_bin:true,
+  has_gaa_on_link_prefix:true,
+  has_gaa_largeaddress_bug:false,
+  supports_all_posix_ai_flags:true,
+  has_restricted_stack_args:false,
+  has_transactions:true,
+  has_sendmsg:true,
+  has_broken_udf:false,
+  has_broken_alloc_console:true,
+  has_always_all_codepages:true,
+  has_localenames:true,
+  has_fast_cwd:true,
+  has_restricted_raw_disk_access:true,
+  use_dont_resolve_hack:false,
+  has_console_logon_sid:true,
+  wow64_has_secondary_stack:false,
+  has_program_compatibility_assistant:true,
+  has_pipe_reject_remote_clients:true,
+  terminate_thread_frees_stack:true,
+  has_precise_system_time:true,
+  has_microsoft_accounts:true,
+};
+
+wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
+  is_server:false,
   has_mandatory_integrity_control:true,
   needs_count_in_si_lpres2:false,
   has_recycle_dot_bin:true,
@@ -202,13 +222,18 @@ wincapc::init ()
 	    case 1:
 	      caps = &wincap_7;
 	      break;
-	    default:
+	    case 2:
+	    case 3:
 	      caps = &wincap_8;
+	      break;
+	    default:
+	      caps = &wincap_10;
 	      break;
 	  }
 	break;
+      case 10:
       default:
-	caps = &wincap_minimal;
+	caps = &wincap_10;
 	break;
     }
 

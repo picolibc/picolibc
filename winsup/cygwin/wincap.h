@@ -16,7 +16,6 @@ struct wincaps
 {
   DWORD    max_sys_priv;
   unsigned is_server                                    : 1;
-  unsigned has_physical_mem_access                      : 1;
   unsigned has_mandatory_integrity_control		: 1;
   unsigned needs_count_in_si_lpres2			: 1;
   unsigned has_recycle_dot_bin				: 1;
@@ -67,7 +66,6 @@ public:
 
   DWORD IMPLEMENT (max_sys_priv)
   bool  IMPLEMENT (is_server)
-  bool  IMPLEMENT (has_physical_mem_access)
   bool	IMPLEMENT (has_mandatory_integrity_control)
   bool	IMPLEMENT (needs_count_in_si_lpres2)
   bool	IMPLEMENT (has_recycle_dot_bin)
