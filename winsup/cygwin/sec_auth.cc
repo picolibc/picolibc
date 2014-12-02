@@ -172,23 +172,6 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
   return hToken;
 }
 
-static void
-str2lsa (LSA_STRING &tgt, const char *srcstr)
-{
-  tgt.Length = strlen (srcstr);
-  tgt.MaximumLength = tgt.Length + 1;
-  tgt.Buffer = (PCHAR) srcstr;
-}
-
-static void
-str2buf2lsa (LSA_STRING &tgt, char *buf, const char *srcstr)
-{
-  tgt.Length = strlen (srcstr);
-  tgt.MaximumLength = tgt.Length + 1;
-  tgt.Buffer = (PCHAR) buf;
-  memcpy (buf, srcstr, tgt.MaximumLength);
-}
-
 HANDLE
 lsa_open_policy (PWCHAR server, ACCESS_MASK access)
 {
@@ -971,7 +954,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   push_self_privilege (SE_TCB_PRIVILEGE, true);
 
   /* Register as logon process. */
-  str2lsa (name, "Cygwin");
+  RtlInitAnsiString (&name, "Cygwin");
   SetLastError (0);
   status = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
   if (status != STATUS_SUCCESS)
@@ -986,7 +969,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
       goto out;
     }
   /* Get handle to our own LSA package. */
-  str2lsa (name, CYG_LSA_PKGNAME);
+  RtlInitAnsiString (&name, CYG_LSA_PKGNAME);
   status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
   if (status != STATUS_SUCCESS)
     {
@@ -1000,7 +983,8 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
     goto out;
 
   /* Create origin. */
-  str2buf2lsa (origin.str, origin.buf, "Cygwin");
+  stpcpy (origin.buf, "Cygwin");
+  RtlInitAnsiString (&origin.str, origin.buf);
   /* Create token source. */
   memcpy (ts.SourceName, "Cygwin.1", 8);
   ts.SourceIdentifier.HighPart = 0;

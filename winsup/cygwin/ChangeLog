@@ -1,5 +1,11 @@
 2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_auth.cc (str2lsa): Remove.
+	(str2buf2lsa): Remove.
+	(lsaauth): Call RtlInitAnsiString instead of str2lsa and str2buf2lsa.
+
+2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (init_cygheap::init_installation_root): Fix typo in
 	comment.
 
