@@ -472,6 +472,12 @@ void extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user);
 /* Get default logonserver for a domain. */
 bool get_logon_server (PWCHAR domain, PWCHAR wserver, ULONG flags);
 
+/* Fetch user profile path from registry, if it already exists. */
+PWCHAR get_user_profile_directory (PCWSTR sidstr, PWCHAR path, SIZE_T path_len);
+
+/* Load user profile if it's not already loaded. */
+HANDLE load_user_profile (HANDLE token, struct passwd *pw, cygpsid &sid);
+
 HANDLE lsa_open_policy (PWCHAR server, ACCESS_MASK access);
 void lsa_close_policy (HANDLE lsa);
 

@@ -1,5 +1,25 @@
 2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (CreateProfile): Import.
+	(LoadUserProfileW): Import.
+	* registry.cc (get_registry_hive_path): Move to sec_auth.cc.
+	(load_registry_hive): Remove.
+	* registry.h (get_registry_hive_path): Drop declaration.
+	(load_registry_hive): Ditto.
+	* sec_auth.cc (get_user_profile_directory): Moved from registry.cc and
+	renamed.  Take third parameter with buffer length.
+	(load_user_profile): New function taking over for load_registry_hive.
+	Use official functions to load profile.  If profile is missing, create
+	it on Vista and later.
+	* security.h (get_user_profile_directory): Declare.
+	(load_user_profile): Declare.
+	* syscalls.cc (seteuid32): Replace call to load_registry_hive with call
+	to load_user_profile.
+	* uinfo.cc (cygheap_user::env_userprofile): Replace call to
+	get_registry_hive_path with call to get_user_profile_directory.
+
+2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (fetch_from_description): Make static.
 	(fetch_from_path): Ditto.
 

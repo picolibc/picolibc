@@ -1,7 +1,7 @@
 /* registry.h: shared info for cygwin
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011 Red Hat, Inc.
+   2011, 2012, 2014 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -37,7 +37,3 @@ public:
 
   ~reg_key ();
 };
-
-/* Evaluates path to the directory of the local user registry hive */
-PWCHAR __stdcall get_registry_hive_path (PCWSTR name, PWCHAR path);
-void __stdcall load_registry_hive (PCWSTR name);

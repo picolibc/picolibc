@@ -3387,11 +3387,7 @@ seteuid32 (uid_t uid)
       NTSTATUS status;
 
       if (!request_restricted_uid_switch)
-	{
-	  /* Avoid having HKCU use default user */
-	  WCHAR name[128];
-	  load_registry_hive (usersid.string (name));
-	}
+	load_user_profile (new_token, pw_new, usersid);
 
       /* Try setting owner to same value as user. */
       status = NtSetInformationToken (new_token, TokenOwner,
