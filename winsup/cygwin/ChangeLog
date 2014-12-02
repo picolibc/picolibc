@@ -1,5 +1,9 @@
 2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* spawn.cc (child_info_spawn::worker): Fix formatting.
+
+2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (str2lsa): Remove.
 	(str2buf2lsa): Remove.
 	(lsaauth): Call RtlInitAnsiString instead of str2lsa and str2buf2lsa.
