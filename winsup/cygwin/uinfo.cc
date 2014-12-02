@@ -320,9 +320,6 @@ cuserid (char *src)
 const char *
 cygheap_user::ontherange (homebodies what, struct passwd *pw)
 {
-  PUSER_INFO_3 ui = NULL;
-  WCHAR wuser[UNLEN + 1];
-  NET_API_STATUS ret;
   char homedrive_env_buf[3];
   char *newhomedrive = NULL;
   char *newhomepath = NULL;
@@ -353,42 +350,56 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	}
     }
 
-  if (what != CH_HOME && homepath == NULL && newhomepath == NULL)
+  if (what != CH_HOME && homepath == NULL)
     {
+      WCHAR wuser[UNLEN + 1];
+      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+      PUSER_INFO_3 ui = NULL;
       char *homepath_env_buf = tp.c_get ();
-      if (!pw)
-	pw = internal_getpwnam (name ());
+      WCHAR profile[MAX_PATH];
+      WCHAR win_id[UNLEN + 1]; /* Large enough for SID */
+
+      homepath_env_buf[0] = homepath_env_buf[1] = '\0';
+      /* Use Cygwin home as HOMEDRIVE/HOMEPATH in the first place.  This
+	 should cover it completely, in theory.  Still, it might be the
+	 wrong choice in the long run, which might demand to set HOMEDRIVE/
+	 HOMEPATH to the correct values per Windows.  Keep the entire rest
+	 of the code mainly for this reason, so switching is easy. */
+      pw = internal_getpwsid (sid ());
       if (pw && pw->pw_dir && *pw->pw_dir)
 	cygwin_conv_path (CCP_POSIX_TO_WIN_A, pw->pw_dir, homepath_env_buf,
 			  NT_MAX_PATH);
-      else
+      /* First fallback: Windows path per Windows user DB. */
+      else if (logsrv ())
 	{
-	  homepath_env_buf[0] = homepath_env_buf[1] = '\0';
-	  if (logsrv ())
+	  sys_mbstowcs (wlogsrv, sizeof (wlogsrv) / sizeof (*wlogsrv),
+			logsrv ());
+	  sys_mbstowcs (wuser, sizeof wuser / sizeof *wuser, winname ());
+	  if (NetUserGetInfo (wlogsrv, wuser, 3, (LPBYTE *) &ui)
+	      == NERR_Success)
 	    {
-	      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-	      sys_mbstowcs (wlogsrv, sizeof (wlogsrv) / sizeof (*wlogsrv),
-			    logsrv ());
-	      sys_mbstowcs (wuser, sizeof wuser / sizeof *wuser, winname ());
-	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3, (LPBYTE *) &ui)))
+	      if (ui->usri3_home_dir_drive && *ui->usri3_home_dir_drive)
 		{
 		  sys_wcstombs (homepath_env_buf, NT_MAX_PATH,
-				ui->usri3_home_dir);
-		  if (!homepath_env_buf[0])
-		    {
-		      sys_wcstombs (homepath_env_buf, NT_MAX_PATH,
-				    ui->usri3_home_dir_drive);
-		      if (homepath_env_buf[0])
-			strcat (homepath_env_buf, "\\");
-		      else
-			cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_ABSOLUTE,
-					  "/", homepath_env_buf, NT_MAX_PATH);
-		    }
+				ui->usri3_home_dir_drive);
+		  strcat (homepath_env_buf, "\\");
 		}
+	      else if (ui->usri3_home_dir && *ui->usri3_home_dir)
+		sys_wcstombs (homepath_env_buf, NT_MAX_PATH,
+			      ui->usri3_home_dir);
 	    }
 	  if (ui)
 	    NetApiBufferFree (ui);
 	}
+      /* Second fallback: Windows profile dir. */
+      if (!homepath_env_buf[0]
+	  && get_user_profile_directory (get_windows_id (win_id),
+					 profile, MAX_PATH))
+	sys_wcstombs (homepath_env_buf, NT_MAX_PATH, profile);
+      /* Last fallback: Cygwin root dir. */
+      if (!homepath_env_buf[0])
+	cygwin_conv_path (CCP_POSIX_TO_WIN_A | CCP_ABSOLUTE,
+			  "/", homepath_env_buf, NT_MAX_PATH);
 
       if (homepath_env_buf[1] != ':')
 	{

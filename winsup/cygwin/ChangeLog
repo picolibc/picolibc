@@ -1,5 +1,10 @@
 2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (cygheap_user::ontherange): Fix order of fallbacks creating
+	HOMEDRIVE/HOMEPATH values to be Windows-compliant.  Add comments.
+
+2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (CreateProfile): Import.
 	(LoadUserProfileW): Import.
 	* registry.cc (get_registry_hive_path): Move to sec_auth.cc.
