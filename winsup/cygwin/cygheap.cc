@@ -192,7 +192,7 @@ init_cygheap::init_installation_root ()
 
   /* Copy result into installation_dir before stripping off "bin" dir and
      revert to Win32 path.  This path is added to the Windows environment
-     in buildenv.  See there for a description. */
+     in build_env.  See there for a description. */
   installation_dir_len = wcpncpy (installation_dir, installation_root + len,
 				  PATH_MAX)
 			 - installation_dir;

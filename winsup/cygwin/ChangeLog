@@ -1,5 +1,10 @@
 2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.cc (init_cygheap::init_installation_root): Fix typo in
+	comment.
+
+2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (IdnToAscii): Use simpler, equivalent LoadDLLfuncEx.
 	(IdnToUnicode): Ditto.
 
