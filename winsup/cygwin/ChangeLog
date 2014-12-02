@@ -1,5 +1,17 @@
 2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (fetch_windows_home): New function fetching Windows-compliant
+	home directory.  Include longish comment to explain what we're doing.
+	(cygheap_pwdgrp::get_home): Take additional sid parameter.  In
+	NSS_SCHEME_WINDOWS case, call fetch_windows_home to create home
+	directory.
+	(pwdgrp::fetch_account_from_windows): Call cygheap_pwdgrp::get_home
+	with additional sid argument.
+	* cygheap.h (cygheap_pwdgrp::get_home): Align declaration to above
+	change.
+
+2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (cygheap_user::ontherange): Fix order of fallbacks creating
 	HOMEDRIVE/HOMEPATH values to be Windows-compliant.  Add comments.
 
