@@ -1,5 +1,13 @@
 2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (create_lock_in_parent): Make lf_obj handle inheritable.
+	Explain why.
+	(lockf_t::create_lock_obj): Use FALSE, rather than 0 for BOOL argument.
+	(lockf_t::del_lock_obj): Check if NtSetEvent succeeded and print system
+	message if not.
+
+2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (fetch_windows_home): New function fetching Windows-compliant
 	home directory.  Include longish comment to explain what we're doing.
 	(cygheap_pwdgrp::get_home): Take additional sid parameter.  In

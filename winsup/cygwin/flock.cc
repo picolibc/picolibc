@@ -703,6 +703,12 @@ create_lock_in_parent (PVOID param)
       NtClose (lf_obj);
       return 0;
     }
+  /* The handle gets created non-inheritable.  That's fine, unless the parent
+     starts another process accessing this object.  So, after it's clear we
+     have to store the handle for further use, make sure it gets inheritable
+     by child processes. */
+  if (!SetHandleInformation (lf_obj, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT))
+    goto err;
   /* otherwise generate inode from directory name... */
   node = inode_t::get (dev, ino, true, false);
   /* ...and generate lock from object name. */
@@ -810,7 +816,7 @@ lockf_t::create_lock_obj ()
 	  return;
 	}
       if (!DuplicateHandle (GetCurrentProcess (), lf_obj, parent_proc,
-			    &parent_lf_obj, TRUE, 0, DUPLICATE_SAME_ACCESS))
+			    &parent_lf_obj, TRUE, FALSE, DUPLICATE_SAME_ACCESS))
 	debug_printf ("DuplicateHandle (lf_obj): %E");
       else
 	{
@@ -873,7 +879,9 @@ lockf_t::del_lock_obj (HANDLE fhdl, bool signal)
       if ((lf_flags & F_POSIX) || signal
 	  || (fhdl && get_obj_handle_count (fhdl) <= 1))
 	{
-	  NtSetEvent (lf_obj, NULL);
+	  NTSTATUS status = NtSetEvent (lf_obj, NULL);
+	  if (!NT_SUCCESS (status))
+	    system_printf ("NtSetEvent, %y", status);
 	  /* For BSD locks, notify the parent process. */
 	  if (lf_flags & F_FLOCK)
 	    {
