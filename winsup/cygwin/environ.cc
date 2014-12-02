@@ -9,12 +9,14 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <userenv.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include <wctype.h>
 #include <ctype.h>
 #include <locale.h>
 #include <assert.h>
+#include <sys/param.h>
 #include <cygwin/version.h>
 #include "pinfo.h"
 #include "perprocess.h"
@@ -1047,14 +1049,39 @@ raise_envblock (int new_tl, PWCHAR &envblock, PWCHAR &s)
 
 #define SPENVS_SIZE (sizeof (spenvs) / sizeof (spenvs[0]))
 
+int
+env_compare (const void *key, const void *memb)
+{
+  const char *k = *(const char **) key;
+  const char *m = *(const char **) memb;
+
+  char *ke = strchr (k, '=');
+  char *me = strchr (m, '=');
+  if (ke == NULL || me == NULL)
+    return strcasecmp (k, m);
+  int ret = strncasecmp (k, m, MIN (ke - k, me - m));
+  if (!ret)
+    ret = (ke - k) - (me - m);
+  return ret;
+}
+
 /* Create a Windows-style environment block, i.e. a typical character buffer
    filled with null terminated strings, terminated by double null characters.
    Converts environment variables noted in conv_envvars into win32 form
-   prior to placing them in the string.  */
+   prior to placing them in the string.
+
+   If new_token is set, we're going to switch the user account in
+   child_info_spawn::worker.  If so, we're also fetching the Windows default
+   environment for the new user, and merge it into the environment we propage
+   to the child. */
 char ** __reg3
 build_env (const char * const *envp, PWCHAR &envblock, int &envc,
-	   bool no_envblock)
+	   bool no_envblock, HANDLE new_token)
 {
+  PWCHAR cwinenv = NULL;
+  size_t winnum = 0;
+  char **winenv = NULL;
+
   int len, n;
   const char * const *srcp;
   char **dstp;
@@ -1066,13 +1093,57 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
   for (n = 0; envp[n]; n++)
     continue;
 
+  /* Fetch windows env and convert to POSIX-style env. */
+  if (new_token
+      && CreateEnvironmentBlock ((LPVOID *) &cwinenv, new_token, FALSE))
+    {
+      PWCHAR var = cwinenv;
+      while (*var)
+	{
+	  ++winnum;
+	  var = wcschr (var, L'\0') + 1;
+	}
+      winenv = (char **) calloc (winnum + 1, sizeof (char *));
+      if (winenv)
+	{
+	  for (winnum = 0, var = cwinenv;
+	       *var;
+	       ++winnum, var = wcschr (var, L'\0') + 1)
+	    sys_wcstombs_alloc (&winenv[winnum], HEAP_NOTHEAP, var);
+	}
+      DestroyEnvironmentBlock (cwinenv);
+      /* Eliminate variables which are already available in envp.  The windows
+	 env is sorted, so we can use bsearch.  We're doing this first step,
+	 so the following code doesn't allocate too much memory. */
+      if (winenv)
+	{
+	  for (srcp = envp; *srcp; srcp++)
+	    {
+	      char **elem = (char **) bsearch (srcp, winenv, winnum,
+					       sizeof *winenv, env_compare);
+	      if (elem)
+		{
+		  system_printf ("remove: %s", *elem);
+		  free (*elem);
+		  /* Use memmove to keep array sorted.
+		     winnum - (elem - winenv) copies all elements following
+		     elem, including the trailing NULL pointer. */
+		  memmove (elem, elem + 1,
+			   (winnum - (elem - winenv)) * sizeof *elem);
+		  --winnum;
+		}
+	    }
+	}
+    }
+
   /* Allocate a new "argv-style" environ list with room for extra stuff. */
   char **newenv = (char **) cmalloc_abort (HEAP_1_ARGV, sizeof (char *) *
-				     (n + SPENVS_SIZE + 1));
+				     (n + winnum + SPENVS_SIZE + 1));
 
   int tl = 0;
   char **pass_dstp;
-  char **pass_env = (char **) alloca (sizeof (char *) * (n + SPENVS_SIZE + 1));
+  char **pass_env = (char **) alloca (sizeof (char *)
+				      * (n + winnum + SPENVS_SIZE + 1));
   /* Iterate over input list, generating a new environment list and refreshing
      "special" entries, if necessary. */
   for (srcp = envp, dstp = newenv, pass_dstp = pass_env; *srcp; srcp++)
@@ -1107,19 +1178,49 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
   assert ((srcp - envp) == n);
   /* Fill in any required-but-missing environment variables. */
   for (unsigned i = 0; i < SPENVS_SIZE; i++)
-    if (!saw_spenv[i] && (spenvs[i].force_into_environment || cygheap->user.issetuid ()))
+    if (!saw_spenv[i] && (spenvs[i].force_into_environment
+			  || cygheap->user.issetuid ()))
       {
 	*dstp = spenvs[i].retrieve (false);
 	if (*dstp && *dstp != env_dontadd)
 	  {
 	    *pass_dstp++ = *dstp;
 	    tl += strlen (*dstp) + 1;
+	    /* Eliminate from winenv. */
+	    if (winenv)
+	      {
+		char **elem = (char **) bsearch (dstp, winenv, winnum,
+						 sizeof *winenv, env_compare);
+		if (elem)
+		  {
+		    system_printf ("remove: %s", *elem);
+		    free (*elem);
+		    memmove (elem, elem + 1,
+			     (winnum - (elem - winenv)) * sizeof *elem);
+		    --winnum;
+		  }
+	      }
 	    dstp++;
 	  }
       }
 
+  /* Fill in any Windows environment vars still missing. */
+  if (winenv)
+    {
+      char **elem;
+      for (elem = winenv; *elem; ++elem)
+	{
+	  *dstp = cstrdup1 (*elem);
+	  free (*elem);
+	  *pass_dstp++ = *dstp;
+	  tl += strlen (*dstp) + 1;
+	  ++dstp;
+	}
+      free (winenv);
+    }
+
   envc = dstp - newenv;		/* Number of entries in newenv */
-  assert ((size_t) envc <= (n + SPENVS_SIZE));
+  assert ((size_t) envc <= (n + winnum + SPENVS_SIZE));
   *dstp = NULL;			/* Terminate */
 
   size_t pass_envc = pass_dstp - pass_env;

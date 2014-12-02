@@ -28,6 +28,7 @@ details. */
 #define _SHELL32_
 #define _SPOOL32_
 #define _USER32_
+#define _USERENV_
 #define _WINMM_
 #define WINIMPM
 #define WINSOCK_API_LINKAGE

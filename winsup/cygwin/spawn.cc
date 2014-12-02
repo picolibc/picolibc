@@ -531,8 +531,14 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       if (!real_path.iscygexec())
 	::cygheap->fdtab.set_file_pointers_for_exec ();
 
+      /* If we switch the user, merge the user's Windows environment. */
+      bool switch_user = ::cygheap->user.issetuid ()
+			 && (::cygheap->user.saved_uid
+			     != ::cygheap->user.real_uid);
       moreinfo->envp = build_env (envp, envblock, moreinfo->envc,
-				  real_path.iscygexec ());
+				  real_path.iscygexec (),
+				  switch_user ? ::cygheap->user.primary_token ()
+					      : NULL);
       if (!moreinfo->envp || !envblock)
 	{
 	  set_errno (E2BIG);

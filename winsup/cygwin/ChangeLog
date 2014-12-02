@@ -1,5 +1,20 @@
 2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (CreateEnvironmentBlock): Import.
+	(DestroyEnvironmentBlock): Import.
+	* environ.cc (env_compare): New static bsearch comparison function.
+	(build_env): Add parameter taking a user token.  If token is non-NULL,
+	fetch user's default Windows environment and merge it into the resulting
+	environment.  Explain what we do in preceeding comment.
+	* environ,h (build_env): Align prototype to above change.
+	* external.cc (create_winenv): Call build_env with NULL token.
+	* spawn.cc (child_info_spawn::worker): When spawning new process under
+	another user account, call build_env with new token to allow merging
+	user's default Windows environment.
+	* winlean.h (_USERENV_): Define to override dllimport.
+
+2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* spawn.cc (child_info_spawn::worker): Fix formatting.
 
 2014-12-02  Corinna Vinschen  <corinna@vinschen.de>
