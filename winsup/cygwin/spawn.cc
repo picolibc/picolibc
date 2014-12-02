@@ -467,7 +467,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 	}
 
-debug_printf ("ping 1");
       if (mode == _P_DETACH)
 	c_flags |= DETACHED_PROCESS;
       else
