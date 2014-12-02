@@ -807,7 +807,7 @@ cygheap_pwdgrp::nss_init_line (const char *line)
    Therefore, allow to fetch additional passwd/group attributes from the
    "Comment" field in XML short style.  For symmetry, this is also allowed
    from the equivalent "description" AD attribute. */
-char *
+static char *
 fetch_from_description (PCWSTR desc, PCWSTR search, size_t len)
 {
   PWCHAR s, e;
@@ -838,7 +838,7 @@ fetch_from_description (PCWSTR desc, PCWSTR search, size_t len)
   return ret;
 }
 
-char *
+static char *
 fetch_from_path (PCWSTR str, PCWSTR dom, PCWSTR name, bool full_qualified)
 {
   tmp_pathbuf tp;
