@@ -577,8 +577,8 @@ LoadDLLfuncEx (CancelSynchronousIo, 4, kernel32, 1)
 LoadDLLfunc (CreateSymbolicLinkW, 12, kernel32)
 LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
 LoadDLLfunc (GetSystemTimePreciseAsFileTime, 4, kernel32)
-LoadDLLfuncEx2 (IdnToAscii, 20, kernel32, 1, 0)
-LoadDLLfuncEx2 (IdnToUnicode, 20, kernel32, 1, 0)
+LoadDLLfuncEx (IdnToAscii, 20, kernel32, 1)
+LoadDLLfuncEx (IdnToUnicode, 20, kernel32, 1)
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
 
 /* ldap functions are cdecl! */
