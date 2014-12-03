@@ -27,6 +27,24 @@ What changed:
 - The xdr functions are no longer exported for newly built executables.
   Use libtirpc-devel instead.
 
+- 32 bit only: Change default values for socket buffer size to raise
+  performance on 10Gb networks.
+
+- When spawning a process under another user account, merge the user's
+  default Windows environment into the new process' environment.
+
 
 Bug Fixes
 ---------
+
+- Fix the problem that ptys master side always writes single byte packages
+  to the slave side, and pty slaves always read VMIN byte packages from
+  the master side if VMIN is > 0.
+  Fixes: https://cygwin.com/ml/cygwin-developers/2014-11/msg00000.html
+
+- Fix a synchronization problem in signal handling when using pthreads.
+  Addresses: https://cygwin.com/ml/cygwin/2014-11/msg00472.html
+
+- Fix an "invalid handle" problem when using flock(2) with a parent process
+  holding the lock.
+  Addresses: https://cygwin.com/ml/cygwin/2014-12/msg00012.html
