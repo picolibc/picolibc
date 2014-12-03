@@ -1,3 +1,9 @@
+2014-12-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/inttypes.h: Only enable the 8-bit scanning macros
+	if _WANT_IO_C99_FORMATS is defined by configuration.  Add comment
+	on why.
+
 2014-11-28  Matthew Fortune  <matthew.fortune@imgtec.com>
 
 	* libc/include/machine/setjmp.h [__mips__]: Remove __mips_fpr == 64
