@@ -36,6 +36,21 @@ are supposed to work.  Finally implement a CLASS_OBJ emulation.  Update
 getfacl(1)/setfacl(1) accordingly.
 </para></listitem>
 
+<listitem><para>
+The xdr functions are no longer exported for newly built executables.
+Use libtirpc-devel instead.
+</para></listitem>
+
+<listitem><para>
+32 bit only: Change default values for socket buffer size to raise
+performance on 10Gb networks.
+</para></listitem>
+
+<listitem><para>
+When spawning a process under another user account, merge the user's
+default Windows environment into the new process' environment.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
