@@ -1,3 +1,8 @@
+2014-12-04  Ulrich Weigand  <uweigand@de.ibm.com>
+	    Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/signal.h [__SPU__] (kill): Declare.
+
 2014-12-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/inttypes.h: Only enable the 8-bit scanning macros
