@@ -59,7 +59,7 @@ echo "{"
 echo "  PCWSTR win_tzkey;"
 echo "  PCWSTR country;"
 echo "  PCWSTR posix_tzid;"
-echo "} tzmap[] ="
+echo "} const tzmap[] ="
 echo "{"
 wget -O - "${ZONES_FILE}" | \
 {

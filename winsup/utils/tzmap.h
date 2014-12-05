@@ -47,7 +47,7 @@ struct
   PCWSTR win_tzkey;
   PCWSTR country;
   PCWSTR posix_tzid;
-} tzmap[] =
+} const tzmap[] =
 {
   { L"AUS Central Standard Time", L"", L"Australia/Darwin" },
   { L"AUS Central Standard Time", L"AU", L"Australia/Darwin" },

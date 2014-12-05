@@ -1,3 +1,8 @@
+2014-12-05  Václav Zeman  <vhaisman@gmail.com>
+
+	* tzmap-from-unicode.org: Create tzmap as const.
+	* tzmap.h: Regenerate.
+
 2014-12-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Add rules to create and depend on tzmap.h.
