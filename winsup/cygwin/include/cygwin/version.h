@@ -457,12 +457,13 @@ details. */
       279: Export stime.
       280: Static atexit in libcygwin.a, CW_FIXED_ATEXIT.
       281: Add CW_GETNSS_PWD_SRC, CW_GETNSS_GRP_SRC.
+      282: Export __bsd_qsort_r, qsort_r.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 281
+#define CYGWIN_VERSION_API_MINOR 282
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
