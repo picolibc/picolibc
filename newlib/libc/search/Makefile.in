@@ -86,18 +86,22 @@ am__objects_1 = lib_a-bsearch.$(OBJEXT) lib_a-qsort.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@	lib_a-tfind.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-tsearch.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-twalk.$(OBJEXT)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_3 = lib_a-bsd_qsort_r.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-qsort_r.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2)
+@USE_LIBTOOL_FALSE@	$(am__objects_2) $(am__objects_3)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libsearch_la_LIBADD =
-am__objects_3 = bsearch.lo qsort.lo
-@ELIX_LEVEL_1_FALSE@am__objects_4 = hash.lo hash_bigkey.lo hash_buf.lo \
+am__objects_4 = bsearch.lo qsort.lo
+@ELIX_LEVEL_1_FALSE@am__objects_5 = hash.lo hash_bigkey.lo hash_buf.lo \
 @ELIX_LEVEL_1_FALSE@	hash_func.lo hash_log2.lo hash_page.lo \
 @ELIX_LEVEL_1_FALSE@	hcreate.lo hcreate_r.lo tdelete.lo \
 @ELIX_LEVEL_1_FALSE@	tdestroy.lo tfind.lo tsearch.lo twalk.lo
-@USE_LIBTOOL_TRUE@am_libsearch_la_OBJECTS = $(am__objects_3) \
-@USE_LIBTOOL_TRUE@	$(am__objects_4)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = bsd_qsort_r.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	qsort_r.lo
+@USE_LIBTOOL_TRUE@am_libsearch_la_OBJECTS = $(am__objects_4) \
+@USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
 libsearch_la_OBJECTS = $(am_libsearch_la_OBJECTS)
 libsearch_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -278,7 +282,7 @@ GENERAL_SOURCES = \
 	page.h \
 	qsort.c
 
-@ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@ELIX_2_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	hash.c \
 @ELIX_LEVEL_1_FALSE@	hash_bigkey.c \
 @ELIX_LEVEL_1_FALSE@	hash_buf.c \
@@ -293,19 +297,27 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@	tsearch.c \
 @ELIX_LEVEL_1_FALSE@	twalk.c
 
-@ELIX_LEVEL_1_TRUE@ELIX_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_2_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_4_SOURCES = \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	bsd_qsort_r.c \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	qsort_r.c
+
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_4_SOURCES = 
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_4_SOURCES = 
+@ELIX_LEVEL_1_TRUE@ELIX_4_SOURCES = 
 libsearch_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libsearch.la
-@USE_LIBTOOL_TRUE@libsearch_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_TRUE@libsearch_la_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_2_SOURCES) $(ELIX_4_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 SUFFIXES = .def
 CHEWOUT_FILES = \
 	bsearch.def \
-	qsort.def
+	qsort.def \
+	qsort_r.def
 
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
 TARGETDOC = ../tmp.texi
@@ -468,6 +480,18 @@ lib_a-twalk.o: twalk.c
 
 lib_a-twalk.obj: twalk.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-twalk.obj `if test -f 'twalk.c'; then $(CYGPATH_W) 'twalk.c'; else $(CYGPATH_W) '$(srcdir)/twalk.c'; fi`
+
+lib_a-bsd_qsort_r.o: bsd_qsort_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bsd_qsort_r.o `test -f 'bsd_qsort_r.c' || echo '$(srcdir)/'`bsd_qsort_r.c
+
+lib_a-bsd_qsort_r.obj: bsd_qsort_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-bsd_qsort_r.obj `if test -f 'bsd_qsort_r.c'; then $(CYGPATH_W) 'bsd_qsort_r.c'; else $(CYGPATH_W) '$(srcdir)/bsd_qsort_r.c'; fi`
+
+lib_a-qsort_r.o: qsort_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort_r.o `test -f 'qsort_r.c' || echo '$(srcdir)/'`qsort_r.c
+
+lib_a-qsort_r.obj: qsort_r.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-qsort_r.obj `if test -f 'qsort_r.c'; then $(CYGPATH_W) 'qsort_r.c'; else $(CYGPATH_W) '$(srcdir)/qsort_r.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

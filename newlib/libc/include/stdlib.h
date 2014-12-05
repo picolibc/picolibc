@@ -248,6 +248,22 @@ int	_EXFUN(_system_r,(struct _reent *, const char *));
 
 _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *));
 
+/* There are two common qsort_r variants.  If you request
+   _BSD_SOURCE, you get the BSD version; otherwise you get the GNU
+   version.  We want that #undef qsort_r will still let you
+   invoke the underlying function, but that requires gcc support. */
+#ifdef _BSD_SOURCE
+# ifdef __GNUC__
+_VOID	_EXFUN(qsort_r,(_PTR __base, size_t __nmemb, size_t __size, _PTR __thunk, int (*_compar)(_PTR, const _PTR, const _PTR)))
+             __asm__ (__ASMNAME ("__bsd_qsort_r"));
+# else
+_VOID	_EXFUN(__bsd_qsort_r,(_PTR __base, size_t __nmemb, size_t __size, _PTR __thunk, int (*_compar)(_PTR, const _PTR, const _PTR)));
+#  define qsort_r __bsd_qsort_r
+# endif
+#elif __GNU_VISIBLE
+_VOID	_EXFUN(qsort_r,(_PTR __base, size_t __nmemb, size_t __size, int (*_compar)(const _PTR, const _PTR, _PTR), _PTR __thunk));
+#endif
+
 /* On platforms where long double equals double.  */
 #ifdef _HAVE_LONG_DOUBLE
 #if !defined(__STRICT_ANSI__) || \

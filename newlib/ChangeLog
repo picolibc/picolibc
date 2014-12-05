@@ -1,3 +1,18 @@
+2014-12-05  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* libc/include/stdlib.h (__bsd_qsort_r): Declare.
+	(qsort_r): Declare.
+	* libc/search/Makefile.am (ELIX_2_SOURCES): Rename from ELIX_SOURCES.
+	(ELIX_4_SOURCES): Define.  Add bsd_qsort_r.c and qsort_r.c.
+	(libsearch_la_SOURCES): Adapt accordingly.
+	(lib_a_SOURCES): Adapt accordingly.
+	(CHEWOUT_FILES): Add qsort_r.def.
+	* libc/search/Makefile.in: Regenerate.
+	* libc/search/bsd_qsort_r.c: New file.
+	* libc/search/qsort.c: Update from FreeBSD HEAD. Adapt for both BSD
+	and GNU qsort_r flavors.
+	* libc/search/qsort_r.c: New file.
+
 2014-12-04  Ulrich Weigand  <uweigand@de.ibm.com>
 	    Corinna Vinschen  <vinschen@redhat.com>
 
