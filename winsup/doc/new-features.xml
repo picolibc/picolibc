@@ -51,6 +51,10 @@ When spawning a process under another user account, merge the user's
 default Windows environment into the new process' environment.
 </para></listitem>
 
+<listitem><para>
+New APIs: qsort_r, __bsd_qsort_r.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

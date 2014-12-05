@@ -1047,6 +1047,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     madvise
     mkstemps
     openpty
+    qsort_r			(see chapter "Implementation Notes")
     rcmd
     rcmd_af
     reallocf
@@ -1175,6 +1176,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_getattr_np
     pthread_sigqueue
     ptsname_r
+    qsort_r			(see chapter "Implementation Notes")
     quotactl
     rawmemchr
     removexattr
@@ -1567,6 +1569,9 @@ available when cygserver is running.</para>
 <para>The Linux-specific function <function>quotactl</function> only implements
 what works on Windows:  Windows only supports user block quotas on NTFS, no
 group quotas, no inode quotas, no time constraints.</para>
+
+<para><function>qsort_r</function> is available in both BSD and GNU flavors,
+depending on whether _BSD_SOURCE or _GNU_SOURCE is defined when compiling.</para>
 
 </sect1>
 
