@@ -84,6 +84,15 @@ path-mount.o: path.cc
 	${COMPILE.cc} -c -DFSTAB_ONLY -o $@ $<
 mount.exe: path-mount.o
 
+.PHONY: tzmap
+tzmap:
+	${srcdir}/tzmap-from-unicode.org > ${srcdir}/$@.h
+
+tzmap.h:
+	[ -f "${srcdir}/tzmap.h" ] || ${srcdir}/tzmap-from-unicode.org > ${srcdir}/$@
+
+tzset.o: tzmap.h
+
 # Provide any necessary per-target variable overrides.
 
 cygcheck.exe: MINGW_LDFLAGS += ${ZLIB} -lwininet -lpsapi -lntdll

@@ -1,3 +1,11 @@
+2014-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Add rules to create and depend on tzmap.h.
+	* tzmap-from-unicode.org: New script to create tzmap.h.
+	* tzmap.h: New auto-generated file.
+	* tzset.c: Drop tzmap from here and include tzmap.h instead.  Drop
+	Windows 2000 considerations.
+
 2014-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (main): Call enum_local_groups with offset 0x30000 for local
