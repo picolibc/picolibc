@@ -1,3 +1,7 @@
+2014-12-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (build_env): Remove loquacious debug statements.
+
 2014-12-05  Yaakov Selkowitz  <yselkowitz@cygwin.com>
 
 	* common.din (__bsd_qsort_r): Add.

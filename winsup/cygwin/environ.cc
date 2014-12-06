@@ -1123,7 +1123,6 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 					       sizeof *winenv, env_compare);
 	      if (elem)
 		{
-		  system_printf ("remove: %s", *elem);
 		  free (*elem);
 		  /* Use memmove to keep array sorted.
 		     winnum - (elem - winenv) copies all elements following
@@ -1193,7 +1192,6 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 						 sizeof *winenv, env_compare);
 		if (elem)
 		  {
-		    system_printf ("remove: %s", *elem);
 		    free (*elem);
 		    memmove (elem, elem + 1,
 			     (winnum - (elem - winenv)) * sizeof *elem);
