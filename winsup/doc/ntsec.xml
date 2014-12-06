@@ -632,257 +632,6 @@ with uid/gid -1.
 
 </sect3>
 
-<sect3 id="ntsec-mapping-passwdinfo"><title id="ntsec-mapping-passwdinfo.title">Cygwin user names, home dirs, login shells</title>
-
-<para>
-Obviously, if you don't maintain <filename>passwd</filename> and
-<filename>group</filename> files, you need to have a way to maintain the other
-fields of a passwd entry as well.  Three things come to mind:
-</para>
-
-<itemizedlist spacing="compact">
-
-<listitem>
-<para>
-You want to use a Cygwin username different from your Windows username.
-</para>
-
-<note><para>
-Note: This is only supported via <filename>/etc/passwd</filename> and
-<filename>/etc/group</filename> files.  A Cygwin username maintained in
-the Windows user databases would require very costly (read: slow) search
-operations.
-</para></note>
-</listitem>
-
-<listitem>
-<para>
-You want a home dir different from the default <filename>/home/$USER</filename>.
-</para>
-</listitem>
-
-<listitem>
-<para>
-You want to specify a different login shell than <filename>/bin/bash</filename>.
-</para>
-</listitem>
-
-</itemizedlist>
-
-<para>
-How this is done depends on your account being a domain account or a
-local account.  Let's start with the default.  Assuming your Windows
-account name is <literal>bigfoot</literal> and your domain is
-<literal>MY_DOM</literal>.  Your default passwd entry <!-- in absence of
-anything I'll describe below -->looks like this:
-</para>
-
-<screen>
-  bigfoot:*:&lt;uid&gt;:&lt;gid&gt;:U-MY_DOM\bigfoot,S-1-5-....:/home/bigfoot:/bin/bash
-</screen>
-
-<para>
-or, if your account is from a different domain than the primary domain of
-the machine:
-</para>
-
-<screen>
-  MY_DOM+bigfoot:*:&lt;uid&gt;:&lt;gid&gt;:U-MY_DOM\bigfoot,S-1-5-....:/home/bigfoot:/bin/bash
-</screen>
-
-<para>
-Yes, the default homedir is still /home/bigfoot.
-</para>
-
-<para>
-If your account is a domain account:
-</para>
-
-<itemizedlist spacing="compact">
-
-<listitem>
-<para>
-Either create an <filename>/etc/passwd</filename> and/or
-<filename>/etc/group</filename> file with entries for your account and tweak
-that,
-</para>
-</listitem>
-
-<listitem>
-<para>
-or Cygwin will utilize the
-<literal>posixAccount</literal>/<literal>posixGroup</literal> attributes per
-<ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>.  These
-attributes are by default available in Active Directory since Windows Server
-2003 R2.  They are <literal>not set</literal>, unless utilized by the
-(deprecated since Server 2012 R2) Active Directory "Server for NIS" feature.
-The user attributes utilized by Cygwin are:
-</para>
-
-<segmentedlist><?dbhtml list-presentation="table"?>
-  <seglistitem>
-    <seg><literal>unixHomeDirectory</literal></seg>
-    <seg>If set, will be used as Cygwin home directory.</seg>
-  </seglistitem>
-  <seglistitem>
-    <seg><literal>loginShell</literal></seg>
-    <seg>If set, will be used as Cygwin login shell.</seg>
-  </seglistitem>
-  <seglistitem>
-    <seg><literal>gecos</literal></seg>
-    <seg>Content will be added to the pw_gecos field.</seg>
-  </seglistitem>
-  <seglistitem>
-    <seg><literal>uidNumber</literal></seg>
-    <seg>See <xref linkend="ntsec-mapping-nfs"></xref>.</seg>
-  </seglistitem>
-  <seglistitem>
-    <seg>The group attributes utilized by Cygwin are:</seg>
-  </seglistitem>
-  <seglistitem>
-    <seg><literal>gidNumber</literal></seg>
-    <seg>See <xref linkend="ntsec-mapping-nfs"></xref>.</seg>
-  </seglistitem>
-</segmentedlist>
-
-<para>
-Apart from power shell scripting or inventing new CLI tools, these attributes
-can be changed using the <literal>Attribute Editor</literal> tab in the user
-properties dialog of the <literal>Active Directory Users and Computers</literal>
-MMC snap-in.  Alternatively, if the <literal>Server for NIS</literal>
-administration feature has been installed, there will be a
-<literal>UNIX Attributes</literal> tab which contains the required fields,
-except for the gecos field, which isn't really important anyway.  Last resort
-is <literal>ADSI Edit</literal>.
-</para>
-
-<para> 
-The primary group of a user is always the Windows primary group set in
-Active Directory and can't be changed.
-</para>
-</listitem>
-
-</itemizedlist>
-
-<para>
-If your machine is not a domain member machine or your account is a
-local account for some reason:
-</para>
-
-<itemizedlist spacing="compact">
-
-<listitem>
-<para>
-Either create an <filename>/etc/passwd</filename> and/or
-<filename>/etc/group</filename> file with entries for your account and tweak
-that,
-</para>
-</listitem>
-
-<listitem>
-<para>
-or enter the information into the comment field of your local user entry.
-In the <literal>Local Users and Groups</literal> MMC snap-in it's called
-<literal>Description</literal>.
-</para>
-
-<para>
-You can utilize this field even if you're running a "home edition" of
-Windows, using the command line.  The <command>net user</command> command
-allows to set all values in the SAM, even if the GUI is crippled.
-</para>
-
-<para>
-A Cygwin SAM comment entry looks like this:
-</para>
-
-<screen>
-&lt;cygwin key="value" key="value" [...] /&gt;
-</screen>
-
-<para>
-The supported keys are:
-</para>
-
-<segmentedlist><?dbhtml list-presentation="table"?>
-  <seglistitem>
-    <seg><literal>home="value"</literal></seg>
-    <seg>Sets the Cygwin home dir to value.</seg>
-  </seglistitem>
-  <seglistitem>
-    <seg><literal>shell="value"</literal></seg>
-    <seg>Sets the Cygwin login shell to value.</seg>
-  </seglistitem>
-  <seglistitem>
-    <seg><literal>group="value"</literal></seg>
-    <seg>Sets the Cygwin primary group of the account to value, provided that
-	 the user *is* already a member of that group.  This allows to override
-         the default "None" primary group for local accounts.  One nice idea
-	 here is, for instance group="Users".</seg>
-  </seglistitem>
-  <seglistitem>
-    <seg><literal>unix="value"</literal></seg>
-    <seg>Sets the NFS/Samba uid of the user to the decimal value.
-         See <xref linkend="ntsec-mapping-nfs"></xref>.</seg>
-  </seglistitem>
-</segmentedlist>
-
-<para>
-The &lt;cygwin .../&gt; string can start at any point in the comment, but
-you have to follow the rules:
-</para>
-
-<itemizedlist spacing="compact">
-<listitem>
-It starts with "&lt;cygwin " and ends with "/&gt;".
-</listitem>
-<listitem>
-The "cygwin" string and the key names have to be lowercase.
-</listitem>
-<listitem>
-No spaces between key and "value", just the equal sign.
-</listitem>
-<listitem>
-The value must be placed within double quotes and it must not contain a double
-quote itself.  The double quotes are required for the decimal values as well!
-</listitem>
-</itemizedlist>
-
-<para>
-CMD example:
-</para>
-
-<screen>
-net user corinna /comment:"&lt;cygwin home=\"/home/foo\"/&gt;"
-</screen>
-
-<para>
-Bash example (use single quotes):
-</para>
-
-<screen>
-net user corinna /comment:'&lt;cygwin home="/home/foo"/&gt;'
-</screen>
-
-<para>
-For changing group comments, use the `net localgroup' command.  The supported
-key/value pair for groups are:
-</para>
-
-<segmentedlist><?dbhtml list-presentation="table"?>
-  <seglistitem>
-    <seg><literal>unix="value"</literal></seg>
-    <seg>Sets the NFS/Samba gid of the group to the decimal value.
-         See <xref linkend="ntsec-mapping-nfs"></xref>.</seg>
-  </seglistitem>
-</segmentedlist>
-
-</listitem>
-
-</itemizedlist>
-
-</sect3>
-
 <sect3 id="ntsec-mapping-caching"><title id="ntsec-mapping-caching.title">Caching account information</title>
 
 <para>
@@ -979,151 +728,72 @@ will not impact the running instance, only future instances.
 
 </sect3>
 
-<sect3 id="ntsec-mapping-nfs"><title id="ntsec-mapping-nfs.title">NFS account mapping</title>
+<sect3 id="ntsec-mapping-passwdinfo"><title id="ntsec-mapping-passwdinfo.title">Cygwin user names, home dirs, login shells</title>
 
 <para>
-Microsoft's NFS client does not map the uid/gid values on the NFS shares
-to SIDs.  There's no such thing as a (fake) security descriptor returned
-to the application.  Rather, via an undocumented API an application can
-fetch <ulink url="https://tools.ietf.org/html/rfc1813">RFC 1813</ulink>
-compatible NFSv3 stat information from the share.  This is what Cygwin is
-using to show stat information for files on NFS shares.
-</para>
-
-<para>
-The problem is, while all other information in this stat record, like
-timestamps, file size etc., can be used by Cygwin, Cygwin had no way to
-map the values of the st_uid and st_gid members to a Windows SID for a
-long time.  So it just faked the file owner info and claimed that it's
-you.
-</para>
-
-<para>
-However, SFU has, over time, developed multiple methods to map UNIX
-uid/gid values on NFS shares to Windows SIDs.  You'll find the full
-documentation of the mapping methods in
-<ulink url="http://blogs.technet.com/b/filecab/archive/2012/10/09/nfs-identity-mapping-in-windows-server-2012.aspx">NFS Identity Mapping in Windows Server 2012</ulink>
-</para>
-
-<para>
-Cygwin now utilizes the
-<ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>
-mapping for this purpose.  This is most of the time provided by an AD domain,
-but it could also be a standalone LDAP mapping server.  Per
-<ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>, the uid is
-in the attribute <literal>uidNumber</literal>.  For groups, the gid is in the
-<literal>gidNumber</literal> attribute.
-</para>
-
-<para>
-When Cygwin stat()s files on an NFS share, it asks the mapping server via
-LDAP in two different ways, depending on the role of the mapping server.
+Obviously, if you don't maintain <filename>passwd</filename> and
+<filename>group</filename> files, you need to have a way to maintain the other
+fields of a passwd entry as well.  A couple of things come to mind:
 </para>
 
 <itemizedlist spacing="compact">
 
 <listitem>
-If the server is an AD domain controller, it asks for an account with
-<literal>uidNumber</literal> attribute == <literal>st_uid</literal> field of
-the stat record returned by NFS.  If an account matches, AD returns the
-Windows SID, so we have an immediate mapping from UNIX uid to a Windows SID,
-if the user account has a valid <literal>uidNumber</literal> attribute.  For
-groups, the method is the same, just that Cygwin asks for a group with
-<literal>gidNumber</literal> attribute == <literal>st_gid</literal> field of the
-stat record.
+<para>
+You want to use a Cygwin username different from your Windows username.
+</para>
+
+<note><para>
+Note: This is only supported via <filename>/etc/passwd</filename>.  A
+Cygwin username maintained in the Windows user databases would require
+very costly (read: slow) search operations.
+</para></note>
 </listitem>
 
 <listitem>
-If the server is a standalone LDAP mapping server Cygwin asks for the
-same <literal>uidNumber</literal>/<literal>gidNumber</literal> attributes, but
-it can't expect that the LDAP server knows anything about Windows SIDs.
-Rather, the mapping server returns the account name.  Cygwin then asks the
-DC for an account with this name, and if that succeeds, we have a mapping
-between UNIX uid/gid and Windows SIDs.
+<para>
+You want to change the primary group of a user.  For AD accounts this is
+not supported.  The primary group of a user is always the Windows
+primary group set in Active Directory and can't be changed.  For SAM
+accounts, you can add the primary group to the SAM
+<literal>description</literal> field of the user.  See <xref
+linkend="ntsec-mapping-nsswitch-desc"></xref> for more info.
+</para>
+</listitem>
+
+<listitem>
+<para>
+You want a home dir different from the default
+<filename>/home/$USERNAME</filename>.
+</para>
+</listitem>
+
+<listitem>
+<para>
+You want to specify a different login shell than <filename>/bin/bash</filename>.
+</para>
+</listitem>
+
+<listitem>
+<para>
+You want to add specific content to the pw_gecos field.
+</para>
 </listitem>
 
 </itemizedlist>
 
 <para>
-The mapping will be cached for the lifetime of the process, and inherited
-by child processes.
-</para>
-
-</sect3>
-
-<sect3 id="ntsec-mapping-samba"><title id="ntsec-mapping-samba.title">Samba account mapping</title>
-
-<para>
-A fully set up Samba with domain integration is running winbindd to
-map Window SIDs to artificially created UNIX uids and gids, and this
-mapping is transparent within the domain, so Cygwin doesn't have to do
-anything special.
+For simple needs you can create <filename>/etc/passwd</filename> and/or
+<filename>/etc/group</filename> files with entries for your account
+and tweak that.
 </para>
 
 <para>
-However, setting up winbindd isn't for everybody, and it fails to map
-Windows accounts to already existing UNIX users or groups.  In contrast
-to NFS, Samba returns security descriptors, but unmapped UNIX accounts
-get special SIDs:
-</para>
-
-<itemizedlist spacing="compact">
-
-<listitem>
-A UNIX user account with uid X is mapped to the Windows SID S-1-22-1-X.
-</listitem>
-
-<listitem>
-A UNIX group account with gid X is mapped to SID S-1-22-2-X.
-</listitem>
-
-</itemizedlist>
-
-<para>
-As you can see, even though we have SIDs, they just reflect the actual
-uid/gid values on the UNIX box in the RID value.  It's only marginally
-different from the NFS method, so why not just use the same method as
-for NFS?
-</para>
-
-<para>
-That's what Cygwin will do.  If it encounters a S-1-22-x-y SID, it
-will perform the same
-<ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>
-mapping as for NFS shares.
-</para>
-
-<para>
-For home users without any Windows domain or LDAP server per
-<ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>,
-but with a Linux machine running Samba, just add this information to
-your SAM account.  Assuming the uid of your Linux user account is 505
-and the gid of your primary group is, say, 100, just add the values to
-your SAM user and group accounts.  The following example assumes you
-didn't already add something else to the comment field.
-</para>
-
-<para>
-To your user's SAM comment (remember: called <literal>Description</literal>
-in the GUI),
-add:
-</para>
-
-<screen>
-  &lt;cygwin group="Users" unix="505"/&gt;
-</screen>
-
-<para>
-To the user's group SAM comment add:
-</para>
-
-<screen>
-  &lt;cygwin unix="100"/&gt;
-</screen>
-
-<para>
-This should be sufficient to work on your Samba share and to see
-all files owned by your Linux user account as your files.
+For bigger installations, maintaining per-client files is rather troublesome.
+Also, no two environments are the same, so the needs are pretty different.
+Therefore Cygwin supports configuring how to fetch home directory,
+login shell, and gecos information in /etc/nsswitch.conf.  See the next
+section for detailed information how to configure Cygwin's account handling.
 </para>
 
 </sect3>
@@ -1131,11 +801,9 @@ all files owned by your Linux user account as your files.
 <sect3 id="ntsec-mapping-nsswitch"><title id="ntsec-mapping-nsswitch.title">The <filename>/etc/nsswitch.conf</filename> file</title>
 
 <para>
-Last, but not least, let's talk about the way to configure how the
-mapping works on your machine.  On Linux and some other UNIXy OSes, we
-have a file called
+On Linux and some other UNIXy OSes, we have a file called
 <ulink url="http://linux.die.net/man/5/nsswitch.conf">/etc/nsswitch.conf</ulink>.
-One part of it is to specify how the passwd and group entries are generated.
+Among other things, it determines how passwd and group entries are generated.
 That's what Cygwin now provides as well.
 </para>
 
@@ -1194,7 +862,7 @@ the old information.
 
 <para>
 So, what settings can we perform with <filename>/etc/nsswitch.conf</filename>?
-To explain, lets have a look into an <filename>/etc/nsswitch.conf</filename>
+Let's start with an example <filename>/etc/nsswitch.conf</filename> file
 file set up to all default values:
 </para>
 
@@ -1205,8 +873,13 @@ file set up to all default values:
 <!--
   db_prefix:    auto
   db_separator: + -->
-  db_enum:      cache builtin
+  db_enum:  cache builtin
+  db_home:  cygwin desc
+  db_shell: cygwin desc
+  db_gecos: cygwin desc
 </screen>
+
+<sect4 id="ntsec-mapping-nsswitch-syntax"><title id="ntsec-mapping-nsswitch-syntax.title">The <filename>/etc/nsswitch.conf</filename> syntax</title>
 
 <para>
 The first line, starting with a hash <literal>#</literal> is a comment.
@@ -1245,9 +918,9 @@ Apart from this restriction, the reminder of the line can have as
 many spaces and TABs as you like.
 </para>
 
-<para>
-Now let's have a look at the available keywords and settings.
-</para>
+</sect4>
+
+<sect4 id="ntsec-mapping-nsswitch-pwdgrp"><title id="ntsec-mapping-nsswitch-pwdgrp.title">The <literal>passwd:</literal> and <literal>group:</literal> settings</title>
 
 <para>
 The two lines starting with the keywords <literal>passwd:</literal> and
@@ -1304,13 +977,24 @@ Cygwin will always try the files first, then the db.
 </para>
 
 <para>
-The remaining entries define certain aspects of the Windows account
-database search.  Right now, only one entry is valid:
+<literal>passwd:</literal> and <literal>group:</literal> are the two basic
+settings defining where to get the account information from.  The following
+settings starting with <literal>db_</literal> define certain aspects of the
+Windows account database search and how to generate <literal>passwd</literal>
+and <literal>group</literal> information from the database.
 </para>
+
+</sect4>
+
+<!--
+
+  DESCRIPTION OF db_prefix AND db_separator
+
+  Keep in for reference
+
 
 <itemizedlist spacing="compact">
 
-<!--
 <listitem>
 <para>
 <literal>db_prefix:</literal> determines how the Cygwin user or group name
@@ -1451,8 +1135,12 @@ This results in usernames with the backslash as separator:
 </screen>
 
 </listitem>
+
+</itemizedlist>
 -->
-<listitem>
+
+<sect4 id="ntsec-mapping-nsswitch-enum"><title id="ntsec-mapping-nsswitch-enum.title">The <literal>db_enum:</literal> setting</title>
+
 <para>
 <literal>db_enum:</literal> defines the depth of a database search, if an
 application calls one of the enumeration functions
@@ -1497,8 +1185,8 @@ The recognized sources are the following:
   </varlistentry>
   <varlistentry>
     <term><literal>all</literal></term>
-    <listitem>The opposite.  Enumerates accounts from all known sources, including
-         all trusted domains.</listitem>
+    <listitem>The opposite.  Enumerates accounts from all known sources,
+	      including all trusted domains.</listitem>
   </varlistentry>
   <varlistentry>
     <term><literal>cache</literal></term>
@@ -1506,15 +1194,15 @@ The recognized sources are the following:
   </varlistentry>
   <varlistentry>
     <term><literal>builtin</literal></term>
-    <listitem>Enumerate the predefined builtin accounts for backward compatibility. 
-         These are five passwd accounts (SYSTEM, LocalService, NetworkService,
-	 Administrators, TrustedInstaller) and two group accounts (SYSTEM and
-	 TrustedInstaller).</listitem>
+    <listitem>Enumerate the predefined builtin accounts for backward
+	      compatibility.  These are five passwd accounts (SYSTEM,
+	      LocalService, NetworkService, Administrators, TrustedInstaller)
+	      and two group accounts (SYSTEM and TrustedInstaller).</listitem>
   </varlistentry>
   <varlistentry>
     <term><literal>files</literal></term>
     <listitem>Enumerate the accounts from <filename>/etc/passwd</filename> or
-         <filename>/etc/group</filename>.</listitem>
+	      <filename>/etc/group</filename>.</listitem>
   </varlistentry>
   <varlistentry>
     <term><literal>local</literal></term>
@@ -1531,11 +1219,11 @@ The recognized sources are the following:
   <varlistentry>
     <term><literal>some.domain</literal></term>
     <listitem>Enumerate all accounts from the trusted domain some.domain.  The
-	 trusted domain can be given as Netbios flat name (MY_DOMAIN) or as
-	 dns domain name (my_domain.corp).  In contrast to the aforementioned
-	 fixed source keywords, distinct domain names are caseinsensitive.
-	 Only domains which are actually trusted domains are enumerated.
-	 Unknown domains are simply ignored.</listitem>
+	      trusted domain can be given as Netbios flat name (MY_DOMAIN) or
+	      as dns domain name (my_domain.corp).  In contrast to the
+	      aforementioned fixed source keywords, distinct domain names are
+	      caseinsensitive.  Only domains which are actually trusted domains
+	      are enumerated.  Unknown domains are simply ignored.</listitem>
   </varlistentry>
 </variablelist>
 
@@ -1600,12 +1288,833 @@ domain1.corp, sub.domain.corp and domain2.net.
 Enumerate everything and the kitchen sink.
 </para>
 
+</sect4>
+
+<sect4 id="ntsec-mapping-nsswitch-passwd"><title id="ntsec-mapping-nsswitch-passwd.title">Settings defining how to create the <literal>passwd</literal> entry</title>
+
+<para>
+<filename>/etc/nsswitch.conf</filename> supports three settings to configure
+where to get the pw_dir, pw_shell, and pw_gecos content of a
+<literal>passwd</literal> entry from:
+</para>
+
+<screen>
+  db_home: schema...     # Define how to fetch the pw_dir entry.
+  db_shell: schema...    # Define how to fetch the pw_shell entry.
+  db_gecos: schema...    # Define how to fetch the pw_gecos entry.
+</screen>
+
+"schema..." is a list of up to four space-separated schemata:
+
+<screen>
+  db_FOO: schema1 schema2 ...
+</screen>
+
+<para>
+When generating a passwd entry, Cygwin tries the schemata in order.  If
+the first schema returns an empty string, it skips to the second, and so
+on.  Schemata only supported on AD are silently skipped for SAM accounts
+and on non-AD machines.
+</para>
+
+<para>
+Four schemata are predefined, two schemata are variable.  The predefined
+schemata are the following:
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><literal>windows</literal></term>
+    <listitem>Utilizes typical Windows settings.  Supported for AD and SAM
+	      accounts.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>cygwin</literal></term>
+    <listitem>Utilizes the cygwinUser AD schema extension.  This schema
+	      extension is available via a schema extension file
+	      <filename>/usr/share/cygwin/cygwin.ldif</filename>.
+	      See <xref linkend="ntsec-mapping-nsswitch-cygwin"></xref> for
+	      more information.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>unix</literal></term>
+    <listitem>Utilizes the posixAccount schema attributes per
+	      <ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>.
+	      The posixAccount schema is available by default since Windows
+	      Server 2003 R2, but typically only utilized when installing the
+	      Active Directory "Server for NIS" feature (which is deprecated
+	      since Server 2012 R2).
+	      See also <xref linkend="ntsec-mapping-nsswitch-posix"></xref>.
+	      </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>desc</literal></term>
+    <listitem>Utilizes XML-style attributes in the description attribute.
+	      Supported for AD and SAM accounts.
+	      See <xref linkend="ntsec-mapping-nsswitch-desc"></xref>
+	      for a more detailed description.</listitem>
+  </varlistentry>
+</variablelist>
+
+<para>
+The variable schemata are as follows.  Note that the leading characters
+(<literal>@</literal> and <literal>/</literal>) are an integral part of the
+definition.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><literal>@ad_attribute</literal></term>
+    <listitem><literal>ad_attribute</literal> is any arbitrary AD attribute
+	      name which should (ideally) be available in the User class or
+	      in any attached auxiliary class.  It's always treated as a
+	      single string argument.  Only the first string of a multi-string
+	      attributes will be read.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>/path</literal></term>
+    <listitem>An arbitrary string, typically a path.  The leading slash is
+	      required.  Given that a single, fixed path for all users
+	      only makes marginal sense, the /path schema supports wildcards.
+	      A wildcard is a per-cent (<literal>%</literal>) character,
+	      followed by another character giving the meaning.  The supported
+	      wildcard characters are:
+	      
+	      <variablelist>
+	        <varlistentry>
+		  <term><literal>%u</literal></term>
+		  <listitem>The Cygwin username (that's lowercase
+			    <literal>u</literal>).</listitem>
+		</varlistentry>
+	        <varlistentry>
+		  <term><literal>%U</literal></term>
+		  <listitem>The Windows username (that's uppercase
+			    <literal>U</literal>).</listitem>
+		</varlistentry>
+	        <varlistentry>
+		  <term><literal>%D</literal></term>
+		  <listitem>Windows domain in NetBIOS style.</listitem>
+		</varlistentry>
+	        <varlistentry>
+		  <term><literal>%_</literal></term>
+		  <listitem>Since space and TAB characters are used to separate
+			    the schemata, a space in the filename has to be
+			    given as <literal>%_</literal> (that's an
+			    underscore).</listitem>
+		</varlistentry>
+	        <varlistentry>
+		  <term><literal>%%</literal></term>
+		  <listitem>A per-cent character.</listitem>
+		</varlistentry>
+	      </variablelist>
+	      <para>Any other <literal>%X</literal> expression is treated as if
+	      the character <literal>X</literal> has been given alone.</para>
+	      </listitem>
+  </varlistentry>
+</variablelist>
+
+<para>
+The exact meaning of a schema depends on the setting it's used for.  The
+following sections explain the settings in detail.
+</para>
+
+</sect4>
+
+<sect4 id="ntsec-mapping-nsswitch-home"><title id="ntsec-mapping-nsswitch-home.title">The <literal>db_home:</literal> setting</title>
+
+<para>
+The <literal>db_home:</literal> setting defines how Cygwin fetches the user's
+home directory, or, more precise, the content of the <literal>pw_dir</literal>
+member of the user's passwd entry.  The following list describes the meaning
+of each schema when used with <literal>db_home:</literal>
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><literal>windows</literal></term>
+    <listitem>The user's home directory is set to the same directory which is
+	      used as Windows home directory.  This is the
+	      <literal>homeDrive</literal> AD attribute if set, or the
+	      <literal>homeDirectory</literal> AD attribute if
+	      <literal>homeDrive</literal> is not set.  For SAM accounts,
+	      this is equivalent to the "Home folder" setting in SAM.
+	      If both attributes are unset, Cygwin falls back to the user's
+	      local profile directory, typically something along the lines
+	      of <filename>C:\Users\$USERNAME</filename>.  Of course, the
+	      Windows directory is converted to POSIX-style by Cygwin.
+	      </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>cygwin</literal></term>
+    <listitem>AD only: The user's home directory is set to the POSIX path given
+	      in the <literal>cygwinHome</literal> attribute from the
+	      <literal>cygwinUser</literal> auxiliary class.
+	      See also <xref linkend="ntsec-mapping-nsswitch-cygwin"></xref>.
+	      </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>unix</literal></term>
+    <listitem>AD only: The user's home directory is set to the POSIX path given
+	      in the <literal>unixHomeDirectory</literal> attribute from the
+	      <literal>posixAccount</literal> auxiliary class.
+	      See also <xref linkend="ntsec-mapping-nsswitch-posix"></xref>.
+	      </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>desc</literal></term>
+    <listitem>The user's home directory is set to the POSIX path given in the
+	      home="..." XML-alike setting in the user's
+	      <literal>description</literal> attribute in SAM or AD.
+	      See <xref linkend="ntsec-mapping-nsswitch-desc"></xref>
+	      for a detailed description.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>@ad_attribute</literal></term>
+    <listitem>AD only: The user's home directory is set to the path given
+	      in the <literal>ad_attribute</literal> attribute.  The path
+	      can be given as Windows or POSIX path.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>/path</literal></term>
+    <listitem>The user's home directory is set to the given POSIX path.
+	      Remember the wildcards described in
+	      <xref linkend="ntsec-mapping-nsswitch-passwd"></xref>.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>Fallback</term>
+    <listitem>If none of the schemes given for <literal>db_home:</literal>
+	      define a non-empty directory, the user's home directory is set to
+	      <filename>/home/$USERNAME</filename>.</listitem>
+  </varlistentry>
+</variablelist>
+
+<para>
+As has been briefly mentioned before, the default setting for
+<literal>db_home:</literal> is
+</para>
+
+<screen>
+  db_home: cygwin desc
+</screen>
+
+<para>
+So, for AD accounts Cygwin tries to fetch the path from the user's
+<literal>cygwinHome</literal> attribute first.  If that's not available,
+or if the account is a local SAM account, Cygwin tries to get the home
+directory from the <literal>home=</literal> attribute of the user's
+<literal>description</literal> field.  If that's not available, Cygwin
+falls back to the path <filename>/home/$USERNAME</filename>.
+</para>
+
+</sect4>
+
+<sect4 id="ntsec-mapping-nsswitch-shell"><title id="ntsec-mapping-nsswitch-shell.title">The <literal>db_shell:</literal> setting</title>
+
+<para>
+The <literal>db_shell:</literal> setting defines how Cygwin fetches the user's
+login shell, the content of the <literal>pw_shell</literal> member of the
+user's passwd entry.  The following list describes the meaning of each schema
+when used with <literal>db_shell:</literal>
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><literal>windows</literal></term>
+    <listitem>The <literal>windows</literal> schema is ignored for now.
+	      The logical choice would be CMD, but that introduces some
+	      problems, for instance the fact that CMD has no concept of
+	      running as <literal>login shell</literal>.  This may change
+	      in future.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>cygwin</literal></term>
+    <listitem>AD only: The user's home directory is set to the POSIX path given
+	      in the <literal>cygwinShell</literal> attribute from the
+	      <literal>cygwinUser</literal> auxiliary class.
+	      See also <xref linkend="ntsec-mapping-nsswitch-cygwin"></xref>.
+	      </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>unix</literal></term>
+    <listitem>AD only: The user's login shell is set to the POSIX path given
+	      in the <literal>loginShell</literal> attribute from the
+	      <literal>posixAccount</literal> auxiliary class.
+	      See also <xref linkend="ntsec-mapping-nsswitch-posix"></xref>.
+	      </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>desc</literal></term>
+    <listitem>The user's login shell is set to the POSIX path given in the
+	      shell="..." XML-alike setting in the user's
+	      <literal>description</literal> attribute in SAM or AD.
+	      See <xref linkend="ntsec-mapping-nsswitch-desc"></xref>
+	      for a detailed description.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>@ad_attribute</literal></term>
+    <listitem>AD only: The user's login shell is set to the path given
+	      in the <literal>ad_attribute</literal> attribute.  The path
+	      can be given as Windows or POSIX path.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>/path</literal></term>
+    <listitem>The user's login shell is set to the given POSIX path.
+	      Albeit not being as important here, the wildcards described in
+	      <xref linkend="ntsec-mapping-nsswitch-passwd"></xref>
+	      are also available for specifying a login shell path.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>Fallback</term>
+    <listitem>If none of the schemes given for <literal>db_shell:</literal>
+	      define a non-empty pathname, the user's login shell is set to
+	      <filename>/bin/bash</filename>.</listitem>
+  </varlistentry>
+</variablelist>
+
+<para>
+As for <literal>db_home:</literal>, the default setting for
+<literal>db_shell:</literal> is
+</para>
+
+<screen>
+  db_shell: cygwin desc
+</screen>
+
+<para>
+So, for AD accounts Cygwin tries to fetch the path from the user's
+<literal>cygwinShell</literal> attribute first.  If that's not available,
+or if the account is a local SAM account, Cygwin tries to get the home
+directory from the <literal>shell=</literal> attribute of the user's
+<literal>description</literal> field.  If that's not available, Cygwin
+falls back to <filename>/bin/bash</filename>.
+</para>
+
+</sect4>
+
+<sect4 id="ntsec-mapping-nsswitch-gecos"><title id="ntsec-mapping-nsswitch-gecos.title">The <literal>db_gecos:</literal> setting</title>
+
+<para>
+The <literal>db_gecos:</literal> setting defines how to fetch additional
+content for the <literal>pw_gecos</literal> member of the user's passwd entry.
+There's always a fixed, Cygwin-specific part in the <literal>pw_gecos</literal>
+field for identifying the account.  However, an administrator might want to
+add informative content like, for instance, the user's full name.  That's
+what the <literal>db_gecos:</literal> setting is for.
+The following list describes the meaning of each schema when used with
+<literal>db_gecos:</literal>
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><literal>windows</literal></term>
+    <listitem>Add the AD <literal>displayName</literal> attribute or, for
+	      SAM accounts, the "Full name" entry to the
+	      <literal>pw_gecos</literal> field.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>cygwin</literal></term>
+    <listitem>AD only: The content of the <literal>cygwinGecos</literal>
+	      attribute from the <literal>cygwinUser</literal> auxiliary class
+	      is added to <literal>pw_gecos</literal>.
+	      See also <xref linkend="ntsec-mapping-nsswitch-cygwin"></xref>.
+	      </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>unix</literal></term>
+    <listitem>AD only: The content of the <literal>gecos</literal> attribute
+	      from the <literal>posixAccount</literal> auxiliary class
+	      is added to <literal>pw_gecos</literal>.
+	      See also <xref linkend="ntsec-mapping-nsswitch-posix"></xref>.
+	      </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>desc</literal></term>
+    <listitem>The content of the gecos="..." XML-alike setting in the user's
+	      <literal>description</literal> attribute in SAM or AD is added
+	      to <literal>pw_gecos</literal>.
+	      See <xref linkend="ntsec-mapping-nsswitch-desc"></xref>
+	      for a detailed description.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>@ad_attribute</literal></term>
+    <listitem>AD only: The content of the <literal>ad_attribute</literal>
+	      attribute is added to <literal>pw_gecos</literal>.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><literal>/path</literal></term>
+    <listitem>The string following the slash is added to
+	      <literal>pw_gecos</literal>.  Here, the wildcards described in
+	      <xref linkend="ntsec-mapping-nsswitch-passwd"></xref>
+	      may come in handy.</listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>Fallback</term>
+    <listitem>If none of the schemes given for <literal>db_gecos:</literal>
+	      define a non-empty pathname, nothing is added to
+	      <literal>pw_gecos</literal>.</listitem>
+  </varlistentry>
+</variablelist>
+
+<para>
+As for <literal>db_home:</literal> and <literal>db_shell:</literal>, the
+default setting for <literal>db_gecos:</literal> is
+</para>
+
+<screen>
+  db_gecos: cygwin desc
+</screen>
+
+<para>
+So, for AD accounts Cygwin tries to fetch the string from the user's
+<literal>cygwinGecos</literal> attribute first.  If that's not available,
+or if the account is a local SAM account, Cygwin tries to get the home
+directory from the <literal>gecos=</literal> attribute of the user's
+<literal>description</literal> field.  If that's not available, Cygwin
+just doesn't add anything to <literal>pw_gecos</literal>.
+</para>
+
+</sect4>
+
+<sect4 id="ntsec-mapping-nsswitch-cygwin"><title id="ntsec-mapping-nsswitch-cygwin.title">The <literal>cygwin</literal> schema</title>
+
+<para>
+The <literal>cygwin</literal> schema is based on a Cygwin-specific Active
+Directory schema extension.  Using this schema extension allows to maintain
+Cygwin-specific settings entirely within AD, without colliding with any other
+schema.
+</para>
+
+<para>
+The cygwin schema extension is available in a default Cygwin installation
+in the file <filename>/usr/share/cygwin/cygwin.ldif</filename>.  To install
+the schema extension, you have to be schema admin, and you have to run the
+<command>ldifde</command> command on the schema master.  The installation
+itself is rather simple.  Assuming you're schema admin and running a shell
+with administrative privileges:
+</para>
+
+<screen>
+  $ cd /usr/share/cygwin
+  $ ldifde -i -f cygwin.ldif -k -c "CN=schema,CN=Configuration,DC=X" #schemaNamingContext
+</screen>
+
+<para>
+Afterwards, the auxiliary class <literal>cygwinUser</literal> is attached to
+the class <literal>User</literal>, and the auxiliary class
+<literal>cygwinGroup</literal> is attached to the class
+<literal>Group</literal>.  The new attributes can be immediately edited
+using <command>ADSI Edit</command>.
+</para>
+
+<para>
+At the time of writing the following attributes are utilized by Cygwin:
+</para>
+
+<segmentedlist><?dbhtml list-presentation="table"?>
+  <seglistitem>
+    <seg><literal>cygwinHome</literal></seg>
+    <seg>Used as Cygwin home directory with <literal>db_home: cygwin</literal>.
+	 See <xref linkend="ntsec-mapping-nsswitch-home"></xref>.</seg>
+  </seglistitem>
+  <seglistitem>
+    <seg><literal>cygwinShell</literal></seg>
+    <seg>Used as Cygwin login shell with <literal>db_shell: cygwin</literal>.
+	 See <xref linkend="ntsec-mapping-nsswitch-shell"></xref>.</seg>
+  </seglistitem>
+  <seglistitem>
+    <seg><literal>cygwinGecos</literal></seg>
+    <seg>Content will be added to the pw_gecos field with
+	 <literal>db_gecos: cygwin</literal>.
+	 See <xref linkend="ntsec-mapping-nsswitch-gecos"></xref>.</seg>
+  </seglistitem>
+<!--
+  <seglistitem>
+    <seg><literal>cygwinFstab</literal></seg>
+    <seg>yada yada yada</seg>
+  </seglistitem>
+  <seglistitem>
+    <seg><literal>cygwinUnixUid</literal></seg>
+    <seg>See <xref linkend="ntsec-mapping-nfs"></xref> and
+	 <xref linkend="ntsec-mapping-samba"></xref>.</seg>
+  </seglistitem>
+
+<para>
+The group attributes utilized by Cygwin are:
+</para>
+
+</segmentedlist>
+  <seglistitem>
+    <seg><literal>cygwinUnixGid</literal></seg>
+    <seg>See <xref linkend="ntsec-mapping-nfs"></xref> and
+	 <xref linkend="ntsec-mapping-samba"></xref>.</seg>
+  </seglistitem>
+</segmentedlist>
+-->
+</segmentedlist>
+
+</sect4>
+
+<sect4 id="ntsec-mapping-nsswitch-posix"><title id="ntsec-mapping-nsswitch-posix.title">The <literal>unix</literal> schema</title>
+
+<para>
+The <literal>unix</literal> schema utilizes the 
+<literal>posixAccount</literal> attribute extension.  This is one of two
+schema extensions which are connected to AD accounts, available by default
+starting with Windows Server 2003 R2.  They are usually
+<literal>not set</literal>, unless used by the Active Directory
+<literal>Server for NIS</literal> feature (deprecated since Server 2012 R2).
+
+Two schemata are interesting for Cygwin, <literal>posixAccount</literal>,
+connected to user accounts, and <literal>posixGroup</literal>, connected
+to group accounts.  Both follow the description of RFC 2307,
+<ulink url="https://tools.ietf.org/html/rfc2307">an Approach for Using LDAP as
+a Network Information Service</ulink>.
+The user attributes utilized by Cygwin are:
+</para>
+
+<segmentedlist><?dbhtml list-presentation="table"?>
+  <seglistitem>
+    <seg><literal>unixHomeDirectory</literal></seg>
+    <seg>Used as Cygwin home directory with <literal>db_home: unix</literal>.
+	 See <xref linkend="ntsec-mapping-nsswitch-home"></xref>.</seg>
+  </seglistitem>
+  <seglistitem>
+    <seg><literal>loginShell</literal></seg>
+    <seg>Used as Cygwin login shell with <literal>db_shell: unix</literal>.
+	 See <xref linkend="ntsec-mapping-nsswitch-shell"></xref>.</seg>
+  </seglistitem>
+  <seglistitem>
+    <seg><literal>gecos</literal></seg>
+    <seg>Content will be added to the pw_gecos field with
+	 <literal>db_gecos: unix</literal>.
+	 See <xref linkend="ntsec-mapping-nsswitch-gecos"></xref>.</seg>
+  </seglistitem>
+  <seglistitem>
+    <seg><literal>uidNumber</literal></seg>
+    <seg>See <xref linkend="ntsec-mapping-nfs"></xref> and
+	 <xref linkend="ntsec-mapping-samba"></xref>.</seg>
+  </seglistitem>
+</segmentedlist>
+
+<para>
+The group attributes utilized by Cygwin are:
+</para>
+
+<segmentedlist><?dbhtml list-presentation="table"?>
+  <seglistitem>
+    <seg><literal>gidNumber</literal></seg>
+    <seg>See <xref linkend="ntsec-mapping-nfs"></xref> and
+	 <xref linkend="ntsec-mapping-samba"></xref>.</seg>
+  </seglistitem>
+</segmentedlist>
+
+<para>
+Apart from power shell scripting or inventing new CLI tools, these attributes
+can be changed using the <literal>Attribute Editor</literal> tab in the user
+properties dialog of the <literal>Active Directory Users and Computers</literal>
+MMC snap-in.  Alternatively, if the <literal>Server for NIS</literal>
+administration feature has been installed, there will be a
+<literal>UNIX Attributes</literal> tab which contains the required fields,
+except for the gecos field.  Last resort is <command>ADSI Edit</command>.
+</para>
+
+</sect4>
+
+<sect4 id="ntsec-mapping-nsswitch-desc"><title id="ntsec-mapping-nsswitch-desc.title">The <literal>desc</literal> schema</title>
+
+<para>
+When using user accounts from the local account database, the SAM, there
+are only a very limited number of settings available.  In contrast to
+Active Directory there's no way to add fields to a user's entry.  You have
+to make do with the fields available.  The method to utilize the
+<literal>description</literal> field has been mainly introduced for those
+accounts, usually the only ones a home user has.  However, for symmetry,
+and because there may be a reason to use this in an AD environment, this
+schema is also supported for AD users.
+</para>
+
+<note>
+<para>
+The presentation of local user account settings on Windows is confusing,
+to say the least.  The <literal>description</literal> field is not visible at
+all in the user settings available via the <literal>User Accounts</literal>
+control settings.  And while it's called <literal>Description</literal> in the
+<literal>Local Users and Groups</literal> MMC snap-in (available, for instance,
+via the <literal>Computer Management</literal> GUI), in the command
+line tool <command>net user</command> the same field is called
+<literal>comment</literal>.  The latter is especially confusing for
+AD admins, because the <literal>comment</literal> attribute in AD is called
+<literal>usercomment</literal> on the command line.  Confused?  Never mind,
+you're not the only one...
+</para>
+</note>
+
+<para>
+Fortunately you can utilize the <literal>description</literal> field even if
+you're running a "home edition" of Windows, by using the command line.  The
+<command>net user</command> command allows to set all values in the SAM, even
+if the GUI is crippled.
+</para>
+
+<para>
+A Cygwin SAM comment entry looks like this:
+</para>
+
+<screen>
+&lt;cygwin key="value" key="value" [...] /&gt;
+</screen>
+
+<para>
+The supported keys are:
+</para>
+
+<segmentedlist><?dbhtml list-presentation="table"?>
+  <seglistitem>
+    <seg><literal>home="value"</literal></seg>
+    <seg>Sets the Cygwin home dir to value.</seg>
+  </seglistitem>
+  <seglistitem>
+    <seg><literal>shell="value"</literal></seg>
+    <seg>Sets the Cygwin login shell to value.</seg>
+  </seglistitem>
+  <seglistitem>
+    <seg><literal>gecos="value"</literal></seg>
+    <seg>Adds the string value to the user's gecos field.</seg>
+  </seglistitem>
+</segmentedlist>
+
+<para>
+The next two settings are only supported for SAM accounts.
+</para>
+
+<segmentedlist><?dbhtml list-presentation="table"?>
+  <seglistitem>
+    <seg><literal>group="value"</literal></seg>
+    <seg>Sets the Cygwin primary group of the account to value, provided that
+    	 the user <emphasis>is</emphasis> already a member of that group.
+	 This allows to override the default <literal>None</literal> primary
+	 group for local accounts.  One nice idea here is, for instance,
+	 group="Users".</seg>
+  </seglistitem>
+  <seglistitem>
+    <seg><literal>unix="value"</literal></seg>
+    <seg>Sets the NFS/Samba uid of the user to the decimal value.
+         See <xref linkend="ntsec-mapping-nfs"></xref> and
+	 <xref linkend="ntsec-mapping-samba"></xref>.</seg>
+  </seglistitem>
+</segmentedlist>
+
+<para>
+The &lt;cygwin .../&gt; string can start at any point in the comment, but
+you have to follow the rules:
+</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+It starts with "&lt;cygwin " and ends with "/&gt;".
+</listitem>
+<listitem>
+The "cygwin" string and the key names have to be lowercase.
+</listitem>
+<listitem>
+No spaces between key and "value", just the equal sign.
+</listitem>
+<listitem>
+The value must be placed within double quotes and it must not contain a double
+quote itself.  The double quotes are required for the decimal values as well!
+</listitem>
+</itemizedlist>
+
+<note>
+<para>
+There's also a length restriction imposed by Windows.  The
+<literal>description</literal> entry has a maximumn length of 1023 characters.
+</para>
+</note>
+
+<para>
+CMD example:
+</para>
+
+<screen>
+net user corinna /comment:"&lt;cygwin home=\"/home/foo\"/&gt;"
+</screen>
+
+<para>
+Bash example (use single quotes):
+</para>
+
+<screen>
+net user corinna /comment:'&lt;cygwin home="/home/foo"/&gt;'
+</screen>
+
+<para>
+For changing group comments, use the `net localgroup' command.  The supported
+key/value pair for SAM groups are:
+</para>
+
+<segmentedlist><?dbhtml list-presentation="table"?>
+  <seglistitem>
+    <seg><literal>unix="value"</literal></seg>
+    <seg>Sets the NFS/Samba gid of the group to the decimal value.
+         See <xref linkend="ntsec-mapping-nfs"></xref> and
+	 <xref linkend="ntsec-mapping-samba"></xref>.</seg>
+  </seglistitem>
+</segmentedlist>
+
+</sect4>
+
+</sect3>
+
+<sect3 id="ntsec-mapping-nfs"><title id="ntsec-mapping-nfs.title">NFS account mapping</title>
+
+<para>
+Microsoft's NFS client does not map the uid/gid values on the NFS shares
+to SIDs.  There's no such thing as a (fake) security descriptor returned
+to the application.  Rather, via an undocumented API an application can
+fetch <ulink url="https://tools.ietf.org/html/rfc1813">RFC 1813</ulink>
+compatible NFSv3 stat information from the share.  This is what Cygwin is
+using to show stat information for files on NFS shares.
+</para>
+
+<para>
+The problem is, while all other information in this stat record, like
+timestamps, file size etc., can be used by Cygwin, Cygwin had no way to
+map the values of the st_uid and st_gid members to a Windows SID for a
+long time.  So it just faked the file owner info and claimed that it's
+you.
+</para>
+
+<para>
+However, SFU has, over time, developed multiple methods to map UNIX
+uid/gid values on NFS shares to Windows SIDs.  You'll find the full
+documentation of the mapping methods in
+<ulink url="http://blogs.technet.com/b/filecab/archive/2012/10/09/nfs-identity-mapping-in-windows-server-2012.aspx">NFS Identity Mapping in Windows Server 2012</ulink>
+</para>
+
+<para>
+Cygwin now utilizes the
+<ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>
+mapping for this purpose.  This is most of the time provided by an AD domain,
+but it could also be a standalone LDAP mapping server.  Per
+<ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>, the uid is
+in the attribute <literal>uidNumber</literal>.  For groups, the gid is in the
+<literal>gidNumber</literal> attribute.
+See <xref linkend="ntsec-mapping-nsswitch-posix"></xref>.
+</para>
+
+<para>
+When Cygwin stat()s files on an NFS share, it asks the mapping server via
+LDAP in two different ways, depending on the role of the mapping server.
+</para>
+
+<itemizedlist spacing="compact">
+
+<listitem>
+If the server is an AD domain controller, it asks for an account with
+<literal>uidNumber</literal> attribute == <literal>st_uid</literal> field of
+the stat record returned by NFS.  If an account matches, AD returns the
+Windows SID, so we have an immediate mapping from UNIX uid to a Windows SID,
+if the user account has a valid <literal>uidNumber</literal> attribute.  For
+groups, the method is the same, just that Cygwin asks for a group with
+<literal>gidNumber</literal> attribute == <literal>st_gid</literal> field of the
+stat record.
+</listitem>
+
+<listitem>
+If the server is a standalone LDAP mapping server Cygwin asks for the
+same <literal>uidNumber</literal>/<literal>gidNumber</literal> attributes, but
+it can't expect that the LDAP server knows anything about Windows SIDs.
+Rather, the mapping server returns the account name.  Cygwin then asks the
+DC for an account with this name, and if that succeeds, we have a mapping
+between UNIX uid/gid and Windows SIDs.
 </listitem>
 
 </itemizedlist>
 
+<para>
+The mapping will be cached for the lifetime of the process, and inherited
+by child processes.
+</para>
+
 </sect3>
 
+<sect3 id="ntsec-mapping-samba"><title id="ntsec-mapping-samba.title">Samba account mapping</title>
+
+<para>
+A fully set up Samba with domain integration is running winbindd to
+map Window SIDs to artificially created UNIX uids and gids, and this
+mapping is transparent within the domain, so Cygwin doesn't have to do
+anything special.
+</para>
+
+<para>
+However, setting up winbindd isn't for everybody, and it fails to map
+Windows accounts to already existing UNIX users or groups.  In contrast
+to NFS, Samba returns security descriptors, but unmapped UNIX accounts
+get special SIDs:
+</para>
+
+<itemizedlist spacing="compact">
+
+<listitem>
+A UNIX user account with uid X is mapped to the Windows SID S-1-22-1-X.
+</listitem>
+
+<listitem>
+A UNIX group account with gid X is mapped to SID S-1-22-2-X.
+</listitem>
+
+</itemizedlist>
+
+<para>
+As you can see, even though we have SIDs, they just reflect the actual
+uid/gid values on the UNIX box in the RID value.  It's only marginally
+different from the NFS method, so why not just use the same method as
+for NFS?
+</para>
+
+<para>
+That's what Cygwin will do.  If it encounters a S-1-22-x-y SID, it
+will perform the same
+<ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>
+mapping as for NFS shares.
+</para>
+
+<para>
+For home users without any Windows domain or LDAP server per
+<ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>,
+but with a Linux machine running Samba, just add this information to
+your SAM account.  Assuming the uid of your Linux user account is 505
+and the gid of your primary group is, say, 100, just add the values to
+your SAM user and group accounts.  The following example assumes you
+didn't already add something else to the comment field.
+</para>
+
+<para>
+To your user's SAM comment (remember: called <literal>Description</literal>
+in the GUI),
+add:
+</para>
+
+<screen>
+  &lt;cygwin group="Users" unix="505"/&gt;
+</screen>
+
+<para>
+To the user's group SAM comment add:
+</para>
+
+<screen>
+  &lt;cygwin unix="100"/&gt;
+</screen>
+
+<para>
+This should be sufficient to work on your Samba share and to see
+all files owned by your Linux user account as your files.
+</para>
+
+</sect3>
 
 </sect2>
 
