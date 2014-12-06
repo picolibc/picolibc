@@ -1215,55 +1215,55 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getmntent
     memalign
     setmntent
-    xdr_array
-    xdr_bool
-    xdr_bytes
-    xdr_char
-    xdr_double
-    xdr_enum
-    xdr_float
-    xdr_free
-    xdr_hyper
-    xdr_int
-    xdr_int16_t
-    xdr_int32_t
-    xdr_int64_t
-    xdr_int8_t
-    xdr_long
-    xdr_longlong_t
-    xdr_netobj
-    xdr_opaque
-    xdr_pointer
-    xdr_reference
-    xdr_short
-    xdr_sizeof
-    xdr_string
-    xdr_u_char
-    xdr_u_hyper
-    xdr_u_int
-    xdr_u_int16_t
-    xdr_u_int32_t
-    xdr_u_int64_t
-    xdr_u_int8_t
-    xdr_u_long
-    xdr_u_longlong_t
-    xdr_u_short
-    xdr_uint16_t
-    xdr_uint32_t
-    xdr_uint64_t
-    xdr_uint8_t
-    xdr_union
-    xdr_vector
-    xdr_void
-    xdr_wrapstring
-    xdrmem_create
-    xdrrec_create
-    xdrrec_endofrecord
-    xdrrec_eof
-    xdrrec_skiprecord
-    __xdrrec_getrec
-    __xdrrec_setnonblock
-    xdrstdio_create
+    xdr_array			(available in external "libtirpc" library)
+    xdr_bool			(available in external "libtirpc" library)
+    xdr_bytes			(available in external "libtirpc" library)
+    xdr_char			(available in external "libtirpc" library)
+    xdr_double			(available in external "libtirpc" library)
+    xdr_enum			(available in external "libtirpc" library)
+    xdr_float			(available in external "libtirpc" library)
+    xdr_free			(available in external "libtirpc" library)
+    xdr_hyper			(available in external "libtirpc" library)
+    xdr_int			(available in external "libtirpc" library)
+    xdr_int16_t			(available in external "libtirpc" library)
+    xdr_int32_t			(available in external "libtirpc" library)
+    xdr_int64_t			(available in external "libtirpc" library)
+    xdr_int8_t			(available in external "libtirpc" library)
+    xdr_long			(available in external "libtirpc" library)
+    xdr_longlong_t		(available in external "libtirpc" library)
+    xdr_netobj			(available in external "libtirpc" library)
+    xdr_opaque			(available in external "libtirpc" library)
+    xdr_pointer			(available in external "libtirpc" library)
+    xdr_reference		(available in external "libtirpc" library)
+    xdr_short			(available in external "libtirpc" library)
+    xdr_sizeof			(available in external "libtirpc" library)
+    xdr_string			(available in external "libtirpc" library)
+    xdr_u_char			(available in external "libtirpc" library)
+    xdr_u_hyper			(available in external "libtirpc" library)
+    xdr_u_int			(available in external "libtirpc" library)
+    xdr_u_int16_t		(available in external "libtirpc" library)
+    xdr_u_int32_t		(available in external "libtirpc" library)
+    xdr_u_int64_t		(available in external "libtirpc" library)
+    xdr_u_int8_t		(available in external "libtirpc" library)
+    xdr_u_long			(available in external "libtirpc" library)
+    xdr_u_longlong_t		(available in external "libtirpc" library)
+    xdr_u_short			(available in external "libtirpc" library)
+    xdr_uint16_t		(available in external "libtirpc" library)
+    xdr_uint32_t		(available in external "libtirpc" library)
+    xdr_uint64_t		(available in external "libtirpc" library)
+    xdr_uint8_t			(available in external "libtirpc" library)
+    xdr_union			(available in external "libtirpc" library)
+    xdr_vector			(available in external "libtirpc" library)
+    xdr_void			(available in external "libtirpc" library)
+    xdr_wrapstring		(available in external "libtirpc" library)
+    xdrmem_create		(available in external "libtirpc" library)
+    xdrrec_create		(available in external "libtirpc" library)
+    xdrrec_endofrecord		(available in external "libtirpc" library)
+    xdrrec_eof			(available in external "libtirpc" library)
+    xdrrec_skiprecord		(available in external "libtirpc" library)
+    __xdrrec_getrec		(available in external "libtirpc" library)
+    __xdrrec_setnonblock	(available in external "libtirpc" library)
+    xdrstdio_create		(available in external "libtirpc" library)
 </screen>
 
 </sect1>

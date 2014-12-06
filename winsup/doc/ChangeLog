@@ -1,5 +1,9 @@
 2014-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix.xml (std-solaris): Point to libtirpc for xdr functions.
+
+2014-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.xsl (toc.section.depth): Set to 4.
 	* ntsec.xml: Revamp account mapping documentation to account for the
 	new db_home, db_shell, db_gecos settings.
