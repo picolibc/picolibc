@@ -497,7 +497,6 @@ details. */
      /* Identifiers used in the Win32 registry. */
 
 #define CYGWIN_INFO_CYGWIN_REGISTRY_NAME "Cygwin"
-#define CYGWIN_INFO_PROGRAM_OPTIONS_NAME "Program Options"
 #define CYGWIN_INFO_INSTALLATIONS_NAME   "Installations"
 
      /* The default cygdrive prefix. */

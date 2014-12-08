@@ -1,3 +1,10 @@
+2014-12-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (regopt): Remove function.
+	(environ_init): Drop undocumented feature to read application-specific
+	environment variables from the registry.
+	* include/cygwin/version.h (CYGWIN_INFO_PROGRAM_OPTIONS_NAME): Remove.
+
 2014-12-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (build_env): Remove loquacious debug statements.
