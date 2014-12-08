@@ -1,3 +1,11 @@
+2014-12-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-setup.xml (faq.setup.upgrade-mountpoints): Remove.
+	* pathnames.xml (pathnames-mount-ex): Remove note about 1.5->1.7
+	registry mount point updates.
+
+2014-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
 2014-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.xml (std-solaris): Point to libtirpc for xdr functions.

@@ -256,27 +256,6 @@ points will disappear as soon as your last Cygwin process ends.
 See <xref linkend="mount"></xref> and <xref linkend="umount"></xref> for more
 information.</para>
 
-<note><para>
-When you upgrade an existing older Cygwin installation to Cygwin 1.7,
-your old system mount points (stored in the HKEY_LOCAL_MACHINE branch
-of your registry) are read by a script and the <filename>/etc/fstab</filename>
-file is generated from these entries.  Note that entries for
-<filename>/</filename>, <filename>/usr/bin</filename>, and
-<filename>/usr/lib</filename> are <emphasis role='bold'>never</emphasis>
-generated.
-</para>
-
-<para>
-The old user mount points in your HKEY_CURRENT_USER branch of the registry
-are not used to generate <filename>/etc/fstab</filename>.  If you want
-to create a user specific <filename>/etc/fstab.d/${USER}</filename> file
-from your old entries, there's a script available which does exactly
-that for you, <filename>/bin/copy-user-registry-fstab</filename>.  Just
-start the script and it will create your user specific fstab file.  Stop
-all your Cygwin processes and restart them, and you can simply use your
-old user mount points as before.
-</para></note>
-
 </sect2>
 
 <sect2 id="unc-paths"><title>UNC paths</title>

@@ -156,23 +156,6 @@ and that installing the older version will not help improve Cygwin.
 </para>
 </answer></qandaentry>
 
-<qandaentry id="faq.setup.upgrade-mountpoints">
-<question><para>After upgrading from Cygwin 1.5 to Cygwin 1.7 my user mount points disappeared!  How can I get them back?</para></question>
-<answer>
-
-<para>
-When you upgrade an existing older Cygwin installation to Cygwin 1.7, your old
-system mount points (stored in the HKEY_LOCAL_MACHINE branch of your registry)
-are read by a script and the /etc/fstab file is generated from these entries. 
-No such automatism exists for the user mount points formerly stored in the
-HKEY_CURRENT_USER branch of the registry.  There's a bash script for your
-convenience, which creates a user-specific /etc/fstab/${USER} file for you,
-called /bin/copy-user-registry-fstab.  For more information on the new fstab
-files see the User's Guide at
-<ulink url="http://cygwin.com/cygwin-ug-net/using.html#mount-table">http://cygwin.com/cygwin-ug-net/using.html#mount-table</ulink>
-</para>
-</answer></qandaentry>
-
 <qandaentry id="faq.setup.virus">
 <question><para>Is Cygwin Setup, or one of the packages, infected with a virus?</para></question>
 <answer>
