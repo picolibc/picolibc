@@ -34,6 +34,8 @@ lib_a_SOURCES += strncmp-stub.c
 lib_a_SOURCES += strncmp.S
 lib_a_SOURCES += strnlen-stub.c
 lib_a_SOURCES += strnlen.S
+lib_a_SOURCES += strrchr-stub.c
+lib_a_SOURCES += strrchr.S
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS=$(AM_CFLAGS)

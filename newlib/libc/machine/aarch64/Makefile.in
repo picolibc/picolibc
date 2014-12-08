@@ -81,7 +81,8 @@ am_lib_a_OBJECTS = lib_a-memchr-stub.$(OBJEXT) lib_a-memchr.$(OBJEXT) \
 	lib_a-strcpy.$(OBJEXT) lib_a-strlen-stub.$(OBJEXT) \
 	lib_a-strlen.$(OBJEXT) lib_a-strncmp-stub.$(OBJEXT) \
 	lib_a-strncmp.$(OBJEXT) lib_a-strnlen-stub.$(OBJEXT) \
-	lib_a-strnlen.$(OBJEXT)
+	lib_a-strnlen.$(OBJEXT) lib_a-strrchr-stub.$(OBJEXT) \
+	lib_a-strrchr.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -212,7 +213,7 @@ lib_a_SOURCES = memchr-stub.c memchr.S memcmp-stub.c memcmp.S \
 	memset.S setjmp.S strchr-stub.c strchr.S strchrnul-stub.c \
 	strchrnul.S strcmp-stub.c strcmp.S strcpy-stub.c strcpy.S \
 	strlen-stub.c strlen.S strncmp-stub.c strncmp.S strnlen-stub.c \
-	strnlen.S
+	strnlen.S strrchr-stub.c strrchr.S
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -353,6 +354,12 @@ lib_a-strnlen.o: strnlen.S
 lib_a-strnlen.obj: strnlen.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strnlen.obj `if test -f 'strnlen.S'; then $(CYGPATH_W) 'strnlen.S'; else $(CYGPATH_W) '$(srcdir)/strnlen.S'; fi`
 
+lib_a-strrchr.o: strrchr.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strrchr.o `test -f 'strrchr.S' || echo '$(srcdir)/'`strrchr.S
+
+lib_a-strrchr.obj: strrchr.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strrchr.obj `if test -f 'strrchr.S'; then $(CYGPATH_W) 'strrchr.S'; else $(CYGPATH_W) '$(srcdir)/strrchr.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
@@ -430,6 +437,12 @@ lib_a-strnlen-stub.o: strnlen-stub.c
 
 lib_a-strnlen-stub.obj: strnlen-stub.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strnlen-stub.obj `if test -f 'strnlen-stub.c'; then $(CYGPATH_W) 'strnlen-stub.c'; else $(CYGPATH_W) '$(srcdir)/strnlen-stub.c'; fi`
+
+lib_a-strrchr-stub.o: strrchr-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strrchr-stub.o `test -f 'strrchr-stub.c' || echo '$(srcdir)/'`strrchr-stub.c
+
+lib_a-strrchr-stub.obj: strrchr-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strrchr-stub.obj `if test -f 'strrchr-stub.c'; then $(CYGPATH_W) 'strrchr-stub.c'; else $(CYGPATH_W) '$(srcdir)/strrchr-stub.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
