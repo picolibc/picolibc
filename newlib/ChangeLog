@@ -1,3 +1,9 @@
+2014-12-07  Freddie Chopin  <freddie_chopin@op.pl>
+
+	* libc/time/gmtime_r.c (gmtime_r): Fixed bug in calculations for dates
+	after year 2069 or before year 1901. Ideas for solution taken from
+	musl's __secs_to_tm()
+
 2014-12-05  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* libc/include/stdlib.h (__bsd_qsort_r): Declare.
