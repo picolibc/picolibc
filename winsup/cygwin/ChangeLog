@@ -1,3 +1,7 @@
+2014-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winver.rc (LegalCopyright): Fix belatedly (uh-oh).
+
 2014-12-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (regopt): Remove function.
