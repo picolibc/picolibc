@@ -1,3 +1,7 @@
+2014-12-10  Michael DePaulo  <mikedep333@gmail.com>
+
+	* ntsec.xml (ntsec-mapping-samba): Clarify Samba file server setup.
+
 2014-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-using.xml (faq.using.bloda): Add Lenovo RapidBoot Shield to

@@ -2042,10 +2042,9 @@ by child processes.
 <sect3 id="ntsec-mapping-samba"><title id="ntsec-mapping-samba.title">Samba account mapping</title>
 
 <para>
-A fully set up Samba with domain integration is running winbindd to
-map Window SIDs to artificially created UNIX uids and gids, and this
-mapping is transparent within the domain, so Cygwin doesn't have to do
-anything special.
+A fully set up Samba file server with domain integration is running winbindd to
+map Window SIDs to artificially created UNIX uids and gids, and this mapping is
+transparent within the domain, so Cygwin doesn't have to do anything special.
 </para>
 
 <para>
