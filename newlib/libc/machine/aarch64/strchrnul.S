@@ -55,7 +55,7 @@
 #define vhas_nul2	v4
 #define vhas_chr1	v5
 #define vhas_chr2	v6
-#define vrepmask	v15
+#define vrepmask	v7
 #define vend1		v16
 
 /* Core algorithm.
