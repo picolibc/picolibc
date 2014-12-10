@@ -1132,6 +1132,7 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>Sophos Anti-Virus 7</para></listitem>
 <listitem><para>Bufferzone from Trustware</para></listitem>
 <listitem><para>Lenovo IPS Core Service (ipssvc)</para></listitem>
+<listitem><para>Lenovo RapidBoot Shield</para></listitem>
 <listitem><para>Credant Guardian Shield</para></listitem>
 <listitem><para>AVAST (disable FILESYSTEM and BEHAVIOR realtime shields)</para></listitem>
 <listitem><para>Citrix Metaframe Presentation Server/XenApp (see <ulink url="http://support.citrix.com/article/CTX107825">Citrix Support page</ulink>)</para></listitem>

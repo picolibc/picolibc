@@ -1,3 +1,8 @@
+2014-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-using.xml (faq.using.bloda): Add Lenovo RapidBoot Shield to
+	BLODA list.
+
 2014-12-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-setup.xml (faq.setup.upgrade-mountpoints): Remove.
