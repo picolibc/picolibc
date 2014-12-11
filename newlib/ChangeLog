@@ -1,3 +1,9 @@
+2014-12-11  Jonathan Roelofs  <jonathan@codesourcery.com>
+	    Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/stdio.h: Fix type signature of __sfeof and __sferror 
+	for C++.
+
 2014-12-11  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* libc/include/stdio_ext.h: Rename __fwriteable to __fwritable.

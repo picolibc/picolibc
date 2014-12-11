@@ -649,8 +649,8 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #endif
 #endif
 
-#define	__sfeof(p)	(((p)->_flags & __SEOF) != 0)
-#define	__sferror(p)	(((p)->_flags & __SERR) != 0)
+#define	__sfeof(p)	((int)(((p)->_flags & __SEOF) != 0))
+#define	__sferror(p)	((int)(((p)->_flags & __SERR) != 0))
 #define	__sclearerr(p)	((void)((p)->_flags &= ~(__SERR|__SEOF)))
 #define	__sfileno(p)	((p)->_file)
 
