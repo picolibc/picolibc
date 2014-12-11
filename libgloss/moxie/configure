@@ -585,6 +585,8 @@ ac_unique_file="crt0.S"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 host_makefile_frag_path
+BUILD_CRT0_FALSE
+BUILD_CRT0_TRUE
 CCASFLAGS
 CCAS
 RANLIB
@@ -2521,6 +2523,20 @@ fi
 
 test "${CCAS+set}" = set || CCAS=$CC
 test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
+
+
+
+
+case "${target}" in
+  moxie-*-moxiebox*)
+    BUILD_CRT0_TRUE='#'
+    BUILD_CRT0_FALSE=
+    ;;
+  *)
+    BUILD_CRT0_TRUE=
+    BUILD_CRT0_FALSE='#'
+    ;;
+esac
 
 
 
