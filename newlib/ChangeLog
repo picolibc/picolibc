@@ -1,3 +1,14 @@
+2014-12-11  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* libc/include/stdio_ext.h: Rename __fwriteable to __fwritable.
+	[!__GNUC__]: Declare real functions for the macros, and make
+	the macros conditional on !__cplusplus.
+	* libc/stdio/Makefile.am (ELIX_4_SOURCES): Add stdio_ext.c.
+	(CHEWOUT_FILES): Add stdio_ext.def.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio/stdio.tex: Include stdio_ext.def.
+	* libc/stdio/stdio_ext.c: New file.
+
 2014-12-04  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/stdio_ext.h: Remove excess "inline".

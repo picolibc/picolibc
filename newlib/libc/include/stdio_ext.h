@@ -38,7 +38,7 @@ _ELIDABLE_INLINE int
 __freadable (FILE *__fp) { return (__fp->_flags & (__SRD | __SRW)) != 0; }
 
 _ELIDABLE_INLINE int
-__fwriteable (FILE *__fp) { return (__fp->_flags & (__SWR | __SRW)) != 0; }
+__fwritable (FILE *__fp) { return (__fp->_flags & (__SWR | __SRW)) != 0; }
 
 _ELIDABLE_INLINE int
 __flbf (FILE *__fp) { return (__fp->_flags & __SLBF) != 0; }
@@ -48,13 +48,25 @@ __fpending (FILE *__fp) { return __fp->_p - __fp->_bf._base; }
 
 #else
 
+size_t	 _EXFUN(__fbufsize,(FILE *));
+int	 _EXFUN(__freading,(FILE *));
+int	 _EXFUN(__fwriting,(FILE *));
+int	 _EXFUN(__freadable,(FILE *));
+int	 _EXFUN(__fwritable,(FILE *));
+int	 _EXFUN(__flbf,(FILE *));
+size_t	 _EXFUN(__fpending,(FILE *));
+
+#ifndef __cplusplus
+
 #define __fbufsize(__fp) ((size_t) (__fp)->_bf._size)
 #define __freading(__fp) (((__fp)->_flags & __SRD) != 0)
 #define __fwriting(__fp) (((__fp)->_flags & __SWR) != 0)
 #define __freadable(__fp) (((__fp)->_flags & (__SRD | __SRW)) != 0)
-#define __fwriteable(__fp) (((__fp)->_flags & (__SWR | __SRW)) != 0)
+#define __fwritable(__fp) (((__fp)->_flags & (__SWR | __SRW)) != 0)
 #define __flbf(__fp) (((__fp)->_flags & __SLBF) != 0)
 #define __fpending(__fp) ((size_t) ((__fp)->_p - (__fp)->_bf._base))
+
+#endif /* __cplusplus */
 
 #endif /* __GNUC__ */
 

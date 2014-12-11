@@ -155,6 +155,7 @@ ELIX_4_SOURCES = \
 	open_memstream.c	\
 	putwc.c			\
 	putwchar.c		\
+	stdio_ext.c		\
 	swprintf.c		\
 	swscanf.c		\
 	ungetwc.c		\
@@ -391,6 +392,7 @@ CHEWOUT_FILES = \
 	setvbuf.def		\
 	sprintf.def		\
 	sscanf.def		\
+	stdio_ext.def		\
 	swprintf.def		\
 	swscanf.def		\
 	tmpfile.def		\
