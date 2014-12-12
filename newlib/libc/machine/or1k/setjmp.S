@@ -31,12 +31,7 @@ setjmp:
 
 	l.sw	4(r3), r1
 	l.sw	8(r3), r2
-	l.sw	12(r3), r3
-	l.sw	16(r3), r4
-	l.sw	20(r3), r5
-	l.sw	24(r3), r6
-	l.sw	28(r3), r7
-	l.sw	32(r3), r8
+	/* Skip r3-r8 as they are not preserved across function calls */
 	l.sw	36(r3), r9
 	/* Skip r10 as it's preserved to be used by TLS */ 
 	/* Skip r11, setjmp always set it to 0 */
@@ -77,12 +72,7 @@ longjmp:
 
 	l.lwz	r1, 4(r3)
 	l.lwz	r2, 8(r3)
-	/* Skip r3 as it contains the current buffer address */
-	l.lwz	r4, 16(r3)
-	l.lwz	r5, 20(r3)
-	l.lwz	r6, 24(r3)
-	l.lwz	r7, 28(r3)
-	l.lwz	r8, 32(r3)
+	/* Skip r3-r8 as they are not preserved across function calls */
 	l.lwz	r9, 36(r3)
 	/* Skip r11 as it's always set by longjmp */
 	l.lwz	r14, 52(r3)
@@ -94,7 +84,6 @@ longjmp:
 	l.lwz	r26, 100(r3)
 	l.lwz	r28, 108(r3)
 	l.lwz	r30, 116(r3)
-	l.lwz	r3, 12(r3)
 
 	l.jr	r9
 	l.nop

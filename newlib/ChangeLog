@@ -1,3 +1,7 @@
+2014-12-12  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
+	* libc/machine/or1k/setjmp.S: Remove save/restore of r3-r8
+
 2014-12-11  Jonathan Roelofs  <jonathan@codesourcery.com>
 	    Corinna Vinschen  <vinschen@redhat.com>
 
