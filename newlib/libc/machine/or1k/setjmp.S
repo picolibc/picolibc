@@ -49,8 +49,18 @@ setjmp:
 	l.mfspr	r13, r0, 17
 	l.sw	124(r3), r13
 /* Set result register to 0 and jump */
+// Different cases for optional delay slot
+#if defined(__OR1K_NODELAY__)
+	l.addi	r11, r0, 0
+	l.jr	r9
+#elif defined(__OR1K_DELAY__)
 	l.jr	r9
 	l.addi	r11, r0, 0
+#else
+	l.addi	r11, r0, 0
+	l.jr	r9
+	l.nop
+#endif
 
 .align  4
 .global longjmp
@@ -83,7 +93,16 @@ longjmp:
 	l.lwz	r24, 92(r3)
 	l.lwz	r26, 100(r3)
 	l.lwz	r28, 108(r3)
-	l.lwz	r30, 116(r3)
 
+// Different cases for optional delay slot
+#if defined(__OR1K_NODELAY__)
+	l.lwz	r30, 116(r3)
+	l.jr	r9
+#elif defined(__OR1K_DELAY__)
+	l.jr	r9
+	l.lwz	r30, 116(r3)
+#else
+	l.lwz	r30, 116(r3)
 	l.jr	r9
 	l.nop
+#endif

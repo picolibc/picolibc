@@ -245,7 +245,7 @@ case "${host_cpu}" in
   nios2*)
 	machine_dir=nios2
 	;;
-  or1k*)
+  or1k*|or1knd*)
 	machine_dir=or1k
 	;;
   powerpc*)

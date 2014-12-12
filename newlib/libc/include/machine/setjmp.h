@@ -1,7 +1,7 @@
 
 _BEGIN_STD_C
 
-#ifdef __or1k__
+#if defined(__or1k__) || defined(__or1knd__)
 #define _JBLEN 31 /* 32 GPRs - r0 */
 #define _JBTYPE unsigned long
 #endif

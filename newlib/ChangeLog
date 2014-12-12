@@ -1,5 +1,11 @@
 2014-12-12  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
+	* configure.host: or1knd support, OpenRISC without delay slot
+	* libc/include/machine/setjmp.h: Add or1knd
+	* libc/machine/or1k/setjmp.S: Optional delay slot
+
+2014-12-12  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
 	* libc/machine/or1k/setjmp.S: Remove save/restore of r3-r8
 
 2014-12-11  Jonathan Roelofs  <jonathan@codesourcery.com>
