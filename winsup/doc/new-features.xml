@@ -31,6 +31,11 @@ representing POSIX permission bits.
 </para></listitem>
 
 <listitem><para>
+Add -k/--remove-default option to setfacl to remove all default ACL entries
+from an ACL.
+</para></listitem>
+
+<listitem><para>
 Revamp Solaris ACL implementation to more closely work like POSIX ACLs
 are supposed to work.  Finally implement a CLASS_OBJ emulation.  Update
 getfacl(1)/setfacl(1) accordingly.

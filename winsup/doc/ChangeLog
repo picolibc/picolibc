@@ -1,3 +1,8 @@
+2014-12-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.34): Add setfacl -k option.
+	* utils.xml (setfacl): Ditto.
+
 2014-12-10  Michael DePaulo  <mikedep333@gmail.com>
 
 	* ntsec.xml (ntsec-mapping-samba): Clarify Samba file server setup.
