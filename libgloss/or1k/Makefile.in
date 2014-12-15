@@ -74,10 +74,23 @@ COMMON_FILES = syscalls \
 LIBOR1K_FILES = $(COMMON_FILES)
 LIBOR1K_OBJS = $(addsuffix .o,$(LIBOR1K_FILES))
 
+BOARDS = atlys \
+	de0_nano \
+	ml501 \
+	optimsoc \
+	or1ksim \
+	or1ksim-uart \
+	ordb1a3pe1500 \
+	ordb2a \
+	orpsocrefdesign
+
+BOARD_LIBS = $(addprefix libboard-,$(addsuffix .a,$(BOARDS)))
+BOARD_OBJS = $(addprefix libboard-,$(addsuffix .o,$(BOARDS)))
+
 GCC_LDFLAGS = `if [ -d ${objroot}/../gcc ] ; \
 	then echo -L${objroot}/../gcc ; fi`
 
-OUTPUTS = libor1k.a crt0.o
+OUTPUTS = libor1k.a crt0.o ${BOARD_LIBS}
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -91,6 +104,16 @@ all: ${OUTPUTS}
 
 libor1k.a: $(LIBOR1K_OBJS)
 	${AR} ${ARFLAGS} $@ $(LIBOR1K_OBJS)
+	${RANLIB} $@
+
+libboard-%.o: boards/%.S
+	${CC} ${CFLAGS} -o $@ -c $<
+
+libboard-%.o: boards/%.c
+	${CC} ${CFLAGS} -o $@ -c $<
+
+libboard-%.a: libboard-%.o
+	${AR} ${ARFLAGS} $@ $<
 	${RANLIB} $@
 
 doc:

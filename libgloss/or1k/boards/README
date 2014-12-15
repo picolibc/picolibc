@@ -1,0 +1,65 @@
+# Add a new board
+
+Before adding a new board, you may consider if your board can use another
+board definition and simply overwrite the weak symbols.
+
+If you think it is worth adding a new board, you need to perform the following
+steps:
+
+ * Decide for a meaningful board name (refered to as <board> below). It should
+   be specific enough (not openrisc..), but be rather generic if it may cover
+   similar boards as well.
+ 
+ * Create a file <board>.S (assembler) or <board>.c (C). Of course, C is easier
+   to write and you can implement everything in C, but there are restrictions:
+   
+    * There is an early initialization function. It is called before the C
+      library and even the stack are initialized. A default implementation skips
+      this step, so everything will compile, but if you really need
+      initialization that early you are bound to assembly language.
+      
+    * You essentially should not use the C library functions as this may lead to
+      link issues and circular dependencies.
+      
+   You can copy board_tmpl.S or board_tmpl.c as starting point for your board.
+   
+ * The following symbols must be defined in your board file:
+ 
+    * _or1k_board_mem_base: Memory base address
+    
+    * _or1k_board_mem_size: Memory size
+    
+    * _or1k_board_clk_freq: Clock frequency
+    
+    * _or1k_board_uart_base: UART base address. Set to 0 if no UART present.
+    
+    * _or1k_board_uart_baud: UART baud rate. Only used if UART base is > 0
+    
+    * _or1k_board_uart_IRQ: UART interrupt line. Only used if UART base is > 0
+    
+   You can define a weak attribute for all of the symbols so that they can
+   be overwritten by the user (more flexibility).
+   
+ * The following functions need to be implemented:
+ 
+   * _or1k_board_init: Is called after C library initialization and UART
+       initialization.
+       
+   * _or1k_board_exit: Is called after the program has exited and the C library
+       finished all deconstructions etc.
+       
+   Similar to the symbols you can define those functions weak.
+ 
+ * The following functions can be implemented: 
+ 
+   * _or1k_board_init_early: Only in assembly (see above). Is called before
+       anything is initialized, not even the stack! You can use all registers
+       in this function. The default implementation in crt0.S skips this step,
+       which is fine in most cases. If you decide to implement it, you need to
+       define it with the global attribute to overwrite the default
+       implementation. It is recommended to do so in assembler board files to
+       keep the ability to overwrite the default implementation by the user.
+
+When you are done with your board, add it to libgloss/or1k/Makefile.in to the
+BOARDS variable and compile.
+

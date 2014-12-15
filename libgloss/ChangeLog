@@ -1,5 +1,23 @@
 2014-12-15  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
+	* or1k/Makefile.in: Build and install board libraries
+	* or1k/board.h: New file
+	* or1k/boards/README: New file
+	* or1k/boards/atlys.S: New file
+	* or1k/boards/de0_nano.S: New file
+	* or1k/boards/ml501.S: New file
+	* or1k/boards/ml509.S: New file
+	* or1k/boards/optimsoc.S: New file
+	* or1k/boards/or1ksim-uart.S: New file
+	* or1k/boards/or1ksim.S: New file
+	* or1k/boards/ordb1a3pe1500.S: New file
+	* or1k/boards/ordb2a.S: New file
+	* or1k/boards/orpsocrefdesign.S: New file
+	* or1k/boards/tmpl.S: New file
+	* or1k/boards/tmpl.c: New file
+
+2014-12-15  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
 	* or1k/Makefile.in: Add libor1k
 	* or1k/README: New file
 	* or1k/caches-asm.S: New file
