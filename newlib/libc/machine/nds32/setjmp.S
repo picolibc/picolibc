@@ -51,13 +51,53 @@ The $r16 ~ $r19 are used to store D0/D1, keep them for backward-compatible.
 	.global	setjmp
 	.type	setjmp, @function
 setjmp:
-#ifdef __NDS32_REDUCED_REGS__
+#if __NDS32_REDUCED_REGS__
 	smw.bim	$r6, [$r0], $r10, #0b0000
 	addi	$r0, $r0, #32	/* Leave room to keep jum_buf all the same.  */
 	smw.bim	$r31, [$r0], $r31, #0b1111
 #else
 	smw.bim	$r6, [$r0], $r14, #0b0000
 	smw.bim	$r16, [$r0], $r19, #0b1111
+#endif
+
+#if __NDS32_EXT_FPU_SP__ || __NDS32_EXT_FPU_DP__
+
+	/* Extract $fpcfg.freg (b[3:2]), then save into jmp_buf.  */
+	fmfcfg	$r2
+	slli	$r2, $r2, #28
+	srli	$r2, $r2, #30
+	swi.bi	$r2, [$r0], #4
+
+	/* Make sure $r0 is double-word-aligned.  */
+	addi	$r0, $r0, #7
+	bitci	$r0, $r0, #7
+
+	/* Case switch according to $fpcfg.freg  */
+	beqz	$r2, .LCFG0_save	/* Branch if $fpcfg.freg = 0b00.  */
+	xori	$r15, $r2, #0b10
+	beqz	$r15, .LCFG2_save	/* Branch $fpcfg.freg = 0b10.  */
+	srli	$r2, $r2, #0b01
+	beqz	$r2, .LCFG1_save	/* Branch if $fpcfg.freg = 0b01.  */
+	 /* Fall-through if $fpcfg.freg = 0b11.  */
+.LCFG3_save:
+	fsdi.bi $fd31, [$r0], #8
+	fsdi.bi $fd29, [$r0], #8
+	fsdi.bi $fd27, [$r0], #8
+	fsdi.bi $fd25, [$r0], #8
+	fsdi.bi $fd23, [$r0], #8
+	fsdi.bi $fd21, [$r0], #8
+	fsdi.bi $fd19, [$r0], #8
+	fsdi.bi $fd17, [$r0], #8
+.LCFG2_save:
+	fsdi.bi $fd15, [$r0], #8
+	fsdi.bi $fd13, [$r0], #8
+	fsdi.bi $fd11, [$r0], #8
+	fsdi.bi $fd9, [$r0], #8
+.LCFG1_save:
+	fsdi.bi $fd7, [$r0], #8
+	fsdi.bi $fd5, [$r0], #8
+.LCFG0_save:
+	fsdi.bi $fd3, [$r0], #8
 #endif
 
 	/* Set return value to zero.  */
@@ -72,7 +112,7 @@ setjmp:
 	.global	longjmp
 	.type	longjmp, @function
 longjmp:
-#ifdef __NDS32_REDUCED_REGS__
+#if __NDS32_REDUCED_REGS__
 	lmw.bim	$r6, [$r0], $r10, #0b0000
 	addi    $r0, $r0, #32
 	lmw.bim	$r31, [$r0], $r31, #0b1111
@@ -80,6 +120,44 @@ longjmp:
 	lmw.bim	$r6, [$r0], $r14, #0b0000
 	lmw.bim	$r16, [$r0], $r19, #0b1111
 #endif
+
+#if __NDS32_EXT_FPU_SP__ || __NDS32_EXT_FPU_DP__
+
+	/* Restore value of $fpcfg.freg (b[3:2]).  */
+	lwi.bi	$r2, [$r0], #4
+
+	/* Make sure $r0 is double-word-aligned.  */
+	addi	$r0, $r0, #7
+	bitci	$r0, $r0, #7
+
+	/* Case switch according to $fpcfg.freg  */
+	beqz	$r2, .LCFG0_restore	/* Branch if $fpcfg.freg = 0b00.  */
+	xori	$r15, $r2, #0b10
+	beqz	$r15, .LCFG2_restore	/* Branch $fpcfg.freg = 0b10.  */
+	srli	$r2, $r2, #0b01
+	beqz	$r2, .LCFG1_restore	/* Branch if $fpcfg.freg = 0b01.  */
+	 /* Fall-through if $fpcfg.freg = 0b11.  */
+.LCFG3_restore:
+	fldi.bi $fd31, [$r0], #8
+	fldi.bi $fd29, [$r0], #8
+	fldi.bi $fd27, [$r0], #8
+	fldi.bi $fd25, [$r0], #8
+	fldi.bi $fd23, [$r0], #8
+	fldi.bi $fd21, [$r0], #8
+	fldi.bi $fd19, [$r0], #8
+	fldi.bi $fd17, [$r0], #8
+.LCFG2_restore:
+	fldi.bi $fd15, [$r0], #8
+	fldi.bi $fd13, [$r0], #8
+	fldi.bi $fd11, [$r0], #8
+	fldi.bi $fd9, [$r0], #8
+.LCFG1_restore:
+	fldi.bi $fd7, [$r0], #8
+	fldi.bi $fd5, [$r0], #8
+.LCFG0_restore:
+	fldi.bi $fd3, [$r0], #8
+#endif
+
 	/* Set val as return value.  If the value val is 0, 1 will be returned
 	   instead.  */
 	movi	$r0, 1

@@ -1,5 +1,10 @@
 2014-12-15  Nick Hung  <nick@andestech.com>
 
+	* newlib/libc/include/machine/setjmp.h: Add FPU support.
+	* newlib/libc/machine/nds32/setjmp.S: Add FPU support.
+
+2014-12-15  Nick Hung  <nick@andestech.com>
+
 	* configure.host: Add libm nds32 machine directory.
 	* libm/machine/configure: Regenerated.
 	* libm/machine/configure.in: Add nds32 AC_CONFIG.
