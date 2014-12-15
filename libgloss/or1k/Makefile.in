@@ -55,10 +55,29 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
+# object files needed
+COMMON_FILES = syscalls \
+	or1k_uart \
+	outbyte \
+	caches-asm \
+	exceptions \
+	exceptions-asm \
+	interrupts \
+	interrupts-asm \
+	mmu-asm \
+	timer \
+	sbrk \
+	impure \
+	util \
+	sync-asm
+
+LIBOR1K_FILES = $(COMMON_FILES)
+LIBOR1K_OBJS = $(addsuffix .o,$(LIBOR1K_FILES))
+
 GCC_LDFLAGS = `if [ -d ${objroot}/../gcc ] ; \
 	then echo -L${objroot}/../gcc ; fi`
 
-OUTPUTS = crt0.o
+OUTPUTS = libor1k.a crt0.o
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -69,6 +88,10 @@ all: ${OUTPUTS}
 #
 # here's where we build the library for each target
 #
+
+libor1k.a: $(LIBOR1K_OBJS)
+	${AR} ${ARFLAGS} $@ $(LIBOR1K_OBJS)
+	${RANLIB} $@
 
 doc:
 

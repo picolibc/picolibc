@@ -1,5 +1,28 @@
 2014-12-15  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
+	* or1k/Makefile.in: Add libor1k
+	* or1k/README: New file
+	* or1k/caches-asm.S: New file
+	* or1k/exceptions-asm.S: New file
+	* or1k/exceptions.c: New file
+	* or1k/impure.c: New file
+	* or1k/include/or1k-nop.h: New file
+	* or1k/include/or1k-support.h: New file
+	* or1k/interrupts-asm.S: New file
+	* or1k/interrupts.c: New file
+	* or1k/mmu-asm.S: New file
+	* or1k/or1k-internals.h: New file
+	* or1k/or1k_uart.c: New file
+	* or1k/or1k_uart.h: New file
+	* or1k/outbyte.S: New file
+	* or1k/sbrk.c: New file
+	* or1k/sync-asm.S: New file
+	* or1k/syscalls.c: New file
+	* or1k/timer.c: New file
+	* or1k/util.c: New file
+
+2014-12-15  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
 	* README: Add details about or1k.
 	* configure.in: Add or1k/or1knd
 	* configure: Regenerated.

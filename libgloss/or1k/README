@@ -1,0 +1,77 @@
+This document describes the internals of the port for OpenRISC
+1000. The API is documented in or1k-support.h as Doxygen comments.
+
+# Data Structures
+
++----------------+ 0x0
+|    vectors     |
++----------------+
+|  text,data,..  |
++----------------+
+|      bss       |
++----------------+
+|      heap      |
+|       vv       |
+|                |
+|       ^^       |
+|    stack(s)    |
++----------------+ _or1k_board_mem_base +
+		   _or1k_board_mem_size
+
+## Stack and Heap
+
+The stack is allocated at the end of available physical memory which
+is defined by each board as _or1k_board_mem_base and
+_or1k_board_mem_size. The _or1k_stack_top and _or1k_stack_bottom are
+determined by those variables and _or1k_stack_size (which may be
+overwritten in _or1k_board_init_early).
+
+A second stack for exceptions is allocated as we allow exceptions to
+be arbitrary complex and call C functions etc. It is not an option to
+re-use the current software stack as we want to be so generic, that
+this can also be a virtual memory stack at moment of exception. The
+exception starts below the normal software stack and is
+_or1k_exception_stack_size large.
+
+Multicore: For each core a stack and exception stack is allocated and
+the stack pointer set at boot. That is: sp(core0) = _or1k_stack_top,
+sp(core1) = _or1k_stack_top - _or1k_stack_size, etc.
+
+## _or1k_stack_core (multicore only)
+
+An array of pointers to the software stacks (size:
+4*or1k_numcores()). It is dynamically allocated from heap in or1k_init
+by calling sbrk(). The pointers contain the values for stack top
+pointers as described above. This variable is essentially used on boot
+of the slave cores to configure the stack register.
+
+## _or1k_exception_stack_core (multicore only)
+
+An array of pointers to the exception stacks (size:
+4*or1k_numcores()). It is allocated identical as the stack_core
+array. It is loaded whenever an exception occurs to start with a clean
+stack in the exception.
+
+## _or1k_exception_handler_table
+
+A table of function pointers to the handlers of the exceptions. The
+generic exception handler checks if an exception handler is registered
+and calls it. There are 30 exceptions defined (0x0 is not an exception
+vector and 0x100 is reset which is static). This array resides in BSS
+and is therefore initialized as 0 (no handler registered) after start.
+
+Multicore: As the number of course is not known at compile time, the
+variable is a pointer to and array of arrays (cores x 30) which is
+allocated in or1k_init() on heap (using sbrk).
+
+## _or1k_interrupt_handler_table and _or1k_interrupt_handler_table_data_ptr 
+
+The interrupt handlers are stored identical to to the exception handler table.
+
+## _or1k_reent
+
+The struct _or1k_reent contains formerly global data and allows for
+reentrancy. In the single core case, this is an allocated object,
+while it is a pointer to an array of structs in the multicore library.
+It is allocated in _or1k_reent_init() on the heap.
+
