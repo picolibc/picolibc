@@ -30,7 +30,9 @@ lsrc =	atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	copysignl.c nanl.c ilogbl.c asinhl.c cbrtl.c nextafterl.c rintl.c \
 	scalbnl.c exp2l.c scalblnl.c tgammal.c nearbyintl.c lrintl.c llrintl.c \
 	roundl.c lroundl.c llroundl.c truncl.c remquol.c fdiml.c fmaxl.c fminl.c \
-	fmal.c acoshl.c atanhl.c remainderl.c lgammal.c erfl.c erfcl.c
+	fmal.c acoshl.c atanhl.c remainderl.c lgammal.c erfl.c erfcl.c \
+	logbl.c nexttowardf.c nexttoward.c nexttowardl.c log2l.c
+
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 

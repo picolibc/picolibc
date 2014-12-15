@@ -1,3 +1,15 @@
+2014-12-15  Jonathan Roelofs  <jonathan@codesourcery.com>
+
+	* libc/include/math.h: Add log2l,logbl,nexttowardf,
+	* nexttoward,nexttowardl
+	* libm/common/Makefile.am: Reference new files
+	* libm/common/Makefile.in: Reference new files
+	* libm/common/log2l.c: New File
+	* libm/common/logbl.c: Likewise
+	* libm/common/nexttowardf.c: Likewise
+	* libm/common/nexttoward.c: Likewise
+	* libm/common/nexttowardl.c: Likewise
+
 2014-12-15  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* libc/include/stdio.h (__SNLK): Define.

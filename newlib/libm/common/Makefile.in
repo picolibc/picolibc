@@ -136,7 +136,10 @@ am__objects_3 = lib_a-atanl.$(OBJEXT) lib_a-cosl.$(OBJEXT) \
 	lib_a-fminl.$(OBJEXT) lib_a-fmal.$(OBJEXT) \
 	lib_a-acoshl.$(OBJEXT) lib_a-atanhl.$(OBJEXT) \
 	lib_a-remainderl.$(OBJEXT) lib_a-lgammal.$(OBJEXT) \
-	lib_a-erfl.$(OBJEXT) lib_a-erfcl.$(OBJEXT)
+	lib_a-erfl.$(OBJEXT) lib_a-erfcl.$(OBJEXT) \
+	lib_a-logbl.$(OBJEXT) lib_a-nexttowardf.$(OBJEXT) \
+	lib_a-nexttoward.$(OBJEXT) lib_a-nexttowardl.$(OBJEXT) \
+	lib_a-log2l.$(OBJEXT)
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_FALSE@am__objects_4 =  \
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_FALSE@	$(am__objects_3)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
@@ -169,7 +172,8 @@ am__objects_7 = atanl.lo cosl.lo sinl.lo tanl.lo tanhl.lo frexpl.lo \
 	tgammal.lo nearbyintl.lo lrintl.lo llrintl.lo roundl.lo \
 	lroundl.lo llroundl.lo truncl.lo remquol.lo fdiml.lo fmaxl.lo \
 	fminl.lo fmal.lo acoshl.lo atanhl.lo remainderl.lo lgammal.lo \
-	erfl.lo erfcl.lo
+	erfl.lo erfcl.lo logbl.lo nexttowardf.lo nexttoward.lo \
+	nexttowardl.lo log2l.lo
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_TRUE@am__objects_8 =  \
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_TRUE@	$(am__objects_7)
 @USE_LIBTOOL_TRUE@am_libcommon_la_OBJECTS = $(am__objects_5) \
@@ -355,7 +359,8 @@ lsrc = atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	copysignl.c nanl.c ilogbl.c asinhl.c cbrtl.c nextafterl.c rintl.c \
 	scalbnl.c exp2l.c scalblnl.c tgammal.c nearbyintl.c lrintl.c llrintl.c \
 	roundl.c lroundl.c llroundl.c truncl.c remquol.c fdiml.c fmaxl.c fminl.c \
-	fmal.c acoshl.c atanhl.c remainderl.c lgammal.c erfl.c erfcl.c
+	fmal.c acoshl.c atanhl.c remainderl.c lgammal.c erfl.c erfcl.c \
+	logbl.c nexttowardf.c nexttoward.c nexttowardl.c log2l.c
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libcommon.la
@@ -1202,6 +1207,36 @@ lib_a-erfcl.o: erfcl.c
 
 lib_a-erfcl.obj: erfcl.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-erfcl.obj `if test -f 'erfcl.c'; then $(CYGPATH_W) 'erfcl.c'; else $(CYGPATH_W) '$(srcdir)/erfcl.c'; fi`
+
+lib_a-logbl.o: logbl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-logbl.o `test -f 'logbl.c' || echo '$(srcdir)/'`logbl.c
+
+lib_a-logbl.obj: logbl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-logbl.obj `if test -f 'logbl.c'; then $(CYGPATH_W) 'logbl.c'; else $(CYGPATH_W) '$(srcdir)/logbl.c'; fi`
+
+lib_a-nexttowardf.o: nexttowardf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nexttowardf.o `test -f 'nexttowardf.c' || echo '$(srcdir)/'`nexttowardf.c
+
+lib_a-nexttowardf.obj: nexttowardf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nexttowardf.obj `if test -f 'nexttowardf.c'; then $(CYGPATH_W) 'nexttowardf.c'; else $(CYGPATH_W) '$(srcdir)/nexttowardf.c'; fi`
+
+lib_a-nexttoward.o: nexttoward.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nexttoward.o `test -f 'nexttoward.c' || echo '$(srcdir)/'`nexttoward.c
+
+lib_a-nexttoward.obj: nexttoward.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nexttoward.obj `if test -f 'nexttoward.c'; then $(CYGPATH_W) 'nexttoward.c'; else $(CYGPATH_W) '$(srcdir)/nexttoward.c'; fi`
+
+lib_a-nexttowardl.o: nexttowardl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nexttowardl.o `test -f 'nexttowardl.c' || echo '$(srcdir)/'`nexttowardl.c
+
+lib_a-nexttowardl.obj: nexttowardl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nexttowardl.obj `if test -f 'nexttowardl.c'; then $(CYGPATH_W) 'nexttowardl.c'; else $(CYGPATH_W) '$(srcdir)/nexttowardl.c'; fi`
+
+lib_a-log2l.o: log2l.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-log2l.o `test -f 'log2l.c' || echo '$(srcdir)/'`log2l.c
+
+lib_a-log2l.obj: log2l.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-log2l.obj `if test -f 'log2l.c'; then $(CYGPATH_W) 'log2l.c'; else $(CYGPATH_W) '$(srcdir)/log2l.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
