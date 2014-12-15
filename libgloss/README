@@ -8,3 +8,4 @@ pa	- WinBond and Oki boards with a PA.
 mips	- R3000 support. Array Tech LSI33k based RAID disk controller.
 lm32    - Lattice Mico32 simulator.
 epiphany - Adapteva Epiphany multicore processor.
+or1k	- OpenRISC 1000 processor.

@@ -1,3 +1,15 @@
+2014-12-15  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
+	* README: Add details about or1k.
+	* configure.in: Add or1k/or1knd
+	* configure: Regenerated.
+	* or1k/aclocal.m4: New file.
+	* or1k/configure: Ditto.
+	* or1k/Makefile.in: New file
+	* or1k/configure.in: New file
+	* or1k/crt0.S: New file
+	* or1k/include/or1k-asm.h: New file
+
 2014-12-15  Nick Hung  <nick@andestech.com>
 
 	* libgloss/nds32/_exit.S: Finish with an infinite loop in _exit.
