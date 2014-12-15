@@ -1,3 +1,14 @@
+2014-12-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setfacl.c (action_t): Add DeleteDef value.
+	(delacl): Take new parameter to differe between DeleteAll and DeleteDef.
+	Extend conditional to handle DefaultDef.  Change comment accordingly.
+	(setfacl): Call delacl in DefaultDef case as well.
+	(usage): Add and describe -k option.  Add -k to require options.
+	(longopts): Add --remove-default option.
+	(opts): Add -k option.
+	(main): Handle -k option.
+
 2014-12-05  Václav Zeman  <vhaisman@gmail.com>
 
 	* tzmap-from-unicode.org: Create tzmap as const.

@@ -49,6 +49,7 @@ typedef enum {
   Delete,
   ModNDel,
   DeleteAll,
+  DeleteDef,
   SetFromFile
 } action_t;
 
@@ -332,13 +333,15 @@ addmissing (aclent_t *tgt, int tcnt)
 }
 
 int
-delacl (aclent_t *tgt, int tcnt)
+delacl (aclent_t *tgt, int tcnt, action_t action)
 {
   int t;
 
-  /* Remove all extended ACL entries. */
   for (t = 0; t < tcnt; ++t)
-    if (tgt[t].a_type & (USER | GROUP | CLASS_OBJ))
+    /* -b (DeleteAll): Remove all extended ACL entries.
+       -k (DeleteDef): Remove all default ACL entries. */
+    if ((action == DeleteAll && (tgt[t].a_type & (USER | GROUP | CLASS_OBJ)))
+	|| (action == DeleteDef && (tgt[t].a_type & ACL_DEFAULT)))
       {
 	--tcnt;
 	if (t < tcnt)
@@ -374,8 +377,9 @@ setfacl (action_t action, const char *path, aclent_t *acls, int cnt)
 	}
       break;
     case DeleteAll:
+    case DeleteDef:
       if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
-	  || (lcnt = delacl (lacl, lcnt)) < 0
+	  || (lcnt = delacl (lacl, lcnt, action)) < 0
 	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
 	{
 	  perror (prog_name);
@@ -397,7 +401,7 @@ setfacl (action_t action, const char *path, aclent_t *acls, int cnt)
 }
 
 static void
-usage (FILE * stream)
+usage (FILE *stream)
 {
   fprintf (stream, ""
 	    "Usage: %s [-r] {-f ACL_FILE | -s acl_entries} FILE...\n"
@@ -409,6 +413,8 @@ usage (FILE * stream)
 	    "  -d, --delete     delete one or more specified ACL entries\n"
 	    "  -f, --file       set ACL entries for FILE to ACL entries read\n"
 	    "                   from a ACL_FILE\n"
+	    "  -k, --remove-default\n"
+	    "                   remove all default ACL entries\n"
 	    "  -m, --modify     modify one or more specified ACL entries\n"
 	    "  -r, --replace    replace mask entry with maximum permissions\n"
 	    "                   needed for the file group class\n"
@@ -417,7 +423,7 @@ usage (FILE * stream)
 	    "  -h, --help       output usage information and exit\n"
 	    "  -V, --version    output version information and exit\n"
 	    "\n"
-	    "At least one of (-b, -d, -f, -m, -s) must be specified\n"
+	    "At least one of (-b, -d, -f, -k, -m, -s) must be specified\n"
 	    "\n", prog_name, prog_name);
   if (stream == stdout)
   {
@@ -484,6 +490,9 @@ usage (FILE * stream)
 	    "     - One default mask entry for the file group class.\n"
 	    "     - One default other entry.\n"
 	    "\n"
+	    "-k   Remove all default ACL entries. If no default ACL entries\n"
+	    "     exist, no warnings are issued.\n"
+	    "\n"
 	    "-m   Add or modify one or more specified ACL entries.\n"
 	    "     Acl_entries is a comma-separated list of entries from the \n"
 	    "     same list as above.\n"
@@ -512,6 +521,7 @@ struct option longopts[] = {
   {"remove-all", no_argument, NULL, 'b'},
   {"delete", required_argument, NULL, 'd'},
   {"file", required_argument, NULL, 'f'},
+  {"remove-default", no_argument, NULL, 'k'},
   {"modify", required_argument, NULL, 'm'},
   {"replace", no_argument, NULL, 'r'},
   {"substitute", required_argument, NULL, 's'},
@@ -519,7 +529,7 @@ struct option longopts[] = {
   {"version", no_argument, NULL, 'V'},
   {0, no_argument, NULL, 0}
 };
-const char *opts = "bd:f:hm:rs:V";
+const char *opts = "bd:f:hkm:rs:V";
 
 static void
 print_version ()
@@ -593,6 +603,15 @@ main (int argc, char **argv)
       case 'h':
 	usage (stdout);
 	return 0;
+      case 'k':
+	if (action == NoAction)
+	  action = DeleteDef;
+	else
+	  {
+	    usage (stderr);
+	    return 1;
+	  }
+	break;
       case 'm':
 	if (action == NoAction)
 	  action = Modify;
