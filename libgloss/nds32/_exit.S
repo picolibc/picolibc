@@ -27,22 +27,18 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifdef __NDS32_VH__
-
 #include "vh.h"
-.extern _impure_ptr
-TYPE3 _exit, VH_EXIT
-
-#else	/* not __NDS32_VH__ */
-
 #include "../syscall.h"
-#include "syscall_extra.h"
-	.section .text
+	.text
 	.global	_exit
 	.type	_exit, @function
-	.align 2
+	.align	2
 _exit:
+#ifdef __NDS32_VH__
+	BREAK	VH_EXIT		/* Generate_Exception(Breakpoint);  */
+#else
 	syscall	SYS_exit	/* Make syscall 'SYS_exit'.  */
+#endif
+.L_infinite_loop:
+	b	.L_infinite_loop
 	.size	_exit, .-_exit
-
-#endif	/* not __NDS32_VH__ */

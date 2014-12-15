@@ -30,13 +30,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef __NDS32_VH__
 
 #include "vh.h"
-.extern _impure_ptr
 TYPE3 _gettimeofday, VH_GETTIMEOFDAY
 
 #else	/* not __NDS32_VH__ */
 
 #include "../syscall.h"
 #include "syscall_extra.h"
-SYS_WRAPPER _gettimeofday, SYS_gettimeofday
+	.text
+	.global	_gettimeofday
+	.type	_gettimeofday, @function
+	.align	2
+_gettimeofday:
+	syscall	SYS_gettimeofday
+	ret
+	.size   _gettimeofday, .-_gettimeofday
 
 #endif	/* not __NDS32_VH__ */

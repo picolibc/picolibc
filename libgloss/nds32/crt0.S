@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ##
 ##==============================================================================
 
+#include "syscall_extra.h"
+
 ##------------------------------------------------------------------------------
 ## Vector table setup
 ##------------------------------------------------------------------------------
@@ -47,6 +49,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ##------------------------------------------------------------------------------
 	.section	.text
 	.weak	_SDA_BASE_
+	.weak	_ITB_BASE_
+	.weak	_arg_init
+	.weak	__pre_c_init
+	.weak	__post_c_init
+	.weak	_call_exit
 	.global	_start
 	.type	_start, @function
 	.align	2
@@ -60,8 +67,22 @@ _start:
 	   determined by Linker.  SDA stands for Small Data Access.  */
 	la	$gp, _SDA_BASE_
 
+#if __NDS32_EXT_EX9__
+.L_init_itb:
+	/* Initialization for Instruction Table Base (ITB).
+	   The symbol _ITB_BASE_ is determined by Linker.
+	   Set $ITB only if MSC_CFG.EIT (cr4.b'24) is set.  */
+	mfsr	$r0, $MSC_CFG
+	srli	$r0, $r0, 24
+	andi	$r0, $r0, 0x1
+	beqz	$r0, 1f		/* Fall through ?  */
+	la	$r0, _ITB_BASE_
+	mtusr	$r0, $ITB
+1:
+#endif
+
 .L_init_sp:
-	/* Initialization for stack pointe.  The symbol _stack is defined
+	/* Initialization for stack pointer.  The symbol _stack is defined
 	   in linker script.  Make sure $sp is 8-byte aligned.  */
 	la	$sp, _stack
 #if __NDS32_ISA_V3__
@@ -71,23 +92,33 @@ _start:
 	and	$sp, $sp, $r0
 #endif
 
-#if __NDS32_EX9_EXT__
-.L_init_itb:
-	/* Initialization for Instruction Table Base (ITB).
-	   The symbol $_ITB_BASE_ is determined by Linker.
-	   Set $ITB only if MSC_CFG.EIT (cr4.b'24) is set.  */
-	mfsr    $r0, $MSC_CFG
-	srli    $r0, $r0, 24
-	andi    $r0, $r0, 0x1
-	beqz    $r0, .L_zero_out_bss	/* Fall through ?  */
-	la      $r0, $_ITB_BASE_
-	mtusr   $r0, $ITB
+#if __NDS32_EXT_FPU_SP__ || __NDS32_EXT_FPU_DP__
+.L_init_fpu:
+	/* Initialize FPU
+	   Set FUCOP_CTL.CP0EN (fucpr.b'0).  */
+	mfsr	$r0, $FUCOP_CTL
+	ori	$r0, $r0, 0x1
+	mtsr	$r0, $FUCOP_CTL
+	dsb
+	/* According to [bugzilla #9425], set flush-to-zero mode.
+	   That is, set $FPCSR.DNZ(b'12) = 1.  */
+	FMFCSR	$r0
+	ori	$r0, $r0, 0x1000
+	FMTCSR	$r0
+	dsb
 #endif
+
+.L_pre_c_init:
+	! call __pre_c_init if provided
+	! sample __pre_c_init is in BSP
+	la	$r15, __pre_c_init	! load address of __pre_c_init
+	beqz	$r15, .L_zero_out_bss	! check existence of __pre_c_init
+	jral	$r15			! pre-c-runtime initialization
 
 .L_zero_out_bss:
 	/* Zero out the bss section.
 	   Equivalence C code for follow part:
-	   if (_end == _edata) goto .L_call_main
+	   if (_end == _edata) goto .L_post_c_init
 	   unsinged int *ptr = _edata;
 	   while (ptr != _end)
 	     *ptr++ = 0
@@ -98,20 +129,51 @@ _start:
 	la	$r0, _edata
 	la	$r1, _end
 	movi	$r2, #0
-	beq	$r0, $r1, .L_call_main	/* Branch if no bss.  */
+	beq	$r0, $r1, .L_post_c_init	/* Branch if no bss.  */
 .Lword_clear:
 	swi.bi	$r2, [$r0], #4
 	bne	$r0, $r1, .Lword_clear
 
-.L_call_main:
+.L_post_c_init:
+	! call __post_c_init if provided
+	! no sample __post_c_init is provided
+	la	$r15, __post_c_init	! load address of __post_c_init
+	beqz	$r15, .L_arg_init	! check existence of __post_c_init
+	jral	$r15			! post-c-runtime initialization
+
+.L_arg_init:
+	! argc/argv initialization if necessary
+	la	$r7, _arg_init		! get address of _arg_init
+	beqz	$r7, .L_clean_reg	! if there isn't _arg_init, go main
+	addi	$sp, $sp, -512		! allocate space for command line
+					! and arguments
+	move	$r6, $sp		! r6 = buffer addr of cmd line
+	move	$r0, $r6		! r0 = buffer addr of cmd line
+	syscall	SYS_getcmdline		! get cmd line
+	move	$r0, $r6		! r0 = buffer addr of cmd line
+	addi	$r1, $r6, 256		! r1 = argv
+	jral	$r7			! init argc/argv
+	addi	$r1, $r6, 256		! r1 = argv
+	b	.L_call_main
+
+.L_clean_reg:
 	/* Prepare argc/argv/env for main function.
 	   Since there is no operating system so far,
 	   we set $r0, $r1, and $r2 to be zero.
-	   Note: $r2 already set to zero in line 84.  */
+	   Note: $r2 already set to zero in .L_zero_out_bss: code fragment.  */
 	movi	$r0, 0
 	movi	$r1, 0
+	movi	$r2, 0
+
+.L_call_main:
 	/* Call 'main'.  */
 	bal	main
+
+	/* Call _call_exit.  */
+	! call _call_exit if necessary; default implementation is in crtexit.c
+	la	$r15, _call_exit		! load address of _call_exit
+	beqz	$r15, .L_terminate_program	! no _call_exit? go exit
+	jral	$r15				! _call_exit will never return
 
 .L_terminate_program:
 	/* There are two ways to terminate program:

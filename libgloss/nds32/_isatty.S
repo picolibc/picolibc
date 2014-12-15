@@ -27,6 +27,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/*
+  SYNOPSIS
+    #include <unistd.h>
+    int isatty(int fildes);
+  RETURN VALUE
+    The isatty() function shall return 1 if fildes is associated with
+    a terminal;	 otherwise, it shall return 0 and may set errno
+    to indicate the error.
+*/
 #ifdef __NDS32_VH__
 
 #include "vh.h"
@@ -37,6 +46,21 @@ TYPE0 _isatty, VH_ISATTY
 
 #include "../syscall.h"
 #include "syscall_extra.h"
-SYS_WRAPPER _isatty, SYS_isatty
+	.text
+	.global	_isatty
+	.type	_isatty, @function
+	.align	2
+_isatty:
+	syscall	SYS_isatty	/* Make syscall with SWID=`SYS_isatty'.
+				   Reture value `0' stored in $r0 means
+				   there is something wrong.  */
+	bnez	$r0, 1f		/* Branch if success.  */
+	syscall	SYS_geterr	/* There is something wrong.  */
+	l.w     $r15, _impure_ptr
+	swi     $r0, [$r15]     /* Set errno.  */
+	move	$r0, #0
+1:
+	ret
+	.size   _isatty, .-_isatty
 
 #endif	/* not __NDS32_VH__ */

@@ -28,10 +28,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef __NDS32_VH__
-
-#include "../syscall.h"
-#include "syscall_extra.h"
-SYS_WRAPPER _getpid, SYS_getpid
-
-#endif	/* not __NDS32_VH__ */
+	.text
+	.global	_getpid
+	.type	_getpid, @function
+	.align	2
+_getpid:
+	/* The getpid() function shall always be successful and
+	   no return value is reserved to indicate an error.  */
+	movi	$r0, 1	/* A minimal implementation, success.  */
+	ret
+	.size   _getpid, .-_getpid

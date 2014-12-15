@@ -1,3 +1,21 @@
+2014-12-15  Nick Hung  <nick@andestech.com>
+
+	* libgloss/nds32/_exit.S: Finish with an infinite loop in _exit.
+	* libgloss/nds32/_getpid.S: Don't issue _getpid system call, it is
+	always successful.
+	* libgloss/nds32/_gettimeofday.S: No error for _gettimeofday is defined
+	in SYS_geterr handler.
+	* libgloss/nds32/_isatty.S: No error for _isatty is defined in
+	SYS_geterr handler.
+	* libgloss/nds32/_kill.S: Alway fail. errno = EINVAL.
+	* libgloss/nds32/_link.S: Alway fail. errno =  EMLINK.
+	* libgloss/nds32/_times.S: Alway fail. errno = EACCES.
+	* libgloss/nds32/_unlink.S: fix copy and paste error.
+	* libgloss/nds32/crt0.S: Add pre_c_init, post_c_init, arg_init.
+	* libgloss/nds32/crt1.S: Add pre_c_init, post_c_init, arg_init.
+	* libgloss/nds32/syscall_extra.h: Re-format.
+	* libgloss/nds32/vh.h: Add more virtual hosting number.
+
 2014-12-11  Anthony Green  <green@moxielogic.com>
 
 	* moxie/configure: Rebuilt.

@@ -32,11 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /* These are additional syscalls for nds32 target. */
-#define SYS_rename       3001
-#define SYS_isatty       3002
-#define SYS_system       3003
+#define SYS_rename	3001
+#define SYS_isatty	3002
+#define SYS_system	3003
 
-#define SYS_geterr       6001
+#define SYS_geterr	6001
+#define SYS_getcmdline	6002
 
 
 /* Define macros that generate assembly output.  */

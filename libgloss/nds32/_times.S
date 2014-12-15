@@ -27,10 +27,19 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifndef __NDS32_VH__
-
-#include "../syscall.h"
-#include "syscall_extra.h"
-SYS_WRAPPER _times, SYS_times
-
-#endif	/* not __NDS32_VH__ */
+/* If times() fails, (clock_t)-1 shall be returned and errno set
+   to indicate the error.  */
+	.extern	_impure_ptr	/* The first element is _errno.  */
+	.text
+	.global	_times
+	.type	_times, @function
+	.align	2
+_times:
+	/* A minimal implementation need not offer any timing information,
+	   so should always fail with an appropriate value in errno.  */
+	movi	$r0, #13	/* EACCES: Permission denied  */
+	l.w     $r15, _impure_ptr
+	swi     $r0, [$r15]
+	movi	$r0, -1		/* Set return value to -1.  */
+	ret
+	.size   _times, .-_times

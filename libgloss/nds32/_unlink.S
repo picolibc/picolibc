@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vh.h"
 .extern _impure_ptr
-TYPE1 _lseek, VH_LSEEK
+TYPE1 _unlink, VH_UNLINK
 
 #else	/* not __NDS32_VH__ */
 

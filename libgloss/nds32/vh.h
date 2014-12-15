@@ -43,6 +43,9 @@ BREAK #SWID definition:
 #define VH_ISATTY       0x7F2B
 #define VH_SYSTEM       0x7F2C
 #define VH_GETERR       0x7F2D	/* The method we get errno.  */
+#define VH_GETPID       0x7F2E
+#define VH_KILL         0x7F2F
+#define VH_TIMES        0x7F30
 
 
 /* Define macros that generate assembly output.

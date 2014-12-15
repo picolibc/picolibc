@@ -27,11 +27,20 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
-#ifndef __NDS32_VH__
-
-#include "../syscall.h"
-#include "syscall_extra.h"
-SYS_WRAPPER _kill, SYS_kill
-
-#endif	/* not __NDS32_VH__ */
+/* Upon successful completion, 0 shall be returned. Otherwise,
+   -1 shall be returned and errno set to indicate the error.  */
+	.extern	_impure_ptr	/* The first element is _errno.  */
+	.text
+	.global	_kill
+	.type	_kill, @function
+	.align	2
+_kill:
+	/* A minimal implementation has no concept of either signals,
+	   nor of processes to receive those signals. So this function
+	   should always fail with an appropriate value in errno.  */
+	movi	$r0, #22	/* EINVAL: Invalid argument  */
+	l.w     $r15, _impure_ptr
+	swi     $r0, [$r15]
+	movi	$r0, -1		/* Set return value to -1.  */
+	ret
+	.size   _kill, .-_kill
