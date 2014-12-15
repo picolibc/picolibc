@@ -13,6 +13,9 @@ What's new:
 - Add -b/--remove-all option to setfacl to reduce the ACL to only the
   entries representing POSIX permission bits.
 
+- Add -k/--remove-default option to setfacl to remove all default ACL
+  entries from an ACL.
+
 - Provide Cygwin documentation (PDFs and HTML) for offline usage in
   /usr/share/doc/cygwin-${version}.
 
