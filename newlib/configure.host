@@ -238,9 +238,9 @@ case "${host_cpu}" in
 	;;
   nds32*)
 	machine_dir=nds32
-	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED "
-	newlib_cflags="${newlib_cflags} -DSMALL_MEMORY "
+	libm_machine_dir=nds32
 	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections"
+	newlib_cflags="${newlib_cflags} -DHAVE_RENAME"
 	;;
   nios2*)
 	machine_dir=nios2

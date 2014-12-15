@@ -1,3 +1,16 @@
+2014-12-15  Nick Hung  <nick@andestech.com>
+
+	* configure.host: Add libm nds32 machine directory.
+	* libm/machine/configure: Regenerated.
+	* libm/machine/configure.in: Add nds32 AC_CONFIG.
+	* libm/machine/nds32/Makefile.am: New file.
+	* libm/machine/nds32/Makefile.in: Generated.
+	* libm/machine/nds32/aclocal.m4: Generated.
+	* libm/machine/nds32/configure: Generated.
+	* libm/machine/nds32/configure.in: New file.
+	* libm/machine/nds32/w_sqrt.S: New file.
+	* libm/machine/nds32/wf_sqrt.S: New file.
+
 2014-12-15  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/stdlib.h: Include sys/cdefs.h to avoid undefined
