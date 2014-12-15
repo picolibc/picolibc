@@ -146,6 +146,7 @@ ELIX_4_SOURCES = \
 	fpurge.c		\
 	fputwc.c		\
 	fputws.c		\
+	fsetlocking.c		\
 	funopen.c		\
 	fwide.c			\
 	fwprintf.c		\
@@ -357,6 +358,7 @@ CHEWOUT_FILES = \
 	fread.def		\
 	freopen.def		\
 	fseek.def		\
+	fsetlocking.def		\
 	fsetpos.def		\
 	ftell.def		\
 	funopen.def		\
@@ -433,6 +435,7 @@ $(lpfx)fputws.$(oext): local.h fvwrite.h
 $(lpfx)fread.$(oext): local.h
 $(lpfx)freopen.$(oext): local.h
 $(lpfx)fseek.$(oext): local.h
+$(lpfx)fsetlocking.$(oext): local.h
 $(lpfx)ftell.$(oext): local.h
 $(lpfx)funopen.$(oext): local.h
 $(lpfx)fvwrite.$(oext): local.h fvwrite.h

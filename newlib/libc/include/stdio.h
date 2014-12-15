@@ -83,6 +83,7 @@ typedef _fpos64_t fpos64_t;
 #define	__SL64	0x8000		/* is 64-bit offset large file */
 
 /* _flags2 flags */
+#define	__SNLK  0x0001		/* stdio functions do not lock streams themselves */
 #define	__SWID	0x2000		/* true => stream orientation wide, false => byte, only valid if __SORD in _flags is true */
 
 /*

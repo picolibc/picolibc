@@ -1,3 +1,19 @@
+2014-12-15  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* libc/include/stdio.h (__SNLK): Define.
+	* libc/include/stdio_ext.h (FSETLOCKING_QUERY, FSETLOCKING_INTERNAL,
+	FSETLOCKING_BYCALLER): Define.
+	(__fsetlocking): Declare.
+	* libc/stdio/Makefile.am: Build fsetlocking.c.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio/fsetlocking.c: New file.
+	* libc/stdio/local.h (_newlib_flockfile_start): Make _flockfile
+	call dependent on __SNLK flag.
+	(_newlib_flockfile_exit, _newlib_flockfile_end): Ditto for
+	_funlockfile calls.
+	Define all locking macros as empty if __SINGLE_THREAD__.
+	* libc/stdio/stdio.tex: Include fsetlocking.def.
+
 2014-12-15  Nick Hung  <nick@andestech.com>
 
 	* newlib/libc/include/machine/setjmp.h: Add FPU support.

@@ -13,14 +13,18 @@
 
 #include <stdio.h>
 
+#define	FSETLOCKING_QUERY	0
+#define	FSETLOCKING_INTERNAL	1
+#define	FSETLOCKING_BYCALLER	2
+
 _BEGIN_STD_C
 
 void	 _EXFUN(__fpurge,(FILE *));
+int	 _EXFUN(__fsetlocking,(FILE *, int));
 
 /* TODO:
 
    void _flushlbf (void);
-   int __fsetlocking (FILE *__fp, int __type);
 */
 
 #ifdef  __GNUC__

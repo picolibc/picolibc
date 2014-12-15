@@ -143,6 +143,7 @@ am__objects_2 = $(am__objects_1) lib_a-clearerr.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fpurge.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fputwc.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fputws.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fsetlocking.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-funopen.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fwide.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-fwprintf.$(OBJEXT) \
@@ -206,6 +207,7 @@ am__objects_8 = $(am__objects_7) clearerr.lo fclose.lo fdopen.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fpurge.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fputwc.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fputws.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fsetlocking.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	funopen.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fwide.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fwprintf.lo \
@@ -514,6 +516,7 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fpurge.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fputwc.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fputws.c		\
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fsetlocking.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	funopen.c		\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fwide.c			\
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	fwprintf.c		\
@@ -631,6 +634,7 @@ CHEWOUT_FILES = \
 	fread.def		\
 	freopen.def		\
 	fseek.def		\
+	fsetlocking.def		\
 	fsetpos.def		\
 	ftell.def		\
 	funopen.def		\
@@ -1355,6 +1359,12 @@ lib_a-fputws.o: fputws.c
 lib_a-fputws.obj: fputws.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fputws.obj `if test -f 'fputws.c'; then $(CYGPATH_W) 'fputws.c'; else $(CYGPATH_W) '$(srcdir)/fputws.c'; fi`
 
+lib_a-fsetlocking.o: fsetlocking.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fsetlocking.o `test -f 'fsetlocking.c' || echo '$(srcdir)/'`fsetlocking.c
+
+lib_a-fsetlocking.obj: fsetlocking.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fsetlocking.obj `if test -f 'fsetlocking.c'; then $(CYGPATH_W) 'fsetlocking.c'; else $(CYGPATH_W) '$(srcdir)/fsetlocking.c'; fi`
+
 lib_a-funopen.o: funopen.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-funopen.o `test -f 'funopen.c' || echo '$(srcdir)/'`funopen.c
 
@@ -1772,6 +1782,7 @@ $(lpfx)fputws.$(oext): local.h fvwrite.h
 $(lpfx)fread.$(oext): local.h
 $(lpfx)freopen.$(oext): local.h
 $(lpfx)fseek.$(oext): local.h
+$(lpfx)fsetlocking.$(oext): local.h
 $(lpfx)ftell.$(oext): local.h
 $(lpfx)funopen.$(oext): local.h
 $(lpfx)fvwrite.$(oext): local.h fvwrite.h
