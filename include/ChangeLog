@@ -1,3 +1,27 @@
+2014-12-11  Uros Bizjak  <ubizjak@gmail.com>
+            Ben Elliston  <bje@au.ibm.com>
+            Manuel Lopez-Ibanez  <manu@gcc.gnu.org>
+
+	* libiberty.h (xvasprintf): Declare.
+
+2014-12-09  Trevor Saunders  <tsaunders@mozilla.com>
+
+	* hashtab.h, splay-tree.h: Remove GTY markers.
+
+2014-12-08  Mark Wielaard  <mjw@redhat.com>
+
+	PR debug/60782
+	* dwarf2.def: Add DWARFv5 DW_TAG_atomic_type.
+
+2014-11-21  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf2.h: Add DW_LANG_C_plus_plus_11, DW_LANG_C11 and
+	DW_LANG_C_plus_plus_14.
+
+2014-11-25  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf2.def (DW_AT_noreturn): New DWARF5 attribute.
+
 2014-11-14  Shinichiro Hamaji  <shinichiro.hamaji@gmail.com>
 
 	* dwarf2.def (DW_AT_APPLE_optimized, DW_AT_APPLE_flags)
