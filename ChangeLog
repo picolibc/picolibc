@@ -1,3 +1,8 @@
+2014-12-16  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* config.sub: Merge from binutils.
+	* config.guess: Ditto.
+
 2014-07-05  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
 
 	* configure.ac: Don't accept isl 0.10.
