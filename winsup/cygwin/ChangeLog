@@ -1,4 +1,9 @@
-2014-12-15  Corinna Vinschen  <corinna@vinschen.de>
+2014-12-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (find_fast_cwd): Point to problem reporting web site rather
+	than to mailing list.
+
+2014-12-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (warn_msdos): Slightly reformat.
 	(find_fast_cwd): Change warning message to urge an update before

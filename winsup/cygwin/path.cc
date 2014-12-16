@@ -4212,7 +4212,7 @@ find_fast_cwd ()
 "  Couldn't compute FAST_CWD pointer.  This typically occurs if you're using\n"
 "  an older Cygwin version on a newer Windows.  Please update to the latest\n"
 "  available Cygwin version from https://cygwin.com/.  If the problem persists,\n"
-"  report this problem to the public mailing list cygwin@cygwin.com\n\n");
+"  please see https://cygwin.com/problems.html\n\n");
   if (f_cwd_ptr && *f_cwd_ptr)
     {
       /* Just evaluate structure version. */
