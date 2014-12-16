@@ -1,3 +1,8 @@
+2014-12-16  DJ Delorie  <dj@redhat.com>
+
+	* libc/stdlib/nano-mallocr.c (ALIGN_TO): Do not assume that
+	integers are as big as pointers.
+
 2014-12-16  Richard Earnshaw  <rearnsha@arm.com>
 
 	* libc/machine/aarch64/strcpy.S: Improve handling of short strings.

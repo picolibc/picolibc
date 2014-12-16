@@ -105,7 +105,7 @@
 #define current_mallinfo __malloc_current_mallinfo
 
 #define ALIGN_TO(size, align) \
-    (((size) + (align) -1) & ~((align) -1))
+    (((size) + (align) -1L) & ~((align) -1L))
 
 /* Alignment of allocated block */
 #define MALLOC_ALIGN (8U)
