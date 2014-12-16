@@ -1,3 +1,7 @@
+2014-12-16  Richard Earnshaw  <rearnsha@arm.com>
+
+	* libc/machine/aarch64/strcpy.S: Improve handling of short strings.
+
 2014-12-16  Jon Beniston  <jon@beniston.com>
 
 	* libc/include/stdlib.h (__itoa):  Declare prototype.
