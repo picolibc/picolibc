@@ -1,3 +1,14 @@
+2014-12-16  Jon Beniston  <jon@beniston.com>
+
+	* libc/include/stdlib.h (__itoa):  Declare prototype.
+	(__utoa): Ditto.
+	(itoa): Ditto, non-strict-ANSI only.
+	(utoa): Ditto.
+	* libc/stdlib/Makefile.am: Add itoa.c and utoa.c.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/itoa.c: New file.
+	* libc/stdlib/utoa.c: New file.
+
 2014-12-15  Jonathan Roelofs  <jonathan@codesourcery.com>
 
 	* libc/include/math.h: Add log2l,logbl,nexttowardf,

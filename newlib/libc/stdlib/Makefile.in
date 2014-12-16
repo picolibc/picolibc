@@ -94,17 +94,18 @@ am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-eprintf.$(OBJEXT) lib_a-exit.$(OBJEXT) \
 	lib_a-gdtoa-gethex.$(OBJEXT) lib_a-gdtoa-hexnan.$(OBJEXT) \
 	lib_a-getenv.$(OBJEXT) lib_a-getenv_r.$(OBJEXT) \
-	lib_a-labs.$(OBJEXT) lib_a-ldiv.$(OBJEXT) \
-	lib_a-ldtoa.$(OBJEXT) lib_a-malloc.$(OBJEXT) \
-	lib_a-mblen.$(OBJEXT) lib_a-mblen_r.$(OBJEXT) \
-	lib_a-mbstowcs.$(OBJEXT) lib_a-mbstowcs_r.$(OBJEXT) \
-	lib_a-mbtowc.$(OBJEXT) lib_a-mbtowc_r.$(OBJEXT) \
-	lib_a-mlock.$(OBJEXT) lib_a-mprec.$(OBJEXT) \
-	lib_a-mstats.$(OBJEXT) lib_a-rand.$(OBJEXT) \
-	lib_a-rand_r.$(OBJEXT) lib_a-realloc.$(OBJEXT) \
-	lib_a-reallocf.$(OBJEXT) lib_a-sb_charsets.$(OBJEXT) \
-	lib_a-strtod.$(OBJEXT) lib_a-strtol.$(OBJEXT) \
-	lib_a-strtoul.$(OBJEXT) lib_a-wcstod.$(OBJEXT) \
+	lib_a-itoa.$(OBJEXT) lib_a-labs.$(OBJEXT) \
+	lib_a-ldiv.$(OBJEXT) lib_a-ldtoa.$(OBJEXT) \
+	lib_a-malloc.$(OBJEXT) lib_a-mblen.$(OBJEXT) \
+	lib_a-mblen_r.$(OBJEXT) lib_a-mbstowcs.$(OBJEXT) \
+	lib_a-mbstowcs_r.$(OBJEXT) lib_a-mbtowc.$(OBJEXT) \
+	lib_a-mbtowc_r.$(OBJEXT) lib_a-mlock.$(OBJEXT) \
+	lib_a-mprec.$(OBJEXT) lib_a-mstats.$(OBJEXT) \
+	lib_a-rand.$(OBJEXT) lib_a-rand_r.$(OBJEXT) \
+	lib_a-realloc.$(OBJEXT) lib_a-reallocf.$(OBJEXT) \
+	lib_a-sb_charsets.$(OBJEXT) lib_a-strtod.$(OBJEXT) \
+	lib_a-strtol.$(OBJEXT) lib_a-strtoul.$(OBJEXT) \
+	lib_a-utoa.$(OBJEXT) lib_a-wcstod.$(OBJEXT) \
 	lib_a-wcstol.$(OBJEXT) lib_a-wcstoul.$(OBJEXT) \
 	lib_a-wcstombs.$(OBJEXT) lib_a-wcstombs_r.$(OBJEXT) \
 	lib_a-wctomb.$(OBJEXT) lib_a-wctomb_r.$(OBJEXT) \
@@ -151,13 +152,13 @@ am__objects_9 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	__ten_mu.lo _Exit.lo abort.lo abs.lo assert.lo atexit.lo \
 	atof.lo atoff.lo atoi.lo atol.lo calloc.lo div.lo dtoa.lo \
 	dtoastub.lo environ.lo envlock.lo eprintf.lo exit.lo \
-	gdtoa-gethex.lo gdtoa-hexnan.lo getenv.lo getenv_r.lo labs.lo \
-	ldiv.lo ldtoa.lo malloc.lo mblen.lo mblen_r.lo mbstowcs.lo \
-	mbstowcs_r.lo mbtowc.lo mbtowc_r.lo mlock.lo mprec.lo \
-	mstats.lo rand.lo rand_r.lo realloc.lo reallocf.lo \
-	sb_charsets.lo strtod.lo strtol.lo strtoul.lo wcstod.lo \
-	wcstol.lo wcstoul.lo wcstombs.lo wcstombs_r.lo wctomb.lo \
-	wctomb_r.lo $(am__objects_8)
+	gdtoa-gethex.lo gdtoa-hexnan.lo getenv.lo getenv_r.lo itoa.lo \
+	labs.lo ldiv.lo ldtoa.lo malloc.lo mblen.lo mblen_r.lo \
+	mbstowcs.lo mbstowcs_r.lo mbtowc.lo mbtowc_r.lo mlock.lo \
+	mprec.lo mstats.lo rand.lo rand_r.lo realloc.lo reallocf.lo \
+	sb_charsets.lo strtod.lo strtol.lo strtoul.lo utoa.lo \
+	wcstod.lo wcstol.lo wcstoul.lo wcstombs.lo wcstombs_r.lo \
+	wctomb.lo wctomb_r.lo $(am__objects_8)
 am__objects_10 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
 	efgcvt.lo erand48.lo jrand48.lo lcong48.lo lrand48.lo \
 	mrand48.lo msize.lo mtrim.lo nrand48.lo rand48.lo seed48.lo \
@@ -355,12 +356,12 @@ GENERAL_SOURCES = __adjust.c __atexit.c __call_atexit.c __exp10.c \
 	__ten_mu.c _Exit.c abort.c abs.c assert.c atexit.c atof.c \
 	atoff.c atoi.c atol.c calloc.c div.c dtoa.c dtoastub.c \
 	environ.c envlock.c eprintf.c exit.c gdtoa-gethex.c \
-	gdtoa-hexnan.c getenv.c getenv_r.c labs.c ldiv.c ldtoa.c \
+	gdtoa-hexnan.c getenv.c getenv_r.c itoa.o labs.c ldiv.c ldtoa.c \
 	malloc.c mblen.c mblen_r.c mbstowcs.c mbstowcs_r.c mbtowc.c \
 	mbtowc_r.c mlock.c mprec.c mstats.c rand.c rand_r.c realloc.c \
-	reallocf.c sb_charsets.c strtod.c strtol.c strtoul.c wcstod.c \
-	wcstol.c wcstoul.c wcstombs.c wcstombs_r.c wctomb.c wctomb_r.c \
-	$(am__append_1)
+	reallocf.c sb_charsets.c strtod.c strtol.c strtoul.c utoa.c \
+	wcstod.c wcstol.c wcstoul.c wcstombs.c wcstombs_r.c wctomb.c \
+	wctomb_r.c $(am__append_1)
 @NEWLIB_NANO_MALLOC_FALSE@MALIGNR = malignr
 @NEWLIB_NANO_MALLOC_TRUE@MALIGNR = nano-malignr
 @NEWLIB_NANO_MALLOC_FALSE@MALLOPTR = malloptr
@@ -495,6 +496,7 @@ CHEWOUT_FILES = \
 	envlock.def	\
 	exit.def	\
 	getenv.def	\
+	itoa.def	\
 	labs.def	\
 	ldiv.def	\
 	llabs.def	\
@@ -515,6 +517,7 @@ CHEWOUT_FILES = \
 	strtoll.def 	\
 	strtoul.def 	\
 	strtoull.def 	\
+	utoa.def	\
 	wcsnrtombs.def	\
 	wcstod.def 	\
 	wcstol.def 	\
@@ -754,6 +757,12 @@ lib_a-getenv_r.o: getenv_r.c
 lib_a-getenv_r.obj: getenv_r.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getenv_r.obj `if test -f 'getenv_r.c'; then $(CYGPATH_W) 'getenv_r.c'; else $(CYGPATH_W) '$(srcdir)/getenv_r.c'; fi`
 
+lib_a-itoa.o: itoa.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-itoa.o `test -f 'itoa.c' || echo '$(srcdir)/'`itoa.c
+
+lib_a-itoa.obj: itoa.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-itoa.obj `if test -f 'itoa.c'; then $(CYGPATH_W) 'itoa.c'; else $(CYGPATH_W) '$(srcdir)/itoa.c'; fi`
+
 lib_a-labs.o: labs.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-labs.o `test -f 'labs.c' || echo '$(srcdir)/'`labs.c
 
@@ -879,6 +888,12 @@ lib_a-strtoul.o: strtoul.c
 
 lib_a-strtoul.obj: strtoul.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoul.obj `if test -f 'strtoul.c'; then $(CYGPATH_W) 'strtoul.c'; else $(CYGPATH_W) '$(srcdir)/strtoul.c'; fi`
+
+lib_a-utoa.o: utoa.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-utoa.o `test -f 'utoa.c' || echo '$(srcdir)/'`utoa.c
+
+lib_a-utoa.obj: utoa.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-utoa.obj `if test -f 'utoa.c'; then $(CYGPATH_W) 'utoa.c'; else $(CYGPATH_W) '$(srcdir)/utoa.c'; fi`
 
 lib_a-wcstod.o: wcstod.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstod.o `test -f 'wcstod.c' || echo '$(srcdir)/'`wcstod.c

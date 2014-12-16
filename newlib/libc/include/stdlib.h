@@ -176,6 +176,12 @@ char *	_EXFUN(ecvtbuf,(double, int, int*, int*, char *));
 char *	_EXFUN(fcvtbuf,(double, int, int*, int*, char *));
 char *	_EXFUN(ecvtf,(float,int,int *,int *));
 char *	_EXFUN(dtoa,(double, int, int, int *, int*, char**));
+#endif
+char *	_EXFUN(__itoa,(int, char *, int));
+char *	_EXFUN(__utoa,(unsigned, char *, int));
+#ifndef __STRICT_ANSI__
+char *	_EXFUN(itoa,(int, char *, int));
+char *	_EXFUN(utoa,(unsigned, char *, int));
 int	_EXFUN(rand_r,(unsigned *__seed));
 
 double _EXFUN(drand48,(_VOID));
