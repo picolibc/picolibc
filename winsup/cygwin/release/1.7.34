@@ -19,6 +19,16 @@ What's new:
 - Provide Cygwin documentation (PDFs and HTML) for offline usage in
   /usr/share/doc/cygwin-${version}.
 
+- New APIs: qsort_r, __bsd_qsort_r.
+
+- New APIs: __fbufsize, __flbf, __fpending, __freadable, __freading,
+  __fsetlocking, __fwritable, __fwriting.
+
+- New APIs: clearerr_unlocked, feof_unlocked, ferror_unlocked, fflush_unlocked,
+  fgetc_unlocked, fgets_unlocked, fgetwc_unlocked, fgetws_unlocked,
+  fileno_unlocked, fputc_unlocked, fputs_unlocked, fputwc_unlocked,
+  fputws_unlocked, fread_unlocked, fwrite_unlocked, getwc_unlocked,
+  getwchar_unlocked, putwc_unlocked, putwchar_unlocked.
 
 What changed:
 -------------

@@ -458,12 +458,19 @@ details. */
       280: Static atexit in libcygwin.a, CW_FIXED_ATEXIT.
       281: Add CW_GETNSS_PWD_SRC, CW_GETNSS_GRP_SRC.
       282: Export __bsd_qsort_r, qsort_r.
+      283: Export __fbufsize, __flbf, __fpending, __freadable, __freading,
+           __fsetlocking, __fwritable, __fwriting. clearerr_unlocked,
+           feof_unlocked, ferror_unlocked, fflush_unlocked, fgetc_unlocked,
+           fgets_unlocked, fgetwc_unlocked, fgetws_unlocked, fileno_unlocked,
+           fputc_unlocked, fputs_unlocked, fputwc_unlocked, fputws_unlocked,
+           fread_unlocked, fwrite_unlocked, getwc_unlocked, getwchar_unlocked,
+           putwc_unlocked, putwchar_unlocked.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 282
+#define CYGWIN_VERSION_API_MINOR 283
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

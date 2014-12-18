@@ -49,9 +49,17 @@ __dn_expand SIGFE
 __dn_skipname SIGFE
 __eprintf SIGFE
 __errno NOSIGFE
+__fbufsize NOSIGFE
+__flbf NOSIGFE
 __fpclassifyd NOSIGFE
 __fpclassifyf NOSIGFE
+__fpending NOSIGFE
 __fpurge SIGFE
+__freadable NOSIGFE
+__freading NOSIGFE
+__fsetlocking SIGFE
+__fwritable NOSIGFE
+__fwriting NOSIGFE
 __getreent NOSIGFE
 __infinity NOSIGFE
 __isinfd NOSIGFE
@@ -209,6 +217,7 @@ cimag NOSIGFE
 cimagf NOSIGFE
 cleanup_glue NOSIGFE
 clearerr SIGFE
+clearerr_unlocked SIGFE
 clock SIGFE
 clock_getcpuclockid SIGFE
 clock_getres SIGFE
@@ -364,8 +373,10 @@ fegetprec NOSIGFE
 fegetround NOSIGFE
 feholdexcept SIGFE
 feof SIGFE
+feof_unlocked SIGFE
 feraiseexcept SIGFE
 ferror SIGFE
+ferror_unlocked SIGFE
 fesetenv SIGFE
 fesetexceptflag SIGFE
 fesetprec NOSIGFE
@@ -374,16 +385,22 @@ fetestexcept NOSIGFE
 feupdateenv SIGFE
 fexecve SIGFE
 fflush SIGFE
+fflush_unlocked SIGFE
 ffs NOSIGFE
 ffsl NOSIGFE
 ffsll NOSIGFE
 fgetc SIGFE
+fgetc_unlocked SIGFE
 fgetpos SIGFE
 fgets SIGFE
+fgets_unlocked SIGFE
 fgetwc SIGFE
+fgetwc_unlocked SIGFE
 fgetws SIGFE
+fgetws_unlocked SIGFE
 fgetxattr SIGFE
 fileno SIGFE
+fileno_unlocked SIGFE
 finite NOSIGFE
 finitef NOSIGFE
 fiprintf SIGFE
@@ -410,10 +427,15 @@ fpathconf SIGFE
 fprintf SIGFE
 fpurge SIGFE
 fputc SIGFE
+fputc_unlocked SIGFE
 fputs SIGFE
+fputs_unlocked SIGFE
 fputwc SIGFE
+fputwc_unlocked SIGFE
 fputws SIGFE
+fputws_unlocked SIGFE
 fread SIGFE
+fread_unlocked SIGFE
 free SIGFE
 freeaddrinfo = cygwin_freeaddrinfo SIGFE
 freeifaddrs SIGFE
@@ -454,6 +476,7 @@ futimesat SIGFE
 fwide SIGFE
 fwprintf SIGFE
 fwrite SIGFE
+fwrite_unlocked SIGFE
 fwscanf SIGFE
 gai_strerror = cygwin_gai_strerror NOSIGFE
 gamma NOSIGFE
@@ -546,7 +569,9 @@ getutxid SIGFE
 getutxline SIGFE
 getw SIGFE
 getwc SIGFE
+getwc_unlocked SIGFE
 getwchar SIGFE
+getwchar_unlocked SIGFE
 getwd SIGFE
 getxattr SIGFE
 glob SIGFE
@@ -918,7 +943,9 @@ pututline SIGFE
 pututxline SIGFE
 putw SIGFE
 putwc SIGFE
+putwc_unlocked SIGFE
 putwchar SIGFE
+putwchar_unlocked SIGFE
 pwrite SIGFE
 qsort NOSIGFE
 qsort_r NOSIGFE
