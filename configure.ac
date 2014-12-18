@@ -1650,9 +1650,12 @@ if test "x$with_isl" != "xno" &&
   dnl with user input.
   ISL_INIT_FLAGS
   dnl The versions of ISL that work for Graphite
-  ISL_CHECK_VERSION(0,11)
+  ISL_CHECK_VERSION(0,10)
   if test "${gcc_cv_isl}" = no ; then
-    ISL_CHECK_VERSION(0,12)
+    ISL_CHECK_VERSION(0,11)
+    if test "${gcc_cv_isl}" = no ; then
+      ISL_CHECK_VERSION(0,12)
+    fi
   fi
   dnl Only execute fail-action, if ISL has been requested.
   ISL_IF_FAILED([
