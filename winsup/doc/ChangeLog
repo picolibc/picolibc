@@ -1,5 +1,9 @@
 2014-12-18  Yaakov Selkowitz  <yselkowitz@cygwin.com>
 
+	* ntsec.xml (ntsec-logonuser): Fix spelling of pw_passwd field.
+
+2014-12-18  Yaakov Selkowitz  <yselkowitz@cygwin.com>
+
 	* new-features.xml (ov-new1.7.34): Document Solaris stdio_ext.h
 	functions and BSD/GNU unlocked stdio extensions.
 	* posix.xml (std-bsd): Add BSD unlocked stdio extensions.

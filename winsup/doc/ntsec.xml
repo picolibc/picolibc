@@ -2311,7 +2311,7 @@ example:</para>
     /* Use standard method on non-Cygwin systems. */
     hashed_password = crypt (cleartext_password, salt);
     if (!user_pwd_entry ||
-        strcmp (hashed_password, user_pwd_entry->pw_password))
+        strcmp (hashed_password, user_pwd_entry->pw_passwd))
       error_exit;
 #endif /* CYGWIN */
 
