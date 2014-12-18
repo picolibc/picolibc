@@ -993,6 +993,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     bindresvport_sa
     cfmakeraw
     cfsetspeed
+    clearerr_unlocked
     daemon
     dn_comp
     dn_expand
@@ -1002,12 +1003,19 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     endusershell
     err
     errx
+    feof_unlocked
+    ferror_unlocked
+    fflush_unlocked
+    fileno_unlocked
+    fgetc_unlocked
     finite
     finitef
     fiprintf
     flock			(see chapter "Implementation Notes")
     forkpty
     fpurge
+    fputc_unlocked
+    fread_unlocked
     freeifaddrs
     fstatfs
     fts_children
@@ -1020,6 +1028,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fts_set_clientptr
     funopen
     futimes
+    fwrite_unlocked
     gamma
     gamma_r
     gammaf
@@ -1144,9 +1153,15 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fegetexcept
     ffsl
     ffsll
+    fgets_unlocked
+    fgetwc_unlocked
+    fgetws_unlocked
     fgetxattr
     flistxattr
     fopencookie
+    fputs_unlocked
+    fputwc_unlocked
+    fputws_unlocked
     fremovexattr
     fsetxattr
     get_avphys_pages
@@ -1158,6 +1173,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getopt_long
     getopt_long_only
     getpt
+    getwc_unlocked
+    getwchar_unlocked
     getxattr
     lgetxattr
     listxattr
@@ -1176,6 +1193,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_getattr_np
     pthread_sigqueue
     ptsname_r
+    putwc_unlocked
+    putwchar_unlocked
     qsort_r			(see chapter "Implementation Notes")
     quotactl
     rawmemchr
@@ -1199,7 +1218,15 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 <sect1 id="std-solaris"><title>System interfaces compatible with Solaris or SunOS functions:</title>
 
 <screen>
+    __fbufsize
+    __flbf
+    __fpending
     __fpurge
+    __freadable
+    __freading
+    __fsetlocking
+    __fwritable
+    __fwriting
     acl
     aclcheck
     aclfrommode

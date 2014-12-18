@@ -60,6 +60,19 @@ default Windows environment into the new process' environment.
 New APIs: qsort_r, __bsd_qsort_r.
 </para></listitem>
 
+<listitem><para>
+New APIs: __fbufsize, __flbf, __fpending, __freadable, __freading,
+__fsetlocking, __fwritable, __fwriting.
+</para></listitem>
+
+<listitem><para>
+New APIs: clearerr_unlocked, feof_unlocked, ferror_unlocked, fflush_unlocked,
+fgetc_unlocked, fgets_unlocked, fgetwc_unlocked, fgetws_unlocked,
+fileno_unlocked, fputc_unlocked, fputs_unlocked, fputwc_unlocked,
+fputws_unlocked, fread_unlocked, fwrite_unlocked, getwc_unlocked,
+getwchar_unlocked, putwc_unlocked, putwchar_unlocked.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
