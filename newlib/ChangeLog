@@ -1,3 +1,35 @@
+2014-12-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * NEWS: Update with 2.2.0 info.
+        * README: Ditto.
+        * acinclude.m4: Change version number to 2.2.0.
+        * libc/libc.texinfo: Ditto.
+        * libm/libm.texinfo: Ditto.
+        * configure: Regenerated.
+        * Makefile.in: Regenerated.
+        * doc/configure: Ditto.
+        * libc/*/configure: Ditto.
+        * libm/*/configure: Ditto.
+        * libc/sys/linux/shared.ld: Add VERS_2.2
+
+2013-12-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * NEWS: Update with 2.1.0 info.
+        * README: Ditto.
+        * acinclude.m4: Change version number to 2.1.0.
+        * aclocal.m4: Regenerated.
+        * configure: Ditto.
+        * Makefile.in: Regenerated.
+        * doc/aclocal.m4: Ditto.
+        * doc/configure: Ditto.
+        * libc/*/aclocal.m4: Ditto.
+        * libc/*/configure: Ditto.
+        * libc/libc.texinfo: Ditto.
+        * libm/*/aclocal.m4: Ditto.
+        * libm/*/configure: Ditto.
+        * libm/libm.texinfo: Ditto.
+        * libc/sys/linux/shared.ld: Add VERS_2.1
+
 2014-12-18  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	Implement BSD/GNU unlocked stdio extensions.

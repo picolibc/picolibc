@@ -1,3 +1,15 @@
+*** Major changes in newlib version 2.2.0:
+
+- multiple functional/performance enhancements for arm/aarch64
+- new nano formatted I/O support
+- replacement of or16/or32 with or1k platform
+- qsort_r support
+- additional long double math routines
+- ito/utoa/ltoa
+- restructuring of gmtime/localtime so tz functions only linked by localtime
+- unlocked I/O functions
+- various warning clean-ups
+
 *** Major changes in newlib version 2.1.0:
 
 - multibyte decimal point support added to
