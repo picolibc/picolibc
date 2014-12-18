@@ -45,9 +45,6 @@ Permission denied
 o EADDRINUSE
 Address already in use
 
-o EADDRNOTAVAIL
-Address not available
-
 o EADV
 Advertise error
 
@@ -69,9 +66,6 @@ Bad message
 o EBUSY
 Device or resource busy
 
-o ECANCELED
-Operation canceled
-
 o ECHILD
 No children
 
@@ -84,9 +78,6 @@ Software caused connection abort
 o ECONNREFUSED
 Connection refused
 
-o ECONNRESET
-Connection reset by peer
-
 o EDEADLK
 Deadlock
 
@@ -97,7 +88,7 @@ o EEXIST
 File exists
 
 o EDOM
-Mathematics argument out of domain of function
+Math argument
 
 o EFAULT
 Bad address
@@ -113,9 +104,6 @@ Host is unreachable
 
 o EIDRM
 Identifier removed
-
-o EILSEQ
-Illegal byte sequence
 
 o EINPROGRESS
 Connection already in progress
@@ -151,7 +139,7 @@ o ELIBSCN
 <<.lib>> section in a.out corrupted
 
 o EMFILE
-File descriptor value too large
+Too many open files
 
 o EMLINK
 Too many links
@@ -166,22 +154,13 @@ o ENAMETOOLONG
 File or path name too long
 
 o ENETDOWN
-Network interface is not configured
-
-o ENETRESET
-Connection aborted by network
+Network interface not configured
 
 o ENETUNREACH
 Network is unreachable
 
 o ENFILE
 Too many open files in system
-
-o ENOBUFS
-No buffer space available
-
-o ENODATA
-No data
 
 o ENODEV
 No such device
@@ -237,9 +216,6 @@ Not a directory
 o ENOTEMPTY
 Directory not empty
 
-o ENOTRECOVERABLE
-State not recoverable
-
 o ENOTSOCK
 Socket operation on non-socket
 
@@ -251,15 +227,6 @@ Not a character device
 
 o ENXIO
 No such device or address
-
-o EOPNOTSUPP
-Operation not supported on socket
-
-o EOVERFLOW
-Value too large for defined data type
-
-o EOWNERDEAD
-Previous owner died
 
 o EPERM
 Not owner
@@ -300,9 +267,6 @@ No such process
 o ESRMNT
 Srmount error
 
-o ESTRPIPE
-Strings pipe error
-
 o ETIME
 Stream ioctl timeout
 
@@ -312,11 +276,20 @@ Connection timed out
 o ETXTBSY
 Text file busy
 
-o EWOULDBLOCK
-Operation would block (usually same as EAGAIN)
-
 o EXDEV
 Cross-device link
+
+o ECANCELED
+Operation canceled
+
+o ENOTRECOVERABLE
+State not recoverable
+
+o EOWNERDEAD
+Previous owner died
+
+o ESTRPIPE
+Strings pipe error
 
 o-
 
@@ -531,11 +504,6 @@ _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
       error = "Network interface is not configured";
       break;
 #endif
-#ifdef ENETRESET
-    case ENETRESET:
-      error = "Connection aborted by network";
-      break;
-#endif
 #ifdef ENFILE
     case ENFILE:
       error = "Too many open files in system";
@@ -543,7 +511,7 @@ _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
 #endif
 #ifdef EMFILE
     case EMFILE:
-      error = "File descriptor value too large";
+      error = "Too many open files";
       break;
 #endif
 #ifdef ENOTTY
@@ -598,7 +566,7 @@ _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
 #endif
 #ifdef EDOM
     case EDOM:
-      error = "Mathematics argument out of domain of function";
+      error = "Math argument";
       break;
 #endif
 #ifdef ERANGE
@@ -614,11 +582,6 @@ _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
 #ifdef EIDRM
     case EIDRM:
       error = "Identifier removed";
-      break;
-#endif
-#ifdef EILSEQ
-    case EILSEQ:
-      error = "Illegal byte sequence";
       break;
 #endif
 #ifdef EDEADLK
@@ -761,11 +724,6 @@ _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
       error = "No buffer space available";
       break;
 #endif
-#ifdef ENODATA
-    case ENODATA:
-      error = "No data";
-      break;
-#endif
 #ifdef EAFNOSUPPORT
     case EAFNOSUPPORT:
       error = "Address family not supported by protocol family";
@@ -796,19 +754,9 @@ _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
       error = "Connection refused";
       break;
 #endif
-#ifdef ECONNRESET
-    case ECONNRESET:
-      error = "Connection reset by peer";
-      break;
-#endif
 #ifdef EADDRINUSE
     case EADDRINUSE:
       error = "Address already in use";
-      break;
-#endif
-#ifdef EADDRNOTAVAIL
-    case EADDRNOTAVAIL:
-      error = "Address not available";
       break;
 #endif
 #ifdef ECONNABORTED
@@ -860,11 +808,6 @@ _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
     case EOPNOTSUPP:
         error = "Operation not supported on socket";
         break;
-#endif
-#ifdef EOVERFLOW
-    case EOVERFLOW:
-      error = "Value too large for defined data type";
-      break;
 #endif
 #ifdef EMSGSIZE
     case EMSGSIZE:

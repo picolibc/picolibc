@@ -71,7 +71,6 @@ default_newlib_io_long_long=no
 default_newlib_io_long_double=no
 default_newlib_io_pos_args=no
 default_newlib_atexit_dynamic_alloc=yes
-default_newlib_nano_malloc=no
 aext=a
 oext=o
 lpfx="lib_a-"
@@ -176,7 +175,7 @@ case "${host_cpu}" in
 	machine_dir=lm32
 	;;
   m32c)
-	machine_dir=m32c	
+	machine_dir=m32c
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
 	;;
 
@@ -229,24 +228,23 @@ case "${host_cpu}" in
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
 	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections "
 	newlib_cflags="${newlib_cflags} -mOs "
-	newlib_cflags="${newlib_cflags} -mhwmult=none "
 	machine_dir=msp430
-	default_newlib_nano_malloc="yes"
 	;;
   mt*)
 	machine_dir=mt
 	;;
   nds32*)
 	machine_dir=nds32
-	libm_machine_dir=nds32
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED "
+	newlib_cflags="${newlib_cflags} -DSMALL_MEMORY "
 	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections"
-	newlib_cflags="${newlib_cflags} -DHAVE_RENAME"
 	;;
   nios2*)
 	machine_dir=nios2
 	;;
-  or1k*|or1knd*)
-	machine_dir=or1k
+  or16)
+	;;
+  or32)
 	;;
   powerpc*)
 	machine_dir=powerpc
@@ -383,10 +381,6 @@ case "${host}" in
 	posix_dir=posix
 	unix_dir=unix
 	;;
-  *-*-tirtos*)
-	sys_dir=tirtos
-	have_crt0="no"
-	;;
   a29k-*-*)
 	sys_dir=a29khif
 	signal_dir=
@@ -502,9 +496,6 @@ case "${host}" in
   nios2*)
 	sys_dir=
 	;;
-  or1k-*-* | or1knd-*-*)
-        syscall_dir=syscalls
-	;;
   powerpcle-*-pe)
 	posix_dir=posix
 	;;
@@ -585,10 +576,6 @@ case "${host}" in
 # doesn't work because VxWorks does not have sbrk.
   *-wrs-vxworks*)
 	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED -DMISSING_SYSCALL_NAMES -DHAVE_FCNTL"
-	;;
-# TIRTOS supplies its own version of malloc
-  *-*-tirtos*)
-	newlib_cflags="${newlib_cflags} -D__DYNAMIC_REENT__ -DMALLOC_PROVIDED"
 	;;
 # UDI doesn't have exec, so system() should fail the right way
   a29k-amd-udi)
@@ -732,14 +719,9 @@ case "${host}" in
   mn10?00-*-*)
 	syscall_dir=syscalls
 	;;
-  moxie-*-elf* | moxie-*-rtems*)
+  moxie-*-*)
         syscall_dir=syscalls
 	default_newlib_io_long_long="yes"
-        ;;
-  moxie-*-moxiebox)
-        syscall_dir=syscalls
-	default_newlib_io_long_long="yes"
-	newlib_cflags="${newlib_cflags} -Os -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
         ;;
   nios2*)
 	syscall_dir=
@@ -850,13 +832,6 @@ fi
 if [ "x${newlib_atexit_dynamic_alloc}" = "x" ]; then
 	if [ ${default_newlib_atexit_dynamic_alloc} = "yes" ]; then
 		newlib_atexit_dynamic_alloc="yes"; 
-	fi
-fi
-
-# Enable nano-malloc if requested.
-if [ "x${newlib_nano_malloc}" = "x" ]; then
-	if [ ${default_newlib_nano_malloc} = "yes" ]; then
-		newlib_nano_malloc="yes";
 	fi
 fi
 

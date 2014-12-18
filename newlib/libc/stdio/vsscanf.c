@@ -43,12 +43,6 @@ _DEFUN(vsscanf, (str, fmt, ap),
   return _vsscanf_r (_REENT, str, fmt, ap);
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-_EXFUN(vsiscanf, (const char *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vsscanf"))));
-#endif
-
 #endif /* !_REENT_ONLY */
 
 int
@@ -69,9 +63,3 @@ _DEFUN(_vsscanf_r, (ptr, str, fmt, ap),
   f._file = -1;  /* No file. */
   return __ssvfscanf_r (ptr, &f, fmt, ap);
 }
-
-#ifdef _NANO_FORMATTED_IO
-int
-_EXFUN(_vsiscanf_r, (struct _reent *, const char *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_vsscanf_r"))));
-#endif

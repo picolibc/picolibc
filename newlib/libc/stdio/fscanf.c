@@ -50,12 +50,6 @@ fscanf(FILE *fp, fmt, va_alist)
   return ret;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-_EXFUN(fiscanf, (FILE *, const char *, ...)
-       _ATTRIBUTE ((__alias__("fscanf"))));
-#endif
-
 #endif /* !_REENT_ONLY */
 
 int
@@ -82,8 +76,3 @@ _fscanf_r(ptr, FILE *fp, fmt, va_alist)
   return (ret);
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-_EXFUN(_fiscanf_r, (struct _reent *, FILE *, const char *, ...)
-       _ATTRIBUTE ((__alias__("_fscanf_r"))));
-#endif

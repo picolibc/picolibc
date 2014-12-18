@@ -38,7 +38,7 @@
    case _STDIO_CLOSE_PER_REENT_STD_STREAMS is defined these file descriptors
    will be closed via close() provided the owner of the reent structure
    triggerd the on demand reent initilization, see CHECK_INIT(). */
-#if !defined(__rtems__) && !defined(__tirtos__)
+#ifndef __rtems__
 #define _STDIO_CLOSE_PER_REENT_STD_STREAMS
 #endif
 
@@ -60,16 +60,7 @@
 #define _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
 #endif
 
-#if defined(__SINGLE_THREAD__) || defined(__IMPL_UNLOCKED__)
-
-# define _newlib_flockfile_start(_fp)
-# define _newlib_flockfile_exit(_fp)
-# define _newlib_flockfile_end(_fp)
-# define _newlib_sfp_lock_start()
-# define _newlib_sfp_lock_exit()
-# define _newlib_sfp_lock_end()
-
-#elif defined(_STDIO_WITH_THREAD_CANCELLATION_SUPPORT)
+#ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
 #include <pthread.h>
 
 /* Start a stream oriented critical section: */
@@ -77,19 +68,16 @@
 	{ \
 	  int __oldfpcancel; \
 	  pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &__oldfpcancel); \
-	  if (!(_fp->_flags2 & __SNLK)) \
-	    _flockfile (_fp)
+	  _flockfile (_fp)
 
 /* Exit from a stream oriented critical section prematurely: */
 # define _newlib_flockfile_exit(_fp) \
-	  if (!(_fp->_flags2 & __SNLK)) \
-	    _funlockfile (_fp); \
+	  _funlockfile (_fp); \
 	  pthread_setcancelstate (__oldfpcancel, &__oldfpcancel);
 
 /* End a stream oriented critical section: */
 # define _newlib_flockfile_end(_fp) \
-	  if (!(_fp->_flags2 & __SNLK)) \
-	    _funlockfile (_fp); \
+	  _funlockfile (_fp); \
 	  pthread_setcancelstate (__oldfpcancel, &__oldfpcancel); \
 	}
 
@@ -111,20 +99,17 @@
 	  pthread_setcancelstate (__oldsfpcancel, &__oldsfpcancel); \
 	}
 
-#else /* !__SINGLE_THREAD__ && !__IMPL_UNLOCKED__ && !_STDIO_WITH_THREAD_CANCELLATION_SUPPORT */
+#else /* !_STDIO_WITH_THREAD_CANCELLATION_SUPPORT */
 
 # define _newlib_flockfile_start(_fp) \
 	{ \
-		if (!(_fp->_flags2 & __SNLK)) \
-		  _flockfile (_fp)
+		_flockfile(_fp)
 
 # define _newlib_flockfile_exit(_fp) \
-		if (!(_fp->_flags2 & __SNLK)) \
-		  _funlockfile(_fp); \
+		_funlockfile(_fp); \
 
 # define _newlib_flockfile_end(_fp) \
-		if (!(_fp->_flags2 & __SNLK)) \
-		  _funlockfile(_fp); \
+		_funlockfile(_fp); \
 	}
 
 # define _newlib_sfp_lock_start() \
@@ -138,10 +123,8 @@
 		__sfp_lock_release (); \
 	}
 
-#endif /* __SINGLE_THREAD__ || __IMPL_UNLOCKED__ */
+#endif /* _STDIO_WITH_THREAD_CANCELLATION_SUPPORT */
 
-extern wint_t _EXFUN(__fgetwc, (struct _reent *, FILE *));
-extern wint_t _EXFUN(__fputwc, (struct _reent *, wchar_t, FILE *));
 extern u_char *_EXFUN(__sccl, (char *, u_char *fmt));
 extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
 extern int    _EXFUN(__ssvfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
@@ -164,9 +147,6 @@ int	      _EXFUN(_svfiwprintf_r,(struct _reent *, FILE *, const wchar_t *,
 extern FILE  *_EXFUN(__sfp,(struct _reent *));
 extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
 extern int    _EXFUN(__sflush_r,(struct _reent *,FILE *));
-#ifdef _STDIO_BSD_SEMANTICS
-extern int    _EXFUN(__sflushw_r,(struct _reent *,FILE *));
-#endif
 extern int    _EXFUN(__srefill_r,(struct _reent *,FILE *));
 extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(struct _reent *, void *, char *,
 					       _READ_WRITE_BUFSIZE_TYPE));

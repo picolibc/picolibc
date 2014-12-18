@@ -10,10 +10,31 @@
 #define _STDINT_H
 
 #include <machine/_default_types.h>
-#include <sys/_intsup.h>
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if __GNUC_PREREQ (3, 2)
+/* gcc > 3.2 implicitly defines the values we are interested */
+#define __STDINT_EXP(x) __##x##__
+#else
+#define __STDINT_EXP(x) x
+#include <limits.h>
+#endif
+
+/* Check if "long long" is 64bit wide */
+/* Modern GCCs provide __LONG_LONG_MAX__, SUSv3 wants LLONG_MAX */
+#if ( defined(__LONG_LONG_MAX__) && (__LONG_LONG_MAX__ > 0x7fffffff) ) \
+  || ( defined(LLONG_MAX) && (LLONG_MAX > 0x7fffffff) )
+#define __have_longlong64 1
+#endif
+
+/* Check if "long" is 64bit or 32bit wide */
+#if __STDINT_EXP(LONG_MAX) > 0x7fffffff
+#define __have_long64 1
+#elif __STDINT_EXP(LONG_MAX) == 0x7fffffff && !defined(__SPU__)
+#define __have_long32 1
 #endif
 
 #ifdef ___int8_t_defined
@@ -402,26 +423,11 @@ typedef __uintptr_t uintptr_t;
 #endif
 #define PTRDIFF_MIN (-PTRDIFF_MAX - 1)
 
-/* This must match definition in <wchar.h> */
-#ifndef WCHAR_MIN
-#ifdef __WCHAR_MIN__
-#define WCHAR_MIN __WCHAR_MIN__
-#elif defined(__WCHAR_UNSIGNED__) || (L'\0' - 1 > 0)
-#define WCHAR_MIN (0 + L'\0')
-#else
-#define WCHAR_MIN (-0x7fffffff - 1 + L'\0')
-#endif
-#endif
-
-/* This must match definition in <wchar.h> */
-#ifndef WCHAR_MAX
 #ifdef __WCHAR_MAX__
 #define WCHAR_MAX __WCHAR_MAX__
-#elif defined(__WCHAR_UNSIGNED__) || (L'\0' - 1 > 0)
-#define WCHAR_MAX (0xffffffffu + L'\0')
-#else
-#define WCHAR_MAX (0x7fffffff + L'\0')
 #endif
+#ifdef __WCHAR_MIN__
+#define WCHAR_MIN __WCHAR_MIN__
 #endif
 
 /* wint_t is unsigned int on almost all GCC targets.  */

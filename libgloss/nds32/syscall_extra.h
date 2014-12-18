@@ -32,28 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /* These are additional syscalls for nds32 target. */
-#define SYS_rename	3001
-#define SYS_isatty	3002
-#define SYS_system	3003
+#define SYS_rename       3001
+#define SYS_isatty       3002
+#define SYS_system       3003
 
-#define SYS_geterr	6001
-#define SYS_getcmdline	6002
-
-
-/* Define macros that generate assembly output.  */
-.macro SYS_WRAPPER name num
-	.text
-	.global	\name
-	.type	\name, @function
-	.align	2
-\name:
-	/* Make syscall with arg=`\num'.
-	   Reture value `-1' stored in $r0 means there is something wrong.
-	   If there is something wrong, make syscall to get `SYS_geterr' to get
-	   error code to see what exactly happens and store it in errno  .  */
-	syscall	\num		/* Make syscall with arg=`\num'.  */
-	j	__syscall_error_handler
-	.size   \name, .-\name
-.endm
+#define SYS_geterr       6001
 
 #endif /* _SYSCALL_EXTRA_H */

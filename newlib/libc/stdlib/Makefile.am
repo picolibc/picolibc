@@ -31,7 +31,6 @@ GENERAL_SOURCES = \
 	gdtoa-hexnan.c	\
 	getenv.c  	\
 	getenv_r.c	\
-	itoa.c          \
 	labs.c 		\
 	ldiv.c  	\
 	ldtoa.c		\
@@ -53,7 +52,6 @@ GENERAL_SOURCES = \
 	strtod.c	\
 	strtol.c	\
 	strtoul.c	\
-	utoa.c          \
 	wcstod.c	\
 	wcstol.c	\
 	wcstoul.c	\
@@ -259,7 +257,6 @@ CHEWOUT_FILES= \
 	envlock.def	\
 	exit.def	\
 	getenv.def	\
-	itoa.def	\
 	labs.def	\
 	ldiv.def	\
 	llabs.def	\
@@ -280,7 +277,6 @@ CHEWOUT_FILES= \
 	strtoll.def 	\
 	strtoul.def 	\
 	strtoull.def 	\
-	utoa.def	\
 	wcsnrtombs.def	\
 	wcstod.def 	\
 	wcstol.def 	\

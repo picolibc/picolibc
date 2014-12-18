@@ -5,7 +5,6 @@ extern "C" {
 #endif
 #define	_SYS__DEFAULT_FCNTL_H_
 #include <_ansi.h>
-#include <sys/cdefs.h>
 #define	_FOPEN		(-1)	/* from sys/file.h, kernel use only */
 #define	_FREAD		0x0001	/* read enabled */
 #define	_FWRITE		0x0002	/* write enabled */
@@ -44,25 +43,29 @@ extern "C" {
 #define	O_NONBLOCK	_FNONBLOCK
 #define	O_NOCTTY	_FNOCTTY
 /* For machines which care - */
-#if defined (__CYGWIN__)
+#if defined (_WIN32) || defined (__CYGWIN__)
 #define _FBINARY        0x10000
 #define _FTEXT          0x20000
 #define _FNOINHERIT	0x40000
-#define _FDIRECT        0x80000
-#define _FNOFOLLOW      0x100000
-#define _FDIRECTORY     0x200000
-#define _FEXECSRCH      0x400000
 
 #define O_BINARY	_FBINARY
 #define O_TEXT		_FTEXT
+#define O_NOINHERIT	_FNOINHERIT
+/* O_CLOEXEC is the Linux equivalent to O_NOINHERIT */
 #define O_CLOEXEC	_FNOINHERIT
-#define O_DIRECT        _FDIRECT
-#define O_NOFOLLOW      _FNOFOLLOW
-#define O_DSYNC         _FSYNC
-#define O_RSYNC         _FSYNC
-#define O_DIRECTORY     _FDIRECTORY
-#define O_EXEC          _FEXECSRCH
-#define O_SEARCH        _FEXECSRCH
+
+/* The windows header files define versions with a leading underscore.  */
+#define _O_RDONLY	O_RDONLY
+#define _O_WRONLY	O_WRONLY
+#define _O_RDWR		O_RDWR
+#define _O_APPEND	O_APPEND
+#define _O_CREAT	O_CREAT
+#define _O_TRUNC	O_TRUNC
+#define _O_EXCL		O_EXCL
+#define _O_TEXT		O_TEXT
+#define _O_BINARY	O_BINARY
+#define _O_RAW		O_BINARY
+#define _O_NOINHERIT	O_NOINHERIT
 #endif
 
 #ifndef	_POSIX_SOURCE
@@ -133,7 +136,7 @@ extern "C" {
 #define	F_UNLKSYS	4	/* remove remote locks for a given system */
 #endif	/* !_POSIX_SOURCE */
 
-#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || defined(__CYGWIN__)
+#ifdef __CYGWIN__
 /* Special descriptor value to denote the cwd in calls to openat(2) etc. */
 #define AT_FDCWD -2
 
@@ -142,14 +145,6 @@ extern "C" {
 #define AT_SYMLINK_NOFOLLOW     2
 #define AT_SYMLINK_FOLLOW       4
 #define AT_REMOVEDIR            8
-#endif
-
-#if __BSD_VISIBLE
-/* lock operations for flock(2) */
-#define	LOCK_SH		0x01		/* shared file lock */
-#define	LOCK_EX		0x02		/* exclusive file lock */
-#define	LOCK_NB		0x04		/* don't block when locking */
-#define	LOCK_UN		0x08		/* unlock file */
 #endif
 
 /*#include <sys/stdtypes.h>*/
@@ -180,21 +175,17 @@ struct eflock {
 };
 #endif	/* !_POSIX_SOURCE */
 
+
 #include <sys/types.h>
 #include <sys/stat.h>		/* sigh. for the mode bits for open/creat */
 
 extern int open _PARAMS ((const char *, int, ...));
-#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || defined(__CYGWIN__)
-extern int openat _PARAMS ((int, const char *, int, ...));
-#endif
 extern int creat _PARAMS ((const char *, mode_t));
 extern int fcntl _PARAMS ((int, int, ...));
-#if __BSD_VISIBLE
-extern int flock _PARAMS ((int, int));
-#endif
 #ifdef __CYGWIN__
 #include <sys/time.h>
 extern int futimesat _PARAMS ((int, const char *, const struct timeval *));
+extern int openat _PARAMS ((int, const char *, int, ...));
 #endif
 
 /* Provide _<systemcall> prototypes for functions provided by some versions

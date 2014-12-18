@@ -976,7 +976,7 @@ func_enable_tag ()
 
 
   case $host in
-    *cygwin* | *mingw* | *pw32* | *cegcc* | *solaris2* )
+    *cygwin* | *mingw* | *pw32* | *cegcc*)
       # don't eliminate duplications in $postdeps and $predeps
       opt_duplicate_compiler_generated_deps=:
       ;;

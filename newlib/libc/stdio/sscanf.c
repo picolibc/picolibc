@@ -430,12 +430,6 @@ sscanf(str, fmt, va_alist)
   return ret;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-_EXFUN(siscanf, (const char *, const char *, ...)
-       _ATTRIBUTE ((__alias__("sscanf"))));
-#endif
-
 #endif /* !_REENT_ONLY */
 
 #ifdef _HAVE_STDC
@@ -473,9 +467,3 @@ _sscanf_r(ptr, str, fmt, va_alist)
   va_end (ap);
   return ret;
 }
-
-#ifdef _NANO_FORMATTED_IO
-int
-_EXFUN(_siscanf_r, (struct _reent *, const char *, const char *, ...)
-       _ATTRIBUTE ((__alias__("_sscanf_r"))));
-#endif

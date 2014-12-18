@@ -40,7 +40,7 @@ _DEFUN (numtestf, (float),
     }
 
   /* Check for not a number or infinity. */
-  if (exp == 0xff)
+  if (exp == 0x7f8)
     {
       if(wx & 0x7fffff)
         return (NAN);

@@ -202,7 +202,7 @@ _swiread (int file,
 #endif
 }
 
-int __attribute__((weak))
+int
 _read (int file,
        char * ptr,
        int len)
@@ -307,7 +307,7 @@ _swiwrite (
 #endif
 }
 
-int __attribute__((weak))
+int
 _write (int    file,
 	char * ptr,
 	int    len)
@@ -451,7 +451,7 @@ _getpid (int n)
   n = n;
 }
 
-caddr_t __attribute__((weak))
+caddr_t
 _sbrk (int incr)
 {
   extern char   end asm ("end");	/* Defined by the linker.  */

@@ -63,13 +63,13 @@ static int   alloc_segs(HTAB *, int);
 static int   flush_meta(HTAB *);
 static int   hash_access(HTAB *, ACTION, DBT *, DBT *);
 static int   hash_close(DB *);
-static int   hash_delete(const DB *, const DBT *, u_int);
+static int   hash_delete(const DB *, const DBT *, __uint32_t);
 static int   hash_fd(const DB *);
-static int   hash_get(const DB *, const DBT *, DBT *, u_int);
-static int   hash_put(const DB *, DBT *, const DBT *, u_int);
+static int   hash_get(const DB *, const DBT *, DBT *, __uint32_t);
+static int   hash_put(const DB *, DBT *, const DBT *, __uint32_t);
 static void *hash_realloc(SEGMENT **, int, int);
-static int   hash_seq(const DB *, DBT *, DBT *, u_int);
-static int   hash_sync(const DB *, u_int);
+static int   hash_seq(const DB *, DBT *, DBT *, __uint32_t);
+static int   hash_sync(const DB *, __uint32_t);
 static int   hdestroy(HTAB *);
 static HTAB *init_hash(HTAB *, const char *, const HASHINFO *);
 static int   init_htab(HTAB *, int);
@@ -494,7 +494,7 @@ hdestroy(hashp)
 static int
 hash_sync(dbp, flags)
 	const DB *dbp;
-	u_int flags;
+	__uint32_t flags;
 {
 	HTAB *hashp;
 
@@ -573,7 +573,7 @@ hash_get(dbp, key, data, flag)
 	const DB *dbp;
 	const DBT *key;
 	DBT *data;
-	u_int flag;
+	__uint32_t flag;
 {
 	HTAB *hashp;
 
@@ -590,7 +590,7 @@ hash_put(dbp, key, data, flag)
 	const DB *dbp;
 	DBT *key;
 	const DBT *data;
-	u_int flag;
+	__uint32_t flag;
 {
 	HTAB *hashp;
 
@@ -612,7 +612,7 @@ static int
 hash_delete(dbp, key, flag)
 	const DB *dbp;
 	const DBT *key;
-	u_int flag;		/* Ignored */
+	__uint32_t flag;		/* Ignored */
 {
 	HTAB *hashp;
 
@@ -764,7 +764,7 @@ static int
 hash_seq(dbp, key, data, flag)
 	const DB *dbp;
 	DBT *key, *data;
-	u_int flag;
+	__uint32_t flag;
 {
 	__uint32_t bucket;
 	BUFHEAD *bufp;

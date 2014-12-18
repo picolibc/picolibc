@@ -264,10 +264,10 @@ _swiread (int fh,
 #endif
 }
 
-/* fd, is a valid user file handle.
+/* fd, is a valid user file handle. 
    Translates the return of _swiread into
    bytes read. */
-int __attribute__((weak))
+int
 _read (int fd,
        char * ptr,
        int len)
@@ -418,7 +418,7 @@ _swiwrite (
 }
 
 /* fd, is a user file descriptor. */
-int __attribute__((weak))
+int
 _write (int    fd,
 	char * ptr,
 	int    len)
@@ -587,7 +587,7 @@ _getpid (int n __attribute__ ((unused)))
   return 1;
 }
 
-caddr_t __attribute__((weak))
+caddr_t
 _sbrk (int incr)
 {
   extern char end asm ("end"); /* Defined by the linker.  */

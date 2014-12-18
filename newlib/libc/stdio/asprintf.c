@@ -50,12 +50,6 @@ _DEFUN(_asprintf_r, (ptr, strp, fmt),
   return (ret);
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-_EXFUN(_asiprintf_r, (struct _reent *, char **, const char *, ...)
-       _ATTRIBUTE ((__alias__("_asprintf_r"))));
-#endif
-
 #ifndef _REENT_ONLY
 
 int
@@ -83,9 +77,4 @@ _DEFUN(asprintf, (strp, fmt),
   return (ret);
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-_EXFUN(asiprintf, (char **, const char *, ...)
-       _ATTRIBUTE ((__alias__("asprintf"))));
-#endif
 #endif /* ! _REENT_ONLY */

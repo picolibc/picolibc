@@ -49,7 +49,3 @@ VERS_2.0 {
 VERS_2.1 {
 	global: *;
 };
-
-VERS_2.2 {
-	global: *;
-};

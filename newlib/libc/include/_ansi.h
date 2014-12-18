@@ -35,7 +35,7 @@
 #define _END_STD_C  }
 #endif
 #if __GNUC_PREREQ (3, 3)
-#define _NOTHROW __attribute__ ((__nothrow__))
+#define _NOTHROW __attribute__ ((nothrow))
 #else
 #define _NOTHROW throw()
 #endif
@@ -72,6 +72,9 @@
 #ifndef _LONG_DOUBLE
 #define _LONG_DOUBLE long double
 #endif
+#ifndef _LONG_LONG_TYPE
+#define _LONG_LONG_TYPE long long
+#endif
 #ifndef _PARAMS
 #define _PARAMS(paramlist)		paramlist
 #endif
@@ -90,6 +93,7 @@
 #define	_DEFUN_VOID(name)		name()
 #define _CAST_VOID
 #define _LONG_DOUBLE double
+#define _LONG_LONG_TYPE long
 #ifndef _PARAMS
 #define _PARAMS(paramlist)		()
 #endif

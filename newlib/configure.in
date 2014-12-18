@@ -181,7 +181,7 @@ AC_ARG_ENABLE(newlib-nano-malloc,
     no)  newlib_nano_malloc=no  ;;
     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-nano-malloc option) ;;
   esac
- fi], [newlib_nano_malloc=])dnl
+ fi], [newlib_nano_malloc=no])dnl
 
 dnl Support --disable-newlib-unbuf-stream-opt
 AC_ARG_ENABLE(newlib-unbuf-stream-opt,
@@ -206,17 +206,6 @@ AC_ARG_ENABLE(lite-exit,
     *)   AC_MSG_ERROR(bad value ${enableval} for lite-exit option) ;;
   esac
  fi], [lite_exit=no])dnl
-
-dnl Support --enable-newlib-nano-formatted-io
-dnl This option is also read in libc/configure.in.  It is repeated
-dnl here so that it shows up in the help text.
-AC_ARG_ENABLE(newlib_nano_formatted_io,
-[  --enable-newlib-nano-formatted-io    Use nano version formatted IO],
-[case "${enableval}" in
-   yes) newlib_nano_formatted_io=yes ;;
-   no)  newlib_nano_formatted_io=no ;;
-   *) AC_MSG_ERROR(bad value ${enableval} for newlib-nano-formatted-io) ;;
- esac],[newlib_nano_formatted_io=no])
 
 NEWLIB_CONFIGURE(.)
 
@@ -435,10 +424,6 @@ if test "${lite_exit}" = "yes"; then
 AC_DEFINE_UNQUOTED(_LITE_EXIT)
 fi
 
-if test "${newlib_nano_formatted_io}" = "yes"; then
-AC_DEFINE_UNQUOTED(_NANO_FORMATTED_IO)
-fi
-
 dnl
 dnl Parse --enable-newlib-iconv-encodings option argument
 dnl
@@ -616,47 +601,6 @@ rm -f conftest*])
 if test $newlib_cv_ldbl_eq_dbl = yes; then
   AC_DEFINE_UNQUOTED(_LDBL_EQ_DBL)
 fi
-
-#### Determine if uintptr_t is unsigned long long
-AC_CACHE_CHECK(whether uintptr_t equals unsigned long long,
-	       newlib_cv_uintptr_eq_ulonglong, [dnl
-cat > conftest.c <<EOF
-#include <inttypes.h>
-extern int foo(uintptr_t);
-extern int foo(unsigned long long);
-EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
-							1>&AS_MESSAGE_LOG_FD])
-then
-  newlib_cv_uintptr_eq_ulonglong=yes;
-else
-  newlib_cv_uintptr_eq_ulonglong=no;
-fi
-rm -f conftest*])
-if test $newlib_cv_uintptr_eq_ulonglong = yes; then
-  AC_DEFINE_UNQUOTED(_UINTPTR_EQ_ULONGLONG)
-else
-#### Determine if uintptr_t is unsigned long
-AC_CACHE_CHECK(whether uintptr_t equals unsigned long,
-	       newlib_cv_uintptr_eq_ulong, [dnl
-cat > conftest.c <<EOF
-#include <inttypes.h>
-extern int foo(uintptr_t);
-extern int foo(unsigned long);
-EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
-							1>&AS_MESSAGE_LOG_FD])
-then
-  newlib_cv_uintptr_eq_ulong=yes;
-else
-  newlib_cv_uintptr_eq_ulong=no;
-fi
-rm -f conftest*])
-if test $newlib_cv_uintptr_eq_ulong = yes; then
-  AC_DEFINE_UNQUOTED(_UINTPTR_EQ_ULONG)
-fi
-fi
-
 
 AC_SUBST(CFLAGS)
 

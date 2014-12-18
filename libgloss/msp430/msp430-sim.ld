@@ -1,4 +1,4 @@
-/*  Copyright (c) 2013-2014 Red Hat, Inc. All rights reserved.
+/* Copyright (c) 2005,2008,2009,2011,2013 Red Hat, Inc. All rights reserved.
 
    This copyrighted material is made available to anyone wishing to use, modify,
    copy, or redistribute it subject to the terms and conditions of the BSD
@@ -8,18 +8,22 @@
    is available at http://www.opensource.org/licenses. Any Red Hat trademarks that
    are incorporated in the source code or documentation are not subject to the BSD
    License and may only be used or replicated with the express permission of
-   Red Hat, Inc.  */
+   Red Hat, Inc.
+*/
 
-/* Default linker script, for normal MSP430 executables.  */
-
+/* Default linker script, for normal executables */
 OUTPUT_ARCH(msp430)
 ENTRY(_start)
+
+/* Do we need any of these for elf?
+   __DYNAMIC = 0;    */
 
 INCLUDE intr_vectors.ld
 
 MEMORY
 {
-  RAM (w) : ORIGIN = 0x00200, LENGTH = 0x0ee00
+	RAM (w)      : ORIGIN = 0x00200, LENGTH = 0x0ee00
+	RESETVEC (w) : ORIGIN = 0x0fffe, LENGTH = 0x00002
 }
 
 SECTIONS
@@ -27,13 +31,11 @@ SECTIONS
   .resetvec :
   {
     *(.resetvec)
-  } > VECT31
+  } > RESETVEC
 
-  .rodata :
-  {
+  .rodata : {
     . = ALIGN(2);
     *(.plt)
-    *(.lower.rodata.* .lower.rodata)
     *(.rodata .rodata.* .gnu.linkonce.r.* .const .const:*)
     *(.rodata1)
     *(.eh_frame_hdr)
@@ -74,13 +76,15 @@ SECTIONS
     KEEP (*(.dtors))
   } > RAM
 
-  .text :
+  .text           :
   {
     . = ALIGN(2);
     PROVIDE (_start = .);
-    KEEP (*(SORT(.crt_*)))
-    *(.lowtext)
-    *(.lower.text.* .lower.text)    
+    KEEP (*(.crt_init))
+    KEEP (*(.crt_bss))
+    KEEP (*(.crt_movedata))
+    KEEP (*(.crt_main))
+    KEEP (*(.lowtext))
     *(.text .stub .text.* .gnu.linkonce.t.* .text:*)
     KEEP (*(.text.*personality*))
     /* .gnu.warning sections are handled specially by elf32.em.  */
@@ -95,12 +99,10 @@ SECTIONS
     KEEP (*(.tm_clone_table))
   } > RAM
 
-  .data :
-  {
+  .data : {
     . = ALIGN(2);
     PROVIDE (__datastart = .);
 
-    *(.lower.data.* .lower.data)
     KEEP (*(.jcr))
     *(.data.rel.ro.local) *(.data.rel.ro*)
     *(.dynamic)
@@ -128,11 +130,9 @@ SECTIONS
   PROVIDE(__romdatastart = LOADADDR(.data));
   PROVIDE (__romdatacopysize = SIZEOF(.data));
 
-  .bss :
-  {
+  .bss : {
     . = ALIGN(2);
     PROVIDE (__bssstart = .);
-    *(.lower.bss.* .lower.bss)
     *(.dynbss)
     *(.sbss .sbss.*)
     *(.bss .bss.* .gnu.linkonce.b.*)
@@ -141,8 +141,7 @@ SECTIONS
   PROVIDE (__bsssize = SIZEOF(.bss));
 
   /* This section contains data that is not initialised at startup.  */
-  .noinit (NOLOAD) :
-  {
+  .noinit : {
     . = ALIGN(2);
     PROVIDE (__noinit_start = .);
     *(.noinit)
@@ -150,7 +149,7 @@ SECTIONS
     *(COMMON)
     PROVIDE (__noinit_end = .);
   } > RAM
-
+    
   _end = .;
   PROVIDE (end = .);
 
@@ -158,16 +157,6 @@ SECTIONS
   {
     PROVIDE (__stack = .);
     *(.stack)
-  }
-
-  /* Make sure that .upper sections are not used without -mlarge support.  */
-  .upper :
-  {
-    *(.upper.rodata.* .upper.rodata)
-    *(.upper.data.* .upper.data)
-    *(.upper.bss.* .upper.bss)
-    *(.upper.text.* .upper.text)  
-    ASSERT (SIZEOF(.upper) == 0, ".upper sections present in a binary linked without -mlarge support");
   }
 
   /* The rest are all not normally part of the runtime image.  */
@@ -190,13 +179,13 @@ SECTIONS
   /* DWARF debug sections.
      Symbols in the DWARF debugging sections are relative to the beginning
      of the section so we begin them at 0.  */
-  /* DWARF 1.  */
+  /* DWARF 1 */
   .debug          0 : { *(.debug) }
   .line           0 : { *(.line) }
-  /* GNU DWARF 1 extensions.  */
+  /* GNU DWARF 1 extensions */
   .debug_srcinfo  0 : { *(.debug_srcinfo) }
   .debug_sfnames  0 : { *(.debug_sfnames) }
-  /* DWARF 1.1 and DWARF 2.  */
+  /* DWARF 1.1 and DWARF 2 */
   .debug_aranges  0 : { *(.debug_aranges) }
   .debug_pubnames 0 : { *(.debug_pubnames) }
   /* DWARF 2 */
@@ -207,12 +196,12 @@ SECTIONS
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }
   .debug_macinfo  0 : { *(.debug_macinfo) }
-  /* SGI/MIPS DWARF 2 extensions.  */
+  /* SGI/MIPS DWARF 2 extensions */
   .debug_weaknames 0 : { *(.debug_weaknames) }
   .debug_funcnames 0 : { *(.debug_funcnames) }
   .debug_typenames 0 : { *(.debug_typenames) }
   .debug_varnames  0 : { *(.debug_varnames) }
-  /* DWARF 3.  */
+  /* DWARF 3 */
   .debug_pubtypes 0 : { *(.debug_pubtypes) }
   .debug_ranges   0 : { *(.debug_ranges) }
   /* DWARF Extension.  */

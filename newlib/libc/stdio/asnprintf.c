@@ -58,12 +58,6 @@ _DEFUN(_asnprintf_r, (ptr, buf, lenp, fmt),
   return (char *) f._bf._base;
 }
 
-#ifdef _NANO_FORMATTED_IO
-char *
-_EXFUN(_asniprintf_r, (struct _reent *, char *, size_t *, const char *, ...)
-       _ATTRIBUTE ((__alias__("_asnprintf_r"))));
-#endif
-
 #ifndef _REENT_ONLY
 
 char *
@@ -111,9 +105,4 @@ _DEFUN(asnprintf, (buf, lenp, fmt),
   return (char *) f._bf._base;
 }
 
-#ifdef _NANO_FORMATTED_IO
-char *
-_EXFUN(asniprintf, (char *, size_t *, const char *, ...)
-       _ATTRIBUTE ((__alias__("asnprintf"))));
-#endif
 #endif /* ! _REENT_ONLY */

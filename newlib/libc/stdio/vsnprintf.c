@@ -41,12 +41,6 @@ _DEFUN(vsnprintf, (str, size, fmt, ap),
   return _vsnprintf_r (_REENT, str, size, fmt, ap);
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-_EXFUN(vsniprintf, (char *, size_t, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vsnprintf"))));
-#endif
-
 #endif /* !_REENT_ONLY */
 
 int
@@ -76,9 +70,3 @@ _DEFUN(_vsnprintf_r, (ptr, str, size, fmt, ap),
     *f._p = 0;
   return ret;
 }
-
-#ifdef _NANO_FORMATTED_IO
-int
-_EXFUN(_vsniprintf_r, (struct _reent *, char *, size_t, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_vsnprintf_r"))));
-#endif

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013-2014 Andes Technology Corporation.
+Copyright (c) 2013 Andes Technology Corporation.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ##
 ##==============================================================================
 
-#include "syscall_extra.h"
 
 ##------------------------------------------------------------------------------
 ## Vector table setup
@@ -49,139 +48,61 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ##------------------------------------------------------------------------------
 	.section	.text
 	.weak	_SDA_BASE_
-	.weak	_ITB_BASE_
-	.weak	_arg_init
-	.weak	__pre_c_init
-	.weak	__post_c_init
-	.weak	_call_exit
+	.weak	_FP_BASE_
 	.global	_start
 	.type	_start, @function
 	.align	2
 _start:
-	/* The initialization sequence really does matter !!!
-	   The global pointer must be
-	   initialized precedence over all others.  */
-
-.L_init_gp:
-	/* Initialization for global pointer.  The symbol _SDA_BASE_ is
-	   determined by Linker.  SDA stands for Small Data Access.  */
+.L_fp_gp_lp_init:
+	/* Initialization for $fp, $gp, and $lp. The _SDA_BASE_ location
+	   stands for Small Data Access.  */
+	la	$fp, _FP_BASE_
 	la	$gp, _SDA_BASE_
+	movi	$lp, #0
 
-#if __NDS32_EXT_EX9__
-.L_init_itb:
-	/* Initialization for Instruction Table Base (ITB).
-	   The symbol _ITB_BASE_ is determined by Linker.
-	   Set $ITB only if MSC_CFG.EIT (cr4.b'24) is set.  */
-	mfsr	$r0, $MSC_CFG
-	srli	$r0, $r0, 24
-	andi	$r0, $r0, 0x1
-	beqz	$r0, 1f		/* Fall through ?  */
-	la	$r0, _ITB_BASE_
-	mtusr	$r0, $ITB
-1:
-#endif
-
-.L_init_sp:
-	/* Initialization for stack pointer.  The symbol _stack is defined
-	   in linker script.  Make sure $sp is 8-byte aligned.  */
+.L_stack_init:
+	/* Initialization for $sp and make sure it is 8-byte aligned.  */
 	la	$sp, _stack
-#if __NDS32_ISA_V3__
-	bitci	$sp, $sp, #7
-#else
 	movi	$r0, #-8		/* Set $r0 as 0xFFFFFFF8.  */
 	and	$sp, $sp, $r0
-#endif
 
-#if __NDS32_EXT_FPU_SP__ || __NDS32_EXT_FPU_DP__
-.L_init_fpu:
-	/* Initialize FPU
-	   Set FUCOP_CTL.CP0EN (fucpr.b'0).  */
-	mfsr	$r0, $FUCOP_CTL
-	ori	$r0, $r0, 0x1
-	mtsr	$r0, $FUCOP_CTL
-	dsb
-	/* According to [bugzilla #9425], set flush-to-zero mode.
-	   That is, set $FPCSR.DNZ(b'12) = 1.  */
-	FMFCSR	$r0
-	ori	$r0, $r0, 0x1000
-	FMTCSR	$r0
-	dsb
-#endif
+.L_bss_clear:
+        /* Clear bss section.  */
+        la      $r3, _end
+        la      $r0, _edata
+	beq	$r0, $r3, .L_call_main	/* Branch if no bss.  */
+        sub     $r1, $r3, $r0           /* Size to be clear.  */
 
-.L_pre_c_init:
-	! call __pre_c_init if provided
-	! sample __pre_c_init is in BSP
-	la	$r15, __pre_c_init	! load address of __pre_c_init
-	beqz	$r15, .L_zero_out_bss	! check existence of __pre_c_init
-	jral	$r15			! pre-c-runtime initialization
+        /* Set $r2 as how many words to be clear.
+           Set $r1 as how many bytes are less than a woard to be clear.  */
+        srli    $r2, $r1, #2
+        andi    $r1, $r1, #3
+        beqz    $r3, .Lbyte_clear
 
-.L_zero_out_bss:
-	/* Zero out the bss section.
-	   Equivalence C code for follow part:
-	   if (_end == _edata) goto .L_call_main
-	   unsinged int *ptr = _edata;
-	   while (ptr != _end)
-	     *ptr++ = 0
-	   $r0 = ptr/_edata
-	   $r1 = _end
-	   $r2 = 0
-	 */
-	la	$r0, _edata
-	la	$r1, _end
-	movi	$r2, #0
-	beq	$r0, $r1, .L_cpp_init	/* Branch if no bss.  */
+        la      $r4, #0x00000000
 .Lword_clear:
-	swi.bi	$r2, [$r0], #4
-	bne	$r0, $r1, .Lword_clear
+        swi.bi  $r4, [$r0], #4
+        addi    $r2, $r2, #-1
+        bnez    $r2, .Lword_clear       /* Loop again ?  */
+        beqz    $r1, .Lend_bss
 
-.L_cpp_init:
+.Lbyte_clear:
+        sbi.bi  $r4, [$r0], #1
+        addi    $r1, $r1, #-1
+        bnez    $r1, .Lbyte_clear
+.Lend_bss:
+
+
+.L_call_main:
 	/* Call '_init' to invoke constructors.  */
 	jal	_init
 	/* Register '_fini' into atexit() to invoke destructors when
 	   exit() has been reached.  */
 	la	$r0, _fini
 	jal	atexit
-
-.L_post_c_init:
-	! call __post_c_init if provided
-	! no sample __post_c_init is provided
-	la	$r15, __post_c_init	! load address of __post_c_init
-	beqz	$r15, .L_arg_init	! check existence of __post_c_init
-	jral	$r15			! post-c-runtime initialization
-
-.L_arg_init:
-	! argc/argv initialization if necessary
-	la	$r7, _arg_init		! get address of _arg_init
-	beqz	$r7, .L_clean_reg	! if there isn't _arg_init, go main
-	addi	$sp, $sp, -512		! allocate space for command line
-					! and arguments
-	move	$r6, $sp		! r6 = buffer addr of cmd line
-	move	$r0, $r6		! r0 = buffer addr of cmd line
-	syscall	SYS_getcmdline		! get cmd line
-	move	$r0, $r6		! r0 = buffer addr of cmd line
-	addi	$r1, $r6, 256		! r1 = argv
-	jral	$r7			! init argc/argv
-	addi	$r1, $r6, 256		! r1 = argv
-	b	.L_call_main
-
-.L_clean_reg:
-	/* Prepare argc/argv/env for main function.
-	   Since there is no operating system so far,
-	   we set $r0, $r1, and $r2 to be zero.
-	   Note: $r2 already set to zero in .L_zero_out_bss: code fragment.  */
-	movi	$r0, 0
-	movi	$r1, 0
-	movi	$r2, 0
-
-.L_call_main:
 	/* Call 'main'.  */
-	bal	main
-
-	/* Call _call_exit.  */
-	! call _call_exit if necessary; default implementation is in crtexit.c
-	la	$r15, _call_exit		! load address of _call_exit
-	beqz	$r15, .L_terminate_program	! no _call_exit? go exit
-	jral	$r15				! _call_exit will never return
+	la	$r15, main
+	jral	$r15
 
 .L_terminate_program:
 	/* There are two ways to terminate program:
@@ -192,11 +113,11 @@ _start:
 	    Currently, we use option 2 as a solution to follow C99 5.1.2.2.3,
 	    but aware that general exit() will do some cleanup procedures
 	    which may result in large-memory-footprints.  */
-
-	bal	exit
+	la	$r15, exit
+	jral	$r15
 
 .L_forever_loop:
 	/* Should never return here.  */
-	b	.L_forever_loop
+        b       .L_forever_loop
 
 	.size	_start, .-_start

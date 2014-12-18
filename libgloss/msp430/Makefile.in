@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2014 Red Hat, Inc. All rights reserved.
+# Copyright (c) 2008, 2009, 2011, 2013 Red Hat, Inc. All rights reserved.
 #
 # This copyrighted material is made available to anyone wishing to use, modify,
 # copy, or redistribute it subject to the terms and conditions of the BSD
@@ -12,7 +12,6 @@
 
 # Makefile for libgloss/msp430.
 
-DESTDIR =
 VPATH = @srcdir@
 srcdir = @srcdir@
 objdir = .
@@ -57,62 +56,46 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-SCRIPTS  = $(srcdir)/msp430.ld
-SCRIPTS += $(srcdir)/msp430-sim.ld
+SCRIPTS = $(srcdir)/msp430.ld $(srcdir)/msp430-sim.ld
 SCRIPTS += $(srcdir)/msp430xl-sim.ld
-SCRIPTS += $(srcdir)/intr_vectors.ld
+SCRIPTS += $(srcdir)/msp430F5438A-s.ld
+SCRIPTS += $(srcdir)/msp430F5438A-l.ld
 
-CRT = gcrt0.o crt0.o crt0-minrt.o crtn.o crtn-minrt.o
+CRT = gcrt0.o crt0.o crtn.o
 SIM_BSP = libsim.a
-LIB_CIO = libcio.a
-LIB_CRT = libcrt.a
+LIBNOSYS = libnosys.a
 
 SIM_OBJS = syscalls.o \
 	cio.o \
 	write.o \
 	sbrk.o
 
-CIO_OBJS = ciosyscalls.o \
+NOSYS_OBJS = nosyscalls.o \
 	cio.o \
 	write.o \
-	unlink.o \
 	sbrk.o
 
-# Each crt_*.o is built from crt0.S using -DL*.  crt0.o is built from
-# crt0.s with -DL0 via the default rule below.
-CRT_OBJS = \
-	crt_bss.o \
-	crt_high_bss.o \
-	crt_movedata.o \
-	crt_main.o \
-	crt_main_minrt.o \
-	crt_callexit.o \
-	crt_init.o
+SCRIPTS += $(srcdir)/intr_vectors.ld
+
+LIB_CRT = libcrt.a
+
+CRT_OBJS = crt_bss.o crt_movedata.o
 
 #### Host specific Makefile fragment comes in here.
 @host_makefile_frag@
 
 
-all: $(CRT) $(SIM_BSP) $(LIB_CIO) $(LIB_CRT) copy_scripts_to_objdir
-
-crt_%.o : crt0.S
-	$(CC) -DL$* -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $< -o $@
-
-crt0-minrt.o : crt0.S
-	$(CC) -DL0 -DMINRT -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $< -o $@
-
-crtn-minrt.o : crtn.S
-	$(CC) -DL0 -DMINRT -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $< -o $@
-
 # Override .S.o rule to pass assembler debugging flags
 .S.o:
-	$(CC) -DL0 -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
+	$(CC) -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
+
+all: $(CRT) $(SIM_BSP) $(LIBNOSYS) $(LIB_CRT) copy_scripts_to_objdir
 
 $(SIM_BSP): $(SIM_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
-$(LIB_CIO): $(CIO_OBJS)
+$(LIBNOSYS): $(NOSYS_OBJS)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
 
@@ -153,14 +136,13 @@ unlink.o : $(SDEPS)
 utime.o : $(SDEPS)
 write.o : $(SDEPS)
 
-install: $(CRT) $(SIM_BSP) $(LIB_CIO) $(LIB_CRT) $(SCRIPTS)
-	mkdir -p $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
-	for c in $(CRT) $(SIM_BSP) $(LIB_CIO) $(LIB_CRT); do \
-	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ;\
+install: $(CRT) $(SIM_BSP) $(LIBNOSYS) $(LIB_CRT) $(SCRIPTS)
+	for c in $(CRT) $(SIM_BSP) $(LIBNOSYS) $(LIB_CRT); do \
+	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$c ;\
 	done
 	for c in $(SCRIPTS); do \
 	  b=`basename $$c`; \
-	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$b ;\
+	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$b ;\
 	done
 
 clean mostlyclean:

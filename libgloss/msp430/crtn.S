@@ -13,7 +13,6 @@
 
 #include "memmodel.h"
 
-#ifndef MINRT
 	.section	.init,"ax"
 	call_	#_msp430_run_preinit_array
 	call_	#_msp430_run_init_array
@@ -29,4 +28,3 @@ __msp430_fini_end:
 
 	.text
 
-#endif

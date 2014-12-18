@@ -98,7 +98,7 @@ _DEFUN (memccpy, (dst0, src0, endchar, len0),
      then punt into the byte copy loop.  This should be rare.  */
   if (!TOO_SMALL(len0) && !UNALIGNED (src, dst))
     {
-      unsigned int i;
+      int i;
       unsigned long mask = 0;
 
       aligned_dst = (long*)dst;

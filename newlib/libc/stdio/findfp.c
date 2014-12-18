@@ -35,11 +35,7 @@ const struct __sFILE_fake __sf_fake_stderr =
     {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
 #endif
 
-#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
-_NOINLINE_STATIC _VOID
-#else
 static _VOID
-#endif
 _DEFUN(std, (ptr, flags, file, data),
             FILE *ptr _AND
             int flags _AND
@@ -174,22 +170,8 @@ _VOID
 _DEFUN(_cleanup_r, (ptr),
        struct _reent *ptr)
 {
-  int (*cleanup_func) (struct _reent *, FILE *);
-#ifdef _STDIO_BSD_SEMANTICS
-  /* BSD and Glibc systems only flush streams which have been written to
-     at exit time.  Calling flush rather than close for speed, as on
-     the aforementioned systems. */
-  cleanup_func = __sflushw_r;
-#else
-  /* Otherwise close files and flush read streams, too.
-     Note we call flush directly if "--enable-lite-exit" is in effect.  */
-#ifdef _LITE_EXIT
-  cleanup_func = _fflush_r;
-#else
-  cleanup_func = _fclose_r;
-#endif
-#endif
-  _CAST_VOID _fwalk_reent (ptr, cleanup_func);
+  _CAST_VOID _fwalk(ptr, fclose);
+  /* _CAST_VOID _fwalk (ptr, fflush); */	/* `cheating' */
 }
 
 #ifndef _REENT_ONLY

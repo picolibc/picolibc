@@ -93,11 +93,6 @@ SECTIONS
   }
 
   . = .;
-  .MIPS.abiflags : {
-    __MIPS_abiflags_start = .;
-    *(.MIPS.abiflags)
-    __MIPS_abiflags_end = .;
-  }
   .rodata : {
     *(.rdata)
     *(.rodata)
@@ -142,7 +137,6 @@ SECTIONS
     *(COMMON)
   }
 
-  . = ALIGN(4);
   PROVIDE (end = .);
   _end = .;
 

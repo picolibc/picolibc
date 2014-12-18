@@ -98,8 +98,6 @@
 #define SR_SX		0x00000040	/* Supervisor extended addressing enabled */
 #define SR_UX		0x00000020	/* User extended addressing enabled */
 
-#define SR_MSA		0x08000000	/* MSA ASE */
-
 /* Standard (R4000) cache operations. Taken from "MIPS R4000
    Microprocessor User's Manual" 2nd edition: */
 

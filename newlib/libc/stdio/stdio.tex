@@ -50,7 +50,6 @@ structure.
 * fread::       Read array elements from a file
 * freopen::     Open a file using an existing file descriptor
 * fseek::       Set file position
-* __fsetlocking::	Set or query locking mode on FILE stream
 * fsetpos::     Restore position of a stream or file
 * ftell::       Return position in a stream or file
 * funopen::     Open a stream with custom callbacks
@@ -86,7 +85,6 @@ structure.
 * siscanf::     Scan and format input (integer only)
 * sprintf::     Write formatted output
 * sscanf::      Scan and format input
-* stdio_ext::	Access internals of FILE structure
 * swprintf::    Write formatted wide character output
 * swscanf::     Scan and format wide character input
 * tmpfile::     Create a temporary file
@@ -178,9 +176,6 @@ structure.
 
 @page
 @include stdio/fseek.def
-
-@page
-@include stdio/fsetlocking.def
 
 @page
 @include stdio/fsetpos.def
@@ -286,9 +281,6 @@ structure.
 
 @page
 @include stdio/sscanf.def
-
-@page
-@include stdio/stdio_ext.def
 
 @page
 @include stdio/swprintf.def

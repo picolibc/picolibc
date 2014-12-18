@@ -73,9 +73,6 @@
 /* Define if enable lite version of exit.  */
 #undef _LITE_EXIT
 
-/* Define if nano version formatted IO is used.  */
-#undef _NANO_FORMATTED_IO
-
 @BOTTOM@
 /*
  * Iconv encodings enabled ("to" direction)

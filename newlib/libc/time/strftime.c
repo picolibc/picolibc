@@ -694,12 +694,12 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 #endif /* !_WANT_C99_TIME_FORMATS */
 {
   size_t count = 0;
-  int len = 0;
+  int i, len = 0;
   const CHAR *ctloc;
 #if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
   CHAR ctlocbuf[CTLOCBUFLEN];
 #endif
-  size_t i, ctloclen;
+  size_t ctloclen;
   CHAR alt;
   CHAR pad;
   unsigned long width;
@@ -1299,7 +1299,7 @@ recurse:
 	case CQ('Z'):
 	  if (tim_p->tm_isdst >= 0)
 	    {
-	      size_t size;
+	      int size;
 	      TZ_LOCK;
 	      size = strlen(_tzname[tim_p->tm_isdst > 0]);
 	      for (i = 0; i < size; i++)

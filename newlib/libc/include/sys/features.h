@@ -25,12 +25,6 @@
 extern "C" {
 #endif
 
-/* Macros to determine that newlib is being used.  Put in this header to 
- * be similar to where glibc stores its version of these macros.
- */
-#define __NEWLIB__  		2
-#define __NEWLIB_MINOR__  	1
-
 /* Macro to test version of GCC.  Returns 0 for non-GCC or too old GCC. */
 #ifndef __GNUC_PREREQ
 # if defined __GNUC__ && defined __GNUC_MINOR__

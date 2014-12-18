@@ -138,11 +138,9 @@ _flat_map:
 
 	mrs	x0, sctlr_el3
 	ldr	x1, =0x100d			/* bits I(12) SA(3) C(2) M(0) */
-	bic	x0, x0, #(1 << 1)		/* clear bit A(1) */
-	bic	x0, x0, #(1 << 19)		/* clear WXN */
+	bic	x0, x0, #2			/* clear bit A(1) */
 	orr	x0, x0, x1			/* set bits */
 
-	dsb	sy
 	msr	sctlr_el3, x0
 	isb
 	ret
