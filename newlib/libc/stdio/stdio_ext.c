@@ -1,6 +1,6 @@
 /*
 FUNCTION
-<<__fbufsize>>, <<__fpending>>, <<__flbf>>, <<__freadable>>, <<__fwritable>> <<__freading>>, <<__fwriting>>,---access internals of FILE structure
+<<stdio_ext>>,<<__fbufsize>>,<<__fpending>>,<<__flbf>>,<<__freadable>>,<<__fwritable>>,<<__freading>>,<<__fwriting>>---access internals of FILE structure
 
 INDEX
 	__fbufsize

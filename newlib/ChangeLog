@@ -1,3 +1,8 @@
+2014-12-18  Corinna Vinschen  <vinschen@redhat.com>
+
+	* stdio.tex: Add menu entries for __fsetlocking and stdio_ext.
+	* stdio_ext.c: Add "stdio_ext" to synopsis.
+
 2014-12-16  DJ Delorie  <dj@redhat.com>
 
 	* libc/stdlib/nano-mallocr.c (ALIGN_TO): Do not assume that
