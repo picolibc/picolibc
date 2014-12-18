@@ -17,23 +17,40 @@
 
 /*
 FUNCTION
-<<fputs>>---write a character string in a file or stream
+<<fputs>>, <<fputs_unlocked>>---write a character string in a file or stream
 
 INDEX
 	fputs
 INDEX
+	fputs_unlocked
+INDEX
 	_fputs_r
+INDEX
+	_fputs_unlocked_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fputs(const char *restrict <[s]>, FILE *restrict <[fp]>);
 
+	#define _GNU_SOURCE
+	#include <stdio.h>
+	int fputs_unlocked(const char *restrict <[s]>, FILE *restrict <[fp]>);
+
 	#include <stdio.h>
 	int _fputs_r(struct _reent *<[ptr]>, const char *restrict <[s]>, FILE *restrict <[fp]>);
+
+	#include <stdio.h>
+	int _fputs_unlocked_r(struct _reent *<[ptr]>, const char *restrict <[s]>, FILE *restrict <[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int fputs(<[s]>, <[fp]>)
+	char *<[s]>;
+	FILE *<[fp]>;
+
+	#define _GNU_SOURCE
+	#include <stdio.h>
+	int fputs_unlocked(<[s]>, <[fp]>)
 	char *<[s]>;
 	FILE *<[fp]>;
 
@@ -43,12 +60,27 @@ TRAD_SYNOPSIS
 	char *<[s]>;
 	FILE *<[fp]>;
 
+	#include <stdio.h>
+	int _fputs_unlocked_r(<[ptr]>, <[s]>, <[fp]>)
+	struct _reent *<[ptr]>;
+	char *<[s]>;
+	FILE *<[fp]>;
+
 DESCRIPTION
 <<fputs>> writes the string at <[s]> (but without the trailing null)
 to the file or stream identified by <[fp]>.
 
-<<_fputs_r>> is simply the reentrant version of <<fputs>> that takes
-an additional reentrant struct pointer argument: <[ptr]>.
+<<fputs_unlocked>> is a non-thread-safe version of <<fputs>>.
+<<fputs_unlocked>> may only safely be used within a scope
+protected by flockfile() (or ftrylockfile()) and funlockfile().  This
+function may safely be used in a multi-threaded program if and only
+if they are called while the invoking thread owns the (FILE *)
+object, as is the case after a successful call to the flockfile() or
+ftrylockfile() functions.  If threads are disabled, then
+<<fputs_unlocked>> is equivalent to <<fputs>>.
+
+<<_fputs_r>> and <<_fputs_unlocked_r>> are simply reentrant versions of the
+above that take an additional reentrant struct pointer argument: <[ptr]>.
 
 RETURNS
 If successful, the result is <<0>>; otherwise, the result is <<EOF>>.
@@ -56,6 +88,8 @@ If successful, the result is <<0>>; otherwise, the result is <<EOF>>.
 PORTABILITY
 ANSI C requires <<fputs>>, but does not specify that the result on
 success must be <<0>>; any non-negative value is permitted.
+
+<<fputs_unlocked>> is a GNU extension.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
@@ -67,10 +101,14 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "fvwrite.h"
 #include "local.h"
 
+#ifdef __IMPL_UNLOCKED__
+#define _fputs_r _fputs_unlocked_r
+#define fputs fputs_unlocked
+#endif
+
 /*
  * Write the given string to the given file.
  */
-
 int
 _DEFUN(_fputs_r, (ptr, s, fp),
        struct _reent * ptr _AND

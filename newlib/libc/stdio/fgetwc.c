@@ -26,21 +26,34 @@
 
 /*
 FUNCTION
-<<fgetwc>>, <<getwc>>---get a wide character from a file or stream
+<<fgetwc>>, <<getwc>>, <<fgetwc_unlocked>>, <<getwc_unlocked>>---get a wide character from a file or stream
 
 INDEX
 	fgetwc
 INDEX
+	fgetwc_unlocked
+INDEX
 	_fgetwc_r
+INDEX
+	_fgetwc_unlocked_r
 INDEX
 	getwc
 INDEX
+	getwc_unlocked
+INDEX
 	_getwc_r
+INDEX
+	_getwc_unlocked_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	#include <wchar.h>
 	wint_t fgetwc(FILE *<[fp]>);
+
+	#define _GNU_SOURCE
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t fgetwc_unlocked(FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
@@ -48,16 +61,35 @@ ANSI_SYNOPSIS
 
 	#include <stdio.h>
 	#include <wchar.h>
+	wint_t _fgetwc_unlocked_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+
+	#include <stdio.h>
+	#include <wchar.h>
 	wint_t getwc(FILE *<[fp]>);
+
+	#define _GNU_SOURCE
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t getwc_unlocked(FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
 	wint_t _getwc_r(struct _reent *<[ptr]>, FILE *<[fp]>);
 
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t _getwc_unlocked_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	#include <wchar.h>
 	wint_t fgetwc(<[fp]>)
+	FILE *<[fp]>;
+
+	#define _GNU_SOURCE
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t fgetwc_unlocked(<[fp]>)
 	FILE *<[fp]>;
 
 	#include <stdio.h>
@@ -68,7 +100,19 @@ TRAD_SYNOPSIS
 
 	#include <stdio.h>
 	#include <wchar.h>
+	wint_t _fgetwc_unlocked_r(<[ptr]>, <[fp]>)
+	struct _reent *<[ptr]>;
+	FILE *<[fp]>;
+
+	#include <stdio.h>
+	#include <wchar.h>
 	wint_t getwc(<[fp]>)
+	FILE *<[fp]>;
+
+	#define _GNU_SOURCE
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t getwc_unlocked(<[fp]>)
 	FILE *<[fp]>;
 
 	#include <stdio.h>
@@ -77,18 +121,33 @@ TRAD_SYNOPSIS
 	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t _getwc_unlocked_r(<[ptr]>, <[fp]>)
+	struct _reent *<[ptr]>;
+	FILE *<[fp]>;
+
 DESCRIPTION
 Use <<fgetwc>> to get the next wide character from the file or stream
 identified by <[fp]>.  As a side effect, <<fgetwc>> advances the file's
 current position indicator.
 
-The  <<getwc>>  function  or macro functions identically to <<fgetwc>>.  It
-may be implemented as a macro, and may evaluate its argument more  than
-once. There is no reason ever to use it.
+<<fgetwc_unlocked>> is a non-thread-safe version of <<fgetwc>>.
+<<fgetwc_unlocked>> may only safely be used within a scope
+protected by flockfile() (or ftrylockfile()) and funlockfile().  This
+function may safely be used in a multi-threaded program if and only
+if they are called while the invoking thread owns the (FILE *)
+object, as is the case after a successful call to the flockfile() or
+ftrylockfile() functions.  If threads are disabled, then
+<<fgetwc_unlocked>> is equivalent to <<fgetwc>>.
 
-<<_fgetwc_r>> and <<_getwc_r>> are simply reentrant versions of
-<<fgetwc>> and <<getwc>> that are passed the additional reentrant
-structure pointer argument: <[ptr]>.
+The <<getwc>> and <<getwc_unlocked>> functions or macros functions identically
+to <<fgetwc>> and <<fgetwc_unlocked>>.  It may be implemented as a macro, and
+may evaluate its argument more than once. There is no reason ever to use it.
+
+<<_fgetwc_r>>, <<_getwc_r>>, <<_fgetwc_unlocked_r>>, and <<_getwc_unlocked_r>>
+are simply reentrant versions of the above functions that are passed the
+additional reentrant structure pointer argument: <[ptr]>.
 
 RETURNS
 The next wide character cast to <<wint_t>>), unless there is no more data,
@@ -99,7 +158,9 @@ You can distinguish the two situations that cause an <<EOF>> result by
 using the <<ferror>> and <<feof>> functions.
 
 PORTABILITY
-C99, POSIX.1-2001
+<<fgetwc>> and <<getwc>> are required by C99 and POSIX.1-2001.
+
+<<fgetwc_unlocked>> and <<getwc_unlocked>> are GNU extensions.
 */
 
 #include <_ansi.h>
@@ -110,7 +171,7 @@ C99, POSIX.1-2001
 #include <wchar.h>
 #include "local.h"
 
-static wint_t
+wint_t
 _DEFUN(__fgetwc, (ptr, fp),
 	struct _reent *ptr _AND
 	register FILE *fp)

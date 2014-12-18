@@ -17,18 +17,29 @@
 
 /*
 FUNCTION
-<<clearerr>>---clear file or stream error indicator
+<<clearerr>>, <<clearerr_unlocked>>---clear file or stream error indicator
 
 INDEX
 	clearerr
+INDEX
+	clearerr_unlocked
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	void clearerr(FILE *<[fp]>);
 
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	void clearerr_unlocked(FILE *<[fp]>);
+
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	void clearerr(<[fp]>)
+	FILE *<[fp]>;
+
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	void clearerr_unlocked(<[fp]>)
 	FILE *<[fp]>;
 
 DESCRIPTION
@@ -42,12 +53,22 @@ Use <<clearerr>> to reset both of these indicators.
 
 See <<ferror>> and <<feof>> to query the two indicators.
 
+<<clearerr_unlocked>> is a non-thread-safe version of <<clearerr>>.
+<<clearerr_unlocked>> may only safely be used within a scope
+protected by flockfile() (or ftrylockfile()) and funlockfile().  This
+function may safely be used in a multi-threaded program if and only
+if they are called while the invoking thread owns the (FILE *)
+object, as is the case after a successful call to the flockfile() or
+ftrylockfile() functions.  If threads are disabled, then
+<<clearerr_unlocked>> is equivalent to <<clearerr>>.
 
 RETURNS
 <<clearerr>> does not return a result.
 
 PORTABILITY
 ANSI C requires <<clearerr>>.
+
+<<clearerr_unlocked>> is a BSD extension also provided by GNU libc.
 
 No supporting OS subroutines are required.
 */

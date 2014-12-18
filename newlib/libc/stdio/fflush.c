@@ -17,18 +17,31 @@
 
 /*
 FUNCTION
-<<fflush>>---flush buffered file output
+<<fflush>>, <<fflush_unlocked>>---flush buffered file output
 
 INDEX
 	fflush
 INDEX
+	fflush_unlocked
+INDEX
 	_fflush_r
+INDEX
+	_fflush_unlocked_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fflush(FILE *<[fp]>);
 
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	int fflush_unlocked(FILE *<[fp]>);
+
+	#include <stdio.h>
 	int _fflush_r(struct _reent *<[reent]>, FILE *<[fp]>);
+
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	int _fflush_unlocked_r(struct _reent *<[reent]>, FILE *<[fp]>);
 
 DESCRIPTION
 The <<stdio>> output functions can buffer output before delivering it
@@ -45,9 +58,18 @@ descriptor, set the position of the file descriptor to match next
 unread byte, useful for obeying POSIX semantics when ending a process
 without consuming all input from the stream.
 
-The alternate function <<_fflush_r>> is a reentrant version, where the
-extra argument <[reent]> is a pointer to a reentrancy structure, and
-<[fp]> must not be NULL.
+<<fflush_unlocked>> is a non-thread-safe version of <<fflush>>.
+<<fflush_unlocked>> may only safely be used within a scope
+protected by flockfile() (or ftrylockfile()) and funlockfile().  This
+function may safely be used in a multi-threaded program if and only
+if they are called while the invoking thread owns the (FILE *)
+object, as is the case after a successful call to the flockfile() or
+ftrylockfile() functions.  If threads are disabled, then
+<<fflush_unlocked>> is equivalent to <<fflush>>.
+
+The alternate functions <<_fflush_r>> and <<_fflush_unlocked_r>> are
+reentrant versions, where the extra argument <[reent]> is a pointer to
+a reentrancy structure, and <[fp]> must not be NULL.
 
 RETURNS
 <<fflush>> returns <<0>> unless it encounters a write error; in that
@@ -57,6 +79,8 @@ PORTABILITY
 ANSI C requires <<fflush>>.  The behavior on input streams is only
 specified by POSIX, and not all implementations follow POSIX rules.
 
+<<fflush_unlocked>> is a BSD extension also provided by GNU libc.
+
 No supporting OS subroutines are required.
 */
 
@@ -65,6 +89,12 @@ No supporting OS subroutines are required.
 #include <errno.h>
 #include "local.h"
 
+#ifdef __IMPL_UNLOCKED__
+#define _fflush_r _fflush_unlocked_r
+#define fflush fflush_unlocked
+#endif
+
+#ifndef __IMPL_UNLOCKED__
 /* Flush a single file, or (if fp is NULL) all files.  */
 
 /* Core function which does not lock file pointer.  This gets called
@@ -216,6 +246,8 @@ _DEFUN(__sflushw_r, (ptr, fp),
   return (fp->_flags & __SWR) ?  __sflush_r (ptr, fp) : 0;
 }
 #endif
+
+#endif /* __IMPL_UNLOCKED__ */
 
 int
 _DEFUN(_fflush_r, (ptr, fp),

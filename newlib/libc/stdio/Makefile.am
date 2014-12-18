@@ -138,24 +138,43 @@ endif !NEWLIB_NANO_FORMATTED_IO
 ELIX_4_SOURCES = \
 	$(ELIX_4_INT_FORMATTED_IO_SOURCES) \
 	asnprintf.c		\
+	clearerr_u.c		\
 	dprintf.c		\
+	feof_u.c		\
+	ferror_u.c		\
+	fflush_u.c		\
+	fgetc_u.c		\
+	fgets_u.c		\
 	fgetwc.c		\
+	fgetwc_u.c		\
 	fgetws.c		\
+	fgetws_u.c		\
+	fileno_u.c		\
 	fmemopen.c		\
 	fopencookie.c		\
 	fpurge.c		\
+	fputc_u.c		\
+	fputs_u.c		\
 	fputwc.c		\
+	fputwc_u.c		\
 	fputws.c		\
+	fputws_u.c		\
+	fread_u.c		\
 	fsetlocking.c		\
 	funopen.c		\
 	fwide.c			\
 	fwprintf.c		\
+	fwrite_u.c		\
 	fwscanf.c		\
 	getwc.c			\
+	getwc_u.c		\
 	getwchar.c		\
+	getwchar_u.c		\
 	open_memstream.c	\
 	putwc.c			\
+	putwc_u.c		\
 	putwchar.c		\
+	putwchar_u.c		\
 	stdio_ext.c		\
 	swprintf.c		\
 	swscanf.c		\
@@ -419,20 +438,41 @@ doc: $(CHEWOUT_FILES)
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref
 
+$(lpfx)clearerr.$(oext): local.h
+$(lpfx)clearerr_u.$(oext): local.h
 $(lpfx)fclose.$(oext): local.h
 $(lpfx)fdopen.$(oext): local.h
+$(lpfx)feof.$(oext): local.h
+$(lpfx)feof_u.$(oext): local.h
+$(lpfx)ferror.$(oext): local.h
+$(lpfx)ferror_u.$(oext): local.h
 $(lpfx)fflush.$(oext): local.h
+$(lpfx)fflush_u.$(oext): fflush.c
+$(lpfx)fgetc.$(oext): local.h
+$(lpfx)fgetc_u.$(oext): local.h
+$(lpfx)fgets.$(oext): local.h
+$(lpfx)fgets_u.$(oext): fgets.c
 $(lpfx)fgetwc.$(oext): local.h
+$(lpfx)fgetwc_u.$(oext): local.h
 $(lpfx)fgetws.$(oext): local.h
+$(lpfx)fgetws_u.$(oext): fgetws.c
+$(lpfx)fileno.$(oext): local.h
+$(lpfx)fileno_u.$(oext): local.h
 $(lpfx)findfp.$(oext): local.h
 $(lpfx)fmemopen.$(oext): local.h
 $(lpfx)fopen.$(oext): local.h
 $(lpfx)fopencookie.$(oext): local.h
 $(lpfx)fpurge.$(oext): local.h
+$(lpfx)fputc.$(oext): local.h
+$(lpfx)fputc_u.$(oext): local.h
 $(lpfx)fputs.$(oext): fvwrite.h
+$(lpfx)fputs_u.$(oext): fputs.c
 $(lpfx)fputwc.$(oext): local.h
+$(lpfx)fputwc_u.$(oext): local.h
 $(lpfx)fputws.$(oext): local.h fvwrite.h
+$(lpfx)fputws_u.$(oext): fputws.c
 $(lpfx)fread.$(oext): local.h
+$(lpfx)fread_u.$(oext): fread.c
 $(lpfx)freopen.$(oext): local.h
 $(lpfx)fseek.$(oext): local.h
 $(lpfx)fsetlocking.$(oext): local.h
@@ -443,15 +483,20 @@ $(lpfx)fwalk.$(oext): local.h
 $(lpfx)fwide.$(oext): local.h
 $(lpfx)fwprintf.$(oext): local.h
 $(lpfx)fwrite.$(oext): local.h fvwrite.h
+$(lpfx)fwrite_u.$(oext): fwrite.c
 $(lpfx)fwscanf.$(oext): local.h
 $(lpfx)getwc.$(oext): local.h
+$(lpfx)getwc_u.$(oext): local.h
 $(lpfx)getwchar.$(oext): local.h
+$(lpfx)getwchar_u.$(oext): local.h
 $(lpfx)iscanf.$(oext): local.h
 $(lpfx)makebuf.$(oext): local.h
 $(lpfx)open_memstream.$(oext): local.h
 $(lpfx)puts.$(oext): fvwrite.h
 $(lpfx)putwc.$(oext): local.h
+$(lpfx)putwc_u.$(oext): local.h
 $(lpfx)putwchar.$(oext): local.h
+$(lpfx)putwchar_u.$(oext): local.h
 $(lpfx)refill.$(oext): local.h
 $(lpfx)scanf.$(oext): local.h
 $(lpfx)setbuf.$(oext): local.h

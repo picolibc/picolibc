@@ -26,21 +26,34 @@
 
 /*
 FUNCTION
-<<fputwc>>, <<putwc>>---write a wide character on a stream or file
+<<fputwc>>, <<putwc>>, <<fputwc_unlocked>>, <<putwc_unlocked>>---write a wide character on a stream or file
 
 INDEX
 	fputwc
 INDEX
+	fputwc_unlocked
+INDEX
 	_fputwc_r
+INDEX
+	_fputwc_unlocked_r
 INDEX
 	putwc
 INDEX
+	putwc_unlocked
+INDEX
 	_putwc_r
+INDEX
+	_putwc_unlocked_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	#include <wchar.h>
 	wint_t fputwc(wchar_t <[wc]>, FILE *<[fp]>);
+
+	#define _GNU_SOURCE
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t fputwc_unlocked(wchar_t <[wc]>, FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
@@ -48,16 +61,36 @@ ANSI_SYNOPSIS
 
 	#include <stdio.h>
 	#include <wchar.h>
+	wint_t _fputwc_unlocked_r(struct _reent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
+
+	#include <stdio.h>
+	#include <wchar.h>
 	wint_t putwc(wchar_t <[wc]>, FILE *<[fp]>);
+
+	#define _GNU_SOURCE
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t putwc_unlocked(wchar_t <[wc]>, FILE *<[fp]>);
 
 	#include <stdio.h>
 	#include <wchar.h>
 	wint_t _putwc_r(struct _reent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
 
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t _putwc_unlocked_r(struct _reent *<[ptr]>, wchar_t <[wc]>, FILE *<[fp]>);
+
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	#include <wchar.h>
 	wint_t fputwc(<[wc]>, <[fp]>)
+	wchar_t <[wc]>;
+	FILE *<[fp]>;
+
+	#define _GNU_SOURCE
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t fputwc_unlocked(<[wc]>, <[fp]>)
 	wchar_t <[wc]>;
 	FILE *<[fp]>;
 
@@ -70,13 +103,34 @@ TRAD_SYNOPSIS
 
 	#include <stdio.h>
 	#include <wchar.h>
+	wint_t _fputwc_unlocked_r(<[ptr]>, <[wc]>, <[fp]>)
+	struct _reent *<[ptr]>;
+	wchar_t <[wc]>;
+	FILE *<[fp]>;
+
+	#include <stdio.h>
+	#include <wchar.h>
 	wint_t putwc(<[wc]>, <[fp]>)
+	wchar_t <[wc]>;
+	FILE *<[fp]>;
+
+	#define _GNU_SOURCE
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t putwc_unlocked(<[wc]>, <[fp]>)
 	wchar_t <[wc]>;
 	FILE *<[fp]>;
 
 	#include <stdio.h>
 	#include <wchar.h>
 	wint_t _putwc_r(<[ptr]>, <[wc]>, <[fp]>)
+	struct _reent *<[ptr]>;
+	wchar_t <[wc]>;
+	FILE *<[fp]>;
+
+	#include <stdio.h>
+	#include <wchar.h>
+	wint_t _putwc_unlocked_r(<[ptr]>, <[wc]>, <[fp]>)
 	struct _reent *<[ptr]>;
 	wchar_t <[wc]>;
 	FILE *<[fp]>;
@@ -91,13 +145,22 @@ file or stream.  Otherwise, the new wide character is written at the
 current value of the position indicator, and the position indicator
 oadvances by one.
 
-The <<putwc>> function or macro functions identically to <<fputwc>>.  It
-may be implemented as a macro, and may evaluate its argument more than
-once. There is no reason ever to use it.
+<<fputwc_unlocked>> is a non-thread-safe version of <<fputwc>>.
+<<fputwc_unlocked>> may only safely be used within a scope
+protected by flockfile() (or ftrylockfile()) and funlockfile().  This
+function may safely be used in a multi-threaded program if and only
+if they are called while the invoking thread owns the (FILE *)
+object, as is the case after a successful call to the flockfile() or
+ftrylockfile() functions.  If threads are disabled, then
+<<fputwc_unlocked>> is equivalent to <<fputwc>>.
 
-The <<_fputwc_r>> and <<_putwc_r>> functions are simply reentrant versions
-of <<fputwc>> and <<putwc>> that take an additional reentrant structure
-argument: <[ptr]>.
+The <<putwc>> and <<putwc_unlocked>> functions or macros function identically
+to <<fputwc>> and <<fputwc_unlocked>>.  They may be implemented as a macro, and
+may evaluate its argument more than once. There is no reason ever to use them.
+
+The <<_fputwc_r>>, <<_putwc_r>>, <<_fputwc_unlocked_r>>, and
+<<_putwc_unlocked_r>> functions are simply reentrant versions of the above
+that take an additional reentrant structure argument: <[ptr]>.
 
 RETURNS
 If successful, <<fputwc>> and <<putwc>> return their argument <[wc]>.
@@ -105,7 +168,9 @@ If an error intervenes, the result is <<EOF>>.  You can use
 `<<ferror(<[fp]>)>>' to query for errors.
 
 PORTABILITY
-C99, POSIX.1-2001
+<<fputwc>> and <<putwc>> are required by C99 and POSIX.1-2001.
+
+<<fputwc_unlocked>> and <<putwc_unlocked>> are GNU extensions.
 */
 
 #include <_ansi.h>
@@ -117,7 +182,7 @@ C99, POSIX.1-2001
 #include <wchar.h>
 #include "local.h"
 
-static wint_t
+wint_t
 _DEFUN(__fputwc, (ptr, wc, fp),
 	struct _reent *ptr _AND
 	wchar_t wc _AND

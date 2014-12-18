@@ -17,20 +17,33 @@
 
 /*
 FUNCTION
-<<fread>>---read array elements from a file
+<<fread>>. <<fread_unlocked>>---read array elements from a file
 
 INDEX
 	fread
 INDEX
+	fread_unlocked
+INDEX
 	_fread_r
+INDEX
+	_fread_unlocked_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	size_t fread(void *restrict <[buf]>, size_t <[size]>, size_t <[count]>,
 		     FILE *restrict <[fp]>);
 
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	size_t fread_unlocked(void *restrict <[buf]>, size_t <[size]>, size_t <[count]>,
+		     FILE *restrict <[fp]>);
+
 	#include <stdio.h>
 	size_t _fread_r(struct _reent *<[ptr]>, void *restrict <[buf]>,
+	                size_t <[size]>, size_t <[count]>, FILE *restrict <[fp]>);
+
+	#include <stdio.h>
+	size_t _fread_unlocked_r(struct _reent *<[ptr]>, void *restrict <[buf]>,
 	                size_t <[size]>, size_t <[count]>, FILE *restrict <[fp]>);
 
 TRAD_SYNOPSIS
@@ -41,8 +54,24 @@ TRAD_SYNOPSIS
 	size_t <[count]>;
 	FILE *<[fp]>;
 
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	size_t fread_unlocked(<[buf]>, <[size]>, <[count]>, <[fp]>)
+	char *<[buf]>;
+	size_t <[size]>;
+	size_t <[count]>;
+	FILE *<[fp]>;
+
 	#include <stdio.h>
 	size_t _fread_r(<[ptr]>, <[buf]>, <[size]>, <[count]>, <[fp]>)
+	struct _reent *<[ptr]>;
+	char *<[buf]>;
+	size_t <[size]>;
+	size_t <[count]>;
+	FILE *<[fp]>;
+
+	#include <stdio.h>
+	size_t _fread_unlocked_r(<[ptr]>, <[buf]>, <[size]>, <[count]>, <[fp]>)
 	struct _reent *<[ptr]>;
 	char *<[buf]>;
 	size_t <[size]>;
@@ -58,8 +87,17 @@ starting at <[buf]>.   <<fread>> may copy fewer elements than
 <<fread>> also advances the file position indicator (if any) for
 <[fp]> by the number of @emph{characters} actually read.
 
-<<_fread_r>> is simply the reentrant version of <<fread>> that
-takes an additional reentrant structure pointer argument: <[ptr]>.
+<<fread_unlocked>> is a non-thread-safe version of <<fread>>.
+<<fread_unlocked>> may only safely be used within a scope
+protected by flockfile() (or ftrylockfile()) and funlockfile().  This
+function may safely be used in a multi-threaded program if and only
+if they are called while the invoking thread owns the (FILE *)
+object, as is the case after a successful call to the flockfile() or
+ftrylockfile() functions.  If threads are disabled, then
+<<fread_unlocked>> is equivalent to <<fread>>.
+
+<<_fread_r>> and <<_fread_unlocked_r>> are simply reentrant versions of the
+above that take an additional reentrant structure pointer argument: <[ptr]>.
 
 RETURNS
 The result of <<fread>> is the number of elements it succeeded in
@@ -67,6 +105,8 @@ reading.
 
 PORTABILITY
 ANSI C requires <<fread>>.
+
+<<fread_unlocked>> is a BSD extension also provided by GNU libc.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
@@ -77,6 +117,11 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <string.h>
 #include <malloc.h>
 #include "local.h"
+
+#ifdef __IMPL_UNLOCKED__
+#define _fread_r _fread_unlocked_r
+#define fread fread_unlocked
+#endif
 
 #ifdef __SCLE
 static size_t

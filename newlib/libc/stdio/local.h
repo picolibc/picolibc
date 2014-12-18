@@ -60,7 +60,16 @@
 #define _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
 #endif
 
-#ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
+#if defined(__SINGLE_THREAD__) || defined(__IMPL_UNLOCKED__)
+
+# define _newlib_flockfile_start(_fp)
+# define _newlib_flockfile_exit(_fp)
+# define _newlib_flockfile_end(_fp)
+# define _newlib_sfp_lock_start()
+# define _newlib_sfp_lock_exit()
+# define _newlib_sfp_lock_end()
+
+#elif defined(_STDIO_WITH_THREAD_CANCELLATION_SUPPORT)
 #include <pthread.h>
 
 /* Start a stream oriented critical section: */
@@ -102,7 +111,7 @@
 	  pthread_setcancelstate (__oldsfpcancel, &__oldsfpcancel); \
 	}
 
-#elif !defined(__SINGLE_THREAD__) /* !_STDIO_WITH_THREAD_CANCELLATION_SUPPORT */
+#else /* !__SINGLE_THREAD__ && !__IMPL_UNLOCKED__ && !_STDIO_WITH_THREAD_CANCELLATION_SUPPORT */
 
 # define _newlib_flockfile_start(_fp) \
 	{ \
@@ -129,17 +138,10 @@
 		__sfp_lock_release (); \
 	}
 
-#else /* __SINGLE_THREAD__ */
+#endif /* __SINGLE_THREAD__ || __IMPL_UNLOCKED__ */
 
-# define _newlib_flockfile_start(_fp)
-# define _newlib_flockfile_exit(_fp)
-# define _newlib_flockfile_end(_fp)
-# define _newlib_sfp_lock_start()
-# define _newlib_sfp_lock_exit()
-# define _newlib_sfp_lock_end()
-
-#endif /* _STDIO_WITH_THREAD_CANCELLATION_SUPPORT */
-
+extern wint_t _EXFUN(__fgetwc, (struct _reent *, FILE *));
+extern wint_t _EXFUN(__fputwc, (struct _reent *, wchar_t, FILE *));
 extern u_char *_EXFUN(__sccl, (char *, u_char *fmt));
 extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
 extern int    _EXFUN(__ssvfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));

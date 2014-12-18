@@ -17,27 +17,50 @@
 
 /*
 FUNCTION
-<<fgetc>>---get a character from a file or stream
+<<fgetc>>, <<fgetc_unlocked>>---get a character from a file or stream
 
 INDEX
 	fgetc
 INDEX
+	fgetc_unlocked
+INDEX
 	_fgetc_r
+INDEX
+	_fgetc_unlocked_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fgetc(FILE *<[fp]>);
 
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	int fgetc_unlocked(FILE *<[fp]>);
+
 	#include <stdio.h>
 	int _fgetc_r(struct _reent *<[ptr]>, FILE *<[fp]>);
+
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	int _fgetc_unlocked_r(struct _reent *<[ptr]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int fgetc(<[fp]>)
 	FILE *<[fp]>;
 
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	int fgetc_unlocked(<[fp]>)
+	FILE *<[fp]>;
+
 	#include <stdio.h>
 	int _fgetc_r(<[ptr]>, <[fp]>)
+	struct _reent *<[ptr]>;
+	FILE *<[fp]>;
+
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	int _fgetc_unlocked_r(<[ptr]>, <[fp]>)
 	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 
@@ -48,9 +71,18 @@ current position indicator.
 
 For a macro version of this function, see <<getc>>.
 
-The function <<_fgetc_r>> is simply a reentrant version of
-<<fgetc>> that is passed the additional reentrant structure
-pointer argument: <[ptr]>.
+<<fgetc_unlocked>> is a non-thread-safe version of <<fgetc>>.
+<<fgetc_unlocked>> may only safely be used within a scope
+protected by flockfile() (or ftrylockfile()) and funlockfile().  This
+function may safely be used in a multi-threaded program if and only
+if they are called while the invoking thread owns the (FILE *)
+object, as is the case after a successful call to the flockfile() or
+ftrylockfile() functions.  If threads are disabled, then
+<<fgetc_unlocked>> is equivalent to <<fgetc>>.
+
+The functions <<_fgetc_r>> and <<_fgetc_unlocked_r>> are simply reentrant
+versions that are passed the additional reentrant structure pointer
+argument: <[ptr]>.
 
 RETURNS
 The next character (read as an <<unsigned char>>, and cast to
@@ -62,6 +94,8 @@ using the <<ferror>> and <<feof>> functions.
 
 PORTABILITY
 ANSI C requires <<fgetc>>.
+
+<<fgetc_unlocked>> is a BSD extension also provided by GNU libc.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.

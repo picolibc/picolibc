@@ -371,7 +371,9 @@ int	_EXFUN(_fcloseall_r, (struct _reent *));
 FILE *	_EXFUN(_fdopen_r, (struct _reent *, int, const char *));
 int	_EXFUN(_fflush_r, (struct _reent *, FILE *));
 int	_EXFUN(_fgetc_r, (struct _reent *, FILE *));
+int	_EXFUN(_fgetc_unlocked_r, (struct _reent *, FILE *));
 char *  _EXFUN(_fgets_r, (struct _reent *, char *__restrict, int, FILE *__restrict));
+char *  _EXFUN(_fgets_unlocked_r, (struct _reent *, char *__restrict, int, FILE *__restrict));
 #ifdef _COMPILING_NEWLIB
 int	_EXFUN(_fgetpos_r, (struct _reent *, FILE *__restrict, _fpos_t *__restrict));
 int	_EXFUN(_fsetpos_r, (struct _reent *, FILE *, const _fpos_t *));
@@ -390,8 +392,11 @@ int	_EXFUN(_fprintf_r, (struct _reent *, FILE *__restrict, const char *__restric
                _ATTRIBUTE ((__format__ (__printf__, 3, 4))));
 int	_EXFUN(_fpurge_r, (struct _reent *, FILE *));
 int	_EXFUN(_fputc_r, (struct _reent *, int, FILE *));
+int	_EXFUN(_fputc_unlocked_r, (struct _reent *, int, FILE *));
 int	_EXFUN(_fputs_r, (struct _reent *, const char *__restrict, FILE *__restrict));
+int	_EXFUN(_fputs_unlocked_r, (struct _reent *, const char *__restrict, FILE *__restrict));
 size_t	_EXFUN(_fread_r, (struct _reent *, _PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
+size_t	_EXFUN(_fread_unlocked_r, (struct _reent *, _PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
 int	_EXFUN(_fscanf_r, (struct _reent *, FILE *__restrict, const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 4))));
 int	_EXFUN(_fseek_r, (struct _reent *, FILE *, long, int));
@@ -400,6 +405,7 @@ long	_EXFUN(_ftell_r, (struct _reent *, FILE *));
 _off_t	_EXFUN(_ftello_r,(struct _reent *, FILE *));
 void	_EXFUN(_rewind_r, (struct _reent *, FILE *));
 size_t	_EXFUN(_fwrite_r, (struct _reent *, const _PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
+size_t	_EXFUN(_fwrite_unlocked_r, (struct _reent *, const _PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
 int	_EXFUN(_getc_r, (struct _reent *, FILE *));
 int	_EXFUN(_getc_unlocked_r, (struct _reent *, FILE *));
 int	_EXFUN(_getchar_r, (struct _reent *));
@@ -485,6 +491,23 @@ int	_EXFUN(_vsscanf_r, (struct _reent *, const char *__restrict, const char *__r
 int	_EXFUN(fpurge, (FILE *));
 ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
 ssize_t _EXFUN(__getline, (char **, size_t *, FILE *));
+
+#if __BSD_VISIBLE
+void	_EXFUN(clearerr_unlocked, (FILE *));
+int	_EXFUN(feof_unlocked, (FILE *));
+int	_EXFUN(ferror_unlocked, (FILE *));
+int	_EXFUN(fileno_unlocked, (FILE *));
+int	_EXFUN(fflush_unlocked, (FILE *));
+int	_EXFUN(fgetc_unlocked, (FILE *));
+int	_EXFUN(fputc_unlocked, (int, FILE *));
+size_t	_EXFUN(fread_unlocked, (_PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
+size_t	_EXFUN(fwrite_unlocked, (const _PTR __restrict , size_t _size, size_t _n, FILE *));
+#endif
+
+#if __GNU_VISIBLE
+char *  _EXFUN(fgets_unlocked, (char *__restrict, int, FILE *__restrict));
+int	_EXFUN(fputs_unlocked, (const char *__restrict, FILE *__restrict));
+#endif
 
 #ifdef __LARGE64_FILES
 #if !defined(__CYGWIN__) || defined(_COMPILING_NEWLIB)
@@ -659,7 +682,13 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #define	feof(p)		__sfeof(p)
 #define	ferror(p)	__sferror(p)
 #define	clearerr(p)	__sclearerr(p)
-#endif
+
+#if __BSD_VISIBLE
+#define	feof_unlocked(p)	__sfeof(p)
+#define	ferror_unlocked(p)	__sferror(p)
+#define	clearerr_unlocked(p)	__sclearerr(p)
+#endif /* __BSD_VISIBLE */
+#endif /* _REENT_SMALL */
 
 #if 0 /*ndef __STRICT_ANSI__ - FIXME: must initialize stdio first, use fn */
 #define	fileno(p)	__sfileno(p)
@@ -687,6 +716,11 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 
 #define	getchar()	getc(stdin)
 #define	putchar(x)	putc(x, stdout)
+
+#ifndef __STRICT_ANSI__
+#define	getchar_unlocked()	getc_unlocked(stdin)
+#define	putchar_unlocked(x)	putc_unlocked(x, stdout)
+#endif
 
 _END_STD_C
 

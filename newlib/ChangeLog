@@ -1,3 +1,68 @@
+2014-12-18  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	Implement BSD/GNU unlocked stdio extensions.
+	* libc/include/stdio.h (clearerr_unlocked, feof_unlocked,
+	ferror_unlocked, fflush_unlocked, fgetc_unlocked, fgets_unlocked,
+	fileno_unlocked, fputc_unlocked, fputs_unlocked, fread_unlocked,
+	fwrite_unlocked): Declare.
+	* libc/include/wchar.h (fgetwc_unlocked, fgetws_unlocked,
+	fputwc_unlocked, fputws_unlocked, getwc_unlocked, getwchar_unlocked,
+	putwc_unlocked, putwchar_unlocked): Declare.
+	* libc/stdio/Makefile.am (ELIX_4_SOURCES): Add clearerr_u.c,
+	feof_u.c, ferror_u.c, fflush_u.c, fgetc_u.c, fgets_u.c, fgetwc_u.c,
+	fgetws_u.c, fileno_u.c, fputc_u.c, fputs_u.c, fputwc_u.c, fputws_u.c,
+	fread_u.c, fwrite_u.c, getwc_u.c, getwchar_u.c, putwc_u.c, putwchar_u.c.
+	Add necessary dependencies.
+	* libc/stdio/Makefile.in: Regenerate.
+	* libc/stdio/clearerr.c: Document unlocked variant.
+	* libc/stdio/clearerr_u.c: New file.
+	* libc/stdio/feof.c: Document unlocked variant.
+	* libc/stdio/feof_u.c: New file.
+	* libc/stdio/ferror.c: Document unlocked variant.
+	* libc/stdio/ferror_u.c: New file.
+	* libc/stdio/fflush.c: Add __IMPL_UNLOCKED__ overrides.
+	Document unlocked variants.
+	* libc/stdio/fflush_u.c: New file.
+	* libc/stdio/fgetc.c: Document unlocked variants.
+	* libc/stdio/fgetc_u.c: New file.
+	* libc/stdio/fgets.c: Add __IMPL_UNLOCKED__ overrides.
+	Document unlocked variants.
+	* libc/stdio/fgets_u.c: New file.
+	* libc/stdio/fgetwc.c: Document unlocked variants.
+	(__fgetwc): Make non-static.
+	* libc/stdio/fgetwc_u.c: New file.
+	* libc/stdio/fgetws.c: Add __IMPL_UNLOCKED__ overrides.
+	Document unlocked variants.
+	* libc/stdio/fgetws_u.c: New file.
+	* libc/stdio/fileno.c: Document unlocked variant.
+	* libc/stdio/fileno_u.c: New file.
+	* libc/stdio/fputc.c: Document unlocked variants.
+	* libc/stdio/fputc_u.c: New file.
+	* libc/stdio/fputs.c: Add __IMPL_UNLOCKED__ overrides.
+	Document unlocked variants.
+	* libc/stdio/fputs_u.c: New file.
+	* libc/stdio/fputwc.c: Document unlocked variants.
+	(__fputwc): Make non-static.
+	* libc/stdio/fputwc_u.c: New file.
+	* libc/stdio/fputws.c: Add __IMPL_UNLOCKED__ overrides.
+	Document unlocked variants.
+	* libc/stdio/fputws_u.c: New file.
+	* libc/stdio/fread.c: Add __IMPL_UNLOCKED__ overrides.
+	Document unlocked variants.
+	* libc/stdio/fread_u.c: New file.
+	* libc/stdio/fwrite.c: Add __IMPL_UNLOCKED__ overrides.
+	Document unlocked variants.
+	* libc/stdio/fwrite_u.c: New file.
+	* libc/stdio/getwc_u.c: New file.
+	* libc/stdio/getwchar.c: Document unlocked variants.
+	* libc/stdio/getwchar_u.c: New file.
+	* libc/stdio/local.h: Define locking macros as empty ifdef
+	__IMPL_UNLOCKED__.
+	(__fgetwc, __fputwc): Declare.
+	* libc/stdio/putwc_u.c: New file.
+	* libc/stdio/putwchar.c: Document unlocked variants.
+	* libc/stdio/putwchar_u.c: New file.
+
 2014-12-18  Corinna Vinschen  <vinschen@redhat.com>
 
 	* stdio.tex: Add menu entries for __fsetlocking and stdio_ext.

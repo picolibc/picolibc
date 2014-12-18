@@ -17,18 +17,29 @@
 
 /*
 FUNCTION
-<<ferror>>---test whether read/write error has occurred
+<<ferror>>, <<ferror_unlocked>>---test whether read/write error has occurred
 
 INDEX
 	ferror
+INDEX
+	ferror_unlocked
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int ferror(FILE *<[fp]>);
 
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	int ferror_unlocked(FILE *<[fp]>);
+
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int ferror(<[fp]>)
+	FILE *<[fp]>;
+
+	#define _BSD_SOURCE
+	#include <stdio.h>
+	int ferror_unlocked(<[fp]>)
 	FILE *<[fp]>;
 
 DESCRIPTION
@@ -39,12 +50,23 @@ Use <<ferror>> to query this indicator.
 
 See <<clearerr>> to reset the error indicator.
 
+<<ferror_unlocked>> is a non-thread-safe version of <<ferror>>.
+<<ferror_unlocked>> may only safely be used within a scope
+protected by flockfile() (or ftrylockfile()) and funlockfile().  This
+function may safely be used in a multi-threaded program if and only
+if they are called while the invoking thread owns the (FILE *)
+object, as is the case after a successful call to the flockfile() or
+ftrylockfile() functions.  If threads are disabled, then
+<<ferror_unlocked>> is equivalent to <<ferror>>.
+
 RETURNS
 <<ferror>> returns <<0>> if no errors have occurred; it returns a
 nonzero value otherwise.
 
 PORTABILITY
 ANSI C requires <<ferror>>.
+
+<<ferror_unlocked>> is a BSD extension also provided by GNU libc.
 
 No supporting OS subroutines are required.
 */
