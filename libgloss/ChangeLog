@@ -1,3 +1,7 @@
+2014-12-27  Anthony Green  <green@moxielogic.com>
+
+	* moxie/crt0.S (_start): sub.l is now sub.
+
 2014-12-15  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
 	* or1k/Makefile.in: Build and install board libraries
