@@ -1,7 +1,7 @@
 /*
  *  Written by Joel Sherrill <joel@OARcorp.com>.
  *
- *  COPYRIGHT (c) 1989-2000.
+ *  COPYRIGHT (c) 1989-2014.
  *
  *  On-Line Applications Research Corporation (OAR).
  *
@@ -29,7 +29,7 @@ extern "C" {
  * be similar to where glibc stores its version of these macros.
  */
 #define __NEWLIB__  		2
-#define __NEWLIB_MINOR__  	1
+#define __NEWLIB_MINOR__  	2
 
 /* Macro to test version of GCC.  Returns 0 for non-GCC or too old GCC. */
 #ifndef __GNUC_PREREQ
