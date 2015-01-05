@@ -103,11 +103,11 @@ trap.o:	$(srcdir)/trap.S
 
 install: $($(CPU)_INSTALL)
 	for c in $(CRT0); do \
-	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$c ; \
+	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ; \
 	done; 
-	$(INSTALL_DATA) $(SIM_BSP) $(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
+	$(INSTALL_DATA) $(SIM_BSP) $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$(SIM_BSP)
 	for c in $(SCRIPTS); do \
-	  $(INSTALL_DATA) $(srcdir)/$$c $(tooldir)/lib/$$c ; \
+	  $(INSTALL_DATA) $(srcdir)/$$c $(DESTDIR)$(tooldir)/lib/$$c ; \
 	done;
 
 clean mostlyclean:

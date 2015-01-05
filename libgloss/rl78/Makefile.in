@@ -135,11 +135,11 @@ write.o : $(SDEPS)
 
 install: $(CRT) $(SIM_BSP) $(SCRIPTS)
 	for c in $(CRT) $(SIM_BSP); do \
-	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$c ;\
+	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ;\
 	done
 	for c in $(SCRIPTS); do \
 	  b=`basename $$c`; \
-	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$b ;\
+	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$b ;\
 	done
 
 clean mostlyclean:

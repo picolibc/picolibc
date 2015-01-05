@@ -99,13 +99,13 @@ crtn.o: $(srcdir)/crtn.S $(srcdir)/sim-crtn.S
 
 install: $(CRT) $(SIM_BSP)
 	for c in $(CRT) $(SIM_BSP); do \
-	  $(INSTALL_DATA) $$c $(tooldir)/lib${MULTISUBDIR}/$$c ;\
+	  $(INSTALL_DATA) $$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ;\
 	done
 	if test -z "$(MULTISUBDIR)"; then \
 	  for c in $(SCRIPTS); do \
-	    $(INSTALL_DATA) $(srcdir)/$$c $(tooldir)/lib${MULTISUBDIR}/$$c ;\
+	    $(INSTALL_DATA) $(srcdir)/$$c $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/$$c ;\
 	  done; \
-	  $(INSTALL_DATA) $(srcdir)/gmap_default.ld $(tooldir)/lib/gmap_default.tmpl; \
+	  $(INSTALL_DATA) $(srcdir)/gmap_default.ld $(DESTDIR)$(tooldir)/lib/gmap_default.tmpl; \
 	else true; fi
 
 clean mostlyclean:

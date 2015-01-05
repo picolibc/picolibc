@@ -72,10 +72,10 @@ distclean maintainer-clean realclean: clean
 .PHONY: install info install-info clean-info
 install: install-scripts # install-includes 
 	@for crt0 in ${CRT0S}; do\
-	 $(INSTALL_PROGRAM) $${crt0} $(tooldir)/lib${MULTISUBDIR}; \
+	 $(INSTALL_PROGRAM) $${crt0} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
 	done
 	@for bsp in ${BSPS}; do\
-	 $(INSTALL_PROGRAM) $${bsp} $(tooldir)/lib${MULTISUBDIR}; \
+	 $(INSTALL_PROGRAM) $${bsp} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
 	done
 
 install-includes:
@@ -86,7 +86,7 @@ install-includes:
 	
 install-scripts:
 	@for script in ${SCRIPTS}; do\
-	 $(INSTALL_DATA) ${srcdir}/$${script} $(tooldir)/lib${MULTISUBDIR}; \
+	 $(INSTALL_DATA) ${srcdir}/$${script} $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}; \
 	done
 	
 doc:
