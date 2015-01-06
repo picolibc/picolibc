@@ -1,7 +1,7 @@
 /*
-   strcpy - copy a string.
+   strcpy/stpcpy - copy a string returning pointer to start/end.
 
-   Copyright (c) 2013, 2014 ARM Ltd.
+   Copyright (c) 2013, 2014, 2015 ARM Ltd.
    All Rights Reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,9 @@
  * ARMv8-a, AArch64, unaligned accesses, min page size 4k.
  */
 
-/* To test the page crossing code path more thoroughly, compile with
+/* To build as stpcpy, define BUILD_STPCPY before compiling this file.
+
+   To test the page crossing code path more thoroughly, compile with
    -DSTRCPY_TEST_PAGE_CROSS - this will force all copies through the slower
    entry path.  This option is not intended for production use.  */
 
@@ -63,6 +65,12 @@
 #define pos		x15
 #define len		x16
 #define to_align	x17
+
+#ifdef BUILD_STPCPY
+#define STRCPY stpcpy
+#else
+#define STRCPY strcpy
+#endif
 
 	.macro def_fn f p2align=0
 	.text
@@ -94,10 +102,16 @@
 	   misaligned, crosses a page boundary - after that we move to aligned
 	   fetches for the remainder of the string.  */
 
+#ifdef STRCPY_TEST_PAGE_CROSS
+	/* Make everything that isn't Qword aligned look like a page cross.  */
+#define MIN_PAGE_P2 4
+#else
 #define MIN_PAGE_P2 12
+#endif
+
 #define MIN_PAGE_SIZE (1 << MIN_PAGE_P2)
 
-def_fn strcpy p2align=6
+def_fn STRCPY p2align=6
 	/* For moderately short strings, the fastest way to do the copy is to
 	   calculate the length of the string in the same way as strlen, then
 	   essentially do a memcpy of the result.  This avoids the need for
@@ -108,80 +122,112 @@ def_fn strcpy p2align=6
 	   always be difficult - we mitigate against this by preferring
 	   conditional select operations over branches whenever this is
 	   feasible.  */
-	add	tmp2, srcin, #15
+	and	tmp2, srcin, #(MIN_PAGE_SIZE - 1)
 	mov	zeroones, #REP8_01
 	and	to_align, srcin, #15
-	eor	tmp2, tmp2, srcin
-	mov	dst, dstin
+	cmp	tmp2, #(MIN_PAGE_SIZE - 16)
 	neg	tmp1, to_align
-#ifdef STRCPY_TEST_PAGE_CROSS
-	b	.Lpage_cross
-#else
 	/* The first fetch will straddle a (possible) page boundary iff
 	   srcin + 15 causes bit[MIN_PAGE_P2] to change value.  A 16-byte
 	   aligned string will never fail the page align check, so will
 	   always take the fast path.  */
-	tbnz	tmp2, #MIN_PAGE_P2, .Lpage_cross
-#endif
+	b.gt	.Lpage_cross
+
+.Lpage_cross_ok:
 	ldp	data1, data2, [srcin]
-	add	src, srcin, #16
+#ifdef __AARCH64EB__
+	/* Because we expect the end to be found within 16 characters
+	   (profiling shows this is the most common case), it's worth
+	   swapping the bytes now to save having to recalculate the
+	   termination syndrome later.  We preserve data1 and data2
+	   so that we can re-use the values later on.  */
+	rev	tmp2, data1
+	sub	tmp1, tmp2, zeroones
+	orr	tmp2, tmp2, #REP8_7f
+	bics	has_nul1, tmp1, tmp2
+	b.ne	.Lfp_le8
+	rev	tmp4, data2
+	sub	tmp3, tmp4, zeroones
+	orr	tmp4, tmp4, #REP8_7f
+#else
 	sub	tmp1, data1, zeroones
 	orr	tmp2, data1, #REP8_7f
+	bics	has_nul1, tmp1, tmp2
+	b.ne	.Lfp_le8
 	sub	tmp3, data2, zeroones
 	orr	tmp4, data2, #REP8_7f
-	bic	has_nul1, tmp1, tmp2
+#endif
 	bics	has_nul2, tmp3, tmp4
-	ccmp	has_nul1, #0, #0, eq	/* NZCV = 0000  */
-	b.ne	.Learly_end_found
-	stp	data1, data2, [dst], #16
-	sub	src, src, to_align
-	sub	dst, dst, to_align
+	b.eq	.Lbulk_entry
+
+	/* The string is short (<=16 bytes).  We don't know exactly how
+	   short though, yet.  Work out the exact length so that we can
+	   quickly select the optimal copy strategy.  */
+.Lfp_gt8:
+	rev	has_nul2, has_nul2
+	clz	pos, has_nul2
+	mov	tmp2, #56
+	add	dst, dstin, pos, lsr #3		/* Bits to bytes.  */
+	sub	pos, tmp2, pos
+#ifdef __AARCH64EB__
+	lsr	data2, data2, pos
+#else
+	lsl	data2, data2, pos
+#endif
+	str	data2, [dst, #1]
+	str	data1, [dstin]
+#ifdef BUILD_STPCPY
+	add	dstin, dst, #8
+#endif
+	ret
+
+.Lfp_le8:
+	rev	has_nul1, has_nul1
+	clz	pos, has_nul1
+	add	dst, dstin, pos, lsr #3		/* Bits to bytes.  */
+	subs	tmp2, pos, #24			/* Pos in bits. */
+	b.lt	.Lfp_lt4
+#ifdef __AARCH64EB__
+	mov	tmp2, #56
+	sub	pos, tmp2, pos
+	lsr	data2, data1, pos
+	lsr	data1, data1, #32
+#else
+	lsr	data2, data1, tmp2
+#endif
+	/* 4->7 bytes to copy.  */
+	str	data2w, [dst, #-3]
+	str	data1w, [dstin]
+#ifdef BUILD_STPCPY
+	mov	dstin, dst
+#endif
+	ret
+.Lfp_lt4:
+	cbz	pos, .Lfp_lt2
+	/* 2->3 bytes to copy.  */
+#ifdef __AARCH64EB__
+	lsr	data1, data1, #48
+#endif
+	strh	data1w, [dstin]
+	/* Fall-through, one byte (max) to go.  */
+.Lfp_lt2:
+	/* Null-terminated string.  Last character must be zero!  */
+	strb	wzr, [dst]
+#ifdef BUILD_STPCPY
+	mov	dstin, dst
+#endif
+	ret
+
+	.p2align 6
+	/* Aligning here ensures that the entry code and main loop all lies
+	   within one 64-byte cache line.  */
+.Lbulk_entry:
+	sub	to_align, to_align, #16
+	stp	data1, data2, [dstin]
+	sub	src, srcin, to_align
+	sub	dst, dstin, to_align
 	b	.Lentry_no_page_cross
 
-.Lpage_cross:
-	bic	src, srcin, #15
-	/* Start by loading two words at [srcin & ~15], then forcing the
-	   bytes that precede srcin to 0xff.  This means they never look
-	   like termination bytes.  */
-	ldp	data1, data2, [src], #16
-	lsl	tmp1, tmp1, #3	/* Bytes beyond alignment -> bits.  */
-	tst	to_align, #7
-	csetm	tmp2, ne
-#ifdef __AARCH64EB__
-	lsl	tmp2, tmp2, tmp1	/* Shift (tmp1 & 63).  */
-#else
-	lsr	tmp2, tmp2, tmp1	/* Shift (tmp1 & 63).  */
-#endif
-	orr	data1, data1, tmp2
-	orr	data2a, data2, tmp2
-	cmp	to_align, #8
-	csinv	data1, data1, xzr, lt
-	csel	data2, data2, data2a, lt
-	sub	tmp1, data1, zeroones
-	orr	tmp2, data1, #REP8_7f
-	sub	tmp3, data2, zeroones
-	orr	tmp4, data2, #REP8_7f
-	bic	has_nul1, tmp1, tmp2
-	bics	has_nul2, tmp3, tmp4
-	ccmp	has_nul1, #0, #0, eq	/* NZCV = 0000  */
-	b.ne	.Learly_end_found
-	ldp	data1, data2, [src], #16
-	sub	tmp1, data1, zeroones
-	orr	tmp2, data1, #REP8_7f
-	sub	tmp3, data2, zeroones
-	orr	tmp4, data2, #REP8_7f
-	bic	has_nul1, tmp1, tmp2
-	bics	has_nul2, tmp3, tmp4
-	ccmp	has_nul1, #0, #0, eq	/* NZCV = 0000  */
-	b.ne	.Learly_end_found
-	/* We've now checked between 16 and 32 bytes, but not found a null,
-	   so we can safely start bulk copying.  Start by refetching the
-	   first 16 bytes of the real string; we know this can't trap now.  */
-	ldp	data1a, data2a, [srcin]
-	stp	data1a, data2a, [dst], #16
-	sub	dst, dst, to_align
-	/* Everything is now set up, so we can just fall into the bulk
-	   copy loop.  */
 	/* The inner loop deals with two Dwords at a time.  This has a
 	   slightly higher start-up cost, but we should win quite quickly,
 	   especially on cores with a high number of issue slots per
@@ -225,72 +271,71 @@ def_fn strcpy p2align=6
 	add	dst, dst, pos, lsr #3
 	ldp	data1, data2, [src, #-32]
 	stp	data1, data2, [dst, #-16]
+#ifdef BUILD_STPCPY
+	sub	dstin, dst, #1
+#endif
 	ret
 
-	/* The string is short (<32 bytes).  We don't know exactly how
-	   short though, yet.  Work out the exact length so that we can
-	   quickly select the optimal copy strategy.  */
-.Learly_end_found:
-	cmp	has_nul1, #0
+.Lpage_cross:
+	bic	src, srcin, #15
+	/* Start by loading two words at [srcin & ~15], then forcing the
+	   bytes that precede srcin to 0xff.  This means they never look
+	   like termination bytes.  */
+	ldp	data1, data2, [src]
+	lsl	tmp1, tmp1, #3	/* Bytes beyond alignment -> bits.  */
+	tst	to_align, #7
+	csetm	tmp2, ne
 #ifdef __AARCH64EB__
-	/* For big-endian, carry propagation (if the final byte in the
-	   string is 0x01) means we cannot use has_nul directly.  The
-	   easiest way to get the correct byte is to byte-swap the data
-	   and calculate the syndrome a second time.  */
-	csel	data1, data1, data2, ne
-	rev	data1, data1
+	lsl	tmp2, tmp2, tmp1	/* Shift (tmp1 & 63).  */
+#else
+	lsr	tmp2, tmp2, tmp1	/* Shift (tmp1 & 63).  */
+#endif
+	orr	data1, data1, tmp2
+	orr	data2a, data2, tmp2
+	cmp	to_align, #8
+	csinv	data1, data1, xzr, lt
+	csel	data2, data2, data2a, lt
 	sub	tmp1, data1, zeroones
 	orr	tmp2, data1, #REP8_7f
+	sub	tmp3, data2, zeroones
+	orr	tmp4, data2, #REP8_7f
 	bic	has_nul1, tmp1, tmp2
+	bics	has_nul2, tmp3, tmp4
+	ccmp	has_nul1, #0, #0, eq	/* NZCV = 0000  */
+	b.eq	.Lpage_cross_ok
+	/* We now need to make data1 and data2 look like they've been
+	   loaded directly from srcin.  Do a rotate on the 128-bit value.  */
+	lsl	tmp1, to_align, #3	/* Bytes->bits.  */
+	neg	tmp2, to_align, lsl #3
+#ifdef __AARCH64EB__
+	lsl	data1a, data1, tmp1
+	lsr	tmp4, data2, tmp2
+	lsl	data2, data2, tmp1
+	orr	tmp4, tmp4, data1a
+	cmp	to_align, #8
+	csel	data1, tmp4, data2, lt
+	rev	tmp2, data1
+	rev	tmp4, data2
+	sub	tmp1, tmp2, zeroones
+	orr	tmp2, tmp2, #REP8_7f
+	sub	tmp3, tmp4, zeroones
+	orr	tmp4, tmp4, #REP8_7f
 #else
-	csel	has_nul1, has_nul1, has_nul2, ne
+	lsr	data1a, data1, tmp1
+	lsl	tmp4, data2, tmp2
+	lsr	data2, data2, tmp1
+	orr	tmp4, tmp4, data1a
+	cmp	to_align, #8
+	csel	data1, tmp4, data2, lt
+	sub	tmp1, data1, zeroones
+	orr	tmp2, data1, #REP8_7f
+	sub	tmp3, data2, zeroones
+	orr	tmp4, data2, #REP8_7f
 #endif
-	rev	has_nul1, has_nul1
-	sub	tmp1, src, #7
-	sub	src, src, #15
-	clz	pos, has_nul1
-	csel	src, src, tmp1, ne
-	sub	dst, dstin, srcin
-	add	src, src, pos, lsr #3		/* Bits to bytes.  */
-	add	dst, dst, src
-	sub	len, src, srcin
-	cmp	len, #8
-	b.lt	.Llt8
-	cmp	len, #16
-	b.lt	.Llt16
-	/* 16->32 bytes to copy.  */
-	ldp	data1, data2, [srcin]
-	ldp	data1a, data2a, [src, #-16]
-	stp	data1, data2, [dstin]
-	stp	data1a, data2a, [dst, #-16]
-	ret
-.Llt16:
-	/* 8->15 bytes to copy.  */
-	ldr	data1, [srcin]
-	ldr	data2, [src, #-8]
-	str	data1, [dstin]
-	str	data2, [dst, #-8]
-	ret
-.Llt8:
-	cmp	len, #4
-	b.lt	.Llt4
-	/* 4->7 bytes to copy.  */
-	ldr	data1w, [srcin]
-	ldr	data2w, [src, #-4]
-	str	data1w, [dstin]
-	str	data2w, [dst, #-4]
-	ret
-.Llt4:
-	cmp	len, #2
-	b.lt	.Llt2
-	/* 2->3 bytes to copy.  */
-	ldrh	data1w, [srcin]
-	strh	data1w, [dstin]
-	/* Fall-through, one byte (max) to go.  */
-.Llt2:
-	/* Null-terminated string.  Last character must be zero!  */
-	strb	wzr, [dst, #-1]
-	ret
+	bic	has_nul1, tmp1, tmp2
+	cbnz	has_nul1, .Lfp_le8
+	bic	has_nul2, tmp3, tmp4
+	b	.Lfp_gt8
 
-	.size	strcpy, . - strcpy
+	.size	STRCPY, . - STRCPY
 #endif
