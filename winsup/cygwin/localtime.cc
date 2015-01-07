@@ -900,12 +900,18 @@ tzload(timezone_t sp, const char *name, const int doextend)
 		}
 	}
 	free(up);
+	/*
+	** Get latest zone offsets into tzinfo (for newlib). . .
+	*/
 	if (sp == lclptr)
 	  {
-	    __gettzinfo ()->__tzrule[0].offset
-				    = -sp->ttis[1].tt_gmtoff;
-	    __gettzinfo ()->__tzrule[1].offset
-				    = -sp->ttis[0].tt_gmtoff;
+	    for (i = 0; i < sp->timecnt; ++i)
+	      {
+		const struct ttinfo *const ttisp = &sp->ttis[sp->types[i]];
+
+		__gettzinfo ()->__tzrule[ttisp->tt_isdst].offset
+				    = -ttisp->tt_gmtoff;
+	      }
 	  }
 	return 0;
 oops:
@@ -1355,6 +1361,9 @@ tzparse(timezone_t sp, const char *name, const int lastditch)
 					break;
 				janfirst = newfirst;
 			}
+			/*
+			** Get zone offsets into tzinfo (for newlib). . .
+			*/
 			if (sp == lclptr)
 			  {
 			    __gettzinfo ()->__tzrule[0].offset
@@ -1447,6 +1456,9 @@ tzparse(timezone_t sp, const char *name, const int lastditch)
 			sp->ttis[1].tt_isdst = TRUE;
 			sp->ttis[1].tt_abbrind = (int)(stdlen + 1);
 			sp->typecnt = 2;
+			/*
+			** Get zone offsets into tzinfo (for newlib). . .
+			*/
 			if (sp == lclptr)
 			  {
 			    __gettzinfo ()->__tzrule[0].offset
@@ -1463,6 +1475,9 @@ tzparse(timezone_t sp, const char *name, const int lastditch)
 		sp->ttis[0].tt_gmtoff = -stdoffset;
 		sp->ttis[0].tt_isdst = 0;
 		sp->ttis[0].tt_abbrind = 0;
+		/*
+		** Get zone offsets into tzinfo (for newlib). . .
+		*/
 		if (sp == lclptr)
 		  {
 		    __gettzinfo ()->__tzrule[0].offset = -sp->ttis[0].tt_gmtoff;
