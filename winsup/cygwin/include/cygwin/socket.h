@@ -1,7 +1,7 @@
 /* cygwin/socket.h
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2009, 2010, 2012,
-   2013, 2014 Red Hat, Inc.
+   2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -77,7 +77,10 @@ struct msghdr
 
 struct cmsghdr
 {
-  socklen_t		cmsg_len;	/* Length of cmsghdr + data	*/
+  /* Amazing but true: The type of cmsg_len should be socklen_t but, just
+     as on Linux, the definition of the kernel is incompatible with this,
+     so the Windows socket headers define cmsg_len as SIZE_T. */
+  size_t		cmsg_len;	/* Length of cmsghdr + data	*/
   int			cmsg_level;	/* Protocol			*/
   int			cmsg_type;	/* Protocol type		*/
 };
