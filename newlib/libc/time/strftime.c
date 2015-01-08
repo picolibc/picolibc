@@ -1283,13 +1283,24 @@ recurse:
           if (tim_p->tm_isdst >= 0)
             {
 	      long offset;
+
+#if defined (__CYGWIN__)
+	      /* Cygwin must check if the application has been built with or
+		 without the extra tm members for backward compatibility, and
+		 then use either that or the old method fetching from tzinfo.
+		 Rather than pulling in the version check infrastructure, we
+		 just call a Cygwin function. */
+	      extern long __cygwin_gettzoffset (const struct tm *tmp);
+	      offset = __cygwin_gettzoffset (tim_p);
+#elif defined (__TM_GMTOFF)
+	      offset = tim_p->__TM_GMTOFF;
+#else
 	      __tzinfo_type *tz = __gettzinfo ();
-	      TZ_LOCK;
 	      /* The sign of this is exactly opposite the envvar TZ.  We
-	         could directly use the global _timezone for tm_isdst==0,
-	         but have to use __tzrule for daylight savings.  */
+		 could directly use the global _timezone for tm_isdst==0,
+		 but have to use __tzrule for daylight savings.  */
 	      offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
-	      TZ_UNLOCK;
+#endif
 	      len = snprintf (&s[count], maxsize - count, CQ("%+03ld%.2ld"),
 			      offset / SECSPERHOUR,
 			      labs (offset / SECSPERMIN) % 60L);
@@ -1300,12 +1311,27 @@ recurse:
 	  if (tim_p->tm_isdst >= 0)
 	    {
 	      size_t size;
+	      const char *tznam;
+
 	      TZ_LOCK;
-	      size = strlen(_tzname[tim_p->tm_isdst > 0]);
+#if defined (__CYGWIN__)
+	      /* See above. */
+	      extern const char *__cygwin_gettzname (const struct tm *tmp);
+	      tznam = __cygwin_gettzname (tim_p);
+#elif defined (__TM_ZONE)
+	      tznam = tim_p->__TM_ZONE;
+#else
+	      tznam = _tzname[tim_p->tm_isdst > 0];
+#endif
+	      /* Note that in case of wcsftime this loop only works for
+	         timezone abbreviations using the portable codeset (aka ASCII).
+		 This seems to be the case, but if that ever changes, this
+		 loop needs revisiting. */
+	      size = strlen (tznam);
 	      for (i = 0; i < size; i++)
 		{
 		  if (count < maxsize - 1)
-		    s[count++] = _tzname[tim_p->tm_isdst > 0][i];
+		    s[count++] = tznam[i];
 		  else
 		    {
 		      TZ_UNLOCK;

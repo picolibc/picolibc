@@ -1,3 +1,11 @@
+2015-01-08  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/time/strftime.c (__strftime): Utilize __TM_GMTOFF and __TM_ZONE
+	on systems where available.  On Cygwin, call function to get values.
+	Add comment to explain why.  Drop TZ_LOCK/TZ_UNLOCK in 'z' case since
+	it's not necessary.  In 'Z' case, add a comment to document a potential
+	codeset problem.
+
 2015-01-08  Renlin Li  <renlin.li@arm.com>
 
 	* testsuite/newlib.wctype/twctrans.c (main): Use towlower and towupper.
