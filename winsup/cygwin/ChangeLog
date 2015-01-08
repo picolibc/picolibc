@@ -1,3 +1,9 @@
+2015-01-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc (__cygwin_gettzoffset): New function for access from
+	newlib.
+	(__cygwin_gettzname): Ditto.
+
 2015-01-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* localtime.cc (tzload): Fix loading latest timezone offsets into

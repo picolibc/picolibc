@@ -2558,3 +2558,28 @@ posix2time(time_t t)
 }
 
 #endif /* defined STD_INSPIRED */
+
+extern "C" long
+__cygwin_gettzoffset (const struct tm *tmp)
+{
+#ifdef TM_GMTOFF
+  if (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS)
+    return tmp->TM_GMTOFF;
+#endif /* defined TM_GMTOFF */
+  __tzinfo_type *tz = __gettzinfo ();
+  /* The sign of this is exactly opposite the envvar TZ.  We
+     could directly use the global _timezone for tm_isdst==0,
+     but have to use __tzrule for daylight savings.  */
+  long offset = -tz->__tzrule[tmp->tm_isdst > 0].offset;
+  return offset;
+}
+
+extern "C" const char *
+__cygwin_gettzname (const struct tm *tmp)
+{
+#ifdef TM_ZONE
+  if (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS)
+    return tmp->TM_ZONE;
+#endif
+  return _tzname[tmp->tm_isdst > 0];
+}
