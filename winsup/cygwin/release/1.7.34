@@ -61,3 +61,12 @@ Bug Fixes
 - Fix an "invalid handle" problem when using flock(2) with a parent process
   holding the lock.
   Addresses: https://cygwin.com/ml/cygwin/2014-12/msg00012.html
+
+- Load correct timezone offsets when fetching timezone info from
+  zoneinfo files.  Use tm_gmtoff and tm_zone members in strftime to
+  generate more correct timezone info for non-recent eras.
+  Addresses: https://cygwin.com/ml/cygwin/2014-12/msg00313.html
+
+- Fix type of cmsg_len member of struct cmsghdr in /usr/include/cygwin/socket.h
+  to size_t to align with Winsock.
+  Addresses: https://cygwin.com/ml/cygwin/2014-12/msg00376.html
