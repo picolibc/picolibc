@@ -1,7 +1,7 @@
 /* uinfo.cc: user info (uid, gid, etc...)
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2014 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -815,10 +815,24 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 }
 
 static char *
-fetch_windows_home (PCWSTR home_from_db, cygpsid &sid)
+fetch_windows_home (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid)
 {
+  PCWSTR home_from_db = NULL;
   char *home = NULL;
 
+  if (pldap)
+    {
+      home_from_db = pldap->get_string_attribute (L"homeDrive");
+      if (!home_from_db || !*home_from_db)
+	home_from_db = pldap->get_string_attribute (L"homeDirectory");
+    }
+  else if (ui)
+    {
+      if (ui->usri3_home_dir_drive && *ui->usri3_home_dir_drive)
+	home_from_db = ui->usri3_home_dir_drive;
+      else if (ui->usri3_home_dir && *ui->usri3_home_dir)
+	home_from_db = ui->usri3_home_dir;
+    }
   if (home_from_db && *home_from_db)
     home = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX, home_from_db);
   else
@@ -880,12 +894,14 @@ fetch_from_description (PCWSTR desc, PCWSTR search, size_t len)
 }
 
 static char *
-fetch_from_path (PCWSTR str, PCWSTR dom, PCWSTR name, bool full_qualified)
+fetch_from_path (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid,
+		 PCWSTR str, PCWSTR dom, PCWSTR name, bool full_qualified)
 {
   tmp_pathbuf tp;
   PWCHAR wpath = tp.w_get ();
   PWCHAR w = wpath;
   PWCHAR we = wpath + NT_MAX_PATH - 1;
+  char *home;
   char *ret = NULL;
 
   while (*str && w < we)
@@ -910,6 +926,19 @@ fetch_from_path (PCWSTR str, PCWSTR dom, PCWSTR name, bool full_qualified)
 	      break;
 	    case L'D':
 	      w = wcpncpy (w, dom, we - w);
+	      break;
+	    case L'H':
+	      home = fetch_windows_home (pldap, ui, sid);
+	      if (home)
+		{
+		  /* Drop one leading slash to accommodate home being an
+		     absolute path.  We don't check for broken usage of
+		     %H here, of course. */
+		  if (w > wpath && w[-1] == L'/')
+		    --w;
+		  w += sys_mbstowcs (w, we - w, home) - 1;
+		  free (home);
+		}
 	      break;
 	    case L'_':
 	      *w++ = L' ';
@@ -940,10 +969,7 @@ cygheap_pwdgrp::get_home (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
 	case NSS_SCHEME_FALLBACK:
 	  return NULL;
 	case NSS_SCHEME_WINDOWS:
-	  val = pldap->get_string_attribute (L"homeDrive");
-	  if (!val || !*val)
-	    val = pldap->get_string_attribute (L"homeDirectory");
-	  home = fetch_windows_home (val, sid);
+	  home = fetch_windows_home (pldap, NULL, sid);
 	  break;
 	case NSS_SCHEME_CYGWIN:
 	  val = pldap->get_string_attribute (L"cygwinHome");
@@ -961,8 +987,8 @@ cygheap_pwdgrp::get_home (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
 	    home = fetch_from_description (val, L"home=\"", 6);
 	  break;
 	case NSS_SCHEME_PATH:
-	  home = fetch_from_path (home_scheme[idx].attrib, dom, name,
-				  full_qualified);
+	  home = fetch_from_path (pldap, NULL, sid, home_scheme[idx].attrib,
+				  dom, name, full_qualified);
 	  break;
 	case NSS_SCHEME_FREEATTR:
 	  val = pldap->get_string_attribute (home_scheme[idx].attrib);
@@ -983,7 +1009,6 @@ char *
 cygheap_pwdgrp::get_home (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 			  PCWSTR name, bool full_qualified)
 {
-  PWCHAR val = NULL;
   char *home = NULL;
 
   for (uint16_t idx = 0; !home && idx < NSS_SCHEME_MAX; ++idx)
@@ -993,11 +1018,7 @@ cygheap_pwdgrp::get_home (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 	case NSS_SCHEME_FALLBACK:
 	  return NULL;
 	case NSS_SCHEME_WINDOWS:
-	  if (ui->usri3_home_dir_drive && *ui->usri3_home_dir_drive)
-	    val = ui->usri3_home_dir_drive;
-	  else if (ui->usri3_home_dir && *ui->usri3_home_dir)
-	    val = ui->usri3_home_dir;
-	  home = fetch_windows_home (val, sid);
+	  home = fetch_windows_home (NULL, ui, sid);
 	  break;
 	case NSS_SCHEME_CYGWIN:
 	case NSS_SCHEME_UNIX:
@@ -1007,8 +1028,8 @@ cygheap_pwdgrp::get_home (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 	  home = fetch_from_description (ui->usri3_comment, L"home=\"", 6);
 	  break;
 	case NSS_SCHEME_PATH:
-	  home = fetch_from_path (home_scheme[idx].attrib, dom, name,
-				  full_qualified);
+	  home = fetch_from_path (NULL, ui, sid, home_scheme[idx].attrib,
+				  dom, name, full_qualified);
 	  break;
 	}
     }
@@ -1016,8 +1037,8 @@ cygheap_pwdgrp::get_home (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 }
 
 char *
-cygheap_pwdgrp::get_shell (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
-			   bool full_qualified)
+cygheap_pwdgrp::get_shell (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
+			   PCWSTR name, bool full_qualified)
 {
   PWCHAR val;
   char *shell = NULL;
@@ -1046,8 +1067,8 @@ cygheap_pwdgrp::get_shell (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
 	    shell = fetch_from_description (val, L"shell=\"", 7);
 	  break;
 	case NSS_SCHEME_PATH:
-	  shell = fetch_from_path (shell_scheme[idx].attrib, dom, name,
-				   full_qualified);
+	  shell = fetch_from_path (pldap, NULL, sid, shell_scheme[idx].attrib,
+	  			   dom, name, full_qualified);
 	  break;
 	case NSS_SCHEME_FREEATTR:
 	  val = pldap->get_string_attribute (shell_scheme[idx].attrib);
@@ -1065,8 +1086,8 @@ cygheap_pwdgrp::get_shell (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
 }
 
 char *
-cygheap_pwdgrp::get_shell (PUSER_INFO_3 ui, PCWSTR dom, PCWSTR name,
-			   bool full_qualified)
+cygheap_pwdgrp::get_shell (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
+			   PCWSTR name, bool full_qualified)
 {
   char *shell = NULL;
 
@@ -1085,8 +1106,8 @@ cygheap_pwdgrp::get_shell (PUSER_INFO_3 ui, PCWSTR dom, PCWSTR name,
 	  shell = fetch_from_description (ui->usri3_comment, L"shell=\"", 7);
 	  break;
 	case NSS_SCHEME_PATH:
-	  shell = fetch_from_path (shell_scheme[idx].attrib, dom, name,
-				   full_qualified);
+	  shell = fetch_from_path (NULL, ui, sid, shell_scheme[idx].attrib,
+				   dom, name, full_qualified);
 	  break;
 	}
     }
@@ -1103,8 +1124,8 @@ colon_to_semicolon (char *str)
 }
 
 char *
-cygheap_pwdgrp::get_gecos (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
-			   bool full_qualified)
+cygheap_pwdgrp::get_gecos (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
+			   PCWSTR name, bool full_qualified)
 {
   PWCHAR val;
   char *gecos = NULL;
@@ -1136,8 +1157,9 @@ cygheap_pwdgrp::get_gecos (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
 	    gecos = fetch_from_description (val, L"gecos=\"", 7);
 	  break;
 	case NSS_SCHEME_PATH:
-	  gecos = fetch_from_path (gecos_scheme[idx].attrib + 1, dom, name,
-				   full_qualified);
+	  gecos = fetch_from_path (pldap, NULL, sid,
+				   gecos_scheme[idx].attrib + 1,
+				   dom, name, full_qualified);
 	  break;
 	case NSS_SCHEME_FREEATTR:
 	  val = pldap->get_string_attribute (gecos_scheme[idx].attrib);
@@ -1152,8 +1174,8 @@ cygheap_pwdgrp::get_gecos (cyg_ldap *pldap, PCWSTR dom, PCWSTR name,
 }
 
 char *
-cygheap_pwdgrp::get_gecos (PUSER_INFO_3 ui, PCWSTR dom, PCWSTR name,
-			   bool full_qualified)
+cygheap_pwdgrp::get_gecos (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
+			   PCWSTR name, bool full_qualified)
 {
   char *gecos = NULL;
 
@@ -1175,8 +1197,8 @@ cygheap_pwdgrp::get_gecos (PUSER_INFO_3 ui, PCWSTR dom, PCWSTR name,
 	  gecos = fetch_from_description (ui->usri3_comment, L"gecos=\"", 7);
 	  break;
 	case NSS_SCHEME_PATH:
-	  gecos = fetch_from_path (gecos_scheme[idx].attrib + 1, dom, name,
-				   full_qualified);
+	  gecos = fetch_from_path (NULL, ui, sid, gecos_scheme[idx].attrib + 1,
+				   dom, name, full_qualified);
 	  break;
 	}
     }
@@ -2066,9 +2088,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		    {
 		      home = cygheap->pg.get_home (cldap, sid, dom, name,
 						   fully_qualified_name);
-		      shell = cygheap->pg.get_shell (cldap, dom, name,
+		      shell = cygheap->pg.get_shell (cldap, sid, dom, name,
 						     fully_qualified_name);
-		      gecos = cygheap->pg.get_gecos (cldap, dom, name,
+		      gecos = cygheap->pg.get_gecos (cldap, sid, dom, name,
 						     fully_qualified_name);
 		    }
 		  /* Check and, if necessary, add unix<->windows id mapping on
@@ -2122,9 +2144,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  /* Fetch user attributes. */
 		  home = cygheap->pg.get_home (ui, sid, dom, name,
 					       fully_qualified_name);
-		  shell = cygheap->pg.get_shell (ui, dom, name,
+		  shell = cygheap->pg.get_shell (ui, sid, dom, name,
 						 fully_qualified_name);
-		  gecos = cygheap->pg.get_gecos (ui, dom, name,
+		  gecos = cygheap->pg.get_gecos (ui, sid, dom, name,
 						 fully_qualified_name);
 		  uxid = fetch_from_description (ui->usri3_comment,
 						 L"unix=\"", 6);

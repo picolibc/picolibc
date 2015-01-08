@@ -1,5 +1,21 @@
 2015-01-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.h (cygheap_pwdgrp::get_shell): Add sid to argument list.
+	(cygheap_pwdgrp::get_gecos): Ditto.
+	* uinfo.cc (fetch_windows_home): Accept cyg_ldap and PUSER_INFO_3
+	arguments, and fetch db home dir values right here.
+	(fetch_from_path): Accept cyg_ldap, PUSER_INFO_3 pointers and sid
+	arguments.  Add '%H' format specifier to fetch Windows home dir in
+	POSIX notation.
+	(cygheap_pwdgrp::get_home): Accommodate changes to fetch_windows_home
+	and fetch_from_path.
+	(cygheap_pwdgrp::get_shell): Ditto.
+	(cygheap_pwdgrp::get_gecos): Ditto.
+	(pwdgrp::fetch_account_from_windows): Accommodate sid argument to
+	cygheap_pwdgrp::get_shell and cygheap_pwdgrp::get_gecos.
+
+2015-01-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/socket.h (struct cmsghdr): Redefine cmsg_len as type
 	size_t.  Add comment to explain why.
 

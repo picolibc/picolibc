@@ -1,7 +1,7 @@
 /* cygheap.h: Cygwin heap manager.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013, 2014 Red Hat, Inc.
+   2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -475,11 +475,15 @@ public:
   char *get_home (struct _USER_INFO_3 *ui, cygpsid &sid, PCWSTR dom,
 		  PCWSTR name, bool fq);
 
-  char *get_shell (cyg_ldap *pldap, PCWSTR dom, PCWSTR name, bool fq);
-  char *get_shell (struct _USER_INFO_3 *ui, PCWSTR dom, PCWSTR name, bool fq);
+  char *get_shell (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom, PCWSTR name,
+		   bool fq);
+  char *get_shell (struct _USER_INFO_3 *ui, cygpsid &sid, PCWSTR dom,
+		   PCWSTR name, bool fq);
 
-  char *get_gecos (cyg_ldap *pldap, PCWSTR dom, PCWSTR name, bool fq);
-  char *get_gecos (struct _USER_INFO_3 *ui, PCWSTR dom, PCWSTR name, bool fq);
+  char *get_gecos (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom, PCWSTR name,
+		   bool fq);
+  char *get_gecos (struct _USER_INFO_3 *ui, cygpsid &sid, PCWSTR dom,
+		   PCWSTR name, bool fq);
 
   inline int nss_db_enums () const { return enums; }
   inline PCWSTR nss_db_enum_tdoms () const { return enum_tdoms; }
