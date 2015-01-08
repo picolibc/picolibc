@@ -1,3 +1,7 @@
+2015-01-08  Renlin Li  <renlin.li@arm.com>
+
+	* testsuite/newlib.wctype/twctrans.c (main): Use towlower and towupper.
+
 2015-01-06  Richard Earnshaw  <rearnsha@arm.com>
 
 	* libc/machine/aarch64/strcpy.S (strcpy): Further performance
