@@ -1,3 +1,8 @@
+2015-01-12  Renlin Li  <renlin.li@arm.com>
+
+	* testsuite/newlib.wctype/tiswctype.c (main): Use wide character type
+	function.
+
 2015-01-08  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/time/strftime.c (__strftime): Utilize __TM_GMTOFF and __TM_ZONE

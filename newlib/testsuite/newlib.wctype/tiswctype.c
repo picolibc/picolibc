@@ -8,51 +8,51 @@ int main()
 
   x = wctype ("alpha");
   CHECK (x != 0);
-  CHECK (iswctype (L'a', x) && isalpha ('a'));
+  CHECK (iswctype (L'a', x) && iswalpha (L'a'));
 
   x = wctype ("alnum");
   CHECK (x != 0);
-  CHECK (iswctype (L'0', x) && isalnum ('0'));
+  CHECK (iswctype (L'0', x) && iswalnum (L'0'));
 
   x = wctype ("blank");
   CHECK (x != 0);
-  CHECK (iswctype (L' ', x) && isblank (' '));
+  CHECK (iswctype (L' ', x) && iswblank (L' '));
 
   x = wctype ("cntrl");
   CHECK (x != 0);
-  CHECK (iswctype (L'\n', x) && iscntrl ('\n'));
+  CHECK (iswctype (L'\n', x) && iswcntrl (L'\n'));
 
   x = wctype ("digit");
   CHECK (x != 0);
-  CHECK (iswctype (L'7', x) && isdigit ('7'));
+  CHECK (iswctype (L'7', x) && iswdigit (L'7'));
 
   x = wctype ("graph");
   CHECK (x != 0);
-  CHECK (iswctype (L'!', x) && isgraph ('!'));
+  CHECK (iswctype (L'!', x) && iswgraph (L'!'));
 
   x = wctype ("lower");
   CHECK (x != 0);
-  CHECK (iswctype (L'k', x) && islower ('k'));
+  CHECK (iswctype (L'k', x) && iswlower (L'k'));
 
   x = wctype ("print");
   CHECK (x != 0);
-  CHECK (iswctype (L'@', x) && isprint ('@'));
+  CHECK (iswctype (L'@', x) && iswprint (L'@'));
 
   x = wctype ("punct");
   CHECK (x != 0);
-  CHECK (iswctype (L'.', x) && ispunct ('.'));
+  CHECK (iswctype (L'.', x) && iswpunct (L'.'));
 
   x = wctype ("space");
   CHECK (x != 0);
-  CHECK (iswctype (L'\t', x) && isspace ('\t'));
+  CHECK (iswctype (L'\t', x) && iswspace (L'\t'));
 
   x = wctype ("upper");
   CHECK (x != 0);
-  CHECK (iswctype (L'T', x) && isupper ('T'));
+  CHECK (iswctype (L'T', x) && iswupper (L'T'));
 
   x = wctype ("xdigit");
   CHECK (x != 0);
-  CHECK (iswctype (L'B', x) && isxdigit ('B'));
+  CHECK (iswctype (L'B', x) && iswxdigit (L'B'));
 
   x = wctype ("unknown");
   CHECK (x == 0);
