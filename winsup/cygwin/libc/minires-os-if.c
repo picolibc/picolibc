@@ -249,6 +249,13 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
   rr = pQueryResultsSet;
   section = 0;
   while (rr) {
+    /* Some Windows versions return questions when providing locally generated
+       answers, for example for "localhost" or for the computer name. */
+    if (((rr->Flags.DW & 0x3) == DnsSectionQuestion) &&
+       (rr->wDataLength > 0)) {
+      DPRINTF(debug, "Changing record below from question to answer\n");
+      rr->Flags.DW ^= DnsSectionQuestion ^ DnsSectionAnswer;
+    }
     if (!counts[0] && (rr->Flags.DW & 0x3)) {
       /* No question. Adopt the first name as the name in the question */
       if ((len = dn_comp(rr->pName, ptr, AnsLength - 4,

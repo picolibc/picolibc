@@ -1,3 +1,7 @@
+2015-01-12  Pierre A. Humblet <pierre@phumblet.no-ip.org>
+
+	* minires-os-if.c (cygwin_query): Change questions into answers.
+
 2015-01-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (cygheap_pwdgrp::get_shell): Add sid to argument list.
