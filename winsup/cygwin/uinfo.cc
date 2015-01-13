@@ -1749,19 +1749,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  ret = LookupAccountNameW (NULL, name, sid, &slen, dom, &dlen,
 				    &acc_type);
 	}
-      /* LookupAccountName doesn't find NT SERVICE accounts.  Try just for
-      	 kicks (and to make TrustedInstaller work here :-P */
-      else if (!ret)
-	{
-	  p = wcpcpy (name, L"NT SERVICE");
-	  *p = L'\\';
-	  sys_mbstowcs (p + 1, UNLEN + 1, arg.name);
-	  slen = SECURITY_MAX_SID_SIZE;
-	  dlen = DNLEN + 1;
-	  sid = csid;
-	  ret = LookupAccountNameW (NULL, name, sid, &slen, dom, &dlen,
-				    &acc_type);
-	}
       if (!ret)
 	{
 	  debug_printf ("LookupAccountNameW (%W), %E", name);
@@ -1807,12 +1794,17 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  /* All is well if db_prefix is always. */
 	  if (cygheap->pg.nss_prefix_always ())
 	    break;
-	  /* Otherwise, no fully_qualified for builtin accounts. */
+	  /* Otherwise, no fully_qualified for builtin accounts, except for
+	     NT SERVICE, for which we require the prefix.  Note that there's
+	     no equivalent test in the `if (!fq_name)' branch above, because
+	     LookupAccountName never returns NT SERVICE accounts if they are
+	     not prependend with the domain anyway. */
 	  if (sid_id_auth (sid) != 5 /* SECURITY_NT_AUTHORITY */
-	      || sid_sub_auth (sid, 0) != SECURITY_NT_NON_UNIQUE)
+	      || (sid_sub_auth (sid, 0) != SECURITY_NT_NON_UNIQUE
+		  && sid_sub_auth (sid, 0) != SECURITY_SERVICE_ID_BASE_RID))
 	    {
 	      debug_printf ("Invalid account name <%s> (fully qualified/"
-			    "not NON_UNIQUE)", arg.name);
+			    "not NON_UNIQUE or NT_SERVICE)", arg.name);
 	      return NULL;
 	    }
 	  /* All is well if db_prefix is primary. */

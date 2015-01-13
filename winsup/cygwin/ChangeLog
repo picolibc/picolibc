@@ -1,3 +1,10 @@
+2015-01-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Drop code from
+	2014-11-17, always prepending domain to NT SERVICE accounts when
+	searching by name.  Fix test expression to allow fully qualified
+	names for NT SERVICE accounts.  Extend comment to explain a bit.
+
 2015-01-12  Pierre A. Humblet <pierre@phumblet.no-ip.org>
 
 	* minires-os-if.c (cygwin_query): Change questions into answers.
