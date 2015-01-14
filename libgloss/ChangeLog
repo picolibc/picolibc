@@ -1,10 +1,14 @@
+2015-01-14  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
+	* or1k/include/or1k-sprs.h: New auto-generated header file.
+
 2015-01-05  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
 
-        * lm32/Makefile.in (install): Respect DESTDIR.
-        (install-scripts): Ditto.
-        * mep/Makefile.in (install): Ditto.
-        * mt/Makefile.in (install): Ditto.
-        * rl78/Makefile.in (install): Ditto.
+	* lm32/Makefile.in (install): Respect DESTDIR.
+	(install-scripts): Ditto.
+	* mep/Makefile.in (install): Ditto.
+	* mt/Makefile.in (install): Ditto.
+	* rl78/Makefile.in (install): Ditto.
 
 2014-12-27  Anthony Green  <green@moxielogic.com>
 
