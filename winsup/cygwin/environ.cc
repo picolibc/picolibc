@@ -1071,9 +1071,11 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 	    sys_wcstombs_alloc (&winenv[winnum], HEAP_NOTHEAP, var);
 	}
       DestroyEnvironmentBlock (cwinenv);
-      /* Eliminate variables which are already available in envp.  The windows
-	 env is sorted, so we can use bsearch.  We're doing this first step,
-	 so the following code doesn't allocate too much memory. */
+      /* Eliminate variables which are already available in envp, as well as
+	 the small set of crucial variables needing POSIX conversion and
+	 potentially collide.  The windows env is sorted, so we can use
+	 bsearch.  We're doing this first step, so the following code doesn't
+	 allocate too much memory. */
       if (winenv)
 	{
 	  for (srcp = envp; *srcp; srcp++)
@@ -1090,6 +1092,20 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 			   (winnum - (elem - winenv)) * sizeof *elem);
 		  --winnum;
 		}
+	    }
+	  for (char **elem = winenv; *elem; elem++)
+	    {
+	      if (match_first_char (*elem, WC))
+		for (int i = 0; conv_envvars[i].name != NULL; i++)
+		  if (strncmp (*elem, conv_envvars[i].name,
+			       conv_envvars[i].namelen) == 0)
+		    {
+		      free (*elem);
+		      memmove (elem, elem + 1,
+			       (winnum - (elem - winenv)) * sizeof *elem);
+		      --winnum;
+		      --elem;
+		    }
 	    }
 	}
     }

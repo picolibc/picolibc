@@ -1,3 +1,9 @@
+2015-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (build_env): When merging the user's Windows environment,
+	explicitely skip the variables needing conversion to avoid collisions.
+	Extend comment to explain.
+
 2015-01-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Drop code from
