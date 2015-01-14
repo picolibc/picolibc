@@ -1396,6 +1396,17 @@ definition.
 		  <listitem>Windows domain in NetBIOS style.</listitem>
 		</varlistentry>
 	        <varlistentry>
+		  <term><literal>%H</literal></term>
+		  <listitem>Windows home directory in POSIX style.  Note that,
+			    for the <literal>db_home:</literal> setting, this
+			    only makes sense right after the preceeding slash,
+			    as in
+<screen>
+db_home:  /%H/cygwin
+</screen>
+		  </listitem>
+		</varlistentry>
+	        <varlistentry>
 		  <term><literal>%_</literal></term>
 		  <listitem>Since space and TAB characters are used to separate
 			    the schemata, a space in the filename has to be
@@ -1434,13 +1445,16 @@ of each schema when used with <literal>db_home:</literal>
     <term><literal>windows</literal></term>
     <listitem>The user's home directory is set to the same directory which is
 	      used as Windows home directory.  This is the
+<!--
 	      <literal>homeDrive</literal> AD attribute if set, or the
 	      <literal>homeDirectory</literal> AD attribute if
-	      <literal>homeDrive</literal> is not set.  For SAM accounts,
-	      this is equivalent to the "Home folder" setting in SAM.
-	      If both attributes are unset, Cygwin falls back to the user's
-	      local profile directory, typically something along the lines
-	      of <filename>C:\Users\$USERNAME</filename>.  Of course, the
+	      <literal>homeDrive</literal> is not set.
+-->
+	      <literal>homeDirectory</literal> AD attribute.
+	      For SAM accounts, this is equivalent to the "Home folder" setting
+	      in SAM.  If both attributes are unset, Cygwin falls back to the
+	      user's local profile directory, typically something along the
+	      lines of <filename>C:\Users\$USERNAME</filename>.  Of course, the
 	      Windows directory is converted to POSIX-style by Cygwin.
 	      </listitem>
   </varlistentry>
