@@ -822,15 +822,23 @@ fetch_windows_home (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid)
 
   if (pldap)
     {
+#if 0
+      /* Disable preferring homeDrive for now.  The drive letter may not
+         be available when it's needed. */
       home_from_db = pldap->get_string_attribute (L"homeDrive");
       if (!home_from_db || !*home_from_db)
+#endif
 	home_from_db = pldap->get_string_attribute (L"homeDirectory");
     }
   else if (ui)
     {
+#if 0
+      /* Ditto. */
       if (ui->usri3_home_dir_drive && *ui->usri3_home_dir_drive)
 	home_from_db = ui->usri3_home_dir_drive;
-      else if (ui->usri3_home_dir && *ui->usri3_home_dir)
+      else
+#endif
+      if (ui->usri3_home_dir && *ui->usri3_home_dir)
 	home_from_db = ui->usri3_home_dir;
     }
   if (home_from_db && *home_from_db)
