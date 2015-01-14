@@ -2,7 +2,7 @@
    process's environment.
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -736,37 +736,23 @@ static struct renv {
 	const char *name;
 	const size_t namelen;
 } renv_arr[] = {
-	{ NL("ALLUSERSPROFILE=") },		// 0
-	{ NL("COMMONPROGRAMFILES=") },		// 1
-	{ NL("COMPUTERNAME=") },
+	{ NL("COMMONPROGRAMFILES=") },		// 0
 	{ NL("COMSPEC=") },
-	{ NL("HOME=") },			// 4
-	{ NL("HOMEDRIVE=") },
-	{ NL("HOMEPATH=") },
-	{ NL("NUMBER_OF_PROCESSORS=") },	// 7
-	{ NL("OS=") },				// 8
-	{ NL("PATH=") },			// 9
-	{ NL("PATHEXT=") },
-	{ NL("PROCESSOR_ARCHITECTURE=") },
-	{ NL("PROCESSOR_IDENTIFIER=") },
-	{ NL("PROCESSOR_LEVEL=") },
-	{ NL("PROCESSOR_REVISION=") },
+	{ NL("PATH=") },			// 2
 	{ NL("PROGRAMFILES=") },
-	{ NL("SYSTEMDRIVE=") },			// 16
+	{ NL("SYSTEMDRIVE=") },			// 4
 	{ NL("SYSTEMROOT=") },
-	{ NL("TEMP=") },			// 18
-	{ NL("TERM=") },
+	{ NL("TEMP=") },			// 6
 	{ NL("TMP=") },
-	{ NL("TMPDIR=") },
-	{ NL("WINDIR=") }			// 22
+	{ NL("WINDIR=") }			// 8
 };
 #define RENV_SIZE (sizeof (renv_arr) / sizeof (renv_arr[0]))
 
 /* Set of first characters of the above list of variables. */
-static const char idx_arr[] = "ACHNOPSTW";
+static const char idx_arr[] = "CPSTW";
 /* Index into renv_arr at which the variables with this specific character
    starts. */
-static const int start_at[] = { 0, 1, 4, 7, 8, 9, 16, 18, 22 };
+static const int start_at[] = { 0, 2, 4, 6, 8 };
 
 /* Turn environment variable part of a=b string into uppercase - for some
    environment variables only. */

@@ -1,5 +1,11 @@
 2015-01-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* environ.cc (renv_arr): Drop variables not usually in a Windows
+	environment and all variables being uppercase anyway.  But keep
+	TMP and TEMP for paranoia.
+
+2015-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* environ.cc (build_env): When merging the user's Windows environment,
 	explicitely skip the variables needing conversion to avoid collisions.
 	Extend comment to explain.
