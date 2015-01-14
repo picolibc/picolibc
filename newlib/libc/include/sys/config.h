@@ -185,6 +185,10 @@
 #define __CUSTOM_FILE_IO__
 #endif
 
+#if defined(__or1k__) || defined(__or1knd__)
+#define __DYNAMIC_REENT__
+#endif
+
 /* This block should be kept in sync with GCC's limits.h.  The point
    of having these definitions here is to not include limits.h, which
    would pollute the user namespace, while still using types of the

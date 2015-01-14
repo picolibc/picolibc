@@ -1,3 +1,17 @@
+2015-01-14  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
+	* configure.host: Add extra system for OpenRISC baremetal
+	* libc/include/sys/config.h: Dynamic reentrancy for or1k sys targets
+	* libc/sys/or1k/: New system for or1k baremetal
+	* libc/sys/or1k/Makefile.am: New file
+	* libc/sys/or1k/Makefile.in: New file
+	* libc/sys/or1k/aclocal.m4: New file
+	* libc/sys/or1k/configure.in: New file
+	* libc/sys/or1k/configure: New file
+	* libc/sys/or1k/getreent.S: New file
+	* libc/sys/or1k/mlock.S: New file
+	* libc/sys/or1k/or1k-asm.S: New file
+
 2015-01-12  Renlin Li  <renlin.li@arm.com>
 
 	* testsuite/newlib.wctype/tiswctype.c (main): Use wide character type
