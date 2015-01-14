@@ -70,3 +70,6 @@ Bug Fixes
 - Fix type of cmsg_len member of struct cmsghdr in /usr/include/cygwin/socket.h
   to size_t to align with Winsock.
   Addresses: https://cygwin.com/ml/cygwin/2014-12/msg00376.html
+
+- Fix a problem in the resolver trying to resolve "localhost".
+  Addresses: https://cygwin.com/ml/cygwin/2015-01/msg00044.html
