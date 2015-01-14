@@ -231,28 +231,13 @@ of environment variables, except for a restricted set to maintain minimal
 backward compatibility.  The current list of always uppercased variables is:
 </para>
 <screen>
-  ALLUSERSPROFILE
   COMMONPROGRAMFILES
-  COMPUTERNAME
   COMSPEC
-  HOME
-  HOMEDRIVE
-  HOMEPATH
-  NUMBER_OF_PROCESSORS
-  OS
   PATH
-  PATHEXT
-  PROCESSOR_ARCHITECTURE
-  PROCESSOR_IDENTIFIER
-  PROCESSOR_LEVEL
-  PROCESSOR_REVISION
-  PROGRAMFILES
   SYSTEMDRIVE
   SYSTEMROOT
   TEMP
-  TERM
   TMP
-  TMPDIR
   WINDIR
 </screen>
 </listitem>

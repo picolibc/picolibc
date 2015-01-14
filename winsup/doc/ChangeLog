@@ -1,3 +1,8 @@
+2015-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.xml (cygwinenv-removed-options): Accommodate list of
+	always uppercased Windows variables to latest change.
+
 2014-12-18  Yaakov Selkowitz  <yselkowitz@cygwin.com>
 
 	* ntsec.xml (ntsec-logonuser): Fix spelling of pw_passwd field.
