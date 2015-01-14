@@ -1,3 +1,7 @@
+2015-01-14  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* doc/makedoc.c: Use uintptr_t to avoid int/pointer size warnings
+
 2015-01-14  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
 	* configure.host: Add extra system for OpenRISC baremetal

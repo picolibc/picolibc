@@ -40,6 +40,7 @@ There is  no
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdint.h>
 
 #define DEF_SIZE 5000
 #define STACK 50
@@ -219,10 +220,10 @@ typedef void (*stinst_type)(NOARGS);
 stinst_type *pc;
 stinst_type sstack[STACK];
 stinst_type *ssp = &sstack[0];
-int istack[STACK];
-int *isp = &istack[0];
+uintptr_t istack[STACK];
+uintptr_t *isp = &istack[0];
 
-typedef int *word_type;
+typedef uintptr_t *word_type;
 
 
 
@@ -270,7 +271,7 @@ WORD(push_number)
 {
     isp++;
     pc++;
-    *isp = (int)(*pc);
+    *isp = (uintptr_t)(*pc);
     pc++;
     
 }
@@ -1338,7 +1339,7 @@ return(ret);
  
 static void DEFUN_VOID(bang)
 {
-*(int *)((isp[0])) = isp[-1];
+*(uintptr_t *)((isp[0])) = isp[-1];
 isp-=2;
 pc++;
 
@@ -1346,7 +1347,7 @@ pc++;
 
 WORD(atsign)
 {
-    isp[0] = *(int *)(isp[0]);
+    isp[0] = *(uintptr_t *)(isp[0]);
     pc++;
 }
 
