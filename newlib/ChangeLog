@@ -1,5 +1,9 @@
 2015-01-14  Joel Sherrill <joel.sherrill@oarcorp.com>
 
+	* libc/include/sys/unistd.h [__BSD_VISIBLE]: Add issetugid() prototype.
+
+2015-01-14  Joel Sherrill <joel.sherrill@oarcorp.com>
+
 	* doc/makedoc.c: Use uintptr_t to avoid int/pointer size warnings
 
 2015-01-14  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>

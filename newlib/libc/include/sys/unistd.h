@@ -117,6 +117,9 @@ char *  _EXFUN(getwd, (char *__buf ));
 int	_EXFUN(iruserok, (unsigned long raddr, int superuser, const char *ruser, const char *luser));
 #endif
 int     _EXFUN(isatty, (int __fildes ));
+#if __BSD_VISIBLE
+int        _EXFUN(issetugid, (void));
+#endif
 #if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(lchown, (const char *__path, uid_t __owner, gid_t __group ));
 #endif
