@@ -147,55 +147,45 @@ _start:
 
 ;; block move to initialize .data
 
-	;; we're copying from 00:[_romdatastart] to 0F:[_datastart]
-	;; and our data is not in the mirrored area.
 	mov	es, #0
-
-	sel	rb0		; bank 0
-	movw	hl, #__datastart
-	movw	de, #__romdatastart
-	sel	rb1		; bank 1
-	movw	ax, #__romdatacopysize
-	shrw	ax,1
-1:
+	movw	bc, #__romdatacopysize
+1:	
+	movw	ax, bc
 	cmpw	ax, #0
 	bz	$1f
-	decw	ax
-	sel	rb0		; bank 0
-	movw	ax, es:[de]
-	movw	[hl], ax
-	incw	de
-	incw	de
-	incw	hl
-	incw	hl
-	sel	rb1
+	decw	bc
+	decw	bc
+	movw	ax, es:__romdatastart[bc]
+	movw	__datastart[bc], ax
 	br	$1b
-1:
-	sel	rb0		; bank 0
+1:	
+	
+	mov	es, #0
+	movw	bc, #__romsaddrcopysize
+1:	
+	movw	ax, bc
+	cmpw	ax, #0
+	bz	$1f
+	decw	bc
+	decw	bc
+	movw	ax, es:__romsaddrstart[bc]
+	movw	__saddrstart[bc], ax
+	br	$1b
+1:	
 
 
 ;; block fill to .bss
 
-	sel	rb0		; bank 0
-	movw	hl, #__bssstart
+	movw	bc, #__bsssize
 	movw	ax, #0
-	sel	rb1		; bank 1
-	movw	ax, #__bsssize
-	shrw	ax,1
-1:
-	cmpw	ax, #0
+1:	
+	cmpw	ax, bc
 	bz	$1f
-	decw	ax
-	sel	rb0		; bank 0
-	movw	[hl], ax
-	incw	hl
-	incw	hl
-	sel	rb1
+	movw	__bssstart[bc], ax
+	decw	bc
+	decw	bc
 	br	$1b
-1:
-	sel	rb0		; bank 0
-
-
+1:	
 
 	call	!!__rl78_init
 

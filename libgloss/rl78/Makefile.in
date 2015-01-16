@@ -67,6 +67,7 @@ SIM_OBJS = \
 	close.o \
 	read.o \
 	write.o \
+	swrite.o \
 	lseek.o \
 	unlink.o \
 	getpid.o \

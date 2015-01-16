@@ -85,10 +85,16 @@ tputc (char c)
   SDR00 = c;
 }
 
+/* defaults to 0 unless open() is linked in */
+int _open_present;
+
 int
 _write(int fd, char *ptr, int len)
 {
   int rv = len;
+
+  if (_open_present && fd > 2)
+    return _SYS_write (fd, ptr, len);
 
   if (!initted)
     init_uart0 ();

@@ -43,8 +43,10 @@ MEMORY {
 	IVEC (r)  : ORIGIN = 0x00004, LENGTH = 0x0007c
 	OPT (r)   : ORIGIN = 0x000c0, LENGTH = 0x00004
 	ROM (r)   : ORIGIN = 0x000d8, LENGTH = 0x7ff28
-	RAM (w)   : ORIGIN = 0xf8000, LENGTH = 0x07ee0
-	STACK (w) : ORIGIN = 0xffee0, LENGTH = 0x00002
+/* The G10 variant needs to use RAM for virtual registers.  */
+	RAM (w)   : ORIGIN = 0xf8000, LENGTH = 0x07e20
+	STACK (w) : ORIGIN = 0xffe20, LENGTH = 0x00002
+	SADDR (w) : ORIGIN = 0xffe20, LENGTH = 0x000a0
 }
 
 SECTIONS
@@ -125,6 +127,15 @@ SECTIONS
     PROVIDE (__stack = .);
     *(.stack)
   }
+  
+  .saddr : {
+    . = ALIGN(2);
+    PROVIDE (__saddrstart = .);
+    *(.saddr)
+    . = ALIGN(2);
+  } >SADDR AT>ROM
+  PROVIDE(__romsaddrstart = LOADADDR(.saddr));
+  PROVIDE (__romsaddrcopysize = SIZEOF(.saddr));
 
   .rodata (MAX(__romdatastart + __romdatacopysize, 0x1000)) : {
     . = ALIGN(2);
@@ -169,6 +180,10 @@ SECTIONS
     KEEP (*(.dtors))
   } > ROM
 
+  .frodata : {
+    *(.frodata)
+  } > ROM
+
   .text           :
   {
     PROVIDE (_start = .);
@@ -210,7 +225,7 @@ SECTIONS
   /* DWARF 2 */
   .debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
   .debug_abbrev   0 : { *(.debug_abbrev) }
-  .debug_line     0 : { *(.debug_line) }
+  .debug_line     0 : { *(.debug_line .debug_line.* .debug_line_end ) }
   .debug_frame    0 : { *(.debug_frame) }
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }

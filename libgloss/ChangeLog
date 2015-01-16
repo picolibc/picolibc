@@ -1,3 +1,17 @@
+2015-01-15  DJ Delorie  <dj@redhat.com>
+
+	* rl78/crt0.S: Initialize .saddr.  Avoid using SEL.
+	* rl78/rl78-sim.ld: Add .saddr/.frodata section.
+	* rl78/rl78.ld: Likewise.
+	* rl78/rl78-sim.ld: Make room for virtual register banks.
+	* rl78/rl78.ld: Likewise.
+
+	* rl78/vregs.h: New.
+	* rl78-sys.h: Use it.
+	* rl78/swrite.S: New.
+	* rl78/Makefile.in: Build it.
+	* rl78/write.c: Use it.
+
 2015-01-14  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
 	* or1k/include/or1k-sprs.h: New auto-generated header file.

@@ -31,23 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "syscall.h"
-
-r8	=	0xffef0
-r9	=	0xffef1
-r10	=	0xffef2
-r11	=	0xffef3
-r12	=	0xffef4
-r13	=	0xffef5
-r14	=	0xffef6
-r15	=	0xffef7
-r16	=	0xffee8
-r17	=	0xffee9
-r18	=	0xffeea
-r19	=	0xffeeb
-r20	=	0xffeec
-r21	=	0xffeed
-r22	=	0xffeee
-r23	=	0xffeef
+#include "vregs.h"
 
 #define SYS__exit  SYS_exit
 
