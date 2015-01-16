@@ -1,7 +1,7 @@
 /* miscfuncs.cc: misc funcs that don't belong anywhere else
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -532,6 +532,19 @@ __import_address (void *imp)
   __except (NO_ERROR) {}
   __endtry
   return NULL;
+}
+
+/* Helper function to generate the correct caller address.  For external
+   calls, the return address on the stack is _sigbe.  In that case the
+   actual caller return address is on the cygtls stack.  Use this function
+   via the macro caller_return_address. */
+extern "C" void _sigbe ();
+
+void *
+__caller_return_address (void *builtin_ret_addr)
+{
+  return builtin_ret_addr == &_sigbe
+	 ? (void *) _my_tls.retaddr () : builtin_ret_addr;
 }
 
 /* CygwinCreateThread.

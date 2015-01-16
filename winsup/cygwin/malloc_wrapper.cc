@@ -1,7 +1,7 @@
 /* malloc_wrapper.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2013, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -38,7 +38,7 @@ static bool internal_malloc_determined;
 extern "C" void
 free (void *p)
 {
-  malloc_printf ("(%p), called by %p", p, __builtin_return_address (0));
+  malloc_printf ("(%p), called by %p", p, caller_return_address ());
   if (!use_internal)
     user_data->free (p);
   else
@@ -61,7 +61,8 @@ malloc (size_t size)
       res = dlmalloc (size);
       __malloc_unlock ();
     }
-  malloc_printf ("(%ld) = %p, called by %p", size, res, __builtin_return_address (0));
+  malloc_printf ("(%ld) = %p, called by %p", size, res,
+					     caller_return_address ());
   return res;
 }
 
@@ -77,7 +78,8 @@ realloc (void *p, size_t size)
       res = dlrealloc (p, size);
       __malloc_unlock ();
     }
-  malloc_printf ("(%p, %ld) = %p, called by %p", p, size, res, __builtin_return_address (0));
+  malloc_printf ("(%p, %ld) = %p, called by %p", p, size, res,
+  						 caller_return_address ());
   return res;
 }
 
@@ -104,7 +106,8 @@ calloc (size_t nmemb, size_t size)
       res = dlcalloc (nmemb, size);
       __malloc_unlock ();
     }
-  malloc_printf ("(%ld, %ld) = %p, called by %p", nmemb, size, res, __builtin_return_address (0));
+  malloc_printf ("(%ld, %ld) = %p, called by %p", nmemb, size, res,
+						  caller_return_address ());
   return res;
 }
 

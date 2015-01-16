@@ -1,3 +1,17 @@
+2015-01-16  Marco Atzeri <marco.atzeri@gmail.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef: Export _sigbe on 64 bit as well.
+	* malloc_wrapper.cc (free): In malloc_printf, call caller_return_address
+	instead of __builtin_return_address.
+	(malloc): Ditto.
+	(realloc): Ditto.
+	(calloc): Ditto.
+	* miscfuncs.cc (__caller_return_address): New function.
+	* miscfuncs.h (caller_return_address): New macro calling
+	__caller_return_address.
+	(__caller_return_address): Add prototype.
+
 2015-01-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (fetch_windows_home): Disable fetching from homeDrive or
