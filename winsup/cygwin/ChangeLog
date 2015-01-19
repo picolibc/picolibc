@@ -1,3 +1,10 @@
+2015-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver_ipc.h (ipc_retval): Add default constructor.
+	(class thread): struct->class.  Add prototypes for new private methods
+	dup_signal_arrived and close_signal_arrived.  Implement constructor and
+	destructor.
+
 2015-01-16  Marco Atzeri <marco.atzeri@gmail.com>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

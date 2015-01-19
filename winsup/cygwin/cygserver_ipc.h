@@ -1,6 +1,6 @@
 /* cygserver_ipc.h
 
-   Copyright 2002, 2003, 2004, 2012, 2013, 2014 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -62,6 +62,7 @@ private:
   };
 
 public:
+  ipc_retval () { ssz = 0; }
   ipc_retval (ssize_t nssz) { ssz = nssz; }
 
   operator int () const { return i; }
@@ -84,10 +85,23 @@ public:
   vm_object_t operator = (vm_object_t nobj) { return obj = nobj; }
 };
 
-struct thread {
+class thread {
+private:
+  /* Implemented in cgyserver/process.cc */
+  void dup_signal_arrived ();
+  void close_signal_arrived ();
+public:
   class process *client;
   proc *ipcblk;
   ipc_retval td_retval[2];
+
+  thread (class process *_client, proc *_proc, bool _init_m1)
+  : client (_client), ipcblk (_proc)
+  {
+    td_retval[0] = td_retval[1] = _init_m1 ? -1 : 0;
+    dup_signal_arrived ();
+  }
+  ~thread () { close_signal_arrived (); }
 };
 #define td_proc ipcblk
 #define p_pid cygpid
