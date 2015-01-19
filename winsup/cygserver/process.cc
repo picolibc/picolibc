@@ -1,6 +1,6 @@
 /* process.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2014 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2014, 2015 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -19,6 +19,8 @@ details. */
 #include <stdlib.h>
 
 #include "process.h"
+
+#include "cygserver_ipc.h"
 
 /*****************************************************************************/
 
@@ -39,11 +41,10 @@ process_cleanup::process ()
 
 /*****************************************************************************/
 
-process::process (const pid_t cygpid, const DWORD winpid, HANDLE signal_arrived)
+process::process (const pid_t cygpid, const DWORD winpid)
   : _cygpid (cygpid),
     _winpid (winpid),
     _hProcess (NULL),
-    _signal_arrived (INVALID_HANDLE_VALUE),
     _cleaning_up (false),
     _exit_status (STILL_ACTIVE),
     _routines_head (NULL),
@@ -60,19 +61,6 @@ process::process (const pid_t cygpid, const DWORD winpid, HANDLE signal_arrived)
   else
     debug_printf ("got handle %p for new cache process %d(%u)",
 		  _hProcess, _cygpid, _winpid);
-  if (!signal_arrived)
-    debug_printf ("signal_arrived NULL for process %d(%u)", _cygpid, _winpid);
-  else if (signal_arrived != INVALID_HANDLE_VALUE)
-    {
-      if (!DuplicateHandle (_hProcess, signal_arrived,
-			    GetCurrentProcess (), &_signal_arrived,
-			    0, FALSE, DUPLICATE_SAME_ACCESS))
-	{
-	  system_printf ("error getting signal_arrived to server (%u)",
-			 GetLastError ());
-	  _signal_arrived = INVALID_HANDLE_VALUE;
-	}
-    }
   InitializeCriticalSection (&_access);
   debug ("initialized (%u)", _cygpid);
 }
@@ -81,8 +69,6 @@ process::~process ()
 {
   debug ("deleting (%u)", _cygpid);
   DeleteCriticalSection (&_access);
-  if (_signal_arrived && _signal_arrived != INVALID_HANDLE_VALUE)
-    CloseHandle (_signal_arrived);
   CloseHandle (_hProcess);
 }
 
@@ -239,8 +225,7 @@ process_cache::~process_cache ()
  * have been deleted once it has been unlocked.
  */
 class process *
-process_cache::process (const pid_t cygpid, const DWORD winpid,
-			HANDLE signal_arrived)
+process_cache::process (const pid_t cygpid, const DWORD winpid)
 {
   /* TODO: make this more granular, so a search doesn't involve the
    * write lock.
@@ -260,7 +245,7 @@ process_cache::process (const pid_t cygpid, const DWORD winpid,
 	  return NULL;
 	}
 
-      entry = new class process (cygpid, winpid, signal_arrived);
+      entry = new class process (cygpid, winpid);
       if (!entry->is_active ())
 	{
 	  LeaveCriticalSection (&_cache_write_access);
@@ -493,6 +478,27 @@ process_cache::find (const DWORD winpid, class process **previous)
       *previous = ptr;
 
   return NULL;
+}
+
+void
+thread::dup_signal_arrived ()
+{
+  if (ipcblk && ipcblk->signal_arrived
+      && !DuplicateHandle (client->handle (), ipcblk->signal_arrived,
+			   GetCurrentProcess (), &ipcblk->signal_arrived,
+			   0, FALSE, DUPLICATE_SAME_ACCESS))
+      {
+	system_printf ("error duplicating thread's signal_arrived "
+		       "to server (%u)", GetLastError ());
+	ipcblk->signal_arrived = NULL;
+      }
+}
+
+void
+thread::close_signal_arrived ()
+{
+  if (ipcblk && ipcblk->signal_arrived)
+    CloseHandle (ipcblk->signal_arrived);
 }
 
 /*****************************************************************************/

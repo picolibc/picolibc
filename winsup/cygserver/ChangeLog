@@ -1,3 +1,23 @@
+2015-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.h: Throughout, convert "struct thread" to "class thread".
+	* bsd_mutex.cc (_msleep): Fetch signal_arrived handle from thread's
+	ipcblk.
+	* process.h (class process): Drop _signal_arrived and align methods.
+	(process_cache::process): Drop signal_arrived parameter.
+	* process.cc (process::process): Ditto.  Drop related code.
+	(process::~process): Drop closing signal_arrived handle.
+	(process_cache::process): Drop signal_arrived parameter in call to
+	process::process.
+	(thread::dup_signal_arrived): New method duplicating thread's
+	signal_arrived handle.
+	(thread::close_signal_arrived): New method closing thread's
+	signal_arrived handle.
+	* msg.cc (client_request_msg::serve): Drop signal_arrived parameter from
+	call to process_cache::process. Use thread constructor to initialize td.
+	* sem.cc (client_request_sem::serve): Ditto.
+	* shm.cc (client_request_shm::serve): Ditto.
+
 2014-11-06  Florian Friesdorf  <flo@chaoflow.net>
 
 	* cygserver-config: Add -N option to allow different service name.

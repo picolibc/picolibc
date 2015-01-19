@@ -52,8 +52,7 @@ client_request_sem::serve (transport_layer_base *const conn,
       return;
     }
   process *const client = cache->process (_parameters.in.ipcblk.cygpid,
-					  _parameters.in.ipcblk.winpid,
-					  _parameters.in.ipcblk.signal_arrived);
+					  _parameters.in.ipcblk.winpid);
   if (!client)
     {
       error_code (EAGAIN);
@@ -79,7 +78,7 @@ client_request_sem::serve (transport_layer_base *const conn,
   conn->revert_to_self ();
   /* sysv_sem.cc takes care of itself. */
   client->release ();
-  thread td = { client, &_parameters.in.ipcblk, {-1, -1} };
+  thread td (client, &_parameters.in.ipcblk, true);
   int res;
   switch (_parameters.in.semop)
     {

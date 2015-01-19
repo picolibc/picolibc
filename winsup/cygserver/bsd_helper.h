@@ -1,6 +1,6 @@
 /* bsd_helper.h: Helps integrating BSD kernel code
 
-   Copyright 2003, 2012 Red Hat, Inc.
+   Copyright 2003, 2012, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -39,24 +39,24 @@ extern SECURITY_ATTRIBUTES sec_all_nih;
 
 void securityinit (void);
 
-int win_copyin (struct thread *, const void *, void *, size_t);
-int win_copyout (struct thread *, const void *, void *, size_t);
+int win_copyin (class thread *, const void *, void *, size_t);
+int win_copyout (class thread *, const void *, void *, size_t);
 #define copyin(a,b,c) win_copyin((td),(a),(b),(c))
 #define copyout(a,b,c) win_copyout((td),(a),(b),(c))
 
 void *get_token_info (HANDLE, TOKEN_INFORMATION_CLASS);
-int ipcperm (struct thread *, struct ipc_perm *, unsigned int);
-int suser (struct thread *);
+int ipcperm (class thread *, struct ipc_perm *, unsigned int);
+int suser (class thread *);
 bool adjust_identity_info (struct proc *p);
 
 struct vmspace *ipc_p_vmspace (struct proc *);
-int ipcexit_creat_hookthread(struct thread *);
+int ipcexit_creat_hookthread(class thread *);
 void ipcinit (void);
 int ipcunload (void);
 
 vm_object_t _vm_pager_allocate (int, int);
 #define vm_pager_allocate(a,b,s,c,d) _vm_pager_allocate((s),(mode))
-vm_object_t vm_object_duplicate (struct thread *td, vm_object_t object);
+vm_object_t vm_object_duplicate (class thread *td, vm_object_t object);
 void vm_object_deallocate (vm_object_t object);
 
 void tunable_param_init (const char *, bool);

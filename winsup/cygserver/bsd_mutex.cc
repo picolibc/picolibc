@@ -1,6 +1,6 @@
 /* bsd_mutex.cc
 
-   Copyright 2003, 2004, 2005, 2007, 2012, 2014 Red Hat Inc.
+   Copyright 2003, 2004, 2005, 2007, 2012, 2014, 2015 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -314,13 +314,12 @@ _msleep (void *ident, struct mtx *mtx, int priority,
       evt,
       msleep_glob_evt,
       td->client->handle (),
-      td->client->signal_arrived ()
+      td->ipcblk->signal_arrived
     };
   /* PCATCH handling.  If PCATCH is given and signal_arrived is a valid
      handle, then it's used in the WaitFor call and EINTR is returned. */
   int obj_cnt = 3;
-  if ((priority & PCATCH)
-      && td->client->signal_arrived () != INVALID_HANDLE_VALUE)
+  if ((priority & PCATCH) && obj[3])
     obj_cnt = 4;
   switch (WaitForMultipleObjects (obj_cnt, obj, FALSE, timo ?: INFINITE))
     {

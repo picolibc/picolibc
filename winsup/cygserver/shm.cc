@@ -55,8 +55,7 @@ client_request_shm::serve (transport_layer_base *const conn,
       return;
     }
   process *const client = cache->process (_parameters.in.ipcblk.cygpid,
-					  _parameters.in.ipcblk.winpid,
-					  _parameters.in.ipcblk.signal_arrived);
+					  _parameters.in.ipcblk.winpid);
   if (!client)
     {
       error_code (EAGAIN);
@@ -82,7 +81,7 @@ client_request_shm::serve (transport_layer_base *const conn,
   conn->revert_to_self ();
   /* sysv_shm.cc takes care of itself. */
   client->release ();
-  thread td = { client, &_parameters.in.ipcblk, {0, 0} };
+  thread td (client, &_parameters.in.ipcblk, false);
   int res;
   shmop_t shmop = _parameters.in.shmop; /* Get's overwritten otherwise. */
   switch (shmop)
