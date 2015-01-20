@@ -34,6 +34,7 @@ if test -n "${sys_dir}"; then
 	m88kbug) AC_CONFIG_SUBDIRS(m88kbug) ;;
 	mmixware) AC_CONFIG_SUBDIRS(mmixware) ;;
 	netware) AC_CONFIG_SUBDIRS(netware) ;;
+	or1k) AC_CONFIG_SUBDIRS(or1k) ;;
 	rdos) AC_CONFIG_SUBDIRS(rdos) ;;
 	rtems) AC_CONFIG_SUBDIRS(rtems) ;;
 	sh) AC_CONFIG_SUBDIRS(sh) ;;
