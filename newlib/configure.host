@@ -502,8 +502,10 @@ case "${host}" in
   nios2*)
 	sys_dir=
 	;;
-  or1k-*-* | or1knd-*-*)
-        syscall_dir=syscalls
+  or1k-*-elf | or1knd-*-elf)
+	sys_dir=or1k
+	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED "
+	have_crt0="no"
 	;;
   powerpcle-*-pe)
 	posix_dir=posix
@@ -746,6 +748,9 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_SYSTEM -DMISSING_SYSCALL_NAMES"
 	;;
   nds32*)
+	syscall_dir=syscalls
+	;;
+  or1k*|or1knd*)
 	syscall_dir=syscalls
 	;;
   powerpc*-*-eabialtivec*)
