@@ -1,3 +1,9 @@
+2015-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* common.din (sockatmark): Export.
+	* net.cc (sockatmark): New function.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2015-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver_ipc.h (ipc_retval): Add default constructor.

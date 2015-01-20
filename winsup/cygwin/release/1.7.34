@@ -30,6 +30,9 @@ What's new:
   fputws_unlocked, fread_unlocked, fwrite_unlocked, getwc_unlocked,
   getwchar_unlocked, putwc_unlocked, putwchar_unlocked.
 
+- New API: sockatmark.
+
+
 What changed:
 -------------
 

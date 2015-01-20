@@ -1118,6 +1118,7 @@ sinhf NOSIGFE
 siprintf SIGFE
 sleep SIGFE
 snprintf SIGFE
+sockatmark SIGFE
 socket = cygwin_socket SIGFE
 socketpair SIGFE
 spawnl SIGFE
