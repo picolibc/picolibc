@@ -1,8 +1,8 @@
-2015-01-19  Wilco Dijkstra  wdijkstr@arm.com
+2015-01-20  Wilco Dijkstra  wdijkstr@arm.com
 
 	* libc/machine/aarch64/strlen.S (strlen): Improve performance.
 
-2015-01-19  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+2015-01-20  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
 	* configure.host: Add extra system for OpenRISC baremetal.
 
