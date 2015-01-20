@@ -1,3 +1,7 @@
+2015-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix.xml (std-susv4): Move sockatmark here from std-notimpl.
+
 2015-01-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntsec.xml (ntsec-mapping-nsswitch-passwd): Document /path %H wildcard.

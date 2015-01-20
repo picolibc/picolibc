@@ -786,6 +786,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sinhf
     sleep
     snprintf
+    sockatmark
     socket
     socketpair
     sprintf
@@ -1486,7 +1487,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sigtimedwait
     sinhl
     sinl
-    sockatmark
     sqrtl
     strcasecmp_l
     strcoll_l
