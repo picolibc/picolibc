@@ -73,3 +73,9 @@ Bug Fixes
 
 - Fix a problem in the resolver trying to resolve "localhost".
   Addresses: https://cygwin.com/ml/cygwin/2015-01/msg00044.html
+
+- Update Cygserver's idea of signal handling to the latest state of
+  per-thread signalling in Cygwin.
+  Addresses: https://cygwin.com/ml/cygwin/2015-01/msg00259.html
+             https://cygwin.com/ml/cygwin/2015-01/msg00269.html
+  
