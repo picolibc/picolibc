@@ -1,3 +1,8 @@
+2015-01-21  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* COPYING.LIBGLOSS: Add Controls and Data Services copyright.
+	* COPYING.NEWLIB: Likewise.
+
 2014-12-16  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* config.sub: Merge from binutils.
