@@ -1,5 +1,10 @@
 2015-01-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Allow fetching gid,
+	home, shell and gecos info from NT4 domain.
+
+2015-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (get_logon_server): Constify domain parameter.
 	* security.h (get_logon_server): Same in prototype.
 

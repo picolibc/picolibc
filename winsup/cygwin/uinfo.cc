@@ -2077,32 +2077,62 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 
 	  if (is_domain_account)
 	    {
-	      /* Use LDAP to fetch domain account infos. */
-	      if (cldap->open (NULL) != NO_ERROR)
-		break;
-	      if (cldap->fetch_ad_account (sid, is_group (), domain))
+	      /* On AD machines, use LDAP to fetch domain account infos. */
+	      if (cygheap->dom.primary_dns_name ())
 		{
-		  if ((id_val = cldap->get_primary_gid ()) != ILLEGAL_GID)
-		    gid = posix_offset + id_val;
-		  if (!is_group ())
+		  if (cldap->open (NULL) != NO_ERROR)
+		    break;
+		  if (cldap->fetch_ad_account (sid, is_group (), domain))
 		    {
-		      home = cygheap->pg.get_home (cldap, sid, dom, name,
-						   fully_qualified_name);
-		      shell = cygheap->pg.get_shell (cldap, sid, dom, name,
-						     fully_qualified_name);
-		      gecos = cygheap->pg.get_gecos (cldap, sid, dom, name,
-						     fully_qualified_name);
+		      if ((id_val = cldap->get_primary_gid ()) != ILLEGAL_GID)
+			gid = posix_offset + id_val;
+		      if (!is_group ())
+			{
+			  home = cygheap->pg.get_home (cldap, sid, dom, name,
+						       fully_qualified_name);
+			  shell = cygheap->pg.get_shell (cldap, sid, dom, name,
+							 fully_qualified_name);
+			  gecos = cygheap->pg.get_gecos (cldap, sid, dom, name,
+							 fully_qualified_name);
+			}
+		      /* Check and, if necessary, add unix<->windows id mapping
+			 on the fly, unless we're called from getpwent. */
+		      if (!pldap)
+			{
+			  id_val = cldap->get_unix_uid ();
+			  if (id_val != ILLEGAL_UID
+			      && cygheap->ugid_cache.get_uid (id_val)
+				 == ILLEGAL_UID)
+			    cygheap->ugid_cache.add_uid (id_val, uid);
+			}
 		    }
-		  /* Check and, if necessary, add unix<->windows id mapping on
-		     the fly, unless we're called from getpwent. */
-		  if (!pldap)
+		}
+	      /* If primary_dns_name() is empty, we're likely running under an
+		 NT4 domain, so we can't use LDAP.  For user accounts fall back
+		 to NetUserGetInfo.  This isn't overly fast, but keep in mind
+		 that NT4 domains are mostly replaced by AD these days. */
+	      else if (!is_group () && acc_type == SidTypeUser)
+		{
+		  WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+		  NET_API_STATUS nas;
+		  PUSER_INFO_3 ui;
+		  
+		  if (!get_logon_server (cygheap->dom.primary_flat_name (),
+					 server, DS_IS_FLAT_NAME))
+		    break;
+		  nas = NetUserGetInfo (server, name, 3, (PBYTE *) &ui);
+		  if (nas != NERR_Success)
 		    {
-		      id_val = cldap->get_unix_uid ();
-		      if (id_val != ILLEGAL_UID
-			  && cygheap->ugid_cache.get_uid (id_val)
-			     == ILLEGAL_UID)
-			cygheap->ugid_cache.add_uid (id_val, uid);
+		      debug_printf ("NetUserGetInfo(%W) %u", name, nas);
+		      break;
 		    }
+		  gid = posix_offset + ui->usri3_primary_group_id;
+		  home = cygheap->pg.get_home (ui, sid, dom, name,
+					       fully_qualified_name);
+		  shell = cygheap->pg.get_shell (ui, sid, dom, name,
+						 fully_qualified_name);
+		  gecos = cygheap->pg.get_gecos (ui, sid, dom, name,
+						 fully_qualified_name);
 		}
 	    }
 	  /* Otherwise check account domain (local SAM).*/
