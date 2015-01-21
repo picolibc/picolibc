@@ -1,7 +1,7 @@
 /* security.h: security declarations
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013, 2014 Red Hat, Inc.
+   2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -470,7 +470,7 @@ bool get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw);
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user);
 /* Get default logonserver for a domain. */
-bool get_logon_server (PWCHAR domain, PWCHAR wserver, ULONG flags);
+bool get_logon_server (PCWSTR domain, PWCHAR wserver, ULONG flags);
 
 /* Fetch user profile path from registry, if it already exists. */
 PWCHAR get_user_profile_directory (PCWSTR sidstr, PWCHAR path, SIZE_T path_len);

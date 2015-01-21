@@ -1,7 +1,7 @@
 /* sec_auth.cc: NT authentication functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -312,7 +312,7 @@ lsa_close_policy (HANDLE lsa)
 }
 
 bool
-get_logon_server (PWCHAR domain, WCHAR *server, ULONG flags)
+get_logon_server (PCWSTR domain, PWCHAR server, ULONG flags)
 {
   DWORD ret;
   PDOMAIN_CONTROLLER_INFOW pci;
