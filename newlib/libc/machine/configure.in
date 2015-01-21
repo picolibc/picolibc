@@ -69,6 +69,7 @@ if test -n "${machine_dir}"; then
 	tic6x) AC_CONFIG_SUBDIRS(tic6x) ;;
 	tic80) AC_CONFIG_SUBDIRS(tic80) ;;
 	v850) AC_CONFIG_SUBDIRS(v850) ;;
+	visium) AC_CONFIG_SUBDIRS(visium) ;;
 	w65) AC_CONFIG_SUBDIRS(w65) ;;
 	x86_64) AC_CONFIG_SUBDIRS(x86_64) ;;
 	xc16x) AC_CONFIG_SUBDIRS(xc16x) ;;

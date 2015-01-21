@@ -338,6 +338,11 @@ _BEGIN_STD_C
 #define _JBLEN 0x44
 #endif
 
+#ifdef __VISIUM__
+/* All call-saved GP registers: r11-r19,r21,r22,r23.  */
+#define _JBLEN 12
+#endif
+
 #ifdef _JBLEN
 #ifdef _JBTYPE
 typedef	_JBTYPE jmp_buf[_JBLEN];

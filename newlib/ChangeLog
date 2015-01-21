@@ -1,3 +1,13 @@
+2015-01-21  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* configure.host: Add Visium support.
+	* libc/machine/configure.in: Likewise.
+	* libc/machine/configure: Regenerate.
+	* libc/machine/visium/: New directory.
+	* libc/include/machine/setjmp.h (_JBLEN): Define for Visium.
+	* libc/include/machine/ieeefp.h (__IEEE_BIG_ENDIAN): Likewise.
+	* libc/include/machine/time.h (_CLOCKS_PER_SEC_): Likewise.
+
 2015-01-20  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
 	* libc/sys/configure.in: Add OpenRISC.

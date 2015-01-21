@@ -286,6 +286,9 @@ case "${host_cpu}" in
 	machine_dir=v850
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED "
 	;;
+  visium)
+	machine_dir=visium
+	;;
   w65*)
 	machine_dir=w65
 	;;
@@ -544,6 +547,9 @@ case "${host}" in
           have_crt0="no"
         fi
 	;;
+  visium-*-*)
+	sys_dir=
+	;;
   w65-*-*)
 	sys_dir=w65
 	;;
@@ -801,6 +807,10 @@ case "${host}" in
 	;;
   v850*-*-*)
 	syscall_dir=syscalls
+	;;
+  visium-*-*)
+	newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED -DHAVE_SYSTEM -DMISSING_SYSCALL_NAMES"
+	syscall_dir=
 	;;
   w65-*-*)
 	syscall_dir=syscalls	

@@ -126,6 +126,10 @@ case "${target}" in
   v850*-*-*)
         AC_CONFIG_SUBDIRS([v850])
         ;;
+  visium-*-*)
+	AC_CONFIG_SUBDIRS([visium])
+	config_testsuite=false
+	;;
   xc16x-*-*)
 	AC_CONFIG_SUBDIRS([xc16x])
 	;;

@@ -1,3 +1,9 @@
+2015-01-21  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* configure.in: Add Visium support.
+	* configure: Regenerate.
+	* visium/: New directory.
+
 2015-01-15  DJ Delorie  <dj@redhat.com>
 
 	* rl78/crt0.S: Initialize .saddr.  Avoid using SEL.
