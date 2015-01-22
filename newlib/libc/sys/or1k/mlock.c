@@ -16,7 +16,7 @@
  */
 
 #include <reent.h>
-#include <or1k-support.h>
+#include <stdint.h>
 
 /* Lock calls from different cores, but allows recursive calls from the same
  * core. The lock is not only atomic to other cores calling malloc, but also
@@ -35,6 +35,8 @@ volatile uint32_t _or1k_malloc_lock;
 volatile uint32_t _or1k_malloc_lock_cnt;
 // The exception enable restore of the current mutex holder
 volatile uint32_t _or1k_malloc_lock_restore;
+
+extern uint32_t or1k_sync_cas(void *address, uint32_t compare, uint32_t swap);
 
 /**
  * Recursive lock of the malloc
@@ -59,7 +61,7 @@ void __malloc_lock(struct _reent *ptr) {
 			while (_or1k_malloc_lock != 0) {}
 			// .. and then try to set it atomically. As this may
 			// fail, we need to repeat this
-		} while (or1k_sync_cas(&_or1k_malloc_lock, 0, id) != 0);
+		} while (or1k_sync_cas((void*) &_or1k_malloc_lock, 0, id) != 0);
 	}
 
 	// Store the TEE and IEE flags for later restore
