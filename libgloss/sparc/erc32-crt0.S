@@ -6,6 +6,9 @@
 
 #include "asm.h"
 
+	.register %g2, #scratch
+	.register %g3, #scratch
+
 	.data
         .align  8
 SYM(environ):

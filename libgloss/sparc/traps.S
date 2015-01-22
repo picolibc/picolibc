@@ -15,6 +15,9 @@
 #include "asm.h"
 #include "slite.h"
 
+	.register %g2, #scratch
+	.register %g3, #scratch
+
 	.text
 	.align 4
 

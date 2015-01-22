@@ -21,6 +21,9 @@
 #else
 #define SAVE_SIZE -64
 #endif
+
+.register %g2, #scratch
+.register %g3, #scratch
 	
 .data
         .align  8

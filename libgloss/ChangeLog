@@ -1,3 +1,10 @@
+2015-01-22  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* sparc/crt0.S: Declare use of system registers.
+	* sparc/cygmon-crt0.S: Ditto.
+	* sparc/erc32-crt0.S: Ditto.
+	* sparc/traps.S: Ditto.
+
 2015-01-21  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* configure.in: Add Visium support.
@@ -22,7 +29,7 @@
 
 	* or1k/include/or1k-sprs.h: New auto-generated header file.
 
-2015-01-05  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+2015-01-05  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* lm32/Makefile.in (install): Respect DESTDIR.
 	(install-scripts): Ditto.
