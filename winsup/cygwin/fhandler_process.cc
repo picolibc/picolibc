@@ -1,7 +1,7 @@
 /* fhandler_process.cc: fhandler for /proc/<pid> virtual filesystem
 
    Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
-   2013, 2014 Red Hat, Inc.
+   2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -77,7 +77,7 @@ static const virt_tab_t process_tab[] =
   { _VN ("uid"),        FH_PROCESS,   virt_file,      format_process_uid },
   { _VN ("winexename"), FH_PROCESS,   virt_file,      format_process_winexename },
   { _VN ("winpid"),     FH_PROCESS,   virt_file,      format_process_winpid },
-  { NULL, 0,	        FH_NADA,       virt_none,      NULL }
+  { NULL, 0,	        FH_NADA,      virt_none,      NULL }
 };
 
 static const int PROCESS_LINK_COUNT =
@@ -111,11 +111,11 @@ fhandler_process::exists ()
 	  fileid = entry - process_tab;
 	  return entry->type;
 	}
-      if (entry->type == virt_directory)
+      if (entry->type == virt_directory)	/* fd subdir only */
 	{
 	  fileid = entry - process_tab;
 	  if (fill_filebuf ())
-	    return virt_symlink;
+	    return fd_type;
 	  /* Check for nameless device entries. */
 	  path = strrchr (path, '/');
 	  if (path && *++path)
@@ -325,6 +325,7 @@ out:
 struct process_fd_t {
   const char *path;
   _pinfo *p;
+  virtual_ftype_t *fd_type;
 };
 
 bool
@@ -350,7 +351,7 @@ fhandler_process::fill_filebuf ()
     {
       if (process_tab[fileid].fhandler == FH_PROCESSFD)
 	{
-	  process_fd_t fd = { path, p };
+	  process_fd_t fd = { path, p , &fd_type };
 	  filesize = process_tab[fileid].format_func (&fd, filebuf);
 	}
       else
@@ -366,20 +367,27 @@ format_process_fd (void *data, char *&destbuf)
   _pinfo *p = ((process_fd_t *) data)->p;
   const char *path = ((process_fd_t *) data)->path;
   size_t fs = 0;
-  char *fdp = strrchr (path, '/');
-
-  if (!fdp || *++fdp == 'f') /* The "fd" directory itself. */
+  /* path looks like "$PID/fd", "$PID/fd/", "$PID/fd/[0-9]*".  In the latter
+     case a trailing slash and more followup chars are allowed, provided the
+     descriptor symlink points to a directory. */
+  char *fdp = strchr (path, '/') + 3;
+  /* The "fd" directory itself? */
+  if (fdp[0] =='\0' || (fdp[0] == '/' && fdp[1] == '\0'))
     {
       if (destbuf)
 	cfree (destbuf);
       destbuf = p->fds (fs);
+      *((process_fd_t *) data)->fd_type = virt_symlink;
     }
   else
     {
+      char *e;
+      int fd;
+
       if (destbuf)
 	cfree (destbuf);
-      int fd = atoi (fdp);
-      if (fd < 0 || (fd == 0 && !isdigit (*fdp)))
+      fd = strtol (++fdp, &e, 10);
+      if (fd < 0 || e == fdp || (*e != '/' && *e != '\0'))
 	{
 	  set_errno (ENOENT);
 	  return 0;
@@ -389,6 +397,17 @@ format_process_fd (void *data, char *&destbuf)
 	{
 	  set_errno (ENOENT);
 	  return 0;
+	}
+      if (*e == '\0')
+	*((process_fd_t *) data)->fd_type = virt_symlink;
+      else /* trailing path */
+	{
+	  char *newbuf = (char *) cmalloc_abort (HEAP_STR, strlen (destbuf)
+							   + strlen (e) + 1);
+	  stpcpy (stpcpy (newbuf, destbuf), e);
+	  cfree (destbuf);
+	  destbuf = newbuf;
+	  *((process_fd_t *) data)->fd_type = virt_fsdir;
 	}
     }
   return fs;

@@ -1,3 +1,21 @@
+2015-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_process): Add fd_type member.
+	* fhandler_process.cc (process_tab): Fix indentation.
+	(fhandler_process::exists): Rely on format_process_fd returning file
+	type in fd_type.
+	(struct process_fd_t): Add fd_type member.
+	(fhandler_process::fill_filebuf): Allow format_process_fd to set
+	this->fd_type member.
+	(format_process_fd): Fix path evaluation to allow recognizing trailing
+	path components.  Fix check for file descriptor path component.  Return
+	virt_symlink in fd_type if no trailing path compenents exist, return
+	virt_fsdir otherwise and copy full resulting path into destbuf.
+	* path.cc (path_conv::check): If /proc/$PID/fd symlink has trailing
+	path components, reparse resulting path as if it's the incoming path.
+	Add comment to wail over the outdated and hackish check method, and to
+	explain what we do here.
+
 2015-01-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Allow fetching gid,

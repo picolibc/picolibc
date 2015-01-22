@@ -1,7 +1,7 @@
 /* path.cc: path support.
 
      Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-     2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+     2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
   This file is part of Cygwin.
 
@@ -747,6 +747,8 @@ path_conv::check (const char *src, unsigned opt,
 		  full_path = THIS_path;
 		}
 
+    retry_fs_via_processfd:
+
 	      /* Convert to native path spec sans symbolic link info. */
 	      error = mount_table->conv_to_win32_path (path_copy, full_path,
 						       dev, &sym.pflags);
@@ -795,6 +797,29 @@ path_conv::check (const char *src, unsigned opt,
 			{
 			  fh->fill_filebuf ();
 			  symlen = sym.set (fh->get_filebuf ());
+			}
+		      else if (file_type == virt_fsdir && dev == FH_PROCESS)
+			{
+			  /* FIXME: This is YA bad hack to workaround that
+			     we're checking for isvirtual_dev at this point.
+			     This should only happen if the file is actually
+			     a virtual file, and NOT already if the preceeding
+			     path components constitute a virtual file.
+
+			     Anyway, what we do here is this:  If the descriptor
+			     symlink points to a dir, and if there are trailing
+			     path components, it's actually pointing somewhere
+			     else.  The format_process_fd function returns the
+			     full path, resolved symlink plus trailing path
+			     components, in its filebuf.  This is a POSIX path
+			     we know nothing about, so we have to convert it to
+			     native again, calling conv_to_win32_path.  Since
+			     basically nothing happened yet, just copy it over
+			     into full_path and jump back to the
+			     conv_to_win32_path call.  What a mess. */
+			  stpcpy (path_copy, fh->get_filebuf ());
+			  delete fh;
+			  goto retry_fs_via_processfd;
 			}
 		      delete fh;
 		    }
