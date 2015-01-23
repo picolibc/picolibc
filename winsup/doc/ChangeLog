@@ -1,3 +1,9 @@
+2015-01-23  Pierre A. Humblet  <phumblet@phumblet.no-ip.org>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new1.7.34): Add extension of gethostbyname2.
+	Add sockatmark.
+
 2015-01-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.xml (std-susv4): Move sockatmark here from std-notimpl.
