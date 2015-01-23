@@ -19,6 +19,9 @@ What's new:
 - Provide Cygwin documentation (PDFs and HTML) for offline usage in
   /usr/share/doc/cygwin-${version}.
 
+- Make gethostbyname2 handle numerical host addresses as well as the reserved
+  domain names "localhost" and "invalid" per RFC 6761.
+
 - New APIs: qsort_r, __bsd_qsort_r.
 
 - New APIs: __fbufsize, __flbf, __fpending, __freadable, __freading,
