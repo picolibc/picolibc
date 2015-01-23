@@ -72,6 +72,7 @@ extern "C"
   int __stdcall rcmd (char **ahost, unsigned short inport, char *locuser,
 		      char *remuser, char *cmd, SOCKET * fd2p);
   int sscanf (const char *, const char *, ...);
+  int cygwin_inet_pton(int, const char *, void *);
   int cygwin_inet_aton(const char *, struct in_addr *);
   const char *cygwin_inet_ntop (int, const void *, char *, socklen_t);
   int dn_length1(const unsigned char *, const unsigned char *,
@@ -1168,6 +1169,104 @@ memcpy4to6 (char *dst, const u_char *src)
   memcpy (dst + 12, src, NS_INADDRSZ);
 }
 
+/* gethostby_specials: RFC 6761 
+   Handles numerical addresses and special names for gethostbyname2 */ 
+static hostent *
+gethostby_specials (const char *name, const int af,
+		    const int addrsize_in, const int addrsize_out)
+{
+  int namelen = strlen (name);
+  /* Ignore a final '.' */
+  if ((namelen == 0) || ((namelen -= (name[namelen - 1] == '.')) == 0)) 
+    {
+      set_errno (EINVAL);
+      h_errno = NETDB_INTERNAL;
+      return NULL;
+    }
+
+  int res;
+  u_char address[NS_IN6ADDRSZ];
+  /* Test for numerical addresses */
+  res = cygwin_inet_pton(af, name, address);
+  /* Test for special domain names */
+  if (res != 1)
+    {
+      {
+	char const match[] = "invalid";
+	int const matchlen = sizeof(match) - 1;
+	int start = namelen - matchlen;
+	if ((start >= 0) && ((start == 0) || (name[start-1] == '.'))
+	    && (strncasecmp (&name[start], match , matchlen) == 0))
+	  {
+	    h_errno = HOST_NOT_FOUND;
+	    return NULL;
+	  }
+      }
+      {
+	char const match[] = "localhost";
+	int const matchlen = sizeof(match) - 1;
+	int start = namelen - matchlen;
+	if ((start >= 0) && ((start == 0) || (name[start-1] == '.'))
+	    && (strncasecmp (&name[start], match , matchlen) == 0))
+	  {
+	    res = 1;
+	    if (af == AF_INET)
+	      {
+		address[0] = 127;
+		address[1] = address[2] = 0;
+		address[3] = 1;
+	      }
+	    else
+	      {
+		memset (address, 0, NS_IN6ADDRSZ);
+		address[NS_IN6ADDRSZ-1] = 1;
+	      }
+	  }
+      }
+    }
+  if (res != 1)
+    return NULL;  
+
+  int const alias_count = 0, address_count = 1;
+  char * string_ptr;
+  int sz = DWORD_round (sizeof(hostent))
+    + sizeof (char *) * (alias_count + address_count + 2)
+    + namelen + 1
+    + address_count * addrsize_out;
+  hostent *ret = realloc_ent (sz,  (hostent *) NULL);
+  if (!ret)
+    {
+      /* errno is already set */
+      h_errno = NETDB_INTERNAL;
+      return NULL;
+    }
+
+  ret->h_addrtype = af;
+  ret->h_length = addrsize_out;
+  ret->h_aliases = (char **) (((char *) ret) + DWORD_round (sizeof(hostent)));
+  ret->h_addr_list = ret->h_aliases + alias_count + 1;
+  string_ptr = (char *) (ret->h_addr_list + address_count + 1);
+  ret->h_name = string_ptr;
+
+  memcpy (string_ptr, name, namelen);
+  string_ptr[namelen] = 0;
+  string_ptr += namelen + 1;
+
+  ret->h_addr_list[0] = string_ptr;
+  if (addrsize_in != addrsize_out)
+    {
+      memcpy4to6 (string_ptr, address);
+      ret->h_addrtype = AF_INET6;
+    }
+  else
+    memcpy (string_ptr, address, addrsize_out);
+
+  ret->h_aliases[alias_count] = NULL;
+  ret->h_addr_list[address_count] = NULL;
+
+  return ret;
+}
+
 static hostent *
 gethostby_helper (const char *name, const int af, const int type,
 		  const int addrsize_in, const int addrsize_out)
@@ -1210,7 +1309,6 @@ gethostby_helper (const char *name, const int af, const int type,
       return NULL;
     }
   u_char *eomsg = msg + anlen - 1;
-
 
   /* We scan the answer records to determine the required memory size.
      They can be corrupted and we don't fully trust that the message
@@ -1347,13 +1445,17 @@ gethostby_helper (const char *name, const int af, const int type,
 	{
 	  if (address_count == 0)
 	    {
-	      dn_expand (msg, eomsg, curptr->name (), string_ptr, curptr->namelen1);
+	      dn_expand (msg, eomsg, curptr->name (), string_ptr,
+			 curptr->namelen1);
 	      ret->h_name = string_ptr;
 	      string_ptr += curptr->namelen1;
 	    }
 	  ret->h_addr_list[address_count++] = string_ptr;
 	  if (addrsize_in != addrsize_out)
-	    memcpy4to6 (string_ptr, curptr->data);
+	    {
+	      memcpy4to6 (string_ptr, curptr->data);
+	      ret->h_addrtype =  AF_INET6;
+	    }
 	  else
 	    memcpy (string_ptr, curptr->data, addrsize_in);
 	  string_ptr += addrsize_out;
@@ -1367,7 +1469,7 @@ gethostby_helper (const char *name, const int af, const int type,
 
   return ret;
 
- corrupted:
+corrupted:
   free (msg);
   /* Hopefully message corruption errors are temporary.
      Should it be NO_RECOVERY ? */
@@ -1384,10 +1486,11 @@ gethostbyname2 (const char *name, int af)
   __try
     {
       if (!(_res.options & RES_INIT))
-	  res_init();
-      bool v4to6 = _res.options & RES_USE_INET6;
+	res_init();
 
+      bool v4to6 = _res.options & RES_USE_INET6;
       int type, addrsize_in, addrsize_out;
+
       switch (af)
 	{
 	case AF_INET:
@@ -1405,7 +1508,10 @@ gethostbyname2 (const char *name, int af)
 	  __leave;
 	}
 
-      res = gethostby_helper (name, af, type, addrsize_in, addrsize_out);
+      h_errno = NETDB_SUCCESS;
+      res = gethostby_specials (name, af, addrsize_in, addrsize_out);
+      if ((res == NULL) && (h_errno == NETDB_SUCCESS))
+	  res = gethostby_helper (name, af, type, addrsize_in, addrsize_out);
     }
   __except (EFAULT) {}
   __endtry

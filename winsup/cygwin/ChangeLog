@@ -1,3 +1,10 @@
+2015-01-23  Pierre A. Humblet <pierre@phumblet.no-ip.org>
+
+	* net.cc (cygwin_inet_pton): Declare.
+	(gethostby_specials): New function.
+	(gethostby_helper): Change returned addrtype in 4-to-6 case.
+	(gethostbyname2): Call gethostby_specials.
+
 2015-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_process): Add fd_type member.
