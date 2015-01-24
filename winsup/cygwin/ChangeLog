@@ -1,3 +1,8 @@
+2015-01-24  Pierre A. Humblet <pierre@phumblet.no-ip.org>
+
+	* uname.cc (uname): Shorten "WOW64" to "WOW" to account for the new
+	Windows 10 OS version "10.0" starting with preview build 9926.
+
 2015-01-23  Pierre A. Humblet <pierre@phumblet.no-ip.org>
 
 	* net.cc (cygwin_inet_pton): Declare.

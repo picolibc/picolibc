@@ -1,7 +1,7 @@
 /* uname.cc
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006, 2007, 2008, 2013, 2014 Red Hat, Inc.
+   2006, 2007, 2008, 2013, 2014, 2015 Red Hat, Inc.
    Written by Steve Chamberlain of Cygnus Support, sac@cygnus.com
    Rewritten by Geoffrey Noer of Cygnus Solutions, noer@cygnus.com
 
@@ -32,7 +32,7 @@ uname (struct utsname *name)
       /* Add a hint to the sysname, that we're running under WOW64.  This might
 	 give an early clue if somebody encounters problems. */
       if (wincap.is_wow64 ())
-	strncat (name->sysname, "-WOW64",
+	strncat (name->sysname, "-WOW",
 		 sizeof name->sysname - strlen (name->sysname) - 1);
 
       GetSystemInfo (&sysinfo);
