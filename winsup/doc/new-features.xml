@@ -36,7 +36,7 @@ from an ACL.
 </para></listitem>
 
 <listitem><para>
-Make gethostbyname2 handle numerical host addresses as well as the
+Make gethostbyname2 handle numeric host addresses as well as the
 reserved domain names "localhost" and "invalid" per RFC 6761.
 </para></listitem>
 
