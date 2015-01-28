@@ -1,3 +1,7 @@
+2015-01-28  Christian Eggers  <ceggers@gmx.de>
+
+	* libc/include/sys/time.h: #include <sys/cdefs.h> for __BSD_VISIBLE.
+
 2015-01-23  Corinna Vinschen  <vinschen@redhat.com>
 
 	Complete action from 2001-12-18:
