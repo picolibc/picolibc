@@ -1,3 +1,7 @@
+2015-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Simplify rule to build dependencies from cygwin dir.
+
 2015-01-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.h: Throughout, convert "struct thread" to "class thread".

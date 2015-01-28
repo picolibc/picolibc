@@ -1,5 +1,5 @@
 # Makefile for Cygwin server
-# Copyright 2003, 2006, 2007, 2008, 2009, 2014 Red Hat, Inc.
+# Copyright 2003, 2006, 2007, 2008, 2009, 2014, 2015 Red Hat, Inc.
 
 # This file is part of Cygwin.
 
@@ -73,11 +73,8 @@ fullclean: clean libclean
 cygserver.exe: $(CYGWIN_LIB) $(OBJS) $(CYGWIN_OBJS)
 	$(CXX) -o $@ ${wordlist 2,999,$^} -static -static-libgcc -B$(cygwin_build) -lntdll
 
-$(cygwin_build)/%.o: $(cygwin_source)/%.cc
-	@$(MAKE) -C $(@D) $(@F)
-
-$(cygwin_build)/%.o: $(cygwin_source)/%.c
-	@$(MAKE) -C $(@D) $(@F)
+$(cygwin_build)/%.o:
+	$(MAKE) -C $(@D) $(@F)
 
 Makefile: Makefile.in configure
 	./config.status
