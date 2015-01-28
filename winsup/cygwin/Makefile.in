@@ -1,6 +1,6 @@
 # Makefile.in for Cygwin.
 # Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-# 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+# 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 #
 # This file is part of Cygwin.
 #
@@ -315,6 +315,8 @@ EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
 	spawn.o \
 )
 
+VERSION_OFILES:=version.o winver.o
+
 ifdef PREPROCESS
 override DLL_OFILES:=$(patsubst %.o,%_E,${DLL_OFILES})
 override EXCLUDE_STATIC_OFILES:=$(patsubst %.o,%_E,${EXCLUDE_STATIC_OFILES})
@@ -599,7 +601,7 @@ uninstall-man:
 	done
 
 clean:
-	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h $(srcdir)/$(TLSOFFSETS_H) $(srcdir)/devices.cc
+	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h $(srcdir)/$(TLSOFFSETS_H) $(srcdir)/devices.cc
 	-@$(MAKE) -C ${cygserver_blddir} libclean
 
 maintainer-clean realclean: clean
@@ -612,12 +614,12 @@ $(LDSCRIPT): $(LDSCRIPT).in
 	$(CC) -E - -P < $^ -o $@
 
 # Rule to build cygwin.dll
-$(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
+$(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile $(VERSION_OFILES)
 	$(CXX) $(CXXFLAGS) \
 	-mno-use-libstdc-wrappers -L${WINDOWS_LIBDIR} \
 	-Wl,--gc-sections $(nostdlib) -Wl,-T$(firstword $^) -static \
 	-Wl,--heap=0 -Wl,--out-implib,cygdll.a -shared -o $@ \
-	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
+	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) $(VERSION_OFILES) \
 	$(MALLOC_OBJ) $(LIBSERVER) $(LIBM) $(LIBC) \
 	-lgcc $(DLL_IMPORTS) -Wl,-Map,cygwin.map
 	@$(word 2,$^) $(OBJDUMP) $(OBJCOPY) $@ ${patsubst %0.dll,%1.dbg,$@}
@@ -646,9 +648,6 @@ dll_ofiles: $(DLL_OFILES)
 
 $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
 	$(AR) rcv $(LIBGMON_A) $(GMON_OFILES)
-
-version.cc winver.o: winver_stamp
-	@ :
 
 globals.h: mkglobals_h globals.cc
 	$^ > $@
@@ -692,11 +691,9 @@ librt.a: ${LIB_NAME} posix_ipc.o
 ${EXTRALIBS}: lib%.a: %.o
 	$(AR) cru $@ $?
 
-winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
-	@echo "Making version.o and winver.o";\
-	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} $(addprefix -I,${CCWRAP_SYSTEM_HEADERS} ${CCWRAP_DIRAFTER_HEADERS}) S&& \
-	$(COMPILE.cc) -c -o version.o version.cc && \
-	touch $@
+version.cc winver.o: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
+	@echo "Making version.cc and winver.o";\
+	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} $(addprefix -I,${CCWRAP_SYSTEM_HEADERS} ${CCWRAP_DIRAFTER_HEADERS})
 
 Makefile: ${srcdir}/Makefile.in
 	/bin/sh ./config.status

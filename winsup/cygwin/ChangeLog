@@ -1,3 +1,12 @@
+2015-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (VERSION_OFILES): New variable containing object files
+	with version information.  Use throughout.
+	(clean): Drop winver_stamp.
+	(version.cc winver.o): Drop empty rule.
+	(winver_stamp): Convert to rule targeting version.cc and winver.o
+	directly.  Drop touching winver_stamp.  Fix typo.
+
 2015-01-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uname.cc (uname): Shorten "WOW64" to "WOW" to account for the new
