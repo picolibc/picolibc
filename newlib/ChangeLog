@@ -1,3 +1,8 @@
+2015-01-29  Nick Clifton  <nickc@redhat.com>
+
+	* libc/stdlib/wcstold.c (wcstold): Add implementation for when
+	long double is not the same as double.
+
 2015-01-28  Christian Eggers  <ceggers@gmx.de>
 
 	* libc/include/sys/time.h: #include <sys/cdefs.h> for __BSD_VISIBLE.
