@@ -1,3 +1,9 @@
+2015-02-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkvers.sh: Automate generating the copyright date in the version
+	resource.
+	* winver.rc: Ditto.
+
 2015-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (VERSION_OFILES): New variable containing object files

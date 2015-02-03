@@ -33,7 +33,7 @@ BEGIN
       VALUE "FileDescription", "Cygwin POSIX Emulation DLL"
       VALUE "FileVersion", STRINGIFY(CYGWIN_VERSION)
       VALUE "InternalName", CYGWIN_DLL_NAME
-      VALUE "LegalCopyright", "Copyright \251 Red Hat, Inc. 1996-2014"
+      VALUE "LegalCopyright", "Copyright \251 Red Hat, Inc. 1996-" STRINGIFY(CYGWIN_BUILD_YEAR)
       VALUE "OriginalFilename", CYGWIN_DLL_NAME
       VALUE "ProductName", "Cygwin"
       VALUE "ProductVersion", STRINGIFY(CYGWIN_VERSION)
