@@ -16,6 +16,8 @@ What's new:
 - Add -k/--remove-default option to setfacl to remove all default ACL
   entries from an ACL.
 
+- Add restore action to regtool.
+
 - Provide Cygwin documentation (PDFs and HTML) for offline usage in
   /usr/share/doc/cygwin-${version}.
 
