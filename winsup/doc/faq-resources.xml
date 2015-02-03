@@ -24,20 +24,19 @@ their documentation in <literal>/usr/doc/</literal>
 instead of <literal>/usr/share/doc/</literal>.
 </para>
 <para>There are links to quite a lot of documentation on the main Cygwin
-project web page, <ulink url="http://cygwin.com/">http://cygwin.com/</ulink>,
-including this FAQ.  Be sure to at least read any 'Release Notes' or 'Readme'
-or 'read this' links on the main web page, if there are any.
+project web page, <ulink url="https://cygwin.com/"/>, including this FAQ.
+Be sure to at least read any 'Release Notes' or 'Readme' or 'read this'
+links on the main web page, if there are any.
 </para>
-<para>There is a comprehensive Cygwin User's Guide at <ulink
-url="http://cygwin.com/cygwin-ug-net/cygwin-ug-net.html">http://cygwin.com/cygwin-ug-net/cygwin-ug-net.html</ulink>
-and an API Reference at <ulink
-url="http://cygwin.com/cygwin-api/cygwin-api.html">http://cygwin.com/cygwin-api/cygwin-api.html</ulink>.
+<para>There is a comprehensive Cygwin User's Guide at
+<ulink url="https://cygwin.com/cygwin-ug-net/cygwin-ug-net.html"/>
+and an API Reference at
+<ulink url="https://cygwin.com/cygwin-api/cygwin-api.html"/>.
 </para>
-<para>You can find documentation for the individual GNU tools at <ulink
-url="http://www.fsf.org/manual/">http://www.fsf.org/manual/</ulink>.  (You
-should read GNU manuals from a local mirror, check <ulink
-url="http://www.fsf.org/server/list-mirrors.html">http://www.fsf.org/server/list-mirrors.html</ulink>
-for a list of them.)
+<para>You can find documentation for the individual GNU tools at
+<ulink url="http://www.fsf.org/manual/"/>.  (You should read GNU manuals from
+a local mirror, check
+<ulink url="http://www.fsf.org/server/list-mirrors.html"/> for a list of them.)
 </para>
 </answer></qandaentry>
 
@@ -45,14 +44,14 @@ for a list of them.)
 <question><para>What Cygwin mailing lists can I join?</para></question>
 <answer>
 <para>Comprehensive information about the Cygwin mailing lists can be found at
-<ulink url="http://cygwin.com/lists.html" />.
+<ulink url="https://cygwin.com/lists.html"/>.
 </para>
 </answer></qandaentry>
 
 <qandaentry id="faq.resources.problems">
 <question><para>What if I have a problem? (Or: Why won't you/the mailing list answer my questions?)</para></question>
 <answer>
-<para>Comprehensive information about reporting problems with Cygwin can be found at <ulink url="http://cygwin.com/problems.html" />.
+<para>Comprehensive information about reporting problems with Cygwin can be found at <ulink url="https://cygwin.com/problems.html"/>.
 </para>
 </answer></qandaentry>
 </qandadiv>

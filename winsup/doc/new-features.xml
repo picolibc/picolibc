@@ -1460,7 +1460,7 @@ Getting a domain user's groups is hopefully more bulletproof now.
 Cygwin now comes with a real LSA authentication package.  This must be
 manually installed by a privileged user using the /bin/cyglsa-config
 script.  The advantages and disadvantages are noted in
-http://cygwin.com/ml/cygwin-developers/2006-11/msg00000.html
+https://cygwin.com/ml/cygwin-developers/2006-11/msg00000.html
 </para></listitem>
 
 <listitem><para>

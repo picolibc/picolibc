@@ -8,10 +8,10 @@
 <sect1 id="internet-setup">
 <title>Internet Setup</title>
 <para>To install the Cygwin net release, go to <ulink
-url="http://cygwin.com/">http://cygwin.com/</ulink> and run either
-<ulink url="http://cygwin.com/setup-x86.exe">setup-x86.exe</ulink>
+url="https://cygwin.com/"/> and run either
+<ulink url="https://cygwin.com/setup-x86.exe">setup-x86.exe</ulink>
 to install the 32 bit version of Cygwin, or
-<ulink url="http://cygwin.com/setup-x86_64.exe">setup-x86_64.exe</ulink>
+<ulink url="https://cygwin.com/setup-x86_64.exe">setup-x86_64.exe</ulink>
 to install the 64 bit version of Cygwin.  This will download a GUI
 installer which can be run to download a complete cygwin installation
 via the internet.  Follow the instructions on each screen to install Cygwin.
@@ -22,9 +22,9 @@ via the internet.  Follow the instructions on each screen to install Cygwin.
 For easier reading the installer is called <command>setup.exe</command>
 throughout the following sections.  This refers likewise to both
 installer applications,
-<ulink url="http://cygwin.com/setup-x86.exe">setup-x86.exe</ulink>
+<ulink url="https://cygwin.com/setup-x86.exe">setup-x86.exe</ulink>
 for 32 bit, as well as
-<ulink url="http://cygwin.com/setup-x86_64.exe">setup-x86_64.exe</ulink>
+<ulink url="https://cygwin.com/setup-x86_64.exe">setup-x86_64.exe</ulink>
 for 64 bit.  Apart from the target architecture they are the same thing.
 </note>
 </para>
@@ -34,7 +34,7 @@ The <command>setup.exe</command> installer is designed to be easy
 for new users to understand while remaining flexible for the 
 experienced. The volunteer development team is constantly working
 on <command>setup.exe</command>; before requesting a new feature,
-check the wishlist in the <ulink url="http://sourceware.org/cgi-bin/cvsweb.cgi/setup/README?cvsroot=cygwin-apps&amp;rev=2">CVS <literal>README</literal>
+check the wishlist in the <ulink url="https://sourceware.org/cgi-bin/cvsweb.cgi/setup/README?cvsroot=cygwin-apps&amp;rev=2">CVS <literal>README</literal>
 </ulink>. It may already be present in the CVS version!
 </para>
 
@@ -52,9 +52,7 @@ most installations, you can get a working minimal Cygwin environment
 installed by simply clicking the <literal>Next</literal> button
 at each page. The only exception to this is choosing a Cygwin mirror,
 which you can choose by experimenting with those listed at
-<ulink url="http://cygwin.com/mirrors.html">
-http://cygwin.com/mirrors.html
-</ulink>. For more details about each of page of the 
+<ulink url="https://cygwin.com/mirrors.html"/>. For more details about each of page of the 
 <command>setup.exe</command> installation, read on below.
 Please note that this guide assumes that you have a basic understanding
 of Unix (or a Unix-like OS). If you are new to Unix, you will also want 
@@ -148,8 +146,8 @@ authorization for proxy servers.
 <para>
 Since there is no way of knowing from where you will be downloading
 Cygwin, you need to choose at least one mirror site.  Cygwin mirrors 
-are geographically distributed around the world; check the list at <ulink 
-url="http://cygwin.com/mirrors.html">http://cygwin.com/mirrors.html</ulink>
+are geographically distributed around the world; check the list at
+<ulink url="https://cygwin.com/mirrors.html"/>
 to find one near you. You can select multiple mirrors by holding down
 <literal>CTRL</literal> and clicking on each one. If you have the URL of 
 an unlisted mirror (for example, if your organization has an internal Cygwin 
@@ -163,9 +161,8 @@ For each selected mirror site, <command>setup.exe</command> downloads a
 small text file called <literal>setup.bz2</literal> that contains a list
 of packages available from that site along with some basic information about
 each package which <command>setup.exe</command> parses and uses to create the 
-chooser window. For details about the format of this file, see 
-the <ulink url="http://sourceware.org/cygwin-apps/setup.html">
-setup.exe homepage</ulink>.
+chooser window. For details about the format of this file, see the
+<ulink url="https://sourceware.org/cygwin-apps/setup.html">setup.exe homepage</ulink>.
 </para>
 <para>
 The chooser is the most complex part of <command>setup.exe</command>. 
@@ -260,7 +257,7 @@ scripts to finish correctly setting up installed packages. Since each
 script is run separately, several windows may pop up. If you are 
 interested in what is being done, see the Cygwin Package Contributor's
 Guide at <ulink 
-url="http://cygwin.com/setup.html">http://cygwin.com/setup.html</ulink>
+url="https://cygwin.com/setup.html"/>
 When the last post-install script is completed, <command>setup.exe</command> 
 will display a box announcing the completion. A few packages, such as
 the OpenSSH server, require some manual site-specific configuration. 
@@ -277,7 +274,7 @@ HTTP instead of FTP).  If you notice something is not working after
 running setup, you can check the <command>setup.exe</command> log file
 at <literal>/var/log/setup.log.full</literal>. Make a backup of this
 file before running <command>setup.exe</command> again, and follow the
-steps for <ulink url="http://cygwin.com/problems.html">Reporting
+steps for <ulink url="https://cygwin.com/problems.html">Reporting
 Problems with Cygwin</ulink>.
 </para>
 </sect2>

@@ -20,7 +20,7 @@ by prefixing with <literal>no</literal>.</para>
 foreign applications which try to inject threads into a Cygwin process,
 or which redirect system sockets by providing an enforced so-called
 <literal>Layered Service Provider</literal>.  This may or may not help to
-detect <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda">
+detect <ulink url="https://cygwin.com/faq/faq.html#faq.using.bloda">
 BLODAs</ulink>.  Don't use this option for day-to-day usage, it will slow
 down every thread and socket creation!</para>
 </listitem>

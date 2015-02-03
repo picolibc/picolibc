@@ -10,22 +10,19 @@
 <question><para>What is it?</para></question>
 <answer>
 
-<para>The Cygwin tools are ports of the popular GNU development tools for
-Microsoft Windows.  They run thanks to the Cygwin library which
+<para>Cygwin is a distribution of popular GNU and other Open Source tools
+running on Microsoft Windows.  The core part is the Cygwin library which
 provides the POSIX system calls and environment these programs expect.
 </para>
-<para>With these tools installed, it is possible to write Windows console
-or GUI applications that make use of significant parts of the POSIX API.
-As a result, it is possible to easily port many Unix programs without the need
-for extensive changes to the source code.  This includes configuring
-and building most of the available GNU software (including the packages
-included with the Cygwin development tools themselves) as well as lots
-of BSD tools and packages (including OpenSSH).  Even if
-the development tools are of little to no use to you, you may have
-interest in the many standard POSIX utilities provided with the package.
-They can be used from one of the provided Unix shells like bash, tcsh or zsh,
-as well as from the standard Windows command shell if you have to for some
-sad reason.
+<para>The Cygwin distribution contains thousands of packages from the Open
+Source world including most GNU tools, many BSD tools, an X server and a full
+set of X applications.  If you're a developer you will find tools, headers
+and libraries allowing to write Windows console or GUI applications that make
+use of significant parts of the POSIX API.  Cygwin allows easy porting of many
+Unix programs without the need for extensive changes to the source code.  This
+includes configuring and building most of the available GNU or BSD software,
+including the packages included with the Cygwin distribution themselves.
+They can be used from one of the provided Unix shells like bash, tcsh or zsh.
 </para>
 </answer></qandaentry>
 
@@ -33,17 +30,12 @@ sad reason.
 <question><para>What versions of Windows are supported?</para></question>
 <answer>
 
-<para>Cygwin can be expected to run on all modern versions of Windows.
-This includes, as of the time of writing this, Windows XP SP3, Windows
-Server 2003, Windows Vista, Windows Server 2008, Windows 7, Windows
-Server 2012, Windows 8.  The 32 bit version also runs in the WOW64 32 bit
-environment on released 64 bit versions of Windows
-(XP/2003/Vista/2008/7/2008 R2/8/2012).
-Since Cygwin is a community-supported free software project, patches to
-provide support for other versions would be thoughtfully considered.
-Paid support contracts or enhancements are available through Red Hat.  For 
-information about getting a Red Hat support contract, see 
-<ulink url="http://cygwin.com/licensing.html" />.
+<para>Cygwin can be expected to run on all modern, released versions of Windows.
+State January 2015 this includes Windows XP SP3, Windows Server 2003/2003R2
+and all later versions of Windows up to Windows 8.1 and Windows Server 2012R2.
+The 32 bit version of Cygwin also runs in the WOW64 32 bit environment on
+released 64 bit versions of Windows (XP SP3 up to 8.1/2012R2), the 64 bit
+version of course only on 64 bit Windows.
 </para>
 <para>Keep in mind that Cygwin can only do as much as the underlying OS
 supports.  Because of this, Cygwin will behave differently, and
@@ -55,17 +47,17 @@ exhibit different limitations, on the various versions of Windows.
 <question><para>Where can I get it?</para></question>
 <answer>
 
-<para>The home page for the Cygwin project is <ulink url="http://cygwin.com/">http://cygwin.com/</ulink>.
+<para>The home page for the Cygwin project is
+<ulink url="https://cygwin.com/"/>.
 There you should find everything you need for Cygwin, including links
 for download and setup, a current list of mirror sites, a User's
-Guide, an API Reference, mailing lists and archives, and additional
-ported software.
+Guide, an API Reference, mailing lists and archives.
 </para>
 <para>You can find documentation for the individual GNU tools typically
 as man pages or info pages as part of the Cygwin net distribution.
 Additionally you can get the latest docs at
-<ulink url="http://www.gnu.org/manual/" />.  (You should read GNU manuals from a
-local mirror.  Check <ulink url="http://www.gnu.org/server/list-mirrors.html" />
+<ulink url="http://www.gnu.org/manual/"/>.  (You should read GNU manuals from a
+local mirror.  Check <ulink url="http://www.gnu.org/server/list-mirrors.html"/>
 for a list of them.)
 </para>
 </answer></qandaentry>
@@ -85,7 +77,7 @@ these tools.
 <para>In particular, if you intend to port a proprietary (non-GPL'd)
 application using Cygwin, you will need the proprietary-use license 
 for the Cygwin library.  This is available for purchase from Red Hat;
-please visit <ulink url="http://cygwin.com/licensing.html" /> for more
+please visit <ulink url="https://cygwin.com/licensing.html"/> for more
 information.  All other questions should be sent to the public project
 mailing list cygwin@cygwin.com.
 </para>
@@ -103,7 +95,9 @@ freedoms, so it is free software.
 
 <para>To find the version of the Cygwin DLL installed, you can use
 <filename>uname</filename> as on Linux or <filename>cygcheck</filename>. Refer to each command's
-<literal>--help</literal> output and the <ulink url='http://cygwin.com/cygwin-ug-net/'>Cygwin User's Guide</ulink> for more information.
+<literal>--help</literal> output and the
+<ulink url='https://cygwin.com/cygwin-ug-net/'>Cygwin User's Guide</ulink>
+for more information.
 </para>
 <para>If you are looking for the version number for the whole Cygwin
 release, there is none. Each package in the Cygwin release has its own
@@ -113,10 +107,11 @@ Each package has its own version numbers and its own release process.
 </para>
 <para>So, how do you get the most up-to-date version of Cygwin?  Easy.  Just
 download the Cygwin Setup program by following the instructions
-<ulink url='http://cygwin.com/install.html'>here</ulink>.  The setup program will handle the task
-of updating the packages on your system to the latest version. For
-more information about using Cygwin's <filename>setup.exe</filename>, see 
-<ulink url='http://cygwin.com/cygwin-ug-net/setup-net.html'>Setting Up Cygwin</ulink>
+<ulink url='https://cygwin.com/install.html'>here</ulink>.
+The setup program will handle the task of updating the packages on your system
+to the latest version. For more information about using Cygwin's
+<filename>setup.exe</filename>, see 
+<ulink url='https://cygwin.com/cygwin-ug-net/setup-net.html'>Setting Up Cygwin</ulink>
 in the Cygwin User's Guide. 
 </para></answer></qandaentry>
 
@@ -129,26 +124,29 @@ questions, all of these people will appreciate it if you use the cygwin
 mailing lists rather than sending personal email.)</emphasis>
 </para>
 <para>
-Corinna Vinschen (corinna) is the current project lead. Corinna is a
-senior Red Hat engineer. Corinna is responsible for such important
-subsystems as security and networking and has recently added support to
-Cygwin for wide characters, increased path length, IPv6, advisory
-file locking and more.
+Corinna Vinschen is the current project lead. Corinna is a senior Red Hat
+engineer. Corinna is responsible for the Cygwin library and maintains a couple
+of packages, for instance OpenSSH, OpenSSL, and a lot more.
 </para>
 <para>
-Yaakov Selkowitz is the Cygwin/X coordinator. Jon Turney serves on the
-Cygwin/X team as a developer.
+Yaakov Selkowitz is another Red Hat engineer working on the Cygwin project.
+He's the guy behind the current build and packaging system and maintains by
+far the most packages in the Cygwin distribution.
+</para>
+<para>
+Jon Turney is developer and maintainer of the Cygwin X server and a couple
+of related packages.
 </para>
 <para>
 The packages in the Net release are maintained by a large group of people;
-a complete list can be found <ulink url='http://cygwin.com/cygwin-pkg-maint'>here</ulink>.
+a complete list can be found
+<ulink url='https://cygwin.com/cygwin-pkg-maint'>here</ulink>.
 </para>
-<para>Please note that all of us working on Cygwin try to
-be as responsive as possible and deal with patches and questions as we
-get them, but realistically we don't have time to answer all of the
-email that is sent to the main mailing list.  Making Net releases of the
-Win32 tools and helping people on the Net out is not our primary job
-function, so some email will have to go unanswered.
+<para>Please note that all of us working on Cygwin try to be as responsive as
+possible and deal with patches and questions as we get them, but realistically
+we don't have time to answer all of the email that is sent to the main mailing
+list.  Making Net releases of the Win32 tools and helping people on the Net out
+is not our primary job function, so some email will have to go unanswered.
 </para>
 <para>Many thanks to everyone using the tools for their many contributions in
 the form of advice, bug reports, and code fixes.  Keep them coming!

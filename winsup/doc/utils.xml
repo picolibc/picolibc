@@ -141,7 +141,7 @@ $ cygcheck -l less
       of packages. This feature requires an active internet connection, since
       it must query the <literal>cygwin.com</literal> web site. In fact, it is
       equivalent to the search that is available on the <ulink
-      url="http://cygwin.com/packages/">Cygwin package listing</ulink>
+      url="https://cygwin.com/packages/">Cygwin package listing</ulink>
       page.</para>
 
     <para>For example, perhaps you are getting an error because you are missing

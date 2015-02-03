@@ -49,7 +49,7 @@ The chmod call maps UNIX-style permissions back to the Win32 equivalents.
 Because many programs expect to be able to find the
 <filename>/etc/passwd</filename> and
 <filename>/etc/group</filename> files, we provide <ulink 
-url="http://cygwin.com/cygwin-ug-net/using-utils.html">utilities</ulink>
+url="https://cygwin.com/cygwin-ug-net/using-utils.html">utilities</ulink>
 that can be used to construct them from the user and group information
 provided by the operating system.</para>
 
@@ -272,7 +272,7 @@ location, Cygwin can do nothing to compensate (though it will
 retry a few times automatically).</para></listitem>
 
 <listitem><para>DLL injection by
-<ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda">
+<ulink url="https://cygwin.com/faq/faq.html#faq.using.bloda">
 BLODA</ulink>. Badly-behaved applications which
 inject dlls into other processes often manage to clobber important
 sections of the child's address space, leading to base address

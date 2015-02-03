@@ -1,3 +1,23 @@
+2015-02-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Throughout, replace http with https as far as cygwin.com and
+	sourceware.org URLs are concerned.
+	* Throughout, simplify ulink expressions if the visible text is the
+	URL anyway.
+	* faq-programming.xml (faq.programming.dll-relocatable): Remove.
+	* faq-setup.xml (faq.setup.name-with-space): Change for 1.7.34.
+	(faq.setup.home): Ditto.
+	* faq-using.xml (faq.using.printing): Clarify old links and availability
+	of a2ps and file.
+	(faq.using.xemacs): Drop outdated version info and pointers to native
+	XEmacs.
+	(faq.using.ntemacs): Remove.
+	* faq-what.xml (faq.what.what): Rephrase to reflect reality.
+	(faq.what.supported): Ditto.
+	(faq.what.who): Rephrase slightly.
+	* legal.xml: Bump copyright.
+	* setup-net.xml (internet-setup): Fix references to setup executables.
+
 2015-01-23  Pierre A. Humblet  <phumblet@phumblet.no-ip.org>
 	    Corinna Vinschen  <corinna@vinschen.de>
 

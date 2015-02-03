@@ -15,17 +15,17 @@ volunteers to prepare and maintain packages, because the priority of the
 Cygwin Team is Cygwin itself.
 </para>
 <para>The Cygwin Package Contributor's Guide at
-<ulink url="http://cygwin.com/setup.html">http://cygwin.com/setup.html</ulink> details everything you need to know
+<ulink url="https://cygwin.com/setup.html"/> details everything you need to know
 about being a package maintainer. The quickest way to get started is to
 read the <emphasis>Initial packaging procedure, script-based</emphasis> section on
 that page.  The <literal>generic-build-script</literal> found there works well for
 most packages. 
 </para>
 <para>For questions about package maintenance, use the cygwin-apps mailing
-list (start at <ulink url="http://cygwin.com/lists.html">http://cygwin.com/lists.html</ulink>) <emphasis>after</emphasis>
+list (start at <ulink url="https://cygwin.com/lists.html"/>) <emphasis>after</emphasis>
 searching and browsing the cygwin-apps list archives, of course.  Be
 sure to look at the <emphasis>Submitting a package</emphasis> checklist at
-<ulink url="http://cygwin.com/setup.html">http://cygwin.com/setup.html</ulink> before sending an ITP (Intent To
+<ulink url="https://cygwin.com/setup.html"/> before sending an ITP (Intent To
 Package) email to cygwin-apps.
 </para>
 <para>You should also announce your intentions to the general cygwin list, in
@@ -38,7 +38,7 @@ case others were thinking the same thing.
 <answer>
 
 <para>If you want to contribute to Cygwin itself, see
-<ulink url="http://cygwin.com/contrib.html">http://cygwin.com/contrib.html</ulink>.
+<ulink url="https://cygwin.com/contrib.html"/>.
 </para>
 </answer></qandaentry>
 
@@ -360,7 +360,7 @@ package at runtime.
 <answer>
 
 <para>Beware of using non-portable shell features in your Makefiles (see tips
-at <ulink url="http://cygwin.com/faq/faq.html#faq.using.shell-scripts" />).
+at <ulink url="https://cygwin.com/faq/faq.html#faq.using.shell-scripts"/>).
 </para>
 <para>Errors of <literal>make: execvp: /bin/sh: Illegal Argument</literal> or 
 <literal>make: execvp: /bin/sh: Argument list too long</literal> are often
@@ -388,7 +388,7 @@ done
 </screen>
 
 <para>
-See <ulink url="http://cygwin.com/cygwin-ug-net/using.html#mount-table" /> 
+See <ulink url="https://cygwin.com/cygwin-ug-net/using.html#mount-table"/> 
 for more information on using mount.
 </para>
 
@@ -401,7 +401,7 @@ error?</para></question>
 
 <para>
 Try running cygserver.  Read 
-<ulink url="http://cygwin.com/cygwin-ug-net/using-cygserver.html" />. If you're
+<ulink url="https://cygwin.com/cygwin-ug-net/using-cygserver.html"/>. If you're
 trying to use PostgreSQL, also read 
 <literal>/usr/share/doc/Cygwin/postgresql-*.README</literal>.
 </para>
@@ -469,9 +469,9 @@ or at least after all the object files and static libraries that reference them.
 
 <note><para>There are a few restrictions for calls to the Win32 API.
 For details, see the User's Guide section
-<ulink url="http://cygwin.com/cygwin-ug-net/setup-env.html#setup-env-win32">Restricted Win32 environment</ulink>,
+<ulink url="https://cygwin.com/cygwin-ug-net/setup-env.html#setup-env-win32">Restricted Win32 environment</ulink>,
 as well as the User's Guide section
-<ulink url="http://cygwin.com/cygwin-ug-net/using.html#pathnames-win32-api">Using the Win32 file API in Cygwin applications</ulink>.</para></note>
+<ulink url="https://cygwin.com/cygwin-ug-net/using.html#pathnames-win32-api">Using the Win32 file API in Cygwin applications</ulink>.</para></note>
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.win32-no-cygwin">
@@ -485,7 +485,7 @@ desirable for native Windows programs that don't need a UNIX emulation layer.
 </para>
 <para>This is not to be confused with 'MinGW' (Minimalist GNU for Windows),
 which is a completely separate effort.  That project's home page is
-<ulink url="http://www.mingw.org/index.shtml">http://www.mingw.org/index.shtml</ulink>.
+<ulink url="http://www.mingw.org/index.shtml"/>.
 </para>
 </answer></qandaentry>
 
@@ -500,7 +500,7 @@ self-contained executable.
 </para>
 <para>If this is an issue because you intend to distribute your Cygwin
 application, then you had better read and understand
-<ulink url="http://cygwin.com/licensing.html">http://cygwin.com/licensing.html</ulink>, which explains the licensing
+<ulink url="https://cygwin.com/licensing.html"/>, which explains the licensing
 options.  Unless you purchase a special commercial license from Red
 Hat, then your Cygwin application must be Open Source.
 </para>
@@ -558,7 +558,7 @@ code links against the Cygwin dll (and if your program is calling
 functions from Cygwin, it must, as a matter of fact, be linked against
 it), you must apply the GPL to your source as well.  Of course, this
 only matters if you plan to distribute your program in binary form.  For
-more information, see <ulink url="http://gnu.org/licenses/gpl-faq.html">http://gnu.org/licenses/gpl-faq.html</ulink>.  If
+more information, see <ulink url="http://gnu.org/licenses/gpl-faq.html"/>.  If
 that is not a problem, read on.
 </para>
 <para>If you want to load the DLL dynamically, read
@@ -711,7 +711,7 @@ documentation, see the README included in the <literal>cygwin-doc</literal> pack
 </para>
 
 <para>Next, get the Cygwin source.  Ideally, you should check out
-what you need from CVS (<ulink url="http://cygwin.com/cvs.html" />).  This is the
+what you need from CVS (<ulink url="https://cygwin.com/cvs.html"/>).  This is the
 <emphasis>preferred method</emphasis> for acquiring the sources.  Otherwise, if
 you are trying to duplicate a cygwin release then you should 
 download the corresponding source package
@@ -751,10 +751,10 @@ same time. Remove all but one.
 symbols that you see in gdb are basically meaningless. It is also a good
 idea to use the latest code in case the bug has been fixed, so we
 recommend trying the latest snapshot from
-<ulink url="http://cygwin.com/snapshots/" /> or building the DLL from CVS.
+<ulink url="https://cygwin.com/snapshots/"/> or building the DLL from CVS.
 </para>
 <para>To build a debugging version of the Cygwin DLL, you will need to follow
-the instructions at <ulink url="http://cygwin.com/faq/faq.html#faq.programming.building-cygwin" />. 
+the instructions at <ulink url="https://cygwin.com/faq/faq.html#faq.programming.building-cygwin"/>. 
 You can also contact the mailing list for pointers (a simple test case that 
 demonstrates the bug is always welcome).  
 </para>
@@ -776,7 +776,7 @@ incompatibilities. Please send us patches if you do this work!
 <answer>
 
 <para>If you need to change the maximum amount of memory available to Cygwin, see
-<ulink url="http://cygwin.com/cygwin-ug-net/setup-maxmem.html">http://cygwin.com/cygwin-ug-net/setup-maxmem.html</ulink>. Otherwise,
+<ulink url="https://cygwin.com/cygwin-ug-net/setup-maxmem.html"/>. Otherwise,
 just pass heap/stack linker arguments to gcc.  To create foo.exe with
 a heap size of 200MB and a stack size of 8MB, you would invoke
 gcc as:
@@ -802,7 +802,7 @@ recursively, provided the command is in your path.
 <answer>
 
 <para>There's documentation that explains the process in the Cygwin User's
-Guide here: <ulink url="http://cygwin.com/cygwin-ug-net/dll.html">http://cygwin.com/cygwin-ug-net/dll.html</ulink>
+Guide here: <ulink url="https://cygwin.com/cygwin-ug-net/dll.html"/>.
 </para>
 </answer></qandaentry>
 
@@ -814,107 +814,6 @@ Guide here: <ulink url="http://cygwin.com/cygwin-ug-net/dll.html">http://cygwin.
 </para>
 <para>Set a breakpoint at *0x401000 in gdb and then run the program in
 question.
-</para>
-</answer></qandaentry>
-
-<qandaentry id="faq.programming.dll-relocatable">
-<question><para>How can I build a relocatable dll?</para></question>
-<answer>
-
-<para><emphasis role='bold'>(Please note: This section has not yet been updated for the latest net release.  However, there was a discussion on the cygwin mailing list once that addresses this issue.  Read <ulink url="http://cygwin.com/ml/cygwin/2000-06/msg00688.html">http://cygwin.com/ml/cygwin/2000-06/msg00688.html</ulink> and related messages.)</emphasis>
-</para>
-<para>You must execute the following sequence of five commands, in this
-order:
-</para>
-<screen>
-$(LD) -s --base-file BASEFILE --dll -o DLLNAME OBJS LIBS -e ENTRY
-
-$(DLLTOOL) --as=$(AS) --dllname DLLNAME --def DEFFILE \
-        --base-file BASEFILE --output-exp EXPFILE
-
-$(LD) -s --base-file BASEFILE EXPFILE -dll -o DLLNAME OBJS LIBS -e ENTRY
-
-$(DLLTOOL) --as=$(AS) --dllname DLLNAME --def DEFFILE \
-	--base-file BASEFILE --output-exp EXPFILE
-
-$(LD) EXPFILE --dll -o DLLNAME OBJS LIBS -e ENTRY
-</screen>
-
-<para>In this example, $(LD) is the linker, ld.
-</para>
-<para>$(DLLTOOL) is dlltool.
-</para>
-<para>$(AS) is the assembler, as.
-</para>
-<para>DLLNAME is the name of the DLL you want to create, e.g., tcl80.dll.
-</para>
-<para>OBJS is the list of object files you want to put into the DLL.
-</para>
-<para>LIBS is the list of libraries you want to link the DLL against.  For
-example, you may or may not want -lcygwin.  You may want -lkernel32.
-</para>
-<para>DEFFILE is the name of your definitions file.  A simple DEFFILE would
-consist of ``EXPORTS'' followed by a list of all symbols which should
-be exported from the DLL.  Each symbol should be on a line by itself.
-Other programs will only be able to access the listed symbols.
-</para>
-<para>BASEFILE is a temporary file that is used during this five stage
-process, e.g., tcl.base.
-</para>
-<para>EXPFILE is another temporary file, e.g., tcl.exp.
-</para>
-<para>ENTRY is the name of the function which you want to use as the entry
-point.  This function should be defined using the WINAPI attribute,
-and should take three arguments:
-        int WINAPI startup (HINSTANCE, DWORD, LPVOID)
-</para>
-<para>This means that the actual symbol name will have an appended @12, so if
-your entry point really is named <literal>startup</literal>, the string you should
-use for ENTRY in the above examples would be <literal>startup@12</literal>.
-</para>
-<para>If your DLL calls any Cygwin API functions, the entry function will need
-to initialize the Cygwin impure pointer.  You can do that by declaring
-a global variable <literal>_impure_ptr</literal>, and then initializing it in the
-entry function.  Be careful not to export the global variable
-<literal>_impure_ptr</literal> from your DLL; that is, do not put it in DEFFILE.
-</para>
-<screen>
-/* This is a global variable.  */
-struct _reent *_impure_ptr;
-extern struct _reent *__imp_reent_data;
-
-int entry (HINSTANT hinst, DWORD reason, LPVOID reserved)
-{
-  _impure_ptr = __imp_reent_data;
-  /* Whatever else you want to do.  */
-}
-</screen>
-
-<para>You may put an optional `--subsystem windows' on the $(LD) lines.
-Note that if you specify a --subsytem &lt;x&gt; flag to ld,
-the -e entry must come after the subsystem flag, since the subsystem flag
-sets a different default entry point.
-</para>
-<para>You may put an optional `--image-base BASEADDR' on the $(LD) lines.
-This will set the default image base.  Programs using this DLL will
-start up a bit faster if each DLL occupies a different portion of the
-address space.  Each DLL starts at the image base, and continues for
-whatever size it occupies.
-</para>
-<para>Now that you've built your DLL, you may want to build a library so
-that other programs can link against it.  This is not required: you
-could always use the DLL via LoadLibrary.  However, if you want to be
-able to link directly against the DLL, you need to create a library.
-Do that like this:
-</para>
-<para>$(DLLTOOL) --as=$(AS) --dllname DLLNAME --def DEFFILE --output-lib LIBFILE
-</para>
-<para>$(DLLTOOL), $(AS), DLLNAME, and DEFFILE are the same as above.  Make
-sure you use the same DLLNAME and DEFFILE, or things won't work right.
-</para>
-<para>LIBFILE is the name of the library you want to create, e.g.,
-libtcl80.a.  You can then link against that library using something
-like -ltcl80 in your linker command.
 </para>
 </answer></qandaentry>
 

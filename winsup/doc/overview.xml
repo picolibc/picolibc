@@ -51,7 +51,7 @@ information on how the GNU GPL may affect your use of these
 tools. If you intend to port a proprietary application using the Cygwin
 library, you may want the Cygwin proprietary-use license.
 For more information about the proprietary-use license, please go to
-<ulink url="http://www.redhat.com/services/custom/cygwin/">http://www.redhat.com/services/custom/cygwin/</ulink>. 
+<ulink url="http://www.redhat.com/services/custom/cygwin/"/>. 
 Customers of the native Win32 GNUPro should feel free to submit bug
 reports and ask questions through Red Hat channels.  All other
 questions should be sent to the project mailing list
@@ -105,7 +105,7 @@ the GNU configure mechanism. Self hosting was achieved as of the beta
 <para>
 The entire Cygwin toolset was available as a monolithic install. In
 April 2000, the project announced a
-<ulink url="http://www.cygwin.com/ml/cygwin/2000-04/msg00269.html">
+<ulink url="https://www.cygwin.com/ml/cygwin/2000-04/msg00269.html">
 New Cygwin Net Release</ulink> which provided the native non-Cygwin Win32 program
 <command>setup.exe</command> to install and upgrade each package
 separately. Since then, the Cygwin DLL and <command>setup.exe</command> 

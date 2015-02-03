@@ -25,7 +25,7 @@ installed.  Scroll down to locate the missing package, for instance
 </para>
 <para>For a detailed explanation of the general problem, and how to extend
 it to other missing DLLs and identify their containing packages, see
-<ulink url="http://cygwin.com/ml/cygwin/2002-01/msg01619.html">http://cygwin.com/ml/cygwin/2002-01/msg01619.html</ulink>.
+<ulink url="https://cygwin.com/ml/cygwin/2002-01/msg01619.html"/>.
 </para>
 </answer></qandaentry>
 
@@ -50,7 +50,7 @@ will slow things down tremendously if it does not exist.
 (sshd, inetd, etc), then it depends on the method used to switch to
 another user.  This problem as well as its solution is described in
 detail in the Cygwin User's Guide, see
-<ulink url="http://cygwin.com/cygwin-ug-net/ntsec.html" />.
+<ulink url="https://cygwin.com/cygwin-ug-net/ntsec.html"/>.
 </para>
 <para>Workarounds include using public network share that does not require
 authentication (for non-critical files), providing your password to a
@@ -238,8 +238,9 @@ currently installed as part of the sh-utils, but again, it does not work.
 <literal>ssh username@localhost</literal> as a <literal>su</literal>
 replacement.
 </para>
-<para>For some technical background into why <literal>su</literal> doesn't work, read
-<ulink url="http://www.cygwin.com/ml/cygwin/2003-06/msg00897.html">http://www.cygwin.com/ml/cygwin/2003-06/msg00897.html</ulink> and
+<para>For some technical background into why <literal>su</literal> doesn't
+work, read
+<ulink url="https://www.cygwin.com/ml/cygwin/2003-06/msg00897.html"/> and
 related messages.
 </para>
 </answer></qandaentry>
@@ -274,7 +275,7 @@ for memory cards or USB sticks to exchange pictures...
 <para>For other cases, understand that Cygwin attempts to show UNIX 
 permissions based on the security features of Windows, so the Windows 
 ACLs are likely the source of your problem.  See the Cygwin User's 
-Guide at <ulink url="http://cygwin.com/cygwin-ug-net/ntsec.html" />
+Guide at <ulink url="https://cygwin.com/cygwin-ug-net/ntsec.html"/>
 for more information on how Cygwin maps Windows permissions.
 </para>
 </answer></qandaentry>
@@ -326,25 +327,26 @@ to determine whether they are executable.
 <question><para>How do I print under Cygwin?</para></question>
 <answer>
 
-<para>lpr is available in the cygutils package.  Some <ulink url="http://cygwin.com/ml/cygwin/2008-05/msg00123.html">usage hints</ulink> are available courtesy of Rodrigo Medina.
+<para>lpr is available in the cygutils package.  Some <ulink url="https://cygwin.com/ml/cygwin/2008-05/msg00123.html">usage hints</ulink> are available courtesy of Rodrigo Medina.
 </para>
 <para>Jason Tishler has written a couple of messages that explain how to use
 a2ps (for nicely formatted text in PostScript) and ghostscript (to print
 PostScript files on non-PostScript Windows printers).  Start at
-<ulink url="http://cygwin.com/ml/cygwin/2001-04/msg00657.html">http://cygwin.com/ml/cygwin/2001-04/msg00657.html</ulink>.  Note that the
-<literal>file</literal> command is now available as part of Cygwin setup.
+<ulink url="https://cygwin.com/ml/cygwin/2001-04/msg00657.html"/>.  Note that
+these are old mails and <command>a2ps</command> as well as
+<command>file</command> are long available as part of the Cygwin distribution.
 </para>
-<para>Alternatively, you can use the Windows <literal>print</literal>
-command.  (It does not seem to be available on Win9x.)  Type
+<para>Alternatively, you can use the Windows <command>print</command>
+command.  Type
 </para>
 <screen>
 	bash$ print /\?
 </screen>
 
-<para>for usage instructions (note the <literal>?</literal> must be escaped from the
-shell).
+<para>for usage instructions (note the <literal>?</literal> must be escaped
+from the shell).
 </para>
-<para>Finally, you can simply <literal>cat</literal> the file to the printer's share name:
+<para>Finally, you can simply <command>cat</command> the file to the printer's share name:
 </para>
 <screen>
 	bash$ cat myfile &gt; //host/printer
@@ -362,7 +364,7 @@ formfeed character to your file.
 <para>Internationalization is a complex issue. The short answer is that
 Cygwin relies on the setting of the setting of LANG/LC_xxx environment
 variables. The long answer can be found in the User's Guide in the
-section <ulink url="http://cygwin.com/cygwin-ug-net/setup-locale.html">Internationalization</ulink>
+section <ulink url="https://cygwin.com/cygwin-ug-net/setup-locale.html">Internationalization</ulink>
 </para>
 
 <para> Cygwin uses UTF-8 by default.  To use a different character set, you
@@ -414,7 +416,7 @@ if you have one a single Cygwin installation, for example, if you update the
 Cygwin package without exiting <emphasis>all</emphasis> Cygwin apps (including
 services like sshd) beforehand.</para>
 <para>The only DLL that is sanctioned by the Cygwin project is the one that
-you get by running <ulink url="http://cygwin.com/install.html">setup.exe</ulink>,
+you get by running <ulink url="https://cygwin.com/install.html">setup-x86.exe or setup-x86_64.exe</ulink>,
 installed in a directory controlled by this program.  If you have other
 versions on your system and desire help from the cygwin project, you should
 delete or rename all DLLs that are not installed by
@@ -450,7 +452,7 @@ Can I bundle Cygwin with my product for free?
 </para></question>
 <answer><para>
 Only if you comply with Cygwin's <ulink
-url="http://cygwin.com/licensing.html">license</ulink> very carefully.  If you
+url="https://cygwin.com/licensing.html">license</ulink> very carefully.  If you
 choose to distribute cygwin1.dll, you must be willing to distribute the
 exact source code used to build that copy of cygwin1.dll as per the
 terms of the GPL.  If you ship applications that link with cygwin1.dll,
@@ -485,7 +487,7 @@ installed distribution.
 <para>Probably because there is nobody willing or able to maintain it.  It
 takes time, and the priority for the Cygwin Team is the Cygwin package.
 The rest is a volunteer effort.  Want to contribute?  See
-<ulink url="http://cygwin.com/setup.html">http://cygwin.com/setup.html</ulink>.
+<ulink url="https://cygwin.com/setup.html"/>.
 </para>
 </answer></qandaentry>
 
@@ -569,7 +571,7 @@ of your current Cygwin session.
 </para>
 <para>You can change the default <literal>cygdrive</literal> prefix and whether it is binmode or textmode using the <filename>/etc/fstab</filename> file
 as well.  See the Cygwin User's Guide at
-<ulink url="http://cygwin.com/cygwin-ug-net/using.html#mount-table">http://cygwin.com/cygwin-ug-net/using.html#mount-table</ulink>
+<ulink url="https://cygwin.com/cygwin-ug-net/using.html#mount-table"/>
 for more details.
 </para>
 </answer></qandaentry>
@@ -618,7 +620,7 @@ of poorly written firewall-type software that causes things to break.
 Note that with many of these products, simply disabling the firewall
 does not remove these changes; it must be completely uninstalled.
 </para>
-<para>See also <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda" />
+<para>See also <ulink url="https://cygwin.com/faq/faq.html#faq.using.bloda"/>
 for a list of applications that have been known, at one time or another, to 
 interfere with the normal functioning of Cygwin.
 </para>
@@ -652,7 +654,7 @@ configuration fails.
 <para>To help with this problem, Cygwin supports case sensitivity
 starting with Cygwin 1.7.0.  For a detailed description how to use that
 feature see the Cygwin User's Guilde at
-<ulink url="http://cygwin.com/cygwin-ug-net/using-specialnames.html">http://cygwin.com/cygwin-ug-net/using-specialnames.html</ulink>.
+<ulink url="https://cygwin.com/cygwin-ug-net/using-specialnames.html"/>.
 </para>
 
 </answer></qandaentry>
@@ -672,7 +674,7 @@ letters 'aux' in it will hang.
 <para>At least that's what happens when using native Windows tools.  Cygwin
 1.7.0 and later can deal with these filenames just fine.  Again, see the
 User's Guide at
-<ulink url="http://cygwin.com/cygwin-ug-net/using-specialnames.html">http://cygwin.com/cygwin-ug-net/using-specialnames.html</ulink>
+<ulink url="https://cygwin.com/cygwin-ug-net/using-specialnames.html"/>
 for a detailed description of what's possible with filenames and what is not.
 </para>
 </answer></qandaentry>
@@ -768,7 +770,7 @@ contents are exempt from scanning.  In a default installation, this
 would be <literal>C:\cygwin\bin</literal>.  Obviously, this could be
 exploited by a hostile non-Cygwin program, so do this at your own risk.
 </para>
-<para>See also <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda" />
+<para>See also <ulink url="https://cygwin.com/faq/faq.html#faq.using.bloda"/>
 for a list of applications that have been known, at one time or another, to
 interfere with the normal functioning of Cygwin.
 </para>
@@ -781,7 +783,7 @@ interfere with the normal functioning of Cygwin.
 <para>Yes.  Install the emacs package.  This provides everything you
 need in order to run GNU emacs in a terminal window.  If you also want
 to be able to use the X11
-(<ulink url="http://x.cygwin.com/">http://x.cygwin.com/</ulink>)
+(<ulink url="https://x.cygwin.com/"/>)
 GUI, install the emacs-X11 package.  In either case, you run emacs by
 typing 'emacs' or '/usr/bin/emacs'.
 </para>
@@ -793,7 +795,7 @@ typing 'emacs' or '/usr/bin/emacs'.
 
 <para>Yes.  It can be used in three different modes:</para>
 <para><itemizedlist>
-<listitem><para>X11 (<ulink url="http://x.cygwin.com/">http://x.cygwin.com/</ulink>) GUI</para></listitem>
+<listitem><para>X11 (<ulink url="https://x.cygwin.com/"/>) GUI</para></listitem>
 </itemizedlist></para>
 <para>You have to <emphasis>set</emphasis> the DISPLAY environment variable
 before starting xemacs.</para>
@@ -815,127 +817,12 @@ before starting xemacs.</para>
 <screen>
 	bash$ xemacs -nw
 </screen>
-<para>The current stable Cygwin version of XEmacs is 21.4.x. But there is also a
-Cygwin test release version (21.5.x) available for download via setup.exe.
-</para>
 <para>To use all the standard packages with XEmacs you should download the following
 two packages:</para>
 <para><itemizedlist>
 <listitem><para>xemacs-sumo - XEmacs standard packages</para></listitem>
 <listitem><para>xemacs-mule-sumo - XEmacs MULE (MUlti Lingual Emacs) packages</para></listitem>
 </itemizedlist></para>
-<para>An alternative <emphasis>native</emphasis> distribution of XEmacs for
-Windows based systems can be downloaded from
-<ulink url="http://xemacs.org/Download/win32/index.html">http://xemacs.org/Download/win32/index.html</ulink>.
-It uses an <emphasis>InnoSetup Kit</emphasis> based installer.</para>
-</answer></qandaentry>
-
-<qandaentry id="faq.using.ntemacs">
-<question><para>What about NT Emacs?</para></question>
-<answer>
-
-<para>If you want GNU Emacs with a native Microsoft GUI interface,
-then you can either use XEmacs (see above), or native
-NT Emacs: see section
-<ulink url="http://www.gnu.org/software/emacs/windows/Getting-Emacs.html#Getting-Emacs">Where can I get pre-compiled versions?</ulink> in NT Emacs FAQ.
-
-</para>
-<para>NT Emacs uses the Windows command shell by default.  Since it is not a
-Cygwin application, it has no knowledge of Cygwin mounts.  With those
-points in mind, you need to add the following code to your ~/.emacs
-(or ~/_emacs) file in order to use Cygwin bash.  This is particularly useful
-for the JDEE package (<ulink url="http://jdee.sunsite.dk/">http://jdee.sunsite.dk/</ulink>).  The following
-settings are for Emacs 21.1:
-</para>
-<screen>
-
-	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;; Initial setup
-	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-	;; This assumes that Cygwin is installed in C:\cygwin (the
-	;; default) and that C:\cygwin\bin is not already in your
-	;; Windows Path (it generally should not be).
-
-	(setq exec-path (cons "C:/cygwin/bin" exec-path))
-	(setenv "PATH" (concat "C:\\cygwin\\bin;" (getenv "PATH")))
-
-	;;   LOGNAME and USER are expected in many Emacs packages
-	;;   Check these environment variables.
-
-	(if (and (null (getenv "USER"))
-		 ;; Windows includes variable USERNAME, which is copied to
-		 ;; LOGNAME and USER respectively.
-		 (getenv "USERNAME"))
-	    (setenv "USER" (getenv "USERNAME")))
-
-	(if (and (getenv "LOGNAME")
-		 ;;  Bash shell defines only LOGNAME
-		 (null (getenv "USER")))
-	    (setenv "USER" (getenv "LOGNAME")))
-
-	(if (and (getenv "USER")
-		 (null (getenv "LOGNAME")))
-	    (setenv "LOGNAME" (getenv "USER")))
-
-	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;; (A) M-x shell: This change M-x shell permanently
-	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-	;; Would call Windows command interpreter. Change it.
-
-	(setq shell-file-name "bash")
-	(setenv "SHELL" shell-file-name)
-	(setq explicit-shell-file-name shell-file-name)
-
-	;; Remove C-m (^M) characters that appear in output
-
-	(add-hook 'comint-output-filter-functions
-	          'comint-strip-ctrl-m)
-
-	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	;; (B) *OR* call following function with M-x my-bash
-	;; The M-x shell would continue to run standard Windows shell
-	;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-	(defun my-bash (&amp;optional buffer)
-	  "Run Cygwin Bash shell in optional BUFFER; default *shell-bash*."
-	  (autoload 'comint-check-proc "comint")
-	  (interactive
-	   (let ((name "*shell-bash*"))
-	     (if current-prefix-arg
-		 (setq name (read-string
-			     (format "Cygwin shell buffer (default %s): " name)
-			     (not 'initial-input)
-			     (not 'history)
-			     name)))
-	     (list name)))
-	  (or buffer
-	      (setq buffer "*shell-bash*"))
-	  (if (comint-check-proc buffer)
-	      (pop-to-buffer buffer)
-	    (let* ((shell-file-name            "bash")
-		   (explicit-shell-file-name   shell-file-name)
-		   (explicit-sh-args           '("--login" "-i"))
-		   (explicit-bash-args         explicit-sh-args)
-		   (w32-quote-process-args     ?\"));; Use Cygwin quoting rules.
-	      (shell buffer)
-	      ;;  By default Emacs sends "\r\n", but bash wants plain "\n"
-	      (set-buffer-process-coding-system 'undecided-dos 'undecided-unix)
-	      ;; With TAB completion, add slash path separator, none to filenames
-	      (make-local-variable 'comint-completion-addsuffix)
-	      (setq comint-completion-addsuffix '("/" . ""))
-	      ;;  This variable is local to buffer
-	      (setq comint-prompt-regexp "^[ \n\t]*[$] ?"))))
-
-</screen>
-
-<para>If you want NT Emacs to understand Cygwin paths, get
-cygwin-mount.el from <ulink url="http://www.emacswiki.org/elisp/index.html">http://www.emacswiki.org/elisp/index.html</ulink>.
-</para>
-<para>Note that all of this ``just works'' if you use the Cygwin port of
-Emacs or XEmacs from Cygwin Setup.
-</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.symlinkstoppedworking">
@@ -974,7 +861,7 @@ file:
 </para>
 <para>Alternatively, use Windows shortcuts as symlinks.  See the CYGWIN
 environment variable option "winsymlinks" 
-<ulink url="http://cygwin.com/cygwin-ug-net/using-cygwinenv.html">http://cygwin.com/cygwin-ug-net/using-cygwinenv.html</ulink>
+<ulink url="https://cygwin.com/cygwin-ug-net/using-cygwinenv.html"/>
 </para>
 </answer></qandaentry>
 
@@ -1065,7 +952,7 @@ such as this when trying to start a Tk app:</para>
 
 <para>Then you need to start an X server, or if one is already running, set the
 <literal>DISPLAY</literal> variable to the proper value.  The Cygwin distribution
-includes an X server; please see the <ulink url="http://x.cygwin.com/docs/ug/cygwin-x-ug.html">Cygwin/X User Guide</ulink>
+includes an X server; please see the <ulink url="https://x.cygwin.com/docs/ug/cygwin-x-ug.html">Cygwin/X User Guide</ulink>
 for installation and startup instructions.
 </para></answer></qandaentry>
 
@@ -1223,7 +1110,7 @@ such as virtual memory paging and file caching.</para>
   ones undoes the effects of rebaseall and often causes fork() failures
   to reappear. If so, just run rebaseall again.
   </para>
-  <para>See the <ulink url="http://cygwin.com/cygwin-ug-net/highlights.html#ov-hi-process">
+  <para>See the <ulink url="https://cygwin.com/cygwin-ug-net/highlights.html#ov-hi-process">
   process creation</ulink> section of the User's Guide for the technical reasons it is so
   difficult to make <literal>fork()</literal> work reliably.</para>
 </answer>

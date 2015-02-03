@@ -15,16 +15,16 @@ installer <command>setup-*.exe</command>.  It is flexible and easy to use.
 You can pick and choose the packages you wish to install, and update
 them individually.  Full source code is available for all packages and
 tools.  More information on using Cygwin Setup may be found at
-<ulink url="http://cygwin.com/cygwin-ug-net/setup-net.html" />.
+<ulink url="https://cygwin.com/cygwin-ug-net/setup-net.html"/>.
 </para>
 <para>If you do it any other way, you're on your own!
 If something doesn't work right for you, and
 it's not covered here or in the latest development snapshot at
-<ulink url="http://cygwin.com/snapshots/">http://cygwin.com/snapshots/</ulink>, then by all means report it to the
+<ulink url="https://cygwin.com/snapshots/"/>, then by all means report it to the
 mailing list.
 </para>
 <para>For a searchable list of packages that can be installed with Cygwin,
-see <ulink url="http://cygwin.com/packages/">http://cygwin.com/packages/</ulink>.
+see <ulink url="https://cygwin.com/packages/"/>.
 </para>
 </answer></qandaentry>
 
@@ -143,10 +143,10 @@ now.)
 <para>Cygwin Setup can be used to install any packages that are on a
 Cygwin mirror, which usually includes one version previous to the
 current one. The complete list may be searched at 
-<ulink url="http://cygwin.com/packages/">http://cygwin.com/packages/</ulink>.  There is no complete archive of
+<ulink url="https://cygwin.com/packages/"/>.  There is no complete archive of
 older packages. If you have a problem with the current version of
 a Cygwin package, please report it to the mailing list using the 
-guidelines at <ulink url="http://cygwin.com/problems.html">http://cygwin.com/problems.html</ulink>.
+guidelines at <ulink url="https://cygwin.com/problems.html"/>.
 </para>
 <para>That said, if you really need an older package, you may be able to find
 an outdated or archival mirror by searching the web for an old package
@@ -199,7 +199,7 @@ disk if you are paranoid.
 <para>This should be safe, but only if Cygwin Setup is not substituted by
 something malicious, and no mirror has been compromised.
 </para>
-<para>See also <ulink url="http://cygwin.com/faq/faq.html#faq.using.bloda" />
+<para>See also <ulink url="https://cygwin.com/faq/faq.html#faq.using.bloda"/>
 for a list of applications that have been known, at one time or another, to
 interfere with the normal functioning of Cygwin.
 </para>
@@ -211,10 +211,10 @@ interfere with the normal functioning of Cygwin.
 <para>When using Cygwin Setup for the first time, the default is to install
 a minimal subset of all available packages.  If you want anything beyond that,
 you will have to select it explicitly.  See 
-<ulink url="http://cygwin.com/packages/" /> for a searchable list of available
+<ulink url="https://cygwin.com/packages/"/> for a searchable list of available
 packages, or use <literal>cygcheck -p </literal> as described in the Cygwin
 User's Guide at
-<ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html#cygcheck" />.
+<ulink url="https://cygwin.com/cygwin-ug-net/using-utils.html#cygcheck"/>.
 </para>
 <para>If you want to build programs, of course you'll need <literal>gcc</literal>,
 <literal>binutils</literal>, <literal>make</literal> and probably other packages from the
@@ -316,11 +316,11 @@ prior actions is in <literal>/var/log/setup.log</literal>.
 <answer>
 
 <para>First, make sure that you are using the latest version of Cygwin Setup.
-The latest version is always available from the Cygwin Home Page at <ulink
-url="http://cygwin.com/">http://cygwin.com/</ulink>.  </para>
+The latest version is always available from the Cygwin Home Page at
+<ulink url="https://cygwin.com/"/>.
+</para>
 <para>If you are downloading from the Internet, setup will fail if it cannot
-download the list of mirrors at <ulink
-url="http://cygwin.com/mirrors.html">http://cygwin.com/mirrors.html</ulink>.
+download the list of mirrors at <ulink url="https://cygwin.com/mirrors.html"/>.
 It could be that the network is too busy.  Something similar could be the
 cause of a download site not working.  Try another mirror, or try again
 later.
@@ -356,13 +356,13 @@ you are much better off if you can avoid the problem entirely.
 </para>
 <para>You have two choices:
 </para><orderedlist>
-<listitem><para>You can rename the user in the Windows User Manager GUI and then
-run mkpasswd.
+<listitem><para>You can rename the user in the Windows User Manager GUI.
 </para>
 </listitem>
-<listitem><para>If you already have an /etc/passwd file, you can simply edit
-your Cygwin user name (first field). It's also a good idea to avoid spaces in
-the home directory.
+<listitem><para>If that's not possible, you can create an /etc/passwd file
+using the <command>mkpasswd</command> command.  Then you can simply edit your
+Cygwin user name (first field). It's also a good idea to avoid spaces in the
+home directory.
 </para>
 </listitem>
 </orderedlist>
@@ -373,30 +373,33 @@ the home directory.
 <question><para>My <literal>HOME</literal> environment variable is not what I want.</para></question>
 <answer>
 
-<para>When starting Cygwin from Windows, <literal>HOME</literal> is determined as follows
-in order of decreasing priority:
+<para>When starting Cygwin from Windows, <literal>HOME</literal> is determined
+as follows:
 </para>
 <orderedlist>
-<listitem><para><literal>HOME</literal> from the Windows environment, translated to POSIX form.
+<listitem><para>If <literal>HOME</literal> is set in the Windows environment,
+translated to POSIX form.
 </para>
 </listitem>
-<listitem><para>The pw_home field from the passwd entry as returned by <command>getent passwd</command>.
-</para>
-</listitem>
-<listitem><para>/home/USERNAME
+<listitem><para>Otherwise, use the pw_home field from the passwd entry as
+returned by <command>getent passwd</command>.  If you want to learn how this
+field is set by Cygwin and how you can change it, this is explained in great
+detail in the Cygwin User's Guide at
+<ulink url="https://cygwin.com/cygwin-ug-net/ntsec.html"/>.
 </para>
 </listitem>
 </orderedlist>
 
-<para>When using Cygwin from the network (telnet, ssh,...), <literal>HOME</literal> is taken from the passwd entry.
+<para>When using Cygwin from a network login (via ssh for instance),
+<literal>HOME</literal> is always taken from the passwd entry.
 </para>
-<para>If your <literal>HOME</literal> is set to a value such as /cygdrive/c, it is likely 
-that it was set in Windows. Start a DOS Command Window and type 
+<para>If your <literal>HOME</literal> is set to a value such as /cygdrive/c,
+it is likely that it was set in Windows. Start a DOS Command Window and type 
 "set HOME" to verify if this is the case.
 </para>
-<para>Access to shared drives is often restricted when starting from the network,
-thus Domain users may wish to have a different <literal>HOME</literal> in the 
-Windows environment (on shared drive) than in Cygwin (on local drive).
+<para>Access to shared drives is often restricted when starting from the
+network, thus Domain users may wish to have a different <literal>HOME</literal>
+in the Windows environment (on shared drive) than in Cygwin (on local drive).
 Note that ssh only considers the account information as retrieved by
 getpwnam(3), disregarding <literal>HOME</literal>. 
 </para>
@@ -443,7 +446,7 @@ of Cygwin is as follows:
 <orderedlist>
 <listitem><para>If you have any Cygwin services running, remove by repeating 
 the instructions in <ulink
-url="http://cygwin.com/faq/faq.html#faq.setup.uninstall-service" /> for
+url="https://cygwin.com/faq/faq.html#faq.setup.uninstall-service"/> for
 all services that you installed.  Common services that might have been
 installed are <literal>sshd</literal>, <literal>cron</literal>, 
 <literal>cygserver</literal>, <literal>inetd</literal>, <literal>apache</literal>, 
@@ -454,12 +457,12 @@ installed are <literal>sshd</literal>, <literal>cron</literal>,
 that might be running in the background.  Exit the command prompt and ensure
 that no Cygwin processes remain.  Note: If you want to save your mount points for a later 
 reinstall, first save the output of <literal>mount -m</literal> as described at 
-<ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html#mount" />.
+<ulink url="https://cygwin.com/cygwin-ug-net/using-utils.html#mount"/>.
 </para>
 </listitem>
 <listitem><para>If you installed <literal>cyglsa.dll</literal> by running the
 shell script <literal>/usr/bin/cyglsa-config</literal> as described in
-<ulink url="http://cygwin.com/cygwin-ug-net/ntsec.html" />, then you need to
+<ulink url="https://cygwin.com/cygwin-ug-net/ntsec.html"/>, then you need to
 configure Windows to stop using the LSA authentication package.  You do so by
 editing the registry and restoring
 <literal>/HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Control/Lsa/Authentication Packages</literal>
@@ -522,7 +525,7 @@ problems, or at the request of a Cygwin developer.
 <para>You cannot use Cygwin Setup to install a snapshot.
 </para>
 <para>First, you will need to download the snapshot from the snapshots
-page at <ulink url="http://cygwin.com/snapshots/">http://cygwin.com/snapshots/</ulink>.  Note the directory where
+page at <ulink url="https://cygwin.com/snapshots/"/>.  Note the directory where
 you saved the snapshot tarball.
 </para>
 <para>Before installing a snapshot, you must first Close <emphasis role='bold'>all</emphasis> Cygwin
@@ -552,7 +555,7 @@ to <literal>C:\cygwin\bin\cygwin1.dll</literal> (assuming you installed Cygwin i
 <para>The operative word in trying the snapshots is "<emphasis>trying</emphasis>".  If you
 notice a problem with the snapshot that was not present in the release
 DLL (what we call a "regression"), please report it to the Cygwin
-mailing list (see <ulink url="http://cygwin.com/problems.html">http://cygwin.com/problems.html</ulink> for problem
+mailing list (see <ulink url="https://cygwin.com/problems.html"/> for problem
 reporting guidelines).  If you wish to go back to the older version of the
 DLL, again, close all Cygwin processes, delete
 <literal>C:\cygwin\bin\cygwin1.dll</literal>, and
@@ -569,11 +572,11 @@ files, reinstall the "<literal>cygwin</literal>" package using Setup.
 <answer>
 
 <para>NO.  Cygwin Setup cannot do this for you.  Use a tool designed for
-this purpose.  See <ulink url="http://rsync.samba.org/">http://rsync.samba.org/</ulink>,
-<ulink url="http://www.gnu.org/software/wget/">http://www.gnu.org/software/wget/</ulink> for utilities that can do this for you.
+this purpose.  See <ulink url="http://rsync.samba.org/"/>,
+<ulink url="http://www.gnu.org/software/wget/"/> for utilities that can do this for you.
 For more information on setting up a custom Cygwin package server, see
 the Cygwin Setup homepage at
-<ulink url="http://sourceware.org/cygwin-apps/setup.html">http://sourceware.org/cygwin-apps/setup.html</ulink>.
+<ulink url="https://sourceware.org/cygwin-apps/setup.html"/>.
 </para>
 </answer></qandaentry>
 
@@ -582,10 +585,10 @@ the Cygwin Setup homepage at
 <answer>
 
 <para>While some users have successfully done this, for example Indiana
-University's XLiveCD <ulink url="http://xlivecd.indiana.edu/">http://xlivecd.indiana.edu/</ulink>, there is no
+University's XLiveCD <ulink url="http://xlivecd.indiana.edu/"/>, there is no
 easy way to do it. Full instructions for constructing a portable Cygwin
 on CD by hand can be found on the mailing list at
-<ulink url="http://www.cygwin.com/ml/cygwin/2003-07/msg01117.html">http://www.cygwin.com/ml/cygwin/2003-07/msg01117.html</ulink>
+<ulink url="https://www.cygwin.com/ml/cygwin/2003-07/msg01117.html"/>
 (Thanks to fergus at bonhard dot uklinux dot net for these instructions.)
 Please note that these instructions are rather old and are referring to the
 somewhat different setup of a Cygwin 1.5.x release.  As soon as somebody set
