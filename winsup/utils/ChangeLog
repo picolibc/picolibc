@@ -1,3 +1,15 @@
+2015-02-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc (longopts): Add --force option.
+	(opts): Add -f option.
+	(restore_flags): New variable.
+	(usage): Clarify working of save action.  Add restore action.  Add
+	description for -f/--force option.
+	(set_privilege): Drop function.  The Cygwin DLL is doing that anyway.
+	(cmd_save): Drop call to set_privilege.
+	(cmd_restore): New function.
+	(main): Handle -f/--force option.
+
 2014-12-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (action_t): Add DeleteDef value.
