@@ -1,5 +1,11 @@
 2015-02-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* utils.xml (regtool): Clarify save action.  Add description for
+	restore action.
+	* new-features.xml (ov-new1.7.34): Add regtool restore.
+
+2015-02-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Throughout, replace http with https as far as cygwin.com and
 	sourceware.org URLs are concerned.
 	* Throughout, simplify ulink expressions if the visible text is the

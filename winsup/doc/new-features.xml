@@ -36,6 +36,10 @@ from an ACL.
 </para></listitem>
 
 <listitem><para>
+Add restore action to regtool.
+</para></listitem>
+
+<listitem><para>
 Make gethostbyname2 handle numeric host addresses as well as the
 reserved domain names "localhost" and "invalid" per RFC 6761.
 </para></listitem>

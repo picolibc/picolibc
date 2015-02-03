@@ -1538,7 +1538,8 @@ Actions:
  unset KEY\VALUE            removes VALUE from KEY
  load KEY\SUBKEY PATH       load hive from PATH into new SUBKEY
  unload KEY\SUBKEY          unload hive and remove SUBKEY
- save KEY\SUBKEY PATH       save SUBKEY into new hive PATH
+ save KEY\SUBKEY PATH       save SUBKEY into new file PATH
+ restore KEY\SUBKEY PATH    restore SUBKEY from file PATH
 
 Options for 'list' Action:
 
@@ -1566,6 +1567,11 @@ Options for 'set' Action:
 Options for 'set' and 'unset' Actions:
 
  -K&lt;c&gt;, --key-separator[=]&lt;c&gt;  set key separator to &lt;c&gt; instead of '\'
+
+Options for 'restore' action:
+
+ -f, --force    restore even if open handles exist at or beneath the location
+                in the registry hierarchy to which KEY\SUBKEY points
 
 Other Options:
 
@@ -1673,7 +1679,13 @@ Example: regtool.exe get '\user\software\Microsoft\Clock\iFormat'
       unloads the file and removes the subkey. </para>
 
     <para>The <literal>save</literal> action saves a subkey into a registry
-      hive. </para>
+      file.  Ideally you append the suffix <filename>.reg</filename> to the file
+      so it gets automatically recognized as registry file by
+      <command>Windows Explorer</command>.</para>
+
+    <para>The <literal>restore</literal> action restores a registry subkey
+      from a file saved via the aforementioned <literal>save</literal> action.
+      </para>
 
     <para> By default, the last "\" or "/" is assumed to be the separator
       between the key and the value. You can use the <literal>-K</literal>
