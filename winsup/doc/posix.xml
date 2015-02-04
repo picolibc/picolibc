@@ -950,6 +950,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcstoimax
     wcstok
     wcstol
+    wcstold
     wcstoll
     wcstombs
     wcstoul
@@ -1508,7 +1509,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     waitid
     wcscasecmp_l
     wcsncasecmp_l
-    wcstold
     wcsxfrm_l
     wctrans_l
     wctype_l
