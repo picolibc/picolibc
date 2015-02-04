@@ -1,3 +1,8 @@
+2015-02-04  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/wchar.h (wcstold): Drop _LDBL_EQ_DBL requirement for
+	declaration.
+
 2015-01-29  Nick Clifton  <nickc@redhat.com>
 
 	* libc/stdlib/wcstold.c (wcstold): Add implementation for when

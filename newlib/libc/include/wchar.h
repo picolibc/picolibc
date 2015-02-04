@@ -143,10 +143,7 @@ long    _EXFUN(_wcstol_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 long long _EXFUN(_wcstoll_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 unsigned long _EXFUN(_wcstoul_r, (struct _reent *, const wchar_t *, wchar_t **, int));
 unsigned long long _EXFUN(_wcstoull_r, (struct _reent *, const wchar_t *, wchar_t **, int));
-/* On platforms where long double equals double.  */
-#ifdef _LDBL_EQ_DBL
 long double _EXFUN(wcstold, (const wchar_t *, wchar_t **));
-#endif /* _LDBL_EQ_DBL */
 
 wint_t _EXFUN(fgetwc, (__FILE *));
 wchar_t *_EXFUN(fgetws, (wchar_t *__restrict, int, __FILE *__restrict));
