@@ -208,9 +208,7 @@ long long _wcstoll_r (struct _reent *, const wchar_t *, wchar_t **, int);
 unsigned long _wcstoul_r (struct _reent *, const wchar_t *, wchar_t **, int);
 unsigned long long _wcstoull_r (struct _reent *, const wchar_t *, wchar_t **, int);
 #if __ISO_C_VISIBLE >= 1999
-#ifdef _LDBL_EQ_DBL
 long double wcstold (const wchar_t *, wchar_t **);
-#endif /* _LDBL_EQ_DBL */
 #endif
 
 #if __GNU_VISIBLE
@@ -223,9 +221,7 @@ unsigned long long wcstoull_l (const wchar_t *__restrict, wchar_t **__restrict,
 			       int, locale_t);
 double wcstod_l (const wchar_t *, wchar_t **, locale_t);
 float wcstof_l (const wchar_t *, wchar_t **, locale_t);
-#ifdef _LDBL_EQ_DBL
 long double wcstold_l (const wchar_t *, wchar_t **, locale_t);
-#endif /* _LDBL_EQ_DBL */
 #endif
 
 wint_t fgetwc (__FILE *);
