@@ -1,3 +1,8 @@
+2015-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-using.xml (faq.using.ssh-pubkey-stops-working): New entry.
+	(faq.using.same-with-rhosts): Ditto.
+
 2015-02-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* utils.xml (regtool): Clarify save action.  Add description for

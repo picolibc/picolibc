@@ -932,6 +932,101 @@ usually all set and you can start the sshd service via
 
 </answer></qandaentry>
 
+<qandaentry id="faq.using.ssh-pubkey-stops-working">
+<question><para>Why does public key authentication with ssh fail after updating to Cygwin 1.7.34?</para></question>
+<answer>
+
+<para>
+This is the result of fixing a long-standing security problem in Cygwin's
+POSIX ACL handling.  IEEE 1003.1e draft 17 defines that the permissions
+of secondary user and group entries in an ACL are reflected in the group
+permission mask by or'ing the permissions of the file's primary group with
+all permissions of secondary users and groups in the ACL.  The background
+is that this way the standard POSIX permission bits reflect the fact that
+<emphasis role='bold'>somebody else</emphasis> has additional, otherwise
+potentially invisible permissions on the file.  This relatively complex
+interface has been defined in order to ensure that applications that are
+compliant with IEEE 1003.1 (“POSIX.1”) will still function as expected on
+systems with ACLs.</para>
+
+<para>So, what does that mean for your situation?  Typically this means the
+private key file, for instance <filename>~/.ssh/id_rsa</filename>, has too
+open permissions.  OpenSSH expects the permissions of the private key file
+to be 0600.  Let's use the default SSH2 RSA keyfile as example:</para>
+
+<screen>
+  $ ls -l .ssh/id_rsa
+  -rw-------  1 user group 1766 Aug 26  2013 .ssh/id_rsa
+</screen>
+
+<para>However, if other accounts can read the file, the key is potentially
+compromised.  Consider the file has additional rw- permissions for a group
+<literal>bad_guys</literal>.  Up to Cygwin 1.7.33 that would have looked
+like this:</para>
+
+<screen>
+  $ ls -l .ssh/id_rsa
+  -rw-------+ 1 user group 1766 Aug 26  2013 .ssh/id_rsa
+</screen>
+
+<para>Notice the extra <emphasis role='bold'>+</emphasis> character following
+the permission string.  This shows that additional ACL entries are in the ACL.
+But an application only checking the POSIX permission bits (and ssh is one of
+them!), will not notice the fact, because it gets the permissions 0600 for the
+file.</para>
+
+<para>Starting with Cygwin 1.7.34, the extra permissions are reflected in
+the group permission bits per IEEE 1003.1e draft 17:</para>
+
+<screen>
+  $ ls -l .ssh/id_rsa
+  -rw-rw----+ 1 user group 1766 Aug 26  2013 .ssh/id_rsa
+</screen>
+
+<para>So now ssh will notice that the file has extra permissions and it will
+complain.  The same problem occurs if the file
+<filename>~/.ssh/authorized_keys</filename> has too open permissions.  On
+the client side you won't get any helping text, though, other than that you're
+suddenly asked for a password.  That's a rather good hint to have a closer
+look at the server's <filename>~/.ssh/authorized_keys</filename> file.</para>
+
+<para>To fix the permissions of your private key file or your
+<filename>~/.ssh/authorized_keys</filename> file, simply use the
+<command>setfacl</command> command with the <literal>-b</literal> option. 
+This removes all additional ACL entries and thus fixes the permissions to
+be not too open:</para>
+
+<screen>
+  $ ls -l .ssh/id_rsa
+  -rw-rw----+ 1 user group 1766 Aug 26  2013 .ssh/id_rsa
+  $ setfacl -b .ssh/id_rsa
+  $ ls -l .ssh/id_rsa
+  -rw-------  1 user group 1766 Aug 26  2013 .ssh/id_rsa
+</screen>
+
+<para>For more information on <command>setfacl</command>, see
+<ulink url="https://cygwin.com/cygwin-ug-net/using-utils.html#setfacl"/></para>
+</answer></qandaentry>
+
+<qandaentry id="faq.using.same-with-rhosts">
+<question><para>Why is my .rhosts file not recognized by rlogin anymore after updating to Cygwin 1.7.34?</para></question>
+<answer>
+
+<para>The problem is exactly the same as with the key files of SSH.  See
+<xref linkend="faq.using.ssh-pubkey-stops-working"/>.</para>
+
+<para>The solution is the same:</para>
+
+<screen>
+  $ ls -l .rhosts
+  -rw-rw----+ 1 user group 42 Nov 12  2010 .rhosts
+  $ setfacl -b .rhosts
+  $ ls -l .rhosts
+  -rw-------  1 user group 42 Nov 12  2010 .rhosts
+</screen>
+
+</answer></qandaentry>
+
 <qandaentry id="faq.using.tcl-tk">
 <question><para>Why do my Tk programs not work anymore?</para></question>
 <answer>
