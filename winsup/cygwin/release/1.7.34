@@ -26,6 +26,8 @@ What's new:
 
 - New APIs: qsort_r, __bsd_qsort_r.
 
+- New API: wcstold.
+
 - New APIs: __fbufsize, __flbf, __fpending, __freadable, __freading,
   __fsetlocking, __fwritable, __fwriting.
 

@@ -1323,6 +1323,7 @@ wcstof NOSIGFE
 wcstoimax = wcstoll NOSIGFE
 wcstok NOSIGFE
 wcstol NOSIGFE
+wcstold NOSIGFE
 wcstoll NOSIGFE
 wcstombs NOSIGFE
 wcstoul NOSIGFE
