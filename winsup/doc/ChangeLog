@@ -1,3 +1,8 @@
+2015-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix.xml (std-susv4): Move cabsl, cimagl, creall, hypotl, sqrtl here
+	from std-notimpl.  Add finitel.
+
 2015-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.xml (std-susv4): Move wcstold here from std-notimpl.
