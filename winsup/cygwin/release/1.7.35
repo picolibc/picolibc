@@ -1,0 +1,15 @@
+What's new:
+-----------
+
+- New APIs: cabsl, cimagl, creall, finitel, hypotl, sqrtl.
+
+
+What changed:
+-------------
+
+
+Bug Fixes
+---------
+
+- Fix /proc/cpuinfo multicore info on Intel CPUs.
+  Addresses: https://cygwin.com/ml/cygwin-apps/2015-02/msg00077.html
