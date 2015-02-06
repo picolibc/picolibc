@@ -1,7 +1,7 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
    Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
-   2013, 2014 Red Hat, Inc.
+   2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -793,7 +793,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 					   cache_size);
 
 	      /* Recognize multi-core CPUs. */
-	      if (is_amd && maxe >= 0x80000008)
+	      if (maxe >= 0x80000008)
 		{
 		  uint32_t core_info;
 		  cpuid (&unused, &unused, &core_info, &unused, 0x80000008);
