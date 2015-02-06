@@ -177,6 +177,7 @@ btowc NOSIGFE
 bzero NOSIGFE
 cabs NOSIGFE
 cabsf NOSIGFE
+cabsl NOSIGFE
 cacos NOSIGFE
 cacosf NOSIGFE
 cacosh NOSIGFE
@@ -215,6 +216,7 @@ chown SIGFE
 chroot SIGFE
 cimag NOSIGFE
 cimagf NOSIGFE
+cimagl NOSIGFE
 cleanup_glue NOSIGFE
 clearerr SIGFE
 clearerr_unlocked SIGFE
@@ -246,6 +248,7 @@ cproj NOSIGFE
 cprojf NOSIGFE
 creal NOSIGFE
 crealf NOSIGFE
+creall NOSIGFE
 creat SIGFE
 csin NOSIGFE
 csinf NOSIGFE
@@ -403,6 +406,7 @@ fileno SIGFE
 fileno_unlocked SIGFE
 finite NOSIGFE
 finitef NOSIGFE
+finitel NOSIGFE
 fiprintf SIGFE
 flistxattr SIGFE
 flock SIGFE
@@ -592,6 +596,7 @@ htonl NOSIGFE
 htons NOSIGFE
 hypot NOSIGFE
 hypotf NOSIGFE
+hypotl NOSIGFE
 if_freenameindex SIGFE
 if_indextoname SIGFE
 if_nameindex SIGFE
@@ -1132,6 +1137,7 @@ spawnvpe SIGFE
 sprintf SIGFE
 sqrt NOSIGFE
 sqrtf NOSIGFE
+sqrtl NOSIGFE
 srand NOSIGFE
 srand48 NOSIGFE
 srandom NOSIGFE

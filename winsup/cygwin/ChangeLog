@@ -1,5 +1,10 @@
 2015-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* common.din: Export cabsl, cimagl, creall, finitel, hypotl, sqrtl.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
+2015-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 35.
 
 2015-02-06  Corinna Vinschen  <corinna@vinschen.de>
