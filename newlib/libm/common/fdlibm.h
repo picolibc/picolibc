@@ -146,6 +146,8 @@ extern double scalb __P((double, double));
 #endif
 extern double significand __P((double));
 
+extern long double __ieee754_hypotl __P((long double, long double));
+
 /* ieee style elementary functions */
 extern double __ieee754_sqrt __P((double));			
 extern double __ieee754_acos __P((double));			

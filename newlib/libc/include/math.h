@@ -254,6 +254,10 @@ extern int __signbitd (double x);
           (__extension__ ({__typeof__(a) __a = (a); __typeof__(b) __b = (b); \
                            fpclassify(__a) == FP_NAN || fpclassify(__b) == FP_NAN;}))
 
+/* Non ANSI long double precision functions.  */
+
+extern int finitel _PARAMS((long double));
+
 /* Non ANSI double precision functions.  */
 
 extern double infinity _PARAMS((void));
@@ -454,6 +458,8 @@ extern long double erfl _PARAMS((long double));
 extern long double erfcl _PARAMS((long double));
 #endif /* ! defined (_REENT_ONLY) */
 #else /* !_LDBL_EQ_DBL */
+extern long double hypotl _PARAMS((long double, long double));
+extern long double sqrtl _PARAMS((long double));
 #ifdef __i386__
 /* Other long double precision functions.  */
 extern _LONG_DOUBLE rintl _PARAMS((_LONG_DOUBLE));

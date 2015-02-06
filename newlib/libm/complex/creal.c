@@ -10,33 +10,39 @@
 
 /*
 FUNCTION
-        <<creal>>, <<crealf>>---real part
+        <<creal>>, <<crealf>>, <<creall>>---real part
 
 INDEX
         creal
 INDEX
         crealf
+INDEX
+        creall
 
 ANSI_SYNOPSIS
        #include <complex.h>
        double creal(double complex <[z]>);
        float crealf(float complex <[z]>);
+       double long creall(long double complex <[z]>);
 
-
+       
 DESCRIPTION
         These functions compute the real part of <[z]>.
 
         <<crealf>> is identical to <<creal>>, except that it performs
-        its calculations on <<floats complex>>.
+        its calculations on <<float complex>>.
+
+        <<creall>> is identical to <<creal>>, except that it performs
+        its calculations on <<long double complex>>.
 
 RETURNS
-        The creal functions return the real part value.
+        The creal* functions return the real part value.
 
 PORTABILITY
-        <<creal>> and <<crealf>> are ISO C99
+        <<creal>>, <<crealf>> and <<creall>> are ISO C99
 
 QUICKREF
-        <<creal>> and <<crealf>> are ISO C99
+        <<creal>>, <<crealf>> and <<creall>> are ISO C99
 
 */
 

@@ -9,7 +9,8 @@ src = cabs.c cacos.c cacosh.c carg.c casin.c casinh.c \
       cexp.c cimag.c  clog.c conj.c  \
       cpow.c cproj.c  creal.c  \
       csin.c csinh.c csqrt.c ctan.c ctanh.c
-	
+
+lsrc = cabsl.c creall.c cimagl.c
 
 fsrc =	cabsf.c casinf.c ccosf.c cimagf.c cprojf.c  \
         csqrtf.c cacosf.c casinhf.c ccoshf.c clogf.c \
@@ -21,11 +22,11 @@ libcomplex_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libcomplex.la
-libcomplex_la_SOURCES = $(src) $(fsrc)
+libcomplex_la_SOURCES = $(src) $(fsrc) $(lsrc)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(src) $(fsrc)
+lib_a_SOURCES = $(src) $(fsrc) $(lsrc)
 lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 endif # USE_LIBTOOL

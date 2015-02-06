@@ -50,15 +50,17 @@ fsrc =	kf_rem_pio2.c \
 	sf_tan.c sf_tanh.c \
 	wf_exp2.c wf_tgamma.c
 
+lsrc = el_hypot.c
+
 libmath_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libmath.la
-libmath_la_SOURCES = $(src) $(fsrc)
+libmath_la_SOURCES = $(src) $(fsrc) $(lsrc)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = $(src) $(fsrc)
+lib_a_SOURCES = $(src) $(fsrc) $(lsrc)
 lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 endif # USE_LIBTOOL

@@ -138,8 +138,10 @@ am__objects_2 = lib_a-kf_rem_pio2.$(OBJEXT) lib_a-kf_cos.$(OBJEXT) \
 	lib_a-sf_signif.$(OBJEXT) lib_a-sf_sin.$(OBJEXT) \
 	lib_a-sf_tan.$(OBJEXT) lib_a-sf_tanh.$(OBJEXT) \
 	lib_a-wf_exp2.$(OBJEXT) lib_a-wf_tgamma.$(OBJEXT)
+am__objects_5 = lib_a-el_hypot.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2)
+@USE_LIBTOOL_FALSE@	$(am__objects_2) \
+@USE_LIBTOOL_FALSE@	$(am__objects_5)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmath_la_LIBADD =
@@ -169,8 +171,10 @@ am__objects_4 = kf_rem_pio2.lo kf_cos.lo kf_sin.lo kf_tan.lo \
 	sf_cos.lo sf_erf.lo sf_fabs.lo sf_floor.lo sf_frexp.lo \
 	sf_ldexp.lo sf_signif.lo sf_sin.lo sf_tan.lo sf_tanh.lo \
 	wf_exp2.lo wf_tgamma.lo
+am__objects_6 = el_hypot.lo 
 @USE_LIBTOOL_TRUE@am_libmath_la_OBJECTS = $(am__objects_3) \
-@USE_LIBTOOL_TRUE@	$(am__objects_4)
+@USE_LIBTOOL_TRUE@	$(am__objects_4) \
+@USE_LIBTOOL_TRUE@	$(am__objects_6)
 libmath_la_OBJECTS = $(am_libmath_la_OBJECTS)
 libmath_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -372,13 +376,15 @@ fsrc = kf_rem_pio2.c \
 	sf_tan.c sf_tanh.c \
 	wf_exp2.c wf_tgamma.c
 
+lsrc = el_hypot.c
+
 libmath_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libmath.la
-@USE_LIBTOOL_TRUE@libmath_la_SOURCES = $(src) $(fsrc)
+@USE_LIBTOOL_TRUE@libmath_la_SOURCES = $(src) $(fsrc) $(lsrc)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc) $(lsrc)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 chobj = w_acos.def w_acosh.def w_asin.def s_asinh.def \
 	s_atan.def w_atan2.def w_atanh.def w_j0.def \
@@ -1259,6 +1265,12 @@ lib_a-wf_tgamma.o: wf_tgamma.c
 
 lib_a-wf_tgamma.obj: wf_tgamma.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_tgamma.obj `if test -f 'wf_tgamma.c'; then $(CYGPATH_W) 'wf_tgamma.c'; else $(CYGPATH_W) '$(srcdir)/wf_tgamma.c'; fi`
+
+lib_a-el_hypot.o: el_hypot.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-el_hypot.o `test -f 'el_hypot.c' || echo '$(srcdir)/'`el_hypot.c
+
+lib_a-el_hypot.obj: el_hypot.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-el_hypot.obj `if test -f 'el_hypot.c'; then $(CYGPATH_W) 'el_hypot.c'; else $(CYGPATH_W) '$(srcdir)/el_hypot.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

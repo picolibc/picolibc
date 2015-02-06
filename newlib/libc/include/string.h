@@ -104,7 +104,10 @@ char	*_EXFUN(strerror_r,(int, char *, size_t));
 #else
 # ifdef __GNUC__
 int	_EXFUN(strerror_r,(int, char *, size_t))
-             __asm__ (__ASMNAME ("__xpg_strerror_r"));
+#ifdef __ASMNAME
+             __asm__ (__ASMNAME ("__xpg_strerror_r"))
+#endif
+  ;
 # else
 int	_EXFUN(__xpg_strerror_r,(int, char *, size_t));
 #  define strerror_r __xpg_strerror_r

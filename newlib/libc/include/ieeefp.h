@@ -4,11 +4,12 @@
 #include "_ansi.h"
 
 #include <machine/ieeefp.h>
+#include <float.h>
 
 _BEGIN_STD_C
 
 /* FIXME FIXME FIXME:
-   Neither of __ieee_{float,double}_shape_tape seem to be used anywhere
+   Neither of __ieee_{float,double}_shape_type seem to be used anywhere
    except in libm/test.  If that is the case, please delete these from here.
    If that is not the case, please insert documentation here describing why
    they're needed.  */
@@ -46,9 +47,7 @@ typedef union
     long aslong[2];
 } __ieee_double_shape_type;
 
-#endif
-
-#ifdef __IEEE_LITTLE_ENDIAN
+#elif defined __IEEE_LITTLE_ENDIAN
 
 typedef union 
 {
@@ -92,7 +91,7 @@ typedef union
 
 } __ieee_double_shape_type;
 
-#endif
+#endif /* __IEEE_LITTLE_ENDIAN */
 
 #ifdef __IEEE_BIG_ENDIAN
 
@@ -118,9 +117,7 @@ typedef union
   
 } __ieee_float_shape_type;
 
-#endif
-
-#ifdef __IEEE_LITTLE_ENDIAN
+#elif defined __IEEE_LITTLE_ENDIAN
 
 typedef union
 {
@@ -144,10 +141,70 @@ typedef union
   
 } __ieee_float_shape_type;
 
+#endif /* __IEEE_LITTLE_ENDIAN */
+
+#ifndef _LDBL_EQ_DBL
+
+#ifndef LDBL_MANT_DIG
+#error "LDBL_MANT_DIG not defined - should be found in float.h"
+
+#elif LDBL_MANT_DIG == DBL_MANT_DIG
+#error "double and long double are the same size but LDBL_EQ_DBL is not defined"
+
+#elif LDBL_MANT_DIG == 53
+/* This happens when doubles are 32-bits and long doubles are 64-bits.  */
+#define	EXT_EXPBITS	11
+#define EXT_FRACHBITS	20
+#define	EXT_FRACLBITS	32
+#define __ieee_ext_field_type unsigned long
+
+#elif LDBL_MANT_DIG == 64
+#define	EXT_EXPBITS	15
+#define EXT_FRACHBITS	32
+#define	EXT_FRACLBITS	32
+#define __ieee_ext_field_type unsigned int
+
+#elif LDBL_MANT_DIG == 65
+#define	EXT_EXPBITS	15
+#define EXT_FRACHBITS	32
+#define	EXT_FRACLBITS	32
+#define __ieee_ext_field_type unsigned int
+
+#elif LDBL_MANT_DIG == 112
+#define	EXT_EXPBITS	15
+#define EXT_FRACHBITS	48
+#define	EXT_FRACLBITS	64
+#define __ieee_ext_field_type unsigned long long
+
+#elif LDBL_MANT_DIG == 113
+#define	EXT_EXPBITS	15
+#define EXT_FRACHBITS	48
+#define	EXT_FRACLBITS	64
+#define __ieee_ext_field_type unsigned long long
+
+#else
+#error Unsupported value for LDBL_MANT_DIG
 #endif
 
+#define	EXT_EXP_INFNAN	   ((1 << EXT_EXPBITS) - 1) /* 32767 */
+#define	EXT_EXP_BIAS	   ((1 << (EXT_EXPBITS - 1)) - 1) /* 16383 */
+#define	EXT_FRACBITS	   (EXT_FRACLBITS + EXT_FRACHBITS)
 
+typedef struct ieee_ext
+{
+  __ieee_ext_field_type	 ext_fracl : EXT_FRACLBITS;
+  __ieee_ext_field_type	 ext_frach : EXT_FRACHBITS;
+  __ieee_ext_field_type	 ext_exp   : EXT_EXPBITS;
+  __ieee_ext_field_type	 ext_sign  : 1;
+} ieee_ext;
 
+typedef union ieee_ext_u
+{
+  long double		extu_ld;
+  struct ieee_ext	extu_ext;
+} ieee_ext_u;
+
+#endif /* ! _LDBL_EQ_DBL */
 
 
 /* FLOATING ROUNDING */

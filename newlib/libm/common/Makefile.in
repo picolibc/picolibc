@@ -139,7 +139,7 @@ am__objects_3 = lib_a-atanl.$(OBJEXT) lib_a-cosl.$(OBJEXT) \
 	lib_a-erfl.$(OBJEXT) lib_a-erfcl.$(OBJEXT) \
 	lib_a-logbl.$(OBJEXT) lib_a-nexttowardf.$(OBJEXT) \
 	lib_a-nexttoward.$(OBJEXT) lib_a-nexttowardl.$(OBJEXT) \
-	lib_a-log2l.$(OBJEXT)
+	lib_a-log2l.$(OBJEXT) lib_a-sl_finite.$(OBJEXT)
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_FALSE@am__objects_4 =  \
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_FALSE@	$(am__objects_3)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
@@ -173,7 +173,7 @@ am__objects_7 = atanl.lo cosl.lo sinl.lo tanl.lo tanhl.lo frexpl.lo \
 	lroundl.lo llroundl.lo truncl.lo remquol.lo fdiml.lo fmaxl.lo \
 	fminl.lo fmal.lo acoshl.lo atanhl.lo remainderl.lo lgammal.lo \
 	erfl.lo erfcl.lo logbl.lo nexttowardf.lo nexttoward.lo \
-	nexttowardl.lo log2l.lo
+	nexttowardl.lo log2l.lo sl_finite.lo
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_TRUE@am__objects_8 =  \
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_TRUE@	$(am__objects_7)
 @USE_LIBTOOL_TRUE@am_libcommon_la_OBJECTS = $(am__objects_5) \
@@ -360,7 +360,8 @@ lsrc = atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	scalbnl.c exp2l.c scalblnl.c tgammal.c nearbyintl.c lrintl.c llrintl.c \
 	roundl.c lroundl.c llroundl.c truncl.c remquol.c fdiml.c fmaxl.c fminl.c \
 	fmal.c acoshl.c atanhl.c remainderl.c lgammal.c erfl.c erfcl.c \
-	logbl.c nexttowardf.c nexttoward.c nexttowardl.c log2l.c
+	logbl.c nexttowardf.c nexttoward.c nexttowardl.c log2l.c \
+	sl_finite.c
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libcommon.la
@@ -1237,6 +1238,12 @@ lib_a-log2l.o: log2l.c
 
 lib_a-log2l.obj: log2l.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-log2l.obj `if test -f 'log2l.c'; then $(CYGPATH_W) 'log2l.c'; else $(CYGPATH_W) '$(srcdir)/log2l.c'; fi`
+
+lib_a-sl_finite.o: sl_finite.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sl_finite.o `test -f 'sl_finite.c' || echo '$(srcdir)/'`sl_finite.c
+
+lib_a-sl_finite.obj: sl_finite.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sl_finite.obj `if test -f 'sl_finite.c'; then $(CYGPATH_W) 'sl_finite.c'; else $(CYGPATH_W) '$(srcdir)/sl_finite.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

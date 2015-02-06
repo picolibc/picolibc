@@ -60,6 +60,7 @@ setjmp:
 	clr   	r12
 	ret
 #endif	
+	.size setjmp , . - setjmp
 
 	
 	.global	longjmp
@@ -102,4 +103,5 @@ longjmp:
 	add.w    #2, r1
 	mov.w	r14, r0
 #endif
+	.size longjmp , . - longjmp
 

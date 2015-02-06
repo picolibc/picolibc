@@ -1,3 +1,44 @@
+2015-02-06  Nick Clifton  <nickc@redhat.com>
+
+	* libc/include/complex.h (cabsl): Add prototype.
+	(cimagl): Add prototype.
+	(creall): Add prototype.
+	* libc/include/ieeefp.h: Include float.h.
+	(EXT_EXPBITS, EXT_FRACHBITS, EXT_FRACLBITS)
+	(EXT_EXP_INFNAN. EXT_EXP_BIAS, EXT_FRACBITS): Define.
+	(struct ieee_ext, union ieee_ext_u): New types for long double
+	support.
+	* libc/include/math.h (finitel): Add prototype.
+	(hypotl): Add prototype.
+	(sqrtl): Add prototype.
+	* libm/common/Makefile.am (lsrc): Add sl_finite.c.
+	* libm/common/Makefile.in: Regenerate.
+	* libm/common/fdlibm.h (__ieee754_hypotl): Add prototype.
+	* libm/common/hypotl.c (hypotl): Add implementation for when long
+	double is larger than double.
+	* libm/common/sqrtl.c (sqrtl): Likewise.
+	* libm/common/sl_finite.c: New file.  Adds implementation of the
+	finitel function.
+	* libm/complex/Makefile.am (lsrc): Define.
+	(libcomplex_la_SOURCES): Add lsrc.
+	(lib_a_SOURCES): Add lsrc.
+	* libm/complex/Makefile.in: Regenerate.
+	* libm/complex/cabs.c: Add documentation of cabsl function.
+	* libm/complex/cimag.c: Add documentation of cimagl function.
+	* libm/complex/creall.c: Add documentation of creall function.
+	* libm/complex/cabsl.c: New file.  Adds implementation of the
+	cabsl function.
+	* libm/complex/cimagl.c: New file.  Adds implementation of the
+	cimagl function.
+	* libm/complex/creall.c: New file.  Adds implementation of the
+	creall function.
+	* libm/math/Makefile.am (lsrc): Define.
+	(libmath_la_SOURCES): Add lsrc.
+	(lib_a_SOURCES): Add lsrc.
+	* libm/math/Makefile.in: Regenerate.
+	* libm/math/el_hypot.c: New file.  Adds implementation of the
+	__ieee754_hypotl function.
+
 2015-02-04  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/wchar.h (wcstold): Drop _LDBL_EQ_DBL requirement for

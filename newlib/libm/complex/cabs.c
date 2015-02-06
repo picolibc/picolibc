@@ -10,17 +10,20 @@
 
 /*
 FUNCTION
-        <<cabs>>, <<cabsf>>---complex absolute-value
+        <<cabs>>, <<cabsf>>, <<cabsl>>---complex absolute-value
 
 INDEX
         cabs
 INDEX
         cabsf
+INDEX
+        cabsl
 
 ANSI_SYNOPSIS
        #include <complex.h>
        double cabs(double complex <[z]>);
        float cabsf(float complex <[z]>);
+       long double cabsl(long double complex <[z]>);
 
 
 DESCRIPTION
@@ -28,16 +31,19 @@ DESCRIPTION
         (also called norm, modulus, or magnitude) of <[z]>. 
 
         <<cabsf>> is identical to <<cabs>>, except that it performs
-        its calculations on <<floats complex>>.
+        its calculations on <<float complex>>.
+
+        <<cabsl>> is identical to <<cabs>>, except that it performs
+        its calculations on <<long double complex>>.
 
 RETURNS
-        The cabs functions return the complex absolute value.
+        The cabs* functions return the complex absolute value.
 
 PORTABILITY
-        <<cabs>> and <<cabsf>> are ISO C99
+        <<cabs>>, <<cabsf>> and <<cabsl>> are ISO C99
 
 QUICKREF
-        <<cabs>> and <<cabsf>> are ISO C99
+        <<cabs>>, <<cabsf>> and <<cabsl>> are ISO C99
 
 */
 

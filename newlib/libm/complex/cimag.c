@@ -10,33 +10,39 @@
 
 /*
 FUNCTION
-        <<cimag>>, <<cimagf>>---imaginary part
+        <<cimag>>, <<cimagf>>, <<cimagl>>---imaginary part
 
 INDEX
         cimag
 INDEX
         cimagf
+INDEX
+        cimagl
 
 ANSI_SYNOPSIS
        #include <complex.h>
        double cimag(double complex <[z]>);
        float cimagf(float complex <[z]>);
+       long double cimagl(long double complex <[z]>);
 
 
 DESCRIPTION
         These functions compute the imaginary part of <[z]>.
 
         <<cimagf>> is identical to <<cimag>>, except that it performs
-        its calculations on <<floats complex>>.
+        its calculations on <<float complex>>.
+
+        <<cimagl>> is identical to <<cimag>>, except that it performs
+        its calculations on <<long double complex>>.
 
 RETURNS
-        The cimag functions return the imaginary part value (as a real).
+        The cimag* functions return the imaginary part value (as a real).
 
 PORTABILITY
-        <<cimag>> and <<cimagf>> are ISO C99
+        <<cimag>>, <<cimagf>> and <<cimagl>> are ISO C99
 
 QUICKREF
-        <<cimag>> and <<cimagf>> are ISO C99
+        <<cimag>>, <<cimagf>> and <<cimagl>> are ISO C99
 
 */
 

@@ -79,8 +79,11 @@ am__objects_2 = lib_a-cabsf.$(OBJEXT) lib_a-casinf.$(OBJEXT) \
 	lib_a-cargf.$(OBJEXT) lib_a-catanhf.$(OBJEXT) \
 	lib_a-cexpf.$(OBJEXT) lib_a-cpowf.$(OBJEXT) \
 	lib_a-csinhf.$(OBJEXT)
+am__objects_5 = lib_a-cabsl.$(OBJEXT) lib_a-creall.$(OBJEXT) \
+	lib_a-cimagl.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2)
+@USE_LIBTOOL_FALSE@	$(am__objects_2) \
+@USE_LIBTOOL_FALSE@	$(am__objects_5)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcomplex_la_LIBADD =
@@ -93,8 +96,10 @@ am__objects_4 = cabsf.lo casinf.lo ccosf.lo cimagf.lo cprojf.lo \
 	ctanf.lo cacoshf.lo catanf.lo cephes_subrf.lo conjf.lo \
 	csinf.lo ctanhf.lo cargf.lo catanhf.lo cexpf.lo cpowf.lo \
 	csinhf.lo
+am__objects_6 = cabsl.lo creall.lo ciamgl.lo
 @USE_LIBTOOL_TRUE@am_libcomplex_la_OBJECTS = $(am__objects_3) \
-@USE_LIBTOOL_TRUE@	$(am__objects_4)
+@USE_LIBTOOL_TRUE@	$(am__objects_4) \
+@USE_LIBTOOL_TRUE@	$(am__objects_6)
 libcomplex_la_OBJECTS = $(am_libcomplex_la_OBJECTS)
 libcomplex_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -249,6 +254,8 @@ src = cabs.c cacos.c cacosh.c carg.c casin.c casinh.c \
       cpow.c cproj.c  creal.c  \
       csin.c csinh.c csqrt.c ctan.c ctanh.c
 
+lsrc = cabsl.c creall.c cimagl.c
+
 fsrc = cabsf.c casinf.c ccosf.c cimagf.c cprojf.c  \
         csqrtf.c cacosf.c casinhf.c ccoshf.c clogf.c \
         crealf.c ctanf.c cacoshf.c catanf.c   \
@@ -257,11 +264,11 @@ fsrc = cabsf.c casinf.c ccosf.c cimagf.c cprojf.c  \
 
 libcomplex_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libcomplex.la
-@USE_LIBTOOL_TRUE@libcomplex_la_SOURCES = $(src) $(fsrc)
+@USE_LIBTOOL_TRUE@libcomplex_la_SOURCES = $(src) $(fsrc) $(lsrc)
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc)
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc) $(lsrc)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 chobj = cabs.def cacos.def cacosh.def carg.def \
         casin.def casinh.def catan.def catanh.def \
@@ -616,6 +623,27 @@ lib_a-csinhf.o: csinhf.c
 
 lib_a-csinhf.obj: csinhf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinhf.obj `if test -f 'csinhf.c'; then $(CYGPATH_W) 'csinhf.c'; else $(CYGPATH_W) '$(srcdir)/csinhf.c'; fi`
+
+lib_a-cabsl.o: cabsl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabsl.o `test -f 'cabsl.c' || echo '$(srcdir)/'`cabsl.c
+
+lib_a-cabsl.obj: cabsl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cabsl.obj `if test -f 'cabsl.c'; then $(CYGPATH_W) 'cabsl.c'; else $(CYGPATH_W) '$(srcdir)/cabsl.c'; fi`
+
+lib_a-creall.o: creall.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creall.o `test -f 'creall.c' || echo '$(srcdir)/'`creall.c
+
+lib_a-creall.obj: creall.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creall.obj `if test -f 'creall.c'; then $(CYGPATH_W) 'creall.c'; else $(CYGPATH_W) '$(srcdir)/creall.c'; fi`
+
+lib_a-cimagl.o: cimagl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimagl.o `test -f 'cimagl.c' || echo '$(srcdir)/'`cimagl.c
+
+lib_a-cimagl.obj: cimagl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cimagl.obj `if test -f 'cimagl.c'; then $(CYGPATH_W) 'cimagl.c'; else $(CYGPATH_W) '$(srcdir)/cimagl.c'; fi`
+
+
+
 
 mostlyclean-libtool:
 	-rm -f *.lo
