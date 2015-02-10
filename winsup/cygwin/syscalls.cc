@@ -1720,10 +1720,21 @@ void
 fhandler_base::stat_fixup (struct stat *buf)
 {
   /* For devices, set inode number to device number.  This gives us a valid,
-     unique inode number without having to call hash_path_name. */
+     unique inode number without having to call hash_path_name.  /dev/tty needs
+     a bit of persuasion to get the same st_ino value in stat and fstat. */
   if (!buf->st_ino)
-    buf->st_ino = (get_major () == DEV_VIRTFS_MAJOR) ? get_ino ()
-						     : get_device ();
+    {
+      if (get_major () == DEV_VIRTFS_MAJOR)
+	buf->st_ino = get_ino ();
+      else if (dev () == FH_TTY ||
+	       ((get_major () == DEV_PTYS_MAJOR
+		 || get_major () == DEV_CONS_MAJOR)
+		&& !strcmp (get_name (), "/dev/tty")))
+	buf->st_ino = FH_TTY;
+      else
+	buf->st_ino = get_device ();
+      	
+    }
   /* For /dev-based devices, st_dev must be set to the device number of /dev,
      not it's own device major/minor numbers.  What we do here to speed up
      the process is to fetch the device number of /dev only once, liberally

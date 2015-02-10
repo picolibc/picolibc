@@ -1,3 +1,8 @@
+2015-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (fhandler_base::stat_fixup): Generate unique inode number
+	for /dev/tty under all circumstances.  Add to comment.
+
 2015-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* common.din: Export cabsl, cimagl, creall, finitel, hypotl, sqrtl.
