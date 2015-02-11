@@ -1,3 +1,8 @@
+2015-02-11  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
+	* or1k/or1k_uart.c: Write bugfix and cleanup/documentation.
+	* or1k/or1k_uart.h: Cleanup.
+
 2015-01-22  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* sparc/crt0.S: Declare use of system registers.
