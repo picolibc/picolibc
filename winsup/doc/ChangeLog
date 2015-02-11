@@ -1,3 +1,7 @@
+2015-02-11  Warren Young  <warren@etr-usa.com>
+
+	* faq-using.xml (faq.using.startup-slow): New entry.
+
 2015-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.xml (std-susv4): Move cabsl, cimagl, creall, hypotl, sqrtl here
