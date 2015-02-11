@@ -1,3 +1,25 @@
+2015-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dlfcn.cc (check_path_access): Drop FE_NATIVE from find_exec call.
+	(gfpod_helper): Drop equality sign from environment variable name
+	in call to check_path_access.
+	* exec.cc (execlp): Drop equality sign from environment variable name
+	in call to find_exec.
+	(execvp): Ditto.
+	(execvpe): Ditto.
+	* path.h (enum fe_types): Drop FE_NATIVE.
+	(find_exec): Rename third paramter in declaration from search.  Drop
+	equality sign from default value.
+	* spawn.cc (perhaps_suffix): Add PC_POSIX to path_conv::check call.
+	(find_exec): Simplify function.  Iterate over POSIX pathlist rather
+	than Windows pathlist.  Drop handling of FE_NATIVE flag.  Always fill
+	posix path of incoming path_conv buf, unless FE_NNF flag is given.
+	(av::setup): Drop equality sign from environment variable name
+	in call to find_exec.  Call unshift with normalized_path.
+	* winf.cc (av::unshift): Drop conv parameter and code converting
+	Windows to POSIX path.
+	* winf.h (av::unshift): Accommodate prototype.
+
 2015-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (fhandler_base::stat_fixup): Generate unique inode number

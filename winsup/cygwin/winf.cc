@@ -1,6 +1,6 @@
 /* winf.cc
 
-   Copyright 2003, 2004, 2005, 2006, 2008, 2009, 2013, 2014 Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2008, 2009, 2013, 2014, 2015 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -126,7 +126,7 @@ linebuf::fromargv (av& newargv, const char *real_path, bool cmdlenoverflow_ok)
 }
 
 int
-av::unshift (const char *what, int conv)
+av::unshift (const char *what)
 {
   char **av;
   av = (char **) crealloc (argv, (argc + 2) * sizeof (char *));
@@ -135,17 +135,6 @@ av::unshift (const char *what, int conv)
 
   argv = av;
   memmove (argv + 1, argv, (argc + 1) * sizeof (char *));
-  tmp_pathbuf tp;
-  char *buf = tp.c_get ();
-  if (conv)
-    {
-      cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, what, buf,
-			NT_MAX_PATH);
-      char *p = strchr (buf, '\0') - 4;
-      if (p > buf && ascii_strcasematch (p, ".exe"))
-	*p = '\0';
-      what = buf;
-    }
   *argv = cstrdup1 (what);
   calloced++;
   argc++;

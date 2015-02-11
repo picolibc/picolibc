@@ -1,6 +1,6 @@
 /* winf.h
 
-   Copyright 2006, 2007, 2009, 2011, 2013 Red Hat, Inc.
+   Copyright 2006, 2007, 2009, 2011, 2013, 2015 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -41,7 +41,7 @@ class av
 	cfree (argv);
       }
   }
-  int unshift (const char *what, int conv = 0) __reg2;
+  int unshift (const char *what) __reg2;
   operator char **() {return argv;}
   void all_calloced () {calloced = argc;}
   void replace0_maybe (const char *arg0)

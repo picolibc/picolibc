@@ -1,7 +1,7 @@
 /* dlfcn.cc
 
    Copyright 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011, 2013, 2014 Red Hat, Inc.
+   2010, 2011, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -37,7 +37,7 @@ set_dl_error (const char *str)
 inline const char *
 check_path_access (const char *mywinenv, const char *name, path_conv& buf)
 {
-  return find_exec (name, buf, mywinenv, FE_NNF | FE_NATIVE | FE_DLL);
+  return find_exec (name, buf, mywinenv, FE_NNF | FE_DLL);
 }
 
 /* Search LD_LIBRARY_PATH for dll, if it exists.  Search /usr/bin and /usr/lib
@@ -47,7 +47,7 @@ gfpod_helper (const char *name, path_conv &real_filename)
 {
   if (strchr (name, '/'))
     real_filename.check (name, PC_SYM_FOLLOW | PC_NULLEMPTY);
-  else if (!check_path_access ("LD_LIBRARY_PATH=", name, real_filename))
+  else if (!check_path_access ("LD_LIBRARY_PATH", name, real_filename))
     check_path_access ("/usr/bin:/usr/lib", name, real_filename);
   if (!real_filename.exists ())
     real_filename.error = ENOENT;

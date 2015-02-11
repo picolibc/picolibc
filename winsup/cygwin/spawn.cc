@@ -1,7 +1,7 @@
 /* spawn.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -53,7 +53,7 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
 
   err = 0;
   debug_printf ("prog '%s'", prog);
-  buf.check (prog, PC_SYM_FOLLOW | PC_NULLEMPTY,
+  buf.check (prog, PC_SYM_FOLLOW | PC_NULLEMPTY | PC_POSIX,
 	     (opt & FE_DLL) ? stat_suffixes : exe_suffixes);
 
   if (buf.isdir ())
@@ -75,124 +75,86 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
   return ext;
 }
 
-/* Find an executable name, possibly by appending known executable
-   suffixes to it.  The win32-translated name is placed in 'buf'.
-   Any found suffix is returned in known_suffix.
+/* Find an executable name, possibly by appending known executable suffixes
+   to it.  The path_conv struct 'buf' is filled and contains both, win32 and
+   posix path of the file..  Any found suffix is returned in known_suffix.
 
-   If the file is not found and !null_if_not_found then the win32 version
-   of name is placed in buf and returned.  Otherwise the contents of buf
-   is undefined and NULL is returned.  */
-
+   If the file is not found and !FE_NNF then the win32 version of name is
+   placed in buf and returned.  Otherwise the contents of buf is undefined
+   and NULL is returned.  */
 const char * __reg3
-find_exec (const char *name, path_conv& buf, const char *mywinenv,
+find_exec (const char *name, path_conv& buf, const char *search,
 	   unsigned opt, const char **known_suffix)
 {
   const char *suffix = "";
-  debug_printf ("find_exec (%s)", name);
-  const char *retval;
+  const char *retval = NULL;
   tmp_pathbuf tp;
+  char *tmp_path;
   char *tmp = tp.c_get ();
-  const char *posix = (opt & FE_NATIVE) ? NULL : name;
   bool has_slash = !!strpbrk (name, "/\\");
   int err = 0;
 
-  /* Check to see if file can be opened as is first.
-     Win32 systems always check . first, but PATH may not be set up to
-     do this. */
+  debug_printf ("find_exec (%s)", name);
+
+  /* Check to see if file can be opened as is first. */
   if ((has_slash || opt & FE_CWD)
       && (suffix = perhaps_suffix (name, buf, err, opt)) != NULL)
     {
-      if (posix && !has_slash)
-	{
-	  tmp[0] = '.';
-	  tmp[1] = '/';
-	  strcpy (tmp + 2, name);
-	  posix = tmp;
-	}
       retval = buf.get_win32 ();
       goto out;
     }
 
-  win_env *winpath;
   const char *path;
-  const char *posix_path;
-
-  posix = (opt & FE_NATIVE) ? NULL : tmp;
-
-  if (strchr (mywinenv, '/'))
-    {
-      /* it's not really an environment variable at all */
-      int n = cygwin_conv_path_list (CCP_POSIX_TO_WIN_A, mywinenv, NULL, 0);
-      char *s = (char *) alloca (n);
-      if (cygwin_conv_path_list (CCP_POSIX_TO_WIN_A, mywinenv, s, n))
-	goto errout;
-      path = s;
-      posix_path = mywinenv - 1;
-    }
-  else if (has_slash || strchr (name, '\\') || isdrive (name)
-      || !(winpath = getwinenv (mywinenv))
-      || !(path = winpath->get_native ()) || *path == '\0')
-    /* Return the error condition if this is an absolute path or if there
-       is no PATH to search. */
+  /* If it starts with a slash, it's a PATH-like pathlist.  Otherwise it's
+     the name of an environment variable. */
+  if (strchr (search, '/'))
+    *stpncpy (tmp, search, NT_MAX_PATH - 1) = '\0';
+  else if (has_slash || isdrive (name) || !(path = getenv (search)) || !*path)
     goto errout;
   else
-    posix_path = winpath->get_posix () - 1;
+    *stpncpy (tmp, path, NT_MAX_PATH - 1) = '\0';
 
-  debug_printf ("%s%s", mywinenv, path);
-  /* Iterate over the specified path, looking for the file with and without
-     executable extensions. */
+  path = tmp;
+  debug_printf ("searchpath %s", path);
+
+  tmp_path = tp.c_get ();
   do
     {
-      posix_path++;
-      char *eotmp = strccpy (tmp, &path, ';');
+      char *eotmp = strccpy (tmp_path, &path, ':');
       /* An empty path or '.' means the current directory, but we've
 	 already tried that.  */
-      if (opt & FE_CWD && (tmp[0] == '\0' || (tmp[0] == '.' && tmp[1] == '\0')))
+      if ((opt & FE_CWD) && (tmp_path[0] == '\0'
+			     || (tmp_path[0] == '.' && tmp_path[1] == '\0')))
 	continue;
 
-      *eotmp++ = '\\';
+      *eotmp++ = '/';
       strcpy (eotmp, name);
 
-      debug_printf ("trying %s", tmp);
+      debug_printf ("trying %s", tmp_path);
 
       int err1;
 
-      if ((suffix = perhaps_suffix (tmp, buf, err1, opt)) != NULL)
+      if ((suffix = perhaps_suffix (tmp_path, buf, err1, opt)) != NULL)
 	{
 	  if (buf.has_acls () && check_file_access (buf, X_OK, true))
 	    continue;
-
-	  if (posix == tmp)
-	    {
-	      eotmp = strccpy (tmp, &posix_path, ':');
-	      if (eotmp == tmp)
-		*eotmp++ = '.';
-	      *eotmp++ = '/';
-	      strcpy (eotmp, name);
-	    }
 	  retval = buf.get_win32 ();
 	  goto out;
 	}
+
     }
-  while (*path && *++path && (posix_path = strchr (posix_path, ':')));
+  while (*path && *++path);
 
  errout:
-  posix = NULL;
   /* Couldn't find anything in the given path.
-     Take the appropriate action based on null_if_not_found. */
-  if (opt & FE_NNF)
-    retval = NULL;
-  else if (!(opt & FE_NATIVE))
-    retval = name;
-  else
+     Take the appropriate action based on FE_NNF. */
+  if (!(opt & FE_NNF))
     {
-      buf.check (name);
+      buf.check (name, PC_SYM_FOLLOW | PC_POSIX);
       retval = buf.get_win32 ();
     }
 
  out:
-  if (posix)
-    retval = buf.set_path (posix);
   debug_printf ("%s = find_exec (%s)", (char *) buf.get_win32 (), name);
   if (known_suffix)
     *known_suffix = suffix ?: strchr (buf.get_win32 (), '\0');
@@ -1238,10 +1200,8 @@ av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
 	if (arg1)
 	  unshift (arg1);
 
-	/* FIXME: This should not be using FE_NATIVE.  It should be putting
-	   the posix path on the argv list. */
-	find_exec (pgm, real_path, "PATH=", FE_NATIVE, &ext);
-	unshift (real_path.get_win32 (), 1);
+	find_exec (pgm, real_path, "PATH", FE_NADA, &ext);
+	unshift (real_path.normalized_path);
       }
   if (real_path.iscygexec ())
     dup_all ();

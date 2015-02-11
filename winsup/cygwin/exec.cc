@@ -1,7 +1,7 @@
 /* exec.cc: exec system call support.
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008,
-   2009, 2011, 2012 Red Hat, Inc.
+   2009, 2011, 2012, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -76,7 +76,7 @@ execlp (const char *file, const char *arg0, ...)
   va_end (args);
   MALLOC_CHECK;
   return spawnve (_P_OVERLAY | _P_PATH_TYPE_EXEC,
-		  find_exec (file, buf, "PATH=", FE_NNF) ?: "",
+		  find_exec (file, buf, "PATH", FE_NNF) ?: "",
 		  (char * const  *) argv, cur_environ ());
 }
 
@@ -102,7 +102,7 @@ execvp (const char *file, char * const *argv)
 
   MALLOC_CHECK;
   return spawnve (_P_OVERLAY | _P_PATH_TYPE_EXEC,
-		  find_exec (file, buf, "PATH=", FE_NNF) ?: "",
+		  find_exec (file, buf, "PATH", FE_NNF) ?: "",
 		  argv, cur_environ ());
 }
 
@@ -113,7 +113,7 @@ execvpe (const char *file, char * const *argv, char *const *envp)
 
   MALLOC_CHECK;
   return spawnve (_P_OVERLAY | _P_PATH_TYPE_EXEC,
-		  find_exec (file, buf, "PATH=", FE_NNF) ?: "",
+		  find_exec (file, buf, "PATH", FE_NNF) ?: "",
 		  argv, envp);
 }
 
