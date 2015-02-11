@@ -989,7 +989,7 @@ fhandler_base::lock (int a_op, struct flock *fl)
 	if ((a_flags & F_POSIX)
 	    && ((get_flags () & O_ACCMODE) == O_WRONLY))
 	  {
-	    system_printf ("get_access() == %x", get_access ());
+	    debug_printf ("request F_RDLCK on O_WRONLY file: EBADF");
 	    set_errno (EBADF);
 	    return -1;
 	  }
@@ -999,7 +999,7 @@ fhandler_base::lock (int a_op, struct flock *fl)
 	if ((a_flags & F_POSIX)
 	    && ((get_flags () & O_ACCMODE) == O_RDONLY))
 	  {
-	    system_printf ("get_access() == %x", get_access ());
+	    debug_printf ("request F_WRLCK on O_RDONLY file: EBADF");
 	    set_errno (EBADF);
 	    return -1;
 	  }

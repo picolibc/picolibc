@@ -1,5 +1,10 @@
 2015-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (fhandler_base::lock): Convert accidental system_printf to
+	debug_printf in case of non-matching file modes.  Clear up debug output.
+
+2015-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dlfcn.cc (check_path_access): Drop FE_NATIVE from find_exec call.
 	(gfpod_helper): Drop equality sign from environment variable name
 	in call to check_path_access.
