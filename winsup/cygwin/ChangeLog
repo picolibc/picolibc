@@ -1,5 +1,10 @@
 2015-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (setacl): Introduce bool array "invalid" to note the
+	invalidation of incoming acl entries while iterating over them.
+
+2015-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.h (cygheap_pwdgrp::get_home): Add dnsdomain parameter to
 	declaration in ldap-related method.
 	(cygheap_pwdgrp::get_shell): Ditto.

@@ -13,3 +13,8 @@ Bug Fixes
 
 - Fix /proc/cpuinfo multicore info on Intel CPUs.
   Addresses: https://cygwin.com/ml/cygwin-apps/2015-02/msg00077.html
+
+- Regression in 1.7.34: acl(SETACL, ...) overwrote the incoming acltent_t
+  array for bookkeeping purposes while iterating over its entries.  This
+  broke reusing the acl in the calling application (e.g. setfacl).
+  Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00304.html
