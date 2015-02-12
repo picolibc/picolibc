@@ -1,3 +1,35 @@
+2015-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (cygheap_pwdgrp::get_home): Add dnsdomain parameter to
+	declaration in ldap-related method.
+	(cygheap_pwdgrp::get_shell): Ditto.
+	(cygheap_pwdgrp::get_gecos): Ditto.
+	* ldap.cc (cyg_ldap::open): Use NO_ERROR instead of 0.
+	(cyg_ldap::close): Reset last_fetched_sid.
+	(cyg_ldap::fetch_ad_account): Return immediately if sid is the same as
+	last_fetched_sid.  Open LDAP connection from here.  Move initialization
+	of rdse after open call.  Set last_fetched_sid if LDAP call was
+	successful.
+	* ldap.h (class cyg_ldap): Add member last_fetched_sid.
+	(cyg_ldap::cyg_ldap): Initialize last_fetched_sid.
+	(cyg_ldap::is_open): New inline method.
+	* uinfo.cc (cygheap_pwdgrp::init): Drop initialization of db_home,
+	db_shell and db_gecos with "cygwin desc", thus only using the fallback
+	by default.
+	(fetch_windows_home): Add parameter dnsdomain.  Call
+	cyg_ldap::fetch_ad_account if required.
+	(fetch_from_path): Add parameter dnsdomain.  Call fetch_windows_home
+	accordingly.
+	(cygheap_pwdgrp::get_home): Accomodate call to fetch_windows_home.
+	Add dnsdomain parameter in ldap-related method.  Call
+	cyg_ldap::fetch_ad_account if required.
+	(cygheap_pwdgrp::get_shell): Ditto.
+	(cygheap_pwdgrp::get_gecos): Ditto.
+	(pwdgrp::fetch_account_from_windows): Drop cyg_ldap::open call prior to
+	cyg_ldap::fetch_ad_account call.  Set is_current_user to true if we're
+	handling the current user account.  Make sure to perform the LDAP calls
+	only for users, and only if required.
+
 2015-02-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc (fhandler_base::lock): Convert accidental system_printf to

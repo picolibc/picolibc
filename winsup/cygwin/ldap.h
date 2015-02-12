@@ -1,6 +1,6 @@
 /* ldap.h.
 
-   Copyright 2014 Red Hat, Inc.
+   Copyright 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -32,6 +32,7 @@ class cyg_ldap {
   bool isAD;
   PLDAPSearch srch_id;
   PLDAPMessage srch_msg, srch_entry;
+  cygsid last_fetched_sid;
 
   inline int map_ldaperr_to_errno (ULONG lerr);
   inline int wait (cygthread *thr);
@@ -45,7 +46,8 @@ class cyg_ldap {
 
 public:
   cyg_ldap () : lh (NULL), rootdse (NULL), msg (NULL), entry (NULL), val (NULL),
-		isAD (false), srch_id (NULL), srch_msg (NULL), srch_entry (NULL)
+		isAD (false), srch_id (NULL), srch_msg (NULL),
+		srch_entry (NULL), last_fetched_sid (NO_SID)
   {}
   ~cyg_ldap () { close (); }
 
@@ -54,6 +56,7 @@ public:
   ULONG search_s (PWCHAR base, PWCHAR filter, PWCHAR *attrs);
   ULONG next_page_s ();
 
+  bool is_open () const { return !!lh; }
   operator PLDAP () const { return lh; }
   int open (PCWSTR in_domain);
   void close ();

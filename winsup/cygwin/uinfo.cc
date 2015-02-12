@@ -604,12 +604,14 @@ cygheap_pwdgrp::init ()
   grp_src = (NSS_SRC_FILES | NSS_SRC_DB);
   prefix = NSS_PFX_AUTO;
   separator[0] = L'+';
+#if 0
   home_scheme[0].method = NSS_SCHEME_CYGWIN;
   home_scheme[1].method = NSS_SCHEME_DESC;
   shell_scheme[0].method = NSS_SCHEME_CYGWIN;
   shell_scheme[1].method = NSS_SCHEME_DESC;
   gecos_scheme[0].method = NSS_SCHEME_CYGWIN;
   gecos_scheme[1].method = NSS_SCHEME_DESC;
+#endif
   enums = (ENUM_CACHE | ENUM_BUILTIN);
   enum_tdoms = NULL;
   caching = true;	/* INTERNAL ONLY */
@@ -815,20 +817,24 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 }
 
 static char *
-fetch_windows_home (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid)
+fetch_windows_home (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid,
+		    PCWSTR dnsdomain)
 {
   PCWSTR home_from_db = NULL;
   char *home = NULL;
 
   if (pldap)
     {
+      if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	{
 #if 0
-      /* Disable preferring homeDrive for now.  The drive letter may not
-         be available when it's needed. */
-      home_from_db = pldap->get_string_attribute (L"homeDrive");
-      if (!home_from_db || !*home_from_db)
+	  /* Disable preferring homeDrive for now.  The drive letter may not
+	     be available when it's needed. */
+	  home_from_db = pldap->get_string_attribute (L"homeDrive");
+	  if (!home_from_db || !*home_from_db)
 #endif
-	home_from_db = pldap->get_string_attribute (L"homeDirectory");
+	  home_from_db = pldap->get_string_attribute (L"homeDirectory");
+	}
     }
   else if (ui)
     {
@@ -902,8 +908,8 @@ fetch_from_description (PCWSTR desc, PCWSTR search, size_t len)
 }
 
 static char *
-fetch_from_path (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid,
-		 PCWSTR str, PCWSTR dom, PCWSTR name, bool full_qualified)
+fetch_from_path (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid, PCWSTR str,
+		 PCWSTR dom, PCWSTR dnsdomain, PCWSTR name, bool full_qualified)
 {
   tmp_pathbuf tp;
   PWCHAR wpath = tp.w_get ();
@@ -936,7 +942,7 @@ fetch_from_path (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid,
 	      w = wcpncpy (w, dom, we - w);
 	      break;
 	    case L'H':
-	      home = fetch_windows_home (pldap, ui, sid);
+	      home = fetch_windows_home (pldap, ui, sid, dnsdomain);
 	      if (home)
 		{
 		  /* Drop one leading slash to accommodate home being an
@@ -965,7 +971,7 @@ fetch_from_path (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid,
 
 char *
 cygheap_pwdgrp::get_home (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
-			  PCWSTR name, bool full_qualified)
+			  PCWSTR dnsdomain, PCWSTR name, bool full_qualified)
 {
   PWCHAR val;
   char *home = NULL;
@@ -977,35 +983,49 @@ cygheap_pwdgrp::get_home (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
 	case NSS_SCHEME_FALLBACK:
 	  return NULL;
 	case NSS_SCHEME_WINDOWS:
-	  home = fetch_windows_home (pldap, NULL, sid);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    home = fetch_windows_home (pldap, NULL, sid, dnsdomain);
 	  break;
 	case NSS_SCHEME_CYGWIN:
-	  val = pldap->get_string_attribute (L"cygwinHome");
-	  if (val && *val)
-	    sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (L"cygwinHome");
+	      if (val && *val)
+		sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+	    }
 	  break;
 	case NSS_SCHEME_UNIX:
-	  val = pldap->get_string_attribute (L"unixHomeDirectory");
-	  if (val && *val)
-	    sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (L"unixHomeDirectory");
+	      if (val && *val)
+		sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+	    }
 	  break;
 	case NSS_SCHEME_DESC:
-	  val = pldap->get_string_attribute (L"description");
-	  if (val && *val)
-	    home = fetch_from_description (val, L"home=\"", 6);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (L"description");
+	      if (val && *val)
+		home = fetch_from_description (val, L"home=\"", 6);
+	    }
 	  break;
 	case NSS_SCHEME_PATH:
 	  home = fetch_from_path (pldap, NULL, sid, home_scheme[idx].attrib,
-				  dom, name, full_qualified);
+				  dom, dnsdomain, name, full_qualified);
 	  break;
 	case NSS_SCHEME_FREEATTR:
-	  val = pldap->get_string_attribute (home_scheme[idx].attrib);
-	  if (val && *val)
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
 	    {
-	      if (isdrive (val) || *val == '\\')
-		home = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX, val);
-	      else
-		sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+	      val = pldap->get_string_attribute (home_scheme[idx].attrib);
+	      if (val && *val)
+		{
+		  if (isdrive (val) || *val == '\\')
+		    home = (char *)
+			   cygwin_create_path (CCP_WIN_W_TO_POSIX, val);
+		  else
+		    sys_wcstombs_alloc (&home, HEAP_NOTHEAP, val);
+		}
 	    }
 	  break;
 	}
@@ -1026,7 +1046,7 @@ cygheap_pwdgrp::get_home (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 	case NSS_SCHEME_FALLBACK:
 	  return NULL;
 	case NSS_SCHEME_WINDOWS:
-	  home = fetch_windows_home (NULL, ui, sid);
+	  home = fetch_windows_home (NULL, ui, sid, NULL);
 	  break;
 	case NSS_SCHEME_CYGWIN:
 	case NSS_SCHEME_UNIX:
@@ -1037,7 +1057,7 @@ cygheap_pwdgrp::get_home (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 	  break;
 	case NSS_SCHEME_PATH:
 	  home = fetch_from_path (NULL, ui, sid, home_scheme[idx].attrib,
-				  dom, name, full_qualified);
+				  dom, NULL, name, full_qualified);
 	  break;
 	}
     }
@@ -1046,7 +1066,7 @@ cygheap_pwdgrp::get_home (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 
 char *
 cygheap_pwdgrp::get_shell (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
-			   PCWSTR name, bool full_qualified)
+			   PCWSTR dnsdomain, PCWSTR name, bool full_qualified)
 {
   PWCHAR val;
   char *shell = NULL;
@@ -1060,32 +1080,45 @@ cygheap_pwdgrp::get_shell (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
 	case NSS_SCHEME_WINDOWS:
 	  break;
 	case NSS_SCHEME_CYGWIN:
-	  val = pldap->get_string_attribute (L"cygwinShell");
-	  if (val && *val)
-	    sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (L"cygwinShell");
+	      if (val && *val)
+		sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+	    }
 	  break;
 	case NSS_SCHEME_UNIX:
-	  val = pldap->get_string_attribute (L"loginShell");
-	  if (val && *val)
-	    sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (L"loginShell");
+	      if (val && *val)
+		sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+	    }
 	  break;
 	case NSS_SCHEME_DESC:
-	  val = pldap->get_string_attribute (L"description");
-	  if (val && *val)
-	    shell = fetch_from_description (val, L"shell=\"", 7);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (L"description");
+	      if (val && *val)
+		shell = fetch_from_description (val, L"shell=\"", 7);
+	    }
 	  break;
 	case NSS_SCHEME_PATH:
 	  shell = fetch_from_path (pldap, NULL, sid, shell_scheme[idx].attrib,
-	  			   dom, name, full_qualified);
+	  			   dom, dnsdomain, name, full_qualified);
 	  break;
 	case NSS_SCHEME_FREEATTR:
-	  val = pldap->get_string_attribute (shell_scheme[idx].attrib);
-	  if (val && *val)
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
 	    {
-	      if (isdrive (val) || *val == '\\')
-		shell = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX, val);
-	      else
-		sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+	      val = pldap->get_string_attribute (shell_scheme[idx].attrib);
+	      if (val && *val)
+		{
+		  if (isdrive (val) || *val == '\\')
+		    shell = (char *)
+			    cygwin_create_path (CCP_WIN_W_TO_POSIX, val);
+		  else
+		    sys_wcstombs_alloc (&shell, HEAP_NOTHEAP, val);
+		}
 	    }
 	  break;
 	}
@@ -1115,7 +1148,7 @@ cygheap_pwdgrp::get_shell (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 	  break;
 	case NSS_SCHEME_PATH:
 	  shell = fetch_from_path (NULL, ui, sid, shell_scheme[idx].attrib,
-				   dom, name, full_qualified);
+				   dom, NULL, name, full_qualified);
 	  break;
 	}
     }
@@ -1133,7 +1166,7 @@ colon_to_semicolon (char *str)
 
 char *
 cygheap_pwdgrp::get_gecos (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
-			   PCWSTR name, bool full_qualified)
+			   PCWSTR dnsdomain, PCWSTR name, bool full_qualified)
 {
   PWCHAR val;
   char *gecos = NULL;
@@ -1145,34 +1178,49 @@ cygheap_pwdgrp::get_gecos (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
 	case NSS_SCHEME_FALLBACK:
 	  return NULL;
 	case NSS_SCHEME_WINDOWS:
-	  val = pldap->get_string_attribute (L"displayName");
-	  if (val && *val)
-	    sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (L"displayName");
+	      if (val && *val)
+		sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	    }
 	  break;
 	case NSS_SCHEME_CYGWIN:
-	  val = pldap->get_string_attribute (L"cygwinGecos");
-	  if (val && *val)
-	    sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (L"cygwinGecos");
+	      if (val && *val)
+		sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	    }
 	  break;
 	case NSS_SCHEME_UNIX:
-	  val = pldap->get_string_attribute (L"gecos");
-	  if (val && *val)
-	    sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (L"gecos");
+	      if (val && *val)
+		sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	    }
 	  break;
 	case NSS_SCHEME_DESC:
-	  val = pldap->get_string_attribute (L"description");
-	  if (val && *val)
-	    gecos = fetch_from_description (val, L"gecos=\"", 7);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (L"description");
+	      if (val && *val)
+		gecos = fetch_from_description (val, L"gecos=\"", 7);
+	    }
 	  break;
 	case NSS_SCHEME_PATH:
 	  gecos = fetch_from_path (pldap, NULL, sid,
 				   gecos_scheme[idx].attrib + 1,
-				   dom, name, full_qualified);
+				   dom, dnsdomain, name, full_qualified);
 	  break;
 	case NSS_SCHEME_FREEATTR:
-	  val = pldap->get_string_attribute (gecos_scheme[idx].attrib);
-	  if (val && *val)
-	    sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
+	    {
+	      val = pldap->get_string_attribute (gecos_scheme[idx].attrib);
+	      if (val && *val)
+		sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, val);
+	    }
 	  break;
 	}
     }
@@ -1206,7 +1254,7 @@ cygheap_pwdgrp::get_gecos (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 	  break;
 	case NSS_SCHEME_PATH:
 	  gecos = fetch_from_path (NULL, ui, sid, gecos_scheme[idx].attrib + 1,
-				   dom, name, full_qualified);
+				   dom, NULL, name, full_qualified);
 	  break;
 	}
     }
@@ -1676,6 +1724,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   gid_t gid = ILLEGAL_GID;
   bool is_domain_account = true;
   PCWSTR domain = NULL;
+  bool is_current_user = false;
   char *shell = NULL;
   char *home = NULL;
   char *gecos = NULL;
@@ -1708,8 +1757,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	     DC for some weird reason.  Use LDAP instead. */
 	  PWCHAR val;
 
-	  if (cldap->open (NULL) == NO_ERROR
-	      && cldap->fetch_ad_account (sid, is_group ())
+	  if (cldap->fetch_ad_account (sid, true)
 	      && (val = cldap->get_group_name ()))
 	    {
 	      wcpcpy (name, val);
@@ -2069,49 +2117,52 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		 the educated guess that the user is in group "Domain Users"
 		 or "None". */
 	      if (sid == cygheap->user.sid ())
-		gid = posix_offset
-		      + sid_sub_auth_rid (cygheap->user.groups.pgsid);
+		{
+		  is_current_user = true;
+		  gid = posix_offset
+			+ sid_sub_auth_rid (cygheap->user.groups.pgsid);
+		}
 	      else
 		gid = posix_offset + DOMAIN_GROUP_RID_USERS;
 	    }
 
 	  if (is_domain_account)
 	    {
+	      /* Skip this when creating group entries and for non-users. */
+	      if (is_group() || acc_type != SidTypeUser)
+		break;
 	      /* On AD machines, use LDAP to fetch domain account infos. */
 	      if (cygheap->dom.primary_dns_name ())
 		{
-		  if (cldap->open (NULL) != NO_ERROR)
-		    break;
-		  if (cldap->fetch_ad_account (sid, is_group (), domain))
+		  /* For the current user we got the primary group from the
+		     user token.  For any other user we fetch it from AD. */
+		  if (!is_current_user
+		      && cldap->fetch_ad_account (sid, false, domain)
+		      && (id_val = cldap->get_primary_gid ()) != ILLEGAL_GID)
+		    gid = posix_offset + id_val;
+		  home = cygheap->pg.get_home (cldap, sid, dom, domain,
+					       name, fully_qualified_name);
+		  shell = cygheap->pg.get_shell (cldap, sid, dom, domain,
+						 name,
+						 fully_qualified_name);
+		  gecos = cygheap->pg.get_gecos (cldap, sid, dom, domain,
+						 name, fully_qualified_name);
+		  /* Check and, if necessary, add unix<->windows id mapping
+		     on the fly, unless we're called from getpwent. */
+		  if (!pldap && cldap->is_open ())
 		    {
-		      if ((id_val = cldap->get_primary_gid ()) != ILLEGAL_GID)
-			gid = posix_offset + id_val;
-		      if (!is_group ())
-			{
-			  home = cygheap->pg.get_home (cldap, sid, dom, name,
-						       fully_qualified_name);
-			  shell = cygheap->pg.get_shell (cldap, sid, dom, name,
-							 fully_qualified_name);
-			  gecos = cygheap->pg.get_gecos (cldap, sid, dom, name,
-							 fully_qualified_name);
-			}
-		      /* Check and, if necessary, add unix<->windows id mapping
-			 on the fly, unless we're called from getpwent. */
-		      if (!pldap)
-			{
-			  id_val = cldap->get_unix_uid ();
-			  if (id_val != ILLEGAL_UID
-			      && cygheap->ugid_cache.get_uid (id_val)
-				 == ILLEGAL_UID)
-			    cygheap->ugid_cache.add_uid (id_val, uid);
-			}
+		      id_val = cldap->get_unix_uid ();
+		      if (id_val != ILLEGAL_UID
+			  && cygheap->ugid_cache.get_uid (id_val)
+			     == ILLEGAL_UID)
+			cygheap->ugid_cache.add_uid (id_val, uid);
 		    }
 		}
 	      /* If primary_dns_name() is empty, we're likely running under an
 		 NT4 domain, so we can't use LDAP.  For user accounts fall back
 		 to NetUserGetInfo.  This isn't overly fast, but keep in mind
 		 that NT4 domains are mostly replaced by AD these days. */
-	      else if (!is_group () && acc_type == SidTypeUser)
+	      else
 		{
 		  WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
 		  NET_API_STATUS nas;

@@ -470,18 +470,18 @@ public:
   inline bool nss_cygserver_caching () const { return caching; }
   inline void nss_disable_cygserver_caching () { caching = false; }
 
-  char *get_home (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom, PCWSTR name,
-		  bool fq);
+  char *get_home (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom, PCWSTR dnsdomain,
+		  PCWSTR name, bool fq);
   char *get_home (struct _USER_INFO_3 *ui, cygpsid &sid, PCWSTR dom,
 		  PCWSTR name, bool fq);
 
-  char *get_shell (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom, PCWSTR name,
-		   bool fq);
+  char *get_shell (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom, PCWSTR dnsdomain,
+		   PCWSTR name, bool fq);
   char *get_shell (struct _USER_INFO_3 *ui, cygpsid &sid, PCWSTR dom,
 		   PCWSTR name, bool fq);
 
-  char *get_gecos (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom, PCWSTR name,
-		   bool fq);
+  char *get_gecos (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom, PCWSTR dnsdomain,
+		   PCWSTR name, bool fq);
   char *get_gecos (struct _USER_INFO_3 *ui, cygpsid &sid, PCWSTR dom,
 		   PCWSTR name, bool fq);
 

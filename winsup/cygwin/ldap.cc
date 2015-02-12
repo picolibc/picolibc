@@ -1,6 +1,6 @@
 /* ldap.cc: Helper functions for ldap access to Active Directory.
 
-   Copyright 2014 Red Hat, Inc.
+   Copyright 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -312,11 +312,11 @@ cyg_ldap::next_page ()
 int
 cyg_ldap::open (PCWSTR domain)
 {
-  int ret = 0;
+  int ret = NO_ERROR;
 
   /* Already open? */
   if (lh)
-    return 0;
+    return NO_ERROR;
 
   if ((ret = connect (domain)) != NO_ERROR)
     goto err;
@@ -351,7 +351,7 @@ cyg_ldap::open (PCWSTR domain)
   val = NULL;
   ldap_msgfree (msg);
   msg = entry = NULL;
-  return 0;
+  return NO_ERROR;
 err:
   close ();
   return ret;
@@ -378,16 +378,23 @@ cyg_ldap::close ()
   rootdse = NULL;
   srch_id = NULL;
   srch_msg = srch_entry = NULL;
+  last_fetched_sid = NO_SID;
 }
 
 bool
 cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
 {
-  WCHAR filter[140], *f, *rdse = rootdse;
+  WCHAR filter[140], *f, *rdse = NULL;
   LONG len = (LONG) RtlLengthSid (sid);
   PBYTE s = (PBYTE) sid;
   static WCHAR hex_wchars[] = L"0123456789abcdef";
   tmp_pathbuf tp;
+
+  if (last_fetched_sid == sid)
+    return true;
+
+  if (open (NULL) != NO_ERROR)
+    return false;
 
   if (msg)
     {
@@ -426,6 +433,11 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
 	  r = wcpcpy (r, domain);
 	}
     }
+  else
+    {
+      /* rootdse is only valid after open. */
+      rdse = rootdse;
+    }
   if (!user_attr)
     cygheap->pg.init_ldap_user_attr ();
   attr = group ? group_attr : user_attr;
@@ -436,6 +448,7 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
       debug_printf ("No entry for %W in rootdse %W", filter, rdse);
       return false;
     }
+  last_fetched_sid = sid;
   return true;
 }
 
