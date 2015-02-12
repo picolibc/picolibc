@@ -14,6 +14,15 @@ Bug Fixes
 - Fix /proc/cpuinfo multicore info on Intel CPUs.
   Addresses: https://cygwin.com/ml/cygwin-apps/2015-02/msg00077.html
 
+- Generate unique inode number for /dev/tty under all circumstances.
+  Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00211.html
+
+- Fix handling of PATH search in execlp and other calls to honor mount flags.
+  Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00119.html
+
+- Remove a debug message accidentally printed to the terminal window
+  if an application calls fcntl(F_SETFL) erroneously.
+
 - Regression in 1.7.34: acl(SETACL, ...) overwrote the incoming acltent_t
   array for bookkeeping purposes while iterating over its entries.  This
   broke reusing the acl in the calling application (e.g. setfacl).
