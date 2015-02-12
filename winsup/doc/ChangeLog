@@ -1,3 +1,7 @@
+2015-02-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntsec.xml: Throughout fix references to the Cygwin version number.
+
 2015-02-11  Warren Young  <warren@etr-usa.com>
 
 	* faq-using.xml (faq.using.startup-slow): New entry.

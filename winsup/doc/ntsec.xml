@@ -117,12 +117,12 @@ treat these SIDs as identifying two separate accounts.  One is
 "FOO\johndoe", the other one is "BAR\johndoe" or "johndoe@bar.local".
 Different SID, different account.  Full stop.  </para>
 
-<para>Starting with Cygwin 1.7.33, Cygwin uses an automatic, internal
+<para>Starting with Cygwin 1.7.34, Cygwin uses an automatic, internal
 translation from Windows SID to POSIX UID/GID.  This mechanism, which is
 the preferred method for the SID&lt;=&gt;UID/GID mapping, is described in
 detail in <xref linkend="ntsec-mapping"></xref>.</para>
 
-<para>Prior to Cygwin 1.7.33, the last part of the SID, the so called
+<para>Prior to Cygwin 1.7.34, the last part of the SID, the so called
 "Relative IDentifier" (RID), was by default used as UID and/or GID
 when you created the <filename>/etc/passwd</filename> and
 <filename>/etc/group</filename> files using the
@@ -266,7 +266,7 @@ documented, albeit in a confusing way and spread over multiple MSDN articles.
 </para>
 
 <para>
-Starting with Cygwin 1.7.33, Cygwin utilizes an approach inspired by the
+Starting with Cygwin 1.7.34, Cygwin utilizes an approach inspired by the
 mapping method as implemented by SFU, with a few differences for backward
 compatibility and to handle some border cases differently.
 </para>
