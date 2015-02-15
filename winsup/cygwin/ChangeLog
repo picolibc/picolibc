@@ -1,3 +1,19 @@
+2015-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.h (path_conv): Make path_flags private.  Rename known_suffix to
+	suffix and make private.  Rename normalized_path to posix_path and
+	make privtae.  Accommodate name changes throughout in path_conv
+	methods.
+	(path_conv::known_suffix): New method.  Use throughout instead of
+	accessing suffix directly.
+	(path_conv::get_win32): Constify.
+	(path_conv::get_posix): New method to read posix_path.  Use throughout
+	instead of accessing normalized_path directly.
+	(path_conv::set_posix): Rename from set_normalized_path.  Accommodate
+	name change throughout.
+
+	* spawn.cc (find_exec): Return POSIX path, not Win32 path.
+
 2015-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (setacl): Introduce bool array "invalid" to note the
