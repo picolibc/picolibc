@@ -1,3 +1,7 @@
+2015-02-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix.xml (std-gnu): Add missing __mempcpy.
+
 2015-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntsec.xml: Throughout fix references to the Cygwin version number.
