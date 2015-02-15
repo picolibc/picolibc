@@ -66,8 +66,8 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
       err = ENOENT;
       ext = NULL;
     }
-  else if (buf.known_suffix)
-    ext = buf.get_win32 () + (buf.known_suffix - buf.get_win32 ());
+  else if (buf.known_suffix ())
+    ext = buf.get_win32 () + (buf.known_suffix () - buf.get_win32 ());
   else
     ext = strchr (buf.get_win32 (), '\0');
 
@@ -77,9 +77,9 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
 
 /* Find an executable name, possibly by appending known executable suffixes
    to it.  The path_conv struct 'buf' is filled and contains both, win32 and
-   posix path of the file..  Any found suffix is returned in known_suffix.
+   posix path of the file.  Any found suffix is returned in known_suffix.
 
-   If the file is not found and !FE_NNF then the win32 version of name is
+   If the file is not found and !FE_NNF then the POSIX version of name is
    placed in buf and returned.  Otherwise the contents of buf is undefined
    and NULL is returned.  */
 const char * __reg3
@@ -100,7 +100,7 @@ find_exec (const char *name, path_conv& buf, const char *search,
   if ((has_slash || opt & FE_CWD)
       && (suffix = perhaps_suffix (name, buf, err, opt)) != NULL)
     {
-      retval = buf.get_win32 ();
+      retval = buf.get_posix ();
       goto out;
     }
 
@@ -138,7 +138,7 @@ find_exec (const char *name, path_conv& buf, const char *search,
 	{
 	  if (buf.has_acls () && check_file_access (buf, X_OK, true))
 	    continue;
-	  retval = buf.get_win32 ();
+	  retval = buf.get_posix ();
 	  goto out;
 	}
 
@@ -151,11 +151,11 @@ find_exec (const char *name, path_conv& buf, const char *search,
   if (!(opt & FE_NNF))
     {
       buf.check (name, PC_SYM_FOLLOW | PC_POSIX);
-      retval = buf.get_win32 ();
+      retval = buf.get_posix ();
     }
 
  out:
-  debug_printf ("%s = find_exec (%s)", (char *) buf.get_win32 (), name);
+  debug_printf ("%s = find_exec (%s)", (char *) buf.get_posix (), name);
   if (known_suffix)
     *known_suffix = suffix ?: strchr (buf.get_win32 (), '\0');
   if (!retval && err)
@@ -1201,7 +1201,7 @@ av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
 	  unshift (arg1);
 
 	find_exec (pgm, real_path, "PATH", FE_NADA, &ext);
-	unshift (real_path.normalized_path);
+	unshift (real_path.get_posix ());
       }
   if (real_path.iscygexec ())
     dup_all ();

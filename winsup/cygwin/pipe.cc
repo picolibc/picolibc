@@ -1,7 +1,7 @@
 /* pipe.cc: pipe for Cygwin.
 
    Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013 Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2015 Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -412,9 +412,9 @@ pipe_worker (int filedes[2], unsigned int psize, int mode)
       cygheap_fdnew fdout (fdin, false);
       char buf[sizeof ("/dev/fd/pipe:[2147483647]")];
       __small_sprintf (buf, "/dev/fd/pipe:[%d]", (int) fdin);
-      fhs[0]->pc.set_normalized_path (buf);
+      fhs[0]->pc.set_posix (buf);
       __small_sprintf (buf, "pipe:[%d]", (int) fdout);
-      fhs[1]->pc.set_normalized_path (buf);
+      fhs[1]->pc.set_posix (buf);
       fdin = fhs[0];
       fdout = fhs[1];
       filedes[0] = fdin;

@@ -1,7 +1,7 @@
 /* dtable.cc: file descriptor support.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -452,9 +452,9 @@ build_fh_dev (const device& dev, const char *unix_name)
 {
   path_conv pc (dev);
   if (unix_name)
-    pc.set_normalized_path (unix_name);
+    pc.set_posix (unix_name);
   else
-    pc.set_normalized_path (dev.name);
+    pc.set_posix (dev.name);
   return build_fh_pc (pc);
 }
 

@@ -1,7 +1,7 @@
 /* fhandler_disk_file.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -258,7 +258,7 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
   bool first = true;
   PFILE_BOTH_DIR_INFORMATION fdibuf = (PFILE_BOTH_DIR_INFORMATION)
 				       alloca (65536);
-  __DIR_mounts *dir = new __DIR_mounts (normalized_path);
+  __DIR_mounts *dir = new __DIR_mounts (get_posix ());
   while (NT_SUCCESS (NtQueryDirectoryFile (fh, NULL, NULL, NULL, &io, fdibuf,
 					   65536, FileBothDirectoryInformation,
 					   FALSE, NULL, first)))
@@ -2110,7 +2110,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	{
 	  tmp_pathbuf tp;
 	  char *file = tp.c_get ();
-	  char *p = stpcpy (file, pc.normalized_path);
+	  char *p = stpcpy (file, pc.get_posix ());
 	  if (p[-1] != '/')
 	    *p++ = '/';
 	  sys_wcstombs (p, NT_MAX_PATH - (p - file),

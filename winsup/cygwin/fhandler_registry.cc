@@ -1,7 +1,7 @@
 /* fhandler_registry.cc: fhandler for /proc/registry virtual filesystem
 
    Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
-   2013 Red Hat, Inc.
+   2013, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -452,12 +452,12 @@ out:
 void
 fhandler_registry::set_name (path_conv &in_pc)
 {
-  if (strncasematch (in_pc.normalized_path, "/proc/registry32", 16))
+  if (strncasematch (in_pc.get_posix (), "/proc/registry32", 16))
     {
       wow64 = KEY_WOW64_32KEY;
       prefix_len += 2;
     }
-  else if (strncasematch (in_pc.normalized_path, "/proc/registry64", 16))
+  else if (strncasematch (in_pc.get_posix (), "/proc/registry64", 16))
     {
       wow64 = KEY_WOW64_64KEY;
       prefix_len += 2;

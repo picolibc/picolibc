@@ -335,7 +335,7 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
 			     So we replace dst with what we found in head
 			     instead.  All the work replacing symlinks has been
 			     done in that path anyway, so why repeat it? */
-			  tail = stpcpy (dst, head.normalized_path);
+			  tail = stpcpy (dst, head.get_posix ());
 			}
 		      check_parent = false;
 		    }
@@ -373,9 +373,9 @@ path_conv::add_ext_from_sym (symlink_info &sym)
 {
   if (sym.ext_here && *sym.ext_here)
     {
-      known_suffix = path + sym.extn;
+      suffix = path + sym.extn;
       if (sym.ext_tacked_on)
-	strcpy ((char *) known_suffix, sym.ext_here);
+	strcpy ((char *) suffix, sym.ext_here);
     }
 }
 
@@ -409,13 +409,13 @@ mkrelpath (char *path, bool caseinsensitive)
 }
 
 void
-path_conv::set_normalized_path (const char *path_copy)
+path_conv::set_posix (const char *path_copy)
 {
   if (path_copy)
     {
       size_t n = strlen (path_copy) + 1;
-      char *p = (char *) crealloc_abort ((void *) normalized_path, n);
-      normalized_path = (const char *) memcpy (p, path_copy, n);
+      char *p = (char *) crealloc_abort ((void *) posix_path, n);
+      posix_path = (const char *) memcpy (p, path_copy, n);
     }
 }
 
@@ -659,7 +659,7 @@ path_conv::check (const char *src, unsigned opt,
     {
       int loop = 0;
       path_flags = 0;
-      known_suffix = NULL;
+      suffix = NULL;
       fileattr = INVALID_FILE_ATTRIBUTES;
       caseinsensitive = OBJ_CASE_INSENSITIVE;
       if (wide_path)
@@ -673,10 +673,10 @@ path_conv::check (const char *src, unsigned opt,
       close_conv_handle ();
       memset (&dev, 0, sizeof (dev));
       fs.clear ();
-      if (normalized_path)
+      if (posix_path)
 	{
-	  cfree ((void *) normalized_path);
-	  normalized_path = NULL;
+	  cfree ((void *) posix_path);
+	  posix_path = NULL;
 	}
       int component = 0;		// Number of translated components
 
@@ -1230,7 +1230,7 @@ path_conv::check (const char *src, unsigned opt,
 	{
 	  if (tail < path_end && tail > path_copy + 1)
 	    *tail = '/';
-	  set_normalized_path (path_copy);
+	  set_posix (path_copy);
 	  if (is_msdos && dos_file_warning && !(opt & PC_NOWARN))
 	    warn_msdos (src);
 	}
@@ -1252,10 +1252,10 @@ path_conv::check (const char *src, unsigned opt,
 
 path_conv::~path_conv ()
 {
-  if (normalized_path)
+  if (posix_path)
     {
-      cfree ((void *) normalized_path);
-      normalized_path = NULL;
+      cfree ((void *) posix_path);
+      posix_path = NULL;
     }
   if (path)
     {
@@ -1623,10 +1623,10 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
       /* The symlink target is relative to the directory in which
 	 the symlink gets created, not relative to the cwd.  Therefore
 	 we have to mangle the path quite a bit before calling path_conv. */
-      ssize_t len = strrchr (win32_newpath.normalized_path, '/')
-		    - win32_newpath.normalized_path + 1;
+      ssize_t len = strrchr (win32_newpath.get_posix (), '/')
+		    - win32_newpath.get_posix () + 1;
       char *absoldpath = tp.t_get ();
-      stpcpy (stpncpy (absoldpath, win32_newpath.normalized_path, len),
+      stpcpy (stpncpy (absoldpath, win32_newpath.get_posix (), len),
 	      oldpath);
       win32_oldpath.check (absoldpath, PC_SYM_NOFOLLOW, stat_suffixes);
 
@@ -1860,10 +1860,10 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
 				     stat_suffixes);
 	      else
 		{
-		  len = strrchr (win32_newpath.normalized_path, '/')
-			- win32_newpath.normalized_path + 1;
+		  len = strrchr (win32_newpath.get_posix (), '/')
+			- win32_newpath.get_posix () + 1;
 		  char *absoldpath = tp.t_get ();
-		  stpcpy (stpncpy (absoldpath, win32_newpath.normalized_path,
+		  stpcpy (stpncpy (absoldpath, win32_newpath.get_posix (),
 				   len),
 			  oldpath);
 		  win32_oldpath.check (absoldpath, PC_SYM_NOFOLLOW,
@@ -3243,16 +3243,16 @@ chdir (const char *in_dir)
 	{
 	  /* The sequence chdir("xx"); chdir(".."); must be a noop if xx
 	     is not a symlink. This is exploited by find.exe.
-	     The posix_cwd is just path.normalized_path.
+	     The posix_cwd is just path.get_posix ().
 	     In other cases we let cwd.set obtain the Posix path through
 	     the mount table. */
-	  if (!isdrive(path.normalized_path))
-	    posix_cwd = path.normalized_path;
+	  if (!isdrive (path.get_posix ()))
+	    posix_cwd = path.get_posix ();
 	  res = 0;
 	}
       else
        {
-	 posix_cwd = path.normalized_path;
+	 posix_cwd = path.get_posix ();
 	 res = 0;
        }
 
@@ -3579,11 +3579,11 @@ realpath (const char *__restrict path, char *__restrict resolved)
 	  if (!resolved)
 	    {
 	      resolved = (char *)
-			 malloc (strlen (real_path.normalized_path) + 1);
+			 malloc (strlen (real_path.get_posix ()) + 1);
 	      if (!resolved)
 		return NULL;
 	    }
-	  strcpy (resolved, real_path.normalized_path);
+	  strcpy (resolved, real_path.get_posix ());
 	  return resolved;
 	}
 
@@ -3670,7 +3670,7 @@ conv_path_list_buf_size (const char *path_list, bool to_posix)
   /* 100: slop */
   size = strlen (path_list)
     + (num_elms * max_mount_path_len)
-    + (nrel * strlen (to_posix ? pc.normalized_path : pc.get_win32 ()))
+    + (nrel * strlen (to_posix ? pc.get_posix () : pc.get_win32 ()))
     + 100;
 
   return size;

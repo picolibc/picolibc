@@ -1,7 +1,7 @@
 /* fhandler.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015  Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -196,7 +196,7 @@ class fhandler_base
   virtual void set_name (path_conv &pc);
   virtual void set_name (const char *s)
   {
-    pc.set_normalized_path (s);
+    pc.set_posix (s);
     pc.set_path (s);
   }
   int error () const {return pc.error;}
@@ -295,7 +295,7 @@ class fhandler_base
   bool isremote () { return pc.isremote (); }
 
   bool has_attribute (DWORD x) const {return pc.has_attribute (x);}
-  const char *get_name () const { return pc.normalized_path; }
+  const char *get_name () const { return pc.get_posix (); }
   const char *get_win32_name () { return pc.get_win32 (); }
   virtual dev_t get_dev () { return get_device (); }
   ino_t get_ino () { return ino ?: ino = hash_path_name (0, pc.get_nt_native_path ()); }

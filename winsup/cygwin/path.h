@@ -144,14 +144,15 @@ class path_conv
   void add_ext_from_sym (symlink_info&);
   DWORD symlink_length;
   const char *path;
+  unsigned path_flags;
+  const char *suffix;
+  const char *posix_path;
   path_conv_handle conv_handle;
  public:
-  unsigned path_flags;
-  const char *known_suffix;
-  const char *normalized_path;
   int error;
   device dev;
 
+  const char *known_suffix () { return suffix; }
   bool isremote () const {return fs.is_remote_drive ();}
   ULONG objcaseinsensitive () const {return caseinsensitive;}
   bool has_acls () const {return !(path_flags & PATH_NOACL) && fs.has_acls (); }
@@ -232,7 +233,7 @@ class path_conv
 
   path_conv (const device& in_dev)
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
-    path_flags (0), known_suffix (NULL), normalized_path (NULL), error (0),
+    path_flags (0), suffix (NULL), posix_path (NULL), error (0),
     dev (in_dev)
   {
     set_path (in_dev.native);
@@ -241,7 +242,7 @@ class path_conv
   path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
-    path_flags (0), known_suffix (NULL), normalized_path (NULL), error (0)
+    path_flags (0), suffix (NULL), posix_path (NULL), error (0)
   {
     check (src, opt, suffixes);
   }
@@ -249,7 +250,7 @@ class path_conv
   path_conv (const UNICODE_STRING *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
-    path_flags (0), known_suffix (NULL), normalized_path (NULL), error (0)
+    path_flags (0), suffix (NULL), posix_path (NULL), error (0)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
@@ -257,18 +258,18 @@ class path_conv
   path_conv (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
-    path_flags (0), known_suffix (NULL), normalized_path (NULL), error (0)
+    path_flags (0), suffix (NULL), posix_path (NULL), error (0)
   {
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
   path_conv ()
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
-    path_flags (0), known_suffix (NULL), normalized_path (NULL), error (0)
+    path_flags (0), suffix (NULL), posix_path (NULL), error (0)
   {}
 
   ~path_conv ();
-  inline const char *get_win32 () { return path; }
+  inline const char *get_win32 () const { return path; }
   PUNICODE_STRING get_nt_native_path ();
   inline POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &attr,
 					     SECURITY_ATTRIBUTES &sa)
@@ -309,17 +310,17 @@ class path_conv
   void free_strings ()
   {
     cfree_and_null (path);
-    cfree_and_null (normalized_path);
+    cfree_and_null (posix_path);
     cfree_and_null (wide_path);
   }
   path_conv& eq_worker (const path_conv& pc, const char *in_path,
-			const char *in_normalized_path)
+			const char *in_posix_path)
   {
     free_strings ();
     memcpy (this, &pc, sizeof pc);
     path = cstrdup (in_path);
     conv_handle.dup (pc.conv_handle);
-    normalized_path = cstrdup(pc.normalized_path);
+    posix_path = cstrdup(pc.posix_path);
     if (pc.wide_path)
       {
 	wide_path = cwcsdup (uni_path.Buffer);
@@ -333,7 +334,7 @@ class path_conv
   path_conv &operator << (const path_conv& pc)
   {
     const char *save_path;
-    const char *save_normalized_path;
+    const char *save_posix_path;
     if (!path)
       save_path = pc.path;
     else
@@ -341,19 +342,19 @@ class path_conv
 	save_path = (char *) alloca (strlen (path) + 1);
 	strcpy ((char *) save_path, path);
       }
-    if (!normalized_path)
-      save_normalized_path = pc.normalized_path;
+    if (!posix_path)
+      save_posix_path = pc.posix_path;
     else
       {
-	save_normalized_path = (char *) alloca (strlen (normalized_path) + 1);
-	strcpy ((char *) save_normalized_path, path);
+	save_posix_path = (char *) alloca (strlen (posix_path) + 1);
+	strcpy ((char *) save_posix_path, path);
       }
-    return eq_worker (pc, save_path, save_normalized_path);
+    return eq_worker (pc, save_path, save_posix_path);
   }
 
   path_conv &operator =(const path_conv& pc)
   {
-    return eq_worker (pc, pc.path, pc.normalized_path);
+    return eq_worker (pc, pc.path, pc.posix_path);
   }
   dev_t get_device () {return dev.get_device ();}
   DWORD file_attributes () const {return fileattr;}
@@ -395,7 +396,8 @@ class path_conv
 #if 0 /* obsolete, method still exists in fhandler_disk_file.cc */
   unsigned __stdcall ndisk_links (DWORD);
 #endif
-  void __reg2 set_normalized_path (const char *);
+  inline const char *get_posix () const { return posix_path; }
+  void __reg2 set_posix (const char *);
   DWORD get_symlink_length () { return symlink_length; };
  private:
   char *modifiable_path () {return (char *) path;}
