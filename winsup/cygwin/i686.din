@@ -43,7 +43,6 @@ __f_tan = _f_tan NOSIGFE
 __f_tanf = _f_tanf NOSIGFE
 __getdelim SIGFE
 __getline SIGFE
-__mempcpy = mempcpy NOSIGFE
 __wrap__Znaj NOSIGFE                # void *operator new[](std::size_t sz) throw (std::bad_alloc)
 __wrap__ZnajRKSt9nothrow_t NOSIGFE  # void *operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
 __wrap__Znwj NOSIGFE                # void *operator new(std::size_t sz) throw (std::bad_alloc)

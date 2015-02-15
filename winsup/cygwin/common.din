@@ -68,6 +68,7 @@ __isnand NOSIGFE
 __isnanf NOSIGFE
 __locale_mb_cur_max NOSIGFE
 __main NOSIGFE
+__mempcpy = mempcpy NOSIGFE
 __opendir_with_d_ino SIGFE
 __res_close SIGFE
 __res_init SIGFE

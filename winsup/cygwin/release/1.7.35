@@ -27,3 +27,6 @@ Bug Fixes
   array for bookkeeping purposes while iterating over its entries.  This
   broke reusing the acl in the calling application (e.g. setfacl).
   Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00304.html
+
+- 64 bit: Export forgottne symbol __mempcpy.
+  Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00394.html
