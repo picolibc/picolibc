@@ -77,7 +77,11 @@ perhaps_suffix (const char *prog, path_conv& buf, int& err, unsigned opt)
 
 /* Find an executable name, possibly by appending known executable suffixes
    to it.  The path_conv struct 'buf' is filled and contains both, win32 and
-   posix path of the file.  Any found suffix is returned in known_suffix.
+   posix path of the target file.  Any found suffix is returned in known_suffix.
+   Eventually the posix path in buf is overwritten with the exact path as it
+   gets constructed for the path search.  The reason is that the path is used
+   to create argv[0] in av::setup, and this requires that the filename stays
+   intact, instead of being resolved if the file is a symlink.
 
    If the file is not found and !FE_NNF then the POSIX version of name is
    placed in buf and returned.  Otherwise the contents of buf is undefined
@@ -100,6 +104,13 @@ find_exec (const char *name, path_conv& buf, const char *search,
   if ((has_slash || opt & FE_CWD)
       && (suffix = perhaps_suffix (name, buf, err, opt)) != NULL)
     {
+      if (!has_slash)
+	{
+	  /* Overwrite potential symlink target with original path.
+	     See comment preceeding this method. */
+	  stpcpy (stpcpy (tmp, "./"), name);
+	  buf.set_posix (tmp);
+	}
       retval = buf.get_posix ();
       goto out;
     }
@@ -128,7 +139,7 @@ find_exec (const char *name, path_conv& buf, const char *search,
 	continue;
 
       *eotmp++ = '/';
-      strcpy (eotmp, name);
+      stpcpy (eotmp, name);
 
       debug_printf ("trying %s", tmp_path);
 
@@ -138,6 +149,9 @@ find_exec (const char *name, path_conv& buf, const char *search,
 	{
 	  if (buf.has_acls () && check_file_access (buf, X_OK, true))
 	    continue;
+	  /* Overwrite potential symlink target with original path.
+	     See comment preceeding this method. */
+	  buf.set_posix (tmp_path);
 	  retval = buf.get_posix ();
 	  goto out;
 	}

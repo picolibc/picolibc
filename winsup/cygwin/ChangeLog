@@ -1,3 +1,9 @@
+2015-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spawn.cc (find_exec): Extend preceeding comment to explain more
+	detailed what's going on in this function.  Overwrite potential symlink
+	target with original path.
+
 2015-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* i686.din (__mempcpy): Move symbol export from here...
