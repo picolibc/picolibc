@@ -1,3 +1,10 @@
+2015-02-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setup-files.xml (setup-files): Drop hint to set HOME in Windows
+	environment.
+	* setup-env.xml (setup-env-ov): Discourage setting HOME in the Windows
+	environment.
+
 2015-02-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.xml (std-gnu): Add missing __mempcpy.

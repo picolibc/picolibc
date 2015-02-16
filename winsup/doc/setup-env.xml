@@ -50,10 +50,11 @@ This is usually done by the batch file you're starting your shell with.
 
 <para> 
 The <envar>HOME</envar> environment variable is used by many programs to
-determine the location of your home directory and we recommend that it be
-defined.  This environment variable is also converted from Windows format
-when a Cygwin process first starts.  It's usually set in the shell
-profile scripts in the /etc directory.
+determine the location of your home directory.  This environment variable,
+if it exists, is converted from Windows format when a Cygwin process first
+starts.  However, it's usually set in the shell profile scripts in the /etc
+directory, and it's <emphasis role='bold'>not</emphasis> recommended to set
+the variable in your Windows environment.
 </para>
 
 <para>

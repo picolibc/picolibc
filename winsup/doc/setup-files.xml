@@ -8,18 +8,16 @@
 To set up bash so that cut and paste work properly, click on the
 "Properties" button of the window, then on the "Misc" tab.  Make sure
 that "QuickEdit mode" and "Insert mode" are checked.  These settings
-will be remembered next time you run bash from that shortcut. Similarly
-you can set the working directory inside the "Program" tab. The entry
-"%HOME%" is valid, but requires that you set <envar>HOME</envar> in
-the Windows environment.
+will be remembered next time you run bash from that shortcut.
 </para>
 
 <para>
-Your home directory should contain three initialization files
-that control the behavior of bash.  They are
-<filename>.profile</filename>, <filename>.bashrc</filename> and
-<filename>.inputrc</filename>.  The Cygwin base installation creates
-stub files when you start bash for the first time.</para>
+Your home directory should contain three initialization files that
+control the behavior of bash.  They are <filename>.profile</filename>,
+<filename>.bashrc</filename> and <filename>.inputrc</filename>.
+The Cygwin base installation creates stub files when you start bash
+for the first time.
+</para>
 
 <para>
 <filename>.profile</filename> (other names are also valid, see the bash man
