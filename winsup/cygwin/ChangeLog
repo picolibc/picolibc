@@ -1,3 +1,19 @@
+2015-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ldap.h (class cyg_ldap): Rename rootdse to def_context.  Change
+	throughout.
+	* ldap.cc (cyg_ldap::open): Fix debug output.
+	(cyg_ldap::fetch_ad_account): Rename rdse to base.  Restrict LDAP
+	query to users and groups only.
+	(cyg_ldap::enumerate_ad_accounts): Rearrange filter expression for
+	user accounts.
+	(SYSTEM_CONTAINER): New macro.
+	(cyg_ldap::fetch_posix_offset_for_domain): Set base in LDAP search
+	to the "System" container in the default naming context to restrict
+	the search scope.
+	(cyg_ldap::fetch_unix_sid_from_ad): Add objectCategory=Person to
+	search filter for users.
+
 2015-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (find_exec): Extend preceeding comment to explain more

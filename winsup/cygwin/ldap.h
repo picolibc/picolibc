@@ -25,7 +25,7 @@ details. */
 
 class cyg_ldap {
   PLDAP lh;
-  PWCHAR rootdse;
+  PWCHAR def_context;
   PLDAPMessage msg, entry;
   PWCHAR *val;
   PWCHAR *attr;
@@ -45,8 +45,8 @@ class cyg_ldap {
   uint32_t get_num_attribute (int idx);
 
 public:
-  cyg_ldap () : lh (NULL), rootdse (NULL), msg (NULL), entry (NULL), val (NULL),
-		isAD (false), srch_id (NULL), srch_msg (NULL),
+  cyg_ldap () : lh (NULL), def_context (NULL), msg (NULL), entry (NULL),
+		val (NULL), isAD (false), srch_id (NULL), srch_msg (NULL),
 		srch_entry (NULL), last_fetched_sid (NO_SID)
   {}
   ~cyg_ldap () { close (); }
