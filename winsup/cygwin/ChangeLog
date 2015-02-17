@@ -1,5 +1,10 @@
 2015-02-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ldap.cc (cyg_ldap::fetch_posix_offset_for_domain): Drop stray
+	system_printf.
+
+2015-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ldap.h (class cyg_ldap): Rename rootdse to def_context.  Change
 	throughout.
 	* ldap.cc (cyg_ldap::open): Fix debug output.

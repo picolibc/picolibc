@@ -550,7 +550,6 @@ cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
     }
   /* If domain name has no dot, it's a Netbios name.  In that case, filter
      by flatName rather than by name. */
-  system_printf ("base <%W>", base);
   wcpcpy (wcpcpy (base, SYSTEM_CONTAINER), def_context);
   __small_swprintf (filter, L"(&(objectClass=trustedDomain)(%W=%W))",
 		    wcschr (domain, L'.') ? L"name" : L"flatName", domain);
