@@ -1,3 +1,9 @@
+2015-02-17  Renlin Li  <renlin.li@arm.com>
+
+	* arm/crt0.S: Initialise __heap_limit when ARM_RDI_MONITOR is defined.
+	* arm/syscalls.c: define __heap_limit global symbol.
+	* arm/syscalls.c (_sbrk): Honour __heap_limit.
+
 2015-02-11  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
 	* or1k/or1k_uart.c: Write bugfix and cleanup/documentation.
