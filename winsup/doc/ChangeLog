@@ -1,3 +1,9 @@
+2015-02-17  Warren Young  <warren@etr-usa.com>
+
+	* faq-using.xml (faq.using.startup-slow): Applied Andrey Repin's
+	improvements <anrdaemon@yandex.ru>, plus made a few minor ones
+	of my own.
+
 2015-02-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setup-files.xml (setup-files): Drop hint to set HOME in Windows

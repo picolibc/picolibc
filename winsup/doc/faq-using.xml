@@ -33,63 +33,121 @@ it to other missing DLLs and identify their containing packages, see
 <question><para>Starting a new terminal window is slow. What's going on?</para></question>
 <answer>
 
-<para>There are many possible causes for this. This answer is more a
-list of things to look into than a set of solutions.</para>
+<para>There are many possible causes for this.</para>
+
+<para>If your terminal windows suddenly began starting slowly after a
+Cygwin upgrade, it may indicate issues in the authentication
+setup.</para>
+
+<para>For almost all its lifetime, Cygwin has used Unix-like
+<filename>/etc/passwd</filename> and <filename>/etc/group</filename>
+files to mirror the contents of the Windows SAM and AD databases.
+Although these files can still be used, since Cygwin 1.7.34, new
+installations now use the SAM/AD databases directly.</para>
+
+<para>To switch to the new method, move these two files out of the way
+and restart the Cygwin terminal. That runs Cygwin in its new default
+mode.</para>
+
+<para>If you are on a system that isn't using AD domain logins, this
+makes Cygwin use the native Windows SAM database directly, which may be
+faster than the old method involving <filename>/etc/passwd</filename>
+and such. At worst, it will only be a bit slower. (The speed difference
+you see depends on which benchmark you run.) For the AD case, it can be
+slower than the old method, since it is trading a local file read for a
+network request. Version 1.7.35 will reduce the number of AD server
+requests the DLL makes relative to 1.7.34, with the consequence that you
+will now have to alter <filename>/etc/nsswitch.conf</filename> in order
+to change your Cygwin home directory, instead of being able to change it
+from the AD configuration.</para>
+
+<para>If you are still experiencing very slow shell startups, there are
+a number of other things you can look into:</para>
 
 <orderedlist>
   <listitem>
-    <para>If your terminal windows suddenly began starting slowly after a
-    Cygwin upgrade, the most likely cause is that you have an outdated
-    authentication setup.</para>
-
-    <para>For almost all its lifetime, Cygwin has used Unix-like
-    <filename>/etc/passwd</filename> and <filename>/etc/group</filename> files
-    to mirror the contents of the Windows SAM and AD databases.  Although these
-    files can still be used, since Cygwin 1.7.34, new installations now use the
-    SAM/AD databases directly.</para>
-
-    <para>To switch to the new method, move these two files out of the way and
-    restart the Cygwin terminal. That runs Cygwin in its new default mode. If
-    you are on a system that isn't using AD domain logins, this makes Cygwin
-    use the native Windows SAM database directly, which may be faster than the
-    old method involving <filename>/etc/passwd</filename> and such. At worst,
-    it will only be a bit slower. (Which situation applies depends on the
-    benchmark you run.)</para>
-
-    <para>If you are on an AD system, a hybrid approach you might consider is
-    to re-run <command>mkpasswd</command> and <command>mkgroup</command>, then
-    put the following into <filename>/etc/nsswitch.conf</filename> to make
-    Cygwin treat these files as read-only local caches of your AD database:
-    </para>
-
-    <screen>
-    passwd: files
-    group:  files
-    </screen>
-
-    <para>By leaving out the "db" option, we are telling the Cygwin DLL not to
-    even <emphasis>try</emphasis> to do AD lookups. If your AD servers are
-    slow, this local cache will speed things up. The downside is the old stale
-    cache problem: any time the AD databases change, your local cache will go
-    out of date until you update the files manually.</para> 
+    <para>One common cause of slow Cygwin Terminal starts is a bad DNS
+    setup. This particularly affects AD clients, but there may be other
+    things in your Cygwin startup that depend on getting fast answers
+    back from a network server.</para>
+    
+    <para>Keep in mind that this may affect Cygwin even when the domain
+    controller is on the same machine as Cygwin, or is on a nearby
+    server. A bad DNS server IP can cause long delays while the local
+    TCP/IP stack times out on a connection to a server that simply isn't
+    there, for example.</para>
   </listitem>
 
   <listitem>
-    <para>Another common cause of slow Cygwin Terminal starts is a bad DNS
-    setup. Many things that occur during a Cygwin Terminal startup require
-    fast DNS lookups.</para>
+    <para>Another cause for AD client system is slow DC replies,
+    commonly observed in configurations with remote DC access. The
+    Cygwin DLL queries information about every group you're in to
+    populate the local cache on startup. You may speed up this process a
+    little by caching your own information in local files. Run these
+    commands in a Cygwin terminal with write access to
+    <filename>/etc</filename>:</para>
+
+    <screen>getent passwd $(id -u) > /etc/passwd
+getent group $(id -G) > /etc/group</screen>
+
+    <para>Also, set <filename>/etc/nsswitch.conf</filename> as
+    follows:</para>
+
+    <screen>passwd: files db
+group:  files db</screen>
+
+    <para>This will limit the need for Cygwin to contact the AD domain
+    controller (DC) while still allowing for additional information to
+    be retrieved from DC, such as when listing remote
+    directories.</para>
+  </listitem>
+
+  <listitem>
+    <para>Either in addition to the previous item or instead of it, you
+    can run <ulink
+    url="https://cygwin.com/cygwin-ug-net/using-cygserver.html"><command>cygserver</command></ulink>
+    as a local caching service to speed up DC requests.</para>
+
+    <para>Cygwin programs will check with <command>cygserver</command>
+    before trying to query the DC directly.</para>
+  </listitem>
+
+  <listitem>
+    <para>A less preferable option is to create a static read-only cache
+    of the authentication data. This is the old-fashioned method of
+    making Cygwin integrate with AD, the only method available in
+    releases before 1.7.34. To do this, run <command>mkpasswd</command>
+    and <command>mkgroup</command>, then put the following into
+    <filename>/etc/nsswitch.conf</filename> to make Cygwin treat these
+    files as the only sources of user and group information:</para>
+
+    <screen>passwd: files
+group:  files</screen>
+
+    <para>By leaving out the <computeroutput>db</computeroutput> option,
+    we are telling the Cygwin DLL not to even try to do AD lookups. If
+    your AD servers are slow, this local cache will speed things up. The
+    downside is that you open yourself up to the <ulink
+    url="http://en.wikipedia.org/wiki/Cache_(computing)">stale cache
+    problem</ulink>: any time the AD databases change, your local cache
+    will go out of date until you update the files manually.</para>
   </listitem>
 </orderedlist>
 
-<para>If none of the above helps, the best troubleshooting method is to run
-your startup scripts in debug mode. Right-click your Cygwin Terminal icon, go
-to Properties, and edit the command. It should be something like
-<command>C:\cygwin\bin\mintty.exe -i /Cygwin-Terminal.ico -</command>.
-Assuming you are using Bash for your login shell, change it to
-<command>C:\cygwin64\bin\mintty /bin/bash -lx</command>. That will cause it to
-write out a line for every command it runs. A slow Cygwin Terminal launch
-usually means one or more of the many commands Cygwin runs when starting up
-will take a long time. That will be your clue as to what's going on.</para>
+<para>If none of the above helps, the best troubleshooting method is to
+run your startup scripts in debug mode. Right-click your Cygwin Terminal
+icon, go to Properties, and edit the command. It should be something
+like <command>C:\cygwin\bin\mintty.exe -i /Cygwin-Terminal.ico
+-</command>.  Assuming you are using Bash for your login shell, change
+it to <command>C:\cygwin\bin\mintty /bin/bash -lx</command> then try
+running Cygwin Terminal again. The <option>-x</option> option tells Bash
+to write every command it runs to the terminal before launching it. If
+the terminal immediately starts filling with lines of text but then
+pauses, the line where the output paused is your clue as to what's going
+on. The Cygwin DLL proper probably isn't the cause of the slowdown in
+this case, since those delays happen before the first line of text
+appears in the terminal.</para>
+
 </answer></qandaentry>
 
 <qandaentry id="faq.using.slow">
