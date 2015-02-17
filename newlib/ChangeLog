@@ -1,5 +1,18 @@
 2015-02-17  Hale Wang  <hale.wang@arm.com>
 
+	* libc/machine/arm/aeabi_memclr.c: New file to support
+	aeabi_memclr.
+	* libc/machine/arm/aeabi_memset.c: New file to support
+	aeabi_memset.
+	* libc/machine/arm/aeabi_memset-soft.S: Ditto.
+	* libc/machine/arm/aeabi_memset-arm.S: Ditto.
+	* libc/machine/arm/aeabi_memset-thumb.S: Ditto.
+	* libc/machine/arm/aeabi_memset-thumb2.S: Ditto.
+	* libc/machine/arm/Makefile.am: Add dependencies.
+	* libc/machine/arm/Makefile.in: Regenerated.
+
+2015-02-17  Hale Wang  <hale.wang@arm.com>
+
 	* libc/machine/arm/aeabi_memmove.c: New file to support
 	aeabi_memmove.
 	* libc/machine/arm/aeabi_memmove-soft.S: Ditto.

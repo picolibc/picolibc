@@ -87,7 +87,9 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-access.$(OBJEXT) \
 	lib_a-aeabi_memcpy.$(OBJEXT) \
 	lib_a-aeabi_memcpy-armv7a.$(OBJEXT) \
 	lib_a-aeabi_memmove.$(OBJEXT) \
-	lib_a-aeabi_memmove-soft.$(OBJEXT)
+	lib_a-aeabi_memmove-soft.$(OBJEXT) \
+	lib_a-aeabi_memset.$(OBJEXT) lib_a-aeabi_memset-soft.$(OBJEXT) \
+	lib_a-aeabi_memclr.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -235,7 +237,8 @@ noinst_LIBRARIES = lib.a
 lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c \
 	        $(MEMCPY_SRC) $(MEMCHR_SRC) $(STRLEN_SRC) \
 		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S \
-		aeabi_memmove.c aeabi_memmove-soft.S
+		aeabi_memmove.c aeabi_memmove-soft.S \
+		aeabi_memset.c aeabi_memset-soft.S aeabi_memclr.c
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -248,7 +251,10 @@ STRCMP_DEP = strcmp-arm-tiny.S strcmp-armv4.S strcmp-armv4t.S strcmp-armv6.S \
 	strcmp-armv6m.S strcmp-armv7.S strcmp-armv7m.S
 
 AEABI_MEMMOVE_DEP = aeabi_memmove-thumb.S aeabi_memmove-thumb2.S \
-		aeabi_memmove-arm.S
+	aeabi_memmove-arm.S
+
+AEABI_MEMSET_DEP = aeabi_memset-thumb.S aeabi_memset-thumb2.S \
+	aeabi_memset-arm.S
 
 all: all-am
 
@@ -350,6 +356,12 @@ lib_a-aeabi_memmove-soft.o: aeabi_memmove-soft.S
 lib_a-aeabi_memmove-soft.obj: aeabi_memmove-soft.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memmove-soft.obj `if test -f 'aeabi_memmove-soft.S'; then $(CYGPATH_W) 'aeabi_memmove-soft.S'; else $(CYGPATH_W) '$(srcdir)/aeabi_memmove-soft.S'; fi`
 
+lib_a-aeabi_memset-soft.o: aeabi_memset-soft.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memset-soft.o `test -f 'aeabi_memset-soft.S' || echo '$(srcdir)/'`aeabi_memset-soft.S
+
+lib_a-aeabi_memset-soft.obj: aeabi_memset-soft.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memset-soft.obj `if test -f 'aeabi_memset-soft.S'; then $(CYGPATH_W) 'aeabi_memset-soft.S'; else $(CYGPATH_W) '$(srcdir)/aeabi_memset-soft.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
@@ -385,6 +397,18 @@ lib_a-aeabi_memmove.o: aeabi_memmove.c
 
 lib_a-aeabi_memmove.obj: aeabi_memmove.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memmove.obj `if test -f 'aeabi_memmove.c'; then $(CYGPATH_W) 'aeabi_memmove.c'; else $(CYGPATH_W) '$(srcdir)/aeabi_memmove.c'; fi`
+
+lib_a-aeabi_memset.o: aeabi_memset.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memset.o `test -f 'aeabi_memset.c' || echo '$(srcdir)/'`aeabi_memset.c
+
+lib_a-aeabi_memset.obj: aeabi_memset.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memset.obj `if test -f 'aeabi_memset.c'; then $(CYGPATH_W) 'aeabi_memset.c'; else $(CYGPATH_W) '$(srcdir)/aeabi_memset.c'; fi`
+
+lib_a-aeabi_memclr.o: aeabi_memclr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memclr.o `test -f 'aeabi_memclr.c' || echo '$(srcdir)/'`aeabi_memclr.c
+
+lib_a-aeabi_memclr.obj: aeabi_memclr.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memclr.obj `if test -f 'aeabi_memclr.c'; then $(CYGPATH_W) 'aeabi_memclr.c'; else $(CYGPATH_W) '$(srcdir)/aeabi_memclr.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -568,6 +592,10 @@ $(lpfx)strcmp.obj: $(STRCMP_DEP)
 $(lpfx)aeabi_memmove.o: $(AEABI_MEMMOVE_DEP)
 
 $(lpfx)aeabi_memmove.obj: $(AEABI_MEMMOVE_DEP)
+
+$(lpfx)aeabi_memset.o: $(AEABI_MEMSET_DEP)
+
+$(lpfx)aeabi_memset.obj: $(AEABI_MEMSET_DEP)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
