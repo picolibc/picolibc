@@ -1,3 +1,9 @@
+2015-02-17  Ken Brown  <kbrown@cornell.edu>
+
+	* dump_setup.cc (check_package_files): Accommodate postinstall
+	files in any directory whose name contains "/postinstall/", not
+	just /etc/postinstall.
+
 2015-02-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regtool.cc (longopts): Add --force option.

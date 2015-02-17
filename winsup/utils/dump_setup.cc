@@ -396,7 +396,7 @@ check_package_files (int verbose, char *package)
 	  if (!directory_exists (verbose, filename, package))
 	    result = false;
 	}
-      else if (!strncmp (filename, "etc/postinstall/", 16))
+      else if (strstr (filename, "/postinstall/"))
 	{
 	  if (!file_exists (verbose, filename, ".done", package))
 	    result = false;
