@@ -49,7 +49,8 @@ endif !OPT_SIZE
 
 lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c \
 	        $(MEMCPY_SRC) $(MEMCHR_SRC) $(STRLEN_SRC) \
-		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S
+		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S \
+		aeabi_memmove.c aeabi_memmove-soft.S
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -62,6 +63,8 @@ CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 MEMCPY_DEP=memcpy-armv7a.S memcpy-armv7m.S
 STRCMP_DEP=strcmp-arm-tiny.S strcmp-armv4.S strcmp-armv4t.S strcmp-armv6.S \
 	strcmp-armv6m.S strcmp-armv7.S strcmp-armv7m.S
+AEABI_MEMMOVE_DEP=aeabi_memmove-thumb.S aeabi_memmove-thumb2.S \
+		aeabi_memmove-arm.S
 
 $(lpfx)memcpy.o: $(MEMCPY_DEP)
 
@@ -70,3 +73,7 @@ $(lpfx)memcpy.obj: $(MEMCPY_DEP)
 $(lpfx)strcmp.o: $(STRCMP_DEP)
 
 $(lpfx)strcmp.obj: $(STRCMP_DEP)
+
+$(lpfx)aeabi_memmove.o: $(AEABI_MEMMOVE_DEP)
+
+$(lpfx)aeabi_memmove.obj: $(AEABI_MEMMOVE_DEP)

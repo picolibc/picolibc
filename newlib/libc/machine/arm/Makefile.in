@@ -85,7 +85,9 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-access.$(OBJEXT) \
 	lib_a-strcmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) lib_a-strlen-armv7.$(OBJEXT) \
 	lib_a-aeabi_memcpy.$(OBJEXT) \
-	lib_a-aeabi_memcpy-armv7a.$(OBJEXT)
+	lib_a-aeabi_memcpy-armv7a.$(OBJEXT) \
+	lib_a-aeabi_memmove.$(OBJEXT) \
+	lib_a-aeabi_memmove-soft.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -232,7 +234,8 @@ noinst_LIBRARIES = lib.a
 @OPT_SIZE_TRUE@MEMCPY_OBJ = 
 lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c \
 	        $(MEMCPY_SRC) $(MEMCHR_SRC) $(STRLEN_SRC) \
-		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S
+		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S \
+		aeabi_memmove.c aeabi_memmove-soft.S
 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
@@ -243,6 +246,9 @@ CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 MEMCPY_DEP = memcpy-armv7a.S memcpy-armv7m.S
 STRCMP_DEP = strcmp-arm-tiny.S strcmp-armv4.S strcmp-armv4t.S strcmp-armv6.S \
 	strcmp-armv6m.S strcmp-armv7.S strcmp-armv7m.S
+
+AEABI_MEMMOVE_DEP = aeabi_memmove-thumb.S aeabi_memmove-thumb2.S \
+		aeabi_memmove-arm.S
 
 all: all-am
 
@@ -338,6 +344,12 @@ lib_a-aeabi_memcpy-armv7a.o: aeabi_memcpy-armv7a.S
 lib_a-aeabi_memcpy-armv7a.obj: aeabi_memcpy-armv7a.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memcpy-armv7a.obj `if test -f 'aeabi_memcpy-armv7a.S'; then $(CYGPATH_W) 'aeabi_memcpy-armv7a.S'; else $(CYGPATH_W) '$(srcdir)/aeabi_memcpy-armv7a.S'; fi`
 
+lib_a-aeabi_memmove-soft.o: aeabi_memmove-soft.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memmove-soft.o `test -f 'aeabi_memmove-soft.S' || echo '$(srcdir)/'`aeabi_memmove-soft.S
+
+lib_a-aeabi_memmove-soft.obj: aeabi_memmove-soft.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memmove-soft.obj `if test -f 'aeabi_memmove-soft.S'; then $(CYGPATH_W) 'aeabi_memmove-soft.S'; else $(CYGPATH_W) '$(srcdir)/aeabi_memmove-soft.S'; fi`
+
 .c.o:
 	$(COMPILE) -c $<
 
@@ -367,6 +379,12 @@ lib_a-aeabi_memcpy.o: aeabi_memcpy.c
 
 lib_a-aeabi_memcpy.obj: aeabi_memcpy.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memcpy.obj `if test -f 'aeabi_memcpy.c'; then $(CYGPATH_W) 'aeabi_memcpy.c'; else $(CYGPATH_W) '$(srcdir)/aeabi_memcpy.c'; fi`
+
+lib_a-aeabi_memmove.o: aeabi_memmove.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memmove.o `test -f 'aeabi_memmove.c' || echo '$(srcdir)/'`aeabi_memmove.c
+
+lib_a-aeabi_memmove.obj: aeabi_memmove.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memmove.obj `if test -f 'aeabi_memmove.c'; then $(CYGPATH_W) 'aeabi_memmove.c'; else $(CYGPATH_W) '$(srcdir)/aeabi_memmove.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -546,6 +564,10 @@ $(lpfx)memcpy.obj: $(MEMCPY_DEP)
 $(lpfx)strcmp.o: $(STRCMP_DEP)
 
 $(lpfx)strcmp.obj: $(STRCMP_DEP)
+
+$(lpfx)aeabi_memmove.o: $(AEABI_MEMMOVE_DEP)
+
+$(lpfx)aeabi_memmove.obj: $(AEABI_MEMMOVE_DEP)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
