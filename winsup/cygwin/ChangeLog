@@ -1,5 +1,21 @@
 2015-02-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ldap.cc (struct cyg_ldap_search): Add scope member.
+	(cyg_ldap::search_s): Add parameter scope.  Use as LDAP search scope
+	instead of fixed LDAP_SCOPE_SUBTREE scope.
+	(ldap_search_thr): Call cyg_ldap::search_s with scope from argument.
+	(cyg_ldap::search): Add parameter scope and fill in to cyg_ldap_search.
+	(cyg_ldap::fetch_ad_account): Call search with LDAP_SCOPE_SUBTREE scope.
+	(cyg_ldap::fetch_posix_offset_for_domain): Call search with
+	LDAP_SCOPE_ONELEVEL scope.
+	(cyg_ldap::fetch_unix_sid_from_ad): Call search with LDAP_SCOPE_SUBTREE
+	scope.
+	(cyg_ldap::fetch_unix_name_from_rfc2307): Ditto.
+	* ldap.h (cyg_ldap::search): Align prototype to above change.
+	(cyg_ldap::search_s): Ditto.
+
+2015-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ldap.cc: Macro-ize filter expressions.  Use throughout to compute
 	required filter buffer size if filter is a local buffer.
 

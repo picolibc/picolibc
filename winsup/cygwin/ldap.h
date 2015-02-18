@@ -37,7 +37,7 @@ class cyg_ldap {
   inline int map_ldaperr_to_errno (ULONG lerr);
   inline int wait (cygthread *thr);
   inline int connect (PCWSTR domain);
-  inline int search (PWCHAR base, PWCHAR filter, PWCHAR *attrs);
+  inline int search (PWCHAR base, ULONG scope, PWCHAR filter, PWCHAR *attrs);
   inline int next_page ();
   bool fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group);
   PWCHAR fetch_unix_name_from_rfc2307 (uint32_t id, bool group);
@@ -53,7 +53,7 @@ public:
 
   ULONG connect_ssl (PCWSTR domain);
   ULONG connect_non_ssl (PCWSTR domain);
-  ULONG search_s (PWCHAR base, PWCHAR filter, PWCHAR *attrs);
+  ULONG search_s (PWCHAR base, ULONG scope, PWCHAR filter, PWCHAR *attrs);
   ULONG next_page_s ();
 
   bool is_open () const { return !!lh; }

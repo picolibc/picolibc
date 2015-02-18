@@ -232,18 +232,19 @@ cyg_ldap::connect (PCWSTR domain)
 struct cyg_ldap_search {
   cyg_ldap *that;
   PWCHAR base;
+  ULONG scope;
   PWCHAR filter;
   PWCHAR *attrs;
   ULONG ret;
 };
 
 ULONG
-cyg_ldap::search_s (PWCHAR base, PWCHAR filter, PWCHAR *attrs)
+cyg_ldap::search_s (PWCHAR base, ULONG scope, PWCHAR filter, PWCHAR *attrs)
 {
   ULONG ret;
   
-  if ((ret = ldap_search_sW (lh, base, LDAP_SCOPE_SUBTREE, filter,
-			     attrs, 0, &msg)) != LDAP_SUCCESS)
+  if ((ret = ldap_search_sW (lh, base, scope, filter, attrs, 0, &msg))
+      != LDAP_SUCCESS)
     debug_printf ("ldap_search_sW(%W,%W) error 0x%02x", base, filter, ret);
   return ret;
 }
@@ -252,14 +253,14 @@ static DWORD WINAPI
 ldap_search_thr (LPVOID param)
 {
   cyg_ldap_search *cl = (cyg_ldap_search *) param;
-  cl->ret = cl->that->search_s (cl->base, cl->filter, cl->attrs);
+  cl->ret = cl->that->search_s (cl->base, cl->scope, cl->filter, cl->attrs);
   return 0;
 }
 
 inline int
-cyg_ldap::search (PWCHAR base, PWCHAR filter, PWCHAR *attrs)
+cyg_ldap::search (PWCHAR base, ULONG scope, PWCHAR filter, PWCHAR *attrs)
 {
-  cyg_ldap_search cl = { this, base, filter, attrs, NO_ERROR };
+  cyg_ldap_search cl = { this, base, scope, filter, attrs, NO_ERROR };
   cygthread *thr = new cygthread (ldap_search_thr, &cl, "ldap_search");
   return wait (thr) ?: map_ldaperr_to_errno (cl.ret);
 }
@@ -452,7 +453,7 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
   if (!user_attr)
     cygheap->pg.init_ldap_user_attr ();
   attr = group ? group_attr : user_attr;
-  if (search (base, filter, attr) != 0)
+  if (search (base, LDAP_SCOPE_SUBTREE, filter, attr) != 0)
       return false;
   if (!(entry = ldap_first_entry (lh, msg)))
     {
@@ -566,7 +567,7 @@ cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
   __small_swprintf (filter, wcschr (domain, L'.') ? PSX_OFFSET_FILTER
 						  : PSX_OFFSET_FILTER_FLAT,
 		    domain);
-  if (search (base, filter, attr = tdom_attr) != 0)
+  if (search (base, LDAP_SCOPE_ONELEVEL, filter, attr = tdom_attr) != 0)
     return UINT32_MAX;
   if (!(entry = ldap_first_entry (lh, msg)))
     {
@@ -621,7 +622,7 @@ cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
       msg = entry = NULL;
     }
   __small_swprintf (filter, group ? UXID_FILTER_GRP : UXID_FILTER_USR, id);
-  if (search (def_context, filter, sid_attr) != 0)
+  if (search (def_context, LDAP_SCOPE_SUBTREE, filter, sid_attr) != 0)
     return false;
   if ((entry = ldap_first_entry (lh, msg))
       && (bval = ldap_get_values_lenW (lh, entry, sid_attr[0])))
@@ -656,7 +657,7 @@ cyg_ldap::fetch_unix_name_from_rfc2307 (uint32_t id, bool group)
     }
   attr = group ? rfc2307_gid_attr : rfc2307_uid_attr;
   __small_swprintf (filter, group ? PSXID_FILTER_GRP : PSXID_FILTER_USR, id);
-  if (search (def_context, filter, attr) != 0)
+  if (search (def_context, LDAP_SCOPE_SUBTREE, filter, attr) != 0)
     return NULL;
   if (!(entry = ldap_first_entry (lh, msg)))
     {
