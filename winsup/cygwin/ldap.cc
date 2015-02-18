@@ -21,6 +21,7 @@ details. */
 #include "lm.h"
 #include "dsgetdc.h"
 #include "tls_pbuf.h"
+#include <sys/param.h>
 
 #define CYG_LDAP_ENUM_PAGESIZE	100	/* entries per page */
 
@@ -382,10 +383,19 @@ cyg_ldap::close ()
   last_fetched_sid = NO_SID;
 }
 
+#define ACCOUNT_FILTER_START	L"(&(|(&(objectCategory=Person)" \
+				       "(objectClass=User))" \
+				     "(objectClass=Group))" \
+				   "(objectSid="
+
+#define ACCOUNT_FILTER_END	L"))"
+
 bool
 cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
 {
-  WCHAR filter[240], *f, *base = NULL;
+  WCHAR filter[sizeof (ACCOUNT_FILTER_START) + sizeof (ACCOUNT_FILTER_END)
+	       + 3 * SECURITY_MAX_SID_SIZE + 1];
+  PWCHAR f, base = NULL;
   LONG len = (LONG) RtlLengthSid (sid);
   PBYTE s = (PBYTE) sid;
   static WCHAR hex_wchars[] = L"0123456789abcdef";
@@ -407,17 +417,14 @@ cyg_ldap::fetch_ad_account (PSID sid, bool group, PCWSTR domain)
       ldap_value_freeW (val);
       val = NULL;
     }
-  f = wcpcpy (filter, L"(&(|(&(objectCategory=Person)"
-			     "(objectClass=User))"
-			   "(objectClass=Group))"
-			 "(objectSid=");
+  f = wcpcpy (filter, ACCOUNT_FILTER_START);
   while (len-- > 0)
     {
       *f++ = L'\\';
       *f++ = hex_wchars[*s >> 4];
       *f++ = hex_wchars[*s++ & 0xf];
     }
-  wcpcpy (f, L"))");
+  wcpcpy (f, ACCOUNT_FILTER_END);
   if (domain)
     {
       /* FIXME:  This is a hack.  The most correct solution is probably to
@@ -530,13 +537,16 @@ cyg_ldap::next_account (cygsid &sid)
 
 #define SYSTEM_CONTAINER	L"CN=System,"
 
+#define PSX_OFFSET_FILTER	L"(&(objectClass=trustedDomain)(name=%W))"
+#define PSX_OFFSET_FILTER_FLAT	L"(&(objectClass=trustedDomain)(flatName=%W))"
+
 /* Return UINT32_MAX on error to allow differing between not being able
    to fetch a value and a real 0 offset. */
 uint32_t
 cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
 {
   WCHAR base[wcslen (def_context) + sizeof (SYSTEM_CONTAINER) / sizeof (WCHAR)];
-  WCHAR filter[300];
+  WCHAR filter[sizeof (PSX_OFFSET_FILTER_FLAT) + wcslen (domain) + 1];
 
   if (msg)
     {
@@ -548,11 +558,14 @@ cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
       ldap_value_freeW (val);
       val = NULL;
     }
+  /* As base, use system container within default naming context to restrict
+     the search to this container only. */
+  wcpcpy (wcpcpy (base, SYSTEM_CONTAINER), def_context);
   /* If domain name has no dot, it's a Netbios name.  In that case, filter
      by flatName rather than by name. */
-  wcpcpy (wcpcpy (base, SYSTEM_CONTAINER), def_context);
-  __small_swprintf (filter, L"(&(objectClass=trustedDomain)(%W=%W))",
-		    wcschr (domain, L'.') ? L"name" : L"flatName", domain);
+  __small_swprintf (filter, wcschr (domain, L'.') ? PSX_OFFSET_FILTER
+						  : PSX_OFFSET_FILTER_FLAT,
+		    domain);
   if (search (base, filter, attr = tdom_attr) != 0)
     return UINT32_MAX;
   if (!(entry = ldap_first_entry (lh, msg)))
@@ -589,10 +602,17 @@ cyg_ldap::get_num_attribute (int idx)
   return (uint32_t) -1;
 }
 
+#define UXID_FILTER_GRP L"(&(objectClass=Group)" \
+			   "(gidNumber=%u))"
+
+#define UXID_FILTER_USR L"(&(objectCategory=Person)" \
+			   "(objectClass=User)" \
+			   "(uidNumber=%u))"
+
 bool
 cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
 {
-  WCHAR filter[48];
+  WCHAR filter[MAX (sizeof (UXID_FILTER_GRP), sizeof (UXID_FILTER_USR)) + 16];
   PLDAP_BERVAL *bval;
 
   if (msg)
@@ -600,12 +620,7 @@ cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
       ldap_msgfree (msg);
       msg = entry = NULL;
     }
-  if (group)
-    __small_swprintf (filter, L"(&(objectClass=Group)(gidNumber=%u))", id);
-  else
-    __small_swprintf (filter, L"(&(objectCategory=Person)"
-			         "(objectClass=User)"
-				 "(uidNumber=%u))", id);
+  __small_swprintf (filter, group ? UXID_FILTER_GRP : UXID_FILTER_USR, id);
   if (search (def_context, filter, sid_attr) != 0)
     return false;
   if ((entry = ldap_first_entry (lh, msg))
@@ -618,10 +633,16 @@ cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
   return false;
 }
 
+#define PSXID_FILTER_GRP L"(&(objectClass=posixGroup)" \
+			    "(gidNumber=%u))"
+
+#define PSXID_FILTER_USR L"(&(objectClass=posixAccount)" \
+			    "(uidNumber=%u))"
+
 PWCHAR
 cyg_ldap::fetch_unix_name_from_rfc2307 (uint32_t id, bool group)
 {
-  WCHAR filter[52];
+  WCHAR filter[MAX (sizeof (PSXID_FILTER_GRP), sizeof (PSXID_FILTER_USR)) + 16];
 
   if (msg)
     {
@@ -634,11 +655,7 @@ cyg_ldap::fetch_unix_name_from_rfc2307 (uint32_t id, bool group)
       val = NULL;
     }
   attr = group ? rfc2307_gid_attr : rfc2307_uid_attr;
-  if (group)
-    __small_swprintf (filter, L"(&(objectClass=posixGroup)(gidNumber=%u))", id);
-  else
-    __small_swprintf (filter, L"(&(objectClass=posixAccount)(uidNumber=%u))",
-		      id);
+  __small_swprintf (filter, group ? PSXID_FILTER_GRP : PSXID_FILTER_USR, id);
   if (search (def_context, filter, attr) != 0)
     return NULL;
   if (!(entry = ldap_first_entry (lh, msg)))

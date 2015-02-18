@@ -1,3 +1,8 @@
+2015-02-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ldap.cc: Macro-ize filter expressions.  Use throughout to compute
+	required filter buffer size if filter is a local buffer.
+
 2015-02-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ldap.cc (cyg_ldap::fetch_posix_offset_for_domain): Drop stray
