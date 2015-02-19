@@ -1,7 +1,7 @@
 /* sec_acl.cc: Sun compatible ACL functions.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2014 Red Hat, Inc.
+   2011, 2012, 2014, 2015 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -138,7 +138,8 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	{
 	case USER_OBJ:
 	  allow = &owner_allow;
-	  *allow = STANDARD_RIGHTS_ALL;
+	  *allow = STANDARD_RIGHTS_ALL
+		   | (pc.fs_is_samba () ? 0 : FILE_WRITE_ATTRIBUTES);
 	  break;
 	case GROUP_OBJ:
 	  allow = &group_allow;

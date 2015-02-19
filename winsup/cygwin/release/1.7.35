@@ -23,10 +23,15 @@ Bug Fixes
 - Remove a debug message accidentally printed to the terminal window
   if an application calls fcntl(F_SETFL) erroneously.
 
-- Regression in 1.7.34: acl(SETACL, ...) overwrote the incoming acltent_t
-  array for bookkeeping purposes while iterating over its entries.  This
-  broke reusing the acl in the calling application (e.g. setfacl).
-  Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00304.html
+- Two regressions in 1.7.34 acl(SETACL, ...):
+
+  - SETACL overwrote the incoming acltent_t array for bookkeeping purposes
+    while iterating over its entries.  This broke reusing the acl in the
+    calling application (e.g. setfacl).
+    Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00304.html
+
+  - SETACL accidentally missed to grant owner FILE_WRITE_ATTRIBUTES access.
+    Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00457.html
 
 - 64 bit: Export forgotten symbol __mempcpy.
   Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00394.html
