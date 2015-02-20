@@ -1,3 +1,10 @@
+2015-02-19  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* include/cygwin/stdlib.h (initstate, random, setstate, srandom):
+	Check if __XSI_VISIBLE is set by sys/cdefs.h, rather than testing
+	for _XOPEN_SOURCE directly, to work correctly when _GNU_SOURCE is
+	set.
+
 2015-02-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (setacl): Always grant owner FILE_WRITE_ATTRIBUTES access.
