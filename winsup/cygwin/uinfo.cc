@@ -125,7 +125,7 @@ internal_getlogin (cygheap_user &user)
   pwd = internal_getpwsid (user.sid (), &cldap);
   pgrp = internal_getgrsid (user.groups.pgsid, &cldap);
   if (!cygheap->pg.nss_cygserver_caching ())
-    internal_getgroups (0, NULL, &cldap);
+    internal_getgroups (0, NULL, &cldap, 3000000U); /* 300ms in 100ns units */
   if (!pwd)
     debug_printf ("user not found in passwd DB");
   else

@@ -1,7 +1,7 @@
 /* times.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -40,6 +40,23 @@ get_system_time (PLARGE_INTEGER systime)
   wincap.has_precise_system_time ()
   	? GetSystemTimePreciseAsFileTime ((LPFILETIME) systime)
 	: GetSystemTimeAsFileTime ((LPFILETIME) systime);
+}
+
+/* There's no GetTickCount64 on pre-Vista.  This is the do-it-yourself kit,
+   as it was implemented as hires_ms::timeGetTime_ns once.  Resurrect the
+   functionality to allow reliable (albeit low res) timing values.  The
+   function returns the value in 100ns interval to avoid a division by 10000. */
+ULONGLONG
+GetTickCount_ns ()
+{
+  LARGE_INTEGER t;
+  do
+    {
+      t.HighPart = SharedUserData.InterruptTime.High1Time;
+      t.LowPart = SharedUserData.InterruptTime.LowPart;
+    }
+  while (t.HighPart != SharedUserData.InterruptTime.High2Time);
+  return (ULONGLONG) t.QuadPart;
 }
 
 /* Cygwin internal */

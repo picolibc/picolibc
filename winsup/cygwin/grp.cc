@@ -1,7 +1,7 @@
 /* grp.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2008, 2009, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
    Original stubs by Jason Molenda of Cygnus Support, crash@cygnus.com
    First implementation by Gunther Ebert, gunther.ebert@ixos-leipzig.de
@@ -492,8 +492,12 @@ endgrent_filtered (void *gr)
   ((gr_ent *) gr)->endgrent ();
 }
 
+/* timeout_ns (in 100ns units) is set to non-0 when called from
+   internal_getlogin.  This restricts fetching of the user's groups at process
+   tree startup to a (hopefully) bearable time.  */
 int
-internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
+internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap,
+		    const DWORD timeout_ns)
 {
   NTSTATUS status;
   HANDLE tok;
@@ -527,6 +531,10 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
       status = NtQueryInformationToken (tok, TokenGroups, groups, size, &size);
       if (NT_SUCCESS (status))
 	{
+	  ULONGLONG t0;
+
+	  if (timeout_ns)
+	    t0 = GetTickCount_ns ();
 	  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 	    {
 	      cygpsid sid = groups->Groups[pg].Sid;
@@ -543,6 +551,8 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
 			goto error;
 		    }
 		}
+	      if (timeout_ns && GetTickCount_ns () - t0 >= timeout_ns)
+		break;
 	    }
 	}
     }

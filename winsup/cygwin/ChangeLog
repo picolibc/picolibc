@@ -1,3 +1,14 @@
+2015-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (internal_getgroups): Take additional timeout_ns parameter.
+	Restrict fetching group account entries from user token groups by
+	timeout_ns 100ns-intervals.  Add preceding comment to explain why.
+	* pwdgrp.h (internal_getgroups): Align prototype.
+	* times.cc (GetTickCount_ns): New function.
+	* uinfo.cc (internal_getlogin): Call internal_getgroups wih 300ms
+	timeout.
+	* winsup.h (GetTickCount_ns): Declare.
+
 2015-02-19  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* Makefile.in (sigfe.o): Use CFLAGS.

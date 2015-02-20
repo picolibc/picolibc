@@ -1,7 +1,7 @@
 /* winsup.h: main Cygwin header file.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -207,6 +207,7 @@ void __reg2 nofinalslash (const char *src, char *dst);
 void __reg3 *hook_or_detect_cygwin (const char *, const void *, WORD&, HANDLE h = NULL);
 
 /* Time related */
+ULONGLONG GetTickCount_ns ();
 void __stdcall totimeval (struct timeval *, PLARGE_INTEGER, int, int);
 time_t __stdcall to_time_t (PLARGE_INTEGER);
 void __stdcall to_timestruc_t (PLARGE_INTEGER, timestruc_t *);

@@ -1,6 +1,6 @@
 /* pwdgrp.h
 
-   Copyright 2001, 2002, 2003, 2014 Red Hat inc.
+   Copyright 2001, 2002, 2003, 2014, 2015 Red Hat inc.
 
    Stuff common to pwd and grp handling.
 
@@ -27,7 +27,7 @@ extern struct group *internal_getgrsid_from_db (cygpsid &sid);
 extern struct group *internal_getgrgid (gid_t, cyg_ldap * = NULL);
 extern struct group *internal_getgrnam (const char *, cyg_ldap * = NULL);
 
-extern int internal_getgroups (int, gid_t *, cyg_ldap *);
+extern int internal_getgroups (int, gid_t *, cyg_ldap *, const DWORD = 0);
 
 /* These functions are called from mkpasswd/mkgroup via cygwin_internal. */
 void *setpwent_filtered (int enums, PCWSTR enum_tdoms);
