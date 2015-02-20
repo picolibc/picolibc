@@ -710,7 +710,7 @@ sigfe.s: $(DEF_FILE)
 	[ -s $@ ] && touch $@
 
 sigfe.o: sigfe.s
-	$(CC) -c -o $@ $<
+	$(CC) ${CFLAGS} -c -o $@ $<
 
 ctags: CTAGS
 tags:  CTAGS
