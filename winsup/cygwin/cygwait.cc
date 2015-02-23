@@ -18,8 +18,10 @@
 #define is_cw_sig		(mask & cw_sig)
 #define is_cw_sig_eintr		(mask & cw_sig_eintr)
 #define is_cw_sig_cont		(mask & cw_sig_cont)
+#define is_cw_sig_restart	(mask & cw_sig_restart)
 
-#define is_cw_sig_handle	(mask & (cw_sig | cw_sig_eintr | cw_sig_cont))
+#define is_cw_sig_handle	(mask & (cw_sig | cw_sig_eintr \
+					 | cw_sig_cont | cw_sig_restart))
 
 LARGE_INTEGER cw_nowait_storage;
 
@@ -88,7 +90,7 @@ cygwait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 	    continue;
 	  if (is_cw_sig_eintr || (is_cw_sig_cont && sig == SIGCONT))
 	    ;
-	  else if (_my_tls.call_signal_handler ())
+	  else if (_my_tls.call_signal_handler () || is_cw_sig_restart)
 	    continue;
 	  res = WAIT_SIGNALED;	/* caller will deal with signals */
 	}

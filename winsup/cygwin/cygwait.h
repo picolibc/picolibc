@@ -1,7 +1,7 @@
 /* cygwait.h
 
-   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013
-   Red Hat, Inc.
+   Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
+   2015 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -16,11 +16,12 @@
 
 enum cw_wait_mask
 {
-  cw_cancel =		0x0001,
-  cw_cancel_self =	0x0002,
-  cw_sig =		0x0004,
-  cw_sig_eintr =	0x0008,
-  cw_sig_cont =		0x0010
+  cw_cancel =		0x0001,	/* Cancellation point.  Return to caller. */
+  cw_cancel_self =	0x0002,	/* Cancellation point.  Cancel self. */
+  cw_sig =		0x0004,	/* Handle signals. */
+  cw_sig_eintr =	0x0008,	/* Caller handles signals. */
+  cw_sig_cont =		0x0010,	/* Caller handles SIGCONT. */
+  cw_sig_restart =	0x0020	/* Restart even if SA_RESTART isn't set. */
 };
 
 extern LARGE_INTEGER cw_nowait_storage;
