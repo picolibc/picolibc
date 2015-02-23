@@ -35,3 +35,6 @@ Bug Fixes
 
 - 64 bit: Export forgotten symbol __mempcpy.
   Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00394.html
+
+- 64 bit: Avoid misbehaviour in signal mask computation.
+  Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00665.html

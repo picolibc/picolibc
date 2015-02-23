@@ -1,3 +1,7 @@
+2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.h (SIGTOMASK): Add cast to sigset_t to avoid int overflow.
+
 2015-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (internal_getgroups): Take additional timeout_ns parameter.

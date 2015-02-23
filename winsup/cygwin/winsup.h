@@ -131,7 +131,7 @@ extern int cygserver_running;
     })
 
 /* Convert a signal to a signal mask */
-#define SIGTOMASK(sig)	(1 << ((sig) - 1))
+#define SIGTOMASK(sig)	((sigset_t) 1 << ((sig) - 1))
 
 #define set_api_fatal_return(n) do {extern int __api_fatal_exit_val; __api_fatal_exit_val = (n);} while (0)
 
