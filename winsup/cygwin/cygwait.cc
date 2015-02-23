@@ -1,6 +1,6 @@
 /* cygwait.h
 
-   Copyright 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 2011, 2012, 2013, 2015 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -87,9 +87,10 @@ cygwait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 	  if (!sig)
 	    continue;
 	  if (is_cw_sig_eintr || (is_cw_sig_cont && sig == SIGCONT))
-	    res = WAIT_SIGNALED;	/* caller will deal with signals */
+	    ;
 	  else if (_my_tls.call_signal_handler ())
 	    continue;
+	  res = WAIT_SIGNALED;	/* caller will deal with signals */
 	}
       break;
     }

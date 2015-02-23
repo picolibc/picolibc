@@ -1,5 +1,10 @@
 2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwait.cc (cygwait): Move setting res to WAIT_SIGNALED to clarify
+	when WAIT_SIGNALED is returned to the caller.
+
+2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* winsup.h (SIGTOMASK): Add cast to sigset_t to avoid int overflow.
 
 2015-02-20  Corinna Vinschen  <corinna@vinschen.de>
