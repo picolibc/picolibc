@@ -1,3 +1,8 @@
+2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pwdgrp.cc: Handle default fetch_user_arg_type_t in switches
+	throughout to silence compiler.
+
 2015-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Simplify rule to build dependencies from cygwin dir.
