@@ -14,6 +14,7 @@ details. */
 
 #include "winsup.h"
 #include <lm.h>
+#include <ntsecapi.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,6 +115,65 @@ internal_getgrsid (cygpsid &sid, cyg_ldap *pldap)
     }
   if (cygheap->pg.nss_grp_db ())
     return cygheap->pg.grp_cache.win.add_group_from_windows (sid, pldap);
+  return NULL;
+}
+
+/* Like internal_getgrsid but return only already cached data,
+   NULL otherwise. */
+static struct group *
+internal_getgrsid_cachedonly (cygpsid &sid)
+{
+  struct group *ret;
+
+  /* Check caches only. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.grp_cache.cygserver.find_group (sid)))
+    return ret;
+  if (cygheap->pg.nss_grp_files ()
+      && (ret = cygheap->pg.grp_cache.file.find_group (sid)))
+    return ret;
+  if (cygheap->pg.nss_grp_db ()
+      && (ret = cygheap->pg.grp_cache.win.find_group (sid)))
+    return ret;
+  return NULL;
+}
+
+/* Called from internal_getgroups.  The full information required to create
+   a group account entry is already available from the LookupAccountSids
+   call.  internal_getgrfull passes all available info into
+   pwdgrp::fetch_account_from_line, thus avoiding a LookupAccountSid call
+   for each group.  This is quite a bit faster, especially in slower
+   environments. */
+static struct group * __attribute__((used))
+internal_getgrfull (fetch_full_grp_t &full_grp, cyg_ldap *pldap)
+{
+  struct group *ret;
+
+  cygheap->pg.nss_init ();
+  /* Check caches first. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.grp_cache.cygserver.find_group (full_grp.sid)))
+    return ret;
+  if (cygheap->pg.nss_grp_files ()
+      && (ret = cygheap->pg.grp_cache.file.find_group (full_grp.sid)))
+    return ret;
+  if (cygheap->pg.nss_grp_db ()
+      && (ret = cygheap->pg.grp_cache.win.find_group (full_grp.sid)))
+    return ret;
+  /* Ask sources afterwards. */
+  if (cygheap->pg.nss_cygserver_caching ()
+      && (ret = cygheap->pg.grp_cache.cygserver.add_group_from_cygserver
+      							(full_grp.sid)))
+    return ret;
+  if (cygheap->pg.nss_grp_files ())
+    {
+      cygheap->pg.grp_cache.file.check_file ();
+      if ((ret = cygheap->pg.grp_cache.file.add_group_from_file
+      							(full_grp.sid)))
+	return ret;
+    }
+  if (cygheap->pg.nss_grp_db ())
+    return cygheap->pg.grp_cache.win.add_group_from_windows (full_grp, pldap);
   return NULL;
 }
 
@@ -502,8 +562,15 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap,
   NTSTATUS status;
   HANDLE tok;
   ULONG size;
-  int cnt = 0;
+  PTOKEN_GROUPS groups;
+  PSID *sidp_buf;
+  ULONG scnt;
+  PLSA_REFERENCED_DOMAIN_LIST dlst = NULL;
+  PLSA_TRANSLATED_NAME nlst = NULL;
+
+  tmp_pathbuf tp;
   struct group *grp;
+  int cnt = 0;
 
   if (cygheap->user.groups.issetgroups ())
     {
@@ -515,53 +582,101 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap,
 	      grouplist[cnt] = grp->gr_gid;
 	    ++cnt;
 	    if (gidsetsize && cnt > gidsetsize)
-	      goto error;
+	      {
+		cnt = -1;
+		break;
+	      }
 	  }
-      return cnt;
+      goto out;
     }
 
   /* If impersonated, use impersonation token. */
-  tok = cygheap->user.issetuid () ? cygheap->user.primary_token () : hProcToken;
+  tok = cygheap->user.issetuid () ? cygheap->user.primary_token ()
+				  : hProcToken;
 
-  status = NtQueryInformationToken (tok, TokenGroups, NULL, 0, &size);
-  if (NT_SUCCESS (status) || status == STATUS_BUFFER_TOO_SMALL)
+  /* Fetch groups from user token. */
+  groups = (PTOKEN_GROUPS) tp.w_get ();
+  status = NtQueryInformationToken (tok, TokenGroups, groups, 2 * NT_MAX_PATH,
+				    &size);
+  if (!NT_SUCCESS (status))
     {
-      PTOKEN_GROUPS groups = (PTOKEN_GROUPS) alloca (size);
-
-      status = NtQueryInformationToken (tok, TokenGroups, groups, size, &size);
+      system_printf ("token group list > 64K?  status = %u", status);
+      goto out;
+    }
+  /* Iterate over the group list and check which of them are already cached.
+     Those are simply copied to grouplist.  The non-cached ones are collected
+     in sidp_buf for a later call to LsaLookupSids. */
+  sidp_buf = (PSID *) tp.w_get ();
+  scnt = 0;
+  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+    {
+      cygpsid sid = groups->Groups[pg].Sid;
+      if ((groups->Groups[pg].Attributes
+	  & (SE_GROUP_ENABLED | SE_GROUP_INTEGRITY_ENABLED)) == 0
+	  || sid == well_known_world_sid)
+	continue;
+      if ((grp = internal_getgrsid_cachedonly (sid)))
+	{
+	  if (cnt < gidsetsize)
+	    grouplist[cnt] = grp->gr_gid;
+	  ++cnt;
+	  if (gidsetsize && cnt > gidsetsize)
+	    {
+	      cnt = -1;
+	      goto out;
+	    }
+	}
+      else 
+	sidp_buf[scnt++] = sid;
+    }
+  /* If there are non-cached groups left, call LsaLookupSids and call
+     internal_getgrfull on the returned groups.  This performs a lot
+     better than calling internal_getgrsid on each group. */
+  if (scnt > 0)
+    {
+      status = STATUS_ACCESS_DENIED;
+      HANDLE lsa = lsa_open_policy (NULL, POLICY_LOOKUP_NAMES);
+      if (!lsa)
+	{
+	  system_printf ("POLICY_LOOKUP_NAMES not given?");
+	  goto out;
+	}
+      status = LsaLookupSids (lsa, scnt, sidp_buf, &dlst, &nlst);
+      lsa_close_policy (lsa);
       if (NT_SUCCESS (status))
 	{
-	  ULONGLONG t0;
-
-	  if (timeout_ns)
-	    t0 = GetTickCount_ns ();
-	  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+	  for (ULONG ncnt = 0; ncnt < scnt; ++ncnt)
 	    {
-	      cygpsid sid = groups->Groups[pg].Sid;
-	      if ((groups->Groups[pg].Attributes
-		  & (SE_GROUP_ENABLED | SE_GROUP_INTEGRITY_ENABLED)) == 0
-		  || sid == well_known_world_sid)
-		continue;
-	      if ((grp = internal_getgrsid (sid, pldap)))
+	      fetch_full_grp_t full_grp =
+		{
+		  .sid = sidp_buf[ncnt],
+		  .name = &nlst[ncnt].Name,
+		  .dom = &dlst->Domains[nlst[ncnt].DomainIndex].Name,
+		  .acc_type = nlst[ncnt].Use
+		};
+	      if ((grp = internal_getgrfull (full_grp, pldap)))
 		{
 		  if (cnt < gidsetsize)
 		    grouplist[cnt] = grp->gr_gid;
 		  ++cnt;
 		  if (gidsetsize && cnt > gidsetsize)
-		    goto error;
+		    {
+		      cnt = -1;
+		      goto out;
+		    }
 		}
-	      if (timeout_ns && GetTickCount_ns () - t0 >= timeout_ns)
-		break;
 	    }
 	}
     }
-  else
-    debug_printf ("%u = NtQueryInformationToken(NULL) %y", size, status);
-  return cnt;
 
-error:
-  set_errno (EINVAL);
-  return -1;
+out:
+  if (dlst)
+    LsaFreeMemory (dlst);
+  if (nlst)
+    LsaFreeMemory (nlst);
+  if (cnt == -1)
+    set_errno (EINVAL);
+  return cnt;
 }
 
 extern "C" int

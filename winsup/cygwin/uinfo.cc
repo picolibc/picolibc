@@ -1545,6 +1545,19 @@ pwdgrp::add_account_from_windows (uint32_t id, cyg_ldap *pldap)
   return add_account_post_fetch (line, true);
 }
 
+/* Called from internal_getgrfull, in turn called from internal_getgroups. */
+struct group *
+pwdgrp::add_group_from_windows (fetch_full_grp_t &full_grp, cyg_ldap *pldap)
+{
+  fetch_user_arg_t arg;
+  arg.type = FULL_grp_arg;
+  arg.full_grp = &full_grp;
+  char *line = fetch_account_from_windows (arg, pldap);
+  if (!line)
+    return NULL;
+  return (struct group *) add_account_post_fetch (line, true);
+}
+
 /* Check if file exists and if it has been written to since last checked.
    If file has been changed, invalidate the current cache.
    
@@ -1627,6 +1640,8 @@ pwdgrp::fetch_account_from_line (fetch_user_arg_t &arg, const char *line)
       if (strtoul (p + 1, &e, 10) != arg.id || !e || *e != ':')
 	return NULL;
       break;
+    default:
+      return NULL;
     }
   return cstrdup (line);
 }
@@ -1653,6 +1668,8 @@ pwdgrp::fetch_account_from_file (fetch_user_arg_t &arg)
       break;
     case ID_arg:
       break;
+    default:
+      return NULL;
     }
   if (rl.init (&attr, buf, NT_MAX_PATH))
     while ((buf = rl.gets ()))
@@ -1742,6 +1759,17 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 
   switch (arg.type)
     {
+    case FULL_grp_arg:
+      {
+	sid = arg.full_grp->sid;
+	*wcpncpy (name, arg.full_grp->name->Buffer,
+		  arg.full_grp->name->Length / sizeof (WCHAR)) = L'\0';
+	*wcpncpy (dom, arg.full_grp->dom->Buffer,
+		  arg.full_grp->dom->Length / sizeof (WCHAR)) = L'\0';
+	acc_type = arg.full_grp->acc_type;
+      	ret = acc_type != SidTypeUnknown;
+      }
+      break;
     case SID_arg:
       sid = *arg.sid;
       ret = LookupAccountSidW (NULL, sid, name, &nlen, dom, &dlen, &acc_type);
@@ -2489,6 +2517,9 @@ client_request_pwdgrp::client_request_pwdgrp (fetch_user_arg_t &arg, bool group)
     case ID_arg:
       _parameters.in.arg.id = arg.id;
       len = sizeof (uint32_t);
+    default:
+      api_fatal ("Fetching account info from cygserver with wrong arg.type "
+		 "%d", arg.type);
     }
   msglen (__builtin_offsetof (struct _pwdgrp_param_t::_pwdgrp_in_t, arg) + len);
 }

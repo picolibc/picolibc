@@ -1,5 +1,28 @@
 2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (LsaLookupSids): Import.
+	* cygserver_pwdgrp.h: Include userinfo.h.  Drop workaround defining
+	fetch_user_arg_type_t locally.
+	* grp.cc (internal_getgrsid_cachedonly): New function.
+	(internal_getgrfull): Ditto.
+	(internal_getgroups): Rearrange function.  Center around fetching all
+	cached group info first, calling LsaLookupSids on all so far non-cached
+	groups second.  Pass all available info to new internal_getgrfull call.
+	* pwdgrp.h: Include userinfo.h.  Move definitions of
+	fetch_user_arg_type_t and fetch_user_arg_t there.
+	(pwdgrp::add_group_from_windows): Declare with getting full group info.
+	Called from internal_getgrfull.
+	* uinfo.cc (pwdgrp::add_group_from_windows): Define.
+	(pwdgrp::fetch_account_from_line): Add default case.
+	(pwdgrp::fetch_account_from_file): Ditto.
+	(pwdgrp::fetch_account_from_windows): Handle FULL_grp_arg.
+	(client_request_pwdgrp::client_request_pwdgrp): Add default case.
+	* userinfo.h: New header.
+	(enum fetch_user_arg_type_t): Add FULL_grp_arg.
+	(struct fetch_full_grp_t): New datatype.
+
+2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (internal_getgroups): Check for group attributes and
 	Everyone sid before calling internal_getgrsid.
 

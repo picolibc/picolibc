@@ -15,6 +15,7 @@ details. */
 #include "sync.h"
 #include "ldap.h"
 #include "miscfuncs.h"
+#include "userinfo.h"
 
 /* These functions are needed to allow searching and walking through
    the passwd and group lists */
@@ -36,24 +37,6 @@ void endpwent_filtered (void *gr);
 void *setgrent_filtered (int enums, PCWSTR enum_tdoms);
 void *getgrent_filtered (void *gr);
 void endgrent_filtered (void *gr);
-
-enum fetch_user_arg_type_t {
-  SID_arg,
-  NAME_arg,
-  ID_arg
-};
-
-struct fetch_user_arg_t
-{
-  fetch_user_arg_type_t type;
-  union {
-    cygpsid *sid;
-    const char *name;
-    uint32_t id;
-  };
-  /* Only used in fetch_account_from_file/line. */
-  size_t len;
-};
 
 struct pg_pwd
 {
@@ -176,6 +159,8 @@ public:
     { return (struct group *) add_account_from_windows (name, pldap); }
   struct group *add_group_from_windows (uint32_t id, cyg_ldap *pldap = NULL)
     { return (struct group *) add_account_from_windows (id, pldap); }
+  struct group *add_group_from_windows (fetch_full_grp_t &full_grp,
+  					cyg_ldap *pldap = NULL);
   struct group *find_group (cygpsid &sid);
   struct group *find_group (const char *name);
   struct group *find_group (gid_t gid);

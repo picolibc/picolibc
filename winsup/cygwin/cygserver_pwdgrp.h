@@ -1,6 +1,6 @@
 /* cygserver_pwdgrp.h: Request account information
 
-   Copyright 2014 Red Hat, Inc.
+   Copyright 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,20 +13,10 @@ details. */
 
 #include <sys/types.h>
 #include "cygserver.h"
+#include "userinfo.h"
 
 class transport_layer_base;
 class process_cache;
-
-#ifdef __INSIDE_CYGWIN__
-#include "pwdgrp.h"
-#else
-/* Don't include pwdgrp.h, but keep this in sync. */
-enum fetch_user_arg_type_t {
-  SID_arg,
-  NAME_arg,
-  ID_arg
-};
-#endif
 
 class client_request_pwdgrp : public client_request
 {
