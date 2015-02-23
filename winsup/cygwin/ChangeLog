@@ -1,5 +1,10 @@
 2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* grp.cc (internal_getgroups): Check for group attributes and
+	Everyone sid before calling internal_getgrsid.
+
+2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwait.h (enum cw_wait_mask): Add cw_sig_restart.  Add comments
 	to explain the meaning of the possible values.
 	* cygwait.cc (is_cw_sig_restart): Define.

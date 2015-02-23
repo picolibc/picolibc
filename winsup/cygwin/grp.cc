@@ -538,18 +538,17 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap,
 	  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 	    {
 	      cygpsid sid = groups->Groups[pg].Sid;
+	      if ((groups->Groups[pg].Attributes
+		  & (SE_GROUP_ENABLED | SE_GROUP_INTEGRITY_ENABLED)) == 0
+		  || sid == well_known_world_sid)
+		continue;
 	      if ((grp = internal_getgrsid (sid, pldap)))
 		{
-		  if ((groups->Groups[pg].Attributes
-		      & (SE_GROUP_ENABLED | SE_GROUP_INTEGRITY_ENABLED))
-		      && sid != well_known_world_sid)
-		    {
-		      if (cnt < gidsetsize)
-			grouplist[cnt] = grp->gr_gid;
-		      ++cnt;
-		      if (gidsetsize && cnt > gidsetsize)
-			goto error;
-		    }
+		  if (cnt < gidsetsize)
+		    grouplist[cnt] = grp->gr_gid;
+		  ++cnt;
+		  if (gidsetsize && cnt > gidsetsize)
+		    goto error;
 		}
 	      if (timeout_ns && GetTickCount_ns () - t0 >= timeout_ns)
 		break;
