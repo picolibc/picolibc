@@ -17,6 +17,8 @@ enum fetch_user_arg_type_t {
   FULL_grp_arg,
 };
 
+#ifdef __INSIDE_CYGWIN__
+
 struct fetch_full_grp_t {
   cygpsid sid;
   PUNICODE_STRING name;
@@ -36,3 +38,5 @@ struct fetch_user_arg_t
   /* Only used in fetch_account_from_file/line. */
   size_t len;
 };
+
+#endif

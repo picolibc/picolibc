@@ -1,5 +1,11 @@
 2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* userinfo.h (struct fetch_full_grp_t): Define only when building
+	Cygwin itself.
+	(struct fetch_user_arg_t): Ditto.
+
+2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (LsaLookupSids): Import.
 	* cygserver_pwdgrp.h: Include userinfo.h.  Drop workaround defining
 	fetch_user_arg_type_t locally.
