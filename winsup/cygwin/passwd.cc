@@ -1,7 +1,7 @@
 /* passwd.cc: getpwnam () and friends
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008,
-   2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013, 2014, 2015  Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -600,6 +600,7 @@ pg_ent::enumerate_ad ()
 	      if (!nss_db_enum_primary ()
 		  || cldap.enumerate_ad_accounts (NULL, group) != NO_ERROR)
 		continue;
+	      RtlInitUnicodeString (&dom, cygheap->dom.primary_flat_name ());
 	    }
 	  else if ((td = cygheap->dom.trusted_domain (resume - 1)))
 	    {
@@ -616,6 +617,7 @@ pg_ent::enumerate_ad ()
 		      || cldap.enumerate_ad_accounts (td->DnsDomainName, group)
 			 != NO_ERROR)
 		continue;
+	      RtlInitUnicodeString (&dom, td->NetbiosDomainName);
 	    }
 	  else
 	    {
@@ -628,9 +630,21 @@ pg_ent::enumerate_ad ()
       int ret = cldap.next_account (sid);
       if (ret == NO_ERROR)
 	{
+	  fetch_acc_t full;
 	  fetch_user_arg_t arg;
-	  arg.type = SID_arg;
-	  arg.sid = &sid;
+	  UNICODE_STRING name;
+
+	  arg.type = FULL_acc_arg;
+	  arg.full_acc = &full;
+	  full.sid = sid;
+	  RtlInitUnicodeString (&name,
+				cldap.get_string_attribute (L"sAMAccountName"));
+	  full.name = &name;
+	  full.dom = &dom;
+	  if (sid_sub_auth (sid, 0) == SECURITY_BUILTIN_DOMAIN_RID)
+	    full.acc_type = SidTypeAlias;
+	  else
+	    full.acc_type = group ? SidTypeGroup : SidTypeUser;
 	  char *line = pg.fetch_account_from_windows (arg, &cldap);
 	  if (line)
 	    return pg.add_account_post_fetch (line, false);

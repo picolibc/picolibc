@@ -1547,11 +1547,11 @@ pwdgrp::add_account_from_windows (uint32_t id, cyg_ldap *pldap)
 
 /* Called from internal_getgrfull, in turn called from internal_getgroups. */
 struct group *
-pwdgrp::add_group_from_windows (fetch_full_grp_t &full_grp, cyg_ldap *pldap)
+pwdgrp::add_group_from_windows (fetch_acc_t &full_acc, cyg_ldap *pldap)
 {
   fetch_user_arg_t arg;
-  arg.type = FULL_grp_arg;
-  arg.full_grp = &full_grp;
+  arg.type = FULL_acc_arg;
+  arg.full_acc = &full_acc;
   char *line = fetch_account_from_windows (arg, pldap);
   if (!line)
     return NULL;
@@ -1759,14 +1759,14 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 
   switch (arg.type)
     {
-    case FULL_grp_arg:
+    case FULL_acc_arg:
       {
-	sid = arg.full_grp->sid;
-	*wcpncpy (name, arg.full_grp->name->Buffer,
-		  arg.full_grp->name->Length / sizeof (WCHAR)) = L'\0';
-	*wcpncpy (dom, arg.full_grp->dom->Buffer,
-		  arg.full_grp->dom->Length / sizeof (WCHAR)) = L'\0';
-	acc_type = arg.full_grp->acc_type;
+	sid = arg.full_acc->sid;
+	*wcpncpy (name, arg.full_acc->name->Buffer,
+		  arg.full_acc->name->Length / sizeof (WCHAR)) = L'\0';
+	*wcpncpy (dom, arg.full_acc->dom->Buffer,
+		  arg.full_acc->dom->Length / sizeof (WCHAR)) = L'\0';
+	acc_type = arg.full_acc->acc_type;
       	ret = acc_type != SidTypeUnknown;
       }
       break;

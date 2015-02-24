@@ -14,12 +14,12 @@ enum fetch_user_arg_type_t {
   SID_arg,
   NAME_arg,
   ID_arg,
-  FULL_grp_arg,
+  FULL_acc_arg,
 };
 
 #ifdef __INSIDE_CYGWIN__
 
-struct fetch_full_grp_t {
+struct fetch_acc_t {
   cygpsid sid;
   PUNICODE_STRING name;
   PUNICODE_STRING dom;
@@ -33,7 +33,7 @@ struct fetch_user_arg_t
     cygpsid *sid;
     const char *name;
     uint32_t id;
-    fetch_full_grp_t *full_grp;
+    fetch_acc_t *full_acc;
   };
   /* Only used in fetch_account_from_file/line. */
   size_t len;

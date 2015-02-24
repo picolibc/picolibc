@@ -17,12 +17,6 @@ details. */
 #include <ntldap.h>
 #pragma pop_macro ("DECLSPEC_IMPORT")
 
-#define LDAP_USER_PGRP_ATTR		 0
-#define LDAP_USER_UID_ATTR		 1
-
-#define LDAP_GROUP_NAME_ATTR		 0
-#define LDAP_GROUP_GID_ATTR		 1
-
 class cyg_ldap {
   PLDAP lh;
   PWCHAR def_context;
@@ -31,7 +25,6 @@ class cyg_ldap {
   PWCHAR *attr;
   bool isAD;
   PLDAPSearch srch_id;
-  PLDAPMessage srch_msg, srch_entry;
   cygsid last_fetched_sid;
 
   inline int map_ldaperr_to_errno (ULONG lerr);
@@ -41,13 +34,11 @@ class cyg_ldap {
   inline int next_page ();
   bool fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group);
   PWCHAR fetch_unix_name_from_rfc2307 (uint32_t id, bool group);
-  PWCHAR get_string_attribute (int idx);
-  uint32_t get_num_attribute (int idx);
 
 public:
   cyg_ldap () : lh (NULL), def_context (NULL), msg (NULL), entry (NULL),
-		val (NULL), isAD (false), srch_id (NULL), srch_msg (NULL),
-		srch_entry (NULL), last_fetched_sid (NO_SID)
+		val (NULL), isAD (false), srch_id (NULL), 
+		last_fetched_sid (NO_SID)
   {}
   ~cyg_ldap () { close (); }
 
@@ -60,6 +51,8 @@ public:
   operator PLDAP () const { return lh; }
   int open (PCWSTR in_domain);
   void close ();
+  PWCHAR get_string_attribute (PCWSTR name);
+  uint32_t get_num_attribute (PCWSTR name);
   bool fetch_ad_account (PSID sid, bool group, PCWSTR domain = NULL);
   int enumerate_ad_accounts (PCWSTR domain, bool group);
   int next_account (cygsid &sid);
@@ -67,11 +60,10 @@ public:
   uid_t remap_uid (uid_t uid);
   gid_t remap_gid (gid_t gid);
   /* User only */
-  gid_t get_primary_gid () { return get_num_attribute (LDAP_USER_PGRP_ATTR); }
-  gid_t get_unix_uid () { return get_num_attribute (LDAP_USER_UID_ATTR); }
+  gid_t get_primary_gid () { return get_num_attribute (L"primaryGroupID"); }
+  gid_t get_unix_uid () { return get_num_attribute (L"uidNumber"); }
   /* group only */
   PWCHAR get_group_name ()
-	    { return get_string_attribute (LDAP_GROUP_NAME_ATTR); }
-  gid_t get_unix_gid () { return get_num_attribute (LDAP_GROUP_GID_ATTR); }
-  PWCHAR get_string_attribute (PCWSTR name);
+	    { return get_string_attribute (L"sAMAccountName"); }
+  gid_t get_unix_gid () { return get_num_attribute (L"gidNumber"); }
 };

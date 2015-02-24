@@ -145,35 +145,35 @@ internal_getgrsid_cachedonly (cygpsid &sid)
    for each group.  This is quite a bit faster, especially in slower
    environments. */
 static struct group * __attribute__((used))
-internal_getgrfull (fetch_full_grp_t &full_grp, cyg_ldap *pldap)
+internal_getgrfull (fetch_acc_t &full_acc, cyg_ldap *pldap)
 {
   struct group *ret;
 
   cygheap->pg.nss_init ();
   /* Check caches first. */
   if (cygheap->pg.nss_cygserver_caching ()
-      && (ret = cygheap->pg.grp_cache.cygserver.find_group (full_grp.sid)))
+      && (ret = cygheap->pg.grp_cache.cygserver.find_group (full_acc.sid)))
     return ret;
   if (cygheap->pg.nss_grp_files ()
-      && (ret = cygheap->pg.grp_cache.file.find_group (full_grp.sid)))
+      && (ret = cygheap->pg.grp_cache.file.find_group (full_acc.sid)))
     return ret;
   if (cygheap->pg.nss_grp_db ()
-      && (ret = cygheap->pg.grp_cache.win.find_group (full_grp.sid)))
+      && (ret = cygheap->pg.grp_cache.win.find_group (full_acc.sid)))
     return ret;
   /* Ask sources afterwards. */
   if (cygheap->pg.nss_cygserver_caching ()
       && (ret = cygheap->pg.grp_cache.cygserver.add_group_from_cygserver
-      							(full_grp.sid)))
+      							(full_acc.sid)))
     return ret;
   if (cygheap->pg.nss_grp_files ())
     {
       cygheap->pg.grp_cache.file.check_file ();
       if ((ret = cygheap->pg.grp_cache.file.add_group_from_file
-      							(full_grp.sid)))
+      							(full_acc.sid)))
 	return ret;
     }
   if (cygheap->pg.nss_grp_db ())
-    return cygheap->pg.grp_cache.win.add_group_from_windows (full_grp, pldap);
+    return cygheap->pg.grp_cache.win.add_group_from_windows (full_acc, pldap);
   return NULL;
 }
 
@@ -647,14 +647,14 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap,
 	{
 	  for (ULONG ncnt = 0; ncnt < scnt; ++ncnt)
 	    {
-	      fetch_full_grp_t full_grp =
+	      fetch_acc_t full_acc =
 		{
 		  .sid = sidp_buf[ncnt],
 		  .name = &nlst[ncnt].Name,
 		  .dom = &dlst->Domains[nlst[ncnt].DomainIndex].Name,
 		  .acc_type = nlst[ncnt].Use
 		};
-	      if ((grp = internal_getgrfull (full_grp, pldap)))
+	      if ((grp = internal_getgrfull (full_acc, pldap)))
 		{
 		  if (cnt < gidsetsize)
 		    grouplist[cnt] = grp->gr_gid;

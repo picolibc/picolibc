@@ -159,7 +159,7 @@ public:
     { return (struct group *) add_account_from_windows (name, pldap); }
   struct group *add_group_from_windows (uint32_t id, cyg_ldap *pldap = NULL)
     { return (struct group *) add_account_from_windows (id, pldap); }
-  struct group *add_group_from_windows (fetch_full_grp_t &full_grp,
+  struct group *add_group_from_windows (fetch_acc_t &full_acc,
   					cyg_ldap *pldap = NULL);
   struct group *find_group (cygpsid &sid);
   struct group *find_group (const char *name);
@@ -169,20 +169,21 @@ public:
 class pg_ent
 {
 protected:
-  pwdgrp        pg;
-  bool		group;
-  pg_pwd        pwd;
-  pg_grp        grp;
-  NT_readline	rl;
-  cyg_ldap	cldap;
-  PCHAR         buf;
-  ULONG         cnt;
-  ULONG         max;
-  ULONG_PTR     resume;
-  int           enums;		/* ENUM_xxx values defined in sys/cygwin.h. */
-  PCWSTR        enum_tdoms;
-  bool		from_files;
-  bool		from_db;
+  pwdgrp         pg;
+  bool           group;
+  pg_pwd         pwd;
+  pg_grp         grp;
+  NT_readline    rl;
+  cyg_ldap       cldap;
+  PCHAR          buf;
+  ULONG          cnt;
+  ULONG          max;
+  ULONG_PTR      resume;
+  int            enums;		/* ENUM_xxx values defined in sys/cygwin.h. */
+  PCWSTR         enum_tdoms;
+  bool           from_files;
+  bool           from_db;
+  UNICODE_STRING dom;
   enum {
     rewound = 0,
     from_cache,

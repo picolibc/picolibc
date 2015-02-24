@@ -34,6 +34,8 @@ static PWCHAR rootdse_attr[] =
 
 static const PCWSTR std_user_attr[] =
 {
+  L"sAMAccountName",
+  L"objectSid",
   L"primaryGroupID",
   L"uidNumber",
   L"cygwinUnixUid",		/* TODO */
@@ -55,7 +57,8 @@ static const PCWSTR std_user_attr[] =
 
 static PWCHAR group_attr[] =
 {
-  (PWCHAR) L"cn",
+  (PWCHAR) L"sAMAccountName",
+  (PWCHAR) L"objectSid",
   (PWCHAR) L"gidNumber",
   (PWCHAR) L"cygwinUnixGid",	/* TODO */
   NULL
@@ -283,9 +286,9 @@ cyg_ldap::next_page_s ()
   do
     {
       ret = ldap_get_next_page_s (lh, srch_id, NULL, CYG_LDAP_ENUM_PAGESIZE,
-				  &total, &srch_msg);
+				  &total, &msg);
     }
-  while (ret == LDAP_SUCCESS && ldap_count_entries (lh, srch_msg) == 0);
+  while (ret == LDAP_SUCCESS && ldap_count_entries (lh, msg) == 0);
   if (ret && ret != LDAP_NO_RESULTS_RETURNED)
     debug_printf ("ldap_result() error 0x%02x", ret);
   return ret;
@@ -367,8 +370,6 @@ cyg_ldap::close ()
     ldap_search_abandon_page (lh, srch_id);
   if (lh)
     ldap_unbind (lh);
-  if (srch_msg)
-    ldap_msgfree (srch_msg);
   if (msg)
     ldap_msgfree (msg);
   if (val)
@@ -380,8 +381,27 @@ cyg_ldap::close ()
   val = NULL;
   def_context = NULL;
   srch_id = NULL;
-  srch_msg = srch_entry = NULL;
   last_fetched_sid = NO_SID;
+}
+
+PWCHAR
+cyg_ldap::get_string_attribute (PCWSTR name)
+{
+  if (val)
+    ldap_value_freeW (val);
+  val = ldap_get_valuesW (lh, entry, (PWCHAR) name);
+  if (val)
+    return val[0];
+  return NULL;
+}
+
+uint32_t
+cyg_ldap::get_num_attribute (PCWSTR name)
+{
+  PWCHAR ret = get_string_attribute (name);
+  if (ret)
+    return (uint32_t) wcstoul (ret, NULL, 10);
+  return (uint32_t) -1;
 }
 
 #define ACCOUNT_FILTER_START	L"(&(|(&(objectCategory=Person)" \
@@ -478,19 +498,26 @@ cyg_ldap::enumerate_ad_accounts (PCWSTR domain, bool group)
   if (!group)
     filter = L"(&(objectCategory=Person)"
 		"(objectClass=User)"
-		/* 512 == ADS_UF_NORMAL_ACCOUNT */
+		/* 512 == ADS_UF_NORMAL_ACCOUNT
+		   Without checking this flag we'd enumerate undesired accounts
+		   like, e.g., interdomain trusts. */
 	        "(userAccountControl:" LDAP_MATCHING_RULE_BIT_AND ":=512)"
 	        "(objectSid=*))";
   else if (!domain)
+    /* From the local domain, we fetch well-known groups. */
     filter = L"(&(objectClass=Group)"
 		"(objectSid=*))";
   else
+    /* From foreign domains, we don't. */
     filter = L"(&(objectClass=Group)"
 		/* 1 == BUILTIN_LOCAL_GROUP */
 		"(!(groupType:" LDAP_MATCHING_RULE_BIT_AND ":=1))"
 		"(objectSid=*))";
+  if (!user_attr)
+    cygheap->pg.init_ldap_user_attr ();
+  attr = group ? group_attr : user_attr;
   srch_id = ldap_search_init_pageW (lh, def_context, LDAP_SCOPE_SUBTREE,
-				    (PWCHAR) filter, sid_attr, 0, NULL, NULL,
+				    (PWCHAR) filter, attr, 0, NULL, NULL,
 				    INFINITE, CYG_LDAP_ENUM_PAGESIZE, NULL);
   if (srch_id == NULL)
     {
@@ -507,25 +534,25 @@ cyg_ldap::next_account (cygsid &sid)
   ULONG ret;
   PLDAP_BERVAL *bval;
 
-  if (srch_entry)
+  if (entry)
     {
-      if ((srch_entry = ldap_next_entry (lh, srch_entry))
-	  && (bval = ldap_get_values_lenW (lh, srch_entry, sid_attr[0])))
+      if ((entry = ldap_next_entry (lh, entry))
+	  && (bval = ldap_get_values_lenW (lh, entry, (PWCHAR) L"objectSid")))
 	{
-	  sid = (PSID) bval[0]->bv_val;
+	  last_fetched_sid = sid = (PSID) bval[0]->bv_val;
 	  ldap_value_free_len (bval);
 	  return NO_ERROR;
 	}
-      ldap_msgfree (srch_msg);
-      srch_msg = srch_entry = NULL;
+      ldap_msgfree (msg);
+      msg = entry = NULL;
     }
   ret = next_page ();
   if (ret == NO_ERROR)
     {
-      if ((srch_entry = ldap_first_entry (lh, srch_msg))
-	  && (bval = ldap_get_values_lenW (lh, srch_entry, sid_attr[0])))
+      if ((entry = ldap_first_entry (lh, msg))
+	  && (bval = ldap_get_values_lenW (lh, entry, (PWCHAR) L"objectSid")))
 	{
-	  sid = (PSID) bval[0]->bv_val;
+	  last_fetched_sid = sid = (PSID) bval[0]->bv_val;
 	  ldap_value_free_len (bval);
 	  return NO_ERROR;
 	}
@@ -574,33 +601,7 @@ cyg_ldap::fetch_posix_offset_for_domain (PCWSTR domain)
       debug_printf ("No entry for %W in def_context %W", filter, def_context);
       return UINT32_MAX;
     }
-  return get_num_attribute (0);
-}
-
-PWCHAR
-cyg_ldap::get_string_attribute (PCWSTR name)
-{
-  if (val)
-    ldap_value_freeW (val);
-  val = ldap_get_valuesW (lh, entry, (PWCHAR) name);
-  if (val)
-    return val[0];
-  return NULL;
-}
-
-PWCHAR
-cyg_ldap::get_string_attribute (int idx)
-{
-  return get_string_attribute (attr[idx]);
-}
-
-uint32_t
-cyg_ldap::get_num_attribute (int idx)
-{
-  PWCHAR ret = get_string_attribute (attr[idx]);
-  if (ret)
-    return (uint32_t) wcstoul (ret, NULL, 10);
-  return (uint32_t) -1;
+  return get_num_attribute (tdom_attr[0]);
 }
 
 #define UXID_FILTER_GRP L"(&(objectClass=Group)" \
@@ -625,7 +626,7 @@ cyg_ldap::fetch_unix_sid_from_ad (uint32_t id, cygsid &sid, bool group)
   if (search (def_context, LDAP_SCOPE_SUBTREE, filter, sid_attr) != 0)
     return false;
   if ((entry = ldap_first_entry (lh, msg))
-      && (bval = ldap_get_values_lenW (lh, entry, sid_attr[0])))
+      && (bval = ldap_get_values_lenW (lh, entry, (PWCHAR) L"objectSid")))
     {
       sid = (PSID) bval[0]->bv_val;
       ldap_value_free_len (bval);
@@ -664,7 +665,7 @@ cyg_ldap::fetch_unix_name_from_rfc2307 (uint32_t id, bool group)
       debug_printf ("No entry for %W in def_context %W", filter, def_context);
       return NULL;
     }
-  return get_string_attribute (0);
+  return get_string_attribute (attr[0]);
 }
 
 uid_t
