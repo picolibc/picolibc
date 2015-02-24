@@ -7,6 +7,8 @@ What's new:
 What changed:
 -------------
 
+- Performance improvements of the new account DB handling.
+
 
 Bug Fixes
 ---------
@@ -38,3 +40,6 @@ Bug Fixes
 
 - 64 bit: Avoid misbehaviour in signal mask computation.
   Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00665.html
+
+- Avoid data loss on non-blocking pipes after switching back to blocking.
+  Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00575.html

@@ -1,7 +1,7 @@
 /* fhandler.cc.  See console.cc for fhandler_console functions.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -205,6 +205,8 @@ fhandler_base::set_flags (int flags, int supplied_bin)
     bin = wbinary () || rbinary () ? O_BINARY : O_TEXT;
 
   openflags = flags | bin;
+  if (openflags & O_NONBLOCK)
+    was_nonblocking (true);
 
   bin &= O_BINARY;
   rbinary (bin ? true : false);
@@ -1242,8 +1244,13 @@ fhandler_base_overlapped::close ()
   int res;
   int writer = (get_access () & GENERIC_WRITE);
   /* Need to treat non-blocking I/O specially because Windows appears to
-     be brain-dead  */
-  if (writer && is_nonblocking () && has_ongoing_io ())
+     be brain-dead.  We're checking here if the descriptor was ever set
+     to nonblocking, rather than checking if it's nonblocking at close time.
+     The reason is that applications may switch back to blocking (for the
+     sake of some other application accessing this descriptor) without
+     performaing any further I/O.  These applications would suffer data
+     loss, which this workaround is trying to fix. */
+  if (writer && was_nonblocking () && has_ongoing_io ())
     {
       clone (HEAP_3_FHANDLER)->check_later ();
       res = 0;
@@ -1629,6 +1636,8 @@ fhandler_base::set_nonblocking (int yes)
   int current = openflags & O_NONBLOCK_MASK;
   int new_flags = yes ? (!current ? O_NONBLOCK : current) : 0;
   openflags = (openflags & ~O_NONBLOCK_MASK) | new_flags;
+  if (new_flags)
+    was_nonblocking (true);
 }
 
 int

@@ -1,3 +1,13 @@
+2015-02-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_base): Add was_nonblocking status flag.
+	* fhandler.cc (fhandler_base::set_flags): Set was_nonblocking if the
+	O_NONBLOCK flag has been specified.
+	(fhandler_base_overlapped::close): Check for was_nonblocking instead
+	of for is_nonblocking.  Explain why.
+	(fhandler_base::set_nonblocking): Set was_nonblocking if noblocking
+	mode gets enabled.
+
 2015-02-24  Ken Brown  <kbrown@cornell.edu>
 
 	* include/sys/socket.h (sockatmark): Add prototype.

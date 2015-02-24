@@ -149,12 +149,16 @@ class fhandler_base
     unsigned need_fork_fixup    : 1; /* Set if need to fixup after fork. */
     unsigned isclosed		: 1; /* Set when fhandler is closed. */
     unsigned mandatory_locking	: 1; /* Windows mandatory locking */
+    unsigned was_nonblocking	: 1; /* Set when setting O_NONBLOCK.  Never
+					reset.  This is for the sake of
+					fhandler_base_overlapped::close. */
 
    public:
     status_flags () :
       rbinary (0), rbinset (0), wbinary (0), wbinset (0), nohandle (0),
       did_lseek (0), query_open (no_query), close_on_exec (0),
-      need_fork_fixup (0), isclosed (0), mandatory_locking (0)
+      need_fork_fixup (0), isclosed (0), mandatory_locking (0),
+      was_nonblocking (0)
       {}
   } status, open_status;
 
@@ -250,6 +254,7 @@ class fhandler_base
   IMPLEMENT_STATUS_FLAG (bool, need_fork_fixup)
   IMPLEMENT_STATUS_FLAG (bool, isclosed)
   IMPLEMENT_STATUS_FLAG (bool, mandatory_locking)
+  IMPLEMENT_STATUS_FLAG (bool, was_nonblocking)
 
   int get_default_fmode (int flags);
 
